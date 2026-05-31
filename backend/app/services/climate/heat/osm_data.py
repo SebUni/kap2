@@ -109,6 +109,10 @@ def _overpass_query(query_body: str, _retries: int = 5) -> dict:
                 resp = client.post(
                     settings.OVERPASS_URL,
                     data={"data": full_query},
+                    headers={
+                        "User-Agent": settings.NOMINATIM_USER_AGENT,
+                        "Accept": "application/json",
+                    },
                 )
                 resp.raise_for_status()
                 raw_bytes = len(resp.content)

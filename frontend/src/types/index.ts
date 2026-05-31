@@ -20,13 +20,6 @@ export interface KommuneSearchResult {
   geojson?: Record<string, unknown>
 }
 
-export interface GridCell {
-  id: number
-  row: number
-  col: number
-  cell_size_m: number
-}
-
 export interface StepHistoryEntry {
   label: string
   detail: string
@@ -37,13 +30,11 @@ export interface StepHistoryEntry {
 }
 
 export interface AssessmentStatus {
-  climate_type: string
-  level: number
+  status: 'pending' | 'running' | 'done' | 'error' | null
   progress_pct: number
-  status: 'pending' | 'running' | 'done' | 'error'
-  message?: string
-  started_at?: string
-  finished_at?: string
+  message?: string | null
+  started_at?: string | null
+  finished_at?: string | null
   step_history: StepHistoryEntry[]
   eta_seconds?: number | null
 }
@@ -68,31 +59,25 @@ export interface Measure {
   created_at: string
 }
 
-export interface MeasureImpact {
-  id: number
-  grid_cell_id: number
-  indicator_deltas: Record<string, number>
-  costs: Record<string, number>
-  savings: Record<string, number>
-}
-
 export interface MeasureImpactSummary {
   measure_id: number
+  measure_type?: string
   affected_cells: number
   affected_area_m2?: number
-  total_indicator_deltas: Record<string, number>
-  total_costs: Record<string, number>
-  total_savings: Record<string, number>
+  linked_risk_codes?: string[]
+  avg_index_reduction_pct?: number
+  investment_eur?: number
+  annual_maintenance_eur?: number
+  annual_benefit_eur?: number
+  message?: string
 }
 
-export interface MeasureTypeDef {
-  label: string
-  params: { key: string; label: string; type: string; default: number }[]
-}
+// ── GeoJSON ─────────────────────────────────────────────────────────────────
 
 export interface GeoJSONFeatureCollection {
   type: 'FeatureCollection'
   features: GeoJSONFeature[]
+  meta?: LayerMeta
 }
 
 export interface GeoJSONFeature {
@@ -106,48 +91,186 @@ export interface GeoJSONGeometry {
   coordinates: unknown
 }
 
-export interface ClimateTypeInfo {
-  climate_type: string
+export interface LayerMeta {
+  code: string
+  category: LayerCategory
   label: string
-  max_level: number
-  indicators: { key: string; label: string; unit: string; description: string }[]
+  unit: string
+  min: number
+  max: number
+  scale_max?: number
 }
 
-// ── Risk Zone Types ───────────────────────────────────────────────────────────
+// ── Katalog (vom Backend, single source of truth) ───────────────────────────
 
-export interface RiskZone {
-  zone_index: number
-  cell_count: number
-  mean_risk: number
-  max_risk: number
-  area_m2: number
-  climate_type: string
+export type LayerCategory = 'hazards' | 'exposures' | 'vulnerabilities' | 'risks'
+export type GroupKey = 'measures' | 'risks' | 'hazards' | 'exposures' | 'vulnerabilities'
+
+export interface CatalogIndicator {
+  code: string
+  name: string
+  description: string
+  unit: string
+  spatial?: boolean
+  coastal?: boolean
+  norm_min: number
+  norm_max: number
+  proxy: string
+  source: string
+  category?: string
 }
 
-export interface RiskSummary {
-  climate_type: string
-  zone_count: number
-  total_area_m2: number
-  aggregated_risk: number
-  highest_zone_risk: number
+export interface CatalogRisk {
+  code: string
+  name: string
+  description: string
+  outcome_unit: string
+  group: string
+  cost_dimension: string
+  hazards: string[]
+  exposures: string[]
+  vulnerabilities: string[]
+  priority?: number
 }
 
-export interface RiskProjectionYear {
-  year: number
-  rcp45: { zone_count: number; mean_severity: number; max_severity: number; total_cells_at_risk: number }
-  rcp85: { zone_count: number; mean_severity: number; max_severity: number; total_cells_at_risk: number }
+export interface CatalogMeasure {
+  code: string
+  name: string
+  description: string
+  measure_type: string
+  effect_target: string[]
+  linked_risk_codes: string[]
+  default_reduction: number
+  coverage_scaling: string
+  cost_per_m2: number
+  cost_per_unit: number
+  maintenance_per_m2_year: number
+  benefit_per_m2_year: number
+  kang_cluster?: string
+  kang_field?: string
 }
 
-export type RiskProjection = RiskProjectionYear[]
-
-// Climate type display metadata
-export const CLIMATE_TYPE_META: Record<string, { label: string; icon: string; color: string }> = {
-  heat: { label: 'Hitze', icon: '🌡️', color: '#ef4444' },
-  heavy_rain: { label: 'Starkregen', icon: '🌧️', color: '#3b82f6' },
-  river_flood: { label: 'Hochwasser', icon: '🌊', color: '#0ea5e9' },
-  drought: { label: 'Dürre', icon: '🏜️', color: '#f59e0b' },
-  forest_fire: { label: 'Waldbrand', icon: '🌲', color: '#22c55e' },
-  agriculture: { label: 'Landwirtschaft', icon: '🌾', color: '#84cc16' },
-  storms: { label: 'Stürme', icon: '💨', color: '#8b5cf6' },
-  sea_level: { label: 'Meeresspiegel', icon: '🌊', color: '#06b6d4' },
+export interface CategoryDef {
+  code: string
+  label: string
 }
+
+export interface KangField {
+  code: string
+  label: string
+}
+
+export interface KangCluster {
+  code: string
+  label: string
+  fields: KangField[]
+}
+
+export interface KwraGroup {
+  code: string
+  challenge: string
+  label: string
+  color: string
+  description: string
+}
+
+export interface Catalog {
+  groups: KwraGroup[]
+  hazards: CatalogIndicator[]
+  exposures: CatalogIndicator[]
+  vulnerabilities: CatalogIndicator[]
+  risks: CatalogRisk[]
+  measures: CatalogMeasure[]
+  hazard_categories: CategoryDef[]
+  exposure_categories: CategoryDef[]
+  vulnerability_categories: CategoryDef[]
+  kang_clusters: KangCluster[]
+}
+
+// ── Risiko-Histogramm (Verteilung Index-Höhen je Risiko) ─────────────────────
+
+export interface RiskHistogramEntry {
+  name: string
+  group: string
+  outcome_unit: string
+  cost_dimension: string
+  counts: number[]
+  nonzero_cells: number
+  mean_index: number
+  max_index: number
+  outcome: number
+  cost_eur: number
+}
+
+export interface RiskHistogram {
+  total_cells: number
+  bin_labels: string[]
+  bin_centers: number[]
+  bin_width: number
+  risks: Record<string, RiskHistogramEntry>
+}
+
+// ── Aggregierte Risiken / Kosten ─────────────────────────────────────────────
+
+export interface RiskAggregateEntry {
+  index: number
+  max_index: number
+  outcome: number
+  outcome_unit: string
+  cost_eur: number
+  cost_dimension: string
+  group: string
+  name: string
+}
+
+export interface RiskGroupEntry {
+  label: string
+  color: string
+  index: number
+  risk_codes: string[]
+}
+
+export interface RiskAggregate {
+  risks: Record<string, RiskAggregateEntry>
+  groups: Record<string, RiskGroupEntry>
+  cost: {
+    total_eur: number
+    by_risk: {
+      code: string; name: string; cost_eur: number; outcome: number
+      outcome_unit: string; cost_dimension: string; index: number
+    }[]
+  }
+}
+
+export interface CostSummary {
+  damages_base_eur: number
+  damages_with_measures_eur: number
+  damage_reduction_eur: number
+  by_risk: RiskAggregate['cost']['by_risk']
+  measures: {
+    total_investment_eur: number
+    total_annual_maintenance_eur: number
+    total_annual_benefit_eur: number
+    rows: {
+      id: number; name: string; measure_type: string
+      investment_eur: number; annual_maintenance_eur: number; annual_benefit_eur: number
+    }[]
+  }
+}
+
+export interface RiskProjection {
+  years: number[]
+  groups: {
+    code: string; label: string; color: string; base_index: number
+    rcp45: number[]; rcp85: number[]
+  }[]
+  source: string
+}
+
+export const GROUP_ORDER: { key: GroupKey; label: string }[] = [
+  { key: 'measures', label: 'Maßnahmen' },
+  { key: 'risks', label: 'Klimarisiken' },
+  { key: 'hazards', label: 'Klimatreiber' },
+  { key: 'exposures', label: 'Expositionen' },
+  { key: 'vulnerabilities', label: 'Verwundbarkeiten' },
+]

@@ -1,298 +1,367 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useStore } from '../store'
-import { CLIMATE_TYPE_META } from '../types'
-import type { AssessmentStatus } from '../types'
+import InfoTooltip from './InfoTooltip'
 import {
-  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  ResponsiveContainer, Tooltip,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Legend,
 } from 'recharts'
-import RiskOverview from './dashboard/RiskOverview'
-import RiskSection from './dashboard/RiskSection'
-import AssessmentControls from './dashboard/AssessmentControls'
-import ClimateTabs from './dashboard/ClimateTabs'
-import ClimateDetail from './dashboard/ClimateDetail'
-import ImpactSection from './dashboard/ImpactSection'
 
-export default function Dashboard() {
-  const {
-    kommune, assessmentGeoJson, statuses, climateHistory, regionalClimate,
-    climateProjection, measures, riskSummary, activeClimateType,
-    loadStatuses, loadClimateHistory, loadRegionalClimate, loadClimateProjection,
-    loadRiskSummary,
-  } = useStore()
+const LINE_PALETTE = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
 
-  // Climate sub-tab: null = Übersicht, string = specific climate type
-  const [climateTab, setClimateTab] = useState<string | null>(null)
+function AssessmentBar() {
+  const { kommune, status, loadStatus, startAssessment, abortAssessment, loadRiskSummary, loadCostSummary, loadRiskHistogram } = useStore()
+  const [polling, setPolling] = useState(false)
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Load climate data when kommune changes
   useEffect(() => {
     if (!kommune) return
-    loadClimateHistory(kommune.id).catch(() => {})
-    loadRegionalClimate(kommune.id).catch(() => {})
-    loadClimateProjection(kommune.id).catch(() => {})
-    loadStatuses(kommune.id).catch(() => {})
-    loadRiskSummary(kommune.id).catch(() => {})
+    loadStatus(kommune.id).catch(() => {})
   }, [kommune])
 
-  // ── Data for Übersicht charts ─────────────────────────────────────────────
-  const rc = regionalClimate as Record<string, unknown> | null
+  useEffect(() => {
+    if (status?.status === 'running' && !polling) setPolling(true)
+  }, [status?.status])
 
-  const historyData: { year: number; hot_days: number; mean_temp: number; summer_max: number }[] = []
-  if (climateHistory) {
-    const years = (climateHistory.years as number[]) || []
-    const hotDays = (climateHistory.hot_days as number[]) || []
-    const meanTemp = (climateHistory.mean_temp as number[]) || []
-    const summerMax = (climateHistory.summer_max_temp as number[]) || []
-    for (let i = 0; i < years.length; i++) {
-      historyData.push({
-        year: years[i], hot_days: hotDays[i] ?? 0,
-        mean_temp: meanTemp[i] ?? 0, summer_max: summerMax[i] ?? 0,
-      })
-    }
-  }
-
-  type ProjectionRow = {
-    year: number
-    hot_days_hist?: number; mean_temp_hist?: number
-    hot_days_rcp45?: number; hot_days_rcp85?: number
-    mean_temp_rcp45?: number; mean_temp_rcp85?: number
-    tropical_nights_rcp45?: number; tropical_nights_rcp85?: number
-  }
-  const projectionData: ProjectionRow[] = []
-  if (climateProjection || climateHistory) {
-    const rowMap = new Map<number, ProjectionRow>()
-    if (climateHistory) {
-      const years = (climateHistory.years as number[]) || []
-      const hotDays = (climateHistory.hot_days as number[]) || []
-      const meanTemp = (climateHistory.mean_temp as number[]) || []
-      for (let i = 0; i < years.length; i++) {
-        rowMap.set(years[i], { year: years[i], hot_days_hist: hotDays[i], mean_temp_hist: meanTemp[i] })
-      }
-    }
-    if (climateProjection) {
-      const years = (climateProjection.years as number[]) || []
-      const scenarios = climateProjection.scenarios as Record<string, Record<string, unknown>> | undefined
-      if (scenarios) {
-        const rcp45 = scenarios.rcp45 || {}; const rcp85 = scenarios.rcp85 || {}
-        const hd45 = (rcp45.hot_days as number[]) || []; const hd85 = (rcp85.hot_days as number[]) || []
-        const mt45 = (rcp45.mean_temp as number[]) || []; const mt85 = (rcp85.mean_temp as number[]) || []
-        const tn45 = (rcp45.tropical_nights as number[]) || []; const tn85 = (rcp85.tropical_nights as number[]) || []
-        for (let i = 0; i < years.length; i++) {
-          const existing = rowMap.get(years[i]) || { year: years[i] }
-          rowMap.set(years[i], {
-            ...existing,
-            hot_days_rcp45: hd45[i], hot_days_rcp85: hd85[i],
-            mean_temp_rcp45: mt45[i], mean_temp_rcp85: mt85[i],
-            tropical_nights_rcp45: tn45[i], tropical_nights_rcp85: tn85[i],
-          })
+  useEffect(() => {
+    if (!kommune || !polling) return
+    pollRef.current = setInterval(async () => {
+      const st = await loadStatus(kommune.id).catch(() => null)
+      if (st && (st.status === 'done' || st.status === 'error')) {
+        setPolling(false)
+        if (st.status === 'done') {
+          loadRiskSummary(kommune.id).catch(() => {})
+          loadCostSummary(kommune.id).catch(() => {})
+          loadRiskHistogram(kommune.id).catch(() => {})
         }
       }
-    }
-    Array.from(rowMap.keys()).sort((a, b) => a - b).forEach(y => projectionData.push(rowMap.get(y)!))
-  }
+    }, 800)
+    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+  }, [kommune, polling])
 
-  const sortedSummaries = [...riskSummary]
-    .filter(s => s.climate_type !== 'health')
-    .sort((a, b) => b.aggregated_risk - a.aggregated_risk)
-
-  const measureLabelsMap: Record<string, string> = {
-    drinking_fountain: 'Trinkbrunnen', green_roof: 'Dachbegrünung',
-    facade_greening: 'Fassadenbegrünung', tree_planting: 'Baumpflanzung',
-    unsealing: 'Entsiegelung', shade_structure: 'Verschattung',
-  }
-  const typeColors: Record<string, string> = {
-    drinking_fountain: '#3b82f6', green_roof: '#22c55e', facade_greening: '#10b981',
-    tree_planting: '#84cc16', unsealing: '#f59e0b', shade_structure: '#8b5cf6',
-  }
+  if (!kommune) return null
+  const running = status?.status === 'running'
 
   return (
-    <div className="dashboard-grid">
-      {/* ── Climate Tab Navigation ─────────────────────────────────── */}
-      <ClimateTabs activeTab={climateTab} onTabChange={setClimateTab} />
-
-      {/* ── Per-Type Detail View ───────────────────────────────────── */}
-      {climateTab !== null ? (
-        <ClimateDetail climateType={climateTab} />
-      ) : (
-        /* ── Übersicht Content ───────────────────────────────────── */
-        <>
-          {/* Assessment Controls (overview mode with "Alle berechnen") */}
-          <AssessmentControls showAllButton />
-
-          {/* Risk Overview (Radar + Top 3) */}
-          <RiskOverview />
-
-          {/* Per-Risk Sections */}
-          {sortedSummaries.length > 0 && (
-            <div className="dashboard-section">
-              <h3 className="section-title">Einzelrisiken</h3>
-              {sortedSummaries.map(s => (
-                <RiskSection
-                  key={s.climate_type}
-                  summary={s}
-                  status={statuses.find(st => st.climate_type === s.climate_type) as AssessmentStatus | undefined}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Regional Climate Info */}
-          {rc && (
-            <div className="dashboard-section">
-              <h3 className="section-title">Regionale Klimadaten (DWD)</h3>
-              <div className="kpi-row">
-                <div className="kpi-card">
-                  <div className="kpi-label">Heiße Tage/Jahr</div>
-                  <div className="kpi-value accent">{(rc.hot_days_per_year as number)?.toFixed(1)}</div>
-                  <div className="kpi-unit">Tmax ≥ 30°C</div>
-                </div>
-                <div className="kpi-card">
-                  <div className="kpi-label">Sommertage/Jahr</div>
-                  <div className="kpi-value">{(rc.summer_days_per_year as number)?.toFixed(0)}</div>
-                  <div className="kpi-unit">Tmax ≥ 25°C</div>
-                </div>
-                <div className="kpi-card">
-                  <div className="kpi-label">Tropenächte/Jahr</div>
-                  <div className="kpi-value">{(rc.tropical_nights_per_year as number)?.toFixed(1)}</div>
-                  <div className="kpi-unit">Tmin ≥ 20°C</div>
-                </div>
-                <div className="kpi-card">
-                  <div className="kpi-label">Sommer-Ø Tmax</div>
-                  <div className="kpi-value">{(rc.summer_max_temp_avg as number)?.toFixed(1)}°C</div>
-                  <div className="kpi-unit">Referenztemperatur</div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Climate Charts */}
-          <div className="dashboard-charts">
-            {historyData.length > 0 && (
-              <div className="chart-card">
-                <h3 className="chart-title">Heiße Tage pro Jahr (ab 1990)</h3>
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={historyData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6 }} />
-                    <Bar dataKey="hot_days" name="Heiße Tage (≥30°C)" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-            {historyData.length > 0 && (
-              <div className="chart-card">
-                <h3 className="chart-title">Temperaturentwicklung (ab 1990)</h3>
-                <ResponsiveContainer width="100%" height={220}>
-                  <LineChart data={historyData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} domain={['auto', 'auto']} />
-                    <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6 }} />
-                    <Legend wrapperStyle={{ fontSize: '0.75rem' }} />
-                    <Line type="monotone" dataKey="mean_temp" name="Jahresmittel (°C)" stroke="#2563eb" strokeWidth={2} dot={false} />
-                    <Line type="monotone" dataKey="summer_max" name="Sommer Ø Tmax (°C)" stroke="#ef4444" strokeWidth={2} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
+    <div className="dashboard-section" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+      <div style={{ flex: 1, minWidth: 200 }}>
+        <h2 className="dashboard-title" style={{ margin: 0, fontSize: '1.05rem' }}>Klimarisiko-Analyse</h2>
+        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>
+          {status?.status === 'done' ? '✓ Berechnung abgeschlossen'
+            : running ? (status?.message || 'Berechnung läuft …')
+            : status?.status === 'error' ? `✕ ${status?.message || 'Fehler'}`
+            : 'Noch keine Berechnung – Klimatreiber, Expositionen, Verwundbarkeiten & Risiken pro 100m-Zelle.'}
+        </div>
+        {running && (
+          <div className="progress-bar" style={{ marginTop: 6 }}>
+            <div className="fill" style={{ width: `${status?.progress_pct || 0}%` }} />
           </div>
+        )}
+      </div>
+      {running ? (
+        <button className="btn btn-danger btn-sm" onClick={() => kommune && abortAssessment(kommune.id)}>✕ Abbrechen</button>
+      ) : (
+        <button className="btn btn-primary btn-sm" onClick={() => { if (kommune) { setPolling(true); startAssessment(kommune.id) } }}>
+          ▶ Berechnen
+        </button>
+      )}
+    </div>
+  )
+}
 
-          {/* Climate Projection */}
-          {projectionData.length > 0 && (
-            <div className="dashboard-section">
-              <h3 className="section-title">Klimafortschreibung (bis 2065)</h3>
-              <div className="dashboard-charts">
-                <div className="chart-card">
-                  <h3 className="chart-title">Heiße Tage – Fortschreibung</h3>
-                  <ResponsiveContainer width="100%" height={220}>
-                    <LineChart data={projectionData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-                      <YAxis tick={{ fontSize: 10 }} />
-                      <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6 }} />
-                      <Legend wrapperStyle={{ fontSize: '0.75rem' }} />
-                      <Line type="monotone" dataKey="hot_days_hist" name="Historisch" stroke="#64748b" strokeWidth={2} dot={false} />
-                      <Line type="monotone" dataKey="hot_days_rcp45" name="RCP 4.5" stroke="#f59e0b" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                      <Line type="monotone" dataKey="hot_days_rcp85" name="RCP 8.5" stroke="#ef4444" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="chart-card">
-                  <h3 className="chart-title">Jahresmitteltemperatur – Fortschreibung</h3>
-                  <ResponsiveContainer width="100%" height={220}>
-                    <LineChart data={projectionData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-                      <YAxis tick={{ fontSize: 10 }} domain={['auto', 'auto']} />
-                      <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6 }} />
-                      <Legend wrapperStyle={{ fontSize: '0.75rem' }} />
-                      <Line type="monotone" dataKey="mean_temp_hist" name="Historisch" stroke="#64748b" strokeWidth={2} dot={false} />
-                      <Line type="monotone" dataKey="mean_temp_rcp45" name="RCP 4.5" stroke="#2563eb" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                      <Line type="monotone" dataKey="mean_temp_rcp85" name="RCP 8.5" stroke="#ef4444" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          )}
+export default function Dashboard() {
+  const { kommune, catalog, riskSummary, costSummary, riskHistogram, status, loadCatalog, loadRiskSummary, loadCostSummary, loadRiskHistogram } = useStore()
 
-          {/* Measure timeline */}
-          {measures.length > 0 && (() => {
-            const yearMap = new Map<number, { type: string; count: number }[]>()
-            for (const m of measures) {
-              const yr = m.implementation_year || 2026
-              if (!yearMap.has(yr)) yearMap.set(yr, [])
-              const group = yearMap.get(yr)!
-              const existing = group.find(g => g.type === m.measure_type)
-              if (existing) existing.count++
-              else group.push({ type: m.measure_type, count: 1 })
-            }
-            const years = Array.from(yearMap.keys()).sort((a, b) => a - b)
-            const minYear = Math.min(...years) - 1
-            const maxYear = Math.max(...years, 2035) + 1
-            const allTypes = [...new Set(measures.map(m => m.measure_type))]
-            const timelineData: Record<string, number | string>[] = []
-            for (let yr = minYear; yr <= maxYear; yr++) {
-              const row: Record<string, number | string> = { year: yr }
-              const groups = yearMap.get(yr)
-              if (groups) for (const g of groups) row[g.type] = g.count
-              timelineData.push(row)
-            }
-            return (
-              <div className="dashboard-section">
-                <h3 className="section-title">Maßnahmen-Zeitplan</h3>
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={timelineData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
-                    <Tooltip
-                      contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6 }}
-                      formatter={(value: unknown, name: unknown) => [String(value), measureLabelsMap[String(name)] || String(name)]}
-                    />
-                    <Legend wrapperStyle={{ fontSize: '0.75rem' }} formatter={(v: string) => measureLabelsMap[v] || v} />
-                    {allTypes.map(t => (
-                      <Bar key={t} dataKey={t} stackId="measures" fill={typeColors[t] || '#94a3b8'} radius={[2, 2, 0, 0]} />
-                    ))}
-                  </BarChart>
+  useEffect(() => { loadCatalog().catch(() => {}) }, [])
+  useEffect(() => {
+    if (!kommune || status?.status !== 'done') return
+    loadRiskSummary(kommune.id).catch(() => {})
+    loadCostSummary(kommune.id).catch(() => {})
+    loadRiskHistogram(kommune.id).catch(() => {})
+  }, [kommune, status?.status])
+
+  const fmtEur = (v: number) => v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+
+  // ── Summary spider: 5 KWRA groups ────────────────────────────────────────
+  const groupOrder = catalog?.groups.map(g => g.code) || []
+  const groupRadar = groupOrder
+    .filter(code => riskSummary?.groups[code])
+    .map(code => ({
+      group: riskSummary!.groups[code].label,
+      index: riskSummary!.groups[code].index,
+    }))
+
+  return (
+    <div className="dashboard-grid" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <AssessmentBar />
+
+      {status?.status === 'done' && riskSummary ? (
+        <>
+          {/* ── ZUSAMMENFASSUNG ──────────────────────────────────────── */}
+          <section className="dashboard-section">
+            <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              Zusammenfassung
+              <InfoTooltip title="Übergreifende Metrik"
+                description="Risikogruppen-Index = Mittelwert der normalisierten Einzelrisiko-Indizes (0–100) je KWRA-Herausforderung. Macht die fünf Herausforderungen vergleichbar." />
+            </h2>
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+              <div className="chart-card" style={{ flex: '1 1 360px', minHeight: 320 }}>
+                <h3 className="chart-title">Risikogruppen (Index 0–100)</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <RadarChart data={groupRadar} outerRadius="70%">
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="group" tick={{ fontSize: 11 }} />
+                    <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 9 }} />
+                    <Radar name="Risiko-Index" dataKey="index" stroke="#ef4444" fill="#ef4444" fillOpacity={0.4} />
+                    <Tooltip />
+                  </RadarChart>
                 </ResponsiveContainer>
               </div>
-            )
-          })()}
 
-          {/* Impact Overview (aggregated – only shown after IST calculation) */}
-          <ImpactSection />
-
-          {/* Empty state */}
-          {statuses.length === 0 && historyData.length === 0 && sortedSummaries.length === 0 && (
-            <div className="dashboard-empty">
-              <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Keine Analyseergebnisse vorhanden</p>
-              <p>Wählen Sie oben &quot;▶▶ Alle berechnen&quot; um alle Klimarisiken zu berechnen.</p>
+              <div className="chart-card" style={{ flex: '1 1 280px' }}>
+                <h3 className="chart-title">Kostenzusammenfassung</h3>
+                <div className="kpi-row" style={{ flexDirection: 'column', gap: 8 }}>
+                  <div className="kpi-card">
+                    <div className="kpi-label">Erwartete Schäden (Basis)</div>
+                    <div className="kpi-value accent" style={{ fontSize: '1.1rem' }}>
+                      {fmtEur(riskSummary.cost.total_eur)}<span className="kpi-unit"> /Jahr</span>
+                    </div>
+                  </div>
+                  {costSummary && (
+                    <>
+                      <div className="kpi-card">
+                        <div className="kpi-label">Mit Maßnahmen</div>
+                        <div className="kpi-value" style={{ fontSize: '1.1rem' }}>
+                          {fmtEur(costSummary.damages_with_measures_eur)}<span className="kpi-unit"> /Jahr</span>
+                        </div>
+                      </div>
+                      <div className="kpi-card">
+                        <div className="kpi-label">Vermiedene Schäden</div>
+                        <div className="kpi-value success" style={{ fontSize: '1.1rem' }}>
+                          {fmtEur(costSummary.damage_reduction_eur)}<span className="kpi-unit"> /Jahr</span>
+                        </div>
+                      </div>
+                      <div className="kpi-card">
+                        <div className="kpi-label">Maßnahmen-Investition</div>
+                        <div className="kpi-value" style={{ fontSize: '1.1rem' }}>
+                          {fmtEur(costSummary.measures.total_investment_eur)}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
+          </section>
+
+          {/* ── RISIKEN: Spinne je KWRA-Gruppe ───────────────────────── */}
+          <section className="dashboard-section">
+            <h2 className="section-title">Risiken</h2>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              {groupOrder.map(code => {
+                const g = riskSummary.groups[code]
+                if (!g || !g.risk_codes.length) return null
+                const data = g.risk_codes.map(rc => ({
+                  risk: riskSummary.risks[rc]?.name || rc,
+                  index: riskSummary.risks[rc]?.index || 0,
+                }))
+                const grpDef = catalog?.groups.find(x => x.code === code)
+                return (
+                  <div key={code} className="chart-card" style={{ flex: '1 1 340px', minHeight: 320 }}>
+                    <h3 className="chart-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ color: g.color }}>●</span> {g.label}
+                      {grpDef && <InfoTooltip title={g.label} description={grpDef.description} />}
+                    </h3>
+                    <ResponsiveContainer width="100%" height={280}>
+                      <RadarChart data={data} outerRadius="65%">
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="risk" tick={{ fontSize: 9 }} />
+                        <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8 }} />
+                        <Radar name="Index" dataKey="index" stroke={g.color} fill={g.color} fillOpacity={0.4} />
+                        <Tooltip />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+
+          {/* ── RISIKOVERTEILUNG ─────────────────────────────────────── */}
+          {riskHistogram && (
+            <section className="dashboard-section">
+              <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                Risikoverteilung
+                <InfoTooltip title="Häufigkeit der Risiko-Index-Höhen"
+                  description="Zeigt, in wie vielen 100m-Zellen ein Risiko welche Index-Höhe (0–100, 20 Klassen à 5) erreicht. Wenige Zellen mit hohem Index → punktuelle Maßnahmen; viele Zellen mit hohem Index → flächendeckender Handlungsbedarf." />
+              </h2>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                {groupOrder.map(code => {
+                  const g = riskSummary.groups[code]
+                  if (!g || !g.risk_codes.length) return null
+                  const risksInGroup = g.risk_codes.filter(rc => riskHistogram.risks[rc])
+                  if (!risksInGroup.length) return null
+                  const data = riskHistogram.bin_labels.map((label, i) => {
+                    const row: Record<string, number | string> = { bin: label }
+                    risksInGroup.forEach(rc => {
+                      row[riskHistogram.risks[rc].name] = riskHistogram.risks[rc].counts[i]
+                    })
+                    return row
+                  })
+                  return (
+                    <div key={code} className="chart-card" style={{ flex: '1 1 460px', minWidth: 360 }}>
+                      <h3 className="chart-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ color: g.color }}>●</span> {g.label}
+                      </h3>
+                      <ResponsiveContainer width="100%" height={260}>
+                        <LineChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                          <XAxis dataKey="bin" tick={{ fontSize: 9 }} interval={1} />
+                          <YAxis tick={{ fontSize: 9 }} allowDecimals={false}
+                            label={{ value: 'Zellen', angle: -90, position: 'insideLeft', fontSize: 10 }} />
+                          <Tooltip wrapperStyle={{ fontSize: 11 }} />
+                          <Legend wrapperStyle={{ fontSize: 10 }} />
+                          {risksInGroup.map((rc, idx) => (
+                            <Line key={rc} type="monotone" dataKey={riskHistogram.risks[rc].name}
+                              stroke={LINE_PALETTE[idx % LINE_PALETTE.length]} strokeWidth={2} dot={false} />
+                          ))}
+                        </LineChart>
+                      </ResponsiveContainer>
+
+                      {/* Ausklappbare Absolutwerte je Risiko */}
+                      <div style={{ marginTop: 8 }}>
+                        {risksInGroup.map(rc => {
+                          const r = riskHistogram.risks[rc]
+                          return (
+                            <details key={rc} style={{ borderTop: '1px solid var(--border)', padding: '4px 0' }}>
+                              <summary style={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500 }}>
+                                {r.name}
+                              </summary>
+                              <div style={{ padding: '6px 4px' }}>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
+                                  <div className="kpi-card" style={{ flex: '1 1 110px' }}>
+                                    <div className="kpi-label">Ø Index</div>
+                                    <div className="kpi-value" style={{ fontSize: '0.95rem' }}>{r.mean_index.toFixed(1)}</div>
+                                  </div>
+                                  <div className="kpi-card" style={{ flex: '1 1 110px' }}>
+                                    <div className="kpi-label">Max. Index</div>
+                                    <div className="kpi-value" style={{ fontSize: '0.95rem' }}>{r.max_index.toFixed(1)}</div>
+                                  </div>
+                                  <div className="kpi-card" style={{ flex: '1 1 110px' }}>
+                                    <div className="kpi-label">Betroffene Zellen</div>
+                                    <div className="kpi-value" style={{ fontSize: '0.95rem' }}>
+                                      {r.nonzero_cells.toLocaleString('de-DE')}
+                                      <span className="kpi-unit"> / {riskHistogram.total_cells.toLocaleString('de-DE')}</span>
+                                    </div>
+                                  </div>
+                                  <div className="kpi-card" style={{ flex: '1 1 110px' }}>
+                                    <div className="kpi-label">Ergebnis</div>
+                                    <div className="kpi-value" style={{ fontSize: '0.95rem' }}>
+                                      {r.outcome.toLocaleString('de-DE', { maximumFractionDigits: 1 })}
+                                      <span className="kpi-unit"> {r.outcome_unit}</span>
+                                    </div>
+                                  </div>
+                                  {(r.cost_dimension === 'monetary' || r.cost_eur > 0) && (
+                                    <div className="kpi-card" style={{ flex: '1 1 110px' }}>
+                                      <div className="kpi-label">Schaden/Jahr</div>
+                                      <div className="kpi-value accent" style={{ fontSize: '0.95rem' }}>{fmtEur(r.cost_eur)}</div>
+                                    </div>
+                                  )}
+                                </div>
+                                <table className="data-table" style={{ fontSize: '0.74rem' }}>
+                                  <thead>
+                                    <tr><th>Index-Klasse</th><th style={{ textAlign: 'right' }}>Zellen</th><th style={{ textAlign: 'right' }}>Anteil</th></tr>
+                                  </thead>
+                                  <tbody>
+                                    {riskHistogram.bin_labels.map((label, i) => {
+                                      const cnt = r.counts[i]
+                                      if (cnt === 0) return null
+                                      const pct = riskHistogram.total_cells > 0 ? (cnt / riskHistogram.total_cells) * 100 : 0
+                                      return (
+                                        <tr key={label}>
+                                          <td>{label}</td>
+                                          <td style={{ textAlign: 'right' }}>{cnt.toLocaleString('de-DE')}</td>
+                                          <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>{pct.toFixed(1)} %</td>
+                                        </tr>
+                                      )
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </details>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
           )}
+
+          {/* ── KOSTEN ───────────────────────────────────────────────── */}
+          <section className="dashboard-section">
+            <h2 className="section-title">Kosten</h2>
+            <div className="chart-card">
+              <h3 className="chart-title">Erwartete Schäden je Risiko</h3>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Risiko</th>
+                    <th style={{ textAlign: 'right' }}>Index</th>
+                    <th style={{ textAlign: 'right' }}>Ergebnis</th>
+                    <th style={{ textAlign: 'right' }}>Schaden/Jahr</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(costSummary?.by_risk || riskSummary.cost.by_risk).slice(0, 20).map(r => (
+                    <tr key={r.code}>
+                      <td style={{ fontWeight: 500 }}>{r.name}</td>
+                      <td style={{ textAlign: 'right' }}>{r.index.toFixed(1)}</td>
+                      <td style={{ textAlign: 'right', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        {r.outcome.toLocaleString('de-DE', { maximumFractionDigits: 1 })} {r.outcome_unit}
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        {r.cost_dimension === 'monetary' || r.cost_eur > 0 ? fmtEur(r.cost_eur) : '–'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {costSummary && costSummary.measures.rows.length > 0 && (
+              <div className="chart-card" style={{ marginTop: '1rem' }}>
+                <h3 className="chart-title">Maßnahmen – Investition & Nutzen</h3>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Maßnahme</th>
+                      <th style={{ textAlign: 'right' }}>Investition</th>
+                      <th style={{ textAlign: 'right' }}>Unterhalt/Jahr</th>
+                      <th style={{ textAlign: 'right' }}>Nutzen/Jahr</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {costSummary.measures.rows.map(m => (
+                      <tr key={m.id}>
+                        <td style={{ fontWeight: 500 }}>{m.name}</td>
+                        <td style={{ textAlign: 'right' }}>{fmtEur(m.investment_eur)}</td>
+                        <td style={{ textAlign: 'right' }}>{fmtEur(m.annual_maintenance_eur)}</td>
+                        <td style={{ textAlign: 'right', color: 'var(--success)' }}>{fmtEur(m.annual_benefit_eur)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         </>
+      ) : (
+        <div className="dashboard-empty" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Noch keine Analyseergebnisse</p>
+          <p>Klicken Sie oben auf „▶ Berechnen“, um alle Klimarisiken für die 100m-Zellen zu ermitteln.</p>
+        </div>
       )}
     </div>
   )

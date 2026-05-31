@@ -13,18 +13,6 @@ from app.db.database import Base
 
 # ── Enums ──────────────────────────────────────────────────────────────────────
 
-class ClimateType(str, enum.Enum):
-    HEAT = "heat"
-    HEAVY_RAIN = "heavy_rain"
-    RIVER_FLOOD = "river_flood"
-    DROUGHT = "drought"
-    FOREST_FIRE = "forest_fire"
-    AGRICULTURE = "agriculture"
-    STORMS = "storms"
-    SEA_LEVEL = "sea_level"
-    HEALTH = "health"
-
-
 class AssessmentStatus(str, enum.Enum):
     PENDING = "pending"
     RUNNING = "running"
@@ -47,7 +35,7 @@ class Kommune(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     grid_cells = relationship("GridCell", back_populates="kommune", cascade="all, delete-orphan")
-    assessments = relationship("ClimateAssessment", back_populates="kommune", cascade="all, delete-orphan")
+    assessments = relationship("CellAssessment", back_populates="kommune", cascade="all, delete-orphan")
     config_params = relationship("ConfigParameter", back_populates="kommune", cascade="all, delete-orphan")
     measures = relationship("AdaptationMeasure", back_populates="kommune", cascade="all, delete-orphan")
     project_statuses = relationship("ProjectStatus", back_populates="kommune", cascade="all, delete-orphan")
@@ -67,25 +55,30 @@ class GridCell(Base):
     cell_size_m = Column(Integer, default=100)
 
     kommune = relationship("Kommune", back_populates="grid_cells")
-    assessments = relationship("ClimateAssessment", back_populates="grid_cell", cascade="all, delete-orphan")
+    assessments = relationship("CellAssessment", back_populates="grid_cell", cascade="all, delete-orphan")
     measure_impacts = relationship("MeasureImpact", back_populates="grid_cell", cascade="all, delete-orphan")
 
 
-# ── Climate Assessment ─────────────────────────────────────────────────────────
+# ── Cell Assessment ──────────────────────────────────────────────────────────────
+# Ein Datensatz pro Zelle. ``data`` enthält die komplette KAP3-Bewertung:
+#   {
+#     "hazards":          {CODE: absoluter Wert, ...},
+#     "exposures":        {CODE: absoluter Wert, ...},
+#     "vulnerabilities":  {CODE: absoluter Wert, ...},
+#     "risks":            {CODE: {"index": 0-100, "outcome": float, "cost_eur": float}, ...},
+#     "inputs":           {... Rohgrößen (Versiegelung, ΔT, Bevölkerung, ...) ...}
+#   }
 
-class ClimateAssessment(Base):
-    __tablename__ = "climate_assessments"
+class CellAssessment(Base):
+    __tablename__ = "cell_assessments"
     __table_args__ = (
-        UniqueConstraint("kommune_id", "grid_cell_id", "climate_type", "level",
-                         name="uq_assessment_cell_type_level"),
+        UniqueConstraint("kommune_id", "grid_cell_id", name="uq_cell_assessment"),
     )
 
     id = Column(Integer, primary_key=True, index=True)
     kommune_id = Column(Integer, ForeignKey("kommunen.id", ondelete="CASCADE"), nullable=False)
     grid_cell_id = Column(Integer, ForeignKey("grid_cells.id", ondelete="CASCADE"), nullable=False)
-    climate_type = Column(Enum(ClimateType), nullable=False)
-    level = Column(Integer, nullable=False, default=1)
-    indicators = Column(JSON, default=dict)
+    data = Column(JSON, default=dict)
     calculated_at = Column(DateTime, default=datetime.utcnow)
 
     kommune = relationship("Kommune", back_populates="assessments")
@@ -150,13 +143,13 @@ class MeasureImpact(Base):
 class ProjectStatus(Base):
     __tablename__ = "project_statuses"
     __table_args__ = (
-        UniqueConstraint("kommune_id", "climate_type", "level",
-                         name="uq_status_kommune_type_level"),
+        UniqueConstraint("kommune_id", "task_key", "level",
+                         name="uq_status_kommune_task_level"),
     )
 
     id = Column(Integer, primary_key=True, index=True)
     kommune_id = Column(Integer, ForeignKey("kommunen.id", ondelete="CASCADE"), nullable=False)
-    climate_type = Column(Enum(ClimateType), nullable=False)
+    task_key = Column(String(64), nullable=False, default="assessment")
     level = Column(Integer, nullable=False, default=1)
     progress_pct = Column(Float, default=0.0)
     status = Column(Enum(AssessmentStatus), default=AssessmentStatus.PENDING)
@@ -174,13 +167,13 @@ class ProjectStatus(Base):
 class RiskZone(Base):
     __tablename__ = "risk_zones"
     __table_args__ = (
-        UniqueConstraint("kommune_id", "climate_type", "level", "zone_index",
-                         name="uq_risk_zone_kommune_type_level_idx"),
+        UniqueConstraint("kommune_id", "layer_code", "level", "zone_index",
+                         name="uq_risk_zone_kommune_layer_level_idx"),
     )
 
     id = Column(Integer, primary_key=True, index=True)
     kommune_id = Column(Integer, ForeignKey("kommunen.id", ondelete="CASCADE"), nullable=False)
-    climate_type = Column(Enum(ClimateType), nullable=False)
+    layer_code = Column(String(64), nullable=False)
     level = Column(Integer, nullable=False, default=1)
     zone_index = Column(Integer, nullable=False)
     cell_count = Column(Integer, nullable=False, default=0)

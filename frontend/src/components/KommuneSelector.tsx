@@ -4,7 +4,7 @@ import { api } from '../api/client'
 import type { KommuneSearchResult, Kommune } from '../types'
 
 export default function KommuneSelector() {
-  const { kommune, setKommune, loadGrid, loadStatuses, loadMeasures, loadConfig } = useStore()
+  const { kommune, setKommune, loadGrid, loadStatus, loadMeasures, loadConfig } = useStore()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<KommuneSearchResult[]>([])
   const [open, setOpen] = useState(false)
@@ -47,7 +47,7 @@ export default function KommuneSelector() {
       }
       await Promise.all([
         loadGrid(k.id),
-        loadStatuses(k.id),
+        loadStatus(k.id),
         loadMeasures(k.id),
         loadConfig(k.id),
       ])

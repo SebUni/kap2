@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.models import (
     Kommune, ConfigParameter,
-    ClimateAssessment, GridCell, AdaptationMeasure,
+    CellAssessment, GridCell, AdaptationMeasure,
     MeasureImpact, ProjectStatus, RiskZone,
 )
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
@@ -117,9 +117,9 @@ def reset_kommune(kommune_id: int, db: Session = Depends(get_db)):
             .filter(MeasureImpact.measure_id.in_(measure_ids))\
             .delete(synchronize_session=False)
 
-    # 2. Climate assessments
-    db.query(ClimateAssessment)\
-        .filter(ClimateAssessment.kommune_id == kommune_id)\
+    # 2. Cell assessments
+    db.query(CellAssessment)\
+        .filter(CellAssessment.kommune_id == kommune_id)\
         .delete(synchronize_session=False)
 
     # 3. Risk zones (DB cascades to risk_zone_cells)
@@ -182,54 +182,25 @@ def _estimate_area_km2(shape) -> float:
 
 
 def _set_default_config(db: Session, kommune_id: int):
-    """Set default configuration parameters for a new kommune."""
-    from app.services.climate.registry import get_assessor
-    assessor = get_assessor("heat")
-    if not assessor:
-        return
+    """Set minimal default configuration parameters for a new kommune.
 
-    for param in assessor.get_required_config():
-        existing = db.query(ConfigParameter).filter(
-            ConfigParameter.kommune_id == kommune_id,
-            ConfigParameter.category == param.category,
-            ConfigParameter.key == param.key,
-        ).first()
-        if not existing:
-            db.add(ConfigParameter(
-                kommune_id=kommune_id,
-                category=param.category,
-                key=param.key,
-                value=param.default_value,
-                description=param.description,
-            ))
-
-    # Add cost parameters
-    cost_defaults = [
-        ("costs", "drinking_fountain_unit", 8000, "Kosten pro Trinkbrunnen (€)"),
-        ("costs", "drinking_fountain_annual", 500, "Jährliche Wartung Trinkbrunnen (€)"),
-        ("costs", "green_roof_per_m2", 45, "Kosten Dachbegrünung pro m² (€)"),
-        ("costs", "facade_greening_per_m2", 60, "Kosten Fassadenbegrünung pro m² (€)"),
-        ("costs", "tree_planting_unit", 1200, "Kosten pro Baum inkl. Pflanzung (€)"),
-        ("costs", "tree_annual_maintenance", 80, "Jährliche Baumpflege pro Baum (€)"),
-        ("costs", "unsealing_per_m2", 35, "Kosten Entsiegelung pro m² (€)"),
-        ("costs", "shade_structure_per_m2", 120, "Kosten Verschattung pro m² (€)"),
-        ("savings", "emergency_call_cost", 500, "Kosten pro Notfalleinsatz (€)"),
-        ("savings", "emergency_calls_per_1000_hot_day", 2.0, "Notfalleinsätze pro 1000 Einw. pro Hitzetag"),
-        ("heat", "hot_days_per_year", 20, "Anzahl Hitzetage pro Jahr"),
+    Die fachlichen Annahmen (Koeffizienten, Wirkungsstärken, Kostensätze) liegen
+    fest im Katalog (``app/data/catalog.py``). Hier werden nur überschreibbare
+    Defaults gesetzt, falls später UI-Konfiguration gewünscht ist.
+    """
+    defaults = [
+        ("uhi", "alpha", 6.0, "UHI-Koeffizient α (Albedo & Versiegelung)"),
+        ("uhi", "beta", 2.0, "UHI-Koeffizient β (Gebäudedichte)"),
+        ("uhi", "gamma", 3.5, "UHI-Koeffizient γ (Grünkühlung)"),
+        ("uhi", "delta", 2.0, "UHI-Koeffizient δ (Wasserkühlung)"),
     ]
-    for cat, key, val, desc in cost_defaults:
+    for cat, key, val, desc in defaults:
         existing = db.query(ConfigParameter).filter(
             ConfigParameter.kommune_id == kommune_id,
             ConfigParameter.category == cat,
             ConfigParameter.key == key,
         ).first()
         if not existing:
-            db.add(ConfigParameter(
-                kommune_id=kommune_id,
-                category=cat,
-                key=key,
-                value=val,
-                description=desc,
-            ))
-
+            db.add(ConfigParameter(kommune_id=kommune_id, category=cat, key=key,
+                                   value=val, description=desc))
     db.commit()

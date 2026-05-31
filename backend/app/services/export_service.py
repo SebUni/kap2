@@ -30,8 +30,8 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
     headers = [
         "ID", "Name", "Typ", "Umsetzungsjahr", "Beschreibung",
         "Konfiguration", "Geometrie (WKT)",
-        "Kosten (Invest.)", "Kosten (jährl.)", "Einsparungen (jährl.)",
-        "ΔTemperatur (Σ)", "ΔHitzeindex (Σ)",
+        "Investition (€)", "Wartung/Jahr (€)", "Nutzen/Jahr (€)",
+        "Ø Risiko-Reduktion (Index-Pkt., Σ)",
     ]
     ws.append(headers)
 
@@ -48,8 +48,9 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
         total_savings = sum(
             sum(v for v in imp.savings.values()) for imp in impacts
         )
-        total_dt = sum(imp.indicator_deltas.get("temperature_estimate", 0) for imp in impacts)
-        total_dhi = sum(imp.indicator_deltas.get("heat_stress_index", 0) for imp in impacts)
+        total_didx = sum(
+            sum(v for v in (imp.indicator_deltas or {}).values()) for imp in impacts
+        )
 
         import json
         config_str = json.dumps(m.config or {}, ensure_ascii=False)
@@ -65,8 +66,7 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
             round(total_invest, 2),
             round(total_maint, 2),
             round(total_savings, 2),
-            round(total_dt, 2),
-            round(total_dhi, 2),
+            round(total_didx, 2),
         ])
 
     # ── Sheet 2: Summary ──

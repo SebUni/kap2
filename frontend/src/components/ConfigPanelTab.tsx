@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react'
 import { useStore } from '../store'
 
 export default function ConfigPanelTab() {
-  const { kommune, configParams, loadConfig, updateConfig, statuses, loadStatuses } = useStore()
+  const { kommune, configParams, loadConfig, updateConfig, status, loadStatus } = useStore()
   const [edits, setEdits] = useState<Record<string, unknown>>({})
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (kommune) {
       loadConfig(kommune.id)
-      loadStatuses(kommune.id)
+      loadStatus(kommune.id)
     }
   }, [kommune?.id])
 
@@ -50,7 +50,7 @@ export default function ConfigPanelTab() {
     setSaving(false)
   }
 
-  const heatStatus = statuses.find(s => s.climate_type === 'heat')
+  const heatStatus = status
   const isReady = heatStatus?.status === 'done'
   const isRunning = heatStatus?.status === 'running'
 

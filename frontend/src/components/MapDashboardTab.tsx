@@ -1,9 +1,25 @@
+import { useEffect } from 'react'
 import { useStore } from '../store'
 import MapView from './MapView'
 import MeasureSidebar from './MeasureSidebar'
+import LayerPanel from './LayerPanel'
 
 export default function MapDashboardTab() {
-  const { kommune, selectedMeasure } = useStore()
+  const { kommune, selectedMeasure, catalog, loadCatalog, loadMeasures, activeLayer, setActiveLayer } = useStore()
+
+  useEffect(() => { loadCatalog().catch(() => {}) }, [])
+
+  useEffect(() => {
+    if (!kommune) return
+    loadMeasures(kommune.id).catch(() => {})
+  }, [kommune])
+
+  // Default to first risk layer once catalog is available
+  useEffect(() => {
+    if (catalog && !activeLayer && catalog.risks.length > 0) {
+      setActiveLayer({ category: 'risks', code: catalog.risks[0].code }).catch(() => {})
+    }
+  }, [catalog])
 
   if (!kommune) {
     return (
@@ -22,7 +38,8 @@ export default function MapDashboardTab() {
   }
 
   return (
-    <div className="main-content">
+    <div className="main-content" style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+      <LayerPanel />
       <div className="map-container" style={{ flex: 1, position: 'relative' }}>
         <MapView />
         {selectedMeasure && <MeasureSidebar />}

@@ -15,7 +15,7 @@ const TAB_ROUTES = [
 ]
 
 function AppContent() {
-  const { statuses, kommune, setActiveTab, resetKommune } = useStore()
+  const { hasAssessment, kommune, setActiveTab, resetKommune, loadStatus } = useStore()
   const navigate = useNavigate()
   const location = useLocation()
   const [showConfig, setShowConfig] = useState(false)
@@ -35,7 +35,10 @@ function AppContent() {
     }
   }
 
-  const hasCompletedAssessment = statuses.some(s => s.status === 'done')
+  const hasCompletedAssessment = hasAssessment
+
+  // Load status when kommune changes (drives tab locking)
+  useEffect(() => { if (kommune) loadStatus(kommune.id).catch(() => {}) }, [kommune])
 
   // Sync store activeTab from URL
   const activeIdx = Math.max(0, TAB_ROUTES.findIndex(t => t.path === location.pathname))

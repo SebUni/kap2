@@ -12,9 +12,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json()
 }
 
-// ── Kommune ─────────────────────────────────────────────────────────────
-
 export const api = {
+  // ── Kommune ─────────────────────────────────────────────────────────
   searchKommune: (q: string) =>
     request<Record<string, unknown>[]>(`/kommune/search?q=${encodeURIComponent(q)}`),
 
@@ -24,134 +23,85 @@ export const api = {
       body: JSON.stringify({ osm_id, name, osm_type: osm_type || 'relation', geojson: geojson || null }),
     }),
 
-  getKommune: (id: number) =>
-    request<Record<string, unknown>>(`/kommune/${id}`),
-
-  listKommunen: () =>
-    request<Record<string, unknown>[]>('/kommune'),
+  getKommune: (id: number) => request<Record<string, unknown>>(`/kommune/${id}`),
+  listKommunen: () => request<Record<string, unknown>[]>('/kommune'),
 
   // ── Grid ────────────────────────────────────────────────────────────
-
   generateGrid: (kommuneId: number, cellSizeM = 100) =>
     request<{ cells_created: number }>(`/kommune/${kommuneId}/grid`, {
-      method: 'POST',
-      body: JSON.stringify({ cell_size_m: cellSizeM }),
+      method: 'POST', body: JSON.stringify({ cell_size_m: cellSizeM }),
     }),
+  getGrid: (kommuneId: number) => request<Record<string, unknown>>(`/kommune/${kommuneId}/grid`),
 
-  getGrid: (kommuneId: number) =>
-    request<Record<string, unknown>>(`/kommune/${kommuneId}/grid`),
+  // ── Katalog ─────────────────────────────────────────────────────────
+  getCatalog: () => request<Record<string, unknown>>('/catalog'),
 
   // ── Assessment ──────────────────────────────────────────────────────
-
-  getClimateTypes: () =>
-    request<Record<string, unknown>[]>('/climate-types'),
-
-  startAssessment: (kommuneId: number, climateType = 'heat', level = 1) =>
-    request<Record<string, unknown>>(`/kommune/${kommuneId}/assess`, {
-      method: 'POST',
-      body: JSON.stringify({ climate_type: climateType, level }),
-    }),
-
-  startBatchAssessment: (kommuneId: number, level = 4) =>
-    request<Record<string, unknown>>(`/kommune/${kommuneId}/assess/batch?level=${level}`, {
-      method: 'POST',
-    }),
-
-  abortAssessment: (kommuneId: number, climateType = 'heat', level = 1) =>
-    request<Record<string, unknown>>(`/kommune/${kommuneId}/assess/abort`, {
-      method: 'POST',
-      body: JSON.stringify({ climate_type: climateType, level }),
-    }),
-
+  startAssessment: (kommuneId: number) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/assess`, { method: 'POST' }),
+  abortAssessment: (kommuneId: number) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/assess/abort`, { method: 'POST' }),
   getStatus: (kommuneId: number) =>
-    request<Record<string, unknown>[]>(`/kommune/${kommuneId}/status`),
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/status`),
 
-  getAssessment: (kommuneId: number, climateType: string, level = 1) =>
-    request<Record<string, unknown>>(`/kommune/${kommuneId}/assessment/${climateType}?level=${level}`),
+  getLayer: (kommuneId: number, code: string) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/layer/${code}`),
+  getRiskSummary: (kommuneId: number) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/risk-summary`),
+  getRiskZones: (kommuneId: number, riskCode: string) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/risk-zones/${riskCode}`),
+  getRiskHistogram: (kommuneId: number) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/risk-histogram`),
+  getRiskProjection: (kommuneId: number) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/risk-projection`),
 
   // ── Config ──────────────────────────────────────────────────────────
-
   getConfig: (kommuneId: number) =>
     request<Record<string, unknown>[]>(`/kommune/${kommuneId}/config`),
-
   updateConfig: (kommuneId: number, updates: Record<string, unknown>[]) =>
     request<Record<string, unknown>[]>(`/kommune/${kommuneId}/config`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
+      method: 'PUT', body: JSON.stringify(updates),
     }),
 
   // ── Measures ────────────────────────────────────────────────────────
-
-  getMeasureCatalog: () =>
-    request<Record<string, Record<string, unknown>>>('/measure-catalog'),
-
+  getMeasureCatalog: () => request<Record<string, unknown>[]>('/measure-catalog'),
   createMeasure: (kommuneId: number, data: Record<string, unknown>) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/measures`, {
-      method: 'POST',
-      body: JSON.stringify(data),
+      method: 'POST', body: JSON.stringify(data),
     }),
-
   listMeasures: (kommuneId: number) =>
     request<Record<string, unknown>[]>(`/kommune/${kommuneId}/measures`),
-
-  getMeasure: (id: number) =>
-    request<Record<string, unknown>>(`/measures/${id}`),
-
+  getMeasure: (id: number) => request<Record<string, unknown>>(`/measures/${id}`),
   updateMeasure: (id: number, data: Record<string, unknown>) =>
     request<Record<string, unknown>>(`/measures/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
+      method: 'PUT', body: JSON.stringify(data),
     }),
-
   deleteMeasure: (id: number) =>
     request<Record<string, unknown>>(`/measures/${id}`, { method: 'DELETE' }),
-
   calculateImpact: (measureId: number) =>
-    request<Record<string, unknown>>(`/measures/${measureId}/calculate-impact`, {
-      method: 'POST',
-    }),
-
-  getMeasureImpacts: (measureId: number) =>
-    request<Record<string, unknown>[]>(`/measures/${measureId}/impacts`),
+    request<Record<string, unknown>>(`/measures/${measureId}/calculate-impact`, { method: 'POST' }),
+  getCostSummary: (kommuneId: number) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/cost-summary`),
 
   // ── Export/Import ───────────────────────────────────────────────────
-
-  exportMeasuresUrl: (kommuneId: number) =>
-    `${BASE}/kommune/${kommuneId}/measures/export`,
-
+  exportMeasuresUrl: (kommuneId: number) => `${BASE}/kommune/${kommuneId}/measures/export`,
   importMeasures: async (kommuneId: number, file: File) => {
     const formData = new FormData()
     formData.append('file', file)
-    const res = await fetch(`${BASE}/kommune/${kommuneId}/measures/import`, {
-      method: 'POST',
-      body: formData,
-    })
+    const res = await fetch(`${BASE}/kommune/${kommuneId}/measures/import`, { method: 'POST', body: formData })
     if (!res.ok) throw new Error(`Import failed: ${res.status}`)
     return res.json()
   },
 
-  // ── Climate History ─────────────────────────────────────────────────
-
+  // ── Klimadaten ──────────────────────────────────────────────────────
   getClimateHistory: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/climate-history`),
-
   getRegionalClimate: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/regional-climate`),
-
   getClimateProjection: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/climate-projection`),
 
-  // ── Risk Zones ──────────────────────────────────────────────────────
-
-  getRiskZones: (kommuneId: number, climateType: string, level = 1) =>
-    request<Record<string, unknown>>(`/kommune/${kommuneId}/risk-zones/${climateType}?level=${level}`),
-
-  getRiskSummary: (kommuneId: number) =>
-    request<Record<string, unknown>[]>(`/kommune/${kommuneId}/risk-summary`),
-
-  getRiskProjection: (kommuneId: number, climateType: string, level = 1) =>
-    request<Record<string, unknown>[]>(`/kommune/${kommuneId}/risk-projection/${climateType}?level=${level}`),
-  // ── Reset ────────────────────────────────────────────────────────────────────
-
+  // ── Reset ───────────────────────────────────────────────────────────
   resetKommune: (kommuneId: number) =>
-    request<{ message: string }>(`/kommune/${kommuneId}/reset`, { method: 'POST' }),}
+    request<{ message: string }>(`/kommune/${kommuneId}/reset`, { method: 'POST' }),
+}

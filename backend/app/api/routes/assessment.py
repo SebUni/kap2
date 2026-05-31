@@ -1,130 +1,71 @@
 import logging
 from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from geoalchemy2.shape import to_shape
 from shapely.geometry import mapping
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
+from app.data import catalog
 from app.models.models import (
-    Kommune, ClimateAssessment, GridCell, ProjectStatus, ClimateType,
-    AssessmentStatus,
+    Kommune, CellAssessment, GridCell, ProjectStatus, AssessmentStatus,
 )
-from app.schemas.schemas import AssessmentRequest, AssessmentStatusOut
-from app.tasks.assessment_task import run_assessment_background, abort_assessment, run_batch_assessment_background
-from app.services.climate.registry import list_assessors
+from app.tasks.assessment_task import (
+    run_assessment_background, abort_assessment, TASK_KEY,
+)
+from app.services.measure_service import get_risk_aggregate
 
 log = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/climate-types")
-def get_climate_types():
-    """List all available climate assessor types."""
-    return list_assessors()
+def _layer_category(code: str) -> str | None:
+    if code in catalog.HAZARDS_BY_CODE:
+        return "hazards"
+    if code in catalog.EXPOSURES_BY_CODE:
+        return "exposures"
+    if code in catalog.VULNERABILITIES_BY_CODE:
+        return "vulnerabilities"
+    if code in catalog.RISKS_BY_CODE:
+        return "risks"
+    return None
 
 
 @router.post("/kommune/{kommune_id}/assess")
-def start_assessment(
-    kommune_id: int,
-    req: AssessmentRequest,
-    db: Session = Depends(get_db),
-):
-    """Start a climate assessment calculation in the background."""
-    log.info("[ROUTE] POST /kommune/%s/assess  type=%s level=%s", kommune_id, req.climate_type, req.level)
-    # Check kommune and grid exist
+def start_assessment(kommune_id: int, db: Session = Depends(get_db)):
+    """Startet die vollständige KAP3-Bewertung im Hintergrund."""
     cell_count = db.query(GridCell).filter(GridCell.kommune_id == kommune_id).count()
-    log.info("[ROUTE] Grid cells for kommune %s: %d", kommune_id, cell_count)
     if cell_count == 0:
         raise HTTPException(400, "Keine Grid-Zellen vorhanden. Bitte zuerst Grid generieren.")
 
-    # Immediately set status to RUNNING/0% so the frontend sees it right away
-    # (before the background thread even starts)
-    ct = ClimateType(req.climate_type)
-    ps = (
-        db.query(ProjectStatus)
-        .filter(
-            ProjectStatus.kommune_id == kommune_id,
-            ProjectStatus.climate_type == ct,
-            ProjectStatus.level == req.level,
-        )
-        .first()
-    )
-    if ps:
-        ps.status = AssessmentStatus.RUNNING
-        ps.progress_pct = 0.0
-        ps.message = "Berechnung wird vorbereitet …"
-        ps.started_at = datetime.utcnow()
-        ps.finished_at = None
-    else:
-        ps = ProjectStatus(
-            kommune_id=kommune_id,
-            climate_type=ct,
-            level=req.level,
-            status=AssessmentStatus.RUNNING,
-            progress_pct=0.0,
-            message="Berechnung wird vorbereitet …",
-            started_at=datetime.utcnow(),
-        )
+    ps = (db.query(ProjectStatus)
+          .filter(ProjectStatus.kommune_id == kommune_id, ProjectStatus.task_key == TASK_KEY)
+          .first())
+    if not ps:
+        ps = ProjectStatus(kommune_id=kommune_id, task_key=TASK_KEY, level=1)
         db.add(ps)
+    ps.status = AssessmentStatus.RUNNING
+    ps.progress_pct = 0.0
+    ps.message = "Berechnung wird vorbereitet …"
+    ps.started_at = datetime.utcnow()
+    ps.finished_at = None
     db.commit()
 
-    # Kick off background task
-    run_assessment_background(kommune_id, req.climate_type, req.level)
-
-    return {
-        "message": "Berechnung gestartet",
-        "kommune_id": kommune_id,
-        "climate_type": req.climate_type,
-        "level": req.level,
-    }
-
-
-@router.post("/kommune/{kommune_id}/assess/batch")
-def start_batch_assessment(
-    kommune_id: int,
-    level: int = 4,
-    db: Session = Depends(get_db),
-):
-    """Start all climate assessments sequentially with shared OSM data.
-
-    Pre-fetches OSM data once, then runs each assessor in order.
-    """
-    cell_count = db.query(GridCell).filter(GridCell.kommune_id == kommune_id).count()
-    if cell_count == 0:
-        raise HTTPException(400, "Keine Grid-Zellen vorhanden. Bitte zuerst Grid generieren.")
-
-    run_batch_assessment_background(kommune_id, level)
-
-    return {
-        "message": "Batch-Berechnung gestartet",
-        "kommune_id": kommune_id,
-        "level": level,
-    }
+    run_assessment_background(kommune_id)
+    return {"message": "Berechnung gestartet", "kommune_id": kommune_id}
 
 
 @router.post("/kommune/{kommune_id}/assess/abort")
-def abort_running_assessment(
-    kommune_id: int,
-    req: AssessmentRequest,
-    db: Session = Depends(get_db),
-):
-    """Abort a running climate assessment."""
-    aborted = abort_assessment(kommune_id, req.climate_type, req.level)
+def abort_running_assessment(kommune_id: int, db: Session = Depends(get_db)):
+    aborted = abort_assessment(kommune_id)
     if aborted:
-        # Update status in DB
-        status = (
-            db.query(ProjectStatus)
-            .filter(
-                ProjectStatus.kommune_id == kommune_id,
-                ProjectStatus.climate_type == ClimateType(req.climate_type),
-                ProjectStatus.level == req.level,
-            )
-            .first()
-        )
-        if status:
-            status.status = AssessmentStatus.ERROR
-            status.message = "Berechnung abgebrochen"
+        ps = (db.query(ProjectStatus)
+              .filter(ProjectStatus.kommune_id == kommune_id, ProjectStatus.task_key == TASK_KEY)
+              .first())
+        if ps:
+            ps.status = AssessmentStatus.ERROR
+            ps.message = "Berechnung abgebrochen"
             db.commit()
         return {"message": "Berechnung wird abgebrochen", "aborted": True}
     return {"message": "Keine laufende Berechnung gefunden", "aborted": False}
@@ -132,154 +73,184 @@ def abort_running_assessment(
 
 @router.get("/kommune/{kommune_id}/status")
 def get_status(kommune_id: int, db: Session = Depends(get_db)):
-    """Get the calculation status for a municipality."""
-    statuses = (
-        db.query(ProjectStatus)
-        .filter(ProjectStatus.kommune_id == kommune_id)
-        .all()
-    )
-    return [
-        {
-            "climate_type": s.climate_type.value if s.climate_type else None,
-            "level": s.level,
-            "progress_pct": s.progress_pct,
-            "status": s.status.value if s.status else None,
-            "message": s.message,
-            "started_at": s.started_at.isoformat() if s.started_at else None,
-            "finished_at": s.finished_at.isoformat() if s.finished_at else None,
-            "step_history": s.step_history or [],
-            "eta_seconds": s.eta_seconds,
-        }
-        for s in statuses
-    ]
-
-
-@router.get("/kommune/{kommune_id}/assessment/{climate_type}")
-def get_assessment(
-    kommune_id: int,
-    climate_type: str,
-    level: int = 1,
-    db: Session = Depends(get_db),
-):
-    """Get assessment results as GeoJSON FeatureCollection."""
-    try:
-        ct = ClimateType(climate_type)
-    except ValueError:
-        raise HTTPException(400, f"Unbekannter Klimatyp: {climate_type}")
-
-    assessments = (
-        db.query(ClimateAssessment, GridCell)
-        .join(GridCell, ClimateAssessment.grid_cell_id == GridCell.id)
-        .filter(
-            ClimateAssessment.kommune_id == kommune_id,
-            ClimateAssessment.climate_type == ct,
-            ClimateAssessment.level == level,
-        )
-        .all()
-    )
-
-    features = []
-    for assessment, cell in assessments:
-        shape = to_shape(cell.geometry)
-        features.append({
-            "type": "Feature",
-            "properties": {
-                "grid_cell_id": cell.id,
-                "row": cell.row_idx,
-                "col": cell.col_idx,
-                **assessment.indicators,
-            },
-            "geometry": mapping(shape),
-        })
-
+    ps = (db.query(ProjectStatus)
+          .filter(ProjectStatus.kommune_id == kommune_id, ProjectStatus.task_key == TASK_KEY)
+          .first())
+    if not ps:
+        return {"status": None, "progress_pct": 0.0, "message": None,
+                "step_history": [], "eta_seconds": None}
     return {
-        "type": "FeatureCollection",
-        "features": features,
+        "status": ps.status.value if ps.status else None,
+        "progress_pct": ps.progress_pct,
+        "message": ps.message,
+        "started_at": ps.started_at.isoformat() if ps.started_at else None,
+        "finished_at": ps.finished_at.isoformat() if ps.finished_at else None,
+        "step_history": ps.step_history or [],
+        "eta_seconds": ps.eta_seconds,
     }
 
 
-@router.get("/kommune/{kommune_id}/climate-history")
-def get_climate_history(kommune_id: int, db: Session = Depends(get_db)):
-    """Get historical climate indicator time series (from ~1990) for this municipality's region."""
-    from app.services.climate.dwd_data import get_climate_history as _get_history
+@router.get("/kommune/{kommune_id}/layer/{code}")
+def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
+    """GeoJSON einer einzelnen Ebene (H/E/V-Code oder Risiko-Code).
 
+    Property ``value`` enthält den darzustellenden Wert (absolute Einheit für
+    H/E/V, Index 0..100 für Risiken). ``meta`` liefert Min/Max für die Legende.
+    """
+    category = _layer_category(code)
+    if not category:
+        raise HTTPException(404, f"Unbekannter Code: {code}")
+
+    rows = (
+        db.query(CellAssessment, GridCell)
+        .join(GridCell, CellAssessment.grid_cell_id == GridCell.id)
+        .filter(CellAssessment.kommune_id == kommune_id)
+        .all()
+    )
+    features = []
+    vmin, vmax = None, None
+    for ca, cell in rows:
+        data = ca.data or {}
+        if category == "risks":
+            value = float(data.get("risks", {}).get(code, {}).get("index", 0.0))
+        else:
+            value = float(data.get(category, {}).get(code, 0.0))
+        vmin = value if vmin is None else min(vmin, value)
+        vmax = value if vmax is None else max(vmax, value)
+        features.append({
+            "type": "Feature",
+            "properties": {"grid_cell_id": cell.id, "row": cell.row_idx,
+                           "col": cell.col_idx, "value": round(value, 3)},
+            "geometry": mapping(to_shape(cell.geometry)),
+        })
+
+    meta = {"code": code, "category": category, "min": vmin or 0.0, "max": vmax or 0.0}
+    if category == "risks":
+        r = catalog.RISKS_BY_CODE[code]
+        meta.update({"label": r["name"], "unit": "Index (0-100)", "scale_max": 100.0})
+    else:
+        m = catalog.INDICATOR_BY_CODE[code]
+        meta.update({"label": m["name"], "unit": m["unit"], "scale_max": m.get("norm_max")})
+
+    return {"type": "FeatureCollection", "features": features, "meta": meta}
+
+
+@router.get("/kommune/{kommune_id}/risk-summary")
+def risk_summary(kommune_id: int, db: Session = Depends(get_db)):
+    """Aggregiertes Risiko (Basis, ohne Maßnahmen): Gruppen + Einzelrisiken."""
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    return get_risk_aggregate(db, kommune_id, apply_measures=False)
+
+
+@router.get("/kommune/{kommune_id}/risk-histogram")
+def risk_histogram(kommune_id: int, db: Session = Depends(get_db)):
+    """Häufigkeitsverteilung der Risiko-Index-Höhen je Risiko (20 Bins à 5, 0-100).
+
+    Liefert pro Risiko die Zellanzahl je Index-Klasse plus Outcome-/Index-Kennzahlen.
+    Botschaft: wenige hohe Zellen → punktuelle Maßnahmen; viele hohe → flächendeckend.
+    """
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
 
-    bundesland = kommune.bundesland or None
-    return _get_history(bundesland)
+    N_BINS = 20
+    WIDTH = 5.0  # 0..100
+    bins_labels = [f"{int(i * WIDTH)}-{int((i + 1) * WIDTH)}" for i in range(N_BINS)]
+    bin_centers = [round((i + 0.5) * WIDTH, 1) for i in range(N_BINS)]
+
+    rows = (
+        db.query(CellAssessment)
+        .filter(CellAssessment.kommune_id == kommune_id)
+        .all()
+    )
+    total_cells = len(rows)
+
+    counts: dict[str, list[int]] = {r["code"]: [0] * N_BINS for r in catalog.RISKS}
+    nonzero: dict[str, int] = {r["code"]: 0 for r in catalog.RISKS}
+    for ca in rows:
+        risks = (ca.data or {}).get("risks", {})
+        for code, r in risks.items():
+            if code not in counts:
+                continue
+            idx = float(r.get("index", 0.0))
+            b = min(N_BINS - 1, max(0, int(idx // WIDTH)))
+            counts[code][b] += 1
+            if idx > 0.0:
+                nonzero[code] += 1
+
+    # Outcome/Index-Kennzahlen aus dem Aggregat (mit/ohne Maßnahmen = Basis)
+    agg = get_risk_aggregate(db, kommune_id, apply_measures=False)
+
+    risks_out: dict[str, dict] = {}
+    for risk in catalog.RISKS:
+        code = risk["code"]
+        a = agg["risks"].get(code, {})
+        risks_out[code] = {
+            "name": risk["name"],
+            "group": risk["group"],
+            "outcome_unit": risk["outcome_unit"],
+            "cost_dimension": risk["cost_dimension"],
+            "counts": counts[code],
+            "nonzero_cells": nonzero[code],
+            "mean_index": a.get("index", 0.0),
+            "max_index": a.get("max_index", 0.0),
+            "outcome": a.get("outcome", 0.0),
+            "cost_eur": a.get("cost_eur", 0.0),
+        }
+
+    return {
+        "total_cells": total_cells,
+        "bin_labels": bins_labels,
+        "bin_centers": bin_centers,
+        "bin_width": WIDTH,
+        "risks": risks_out,
+    }
+
+
+@router.get("/kommune/{kommune_id}/risk-zones/{risk_code}")
+def risk_zones(kommune_id: int, risk_code: str, db: Session = Depends(get_db)):
+    from app.services.risk_zone_service import get_risk_zones_geojson
+    if risk_code not in catalog.RISKS_BY_CODE:
+        raise HTTPException(400, f"Unbekannter Risiko-Code: {risk_code}")
+    return get_risk_zones_geojson(db, kommune_id, risk_code)
+
+
+# ── DWD / Klimadaten (unverändert weiterverwendet) ─────────────────────────────
+
+@router.get("/kommune/{kommune_id}/climate-history")
+def get_climate_history(kommune_id: int, db: Session = Depends(get_db)):
+    from app.services.climate.dwd_data import get_climate_history as _h
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    return _h(kommune.bundesland or None)
 
 
 @router.get("/kommune/{kommune_id}/regional-climate")
 def get_regional_climate(kommune_id: int, db: Session = Depends(get_db)):
-    """Get current regional climate summary (hot days, temperatures) from DWD data."""
-    from app.services.climate.dwd_data import get_regional_climate as _get_regional
-
+    from app.services.climate.dwd_data import get_regional_climate as _r
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
-
-    bundesland = kommune.bundesland or "Nordrhein-Westfalen"
-    return _get_regional(bundesland)
+    return _r(kommune.bundesland or "Nordrhein-Westfalen")
 
 
 @router.get("/kommune/{kommune_id}/climate-projection")
 def get_climate_projection_route(kommune_id: int, db: Session = Depends(get_db)):
-    """Get climate projection data (2025–2065) for RCP 4.5 and RCP 8.5."""
     from app.services.climate.dwd_data import get_climate_projection
-
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
-
-    bundesland = kommune.bundesland or None
-    return get_climate_projection(bundesland)
+    return get_climate_projection(kommune.bundesland or None)
 
 
-# ── Risk Zone endpoints ───────────────────────────────────────────────────────
-
-@router.get("/kommune/{kommune_id}/risk-zones/{climate_type}")
-def get_risk_zones(
-    kommune_id: int,
-    climate_type: str,
-    level: int = 1,
-    db: Session = Depends(get_db),
-):
-    """Get risk zones as GeoJSON FeatureCollection for a specific climate type."""
-    from app.services.risk_zone_service import get_risk_zones_geojson
-    try:
-        ClimateType(climate_type)
-    except ValueError:
-        raise HTTPException(400, f"Unbekannter Klimatyp: {climate_type}")
-    return get_risk_zones_geojson(db, kommune_id, climate_type, level)
-
-
-@router.get("/kommune/{kommune_id}/risk-summary")
-def get_risk_summary_route(kommune_id: int, db: Session = Depends(get_db)):
-    """Get aggregated risk summary for all climate types."""
-    from app.services.risk_zone_service import get_risk_summary
+@router.get("/kommune/{kommune_id}/risk-projection")
+def get_risk_projection(kommune_id: int, db: Session = Depends(get_db)):
+    """Projiziert die KWRA-Gruppen-Indizes 2025–2065 (RCP4.5/8.5)."""
+    from app.services.projection_service import project_group_risks
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
-    return get_risk_summary(db, kommune_id)
-
-
-@router.get("/kommune/{kommune_id}/risk-projection/{climate_type}")
-def get_risk_projection(
-    kommune_id: int,
-    climate_type: str,
-    level: int = 1,
-    db: Session = Depends(get_db),
-):
-    """Get risk zone projections (2025-2065) for a specific climate type."""
-    from app.services.projection_service import project_risk_zones
-    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
-    if not kommune:
-        raise HTTPException(404, "Kommune nicht gefunden")
-    try:
-        ClimateType(climate_type)
-    except ValueError:
-        raise HTTPException(400, f"Unbekannter Klimatyp: {climate_type}")
-    bundesland = kommune.bundesland or "Sachsen"
-    return project_risk_zones(db, kommune_id, climate_type, level, bundesland)
+    return project_group_risks(db, kommune_id, kommune.bundesland or "Sachsen")

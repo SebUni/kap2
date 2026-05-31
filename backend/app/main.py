@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import kommune, assessment, measures, config, export
+from app.api.routes import kommune, assessment, measures, config, export, catalog as catalog_route
 
 # ── Logging: stdout + file ────────────────────────────────────────────────────
 LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
@@ -50,6 +50,19 @@ app.include_router(assessment.router, prefix="/api", tags=["Assessment"])
 app.include_router(measures.router, prefix="/api", tags=["Maßnahmen"])
 app.include_router(config.router, prefix="/api", tags=["Konfiguration"])
 app.include_router(export.router, prefix="/api", tags=["Export/Import"])
+app.include_router(catalog_route.router, prefix="/api", tags=["Katalog"])
+
+
+@app.on_event("startup")
+def _ensure_tables():
+    """Stellt sicher, dass alle Tabellen existieren (DB-Reset-freundlich)."""
+    try:
+        from app.db.database import Base, engine
+        import app.models.models  # noqa: F401  (Modelle registrieren)
+        Base.metadata.create_all(bind=engine)
+        logging.getLogger("app").info("DB-Tabellen sichergestellt (create_all)")
+    except Exception as exc:  # pragma: no cover
+        logging.getLogger("app").error("create_all fehlgeschlagen: %s", exc)
 
 
 @app.get("/api/health")
