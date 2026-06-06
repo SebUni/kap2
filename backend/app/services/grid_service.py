@@ -10,20 +10,30 @@ from app.config import settings
 from app.models.models import Kommune, GridCell
 
 
-def generate_grid(db: Session, kommune_id: int, cell_size_m: int = 100) -> int:
+def generate_grid(db: Session, kommune_id: int, cell_size_m: int = 100, *, force: bool = False) -> int:
     """Generate a rectangular grid of cells over the municipality boundary.
 
     Uses a projected CRS (UTM) for metric grid generation, then converts
     cells back to WGS84 (EPSG:4326).
 
-    Returns the number of cells created.
+    If a grid already exists and ``force`` is False, returns the existing
+    cell count without deleting assessments or other derived data.
+
+    Returns the number of cells created (or already present).
     """
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune or kommune.boundary is None:
         raise ValueError(f"Kommune {kommune_id} not found or has no boundary")
 
-    # Delete existing grid for this kommune
-    db.query(GridCell).filter(GridCell.kommune_id == kommune_id).delete()
+    existing_count = (
+        db.query(GridCell).filter(GridCell.kommune_id == kommune_id).count()
+    )
+    if existing_count > 0 and not force:
+        return existing_count
+
+    # Delete existing grid for this kommune (cascades to assessments)
+    if existing_count > 0:
+        db.query(GridCell).filter(GridCell.kommune_id == kommune_id).delete()
 
     # Load boundary as shapely geometry
     boundary_shape = to_shape(kommune.boundary)

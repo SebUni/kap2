@@ -270,6 +270,12 @@ body {
   position: relative;
 }
 
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .search-container input {
   width: 250px;
   padding: 0.4rem 0.8rem;

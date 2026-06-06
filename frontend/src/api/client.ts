@@ -24,12 +24,13 @@ export const api = {
     }),
 
   getKommune: (id: number) => request<Record<string, unknown>>(`/kommune/${id}`),
-  listKommunen: () => request<Record<string, unknown>[]>('/kommune'),
+  listKommunen: (calculated = false) =>
+    request<Record<string, unknown>[]>(`/kommune${calculated ? '?calculated=true' : ''}`),
 
   // ── Grid ────────────────────────────────────────────────────────────
-  generateGrid: (kommuneId: number, cellSizeM = 100) =>
+  generateGrid: (kommuneId: number, cellSizeM = 100, force = false) =>
     request<{ cells_created: number }>(`/kommune/${kommuneId}/grid`, {
-      method: 'POST', body: JSON.stringify({ cell_size_m: cellSizeM }),
+      method: 'POST', body: JSON.stringify({ cell_size_m: cellSizeM, force }),
     }),
   getGrid: (kommuneId: number) => request<Record<string, unknown>>(`/kommune/${kommuneId}/grid`),
 

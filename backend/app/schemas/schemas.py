@@ -47,6 +47,7 @@ class GridCellOut(BaseModel):
 
 class GridGenerateRequest(BaseModel):
     cell_size_m: int = 100
+    force: bool = False
 
 
 # ── Assessment ─────────────────────────────────────────────────────────────────

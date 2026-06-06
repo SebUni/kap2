@@ -357,8 +357,12 @@ export default function Dashboard() {
             )}
           </section>
         </>
+      ) : status?.status === 'done' ? (
+        <div className="dashboard-empty">
+          <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Ergebnisse werden geladen …</p>
+        </div>
       ) : (
-        <div className="dashboard-empty" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+        <div className="dashboard-empty">
           <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Noch keine Analyseergebnisse</p>
           <p>Klicken Sie oben auf „▶ Berechnen“, um alle Klimarisiken für die 100m-Zellen zu ermitteln.</p>
         </div>

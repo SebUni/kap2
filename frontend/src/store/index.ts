@@ -24,7 +24,7 @@ interface AppState {
   // Grid
   gridGeoJson: GeoJSONFeatureCollection | null
   loadGrid: (kommuneId: number) => Promise<void>
-  generateGrid: (kommuneId: number, cellSize?: number) => Promise<void>
+  generateGrid: (kommuneId: number, cellSize?: number, force?: boolean) => Promise<void>
 
   // Catalog (single source of truth, loaded once)
   catalog: Catalog | null
@@ -95,6 +95,9 @@ export const useStore = create<AppState>((set, get) => ({
   kommune: null,
   setKommune: (k) => set({ kommune: k }),
   loadKommune: async (id) => {
+    if (get().kommune?.id !== id) {
+      set({ riskSummary: null, costSummary: null, riskHistogram: null })
+    }
     const data = await api.getKommune(id)
     set({ kommune: data as unknown as Kommune })
   },
@@ -105,8 +108,8 @@ export const useStore = create<AppState>((set, get) => ({
     const data = await api.getGrid(kommuneId)
     set({ gridGeoJson: data as unknown as GeoJSONFeatureCollection })
   },
-  generateGrid: async (kommuneId, cellSize = 100) => {
-    await api.generateGrid(kommuneId, cellSize)
+  generateGrid: async (kommuneId, cellSize = 100, force = false) => {
+    await api.generateGrid(kommuneId, cellSize, force)
     await get().loadGrid(kommuneId)
   },
 

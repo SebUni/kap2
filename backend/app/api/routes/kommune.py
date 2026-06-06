@@ -12,7 +12,7 @@ from app.models.models import (
     CellAssessment, GridCell, AdaptationMeasure,
     MeasureImpact, ProjectStatus, RiskZone, GeoExportJob,
 )
-from app.services.geodata_export_service import get_exports_dir
+from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
 from app.services import osm_service, grid_service
 
@@ -75,8 +75,10 @@ def get_kommune(kommune_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("")
-def list_kommunen(db: Session = Depends(get_db)):
-    kommunen = db.query(Kommune).all()
+def list_kommunen(calculated: bool = False, db: Session = Depends(get_db)):
+    kommunen = db.query(Kommune).order_by(Kommune.name).all()
+    if calculated:
+        kommunen = [k for k in kommunen if assessment_is_done(db, k.id)]
     return [_kommune_to_out(k, include_boundary=False) for k in kommunen]
 
 
@@ -87,7 +89,9 @@ def generate_grid(kommune_id: int, req: GridGenerateRequest = GridGenerateReques
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
 
-    count = grid_service.generate_grid(db, kommune_id, cell_size_m=req.cell_size_m)
+    count = grid_service.generate_grid(
+        db, kommune_id, cell_size_m=req.cell_size_m, force=req.force,
+    )
     return {"kommune_id": kommune_id, "cells_created": count, "cell_size_m": req.cell_size_m}
 
 
