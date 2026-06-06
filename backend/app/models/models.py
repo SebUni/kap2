@@ -20,6 +20,13 @@ class AssessmentStatus(str, enum.Enum):
     ERROR = "error"
 
 
+class ExportStatus(str, enum.Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    DONE = "done"
+    ERROR = "error"
+
+
 # ── Kommune ────────────────────────────────────────────────────────────────────
 
 class Kommune(Base):
@@ -40,6 +47,7 @@ class Kommune(Base):
     measures = relationship("AdaptationMeasure", back_populates="kommune", cascade="all, delete-orphan")
     project_statuses = relationship("ProjectStatus", back_populates="kommune", cascade="all, delete-orphan")
     risk_zones = relationship("RiskZone", back_populates="kommune", cascade="all, delete-orphan")
+    geo_exports = relationship("GeoExportJob", back_populates="kommune", cascade="all, delete-orphan")
 
 
 # ── Grid ───────────────────────────────────────────────────────────────────────
@@ -197,3 +205,20 @@ class RiskZoneCell(Base):
 
     risk_zone = relationship("RiskZone", back_populates="cells")
     grid_cell = relationship("GridCell")
+
+
+# ── Geo Export Jobs ────────────────────────────────────────────────────────────
+
+class GeoExportJob(Base):
+    __tablename__ = "geo_export_jobs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    kommune_id = Column(Integer, ForeignKey("kommunen.id", ondelete="CASCADE"), nullable=False)
+    export_type = Column(String(32), nullable=False, default="geodaten")
+    status = Column(Enum(ExportStatus), default=ExportStatus.PENDING)
+    file_path = Column(String(512))
+    error_message = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    finished_at = Column(DateTime)
+
+    kommune = relationship("Kommune", back_populates="geo_exports")

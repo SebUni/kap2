@@ -39,6 +39,15 @@ export interface AssessmentStatus {
   eta_seconds?: number | null
 }
 
+export interface GeoExportJob {
+  id: number
+  export_type: 'geodaten' | 'dashboard' | 'massnahmen' | 'alle'
+  status: 'pending' | 'running' | 'done' | 'error'
+  created_at: string
+  finished_at: string | null
+  error_message: string | null
+}
+
 export interface ConfigParameter {
   id: number
   category: string

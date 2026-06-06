@@ -84,6 +84,12 @@ export const api = {
     request<Record<string, unknown>>(`/kommune/${kommuneId}/cost-summary`),
 
   // ── Export/Import ───────────────────────────────────────────────────
+  listExports: (kommuneId: number) =>
+    request<Record<string, unknown>[]>(`/kommune/${kommuneId}/exports`),
+  startGeodataExport: (kommuneId: number) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/exports/geodaten`, { method: 'POST' }),
+  exportDownloadUrl: (kommuneId: number, exportId: number) =>
+    `${BASE}/kommune/${kommuneId}/exports/${exportId}/download`,
   exportMeasuresUrl: (kommuneId: number) => `${BASE}/kommune/${kommuneId}/measures/export`,
   importMeasures: async (kommuneId: number, file: File) => {
     const formData = new FormData()

@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard'
 import MeasuresTableTab from './components/MeasuresTableTab'
 import ConfigPanelTab from './components/ConfigPanelTab'
 import HelpSection from './components/dashboard/HelpSection'
+import ExportModal from './components/ExportModal'
 
 const TAB_ROUTES = [
   { label: 'Dashboard', path: '/' },
@@ -20,6 +21,7 @@ function AppContent() {
   const location = useLocation()
   const [showConfig, setShowConfig] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [showExport, setShowExport] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
   const [resetting, setResetting] = useState(false)
 
@@ -122,6 +124,24 @@ function AppContent() {
             ?
           </button>
           <button
+            onClick={() => setShowExport(true)}
+            disabled={!kommune || !hasCompletedAssessment}
+            title={hasCompletedAssessment ? 'Daten exportieren' : 'Erst IST-Berechnung durchführen'}
+            style={{
+              background: 'transparent',
+              color: 'var(--text)',
+              border: '1px solid var(--border)',
+              borderRadius: 8,
+              width: 36, height: 36,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: (!kommune || !hasCompletedAssessment) ? 'not-allowed' : 'pointer',
+              fontSize: '1.1rem', flexShrink: 0,
+              opacity: (!kommune || !hasCompletedAssessment) ? 0.4 : 1,
+            }}
+          >
+            ⬇
+          </button>
+          <button
             onClick={() => setShowConfig(!showConfig)}
             title="Konfiguration"
             style={{
@@ -164,6 +184,11 @@ function AppContent() {
           </span>
         )}
       </div>
+
+      {/* Export Modal */}
+      {showExport && kommune && (
+        <ExportModal kommuneId={kommune.id} onClose={() => setShowExport(false)} />
+      )}
 
       {/* Help Overlay */}
       {showHelp && (

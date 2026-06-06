@@ -11,3 +11,5 @@ shapely==2.0.6
 geojson==3.1.0
 openpyxl==3.1.5
 python-multipart==0.0.18
+pyogrio==0.12.1
+numpy>=1.26.0

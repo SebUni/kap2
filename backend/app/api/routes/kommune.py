@@ -1,3 +1,6 @@
+import os
+import shutil
+
 from fastapi import APIRouter, Depends, HTTPException
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import shape as shapely_shape, mapping
@@ -7,8 +10,9 @@ from app.db.database import get_db
 from app.models.models import (
     Kommune, ConfigParameter,
     CellAssessment, GridCell, AdaptationMeasure,
-    MeasureImpact, ProjectStatus, RiskZone,
+    MeasureImpact, ProjectStatus, RiskZone, GeoExportJob,
 )
+from app.services.geodata_export_service import get_exports_dir
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
 from app.services import osm_service, grid_service
 
@@ -142,7 +146,18 @@ def reset_kommune(kommune_id: int, db: Session = Depends(get_db)):
         .filter(ProjectStatus.kommune_id == kommune_id)\
         .delete(synchronize_session=False)
 
+    # 7. Geo export jobs
+    db.query(GeoExportJob)\
+        .filter(GeoExportJob.kommune_id == kommune_id)\
+        .delete(synchronize_session=False)
+
     db.commit()
+
+    # Remove export files from disk
+    export_dir = get_exports_dir(kommune_id)
+    if os.path.isdir(export_dir):
+        shutil.rmtree(export_dir, ignore_errors=True)
+
     return {"message": "Zurückgesetzt", "kommune_id": kommune_id}
 
 
