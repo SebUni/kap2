@@ -80,6 +80,22 @@ def cell_outcome(risk: dict, index: float, cell_pop: float,
     return ref * (index / 100.0) * factor
 
 
+def cell_outcome_breakdown(risk: dict, index: float, cell_pop: float,
+                           cell_area_km2: float = CELL_AREA_KM2) -> dict:
+    """Zellbezogene Faktoren für Outcome = ref · (Index/100) · Skalierung (Tooltip)."""
+    ref = float(risk.get("ref_value", 0.0))
+    factor = _scale_factor(risk, cell_pop, cell_area_km2)
+    idx_frac = index / 100.0
+    return {
+        "ref_value": ref,
+        "scale_factor": round(factor, 6),
+        "index_fraction": round(idx_frac, 4),
+        "cell_pop": round(cell_pop, 2),
+        "cell_area_km2": cell_area_km2,
+        "outcome": round(ref * idx_frac * factor, 4),
+    }
+
+
 def _percentile(values: list[float], pct: float = AGGREGATION_PERCENTILE) -> float:
     if not values:
         return 0.0

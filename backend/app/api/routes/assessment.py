@@ -16,6 +16,9 @@ from app.tasks.assessment_task import (
 )
 from app.services.measure_service import get_risk_aggregate
 from app.services.engine import risk_engine
+from app.services.engine import formulas
+from app.services.engine.formulas import build_regional_context
+from app.services.engine.runner import COASTAL_BUNDESLAENDER
 
 log = logging.getLogger(__name__)
 router = APIRouter()
@@ -102,41 +105,75 @@ def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
     if not category:
         raise HTTPException(404, f"Unbekannter Code: {code}")
 
-    rows = (
-        db.query(CellAssessment, GridCell)
-        .join(GridCell, CellAssessment.grid_cell_id == GridCell.id)
-        .filter(CellAssessment.kommune_id == kommune_id)
-        .all()
-    )
-    features = []
-    vmin, vmax = None, None
-    for ca, cell in rows:
-        data = ca.data or {}
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+
+    try:
+        is_coastal = (kommune.bundesland or "") in COASTAL_BUNDESLAENDER
+        regional = build_regional_context(kommune.bundesland, is_coastal)
+        recipe = formulas.recipe_for_layer(code, category)
+
+        rows = (
+            db.query(CellAssessment, GridCell)
+            .join(GridCell, CellAssessment.grid_cell_id == GridCell.id)
+            .filter(CellAssessment.kommune_id == kommune_id)
+            .all()
+        )
+        features = []
+        vmin, vmax = None, None
+        for ca, cell in rows:
+            data = ca.data or {}
+            props: dict = {
+                "grid_cell_id": cell.id,
+                "row": cell.row_idx,
+                "col": cell.col_idx,
+            }
+            if category == "risks":
+                rdef = catalog.RISKS_BY_CODE[code]
+                idx = float(data.get("risks", {}).get(code, {}).get("index", 0.0))
+                cell_pop = float(data.get("inputs", {}).get("pop", 0.0))
+                value = risk_engine.cell_outcome(rdef, idx, cell_pop)
+                hev_abs = {
+                    "hazards": data.get("hazards", {}),
+                    "exposures": data.get("exposures", {}),
+                    "vulnerabilities": data.get("vulnerabilities", {}),
+                }
+                hev_norm = risk_engine.normalize_hev(hev_abs)
+                breakdown = formulas.risk_cell_breakdown(rdef, hev_abs, hev_norm)
+                props["index"] = round(idx, 2)
+                props["H"] = breakdown["H"]
+                props["E"] = breakdown["E"]
+                props["V"] = breakdown["V"]
+                props["outcome"] = risk_engine.cell_outcome_breakdown(rdef, idx, cell_pop)
+            else:
+                raw = data.get(category, {}).get(code)
+                value = float(raw) if raw is not None else 0.0
+                ci = data.get("inputs", {})
+                props["inputs"] = formulas.resolve_inputs(recipe, ci, regional, data)
+            vmin = value if vmin is None else min(vmin, value)
+            vmax = value if vmax is None else max(vmax, value)
+            props["value"] = round(value, 3)
+            features.append({
+                "type": "Feature",
+                "properties": props,
+                "geometry": mapping(to_shape(cell.geometry)),
+            })
+
+        meta = {"code": code, "category": category, "min": vmin or 0.0, "max": vmax or 0.0, "recipe": recipe}
         if category == "risks":
-            rdef = catalog.RISKS_BY_CODE[code]
-            idx = float(data.get("risks", {}).get(code, {}).get("index", 0.0))
-            cell_pop = float(data.get("inputs", {}).get("pop", 0.0))
-            value = risk_engine.cell_outcome(rdef, idx, cell_pop)
+            r = catalog.RISKS_BY_CODE[code]
+            meta.update({"label": r["name"], "unit": r["outcome_unit"]})
         else:
-            value = float(data.get(category, {}).get(code, 0.0))
-        vmin = value if vmin is None else min(vmin, value)
-        vmax = value if vmax is None else max(vmax, value)
-        features.append({
-            "type": "Feature",
-            "properties": {"grid_cell_id": cell.id, "row": cell.row_idx,
-                           "col": cell.col_idx, "value": round(value, 3)},
-            "geometry": mapping(to_shape(cell.geometry)),
-        })
+            m = catalog.INDICATOR_BY_CODE[code]
+            meta.update({"label": m["name"], "unit": m["unit"], "scale_max": m.get("norm_max")})
 
-    meta = {"code": code, "category": category, "min": vmin or 0.0, "max": vmax or 0.0}
-    if category == "risks":
-        r = catalog.RISKS_BY_CODE[code]
-        meta.update({"label": r["name"], "unit": r["outcome_unit"]})
-    else:
-        m = catalog.INDICATOR_BY_CODE[code]
-        meta.update({"label": m["name"], "unit": m["unit"], "scale_max": m.get("norm_max")})
-
-    return {"type": "FeatureCollection", "features": features, "meta": meta}
+        return {"type": "FeatureCollection", "features": features, "meta": meta}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        log.exception("get_layer failed kommune=%s code=%s", kommune_id, code)
+        raise HTTPException(500, f"Layer konnte nicht geladen werden: {exc}") from exc
 
 
 @router.get("/kommune/{kommune_id}/risk-summary")

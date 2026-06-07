@@ -2,9 +2,204 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useStore } from '../store'
-import type { LayerMeta } from '../types'
+import type {
+  CellOutcomeBreakdown, HevRecipeMeta, IndicatorRecipe, LayerMeta,
+  LayerRecipe, OutcomeFactorMeta, ResolvedInput, RiskRecipe,
+} from '../types'
 
 const CHOROPLETH_COLORS = ['#fef9c3', '#fde047', '#fb923c', '#ef4444', '#991b1b']
+type TooltipMode = 'off' | 'short' | 'detail'
+const TOOLTIP_MODE_KEY = 'map-tooltip-mode'
+
+function isRiskRecipe(r: LayerRecipe): r is RiskRecipe {
+  return 'formula_index' in r
+}
+
+function fmtNum(v: number) {
+  return v.toLocaleString('de-DE', { maximumFractionDigits: 3 })
+}
+
+function provBadge(prov?: string) {
+  const map: Record<string, { bg: string; text: string; label: string }> = {
+    extern: { bg: '#dbeafe', text: '#1d4ed8', label: 'extern' },
+    param: { bg: '#fef3c7', text: '#b45309', label: 'Parameter' },
+    computed: { bg: '#ede9fe', text: '#6d28d9', label: 'berechnet' },
+  }
+  const s = map[prov || ''] || map.extern
+  return ` <span style="font-size:8px;background:${s.bg};color:${s.text};padding:0 3px;border-radius:2px;margin-left:3px">${s.label}</span>`
+}
+
+function parseProp<T>(raw: unknown): T | undefined {
+  if (raw == null) return undefined
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw) as T } catch { return undefined }
+  }
+  return raw as T
+}
+
+const TOOLTIP_MODE_CYCLE: TooltipMode[] = ['off', 'short', 'detail']
+const TOOLTIP_MODE_LABEL: Record<TooltipMode, string> = {
+  off: 'Inspektor: Aus',
+  short: 'Inspektor: Kurz',
+  detail: 'Inspektor: Details',
+}
+
+function readTooltipMode(): TooltipMode {
+  try {
+    const v = localStorage.getItem(TOOLTIP_MODE_KEY)
+    if (v === 'off' || v === 'short' || v === 'detail') return v
+  } catch { /* ignore */ }
+  return 'short'
+}
+
+function nextTooltipMode(mode: TooltipMode): TooltipMode {
+  const i = TOOLTIP_MODE_CYCLE.indexOf(mode)
+  return TOOLTIP_MODE_CYCLE[(i + 1) % TOOLTIP_MODE_CYCLE.length]
+}
+
+function outcomeFactorValue(
+  factor: OutcomeFactorMeta,
+  cell: CellOutcomeBreakdown,
+  r: RiskRecipe,
+): string {
+  if (factor.key === 'ref_value')
+    return `${fmtNum(factor.value ?? cell.ref_value)}${factor.unit ? ' ' + factor.unit : ''}`
+  if (factor.key === 'scale_factor') {
+    if (r.scale === 'pop')
+      return `${fmtNum(cell.scale_factor)} (= ${fmtNum(cell.cell_pop)} Ew. / 100.000)`
+    if (r.scale === 'area')
+      return `${fmtNum(cell.scale_factor)} (= ${fmtNum(cell.cell_area_km2)} km² / 50)`
+    return fmtNum(cell.scale_factor)
+  }
+  return '—'
+}
+
+const TOOLTIP_MAX_WIDTH = 920
+
+function buildTooltipHtml(
+  meta: LayerMeta,
+  props: Record<string, unknown>,
+  value: number,
+  mode: TooltipMode,
+) {
+  const gridCells: string[] = []
+  const gridHeader = () => {
+    gridCells.push(
+      '<span class="col-head">Name</span>',
+      '<span class="col-head col-val">Wert</span>',
+      '<span class="col-head col-norm">Norm</span>',
+      '<span class="col-head">Quelle</span>',
+    )
+  }
+  const gridSection = (title: string) => {
+    gridCells.push(`<span class="grid-section">${title}</span>`)
+  }
+  const gridRow = (name: string, val: string, norm = '', src = '') => {
+    gridCells.push(
+      `<span class="col-name">${name}</span>`,
+      `<span class="col-val">${val || '—'}</span>`,
+      `<span class="col-norm">${norm}</span>`,
+      `<span class="col-src">${src}</span>`,
+    )
+  }
+  const gridHtml = () => gridCells.length
+    ? `<div class="kap-tooltip-grid">${gridCells.join('')}</div>`
+    : ''
+
+  let h = `<div class="kap-tooltip-inner" style="--kap-tooltip-max:${TOOLTIP_MAX_WIDTH}px;font-family:system-ui,sans-serif;font-size:11px;line-height:1.4">`
+  h += `<div style="font-weight:700;font-size:12px;margin-bottom:2px">${meta.label}</div>`
+  h += `<div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">${fmtNum(value)} ${meta.unit}</div>`
+
+  const r = meta.recipe
+  if (r && isRiskRecipe(r)) {
+    const idx = props.index != null ? Number(props.index) : null
+    if (idx != null && mode === 'short')
+      h += `<div style="margin:2px 0;font-size:10px;color:#64748b">Risiko-Index: <strong style="color:#0f172a">${fmtNum(idx)}</strong> (0–100)</div>`
+
+    if (mode === 'detail') {
+      h += `<div style="color:#64748b;margin:3px 0 1px;overflow-wrap:anywhere"><code style="font-size:10px">${r.formula_index}</code></div>`
+      if (r.formula_outcome)
+        h += `<div style="color:#64748b;margin:0 0 3px;overflow-wrap:anywhere"><code style="font-size:10px">Outcome = ${r.formula_outcome}</code></div>`
+
+      gridHeader()
+      if (idx != null)
+        gridRow('Risiko-Index', fmtNum(idx), '', '0–100')
+
+      const sec = (title: string, items?: HevRecipeMeta[], vals?: number[][]) => {
+        if (!items?.length) return
+        gridSection(title)
+        items.forEach((it, i) => {
+          const pair = (vals && vals[i]) || [0, 0]
+          const src = [
+            it.source,
+            it.spatial === false ? 'nicht räumlich' : '',
+            it.norm_min != null && it.norm_max != null
+              ? `[${fmtNum(it.norm_min)}…${fmtNum(it.norm_max)}]`
+              : '',
+          ].filter(Boolean).join(' · ')
+          gridRow(
+            it.name,
+            `${fmtNum(pair[0])}${it.unit ? '\u00a0' + it.unit : ''}`,
+            fmtNum(pair[1]),
+            src,
+          )
+        })
+      }
+      sec('Treiber (H)', r.hazards, parseProp(props.H))
+      sec('Expositionen (E)', r.exposures, parseProp(props.E))
+      sec('Verwundbarkeiten (V)', r.vulnerabilities, parseProp(props.V))
+
+      const cellOutcome = parseProp<CellOutcomeBreakdown>(props.outcome)
+      if (cellOutcome && r.outcome_factors?.length) {
+        gridSection('Outcome-Faktoren')
+        for (const factor of r.outcome_factors) {
+          gridRow(
+            factor.label,
+            `${outcomeFactorValue(factor, cellOutcome, r)}${provBadge(factor.prov)}`,
+            '',
+            [factor.formula, factor.source].filter(Boolean).join(' · '),
+          )
+        }
+        gridRow(
+          'Index-Anteil',
+          fmtNum(cellOutcome.index_fraction),
+          '',
+          `Index\u00a0${fmtNum(idx ?? 0)}/100`,
+        )
+      }
+
+      h += gridHtml()
+      h += '<div style="margin-top:5px;color:#94a3b8;font-size:9px">H,E,V normiert 0–100 für die Multiplikation</div>'
+
+      if (cellOutcome && r.outcome_factors?.length) {
+        h += `<div style="margin-top:4px;padding-top:4px;border-top:1px solid #e2e8f0;color:#475569;font-size:10px;overflow-wrap:anywhere">` +
+          `<code>${fmtNum(cellOutcome.ref_value)} · ${fmtNum(cellOutcome.index_fraction)} · ${fmtNum(cellOutcome.scale_factor)}` +
+          ` = ${fmtNum(cellOutcome.outcome)} ${meta.unit}</code></div>`
+      }
+    }
+  } else if (r && 'inputs' in r) {
+    const ir = r as IndicatorRecipe
+    if (mode === 'detail' && ir.formula)
+      h += `<div style="color:#475569;margin:0 0 4px"><code style="font-size:10px;background:#f1f5f9;padding:1px 3px;border-radius:3px">${ir.formula}</code></div>`
+    if (mode === 'detail') {
+      gridHeader()
+      const cells = (parseProp(props.inputs) as ResolvedInput[]) || []
+      ir.inputs.forEach((inp, i) => {
+        const c = cells[i] || ({} as ResolvedInput)
+        const prov = c.prov || inp.prov
+        let disp: string
+        const raw = c.v ?? inp.value
+        if (raw == null) disp = '—'
+        else if (typeof raw === 'string') disp = raw
+        else disp = `${fmtNum(raw)}${inp.unit ? '\u00a0' + inp.unit : ''}`
+        gridRow(inp.label, `${disp}${provBadge(prov)}`, '', inp.source || '')
+      })
+      h += gridHtml()
+    }
+  }
+  h += '</div>'
+  return h
+}
 
 export default function MapView() {
   const mapContainer = useRef<HTMLDivElement>(null)
@@ -16,12 +211,26 @@ export default function MapView() {
   } = useStore()
 
   const [mapLoaded, setMapLoaded] = useState(false)
+  const [tooltipMode, setTooltipMode] = useState<TooltipMode>(readTooltipMode)
   const [drawMode, setDrawMode] = useState(false)
   const [drawCoords, setDrawCoords] = useState<[number, number][]>([])
   const [cursorCoord, setCursorCoord] = useState<[number, number] | null>(null)
   const [showMeasureForm, setShowMeasureForm] = useState(false)
 
   const meta = layerGeoJson?.meta as LayerMeta | undefined
+  const { activeLayer, setActiveLayer } = useStore()
+
+  // Layer-Cache ohne aktuelle Tooltip-Metadaten automatisch neu laden
+  useEffect(() => {
+    if (!kommune || !activeLayer || !layerGeoJson) return
+    const layerMeta = layerGeoJson.meta as LayerMeta | undefined
+    const recipe = layerMeta?.recipe
+    const staleRiskRecipe = activeLayer.category === 'risks' && recipe && isRiskRecipe(recipe)
+      && !recipe.outcome_factors?.length
+    if (layerMeta && (!recipe || staleRiskRecipe)) {
+      setActiveLayer(activeLayer).catch(() => {})
+    }
+  }, [kommune?.id, activeLayer?.code])
 
   // Initialize map
   useEffect(() => {
@@ -119,22 +328,71 @@ export default function MapView() {
           id: 'active-layer-line', type: 'line', source: 'active-layer',
           paint: { 'line-color': '#00000022', 'line-width': 0.3 },
         }, beforeId)
-
-        map.on('mousemove', 'active-layer-fill', (e) => {
-          if (!e.features?.[0]) return
-          const v = e.features[0].properties?.value
-          const m = useStore.getState().layerGeoJson?.meta as LayerMeta | undefined
-          if (v == null || !m) return
-          if (!popupRef.current) popupRef.current = new maplibregl.Popup({ closeButton: false, closeOnClick: false })
-          popupRef.current
-            .setLngLat(e.lngLat)
-            .setHTML(`<strong>${m.label}</strong><br/>${Number(v).toLocaleString('de-DE', { maximumFractionDigits: 2 })} ${m.unit}`)
-            .addTo(map)
-        })
-        map.on('mouseleave', 'active-layer-fill', () => popupRef.current?.remove())
       }
     } catch (err) { console.warn('MapView: active layer error', err) }
   }, [layerGeoJson, mapLoaded])
+
+  const setTooltipModePersist = (mode: TooltipMode) => {
+    setTooltipMode(mode)
+    try { localStorage.setItem(TOOLTIP_MODE_KEY, mode) } catch { /* ignore */ }
+    if (mode === 'off') popupRef.current?.remove()
+  }
+
+  const cycleTooltipMode = () => setTooltipModePersist(nextTooltipMode(tooltipMode))
+
+  // Tooltip ausblenden beim Maßnahmen-Zeichnen
+  useEffect(() => {
+    if (drawMode) popupRef.current?.remove()
+  }, [drawMode])
+
+  // Tooltip (eigener Effect: MapLibre unterstützt keine verschachtelten Properties)
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !mapLoaded) return
+
+    const onMove = (e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) => {
+      if (tooltipMode === 'off' || drawMode) {
+        popupRef.current?.remove()
+        return
+      }
+      if (!e.features?.[0]) return
+      const hit = e.features[0]
+      const layerData = useStore.getState().layerGeoJson
+      const m = layerData?.meta as LayerMeta | undefined
+      if (!m) return
+
+      const cellId = hit.properties?.grid_cell_id
+      const full = layerData?.features?.find(
+        f => f.properties?.grid_cell_id === cellId,
+      )
+      const props = (full?.properties ?? hit.properties) as Record<string, unknown>
+      const v = props?.value
+      if (v == null) return
+
+      if (!popupRef.current) {
+        popupRef.current = new maplibregl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+          maxWidth: `${TOOLTIP_MAX_WIDTH}px`,
+          className: 'kap-tooltip',
+        })
+      }
+      popupRef.current
+        .setLngLat(e.lngLat)
+        .setHTML(buildTooltipHtml(m, props, Number(v), tooltipMode))
+        .addTo(map)
+    }
+    const onLeave = () => popupRef.current?.remove()
+
+    if (!map.getLayer('active-layer-fill')) return
+
+    map.on('mousemove', 'active-layer-fill', onMove)
+    map.on('mouseleave', 'active-layer-fill', onLeave)
+    return () => {
+      map.off('mousemove', 'active-layer-fill', onMove)
+      map.off('mouseleave', 'active-layer-fill', onLeave)
+    }
+  }, [mapLoaded, layerGeoJson, tooltipMode, drawMode])
 
   // Measures overlay
   useEffect(() => {
@@ -309,6 +567,13 @@ export default function MapView() {
             <button onClick={cancelDraw}>✕ Abbrechen</button>
           </>
         )}
+        <button
+          type="button"
+          className={`tooltip-mode-btn${tooltipMode !== 'off' ? ' active' : ''}`}
+          onClick={cycleTooltipMode}
+          title="Inspektor: Aus → Kurz → Details"
+          aria-label={TOOLTIP_MODE_LABEL[tooltipMode]}
+        >{TOOLTIP_MODE_LABEL[tooltipMode]}</button>
       </div>
 
       {/* Legend for active layer */}

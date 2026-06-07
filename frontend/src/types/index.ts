@@ -100,6 +100,69 @@ export interface GeoJSONGeometry {
   coordinates: unknown
 }
 
+export type InputProvenance = 'extern' | 'param' | 'computed'
+
+export interface RecipeInputMeta {
+  key: string
+  label: string
+  prov: InputProvenance
+  unit: string
+  source?: string
+  value?: number | string
+}
+
+export interface IndicatorRecipe {
+  formula: string
+  inputs: RecipeInputMeta[]
+}
+
+export interface HevRecipeMeta {
+  code: string
+  name: string
+  unit: string
+  norm_min?: number
+  norm_max?: number
+  source?: string
+  spatial?: boolean
+}
+
+export interface OutcomeFactorMeta {
+  key: string
+  label: string
+  value?: number
+  unit?: string
+  formula?: string
+  source?: string
+  prov?: InputProvenance
+}
+
+export interface CellOutcomeBreakdown {
+  ref_value: number
+  scale_factor: number
+  index_fraction: number
+  cell_pop: number
+  cell_area_km2: number
+  outcome: number
+}
+
+export interface RiskRecipe {
+  formula_index: string
+  formula_outcome: string
+  hazards: HevRecipeMeta[]
+  exposures: HevRecipeMeta[]
+  vulnerabilities: HevRecipeMeta[]
+  scale: string
+  ref_value: number
+  outcome_factors: OutcomeFactorMeta[]
+}
+
+export type LayerRecipe = IndicatorRecipe | RiskRecipe
+
+export interface ResolvedInput {
+  v: number | string | null
+  prov: InputProvenance
+}
+
 export interface LayerMeta {
   code: string
   category: LayerCategory
@@ -108,6 +171,7 @@ export interface LayerMeta {
   min: number
   max: number
   scale_max?: number
+  recipe?: LayerRecipe
 }
 
 // ── Katalog (vom Backend, single source of truth) ───────────────────────────

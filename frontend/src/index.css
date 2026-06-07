@@ -205,6 +205,87 @@ body {
   border-radius: 4px;
 }
 
+.assessment-steps-panel {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin-top: 8px;
+}
+
+.assessment-steps-toggle {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin-top: 1px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.assessment-steps-toggle:hover {
+  color: var(--text);
+}
+
+.assessment-steps-body {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.assessment-steps-panel.expanded .assessment-steps-body {
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.assessment-step-row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 2px 0;
+  line-height: 1.35;
+}
+
+.assessment-step-row.faded {
+  opacity: 0.5;
+}
+
+.assessment-step-row.active {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.assessment-step-row.done {
+  opacity: 0.7;
+}
+
+.assessment-step-time {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  min-width: 4.5rem;
+}
+
+.assessment-step-row.active .assessment-step-time {
+  color: var(--text);
+}
+
+.assessment-step-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.assessment-step-detail {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
 /* Status indicator */
 .status-badge {
   display: inline-flex;
@@ -354,6 +435,83 @@ body {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
+}
+
+.tooltip-mode-btn:not(.active) {
+  opacity: 0.85;
+}
+
+.maplibregl-popup.kap-tooltip {
+  max-width: 1000px !important;
+}
+
+.maplibregl-popup.kap-tooltip .maplibregl-popup-content {
+  padding: 10px 12px;
+  line-height: 1.4;
+  box-sizing: border-box;
+  max-width: 1000px;
+}
+
+.kap-tooltip-inner {
+  width: fit-content;
+  max-width: var(--kap-tooltip-max, 1000px);
+  min-width: 280px;
+  box-sizing: border-box;
+}
+
+.kap-tooltip-grid {
+  display: grid;
+  grid-template-columns: max-content max-content max-content minmax(0, max-content);
+  column-gap: 12px;
+  row-gap: 2px;
+  align-items: baseline;
+  font-size: 10px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 4px 0;
+}
+
+.kap-tooltip-grid .col-head {
+  color: #94a3b8;
+  font-size: 9px;
+  padding-bottom: 3px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.kap-tooltip-grid .grid-section {
+  grid-column: 1 / -1;
+  font-weight: 700;
+  margin-top: 6px;
+  color: #475569;
+}
+
+.kap-tooltip-grid .col-name {
+  color: #64748b;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.kap-tooltip-grid .col-val {
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.kap-tooltip-grid .col-norm {
+  color: #64748b;
+  text-align: right;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.kap-tooltip-grid .col-src {
+  color: #94a3b8;
+  font-size: 9px;
+  line-height: 1.35;
+  white-space: normal;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 /* Config panel */
