@@ -48,7 +48,8 @@ Code: `backend/app/services/engine/{inputs,indicators,risk_engine,runner}.py`.
 | **DWD CDC** (regional, je Bundesland) | Sommer-Tagesmaximum, heiße Tage/Jahr, Tropennächte, Jahresmittel; Klimafortschreibung RCP4.5/8.5 |
 | **Zensus 2022** (100m-Gitter, falls vorhanden) | Bevölkerung je Zelle; sonst OSM-Wohngebäudevolumen-Proxy |
 | **Zensus Demografie** | Alters-/Risikogruppen-Anteile |
-| **Terrain-Proxys** | Hangneigung/Senken (vereinfachte Ableitungen) |
+| **AWS Terrarium DEM** | Mittelhöhe, Hangneigung, Senkentiefe, D8-Abfluss, TWI je Zelle |
+| **OSM Gewässer** | `natural=water`, `waterway` → Distanz/Proximität zu Fließ- und Stillgewässern |
 
 Mehrkern-Verarbeitung: `multiprocessing` (fork, bis 8 Worker, Chunk 50) für die
 OSM-Aggregation je Zelle (wiederverwendet aus dem alten Hitze-Assessor).

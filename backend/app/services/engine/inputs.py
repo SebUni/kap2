@@ -1,6 +1,6 @@
 """Gemeinsamer Eingabepass: berechnet pro 100m-Zelle alle Rohgrößen, die die
 H/E/V-Calculatoren benötigen (OSM-Landnutzung, Gebäude/Straßen/Bäume, UHI-ΔT,
-Belüftung, Bevölkerung, Topografie-Proxys, regionale DWD-Werte).
+Belüftung, Bevölkerung, Gelände/DEM, Gewässernähe, regionale DWD-Werte).
 
 Reuse: ``app.services.climate.heat.osm_data`` für die OSM-Extraktion und die
 UHI-Formel aus dem Hitze-Assessor.
@@ -82,8 +82,12 @@ def gather_cell_inputs(
 
     ``cell_inputs`` ist an die Reihenfolge von ``grid_cells`` gekoppelt.
     """
-    from app.services.climate.heat.osm_data import fetch_landuse, fetch_buildings_and_roads
+    from app.services.climate.heat.osm_data import (
+        fetch_landuse, fetch_buildings_and_roads, fetch_water_features,
+        compute_water_distance_m, water_proximity_score,
+    )
     from app.services.climate.dwd_data import get_regional_climate
+    from app.services.terrain_service import compute_terrain_for_cells
     from app.services.zensus_service import distribute_population, demographic_shares
 
     regional_clim = get_regional_climate(bundesland or "Nordrhein-Westfalen")
@@ -124,6 +128,12 @@ def gather_cell_inputs(
 
     total = len(grid_cells)
     lu_bm: list[tuple | None] = [None] * total
+
+    if progress_callback:
+        progress_callback(10.0, "Lade OSM-Gewässer")
+    water_features = fetch_water_features(grid_cells)
+
+    terrain_by_idx = compute_terrain_for_cells(grid_cells, progress_callback)
 
     if progress_callback:
         progress_callback(15.0, f"Analyse Oberflächen ({_N_WORKERS} Kerne) für {total} Zellen")
@@ -182,6 +192,19 @@ def gather_cell_inputs(
         cell_size_m = cell.get("cell_size_m", 100)
         area_m2 = float(cell_size_m) ** 2
 
+        terrain = terrain_by_idx.get(idx, {})
+        water_dist_m = compute_water_distance_m(cell["geometry"], water_features, cell_size_m)
+        water_prox = water_proximity_score(water_dist_m)
+        # Kombiniert OSM-Flächenanteil, Nachbar-Wasser und Distanz zu Fließgewässern
+        water_adj_combined = max(water_adj, water_prox, lu["water_fraction"])
+
+        depression_factor = terrain.get("depression_factor")
+        slope_factor = terrain.get("slope_factor")
+        if depression_factor is None:
+            depression_factor = max(0.0, min(1.0, 0.5 * imp + 0.5 * water_adj_combined - 0.2 * vent_score))
+        if slope_factor is None:
+            slope_factor = max(0.0, min(1.0, 0.3 + 0.4 * (1.0 - vent_score)))
+
         cell_inputs.append({
             "grid_cell_id": cell["id"],
             "row": r, "col": c,
@@ -189,8 +212,10 @@ def gather_cell_inputs(
             "imp_frac": imp,
             "albedo": lu["albedo"],
             "green_frac": lu["green_fraction"],
-            "water_frac": max(lu["water_fraction"], water_adj * 0.5),
-            "water_adj": water_adj,
+            "water_frac": max(lu["water_fraction"], water_adj * 0.5, water_prox * 0.3),
+            "water_adj": round(water_adj_combined, 3),
+            "water_dist_m": round(water_dist_m, 1),
+            "water_prox": round(water_prox, 3),
             "forest_frac": lu.get("forest_fraction", 0.0),
             "farmland_frac": lu.get("farmland_fraction", 0.0),
             "bldg_cov": bm["building_coverage"],
@@ -201,9 +226,17 @@ def gather_cell_inputs(
             "svf": bm["sky_view_factor"],
             "vent_score": vent_score,
             "uhi_delta": uhi,
-            # Topografie-Proxy: Senkenanfälligkeit ~ Versiegelung + Wassernähe − Belüftung
-            "depression_proxy": round(max(0.0, min(1.0, 0.5 * imp + 0.5 * water_adj - 0.2 * vent_score)), 3),
-            "slope_proxy": round(max(0.0, min(1.0, 0.3 + 0.4 * (1.0 - vent_score))), 3),
+            # Gelände aus Terrarium-DEM (TWI + Senkentiefe / Hangneigung)
+            "mean_elevation_m": terrain.get("mean_elevation_m", 0.0),
+            "slope_deg": terrain.get("slope_deg", 0.0),
+            "sink_depth_m": terrain.get("sink_depth_m", 0.0),
+            "twi": terrain.get("twi", 0.0),
+            "twi_norm": terrain.get("twi_norm", 0.0),
+            "flow_accum": terrain.get("flow_accum", 1.0),
+            "depression_proxy": depression_factor,
+            "slope_proxy": slope_factor,
+            "depression_factor": depression_factor,
+            "slope_factor": slope_factor,
             "pop": 0.0,
         })
 

@@ -10,7 +10,7 @@ import time as _time
 from typing import Any
 
 import httpx
-from shapely.geometry import shape, Polygon, MultiPolygon, mapping
+from shapely.geometry import shape, Polygon, MultiPolygon, LineString, mapping
 from shapely.ops import unary_union
 
 from app.config import settings
@@ -26,6 +26,7 @@ OVERPASS_TIMEOUT = 120
 _cache_lock = threading.Lock()
 _landuse_cache: dict[str, tuple[float, list[dict], int]] = {}  # bbox → (ts, features, bytes)
 _buildings_cache: dict[str, tuple[float, dict]] = {}            # bbox → (ts, result_dict)
+_water_cache: dict[str, tuple[float, list[dict]]] = {}          # bbox → (ts, water features)
 _CACHE_TTL = 600  # 10 min – long enough for a full batch run
 
 # ── Land-use categories and their properties ─────────────────────────────────
@@ -169,6 +170,7 @@ def clear_osm_cache():
     with _cache_lock:
         _landuse_cache.clear()
         _buildings_cache.clear()
+        _water_cache.clear()
     log.info("OSM data cache cleared")
 
 
@@ -249,6 +251,121 @@ def fetch_landuse(grid_cells: list[dict]) -> list[dict]:
         _landuse_cache[bbox] = (_time.time(), results, response_bytes)
 
     return results, response_bytes
+
+
+def fetch_water_features(grid_cells: list[dict]) -> list[dict]:
+    """Fetch OSM water polygons and waterways (rivers, streams, drains).
+
+    Returns list of {geometry, kind} where kind is 'polygon' or 'line'.
+    """
+    bbox = _bbox_from_cells(grid_cells)
+
+    with _cache_lock:
+        cached = _water_cache.get(bbox)
+        if cached and _time.time() - cached[0] < _CACHE_TTL:
+            return cached[1]
+
+    log.info("fetch_water_features: querying Overpass for bbox=%s", bbox[:30])
+
+    query = f"""
+    (
+      way["natural"="water"]({bbox});
+      relation["natural"="water"]({bbox});
+      way["water"]({bbox});
+      relation["water"]({bbox});
+      way["waterway"]({bbox});
+      relation["waterway"]({bbox});
+    );
+    out body;
+    >;
+    out skel qt;
+    """
+
+    data = _overpass_query(query)
+    elements = data.get("elements", [])
+
+    nodes: dict[int, tuple[float, float]] = {}
+    for el in elements:
+        if el["type"] == "node":
+            nodes[el["id"]] = (el["lon"], el["lat"])
+
+    results: list[dict] = []
+    for el in elements:
+        tags = el.get("tags", {})
+        if not (tags.get("natural") == "water" or tags.get("water") or tags.get("waterway")):
+            continue
+
+        if el["type"] == "way":
+            nds = el.get("nodes", [])
+            coords = [nodes[n] for n in nds if n in nodes]
+            if len(coords) < 2:
+                continue
+            waterway = tags.get("waterway", "")
+            is_area = (
+                tags.get("natural") == "water"
+                or tags.get("water")
+                or tags.get("area") == "yes"
+                or (len(coords) >= 4 and coords[0] == coords[-1])
+            )
+            if is_area and len(coords) >= 4:
+                try:
+                    geom = Polygon(coords)
+                    if not geom.is_valid:
+                        geom = geom.buffer(0)
+                    results.append({"geometry": geom, "kind": "polygon"})
+                except Exception:
+                    pass
+            elif waterway or len(coords) >= 2:
+                results.append({"geometry": LineString(coords), "kind": "line"})
+
+        elif el["type"] == "relation":
+            geom = _element_to_polygon(el, nodes, elements)
+            if geom is not None:
+                results.append({"geometry": geom, "kind": "polygon"})
+
+    log.info("Fetched %d water features from OSM", len(results))
+
+    with _cache_lock:
+        _water_cache[bbox] = (_time.time(), results)
+
+    return results
+
+
+def compute_water_distance_m(
+    cell_geom: Any,
+    water_features: list[dict],
+    cell_size_m: float,
+) -> float:
+    """Kürzeste Distanz (m) von der Zelle zum nächsten OSM-Gewässer."""
+    if not water_features:
+        return float(cell_size_m * 20)
+
+    import pyproj
+    from shapely.ops import transform as shp_transform
+
+    minx, miny, maxx, maxy = cell_geom.bounds
+    lat = (miny + maxy) / 2.0
+    utm_zone = int((cell_geom.centroid.x + 180) / 6) + 1
+    utm_epsg = 32600 + utm_zone if lat >= 0 else 32700 + utm_zone
+
+    to_utm = pyproj.Transformer.from_crs("EPSG:4326", f"EPSG:{utm_epsg}", always_xy=True).transform
+    cell_utm = shp_transform(to_utm, cell_geom)
+
+    min_dist = float("inf")
+    for feat in water_features:
+        feat_utm = shp_transform(to_utm, feat["geometry"])
+        d = cell_utm.distance(feat_utm)
+        if d < min_dist:
+            min_dist = d
+
+    return min_dist if min_dist < float("inf") else float(cell_size_m * 20)
+
+
+def water_proximity_score(dist_m: float, max_dist_m: float = 500.0) -> float:
+    """0..1: 1 = direkt am Gewässer, 0 = weiter als max_dist_m entfernt."""
+    if dist_m <= 0:
+        return 1.0
+    return max(0.0, 1.0 - dist_m / max_dist_m)
 
 
 def compute_cell_landuse(

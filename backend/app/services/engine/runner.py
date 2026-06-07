@@ -63,6 +63,11 @@ def run_full_assessment(
                 "imp_frac": ci["imp_frac"],
                 "green_frac": ci["green_frac"],
                 "water_frac": ci["water_frac"],
+                "mean_elevation_m": ci.get("mean_elevation_m", 0.0),
+                "slope_deg": ci.get("slope_deg", 0.0),
+                "sink_depth_m": ci.get("sink_depth_m", 0.0),
+                "twi": ci.get("twi", 0.0),
+                "water_dist_m": ci.get("water_dist_m", 0.0),
             },
         }
         results.append({"grid_cell_id": ci["grid_cell_id"], "data": data})

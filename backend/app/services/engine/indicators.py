@@ -33,9 +33,11 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
     road_cov = ci["road_cov"]
     uhi = ci["uhi_delta"]
     vent = ci["vent_score"]
-    depression = ci["depression_proxy"]
-    slope = ci["slope_proxy"]
+    depression = ci.get("depression_factor", ci["depression_proxy"])
+    slope = ci.get("slope_factor", ci["slope_proxy"])
     water_adj = ci.get("water_adj", 0.0)
+    water_prox = ci.get("water_prox", water_adj)
+    twi_norm = ci.get("twi_norm", depression)
 
     coastal = regional["is_coastal"]
     dry = regional["dry_index"]
@@ -56,7 +58,9 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "SOIL_MOISTURE_DECLINE": round(regional["soil_moisture_decline"] * (0.5 + 0.6 * (farmland + green)), 1),
         "HEAT_WAVE": round(_clamp(regional["hot_days"] + uhi * 1.5, 0, 40), 1),
         "COLD_EXTREME": round(regional["frost_days"] * (1.0 - 0.3 * min(uhi / 5.0, 1.0)), 1),
-        "HEAVY_RAIN_FLOOD": round(_clamp(regional["heavy_rain_index"] * (0.5 + imp) * (0.7 + depression), 0, 100), 1),
+        "HEAVY_RAIN_FLOOD": round(
+            _clamp(regional["heavy_rain_index"] * (0.4 + imp) * (0.5 + 0.5 * twi_norm) * (0.6 + depression), 0, 100), 1
+        ),
         "DROUGHT": round(_clamp(regional["drought_days"] * (0.6 + 0.7 * (farmland + green)), 0, 60), 1),
         "TROPICAL_CYCLONE": 0.05,
         "EXTRATROPICAL_STORM": round(regional["storm_days"] * (0.8 + 0.5 * vent), 1),
@@ -67,7 +71,9 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "COASTAL_EROSION": 1.0 if coastal else 0.0,
         "SOIL_SALINIZATION": 0.4 if coastal else 0.05,
         "SURFACE_WATER_HEATING": round(regional["surface_water_heating"] * (0.5 + water), 2),
-        "LOW_FLOW_NIEDRIGWASSER": round(_clamp(regional["low_flow_days"] * (0.7 + 0.5 * dry), 0, 60), 1),
+        "LOW_FLOW_NIEDRIGWASSER": round(
+            _clamp(regional["low_flow_days"] * (0.6 + 0.4 * dry) * (1.0 + 0.3 * water_prox), 0, 60), 1
+        ),
         "CASCADE_EVENT": 0.3,
     }
     # Compound = max der normalisierten Bestandteile (model_parameters: max_of_constituent)
@@ -97,12 +103,12 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "FOREST_AREA": round(area_ha * forest, 4),
         "BIODIVERSITY_HOTSPOTS": round(area_ha * (forest + water) * 0.5, 4),
         "EROSION_PRONE_SOILS": round(area_ha * farmland * slope, 4),
-        "COASTAL_RIPARIAN_ZONES": round(area_ha * water_adj, 4),
-        "FLOODPLAINS": round(area_ha * depression * (1.0 if water_adj > 0 else 0.4), 4),
+        "COASTAL_RIPARIAN_ZONES": round(area_ha * max(water_adj, water_prox) * (0.5 + 0.5 * twi_norm), 4),
+        "FLOODPLAINS": round(area_ha * depression * max(water_prox, 0.3 if water_adj > 0 else 0.1), 4),
         "COASTAL_STORM_SURGE_EXPOSURE": round(area_ha * bldg_cov, 4) if coastal else 0.0,
         "GROUNDWATER_DEPENDENT_ECOSYSTEMS": round(area_ha * (forest + green) * (0.3 + water_adj), 4),
         "FISHERIES_AQUACULTURE_AREAS": round(water * 5.0, 2),
-        "FISH_SPAWNING_HABITATS": round(area_ha * water, 4),
+        "FISH_SPAWNING_HABITATS": round(area_ha * max(water, water_prox * 0.5), 4),
     }
 
     # ── Vulnerabilities (Index 0..100 bzw. natürliche Einheit) ─────────────────
