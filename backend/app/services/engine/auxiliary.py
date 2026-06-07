@@ -1,0 +1,98 @@
+"""Befüllt ``cell_assessments.data['auxiliary']`` — alle Sonstige-Layer-Werte."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from app.data import catalog
+
+
+def _computed_industrial(ci: dict) -> float:
+    return max(0.0, ci.get("imp_frac", 0.0) - ci.get("bldg_cov", 0.0) - ci.get("road_cov", 0.0))
+
+
+def _norm_index(value: float | None, lo: float, hi: float, invert: bool = False) -> float | None:
+    if value is None:
+        return None
+    if hi <= lo:
+        return 50.0
+    t = max(0.0, min(1.0, (value - lo) / (hi - lo)))
+    if invert:
+        t = 1.0 - t
+    return round(t * 100.0, 1)
+
+
+def build_auxiliary(ci: dict, regional: dict) -> dict[str, float | None]:
+    """Map cell inputs + regional context to AUXILIARY catalog codes."""
+    pop = float(ci.get("pop") or 0.0)
+    share_o = ci.get("share_over_65")
+    share_u = ci.get("share_under_18")
+
+    aux: dict[str, Any] = {
+        # Zensus
+        "POPULATION_COUNT": round(pop, 2) if pop else 0.0,
+        "SHARE_OVER_65": share_o,
+        "SHARE_UNDER_18": share_u,
+        "POPULATION_OVER_65": round(ci.get("pop_over_65") or 0.0, 2),
+        "POPULATION_UNDER_18": round(ci.get("pop_under_18") or 0.0, 2),
+        "LIVING_AREA_PER_PERSON": ci.get("living_area_per_person"),
+        "NET_COLD_RENT": ci.get("net_cold_rent"),
+        "OWNER_SHARE": ci.get("owner_share"),
+        "BUILDING_COUNT_ZENSUS": ci.get("building_count_zensus"),
+        "BUILDING_AGE_MEAN": ci.get("building_age_mean"),
+        # OSM
+        "IMPERVIOUS_FRACTION": round(ci.get("imp_frac", 0.0), 4),
+        "GREEN_FRACTION": round(ci.get("green_frac", 0.0), 4),
+        "WATER_FRACTION": round(ci.get("water_frac", 0.0), 4),
+        "FOREST_FRACTION": round(ci.get("forest_frac", 0.0), 4),
+        "FARMLAND_FRACTION": round(ci.get("farmland_frac", 0.0), 4),
+        "BUILDING_COVERAGE": round(ci.get("bldg_cov", 0.0), 4),
+        "BUILDING_COUNT": float(ci.get("bldg_count") or 0),
+        "AVG_BUILDING_HEIGHT": round(ci.get("avg_height", 0.0), 2),
+        "ROAD_COVERAGE": round(ci.get("road_cov", 0.0), 4),
+        "TREE_CANOPY": round(ci.get("canopy_frac", 0.0), 4),
+        "SKY_VIEW_FACTOR": round(ci.get("svf", 0.0), 4),
+        "SURFACE_ALBEDO": round(ci.get("albedo", 0.0), 4),
+        "INDUSTRIAL_FRACTION": round(_computed_industrial(ci), 4),
+        "VENTILATION_SCORE": round(ci.get("vent_score", 0.0), 4),
+        # Terrain
+        "MEAN_ELEVATION": ci.get("mean_elevation_m"),
+        "SLOPE_DEGREES": ci.get("slope_deg"),
+        "SINK_DEPTH": ci.get("sink_depth_m"),
+        "TWI": ci.get("twi"),
+        "TWI_NORMALIZED": ci.get("twi_norm"),
+        "DEPRESSION_FACTOR": ci.get("depression_factor"),
+        "SLOPE_FACTOR": ci.get("slope_factor"),
+        "FLOW_ACCUMULATION": ci.get("flow_accum"),
+        # Water
+        "WATER_DISTANCE": ci.get("water_dist_m"),
+        "WATER_PROXIMITY": ci.get("water_prox"),
+        "WATER_ADJACENCY": ci.get("water_adj"),
+        # Regional (DWD) — same value per kommune, stored per cell for export
+        "HOT_DAYS": regional.get("hot_days"),
+        "FROST_DAYS": regional.get("frost_days"),
+        "MEAN_ANNUAL_TEMP": regional.get("mean_temp"),
+        "DROUGHT_DAYS": regional.get("drought_days"),
+        "DRYNESS_INDEX": regional.get("dry_index"),
+        "STORM_DAYS": regional.get("storm_days"),
+        "HEAVY_RAIN_INDEX": regional.get("heavy_rain_index"),
+        "TEMPERATURE_RISE": regional.get("mean_temp_rise"),
+        "SOIL_MOISTURE_DECLINE": regional.get("soil_moisture_decline"),
+        "LOW_FLOW_DAYS": regional.get("low_flow_days"),
+        "SURFACE_WATER_HEATING_REGIONAL": regional.get("surface_water_heating"),
+        "SEA_LEVEL_RISE": regional.get("sea_level_rise"),
+    }
+
+    for code in catalog.AUXILIARY_BY_CODE:
+        if code not in aux:
+            aux[code] = None
+
+    rounded: dict[str, float | None] = {}
+    for k, v in aux.items():
+        if v is None:
+            rounded[k] = None
+        elif isinstance(v, float):
+            rounded[k] = round(v, 4)
+        else:
+            rounded[k] = float(v)
+    return rounded

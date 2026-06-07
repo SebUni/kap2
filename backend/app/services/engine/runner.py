@@ -13,7 +13,9 @@ from typing import Any
 
 from app.services.engine.inputs import gather_cell_inputs
 from app.services.engine.indicators import compute_cell_hev
+from app.services.engine.auxiliary import build_auxiliary
 from app.services.engine import risk_engine
+from app.services.engine.progress import RISK_COMPOSE, FINALIZE, lerp
 
 log = logging.getLogger(__name__)
 
@@ -44,7 +46,7 @@ def run_full_assessment(
     results: list[dict] = []
 
     if progress_callback:
-        progress_callback(55.0, "Berechne Klimatreiber, Expositionen & Verwundbarkeiten")
+        progress_callback(RISK_COMPOSE[0], "Berechne Klimatreiber, Expositionen & Verwundbarkeiten")
 
     for i, ci in enumerate(cell_inputs):
         hev = compute_cell_hev(ci, regional)
@@ -57,26 +59,20 @@ def run_full_assessment(
             "exposures": hev["exposures"],
             "vulnerabilities": hev["vulnerabilities"],
             "risks": risks,
+            "auxiliary": build_auxiliary(ci, regional),
             "inputs": {
-                "pop": round(ci.get("pop", 0.0), 1),
-                "uhi_delta": ci["uhi_delta"],
-                "imp_frac": ci["imp_frac"],
-                "green_frac": ci["green_frac"],
-                "water_frac": ci["water_frac"],
-                "mean_elevation_m": ci.get("mean_elevation_m", 0.0),
-                "slope_deg": ci.get("slope_deg", 0.0),
-                "sink_depth_m": ci.get("sink_depth_m", 0.0),
-                "twi": ci.get("twi", 0.0),
-                "water_dist_m": ci.get("water_dist_m", 0.0),
+                k: (round(v, 4) if isinstance(v, float) else v)
+                for k, v in ci.items()
+                if k not in ("grid_cell_id", "row", "col")
             },
         }
         results.append({"grid_cell_id": ci["grid_cell_id"], "data": data})
 
-        if progress_callback and i % 300 == 0 and total > 0:
-            pct = 55.0 + (i + 1) / total * 40.0
+        if progress_callback and (i % 150 == 0 or i + 1 == total):
+            pct = lerp(RISK_COMPOSE[0], RISK_COMPOSE[1], (i + 1) / total)
             progress_callback(pct, "Risikokomposition", f"{i + 1}/{total}")
 
     if progress_callback:
-        progress_callback(96.0, "Speichere Ergebnisse")
+        progress_callback(FINALIZE[0], "Berechnung abschließen")
 
     return results

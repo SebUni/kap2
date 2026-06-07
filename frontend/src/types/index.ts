@@ -176,8 +176,8 @@ export interface LayerMeta {
 
 // ── Katalog (vom Backend, single source of truth) ───────────────────────────
 
-export type LayerCategory = 'hazards' | 'exposures' | 'vulnerabilities' | 'risks'
-export type GroupKey = 'measures' | 'risks' | 'hazards' | 'exposures' | 'vulnerabilities'
+export type LayerCategory = 'hazards' | 'exposures' | 'vulnerabilities' | 'risks' | 'auxiliary'
+export type GroupKey = 'measures' | 'risks' | 'hazards' | 'exposures' | 'vulnerabilities' | 'auxiliary'
 
 export interface CatalogIndicator {
   code: string
@@ -258,6 +258,8 @@ export interface Catalog {
   exposure_categories: CategoryDef[]
   vulnerability_categories: CategoryDef[]
   kang_clusters: KangCluster[]
+  auxiliary: CatalogIndicator[]
+  auxiliary_categories: CategoryDef[]
 }
 
 // ── Risiko-Histogramm (Verteilung Index-Höhen je Risiko) ─────────────────────
@@ -346,4 +348,5 @@ export const GROUP_ORDER: { key: GroupKey; label: string }[] = [
   { key: 'hazards', label: 'Klimatreiber' },
   { key: 'exposures', label: 'Expositionen' },
   { key: 'vulnerabilities', label: 'Verwundbarkeiten' },
+  { key: 'auxiliary', label: 'Sonstige' },
 ]

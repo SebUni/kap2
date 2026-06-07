@@ -46,15 +46,56 @@ Code: `backend/app/services/engine/{inputs,indicators,risk_engine,runner}.py`.
 |---|---|
 | **OSM** (Overpass) | Gebäudepolygone (+Höhe/Stockwerke), Straßen, Landnutzung, Bäume → Versiegelung, Albedo, Bebauungsgrad, Baumkronen, Grün-/Wasseranteil |
 | **DWD CDC** (regional, je Bundesland) | Sommer-Tagesmaximum, heiße Tage/Jahr, Tropennächte, Jahresmittel; Klimafortschreibung RCP4.5/8.5 |
-| **Zensus 2022** (100m-Gitter, falls vorhanden) | Bevölkerung je Zelle; sonst OSM-Wohngebäudevolumen-Proxy |
-| **Zensus Demografie** | Alters-/Risikogruppen-Anteile |
+| **Zensus 2022** (Destatis INSPIRE 100m-Gitter, EPSG:3035) | Bevölkerung, Altersanteile (≥65, **<18**), Wohnfläche/Bewohner, Eigentümerquote, Nettokaltmiete, Gebäudealter je Zelle — Pflichtdaten, kein OSM-Proxy |
 | **AWS Terrarium DEM** | Mittelhöhe, Hangneigung, Senkentiefe, D8-Abfluss, TWI je Zelle |
 | **OSM Gewässer** | `natural=water`, `waterway` → Distanz/Proximität zu Fließ- und Stillgewässern |
+
+### Zensus-Autoloader
+
+Pflicht-Themen (Manifest in `zensus_loader.py`): `population`, `share_over_65`,
+`share_under_18`, `living_area_per_person`, `owner_share`, `net_cold_rent`,
+`building_age`. Beim Assessment-Lauf werden fehlende ZIPs von Destatis geladen,
+bbox-gefiltert je Kommune gecacht unter `backend/data/zensus/extract/{key}/`.
+
+Manuell: `python -m app.cli zensus-download [--keys population,...]` oder
+`POST /api/admin/zensus/sync`.
+
+Geheimhaltung (`–`, `KLAMMERN`): Zelle ohne Wert → NULL in Sonstige-Layern;
+abgeleitete H/E/V nutzen regionalen Fallback nur wenn Zensus-Zelle fehlt.
 
 Mehrkern-Verarbeitung: `multiprocessing` (fork, bis 8 Worker, Chunk 50) für die
 OSM-Aggregation je Zelle (wiederverwendet aus dem alten Hitze-Assessor).
 
 ---
+
+## 2a. Gitter (100 m, EPSG:3035)
+
+Das Bewertungsgitter folgt dem **Destatis INSPIRE 100m-Gitter** (EPSG:3035),
+nicht mehr einer lokalen UTM-Bbox. Pro Zelle werden gespeichert:
+
+| Feld | Bedeutung |
+|---|---|
+| `gitter_id` | INSPIRE-ID, z. B. `CRS3035RES100mN4340900E2698700` |
+| `x_3035`, `y_3035` | Zellmittelpunkt in EPSG:3035 |
+| `row_idx`, `col_idx` | `y_3035/100`, `x_3035/100` (Nachbar-Lookup ±1 = ±100 m) |
+
+Code: `grid_service.generate_grid`. Nach Gitter-Umstellung sind bestehende
+Assessments ungültig (Alembic-Migration leert abgeleitete Tabellen).
+
+---
+
+## 2b. Sonstige Layer (Sidebar)
+
+Kategorie **Sonstige** (`catalog.AUXILIARY`, ~42 Indikatoren) dokumentiert
+Rohdaten für Nachvollziehbarkeit: Zensus, OSM, Gelände, Gewässer, regionale
+DWD-Werte. Werte werden in `CellAssessment.data["auxiliary"]` persistiert und
+als eigener GeoPackage-Layer **`sonstige_100m`** exportiert (eine Spalte pro
+Katalog-Code). H/E/V-Tooltips verweisen über `formulas.py` auf die zugehörigen
+Sonstige-Codes (`aux_layer`).
+
+Unterkategorien: `zensus`, `osm`, `terrain`, `water`, `regional` — siehe
+`catalog_auxiliary.py`.
+
 
 ## 3. Urbane Überwärmung (UHI) – ΔT pro Zelle
 
@@ -90,11 +131,22 @@ Katalog: `unit`, `[norm_min, norm_max]`, `spatial`, `proxy`, `source`,
 `description` (alle im `(i)`-Tooltip sichtbar).
 
 - **Räumlich aufgelöst (`spatial=true`):** aus Zell-Inputs abgeleitet
-  (z. B. `POPULATION_DENSITY` aus Zensus/OSM, `HEAT_WAVE`/`UHI_INTENSITY` aus ΔT,
-  `IMPERVIOUSNESS` aus OSM).
+  (z. B. `POPULATION_DENSITY` aus Zensus-100m-Bevölkerung,
+  `AGE_STRUCTURE` aus Anteil ≥65 + **<18** je Zelle,
+  `HEAT_WAVE`/`UHI_INTENSITY` aus ΔT, `IMPERVIOUSNESS` aus OSM).
 - **Konstant (`spatial=false`):** regionaler Wert für alle Zellen
-  (z. B. `SEA_LEVEL_RISE`, `MEAN_TEMPERATURE_RISE`, demografische Quoten).
+  (z. B. `SEA_LEVEL_RISE`, `MEAN_TEMPERATURE_RISE`, einige Sturm-/Dürre-Proxys).
   Diese sind in den Tooltips als „nicht räumlich aufgelöst“ gekennzeichnet.
+
+### Wichtige abgeleitete Formeln (Zensus-basiert)
+
+| Code | Formel (Kurz) |
+|---|---|
+| `POPULATION_DENSITY` | `pop / Fläche_km²` (pop aus Zensus-100m) |
+| `AGE_STRUCTURE` | `share_over_65 + share_under_18` (%, je Zelle) |
+| `VULNERABLE_GROUPS_POPULATION` | `pop × (share_over_65 + share_under_18) / 100` |
+| `BUILDING_STABILITY` | Index steigt mit Gebäudealter (Zensus mittleres Baujahr) + OSM-Höhe/Deckung |
+| `INCOME_SOCIAL_RESILIENCE` | Mittel aus Miete-, Eigentümer- und Wohnflächen-Indizes (Zensus-100m) |
 
 ### Normalisierung (nur fürs Risiko)
 `risk_engine.normalize_hev` → `catalog.normalize_value(code, x)`:
@@ -197,7 +249,8 @@ Indizes mit dem DWD-Trend der heißen Tage (RCP4.5/8.5) bis ~2065.
 
 | Endpoint | Zweck |
 |---|---|
-| `GET /api/catalog` | fester H/E/V/Risiken/Maßnahmen/Gruppen-Katalog |
+| `GET /api/catalog` | fester H/E/V/Risiken/Maßnahmen/Sonstige/Gruppen-Katalog |
+| `POST /api/admin/zensus/sync` | Zensus-CSVs herunterladen/cachen |
 | `POST /api/kommune/{id}/assess` | vollständigen Lauf starten |
 | `GET /api/kommune/{id}/status` | Fortschritt/Status (Polling) |
 | `GET /api/kommune/{id}/layer/{code}` | GeoJSON einer Ebene (absolute Einheit bzw. Index) |
@@ -211,11 +264,19 @@ Indizes mit dem DWD-Trend der heißen Tage (RCP4.5/8.5) bis ~2065.
 ## 10. Datenmodell
 
 - **`CellAssessment.data`** (JSONB) je Zelle:
-  `{"hazards": {CODE: wert}, "exposures": {…}, "vulnerabilities": {…}, "risks": {CODE: {"index": …}}}`
+  `{"inputs": {…}, "hazards": {CODE: wert}, "exposures": {…}, "vulnerabilities": {…},
+   "auxiliary": {CODE: wert|null}, "risks": {CODE: {"index": …}}}`
+- **`GridCell`:** `gitter_id`, `x_3035`, `y_3035` (Zensus INSPIRE 100m)
 - **`ProjectStatus.task_key`** (String) statt früherem `climate_type`-Enum.
 - **`RiskZone.layer_code`** (String) statt Enum.
 - DB wurde für das neue Schema zurückgesetzt; Tabellen werden beim App-Start
   via `Base.metadata.create_all` sichergestellt.
+
+### GeoPackage-Export
+
+Layer **`bewertung_100m`**: H/E/V/R + `gitter_id` als Join-Schlüssel.
+Layer **`sonstige_100m`**: alle `catalog.AUXILIARY`-Spalten aus `data.auxiliary`
+(NULL bei fehlenden/geheimen Zensus-Werten).
 
 ---
 

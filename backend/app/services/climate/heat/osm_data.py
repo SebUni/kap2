@@ -42,6 +42,7 @@ LANDUSE_IMPERVIOUS: dict[str, float] = {
     "farmland": 0.05,
     "farmyard": 0.40,
     "forest": 0.02,
+    "forestry": 0.02,
     "meadow": 0.03,
     "grass": 0.03,
     "orchard": 0.05,
@@ -62,6 +63,7 @@ LANDUSE_ALBEDO: dict[str, float] = {
     "farmland": 0.25,
     "farmyard": 0.22,
     "forest": 0.12,
+    "forestry": 0.12,
     "meadow": 0.25,
     "grass": 0.25,
     "orchard": 0.18,
@@ -74,6 +76,7 @@ LANDUSE_ALBEDO: dict[str, float] = {
 
 NATURAL_IMPERVIOUS: dict[str, float] = {
     "wood": 0.02,
+    "forest": 0.02,
     "scrub": 0.05,
     "heath": 0.05,
     "grassland": 0.03,
@@ -85,6 +88,7 @@ NATURAL_IMPERVIOUS: dict[str, float] = {
 
 NATURAL_ALBEDO: dict[str, float] = {
     "wood": 0.12,
+    "forest": 0.12,
     "scrub": 0.18,
     "heath": 0.20,
     "grassland": 0.25,
@@ -93,7 +97,6 @@ NATURAL_ALBEDO: dict[str, float] = {
     "bare_rock": 0.30,
     "sand": 0.35,
 }
-
 
 def _overpass_query(query_body: str, _retries: int = 5) -> dict:
     """Execute a synchronous Overpass API query with retry on transient errors.
@@ -405,7 +408,6 @@ def compute_cell_landuse(
         nat = feat["natural"]
         leisure = feat["leisure"]
 
-        # Determine impervious fraction and albedo
         if lu and lu in LANDUSE_IMPERVIOUS:
             imp = LANDUSE_IMPERVIOUS[lu]
             alb = LANDUSE_ALBEDO.get(lu, 0.20)
@@ -430,9 +432,9 @@ def compute_cell_landuse(
         # Track green / water
         if nat == "water":
             water_area += frac
-        elif nat in ("wood", "grassland", "scrub", "heath", "wetland"):
+        elif nat in ("wood", "forest", "grassland", "scrub", "heath", "wetland"):
             green_area += frac
-        elif lu in ("forest", "meadow", "grass", "orchard", "vineyard",
+        elif lu in ("forest", "forestry", "meadow", "grass", "orchard", "vineyard",
                      "allotments", "village_green"):
             green_area += frac
         elif leisure == "park":
@@ -453,12 +455,24 @@ def compute_cell_landuse(
 
     # Detailed vegetation breakdown for Level 4
     forest_area = 0.0
+    glacier_area = 0.0
     farmland_area = 0.0
     for label, area in landuse_areas.items():
-        if label in ("forest", "wood"):
+        if label in ("forest", "wood", "forestry"):
             forest_area += area
         elif label in ("farmland", "orchard", "vineyard"):
             farmland_area += area
+
+    # Gletscher separat (natural=glacier wird nicht in LANDUSE/NATURAL-Tabellen verarbeitet)
+    for feat in landuse_features:
+        if feat.get("natural") != "glacier":
+            continue
+        feat_geom = feat["geometry"]
+        if not cell_geom.intersects(feat_geom):
+            continue
+        intersection = cell_geom.intersection(feat_geom)
+        if intersection.area > 0 and cell_area > 0:
+            glacier_area += intersection.area / cell_area
 
     return {
         "impervious_fraction": round(min(max(imp_final, 0.0), 1.0), 4),
@@ -466,6 +480,7 @@ def compute_cell_landuse(
         "green_fraction": round(min(green_area, 1.0), 4),
         "water_fraction": round(min(water_area, 1.0), 4),
         "forest_fraction": round(min(forest_area, 1.0), 4),
+        "glacier_fraction": round(min(glacier_area, 1.0), 4),
         "farmland_fraction": round(min(farmland_area, 1.0), 4),
         "dominant_landuse": dominant,
         "coverage_pct": round(total_covered * 100, 1),
@@ -672,6 +687,182 @@ def _empty_building_metrics() -> dict:
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+def _ways_by_id(all_elements: list[dict]) -> dict[int, list[int]]:
+    return {
+        el["id"]: el.get("nodes", [])
+        for el in all_elements
+        if el.get("type") == "way"
+    }
+
+
+def _group_connected_ways(
+    way_ids: list[int],
+    ways_by_id: dict[int, list[int]],
+) -> list[list[int]]:
+    """Gruppiert Way-IDs, die Endpunkte teilen (für Multipolygon-Ringe)."""
+    if not way_ids:
+        return []
+    id_set = set(way_ids)
+    endpoint_map: dict[int, list[int]] = {}
+    for wid in way_ids:
+        nds = ways_by_id.get(wid, [])
+        if len(nds) < 2:
+            continue
+        for n in (nds[0], nds[-1]):
+            endpoint_map.setdefault(n, []).append(wid)
+
+    visited: set[int] = set()
+    groups: list[list[int]] = []
+    for wid in way_ids:
+        if wid in visited:
+            continue
+        stack = [wid]
+        group: list[int] = []
+        while stack:
+            w = stack.pop()
+            if w in visited:
+                continue
+            visited.add(w)
+            group.append(w)
+            nds = ways_by_id.get(w, [])
+            if len(nds) >= 2:
+                for n in (nds[0], nds[-1]):
+                    for nb in endpoint_map.get(n, []):
+                        if nb in id_set and nb not in visited:
+                            stack.append(nb)
+        if group:
+            groups.append(group)
+    return groups
+
+
+def _stitch_ring_from_way_ids(
+    way_ids: list[int],
+    ways_by_id: dict[int, list[int]],
+    nodes: dict[int, tuple[float, float]],
+) -> list[tuple[float, float]] | None:
+    """Stitcht OSM-Way-Segmente zu einem geschlossenen Koordinatenring."""
+    segments: list[list[int]] = []
+    for wid in way_ids:
+        nds = ways_by_id.get(wid)
+        if nds and len(nds) >= 2:
+            segments.append(list(nds))
+    if not segments:
+        return None
+
+    ring_nds = list(segments.pop(0))
+    guard = len(segments) + 20
+    while segments and guard > 0:
+        guard -= 1
+        end = ring_nds[-1]
+        start = ring_nds[0]
+        merged = False
+        for i, seg in enumerate(segments):
+            if seg[0] == end:
+                ring_nds.extend(seg[1:])
+                segments.pop(i)
+                merged = True
+                break
+            if seg[-1] == end:
+                ring_nds.extend(reversed(seg[:-1]))
+                segments.pop(i)
+                merged = True
+                break
+            if seg[-1] == start:
+                ring_nds = seg + ring_nds[1:]
+                segments.pop(i)
+                merged = True
+                break
+            if seg[0] == start:
+                ring_nds = list(reversed(seg)) + ring_nds[1:]
+                segments.pop(i)
+                merged = True
+                break
+        if not merged:
+            break
+
+    if ring_nds[0] != ring_nds[-1]:
+        if len(ring_nds) >= 3:
+            ring_nds.append(ring_nds[0])
+        else:
+            return None
+
+    coords = [nodes[n] for n in ring_nds if n in nodes]
+    return coords if len(coords) >= 4 else None
+
+
+def _ring_to_polygon(coords: list[tuple[float, float]]) -> Polygon | None:
+    try:
+        poly = Polygon(coords)
+        if poly.is_valid:
+            return poly
+        fixed = poly.buffer(0)
+        return fixed if not fixed.is_empty else None
+    except Exception:
+        return None
+
+
+def _relation_to_multipolygon(
+    el: dict,
+    nodes: dict[int, tuple[float, float]],
+    all_elements: list[dict],
+) -> Polygon | MultiPolygon | None:
+    """Multipolygon-Relation: äußere Ringe stitchen, innere Löcher zuordnen."""
+    ways_by_id = _ways_by_id(all_elements)
+    outer_refs: list[int] = []
+    inner_refs: list[int] = []
+    for member in el.get("members", []):
+        if member.get("type") != "way":
+            continue
+        ref = member.get("ref")
+        if ref is None:
+            continue
+        role = member.get("role", "outer")
+        if role == "inner":
+            inner_refs.append(ref)
+        else:
+            outer_refs.append(ref)
+
+    hole_rings: list[list[tuple[float, float]]] = []
+    for ig in _group_connected_ways(inner_refs, ways_by_id):
+        ring = _stitch_ring_from_way_ids(ig, ways_by_id, nodes)
+        if ring:
+            hole_rings.append(ring)
+
+    polys: list[Polygon] = []
+    for og in _group_connected_ways(outer_refs, ways_by_id):
+        ring = _stitch_ring_from_way_ids(og, ways_by_id, nodes)
+        if not ring:
+            continue
+        holes_here: list[list[tuple[float, float]]] = []
+        if hole_rings:
+            try:
+                outer_tmp = Polygon(ring)
+                for hole in hole_rings:
+                    hp = Polygon(hole)
+                    if outer_tmp.contains(hp.centroid):
+                        holes_here.append(hole)
+            except Exception:
+                pass
+        try:
+            poly = Polygon(ring, holes_here) if holes_here else Polygon(ring)
+            if poly.is_valid and not poly.is_empty:
+                polys.append(poly)
+            else:
+                fixed = poly.buffer(0)
+                if not fixed.is_empty:
+                    polys.append(fixed)
+        except Exception:
+            pr = _ring_to_polygon(ring)
+            if pr is not None:
+                polys.append(pr)
+
+    if not polys:
+        return None
+    if len(polys) == 1:
+        return polys[0]
+    return unary_union(polys)
+
+
 def _element_to_polygon(
     el: dict,
     nodes: dict[int, tuple[float, float]],
@@ -682,41 +873,13 @@ def _element_to_polygon(
         nds = el.get("nodes", [])
         coords = [nodes[n] for n in nds if n in nodes]
         if len(coords) >= 4:
-            try:
-                poly = Polygon(coords)
-                if poly.is_valid:
-                    return poly
-                return poly.buffer(0)
-            except Exception:
-                return None
+            return _ring_to_polygon(coords)
+        if len(coords) >= 3 and coords[0] == coords[-1]:
+            return _ring_to_polygon(coords)
+        return None
 
-    elif el["type"] == "relation":
-        outer_rings = []
-        for member in el.get("members", []):
-            if member.get("role") != "outer":
-                continue
-            ref = member.get("ref")
-            # Find referenced way
-            for sub in all_elements:
-                if sub["type"] == "way" and sub["id"] == ref:
-                    nds = sub.get("nodes", [])
-                    coords = [nodes[n] for n in nds if n in nodes]
-                    if len(coords) >= 4:
-                        outer_rings.append(coords)
-                    break
-        if outer_rings:
-            polys = []
-            for ring in outer_rings:
-                try:
-                    p = Polygon(ring)
-                    if p.is_valid:
-                        polys.append(p)
-                    else:
-                        polys.append(p.buffer(0))
-                except Exception:
-                    continue
-            if polys:
-                return unary_union(polys)
+    if el["type"] == "relation":
+        return _relation_to_multipolygon(el, nodes, all_elements)
 
     return None
 

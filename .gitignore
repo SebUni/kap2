@@ -1,0 +1,52 @@
+# Python
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+dist/
+build/
+.pip/
+pip-cache/
+
+# Secrets / local env
+.env
+.env.*
+!.env.example
+
+# Logs
+backend/logs/
+*.log
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Zensus bulk data (download: python -m app.cli zensus-download)
+backend/data/zensus/extract/
+backend/data/zensus/index/
+backend/data/zensus/**/*.zip
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Models / binaries
+*.pkl
+*.h5
+*.pt
+*.bin
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Local notes
+TODO.md

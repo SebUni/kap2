@@ -9,76 +9,72 @@ import pyproj
 from app.config import settings
 from app.models.models import Kommune, GridCell
 
+CELL_SIZE_M = 100
+
+
+def gitter_id_from_origin(x0: int, y0: int) -> str:
+    """INSPIRE GITTER_ID for 100m cell lower-left corner in EPSG:3035."""
+    return f"CRS3035RES100mN{y0}E{x0}"
+
 
 def generate_grid(db: Session, kommune_id: int, cell_size_m: int = 100, *, force: bool = False) -> int:
-    """Generate a rectangular grid of cells over the municipality boundary.
+    """Generate Zensus INSPIRE 100m grid cells intersecting the municipality.
 
-    Uses a projected CRS (UTM) for metric grid generation, then converts
-    cells back to WGS84 (EPSG:4326).
-
-    If a grid already exists and ``force`` is False, returns the existing
-    cell count without deleting assessments or other derived data.
-
-    Returns the number of cells created (or already present).
+    Uses EPSG:3035 for alignment with Destatis/BKG Zensus 2022 grid, stores
+    geometry in EPSG:4326.
     """
+    if cell_size_m != 100:
+        raise ValueError("Nur 100m-Zensus-Gitter wird unterstützt")
+
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune or kommune.boundary is None:
         raise ValueError(f"Kommune {kommune_id} not found or has no boundary")
 
-    existing_count = (
-        db.query(GridCell).filter(GridCell.kommune_id == kommune_id).count()
-    )
+    existing_count = db.query(GridCell).filter(GridCell.kommune_id == kommune_id).count()
     if existing_count > 0 and not force:
         return existing_count
 
-    # Delete existing grid for this kommune (cascades to assessments)
     if existing_count > 0:
         db.query(GridCell).filter(GridCell.kommune_id == kommune_id).delete()
 
-    # Load boundary as shapely geometry
     boundary_shape = to_shape(kommune.boundary)
 
-    # Set up coordinate transformations: WGS84 <-> UTM
     proj_wgs84 = pyproj.CRS("EPSG:4326")
-    proj_utm = pyproj.CRS(f"EPSG:{settings.CALCULATION_SRID}")
+    proj_laea = pyproj.CRS(f"EPSG:{settings.ZENSUS_SRID}")
+    to_laea = pyproj.Transformer.from_crs(proj_wgs84, proj_laea, always_xy=True)
+    to_wgs = pyproj.Transformer.from_crs(proj_laea, proj_wgs84, always_xy=True)
 
-    transformer_to_utm = pyproj.Transformer.from_crs(proj_wgs84, proj_utm, always_xy=True)
-    transformer_to_wgs = pyproj.Transformer.from_crs(proj_utm, proj_wgs84, always_xy=True)
+    boundary_laea = transform(to_laea.transform, boundary_shape)
+    minx, miny, maxx, maxy = boundary_laea.bounds
 
-    # Transform boundary to UTM
-    boundary_utm = transform(transformer_to_utm.transform, boundary_shape)
-    minx, miny, maxx, maxy = boundary_utm.bounds
-
-    # Generate grid cells
-    cols = math.ceil((maxx - minx) / cell_size_m)
-    rows = math.ceil((maxy - miny) / cell_size_m)
+    x_start = int(math.floor(minx / cell_size_m) * cell_size_m)
+    y_start = int(math.floor(miny / cell_size_m) * cell_size_m)
+    x_end = int(math.ceil(maxx / cell_size_m) * cell_size_m)
+    y_end = int(math.ceil(maxy / cell_size_m) * cell_size_m)
 
     cells = []
-    for row_idx in range(rows):
-        for col_idx in range(cols):
-            x0 = minx + col_idx * cell_size_m
-            y0 = miny + row_idx * cell_size_m
-            x1 = x0 + cell_size_m
-            y1 = y0 + cell_size_m
-
-            cell_utm = box(x0, y0, x1, y1)
-
-            # Only include cells that intersect the municipality boundary
-            if not cell_utm.intersects(boundary_utm):
+    for y0 in range(y_start, y_end, cell_size_m):
+        for x0 in range(x_start, x_end, cell_size_m):
+            cell_laea = box(x0, y0, x0 + cell_size_m, y0 + cell_size_m)
+            if not cell_laea.intersects(boundary_laea):
                 continue
 
-            # Transform cell back to WGS84
-            cell_wgs = transform(transformer_to_wgs.transform, cell_utm)
+            x_mp = x0 + cell_size_m // 2
+            y_mp = y0 + cell_size_m // 2
+            gid = gitter_id_from_origin(x0, y0)
+            cell_wgs = transform(to_wgs.transform, cell_laea)
 
             cells.append(GridCell(
                 kommune_id=kommune_id,
                 geometry=from_shape(cell_wgs, srid=4326),
-                row_idx=row_idx,
-                col_idx=col_idx,
+                gitter_id=gid,
+                x_3035=x_mp,
+                y_3035=y_mp,
+                row_idx=y_mp // cell_size_m,
+                col_idx=x_mp // cell_size_m,
                 cell_size_m=cell_size_m,
             ))
 
-    # Bulk insert
     if cells:
         db.bulk_save_objects(cells)
         db.commit()
@@ -97,6 +93,9 @@ def get_grid_geojson(db: Session, kommune_id: int) -> dict:
             "type": "Feature",
             "properties": {
                 "id": cell.id,
+                "gitter_id": cell.gitter_id,
+                "x_3035": cell.x_3035,
+                "y_3035": cell.y_3035,
                 "row": cell.row_idx,
                 "col": cell.col_idx,
                 "cell_size_m": cell.cell_size_m,

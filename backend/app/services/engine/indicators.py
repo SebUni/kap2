@@ -15,6 +15,33 @@ def _clamp(x: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, x))
 
 
+def _building_stability(ci: dict) -> float:
+    bldg_cov = ci.get("bldg_cov", 0.0)
+    avg_h = ci.get("avg_height", 0.0)
+    base = 50.0 + bldg_cov * 20.0 + (10.0 if avg_h > 18 else 0.0)
+    age = ci.get("building_age_mean")
+    if age is not None:
+        base += min(30.0, max(0.0, (2024.0 - float(age)) / 100.0 * 30.0))
+    return round(_clamp(base, 0, 100), 1)
+
+
+def _income_resilience(ci: dict) -> float:
+    """Hoher Index = geringe soziale Resilienz (invers)."""
+    scores: list[float] = []
+    rent = ci.get("net_cold_rent")
+    if rent is not None:
+        scores.append(_clamp(float(rent) / 18.0 * 100.0, 0, 100))
+    owner = ci.get("owner_share")
+    if owner is not None:
+        scores.append(_clamp(100.0 - float(owner), 0, 100))
+    la = ci.get("living_area_per_person")
+    if la is not None:
+        scores.append(_clamp(100.0 - min(float(la) / 60.0 * 100.0, 100.0), 0, 100))
+    if not scores:
+        return 45.0
+    return round(sum(scores) / len(scores), 1)
+
+
 def compute_cell_hev(ci: dict, regional: dict) -> dict:
     """Gibt {"hazards":{}, "exposures":{}, "vulnerabilities":{}} für eine Zelle."""
     area_ha = ci["area_m2"] / 10_000.0
@@ -33,17 +60,23 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
     road_cov = ci["road_cov"]
     uhi = ci["uhi_delta"]
     vent = ci["vent_score"]
+    glacier_frac = ci.get("glacier_frac", 0.0)
+    snow_elev = ci.get("snow_elevation_factor", 0.2)
     depression = ci.get("depression_factor", ci["depression_proxy"])
     slope = ci.get("slope_factor", ci["slope_proxy"])
     water_adj = ci.get("water_adj", 0.0)
     water_prox = ci.get("water_prox", water_adj)
     twi_norm = ci.get("twi_norm", depression)
+    elev_m = float(ci.get("mean_elevation_m", 0.0))
 
     coastal = regional["is_coastal"]
     dry = regional["dry_index"]
-    demo = regional["demographics"]
-    share_vuln = demo["share_vulnerable"]
-    share_old = demo["share_over_65"]
+    share_old = float(ci.get("share_over_65") if ci.get("share_over_65") is not None
+                    else regional["demographics"].get("share_over_65", 22.0))
+    share_young = float(ci.get("share_under_18") if ci.get("share_under_18") is not None
+                      else regional["demographics"].get("share_under_18", 18.0))
+    share_vuln = float(ci.get("share_vulnerable") if ci.get("share_vulnerable") is not None
+                       else min(100.0, share_old + share_young))
 
     industrial = max(0.0, imp - bldg_cov - road_cov)  # grober Industrie/Gewerbe-Proxy
 
@@ -53,7 +86,13 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "SEA_LEVEL_RISE": regional["sea_level_rise"] if coastal else 0.0,
         "OCEAN_WARMING": 1.2 if coastal else 0.0,
         "OCEAN_ACIDIFICATION": 0.1 if coastal else 0.0,
-        "GLACIER_SNOW_LOSS": 0.5,
+        "GLACIER_SNOW_LOSS": round(
+            regional["glacier_loss_rate"] * glacier_frac
+            + regional["snow_decline_rate_pct"]
+            * (0.25 + 0.75 * snow_elev)
+            * min(1.0, regional.get("snow_days", 20) / 45.0),
+            3,
+        ),
         "PERMAFROST_THAW": 0.0,
         "SOIL_MOISTURE_DECLINE": round(regional["soil_moisture_decline"] * (0.5 + 0.6 * (farmland + green)), 1),
         "HEAT_WAVE": round(_clamp(regional["hot_days"] + uhi * 1.5, 0, 40), 1),
@@ -69,7 +108,16 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "LANDSLIDE": round(_clamp(slope * 100.0 * (regional["heavy_rain_index"] / 100.0), 0, 100), 1),
         "SALTWATER_INTRUSION": 0.3 if coastal else 0.0,
         "COASTAL_EROSION": 1.0 if coastal else 0.0,
-        "SOIL_SALINIZATION": 0.4 if coastal else 0.05,
+        "SOIL_SALINIZATION": round(min(1.0, (
+            (0.4 if coastal else 0.05)
+            * (0.35 + 0.65 * depression)
+            * (0.45 + 0.55 * farmland)
+            * (0.55 + 0.45 * dry)
+            * (
+                (0.5 + 0.5 * max(water_prox, water_adj)) if coastal
+                else (0.55 + 0.45 * max(0.0, min(1.0, 1.0 - elev_m / 80.0)))
+            )
+        )), 3),
         "SURFACE_WATER_HEATING": round(regional["surface_water_heating"] * (0.5 + water), 2),
         "LOW_FLOW_NIEDRIGWASSER": round(
             _clamp(regional["low_flow_days"] * (0.6 + 0.4 * dry) * (1.0 + 0.3 * water_prox), 0, 60), 1
@@ -87,7 +135,7 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
     # ── Exposures (absolute Einheit) ───────────────────────────────────────────
     E = {
         "POPULATION_DENSITY": round(pop_density, 1),
-        "AGE_STRUCTURE": round(share_old + demo["share_under_6"], 1),
+        "AGE_STRUCTURE": round(share_old + share_young, 1),
         "OUTDOOR_THERMAL_EXPOSURE": round(2.0 + 3.0 * green, 2),
         "VULNERABLE_GROUPS_POPULATION": round(pop * share_vuln / 100.0, 1),
         "BUILDING_STOCK": round(bldg_cov * ci["area_m2"], 0),
@@ -113,11 +161,11 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
 
     # ── Vulnerabilities (Index 0..100 bzw. natürliche Einheit) ─────────────────
     V = {
-        "BUILDING_STABILITY": round(_clamp(50.0 + bldg_cov * 20.0 + (10.0 if avg_h > 18 else 0.0), 0, 100), 1),
+        "BUILDING_STABILITY": _building_stability(ci),
         "CRITICAL_INFRA_CONDITION": 50.0,
         "MATERIAL_HEAT_SENSITIVITY": round(_clamp(imp * 100.0, 0, 100), 1),
         "VULNERABLE_GROUPS_SHARE": round(share_vuln, 1),
-        "INCOME_SOCIAL_RESILIENCE": 45.0,
+        "INCOME_SOCIAL_RESILIENCE": _income_resilience(ci),
         "HEALTHCARE_ACCESS": 40.0,
         "WILDFIRE_SUSCEPTIBILITY": round(_clamp(forest * 100.0 * (0.5 + dry / 2.0), 0, 100), 1),
         "BIODIVERSITY_RESILIENCE": round(_clamp(100.0 - (forest + green) * 100.0 * 0.6, 0, 100), 1),

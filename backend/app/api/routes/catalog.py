@@ -25,4 +25,6 @@ def get_catalog():
         "exposure_categories": catalog.EXPOSURE_CATEGORIES,
         "vulnerability_categories": catalog.VULNERABILITY_CATEGORIES,
         "kang_clusters": catalog.KANG_CLUSTERS,
+        "auxiliary": catalog.AUXILIARY,
+        "auxiliary_categories": catalog.AUXILIARY_CATEGORIES,
     }

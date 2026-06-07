@@ -23,9 +23,9 @@ log = logging.getLogger(__name__)
 
 # Bundesweite Zensus-2022-Mittelwerte (Anteile), Quelle: Destatis Zensus 2022.
 NATIONAL_DEMOGRAPHICS = {
-    "share_over_65": 22.0,       # % Bevölkerung ≥ 65
-    "share_under_6": 5.5,        # % Bevölkerung ≤ 6
-    "share_vulnerable": 30.0,    # % vulnerable Gruppen (Alter + Sozialstruktur, grob)
+    "share_over_65": 22.0,
+    "share_under_18": 18.0,
+    "share_vulnerable": 40.0,
     "persons_per_residential_building": 5.0,
 }
 

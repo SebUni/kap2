@@ -7,7 +7,10 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   })
   if (!res.ok) {
     const body = await res.text()
-    throw new Error(`API ${res.status}: ${body}`)
+    if (res.status === 500 && !body.trim()) {
+      throw new Error('Backend nicht erreichbar (Port 8000). Bitte Backend starten: cd backend && python3 -m uvicorn app.main:app --reload')
+    }
+    throw new Error(`API ${res.status}: ${body || res.statusText}`)
   }
   return res.json()
 }

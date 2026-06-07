@@ -38,6 +38,9 @@ class KommuneOut(BaseModel):
 
 class GridCellOut(BaseModel):
     id: int
+    gitter_id: str
+    x_3035: int
+    y_3035: int
     row_idx: int
     col_idx: int
     cell_size_m: int

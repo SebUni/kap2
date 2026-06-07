@@ -17,7 +17,7 @@ from app.tasks.assessment_task import (
 from app.services.measure_service import get_risk_aggregate
 from app.services.engine import risk_engine
 from app.services.engine import formulas
-from app.services.engine.formulas import build_regional_context
+from app.services.engine.inputs import build_regional_context
 from app.services.engine.runner import COASTAL_BUNDESLAENDER
 
 log = logging.getLogger(__name__)
@@ -31,6 +31,8 @@ def _layer_category(code: str) -> str | None:
         return "exposures"
     if code in catalog.VULNERABILITIES_BY_CODE:
         return "vulnerabilities"
+    if code in catalog.AUXILIARY_BY_CODE:
+        return "auxiliary"
     if code in catalog.RISKS_BY_CODE:
         return "risks"
     return None
@@ -126,6 +128,7 @@ def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
             data = ca.data or {}
             props: dict = {
                 "grid_cell_id": cell.id,
+                "gitter_id": cell.gitter_id,
                 "row": cell.row_idx,
                 "col": cell.col_idx,
             }

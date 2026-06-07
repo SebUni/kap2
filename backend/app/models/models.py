@@ -58,8 +58,11 @@ class GridCell(Base):
     id = Column(Integer, primary_key=True, index=True)
     kommune_id = Column(Integer, ForeignKey("kommunen.id", ondelete="CASCADE"), nullable=False)
     geometry = Column(Geometry("POLYGON", srid=4326), nullable=False)
-    row_idx = Column(Integer, nullable=False)
-    col_idx = Column(Integer, nullable=False)
+    gitter_id = Column(String(64), unique=True, index=True, nullable=False)
+    x_3035 = Column(Integer, nullable=False)
+    y_3035 = Column(Integer, nullable=False)
+    row_idx = Column(Integer, nullable=False, default=0)
+    col_idx = Column(Integer, nullable=False, default=0)
     cell_size_m = Column(Integer, default=100)
 
     kommune = relationship("Kommune", back_populates="grid_cells")
@@ -75,6 +78,7 @@ class GridCell(Base):
 #     "vulnerabilities":  {CODE: absoluter Wert, ...},
 #     "risks":            {CODE: {"index": 0-100, "outcome": float, "cost_eur": float}, ...},
 #     "inputs":           {... Rohgrößen (Versiegelung, ΔT, Bevölkerung, ...) ...}
+#     "auxiliary":        {CODE: Wert, ...}  # Sonstige-Layer (Zensus, OSM, DEM, regional)
 #   }
 
 class CellAssessment(Base):

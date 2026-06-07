@@ -308,6 +308,9 @@ def compute_terrain_for_cells(
     with _cache_lock:
         cached = _dem_cache.get(cache_key)
         if cached and _time.time() - cached[0] < _CACHE_TTL:
+            if progress_callback:
+                from app.services.engine.progress import TERRAIN_HYDRO
+                progress_callback(TERRAIN_HYDRO[1], "Geländeanalyse (Cache)")
             return cached[1]
 
     all_geoms = [c["geometry"] for c in grid_cells]
@@ -317,33 +320,42 @@ def compute_terrain_for_cells(
     cell_size_m = float(grid_cells[0].get("cell_size_m", 100))
     zoom = _select_zoom(cell_size_m, lat_center)
 
+    from app.services.engine.progress import TERRAIN_DEM, TERRAIN_ELEV, TERRAIN_HYDRO, lerp
+
     if progress_callback:
-        progress_callback(12.0, "Lade Höhenmodell (Terrarium)")
+        progress_callback(TERRAIN_DEM[0], "Lade Höhenmodell (Terrarium)")
 
     dem = _build_dem_mosaic(west, south, east, north, zoom)
 
     if progress_callback:
-        progress_callback(18.0, "Berechne Zellhöhen")
+        progress_callback(TERRAIN_DEM[1], "Lade Höhenmodell (Terrarium)")
+        progress_callback(TERRAIN_ELEV[0], "Berechne Zellhöhen")
 
     # Höhe je Zelle
+    # Lokales Raster (0-basiert) — Zensus row/col sind große EPSG:3035-Koordinaten/100
+    local_rows = sorted({c["row"] for c in grid_cells})
+    local_cols = sorted({c["col"] for c in grid_cells})
+    row_i = {r: i for i, r in enumerate(local_rows)}
+    col_i = {c: j for j, c in enumerate(local_cols)}
+
     cell_elev: dict[tuple[int, int], float] = {}
-    max_row = max(c["row"] for c in grid_cells)
-    max_col = max(c["col"] for c in grid_cells)
-    elev_grid = np.full((max_row + 1, max_col + 1), np.nan)
-    valid = np.zeros((max_row + 1, max_col + 1), dtype=bool)
+    max_row = len(local_rows)
+    max_col = len(local_cols)
+    elev_grid = np.full((max_row, max_col), np.nan)
+    valid = np.zeros((max_row, max_col), dtype=bool)
 
     for idx, cell in enumerate(grid_cells):
-        r, c = cell["row"], cell["col"]
+        r, c = row_i[cell["row"]], col_i[cell["col"]]
         e = _sample_cell_elevation(cell["geometry"], dem)
         cell_elev[(r, c)] = e
         elev_grid[r, c] = e
         valid[r, c] = True
-        if progress_callback and idx % 500 == 0 and idx > 0:
-            pct = 18.0 + idx / len(grid_cells) * 12.0
+        if progress_callback and idx > 0 and (idx % 300 == 0 or idx + 1 == len(grid_cells)):
+            pct = lerp(TERRAIN_ELEV[0], TERRAIN_ELEV[1], idx / len(grid_cells))
             progress_callback(pct, "Zellhöhen", f"{idx}/{len(grid_cells)}")
 
     if progress_callback:
-        progress_callback(32.0, "Hydrologie (Hang, Senke, TWI)")
+        progress_callback(TERRAIN_HYDRO[0], "Hydrologie (Hang, Senke, TWI)")
 
     elev_filled = _fill_nan_nearest(elev_grid)
     slope_rad = _compute_slope_grid(elev_filled, cell_size_m)
@@ -357,7 +369,7 @@ def compute_terrain_for_cells(
 
     results: dict[int, dict] = {}
     for idx, cell in enumerate(grid_cells):
-        r, c = cell["row"], cell["col"]
+        r, c = row_i[cell["row"]], col_i[cell["col"]]
         slope_deg = float(math.degrees(slope_rad[r, c]))
         s_norm = float(slope_norm_all[r, c])
         sk_m = float(sink_depth[r, c])
@@ -383,6 +395,9 @@ def compute_terrain_for_cells(
 
     with _cache_lock:
         _dem_cache[cache_key] = (_time.time(), results)
+
+    if progress_callback:
+        progress_callback(TERRAIN_HYDRO[1], "Geländeanalyse abgeschlossen")
 
     log.info(
         "Terrain: %d cells, zoom=%d, elev %.0f..%.0f m",

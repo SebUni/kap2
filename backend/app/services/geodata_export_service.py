@@ -1,4 +1,4 @@
-"""GeoPackage export for municipality geodata (boundary + assessment grid)."""
+"""GeoPackage export for municipality geodata (boundary + assessment grid + auxiliary)."""
 
 import logging
 import os
@@ -58,7 +58,9 @@ def _write_layer(path: str, layer: str, geometries, field_data: list, fields: li
     wkb_arr = _wkb_array(geometries)
     np_fields = []
     for col in field_data:
-        if isinstance(col[0], str):
+        if col is None:
+            np_fields.append(np.array([None] * len(geometries), dtype=object))
+        elif isinstance(col[0], str):
             np_fields.append(np.array(col, dtype=object))
         elif isinstance(col[0], (int, np.integer)):
             np_fields.append(np.array(col, dtype=np.int64))
@@ -119,22 +121,24 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
     exposure_codes = [e["code"] for e in catalog.EXPOSURES]
     vulnerability_codes = [v["code"] for v in catalog.VULNERABILITIES]
     risk_codes = [r["code"] for r in catalog.RISKS]
+    auxiliary_codes = [a["code"] for a in catalog.AUXILIARY]
 
     geometries = []
-    row_vals, col_vals, size_vals = [], [], []
+    gitter_ids, x3035_vals, y3035_vals = [], [], []
     hazard_cols: dict[str, list] = {c: [] for c in hazard_codes}
     exposure_cols: dict[str, list] = {c: [] for c in exposure_codes}
     vulnerability_cols: dict[str, list] = {c: [] for c in vulnerability_codes}
     risk_index_cols: dict[str, list] = {c: [] for c in risk_codes}
     risk_outcome_cols: dict[str, list] = {f"{c}_outcome": [] for c in risk_codes}
     risk_cost_cols: dict[str, list] = {f"{c}_cost_eur": [] for c in risk_codes}
+    auxiliary_cols: dict[str, list] = {c: [] for c in auxiliary_codes}
 
     for ca, cell in rows:
         data = ca.data or {}
         geometries.append(to_shape(cell.geometry))
-        row_vals.append(cell.row_idx)
-        col_vals.append(cell.col_idx)
-        size_vals.append(cell.cell_size_m)
+        gitter_ids.append(cell.gitter_id or "")
+        x3035_vals.append(cell.x_3035)
+        y3035_vals.append(cell.y_3035)
 
         hazards = data.get("hazards", {})
         for code in hazard_codes:
@@ -155,8 +159,14 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
             risk_outcome_cols[f"{code}_outcome"].append(float(rdata.get("outcome", 0.0)))
             risk_cost_cols[f"{code}_cost_eur"].append(float(rdata.get("cost_eur", 0.0)))
 
-    field_data: list = [row_vals, col_vals, size_vals]
-    fields = ["row", "col", "cell_size_m"]
+        auxiliary = data.get("auxiliary", {})
+        for code in auxiliary_codes:
+            val = auxiliary.get(code)
+            auxiliary_cols[code].append(float(val) if val is not None else None)
+
+    # Layer: bewertung_100m
+    field_data: list = [gitter_ids, x3035_vals, y3035_vals]
+    fields = ["gitter_id", "x_3035", "y_3035"]
 
     for code in hazard_codes:
         field_data.append(hazard_cols[code])
@@ -183,6 +193,22 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
         geometries,
         field_data,
         fields,
+        append=True,
+    )
+
+    # Layer: sonstige_100m
+    aux_field_data: list = [gitter_ids, x3035_vals, y3035_vals]
+    aux_fields = ["gitter_id", "x_3035", "y_3035"]
+    for code in auxiliary_codes:
+        aux_field_data.append(auxiliary_cols[code])
+        aux_fields.append(code)
+
+    _write_layer(
+        output_path,
+        "sonstige_100m",
+        geometries,
+        aux_field_data,
+        aux_fields,
         append=True,
     )
 

@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import kommune, assessment, measures, config, export, catalog as catalog_route
+from app.api.routes import kommune, assessment, measures, config, export, catalog as catalog_route, admin
 
 # ── Logging: stdout + file ────────────────────────────────────────────────────
 LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
@@ -51,6 +51,7 @@ app.include_router(measures.router, prefix="/api", tags=["Maßnahmen"])
 app.include_router(config.router, prefix="/api", tags=["Konfiguration"])
 app.include_router(export.router, prefix="/api", tags=["Export/Import"])
 app.include_router(catalog_route.router, prefix="/api", tags=["Katalog"])
+app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 
 @app.on_event("startup")

@@ -737,37 +737,15 @@ def risk_cell_breakdown(
     }
 
 
-def build_regional_context(bundesland: str | None, is_coastal: bool) -> dict:
-    """Regionale Konstanten für Tooltip-Auflösung (gleiche Logik wie Assessment)."""
-    from app.services.climate.dwd_data import get_regional_climate
-    from app.services.zensus_service import demographic_shares
-
-    regional_clim = get_regional_climate(bundesland or "Nordrhein-Westfalen")
-    demo = demographic_shares()
-    hot_days = float(regional_clim["hot_days_per_year"])
-    mean_temp = float(regional_clim["mean_temp_annual"])
-    return {
-        "bundesland": bundesland,
-        "hot_days": hot_days,
-        "summer_temp": float(regional_clim["summer_max_temp_avg"]),
-        "mean_temp": mean_temp,
-        "tropical_nights": float(regional_clim["tropical_nights_per_year"]),
-        "is_coastal": is_coastal,
-        "drought_days": round(8.0 + hot_days * 1.2, 1),
-        "dry_index": round(min(1.0, hot_days / 25.0), 3),
-        "frost_days": round(max(0.0, 90.0 - mean_temp * 6.0), 1),
-        "storm_days": 6.0,
-        "heavy_rain_index": round(40.0 + (mean_temp - 9.5) * 4.0, 1),
-        "mean_temp_rise": round(1.6 + (mean_temp - 9.5) * 0.1, 2),
-        "soil_moisture_decline": round(20.0 + hot_days, 1),
-        "low_flow_days": round(10.0 + hot_days, 1),
-        "surface_water_heating": round(1.5 + (mean_temp - 9.5) * 0.2, 2),
-        "sea_level_rise": 4.5 if is_coastal else 0.0,
-        "demographics": demo,
-    }
-
-
 def recipe_for_layer(code: str, category: str) -> dict:
     if category == "risks":
         return risk_recipe(catalog.RISKS_BY_CODE[code])
+    if category == "auxiliary":
+        m = catalog.AUXILIARY_BY_CODE[code]
+        return {
+            "formula": f"Direkt aus {m.get('source', 'Quelle')}",
+            "inputs": [
+                _i(code, m["name"], EXTERN, m.get("unit", ""), "auxiliary"),
+            ],
+        }
     return get_recipe(code)

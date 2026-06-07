@@ -11,6 +11,7 @@ const GROUP_DEFS: { key: 'measures' | LayerCategory; label: string }[] = [
   { key: 'hazards', label: 'Klimatreiber' },
   { key: 'exposures', label: 'Expositionen' },
   { key: 'vulnerabilities', label: 'Verwundbarkeiten' },
+  { key: 'auxiliary', label: 'Sonstige' },
 ]
 
 export default function LayerPanel() {
@@ -21,7 +22,7 @@ export default function LayerPanel() {
   } = useStore()
   // Gruppen-Kollaps (oberste Ebene)
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({
-    exposures: true, vulnerabilities: true,
+    exposures: true, vulnerabilities: true, auxiliary: true,
   })
   // Kategorie-Kollaps (Zwischenebene), Default: eingeklappt
   const [collapsedCats, setCollapsedCats] = useState<Record<string, boolean>>({})
@@ -30,9 +31,12 @@ export default function LayerPanel() {
     return <div className="layer-panel" style={{ padding: '0.75rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>Lade Katalog…</div>
   }
 
-  const toggleGroup = (key: string) => setCollapsedGroups(c => ({ ...c, [key]: !c[key] }))
-  const toggleCat = (key: string) => setCollapsedCats(c => ({ ...c, [key]: !c[key] }))
+  const groupCollapsed = (key: string) => collapsedGroups[key] ?? false
+  const toggleGroup = (key: string) =>
+    setCollapsedGroups(c => ({ ...c, [key]: !(c[key] ?? false) }))
   const catCollapsed = (key: string) => collapsedCats[key] ?? true
+  const toggleCat = (key: string) =>
+    setCollapsedCats(c => ({ ...c, [key]: !(c[key] ?? true) }))
 
   const indicatorRows = (it: CatalogIndicator) => ([
     { label: 'Einheit', value: it.unit },
@@ -61,15 +65,16 @@ export default function LayerPanel() {
         style={{
           display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px 4px 18px',
           cursor: 'pointer', fontSize: '0.78rem', borderRadius: 6,
-          background: active ? 'var(--primary)' : 'transparent',
-          color: active ? '#fff' : 'var(--text)',
+          fontWeight: active ? 600 : 400,
         }}
       >
-        <span style={{
-          width: 12, height: 12, borderRadius: 3, flexShrink: 0,
-          border: `2px solid ${active ? '#fff' : 'var(--border)'}`,
-          background: active ? '#fff' : 'transparent',
-        }} />
+        <input
+          type="checkbox"
+          checked={active}
+          readOnly
+          tabIndex={-1}
+          style={{ flexShrink: 0, pointerEvents: 'none', margin: 0 }}
+        />
         <span style={{ flex: 1, opacity: spatial === false ? 0.7 : 1 }}>{name}</span>
         <span onClick={e => e.stopPropagation()}>{info}</span>
       </div>
@@ -133,7 +138,7 @@ export default function LayerPanel() {
       </div>
 
       {GROUP_DEFS.map(group => {
-        const isCollapsed = collapsedGroups[group.key]
+        const isCollapsed = groupCollapsed(group.key)
         return (
           <div key={group.key} style={{ borderBottom: '1px solid var(--border)' }}>
             <div
@@ -200,6 +205,8 @@ export default function LayerPanel() {
                   renderIndicatorGroup('exposures', catalog.exposures, catalog.exposure_categories)}
                 {group.key === 'vulnerabilities' &&
                   renderIndicatorGroup('vulnerabilities', catalog.vulnerabilities, catalog.vulnerability_categories)}
+                {group.key === 'auxiliary' &&
+                  renderIndicatorGroup('auxiliary', catalog.auxiliary, catalog.auxiliary_categories)}
               </div>
             )}
           </div>

@@ -12,6 +12,7 @@ from app.db.database import SessionLocal
 from app.models.models import (
     Kommune, GridCell, CellAssessment, ProjectStatus, AssessmentStatus,
 )
+from app.services.engine.progress import FINALIZE, MonotonicProgress
 from app.services.engine.runner import run_full_assessment
 
 log = logging.getLogger(__name__)
@@ -78,8 +79,14 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
             return
 
         grid_cell_dicts = [{
-            "id": c.id, "row": c.row_idx, "col": c.col_idx,
-            "cell_size_m": c.cell_size_m, "geometry": to_shape(c.geometry),
+            "id": c.id,
+            "gitter_id": c.gitter_id,
+            "x_3035": c.x_3035,
+            "y_3035": c.y_3035,
+            "row": c.row_idx,
+            "col": c.col_idx,
+            "cell_size_m": c.cell_size_m,
+            "geometry": to_shape(c.geometry),
         } for c in cells]
 
         kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
@@ -111,15 +118,17 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
             elif detail and _steps:
                 _steps[-1]["detail"] = detail
                 status.step_history = list(_steps)
-            status.message = f"{_last_phase[0] or 'Berechnung'} ({round(pct):.0f}%)"
-            if pct - _last_pct[0] >= 2.0 or pct >= 100.0 or phase:
+            status.message = f"{round(pct):.0f}% – {_last_phase[0] or 'Berechnung'}"
+            if pct - _last_pct[0] >= 1.0 or pct >= 100.0 or phase:
                 db.commit()
                 _last_pct[0] = pct
 
+        progress = MonotonicProgress(update_progress)
         results = run_full_assessment(
-            grid_cell_dicts, bundesland, population, area_km2, update_progress,
+            grid_cell_dicts, bundesland, population, area_km2, progress,
         )
 
+        update_progress(FINALIZE[0], "Speichere Ergebnisse")
         db.query(CellAssessment).filter(CellAssessment.kommune_id == kommune_id).delete()
         now = datetime.utcnow()
         for r in results:
@@ -127,6 +136,7 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
                 kommune_id=kommune_id, grid_cell_id=r["grid_cell_id"],
                 data=r["data"], calculated_at=now,
             ))
+        update_progress(FINALIZE[1], "Speichere Ergebnisse")
 
         status.status = AssessmentStatus.DONE
         status.progress_pct = 100.0

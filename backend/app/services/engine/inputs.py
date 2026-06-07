@@ -37,6 +37,13 @@ def _cell_worker(idx: int):
     return idx, lu, bm
 
 
+def _snow_elevation_factor(elev_m: float) -> float:
+    """Höhenmodulation für Schneedeckentage: Flachland schwach, Hochlagen stark."""
+    if elev_m <= 50:
+        return 0.2
+    return round(min(1.0, 0.2 + 0.8 * min(1.0, (elev_m - 50) / 1500.0)), 4)
+
+
 def compute_uhi_delta(lu: dict, bm: dict) -> float:
     """Tag-UHI ΔT (K) nach der KAP2/KAP3-Formel (siehe Handbuch)."""
     imp_lu = lu["impervious_fraction"]
@@ -70,6 +77,41 @@ def compute_uhi_delta(lu: dict, bm: dict) -> float:
     return max(0.0, round(delta, 3))
 
 
+def build_regional_context(bundesland: str | None, is_coastal: bool) -> dict:
+    """Regionale Klimawerte und Demografie (identisch zum Assessment-Pass)."""
+    from app.services.climate.dwd_data import get_regional_climate, get_snow_cover_climate
+    from app.services.zensus_loader import demographic_shares
+
+    bl = bundesland or "Nordrhein-Westfalen"
+    regional_clim = get_regional_climate(bl)
+    snow_clim = get_snow_cover_climate(bl)
+    demo = demographic_shares()
+    hot_days = float(regional_clim["hot_days_per_year"])
+    mean_temp = float(regional_clim["mean_temp_annual"])
+    return {
+        "bundesland": bundesland,
+        "hot_days": hot_days,
+        "summer_temp": float(regional_clim["summer_max_temp_avg"]),
+        "mean_temp": mean_temp,
+        "tropical_nights": float(regional_clim["tropical_nights_per_year"]),
+        "is_coastal": is_coastal,
+        "drought_days": round(8.0 + hot_days * 1.2, 1),
+        "dry_index": round(min(1.0, hot_days / 25.0), 3),
+        "frost_days": round(max(0.0, 90.0 - mean_temp * 6.0), 1),
+        "storm_days": 6.0,
+        "heavy_rain_index": round(40.0 + (mean_temp - 9.5) * 4.0, 1),
+        "mean_temp_rise": round(1.6 + (mean_temp - 9.5) * 0.1, 2),
+        "soil_moisture_decline": round(20.0 + hot_days, 1),
+        "low_flow_days": round(10.0 + hot_days, 1),
+        "surface_water_heating": round(1.5 + (mean_temp - 9.5) * 0.2, 2),
+        "sea_level_rise": 4.5 if is_coastal else 0.0,
+        "glacier_loss_rate": 0.5,
+        "snow_days": float(snow_clim["snow_days_per_year"]),
+        "snow_decline_rate_pct": float(snow_clim["snow_decline_rate_pct"]),
+        "demographics": demo,
+    }
+
+
 def gather_cell_inputs(
     grid_cells: list[dict],
     bundesland: str | None,
@@ -86,57 +128,46 @@ def gather_cell_inputs(
         fetch_landuse, fetch_buildings_and_roads, fetch_water_features,
         compute_water_distance_m, water_proximity_score,
     )
-    from app.services.climate.dwd_data import get_regional_climate
     from app.services.terrain_service import compute_terrain_for_cells
-    from app.services.zensus_service import distribute_population, demographic_shares
+    from app.services.zensus_loader import ensure_zensus_datasets, load_zensus_for_cells, apply_zensus_to_cell_inputs
+    from app.services.engine.progress import (
+        ZENSUS, OSM_LANDUSE, OSM_BUILDINGS, OSM_WATER,
+        CELL_SURFACE, CELL_NEIGHBORS, ZENSUS_APPLY, lerp,
+    )
 
-    regional_clim = get_regional_climate(bundesland or "Nordrhein-Westfalen")
-    demo = demographic_shares()
-
-    # Regionale Treiber-Werte (Konstanten / nicht räumlich aufgelöst)
-    hot_days = float(regional_clim["hot_days_per_year"])
-    mean_temp = float(regional_clim["mean_temp_annual"])
-    # einfache Ableitungen für regionale Hazards
-    regional = {
-        "bundesland": bundesland,
-        "hot_days": hot_days,
-        "summer_temp": float(regional_clim["summer_max_temp_avg"]),
-        "mean_temp": mean_temp,
-        "tropical_nights": float(regional_clim["tropical_nights_per_year"]),
-        "is_coastal": is_coastal,
-        # dürre/trockenheit grob aus Hitze-Niveau
-        "drought_days": round(8.0 + hot_days * 1.2, 1),
-        "dry_index": round(min(1.0, hot_days / 25.0), 3),
-        "frost_days": round(max(0.0, 90.0 - mean_temp * 6.0), 1),
-        "storm_days": 6.0,
-        "heavy_rain_index": round(40.0 + (mean_temp - 9.5) * 4.0, 1),
-        "mean_temp_rise": round(1.6 + (mean_temp - 9.5) * 0.1, 2),
-        "soil_moisture_decline": round(20.0 + hot_days, 1),
-        "low_flow_days": round(10.0 + hot_days, 1),
-        "surface_water_heating": round(1.5 + (mean_temp - 9.5) * 0.2, 2),
-        "sea_level_rise": 4.5 if is_coastal else 0.0,
-        "demographics": demo,
-    }
+    regional = build_regional_context(bundesland, is_coastal)
 
     if progress_callback:
-        progress_callback(2.0, "Herunterladen OSM-Landnutzung")
+        progress_callback(ZENSUS[0], "Zensus-Daten prüfen/laden")
+    ensure_zensus_datasets()
+    if progress_callback:
+        progress_callback(ZENSUS[1], "Zensus-Daten prüfen/laden")
+
+    if progress_callback:
+        progress_callback(OSM_LANDUSE[0], "Herunterladen OSM-Landnutzung")
     landuse_features, _ = fetch_landuse(grid_cells)
     if progress_callback:
-        progress_callback(8.0, "Herunterladen OSM-Gebäude, Straßen & Bäume")
+        progress_callback(OSM_LANDUSE[1], "Herunterladen OSM-Landnutzung")
+    if progress_callback:
+        progress_callback(OSM_BUILDINGS[0], "Herunterladen OSM-Gebäude, Straßen & Bäume")
     detail = fetch_buildings_and_roads(grid_cells)
     buildings, roads, trees = detail["buildings"], detail["roads"], detail["trees"]
+    if progress_callback:
+        progress_callback(OSM_BUILDINGS[1], "Herunterladen OSM-Gebäude, Straßen & Bäume")
 
     total = len(grid_cells)
     lu_bm: list[tuple | None] = [None] * total
 
     if progress_callback:
-        progress_callback(10.0, "Lade OSM-Gewässer")
+        progress_callback(OSM_WATER[0], "Lade OSM-Gewässer")
     water_features = fetch_water_features(grid_cells)
+    if progress_callback:
+        progress_callback(OSM_WATER[1], "OSM-Daten geladen")
 
     terrain_by_idx = compute_terrain_for_cells(grid_cells, progress_callback)
 
     if progress_callback:
-        progress_callback(15.0, f"Analyse Oberflächen ({_N_WORKERS} Kerne) für {total} Zellen")
+        progress_callback(CELL_SURFACE[0], f"Analyse Oberflächen ({_N_WORKERS} Kerne) für {total} Zellen")
 
     _w["lu"] = landuse_features
     _w["bldgs"] = buildings
@@ -149,40 +180,49 @@ def gather_cell_inputs(
                 pool.imap_unordered(_cell_worker, range(total), chunksize=_CHUNK)
             ):
                 lu_bm[idx] = (lu, bm)
-                if progress_callback and done % 200 == 0:
-                    pct = 15.0 + (done + 1) / total * 35.0
+                if progress_callback and (done % 100 == 0 or done + 1 == total):
+                    pct = lerp(CELL_SURFACE[0], CELL_SURFACE[1], (done + 1) / total)
                     progress_callback(pct, "Zellanalyse", f"{done + 1}/{total}")
     finally:
         _w.clear()
 
-    # Belüftungsindex (Nachbarschaft)
-    row_col: dict[tuple[int, int], int] = {}
+    # Nachbarschaftsindex (Zensus-Gitter: ±100 m in EPSG:3035)
+    if progress_callback:
+        progress_callback(CELL_NEIGHBORS[0], "Nachbarschaft & Zell-Eingaben")
+
+    coord_idx: dict[tuple[int, int], int] = {}
+    step = 100
     for idx, cell in enumerate(grid_cells):
-        row_col[(cell["row"], cell["col"])] = idx
+        x = cell.get("x_3035", cell.get("col", 0) * step)
+        y = cell.get("y_3035", cell.get("row", 0) * step)
+        coord_idx[(x, y)] = idx
 
     cell_inputs: list[dict] = []
     for idx, cell in enumerate(grid_cells):
+        if progress_callback and idx > 0 and (idx % 500 == 0 or idx + 1 == total):
+            pct = lerp(CELL_NEIGHBORS[0], CELL_NEIGHBORS[1], idx / total)
+            progress_callback(pct, "Nachbarschaft & Zell-Eingaben", f"{idx}/{total}")
         lu, bm = lu_bm[idx]
         # Belüftung + Wassernähe aus Nachbarn
         open_n = total_n = 0
         water_adj = 0.0
         r, c = cell["row"], cell["col"]
-        for dr in (-1, 0, 1):
-            for dc in (-1, 0, 1):
-                if dr == 0 and dc == 0:
-                    continue
-                ni = row_col.get((r + dr, c + dc))
-                if ni is None:
-                    open_n += 1
-                    total_n += 1
-                    continue
+        x_mp = cell.get("x_3035", c * step)
+        y_mp = cell.get("y_3035", r * step)
+        for dx, dy in ((step, 0), (-step, 0), (0, step), (0, -step),
+                       (step, step), (step, -step), (-step, step), (-step, -step)):
+            ni = coord_idx.get((x_mp + dx, y_mp + dy))
+            if ni is None:
+                open_n += 1
                 total_n += 1
-                nlu, nbm = lu_bm[ni]
-                if (nbm["building_coverage"] < 0.05
-                        and nlu["green_fraction"] + nlu["water_fraction"]
-                        + nlu.get("farmland_fraction", 0.0) > 0.3):
-                    open_n += 1
-                water_adj = max(water_adj, nlu["water_fraction"])
+                continue
+            total_n += 1
+            nlu, nbm = lu_bm[ni]
+            if (nbm["building_coverage"] < 0.05
+                    and nlu["green_fraction"] + nlu["water_fraction"]
+                    + nlu.get("farmland_fraction", 0.0) > 0.3):
+                open_n += 1
+            water_adj = max(water_adj, nlu["water_fraction"])
         vent_score = open_n / max(total_n, 1)
 
         uhi = compute_uhi_delta(lu, bm)
@@ -207,6 +247,9 @@ def gather_cell_inputs(
 
         cell_inputs.append({
             "grid_cell_id": cell["id"],
+            "gitter_id": cell.get("gitter_id"),
+            "x_3035": x_mp,
+            "y_3035": y_mp,
             "row": r, "col": c,
             "area_m2": area_m2,
             "imp_frac": imp,
@@ -217,6 +260,10 @@ def gather_cell_inputs(
             "water_dist_m": round(water_dist_m, 1),
             "water_prox": round(water_prox, 3),
             "forest_frac": lu.get("forest_fraction", 0.0),
+            "glacier_frac": lu.get("glacier_fraction", 0.0),
+            "snow_elevation_factor": _snow_elevation_factor(
+                terrain.get("mean_elevation_m", 0.0),
+            ),
             "farmland_frac": lu.get("farmland_fraction", 0.0),
             "bldg_cov": bm["building_coverage"],
             "bldg_count": bm.get("building_count", 0),
@@ -240,7 +287,11 @@ def gather_cell_inputs(
             "pop": 0.0,
         })
 
-    # Bevölkerung verteilen (Zensus / Proxy)
-    distribute_population(cell_inputs, kommune_population, area_km2)
+    if progress_callback:
+        progress_callback(ZENSUS_APPLY[0], "Zensus-Daten anwenden")
+    zensus = load_zensus_for_cells(grid_cells)
+    apply_zensus_to_cell_inputs(cell_inputs, grid_cells, zensus)
+    if progress_callback:
+        progress_callback(ZENSUS_APPLY[1], "Zensus-Daten anwenden")
 
     return cell_inputs, regional

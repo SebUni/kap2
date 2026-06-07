@@ -71,10 +71,10 @@ HAZARDS: list[dict] = [
      "proxy": "Nationaler Konstantwert; nur Küstenkommunen.",
      "source": "Copernicus C3S"},
     {"code": "GLACIER_SNOW_LOSS", "name": "Gletscherschwund und Schneerückgang",
-     "unit": "%/Jahr", "norm_min": 0.0, "norm_max": 5.0, "spatial": False,
+     "unit": "%/Jahr", "norm_min": 0.0, "norm_max": 5.0, "spatial": True,
      "description": "Rückgang von Gletschermassen und Schneedecke.",
-     "proxy": "Regionaler Konstantwert (alpine Relevanz aus Höhenlage).",
-     "source": "Copernicus C3S"},
+     "proxy": "Gletscher (OSM natural=glacier) + relativer Schneedecken-Rückgang (DWD CDC snowcover_days-Trend), höhenmoduliert (DEM).",
+     "source": "OSM + DWD CDC + Terrarium DEM"},
     {"code": "PERMAFROST_THAW", "name": "Permafrosttauung",
      "unit": "Index", "norm_min": 0.0, "norm_max": 1.0, "spatial": False,
      "description": "Auftauen dauerhaft gefrorener Böden in Permafrostregionen.",
@@ -141,10 +141,10 @@ HAZARDS: list[dict] = [
      "proxy": "Konstantwert; nur Küstenkommunen.",
      "source": "BSH"},
     {"code": "SOIL_SALINIZATION", "name": "Bodenversalzung",
-     "unit": "Index", "norm_min": 0.0, "norm_max": 1.0, "spatial": False,
+     "unit": "Index", "norm_min": 0.0, "norm_max": 1.0, "spatial": True,
      "description": "Versalzung von Böden z. B. durch Meeresspiegelanstieg oder Bewässerungsfehler.",
-     "proxy": "Konstantwert (geringe Relevanz im Binnenland).",
-     "source": "ESDAC"},
+     "proxy": "Basis Küste/Binnen × Senkenlage (DEM) × Ackeranteil (OSM) × Trockenheit (DWD) × Gewässernähe (Küste) bzw. Tieflage (Binnen).",
+     "source": "OSM + Terrarium DEM + DWD CDC"},
     {"code": "COMPOUND_EVENT", "name": "Kombinierte/Compound-Events",
      "unit": "Index", "norm_min": 0.0, "norm_max": 1.0, "spatial": True,
      "description": "Überlagerung mehrerer Klimatreiber (z. B. Hitze + Dürre).",
@@ -174,13 +174,13 @@ EXPOSURES: list[dict] = [
     {"code": "POPULATION_DENSITY", "name": "Bevölkerungsdichte",
      "unit": "Pers./km²", "norm_min": 0.0, "norm_max": 8000.0, "spatial": True,
      "description": "Räumliche Dichte der Bevölkerung.",
-     "proxy": "Zensus-2022-100m-Gitter (falls vorhanden), sonst aus OSM-Wohngebäudevolumen verteilte Einwohnerzahl.",
-     "source": "Zensus 2022 (100m-Gitter) / OSM-Proxy"},
+     "proxy": "Zensus-2022-100m-Gitter: Bevölkerungszahl je Zelle / Fläche.",
+     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
     {"code": "AGE_STRUCTURE", "name": "Altersstruktur (Ältere, Kinder)",
      "unit": "%", "norm_min": 0.0, "norm_max": 50.0, "spatial": True,
      "description": "Anteil altersbedingt vulnerabler Bevölkerungsgruppen.",
-     "proxy": "Zensus-Gemeindeanteil (≥65 + ≤6 Jahre), gleich auf bewohnte Zellen verteilt.",
-     "source": "Zensus 2022 (Gemeinde)"},
+     "proxy": "Zensus-100m: Anteil ≥65 Jahre + Anteil <18 Jahre je Zelle.",
+     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
     {"code": "OUTDOOR_THERMAL_EXPOSURE", "name": "Aufenthalt im Freien (therm. Exposition)",
      "unit": "h/Tag", "norm_min": 0.0, "norm_max": 8.0, "spatial": True,
      "description": "Exposition der Bevölkerung durch Aufenthalt im Freien bei Hitze.",
@@ -189,8 +189,8 @@ EXPOSURES: list[dict] = [
     {"code": "VULNERABLE_GROUPS_POPULATION", "name": "Vulnerable Gruppen (Personen)",
      "unit": "Pers.", "norm_min": 0.0, "norm_max": 2000.0, "spatial": True,
      "description": "Bevölkerungsgruppen mit erhöhter Schadenswahrscheinlichkeit.",
-     "proxy": "Bevölkerung pro Zelle × Gemeindeanteil vulnerabler Gruppen.",
-     "source": "Zensus 2022"},
+     "proxy": "Zensus-100m: Bevölkerung × (Anteil ≥65 + Anteil <18) je Zelle.",
+     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
     {"code": "BUILDING_STOCK", "name": "Gebäudebestand / Gebäudefläche",
      "unit": "m²", "norm_min": 0.0, "norm_max": 6000.0, "spatial": True,
      "description": "Gebäudebestand und bebaute Fläche.",
@@ -313,12 +313,13 @@ VULNERABILITIES: list[dict] = [
     {"code": "VULNERABLE_GROUPS_SHARE", "name": "Anteil vulnerabler Gruppen", "unit": "%",
      "norm_min": 0.0, "norm_max": 50.0, "spatial": True,
      "description": "Anteil sozial vulnerabler Bevölkerungsgruppen.",
-     "proxy": "Zensus-Gemeindeanteil (Alter + Sozialstruktur).",
-     "source": "Zensus 2022"},
+     "proxy": "Zensus-100m: Anteil ≥65 + Anteil <18 Jahre je Zelle.",
+     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
     {"code": "INCOME_SOCIAL_RESILIENCE", "name": "Soziale Resilienz (invers)", "unit": "Index",
-     "norm_min": 0.0, "norm_max": 100.0, "spatial": False,
+     "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
      "description": "Sozioökonomische Resilienz (hoher Wert = geringe Resilienz).",
-     "proxy": "Regionaler Annahmewert.", "source": "Zensus 2022 (Gemeinde)"},
+     "proxy": "Kombination aus Nettokaltmiete, Eigentümerquote und Wohnfläche je Bewohner (Zensus-100m).",
+     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
     {"code": "HEALTHCARE_ACCESS", "name": "Zugang zu Gesundheitsdiensten (invers)", "unit": "Index",
      "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
      "description": "Erreichbarkeit von Gesundheitsdiensten (hoher Wert = schlechter Zugang).",
@@ -1231,6 +1232,8 @@ for _m in MEASURES:
     _m["kang_field"] = _field
 
 
+from app.data.catalog_auxiliary import AUXILIARY, AUXILIARY_CATEGORIES, AUXILIARY_BY_CODE
+
 # ── Lookups ──────────────────────────────────────────────────────────────────────
 
 HAZARDS_BY_CODE = {h["code"]: h for h in HAZARDS}
@@ -1239,7 +1242,12 @@ VULNERABILITIES_BY_CODE = {v["code"]: v for v in VULNERABILITIES}
 RISKS_BY_CODE = {r["code"]: r for r in RISKS}
 MEASURES_BY_CODE = {m["code"]: m for m in MEASURES}
 
-INDICATOR_BY_CODE = {**HAZARDS_BY_CODE, **EXPOSURES_BY_CODE, **VULNERABILITIES_BY_CODE}
+INDICATOR_BY_CODE = {
+    **HAZARDS_BY_CODE,
+    **EXPOSURES_BY_CODE,
+    **VULNERABILITIES_BY_CODE,
+    **AUXILIARY_BY_CODE,
+}
 
 
 def normalize_value(code: str, value: float) -> float:

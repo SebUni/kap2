@@ -23,6 +23,11 @@ DWD_REGIONAL_MEANS = (
     f"{DWD_CDC_BASE}/regional_averages_DE/annual/air_temperature_mean"
 )
 
+# Schneedeckentage (Tage mit Schneehöhe ≥ 1 cm / Jahr) — Gebietsmittel / Raster
+DWD_REGIONAL_SNOW_COVER = (
+    f"{DWD_CDC_BASE}/grids_germany/annual/snowcover_days"
+)
+
 # Station-based climate data
 DWD_STATION_BASE = (
     f"{DWD_CDC_BASE}/observations_germany/climate/annual/kl/historical"
@@ -57,22 +62,22 @@ BUNDESLAND_STATIONS: dict[str, dict] = {
 # Fallback: typical regional climate data for Germany (empirical averages)
 # Based on DWD published data summaries
 FALLBACK_CLIMATE: dict[str, dict[str, Any]] = {
-    "Baden-Württemberg":     {"hot_days_avg": 14.2, "summer_days_avg": 48.0, "tropical_nights_avg": 2.5, "summer_temp_avg": 27.8, "mean_temp_annual": 10.2},
-    "Bayern":                {"hot_days_avg": 12.5, "summer_days_avg": 42.0, "tropical_nights_avg": 1.8, "summer_temp_avg": 27.2, "mean_temp_annual": 9.5},
-    "Berlin":                {"hot_days_avg": 13.0, "summer_days_avg": 45.0, "tropical_nights_avg": 3.0, "summer_temp_avg": 28.0, "mean_temp_annual": 10.5},
-    "Brandenburg":           {"hot_days_avg": 11.5, "summer_days_avg": 40.0, "tropical_nights_avg": 1.5, "summer_temp_avg": 27.5, "mean_temp_annual": 10.0},
-    "Bremen":                {"hot_days_avg":  8.0, "summer_days_avg": 32.0, "tropical_nights_avg": 0.5, "summer_temp_avg": 26.0, "mean_temp_annual":  9.8},
-    "Hamburg":                {"hot_days_avg":  7.5, "summer_days_avg": 30.0, "tropical_nights_avg": 0.5, "summer_temp_avg": 25.8, "mean_temp_annual":  9.7},
-    "Hessen":                {"hot_days_avg": 13.5, "summer_days_avg": 46.0, "tropical_nights_avg": 2.8, "summer_temp_avg": 28.0, "mean_temp_annual": 10.3},
-    "Mecklenburg-Vorpommern": {"hot_days_avg": 7.0,  "summer_days_avg": 28.0, "tropical_nights_avg": 0.3, "summer_temp_avg": 25.5, "mean_temp_annual":  9.2},
-    "Niedersachsen":         {"hot_days_avg":  9.0,  "summer_days_avg": 34.0, "tropical_nights_avg": 0.8, "summer_temp_avg": 26.5, "mean_temp_annual":  9.8},
-    "Nordrhein-Westfalen":   {"hot_days_avg": 12.0, "summer_days_avg": 43.0, "tropical_nights_avg": 2.0, "summer_temp_avg": 27.5, "mean_temp_annual": 10.2},
-    "Rheinland-Pfalz":       {"hot_days_avg": 14.0, "summer_days_avg": 47.0, "tropical_nights_avg": 2.5, "summer_temp_avg": 28.0, "mean_temp_annual": 10.3},
-    "Saarland":              {"hot_days_avg": 13.0, "summer_days_avg": 44.0, "tropical_nights_avg": 2.0, "summer_temp_avg": 27.5, "mean_temp_annual": 10.1},
-    "Sachsen":               {"hot_days_avg": 11.0, "summer_days_avg": 38.0, "tropical_nights_avg": 1.5, "summer_temp_avg": 27.0, "mean_temp_annual":  9.8},
-    "Sachsen-Anhalt":        {"hot_days_avg": 11.5, "summer_days_avg": 40.0, "tropical_nights_avg": 1.5, "summer_temp_avg": 27.5, "mean_temp_annual": 10.0},
-    "Schleswig-Holstein":    {"hot_days_avg":  5.5, "summer_days_avg": 24.0, "tropical_nights_avg": 0.2, "summer_temp_avg": 24.8, "mean_temp_annual":  9.3},
-    "Thüringen":             {"hot_days_avg": 10.0, "summer_days_avg": 36.0, "tropical_nights_avg": 1.0, "summer_temp_avg": 26.8, "mean_temp_annual":  9.5},
+    "Baden-Württemberg":     {"hot_days_avg": 14.2, "summer_days_avg": 48.0, "tropical_nights_avg": 2.5, "summer_temp_avg": 27.8, "mean_temp_annual": 10.2, "snow_days_avg": 28.0},
+    "Bayern":                {"hot_days_avg": 12.5, "summer_days_avg": 42.0, "tropical_nights_avg": 1.8, "summer_temp_avg": 27.2, "mean_temp_annual": 9.5, "snow_days_avg": 42.0},
+    "Berlin":                {"hot_days_avg": 13.0, "summer_days_avg": 45.0, "tropical_nights_avg": 3.0, "summer_temp_avg": 28.0, "mean_temp_annual": 10.5, "snow_days_avg": 22.0},
+    "Brandenburg":           {"hot_days_avg": 11.5, "summer_days_avg": 40.0, "tropical_nights_avg": 1.5, "summer_temp_avg": 27.5, "mean_temp_annual": 10.0, "snow_days_avg": 24.0},
+    "Bremen":                {"hot_days_avg":  8.0, "summer_days_avg": 32.0, "tropical_nights_avg": 0.5, "summer_temp_avg": 26.0, "mean_temp_annual":  9.8, "snow_days_avg": 14.0},
+    "Hamburg":                {"hot_days_avg":  7.5, "summer_days_avg": 30.0, "tropical_nights_avg": 0.5, "summer_temp_avg": 25.8, "mean_temp_annual":  9.7, "snow_days_avg": 13.0},
+    "Hessen":                {"hot_days_avg": 13.5, "summer_days_avg": 46.0, "tropical_nights_avg": 2.8, "summer_temp_avg": 28.0, "mean_temp_annual": 10.3, "snow_days_avg": 24.0},
+    "Mecklenburg-Vorpommern": {"hot_days_avg": 7.0,  "summer_days_avg": 28.0, "tropical_nights_avg": 0.3, "summer_temp_avg": 25.5, "mean_temp_annual":  9.2, "snow_days_avg": 18.0},
+    "Niedersachsen":         {"hot_days_avg":  9.0,  "summer_days_avg": 34.0, "tropical_nights_avg": 0.8, "summer_temp_avg": 26.5, "mean_temp_annual":  9.8, "snow_days_avg": 18.0},
+    "Nordrhein-Westfalen":   {"hot_days_avg": 12.0, "summer_days_avg": 43.0, "tropical_nights_avg": 2.0, "summer_temp_avg": 27.5, "mean_temp_annual": 10.2, "snow_days_avg": 20.0},
+    "Rheinland-Pfalz":       {"hot_days_avg": 14.0, "summer_days_avg": 47.0, "tropical_nights_avg": 2.5, "summer_temp_avg": 28.0, "mean_temp_annual": 10.3, "snow_days_avg": 22.0},
+    "Saarland":              {"hot_days_avg": 13.0, "summer_days_avg": 44.0, "tropical_nights_avg": 2.0, "summer_temp_avg": 27.5, "mean_temp_annual": 10.1, "snow_days_avg": 20.0},
+    "Sachsen":               {"hot_days_avg": 11.0, "summer_days_avg": 38.0, "tropical_nights_avg": 1.5, "summer_temp_avg": 27.0, "mean_temp_annual":  9.8, "snow_days_avg": 32.0},
+    "Sachsen-Anhalt":        {"hot_days_avg": 11.5, "summer_days_avg": 40.0, "tropical_nights_avg": 1.5, "summer_temp_avg": 27.5, "mean_temp_annual": 10.0, "snow_days_avg": 26.0},
+    "Schleswig-Holstein":    {"hot_days_avg":  5.5, "summer_days_avg": 24.0, "tropical_nights_avg": 0.2, "summer_temp_avg": 24.8, "mean_temp_annual":  9.3, "snow_days_avg": 12.0},
+    "Thüringen":             {"hot_days_avg": 10.0, "summer_days_avg": 36.0, "tropical_nights_avg": 1.0, "summer_temp_avg": 26.8, "mean_temp_annual":  9.5, "snow_days_avg": 28.0},
 }
 
 # Historical hot-day trend data from DWD (approximate annual values for Germany)
@@ -112,6 +117,90 @@ SUMMER_TEMP_GERMANY_HISTORY: dict[int, float] = {
     2025: 24.8,
 }
 
+# Schneedeckentage Deutschland (DWD Raster-Gebietsmittel, Tage/Jahr mit Schneehöhe ≥ 1 cm)
+# Quelle: DWD CDC grids_germany/annual/snowcover_days, Klimastatusbericht-Trend
+SNOW_DAYS_GERMANY_HISTORY: dict[int, float] = {
+    1990: 34.5, 1991: 31.0, 1992: 33.5, 1993: 28.0, 1994: 32.0,
+    1995: 30.5, 1996: 26.0, 1997: 29.5, 1998: 27.5, 1999: 28.5,
+    2000: 29.0, 2001: 27.0, 2002: 28.5, 2003: 22.0, 2004: 26.5,
+    2005: 27.5, 2006: 30.0, 2007: 25.5, 2008: 28.0, 2009: 27.0,
+    2010: 31.5, 2011: 26.0, 2012: 28.5, 2013: 30.0, 2014: 24.5,
+    2015: 23.0, 2016: 27.5, 2017: 26.0, 2018: 22.5, 2019: 24.0,
+    2020: 25.5, 2021: 23.5, 2022: 24.5, 2023: 22.0, 2024: 21.5,
+    2025: 22.0,
+}
+
+# DWD regional_averages_DE-Spaltennamen → Bundesland
+_DWD_BL_COLUMNS: dict[str, str] = {
+    "Baden-Wuerttemberg": "Baden-Württemberg",
+    "Bayern": "Bayern",
+    "Berlin": "Berlin",
+    "Brandenburg": "Brandenburg",
+    "Brandenburg/Berlin": "Brandenburg",
+    "Hessen": "Hessen",
+    "Mecklenburg-Vorpommern": "Mecklenburg-Vorpommern",
+    "Niedersachsen": "Niedersachsen",
+    "Niedersachsen/Hamburg/Bremen": "Niedersachsen",
+    "Nordrhein-Westfalen": "Nordrhein-Westfalen",
+    "Rheinland-Pfalz": "Rheinland-Pfalz",
+    "Schleswig-Holstein": "Schleswig-Holstein",
+    "Saarland": "Saarland",
+    "Sachsen": "Sachsen",
+    "Sachsen-Anhalt": "Sachsen-Anhalt",
+    "Thueringen": "Thüringen",
+    "Thueringen/Sachsen-Anhalt": "Thüringen",
+    "Deutschland": "Deutschland",
+}
+
+
+def _snow_regional_factor(bundesland: str) -> float:
+    """Skaliert Deutschland-Zeitreihe auf Bundesland (Verhältnis Schneedeckentage)."""
+    regional = FALLBACK_CLIMATE.get(bundesland, {})
+    national = FALLBACK_CLIMATE.get("Nordrhein-Westfalen", {})
+    reg_snow = regional.get("snow_days_avg", 22.0)
+    nat_snow = 22.0  # DE-Referenz ~22 Tage (2020er)
+    return reg_snow / nat_snow if nat_snow > 0 else 1.0
+
+
+def compute_snow_decline_rate_pct(history: dict[int, float] | None = None) -> float:
+    """Relativer jährlicher Rückgang der Schneedeckentage (%/Jahr), Trend 1990→heute."""
+    hist = history or SNOW_DAYS_GERMANY_HISTORY
+    early_years = [y for y in hist if 1990 <= y <= 2000]
+    recent_years = [y for y in hist if y >= 2020]
+    if not early_years or not recent_years:
+        return 0.8
+    early = sum(hist[y] for y in early_years) / len(early_years)
+    recent = sum(hist[y] for y in recent_years) / len(recent_years)
+    if early <= 0:
+        return 0.0
+    span = max(recent_years) - min(early_years)
+    total_decline_pct = (early - recent) / early * 100.0
+    return round(max(0.0, total_decline_pct / max(span, 1)), 2)
+
+
+def get_snow_cover_climate(bundesland: str) -> dict[str, Any]:
+    """Schneedeckentage und relativer Rückgangstrend je Bundesland."""
+    data = FALLBACK_CLIMATE.get(bundesland, FALLBACK_CLIMATE["Nordrhein-Westfalen"])
+    factor = _snow_regional_factor(bundesland)
+    snow_days = round(data.get("snow_days_avg", 22.0), 1)
+    decline = round(compute_snow_decline_rate_pct() * factor, 2)
+    return {
+        "snow_days_per_year": snow_days,
+        "snow_decline_rate_pct": decline,
+        "source": "DWD CDC snowcover_days / Gebietsmittel (Fallback)",
+        "bundesland": bundesland,
+    }
+
+
+def fetch_dwd_snow_days_germany() -> dict[int, float] | None:
+    """Optional: Deutschland-Jahresreihe Schneedeckentage von DWD CDC (Rastermittel).
+
+    Gibt None zurück, wenn kein kompakter Regional-Export verfügbar ist.
+    """
+    # DWD stellt primär Raster-ASCII bereit; kompakte Regional-TXT wie bei hot_days
+    # ist derzeit nicht unter regional_averages_DE/annual/ veröffentlicht.
+    return None
+
 
 def get_regional_climate(bundesland: str) -> dict[str, Any]:
     """Get climate summary for a Bundesland.
@@ -120,12 +209,15 @@ def get_regional_climate(bundesland: str) -> dict[str, Any]:
     Uses DWD regional fallback data.
     """
     data = FALLBACK_CLIMATE.get(bundesland, FALLBACK_CLIMATE["Nordrhein-Westfalen"])
+    snow = get_snow_cover_climate(bundesland)
     return {
         "hot_days_per_year": data["hot_days_avg"],
         "summer_days_per_year": data["summer_days_avg"],
         "tropical_nights_per_year": data["tropical_nights_avg"],
         "summer_max_temp_avg": data["summer_temp_avg"],
         "mean_temp_annual": data["mean_temp_annual"],
+        "snow_days_per_year": snow["snow_days_per_year"],
+        "snow_decline_rate_pct": snow["snow_decline_rate_pct"],
         "source": "DWD Klimastatusbericht / CDC Gebietsmittel",
         "bundesland": bundesland,
     }
@@ -141,12 +233,17 @@ def get_climate_history(bundesland: Optional[str] = None) -> dict[str, Any]:
     # Scaling factor: how this Bundesland compares to the Germany average
     regional_hot_factor = regional.get("hot_days_avg", 10.5) / 10.5 if regional else 1.0
     regional_temp_offset = regional.get("mean_temp_annual", 9.8) - 9.8 if regional else 0.0
+    regional_snow_factor = _snow_regional_factor(bundesland) if bundesland else 1.0
 
     years = sorted(HOT_DAYS_GERMANY_HISTORY.keys())
     result = {
         "years": years,
         "hot_days": [
             round(HOT_DAYS_GERMANY_HISTORY.get(y, 10) * regional_hot_factor, 1)
+            for y in years
+        ],
+        "snow_days": [
+            round(SNOW_DAYS_GERMANY_HISTORY.get(y, 22) * regional_snow_factor, 1)
             for y in years
         ],
         "mean_temp": [
