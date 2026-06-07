@@ -102,17 +102,17 @@ export default function Dashboard() {
             <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               Zusammenfassung
               <InfoTooltip title="Übergreifende Metrik"
-                description="Risikogruppen-Index = Mittelwert der normalisierten Einzelrisiko-Indizes (0–100) je KWRA-Herausforderung. Macht die fünf Herausforderungen vergleichbar." />
+                description="Risikogruppen-Index = Mittel der 90.-Perzentil-Einzelrisiko-Indizes (0–100) je KWRA-Herausforderung. Das P90 hebt belastete Zellen hervor und vermeidet die Verflachung durch viele leere Insel-/Strandzellen." />
             </h2>
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
               <div className="chart-card" style={{ flex: '1 1 360px', minHeight: 320 }}>
-                <h3 className="chart-title">Risikogruppen (Index 0–100)</h3>
+                <h3 className="chart-title">Risikogruppen (P90-Index 0–100)</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <RadarChart data={groupRadar} outerRadius="70%">
                     <PolarGrid />
                     <PolarAngleAxis dataKey="group" tick={{ fontSize: 11 }} />
                     <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 9 }} />
-                    <Radar name="Risiko-Index" dataKey="index" stroke="#ef4444" fill="#ef4444" fillOpacity={0.4} />
+                    <Radar name="P90-Index" dataKey="index" stroke="#ef4444" fill="#ef4444" fillOpacity={0.4} />
                     <Tooltip />
                   </RadarChart>
                 </ResponsiveContainer>
@@ -177,7 +177,7 @@ export default function Dashboard() {
                         <PolarGrid />
                         <PolarAngleAxis dataKey="risk" tick={{ fontSize: 9 }} />
                         <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8 }} />
-                        <Radar name="Index" dataKey="index" stroke={g.color} fill={g.color} fillOpacity={0.4} />
+                        <Radar name="P90-Index" dataKey="index" stroke={g.color} fill={g.color} fillOpacity={0.4} />
                         <Tooltip />
                       </RadarChart>
                     </ResponsiveContainer>
@@ -240,8 +240,8 @@ export default function Dashboard() {
                               <div style={{ padding: '6px 4px' }}>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
                                   <div className="kpi-card" style={{ flex: '1 1 110px' }}>
-                                    <div className="kpi-label">Ø Index</div>
-                                    <div className="kpi-value" style={{ fontSize: '0.95rem' }}>{r.mean_index.toFixed(1)}</div>
+                                    <div className="kpi-label">P90-Index</div>
+                                    <div className="kpi-value" style={{ fontSize: '0.95rem' }}>{r.p90_index.toFixed(1)}</div>
                                   </div>
                                   <div className="kpi-card" style={{ flex: '1 1 110px' }}>
                                     <div className="kpi-label">Max. Index</div>

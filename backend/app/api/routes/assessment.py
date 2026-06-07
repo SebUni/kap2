@@ -15,6 +15,7 @@ from app.tasks.assessment_task import (
     run_assessment_background, abort_assessment, TASK_KEY,
 )
 from app.services.measure_service import get_risk_aggregate
+from app.services.engine import risk_engine
 
 log = logging.getLogger(__name__)
 router = APIRouter()
@@ -94,8 +95,8 @@ def get_status(kommune_id: int, db: Session = Depends(get_db)):
 def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
     """GeoJSON einer einzelnen Ebene (H/E/V-Code oder Risiko-Code).
 
-    Property ``value`` enthält den darzustellenden Wert (absolute Einheit für
-    H/E/V, Index 0..100 für Risiken). ``meta`` liefert Min/Max für die Legende.
+    Property ``value`` enthält den darzustellenden Wert in absoluter Einheit
+    (H/E/V und Risiken). ``meta`` liefert Min/Max für die Legende.
     """
     category = _layer_category(code)
     if not category:
@@ -112,7 +113,10 @@ def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
     for ca, cell in rows:
         data = ca.data or {}
         if category == "risks":
-            value = float(data.get("risks", {}).get(code, {}).get("index", 0.0))
+            rdef = catalog.RISKS_BY_CODE[code]
+            idx = float(data.get("risks", {}).get(code, {}).get("index", 0.0))
+            cell_pop = float(data.get("inputs", {}).get("pop", 0.0))
+            value = risk_engine.cell_outcome(rdef, idx, cell_pop)
         else:
             value = float(data.get(category, {}).get(code, 0.0))
         vmin = value if vmin is None else min(vmin, value)
@@ -127,7 +131,7 @@ def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
     meta = {"code": code, "category": category, "min": vmin or 0.0, "max": vmax or 0.0}
     if category == "risks":
         r = catalog.RISKS_BY_CODE[code]
-        meta.update({"label": r["name"], "unit": "Index (0-100)", "scale_max": 100.0})
+        meta.update({"label": r["name"], "unit": r["outcome_unit"]})
     else:
         m = catalog.INDICATOR_BY_CODE[code]
         meta.update({"label": m["name"], "unit": m["unit"], "scale_max": m.get("norm_max")})
@@ -194,7 +198,7 @@ def risk_histogram(kommune_id: int, db: Session = Depends(get_db)):
             "cost_dimension": risk["cost_dimension"],
             "counts": counts[code],
             "nonzero_cells": nonzero[code],
-            "mean_index": a.get("index", 0.0),
+            "p90_index": a.get("index", 0.0),
             "max_index": a.get("max_index", 0.0),
             "outcome": a.get("outcome", 0.0),
             "cost_eur": a.get("cost_eur", 0.0),

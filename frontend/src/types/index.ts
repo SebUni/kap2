@@ -205,7 +205,7 @@ export interface RiskHistogramEntry {
   cost_dimension: string
   counts: number[]
   nonzero_cells: number
-  mean_index: number
+  p90_index: number
   max_index: number
   outcome: number
   cost_eur: number

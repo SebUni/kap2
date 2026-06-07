@@ -5,14 +5,21 @@ mit normalisierten Pathway-Gewichten → Index 0..100 (vergleichbare Metrik).
 Zusätzlich werden Outcome-Schätzung (outcome_unit) und – wo monetär – Schadens-
 kosten (€/Jahr) abgeleitet.
 
-Aggregationsregel: ``weighted_sum_pathways`` mit ``NORMALIZE_PATHWAY_WEIGHTS``
-(siehe model_parameters.csv). Compound/Cascade sind als Hazards mit
-``max_of_constituent_hazards`` bzw. Konstantwert hinterlegt (siehe indicators.py).
+Kommune-Aggregation: 90.-Perzentil der Zell-Indizes je Risiko (statt Mittelwert),
+damit belastete Zellen in Dashboard/Spinnendiagrammen sichtbar bleiben.
+Kartenlayer: absolute Outcome-Werte pro Zelle via ``cell_outcome``.
+
+Pathway-Gewichte: ``NORMALIZE_PATHWAY_WEIGHTS`` (siehe model_parameters.csv).
+Compound/Cascade sind als Hazards mit ``max_of_constituent_hazards`` bzw.
+Konstantwert hinterlegt (siehe indicators.py).
 """
 
 from __future__ import annotations
 
 from app.data import catalog
+
+CELL_AREA_KM2 = 0.01  # 100 m × 100 m Rasterzelle
+AGGREGATION_PERCENTILE = 90.0
 
 # Pathways je Risiko einmalig vorbauen
 _PATHWAYS: dict[str, list[dict]] = {r["code"]: catalog.build_pathways(r) for r in catalog.RISKS}
@@ -56,20 +63,40 @@ def cell_risk_indices(hev_norm: dict) -> dict:
     return result
 
 
-def _scale_factor(risk: dict, total_pop: float, area_km2: float) -> float:
+def _scale_factor(risk: dict, pop: float, area_km2: float) -> float:
     scale = risk.get("scale", "pop")
     if scale == "pop":
-        return (total_pop or 0.0) / 100_000.0
+        return (pop or 0.0) / 100_000.0
     if scale == "area":
         return (area_km2 or 0.0) / 50.0
     return 1.0  # flat (Index-Outcomes)
 
 
-def estimate_outcome_and_cost(risk: dict, mean_index: float, total_pop: float, area_km2: float) -> dict:
-    """Outcome-Schätzung + monetäre Kosten für ein Risiko."""
+def cell_outcome(risk: dict, index: float, cell_pop: float,
+                 cell_area_km2: float = CELL_AREA_KM2) -> float:
+    """Absolute Outcome-Schätzung für eine einzelne Zelle (Kartenlayer)."""
+    ref = float(risk.get("ref_value", 0.0))
+    factor = _scale_factor(risk, cell_pop, cell_area_km2)
+    return ref * (index / 100.0) * factor
+
+
+def _percentile(values: list[float], pct: float = AGGREGATION_PERCENTILE) -> float:
+    if not values:
+        return 0.0
+    sorted_vals = sorted(values)
+    k = (len(sorted_vals) - 1) * pct / 100.0
+    f = int(k)
+    c = min(f + 1, len(sorted_vals) - 1)
+    if f == c:
+        return sorted_vals[f]
+    return sorted_vals[f] + (k - f) * (sorted_vals[c] - sorted_vals[f])
+
+
+def estimate_outcome_and_cost(risk: dict, agg_index: float, total_pop: float, area_km2: float) -> dict:
+    """Outcome-Schätzung + monetäre Kosten für ein Risiko (agg_index = P90 der Zell-Indizes)."""
     factor = _scale_factor(risk, total_pop, area_km2)
     ref = float(risk.get("ref_value", 0.0))
-    outcome = ref * (mean_index / 100.0) * factor
+    outcome = ref * (agg_index / 100.0) * factor
     cost_eur = 0.0
     dim = risk.get("cost_dimension")
     if dim == "monetary":
@@ -89,25 +116,23 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
         "cost": {total_eur, by_risk: [...]},
       }
     """
-    n = len(cell_data_list) or 1
-    sums: dict[str, float] = {}
-    maxs: dict[str, float] = {}
+    indices_by_code: dict[str, list[float]] = {}
     for cd in cell_data_list:
         risks = cd.get("risks", {})
         for code, r in risks.items():
             idx = float(r.get("index", 0.0))
-            sums[code] = sums.get(code, 0.0) + idx
-            if idx > maxs.get(code, 0.0):
-                maxs[code] = idx
+            indices_by_code.setdefault(code, []).append(idx)
 
     risk_out: dict[str, dict] = {}
     for risk in catalog.RISKS:
         code = risk["code"]
-        mean_idx = round(sums.get(code, 0.0) / n, 2)
-        est = estimate_outcome_and_cost(risk, mean_idx, total_pop, area_km2)
+        vals = indices_by_code.get(code, [])
+        p90_idx = round(_percentile(vals), 2)
+        max_idx = round(max(vals) if vals else 0.0, 2)
+        est = estimate_outcome_and_cost(risk, p90_idx, total_pop, area_km2)
         risk_out[code] = {
-            "index": mean_idx,
-            "max_index": round(maxs.get(code, 0.0), 2),
+            "index": p90_idx,
+            "max_index": max_idx,
             "outcome": est["outcome"],
             "outcome_unit": risk["outcome_unit"],
             "cost_eur": est["cost_eur"],
@@ -116,7 +141,7 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             "name": risk["name"],
         }
 
-    # Gruppen-Mittel (übergreifende Metrik)
+    # Gruppen-P90: Mittel der Einzelrisiko-P90-Indizes je KWRA-Gruppe
     groups: dict[str, dict] = {}
     for g in catalog.KWRA_GROUPS:
         codes = [r["code"] for r in catalog.RISKS if r["group"] == g["code"]]
@@ -125,6 +150,7 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             "label": g["label"], "color": g["color"],
             "index": round(sum(vals) / len(vals), 2),
             "risk_codes": codes,
+            "aggregation": f"P{int(AGGREGATION_PERCENTILE)}",
         }
 
     by_risk = sorted(
