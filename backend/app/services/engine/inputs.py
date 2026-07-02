@@ -177,6 +177,7 @@ def _assemble_cell_input(
         "energy_infra_count": bm.get("energy_infra_count", 0.0),
         "water_wastewater_count": bm.get("water_wastewater_count", 0),
         "communication_count": bm.get("communication_count", 0),
+        "transport_hub_count": bm.get("transport_hub_count", 0),
         "dist_hospital_m": hc["dist_hospital_m"],
         "dist_doctor_m": hc["dist_doctor_m"],
         "dist_pharmacy_m": hc["dist_pharmacy_m"],

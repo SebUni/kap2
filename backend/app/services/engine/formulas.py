@@ -277,8 +277,8 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "TRANSPORT_HUBS": {
-        "formula": "Straßenanteil · 18",
-        "inputs": [_i("road_cov", "Straßenanteil (OSM)", EXTERN, "", "cell")],
+        "formula": "Anzahl OSM-Verkehrsknoten (Bahnhof/Halt/ÖPNV)",
+        "inputs": [_i("transport_hub_count", "Verkehrsknoten (OSM)", EXTERN, "Anzahl", "cell")],
     },
     "COMMUNICATION_INFRA": {
         "formula": "Anzahl OSM Mobilfunk-/Kommunikationsmasten",
@@ -455,8 +455,19 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("__const", "Finanzielle Kapazität (invers)", PARAM, "Index", "const", 45.0)],
     },
     "INFRA_CRITICALITY": {
-        "formula": "clamp(Gebäude · 0,3 ; 0…100)",
-        "inputs": [_i("bldg_count", "Gebäudeanzahl (OSM)", EXTERN, "", "cell")],
+        "formula": "clamp(w_E·Energie + w_W·Wasser + w_K·Komm + w_G·Gesundheit + w_V·Verkehr ; 0…100)",
+        "inputs": [
+            _i("energy_infra_count", "Energieinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
+            _i("water_wastewater_count", "Wasser/Abwasser (OSM)", EXTERN, "Anzahl", "cell"),
+            _i("communication_count", "Kommunikationsinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
+            _i("healthcare_access_score", "Gesundheits-Erreichbarkeit (OSM)", EXTERN, "", "cell"),
+            _i("transport_hub_count", "Verkehrsknoten (OSM)", EXTERN, "Anzahl", "cell"),
+            _i("w_energy", "Gewicht Energie (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 8.0),
+            _i("w_water", "Gewicht Wasser (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 8.0),
+            _i("w_comm", "Gewicht IT/TK (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 6.0),
+            _i("w_health", "Gewicht Gesundheit (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 10.0),
+            _i("w_transport", "Gewicht Verkehr (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 6.0),
+        ],
     },
     "REDUNDANCY_BACKUP": {
         "formula": "Regionaler Annahmewert",

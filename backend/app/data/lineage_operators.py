@@ -29,6 +29,11 @@ CELL_OPERATORS: dict[str, list[OperatorStep]] = {
         "label": "Kommunikation zählen",
         "tooltip": "Zählt Kommunikationsinfrastruktur in der Zelle (OSM).",
     }],
+    "transport_hub_count": [{
+        "op_kind": "count",
+        "label": "Verkehrsknoten zählen",
+        "tooltip": "Zählt Verkehrsknoten (Bahnhof/Halt/ÖPNV-Station) in der Zelle (OSM).",
+    }],
     "bldg_cov": [{
         "op_kind": "coverage",
         "label": "Gebäudeflächen ermitteln",
@@ -217,6 +222,11 @@ FORMULA_OPERATORS: dict[str, list[OperatorStep]] = {
         {"op_kind": "scale_factor", "label": "×", "factor": 6, "tooltip": "Industriefläche × 6."},
         {"op_kind": "scale_factor", "label": "×", "factor": 0.004, "tooltip": "Gebäudeanzahl × 0,004."},
         {"op_kind": "add", "label": "+", "tooltip": "Summe der beiden Terme."},
+    ],
+    "INFRA_CRITICALITY": [
+        {"op_kind": "multiply", "label": "×", "tooltip": "Jeder KRITIS-Sektor mit seinem Gewicht (BBK) multipliziert."},
+        {"op_kind": "add", "label": "+", "tooltip": "Gewichtete Summe aus Energie, Wasser, IT/TK, Gesundheit und Verkehr."},
+        {"op_kind": "clamp", "label": "Begrenzen", "tooltip": "Ergebnis auf 0…100 begrenzt."},
     ],
     "POPULATION_DENSITY": [{
         "op_kind": "divide",

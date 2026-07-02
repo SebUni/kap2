@@ -53,6 +53,7 @@ INTERMEDIATE_LABELS: dict[str, str] = {
     "area_ha": "Zellfläche (ha)",
     "industrial": "Industriefläche (abgeleitet)",
     "healthcare_access_score": "Gesundheitszugang",
+    "transport_hub_count": "Verkehrsknoten",
     "hot_days": "Heiße Tage/Jahr",
     "frost_days": "Frosttage",
     "heavy_rain_index": "Starkregenindex",
@@ -88,6 +89,7 @@ CELL_INPUT_LINEAGE: dict[str, tuple[list[str], list[str]]] = {
     "energy_infra_count": ([], ["osm"]),
     "water_wastewater_count": ([], ["osm"]),
     "communication_count": ([], ["osm"]),
+    "transport_hub_count": ([], ["osm"]),
     "uhi_delta": (
         ["bldg_cov", "road_cov", "green_frac", "forest_frac", "water_frac", "canopy_frac", "svf"],
         ["osm", "param"],

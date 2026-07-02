@@ -34,6 +34,7 @@ _CACHE_TTL = 600  # 10 min – long enough for a full batch run
 _POWER_LINE_TAGS = frozenset({"line", "cable", "minor_line", "busbar"})
 _WATER_INFRA_TAGS = frozenset({"water_works", "wastewater_plant", "water_tower"})
 _COMM_MAN_MADE_TAGS = frozenset({"mast", "communications_tower"})
+_TRANSPORT_RAILWAY_TAGS = frozenset({"station", "halt"})
 _HEALTHCARE_HOSPITAL_AMENITY = frozenset({"hospital"})
 _HEALTHCARE_DOCTOR_AMENITY = frozenset({"clinic", "doctors"})
 _HEALTHCARE_PHARMACY_AMENITY = frozenset({"pharmacy"})
@@ -855,6 +856,7 @@ def _empty_infra_features() -> dict:
         "water_points": [],
         "water_areas": [],
         "comm_points": [],
+        "transport_points": [],
         "healthcare_hospital": [],
         "healthcare_doctor": [],
         "healthcare_pharmacy": [],
@@ -904,6 +906,9 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
       node["tower"="communication"]({bbox});
       node["man_made"~"mast|communications_tower"]({bbox});
       node["communication"]({bbox});
+      node["railway"~"^(station|halt)$"]({bbox});
+      node["public_transport"="station"]({bbox});
+      node["amenity"="bus_station"]({bbox});
       node["amenity"~"hospital|clinic|doctors|pharmacy"]({bbox});
       way["amenity"~"hospital|clinic|doctors|pharmacy"]({bbox});
       node["healthcare"~"hospital|clinic|doctor|pharmacy|centre"]({bbox});
@@ -927,6 +932,7 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
     result = _empty_infra_features()
     comm_node_ids: set[int] = set()
     water_node_ids: set[int] = set()
+    transport_node_ids: set[int] = set()
     healthcare_ids: set[int | tuple[str, int]] = set()
 
     from shapely.geometry import Point
@@ -975,6 +981,15 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
                 comm_node_ids.add(el["id"])
                 lon, lat = nodes[el["id"]]
                 result["comm_points"].append({"lon": lon, "lat": lat})
+            is_transport = (
+                tags.get("railway") in _TRANSPORT_RAILWAY_TAGS
+                or tags.get("public_transport") == "station"
+                or tags.get("amenity") == "bus_station"
+            )
+            if is_transport and el["id"] not in transport_node_ids:
+                transport_node_ids.add(el["id"])
+                lon, lat = nodes[el["id"]]
+                result["transport_points"].append({"lon": lon, "lat": lat})
             _add_healthcare_geometry(
                 result, tags, Point(nodes[el["id"]]), healthcare_ids, el_id,
             )
@@ -1001,11 +1016,12 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
 
     log.info(
         "Fetched infrastructure from OSM: %d energy pts, %d lines, %d areas, "
-        "%d water pts, %d water areas, %d comm pts, "
+        "%d water pts, %d water areas, %d comm pts, %d transport pts, "
         "%d hospital, %d doctor, %d pharmacy (%.2f MB)",
         len(result["energy_points"]), len(result["energy_lines"]),
         len(result["energy_areas"]), len(result["water_points"]),
         len(result["water_areas"]), len(result["comm_points"]),
+        len(result["transport_points"]),
         len(result["healthcare_hospital"]), len(result["healthcare_doctor"]),
         len(result["healthcare_pharmacy"]),
         response_bytes / 1_048_576,
@@ -1048,10 +1064,16 @@ def compute_cell_infrastructure(cell_geom: Any, infra: dict) -> dict:
         if cell_geom.contains(Point(pt["lon"], pt["lat"])):
             comm += 1
 
+    transport = 0
+    for pt in infra.get("transport_points", []):
+        if cell_geom.contains(Point(pt["lon"], pt["lat"])):
+            transport += 1
+
     return {
         "energy_infra_count": round(energy, 2),
         "water_wastewater_count": water,
         "communication_count": comm,
+        "transport_hub_count": transport,
     }
 
 
@@ -1060,6 +1082,7 @@ def _empty_infra_metrics() -> dict:
         "energy_infra_count": 0.0,
         "water_wastewater_count": 0,
         "communication_count": 0,
+        "transport_hub_count": 0,
     }
 
 

@@ -150,7 +150,7 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "LOCATION_HAZARD_ZONES": round(area_ha * bldg_cov * max(depression, min(uhi / 6.0, 1.0)), 4),
         "ENERGY_INFRASTRUCTURE": round(float(ci.get("energy_infra_count") or 0), 2),
         "WATER_WASTEWATER_INFRA": round(float(ci.get("water_wastewater_count") or 0), 2),
-        "TRANSPORT_HUBS": round(road_cov * 18.0, 2),
+        "TRANSPORT_HUBS": round(float(ci.get("transport_hub_count") or 0), 2),
         "COMMUNICATION_INFRA": round(float(ci.get("communication_count") or 0), 2),
         "HEALTHCARE_INFRASTRUCTURE": round(
             float(ci.get("healthcare_access_score") or 0) * 100.0, 1,
@@ -169,6 +169,19 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "FISH_SPAWNING_HABITATS": round(area_ha * max(water, water_prox * 0.5), 4),
     }
 
+    # INFRA_CRITICALITY: gewichtete Dichte echter KRITIS-Assets (BBK-KRITIS-Sektoren).
+    # Gewichte editierbar über PUT /kommune/{id}/parameters (vulnerabilities.INFRA_CRITICALITY.param.w_*).
+    _ov = override_context.get_override
+    _wc = "vulnerabilities.INFRA_CRITICALITY.param."
+    infra_criticality = _clamp(
+        float(_ov(_wc + "w_energy", 8.0)) * float(ci.get("energy_infra_count") or 0)
+        + float(_ov(_wc + "w_water", 8.0)) * float(ci.get("water_wastewater_count") or 0)
+        + float(_ov(_wc + "w_comm", 6.0)) * float(ci.get("communication_count") or 0)
+        + float(_ov(_wc + "w_health", 10.0)) * float(ci.get("healthcare_access_score") or 0)
+        + float(_ov(_wc + "w_transport", 6.0)) * float(ci.get("transport_hub_count") or 0),
+        0, 100,
+    )
+
     # ── Vulnerabilities (Index 0..100 bzw. natürliche Einheit) ─────────────────
     V = {
         "BUILDING_STABILITY": _building_stability(ci),
@@ -183,7 +196,7 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "SINGLE_SITE_DEPENDENCY": round(_clamp(industrial * 200.0, 0, 100), 1),
         "SUPPLY_CHAIN_DEPENDENCY": 50.0,
         "FINANCIAL_ADAPTATION_CAPACITY": 45.0,
-        "INFRA_CRITICALITY": round(_clamp(bldg_count * 0.3, 0, 100), 1),
+        "INFRA_CRITICALITY": round(infra_criticality, 1),
         "REDUNDANCY_BACKUP": 50.0,
         "INFRA_DEPENDENCY_CHAIN": 50.0,
         "HEAT_SENSITIVITY": round(_clamp(share_vuln + uhi * 6.0 + (1.0 - green) * 20.0, 0, 100), 1),
