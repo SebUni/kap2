@@ -68,7 +68,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             label="Referenzwert (Index = 100)",
             value=float(r.get("ref_value", 0.0)),
             unit=r.get("outcome_unit", ""),
-            source="Referenz-Outcome bei Index 100 / 100.000 Ew. (Risikokatalog)",
+            source=r.get("source") or "Modellannahme (kein Kurz-Key hinterlegt)",
         ))
 
     for cat_key, items in (
@@ -86,7 +86,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                     label=label,
                     value=float(m.get(bound, 0.0)),
                     unit=m.get("unit", ""),
-                    source=m.get("source") or "Risikokatalog (Normierungsskala)",
+                    source=m.get("source") or "Modellannahme (Normierungsskala, unbelegt)",
                 ))
 
     for ptype, label in PATHWAY_WEIGHT_LABELS.items():
@@ -101,7 +101,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             label=label,
             value=val,
             unit="Gewicht",
-            source="pathway_weight_defaults (Risikokatalog)",
+            source=catalog.PATHWAY_WEIGHT_SOURCE,
         ))
 
     for code, recipe in formulas.DETAILED.items():
@@ -122,7 +122,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 label=inp.get("label", key),
                 value=inp["value"],
                 unit=inp.get("unit", ""),
-                source=inp.get("source") or "Modellannahme (Formelrezept)",
+                source=inp.get("source") or "Modellannahme (unbelegter Modellparameter)",
             ))
 
     for m in catalog.MEASURES:
@@ -136,7 +136,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             label="Standard-Risikoreduktion",
             value=float(m.get("default_reduction", 0.0)),
             unit="Anteil",
-            source="Maßnahmenkatalog",
+            source=m.get("source") or "Modellannahme (Maßnahmenwirkung, unbelegt)",
         ))
 
     uhi_defaults = {"alpha": 6.0, "beta": 2.0, "gamma": 3.5, "delta": 2.0}
@@ -154,7 +154,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 label=uhi_labels[key],
                 value=val,
                 unit="K/Index",
-                source="UHI-Modell (Hitze-Assessor)",
+                source="VDI 3787 Bl.1 / Oke 1982 / Stewart & Oke 2012",
             ))
 
     return params
