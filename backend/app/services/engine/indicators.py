@@ -9,6 +9,7 @@ den (i)-Tooltips dokumentiert.
 from __future__ import annotations
 
 from app.data import catalog
+from app.services.engine import override_context
 
 
 def _clamp(x: float, lo: float, hi: float) -> float:
@@ -132,9 +133,9 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
     }
     # Compound = max der normalisierten Bestandteile (model_parameters: max_of_constituent)
     comp = max(
-        catalog.normalize_value("HEAT_WAVE", H["HEAT_WAVE"]),
-        catalog.normalize_value("DROUGHT", H["DROUGHT"]),
-        catalog.normalize_value("HEAVY_RAIN_FLOOD", H["HEAVY_RAIN_FLOOD"]),
+        override_context.normalize_value("HEAT_WAVE", H["HEAT_WAVE"]),
+        override_context.normalize_value("DROUGHT", H["DROUGHT"]),
+        override_context.normalize_value("HEAVY_RAIN_FLOOD", H["HEAVY_RAIN_FLOOD"]),
     )
     H["COMPOUND_EVENT"] = round(comp, 3)
 

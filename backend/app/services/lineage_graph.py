@@ -559,12 +559,16 @@ def _tooltip_for_node(
     if ntype == "pathway":
         chain = meta.get("chain_label", "")
         type_label = meta.get("type_label", "")
+        weight = meta.get("weight")
         lines = [label]
         if chain:
             lines.append(f"Zusammensetzung: {chain}")
         if type_label:
             lines.append(f"Typ: {type_label}")
-        lines.append("Berechnung: Gewicht · normierte Gefahr · Betroffenheit · Empfindlichkeit")
+        weight_str = f"{weight:g}" if isinstance(weight, (int, float)) else "Gewicht"
+        lines.append(
+            f"Berechnung: {weight_str} · normierte Gefahr · Betroffenheit · Empfindlichkeit"
+        )
         return "\n".join(lines)
 
     if ntype == "operator":
@@ -575,10 +579,11 @@ def _tooltip_for_node(
             src = meta.get("source", "")
             val = meta.get("value")
             unit = meta.get("unit", "")
+            scale = meta.get("scale", "pop")
             lines = ["Skalierung", f"Referenzwert: {val:g} {unit}".strip()]
             if src:
                 lines.append(f"Quelle: {src}")
-            lines.append("Index/100 · Einwohner_zelle/100.000")
+            lines.append(_SCALE_FORMULAS.get(scale, _SCALE_FORMULAS["flat"]))
             return "\n".join(lines)
         if kind == "multiply":
             return tooltip or "Multiplikation: Gefahr × Betroffenheit × Empfindlichkeit"
@@ -666,11 +671,25 @@ def _add_operator_compute(
     return op_id
 
 
+_SCALE_FORMULAS = {
+    "pop": "Index/100 · Einwohner_zelle/100.000",
+    "area": "Index/100 · Fläche/50 km²",
+    "flat": "Index/100 · ×1",
+}
+
+_SCALE_SOURCES = {
+    "pop": "Referenz-Outcome bei Index 100 / 100.000 Ew. (Risikokatalog)",
+    "area": "Referenz-Outcome bei Index 100 / 50 km² (Risikokatalog)",
+    "flat": "Referenz-Outcome bei Index 100 (Index-Outcome, Risikokatalog)",
+}
+
+
 def _add_operator_scaling(
     b: "LineageBuilder",
     risk_code: str,
     ref: float,
     unit: str,
+    scale: str = "pop",
 ) -> str:
     op_id = f"op:scaling:{risk_code}"
     b.add_node(
@@ -681,7 +700,8 @@ def _add_operator_scaling(
             "parameter_id": f"risks.{risk_code}.ref_value",
             "value": ref,
             "unit": unit,
-            "source": "Referenz-Outcome bei Index 100 / 100.000 Ew. (Risikokatalog)",
+            "scale": scale,
+            "source": _SCALE_SOURCES.get(scale, _SCALE_SOURCES["flat"]),
             "tooltip": "Skalierung des Indexes auf den Referenz-Outcome.",
         },
     )
@@ -723,8 +743,9 @@ def _add_operator_multiplier(
     risk_code: str,
     ref: float,
     unit: str,
+    scale: str = "pop",
 ) -> str:
-    return _add_operator_scaling(b, risk_code, ref, unit)
+    return _add_operator_scaling(b, risk_code, ref, unit, scale)
 
 
 def _add_operator_norm(
@@ -1212,7 +1233,7 @@ def build_risk_lineage(code: str) -> dict:
     ref = float(risk.get("ref_value", 0.0))
     unit = risk.get("outcome_unit", "")
     risk_name = risk.get("name", code)
-    scale_id = _add_operator_scaling(b, code, ref, unit)
+    scale_id = _add_operator_scaling(b, code, ref, unit, risk.get("scale", "pop"))
     b.add_node(
         out_id, "outcome",
         risk_name,
