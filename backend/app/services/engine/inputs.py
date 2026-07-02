@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 import multiprocessing
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
 
 log = logging.getLogger(__name__)
@@ -24,16 +25,27 @@ UHI_EPSILON = 1.5
 UHI_TREE = 0.3
 
 _w: dict = {}
+_nw: dict = {}
 _N_WORKERS = min(os.cpu_count() or 4, 8)
 _MP = multiprocessing.get_context("fork")
 _CHUNK = 50
+_NEIGHBOR_OFFSETS = (
+    (1, 0), (-1, 0), (0, 1), (0, -1),
+    (1, 1), (1, -1), (-1, 1), (-1, -1),
+)
 
 
 def _cell_worker(idx: int):
-    from app.services.climate.heat.osm_data import compute_cell_landuse, compute_cell_buildings
+    from app.services.climate.heat.osm_data import (
+        compute_cell_landuse,
+        compute_cell_buildings,
+        compute_cell_infrastructure,
+    )
     g = _w["cells"][idx]["geometry"]
     lu = compute_cell_landuse(g, _w["lu"])
     bm = compute_cell_buildings(g, _w["bldgs"], _w["roads"], _w["trees"])
+    infra = compute_cell_infrastructure(g, _w["infra"])
+    bm.update(infra)
     return idx, lu, bm
 
 
@@ -67,14 +79,183 @@ def compute_uhi_delta(lu: dict, bm: dict) -> float:
     bldg_factor = bldg_cov * height_factor
 
     meadow = max(0.0, green - forest)
-    green_cooling = UHI_GAMMA * forest * 1.8 + UHI_GAMMA * meadow + UHI_GAMMA * farmland * 0.5
-    water_cooling = UHI_DELTA * water
+    from app.services.engine.override_context import uhi_coefficients
+    uhi = uhi_coefficients()
+    green_cooling = uhi["gamma"] * forest * 1.8 + uhi["gamma"] * meadow + uhi["gamma"] * farmland * 0.5
+    water_cooling = uhi["delta"] * water
     tree_cooling = UHI_TREE * canopy * 10.0
     canyon = UHI_EPSILON * (1.0 - svf) * height_factor
 
-    uhi_base = UHI_ALPHA * (1.0 - albedo_lu) * imp + UHI_BETA * bldg_factor
+    uhi_base = uhi["alpha"] * (1.0 - albedo_lu) * imp + uhi["beta"] * bldg_factor
     delta = uhi_base - green_cooling - water_cooling - tree_cooling + canyon
     return max(0.0, round(delta, 3))
+
+
+def _assemble_cell_input(
+    cell: dict,
+    lu: dict,
+    bm: dict,
+    lu_bm: list,
+    coord_idx: dict[tuple[int, int], int],
+    terrain: dict,
+    water_features: list[dict],
+    water_index: tuple[Any, list[Any]] | None,
+    infra_features: dict,
+    healthcare_indexes: dict[str, tuple[Any, list] | None],
+    step: int,
+) -> dict:
+    from app.services.climate.heat.osm_data import (
+        compute_water_distance_m,
+        water_proximity_score,
+        compute_cell_healthcare_access,
+    )
+
+    open_n = total_n = 0
+    water_adj = 0.0
+    r, c = cell["row"], cell["col"]
+    x_mp = cell.get("x_3035", c * step)
+    y_mp = cell.get("y_3035", r * step)
+    for ox, oy in _NEIGHBOR_OFFSETS:
+        ni = coord_idx.get((x_mp + ox * step, y_mp + oy * step))
+        if ni is None:
+            open_n += 1
+            total_n += 1
+            continue
+        total_n += 1
+        nlu, nbm = lu_bm[ni]
+        if (nbm["building_coverage"] < 0.05
+                and nlu["green_fraction"] + nlu["water_fraction"]
+                + nlu.get("farmland_fraction", 0.0) > 0.3):
+            open_n += 1
+        water_adj = max(water_adj, nlu["water_fraction"])
+    vent_score = open_n / max(total_n, 1)
+
+    uhi = compute_uhi_delta(lu, bm)
+    imp_detail = bm["building_coverage"] + bm["road_coverage"] * 0.95
+    imp = max(0.02, min(imp_detail if imp_detail > 0.01 else lu["impervious_fraction"], 0.98))
+
+    cell_size_m = cell.get("cell_size_m", 100)
+    area_m2 = float(cell_size_m) ** 2
+
+    water_dist_m = compute_water_distance_m(
+        cell["geometry"], water_features, cell_size_m, water_index,
+    )
+    water_prox = water_proximity_score(water_dist_m)
+    water_adj_combined = max(water_adj, water_prox, lu["water_fraction"])
+
+    depression_factor = terrain.get("depression_factor")
+    slope_factor = terrain.get("slope_factor")
+    if depression_factor is None:
+        depression_factor = max(0.0, min(1.0, 0.5 * imp + 0.5 * water_adj_combined - 0.2 * vent_score))
+    if slope_factor is None:
+        slope_factor = max(0.0, min(1.0, 0.3 + 0.4 * (1.0 - vent_score)))
+
+    hc = compute_cell_healthcare_access(
+        cell["geometry"], infra_features, healthcare_indexes,
+    )
+
+    return {
+        "grid_cell_id": cell["id"],
+        "gitter_id": cell.get("gitter_id"),
+        "x_3035": x_mp,
+        "y_3035": y_mp,
+        "row": r, "col": c,
+        "area_m2": area_m2,
+        "imp_frac": imp,
+        "albedo": lu["albedo"],
+        "green_frac": lu["green_fraction"],
+        "water_frac": max(lu["water_fraction"], water_adj * 0.5, water_prox * 0.3),
+        "water_adj": round(water_adj_combined, 3),
+        "water_dist_m": round(water_dist_m, 1),
+        "water_prox": round(water_prox, 3),
+        "forest_frac": lu.get("forest_fraction", 0.0),
+        "glacier_frac": lu.get("glacier_fraction", 0.0),
+        "snow_elevation_factor": _snow_elevation_factor(terrain.get("mean_elevation_m", 0.0)),
+        "farmland_frac": lu.get("farmland_fraction", 0.0),
+        "bldg_cov": bm["building_coverage"],
+        "bldg_count": bm.get("building_count", 0),
+        "energy_infra_count": bm.get("energy_infra_count", 0.0),
+        "water_wastewater_count": bm.get("water_wastewater_count", 0),
+        "communication_count": bm.get("communication_count", 0),
+        "dist_hospital_m": hc["dist_hospital_m"],
+        "dist_doctor_m": hc["dist_doctor_m"],
+        "dist_pharmacy_m": hc["dist_pharmacy_m"],
+        "healthcare_weight_hospital": hc["healthcare_weight_hospital"],
+        "healthcare_weight_doctor": hc["healthcare_weight_doctor"],
+        "healthcare_weight_pharmacy": hc["healthcare_weight_pharmacy"],
+        "healthcare_access_score": hc["healthcare_access_score"],
+        "avg_height": bm["avg_building_height"],
+        "road_cov": bm["road_coverage"],
+        "canopy_frac": bm["tree_canopy_fraction"],
+        "svf": bm["sky_view_factor"],
+        "vent_score": vent_score,
+        "uhi_delta": uhi,
+        "mean_elevation_m": terrain.get("mean_elevation_m", 0.0),
+        "slope_deg": terrain.get("slope_deg", 0.0),
+        "sink_depth_m": terrain.get("sink_depth_m", 0.0),
+        "twi": terrain.get("twi", 0.0),
+        "twi_norm": terrain.get("twi_norm", 0.0),
+        "flow_accum": terrain.get("flow_accum", 1.0),
+        "depression_proxy": depression_factor,
+        "slope_proxy": slope_factor,
+        "depression_factor": depression_factor,
+        "slope_factor": slope_factor,
+        "pop": 0.0,
+    }
+
+
+def _neighbor_worker(idx: int):
+    cell = _nw["cells"][idx]
+    lu, bm = _nw["lu_bm"][idx]
+    return idx, _assemble_cell_input(
+        cell, lu, bm,
+        _nw["lu_bm"], _nw["coord_idx"],
+        _nw["terrain"].get(idx, {}),
+        _nw["water_features"],
+        _nw["water_index"],
+        _nw["infra_features"],
+        _nw["healthcare_indexes"],
+        _nw["step"],
+    )
+
+
+def _fetch_osm_data_parallel(
+    grid_cells: list[dict],
+    progress_callback: Any = None,
+) -> tuple[list, dict, list, dict]:
+    """Lädt Landnutzung, Gebäude, Gewässer und Infrastruktur parallel."""
+    from app.services.climate.heat.osm_data import (
+        fetch_landuse, fetch_buildings_and_roads, fetch_water_features, fetch_infrastructure,
+    )
+    from app.services.engine.progress import OSM_LANDUSE, OSM_BUILDINGS, OSM_WATER, OSM_INFRA
+
+    jobs = {
+        "landuse": fetch_landuse,
+        "buildings": fetch_buildings_and_roads,
+        "water": fetch_water_features,
+        "infra": fetch_infrastructure,
+    }
+    results: dict[str, Any] = {}
+
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        futures = {ex.submit(fn, grid_cells): name for name, fn in jobs.items()}
+        for fut in as_completed(futures):
+            name = futures[fut]
+            results[name] = fut.result()
+
+    landuse_features, _ = results["landuse"]
+    detail = results["buildings"]
+    buildings, roads, trees = detail["buildings"], detail["roads"], detail["trees"]
+    water_features = results["water"]
+    infra_features = results["infra"]
+
+    if progress_callback:
+        progress_callback(OSM_LANDUSE[1], "OSM Landnutzung geladen")
+        progress_callback(OSM_BUILDINGS[1], "OSM Gebäude, Straßen & Bäume geladen")
+        progress_callback(OSM_WATER[1], "OSM Gewässer geladen")
+        progress_callback(OSM_INFRA[1], "OSM-Daten geladen")
+
+    return landuse_features, {"buildings": buildings, "roads": roads, "trees": trees}, water_features, infra_features
 
 
 def build_regional_context(bundesland: str | None, is_coastal: bool) -> dict:
@@ -124,15 +305,11 @@ def gather_cell_inputs(
 
     ``cell_inputs`` ist an die Reihenfolge von ``grid_cells`` gekoppelt.
     """
-    from app.services.climate.heat.osm_data import (
-        fetch_landuse, fetch_buildings_and_roads, fetch_water_features,
-        compute_water_distance_m, water_proximity_score,
-    )
+    from app.services.climate.heat.osm_data import build_water_spatial_index, build_healthcare_indexes
     from app.services.terrain_service import compute_terrain_for_cells
     from app.services.zensus_loader import ensure_zensus_datasets, load_zensus_for_cells, apply_zensus_to_cell_inputs
     from app.services.engine.progress import (
-        ZENSUS, OSM_LANDUSE, OSM_BUILDINGS, OSM_WATER,
-        CELL_SURFACE, CELL_NEIGHBORS, ZENSUS_APPLY, lerp,
+        ZENSUS, OSM_LANDUSE, CELL_SURFACE, CELL_NEIGHBORS, ZENSUS_APPLY, lerp,
     )
 
     regional = build_regional_context(bundesland, is_coastal)
@@ -144,25 +321,15 @@ def gather_cell_inputs(
         progress_callback(ZENSUS[1], "Zensus-Daten prüfen/laden")
 
     if progress_callback:
-        progress_callback(OSM_LANDUSE[0], "Herunterladen OSM-Landnutzung")
-    landuse_features, _ = fetch_landuse(grid_cells)
-    if progress_callback:
-        progress_callback(OSM_LANDUSE[1], "Herunterladen OSM-Landnutzung")
-    if progress_callback:
-        progress_callback(OSM_BUILDINGS[0], "Herunterladen OSM-Gebäude, Straßen & Bäume")
-    detail = fetch_buildings_and_roads(grid_cells)
-    buildings, roads, trees = detail["buildings"], detail["roads"], detail["trees"]
-    if progress_callback:
-        progress_callback(OSM_BUILDINGS[1], "Herunterladen OSM-Gebäude, Straßen & Bäume")
+        progress_callback(OSM_LANDUSE[0], "Lade OSM-Daten parallel (4 Abfragen)")
+
+    landuse_features, bldg_detail, water_features, infra_features = _fetch_osm_data_parallel(
+        grid_cells, progress_callback,
+    )
+    buildings, roads, trees = bldg_detail["buildings"], bldg_detail["roads"], bldg_detail["trees"]
 
     total = len(grid_cells)
     lu_bm: list[tuple | None] = [None] * total
-
-    if progress_callback:
-        progress_callback(OSM_WATER[0], "Lade OSM-Gewässer")
-    water_features = fetch_water_features(grid_cells)
-    if progress_callback:
-        progress_callback(OSM_WATER[1], "OSM-Daten geladen")
 
     terrain_by_idx = compute_terrain_for_cells(grid_cells, progress_callback)
 
@@ -173,6 +340,7 @@ def gather_cell_inputs(
     _w["bldgs"] = buildings
     _w["roads"] = roads
     _w["trees"] = trees
+    _w["infra"] = infra_features
     _w["cells"] = grid_cells
     try:
         with _MP.Pool(_N_WORKERS) as pool:
@@ -188,7 +356,10 @@ def gather_cell_inputs(
 
     # Nachbarschaftsindex (Zensus-Gitter: ±100 m in EPSG:3035)
     if progress_callback:
-        progress_callback(CELL_NEIGHBORS[0], "Nachbarschaft & Zell-Eingaben")
+        progress_callback(
+            CELL_NEIGHBORS[0],
+            f"Nachbarschaft & Zell-Eingaben ({_N_WORKERS} Kerne) für {total} Zellen",
+        )
 
     coord_idx: dict[tuple[int, int], int] = {}
     step = 100
@@ -197,101 +368,36 @@ def gather_cell_inputs(
         y = cell.get("y_3035", cell.get("row", 0) * step)
         coord_idx[(x, y)] = idx
 
-    cell_inputs: list[dict] = []
-    for idx, cell in enumerate(grid_cells):
-        if progress_callback and idx > 0 and (idx % 500 == 0 or idx + 1 == total):
-            pct = lerp(CELL_NEIGHBORS[0], CELL_NEIGHBORS[1], idx / total)
-            progress_callback(pct, "Nachbarschaft & Zell-Eingaben", f"{idx}/{total}")
-        lu, bm = lu_bm[idx]
-        # Belüftung + Wassernähe aus Nachbarn
-        open_n = total_n = 0
-        water_adj = 0.0
-        r, c = cell["row"], cell["col"]
-        x_mp = cell.get("x_3035", c * step)
-        y_mp = cell.get("y_3035", r * step)
-        for dx, dy in ((step, 0), (-step, 0), (0, step), (0, -step),
-                       (step, step), (step, -step), (-step, step), (-step, -step)):
-            ni = coord_idx.get((x_mp + dx, y_mp + dy))
-            if ni is None:
-                open_n += 1
-                total_n += 1
-                continue
-            total_n += 1
-            nlu, nbm = lu_bm[ni]
-            if (nbm["building_coverage"] < 0.05
-                    and nlu["green_fraction"] + nlu["water_fraction"]
-                    + nlu.get("farmland_fraction", 0.0) > 0.3):
-                open_n += 1
-            water_adj = max(water_adj, nlu["water_fraction"])
-        vent_score = open_n / max(total_n, 1)
+    water_index = build_water_spatial_index(water_features)
+    healthcare_indexes = build_healthcare_indexes(infra_features)
+    cell_inputs: list[dict | None] = [None] * total
 
-        uhi = compute_uhi_delta(lu, bm)
-        imp_detail = bm["building_coverage"] + bm["road_coverage"] * 0.95
-        imp = max(0.02, min(imp_detail if imp_detail > 0.01 else lu["impervious_fraction"], 0.98))
-
-        cell_size_m = cell.get("cell_size_m", 100)
-        area_m2 = float(cell_size_m) ** 2
-
-        terrain = terrain_by_idx.get(idx, {})
-        water_dist_m = compute_water_distance_m(cell["geometry"], water_features, cell_size_m)
-        water_prox = water_proximity_score(water_dist_m)
-        # Kombiniert OSM-Flächenanteil, Nachbar-Wasser und Distanz zu Fließgewässern
-        water_adj_combined = max(water_adj, water_prox, lu["water_fraction"])
-
-        depression_factor = terrain.get("depression_factor")
-        slope_factor = terrain.get("slope_factor")
-        if depression_factor is None:
-            depression_factor = max(0.0, min(1.0, 0.5 * imp + 0.5 * water_adj_combined - 0.2 * vent_score))
-        if slope_factor is None:
-            slope_factor = max(0.0, min(1.0, 0.3 + 0.4 * (1.0 - vent_score)))
-
-        cell_inputs.append({
-            "grid_cell_id": cell["id"],
-            "gitter_id": cell.get("gitter_id"),
-            "x_3035": x_mp,
-            "y_3035": y_mp,
-            "row": r, "col": c,
-            "area_m2": area_m2,
-            "imp_frac": imp,
-            "albedo": lu["albedo"],
-            "green_frac": lu["green_fraction"],
-            "water_frac": max(lu["water_fraction"], water_adj * 0.5, water_prox * 0.3),
-            "water_adj": round(water_adj_combined, 3),
-            "water_dist_m": round(water_dist_m, 1),
-            "water_prox": round(water_prox, 3),
-            "forest_frac": lu.get("forest_fraction", 0.0),
-            "glacier_frac": lu.get("glacier_fraction", 0.0),
-            "snow_elevation_factor": _snow_elevation_factor(
-                terrain.get("mean_elevation_m", 0.0),
-            ),
-            "farmland_frac": lu.get("farmland_fraction", 0.0),
-            "bldg_cov": bm["building_coverage"],
-            "bldg_count": bm.get("building_count", 0),
-            "avg_height": bm["avg_building_height"],
-            "road_cov": bm["road_coverage"],
-            "canopy_frac": bm["tree_canopy_fraction"],
-            "svf": bm["sky_view_factor"],
-            "vent_score": vent_score,
-            "uhi_delta": uhi,
-            # Gelände aus Terrarium-DEM (TWI + Senkentiefe / Hangneigung)
-            "mean_elevation_m": terrain.get("mean_elevation_m", 0.0),
-            "slope_deg": terrain.get("slope_deg", 0.0),
-            "sink_depth_m": terrain.get("sink_depth_m", 0.0),
-            "twi": terrain.get("twi", 0.0),
-            "twi_norm": terrain.get("twi_norm", 0.0),
-            "flow_accum": terrain.get("flow_accum", 1.0),
-            "depression_proxy": depression_factor,
-            "slope_proxy": slope_factor,
-            "depression_factor": depression_factor,
-            "slope_factor": slope_factor,
-            "pop": 0.0,
-        })
+    _nw["cells"] = grid_cells
+    _nw["lu_bm"] = lu_bm
+    _nw["coord_idx"] = coord_idx
+    _nw["terrain"] = terrain_by_idx
+    _nw["water_index"] = water_index
+    _nw["water_features"] = water_features
+    _nw["infra_features"] = infra_features
+    _nw["healthcare_indexes"] = healthcare_indexes
+    _nw["step"] = step
+    try:
+        with _MP.Pool(_N_WORKERS) as pool:
+            for done, (idx, ci) in enumerate(
+                pool.imap_unordered(_neighbor_worker, range(total), chunksize=_CHUNK)
+            ):
+                cell_inputs[idx] = ci
+                if progress_callback and (done % 200 == 0 or done + 1 == total):
+                    pct = lerp(CELL_NEIGHBORS[0], CELL_NEIGHBORS[1], (done + 1) / total)
+                    progress_callback(pct, "Nachbarschaft & Zell-Eingaben", f"{done + 1}/{total}")
+    finally:
+        _nw.clear()
 
     if progress_callback:
         progress_callback(ZENSUS_APPLY[0], "Zensus-Daten anwenden")
     zensus = load_zensus_for_cells(grid_cells)
-    apply_zensus_to_cell_inputs(cell_inputs, grid_cells, zensus)
+    apply_zensus_to_cell_inputs(list(cell_inputs), grid_cells, zensus)
     if progress_callback:
         progress_callback(ZENSUS_APPLY[1], "Zensus-Daten anwenden")
 
-    return cell_inputs, regional
+    return list(cell_inputs), regional

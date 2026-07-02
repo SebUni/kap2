@@ -9,8 +9,11 @@ from __future__ import annotations
 import io
 import logging
 import math
+import multiprocessing
+import os
 import threading
 import time as _time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import httpx
@@ -37,6 +40,11 @@ _D8 = (
     (-1, -1, math.sqrt(2)), (-1, 1, math.sqrt(2)),
     (1, -1, math.sqrt(2)), (1, 1, math.sqrt(2)),
 )
+
+_tw: dict = {}
+_N_WORKERS = min(os.cpu_count() or 4, 8)
+_MP = multiprocessing.get_context("fork")
+_ELEV_CHUNK = 50
 
 
 def _decode_terrarium(rgb: np.ndarray) -> np.ndarray:
@@ -112,9 +120,19 @@ def _build_dem_mosaic(
     cols = len(xs) * TILE_SIZE
     mosaic = np.full((rows, cols), np.nan)
 
-    for yi, ty in enumerate(ys):
-        for xi, tx in enumerate(xs):
-            tile = _fetch_tile(zoom, tx, ty)
+    tile_jobs = [
+        (yi, xi, ty, tx)
+        for yi, ty in enumerate(ys)
+        for xi, tx in enumerate(xs)
+    ]
+
+    def _fetch_job(job: tuple[int, int, int, int]) -> tuple[int, int, np.ndarray]:
+        yi, xi, ty, tx = job
+        return yi, xi, _fetch_tile(zoom, tx, ty)
+
+    workers = min(len(tile_jobs), 8)
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        for yi, xi, tile in ex.map(_fetch_job, tile_jobs):
             r0, c0 = yi * TILE_SIZE, xi * TILE_SIZE
             mosaic[r0:r0 + TILE_SIZE, c0:c0 + TILE_SIZE] = tile
 
@@ -182,6 +200,14 @@ def _sample_cell_elevation(cell_geom: Any, dem: dict, n: int = 5) -> float:
         e = _elev_at(dem, cx, cy)
         return e if not math.isnan(e) else 0.0
     return float(np.mean(samples))
+
+
+def _elev_worker(idx: int) -> tuple[int, int, int, float]:
+    cell = _tw["cells"][idx]
+    r = _tw["row_i"][cell["row"]]
+    c = _tw["col_i"][cell["col"]]
+    e = _sample_cell_elevation(cell["geometry"], _tw["dem"])
+    return idx, r, c, e
 
 
 def _fill_nan_nearest(grid: np.ndarray) -> np.ndarray:
@@ -344,15 +370,24 @@ def compute_terrain_for_cells(
     elev_grid = np.full((max_row, max_col), np.nan)
     valid = np.zeros((max_row, max_col), dtype=bool)
 
-    for idx, cell in enumerate(grid_cells):
-        r, c = row_i[cell["row"]], col_i[cell["col"]]
-        e = _sample_cell_elevation(cell["geometry"], dem)
-        cell_elev[(r, c)] = e
-        elev_grid[r, c] = e
-        valid[r, c] = True
-        if progress_callback and idx > 0 and (idx % 300 == 0 or idx + 1 == len(grid_cells)):
-            pct = lerp(TERRAIN_ELEV[0], TERRAIN_ELEV[1], idx / len(grid_cells))
-            progress_callback(pct, "Zellhöhen", f"{idx}/{len(grid_cells)}")
+    n_cells = len(grid_cells)
+    _tw["cells"] = grid_cells
+    _tw["dem"] = dem
+    _tw["row_i"] = row_i
+    _tw["col_i"] = col_i
+    try:
+        with _MP.Pool(_N_WORKERS) as pool:
+            for done, (idx, r, c, e) in enumerate(
+                pool.imap_unordered(_elev_worker, range(n_cells), chunksize=_ELEV_CHUNK)
+            ):
+                cell_elev[(r, c)] = e
+                elev_grid[r, c] = e
+                valid[r, c] = True
+                if progress_callback and (done % 300 == 0 or done + 1 == n_cells):
+                    pct = lerp(TERRAIN_ELEV[0], TERRAIN_ELEV[1], (done + 1) / n_cells)
+                    progress_callback(pct, f"Zellhöhen ({_N_WORKERS} Kerne)", f"{done + 1}/{n_cells}")
+    finally:
+        _tw.clear()
 
     if progress_callback:
         progress_callback(TERRAIN_HYDRO[0], "Hydrologie (Hang, Senke, TWI)")

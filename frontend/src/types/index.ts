@@ -145,9 +145,46 @@ export interface CellOutcomeBreakdown {
   outcome: number
 }
 
+export interface PathwayRecipeMeta {
+  type: string
+  type_label: string
+  weight: number
+  hazard: string
+  exposure: string
+  vulnerability: string
+  hazard_name: string
+  exposure_name: string
+  vulnerability_name: string
+  chain_description?: string
+  chain_label?: string
+  formula: string
+}
+
+export interface CellPathwayTerm {
+  type: string
+  weight: number
+  hazard: string
+  exposure: string
+  vulnerability: string
+  h_norm: number
+  e_norm: number
+  v_norm: number
+  term: number
+}
+
+export interface CellPathwayBreakdown {
+  pathways: CellPathwayTerm[]
+  weight_sum: number
+  term_sum: number
+  index: number
+}
+
 export interface RiskRecipe {
   formula_index: string
+  formula_index_header?: string
   formula_outcome: string
+  pathways: PathwayRecipeMeta[]
+  weight_sum: number
   hazards: HevRecipeMeta[]
   exposures: HevRecipeMeta[]
   vulnerabilities: HevRecipeMeta[]
@@ -157,6 +194,71 @@ export interface RiskRecipe {
 }
 
 export type LayerRecipe = IndicatorRecipe | RiskRecipe
+
+export interface LayerRecipeMeta {
+  code: string
+  category: LayerCategory
+  label: string
+  description?: string
+  unit?: string
+  norm_min?: number
+  norm_max?: number
+  source?: string
+  proxy?: string
+  spatial?: boolean
+  group?: string
+  recipe: LayerRecipe
+  lineage?: LineageGraph
+}
+
+export type LineageNodeType =
+  | 'source' | 'parameter' | 'intermediate' | 'hazard' | 'exposure' | 'vulnerability'
+  | 'pathway' | 'aggregation' | 'outcome' | 'norm' | 'operator'
+
+export interface LineageNodeData {
+  id: string
+  type: LineageNodeType
+  label: string
+  column: number
+  collapse_group: string
+  meta?: Record<string, unknown>
+}
+
+export interface LineageEdgeData {
+  id: string
+  source: string
+  target: string
+  label?: string | null
+  parameter_id?: string | null
+  meta?: Record<string, unknown>
+}
+
+export interface LineageCollapseGroup {
+  id: string
+  label: string
+  default_collapsed?: boolean
+}
+
+export interface LineageGraph {
+  nodes: LineageNodeData[]
+  edges: LineageEdgeData[]
+  collapse_groups: LineageCollapseGroup[]
+}
+
+export interface ModelParameter {
+  id: string
+  layer_code: string
+  layer_category: string
+  label: string
+  value: number | string
+  default_value: number | string
+  unit: string
+  source: string
+  prov: string
+  editable: boolean
+  overridden: boolean
+  custom_source?: string | null
+}
 
 export interface ResolvedInput {
   v: number | string | null
@@ -345,8 +447,8 @@ export interface RiskProjection {
 export const GROUP_ORDER: { key: GroupKey; label: string }[] = [
   { key: 'measures', label: 'Maßnahmen' },
   { key: 'risks', label: 'Klimarisiken' },
-  { key: 'hazards', label: 'Klimatreiber' },
-  { key: 'exposures', label: 'Expositionen' },
-  { key: 'vulnerabilities', label: 'Verwundbarkeiten' },
+  { key: 'hazards', label: 'Klimatische Einflüsse' },
+  { key: 'exposures', label: 'Räumliche Expositionen' },
+  { key: 'vulnerabilities', label: 'Sensitivitäten' },
   { key: 'auxiliary', label: 'Sonstige' },
 ]

@@ -27,7 +27,22 @@ _cache_lock = threading.Lock()
 _landuse_cache: dict[str, tuple[float, list[dict], int]] = {}  # bbox → (ts, features, bytes)
 _buildings_cache: dict[str, tuple[float, dict]] = {}            # bbox → (ts, result_dict)
 _water_cache: dict[str, tuple[float, list[dict]]] = {}          # bbox → (ts, water features)
+_infra_cache: dict[str, tuple[float, dict]] = {}                # bbox → (ts, infra dict)
 _CACHE_TTL = 600  # 10 min – long enough for a full batch run
+
+# OSM power way tags treated as line segments (weight 0.5 per cell intersection)
+_POWER_LINE_TAGS = frozenset({"line", "cable", "minor_line", "busbar"})
+_WATER_INFRA_TAGS = frozenset({"water_works", "wastewater_plant", "water_tower"})
+_COMM_MAN_MADE_TAGS = frozenset({"mast", "communications_tower"})
+_HEALTHCARE_HOSPITAL_AMENITY = frozenset({"hospital"})
+_HEALTHCARE_DOCTOR_AMENITY = frozenset({"clinic", "doctors"})
+_HEALTHCARE_PHARMACY_AMENITY = frozenset({"pharmacy"})
+_HEALTHCARE_HOSPITAL_HC = frozenset({"hospital"})
+_HEALTHCARE_DOCTOR_HC = frozenset({"clinic", "doctor", "centre", "health_centre"})
+_HEALTHCARE_PHARMACY_HC = frozenset({"pharmacy"})
+
+HEALTHCARE_ROAD_FACTOR = 1.3
+HEALTHCARE_MAX_DIST_M = 20_000.0
 
 # ── Land-use categories and their properties ─────────────────────────────────
 
@@ -156,16 +171,25 @@ def _bbox_from_cells(grid_cells: list[dict]) -> str:
     return f"{miny},{minx},{maxy},{maxx}"
 
 
-def prefetch_osm_data(grid_cells: list[dict], include_buildings: bool = False):
+def prefetch_osm_data(
+    grid_cells: list[dict],
+    include_buildings: bool = False,
+    include_infrastructure: bool = False,
+):
     """Pre-fetch and cache OSM data for the given grid cells.
 
     Call this once before running multiple assessors on the same grid
     to avoid repeated Overpass API requests and 429 rate-limits.
     """
-    log.info("prefetch_osm_data: landuse (+ buildings=%s) for %d cells", include_buildings, len(grid_cells))
+    log.info(
+        "prefetch_osm_data: landuse (buildings=%s, infra=%s) for %d cells",
+        include_buildings, include_infrastructure, len(grid_cells),
+    )
     fetch_landuse(grid_cells)
     if include_buildings:
         fetch_buildings_and_roads(grid_cells)
+    if include_infrastructure:
+        fetch_infrastructure(grid_cells)
 
 
 def clear_osm_cache():
@@ -174,6 +198,7 @@ def clear_osm_cache():
         _landuse_cache.clear()
         _buildings_cache.clear()
         _water_cache.clear()
+        _infra_cache.clear()
     log.info("OSM data cache cleared")
 
 
@@ -334,10 +359,23 @@ def fetch_water_features(grid_cells: list[dict]) -> list[dict]:
     return results
 
 
+def build_water_spatial_index(
+    water_features: list[dict],
+) -> tuple[Any, list[Any]] | None:
+    """STRtree über Gewässer-Geometrien für schnelle Nächst-Nachbarsuche."""
+    if not water_features:
+        return None
+    from shapely.strtree import STRtree
+
+    geoms = [f["geometry"] for f in water_features]
+    return STRtree(geoms), geoms
+
+
 def compute_water_distance_m(
     cell_geom: Any,
     water_features: list[dict],
     cell_size_m: float,
+    water_index: tuple[Any, list[Any]] | None = None,
 ) -> float:
     """Kürzeste Distanz (m) von der Zelle zum nächsten OSM-Gewässer."""
     if not water_features:
@@ -354,6 +392,12 @@ def compute_water_distance_m(
     to_utm = pyproj.Transformer.from_crs("EPSG:4326", f"EPSG:{utm_epsg}", always_xy=True).transform
     cell_utm = shp_transform(to_utm, cell_geom)
 
+    if water_index is not None:
+        tree, geoms = water_index
+        nearest_i = int(tree.nearest(cell_geom))
+        feat_utm = shp_transform(to_utm, geoms[nearest_i])
+        return float(cell_utm.distance(feat_utm))
+
     min_dist = float("inf")
     for feat in water_features:
         feat_utm = shp_transform(to_utm, feat["geometry"])
@@ -369,6 +413,122 @@ def water_proximity_score(dist_m: float, max_dist_m: float = 500.0) -> float:
     if dist_m <= 0:
         return 1.0
     return max(0.0, 1.0 - dist_m / max_dist_m)
+
+
+def _healthcare_category(tags: dict) -> str | None:
+    """Classify OSM healthcare feature as hospital, doctor, or pharmacy."""
+    amenity = tags.get("amenity", "")
+    hc = tags.get("healthcare", "")
+    if amenity in _HEALTHCARE_PHARMACY_AMENITY or hc in _HEALTHCARE_PHARMACY_HC:
+        return "pharmacy"
+    if (
+        amenity in _HEALTHCARE_HOSPITAL_AMENITY
+        or hc in _HEALTHCARE_HOSPITAL_HC
+        or tags.get("building") == "hospital"
+    ):
+        return "hospital"
+    if amenity in _HEALTHCARE_DOCTOR_AMENITY or hc in _HEALTHCARE_DOCTOR_HC:
+        return "doctor"
+    return None
+
+
+def build_healthcare_spatial_index(geoms: list) -> tuple[Any, list] | None:
+    """STRtree over healthcare geometries for fast nearest-neighbour lookup."""
+    if not geoms:
+        return None
+    from shapely.strtree import STRtree
+
+    return STRtree(geoms), geoms
+
+
+def build_healthcare_indexes(infra: dict) -> dict[str, tuple[Any, list] | None]:
+    return {
+        "hospital": build_healthcare_spatial_index(infra.get("healthcare_hospital", [])),
+        "doctor": build_healthcare_spatial_index(infra.get("healthcare_doctor", [])),
+        "pharmacy": build_healthcare_spatial_index(infra.get("healthcare_pharmacy", [])),
+    }
+
+
+def compute_nearest_distance_m(
+    cell_geom: Any,
+    geoms: list,
+    spatial_index: tuple[Any, list] | None,
+    fallback_m: float = HEALTHCARE_MAX_DIST_M,
+) -> float:
+    """Shortest straight-line distance (m) from cell to nearest geometry, × road factor."""
+    if not geoms:
+        return fallback_m
+
+    import pyproj
+    from shapely.ops import transform as shp_transform
+
+    minx, miny, maxx, maxy = cell_geom.bounds
+    lat = (miny + maxy) / 2.0
+    utm_zone = int((cell_geom.centroid.x + 180) / 6) + 1
+    utm_epsg = 32600 + utm_zone if lat >= 0 else 32700 + utm_zone
+
+    to_utm = pyproj.Transformer.from_crs("EPSG:4326", f"EPSG:{utm_epsg}", always_xy=True).transform
+    cell_utm = shp_transform(to_utm, cell_geom)
+
+    if spatial_index is not None:
+        tree, indexed_geoms = spatial_index
+        nearest_i = int(tree.nearest(cell_geom))
+        feat_utm = shp_transform(to_utm, indexed_geoms[nearest_i])
+        raw_m = float(cell_utm.distance(feat_utm))
+    else:
+        raw_m = float("inf")
+        for geom in geoms:
+            feat_utm = shp_transform(to_utm, geom)
+            raw_m = min(raw_m, float(cell_utm.distance(feat_utm)))
+
+    if raw_m >= float("inf"):
+        return fallback_m
+
+    return min(fallback_m, raw_m * HEALTHCARE_ROAD_FACTOR)
+
+
+def healthcare_proximity_score(dist_m: float, max_m: float = HEALTHCARE_MAX_DIST_M) -> float:
+    """0..1 proximity score (1 = at facility, 0 = at or beyond max_m)."""
+    d = min(max(0.0, dist_m), max_m)
+    return max(0.0, 1.0 - d / max_m)
+
+
+def healthcare_access_from_distances(dist_h: float, dist_d: float, dist_p: float) -> dict:
+    """Weighted access score from effective distances (m, incl. road factor)."""
+    prox_h = healthcare_proximity_score(dist_h)
+    prox_d = healthcare_proximity_score(dist_d)
+    prox_p = healthcare_proximity_score(dist_p)
+    w_h = 0.50 * prox_h
+    w_d = 0.35 * prox_d
+    w_p = 0.15 * prox_p
+    score = w_h + w_d + w_p
+    return {
+        "dist_hospital_m": round(dist_h, 1),
+        "dist_doctor_m": round(dist_d, 1),
+        "dist_pharmacy_m": round(dist_p, 1),
+        "healthcare_weight_hospital": round(w_h, 4),
+        "healthcare_weight_doctor": round(w_d, 4),
+        "healthcare_weight_pharmacy": round(w_p, 4),
+        "healthcare_access_score": round(score, 4),
+    }
+
+
+def compute_cell_healthcare_access(
+    cell_geom: Any,
+    infra: dict,
+    healthcare_indexes: dict[str, tuple[Any, list] | None],
+) -> dict:
+    """Per-cell distances and composite healthcare access score."""
+    dist_h = compute_nearest_distance_m(
+        cell_geom, infra.get("healthcare_hospital", []), healthcare_indexes.get("hospital"),
+    )
+    dist_d = compute_nearest_distance_m(
+        cell_geom, infra.get("healthcare_doctor", []), healthcare_indexes.get("doctor"),
+    )
+    dist_p = compute_nearest_distance_m(
+        cell_geom, infra.get("healthcare_pharmacy", []), healthcare_indexes.get("pharmacy"),
+    )
+    return healthcare_access_from_distances(dist_h, dist_d, dist_p)
 
 
 def compute_cell_landuse(
@@ -682,6 +842,224 @@ def _empty_building_metrics() -> dict:
         "tree_count": 0,
         "tree_canopy_fraction": 0.0,
         "sky_view_factor": 1.0,
+    }
+
+
+# ── Critical infrastructure (power, water/wastewater, communication) ───────────
+
+def _empty_infra_features() -> dict:
+    return {
+        "energy_points": [],
+        "energy_lines": [],
+        "energy_areas": [],
+        "water_points": [],
+        "water_areas": [],
+        "comm_points": [],
+        "healthcare_hospital": [],
+        "healthcare_doctor": [],
+        "healthcare_pharmacy": [],
+    }
+
+
+def _add_healthcare_geometry(
+    result: dict,
+    tags: dict,
+    geom: Any,
+    seen: set,
+    key: int | tuple[str, int],
+) -> None:
+    cat = _healthcare_category(tags)
+    if cat is None or key in seen:
+        return
+    seen.add(key)
+    result[f"healthcare_{cat}"].append(geom)
+
+
+def fetch_infrastructure(grid_cells: list[dict]) -> dict:
+    """Fetch OSM energy, water/wastewater, communication and healthcare infrastructure.
+
+    Returns dict with keys: energy_points, energy_lines, energy_areas,
+    water_points, water_areas, comm_points, healthcare_hospital,
+    healthcare_doctor, healthcare_pharmacy.
+    """
+    bbox = _bbox_from_cells(grid_cells)
+
+    with _cache_lock:
+        cached = _infra_cache.get(bbox)
+        if cached:
+            ts, result = cached
+            if _time.time() - ts < _CACHE_TTL:
+                log.info("fetch_infrastructure: cache HIT for bbox=%s", bbox[:30])
+                return result
+            del _infra_cache[bbox]
+
+    log.info("fetch_infrastructure: cache MISS — querying Overpass")
+
+    query = f"""
+    (
+      node["power"]({bbox});
+      way["power"]({bbox});
+      node["man_made"~"water_works|wastewater_plant|water_tower"]({bbox});
+      way["man_made"~"water_works|wastewater_plant"]({bbox});
+      node["tower"="communication"]({bbox});
+      node["man_made"~"mast|communications_tower"]({bbox});
+      node["communication"]({bbox});
+      node["amenity"~"hospital|clinic|doctors|pharmacy"]({bbox});
+      way["amenity"~"hospital|clinic|doctors|pharmacy"]({bbox});
+      node["healthcare"~"hospital|clinic|doctor|pharmacy|centre"]({bbox});
+      way["healthcare"~"hospital|clinic|doctor|pharmacy|centre"]({bbox});
+      way["building"="hospital"]({bbox});
+    );
+    out body;
+    >;
+    out skel qt;
+    """
+
+    data = _overpass_query(query)
+    response_bytes = data.get("_response_bytes", 0)
+    elements = data.get("elements", [])
+
+    nodes: dict[int, tuple[float, float]] = {}
+    for el in elements:
+        if el["type"] == "node":
+            nodes[el["id"]] = (el["lon"], el["lat"])
+
+    result = _empty_infra_features()
+    comm_node_ids: set[int] = set()
+    water_node_ids: set[int] = set()
+    healthcare_ids: set[int | tuple[str, int]] = set()
+
+    from shapely.geometry import Point
+
+    for el in elements:
+        tags = el.get("tags", {})
+        el_type = el.get("type")
+        el_id = el.get("id")
+
+        if el_type == "node" and "power" in tags:
+            if el["id"] in nodes:
+                lon, lat = nodes[el["id"]]
+                result["energy_points"].append({"lon": lon, "lat": lat})
+
+        elif el_type == "way" and "power" in tags:
+            power_tag = tags.get("power", "")
+            if power_tag in _POWER_LINE_TAGS:
+                nds = el.get("nodes", [])
+                coords = [nodes[n] for n in nds if n in nodes]
+                if len(coords) >= 2:
+                    result["energy_lines"].append({"geometry": LineString(coords)})
+            else:
+                geom = _element_to_polygon(el, nodes, elements)
+                if geom is not None:
+                    result["energy_areas"].append({"geometry": geom})
+                else:
+                    nds = el.get("nodes", [])
+                    coords = [nodes[n] for n in nds if n in nodes]
+                    if len(coords) >= 2:
+                        result["energy_lines"].append({"geometry": LineString(coords)})
+
+        elif el_type == "node":
+            if el["id"] not in nodes:
+                continue
+            mm = tags.get("man_made", "")
+            if mm in _WATER_INFRA_TAGS and el["id"] not in water_node_ids:
+                water_node_ids.add(el["id"])
+                lon, lat = nodes[el["id"]]
+                result["water_points"].append({"lon": lon, "lat": lat})
+            is_comm = (
+                tags.get("tower") == "communication"
+                or mm in _COMM_MAN_MADE_TAGS
+                or "communication" in tags
+            )
+            if is_comm and el["id"] not in comm_node_ids:
+                comm_node_ids.add(el["id"])
+                lon, lat = nodes[el["id"]]
+                result["comm_points"].append({"lon": lon, "lat": lat})
+            _add_healthcare_geometry(
+                result, tags, Point(nodes[el["id"]]), healthcare_ids, el_id,
+            )
+
+        elif el_type == "way":
+            if tags.get("man_made") in _WATER_INFRA_TAGS:
+                geom = _element_to_polygon(el, nodes, elements)
+                if geom is not None:
+                    result["water_areas"].append({"geometry": geom})
+            cat = _healthcare_category(tags)
+            if cat is not None and ("way", el_id) not in healthcare_ids:
+                geom = _element_to_polygon(el, nodes, elements)
+                if geom is not None:
+                    _add_healthcare_geometry(result, tags, geom, healthcare_ids, ("way", el_id))
+                else:
+                    nds = el.get("nodes", [])
+                    coords = [nodes[n] for n in nds if n in nodes]
+                    if coords:
+                        lon = sum(c[0] for c in coords) / len(coords)
+                        lat = sum(c[1] for c in coords) / len(coords)
+                        _add_healthcare_geometry(
+                            result, tags, Point(lon, lat), healthcare_ids, ("way", el_id),
+                        )
+
+    log.info(
+        "Fetched infrastructure from OSM: %d energy pts, %d lines, %d areas, "
+        "%d water pts, %d water areas, %d comm pts, "
+        "%d hospital, %d doctor, %d pharmacy (%.2f MB)",
+        len(result["energy_points"]), len(result["energy_lines"]),
+        len(result["energy_areas"]), len(result["water_points"]),
+        len(result["water_areas"]), len(result["comm_points"]),
+        len(result["healthcare_hospital"]), len(result["healthcare_doctor"]),
+        len(result["healthcare_pharmacy"]),
+        response_bytes / 1_048_576,
+    )
+
+    with _cache_lock:
+        _infra_cache[bbox] = (_time.time(), result)
+
+    return result
+
+
+def compute_cell_infrastructure(cell_geom: Any, infra: dict) -> dict:
+    """Count infrastructure features intersecting a single grid cell."""
+    from shapely.geometry import Point
+
+    if cell_geom is None or cell_geom.is_empty:
+        return _empty_infra_metrics()
+
+    energy = 0.0
+    for pt in infra.get("energy_points", []):
+        if cell_geom.contains(Point(pt["lon"], pt["lat"])):
+            energy += 1.0
+    for line in infra.get("energy_lines", []):
+        if cell_geom.intersects(line["geometry"]):
+            energy += 0.5
+    for area in infra.get("energy_areas", []):
+        if cell_geom.intersects(area["geometry"]):
+            energy += 1.0
+
+    water = 0
+    for pt in infra.get("water_points", []):
+        if cell_geom.contains(Point(pt["lon"], pt["lat"])):
+            water += 1
+    for area in infra.get("water_areas", []):
+        if cell_geom.intersects(area["geometry"]):
+            water += 1
+
+    comm = 0
+    for pt in infra.get("comm_points", []):
+        if cell_geom.contains(Point(pt["lon"], pt["lat"])):
+            comm += 1
+
+    return {
+        "energy_infra_count": round(energy, 2),
+        "water_wastewater_count": water,
+        "communication_count": comm,
+    }
+
+
+def _empty_infra_metrics() -> dict:
+    return {
+        "energy_infra_count": 0.0,
+        "water_wastewater_count": 0,
+        "communication_count": 0,
     }
 
 

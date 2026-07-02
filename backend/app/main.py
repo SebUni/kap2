@@ -1,35 +1,12 @@
 import logging
-import logging.handlers
-import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import kommune, assessment, measures, config, export, catalog as catalog_route, admin
+from app.api.routes import kommune, assessment, measures, config, export, catalog as catalog_route, admin, parameters
+from app.log_config import setup_logging
 
-# ── Logging: stdout + file ────────────────────────────────────────────────────
-LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
-os.makedirs(LOG_DIR, exist_ok=True)
-LOG_FILE = os.path.join(LOG_DIR, "kap2.log")
-
-_fmt = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-
-# File handler (rotating, max 5 MB, keep 3 backups)
-_fh = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=5_000_000, backupCount=3, encoding="utf-8")
-_fh.setFormatter(_fmt)
-_fh.setLevel(logging.DEBUG)
-
-# Attach file handler to root logger so ALL loggers write to file
-root = logging.getLogger()
-root.setLevel(logging.DEBUG)
-root.addHandler(_fh)
-
-# Prevent uvicorn loggers from propagating (avoids double entries)
-for _name in ("uvicorn", "uvicorn.access", "uvicorn.error"):
-    _lg = logging.getLogger(_name)
-    _lg.addHandler(_fh)
-    _lg.propagate = False
-
-logging.getLogger("app").setLevel(logging.DEBUG)
+setup_logging()
 
 app = FastAPI(
     title="KAP2 – Klimafolgen-Anpassungsplanung",
@@ -51,6 +28,7 @@ app.include_router(measures.router, prefix="/api", tags=["Maßnahmen"])
 app.include_router(config.router, prefix="/api", tags=["Konfiguration"])
 app.include_router(export.router, prefix="/api", tags=["Export/Import"])
 app.include_router(catalog_route.router, prefix="/api", tags=["Katalog"])
+app.include_router(parameters.router, prefix="/api", tags=["Parameter"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 
@@ -61,9 +39,41 @@ def _ensure_tables():
         from app.db.database import Base, engine
         import app.models.models  # noqa: F401  (Modelle registrieren)
         Base.metadata.create_all(bind=engine)
+        _migrate_config_columns(engine)
         logging.getLogger("app").info("DB-Tabellen sichergestellt (create_all)")
     except Exception as exc:  # pragma: no cover
         logging.getLogger("app").error("create_all fehlgeschlagen: %s", exc)
+
+
+def _migrate_config_columns(engine):
+    """Fügt neue Spalten an config_parameters hinzu (bestehende DBs)."""
+    from sqlalchemy import inspect, text
+
+    insp = inspect(engine)
+    if "config_parameters" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("config_parameters")}
+    alters = []
+    if "parameter_id" not in cols:
+        alters.append("ADD COLUMN parameter_id VARCHAR(200)")
+    if "source" not in cols:
+        alters.append("ADD COLUMN source TEXT")
+    if "custom_source" not in cols:
+        alters.append("ADD COLUMN custom_source TEXT")
+    if not alters:
+        return
+    dialect = engine.dialect.name
+    with engine.begin() as conn:
+        for clause in alters:
+            if dialect == "postgresql":
+                conn.execute(text(f"ALTER TABLE config_parameters {clause}"))
+            else:
+                col = clause.replace("ADD COLUMN ", "").split()[0]
+                ctype = "VARCHAR(200)" if col == "parameter_id" else "TEXT"
+                try:
+                    conn.execute(text(f"ALTER TABLE config_parameters ADD COLUMN {col} {ctype}"))
+                except Exception:
+                    pass
 
 
 @app.get("/api/health")

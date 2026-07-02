@@ -157,3 +157,44 @@ def import_measures_xlsx(db: Session, kommune_id: int, file: BinaryIO) -> dict:
         "skipped": skipped,
         "errors": errors[:20],  # Limit error messages
     }
+
+
+def export_parameters_xlsx(db: Session, kommune_id: int, kommune_name: str = "") -> bytes:
+    """Export all model parameters for a kommune as Excel."""
+    from datetime import datetime
+    from app.services import parameter_registry
+
+    params = parameter_registry.catalog_parameters()
+    overrides = parameter_registry.load_db_overrides(db, kommune_id)
+    merged = parameter_registry.merge_overrides(params, overrides)
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Parameter"
+    headers = [
+        "ID", "Ebene", "Kategorie", "Bezeichnung", "Wert", "Default",
+        "Einheit", "Quelle", "Override-Quelle", "Geändert",
+    ]
+    ws.append(headers)
+    for p in merged:
+        ws.append([
+            p["id"],
+            p["layer_code"],
+            p["layer_category"],
+            p["label"],
+            p["value"],
+            p["default_value"],
+            p.get("unit", ""),
+            p.get("source", ""),
+            p.get("custom_source") or "",
+            "ja" if p.get("overridden") else "nein",
+        ])
+
+    meta = wb.create_sheet("Metadaten")
+    meta.append(["Kommune", kommune_name or str(kommune_id)])
+    meta.append(["Exportdatum", datetime.utcnow().isoformat()])
+    meta.append(["Modellversion", "KAP2 0.1.0"])
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    return buf.getvalue()

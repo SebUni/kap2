@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { useStore } from '../store'
-import InfoTooltip from './InfoTooltip'
+import LayerInfoButton from './LayerInfoButton'
 import type {
-  CatalogIndicator, CatalogRisk, CatalogMeasure, CategoryDef, LayerCategory,
+  CatalogIndicator, CatalogMeasure, CategoryDef, LayerCategory,
 } from '../types'
 
 const GROUP_DEFS: { key: 'measures' | LayerCategory; label: string }[] = [
   { key: 'measures', label: 'Maßnahmen' },
   { key: 'risks', label: 'Klimarisiken' },
-  { key: 'hazards', label: 'Klimatreiber' },
-  { key: 'exposures', label: 'Expositionen' },
-  { key: 'vulnerabilities', label: 'Verwundbarkeiten' },
+  { key: 'hazards', label: 'Klimatische Einflüsse' },
+  { key: 'exposures', label: 'Räumliche Expositionen' },
+  { key: 'vulnerabilities', label: 'Sensitivitäten' },
   { key: 'auxiliary', label: 'Sonstige' },
 ]
 
@@ -18,7 +18,7 @@ export default function LayerPanel() {
   const {
     catalog, activeLayer, setActiveLayer,
     showMeasures, setShowMeasures, measures,
-    selectedMeasure, setSelectedMeasure,
+    selectedMeasure, setSelectedMeasure, setInfoLayer,
   } = useStore()
   // Gruppen-Kollaps (oberste Ebene)
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({
@@ -38,19 +38,12 @@ export default function LayerPanel() {
   const toggleCat = (key: string) =>
     setCollapsedCats(c => ({ ...c, [key]: !(c[key] ?? true) }))
 
-  const indicatorRows = (it: CatalogIndicator) => ([
-    { label: 'Einheit', value: it.unit },
-    { label: 'Proxy', value: it.proxy },
-    { label: 'Quelle', value: it.source },
-    { label: 'Normierung', value: `${it.norm_min} … ${it.norm_max} ${it.unit}` },
-  ])
-
-  const riskRows = (r: CatalogRisk) => ([
-    { label: 'Ergebnis', value: r.outcome_unit },
-    { label: 'Treiber', value: r.hazards.join(', ') },
-    { label: 'Exposition', value: r.exposures.join(', ') },
-    { label: 'Verwundbark.', value: r.vulnerabilities.join(', ') },
-  ])
+  const infoButton = (name: string, category: LayerCategory, code: string) => (
+    <LayerInfoButton
+      label={name}
+      onClick={() => setInfoLayer({ category, code })}
+    />
+  )
 
   const renderItem = (
     code: string, name: string, category: LayerCategory,
@@ -115,8 +108,7 @@ export default function LayerPanel() {
     const inCat = items.filter(it => (it.category ?? cats[0]?.code) === cat.code)
     return renderCategory(groupKey, cat.code, cat.label, inCat.length, (
       inCat.map(it => renderItem(it.code, it.name, groupKey,
-        <InfoTooltip title={it.name} description={it.description} rows={indicatorRows(it)}
-          note={it.spatial === false ? 'Nicht räumlich aufgelöst (Konstantwert)' : undefined} />,
+        infoButton(it.name, groupKey, it.code),
         it.spatial))
     ))
   })
@@ -195,7 +187,7 @@ export default function LayerPanel() {
                   const inGroup = catalog.risks.filter(r => r.group === g.code)
                   return renderCategory('risks', g.code, g.label, inGroup.length, (
                     inGroup.map(r => renderItem(r.code, r.name, 'risks',
-                      <InfoTooltip title={r.name} description={r.description} rows={riskRows(r)} />))
+                      infoButton(r.name, 'risks', r.code)))
                   ))
                 })}
 

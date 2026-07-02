@@ -29,7 +29,7 @@ function StepRow({ step, active, faded }: { step: StepHistoryEntry; active?: boo
 }
 
 function AssessmentBar() {
-  const { kommune, status, loadStatus, startAssessment, abortAssessment, loadRiskSummary, loadCostSummary, loadRiskHistogram } = useStore()
+  const { kommune, status, loadStatus, startAssessment, abortAssessment, loadRiskSummary, loadCostSummary, loadRiskHistogram, activeLayer, setActiveLayer } = useStore()
   const [polling, setPolling] = useState(false)
   const [stepsExpanded, setStepsExpanded] = useState(false)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -53,31 +53,54 @@ function AssessmentBar() {
           loadRiskSummary(kommune.id).catch(() => {})
           loadCostSummary(kommune.id).catch(() => {})
           loadRiskHistogram(kommune.id).catch(() => {})
+          if (activeLayer) {
+            setActiveLayer(activeLayer).catch(() => {})
+          }
         }
       }
     }, 800)
     return () => { if (pollRef.current) clearInterval(pollRef.current) }
-  }, [kommune, polling])
-
-  useEffect(() => {
-    if (status?.status !== 'running') setStepsExpanded(false)
-  }, [status?.status])
+  }, [kommune, polling, activeLayer])
 
   if (!kommune) return null
   const running = status?.status === 'running'
+  const done = status?.status === 'done'
   const steps = status?.step_history ?? []
+  const showStepLog = steps.length > 0 && (running || done || status?.status === 'error')
   const currentIdx = steps.findIndex(s => !s.finished)
   const currentStep = currentIdx >= 0 ? steps[currentIdx] : steps[steps.length - 1]
   const previousStep = currentIdx > 0 ? steps[currentIdx - 1] : currentIdx === -1 && steps.length > 1 ? steps[steps.length - 2] : undefined
   const pct = Math.round(status?.progress_pct ?? 0)
   const runningLabel = currentStep?.label ?? 'Berechnung'
 
+  const handleStartAssessment = async () => {
+    if (!kommune) return
+    setStepsExpanded(false)
+    try {
+      await startAssessment(kommune.id)
+      setPolling(true)
+    } catch {
+      setPolling(false)
+    }
+  }
+
+  const canRecalculate = done || status?.status === 'error'
+  const startButtonLabel = canRecalculate ? '↻ Neu berechnen' : '▶ Berechnen'
+
   return (
     <div className="dashboard-section" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
       <div style={{ flex: 1, minWidth: 200 }}>
         <h2 className="dashboard-title" style={{ margin: 0, fontSize: '1.05rem' }}>Klimarisiko-Analyse</h2>
         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>
-          {status?.status === 'done' ? '✓ Berechnung abgeschlossen'
+          {done ? (
+              <span>
+                <span style={{ fontWeight: 600, color: 'var(--success)', marginRight: 6 }}>100%</span>
+                Abgeschlossen
+                {currentStep?.detail && (
+                  <span style={{ marginLeft: 6, opacity: 0.75 }}>{currentStep.detail}</span>
+                )}
+              </span>
+            )
             : running ? (
               <span>
                 <span style={{ fontWeight: 600, color: 'var(--text)', marginRight: 6 }}>{pct}%</span>
@@ -88,46 +111,53 @@ function AssessmentBar() {
               </span>
             )
             : status?.status === 'error' ? `✕ ${status?.message || 'Fehler'}`
-            : 'Noch keine Berechnung – Klimatreiber, Expositionen, Verwundbarkeiten & Risiken pro 100m-Zelle.'}
+            : 'Noch keine Berechnung – Klimatische Einflüsse, Räumliche Expositionen, Sensitivitäten & Risiken pro 100m-Zelle.'}
         </div>
         {running && (
-          <>
-            <div className="progress-bar" style={{ marginTop: 6 }}>
-              <div className="fill" style={{ width: `${status?.progress_pct || 0}%` }} />
+          <div className="progress-bar" style={{ marginTop: 6 }}>
+            <div className="fill" style={{ width: `${status?.progress_pct || 0}%` }} />
+          </div>
+        )}
+        {done && (
+          <div className="progress-bar" style={{ marginTop: 6 }}>
+            <div className="fill" style={{ width: '100%', background: 'var(--success)' }} />
+          </div>
+        )}
+        {showStepLog && (
+          <div className={`assessment-steps-panel${stepsExpanded ? ' expanded' : ''}`} style={{ marginTop: running || done ? 8 : 0 }}>
+            <button
+              type="button"
+              className="assessment-steps-toggle"
+              onClick={() => setStepsExpanded(v => !v)}
+              aria-expanded={stepsExpanded}
+              aria-label={stepsExpanded ? 'Protokoll einklappen' : 'Protokoll ausklappen'}
+            >
+              {stepsExpanded ? '▼' : '▶'}
+            </button>
+            <div className="assessment-steps-body">
+              {stepsExpanded ? (
+                steps.map((step, i) => (
+                  <StepRow key={`${step.label}-${step.started}-${i}`} step={step} active={!step.finished && i === currentIdx} />
+                ))
+              ) : (
+                <>
+                  {currentStep && <StepRow step={currentStep} active={running} />}
+                  {previousStep && <StepRow step={previousStep} faded />}
+                </>
+              )}
             </div>
-            {steps.length > 0 && (
-              <div className={`assessment-steps-panel${stepsExpanded ? ' expanded' : ''}`}>
-                <button
-                  type="button"
-                  className="assessment-steps-toggle"
-                  onClick={() => setStepsExpanded(v => !v)}
-                  aria-expanded={stepsExpanded}
-                  aria-label={stepsExpanded ? 'Schritte einklappen' : 'Schritte ausklappen'}
-                >
-                  {stepsExpanded ? '▼' : '▶'}
-                </button>
-                <div className="assessment-steps-body">
-                  {stepsExpanded ? (
-                    steps.map((step, i) => (
-                      <StepRow key={`${step.label}-${step.started}-${i}`} step={step} active={!step.finished && i === currentIdx} />
-                    ))
-                  ) : (
-                    <>
-                      {currentStep && <StepRow step={currentStep} active />}
-                      {previousStep && <StepRow step={previousStep} faded />}
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-          </>
+          </div>
         )}
       </div>
       {running ? (
         <button className="btn btn-danger btn-sm" onClick={() => kommune && abortAssessment(kommune.id)}>✕ Abbrechen</button>
       ) : (
-        <button className="btn btn-primary btn-sm" onClick={() => { if (kommune) { setPolling(true); startAssessment(kommune.id) } }}>
-          ▶ Berechnen
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={handleStartAssessment}
+          title={canRecalculate ? 'Assessment mit aktuellen Daten erneut ausführen' : 'Erstberechnung für alle 100m-Zellen starten'}
+        >
+          {startButtonLabel}
         </button>
       )}
     </div>
@@ -429,7 +459,7 @@ export default function Dashboard() {
       ) : (
         <div className="dashboard-empty">
           <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Noch keine Analyseergebnisse</p>
-          <p>Klicken Sie oben auf „▶ Berechnen“, um alle Klimarisiken für die 100m-Zellen zu ermitteln.</p>
+          <p>Klicken Sie oben auf „▶ Berechnen“ bzw. nach Abschluss auf „↻ Neu berechnen“, um alle Klimarisiken für die 100m-Zellen zu ermitteln.</p>
         </div>
       )}
     </div>

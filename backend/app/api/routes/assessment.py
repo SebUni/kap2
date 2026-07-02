@@ -56,6 +56,8 @@ def start_assessment(kommune_id: int, db: Session = Depends(get_db)):
     ps.message = "Berechnung wird vorbereitet …"
     ps.started_at = datetime.utcnow()
     ps.finished_at = None
+    ps.step_history = []
+    ps.eta_seconds = None
     db.commit()
 
     run_assessment_background(kommune_id)
@@ -149,9 +151,12 @@ def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
                 props["E"] = breakdown["E"]
                 props["V"] = breakdown["V"]
                 props["outcome"] = risk_engine.cell_outcome_breakdown(rdef, idx, cell_pop)
+                props["pathways"] = formulas.risk_pathway_cell_breakdown(rdef, hev_norm)
             else:
                 raw = data.get(category, {}).get(code)
-                value = float(raw) if raw is not None else 0.0
+                if raw is None:
+                    continue
+                value = float(raw)
                 ci = data.get("inputs", {})
                 props["inputs"] = formulas.resolve_inputs(recipe, ci, regional, data)
             vmin = value if vmin is None else min(vmin, value)
@@ -169,7 +174,7 @@ def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
             meta.update({"label": r["name"], "unit": r["outcome_unit"]})
         else:
             m = catalog.INDICATOR_BY_CODE[code]
-            meta.update({"label": m["name"], "unit": m["unit"], "scale_max": m.get("norm_max")})
+            meta.update({"label": m["name"], "unit": m["unit"]})
 
         return {"type": "FeatureCollection", "features": features, "meta": meta}
     except HTTPException:

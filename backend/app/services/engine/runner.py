@@ -9,6 +9,8 @@ gespeichert werden.
 from __future__ import annotations
 
 import logging
+import multiprocessing
+import os
 from typing import Any
 
 from app.services.engine.inputs import gather_cell_inputs
@@ -24,6 +26,34 @@ COASTAL_BUNDESLAENDER = {
     "Hamburg", "Bremen",
 }
 
+_rw: dict = {}
+_N_WORKERS = min(os.cpu_count() or 4, 8)
+_MP = multiprocessing.get_context("fork")
+_CHUNK = 50
+
+
+def _risk_worker(idx: int) -> tuple[int, dict]:
+    ci = _rw["cell_inputs"][idx]
+    regional = _rw["regional"]
+    hev = compute_cell_hev(ci, regional)
+    hev_norm = risk_engine.normalize_hev(hev)
+    indices = risk_engine.cell_risk_indices(hev_norm)
+    risks = {code: {"index": risk_idx} for code, risk_idx in indices.items()}
+
+    data = {
+        "hazards": hev["hazards"],
+        "exposures": hev["exposures"],
+        "vulnerabilities": hev["vulnerabilities"],
+        "risks": risks,
+        "auxiliary": build_auxiliary(ci, regional),
+        "inputs": {
+            k: (round(v, 4) if isinstance(v, float) else v)
+            for k, v in ci.items()
+            if k not in ("grid_cell_id", "row", "col")
+        },
+    }
+    return idx, {"grid_cell_id": ci["grid_cell_id"], "data": data}
+
 
 def run_full_assessment(
     grid_cells: list[dict],
@@ -31,11 +61,15 @@ def run_full_assessment(
     kommune_population: int | None,
     area_km2: float | None,
     progress_callback: Any = None,
+    parameter_overrides: dict[str, Any] | None = None,
 ) -> list[dict]:
     """Berechnet die komplette KAP3-Bewertung je Zelle.
 
     Gibt Liste von {grid_cell_id, data} zurück.
     """
+    from app.services.engine.override_context import set_overrides
+
+    set_overrides(parameter_overrides)
     is_coastal = (bundesland or "") in COASTAL_BUNDESLAENDER
 
     cell_inputs, regional = gather_cell_inputs(
@@ -43,34 +77,29 @@ def run_full_assessment(
     )
 
     total = len(cell_inputs) or 1
-    results: list[dict] = []
+    ordered: list[dict | None] = [None] * total
 
     if progress_callback:
-        progress_callback(RISK_COMPOSE[0], "Berechne Klimatreiber, Expositionen & Verwundbarkeiten")
+        progress_callback(
+            RISK_COMPOSE[0],
+            f"Berechne klimatische Einflüsse, räumliche Expositionen & Sensitivitäten ({_N_WORKERS} Kerne)",
+        )
 
-    for i, ci in enumerate(cell_inputs):
-        hev = compute_cell_hev(ci, regional)
-        hev_norm = risk_engine.normalize_hev(hev)
-        indices = risk_engine.cell_risk_indices(hev_norm)
-        risks = {code: {"index": idx} for code, idx in indices.items()}
+    _rw["cell_inputs"] = cell_inputs
+    _rw["regional"] = regional
+    try:
+        with _MP.Pool(_N_WORKERS) as pool:
+            for done, (idx, result) in enumerate(
+                pool.imap_unordered(_risk_worker, range(total), chunksize=_CHUNK)
+            ):
+                ordered[idx] = result
+                if progress_callback and (done % 150 == 0 or done + 1 == total):
+                    pct = lerp(RISK_COMPOSE[0], RISK_COMPOSE[1], (done + 1) / total)
+                    progress_callback(pct, "Risikokomposition", f"{done + 1}/{total}")
+    finally:
+        _rw.clear()
 
-        data = {
-            "hazards": hev["hazards"],
-            "exposures": hev["exposures"],
-            "vulnerabilities": hev["vulnerabilities"],
-            "risks": risks,
-            "auxiliary": build_auxiliary(ci, regional),
-            "inputs": {
-                k: (round(v, 4) if isinstance(v, float) else v)
-                for k, v in ci.items()
-                if k not in ("grid_cell_id", "row", "col")
-            },
-        }
-        results.append({"grid_cell_id": ci["grid_cell_id"], "data": data})
-
-        if progress_callback and (i % 150 == 0 or i + 1 == total):
-            pct = lerp(RISK_COMPOSE[0], RISK_COMPOSE[1], (i + 1) / total)
-            progress_callback(pct, "Risikokomposition", f"{i + 1}/{total}")
+    results = [r for r in ordered if r is not None]
 
     if progress_callback:
         progress_callback(FINALIZE[0], "Berechnung abschließen")

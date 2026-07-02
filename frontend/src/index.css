@@ -259,7 +259,7 @@ body {
   font-weight: 500;
 }
 
-.assessment-step-row.done {
+.assessment-steps-panel.expanded .assessment-step-row.done {
   opacity: 0.7;
 }
 
@@ -442,21 +442,57 @@ body {
 }
 
 .maplibregl-popup.kap-tooltip {
-  max-width: 1000px !important;
+  max-width: min(1200px, 96vw) !important;
 }
 
 .maplibregl-popup.kap-tooltip .maplibregl-popup-content {
   padding: 10px 12px;
   line-height: 1.4;
   box-sizing: border-box;
-  max-width: 1000px;
+  width: auto;
+  max-width: min(1200px, 96vw) !important;
 }
 
 .kap-tooltip-inner {
-  width: fit-content;
-  max-width: var(--kap-tooltip-max, 1000px);
-  min-width: 280px;
+  min-width: min(var(--kap-tooltip-min, 720px), 96vw);
+  max-width: min(var(--kap-tooltip-max, 1200px), 96vw);
   box-sizing: border-box;
+}
+
+.kap-formula-block {
+  margin: 4px 0 6px;
+  padding: 6px 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.kap-formula-line {
+  font-size: 9px;
+  line-height: 1.45;
+  margin: 2px 0;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.kap-formula-line code {
+  font-size: 9px;
+  background: #f1f5f9;
+  padding: 1px 3px;
+  border-radius: 3px;
+}
+
+.kap-formula-sum {
+  margin-top: 4px;
+  padding-top: 3px;
+  border-top: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.kap-formula-outcome {
+  margin: 4px 0;
+  color: #475569;
 }
 
 .kap-tooltip-grid {
@@ -1157,4 +1193,931 @@ body {
 .tab-bar button.tab-disabled:hover {
   background: transparent;
   color: var(--text-muted);
+}
+
+/* ── Layer Info Modal & Causal Chain ───────────────────────────────────────── */
+
+.layer-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 0;
+}
+
+.layer-info-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.layer-info-header {
+  align-items: flex-start;
+}
+
+.layer-info-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.layer-info-kicker {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.help-overlay-content.layer-info-modal {
+  max-width: min(95vw, 1280px);
+}
+
+.layer-info-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.layer-info-tabs button {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.layer-info-tabs button.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+.layer-info-body {
+  padding: 16px 24px;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.layer-info-body .kap-lineage-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.layer-info-body .kap-lineage-canvas-wrap {
+  height: clamp(320px, 45vh, 500px);
+  min-height: 320px;
+  max-height: 500px;
+  flex-shrink: 0;
+}
+
+.layer-info-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.layer-info-footer {
+  padding: 12px 24px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.layer-info-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+  padding: 0;
+}
+
+.kap-chain-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.kap-chain-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.kap-chain-box {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--bg);
+}
+
+.kap-chain-header {
+  margin-bottom: 8px;
+}
+
+.kap-chain-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  line-height: 1.3;
+}
+
+.kap-chain-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.kap-chain-badge {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.kap-flow-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kap-flow-op {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.kap-flow-arrow {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.kap-hev-node {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 100px;
+  max-width: 180px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.72rem;
+}
+
+.kap-hev-role {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.kap-hev-norm, .kap-hev-src {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+
+.kap-chain-aggregate,
+.kap-chain-outcome {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: min(220px, 28vw);
+}
+
+.kap-chain-sidebox {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--surface);
+  width: 100%;
+}
+
+.kap-sidebox-title {
+  font-weight: 700;
+  font-size: 0.78rem;
+  margin-bottom: 6px;
+}
+
+.kap-formula-line {
+  display: block;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.kap-formula-detail {
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+.kap-outcome-factor {
+  margin-top: 6px;
+  font-size: 0.72rem;
+}
+
+.kap-outcome-label {
+  display: block;
+  font-weight: 600;
+}
+
+.kap-outcome-src {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+
+.kap-indicator-flow {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.kap-input-stack,
+.kap-indicator-formula,
+.kap-indicator-norm {
+  flex: 1;
+  min-width: 180px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--bg);
+  font-size: 0.78rem;
+}
+
+.kap-input-item {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.kap-input-item:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.kap-prov-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-right: 4px;
+}
+
+.kap-input-src, .kap-indicator-desc {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  margin-top: 4px;
+}
+
+.kap-param-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.kap-param-table th,
+.kap-param-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.kap-param-table tr.overridden td {
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.kap-param-status.is-override {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.kap-param-error {
+  color: #dc2626;
+  font-size: 0.78rem;
+  margin-bottom: 8px;
+}
+
+.kap-param-table--grouped .kap-param-section {
+  margin-bottom: 2rem;
+}
+
+.kap-param-table--grouped .kap-param-section > h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  padding-top: 0.5rem;
+  scroll-margin-top: 1rem;
+}
+
+.kap-param-subsection {
+  margin-bottom: 1.25rem;
+}
+
+.kap-param-subsection h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--text-muted);
+  scroll-margin-top: 1rem;
+}
+
+.kap-param-risk-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.kap-param-risk-hint a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.kap-param-risk-hint a:hover {
+  text-decoration: underline;
+}
+
+.kap-measure-info {
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.kap-measure-info p {
+  margin: 6px 0;
+}
+
+/* ── Lineage Flow (React Flow) ─────────────────────────────────────────────── */
+
+:root {
+  --lineage-source: #64748b;
+  --lineage-parameter: #7c3aed;
+  --lineage-intermediate: #2563eb;
+  --lineage-hazard: #dc2626;
+  --lineage-exposure: #ea580c;
+  --lineage-vulnerability: #9333ea;
+  --lineage-pathway: #64748b;
+  --lineage-aggregation: #4f46e5;
+  --lineage-outcome: #047857;
+  --lineage-norm: #047857;
+  --lineage-operator: #d97706;
+}
+
+.kap-lineage-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.kap-lineage-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.kap-lineage-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.kap-lineage-legend-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.kap-lineage-legend-group-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.kap-lineage-legend-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.kap-lineage-chip {
+  font-size: 0.62rem;
+  padding: 2px 8px;
+  border-radius: 0;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  background: var(--surface);
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.kap-lineage-chip.is-off {
+  opacity: 0.42;
+  border-style: dashed;
+  background: transparent;
+}
+
+.kap-lineage-chip--square {
+  border-radius: 0;
+}
+
+.kap-lineage-chip--rounded {
+  border-radius: 10px;
+}
+
+.kap-lineage-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.kap-lineage-toggle {
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  color: var(--text);
+}
+
+.kap-lineage-toggle.is-collapsed {
+  opacity: 0.65;
+}
+
+.kap-lineage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.kap-lineage-modeswitch {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.kap-lineage-modeswitch button {
+  font-size: 0.72rem;
+  padding: 5px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.kap-lineage-modeswitch button.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.kap-lineage-reset {
+  font-size: 0.72rem;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.kap-lineage-canvas-wrap {
+  flex: 1 1 auto;
+  min-height: 420px;
+  height: min(58vh, 560px);
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+  overscroll-behavior: contain;
+  touch-action: none;
+}
+
+.kap-lineage-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.kap-lineage-canvas .vis-network {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+}
+
+.kap-lineage-canvas canvas {
+  display: block;
+}
+
+.kap-lineage-pathways-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+.kap-lineage-hint {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Eigenes HTML-Tooltip (vis-network unterstützt nur Plaintext) */
+.kap-lineage-tooltip {
+  display: none;
+  position: absolute;
+  z-index: 30;
+  max-width: 340px;
+  padding: 10px 12px;
+  font-family: system-ui, sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+  pointer-events: none;
+}
+
+.kap-lineage-tip-title {
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.kap-lineage-tip-row {
+  margin-top: 4px;
+}
+
+.kap-lineage-tip-key {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.kap-lineage-tip-text {
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+.kap-lineage-node {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  font-size: 0.7rem;
+  line-height: 1.25;
+  max-width: 168px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.kap-lineage-node.compact {
+  padding: 4px 8px;
+  font-size: 0.65rem;
+  max-width: 180px;
+}
+
+.kap-lineage-node-label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kap-lineage-node--source {
+  border-color: var(--lineage-source);
+  background: color-mix(in srgb, var(--lineage-source) 12%, var(--surface));
+  border-radius: 0;
+}
+
+.kap-lineage-node--parameter {
+  border-color: var(--lineage-parameter);
+  background: color-mix(in srgb, var(--lineage-parameter) 10%, var(--surface));
+  border-radius: 10px;
+}
+
+.kap-lineage-node--intermediate {
+  border-color: var(--lineage-intermediate);
+  background: color-mix(in srgb, var(--lineage-intermediate) 10%, var(--surface));
+  border-radius: 0;
+}
+
+.kap-lineage-node--hazard {
+  border-color: var(--lineage-hazard);
+  background: color-mix(in srgb, var(--lineage-hazard) 10%, var(--surface));
+}
+
+.kap-lineage-node--exposure {
+  border-color: var(--lineage-exposure);
+  background: color-mix(in srgb, var(--lineage-exposure) 10%, var(--surface));
+}
+
+.kap-lineage-node--vulnerability {
+  border-color: var(--lineage-vulnerability);
+  background: color-mix(in srgb, var(--lineage-vulnerability) 10%, var(--surface));
+}
+
+.kap-lineage-node--pathway {
+  border-color: var(--lineage-pathway);
+  background: var(--surface);
+}
+
+.kap-lineage-node--aggregation {
+  border-color: var(--lineage-aggregation);
+  background: color-mix(in srgb, var(--lineage-aggregation) 12%, var(--surface));
+  border-style: dashed;
+}
+
+.kap-lineage-node--outcome {
+  border-color: var(--lineage-outcome);
+  background: color-mix(in srgb, var(--lineage-outcome) 12%, var(--surface));
+  font-weight: 600;
+}
+
+.kap-lineage-node--norm {
+  border-style: dashed;
+  border-color: var(--lineage-norm);
+}
+
+.kap-lineage-chip.kap-lineage-node--source { background: color-mix(in srgb, var(--lineage-source) 20%, transparent); border-color: var(--lineage-source); }
+.kap-lineage-chip.kap-lineage-node--parameter { background: color-mix(in srgb, var(--lineage-parameter) 18%, transparent); border-color: var(--lineage-parameter); }
+.kap-lineage-chip.kap-lineage-node--intermediate { background: color-mix(in srgb, var(--lineage-intermediate) 20%, transparent); border-color: var(--lineage-intermediate); }
+.kap-lineage-chip.kap-lineage-node--hazard { background: color-mix(in srgb, var(--lineage-hazard) 20%, transparent); border-color: var(--lineage-hazard); }
+.kap-lineage-chip.kap-lineage-node--exposure { background: color-mix(in srgb, var(--lineage-exposure) 20%, transparent); border-color: var(--lineage-exposure); }
+.kap-lineage-chip.kap-lineage-node--vulnerability { background: color-mix(in srgb, var(--lineage-vulnerability) 20%, transparent); border-color: var(--lineage-vulnerability); }
+.kap-lineage-chip.kap-lineage-node--pathway { background: color-mix(in srgb, var(--lineage-pathway) 15%, transparent); border-color: var(--lineage-pathway); }
+.kap-lineage-chip.kap-lineage-node--aggregation { background: color-mix(in srgb, var(--lineage-aggregation) 15%, transparent); border-color: var(--lineage-aggregation); }
+.kap-lineage-chip.kap-lineage-node--outcome { background: color-mix(in srgb, var(--lineage-outcome) 15%, transparent); border-color: var(--lineage-outcome); }
+.kap-lineage-chip.kap-lineage-node--norm { background: color-mix(in srgb, var(--lineage-norm) 25%, transparent); border-color: var(--lineage-norm); }
+.kap-lineage-chip.kap-lineage-node--operator { background: color-mix(in srgb, var(--lineage-operator) 18%, transparent); border-color: var(--lineage-operator); }
+
+/* Operator-Overlays (editierbare Multiplikatoren, Normierung, Gewicht) */
+.kap-op-overlay {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.kap-op-overlay button,
+.kap-op-overlay input {
+  pointer-events: auto;
+}
+
+.kap-op {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px 8px;
+  min-width: 72px;
+  background: var(--surface);
+  border: 1px solid #d97706;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+  font-family: system-ui, sans-serif;
+  text-align: center;
+}
+
+.kap-op--weight {
+  padding: 4px;
+  min-width: 0;
+  border-color: #94a3b8;
+  background: #f8fafc;
+  border-radius: 999px;
+}
+
+.kap-op--symbol {
+  padding: 4px 6px;
+  min-width: 0;
+  border-radius: 8px;
+}
+
+.kap-op--symbol .kap-op-value--symbol {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.kap-op-kind {
+  font-size: 0.58rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.kap-op-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+.kap-op-value--btn {
+  border: none;
+  background: transparent;
+  padding: 0 2px;
+  cursor: default;
+  font: inherit;
+  color: inherit;
+}
+
+.kap-op-value--btn:hover {
+  color: #d97706;
+}
+
+.kap-op-value--editable {
+  cursor: pointer;
+}
+
+.kap-op--weight .kap-op-value--btn:hover {
+  color: #475569;
+}
+
+.kap-op-value--circle {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+}
+
+.kap-op-unit {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  line-height: 1.1;
+  max-width: 110px;
+}
+
+.kap-op-bound {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 0.72rem;
+}
+
+.kap-op-limit {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.kap-op-map {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+
+.kap-op-input {
+  font: inherit;
+  text-align: center;
+  border: 1px solid #d97706;
+  border-radius: 4px;
+  padding: 1px 4px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.kap-op-input--value {
+  width: 4.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.kap-op-input--limit {
+  width: 3.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.kap-op--scaling {
+  border-color: #d97706;
+}
+
+.kap-op-value--symbol {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.kap-op-overlay--edge .kap-op--weight-edge {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  padding: 3px 8px;
+}
+
+.kap-op-overlay--edge .kap-op-kind {
+  font-size: 0.52rem;
+  line-height: 1;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.kap-op-value--weight {
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.kap-op-overlay--edge .kap-op-value--weight {
+  font-size: 0.78rem;
+}
+
+.kap-op-input--weight {
+  width: 2.75rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-color: #94a3b8;
+}
+
+.kap-param-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 10px;
+  min-width: 100px;
+  max-width: 148px;
+  background: color-mix(in srgb, var(--lineage-parameter) 8%, var(--surface));
+  border: 1.5px solid var(--lineage-parameter);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+  font-family: system-ui, sans-serif;
+  text-align: center;
+}
+
+.kap-param-node-name {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.kap-param-node-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.kap-param-node-unit {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+.kap-op-overlay--parameter {
+  pointer-events: none;
 }

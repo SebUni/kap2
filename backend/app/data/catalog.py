@@ -1,13 +1,13 @@
 """Fest verdrahteter Fachkatalog (einmalig portiert aus den KAP3-CSVs).
 
-Dieser Katalog ist die EINZIGE Quelle der Wahrheit für Klimatreiber (Hazards),
-Expositionen, Verwundbarkeiten, Risiken und Maßnahmen. Es gibt bewusst keinen
+Dieser Katalog ist die EINZIGE Quelle der Wahrheit für klimatische Einflüsse (Hazards),
+räumliche Expositionen, Sensitivitäten, Risiken und Maßnahmen. Es gibt bewusst keinen
 Laufzeit-CSV-Parser und kein generisches Katalogsystem – die Inhalte sind als
 Python-Konstanten hinterlegt (siehe Plan).
 
 Konventionen
 ------------
-* Klimatreiber/Expositionen/Verwundbarkeiten werden pro 100m-Zelle in ihrer
+* Klimatische Einflüsse/räumliche Expositionen/Sensitivitäten werden pro 100m-Zelle in ihrer
   ABSOLUTEN Einheit berechnet und angezeigt (``unit``).
 * ``norm_min`` / ``norm_max`` definieren die Referenzskala, die AUSSCHLIESSLICH
   für die Risikoberechnung genutzt wird (Normalisierung auf 0..1). Sie hat keinen
@@ -45,7 +45,7 @@ KWRA_GROUPS: list[dict] = [
 CHALLENGE_TO_GROUP = {g["challenge"]: g["code"] for g in KWRA_GROUPS}
 
 
-# ── Klimatreiber (Hazards) ─────────────────────────────────────────────────────
+# ── Klimatische Einflüsse (Hazards) ────────────────────────────────────────────
 # unit = absolute Einheit; norm_* = Referenzskala nur für Risikoberechnung.
 # spatial = ob lokal räumlich auflösbar; proxy/source = Tooltip + Handbuch.
 
@@ -147,7 +147,7 @@ HAZARDS: list[dict] = [
      "source": "OSM + Terrarium DEM + DWD CDC"},
     {"code": "COMPOUND_EVENT", "name": "Kombinierte/Compound-Events",
      "unit": "Index", "norm_min": 0.0, "norm_max": 1.0, "spatial": True,
-     "description": "Überlagerung mehrerer Klimatreiber (z. B. Hitze + Dürre).",
+     "description": "Überlagerung mehrerer klimatischer Einflüsse (z. B. Hitze + Dürre).",
      "proxy": "Maximum der normalisierten Bestandteile (Hitze, Dürre, Starkregen) – siehe model_parameters.",
      "source": "abgeleitet (max_of_constituent_hazards)"},
     {"code": "CASCADE_EVENT", "name": "Kaskadeneffekte",
@@ -168,7 +168,7 @@ HAZARDS: list[dict] = [
 ]
 
 
-# ── Expositionen ────────────────────────────────────────────────────────────────
+# ── Räumliche Expositionen ────────────────────────────────────────────────────
 
 EXPOSURES: list[dict] = [
     {"code": "POPULATION_DENSITY", "name": "Bevölkerungsdichte",
@@ -225,6 +225,11 @@ EXPOSURES: list[dict] = [
      "unit": "Anzahl", "norm_min": 0.0, "norm_max": 10.0, "spatial": True,
      "description": "Telekommunikations- und Kommunikationsanlagen.",
      "proxy": "OSM communication/tower=communication pro Zelle.",
+     "source": "OSM"},
+    {"code": "HEALTHCARE_INFRASTRUCTURE", "name": "Gesundheitsversorgung (Erreichbarkeit)",
+     "unit": "Index", "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
+     "description": "Nähe zu Krankenhaus, Arzt und Apotheke (höher = besserer Zugang).",
+     "proxy": "100 · (0,5·prox(20km,KH) + 0,35·prox(20km,Arzt) + 0,15·prox(20km,Apo)); Luftlinie × 1,3.",
      "source": "OSM"},
     {"code": "INDUSTRIAL_COMMERCIAL_AREAS", "name": "Industrie- und Gewerbeflächen",
      "unit": "ha", "norm_min": 0.0, "norm_max": 1.0, "spatial": True,
@@ -289,7 +294,7 @@ EXPOSURES: list[dict] = [
 ]
 
 
-# ── Verwundbarkeiten ─────────────────────────────────────────────────────────────
+# ── Sensitivitäten ──────────────────────────────────────────────────────────────
 # Die meisten sind Index 0..100 (höher = verwundbarer). Anpassungskapazitäten
 # (z. B. Frühwarnung, Redundanz) werden invertiert gespeichert, sodass ein hoher
 # Wert immer „mehr Risiko" bedeutet.
@@ -323,7 +328,7 @@ VULNERABILITIES: list[dict] = [
     {"code": "HEALTHCARE_ACCESS", "name": "Zugang zu Gesundheitsdiensten (invers)", "unit": "Index",
      "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
      "description": "Erreichbarkeit von Gesundheitsdiensten (hoher Wert = schlechter Zugang).",
-     "proxy": "Distanz zu OSM amenity=hospital/clinic/doctors (nähebasiert invertiert).",
+     "proxy": "100 · (1 − (0,5·prox(KH) + 0,35·prox(Arzt) + 0,15·prox(Apo))); prox = 1 − min(dist,20km)/20km; dist = Luftlinie × 1,3.",
      "source": "OSM"},
     {"code": "WILDFIRE_SUSCEPTIBILITY", "name": "Waldbrandanfälligkeit", "unit": "Index",
      "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
@@ -1139,6 +1144,7 @@ _EXPOSURE_CATEGORY_MAP: dict[str, str] = {
     "BUILDING_STOCK": "building", "BUILDING_USE_TYPES": "building", "LOCATION_HAZARD_ZONES": "building",
     "ENERGY_INFRASTRUCTURE": "infra", "WATER_WASTEWATER_INFRA": "infra",
     "TRANSPORT_HUBS": "infra", "COMMUNICATION_INFRA": "infra",
+    "HEALTHCARE_INFRASTRUCTURE": "people",
     "INDUSTRIAL_COMMERCIAL_AREAS": "economy", "SUPPLY_CHAIN_NODES": "economy",
     "AGRICULTURAL_LAND": "nature", "FOREST_AREA": "nature",
     "BIODIVERSITY_HOTSPOTS": "nature", "EROSION_PRONE_SOILS": "nature",

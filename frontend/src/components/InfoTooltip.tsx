@@ -14,7 +14,7 @@ interface Props {
 
 /**
  * Kleines (i)-Icon mit Hover-Infobox. Dokumentation "am Objekt" für
- * Hazards/Expositionen/Verwundbarkeiten/Risiken/Maßnahmen.
+ * Klimatische Einflüsse/Räumliche Expositionen/Sensitivitäten/Risiken/Maßnahmen.
  */
 export default function InfoTooltip({ title, description, rows, note }: Props) {
   const [open, setOpen] = useState(false)
@@ -25,7 +25,7 @@ export default function InfoTooltip({ title, description, rows, note }: Props) {
     const el = iconRef.current
     if (el) {
       const r = el.getBoundingClientRect()
-      setPos({ top: r.bottom + 6, left: Math.min(r.left, window.innerWidth - 320) })
+      setPos({ top: r.bottom + 6, left: Math.min(r.left, window.innerWidth - 410) })
     }
     setOpen(true)
   }
@@ -49,7 +49,7 @@ export default function InfoTooltip({ title, description, rows, note }: Props) {
         <div
           style={{
             position: 'fixed', top: pos.top, left: pos.left, zIndex: 9999,
-            width: 300, background: 'var(--surface)', border: '1px solid var(--border)',
+            minWidth: 390, width: 390, maxWidth: 'min(390px, 96vw)', background: 'var(--surface)', border: '1px solid var(--border)',
             borderRadius: 8, padding: '0.6rem 0.7rem', boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
             fontSize: '0.75rem', fontWeight: 400, color: 'var(--text)', textAlign: 'left',
             cursor: 'default', whiteSpace: 'normal',

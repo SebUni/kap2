@@ -39,6 +39,26 @@ export const api = {
 
   // ── Katalog ─────────────────────────────────────────────────────────
   getCatalog: () => request<Record<string, unknown>>('/catalog'),
+  getLayerRecipe: (code: string, category?: string) =>
+    request<Record<string, unknown>>(
+      `/catalog/layer/${code}/recipe${category ? `?category=${category}` : ''}`,
+    ),
+
+  // ── Parameter ───────────────────────────────────────────────────────
+  getParameters: (kommuneId: number, layer?: string, category?: string) => {
+    const q = new URLSearchParams()
+    if (layer) q.set('layer', layer)
+    if (category) q.set('category', category)
+    const qs = q.toString()
+    return request<Record<string, unknown>[]>(
+      `/kommune/${kommuneId}/parameters${qs ? `?${qs}` : ''}`,
+    )
+  },
+  updateParameters: (kommuneId: number, updates: { parameter_id: string; value: unknown; custom_source?: string }[]) =>
+    request<Record<string, unknown>[]>(`/kommune/${kommuneId}/parameters`, {
+      method: 'PUT', body: JSON.stringify(updates),
+    }),
+  exportParametersUrl: (kommuneId: number) => `${BASE}/kommune/${kommuneId}/parameters/export`,
 
   // ── Assessment ──────────────────────────────────────────────────────
   startAssessment: (kommuneId: number) =>

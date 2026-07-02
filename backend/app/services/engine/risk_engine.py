@@ -17,6 +17,7 @@ Konstantwert hinterlegt (siehe indicators.py).
 from __future__ import annotations
 
 from app.data import catalog
+from app.services.engine import override_context
 
 CELL_AREA_KM2 = 0.01  # 100 m × 100 m Rasterzelle
 AGGREGATION_PERCENTILE = 90.0
@@ -32,11 +33,11 @@ def normalize_hev(hev: dict) -> dict:
     """Normalisiert absolute H/E/V-Werte einer Zelle auf 0..1 (nur fürs Risiko)."""
     out = {"hazards": {}, "exposures": {}, "vulnerabilities": {}}
     for code, val in hev["hazards"].items():
-        out["hazards"][code] = catalog.normalize_value(code, val)
+        out["hazards"][code] = override_context.normalize_value(code, val)
     for code, val in hev["exposures"].items():
-        out["exposures"][code] = catalog.normalize_value(code, val)
+        out["exposures"][code] = override_context.normalize_value(code, val)
     for code, val in hev["vulnerabilities"].items():
-        out["vulnerabilities"][code] = catalog.normalize_value(code, val)
+        out["vulnerabilities"][code] = override_context.normalize_value(code, val)
     return out
 
 
@@ -75,7 +76,7 @@ def _scale_factor(risk: dict, pop: float, area_km2: float) -> float:
 def cell_outcome(risk: dict, index: float, cell_pop: float,
                  cell_area_km2: float = CELL_AREA_KM2) -> float:
     """Absolute Outcome-Schätzung für eine einzelne Zelle (Kartenlayer)."""
-    ref = float(risk.get("ref_value", 0.0))
+    ref = override_context.effective_ref_value(risk["code"], float(risk.get("ref_value", 0.0)))
     factor = _scale_factor(risk, cell_pop, cell_area_km2)
     return ref * (index / 100.0) * factor
 
@@ -83,7 +84,7 @@ def cell_outcome(risk: dict, index: float, cell_pop: float,
 def cell_outcome_breakdown(risk: dict, index: float, cell_pop: float,
                            cell_area_km2: float = CELL_AREA_KM2) -> dict:
     """Zellbezogene Faktoren für Outcome = ref · (Index/100) · Skalierung (Tooltip)."""
-    ref = float(risk.get("ref_value", 0.0))
+    ref = override_context.effective_ref_value(risk["code"], float(risk.get("ref_value", 0.0)))
     factor = _scale_factor(risk, cell_pop, cell_area_km2)
     idx_frac = index / 100.0
     return {
@@ -111,7 +112,7 @@ def _percentile(values: list[float], pct: float = AGGREGATION_PERCENTILE) -> flo
 def estimate_outcome_and_cost(risk: dict, agg_index: float, total_pop: float, area_km2: float) -> dict:
     """Outcome-Schätzung + monetäre Kosten für ein Risiko (agg_index = P90 der Zell-Indizes)."""
     factor = _scale_factor(risk, total_pop, area_km2)
-    ref = float(risk.get("ref_value", 0.0))
+    ref = override_context.effective_ref_value(risk["code"], float(risk.get("ref_value", 0.0)))
     outcome = ref * (agg_index / 100.0) * factor
     cost_eur = 0.0
     dim = risk.get("cost_dimension")

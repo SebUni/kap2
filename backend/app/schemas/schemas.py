@@ -80,6 +80,9 @@ class ConfigParameterOut(BaseModel):
     key: str
     value: Any
     description: Optional[str] = None
+    parameter_id: Optional[str] = None
+    source: Optional[str] = None
+    custom_source: Optional[str] = None
 
     model_config = {"from_attributes": True}
 
@@ -89,6 +92,12 @@ class ConfigParameterUpdate(BaseModel):
     key: str
     value: Any
     description: Optional[str] = None
+
+
+class ParameterUpdate(BaseModel):
+    parameter_id: str
+    value: Any
+    custom_source: Optional[str] = None
 
 
 # ── Measures ───────────────────────────────────────────────────────────────────

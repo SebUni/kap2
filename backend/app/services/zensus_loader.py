@@ -10,6 +10,7 @@ import os
 import re
 import tempfile
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Any
 from urllib.request import Request, urlopen
@@ -23,17 +24,16 @@ from app.config import settings
 log = logging.getLogger(__name__)
 
 MISSING_MARKERS = {"–", "-", "", "…", "..."}
+# Spaltennamen gemäß Destatis CSV „Gebaeude_nach_Baujahr_in_Mikrozensus_Klassen“
 BUILDING_AGE_CLASSES: list[tuple[str, int]] = [
     ("Vor1919", 1900),
-    ("a1919bis1949", 1934),
-    ("a1950bis1959", 1954),
-    ("a1960bis1969", 1964),
-    ("a1970bis1979", 1974),
-    ("a1980bis1989", 1984),
-    ("a1990bis1999", 1994),
-    ("a2000bis2009", 2004),
-    ("a2010bis2015", 2012),
-    ("a2016undspaeter", 2020),
+    ("a1919bis1948", 1933),
+    ("a1949bis1978", 1963),
+    ("a1979bis1990", 1984),
+    ("a1991bis2000", 1995),
+    ("a2001bis2010", 2005),
+    ("a2011bis2019", 2015),
+    ("a2020undspaeter", 2022),
 ]
 
 REQUIRED_KEYS = (
@@ -172,9 +172,9 @@ def _gitter_id_from_row(row: dict) -> str | None:
     return None
 
 
-def _is_suppressed(row: dict) -> bool:
-    flag = (row.get("werterlaeuternde_Zeichen") or "").strip()
-    return flag == "KLAMMERN"
+def _is_statistically_uncertain(row: dict) -> bool:
+    """KLAMMERN = eingeschränkte Aussagekraft, Wert wird trotzdem veröffentlicht."""
+    return (row.get("werterlaeuternde_Zeichen") or "").strip() == "KLAMMERN"
 
 
 def is_dataset_ready(key: str, *, min_bytes: int = 10_000) -> bool:
@@ -244,9 +244,9 @@ def ensure_zensus_dataset(key: str) -> str:
 
 def ensure_zensus_datasets(keys: list[str] | None = None) -> list[str]:
     keys = list(keys or REQUIRED_KEYS)
-    paths = []
-    for key in keys:
-        paths.append(ensure_zensus_dataset(key))
+    workers = min(len(keys), 4)
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        paths = list(ex.map(ensure_zensus_dataset, keys))
     return paths
 
 
@@ -290,10 +290,10 @@ def load_dataset_bbox(key: str, bbox: tuple[int, int, int, int]) -> dict[str, di
             gid = _gitter_id_from_row(row)
             if not gid:
                 continue
-            if _is_suppressed(row):
-                out[gid] = {"suppressed": True}
-                continue
             parsed: dict[str, Any] = {"x": x, "y": y}
+            uncertain = _is_statistically_uncertain(row)
+            if uncertain:
+                parsed["statistically_uncertain"] = True
             d = ZENSUS_DATASETS[key]
             for col in d.value_columns:
                 if col == "Insgesamt_Gebaeude":
@@ -304,6 +304,11 @@ def load_dataset_bbox(key: str, bbox: tuple[int, int, int, int]) -> dict[str, di
                     parsed[col] = _parse_float(row.get(col))
             if key == "building_age":
                 parsed["building_age_mean"] = _mean_building_year(parsed)
+            # Nur echte Geheimhaltung (–) zählt als fehlend — nicht KLAMMERN-Werte.
+            if key != "building_age" and key != "population":
+                primary = d.value_columns[0]
+                if parsed.get(primary) is None:
+                    continue
             out[gid] = parsed
 
     _bbox_cache.setdefault(key, {})[cache_key] = out
@@ -335,7 +340,14 @@ def load_zensus_for_cells(
     keys = list(keys or REQUIRED_KEYS)
     geoms = [c["geometry"] for c in grid_cells]
     bbox = bbox_3035_from_wgs_geoms(geoms)
-    return {key: load_dataset_bbox(key, bbox) for key in keys}
+    workers = min(len(keys), 4)
+
+    def _load(key: str) -> tuple[str, dict[str, dict[str, Any]]]:
+        return key, load_dataset_bbox(key, bbox)
+
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        pairs = list(ex.map(_load, keys))
+    return {key: data for key, data in pairs}
 
 
 def apply_zensus_to_cell_inputs(
@@ -362,26 +374,28 @@ def apply_zensus_to_cell_inputs(
             continue
 
         p = pop_data.get(gid, {})
-        if p.get("suppressed"):
-            ci["pop"] = 0.0
-        else:
-            ci["pop"] = float(p.get("Einwohner") or 0.0)
+        ci["pop"] = float(p.get("Einwohner") or 0.0)
 
         o65 = over65.get(gid, {})
         u18 = under18.get(gid, {})
-        ci["share_over_65"] = None if o65.get("suppressed") else o65.get("AnteilUeber65")
-        ci["share_under_18"] = None if u18.get("suppressed") else u18.get("AnteilUnter18")
+        ci["share_over_65"] = o65.get("AnteilUeber65")
+        ci["share_under_18"] = u18.get("AnteilUnter18")
 
         la = living.get(gid, {})
         ow = owner.get(gid, {})
         rt = rent.get(gid, {})
         ba = bage.get(gid, {})
 
-        ci["living_area_per_person"] = None if la.get("suppressed") else la.get("durchschnFlaechejeBew")
-        ci["owner_share"] = None if ow.get("suppressed") else ow.get("Eigentuemerquote")
-        ci["net_cold_rent"] = None if rt.get("suppressed") else rt.get("durchschnMieteQM")
-        ci["building_count_zensus"] = None if ba.get("suppressed") else ba.get("Insgesamt_Gebaeude")
-        ci["building_age_mean"] = None if ba.get("suppressed") else ba.get("building_age_mean")
+        ci["living_area_per_person"] = la.get("durchschnFlaechejeBew")
+        ci["owner_share"] = ow.get("Eigentuemerquote")
+        ci["net_cold_rent"] = rt.get("durchschnMieteQM")
+        ci["building_count_zensus"] = ba.get("Insgesamt_Gebaeude")
+        ci["building_age_mean"] = ba.get("building_age_mean")
+        ci["zensus_uncertain"] = any(
+            z.get("statistically_uncertain")
+            for z in (o65, u18, la, ow, rt, ba)
+            if z
+        )
         ci["gitter_id"] = gid
 
         share_o = ci.get("share_over_65") or 0.0

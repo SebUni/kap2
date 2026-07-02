@@ -13,7 +13,7 @@ Proxy/Quelle und Normierung.
 
 ## 1. Grundprinzipien
 
-- **Fest verdrahtet:** Hazards (23), Expositionen (23), Verwundbarkeiten (33),
+- **Fest verdrahtet:** Klimatische Einflüsse (23), Räumliche Expositionen (23), Sensitivitäten (33),
   Risiken (48) und Maßnahmen (46) sind als Python-Konstanten in
   `catalog.py` hinterlegt (einmalig aus den KAP3-CSVs portiert). Kein
   Laufzeit-CSV-Parser.
@@ -124,7 +124,7 @@ Daraus speisen sich u. a. `HEAT_WAVE`, `UHI_INTENSITY`, `MEAN_TEMPERATURE_RISE`.
 
 ---
 
-## 4. Hazards / Expositionen / Verwundbarkeiten (absolut)
+## 4. Klimatische Einflüsse / Räumliche Expositionen / Sensitivitäten (absolut)
 
 Berechnung in `engine/indicators.py:compute_cell_hev`. Jeder Code besitzt im
 Katalog: `unit`, `[norm_min, norm_max]`, `spatial`, `proxy`, `source`,

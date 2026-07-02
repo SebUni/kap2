@@ -3,11 +3,20 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useStore } from '../store'
 import type {
-  CellOutcomeBreakdown, HevRecipeMeta, IndicatorRecipe, LayerMeta,
-  LayerRecipe, OutcomeFactorMeta, ResolvedInput, RiskRecipe,
+  CellOutcomeBreakdown, CellPathwayBreakdown, HevRecipeMeta, IndicatorRecipe,
+  LayerMeta, LayerRecipe, OutcomeFactorMeta, ResolvedInput, RiskRecipe,
 } from '../types'
 
 const CHOROPLETH_COLORS = ['#fef9c3', '#fde047', '#fb923c', '#ef4444', '#991b1b']
+/** Höherer Wert = bessere Erreichbarkeit → grün statt rot. */
+const CHOROPLETH_GOOD_HIGH = new Set([
+  'HEALTHCARE_ACCESS_GRID', 'HEALTHCARE_ACCESS_SCORE',
+  'HEALTHCARE_INDEX_HOSPITAL', 'HEALTHCARE_INDEX_DOCTOR', 'HEALTHCARE_INDEX_PHARMACY',
+])
+
+function choroplethColors(code?: string) {
+  return CHOROPLETH_GOOD_HIGH.has(code ?? '') ? [...CHOROPLETH_COLORS].reverse() : CHOROPLETH_COLORS
+}
 type TooltipMode = 'off' | 'short' | 'detail'
 const TOOLTIP_MODE_KEY = 'map-tooltip-mode'
 
@@ -17,6 +26,13 @@ function isRiskRecipe(r: LayerRecipe): r is RiskRecipe {
 
 function fmtNum(v: number) {
   return v.toLocaleString('de-DE', { maximumFractionDigits: 3 })
+}
+
+/** Skalenende für absolute Werte: Min/Max der aktuell gezeigten Zellen. */
+function layerScaleBounds(meta?: LayerMeta): { lo: number; hi: number } {
+  const lo = meta?.min ?? 0
+  const hi = meta?.max != null && meta.max > lo ? meta.max : lo + 1
+  return { lo, hi }
 }
 
 function provBadge(prov?: string) {
@@ -74,7 +90,57 @@ function outcomeFactorValue(
   return '—'
 }
 
-const TOOLTIP_MAX_WIDTH = 920
+const TOOLTIP_MIN_WIDTH = 720
+const TOOLTIP_MAX_WIDTH = 1200
+
+function fmtNormFrac(normPct: number) {
+  return fmtNum(normPct / 100)
+}
+
+function buildRiskFormulaHtml(
+  r: RiskRecipe,
+  cellPathways: CellPathwayBreakdown | undefined,
+) {
+  let s = `<div class="kap-formula-block">`
+  s += `<div style="font-weight:600;font-size:10px;color:#475569;margin-bottom:3px">Index-Berechnung</div>`
+  s += `<div class="kap-formula-line">${
+    r.formula_index_header || 'Index = 100 · Σ(w·Ĥ·Ê·V̂) / Σw  (Ĥ,Ê,V̂ normiert 0…1)'
+  }</div>`
+
+  const meta = r.pathways || []
+  const cells = cellPathways?.pathways || []
+
+  for (let i = 0; i < meta.length; i++) {
+    const p = meta[i]
+    const c = cells[i]
+    if (c) {
+      s += `<div class="kap-formula-line">` +
+        `<span style="color:#94a3b8">${p.type_label}:</span> ` +
+        `<code>${fmtNum(p.weight)} · ${fmtNormFrac(c.h_norm)} · ${fmtNormFrac(c.e_norm)} · ${fmtNormFrac(c.v_norm)}</code>` +
+        ` <span style="color:#64748b">(Ĥ·Ê·V̂ = ${p.hazard_name} · ${p.exposure_name} · ${p.vulnerability_name})</span>` +
+        ` → <strong>${fmtNum(c.term)}</strong></div>`
+    } else {
+      s += `<div class="kap-formula-line">` +
+        `<span style="color:#94a3b8">${p.type_label}:</span> ` +
+        `<code>${p.formula}</code></div>`
+    }
+  }
+
+  if (cellPathways) {
+    s += `<div class="kap-formula-line kap-formula-sum">` +
+      `<code>Σ = ${fmtNum(cellPathways.term_sum)}` +
+      ` → Index = 100 · ${fmtNum(cellPathways.term_sum)} / ${fmtNum(cellPathways.weight_sum)}` +
+      ` = ${fmtNum(cellPathways.index)}</code></div>`
+  } else if (r.formula_index) {
+    s += `<div class="kap-formula-line"><code>${r.formula_index}</code></div>`
+  }
+
+  s += `</div>`
+  if (r.formula_outcome) {
+    s += `<div class="kap-formula-line kap-formula-outcome"><code>${r.formula_outcome}</code></div>`
+  }
+  return s
+}
 
 function buildTooltipHtml(
   meta: LayerMeta,
@@ -106,7 +172,7 @@ function buildTooltipHtml(
     ? `<div class="kap-tooltip-grid">${gridCells.join('')}</div>`
     : ''
 
-  let h = `<div class="kap-tooltip-inner" style="--kap-tooltip-max:${TOOLTIP_MAX_WIDTH}px;font-family:system-ui,sans-serif;font-size:11px;line-height:1.4">`
+  let h = `<div class="kap-tooltip-inner" style="--kap-tooltip-min:${TOOLTIP_MIN_WIDTH}px;--kap-tooltip-max:${TOOLTIP_MAX_WIDTH}px;font-family:system-ui,sans-serif;font-size:11px;line-height:1.4">`
   h += `<div style="font-weight:700;font-size:12px;margin-bottom:2px">${meta.label}</div>`
   h += `<div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">${fmtNum(value)} ${meta.unit}</div>`
 
@@ -117,9 +183,7 @@ function buildTooltipHtml(
       h += `<div style="margin:2px 0;font-size:10px;color:#64748b">Risiko-Index: <strong style="color:#0f172a">${fmtNum(idx)}</strong> (0–100)</div>`
 
     if (mode === 'detail') {
-      h += `<div style="color:#64748b;margin:3px 0 1px;overflow-wrap:anywhere"><code style="font-size:10px">${r.formula_index}</code></div>`
-      if (r.formula_outcome)
-        h += `<div style="color:#64748b;margin:0 0 3px;overflow-wrap:anywhere"><code style="font-size:10px">Outcome = ${r.formula_outcome}</code></div>`
+      h += buildRiskFormulaHtml(r, parseProp<CellPathwayBreakdown>(props.pathways))
 
       gridHeader()
       if (idx != null)
@@ -145,9 +209,9 @@ function buildTooltipHtml(
           )
         })
       }
-      sec('Treiber (H)', r.hazards, parseProp(props.H))
-      sec('Expositionen (E)', r.exposures, parseProp(props.E))
-      sec('Verwundbarkeiten (V)', r.vulnerabilities, parseProp(props.V))
+      sec('Klimatische Einflüsse', r.hazards, parseProp(props.H))
+      sec('Räumliche Expositionen', r.exposures, parseProp(props.E))
+      sec('Sensitivitäten', r.vulnerabilities, parseProp(props.V))
 
       const cellOutcome = parseProp<CellOutcomeBreakdown>(props.outcome)
       if (cellOutcome && r.outcome_factors?.length) {
@@ -172,7 +236,7 @@ function buildTooltipHtml(
       h += '<div style="margin-top:5px;color:#94a3b8;font-size:9px">H,E,V normiert 0–100 für die Multiplikation</div>'
 
       if (cellOutcome && r.outcome_factors?.length) {
-        h += `<div style="margin-top:4px;padding-top:4px;border-top:1px solid #e2e8f0;color:#475569;font-size:10px;overflow-wrap:anywhere">` +
+        h += `<div class="kap-formula-line kap-formula-outcome">` +
           `<code>${fmtNum(cellOutcome.ref_value)} · ${fmtNum(cellOutcome.index_fraction)} · ${fmtNum(cellOutcome.scale_factor)}` +
           ` = ${fmtNum(cellOutcome.outcome)} ${meta.unit}</code></div>`
       }
@@ -180,7 +244,7 @@ function buildTooltipHtml(
   } else if (r && 'inputs' in r) {
     const ir = r as IndicatorRecipe
     if (mode === 'detail' && ir.formula)
-      h += `<div style="color:#475569;margin:0 0 4px"><code style="font-size:10px;background:#f1f5f9;padding:1px 3px;border-radius:3px">${ir.formula}</code></div>`
+      h += `<div class="kap-formula-line"><code>${ir.formula}</code></div>`
     if (mode === 'detail') {
       gridHeader()
       const cells = (parseProp(props.inputs) as ResolvedInput[]) || []
@@ -218,6 +282,7 @@ export default function MapView() {
   const [showMeasureForm, setShowMeasureForm] = useState(false)
 
   const meta = layerGeoJson?.meta as LayerMeta | undefined
+  const scaleBounds = useMemo(() => layerScaleBounds(meta), [meta])
   const { activeLayer, setActiveLayer } = useStore()
 
   // Layer-Cache ohne aktuelle Tooltip-Metadaten automatisch neu laden
@@ -226,7 +291,7 @@ export default function MapView() {
     const layerMeta = layerGeoJson.meta as LayerMeta | undefined
     const recipe = layerMeta?.recipe
     const staleRiskRecipe = activeLayer.category === 'risks' && recipe && isRiskRecipe(recipe)
-      && !recipe.outcome_factors?.length
+      && (!recipe.outcome_factors?.length || !recipe.pathways?.length)
     if (layerMeta && (!recipe || staleRiskRecipe)) {
       setActiveLayer(activeLayer).catch(() => {})
     }
@@ -302,11 +367,12 @@ export default function MapView() {
         }
       : empty
 
-    const lo = meta?.min ?? 0
-    const hi = meta?.scale_max && meta.scale_max > lo ? meta.scale_max : (meta?.max && meta.max > lo ? meta.max : lo + 1)
-    const stops = CHOROPLETH_COLORS.map((c, i) => [lo + (hi - lo) * (i / (CHOROPLETH_COLORS.length - 1)), c]).flat()
+    const { lo, hi } = layerScaleBounds(meta)
+    const colors = choroplethColors(meta?.code)
+    const stops = colors.map((c, i) => [lo + (hi - lo) * (i / (colors.length - 1)), c]).flat()
 
     try {
+      if (map.getLayer('active-layer-points')) map.removeLayer('active-layer-points')
       const src = map.getSource('active-layer') as maplibregl.GeoJSONSource
       if (src) {
         src.setData(data)
@@ -330,7 +396,7 @@ export default function MapView() {
         }, beforeId)
       }
     } catch (err) { console.warn('MapView: active layer error', err) }
-  }, [layerGeoJson, mapLoaded])
+  }, [layerGeoJson, mapLoaded, meta])
 
   const setTooltipModePersist = (mode: TooltipMode) => {
     setTooltipMode(mode)
@@ -376,6 +442,8 @@ export default function MapView() {
           maxWidth: `${TOOLTIP_MAX_WIDTH}px`,
           className: 'kap-tooltip',
         })
+      } else {
+        popupRef.current.setMaxWidth(`${TOOLTIP_MAX_WIDTH}px`)
       }
       popupRef.current
         .setLngLat(e.lngLat)
@@ -582,12 +650,22 @@ export default function MapView() {
           <div style={{ fontWeight: 600, marginBottom: 4 }}>{meta.label}</div>
           <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: 4 }}>{meta.unit}</div>
           <div style={{ display: 'flex', height: 10, borderRadius: 3, overflow: 'hidden' }}>
-            {CHOROPLETH_COLORS.map(c => <div key={c} style={{ flex: 1, background: c }} />)}
+            {choroplethColors(meta.code).map(c => <div key={c} style={{ flex: 1, background: c }} />)}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', marginTop: 2 }}>
-            <span>{fmt(meta.min)}</span>
-            <span>{fmt(meta.scale_max && meta.scale_max > meta.min ? meta.scale_max : meta.max)}</span>
+            <span>{fmt(scaleBounds.lo)}</span>
+            <span>{fmt(scaleBounds.hi)}</span>
           </div>
+          {meta.code === 'HEALTHCARE_ACCESS_INDEX' && (
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 4 }}>
+              Höher = schlechterer Zugang
+            </div>
+          )}
+          {meta.code === 'HEALTHCARE_ACCESS_GRID' && (
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 4 }}>
+              0,50·KH + 0,35·Arzt + 0,15·Apo (höher = besser)
+            </div>
+          )}
         </div>
       )}
 

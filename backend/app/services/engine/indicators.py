@@ -1,5 +1,5 @@
-"""Berechnet pro Zelle alle Klimatreiber (Hazards), Expositionen und
-Verwundbarkeiten in ABSOLUTEN Einheiten aus den Rohgrößen (``inputs.py``).
+"""Berechnet pro Zelle alle klimatischen Einflüsse (Hazards), räumlichen Expositionen und
+Sensitivitäten in ABSOLUTEN Einheiten aus den Rohgrößen (``inputs.py``).
 
 Wo kein lokaler räumlicher Proxy existiert (catalog: ``spatial=False``), wird ein
 regionaler/nationaler Konstantwert gesetzt. Alle Annahmen sind im Handbuch und in
@@ -40,6 +40,12 @@ def _income_resilience(ci: dict) -> float:
     if not scores:
         return 45.0
     return round(sum(scores) / len(scores), 1)
+
+
+def _healthcare_access(ci: dict) -> float:
+    """Inverser Zugangsindex: geringere Erreichbarkeit = höhere Verwundbarkeit."""
+    score = float(ci.get("healthcare_access_score") or 0)
+    return round(_clamp(100.0 * (1.0 - score), 0, 100), 1)
 
 
 def compute_cell_hev(ci: dict, regional: dict) -> dict:
@@ -141,10 +147,13 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "BUILDING_STOCK": round(bldg_cov * ci["area_m2"], 0),
         "BUILDING_USE_TYPES": float(bldg_count),
         "LOCATION_HAZARD_ZONES": round(area_ha * bldg_cov * max(depression, min(uhi / 6.0, 1.0)), 4),
-        "ENERGY_INFRASTRUCTURE": round(bldg_count * 0.012 + industrial * 5.0, 2),
-        "WATER_WASTEWATER_INFRA": round(bldg_count * 0.008 + 0.2, 2),
+        "ENERGY_INFRASTRUCTURE": round(float(ci.get("energy_infra_count") or 0), 2),
+        "WATER_WASTEWATER_INFRA": round(float(ci.get("water_wastewater_count") or 0), 2),
         "TRANSPORT_HUBS": round(road_cov * 18.0, 2),
-        "COMMUNICATION_INFRA": round(bldg_count * 0.005, 2),
+        "COMMUNICATION_INFRA": round(float(ci.get("communication_count") or 0), 2),
+        "HEALTHCARE_INFRASTRUCTURE": round(
+            float(ci.get("healthcare_access_score") or 0) * 100.0, 1,
+        ),
         "INDUSTRIAL_COMMERCIAL_AREAS": round(area_ha * industrial, 4),
         "AGRICULTURAL_LAND": round(area_ha * farmland, 4),
         "SUPPLY_CHAIN_NODES": round(industrial * 6.0 + bldg_count * 0.004, 2),
@@ -166,7 +175,7 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "MATERIAL_HEAT_SENSITIVITY": round(_clamp(imp * 100.0, 0, 100), 1),
         "VULNERABLE_GROUPS_SHARE": round(share_vuln, 1),
         "INCOME_SOCIAL_RESILIENCE": _income_resilience(ci),
-        "HEALTHCARE_ACCESS": 40.0,
+        "HEALTHCARE_ACCESS": _healthcare_access(ci),
         "WILDFIRE_SUSCEPTIBILITY": round(_clamp(forest * 100.0 * (0.5 + dry / 2.0), 0, 100), 1),
         "BIODIVERSITY_RESILIENCE": round(_clamp(100.0 - (forest + green) * 100.0 * 0.6, 0, 100), 1),
         "SOIL_SENSITIVITY": round(_clamp(slope * 60.0 + farmland * 40.0, 0, 100), 1),

@@ -111,6 +111,9 @@ class ConfigParameter(Base):
     key = Column(String(100), nullable=False)
     value = Column(JSON, nullable=False)
     description = Column(Text)
+    parameter_id = Column(String(200), nullable=True)
+    source = Column(Text, nullable=True)
+    custom_source = Column(Text, nullable=True)
 
     kommune = relationship("Kommune", back_populates="config_params")
 

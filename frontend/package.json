@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "vite",
+    "dev:clean": "rm -rf node_modules/.vite && vite",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -12,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@dagrejs/dagre": "^3.0.0",
     "@deck.gl/core": "^9.2.11",
     "@deck.gl/geo-layers": "^9.2.11",
     "@deck.gl/layers": "^9.2.11",
@@ -23,6 +25,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
+    "@xyflow/react": "^12.11.1",
     "maplibre-gl": "^5.21.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -30,6 +33,8 @@
     "react-router-dom": "^7.13.2",
     "recharts": "^3.8.1",
     "typescript": "^6.0.2",
+    "vis-data": "^8.0.4",
+    "vis-network": "^10.1.0",
     "vite": "^5.4.21",
     "zustand": "^5.0.12"
   }

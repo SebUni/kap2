@@ -16,7 +16,7 @@ const TAB_ROUTES = [
 ]
 
 function AppContent() {
-  const { hasAssessment, kommune, setActiveTab, resetKommune, loadStatus } = useStore()
+  const { hasAssessment, kommune, setActiveTab, resetKommune, loadStatus, configPanelRequested } = useStore()
   const navigate = useNavigate()
   const location = useLocation()
   const [showConfig, setShowConfig] = useState(false)
@@ -41,6 +41,12 @@ function AppContent() {
 
   // Load status when kommune changes (drives tab locking)
   useEffect(() => { if (kommune) loadStatus(kommune.id).catch(() => {}) }, [kommune])
+
+  useEffect(() => {
+    if (configPanelRequested > 0) {
+      setShowConfig(true)
+    }
+  }, [configPanelRequested])
 
   // Sync store activeTab from URL
   const activeIdx = Math.max(0, TAB_ROUTES.findIndex(t => t.path === location.pathname))

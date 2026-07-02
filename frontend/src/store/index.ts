@@ -44,6 +44,12 @@ interface AppState {
   showMeasures: boolean
   setShowMeasures: (v: boolean) => void
 
+  // Layer info modal
+  infoLayer: ActiveLayer | null
+  setInfoLayer: (layer: ActiveLayer | null) => void
+  configPanelRequested: number
+  requestConfigPanel: () => void
+
   // Risk / cost aggregates
   riskSummary: RiskAggregate | null
   costSummary: CostSummary | null
@@ -130,6 +136,15 @@ export const useStore = create<AppState>((set, get) => ({
     return data
   },
   startAssessment: async (kommuneId) => {
+    set({
+      status: {
+        status: 'running',
+        progress_pct: 0,
+        message: 'Berechnung wird vorbereitet …',
+        step_history: [],
+        eta_seconds: null,
+      },
+    })
     await api.startAssessment(kommuneId)
     await get().loadStatus(kommuneId)
   },
@@ -154,6 +169,11 @@ export const useStore = create<AppState>((set, get) => ({
   },
   showMeasures: true,
   setShowMeasures: (v) => set({ showMeasures: v }),
+
+  infoLayer: null,
+  setInfoLayer: (layer) => set({ infoLayer: layer }),
+  configPanelRequested: 0,
+  requestConfigPanel: () => set({ configPanelRequested: get().configPanelRequested + 1 }),
 
   // Aggregates
   riskSummary: null,

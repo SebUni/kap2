@@ -1,14 +1,28 @@
 import { useState, useEffect } from 'react'
 import { useStore } from '../store'
+import { api } from '../api/client'
+import type { ModelParameter } from '../types'
+import ParameterTable from './ParameterTable'
 
 export default function ConfigPanelTab() {
-  const { kommune, configParams, loadConfig, updateConfig, status, loadStatus } = useStore()
-  const [edits, setEdits] = useState<Record<string, unknown>>({})
-  const [saving, setSaving] = useState(false)
+  const { kommune, catalog, status, loadStatus } = useStore()
+  const [parameters, setParameters] = useState<ModelParameter[]>([])
+  const [loading, setLoading] = useState(false)
+
+  const loadParameters = async () => {
+    if (!kommune) return
+    setLoading(true)
+    try {
+      const res = await api.getParameters(kommune.id)
+      setParameters(res as unknown as ModelParameter[])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (kommune) {
-      loadConfig(kommune.id)
+      loadParameters()
       loadStatus(kommune.id)
     }
   }, [kommune?.id])
@@ -21,44 +35,24 @@ export default function ConfigPanelTab() {
     )
   }
 
-  // Group by category
-  const categories: Record<string, typeof configParams> = {}
-  for (const p of configParams) {
-    if (!categories[p.category]) categories[p.category] = []
-    categories[p.category].push(p)
-  }
-
-  const categoryLabels: Record<string, string> = {
-    heat: 'Hitze-Parameter',
-    costs: 'Kostenannahmen',
-    savings: 'Einsparungsannahmen',
-  }
-
-  const handleChange = (category: string, key: string, value: string) => {
-    const numVal = parseFloat(value)
-    setEdits({ ...edits, [`${category}.${key}`]: isNaN(numVal) ? value : numVal })
-  }
-
-  const handleSave = async () => {
-    setSaving(true)
-    const updates = Object.entries(edits).map(([ck, value]) => {
-      const [category, key] = ck.split('.')
-      return { category, key, value }
-    })
-    await updateConfig(kommune.id, updates)
-    setEdits({})
-    setSaving(false)
-  }
-
   const heatStatus = status
   const isReady = heatStatus?.status === 'done'
   const isRunning = heatStatus?.status === 'running'
 
   return (
-    <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem', maxWidth: 800, margin: '0 auto' }}>
-      <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem' }}>Konfiguration</h2>
+    <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem', maxWidth: 960, margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>Konfiguration</h2>
+        <a
+          className="btn btn-secondary"
+          href={api.exportParametersUrl(kommune.id)}
+          download
+          style={{ fontSize: '0.8rem', textDecoration: 'none' }}
+        >
+          Parameter exportieren (xlsx)
+        </a>
+      </div>
 
-      {/* Status Indicator */}
       <div className="card" style={{ marginBottom: '1.5rem', borderColor: isReady ? 'var(--success)' : isRunning ? 'var(--primary)' : 'var(--warning)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -81,39 +75,16 @@ export default function ConfigPanelTab() {
         )}
       </div>
 
-      {/* Config Parameters */}
-      {Object.entries(categories).map(([cat, params]) => (
-        <div className="config-section" key={cat}>
-          <h3>{categoryLabels[cat] || cat}</h3>
-          {params.map(p => {
-            const editKey = `${p.category}.${p.key}`
-            const currentVal = edits[editKey] !== undefined ? edits[editKey] : p.value
-            return (
-              <div className="config-row" key={p.key}>
-                <label title={p.description || ''}>
-                  {p.description || p.key}
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  value={String(currentVal)}
-                  onChange={e => handleChange(p.category, p.key, e.target.value)}
-                />
-              </div>
-            )
-          })}
-        </div>
-      ))}
-
-      {Object.keys(edits).length > 0 && (
-        <div style={{ position: 'sticky', bottom: 0, padding: '1rem 0', background: 'var(--bg)' }}>
-          <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-            {saving ? 'Speichern...' : `${Object.keys(edits).length} Änderungen speichern`}
-          </button>
-          <button className="btn btn-secondary" onClick={() => setEdits({})} style={{ marginLeft: 8 }}>
-            Verwerfen
-          </button>
-        </div>
+      {loading && <p style={{ color: 'var(--text-muted)' }}>Parameter werden geladen …</p>}
+      {!loading && (
+        <ParameterTable
+          kommuneId={kommune.id}
+          parameters={parameters}
+          onUpdated={loadParameters}
+          grouped
+          catalog={catalog ?? undefined}
+          showExport={false}
+        />
       )}
     </div>
   )

@@ -124,8 +124,15 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
                 _last_pct[0] = pct
 
         progress = MonotonicProgress(update_progress)
+        from app.services import parameter_registry
+        from app.services.engine.override_context import set_overrides
+
+        overrides = parameter_registry.overrides_map(
+            parameter_registry.load_db_overrides(db, kommune_id)
+        )
+        set_overrides(overrides)
         results = run_full_assessment(
-            grid_cell_dicts, bundesland, population, area_km2, progress,
+            grid_cell_dicts, bundesland, population, area_km2, progress, overrides,
         )
 
         update_progress(FINALIZE[0], "Speichere Ergebnisse")
@@ -140,12 +147,21 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
 
         status.status = AssessmentStatus.DONE
         status.progress_pct = 100.0
-        status.message = f"Fertig – {len(results)} Zellen berechnet"
         status.finished_at = datetime.utcnow()
+        finished_iso = status.finished_at.isoformat()
+        status.message = f"100% – Abgeschlossen"
         status.eta_seconds = 0.0
         if _steps:
-            _steps[-1]["finished"] = status.finished_at.isoformat()
-            _steps[-1]["pct_end"] = 100.0
+            _steps[-1]["finished"] = finished_iso
+            _steps[-1]["pct_end"] = round(FINALIZE[1], 1)
+        _steps.append({
+            "label": "Abgeschlossen",
+            "detail": f"{len(results)} Zellen berechnet",
+            "started": finished_iso,
+            "finished": finished_iso,
+            "pct_start": 100.0,
+            "pct_end": 100.0,
+        })
         status.step_history = list(_steps)
         db.commit()
         log.info("[TASK] Assessment DONE: %d Zellen", len(results))

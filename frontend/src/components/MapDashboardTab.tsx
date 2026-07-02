@@ -3,9 +3,13 @@ import { useStore } from '../store'
 import MapView from './MapView'
 import MeasureSidebar from './MeasureSidebar'
 import LayerPanel from './LayerPanel'
+import LayerInfoModal from './LayerInfoModal'
 
 export default function MapDashboardTab() {
-  const { kommune, selectedMeasure, catalog, loadCatalog, loadMeasures, activeLayer, setActiveLayer } = useStore()
+  const {
+    kommune, selectedMeasure, catalog, loadCatalog, loadMeasures,
+    activeLayer, setActiveLayer, infoLayer, setInfoLayer, requestConfigPanel,
+  } = useStore()
 
   useEffect(() => { loadCatalog().catch(() => {}) }, [])
 
@@ -44,6 +48,16 @@ export default function MapDashboardTab() {
         <MapView />
         {selectedMeasure && <MeasureSidebar />}
       </div>
+      {infoLayer && (
+        <LayerInfoModal
+          layer={infoLayer}
+          onClose={() => setInfoLayer(null)}
+          onOpenConfig={() => {
+            setInfoLayer(null)
+            requestConfigPanel()
+          }}
+        />
+      )}
     </div>
   )
 }

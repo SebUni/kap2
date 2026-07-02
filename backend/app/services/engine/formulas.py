@@ -114,8 +114,9 @@ DETAILED: dict[str, dict] = {
     "HEAT_WAVE": {
         "formula": "clamp(Heiße Tage + 1,5·UHI-ΔT ; 0…40)",
         "inputs": [
-            _i("hot_days", "Heiße Tage/Jahr (DWD)", EXTERN, "Tage", "regional"),
+            _i("hot_days", "Heiße Tage/Jahr (DWD)", EXTERN, "Tage", "cell"),
             _i("uhi_delta", "UHI-ΔT (OSM-Modell)", COMPUTED, "K", "cell"),
+            _i("uhi_weight", "UHI-Gewichtung", PARAM, "×", "const", 1.5),
         ],
     },
     "COLD_EXTREME": {
@@ -264,23 +265,35 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "ENERGY_INFRASTRUCTURE": {
-        "formula": "Gebäude · 0,012 + Industrie · 5",
+        "formula": "Punkte(power=*) + 0,5 · Leitungssegmente(power=line/cable/…)",
         "inputs": [
-            _i("bldg_count", "Gebäudeanzahl (OSM)", EXTERN, "", "cell"),
-            _i("industrial", "Industrieanteil (OSM)", COMPUTED, "", "computed", "industrial"),
+            _i("energy_infra_count", "Energieinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
         ],
     },
     "WATER_WASTEWATER_INFRA": {
-        "formula": "Gebäude · 0,008 + 0,2",
-        "inputs": [_i("bldg_count", "Gebäudeanzahl (OSM)", EXTERN, "", "cell")],
+        "formula": "Anzahl OSM Wasser-/Abwasseranlagen",
+        "inputs": [
+            _i("water_wastewater_count", "Wasser/Abwasser (OSM)", EXTERN, "Anzahl", "cell"),
+        ],
     },
     "TRANSPORT_HUBS": {
         "formula": "Straßenanteil · 18",
         "inputs": [_i("road_cov", "Straßenanteil (OSM)", EXTERN, "", "cell")],
     },
     "COMMUNICATION_INFRA": {
-        "formula": "Gebäude · 0,005",
-        "inputs": [_i("bldg_count", "Gebäudeanzahl (OSM)", EXTERN, "", "cell")],
+        "formula": "Anzahl OSM Mobilfunk-/Kommunikationsmasten",
+        "inputs": [
+            _i("communication_count", "Kommunikationsinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
+        ],
+    },
+    "HEALTHCARE_INFRASTRUCTURE": {
+        "formula": "100 · (0,5·prox(KH) + 0,35·prox(Arzt) + 0,15·prox(Apo))",
+        "inputs": [
+            _i("healthcare_access_score", "Erreichbarkeits-Score (OSM)", EXTERN, "", "cell"),
+            _i("dist_hospital_m", "Distanz Krankenhaus (OSM)", EXTERN, "m", "cell"),
+            _i("dist_doctor_m", "Distanz Arzt/Klinik (OSM)", EXTERN, "m", "cell"),
+            _i("dist_pharmacy_m", "Distanz Apotheke (OSM)", EXTERN, "m", "cell"),
+        ],
     },
     "INDUSTRIAL_COMMERCIAL_AREAS": {
         "formula": "Fläche(ha) · Industrieanteil",
@@ -400,8 +413,13 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "HEALTHCARE_ACCESS": {
-        "formula": "Regionaler Annahmewert",
-        "inputs": [_i("__const", "Gesundheitszugang (invers)", PARAM, "Index", "const", 40.0)],
+        "formula": "100 · (1 − (0,5·prox(KH) + 0,35·prox(Arzt) + 0,15·prox(Apo)))",
+        "inputs": [
+            _i("healthcare_access_score", "Erreichbarkeits-Score (OSM)", EXTERN, "", "cell"),
+            _i("dist_hospital_m", "Distanz Krankenhaus × 1,3 (OSM)", EXTERN, "m", "cell"),
+            _i("dist_doctor_m", "Distanz Arzt/Klinik × 1,3 (OSM)", EXTERN, "m", "cell"),
+            _i("dist_pharmacy_m", "Distanz Apotheke × 1,3 (OSM)", EXTERN, "m", "cell"),
+        ],
     },
     "WILDFIRE_SUSCEPTIBILITY": {
         "formula": "clamp(Wald · 100 · (0,5 + Trockenheit/2) ; 0…100)",
@@ -551,7 +569,7 @@ DETAILED: dict[str, dict] = {
 
 def _input_meta(inp: dict) -> dict:
     meta = {k: v for k, v in inp.items() if k in ("key", "label", "prov", "unit", "source", "coastal_only")}
-    if inp.get("source") == "const" and "value" in inp and inp["value"] is not None:
+    if inp.get("source") in ("const", "hev", "computed") and "value" in inp and inp["value"] is not None:
         meta["value"] = inp["value"]
     return meta
 
@@ -598,6 +616,97 @@ def _hev_meta(codes: list[str]) -> list[dict]:
             "spatial": m.get("spatial", False),
         })
     return out
+
+
+_PATHWAY_LABELS: dict[str, str] = {
+    "primary": "Hauptwirkungskette",
+    "aligned": "Parallele Wirkung",
+    "alternate_hazard": "Alternative Gefahr",
+    "alternate_exposure": "Alternative Betroffenheit",
+    "alternate_vulnerability": "Alternative Empfindlichkeit",
+    "compound_he": "Gefahr und Betroffenheit",
+    "compound_hv": "Gefahr und Empfindlichkeit",
+    "compound_ev": "Betroffenheit und Empfindlichkeit",
+}
+
+
+def _indicator_name(code: str) -> str:
+    return catalog.INDICATOR_BY_CODE.get(code, {}).get("name", code)
+
+
+def risk_pathway_meta(risk: dict) -> list[dict]:
+    """Wirkungsketten mit benannten H/E/V-Faktoren für Tooltip-Formeln."""
+    from app.data.pathway_descriptions import (
+        chain_label,
+        get_pathway_description,
+    )
+
+    risk_code = risk.get("code", "")
+    out: list[dict] = []
+    for p in catalog.build_pathways(risk):
+        h_name = _indicator_name(p["hazard"])
+        e_name = _indicator_name(p["exposure"])
+        v_name = _indicator_name(p["vulnerability"])
+        w = float(p["weight"])
+        type_label = _PATHWAY_LABELS.get(p["pathway_type"], p["pathway_type"])
+        cl = chain_label(h_name, e_name, v_name)
+        chain_description = get_pathway_description(
+            risk_code, p["hazard"], p["exposure"], p["vulnerability"],
+            p["pathway_type"], h_name, e_name, v_name,
+        )
+        out.append({
+            "type": p["pathway_type"],
+            "type_label": type_label,
+            "weight": w,
+            "hazard": p["hazard"],
+            "exposure": p["exposure"],
+            "vulnerability": p["vulnerability"],
+            "hazard_name": h_name,
+            "exposure_name": e_name,
+            "vulnerability_name": v_name,
+            "chain_description": chain_description,
+            "chain_label": cl,
+            "formula": (
+                f"{w:g}·Ĥ({h_name})·Ê({e_name})·V̂({v_name})"
+            ),
+        })
+    return out
+
+
+def risk_pathway_cell_breakdown(risk: dict, hev_norm: dict) -> dict:
+    """Zellbezogene Terme je Wirkungskette (Ĥ,Ê,V̂ als 0…100 wie in der Tabelle)."""
+    Hn = hev_norm["hazards"]
+    En = hev_norm["exposures"]
+    Vn = hev_norm["vulnerabilities"]
+    pathways: list[dict] = []
+    term_sum = 0.0
+    weight_sum = 0.0
+    for p in catalog.build_pathways(risk):
+        h = float(Hn.get(p["hazard"], 0.0))
+        e = float(En.get(p["exposure"], 0.0))
+        v = float(Vn.get(p["vulnerability"], 0.0))
+        w = float(p["weight"])
+        term = w * h * e * v
+        term_sum += term
+        weight_sum += w
+        pathways.append({
+            "type": p["pathway_type"],
+            "weight": w,
+            "hazard": p["hazard"],
+            "exposure": p["exposure"],
+            "vulnerability": p["vulnerability"],
+            "h_norm": round(h * 100.0, 2),
+            "e_norm": round(e * 100.0, 2),
+            "v_norm": round(v * 100.0, 2),
+            "term": round(term, 5),
+        })
+    index = round(100.0 * term_sum / weight_sum, 2) if weight_sum else 0.0
+    return {
+        "pathways": pathways,
+        "weight_sum": round(weight_sum, 2),
+        "term_sum": round(term_sum, 5),
+        "index": index,
+    }
 
 
 def _outcome_factor_meta(risk: dict) -> list[dict]:
@@ -651,15 +760,35 @@ def risk_recipe(risk: dict) -> dict:
     scale = risk.get("scale", "pop")
     unit = risk.get("outcome_unit", "")
     ref = float(risk.get("ref_value", 0.0))
+    pathways = risk_pathway_meta(risk)
+    weight_sum = round(sum(p["weight"] for p in pathways), 2) or 1.0
+    index_terms = " + ".join(p["formula"] for p in pathways)
+    formula_index = (
+        f"Index = 100 · ({index_terms}) / {weight_sum:g}"
+        if pathways
+        else "Index = 0"
+    )
     if scale == "pop":
-        outcome = f"{ref} · (Index/100) · (Einwohner/100.000)  →  {unit}"
+        outcome = (
+            f"Outcome = Referenz · (Index/100) · (Einwohner_zelle/100.000)"
+            f"  →  {unit}"
+        )
     elif scale == "area":
-        outcome = f"{ref} · (Index/100) · (Fläche/50 km²)  →  {unit}"
+        outcome = (
+            f"Outcome = Referenz · (Index/100) · (Zellfläche/50 km²)"
+            f"  →  {unit}"
+        )
     else:
-        outcome = f"{ref} · (Index/100)  →  {unit}"
+        outcome = f"Outcome = Referenz · (Index/100)  →  {unit}"
     return {
-        "formula_index": "100 · Σ(w · H · E · V) / Σ w_aktiv   (H,E,V normiert 0…1)",
+        "formula_index": formula_index,
+        "formula_index_header": (
+            f"Index = 100 · Σ(w·Ĥ·Ê·V̂) / Σw   "
+            f"(Σw = {weight_sum:g}, Ĥ/Ê/V̂ normiert 0…1)"
+        ),
         "formula_outcome": outcome,
+        "pathways": pathways,
+        "weight_sum": weight_sum,
         "hazards": _hev_meta(risk.get("hazards", [])),
         "exposures": _hev_meta(risk.get("exposures", [])),
         "vulnerabilities": _hev_meta(risk.get("vulnerabilities", [])),
