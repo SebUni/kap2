@@ -147,6 +147,7 @@ export default function MeasuresTableTab() {
                   <th>Handlungsfeld</th>
                   <th>Typ</th>
                   <th>Jahr</th>
+                  <th style={{ textAlign: 'right' }}>Anzahl</th>
                   <th style={{ textAlign: 'right' }}>Investition</th>
                   <th style={{ textAlign: 'right' }}>Unterhalt/Jahr</th>
                   <th style={{ textAlign: 'right' }}>Nutzen/Jahr</th>
@@ -164,6 +165,9 @@ export default function MeasuresTableTab() {
                       <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{fieldLabel(cluster, cat?.kang_field) || '–'}</td>
                       <td style={{ fontSize: '0.8rem' }}>{measureName(m.measure_type)}</td>
                       <td>{m.implementation_year || '–'}</td>
+                      <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>
+                        {imp?.unit_label != null ? `${imp.count ?? '–'} ${imp.unit_label}` : '–'}
+                      </td>
                       <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>{imp ? fmtCurrency(imp.investment_eur || 0) : '–'}</td>
                       <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>{imp ? fmtCurrency(imp.annual_maintenance_eur || 0) : '–'}</td>
                       <td style={{ textAlign: 'right', fontSize: '0.85rem', color: 'var(--success)' }}>{imp ? fmtCurrency(imp.annual_benefit_eur || 0) : '–'}</td>

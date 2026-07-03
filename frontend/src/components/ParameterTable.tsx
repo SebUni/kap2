@@ -126,8 +126,9 @@ export default function ParameterTable({
         <tbody>
           {parameters.map(p => {
             const editing = edits[p.id]
+            const notApplicable = p.applicable === false
             return (
-              <tr key={p.id} className={p.overridden ? 'overridden' : ''}>
+              <tr key={p.id} className={[p.overridden ? 'overridden' : '', notApplicable ? 'not-applicable' : ''].filter(Boolean).join(' ')}>
                 <td><span className="kap-param-cell-text" title={p.label}>{p.label}</span></td>
                 <td>
                   {editing ? (
@@ -142,7 +143,7 @@ export default function ParameterTable({
                       style={{ width: '100%', fontSize: '0.75rem' }}
                     />
                   ) : (
-                    <span>{String(p.value)}</span>
+                    <span>{notApplicable ? '—' : String(p.value)}</span>
                   )}
                 </td>
                 <td>{p.unit}</td>
@@ -159,8 +160,8 @@ export default function ParameterTable({
                       style={{ width: '100%', fontSize: '0.75rem' }}
                     />
                   ) : (
-                    <span className="kap-param-cell-text" title={p.custom_source || p.source || ''}>
-                      {p.custom_source || p.source}
+                    <span className="kap-param-cell-text" title={notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source || '')}>
+                      {notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source)}
                     </span>
                   )}
                 </td>
@@ -303,8 +304,9 @@ function ParameterRows({
     <>
       {params.map(p => {
         const editing = edits[p.id]
+        const notApplicable = p.applicable === false
         return (
-          <tr key={p.id} className={p.overridden ? 'overridden' : ''}>
+          <tr key={p.id} className={[p.overridden ? 'overridden' : '', notApplicable ? 'not-applicable' : ''].filter(Boolean).join(' ')}>
             <td><span className="kap-param-cell-text" title={p.label}>{p.label}</span></td>
             <td>
               {editing ? (
@@ -319,7 +321,7 @@ function ParameterRows({
                   style={{ width: '100%', fontSize: '0.75rem' }}
                 />
               ) : (
-                <span>{String(p.value)}</span>
+                <span>{notApplicable ? '—' : String(p.value)}</span>
               )}
             </td>
             <td>{p.unit}</td>
@@ -336,8 +338,8 @@ function ParameterRows({
                   style={{ width: '100%', fontSize: '0.75rem' }}
                 />
               ) : (
-                <span className="kap-param-cell-text" title={p.custom_source || p.source || ''}>
-                  {p.custom_source || p.source}
+                <span className="kap-param-cell-text" title={notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source || '')}>
+                  {notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source)}
                 </span>
               )}
             </td>

@@ -1590,6 +1590,15 @@ body {
   font-weight: 600;
 }
 
+.kap-param-table tr.not-applicable td {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.kap-param-table tr.not-applicable .kap-param-status {
+  opacity: 0.65;
+}
+
 .kap-param-error {
   color: #dc2626;
   font-size: 0.78rem;

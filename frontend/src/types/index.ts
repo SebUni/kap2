@@ -68,6 +68,27 @@ export interface Measure {
   created_at: string
 }
 
+export interface CostComponent {
+  param: string
+  label: string
+  unit_price: number
+  quantity: number
+  quantity_unit: string
+  amount_eur: number
+  source: string
+  overridden: boolean
+}
+
+export interface CostBlock {
+  total_eur: number
+  components: CostComponent[]
+}
+
+export interface CostBreakdown {
+  investment: CostBlock
+  annual_maintenance: CostBlock
+}
+
 export interface MeasureImpactSummary {
   measure_id: number
   measure_type?: string
@@ -78,6 +99,12 @@ export interface MeasureImpactSummary {
   investment_eur?: number
   annual_maintenance_eur?: number
   annual_benefit_eur?: number
+  count?: number
+  count_is_default?: boolean
+  recommended_count?: number
+  unit_label?: string | null
+  unit_factor?: number
+  cost_breakdown?: CostBreakdown
   message?: string
 }
 
@@ -258,6 +285,7 @@ export interface ModelParameter {
   editable: boolean
   overridden: boolean
   custom_source?: string | null
+  applicable?: boolean
 }
 
 export interface ResolvedInput {
@@ -317,10 +345,16 @@ export interface CatalogMeasure {
   linked_risk_codes: string[]
   default_reduction: number
   coverage_scaling: string
-  cost_per_m2: number
-  cost_per_unit: number
-  maintenance_per_m2_year: number
+  cost_fixed: number | null
+  cost_per_m2: number | null
+  cost_per_unit: number | null
+  maintenance_per_m2_year: number | null
+  maintenance_per_unit_year: number | null
   benefit_per_m2_year: number
+  unit_label: string | null
+  unit_density_per_ha: number | null
+  source: string
+  sources?: Record<string, string>
   kang_cluster?: string
   kang_field?: string
 }

@@ -9,6 +9,8 @@ export default function MeasureSidebar() {
   const [loading, setLoading] = useState(false)
   const [editName, setEditName] = useState('')
   const [editYear, setEditYear] = useState<number>(2026)
+  const [editCount, setEditCount] = useState<number | null>(null)
+  const [showBreakdown, setShowBreakdown] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
 
@@ -16,11 +18,16 @@ export default function MeasureSidebar() {
     if (selectedMeasure) {
       setEditName(selectedMeasure.name)
       setEditYear(selectedMeasure.implementation_year || 2026)
+      setEditCount(null)
+      setShowBreakdown(false)
       setDirty(false)
       setImpact(null)
       setLoading(true)
       calculateImpact(selectedMeasure.id)
-        .then(r => setImpact(r))
+        .then(r => {
+          setImpact(r)
+          if (r.unit_label != null && r.count != null) setEditCount(r.count)
+        })
         .catch(() => {})
         .finally(() => setLoading(false))
     } else {
@@ -44,7 +51,11 @@ export default function MeasureSidebar() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const updated = await updateMeasure(selectedMeasure.id, { name: editName, implementation_year: editYear })
+      const payload: Record<string, unknown> = { name: editName, implementation_year: editYear }
+      if (impact?.unit_label != null && editCount != null) {
+        payload.config = { ...(selectedMeasure.config || {}), count: editCount }
+      }
+      const updated = await updateMeasure(selectedMeasure.id, payload)
       setSelectedMeasure(updated)
       setDirty(false)
       setLoading(true)
@@ -130,10 +141,41 @@ export default function MeasureSidebar() {
                 <span style={{ color: 'var(--success)' }}>−{impact.avg_index_reduction_pct.toFixed(1)} %</span>
               </div>
             )}
+            {impact.unit_factor != null && impact.unit_factor < 1 && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4 }}>
+                Wirkung auf {Math.round(impact.unit_factor * 100)}% skaliert ({impact.count} von {impact.recommended_count} {impact.unit_label})
+              </div>
+            )}
           </div>
 
+          {impact.unit_label != null && (
+            <div className="card">
+              <h3>
+                Anzahl ({impact.unit_label})
+                {impact.count_is_default && (
+                  <span className="kap-prov-badge" style={{ marginLeft: 8 }}>Anzahl = Richtwert</span>
+                )}
+              </h3>
+              <input
+                type="number" min={0} value={editCount ?? ''}
+                onChange={e => { setEditCount(e.target.value === '' ? null : parseInt(e.target.value, 10) || 0); setDirty(true) }}
+                style={{ fontSize: '0.9rem', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 6px', width: 80, background: 'var(--surface)' }}
+              />
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                Richtwert: {impact.recommended_count}
+              </div>
+            </div>
+          )}
+
           <div className="card">
-            <h3>Kosten</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              Kosten
+              <InfoTooltip
+                title="Kosten"
+                description="Investition und Unterhalt ergeben sich aus Anzahl/Fläche × Katalog-Einheitspreisen."
+                note="Enthält ggf. kommunale Override-Preise – Details unter „Herleitung anzeigen“."
+              />
+            </h3>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
               <span style={{ color: 'var(--text-muted)' }}>Investition</span>
               <span>{fmtEur(impact.investment_eur)}</span>
@@ -142,6 +184,38 @@ export default function MeasureSidebar() {
               <span style={{ color: 'var(--text-muted)' }}>Unterhalt/Jahr</span>
               <span>{fmtEur(impact.annual_maintenance_eur)}</span>
             </div>
+
+            {impact.cost_breakdown && (
+              <>
+                <button
+                  type="button" className="btn btn-secondary btn-sm" style={{ marginTop: 6 }}
+                  onClick={() => setShowBreakdown(v => !v)}
+                >
+                  {showBreakdown ? 'Herleitung ausblenden' : 'Herleitung anzeigen'}
+                </button>
+                {showBreakdown && (
+                  <div style={{ marginTop: 6, fontSize: '0.75rem' }}>
+                    {(['investment', 'annual_maintenance'] as const).map(blockKey => (
+                      <div key={blockKey} style={{ marginBottom: 6 }}>
+                        <div style={{ fontWeight: 600, color: 'var(--text-muted)' }}>
+                          {blockKey === 'investment' ? 'Investition' : 'Unterhalt/Jahr'}
+                        </div>
+                        {impact.cost_breakdown![blockKey].components.map((c, i) => (
+                          <div key={i} style={{ padding: '2px 0', borderBottom: '1px solid var(--border)' }}>
+                            <div>
+                              {c.quantity.toLocaleString('de-DE')} × {c.unit_price.toLocaleString('de-DE')} €/{c.quantity_unit}
+                              {' = '}{c.amount_eur.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}
+                              {c.overridden && <span className="kap-prov-badge" style={{ marginLeft: 6 }}>Override</span>}
+                            </div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.68rem' }}>{c.source}</div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           <div className="card" style={{ borderColor: 'var(--primary)' }}>

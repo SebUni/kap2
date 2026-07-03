@@ -688,6 +688,7 @@ function MeasureCreateModal({ onClose }: { onClose: () => void }) {
   const [measureCode, setMeasureCode] = useState('')
   const [implYear, setImplYear] = useState(2026)
   const [saving, setSaving] = useState(false)
+  const [count, setCount] = useState<number | null>(null)
 
   const activeCluster = clusters.find(c => c.code === clusterCode)
 
@@ -729,6 +730,13 @@ function MeasureCreateModal({ onClose }: { onClose: () => void }) {
   }, [drawnGeometry])
   const polyAreaHa = polyArea / 10000
 
+  const recommendedCount = useMemo(() => {
+    if (!current || current.unit_label == null) return null
+    return Math.max(1, Math.round((current.unit_density_per_ha ?? 0) * polyAreaHa))
+  }, [current, polyAreaHa])
+
+  useEffect(() => { setCount(recommendedCount) }, [measureCode])
+
   const autoName = useMemo(() => {
     const label = current?.name || measureCode
     const existing = measures.filter(m => m.measure_type === measureCode).length + 1
@@ -747,7 +755,7 @@ function MeasureCreateModal({ onClose }: { onClose: () => void }) {
         name: name || autoName,
         measure_type: measureCode,
         geometry_geojson: drawnGeometry,
-        config: {},
+        config: current?.unit_label != null ? { count: count ?? recommendedCount ?? 1 } : {},
         implementation_year: implYear,
       })
       await calculateImpact(measure.id)
@@ -840,6 +848,39 @@ function MeasureCreateModal({ onClose }: { onClose: () => void }) {
           )}
         </div>
       )}
+
+      {current?.unit_label != null && (
+        <div className="form-group">
+          <label>Anzahl ({current.unit_label})</label>
+          <input
+            type="number" min={0} value={count ?? ''}
+            onChange={e => setCount(e.target.value === '' ? null : parseInt(e.target.value, 10) || 0)}
+          />
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
+            Richtwert: {recommendedCount} {current.unit_label}
+            {current.unit_density_per_ha != null && ` (Dichte ${current.unit_density_per_ha}/ha × ${polyAreaHa.toFixed(2)} ha)`}
+          </div>
+        </div>
+      )}
+
+      {current && (() => {
+        const c = count ?? recommendedCount ?? 0
+        const parts: { label: string; amount: number }[] = []
+        if (current.cost_fixed != null) parts.push({ label: 'Fixkosten', amount: current.cost_fixed })
+        if (current.cost_per_unit != null && current.unit_label != null)
+          parts.push({ label: `${c} × ${current.cost_per_unit.toLocaleString('de-DE')} €/${current.unit_label}`, amount: c * current.cost_per_unit })
+        if (current.cost_per_m2 != null)
+          parts.push({ label: `${Math.round(polyArea)} m² × ${current.cost_per_m2.toLocaleString('de-DE')} €/m²`, amount: polyArea * current.cost_per_m2 })
+        if (!parts.length) return null
+        const total = parts.reduce((s, p) => s + p.amount, 0)
+        return (
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+            <strong>Kostenschätzung (Katalogwerte, vorläufig):</strong>{' '}
+            {total.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}
+            {parts.map((p, i) => <div key={i} style={{ marginLeft: 8 }}>· {p.label}</div>)}
+          </div>
+        )
+      })()}
 
       <div className="form-group">
         <label>Name</label>
