@@ -32,31 +32,161 @@ from app.services.engine import risk_engine
 log = logging.getLogger(__name__)
 
 
-def _coverage(db: Session, measure: AdaptationMeasure) -> dict[int, float]:
-    """Deckungsgrad (0..1) je Zelle für eine Maßnahmen-Geometrie."""
+def _coverage(db: Session, measure: AdaptationMeasure) -> tuple[dict[int, float], float]:
+    """Deckungsgrad (0..1) je Zelle plus abgedeckte Gesamtfläche (m²).
+
+    Die Fläche wird als Σ (cell_size_m² · frac) über alle schneidenden Zellen
+    bestimmt; die 3857-Verzerrung kürzt sich im frac-Verhältnis heraus. Sie wird
+    hier zentral berechnet, weil sowohl die Kosten- als auch die Wirkungs-
+    skalierung (unit_factor) die Gesamtfläche vor der Zell-Schleife brauchen.
+    """
     cell_area = func.ST_Area(func.ST_Transform(GridCell.geometry, 3857))
     inter = func.ST_Area(func.ST_Transform(
         func.ST_Intersection(GridCell.geometry, measure.geometry), 3857))
     frac = case((cell_area > 0, inter / cell_area), else_=literal(0.0))
     rows = (
-        db.query(GridCell.id, frac.label("frac"))
+        db.query(GridCell.id, GridCell.cell_size_m, frac.label("frac"))
         .filter(GridCell.kommune_id == measure.kommune_id,
                 func.ST_Intersects(GridCell.geometry, measure.geometry))
         .all()
     )
-    return {r.id: max(0.0, min(1.0, float(r.frac))) for r in rows}
+    frac_map: dict[int, float] = {}
+    covered_area_m2 = 0.0
+    for r in rows:
+        f = max(0.0, min(1.0, float(r.frac)))
+        frac_map[r.id] = f
+        size = float(r.cell_size_m or 100)
+        covered_area_m2 += (size ** 2) * f
+    return frac_map, covered_area_m2
 
 
-def _reduction_factor(mdef: dict, fraction: float) -> float:
-    """Kombinierter Skalierungsfaktor (0..1) für den Risiko-Index einer Zelle."""
+def _reduction_factor(mdef: dict, fraction: float, unit_factor: float = 1.0) -> float:
+    """Kombinierter Skalierungsfaktor (0..1) für den Risiko-Index einer Zelle.
+
+    ``unit_factor`` (0..1) skaliert die Wirkung von Stück-Maßnahmen anhand der
+    Anzahl gegenüber dem Richtwert (min(1, Anzahl/Richtwert)); für Flächen-
+    maßnahmen ist er 1.0 und lässt die bisherige Rechnung unverändert.
+    """
     base_r = float(mdef.get("default_reduction", 0.0))
     if mdef.get("coverage_scaling") == "saturating":
         r = base_r * min(1.0, fraction * 1.5)
     else:
         r = base_r * fraction
+    r = r * unit_factor
     r = max(0.0, min(0.95, r))
     n = max(1, len(mdef.get("effect_target", []) or []))
     return (1.0 - r) ** n
+
+
+def _resolve_count(
+    mdef: dict, config: dict | None, covered_area_m2: float
+) -> tuple[int, bool, int]:
+    """Stückzahl, Default-Flag und Richtwert-Anzahl einer Maßnahme.
+
+    Flächenmaßnahmen (``unit_label`` is None) haben keine Stück-Logik ⇒
+    (0, False, 0). Fehlt ``config["count"]``, greift die Richtwert-Anzahl aus der
+    Dichte als Default (``is_default=True``), damit Bestandsmaßnahmen ohne
+    Frontend-Eingabe weiter sinnvoll rechnen.
+    """
+    if mdef.get("unit_label") is None:
+        return 0, False, 0
+    density = float(mdef.get("unit_density_per_ha") or 0.0)
+    recommended = max(1, round(density * covered_area_m2 / 10_000))
+    raw = (config or {}).get("count")
+    if raw is None:
+        return recommended, True, recommended
+    return max(0, int(round(float(raw)))), False, recommended
+
+
+def _unit_effect_factor(count: int, recommended_count: int) -> float:
+    """Wirkungs-Skalierung 0..1 aus Anzahl vs. Richtwert (1.0 ohne Stück-Logik)."""
+    if recommended_count > 0:
+        return min(1.0, count / recommended_count)
+    return 1.0
+
+
+# Kostenkomponenten je Block. quantity_kind: fixed = Pauschale (Menge 1),
+# unit = Stückzahl (Einheit = unit_label), area = Fläche (Einheit m²).
+_INVESTMENT_COMPONENTS: tuple[tuple[str, str, str], ...] = (
+    ("cost_fixed", "Fixkosten (Planung/Konzept)", "fixed"),
+    ("cost_per_unit", "Kosten je {unit}", "unit"),
+    ("cost_per_m2", "Kosten je m²", "area"),
+)
+_MAINTENANCE_COMPONENTS: tuple[tuple[str, str, str], ...] = (
+    ("maintenance_per_unit_year", "Unterhalt je {unit} und Jahr", "unit"),
+    ("maintenance_per_m2_year", "Unterhalt je m² und Jahr", "area"),
+)
+
+
+def _component_source(mdef: dict, field: str) -> tuple[str, bool]:
+    """(Quelle, overridden) einer Kostenkomponente.
+
+    Ein kommunaler ``custom_source``-Override hat Vorrang, sonst die per-Feld-
+    Quelle aus ``sources`` bzw. der Maßnahmen-Fallback ``source``.
+    """
+    custom = (mdef.get("custom_sources") or {}).get(field)
+    if custom:
+        return custom, True
+    source = (mdef.get("sources") or {}).get(field) or mdef.get("source") or ""
+    return source, False
+
+
+def compute_costs(mdef: dict, count: int, area_m2: float) -> dict:
+    """Kosten-Rohdaten (investment + annual_maintenance) mit Komponenten-Breakdown.
+
+    Investition = cost_fixed + count·cost_per_unit + area·cost_per_m2,
+    Unterhalt/a = count·maintenance_per_unit_year + area·maintenance_per_m2_year.
+    Nur Komponenten, deren Katalogfeld ``is not None`` ist, tauchen auf; ``0.0``
+    gilt als anwendbar (z. B. kostenlose Bauverbote). Jede Komponente trägt
+    Einzelpreis, Menge, Betrag und Quelle inkl. Override-Flag.
+    """
+    unit_label = mdef.get("unit_label") or "Einheit"
+
+    def _block(specs: tuple[tuple[str, str, str], ...]) -> dict:
+        components: list[dict] = []
+        total = 0.0
+        for field, label_tpl, kind in specs:
+            unit_price = mdef.get(field)
+            if unit_price is None:
+                continue
+            unit_price = float(unit_price)
+            if kind == "unit":
+                quantity, quantity_unit = count, unit_label
+            elif kind == "area":
+                quantity, quantity_unit = round(float(area_m2), 2), "m²"
+            else:  # fixed
+                quantity, quantity_unit = 1, "pauschal"
+            amount = round(unit_price * quantity, 2)
+            total += amount
+            source, overridden = _component_source(mdef, field)
+            components.append({
+                "param": field,
+                "label": label_tpl.format(unit=unit_label),
+                "unit_price": unit_price,
+                "quantity": quantity,
+                "quantity_unit": quantity_unit,
+                "amount_eur": amount,
+                "source": source,
+                "overridden": overridden,
+            })
+        return {"total_eur": round(total, 2), "components": components}
+
+    return {
+        "investment": _block(_INVESTMENT_COMPONENTS),
+        "annual_maintenance": _block(_MAINTENANCE_COMPONENTS),
+    }
+
+
+def _measure_custom_sources(db_overrides: list[dict], measure_code: str) -> dict[str, str]:
+    """Per-Feld ``custom_source``-Overrides einer Maßnahme (measures.<code>.<field>)."""
+    prefix = f"measures.{measure_code}."
+    out: dict[str, str] = {}
+    for o in db_overrides:
+        pid = o.get("parameter_id") or ""
+        cs = o.get("custom_source")
+        if cs and pid.startswith(prefix):
+            out[pid[len(prefix):]] = cs
+    return out
 
 
 def compute_impact(db: Session, measure_id: int) -> dict:
@@ -70,16 +200,20 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     if not mdef:
         raise ValueError(f"Unbekannter Maßnahmentyp: {measure.measure_type}")
 
-    overrides = parameter_registry.overrides_map(
-        parameter_registry.load_db_overrides(db, measure.kommune_id)
-    )
+    db_overrides = parameter_registry.load_db_overrides(db, measure.kommune_id)
+    overrides = parameter_registry.overrides_map(db_overrides)
     mdef = parameter_registry.resolve_measure_def(mdef, overrides)
+    mdef = {**mdef, "custom_sources": _measure_custom_sources(db_overrides, measure.measure_type)}
 
-    coverage = _coverage(db, measure)
+    coverage, covered_area_m2 = _coverage(db, measure)
     if not coverage:
         db.query(MeasureImpact).filter(MeasureImpact.measure_id == measure_id).delete()
         db.commit()
         return {"measure_id": measure_id, "affected_cells": 0, "message": "Keine überlappenden Zellen"}
+
+    # Anzahl/Wirkungsskalierung brauchen die Gesamtfläche vor der Zell-Schleife.
+    count, count_is_default, recommended_count = _resolve_count(mdef, measure.config, covered_area_m2)
+    unit_factor = _unit_effect_factor(count, recommended_count)
 
     linked = mdef.get("linked_risk_codes", [])
     cell_ids = list(coverage.keys())
@@ -97,10 +231,8 @@ def compute_impact(db: Session, measure_id: int) -> dict:
             total_index_by_risk[code] = total_index_by_risk.get(code, 0.0) + \
                 float((ca.data or {}).get("risks", {}).get(code, {}).get("index", 0.0))
 
-    kommune = measure.kommune
     base_agg = get_risk_aggregate(db, measure.kommune_id, apply_measures=False)
 
-    covered_area_m2 = 0.0
     db.query(MeasureImpact).filter(MeasureImpact.measure_id == measure_id).delete()
 
     covered_base_index: dict[str, float] = {}
@@ -110,9 +242,7 @@ def compute_impact(db: Session, measure_id: int) -> dict:
         ca = assessments.get(cid)
         if not ca:
             continue
-        factor = _reduction_factor(mdef, frac)
-        cell_size = ca.grid_cell.cell_size_m if ca.grid_cell else 100
-        covered_area_m2 += (cell_size ** 2) * frac
+        factor = _reduction_factor(mdef, frac, unit_factor)
         deltas = {}
         for code in linked:
             base_idx = float((ca.data or {}).get("risks", {}).get(code, {}).get("index", 0.0))
@@ -123,10 +253,11 @@ def compute_impact(db: Session, measure_id: int) -> dict:
         db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid,
                              indicator_deltas=deltas, costs={}, savings={}))
 
-    # Kosten
-    investment = float(mdef.get("cost_per_unit", 0.0)) + float(mdef.get("cost_per_m2", 0.0)) * covered_area_m2
-    annual_maintenance = float(mdef.get("maintenance_per_m2_year", 0.0)) * covered_area_m2
-    annual_benefit_direct = float(mdef.get("benefit_per_m2_year", 0.0)) * covered_area_m2
+    # Kosten (Fix + Stück + Fläche; None-Felder erzeugen keine Komponente)
+    cost_breakdown = compute_costs(mdef, count, covered_area_m2)
+    investment = cost_breakdown["investment"]["total_eur"]
+    annual_maintenance = cost_breakdown["annual_maintenance"]["total_eur"]
+    annual_benefit_direct = float(mdef.get("benefit_per_m2_year") or 0.0) * covered_area_m2
 
     # Monetarisierte Schadensreduktion (nur monetäre Risiken)
     annual_benefit_damage = 0.0
@@ -145,7 +276,9 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     first_imp = db.query(MeasureImpact).filter(MeasureImpact.measure_id == measure_id).first()
     if first_imp:
         first_imp.costs = {"investment": round(investment, 2),
-                           "annual_maintenance": round(annual_maintenance, 2)}
+                           "annual_maintenance": round(annual_maintenance, 2),
+                           "count": count,
+                           "breakdown": cost_breakdown}
         first_imp.savings = {"annual_benefit_direct": round(annual_benefit_direct, 2),
                              "annual_benefit_damage": round(annual_benefit_damage, 2)}
 
@@ -167,6 +300,12 @@ def compute_impact(db: Session, measure_id: int) -> dict:
         "investment_eur": round(investment, 2),
         "annual_maintenance_eur": round(annual_maintenance, 2),
         "annual_benefit_eur": round(annual_benefit_direct + annual_benefit_damage, 2),
+        "count": count,
+        "count_is_default": count_is_default,
+        "recommended_count": recommended_count,
+        "unit_label": mdef.get("unit_label"),
+        "unit_factor": round(unit_factor, 4),
+        "cost_breakdown": cost_breakdown,
     }
 
 
@@ -179,7 +318,9 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
     if not apply_measures:
         return [dict(d) for d in base.values()]
 
-    # Maßnahmen-Faktoren je Zelle/Risiko (multiplikativ kombiniert)
+    # Maßnahmen-Faktoren je Zelle/Risiko (multiplikativ kombiniert). Fläche, Anzahl
+    # und unit_factor werden pro Maßnahme genauso bestimmt wie in compute_impact,
+    # damit Dashboard ("mit Maßnahmen") und Sidebar nicht divergieren.
     factors: dict[int, dict[str, float]] = {}
     measures = db.query(AdaptationMeasure).filter(
         AdaptationMeasure.kommune_id == kommune_id).all()
@@ -187,13 +328,15 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
         parameter_registry.load_db_overrides(db, kommune_id)
     )
     for m in measures:
-        base = catalog.MEASURES_BY_CODE.get(m.measure_type)
-        if not base:
+        mbase = catalog.MEASURES_BY_CODE.get(m.measure_type)
+        if not mbase:
             continue
-        mdef = parameter_registry.resolve_measure_def(base, overrides)
-        coverage = _coverage(db, m)
-        for cid, frac in coverage.items():
-            factor = _reduction_factor(mdef, frac)
+        mdef = parameter_registry.resolve_measure_def(mbase, overrides)
+        frac_map, covered_area_m2 = _coverage(db, m)
+        count, _, recommended = _resolve_count(mdef, m.config, covered_area_m2)
+        unit_factor = _unit_effect_factor(count, recommended)
+        for cid, frac in frac_map.items():
+            factor = _reduction_factor(mdef, frac, unit_factor)
             cell_factors = factors.setdefault(cid, {})
             for code in mdef.get("linked_risk_codes", []):
                 cell_factors[code] = cell_factors.get(code, 1.0) * factor
