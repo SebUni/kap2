@@ -461,7 +461,8 @@ RISKS: list[dict] = [
      "hazards": ["HEAT_WAVE", "COLD_EXTREME", "COMPOUND_EVENT"],
      "exposures": ["POPULATION_DENSITY", "VULNERABLE_GROUPS_POPULATION", "AGE_STRUCTURE"],
      "vulnerabilities": ["HEAT_SENSITIVITY", "HEALTHCARE_ACCESS", "VULNERABLE_GROUPS_SHARE"],
-     # Anker: ~18/100k Extrem bei Index=100; RKI-Hitzejahre ~4-11/100k (2018≈10,5) ⇒ typischer Index 20-40 liefert ~3,6-7,2/100k (statistikkonform).
+     # Herleitung: Worst-Case-Anker 18/100k bei Index=100 ≈ 1,7× schlimmstes beobachtetes Jahr (2018: ~8.700 Tote = 10,5/100k; RKI/Winklmayr 2022). Typische Kommune P90-Index 20-40 ⇒ 3,6-7,2/100k (statistikkonform, UBA GE-I-2).
+     # cost_per_outcome_eur: VSL-Punktwert 3,5 Mio € im gängigen EU/OECD-Band (~1-4 Mio); UBA MK3.1 nennt keinen einzelnen VSL-Wert (bewertet nur Luftschadstoff-/Lärmeffekte), daher Punktwert im Band statt exaktem UBA-Wert.
      "ref_value": 18.0, "scale": "pop", "cost_per_outcome_eur": 3500000.0, "source": "RKI 2022 / Winklmayr u.a. 2022 / UBA MK3.1 2020",
      "description": "Erwartete jährliche Mortalität durch klimatische Belastungen.",
      "priority": 1},
@@ -470,7 +471,7 @@ RISKS: list[dict] = [
      "hazards": ["HEAT_WAVE", "DROUGHT", "HEAVY_RAIN_FLOOD"],
      "exposures": ["POPULATION_DENSITY", "VULNERABLE_GROUPS_POPULATION"],
      "vulnerabilities": ["HEAT_SENSITIVITY", "DISEASE_VECTOR_SUSCEPTIBILITY", "HEALTHCARE_ACCESS"],
-     # Anker an Hitze-/Extremwetter-Morbiditätsraten UBA MK3.1; unbelegter Punktwert, editierbar.
+     # Modellannahme (Punktwert, editierbar): kalibriert gegen Größenordnung der UBA-MK3.1-Morbiditätskostensätze; keine belastbare nationale Pro-Kopf-Fallstatistik ⇒ als Annahme gekennzeichnet, nicht als Herleitung.
      "ref_value": 320.0, "scale": "pop", "cost_per_outcome_eur": 5000.0, "source": "UBA MK3.1 2020 / RKI JoHM",
      "description": "Erwartete jährliche Morbidität (Erkrankungen).", "priority": 1},
     {"code": "EXPECTED_ANNUAL_INJURIES", "name": "Erwartete jährliche Verletztenzahlen",
@@ -478,7 +479,7 @@ RISKS: list[dict] = [
      "hazards": ["HEAVY_RAIN_FLOOD", "EXTRATROPICAL_STORM", "LANDSLIDE"],
      "exposures": ["POPULATION_DENSITY", "LOCATION_HAZARD_ZONES"],
      "vulnerabilities": ["EMERGENCY_MANAGEMENT", "EARLY_WARNING_SYSTEMS"],
-     # Anker an Verletztenzahlen bei Extremereignissen (Sturm/Starkregen); unbelegter Punktwert, editierbar.
+     # Modellannahme (Punktwert, editierbar): Größenordnung Verletztenzahlen bei Extremereignissen (Sturm/Starkregen); keine belastbare nationale Pro-Kopf-Statistik ⇒ als Annahme gekennzeichnet.
      "ref_value": 45.0, "scale": "pop", "cost_per_outcome_eur": 12000.0, "source": "UBA MK3.1 2020 / RKI JoHM",
      "description": "Erwartete jährliche Verletztenzahlen durch Extremereignisse.", "priority": 2},
     {"code": "EXPECTED_ANNUAL_MENTAL_HEALTH", "name": "Psychische Belastungsfälle",
@@ -486,7 +487,7 @@ RISKS: list[dict] = [
      "hazards": ["HEAT_WAVE", "DROUGHT", "COMPOUND_EVENT", "CASCADE_EVENT"],
      "exposures": ["POPULATION_DENSITY", "VULNERABLE_GROUPS_POPULATION"],
      "vulnerabilities": ["INCOME_SOCIAL_RESILIENCE", "HEALTHCARE_ACCESS"],
-     # Anker an psychischen Belastungsfällen nach Extremwetterereignissen; unbelegter Punktwert, editierbar.
+     # Modellannahme (Punktwert, editierbar): Größenordnung psychischer Belastungsfälle nach Extremwetter; keine belastbare nationale Pro-Kopf-Statistik ⇒ als Annahme gekennzeichnet.
      "ref_value": 150.0, "scale": "pop", "cost_per_outcome_eur": 4000.0, "source": "UBA MK3.1 2020 / RKI JoHM",
      "description": "Erwartete jährliche Fälle psychischer Belastung.", "priority": 2},
     {"code": "EXPECTED_ANNUAL_AFFECTED_EVACUATED", "name": "Betroffene/Evakuierte Personen",
@@ -494,7 +495,7 @@ RISKS: list[dict] = [
      "hazards": ["HEAVY_RAIN_FLOOD", "STORM_SURGE", "WILDFIRE"],
      "exposures": ["POPULATION_DENSITY", "LOCATION_HAZARD_ZONES", "COASTAL_STORM_SURGE_EXPOSURE"],
      "vulnerabilities": ["EMERGENCY_MANAGEMENT", "EARLY_WARNING_SYSTEMS"],
-     # Anker an Evakuierten-/Betroffenenzahlen bei Hochwasser/Sturmflut; unbelegter Punktwert, editierbar.
+     # Modellannahme (Punktwert, editierbar): Größenordnung Evakuierten-/Betroffenenzahlen bei Hochwasser/Sturmflut; keine belastbare nationale Pro-Kopf-Statistik ⇒ als Annahme gekennzeichnet.
      "ref_value": 800.0, "scale": "pop", "cost_per_outcome_eur": 2500.0, "source": "UBA MK3.1 2020 / RKI JoHM",
      "description": "Erwartete jährliche Zahl betroffener oder evakuierter Personen.", "priority": 1},
     {"code": "EXPECTED_THERMAL_STRESS_HOURS", "name": "Stunden thermischer Belastung",
@@ -518,63 +519,63 @@ RISKS: list[dict] = [
      "hazards": ["HEAT_WAVE", "HEAVY_RAIN_FLOOD", "EXTRATROPICAL_STORM"],
      "exposures": ["BUILDING_STOCK", "LOCATION_HAZARD_ZONES"],
      "vulnerabilities": ["BUILDING_STABILITY", "FINANCIAL_ADAPTATION_CAPACITY"],
-     # Sektorale Schadenskosten DE als Anker bei Index=100.
+     # Herleitung: nat. jährl. Gebäudeschäden (Hochwasser+Sturm/Hagel) ~3,5 Mrd €/J ÷ 832 (100k-Einw.-Einheiten DE) ≈ 4,2 Mio €/100k → 4,5 Mio bei Index=100. Prognos 2023: Ahr-Anteil Bauwesen+Privathaushalte 20,9 von 40,5 Mrd €.
      "ref_value": 4500000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Gebäudeschäden.", "priority": 1},
     {"code": "EXPECTED_TRANSPORT_DAMAGE_EUR", "name": "Schäden an Verkehrswegen",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["HEAT_WAVE", "HEAVY_RAIN_FLOOD", "DROUGHT"],
      "exposures": ["TRANSPORT_HUBS", "LOCATION_HAZARD_ZONES"],
      "vulnerabilities": ["MATERIAL_HEAT_SENSITIVITY", "CRITICAL_INFRA_CONDITION"],
-     # Sektorale Schadenskosten DE (Verkehrsinfrastruktur) als Anker bei Index=100.
+     # Herleitung: nat. jährl. Verkehrsinfrastruktur-Schäden ~1,5 Mrd €/J ÷ 832 ≈ 1,8 Mio €/100k bei Index=100. Prognos 2023: Ahr-Anteil Verkehr 6,8 von 40,5 Mrd € (~17%).
      "ref_value": 1800000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Schäden an Verkehrswegen.", "priority": 2},
     {"code": "EXPECTED_ENERGY_INFRA_DAMAGE_EUR", "name": "Schäden an Energieinfrastruktur",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["HEAT_WAVE", "EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD"],
      "exposures": ["ENERGY_INFRASTRUCTURE"],
      "vulnerabilities": ["CRITICAL_INFRA_CONDITION", "REDUNDANCY_BACKUP"],
-     # Sektorale Schadenskosten DE (Energieinfrastruktur) als Anker bei Index=100.
+     # Herleitung: nat. jährl. Energieinfrastruktur-Schäden ~0,75 Mrd €/J ÷ 832 ≈ 0,9 Mio €/100k bei Index=100. Prognos 2023 (Teilmenge Industrie/Infrastruktur der Extremwetterschäden).
      "ref_value": 900000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Schäden an Energieinfrastruktur.", "priority": 1},
     {"code": "EXPECTED_TELECOM_DAMAGE_EUR", "name": "Schäden an Telekommunikation",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD"],
      "exposures": ["COMMUNICATION_INFRA"],
      "vulnerabilities": ["CRITICAL_INFRA_CONDITION", "REDUNDANCY_BACKUP"],
-     # Sektorale Schadenskosten DE (Telekommunikation) als Anker bei Index=100.
+     # Herleitung: nat. jährl. Telekommunikationsschäden ~0,33 Mrd €/J ÷ 832 ≈ 0,4 Mio €/100k bei Index=100. Prognos 2023 (kleiner Infrastruktur-Teilbetrag).
      "ref_value": 400000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Schäden an Telekommunikationsinfrastruktur.", "priority": 2},
     {"code": "EXPECTED_WATER_WASTEWATER_DAMAGE_EUR", "name": "Schäden Wasser-/Abwasser",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["HEAVY_RAIN_FLOOD", "DROUGHT", "HEAT_WAVE"],
      "exposures": ["WATER_WASTEWATER_INFRA"],
      "vulnerabilities": ["CRITICAL_INFRA_CONDITION", "GROUNDWATER_DEPENDENCY"],
-     # Sektorale Schadenskosten DE (Wasser/Abwasser) als Anker bei Index=100.
+     # Herleitung: nat. jährl. Wasser-/Abwasserschäden ~0,58 Mrd €/J ÷ 832 ≈ 0,7 Mio €/100k bei Index=100. Prognos 2023: Ahr-Anteil Wasser/Hochwasser-/Küstenschutz 2,5 von 40,5 Mrd € + Dürre-Wasserkosten.
      "ref_value": 700000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Schäden an Wasser-/Abwassersystemen.", "priority": 1},
     {"code": "EXPECTED_AGRICULTURAL_DAMAGE_EUR", "name": "Landwirtschaftliche Schäden",
      "outcome_unit": "€/Jahr", "group": "drought", "cost_dimension": "monetary",
      "hazards": ["DROUGHT", "HEAT_WAVE", "HEAVY_RAIN_FLOOD"],
      "exposures": ["AGRICULTURAL_LAND"],
      "vulnerabilities": ["IRRIGATION_DEPENDENCY", "WATER_STRESS_INDEX", "SOIL_SENSITIVITY"],
-     # Sektorale Schadenskosten DE (Landwirtschaft) als Anker bei Index=100, flächenskaliert.
+     # Herleitung: nat. landwirtschaftl. Klimaschaden ~3,9 Mrd €/J (Hitze/Dürre 2018/19: ~7,8 Mrd € über 2 J) ÷ Ackerland-Einheiten (~166.000 km²/50 = 3.320) ≈ 1,2 Mio €/50 km² Ackerland; auf 2,2 Mio bei Index=100 (Worst-Case-Dürrejahr) angehoben. scale=area an Nutzfläche der Kommune. Prognos 2023.
      "ref_value": 2200000.0, "scale": "area", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche landwirtschaftliche Schäden / Ernteverluste.", "priority": 1},
     {"code": "EXPECTED_TOTAL_DAMAGE_EAD_EUR", "name": "Gesamtschäden (EAD)",
      "outcome_unit": "€/Jahr", "group": "compound", "cost_dimension": "monetary",
      "hazards": ["HEAT_WAVE", "HEAVY_RAIN_FLOOD", "DROUGHT", "EXTRATROPICAL_STORM"],
      "exposures": ["BUILDING_STOCK", "ENERGY_INFRASTRUCTURE", "AGRICULTURAL_LAND"],
      "vulnerabilities": ["BUILDING_STABILITY", "FINANCIAL_ADAPTATION_CAPACITY", "CRITICAL_INFRA_CONDITION"],
-     # Gesamtschadenssumme (EAD) als Anker bei Index=100, Summe der Sektorschäden plausibilisiert.
-     "ref_value": 8000000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Gesamtschäden (Expected Annual Damage).", "priority": 1},
+     # Herleitung: nat. jährl. Gesamtschaden (EAD) ~8 Mrd €/J ÷ 832 ≈ 9,6 Mio €/100k → 10 Mio bei Index=100. Prognos 2023: seit 2000 ≥70 Mrd € Hochwasser + 35 Mrd € Hitze/Dürre 2018/19; Einzeljahr wie 2021 ~40 Mrd €.
+     "ref_value": 10000000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Gesamtschäden (Expected Annual Damage).", "priority": 1},
     {"code": "EXPECTED_RESTORATION_COSTS_EUR", "name": "Wiederherstellungskosten",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["HEAVY_RAIN_FLOOD", "EXTRATROPICAL_STORM", "WILDFIRE"],
      "exposures": ["BUILDING_STOCK", "FOREST_AREA", "ENERGY_INFRASTRUCTURE"],
      "vulnerabilities": ["FINANCIAL_ADAPTATION_CAPACITY", "PLANNING_IMPLEMENTATION_CAPACITY"],
-     # Sektorale Wiederherstellungskosten als Anker bei Index=100.
+     # Herleitung: Wiederherstellungskosten als Teilmenge des EAD ~1,25 Mrd €/J ÷ 832 ≈ 1,5 Mio €/100k bei Index=100 (Prognos 2023, Reparatur-/Wiederaufbauanteil der Sektorschäden).
      "ref_value": 1500000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Wiederherstellungskosten.", "priority": 2},
     {"code": "EXPECTED_SOIL_LOSS_DEGRADATION_EUR", "name": "Bodenverluste / -degradation (€)",
      "outcome_unit": "€/Jahr", "group": "drought", "cost_dimension": "monetary",
      "hazards": ["DROUGHT", "HEAVY_RAIN_FLOOD", "SOIL_SALINIZATION"],
      "exposures": ["EROSION_PRONE_SOILS", "AGRICULTURAL_LAND"],
      "vulnerabilities": ["SOIL_SENSITIVITY", "IRRIGATION_DEPENDENCY"],
-     # Sektorale Schadenskosten DE (Bodenverlust) als Anker bei Index=100, flächenskaliert.
+     # Herleitung: Bodenverlust-/Erosionskosten ~2 Mrd €/J ÷ 3.320 Ackerland-Einheiten (50 km²) ≈ 0,6 Mio €/50 km² bei Index=100. scale=area an Nutzfläche der Kommune. Prognos 2023 (Teilbetrag Landwirtschaft/Boden).
      "ref_value": 600000.0, "scale": "area", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Bodenverluste / Bodendegradation.", "priority": 2},
     {"code": "EXPECTED_CI_OUTAGE_HOURS", "name": "Ausfallzeiten kritischer Infrastruktur",
      "outcome_unit": "Stunden/Jahr", "group": "compound", "cost_dimension": "operational",
@@ -651,28 +652,28 @@ RISKS: list[dict] = [
      "hazards": ["MEAN_TEMPERATURE_RISE", "DROUGHT", "WILDFIRE"],
      "exposures": ["BIODIVERSITY_HOTSPOTS", "FOREST_AREA"],
      "vulnerabilities": ["BIODIVERSITY_RESILIENCE", "WILDFIRE_SUSCEPTIBILITY"],
-     # BfN/UBA-Naturschutz-Monitoring als Anker; unbelegter Punktwert, editierbar.
+     # Modellannahme (mangels flächendeckender Monitoring-Rohdaten): ~5 Arten/50 km² bei Index=100, an BfN/UBA-Naturschutz-Größenordnung gehängt; Punktwert, editierbar.
      "ref_value": 5.0, "scale": "area", "source": "BfN / UBA (Modellannahme)", "description": "Erwarteter jährlicher Biodiversitätsverlust.", "priority": 2},
     {"code": "EXPECTED_HABITAT_LOSS", "name": "Habitatverlust",
      "outcome_unit": "ha/Jahr", "group": "gradual", "cost_dimension": "environment",
      "hazards": ["DROUGHT", "WILDFIRE", "SEA_LEVEL_RISE"],
      "exposures": ["BIODIVERSITY_HOTSPOTS", "COASTAL_RIPARIAN_ZONES", "FOREST_AREA"],
      "vulnerabilities": ["BIODIVERSITY_RESILIENCE", "EROSION_SUSCEPTIBILITY"],
-     # BfN/UBA-Naturschutz-Monitoring (Habitatverlust) als Anker; unbelegter Punktwert, editierbar.
+     # Modellannahme (mangels flächendeckender Monitoring-Rohdaten): ~8 ha/50 km² bei Index=100, an BfN/UBA-Habitatverlust-Größenordnung gehängt; Punktwert, editierbar.
      "ref_value": 8.0, "scale": "area", "source": "BfN / UBA (Modellannahme)", "description": "Erwarteter jährlicher Habitatverlust.", "priority": 2},
     {"code": "EXPECTED_SOIL_DEGRADATION", "name": "Bodenverschlechterung",
      "outcome_unit": "ha/Jahr", "group": "drought", "cost_dimension": "environment",
      "hazards": ["DROUGHT", "HEAVY_RAIN_FLOOD", "SOIL_SALINIZATION"],
      "exposures": ["EROSION_PRONE_SOILS", "AGRICULTURAL_LAND"],
      "vulnerabilities": ["SOIL_SENSITIVITY", "IRRIGATION_DEPENDENCY"],
-     # BfN/UBA-Bodenmonitoring als Anker; unbelegter Punktwert, editierbar.
+     # Modellannahme (mangels flächendeckender Monitoring-Rohdaten): ~12 ha/50 km² bei Index=100, an BfN/UBA-Bodenmonitoring-Größenordnung gehängt; Punktwert, editierbar.
      "ref_value": 12.0, "scale": "area", "source": "BfN / UBA (Modellannahme)", "description": "Erwartete jährliche Bodenverschlechterung.", "priority": 2},
     {"code": "EXPECTED_VEGETATION_DAMAGE", "name": "Vegetationsschäden",
      "outcome_unit": "ha/Jahr", "group": "drought", "cost_dimension": "environment",
      "hazards": ["DROUGHT", "HEAT_WAVE", "WILDFIRE"],
      "exposures": ["FOREST_AREA", "AGRICULTURAL_LAND"],
      "vulnerabilities": ["WILDFIRE_SUSCEPTIBILITY", "WATER_STRESS_INDEX"],
-     # BfN/UBA-Vegetationsmonitoring als Anker; unbelegter Punktwert, editierbar.
+     # Modellannahme (mangels flächendeckender Monitoring-Rohdaten): ~15 ha/50 km² bei Index=100, an BfN/UBA-Vegetationsmonitoring-Größenordnung gehängt; Punktwert, editierbar.
      "ref_value": 15.0, "scale": "area", "source": "BfN / UBA (Modellannahme)", "description": "Erwartete Vegetationsschäden.", "priority": 2},
     {"code": "HYDROLOGICAL_STRESS_RISK_INDEX", "name": "Risiko hydrologischer Belastungen",
      "outcome_unit": "Index", "group": "drought", "cost_dimension": "operational",
@@ -707,42 +708,42 @@ RISKS: list[dict] = [
      "hazards": ["DROUGHT", "HEAVY_RAIN_FLOOD", "SEA_LEVEL_RISE"],
      "exposures": ["FOREST_AREA", "GROUNDWATER_DEPENDENT_ECOSYSTEMS", "FLOODPLAINS"],
      "vulnerabilities": ["BIODIVERSITY_RESILIENCE", "GREEN_SPACE_SHARE"],
-     # Ökosystemleistungswert (Prognos/GWS/IÖW-Kategorie Umwelt) als Anker, flächenskaliert.
+     # Herleitung: Verlust an Ökosystemleistungen (Wald-/Gewässerfunktionen) ~5,7 Mrd €/J ÷ 7.152 Flächen-Einheiten (357.600 km²/50) ≈ 0,8 Mio €/50 km² bei Index=100. scale=area an Kommunefläche. Prognos 2023 (Kategorie Umwelt/Forst; Waldsterben 2018/19).
      "ref_value": 800000.0, "scale": "area", "source": "Prognos/GWS/IÖW 2023", "description": "Erwarteter Verlust von Ökosystemleistungen.", "priority": 2},
     {"code": "EXPECTED_INDIRECT_ECONOMIC_LOSS_EUR", "name": "Indirekte wirtschaftliche Verluste",
      "outcome_unit": "€/Jahr", "group": "compound", "cost_dimension": "monetary",
      "hazards": ["CASCADE_EVENT", "COMPOUND_EVENT", "DROUGHT"],
      "exposures": ["INDUSTRIAL_COMMERCIAL_AREAS", "SUPPLY_CHAIN_NODES"],
      "vulnerabilities": ["SUPPLY_CHAIN_DEPENDENCY", "FINANCIAL_ADAPTATION_CAPACITY"],
-     # Sektorale Schadenskosten DE (indirekte Verluste) als Anker bei Index=100.
+     # Herleitung: indirekte Folgeschäden (Lieferketten/Produktivität) ~1,0 Mrd €/J ÷ 832 ≈ 1,2 Mio €/100k bei Index=100. Prognos 2023: indirekter Anteil ~18% (Ahr 7,1 von 40,5 Mrd €).
      "ref_value": 1200000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete indirekte wirtschaftliche Verluste.", "priority": 2},
     {"code": "EXPECTED_SUPPLY_SHORTAGE_COSTS_EUR", "name": "Kosten Versorgungsengpässe",
      "outcome_unit": "€/Jahr", "group": "drought", "cost_dimension": "monetary",
      "hazards": ["DROUGHT", "CASCADE_EVENT", "HEAT_WAVE"],
      "exposures": ["SUPPLY_CHAIN_NODES", "AGRICULTURAL_LAND"],
      "vulnerabilities": ["SUPPLY_CHAIN_DEPENDENCY", "WATER_STRESS_INDEX"],
-     # Sektorale Schadenskosten DE (Versorgungsengpässe) als Anker bei Index=100.
+     # Herleitung: Versorgungsengpass-Kosten (Dürre/Kaskaden) ~0,5 Mrd €/J ÷ 832 ≈ 0,6 Mio €/100k bei Index=100 (Prognos 2023, Teilbetrag indirekter wirtschaftlicher Folgen).
      "ref_value": 600000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete Kosten durch Versorgungsengpässe.", "priority": 2},
     {"code": "EXPECTED_CLIMATE_MIGRATION_COSTS_EUR", "name": "Kosten klimabedingter Migration",
      "outcome_unit": "€/Jahr", "group": "compound", "cost_dimension": "monetary",
      "hazards": ["DROUGHT", "SEA_LEVEL_RISE", "HEAVY_RAIN_FLOOD"],
      "exposures": ["POPULATION_DENSITY", "COASTAL_STORM_SURGE_EXPOSURE"],
      "vulnerabilities": ["INCOME_SOCIAL_RESILIENCE", "FINANCIAL_ADAPTATION_CAPACITY"],
-     # Sektorale Schadenskosten DE (Migration/Verdrängung) als Anker bei Index=100.
+     # Herleitung: Kosten klimabedingter Verdrängung/Migration ~0,33 Mrd €/J ÷ 832 ≈ 0,4 Mio €/100k bei Index=100 (Prognos 2023, kleiner Teilbetrag; national gering, editierbar).
      "ref_value": 400000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete Kosten klimabedingter Migration / Verdrängung.", "priority": 3},
     {"code": "EXPECTED_LOCATION_DISADVANTAGE_EUR", "name": "Wirtschaftliche Standortnachteile",
      "outcome_unit": "€/Jahr", "group": "compound", "cost_dimension": "monetary",
      "hazards": ["HEAT_WAVE", "DROUGHT", "HEAVY_RAIN_FLOOD"],
      "exposures": ["INDUSTRIAL_COMMERCIAL_AREAS", "LOCATION_HAZARD_ZONES"],
      "vulnerabilities": ["SINGLE_SITE_DEPENDENCY", "FINANCIAL_ADAPTATION_CAPACITY"],
-     # Sektorale Schadenskosten DE (Standortnachteile) als Anker bei Index=100.
+     # Herleitung: wirtschaftliche Standortnachteile ~0,42 Mrd €/J ÷ 832 ≈ 0,5 Mio €/100k bei Index=100 (Prognos 2023, Teilbetrag indirekter Standort-/Wettbewerbsfolgen).
      "ref_value": 500000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete wirtschaftliche Standortnachteile.", "priority": 3},
     {"code": "EXPECTED_DELAYED_DAMAGE_COSTS_EUR", "name": "Verzögerte Schadenswirkungen",
      "outcome_unit": "€/Jahr", "group": "compound", "cost_dimension": "monetary",
      "hazards": ["COMPOUND_EVENT", "CASCADE_EVENT"],
      "exposures": ["BUILDING_STOCK", "ENERGY_INFRASTRUCTURE"],
      "vulnerabilities": ["PLANNING_IMPLEMENTATION_CAPACITY", "FINANCIAL_ADAPTATION_CAPACITY"],
-     # Sektorale Schadenskosten DE (verzögerte Schäden) als Anker bei Index=100.
+     # Herleitung: verzögerte Schadenswirkungen ~0,29 Mrd €/J ÷ 832 ≈ 0,35 Mio €/100k bei Index=100 (Prognos 2023, spät auftretender Teilbetrag der Sektorschäden).
      "ref_value": 350000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete verzögerte Schadenswirkungen.", "priority": 3},
     {"code": "SYSTEMIC_DOMINO_RISK_INDEX", "name": "Risiko systemischer Dominoeffekte",
      "outcome_unit": "Index", "group": "compound", "cost_dimension": "operational",
@@ -777,14 +778,14 @@ RISKS: list[dict] = [
      "hazards": ["SURFACE_WATER_HEATING", "LOW_FLOW_NIEDRIGWASSER", "DROUGHT", "HEAT_WAVE"],
      "exposures": ["FISHERIES_AQUACULTURE_AREAS"],
      "vulnerabilities": ["FISHERIES_TEMPERATURE_SENSITIVITY", "FISHERIES_MANAGEMENT_CAPACITY"],
-     # Sektorale Schadenskosten DE (Fischerei) als Anker bei Index=100, flächenskaliert.
+     # Modellannahme (Punktwert, editierbar): Fischerei ist national klein; grober Anker ~0,3 Mio €/50 km² Gewässerfläche bei Index=100, an Gewässer-/Fischereianteil skaliert. Keine belastbare Prognos-Einzelposition ⇒ als Annahme gekennzeichnet.
      "ref_value": 300000.0, "scale": "area", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche wirtschaftliche Verluste in der Fischerei.", "priority": 2},
     {"code": "EXPECTED_AQUACULTURE_DAMAGE_EUR", "name": "Schäden in der Aquakultur",
      "outcome_unit": "€/Jahr", "group": "drought", "cost_dimension": "monetary",
      "hazards": ["SURFACE_WATER_HEATING", "LOW_FLOW_NIEDRIGWASSER", "HEAVY_RAIN_FLOOD"],
      "exposures": ["FISHERIES_AQUACULTURE_AREAS"],
      "vulnerabilities": ["AQUACULTURE_TECHNICAL_VULNERABILITY", "WATER_STRESS_INDEX"],
-     # Sektorale Schadenskosten DE (Aquakultur) als Anker bei Index=100, flächenskaliert.
+     # Modellannahme (Punktwert, editierbar): Aquakultur national sehr klein; grober Anker ~0,2 Mio €/50 km² Gewässerfläche bei Index=100. Keine belastbare Prognos-Einzelposition ⇒ als Annahme gekennzeichnet.
      "ref_value": 200000.0, "scale": "area", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Schäden in der Aquakultur.", "priority": 2},
     {"code": "FISHERIES_STOCK_STRESS_RISK_INDEX", "name": "Risiko fischereilicher Bestandsbelastung",
      "outcome_unit": "Index", "group": "drought", "cost_dimension": "environment",
