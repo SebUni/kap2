@@ -48,7 +48,8 @@ interface AppState {
   infoLayer: ActiveLayer | null
   setInfoLayer: (layer: ActiveLayer | null) => void
   configPanelRequested: number
-  requestConfigPanel: () => void
+  configScrollAnchor: string | null
+  requestConfigPanel: (scrollAnchor?: string) => void
 
   // Risk / cost aggregates
   riskSummary: RiskAggregate | null
@@ -173,7 +174,11 @@ export const useStore = create<AppState>((set, get) => ({
   infoLayer: null,
   setInfoLayer: (layer) => set({ infoLayer: layer }),
   configPanelRequested: 0,
-  requestConfigPanel: () => set({ configPanelRequested: get().configPanelRequested + 1 }),
+  configScrollAnchor: null,
+  requestConfigPanel: (scrollAnchor) => set({
+    configPanelRequested: get().configPanelRequested + 1,
+    configScrollAnchor: scrollAnchor ?? null,
+  }),
 
   // Aggregates
   riskSummary: null,

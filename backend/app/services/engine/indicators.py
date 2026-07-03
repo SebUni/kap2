@@ -182,6 +182,50 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         0, 100,
     )
 
+    def _derived_or(param_id: str, derived: float | None, neutral: float) -> float:
+        """Reihenfolge: User-Override > ortsaufgelöste Ableitung > neutraler Fallback."""
+        ov = _ov(param_id)
+        if ov is not None:
+            return float(ov)
+        return derived if derived is not None else neutral
+
+    # ── Notfall-/Frühwarn-Infrastruktur (OSM Feuerwehr/Rettung, invers) ─────────
+    emergency_access = ci.get("emergency_access_score")  # 0..1 oder None (kein OSM-Datum)
+    emergency_mgmt_derived = (
+        None if emergency_access is None
+        else _clamp(100.0 * (1.0 - float(emergency_access)), 0, 100)
+    )
+    emergency_management = round(_derived_or(
+        "vulnerabilities.EMERGENCY_MANAGEMENT.param.__const", emergency_mgmt_derived, 40.0), 1)
+    # Frühwarnung: gleicher OSM-Proxy, geringere Aussagekraft ⇒ zur Neutrale 50 gedämpft.
+    early_warning_derived = (
+        None if emergency_mgmt_derived is None
+        else _clamp(50.0 + (emergency_mgmt_derived - 50.0) * 0.6, 0, 100)
+    )
+    early_warning = round(_derived_or(
+        "vulnerabilities.EARLY_WARNING_SYSTEMS.param.__const", early_warning_derived, 40.0), 1)
+
+    # ── Deichzustand (OSM man_made=dyke/embankment × Hochwasserexposition, invers) ──
+    dyke_prox = float(ci.get("dyke_prox") or 0.0)
+    levee_baseline = 50.0 if coastal else 30.0
+    exposure = _clamp(max(water_prox, 1.0 if coastal else twi_norm, depression), 0.0, 1.0)
+    if coastal or water_prox > 0.05 or depression > 0.3:
+        levee_derived = _clamp(
+            levee_baseline + 40.0 * exposure * (1.0 - dyke_prox) - 25.0 * dyke_prox, 0, 100)
+    else:
+        levee_derived = levee_baseline
+    levee_condition = round(_derived_or(
+        "vulnerabilities.LEVEE_CONDITION.param.__const", levee_derived, levee_baseline), 1)
+
+    # ── Sozioökonomie (BBSR INKAR / Regionalstatistik je AGS, invers) ──────────
+    socio = regional.get("socioeconomic") or {}
+    financial_capacity = round(_derived_or(
+        "vulnerabilities.FINANCIAL_ADAPTATION_CAPACITY.param.__const",
+        socio.get("financial_adaptation"), 50.0), 1)
+    planning_capacity = round(_derived_or(
+        "vulnerabilities.PLANNING_IMPLEMENTATION_CAPACITY.param.__const",
+        socio.get("planning_capacity"), 50.0), 1)
+
     # ── Vulnerabilities (Index 0..100 bzw. natürliche Einheit) ─────────────────
     V = {
         "BUILDING_STABILITY": _building_stability(ci),
@@ -195,7 +239,7 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "SOIL_SENSITIVITY": round(_clamp(slope * 60.0 + farmland * 40.0, 0, 100), 1),
         "SINGLE_SITE_DEPENDENCY": round(_clamp(industrial * 200.0, 0, 100), 1),
         "SUPPLY_CHAIN_DEPENDENCY": 50.0,
-        "FINANCIAL_ADAPTATION_CAPACITY": 45.0,
+        "FINANCIAL_ADAPTATION_CAPACITY": financial_capacity,
         "INFRA_CRITICALITY": round(infra_criticality, 1),
         "REDUNDANCY_BACKUP": 50.0,
         "INFRA_DEPENDENCY_CHAIN": 50.0,
@@ -206,14 +250,14 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         "WATER_STRESS_INDEX": round(_clamp(imp * 40.0 + min(pop_density / 4000.0, 1.0) * 40.0 + dry * 20.0, 0, 100), 1),
         "IRRIGATION_DEPENDENCY": round(_clamp(farmland * 100.0 * (0.5 + dry / 2.0), 0, 100), 1),
         "EROSION_SUSCEPTIBILITY": round(_clamp(slope * 100.0 * (1.0 - green), 0, 100), 1),
-        "LEVEE_CONDITION": 50.0 if coastal else 30.0,
+        "LEVEE_CONDITION": levee_condition,
         "SALTWATER_INTRUSION_RISK": 40.0 if coastal else 10.0,
         "SEALING_DEGREE": round(_clamp(imp * 100.0, 0, 100), 1),
         "UHI_INTENSITY": round(uhi, 2),
         "GREEN_SPACE_SHARE": round(_clamp(100.0 - green * 100.0, 0, 100), 1),
-        "EARLY_WARNING_SYSTEMS": 40.0,
-        "EMERGENCY_MANAGEMENT": 40.0,
-        "PLANNING_IMPLEMENTATION_CAPACITY": 45.0,
+        "EARLY_WARNING_SYSTEMS": early_warning,
+        "EMERGENCY_MANAGEMENT": emergency_management,
+        "PLANNING_IMPLEMENTATION_CAPACITY": planning_capacity,
         "FISHERIES_TEMPERATURE_SENSITIVITY": round(_clamp(water * 100.0 * (regional["surface_water_heating"] / 3.0), 0, 100), 1),
         "AQUACULTURE_TECHNICAL_VULNERABILITY": 50.0,
         "FISHERIES_MANAGEMENT_CAPACITY": 45.0,

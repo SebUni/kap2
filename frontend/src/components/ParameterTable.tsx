@@ -1,6 +1,15 @@
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import { useState, useEffect, type Dispatch, type ReactNode, type SetStateAction } from 'react'
 import { api } from '../api/client'
-import type { Catalog, CatalogRisk, ModelParameter } from '../types'
+import type { Catalog, ModelParameter } from '../types'
+import {
+  buildIndicatorUsageIndex,
+  indicatorName,
+  mainSectionKeyFromAnchor,
+  measureOutputLinks,
+  paramSectionId,
+  riskInputLinks,
+  type ParamSectionLink,
+} from '../utils/paramSectionLinks'
 
 interface Props {
   kommuneId: number
@@ -10,10 +19,12 @@ interface Props {
   showExport?: boolean
   grouped?: boolean
   catalog?: Catalog
+  scrollAnchor?: string | null
+  scrollTrigger?: number
 }
 
 export default function ParameterTable({
-  kommuneId, parameters, onUpdated, compact, showExport = true, grouped, catalog,
+  kommuneId, parameters, onUpdated, compact, showExport = true, grouped, catalog, scrollAnchor, scrollTrigger,
 }: Props) {
   const [edits, setEdits] = useState<Record<string, { value: string; source: string }>>({})
   const [saving, setSaving] = useState(false)
@@ -59,7 +70,10 @@ export default function ParameterTable({
   }
 
   if (!parameters.length) {
-    return <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Keine Parameter für diese Ebene.</p>
+    const msg = grouped
+      ? 'Keine Parameter geladen. Bitte prüfen Sie, ob das Backend läuft, und laden Sie die Seite neu.'
+      : 'Keine Parameter für diese Ebene.'
+    return <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{msg}</p>
   }
 
   if (grouped) {
@@ -77,6 +91,8 @@ export default function ParameterTable({
         cancelEdit={cancelEdit}
         startEdit={startEdit}
         showExport={showExport}
+        scrollAnchor={scrollAnchor}
+        scrollTrigger={scrollTrigger}
       />
     )
   }
@@ -112,7 +128,7 @@ export default function ParameterTable({
             const editing = edits[p.id]
             return (
               <tr key={p.id} className={p.overridden ? 'overridden' : ''}>
-                <td>{p.label}</td>
+                <td><span className="kap-param-cell-text" title={p.label}>{p.label}</span></td>
                 <td>
                   {editing ? (
                     <input
@@ -123,7 +139,7 @@ export default function ParameterTable({
                         ...edits,
                         [p.id]: { ...editing, value: ev.target.value },
                       })}
-                      style={{ width: 90, fontSize: '0.75rem' }}
+                      style={{ width: '100%', fontSize: '0.75rem' }}
                     />
                   ) : (
                     <span>{String(p.value)}</span>
@@ -140,10 +156,10 @@ export default function ParameterTable({
                         ...edits,
                         [p.id]: { ...editing, source: ev.target.value },
                       })}
-                      style={{ width: '100%', minWidth: 140, fontSize: '0.75rem' }}
+                      style={{ width: '100%', fontSize: '0.75rem' }}
                     />
                   ) : (
-                    <span title={p.custom_source || ''}>
+                    <span className="kap-param-cell-text" title={p.custom_source || p.source || ''}>
                       {p.custom_source || p.source}
                     </span>
                   )}
@@ -187,44 +203,66 @@ export default function ParameterTable({
   )
 }
 
-function indicatorName(
-  catalog: Catalog | undefined,
-  category: string,
-  code: string,
-): string {
-  if (!catalog || !code) return code
-  const list = category === 'hazards' ? catalog.hazards
-    : category === 'exposures' ? catalog.exposures
-      : category === 'vulnerabilities' ? catalog.vulnerabilities
-        : category === 'risks' ? catalog.risks
-          : category === 'measures' ? catalog.measures
-            : []
-  const item = list.find((x: { code: string }) => x.code === code)
-  return item?.name ?? code
+function ParamCrossRefHint({ intro, links }: { intro: string; links: ParamSectionLink[] }) {
+  if (!links.length) return null
+  return (
+    <p className="kap-param-crossref-hint">
+      <em>{intro}</em>{' '}
+      {links.map((link, i) => (
+        <span key={link.href}>
+          {i > 0 ? ' · ' : ''}
+          <a href={link.href} className="kap-param-anchor-link">{link.label}</a>
+        </span>
+      ))}
+    </p>
+  )
 }
 
-function riskInputLinks(risk: CatalogRisk, catalog: Catalog | undefined): { href: string; label: string }[] {
-  if (!catalog) return []
-  const links: { href: string; label: string }[] = []
-  for (const code of risk.hazards) {
-    links.push({
-      href: `#param-hazards-${code}`,
-      label: indicatorName(catalog, 'hazards', code),
-    })
-  }
-  for (const code of risk.exposures) {
-    links.push({
-      href: `#param-exposures-${code}`,
-      label: indicatorName(catalog, 'exposures', code),
-    })
-  }
-  for (const code of risk.vulnerabilities) {
-    links.push({
-      href: `#param-vulnerabilities-${code}`,
-      label: indicatorName(catalog, 'vulnerabilities', code),
-    })
-  }
-  return links
+const PARAM_TABLE_COLGROUP = (
+  <colgroup>
+    <col className="kap-param-col-label" />
+    <col className="kap-param-col-value" />
+    <col className="kap-param-col-unit" />
+    <col className="kap-param-col-source" />
+    <col className="kap-param-col-status" />
+    <col className="kap-param-col-actions" />
+  </colgroup>
+)
+
+function CollapsibleParamSection({
+  sectionKey,
+  title,
+  anchorId,
+  count,
+  expanded,
+  onToggle,
+  children,
+}: {
+  sectionKey: string
+  title: string
+  anchorId: string
+  count: number
+  expanded: boolean
+  onToggle: (key: string) => void
+  children: ReactNode
+}) {
+  return (
+    <section className={`kap-param-section${expanded ? ' is-open' : ' is-collapsed'}`}>
+      <button
+        type="button"
+        className="kap-param-section-toggle"
+        aria-expanded={expanded}
+        onClick={() => onToggle(sectionKey)}
+      >
+        <span className="kap-param-section-chevron" aria-hidden>{expanded ? '▾' : '▸'}</span>
+        <span className="kap-param-section-title" id={anchorId}>{title}</span>
+        <span className="kap-param-section-count">{count} Parameter</span>
+      </button>
+      {expanded && (
+        <div className="kap-param-section-body">{children}</div>
+      )}
+    </section>
+  )
 }
 
 interface GroupedProps {
@@ -240,6 +278,8 @@ interface GroupedProps {
   cancelEdit: (id: string) => void
   startEdit: (p: ModelParameter) => void
   showExport: boolean
+  scrollAnchor?: string | null
+  scrollTrigger?: number
 }
 
 function ParameterRows({
@@ -265,7 +305,7 @@ function ParameterRows({
         const editing = edits[p.id]
         return (
           <tr key={p.id} className={p.overridden ? 'overridden' : ''}>
-            <td>{p.label}</td>
+            <td><span className="kap-param-cell-text" title={p.label}>{p.label}</span></td>
             <td>
               {editing ? (
                 <input
@@ -276,7 +316,7 @@ function ParameterRows({
                     ...edits,
                     [p.id]: { ...editing, value: ev.target.value },
                   })}
-                  style={{ width: 90, fontSize: '0.75rem' }}
+                  style={{ width: '100%', fontSize: '0.75rem' }}
                 />
               ) : (
                 <span>{String(p.value)}</span>
@@ -293,10 +333,10 @@ function ParameterRows({
                     ...edits,
                     [p.id]: { ...editing, source: ev.target.value },
                   })}
-                  style={{ width: '100%', minWidth: 140, fontSize: '0.75rem' }}
+                  style={{ width: '100%', fontSize: '0.75rem' }}
                 />
               ) : (
-                <span title={p.custom_source || ''}>
+                <span className="kap-param-cell-text" title={p.custom_source || p.source || ''}>
                   {p.custom_source || p.source}
                 </span>
               )}
@@ -348,7 +388,55 @@ function GroupedParameterList({
   cancelEdit,
   startEdit,
   showExport,
+  scrollAnchor,
+  scrollTrigger,
 }: GroupedProps) {
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(() => new Set())
+  const indicatorUsage = buildIndicatorUsageIndex(catalog)
+
+  const expandForAnchor = (anchorId: string) => {
+    const key = mainSectionKeyFromAnchor(anchorId)
+    if (!key) return
+    setExpandedSections(prev => {
+      if (prev.has(key)) return prev
+      const next = new Set(prev)
+      next.add(key)
+      return next
+    })
+  }
+
+  const toggleSection = (key: string) => {
+    setExpandedSections(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  useEffect(() => {
+    if (!scrollAnchor || !scrollTrigger) return
+    const id = scrollAnchor.replace(/^#/, '')
+    expandForAnchor(id)
+    const timer = window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 120)
+    return () => window.clearTimeout(timer)
+  }, [scrollAnchor, scrollTrigger])
+
+  const handleAnchorNavigate = (e: React.MouseEvent<HTMLDivElement>) => {
+    const link = (e.target as HTMLElement).closest('a.kap-param-anchor-link') as HTMLAnchorElement | null
+    if (!link) return
+    const href = link.getAttribute('href')
+    if (!href?.startsWith('#')) return
+    e.preventDefault()
+    const id = href.slice(1)
+    expandForAnchor(id)
+    window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
+  }
+
   const byCategory = (cat: string) => parameters.filter(p => p.layer_category === cat)
   const byIndicator = (cat: string, code: string) =>
     parameters.filter(p => p.layer_category === cat && p.layer_code === code)
@@ -372,8 +460,18 @@ function GroupedParameterList({
     </thead>
   )
 
+  const widthLockTable = (
+    <div className="kap-param-table-width-lock" aria-hidden="true">
+      <table>
+        {PARAM_TABLE_COLGROUP}
+        {tableHead}
+      </table>
+    </div>
+  )
+
   const renderTable = (rows: ModelParameter[]) => (
     <table>
+      {PARAM_TABLE_COLGROUP}
       {tableHead}
       <tbody>
         <ParameterRows
@@ -389,8 +487,16 @@ function GroupedParameterList({
     </table>
   )
 
+  const modelCount = byCategory('model').length
+  const uhiCount = byCategory('uhi').length
+  const hazardCount = parameters.filter(p => p.layer_category === 'hazards').length
+  const exposureCount = parameters.filter(p => p.layer_category === 'exposures').length
+  const vulnCount = parameters.filter(p => p.layer_category === 'vulnerabilities').length
+  const riskCount = parameters.filter(p => p.layer_category === 'risks').length
+  const measureCount = parameters.filter(p => p.layer_category === 'measures').length
+
   return (
-    <div className="kap-param-table kap-param-table--grouped">
+    <div className="kap-param-table kap-param-table--grouped" onClick={handleAnchorNavigate}>
       {showExport && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
           <a
@@ -404,94 +510,150 @@ function GroupedParameterList({
         </div>
       )}
       {error && <div className="kap-param-error">{error}</div>}
+      {widthLockTable}
 
-      {byCategory('model').length > 0 && (
-        <section className="kap-param-section">
-          <h3 id="param-model">Modellweite Annahmen</h3>
+      {modelCount > 0 && (
+        <CollapsibleParamSection
+          sectionKey="model"
+          title="Modellweite Annahmen"
+          anchorId={paramSectionId('model')}
+          count={modelCount}
+          expanded={expandedSections.has('model')}
+          onToggle={toggleSection}
+        >
           {renderTable(byCategory('model'))}
-        </section>
+        </CollapsibleParamSection>
       )}
 
-      {byCategory('uhi').length > 0 && (
-        <section className="kap-param-section">
-          <h3 id="param-uhi">UHI-Modell</h3>
+      {uhiCount > 0 && (
+        <CollapsibleParamSection
+          sectionKey="uhi"
+          title="UHI-Modell"
+          anchorId={paramSectionId('uhi')}
+          count={uhiCount}
+          expanded={expandedSections.has('uhi')}
+          onToggle={toggleSection}
+        >
           {renderTable(byCategory('uhi'))}
-        </section>
+        </CollapsibleParamSection>
       )}
 
       {hazardCodes.length > 0 && (
-        <section className="kap-param-section">
-          <h3 id="param-hazards">Klimatische Einflüsse</h3>
+        <CollapsibleParamSection
+          sectionKey="hazards"
+          title="Klimatische Einflüsse"
+          anchorId={paramSectionId('hazards')}
+          count={hazardCount}
+          expanded={expandedSections.has('hazards')}
+          onToggle={toggleSection}
+        >
           {hazardCodes.map(code => (
             <div key={code} className="kap-param-subsection">
-              <h4 id={`param-hazards-${code}`}>{indicatorName(catalog, 'hazards', code)}</h4>
+              <h4 id={paramSectionId('hazards', code)}>{indicatorName(catalog, 'hazards', code)}</h4>
               {renderTable(byIndicator('hazards', code))}
+              <ParamCrossRefHint
+                intro="Verwendet als Eingang für:"
+                links={indicatorUsage[`hazards:${code}`] ?? []}
+              />
             </div>
           ))}
-        </section>
+        </CollapsibleParamSection>
       )}
 
       {exposureCodes.length > 0 && (
-        <section className="kap-param-section">
-          <h3 id="param-exposures">Räumliche Expositionen</h3>
+        <CollapsibleParamSection
+          sectionKey="exposures"
+          title="Räumliche Expositionen"
+          anchorId={paramSectionId('exposures')}
+          count={exposureCount}
+          expanded={expandedSections.has('exposures')}
+          onToggle={toggleSection}
+        >
           {exposureCodes.map(code => (
             <div key={code} className="kap-param-subsection">
-              <h4 id={`param-exposures-${code}`}>{indicatorName(catalog, 'exposures', code)}</h4>
+              <h4 id={paramSectionId('exposures', code)}>{indicatorName(catalog, 'exposures', code)}</h4>
               {renderTable(byIndicator('exposures', code))}
+              <ParamCrossRefHint
+                intro="Verwendet als Eingang für:"
+                links={indicatorUsage[`exposures:${code}`] ?? []}
+              />
             </div>
           ))}
-        </section>
+        </CollapsibleParamSection>
       )}
 
       {vulnCodes.length > 0 && (
-        <section className="kap-param-section">
-          <h3 id="param-vulnerabilities">Sensitivitäten</h3>
+        <CollapsibleParamSection
+          sectionKey="vulnerabilities"
+          title="Sensitivitäten"
+          anchorId={paramSectionId('vulnerabilities')}
+          count={vulnCount}
+          expanded={expandedSections.has('vulnerabilities')}
+          onToggle={toggleSection}
+        >
           {vulnCodes.map(code => (
             <div key={code} className="kap-param-subsection">
-              <h4 id={`param-vulnerabilities-${code}`}>{indicatorName(catalog, 'vulnerabilities', code)}</h4>
+              <h4 id={paramSectionId('vulnerabilities', code)}>{indicatorName(catalog, 'vulnerabilities', code)}</h4>
               {renderTable(byIndicator('vulnerabilities', code))}
+              <ParamCrossRefHint
+                intro="Verwendet als Eingang für:"
+                links={indicatorUsage[`vulnerabilities:${code}`] ?? []}
+              />
             </div>
           ))}
-        </section>
+        </CollapsibleParamSection>
       )}
 
       {riskCodes.length > 0 && (
-        <section className="kap-param-section">
-          <h3 id="param-risks">Klimarisiken</h3>
+        <CollapsibleParamSection
+          sectionKey="risks"
+          title="Klimarisiken"
+          anchorId={paramSectionId('risks')}
+          count={riskCount}
+          expanded={expandedSections.has('risks')}
+          onToggle={toggleSection}
+        >
           {riskCodes.map(code => {
             const risk = catalog?.risks.find(r => r.code === code)
             const links = risk ? riskInputLinks(risk, catalog) : []
             return (
               <div key={code} className="kap-param-subsection">
-                <h4 id={`param-risks-${code}`}>{indicatorName(catalog, 'risks', code)}</h4>
+                <h4 id={paramSectionId('risks', code)}>{indicatorName(catalog, 'risks', code)}</h4>
                 {renderTable(byIndicator('risks', code))}
-                {links.length > 0 && (
-                  <p className="kap-param-risk-hint">
-                    <em>Eingangsgrößen für dieses Risiko werden in den Input-Ebenen modelliert:</em>{' '}
-                    {links.map((link, i) => (
-                      <span key={link.href}>
-                        {i > 0 ? ' · ' : ''}
-                        <a href={link.href}>{link.label}</a>
-                      </span>
-                    ))}
-                  </p>
-                )}
+                <ParamCrossRefHint
+                  intro="Eingangsgrößen für dieses Risiko werden in den Input-Ebenen modelliert:"
+                  links={links}
+                />
               </div>
             )
           })}
-        </section>
+        </CollapsibleParamSection>
       )}
 
       {measureCodes.length > 0 && (
-        <section className="kap-param-section">
-          <h3 id="param-measures">Maßnahmen</h3>
-          {measureCodes.map(code => (
-            <div key={code} className="kap-param-subsection">
-              <h4 id={`param-measures-${code}`}>{indicatorName(catalog, 'measures', code)}</h4>
-              {renderTable(byIndicator('measures', code))}
-            </div>
-          ))}
-        </section>
+        <CollapsibleParamSection
+          sectionKey="measures"
+          title="Maßnahmen"
+          anchorId={paramSectionId('measures')}
+          count={measureCount}
+          expanded={expandedSections.has('measures')}
+          onToggle={toggleSection}
+        >
+          {measureCodes.map(code => {
+            const measure = catalog?.measures.find(m => m.code === code)
+            const links = measure ? measureOutputLinks(measure, catalog) : []
+            return (
+              <div key={code} className="kap-param-subsection">
+                <h4 id={paramSectionId('measures', code)}>{indicatorName(catalog, 'measures', code)}</h4>
+                {renderTable(byIndicator('measures', code))}
+                <ParamCrossRefHint
+                  intro="Wirkt auf folgende Klimarisiken:"
+                  links={links}
+                />
+              </div>
+            )
+          })}
+        </CollapsibleParamSection>
       )}
     </div>
   )

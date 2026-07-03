@@ -102,12 +102,16 @@ def _assemble_cell_input(
     water_index: tuple[Any, list[Any]] | None,
     infra_features: dict,
     healthcare_indexes: dict[str, tuple[Any, list] | None],
+    emergency_index: tuple[Any, list] | None,
+    dyke_index: tuple[Any, list] | None,
     step: int,
 ) -> dict:
     from app.services.climate.heat.osm_data import (
         compute_water_distance_m,
         water_proximity_score,
         compute_cell_healthcare_access,
+        compute_cell_emergency_access,
+        compute_cell_dyke_proximity,
     )
 
     open_n = total_n = 0
@@ -153,6 +157,12 @@ def _assemble_cell_input(
     hc = compute_cell_healthcare_access(
         cell["geometry"], infra_features, healthcare_indexes,
     )
+    emergency_access_score = compute_cell_emergency_access(
+        cell["geometry"], infra_features, emergency_index,
+    )
+    dyke_prox = compute_cell_dyke_proximity(
+        cell["geometry"], infra_features, dyke_index,
+    )
 
     return {
         "grid_cell_id": cell["id"],
@@ -178,6 +188,8 @@ def _assemble_cell_input(
         "water_wastewater_count": bm.get("water_wastewater_count", 0),
         "communication_count": bm.get("communication_count", 0),
         "transport_hub_count": bm.get("transport_hub_count", 0),
+        "emergency_access_score": emergency_access_score,
+        "dyke_prox": dyke_prox,
         "dist_hospital_m": hc["dist_hospital_m"],
         "dist_doctor_m": hc["dist_doctor_m"],
         "dist_pharmacy_m": hc["dist_pharmacy_m"],
@@ -216,6 +228,8 @@ def _neighbor_worker(idx: int):
         _nw["water_index"],
         _nw["infra_features"],
         _nw["healthcare_indexes"],
+        _nw["emergency_index"],
+        _nw["dyke_index"],
         _nw["step"],
     )
 
@@ -259,10 +273,15 @@ def _fetch_osm_data_parallel(
     return landuse_features, {"buildings": buildings, "roads": roads, "trees": trees}, water_features, infra_features
 
 
-def build_regional_context(bundesland: str | None, is_coastal: bool) -> dict:
-    """Regionale Klimawerte und Demografie (identisch zum Assessment-Pass)."""
+def build_regional_context(
+    bundesland: str | None,
+    is_coastal: bool,
+    osm_id: str | None = None,
+) -> dict:
+    """Regionale Klimawerte, Demografie und kommunale Sozioökonomie (INKAR)."""
     from app.services.climate.dwd_data import get_regional_climate, get_snow_cover_climate
     from app.services.zensus_loader import demographic_shares
+    from app.services.inkar_loader import socioeconomic_for_kommune
 
     bl = bundesland or "Nordrhein-Westfalen"
     regional_clim = get_regional_climate(bl)
@@ -270,8 +289,10 @@ def build_regional_context(bundesland: str | None, is_coastal: bool) -> dict:
     demo = demographic_shares()
     hot_days = float(regional_clim["hot_days_per_year"])
     mean_temp = float(regional_clim["mean_temp_annual"])
+    socioeconomic = socioeconomic_for_kommune(osm_id, bundesland)
     return {
         "bundesland": bundesland,
+        "socioeconomic": socioeconomic,
         "hot_days": hot_days,
         "summer_temp": float(regional_clim["summer_max_temp_avg"]),
         "mean_temp": mean_temp,
@@ -301,19 +322,25 @@ def gather_cell_inputs(
     area_km2: float | None,
     is_coastal: bool,
     progress_callback: Any = None,
+    osm_id: str | None = None,
 ) -> tuple[list[dict], dict]:
     """Berechnet pro Zelle alle Rohgrößen. Gibt (cell_inputs, regional) zurück.
 
     ``cell_inputs`` ist an die Reihenfolge von ``grid_cells`` gekoppelt.
     """
-    from app.services.climate.heat.osm_data import build_water_spatial_index, build_healthcare_indexes
+    from app.services.climate.heat.osm_data import (
+        build_water_spatial_index,
+        build_healthcare_indexes,
+        build_emergency_spatial_index,
+        build_dyke_spatial_index,
+    )
     from app.services.terrain_service import compute_terrain_for_cells
     from app.services.zensus_loader import ensure_zensus_datasets, load_zensus_for_cells, apply_zensus_to_cell_inputs
     from app.services.engine.progress import (
         ZENSUS, OSM_LANDUSE, CELL_SURFACE, CELL_NEIGHBORS, ZENSUS_APPLY, lerp,
     )
 
-    regional = build_regional_context(bundesland, is_coastal)
+    regional = build_regional_context(bundesland, is_coastal, osm_id)
 
     if progress_callback:
         progress_callback(ZENSUS[0], "Zensus-Daten prüfen/laden")
@@ -371,6 +398,8 @@ def gather_cell_inputs(
 
     water_index = build_water_spatial_index(water_features)
     healthcare_indexes = build_healthcare_indexes(infra_features)
+    emergency_index = build_emergency_spatial_index(infra_features)
+    dyke_index = build_dyke_spatial_index(infra_features)
     cell_inputs: list[dict | None] = [None] * total
 
     _nw["cells"] = grid_cells
@@ -381,6 +410,8 @@ def gather_cell_inputs(
     _nw["water_features"] = water_features
     _nw["infra_features"] = infra_features
     _nw["healthcare_indexes"] = healthcare_indexes
+    _nw["emergency_index"] = emergency_index
+    _nw["dyke_index"] = dyke_index
     _nw["step"] = step
     try:
         with _MP.Pool(_N_WORKERS) as pool:

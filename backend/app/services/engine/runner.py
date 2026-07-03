@@ -62,6 +62,7 @@ def run_full_assessment(
     area_km2: float | None,
     progress_callback: Any = None,
     parameter_overrides: dict[str, Any] | None = None,
+    osm_id: str | None = None,
 ) -> list[dict]:
     """Berechnet die komplette KAP3-Bewertung je Zelle.
 
@@ -74,6 +75,7 @@ def run_full_assessment(
 
     cell_inputs, regional = gather_cell_inputs(
         grid_cells, bundesland, kommune_population, area_km2, is_coastal, progress_callback,
+        osm_id,
     )
 
     total = len(cell_inputs) or 1

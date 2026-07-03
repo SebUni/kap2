@@ -26,6 +26,7 @@ from app.data import catalog
 from app.models.models import (
     AdaptationMeasure, CellAssessment, GridCell, MeasureImpact, Kommune,
 )
+from app.services import parameter_registry
 from app.services.engine import risk_engine
 
 log = logging.getLogger(__name__)
@@ -68,6 +69,11 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     mdef = catalog.MEASURES_BY_CODE.get(measure.measure_type)
     if not mdef:
         raise ValueError(f"Unbekannter Maßnahmentyp: {measure.measure_type}")
+
+    overrides = parameter_registry.overrides_map(
+        parameter_registry.load_db_overrides(db, measure.kommune_id)
+    )
+    mdef = parameter_registry.resolve_measure_def(mdef, overrides)
 
     coverage = _coverage(db, measure)
     if not coverage:
@@ -177,10 +183,14 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
     factors: dict[int, dict[str, float]] = {}
     measures = db.query(AdaptationMeasure).filter(
         AdaptationMeasure.kommune_id == kommune_id).all()
+    overrides = parameter_registry.overrides_map(
+        parameter_registry.load_db_overrides(db, kommune_id)
+    )
     for m in measures:
-        mdef = catalog.MEASURES_BY_CODE.get(m.measure_type)
-        if not mdef:
+        base = catalog.MEASURES_BY_CODE.get(m.measure_type)
+        if not base:
             continue
+        mdef = parameter_registry.resolve_measure_def(base, overrides)
         coverage = _coverage(db, m)
         for cid, frac in coverage.items():
             factor = _reduction_factor(mdef, frac)

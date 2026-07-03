@@ -4,6 +4,7 @@ import MapView from './MapView'
 import MeasureSidebar from './MeasureSidebar'
 import LayerPanel from './LayerPanel'
 import LayerInfoModal from './LayerInfoModal'
+import { configScrollAnchorForLayer } from '../utils/paramSectionLinks'
 
 export default function MapDashboardTab() {
   const {
@@ -53,8 +54,9 @@ export default function MapDashboardTab() {
           layer={infoLayer}
           onClose={() => setInfoLayer(null)}
           onOpenConfig={() => {
+            const anchor = configScrollAnchorForLayer(infoLayer.category, infoLayer.code)
             setInfoLayer(null)
-            requestConfigPanel()
+            requestConfigPanel(anchor)
           }}
         />
       )}

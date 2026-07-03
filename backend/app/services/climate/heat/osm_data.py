@@ -10,7 +10,7 @@ import time as _time
 from typing import Any
 
 import httpx
-from shapely.geometry import shape, Polygon, MultiPolygon, LineString, mapping
+from shapely.geometry import shape, Point, Polygon, MultiPolygon, LineString, mapping
 from shapely.ops import unary_union
 
 from app.config import settings
@@ -35,6 +35,12 @@ _POWER_LINE_TAGS = frozenset({"line", "cable", "minor_line", "busbar"})
 _WATER_INFRA_TAGS = frozenset({"water_works", "wastewater_plant", "water_tower"})
 _COMM_MAN_MADE_TAGS = frozenset({"mast", "communications_tower"})
 _TRANSPORT_RAILWAY_TAGS = frozenset({"station", "halt"})
+# Notfall-/Katastrophenschutz-Infrastruktur (Frühwarnung/Notfallmanagement-Proxy)
+_EMERGENCY_TAGS = frozenset(
+    {"ambulance_station", "water_rescue_station", "disaster_response", "lifeguard_base"}
+)
+# Hochwasserschutz-Bauwerke (Deichzustand-Proxy)
+_DYKE_MAN_MADE_TAGS = frozenset({"dyke", "embankment"})
 _HEALTHCARE_HOSPITAL_AMENITY = frozenset({"hospital"})
 _HEALTHCARE_DOCTOR_AMENITY = frozenset({"clinic", "doctors"})
 _HEALTHCARE_PHARMACY_AMENITY = frozenset({"pharmacy"})
@@ -44,6 +50,11 @@ _HEALTHCARE_PHARMACY_HC = frozenset({"pharmacy"})
 
 HEALTHCARE_ROAD_FACTOR = 1.3
 HEALTHCARE_MAX_DIST_M = 20_000.0
+
+# Notfall-Erreichbarkeit: jenseits ~10 km gilt eine Zelle als schlecht versorgt.
+EMERGENCY_MAX_DIST_M = 10_000.0
+# Deich-Relevanz nur in unmittelbarer Nähe (Hochwasserschutz wirkt lokal).
+DYKE_MAX_DIST_M = 1_000.0
 
 # ── Land-use categories and their properties ─────────────────────────────────
 
@@ -431,6 +442,55 @@ def _healthcare_category(tags: dict) -> str | None:
     if amenity in _HEALTHCARE_DOCTOR_AMENITY or hc in _HEALTHCARE_DOCTOR_HC:
         return "doctor"
     return None
+
+
+def _is_emergency_feature(tags: dict) -> bool:
+    """OSM-Feuerwehr/Rettungs-Infrastruktur (Notfallmanagement-/Frühwarn-Proxy)."""
+    return tags.get("amenity") == "fire_station" or tags.get("emergency") in _EMERGENCY_TAGS
+
+
+def build_emergency_spatial_index(infra: dict) -> tuple[Any, list] | None:
+    geoms = [Point(pt["lon"], pt["lat"]) for pt in infra.get("emergency_points", [])]
+    return build_healthcare_spatial_index(geoms)
+
+
+def build_dyke_spatial_index(infra: dict) -> tuple[Any, list] | None:
+    geoms = [d["geometry"] for d in infra.get("dyke_geoms", [])]
+    return build_healthcare_spatial_index(geoms)
+
+
+def compute_cell_emergency_access(
+    cell_geom: Any,
+    infra: dict,
+    spatial_index: tuple[Any, list] | None,
+) -> float | None:
+    """0..1 Erreichbarkeit der nächsten Feuerwehr/Rettung (1 = direkt, 0 = ≥ max).
+
+    ``None``, wenn im gesamten Gebiet keine Notfall-Infrastruktur gemappt ist
+    (kein Datum ≠ schlecht versorgt → Indikator fällt dann auf Neutralwert).
+    """
+    geoms = [Point(pt["lon"], pt["lat"]) for pt in infra.get("emergency_points", [])]
+    if not geoms:
+        return None
+    dist_m = compute_nearest_distance_m(
+        cell_geom, geoms, spatial_index, fallback_m=EMERGENCY_MAX_DIST_M,
+    )
+    return round(healthcare_proximity_score(dist_m, EMERGENCY_MAX_DIST_M), 4)
+
+
+def compute_cell_dyke_proximity(
+    cell_geom: Any,
+    infra: dict,
+    spatial_index: tuple[Any, list] | None,
+) -> float:
+    """0..1 Nähe zum nächsten Deich/Damm (1 = direkt, 0 = ≥ max)."""
+    geoms = [d["geometry"] for d in infra.get("dyke_geoms", [])]
+    if not geoms:
+        return 0.0
+    dist_m = compute_nearest_distance_m(
+        cell_geom, geoms, spatial_index, fallback_m=DYKE_MAX_DIST_M,
+    )
+    return round(water_proximity_score(dist_m, DYKE_MAX_DIST_M), 4)
 
 
 def build_healthcare_spatial_index(geoms: list) -> tuple[Any, list] | None:
@@ -857,6 +917,8 @@ def _empty_infra_features() -> dict:
         "water_areas": [],
         "comm_points": [],
         "transport_points": [],
+        "emergency_points": [],
+        "dyke_geoms": [],
         "healthcare_hospital": [],
         "healthcare_doctor": [],
         "healthcare_pharmacy": [],
@@ -909,6 +971,11 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
       node["railway"~"^(station|halt)$"]({bbox});
       node["public_transport"="station"]({bbox});
       node["amenity"="bus_station"]({bbox});
+      node["amenity"="fire_station"]({bbox});
+      way["amenity"="fire_station"]({bbox});
+      node["emergency"~"ambulance_station|water_rescue_station|disaster_response|lifeguard_base"]({bbox});
+      way["emergency"~"ambulance_station|water_rescue_station|disaster_response|lifeguard_base"]({bbox});
+      way["man_made"~"dyke|embankment"]({bbox});
       node["amenity"~"hospital|clinic|doctors|pharmacy"]({bbox});
       way["amenity"~"hospital|clinic|doctors|pharmacy"]({bbox});
       node["healthcare"~"hospital|clinic|doctor|pharmacy|centre"]({bbox});
@@ -933,9 +1000,8 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
     comm_node_ids: set[int] = set()
     water_node_ids: set[int] = set()
     transport_node_ids: set[int] = set()
+    emergency_ids: set[int | tuple[str, int]] = set()
     healthcare_ids: set[int | tuple[str, int]] = set()
-
-    from shapely.geometry import Point
 
     for el in elements:
         tags = el.get("tags", {})
@@ -990,6 +1056,10 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
                 transport_node_ids.add(el["id"])
                 lon, lat = nodes[el["id"]]
                 result["transport_points"].append({"lon": lon, "lat": lat})
+            if _is_emergency_feature(tags) and el["id"] not in emergency_ids:
+                emergency_ids.add(el["id"])
+                lon, lat = nodes[el["id"]]
+                result["emergency_points"].append({"lon": lon, "lat": lat})
             _add_healthcare_geometry(
                 result, tags, Point(nodes[el["id"]]), healthcare_ids, el_id,
             )
@@ -999,6 +1069,19 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
                 geom = _element_to_polygon(el, nodes, elements)
                 if geom is not None:
                     result["water_areas"].append({"geometry": geom})
+            if tags.get("man_made") in _DYKE_MAN_MADE_TAGS:
+                nds = el.get("nodes", [])
+                coords = [nodes[n] for n in nds if n in nodes]
+                if len(coords) >= 2:
+                    result["dyke_geoms"].append({"geometry": LineString(coords)})
+            if _is_emergency_feature(tags) and ("way", el_id) not in emergency_ids:
+                emergency_ids.add(("way", el_id))
+                nds = el.get("nodes", [])
+                coords = [nodes[n] for n in nds if n in nodes]
+                if coords:
+                    lon = sum(c[0] for c in coords) / len(coords)
+                    lat = sum(c[1] for c in coords) / len(coords)
+                    result["emergency_points"].append({"lon": lon, "lat": lat})
             cat = _healthcare_category(tags)
             if cat is not None and ("way", el_id) not in healthcare_ids:
                 geom = _element_to_polygon(el, nodes, elements)
@@ -1017,11 +1100,13 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
     log.info(
         "Fetched infrastructure from OSM: %d energy pts, %d lines, %d areas, "
         "%d water pts, %d water areas, %d comm pts, %d transport pts, "
+        "%d emergency pts, %d dyke geoms, "
         "%d hospital, %d doctor, %d pharmacy (%.2f MB)",
         len(result["energy_points"]), len(result["energy_lines"]),
         len(result["energy_areas"]), len(result["water_points"]),
         len(result["water_areas"]), len(result["comm_points"]),
         len(result["transport_points"]),
+        len(result["emergency_points"]), len(result["dyke_geoms"]),
         len(result["healthcare_hospital"]), len(result["healthcare_doctor"]),
         len(result["healthcare_pharmacy"]),
         response_bytes / 1_048_576,

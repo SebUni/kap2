@@ -19,6 +19,34 @@ PATHWAY_WEIGHT_LABELS = {
     "compound_multi": "Gewicht Compound-Pfade",
 }
 
+MEASURE_PARAM_SPECS: tuple[tuple[str, str, str], ...] = (
+    ("default_reduction", "Standard-Risikoreduktion", "Anteil"),
+    ("cost_per_m2", "Investitionskosten pro m²", "€/m²"),
+    ("cost_per_unit", "Investitionskosten pro Einheit", "€/Stück"),
+    ("maintenance_per_m2_year", "Wartungskosten pro m² und Jahr", "€/(m²·a)"),
+    ("benefit_per_m2_year", "Direkter Nutzen pro m² und Jahr", "€/(m²·a)"),
+)
+
+MEASURE_OVERRIDE_FIELDS = tuple(field for field, _, _ in MEASURE_PARAM_SPECS)
+
+# ``source`` in formulas._i steuert die Wertauflösung (const/cell/regional/…); diese Marker
+# sind keine belegbaren Quellen. Für die Anzeige greift dann ``doc_source`` oder ein
+# ehrlicher Modellannahme-Hinweis.
+_RESOLUTION_SOURCE_MARKERS = frozenset(
+    {"const", "cell", "regional", "demo", "computed", "hev", "auxiliary", ""}
+)
+
+
+def _param_doc_source(inp: dict) -> str:
+    """Anzeigbare Herkunft eines Formel-Parameters für die Registry."""
+    doc = inp.get("doc_source")
+    if doc:
+        return doc
+    src = inp.get("source")
+    if src and src not in _RESOLUTION_SOURCE_MARKERS:
+        return src
+    return "Modellannahme (mangels lokaler Daten)"
+
 
 def _base_param(
     pid: str,
@@ -122,7 +150,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 label=inp.get("label", key),
                 value=inp["value"],
                 unit=inp.get("unit", ""),
-                source=inp.get("source") or "Modellannahme (unbelegter Modellparameter)",
+                source=_param_doc_source(inp),
             ))
 
     for m in catalog.MEASURES:
@@ -130,14 +158,16 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             continue
         if layer_code and m["code"] != layer_code:
             continue
-        params.append(_base_param(
-            f"measures.{m['code']}.default_reduction",
-            layer_code=m["code"], layer_category="measures",
-            label="Standard-Risikoreduktion",
-            value=float(m.get("default_reduction", 0.0)),
-            unit="Anteil",
-            source=m.get("source") or "Modellannahme (Maßnahmenwirkung, unbelegt)",
-        ))
+        source = m.get("source") or "KAP3-Vorschlag + Plausibilität (Maßnahmenkosten, unbelegt)"
+        for field, label, unit in MEASURE_PARAM_SPECS:
+            params.append(_base_param(
+                f"measures.{m['code']}.{field}",
+                layer_code=m["code"], layer_category="measures",
+                label=label,
+                value=float(m.get(field, 0.0)),
+                unit=unit,
+                source=source,
+            ))
 
     uhi_defaults = {"alpha": 6.0, "beta": 2.0, "gamma": 3.5, "delta": 2.0}
     uhi_labels = {
@@ -183,6 +213,20 @@ def merge_overrides(
 def overrides_map(db_overrides: list[dict]) -> dict[str, Any]:
     """Flache Map parameter_id → value für die Engine."""
     return {o["parameter_id"]: o["value"] for o in db_overrides if o.get("parameter_id")}
+
+
+def resolve_measure_def(mdef: dict, overrides: dict[str, Any] | None = None) -> dict:
+    """Wendet Parameter-Overrides auf eine Maßnahmen-Katalogdefinition an."""
+    if not mdef:
+        return mdef
+    ov = overrides or {}
+    code = mdef["code"]
+    out = dict(mdef)
+    for field in MEASURE_OVERRIDE_FIELDS:
+        val = ov.get(f"measures.{code}.{field}")
+        if val is not None:
+            out[field] = float(val)
+    return out
 
 
 def load_db_overrides(db, kommune_id: int) -> list[dict]:

@@ -25,6 +25,7 @@ def _i(
     value: Any = None,
     coastal_only: bool = False,
     coastal_split: tuple[Any, Any] | None = None,
+    doc_source: str | None = None,
 ) -> dict:
     d: dict = {
         "key": key,
@@ -38,6 +39,10 @@ def _i(
         d["coastal_only"] = True
     if coastal_split is not None:
         d["coastal_split"] = coastal_split
+    if doc_source is not None:
+        # Anzeigbare Herkunft für die Parameter-Registry (``source`` steuert die
+        # Wertauflösung in ``_resolve_single`` und ist dafür reserviert).
+        d["doc_source"] = doc_source
     return d
 
 
@@ -451,8 +456,13 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("__const", "Lieferkettenabhängigkeit", PARAM, "Index", "const", 50.0)],
     },
     "FINANCIAL_ADAPTATION_CAPACITY": {
-        "formula": "Regionaler Annahmewert",
-        "inputs": [_i("__const", "Finanzielle Kapazität (invers)", PARAM, "Index", "const", 45.0)],
+        "formula": "INKAR-Sozioökonomie (Steuerkraft/Arbeitslosigkeit), invers; Fallback 50",
+        "inputs": [
+            _i("financial_adaptation", "Sozioökonomie-Index (BBSR INKAR)", EXTERN, "Index", "socio"),
+            _i("__const", "Finanzielle Kapazität (invers, Fallback)", PARAM, "Index", "const", 50.0,
+               doc_source="BBSR INKAR / Regionalstatistik (per AGS); "
+                          "Fallback: Modellannahme (mangels lokaler Daten)"),
+        ],
     },
     "INFRA_CRITICALITY": {
         "formula": "clamp(w_E·Energie + w_W·Wasser + w_K·Komm + w_G·Gesundheit + w_V·Verkehr ; 0…100)",
@@ -529,8 +539,13 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "LEVEE_CONDITION": {
-        "formula": "Annahmewert (Küste 50 / sonst 30)",
-        "inputs": [_i("__const", "Deichzustand (invers)", PARAM, "Index", "const", None, coastal_split=(50.0, 30.0))],
+        "formula": "Basis(Küste 50/Binnen 30) + 40·Exposition·(1−Deichnähe) − 25·Deichnähe",
+        "inputs": [
+            _i("dyke_prox", "Nähe Deich/Damm (OSM man_made=dyke/embankment)", EXTERN, "", "cell"),
+            _i("water_prox", "Gewässernähe", EXTERN, "", "cell"),
+            _i("__const", "Deichzustand (invers, Basis-Fallback)", PARAM, "Index", "const", None,
+               coastal_split=(50.0, 30.0), doc_source="OSM man_made=dyke/embankment"),
+        ],
     },
     "SALTWATER_INTRUSION_RISK": {
         "formula": "Annahmewert (Küste 40 / sonst 10)",
@@ -549,16 +564,29 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("green_frac", "Grünanteil (OSM)", EXTERN, "", "cell")],
     },
     "EARLY_WARNING_SYSTEMS": {
-        "formula": "Regionaler Annahmewert",
-        "inputs": [_i("__const", "Frühwarnsysteme (invers)", PARAM, "Index", "const", 40.0)],
+        "formula": "50 + (EMERGENCY − 50)·0,6 (OSM-Notfall-Proxy, gedämpft); Fallback 40",
+        "inputs": [
+            _i("emergency_access_score", "Nähe Feuerwehr/Rettung (OSM, Proxy)", EXTERN, "", "cell"),
+            _i("__const", "Frühwarnsysteme (invers, Fallback)", PARAM, "Index", "const", 40.0,
+               doc_source="OSM amenity=fire_station / emergency=* (Proxy)"),
+        ],
     },
     "EMERGENCY_MANAGEMENT": {
-        "formula": "Regionaler Annahmewert",
-        "inputs": [_i("__const", "Katastrophenschutz (invers)", PARAM, "Index", "const", 40.0)],
+        "formula": "clamp(100·(1 − Notfall-Erreichbarkeit) ; 0…100); Fallback 40",
+        "inputs": [
+            _i("emergency_access_score", "Nähe Feuerwehr/Rettung (OSM)", EXTERN, "", "cell"),
+            _i("__const", "Katastrophenschutz (invers, Fallback)", PARAM, "Index", "const", 40.0,
+               doc_source="OSM amenity=fire_station / emergency=*"),
+        ],
     },
     "PLANNING_IMPLEMENTATION_CAPACITY": {
-        "formula": "Regionaler Annahmewert",
-        "inputs": [_i("__const", "Planungskapazität (invers)", PARAM, "Index", "const", 45.0)],
+        "formula": "INKAR-Finanzkraft (Steuerkraft), invers; Fallback 50",
+        "inputs": [
+            _i("planning_capacity", "Finanzkraft-Index (BBSR INKAR)", EXTERN, "Index", "socio"),
+            _i("__const", "Planungskapazität (invers, Fallback)", PARAM, "Index", "const", 50.0,
+               doc_source="BBSR INKAR / Regionalstatistik (per AGS); "
+                          "Fallback: Modellannahme (mangels lokaler Daten)"),
+        ],
     },
     "FISHERIES_TEMPERATURE_SENSITIVITY": {
         "formula": "clamp(Wasser · 100 · Gewässererwärmung/3 ; 0…100)",
@@ -825,6 +853,8 @@ def _resolve_single(inp: dict, ci: dict, regional: dict, hev: dict | None) -> An
         return regional.get(key)
     if source == "demo":
         return regional.get("demographics", {}).get(key)
+    if source == "socio":
+        return (regional.get("socioeconomic") or {}).get(key)
     if source == "computed":
         resolver_key = inp.get("value") or key
         fn = _COMPUTED_RESOLVERS.get(resolver_key)

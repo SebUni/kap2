@@ -93,6 +93,7 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
         bundesland = kommune.bundesland if kommune else None
         population = kommune.population if kommune else None
         area_km2 = kommune.area_km2 if kommune else None
+        osm_id = kommune.osm_id if kommune else None
 
         _last_pct = [0.0]
         _last_phase = [""]
@@ -132,7 +133,7 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
         )
         set_overrides(overrides)
         results = run_full_assessment(
-            grid_cell_dicts, bundesland, population, area_km2, progress, overrides,
+            grid_cell_dicts, bundesland, population, area_km2, progress, overrides, osm_id,
         )
 
         update_progress(FINALIZE[0], "Speichere Ergebnisse")

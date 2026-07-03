@@ -20,6 +20,19 @@ class Settings(BaseSettings):
     OVERPASS_URL: str = "https://overpass-api.de/api/interpreter"
     NOMINATIM_USER_AGENT: str = "kap2-climate-planner/1.0"
 
+    # ── BBSR INKAR / Regionalstatistik (GENESIS-Online REST) ──────────────────
+    # Kommunale Sozioökonomie (Steuereinnahmekraft, Arbeitslosenquote) je AGS.
+    # Ohne Zugangsdaten wird die Ableitung übersprungen (neutraler Fallback 50).
+    REGIONALSTATISTIK_API_BASE: str = "https://www.regionalstatistik.de/genesis/api/rest/2020"
+    REGIONALSTATISTIK_USERNAME: str = ""
+    REGIONALSTATISTIK_PASSWORD: str = ""
+    # GENESIS-Tabellencodes (überschreibbar, falls sich die Tabellen ändern).
+    REGIONALSTATISTIK_TABLE_TAX: str = "71231-01-03-4"          # Realsteuervergleich, €/Einwohner
+    REGIONALSTATISTIK_TABLE_UNEMPLOYMENT: str = "13211-02-05-4"  # Arbeitslosenquote, %
+    REGIONALSTATISTIK_CACHE_DIR: str = os.path.join(_BACKEND_ROOT, "data", "inkar")
+    REGIONALSTATISTIK_TIMEOUT_S: int = 30
+    REGIONALSTATISTIK_CACHE_TTL_S: int = 30 * 24 * 3600  # 30 Tage (jährliche Daten)
+
     class Config:
         env_file = ".env"
 
