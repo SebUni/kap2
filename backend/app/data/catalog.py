@@ -1049,23 +1049,38 @@ MEASURES: list[dict] = [
      "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.3, "benefit_per_m2_year": 1.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Maßnahmenkosten, unbelegt)", "sources": {}},
+    # Herleitung cost_fixed: Praxisrichtwert Erstellung Hitzeschutz-/Hitzeaktionsplan
+    # Mittelstadt (~80.000 EW): 80.000-150.000 € zzgl. halbe Personalstelle
+    # (klimastadtraum.de, Kommunalberatung; UBA-Projekt "HAP-DE" und Fulda-Arbeitshilfe
+    # nennen selbst keine Kostenzahlen) → Punktwert 100.000 € (unterer Mittelwert).
     {"code": "HEAT_ACTION_PLANS", "name": "Hitzeaktionspläne",
      "description": "Kommunale Hitzeaktionspläne.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"],
-     "cost_fixed": 50000.0, "cost_per_unit": None, "cost_per_m2": None,
+     "cost_fixed": 100000.0, "cost_per_unit": None, "cost_per_m2": None,
      "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
-     "source": "Modellannahme (Maßnahmenkosten, unbelegt)", "sources": {}},
+     "source": "klimastadtraum.de (Praxisrichtwert) / Modellannahme",
+     "sources": {"cost_fixed": "klimastadtraum.de (Praxisrichtwert Hitzeschutzplan-Erstellung Mittelstadt)"}},
+    # Herleitung cost_per_unit: keine belastbare Primärquelle für "Kühlraum"-Herrichtung
+    # als Gesamtpaket auffindbar (Modellannahme); plausibilisiert anhand Marktpreisen
+    # gewerblicher Split-Klimaanlagen 1.500-5.000 € Gerät+Einbau (ADAC/Heizcenter 2026)
+    # zzgl. Ausstattung/Trinkwasserstation/Beschilderung ~2.000-3.000 € → Punktwert 8.000 €
+    # (Modellannahme, mangels belastbarer Quelle für die Gesamtmaßnahme).
     {"code": "COOLING_ROOMS_DRINKING_WATER", "name": "Kühle Räume / Kühlzentren",
      "description": "Öffentliche Kühl- und Trinkwasserinfrastruktur.", "measure_type": "structural",
      "effect_target": ["exposure"], "default_reduction": 0.18, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS", "EXPECTED_ANNUAL_MORTALITY"],
      "cost_fixed": 0.0, "cost_per_unit": 8000.0, "cost_per_m2": None,
      "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
-     "unit_label": "Raum", "unit_density_per_ha": 0.05,
-     "source": "Modellannahme (Maßnahmenkosten, unbelegt)",
-     "sources": {"unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"}},
+     "unit_label": "Raum",
+     # Herleitung unit_density_per_ha: Modellannahme (mangels belastbarer Quelle) — an
+     # HAP-Konzept "kühle Orte" angelehnt: ein fußläufig (~800 m Radius, ~20 ha Einzugs-
+     # gebiet) erreichbarer Kühlraum je Quartier → Punktwert 0,05 Räume/ha (1 je 20 ha).
+     "unit_density_per_ha": 0.05,
+     "source": "Modellannahme (mangels belastbarer Quelle)",
+     "sources": {"cost_per_unit": "Modellannahme, plausibilisiert anhand Marktpreisen Split-Klimaanlagen-Einbau",
+                 "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, angelehnt an HAP-Konzept \"kühle Orte\")"}},
     {"code": "EARLY_WARNING_MEASURE", "name": "Frühwarnsysteme (Maßnahme)",
      "description": "Ausbau von Frühwarnsystemen.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "saturating",
@@ -1074,6 +1089,13 @@ MEASURES: list[dict] = [
      "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Maßnahmenkosten, unbelegt)", "sources": {}},
+    # Herleitung cost_per_m2/maintenance_per_m2_year: kein einheitlicher Kennwert für
+    # "Ausbau Stadtgrün" als Sammelmaßnahme auffindbar (Modellannahme, mangels belastbarer
+    # Quelle) — Plausibilisierung anhand Institut für Stadtgrün/Fachsymposium 2013
+    # (Unterhaltung 0,65-85 €/m²/a je nach Pflegeintensität: Rasen bis Wechselflor) und
+    # Berliner Stadtbaumkampagne (~3.000 €/Baum inkl. 3 Jahre Pflege); 25 €/m² Investition
+    # bzw. 3 €/m² Unterhalt liegen im plausiblen Bereich für Grünfläche mittlerer Dichte
+    # (Baumbestand + Rasen/Strauchflächen, keine intensive Zierbepflanzung).
     {"code": "URBAN_GREEN", "name": "Stadtgrün",
      "description": "Ausbau städtischer Grünflächen.", "measure_type": "planning",
      "effect_target": ["hazard"], "default_reduction": 0.25, "coverage_scaling": "linear",
@@ -1081,7 +1103,9 @@ MEASURES: list[dict] = [
      "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 25.0,
      "maintenance_per_unit_year": None, "maintenance_per_m2_year": 3.0, "benefit_per_m2_year": 5.0,
      "unit_label": None, "unit_density_per_ha": None,
-     "source": "Modellannahme (Maßnahmenkosten, unbelegt)", "sources": {}},
+     "source": "Modellannahme (mangels belastbarer Quelle für Sammelmaßnahme)",
+     "sources": {"cost_per_m2": "Modellannahme, plausibilisiert anhand Institut für Stadtgrün (Semmler 2013) / Berliner Stadtbaumkampagne",
+                 "maintenance_per_m2_year": "Modellannahme, plausibilisiert anhand Institut für Stadtgrün (Semmler 2013)"}},
     {"code": "EVACUATION_EMERGENCY_PLANS", "name": "Evakuierungs- & Notfallpläne",
      "description": "Bevölkerungsschutzpläne.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.22, "coverage_scaling": "saturating",
@@ -1230,6 +1254,12 @@ MEASURES: list[dict] = [
      "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Maßnahmenkosten, unbelegt)", "sources": {}},
+    # Herleitung cost_per_m2/maintenance_per_m2_year: keine belastbare €/m²-Quelle für die
+    # Mischmaßnahme "Schatten/Wasser" auffindbar (Modellannahme, mangels belastbarer
+    # Quelle) — Einzelkomponenten (Sonnensegel-Masten ~160-350 €/Stück, Sonnensegel ab
+    # ~70 €/Stück, sonnensegel-guru.de 2026; Wasserspielplatz-Projekt Stuttgart Süd-
+    # heimer Platz ~230.000 € Gesamtinvestition ohne Flächenangabe) bestätigen nur die
+    # Größenordnung, ergeben aber keinen sauberen Flächen-Kennwert.
     {"code": "PUBLIC_SHADE_WATER", "name": "Schatten / Wasser im öffentlichen Raum",
      "description": "Öffentliche Beschattung und Wasserstellen.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.18, "coverage_scaling": "linear",
@@ -1237,7 +1267,9 @@ MEASURES: list[dict] = [
      "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 35.0,
      "maintenance_per_unit_year": None, "maintenance_per_m2_year": 2.0, "benefit_per_m2_year": 3.0,
      "unit_label": None, "unit_density_per_ha": None,
-     "source": "Modellannahme (Maßnahmenkosten, unbelegt)", "sources": {}},
+     "source": "Modellannahme (mangels belastbarer Quelle)",
+     "sources": {"cost_per_m2": "Modellannahme, Größenordnung plausibilisiert anhand Sonnensegel-/Wasserspielplatz-Projektkosten",
+                 "maintenance_per_m2_year": "Modellannahme (mangels belastbarer Quelle)"}},
     {"code": "ADAPTIVE_FISHERIES_MANAGEMENT", "name": "Adaptive Fischereibewirtschaftung",
      "description": "Anpassung von Fangregeln, Schonzeiten und Monitoring.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "saturating",
@@ -1281,8 +1313,10 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Maßnahmenkosten, unbelegt)", "sources": {}},
     # Herleitung cost_per_unit: Berliner Wasserbetriebe: Errichtung inkl. Trinkwasser-
-    # anschluss ~10-16 T€/Standort → Punktwert 14.000 €.
+    # anschluss ~10-16 T€/Standort → Punktwert 14.000 €. Unabhängig bestätigt durch
+    # Presseberichte (Berliner Zeitung/Tagesspiegel 2026): 12.000-15.000 €/Brunnen.
     # Herleitung maintenance_per_unit_year: Betrieb/Wartung/Beprobung ~2,5-5 T€/a → 3.500 €.
+    # Presseberichte nennen ~4.500 €/a für Wartung/Beprobung (innerhalb der Spanne).
     {"code": "DRINKING_FOUNTAINS", "name": "Trinkbrunnen",
      "description": "Öffentliche Trinkwasserspender im Straßenraum.", "measure_type": "structural",
      "effect_target": ["exposure"], "default_reduction": 0.10, "coverage_scaling": "saturating",
