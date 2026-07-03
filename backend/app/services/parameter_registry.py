@@ -164,7 +164,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 f"measures.{m['code']}.{field}",
                 layer_code=m["code"], layer_category="measures",
                 label=label,
-                value=float(m.get(field, 0.0)),
+                value=float(m.get(field) or 0.0),
                 unit=unit,
                 source=source,
             ))
