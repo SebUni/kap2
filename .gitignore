@@ -32,6 +32,10 @@ backend/data/zensus/extract/
 backend/data/zensus/index/
 backend/data/zensus/**/*.zip
 
+# Laufzeit-Caches offener Klimatreiber (§B2): DWD-CDC-Raster, PEGELONLINE
+backend/data/dwd_cdc/
+backend/data/pegelonline/
+
 # Jupyter
 .ipynb_checkpoints/
 

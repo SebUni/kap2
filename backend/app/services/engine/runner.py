@@ -63,10 +63,12 @@ def run_full_assessment(
     progress_callback: Any = None,
     parameter_overrides: dict[str, Any] | None = None,
     osm_id: str | None = None,
+    centroid: tuple[float, float] | None = None,
 ) -> list[dict]:
     """Berechnet die komplette KAP3-Bewertung je Zelle.
 
-    Gibt Liste von {grid_cell_id, data} zurück.
+    Gibt Liste von {grid_cell_id, data} zurück. ``centroid`` = (lon, lat) des
+    Kommune-Zentroids für ortsaufgelöste regionale Treiber (Report §B2).
     """
     from app.services.engine.override_context import set_overrides
 
@@ -75,7 +77,7 @@ def run_full_assessment(
 
     cell_inputs, regional = gather_cell_inputs(
         grid_cells, bundesland, kommune_population, area_km2, is_coastal, progress_callback,
-        osm_id,
+        osm_id, centroid,
     )
 
     total = len(cell_inputs) or 1

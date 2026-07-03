@@ -95,6 +95,15 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
         area_km2 = kommune.area_km2 if kommune else None
         osm_id = kommune.osm_id if kommune else None
 
+        # Kommune-Zentroid (lon, lat) für ortsaufgelöste regionale Treiber (§B2).
+        centroid = None
+        if kommune is not None and kommune.boundary is not None:
+            try:
+                c = to_shape(kommune.boundary).centroid
+                centroid = (c.x, c.y)
+            except Exception:
+                centroid = None
+
         _last_pct = [0.0]
         _last_phase = [""]
         _steps: list[dict] = []
@@ -134,6 +143,7 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
         set_overrides(overrides)
         results = run_full_assessment(
             grid_cell_dicts, bundesland, population, area_km2, progress, overrides, osm_id,
+            centroid,
         )
 
         update_progress(FINALIZE[0], "Speichere Ergebnisse")

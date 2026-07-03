@@ -277,9 +277,18 @@ def build_regional_context(
     bundesland: str | None,
     is_coastal: bool,
     osm_id: str | None = None,
+    centroid: tuple[float, float] | None = None,
 ) -> dict:
-    """Regionale Klimawerte, Demografie und kommunale Sozioökonomie (INKAR)."""
+    """Regionale Klimawerte, Demografie und kommunale Sozioökonomie (INKAR).
+
+    ``centroid`` = (lon, lat) in WGS84 (Kommune-Zentroid). Ist es gesetzt, werden
+    die Treiber ``hot_days``/``frost_days`` (DWD-CDC-Raster) und ``low_flow_days``
+    (PEGELONLINE, nächster Pegel) ortsaufgelöst abgegriffen (Report §B2). Fehlt
+    der Zentroid oder eine Datenquelle, bleibt der bisherige Bundesland-Proxy
+    erhalten (robuster Fallback, wirft nie).
+    """
     from app.services.climate.dwd_data import get_regional_climate, get_snow_cover_climate
+    from app.services.climate import dwd_cdc_grid, pegelonline
     from app.services.zensus_loader import demographic_shares
     from app.services.inkar_loader import socioeconomic_for_kommune
 
@@ -287,9 +296,34 @@ def build_regional_context(
     regional_clim = get_regional_climate(bl)
     snow_clim = get_snow_cover_climate(bl)
     demo = demographic_shares()
-    hot_days = float(regional_clim["hot_days_per_year"])
     mean_temp = float(regional_clim["mean_temp_annual"])
     socioeconomic = socioeconomic_for_kommune(osm_id, bundesland)
+
+    lon = lat = None
+    if centroid is not None:
+        lon, lat = float(centroid[0]), float(centroid[1])
+
+    # hot_days: DWD-CDC-Raster (1 km) am Zentroid, sonst Bundesland-Mittel.
+    hot_days = float(regional_clim["hot_days_per_year"])
+    if lon is not None:
+        real_hot = dwd_cdc_grid.hot_days_at(lon, lat)
+        if real_hot is not None:
+            hot_days = real_hot
+
+    # frost_days: DWD-CDC-Raster am Zentroid, sonst Proxy aus Jahresmitteltemperatur.
+    frost_days = round(max(0.0, 90.0 - mean_temp * 6.0), 1)
+    if lon is not None:
+        real_frost = dwd_cdc_grid.frost_days_at(lon, lat)
+        if real_frost is not None:
+            frost_days = real_frost
+
+    # low_flow_days: nächster PEGELONLINE-Pegel (Tage < MNW), sonst Proxy aus hot_days.
+    low_flow_days = round(10.0 + hot_days, 1)
+    if lon is not None:
+        real_lfd = pegelonline.low_flow_days_at(lon, lat)
+        if real_lfd is not None:
+            low_flow_days = real_lfd
+
     return {
         "bundesland": bundesland,
         "socioeconomic": socioeconomic,
@@ -300,12 +334,12 @@ def build_regional_context(
         "is_coastal": is_coastal,
         "drought_days": round(8.0 + hot_days * 1.2, 1),
         "dry_index": round(min(1.0, hot_days / 25.0), 3),
-        "frost_days": round(max(0.0, 90.0 - mean_temp * 6.0), 1),
+        "frost_days": frost_days,
         "storm_days": 6.0,
         "heavy_rain_index": round(40.0 + (mean_temp - 9.5) * 4.0, 1),
         "mean_temp_rise": round(1.6 + (mean_temp - 9.5) * 0.1, 2),
         "soil_moisture_decline": round(20.0 + hot_days, 1),
-        "low_flow_days": round(10.0 + hot_days, 1),
+        "low_flow_days": low_flow_days,
         "surface_water_heating": round(1.5 + (mean_temp - 9.5) * 0.2, 2),
         "sea_level_rise": 4.5 if is_coastal else 0.0,
         "glacier_loss_rate": 0.5,
@@ -323,10 +357,12 @@ def gather_cell_inputs(
     is_coastal: bool,
     progress_callback: Any = None,
     osm_id: str | None = None,
+    centroid: tuple[float, float] | None = None,
 ) -> tuple[list[dict], dict]:
     """Berechnet pro Zelle alle Rohgrößen. Gibt (cell_inputs, regional) zurück.
 
     ``cell_inputs`` ist an die Reihenfolge von ``grid_cells`` gekoppelt.
+    ``centroid`` = (lon, lat) des Kommune-Zentroids für ortsaufgelöste Treiber.
     """
     from app.services.climate.heat.osm_data import (
         build_water_spatial_index,
@@ -340,7 +376,7 @@ def gather_cell_inputs(
         ZENSUS, OSM_LANDUSE, CELL_SURFACE, CELL_NEIGHBORS, ZENSUS_APPLY, lerp,
     )
 
-    regional = build_regional_context(bundesland, is_coastal, osm_id)
+    regional = build_regional_context(bundesland, is_coastal, osm_id, centroid)
 
     if progress_callback:
         progress_callback(ZENSUS[0], "Zensus-Daten prüfen/laden")

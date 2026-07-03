@@ -119,7 +119,7 @@ DETAILED: dict[str, dict] = {
     "HEAT_WAVE": {
         "formula": "clamp(Heiße Tage + 1,5·UHI-ΔT ; 0…40)",
         "inputs": [
-            _i("hot_days", "Heiße Tage/Jahr (DWD)", EXTERN, "Tage", "cell"),
+            _i("hot_days", "Heiße Tage/Jahr (DWD CDC, am Zentroid)", EXTERN, "Tage", "cell"),
             _i("uhi_delta", "UHI-ΔT (OSM-Modell)", COMPUTED, "K", "cell"),
             _i("uhi_weight", "UHI-Gewichtung", PARAM, "×", "const", 1.5),
         ],
@@ -127,7 +127,7 @@ DETAILED: dict[str, dict] = {
     "COLD_EXTREME": {
         "formula": "Frosttage · (1 − 0,3·min(UHI/5 ; 1))",
         "inputs": [
-            _i("frost_days", "Frosttage (DWD)", EXTERN, "Tage", "regional"),
+            _i("frost_days", "Frosttage (DWD CDC, am Zentroid)", EXTERN, "Tage", "regional"),
             _i("uhi_delta", "UHI-ΔT (OSM-Modell)", COMPUTED, "K", "cell"),
         ],
     },
@@ -218,7 +218,7 @@ DETAILED: dict[str, dict] = {
     "LOW_FLOW_NIEDRIGWASSER": {
         "formula": "clamp(Niedrigwasser · (0,6+0,4·Trocken) · (1+0,3·Gewässernähe) ; 0…60)",
         "inputs": [
-            _i("low_flow_days", "Niedrigwasser-Tage (regional)", EXTERN, "Tage", "regional"),
+            _i("low_flow_days", "Niedrigwasser-Tage (PEGELONLINE, nächster Pegel)", EXTERN, "Tage", "regional"),
             _i("dry_index", "Trockenheitsindex", EXTERN, "", "regional"),
             _i("water_prox", "Gewässernähe (OSM)", COMPUTED, "", "cell"),
         ],

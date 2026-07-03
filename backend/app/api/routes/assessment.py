@@ -115,7 +115,16 @@ def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
 
     try:
         is_coastal = (kommune.bundesland or "") in COASTAL_BUNDESLAENDER
-        regional = build_regional_context(kommune.bundesland, is_coastal)
+        centroid = None
+        if kommune.boundary is not None:
+            try:
+                c = to_shape(kommune.boundary).centroid
+                centroid = (c.x, c.y)
+            except Exception:
+                centroid = None
+        regional = build_regional_context(
+            kommune.bundesland, is_coastal, kommune.osm_id, centroid,
+        )
         recipe = formulas.recipe_for_layer(code, category)
 
         rows = (

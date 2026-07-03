@@ -33,6 +33,27 @@ class Settings(BaseSettings):
     REGIONALSTATISTIK_TIMEOUT_S: int = 30
     REGIONALSTATISTIK_CACHE_TTL_S: int = 30 * 24 * 3600  # 30 Tage (jährliche Daten)
 
+    # ── DWD CDC Rasterdaten (heiße Tage / Frosttage) — offene, keyless Grids ──
+    # Jährliche 1-km-ESRI-ASCII-Grids (Gauß-Krüger 3 / EPSG:31467), am Kommune-
+    # Zentroid abgegriffen und über die letzten N Jahre gemittelt (Report §B2.1).
+    DWD_CDC_GRID_BASE: str = (
+        "https://opendata.dwd.de/climate_environment/CDC/grids_germany/annual"
+    )
+    DWD_CDC_CACHE_DIR: str = os.path.join(_BACKEND_ROOT, "data", "dwd_cdc")
+    DWD_CDC_TIMEOUT_S: int = 30
+    DWD_CDC_CACHE_TTL_S: int = 30 * 24 * 3600   # 30 Tage (jährliche Grids)
+    DWD_CDC_CLIMATOLOGY_YEARS: int = 10         # Mittel der letzten N verfügbaren Jahre
+
+    # ── BfG / PEGELONLINE (WSV) — Niedrigwasser nächster Pegel, keyless REST ──
+    # Report §B2.6: low_flow_days aus dem nächstgelegenen Pegel (Tage < MNW).
+    PEGELONLINE_API_BASE: str = (
+        "https://www.pegelonline.wsv.de/webservices/rest-api/v2"
+    )
+    PEGELONLINE_CACHE_DIR: str = os.path.join(_BACKEND_ROOT, "data", "pegelonline")
+    PEGELONLINE_TIMEOUT_S: int = 30
+    PEGELONLINE_CACHE_TTL_S: int = 30 * 24 * 3600
+    PEGELONLINE_MAX_DISTANCE_KM: float = 50.0   # nur Pegel innerhalb dieser Distanz
+
     class Config:
         env_file = ".env"
 
