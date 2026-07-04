@@ -237,9 +237,9 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className="kpi-card">
-                        <div className="kpi-label">Maßnahmen-Investition</div>
+                        <div className="kpi-label">Maßnahmen-CAPEX</div>
                         <div className="kpi-value" style={{ fontSize: '1.1rem' }}>
-                          {fmtEur(costSummary.measures.total_investment_eur)}
+                          {fmtEur(costSummary.measures.total_capex_eur)}
                         </div>
                       </div>
                     </>
@@ -427,13 +427,13 @@ export default function Dashboard() {
 
             {costSummary && costSummary.measures.rows.length > 0 && (
               <div className="chart-card" style={{ marginTop: '1rem' }}>
-                <h3 className="chart-title">Maßnahmen – Investition & Nutzen</h3>
+                <h3 className="chart-title">Maßnahmen – CAPEX/OPEX & Nutzen</h3>
                 <table className="data-table">
                   <thead>
                     <tr>
                       <th>Maßnahme</th>
-                      <th style={{ textAlign: 'right' }}>Investition</th>
-                      <th style={{ textAlign: 'right' }}>Unterhalt/Jahr</th>
+                      <th style={{ textAlign: 'right' }}>CAPEX</th>
+                      <th style={{ textAlign: 'right' }}>OPEX/Jahr</th>
                       <th style={{ textAlign: 'right' }}>Nutzen/Jahr</th>
                     </tr>
                   </thead>
@@ -441,8 +441,8 @@ export default function Dashboard() {
                     {costSummary.measures.rows.map(m => (
                       <tr key={m.id}>
                         <td style={{ fontWeight: 500 }}>{m.name}</td>
-                        <td style={{ textAlign: 'right' }}>{fmtEur(m.investment_eur)}</td>
-                        <td style={{ textAlign: 'right' }}>{fmtEur(m.annual_maintenance_eur)}</td>
+                        <td style={{ textAlign: 'right' }}>{fmtEur(m.capex_eur)}</td>
+                        <td style={{ textAlign: 'right' }}>{fmtEur(m.opex_annual_eur)}</td>
                         <td style={{ textAlign: 'right', color: 'var(--success)' }}>{fmtEur(m.annual_benefit_eur)}</td>
                       </tr>
                     ))}

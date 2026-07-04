@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.data import catalog
+from app.data import catalog, sources
 from app.services.engine import formulas
 
 PATHWAY_WEIGHT_LABELS = {
@@ -19,14 +19,16 @@ PATHWAY_WEIGHT_LABELS = {
     "compound_multi": "Gewicht Compound-Pfade",
 }
 
+# Symmetrisches CAPEX/OPEX-Kostenmodell (je fix/Stück/Fläche) + Wirkungs-/Dichte-Parameter.
 MEASURE_PARAM_SPECS: tuple[tuple[str, str, str], ...] = (
     ("default_reduction", "Standard-Risikoreduktion", "Anteil"),
-    ("cost_per_m2", "Investitionskosten pro m²", "€/m²"),
-    ("cost_per_unit", "Investitionskosten pro Einheit", "€/Stück"),
-    ("maintenance_per_m2_year", "Wartungskosten pro m² und Jahr", "€/(m²·a)"),
+    ("capex_fixed", "CAPEX – Grundkosten (einmalig)", "€"),
+    ("capex_per_unit", "CAPEX – Investition pro Einheit", "€/Stück"),
+    ("capex_per_m2", "CAPEX – Investition pro m²", "€/m²"),
+    ("opex_fixed_year", "OPEX – Feste Betriebskosten pro Jahr", "€/a"),
+    ("opex_per_unit_year", "OPEX – Betrieb & Unterhalt pro Einheit und Jahr", "€/(Stück·a)"),
+    ("opex_per_m2_year", "OPEX – Betrieb & Unterhalt pro m² und Jahr", "€/(m²·a)"),
     ("benefit_per_m2_year", "Direkter Nutzen pro m² und Jahr", "€/(m²·a)"),
-    ("cost_fixed", "Fixkosten", "€"),
-    ("maintenance_per_unit_year", "Wartungskosten pro Einheit und Jahr", "€/(Stück·a)"),
     ("unit_density_per_ha", "Richtwert-Dichte", "Stück/ha"),
 )
 
@@ -60,6 +62,8 @@ def _base_param(
     value: Any,
     unit: str = "",
     source: str = "",
+    source_detail: str = "",
+    references: list[dict] | None = None,
     prov: str = "param",
     editable: bool = True,
     applicable: bool = True,
@@ -73,6 +77,8 @@ def _base_param(
         "default_value": value,
         "unit": unit,
         "source": source,
+        "source_detail": source_detail,
+        "references": references or [],
         "prov": prov,
         "editable": editable,
         "overridden": False,
@@ -167,6 +173,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             applicable = m.get(field) is not None
             source = (m.get("sources") or {}).get(field) or m.get("source") \
                 or "Modellannahme (Maßnahmenkosten, unbelegt)"
+            source_detail = (m.get("source_details") or {}).get(field) or ""
+            refs = sources.resolve((m.get("source_refs") or {}).get(field))
             params.append(_base_param(
                 f"measures.{m['code']}.{field}",
                 layer_code=m["code"], layer_category="measures",
@@ -174,6 +182,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 value=float(m.get(field)) if applicable else 0.0,
                 unit=unit,
                 source=source,
+                source_detail=source_detail,
+                references=refs,
                 editable=applicable,
                 applicable=applicable,
             ))

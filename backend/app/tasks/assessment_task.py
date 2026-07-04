@@ -177,6 +177,14 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
         db.commit()
         log.info("[TASK] Assessment DONE: %d Zellen", len(results))
 
+        # Karten-Layer-Cache neu bauen (fertige gzip-Dateien auf Platte)
+        try:
+            from app.services import layer_cache
+            layer_cache.invalidate(kommune_id)
+            layer_cache.precompute(db, kommune_id)
+        except Exception:
+            log.exception("[TASK] layer_cache precompute failed kommune=%s", kommune_id)
+
     except InterruptedError:
         if status:
             status.status = AssessmentStatus.ERROR

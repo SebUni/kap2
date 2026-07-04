@@ -878,21 +878,27 @@ def build_pathways(risk: dict) -> list[dict]:
 #   der Zelle (0..1). coverage_scaling: 'linear' oder 'saturating'.
 # linked_risk_codes: Risiken, die neu berechnet werden.
 #
-# 5-Parameter-Kostenmodell (nicht anwendbar = None, NICHT 0.0 — 0.0 heißt "anwendbar,
-# aber kostenlos", z. B. Bauverbote):
-#   cost_fixed                € einmalig, Planung/Konzept/Einrichtung
-#   cost_per_unit              €/Stück, Investition je Einheit (unit_label)
-#   cost_per_m2                €/m², Investition je Polygonfläche
-#   maintenance_per_unit_year  €/(Stück·a) Unterhalt
-#   maintenance_per_m2_year    €/(m²·a) Unterhalt
-#   unit_label                 z. B. "Brunnen", "Station", "km"; None ⇒ keine Stück-Logik
-#   unit_density_per_ha        Stück/ha Richtwert-Dichte (gesetzt wenn unit_label);
-#                               Richtwert-Anzahl = max(1, round(density · Fläche_ha)),
-#                               skaliert die Wirkung über u = min(1, Anzahl/Richtwert)
-#   source / sources           Kurz-Key-Fallback bzw. per-Feld-Quellen (Keys = Feldnamen
-#                               inkl. default_reduction, unit_density_per_ha)
-# Investition = cost_fixed + Anzahl × cost_per_unit + Fläche × cost_per_m2
-# Unterhalt/a = Anzahl × maintenance_per_unit_year + Fläche × maintenance_per_m2_year
+# Kostenmodell — symmetrisch CAPEX (einmalig) / OPEX (jährlich), je fix / Stück / Fläche.
+# MECE: jeder Euro ist entweder einmalige Investition (CAPEX) oder wiederkehrende Betriebs-
+# und Unterhaltskosten (OPEX); innerhalb beider Blöcke disjunkt nach Bezugsgröße (mengen-
+# unabhängig / je Stück / je m²). Nicht anwendbar = None, NICHT 0.0 — 0.0 heißt "anwendbar,
+# aber kostenlos" (z. B. planungsrechtliche Bauverbote).
+#   capex_fixed          € einmalig, mengenunabhängig (Planung/Konzept/Einrichtung)
+#   capex_per_unit       €/Stück      einmalig je Einheit (unit_label)
+#   capex_per_m2         €/m²         einmalig je Polygonfläche
+#   opex_fixed_year      €/a          wiederkehrend, mengenunabhängig (Betrieb/Koordination)
+#   opex_per_unit_year   €/(Stück·a)  wiederkehrend je Einheit (Betrieb & Unterhalt)
+#   opex_per_m2_year     €/(m²·a)     wiederkehrend je Fläche (Betrieb & Unterhalt)
+#   unit_label           z. B. "Brunnen", "Station", "km"; None ⇒ keine Stück-Logik
+#   unit_density_per_ha  Stück/ha Richtwert-Dichte (gesetzt wenn unit_label);
+#                         Richtwert-Anzahl = max(1, round(density · Fläche_ha)),
+#                         skaliert die Wirkung über u = min(1, Anzahl/Richtwert)
+#   source / sources     Kurz-Key-Fallback bzw. per-Feld-Kurzquelle (Keys = Feldnamen
+#                         inkl. default_reduction, unit_density_per_ha)
+#   source_details       per-Feld-Langtext (Hover-Tooltip): woher der Wert stammt bzw. wie
+#                         er hergeleitet/plausibilisiert wurde (Keys = Feldnamen)
+# CAPEX  = capex_fixed + Anzahl × capex_per_unit + Fläche × capex_per_m2
+# OPEX/a = opex_fixed_year + Anzahl × opex_per_unit_year + Fläche × opex_per_m2_year
 # benefit_per_m2_year (Nutzen-Seite) bleibt unverändert vom Kostenmodell getrennt.
 # default_reduction: unbelegte Modellannahme je Maßnahme (keine externe Kalibrierstudie
 #   vorhanden); Kommune kann Wert über PUT /kommune/{id}/parameters mit eigener Quelle
@@ -902,7 +908,7 @@ def build_pathways(risk: dict) -> list[dict]:
 #   der Recherche-Pass mit belastbaren Quellen je Maßnahme folgt in einem späteren Schritt.
 
 MEASURES: list[dict] = [
-    # Herleitung cost_per_unit: eine einzelne Ortsnetzstation kostet ~18.000-50.000 € (400-kVA-
+    # Herleitung capex_per_unit: eine einzelne Ortsnetzstation kostet ~18.000-50.000 € (400-kVA-
     # Trafo bis eigene MS-Station inkl. Verkabelung; ront.info, ms-elektro), eine vollständige
     # Mittelspannungs-Netzverstärkung ~0,8-3 Mio € (Bayernwerk-Projekte). Der Wert 250.000 €/
     # "Station" steht für ein Verstärkungs-/Redundanzpaket je Netzknoten (Stationsausbau +
@@ -912,14 +918,14 @@ MEASURES: list[dict] = [
      "description": "Erhöht Redundanz im Energienetz.", "measure_type": "structural",
      "effect_target": ["vulnerability"], "default_reduction": 0.30, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ENERGY_OUTAGE_HOURS", "EXPECTED_CI_OUTAGE_HOURS"],
-     "cost_fixed": 0.0, "cost_per_unit": 250000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 250000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Station", "unit_density_per_ha": 0.005,
      "source": "Verteilnetzbetreiber-Praxiswerte (ront.info / Bayernwerk) / BNetzA-Größenordnung",
-     "sources": {"cost_per_unit": "Verteilnetz-Praxiswerte (Einzelstation bis MS-Ausbau)",
+     "sources": {"capex_per_unit": "Verteilnetz-Praxiswerte (Einzelstation bis MS-Ausbau)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_details": {
-        "cost_per_unit": "Eine einzelne Ortsnetzstation kostet ~18.000-50.000 € (400-kVA-Trafo "
+        "capex_per_unit": "Eine einzelne Ortsnetzstation kostet ~18.000-50.000 € (400-kVA-Trafo "
             "bis eigene Mittelspannungsstation inkl. Verkabelung; ront.info, ms-elektro.gmbh); "
             "eine vollständige MS-Netzverstärkung liegt bei ~0,8-3 Mio € (Bayernwerk-Projekte). "
             "Der Punktwert 250.000 € je \"Station\" steht für ein Verstärkungs-/Redundanzpaket "
@@ -927,49 +933,50 @@ MEASURES: list[dict] = [
             "eingeordnet zwischen Einzelstation und Vollausbau (BNetzA/dena-Größenordnung).",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 relevanter "
             "Netzknoten je 200 ha Versorgungsgebiet (0,005 Stationen/ha)."}},
-    # Herleitung cost_per_unit: keine belastbare Einzelquelle für die hitzefeste Ertüchtigung/
+    # Herleitung capex_per_unit: keine belastbare Einzelquelle für die hitzefeste Ertüchtigung/
     # Kühlung energiebezogener Anlagen (Transformatoren, Umspannwerke) — Modellannahme.
     # Größenordnung sechsstellig je Anlage (Zusatzkühlung/Redundanz); Punktwert 120.000 €.
     {"code": "HEAT_RESISTANT_PLANT_COOLING", "name": "Hitzefeste Anlagen / Kühlung",
      "description": "Technische Anpassung energiebezogener Anlagen an Hitze.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.20, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ENERGY_INFRA_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": 120000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 120000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.003,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_unit": "Modellannahme (mangels belastbarer Quelle)",
+     "sources": {"capex_per_unit": "Modellannahme (mangels belastbarer Quelle)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_details": {
-        "cost_per_unit": "Für die hitzefeste Ertüchtigung/Zusatzkühlung energiebezogener "
+        "capex_per_unit": "Für die hitzefeste Ertüchtigung/Zusatzkühlung energiebezogener "
             "Anlagen (Transformatoren, Umspannwerke) war keine belastbare Einzelquelle "
             "auffindbar. Modellannahme in sechsstelliger Größenordnung je Anlage (Zusatz"
             "kühlung, thermische Absicherung, Redundanz) → Punktwert 120.000 €.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 hitzekritische "
             "Anlage je 330 ha (0,003 Anlagen/ha)."}},
-    # Herleitung cost_per_m2: schlüsselfertige Aufdach-PV ~1.015-1.200 €/kWp (2026), Batterie-
+    # Herleitung capex_per_m2: schlüsselfertige Aufdach-PV ~1.015-1.200 €/kWp (2026), Batterie-
     # speicher ~315-500 €/kWh (HTW-Stromspeicher-Inspektion 2025; 42watt). Bei ~6 m² Modul-
     # fläche je kWp entspricht das ~170-200 €/m² Modulfläche; über die Bruttodachfläche inkl.
-    # Speicheranteil → Punktwert 150 €/m². maintenance_per_m2_year: ~1-2 % Betrieb/Versicherung.
+    # Speicheranteil → Punktwert 150 €/m². opex_per_m2_year: ~1-2 % Betrieb/Versicherung.
     {"code": "DECENTRALIZED_ENERGY_PV_STORAGE", "name": "Dezentrale Energie (PV, Speicher)",
      "description": "Dezentrale Erzeugung und Speicher.", "measure_type": "structural",
      "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ENERGY_OUTAGE_HOURS", "SYSTEMIC_DOMINO_RISK_INDEX"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 150.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 2.0, "benefit_per_m2_year": 8.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 150.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 2.0, "benefit_per_m2_year": 8.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "HTW-Stromspeicher-Inspektion 2025 / 42watt (PV + Speicher)",
-     "sources": {"cost_per_m2": "HTW Berlin / 42watt (PV-Systempreis + Speicher)",
-                 "maintenance_per_m2_year": "Modellannahme (Betrieb/Versicherung ~1-2 %)"},
+     "sources": {"capex_per_m2": "HTW Berlin / 42watt (PV-Systempreis + Speicher)",
+                 "opex_per_m2_year": "Modellannahme (Betrieb/Versicherung ~1-2 %)"},
+     "source_refs": {"capex_per_m2": ["HTW_Stromspeicher_2025"]},
      "source_details": {
-        "cost_per_m2": "Schlüsselfertige Aufdach-PV kostet ~1.015-1.200 €/kWp (Frühjahr 2026, "
+        "capex_per_m2": "Schlüsselfertige Aufdach-PV kostet ~1.015-1.200 €/kWp (Frühjahr 2026, "
             "historischer Tiefstand), Batteriespeicher ~315 €/kWh bzw. konservativ 500 €/kWh "
             "(HTW-Stromspeicher-Inspektion 2025, HTW Berlin; 42watt.de). Bei ~6 m² Modulfläche "
             "je kWp sind das ~170-200 €/m² Modulfläche; über die Bruttodachfläche inklusive "
             "Speicheranteil → Punktwert 150 €/m².",
-        "maintenance_per_m2_year": "Modellannahme: ~1-2 % der Investition pro Jahr für Betrieb, "
+        "opex_per_m2_year": "Modellannahme: ~1-2 % der Investition pro Jahr für Betrieb, "
             "Wartung, Wechselrichter-Rücklage und Versicherung → 2 €/m²/a."}},
-    # Herleitung cost_per_m2/maintenance_per_m2_year: Mischmaßnahme Dach- + Fassadenbegrünung.
+    # Herleitung capex_per_m2/opex_per_m2_year: Mischmaßnahme Dach- + Fassadenbegrünung.
     # Extensives Gründach 40-70 €/m² Herstellung, Unterhalt 0,50-5 €/m²/a (BuGG-Marktreport;
     # 11880-dachdecker/co2online 2026); bodengebundene Fassadenbegrünung 15-35 €/m²
     # (co2online/gartenbau.org 2025). 55 €/m² Investition + 4 €/m²/a Unterhalt als Blend im
@@ -978,22 +985,24 @@ MEASURES: list[dict] = [
      "description": "Begrünung von Dächern und Fassaden.", "measure_type": "structural",
      "effect_target": ["hazard", "exposure"], "default_reduction": 0.18, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS", "EXPECTED_BUILDING_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 55.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 4.0, "benefit_per_m2_year": 6.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 55.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 4.0, "benefit_per_m2_year": 6.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "BuGG-Marktreport / Marktpreise Dach-/Fassadenbegrünung",
-     "sources": {"cost_per_m2": "BuGG-Marktreport / Marktpreise Gründach + Fassade",
-                 "maintenance_per_m2_year": "Marktpreise Gründach-/Fassadenpflege"},
+     "sources": {"capex_per_m2": "BuGG-Marktreport / Marktpreise Gründach + Fassade",
+                 "opex_per_m2_year": "Marktpreise Gründach-/Fassadenpflege"},
+     "source_refs": {"capex_per_m2": ["BuGG_Marktreport_2024", "co2online_Dachbegruenung"],
+                     "opex_per_m2_year": ["BuGG_Marktreport_2024", "co2online_Dachbegruenung"]},
      "source_details": {
-        "cost_per_m2": "Mischmaßnahme aus Dach- und Fassadenbegrünung. Extensives Gründach "
+        "capex_per_m2": "Mischmaßnahme aus Dach- und Fassadenbegrünung. Extensives Gründach "
             "kostet 40-70 €/m² Herstellung (BuGG-Marktreport Gebäudegrün; 11880-dachdecker, "
             "co2online 2026), bodengebundene Fassadenbegrünung 15-35 €/m² (co2online, "
             "gartenbau.org 2025; wandgebundene Systeme ab 400 €/m² hier ausgeklammert). "
             "Punktwert 55 €/m² als flächengewichteter Blend im oberen Gründach-Bereich.",
-        "maintenance_per_m2_year": "Unterhalt Gründach 0,50-5 €/m²/a (BuGG/co2online 2026), "
+        "opex_per_m2_year": "Unterhalt Gründach 0,50-5 €/m²/a (BuGG/co2online 2026), "
             "bodengebundene Fassade 5-50 €/m²/a bei fachgerechter Pflege. Punktwert 4 €/m²/a "
             "für den überwiegenden Gründachanteil zzgl. moderatem Fassadenpflegeaufwand."}},
-    # Herleitung cost_per_m2: Objektschutz ist eigentlich objekt-/öffnungsbezogen, nicht
+    # Herleitung capex_per_m2: Objektschutz ist eigentlich objekt-/öffnungsbezogen, nicht
     # flächenbezogen — die BBK-Hochwasserschutzfibel (BMWSB 2022) beschreibt die Maßnahmen
     # qualitativ ohne €/m²-Kennwert. €/m² ist hier eine Modell-Abstraktion, plausibilisiert
     # anhand Einzelmaßnahmenkosten: Rückstauklappe fachkundig ~2.000-3.000 €, mobile
@@ -1003,66 +1012,66 @@ MEASURES: list[dict] = [
      "description": "Gebäudespezifischer Hochwasserschutz.", "measure_type": "structural",
      "effect_target": ["vulnerability"], "default_reduction": 0.35, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_BUILDING_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 40.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 1.0, "benefit_per_m2_year": 9.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 40.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 1.0, "benefit_per_m2_year": 9.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "BBK-Hochwasserschutzfibel (qualitativ) / Modell-Umlage Objektschutz",
-     "sources": {"cost_per_m2": "Modell-Umlage Objektschutz-Einzelmaßnahmen",
-                 "maintenance_per_m2_year": "Modellannahme (Wartung/Funktionsprüfung)"},
+     "sources": {"capex_per_m2": "Modell-Umlage Objektschutz-Einzelmaßnahmen",
+                 "opex_per_m2_year": "Modellannahme (Wartung/Funktionsprüfung)"},
      "source_details": {
-        "cost_per_m2": "Gebäude-Objektschutz ist objekt-/öffnungsbezogen, nicht flächen"
+        "capex_per_m2": "Gebäude-Objektschutz ist objekt-/öffnungsbezogen, nicht flächen"
             "bezogen; die BBK-/BMWSB-Hochwasserschutzfibel (2022) beschreibt die Maßnahmen "
             "qualitativ ohne €/m²-Kennwert. Der €/m²-Wert ist daher eine Modell-Umlage, "
             "plausibilisiert anhand Einzelmaßnahmen: fachkundig eingebaute Rückstauklappe "
             "~2.000-3.000 €, mobile Kellerfenster-Schotts 800-1.200 €/Fenster (kostencheck.de, "
             "glaserei.org 2026) zzgl. Abdichtung und Barrieren. Auf die typische geschützte "
             "Gebäudegrundfläche umgelegt ergibt sich der Punktwert 40 €/m².",
-        "maintenance_per_m2_year": "Modellannahme: 1 €/m²/a für jährliche Funktionsprüfung/"
+        "opex_per_m2_year": "Modellannahme: 1 €/m²/a für jährliche Funktionsprüfung/"
             "Wartung von Rückstausicherungen und mobilen Schutzelementen sowie deren "
             "Ersatzbeschaffung über die Nutzungsdauer."}},
-    # Herleitung cost_per_m2: Entsiegelung (Aufbruch + Entsorgung + Begrünung) ~25-40 €/m²
+    # Herleitung capex_per_m2: Entsiegelung (Aufbruch + Entsorgung + Begrünung) ~25-40 €/m²
     # je nach aufzubrechendem Material (Sieker, bauindex-online 2026); kommunale
     # Förderprogramme setzen bis 40 €/m² an (Bremen), OÖ 30 €/m² pauschal → Punktwert 35 €/m².
     {"code": "DESEALING_SURFACE", "name": "Entsiegelung",
      "description": "Rückbau versiegelter Flächen.", "measure_type": "planning",
      "effect_target": ["hazard", "vulnerability"], "default_reduction": 0.30, "coverage_scaling": "linear",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX", "EXPECTED_BUILDING_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 35.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.5, "benefit_per_m2_year": 5.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 35.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 5.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Sieker / kommunale Entsiegelungs-Förderprogramme",
-     "sources": {"cost_per_m2": "Sieker / Entsiegelungs-Förderprogramme (Bremen, OÖ)",
-                 "maintenance_per_m2_year": "Modellannahme (Pflege der begrünten Fläche)"},
+     "sources": {"capex_per_m2": "Sieker / Entsiegelungs-Förderprogramme (Bremen, OÖ)",
+                 "opex_per_m2_year": "Modellannahme (Pflege der begrünten Fläche)"},
      "source_details": {
-        "cost_per_m2": "Entsiegelung (Aufbruch der Versiegelung, Entsorgung, Bodenlockerung "
+        "capex_per_m2": "Entsiegelung (Aufbruch der Versiegelung, Entsorgung, Bodenlockerung "
             "und Begrünung) kostet ~25-40 €/m² je nach aufzubrechendem Material (Sieker, "
             "bauindex-online 2026). Kommunale Förderprogramme setzen entsprechend an: Bremen "
             "bis 40 €/m², Oberösterreich 30 €/m² pauschal. Punktwert 35 €/m² im oberen "
             "Bereich der Spanne (befestigte Flächen mit Unterbau).",
-        "maintenance_per_m2_year": "Modellannahme: 0,50 €/m²/a geringer Pflegeaufwand der neu "
+        "opex_per_m2_year": "Modellannahme: 0,50 €/m²/a geringer Pflegeaufwand der neu "
             "begrünten/entsiegelten Fläche (extensive Grünpflege)."}},
-    # Herleitung cost_per_m2: sonnenreflektierende Dachbeschichtung 10-30 €/m², Acryl-
+    # Herleitung capex_per_m2: sonnenreflektierende Dachbeschichtung 10-30 €/m², Acryl-
     # beschichtung im Mittel ~18 €/m² (asphalt-shop/steelmonks 2026) → Punktwert 20 €/m².
-    # maintenance_per_m2_year: Modellannahme (anteilige Nachbeschichtung ~alle 10-15 Jahre).
+    # opex_per_m2_year: Modellannahme (anteilige Nachbeschichtung ~alle 10-15 Jahre).
     {"code": "COOL_ROOFS", "name": "Helle Dächer",
      "description": "Hochreflektive Dachflächen.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.15, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 20.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 1.0, "benefit_per_m2_year": 3.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 20.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 1.0, "benefit_per_m2_year": 3.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Marktpreise Dachbeschichtung / Modellannahme",
-     "sources": {"cost_per_m2": "Marktpreise sonnenreflektierende Dachbeschichtung",
-                 "maintenance_per_m2_year": "Modellannahme (anteilige Nachbeschichtung)"},
+     "sources": {"capex_per_m2": "Marktpreise sonnenreflektierende Dachbeschichtung",
+                 "opex_per_m2_year": "Modellannahme (anteilige Nachbeschichtung)"},
      "source_details": {
-        "cost_per_m2": "Sonnenreflektierende (weiße) Dachbeschichtung kostet 10-30 €/m², eine "
+        "capex_per_m2": "Sonnenreflektierende (weiße) Dachbeschichtung kostet 10-30 €/m², eine "
             "Acrylbeschichtung im Mittel ~18 €/m² (asphalt-shop.de, steelmonks 2026). "
             "Punktwert 20 €/m² im Mittel der Marktspanne für die Beschichtung einer "
             "bestehenden Dachfläche (ohne Dacherneuerung).",
-        "maintenance_per_m2_year": "Modellannahme mangels belastbarer Quelle: 1 €/m²/a bildet "
+        "opex_per_m2_year": "Modellannahme mangels belastbarer Quelle: 1 €/m²/a bildet "
             "die anteilige Nachbeschichtung/Auffrischung ab (Beschichtung hält je nach "
             "Produkt ~10-15 Jahre, umgelegt auf die Jahre)."}},
-    # Herleitung cost_per_m2: heller/hitzeresilienter Asphalt verursacht ~3-5 €/m² Mehrkosten
+    # Herleitung capex_per_m2: heller/hitzeresilienter Asphalt verursacht ~3-5 €/m² Mehrkosten
     # gegenüber Normalasphalt (45-60 €/m²), d. h. 20-50 % teurer (strasse-und-autobahn.de,
     # bauindex 2026). Der Wert 30 €/m² entspricht eher einer Deckschichterneuerung mit hellem
     # Belag als nur den Mehrkosten; plausibilisiert im Bereich Teilerneuerung.
@@ -1070,66 +1079,66 @@ MEASURES: list[dict] = [
      "description": "Beläge mit höherer Hitzebeständigkeit.", "measure_type": "structural",
      "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_TRANSPORT_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 30.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 1.0, "benefit_per_m2_year": 3.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 30.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 1.0, "benefit_per_m2_year": 3.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "strasse-und-autobahn.de / bauindex (heller Asphalt) / Modellannahme",
-     "sources": {"cost_per_m2": "Marktdaten heller/hitzeresilienter Asphalt (Teilerneuerung)",
-                 "maintenance_per_m2_year": "Modellannahme (Belagsunterhalt)"},
+     "sources": {"capex_per_m2": "Marktdaten heller/hitzeresilienter Asphalt (Teilerneuerung)",
+                 "opex_per_m2_year": "Modellannahme (Belagsunterhalt)"},
      "source_details": {
-        "cost_per_m2": "Heller/hitzeresilienter Asphalt verursacht ~3-5 €/m² Mehrkosten "
+        "capex_per_m2": "Heller/hitzeresilienter Asphalt verursacht ~3-5 €/m² Mehrkosten "
             "gegenüber Normalasphalt (45-60 €/m²), also 20-50 % Aufpreis (strasse-und-"
             "autobahn.de, bauindex-online 2026). Der Katalogwert 30 €/m² bildet nicht nur den "
             "Aufpreis, sondern eine Deckschichterneuerung mit hellem/resilientem Belag ab "
             "(Teilerneuerung der Fahrbahnoberfläche); plausibilisiert. Als reiner Aufpreis "
             "wären ~3-5 €/m² anzusetzen.",
-        "maintenance_per_m2_year": "Modellannahme: 1 €/m²/a Belagsunterhalt (Risssanierung, "
+        "opex_per_m2_year": "Modellannahme: 1 €/m²/a Belagsunterhalt (Risssanierung, "
             "anteilige Erneuerung der Deckschicht über die Nutzungsdauer)."}},
-    # Herleitung cost_per_m2: Muldenversickerung 10-45 €/m², Mulden-Rigolen-System 60-85 €/m²
+    # Herleitung capex_per_m2: Muldenversickerung 10-45 €/m², Mulden-Rigolen-System 60-85 €/m²
     # abflusswirksamer Fläche (DWA-A 138; baupreislexikon 2026) → Punktwert 45 €/m² an der
     # oberen Grenze reiner Mulden bzw. unterer Grenze kombinierter Systeme.
-    # maintenance_per_m2_year: DWA-Betriebskennwert 0,50-0,75 €/m² abflusswirksamer Fläche;
+    # opex_per_m2_year: DWA-Betriebskennwert 0,50-0,75 €/m² abflusswirksamer Fläche;
     # bezogen auf die (deutlich kleinere) Anlagenfläche selbst höher → Punktwert 2 €/m²/a.
     {"code": "DRAINAGE_SWALES", "name": "Entwässerung (Mulden/Rigolen)",
      "description": "Oberflächenentwässerung und Rigolen.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.25, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_TRANSPORT_DISRUPTION_HOURS", "HYDROLOGICAL_STRESS_RISK_INDEX"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 45.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 2.0, "benefit_per_m2_year": 4.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 45.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 2.0, "benefit_per_m2_year": 4.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "DWA-A 138 / baupreislexikon (Mulden-Rigolen)",
-     "sources": {"cost_per_m2": "DWA-A 138 / baupreislexikon (Mulden-Rigolen-Versickerung)",
-                 "maintenance_per_m2_year": "DWA-A 138 (Betrieb), auf Anlagenfläche umgerechnet"},
+     "sources": {"capex_per_m2": "DWA-A 138 / baupreislexikon (Mulden-Rigolen-Versickerung)",
+                 "opex_per_m2_year": "DWA-A 138 (Betrieb), auf Anlagenfläche umgerechnet"},
      "source_details": {
-        "cost_per_m2": "Nach DWA-A 138 (baupreislexikon 2026) kostet eine reine "
+        "capex_per_m2": "Nach DWA-A 138 (baupreislexikon 2026) kostet eine reine "
             "Muldenversickerung 10-45 €/m² und ein kombiniertes Mulden-Rigolen-System 60-85 "
             "€/m² abflusswirksamer Fläche. Punktwert 45 €/m² liegt an der oberen Grenze der "
             "reinen Mulde bzw. am unteren Rand kombinierter Systeme.",
-        "maintenance_per_m2_year": "Der DWA-Betriebskennwert liegt bei 0,50-0,75 €/m² "
+        "opex_per_m2_year": "Der DWA-Betriebskennwert liegt bei 0,50-0,75 €/m² "
             "abflusswirksamer (angeschlossener) Fläche. Bezogen auf die deutlich kleinere "
             "Anlagenfläche selbst (Mulde/Rigole) fällt der spezifische Unterhalt höher aus "
             "(Mahd, Entschlammung, Kontrolle) → Punktwert 2 €/m²/a."}},
-    # Herleitung cost_per_unit: keine belastbare Standardquelle für die Ertüchtigung eines
+    # Herleitung capex_per_unit: keine belastbare Standardquelle für die Ertüchtigung eines
     # kritischen Verkehrsknotens (Schutz vor Überflutung/Hitze/Ausfall) — Modellannahme in
     # niedriger sechsstelliger Größenordnung je Knoten → 80.000 €.
     {"code": "CRITICAL_NODE_PROTECTION", "name": "Schutz kritischer Knoten",
      "description": "Schutzmaßnahmen für Verkehrsknoten.", "measure_type": "structural",
      "effect_target": ["exposure"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_TRANSPORT_DISRUPTION_HOURS"],
-     "cost_fixed": 0.0, "cost_per_unit": 80000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 80000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Knoten", "unit_density_per_ha": 0.02,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_unit": "Modellannahme (mangels belastbarer Standardquelle)",
+     "sources": {"capex_per_unit": "Modellannahme (mangels belastbarer Standardquelle)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_details": {
-        "cost_per_unit": "Für die Ertüchtigung eines kritischen Verkehrsknotens (Schutz vor "
+        "capex_per_unit": "Für die Ertüchtigung eines kritischen Verkehrsknotens (Schutz vor "
             "Überflutung, Hitze, Ausfall; z. B. Pumpen, Redundanz, Ertüchtigung von Unter"
             "führungen) war keine belastbare Standardquelle auffindbar. Modellannahme in "
             "niedriger sechsstelliger Größenordnung je Knoten → 80.000 €.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 kritischer Knoten "
             "je 50 ha Siedlungs-/Verkehrsfläche (0,02 Knoten/ha)."}},
-    # Herleitung cost_per_m2: Biotopverbund (Trittsteine, Hecken, Säume, Vernetzungsstrukturen)
+    # Herleitung capex_per_m2: Biotopverbund (Trittsteine, Hecken, Säume, Vernetzungsstrukturen)
     # hat keinen einheitlichen Flächenkennwert; günstige lineare Vernetzungselemente
     # (vgl. Hecken 5-20 €/lfm) auf die verbundene Fläche umgelegt → niedrige €/m². Punktwert
     # 8 €/m² als Modellannahme, plausibilisiert.
@@ -1137,21 +1146,21 @@ MEASURES: list[dict] = [
      "description": "Vernetzung von Lebensräumen.", "measure_type": "planning",
      "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_BIODIVERSITY_LOSS", "ECOSYSTEM_FRAGMENTATION_RISK_INDEX"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 8.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.5, "benefit_per_m2_year": 1.5,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 8.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 1.5,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_m2": "Modellannahme, an Vernetzungselement-Kosten (Hecken) angelehnt",
-                 "maintenance_per_m2_year": "Modellannahme (extensive Biotoppflege)"},
+     "sources": {"capex_per_m2": "Modellannahme, an Vernetzungselement-Kosten (Hecken) angelehnt",
+                 "opex_per_m2_year": "Modellannahme (extensive Biotoppflege)"},
      "source_details": {
-        "cost_per_m2": "Der Biotopverbund bündelt lineare/punktuelle Vernetzungselemente "
+        "capex_per_m2": "Der Biotopverbund bündelt lineare/punktuelle Vernetzungselemente "
             "(Trittsteinbiotope, Hecken, Säume, Kleingewässer) ohne einheitlichen Flächen"
             "kennwert. Günstige lineare Elemente (vgl. Hecken 5-20 €/lfm) auf die verbundene "
             "Fläche umgelegt ergeben niedrige €/m². Punktwert 8 €/m² als Modellannahme, "
             "plausibilisiert.",
-        "maintenance_per_m2_year": "Modellannahme: 0,50 €/m²/a für extensive Biotoppflege "
+        "opex_per_m2_year": "Modellannahme: 0,50 €/m²/a für extensive Biotoppflege "
             "(Mahd, Gehölzpflege)."}},
-    # Herleitung cost_per_m2: Auenrenaturierung streut extrem nach Intensität. Extensive
+    # Herleitung capex_per_m2: Auenrenaturierung streut extrem nach Intensität. Extensive
     # Deichrückverlegung/Flächenrückgabe ~0,3-3 €/m² (WWF/BfN Mittlere Elbe: 6,5 Mio € auf
     # 2.300 ha ≈ 2.826 €/ha ≈ 0,28 €/m²); aktive/technische Renaturierung mit Erdbau und
     # Strukturanreicherung liegt bei ~5-20 €/m² (UBA: kleine Maßnahmen ~10 €/lfm bis techn.
@@ -1161,23 +1170,23 @@ MEASURES: list[dict] = [
      "description": "Renaturierung von Auen und Flussauen.", "measure_type": "planning",
      "effect_target": ["hazard"], "default_reduction": 0.30, "coverage_scaling": "linear",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX", "EXPECTED_HABITAT_LOSS"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 12.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.5, "benefit_per_m2_year": 3.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 12.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 3.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "BfN/WWF/UBA (Auenrenaturierung) / Modellannahme",
-     "sources": {"cost_per_m2": "BfN/WWF Mittlere Elbe + UBA (Bandbreite Renaturierung)",
-                 "maintenance_per_m2_year": "Modellannahme (extensive Auenpflege)"},
+     "sources": {"capex_per_m2": "BfN/WWF Mittlere Elbe + UBA (Bandbreite Renaturierung)",
+                 "opex_per_m2_year": "Modellannahme (extensive Auenpflege)"},
      "source_details": {
-        "cost_per_m2": "Auenrenaturierung streut stark nach Intensität. Extensive "
+        "capex_per_m2": "Auenrenaturierung streut stark nach Intensität. Extensive "
             "Deichrückverlegung/Flächenrückgabe kostet ~0,3-3 €/m² (BfN/WWF-Projekt Mittlere "
             "Elbe: 6,5 Mio € auf 2.300 ha ≈ 2.826 €/ha ≈ 0,28 €/m²). Aktive/technische "
             "Renaturierung mit Erdbau und Strukturanreicherung liegt bei ~5-20 €/m² (UBA: "
             "kleine Maßnahmen ~10 €/lfm, technischer Umbau 600+ €/lfm Gewässerlauf). Punktwert "
             "12 €/m² für moderat-intensive Renaturierung mit Erdbau; die Anwendung auf reine "
             "Flächenrückgabe würde deutlich niedriger liegen.",
-        "maintenance_per_m2_year": "Modellannahme: 0,50 €/m²/a für extensive Auenpflege "
+        "opex_per_m2_year": "Modellannahme: 0,50 €/m²/a für extensive Auenpflege "
             "(Gehölzkontrolle, Monitoring); renaturierte Auen sind weitgehend selbsterhaltend."}},
-    # Herleitung cost_per_m2: Hecken kosten 15-55 €/lfm komplett gepflanzt, Windschutzhecken
+    # Herleitung capex_per_m2: Hecken kosten 15-55 €/lfm komplett gepflanzt, Windschutzhecken
     # 5-20 €/lfm (gartenbau-kosten/kostencheck 2026). Als €/m² über die geschützte Feldfläche
     # ist das eine Modell-Umlage (Hecken belegen nur Ränder, Terrassen sind teurer) → 10 €/m²
     # als Mischwert; Modellannahme, plausibilisiert anhand Heckenpreisen.
@@ -1185,21 +1194,21 @@ MEASURES: list[dict] = [
      "description": "Baulicher und vegetativer Erosionsschutz.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.25, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_SOIL_DEGRADATION"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 10.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 10.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Umlage Heckenpreise, gartenbau-kosten)",
-     "sources": {"cost_per_m2": "Modell-Umlage Heckenpreise (gartenbau-kosten/kostencheck)",
-                 "maintenance_per_m2_year": "Modellannahme (Heckenpflege/Terrassenerhalt)"},
+     "sources": {"capex_per_m2": "Modell-Umlage Heckenpreise (gartenbau-kosten/kostencheck)",
+                 "opex_per_m2_year": "Modellannahme (Heckenpflege/Terrassenerhalt)"},
      "source_details": {
-        "cost_per_m2": "Erosionsschutz bündelt lineare Elemente (Hecken 15-55 €/lfm komplett, "
+        "capex_per_m2": "Erosionsschutz bündelt lineare Elemente (Hecken 15-55 €/lfm komplett, "
             "Windschutzhecken 5-20 €/lfm; gartenbau-kosten.de, kostencheck.de 2026) und "
             "flächige (Terrassierung, teurer). Ein €/m² über die geschützte Feldfläche ist "
             "eine Modell-Umlage, da Hecken nur Feldränder belegen. Punktwert 10 €/m² als "
             "Mischwert; für reinen Heckenschutz großer Flächen tendenziell zu hoch.",
-        "maintenance_per_m2_year": "Modellannahme: 0,50 €/m²/a für Heckenschnitt und "
+        "opex_per_m2_year": "Modellannahme: 0,50 €/m²/a für Heckenschnitt und "
             "Erhalt der Erosionsschutzstrukturen."}},
-    # Herleitung cost_per_m2/maintenance: Humusaufbau erfolgt v. a. über Zwischenfrüchte/
+    # Herleitung capex_per_m2/maintenance: Humusaufbau erfolgt v. a. über Zwischenfrüchte/
     # Begrünung; Saatgut 20-60 €/ha, Prämien bis 220 €/ha (KTBL/LfL; ÖPUL) ≈ 0,002-0,022 €/m².
     # Punktwerte auf 0,02 €/m² (Etablierung, ~200 €/ha) bzw. 0,02 €/m²/a (laufende Begrünung,
     # ~200 €/ha/a) angepasst — Alt-Katalogwerte (2 bzw. 0,3 €/m²) lagen ~2 Größenordnungen zu hoch.
@@ -1207,21 +1216,21 @@ MEASURES: list[dict] = [
      "description": "Aufbau organischen Bodenanteils.", "measure_type": "behavioral",
      "effect_target": ["vulnerability"], "default_reduction": 0.15, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_AGRICULTURAL_DAMAGE_EUR", "EXPECTED_SOIL_DEGRADATION"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 0.02,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.02, "benefit_per_m2_year": 1.5,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 0.02,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.02, "benefit_per_m2_year": 1.5,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "KTBL/LfL (Zwischenfrucht-/Begrünungskosten)",
-     "sources": {"cost_per_m2": "KTBL/LfL Zwischenfruchtkosten (Saatgut/Etablierung)",
-                 "maintenance_per_m2_year": "KTBL/LfL (laufende Begrünungskosten)"},
+     "sources": {"capex_per_m2": "KTBL/LfL Zwischenfruchtkosten (Saatgut/Etablierung)",
+                 "opex_per_m2_year": "KTBL/LfL (laufende Begrünungskosten)"},
      "source_details": {
-        "cost_per_m2": "Humusaufbau erfolgt überwiegend über Zwischenfrüchte/Begrünung: "
+        "capex_per_m2": "Humusaufbau erfolgt überwiegend über Zwischenfrüchte/Begrünung: "
             "Saatgut 20-60 €/ha, mit Prämien/anspruchsvollen Mischungen bis 220 €/ha (KTBL/"
             "LfL-Daten; ÖPUL) ≈ 0,002-0,022 €/m². Punktwert 0,02 €/m² (~200 €/ha) für die "
             "Etablierung, im oberen Bereich der belegten Spanne. Der frühere Katalogwert "
             "2 €/m² (=20.000 €/ha) lag rund zwei Größenordnungen darüber und wurde gesenkt.",
-        "maintenance_per_m2_year": "Laufende Begrünungskosten ~20-220 €/ha/a (KTBL/LfL) "
+        "opex_per_m2_year": "Laufende Begrünungskosten ~20-220 €/ha/a (KTBL/LfL) "
             "≈ 0,002-0,022 €/m²/a → Punktwert 0,02 €/m²/a (~200 €/ha/a)."}},
-    # Herleitung cost_per_m2: trockenresistente Sorten verursachen im Wesentlichen nur einen
+    # Herleitung capex_per_m2: trockenresistente Sorten verursachen im Wesentlichen nur einen
     # Saatgut-Mehrpreis (Saatgut gesamt ~50-200 €/ha; KTBL ≈ 0,005-0,02 €/m²). Punktwerte auf
     # 0,02 €/m² bzw. 0,02 €/m²/a gesenkt (obere Grenze der Saatgutspanne) — Alt-Katalogwerte
     # (1 bzw. 0,2 €/m²) lagen weit über jedem realen Sortenaufpreis.
@@ -1229,22 +1238,22 @@ MEASURES: list[dict] = [
      "description": "Anbau klimaresilienter Kulturen.", "measure_type": "behavioral",
      "effect_target": ["vulnerability"], "default_reduction": 0.18, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_AGRICULTURAL_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 0.02,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.02, "benefit_per_m2_year": 1.5,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 0.02,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.02, "benefit_per_m2_year": 1.5,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "KTBL (Saatgutkosten)",
-     "sources": {"cost_per_m2": "KTBL Saatgutkosten (Sortenaufpreis)",
-                 "maintenance_per_m2_year": "KTBL (jährlicher Saatgut-/Sortenaufpreis)"},
+     "sources": {"capex_per_m2": "KTBL Saatgutkosten (Sortenaufpreis)",
+                 "opex_per_m2_year": "KTBL (jährlicher Saatgut-/Sortenaufpreis)"},
      "source_details": {
-        "cost_per_m2": "Der Wechsel auf trockenresistente Sorten verursacht im Kern nur einen "
+        "capex_per_m2": "Der Wechsel auf trockenresistente Sorten verursacht im Kern nur einen "
             "Saatgut-Mehrpreis; das gesamte Saatgut liegt je nach Kultur bei ~50-200 €/ha "
             "(KTBL) ≈ 0,005-0,02 €/m², der Aufpreis nur ein Bruchteil davon. Punktwert "
             "0,02 €/m² an der oberen Grenze der Saatgutspanne. Der frühere Katalogwert 1 €/m² "
             "(=10.000 €/ha) überstieg jeden realen Sortenaufpreis um Faktor ~50-100 und wurde "
             "gesenkt.",
-        "maintenance_per_m2_year": "Jährlicher Saatgut-/Sortenaufpreis wenige €/ha bis "
+        "opex_per_m2_year": "Jährlicher Saatgut-/Sortenaufpreis wenige €/ha bis "
             "~200 €/ha (KTBL) → Punktwert 0,02 €/m²/a."}},
-    # Herleitung cost_per_m2: KTBL-Richtwert für neue Bewässerungssysteme ~5.000 €/ha
+    # Herleitung capex_per_m2: KTBL-Richtwert für neue Bewässerungssysteme ~5.000 €/ha
     # (Tröpfchen am teuersten, 18 €/mm/ha; profi.de/Thünen). Punktwert 0,5 €/m² (=5.000 €/ha)
     # = KTBL-Bewässerungsrichtwert; ein zusätzlicher Speicheranteil würde ihn erhöhen. Alt-
     # Katalogwert 5 €/m² (=50.000 €/ha) lag ~Faktor 10 darüber und wurde gesenkt.
@@ -1252,21 +1261,21 @@ MEASURES: list[dict] = [
      "description": "Speicherung und effiziente Bewässerung.", "measure_type": "structural",
      "effect_target": ["exposure"], "default_reduction": 0.22, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_AGRICULTURAL_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 0.5,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.2, "benefit_per_m2_year": 2.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 0.5,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.2, "benefit_per_m2_year": 2.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "KTBL (Feldbewässerung)",
-     "sources": {"cost_per_m2": "KTBL-Investitionsrichtwert Bewässerung (~5.000 €/ha)",
-                 "maintenance_per_m2_year": "KTBL (Betriebskosten Bewässerung)"},
+     "sources": {"capex_per_m2": "KTBL-Investitionsrichtwert Bewässerung (~5.000 €/ha)",
+                 "opex_per_m2_year": "KTBL (Betriebskosten Bewässerung)"},
      "source_details": {
-        "cost_per_m2": "Als Faustwert für neue Bewässerungssysteme nennt das KTBL ~5.000 €/ha "
+        "capex_per_m2": "Als Faustwert für neue Bewässerungssysteme nennt das KTBL ~5.000 €/ha "
             "Investition (Tröpfchenbewässerung am teuersten, 18 €/mm·ha; profi.de/Thünen). "
             "Punktwert 0,5 €/m² (=5.000 €/ha) entspricht diesem Richtwert; ein zusätzlicher "
             "Wasserspeicher/Speicherteich würde ihn erhöhen (~1-1,5 €/m²). Der frühere "
             "Katalogwert 5 €/m² (=50.000 €/ha) lag um Faktor 10 darüber und wurde gesenkt.",
-        "maintenance_per_m2_year": "KTBL-Betriebskosten (Energie, Auf-/Abbau der Tropfschläuche) "
+        "opex_per_m2_year": "KTBL-Betriebskosten (Energie, Auf-/Abbau der Tropfschläuche) "
             "~0,05-0,27 €/m²/a je nach Wassergabe → Punktwert 0,2 €/m²/a."}},
-    # Herleitung cost_per_m2: Waldumbau/Wiederbewaldung kostet je nach Baumart und Zaun
+    # Herleitung capex_per_m2: Waldumbau/Wiederbewaldung kostet je nach Baumart und Zaun
     # 3.000-20.000 €/ha, mit Vollzaun/intensiver Pflege bis 30.000 €/ha (Landesforsten RLP:
     # Douglasie ~7.600 €/ha, Eiche/Buche >20.000 €/ha; Ø ~12.700 €/ha) ≈ 0,3-3 €/m². Punktwert
     # 1,5 €/m² (=15.000 €/ha) nahe dem Durchschnitt inkl. Zaun — Alt-Katalogwert 4 €/m²
@@ -1275,23 +1284,23 @@ MEASURES: list[dict] = [
      "description": "Waldumbau zu Mischbeständen.", "measure_type": "planning",
      "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_VEGETATION_DAMAGE"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 1.5,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.1, "benefit_per_m2_year": 1.5,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 1.5,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.1, "benefit_per_m2_year": 1.5,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Landesforsten / AGDW (Waldumbaukosten)",
-     "sources": {"cost_per_m2": "Landesforsten RLP / AGDW (Waldumbau €/ha)",
-                 "maintenance_per_m2_year": "Landesforsten (Kulturpflege/Freischneiden)"},
+     "sources": {"capex_per_m2": "Landesforsten RLP / AGDW (Waldumbau €/ha)",
+                 "opex_per_m2_year": "Landesforsten (Kulturpflege/Freischneiden)"},
      "source_details": {
-        "cost_per_m2": "Waldumbau/Wiederbewaldung kostet je nach Baumart und Wildschutzzaun "
+        "capex_per_m2": "Waldumbau/Wiederbewaldung kostet je nach Baumart und Wildschutzzaun "
             "3.000-20.000 €/ha, mit Vollzaun und intensiver Pflege bis 30.000 €/ha "
             "(Landesforsten Rheinland-Pfalz: Douglasie/Lärche ~7.600 €/ha, Roteiche/Tanne "
             "~12.500 €/ha, Buche/Eiche >20.000 €/ha; Ø ~12.700 €/ha) — also ~0,3-3 €/m². "
             "Punktwert 1,5 €/m² (=15.000 €/ha) nahe dem Durchschnitt inkl. Wildschutz. Der "
             "frühere Katalogwert 4 €/m² (=40.000 €/ha) lag oberhalb selbst intensiver Fälle "
             "und wurde gesenkt.",
-        "maintenance_per_m2_year": "Kulturpflege (Freischneiden ~500 €/ha je Gang, ~2 Gänge "
+        "opex_per_m2_year": "Kulturpflege (Freischneiden ~500 €/ha je Gang, ~2 Gänge "
             "in den ersten Jahren; Landesforsten) → Punktwert 0,10 €/m²/a."}},
-    # Herleitung cost_per_m2: präventive Waldbrandmaßnahmen (Wundstreifen/Riegel, Löschwasser-
+    # Herleitung capex_per_m2: präventive Waldbrandmaßnahmen (Wundstreifen/Riegel, Löschwasser-
     # entnahmestellen, Monitoring) sind überwiegend punktuell/linear und je Fläche günstig;
     # kein belastbarer Flächen-Kennwert auffindbar. Punktwert 1 €/m² als Modellannahme, für
     # großflächige Anwendung tendenziell zu hoch.
@@ -1299,21 +1308,21 @@ MEASURES: list[dict] = [
      "description": "Präventive Waldbrandmaßnahmen.", "measure_type": "organizational",
      "effect_target": ["hazard"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_VEGETATION_DAMAGE"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 1.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.3, "benefit_per_m2_year": 1.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 1.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.3, "benefit_per_m2_year": 1.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_m2": "Modellannahme (mangels belastbarer Flächen-Quelle)",
-                 "maintenance_per_m2_year": "Modellannahme (Unterhalt Wundstreifen/Monitoring)"},
+     "sources": {"capex_per_m2": "Modellannahme (mangels belastbarer Flächen-Quelle)",
+                 "opex_per_m2_year": "Modellannahme (Unterhalt Wundstreifen/Monitoring)"},
      "source_details": {
-        "cost_per_m2": "Präventive Waldbrandmaßnahmen (Wundstreifen/Brandriegel, Löschwasser"
+        "capex_per_m2": "Präventive Waldbrandmaßnahmen (Wundstreifen/Brandriegel, Löschwasser"
             "entnahmestellen, Waldbrand-Monitoring) sind überwiegend punktuell bzw. linear "
             "angelegt und je Waldfläche günstig; ein belastbarer flächenbezogener Kennwert "
             "war nicht auffindbar. Punktwert 1 €/m² als Modellannahme — bei großflächiger "
             "Anwendung eher zu hoch.",
-        "maintenance_per_m2_year": "Modellannahme: 0,30 €/m²/a für den Unterhalt der "
+        "opex_per_m2_year": "Modellannahme: 0,30 €/m²/a für den Unterhalt der "
             "Wundstreifen und das laufende Monitoring."}},
-    # Herleitung cost_fixed: Praxisrichtwert Erstellung Hitzeschutz-/Hitzeaktionsplan
+    # Herleitung capex_fixed: Praxisrichtwert Erstellung Hitzeschutz-/Hitzeaktionsplan
     # Mittelstadt (~80.000 EW): 80.000-150.000 € zzgl. halbe Personalstelle
     # (klimastadtraum.de, Kommunalberatung; UBA-Projekt "HAP-DE" und Fulda-Arbeitshilfe
     # nennen selbst keine Kostenzahlen) → Punktwert 100.000 € (unterer Mittelwert).
@@ -1321,18 +1330,22 @@ MEASURES: list[dict] = [
      "description": "Kommunale Hitzeaktionspläne.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"],
-     "cost_fixed": 100000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 100000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 20000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "klimastadtraum.de (Praxisrichtwert) / Modellannahme",
-     "sources": {"cost_fixed": "klimastadtraum.de (Praxisrichtwert Hitzeaktionsplan)"},
-     "source_details": {"cost_fixed": "Praxisrichtwert für die Erstellung eines kommunalen "
+     "sources": {"opex_fixed_year": "Modellannahme (laufende Fortschreibung/Koordination)",
+                 "capex_fixed": "klimastadtraum.de (Praxisrichtwert Hitzeaktionsplan)"},
+     "source_details": {
+        "opex_fixed_year":
+            "Modellannahme für den laufenden Betrieb des Hitzeaktionsplans: jährliche Fortschreibung, Koordination der Warnkette und saisonaler Betrieb (Hitzetelefon). Entspricht grob der anteiligen halben Personalstelle, die klimastadtraum.de bereits für die Erstellung nennt. Punktwert 20.000 €/a (rund 20 % der einmaligen Erstellungskosten); editierbar.",
+        "capex_fixed": "Praxisrichtwert für die Erstellung eines kommunalen "
         "Hitzeschutz-/Hitzeaktionsplans einer Mittelstadt (~80.000 EW): 80.000–150.000 € "
         "zzgl. rund einer halben Personalstelle (klimastadtraum.de, Kommunalberatung). Die "
         "einschlägigen Leitfäden (UBA-Projekt \"HAP-DE\", Fulda-Arbeitshilfe) beschreiben die "
         "Planerstellung, nennen aber selbst keine Kostenzahlen. Punktwert 100.000 € als "
         "unterer Mittelwert der Spanne."}},
-    # Herleitung cost_per_unit: keine belastbare Primärquelle für "Kühlraum"-Herrichtung
+    # Herleitung capex_per_unit: keine belastbare Primärquelle für "Kühlraum"-Herrichtung
     # als Gesamtpaket auffindbar (Modellannahme); plausibilisiert anhand Marktpreisen
     # gewerblicher Split-Klimaanlagen 1.500-5.000 € Gerät+Einbau (ADAC/Heizcenter 2026)
     # zzgl. Ausstattung/Trinkwasserstation/Beschilderung ~2.000-3.000 € → Punktwert 8.000 €
@@ -1341,18 +1354,18 @@ MEASURES: list[dict] = [
      "description": "Öffentliche Kühl- und Trinkwasserinfrastruktur.", "measure_type": "structural",
      "effect_target": ["exposure"], "default_reduction": 0.18, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS", "EXPECTED_ANNUAL_MORTALITY"],
-     "cost_fixed": 0.0, "cost_per_unit": 8000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 8000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Raum",
      # Herleitung unit_density_per_ha: Modellannahme (mangels belastbarer Quelle) — an
      # HAP-Konzept "kühle Orte" angelehnt: ein fußläufig (~800 m Radius, ~20 ha Einzugs-
      # gebiet) erreichbarer Kühlraum je Quartier → Punktwert 0,05 Räume/ha (1 je 20 ha).
      "unit_density_per_ha": 0.05,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_unit": "Modellannahme (Marktpreise Klimatechnik)",
+     "sources": {"capex_per_unit": "Modellannahme (Marktpreise Klimatechnik)",
                  "unit_density_per_ha": "Modellannahme (HAP-Konzept \"kühle Orte\")"},
      "source_details": {
-        "cost_per_unit": "Keine belastbare Primärquelle für die Herrichtung eines "
+        "capex_per_unit": "Keine belastbare Primärquelle für die Herrichtung eines "
             "\"Kühlraums\" als Gesamtpaket auffindbar – daher Modellannahme. Plausibilisiert "
             "anhand Marktpreisen gewerblicher Split-Klimaanlagen 1.500–5.000 € (Gerät + "
             "Einbau, ADAC/Heizcenter 2026) zzgl. Ausstattung, Trinkwasserstation und "
@@ -1361,7 +1374,7 @@ MEASURES: list[dict] = [
             "Konzept fußläufig erreichbarer \"kühler Orte\" aus kommunalen Hitzeaktionsplänen: "
             "ein in ~800 m Radius (~20 ha Einzugsgebiet) erreichbarer Kühlraum je Quartier "
             "→ 0,05 Räume/ha (1 je 20 ha)."}},
-    # Herleitung cost_fixed: kommunales Starkregen-/Hochwasser-Frühwarnsystem — Machbarkeits-
+    # Herleitung capex_fixed: kommunales Starkregen-/Hochwasser-Frühwarnsystem — Machbarkeits-
     # studie ~5.000 €, Messnetzkonzept bis ~100.000 € (LEADER-gefördert), laufender Betrieb
     # 30.000-40.000 €/a (kommunal.de/Hydrotec 2025); Großprojekt Landkreis Fulda >800.000 €.
     # Punktwert 60.000 € für Aufbau eines mittleren Systems (Konzept + Basis-Sensorik).
@@ -1369,20 +1382,23 @@ MEASURES: list[dict] = [
      "description": "Ausbau von Frühwarnsystemen.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_AFFECTED_EVACUATED", "EXPECTED_ANNUAL_INJURIES"],
-     "cost_fixed": 60000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 60000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 35000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "kommunale Praxiswerte Frühwarnsystem (kommunal.de / Hydrotec)",
-     "sources": {"cost_fixed": "kommunale Praxiswerte Starkregen-/Hochwasser-Frühwarnsystem"},
+     "sources": {"opex_fixed_year": "kommunale Praxiswerte (laufender Betrieb Frühwarnsystem)",
+                 "capex_fixed": "kommunale Praxiswerte Starkregen-/Hochwasser-Frühwarnsystem"},
      "source_details": {
-        "cost_fixed": "Kommunales Starkregen-/Hochwasser-Frühwarnsystem: Machbarkeitsstudie "
+        "opex_fixed_year":
+            "Laufender Betrieb (Wartung, Hosting, Softwarepflege) eines kommunalen Starkregen-/Hochwasser-Frühwarnsystems: 30.000–40.000 €/a (kommunal.de, Hydrotec 2025). Punktwert 35.000 €/a. Diese Betriebskosten waren im früheren Modell nicht abbildbar und sind jetzt als feste jährliche OPEX hinterlegt.",
+        "capex_fixed": "Kommunales Starkregen-/Hochwasser-Frühwarnsystem: Machbarkeitsstudie "
             "~5.000 €, Messnetzkonzept bis ~100.000 € (LEADER-gefördert), laufender Betrieb "
             "(Wartung/Hosting/Entwicklung) 30.000-40.000 €/a (kommunal.de, Hydrotec 2025); als "
             "Großprojekt wurde das System im Landkreis Fulda mit >800.000 € gefördert. Punktwert "
             "60.000 € für den einmaligen Aufbau eines mittleren Systems (Konzept + Basis-"
-            "Sensorik/Pegel); die jährlichen Betriebskosten sind im Modell hier nicht separat "
+            "Sensorik/Pegel); die jährlichen Betriebskosten sind separat unter opex_fixed_year "
             "abgebildet."}},
-    # Herleitung cost_per_m2/maintenance_per_m2_year: kein einheitlicher Kennwert für
+    # Herleitung capex_per_m2/opex_per_m2_year: kein einheitlicher Kennwert für
     # "Ausbau Stadtgrün" als Sammelmaßnahme auffindbar (Modellannahme, mangels belastbarer
     # Quelle) — Plausibilisierung anhand Institut für Stadtgrün/Fachsymposium 2013
     # (Unterhaltung 0,65-85 €/m²/a je nach Pflegeintensität: Rasen bis Wechselflor) und
@@ -1393,25 +1409,25 @@ MEASURES: list[dict] = [
      "description": "Ausbau städtischer Grünflächen.", "measure_type": "planning",
      "effect_target": ["hazard"], "default_reduction": 0.25, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 25.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 3.0, "benefit_per_m2_year": 5.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 25.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 3.0, "benefit_per_m2_year": 5.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle für Sammelmaßnahme)",
-     "sources": {"cost_per_m2": "Modellannahme (Institut für Stadtgrün / Berliner Stadtbaumkampagne)",
-                 "maintenance_per_m2_year": "Modellannahme (Institut für Stadtgrün, Semmler 2013)"},
+     "sources": {"capex_per_m2": "Modellannahme (Institut für Stadtgrün / Berliner Stadtbaumkampagne)",
+                 "opex_per_m2_year": "Modellannahme (Institut für Stadtgrün, Semmler 2013)"},
      "source_details": {
-        "cost_per_m2": "Kein einheitlicher €/m²-Kennwert für \"Ausbau Stadtgrün\" als "
+        "capex_per_m2": "Kein einheitlicher €/m²-Kennwert für \"Ausbau Stadtgrün\" als "
             "Sammelmaßnahme auffindbar – daher Modellannahme. Plausibilisiert anhand Institut "
             "für Stadtgrün (Semmler, Fachsymposium 2013, Unterhaltung 0,65–85 €/m²/a je nach "
             "Pflegeintensität) und Berliner Stadtbaumkampagne (~3.000 €/Baum inkl. 3 Jahre "
             "Anwuchspflege). 25 €/m² Investition liegt im plausiblen Bereich für Grünfläche "
             "mittlerer Dichte (Baumbestand + Rasen/Strauchflächen, keine intensive "
             "Zierbepflanzung).",
-        "maintenance_per_m2_year": "Modellannahme, plausibilisiert anhand Institut für "
+        "opex_per_m2_year": "Modellannahme, plausibilisiert anhand Institut für "
             "Stadtgrün (Semmler 2013): Unterhaltung 0,65–85 €/m²/a je nach Pflegeintensität "
             "(extensiver Rasen bis Wechselflor). 3 €/m²/a entspricht mäßig intensiver Pflege "
             "einer Grünfläche mittlerer Dichte."}},
-    # Herleitung cost_fixed: Erstellung kommunaler Evakuierungs-/Notfallpläne — der BBK
+    # Herleitung capex_fixed: Erstellung kommunaler Evakuierungs-/Notfallpläne — der BBK
     # (Bundesamt für Bevölkerungsschutz und Katastrophenhilfe) liefert Rahmenempfehlungen/
     # Leitfäden, aber keine Kostenkennwerte. Modellannahme als einmaliges Planungs-/
     # Konzeptbudget (Analyse, Planwerk, Übungen) → 40.000 €.
@@ -1419,13 +1435,16 @@ MEASURES: list[dict] = [
      "description": "Bevölkerungsschutzpläne.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.22, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_AFFECTED_EVACUATED"],
-     "cost_fixed": 40000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 40000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 8000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "BBK (Leitfäden, ohne Kostenkennwert) / Modellannahme",
-     "sources": {"cost_fixed": "Modellannahme (Planungsbudget; BBK-Leitfäden ohne Kostenangabe)"},
+     "sources": {"opex_fixed_year": "Modellannahme (Übungen/Aktualisierung)",
+                 "capex_fixed": "Modellannahme (Planungsbudget; BBK-Leitfäden ohne Kostenangabe)"},
      "source_details": {
-        "cost_fixed": "Erstellung kommunaler Evakuierungs- und Notfallpläne. Der BBK (Bundesamt "
+        "opex_fixed_year":
+            "Modellannahme für den laufenden Unterhalt der Evakuierungs- und Notfallpläne: regelmäßige Übungen, Aktualisierung des Planwerks und Schulungen. Grob 20 % der einmaligen Erstellung → 8.000 €/a. BBK-Leitfäden nennen keine Kostenkennwerte; editierbar.",
+        "capex_fixed": "Erstellung kommunaler Evakuierungs- und Notfallpläne. Der BBK (Bundesamt "
             "für Bevölkerungsschutz und Katastrophenhilfe) stellt Rahmenempfehlungen und "
             "Leitfäden bereit, nennt aber keine Kostenkennwerte. Modellannahme als einmaliges "
             "Planungs-/Konzeptbudget (Gefährdungsanalyse, Planwerk, Übungen) → 40.000 €. Für "
@@ -1437,41 +1456,41 @@ MEASURES: list[dict] = [
      "description": "Siedlungsrückhaltung in Gefahrenzonen.", "measure_type": "planning",
      "effect_target": ["exposure"], "default_reduction": 0.30, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_BUILDING_DAMAGE_EUR", "EXPECTED_ANNUAL_AFFECTED_EVACUATED"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 0.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.0, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.0, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Planungsrechtliche Maßnahme (direkt kostenneutral)",
-     "sources": {"cost_per_m2": "Planungsrechtlich – direkte Umsetzungskosten ≈ 0",
-                 "maintenance_per_m2_year": "Planungsrechtlich – kein laufender Unterhalt"},
+     "sources": {"capex_per_m2": "Planungsrechtlich – direkte Umsetzungskosten ≈ 0",
+                 "opex_per_m2_year": "Planungsrechtlich – kein laufender Unterhalt"},
      "source_details": {
-        "cost_per_m2": "Rein planungsrechtliche Maßnahme (Bauverbot bzw. Siedlungsrückhaltung "
+        "capex_per_m2": "Rein planungsrechtliche Maßnahme (Bauverbot bzw. Siedlungsrückhaltung "
             "in Gefahrenzonen über die Bauleitplanung). Die direkten Umsetzungskosten sind "
             "≈ 0 €/m² (der Wert 0,0 bedeutet \"anwendbar, aber kostenlos\", nicht \"unbelegt\"). "
             "Etwaige Entschädigungs- oder Opportunitätskosten unbebauter Flächen sind im Modell "
             "bewusst nicht abgebildet.",
-        "maintenance_per_m2_year": "Planungsrechtliche Festsetzung ohne laufenden Unterhalt "
+        "opex_per_m2_year": "Planungsrechtliche Festsetzung ohne laufenden Unterhalt "
             "→ 0 €/m²/a."}},
-    # Herleitung cost_per_m2: Freihaltung von Frischluftkorridoren ist überwiegend Planung/
+    # Herleitung capex_per_m2: Freihaltung von Frischluftkorridoren ist überwiegend Planung/
     # Flächensicherung (Bebauungsverzicht, gelegentliche Gehölzpflege) ohne baulichen Aufwand;
     # kein Marktkennwert. Punktwert 2 €/m² als niedrige Modellannahme (Planungs-/Pflegeanteil).
     {"code": "FRESH_AIR_CORRIDORS", "name": "Frischluftschneisen",
      "description": "Freihaltung von Frischluftkorridoren.", "measure_type": "planning",
      "effect_target": ["hazard"], "default_reduction": 0.20, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 2.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 2.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Planungs-/Flächensicherung)",
-     "sources": {"cost_per_m2": "Modellannahme (Planung/Flächensicherung, mangels Marktkennwert)",
-                 "maintenance_per_m2_year": "Modellannahme (gelegentliche Gehölzpflege)"},
+     "sources": {"capex_per_m2": "Modellannahme (Planung/Flächensicherung, mangels Marktkennwert)",
+                 "opex_per_m2_year": "Modellannahme (gelegentliche Gehölzpflege)"},
      "source_details": {
-        "cost_per_m2": "Die Freihaltung von Frischluftkorridoren ist überwiegend Planung und "
+        "capex_per_m2": "Die Freihaltung von Frischluftkorridoren ist überwiegend Planung und "
             "Flächensicherung (Bebauungsverzicht, gelegentliche Gehölz-/Freihaltepflege) ohne "
             "baulichen Aufwand; ein Marktkennwert existiert nicht. Punktwert 2 €/m² als "
             "niedrige Modellannahme (Planungs- und geringer Pflegeanteil).",
-        "maintenance_per_m2_year": "Modellannahme: 0,50 €/m²/a für gelegentliche Freihalte-/"
+        "opex_per_m2_year": "Modellannahme: 0,50 €/m²/a für gelegentliche Freihalte-/"
             "Gehölzpflege der Korridore."}},
-    # Herleitung cost_per_m2: Schwammstadt ist ein Bündel (Entsiegelung 25-40 €/m² + Mulden-
+    # Herleitung capex_per_m2: Schwammstadt ist ein Bündel (Entsiegelung 25-40 €/m² + Mulden-
     # Rigolen 60-85 €/m² + Baumrigolen/Retention), kein einzelner Kennwert. Plausibilisiert
     # als Mischwert im unteren Bereich der Kombinationsmaßnahmen (Hamburg RISA, DWA-A 138)
     # → Punktwert 40 €/m². Modellannahme für die Sammelmaßnahme.
@@ -1479,148 +1498,148 @@ MEASURES: list[dict] = [
      "description": "Schwammstadt-Konzepte.", "measure_type": "planning",
      "effect_target": ["hazard"], "default_reduction": 0.30, "coverage_scaling": "linear",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX", "EXPECTED_BUILDING_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 40.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 2.0, "benefit_per_m2_year": 5.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 40.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 2.0, "benefit_per_m2_year": 5.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Schwammstadt-Bündel), plausibilisiert anhand RISA / DWA-A 138",
-     "sources": {"cost_per_m2": "Modellannahme, plausibilisiert anhand Entsiegelung + Mulden-Rigolen (RISA/DWA-A 138)",
-                 "maintenance_per_m2_year": "Modellannahme (Pflege der blau-grünen Elemente)"},
+     "sources": {"capex_per_m2": "Modellannahme, plausibilisiert anhand Entsiegelung + Mulden-Rigolen (RISA/DWA-A 138)",
+                 "opex_per_m2_year": "Modellannahme (Pflege der blau-grünen Elemente)"},
      "source_details": {
-        "cost_per_m2": "Die Schwammstadt ist kein Einzelbauteil, sondern ein Bündel aus "
+        "capex_per_m2": "Die Schwammstadt ist kein Einzelbauteil, sondern ein Bündel aus "
             "Entsiegelung (25-40 €/m²), Mulden-Rigolen (60-85 €/m²), Baumrigolen und "
             "dezentraler Retention. Ein sauberer Einzelkennwert existiert nicht; der Wert ist "
             "als Mischwert im unteren Bereich der Kombinationsmaßnahmen plausibilisiert "
             "(Hamburg RISA – Regeninfrastrukturanpassung; DWA-A 138) → Punktwert 40 €/m². "
             "Modellannahme für die Sammelmaßnahme.",
-        "maintenance_per_m2_year": "Modellannahme: 2 €/m²/a für die Pflege der blau-grünen "
+        "opex_per_m2_year": "Modellannahme: 2 €/m²/a für die Pflege der blau-grünen "
             "Elemente (Mahd, Entschlammung, Vegetationskontrolle), analog Mulden-Rigolen."}},
-    # Herleitung cost_per_m2: offene Retentionsflächen/Erdbecken kosten ~26-50 €/m³ nutzbaren
+    # Herleitung capex_per_m2: offene Retentionsflächen/Erdbecken kosten ~26-50 €/m³ nutzbaren
     # Rückhalts (Praxisbeispiele, agrarheute/Sieker 2026); bei flacher Bauweise (~1 m Tiefe)
-    # entspricht das grob €/m² → Punktwert 30 €/m². maintenance_per_m2_year: Unterhalt offener
+    # entspricht das grob €/m² → Punktwert 30 €/m². opex_per_m2_year: Unterhalt offener
     # Erd-/Betonbecken ~0,50 €/m²/a (Sieker); Katalogwert 1,0 €/m²/a mit Puffer für Mahd/
     # Entschlammung.
     {"code": "RETENTION_STORAGE", "name": "Retentionsflächen / Speicher",
      "description": "Oberirdische Retention und Speicher.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.28, "coverage_scaling": "linear",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 30.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 1.0, "benefit_per_m2_year": 4.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 30.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 1.0, "benefit_per_m2_year": 4.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Praxiswerte Regenrückhaltebecken (Sieker / agrarheute)",
-     "sources": {"cost_per_m2": "Praxiswerte offene Retentionsbecken (Sieker/agrarheute), auf Fläche umgerechnet",
-                 "maintenance_per_m2_year": "Sieker (Unterhalt offener Becken), mit Puffer"},
+     "sources": {"capex_per_m2": "Praxiswerte offene Retentionsbecken (Sieker/agrarheute), auf Fläche umgerechnet",
+                 "opex_per_m2_year": "Sieker (Unterhalt offener Becken), mit Puffer"},
      "source_details": {
-        "cost_per_m2": "Offene Retentionsflächen/Erdbecken kosten ~26-50 €/m³ nutzbaren "
+        "capex_per_m2": "Offene Retentionsflächen/Erdbecken kosten ~26-50 €/m³ nutzbaren "
             "Rückhaltevolumens (Praxisbeispiele 2005/2008 ~26-50 €/m³; agrarheute, Sieker "
             "2026; geschlossene Bauweise 230-370 €/m³ hier ausgeklammert). Bei flacher, "
             "offener Bauweise (~1 m Wassertiefe) entspricht 1 m³ ≈ 1 m² Fläche → Punktwert "
             "30 €/m².",
-        "maintenance_per_m2_year": "Unterhalt offener Erd-/Betonbecken ~0,50 €/m²/a (Sieker). "
+        "opex_per_m2_year": "Unterhalt offener Erd-/Betonbecken ~0,50 €/m²/a (Sieker). "
             "Katalogwert 1,0 €/m²/a mit Puffer für Mahd, Entschlammung und Auslaufkontrolle."}},
-    # Herleitung cost_per_m2: großflächige, offene Polder/Hochwasserrückhaltung liegen am
+    # Herleitung capex_per_m2: großflächige, offene Polder/Hochwasserrückhaltung liegen am
     # unteren Ende der Retentionskostenspanne (viel Fläche, wenig Bauwerk) → Punktwert 25 €/m²,
     # abgeleitet aus den Regenrückhaltebecken-Praxiswerten (Sieker/agrarheute 2026).
     {"code": "RETENTION_POLDER_RESERVOIR", "name": "Retention / Polder / Rückhaltebecken",
      "description": "Großflächige Hochwasserretention.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.30, "coverage_scaling": "linear",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX", "EXPECTED_BUILDING_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 25.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 1.0, "benefit_per_m2_year": 4.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 25.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 1.0, "benefit_per_m2_year": 4.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Praxiswerte Rückhaltebecken (Sieker / agrarheute)",
-     "sources": {"cost_per_m2": "Praxiswerte offene Polder/Rückhaltebecken (Sieker/agrarheute)",
-                 "maintenance_per_m2_year": "Sieker (Unterhalt offener Becken)"},
+     "sources": {"capex_per_m2": "Praxiswerte offene Polder/Rückhaltebecken (Sieker/agrarheute)",
+                 "opex_per_m2_year": "Sieker (Unterhalt offener Becken)"},
      "source_details": {
-        "cost_per_m2": "Großflächige, offene Polder und Hochwasserrückhaltebecken liegen am "
+        "capex_per_m2": "Großflächige, offene Polder und Hochwasserrückhaltebecken liegen am "
             "unteren Ende der Retentionskostenspanne (überwiegend Erdbau/Fläche, wenig "
             "Bauwerk): Praxiswerte offener Becken ~26-50 €/m³ (Sieker, agrarheute 2026), bei "
             "flacher Ausformung → Punktwert 25 €/m².",
-        "maintenance_per_m2_year": "Unterhalt offener Rückhaltebecken ~0,50-1,0 €/m²/a (Sieker) "
+        "opex_per_m2_year": "Unterhalt offener Rückhaltebecken ~0,50-1,0 €/m²/a (Sieker) "
             "für Mahd der Böschungen und Kontrolle der Auslassbauwerke → 1,0 €/m²/a."}},
-    # Herleitung cost_per_m2: Flächen-/Muldenversickerung 10-45 €/m² abflusswirksamer Fläche
+    # Herleitung capex_per_m2: Flächen-/Muldenversickerung 10-45 €/m² abflusswirksamer Fläche
     # (DWA-A 138; baupreislexikon 2026) → Punktwert 30 €/m² im mittleren Bereich.
     {"code": "INFILTRATION_AREAS", "name": "Versickerungsflächen",
      "description": "Flächenversickerung.", "measure_type": "structural",
      "effect_target": ["exposure"], "default_reduction": 0.25, "coverage_scaling": "linear",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 30.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 1.0, "benefit_per_m2_year": 3.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 30.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 1.0, "benefit_per_m2_year": 3.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "DWA-A 138 / baupreislexikon (Flächenversickerung)",
-     "sources": {"cost_per_m2": "DWA-A 138 / baupreislexikon (Mulden-/Flächenversickerung)",
-                 "maintenance_per_m2_year": "DWA-A 138 (Betrieb), auf Anlagenfläche umgerechnet"},
+     "sources": {"capex_per_m2": "DWA-A 138 / baupreislexikon (Mulden-/Flächenversickerung)",
+                 "opex_per_m2_year": "DWA-A 138 (Betrieb), auf Anlagenfläche umgerechnet"},
      "source_details": {
-        "cost_per_m2": "Flächen- und Muldenversickerung kosten nach DWA-A 138 (baupreislexikon "
+        "capex_per_m2": "Flächen- und Muldenversickerung kosten nach DWA-A 138 (baupreislexikon "
             "2026) 10-45 €/m² abflusswirksamer Fläche. Punktwert 30 €/m² im mittleren Bereich "
             "(einfache Sickermulde mit Oberbodenzone).",
-        "maintenance_per_m2_year": "DWA-Betriebskennwert 0,50-0,75 €/m² abflusswirksamer "
+        "opex_per_m2_year": "DWA-Betriebskennwert 0,50-0,75 €/m² abflusswirksamer "
             "Fläche; bezogen auf die Sickerfläche selbst → 1 €/m²/a (Mahd, Belüftung, "
             "Kontrolle der Sickerleistung)."}},
-    # Herleitung cost_per_m2: DGM-basierte Abflusslenkung ist überwiegend Planung/geringfügige
+    # Herleitung capex_per_m2: DGM-basierte Abflusslenkung ist überwiegend Planung/geringfügige
     # Geländemodellierung (Bordsteine, Mulden, Wege als Notwasserwege) ohne einheitlichen
     # Baukennwert → Punktwert 8 €/m² als niedrige Modellannahme. Mangels belastbarer Quelle.
     {"code": "RUNOFF_ROUTING_DGM", "name": "Abflusslenkung (DGM-basiert)",
      "description": "Geländebasierte Abflusslenkung.", "measure_type": "planning",
      "effect_target": ["hazard"], "default_reduction": 0.20, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_BUILDING_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 8.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 8.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_m2": "Modellannahme (mangels belastbarer Quelle)",
-                 "maintenance_per_m2_year": "Modellannahme (mangels belastbarer Quelle)"},
+     "sources": {"capex_per_m2": "Modellannahme (mangels belastbarer Quelle)",
+                 "opex_per_m2_year": "Modellannahme (mangels belastbarer Quelle)"},
      "source_details": {
-        "cost_per_m2": "DGM-basierte Abflusslenkung ist überwiegend Planung und geringfügige "
+        "capex_per_m2": "DGM-basierte Abflusslenkung ist überwiegend Planung und geringfügige "
             "Geländemodellierung (Bordsteinführung, flache Notwasserwege), für die kein "
             "einheitlicher Bau-Flächenkennwert vorliegt. 8 €/m² als niedrige Modellannahme "
             "(planungsdominiert), mangels belastbarer Quelle.",
-        "maintenance_per_m2_year": "Modellannahme: 0,50 €/m²/a geringer Unterhalt der "
+        "opex_per_m2_year": "Modellannahme: 0,50 €/m²/a geringer Unterhalt der "
             "Geländeführung."}},
-    # Herleitung cost_per_m2: künstliche Grundwasseranreicherung (Sickerbecken/-gräben) ohne
+    # Herleitung capex_per_m2: künstliche Grundwasseranreicherung (Sickerbecken/-gräben) ohne
     # einheitlichen €/m²-Kennwert; an der unteren Versickerungskostenspanne (DWA-A 138)
     # orientiert → Punktwert 10 €/m². Überwiegend Modellannahme.
     {"code": "GROUNDWATER_RECHARGE", "name": "Grundwasseranreicherung",
      "description": "Künstliche Grundwasseranreicherung.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.20, "coverage_scaling": "linear",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX", "EXPECTED_WATER_SUPPLY_OUTAGE_HOURS"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 10.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 10.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme, an DWA-A 138 (Versickerung) orientiert",
-     "sources": {"cost_per_m2": "Modellannahme, untere Versickerungskostenspanne (DWA-A 138)",
-                 "maintenance_per_m2_year": "Modellannahme (mangels belastbarer Quelle)"},
+     "sources": {"capex_per_m2": "Modellannahme, untere Versickerungskostenspanne (DWA-A 138)",
+                 "opex_per_m2_year": "Modellannahme (mangels belastbarer Quelle)"},
      "source_details": {
-        "cost_per_m2": "Für künstliche Grundwasseranreicherung (großflächige Sickerbecken/"
+        "capex_per_m2": "Für künstliche Grundwasseranreicherung (großflächige Sickerbecken/"
             "-gräben) liegt kein einheitlicher €/m²-Kennwert vor. Der Wert orientiert sich am "
             "unteren Ende der Versickerungskostenspanne nach DWA-A 138 (extensive, offene "
             "Sickerflächen) → Punktwert 10 €/m². Überwiegend Modellannahme.",
-        "maintenance_per_m2_year": "Modellannahme: 0,50 €/m²/a für Erhalt der Sickerleistung "
+        "opex_per_m2_year": "Modellannahme: 0,50 €/m²/a für Erhalt der Sickerleistung "
             "(Belüftung/Kontrolle)."}},
-    # Herleitung cost_per_unit: Rohrnetzsanierung offene Bauweise 80-150 €/lfm, grabenlose
+    # Herleitung capex_per_unit: Rohrnetzsanierung offene Bauweise 80-150 €/lfm, grabenlose
     # Inliner-Verfahren (CIPP) 50-90 €/lfm (DVGW W 392 / energie|wasser-praxis). Ein
     # "Abschnitt" ≈ 1 km Leitung → 50-150 T€; Punktwert 90.000 € (Mittel, gemischtes Verfahren).
     {"code": "LEAKAGE_REDUCTION", "name": "Leckage-Reduktion",
      "description": "Reduktion von Wasserverlusten im Netz.", "measure_type": "structural",
      "effect_target": ["vulnerability"], "default_reduction": 0.22, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_WATER_SUPPLY_OUTAGE_HOURS"],
-     "cost_fixed": 0.0, "cost_per_unit": 90000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 90000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Abschnitt",
      # Herleitung unit_density_per_ha: Modellannahme (Richtwert-Dichte) — sanierungs-
      # bedürftige Netzabschnitte je Fläche, ~1 Abschnitt (≈1 km) je 33 ha Siedlungsfläche.
      "unit_density_per_ha": 0.03,
      "source": "DVGW W 392 / energie|wasser-praxis (Netzsanierung)",
-     "sources": {"cost_per_unit": "DVGW W 392 / energie|wasser-praxis (Rohrnetzsanierung €/lfm)",
+     "sources": {"capex_per_unit": "DVGW W 392 / energie|wasser-praxis (Rohrnetzsanierung €/lfm)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_details": {
-        "cost_per_unit": "Rohrnetzsanierung kostet in offener Bauweise (Rohrersatz) 80-150 "
+        "capex_per_unit": "Rohrnetzsanierung kostet in offener Bauweise (Rohrersatz) 80-150 "
             "€/lfm, im grabenlosen Inliner-Verfahren (CIPP) 50-90 €/lfm (DVGW W 392; "
             "energie|wasser-praxis 2019). Ein Sanierungs-\"Abschnitt\" entspricht rund 1 km "
             "Leitung → 50.000-150.000 €; Punktwert 90.000 € als Mittel eines gemischten "
             "Verfahrensmixes.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: rund ein sanierungs"
             "bedürftiger Netzabschnitt (≈1 km) je 33 ha Siedlungsfläche (0,03 Abschnitte/ha)."}},
-    # Herleitung cost_per_unit: umfassende Deichsanierung/-verstärkung kostet nach Praxis-
+    # Herleitung capex_per_unit: umfassende Deichsanierung/-verstärkung kostet nach Praxis-
     # projekten ~1,25-2,1 Mio €/km an Flussdeichen (Sachsen-Anhalt/Hessen 2024-2026,
     # volksstimme/rp-darmstadt) und ~4 Mio €/km an See-/Küstendeichen (NLWKN Generalplan
     # Küstenschutz: ~500 Mio € für ~125 km). Punktwert 1.250.000 €/km = konservativer unterer
@@ -1630,14 +1649,14 @@ MEASURES: list[dict] = [
      "description": "Küstenschutz und Deichbau.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.35, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_BUILDING_DAMAGE_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": 1250000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 1250000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "km", "unit_density_per_ha": 0.01,
      "source": "NLWKN Generalplan Küstenschutz / Landesbetriebe (Deichsanierung)",
-     "sources": {"cost_per_unit": "Praxisprojekte Flussdeich + NLWKN Generalplan Küstenschutz",
+     "sources": {"capex_per_unit": "Praxisprojekte Flussdeich + NLWKN Generalplan Küstenschutz",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_details": {
-        "cost_per_unit": "Umfassende Deichsanierung/-verstärkung kostet nach Praxisprojekten "
+        "capex_per_unit": "Umfassende Deichsanierung/-verstärkung kostet nach Praxisprojekten "
             "~1,25-2,1 Mio €/km an Flussdeichen (Sachsen-Anhalt/Hessen 2024-2026: 3 Mio € für "
             "1,7 km, 1,5 Mio € für 0,7 km; volksstimme.de, rp-darmstadt.hessen.de) und ~4 Mio "
             "€/km an See-/Küstendeichen (NLWKN Generalplan Küstenschutz: ~500 Mio € für ~125 "
@@ -1646,7 +1665,7 @@ MEASURES: list[dict] = [
             "frühere Katalogwert 300.000 €/km lag um Faktor 4-13 darunter und wurde angehoben.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~0,01 km "
             "Schutzlinie je ha geschützter Fläche (1 km Deich schützt grob 100 ha Hinterland)."}},
-    # Herleitung cost_per_unit: keine belastbare Einzelquelle für "Salzwasserbarriere" als
+    # Herleitung capex_per_unit: keine belastbare Einzelquelle für "Salzwasserbarriere" als
     # Standardanlage — Modellannahme. Kleine lokale Bauwerke gegen Salzwasserintrusion
     # (Sohlschwellen, Regelungswehre) liegen im niedrigen sechsstelligen Bereich, große
     # Sturmflutsperrwerke (z. B. Emssperrwerk) dagegen im dreistelligen Mio-Bereich und sind
@@ -1655,14 +1674,14 @@ MEASURES: list[dict] = [
      "description": "Barrieren gegen Salzwasserintrusion.", "measure_type": "structural",
      "effect_target": ["exposure"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX"],
-     "cost_fixed": 0.0, "cost_per_unit": 150000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 150000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.002,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_unit": "Modellannahme (lokale Kleinbarriere, mangels belastbarer Quelle)",
+     "sources": {"capex_per_unit": "Modellannahme (lokale Kleinbarriere, mangels belastbarer Quelle)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_details": {
-        "cost_per_unit": "Keine belastbare Einzelquelle für eine \"Salzwasserbarriere\" als "
+        "capex_per_unit": "Keine belastbare Einzelquelle für eine \"Salzwasserbarriere\" als "
             "Standardanlage auffindbar – daher Modellannahme. Der Wert steht für lokale "
             "Kleinbauwerke gegen Salzwasserintrusion (Sohlschwellen, Regelungswehre) im "
             "niedrigen sechsstelligen Bereich. Große Sturmflutsperrwerke (z. B. Emssperrwerk, "
@@ -1670,113 +1689,128 @@ MEASURES: list[dict] = [
             "150.000 €/Anlage.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 Barriere je 500 "
             "ha exponierter Küsten-/Ästuarfläche (0,002 Anlagen/ha)."}},
-    # Herleitung cost_fixed: organisatorisch-finanzielle Maßnahme (Risikoanalyse, Priorisierung
+    # Herleitung capex_fixed: organisatorisch-finanzielle Maßnahme (Risikoanalyse, Priorisierung
     # von Investitionsbudgets) ohne baulichen Anteil; kein Marktkennwert. Modellannahme in
     # Höhe eines Beratungs-/Konzeptbudgets → 30.000 €.
     {"code": "RISK_BASED_INVESTMENTS", "name": "Risikobasierte Investitionen",
      "description": "Finanzielle Steuerung nach Risiko.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.15, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_TOTAL_DAMAGE_EAD_EUR"],
-     "cost_fixed": 30000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 30000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 5000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Konzept-/Beratungsbudget)",
-     "sources": {"cost_fixed": "Modellannahme (Beratungs-/Konzeptbudget, mangels Marktkennwert)"},
+     "sources": {"opex_fixed_year": "Modellannahme (laufendes Controlling/Review)",
+                 "capex_fixed": "Modellannahme (Beratungs-/Konzeptbudget, mangels Marktkennwert)"},
      "source_details": {
-        "cost_fixed": "Organisatorisch-finanzielle Maßnahme (Risikoanalyse, risikobasierte "
+        "opex_fixed_year":
+            "Modellannahme für die laufende Pflege der risikobasierten Investitionspriorisierung: jährliches Review und Controlling der Priorisierungsgrundlage. Punktwert 5.000 €/a. Rein organisatorisch, kein belastbarer Kostenkennwert; editierbar.",
+        "capex_fixed": "Organisatorisch-finanzielle Maßnahme (Risikoanalyse, risikobasierte "
             "Priorisierung von Investitionsbudgets) ohne baulichen Anteil; hierfür existiert "
             "kein Marktkennwert. Modellannahme in Höhe eines einmaligen Beratungs-/Konzept"
             "budgets → 30.000 €. Für organisatorische Maßnahmen ist das der erwartete, "
             "ehrliche Regelfall."}},
-    # Herleitung cost_fixed: Anreizprogramm (z. B. Förderung/Prämien für private Vorsorge);
+    # Herleitung capex_fixed: Anreizprogramm (z. B. Förderung/Prämien für private Vorsorge);
     # kein einheitlicher Kennwert. Modellannahme in Höhe eines Programm-Aufsetzbudgets → 25.000 €.
     {"code": "PREVENTION_INCENTIVES", "name": "Präventionsanreize",
      "description": "Anreize für präventive Maßnahmen.", "measure_type": "organizational",
      "effect_target": ["exposure"], "default_reduction": 0.12, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_TOTAL_DAMAGE_EAD_EUR"],
-     "cost_fixed": 25000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 25000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 6000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Programm-Aufsetzbudget)",
-     "sources": {"cost_fixed": "Modellannahme (Aufsetzen eines Anreiz-/Förderprogramms)"},
+     "sources": {"opex_fixed_year": "Modellannahme (Programmverwaltung)",
+                 "capex_fixed": "Modellannahme (Aufsetzen eines Anreiz-/Förderprogramms)"},
      "source_details": {
-        "cost_fixed": "Anreizprogramm (Förderung/Prämien für private Vorsorge); der reine "
+        "opex_fixed_year":
+            "Modellannahme für die laufende Verwaltung des Präventions-Anreizprogramms (Antrags- und Auszahlungsbearbeitung, Öffentlichkeitsarbeit), ohne die ausgezahlten Fördermittel selbst. Punktwert 6.000 €/a; kein belastbarer Kostenkennwert; editierbar.",
+        "capex_fixed": "Anreizprogramm (Förderung/Prämien für private Vorsorge); der reine "
             "Programm-Overhead (Konzeption, Verwaltung) ist gemeint, nicht die ausgezahlten "
             "Fördermittel. Kein einheitlicher Kennwert verfügbar → Modellannahme 25.000 € als "
             "Aufsetzbudget. Erwarteter, ehrlicher Regelfall für organisatorische Maßnahmen."}},
-    # Herleitung cost_per_unit: betriebliche Kühlkonzepte (Prozess-/Gebäudekühlung in Industrie/
+    # Herleitung capex_per_unit: betriebliche Kühlkonzepte (Prozess-/Gebäudekühlung in Industrie/
     # Gewerbe) sind stark anlagenspezifisch; keine belastbare Standard-Quelle. Modellannahme in
     # sechsstelliger Größenordnung je Anlage → 70.000 €.
     {"code": "INDUSTRIAL_COOLING_CONCEPTS", "name": "Kühlkonzepte (Industrie/Gewerbe)",
      "description": "Betriebliche Kühlkonzepte.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.18, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_INDIRECT_ECONOMIC_LOSS_EUR"],
-     "cost_fixed": 0.0, "cost_per_unit": 70000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 70000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.02,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_unit": "Modellannahme (anlagenspezifisch, mangels Standard-Quelle)",
+     "sources": {"capex_per_unit": "Modellannahme (anlagenspezifisch, mangels Standard-Quelle)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_details": {
-        "cost_per_unit": "Betriebliche Kühlkonzepte (Prozess- und Gebäudekühlung in Industrie/"
+        "capex_per_unit": "Betriebliche Kühlkonzepte (Prozess- und Gebäudekühlung in Industrie/"
             "Gewerbe) sind stark anlagen- und branchenspezifisch; eine belastbare Standard"
             "quelle war nicht auffindbar. Modellannahme in sechsstelliger Größenordnung je "
             "ertüchtigter Anlage → 70.000 €.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 kühlrelevante "
             "Anlage je 50 ha Industrie-/Gewerbefläche (0,02 Anlagen/ha)."}},
-    # Herleitung cost_fixed: Lieferketten-Resilienz (Zweitlieferanten, Lager-/Redundanzkonzepte,
+    # Herleitung capex_fixed: Lieferketten-Resilienz (Zweitlieferanten, Lager-/Redundanzkonzepte,
     # Notfallplanung) ist organisatorisch; kein Marktkennwert. Modellannahme als Konzept-/
     # Aufbaubudget → 40.000 €. Organisatorische Maßnahme: Modellannahme ist erwarteter Regelfall.
     {"code": "SUPPLY_CHAIN_RESILIENCE", "name": "Lieferketten-Resilienz",
      "description": "Resilienz in Lieferketten.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_SUPPLY_CHAIN_DISRUPTION_HOURS"],
-     "cost_fixed": 40000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 40000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 8000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Konzept-/Aufbaubudget)",
-     "sources": {"cost_fixed": "Modellannahme (organisatorisch, mangels Marktkennwert)"},
+     "sources": {"opex_fixed_year": "Modellannahme (laufendes Monitoring)",
+                 "capex_fixed": "Modellannahme (organisatorisch, mangels Marktkennwert)"},
      "source_details": {
-        "cost_fixed": "Lieferketten-Resilienz (Aufbau von Zweitlieferanten, Lager-/Redundanz"
+        "opex_fixed_year":
+            "Modellannahme für das laufende Monitoring der Lieferketten-Resilienz (Lieferantenbewertung, Notfallübungen, Aktualisierung der Redundanzkonzepte). Punktwert 8.000 €/a; rein organisatorisch, kein belastbarer Kostenkennwert; editierbar.",
+        "capex_fixed": "Lieferketten-Resilienz (Aufbau von Zweitlieferanten, Lager-/Redundanz"
             "konzepten, betriebliche Notfallplanung) ist eine organisatorische Maßnahme ohne "
             "baulichen Anteil; kein Marktkennwert verfügbar. Modellannahme als einmaliges "
             "Konzept-/Aufbaubudget → 40.000 €. Für organisatorische Resilienzmaßnahmen ist die "
             "Modellannahme der erwartete, ehrliche Regelfall."}},
-    # Herleitung cost_fixed: gezielte Schutzprogramme für vulnerable Gruppen (Hitzetelefon,
+    # Herleitung capex_fixed: gezielte Schutzprogramme für vulnerable Gruppen (Hitzetelefon,
     # aufsuchende Betreuung, Aufklärung) sind organisatorisch; kein einheitlicher Kennwert.
     # Modellannahme als Programmbudget (Konzeption/Koordination) → 35.000 €.
     {"code": "VULNERABLE_GROUP_PROGRAMS", "name": "Schutzprogramme vulnerable Gruppen",
      "description": "Gezielte Programme für vulnerable Gruppen.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.22, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY", "SOCIAL_INEQUALITY_AMPLIFICATION_RISK_INDEX"],
-     "cost_fixed": 35000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 35000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 10000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Programmbudget)",
-     "sources": {"cost_fixed": "Modellannahme (organisatorisches Programmbudget)"},
+     "sources": {"opex_fixed_year": "Modellannahme (laufender Programmbetrieb)",
+                 "capex_fixed": "Modellannahme (organisatorisches Programmbudget)"},
      "source_details": {
-        "cost_fixed": "Gezielte Schutzprogramme für vulnerable Gruppen (z. B. Hitzetelefon, "
+        "opex_fixed_year":
+            "Modellannahme für den laufenden Betrieb der Schutzprogramme für vulnerable Gruppen (aufsuchende Beratung, Netzwerkpflege) — überwiegend Personalaufwand, daher höherer Jahresanteil. Punktwert 10.000 €/a; kein belastbarer Kostenkennwert; editierbar.",
+        "capex_fixed": "Gezielte Schutzprogramme für vulnerable Gruppen (z. B. Hitzetelefon, "
             "aufsuchende Betreuung, Aufklärung in Pflegeeinrichtungen) sind organisatorisch "
             "ohne baulichen Anteil; ein einheitlicher Kennwert existiert nicht. Modellannahme "
             "als einmaliges Programmbudget (Konzeption/Koordination) → 35.000 €."}},
-    # Herleitung cost_fixed: angepasste Arbeitszeitmodelle bei Hitze verursachen im Kern nur
+    # Herleitung capex_fixed: angepasste Arbeitszeitmodelle bei Hitze verursachen im Kern nur
     # organisatorischen Aufwand (Dienstplanung, Betriebsvereinbarung); kein Marktkennwert.
     # Modellannahme als geringes Einführungs-/Konzeptbudget → 10.000 €.
     {"code": "HEAT_WORK_SCHEDULES", "name": "Arbeitszeitmodelle bei Hitze",
      "description": "Angepasste Arbeitszeiten bei Hitze.", "measure_type": "behavioral",
      "effect_target": ["exposure"], "default_reduction": 0.18, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS"],
-     "cost_fixed": 10000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 10000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 2000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Einführungs-/Konzeptbudget)",
-     "sources": {"cost_fixed": "Modellannahme (organisatorischer Einführungsaufwand)"},
+     "sources": {"opex_fixed_year": "Modellannahme (Aktualisierung)",
+                 "capex_fixed": "Modellannahme (organisatorischer Einführungsaufwand)"},
      "source_details": {
-        "cost_fixed": "Angepasste Arbeitszeitmodelle bei Hitze (z. B. Vorverlegung von "
+        "opex_fixed_year":
+            "Modellannahme für die laufende Aktualisierung hitzeangepasster Arbeitszeitmodelle und Dienstpläne. Geringer organisatorischer Aufwand → 2.000 €/a; kein belastbarer Kostenkennwert; editierbar.",
+        "capex_fixed": "Angepasste Arbeitszeitmodelle bei Hitze (z. B. Vorverlegung von "
             "Arbeitszeiten, längere Mittagspausen) verursachen im Kern nur organisatorischen "
             "Aufwand (Dienstplanung, Betriebsvereinbarung); ein Marktkennwert existiert nicht. "
             "Modellannahme als geringes einmaliges Einführungs-/Konzeptbudget → 10.000 €."}},
-    # Herleitung cost_per_m2/maintenance_per_m2_year: keine belastbare €/m²-Quelle für die
+    # Herleitung capex_per_m2/opex_per_m2_year: keine belastbare €/m²-Quelle für die
     # Mischmaßnahme "Schatten/Wasser" auffindbar (Modellannahme, mangels belastbarer
     # Quelle) — Einzelkomponenten (Sonnensegel-Masten ~160-350 €/Stück, Sonnensegel ab
     # ~70 €/Stück, sonnensegel-guru.de 2026; Wasserspielplatz-Projekt Stuttgart Süd-
@@ -1786,41 +1820,44 @@ MEASURES: list[dict] = [
      "description": "Öffentliche Beschattung und Wasserstellen.", "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": 0.18, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 35.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 2.0, "benefit_per_m2_year": 3.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 35.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 2.0, "benefit_per_m2_year": 3.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_m2": "Modellannahme (Sonnensegel-/Wasserspielplatz-Projektkosten)",
-                 "maintenance_per_m2_year": "Modellannahme (mangels belastbarer Quelle)"},
+     "sources": {"capex_per_m2": "Modellannahme (Sonnensegel-/Wasserspielplatz-Projektkosten)",
+                 "opex_per_m2_year": "Modellannahme (mangels belastbarer Quelle)"},
      "source_details": {
-        "cost_per_m2": "Keine belastbare €/m²-Quelle für die Mischmaßnahme \"Schatten/Wasser\" "
+        "capex_per_m2": "Keine belastbare €/m²-Quelle für die Mischmaßnahme \"Schatten/Wasser\" "
             "auffindbar – daher Modellannahme. Die Einzelkomponenten (Sonnensegel-Masten "
             "~160–350 €/Stück, Sonnensegel ab ~70 €/Stück, sonnensegel-guru.de 2026; "
             "Wasserspielplatz Stuttgart Südheimer Platz ~230.000 € Gesamtinvestition ohne "
             "Flächenangabe) bestätigen nur die Größenordnung, ergeben aber keinen sauberen "
             "Flächenkennwert. Punktwert 35 €/m² als Größenordnungs-Schätzung.",
-        "maintenance_per_m2_year": "Modellannahme mangels belastbarer Quelle; 2 €/m²/a als "
+        "opex_per_m2_year": "Modellannahme mangels belastbarer Quelle; 2 €/m²/a als "
             "grober Unterhalt für Beschattungs-/Wasserelemente im öffentlichen Raum "
             "(Reinigung, Wartung, Winterlagerung von Segeln)."}},
-    # Herleitung cost_fixed: adaptive Bewirtschaftung (Fangregeln, Schonzeiten, Monitoring) ist
+    # Herleitung capex_fixed: adaptive Bewirtschaftung (Fangregeln, Schonzeiten, Monitoring) ist
     # rein organisatorisch; kein Marktkennwert. Modellannahme als Monitoring-/Konzeptbudget →
     # 20.000 €. Überwiegend Modellannahme ist im Fischerei-Cluster der erwartete Regelfall.
     {"code": "ADAPTIVE_FISHERIES_MANAGEMENT", "name": "Adaptive Fischereibewirtschaftung",
      "description": "Anpassung von Fangregeln, Schonzeiten und Monitoring.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_FISHERIES_ECONOMIC_LOSS_EUR", "FISHERIES_STOCK_STRESS_RISK_INDEX"],
-     "cost_fixed": 20000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 20000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 5000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Monitoring-/Konzeptbudget)",
-     "sources": {"cost_fixed": "Modellannahme (organisatorisch, mangels Marktkennwert)"},
+     "sources": {"opex_fixed_year": "Modellannahme (Monitoring/Bestandsbewertung)",
+                 "capex_fixed": "Modellannahme (organisatorisch, mangels Marktkennwert)"},
      "source_details": {
-        "cost_fixed": "Adaptive Fischereibewirtschaftung (Anpassung von Fangregeln, Schonzeiten "
+        "opex_fixed_year":
+            "Modellannahme für das laufende Monitoring und die jährliche Bestandsbewertung im adaptiven Fischereimanagement. Punktwert 5.000 €/a; überwiegend Modellannahme (Cluster Fischerei); editierbar.",
+        "capex_fixed": "Adaptive Fischereibewirtschaftung (Anpassung von Fangregeln, Schonzeiten "
             "und Bestandsmonitoring) ist eine rein organisatorische Maßnahme ohne baulichen "
             "Anteil; ein Marktkennwert existiert nicht. Modellannahme als einmaliges Monitoring-"
             "/Konzeptbudget → 20.000 €. Im Fischerei-Cluster ist die Modellannahme der "
             "erwartete, ehrliche Regelfall."}},
-    # Herleitung cost_per_unit: Fischaufstiegsanlagen kosten je nach Bauart und Gewässergröße
+    # Herleitung capex_per_unit: Fischaufstiegsanlagen kosten je nach Bauart und Gewässergröße
     # stark unterschiedlich — ein Beispiel nennt ~600.000 € je Anlage, kompakte technische
     # Pässe (Denil/Schlitzpass) an kleinen Querbauwerken liegen deutlich darunter (Wikipedia/
     # LfU Bayern/BAW). Punktwert 200.000 €/Anlage als repräsentativer Mittelwert über kleine
@@ -1829,14 +1866,14 @@ MEASURES: list[dict] = [
      "description": "Fischpässe und bauliche Durchgängigkeit.", "measure_type": "structural",
      "effect_target": ["exposure"], "default_reduction": 0.22, "coverage_scaling": "saturating",
      "linked_risk_codes": ["FISHERIES_STOCK_STRESS_RISK_INDEX", "LOW_WATER_FISHERIES_IMPACT_INDEX"],
-     "cost_fixed": 0.0, "cost_per_unit": 200000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 200000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.01,
      "source": "LfU Bayern / BAW / Wikipedia (Fischaufstiegsanlagen)",
-     "sources": {"cost_per_unit": "LfU Bayern / BAW / Wikipedia (Fischaufstiegsanlagen, breite Spanne)",
+     "sources": {"capex_per_unit": "LfU Bayern / BAW / Wikipedia (Fischaufstiegsanlagen, breite Spanne)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_details": {
-        "cost_per_unit": "Fischaufstiegsanlagen streuen stark nach Bauart und Gewässergröße: "
+        "capex_per_unit": "Fischaufstiegsanlagen streuen stark nach Bauart und Gewässergröße: "
             "ein dokumentiertes Beispiel liegt bei ~600.000 € je Anlage; kompakte technische "
             "Pässe (Denil-/Vertical-Slot-Pass) an kleinen Querbauwerken sind deutlich günstiger "
             "(Wikipedia, LfU Bayern-Beispielsammlung, BAW-Arbeitshilfe). Punktwert 200.000 €/"
@@ -1845,27 +1882,27 @@ MEASURES: list[dict] = [
             "ab und wurde angehoben.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 Querbauwerk je "
             "100 ha Gewässer-/Auenfläche (0,01 Anlagen/ha)."}},
-    # Herleitung cost_per_unit: keine belastbare Standardquelle für die Resilienz-Ertüchtigung
+    # Herleitung capex_per_unit: keine belastbare Standardquelle für die Resilienz-Ertüchtigung
     # einer Aquakulturanlage (Sauerstoff-/Kühlungstechnik, Notstrom, Wasseraufbereitung) —
     # Modellannahme in sechsstelliger Größenordnung je Anlage → 60.000 €.
     {"code": "AQUACULTURE_RESILIENCE_SYSTEMS", "name": "Aquakultur-Resilienz",
      "description": "Technische und organisatorische Resilienz von Aquakulturanlagen.", "measure_type": "structural",
      "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_AQUACULTURE_DAMAGE_EUR", "FISHERIES_STOCK_STRESS_RISK_INDEX"],
-     "cost_fixed": 0.0, "cost_per_unit": 60000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 0.0, "capex_per_unit": 60000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.01,
      "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"cost_per_unit": "Modellannahme (mangels belastbarer Standardquelle)",
+     "sources": {"capex_per_unit": "Modellannahme (mangels belastbarer Standardquelle)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_details": {
-        "cost_per_unit": "Für die Resilienz-Ertüchtigung einer Aquakulturanlage (Sauerstoff-/"
+        "capex_per_unit": "Für die Resilienz-Ertüchtigung einer Aquakulturanlage (Sauerstoff-/"
             "Kühlungstechnik, Notstrom, Wasseraufbereitung, Redundanz) war keine belastbare "
             "Standardquelle auffindbar. Modellannahme in sechsstelliger Größenordnung je "
             "Anlage → 60.000 €.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 Aquakulturanlage "
             "je 100 ha Fischerei-/Gewässerfläche (0,01 Anlagen/ha)."}},
-    # Herleitung cost_per_m2: Laichhabitat-/Gewässerrenaturierung liegt je nach Aufwand bei
+    # Herleitung capex_per_m2: Laichhabitat-/Gewässerrenaturierung liegt je nach Aufwand bei
     # ~10 €/lfm (kleine Maßnahmen) bis 600+ €/lfm (technischer Umbau) Gewässerlauf (UBA);
     # flächenbezogen für Kies-/Strukturanreicherung Größenordnung einstellige €/m². Punktwert
     # 10 €/m² für moderate Struktur-/Substratanreicherung; Modellannahme, plausibilisiert.
@@ -1873,63 +1910,68 @@ MEASURES: list[dict] = [
      "description": "Renaturierung und Schutz von Laich- und Aufwuchsgebieten.", "measure_type": "planning",
      "effect_target": ["hazard"], "default_reduction": 0.22, "coverage_scaling": "linear",
      "linked_risk_codes": ["FISHERIES_STOCK_STRESS_RISK_INDEX", "LOW_WATER_FISHERIES_IMPACT_INDEX"],
-     "cost_fixed": 0.0, "cost_per_unit": None, "cost_per_m2": 10.0,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
+     "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 10.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "UBA (Gewässerrenaturierung) / Modellannahme",
-     "sources": {"cost_per_m2": "UBA (Bandbreite Gewässerrenaturierung), auf Fläche umgelegt",
-                 "maintenance_per_m2_year": "Modellannahme (extensive Gewässerpflege)"},
+     "sources": {"capex_per_m2": "UBA (Bandbreite Gewässerrenaturierung), auf Fläche umgelegt",
+                 "opex_per_m2_year": "Modellannahme (extensive Gewässerpflege)"},
      "source_details": {
-        "cost_per_m2": "Laichhabitat- und Gewässerrenaturierung liegt nach UBA je nach Aufwand "
+        "capex_per_m2": "Laichhabitat- und Gewässerrenaturierung liegt nach UBA je nach Aufwand "
             "bei ~10 €/lfm (kleine Maßnahmen) bis 600+ €/lfm (technischer Umbau) Gewässerlauf. "
             "Flächenbezogen (Kies-/Substrat- und Strukturanreicherung von Laichbetten) ergibt "
             "sich eine einstellige €/m²-Größenordnung. Punktwert 10 €/m² für moderate Struktur"
             "anreicherung; Modellannahme, plausibilisiert.",
-        "maintenance_per_m2_year": "Modellannahme: 0,50 €/m²/a für extensive Gewässerpflege "
+        "opex_per_m2_year": "Modellannahme: 0,50 €/m²/a für extensive Gewässerpflege "
             "(Substratkontrolle, Gehölzpflege); renaturierte Laichhabitate sind weitgehend "
             "selbsterhaltend."}},
-    # Herleitung cost_fixed: organisatorischer Gewässerschutz (Gewässermonitoring, Uferrand-
+    # Herleitung capex_fixed: organisatorischer Gewässerschutz (Gewässermonitoring, Uferrand-
     # streifen-/Einleiter-Management, Kooperationen) ohne einheitlichen Bau-Kennwert.
     # Modellannahme als Konzept-/Monitoringbudget → 25.000 €.
     {"code": "FISHERIES_WATER_QUALITY_PROTECTION", "name": "Gewässerschutz für Fischerei",
      "description": "Maßnahmen zur Sicherung der Gewässerqualität.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_WATER_AIR_POLLUTION", "FISHERIES_STOCK_STRESS_RISK_INDEX"],
-     "cost_fixed": 25000.0, "cost_per_unit": None, "cost_per_m2": None,
-     "maintenance_per_unit_year": None, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 25000.0, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": 6000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Konzept-/Monitoringbudget)",
-     "sources": {"cost_fixed": "Modellannahme (organisatorisch, mangels Marktkennwert)"},
+     "sources": {"opex_fixed_year": "Modellannahme (Gewässergüte-Monitoring)",
+                 "capex_fixed": "Modellannahme (organisatorisch, mangels Marktkennwert)"},
      "source_details": {
-        "cost_fixed": "Organisatorischer Gewässerschutz zugunsten der Fischerei (Gewässer"
+        "opex_fixed_year":
+            "Modellannahme für das laufende Gewässergüte-Monitoring (Probenahme, Laboranalytik) zum Schutz der Fischbestände. Punktwert 6.000 €/a; überwiegend Modellannahme; editierbar.",
+        "capex_fixed": "Organisatorischer Gewässerschutz zugunsten der Fischerei (Gewässer"
             "monitoring, Uferrandstreifen- und Einleiter-Management, Kooperationen mit "
             "Landwirtschaft/Kommunen) ohne einheitlichen baulichen Kennwert. Modellannahme als "
             "einmaliges Konzept-/Monitoringbudget → 25.000 €."}},
-    # Herleitung cost_per_unit: Berliner Wasserbetriebe: Errichtung inkl. Trinkwasser-
+    # Herleitung capex_per_unit: Berliner Wasserbetriebe: Errichtung inkl. Trinkwasser-
     # anschluss ~10-16 T€/Standort → Punktwert 14.000 €. Unabhängig bestätigt durch
     # Presseberichte (Berliner Zeitung/Tagesspiegel 2026): 12.000-15.000 €/Brunnen.
-    # Herleitung maintenance_per_unit_year: Betrieb/Wartung/Beprobung ~2,5-5 T€/a → 3.500 €.
+    # Herleitung opex_per_unit_year: Betrieb/Wartung/Beprobung ~2,5-5 T€/a → 3.500 €.
     # Presseberichte nennen ~4.500 €/a für Wartung/Beprobung (innerhalb der Spanne).
     {"code": "DRINKING_FOUNTAINS", "name": "Trinkbrunnen",
      "description": "Öffentliche Trinkwasserspender im Straßenraum.", "measure_type": "structural",
      "effect_target": ["exposure"], "default_reduction": 0.10, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS", "EXPECTED_ANNUAL_MORTALITY"],
-     "cost_fixed": 5000.0, "cost_per_unit": 14000.0, "cost_per_m2": None,
-     "maintenance_per_unit_year": 3500.0, "maintenance_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "capex_fixed": 5000.0, "capex_per_unit": 14000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": 3500.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Brunnen", "unit_density_per_ha": 0.5,
      "source": "Berliner Wasserbetriebe / Modellannahme",
-     "sources": {"cost_fixed": "Modellannahme (Planung/Standortvorbereitung)",
-                 "cost_per_unit": "Berliner Wasserbetriebe",
-                 "maintenance_per_unit_year": "Berliner Wasserbetriebe"},
+     "sources": {"capex_fixed": "Modellannahme (Planung/Standortvorbereitung)",
+                 "capex_per_unit": "Berliner Wasserbetriebe",
+                 "opex_per_unit_year": "Berliner Wasserbetriebe"},
+     "source_refs": {"capex_per_unit": ["BWB_Trinkbrunnen"],
+                     "opex_per_unit_year": ["BWB_Trinkbrunnen"]},
      "source_details": {
-        "cost_fixed": "Modellannahme für Planung/Standortvorbereitung je Trinkbrunnen-Programm "
+        "capex_fixed": "Modellannahme für Planung/Standortvorbereitung je Trinkbrunnen-Programm "
             "(Standortsuche, Genehmigung, Tiefbauplanung), nicht direkt einer Quelle "
             "entnommen. 5.000 € pauschal als niedrige Konzeptkosten-Schätzung.",
-        "cost_per_unit": "Berliner Wasserbetriebe: Errichtung eines öffentlichen Trinkbrunnens "
+        "capex_per_unit": "Berliner Wasserbetriebe: Errichtung eines öffentlichen Trinkbrunnens "
             "inkl. Trinkwasseranschluss ~10.000–16.000 €/Standort; unabhängig bestätigt durch "
             "Presseberichte (Berliner Zeitung/Tagesspiegel 2026: 12.000–15.000 €/Brunnen). "
             "Punktwert 14.000 € im oberen Mittel der Spanne.",
-        "maintenance_per_unit_year": "Berliner Wasserbetriebe: Betrieb, Wartung und "
+        "opex_per_unit_year": "Berliner Wasserbetriebe: Betrieb, Wartung und "
             "hygienische Beprobung ~2.500–5.000 €/a; Presseberichte 2026 nennen ~4.500 €/a. "
             "Punktwert 3.500 € im unteren Drittel der Spanne."}},
 ]

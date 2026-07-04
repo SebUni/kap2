@@ -20,6 +20,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Uncompressed-Length", "Content-Length"],
 )
 
 app.include_router(kommune.router, prefix="/api/kommune", tags=["Kommune"])

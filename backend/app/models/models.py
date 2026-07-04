@@ -129,6 +129,11 @@ class AdaptationMeasure(Base):
     measure_type = Column(String(100), nullable=False)
     geometry = Column(Geometry("POLYGON", srid=4326), nullable=False)
     config = Column(JSON, default=dict)
+    # Zuletzt berechnetes compute_impact()-Ergebnis (CAPEX/OPEX/Nutzen/
+    # cost_breakdown/count/...) - measure_service.compute_impact() schreibt hier
+    # direkt auf das bereits geladene Objekt statt auf eine beliebige MeasureImpact-
+    # Zelle, damit Export/cost-summary ohne Neuberechnung zugreifen können.
+    impact_summary = Column(JSON, default=dict)
     implementation_year = Column(Integer)
     description = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)

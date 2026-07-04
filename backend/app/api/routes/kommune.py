@@ -14,7 +14,7 @@ from app.models.models import (
 )
 from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
-from app.services import osm_service, grid_service
+from app.services import osm_service, grid_service, layer_cache
 
 router = APIRouter()
 
@@ -92,6 +92,7 @@ def generate_grid(kommune_id: int, req: GridGenerateRequest = GridGenerateReques
     count = grid_service.generate_grid(
         db, kommune_id, cell_size_m=req.cell_size_m, force=req.force,
     )
+    layer_cache.invalidate(kommune_id)
     return {"kommune_id": kommune_id, "cells_created": count, "cell_size_m": req.cell_size_m}
 
 
@@ -161,6 +162,9 @@ def reset_kommune(kommune_id: int, db: Session = Depends(get_db)):
     export_dir = get_exports_dir(kommune_id)
     if os.path.isdir(export_dir):
         shutil.rmtree(export_dir, ignore_errors=True)
+
+    # Karten-Layer-Cache verwerfen
+    layer_cache.invalidate(kommune_id)
 
     return {"message": "Zurückgesetzt", "kommune_id": kommune_id}
 

@@ -102,6 +102,15 @@ class ParameterUpdate(BaseModel):
 
 # ── Parameters (Registry) ────────────────────────────────────────────────────────
 
+class SourceReference(BaseModel):
+    """Zitierfähiger Bibliografie-Eintrag (app.data.sources.SOURCE_REFERENCES)."""
+    key: str = ""
+    ieee: str = ""
+    url: str = ""
+    archive_url: str = ""
+    accessed: str = ""
+
+
 class ModelParameter(BaseModel):
     """Flaches Parameter-Dict aus parameter_registry._base_param()/catalog_parameters()."""
     id: str
@@ -112,6 +121,8 @@ class ModelParameter(BaseModel):
     default_value: Any
     unit: str = ""
     source: str = ""
+    source_detail: str = ""
+    references: list[SourceReference] = []
     prov: str = "param"
     editable: bool = True
     overridden: bool = False
@@ -147,6 +158,8 @@ class MeasureOut(BaseModel):
     implementation_year: Optional[int] = None
     description: Optional[str] = None
     created_at: datetime
+    impact_summary: Optional[dict] = None
+    """Zuletzt berechnetes compute_impact()-Ergebnis (None vor erster Berechnung)."""
 
     model_config = {"from_attributes": True}
 
@@ -180,6 +193,7 @@ class CostComponent(BaseModel):
     amount_eur: float
     source: str
     source_detail: str = ""
+    references: list[SourceReference] = []
     overridden: bool
 
 
@@ -197,15 +211,17 @@ class EffectScaling(BaseModel):
 
 
 class CostBreakdown(BaseModel):
-    """investment/annual_maintenance kommen 1:1 aus measure_service.compute_costs().
+    """capex/opex kommen 1:1 aus measure_service.compute_costs().
 
-    effect_scaling ist dort (noch) nicht enthalten - unit_factor/count/
-    recommended_count/unit_label liegen als eigene Top-Level-Felder auf
-    MeasureImpactSummary. effect_scaling bleibt daher optional/None und
-    dokumentiert nur die im Beplanungsdokument gezeigte Ziel-Verschachtelung.
+    capex = einmalige Investition (fix/Stück/Fläche), opex = jährliche Betriebs-
+    und Unterhaltskosten (fix/Stück/Fläche). effect_scaling ist dort (noch) nicht
+    enthalten - unit_factor/count/recommended_count/unit_label liegen als eigene
+    Top-Level-Felder auf MeasureImpactSummary. effect_scaling bleibt daher
+    optional/None und dokumentiert nur die im Beplanungsdokument gezeigte
+    Ziel-Verschachtelung.
     """
-    investment: CostBlock
-    annual_maintenance: CostBlock
+    capex: CostBlock
+    opex: CostBlock
     effect_scaling: Optional[EffectScaling] = None
 
 
@@ -223,8 +239,8 @@ class MeasureImpactSummary(BaseModel):
     affected_area_m2: Optional[float] = None
     linked_risk_codes: Optional[list[str]] = None
     avg_index_reduction_pct: Optional[float] = None
-    investment_eur: Optional[float] = None
-    annual_maintenance_eur: Optional[float] = None
+    capex_eur: Optional[float] = None
+    opex_annual_eur: Optional[float] = None
     annual_benefit_eur: Optional[float] = None
     count: Optional[int] = None
     count_is_default: Optional[bool] = None

@@ -441,6 +441,74 @@ body {
   opacity: 0.85;
 }
 
+/* Karten-Ladeoverlay (ausgegraut + Spinner + Fortschritt) */
+.map-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(148, 163, 184, 0.35);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  cursor: progress;
+}
+
+.map-loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.1rem 1.4rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  min-width: 220px;
+}
+
+.map-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: map-spin 0.8s linear infinite;
+}
+
+@keyframes map-spin {
+  to { transform: rotate(360deg); }
+}
+
+.map-loading-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.map-progress {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.map-progress-bar {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 0.15s ease-out;
+}
+
+.map-progress-value {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .maplibregl-popup.kap-tooltip {
   max-width: min(1200px, 96vw) !important;
 }
@@ -1579,6 +1647,22 @@ body {
   padding: 6px 8px;
   text-align: left;
   vertical-align: top;
+}
+
+.kap-param-table .kap-param-th-value,
+.kap-param-table .kap-param-td-value {
+  text-align: right;
+}
+
+.kap-param-table .kap-param-td-unit {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.kap-param-value {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  letter-spacing: 0.01em;
 }
 
 .kap-param-table tr.overridden td {

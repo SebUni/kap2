@@ -15,6 +15,52 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json()
 }
 
+export type ProgressCallback = (fraction: number) => void
+
+/**
+ * Lädt eine (gzip-)JSON-Antwort und meldet echten Byte-Fortschritt.
+ * Der Browser dekomprimiert gzip transparent; als Gesamtgröße dient der
+ * ``X-Uncompressed-Length``-Header (Fallback: ``Content-Length``).
+ */
+async function requestWithProgress<T>(path: string, onProgress?: ProgressCallback): Promise<T> {
+  const res = await fetch(`${BASE}${path}`)
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(`API ${res.status}: ${body || res.statusText}`)
+  }
+  const totalStr = res.headers.get('X-Uncompressed-Length') || res.headers.get('Content-Length')
+  const total = totalStr ? parseInt(totalStr, 10) : 0
+
+  if (!res.body || typeof res.body.getReader !== 'function') {
+    onProgress?.(1)
+    return res.json() as Promise<T>
+  }
+
+  const reader = res.body.getReader()
+  const chunks: Uint8Array[] = []
+  let received = 0
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    if (value) {
+      chunks.push(value)
+      received += value.length
+      if (onProgress && total > 0) onProgress(Math.min(1, received / total))
+    }
+  }
+
+  let bytes: Uint8Array
+  if (chunks.length === 1) {
+    bytes = chunks[0]
+  } else {
+    bytes = new Uint8Array(received)
+    let offset = 0
+    for (const c of chunks) { bytes.set(c, offset); offset += c.length }
+  }
+  onProgress?.(1)
+  return JSON.parse(new TextDecoder().decode(bytes)) as T
+}
+
 export const api = {
   // ── Kommune ─────────────────────────────────────────────────────────
   searchKommune: (q: string) =>
@@ -70,6 +116,10 @@ export const api = {
 
   getLayer: (kommuneId: number, code: string) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/layer/${code}`),
+  getGridGeometry: (kommuneId: number, onProgress?: ProgressCallback) =>
+    requestWithProgress<Record<string, unknown>>(`/kommune/${kommuneId}/grid-geometry`, onProgress),
+  getLayerValues: (kommuneId: number, code: string, onProgress?: ProgressCallback) =>
+    requestWithProgress<Record<string, unknown>>(`/kommune/${kommuneId}/layer/${code}/values`, onProgress),
   getRiskSummary: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/risk-summary`),
   getRiskZones: (kommuneId: number, riskCode: string) =>

@@ -22,7 +22,7 @@ from geoalchemy2 import functions as func
 from sqlalchemy import case, literal
 from sqlalchemy.orm import Session
 
-from app.data import catalog
+from app.data import catalog, sources
 from app.models.models import (
     AdaptationMeasure, CellAssessment, GridCell, MeasureImpact, Kommune,
 )
@@ -105,16 +105,18 @@ def _unit_effect_factor(count: int, recommended_count: int) -> float:
     return 1.0
 
 
-# Kostenkomponenten je Block. quantity_kind: fixed = Pauschale (Menge 1),
-# unit = Stückzahl (Einheit = unit_label), area = Fläche (Einheit m²).
-_INVESTMENT_COMPONENTS: tuple[tuple[str, str, str], ...] = (
-    ("cost_fixed", "Fixkosten (Planung/Konzept)", "fixed"),
-    ("cost_per_unit", "Kosten je {unit}", "unit"),
-    ("cost_per_m2", "Kosten je m²", "area"),
+# Kostenkomponenten je Block (CAPEX einmalig / OPEX jährlich). quantity_kind:
+# fixed = mengenunabhängige Pauschale (Menge 1), unit = Stückzahl (Einheit = unit_label),
+# area = Fläche (Einheit m²).
+_CAPEX_COMPONENTS: tuple[tuple[str, str, str], ...] = (
+    ("capex_fixed", "Grundkosten (Planung/Konzept)", "fixed"),
+    ("capex_per_unit", "Investition je {unit}", "unit"),
+    ("capex_per_m2", "Investition je m²", "area"),
 )
-_MAINTENANCE_COMPONENTS: tuple[tuple[str, str, str], ...] = (
-    ("maintenance_per_unit_year", "Unterhalt je {unit} und Jahr", "unit"),
-    ("maintenance_per_m2_year", "Unterhalt je m² und Jahr", "area"),
+_OPEX_COMPONENTS: tuple[tuple[str, str, str], ...] = (
+    ("opex_fixed_year", "Feste Betriebskosten/Jahr", "fixed"),
+    ("opex_per_unit_year", "Betrieb & Unterhalt je {unit}/Jahr", "unit"),
+    ("opex_per_m2_year", "Betrieb & Unterhalt je m²/Jahr", "area"),
 )
 
 
@@ -136,10 +138,10 @@ def _component_source(mdef: dict, field: str) -> tuple[str, str, bool]:
 
 
 def compute_costs(mdef: dict, count: int, area_m2: float) -> dict:
-    """Kosten-Rohdaten (investment + annual_maintenance) mit Komponenten-Breakdown.
+    """Kosten-Rohdaten (capex + opex) mit Komponenten-Breakdown.
 
-    Investition = cost_fixed + count·cost_per_unit + area·cost_per_m2,
-    Unterhalt/a = count·maintenance_per_unit_year + area·maintenance_per_m2_year.
+    CAPEX  = capex_fixed + count·capex_per_unit + area·capex_per_m2,
+    OPEX/a = opex_fixed_year + count·opex_per_unit_year + area·opex_per_m2_year.
     Nur Komponenten, deren Katalogfeld ``is not None`` ist, tauchen auf; ``0.0``
     gilt als anwendbar (z. B. kostenlose Bauverbote). Jede Komponente trägt
     Einzelpreis, Menge, Betrag und Quelle inkl. Override-Flag.
@@ -163,6 +165,7 @@ def compute_costs(mdef: dict, count: int, area_m2: float) -> dict:
             amount = round(unit_price * quantity, 2)
             total += amount
             source, source_detail, overridden = _component_source(mdef, field)
+            refs = sources.resolve((mdef.get("source_refs") or {}).get(field))
             components.append({
                 "param": field,
                 "label": label_tpl.format(unit=unit_label),
@@ -172,13 +175,14 @@ def compute_costs(mdef: dict, count: int, area_m2: float) -> dict:
                 "amount_eur": amount,
                 "source": source,
                 "source_detail": source_detail,
+                "references": refs,
                 "overridden": overridden,
             })
         return {"total_eur": round(total, 2), "components": components}
 
     return {
-        "investment": _block(_INVESTMENT_COMPONENTS),
-        "annual_maintenance": _block(_MAINTENANCE_COMPONENTS),
+        "capex": _block(_CAPEX_COMPONENTS),
+        "opex": _block(_OPEX_COMPONENTS),
     }
 
 
@@ -213,8 +217,10 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     coverage, covered_area_m2 = _coverage(db, measure)
     if not coverage:
         db.query(MeasureImpact).filter(MeasureImpact.measure_id == measure_id).delete()
+        no_coverage = {"measure_id": measure_id, "affected_cells": 0, "message": "Keine überlappenden Zellen"}
+        measure.impact_summary = no_coverage
         db.commit()
-        return {"measure_id": measure_id, "affected_cells": 0, "message": "Keine überlappenden Zellen"}
+        return no_coverage
 
     # Anzahl/Wirkungsskalierung brauchen die Gesamtfläche vor der Zell-Schleife.
     count, count_is_default, recommended_count = _resolve_count(mdef, measure.config, covered_area_m2)
@@ -255,13 +261,12 @@ def compute_impact(db: Session, measure_id: int) -> dict:
             deltas[code] = round(new_idx - base_idx, 3)
             covered_base_index[code] = covered_base_index.get(code, 0.0) + base_idx
             covered_new_index[code] = covered_new_index.get(code, 0.0) + new_idx
-        db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid,
-                             indicator_deltas=deltas, costs={}, savings={}))
+        db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid, indicator_deltas=deltas))
 
-    # Kosten (Fix + Stück + Fläche; None-Felder erzeugen keine Komponente)
+    # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente)
     cost_breakdown = compute_costs(mdef, count, covered_area_m2)
-    investment = cost_breakdown["investment"]["total_eur"]
-    annual_maintenance = cost_breakdown["annual_maintenance"]["total_eur"]
+    capex = cost_breakdown["capex"]["total_eur"]
+    opex_annual = cost_breakdown["opex"]["total_eur"]
     annual_benefit_direct = float(mdef.get("benefit_per_m2_year") or 0.0) * covered_area_m2
 
     # Monetarisierte Schadensreduktion (nur monetäre Risiken)
@@ -277,33 +282,21 @@ def compute_impact(db: Session, measure_id: int) -> dict:
         reduced_share = (covered_base_index.get(code, 0.0) - covered_new_index.get(code, 0.0)) / total_idx
         annual_benefit_damage += risk_cost * max(0.0, reduced_share)
 
-    # in MeasureImpact-Summen für Export spiegeln (an erste Zelle gehängt)
-    first_imp = db.query(MeasureImpact).filter(MeasureImpact.measure_id == measure_id).first()
-    if first_imp:
-        first_imp.costs = {"investment": round(investment, 2),
-                           "annual_maintenance": round(annual_maintenance, 2),
-                           "count": count,
-                           "breakdown": cost_breakdown}
-        first_imp.savings = {"annual_benefit_direct": round(annual_benefit_direct, 2),
-                             "annual_benefit_damage": round(annual_benefit_damage, 2)}
-
-    db.commit()
-
     avg_reduction = 0.0
     if covered_base_index:
         tot_b = sum(covered_base_index.values())
         tot_n = sum(covered_new_index.values())
         avg_reduction = round((tot_b - tot_n) / tot_b * 100.0, 1) if tot_b > 0 else 0.0
 
-    return {
+    summary = {
         "measure_id": measure_id,
         "measure_type": measure.measure_type,
         "affected_cells": len(coverage),
         "affected_area_m2": round(covered_area_m2, 1),
         "linked_risk_codes": linked,
         "avg_index_reduction_pct": avg_reduction,
-        "investment_eur": round(investment, 2),
-        "annual_maintenance_eur": round(annual_maintenance, 2),
+        "capex_eur": round(capex, 2),
+        "opex_annual_eur": round(opex_annual, 2),
         "annual_benefit_eur": round(annual_benefit_direct + annual_benefit_damage, 2),
         "count": count,
         "count_is_default": count_is_default,
@@ -312,6 +305,15 @@ def compute_impact(db: Session, measure_id: int) -> dict:
         "unit_factor": round(unit_factor, 4),
         "cost_breakdown": cost_breakdown,
     }
+
+    # Persistiert am Maßnahmen-Objekt (bereits in der Session geladen) statt an
+    # einer per Nachfrage-Query gesuchten MeasureImpact-Zelle - so unabhängig von
+    # Flush-Reihenfolge/Autoflush-Konfiguration die einzige Quelle der Wahrheit
+    # für Export/cost-summary, ohne dass diese neu rechnen müssen.
+    measure.impact_summary = summary
+    db.commit()
+
+    return summary
 
 
 def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> list[dict]:

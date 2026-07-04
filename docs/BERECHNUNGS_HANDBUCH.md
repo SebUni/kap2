@@ -14,7 +14,7 @@ Proxy/Quelle und Normierung.
 ## 1. Grundprinzipien
 
 - **Fest verdrahtet:** Klimatische Einflüsse (23), Räumliche Expositionen (23), Sensitivitäten (33),
-  Risiken (48) und Maßnahmen (46) sind als Python-Konstanten in
+  Risiken (48) und Maßnahmen (47) sind als Python-Konstanten in
   `catalog.py` hinterlegt (einmalig aus den KAP3-CSVs portiert). Kein
   Laufzeit-CSV-Parser.
 - **H/E/V absolut:** Jeder Indikator wird pro **100 m × 100 m**-Zelle in seiner
@@ -215,26 +215,144 @@ Farben und Beschreibungen: `catalog.KWRA_GROUPS`.
 
 Modell in `services/measure_service.py`. Eine Maßnahme reduziert ihre
 Zielkomponente(n) `effect_target ∈ {hazard, exposure, vulnerability}` in den
-abgedeckten Zellen, deckungs-skaliert. Da der Risiko-Index multiplikativ in
-H·E·V ist, wirkt die Reduktion analytisch als Index-Skalierung:
+abgedeckten Zellen, deckungs- und (bei Stück-Maßnahmen) anzahl-skaliert. Da
+der Risiko-Index multiplikativ in H·E·V ist, wirkt die Reduktion analytisch
+als Index-Skalierung:
 
-$$r_{\text{eff}} = \mathrm{clamp}(r_{\text{default}} \cdot s(\text{coverage}),\,0,\,0.95)$$
+$$r_{\text{eff}} = \mathrm{clamp}(r_{\text{default}} \cdot s(\text{coverage}) \cdot u,\,0,\,0.95)$$
 $$\text{factor} = (1 - r_{\text{eff}})^{\,n_{\text{targets}}}, \qquad \text{Index}_{\text{neu}} = \text{Index} \cdot \text{factor}$$
 
 - `coverage_scaling = linear` → `s = fraction`;
   `saturating` → `s = min(1, fraction·1.5)`.
 - `default_reduction` je Maßnahme im Katalog (typabhängig, dokumentiert; in
   Config überschreibbar). Quelle: KAP3-Vorschlag + Plausibilitätskalibrierung.
+- `u` (`_unit_effect_factor`) skaliert die Wirkung von **Stück-Maßnahmen**
+  (`unit_label` gesetzt) über die Anzahl relativ zu einem Richtwert:
+  `u = min(1, Anzahl / Richtwert-Anzahl)`, mit
+  `Richtwert-Anzahl = max(1, round(unit_density_per_ha · Fläche_ha))`.
+  Für reine Flächenmaßnahmen (`unit_label is None`) ist `u = 1` — die Formel
+  bleibt dort identisch zur bisherigen Rechnung.
 
-### Kosten / Nutzen
-- **Investition:** `cost_per_unit + cost_per_m2 · abgedeckte_Fläche`
-- **Unterhalt/Jahr:** `maintenance_per_m2_year · Fläche`
-- **Direkter Nutzen/Jahr:** `benefit_per_m2_year · Fläche`
+### Kostenmodell — symmetrisch CAPEX / OPEX
+
+Jede Maßnahme trägt im Katalog (`catalog.py`) sechs Kostenfelder plus die
+Stück-Metadaten. Das Modell ist **MECE**: jeder Euro ist entweder einmalige
+Investition (**CAPEX**) oder wiederkehrende Betriebs- und Unterhaltskosten
+(**OPEX**); innerhalb beider Blöcke disjunkt nach Bezugsgröße (mengenunabhängig
+/ je Stück / je Fläche). **Nicht anwendbar = `None`, nicht `0.0`** — `0.0`
+bedeutet „anwendbar, aber kostenlos" (z. B. planungsrechtliche Bauverbote). Ein
+`None`-Feld erzeugt keine Kostenkomponente im Breakdown und keinen editierbaren
+Registry-Parameter (`applicable: false`).
+
+| Feld | Einheit | Block | Bedeutung |
+|---|---|---|---|
+| `capex_fixed` | € | CAPEX | einmalig, mengenunabhängig (Planung/Konzept/Einrichtung) |
+| `capex_per_unit` | €/Stück | CAPEX | Investition je Einheit (`unit_label`) |
+| `capex_per_m2` | €/m² | CAPEX | Investition je abgedeckter Polygonfläche |
+| `opex_fixed_year` | €/a | OPEX | wiederkehrend, mengenunabhängig (Betrieb/Koordination, z. B. Fortschreibung eines Hitzeaktionsplans) |
+| `opex_per_unit_year` | €/(Stück·a) | OPEX | Betrieb & Unterhalt je Einheit und Jahr |
+| `opex_per_m2_year` | €/(m²·a) | OPEX | Betrieb & Unterhalt je m² und Jahr |
+| `unit_label` | – | – | z. B. „Brunnen", „Station", „km"; `None` ⇒ keine Stück-Logik |
+| `unit_density_per_ha` | Stück/ha | – | Richtwert-Dichte (gesetzt, wenn `unit_label` gesetzt ist) |
+
+> **Warum CAPEX/OPEX statt „Investition + Wartung":** Das frühere 5-Parameter-
+> Modell stellte „Fixkosten" und „Investitionskosten" als Geschwister nebeneinander
+> (zwei vermischte Achsen) und kannte auf der laufenden Seite nur `maintenance_*`.
+> „Wartung" war faktisch schon eine Untermenge der Betriebskosten (Trinkbrunnen:
+> „Betrieb/**Wartung**/Beprobung"; PV: „Betrieb, Wartung … und **Versicherung**").
+> **OPEX** (Betrieb **und** Unterhalt) ist collectively exhaustive; `opex_fixed_year`
+> schließt zusätzlich die Lücke für Konzept-/Planungsmaßnahmen mit mengen-
+> unabhängigen Jahreskosten (z. B. Hitzeaktionsplan-Koordination).
+
+**Formeln:**
+
+$$\text{CAPEX} = \text{capex\_fixed} + \text{Anzahl} \times \text{capex\_per\_unit} + \text{Fläche} \times \text{capex\_per\_m2}$$
+$$\text{OPEX/a} = \text{opex\_fixed\_year} + \text{Anzahl} \times \text{opex\_per\_unit\_year} + \text{Fläche} \times \text{opex\_per\_m2\_year}$$
+
+- **Direkter Nutzen/Jahr:** `benefit_per_m2_year · Fläche` (unverändert, von der
+  Kostenseite getrennt).
 - **Vermiedene Schäden/Jahr:** monetarisierte Index-Reduktion der verknüpften
   monetären Risiken (Anteil der reduzierten Indexsumme an der Gesamtsumme ×
   Risikokosten).
-- Dashboard-Kostensektion vergleicht Schäden **Basis** vs. **mit Maßnahmen**
-  (`measures.get_risk_aggregate(apply_measures=True/False)`).
+- Dashboard-Kostensektion (`cost-summary`) vergleicht Schäden **Basis** vs. **mit
+  Maßnahmen** und summiert `capex_eur` / `opex_annual_eur` je Maßnahme; dieselbe
+  Fläche/Anzahl/`unit_factor`-Herleitung wie `compute_impact`, damit Dashboard,
+  Tabellen und Sidebar nicht divergieren (`_adjusted_cell_data`).
+
+### Quellen & Provenienz (`sources`, `source_details`, `source_refs`)
+
+Provenienz je Kostenfeld auf drei Ebenen (Keys = Feldnamen, inkl.
+`default_reduction`/`unit_density_per_ha`) — Konvention wie bei `HAZARDS`/`RISKS`:
+
+- **`source`** — Maßnahmen-Kurz-Key als Fallback.
+- **`sources[feld]`** — kurze Inline-Quelle je Feld (Anzeige-Label in der Tabelle).
+- **`source_details[feld]`** — Langtext für den Hover-Tooltip: *woher* der Wert
+  stammt bzw. *wie* er hergeleitet/plausibilisiert wurde (z. B. „Blend aus Gründach
+  40–70 €/m² (BuGG) und bodengebundener Fassade 15–35 €/m² (co2online) → 55 €/m²").
+  Ohne belastbaren Beleg ehrlich „Modellannahme (…)".
+- **`source_refs[feld] = [key, …]`** — Verweise auf die zentrale, zitierfähige
+  Bibliografie `app/data/sources.py` (`SOURCE_REFERENCES`). Jeder Eintrag trägt
+  eine **IEEE-Zitation**, die **Live-URL** und einen **archivierten Wayback-
+  Snapshot** (`archive_url`) für den Fall, dass die Quelle offline geht.
+  `sources.resolve()` löst die Keys auf; die aufgelösten Referenzen hängen an
+  jeder `CostComponent` (`cost_breakdown`) und an jedem Maßnahmen-Registry-
+  Parameter (`references`) und werden im (i)-Tooltip von **Sidebar und
+  Konfigurations-Tabelle** als klickbare „Original"/„Archiv-Snapshot"-Links
+  gerendert.
+
+Neuen Snapshot ziehen (Internet Archive / Wayback Machine):
+`curl -s -I "https://web.archive.org/save/<url>" | grep -i '^location:'` bzw.
+jüngsten vorhandenen via `https://web.archive.org/cdx/search/cdx?url=<url>&output=json&limit=-1`.
+Alle Werte bleiben per Config (`PUT /kommune/{id}/parameters`, mit
+`custom_source`-Pflicht) überschreibbar.
+
+### Anzahl (`count`)
+
+`_resolve_count(mdef, config, covered_area_m2)` liefert `(count, is_default,
+recommended_count)`. Fehlt `config["count"]` (Flächenmaßnahmen haben keine
+Anzahl, Bestandsmaßnahmen ohne Frontend-Eingabe), greift die Richtwert-Anzahl
+als Default und die Response markiert `count_is_default: true`, damit
+bestehende Maßnahmen ohne Migration weiter sinnvoll rechnen.
+
+### `cost_breakdown`-Response-Shape
+
+`compute_costs(mdef, count, area_m2)` liefert die Rohdaten, die `compute_impact`
+unter `cost_breakdown` zurückgibt (Pydantic-Dokumentation:
+`CostComponent`/`CostBlock`/`CostBreakdown` in `schemas.py`). Nur Felder mit
+`mdef[field] is not None` erzeugen eine Komponente; Quelle je Komponente ist
+`custom_source` (bei kommunalem Override) sonst `sources[feld]` sonst `source`,
+mit `overridden`-Flag, `source_detail` (Tooltip-Langtext) und `references`
+(aufgelöste Bibliografie-Einträge):
+
+```json
+{
+  "capex": {
+    "total_eur": 75000,
+    "components": [
+      {"param": "capex_fixed", "label": "Grundkosten (Planung/Konzept)",
+       "unit_price": 5000, "quantity": 1, "quantity_unit": "pauschal",
+       "amount_eur": 5000, "source": "Modellannahme (…)",
+       "source_detail": "…", "references": [], "overridden": false},
+      {"param": "capex_per_unit", "label": "Investition je Brunnen",
+       "unit_price": 14000, "quantity": 5, "quantity_unit": "Brunnen",
+       "amount_eur": 70000, "source": "Berliner Wasserbetriebe",
+       "source_detail": "Errichtung inkl. Anschluss ~10-16 T€/Standort -> 14.000 €",
+       "references": [
+         {"key": "BWB_Trinkbrunnen",
+          "ieee": "Berliner Wasserbetriebe, „Trinkbrunnen in Berlin,“ … [Zugriff: 4. Juli 2026].",
+          "url": "https://www.bwb.de/de/trinkbrunnen.php",
+          "archive_url": "https://web.archive.org/web/20260704083542/https://www.bwb.de/de/trinkbrunnen.php",
+          "accessed": "2026-07-04"}],
+       "overridden": false}
+    ]
+  },
+  "opex": {"total_eur": 17500, "components": [ … ]}
+}
+```
+
+`unit_factor`/`count`/`recommended_count`/`unit_label` liegen zusätzlich als
+eigene Top-Level-Felder auf der `MeasureImpactSummary`-Response; die
+Summenfelder heißen `capex_eur` und `opex_annual_eur`.
 
 ---
 
@@ -258,6 +376,10 @@ Indizes mit dem DWD-Trend der heißen Tage (RCP4.5/8.5) bis ~2065.
 | `GET /api/kommune/{id}/risk-zones/{risk_code}` | Risikozonen |
 | `GET /api/kommune/{id}/cost-summary` | Schäden mit/ohne Maßnahmen + Maßnahmenkosten |
 | `GET /api/kommune/{id}/risk-projection` | Gruppen-Projektion RCP4.5/8.5 |
+| `POST /api/kommune/{id}/measures` | Maßnahme anlegen (`config: {"count": …}` bei Stück-Maßnahmen) |
+| `POST /api/measures/{id}/calculate-impact` | Wirkung/Kosten neu berechnen — Response inkl. `count`, `count_is_default`, `recommended_count`, `unit_label`, `unit_factor`, `cost_breakdown` (§7) |
+| `GET /api/kommune/{id}/parameters` | Registry-Parameter (inkl. `measures.<code>.<feld>`), je Parameter `applicable`, `source_detail` (Tooltip-Langtext) und `references` (aufgelöste IEEE-Bibliografie mit Live- + Archiv-URL) |
+| `PUT /api/kommune/{id}/parameters` | Parameter-Override setzen (`custom_source`-Pflicht für Kostenkomponenten-Herleitung) |
 
 ---
 

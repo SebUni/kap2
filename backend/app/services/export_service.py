@@ -31,7 +31,7 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
     headers = [
         "ID", "Name", "Typ", "Umsetzungsjahr", "Beschreibung",
         "Konfiguration", "Geometrie (WKT)",
-        "Investition (€)", "Wartung/Jahr (€)", "Nutzen/Jahr (€)",
+        "CAPEX (€)", "OPEX/Jahr (€)", "Nutzen/Jahr (€)",
         "Ø Risiko-Reduktion (Index-Pkt., Σ)",
         "Anzahl", "Einheit",
     ]
@@ -43,17 +43,17 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
             shape = to_shape(m.geometry)
             geom_wkt = shape.wkt
 
-        # Aggregate impacts
+        # Kosten/Nutzen kommen aus dem zuletzt berechneten compute_impact()-Ergebnis
+        # (measure.impact_summary); nur die Index-Deltas sind echte Pro-Zelle-Daten.
         impacts = db.query(MeasureImpact).filter(MeasureImpact.measure_id == m.id).all()
-        total_invest = sum(imp.costs.get("investment", 0) for imp in impacts)
-        total_maint = sum(imp.costs.get("annual_maintenance", 0) for imp in impacts)
-        total_savings = sum(
-            sum(v for v in imp.savings.values()) for imp in impacts
-        )
+        summary = m.impact_summary or {}
+        total_capex = summary.get("capex_eur", 0)
+        total_opex = summary.get("opex_annual_eur", 0)
+        total_savings = summary.get("annual_benefit_eur", 0)
         total_didx = sum(
             sum(v for v in (imp.indicator_deltas or {}).values()) for imp in impacts
         )
-        count = next((imp.costs["count"] for imp in impacts if "count" in imp.costs), None)
+        count = summary.get("count")
         count = count if count is not None else (m.config or {}).get("count")
         unit_label = catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("unit_label") or ""
 
@@ -68,8 +68,8 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
             m.description or "",
             config_str,
             geom_wkt,
-            round(total_invest, 2),
-            round(total_maint, 2),
+            round(total_capex, 2),
+            round(total_opex, 2),
             round(total_savings, 2),
             round(total_didx, 2),
             count if count is not None else "",
@@ -80,10 +80,8 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
     ws2 = wb.create_sheet("Zusammenfassung")
     ws2.append(["Kennzahl", "Wert"])
     ws2.append(["Anzahl Maßnahmen", len(measures)])
-    ws2.append(["Gesamtinvestition (€)", sum(
-        sum(imp.costs.get("investment", 0)
-            for imp in db.query(MeasureImpact).filter(MeasureImpact.measure_id == m.id).all())
-        for m in measures
+    ws2.append(["Gesamt-CAPEX (€)", sum(
+        (m.impact_summary or {}).get("capex_eur", 0) for m in measures
     )])
 
     # Auto-width
@@ -101,7 +99,7 @@ def import_measures_xlsx(db: Session, kommune_id: int, file: BinaryIO) -> dict:
     """Import measures from an Excel file.
 
     Expected format: same as export (Sheet 'Maßnahmen' with columns matching export).
-    Columns beyond the first 7 (Investition/Wartung/Nutzen/Risiko-Reduktion/Anzahl/
+    Columns beyond the first 7 (CAPEX/OPEX/Nutzen/Risiko-Reduktion/Anzahl/
     Einheit) are optional and backward-compatible - older exports without the
     trailing "Anzahl"/"Einheit" columns still import fine.
     Returns summary of imported/skipped rows.
@@ -186,6 +184,8 @@ def export_parameters_xlsx(db: Session, kommune_id: int, kommune_name: str = "")
     from datetime import datetime
     from app.services import parameter_registry
 
+    from openpyxl.styles import Alignment
+
     params = parameter_registry.catalog_parameters()
     overrides = parameter_registry.load_db_overrides(db, kommune_id)
     merged = parameter_registry.merge_overrides(params, overrides)
@@ -196,9 +196,20 @@ def export_parameters_xlsx(db: Session, kommune_id: int, kommune_name: str = "")
     headers = [
         "ID", "Ebene", "Kategorie", "Bezeichnung", "Wert", "Default",
         "Einheit", "Quelle", "Override-Quelle", "Geändert",
+        "Herleitung", "Quellen (IEEE + Archiv-Snapshot)",
     ]
     ws.append(headers)
+    wrap = Alignment(wrap_text=True, vertical="top")
     for p in merged:
+        refs = p.get("references") or []
+        ref_txt = "\n".join(
+            " | ".join(filter(None, [
+                f"[{i}] {r.get('ieee', '')}",
+                (f"Original: {r['url']}" if r.get("url") else ""),
+                (f"Archiv-Snapshot: {r['archive_url']}" if r.get("archive_url") else ""),
+            ]))
+            for i, r in enumerate(refs, 1)
+        )
         ws.append([
             p["id"],
             p["layer_code"],
@@ -210,7 +221,14 @@ def export_parameters_xlsx(db: Session, kommune_id: int, kommune_name: str = "")
             p.get("source", ""),
             p.get("custom_source") or "",
             "ja" if p.get("overridden") else "nein",
+            p.get("source_detail", ""),
+            ref_txt,
         ])
+        row = ws.max_row
+        ws.cell(row=row, column=11).alignment = wrap  # Herleitung
+        ws.cell(row=row, column=12).alignment = wrap  # Quellen (IEEE)
+    ws.column_dimensions["K"].width = 70   # Herleitung
+    ws.column_dimensions["L"].width = 90   # Quellen (IEEE)
 
     meta = wb.create_sheet("Metadaten")
     meta.append(["Kommune", kommune_name or str(kommune_id)])

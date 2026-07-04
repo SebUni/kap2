@@ -10,6 +10,8 @@ import {
   riskInputLinks,
   type ParamSectionLink,
 } from '../utils/paramSectionLinks'
+import { fmtParamValue } from '../utils/layerInfoFormat'
+import InfoTooltip from './InfoTooltip'
 
 interface Props {
   kommuneId: number
@@ -116,7 +118,7 @@ export default function ParameterTable({
         <thead>
           <tr>
             <th>Bezeichnung</th>
-            <th>Wert</th>
+            <th className="kap-param-th-value">Wert</th>
             <th>Einheit</th>
             <th>Quelle</th>
             <th>Status</th>
@@ -130,7 +132,7 @@ export default function ParameterTable({
             return (
               <tr key={p.id} className={[p.overridden ? 'overridden' : '', notApplicable ? 'not-applicable' : ''].filter(Boolean).join(' ')}>
                 <td><span className="kap-param-cell-text" title={p.label}>{p.label}</span></td>
-                <td>
+                <td className="kap-param-td-value">
                   {editing ? (
                     <input
                       type="number"
@@ -143,10 +145,10 @@ export default function ParameterTable({
                       style={{ width: '100%', fontSize: '0.75rem' }}
                     />
                   ) : (
-                    <span>{notApplicable ? '—' : String(p.value)}</span>
+                    <span className="kap-param-value">{notApplicable ? '—' : fmtParamValue(p.value)}</span>
                   )}
                 </td>
-                <td>{p.unit}</td>
+                <td className="kap-param-td-unit">{p.unit}</td>
                 <td>
                   {editing ? (
                     <input
@@ -160,8 +162,13 @@ export default function ParameterTable({
                       style={{ width: '100%', fontSize: '0.75rem' }}
                     />
                   ) : (
-                    <span className="kap-param-cell-text" title={notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source || '')}>
-                      {notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source)}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span className="kap-param-cell-text" style={{ flex: 1, minWidth: 0 }} title={notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source || '')}>
+                        {notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source)}
+                      </span>
+                      {!notApplicable && (p.source_detail || (p.references && p.references.length > 0)) && (
+                        <InfoTooltip title={p.custom_source || p.source || 'Quelle'} description={p.source_detail} references={p.references} />
+                      )}
                     </span>
                   )}
                 </td>
@@ -308,7 +315,7 @@ function ParameterRows({
         return (
           <tr key={p.id} className={[p.overridden ? 'overridden' : '', notApplicable ? 'not-applicable' : ''].filter(Boolean).join(' ')}>
             <td><span className="kap-param-cell-text" title={p.label}>{p.label}</span></td>
-            <td>
+            <td className="kap-param-td-value">
               {editing ? (
                 <input
                   type="number"
@@ -321,10 +328,10 @@ function ParameterRows({
                   style={{ width: '100%', fontSize: '0.75rem' }}
                 />
               ) : (
-                <span>{notApplicable ? '—' : String(p.value)}</span>
+                <span className="kap-param-value">{notApplicable ? '—' : fmtParamValue(p.value)}</span>
               )}
             </td>
-            <td>{p.unit}</td>
+            <td className="kap-param-td-unit">{p.unit}</td>
             <td>
               {editing ? (
                 <input
@@ -338,8 +345,13 @@ function ParameterRows({
                   style={{ width: '100%', fontSize: '0.75rem' }}
                 />
               ) : (
-                <span className="kap-param-cell-text" title={notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source || '')}>
-                  {notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source)}
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span className="kap-param-cell-text" style={{ flex: 1, minWidth: 0 }} title={notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source || '')}>
+                    {notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source)}
+                  </span>
+                  {!notApplicable && (p.source_detail || (p.references && p.references.length > 0)) && (
+                    <InfoTooltip title={p.custom_source || p.source || 'Quelle'} description={p.source_detail} references={p.references} />
+                  )}
                 </span>
               )}
             </td>
@@ -453,7 +465,7 @@ function GroupedParameterList({
     <thead>
       <tr>
         <th>Bezeichnung</th>
-        <th>Wert</th>
+        <th className="kap-param-th-value">Wert</th>
         <th>Einheit</th>
         <th>Quelle</th>
         <th>Status</th>

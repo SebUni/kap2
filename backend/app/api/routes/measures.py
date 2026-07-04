@@ -20,26 +20,25 @@ def measure_catalog():
 
 @router.get("/kommune/{kommune_id}/cost-summary")
 def cost_summary(kommune_id: int, db: Session = Depends(get_db)):
-    """Kostenübersicht: Schäden (mit/ohne Maßnahmen) + Maßnahmen-Investition/Nutzen."""
+    """Kostenübersicht: Schäden (mit/ohne Maßnahmen) + Maßnahmen-CAPEX/OPEX/Nutzen."""
     from app.services.measure_service import get_risk_aggregate
     base = get_risk_aggregate(db, kommune_id, apply_measures=False)
     withm = get_risk_aggregate(db, kommune_id, apply_measures=True)
 
     measures = db.query(AdaptationMeasure).filter(
         AdaptationMeasure.kommune_id == kommune_id).all()
-    total_investment = total_maintenance = total_benefit = 0.0
+    total_capex = total_opex = total_benefit = 0.0
     measure_rows = []
     for m in measures:
-        imps = db.query(MeasureImpact).filter(MeasureImpact.measure_id == m.id).all()
-        inv = sum(i.costs.get("investment", 0) for i in imps)
-        maint = sum(i.costs.get("annual_maintenance", 0) for i in imps)
-        ben = sum(i.savings.get("annual_benefit_direct", 0)
-                  + i.savings.get("annual_benefit_damage", 0) for i in imps)
-        total_investment += inv
-        total_maintenance += maint
+        summary = m.impact_summary or {}
+        capex = summary.get("capex_eur", 0.0)
+        opex = summary.get("opex_annual_eur", 0.0)
+        ben = summary.get("annual_benefit_eur", 0.0)
+        total_capex += capex
+        total_opex += opex
         total_benefit += ben
         measure_rows.append({"id": m.id, "name": m.name, "measure_type": m.measure_type,
-                             "investment_eur": round(inv, 2), "annual_maintenance_eur": round(maint, 2),
+                             "capex_eur": round(capex, 2), "opex_annual_eur": round(opex, 2),
                              "annual_benefit_eur": round(ben, 2)})
 
     damages_base = base["cost"]["total_eur"]
@@ -50,8 +49,8 @@ def cost_summary(kommune_id: int, db: Session = Depends(get_db)):
         "damage_reduction_eur": round(damages_base - damages_with, 2),
         "by_risk": withm["cost"]["by_risk"],
         "measures": {
-            "total_investment_eur": round(total_investment, 2),
-            "total_annual_maintenance_eur": round(total_maintenance, 2),
+            "total_capex_eur": round(total_capex, 2),
+            "total_opex_annual_eur": round(total_opex, 2),
             "total_annual_benefit_eur": round(total_benefit, 2),
             "rows": measure_rows,
         },
@@ -186,4 +185,5 @@ def _measure_to_dict(m: AdaptationMeasure) -> dict:
         "implementation_year": m.implementation_year,
         "description": m.description,
         "created_at": m.created_at.isoformat() if m.created_at else None,
+        "impact_summary": m.impact_summary,
     }

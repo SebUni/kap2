@@ -68,6 +68,14 @@ export interface Measure {
   created_at: string
 }
 
+export interface SourceReference {
+  key: string
+  ieee: string
+  url: string
+  archive_url: string
+  accessed: string
+}
+
 export interface CostComponent {
   param: string
   label: string
@@ -77,6 +85,7 @@ export interface CostComponent {
   amount_eur: number
   source: string
   source_detail?: string
+  references?: SourceReference[]
   overridden: boolean
 }
 
@@ -86,8 +95,8 @@ export interface CostBlock {
 }
 
 export interface CostBreakdown {
-  investment: CostBlock
-  annual_maintenance: CostBlock
+  capex: CostBlock
+  opex: CostBlock
 }
 
 export interface MeasureImpactSummary {
@@ -97,8 +106,8 @@ export interface MeasureImpactSummary {
   affected_area_m2?: number
   linked_risk_codes?: string[]
   avg_index_reduction_pct?: number
-  investment_eur?: number
-  annual_maintenance_eur?: number
+  capex_eur?: number
+  opex_annual_eur?: number
   annual_benefit_eur?: number
   count?: number
   count_is_default?: boolean
@@ -282,6 +291,8 @@ export interface ModelParameter {
   default_value: number | string
   unit: string
   source: string
+  source_detail?: string
+  references?: SourceReference[]
   prov: string
   editable: boolean
   overridden: boolean
@@ -346,16 +357,18 @@ export interface CatalogMeasure {
   linked_risk_codes: string[]
   default_reduction: number
   coverage_scaling: string
-  cost_fixed: number | null
-  cost_per_m2: number | null
-  cost_per_unit: number | null
-  maintenance_per_m2_year: number | null
-  maintenance_per_unit_year: number | null
+  capex_fixed: number | null
+  capex_per_unit: number | null
+  capex_per_m2: number | null
+  opex_fixed_year: number | null
+  opex_per_unit_year: number | null
+  opex_per_m2_year: number | null
   benefit_per_m2_year: number
   unit_label: string | null
   unit_density_per_ha: number | null
   source: string
   sources?: Record<string, string>
+  source_details?: Record<string, string>
   kang_cluster?: string
   kang_field?: string
 }
@@ -460,12 +473,12 @@ export interface CostSummary {
   damage_reduction_eur: number
   by_risk: RiskAggregate['cost']['by_risk']
   measures: {
-    total_investment_eur: number
-    total_annual_maintenance_eur: number
+    total_capex_eur: number
+    total_opex_annual_eur: number
     total_annual_benefit_eur: number
     rows: {
       id: number; name: string; measure_type: string
-      investment_eur: number; annual_maintenance_eur: number; annual_benefit_eur: number
+      capex_eur: number; opex_annual_eur: number; annual_benefit_eur: number
     }[]
   }
 }

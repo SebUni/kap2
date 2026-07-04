@@ -1,13 +1,16 @@
 import logging
+import os
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from geoalchemy2.shape import to_shape
 from shapely.geometry import mapping
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.data import catalog
+from app.services import layer_cache
 from app.models.models import (
     Kommune, CellAssessment, GridCell, ProjectStatus, AssessmentStatus,
 )
@@ -96,6 +99,71 @@ def get_status(kommune_id: int, db: Session = Depends(get_db)):
         "step_history": ps.step_history or [],
         "eta_seconds": ps.eta_seconds,
     }
+
+
+def _gzip_uncompressed_size(path: str) -> int:
+    """Liest die unkomprimierte Groesse aus dem gzip-Trailer (ISIZE, mod 2^32)."""
+    import struct
+    with open(path, "rb") as fh:
+        fh.seek(-4, os.SEEK_END)
+        return struct.unpack("<I", fh.read(4))[0]
+
+
+def _gzip_json_response(path: str, download_name: str) -> FileResponse:
+    """Streamt eine gzip-JSON-Datei; der Browser dekomprimiert via Content-Encoding.
+
+    ``X-Uncompressed-Length`` erlaubt dem Frontend eine echte Fortschrittsanzeige
+    (die dekomprimierten Bytes werden gegen diese Groesse gemessen).
+    """
+    headers = {"Content-Encoding": "gzip", "Cache-Control": "no-cache"}
+    try:
+        headers["X-Uncompressed-Length"] = str(_gzip_uncompressed_size(path))
+    except Exception:
+        pass
+    return FileResponse(
+        path,
+        media_type="application/json",
+        headers=headers,
+        filename=download_name,
+    )
+
+
+@router.get("/kommune/{kommune_id}/grid-geometry")
+def get_grid_geometry(kommune_id: int, db: Session = Depends(get_db)):
+    """Statische Zellgeometrie (einmal je Kommune) als gzip-GeoJSON.
+
+    Nur ``grid_cell_id`` (+ gitter_id/row/col) und Geometrie; die Layer-Werte
+    kommen getrennt ueber ``/layer/{code}/values``.
+    """
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    path = layer_cache.geometry_file(db, kommune_id)
+    if not path:
+        return {"type": "FeatureCollection", "features": []}
+    return _gzip_json_response(path, f"grid-geometry-{kommune_id}.json")
+
+
+@router.get("/kommune/{kommune_id}/layer/{code}/values")
+def get_layer_values(kommune_id: int, code: str, db: Session = Depends(get_db)):
+    """Layer-Werte ohne Geometrie (klein) als gzip-JSON.
+
+    ``cells`` enthaelt je Zelle ``grid_cell_id``, ``value`` und die
+    Inspektor-Detailfelder; ``meta`` liefert Min/Max/Label/Unit/Recipe.
+    """
+    if not layer_cache.layer_category(code):
+        raise HTTPException(404, f"Unbekannter Code: {code}")
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    try:
+        path = layer_cache.values_file(db, kommune_id, code)
+    except Exception as exc:
+        log.exception("get_layer_values failed kommune=%s code=%s", kommune_id, code)
+        raise HTTPException(500, f"Layer konnte nicht geladen werden: {exc}") from exc
+    if not path:
+        raise HTTPException(404, f"Unbekannter Code: {code}")
+    return _gzip_json_response(path, f"layer-{code}-{kommune_id}.json")
 
 
 @router.get("/kommune/{kommune_id}/layer/{code}")

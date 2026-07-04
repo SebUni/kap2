@@ -272,6 +272,7 @@ export default function MapView() {
   const {
     kommune, measures, layerGeoJson, showMeasures,
     setIsDrawing, setDrawnGeometry, setSelectedMeasure, drawnGeometry,
+    mapLoading, mapProgress,
   } = useStore()
 
   const [mapLoaded, setMapLoaded] = useState(false)
@@ -622,9 +623,24 @@ export default function MapView() {
 
   const fmt = (v: number) => v.toLocaleString('de-DE', { maximumFractionDigits: 2 })
 
+  const progressPct = Math.round((mapProgress ?? 0) * 100)
+
   return (
     <>
       <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
+
+      {mapLoading && (
+        <div className="map-loading-overlay" role="status" aria-live="polite">
+          <div className="map-loading-box">
+            <div className="map-spinner" />
+            <div className="map-loading-label">Karte wird geladen …</div>
+            <div className="map-progress">
+              <div className="map-progress-bar" style={{ width: `${progressPct}%` }} />
+            </div>
+            <div className="map-progress-value">{progressPct}%</div>
+          </div>
+        </div>
+      )}
 
       <div className="draw-toolbar">
         {!drawMode ? (
@@ -865,19 +881,37 @@ function MeasureCreateModal({ onClose }: { onClose: () => void }) {
 
       {current && (() => {
         const c = count ?? recommendedCount ?? 0
-        const parts: { label: string; amount: number }[] = []
-        if (current.cost_fixed != null) parts.push({ label: 'Fixkosten', amount: current.cost_fixed })
-        if (current.cost_per_unit != null && current.unit_label != null)
-          parts.push({ label: `${c} × ${current.cost_per_unit.toLocaleString('de-DE')} €/${current.unit_label}`, amount: c * current.cost_per_unit })
-        if (current.cost_per_m2 != null)
-          parts.push({ label: `${Math.round(polyArea)} m² × ${current.cost_per_m2.toLocaleString('de-DE')} €/m²`, amount: polyArea * current.cost_per_m2 })
-        if (!parts.length) return null
-        const total = parts.reduce((s, p) => s + p.amount, 0)
+        const capexParts: { label: string; amount: number }[] = []
+        if (current.capex_fixed != null) capexParts.push({ label: 'Grundkosten (Planung/Konzept)', amount: current.capex_fixed })
+        if (current.capex_per_unit != null && current.unit_label != null)
+          capexParts.push({ label: `${c} × ${current.capex_per_unit.toLocaleString('de-DE')} €/${current.unit_label}`, amount: c * current.capex_per_unit })
+        if (current.capex_per_m2 != null)
+          capexParts.push({ label: `${Math.round(polyArea)} m² × ${current.capex_per_m2.toLocaleString('de-DE')} €/m²`, amount: polyArea * current.capex_per_m2 })
+        const opexParts: { label: string; amount: number }[] = []
+        if (current.opex_fixed_year != null) opexParts.push({ label: 'Feste Betriebskosten/Jahr', amount: current.opex_fixed_year })
+        if (current.opex_per_unit_year != null && current.unit_label != null)
+          opexParts.push({ label: `${c} × ${current.opex_per_unit_year.toLocaleString('de-DE')} €/${current.unit_label}·a`, amount: c * current.opex_per_unit_year })
+        if (current.opex_per_m2_year != null)
+          opexParts.push({ label: `${Math.round(polyArea)} m² × ${current.opex_per_m2_year.toLocaleString('de-DE')} €/m²·a`, amount: polyArea * current.opex_per_m2_year })
+        if (!capexParts.length && !opexParts.length) return null
+        const fmt = (v: number) => v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+        const capexTotal = capexParts.reduce((s, p) => s + p.amount, 0)
+        const opexTotal = opexParts.reduce((s, p) => s + p.amount, 0)
         return (
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-            <strong>Kostenschätzung (Katalogwerte, vorläufig):</strong>{' '}
-            {total.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}
-            {parts.map((p, i) => <div key={i} style={{ marginLeft: 8 }}>· {p.label}</div>)}
+            <strong>Kostenschätzung (Katalogwerte, vorläufig):</strong>
+            {capexParts.length > 0 && (
+              <div style={{ marginTop: 2 }}>
+                CAPEX (einmalig): {fmt(capexTotal)}
+                {capexParts.map((p, i) => <div key={i} style={{ marginLeft: 8 }}>· {p.label}</div>)}
+              </div>
+            )}
+            {opexParts.length > 0 && (
+              <div style={{ marginTop: 2 }}>
+                OPEX (jährlich): {fmt(opexTotal)}
+                {opexParts.map((p, i) => <div key={i} style={{ marginLeft: 8 }}>· {p.label}</div>)}
+              </div>
+            )}
           </div>
         )
       })()}

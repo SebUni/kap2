@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { api } from '../api/client'
 import type {
   Kommune, AssessmentStatus, ConfigParameter, Measure,
-  GeoJSONFeatureCollection, MeasureImpactSummary,
+  GeoJSONFeatureCollection, GeoJSONFeature, LayerMeta, MeasureImpactSummary,
   Catalog, RiskAggregate, CostSummary, RiskProjection, RiskHistogram,
   LayerCategory,
 } from '../types'
@@ -10,6 +10,36 @@ import type {
 export interface ActiveLayer {
   category: LayerCategory
   code: string
+}
+
+/** Werte-Paket eines Layers (ohne Geometrie), vom Backend getrennt geliefert. */
+interface LayerValuePackage {
+  cells: Record<string, unknown>[]
+  meta: LayerMeta
+}
+
+/**
+ * Fügt statische Zellgeometrie und Layer-Werte über ``grid_cell_id`` zusammen.
+ * Nur Zellen mit einem Wert werden übernommen (identisch zum bisherigen Verhalten).
+ */
+function mergeLayer(
+  geometry: GeoJSONFeatureCollection,
+  values: LayerValuePackage,
+): GeoJSONFeatureCollection {
+  const valueByCell = new Map<unknown, Record<string, unknown>>()
+  for (const c of values.cells) valueByCell.set(c.grid_cell_id, c)
+
+  const features: GeoJSONFeature[] = []
+  for (const f of geometry.features) {
+    const v = valueByCell.get(f.properties?.grid_cell_id)
+    if (!v) continue
+    features.push({
+      type: 'Feature',
+      properties: { ...f.properties, ...v },
+      geometry: f.geometry,
+    })
+  }
+  return { type: 'FeatureCollection', features, meta: values.meta }
 }
 
 interface AppState {
@@ -43,6 +73,13 @@ interface AppState {
   setActiveLayer: (layer: ActiveLayer | null) => Promise<void>
   showMeasures: boolean
   setShowMeasures: (v: boolean) => void
+
+  // Karten-Ladezustand + Caches (Geometrie einmal, Werte je Layer)
+  mapLoading: boolean
+  mapProgress: number | null
+  gridGeometry: GeoJSONFeatureCollection | null
+  gridGeometryKommuneId: number | null
+  layerValueCache: Record<string, LayerValuePackage>
 
   // Layer info modal
   infoLayer: ActiveLayer | null
@@ -103,7 +140,11 @@ export const useStore = create<AppState>((set, get) => ({
   setKommune: (k) => set({ kommune: k }),
   loadKommune: async (id) => {
     if (get().kommune?.id !== id) {
-      set({ riskSummary: null, costSummary: null, riskHistogram: null })
+      set({
+        riskSummary: null, costSummary: null, riskHistogram: null,
+        gridGeometry: null, gridGeometryKommuneId: null,
+        layerValueCache: {}, layerGeoJson: null,
+      })
     }
     const data = await api.getKommune(id)
     set({ kommune: data as unknown as Kommune })
@@ -145,6 +186,8 @@ export const useStore = create<AppState>((set, get) => ({
         step_history: [],
         eta_seconds: null,
       },
+      // Neue Berechnung → alte Layer-Werte verwerfen (Geometrie bleibt gültig).
+      layerValueCache: {},
     })
     await api.startAssessment(kommuneId)
     await get().loadStatus(kommuneId)
@@ -157,15 +200,51 @@ export const useStore = create<AppState>((set, get) => ({
   // Active layer
   activeLayer: null,
   layerGeoJson: null,
+  mapLoading: false,
+  mapProgress: null,
+  gridGeometry: null,
+  gridGeometryKommuneId: null,
+  layerValueCache: {},
   setActiveLayer: async (layer) => {
     set({ activeLayer: layer })
     const k = get().kommune
-    if (!layer || !k) { set({ layerGeoJson: null }); return }
+    if (!layer || !k) { set({ layerGeoJson: null, mapLoading: false, mapProgress: null }); return }
+
+    set({ mapLoading: true, mapProgress: 0 })
     try {
-      const data = await api.getLayer(k.id, layer.code)
-      set({ layerGeoJson: data as unknown as GeoJSONFeatureCollection })
+      // 1. Statische Geometrie einmal pro Kommune laden + cachen.
+      let geometry = get().gridGeometry
+      const geometryCached = !!geometry && get().gridGeometryKommuneId === k.id
+      // Wenn Geometrie noch geladen werden muss, bekommt sie den Großteil der Leiste.
+      const geoWeight = geometryCached ? 0 : 0.75
+      if (!geometryCached) {
+        geometry = await api.getGridGeometry(
+          k.id, (f) => set({ mapProgress: f * geoWeight }),
+        ) as unknown as GeoJSONFeatureCollection
+        set({ gridGeometry: geometry, gridGeometryKommuneId: k.id })
+      }
+
+      // 2. Layer-Werte aus Cache oder laden.
+      let values = get().layerValueCache[layer.code]
+      if (!values) {
+        set({ mapProgress: geoWeight })
+        values = await api.getLayerValues(
+          k.id, layer.code,
+          (f) => set({ mapProgress: geoWeight + f * (1 - geoWeight) }),
+        ) as unknown as LayerValuePackage
+        set({ layerValueCache: { ...get().layerValueCache, [layer.code]: values } })
+      }
+
+      // 3. Nur anwenden, wenn dieser Layer noch der aktive ist (Race-Schutz).
+      if (get().activeLayer?.code !== layer.code) return
+      set({
+        layerGeoJson: mergeLayer(geometry as GeoJSONFeatureCollection, values),
+        mapProgress: 1,
+      })
     } catch {
-      set({ layerGeoJson: null })
+      if (get().activeLayer?.code === layer.code) set({ layerGeoJson: null })
+    } finally {
+      if (get().activeLayer?.code === layer.code) set({ mapLoading: false })
     }
   },
   showMeasures: true,
@@ -274,6 +353,11 @@ export const useStore = create<AppState>((set, get) => ({
       gridGeoJson: null,
       activeLayer: null,
       layerGeoJson: null,
+      gridGeometry: null,
+      gridGeometryKommuneId: null,
+      layerValueCache: {},
+      mapLoading: false,
+      mapProgress: null,
       riskSummary: null,
       costSummary: null,
       riskProjection: null,

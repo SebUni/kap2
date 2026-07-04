@@ -55,7 +55,7 @@ wait_for_backend() {
 echo "Starte Backend (http://0.0.0.0:8000) – Logs: backend/logs/"
 (
   cd "$ROOT/backend"
-  exec "$PYTHON" -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+  exec "$PYTHON" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ) >>"$BACKEND_LOG_DIR/stdout.log" 2>>"$BACKEND_LOG_DIR/stderr.log" &
 BACKEND_PID=$!
 

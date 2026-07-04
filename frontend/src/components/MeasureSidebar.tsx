@@ -172,17 +172,17 @@ export default function MeasureSidebar() {
               Kosten
               <InfoTooltip
                 title="Kosten"
-                description="Investition und Unterhalt ergeben sich aus Anzahl/Fläche × Katalog-Einheitspreisen."
+                description="CAPEX (einmalige Investition) und OPEX (jährliche Betriebs- & Unterhaltskosten) ergeben sich aus Anzahl/Fläche × Katalog-Einheitspreisen."
                 note="Enthält ggf. kommunale Override-Preise – Details unter „Herleitung anzeigen“."
               />
             </h3>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Investition</span>
-              <span>{fmtEur(impact.investment_eur)}</span>
+              <span style={{ color: 'var(--text-muted)' }}>CAPEX (einmalig)</span>
+              <span>{fmtEur(impact.capex_eur)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Unterhalt/Jahr</span>
-              <span>{fmtEur(impact.annual_maintenance_eur)}</span>
+              <span style={{ color: 'var(--text-muted)' }}>OPEX/Jahr</span>
+              <span>{fmtEur(impact.opex_annual_eur)}</span>
             </div>
 
             {impact.cost_breakdown && (
@@ -195,10 +195,10 @@ export default function MeasureSidebar() {
                 </button>
                 {showBreakdown && (
                   <div style={{ marginTop: 6, fontSize: '0.75rem' }}>
-                    {(['investment', 'annual_maintenance'] as const).map(blockKey => (
+                    {(['capex', 'opex'] as const).map(blockKey => (
                       <div key={blockKey} style={{ marginBottom: 6 }}>
                         <div style={{ fontWeight: 600, color: 'var(--text-muted)' }}>
-                          {blockKey === 'investment' ? 'Investition' : 'Unterhalt/Jahr'}
+                          {blockKey === 'capex' ? 'CAPEX (einmalige Investition)' : 'OPEX/Jahr (Betrieb & Unterhalt)'}
                         </div>
                         {impact.cost_breakdown![blockKey].components.map((c, i) => (
                           <div key={i} style={{ padding: '2px 0', borderBottom: '1px solid var(--border)' }}>
@@ -209,10 +209,11 @@ export default function MeasureSidebar() {
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: '0.68rem' }}>
                               <span>{c.source}</span>
-                              {c.source_detail && (
+                              {(c.source_detail || (c.references && c.references.length > 0)) && (
                                 <InfoTooltip
                                   title={c.source || 'Quelle'}
                                   description={c.source_detail}
+                                  references={c.references}
                                 />
                               )}
                             </div>

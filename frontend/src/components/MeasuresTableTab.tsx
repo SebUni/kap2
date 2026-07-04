@@ -81,10 +81,10 @@ export default function MeasuresTableTab() {
   }
 
   const allImpacts = Object.values(impacts)
-  const sumInvest = allImpacts.reduce((s, i) => s + (i.investment_eur || 0), 0)
-  const sumMaint = allImpacts.reduce((s, i) => s + (i.annual_maintenance_eur || 0), 0)
+  const sumCapex = allImpacts.reduce((s, i) => s + (i.capex_eur || 0), 0)
+  const sumOpex = allImpacts.reduce((s, i) => s + (i.opex_annual_eur || 0), 0)
   const sumBenefit = allImpacts.reduce((s, i) => s + (i.annual_benefit_eur || 0), 0)
-  const netAnnual = sumBenefit - sumMaint
+  const netAnnual = sumBenefit - sumOpex
 
   const usedClusters = [...new Set(measures.map(m => clusterOf(m)))]
 
@@ -107,12 +107,12 @@ export default function MeasuresTableTab() {
       {measures.length > 0 && (
         <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
           <div className="kpi-card" style={{ flex: '1 1 140px' }}>
-            <div className="kpi-label">Gesamtinvestition</div>
-            <div className="kpi-value" style={{ fontSize: '1rem' }}>{fmtCurrency(sumInvest)}</div>
+            <div className="kpi-label">Gesamt-CAPEX</div>
+            <div className="kpi-value" style={{ fontSize: '1rem' }}>{fmtCurrency(sumCapex)}</div>
           </div>
           <div className="kpi-card" style={{ flex: '1 1 140px' }}>
-            <div className="kpi-label">Unterhalt/Jahr</div>
-            <div className="kpi-value" style={{ fontSize: '1rem' }}>{fmtCurrency(sumMaint)}</div>
+            <div className="kpi-label">OPEX/Jahr</div>
+            <div className="kpi-value" style={{ fontSize: '1rem' }}>{fmtCurrency(sumOpex)}</div>
           </div>
           <div className="kpi-card" style={{ flex: '1 1 140px' }}>
             <div className="kpi-label">Nutzen/Jahr</div>
@@ -148,8 +148,8 @@ export default function MeasuresTableTab() {
                   <th>Typ</th>
                   <th>Jahr</th>
                   <th style={{ textAlign: 'right' }}>Anzahl</th>
-                  <th style={{ textAlign: 'right' }}>Investition</th>
-                  <th style={{ textAlign: 'right' }}>Unterhalt/Jahr</th>
+                  <th style={{ textAlign: 'right' }}>CAPEX</th>
+                  <th style={{ textAlign: 'right' }}>OPEX/Jahr</th>
                   <th style={{ textAlign: 'right' }}>Nutzen/Jahr</th>
                   <th style={{ textAlign: 'right' }}>Risiko-Minderung</th>
                   <th>Aktionen</th>
@@ -168,8 +168,8 @@ export default function MeasuresTableTab() {
                       <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>
                         {imp?.unit_label != null ? `${imp.count ?? '–'} ${imp.unit_label}` : '–'}
                       </td>
-                      <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>{imp ? fmtCurrency(imp.investment_eur || 0) : '–'}</td>
-                      <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>{imp ? fmtCurrency(imp.annual_maintenance_eur || 0) : '–'}</td>
+                      <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>{imp ? fmtCurrency(imp.capex_eur || 0) : '–'}</td>
+                      <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>{imp ? fmtCurrency(imp.opex_annual_eur || 0) : '–'}</td>
                       <td style={{ textAlign: 'right', fontSize: '0.85rem', color: 'var(--success)' }}>{imp ? fmtCurrency(imp.annual_benefit_eur || 0) : '–'}</td>
                       <td style={{ textAlign: 'right', fontSize: '0.85rem', color: 'var(--success)' }}>
                         {imp?.avg_index_reduction_pct != null ? `−${imp.avg_index_reduction_pct.toFixed(1)} %` : '–'}
