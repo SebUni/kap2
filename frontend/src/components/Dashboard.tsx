@@ -10,6 +10,24 @@ import {
 
 const LINE_PALETTE = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
 
+function InlineSpinner({ size = 14 }: { size?: number }) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        display: 'inline-block',
+        width: size,
+        height: size,
+        border: '2px solid var(--border)',
+        borderTopColor: 'var(--primary)',
+        borderRadius: '50%',
+        animation: 'map-spin 0.8s linear infinite',
+        verticalAlign: 'middle',
+      }}
+    />
+  )
+}
+
 function formatStepTime(iso: string): string {
   try {
     return new Date(iso).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -111,6 +129,12 @@ function AssessmentBar() {
               </span>
             )
             : status?.status === 'error' ? `✕ ${status?.message || 'Fehler'}`
+            : !status ? (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <InlineSpinner size={12} />
+                Ergebnisse werden geladen …
+              </span>
+            )
             : 'Noch keine Berechnung – Klimatische Einflüsse, Räumliche Expositionen, Sensitivitäten & Risiken pro 100m-Zelle.'}
         </div>
         {running && (
@@ -452,9 +476,12 @@ export default function Dashboard() {
             )}
           </section>
         </>
-      ) : status?.status === 'done' ? (
+      ) : status?.status === 'done' || !status ? (
         <div className="dashboard-empty">
-          <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Ergebnisse werden geladen …</p>
+          <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+            <InlineSpinner size={18} />
+            Ergebnisse werden geladen …
+          </p>
         </div>
       ) : (
         <div className="dashboard-empty">
