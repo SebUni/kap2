@@ -924,6 +924,7 @@ MEASURES: list[dict] = [
      "source": "Verteilnetzbetreiber-Praxiswerte (ront.info / Bayernwerk) / BNetzA-Größenordnung",
      "sources": {"capex_per_unit": "Verteilnetz-Praxiswerte (Einzelstation bis MS-Ausbau)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
+     "source_refs": {"capex_per_unit": ["RONT_Ortsnetzstation"]},
      "source_details": {
         "capex_per_unit": "Eine einzelne Ortsnetzstation kostet ~18.000-50.000 € (400-kVA-Trafo "
             "bis eigene Mittelspannungsstation inkl. Verkabelung; ront.info, ms-elektro.gmbh); "
@@ -1018,6 +1019,7 @@ MEASURES: list[dict] = [
      "source": "BBK-Hochwasserschutzfibel (qualitativ) / Modell-Umlage Objektschutz",
      "sources": {"capex_per_m2": "Modell-Umlage Objektschutz-Einzelmaßnahmen",
                  "opex_per_m2_year": "Modellannahme (Wartung/Funktionsprüfung)"},
+     "source_refs": {"capex_per_m2": ["BBK_Hochwasserschutzfibel", "Kostencheck_Rueckstauklappe"]},
      "source_details": {
         "capex_per_m2": "Gebäude-Objektschutz ist objekt-/öffnungsbezogen, nicht flächen"
             "bezogen; die BBK-/BMWSB-Hochwasserschutzfibel (2022) beschreibt die Maßnahmen "
@@ -1042,6 +1044,7 @@ MEASURES: list[dict] = [
      "source": "Sieker / kommunale Entsiegelungs-Förderprogramme",
      "sources": {"capex_per_m2": "Sieker / Entsiegelungs-Förderprogramme (Bremen, OÖ)",
                  "opex_per_m2_year": "Modellannahme (Pflege der begrünten Fläche)"},
+     "source_refs": {"capex_per_m2": ["Bremen_Entsiegelung"]},
      "source_details": {
         "capex_per_m2": "Entsiegelung (Aufbruch der Versiegelung, Entsorgung, Bodenlockerung "
             "und Begrünung) kostet ~25-40 €/m² je nach aufzubrechendem Material (Sieker, "
@@ -1063,6 +1066,7 @@ MEASURES: list[dict] = [
      "source": "Marktpreise Dachbeschichtung / Modellannahme",
      "sources": {"capex_per_m2": "Marktpreise sonnenreflektierende Dachbeschichtung",
                  "opex_per_m2_year": "Modellannahme (anteilige Nachbeschichtung)"},
+     "source_refs": {"capex_per_m2": ["Asphaltshop_Dachbeschichtung"]},
      "source_details": {
         "capex_per_m2": "Sonnenreflektierende (weiße) Dachbeschichtung kostet 10-30 €/m², eine "
             "Acrylbeschichtung im Mittel ~18 €/m² (asphalt-shop.de, steelmonks 2026). "
@@ -1085,6 +1089,7 @@ MEASURES: list[dict] = [
      "source": "strasse-und-autobahn.de / bauindex (heller Asphalt) / Modellannahme",
      "sources": {"capex_per_m2": "Marktdaten heller/hitzeresilienter Asphalt (Teilerneuerung)",
                  "opex_per_m2_year": "Modellannahme (Belagsunterhalt)"},
+     "source_refs": {"capex_per_m2": ["Kirschbaum_HellerAsphalt"]},
      "source_details": {
         "capex_per_m2": "Heller/hitzeresilienter Asphalt verursacht ~3-5 €/m² Mehrkosten "
             "gegenüber Normalasphalt (45-60 €/m²), also 20-50 % Aufpreis (strasse-und-"
@@ -1109,6 +1114,8 @@ MEASURES: list[dict] = [
      "source": "DWA-A 138 / baupreislexikon (Mulden-Rigolen)",
      "sources": {"capex_per_m2": "DWA-A 138 / baupreislexikon (Mulden-Rigolen-Versickerung)",
                  "opex_per_m2_year": "DWA-A 138 (Betrieb), auf Anlagenfläche umgerechnet"},
+     "source_refs": {"capex_per_m2": ["DWA_A138", "Baupreislexikon_Versickerung"],
+                     "opex_per_m2_year": ["DWA_A138", "Baupreislexikon_Versickerung"]},
      "source_details": {
         "capex_per_m2": "Nach DWA-A 138 (baupreislexikon 2026) kostet eine reine "
             "Muldenversickerung 10-45 €/m² und ein kombiniertes Mulden-Rigolen-System 60-85 "
@@ -1176,6 +1183,7 @@ MEASURES: list[dict] = [
      "source": "BfN/WWF/UBA (Auenrenaturierung) / Modellannahme",
      "sources": {"capex_per_m2": "BfN/WWF Mittlere Elbe + UBA (Bandbreite Renaturierung)",
                  "opex_per_m2_year": "Modellannahme (extensive Auenpflege)"},
+     "source_refs": {"capex_per_m2": ["UBA_Gewaesserrenaturierung"]},
      "source_details": {
         "capex_per_m2": "Auenrenaturierung streut stark nach Intensität. Extensive "
             "Deichrückverlegung/Flächenrückgabe kostet ~0,3-3 €/m² (BfN/WWF-Projekt Mittlere "
@@ -1200,6 +1208,7 @@ MEASURES: list[dict] = [
      "source": "Modellannahme (Umlage Heckenpreise, gartenbau-kosten)",
      "sources": {"capex_per_m2": "Modell-Umlage Heckenpreise (gartenbau-kosten/kostencheck)",
                  "opex_per_m2_year": "Modellannahme (Heckenpflege/Terrassenerhalt)"},
+     "source_refs": {"capex_per_m2": ["Gartenbau_Hecke"]},
      "source_details": {
         "capex_per_m2": "Erosionsschutz bündelt lineare Elemente (Hecken 15-55 €/lfm komplett, "
             "Windschutzhecken 5-20 €/lfm; gartenbau-kosten.de, kostencheck.de 2026) und "
@@ -1222,6 +1231,8 @@ MEASURES: list[dict] = [
      "source": "KTBL/LfL (Zwischenfrucht-/Begrünungskosten)",
      "sources": {"capex_per_m2": "KTBL/LfL Zwischenfruchtkosten (Saatgut/Etablierung)",
                  "opex_per_m2_year": "KTBL/LfL (laufende Begrünungskosten)"},
+     "source_refs": {"capex_per_m2": ["LfL_Pflanzenbau"],
+                     "opex_per_m2_year": ["LfL_Pflanzenbau"]},
      "source_details": {
         "capex_per_m2": "Humusaufbau erfolgt überwiegend über Zwischenfrüchte/Begrünung: "
             "Saatgut 20-60 €/ha, mit Prämien/anspruchsvollen Mischungen bis 220 €/ha (KTBL/"
@@ -1244,6 +1255,8 @@ MEASURES: list[dict] = [
      "source": "KTBL (Saatgutkosten)",
      "sources": {"capex_per_m2": "KTBL Saatgutkosten (Sortenaufpreis)",
                  "opex_per_m2_year": "KTBL (jährlicher Saatgut-/Sortenaufpreis)"},
+     "source_refs": {"capex_per_m2": ["LfL_Pflanzenbau"],
+                     "opex_per_m2_year": ["LfL_Pflanzenbau"]},
      "source_details": {
         "capex_per_m2": "Der Wechsel auf trockenresistente Sorten verursacht im Kern nur einen "
             "Saatgut-Mehrpreis; das gesamte Saatgut liegt je nach Kultur bei ~50-200 €/ha "
@@ -1267,6 +1280,8 @@ MEASURES: list[dict] = [
      "source": "KTBL (Feldbewässerung)",
      "sources": {"capex_per_m2": "KTBL-Investitionsrichtwert Bewässerung (~5.000 €/ha)",
                  "opex_per_m2_year": "KTBL (Betriebskosten Bewässerung)"},
+     "source_refs": {"capex_per_m2": ["KTBL_Feldbewaesserung"],
+                     "opex_per_m2_year": ["KTBL_Feldbewaesserung"]},
      "source_details": {
         "capex_per_m2": "Als Faustwert für neue Bewässerungssysteme nennt das KTBL ~5.000 €/ha "
             "Investition (Tröpfchenbewässerung am teuersten, 18 €/mm·ha; profi.de/Thünen). "
@@ -1290,6 +1305,8 @@ MEASURES: list[dict] = [
      "source": "Landesforsten / AGDW (Waldumbaukosten)",
      "sources": {"capex_per_m2": "Landesforsten RLP / AGDW (Waldumbau €/ha)",
                  "opex_per_m2_year": "Landesforsten (Kulturpflege/Freischneiden)"},
+     "source_refs": {"capex_per_m2": ["AGDW_Wiederbewaldung"],
+                     "opex_per_m2_year": ["AGDW_Wiederbewaldung"]},
      "source_details": {
         "capex_per_m2": "Waldumbau/Wiederbewaldung kostet je nach Baumart und Wildschutzzaun "
             "3.000-20.000 €/ha, mit Vollzaun und intensiver Pflege bis 30.000 €/ha "
@@ -1388,6 +1405,8 @@ MEASURES: list[dict] = [
      "source": "kommunale Praxiswerte Frühwarnsystem (kommunal.de / Hydrotec)",
      "sources": {"opex_fixed_year": "kommunale Praxiswerte (laufender Betrieb Frühwarnsystem)",
                  "capex_fixed": "kommunale Praxiswerte Starkregen-/Hochwasser-Frühwarnsystem"},
+     "source_refs": {"capex_fixed": ["Kommunal_Fruehwarnsystem"],
+                     "opex_fixed_year": ["Kommunal_Fruehwarnsystem"]},
      "source_details": {
         "opex_fixed_year":
             "Laufender Betrieb (Wartung, Hosting, Softwarepflege) eines kommunalen Starkregen-/Hochwasser-Frühwarnsystems: 30.000–40.000 €/a (kommunal.de, Hydrotec 2025). Punktwert 35.000 €/a. Diese Betriebskosten waren im früheren Modell nicht abbildbar und sind jetzt als feste jährliche OPEX hinterlegt.",
@@ -1414,7 +1433,8 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle für Sammelmaßnahme)",
      "sources": {"capex_per_m2": "Modellannahme (Institut für Stadtgrün / Berliner Stadtbaumkampagne)",
-                 "opex_per_m2_year": "Modellannahme (Institut für Stadtgrün, Semmler 2013)"},
+                 "opex_per_m2_year": "Institut für Stadtgrün (Semmler 2013)"},
+     "source_refs": {"opex_per_m2_year": ["Semmler_Stadtgruen_2013"]},
      "source_details": {
         "capex_per_m2": "Kein einheitlicher €/m²-Kennwert für \"Ausbau Stadtgrün\" als "
             "Sammelmaßnahme auffindbar – daher Modellannahme. Plausibilisiert anhand Institut "
@@ -1528,6 +1548,8 @@ MEASURES: list[dict] = [
      "source": "Praxiswerte Regenrückhaltebecken (Sieker / agrarheute)",
      "sources": {"capex_per_m2": "Praxiswerte offene Retentionsbecken (Sieker/agrarheute), auf Fläche umgerechnet",
                  "opex_per_m2_year": "Sieker (Unterhalt offener Becken), mit Puffer"},
+     "source_refs": {"capex_per_m2": ["Agrarheute_Rueckhaltebecken"],
+                     "opex_per_m2_year": ["Agrarheute_Rueckhaltebecken"]},
      "source_details": {
         "capex_per_m2": "Offene Retentionsflächen/Erdbecken kosten ~26-50 €/m³ nutzbaren "
             "Rückhaltevolumens (Praxisbeispiele 2005/2008 ~26-50 €/m³; agrarheute, Sieker "
@@ -1549,6 +1571,8 @@ MEASURES: list[dict] = [
      "source": "Praxiswerte Rückhaltebecken (Sieker / agrarheute)",
      "sources": {"capex_per_m2": "Praxiswerte offene Polder/Rückhaltebecken (Sieker/agrarheute)",
                  "opex_per_m2_year": "Sieker (Unterhalt offener Becken)"},
+     "source_refs": {"capex_per_m2": ["Agrarheute_Rueckhaltebecken"],
+                     "opex_per_m2_year": ["Agrarheute_Rueckhaltebecken"]},
      "source_details": {
         "capex_per_m2": "Großflächige, offene Polder und Hochwasserrückhaltebecken liegen am "
             "unteren Ende der Retentionskostenspanne (überwiegend Erdbau/Fläche, wenig "
@@ -1568,6 +1592,8 @@ MEASURES: list[dict] = [
      "source": "DWA-A 138 / baupreislexikon (Flächenversickerung)",
      "sources": {"capex_per_m2": "DWA-A 138 / baupreislexikon (Mulden-/Flächenversickerung)",
                  "opex_per_m2_year": "DWA-A 138 (Betrieb), auf Anlagenfläche umgerechnet"},
+     "source_refs": {"capex_per_m2": ["DWA_A138", "Baupreislexikon_Versickerung"],
+                     "opex_per_m2_year": ["DWA_A138", "Baupreislexikon_Versickerung"]},
      "source_details": {
         "capex_per_m2": "Flächen- und Muldenversickerung kosten nach DWA-A 138 (baupreislexikon "
             "2026) 10-45 €/m² abflusswirksamer Fläche. Punktwert 30 €/m² im mittleren Bereich "
@@ -1631,6 +1657,7 @@ MEASURES: list[dict] = [
      "source": "DVGW W 392 / energie|wasser-praxis (Netzsanierung)",
      "sources": {"capex_per_unit": "DVGW W 392 / energie|wasser-praxis (Rohrnetzsanierung €/lfm)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
+     "source_refs": {"capex_per_unit": ["DVGW_W392"]},
      "source_details": {
         "capex_per_unit": "Rohrnetzsanierung kostet in offener Bauweise (Rohrersatz) 80-150 "
             "€/lfm, im grabenlosen Inliner-Verfahren (CIPP) 50-90 €/lfm (DVGW W 392; "
@@ -1655,6 +1682,7 @@ MEASURES: list[dict] = [
      "source": "NLWKN Generalplan Küstenschutz / Landesbetriebe (Deichsanierung)",
      "sources": {"capex_per_unit": "Praxisprojekte Flussdeich + NLWKN Generalplan Küstenschutz",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
+     "source_refs": {"capex_per_unit": ["NLWKN_Generalplan_Kuestenschutz"]},
      "source_details": {
         "capex_per_unit": "Umfassende Deichsanierung/-verstärkung kostet nach Praxisprojekten "
             "~1,25-2,1 Mio €/km an Flussdeichen (Sachsen-Anhalt/Hessen 2024-2026: 3 Mio € für "
@@ -1872,6 +1900,7 @@ MEASURES: list[dict] = [
      "source": "LfU Bayern / BAW / Wikipedia (Fischaufstiegsanlagen)",
      "sources": {"capex_per_unit": "LfU Bayern / BAW / Wikipedia (Fischaufstiegsanlagen, breite Spanne)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
+     "source_refs": {"capex_per_unit": ["LfU_Bayern_Fischaufstieg"]},
      "source_details": {
         "capex_per_unit": "Fischaufstiegsanlagen streuen stark nach Bauart und Gewässergröße: "
             "ein dokumentiertes Beispiel liegt bei ~600.000 € je Anlage; kompakte technische "
@@ -1916,6 +1945,7 @@ MEASURES: list[dict] = [
      "source": "UBA (Gewässerrenaturierung) / Modellannahme",
      "sources": {"capex_per_m2": "UBA (Bandbreite Gewässerrenaturierung), auf Fläche umgelegt",
                  "opex_per_m2_year": "Modellannahme (extensive Gewässerpflege)"},
+     "source_refs": {"capex_per_m2": ["UBA_Gewaesserrenaturierung"]},
      "source_details": {
         "capex_per_m2": "Laichhabitat- und Gewässerrenaturierung liegt nach UBA je nach Aufwand "
             "bei ~10 €/lfm (kleine Maßnahmen) bis 600+ €/lfm (technischer Umbau) Gewässerlauf. "
