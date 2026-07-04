@@ -285,6 +285,100 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "https://www.gartenbau.org/magazin/hecke-pflanzen-kosten-202222565",
         "accessed": "2026-07-04",
     },
+    # ══ Teil 2 — Nicht-Kosten-Parameter (Hazards, Risiken, Expositionen, Formeln) ══
+    # ── Klimaprojektionen / Hazard-Kennwerte ────────────────────────────────
+    "DWD_Klimareport": {
+        "ieee": "Deutscher Wetterdienst (DWD), „Nationaler Klimareport – Klima: gestern, "
+                "heute und in der Zukunft, 4. Auflage,“ Offenbach am Main, Deutschland. "
+                "[Online]. Verfügbar: https://www.dwd.de/DE/leistungen/klimareports/"
+                "download_report_auflage-4.pdf. [Zugriff: 4. Juli 2026].",
+        "url": "https://www.dwd.de/DE/leistungen/klimareports/download_report_auflage-4.pdf",
+        "archive_url": "https://web.archive.org/web/20231215011034/"
+                       "https://www.dwd.de/DE/leistungen/klimareports/download_report_auflage-4.pdf",
+        "accessed": "2026-07-04",
+    },
+    "IPCC_AR6_WG1": {
+        "ieee": "Intergovernmental Panel on Climate Change (IPCC), „Climate Change 2021: The "
+                "Physical Science Basis. Contribution of Working Group I to the Sixth Assessment "
+                "Report,“ Cambridge University Press, Cambridge/New York, 2021. [Online]. "
+                "Verfügbar: https://www.ipcc.ch/report/ar6/wg1/. [Zugriff: 4. Juli 2026].",
+        "url": "https://www.ipcc.ch/report/ar6/wg1/",
+        "archive_url": "https://web.archive.org/web/20210809075731/https://www.ipcc.ch/report/ar6/wg1/",
+        "accessed": "2026-07-04",
+    },
+    "UBA_KWRA_2021": {
+        "ieee": "Umweltbundesamt (UBA), „Klimawirkungs- und Risikoanalyse 2021 für "
+                "Deutschland,“ Dessau-Roßlau, Deutschland, 2021. [Online]. Verfügbar: "
+                "https://www.umweltbundesamt.de/klimawirkungs-risikoanalyse-2021-fuer-deutschland. "
+                "[Zugriff: 4. Juli 2026].",
+        "url": "https://www.umweltbundesamt.de/klimawirkungs-risikoanalyse-2021-fuer-deutschland",
+        "archive_url": "https://web.archive.org/web/20210731125117/"
+                       "https://www.umweltbundesamt.de/klimawirkungs-risikoanalyse-2021-fuer-deutschland",
+        "accessed": "2026-07-04",
+    },
+    # ── Risiko-Kennwerte (Schäden / Gesundheit) ─────────────────────────────
+    "Prognos_Klimaschaeden_2023": {
+        "ieee": "Prognos AG, Gesellschaft für Wirtschaftliche Strukturforschung (GWS) und "
+                "Institut für ökologische Wirtschaftsforschung (IÖW), „Kosten durch "
+                "Klimawandelfolgen in Deutschland,“ im Auftrag des BMWK/BMUV, Osnabrück/Berlin, "
+                "Deutschland, 2023. [Online]. Verfügbar: https://www.gws-os.com/de/energie-klima/"
+                "projekte/detail/bmu-kliwafo. [Zugriff: 4. Juli 2026].",
+        "url": "https://www.gws-os.com/de/energie-klima/projekte/detail/bmu-kliwafo",
+        "archive_url": "https://web.archive.org/web/20220928001520/"
+                       "https://www.gws-os.com/de/energie-klima/projekte/detail/bmu-kliwafo",
+        "accessed": "2026-07-04",
+    },
+    "RKI_Hitzemortalitaet": {
+        "ieee": "M. an der Heiden, S. Muthers, H. Niemann u. a. / Robert Koch-Institut (RKI), "
+                "„Hitzebedingte Mortalität – Sachstandsbericht Klimawandel und Gesundheit, "
+                "Journal of Health Monitoring S4/2023,“ Berlin, Deutschland, 2023 (Methodik nach "
+                "Winklmayr u. a., Dtsch. Arztebl. Int., 2022). [Online]. Verfügbar: "
+                "https://edoc.rki.de/bitstream/handle/176904/11262/"
+                "JHealthMonit_2023_S4_Hitze_Sachstandsbericht_Klimawandel_Gesundheit.pdf. "
+                "[Zugriff: 4. Juli 2026].",
+        "url": "https://edoc.rki.de/bitstream/handle/176904/11262/"
+               "JHealthMonit_2023_S4_Hitze_Sachstandsbericht_Klimawandel_Gesundheit.pdf",
+        "archive_url": "https://web.archive.org/web/20231024050849/"
+                       "https://edoc.rki.de/bitstream/handle/176904/11262/"
+                       "JHealthMonit_2023_S4_Hitze_Sachstandsbericht_Klimawandel_Gesundheit.pdf",
+        "accessed": "2026-07-04",
+    },
+    # ── Expositionen / Sensitivitäten (Normierungsskalen) ───────────────────
+    "Zensus_2022": {
+        "ieee": "Statistisches Bundesamt (Destatis), „Zensus 2022 – Bevölkerung im "
+                "100-Meter-Gitter,“ Wiesbaden, Deutschland, 2022. [Online]. Verfügbar: "
+                "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Zensus2022/"
+                "_inhalt.html. [Zugriff: 4. Juli 2026].",
+        "url": "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Zensus2022/"
+               "_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20250709030127/"
+                       "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/"
+                       "Zensus2022/_inhalt.html",
+        "accessed": "2026-07-04",
+    },
+    # ── Formel-Parameter (UHI-Koeffizienten) ────────────────────────────────
+    "VDI3787_Stadtklima": {
+        "ieee": "Verein Deutscher Ingenieure (VDI), „VDI 3787 Blatt 1: Umweltmeteorologie – "
+                "Klima- und Lufthygienekarten für Städte und Regionen,“ Düsseldorf, Deutschland. "
+                "[Online]. Verfügbar: https://www.vdi.de/richtlinien/details/"
+                "vdi-3787-blatt-1-umweltmeteorologie-klima-und-planung. [Zugriff: 4. Juli 2026].",
+        "url": "https://www.vdi.de/richtlinien/details/"
+               "vdi-3787-blatt-1-umweltmeteorologie-klima-und-planung",
+        "archive_url": "https://web.archive.org/web/20211027064307/"
+                       "https://www.vdi.de/richtlinien/details/"
+                       "vdi-3787-blatt-1-umweltmeteorologie-klima-und-planung",
+        "accessed": "2026-07-04",
+    },
+    "StewartOke_LCZ_2012": {
+        "ieee": "I. D. Stewart und T. R. Oke, „Local Climate Zones for Urban Temperature "
+                "Studies,“ Bulletin of the American Meteorological Society, Bd. 93, Nr. 12, "
+                "S. 1879–1900, 2012. [Online]. Verfügbar: https://journals.ametsoc.org/view/"
+                "journals/bams/93/12/bams-d-11-00019.1.xml. [Zugriff: 4. Juli 2026].",
+        "url": "https://journals.ametsoc.org/view/journals/bams/93/12/bams-d-11-00019.1.xml",
+        "archive_url": "https://web.archive.org/web/20210411032356/"
+                       "https://journals.ametsoc.org/view/journals/bams/93/12/bams-d-11-00019.1.xml",
+        "accessed": "2026-07-04",
+    },
 }
 
 

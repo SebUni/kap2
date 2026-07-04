@@ -54,12 +54,21 @@ HAZARDS: list[dict] = [
      "unit": "°C", "norm_min": 0.0, "norm_max": 3.0, "spatial": True,
      "description": "Langfristiger Trend steigender mittlerer Lufttemperaturen.",
      "proxy": "Regionaler DWD-Mittelwert (Bundesland) plus lokaler UHI-Aufschlag aus OSM-Landnutzung.",
-     "source": "DWD CDC / Copernicus C3S-CORDEX (regionalisiert)"},
+     "source": "DWD CDC / Copernicus C3S-CORDEX (regionalisiert)",
+     "source_detail": "Normierungs-Obergrenze 3,0 °C entspricht der Spanne des projizierten "
+        "mittleren Temperaturanstiegs in Deutschland bis Ende des Jahrhunderts unter mittleren "
+        "bis hohen Emissionspfaden (DWD Nationaler Klimareport; IPCC AR6 WG1). Die angezeigten "
+        "H-Werte stammen aus regionalem DWD-Mittel + lokalem UHI-Aufschlag; editierbar.",
+     "source_refs": ["DWD_Klimareport", "IPCC_AR6_WG1"]},
     {"code": "SEA_LEVEL_RISE", "name": "Meeresspiegelanstieg",
      "unit": "mm/Jahr", "norm_min": 0.0, "norm_max": 10.0, "spatial": False, "coastal": True,
      "description": "Langfristiger Anstieg des mittleren Meeresspiegels an Küsten.",
      "proxy": "Regionaler Konstantwert; nur für Küstenkommunen aktiv.",
-     "source": "Copernicus C3S / BSH"},
+     "source": "Copernicus C3S / BSH",
+     "source_detail": "Normierungsskala 0-10 mm/a: IPCC AR6 WG1 projiziert für hohe "
+        "Emissionsszenarien globale Meeresspiegelanstiegsraten in dieser Größenordnung bis "
+        "Ende des Jahrhunderts. Für Binnenkommunen inaktiv (nur Küste); editierbar.",
+     "source_refs": ["IPCC_AR6_WG1"]},
     {"code": "OCEAN_WARMING", "name": "Ozeanerwärmung",
      "unit": "°C", "norm_min": 0.0, "norm_max": 3.0, "spatial": False, "coastal": True,
      "description": "Langfristige Erwärmung der Ozeanoberfläche und Wassermassen.",
@@ -89,7 +98,12 @@ HAZARDS: list[dict] = [
      "unit": "Tage/Jahr", "norm_min": 0.0, "norm_max": 40.0, "spatial": True,
      "description": "Akute oder anhaltende extreme Hitzeereignisse.",
      "proxy": "DWD-CDC heiße-Tage-Raster (1 km, am Kommune-Zentroid) + UHI-Modell (ΔT) pro 100m-Zelle aus OSM (siehe Handbuch).",
-     "source": "DWD CDC (Raster) + UHI-Modell (OSM)"},
+     "source": "DWD CDC (Raster) + UHI-Modell (OSM)",
+     "source_detail": "Normierungs-Obergrenze 40 heiße Tage/Jahr orientiert sich an der "
+        "beobachteten und projizierten Zunahme heißer Tage (Tmax ≥ 30 °C) in Deutschland "
+        "(DWD Nationaler Klimareport). Die Zell-Werte stammen aus dem DWD-CDC-Raster zzgl. "
+        "UHI-Aufschlag; editierbar.",
+     "source_refs": ["DWD_Klimareport"]},
     {"code": "COLD_EXTREME", "name": "Kälteextreme und Frostereignisse",
      "unit": "Tage/Jahr", "norm_min": 0.0, "norm_max": 40.0, "spatial": True,
      "description": "Extreme Kälte- und Frostereignisse (regional relevant).",
@@ -99,12 +113,22 @@ HAZARDS: list[dict] = [
      "unit": "Index", "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
      "description": "Extreme Niederschläge inkl. Überflutungen und Sturzfluten.",
      "proxy": "Versiegelungsgrad (OSM) × TWI/Senkenlage (Terrarium-DEM, D8) × regionaler Starkregenindex.",
-     "source": "DWD CDC + AWS Terrarium DEM"},
+     "source": "DWD CDC + AWS Terrarium DEM",
+     "source_detail": "Der Starkregen-/Überflutungsindex (0-100) kombiniert Versiegelung, "
+        "Senkenlage und regionalen Starkregentrend. Die Zunahme von Starkniederschlägen in "
+        "Deutschland ist im DWD Nationalen Klimareport dokumentiert; die Skala selbst ist eine "
+        "dokumentierte Modellwahl (dimensionsloser Index), editierbar.",
+     "source_refs": ["DWD_Klimareport"]},
     {"code": "DROUGHT", "name": "Dürren",
      "unit": "Tage/Jahr", "norm_min": 0.0, "norm_max": 60.0, "spatial": True,
      "description": "Meteorologische, hydrologische oder agrarische Dürreperioden.",
      "proxy": "Trockentage (Proxy aus DWD-CDC heißen Tagen am Zentroid) + erhöhte Empfindlichkeit auf versiegelten/landwirtschaftlichen Flächen.",
-     "source": "DWD CDC (Raster, abgeleitet) / UBA"},
+     "source": "DWD CDC (Raster, abgeleitet) / UBA",
+     "source_detail": "Normierungs-Obergrenze 60 Trocken-/Dürretage orientiert sich an der "
+        "beobachteten und projizierten Zunahme von Trockenperioden in Deutschland (DWD "
+        "Nationaler Klimareport; UBA Klimawirkungs- und Risikoanalyse 2021, Handlungsfeld "
+        "Boden/Landwirtschaft). Zell-Werte als Proxy abgeleitet; editierbar.",
+     "source_refs": ["DWD_Klimareport", "UBA_KWRA_2021"]},
     {"code": "TROPICAL_CYCLONE", "name": "Tropische Wirbelstürme / Orkane",
      "unit": "Anzahl/Jahr", "norm_min": 0.0, "norm_max": 2.0, "spatial": False,
      "description": "Tropische Wirbelstürme und vergleichbare Zyklone.",
@@ -175,12 +199,22 @@ EXPOSURES: list[dict] = [
      "unit": "Pers./km²", "norm_min": 0.0, "norm_max": 8000.0, "spatial": True,
      "description": "Räumliche Dichte der Bevölkerung.",
      "proxy": "Zensus-2022-100m-Gitter: Bevölkerungszahl je Zelle / Fläche.",
-     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
+     "source": "Zensus 2022 (100m-Gitter, Destatis)",
+     "source_detail": "Werte und Normierungsskala basieren auf dem Zensus 2022 (Destatis) im "
+        "100-Meter-Gitter (Bevölkerungszahl, Altersanteile ≥65/<18 Jahre bzw. sozioökonomische "
+        "Merkmale je Zelle). Die Referenzskala (norm_min/norm_max) ist eine dokumentierte "
+        "Modellwahl auf Basis typischer Wertespannen dieser amtlichen Gitterdaten; editierbar.",
+     "source_refs": ["Zensus_2022"]},
     {"code": "AGE_STRUCTURE", "name": "Altersstruktur (Ältere, Kinder)",
      "unit": "%", "norm_min": 0.0, "norm_max": 50.0, "spatial": True,
      "description": "Anteil altersbedingt vulnerabler Bevölkerungsgruppen.",
      "proxy": "Zensus-100m: Anteil ≥65 Jahre + Anteil <18 Jahre je Zelle.",
-     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
+     "source": "Zensus 2022 (100m-Gitter, Destatis)",
+     "source_detail": "Werte und Normierungsskala basieren auf dem Zensus 2022 (Destatis) im "
+        "100-Meter-Gitter (Bevölkerungszahl, Altersanteile ≥65/<18 Jahre bzw. sozioökonomische "
+        "Merkmale je Zelle). Die Referenzskala (norm_min/norm_max) ist eine dokumentierte "
+        "Modellwahl auf Basis typischer Wertespannen dieser amtlichen Gitterdaten; editierbar.",
+     "source_refs": ["Zensus_2022"]},
     {"code": "OUTDOOR_THERMAL_EXPOSURE", "name": "Aufenthalt im Freien (therm. Exposition)",
      "unit": "h/Tag", "norm_min": 0.0, "norm_max": 8.0, "spatial": True,
      "description": "Exposition der Bevölkerung durch Aufenthalt im Freien bei Hitze.",
@@ -190,7 +224,12 @@ EXPOSURES: list[dict] = [
      "unit": "Pers.", "norm_min": 0.0, "norm_max": 2000.0, "spatial": True,
      "description": "Bevölkerungsgruppen mit erhöhter Schadenswahrscheinlichkeit.",
      "proxy": "Zensus-100m: Bevölkerung × (Anteil ≥65 + Anteil <18) je Zelle.",
-     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
+     "source": "Zensus 2022 (100m-Gitter, Destatis)",
+     "source_detail": "Werte und Normierungsskala basieren auf dem Zensus 2022 (Destatis) im "
+        "100-Meter-Gitter (Bevölkerungszahl, Altersanteile ≥65/<18 Jahre bzw. sozioökonomische "
+        "Merkmale je Zelle). Die Referenzskala (norm_min/norm_max) ist eine dokumentierte "
+        "Modellwahl auf Basis typischer Wertespannen dieser amtlichen Gitterdaten; editierbar.",
+     "source_refs": ["Zensus_2022"]},
     {"code": "BUILDING_STOCK", "name": "Gebäudebestand / Gebäudefläche",
      "unit": "m²", "norm_min": 0.0, "norm_max": 6000.0, "spatial": True,
      "description": "Gebäudebestand und bebaute Fläche.",
@@ -319,12 +358,22 @@ VULNERABILITIES: list[dict] = [
      "norm_min": 0.0, "norm_max": 50.0, "spatial": True,
      "description": "Anteil sozial vulnerabler Bevölkerungsgruppen.",
      "proxy": "Zensus-100m: Anteil ≥65 + Anteil <18 Jahre je Zelle.",
-     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
+     "source": "Zensus 2022 (100m-Gitter, Destatis)",
+     "source_detail": "Werte und Normierungsskala basieren auf dem Zensus 2022 (Destatis) im "
+        "100-Meter-Gitter (Bevölkerungszahl, Altersanteile ≥65/<18 Jahre bzw. sozioökonomische "
+        "Merkmale je Zelle). Die Referenzskala (norm_min/norm_max) ist eine dokumentierte "
+        "Modellwahl auf Basis typischer Wertespannen dieser amtlichen Gitterdaten; editierbar.",
+     "source_refs": ["Zensus_2022"]},
     {"code": "INCOME_SOCIAL_RESILIENCE", "name": "Soziale Resilienz (invers)", "unit": "Index",
      "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
      "description": "Sozioökonomische Resilienz (hoher Wert = geringe Resilienz).",
      "proxy": "Kombination aus Nettokaltmiete, Eigentümerquote und Wohnfläche je Bewohner (Zensus-100m).",
-     "source": "Zensus 2022 (100m-Gitter, Destatis)"},
+     "source": "Zensus 2022 (100m-Gitter, Destatis)",
+     "source_detail": "Werte und Normierungsskala basieren auf dem Zensus 2022 (Destatis) im "
+        "100-Meter-Gitter (Bevölkerungszahl, Altersanteile ≥65/<18 Jahre bzw. sozioökonomische "
+        "Merkmale je Zelle). Die Referenzskala (norm_min/norm_max) ist eine dokumentierte "
+        "Modellwahl auf Basis typischer Wertespannen dieser amtlichen Gitterdaten; editierbar.",
+     "source_refs": ["Zensus_2022"]},
     {"code": "HEALTHCARE_ACCESS", "name": "Zugang zu Gesundheitsdiensten (invers)", "unit": "Index",
      "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
      "description": "Erreichbarkeit von Gesundheitsdiensten (hoher Wert = schlechter Zugang).",
@@ -464,6 +513,14 @@ RISKS: list[dict] = [
      # Herleitung: Worst-Case-Anker 18/100k bei Index=100 ≈ 1,7× schlimmstes beobachtetes Jahr (2018: ~8.700 Tote = 10,5/100k; RKI/Winklmayr 2022). Typische Kommune P90-Index 20-40 ⇒ 3,6-7,2/100k (statistikkonform, UBA GE-I-2).
      # cost_per_outcome_eur: VSL-Punktwert 3,5 Mio € im gängigen EU/OECD-Band (~1-4 Mio); UBA MK3.1 nennt keinen einzelnen VSL-Wert (bewertet nur Luftschadstoff-/Lärmeffekte), daher Punktwert im Band statt exaktem UBA-Wert.
      "ref_value": 18.0, "scale": "pop", "cost_per_outcome_eur": 3500000.0, "source": "RKI 2022 / Winklmayr u.a. 2022 / UBA MK3.1 2020",
+     "source_detail": "Worst-Case-Anker 18/100.000 bei Index=100 ≈ 1,7× des bislang "
+        "schlimmsten beobachteten Jahres (2018: ~8.700 Hitzetote ≈ 10,5/100.000; RKI-Methodik "
+        "nach Winklmayr u. a. 2022, RKI-Sachstandsbericht Klimawandel & Gesundheit 2023). "
+        "Die UBA-Klimawirkungs- und Risikoanalyse 2021 (Handlungsfeld Gesundheit) bestätigt "
+        "die zunehmende Hitzemortalität. Eine typische Kommune mit P90-Index 20-40 ergibt "
+        "3,6-7,2/100.000 (statistikkonform). Kostensatz 3,5 Mio € (VSL im gängigen EU/OECD-Band "
+        "~1-4 Mio) als Punktwert; editierbar.",
+     "source_refs": ["RKI_Hitzemortalitaet", "UBA_KWRA_2021"],
      "description": "Erwartete jährliche Mortalität durch klimatische Belastungen.",
      "priority": 1},
     {"code": "EXPECTED_ANNUAL_MORBIDITY", "name": "Erwartete jährliche Morbidität",
@@ -520,14 +577,27 @@ RISKS: list[dict] = [
      "exposures": ["BUILDING_STOCK", "LOCATION_HAZARD_ZONES"],
      "vulnerabilities": ["BUILDING_STABILITY", "FINANCIAL_ADAPTATION_CAPACITY"],
      # Herleitung: nat. jährl. Gebäudeschäden (Hochwasser+Sturm/Hagel) ~3,5 Mrd €/J ÷ 832 (100k-Einw.-Einheiten DE) ≈ 4,2 Mio €/100k → 4,5 Mio bei Index=100. Prognos 2023: Ahr-Anteil Bauwesen+Privathaushalte 20,9 von 40,5 Mrd €.
-     "ref_value": 4500000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Gebäudeschäden.", "priority": 1},
+     "ref_value": 4500000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023",
+     "source_detail": "Nationale jährliche Gebäudeschäden (Hochwasser + Sturm/Hagel) ~3,5 Mrd €/a "
+        "÷ 832 (100.000-Einwohner-Einheiten in DE) ≈ 4,2 Mio €/100.000 → 4,5 Mio € bei Index=100. "
+        "Größenordnung belegt durch Prognos/GWS/IÖW 2023 „Kosten durch Klimawandelfolgen in "
+        "Deutschland“ (BMWK/BMUV): Ahrtal 2021 mit Anteil Bauwesen + Privathaushalte 20,9 von "
+        "40,5 Mrd €. Skaliert mit der Bevölkerung; editierbar.",
+     "source_refs": ["Prognos_Klimaschaeden_2023"],
+     "description": "Erwartete jährliche Gebäudeschäden.", "priority": 1},
     {"code": "EXPECTED_TRANSPORT_DAMAGE_EUR", "name": "Schäden an Verkehrswegen",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["HEAT_WAVE", "HEAVY_RAIN_FLOOD", "DROUGHT"],
      "exposures": ["TRANSPORT_HUBS", "LOCATION_HAZARD_ZONES"],
      "vulnerabilities": ["MATERIAL_HEAT_SENSITIVITY", "CRITICAL_INFRA_CONDITION"],
      # Herleitung: nat. jährl. Verkehrsinfrastruktur-Schäden ~1,5 Mrd €/J ÷ 832 ≈ 1,8 Mio €/100k bei Index=100. Prognos 2023: Ahr-Anteil Verkehr 6,8 von 40,5 Mrd € (~17%).
-     "ref_value": 1800000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Schäden an Verkehrswegen.", "priority": 2},
+     "ref_value": 1800000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023",
+     "source_detail": "Nationale jährliche Verkehrsinfrastruktur-Schäden ~1,5 Mrd €/a ÷ 832 ≈ "
+        "1,8 Mio €/100.000 bei Index=100. Größenordnung belegt durch Prognos/GWS/IÖW 2023 "
+        "„Kosten durch Klimawandelfolgen in Deutschland“ (BMWK/BMUV): Ahrtal 2021 mit "
+        "Verkehrsanteil 6,8 von 40,5 Mrd € (~17 %). Skaliert mit der Bevölkerung; editierbar.",
+     "source_refs": ["Prognos_Klimaschaeden_2023"],
+     "description": "Erwartete jährliche Schäden an Verkehrswegen.", "priority": 2},
     {"code": "EXPECTED_ENERGY_INFRA_DAMAGE_EUR", "name": "Schäden an Energieinfrastruktur",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["HEAT_WAVE", "EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD"],

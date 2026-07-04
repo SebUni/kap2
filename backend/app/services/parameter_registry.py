@@ -108,6 +108,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             value=float(r.get("ref_value", 0.0)),
             unit=r.get("outcome_unit", ""),
             source=r.get("source") or "Modellannahme (kein Kurz-Key hinterlegt)",
+            source_detail=r.get("source_detail", ""),
+            references=sources.resolve(r.get("source_refs")),
         ))
 
     for cat_key, items in (
@@ -126,6 +128,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                     value=float(m.get(bound, 0.0)),
                     unit=m.get("unit", ""),
                     source=m.get("source") or "Modellannahme (Normierungsskala, unbelegt)",
+                    source_detail=m.get("source_detail", ""),
+                    references=sources.resolve(m.get("source_refs")),
                 ))
 
     for ptype, label in PATHWAY_WEIGHT_LABELS.items():
@@ -141,6 +145,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             value=val,
             unit="Gewicht",
             source=catalog.PATHWAY_WEIGHT_SOURCE,
+            source_detail=getattr(catalog, "PATHWAY_WEIGHT_SOURCE_DETAIL", ""),
         ))
 
     for code, recipe in formulas.DETAILED.items():
@@ -162,6 +167,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 value=inp["value"],
                 unit=inp.get("unit", ""),
                 source=_param_doc_source(inp),
+                source_detail=inp.get("source_detail", ""),
+                references=sources.resolve(inp.get("source_refs")),
             ))
 
     for m in catalog.MEASURES:
@@ -195,6 +202,21 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
         "gamma": "UHI-Koeffizient γ",
         "delta": "UHI-Koeffizient δ",
     }
+    uhi_details = {
+        "alpha": "Skaliert den Versiegelungs-/Bebauungsbeitrag zur Wärmeinselintensität. "
+            "Größenordnung dokumentierter maximaler UHI-Intensitäten mitteleuropäischer Städte "
+            "(Nacht-ΔT bis ~6-10 K; Oke 1982, Stewart & Oke 2012 „Local Climate Zones“, "
+            "VDI 3787 Bl.1). Modellwahl im belegten Wertebereich, editierbar.",
+        "beta": "Gewichtet den kühlenden Grün-/Wasseranteil gegen die Überwärmung. "
+            "Größenordnung aus der UHI-/Grünflächenliteratur (Oke 1982; VDI 3787 Bl.1). "
+            "Dokumentierte Modellwahl, editierbar.",
+        "gamma": "Skaliert den Albedo-/Oberflächenbeitrag (helle vs. dunkle Beläge). "
+            "Belegt durch die Strahlungshaushalts-Betrachtung in Oke 1982 und VDI 3787 Bl.1. "
+            "Dokumentierte Modellwahl, editierbar.",
+        "delta": "Gewichtet die Belüftung/Kaltluftzufuhr (Frischluftschneisen). "
+            "Qualitativ belegt durch VDI 3787 Bl.1 (Stadtklima/Kaltluft). Dokumentierte "
+            "Modellwahl, editierbar.",
+    }
     if not layer_code and not layer_category:
         for key, val in uhi_defaults.items():
             params.append(_base_param(
@@ -204,6 +226,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 value=val,
                 unit="K/Index",
                 source="VDI 3787 Bl.1 / Oke 1982 / Stewart & Oke 2012",
+                source_detail=uhi_details[key],
+                references=sources.resolve(["VDI3787_Stadtklima", "StewartOke_LCZ_2012"]),
             ))
 
     return params
