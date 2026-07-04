@@ -8,6 +8,7 @@ from openpyxl import Workbook, load_workbook
 from shapely import wkt
 from sqlalchemy.orm import Session
 
+from app.data import catalog
 from app.models.models import AdaptationMeasure, MeasureImpact
 
 
@@ -32,6 +33,7 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
         "Konfiguration", "Geometrie (WKT)",
         "Investition (€)", "Wartung/Jahr (€)", "Nutzen/Jahr (€)",
         "Ø Risiko-Reduktion (Index-Pkt., Σ)",
+        "Anzahl", "Einheit",
     ]
     ws.append(headers)
 
@@ -51,6 +53,9 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
         total_didx = sum(
             sum(v for v in (imp.indicator_deltas or {}).values()) for imp in impacts
         )
+        count = next((imp.costs["count"] for imp in impacts if "count" in imp.costs), None)
+        count = count if count is not None else (m.config or {}).get("count")
+        unit_label = catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("unit_label") or ""
 
         import json
         config_str = json.dumps(m.config or {}, ensure_ascii=False)
@@ -67,6 +72,8 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
             round(total_maint, 2),
             round(total_savings, 2),
             round(total_didx, 2),
+            count if count is not None else "",
+            unit_label,
         ])
 
     # ── Sheet 2: Summary ──
@@ -94,6 +101,9 @@ def import_measures_xlsx(db: Session, kommune_id: int, file: BinaryIO) -> dict:
     """Import measures from an Excel file.
 
     Expected format: same as export (Sheet 'Maßnahmen' with columns matching export).
+    Columns beyond the first 7 (Investition/Wartung/Nutzen/Risiko-Reduktion/Anzahl/
+    Einheit) are optional and backward-compatible - older exports without the
+    trailing "Anzahl"/"Einheit" columns still import fine.
     Returns summary of imported/skipped rows.
     """
     import json
@@ -134,6 +144,18 @@ def import_measures_xlsx(db: Session, kommune_id: int, file: BinaryIO) -> dict:
                 config = json.loads(config_str) if config_str else {}
             except (json.JSONDecodeError, TypeError):
                 config = {}
+
+            # Anzahl-Spalte (falls vorhanden) überschreibt einen evtl. in der
+            # Konfigurations-JSON eingebetteten count-Wert bewusst - im Bulk-
+            # Excel-Workflow ist die sichtbare Anzahl-Zelle die maßgebliche
+            # Quelle. Das "friert" einen zuvor nur dynamisch berechneten
+            # Richtwert-Default beim Reimport in einen expliziten Override ein
+            # (kein Rückweg ohne manuelles Leeren der Zelle) - akzeptiert.
+            if len(row) > 11 and row[11] not in (None, ""):
+                try:
+                    config["count"] = int(round(float(row[11])))
+                except (TypeError, ValueError):
+                    pass
 
             measure = AdaptationMeasure(
                 kommune_id=kommune_id,

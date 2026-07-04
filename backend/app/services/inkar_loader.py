@@ -159,29 +159,53 @@ def _write_disk_cache(ags: str, data: dict) -> None:
         log.debug("inkar disk-cache write skipped: %s", exc)
 
 
+def _auth_headers() -> dict | None:
+    """GENESIS-Auth per HTTP-Header ``username``/``password`` (verifizierter Transport).
+
+    Ein API-Token wird als Passwort übergeben (Destatis-Muster „Token statt
+    Passwort"); der Nutzername bleibt der Account-Name. Ein separater
+    ``token``-Header wird von diesem GENESIS-Stand ignoriert (Login als GAST).
+    """
+    u = settings.REGIONALSTATISTIK_USERNAME
+    tok = settings.REGIONALSTATISTIK_TOKEN
+    if u and tok:
+        return {"username": u, "password": tok}
+    p = settings.REGIONALSTATISTIK_PASSWORD
+    if u and p:
+        return {"username": u, "password": p}
+    return None
+
+
 def _genesis_table_value(table_code: str, ags: str) -> float | None:
     """Zahlenwert für einen AGS aus einer GENESIS-Tabelle (ffcsv), best-effort.
 
-    GENESIS liefert bei ``format=ffcsv`` eine ``;``-separierte Flat-Datei. Wir
-    suchen die Zeile, deren Regionalschlüssel den (Präfix-)AGS enthält, und
-    nehmen den ersten numerischen Messwert. Bei jeglichem Problem → ``None``.
+    Verifiziertes Protokoll (regionalstatistik.de, genesisws/rest/2020):
+    POST ``/data/table``, Auth via HTTP-Header, ``regionalkey`` filtert auf den
+    AGS, ``format=ffcsv`` liefert eine ``;``-separierte Flat-Datei. Bei
+    Auth-/Netz-/Parsing-Fehlern → ``None`` (neutraler Fallback in indicators.py).
     """
-    if not (settings.REGIONALSTATISTIK_USERNAME and settings.REGIONALSTATISTIK_PASSWORD):
+    headers = _auth_headers()
+    if headers is None:
         return None
     url = f"{settings.REGIONALSTATISTIK_API_BASE.rstrip('/')}/data/table"
-    params = {
-        "username": settings.REGIONALSTATISTIK_USERNAME,
-        "password": settings.REGIONALSTATISTIK_PASSWORD,
+    data = {
         "name": table_code,
         "area": "all",
         "format": "ffcsv",
         "language": "de",
         "compress": "false",
+        "transpose": "false",
+        "regionalkey": ags,
     }
     try:
         with httpx.Client(timeout=settings.REGIONALSTATISTIK_TIMEOUT_S) as client:
-            resp = client.get(url, params=params)
+            resp = client.post(url, data=data, headers=headers)
             resp.raise_for_status()
+            ctype = resp.headers.get("content-type", "")
+            if "json" in ctype:  # GENESIS meldet Fehler als JSON {Code, Type: ERROR}
+                body = resp.json()
+                log.warning("GENESIS %s: %s", table_code, body.get("Content", body))
+                return None
             text = resp.text
     except Exception as exc:
         log.warning("GENESIS-Abfrage %s fehlgeschlagen: %s", table_code, exc)
@@ -228,7 +252,7 @@ def fetch_socioeconomic(ags: str) -> dict | None:
 
     Disk- und Memory-Cache (TTL). ``None``, wenn keine Werte verfügbar.
     """
-    if not ags:
+    if not ags or _auth_headers() is None:
         return None
     with _cache_lock:
         cached = _mem_cache.get(ags)

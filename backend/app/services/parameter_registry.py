@@ -25,6 +25,9 @@ MEASURE_PARAM_SPECS: tuple[tuple[str, str, str], ...] = (
     ("cost_per_unit", "Investitionskosten pro Einheit", "€/Stück"),
     ("maintenance_per_m2_year", "Wartungskosten pro m² und Jahr", "€/(m²·a)"),
     ("benefit_per_m2_year", "Direkter Nutzen pro m² und Jahr", "€/(m²·a)"),
+    ("cost_fixed", "Fixkosten", "€"),
+    ("maintenance_per_unit_year", "Wartungskosten pro Einheit und Jahr", "€/(Stück·a)"),
+    ("unit_density_per_ha", "Richtwert-Dichte", "Stück/ha"),
 )
 
 MEASURE_OVERRIDE_FIELDS = tuple(field for field, _, _ in MEASURE_PARAM_SPECS)
@@ -59,6 +62,7 @@ def _base_param(
     source: str = "",
     prov: str = "param",
     editable: bool = True,
+    applicable: bool = True,
 ) -> dict:
     return {
         "id": pid,
@@ -73,6 +77,7 @@ def _base_param(
         "editable": editable,
         "overridden": False,
         "custom_source": None,
+        "applicable": applicable,
     }
 
 
@@ -158,15 +163,19 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             continue
         if layer_code and m["code"] != layer_code:
             continue
-        source = m.get("source") or "KAP3-Vorschlag + Plausibilität (Maßnahmenkosten, unbelegt)"
         for field, label, unit in MEASURE_PARAM_SPECS:
+            applicable = m.get(field) is not None
+            source = (m.get("sources") or {}).get(field) or m.get("source") \
+                or "Modellannahme (Maßnahmenkosten, unbelegt)"
             params.append(_base_param(
                 f"measures.{m['code']}.{field}",
                 layer_code=m["code"], layer_category="measures",
                 label=label,
-                value=float(m.get(field) or 0.0),
+                value=float(m.get(field)) if applicable else 0.0,
                 unit=unit,
                 source=source,
+                editable=applicable,
+                applicable=applicable,
             ))
 
     uhi_defaults = {"alpha": 6.0, "beta": 2.0, "gamma": 3.5, "delta": 2.0}

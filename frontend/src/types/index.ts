@@ -76,6 +76,7 @@ export interface CostComponent {
   quantity_unit: string
   amount_eur: number
   source: string
+  source_detail?: string
   overridden: boolean
 }
 

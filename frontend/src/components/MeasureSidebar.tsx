@@ -207,7 +207,15 @@ export default function MeasureSidebar() {
                               {' = '}{c.amount_eur.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}
                               {c.overridden && <span className="kap-prov-badge" style={{ marginLeft: 6 }}>Override</span>}
                             </div>
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.68rem' }}>{c.source}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: '0.68rem' }}>
+                              <span>{c.source}</span>
+                              {c.source_detail && (
+                                <InfoTooltip
+                                  title={c.source || 'Quelle'}
+                                  description={c.source_detail}
+                                />
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel
 
@@ -100,6 +100,25 @@ class ParameterUpdate(BaseModel):
     custom_source: Optional[str] = None
 
 
+# ── Parameters (Registry) ────────────────────────────────────────────────────────
+
+class ModelParameter(BaseModel):
+    """Flaches Parameter-Dict aus parameter_registry._base_param()/catalog_parameters()."""
+    id: str
+    layer_code: str
+    layer_category: str
+    label: str
+    value: Any
+    default_value: Any
+    unit: str = ""
+    source: str = ""
+    prov: str = "param"
+    editable: bool = True
+    overridden: bool = False
+    custom_source: Optional[str] = None
+    applicable: Optional[bool] = None
+
+
 # ── Measures ───────────────────────────────────────────────────────────────────
 
 class MeasureCreate(BaseModel):
@@ -148,3 +167,69 @@ class MeasureWithImpactOut(BaseModel):
     total_indicator_deltas: dict
     total_costs: dict
     total_savings: dict
+
+
+# ── Measure cost breakdown (measure_service.compute_costs shape) ────────────────
+
+class CostComponent(BaseModel):
+    param: str
+    label: str
+    unit_price: float
+    quantity: Union[int, float]
+    quantity_unit: str
+    amount_eur: float
+    source: str
+    source_detail: str = ""
+    overridden: bool
+
+
+class CostBlock(BaseModel):
+    total_eur: float
+    components: list[CostComponent]
+
+
+class EffectScaling(BaseModel):
+    unit_factor: float
+    count: int
+    recommended_count: int
+    density_per_ha: Optional[float] = None
+    source: str
+
+
+class CostBreakdown(BaseModel):
+    """investment/annual_maintenance kommen 1:1 aus measure_service.compute_costs().
+
+    effect_scaling ist dort (noch) nicht enthalten - unit_factor/count/
+    recommended_count/unit_label liegen als eigene Top-Level-Felder auf
+    MeasureImpactSummary. effect_scaling bleibt daher optional/None und
+    dokumentiert nur die im Beplanungsdokument gezeigte Ziel-Verschachtelung.
+    """
+    investment: CostBlock
+    annual_maintenance: CostBlock
+    effect_scaling: Optional[EffectScaling] = None
+
+
+class MeasureImpactSummary(BaseModel):
+    """Dokumentiert measure_service.compute_impact()'s Response-Dict.
+
+    Nicht als response_model verdrahtet - der Route-Handler gibt das dict
+    unvalidiert zurück. Die meisten Felder sind optional, da der Early-Exit-
+    Pfad (keine überlappenden Zellen) nur measure_id/affected_cells/message
+    liefert.
+    """
+    measure_id: int
+    measure_type: Optional[str] = None
+    affected_cells: int
+    affected_area_m2: Optional[float] = None
+    linked_risk_codes: Optional[list[str]] = None
+    avg_index_reduction_pct: Optional[float] = None
+    investment_eur: Optional[float] = None
+    annual_maintenance_eur: Optional[float] = None
+    annual_benefit_eur: Optional[float] = None
+    count: Optional[int] = None
+    count_is_default: Optional[bool] = None
+    recommended_count: Optional[int] = None
+    unit_label: Optional[str] = None
+    unit_factor: Optional[float] = None
+    cost_breakdown: Optional[CostBreakdown] = None
+    message: Optional[str] = None

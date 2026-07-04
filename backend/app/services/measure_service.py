@@ -118,17 +118,21 @@ _MAINTENANCE_COMPONENTS: tuple[tuple[str, str, str], ...] = (
 )
 
 
-def _component_source(mdef: dict, field: str) -> tuple[str, bool]:
-    """(Quelle, overridden) einer Kostenkomponente.
+def _component_source(mdef: dict, field: str) -> tuple[str, str, bool]:
+    """(Quelle, Herleitung/Detail, overridden) einer Kostenkomponente.
 
-    Ein kommunaler ``custom_source``-Override hat Vorrang, sonst die per-Feld-
-    Quelle aus ``sources`` bzw. der Maßnahmen-Fallback ``source``.
+    ``source`` ist das kurze Inline-Label (z. B. "Berliner Wasserbetriebe"),
+    ``detail`` die ausführliche Herleitung/Volltext-Quelle für den Hover-Tooltip:
+    woher der Zahlenwert stammt bzw. – wenn er nicht direkt einer Quelle entnommen
+    ist – wie er hergeleitet/plausibilisiert wurde. Ein kommunaler
+    ``custom_source``-Override hat beim Kurz-Label Vorrang.
     """
     custom = (mdef.get("custom_sources") or {}).get(field)
+    detail = (mdef.get("source_details") or {}).get(field) or ""
     if custom:
-        return custom, True
+        return custom, detail, True
     source = (mdef.get("sources") or {}).get(field) or mdef.get("source") or ""
-    return source, False
+    return source, detail, False
 
 
 def compute_costs(mdef: dict, count: int, area_m2: float) -> dict:
@@ -158,7 +162,7 @@ def compute_costs(mdef: dict, count: int, area_m2: float) -> dict:
                 quantity, quantity_unit = 1, "pauschal"
             amount = round(unit_price * quantity, 2)
             total += amount
-            source, overridden = _component_source(mdef, field)
+            source, source_detail, overridden = _component_source(mdef, field)
             components.append({
                 "param": field,
                 "label": label_tpl.format(unit=unit_label),
@@ -167,6 +171,7 @@ def compute_costs(mdef: dict, count: int, area_m2: float) -> dict:
                 "quantity_unit": quantity_unit,
                 "amount_eur": amount,
                 "source": source,
+                "source_detail": source_detail,
                 "overridden": overridden,
             })
         return {"total_eur": round(total, 2), "components": components}

@@ -22,10 +22,13 @@ class Settings(BaseSettings):
 
     # ── BBSR INKAR / Regionalstatistik (GENESIS-Online REST) ──────────────────
     # Kommunale Sozioökonomie (Steuereinnahmekraft, Arbeitslosenquote) je AGS.
-    # Ohne Zugangsdaten wird die Ableitung übersprungen (neutraler Fallback 50).
-    REGIONALSTATISTIK_API_BASE: str = "https://www.regionalstatistik.de/genesis/api/rest/2020"
+    # Auth: HTTP-Header username/password ODER token; data/table via POST,
+    # regionalkey filtert auf den AGS. Ohne (gültige) Zugangsdaten wird die
+    # Ableitung übersprungen (neutraler Fallback 50).
+    REGIONALSTATISTIK_API_BASE: str = "https://www.regionalstatistik.de/genesisws/rest/2020"
     REGIONALSTATISTIK_USERNAME: str = ""
     REGIONALSTATISTIK_PASSWORD: str = ""
+    REGIONALSTATISTIK_TOKEN: str = ""  # Alternative zu username/password (API-Kennung)
     # GENESIS-Tabellencodes (überschreibbar, falls sich die Tabellen ändern).
     REGIONALSTATISTIK_TABLE_TAX: str = "71231-01-03-4"          # Realsteuervergleich, €/Einwohner
     REGIONALSTATISTIK_TABLE_UNEMPLOYMENT: str = "13211-02-05-4"  # Arbeitslosenquote, %
