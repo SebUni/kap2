@@ -961,6 +961,65 @@ def _enrich_risk_sources() -> None:
 _enrich_risk_sources()
 
 
+# ── Quellenanreicherung Hazards/Expositionen/Sensitivitäten ──────────────────────
+# Leitet je Indikator einen source_detail (Herkunft/Proxy + Bedeutung der Normierungs-
+# skala) und – wo eine reale Datengrundlage im source-Label steckt – IEEE/Wayback-Verweise
+# ab. Reine Annahme-/qualitative Werte bleiben ehrlich ohne Referenz. Bereits inline
+# belegte Einträge (Kern-Hazards, Zensus) werden übersprungen.
+
+def _enrich_hev_sources() -> None:
+    # Schlüsselwort im source-Label -> (Bibliografie-Key, Anzeigename).
+    KEYWORD_REFS: tuple[tuple[str, str, str], ...] = (
+        ("OSM", "OSM_Data", "OpenStreetMap (ODbL)"),
+        ("DWD", "DWD_CDC", "DWD Climate Data Center"),
+        ("Copernicus", "Copernicus_C3S", "Copernicus C3S"),
+        ("Sentinel", "Copernicus_C3S", "Copernicus C3S"),
+        ("Zensus", "Zensus_2022", "Zensus 2022 (Destatis)"),
+        ("INKAR", "BBSR_INKAR", "BBSR INKAR"),
+        ("BBSR", "BBSR_INKAR", "BBSR INKAR"),
+        ("UHI", "VDI3787_Stadtklima", "VDI 3787 Bl.1"),
+        ("UBA", "UBA_KWRA_2021", "UBA KWRA 2021"),
+    )
+
+    for items in (HAZARDS, EXPOSURES, VULNERABILITIES):
+        for m in items:
+            if m.get("source_detail"):
+                continue
+            src = m.get("source", "")
+            proxy = m.get("proxy", "").strip()
+            unit = m.get("unit", "")
+            nmin, nmax = m.get("norm_min", 0.0), m.get("norm_max", 0.0)
+
+            refs: list[str] = []
+            names: list[str] = []
+            for kw, key, name in KEYWORD_REFS:
+                if kw in src and key not in refs:
+                    refs.append(key)
+                    names.append(name)
+
+            if refs:
+                closing = f"Datengrundlage(n): {', '.join(names)}."
+            else:
+                closing = ("Mangels belastbarer Einzelquelle beruht der Wert auf einer "
+                           "dokumentierten Modell-/Regionalannahme (unbelegt).")
+
+            proxy_txt = f"Datengrundlage/Proxy: {proxy} " if proxy else ""
+            if m.get("spatial", True):
+                lead = f"Wert je 100-m-Zelle in {unit} (absolute Einheit). "
+            else:
+                lead = (f"Nicht räumlich aufgelöst: regionaler/nationaler Konstantwert "
+                        f"in {unit}. ")
+            scale_txt = (f"Die Referenzskala norm_min={nmin:g}…norm_max={nmax:g} {unit} dient "
+                         "ausschließlich der Risiko-Normierung (0..1), nicht der Anzeige, und ist "
+                         "eine dokumentierte, editierbare Modellwahl. ")
+            m["source_detail"] = lead + proxy_txt + scale_txt + closing
+            if refs:
+                m["source_refs"] = refs
+
+
+_enrich_hev_sources()
+
+
 # ── Pathway-Gewichte (aus pathway_weight_defaults.csv) ──────────────────────────
 # Gewichte sind eine transparente Modellwahl (Rangfolge primär > parallel > alternativ >
 # compound), keine externe Quelle; degressiv gestaffelt nach Pfadtyp-Nähe zum Primärpfad.

@@ -404,6 +404,43 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "https://journals.ametsoc.org/view/journals/bams/93/12/bams-d-11-00019.1.xml",
         "accessed": "2026-07-04",
     },
+    # ── Räumliche Datengrundlagen (Proxys für Hazards/Expositionen/Sensitivitäten) ──
+    "OSM_Data": {
+        "ieee": "OpenStreetMap-Mitwirkende, „OpenStreetMap – freie Geodaten (Gebäude, "
+                "Landnutzung, Infrastruktur),“ OpenStreetMap Foundation. Daten lizenziert "
+                "unter ODbL. [Online]. Verfügbar: https://www.openstreetmap.org/copyright. "
+                "[Zugriff: 4. Juli 2026].",
+        "url": "https://www.openstreetmap.org/copyright",
+        "archive_url": "https://web.archive.org/web/20100610133123/"
+                       "http://www.openstreetmap.org/copyright",
+        "accessed": "2026-07-04",
+    },
+    "DWD_CDC": {
+        "ieee": "Deutscher Wetterdienst (DWD), „Climate Data Center (CDC) – Raster- und "
+                "Stationsdaten zu Klimakennwerten,“ Offenbach am Main, Deutschland. [Online]. "
+                "Verfügbar: https://www.dwd.de/DE/leistungen/cdc/climate-data-center.html. "
+                "[Zugriff: 4. Juli 2026].",
+        "url": "https://www.dwd.de/DE/leistungen/cdc/climate-data-center.html",
+        "archive_url": "https://web.archive.org/web/20210716013105/"
+                       "https://www.dwd.de/DE/leistungen/cdc/climate-data-center.html",
+        "accessed": "2026-07-04",
+    },
+    "Copernicus_C3S": {
+        "ieee": "Copernicus Climate Change Service (C3S), ECMWF, „Copernicus Climate Change "
+                "Service – Klimadaten und -indikatoren,“ Reading, Vereinigtes Königreich. "
+                "[Online]. Verfügbar: https://climate.copernicus.eu/. [Zugriff: 4. Juli 2026].",
+        "url": "https://climate.copernicus.eu/",
+        "archive_url": "https://web.archive.org/web/20260701001320/https://climate.copernicus.eu/",
+        "accessed": "2026-07-04",
+    },
+    "BBSR_INKAR": {
+        "ieee": "Bundesinstitut für Bau-, Stadt- und Raumforschung (BBSR), „INKAR – Indikatoren "
+                "und Karten zur Raum- und Stadtentwicklung,“ Bonn, Deutschland. [Online]. "
+                "Verfügbar: https://www.inkar.de/. [Zugriff: 4. Juli 2026].",
+        "url": "https://www.inkar.de/",
+        "archive_url": "https://web.archive.org/web/20260628060549/https://www.inkar.de/",
+        "accessed": "2026-07-04",
+    },
 }
 
 
