@@ -29,7 +29,7 @@ ausfüllen, nichts anpassen.
 ## Fortschritt
 
 - [x] Prompt 1 — Sofort-Fixes (Render-Loop + falscher Status)
-- [ ] Prompt 2 — Modell-Kritik (nur Doku)
+- [x] Prompt 2 — Modell-Kritik (nur Doku)
 - [ ] Prompt 3 — Modell-Umbau: Monetarisierung + EAD als Summe
 - [ ] Prompt 4 — Zitationssystem: Author-Year
 - [ ] Prompt 5 — Quellen-Inhalte bereinigen
