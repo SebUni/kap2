@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Network } from 'vis-network'
 import { api } from '../api/client'
 import type { LineageNodeData, ModelParameter } from '../types'
@@ -90,6 +90,18 @@ function ParameterBox({
   )
 }
 
+function samePositions(a: Record<string, NodePos>, b: Record<string, NodePos>): boolean {
+  const aKeys = Object.keys(a)
+  const bKeys = Object.keys(b)
+  if (aKeys.length !== bKeys.length) return false
+  for (const key of aKeys) {
+    const pa = a[key]
+    const pb = b[key]
+    if (!pb || pa.x !== pb.x || pa.y !== pb.y) return false
+  }
+  return true
+}
+
 function overlayStyle(x: number, y: number, scale: number): React.CSSProperties {
   return {
     left: x,
@@ -114,14 +126,23 @@ export default function LineageOperatorOverlays({
   const [draft, setDraft] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const operatorNodes = displayNodes.filter(d => d.data.type === 'operator')
-  const parameterNodes = displayNodes.filter(d => d.data.type === 'parameter')
-  const weightEdges = displayEdges.filter(e => e.meta?.op_kind === 'weight')
+  const operatorNodes = useMemo(
+    () => displayNodes.filter(d => d.data.type === 'operator'),
+    [displayNodes],
+  )
+  const parameterNodes = useMemo(
+    () => displayNodes.filter(d => d.data.type === 'parameter'),
+    [displayNodes],
+  )
+  const weightEdges = useMemo(
+    () => displayEdges.filter(e => e.meta?.op_kind === 'weight'),
+    [displayEdges],
+  )
 
   const syncPositions = useCallback(() => {
     if (!network) return
     const scale = typeof network.getScale === 'function' ? network.getScale() : 1
-    setViewScale(scale)
+    setViewScale(prev => (prev === scale ? prev : scale))
 
     const nextNodes: Record<string, NodePos> = {}
     if (operatorNodes.length) {
@@ -144,7 +165,7 @@ export default function LineageOperatorOverlays({
         nextNodes[id] = { x: dom.x, y: dom.y }
       }
     }
-    setNodePositions(nextNodes)
+    setNodePositions(prev => (samePositions(prev, nextNodes) ? prev : nextNodes))
 
     const nextEdges: Record<string, NodePos> = {}
     for (const e of weightEdges) {
@@ -156,7 +177,7 @@ export default function LineageOperatorOverlays({
       const dom = network.canvasToDOM(mid)
       nextEdges[e.id] = { x: dom.x, y: dom.y }
     }
-    setEdgePositions(nextEdges)
+    setEdgePositions(prev => (samePositions(prev, nextEdges) ? prev : nextEdges))
   }, [network, operatorNodes, parameterNodes, weightEdges])
 
   useEffect(() => {
