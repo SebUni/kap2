@@ -513,14 +513,6 @@ RISKS: list[dict] = [
      # Herleitung: Worst-Case-Anker 18/100k bei Index=100 ≈ 1,7× schlimmstes beobachtetes Jahr (2018: ~8.700 Tote = 10,5/100k; RKI/Winklmayr 2022). Typische Kommune P90-Index 20-40 ⇒ 3,6-7,2/100k (statistikkonform, UBA GE-I-2).
      # cost_per_outcome_eur: VSL-Punktwert 3,5 Mio € im gängigen EU/OECD-Band (~1-4 Mio); UBA MK3.1 nennt keinen einzelnen VSL-Wert (bewertet nur Luftschadstoff-/Lärmeffekte), daher Punktwert im Band statt exaktem UBA-Wert.
      "ref_value": 18.0, "scale": "pop", "cost_per_outcome_eur": 3500000.0, "source": "RKI 2022 / Winklmayr u.a. 2022 / UBA MK3.1 2020",
-     "source_detail": "Worst-Case-Anker 18/100.000 bei Index=100 ≈ 1,7× des bislang "
-        "schlimmsten beobachteten Jahres (2018: ~8.700 Hitzetote ≈ 10,5/100.000; RKI-Methodik "
-        "nach Winklmayr u. a. 2022, RKI-Sachstandsbericht Klimawandel & Gesundheit 2023). "
-        "Die UBA-Klimawirkungs- und Risikoanalyse 2021 (Handlungsfeld Gesundheit) bestätigt "
-        "die zunehmende Hitzemortalität. Eine typische Kommune mit P90-Index 20-40 ergibt "
-        "3,6-7,2/100.000 (statistikkonform). Kostensatz 3,5 Mio € (VSL im gängigen EU/OECD-Band "
-        "~1-4 Mio) als Punktwert; editierbar.",
-     "source_refs": ["RKI_Hitzemortalitaet", "UBA_KWRA_2021"],
      "description": "Erwartete jährliche Mortalität durch klimatische Belastungen.",
      "priority": 1},
     {"code": "EXPECTED_ANNUAL_MORBIDITY", "name": "Erwartete jährliche Morbidität",
@@ -577,27 +569,14 @@ RISKS: list[dict] = [
      "exposures": ["BUILDING_STOCK", "LOCATION_HAZARD_ZONES"],
      "vulnerabilities": ["BUILDING_STABILITY", "FINANCIAL_ADAPTATION_CAPACITY"],
      # Herleitung: nat. jährl. Gebäudeschäden (Hochwasser+Sturm/Hagel) ~3,5 Mrd €/J ÷ 832 (100k-Einw.-Einheiten DE) ≈ 4,2 Mio €/100k → 4,5 Mio bei Index=100. Prognos 2023: Ahr-Anteil Bauwesen+Privathaushalte 20,9 von 40,5 Mrd €.
-     "ref_value": 4500000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023",
-     "source_detail": "Nationale jährliche Gebäudeschäden (Hochwasser + Sturm/Hagel) ~3,5 Mrd €/a "
-        "÷ 832 (100.000-Einwohner-Einheiten in DE) ≈ 4,2 Mio €/100.000 → 4,5 Mio € bei Index=100. "
-        "Größenordnung belegt durch Prognos/GWS/IÖW 2023 „Kosten durch Klimawandelfolgen in "
-        "Deutschland“ (BMWK/BMUV): Ahrtal 2021 mit Anteil Bauwesen + Privathaushalte 20,9 von "
-        "40,5 Mrd €. Skaliert mit der Bevölkerung; editierbar.",
-     "source_refs": ["Prognos_Klimaschaeden_2023"],
-     "description": "Erwartete jährliche Gebäudeschäden.", "priority": 1},
+     "ref_value": 4500000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Gebäudeschäden.", "priority": 1},
     {"code": "EXPECTED_TRANSPORT_DAMAGE_EUR", "name": "Schäden an Verkehrswegen",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["HEAT_WAVE", "HEAVY_RAIN_FLOOD", "DROUGHT"],
      "exposures": ["TRANSPORT_HUBS", "LOCATION_HAZARD_ZONES"],
      "vulnerabilities": ["MATERIAL_HEAT_SENSITIVITY", "CRITICAL_INFRA_CONDITION"],
      # Herleitung: nat. jährl. Verkehrsinfrastruktur-Schäden ~1,5 Mrd €/J ÷ 832 ≈ 1,8 Mio €/100k bei Index=100. Prognos 2023: Ahr-Anteil Verkehr 6,8 von 40,5 Mrd € (~17%).
-     "ref_value": 1800000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023",
-     "source_detail": "Nationale jährliche Verkehrsinfrastruktur-Schäden ~1,5 Mrd €/a ÷ 832 ≈ "
-        "1,8 Mio €/100.000 bei Index=100. Größenordnung belegt durch Prognos/GWS/IÖW 2023 "
-        "„Kosten durch Klimawandelfolgen in Deutschland“ (BMWK/BMUV): Ahrtal 2021 mit "
-        "Verkehrsanteil 6,8 von 40,5 Mrd € (~17 %). Skaliert mit der Bevölkerung; editierbar.",
-     "source_refs": ["Prognos_Klimaschaeden_2023"],
-     "description": "Erwartete jährliche Schäden an Verkehrswegen.", "priority": 2},
+     "ref_value": 1800000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Schäden an Verkehrswegen.", "priority": 2},
     {"code": "EXPECTED_ENERGY_INFRA_DAMAGE_EUR", "name": "Schäden an Energieinfrastruktur",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["HEAT_WAVE", "EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD"],
@@ -872,6 +851,114 @@ RISKS: list[dict] = [
      # Index-Risiko: Outcome = Index selbst bei ref=100 (bewusst, kein externer Anker).
      "ref_value": 100.0, "scale": "flat", "source": "Modellannahme (Index=Outcome, dokumentiert)", "description": "Risiko fischereilicher Folgen von Niedrigwasser.", "priority": 2},
 ]
+
+
+# ── Risiko-Quellenanreicherung (source_detail + IEEE-Referenzen) ──────────────────
+# Zentral gepflegte Herleitungstexte + Bibliografie-Verweise je Risiko, sodass der
+# (i)-Tooltip an JEDEM Referenzwert erklärt, wie der Wert zustande kommt und worauf er
+# sich stützt. Ableitung erfolgt anhand des ``source``-Labels; reine Modellannahmen und
+# Index=Outcome-Risiken erhalten einen ehrlichen Erklärtext OHNE (erfundene) Quelle.
+
+def _enrich_risk_sources() -> None:
+    def eur(v: float) -> str:
+        return f"{int(round(v)):,}".replace(",", ".") + " €"
+
+    def scale_word(s: str) -> str:
+        return {"pop": "der Bevölkerung", "area": "der betroffenen Fläche",
+                "flat": "pauschal (mengenunabhängig)"}.get(s, s)
+
+    # Belastbar dokumentierte Einzelrisiken mit maßgeschneidertem Herleitungstext.
+    BESPOKE: dict[str, tuple[str, list[str]]] = {
+        "EXPECTED_ANNUAL_MORTALITY": (
+            "Worst-Case-Anker 18/100.000 bei Index=100 ≈ 1,7× des bislang schlimmsten "
+            "beobachteten Jahres (2018: ~8.700 Hitzetote ≈ 10,5/100.000; RKI-Methodik nach "
+            "Winklmayr u. a. 2022, RKI-Sachstandsbericht Klimawandel & Gesundheit 2023). Die "
+            "UBA-Klimawirkungs- und Risikoanalyse 2021 (Handlungsfeld Gesundheit) bestätigt die "
+            "zunehmende Hitzemortalität. Eine typische Kommune mit P90-Index 20-40 ergibt "
+            "3,6-7,2/100.000 (statistikkonform). Kostensatz 3,5 Mio € (VSL im gängigen "
+            "EU/OECD-Band ~1-4 Mio) als Punktwert; editierbar.",
+            ["RKI_Hitzemortalitaet", "UBA_KWRA_2021"]),
+        "EXPECTED_BUILDING_DAMAGE_EUR": (
+            "Nationale jährliche Gebäudeschäden (Hochwasser + Sturm/Hagel) ~3,5 Mrd €/a ÷ 832 "
+            "(100.000-Einwohner-Einheiten in DE) ≈ 4,2 Mio €/100.000 → 4,5 Mio € bei Index=100. "
+            "Größenordnung belegt durch Prognos/GWS/IÖW 2023 „Kosten durch Klimawandelfolgen in "
+            "Deutschland“ (BMWK/BMUV): Ahrtal 2021 mit Anteil Bauwesen + Privathaushalte 20,9 "
+            "von 40,5 Mrd €. Skaliert mit der Bevölkerung; editierbar.",
+            ["Prognos_Klimaschaeden_2023"]),
+        "EXPECTED_TRANSPORT_DAMAGE_EUR": (
+            "Nationale jährliche Verkehrsinfrastruktur-Schäden ~1,5 Mrd €/a ÷ 832 ≈ 1,8 Mio "
+            "€/100.000 bei Index=100. Größenordnung belegt durch Prognos/GWS/IÖW 2023 (BMWK/"
+            "BMUV): Ahrtal 2021 mit Verkehrsanteil 6,8 von 40,5 Mrd € (~17 %). Skaliert mit "
+            "der Bevölkerung; editierbar.",
+            ["Prognos_Klimaschaeden_2023"]),
+        "EXPECTED_AQUACULTURE_DAMAGE_EUR": (
+            "Punktwert 200.000 € je ~50 km² Gewässerfläche bei Index=100 (Aquakultur ist in "
+            "DE sehr klein). Für diese Einzelposition liegt keine belastbare Prognos-Zahl vor "
+            "⇒ editierbare Modellannahme (nur Größenordnung), ohne eigene Quelle.",
+            []),
+    }
+
+    for r in RISKS:
+        if r.get("source_detail"):
+            continue
+        code, src = r["code"], r.get("source", "")
+        rv = r.get("ref_value", 0.0)
+        unit = r.get("outcome_unit", "")
+        cost = r.get("cost_per_outcome_eur")
+        if code in BESPOKE:
+            detail, refs = BESPOKE[code]
+        elif "UBA MK3.1" in src:  # Gesundheits-Outcomes (Kostensatz aus UBA-Methodenkonvention)
+            detail = (
+                f"Punktwert {rv:g} {unit} je Referenzkommune (100.000 Ew.) bei Index=100. Der "
+                f"zugehörige Kostensatz ({eur(cost)}/Fall) ist an den Gesundheits-Kostensätzen "
+                "der UBA-Methodenkonvention 3.1 (2020) orientiert. Für die Fallzahl selbst liegt "
+                "keine belastbare nationale Pro-Kopf-Statistik vor ⇒ editierbare Modellannahme "
+                "mit UBA MK3.1 als Kostensatz-Anker.")
+            refs = ["UBA_Methodenkonvention_MK3.1"]
+        elif "Belastungsstunden" in src:  # reine Belastungsindikatoren ohne Kostensatz
+            detail = (
+                f"Reiner Belastungsindikator ohne monetären Kostensatz (cost_per_outcome_eur=0). "
+                f"Punktwert {rv:g} {unit} je Referenzkommune bei Index=100 als editierbare "
+                "Modellannahme; keine belastbare Messreihe hinterlegt (unbelegt).")
+            refs = []
+        elif src.startswith("Prognos"):  # monetäre Schadens-/Verlustrisiken
+            detail = (
+                f"Schadensanker {eur(rv)} je Referenzeinheit bei Index=100. Die Größenordnung "
+                "ist der Studie Prognos/GWS/IÖW 2023 „Kosten durch Klimawandelfolgen in "
+                "Deutschland“ (BMWK/BMUV) entnommen, die die nationalen Schäden extremer "
+                "Wetterereignisse (u. a. Dürre-/Hitzesommer 2018/2019, Flut 2021) systematisiert "
+                f"und für Sektoren modelliert. Skaliert mit {scale_word(r.get('scale',''))}; "
+                "editierbar.")
+            refs = ["Prognos_Klimaschaeden_2023"]
+        elif "BBK KRITIS" in src:  # KRITIS-Ausfallzeiten
+            detail = (
+                f"Ausfall-/Störungsanker {rv:g} {unit} je Referenzkommune bei Index=100. Mangels "
+                "kommunaler Ausfallstatistik ist der Wert eine editierbare Modellannahme; "
+                "Größenordnung und Systemabgrenzung sind an den KRITIS-Betrachtungen des BBK "
+                "(Bundesamt für Bevölkerungsschutz und Katastrophenhilfe) angelehnt.")
+            refs = ["BBK_KRITIS"]
+        elif "Index=Outcome" in src:  # normierter Index IST der Outcome
+            detail = (
+                f"Index-Risiko: Der normierte Risiko-Index IST hier der Outcome (ref_value=100 "
+                "per Konstruktion). Das ist eine bewusste, dokumentierte und editierbare "
+                "Modellwahl (kein extern belegter Absolutkennwert); die inhaltliche "
+                "Belastbarkeit stammt aus den zugrunde liegenden H/E/V-Komponenten.")
+            refs = []
+        elif "BfN" in src:  # ökologische Flächenrisiken
+            detail = (
+                f"Punktwert {rv:g} {unit} je Referenzkommune (Flächenbezug) bei Index=100 als "
+                "editierbare Modellannahme. Ein belastbarer nationaler Pro-Fläche-Kennwert fehlt; "
+                "die Größenordnung ist qualitativ am UBA-KWRA-2021-Handlungsfeld Biologische "
+                "Vielfalt/Boden sowie an BfN-Befunden orientiert.")
+            refs = ["UBA_KWRA_2021"]
+        else:
+            continue
+        r["source_detail"] = detail
+        if refs:
+            r["source_refs"] = refs
+
+
+_enrich_risk_sources()
 
 
 # ── Pathway-Gewichte (aus pathway_weight_defaults.csv) ──────────────────────────

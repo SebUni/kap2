@@ -328,6 +328,31 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "https://www.gws-os.com/de/energie-klima/projekte/detail/bmu-kliwafo",
         "accessed": "2026-07-04",
     },
+    "UBA_Methodenkonvention_MK3.1": {
+        "ieee": "Umweltbundesamt (UBA), „Methodenkonvention 3.1 zur Ermittlung von "
+                "Umweltkosten – Kostensätze,“ Dessau-Roßlau, Deutschland, 2020. [Online]. "
+                "Verfügbar: https://www.umweltbundesamt.de/system/files/medien/1410/"
+                "publikationen/2020-12-21_methodenkonvention_3_1_kostensaetze.pdf. "
+                "[Zugriff: 4. Juli 2026].",
+        "url": "https://www.umweltbundesamt.de/system/files/medien/1410/publikationen/"
+               "2020-12-21_methodenkonvention_3_1_kostensaetze.pdf",
+        "archive_url": "https://web.archive.org/web/20260312075140/"
+                       "https://www.umweltbundesamt.de/system/files/medien/1410/publikationen/"
+                       "2020-12-21_methodenkonvention_3_1_kostensaetze.pdf",
+        "accessed": "2026-07-04",
+    },
+    "BBK_KRITIS": {
+        "ieee": "Bundesamt für Bevölkerungsschutz und Katastrophenhilfe (BBK), „Kritische "
+                "Infrastrukturen (KRITIS),“ Bonn, Deutschland. [Online]. Verfügbar: "
+                "https://www.bbk.bund.de/DE/Themen/Kritische-Infrastrukturen/"
+                "kritische-infrastrukturen_node.html. [Zugriff: 4. Juli 2026].",
+        "url": "https://www.bbk.bund.de/DE/Themen/Kritische-Infrastrukturen/"
+               "kritische-infrastrukturen_node.html",
+        "archive_url": "https://web.archive.org/web/20210721012108/"
+                       "https://www.bbk.bund.de/DE/Themen/Kritische-Infrastrukturen/"
+                       "kritische-infrastrukturen_node.html",
+        "accessed": "2026-07-04",
+    },
     "RKI_Hitzemortalitaet": {
         "ieee": "M. an der Heiden, S. Muthers, H. Niemann u. a. / Robert Koch-Institut (RKI), "
                 "„Hitzebedingte Mortalität – Sachstandsbericht Klimawandel und Gesundheit, "
