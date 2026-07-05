@@ -55,13 +55,13 @@ Code: `backend/app/services/engine/{inputs,indicators,risk_engine,runner}.py`.
 **Provenienz der regionalen Klimatreiber** (`build_regional_context`, Feld
 `provenance`): Jeder Treiber ist als echte Quelle (`dwd_cdc_raster`, `pegelonline`)
 oder dokumentierter Proxy (`proxy_mean_temp`, `regional_constant`, …) gekennzeichnet.
-Stand Stufe 2 real ortsaufgelöst: `hot_days`, `frost_days`, `low_flow_days`,
-`heavy_rain_index`. Weiterhin Proxy/Konstante (bis Schicht B, Stufe 4): `storm_days`
-(regionale Konstante — die echte Sturmbö-Häufigkeit kommt aus **ERA5** und wird mit den
-Schadensfunktionen angebunden; ERA5 ist kostenlos und kommerziell nutzbar, seit
-02.07.2025 unter CC-BY 4.0, Zugang über ein kostenloses CDS-Konto + API-Key) und die
-Dürre-Treiber `drought_days`/`dry_index` (aus realen `hot_days` abgeleitet; echte
-Bodenfeuchte via UFZ-Dürremonitor-SMI folgt mit der Dürre-Schadensfunktion). Der frühere `heavy_rain_index` aus der Mitteltemperatur ist
+Real ortsaufgelöst: `hot_days`, `frost_days`, `low_flow_days`, `heavy_rain_index`
+(Stufe 2) sowie **`storm_days`** (Stufe 5b: ERA5-Böenklimatologie, Tage/Jahr ≥ 25 m/s,
+falls der Betreiber das Raster mit `scripts/fetch_era5_storm.py` + kostenlosem CDS-Key
+erzeugt hat — ERA5 ist kostenlos und kommerziell nutzbar, seit 02.07.2025 CC-BY 4.0;
+ohne Raster bleibt der dokumentierte Konstantwert, Provenienz `regional_constant`).
+Weiterhin Proxy: die Dürre-Treiber `drought_days`/`dry_index` (aus realen `hot_days`
+abgeleitet; echte Bodenfeuchte via UFZ-Dürremonitor-SMI wäre eine spätere Verfeinerung). Der frühere `heavy_rain_index` aus der Mitteltemperatur ist
 damit ersetzt (MODELL_KRITIK: fachlich unhaltbarer Proxy).
 
 ### Zensus-Autoloader

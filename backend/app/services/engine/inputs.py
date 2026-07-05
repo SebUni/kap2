@@ -288,7 +288,7 @@ def build_regional_context(
     erhalten (robuster Fallback, wirft nie).
     """
     from app.services.climate.dwd_data import get_regional_climate, get_snow_cover_climate
-    from app.services.climate import dwd_cdc_grid, pegelonline
+    from app.services.climate import dwd_cdc_grid, pegelonline, era5_storm
     from app.services.zensus_loader import demographic_shares
     from app.services.inkar_loader import socioeconomic_for_kommune
 
@@ -324,11 +324,19 @@ def build_regional_context(
         if real_lfd is not None:
             low_flow_days = real_lfd
 
+    # storm_days: ERA5-Sturmtage-Raster am Zentroid (falls vom Betreiber erzeugt),
+    # sonst regionaler Konstantwert (dokumentierter Fallback).
+    storm_days = 6.0
+    real_storm = era5_storm.storm_days_at(lon, lat) if lon is not None else None
+    if real_storm is not None:
+        storm_days = real_storm
+
     # Provenienz je Treiber protokollieren: echte Quelle vs. dokumentierter Proxy.
     provenance: dict[str, str] = {
         "hot_days": "dwd_cdc_raster" if (lon is not None and real_hot is not None) else "regional_constant",
         "frost_days": "dwd_cdc_raster" if (lon is not None and real_frost is not None) else "proxy_mean_temp",
         "low_flow_days": "pegelonline" if (lon is not None and real_lfd is not None) else "proxy_hot_days",
+        "storm_days": "era5" if real_storm is not None else "regional_constant",
     }
 
     # heavy_rain_index (0–100): ECHTE Starkregen-Häufigkeit aus DWD-CDC-Rastern
@@ -359,7 +367,7 @@ def build_regional_context(
         "drought_days": round(8.0 + hot_days * 1.2, 1),
         "dry_index": round(min(1.0, hot_days / 25.0), 3),
         "frost_days": frost_days,
-        "storm_days": 6.0,
+        "storm_days": storm_days,
         "heavy_rain_index": heavy_rain_index,
         "mean_temp_rise": round(1.6 + (mean_temp - 9.5) * 0.1, 2),
         "soil_moisture_decline": round(20.0 + hot_days, 1),

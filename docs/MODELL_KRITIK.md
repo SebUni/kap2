@@ -540,6 +540,16 @@ Stand Juli 2026, in committeten Stufen (Details siehe `git log` / Commit-Message
   sind nicht zell-additiv (kommunenweiter Wert). Der flat-P90-Weg ``ref·(P90-Index/100)``
   implementiert bereits die §6.3-Struktur (``Basisdauer × Hazard×Kritikalität/Redundanz``,
   aus H/E/V), und der VoLL ist als Kostensatz (€/Ausfallstunde) explizit und editierbar.
+- **Stufe 5b — ERA5-Sturmintensität (erledigt):** `storm_days` (bisher regionale
+  Konstante 6,0) kommt jetzt aus der **ERA5**-Böenklimatologie (Tage/Jahr mit 10-m-Böe
+  ≥ 25 m/s) am Zentroid. Loader `climate/era5_storm.py` (gecachtes EPSG:4326-Raster,
+  Fallback auf die Konstante + Provenienz), Fetch-Skript `scripts/fetch_era5_storm.py`
+  (einmaliger Betreiber-Lauf mit kostenlosem CDS-Key; ERA5 CC-BY 4.0). Ohne Raster läuft
+  die App unverändert weiter. Damit sind die drei zuvor als „verschoben" markierten
+  Sofort-Datensätze abgearbeitet (Starkregen DWD-CDC in Stufe 2, ERA5-Sturm hier); die
+  intensitätsbasierten JRC-Hochwassertiefe- und UFZ-SMI-Datensätze bleiben spätere
+  Verfeinerungen der bereits stehenden Flut-/Dürre-Schadensfunktionen (brauchen
+  rasterio/netCDF4 + GB-Downloads).
 - **Nach Schicht B verschoben (Stufe 3+, weil erst dort konsumiert):** die
   intensitäts-/wahrscheinlichkeitsbasierten Hazard-Datensätze
   KOSTRA-DWD (Bemessungsniederschlag), **JRC River Flood Hazard Maps** (EU-weite

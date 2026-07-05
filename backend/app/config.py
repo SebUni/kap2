@@ -57,6 +57,15 @@ class Settings(BaseSettings):
     PEGELONLINE_CACHE_TTL_S: int = 30 * 24 * 3600
     PEGELONLINE_MAX_DISTANCE_KM: float = 50.0   # nur Pegel innerhalb dieser Distanz
 
+    # ── ERA5 / Copernicus CDS — Sturmtage (Böen ≥ Schwelle) am Zentroid ──────────
+    # Loader liest ein gecachtes Sturmtage-Raster (EPSG:4326, ESRI-ASCII), das der
+    # Betreiber einmalig mit ``scripts/fetch_era5_storm.py`` + kostenlosem CDS-Key
+    # erzeugt (ERA5 ist kostenlos, seit 02.07.2025 CC-BY 4.0). Fehlt die Datei, bleibt
+    # der bisherige regionale Konstantwert (robuster Fallback).
+    ERA5_STORM_CACHE_DIR: str = os.path.join(_BACKEND_ROOT, "data", "era5_storm")
+    ERA5_STORM_GUST_THRESHOLD_MS: float = 25.0   # Böen-Schwelle für einen „Sturmtag"
+    ERA5_STORM_CLIMATOLOGY_YEARS: int = 10
+
     class Config:
         env_file = ".env"
 

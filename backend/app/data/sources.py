@@ -518,6 +518,17 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
         "archive_url": "https://web.archive.org/web/20260701001320/https://climate.copernicus.eu/",
         "accessed": "2026-07-04",
     },
+    "ERA5_C3S": {
+        "ieee": "H. Hersbach u. a. / Copernicus Climate Change Service (C3S), „ERA5 hourly data "
+                "on single levels from 1940 to present (ECMWF-Reanalyse v5),“ Copernicus Climate "
+                "Data Store (CDS), 2023. Lizenz: CC-BY 4.0 (seit 02.07.2025). [Online]. Verfügbar: "
+                "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels. "
+                "[Zugriff: 5. Juli 2026].",
+        "url": "https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5",
+        "archive_url": "https://web.archive.org/web/20260415053055/"
+                       "https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5",
+        "accessed": "2026-07-05",
+    },
     "BBSR_INKAR": {
         "ieee": "Bundesinstitut für Bau-, Stadt- und Raumforschung (BBSR), „INKAR – Indikatoren "
                 "und Karten zur Raum- und Stadtentwicklung,“ Bonn, Deutschland. [Online]. "

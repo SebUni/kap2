@@ -140,8 +140,14 @@ HAZARDS: list[dict] = [
     {"code": "EXTRATROPICAL_STORM", "name": "Extratropische Stürme & Starkwind",
      "unit": "Anzahl/Jahr", "norm_min": 0.0, "norm_max": 12.0, "spatial": True,
      "description": "Extratropische Stürme mit starken Winden.",
-     "proxy": "Regionaler Sturmtage-Wert, erhöht in exponierten (offenen/hohen) Lagen.",
-     "source": "DWD CDC"},
+     "proxy": "Sturmtage/Jahr (ERA5-Böen ≥ 25 m/s am Zentroid, falls Raster vorhanden; sonst regionaler Konstantwert), erhöht in exponierten (offenen/hohen) Lagen.",
+     "source": "ERA5 (Copernicus C3S) / DWD CDC",
+     "source_detail": "Die Sturmtage stammen — falls der Betreiber das ERA5-Raster erzeugt hat "
+        "(scripts/fetch_era5_storm.py, kostenloser CDS-Key) — aus der ERA5-Böenklimatologie "
+        "(Tage/Jahr mit 10-m-Böe ≥ 25 m/s). Ohne dieses Raster bleibt ein dokumentierter "
+        "regionaler Konstantwert (Provenienz storm_days in build_regional_context). ERA5 ist "
+        "bundesweit einheitlich, kostenlos und kommerziell nutzbar (CC-BY 4.0).",
+     "source_refs": ["ERA5_C3S", "DWD_CDC"]},
     {"code": "STORM_SURGE", "name": "Sturmfluten und Küstenüberschwemmungen",
      "unit": "Anzahl/Jahr", "norm_min": 0.0, "norm_max": 6.0, "spatial": False, "coastal": True,
      "description": "Sturmfluten und damit verbundene Küstenüberschwemmungen.",
@@ -2703,4 +2709,4 @@ def group_label(code: str) -> str:
 # Wird bei strukturellen Modelländerungen (Risiko-Set, Kostensätze, Aggregation)
 # erhöht. Der Layer-Cache stempelt seine Dateien mit dieser Version und invalidiert
 # automatisch, wenn sich die Version ändert (siehe services/layer_cache.py).
-MODEL_VERSION = "2026.07-schichtB-umwelt"
+MODEL_VERSION = "2026.07-schichtB-era5-sturm"

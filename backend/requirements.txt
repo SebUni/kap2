@@ -15,3 +15,9 @@ python-multipart==0.0.18
 pyogrio==0.12.1
 numpy>=1.26.0
 Pillow>=10.0.0
+
+# Optional, nur für scripts/fetch_era5_storm.py (einmaliger ERA5-Sturmtage-Raster-Bau
+# mit kostenlosem CDS-Key). Die App läuft ohne diese Pakete; der Loader fällt dann auf
+# den regionalen Konstantwert zurück.
+#   cdsapi>=0.7.0
+#   netCDF4>=1.6.0
