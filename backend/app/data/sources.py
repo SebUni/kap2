@@ -497,6 +497,19 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "https://www.dwd.de/DE/leistungen/cdc/climate-data-center.html",
         "accessed": "2026-07-04",
     },
+    "DWD_CDC_Starkregen": {
+        "ieee": "Deutscher Wetterdienst (DWD), „Climate Data Center (CDC) – Jährliche "
+                "Rasterkarten der Anzahl Tage mit Niederschlag ≥ 20 mm bzw. ≥ 30 mm "
+                "(grids_germany/annual, 1 km, EPSG:31467),“ Offenbach am Main, Deutschland. "
+                "[Online]. Verfügbar: https://opendata.dwd.de/climate_environment/CDC/"
+                "grids_germany/annual/precipGE20mm_days/. [Zugriff: 5. Juli 2026].",
+        "url": "https://opendata.dwd.de/climate_environment/CDC/grids_germany/annual/"
+               "precipGE20mm_days/",
+        "archive_url": "https://web.archive.org/web/20260317084148/"
+                       "https://opendata.dwd.de/climate_environment/CDC/grids_germany/annual/"
+                       "precipGE20mm_days/",
+        "accessed": "2026-07-05",
+    },
     "Copernicus_C3S": {
         "ieee": "Copernicus Climate Change Service (C3S), ECMWF, „Copernicus Climate Change "
                 "Service – Klimadaten und -indikatoren,“ Reading, Vereinigtes Königreich. "

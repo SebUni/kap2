@@ -324,6 +324,30 @@ def build_regional_context(
         if real_lfd is not None:
             low_flow_days = real_lfd
 
+    # Provenienz je Treiber protokollieren: echte Quelle vs. dokumentierter Proxy.
+    provenance: dict[str, str] = {
+        "hot_days": "dwd_cdc_raster" if (lon is not None and real_hot is not None) else "regional_constant",
+        "frost_days": "dwd_cdc_raster" if (lon is not None and real_frost is not None) else "proxy_mean_temp",
+        "low_flow_days": "pegelonline" if (lon is not None and real_lfd is not None) else "proxy_hot_days",
+    }
+
+    # heavy_rain_index (0–100): ECHTE Starkregen-Häufigkeit aus DWD-CDC-Rastern
+    # (Tage/Jahr ≥ 20 mm und ≥ 30 mm) statt des früheren Mitteltemperatur-Proxys
+    # (MODELL_KRITIK: heavy_rain aus mean_temp abgeleitet war fachlich unhaltbar).
+    # Kalibrierung: DE-typisch ~8 Tage ≥20 mm + ~2 Tage ≥30 mm → Index ≈ 44 (nahe
+    # dem bisherigen Baseline 40). Fallback: bisheriger Proxy.
+    heavy_rain_index = round(40.0 + (mean_temp - 9.5) * 4.0, 1)
+    provenance["heavy_rain_index"] = "proxy_mean_temp"
+    if lon is not None:
+        p20 = dwd_cdc_grid.precip_days_ge20_at(lon, lat)
+        p30 = dwd_cdc_grid.precip_days_ge30_at(lon, lat)
+        if p20 is not None:
+            idx = p20 * 4.0 + (p30 * 6.0 if p30 is not None else p20 * 1.0)
+            heavy_rain_index = round(min(100.0, idx), 1)
+            provenance["heavy_rain_index"] = (
+                "dwd_cdc_raster" if p30 is not None else "dwd_cdc_raster_ge20_only"
+            )
+
     return {
         "bundesland": bundesland,
         "socioeconomic": socioeconomic,
@@ -336,7 +360,7 @@ def build_regional_context(
         "dry_index": round(min(1.0, hot_days / 25.0), 3),
         "frost_days": frost_days,
         "storm_days": 6.0,
-        "heavy_rain_index": round(40.0 + (mean_temp - 9.5) * 4.0, 1),
+        "heavy_rain_index": heavy_rain_index,
         "mean_temp_rise": round(1.6 + (mean_temp - 9.5) * 0.1, 2),
         "soil_moisture_decline": round(20.0 + hot_days, 1),
         "low_flow_days": low_flow_days,
@@ -346,6 +370,7 @@ def build_regional_context(
         "snow_days": float(snow_clim["snow_days_per_year"]),
         "snow_decline_rate_pct": float(snow_clim["snow_decline_rate_pct"]),
         "demographics": demo,
+        "provenance": provenance,
     }
 
 

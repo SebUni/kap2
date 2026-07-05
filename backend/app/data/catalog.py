@@ -112,13 +112,16 @@ HAZARDS: list[dict] = [
     {"code": "HEAVY_RAIN_FLOOD", "name": "Starkniederschlag und Fluten",
      "unit": "Index", "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
      "description": "Extreme Niederschläge inkl. Überflutungen und Sturzfluten.",
-     "proxy": "Versiegelungsgrad (OSM) × TWI/Senkenlage (Terrarium-DEM, D8) × regionaler Starkregenindex.",
-     "source": "DWD CDC + AWS Terrarium DEM",
+     "proxy": "Versiegelungsgrad (OSM) × TWI/Senkenlage (Terrarium-DEM, D8) × Starkregen-Häufigkeit (DWD-CDC-Raster: Tage/Jahr ≥ 20 mm und ≥ 30 mm).",
+     "source": "DWD CDC (Starkregen-Raster) + AWS Terrarium DEM",
      "source_detail": "Der Starkregen-/Überflutungsindex (0-100) kombiniert Versiegelung, "
-        "Senkenlage und regionalen Starkregentrend. Die Zunahme von Starkniederschlägen in "
-        "Deutschland ist im DWD Nationalen Klimareport dokumentiert; die Skala selbst ist eine "
-        "dokumentierte Modellwahl (dimensionsloser Index), editierbar.",
-     "source_refs": ["DWD_Klimareport"]},
+        "Senkenlage und die ortsaufgelöste Starkregen-Häufigkeit aus den DWD-CDC-Jahresrastern "
+        "(Tage/Jahr mit ≥ 20 mm bzw. ≥ 30 mm Niederschlag, am Zentroid gemittelt). Kalibrierung: "
+        "index = min(100, Tage≥20mm·4 + Tage≥30mm·6); DE-typisch ~8+2 Tage → ≈ 44. Fehlt das "
+        "Raster, greift der frühere Proxy aus dem regionalen Temperatur-/Starkregentrend "
+        "(dokumentiert). Die Zunahme von Starkniederschlägen ist im DWD Nationalen Klimareport "
+        "belegt; die Index-Skala ist eine editierbare Modellwahl.",
+     "source_refs": ["DWD_CDC_Starkregen", "DWD_Klimareport"]},
     {"code": "DROUGHT", "name": "Dürren",
      "unit": "Tage/Jahr", "norm_min": 0.0, "norm_max": 60.0, "spatial": True,
      "description": "Meteorologische, hydrologische oder agrarische Dürreperioden.",
@@ -2667,4 +2670,4 @@ def group_label(code: str) -> str:
 # Wird bei strukturellen Modelländerungen (Risiko-Set, Kostensätze, Aggregation)
 # erhöht. Der Layer-Cache stempelt seine Dateien mit dieser Version und invalidiert
 # automatisch, wenn sich die Version ändert (siehe services/layer_cache.py).
-MODEL_VERSION = "2026.07-schichtA-maxpfad"
+MODEL_VERSION = "2026.07-hazard-starkregen-raster"

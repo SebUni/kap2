@@ -2,10 +2,11 @@
 
 Greift die jährlichen 1-km-Raster des DWD Climate Data Center (offen, ohne
 API-Schlüssel) am Kommune-/Zell-Zentroid ab und bildet ein robustes Klimamittel
-der letzten N verfügbaren Jahre. Ersetzt die Bundesland-Konstanten aus
-:data:`app.services.climate.dwd_data.FALLBACK_CLIMATE` für die Treiber
-``hot_days`` (heiße Tage, Tmax ≥ 30 °C) und ``frost_days`` (Frosttage,
-Tmin < 0 °C) — Report §B2.1.
+der letzten N verfügbaren Jahre. Ersetzt die Bundesland-Konstanten bzw. Proxys
+für die Treiber ``hot_days`` (heiße Tage, Tmax ≥ 30 °C), ``frost_days``
+(Frosttage, Tmin < 0 °C) — Report §B2.1 — sowie ``precipGE20mm_days`` /
+``precipGE30mm_days`` (Starkregen-Häufigkeit, Basis des ``heavy_rain_index``,
+Stufe 2) und ``summer_days`` (Sommertage, Tmax ≥ 25 °C).
 
 Datenquelle je Jahr::
 
@@ -42,8 +43,19 @@ log = logging.getLogger(__name__)
 # ``grids_germany``-Raster liegen in Gauß-Krüger Zone 3 (EPSG:31467) vor.
 _GRID_CRS = "EPSG:31467"
 
-# DWD-Ordnername je Treiber (identisch zum Dateinamens-Baustein).
-_PARAM_DIR: dict[str, str] = {"hot_days": "hot_days", "frost_days": "frost_days"}
+# DWD-Ordnername je Treiber (identisch zum Dateinamens-Baustein). Alle hier
+# gelisteten Raster nutzen das Standard-Dateinamensmuster
+# ``grids_germany_annual_{dir}_{YYYY}_17.asc.gz`` (verifiziert für hot_days,
+# frost_days, precipGE20mm_days, precipGE30mm_days, summer_days). Raster mit
+# abweichendem Dateinamen (z. B. drought_index → ``..._{YYYY}17.asc.gz``) sind hier
+# BEWUSST nicht gelistet und müssten einen eigenen URL-Baustein bekommen.
+_PARAM_DIR: dict[str, str] = {
+    "hot_days": "hot_days",
+    "frost_days": "frost_days",
+    "precipGE20mm_days": "precipGE20mm_days",
+    "precipGE30mm_days": "precipGE30mm_days",
+    "summer_days": "summer_days",
+}
 
 # Mem-Caches: WGS84→GK3-Transformer, geparste Grids je (param, year),
 # abgeleitete Zentroid-Werte je (param, gerundeter Zentroid).
@@ -241,3 +253,18 @@ def hot_days_at(lon: float, lat: float) -> float | None:
 def frost_days_at(lon: float, lat: float) -> float | None:
     """Mittlere Frosttage/Jahr (Tmin < 0 °C) am Zentroid (DWD-CDC-Klimatologie)."""
     return sample_climatology("frost_days", lon, lat)
+
+
+def precip_days_ge20_at(lon: float, lat: float) -> float | None:
+    """Mittlere Tage/Jahr mit Niederschlag ≥ 20 mm am Zentroid (Starkregen-Signal)."""
+    return sample_climatology("precipGE20mm_days", lon, lat)
+
+
+def precip_days_ge30_at(lon: float, lat: float) -> float | None:
+    """Mittlere Tage/Jahr mit Niederschlag ≥ 30 mm am Zentroid (Starkregen-Extreme)."""
+    return sample_climatology("precipGE30mm_days", lon, lat)
+
+
+def summer_days_at(lon: float, lat: float) -> float | None:
+    """Mittlere Sommertage/Jahr (Tmax ≥ 25 °C) am Zentroid (DWD-CDC-Klimatologie)."""
+    return sample_climatology("summer_days", lon, lat)

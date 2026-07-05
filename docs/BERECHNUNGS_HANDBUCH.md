@@ -46,9 +46,22 @@ Code: `backend/app/services/engine/{inputs,indicators,risk_engine,runner}.py`.
 |---|---|
 | **OSM** (Overpass) | Gebäudepolygone (+Höhe/Stockwerke), Straßen, Landnutzung, Bäume → Versiegelung, Albedo, Bebauungsgrad, Baumkronen, Grün-/Wasseranteil |
 | **DWD CDC** (regional, je Bundesland) | Sommer-Tagesmaximum, heiße Tage/Jahr, Tropennächte, Jahresmittel; Klimafortschreibung RCP4.5/8.5 |
+| **DWD CDC Raster** (1 km, EPSG:31467, am Zentroid) | `hot_days`, `frost_days`; **neu (Stufe 2):** Starkregen-Häufigkeit `precipGE20mm_days`/`precipGE30mm_days` → speist den `heavy_rain_index`; `summer_days` verfügbar |
+| **BfG/PEGELONLINE** (nächster WSV-Pegel) | `low_flow_days` (Niedrigwassertage < MNW) |
 | **Zensus 2022** (Destatis INSPIRE 100m-Gitter, EPSG:3035) | Bevölkerung, Altersanteile (≥65, **<18**), Wohnfläche/Bewohner, Eigentümerquote, Nettokaltmiete, Gebäudealter je Zelle — Pflichtdaten, kein OSM-Proxy |
 | **AWS Terrarium DEM** | Mittelhöhe, Hangneigung, Senkentiefe, D8-Abfluss, TWI je Zelle |
 | **OSM Gewässer** | `natural=water`, `waterway` → Distanz/Proximität zu Fließ- und Stillgewässern |
+
+**Provenienz der regionalen Klimatreiber** (`build_regional_context`, Feld
+`provenance`): Jeder Treiber ist als echte Quelle (`dwd_cdc_raster`, `pegelonline`)
+oder dokumentierter Proxy (`proxy_mean_temp`, `regional_constant`, …) gekennzeichnet.
+Stand Stufe 2 real ortsaufgelöst: `hot_days`, `frost_days`, `low_flow_days`,
+`heavy_rain_index`. Weiterhin Proxy/Konstante (bis Schicht B, Stufe 4): `storm_days`
+(regionale Konstante — es existiert kein bundesweit einheitliches Sturm-Gitterprodukt
+ohne ERA5/CDS-Zugang) und die Dürre-Treiber `drought_days`/`dry_index` (aus realen
+`hot_days` abgeleitet; echte Bodenfeuchte via UFZ-Dürremonitor-SMI folgt mit der
+Dürre-Schadensfunktion). Der frühere `heavy_rain_index` aus der Mitteltemperatur ist
+damit ersetzt (MODELL_KRITIK: fachlich unhaltbarer Proxy).
 
 ### Zensus-Autoloader
 
