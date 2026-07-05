@@ -353,12 +353,20 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
 
     out = []
     for cid, data in base.items():
-        new_data = {"risks": {}}
+        cell_pop = float(data.get("inputs", {}).get("pop", 0.0) or 0.0)
+        new_data = {"risks": {}, "inputs": {"pop": cell_pop}}
         risks = data.get("risks", {})
         cell_factors = factors.get(cid, {})
         for code, r in risks.items():
-            idx = float(r.get("index", 0.0)) * cell_factors.get(code, 1.0)
-            new_data["risks"][code] = {"index": idx}
+            factor = cell_factors.get(code, 1.0)
+            entry = {"index": float(r.get("index", 0.0)) * factor}
+            # Legacy-Impact ist linear im Index → Outcome/Kosten mit demselben Faktor
+            # skalieren (statt neu zu rechnen). aggregate() summiert die Zell-Werte.
+            if "outcome" in r:
+                entry["outcome"] = float(r["outcome"]) * factor
+            if "cost_eur" in r:
+                entry["cost_eur"] = float(r["cost_eur"]) * factor
+            new_data["risks"][code] = entry
         out.append(new_data)
     return out
 

@@ -114,39 +114,90 @@ def _percentile(values: list[float], pct: float = AGGREGATION_PERCENTILE) -> flo
     return sorted_vals[f] + (k - f) * (sorted_vals[c] - sorted_vals[f])
 
 
+def cost_from_outcome(risk: dict, outcome: float) -> float:
+    """Monetarisiert einen Outcome: monetäre Risiken 1:1 (€), sonst × Kostensatz."""
+    if catalog.risk_is_monetary(risk):
+        # ref_value liegt bereits in €/Jahr vor → Kostensatz implizit 1 €/€.
+        return outcome
+    rate = override_context.effective_cost_per_outcome(
+        risk["code"], catalog.risk_default_cost_per_outcome(risk))
+    return outcome * rate
+
+
 def estimate_outcome_and_cost(risk: dict, agg_index: float, total_pop: float, area_km2: float) -> dict:
-    """Outcome-Schätzung + monetäre Kosten für ein Risiko (agg_index = P90 der Zell-Indizes)."""
+    """Outcome + Kosten für ein Risiko aus einem AGGREGIERTEN Index (P90).
+
+    Nur noch für ``flat``-skalierte Risiken der primäre Rechenweg (kommunenweiter
+    Einzelwert je Index, z. B. Ausfallstunden/Jahr, Index-Screening). pop-/area-
+    skalierte Risiken werden in ``aggregate`` stattdessen als Summe der Zell-Outcomes
+    gerechnet (Schicht B, §3.6).
+    """
     factor = _scale_factor(risk, total_pop, area_km2)
     ref = override_context.effective_ref_value(risk["code"], float(risk.get("ref_value", 0.0)))
     outcome = ref * (agg_index / 100.0) * factor
-    code = risk["code"]
-    if catalog.risk_is_monetary(risk):
-        # ref_value liegt bereits in €/Jahr vor → Kostensatz implizit 1 €/€.
-        cost_eur = outcome
-    else:
-        # Nicht-monetärer Outcome → über editierbaren Kostensatz monetarisieren.
-        rate = override_context.effective_cost_per_outcome(
-            code, catalog.risk_default_cost_per_outcome(risk))
-        cost_eur = outcome * rate
-    return {"outcome": round(outcome, 2), "cost_eur": round(cost_eur, 2)}
+    return {"outcome": round(outcome, 2), "cost_eur": round(cost_from_outcome(risk, outcome), 2)}
+
+
+def _top_share(weights: list[float], frac: float = 0.05) -> float:
+    """Anteil der Summe, der auf die stärksten ``frac`` der Zellen entfällt (Konzentration)."""
+    total = sum(weights)
+    if total <= 0.0 or not weights:
+        return 0.0
+    k = max(1, int(len(weights) * frac))
+    top = sorted(weights, reverse=True)[:k]
+    return round(sum(top) / total, 4)
 
 
 def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> dict:
-    """Aggregiert Risiken über alle Zellen.
+    """Aggregiert Risiken über alle Zellen (Schicht B: Summe statt P90 × Gesamtbev.).
 
-    Gibt zurück:
-      {
-        "risks": {CODE: {index, max_index, outcome, cost_eur}},
-        "groups": {GROUP: {index, label}},
-        "cost": {total_eur, by_risk: [...]},
-      }
+    pop-/area-skalierte Risiken: ``outcome``/``cost_eur`` = **Summe der Zell-Outcomes**
+    (jede Zelle mit ihrem Index, ihrer Bevölkerung und CELL_AREA_KM2). ``flat``-Risiken
+    (kommunenweiter Einzelwert, z. B. Ausfallstunden, Index-Screening): P90-basiert wie
+    bisher — eine Summe über Zellen wäre hier unsinnig.
+
+    Je Risiko zusätzlich (auch für Prompt 7): ``p90_index`` (= ``index``, Screening),
+    ``max_index``, ``outcome_sum``, ``aggregation`` (sum|p90), ``top5_share``
+    (Konzentration: Anteil aus den stärksten 5 % Zellen), ``area_km2_affected`` und
+    ``share_above_threshold`` (Zellen mit Index ≥ Risikozonen-Schwelle).
+
+    Robuster Fallback für Alt-Zelldaten ohne materialisierten ``outcome`` (Kommune vor
+    Neuberechnung): der Wert wird je Zelle über die Legacy-Impact-Funktion nachgerechnet.
     """
+    from app.services.engine import impact  # lazy: Zyklus impact→risk_engine vermeiden
+
+    try:
+        from app.services.risk_zone_service import RISK_THRESHOLD as _THR
+    except Exception:  # pragma: no cover - defensiver Fallback
+        _THR = 50.0
+
+    n_cells = len(cell_data_list)
     indices_by_code: dict[str, list[float]] = {}
+    sum_outcome: dict[str, float] = {}
+    sum_cost: dict[str, float] = {}
+    weights_by_code: dict[str, list[float]] = {}   # Zell-Beitrag (für top5_share)
+    above_thr: dict[str, int] = {}
+
     for cd in cell_data_list:
         risks = cd.get("risks", {})
+        cell_pop = float(cd.get("inputs", {}).get("pop", 0.0) or 0.0)
         for code, r in risks.items():
             idx = float(r.get("index", 0.0))
             indices_by_code.setdefault(code, []).append(idx)
+            if idx >= _THR:
+                above_thr[code] = above_thr.get(code, 0) + 1
+            risk = catalog.RISKS_BY_CODE.get(code)
+            if risk is None or risk.get("scale", "pop") not in ("pop", "area"):
+                continue
+            o = r.get("outcome")
+            if o is None:
+                imp = impact.compute_cell_impacts(risk, idx, cell_pop)
+                o, c = imp["outcome"], imp["cost_eur"]
+            else:
+                o, c = float(o), float(r.get("cost_eur", 0.0))
+            sum_outcome[code] = sum_outcome.get(code, 0.0) + o
+            sum_cost[code] = sum_cost.get(code, 0.0) + c
+            weights_by_code.setdefault(code, []).append(c if c else o)
 
     risk_out: dict[str, dict] = {}
     for risk in catalog.RISKS:
@@ -154,16 +205,32 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
         vals = indices_by_code.get(code, [])
         p90_idx = round(_percentile(vals), 2)
         max_idx = round(max(vals) if vals else 0.0, 2)
-        est = estimate_outcome_and_cost(risk, p90_idx, total_pop, area_km2)
+        if risk.get("scale", "pop") in ("pop", "area"):
+            outcome = round(sum_outcome.get(code, 0.0), 2)
+            cost = round(sum_cost.get(code, 0.0), 2)
+            aggregation = "sum"
+            top5 = _top_share(weights_by_code.get(code, []))
+        else:
+            est = estimate_outcome_and_cost(risk, p90_idx, total_pop, area_km2)
+            outcome, cost = est["outcome"], est["cost_eur"]
+            aggregation = "p90"
+            top5 = _top_share(vals)  # Konzentrations-Proxy aus der Index-Verteilung
+        cnt = above_thr.get(code, 0)
         risk_out[code] = {
             "index": p90_idx,
+            "p90_index": p90_idx,
             "max_index": max_idx,
-            "outcome": est["outcome"],
+            "outcome": outcome,
+            "outcome_sum": outcome,
             "outcome_unit": risk["outcome_unit"],
-            "cost_eur": est["cost_eur"],
+            "cost_eur": cost,
             "cost_dimension": risk["cost_dimension"],
             "group": risk["group"],
             "name": risk["name"],
+            "aggregation": aggregation,
+            "top5_share": top5,
+            "area_km2_affected": round(cnt * CELL_AREA_KM2, 4),
+            "share_above_threshold": round(cnt / n_cells, 4) if n_cells else 0.0,
         }
 
     # Gruppen-P90: Mittel der Einzelrisiko-P90-Indizes je KWRA-Gruppe
@@ -181,7 +248,8 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
     by_risk = sorted(
         [{"code": c, "name": r["name"], "cost_eur": r["cost_eur"],
           "outcome": r["outcome"], "outcome_unit": r["outcome_unit"],
-          "cost_dimension": r["cost_dimension"], "index": r["index"]}
+          "cost_dimension": r["cost_dimension"], "index": r["index"],
+          "aggregation": r["aggregation"], "top5_share": r["top5_share"]}
          for c, r in risk_out.items()],
         key=lambda x: x["cost_eur"], reverse=True,
     )

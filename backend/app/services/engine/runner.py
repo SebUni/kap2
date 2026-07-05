@@ -13,10 +13,11 @@ import multiprocessing
 import os
 from typing import Any
 
+from app.data import catalog
 from app.services.engine.inputs import gather_cell_inputs
 from app.services.engine.indicators import compute_cell_hev
 from app.services.engine.auxiliary import build_auxiliary
-from app.services.engine import risk_engine
+from app.services.engine import impact, risk_engine
 from app.services.engine.progress import RISK_COMPOSE, FINALIZE, lerp
 
 log = logging.getLogger(__name__)
@@ -38,7 +39,23 @@ def _risk_worker(idx: int) -> tuple[int, dict]:
     hev = compute_cell_hev(ci, regional)
     hev_norm = risk_engine.normalize_hev(hev)
     indices = risk_engine.cell_risk_indices(hev_norm)
-    risks = {code: {"index": risk_idx} for code, risk_idx in indices.items()}
+
+    # Per-Zell-Outcome + Kosten je Risiko materialisieren (Schicht B, Stufe 3): so wird
+    # aggregate() zur reinen Summe und der GeoPackage-Export erhält gefüllte Spalten.
+    # Null-Outcome/Kosten werden weggelassen (JSONB-Ersparnis); der Index bleibt immer.
+    cell_pop = float(ci.get("pop", 0.0) or 0.0)
+    risks: dict[str, dict] = {}
+    for code, risk_idx in indices.items():
+        rdef = catalog.RISKS_BY_CODE[code]
+        imp = impact.compute_cell_impacts(rdef, risk_idx, cell_pop)
+        entry = {"index": risk_idx}
+        outcome = round(imp["outcome"], 4)
+        cost = round(imp["cost_eur"], 2)
+        if outcome:
+            entry["outcome"] = outcome
+        if cost:
+            entry["cost_eur"] = cost
+        risks[code] = entry
 
     data = {
         "hazards": hev["hazards"],

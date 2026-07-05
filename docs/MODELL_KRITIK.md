@@ -495,6 +495,17 @@ Stand Juli 2026, in committeten Stufen (Details siehe `git log` / Commit-Message
 - **Stufe 2 — echte Hazard-Daten, Teil 1 (erledigt):** `heavy_rain_index` aus echten
   DWD-CDC-Starkregenrastern (Tage/Jahr ≥ 20/30 mm) statt des Mitteltemperatur-Proxys;
   Provenienz je Treiber protokolliert (`build_regional_context["provenance"]`).
+- **Stufe 3 — Impact-Framework + Σ-Aggregation (erledigt):** Neues Paket
+  `engine/impact/` (per-Risk-Dispatch; ab Stufe 4 registrierte Schadensfunktionen, sonst
+  `legacy_cell_impact` = bisheriger linearer Weg). Der Runner **materialisiert je Zelle**
+  `{index, outcome, cost_eur}`; `aggregate` bildet für pop-/area-Risiken die **Summe der
+  Zell-Outcomes** (behebt den Karte↔Dashboard-Widerspruch §3.6), `flat`-Risiken
+  (Ausfallstunden, Index-Screening) bleiben P90-basiert. Neue Aggregat-Felder
+  `p90_index`, `outcome_sum`, `aggregation`, `top5_share`, `area_km2_affected`,
+  `share_above_threshold` (auch für Prompt 7). Behebt zugleich den 0-Spalten-Bug im
+  GeoPackage-Export (`outcome`/`cost_eur` je Zelle jetzt gefüllt). Robuster Fallback für
+  Alt-Zelldaten ohne materialisierten Outcome (Neuberechnung je Zelle). Die eigentlichen
+  Schadensfunktionen (§6.1–6.4) und die `k_indirekt`-Konsolidierung folgen in Stufe 4/5.
 - **Nach Schicht B verschoben (Stufe 3+, weil erst dort konsumiert):** die
   intensitäts-/wahrscheinlichkeitsbasierten Hazard-Datensätze
   KOSTRA-DWD (Bemessungsniederschlag), **JRC River Flood Hazard Maps** (EU-weite

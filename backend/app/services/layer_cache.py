@@ -153,9 +153,12 @@ def _build_values_package(rows, regional: dict, code: str, category: str) -> dic
         props: dict = {"grid_cell_id": ca.grid_cell_id}
         if category == "risks":
             rdef = catalog.RISKS_BY_CODE[code]
-            idx = float(data.get("risks", {}).get(code, {}).get("index", 0.0))
+            rcell = data.get("risks", {}).get(code, {})
+            idx = float(rcell.get("index", 0.0))
             cell_pop = float(data.get("inputs", {}).get("pop", 0.0))
-            value = risk_engine.cell_outcome(rdef, idx, cell_pop)
+            # Materialisierten Outcome nutzen (Schicht B); Fallback für Alt-Daten.
+            stored = rcell.get("outcome")
+            value = float(stored) if stored is not None else risk_engine.cell_outcome(rdef, idx, cell_pop)
             hev_abs = {
                 "hazards": data.get("hazards", {}),
                 "exposures": data.get("exposures", {}),
