@@ -69,7 +69,10 @@ def test_total_eur_equals_sum_of_cost_eur():
     override_context.set_overrides({})
     agg = risk_engine.aggregate(_synthetic_cells(), total_pop=100000.0, area_km2=50.0)
     total = agg["cost"]["total_eur"]
-    summed = round(sum(r["cost_eur"] for r in agg["risks"].values()), 2)
+    # Summe ohne nicht-additive Teilkennzahlen (Restaurierung) = total_eur.
+    summed = round(sum(
+        r["cost_eur"] for c, r in agg["risks"].items()
+        if c not in catalog.NON_ADDITIVE_RISK_CODES), 2)
     assert abs(total - summed) < 0.01
     # Kein eigenständiges EAD-Risiko mehr → keine Doppelzählung.
     assert "EXPECTED_TOTAL_DAMAGE_EAD_EUR" not in agg["risks"]

@@ -50,8 +50,10 @@ def test_total_eur_is_sum_of_cell_costs():
     assert abs(agg["risks"][MORT]["cost_eur"] - round(manual, 2)) < 0.01
     assert agg["risks"][MORT]["aggregation"] == "sum"
 
-    # total_eur == Summe aller Einzel-cost_eur.
-    summed = round(sum(r["cost_eur"] for r in agg["risks"].values()), 2)
+    # total_eur == Summe der Einzel-cost_eur ohne nicht-additive Teilkennzahlen.
+    summed = round(sum(
+        r["cost_eur"] for c, r in agg["risks"].items()
+        if c not in catalog.NON_ADDITIVE_RISK_CODES), 2)
     assert abs(agg["cost"]["total_eur"] - summed) < 0.01
 
 

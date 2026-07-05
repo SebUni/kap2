@@ -873,6 +873,37 @@ INDEX_ONLY_RISK_CODES: frozenset[str] = frozenset(
 )
 
 
+# Direkte Sektorschäden (Schicht B, §6.2): ihre Zell-Kosten bilden die Basis für den
+# k_indirekt-Multiplikator (indirekte Folgekosten) und die Restaurierungs-Teilkennzahl.
+DIRECT_SECTOR_RISK_CODES: frozenset[str] = frozenset({
+    "EXPECTED_BUILDING_DAMAGE_EUR",
+    "EXPECTED_TRANSPORT_DAMAGE_EUR",
+    "EXPECTED_ENERGY_INFRA_DAMAGE_EUR",
+    "EXPECTED_TELECOM_DAMAGE_EUR",
+    "EXPECTED_WATER_WASTEWATER_DAMAGE_EUR",
+    "EXPECTED_AGRICULTURAL_DAMAGE_EUR",
+    "EXPECTED_SOIL_LOSS_DEGRADATION_EUR",
+    "EXPECTED_ECOSYSTEM_SERVICE_LOSS",
+    "EXPECTED_FISHERIES_ECONOMIC_LOSS_EUR",
+    "EXPECTED_AQUACULTURE_DAMAGE_EUR",
+})
+
+# Folgekosten, die in den k_indirekt-Multiplikator konsolidiert werden (ihre eigene
+# €-Bewertung wird 0 gesetzt, um die Doppelzählung aus MODELL_KRITIK §3.7 zu beenden).
+CONSOLIDATED_INTO_INDIRECT_CODES: frozenset[str] = frozenset({
+    "EXPECTED_SUPPLY_SHORTAGE_COSTS_EUR",
+    "EXPECTED_LOCATION_DISADVANTAGE_EUR",
+    "EXPECTED_DELAYED_DAMAGE_COSTS_EUR",
+})
+
+# Nicht additive Teilkennzahlen: eine Teilmenge bereits gezählter Schäden
+# (Restaurierung = Anteil der direkten Sektorschäden). Werden ausgewiesen, aber NICHT
+# in ``total_eur`` addiert (sonst Doppelzählung, §3.7).
+NON_ADDITIVE_RISK_CODES: frozenset[str] = frozenset({
+    "EXPECTED_RESTORATION_COSTS_EUR",
+})
+
+
 def risk_is_monetary(risk: dict) -> bool:
     """True, wenn der ref_value bereits in €/Jahr vorliegt (cost_dimension monetary)."""
     return risk.get("cost_dimension") == "monetary"
@@ -891,6 +922,8 @@ def risk_contributes_to_total(risk: dict) -> bool:
     automatisch von der Summe ausgenommen (dokumentierte Vermeidung von
     Doppelzählung).
     """
+    if risk["code"] in NON_ADDITIVE_RISK_CODES:
+        return False   # Teilkennzahl (z. B. Restaurierung) – nicht in die Summe
     if risk_is_monetary(risk):
         return True
     return risk_default_cost_per_outcome(risk) > 0.0
@@ -2670,4 +2703,4 @@ def group_label(code: str) -> str:
 # Wird bei strukturellen Modelländerungen (Risiko-Set, Kostensätze, Aggregation)
 # erhöht. Der Layer-Cache stempelt seine Dateien mit dieser Version und invalidiert
 # automatisch, wenn sich die Version ändert (siehe services/layer_cache.py).
-MODEL_VERSION = "2026.07-schichtB-gesundheit"
+MODEL_VERSION = "2026.07-schichtB-monetaer-kindirekt"

@@ -515,6 +515,21 @@ Stand Juli 2026, in committeten Stufen (Details siehe `git log` / Commit-Message
   Winklmayr 2022, UBA MK3.1, BBK, Prognos). ``ref_value`` ist nur noch Kalibrier-/
   Sanity-Anker (``impact/sanity.py`` prüft die Größenordnung). Monetäre + operative +
   Umwelt-Schadensfunktionen und ``k_indirekt`` folgen in Stufe 4b/5.
+- **Stufe 4b — Monetäre Schadensfunktionen + k_indirekt (erledigt):** Die 10 direkten
+  Sektorschäden (§6.2) rechnen ``Assetwert · Jahresverlustrate · Schadenskurve(Intensität)
+  · g(V̂)`` je Zelle; der Assetwert kommt aus realen Zell-Rohgrößen (Gebäudegeschossfläche,
+  Infrastruktur-Anzahl, Agrar-/Wald-/Gewässerfläche) × editierbaren €-Parametern statt aus
+  ``ref_value``. Die Schadenskurve ist konvex (Exponent > 1). **k_indirekt-Konsolidierung
+  (behebt §3.7):** indirekte Verluste = ``k·Σ direkte Sektorschäden``; Versorgungsengpass/
+  Standortnachteil/verzögerte Schäden = 0 (darin enthalten); Restaurierung =
+  ``quote·Σ direkt`` als **nicht-additive** Teilkennzahl (``NON_ADDITIVE_RISK_CODES``, aus
+  ``total_eur`` ausgenommen). Klimamigration eigenständig. 11 globale + 11 per-Risiko-
+  Parameter (``impact.*`` / ``risks.<CODE>.impact.max_loss_rate``), editierbar, mit
+  Prognos-/TEEB-/GDV-Quellen. Rest offen (Stufe 5): operative (VoLL-Ausfallstunden) und
+  Umwelt-Flächen-Schadensfunktionen, ERA5-Sturmintensität. Die exakte JRC-Tiefe-Schaden-
+  Kurve (Wassertiefe je Wiederkehrperiode) bleibt spätere Verfeinerung (braucht rasterio +
+  DE-Ausschnitt-Download); Stand 4b treibt die real vorhandene normierte Hazard-Intensität
+  die Schadenskurve.
 - **Nach Schicht B verschoben (Stufe 3+, weil erst dort konsumiert):** die
   intensitäts-/wahrscheinlichkeitsbasierten Hazard-Datensätze
   KOSTRA-DWD (Bemessungsniederschlag), **JRC River Flood Hazard Maps** (EU-weite

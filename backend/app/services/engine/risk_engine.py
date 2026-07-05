@@ -253,7 +253,13 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
          for c, r in risk_out.items()],
         key=lambda x: x["cost_eur"], reverse=True,
     )
-    total_cost = round(sum(r["cost_eur"] for r in by_risk), 2)
+    # Nicht-additive Teilkennzahlen (z. B. Restaurierung = Anteil der Sektorschäden)
+    # werden ausgewiesen, aber NICHT in die Summe addiert (Doppelzählung §3.7).
+    total_cost = round(
+        sum(r["cost_eur"] for r in by_risk
+            if r["code"] not in catalog.NON_ADDITIVE_RISK_CODES),
+        2,
+    )
 
     return {
         "risks": risk_out,

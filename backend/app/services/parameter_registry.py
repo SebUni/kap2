@@ -6,7 +6,7 @@ from typing import Any
 
 from app.data import catalog, sources
 from app.services.engine import formulas
-from app.services.engine.impact.params import IMPACT_PARAM_SPECS
+from app.services.engine.impact.params import IMPACT_PARAM_SPECS, IMPACT_GLOBAL_SPECS
 
 # Impact-Parameter (Schicht B) je Risiko gruppiert für die Emission in der Risiko-Schleife.
 _IMPACT_SPECS_BY_RISK: dict[str, list[dict]] = {}
@@ -260,6 +260,18 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source="VDI 3787 Bl.1 / Oke 1982 / Stewart & Oke 2012",
                 source_detail=uhi_details[key],
                 references=sources.resolve(["VDI3787_Stadtklima", "StewartOke_LCZ_2012"]),
+            ))
+        # Globale Schicht-B-Parameter (Assetwerte, k_indirekt, Kurvenexponent).
+        for spec in IMPACT_GLOBAL_SPECS:
+            params.append(_base_param(
+                f"impact.{spec['key']}",
+                layer_code="", layer_category="impact",
+                label=f"Schadensfunktion: {spec['label']}",
+                value=spec["value"],
+                unit=spec.get("unit", ""),
+                source=spec.get("source", ""),
+                source_detail=spec.get("source_detail", ""),
+                references=sources.resolve(spec.get("source_refs")),
             ))
 
     return params

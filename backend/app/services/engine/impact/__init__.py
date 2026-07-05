@@ -26,7 +26,9 @@ IMPACT_FUNCTIONS: dict[str, Callable] = {}
 
 def _register() -> None:
     from app.services.engine.impact.health import HEALTH_IMPACTS
+    from app.services.engine.impact.monetary import MONETARY_IMPACTS
     IMPACT_FUNCTIONS.update(HEALTH_IMPACTS)
+    IMPACT_FUNCTIONS.update(MONETARY_IMPACTS)
 
 
 _register()
@@ -60,4 +62,7 @@ def compute_all_cell_impacts(ctx) -> dict[str, dict]:
             out[code] = fn(risk, ctx)
         else:
             out[code] = legacy_cell_impact(risk, ctx.indices.get(code, 0.0), ctx.pop)
+    # k_indirekt-Konsolidierung der Folgekosten (nach den direkten Sektorschäden).
+    from app.services.engine.impact.monetary import consolidate_indirect
+    consolidate_indirect(out, ctx)
     return out
