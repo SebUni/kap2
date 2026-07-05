@@ -485,6 +485,31 @@ ehrlich"). Schicht B kann **risikogruppen-weise** ausgerollt werden (erst moneta
 health, dann operational + environment), weil jede Gruppe ein eigenes, klar
 abgegrenztes Formelwerk hat.
 
+### 6.7 Umsetzungsstand (Prompt 3 „Modell-Umbau", gestufter Rollout)
+
+Stand Juli 2026, in committeten Stufen (Details siehe `git log` / Commit-Messages):
+
+- **Stufe 1 — Schicht A entdünnt (erledigt):** Index = `100·max(w·Ĥ·Ê·V̂)` statt
+  gewichtetem Mittel (Pfadzahl-Invarianz, §3.1/3.5); Wirkungsketten **kuratiert** und
+  belegt (KWRA 2021 / GIZ Vulnerability Sourcebook), Begründung je Kette im Info-Fenster.
+- **Stufe 2 — echte Hazard-Daten, Teil 1 (erledigt):** `heavy_rain_index` aus echten
+  DWD-CDC-Starkregenrastern (Tage/Jahr ≥ 20/30 mm) statt des Mitteltemperatur-Proxys;
+  Provenienz je Treiber protokolliert (`build_regional_context["provenance"]`).
+- **Nach Schicht B verschoben (Stufe 3+, weil erst dort konsumiert):** die
+  intensitäts-/wahrscheinlichkeitsbasierten Hazard-Datensätze
+  KOSTRA-DWD (Bemessungsniederschlag), **JRC River Flood Hazard Maps** (EU-weite
+  Hochwassertiefe je Wiederkehrperiode — ersetzt 16 Länder-HWGK), **UFZ-Dürremonitor
+  SMI** (Bodenfeuchte/Dürre) und **ERA5-Sturmbö-Frequenz** (`storm_days`). Diese speisen
+  die Schadensfunktionen (§6.1–6.4) und wären ohne deren Konsumenten ungenutzter,
+  untestbarer Code.
+
+  **Korrektur zur Datenlage ERA5/CDS:** ERA5 aus dem Copernicus Climate Data Store ist
+  **kostenlos und kommerziell nutzbar** — seit 2. Juli 2025 unter **CC-BY 4.0**
+  (Namensnennung), Zugang über ein **kostenloses** CDS-Konto + API-Key. Es ist damit
+  **nicht** ausgeschlossen, sondern nur (wie KOSTRA/JRC/SMI) auf die Schicht-B-Stufe
+  verschoben; einzige Voraussetzung ist ein vom Betreiber anzulegender (kostenloser)
+  CDS-API-Key. `storm_days` bleibt bis dahin eine dokumentierte regionale Konstante.
+
 ---
 
 ## 7. Entscheidungsvorlage (Product Owner)

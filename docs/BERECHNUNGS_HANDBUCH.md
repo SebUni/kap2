@@ -57,10 +57,11 @@ Code: `backend/app/services/engine/{inputs,indicators,risk_engine,runner}.py`.
 oder dokumentierter Proxy (`proxy_mean_temp`, `regional_constant`, …) gekennzeichnet.
 Stand Stufe 2 real ortsaufgelöst: `hot_days`, `frost_days`, `low_flow_days`,
 `heavy_rain_index`. Weiterhin Proxy/Konstante (bis Schicht B, Stufe 4): `storm_days`
-(regionale Konstante — es existiert kein bundesweit einheitliches Sturm-Gitterprodukt
-ohne ERA5/CDS-Zugang) und die Dürre-Treiber `drought_days`/`dry_index` (aus realen
-`hot_days` abgeleitet; echte Bodenfeuchte via UFZ-Dürremonitor-SMI folgt mit der
-Dürre-Schadensfunktion). Der frühere `heavy_rain_index` aus der Mitteltemperatur ist
+(regionale Konstante — die echte Sturmbö-Häufigkeit kommt aus **ERA5** und wird mit den
+Schadensfunktionen angebunden; ERA5 ist kostenlos und kommerziell nutzbar, seit
+02.07.2025 unter CC-BY 4.0, Zugang über ein kostenloses CDS-Konto + API-Key) und die
+Dürre-Treiber `drought_days`/`dry_index` (aus realen `hot_days` abgeleitet; echte
+Bodenfeuchte via UFZ-Dürremonitor-SMI folgt mit der Dürre-Schadensfunktion). Der frühere `heavy_rain_index` aus der Mitteltemperatur ist
 damit ersetzt (MODELL_KRITIK: fachlich unhaltbarer Proxy).
 
 ### Zensus-Autoloader
