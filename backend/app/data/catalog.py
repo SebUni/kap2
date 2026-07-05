@@ -2416,6 +2416,56 @@ VULNERABILITIES_BY_CODE = {v["code"]: v for v in VULNERABILITIES}
 RISKS_BY_CODE = {r["code"]: r for r in RISKS}
 MEASURES_BY_CODE = {m["code"]: m for m in MEASURES}
 
+# ── Monetarisierung der Risiken ──────────────────────────────────────────────────
+# Kernprinzip (Product-Owner-Vorgabe): Der Gesamtschaden ist die SUMME der monetär
+# bewerteten Einzelrisiken. JEDES Risiko fließt monetär ein; ein nicht-monetärer
+# Outcome (Tote, Fälle, Stunden, ha, Arten, Index) wird über einen eigenständigen,
+# editierbaren Kostensatz ``cost_per_outcome_eur`` (€ je Outcome-Einheit) bewertet.
+# Ein Risiko bleibt NUR dann unmonetarisiert (Kostensatz 0 → trägt 0 € bei), wenn
+# eine Monetarisierung eine Doppelzählung wäre (reine Screening-Index-Risiken); das
+# ist im jeweiligen ``cost_source_detail`` begründet.
+
+# Reine Screening-/Index-Risiken: Outcome IST der HxVxE-Index. Sie werden bewusst
+# NICHT monetarisiert (Kostensatz 0), weil ihr Schaden bereits über die konkreten
+# Mortalitäts-/Morbiditäts-/Schadens-/Ausfallrisiken erfasst ist – eine eigene
+# €-Bewertung wäre eine Doppelzählung (siehe docs/MODELL_KRITIK.md §6).
+INDEX_ONLY_RISK_CODES: frozenset[str] = frozenset(
+    r["code"] for r in RISKS if r.get("outcome_unit") == "Index"
+)
+
+
+def risk_is_monetary(risk: dict) -> bool:
+    """True, wenn der ref_value bereits in €/Jahr vorliegt (cost_dimension monetary)."""
+    return risk.get("cost_dimension") == "monetary"
+
+
+def risk_default_cost_per_outcome(risk: dict) -> float:
+    """Default-Kostensatz (€ je Outcome-Einheit) eines nicht-monetären Risikos."""
+    return float(risk.get("cost_per_outcome_eur") or 0.0)
+
+
+def risk_contributes_to_total(risk: dict) -> bool:
+    """True, wenn das Risiko einen €-Beitrag zur Gesamtschadenssumme liefert.
+
+    Monetäre Risiken tragen immer bei; nicht-monetäre nur, wenn ein positiver
+    Kostensatz hinterlegt ist. Reine Index-Risiken (Kostensatz 0) sind damit
+    automatisch von der Summe ausgenommen (dokumentierte Vermeidung von
+    Doppelzählung).
+    """
+    if risk_is_monetary(risk):
+        return True
+    return risk_default_cost_per_outcome(risk) > 0.0
+
+
+def cost_unit_label(outcome_unit: str) -> str:
+    """Einheit des Kostensatz-Parameters: „€ je <Outcome-Einheit ohne /Jahr>“."""
+    base = (outcome_unit or "").replace("/Jahr", "").strip()
+    if not base or base == "€":
+        return "€"
+    if base == "Index":
+        return "€ je Index-Punkt"
+    return f"€ je {base}"
+
 INDICATOR_BY_CODE = {
     **HAZARDS_BY_CODE,
     **EXPOSURES_BY_CODE,

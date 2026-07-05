@@ -114,12 +114,15 @@ def estimate_outcome_and_cost(risk: dict, agg_index: float, total_pop: float, ar
     factor = _scale_factor(risk, total_pop, area_km2)
     ref = override_context.effective_ref_value(risk["code"], float(risk.get("ref_value", 0.0)))
     outcome = ref * (agg_index / 100.0) * factor
-    cost_eur = 0.0
-    dim = risk.get("cost_dimension")
-    if dim == "monetary":
+    code = risk["code"]
+    if catalog.risk_is_monetary(risk):
+        # ref_value liegt bereits in €/Jahr vor → Kostensatz implizit 1 €/€.
         cost_eur = outcome
-    elif risk.get("cost_per_outcome_eur"):
-        cost_eur = outcome * float(risk["cost_per_outcome_eur"])
+    else:
+        # Nicht-monetärer Outcome → über editierbaren Kostensatz monetarisieren.
+        rate = override_context.effective_cost_per_outcome(
+            code, catalog.risk_default_cost_per_outcome(risk))
+        cost_eur = outcome * rate
     return {"outcome": round(outcome, 2), "cost_eur": round(cost_eur, 2)}
 
 

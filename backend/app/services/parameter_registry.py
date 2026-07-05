@@ -111,6 +111,20 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             source_detail=r.get("source_detail", ""),
             references=sources.resolve(r.get("source_refs")),
         ))
+        # Monetarisierungs-Kostensatz je nicht-monetärem Risiko: eigenständiger,
+        # editierbarer Parameter (€ je Outcome-Einheit). Monetäre Risiken (ref_value
+        # bereits in €/Jahr) bekommen keinen Kostensatz-Parameter.
+        if not catalog.risk_is_monetary(r):
+            params.append(_base_param(
+                f"risks.{r['code']}.cost_per_outcome",
+                layer_code=r["code"], layer_category="risks",
+                label="Kostensatz (Monetarisierung)",
+                value=catalog.risk_default_cost_per_outcome(r),
+                unit=catalog.cost_unit_label(r.get("outcome_unit", "")),
+                source=r.get("cost_source") or "Modellannahme (Kostensatz, unbelegt)",
+                source_detail=r.get("cost_source_detail", ""),
+                references=sources.resolve(r.get("cost_source_refs")),
+            ))
 
     for cat_key, items in (
         ("hazards", catalog.HAZARDS),

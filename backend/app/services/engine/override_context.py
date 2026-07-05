@@ -23,6 +23,12 @@ def effective_ref_value(risk_code: str, default: float) -> float:
     return float(val) if val is not None else default
 
 
+def effective_cost_per_outcome(risk_code: str, default: float) -> float:
+    """Kommune-Override des Monetarisierungs-Kostensatzes (€ je Outcome-Einheit)."""
+    val = get_override(f"risks.{risk_code}.cost_per_outcome")
+    return float(val) if val is not None else default
+
+
 def effective_norm_bounds(code: str) -> tuple[float, float]:
     cat = None
     if code in catalog.HAZARDS_BY_CODE:
