@@ -163,6 +163,61 @@ def test_override_scope_resets_previous_state():
     override_context.set_overrides({})
 
 
+def test_folgekosten_reconsolidated_from_reduced_direct():
+    """Nach Reduktion der direkten Sektorschäden werden indirekt/Restaurierung neu aus
+    der NEUEN Direktsumme gebildet (§8/B3), nicht auf dem Vor-Maßnahmen-Stand belassen."""
+    override_context.set_overrides({})
+    direct_codes = sorted(catalog.DIRECT_SECTOR_RISK_CODES)[:2]
+    risks = {c: {"index": 25.0, "outcome": 500.0, "cost_eur": 500.0} for c in direct_codes}
+    risks["EXPECTED_INDIRECT_ECONOMIC_LOSS_EUR"] = {"index": 0.0, "outcome": 9999.0, "cost_eur": 9999.0}
+    risks["EXPECTED_RESTORATION_COSTS_EUR"] = {"index": 0.0, "outcome": 8888.0, "cost_eur": 8888.0}
+
+    measure_service._reconsolidate_cell_folgekosten(risks)
+
+    direct_new = 500.0 * len(direct_codes)
+    assert risks["EXPECTED_INDIRECT_ECONOMIC_LOSS_EUR"]["outcome"] == pytest.approx(
+        measure_service._K_INDIRECT_DEFAULT * direct_new)
+    assert risks["EXPECTED_RESTORATION_COSTS_EUR"]["outcome"] == pytest.approx(
+        measure_service._RESTORATION_SHARE_DEFAULT * direct_new)
+
+
+def test_measure_benefit_includes_folgekosten_reconciles():
+    """Einzelmaßnahmen-Nutzen (direkte Reduktion × (1+k)) == Aggregat-Delta aus direkten
+    Schäden + rekonsolidierten Folgekosten (§8/B3)."""
+    override_context.set_overrides({})
+    direct = "EXPECTED_TELECOM_DAMAGE_EUR"   # monetär, pop-skaliert, direkter Sektor
+    rdirect = catalog.RISKS_BY_CODE[direct]
+    IND = "EXPECTED_INDIRECT_ECONOMIC_LOSS_EUR"
+    k = measure_service._K_INDIRECT_DEFAULT
+    factor = 0.5
+
+    def cell(dmg: float) -> dict:
+        return {"inputs": {"pop": 1000.0},
+                "risks": {direct: {"index": 40.0, "outcome": dmg, "cost_eur": dmg},
+                          IND: {"index": 0.0, "outcome": k * dmg, "cost_eur": k * dmg}}}
+
+    cells = [cell(1000.0), cell(2000.0), cell(3000.0)]
+    covered = {0, 2}
+    base = risk_engine.aggregate(copy.deepcopy(cells), 3000.0, 10.0)
+
+    with_cells = []
+    for i, c in enumerate(cells):
+        nc = copy.deepcopy(c)
+        if i in covered:
+            r = nc["risks"][direct]
+            r["outcome"] *= factor
+            r["cost_eur"] *= factor
+            measure_service._reconsolidate_cell_folgekosten(nc["risks"])
+        with_cells.append(nc)
+    withm = risk_engine.aggregate(with_cells, 3000.0, 10.0)
+
+    delta_total = base["cost"]["total_eur"] - withm["cost"]["total_eur"]
+    benefit = sum(
+        measure_service._cell_cost(rdirect, cells[i]["risks"][direct], 1000.0)
+        * (1.0 - factor) * (1.0 + k) for i in covered)
+    assert benefit == pytest.approx(delta_total, abs=0.01)
+
+
 def test_flat_risk_is_p90_and_excluded_from_cell_benefit():
     """Flache Ausfall-/Screening-Risiken sind nicht zell-additiv (Aggregat P90-basiert)
     und deshalb bewusst vom Zellkosten-Nutzen ausgenommen (scale ∉ pop/area)."""

@@ -35,6 +35,33 @@ from app.services.engine import impact, override_context, risk_engine
 
 log = logging.getLogger(__name__)
 
+# Defaults der Folgekosten-Konsolidierung (identisch zu impact/params.py IMPACT_GLOBAL_SPECS;
+# override-fähig über impact.k_indirect / impact.restoration_share).
+_K_INDIRECT_DEFAULT = 0.25
+_RESTORATION_SHARE_DEFAULT = 0.15
+
+
+def _reconsolidate_cell_folgekosten(risks: dict[str, dict]) -> None:
+    """Bildet die Folgekosten einer Zelle aus ihren (ggf. maßnahmenbedingt reduzierten)
+    direkten Sektorschäden neu — in-place, analog ``impact.consolidate_indirect`` (§8/B3).
+
+    Ohne diesen Schritt bliebe nach Anwendung der Maßnahmen ``indirekt = k · Σ direkt``
+    auf dem VOR-Maßnahmen-Stand stehen (die direkten Schäden sind reduziert, die daran
+    gekoppelten Folgekosten aber nicht) — eine Inkonsistenz im Aggregat „mit Maßnahmen".
+    Direkte Sektorschäden sind monetär (outcome == €), daher Summe über ``outcome``.
+    """
+    direct = sum(float(risks[c].get("outcome", 0.0))
+                 for c in catalog.DIRECT_SECTOR_RISK_CODES if c in risks)
+    k = float(override_context.get_override("impact.k_indirect", _K_INDIRECT_DEFAULT))
+    r_share = float(override_context.get_override(
+        "impact.restoration_share", _RESTORATION_SHARE_DEFAULT))
+    for code, value in (("EXPECTED_INDIRECT_ECONOMIC_LOSS_EUR", k * direct),
+                        ("EXPECTED_RESTORATION_COSTS_EUR", r_share * direct)):
+        if code in risks:
+            risks[code] = {"index": risks[code].get("index", 0.0),
+                           "outcome": value, "cost_eur": value}
+    # supply/location/delayed bleiben 0 (in k_indirekt enthalten) — nichts zu tun.
+
 
 def _cell_cost(risk: dict, cell_risk: dict, cell_pop: float) -> float:
     """Zellkosten eines Risikos – identische Basis wie ``risk_engine.aggregate``.
@@ -266,6 +293,11 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     covered_base_index: dict[str, float] = {}
     covered_new_index: dict[str, float] = {}
     annual_benefit_damage = 0.0
+    # Vermeidet eine Maßnahme direkte Sektorschäden, sinken auch die daran gekoppelten
+    # Folgekosten (indirekt = k · Σ direkte Schäden). Dieser Anteil wird im Kommunen-
+    # Aggregat „mit Maßnahmen" über die Rekonsolidierung (siehe _adjusted_cell_data)
+    # mitreduziert; damit der Einzelmaßnahmen-Nutzen dazu passt, wird er hier ergänzt (§8/B3).
+    k_indirect = float(override_context.get_override("impact.k_indirect", _K_INDIRECT_DEFAULT))
 
     for cid, frac in coverage.items():
         ca = assessments.get(cid)
@@ -286,7 +318,11 @@ def compute_impact(db: Session, measure_id: int) -> dict:
             risk = catalog.RISKS_BY_CODE.get(code)
             if (risk and catalog.risk_contributes_to_total(risk)
                     and risk.get("scale", "pop") in ("pop", "area")):
-                annual_benefit_damage += _cell_cost(risk, r, cell_pop) * (1.0 - factor)
+                reduced = _cell_cost(risk, r, cell_pop) * (1.0 - factor)
+                annual_benefit_damage += reduced
+                # gekoppelte Folgekosten (nur direkte Sektorschäden treiben k_indirekt)
+                if code in catalog.DIRECT_SECTOR_RISK_CODES:
+                    annual_benefit_damage += k_indirect * reduced
         db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid, indicator_deltas=deltas))
 
     # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente)
@@ -370,13 +406,20 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
         for code, r in risks.items():
             factor = cell_factors.get(code, 1.0)
             entry = {"index": float(r.get("index", 0.0)) * factor}
-            # Legacy-Impact ist linear im Index → Outcome/Kosten mit demselben Faktor
-            # skalieren (statt neu zu rechnen). aggregate() summiert die Zell-Werte.
+            # Der Maßnahmen-Faktor mindert den Screening-Index; die Schicht-B-Outcomes
+            # hängen zwar an der Hazard-Intensität (nicht direkt am Index), werden hier
+            # aber bewusst PROPORTIONAL zum Index-Faktor skaliert — die pragmatische
+            # Brücke zwischen index-basierter Maßnahmenwirkung und der Kostenschicht
+            # (bewusste Vereinfachung, keine „lineare Legacy-Rechnung"). aggregate()
+            # summiert die Zell-Werte und leitet die Kosten live aus dem Outcome ab.
             if "outcome" in r:
                 entry["outcome"] = float(r["outcome"]) * factor
             if "cost_eur" in r:
                 entry["cost_eur"] = float(r["cost_eur"]) * factor
             new_data["risks"][code] = entry
+        # Folgekosten (indirekt/Restaurierung) aus den NEUEN direkten Sektorschäden neu
+        # bilden, sonst bliebe indirekt = k·Σ direkt VOR den Maßnahmen stehen (§8/B3).
+        _reconsolidate_cell_folgekosten(new_data["risks"])
         out.append(new_data)
     return out
 
