@@ -194,6 +194,14 @@ $$\text{Index} = 100 \cdot \frac{\sum_p w_p\,\hat H_p\,\hat E_p\,\hat V_p}{\sum_
 regionaler Konstantwert (`COMPOUND_EVENT`, `CASCADE_EVENT`) modelliert.
 
 ### Outcome & Kosten (`estimate_outcome_and_cost`)
+> **Schicht A vs. B:** Der hier beschriebene lineare `ref_value`-Weg ist seit dem
+> Schicht-B-Umbau (Option C, `MODELL_KRITIK.md` §5–6) nur noch der **Screening-/
+> Fallback-Pfad** und der **primäre Rechenweg für `flat`-Risiken** (kommunenweite
+> Einzelwerte). Bevölkerungs- und flächenbezogene Schadensrisiken rechnen stattdessen
+> **absolute, per-Zelle berechnete Schadensfunktionen** (nächster Abschnitt), deren
+> Zell-Werte die Kommune-Summe bilden. `ref_value` ist für diese Risiken nur noch
+> Kalibrier-/Sanity-Anker (`impact/sanity.py`).
+
 - `outcome = ref_value · (mean_index/100) · scale_factor`
 - `scale`: `pop` → Einwohner/100 000, `area` → Fläche/50 km², `flat` → 1
 - **Monetarisierung (jedes Risiko fließt monetär ein):**
@@ -217,6 +225,32 @@ regionaler Konstantwert (`COMPOUND_EVENT`, `CASCADE_EVENT`) modelliert.
 - Helfer: `catalog.risk_is_monetary`, `risk_contributes_to_total`,
   `risk_default_cost_per_outcome`, `cost_unit_label`.
 
+### Schicht B — absolute Schadensfunktionen (Σ über Zellen)
+
+Paket `services/engine/impact/` (per-Risk-Dispatch, `IMPACT_FUNCTIONS`). Jedes der
+22 Schadensrisiken liefert je Zelle einen **absoluten** Outcome + monetarisierte
+Kosten; Risiken ohne registrierte Funktion rechnen den linearen `legacy_cell_impact`
+(= `ref·Index/100·Skalierung`, aber je Zelle). Der Runner materialisiert je Zelle
+`{index, outcome, cost_eur}`.
+
+- **Gesundheit** (`impact/health.py`): `Betroffene · Rate · Dosis-Wirkung · g(V̂)`.
+  Hitzegetrieben über die nichtlineare attributable Fraktion
+  `AF = 1 − exp(−β·(Intensität − Schwelle)₊)` (überproportional durch die Schwelle).
+- **Monetäre Sektorschäden** (`impact/monetary.py`): `Assetwert · Jahresverlustrate ·
+  Schadenskurve(Intensität) · g(V̂)`; Assetwert aus realen Zell-Rohgrößen ×
+  editierbaren €-Parametern. Schadenskurve konvex (`curves.py`, Exponent > 1).
+- **Umwelt** (`impact/environment.py`): `exponierte Naturfläche · Verlustrate(Hazard)
+  · g(V̂)`, monetarisiert über den Kostensatz.
+- `g(V̂) = 0,5 + mittlere normierte Vulnerabilität` (Vulnerabilitäts-Modifikator).
+- **k_indirekt-Konsolidierung** (`consolidate_indirect`, behebt §3.7): indirekte
+  Verluste = `k · Σ direkte Sektorschäden`; Versorgungsengpass/Standortnachteil/
+  verzögerte Schäden = 0 € (darin konsolidiert); Restaurierung = `quote · Σ direkt`
+  als **nicht-additive** Teilkennzahl (`NON_ADDITIVE_RISK_CODES`, aus `total_eur` raus).
+- **Operative Ausfallrisiken** (9, `flat`): bewusst keine per-Zell-Funktion —
+  Ausfallstunden sind nicht zell-additiv; sie bleiben P90-basiert (VoLL-Kostensatz).
+- Alle Raten/Koeffizienten/Assetwerte sind editierbare, quellenbelegte Registry-
+  Parameter (`impact/params.py` → `risks.<CODE>.impact.*` / `impact.*`).
+
 ### Gesamtschaden = Summe der Einzelrisiken
 `cost.total_eur = Σ cost_eur` über alle Risiken. Es gibt **kein eigenständiges
 Gesamtschaden-/EAD-Risiko mehr** (früher `EXPECTED_TOTAL_DAMAGE_EAD_EUR`, das
@@ -224,30 +258,43 @@ per Konstruktion ~die Summe der Sektorschäden abbildete und diese in `total_eur
 verdoppelte). Der Dashboard-KPI „Erwartete Schäden gesamt“ ist damit die
 nachrechenbare Summe der monetarisierten Einzelrisiken.
 
-> **Verbleibende Überlappungen (dokumentiert, nicht behoben):** Die additiven
-> Folgekosten-Risiken (Wiederherstellung, indirekte Verluste, Versorgungsengpässe,
-> Standortnachteile, verzögerte Schäden) sind fachlich Teil-/Folgemengen der
-> direkten Sektorschäden und überlappen diese teilweise (siehe
-> `docs/MODELL_KRITIK.md` §3.7 / §6.2). Eine saubere Konsolidierung über einen
-> Indirekt-Multiplikator `k_indirekt` ist Teil der noch offenen Schadensfunktions-
-> Schicht (Option C) und hier bewusst nicht umgesetzt. Ebenso grenzen sich die
-> physischen Umwelt-Flächenverluste (Biodiversität/Habitat) vom laufenden
-> „Verlust von Ökosystemleistungen“ ab (im `cost_source_detail` erläutert).
+> **Folgekosten-Konsolidierung (Schicht B, umgesetzt):** Die Doppelzählung der
+> Folgekosten (§3.7) ist über den Indirekt-Multiplikator `k_indirekt` konsolidiert
+> (`consolidate_indirect`, s. o.): indirekte Verluste = `k · Σ direkte Sektorschäden`;
+> Versorgungsengpass/Standortnachteil/verzögerte Schäden zählen 0 € (darin enthalten);
+> Restaurierung ist eine **nicht-additive** Teilkennzahl und aus `total_eur`
+> ausgenommen (`NON_ADDITIVE_RISK_CODES`). Die physischen Umwelt-Flächenverluste
+> (Biodiversität/Habitat) grenzen sich weiterhin vom laufenden „Verlust von
+> Ökosystemleistungen“ ab (im `cost_source_detail` erläutert).
 
 ### Aggregation (`risk_engine.aggregate`)
-Je Risiko: P90-Index über alle Zellen, Max-Index, Outcome, Kosten.
-Je KWRA-Gruppe: Mittelwert der Risiko-Indizes (übergreifende Metrik fürs
-Spinnendiagramm). `total_eur` = Summe der Einzel-`cost_eur`.
+Je Risiko (Schicht B):
+- **pop-/area-skaliert:** `outcome`/`cost_eur` = **Summe der Zell-Werte**
+  (`aggregation = "sum"`) — behebt den Karte↔Dashboard-Widerspruch (§3.6), weil
+  Kartenschwerpunkte und Dashboard-Summe aus derselben Zellquelle stammen.
+- **`flat`:** kommunenweiter Einzelwert P90-basiert (`aggregation = "p90"`) —
+  eine Summe über Zellen wäre hier unsinnig (Ausfallstunden/Index-Screening).
+- Zusätzliche Felder (auch für das Dashboard): `p90_index` (= `index`), `max_index`,
+  `outcome_sum`, `top5_share` (Anteil der Summe aus den stärksten 5 % Zellen →
+  Hotspot-Signal), `area_km2_affected` und `share_above_threshold` (Zellen ≥
+  Risikozonen-Schwelle). **Robuster Fallback:** Alt-Zelldaten ohne materialisierten
+  Outcome werden je Zelle über `legacy_cell_impact` nachgerechnet (kein 500er).
+
+Je KWRA-Gruppe: Mittelwert der Risiko-P90-Indizes (übergreifende Spinnen-Metrik).
+`total_eur` = Summe der Einzel-`cost_eur` **ohne** `NON_ADDITIVE_RISK_CODES`.
 
 ### Modellversion & Cache-Invalidierung
-Strukturelle Modelländerungen (Risiko-Set, Kostensätze) erhöhen
+Strukturelle Modelländerungen (Risiko-Set, Schadensfunktionen, Hazard-Daten) erhöhen
 `catalog.MODEL_VERSION`. Der Layer-Cache (`layer_cache.py`) stempelt jedes
-Kommune-Cache-Verzeichnis mit dieser Version (`.model_version`) und leert es
-beim ersten Zugriff automatisch, wenn die Version nicht mehr passt – so werden
-z. B. der gelöschte EAD-Layer oder veraltete Werte nicht mehr ausgeliefert. Die
-Risiko-Indizes je Zelle bleiben unverändert (Monetarisierung wirkt erst in der
-Kostenschicht), eine vollständige Neuberechnung der `CellAssessment` ist daher
-nicht erforderlich.
+Kommune-Cache-Verzeichnis mit dieser Version (`.model_version`) und leert es beim
+ersten Zugriff automatisch, wenn die Version nicht mehr passt. Seit Schicht B
+materialisiert der Runner je Zelle `{index, outcome, cost_eur}`; ändern sich die
+**Schadensfunktionen** (Stufe 4/5) oder die **Hazard-Ingestion** (Stufe 2/5b), ist eine
+Neuberechnung der `CellAssessment` erforderlich (MODEL_VERSION-Bump). Reine
+**Kostensatz-Overrides** wirken dagegen erst in der Kostenschicht auf der Zellsumme und
+brauchen keine Neuberechnung. **Anzeige-/Aggregations-Änderungen** (Stufe 6 Maßnahmen-
+Nutzenformel, Stufe 7 Dashboard-Felder) ändern die Per-Zell-Ausgabe nicht und lösen
+daher **bewusst keinen** Bump aus.
 
 ### Risikozonen
 Zusammenhängende Zellen mit hohem Risiko-Index (Connected Components),
@@ -329,9 +376,15 @@ $$\text{OPEX/a} = \text{opex\_fixed\_year} + \text{Anzahl} \times \text{opex\_pe
 
 - **Direkter Nutzen/Jahr:** `benefit_per_m2_year · Fläche` (unverändert, von der
   Kostenseite getrennt).
-- **Vermiedene Schäden/Jahr:** monetarisierte Index-Reduktion der verknüpften
-  monetären Risiken (Anteil der reduzierten Indexsumme an der Gesamtsumme ×
-  Risikokosten).
+- **Vermiedene Schäden/Jahr (E3, Schicht B):** tatsächliches **Delta der summierten
+  Zellkosten** — je abgedeckter Zelle und verknüpftem Risiko
+  `Zellkosten · (1 − factor)`. Für pop-/area-skalierte Risiken ist das exakt der
+  Beitrag der Maßnahme zur „Vermiedene Schäden"-Kennzahl des Kommunen-Aggregats,
+  weil `compute_impact` und `_adjusted_cell_data`/`aggregate` dieselbe Zellkosten-
+  Basis (`_cell_cost`, inkl. Legacy-Fallback für Alt-Zellen) und denselben Zell-
+  Faktor benutzen. Flache Ausfall-/Screening-Risiken sind nicht zell-additiv
+  (Aggregat P90-basiert) und tragen zu dieser Einzelmaßnahmen-Zeile nichts bei;
+  ihre Minderung erscheint im Kommunen-Aggregat „mit Maßnahmen".
 - Dashboard-Kostensektion (`cost-summary`) vergleicht Schäden **Basis** vs. **mit
   Maßnahmen** und summiert `capex_eur` / `opex_annual_eur` je Maßnahme; dieselbe
   Fläche/Anzahl/`unit_factor`-Herleitung wie `compute_impact`, damit Dashboard,

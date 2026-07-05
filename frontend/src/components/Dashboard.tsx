@@ -241,8 +241,8 @@ export default function Dashboard() {
                 <h3 className="chart-title">Kostenzusammenfassung</h3>
                 <div className="kpi-row" style={{ flexDirection: 'column', gap: 8 }}>
                   <div className="kpi-card">
-                    <div className="kpi-label" title="Summe der monetär bewerteten Einzelrisiken (jedes Risiko über seinen Kostensatz monetarisiert; kein eigenständiger Gesamtschaden-Parameter mehr)">
-                      Erwartete Schäden gesamt (Summe der Risiken)
+                    <div className="kpi-label" title="Summe der monetär bewerteten Einzelrisiken (jedes Risiko über seinen Kostensatz monetarisiert; kein eigenständiger Gesamtschaden-Parameter mehr). Bevölkerungs-/flächenbezogene Risiken als Σ über alle 100m-Zellen, Ausfall-/Screening-Risiken P90-basiert; nicht-additive Teilkennzahlen (z. B. Restaurierung) sind ausgenommen.">
+                      Erwartete Schäden gesamt (Σ über Zellen)
                     </div>
                     <div className="kpi-value accent" style={{ fontSize: '1.1rem' }}>
                       {fmtEur(riskSummary.cost.total_eur)}<span className="kpi-unit"> /Jahr</span>
@@ -376,7 +376,9 @@ export default function Dashboard() {
                                     </div>
                                   </div>
                                   <div className="kpi-card" style={{ flex: '1 1 110px' }}>
-                                    <div className="kpi-label">Ergebnis</div>
+                                    <div className="kpi-label">
+                                      Ergebnis {r.aggregation === 'p90' ? '(P90 × Kommune)' : '(Σ über Zellen)'}
+                                    </div>
                                     <div className="kpi-value" style={{ fontSize: '0.95rem' }}>
                                       {r.outcome.toLocaleString('de-DE', { maximumFractionDigits: 1 })}
                                       <span className="kpi-unit"> {r.outcome_unit}</span>
@@ -424,7 +426,11 @@ export default function Dashboard() {
           <section className="dashboard-section">
             <h2 className="section-title">Kosten</h2>
             <div className="chart-card">
-              <h3 className="chart-title">Erwartete Schäden je Risiko</h3>
+              <h3 className="chart-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                Erwartete Schäden je Risiko
+                <InfoTooltip title="Aggregation je Risiko"
+                  description="Schaden/Jahr = Σ über alle 100m-Zellen (bevölkerungs-/flächenbezogene Risiken) bzw. P90-Index × Kommune (Ausfall-/Screening-Risiken, nicht zell-additiv). Der Gesamtschaden ist die nachrechenbare Summe dieser Zeilen – ohne nicht-additive Teilkennzahlen (z. B. Restaurierung, = Anteil bereits gezählter Sektorschäden)." />
+              </h3>
               <table className="data-table">
                 <thead>
                   <tr>

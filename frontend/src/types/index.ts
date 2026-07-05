@@ -435,7 +435,17 @@ export interface RiskHistogramEntry {
   p90_index: number
   max_index: number
   outcome: number
+  /** Aggregierter Outcome (= outcome; Σ über Zellen für pop/area, sonst P90-basiert). */
+  outcome_sum?: number
   cost_eur: number
+  /** "sum" (Σ über Zellen, pop/area) | "p90" (kommunenweiter Einzelwert, flat). */
+  aggregation?: 'sum' | 'p90'
+  /** Anteil der Summe aus den stärksten 5 % Zellen (Konzentration/Hotspot-Signal). */
+  top5_share?: number
+  /** Fläche der Zellen über der Risikozonen-Schwelle (km²). */
+  area_km2_affected?: number
+  /** Anteil der Zellen über der Risikozonen-Schwelle. */
+  share_above_threshold?: number
 }
 
 export interface RiskHistogram {

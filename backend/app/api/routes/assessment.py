@@ -326,7 +326,13 @@ def risk_histogram(kommune_id: int, db: Session = Depends(get_db)):
             "p90_index": a.get("index", 0.0),
             "max_index": a.get("max_index", 0.0),
             "outcome": a.get("outcome", 0.0),
+            "outcome_sum": a.get("outcome_sum", 0.0),
             "cost_eur": a.get("cost_eur", 0.0),
+            # Schicht-B-Aggregationskennzahlen (Σ über Zellen vs. P90; Konzentration/Fläche)
+            "aggregation": a.get("aggregation", "sum"),
+            "top5_share": a.get("top5_share", 0.0),
+            "area_km2_affected": a.get("area_km2_affected", 0.0),
+            "share_above_threshold": a.get("share_above_threshold", 0.0),
         }
 
     return {

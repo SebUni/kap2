@@ -550,6 +550,25 @@ Stand Juli 2026, in committeten Stufen (Details siehe `git log` / Commit-Message
   intensitätsbasierten JRC-Hochwassertiefe- und UFZ-SMI-Datensätze bleiben spätere
   Verfeinerungen der bereits stehenden Flut-/Dürre-Schadensfunktionen (brauchen
   rasterio/netCDF4 + GB-Downloads).
+- **Stufe 6 — Maßnahmen-Engine auf Schicht B (erledigt):** Der Maßnahmen-Nutzen
+  (`compute_impact`) ist jetzt das **tatsächliche Delta der summierten Zellkosten**
+  (`Σ_zellen Σ_linked Zellkosten·(1−factor)`) statt der bisherigen index-proportionalen
+  Verteilung eines P90-basierten Risiko-Gesamtschadens. Für pop-/area-Risiken ist der
+  ausgewiesene Einzelmaßnahmen-Nutzen damit exakt der Beitrag zur „Vermiedene Schäden"-
+  Kennzahl des Kommunen-Aggregats (dieselbe Σ-über-Zellen-Basis via `_cell_cost`, inkl.
+  Legacy-Fallback für Alt-Zellen; derselbe Zell-Faktor wie `_adjusted_cell_data`). Flache
+  Ausfall-/Screening-Risiken bleiben ausgenommen (nicht zell-additiv). 6 neue DB-freie
+  Tests beweisen die Reconciliation.
+- **Stufe 7 — API-Felder + Dashboard + Doku (erledigt):** `risk-histogram` reicht die
+  Schicht-B-Aggregatfelder (`outcome_sum`, `aggregation`, `top5_share`,
+  `area_km2_affected`, `share_above_threshold`) durch; Frontend-Types ergänzt. Dashboard-
+  Labels präzisiert („Erwartete Schäden gesamt (Σ über Zellen)"; Aggregations-Tooltip an
+  der Kostentabelle; „Ergebnis (Σ über Zellen)" vs. „(P90 × Kommune)" je Risiko im
+  Histogramm) — bewusst **keine neuen Widgets** (bleiben Prompt 7 „Dashboard ehrlich").
+  Berechnungshandbuch (Schicht-B-Kapitel, Aggregation, Maßnahmen-Nutzen) und
+  `backend/data/README` (Klima-/Hazard-Raster + Lizenzen) fortgeschrieben. Stufe 6/7
+  ändern die Per-Zell-Ausgabe nicht → **kein** MODEL_VERSION-Bump (keine erzwungene
+  Neuberechnung).
 - **Nach Schicht B verschoben (Stufe 3+, weil erst dort konsumiert):** die
   intensitäts-/wahrscheinlichkeitsbasierten Hazard-Datensätze
   KOSTRA-DWD (Bemessungsniederschlag), **JRC River Flood Hazard Maps** (EU-weite
