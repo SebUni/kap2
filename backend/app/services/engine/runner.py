@@ -13,11 +13,11 @@ import multiprocessing
 import os
 from typing import Any
 
-from app.data import catalog
 from app.services.engine.inputs import gather_cell_inputs
 from app.services.engine.indicators import compute_cell_hev
 from app.services.engine.auxiliary import build_auxiliary
 from app.services.engine import impact, risk_engine
+from app.services.engine.impact.base import CellContext
 from app.services.engine.progress import RISK_COMPOSE, FINALIZE, lerp
 
 log = logging.getLogger(__name__)
@@ -40,17 +40,18 @@ def _risk_worker(idx: int) -> tuple[int, dict]:
     hev_norm = risk_engine.normalize_hev(hev)
     indices = risk_engine.cell_risk_indices(hev_norm)
 
-    # Per-Zell-Outcome + Kosten je Risiko materialisieren (Schicht B, Stufe 3): so wird
-    # aggregate() zur reinen Summe und der GeoPackage-Export erhält gefüllte Spalten.
-    # Null-Outcome/Kosten werden weggelassen (JSONB-Ersparnis); der Index bleibt immer.
-    cell_pop = float(ci.get("pop", 0.0) or 0.0)
+    # Per-Zell-Outcome + Kosten je Risiko materialisieren (Schicht B): registrierte
+    # Schadensfunktionen (Gesundheit ab Stufe 4) erhalten die volle CellContext, alle
+    # übrigen rechnen den linearen Legacy-Weg. aggregate() summiert die Zell-Werte; der
+    # GeoPackage-Export erhält gefüllte Spalten. Null-Outcome/Kosten werden weggelassen.
+    ctx = CellContext(ci=ci, hev=hev, hev_norm=hev_norm, indices=indices, regional=regional)
+    impacts = impact.compute_all_cell_impacts(ctx)
     risks: dict[str, dict] = {}
     for code, risk_idx in indices.items():
-        rdef = catalog.RISKS_BY_CODE[code]
-        imp = impact.compute_cell_impacts(rdef, risk_idx, cell_pop)
+        imp = impacts.get(code, {})
         entry = {"index": risk_idx}
-        outcome = round(imp["outcome"], 4)
-        cost = round(imp["cost_eur"], 2)
+        outcome = round(imp.get("outcome", 0.0), 4)
+        cost = round(imp.get("cost_eur", 0.0), 2)
         if outcome:
             entry["outcome"] = outcome
         if cost:

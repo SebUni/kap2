@@ -116,13 +116,16 @@ def test_old_cells_without_outcome_fall_back():
 
 # ── (f) Export-Spalten gefüllt ─────────────────────────────────────────────────
 
-def test_compute_cell_impacts_nonzero_for_pop_risk():
+def test_compute_cell_impacts_is_legacy_even_with_impact_fn():
     override_context.set_overrides({})
     rdef = catalog.RISKS_BY_CODE[MORT]
-    imp = impact.compute_cell_impacts(rdef, 50.0, 500.0)
-    assert imp["outcome"] > 0.0
-    assert imp["cost_eur"] > 0.0
-    assert not impact.has(MORT)  # Stufe 3: noch keine eigene Impact-Funktion registriert
+    imp = impact.compute_cell_impacts(rdef, 50.0, 500.0)  # Legacy-Einzelweg (Index + pop)
+    legacy = risk_engine.cell_outcome(rdef, 50.0, 500.0)
+    # compute_cell_impacts bleibt der Legacy-Weg (für die Aggregat-Nachrechnung von
+    # Alt-Zelldaten) — auch wenn MORT ab Stufe 4 eine Impact-Funktion hat.
+    assert abs(imp["outcome"] - legacy) < 1e-9
+    assert imp["outcome"] > 0.0 and imp["cost_eur"] > 0.0
+    assert impact.has(MORT)
 
 
 if __name__ == "__main__":

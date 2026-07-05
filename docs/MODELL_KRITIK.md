@@ -506,6 +506,15 @@ Stand Juli 2026, in committeten Stufen (Details siehe `git log` / Commit-Message
   GeoPackage-Export (`outcome`/`cost_eur` je Zelle jetzt gefüllt). Robuster Fallback für
   Alt-Zelldaten ohne materialisierten Outcome (Neuberechnung je Zelle). Die eigentlichen
   Schadensfunktionen (§6.1–6.4) und die `k_indirekt`-Konsolidierung folgen in Stufe 4/5.
+- **Stufe 4a — Gesundheits-Schadensfunktionen (erledigt):** Die 7 Gesundheitsrisiken
+  (§6.1) rechnen jetzt ``Betroffene · Rate · Dosis-Wirkung · g(V̂)`` je Zelle statt
+  ``ref·Index/100``. Hitzegetrieben über die nichtlineare attributable Fraktion
+  ``AF(Hitzetage)`` (überproportional durch die Schwelle — behebt §3.4), ereignis-
+  getrieben über die normierte Flut-/Sturmintensität. Alle Raten/Koeffizienten sind
+  editierbare, quellenbelegte Registry-Parameter (``risks.<CODE>.impact.*``; RKI/
+  Winklmayr 2022, UBA MK3.1, BBK, Prognos). ``ref_value`` ist nur noch Kalibrier-/
+  Sanity-Anker (``impact/sanity.py`` prüft die Größenordnung). Monetäre + operative +
+  Umwelt-Schadensfunktionen und ``k_indirekt`` folgen in Stufe 4b/5.
 - **Nach Schicht B verschoben (Stufe 3+, weil erst dort konsumiert):** die
   intensitäts-/wahrscheinlichkeitsbasierten Hazard-Datensätze
   KOSTRA-DWD (Bemessungsniederschlag), **JRC River Flood Hazard Maps** (EU-weite

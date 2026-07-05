@@ -15,10 +15,21 @@ from __future__ import annotations
 
 from typing import Callable
 
-# Registry: Risiko-Code → Impact-Funktion. Wird ab Stufe 4 (health/monetary/…) befüllt.
-# Signatur: fn(risk: dict, index: float, cell_pop: float, cell_area_km2: float) -> dict
-#           mit Rückgabe {"outcome": float, "cost_eur": float}.
+from app.data import catalog
+from app.services.engine.impact.legacy import legacy_cell_impact
+
+# Registry: Risiko-Code → Impact-Funktion (Signatur ``fn(risk, ctx: CellContext) -> dict``
+# mit Rückgabe {"outcome", "cost_eur"}). Ab Stufe 4 gruppenweise befüllt; Risiken ohne
+# Eintrag rechnen den linearen Legacy-Weg.
 IMPACT_FUNCTIONS: dict[str, Callable] = {}
+
+
+def _register() -> None:
+    from app.services.engine.impact.health import HEALTH_IMPACTS
+    IMPACT_FUNCTIONS.update(HEALTH_IMPACTS)
+
+
+_register()
 
 
 def has(code: str) -> bool:
@@ -29,9 +40,24 @@ def has(code: str) -> bool:
 def compute_cell_impacts(
     risk: dict, index: float, cell_pop: float, cell_area_km2: float | None = None
 ) -> dict:
-    """Outcome + Kosten einer Zelle für ein Risiko (dispatch: registriert → sonst legacy)."""
-    fn = IMPACT_FUNCTIONS.get(risk["code"])
-    if fn is not None:
-        return fn(risk, index, cell_pop, cell_area_km2)
-    from app.services.engine.impact.legacy import legacy_cell_impact
+    """Legacy-Einzelweg (Index + Bevölkerung) — für die Aggregat-Nachrechnung von
+    Alt-Zelldaten ohne materialisierten Outcome. Bewusst OHNE Dispatch: Alt-Daten
+    entstanden vor den Schicht-B-Funktionen und werden identisch (legacy) reproduziert."""
     return legacy_cell_impact(risk, index, cell_pop, cell_area_km2)
+
+
+def compute_all_cell_impacts(ctx) -> dict[str, dict]:
+    """Outcome + Kosten je Risiko für EINE Zelle (voller Dispatch, für den Runner).
+
+    Registrierte Schicht-B-Funktionen erhalten die volle ``CellContext``; alle übrigen
+    Risiken rechnen den linearen Legacy-Weg aus Zell-Index und -Bevölkerung.
+    """
+    out: dict[str, dict] = {}
+    for risk in catalog.RISKS:
+        code = risk["code"]
+        fn = IMPACT_FUNCTIONS.get(code)
+        if fn is not None:
+            out[code] = fn(risk, ctx)
+        else:
+            out[code] = legacy_cell_impact(risk, ctx.indices.get(code, 0.0), ctx.pop)
+    return out

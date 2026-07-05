@@ -6,6 +6,12 @@ from typing import Any
 
 from app.data import catalog, sources
 from app.services.engine import formulas
+from app.services.engine.impact.params import IMPACT_PARAM_SPECS
+
+# Impact-Parameter (Schicht B) je Risiko gruppiert für die Emission in der Risiko-Schleife.
+_IMPACT_SPECS_BY_RISK: dict[str, list[dict]] = {}
+for _spec in IMPACT_PARAM_SPECS:
+    _IMPACT_SPECS_BY_RISK.setdefault(_spec["risk"], []).append(_spec)
 
 PATHWAY_WEIGHT_LABELS = {
     "primary": "Gewicht primärer Pfad",
@@ -124,6 +130,18 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source=r.get("cost_source") or "Modellannahme (Kostensatz, unbelegt)",
                 source_detail=r.get("cost_source_detail", ""),
                 references=sources.resolve(r.get("cost_source_refs")),
+            ))
+        # Schicht-B-Schadensfunktions-Parameter (baseline_mort, β, Schwellen, Raten …).
+        for spec in _IMPACT_SPECS_BY_RISK.get(r["code"], []):
+            params.append(_base_param(
+                f"risks.{r['code']}.impact.{spec['key']}",
+                layer_code=r["code"], layer_category="risks",
+                label=f"Schadensfunktion: {spec['label']}",
+                value=spec["value"],
+                unit=spec.get("unit", ""),
+                source=spec.get("source", ""),
+                source_detail=spec.get("source_detail", ""),
+                references=sources.resolve(spec.get("source_refs")),
             ))
 
     for cat_key, items in (

@@ -762,23 +762,35 @@ def risk_pathway_cell_breakdown(risk: dict, hev_norm: dict) -> dict:
 
 def _outcome_factor_meta(risk: dict) -> list[dict]:
     """Statische Outcome-Faktoren (Referenz + Skalierung) für Tooltips."""
+    from app.services.engine import impact
+
     scale = risk.get("scale", "pop")
     unit = risk.get("outcome_unit", "")
     ref = float(risk.get("ref_value", 0.0))
     is_monetary = risk.get("cost_dimension") == "monetary"
-    ref_source = (
-        "Schadenskosten-Schätzung (Risikokatalog)"
-        if is_monetary
-        else "Referenz-Outcome bei Index 100 / 100.000 Ew. (Risikokatalog)"
-    )
+    has_impact = impact.has(risk["code"])
+    if has_impact:
+        # ref_value ist bei Risiken mit Schadensfunktion nur noch Kalibrier-/Sanity-Anker.
+        ref_source = "Kalibrier-/Sanity-Anker (Schicht B, kein Rechenweg)"
+        ref_label = "Referenzwert (Kalibrier-/Sanity-Anker)"
+    else:
+        ref_source = (
+            "Schadenskosten-Schätzung (Risikokatalog)"
+            if is_monetary
+            else "Referenz-Outcome bei Index 100 / 100.000 Ew. (Risikokatalog)"
+        )
+        ref_label = "Referenzwert (Index = 100)"
     factors: list[dict] = [{
         "key": "ref_value",
-        "label": "Referenzwert (Index = 100)",
+        "label": ref_label,
         "value": ref,
         "unit": unit,
         "source": ref_source,
         "prov": "param",
     }]
+    if has_impact:
+        # Bei Schadensfunktionen keine Index/Skalierungs-Faktoren als Rechenweg zeigen.
+        return factors
     if scale == "pop":
         factors.append({
             "key": "scale_factor",
@@ -819,7 +831,13 @@ def risk_recipe(risk: dict) -> dict:
         if pathways
         else "Index = 0"
     )
-    if scale == "pop":
+    from app.services.engine import impact
+    if impact.has(risk["code"]):
+        outcome = (
+            f"Outcome = Schadensfunktion je Zelle (Betroffene · Rate · Dosis-Wirkung · g(V̂)), "
+            f"summiert über Zellen  →  {unit}. Der Index bleibt Screening-Kennzahl."
+        )
+    elif scale == "pop":
         outcome = (
             f"Outcome = Referenz · (Index/100) · (Einwohner_zelle/100.000)"
             f"  →  {unit}"
