@@ -10,8 +10,12 @@ abbilden:
     neuer_Index = Basis-Index × factor
 
 mit ``r_applied`` aus ``default_reduction`` und Deckungsgrad der Zelle.
-Kosten/Nutzen je Maßnahme werden aus den Katalog-Kostensätzen plus der
-monetarisierten Schadensreduktion (für monetäre Risiken) bestimmt.
+
+Kosten je Maßnahme kommen aus den Katalog-Kostensätzen (CAPEX/OPEX). Der Nutzen ist
+das **tatsächliche Delta der summierten Zellkosten** (E3): je abgedeckter Zelle und
+verknüpftem Risiko ``Zellkosten · (1 − factor)``. Damit ist der ausgewiesene
+Maßnahmen-Nutzen für pop-/area-skalierte Risiken exakt der Beitrag zur „Vermiedene
+Schäden"-Kennzahl des Kommunen-Aggregats (dieselbe Σ-über-Zellen-Basis).
 """
 
 from __future__ import annotations
@@ -27,9 +31,23 @@ from app.models.models import (
     AdaptationMeasure, CellAssessment, GridCell, MeasureImpact, Kommune,
 )
 from app.services import parameter_registry
-from app.services.engine import risk_engine
+from app.services.engine import impact, risk_engine
 
 log = logging.getLogger(__name__)
+
+
+def _cell_cost(risk: dict, cell_risk: dict, cell_pop: float) -> float:
+    """Zellkosten eines Risikos – identische Basis wie ``risk_engine.aggregate``.
+
+    Materialisierte ``cost_eur`` nutzen; für Alt-Zelldaten ohne Outcome (Kommune vor
+    Neuberechnung) den linearen Legacy-Weg nachrechnen. Dadurch ist das Maßnahmen-
+    Nutzen-Delta exakt der Zellsummen-Unterschied zwischen Basis- und Mit-Maßnahmen-
+    Aggregat (dessen Fallback dieselbe Legacy-Nachrechnung nutzt).
+    """
+    if cell_risk.get("outcome") is None:
+        idx = float(cell_risk.get("index", 0.0))
+        return impact.compute_cell_impacts(risk, idx, cell_pop)["cost_eur"]
+    return float(cell_risk.get("cost_eur", 0.0))
 
 
 def _coverage(db: Session, measure: AdaptationMeasure) -> tuple[dict[int, float], float]:
@@ -233,34 +251,39 @@ def compute_impact(db: Session, measure_id: int) -> dict:
         db.query(CellAssessment).filter(CellAssessment.grid_cell_id.in_(cell_ids)).all()
     }
 
-    # Basis-Aggregat (für monetäre Nutzenbewertung)
-    all_cells = db.query(CellAssessment).filter(
-        CellAssessment.kommune_id == measure.kommune_id).all()
-    total_index_by_risk: dict[str, float] = {}
-    for ca in all_cells:
-        for code in linked:
-            total_index_by_risk[code] = total_index_by_risk.get(code, 0.0) + \
-                float((ca.data or {}).get("risks", {}).get(code, {}).get("index", 0.0))
-
-    base_agg = get_risk_aggregate(db, measure.kommune_id, apply_measures=False)
-
     db.query(MeasureImpact).filter(MeasureImpact.measure_id == measure_id).delete()
 
+    # Nutzen = tatsächliches Delta der summierten Zellkosten (E3): je abgedeckter Zelle
+    # und verknüpftem Risiko  Zellkosten · (1 − factor). Für pop-/area-skalierte Risiken
+    # ist das exakt der Beitrag dieser Maßnahme zu „Vermiedene Schäden" (Σ-über-Zellen im
+    # Aggregat), weil dieselbe Zellkosten-Basis (``_cell_cost`` = Aggregat-Basis) und
+    # derselbe multiplikative Zell-Faktor benutzt werden. Flache Ausfall-/Screening-
+    # Risiken sind nicht zell-additiv (Aggregat rechnet sie P90-basiert) und tragen hier
+    # nichts bei; ihre Minderung erscheint im Kommunen-Aggregat „mit Maßnahmen".
     covered_base_index: dict[str, float] = {}
     covered_new_index: dict[str, float] = {}
+    annual_benefit_damage = 0.0
 
     for cid, frac in coverage.items():
         ca = assessments.get(cid)
         if not ca:
             continue
         factor = _reduction_factor(mdef, frac, unit_factor)
+        data = ca.data or {}
+        cell_pop = float(data.get("inputs", {}).get("pop", 0.0) or 0.0)
+        cell_risks = data.get("risks", {})
         deltas = {}
         for code in linked:
-            base_idx = float((ca.data or {}).get("risks", {}).get(code, {}).get("index", 0.0))
+            r = cell_risks.get(code, {})
+            base_idx = float(r.get("index", 0.0))
             new_idx = base_idx * factor
             deltas[code] = round(new_idx - base_idx, 3)
             covered_base_index[code] = covered_base_index.get(code, 0.0) + base_idx
             covered_new_index[code] = covered_new_index.get(code, 0.0) + new_idx
+            risk = catalog.RISKS_BY_CODE.get(code)
+            if (risk and catalog.risk_contributes_to_total(risk)
+                    and risk.get("scale", "pop") in ("pop", "area")):
+                annual_benefit_damage += _cell_cost(risk, r, cell_pop) * (1.0 - factor)
         db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid, indicator_deltas=deltas))
 
     # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente)
@@ -268,22 +291,6 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     capex = cost_breakdown["capex"]["total_eur"]
     opex_annual = cost_breakdown["opex"]["total_eur"]
     annual_benefit_direct = float(mdef.get("benefit_per_m2_year") or 0.0) * covered_area_m2
-
-    # Monetarisierte Schadensreduktion: alle Risiken, die einen €-Beitrag zur
-    # Gesamtschadenssumme liefern (monetäre Sektorschäden + über Kostensätze
-    # monetarisierte Gesundheits-/Ausfall-/Umweltrisiken). Reine Index-Risiken
-    # (Kostensatz 0) tragen nichts bei und werden übersprungen.
-    annual_benefit_damage = 0.0
-    for code in linked:
-        risk = catalog.RISKS_BY_CODE.get(code)
-        if not risk or not catalog.risk_contributes_to_total(risk):
-            continue
-        total_idx = total_index_by_risk.get(code, 0.0)
-        if total_idx <= 0:
-            continue
-        risk_cost = base_agg["risks"].get(code, {}).get("cost_eur", 0.0)
-        reduced_share = (covered_base_index.get(code, 0.0) - covered_new_index.get(code, 0.0)) / total_idx
-        annual_benefit_damage += risk_cost * max(0.0, reduced_share)
 
     avg_reduction = 0.0
     if covered_base_index:
