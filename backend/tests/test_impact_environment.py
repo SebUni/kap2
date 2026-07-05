@@ -19,17 +19,27 @@ from app.services.engine.impact.base import CellContext
 HABITAT = "EXPECTED_HABITAT_LOSS"
 
 
+def _abs(code: str, frac: float) -> float:
+    """Absoluter Hazard-Wert, der über die Katalog-Referenzgrenzen auf ``frac`` normiert
+    (Schicht B liest seit §8/B6-Umfeld die absolute Intensität via ``haz_intensity``)."""
+    m = catalog.INDICATOR_BY_CODE.get(code, {})
+    lo = float(m.get("norm_min", 0.0))
+    hi = float(m.get("norm_max", 1.0))
+    return lo + frac * (hi - lo)
+
+
 def _ctx(forest=0.2, drought=0.4, vnorm=0.5):
     hn = {"hazards": {"DROUGHT": drought, "WILDFIRE": 0.2, "SEA_LEVEL_RISE": 0.0,
                       "MEAN_TEMPERATURE_RISE": 0.3, "HEAT_WAVE": 0.3, "HEAVY_RAIN_FLOOD": 0.3,
                       "SOIL_SALINIZATION": 0.0},
           "exposures": {}, "vulnerabilities": {}}
+    hev = {"hazards": {c: _abs(c, f) for c, f in hn["hazards"].items()},
+           "exposures": {}, "vulnerabilities": {}}
     for r in catalog.RISKS:
         for v in r["vulnerabilities"]:
             hn["vulnerabilities"][v] = vnorm
     ci = {"forest_frac": forest, "green_frac": 0.1, "water_frac": 0.05, "farmland_frac": 0.3}
-    return CellContext(ci=ci, hev={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
-                       hev_norm=hn, indices={}, regional={})
+    return CellContext(ci=ci, hev=hev, hev_norm=hn, indices={}, regional={})
 
 
 def test_habitat_loss_scales_with_area():

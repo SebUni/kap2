@@ -43,8 +43,29 @@ class CellContext:
         return float(self.hev.get("hazards", {}).get(code, 0.0) or 0.0)
 
     def haz_norm(self, code: str) -> float:
-        """Normierter Hazard-Wert der Zelle (0..1)."""
+        """Screening-normierter Hazard-Wert der Zelle (0..1), MIT Norm-Overrides.
+
+        Nur für Screening/Index gedacht — NICHT als Schadensfunktions-Treiber, sonst
+        veränderte ein editierter Screening-Normbereich die absoluten Schäden (§3.3)."""
         return float(self.hev_norm.get("hazards", {}).get(code, 0.0) or 0.0)
+
+    def haz_intensity(self, code: str) -> float:
+        """Normierte Hazard-Intensität (0..1) mit FIXEN Katalog-Referenzgrenzen.
+
+        Treiber der Schicht-B-Schadensfunktionen: entkoppelt von den editierbaren
+        Screening-Normgrenzen (norm_min/max). Damit ändert ein Screening-Norm-Override
+        NICHT mehr die absoluten €/Outcome-Werte (behebt die §3.3-Restlücke); die
+        Schicht-B-Editierbarkeit läuft ausschließlich über die Impact-Parameter
+        (Rate/Kurve/Assetwert), nicht über die Screening-Normierung. Ohne Norm-Override
+        ist ``haz_intensity`` identisch zu ``haz_norm`` (gleiche Katalog-Grenzen)."""
+        from app.data import catalog
+        meta = catalog.INDICATOR_BY_CODE.get(code, {})
+        lo = float(meta.get("norm_min", 0.0))
+        hi = float(meta.get("norm_max", 1.0))
+        if hi <= lo:
+            return 0.0
+        x = (self.haz(code) - lo) / (hi - lo)
+        return max(0.0, min(1.0, x))
 
     def g(self, risk: dict) -> float:
         """Vulnerabilitäts-Modifikator 0,5 + Mittel(V̂) des Risikos (0,5..1,5)."""

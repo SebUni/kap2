@@ -23,11 +23,22 @@ from app.services.engine.impact.curves import damage_fraction
 BUILD = "EXPECTED_BUILDING_DAMAGE_EUR"
 
 
+def _abs(code: str, frac: float) -> float:
+    """Absoluter Hazard-Wert, der über die Katalog-Referenzgrenzen auf ``frac`` normiert
+    (Schicht B liest die absolute Intensität via ``haz_intensity``, §3.3-Entkopplung)."""
+    m = catalog.INDICATOR_BY_CODE.get(code, {})
+    lo = float(m.get("norm_min", 0.0))
+    hi = float(m.get("norm_max", 1.0))
+    return lo + frac * (hi - lo)
+
+
 def _ctx(pop=250.0, flood=0.4, vnorm=0.5, bldg_cov=0.2, avg_height=7.0):
     hn = {"hazards": {"HEAVY_RAIN_FLOOD": flood, "EXTRATROPICAL_STORM": 0.3, "HEAT_WAVE": 0.3,
                       "DROUGHT": 0.3, "SEA_LEVEL_RISE": 0.0, "SURFACE_WATER_HEATING": 0.3,
                       "LOW_FLOW_NIEDRIGWASSER": 0.3, "SOIL_SALINIZATION": 0.0},
           "exposures": {}, "vulnerabilities": {}}
+    hev = {"hazards": {c: _abs(c, f) for c, f in hn["hazards"].items()},
+           "exposures": {}, "vulnerabilities": {}}
     for r in catalog.RISKS:
         for v in r["vulnerabilities"]:
             hn["vulnerabilities"][v] = vnorm
@@ -35,8 +46,7 @@ def _ctx(pop=250.0, flood=0.4, vnorm=0.5, bldg_cov=0.2, avg_height=7.0):
           "transport_hub_count": 1, "energy_infra_count": 1, "communication_count": 1,
           "water_wastewater_count": 1, "farmland_frac": 0.3, "forest_frac": 0.2,
           "green_frac": 0.2, "water_frac": 0.1}
-    return CellContext(ci=ci, hev={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
-                       hev_norm=hn, indices={}, regional={})
+    return CellContext(ci=ci, hev=hev, hev_norm=hn, indices={}, regional={})
 
 
 # ── (a) Assetwert-Skalierung ────────────────────────────────────────────────────
@@ -46,6 +56,23 @@ def test_building_damage_scales_with_asset():
     low = impact.compute_all_cell_impacts(_ctx(bldg_cov=0.1))[BUILD]["cost_eur"]
     high = impact.compute_all_cell_impacts(_ctx(bldg_cov=0.2))[BUILD]["cost_eur"]
     assert abs(high - 2.0 * low) < 1e-6   # doppelte Bebauung → doppelter Assetwert → doppelt
+
+
+# ── §3.3-Entkopplung: Schadensfunktion ignoriert Screening-Norm-Overrides ──────
+
+def test_haz_intensity_ignores_screening_norm_override():
+    """haz_intensity nutzt FIXE Katalog-Referenzgrenzen; ein Screening-Norm-Override
+    ändert nur die Index-Normierung (normalize_value), nicht die absolute Intensität —
+    damit verschiebt ein Norm-Edit nicht mehr die absoluten Schäden (§3.3/§8)."""
+    ctx = _ctx(flood=0.4)   # HEAVY_RAIN_FLOOD absolut = 40 (Grenzen 0..100 → 0,4)
+    override_context.set_overrides({})
+    base_int = ctx.haz_intensity("HEAVY_RAIN_FLOOD")
+    base_norm = override_context.normalize_value("HEAVY_RAIN_FLOOD", ctx.haz("HEAVY_RAIN_FLOOD"))
+    override_context.set_overrides({"hazards.HEAVY_RAIN_FLOOD.norm_max": 50.0})
+    assert ctx.haz_intensity("HEAVY_RAIN_FLOOD") == base_int          # fixe Grenzen: unverändert
+    assert override_context.normalize_value(
+        "HEAVY_RAIN_FLOOD", ctx.haz("HEAVY_RAIN_FLOOD")) != base_norm  # Screening ändert sich
+    override_context.set_overrides({})
 
 
 # ── (b) Konvexe Schadenskurve ───────────────────────────────────────────────────

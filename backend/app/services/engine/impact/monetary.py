@@ -35,7 +35,9 @@ def _sector(ctx: CellContext, risk: dict, asset_value: float,
     """Assetwert · Jahresverlustrate · konvexe Schadenskurve(Intensität) · g(V̂)."""
     loss_rate = ctx.p(risk["code"], "max_loss_rate", loss_default)
     exponent = ctx.pg("damage_exponent", 1.5)
-    intensity = max((ctx.haz_norm(h) for h in hazard_codes), default=0.0)
+    # Fixe Katalog-Referenzgrenzen (haz_intensity), damit Screening-Norm-Overrides die
+    # absoluten Schäden nicht verändern (§3.3-Restlücke).
+    intensity = max((ctx.haz_intensity(h) for h in hazard_codes), default=0.0)
     frac = damage_fraction(intensity, exponent)
     return _result(asset_value * loss_rate * frac * ctx.g(risk))
 
@@ -115,8 +117,8 @@ def aquaculture_damage(risk, ctx):
 
 def migration_costs(risk, ctx):
     ref = ctx.p(risk["code"], "cost_ref_per_100k", 400_000.0)
-    driver = max(ctx.haz_norm("SEA_LEVEL_RISE"), ctx.haz_norm("HEAVY_RAIN_FLOOD"),
-                 ctx.haz_norm("DROUGHT"))
+    driver = max(ctx.haz_intensity("SEA_LEVEL_RISE"), ctx.haz_intensity("HEAVY_RAIN_FLOOD"),
+                 ctx.haz_intensity("DROUGHT"))
     outcome = (ctx.pop / 100_000.0) * ref * driver * ctx.g(risk)
     return _result(outcome)
 

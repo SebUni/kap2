@@ -55,10 +55,11 @@ def morbidity(risk: dict, ctx: CellContext) -> dict:
 def injuries(risk: dict, ctx: CellContext) -> dict:
     code = risk["code"]
     rate = ctx.p(code, "rate_per_100k", 150.0)
-    # Ereignisgetrieben: normierte Intensität des stärksten relevanten Hazards.
-    driver = max(ctx.haz_norm("HEAVY_RAIN_FLOOD"),
-                 ctx.haz_norm("EXTRATROPICAL_STORM"),
-                 ctx.haz_norm("LANDSLIDE"))
+    # Ereignisgetrieben: Intensität des stärksten relevanten Hazards (fixe Katalog-
+    # Referenzgrenzen, entkoppelt von Screening-Norm-Overrides — §3.3-Restlücke).
+    driver = max(ctx.haz_intensity("HEAVY_RAIN_FLOOD"),
+                 ctx.haz_intensity("EXTRATROPICAL_STORM"),
+                 ctx.haz_intensity("LANDSLIDE"))
     outcome = ctx.pop * (rate / 100_000.0) * driver * ctx.g(risk)
     return _result(risk, outcome)
 
@@ -69,9 +70,10 @@ def mental_health(risk: dict, ctx: CellContext) -> dict:
     code = risk["code"]
     rate = ctx.p(code, "rate_per_100k", 1500.0)
     af = _heat_af(ctx, code, 0.0012, 10.0)
-    # zusätzlicher Ereignisanteil (Extremereignisse/Kaskaden/Dürre)
-    event = max(ctx.haz_norm("COMPOUND_EVENT"), ctx.haz_norm("CASCADE_EVENT"),
-                ctx.haz_norm("DROUGHT"))
+    # zusätzlicher Ereignisanteil (Extremereignisse/Kaskaden/Dürre); fixe Katalog-
+    # Referenzgrenzen (haz_intensity, §3.3-Restlücke).
+    event = max(ctx.haz_intensity("COMPOUND_EVENT"), ctx.haz_intensity("CASCADE_EVENT"),
+                ctx.haz_intensity("DROUGHT"))
     driver = min(1.0, af + 0.3 * event)
     outcome = ctx.pop * (rate / 100_000.0) * driver * ctx.g(risk)
     return _result(risk, outcome)
@@ -82,9 +84,9 @@ def mental_health(risk: dict, ctx: CellContext) -> dict:
 def affected_evacuated(risk: dict, ctx: CellContext) -> dict:
     code = risk["code"]
     rate = ctx.p(code, "rate_per_100k", 2500.0)
-    driver = max(ctx.haz_norm("HEAVY_RAIN_FLOOD"),
-                 ctx.haz_norm("STORM_SURGE"),
-                 ctx.haz_norm("WILDFIRE"))
+    driver = max(ctx.haz_intensity("HEAVY_RAIN_FLOOD"),
+                 ctx.haz_intensity("STORM_SURGE"),
+                 ctx.haz_intensity("WILDFIRE"))
     outcome = ctx.pop * (rate / 100_000.0) * driver * ctx.g(risk)
     return _result(risk, outcome)
 

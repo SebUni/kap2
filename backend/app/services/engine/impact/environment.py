@@ -26,7 +26,9 @@ def _result(risk: dict, outcome: float) -> dict:
 
 
 def _driver(ctx: CellContext, hazard_codes: list[str]) -> float:
-    return max((ctx.haz_norm(h) for h in hazard_codes), default=0.0)
+    # Fixe Katalog-Referenzgrenzen (haz_intensity): Screening-Norm-Overrides ändern die
+    # absoluten Flächen-/Artenverluste nicht (§3.3-Restlücke).
+    return max((ctx.haz_intensity(h) for h in hazard_codes), default=0.0)
 
 
 # ── Biodiversitätsverlust (Arten/Jahr) ─────────────────────────────────────────

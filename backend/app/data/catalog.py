@@ -2722,4 +2722,4 @@ def group_label(code: str) -> str:
 # Wird bei strukturellen Modelländerungen (Risiko-Set, Kostensätze, Aggregation)
 # erhöht. Der Layer-Cache stempelt seine Dateien mit dieser Version und invalidiert
 # automatisch, wenn sich die Version ändert (siehe services/layer_cache.py).
-MODEL_VERSION = "2026.07-schichtB-nachbesserung-n1"
+MODEL_VERSION = "2026.07-schichtB-nachbesserung-n6"
