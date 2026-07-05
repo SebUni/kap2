@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api/client'
 import type { ActiveLayer } from '../store'
 import type {
-  CatalogMeasure, LayerRecipeMeta, ModelParameter, PathwayRecipeMeta, RiskRecipe,
+  LayerRecipeMeta, ModelParameter, PathwayRecipeMeta, RiskRecipe,
 } from '../types'
 import LineageFlowDiagram from './LineageFlowDiagram'
 import { useStore } from '../store'
@@ -13,12 +13,15 @@ interface Props {
   onOpenConfig: () => void
 }
 
+type InfoTab = 'logic' | 'reason'
+
 export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) {
-  const { kommune, catalog } = useStore()
+  const { kommune } = useStore()
   const [meta, setMeta] = useState<LayerRecipeMeta | null>(null)
   const [parameters, setParameters] = useState<ModelParameter[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [tab, setTab] = useState<InfoTab>('logic')
 
   const load = async () => {
     if (!kommune) return
@@ -39,10 +42,12 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
   }
 
   useEffect(() => { load() }, [kommune?.id, layer.code, layer.category])
+  // Beim Ebenenwechsel zurück auf den Berechnungs-Tab
+  useEffect(() => { setTab('logic') }, [layer.code, layer.category])
 
-  const measureMeta = layer.category === 'measures' && catalog
-    ? catalog.measures.find(m => m.code === layer.code)
-    : null
+  const justifications = useMemo(() => pathwayJustifications(meta?.recipe), [meta])
+  const hasReasoning = justifications.length > 0
+  const activeTab: InfoTab = tab === 'reason' && !hasReasoning ? 'logic' : tab
 
   const title = meta?.description?.trim() || meta?.label || layer.code
   const showDescription = meta?.description && meta.description.trim() !== title
@@ -61,11 +66,34 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
           <button type="button" onClick={onClose} className="help-overlay-close">✕</button>
         </div>
 
+        {!loading && !error && meta && hasReasoning && (
+          <div className="layer-info-tabs" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'logic'}
+              className={`layer-info-tab${activeTab === 'logic' ? ' active' : ''}`}
+              onClick={() => setTab('logic')}
+            >
+              Berechnungslogik
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'reason'}
+              className={`layer-info-tab${activeTab === 'reason' ? ' active' : ''}`}
+              onClick={() => setTab('reason')}
+            >
+              Wirkungsbegründung
+            </button>
+          </div>
+        )}
+
         <div className="help-overlay-body layer-info-body">
           {loading && <p style={{ color: 'var(--text-muted)' }}>Lade …</p>}
           {error && <p style={{ color: 'var(--danger, #dc2626)' }}>{error}</p>}
 
-          {!loading && !error && meta && (
+          {!loading && !error && meta && activeTab === 'logic' && (
             <>
               {showDescription && (
                 <p className="layer-info-desc">{meta.description}</p>
@@ -83,9 +111,11 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
                   Kein Herkunftsdiagramm für diese Ebene verfügbar.
                 </p>
               )}
-              {measureMeta && <MeasureInfo measure={measureMeta} />}
-              <PathwayJustifications recipe={meta.recipe} />
             </>
+          )}
+
+          {!loading && !error && meta && activeTab === 'reason' && (
+            <PathwayJustifications pathways={justifications} recipe={meta.recipe} />
           )}
         </div>
 
@@ -103,7 +133,7 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
   )
 }
 
-function isRiskRecipe(r: LayerRecipeMeta['recipe']): r is RiskRecipe {
+function isRiskRecipe(r: LayerRecipeMeta['recipe'] | undefined): r is RiskRecipe {
   return !!r && Array.isArray((r as RiskRecipe).pathways)
 }
 
@@ -113,33 +143,36 @@ const PATHWAY_TYPE_ORDER: Record<string, number> = {
   compound_multi: 8,
 }
 
-/**
- * Begründung der Wirkungsketten: eigene Info-Sektion, die für jede kuratierte
- * Wirkungskette die fachliche Herleitung + Quelle (KWRA 2021 / GIZ Vulnerability
- * Sourcebook) sichtbar macht (Stufe 1 — Pfad-Kuratierung).
- */
-function PathwayJustifications({ recipe }: { recipe: LayerRecipeMeta['recipe'] }) {
-  if (!isRiskRecipe(recipe)) return null
-  const pathways = (recipe.pathways || [])
+/** Begründete Wirkungsketten aus dem Recipe extrahieren (leer für Nicht-Risiken). */
+function pathwayJustifications(recipe: LayerRecipeMeta['recipe'] | undefined): PathwayRecipeMeta[] {
+  if (!isRiskRecipe(recipe)) return []
+  return (recipe.pathways || [])
     .filter((p): p is PathwayRecipeMeta => !!p.justification)
     .slice()
     .sort((a, b) => (PATHWAY_TYPE_ORDER[a.type] ?? 9) - (PATHWAY_TYPE_ORDER[b.type] ?? 9))
-  if (!pathways.length) return null
+}
 
+/**
+ * Wirkungsbegründung-Tab: zeigt für jede kuratierte Wirkungskette die fachliche
+ * Herleitung + Quelle (KWRA 2021 / GIZ Vulnerability Sourcebook) — Stufe 1.
+ */
+function PathwayJustifications({
+  pathways, recipe,
+}: { pathways: PathwayRecipeMeta[]; recipe: LayerRecipeMeta['recipe'] }) {
+  if (!pathways.length) return null
   const cluster = pathways.find(p => p.cluster)?.cluster
 
   return (
     <section className="kap-pathway-justify">
-      <h3 className="kap-pathway-justify-title">Begründung der Wirkungsketten</h3>
       {cluster && (
         <p className="kap-pathway-justify-cluster">
           Handlungsfeld/Cluster: <strong>{cluster}</strong>
         </p>
       )}
       <p className="kap-pathway-justify-intro">
-        Die Ketten folgen dem Wirkungsketten-Ansatz (Klimasignal → Exposition ×
+        Die Wirkungsketten folgen dem Wirkungsketten-Ansatz (Klimasignal → Exposition ×
         Empfindlichkeit) der KWRA 2021 bzw. des GIZ Vulnerability Sourcebook. Der Index
-        ist das Maximum der gewichteten Ketten (die stärkste Kette bestimmt den Wert).
+        ist das Maximum der gewichteten Ketten — die stärkste Kette bestimmt den Wert.
       </p>
       <ol className="kap-pathway-justify-list">
         {pathways.map((p, i) => {
@@ -167,17 +200,9 @@ function PathwayJustifications({ recipe }: { recipe: LayerRecipeMeta['recipe'] }
           )
         })}
       </ol>
+      {isRiskRecipe(recipe) && recipe.formula_index_header && (
+        <p className="kap-pathway-justify-formula">{recipe.formula_index_header}</p>
+      )}
     </section>
-  )
-}
-
-function MeasureInfo({ measure }: { measure: CatalogMeasure }) {
-  return (
-    <div className="kap-measure-info">
-      <p><strong>Wirkungsziel:</strong> {measure.effect_target?.join(', ') || '—'}</p>
-      <p><strong>Verknüpfte Risiken:</strong> {measure.linked_risk_codes?.join(', ') || '—'}</p>
-      <p><strong>Standard-Reduktion:</strong> {(measure.default_reduction * 100).toFixed(0)} %</p>
-      {measure.description && <p>{measure.description}</p>}
-    </div>
   )
 }

@@ -1792,12 +1792,42 @@ body {
   margin: 6px 0;
 }
 
+/* ── Info-Fenster: Tabs (Berechnungslogik / Wirkungsbegründung) ────────────── */
+
+.layer-info-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  flex-shrink: 0;
+}
+
+.layer-info-tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 9px 14px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.layer-info-tab:hover {
+  color: var(--text, #0f172a);
+}
+
+.layer-info-tab.active {
+  color: var(--accent, #2563eb);
+  border-bottom-color: var(--accent, #2563eb);
+}
+
 /* ── Begründung der Wirkungsketten (Info-Fenster) ──────────────────────────── */
 
 .kap-pathway-justify {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border, #e2e8f0);
+  margin-top: 2px;
 }
 
 .kap-pathway-justify-title {
@@ -1805,6 +1835,15 @@ body {
   font-weight: 700;
   margin: 0 0 6px;
   color: var(--text, #0f172a);
+}
+
+.kap-pathway-justify-formula {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border, #e2e8f0);
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 .kap-pathway-justify-cluster,
