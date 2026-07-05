@@ -182,14 +182,58 @@ regionaler Konstantwert (`COMPOUND_EVENT`, `CASCADE_EVENT`) modelliert.
 ### Outcome & Kosten (`estimate_outcome_and_cost`)
 - `outcome = ref_value · (mean_index/100) · scale_factor`
 - `scale`: `pop` → Einwohner/100 000, `area` → Fläche/50 km², `flat` → 1
-- Kosten: bei `cost_dimension = monetary` ist `cost_eur = outcome`;
-  sonst `outcome · cost_per_outcome_eur` (z. B. Mortalität × Wert eines
-  statistischen Lebens).
+- **Monetarisierung (jedes Risiko fließt monetär ein):**
+  - `cost_dimension = monetary` → `ref_value` liegt bereits in €/Jahr vor,
+    also `cost_eur = outcome` (impliziter Kostensatz 1 €/€, kein separater
+    Parameter).
+  - alle anderen (Gesundheit, operativ, Umwelt) → `cost_eur = outcome ·
+    cost_per_outcome`, wobei `cost_per_outcome` ein **eigenständiger, editier-
+    und override-fähiger Registry-Parameter** je Risiko ist
+    (`risks.<CODE>.cost_per_outcome`, Einheit „€ je <Outcome>“). Beispiele:
+    Mortalität × VSL (3,5 Mio €, OECD 2012), Ausfallstunden × Cost-of-Outage
+    (EWI-VoLL 2015 / BBK-KRITIS), Habitat-ha × Ökosystemwert (TEEB-DE).
+  - Der VSL und alle übrigen Kostensätze sind damit in der Konfigurations-UI,
+    im Info-Tooltip und im Parameter-Excel sichtbar/belegt – nicht mehr als
+    Prosa im `ref_value`-Tooltip versteckt.
+- **Reine Screening-Index-Risiken** (`outcome_unit = "Index"`,
+  `catalog.INDEX_ONLY_RISK_CODES`) tragen bewusst **0 €** bei: ihr Schaden ist
+  bereits über die konkreten monetär bewerteten Risiken erfasst; eine eigene
+  €-Bewertung wäre Doppelzählung (im `cost_source_detail` begründet). Ihr
+  Kostensatz ist editierbar 0 und kann bei Bedarf gesetzt werden.
+- Helfer: `catalog.risk_is_monetary`, `risk_contributes_to_total`,
+  `risk_default_cost_per_outcome`, `cost_unit_label`.
+
+### Gesamtschaden = Summe der Einzelrisiken
+`cost.total_eur = Σ cost_eur` über alle Risiken. Es gibt **kein eigenständiges
+Gesamtschaden-/EAD-Risiko mehr** (früher `EXPECTED_TOTAL_DAMAGE_EAD_EUR`, das
+per Konstruktion ~die Summe der Sektorschäden abbildete und diese in `total_eur`
+verdoppelte). Der Dashboard-KPI „Erwartete Schäden gesamt“ ist damit die
+nachrechenbare Summe der monetarisierten Einzelrisiken.
+
+> **Verbleibende Überlappungen (dokumentiert, nicht behoben):** Die additiven
+> Folgekosten-Risiken (Wiederherstellung, indirekte Verluste, Versorgungsengpässe,
+> Standortnachteile, verzögerte Schäden) sind fachlich Teil-/Folgemengen der
+> direkten Sektorschäden und überlappen diese teilweise (siehe
+> `docs/MODELL_KRITIK.md` §3.7 / §6.2). Eine saubere Konsolidierung über einen
+> Indirekt-Multiplikator `k_indirekt` ist Teil der noch offenen Schadensfunktions-
+> Schicht (Option C) und hier bewusst nicht umgesetzt. Ebenso grenzen sich die
+> physischen Umwelt-Flächenverluste (Biodiversität/Habitat) vom laufenden
+> „Verlust von Ökosystemleistungen“ ab (im `cost_source_detail` erläutert).
 
 ### Aggregation (`risk_engine.aggregate`)
-Je Risiko: Mittel-Index über alle Zellen, Max-Index, Outcome, Kosten.
+Je Risiko: P90-Index über alle Zellen, Max-Index, Outcome, Kosten.
 Je KWRA-Gruppe: Mittelwert der Risiko-Indizes (übergreifende Metrik fürs
-Spinnendiagramm).
+Spinnendiagramm). `total_eur` = Summe der Einzel-`cost_eur`.
+
+### Modellversion & Cache-Invalidierung
+Strukturelle Modelländerungen (Risiko-Set, Kostensätze) erhöhen
+`catalog.MODEL_VERSION`. Der Layer-Cache (`layer_cache.py`) stempelt jedes
+Kommune-Cache-Verzeichnis mit dieser Version (`.model_version`) und leert es
+beim ersten Zugriff automatisch, wenn die Version nicht mehr passt – so werden
+z. B. der gelöschte EAD-Layer oder veraltete Werte nicht mehr ausgeliefert. Die
+Risiko-Indizes je Zelle bleiben unverändert (Monetarisierung wirkt erst in der
+Kostenschicht), eine vollständige Neuberechnung der `CellAssessment` ist daher
+nicht erforderlich.
 
 ### Risikozonen
 Zusammenhängende Zellen mit hohem Risiko-Index (Connected Components),

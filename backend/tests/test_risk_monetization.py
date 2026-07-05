@@ -111,6 +111,34 @@ def test_cost_rate_override_changes_cost():
     assert abs(changed["cost_eur"] - changed["outcome"] * 1_000_000.0) < 0.01
 
 
+# ── Cache-Invalidierung bei Modellversion-Wechsel ──────────────────────────────
+
+def test_layer_cache_invalidates_on_model_version_change(tmp_path, monkeypatch):
+    from app.services import layer_cache
+    monkeypatch.setattr(layer_cache, "_CACHE_BASE", str(tmp_path))
+    kid = 4242
+    # Cache mit einer alten Modellversion und einer (jetzt veralteten) EAD-Datei füllen.
+    cdir = layer_cache._cache_dir(kid)
+    import os
+    os.makedirs(cdir, exist_ok=True)
+    stale = os.path.join(cdir, "layer_EXPECTED_TOTAL_DAMAGE_EAD_EUR.json.gz")
+    with open(stale, "w") as fh:
+        fh.write("stale")
+    with open(layer_cache._version_path(kid), "w") as fh:
+        fh.write("alte-version")
+    # Zugriff mit aktueller Modellversion → Verzeichnis wird geleert und neu gestempelt.
+    layer_cache._ensure_model_version(kid)
+    assert not os.path.exists(stale)
+    with open(layer_cache._version_path(kid)) as fh:
+        assert fh.read().strip() == catalog.MODEL_VERSION
+    # Erneuter Aufruf mit passender Version lässt den Cache unangetastet.
+    keep = os.path.join(cdir, "layer_EXPECTED_ANNUAL_MORTALITY.json.gz")
+    with open(keep, "w") as fh:
+        fh.write("fresh")
+    layer_cache._ensure_model_version(kid)
+    assert os.path.exists(keep)
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):

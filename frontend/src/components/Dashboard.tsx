@@ -241,7 +241,9 @@ export default function Dashboard() {
                 <h3 className="chart-title">Kostenzusammenfassung</h3>
                 <div className="kpi-row" style={{ flexDirection: 'column', gap: 8 }}>
                   <div className="kpi-card">
-                    <div className="kpi-label">Erwartete Schäden (Basis)</div>
+                    <div className="kpi-label" title="Summe der monetär bewerteten Einzelrisiken (jedes Risiko über seinen Kostensatz monetarisiert; kein eigenständiger Gesamtschaden-Parameter mehr)">
+                      Erwartete Schäden gesamt (Summe der Risiken)
+                    </div>
                     <div className="kpi-value accent" style={{ fontSize: '1.1rem' }}>
                       {fmtEur(riskSummary.cost.total_eur)}<span className="kpi-unit"> /Jahr</span>
                     </div>

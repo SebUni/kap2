@@ -53,6 +53,38 @@ def _values_path(kommune_id: int, code: str) -> str:
     return os.path.join(_cache_dir(kommune_id), f"layer_{code}.json.gz")
 
 
+def _version_path(kommune_id: int) -> str:
+    return os.path.join(_cache_dir(kommune_id), ".model_version")
+
+
+def _ensure_model_version(kommune_id: int) -> None:
+    """Invalidiert den Cache, wenn er unter einer alten Modellversion gebaut wurde.
+
+    Stempelt jedes Kommune-Cache-Verzeichnis mit ``catalog.MODEL_VERSION``. Ändert
+    sich die Modellversion (z. B. entferntes EAD-Risiko, neue Kostensätze), wird das
+    Verzeichnis einmalig geleert, sodass keine veralteten Layer-Dateien (etwa der
+    gelöschte EAD-Layer) mehr ausgeliefert werden. Die Dateien werden anschließend
+    lazy neu gebaut.
+    """
+    vpath = _version_path(kommune_id)
+    current = catalog.MODEL_VERSION
+    stored = None
+    if os.path.exists(vpath):
+        try:
+            with open(vpath, encoding="utf-8") as fh:
+                stored = fh.read().strip()
+        except OSError:
+            stored = None
+    if stored == current:
+        return
+    invalidate(kommune_id)
+    os.makedirs(_cache_dir(kommune_id), exist_ok=True)
+    tmp = vpath + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        fh.write(current)
+    os.replace(tmp, vpath)
+
+
 def layer_category(code: str) -> str | None:
     if code in catalog.HAZARDS_BY_CODE:
         return "hazards"
@@ -164,6 +196,7 @@ def _build_values_package(rows, regional: dict, code: str, category: str) -> dic
 
 def geometry_file(db: Session, kommune_id: int) -> str | None:
     """Pfad zur gzip-Geometriedatei; baut sie bei Bedarf. None, wenn keine Zellen."""
+    _ensure_model_version(kommune_id)
     path = _geometry_path(kommune_id)
     if os.path.exists(path):
         return path
@@ -179,6 +212,7 @@ def values_file(db: Session, kommune_id: int, code: str) -> str | None:
     category = layer_category(code)
     if not category:
         return None
+    _ensure_model_version(kommune_id)
     path = _values_path(kommune_id, code)
     if os.path.exists(path):
         return path
@@ -198,6 +232,7 @@ def precompute(db: Session, kommune_id: int) -> None:
         kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
         if not kommune:
             return
+        _ensure_model_version(kommune_id)
         geom = _build_geometry_package(db, kommune_id)
         if not geom["features"]:
             return

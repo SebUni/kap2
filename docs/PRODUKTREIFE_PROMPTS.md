@@ -30,7 +30,7 @@ ausfüllen, nichts anpassen.
 
 - [x] Prompt 1 — Sofort-Fixes (Render-Loop + falscher Status)
 - [x] Prompt 2 — Modell-Kritik (nur Doku)
-- [ ] Prompt 3 — Modell-Umbau: Monetarisierung + EAD als Summe
+- [x] Prompt 3 — Modell-Umbau: Monetarisierung + EAD als Summe
 - [ ] Prompt 4 — Zitationssystem: Author-Year
 - [ ] Prompt 5 — Quellen-Inhalte bereinigen
 - [ ] Prompt 6 — Parameter-Beschreibungen vervollständigen
