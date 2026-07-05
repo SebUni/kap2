@@ -1254,17 +1254,20 @@ PATHWAY_WEIGHTS: dict[str, float] = {
 
 
 def build_pathways(risk: dict) -> list[dict]:
-    """Reproduziert die Wirkungsketten aus risk_composition.csv deterministisch.
+    """Kuratierte Wirkungsketten eines Risikos (``pathway_curation.CURATED_PATHWAYS``).
 
-    Aus den (geordneten) H/E/V-Listen eines Risikos werden erzeugt:
-    - primary:                 H0 × E0 × V0
-    - aligned:                 Hi × Ei × Vi (gezippte weitere Indizes)
-    - alternate_hazard:        Hi × E0 × V0
-    - alternate_exposure:      H0 × Ei × V0
-    - alternate_vulnerability: H0 × E0 × Vi
-    - compound_he/hv/ev:       H1×E1×V0 / H1×E0×V1 / H0×E1×V1 (falls vorhanden)
-    Gibt Liste von {hazard, exposure, vulnerability, pathway_type, weight} zurück.
+    Jede Kette ist fachlich begründet und quellenbelegt (KWRA 2021 / GIZ Vulnerability
+    Sourcebook); die frühere kartesische Erzeugung aus den H/E/V-Listen ist ersetzt
+    (MODELL_KRITIK §3.5 — sinnlose Mischketten + pfadzahl-abhängige Verdünnung). Der
+    Index ist das MAXIMUM der gewichteten Ketten (``risk_engine.cell_risk_indices``),
+    nicht mehr der gewichtete Mittelwert.
+
+    Gibt Liste von {hazard, exposure, vulnerability, pathway_type, weight, justification,
+    justification_ref, cluster} zurück. Fällt für (theoretisch) unkuratierte Risiken auf
+    die reine Primärkette H0×E0×V0 zurück, statt sinnlose Ketten zu erzeugen.
     """
+    from app.data.pathway_curation import CURATED_PATHWAYS
+
     H = risk["hazards"]
     E = risk["exposures"]
     V = risk["vulnerabilities"]
@@ -1272,32 +1275,26 @@ def build_pathways(risk: dict) -> list[dict]:
         return []
 
     pw = PATHWAY_WEIGHTS
+    spec = CURATED_PATHWAYS.get(risk["code"])
+    if not spec:
+        return [{
+            "hazard": H[0], "exposure": E[0], "vulnerability": V[0],
+            "pathway_type": "primary", "weight": pw["primary"],
+            "justification": "Primärkette (keine Kuratierung hinterlegt).",
+            "justification_ref": None, "cluster": None,
+        }]
+
+    cluster = spec.get("cluster")
+    default_ref = spec.get("ref")
     paths: list[dict] = []
-
-    def add(h, e, v, ptype):
-        paths.append({"hazard": h, "exposure": e, "vulnerability": v,
-                      "pathway_type": ptype, "weight": pw[ptype]})
-
-    add(H[0], E[0], V[0], "primary")
-
-    # aligned: zip the further indices
-    for i in range(1, min(len(H), len(E), len(V))):
-        add(H[i], E[i], V[i], "aligned")
-
-    for h in H[1:]:
-        add(h, E[0], V[0], "alternate_hazard")
-    for e in E[1:]:
-        add(H[0], e, V[0], "alternate_exposure")
-    for v in V[1:]:
-        add(H[0], E[0], v, "alternate_vulnerability")
-
-    if len(H) > 1 and len(E) > 1:
-        add(H[1], E[1], V[0], "compound_he")
-    if len(H) > 1 and len(V) > 1:
-        add(H[1], E[0], V[1], "compound_hv")
-    if len(E) > 1 and len(V) > 1:
-        add(H[0], E[1], V[1], "compound_ev")
-
+    for ch in spec["chains"]:
+        h, e, v, ptype, note = ch[0], ch[1], ch[2], ch[3], ch[4]
+        ref = ch[5] if len(ch) > 5 else default_ref
+        paths.append({
+            "hazard": h, "exposure": e, "vulnerability": v,
+            "pathway_type": ptype, "weight": pw[ptype],
+            "justification": note, "justification_ref": ref, "cluster": cluster,
+        })
     return paths
 
 
@@ -2670,4 +2667,4 @@ def group_label(code: str) -> str:
 # Wird bei strukturellen Modelländerungen (Risiko-Set, Kostensätze, Aggregation)
 # erhöht. Der Layer-Cache stempelt seine Dateien mit dieser Version und invalidiert
 # automatisch, wenn sich die Version ändert (siehe services/layer_cache.py).
-MODEL_VERSION = "2026.07-monetarisierung-ead-summe"
+MODEL_VERSION = "2026.07-schichtA-maxpfad"

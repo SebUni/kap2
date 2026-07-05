@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import type { ActiveLayer } from '../store'
-import type { CatalogMeasure, LayerRecipeMeta, ModelParameter } from '../types'
+import type {
+  CatalogMeasure, LayerRecipeMeta, ModelParameter, PathwayRecipeMeta, RiskRecipe,
+} from '../types'
 import LineageFlowDiagram from './LineageFlowDiagram'
 import { useStore } from '../store'
 
@@ -82,6 +84,7 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
                 </p>
               )}
               {measureMeta && <MeasureInfo measure={measureMeta} />}
+              <PathwayJustifications recipe={meta.recipe} />
             </>
           )}
         </div>
@@ -97,6 +100,74 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
         </div>
       </div>
     </div>
+  )
+}
+
+function isRiskRecipe(r: LayerRecipeMeta['recipe']): r is RiskRecipe {
+  return !!r && Array.isArray((r as RiskRecipe).pathways)
+}
+
+const PATHWAY_TYPE_ORDER: Record<string, number> = {
+  primary: 0, aligned: 1, alternate_hazard: 2, alternate_exposure: 3,
+  alternate_vulnerability: 4, compound_he: 5, compound_hv: 6, compound_ev: 7,
+  compound_multi: 8,
+}
+
+/**
+ * Begründung der Wirkungsketten: eigene Info-Sektion, die für jede kuratierte
+ * Wirkungskette die fachliche Herleitung + Quelle (KWRA 2021 / GIZ Vulnerability
+ * Sourcebook) sichtbar macht (Stufe 1 — Pfad-Kuratierung).
+ */
+function PathwayJustifications({ recipe }: { recipe: LayerRecipeMeta['recipe'] }) {
+  if (!isRiskRecipe(recipe)) return null
+  const pathways = (recipe.pathways || [])
+    .filter((p): p is PathwayRecipeMeta => !!p.justification)
+    .slice()
+    .sort((a, b) => (PATHWAY_TYPE_ORDER[a.type] ?? 9) - (PATHWAY_TYPE_ORDER[b.type] ?? 9))
+  if (!pathways.length) return null
+
+  const cluster = pathways.find(p => p.cluster)?.cluster
+
+  return (
+    <section className="kap-pathway-justify">
+      <h3 className="kap-pathway-justify-title">Begründung der Wirkungsketten</h3>
+      {cluster && (
+        <p className="kap-pathway-justify-cluster">
+          Handlungsfeld/Cluster: <strong>{cluster}</strong>
+        </p>
+      )}
+      <p className="kap-pathway-justify-intro">
+        Die Ketten folgen dem Wirkungsketten-Ansatz (Klimasignal → Exposition ×
+        Empfindlichkeit) der KWRA 2021 bzw. des GIZ Vulnerability Sourcebook. Der Index
+        ist das Maximum der gewichteten Ketten (die stärkste Kette bestimmt den Wert).
+      </p>
+      <ol className="kap-pathway-justify-list">
+        {pathways.map((p, i) => {
+          const src = p.justification_source
+          const isPrimary = p.type === 'primary'
+          return (
+            <li key={i} className={`kap-pathway-justify-item${isPrimary ? ' is-primary' : ''}`}>
+              <div className="kap-pathway-justify-head">
+                <span className="kap-pathway-justify-badge">{p.type_label}</span>
+                <span className="kap-pathway-justify-chain">
+                  {p.hazard_name} × {p.exposure_name} × {p.vulnerability_name}
+                </span>
+                <span className="kap-pathway-justify-weight">Gewicht {p.weight}</span>
+              </div>
+              <p className="kap-pathway-justify-note">{p.justification}</p>
+              {src && (
+                <p className="kap-pathway-justify-src">
+                  Quelle:{' '}
+                  {src.url
+                    ? <a href={src.archive_url || src.url} target="_blank" rel="noopener noreferrer">{src.ieee || src.key}</a>
+                    : (src.ieee || src.key)}
+                </p>
+              )}
+            </li>
+          )
+        })}
+      </ol>
+    </section>
   )
 }
 

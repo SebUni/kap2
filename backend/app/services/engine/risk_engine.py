@@ -1,15 +1,21 @@
 """Risiko-Kompositionsmotor.
 
-Risiko = Σ(w · H_n · E_n · V_n) über die Wirkungsketten (``catalog.build_pathways``)
-mit normalisierten Pathway-Gewichten → Index 0..100 (vergleichbare Metrik).
-Zusätzlich werden Outcome-Schätzung (outcome_unit) und – wo monetär – Schadens-
-kosten (€/Jahr) abgeleitet.
+Risiko = 100 · max_p(w_p · Ĥ_p · Ê_p · V̂_p) über die kuratierten Wirkungsketten
+(``catalog.build_pathways``) → Index 0..100 (vergleichbare Metrik). Der Index ist
+damit die stärkste einzelne Wirkungskette (Primärpfad w=1,0 dominiert, gedämpfte
+Alternativpfade übernehmen nur, wenn sie deutlich stärker sind).
+
+Warum Maximum statt gewichtetem Mittel: Beim Mittelwert hing die Index-Höhe von der
+ANZAHL erzeugter Pfade ab (mehr Nebenpfade → stärkere Verdünnung des dominanten
+Signals, MODELL_KRITIK §3.1/3.5). Das Maximum ist pfadanzahl-invariant und bildet die
+tatsächlich treibende Kette ab. Kombiniert mit der Kuratierung der Pfade (nur fachlich
+belegte Ketten, ``pathway_curation.py``) ersetzt das die frühere kartesische Erzeugung.
 
 Kommune-Aggregation: 90.-Perzentil der Zell-Indizes je Risiko (statt Mittelwert),
 damit belastete Zellen in Dashboard/Spinnendiagrammen sichtbar bleiben.
 Kartenlayer: absolute Outcome-Werte pro Zelle via ``cell_outcome``.
 
-Pathway-Gewichte: ``NORMALIZE_PATHWAY_WEIGHTS`` (siehe model_parameters.csv).
+Pathway-Gewichte: ``catalog.PATHWAY_WEIGHTS`` (degressiv je Pfadtyp, override-fähig).
 Compound/Cascade sind als Hazards mit ``max_of_constituent_hazards`` bzw.
 Konstantwert hinterlegt (siehe indicators.py).
 """
@@ -24,9 +30,6 @@ AGGREGATION_PERCENTILE = 90.0
 
 # Pathways je Risiko einmalig vorbauen
 _PATHWAYS: dict[str, list[dict]] = {r["code"]: catalog.build_pathways(r) for r in catalog.RISKS}
-_WEIGHT_SUM: dict[str, float] = {
-    code: (sum(p["weight"] for p in paths) or 1.0) for code, paths in _PATHWAYS.items()
-}
 
 
 def normalize_hev(hev: dict) -> dict:
@@ -53,13 +56,15 @@ def cell_risk_indices(hev_norm: dict) -> dict:
         if not paths:
             result[code] = 0.0
             continue
-        acc = 0.0
+        best = 0.0
         for p in paths:
             h = Hn.get(p["hazard"], 0.0)
             e = En.get(p["exposure"], 0.0)
             v = Vn.get(p["vulnerability"], 0.0)
-            acc += p["weight"] * h * e * v
-        idx = 100.0 * acc / _WEIGHT_SUM[code]
+            term = p["weight"] * h * e * v
+            if term > best:
+                best = term
+        idx = 100.0 * best
         result[code] = round(min(100.0, idx), 2)
     return result
 

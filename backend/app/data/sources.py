@@ -316,6 +316,32 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "https://www.umweltbundesamt.de/klimawirkungs-risikoanalyse-2021-fuer-deutschland",
         "accessed": "2026-07-04",
     },
+    "UBA_KWRA_2021_TB1": {
+        "ieee": "M. Kahlenborn u. a., „Klimawirkungs- und Risikoanalyse für Deutschland 2021 "
+                "(Teilbericht 1): Grundlagen,“ Umweltbundesamt, Climate Change 20/2021, "
+                "Dessau-Roßlau, Deutschland, 2021. [Online]. Verfügbar: "
+                "https://www.umweltbundesamt.de/publikationen/KWRA-Teil-1-Grundlagen. "
+                "[Zugriff: 5. Juli 2026].",
+        "url": "https://www.umweltbundesamt.de/sites/default/files/medien/479/publikationen/"
+               "kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf",
+        "archive_url": "https://web.archive.org/web/20250829003720/"
+                       "https://www.umweltbundesamt.de/sites/default/files/medien/479/publikationen/"
+                       "kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf",
+        "accessed": "2026-07-05",
+    },
+    "GIZ_Vulnerability_Sourcebook": {
+        "ieee": "Deutsche Gesellschaft für Internationale Zusammenarbeit (GIZ) und EURAC, "
+                "„The Vulnerability Sourcebook: Concept and guidelines for standardised "
+                "vulnerability assessments,“ Bonn/Eschborn, Deutschland, 2. Aufl., 2017. "
+                "[Online]. Verfügbar: https://www.adaptationcommunity.net/publications/"
+                "vulnerability-sourcebook/. [Zugriff: 5. Juli 2026].",
+        "url": "https://www.adaptationcommunity.net/download/va/vulnerability-guides-manuals-"
+               "reports/vuln_source_2017_EN.pdf",
+        "archive_url": "https://web.archive.org/web/20260601152904/"
+                       "https://www.adaptationcommunity.net/download/va/vulnerability-guides-"
+                       "manuals-reports/vuln_source_2017_EN.pdf",
+        "accessed": "2026-07-05",
+    },
     # ── Risiko-Kennwerte (Schäden / Gesundheit) ─────────────────────────────
     "Prognos_Klimaschaeden_2023": {
         "ieee": "Prognos AG, Gesellschaft für Wirtschaftliche Strukturforschung (GWS) und "

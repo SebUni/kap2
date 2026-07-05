@@ -182,6 +182,13 @@ export interface CellOutcomeBreakdown {
   outcome: number
 }
 
+export interface PathwaySource {
+  key?: string
+  ieee?: string
+  url?: string
+  archive_url?: string
+}
+
 export interface PathwayRecipeMeta {
   type: string
   type_label: string
@@ -194,6 +201,10 @@ export interface PathwayRecipeMeta {
   vulnerability_name: string
   chain_description?: string
   chain_label?: string
+  justification?: string
+  justification_ref?: string
+  justification_source?: PathwaySource | null
+  cluster?: string
   formula: string
 }
 
@@ -207,12 +218,12 @@ export interface CellPathwayTerm {
   e_norm: number
   v_norm: number
   term: number
+  is_max?: boolean
 }
 
 export interface CellPathwayBreakdown {
   pathways: CellPathwayTerm[]
-  weight_sum: number
-  term_sum: number
+  max_term: number
   index: number
 }
 

@@ -679,6 +679,7 @@ def risk_pathway_meta(risk: dict) -> list[dict]:
         chain_label,
         get_pathway_description,
     )
+    from app.data import sources
 
     risk_code = risk.get("code", "")
     out: list[dict] = []
@@ -705,6 +706,14 @@ def risk_pathway_meta(risk: dict) -> list[dict]:
             "vulnerability_name": v_name,
             "chain_description": chain_description,
             "chain_label": cl,
+            # Begründung + Quelle der kuratierten Wirkungskette (Info-Fenster-Sektion)
+            "justification": p.get("justification"),
+            "justification_ref": p.get("justification_ref"),
+            "justification_source": (
+                sources.resolve([p["justification_ref"]])[0]
+                if p.get("justification_ref") else None
+            ),
+            "cluster": p.get("cluster"),
             "formula": (
                 f"{w:g}·Ĥ({h_name})·Ê({e_name})·V̂({v_name})"
             ),
@@ -718,16 +727,17 @@ def risk_pathway_cell_breakdown(risk: dict, hev_norm: dict) -> dict:
     En = hev_norm["exposures"]
     Vn = hev_norm["vulnerabilities"]
     pathways: list[dict] = []
-    term_sum = 0.0
-    weight_sum = 0.0
-    for p in catalog.build_pathways(risk):
+    max_term = 0.0
+    max_idx = -1
+    for i, p in enumerate(catalog.build_pathways(risk)):
         h = float(Hn.get(p["hazard"], 0.0))
         e = float(En.get(p["exposure"], 0.0))
         v = float(Vn.get(p["vulnerability"], 0.0))
         w = float(p["weight"])
         term = w * h * e * v
-        term_sum += term
-        weight_sum += w
+        if term > max_term:
+            max_term = term
+            max_idx = i
         pathways.append({
             "type": p["pathway_type"],
             "weight": w,
@@ -738,12 +748,14 @@ def risk_pathway_cell_breakdown(risk: dict, hev_norm: dict) -> dict:
             "e_norm": round(e * 100.0, 2),
             "v_norm": round(v * 100.0, 2),
             "term": round(term, 5),
+            "is_max": False,
         })
-    index = round(100.0 * term_sum / weight_sum, 2) if weight_sum else 0.0
+    if max_idx >= 0:
+        pathways[max_idx]["is_max"] = True
+    index = round(100.0 * max_term, 2)
     return {
         "pathways": pathways,
-        "weight_sum": round(weight_sum, 2),
-        "term_sum": round(term_sum, 5),
+        "max_term": round(max_term, 5),
         "index": index,
     }
 
@@ -801,9 +813,9 @@ def risk_recipe(risk: dict) -> dict:
     ref = float(risk.get("ref_value", 0.0))
     pathways = risk_pathway_meta(risk)
     weight_sum = round(sum(p["weight"] for p in pathways), 2) or 1.0
-    index_terms = " + ".join(p["formula"] for p in pathways)
+    index_terms = " ,  ".join(p["formula"] for p in pathways)
     formula_index = (
-        f"Index = 100 · ({index_terms}) / {weight_sum:g}"
+        f"Index = 100 · max( {index_terms} )"
         if pathways
         else "Index = 0"
     )
@@ -822,8 +834,8 @@ def risk_recipe(risk: dict) -> dict:
     return {
         "formula_index": formula_index,
         "formula_index_header": (
-            f"Index = 100 · Σ(w·Ĥ·Ê·V̂) / Σw   "
-            f"(Σw = {weight_sum:g}, Ĥ/Ê/V̂ normiert 0…1)"
+            "Index = 100 · max(w·Ĥ·Ê·V̂)   "
+            "(stärkste Wirkungskette; Ĥ/Ê/V̂ normiert 0…1)"
         ),
         "formula_outcome": outcome,
         "pathways": pathways,

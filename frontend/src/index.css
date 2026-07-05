@@ -1792,6 +1792,105 @@ body {
   margin: 6px 0;
 }
 
+/* ── Begründung der Wirkungsketten (Info-Fenster) ──────────────────────────── */
+
+.kap-pathway-justify {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border, #e2e8f0);
+}
+
+.kap-pathway-justify-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: var(--text, #0f172a);
+}
+
+.kap-pathway-justify-cluster,
+.kap-pathway-justify-intro {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-muted, #64748b);
+  margin: 0 0 8px;
+}
+
+.kap-pathway-justify-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kap-pathway-justify-item {
+  border: 1px solid var(--border, #e2e8f0);
+  border-left: 3px solid var(--border, #cbd5e1);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--surface-subtle, #f8fafc);
+}
+
+.kap-pathway-justify-item.is-primary {
+  border-left-color: #10b981;
+  background: #ecfdf5;
+}
+
+.kap-pathway-justify-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.kap-pathway-justify-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #475569;
+  background: #e2e8f0;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.kap-pathway-justify-chain {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text, #0f172a);
+}
+
+.kap-pathway-justify-weight {
+  font-size: 0.72rem;
+  color: var(--text-muted, #94a3b8);
+  margin-left: auto;
+}
+
+.kap-pathway-justify-note {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 0 0 4px;
+  color: var(--text, #334155);
+}
+
+.kap-pathway-justify-src {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  margin: 0;
+  color: var(--text-muted, #64748b);
+}
+
+.kap-pathway-justify-src a {
+  color: var(--accent, #2563eb);
+  text-decoration: none;
+}
+
+.kap-pathway-justify-src a:hover {
+  text-decoration: underline;
+}
+
 /* ── Lineage Flow (React Flow) ─────────────────────────────────────────────── */
 
 :root {

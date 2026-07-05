@@ -17,7 +17,11 @@ from app.models.models import CellAssessment, GridCell, RiskZone, RiskZoneCell
 
 log = logging.getLogger(__name__)
 
-RISK_THRESHOLD = 40.0  # Index ≥ → "Risikozone"
+# Index ≥ Schwelle → "Risikozone". Angehoben von 40→50 mit der Umstellung auf die
+# Max-Kombination (Stufe 1, MODELL_KRITIK §3.1): der Index bildet jetzt die stärkste
+# Wirkungskette ab (früher gewichteter Mittelwert, ~Faktor 1,5–2 niedriger). Die
+# Schwelle bleibt damit auf demselben realen Belastungsniveau wie zuvor.
+RISK_THRESHOLD = 50.0
 LEVEL = 1
 
 

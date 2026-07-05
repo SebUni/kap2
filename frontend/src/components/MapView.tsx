@@ -104,7 +104,7 @@ function buildRiskFormulaHtml(
   let s = `<div class="kap-formula-block">`
   s += `<div style="font-weight:600;font-size:10px;color:#475569;margin-bottom:3px">Index-Berechnung</div>`
   s += `<div class="kap-formula-line">${
-    r.formula_index_header || 'Index = 100 · Σ(w·Ĥ·Ê·V̂) / Σw  (Ĥ,Ê,V̂ normiert 0…1)'
+    r.formula_index_header || 'Index = 100 · max(w·Ĥ·Ê·V̂)  (stärkste Wirkungskette; Ĥ,Ê,V̂ normiert 0…1)'
   }</div>`
 
   const meta = r.pathways || []
@@ -114,8 +114,9 @@ function buildRiskFormulaHtml(
     const p = meta[i]
     const c = cells[i]
     if (c) {
-      s += `<div class="kap-formula-line">` +
-        `<span style="color:#94a3b8">${p.type_label}:</span> ` +
+      const win = c.is_max
+      s += `<div class="kap-formula-line"${win ? ' style="background:#ecfdf5"' : ''}>` +
+        `<span style="color:#94a3b8">${p.type_label}${win ? ' ★' : ''}:</span> ` +
         `<code>${fmtNum(p.weight)} · ${fmtNormFrac(c.h_norm)} · ${fmtNormFrac(c.e_norm)} · ${fmtNormFrac(c.v_norm)}</code>` +
         ` <span style="color:#64748b">(Ĥ·Ê·V̂ = ${p.hazard_name} · ${p.exposure_name} · ${p.vulnerability_name})</span>` +
         ` → <strong>${fmtNum(c.term)}</strong></div>`
@@ -128,9 +129,10 @@ function buildRiskFormulaHtml(
 
   if (cellPathways) {
     s += `<div class="kap-formula-line kap-formula-sum">` +
-      `<code>Σ = ${fmtNum(cellPathways.term_sum)}` +
-      ` → Index = 100 · ${fmtNum(cellPathways.term_sum)} / ${fmtNum(cellPathways.weight_sum)}` +
-      ` = ${fmtNum(cellPathways.index)}</code></div>`
+      `<code>max = ${fmtNum(cellPathways.max_term)}` +
+      ` → Index = 100 · ${fmtNum(cellPathways.max_term)}` +
+      ` = ${fmtNum(cellPathways.index)}</code>` +
+      ` <span style="color:#64748b">(stärkste Kette ★)</span></div>`
   } else if (r.formula_index) {
     s += `<div class="kap-formula-line"><code>${r.formula_index}</code></div>`
   }

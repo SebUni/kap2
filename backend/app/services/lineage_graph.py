@@ -589,10 +589,9 @@ def _tooltip_for_node(
             return "\n".join(lines)
         if kind == "multiply":
             return tooltip or "Multiplikation: Gefahr × Betroffenheit × Empfindlichkeit"
-        if kind == "average":
+        if kind in ("average", "max"):
             return tooltip or (
-                "Gewichteter Mittelwert aller Wirkungsketten (0–100). "
-                "Jedes Pfad-Ergebnis wird mit seinem Gewicht multipliziert und aufsummiert."
+                "Stärkste Wirkungskette (0–100): Index = 100 · max(Gewicht · Ĥ · Ê · V̂)."
             )
         if kind == "norm":
             lo, hi = meta.get("norm_min"), meta.get("norm_max")
@@ -620,7 +619,7 @@ def _tooltip_for_node(
             )
 
     if ntype == "aggregation":
-        short = meta.get("short", "gewichteter Mittelwert aller Wirkungsketten")
+        short = meta.get("short", "stärkste Wirkungskette (Maximum)")
         formula = meta.get("formula", "")
         lines = [f"{label}: {short}"]
         if formula:
@@ -724,16 +723,17 @@ def _add_operator_multiply(b: "LineageBuilder", op_id: str) -> str:
 
 
 def _add_operator_average(b: "LineageBuilder") -> str:
-    op_id = "op:avg:index"
+    op_id = "op:max:index"
     b.add_node(
         op_id, "operator", "",
         column=0, collapse_group="outcome",
         meta={
-            "op_kind": "average",
-            "label": "Mittelung",
+            "op_kind": "max",
+            "label": "Maximum",
             "tooltip": (
-                "Gewichteter Mittelwert aller Wirkungsketten (0–100). "
-                "Jedes Pfad-Ergebnis wird mit seinem Gewicht multipliziert und aufsummiert."
+                "Stärkste Wirkungskette (0–100): Index = 100 · max(Gewicht · Ĥ · Ê · V̂). "
+                "Die Kette mit dem höchsten gewichteten Produkt bestimmt den Index; die "
+                "Kettenzahl beeinflusst ihn nicht."
             ),
         },
     )
@@ -1215,6 +1215,9 @@ def build_risk_lineage(code: str) -> dict:
                 "hazard_name": p["hazard_name"],
                 "exposure_name": p["exposure_name"],
                 "vulnerability_name": p["vulnerability_name"],
+                "justification": p.get("justification"),
+                "justification_ref": p.get("justification_ref"),
+                "cluster": p.get("cluster"),
             },
         )
         b.add_edge(h_id, mul_id)

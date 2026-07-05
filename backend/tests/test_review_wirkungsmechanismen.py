@@ -2,7 +2,9 @@
 
 Deckt ab:
   * B6.1 — Skalierungs-Tooltip ist scale-abhängig (pop/area/flat).
-  * B6.6 — jedes Tupel in PATHWAY_DESCRIPTIONS wird von build_pathways erzeugt.
+  * B6.6 — jede kuratierte Wirkungskette (CURATED_PATHWAYS) ist wohlgeformt, begründet
+           und liefert einen Anzeigetitel (die Kuratierung ist die Quelle der Wahrheit,
+           PATHWAY_DESCRIPTIONS nur noch optionaler Titel-Override).
   * B6.4 — Formel-String-Konstanten (formulas.py) == Code-Konstanten (indicators.py).
 
 Läuft mit pytest oder direkt: ``python tests/test_review_wirkungsmechanismen.py``.
@@ -78,21 +80,59 @@ def test_scaling_tooltip_matches_catalog_scale():
             assert _scale_factor(risk, 0.0, 0.0) == 1.0
 
 
-# ── B6.6 — pathway_descriptions ⊆ build_pathways ───────────────────────────────
+# ── B6.6 — kuratierte Wirkungsketten wohlgeformt + begründet ───────────────────
 
-def test_every_pathway_description_is_produced_by_build_pathways():
-    missing: list[tuple[str, str, str, str]] = []
-    cache: dict[str, set[tuple[str, str, str]]] = {}
-    for (risk_code, h, e, v) in PATHWAY_DESCRIPTIONS:
-        if risk_code not in cache:
-            risk = catalog.RISKS_BY_CODE.get(risk_code)
-            paths = catalog.build_pathways(risk) if risk else []
-            cache[risk_code] = {
-                (p["hazard"], p["exposure"], p["vulnerability"]) for p in paths
-            }
-        if (h, e, v) not in cache[risk_code]:
-            missing.append((risk_code, h, e, v))
-    assert not missing, f"Stale pathway_descriptions (nicht von build_pathways erzeugt): {missing}"
+def test_every_risk_is_curated_and_wellformed():
+    """Jedes Risiko hat kuratierte, gültige, begründete Ketten mit genau 1 Primärpfad."""
+    from app.data.pathway_curation import CURATED_PATHWAYS
+
+    errs: list[str] = []
+    for risk in catalog.RISKS:
+        code = risk["code"]
+        spec = CURATED_PATHWAYS.get(code)
+        if not spec:
+            errs.append(f"{code}: nicht kuratiert")
+            continue
+        H, E, V = set(risk["hazards"]), set(risk["exposures"]), set(risk["vulnerabilities"])
+        paths = catalog.build_pathways(risk)
+        n_primary = sum(1 for p in paths if p["pathway_type"] == "primary")
+        if n_primary != 1:
+            errs.append(f"{code}: {n_primary} Primärpfade (erwartet genau 1)")
+        for p in paths:
+            if p["hazard"] not in H or p["exposure"] not in E or p["vulnerability"] not in V:
+                errs.append(f"{code}: Kette {p['hazard']}×{p['exposure']}×{p['vulnerability']} "
+                            "nutzt nicht gelistete H/E/V")
+            if not p.get("justification"):
+                errs.append(f"{code}: Kette ohne Begründung")
+    assert not errs, "Kuratierungs-Fehler:\n" + "\n".join(errs)
+
+
+def test_curated_pathways_carry_source_and_display_title():
+    """Jede Kette liefert Anzeigetitel + auflösbare Begründungsquelle (Info-Fenster)."""
+    from app.data import sources
+    from app.data.pathway_descriptions import get_pathway_description
+
+    for risk in catalog.RISKS:
+        meta = formulas.risk_pathway_meta(risk)
+        assert meta, f"{risk['code']}: keine Pfade"
+        for p in meta:
+            title = get_pathway_description(
+                risk["code"], p["hazard"], p["exposure"], p["vulnerability"],
+                p["type"], p["hazard_name"], p["exposure_name"], p["vulnerability_name"])
+            assert title and title.strip(), f"{risk['code']}: leerer Kettentitel"
+            assert p["justification"], f"{risk['code']}: fehlende Begründung"
+            ref = p.get("justification_ref")
+            assert ref, f"{risk['code']}: fehlende Begründungsquelle"
+            assert sources.resolve([ref]), f"{risk['code']}: Quelle {ref} nicht auflösbar"
+
+
+def test_pathway_descriptions_do_not_contradict_curation():
+    """PATHWAY_DESCRIPTIONS ist nur noch Titel-Override — Einträge müssen zu einer
+    existierenden (kuratierten) Kette gehören oder sind unbenutzt (kein harter Fehler),
+    dürfen aber keine nicht existierenden Risiken referenzieren."""
+    for (risk_code, _h, _e, _v) in PATHWAY_DESCRIPTIONS:
+        assert risk_code in catalog.RISKS_BY_CODE or risk_code == "EXPECTED_TOTAL_DAMAGE_EAD_EUR", \
+            f"PATHWAY_DESCRIPTIONS referenziert unbekanntes Risiko {risk_code}"
 
 
 # ── B6.4 — Formel-String-Konstanten == indicators.py-Konstanten ────────────────
