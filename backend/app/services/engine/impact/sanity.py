@@ -38,10 +38,14 @@ def check(code: str, outcome_sum: float, total_pop: float, area_km2: float) -> f
     if est <= 0.0:
         return None
     ratio = outcome_sum / est
-    if ratio > TOLERANCE or ratio < 1.0 / TOLERANCE:
+    # Ein Outcome von 0 bedeutet i. d. R. fehlende Exposition (keine Nutzfläche/Assets in
+    # der Kommune), keine Parameter-Fehlkalibrierung → Verhältnis 0 ohne Warnung (und ohne
+    # 1/0-Division). Nur echte Abweichungen bei vorhandenem Outcome werden geloggt.
+    if outcome_sum > 0.0 and (ratio > TOLERANCE or ratio < 1.0 / TOLERANCE):
+        factor = ratio if ratio >= 1.0 else 1.0 / ratio
         log.warning(
             "Sanity: %s Schicht-B-Summe %.2f weicht um Faktor %.1f von der "
             "ref_value-Schätzung %.2f ab (Parameter prüfen).",
-            code, outcome_sum, ratio if ratio >= 1 else 1.0 / ratio, est,
+            code, outcome_sum, factor, est,
         )
     return round(ratio, 3)

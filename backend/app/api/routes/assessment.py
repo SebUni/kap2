@@ -333,6 +333,8 @@ def risk_histogram(kommune_id: int, db: Session = Depends(get_db)):
             "top5_share": a.get("top5_share", 0.0),
             "area_km2_affected": a.get("area_km2_affected", 0.0),
             "share_above_threshold": a.get("share_above_threshold", 0.0),
+            # Plausibilitätsanker (Σ/ref_value-Schätzung); Anzeige folgt in Prompt 7.
+            "sanity_ratio": a.get("sanity_ratio"),
         }
 
     return {

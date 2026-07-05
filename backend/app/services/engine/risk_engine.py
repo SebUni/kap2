@@ -135,7 +135,14 @@ def estimate_outcome_and_cost(risk: dict, agg_index: float, total_pop: float, ar
     factor = _scale_factor(risk, total_pop, area_km2)
     ref = override_context.effective_ref_value(risk["code"], float(risk.get("ref_value", 0.0)))
     outcome = ref * (agg_index / 100.0) * factor
-    return {"outcome": round(outcome, 2), "cost_eur": round(cost_from_outcome(risk, outcome), 2)}
+    cost = cost_from_outcome(risk, outcome)
+    # Flat-Risiken (Ausfallstunden): die STUNDEN sind kommunenweit (nicht pop-skaliert),
+    # die €-Bewertung (VoLL/Kostensatz) ist aber auf die Last einer ~100.000-Ew.-Kommune
+    # kalibriert und skaliert daher mit der Bevölkerung — sonst zahlt eine 5.000-Ew.-
+    # Gemeinde denselben €-Ausfall wie eine Großstadt (MODELL_KRITIK §8, Befund B6).
+    if risk.get("scale", "pop") not in ("pop", "area") and total_pop and total_pop > 0:
+        cost *= total_pop / 100_000.0
+    return {"outcome": round(outcome, 2), "cost_eur": round(cost, 2)}
 
 
 def _top_share(weights: list[float], frac: float = 0.05) -> float:
@@ -165,6 +172,7 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
     Neuberechnung): der Wert wird je Zelle über die Legacy-Impact-Funktion nachgerechnet.
     """
     from app.services.engine import impact  # lazy: Zyklus impact→risk_engine vermeiden
+    from app.services.engine.impact import sanity  # lazy (impact/__init__ importiert risk_engine)
 
     try:
         from app.services.risk_zone_service import RISK_THRESHOLD as _THR
@@ -214,11 +222,15 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             cost = round(sum_cost.get(code, 0.0), 2)
             aggregation = "sum"
             top5 = _top_share(weights_by_code.get(code, []))
+            # Plausibilitätsanker: Σ-über-Zellen-Outcome gegen die ref_value-Größenordnung
+            # (loggt bei grober Abweichung, §6.6). Nur für Schicht-B-Summenrisiken sinnvoll.
+            sanity_ratio = sanity.check(code, outcome, total_pop, area_km2)
         else:
             est = estimate_outcome_and_cost(risk, p90_idx, total_pop, area_km2)
             outcome, cost = est["outcome"], est["cost_eur"]
             aggregation = "p90"
             top5 = _top_share(vals)  # Konzentrations-Proxy aus der Index-Verteilung
+            sanity_ratio = None  # flat: outcome == ref·P90/100 per Konstruktion (kein Anker)
         cnt = above_thr.get(code, 0)
         risk_out[code] = {
             "index": p90_idx,
@@ -235,6 +247,7 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             "top5_share": top5,
             "area_km2_affected": round(cnt * CELL_AREA_KM2, 4),
             "share_above_threshold": round(cnt / n_cells, 4) if n_cells else 0.0,
+            "sanity_ratio": sanity_ratio,
         }
 
     # Gruppen-P90: Mittel der Einzelrisiko-P90-Indizes je KWRA-Gruppe

@@ -130,6 +130,30 @@ def test_compute_cell_impacts_is_legacy_even_with_impact_fn():
     assert impact.has(MORT)
 
 
+# ── (h) B6: Flat-Ausfallkosten skalieren mit der Bevölkerung ───────────────────
+
+def test_flat_cost_scales_with_population():
+    """MODELL_KRITIK §8/B6: Flat-Ausfallkosten (VoLL je 100k-Ew.-Last) skalieren mit der
+    Bevölkerung — die Ausfallstunden bleiben kommunenweit gleich, die €-Bewertung nicht."""
+    override_context.set_overrides({})
+    cells = [{"inputs": {"pop": 100.0}, "risks": {OUTAGE: {"index": 40.0}}} for _ in range(20)]
+    big = risk_engine.aggregate(cells, total_pop=100_000.0, area_km2=50.0)["risks"][OUTAGE]
+    small = risk_engine.aggregate(cells, total_pop=5_000.0, area_km2=50.0)["risks"][OUTAGE]
+    assert big["outcome"] == small["outcome"]          # Stunden kommunenweit gleich
+    assert big["cost_eur"] > 0
+    assert small["cost_eur"] == round(big["cost_eur"] * (5_000.0 / 100_000.0), 2)
+
+
+# ── (i) B7: sanity_ratio im Aggregat ───────────────────────────────────────────
+
+def test_sanity_ratio_present_for_sum_risks():
+    override_context.set_overrides({})
+    cells = [_cell(50.0, 200.0) for _ in range(10)]
+    agg = risk_engine.aggregate(cells, total_pop=2000.0, area_km2=10.0)
+    assert "sanity_ratio" in agg["risks"][MORT]          # pop/area: float oder None
+    assert agg["risks"][OUTAGE]["sanity_ratio"] is None  # flat: kein Anker
+
+
 # ── (g) B1: echter 0-Outcome ≠ Legacy-Phantom ──────────────────────────────────
 
 def test_zero_schicht_b_outcome_not_legacy_recomputed():
