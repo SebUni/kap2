@@ -605,13 +605,12 @@ RISKS: list[dict] = [
      "vulnerabilities": ["IRRIGATION_DEPENDENCY", "WATER_STRESS_INDEX", "SOIL_SENSITIVITY"],
      # Herleitung: nat. landwirtschaftl. Klimaschaden ~3,9 Mrd €/J (Hitze/Dürre 2018/19: ~7,8 Mrd € über 2 J) ÷ Ackerland-Einheiten (~166.000 km²/50 = 3.320) ≈ 1,2 Mio €/50 km² Ackerland; auf 2,2 Mio bei Index=100 (Worst-Case-Dürrejahr) angehoben. scale=area an Nutzfläche der Kommune. Prognos 2023.
      "ref_value": 2200000.0, "scale": "area", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche landwirtschaftliche Schäden / Ernteverluste.", "priority": 1},
-    {"code": "EXPECTED_TOTAL_DAMAGE_EAD_EUR", "name": "Gesamtschäden (EAD)",
-     "outcome_unit": "€/Jahr", "group": "compound", "cost_dimension": "monetary",
-     "hazards": ["HEAT_WAVE", "HEAVY_RAIN_FLOOD", "DROUGHT", "EXTRATROPICAL_STORM"],
-     "exposures": ["BUILDING_STOCK", "ENERGY_INFRASTRUCTURE", "AGRICULTURAL_LAND"],
-     "vulnerabilities": ["BUILDING_STABILITY", "FINANCIAL_ADAPTATION_CAPACITY", "CRITICAL_INFRA_CONDITION"],
-     # Herleitung: nat. jährl. Gesamtschaden (EAD) ~8 Mrd €/J ÷ 832 ≈ 9,6 Mio €/100k → 10 Mio bei Index=100. Prognos 2023: seit 2000 ≥70 Mrd € Hochwasser + 35 Mrd € Hitze/Dürre 2018/19; Einzeljahr wie 2021 ~40 Mrd €.
-     "ref_value": 10000000.0, "scale": "pop", "source": "Prognos/GWS/IÖW 2023", "description": "Erwartete jährliche Gesamtschäden (Expected Annual Damage).", "priority": 1},
+    # EXPECTED_TOTAL_DAMAGE_EAD_EUR (Gesamtschäden/EAD) wurde ENTFERNT: Der Gesamtschaden
+    # ist kein eigenständiges HxVxE-Risiko mehr, sondern die SUMME der monetär bewerteten
+    # Einzelrisiken (risk_engine.aggregate → cost.total_eur). Das eigene EAD-Risiko war per
+    # Konstruktion ~die Summe der Sektorschäden und verdoppelte diese in total_eur (siehe
+    # docs/MODELL_KRITIK.md §3.7). Maßnahmen, die früher auf EAD wirkten, sind auf die
+    # konkreten Sektorschadens-Risiken umverdrahtet.
     {"code": "EXPECTED_RESTORATION_COSTS_EUR", "name": "Wiederherstellungskosten",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
      "hazards": ["HEAVY_RAIN_FLOOD", "EXTRATROPICAL_STORM", "WILDFIRE"],
@@ -2153,7 +2152,11 @@ MEASURES: list[dict] = [
     {"code": "RISK_BASED_INVESTMENTS", "name": "Risikobasierte Investitionen",
      "description": "Finanzielle Steuerung nach Risiko.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.15, "coverage_scaling": "saturating",
-     "linked_risk_codes": ["EXPECTED_TOTAL_DAMAGE_EAD_EUR"],
+     # Früher auf das (entfernte) Gesamtschaden-EAD-Risiko verdrahtet; jetzt auf die
+     # direkten monetären Sektorschäden, die eine risikobasierte Investitionssteuerung
+     # nachvollziehbar mindert.
+     "linked_risk_codes": ["EXPECTED_BUILDING_DAMAGE_EUR", "EXPECTED_TRANSPORT_DAMAGE_EUR",
+                           "EXPECTED_ENERGY_INFRA_DAMAGE_EUR"],
      "capex_fixed": 30000.0, "capex_per_unit": None, "capex_per_m2": None,
      "opex_fixed_year": 5000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
@@ -2173,7 +2176,9 @@ MEASURES: list[dict] = [
     {"code": "PREVENTION_INCENTIVES", "name": "Präventionsanreize",
      "description": "Anreize für präventive Maßnahmen.", "measure_type": "organizational",
      "effect_target": ["exposure"], "default_reduction": 0.12, "coverage_scaling": "saturating",
-     "linked_risk_codes": ["EXPECTED_TOTAL_DAMAGE_EAD_EUR"],
+     # Früher auf das (entfernte) Gesamtschaden-EAD-Risiko verdrahtet; jetzt auf die
+     # direkten monetären Sektorschäden, auf die private Vorsorgeanreize wirken.
+     "linked_risk_codes": ["EXPECTED_BUILDING_DAMAGE_EUR", "EXPECTED_RESTORATION_COSTS_EUR"],
      "capex_fixed": 25000.0, "capex_per_unit": None, "capex_per_m2": None,
      "opex_fixed_year": 6000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,

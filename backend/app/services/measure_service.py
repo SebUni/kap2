@@ -269,11 +269,14 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     opex_annual = cost_breakdown["opex"]["total_eur"]
     annual_benefit_direct = float(mdef.get("benefit_per_m2_year") or 0.0) * covered_area_m2
 
-    # Monetarisierte Schadensreduktion (nur monetäre Risiken)
+    # Monetarisierte Schadensreduktion: alle Risiken, die einen €-Beitrag zur
+    # Gesamtschadenssumme liefern (monetäre Sektorschäden + über Kostensätze
+    # monetarisierte Gesundheits-/Ausfall-/Umweltrisiken). Reine Index-Risiken
+    # (Kostensatz 0) tragen nichts bei und werden übersprungen.
     annual_benefit_damage = 0.0
     for code in linked:
         risk = catalog.RISKS_BY_CODE.get(code)
-        if not risk or risk.get("cost_dimension") != "monetary":
+        if not risk or not catalog.risk_contributes_to_total(risk):
             continue
         total_idx = total_index_by_risk.get(code, 0.0)
         if total_idx <= 0:

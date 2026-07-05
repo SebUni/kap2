@@ -71,6 +71,9 @@ def test_total_eur_equals_sum_of_cost_eur():
     total = agg["cost"]["total_eur"]
     summed = round(sum(r["cost_eur"] for r in agg["risks"].values()), 2)
     assert abs(total - summed) < 0.01
+    # Kein eigenständiges EAD-Risiko mehr → keine Doppelzählung.
+    assert "EXPECTED_TOTAL_DAMAGE_EAD_EUR" not in agg["risks"]
+    assert "EXPECTED_TOTAL_DAMAGE_EAD_EUR" not in catalog.RISKS_BY_CODE
 
 
 def test_index_only_risks_are_excluded_from_total():
