@@ -248,6 +248,14 @@ Kosten; Risiken ohne registrierte Funktion rechnen den linearen `legacy_cell_imp
   als **nicht-additive** Teilkennzahl (`NON_ADDITIVE_RISK_CODES`, aus `total_eur` raus).
 - **Operative Ausfallrisiken** (9, `flat`): bewusst keine per-Zell-Funktion —
   Ausfallstunden sind nicht zell-additiv; sie bleiben P90-basiert (VoLL-Kostensatz).
+  Die Ausfall**stunden** sind kommunenweit, die **€-Bewertung** skaliert aber mit der
+  Last (`pop/100.000`) — der VoLL-Satz ist je ~100.000-Ew.-Kommune kalibriert, sonst
+  zahlte eine Kleingemeinde denselben €-Ausfall wie eine Großstadt (§8/B6).
+- **Hazard-Intensität der Schadensfunktionen** nutzt FIXE Katalog-Referenzgrenzen
+  (`CellContext.haz_intensity`), entkoppelt von den editierbaren Screening-Normgrenzen
+  (`norm_min/max`) — ein Screening-Norm-Override verschiebt damit NICHT die absoluten
+  Schäden (§3.3-Restlücke, §8/B-Rest). Die Hitze-Gesundheitsfunktionen rechnen ohnehin
+  mit der absoluten Hitzetage-Intensität.
 - Alle Raten/Koeffizienten/Assetwerte sind editierbare, quellenbelegte Registry-
   Parameter (`impact/params.py` → `risks.<CODE>.impact.*` / `impact.*`).
 
@@ -397,6 +405,11 @@ $$\text{OPEX/a} = \text{opex\_fixed\_year} + \text{Anzahl} \times \text{opex\_pe
   Faktor benutzen. Flache Ausfall-/Screening-Risiken sind nicht zell-additiv
   (Aggregat P90-basiert) und tragen zu dieser Einzelmaßnahmen-Zeile nichts bei;
   ihre Minderung erscheint im Kommunen-Aggregat „mit Maßnahmen".
+  Mindert eine Maßnahme **direkte Sektorschäden**, sinken auch die gekoppelten
+  **Folgekosten** (`indirekt = k · Σ direkt`): das Aggregat „mit Maßnahmen"
+  rekonsolidiert sie je Zelle aus den reduzierten Direktschäden
+  (`_reconsolidate_cell_folgekosten`), und der Einzelmaßnahmen-Nutzen enthält den
+  Anteil `k · Reduktion`, sodass Sidebar-Nutzen == Aggregat-Delta bleibt (§8/B3).
 - Dashboard-Kostensektion (`cost-summary`) vergleicht Schäden **Basis** vs. **mit
   Maßnahmen** und summiert `capex_eur` / `opex_annual_eur` je Maßnahme; dieselbe
   Fläche/Anzahl/`unit_factor`-Herleitung wie `compute_impact`, damit Dashboard,

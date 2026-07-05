@@ -559,6 +559,12 @@ Stand Juli 2026, in committeten Stufen (Details siehe `git log` / Commit-Message
   Legacy-Fallback für Alt-Zellen; derselbe Zell-Faktor wie `_adjusted_cell_data`). Flache
   Ausfall-/Screening-Risiken bleiben ausgenommen (nicht zell-additiv). 6 neue DB-freie
   Tests beweisen die Reconciliation.
+- **Nachbesserungs-Stufen N1–N7 (erledigt, Juli 2026):** Zweit-Review nach Schicht B —
+  Details siehe **§8**. Kurz: N1 Null-Outcome-Phantomschaden (kritisch), N2 Override-Leak
+  + Live-Kostensatz + Stale-Hinweis, N3 Folgekosten nach Maßnahmen rekonsolidieren, N4
+  Doppelzählungen (Belastungsstunden/Boden), N5 Flat-Kosten pop-skaliert + Sanity-Anker,
+  N6 Schadensfunktions-Intensität von den Screening-Normgrenzen entkoppeln (§3.3-Restlücke),
+  N7 Doku/AF-Präzisierung + tsc. MODEL_VERSION-Bumps in N1 und N6.
 - **Stufe 7 — API-Felder + Dashboard + Doku (erledigt):** `risk-histogram` reicht die
   Schicht-B-Aggregatfelder (`outcome_sum`, `aggregation`, `top5_share`,
   `area_km2_affected`, `share_above_threshold`) durch; Frontend-Types ergänzt. Dashboard-
@@ -621,3 +627,35 @@ Nachfolgende Prompts (3 „Modell-Umbau/Monetarisierung", 7 „Dashboard ehrlich
 bei **Option C / C-stufig** direkt auf Abschnitt 5–6 auf: Kostensätze als Parameter
 (6.1–6.4), EAD als Summe (6.2), Aggregation auf Σ-Zell-Outcomes + P90/Max/Top-5 %
 (6.5), Indirekt-Multiplikator statt Einzelrisiken (6.2).
+
+---
+
+## 8. Zweit-Review nach Schicht B (Juli 2026)
+
+Nach der Umsetzung von Schicht B (Stufen 1–7, §6.7) wurde die Implementierung erneut
+geprüft. Die Architektur ist tragfähig (Max-Komposition, 47/47 kuratierte Ketten, EAD
+entfernt, k_indirekt, Σ-Aggregation, Kostensätze für alle 22 Schadensrisiken). Der
+Zweit-Review fand jedoch **einen kritischen Bug und mehrere methodische Restlücken**, die
+in den Nachbesserungs-Stufen **N1–N7** behoben wurden.
+
+| # | Befund | Schwere | Behebung |
+|---|--------|---------|----------|
+| **B1** | **Null-Outcome-Phantomschaden.** Der Runner unterdrückte Per-Zell-``outcome``/``cost_eur`` == 0 (``if outcome:``); ``aggregate``/``_cell_cost``/``get_layer`` deuteten den fehlenden Schlüssel als „Alt-Zelle" und rechneten den **Legacy-Weg** ``ref·Index/100·pop`` nach. Zellen mit legitimem 0-Schicht-B-Outcome (kühl unter AF-Schwelle, ohne Asset/Naturfläche) erzeugten so Phantomschaden (200 Zellen Index 9,6 → 1,73 Tote & 6,05 Mio €/a). Untergrub §3.6. | **kritisch** | **N1**: Outcome/Kosten immer materialisiert (auch 0.0); fehlender Schlüssel = nur noch echte Alt-Zelle. MODEL_VERSION-Bump. Regressionstest. |
+| **B2** | **Override-Leak + Handbuch-Widerspruch.** ``get_risk_aggregate``/``risk_summary`` riefen nie ``set_overrides`` → Aggregations-/Fallback-Pfade lasen die Overrides der zuletzt gerechneten Kommune (Modul-Global). Zudem summierte ``aggregate`` das beim Lauf materialisierte ``cost_eur`` → Kostensatz-Overrides wirkten NICHT ohne Neuberechnung (entgegen Handbuch). | hoch | **N2**: ``override_scope`` (request-scoped, Reset danach); ``aggregate``/``_cell_cost`` leiten Kosten live aus ``outcome × Kostensatz`` ab; ``PUT /parameters`` meldet ``recalculation_required``; Frontend-Hinweis; Handbuch korrigiert. |
+| **B3** | **Maßnahmen-Inkonsistenz zu Schicht B.** ``_adjusted_cell_data`` skalierte Outcome/Kosten linear mit dem Index-Faktor, rekonsolidierte die Folgekosten aber nicht: nach Maßnahmen galt ``indirekt ≠ k·Σ direkt``; Maßnahmen auf Sektorschäden erzeugten keinen Folgekosten-Nutzen (~``k`` Unterschätzung). | hoch | **N3**: Folgekosten je Zelle aus den reduzierten Direktschäden neu gebildet (``_reconsolidate_cell_folgekosten``); Einzelmaßnahmen-Nutzen um ``k·Reduktion`` ergänzt (Reconciliation bleibt exakt); irreführender „Legacy-linear"-Kommentar ersetzt. |
+| **B4** | **Neue Doppelzählung Gesundheit.** Belastungsstunden (800/600 €/h, „Gesundheits- und Produktivitätslast") UND Morbidität (5 000 €/Fall inkl. Produktivität), beide hitzegetrieben auf dieselbe Bevölkerung. | mittel | **N4**: Belastungsstunden auf reinen Produktivitätsverlust reduziert (400/300 €/h), klinischer Anteil nur bei Morbidität; Abgrenzung beidseitig dokumentiert. |
+| **B5** | **Neue Doppelzählung Boden.** Monetäres Bodenrisiko (Ertrags-/Bodenwert 30 k€/ha) und Umwelt-Bodendegradation (30 k€/ha „Bodenfunktionen") bepreisten dieselbe Ackerfläche doppelt. | mittel | **N4**: Umwelt-Boden auf den ökologischen Naturhaushaltsanteil reduziert (10 k€/ha); Abgrenzung in beiden Detailtexten (Muster Habitat↔Ökosystemleistung). |
+| **B6** | **Flat-Kostensätze ignorieren Kommunengröße.** VoLL-Sätze sind auf ~100 000-Ew.-Kommunen kalibriert, wurden aber unskaliert auf jede Gemeinde angewandt → kleine Kommunen um Größenordnungen überschätzt. | mittel | **N5**: ``estimate_outcome_and_cost`` skaliert die flat-Kostenseite mit ``pop/100 000`` (Ausfallstunden bleiben kommunenweit). |
+| **B7** | **Sanity-Anker ungenutzt.** ``impact/sanity.py`` existierte samt Test, wurde aber nie im Betrieb aufgerufen (§6.6-Plausibilisierung fand nicht statt). | klein | **N5**: ``sanity.check`` je pop-/area-Risiko in ``aggregate`` verdrahtet, ``sanity_ratio`` im Aggregat/Histogramm; vorbestehenden ZeroDivisionError behoben, 0-Outcome-Rauschen unterdrückt. |
+| **B8** | **AF-Doku überzeichnet.** Docstrings nannten die attributable Fraktion „überproportional in der Rohintensität", obwohl ``1−exp(−β·Δ₊)`` oberhalb der Schwelle **konkav/sättigend** ist — die Nichtlinearität stammt aus der **Schwelle**. | klein | **N7**: AF-Docstring präzisiert (Schwelle statt Konvexität). |
+| **B-Rest §3.3** | **Norm-Kopplung nur verschoben.** Monetäre/Umwelt-/ereignisgetriebene Schadensfunktionen trieben ihre Kurve mit ``haz_norm`` = den editierbaren Screening-Normgrenzen → ein Norm-Override veränderte weiterhin die absoluten €. | mittel | **N6**: ``haz_intensity`` mit FIXEN Katalog-Referenzgrenzen; alle Schadensfunktions-Treiber umgestellt (ohne Override identisch → reine Entkopplung). MODEL_VERSION-Bump. |
+| **B9** | Stale-Kommentare „Kein Kostensatz (=0)" an den Belastungsstunden-Risiken (längst über ``_RISK_COST_RATES`` gesetzt). | trivial | **N4**: entfernt. |
+| **B10** | ``npx tsc --noEmit`` meldete 2 Typfehler (ungültiges vis-network-Event ``viewChanged``); ``vite build`` prüfte nur transpilierend und blieb grün. | trivial | **N7**: ``viewChanged`` entfernt (``afterDrawing`` deckt Ansichtsänderungen ab); tsc sauber. |
+
+**Verbleibende, bewusst nicht in dieser Runde behobene Punkte** (Zielbild, unverändert
+gültig): die intensitäts-/wahrscheinlichkeitsbasierten Hazard-Datensätze (JRC-Tiefe-
+Schaden, KOSTRA, UFZ-SMI) speisen die Schadenskurven erst als spätere Verfeinerung
+(§6.6/6.7); die proportionale Maßnahmenwirkung auf Schicht-B-Kosten (Index-Faktor) bleibt
+eine bewusste Näherung (Maßnahmen wirken auf den Screening-Index, nicht auf die Hazard-
+Intensität); die Dashboard-Anzeige der neuen Kennzahlen (``sanity_ratio``, Top-5 %,
+Fläche) folgt in Prompt 7.

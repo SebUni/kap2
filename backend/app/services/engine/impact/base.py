@@ -87,10 +87,13 @@ class CellContext:
 def attributable_fraction(intensity: float, beta: float, threshold: float) -> float:
     """Attributable Fraktion ``1 − exp(−β·(Intensität − Schwelle)+)`` ∈ [0, 1).
 
-    Nichtlinear in der Intensität: unterhalb der Schwelle 0, darüber steigend und durch 1
-    begrenzt (eine attributable Fraktion kann nicht > 100 % sein). Durch die Schwelle ist
-    die Wirkung **überproportional in der Rohintensität** (Verdopplung der Hitzetage mehr
-    als verdoppelt die attributable Mortalität) — behebt den Linearitätsfehler des
-    Index-Modells (MODELL_KRITIK §3.4). β und Schwelle sind editierbar (RKI/Winklmayr 2022).
+    Nichtlinear in der Intensität: unterhalb der Schwelle **0**, oberhalb **konkav
+    steigend** (sättigend) und durch 1 begrenzt (eine attributable Fraktion kann nicht
+    > 100 % sein). Wichtig (MODELL_KRITIK §8/B8): Die Nichtlinearität, die den
+    Linearitätsfehler des Index-Modells (§3.4) behebt, entsteht durch die **Schwelle**
+    (Sprung von 0 auf positiv, unterhalb kein Beitrag) — NICHT durch eine konvexe
+    Krümmung; oberhalb der Schwelle ist die Kurve konkav. Für die typische Kalibrierung
+    (kleines β·Δ) verhält sich AF im relevanten Bereich näherungsweise linear in den
+    Hitzetagen über der Schwelle. β und Schwelle sind editierbar (RKI/Winklmayr 2022).
     """
     return 1.0 - exp(-beta * max(0.0, intensity - threshold))

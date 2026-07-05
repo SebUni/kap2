@@ -182,7 +182,9 @@ export default function LineageOperatorOverlays({
 
   useEffect(() => {
     if (!network) return
-    const events = ['afterDrawing', 'viewChanged', 'zoom', 'dragEnd', 'stabilizationIterationsDone'] as const
+    // 'afterDrawing' feuert bei jeder Ansichtsänderung (Pan/Zoom/Drag) → deckt die
+    // Overlay-Neupositionierung ab; 'viewChanged' ist kein vis-network-Event (Typfehler).
+    const events = ['afterDrawing', 'zoom', 'dragEnd', 'stabilizationIterationsDone'] as const
     for (const ev of events) network.on(ev, syncPositions)
     syncPositions()
     return () => {
