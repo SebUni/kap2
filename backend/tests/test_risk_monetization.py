@@ -37,6 +37,22 @@ def test_cost_rate_param_metadata():
     assert cp["unit"].startswith("€ je")
     assert cp["editable"] is True
     assert cp["value"] > 0.0
+    # Der VSL gehört an den Kostensatz, nicht mehr in den ref_value-Tooltip.
+    rv = next(p for p in params if p["id"].endswith(".ref_value"))
+    assert "VSL" not in rv["source_detail"]
+    assert "VSL" in cp["source_detail"]
+    assert cp["references"], "Kostensatz muss belegte Quellen tragen"
+
+
+def test_non_monetary_risks_have_cost_sources():
+    """Jeder Kostensatz trägt Kurz-Quelle + Herleitung; monetarisierte auch Referenzen."""
+    for r in catalog.RISKS:
+        if catalog.risk_is_monetary(r):
+            continue
+        assert r.get("cost_source"), r["code"]
+        assert r.get("cost_source_detail"), r["code"]
+        if catalog.risk_default_cost_per_outcome(r) > 0.0:
+            assert r.get("cost_source_refs"), r["code"]
 
 
 # ── (b) Gesamtschaden == Summe der Einzel-cost_eur ─────────────────────────────

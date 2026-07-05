@@ -853,6 +853,57 @@ RISKS: list[dict] = [
 ]
 
 
+# ── Monetarisierung der Risiken (Helfer) ─────────────────────────────────────────
+# Kernprinzip (Product-Owner-Vorgabe): Der Gesamtschaden ist die SUMME der monetär
+# bewerteten Einzelrisiken. JEDES Risiko fließt monetär ein; ein nicht-monetärer
+# Outcome (Tote, Fälle, Stunden, ha, Arten, Index) wird über einen eigenständigen,
+# editierbaren Kostensatz ``cost_per_outcome_eur`` (€ je Outcome-Einheit) bewertet.
+# Ein Risiko bleibt NUR dann unmonetarisiert (Kostensatz 0 → trägt 0 € bei), wenn
+# eine Monetarisierung eine Doppelzählung wäre (reine Screening-Index-Risiken); das
+# ist im jeweiligen ``cost_source_detail`` begründet.
+
+# Reine Screening-/Index-Risiken: Outcome IST der HxVxE-Index. Sie werden bewusst
+# NICHT monetarisiert (Kostensatz 0), weil ihr Schaden bereits über die konkreten
+# Mortalitäts-/Morbiditäts-/Schadens-/Ausfallrisiken erfasst ist – eine eigene
+# €-Bewertung wäre eine Doppelzählung (siehe docs/MODELL_KRITIK.md §6).
+INDEX_ONLY_RISK_CODES: frozenset[str] = frozenset(
+    r["code"] for r in RISKS if r.get("outcome_unit") == "Index"
+)
+
+
+def risk_is_monetary(risk: dict) -> bool:
+    """True, wenn der ref_value bereits in €/Jahr vorliegt (cost_dimension monetary)."""
+    return risk.get("cost_dimension") == "monetary"
+
+
+def risk_default_cost_per_outcome(risk: dict) -> float:
+    """Default-Kostensatz (€ je Outcome-Einheit) eines nicht-monetären Risikos."""
+    return float(risk.get("cost_per_outcome_eur") or 0.0)
+
+
+def risk_contributes_to_total(risk: dict) -> bool:
+    """True, wenn das Risiko einen €-Beitrag zur Gesamtschadenssumme liefert.
+
+    Monetäre Risiken tragen immer bei; nicht-monetäre nur, wenn ein positiver
+    Kostensatz hinterlegt ist. Reine Index-Risiken (Kostensatz 0) sind damit
+    automatisch von der Summe ausgenommen (dokumentierte Vermeidung von
+    Doppelzählung).
+    """
+    if risk_is_monetary(risk):
+        return True
+    return risk_default_cost_per_outcome(risk) > 0.0
+
+
+def cost_unit_label(outcome_unit: str) -> str:
+    """Einheit des Kostensatz-Parameters: „€ je <Outcome-Einheit ohne /Jahr>“."""
+    base = (outcome_unit or "").replace("/Jahr", "").strip()
+    if not base or base == "€":
+        return "€"
+    if base == "Index":
+        return "€ je Index-Punkt"
+    return f"€ je {base}"
+
+
 # ── Risiko-Quellenanreicherung (source_detail + IEEE-Referenzen) ──────────────────
 # Zentral gepflegte Herleitungstexte + Bibliografie-Verweise je Risiko, sodass der
 # (i)-Tooltip an JEDEM Referenzwert erklärt, wie der Wert zustande kommt und worauf er
@@ -875,8 +926,9 @@ def _enrich_risk_sources() -> None:
             "Winklmayr u. a. 2022, RKI-Sachstandsbericht Klimawandel & Gesundheit 2023). Die "
             "UBA-Klimawirkungs- und Risikoanalyse 2021 (Handlungsfeld Gesundheit) bestätigt die "
             "zunehmende Hitzemortalität. Eine typische Kommune mit P90-Index 20-40 ergibt "
-            "3,6-7,2/100.000 (statistikkonform). Kostensatz 3,5 Mio € (VSL im gängigen "
-            "EU/OECD-Band ~1-4 Mio) als Punktwert; editierbar.",
+            "3,6-7,2/100.000 (statistikkonform). Die monetäre Bewertung erfolgt über den "
+            "separaten, editierbaren Kostensatz-Parameter „Kostensatz (Monetarisierung)“ "
+            "– nicht mehr über diesen Referenzwert.",
             ["RKI_Hitzemortalitaet", "UBA_KWRA_2021"]),
         "EXPECTED_BUILDING_DAMAGE_EUR": (
             "Nationale jährliche Gebäudeschäden (Hochwasser + Sturm/Hagel) ~3,5 Mrd €/a ÷ 832 "
@@ -959,6 +1011,168 @@ def _enrich_risk_sources() -> None:
 
 
 _enrich_risk_sources()
+
+
+# ── Monetarisierungs-Kostensätze je Risiko (Quellen + Herleitung) ─────────────────
+# Setzt für JEDES nicht-monetäre Risiko den Kostensatz ``cost_per_outcome_eur`` (€ je
+# Outcome-Einheit) samt ``cost_source``/``cost_source_detail``/``cost_source_refs`` für
+# den eigenständigen Registry-Parameter „Kostensatz (Monetarisierung)“. Damit fließt
+# jedes Risiko monetär in den Gesamtschaden ein. Reine Screening-Index-Risiken bleiben
+# bewusst bei 0 € (Vermeidung von Doppelzählung – im Detailtext begründet).
+# Quellenprimat: OECD-VSL (Mortalität), UBA-Methodenkonvention 3.1 (Gesundheit/Umwelt),
+# EWI-VoLL 2015 (Energie-/Ausfallkosten), BBK-KRITIS (Ausfallzeiten), Prognos 2023
+# (indirekte/verkehrliche Folgen), TEEB-DE/BfN (Ökosystem-/Flächenwerte).
+
+# CODE -> (Kostensatz €/Outcome, Kurz-Quelle, Referenz-Keys, Herleitungstext).
+_RISK_COST_RATES: dict[str, tuple[float, str, list[str], str]] = {
+    # ── Gesundheit: Personenschäden (Kostensatz je Fall/Person) ──
+    "EXPECTED_ANNUAL_MORTALITY": (
+        3_500_000.0, "OECD 2012 (VSL) / RKI 2023", ["OECD_VSL_2012", "RKI_Hitzemortalitaet"],
+        "Wert eines statistischen Lebens (VSL) 3,5 Mio € je vorzeitigem Todesfall – "
+        "Punktwert im international gebräuchlichen Band (OECD 2012: Meta-Analyse "
+        "internationaler Zahlungsbereitschafts-Studien, EU/OECD-Zentralwerte ~1–4 Mio €). "
+        "Editierbarer Kostensatz; ersetzt die frühere Prosa im Referenzwert-Tooltip."),
+    "EXPECTED_ANNUAL_MORBIDITY": (
+        5_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
+        "Durchschnittliche Krankheitskosten 5.000 € je klimabedingtem Erkrankungsfall "
+        "(ambulante/stationäre Behandlung + Produktivitätsausfall), Größenordnung an den "
+        "Gesundheits-Kostensätzen der UBA-Methodenkonvention 3.1 orientiert. Editierbar."),
+    "EXPECTED_ANNUAL_INJURIES": (
+        12_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
+        "12.000 € je Verletztem (Behandlung, Reha, temporärer Erwerbsausfall) als "
+        "editierbarer Punktwert; Größenordnung an den Gesundheits-/Unfallkostensätzen der "
+        "UBA-Methodenkonvention 3.1 orientiert."),
+    "EXPECTED_ANNUAL_MENTAL_HEALTH": (
+        4_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
+        "4.000 € je psychischem Belastungsfall (Diagnostik, Therapie, Ausfallzeiten) als "
+        "editierbarer Punktwert, an den Gesundheits-Kostensätzen der UBA-Methoden"
+        "konvention 3.1 orientiert. Keine belastbare Einzelstatistik ⇒ Modellannahme."),
+    "EXPECTED_ANNUAL_AFFECTED_EVACUATED": (
+        2_500.0, "UBA MK3.1 / BBK", ["UBA_Methodenkonvention_MK3.1", "BBK_KRITIS"],
+        "2.500 € je betroffener/evakuierter Person (Notunterbringung, Versorgung, "
+        "Einsatz-/Betreuungskosten) als editierbarer Punktwert; Größenordnung an "
+        "UBA MK3.1 und BBK-Bevölkerungsschutz-Kennzahlen orientiert."),
+    "EXPECTED_THERMAL_STRESS_HOURS": (
+        800.0, "UBA MK3.1 2020 (Modellannahme)", ["UBA_Methodenkonvention_MK3.1"],
+        "800 € je aggregierter Belastungsstunde als editierbare Modellannahme "
+        "(Produktivitäts- und Gesundheitslast thermischer Belastung), an den "
+        "Produktivitäts-/Gesundheitskosten-Ansätzen der UBA-Methodenkonvention 3.1 "
+        "orientiert. Bislang 0 € ⇒ Risiko fehlte in der Schadenssumme; jetzt monetarisiert."),
+    "EXPECTED_POLLUTANT_EXPOSURE_HOURS": (
+        600.0, "UBA MK3.1 2020 (Modellannahme)", ["UBA_Methodenkonvention_MK3.1"],
+        "600 € je aggregierter Schadstoff-Expositionsstunde als editierbare Modellannahme "
+        "(Gesundheits-/Produktivitätslast), an UBA-MK3.1-Luftschadstoff-Kostensätzen "
+        "orientiert. Bislang 0 € ⇒ jetzt monetarisiert."),
+    # ── Operativ: Ausfallstunden (Kostensatz je Ausfallstunde, aggregiert) ──
+    "EXPECTED_CI_OUTAGE_HOURS": (
+        40_000.0, "BBK KRITIS / EWI-VoLL 2015", ["BBK_KRITIS", "EWI_VoLL_2015"],
+        "40.000 € je aggregierter Ausfallstunde kritischer Infrastruktur (gemischtes "
+        "Sektorportfolio) als editierbare Modellannahme; hergeleitet als konservativer "
+        "Bruchteil des EWI-VoLL (nationale Stromausfallkosten ~430 Mio €/h) auf "
+        "Kommunalebene, ergänzt um BBK-KRITIS-Systemabgrenzung. Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_ENERGY_OUTAGE_HOURS": (
+        120_000.0, "EWI-VoLL 2015", ["EWI_VoLL_2015"],
+        "120.000 € je Stromausfallstunde als editierbare Modellannahme, hergeleitet aus "
+        "dem Value of Lost Load (EWI 2015: Haushalte ~11,92 €/kWh; nationale Ausfallkosten "
+        "~430 Mio €/h) heruntergerechnet auf die Last einer ~100.000-Ew.-Kommune. "
+        "Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_WATER_SUPPLY_OUTAGE_HOURS": (
+        60_000.0, "BBK KRITIS (Modellannahme)", ["BBK_KRITIS"],
+        "60.000 € je Ausfallstunde der Wasserversorgung (Ersatzversorgung, Gesundheits-/"
+        "Betriebsfolgen) als editierbare Modellannahme, Systemabgrenzung an BBK-KRITIS "
+        "angelehnt. Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_WASTEWATER_OUTAGE_HOURS": (
+        25_000.0, "BBK KRITIS (Modellannahme)", ["BBK_KRITIS"],
+        "25.000 € je Ausfallstunde der Abwasserentsorgung (Umwelt-/Hygienefolgen, "
+        "Notbetrieb) als editierbare Modellannahme, an BBK-KRITIS angelehnt. "
+        "Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_COMMUNICATION_OUTAGE_HOURS": (
+        50_000.0, "BBK KRITIS (Modellannahme)", ["BBK_KRITIS"],
+        "50.000 € je Ausfallstunde der Kommunikationsnetze (Wirtschafts-, Notruf- und "
+        "Koordinationsfolgen) als editierbare Modellannahme, an BBK-KRITIS angelehnt. "
+        "Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_TRANSPORT_DISRUPTION_HOURS": (
+        30_000.0, "Prognos 2023 / BBK", ["Prognos_Klimaschaeden_2023", "BBK_KRITIS"],
+        "30.000 € je Stunde Verkehrsunterbrechung (aggregierte Zeit-/Wertschöpfungskosten "
+        "gestörter Personen- und Güterverkehre) als editierbare Modellannahme, "
+        "Größenordnung an Prognos-2023-Folgekosten und BBK-KRITIS angelehnt. "
+        "Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_SUPPLY_CHAIN_DISRUPTION_HOURS": (
+        40_000.0, "Prognos 2023 (Modellannahme)", ["Prognos_Klimaschaeden_2023"],
+        "40.000 € je Stunde Lieferkettenunterbrechung (Produktions-/Wertschöpfungsausfall) "
+        "als editierbare Modellannahme, an den indirekten Wirtschaftsfolgen aus Prognos "
+        "2023 orientiert. Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_ADMIN_OUTAGE_HOURS": (
+        15_000.0, "BBK KRITIS (Modellannahme)", ["BBK_KRITIS"],
+        "15.000 € je administrativer Ausfallstunde (verzögerte Verwaltungs-/Daseins"
+        "vorsorge-Leistungen) als editierbare Modellannahme, an BBK-KRITIS angelehnt. "
+        "Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_FUNCTIONAL_FAILURE_DURATION": (
+        30_000.0, "BBK KRITIS (Modellannahme)", ["BBK_KRITIS"],
+        "30.000 € je Stunde Funktionsausfall (kaskadierende System-/Versorgungsfolgen) als "
+        "editierbare Modellannahme, an BBK-KRITIS-Kaskadenbetrachtungen angelehnt. "
+        "Bislang 0 € ⇒ jetzt bewertet."),
+    # ── Umwelt: physische Verluste (Kostensatz je Art / ha) ──
+    "EXPECTED_BIODIVERSITY_LOSS": (
+        500_000.0, "TEEB-DE / UBA KWRA 2021", ["TEEB_DE_Naturkapital", "UBA_KWRA_2021"],
+        "500.000 € je verlorener Art (Wiederherstellungs-/Erhaltungsprogramm-Größenordnung) "
+        "als editierbare Modellannahme, am Naturkapital-/Ökosystemleistungs-Bewertungsrahmen "
+        "von TEEB-DE orientiert. Abgrenzung: bewertet den physischen Artverlust, nicht den "
+        "laufenden Leistungsausfall (der über „Verlust von Ökosystemleistungen“ läuft) – "
+        "keine Doppelzählung. Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_HABITAT_LOSS": (
+        80_000.0, "TEEB-DE (Modellannahme)", ["TEEB_DE_Naturkapital"],
+        "80.000 € je ha verlorenem Habitat (Renaturierungs-/Wiederherstellungskosten) als "
+        "editierbare Modellannahme, an TEEB-DE-Bewertungen orientiert. Abgrenzung zum "
+        "laufenden Ökosystemleistungs-Verlust (eigener monetärer Posten) im Sinne der "
+        "Vermeidung von Doppelzählung. Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_SOIL_DEGRADATION": (
+        30_000.0, "TEEB-DE / UBA MK3.1", ["TEEB_DE_Naturkapital", "UBA_Methodenkonvention_MK3.1"],
+        "30.000 € je ha degradiertem Boden (Verlust von Bodenfunktionen/Wiederher"
+        "stellungsaufwand) als editierbare Modellannahme, an TEEB-DE und UBA MK3.1 "
+        "orientiert. Bislang 0 € ⇒ jetzt bewertet."),
+    "EXPECTED_VEGETATION_DAMAGE": (
+        20_000.0, "TEEB-DE (Modellannahme)", ["TEEB_DE_Naturkapital"],
+        "20.000 € je ha geschädigter Vegetation (Wiederbegrünungs-/Wiederherstellungs"
+        "kosten) als editierbare Modellannahme, an TEEB-DE-Bewertungen orientiert. "
+        "Bislang 0 € ⇒ jetzt bewertet."),
+}
+
+_INDEX_EXCLUSION_DETAIL = (
+    "Bewusst NICHT monetarisiert (Kostensatz 0 €): Dieses Risiko ist ein reines "
+    "Screening-Index-Risiko; sein Schadensgehalt ist bereits über die konkreten "
+    "monetär bewerteten Risiken (Mortalität/Morbidität, Sektor-/Ausfall-/Flächen"
+    "schäden) erfasst. Eine eigene €-Bewertung wäre eine Doppelzählung und ist "
+    "deshalb aus der Gesamtschadenssumme ausgenommen (siehe docs/MODELL_KRITIK.md §6). "
+    "Editierbar: Wird ein positiver Kostensatz gesetzt, fließt das Risiko additiv ein.")
+
+
+def _enrich_risk_cost_sources() -> None:
+    for r in RISKS:
+        if risk_is_monetary(r):
+            continue  # ref_value ist bereits €/Jahr → kein Kostensatz-Parameter
+        code = r["code"]
+        if code in _RISK_COST_RATES:
+            rate, src, refs, detail = _RISK_COST_RATES[code]
+            r["cost_per_outcome_eur"] = rate
+            r["cost_source"] = src
+            r["cost_source_detail"] = detail
+            r["cost_source_refs"] = refs
+        elif code in INDEX_ONLY_RISK_CODES:
+            r["cost_per_outcome_eur"] = 0.0
+            r["cost_source"] = "Bewusst nicht monetarisiert (Doppelzählung)"
+            r["cost_source_detail"] = _INDEX_EXCLUSION_DETAIL
+            r["cost_source_refs"] = ["UBA_KWRA_2021"]
+        else:
+            # Sicherheitsnetz: nicht-monetäres Risiko ohne Kostensatz-Eintrag.
+            r.setdefault("cost_per_outcome_eur", 0.0)
+            r["cost_source"] = r.get("cost_source") or "Modellannahme (Kostensatz, unbelegt)"
+            r["cost_source_detail"] = r.get("cost_source_detail") or (
+                "Für dieses Risiko ist noch kein belegter Kostensatz hinterlegt; "
+                "Bewertung als editierbare Modellannahme.")
+
+
+_enrich_risk_cost_sources()
 
 
 # ── Quellenanreicherung Hazards/Expositionen/Sensitivitäten ──────────────────────
@@ -2415,56 +2629,6 @@ EXPOSURES_BY_CODE = {e["code"]: e for e in EXPOSURES}
 VULNERABILITIES_BY_CODE = {v["code"]: v for v in VULNERABILITIES}
 RISKS_BY_CODE = {r["code"]: r for r in RISKS}
 MEASURES_BY_CODE = {m["code"]: m for m in MEASURES}
-
-# ── Monetarisierung der Risiken ──────────────────────────────────────────────────
-# Kernprinzip (Product-Owner-Vorgabe): Der Gesamtschaden ist die SUMME der monetär
-# bewerteten Einzelrisiken. JEDES Risiko fließt monetär ein; ein nicht-monetärer
-# Outcome (Tote, Fälle, Stunden, ha, Arten, Index) wird über einen eigenständigen,
-# editierbaren Kostensatz ``cost_per_outcome_eur`` (€ je Outcome-Einheit) bewertet.
-# Ein Risiko bleibt NUR dann unmonetarisiert (Kostensatz 0 → trägt 0 € bei), wenn
-# eine Monetarisierung eine Doppelzählung wäre (reine Screening-Index-Risiken); das
-# ist im jeweiligen ``cost_source_detail`` begründet.
-
-# Reine Screening-/Index-Risiken: Outcome IST der HxVxE-Index. Sie werden bewusst
-# NICHT monetarisiert (Kostensatz 0), weil ihr Schaden bereits über die konkreten
-# Mortalitäts-/Morbiditäts-/Schadens-/Ausfallrisiken erfasst ist – eine eigene
-# €-Bewertung wäre eine Doppelzählung (siehe docs/MODELL_KRITIK.md §6).
-INDEX_ONLY_RISK_CODES: frozenset[str] = frozenset(
-    r["code"] for r in RISKS if r.get("outcome_unit") == "Index"
-)
-
-
-def risk_is_monetary(risk: dict) -> bool:
-    """True, wenn der ref_value bereits in €/Jahr vorliegt (cost_dimension monetary)."""
-    return risk.get("cost_dimension") == "monetary"
-
-
-def risk_default_cost_per_outcome(risk: dict) -> float:
-    """Default-Kostensatz (€ je Outcome-Einheit) eines nicht-monetären Risikos."""
-    return float(risk.get("cost_per_outcome_eur") or 0.0)
-
-
-def risk_contributes_to_total(risk: dict) -> bool:
-    """True, wenn das Risiko einen €-Beitrag zur Gesamtschadenssumme liefert.
-
-    Monetäre Risiken tragen immer bei; nicht-monetäre nur, wenn ein positiver
-    Kostensatz hinterlegt ist. Reine Index-Risiken (Kostensatz 0) sind damit
-    automatisch von der Summe ausgenommen (dokumentierte Vermeidung von
-    Doppelzählung).
-    """
-    if risk_is_monetary(risk):
-        return True
-    return risk_default_cost_per_outcome(risk) > 0.0
-
-
-def cost_unit_label(outcome_unit: str) -> str:
-    """Einheit des Kostensatz-Parameters: „€ je <Outcome-Einheit ohne /Jahr>“."""
-    base = (outcome_unit or "").replace("/Jahr", "").strip()
-    if not base or base == "€":
-        return "€"
-    if base == "Index":
-        return "€ je Index-Punkt"
-    return f"€ je {base}"
 
 INDICATOR_BY_CODE = {
     **HAZARDS_BY_CODE,

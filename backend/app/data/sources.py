@@ -368,6 +368,52 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "JHealthMonit_2023_S4_Hitze_Sachstandsbericht_Klimawandel_Gesundheit.pdf",
         "accessed": "2026-07-04",
     },
+    "OECD_VSL_2012": {
+        "ieee": "Organisation für wirtschaftliche Zusammenarbeit und Entwicklung (OECD), "
+                "„Mortality Risk Valuation in Environment, Health and Transport Policies,“ "
+                "OECD Publishing, Paris, 2012, doi:10.1787/9789264130807-en. Meta-Analyse "
+                "internationaler Zahlungsbereitschafts-Studien zum Wert eines statistischen "
+                "Lebens (VSL). [Online]. Verfügbar: https://www.oecd.org/en/publications/"
+                "mortality-risk-valuation-in-environment-health-and-transport-policies_"
+                "9789264130807-en.html. [Zugriff: 5. Juli 2026].",
+        "url": "https://www.oecd.org/en/publications/"
+               "mortality-risk-valuation-in-environment-health-and-transport-policies_"
+               "9789264130807-en.html",
+        "archive_url": "https://web.archive.org/web/20260223012309/"
+                       "https://www.oecd.org/en/publications/"
+                       "mortality-risk-valuation-in-environment-health-and-transport-policies_"
+                       "9789264130807-en.html",
+        "accessed": "2026-07-05",
+    },
+    "EWI_VoLL_2015": {
+        "ieee": "C. Growitsch, R. Malischek, S. Nick und H. Wetzel, „The Costs of Power "
+                "Interruptions in Germany – an Assessment in the Light of the Energiewende,“ "
+                "EWI Working Paper Nr. 13/07, Energiewirtschaftliches Institut an der "
+                "Universität zu Köln (EWI), Köln, Deutschland, 2013 (publ. German Economic "
+                "Review, Bd. 16(3), S. 307–323, 2015). Value of Lost Load Haushalte "
+                "~11,92 €/kWh; nationale Ausfallkosten ~430 Mio €/h. [Online]. Verfügbar: "
+                "https://www.ewi.uni-koeln.de/cms/wp-content/uploads/2015/12/"
+                "EWI_WP_13-07-Costs-of-Power-Interruptions-in-Germany.pdf. "
+                "[Zugriff: 5. Juli 2026].",
+        "url": "https://www.ewi.uni-koeln.de/cms/wp-content/uploads/2015/12/"
+               "EWI_WP_13-07-Costs-of-Power-Interruptions-in-Germany.pdf",
+        "archive_url": "https://web.archive.org/web/20250624093413/"
+                       "https://www.ewi.uni-koeln.de/cms/wp-content/uploads/2015/12/"
+                       "EWI_WP_13-07-Costs-of-Power-Interruptions-in-Germany.pdf",
+        "accessed": "2026-07-05",
+    },
+    "TEEB_DE_Naturkapital": {
+        "ieee": "Naturkapital Deutschland – TEEB DE (Hrsg. B. Hansjürgens u. a.), "
+                "„Der Wert der Natur für Wirtschaft und Gesellschaft – Eine Einführung,“ "
+                "Helmholtz-Zentrum für Umweltforschung (UFZ) im Auftrag von BMU/BfN, "
+                "Leipzig/Berlin, Deutschland, 2012–2018. Ökonomische Bewertung von "
+                "Ökosystemleistungen und Naturkapital in Deutschland. [Online]. Verfügbar: "
+                "https://www.ufz.de/teebde/index.php?de=43777. [Zugriff: 5. Juli 2026].",
+        "url": "https://www.ufz.de/teebde/index.php?de=43777",
+        "archive_url": "https://web.archive.org/web/20260510142628/"
+                       "https://www.ufz.de/teebde/index.php?de=43777",
+        "accessed": "2026-07-05",
+    },
     # ── Expositionen / Sensitivitäten (Normierungsskalen) ───────────────────
     "Zensus_2022": {
         "ieee": "Statistisches Bundesamt (Destatis), „Zensus 2022 – Bevölkerung im "
