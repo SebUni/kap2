@@ -43,20 +43,23 @@ def _risk_worker(idx: int) -> tuple[int, dict]:
     # Per-Zell-Outcome + Kosten je Risiko materialisieren (Schicht B): registrierte
     # Schadensfunktionen (Gesundheit ab Stufe 4) erhalten die volle CellContext, alle
     # übrigen rechnen den linearen Legacy-Weg. aggregate() summiert die Zell-Werte; der
-    # GeoPackage-Export erhält gefüllte Spalten. Null-Outcome/Kosten werden weggelassen.
+    # GeoPackage-Export erhält gefüllte Spalten.
     ctx = CellContext(ci=ci, hev=hev, hev_norm=hev_norm, indices=indices, regional=regional)
     impacts = impact.compute_all_cell_impacts(ctx)
     risks: dict[str, dict] = {}
     for code, risk_idx in indices.items():
         imp = impacts.get(code, {})
-        entry = {"index": risk_idx}
-        outcome = round(imp.get("outcome", 0.0), 4)
-        cost = round(imp.get("cost_eur", 0.0), 2)
-        if outcome:
-            entry["outcome"] = outcome
-        if cost:
-            entry["cost_eur"] = cost
-        risks[code] = entry
+        # Outcome/Kosten IMMER schreiben — auch echte 0-Werte. Ein FEHLENDER Schlüssel
+        # bedeutet ausschließlich „Alt-Zelle vor Schicht B" und löst in aggregate()/
+        # _cell_cost/get_layer den Legacy-Fallback (ref·Index/100·pop) aus. Würde ein
+        # legitimer 0-Outcome (kühle Zelle unter der AF-Schwelle, Zelle ohne Asset/
+        # Naturfläche) den Schlüssel weglassen, würde die Zelle fälschlich legacy-
+        # nachgerechnet und erzeugte Phantomschaden (MODELL_KRITIK §8, Befund B1).
+        risks[code] = {
+            "index": risk_idx,
+            "outcome": round(imp.get("outcome", 0.0), 4),
+            "cost_eur": round(imp.get("cost_eur", 0.0), 2),
+        }
 
     data = {
         "hazards": hev["hazards"],

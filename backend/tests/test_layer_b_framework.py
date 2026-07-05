@@ -28,12 +28,11 @@ def _cell(index: float, pop: float, materialize: bool = True) -> dict:
     for r in catalog.RISKS:
         entry = {"index": index}
         if materialize:
+            # wie der Runner seit N1: outcome/cost_eur IMMER schreiben (auch 0.0),
+            # damit ein fehlender Schlüssel eindeutig „Alt-Zelle" bedeutet (§8/B1).
             imp = impact.compute_cell_impacts(r, index, pop)
-            o, c = round(imp["outcome"], 4), round(imp["cost_eur"], 2)
-            if o:
-                entry["outcome"] = o
-            if c:
-                entry["cost_eur"] = c
+            entry["outcome"] = round(imp["outcome"], 4)
+            entry["cost_eur"] = round(imp["cost_eur"], 2)
         risks[r["code"]] = entry
     return {"risks": risks, "inputs": {"pop": pop}}
 
@@ -128,6 +127,26 @@ def test_compute_cell_impacts_is_legacy_even_with_impact_fn():
     assert abs(imp["outcome"] - legacy) < 1e-9
     assert imp["outcome"] > 0.0 and imp["cost_eur"] > 0.0
     assert impact.has(MORT)
+
+
+# ── (g) B1: echter 0-Outcome ≠ Legacy-Phantom ──────────────────────────────────
+
+def test_zero_schicht_b_outcome_not_legacy_recomputed():
+    """MODELL_KRITIK §8/B1: Eine neu gerechnete Zelle mit echtem Schicht-B-Outcome 0
+    (materialisiert, aber Index > 0) trägt 0 bei — kein Legacy-Phantomschaden. Nur ein
+    FEHLENDER Schlüssel (Alt-Zelle) darf über den Legacy-Weg nachgerechnet werden."""
+    override_context.set_overrides({})
+    # Neu gerechnete Zelle: Index > 0, aber Schadensfunktion liefert 0 (kühl/kein Asset).
+    new_cell = {"risks": {MORT: {"index": 9.6, "outcome": 0.0, "cost_eur": 0.0}},
+                "inputs": {"pop": 500.0}}
+    agg_new = risk_engine.aggregate([new_cell] * 200, total_pop=100000.0, area_km2=50.0)
+    assert agg_new["risks"][MORT]["outcome"] == 0.0
+    assert agg_new["risks"][MORT]["cost_eur"] == 0.0
+
+    # Alt-Zelle ohne materialisierten Outcome (Schlüssel fehlt) → Legacy-Fallback (> 0).
+    old_cell = {"risks": {MORT: {"index": 9.6}}, "inputs": {"pop": 500.0}}
+    agg_old = risk_engine.aggregate([old_cell] * 200, total_pop=100000.0, area_km2=50.0)
+    assert agg_old["risks"][MORT]["cost_eur"] > 0.0
 
 
 if __name__ == "__main__":
