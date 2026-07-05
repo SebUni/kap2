@@ -208,8 +208,12 @@ IMPACT_GLOBAL_SPECS: list[dict] = [
      "source_refs": ["Prognos_Klimaschaeden_2023"]},
     {"key": "soil_value_eur_ha", "value": 30_000.0, "label": "Bodenwert je ha",
      "unit": "€/ha", "source": "BGR/Modellannahme",
-     "source_detail": "Bodenwert je ha (Wiederherstellung/Bodenfunktion) für Erosions-/"
-                      "Degradationsschäden.", "source_refs": ["Prognos_Klimaschaeden_2023"]},
+     "source_detail": "ÖKONOMISCHER Bodenwert je ha (Ertrags-/Wiederherstellungswert der "
+                      "Nutzfläche) für das monetäre Erosions-/Degradationsrisiko. Abgrenzung "
+                      "(§8/B5): Der ökologische Bodenfunktionswert (Naturhaushalt) derselben "
+                      "Fläche ist getrennt über das Umweltrisiko „Bodendegradation“ bewertet "
+                      "(dortiger Kostensatz €/ha) — keine Doppelzählung.",
+     "source_refs": ["Prognos_Klimaschaeden_2023"]},
     {"key": "esl_value_eur_ha", "value": 3000.0, "label": "Ökosystemleistungswert je ha·a",
      "unit": "€/ha·a", "source": "TEEB-DE / Grunewald",
      "source_detail": "Jährlicher Wert der Ökosystemleistungen je ha Wald-/Grünfläche.",

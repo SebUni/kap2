@@ -561,16 +561,18 @@ RISKS: list[dict] = [
      "hazards": ["HEAT_WAVE", "MEAN_TEMPERATURE_RISE"],
      "exposures": ["OUTDOOR_THERMAL_EXPOSURE", "POPULATION_DENSITY"],
      "vulnerabilities": ["HEAT_SENSITIVITY", "UHI_INTENSITY", "GREEN_SPACE_SHARE"],
-     # Kein Kostensatz (cost_per_outcome_eur=0); reiner Belastungsindikator, Punktwert als Modellannahme.
-     "ref_value": 400.0, "scale": "pop", "cost_per_outcome_eur": 0.0, "source": "Modellannahme (Belastungsstunden, unbelegt)",
+     # Kostensatz wird in _RISK_COST_RATES gesetzt (Arbeitsproduktivität, ohne klinische
+     # Behandlung — die zählt „Erwartete jährliche Morbidität"; Abgrenzung dort/hier).
+     "ref_value": 400.0, "scale": "pop", "source": "Modellannahme (Belastungsstunden, unbelegt)",
      "description": "Erwartete jährliche Stunden thermischer Belastung.", "priority": 1},
     {"code": "EXPECTED_POLLUTANT_EXPOSURE_HOURS", "name": "Schadstoffexpositionsstunden",
      "outcome_unit": "Stunden/Jahr", "group": "heat", "cost_dimension": "health",
      "hazards": ["HEAT_WAVE", "MEAN_TEMPERATURE_RISE"],
      "exposures": ["POPULATION_DENSITY", "OUTDOOR_THERMAL_EXPOSURE"],
      "vulnerabilities": ["AIR_QUALITY_RISK", "HEAT_SENSITIVITY"],
-     # Kein Kostensatz (cost_per_outcome_eur=0); reiner Belastungsindikator, Punktwert als Modellannahme.
-     "ref_value": 250.0, "scale": "pop", "cost_per_outcome_eur": 0.0, "source": "Modellannahme (Belastungsstunden, unbelegt)",
+     # Kostensatz wird in _RISK_COST_RATES gesetzt (Produktivitäts-/Komfortverlust, ohne
+     # klinische Behandlung — Abgrenzung zur Morbidität).
+     "ref_value": 250.0, "scale": "pop", "source": "Modellannahme (Belastungsstunden, unbelegt)",
      "description": "Erwartete jährliche Schadstoffexpositionsstunden.", "priority": 2},
     {"code": "EXPECTED_BUILDING_DAMAGE_EUR", "name": "Gebäudeschäden",
      "outcome_unit": "€/Jahr", "group": "flood", "cost_dimension": "monetary",
@@ -1076,8 +1078,11 @@ _RISK_COST_RATES: dict[str, tuple[float, str, list[str], str]] = {
     "EXPECTED_ANNUAL_MORBIDITY": (
         5_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
         "Durchschnittliche Krankheitskosten 5.000 € je klimabedingtem Erkrankungsfall "
-        "(ambulante/stationäre Behandlung + Produktivitätsausfall), Größenordnung an den "
-        "Gesundheits-Kostensätzen der UBA-Methodenkonvention 3.1 orientiert. Editierbar."),
+        "(ambulante/stationäre Behandlung + krankheitsbedingter Produktivitätsausfall), "
+        "Größenordnung an den Gesundheits-Kostensätzen der UBA-Methodenkonvention 3.1 "
+        "orientiert. Editierbar. Abgrenzung (§8/B4): erfasst die KLINISCHEN Fälle; die "
+        "subklinische Produktivitätslast thermischer/Schadstoff-Belastung ist getrennt über "
+        "die Belastungsstunden-Risiken bewertet — keine Doppelzählung."),
     "EXPECTED_ANNUAL_INJURIES": (
         12_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
         "12.000 € je Verletztem (Behandlung, Reha, temporärer Erwerbsausfall) als "
@@ -1094,16 +1099,20 @@ _RISK_COST_RATES: dict[str, tuple[float, str, list[str], str]] = {
         "Einsatz-/Betreuungskosten) als editierbarer Punktwert; Größenordnung an "
         "UBA MK3.1 und BBK-Bevölkerungsschutz-Kennzahlen orientiert."),
     "EXPECTED_THERMAL_STRESS_HOURS": (
-        800.0, "UBA MK3.1 2020 (Modellannahme)", ["UBA_Methodenkonvention_MK3.1"],
-        "800 € je aggregierter Belastungsstunde als editierbare Modellannahme "
-        "(Produktivitäts- und Gesundheitslast thermischer Belastung), an den "
-        "Produktivitäts-/Gesundheitskosten-Ansätzen der UBA-Methodenkonvention 3.1 "
-        "orientiert. Bislang 0 € ⇒ Risiko fehlte in der Schadenssumme; jetzt monetarisiert."),
+        400.0, "UBA MK3.1 2020 (Modellannahme)", ["UBA_Methodenkonvention_MK3.1"],
+        "400 € je aggregierter Belastungsstunde als editierbare Modellannahme — bewusst nur "
+        "der ARBEITSPRODUKTIVITÄTS-/Komfortverlust thermischer Belastung, an den "
+        "Produktivitätskosten-Ansätzen der UBA-Methodenkonvention 3.1 orientiert. Abgrenzung "
+        "gegen Doppelzählung (§8/B4): Der klinische Behandlungs-/Krankheitsanteil ist im "
+        "Risiko „Erwartete jährliche Morbidität“ (Kostensatz je Fall) erfasst und hier "
+        "ausgeklammert — Belastungsstunden zählen nur die subklinische Produktivitätslast."),
     "EXPECTED_POLLUTANT_EXPOSURE_HOURS": (
-        600.0, "UBA MK3.1 2020 (Modellannahme)", ["UBA_Methodenkonvention_MK3.1"],
-        "600 € je aggregierter Schadstoff-Expositionsstunde als editierbare Modellannahme "
-        "(Gesundheits-/Produktivitätslast), an UBA-MK3.1-Luftschadstoff-Kostensätzen "
-        "orientiert. Bislang 0 € ⇒ jetzt monetarisiert."),
+        300.0, "UBA MK3.1 2020 (Modellannahme)", ["UBA_Methodenkonvention_MK3.1"],
+        "300 € je aggregierter Schadstoff-Expositionsstunde als editierbare Modellannahme — "
+        "bewusst nur der Produktivitäts-/Komfortverlust, an UBA-MK3.1-Luftschadstoff-"
+        "Kostensätzen orientiert. Abgrenzung gegen Doppelzählung (§8/B4): Der klinische "
+        "Anteil (Atemwegs-/Herz-Kreislauf-Behandlung) ist über die Morbidität erfasst und "
+        "hier ausgeklammert."),
     # ── Operativ: Ausfallstunden (Kostensatz je Ausfallstunde, aggregiert) ──
     "EXPECTED_CI_OUTAGE_HOURS": (
         40_000.0, "BBK KRITIS / EWI-VoLL 2015", ["BBK_KRITIS", "EWI_VoLL_2015"],
@@ -1168,10 +1177,14 @@ _RISK_COST_RATES: dict[str, tuple[float, str, list[str], str]] = {
         "laufenden Ökosystemleistungs-Verlust (eigener monetärer Posten) im Sinne der "
         "Vermeidung von Doppelzählung. Bislang 0 € ⇒ jetzt bewertet."),
     "EXPECTED_SOIL_DEGRADATION": (
-        30_000.0, "TEEB-DE / UBA MK3.1", ["TEEB_DE_Naturkapital", "UBA_Methodenkonvention_MK3.1"],
-        "30.000 € je ha degradiertem Boden (Verlust von Bodenfunktionen/Wiederher"
-        "stellungsaufwand) als editierbare Modellannahme, an TEEB-DE und UBA MK3.1 "
-        "orientiert. Bislang 0 € ⇒ jetzt bewertet."),
+        10_000.0, "TEEB-DE / UBA MK3.1", ["TEEB_DE_Naturkapital", "UBA_Methodenkonvention_MK3.1"],
+        "10.000 € je ha degradiertem Boden — bewusst nur der ÖKOLOGISCHE Bodenfunktionswert "
+        "(Wasserhaushalt, Lebensraum, Kohlenstoffspeicher), an TEEB-DE/UBA MK3.1 orientiert. "
+        "Abgrenzung gegen Doppelzählung (§8/B5): Der ökonomische Boden-/Ertragswert derselben "
+        "Fläche ist über das monetäre Risiko „Bodenverluste / -degradation (€)“ "
+        "(EXPECTED_SOIL_LOSS_DEGRADATION_EUR, Bodenwert je ha × Erosionsintensität) erfasst; "
+        "dieses Umweltrisiko bewertet nur den davon getrennten Naturhaushaltsanteil. "
+        "Editierbar."),
     "EXPECTED_VEGETATION_DAMAGE": (
         20_000.0, "TEEB-DE (Modellannahme)", ["TEEB_DE_Naturkapital"],
         "20.000 € je ha geschädigter Vegetation (Wiederbegrünungs-/Wiederherstellungs"
