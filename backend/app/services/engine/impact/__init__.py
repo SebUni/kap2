@@ -27,8 +27,10 @@ IMPACT_FUNCTIONS: dict[str, Callable] = {}
 def _register() -> None:
     from app.services.engine.impact.health import HEALTH_IMPACTS
     from app.services.engine.impact.monetary import MONETARY_IMPACTS
+    from app.services.engine.impact.environment import ENVIRONMENT_IMPACTS
     IMPACT_FUNCTIONS.update(HEALTH_IMPACTS)
     IMPACT_FUNCTIONS.update(MONETARY_IMPACTS)
+    IMPACT_FUNCTIONS.update(ENVIRONMENT_IMPACTS)
 
 
 _register()

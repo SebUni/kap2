@@ -530,6 +530,16 @@ Stand Juli 2026, in committeten Stufen (Details siehe `git log` / Commit-Message
   Kurve (Wassertiefe je Wiederkehrperiode) bleibt spätere Verfeinerung (braucht rasterio +
   DE-Ausschnitt-Download); Stand 4b treibt die real vorhandene normierte Hazard-Intensität
   die Schadenskurve.
+- **Stufe 5a — Umwelt-Schadensfunktionen + operative Einordnung (erledigt):** Die 4
+  Umwelt-Schadensrisiken (Biodiversität, Habitat, Boden, Vegetation; §6.4) rechnen
+  ``exponierte Naturfläche · Verlustrate(Hazard) · g(V̂)`` je Zelle (area-skaliert →
+  Summe), monetarisiert über den vorhandenen Kostensatz (€/ha bzw. €/Art). Damit haben
+  **alle 22 Schadensrisiken** (Gesundheit, direkte Sektorschäden, Migration, Umwelt) eine
+  Schadensfunktion; Folgekosten sind konsolidiert, reine Index-Risiken bleiben Screening.
+  **Operative Ausfallrisiken (9, flat):** bewusst KEINE per-Zell-Funktion — Ausfallstunden
+  sind nicht zell-additiv (kommunenweiter Wert). Der flat-P90-Weg ``ref·(P90-Index/100)``
+  implementiert bereits die §6.3-Struktur (``Basisdauer × Hazard×Kritikalität/Redundanz``,
+  aus H/E/V), und der VoLL ist als Kostensatz (€/Ausfallstunde) explizit und editierbar.
 - **Nach Schicht B verschoben (Stufe 3+, weil erst dort konsumiert):** die
   intensitäts-/wahrscheinlichkeitsbasierten Hazard-Datensätze
   KOSTRA-DWD (Bemessungsniederschlag), **JRC River Flood Hazard Maps** (EU-weite

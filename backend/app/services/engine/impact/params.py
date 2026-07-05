@@ -156,6 +156,26 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_detail": "Klimabedingte Umsiedlungs-/Verdrängungskosten je 100k Einwohner bei "
                       "voller (normierter) Küsten-/Flut-/Dürreintensität. In DE geringe, aber "
                       "ausgewiesene Größenordnung.", "source_refs": ["Prognos_Klimaschaeden_2023"]},
+
+    # ── Umwelt-Flächen-/Artenverlust (Schicht B §6.4) ───────────────────────────
+    {"risk": "EXPECTED_BIODIVERSITY_LOSS", "key": "species_loss_per_ha", "value": 0.0006,
+     "label": "Artenverlustrate je ha", "unit": "Arten/ha·a", "source": "BfN/UBA (Modellannahme)",
+     "source_detail": "Lokal verlorene Arten je ha Naturfläche bei voller Intensität "
+                      "(Wärme/Dürre/Feuer); über den Kostensatz (€/Art) monetarisiert.",
+     "source_refs": ["TEEB_DE_Naturkapital"]},
+    {"risk": "EXPECTED_HABITAT_LOSS", "key": "loss_rate", "value": 0.02,
+     "label": "Habitatverlustrate", "unit": "ha/ha·a", "source": "BfN (Modellannahme)",
+     "source_detail": "Anteil der exponierten Naturfläche, der bei voller Intensität "
+                      "(Dürre/Feuer/Meeresspiegel) jährlich als Habitat verloren geht.",
+     "source_refs": ["TEEB_DE_Naturkapital"]},
+    {"risk": "EXPECTED_SOIL_DEGRADATION", "key": "loss_rate", "value": 0.03,
+     "label": "Bodendegradationsrate", "unit": "ha/ha·a", "source": "BGR/UBA (Modellannahme)",
+     "source_detail": "Anteil der Ackerfläche, der bei voller Intensität (Dürre/Erosion/"
+                      "Versalzung) jährlich degradiert.", "source_refs": ["TEEB_DE_Naturkapital"]},
+    {"risk": "EXPECTED_VEGETATION_DAMAGE", "key": "loss_rate", "value": 0.05,
+     "label": "Vegetationsschadensrate", "unit": "ha/ha·a", "source": "Waldzustandsbericht (Modellannahme)",
+     "source_detail": "Anteil der Wald-/Agrarfläche mit Vegetationsschaden bei voller "
+                      "Intensität (Dürre/Hitze/Feuer).", "source_refs": ["TEEB_DE_Naturkapital"]},
 ]
 
 # Globale Schicht-B-Parameter (ID ``impact.<key>``): Assetwerte, Konsolidierungsfaktoren,
