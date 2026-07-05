@@ -502,7 +502,7 @@ Bitte **eine** Option ankreuzen (Empfehlung markiert).
       **Linearitäts- und Pfad-Artefakt-Fehler bleiben** — Absolutwerte weiterhin nur
       grobe Indikatoren.
 
-- [ ] **Option C — Zwei-Schichten-Architektur (EMPFOHLEN).** Aufwand: **L–XL**
+- [X] **Option C — Zwei-Schichten-Architektur (EMPFOHLEN).** Aufwand: **L–XL**
       (gruppenweise ausrollbar). HxVxE bleibt Screening; neue Schadensfunktions-Schicht
       für Absolutwerte (Abschnitt 6); Gesamtschaden = Summe. Konsequenz: KWRA-konform
       **und** methodisch belastbare, monetarisierbare Werte je Kommune; Karte, Dashboard

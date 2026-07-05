@@ -36,6 +36,9 @@ backend/data/zensus/**/*.zip
 backend/data/dwd_cdc/
 backend/data/pegelonline/
 
+# Karten-Layer Datei-Cache (gzip GeoJSON, wird bei Berechnung neu gebaut)
+backend/.cache/
+
 # Jupyter
 .ipynb_checkpoints/
 
