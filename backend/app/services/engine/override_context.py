@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from typing import Any
 
 from app.data import catalog
@@ -12,6 +13,23 @@ _overrides: dict[str, Any] = {}
 def set_overrides(overrides: dict[str, Any] | None) -> None:
     global _overrides
     _overrides = dict(overrides or {})
+
+
+@contextmanager
+def override_scope(overrides: dict[str, Any] | None):
+    """Setzt Overrides temporär und stellt danach den vorherigen Stand wieder her.
+
+    Notwendig, weil ``_overrides`` ein Modul-Global ist: Ein Assessment-Lauf (bzw. eine
+    frühere Aggregation) lässt die Overrides der zuletzt gerechneten Kommune stehen. Ohne
+    Scope läsen die Aggregations-/Fallback-Pfade einer ANDEREN Kommune diese fremden
+    Overrides (Cross-Kommune-Leak, MODELL_KRITIK §8, Befund B2)."""
+    global _overrides
+    prev = _overrides
+    _overrides = dict(overrides or {})
+    try:
+        yield
+    finally:
+        _overrides = prev
 
 
 def get_override(parameter_id: str, default: Any = None) -> Any:

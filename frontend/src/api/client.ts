@@ -101,9 +101,10 @@ export const api = {
     )
   },
   updateParameters: (kommuneId: number, updates: { parameter_id: string; value: unknown; custom_source?: string }[]) =>
-    request<Record<string, unknown>[]>(`/kommune/${kommuneId}/parameters`, {
-      method: 'PUT', body: JSON.stringify(updates),
-    }),
+    request<{ results: Record<string, unknown>[]; recalculation_required: boolean }>(
+      `/kommune/${kommuneId}/parameters`, {
+        method: 'PUT', body: JSON.stringify(updates),
+      }),
   exportParametersUrl: (kommuneId: number) => `${BASE}/kommune/${kommuneId}/parameters/export`,
 
   // ── Assessment ──────────────────────────────────────────────────────

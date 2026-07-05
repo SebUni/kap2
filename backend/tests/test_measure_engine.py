@@ -22,13 +22,15 @@ import pytest
 
 from app.data import catalog
 from app.services import measure_service
-from app.services.engine import impact, risk_engine
+from app.services.engine import impact, override_context, risk_engine
 
 # Repräsentative Risiken je Skalierung (dynamisch, robust gegen Katalog-Umbenennungen).
+# Monetär gewählt, damit cost == outcome gilt (die Reconciliation-Handrechnungen bleiben
+# vom Kostensatz unabhängig; die Live-Kostensatz-Wirkung testet _rate_override separat).
 POP_RISK = next(r for r in catalog.RISKS
-                if r.get("scale", "pop") == "pop" and catalog.risk_contributes_to_total(r))
+                if r.get("scale", "pop") == "pop" and catalog.risk_is_monetary(r))
 AREA_RISK = next(r for r in catalog.RISKS
-                 if r.get("scale", "pop") == "area" and catalog.risk_contributes_to_total(r))
+                 if r.get("scale", "pop") == "area" and catalog.risk_is_monetary(r))
 FLAT_RISK = next((r for r in catalog.RISKS
                   if r.get("scale", "pop") not in ("pop", "area")), None)
 
@@ -61,11 +63,16 @@ def _cell_benefit(risk: dict, cell: dict, factor: float) -> float:
     return measure_service._cell_cost(risk, cell["risks"][code], cell_pop) * (1.0 - factor)
 
 
-# ── _cell_cost: materialisiert vs. Legacy-Fallback ──────────────────────────
+# ── _cell_cost: live aus Outcome abgeleitet vs. Legacy-Fallback ─────────────
 
-def test_cell_cost_uses_materialized_value():
-    r = {"index": 40.0, "outcome": 123.0, "cost_eur": 456.0}
-    assert measure_service._cell_cost(POP_RISK, r, 800.0) == 456.0
+def test_cell_cost_derived_from_outcome_live():
+    """Zellkosten werden LIVE aus dem Outcome × aktuellem Kostensatz abgeleitet, NICHT
+    aus dem gespeicherten cost_eur (das hier bewusst abweicht) — so wirken Kostensatz-
+    Overrides ohne Neuberechnung (§8/B2). Für monetäre Risiken gilt cost == outcome."""
+    override_context.set_overrides({})
+    r = {"index": 40.0, "outcome": 123.0, "cost_eur": 456.0}  # cost_eur wird ignoriert
+    assert measure_service._cell_cost(POP_RISK, r, 800.0) == risk_engine.cost_from_outcome(
+        POP_RISK, 123.0)
 
 
 def test_cell_cost_falls_back_to_legacy_without_outcome():
@@ -122,6 +129,38 @@ def test_partial_coverage_only_reduces_covered_cells():
     assert benefit == pytest.approx(cells[1]["risks"][code]["cost_eur"] * (1 - factor), abs=1e-9)
     assert benefit == pytest.approx(
         base["risks"][code]["cost_eur"] - withm["risks"][code]["cost_eur"], abs=0.01)
+
+
+def test_cost_rate_override_is_live_without_recompute():
+    """Kostensatz-Override (risks.*.cost_per_outcome) wirkt LIVE auf die Aggregatsumme,
+    weil aggregate die Kosten aus dem gespeicherten Outcome × aktuellem Satz ableitet —
+    das gespeicherte cost_eur (hier 999) wird ignoriert (§8/B2)."""
+    health = next(r for r in catalog.RISKS
+                  if r.get("scale", "pop") == "pop" and not catalog.risk_is_monetary(r)
+                  and catalog.risk_contributes_to_total(r))
+    code = health["code"]
+    base_rate = catalog.risk_default_cost_per_outcome(health)
+    cell = {"inputs": {"pop": 1000.0},
+            "risks": {code: {"index": 50.0, "outcome": 2.0, "cost_eur": 999.0}}}
+
+    override_context.set_overrides({})
+    a0 = risk_engine.aggregate([copy.deepcopy(cell)], 1000.0, 10.0)
+    assert a0["risks"][code]["cost_eur"] == pytest.approx(2.0 * base_rate, abs=0.01)
+
+    override_context.set_overrides({f"risks.{code}.cost_per_outcome": base_rate * 2})
+    a1 = risk_engine.aggregate([copy.deepcopy(cell)], 1000.0, 10.0)
+    assert a1["risks"][code]["cost_eur"] == pytest.approx(2.0 * base_rate * 2, abs=0.01)
+    override_context.set_overrides({})
+
+
+def test_override_scope_resets_previous_state():
+    """override_scope stellt den vorherigen Override-Stand wieder her (kein Cross-
+    Kommune-Leak, §8/B2)."""
+    override_context.set_overrides({"impact.k_indirect": 0.9})
+    with override_context.override_scope({"impact.k_indirect": 0.1}):
+        assert override_context.get_override("impact.k_indirect") == 0.1
+    assert override_context.get_override("impact.k_indirect") == 0.9
+    override_context.set_overrides({})
 
 
 def test_flat_risk_is_p90_and_excluded_from_cell_benefit():

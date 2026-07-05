@@ -191,10 +191,14 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
                 continue
             o = r.get("outcome")
             if o is None:
-                imp = impact.compute_cell_impacts(risk, idx, cell_pop)
-                o, c = imp["outcome"], imp["cost_eur"]
+                o = impact.compute_cell_impacts(risk, idx, cell_pop)["outcome"]
             else:
-                o, c = float(o), float(r.get("cost_eur", 0.0))
+                o = float(o)
+            # Kosten LIVE aus dem gespeicherten Outcome monetarisieren (statt das beim Lauf
+            # materialisierte cost_eur zu summieren), damit Kostensatz-Overrides
+            # (risks.*.cost_per_outcome) ohne Neuberechnung wirken (§8/B2). Monetäre
+            # Risiken: cost == outcome; nicht-monetäre: outcome × effektiver Kostensatz.
+            c = cost_from_outcome(risk, o)
             sum_outcome[code] = sum_outcome.get(code, 0.0) + o
             sum_cost[code] = sum_cost.get(code, 0.0) + c
             weights_by_code.setdefault(code, []).append(c if c else o)

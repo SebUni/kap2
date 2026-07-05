@@ -30,8 +30,9 @@ def _cell(index: float, pop: float, materialize: bool = True) -> dict:
         if materialize:
             # wie der Runner seit N1: outcome/cost_eur IMMER schreiben (auch 0.0),
             # damit ein fehlender Schlüssel eindeutig „Alt-Zelle" bedeutet (§8/B1).
+            # Outcome mit 6 Stellen wie im Runner (§8/B2: Kosten live aus Outcome).
             imp = impact.compute_cell_impacts(r, index, pop)
-            entry["outcome"] = round(imp["outcome"], 4)
+            entry["outcome"] = round(imp["outcome"], 6)
             entry["cost_eur"] = round(imp["cost_eur"], 2)
         risks[r["code"]] = entry
     return {"risks": risks, "inputs": {"pop": pop}}

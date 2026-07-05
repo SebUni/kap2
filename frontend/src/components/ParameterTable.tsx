@@ -31,6 +31,7 @@ export default function ParameterTable({
   const [edits, setEdits] = useState<Record<string, { value: string; source: string }>>({})
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
 
   const startEdit = (p: ModelParameter) => {
     setEdits({
@@ -57,11 +58,16 @@ export default function ParameterTable({
     setSaving(true)
     setError(null)
     try {
-      await api.updateParameters(kommuneId, [{
+      const res = await api.updateParameters(kommuneId, [{
         parameter_id: p.id,
         value,
         custom_source: e.source.trim() || undefined,
       }])
+      // Kostensätze/Referenzwerte wirken live auf die Aggregation; alle übrigen
+      // (Normgrenzen, Impact-Parameter, Gewichte) erst nach einer Neuberechnung (§8/B2).
+      setNotice(res?.recalculation_required
+        ? 'Änderung gespeichert. Sie wirkt erst nach einer Neuberechnung der Kommune (Bewertung neu starten).'
+        : 'Änderung gespeichert und sofort wirksam.')
       cancelEdit(p.id)
       onUpdated()
     } catch (err) {
@@ -78,8 +84,16 @@ export default function ParameterTable({
     return <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{msg}</p>
   }
 
+  const noticeBanner = notice && (
+    <div className="kap-param-notice" role="status" onClick={() => setNotice(null)}>
+      {notice}
+    </div>
+  )
+
   if (grouped) {
     return (
+      <>
+      {noticeBanner}
       <GroupedParameterList
         kommuneId={kommuneId}
         parameters={parameters}
@@ -96,6 +110,7 @@ export default function ParameterTable({
         scrollAnchor={scrollAnchor}
         scrollTrigger={scrollTrigger}
       />
+      </>
     )
   }
 
@@ -113,6 +128,7 @@ export default function ParameterTable({
           </a>
         </div>
       )}
+      {noticeBanner}
       {error && <div className="kap-param-error">{error}</div>}
       <table>
         <thead>

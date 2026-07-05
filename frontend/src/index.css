@@ -1689,6 +1689,17 @@ body {
   margin-bottom: 8px;
 }
 
+.kap-param-notice {
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
 .kap-param-table--grouped .kap-param-section {
   margin-bottom: 0.75rem;
   border: 1px solid var(--border);

@@ -290,11 +290,23 @@ Kommune-Cache-Verzeichnis mit dieser Version (`.model_version`) und leert es bei
 ersten Zugriff automatisch, wenn die Version nicht mehr passt. Seit Schicht B
 materialisiert der Runner je Zelle `{index, outcome, cost_eur}`; ändern sich die
 **Schadensfunktionen** (Stufe 4/5) oder die **Hazard-Ingestion** (Stufe 2/5b), ist eine
-Neuberechnung der `CellAssessment` erforderlich (MODEL_VERSION-Bump). Reine
-**Kostensatz-Overrides** wirken dagegen erst in der Kostenschicht auf der Zellsumme und
-brauchen keine Neuberechnung. **Anzeige-/Aggregations-Änderungen** (Stufe 6 Maßnahmen-
-Nutzenformel, Stufe 7 Dashboard-Felder) ändern die Per-Zell-Ausgabe nicht und lösen
-daher **bewusst keinen** Bump aus.
+Neuberechnung der `CellAssessment` erforderlich (MODEL_VERSION-Bump). **Anzeige-/
+Aggregations-Änderungen** (Stufe 6 Maßnahmen-Nutzenformel, Stufe 7 Dashboard-Felder)
+ändern die Per-Zell-Ausgabe nicht und lösen daher **bewusst keinen** Bump aus.
+
+**Welche Overrides wirken live, welche brauchen Neuberechnung (§8/B2):** `aggregate`
+monetarisiert die Kommune-Kosten **live aus dem gespeicherten Per-Zell-`outcome` ×
+aktuellem Kostensatz** (`cost_from_outcome`), nicht aus dem beim Lauf materialisierten
+`cost_eur`. Deshalb wirken **Kostensatz-Overrides** (`risks.*.cost_per_outcome`) und —
+für flat-Risiken — **Referenzwert-Overrides** (`ref_value`) **sofort ohne
+Neuberechnung**. Alle Overrides, die den materialisierten Per-Zell-Wert (Index oder
+Outcome) selbst bestimmen — **Normgrenzen** (`*.norm_min/max`), **Impact-Parameter**
+(`risks.*.impact.*`, `impact.*`), **Pfadgewichte**, **UHI-/Formelparameter** — brauchen
+eine Neuberechnung; die API (`PUT …/parameters`) meldet das je Änderung im Feld
+`recalculation_required`, das Frontend zeigt danach den Hinweis „wirkt erst nach
+Neuberechnung". Die Overrides einer Kommune werden für Aggregation/Export als
+**request-scoped Engine-Kontext** gesetzt (`override_context.override_scope`), damit sie
+nicht in die Berechnung einer anderen Kommune durchsickern (Leak-Fix §8/B2).
 
 ### Risikozonen
 Zusammenhängende Zellen mit hohem Risiko-Index (Connected Components),

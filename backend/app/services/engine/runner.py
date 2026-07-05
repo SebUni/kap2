@@ -55,9 +55,13 @@ def _risk_worker(idx: int) -> tuple[int, dict]:
         # legitimer 0-Outcome (kühle Zelle unter der AF-Schwelle, Zelle ohne Asset/
         # Naturfläche) den Schlüssel weglassen, würde die Zelle fälschlich legacy-
         # nachgerechnet und erzeugte Phantomschaden (MODELL_KRITIK §8, Befund B1).
+        # Outcome mit 6 Nachkommastellen: aggregate leitet die Kosten LIVE aus dem
+        # gespeicherten Outcome × Kostensatz ab (§8/B2); bei großen Kostensätzen (VSL
+        # 3,5 Mio €/Tod) würde eine gröbere Rundung kleiner Per-Zell-Outcomes den
+        # €-Betrag spürbar verzerren.
         risks[code] = {
             "index": risk_idx,
-            "outcome": round(imp.get("outcome", 0.0), 4),
+            "outcome": round(imp.get("outcome", 0.0), 6),
             "cost_eur": round(imp.get("cost_eur", 0.0), 2),
         }
 

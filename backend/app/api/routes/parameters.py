@@ -18,6 +18,22 @@ def _find_default(parameter_id: str) -> dict | None:
     return None
 
 
+def _needs_recalc(parameter_id: str) -> bool:
+    """True, wenn ein Parameter-Override eine Neuberechnung der CellAssessment erfordert.
+
+    LIVE wirksam (keine Neuberechnung): Kostensätze ``*.cost_per_outcome`` (aggregate
+    monetarisiert live aus dem gespeicherten Outcome) und ``*.ref_value`` (für Schicht-B-
+    Risiken nur noch Sanity-Anker, für flat-Risiken live in der Aggregation).
+
+    Alles, was den beim Lauf materialisierten Per-Zell-Wert (Index oder Outcome) bestimmt,
+    braucht dagegen eine Neuberechnung: Normgrenzen (``*.norm_min/max``), Impact-Parameter
+    (``risks.*.impact.*`` / ``impact.*``), Pfadgewichte, UHI-/Formelparameter (§8/B2).
+    """
+    if parameter_id.endswith(".cost_per_outcome") or parameter_id.endswith(".ref_value"):
+        return False
+    return True
+
+
 @router.get("/kommune/{kommune_id}/parameters")
 def list_parameters(
     kommune_id: int,
@@ -88,10 +104,16 @@ def update_parameters(
             "parameter_id": u.parameter_id,
             "status": "updated",
             "overridden": u.value != default["default_value"],
+            "recalculation_required": _needs_recalc(u.parameter_id),
         })
 
     db.commit()
-    return results
+    return {
+        "results": results,
+        # Sammelsignal fürs Frontend: mindestens ein geänderter Parameter wirkt erst nach
+        # einer Neuberechnung der CellAssessment (Normgrenzen/Impact-Parameter/Gewichte).
+        "recalculation_required": any(r["recalculation_required"] for r in results),
+    }
 
 
 @router.get("/kommune/{kommune_id}/parameters/export")

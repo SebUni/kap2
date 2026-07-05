@@ -31,7 +31,7 @@ from app.models.models import (
     AdaptationMeasure, CellAssessment, GridCell, MeasureImpact, Kommune,
 )
 from app.services import parameter_registry
-from app.services.engine import impact, risk_engine
+from app.services.engine import impact, override_context, risk_engine
 
 log = logging.getLogger(__name__)
 
@@ -39,15 +39,18 @@ log = logging.getLogger(__name__)
 def _cell_cost(risk: dict, cell_risk: dict, cell_pop: float) -> float:
     """Zellkosten eines Risikos – identische Basis wie ``risk_engine.aggregate``.
 
-    Materialisierte ``cost_eur`` nutzen; für Alt-Zelldaten ohne Outcome (Kommune vor
-    Neuberechnung) den linearen Legacy-Weg nachrechnen. Dadurch ist das Maßnahmen-
-    Nutzen-Delta exakt der Zellsummen-Unterschied zwischen Basis- und Mit-Maßnahmen-
-    Aggregat (dessen Fallback dieselbe Legacy-Nachrechnung nutzt).
+    Kosten werden LIVE aus dem gespeicherten ``outcome`` × aktuellem Kostensatz
+    abgeleitet (``cost_from_outcome``), NICHT aus dem materialisierten ``cost_eur``
+    gelesen — so wirken Kostensatz-Overrides ohne Neuberechnung, und die Reconciliation
+    (Maßnahmen-Nutzen == Aggregat-Delta) bleibt exakt, weil ``aggregate`` dieselbe
+    Ableitung nutzt (§8/B2). Für Alt-Zelldaten ohne Outcome (Kommune vor Neuberechnung)
+    den Outcome über den linearen Legacy-Weg nachrechnen.
     """
-    if cell_risk.get("outcome") is None:
+    o = cell_risk.get("outcome")
+    if o is None:
         idx = float(cell_risk.get("index", 0.0))
-        return impact.compute_cell_impacts(risk, idx, cell_pop)["cost_eur"]
-    return float(cell_risk.get("cost_eur", 0.0))
+        o = impact.compute_cell_impacts(risk, idx, cell_pop)["outcome"]
+    return risk_engine.cost_from_outcome(risk, float(o))
 
 
 def _coverage(db: Session, measure: AdaptationMeasure) -> tuple[dict[int, float], float]:
@@ -379,9 +382,19 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
 
 
 def get_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool = False) -> dict:
-    """Aggregiertes Risiko (mit/ohne Maßnahmen) inkl. Kosten."""
+    """Aggregiertes Risiko (mit/ohne Maßnahmen) inkl. Kosten.
+
+    Die Kommune-Overrides werden für die Dauer der Aggregation als aktiver Engine-Scope
+    gesetzt (``override_scope``) — sonst läsen Kostensatz-/Legacy-Fallback-Pfade die
+    Overrides der zuletzt gerechneten Kommune (Cross-Kommune-Leak, §8/B2). So wirken
+    Kostensatz-Overrides zudem live auf die Aggregatsumme (``aggregate`` monetarisiert
+    aus dem gespeicherten Outcome).
+    """
     kommune = db.query(Kommune).filter_by(id=kommune_id).first()
     total_pop = float(kommune.population or 0) if kommune else 0.0
     area_km2 = float(kommune.area_km2 or 0) if kommune else 0.0
-    cell_data = _adjusted_cell_data(db, kommune_id, apply_measures)
-    return risk_engine.aggregate(cell_data, total_pop, area_km2)
+    overrides = parameter_registry.overrides_map(
+        parameter_registry.load_db_overrides(db, kommune_id))
+    with override_context.override_scope(overrides):
+        cell_data = _adjusted_cell_data(db, kommune_id, apply_measures)
+        return risk_engine.aggregate(cell_data, total_pop, area_km2)
