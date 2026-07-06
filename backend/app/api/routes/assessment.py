@@ -190,63 +190,67 @@ def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
                 centroid = (c.x, c.y)
             except Exception:
                 centroid = None
-        regional = build_regional_context(
-            kommune.bundesland, is_coastal, kommune.osm_id, centroid,
-        )
-        recipe = formulas.recipe_for_layer(code, category)
+        # Kommune-Overrides installieren: build_regional_context (regionale Fallbacks),
+        # normalize_hev/cell_outcome_breakdown/resolve_inputs und die Rezept-Anzeige-
+        # texte lesen Overrides über das Modul-Global (§8/B2-Leak sonst).
+        with layer_cache._override_scope_for(db, kommune_id):
+            regional = build_regional_context(
+                kommune.bundesland, is_coastal, kommune.osm_id, centroid,
+            )
+            recipe = formulas.recipe_for_layer(code, category)
 
-        rows = (
-            db.query(CellAssessment, GridCell)
-            .join(GridCell, CellAssessment.grid_cell_id == GridCell.id)
-            .filter(CellAssessment.kommune_id == kommune_id)
-            .all()
-        )
-        features = []
-        vmin, vmax = None, None
-        for ca, cell in rows:
-            data = ca.data or {}
-            props: dict = {
-                "grid_cell_id": cell.id,
-                "gitter_id": cell.gitter_id,
-                "row": cell.row_idx,
-                "col": cell.col_idx,
-            }
-            if category == "risks":
-                rdef = catalog.RISKS_BY_CODE[code]
-                rcell = data.get("risks", {}).get(code, {})
-                idx = float(rcell.get("index", 0.0))
-                cell_pop = float(data.get("inputs", {}).get("pop", 0.0))
-                # Materialisierten Outcome nutzen (Schicht B); Fallback für Alt-Daten.
-                stored = rcell.get("outcome")
-                value = float(stored) if stored is not None else risk_engine.cell_outcome(rdef, idx, cell_pop)
-                hev_abs = {
-                    "hazards": data.get("hazards", {}),
-                    "exposures": data.get("exposures", {}),
-                    "vulnerabilities": data.get("vulnerabilities", {}),
+            rows = (
+                db.query(CellAssessment, GridCell)
+                .join(GridCell, CellAssessment.grid_cell_id == GridCell.id)
+                .filter(CellAssessment.kommune_id == kommune_id)
+                .all()
+            )
+            features = []
+            vmin, vmax = None, None
+            for ca, cell in rows:
+                data = ca.data or {}
+                props: dict = {
+                    "grid_cell_id": cell.id,
+                    "gitter_id": cell.gitter_id,
+                    "row": cell.row_idx,
+                    "col": cell.col_idx,
                 }
-                hev_norm = risk_engine.normalize_hev(hev_abs)
-                breakdown = formulas.risk_cell_breakdown(rdef, hev_abs, hev_norm)
-                props["index"] = round(idx, 2)
-                props["H"] = breakdown["H"]
-                props["E"] = breakdown["E"]
-                props["V"] = breakdown["V"]
-                props["outcome"] = risk_engine.cell_outcome_breakdown(rdef, idx, cell_pop)
-                props["pathways"] = formulas.risk_pathway_cell_breakdown(rdef, hev_norm)
-            else:
-                raw = data.get(category, {}).get(code)
-                if raw is None:
-                    continue
-                value = float(raw)
-                ci = data.get("inputs", {})
-                props["inputs"] = formulas.resolve_inputs(recipe, ci, regional, data)
-            vmin = value if vmin is None else min(vmin, value)
-            vmax = value if vmax is None else max(vmax, value)
-            props["value"] = round(value, 3)
-            features.append({
-                "type": "Feature",
-                "properties": props,
-                "geometry": mapping(to_shape(cell.geometry)),
-            })
+                if category == "risks":
+                    rdef = catalog.RISKS_BY_CODE[code]
+                    rcell = data.get("risks", {}).get(code, {})
+                    idx = float(rcell.get("index", 0.0))
+                    cell_pop = float(data.get("inputs", {}).get("pop", 0.0))
+                    # Materialisierten Outcome nutzen (Schicht B); Fallback für Alt-Daten.
+                    stored = rcell.get("outcome")
+                    value = float(stored) if stored is not None else risk_engine.cell_outcome(rdef, idx, cell_pop)
+                    hev_abs = {
+                        "hazards": data.get("hazards", {}),
+                        "exposures": data.get("exposures", {}),
+                        "vulnerabilities": data.get("vulnerabilities", {}),
+                    }
+                    hev_norm = risk_engine.normalize_hev(hev_abs)
+                    breakdown = formulas.risk_cell_breakdown(rdef, hev_abs, hev_norm)
+                    props["index"] = round(idx, 2)
+                    props["H"] = breakdown["H"]
+                    props["E"] = breakdown["E"]
+                    props["V"] = breakdown["V"]
+                    props["outcome"] = risk_engine.cell_outcome_breakdown(rdef, idx, cell_pop)
+                    props["pathways"] = formulas.risk_pathway_cell_breakdown(rdef, hev_norm)
+                else:
+                    raw = data.get(category, {}).get(code)
+                    if raw is None:
+                        continue
+                    value = float(raw)
+                    ci = data.get("inputs", {})
+                    props["inputs"] = formulas.resolve_inputs(recipe, ci, regional, data)
+                vmin = value if vmin is None else min(vmin, value)
+                vmax = value if vmax is None else max(vmax, value)
+                props["value"] = round(value, 3)
+                features.append({
+                    "type": "Feature",
+                    "properties": props,
+                    "geometry": mapping(to_shape(cell.geometry)),
+                })
 
         meta = {"code": code, "category": category, "min": vmin or 0.0, "max": vmax or 0.0, "recipe": recipe}
         if category == "risks":
@@ -391,3 +395,17 @@ def get_risk_projection(kommune_id: int, db: Session = Depends(get_db)):
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
     return project_group_risks(db, kommune_id, kommune.bundesland or "Sachsen")
+
+
+@router.get("/kommune/{kommune_id}/cost-projection")
+def get_cost_projection(kommune_id: int, db: Session = Depends(get_db)):
+    """Erwartete Jahresschäden 2025–2065 (RCP4.5/8.5), mit/ohne Maßnahmen.
+
+    „Mit Maßnahmen" preist die Maßnahmenkosten ein: OPEX jährlich ab
+    Umsetzungsjahr, CAPEX einmalig im Umsetzungsjahr.
+    """
+    from app.services.cost_projection_service import project_costs
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    return project_costs(db, kommune_id, kommune.bundesland or "Sachsen")

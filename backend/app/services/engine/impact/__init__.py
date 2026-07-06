@@ -41,6 +41,35 @@ def has(code: str) -> bool:
     return code in IMPACT_FUNCTIONS
 
 
+def lineage_kind(risk: dict) -> str:
+    """Kategorisiert ein Risiko nach seinem tatsächlichen Schicht-B-Rechenweg.
+
+    Grundlage für Wirkungsdiagramm (``lineage_graph``) und Formeltexte
+    (``formulas.risk_recipe``): health | environment | monetary | indirect |
+    restoration | consolidated_zero | index_only | flat.
+    """
+    from app.services.engine.impact.environment import ENVIRONMENT_IMPACTS
+    from app.services.engine.impact.health import HEALTH_IMPACTS
+    from app.services.engine.impact.monetary import MONETARY_IMPACTS
+
+    code = risk["code"]
+    if code in HEALTH_IMPACTS:
+        return "health"
+    if code in ENVIRONMENT_IMPACTS:
+        return "environment"
+    if code in MONETARY_IMPACTS:
+        return "monetary"
+    if code == "EXPECTED_INDIRECT_ECONOMIC_LOSS_EUR":
+        return "indirect"
+    if code == "EXPECTED_RESTORATION_COSTS_EUR":
+        return "restoration"
+    if code in catalog.CONSOLIDATED_INTO_INDIRECT_CODES:
+        return "consolidated_zero"
+    if code in catalog.INDEX_ONLY_RISK_CODES:
+        return "index_only"
+    return "flat"
+
+
 def compute_cell_impacts(
     risk: dict, index: float, cell_pop: float, cell_area_km2: float | None = None
 ) -> dict:

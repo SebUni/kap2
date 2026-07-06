@@ -1292,6 +1292,18 @@ body {
   align-items: flex-start;
 }
 
+.layer-info-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.layer-info-fullscreen-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
 .layer-info-header-text {
   display: flex;
   flex-direction: column;
@@ -1308,6 +1320,24 @@ body {
 
 .help-overlay-content.layer-info-modal {
   max-width: min(95vw, 1280px);
+}
+
+/* Vollbild: Modal (inkl. Kopfzeile mit Titel) füllt den gesamten Viewport;
+   das Diagramm streckt sich über die volle verfügbare Höhe. */
+.help-overlay-content.layer-info-modal--fullscreen {
+  position: fixed;
+  inset: 0;
+  width: auto;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+}
+
+.layer-info-modal--fullscreen .layer-info-body .kap-lineage-canvas-wrap {
+  height: auto;
+  max-height: none;
+  flex: 1 1 auto;
+  min-height: 320px;
 }
 
 .layer-info-tabs {
@@ -2019,6 +2049,11 @@ body {
   background: transparent;
 }
 
+/* Ergebnisse sind gepinnt: Chip nicht klickbar, bleibt aber voll sichtbar. */
+.kap-lineage-chip:disabled {
+  cursor: default;
+}
+
 .kap-lineage-chip--square {
   border-radius: 0;
 }
@@ -2053,29 +2088,6 @@ body {
   align-items: center;
   gap: 6px;
   margin-left: auto;
-}
-
-.kap-lineage-modeswitch {
-  display: inline-flex;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--surface);
-}
-
-.kap-lineage-modeswitch button {
-  font-size: 0.72rem;
-  padding: 5px 12px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.kap-lineage-modeswitch button.active {
-  background: var(--primary);
-  color: #fff;
 }
 
 .kap-lineage-reset {
@@ -2168,6 +2180,18 @@ body {
 .kap-lineage-tip-text {
   margin-top: 4px;
   color: var(--text-muted);
+}
+
+/* KaTeX-Formeln in Tooltips/Modal: leicht größer, umbruchfähig */
+.kap-lineage-tip-math {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.kap-lineage-tip-math .katex {
+  white-space: normal;
 }
 
 .kap-lineage-node {
@@ -2477,6 +2501,131 @@ body {
   color: var(--text-muted);
 }
 
+/* Parameterknoten: nur der Wert-Button ist interaktiv (generische Regel oben) —
+   die Box selbst bleibt durchlässig, damit Pan/Drag auf dem Canvas ankommt. */
 .kap-op-overlay--parameter {
   pointer-events: none;
 }
+
+/* ── Dashboard-Redesign: 12-Spalten-Grid ─────────────────────────────────── */
+.dashboard-grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  align-content: start;
+}
+.col-span-12 { grid-column: span 12; }
+.col-span-6  { grid-column: span 6; }
+.col-span-4  { grid-column: span 4; }
+.col-span-3  { grid-column: span 3; }
+@media (max-width: 1100px) {
+  .col-span-6, .col-span-4 { grid-column: span 12; }
+  .col-span-3 { grid-column: span 6; }
+}
+
+/* ── Kommune-Hero-Header ─────────────────────────────────────────────────── */
+.kommune-hero .hero-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+.kommune-hero .hero-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.hero-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+@media (max-width: 900px) { .hero-kpis { grid-template-columns: 1fr; } }
+.hero-kpi {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+}
+.hero-kpi .hero-kpi-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.hero-kpi .hero-kpi-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.hero-kpi .hero-kpi-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── Klima-Chips (Kommune vs. Deutschland) ───────────────────────────────── */
+.climate-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0.75rem;
+}
+.climate-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  padding: 3px 11px;
+  font-size: 0.76rem;
+  cursor: default;
+  white-space: nowrap;
+}
+.climate-chip .chip-label { color: var(--text-muted); }
+.climate-chip .chip-value { font-weight: 600; }
+.climate-chip .chip-de { color: var(--text-muted); font-size: 0.72rem; }
+.climate-chip .chip-delta-up { color: var(--danger); font-weight: 600; }
+.climate-chip .chip-delta-down { color: var(--primary); font-weight: 600; }
+
+/* ── Chart-Lade-Skeleton (feste Endhöhe, Shimmer) ────────────────────────── */
+.chart-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.chart-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes skeleton-shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chart-skeleton::after { animation: none; }
+}
+
+/* ── Details-Accordion am Seitenende ─────────────────────────────────────── */
+.dashboard-details > summary {
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.25rem 0;
+  user-select: none;
+}
+.dashboard-details[open] > summary { margin-bottom: 0.75rem; }

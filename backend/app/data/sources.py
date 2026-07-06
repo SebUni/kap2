@@ -537,6 +537,101 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
         "archive_url": "https://web.archive.org/web/20260628060549/https://www.inkar.de/",
         "accessed": "2026-07-04",
     },
+    "DWD_VieljaehrigeMittel_1991_2020": {
+        "ieee": "Deutscher Wetterdienst (DWD), „Vieljährige Mittelwerte 1991–2020 für "
+                "Deutschland (Temperatur, Niederschlag, klimatologische Kenntage),“ "
+                "Offenbach, Deutschland. [Online]. Verfügbar: https://www.dwd.de/DE/"
+                "leistungen/klimadatendeutschland/vielj_mittelwerte.html. "
+                "[Zugriff: 5. Juli 2026].",
+        "url": "https://www.dwd.de/DE/leistungen/klimadatendeutschland/"
+               "vielj_mittelwerte.html",
+        "archive_url": "https://web.archive.org/web/2026/https://www.dwd.de/DE/"
+                       "leistungen/klimadatendeutschland/vielj_mittelwerte.html",
+        "accessed": "2026-07-05",
+    },
+    "DWD_Klimastatusbericht": {
+        "ieee": "Deutscher Wetterdienst (DWD), „Klimastatusbericht Deutschland,“ "
+                "Offenbach, Deutschland (jährliche Reihe). [Online]. Verfügbar: "
+                "https://www.dwd.de/DE/leistungen/klimastatusbericht/"
+                "klimastatusbericht.html. [Zugriff: 5. Juli 2026].",
+        "url": "https://www.dwd.de/DE/leistungen/klimastatusbericht/"
+               "klimastatusbericht.html",
+        "archive_url": "https://web.archive.org/web/2026/https://www.dwd.de/DE/"
+                       "leistungen/klimastatusbericht/klimastatusbericht.html",
+        "accessed": "2026-07-05",
+    },
+    "DWD_CDC_Rasterklimatologie": {
+        "ieee": "Deutscher Wetterdienst (DWD), Climate Data Center (CDC), „Raster der "
+                "jährlichen klimatologischen Kenntage für Deutschland (grids_germany/"
+                "annual: Schneedeckentage, heiße Tage, Frosttage, Starkregentage),“ "
+                "Offenbach, Deutschland. [Online]. Verfügbar: https://opendata.dwd.de/"
+                "climate_environment/CDC/grids_germany/annual/. [Zugriff: 5. Juli 2026].",
+        "url": "https://opendata.dwd.de/climate_environment/CDC/grids_germany/annual/",
+        "archive_url": "https://web.archive.org/web/2026/https://opendata.dwd.de/"
+                       "climate_environment/CDC/grids_germany/annual/",
+        "accessed": "2026-07-05",
+    },
+    # ── Maßnahmenwirkung & Betriebskosten (Parameter-Vollerklärung, Juli 2026) ──
+    "VDI_2067_Blatt1": {
+        "ieee": "Verein Deutscher Ingenieure (VDI), „VDI 2067 Blatt 1: Wirtschaftlichkeit "
+                "gebäudetechnischer Anlagen – Grundlagen und Kostenberechnung,“ Düsseldorf, "
+                "Deutschland, 2012. [Online]. Verfügbar: https://www.vdi.de/mitgliedschaft/"
+                "vdi-richtlinien/details/vdi-2067-blatt-1-wirtschaftlichkeit-"
+                "gebaeudetechnischer-anlagen-grundlagen-und-kostenberechnung-1. "
+                "[Zugriff: 6. Juli 2026].",
+        "url": "https://www.vdi.de/mitgliedschaft/vdi-richtlinien/details/vdi-2067-blatt-1-"
+               "wirtschaftlichkeit-gebaeudetechnischer-anlagen-grundlagen-und-"
+               "kostenberechnung-1",
+        "archive_url": "https://web.archive.org/web/20260706052623/https://www.vdi.de/"
+                       "mitgliedschaft/vdi-richtlinien/details/vdi-2067-blatt-1-"
+                       "wirtschaftlichkeit-gebaeudetechnischer-anlagen-grundlagen-und-"
+                       "kostenberechnung-1",
+        "accessed": "2026-07-06",
+    },
+    "Urban_HHAP_Wirksamkeit_2025": {
+        "ieee": "A. Urban, V. Huber, S. Henry u. a., „The effectiveness of heat prevention "
+                "plans in reducing heat-related mortality across Europe,“ Environmental "
+                "Research Letters, Bd. 20, Nr. 12, 124071, 2025, doi: 10.1088/1748-9326/"
+                "ae2775. [Online]. Verfügbar: https://pmc.ncbi.nlm.nih.gov/articles/"
+                "PMC12724396/. [Zugriff: 6. Juli 2026].",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12724396/",
+        "archive_url": "https://web.archive.org/web/20260706052754/"
+                       "https://pmc.ncbi.nlm.nih.gov/articles/PMC12724396/",
+        "accessed": "2026-07-06",
+    },
+    "WMO_EarlyWarnings": {
+        "ieee": "World Meteorological Organization (WMO), „Early warning system / Early "
+                "Warnings for All,“ Genf, Schweiz. [Online]. Verfügbar: "
+                "https://wmo.int/topics/early-warning-system. [Zugriff: 6. Juli 2026].",
+        "url": "https://wmo.int/topics/early-warning-system",
+        "archive_url": "https://web.archive.org/web/20260505235936/"
+                       "https://wmo.int/topics/early-warning-system",
+        "accessed": "2026-07-06",
+    },
+    "BNetzA_SAIDI_2023": {
+        "ieee": "Bundesnetzagentur, „Versorgungsunterbrechungen Strom 2023 (SAIDI: 12,8 "
+                "Minuten),“ Pressemitteilung, Bonn, Deutschland, 2024. [Online]. Verfügbar: "
+                "https://www.bundesnetzagentur.de/SharedDocs/Pressemitteilungen/DE/2024/"
+                "20241111_SAIDI_Strom.html. [Zugriff: 6. Juli 2026].",
+        "url": "https://www.bundesnetzagentur.de/SharedDocs/Pressemitteilungen/DE/2024/"
+               "20241111_SAIDI_Strom.html",
+        "archive_url": "https://web.archive.org/web/20260626202318/"
+                       "https://www.bundesnetzagentur.de/SharedDocs/Pressemitteilungen/"
+                       "DE/2024/20241111_SAIDI_Strom.html",
+        "accessed": "2026-07-06",
+    },
+    "BWB_Niederschlagswasserentgelt": {
+        "ieee": "Berliner Wasserbetriebe, „Bestandsaufnahme von versiegelten Flächen auf "
+                "Privatgrundstücken (Niederschlagswasserentgelt 1,84 €/m² versiegelte "
+                "Fläche und Jahr),“ Berlin, Deutschland. [Online]. Verfügbar: "
+                "https://www.bwb.de/de/bestandsaufnahme-von-versiegelten-flaechen-auf-"
+                "privatgrundstuecken.php. [Zugriff: 6. Juli 2026].",
+        "url": "https://www.bwb.de/de/bestandsaufnahme-von-versiegelten-flaechen-auf-"
+               "privatgrundstuecken.php",
+        "archive_url": "https://web.archive.org/web/20260706052927/https://www.bwb.de/de/"
+                       "bestandsaufnahme-von-versiegelten-flaechen-auf-privatgrundstuecken.php",
+        "accessed": "2026-07-06",
+    },
 }
 
 

@@ -13,6 +13,17 @@ from app.services.measure_service import get_risk_aggregate
 from app.services.climate.dwd_data import get_climate_projection
 
 
+def scenario_factors(proj: dict, scenario: str) -> list[float]:
+    """Relative Klimasignal-Faktoren je Jahr (Hitzetage-Trend, auf Startjahr normiert).
+
+    Gemeinsame Skalierung für Risiko-Index- UND Kosten-Projektion, damit beide
+    Darstellungen im Dashboard dieselbe Klimageschichte erzählen.
+    """
+    series = proj["scenarios"][scenario]["hot_days"]
+    base = series[0] if series else 1.0
+    return [(v / base if base else 1.0) for v in series]
+
+
 def project_group_risks(db: Session, kommune_id: int, bundesland: str) -> dict:
     agg = get_risk_aggregate(db, kommune_id, apply_measures=False)
     groups = agg["groups"]
@@ -20,13 +31,8 @@ def project_group_risks(db: Session, kommune_id: int, bundesland: str) -> dict:
     proj = get_climate_projection(bundesland)
     years = proj["years"]
 
-    def factors(scenario: str) -> list[float]:
-        series = proj["scenarios"][scenario]["hot_days"]
-        base = series[0] if series else 1.0
-        return [(v / base if base else 1.0) for v in series]
-
-    f45 = factors("rcp45")
-    f85 = factors("rcp85")
+    f45 = scenario_factors(proj, "rcp45")
+    f85 = scenario_factors(proj, "rcp85")
 
     out_groups = []
     for code, g in groups.items():

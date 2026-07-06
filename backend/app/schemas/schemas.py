@@ -19,6 +19,9 @@ class KommuneCreate(BaseModel):
     name: str
     osm_type: str = "relation"
     geojson: Optional[dict] = None
+    bundesland: Optional[str] = None
+    address: Optional[dict] = None
+    """Nominatim-address-Objekt des Suchtreffers (für Bundesland-Ableitung)."""
 
 
 class KommuneOut(BaseModel):

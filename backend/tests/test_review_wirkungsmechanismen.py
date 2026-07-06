@@ -55,7 +55,7 @@ def test_scaling_tooltip_area():
 
 def test_scaling_tooltip_flat():
     tip = _scaling_tooltip("flat")
-    assert "×1" in tip
+    assert "P90-Index" in tip
     assert "Einwohner_zelle/100.000" not in tip
 
 
@@ -66,7 +66,7 @@ def test_scaling_tooltip_matches_catalog_scale():
     expected = {
         "pop": "Einwohner_zelle/100.000",
         "area": "Fläche/50 km²",
-        "flat": "×1",
+        "flat": "P90-Index",
     }
     for risk in catalog.RISKS:
         scale = risk.get("scale", "pop")

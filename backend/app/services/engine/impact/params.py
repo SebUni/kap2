@@ -75,6 +75,16 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "label": "Hitzetage-Schwelle", "unit": "Hitzetage/Jahr", "source": "Modellannahme",
      "source_detail": "Schwelle für den hitzegetriebenen Anteil psychischer Belastung.",
      "source_refs": ["RKI_Hitzemortalitaet"]},
+    {"risk": "EXPECTED_ANNUAL_MENTAL_HEALTH", "key": "event_share", "value": 0.3,
+     "label": "Ereignis-Anteil (Extremereignisse)", "unit": "Anteil",
+     "source": "Post-Desaster-Prävalenzstudien (Größenordnung, Modellannahme)",
+     "source_detail": "Zusatztreiber neben der Hitze-AF: Treiber = min(1; AF + Anteil · "
+                      "Ereignisintensität). Bei voller Extremereignis-Intensität (Compound/"
+                      "Kaskade/Dürre) kommen bis zu 30 % der Basisrate als ereignisbedingte "
+                      "Belastungsfälle hinzu — Größenordnung aus Prävalenzstudien nach "
+                      "Flutkatastrophen (PTBS/Depression/Angst bei ~20-30 % der Betroffenen, "
+                      "z. B. Ahrtal-Kohorten). Dokumentierte, editierbare Modellannahme.",
+     "source_refs": []},
 
     # ── Betroffene / Evakuierte ─────────────────────────────────────────────────
     {"risk": "EXPECTED_ANNUAL_AFFECTED_EVACUATED", "key": "rate_per_100k", "value": 2500.0,
@@ -238,4 +248,14 @@ IMPACT_GLOBAL_SPECS: list[dict] = [
      "source_detail": "Konvexität der Schadenskurve (Schaden ∝ Intensität^Exponent). >1 = "
                       "überproportionaler Schaden bei hoher Intensität (Tiefe-Schaden-Kurven).",
      "source_refs": ["Prognos_Klimaschaeden_2023"]},
+    {"key": "floor_height_m", "value": 3.5, "label": "Mittlere Geschosshöhe",
+     "unit": "m", "source": "Bau-Größenordnung DE (Modellannahme)",
+     "source_detail": "Schätzt die Geschosszahl aus der OSM-Gebäudehöhe: Geschosse = "
+                      "max(1; mittlere Gebäudehöhe / Geschosshöhe); Bruttogeschossfläche = "
+                      "Bebauungsgrad × Zellfläche × Geschosse — Basis des Gebäude-Assetwerts "
+                      "(× €/m²). Wohngebäude haben ~2,6-3,0 m lichte Geschosshöhe (zzgl. "
+                      "Decken), Gewerbe-/Altbauten 3,5-4,5 m; 3,5 m als Mittel über den "
+                      "gemischten Bestand. Kleinere Werte erhöhen die geschätzte "
+                      "Geschossfläche und damit die Gebäudeschäden.",
+     "source_refs": []},
 ]

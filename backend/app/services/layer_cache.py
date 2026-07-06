@@ -26,11 +26,25 @@ from sqlalchemy.orm import Session
 
 from app.data import catalog
 from app.models.models import CellAssessment, GridCell, Kommune
-from app.services.engine import formulas, risk_engine
+from app.services.engine import formulas, override_context, risk_engine
 from app.services.engine.inputs import build_regional_context
 from app.services.engine.runner import COASTAL_BUNDESLAENDER
 
 log = logging.getLogger(__name__)
+
+
+def _override_scope_for(db: Session, kommune_id: int):
+    """Override-Scope der Kommune für Request-/Rebuild-Pfade.
+
+    ``build_regional_context`` (regionale Fallback-Parameter), ``normalize_hev``,
+    ``cell_outcome_breakdown`` und ``resolve_inputs`` lesen Overrides über das
+    Modul-Global — ohne Scope läsen sie die Overrides der zuletzt gerechneten
+    Kommune (Cross-Kommune-Leak, MODELL_KRITIK §8/B2)."""
+    from app.services import parameter_registry
+
+    overrides = parameter_registry.overrides_map(
+        parameter_registry.load_db_overrides(db, kommune_id))
+    return override_context.override_scope(overrides)
 
 _CACHE_BASE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -223,8 +237,9 @@ def values_file(db: Session, kommune_id: int, code: str) -> str | None:
     if not kommune:
         return None
     rows = db.query(CellAssessment).filter(CellAssessment.kommune_id == kommune_id).all()
-    regional = _regional_for(kommune)
-    pkg = _build_values_package(rows, regional, code, category)
+    with _override_scope_for(db, kommune_id):
+        regional = _regional_for(kommune)
+        pkg = _build_values_package(rows, regional, code, category)
     _write_gzip_json(path, pkg)
     return path
 
@@ -244,17 +259,18 @@ def precompute(db: Session, kommune_id: int) -> None:
         rows = db.query(CellAssessment).filter(CellAssessment.kommune_id == kommune_id).all()
         if not rows:
             return
-        regional = _regional_for(kommune)
-        codes = list(catalog.INDICATOR_BY_CODE.keys()) + list(catalog.RISKS_BY_CODE.keys())
-        for code in codes:
-            category = layer_category(code)
-            if not category:
-                continue
-            try:
-                pkg = _build_values_package(rows, regional, code, category)
-                _write_gzip_json(_values_path(kommune_id, code), pkg)
-            except Exception:
-                log.exception("layer_cache precompute failed kommune=%s code=%s", kommune_id, code)
+        with _override_scope_for(db, kommune_id):
+            regional = _regional_for(kommune)
+            codes = list(catalog.INDICATOR_BY_CODE.keys()) + list(catalog.RISKS_BY_CODE.keys())
+            for code in codes:
+                category = layer_category(code)
+                if not category:
+                    continue
+                try:
+                    pkg = _build_values_package(rows, regional, code, category)
+                    _write_gzip_json(_values_path(kommune_id, code), pkg)
+                except Exception:
+                    log.exception("layer_cache precompute failed kommune=%s code=%s", kommune_id, code)
         log.info("[layer_cache] precompute done kommune=%s (%d codes)", kommune_id, len(codes))
     except Exception:
         log.exception("layer_cache precompute failed kommune=%s", kommune_id)

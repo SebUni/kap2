@@ -43,19 +43,24 @@ log = logging.getLogger(__name__)
 # ``grids_germany``-Raster liegen in Gauß-Krüger Zone 3 (EPSG:31467) vor.
 _GRID_CRS = "EPSG:31467"
 
-# DWD-Ordnername je Treiber (identisch zum Dateinamens-Baustein). Alle hier
-# gelisteten Raster nutzen das Standard-Dateinamensmuster
+# DWD-Ordnername je Treiber (identisch zum Dateinamens-Baustein). Die meisten
+# Raster nutzen das Standard-Dateinamensmuster
 # ``grids_germany_annual_{dir}_{YYYY}_17.asc.gz`` (verifiziert für hot_days,
 # frost_days, precipGE20mm_days, precipGE30mm_days, summer_days). Raster mit
-# abweichendem Dateinamen (z. B. drought_index → ``..._{YYYY}17.asc.gz``) sind hier
-# BEWUSST nicht gelistet und müssten einen eigenen URL-Baustein bekommen.
+# abweichendem Muster ``..._{YYYY}17.asc.gz`` (ohne Unterstrich, z. B.
+# precipitation, drought_index) stehen zusätzlich in ``_PARAM_NO_UNDERSCORE``.
 _PARAM_DIR: dict[str, str] = {
     "hot_days": "hot_days",
     "frost_days": "frost_days",
     "precipGE20mm_days": "precipGE20mm_days",
     "precipGE30mm_days": "precipGE30mm_days",
     "summer_days": "summer_days",
+    "precipitation": "precipitation",
 }
+
+# Parameter mit Dateinamensmuster ``..._{YYYY}17.asc.gz`` (verifiziert per
+# Verzeichnis-Listing opendata.dwd.de, 2026-07-05).
+_PARAM_NO_UNDERSCORE: frozenset[str] = frozenset({"precipitation"})
 
 # Mem-Caches: WGS84→GK3-Transformer, geparste Grids je (param, year),
 # abgeleitete Zentroid-Werte je (param, gerundeter Zentroid).
@@ -81,7 +86,8 @@ def _get_transformer() -> Transformer:
 def _grid_url(param: str, year: int) -> str:
     d = _PARAM_DIR[param]
     base = settings.DWD_CDC_GRID_BASE.rstrip("/")
-    return f"{base}/{d}/grids_germany_annual_{d}_{year}_17.asc.gz"
+    suffix = f"{year}17.asc.gz" if param in _PARAM_NO_UNDERSCORE else f"{year}_17.asc.gz"
+    return f"{base}/{d}/grids_germany_annual_{d}_{suffix}"
 
 
 def _raw_path(param: str, year: int) -> str:
@@ -268,3 +274,8 @@ def precip_days_ge30_at(lon: float, lat: float) -> float | None:
 def summer_days_at(lon: float, lat: float) -> float | None:
     """Mittlere Sommertage/Jahr (Tmax ≥ 25 °C) am Zentroid (DWD-CDC-Klimatologie)."""
     return sample_climatology("summer_days", lon, lat)
+
+
+def precipitation_at(lon: float, lat: float) -> float | None:
+    """Mittlere Jahresniederschlagssumme (mm) am Zentroid (DWD-CDC-Klimatologie)."""
+    return sample_climatology("precipitation", lon, lat)

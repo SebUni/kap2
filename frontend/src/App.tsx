@@ -6,7 +6,6 @@ import MapDashboardTab from './components/MapDashboardTab'
 import Dashboard from './components/Dashboard'
 import MeasuresTableTab from './components/MeasuresTableTab'
 import ConfigPanelTab from './components/ConfigPanelTab'
-import HelpSection from './components/dashboard/HelpSection'
 import ExportModal from './components/ExportModal'
 
 const TAB_ROUTES = [
@@ -16,11 +15,12 @@ const TAB_ROUTES = [
 ]
 
 function AppContent() {
-  const { hasAssessment, kommune, setActiveTab, resetKommune, loadStatus, configPanelRequested } = useStore()
+  const {
+    hasAssessment, kommune, status, setActiveTab, resetKommune, loadStatus,
+    configPanelRequested, showConfig, setShowConfig,
+  } = useStore()
   const navigate = useNavigate()
   const location = useLocation()
-  const [showConfig, setShowConfig] = useState(false)
-  const [showHelp, setShowHelp] = useState(false)
   const [showExport, setShowExport] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
   const [resetting, setResetting] = useState(false)
@@ -47,6 +47,15 @@ function AppContent() {
       setShowConfig(true)
     }
   }, [configPanelRequested])
+
+  // Projekt-Setup-Flow: Kommune ohne abgeschlossene Berechnung → Konfiguration
+  // als Vollbild erzwingen (dort wird die Berechnung gestartet; das Dashboard
+  // zeigt nur noch Ergebnisse).
+  useEffect(() => {
+    if (kommune && status && status.status !== 'done') {
+      setShowConfig(true)
+    }
+  }, [kommune?.id, status?.status])
 
   // Sync store activeTab from URL
   const activeIdx = Math.max(0, TAB_ROUTES.findIndex(t => t.path === location.pathname))
@@ -114,22 +123,6 @@ function AppContent() {
             )
           )}
           <button
-            onClick={() => setShowHelp(true)}
-            title="Hilfe & Methodik"
-            style={{
-              background: 'transparent',
-              color: 'var(--text)',
-              border: '1px solid var(--border)',
-              borderRadius: 8,
-              width: 36, height: 36,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', fontSize: '1.1rem', flexShrink: 0,
-              fontWeight: 700,
-            }}
-          >
-            ?
-          </button>
-          <button
             onClick={() => setShowExport(true)}
             disabled={!kommune || !hasCompletedAssessment}
             title={hasCompletedAssessment ? 'Daten exportieren' : 'Erst IST-Berechnung durchführen'}
@@ -165,7 +158,7 @@ function AppContent() {
         </div>
       </div>
 
-      <div className="tab-bar">
+      {!showConfig && <div className="tab-bar">
         {TAB_ROUTES.map((tab, i) => {
           const disabled = i > 0 && !hasCompletedAssessment
           return (
@@ -189,26 +182,11 @@ function AppContent() {
             {kommune.name} {kommune.area_km2 ? `(${kommune.area_km2.toFixed(1)} km²)` : ''}
           </span>
         )}
-      </div>
+      </div>}
 
       {/* Export Modal */}
       {showExport && kommune && (
         <ExportModal kommuneId={kommune.id} onClose={() => setShowExport(false)} />
-      )}
-
-      {/* Help Overlay */}
-      {showHelp && (
-        <div className="help-overlay" onClick={() => setShowHelp(false)}>
-          <div className="help-overlay-content" onClick={e => e.stopPropagation()}>
-            <div className="help-overlay-header">
-              <h2>📖 Hilfe & Methodik</h2>
-              <button onClick={() => setShowHelp(false)} className="help-overlay-close">✕</button>
-            </div>
-            <div className="help-overlay-body">
-              <HelpSection />
-            </div>
-          </div>
-        </div>
       )}
 
       {showConfig ? (

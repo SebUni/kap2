@@ -66,10 +66,10 @@ export const api = {
   searchKommune: (q: string) =>
     request<Record<string, unknown>[]>(`/kommune/search?q=${encodeURIComponent(q)}`),
 
-  createKommune: (osm_id: string, name: string, osm_type?: string, geojson?: Record<string, unknown>) =>
+  createKommune: (osm_id: string, name: string, osm_type?: string, geojson?: Record<string, unknown>, address?: Record<string, string>) =>
     request<Record<string, unknown>>('/kommune', {
       method: 'POST',
-      body: JSON.stringify({ osm_id, name, osm_type: osm_type || 'relation', geojson: geojson || null }),
+      body: JSON.stringify({ osm_id, name, osm_type: osm_type || 'relation', geojson: geojson || null, address: address || null }),
     }),
 
   getKommune: (id: number) => request<Record<string, unknown>>(`/kommune/${id}`),
@@ -129,6 +129,10 @@ export const api = {
     request<Record<string, unknown>>(`/kommune/${kommuneId}/risk-histogram`),
   getRiskProjection: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/risk-projection`),
+  getCostProjection: (kommuneId: number) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/cost-projection`),
+  getKommuneProfile: (kommuneId: number) =>
+    request<Record<string, unknown>>(`/kommune/${kommuneId}/profile`),
 
   // ── Config ──────────────────────────────────────────────────────────
   getConfig: (kommuneId: number) =>

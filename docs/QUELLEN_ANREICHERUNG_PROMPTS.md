@@ -3,23 +3,39 @@
 Ziel: Jeder belegte Parameterwert bekommt eine **zitierfähige** Herkunft, die im
 (i)-Hover-Tooltip (Sidebar **und** Konfigurations-Tabelle) sichtbar ist:
 IEEE-Zitation + klickbare **Live-URL** + archivierter **Wayback-Snapshot** (falls
-die Quelle offline geht) + der bereits vorhandene Herleitungs-Langtext
-(`source_details`).
+die Quelle offline geht) + der Herleitungs-Langtext (`source_details`).
 
-## Was bereits steht (nicht neu bauen)
+## Status (Juli 2026): VOLLSTÄNDIG — Ratchet bei 0
 
-- **Infrastruktur fertig:** `backend/app/data/sources.py` (`SOURCE_REFERENCES` +
-  `resolve()`), `references` fließt durch `measure_service.compute_costs`,
-  `parameter_registry` (Maßnahmen-Block), `schemas.SourceReference`,
-  Frontend-`InfoTooltip` (rendert „Original"/„Archiv-Snapshot"-Links, bleibt beim
-  Hinüberfahren offen) und `ParameterTable`/`MeasureSidebar`.
-- **Datenmodell je Katalog-Eintrag:** `sources[feld]` (Kurzlabel),
-  `source_details[feld]` (Tooltip-Langtext, für **Kosten** schon vollständig),
-  `source_refs[feld] = [bib_key, …]` (Verweis auf die Bibliografie).
-- **3 Referenz-Beispiele fertig belegt+archiviert:** `GREEN_ROOFS_FACADES`
-  (BuGG + co2online), `DRINKING_FOUNTAINS` (Berliner Wasserbetriebe),
-  `DECENTRALIZED_ENERGY_PV_STORAGE` (HTW Stromspeicher-Inspektion). Diese sind die
-  Vorlage — Struktur exakt übernehmen.
+**Alle anwendbaren Parameter der Konfigurations-Registry haben einen Infokasten**
+(Herleitung in `source_detail` und/oder IEEE-`references`). Erzwungen durch den
+Ratchet-Test `backend/tests/test_parameter_docs_complete.py`:
+
+- `KNOWN_MISSING` ist **leer** — jeder neue Parameter ohne Doku lässt die Suite
+  sofort fehlschlagen (`test_docs_ratchet_no_new_undocumented`).
+- Offene IDs listet jederzeit:
+  `cd backend && python tests/test_parameter_docs_complete.py --list`
+- Tote Parameter (9 Pfadgewichte + 18 fest verdrahtete Formel-Konstanten) sind aus
+  der Registry entfernt; nur override-fähige Formel-Inputs
+  (`formulas._i(..., overridable=True)`) werden emittiert.
+- Neu aufgenommen und belegt: `model.*` (Referenzskalierung, Risikozonen-Schwelle,
+  Maßnahmen-Sättigung/-Kappung), `regional.*` (Proxy-/Fallback-Klimatreiber),
+  `uhi.epsilon`/`uhi.tree_cooling`, `impact.floor_height_m`,
+  `risks.EXPECTED_ANNUAL_MENTAL_HEALTH.impact.event_share` — Single Source:
+  `backend/app/services/engine/tunables.py`.
+
+### Wo die Herleitungen liegen (nicht neu bauen)
+
+| Parameterart | Ort der Doku |
+| --- | --- |
+| Maßnahmen-Kostenfelder (Einzelrecherche) | inline `sources`/`source_details`/`source_refs` je Maßnahme in `catalog.py` |
+| Maßnahmen-Wirkung/-Nutzen (Cluster-Batches) | zentraler Block `_MEASURE_EFFECT_DOCS` in `catalog.py` |
+| Bewusste 0-Werte (`capex_fixed`/`benefit` = 0) | Auto-Anreicherung `_enrich_measure_zero_cost_docs()` in `catalog.py` (maßnahmen­spezifisch generiert; inline-Einträge haben Vorrang) |
+| model/regional-Stellschrauben | Spec-Listen in `engine/tunables.py` |
+| Impact-Parameter (Schicht B) | `engine/impact/params.py` |
+| UHI-Koeffizienten | uhi-Block in `parameter_registry.py` |
+| Live-Formel-Parameter (KRITIS-Gewichte, Fallback-Konstanten) | `overridable=True`-Inputs in `engine/formulas.py` |
+| H/E/V-Normgrenzen, Risiko-ref_values/Kostensätze | Katalog-Dicts + `_enrich_*`-Funktionen in `catalog.py` |
 
 ## Grundlagen (in JEDER Session mitschicken)
 
@@ -27,15 +43,18 @@ die Quelle offline geht) + der bereits vorhandene Herleitungs-Langtext
 Kontext: Klimarisiko-Tool, Repo /opt/lampp/htdocs/kap2. Quellen-Bibliografie liegt in
 backend/app/data/sources.py (SOURCE_REFERENCES: key -> {ieee, url, archive_url, accessed}),
 resolve() hängt sie an CostComponents/Registry-Parameter (Feld "references"). Katalog-
-Einträge verweisen per source_refs = {feld: [key, ...]}. Vorlage: die 3 fertigen Einträge
-BuGG_Marktreport_2024, co2online_Dachbegruenung, BWB_Trinkbrunnen, HTW_Stromspeicher_2025.
+Einträge verweisen per source_refs = {feld: [key, ...]}.
 
 Regeln:
-- KEINE Werte/Zahlen ändern, KEINE Methodik anfassen — nur Quellen anreichern.
+- Dort wo deine Recherchen von den hinterlegten Werten abweichen, ersetze die bestehenden
+  Werte um konsistent zu bleiben — dokumentiere im source_detail "angepasst von X auf Y
+  gemäß [Quelle]" und plausibilisiere (Größenordnung, Cluster-Konsistenz, pytest).
 - NUR belastbare, real existierende Quellen. Reine "Modellannahme (…)"-Felder bleiben
   ohne source_refs (die ehrliche Prosa in source_details genügt) — nichts erfinden.
+- JEDER anwendbare Parameter braucht mindestens einen source_details-Text — auch 0-Werte
+  ("warum ist das 0?"); der Ratchet-Test erzwingt das.
 - IEEE-Zitation deutsch lokalisiert, Schema:
-  Autor/Institution, „Titel,“ Ort, Jahr. [Online]. Verfügbar: <url>. [Zugriff: 4. Juli 2026].
+  Autor/Institution, „Titel,“ Ort, Jahr. [Online]. Verfügbar: <url>. [Zugriff: 6. Juli 2026].
   (Bei >3 Autoren: "A. Erstautor u. a.". Ohne Jahr: Jahr weglassen.)
 - Jede neue Quelle ZWINGEND archivieren (Wayback), archive_url MUSS ein
   web.archive.org-Permalink sein:
@@ -43,94 +62,76 @@ Regeln:
   Falls leer (PDF/langsam/Ratelimit) den jüngsten vorhandenen Snapshot nehmen:
     curl -s "https://web.archive.org/cdx/search/cdx?url=<url>&output=json&limit=-1&filter=statuscode:200"
     -> https://web.archive.org/web/<timestamp>/<url>
-- bib_key: sprechend + stabil (z. B. "DWA_A138_2005", "KTBL_Bewaesserung").
-- Verifikation: cd backend && python -m pytest tests/test_measure_pricing.py -q
-  (prüft u. a. source_refs -> Bibliografie und Vollständigkeit der Einträge). Danach committen.
+- bib_key: sprechend + stabil (z. B. "DWA_A138", "VDI_2067_Blatt1").
+- Verifikation: cd backend && python -m pytest tests/ -q
+  (test_measure_pricing prüft source_refs -> Bibliografie und Eintrag-Vollständigkeit;
+  test_parameter_docs_complete prüft die Infokasten-Vollständigkeit als Ratchet.)
 ```
 
 Einen neuen Bibliografie-Eintrag anlegen (in `sources.py`) und verdrahten (in `catalog.py`):
 
 ```python
 # sources.py
-"DWA_A138_2005": {
+"DWA_A138": {
     "ieee": "Deutsche Vereinigung für Wasserwirtschaft, Abwasser und Abfall e.V. (DWA), "
             "„Arbeitsblatt DWA-A 138: Planung, Bau und Betrieb von Anlagen zur Versickerung "
             "von Niederschlagswasser,“ Hennef, Deutschland, 2005. [Online]. Verfügbar: "
-            "<url>. [Zugriff: 4. Juli 2026].",
+            "<url>. [Zugriff: 6. Juli 2026].",
     "url": "<live-url>",
     "archive_url": "https://web.archive.org/web/<ts>/<url>",
-    "accessed": "2026-07-04",
+    "accessed": "2026-07-06",
 },
 # catalog.py, in der Maßnahme (neben sources/source_details):
-"source_refs": {"capex_per_m2": ["DWA_A138_2005"], "opex_per_m2_year": ["DWA_A138_2005"]},
+"source_refs": {"capex_per_m2": ["DWA_A138"], "opex_per_m2_year": ["DWA_A138"]},
 ```
 
 ---
 
-## Teil 1 — Restliche KOSTEN-Parameter (Infra fertig, nur Daten)
+## Fortsetzungs-Prompt (Pflege / neue Parameter)
 
-Noch zu belegen: **24 Maßnahmen** mit real belegten (nicht-Modellannahme) Kosten,
-gebatcht nach KAnG-Cluster (Anker wie in `MASSNAHMEN_BEPREISUNG_PROMPTS.md §6`).
-Je Batch: `source_refs` + Bibliografie-Einträge, für die in `source_details` bereits
-genannten Quellen (die Prosa nennt Beleg + Vorgehen — nur URL finden + archivieren).
+Der folgende Prompt hält den Zustand „kein genutzter Parameter ohne Erklärung“
+dauerhaft aufrecht — für neue Parameter, Vertiefung bestehender Herleitungen oder
+das Nachziehen besserer Quellen:
 
-| Batch | Maßnahmen (Auszug) | Quellen-Anker |
-|---|---|---|
-| Gebäude/Begrünung | COOL_ROOFS, HEAT_RESILIENT_PAVEMENT, FLOOD_PROTECTION_BUILDING | BuGG (vorhanden), co2online (vorhanden), kostencheck, BBK-Hochwasserschutzfibel |
-| Wasser/Starkregen | DESEALING_SURFACE, DRAINAGE_SWALES, INFILTRATION_AREAS, RETENTION_STORAGE, RETENTION_POLDER_RESERVOIR, LEAKAGE_REDUCTION | DWA-A 138, Sieker, Hamburg RISA, LANUV NRW, DVGW |
-| Küste/Fluss | LEVEE_REINFORCEMENT, FLOODPLAIN_RENATURATION, EROSION_PROTECTION | NLWKN/MELUND, IKSR, BfN |
-| Land-/Forst | MIXED_FORESTS, HUMUS_BUILDUP, DROUGHT_RESISTANT_VARIETIES, WATER_STORAGE_EFFICIENT_IRRIGATION | KTBL, LfL Bayern, Landesforsten |
-| Energie/Wirtschaft | GRID_REINFORCEMENT_REDUNDANCY | BNetzA/dena, Verteilnetz-Praxiswerte |
-| Bevölkerungsschutz/Fischerei | EARLY_WARNING_MEASURE (opex_fixed_year: kommunal.de/Hydrotec), FISH_PASSAGE_RESTORATION, FISHERIES_SPAWNING_HABITAT_RESTORATION | BBK, kommunal.de, LAWA |
-| Stadt/Hitze (Rest) | HEAT_ACTION_PLANS, URBAN_GREEN | klimastadtraum.de, GALK, difu |
+```
+Kontext: Klimarisiko-Tool, Repo /opt/lampp/htdocs/kap2 (+ Grundlagen-Block aus
+docs/QUELLEN_ANREICHERUNG_PROMPTS.md).
 
-Session-Prompt je Batch: Grundlagen (oben) + „Batch <Name>: finde für die unten
-gelisteten Maßnahmen die in `source_details` genannten Quellen als stabile URL,
-archiviere sie (Wayback), lege je Quelle einen `SOURCE_REFERENCES`-Eintrag an und
-verdrahte `source_refs` je belegtem Kostenfeld. `capex_fixed: 0.0`-Felder
-(planungsrechtlich/kostenlos) brauchen keine Quelle."
+Aufgabe:
+1. cd backend && python tests/test_parameter_docs_complete.py --list
+   → listet alle anwendbaren Parameter ohne Infokasten (Soll: 0).
+2. Für jede gelistete ID: Herleitung (source_detail) schreiben — Wirkmechanismus,
+   Wertherleitung inkl. Bandbreite, ehrliche Kennzeichnung als Modellannahme wo
+   keine belastbare Quelle existiert; belastbare Quellen als IEEE-Eintrag in
+   sources.py anlegen (inkl. Wayback-archive_url) und per source_refs verdrahten.
+   Ablageorte je Parameterart: siehe Tabelle "Wo die Herleitungen liegen".
+3. Weicht ein recherchierter Wert vom hinterlegten ab: Wert ersetzen und im
+   source_detail "angepasst von X auf Y gemäß [Quelle]" dokumentieren;
+   plausibilisieren (Größenordnung je Einheit prüfen — €/m² vs. €/ha!,
+   Cluster-Konsistenz, Kappungsgrenzen 0,05-0,50 bei default_reduction).
+4. KNOWN_MISSING in tests/test_parameter_docs_complete.py auf den neuen Stand
+   schrumpfen (Soll: leer lassen) und die volle Suite laufen lassen:
+   python -m pytest tests/ -q → alles grün, dann committen.
+5. Prüfe bei neuen/geänderten Maßnahmen die Feld-Plausibilität (B-Audit):
+   Hat jede bauliche/technische Maßnahme realistische OPEX (VDI-2067-Größenordnung,
+   Kühlung/Pumpen auch Energie)? Ist benefit_per_m2_year frei von Doppelzählung
+   mit den vermiedenen Schäden und in €/m² plausibel (ha-Maßstab für Agrar/Forst)?
+```
 
----
+## Abgeschlossene Batches (Referenz)
 
-## Teil 2 — NICHT-Kosten-Parameter (Hazards, Risiken, Expositionen, Sensitivitäten, Formeln)
+| Batch | Inhalt | Anker-Quellen |
+| --- | --- | --- |
+| Phase A (Struktur) | tote Parameter raus, 20 neue Stellschrauben verdrahtet+belegt, Ratchet-Test | — |
+| B0 | systematische 0-Wert-Herleitungen (capex_fixed=0, benefit=0) | Modellentscheidungs-Texte |
+| B1 Energie/Wirtschaft | Netzverstärkung (0,30), Kühlung (+OPEX!), PV+Speicher, kritische Knoten, Lieferketten, Leckage | BNetzA_SAIDI_2023, VDI_2067_Blatt1, HTW, DVGW, RONT |
+| B2 Hitze/Gesundheit | HAP (0,20→**0,25** gemäß Studie), kühle Räume (+OPEX), Frühwarnung, Evakuierung, Stadtgrün, Schneisen, helle Dächer/Beläge, Trinkbrunnen, vulnerable Gruppen, Arbeitszeit | **Urban_HHAP_Wirksamkeit_2025** (−25,2 % Hitzemortalität), WMO_EarlyWarnings, VDI 3787 |
+| B3 Wasser/Starkregen | Entsiegelung, Schwammstadt, Retention/Polder, Versickerung, Abflusslenkung, GW-Anreicherung | DWA_A138, BWB_Niederschlagswasserentgelt (1,84 €/m²·a), Agrarheute, UBA |
+| B4 Gebäude | Gründach/Fassade, Objektschutz | BuGG, co2online, BBK_Hochwasserschutzfibel |
+| B5 Küste/Land/Forst | Deich (+OPEX 10 T€/km·a), Sperrwerke (+OPEX), Erosion, Auen, Mischwald, Humus, Sorten, Bewässerung, Waldbrand, Biotopverbund — **9 Agrar-/Forst-Nutzenwerte auf ha-Maßstab plausibilisiert** | NLWKN, LfL, KTBL, AGDW, TEEB DE, UBA |
+| B6 Fischerei/Anreize | adaptives Management, Aquakultur (+OPEX), Laichhabitate, Gewässergüte, Fischaufstieg (+OPEX), Anreiz-/Investitionsprogramme | LfU_Bayern_Fischaufstieg, UBA_Gewaesserrenaturierung |
 
-Diese Parameter haben heute nur ein `source`-Kurzlabel (kein `source_detail`, keine
-`references`). Zwei Schritte:
-
-### 2a. Kleiner Infra-Ausbau in `parameter_registry.py` (einmalig)
-
-`_base_param` kann `source_detail`/`references` bereits — sie werden für Nicht-
-Maßnahmen nur noch nicht befüllt. In `catalog_parameters()` je Emissions-Block
-ergänzen (analog zum Maßnahmen-Block):
-
-- **RISKS** (`ref_value`, ~Z. 98): `source_detail=r.get("source_detail","")`,
-  `references=sources.resolve(r.get("source_refs"))`.
-- **HAZARDS/EXPOSURES/VULNERABILITIES** (`norm_min`/`norm_max`, ~Z. 116):
-  `source_detail=m.get("source_detail","")`, `references=sources.resolve(m.get("source_refs"))`.
-- **Formel-Parameter** (`formulas.DETAILED`-Inputs, ~Z. 146): `source_detail=inp.get("source_detail","")`,
-  `references=sources.resolve(inp.get("source_refs"))`.
-- **pathway_weights / UHI**: analog, falls belegbar (meist dokumentierte Modellwahl → nur `source_detail`).
-
-Frontend braucht KEINE Änderung (ModelParameter.references/-source_detail + Tooltip
-sind generisch). Test: bestehende `python -m pytest backend/tests/` bleibt grün.
-
-### 2b. Daten je Cluster (Research + Wayback), gebatcht
-
-Katalog-Einträge in `catalog.py` um `source_detail` (Langtext) + `source_refs`
-ergänzen; Bibliografie-Einträge in `sources.py` anlegen + archivieren. Cluster:
-
-- **Hazards** (Klimaprojektionen, Kennwerte): DWD, Copernicus/C3S, IPCC AR6, Umweltbundesamt.
-- **Risiken** (`ref_value` Schadens-/Outcome-Kennwerte): KWRA 2021 (UBA), GDV-Schadenstatistik,
-  RKI (Hitzemortalität), Destatis.
-- **Expositionen/Sensitivitäten** (Normierungsskalen): Zensus 2022, CORINE/Copernicus Land,
-  einschlägige Fachliteratur je Indikator.
-- **Formel-Parameter** (UHI-Koeffizienten etc.): VDI 3787, Oke 1982, Stewart & Oke 2012
-  (bereits als `source` vorhanden → nur `source_detail` + ggf. `source_refs` nachziehen).
-
-Session-Prompt je Cluster: Grundlagen (oben) + 2a als Voraussetzung + „Cluster
-<Name>: belege die aufgeführten Parameter mit source_detail + archivierter IEEE-
-Quelle; unbelegbare bleiben ehrlich Modellannahme."
-
-Akzeptanz gesamt: `python -m pytest backend/tests/` grün; im Browser zeigt der
-(i)-Tooltip an einem angereicherten Nicht-Kosten-Parameter IEEE-Zitat + Original-
-und Archiv-Link.
+Methodik-Ergänzung (B1): Flat-skalierte verknüpfte Risiken (z. B. Ausfallstunden bei
+Netzverstärkung) liefern jetzt einen Einzelmaßnahmen-Nutzen als Delta der kommunen-
+weiten P90-Outcome-Kosten (`measure_service.compute_impact`, Feld
+`annual_benefit_flat_eur`) — vorher stand dort 0 € trotz CAPEX.

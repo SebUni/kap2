@@ -62,7 +62,7 @@ export default function KommuneSelector() {
     setOpen(false)
     setGebieteOpen(false)
     try {
-      const k = await api.createKommune(r.osm_id, r.name, r.osm_type, r.geojson) as unknown as Kommune
+      const k = await api.createKommune(r.osm_id, r.name, r.osm_type, r.geojson, r.address) as unknown as Kommune
       const grid = await api.getGrid(k.id) as { features?: unknown[] }
       if (!grid.features?.length) {
         await api.generateGrid(k.id)

@@ -74,7 +74,7 @@ def mental_health(risk: dict, ctx: CellContext) -> dict:
     # Referenzgrenzen (haz_intensity, §3.3-Restlücke).
     event = max(ctx.haz_intensity("COMPOUND_EVENT"), ctx.haz_intensity("CASCADE_EVENT"),
                 ctx.haz_intensity("DROUGHT"))
-    driver = min(1.0, af + 0.3 * event)
+    driver = min(1.0, af + ctx.p(code, "event_share", 0.3) * event)
     outcome = ctx.pop * (rate / 100_000.0) * driver * ctx.g(risk)
     return _result(risk, outcome)
 
@@ -123,4 +123,51 @@ HEALTH_IMPACTS = {
     "EXPECTED_ANNUAL_AFFECTED_EVACUATED": affected_evacuated,
     "EXPECTED_THERMAL_STRESS_HOURS": thermal_stress_hours,
     "EXPECTED_POLLUTANT_EXPOSURE_HOURS": pollutant_exposure_hours,
+}
+
+
+# ── Lineage-Spezifikation (Wirkungsdiagramm) ───────────────────────────────────
+# Deklariert je Risiko, was die Funktion oben rechnet (Bevölkerung · Rate · Treiber ·
+# g(V̂)), damit ``lineage_graph`` den Schicht-B-Zweig des Wirkungsdiagramms exakt aus
+# der tatsächlichen Rechnung baut. Muss die Funktionskörper spiegeln
+# (Key-Gleichheit wird in tests/test_lineage_graph.py geprüft).
+LINEAGE_SPECS: dict[str, dict] = {
+    "EXPECTED_ANNUAL_MORTALITY": {
+        "rate_param": "baseline_mort_per_100k",
+        "driver": {"kind": "af", "hazard": "HEAT_WAVE",
+                   "params": ["beta_per_hotday", "hotday_threshold"]},
+    },
+    "EXPECTED_ANNUAL_MORBIDITY": {
+        "rate_param": "rate_per_100k",
+        "driver": {"kind": "af", "hazard": "HEAT_WAVE",
+                   "params": ["beta_per_hotday", "hotday_threshold"]},
+    },
+    "EXPECTED_ANNUAL_INJURIES": {
+        "rate_param": "rate_per_100k",
+        "driver": {"kind": "intensity",
+                   "hazards": ["HEAVY_RAIN_FLOOD", "EXTRATROPICAL_STORM", "LANDSLIDE"]},
+    },
+    "EXPECTED_ANNUAL_MENTAL_HEALTH": {
+        "rate_param": "rate_per_100k",
+        "driver": {"kind": "af_plus_event", "hazard": "HEAT_WAVE",
+                   "params": ["beta_per_hotday", "hotday_threshold"],
+                   "event_hazards": ["COMPOUND_EVENT", "CASCADE_EVENT", "DROUGHT"],
+                   # editierbarer Registry-Parameter (risks.….impact.event_share)
+                   "event_share_param": "event_share"},
+    },
+    "EXPECTED_ANNUAL_AFFECTED_EVACUATED": {
+        "rate_param": "rate_per_100k",
+        "driver": {"kind": "intensity",
+                   "hazards": ["HEAVY_RAIN_FLOOD", "STORM_SURGE", "WILDFIRE"]},
+    },
+    "EXPECTED_THERMAL_STRESS_HOURS": {
+        "rate_param": "hours_ref_per_100k",
+        "driver": {"kind": "ratio", "hazard": "HEAT_WAVE",
+                   "params": ["reference_hotdays"]},
+    },
+    "EXPECTED_POLLUTANT_EXPOSURE_HOURS": {
+        "rate_param": "hours_ref_per_100k",
+        "driver": {"kind": "ratio", "hazard": "HEAT_WAVE",
+                   "params": ["reference_hotdays"]},
+    },
 }

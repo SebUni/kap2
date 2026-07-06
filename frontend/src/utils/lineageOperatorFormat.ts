@@ -14,8 +14,8 @@ function fmtNum(v: unknown): string {
 }
 
 export function operatorKindLabel(kind: string, meta: Record<string, unknown>): string {
-  if (kind === 'scaling') return 'Skalierung'
-  if (kind === 'average') return 'Mittelung'
+  // Skalierungs-Operatoren tragen ihr Label im Meta (z. B. "Kostensatz").
+  if (kind === 'scaling') return String(meta.label || 'Skalierung')
   if (kind === 'norm') return 'Normierung'
   if (kind === 'multiply' || kind === 'scale_factor') return '×'
   if (kind === 'divide') return '÷'
@@ -25,7 +25,9 @@ export function operatorKindLabel(kind: string, meta: Record<string, unknown>): 
 }
 
 const SINGLE_LABEL_KINDS = new Set([
-  'count', 'coverage', 'neighbor', 'weighted_sum', 'average', 'formula', 'max', 'min',
+  'count', 'coverage', 'neighbor', 'weighted_sum', 'formula', 'max', 'min',
+  // Schicht-B-Operatoren (Schadensfunktionen): Label kommt aus dem Backend-Meta.
+  'af', 'gv', 'damage_curve', 'sum_cells', 'p90', 'intensity', 'ratio',
 ])
 
 export function operatorShowsSingleLabel(kind: string): boolean {
@@ -94,18 +96,19 @@ export function edgeWeightEditField(
   parameters: ModelParameter[],
 ): OperatorEditField | null {
   if (meta.op_kind !== 'weight') return null
-  const pid = meta.parameter_id as string
-  const p = parameters.find(x => x.id === pid)
+  const pid = meta.parameter_id as string | undefined
+  const p = pid ? parameters.find(x => x.id === pid) : undefined
   if (!p) {
+    // Ohne Registry-Parameter (Pfadgewichte sind Modellkonstanten): nur anzeigen.
     return {
-      parameterId: pid,
+      parameterId: pid ?? '',
       value: String(meta.weight ?? ''),
-      editable: true,
+      editable: false,
       label: 'Gewicht',
     }
   }
   return {
-    parameterId: pid,
+    parameterId: p.id,
     value: String(p.value),
     editable: p.editable,
     label: 'Gewicht',

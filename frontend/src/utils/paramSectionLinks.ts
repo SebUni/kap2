@@ -1,7 +1,8 @@
 import type { Catalog, CatalogMeasure, CatalogRisk } from '../types'
 
 export function paramSectionId(category: string, code?: string): string {
-  if (!code || category === 'model' || category === 'uhi') {
+  if (!code || category === 'model' || category === 'uhi'
+      || category === 'impact' || category === 'regional') {
     return `param-${category}`
   }
   return `param-${category}-${code}`
@@ -15,6 +16,8 @@ export function mainSectionKeyFromAnchor(anchorId: string): string | null {
   const id = anchorId.replace(/^#/, '')
   if (id === paramSectionId('model')) return 'model'
   if (id === paramSectionId('uhi')) return 'uhi'
+  if (id === paramSectionId('impact')) return 'impact'
+  if (id === paramSectionId('regional')) return 'regional'
   if (id.startsWith('param-hazards')) return 'hazards'
   if (id.startsWith('param-exposures')) return 'exposures'
   if (id.startsWith('param-vulnerabilities')) return 'vulnerabilities'

@@ -1381,12 +1381,14 @@ def build_pathways(risk: dict) -> list[dict]:
 # CAPEX  = capex_fixed + Anzahl × capex_per_unit + Fläche × capex_per_m2
 # OPEX/a = opex_fixed_year + Anzahl × opex_per_unit_year + Fläche × opex_per_m2_year
 # benefit_per_m2_year (Nutzen-Seite) bleibt unverändert vom Kostenmodell getrennt.
-# default_reduction: unbelegte Modellannahme je Maßnahme (keine externe Kalibrierstudie
-#   vorhanden); Kommune kann Wert über PUT /kommune/{id}/parameters mit eigener Quelle
-#   überschreiben (source-Fallback: "Modellannahme (Maßnahmenwirkung, unbelegt)").
-# Kostenquellen sind Stand dieser Migration überwiegend "Modellannahme (Maßnahmenkosten,
-#   unbelegt)" bzw. für unit_density_per_ha "Modellannahme (Richtwert-Dichte, unbelegt)" —
-#   der Recherche-Pass mit belastbaren Quellen je Maßnahme folgt in einem späteren Schritt.
+# default_reduction: je Maßnahme mit Wirkmechanismus-Herleitung dokumentiert (inline oder
+#   zentral in _MEASURE_EFFECT_DOCS unten); wo Wirksamkeitsstudien existieren, darauf
+#   kalibriert (z. B. Hitzeaktionspläne 0,25 nach Urban u. a. 2025). Kommune kann Werte
+#   über PUT /kommune/{id}/parameters mit eigener Quelle überschreiben.
+# Kostenquellen: recherchierte Kennwerte je Feld (sources/source_details/source_refs);
+#   bewusste 0-Werte erklärt _enrich_measure_zero_cost_docs() maßnahmen­spezifisch.
+#   Vollständigkeit („kein Parameter ohne Infokasten") erzwingt der Ratchet-Test
+#   backend/tests/test_parameter_docs_complete.py.
 
 MEASURES: list[dict] = [
     # Herleitung capex_per_unit: eine einzelne Ortsnetzstation kostet ~18.000-50.000 € (400-kVA-
@@ -1400,19 +1402,43 @@ MEASURES: list[dict] = [
      "effect_target": ["vulnerability"], "default_reduction": 0.30, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ENERGY_OUTAGE_HOURS", "EXPECTED_CI_OUTAGE_HOURS"],
      "capex_fixed": 0.0, "capex_per_unit": 250000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 5000.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Station", "unit_density_per_ha": 0.005,
      "source": "Verteilnetzbetreiber-Praxiswerte (ront.info / Bayernwerk) / BNetzA-Größenordnung",
      "sources": {"capex_per_unit": "Verteilnetz-Praxiswerte (Einzelstation bis MS-Ausbau)",
+                 "opex_per_unit_year": "VDI 2067 (Instandhaltungssätze elektrotechn. Anlagen)",
+                 "default_reduction": "BNetzA-Versorgungsqualität (n-1-Redundanzprinzip)",
+                 "benefit_per_m2_year": "Modellentscheidung (Nutzen über flat-Risiken, dokumentiert)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
-     "source_refs": {"capex_per_unit": ["RONT_Ortsnetzstation"]},
+     "source_refs": {"capex_per_unit": ["RONT_Ortsnetzstation"],
+                     "opex_per_unit_year": ["VDI_2067_Blatt1", "RONT_Ortsnetzstation"],
+                     "default_reduction": ["BNetzA_SAIDI_2023"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Redundante Einspeisung/Ringschluss (n-1-Prinzip) "
+            "verhindert bzw. verkürzt Versorgungsunterbrechungen an den verstärkten Netzknoten — "
+            "die hohe deutsche Versorgungszuverlässigkeit (SAIDI 2023: 12,8 min/a, BNetzA) beruht "
+            "wesentlich auf Redundanz und Verkabelungsgrad der Netze. Für die abgedeckten Zellen "
+            "wird eine Reduktion der Ausfallstunden-Risiken um 30 % angesetzt: konservativ-mittig, "
+            "da vollständige n-1-Auslegung Einzelfehler nahezu eliminiert, Extremwetter aber auch "
+            "redundante Systeme gleichzeitig treffen kann (Restrisiko). Keine externe "
+            "Kalibrierstudie je Kommune — editierbare, dokumentierte Modellannahme im belegten "
+            "Wirkprinzip.",
         "capex_per_unit": "Eine einzelne Ortsnetzstation kostet ~18.000-50.000 € (400-kVA-Trafo "
             "bis eigene Mittelspannungsstation inkl. Verkabelung; ront.info, ms-elektro.gmbh); "
             "eine vollständige MS-Netzverstärkung liegt bei ~0,8-3 Mio € (Bayernwerk-Projekte). "
             "Der Punktwert 250.000 € je \"Station\" steht für ein Verstärkungs-/Redundanzpaket "
             "je Netzknoten (Stationsausbau + redundante Einspeisung + Kabelabschnitt), "
             "eingeordnet zwischen Einzelstation und Vollausbau (BNetzA/dena-Größenordnung).",
+        "opex_per_unit_year": "Betrieb/Instandhaltung der verstärkten Netzknoten: VDI 2067 "
+            "setzt für elektrotechnische Anlagen Wartung + Instandsetzung von ~1-3 % der "
+            "Investitionssumme pro Jahr an. 2 % von 250.000 € → 5.000 €/(Station·a) "
+            "(Inspektion, Schalthandlungen, Trafo-/Kabelinstandhaltung).",
+        "benefit_per_m2_year": "0 €/(m²·a) ist bewusst gesetzt: Der Nutzen der Netzverstärkung "
+            "ist die Reduktion der Ausfallstunden-Risiken (EXPECTED_ENERGY_OUTAGE_HOURS, "
+            "EXPECTED_CI_OUTAGE_HOURS). Diese sind kommunenweite (flat-skalierte) Risiken — ihr "
+            "vermiedener Schaden wird als Differenz der kommunenweiten P90-Outcome-Kosten "
+            "berechnet (measure_service, flat-Nutzen), nicht als €/m². Ein zusätzlicher "
+            "Flächennutzen existiert nicht (kein Energieertrag o. Ä.).",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 relevanter "
             "Netzknoten je 200 ha Versorgungsgebiet (0,005 Stationen/ha)."}},
     # Herleitung capex_per_unit: keine belastbare Einzelquelle für die hitzefeste Ertüchtigung/
@@ -1423,16 +1449,32 @@ MEASURES: list[dict] = [
      "effect_target": ["hazard"], "default_reduction": 0.20, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ENERGY_INFRA_DAMAGE_EUR"],
      "capex_fixed": 0.0, "capex_per_unit": 120000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 6000.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.003,
      "source": "Modellannahme (mangels belastbarer Quelle)",
      "sources": {"capex_per_unit": "Modellannahme (mangels belastbarer Quelle)",
+                 "opex_per_unit_year": "VDI 2067 (Wartungssätze Kälte-/RLT-Technik) + Energie",
+                 "default_reduction": "Modellannahme (Derating-Mechanismus, dokumentiert)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
+     "source_refs": {"opex_per_unit_year": ["VDI_2067_Blatt1"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Transformatoren, Umrichter und Schaltanlagen "
+            "verlieren bei hohen Außentemperaturen Nennleistung (Derating) und altern "
+            "beschleunigt; aktive Zusatzkühlung und hitzefeste Auslegung erhalten die "
+            "Betriebsfähigkeit an Hitzetagen und senken hitzebedingte Anlagenschäden. Angesetzt: "
+            "20 % Reduktion des hitzegetriebenen Energieinfrastruktur-Schadensrisikos in den "
+            "abgedeckten Zellen — konservativ unterhalb der Netzverstärkung (0,30), da nur der "
+            "Hitzepfad adressiert wird (Sturm/Flut unverändert). Keine externe Kalibrierstudie "
+            "vorhanden — editierbare, dokumentierte Modellannahme.",
         "capex_per_unit": "Für die hitzefeste Ertüchtigung/Zusatzkühlung energiebezogener "
             "Anlagen (Transformatoren, Umspannwerke) war keine belastbare Einzelquelle "
             "auffindbar. Modellannahme in sechsstelliger Größenordnung je Anlage (Zusatz"
             "kühlung, thermische Absicherung, Redundanz) → Punktwert 120.000 €.",
+        "opex_per_unit_year": "Kühl- und Klimatechnik verursacht laufende Kosten: VDI 2067 "
+            "setzt für Kälte-/RLT-Anlagen Wartung + Instandsetzung von ~4-6 % der Investition "
+            "pro Jahr an, hinzu kommt der Energieverbrauch der Zusatzkühlung an Hitzetagen. "
+            "5 % von 120.000 € → 6.000 €/(Anlage·a) als Vollkosten-Punktwert (Wartung ~2-4 % "
+            "+ Kühlenergie). Ohne diesen Posten wäre die Maßnahme unrealistisch betriebskostenfrei.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 hitzekritische "
             "Anlage je 330 ha (0,003 Anlagen/ha)."}},
     # Herleitung capex_per_m2: schlüsselfertige Aufdach-PV ~1.015-1.200 €/kWp (2026), Batterie-
@@ -1448,16 +1490,34 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "HTW-Stromspeicher-Inspektion 2025 / 42watt (PV + Speicher)",
      "sources": {"capex_per_m2": "HTW Berlin / 42watt (PV-Systempreis + Speicher)",
-                 "opex_per_m2_year": "Modellannahme (Betrieb/Versicherung ~1-2 %)"},
-     "source_refs": {"capex_per_m2": ["HTW_Stromspeicher_2025"]},
+                 "opex_per_m2_year": "Modellannahme (Betrieb/Versicherung ~1-2 %)",
+                 "default_reduction": "HTW Berlin (Autarkiegrade PV-Speicher-Systeme)",
+                 "benefit_per_m2_year": "HTW Berlin (PV-Ertrag/Eigenverbrauchswert)"},
+     "source_refs": {"capex_per_m2": ["HTW_Stromspeicher_2025"],
+                     "default_reduction": ["HTW_Stromspeicher_2025"],
+                     "benefit_per_m2_year": ["HTW_Stromspeicher_2025"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: PV + Batteriespeicher (zunehmend mit Ersatzstrom-/"
+            "Inselbetriebsfunktion) entkoppeln Verbraucher zeitweise vom Netz und dämpfen die "
+            "Folgen von Versorgungsunterbrechungen sowie systemische Dominoeffekte. Typische "
+            "PV-Speicher-Systeme erreichen Autarkiegrade von ~40-70 % (HTW-Stromspeicher-"
+            "Inspektion); da Ersatzstromfähigkeit nicht in allen Systemen aktiv ist und Ausfälle "
+            "auch nachts/im Winter auftreten, wird konservativ eine Reduktion der verknüpften "
+            "Ausfall-/Domino-Risiken um 25 % in den abgedeckten Zellen angesetzt. Editierbare, "
+            "dokumentierte Modellannahme auf belegter Autarkie-Basis.",
         "capex_per_m2": "Schlüsselfertige Aufdach-PV kostet ~1.015-1.200 €/kWp (Frühjahr 2026, "
             "historischer Tiefstand), Batteriespeicher ~315 €/kWh bzw. konservativ 500 €/kWh "
             "(HTW-Stromspeicher-Inspektion 2025, HTW Berlin; 42watt.de). Bei ~6 m² Modulfläche "
             "je kWp sind das ~170-200 €/m² Modulfläche; über die Bruttodachfläche inklusive "
             "Speicheranteil → Punktwert 150 €/m².",
         "opex_per_m2_year": "Modellannahme: ~1-2 % der Investition pro Jahr für Betrieb, "
-            "Wartung, Wechselrichter-Rücklage und Versicherung → 2 €/m²/a."}},
+            "Wartung, Wechselrichter-Rücklage und Versicherung → 2 €/m²/a.",
+        "benefit_per_m2_year": "Direkter Energieertrag: ~1.000 kWh/kWp·a Ertrag bei ~6 m² "
+            "Modulfläche je kWp ≈ 165 kWh/m² Modulfläche; bewertet mit Eigenverbrauchs-/"
+            "Einspeisemix ~0,15-0,25 €/kWh wären das 25-40 €/m² MODULfläche. Der Parameter "
+            "bezieht sich aber auf die gesamte Maßnahmenfläche (Bruttodach inkl. nicht belegter "
+            "Anteile) und zieht die Betriebskosten nicht ab → konservativer Nettowert 8 €/(m²·a) "
+            "(≈ 20-30 % effektiver Belegungs-/Nutzungsgrad; HTW-Ertrags-/Preisdaten)."}},
     # Herleitung capex_per_m2/opex_per_m2_year: Mischmaßnahme Dach- + Fassadenbegrünung.
     # Extensives Gründach 40-70 €/m² Herstellung, Unterhalt 0,50-5 €/m²/a (BuGG-Marktreport;
     # 11880-dachdecker/co2online 2026); bodengebundene Fassadenbegrünung 15-35 €/m²
@@ -1546,16 +1606,30 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Marktpreise Dachbeschichtung / Modellannahme",
      "sources": {"capex_per_m2": "Marktpreise sonnenreflektierende Dachbeschichtung",
-                 "opex_per_m2_year": "Modellannahme (anteilige Nachbeschichtung)"},
-     "source_refs": {"capex_per_m2": ["Asphaltshop_Dachbeschichtung"]},
+                 "opex_per_m2_year": "Modellannahme (anteilige Nachbeschichtung)",
+                 "default_reduction": "Albedo-Wirkprinzip (VDI 3787, Modellannahme)",
+                 "benefit_per_m2_year": "Modellannahme (eingesparte Kühlenergie)"},
+     "source_refs": {"capex_per_m2": ["Asphaltshop_Dachbeschichtung"],
+                     "default_reduction": ["VDI3787_Stadtklima"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Hochreflektive Dächer senken die Dachoberflächen"
+            "temperatur um bis zu ~30 K und reduzieren die Wärmeabgabe an Innenräume und "
+            "Stadtluft (Albedo-Term des UHI-Modells, VDI 3787). Auf die Wärmebelastungsstunden "
+            "der Zelle wirkt nur der Dachflächenanteil → 15 % Reduktion angesetzt, bewusst der "
+            "niedrigste Wert der Hitzemaßnahmen (kein Schatten-/Verdunstungseffekt wie bei "
+            "Begrünung). Editierbare, dokumentierte Modellannahme.",
         "capex_per_m2": "Sonnenreflektierende (weiße) Dachbeschichtung kostet 10-30 €/m², eine "
             "Acrylbeschichtung im Mittel ~18 €/m² (asphalt-shop.de, steelmonks 2026). "
             "Punktwert 20 €/m² im Mittel der Marktspanne für die Beschichtung einer "
             "bestehenden Dachfläche (ohne Dacherneuerung).",
         "opex_per_m2_year": "Modellannahme mangels belastbarer Quelle: 1 €/m²/a bildet "
             "die anteilige Nachbeschichtung/Auffrischung ab (Beschichtung hält je nach "
-            "Produkt ~10-15 Jahre, umgelegt auf die Jahre)."}},
+            "Produkt ~10-15 Jahre, umgelegt auf die Jahre).",
+        "benefit_per_m2_year": "Direkter Zusatznutzen = eingesparte Kühlenergie der Räume "
+            "unter dem Dach: kühlere Dachflächen senken den Kühlbedarf des obersten Geschosses "
+            "um grob 5-15 kWh/m²·a; bei ~0,30 €/kWh sind das 1,50-4,50 €/m²·a → Punktwert "
+            "3 €/(m²·a). Modellannahme (Größenordnung internationaler Cool-Roof-Programme), "
+            "editierbar."}},
     # Herleitung capex_per_m2: heller/hitzeresilienter Asphalt verursacht ~3-5 €/m² Mehrkosten
     # gegenüber Normalasphalt (45-60 €/m²), d. h. 20-50 % teurer (strasse-und-autobahn.de,
     # bauindex 2026). Der Wert 30 €/m² entspricht eher einer Deckschichterneuerung mit hellem
@@ -1569,9 +1643,18 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "strasse-und-autobahn.de / bauindex (heller Asphalt) / Modellannahme",
      "sources": {"capex_per_m2": "Marktdaten heller/hitzeresilienter Asphalt (Teilerneuerung)",
-                 "opex_per_m2_year": "Modellannahme (Belagsunterhalt)"},
-     "source_refs": {"capex_per_m2": ["Kirschbaum_HellerAsphalt"]},
+                 "opex_per_m2_year": "Modellannahme (Belagsunterhalt)",
+                 "default_reduction": "Modellannahme (Hitzeschadens-Mechanik Fahrbahn)",
+                 "benefit_per_m2_year": "Modellannahme (verlängerte Belagslebensdauer)"},
+     "source_refs": {"capex_per_m2": ["Kirschbaum_HellerAsphalt"],
+                     "default_reduction": ["Kirschbaum_HellerAsphalt"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Hitzewellen verursachen Spurrinnen, Blow-ups "
+            "und beschleunigte Belagsalterung; helle/hitzestabile Beläge bleiben bei hohen "
+            "Oberflächentemperaturen formstabil (modifizierte Bindemittel, höhere Albedo — "
+            "bis ~10-20 K kühlere Belagsoberfläche, Kirschbaum/FGSV-Umfeld). Angesetzt: 20 % "
+            "Reduktion des hitze-/witterungsgetriebenen Verkehrsinfrastruktur-Schadens auf den "
+            "erneuerten Flächen. Keine Kalibrierstudie — editierbare, dokumentierte Modellannahme.",
         "capex_per_m2": "Heller/hitzeresilienter Asphalt verursacht ~3-5 €/m² Mehrkosten "
             "gegenüber Normalasphalt (45-60 €/m²), also 20-50 % Aufpreis (strasse-und-"
             "autobahn.de, bauindex-online 2026). Der Katalogwert 30 €/m² bildet nicht nur den "
@@ -1579,7 +1662,12 @@ MEASURES: list[dict] = [
             "(Teilerneuerung der Fahrbahnoberfläche); plausibilisiert. Als reiner Aufpreis "
             "wären ~3-5 €/m² anzusetzen.",
         "opex_per_m2_year": "Modellannahme: 1 €/m²/a Belagsunterhalt (Risssanierung, "
-            "anteilige Erneuerung der Deckschicht über die Nutzungsdauer)."}},
+            "anteilige Erneuerung der Deckschicht über die Nutzungsdauer).",
+        "benefit_per_m2_year": "Direkter Zusatznutzen = vermiedene vorgezogene Sanierung: "
+            "hält die Deckschicht dank Hitzestabilität einige Jahre länger (z. B. 15 statt 12 "
+            "Jahre bei ~45-60 €/m² Erneuerungskosten), entspricht das ~1-3 €/m²·a vermiedener "
+            "Erneuerungsrücklage; zzgl. geringerer Flickkosten → Punktwert 3 €/(m²·a). "
+            "Modellannahme, editierbar."}},
     # Herleitung capex_per_m2: Muldenversickerung 10-45 €/m², Mulden-Rigolen-System 60-85 €/m²
     # abflusswirksamer Fläche (DWA-A 138; baupreislexikon 2026) → Punktwert 45 €/m² an der
     # oberen Grenze reiner Mulden bzw. unterer Grenze kombinierter Systeme.
@@ -1594,10 +1682,21 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "DWA-A 138 / baupreislexikon (Mulden-Rigolen)",
      "sources": {"capex_per_m2": "DWA-A 138 / baupreislexikon (Mulden-Rigolen-Versickerung)",
-                 "opex_per_m2_year": "DWA-A 138 (Betrieb), auf Anlagenfläche umgerechnet"},
+                 "opex_per_m2_year": "DWA-A 138 (Betrieb), auf Anlagenfläche umgerechnet",
+                 "default_reduction": "DWA-A 138 (Bemessungsprinzip, Modellannahme)",
+                 "benefit_per_m2_year": "Gesplittete Abwassergebühr (BWB-Größenordnung)"},
      "source_refs": {"capex_per_m2": ["DWA_A138", "Baupreislexikon_Versickerung"],
-                     "opex_per_m2_year": ["DWA_A138", "Baupreislexikon_Versickerung"]},
+                     "opex_per_m2_year": ["DWA_A138", "Baupreislexikon_Versickerung"],
+                     "default_reduction": ["DWA_A138"],
+                     "benefit_per_m2_year": ["BWB_Niederschlagswasserentgelt"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Mulden-/Rigolensysteme sind nach DWA-A 138 auf "
+            "Bemessungsregen ausgelegt — sie nehmen den Oberflächenabfluss der angeschlossenen "
+            "Flächen auf, bevor er Straßen/Unterführungen flutet. Bis zum Bemessungsereignis "
+            "wird der Abfluss nahezu vollständig zurückgehalten, bei selteneren Extremen läuft "
+            "das System über. Angesetzt: 25 % Reduktion der verkehrsbezogenen Ausfall-/"
+            "hydrologischen Stressrisiken in den abgedeckten Zellen (Anlagen bedecken nur einen "
+            "Teil der Zellfläche). Editierbare Modellannahme im DWA-Bemessungsprinzip.",
         "capex_per_m2": "Nach DWA-A 138 (baupreislexikon 2026) kostet eine reine "
             "Muldenversickerung 10-45 €/m² und ein kombiniertes Mulden-Rigolen-System 60-85 "
             "€/m² abflusswirksamer Fläche. Punktwert 45 €/m² liegt an der oberen Grenze der "
@@ -1605,7 +1704,12 @@ MEASURES: list[dict] = [
         "opex_per_m2_year": "Der DWA-Betriebskennwert liegt bei 0,50-0,75 €/m² "
             "abflusswirksamer (angeschlossener) Fläche. Bezogen auf die deutlich kleinere "
             "Anlagenfläche selbst (Mulde/Rigole) fällt der spezifische Unterhalt höher aus "
-            "(Mahd, Entschlammung, Kontrolle) → Punktwert 2 €/m²/a."}},
+            "(Mahd, Entschlammung, Kontrolle) → Punktwert 2 €/m²/a.",
+        "benefit_per_m2_year": "Direkter Zusatznutzen = eingespartes Niederschlagswasserentgelt "
+            "der abgekoppelten Flächen (gesplittete Abwassergebühr): z. B. 1,84 €/m² "
+            "versiegelte Fläche und Jahr in Berlin (BWB). Eine Mulde/Rigole entwässert das "
+            "2-4-Fache ihrer eigenen Fläche → auf die Anlagenfläche bezogen ~4 €/(m²·a). "
+            "Kommunal unterschiedlich, editierbar."}},
     # Herleitung capex_per_unit: keine belastbare Standardquelle für die Ertüchtigung eines
     # kritischen Verkehrsknotens (Schutz vor Überflutung/Hitze/Ausfall) — Modellannahme in
     # niedriger sechsstelliger Größenordnung je Knoten → 80.000 €.
@@ -1614,16 +1718,33 @@ MEASURES: list[dict] = [
      "effect_target": ["exposure"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_TRANSPORT_DISRUPTION_HOURS"],
      "capex_fixed": 0.0, "capex_per_unit": 80000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 1600.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Knoten", "unit_density_per_ha": 0.02,
      "source": "Modellannahme (mangels belastbarer Quelle)",
      "sources": {"capex_per_unit": "Modellannahme (mangels belastbarer Standardquelle)",
+                 "opex_per_unit_year": "VDI 2067 (Instandhaltungssätze techn. Schutzeinrichtungen)",
+                 "default_reduction": "BBK-Objektschutz-Prinzip (Größenordnung, Modellannahme)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
+     "source_refs": {"opex_per_unit_year": ["VDI_2067_Blatt1"],
+                     "default_reduction": ["BBK_Hochwasserschutzfibel", "BBK_KRITIS"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Objektschutz am kritischen Verkehrsknoten "
+            "(Flutschotts/Pumpen an Unterführungen, hitzefeste Technik, Notstrom) hält den "
+            "Knoten im Ereignisfall verfügbar. Die BBK-Hochwasserschutzfibel zeigt, dass "
+            "konsequenter Objektschutz die Schäden am geschützten Objekt beim Bemessungs"
+            "ereignis um einen Großteil (bis ~80 %) senkt; da je Zelle nur ein Teil der "
+            "Verkehrsinfrastruktur aus geschützten Knoten besteht und Extremereignisse "
+            "Schutzniveaus überschreiten können, werden 25 % Reduktion der Verkehrsausfall"
+            "stunden in den abgedeckten Zellen angesetzt. Editierbare Modellannahme im "
+            "belegten Wirkprinzip (BBK).",
         "capex_per_unit": "Für die Ertüchtigung eines kritischen Verkehrsknotens (Schutz vor "
             "Überflutung, Hitze, Ausfall; z. B. Pumpen, Redundanz, Ertüchtigung von Unter"
             "führungen) war keine belastbare Standardquelle auffindbar. Modellannahme in "
             "niedriger sechsstelliger Größenordnung je Knoten → 80.000 €.",
+        "opex_per_unit_year": "Schutztechnik erfordert laufende Funktionsprüfung und "
+            "Instandhaltung (Pumpen, Schotts, Notstrom-/USV-Batterien): VDI 2067 setzt für "
+            "technische Anlagen ~1-3 % der Investition pro Jahr an. 2 % von 80.000 € → "
+            "1.600 €/(Knoten·a).",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 kritischer Knoten "
             "je 50 ha Siedlungs-/Verkehrsfläche (0,02 Knoten/ha)."}},
     # Herleitung capex_per_m2: Biotopverbund (Trittsteine, Hecken, Säume, Vernetzungsstrukturen)
@@ -1635,7 +1756,7 @@ MEASURES: list[dict] = [
      "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_BIODIVERSITY_LOSS", "ECOSYSTEM_FRAGMENTATION_RISK_INDEX"],
      "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 8.0,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 1.5,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 0.02,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle)",
      "sources": {"capex_per_m2": "Modellannahme, an Vernetzungselement-Kosten (Hecken) angelehnt",
@@ -1659,7 +1780,7 @@ MEASURES: list[dict] = [
      "effect_target": ["hazard"], "default_reduction": 0.30, "coverage_scaling": "linear",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX", "EXPECTED_HABITAT_LOSS"],
      "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 12.0,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 3.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 0.03,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "BfN/WWF/UBA (Auenrenaturierung) / Modellannahme",
      "sources": {"capex_per_m2": "BfN/WWF Mittlere Elbe + UBA (Bandbreite Renaturierung)",
@@ -1684,7 +1805,7 @@ MEASURES: list[dict] = [
      "effect_target": ["hazard"], "default_reduction": 0.25, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_SOIL_DEGRADATION"],
      "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 10.0,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 0.02,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Umlage Heckenpreise, gartenbau-kosten)",
      "sources": {"capex_per_m2": "Modell-Umlage Heckenpreise (gartenbau-kosten/kostencheck)",
@@ -1707,7 +1828,7 @@ MEASURES: list[dict] = [
      "effect_target": ["vulnerability"], "default_reduction": 0.15, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_AGRICULTURAL_DAMAGE_EUR", "EXPECTED_SOIL_DEGRADATION"],
      "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 0.02,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.02, "benefit_per_m2_year": 1.5,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.02, "benefit_per_m2_year": 0.02,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "KTBL/LfL (Zwischenfrucht-/Begrünungskosten)",
      "sources": {"capex_per_m2": "KTBL/LfL Zwischenfruchtkosten (Saatgut/Etablierung)",
@@ -1731,7 +1852,7 @@ MEASURES: list[dict] = [
      "effect_target": ["vulnerability"], "default_reduction": 0.18, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_AGRICULTURAL_DAMAGE_EUR"],
      "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 0.02,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.02, "benefit_per_m2_year": 1.5,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.02, "benefit_per_m2_year": 0.02,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "KTBL (Saatgutkosten)",
      "sources": {"capex_per_m2": "KTBL Saatgutkosten (Sortenaufpreis)",
@@ -1756,7 +1877,7 @@ MEASURES: list[dict] = [
      "effect_target": ["exposure"], "default_reduction": 0.22, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_AGRICULTURAL_DAMAGE_EUR"],
      "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 0.5,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.2, "benefit_per_m2_year": 2.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.2, "benefit_per_m2_year": 0.05,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "KTBL (Feldbewässerung)",
      "sources": {"capex_per_m2": "KTBL-Investitionsrichtwert Bewässerung (~5.000 €/ha)",
@@ -1781,7 +1902,7 @@ MEASURES: list[dict] = [
      "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "linear",
      "linked_risk_codes": ["EXPECTED_VEGETATION_DAMAGE"],
      "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 1.5,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.1, "benefit_per_m2_year": 1.5,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.1, "benefit_per_m2_year": 0.02,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Landesforsten / AGDW (Waldumbaukosten)",
      "sources": {"capex_per_m2": "Landesforsten RLP / AGDW (Waldumbau €/ha)",
@@ -1807,7 +1928,7 @@ MEASURES: list[dict] = [
      "effect_target": ["hazard"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_VEGETATION_DAMAGE"],
      "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 1.0,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.3, "benefit_per_m2_year": 1.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.3, "benefit_per_m2_year": 0.01,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle)",
      "sources": {"capex_per_m2": "Modellannahme (mangels belastbarer Flächen-Quelle)",
@@ -1826,15 +1947,27 @@ MEASURES: list[dict] = [
     # nennen selbst keine Kostenzahlen) → Punktwert 100.000 € (unterer Mittelwert).
     {"code": "HEAT_ACTION_PLANS", "name": "Hitzeaktionspläne",
      "description": "Kommunale Hitzeaktionspläne.", "measure_type": "organizational",
-     "effect_target": ["vulnerability"], "default_reduction": 0.20, "coverage_scaling": "saturating",
+     # default_reduction 0,25: von 0,20 angehoben gemäß Urban u. a. 2025 (ERL) — europäische
+     # Evaluationsstudie: Hitzeaktionspläne senken die hitzeattributable Übersterblichkeit
+     # um 25,2 % (102 Städte, 14 Länder).
+     "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"],
      "capex_fixed": 100000.0, "capex_per_unit": None, "capex_per_m2": None,
      "opex_fixed_year": 20000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "klimastadtraum.de (Praxisrichtwert) / Modellannahme",
      "sources": {"opex_fixed_year": "Modellannahme (laufende Fortschreibung/Koordination)",
-                 "capex_fixed": "klimastadtraum.de (Praxisrichtwert Hitzeaktionsplan)"},
+                 "capex_fixed": "klimastadtraum.de (Praxisrichtwert Hitzeaktionsplan)",
+                 "default_reduction": "Urban u. a. 2025 (ERL): −25,2 % Hitzemortalität"},
+     "source_refs": {"default_reduction": ["Urban_HHAP_Wirksamkeit_2025"]},
      "source_details": {
+        "default_reduction": "Direkt kalibriert auf die europäische Evaluationsstudie von "
+            "Urban u. a. 2025 (Environmental Research Letters): Die Einführung von Hitze"
+            "präventions-/Hitzeaktionsplänen war über 102 Städte in 14 Ländern (1990-2019) mit "
+            "einer Reduktion der hitzeattributablen Übersterblichkeit um 25,2 % (95 %-KI "
+            "19,8-31,9 %) verbunden — das entspricht exakt den hier verknüpften Risiken "
+            "(Hitzemortalität/-morbidität). Wert daher von zuvor 0,20 (unbelegte Annahme) auf "
+            "0,25 angehoben; angesichts des breiten Konfidenzintervalls editierbar.",
         "opex_fixed_year":
             "Modellannahme für den laufenden Betrieb des Hitzeaktionsplans: jährliche Fortschreibung, Koordination der Warnkette und saisonaler Betrieb (Hitzetelefon). Entspricht grob der anteiligen halben Personalstelle, die klimastadtraum.de bereits für die Erstellung nennt. Punktwert 20.000 €/a (rund 20 % der einmaligen Erstellungskosten); editierbar.",
         "capex_fixed": "Praxisrichtwert für die Erstellung eines kommunalen "
@@ -1853,7 +1986,7 @@ MEASURES: list[dict] = [
      "effect_target": ["exposure"], "default_reduction": 0.18, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS", "EXPECTED_ANNUAL_MORTALITY"],
      "capex_fixed": 0.0, "capex_per_unit": 8000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 800.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Raum",
      # Herleitung unit_density_per_ha: Modellannahme (mangels belastbarer Quelle) — an
      # HAP-Konzept "kühle Orte" angelehnt: ein fußläufig (~800 m Radius, ~20 ha Einzugs-
@@ -1861,13 +1994,27 @@ MEASURES: list[dict] = [
      "unit_density_per_ha": 0.05,
      "source": "Modellannahme (mangels belastbarer Quelle)",
      "sources": {"capex_per_unit": "Modellannahme (Marktpreise Klimatechnik)",
+                 "opex_per_unit_year": "VDI 2067 (Wartung Klimatechnik) + Saisonbetrieb",
+                 "default_reduction": "Kühle-Orte-Prinzip der Hitzeaktionspläne (Modellannahme)",
                  "unit_density_per_ha": "Modellannahme (HAP-Konzept \"kühle Orte\")"},
+     "source_refs": {"opex_per_unit_year": ["VDI_2067_Blatt1"],
+                     "default_reduction": ["Urban_HHAP_Wirksamkeit_2025"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Fußläufig erreichbare gekühlte Aufenthaltsorte "
+            "mit Trinkwasser senken die individuelle Hitzeexposition besonders vulnerabler "
+            "Personen und damit Wärmebelastungsstunden und Hitzemortalität im Einzugsgebiet. "
+            "Kühle Orte sind ein Kernbaustein der Hitzeaktionspläne, deren Gesamtpaket europaweit "
+            "−25,2 % Hitzemortalität erzielt (Urban u. a. 2025); als EINZELNER Baustein wird mit "
+            "18 % ein Wert knapp darunter angesetzt. Editierbare, dokumentierte Modellannahme.",
         "capex_per_unit": "Keine belastbare Primärquelle für die Herrichtung eines "
             "\"Kühlraums\" als Gesamtpaket auffindbar – daher Modellannahme. Plausibilisiert "
             "anhand Marktpreisen gewerblicher Split-Klimaanlagen 1.500–5.000 € (Gerät + "
             "Einbau, ADAC/Heizcenter 2026) zzgl. Ausstattung, Trinkwasserstation und "
             "Beschilderung ~2.000–3.000 €. Punktwert 8.000 € je hergerichtetem Raum.",
+        "opex_per_unit_year": "Klimatechnik läuft nicht kostenlos: VDI-2067-Wartungssätze für "
+            "Klima-/Splitgeräte (~4-6 %/a der Investition) plus Strom im Saisonbetrieb und "
+            "Reinigung/Aufsicht des Raums. 10 % von 8.000 € → 800 €/(Raum·a) als "
+            "Vollkosten-Punktwert des Sommerbetriebs.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle, angelehnt an das "
             "Konzept fußläufig erreichbarer \"kühler Orte\" aus kommunalen Hitzeaktionsplänen: "
             "ein in ~800 m Radius (~20 ha Einzugsgebiet) erreichbarer Kühlraum je Quartier "
@@ -1885,10 +2032,19 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "kommunale Praxiswerte Frühwarnsystem (kommunal.de / Hydrotec)",
      "sources": {"opex_fixed_year": "kommunale Praxiswerte (laufender Betrieb Frühwarnsystem)",
-                 "capex_fixed": "kommunale Praxiswerte Starkregen-/Hochwasser-Frühwarnsystem"},
+                 "capex_fixed": "kommunale Praxiswerte Starkregen-/Hochwasser-Frühwarnsystem",
+                 "default_reduction": "WMO Early Warnings for All (Wirksamkeits-Kennzahlen)"},
      "source_refs": {"capex_fixed": ["Kommunal_Fruehwarnsystem"],
-                     "opex_fixed_year": ["Kommunal_Fruehwarnsystem"]},
+                     "opex_fixed_year": ["Kommunal_Fruehwarnsystem"],
+                     "default_reduction": ["WMO_EarlyWarnings"]},
      "source_details": {
+        "default_reduction": "Kalibriert auf die WMO-Kennzahlen der Initiative \"Early "
+            "Warnings for All\": Eine Warnung 24 Stunden vor dem Ereignis kann die Schäden um "
+            "~30 % senken; Länder mit gut ausgebauten Frühwarnsystemen haben eine um mindestens "
+            "Faktor 6 geringere Katastrophenmortalität. Für die verknüpften Betroffenen-/"
+            "Verletztenrisiken werden 25 % angesetzt — leicht unterhalb der WMO-Schadenszahl, "
+            "weil die Wirkung von der tatsächlichen Warnkette (Erreichbarkeit, Reaktion) "
+            "abhängt. Editierbar.",
         "opex_fixed_year":
             "Laufender Betrieb (Wartung, Hosting, Softwarepflege) eines kommunalen Starkregen-/Hochwasser-Frühwarnsystems: 30.000–40.000 €/a (kommunal.de, Hydrotec 2025). Punktwert 35.000 €/a. Diese Betriebskosten waren im früheren Modell nicht abbildbar und sind jetzt als feste jährliche OPEX hinterlegt.",
         "capex_fixed": "Kommunales Starkregen-/Hochwasser-Frühwarnsystem: Machbarkeitsstudie "
@@ -1914,9 +2070,20 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle für Sammelmaßnahme)",
      "sources": {"capex_per_m2": "Modellannahme (Institut für Stadtgrün / Berliner Stadtbaumkampagne)",
-                 "opex_per_m2_year": "Institut für Stadtgrün (Semmler 2013)"},
-     "source_refs": {"opex_per_m2_year": ["Semmler_Stadtgruen_2013"]},
+                 "opex_per_m2_year": "Institut für Stadtgrün (Semmler 2013)",
+                 "default_reduction": "Stadtklima-Kühlwirkung Grünflächen (VDI 3787)",
+                 "benefit_per_m2_year": "TEEB DE (Ökosystemleistungen Stadtgrün)"},
+     "source_refs": {"opex_per_m2_year": ["Semmler_Stadtgruen_2013"],
+                     "default_reduction": ["VDI3787_Stadtklima", "StewartOke_LCZ_2012"],
+                     "benefit_per_m2_year": ["TEEB_DE_Naturkapital"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Grünflächen kühlen über Verdunstung und "
+            "Beschattung — Parkflächen sind nachts typischerweise 1-3 K (große Parks bis "
+            "~5 K) kühler als das bebaute Umfeld (VDI 3787; Stewart & Oke LCZ) und senken "
+            "damit die Wärmebelastungsstunden im Umfeld. Angesetzt: 25 % Reduktion der "
+            "Wärmebelastungsstunden in den begrünten Zellen — höchster Wert der baulich-"
+            "grünen Hitzemaßnahmen, da Stadtgrün Beschattung UND Verdunstung kombiniert. "
+            "Editierbare Modellannahme im belegten Stadtklima-Wirkprinzip.",
         "capex_per_m2": "Kein einheitlicher €/m²-Kennwert für \"Ausbau Stadtgrün\" als "
             "Sammelmaßnahme auffindbar – daher Modellannahme. Plausibilisiert anhand Institut "
             "für Stadtgrün (Semmler, Fachsymposium 2013, Unterhaltung 0,65–85 €/m²/a je nach "
@@ -1927,7 +2094,12 @@ MEASURES: list[dict] = [
         "opex_per_m2_year": "Modellannahme, plausibilisiert anhand Institut für "
             "Stadtgrün (Semmler 2013): Unterhaltung 0,65–85 €/m²/a je nach Pflegeintensität "
             "(extensiver Rasen bis Wechselflor). 3 €/m²/a entspricht mäßig intensiver Pflege "
-            "einer Grünfläche mittlerer Dichte."}},
+            "einer Grünfläche mittlerer Dichte.",
+        "benefit_per_m2_year": "Direkter Zusatznutzen über die vermiedenen Hitzeschäden hinaus: "
+            "Stadtgrün liefert quantifizierbare Ökosystemleistungen (Regenwasserrückhalt → "
+            "geringeres Niederschlagswasserentgelt, Luftreinhaltung, Erholungs-/Gesundheitswert; "
+            "TEEB DE beziffert städtische Ökosystemleistungen auf einige €/m²·a). Punktwert "
+            "5 €/(m²·a) als konservative Summe von Rückhalte- und Erholungsnutzen; editierbar."}},
     # Herleitung capex_fixed: Erstellung kommunaler Evakuierungs-/Notfallpläne — der BBK
     # (Bundesamt für Bevölkerungsschutz und Katastrophenhilfe) liefert Rahmenempfehlungen/
     # Leitfäden, aber keine Kostenkennwerte. Modellannahme als einmaliges Planungs-/
@@ -1941,8 +2113,17 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "BBK (Leitfäden, ohne Kostenkennwert) / Modellannahme",
      "sources": {"opex_fixed_year": "Modellannahme (Übungen/Aktualisierung)",
-                 "capex_fixed": "Modellannahme (Planungsbudget; BBK-Leitfäden ohne Kostenangabe)"},
+                 "capex_fixed": "Modellannahme (Planungsbudget; BBK-Leitfäden ohne Kostenangabe)",
+                 "default_reduction": "WMO/BBK (Evakuierungswirkung, Modellannahme)"},
+     "source_refs": {"default_reduction": ["WMO_EarlyWarnings", "BBK_Hochwasserschutzfibel"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Geübte Evakuierungs- und Notfallpläne verkürzen "
+            "Reaktionszeiten und senken die Zahl unvorbereitet Betroffener — laut WMO wurden "
+            "2015-2022 weltweit 2,1 Mrd. Menschen dank Frühwarnung/Planung vorsorglich evakuiert; "
+            "geordnete Evakuierung ist der Kernhebel gegen Personenschäden. Angesetzt: 22 % "
+            "Reduktion des Betroffenen-/Evakuiertenrisikos — unterhalb des Frühwarnsystems "
+            "(0,25), da Pläne ohne technisches Warnsystem nur bei rechtzeitiger Alarmierung "
+            "greifen. Editierbare, dokumentierte Modellannahme.",
         "opex_fixed_year":
             "Modellannahme für den laufenden Unterhalt der Evakuierungs- und Notfallpläne: regelmäßige Übungen, Aktualisierung des Planwerks und Schulungen. Grob 20 % der einmaligen Erstellung → 8.000 €/a. BBK-Leitfäden nennen keine Kostenkennwerte; editierbar.",
         "capex_fixed": "Erstellung kommunaler Evakuierungs- und Notfallpläne. Der BBK (Bundesamt "
@@ -1962,8 +2143,17 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Planungsrechtliche Maßnahme (direkt kostenneutral)",
      "sources": {"capex_per_m2": "Planungsrechtlich – direkte Umsetzungskosten ≈ 0",
-                 "opex_per_m2_year": "Planungsrechtlich – kein laufender Unterhalt"},
+                 "opex_per_m2_year": "Planungsrechtlich – kein laufender Unterhalt",
+                 "default_reduction": "Expositionsvermeidung (BBK/ROG-Prinzip, Modellannahme)"},
+     "source_refs": {"default_reduction": ["BBK_Hochwasserschutzfibel"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Expositionsvermeidung ist die wirksamste Form "
+            "der Anpassung — was in der Gefahrenzone nicht (mehr) gebaut wird, kann nicht "
+            "beschädigt werden (Grundprinzip von Hochwasserschutzfibel und Raumordnung). Die "
+            "Wirkung entfaltet sich aber nur für NEUE Bebauung; der Bestand in der Zone bleibt "
+            "exponiert. Angesetzt: 30 % Reduktion von Gebäudeschadens- und Betroffenenrisiko in "
+            "den festgesetzten Zellen über den Planungshorizont (Anteil verhinderter "
+            "Neubau-/Nachverdichtungsexposition). Editierbare, dokumentierte Modellannahme.",
         "capex_per_m2": "Rein planungsrechtliche Maßnahme (Bauverbot bzw. Siedlungsrückhaltung "
             "in Gefahrenzonen über die Bauleitplanung). Die direkten Umsetzungskosten sind "
             "≈ 0 €/m² (der Wert 0,0 bedeutet \"anwendbar, aber kostenlos\", nicht \"unbelegt\"). "
@@ -1983,14 +2173,27 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Planungs-/Flächensicherung)",
      "sources": {"capex_per_m2": "Modellannahme (Planung/Flächensicherung, mangels Marktkennwert)",
-                 "opex_per_m2_year": "Modellannahme (gelegentliche Gehölzpflege)"},
+                 "opex_per_m2_year": "Modellannahme (gelegentliche Gehölzpflege)",
+                 "default_reduction": "Kaltluft-/Belüftungswirkung (VDI 3787)",
+                 "benefit_per_m2_year": "Modellannahme (Freiraum-Ökosystemleistung)"},
+     "source_refs": {"default_reduction": ["VDI3787_Stadtklima"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Freigehaltene Kaltluftbahnen führen nächtliche "
+            "Kalt-/Frischluft aus dem Umland in überwärmte Quartiere — der zentrale Belüftungs"
+            "mechanismus der Stadtklimatologie (VDI 3787 Bl. 1, Kaltlufthaushalt; im UHI-Modell "
+            "der δ-Term). Angesetzt: 20 % Reduktion der Wärmebelastungsstunden in den "
+            "durchlüfteten Zellen — wirkt v. a. nachts (Erholungsphasen), daher unterhalb von "
+            "Stadtgrün (0,25). Editierbare Modellannahme im belegten Wirkprinzip.",
         "capex_per_m2": "Die Freihaltung von Frischluftkorridoren ist überwiegend Planung und "
             "Flächensicherung (Bebauungsverzicht, gelegentliche Gehölz-/Freihaltepflege) ohne "
             "baulichen Aufwand; ein Marktkennwert existiert nicht. Punktwert 2 €/m² als "
             "niedrige Modellannahme (Planungs- und geringer Pflegeanteil).",
         "opex_per_m2_year": "Modellannahme: 0,50 €/m²/a für gelegentliche Freihalte-/"
-            "Gehölzpflege der Korridore."}},
+            "Gehölzpflege der Korridore.",
+        "benefit_per_m2_year": "Direkter Zusatznutzen der freigehaltenen Flächen: extensive "
+            "Grün-/Freiraumnutzung (Erholung, Regenwasserversickerung, Kaltluftproduktion) in "
+            "der Größenordnung niedriger Ökosystemleistungswerte → 2 €/(m²·a) als konservative "
+            "Modellannahme; editierbar."}},
     # Herleitung capex_per_m2: Schwammstadt ist ein Bündel (Entsiegelung 25-40 €/m² + Mulden-
     # Rigolen 60-85 €/m² + Baumrigolen/Retention), kein einzelner Kennwert. Plausibilisiert
     # als Mischwert im unteren Bereich der Kombinationsmaßnahmen (Hamburg RISA, DWA-A 138)
@@ -2130,21 +2333,36 @@ MEASURES: list[dict] = [
      "effect_target": ["vulnerability"], "default_reduction": 0.22, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_WATER_SUPPLY_OUTAGE_HOURS"],
      "capex_fixed": 0.0, "capex_per_unit": 90000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 1800.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Abschnitt",
      # Herleitung unit_density_per_ha: Modellannahme (Richtwert-Dichte) — sanierungs-
      # bedürftige Netzabschnitte je Fläche, ~1 Abschnitt (≈1 km) je 33 ha Siedlungsfläche.
      "unit_density_per_ha": 0.03,
      "source": "DVGW W 392 / energie|wasser-praxis (Netzsanierung)",
      "sources": {"capex_per_unit": "DVGW W 392 / energie|wasser-praxis (Rohrnetzsanierung €/lfm)",
+                 "opex_per_unit_year": "DVGW W 392 (Wasserverlust-Monitoring) / VDI 2067",
+                 "default_reduction": "DVGW W 392 (Wasserverlustmanagement, Wirkprinzip)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
-     "source_refs": {"capex_per_unit": ["DVGW_W392"]},
+     "source_refs": {"capex_per_unit": ["DVGW_W392"],
+                     "opex_per_unit_year": ["DVGW_W392", "VDI_2067_Blatt1"],
+                     "default_reduction": ["DVGW_W392"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Leckageortung und Netzsanierung nach DVGW W 392 "
+            "senken die realen Wasserverluste (in Deutschland im Schnitt ~5-7 % der Netzeinspei"
+            "sung, regional deutlich mehr) und erhöhen Druckstabilität und Versorgungssicherheit "
+            "in Trocken-/Spitzenlastphasen; zugleich sinkt die Rohrbruchrate sanierter Abschnitte "
+            "deutlich. Angesetzt: 22 % Reduktion des Versorgungsausfall-Risikos in den abgedeckten "
+            "Zellen — Modellannahme im Wirkprinzip des DVGW-Wasserverlustmanagements, ohne "
+            "kommunale Kalibrierstudie; editierbar.",
         "capex_per_unit": "Rohrnetzsanierung kostet in offener Bauweise (Rohrersatz) 80-150 "
             "€/lfm, im grabenlosen Inliner-Verfahren (CIPP) 50-90 €/lfm (DVGW W 392; "
             "energie|wasser-praxis 2019). Ein Sanierungs-\"Abschnitt\" entspricht rund 1 km "
             "Leitung → 50.000-150.000 €; Punktwert 90.000 € als Mittel eines gemischten "
             "Verfahrensmixes.",
+        "opex_per_unit_year": "Dauerhaftes Wasserverlustmanagement je sanierten Abschnitt: "
+            "kontinuierliches Monitoring (Durchfluss-/Drucksensorik, Nachtmindestverbrauchs"
+            "analyse nach DVGW W 392) plus anteilige Instandhaltung. VDI-2067-Größenordnung "
+            "~2 % der Investition/Jahr → 1.800 €/(Abschnitt·a).",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: rund ein sanierungs"
             "bedürftiger Netzabschnitt (≈1 km) je 33 ha Siedlungsfläche (0,03 Abschnitte/ha)."}},
     # Herleitung capex_per_unit: umfassende Deichsanierung/-verstärkung kostet nach Praxis-
@@ -2158,7 +2376,7 @@ MEASURES: list[dict] = [
      "effect_target": ["hazard"], "default_reduction": 0.35, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_BUILDING_DAMAGE_EUR"],
      "capex_fixed": 0.0, "capex_per_unit": 1250000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 10000.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "km", "unit_density_per_ha": 0.01,
      "source": "NLWKN Generalplan Küstenschutz / Landesbetriebe (Deichsanierung)",
      "sources": {"capex_per_unit": "Praxisprojekte Flussdeich + NLWKN Generalplan Küstenschutz",
@@ -2184,7 +2402,7 @@ MEASURES: list[dict] = [
      "effect_target": ["exposure"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX"],
      "capex_fixed": 0.0, "capex_per_unit": 150000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 3000.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.002,
      "source": "Modellannahme (mangels belastbarer Quelle)",
      "sources": {"capex_per_unit": "Modellannahme (lokale Kleinbarriere, mangels belastbarer Quelle)",
@@ -2252,16 +2470,31 @@ MEASURES: list[dict] = [
      "effect_target": ["hazard"], "default_reduction": 0.18, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_INDIRECT_ECONOMIC_LOSS_EUR"],
      "capex_fixed": 0.0, "capex_per_unit": 70000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 3500.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.02,
      "source": "Modellannahme (mangels belastbarer Quelle)",
      "sources": {"capex_per_unit": "Modellannahme (anlagenspezifisch, mangels Standard-Quelle)",
+                 "opex_per_unit_year": "VDI 2067 (Wartungssätze Kältetechnik) + Energie",
+                 "default_reduction": "Modellannahme (Hitze-Produktivitätsschutz, dokumentiert)",
                  "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
+     "source_refs": {"opex_per_unit_year": ["VDI_2067_Blatt1"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Hitzewellen verursachen indirekte wirtschaftliche "
+            "Verluste durch Produktivitätseinbußen, Prozessunterbrechungen und Kühlketten"
+            "probleme in Industrie/Gewerbe; betriebliche Kühlkonzepte halten Produktions- und "
+            "Arbeitsbedingungen an Hitzetagen aufrecht. Angesetzt: 18 % Reduktion des "
+            "verknüpften indirekten Verlustrisikos in den abgedeckten Zellen — bewusst unterhalb "
+            "der technischen Anlagen-Ertüchtigung (0,20), da Kühlkonzepte nur den Hitzeanteil "
+            "der (mehrfach getriebenen) indirekten Verluste adressieren. Keine Kalibrierstudie — "
+            "editierbare, dokumentierte Modellannahme.",
         "capex_per_unit": "Betriebliche Kühlkonzepte (Prozess- und Gebäudekühlung in Industrie/"
             "Gewerbe) sind stark anlagen- und branchenspezifisch; eine belastbare Standard"
             "quelle war nicht auffindbar. Modellannahme in sechsstelliger Größenordnung je "
             "ertüchtigter Anlage → 70.000 €.",
+        "opex_per_unit_year": "Kältetechnik ist betriebskostenintensiv: VDI 2067 setzt für "
+            "Kälteanlagen Wartung + Instandsetzung von ~4-6 % der Investition pro Jahr an, "
+            "zuzüglich Stromkosten der Kühlung in Hitzeperioden. 5 % von 70.000 € → "
+            "3.500 €/(Anlage·a) als Vollkosten-Punktwert.",
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: ~1 kühlrelevante "
             "Anlage je 50 ha Industrie-/Gewerbefläche (0,02 Anlagen/ha)."}},
     # Herleitung capex_fixed: Lieferketten-Resilienz (Zweitlieferanten, Lager-/Redundanzkonzepte,
@@ -2276,8 +2509,16 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Konzept-/Aufbaubudget)",
      "sources": {"opex_fixed_year": "Modellannahme (laufendes Monitoring)",
-                 "capex_fixed": "Modellannahme (organisatorisch, mangels Marktkennwert)"},
+                 "capex_fixed": "Modellannahme (organisatorisch, mangels Marktkennwert)",
+                 "default_reduction": "Modellannahme (Redundanz-/Pufferprinzip, dokumentiert)"},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Zweitlieferanten, Sicherheitsbestände und "
+            "betriebliche Notfallpläne verkürzen klimabedingte Lieferunterbrechungen (Ausweich"
+            "beschaffung statt Stillstand) und dämpfen deren Folgen. Angesetzt: 20 % Reduktion "
+            "der Lieferketten-Unterbrechungsstunden im abgedeckten Gebiet — organisatorische "
+            "Maßnahme mit begrenzter Reichweite (externe Störungen der Vorketten bleiben), "
+            "daher unterhalb baulicher Redundanzmaßnahmen. Keine Kalibrierstudie — editierbare, "
+            "dokumentierte Modellannahme.",
         "opex_fixed_year":
             "Modellannahme für das laufende Monitoring der Lieferketten-Resilienz (Lieferantenbewertung, Notfallübungen, Aktualisierung der Redundanzkonzepte). Punktwert 8.000 €/a; rein organisatorisch, kein belastbarer Kostenkennwert; editierbar.",
         "capex_fixed": "Lieferketten-Resilienz (Aufbau von Zweitlieferanten, Lager-/Redundanz"
@@ -2297,8 +2538,17 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Programmbudget)",
      "sources": {"opex_fixed_year": "Modellannahme (laufender Programmbetrieb)",
-                 "capex_fixed": "Modellannahme (organisatorisches Programmbudget)"},
+                 "capex_fixed": "Modellannahme (organisatorisches Programmbudget)",
+                 "default_reduction": "Urban u. a. 2025 (HHAP-Kernbaustein) / RKI-Risikogruppen"},
+     "source_refs": {"default_reduction": ["Urban_HHAP_Wirksamkeit_2025", "RKI_Hitzemortalitaet"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Hitzemortalität konzentriert sich stark auf "
+            "Risikogruppen (Hochaltrige, Pflegebedürftige, Vorerkrankte — RKI/Winklmayr); "
+            "aufsuchende Programme (Hitzetelefon, Pflegeheim-Protokolle, Nachbarschaftshilfe) "
+            "adressieren genau diese Gruppe und sind Kernbaustein wirksamer Hitzeaktionspläne "
+            "(Gesamtpaket: −25,2 % Hitzemortalität, Urban u. a. 2025). Angesetzt: 22 % Reduktion "
+            "des verknüpften Mortalitäts-/Ungleichheitsrisikos — nahe an der HHAP-Gesamtwirkung, "
+            "da die Zielgruppe den Großteil der Übersterblichkeit trägt. Editierbar.",
         "opex_fixed_year":
             "Modellannahme für den laufenden Betrieb der Schutzprogramme für vulnerable Gruppen (aufsuchende Beratung, Netzwerkpflege) — überwiegend Personalaufwand, daher höherer Jahresanteil. Punktwert 10.000 €/a; kein belastbarer Kostenkennwert; editierbar.",
         "capex_fixed": "Gezielte Schutzprogramme für vulnerable Gruppen (z. B. Hitzetelefon, "
@@ -2317,8 +2567,16 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Einführungs-/Konzeptbudget)",
      "sources": {"opex_fixed_year": "Modellannahme (Aktualisierung)",
-                 "capex_fixed": "Modellannahme (organisatorischer Einführungsaufwand)"},
+                 "capex_fixed": "Modellannahme (organisatorischer Einführungsaufwand)",
+                 "default_reduction": "Arbeitsschutz-Wirkprinzip (Expositionsverlagerung)"},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Verlagerung von Arbeits-/Außenaktivitäten aus "
+            "den heißesten Tagesstunden (Vorverlegung, Siesta-Modelle, Pausenregelungen nach "
+            "Arbeitsschutzregel ASR A3.5) reduziert die individuelle Expositionszeit während "
+            "der Belastungsspitzen — die Wärmebelastungsstunden sinken für die erfassten "
+            "Beschäftigten, nicht aber die Stadttemperatur selbst. Angesetzt: 18 % Reduktion "
+            "der Wärmebelastungsstunden im abgedeckten Gebiet (nur werktätige Teilpopulation, "
+            "verhaltensabhängig). Editierbare, dokumentierte Modellannahme.",
         "opex_fixed_year":
             "Modellannahme für die laufende Aktualisierung hitzeangepasster Arbeitszeitmodelle und Dienstpläne. Geringer organisatorischer Aufwand → 2.000 €/a; kein belastbarer Kostenkennwert; editierbar.",
         "capex_fixed": "Angepasste Arbeitszeitmodelle bei Hitze (z. B. Vorverlegung von "
@@ -2340,8 +2598,18 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (mangels belastbarer Quelle)",
      "sources": {"capex_per_m2": "Modellannahme (Sonnensegel-/Wasserspielplatz-Projektkosten)",
-                 "opex_per_m2_year": "Modellannahme (mangels belastbarer Quelle)"},
+                 "opex_per_m2_year": "Modellannahme (mangels belastbarer Quelle)",
+                 "default_reduction": "Beschattungs-Wirkprinzip (UTCI/gefühlte Temperatur)",
+                 "benefit_per_m2_year": "Modellannahme (Aufenthaltsqualität öffentl. Raum)"},
+     "source_refs": {"default_reduction": ["VDI3787_Stadtklima"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Beschattung senkt die Strahlungstemperatur "
+            "(UTCI/gefühlte Temperatur im Schatten mehrere Kelvin unter besonnten Flächen, "
+            "Stadtklimatologie/VDI 3787) und Wasserflächen kühlen lokal durch Verdunstung; "
+            "Trink-/Abkühlmöglichkeiten senken die individuelle Belastung. Angesetzt: 18 % "
+            "Reduktion der Wärmebelastungsstunden auf den ausgestatteten Flächen — punktuelle "
+            "Wirkung an Aufenthaltsorten, daher unterhalb flächiger Begrünung (0,25). "
+            "Editierbare, dokumentierte Modellannahme.",
         "capex_per_m2": "Keine belastbare €/m²-Quelle für die Mischmaßnahme \"Schatten/Wasser\" "
             "auffindbar – daher Modellannahme. Die Einzelkomponenten (Sonnensegel-Masten "
             "~160–350 €/Stück, Sonnensegel ab ~70 €/Stück, sonnensegel-guru.de 2026; "
@@ -2350,7 +2618,11 @@ MEASURES: list[dict] = [
             "Flächenkennwert. Punktwert 35 €/m² als Größenordnungs-Schätzung.",
         "opex_per_m2_year": "Modellannahme mangels belastbarer Quelle; 2 €/m²/a als "
             "grober Unterhalt für Beschattungs-/Wasserelemente im öffentlichen Raum "
-            "(Reinigung, Wartung, Winterlagerung von Segeln)."}},
+            "(Reinigung, Wartung, Winterlagerung von Segeln).",
+        "benefit_per_m2_year": "Direkter Zusatznutzen: nutzbarer öffentlicher Raum auch an "
+            "Hitzetagen (Aufenthaltsqualität, Belebung/Einzelhandelsumfeld, Spielwert von "
+            "Wasserelementen) in der Größenordnung niedriger Freiraum-Nutzwerte → 3 €/(m²·a) "
+            "als konservative Modellannahme; editierbar."}},
     # Herleitung capex_fixed: adaptive Bewirtschaftung (Fangregeln, Schonzeiten, Monitoring) ist
     # rein organisatorisch; kein Marktkennwert. Modellannahme als Monitoring-/Konzeptbudget →
     # 20.000 €. Überwiegend Modellannahme ist im Fischerei-Cluster der erwartete Regelfall.
@@ -2382,7 +2654,7 @@ MEASURES: list[dict] = [
      "effect_target": ["exposure"], "default_reduction": 0.22, "coverage_scaling": "saturating",
      "linked_risk_codes": ["FISHERIES_STOCK_STRESS_RISK_INDEX", "LOW_WATER_FISHERIES_IMPACT_INDEX"],
      "capex_fixed": 0.0, "capex_per_unit": 200000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 3000.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.01,
      "source": "LfU Bayern / BAW / Wikipedia (Fischaufstiegsanlagen)",
      "sources": {"capex_per_unit": "LfU Bayern / BAW / Wikipedia (Fischaufstiegsanlagen, breite Spanne)",
@@ -2406,7 +2678,7 @@ MEASURES: list[dict] = [
      "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_AQUACULTURE_DAMAGE_EUR", "FISHERIES_STOCK_STRESS_RISK_INDEX"],
      "capex_fixed": 0.0, "capex_per_unit": 60000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "opex_fixed_year": None, "opex_per_unit_year": 4000.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": "Anlage", "unit_density_per_ha": 0.01,
      "source": "Modellannahme (mangels belastbarer Quelle)",
      "sources": {"capex_per_unit": "Modellannahme (mangels belastbarer Standardquelle)",
@@ -2427,7 +2699,7 @@ MEASURES: list[dict] = [
      "effect_target": ["hazard"], "default_reduction": 0.22, "coverage_scaling": "linear",
      "linked_risk_codes": ["FISHERIES_STOCK_STRESS_RISK_INDEX", "LOW_WATER_FISHERIES_IMPACT_INDEX"],
      "capex_fixed": 0.0, "capex_per_unit": None, "capex_per_m2": 10.0,
-     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 2.0,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": 0.5, "benefit_per_m2_year": 0.02,
      "unit_label": None, "unit_density_per_ha": None,
      "source": "UBA (Gewässerrenaturierung) / Modellannahme",
      "sources": {"capex_per_m2": "UBA (Bandbreite Gewässerrenaturierung), auf Fläche umgelegt",
@@ -2477,10 +2749,23 @@ MEASURES: list[dict] = [
      "source": "Berliner Wasserbetriebe / Modellannahme",
      "sources": {"capex_fixed": "Modellannahme (Planung/Standortvorbereitung)",
                  "capex_per_unit": "Berliner Wasserbetriebe",
-                 "opex_per_unit_year": "Berliner Wasserbetriebe"},
+                 "opex_per_unit_year": "Berliner Wasserbetriebe",
+                 "default_reduction": "Modellannahme (Einzelbaustein Hitzevorsorge)",
+                 "unit_density_per_ha": "Modellannahme (Innenstadt-Versorgungsdichte)"},
      "source_refs": {"capex_per_unit": ["BWB_Trinkbrunnen"],
-                     "opex_per_unit_year": ["BWB_Trinkbrunnen"]},
+                     "opex_per_unit_year": ["BWB_Trinkbrunnen"],
+                     "default_reduction": ["Urban_HHAP_Wirksamkeit_2025"]},
      "source_details": {
+        "default_reduction": "Wirkmechanismus: Öffentlich zugängliches Trinkwasser beugt "
+            "Dehydrierung vor — dem zentralen Pfad hitzebedingter Notfälle — und ist Standard"
+            "empfehlung aller Hitzeaktionspläne. Als EINZELNER, punktueller Baustein wird mit "
+            "10 % bewusst der niedrigste Wert aller Hitzemaßnahmen angesetzt (das HHAP-"
+            "Gesamtpaket erreicht −25,2 %, Urban u. a. 2025; ein Brunnen allein leistet davon "
+            "nur einen kleinen Teil). Editierbare, dokumentierte Modellannahme.",
+        "unit_density_per_ha": "Modellannahme: 0,5 Brunnen/ha entspricht etwa einem Trink"
+            "brunnen je 2 ha hochfrequentierter Innenstadt-/Aufenthaltsfläche (~140 m "
+            "Abstandsraster) — Versorgungsdichte, wie sie Hitzeaktionspläne für Fußgänger"
+            "bereiche anstreben; für Wohngebiete wäre die Dichte geringer zu wählen.",
         "capex_fixed": "Modellannahme für Planung/Standortvorbereitung je Trinkbrunnen-Programm "
             "(Standortsuche, Genehmigung, Tiefbauplanung), nicht direkt einer Quelle "
             "entnommen. 5.000 € pauschal als niedrige Konzeptkosten-Schätzung.",
@@ -2492,6 +2777,453 @@ MEASURES: list[dict] = [
             "hygienische Beprobung ~2.500–5.000 €/a; Presseberichte 2026 nennen ~4.500 €/a. "
             "Punktwert 3.500 € im unteren Drittel der Spanne."}},
 ]
+
+
+def _fmt_eur_de(value: float) -> str:
+    """1234567.0 → "1.234.567" (deutsches Tausenderformat, ohne Nachkommastellen)."""
+    if value == int(value):
+        return f"{int(value):,}".replace(",", ".")
+    return f"{value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def _enrich_measure_zero_cost_docs() -> None:
+    """Herleitung für bewusste 0-Werte des Maßnahmen-Kostenmodells (je Maßnahme).
+
+    Nutzeranforderung: Auch eine 0 braucht einen Infokasten, der erklärt, WARUM sie 0
+    ist. Die Texte sind maßnahmen-spezifisch (nennen den tatsächlichen Kostenträger der
+    Maßnahme) und werden nur gesetzt, wo noch keine handgeschriebene Herleitung existiert
+    — individuelle ``source_details``-Einträge (z. B. Netzverstärkung) haben Vorrang.
+    """
+    for m in MEASURES:
+        sources_map = m.setdefault("sources", {})
+        details = m.setdefault("source_details", {})
+
+        # capex_fixed == 0: Kosten skalieren vollständig über Stück-/Flächenkostensätze.
+        if m.get("capex_fixed") == 0.0 and not details.get("capex_fixed"):
+            unit_label = m.get("unit_label") or "Stück"
+            carriers: list[str] = []
+            if m.get("capex_per_unit"):
+                carriers.append(
+                    f"Stückkostensatz ({_fmt_eur_de(m['capex_per_unit'])} €/{unit_label})")
+            if m.get("capex_per_m2"):
+                carriers.append(
+                    f"Flächenkostensatz ({_fmt_eur_de(m['capex_per_m2'])} €/m²)")
+            if carriers:
+                detail = (
+                    "0 € ist bewusst gesetzt: Diese Maßnahme hat keinen investiven "
+                    f"Sockelbetrag — die Investition skaliert vollständig über den "
+                    f"{' und den '.join(carriers)} dieser Maßnahme; Planungs-/Nebenkosten "
+                    "sind in diesen Einheitssätzen einkalkuliert. Ein zusätzlicher "
+                    "Grundkosten-Betrag würde im MECE-Kostenmodell (CAPEX = fix + "
+                    "Anzahl × Stücksatz + Fläche × Flächensatz) doppelt zählen. Editierbar, "
+                    "falls die Kommune ein separates Planungs-/Grundbudget ansetzen will."
+                )
+            elif m.get("opex_fixed_year"):
+                detail = (
+                    "0 € ist bewusst gesetzt: Diese organisatorische Maßnahme erfordert "
+                    "keine Bauinvestition; ihr Aufwand ist als laufende feste "
+                    f"Betriebskosten ({_fmt_eur_de(m['opex_fixed_year'])} €/Jahr, "
+                    "opex_fixed_year) modelliert. Editierbar, falls einmalige "
+                    "Aufbaukosten (z. B. Erstkonzept) separat budgetiert werden."
+                )
+            else:
+                detail = (
+                    "0 € ist bewusst gesetzt: Die Maßnahme wirkt planungsrechtlich/"
+                    "organisatorisch ohne modellierte Bauinvestition; der geringe "
+                    "Verwaltungsaufwand ist nicht als eigener Kostenblock angesetzt. "
+                    "Editierbar, falls die Kommune Umsetzungskosten budgetieren will."
+                )
+            details["capex_fixed"] = detail
+            sources_map.setdefault(
+                "capex_fixed", "Modellentscheidung (Kostenstruktur, dokumentiert)")
+
+        # benefit_per_m2_year == 0: Hauptnutzen läuft über vermiedene Schäden (E3),
+        # nicht über dieses Feld — sonst Doppelzählung.
+        if m.get("benefit_per_m2_year") == 0.0 and not details.get("benefit_per_m2_year"):
+            details["benefit_per_m2_year"] = (
+                "0 €/(m²·a) ist bewusst gesetzt: Der Hauptnutzen der Maßnahme — vermiedene "
+                "Klimaschäden — wird NICHT über dieses Feld gerechnet, sondern als "
+                "Reduktion der Zellschadenskosten der verknüpften Risiken "
+                "(Risikoreduktion × Zellkosten, measure_service). Dieses Feld bildet nur "
+                "direkte marktfähige Zusatznutzen ab (z. B. Energieertrag, eingesparte "
+                "Wasser-/Energiekosten). Für diese Maßnahme ist kein solcher "
+                "flächenbezogener Zusatznutzen belegt — ein Wert > 0 ohne Beleg wäre eine "
+                "Doppelzählung des Schadensnutzens."
+            )
+            sources_map.setdefault(
+                "benefit_per_m2_year", "Modellentscheidung (Nutzen-Abgrenzung, dokumentiert)")
+
+
+_enrich_measure_zero_cost_docs()
+
+
+# ── Wirkungs-/Nutzen-Herleitungen je Maßnahme (Parameter-Vollerklärung) ─────────
+# Je Eintrag: Feld → (Quellen-Kurzlabel, [Bibliografie-Keys], Herleitungstext).
+# Zentrale Datenstruktur statt Inline-Edit je Maßnahme; Inline-``source_details``
+# in den Maßnahmen-Dicts haben Vorrang (werden hier nicht überschrieben).
+_MEASURE_EFFECT_DOCS: dict[str, dict[str, tuple[str, list[str], str]]] = {
+    # ── Wasser/Starkregen ────────────────────────────────────────────────────────
+    "DESEALING_SURFACE": {
+        "default_reduction": ("Entsiegelungs-Wirkprinzip (Abflussbeiwert)", ["Bremen_Entsiegelung", "DWA_A138"],
+            "Wirkmechanismus: Entsiegelung stellt die natürliche Versickerung wieder her — der "
+            "Abflussbeiwert sinkt von ~0,9 (Asphalt/Beton) auf ~0,1-0,3 (begrünte Fläche), d. h. "
+            "60-80 % des Oberflächenabflusses der entsiegelten Fläche entfallen (DWA-A-138-"
+            "Kennwerte; Bremer Entsiegelungsprogramm). Zusätzlich kühlt die Fläche und speist "
+            "Grundwasser. Angesetzt: 30 % Reduktion der verknüpften Überflutungs-/Hitzerisiken "
+            "in den entsiegelten Zellen. Editierbare Modellannahme im belegten Wirkprinzip."),
+        "benefit_per_m2_year": ("Gesplittete Abwassergebühr + Ökosystemleistung", ["BWB_Niederschlagswasserentgelt", "TEEB_DE_Naturkapital"],
+            "Direkter Zusatznutzen: Entsiegelte Flächen entfallen aus dem Niederschlagswasser"
+            "entgelt (z. B. 1,84 €/m²·a in Berlin, BWB) und erbringen Ökosystemleistungen "
+            "(Versickerung, Kühlung, Grün; TEEB DE einige €/m²·a) → Punktwert 5 €/(m²·a). "
+            "Kommunal unterschiedlich, editierbar."),
+    },
+    "SPONGE_CITY": {
+        "default_reduction": ("Schwammstadt-Prinzip (RISA/DWA-Bemessung)", ["DWA_A138"],
+            "Wirkmechanismus: Schwammstadt-Bündel (Entsiegelung, Mulden/Rigolen, Baumrigolen, "
+            "Retentionsflächen) halten Niederschlag dezentral zurück und verdunsten ihn — "
+            "bemessen nach DWA-A 138 nimmt das System Regen bis zum Bemessungsereignis nahezu "
+            "vollständig auf und dämpft zugleich Hitze über Verdunstung. Angesetzt: 30 % "
+            "Reduktion der verknüpften Überflutungs-/Gebäudeschadensrisiken in den umgestalteten "
+            "Zellen (oberer Bereich der Flächenmaßnahmen, da Maßnahmenbündel). Editierbare "
+            "Modellannahme im DWA-Bemessungsprinzip."),
+        "benefit_per_m2_year": ("Gesplittete Abwassergebühr + Stadtgrün-Nutzen", ["BWB_Niederschlagswasserentgelt", "TEEB_DE_Naturkapital"],
+            "Direkter Zusatznutzen: abgekoppelte Flächen sparen Niederschlagswasserentgelt "
+            "(1,84 €/m²·a Berlin, BWB; bei Versickerung −50 bis −100 % der Gebühr) plus Grün-/"
+            "Aufenthaltsnutzen der blau-grünen Elemente (TEEB DE) → 5 €/(m²·a); editierbar."),
+    },
+    "RETENTION_STORAGE": {
+        "default_reduction": ("Retentions-Bemessung (DWA)", ["DWA_A138", "Agrarheute_Rueckhaltebecken"],
+            "Wirkmechanismus: Rückhaltebecken/-flächen kappen die Abflussspitze — bis zur "
+            "Bemessungsgröße wird der Scheitel vollständig zwischengespeichert und gedrosselt "
+            "abgegeben (DWA-Regelwerk). Angesetzt: 28 % Reduktion der verknüpften Überflutungs"
+            "risiken in den geschützten Zellen — knapp unter Mulden-Rigolen-Systemen, da "
+            "zentrale Becken nur den kanalisierten Abfluss erfassen (wilder Abfluss bleibt). "
+            "Editierbare Modellannahme im Bemessungsprinzip."),
+        "benefit_per_m2_year": ("Gesplittete Abwassergebühr (angeschl. Flächen)", ["BWB_Niederschlagswasserentgelt"],
+            "Direkter Zusatznutzen: Für die an die Retention angeschlossenen, abgekoppelten "
+            "Flächen entfällt Niederschlagswasserentgelt (1,84 €/m²·a Berlin, BWB); auf die "
+            "Beckenfläche bezogen (Einzugsfläche ≫ Beckenfläche) → 4 €/(m²·a). Editierbar."),
+    },
+    "RETENTION_POLDER_RESERVOIR": {
+        "default_reduction": ("Polder-Scheitelkappung (Praxisnachweis)", ["Agrarheute_Rueckhaltebecken", "UBA_Gewaesserrenaturierung"],
+            "Wirkmechanismus: Flutpolder und Speicherbecken kappen Hochwasserscheitel "
+            "nachweislich — gesteuerte Polder senken den Scheitel des Bemessungshochwassers "
+            "am Unterlieger messbar (Praxis der Länder-Hochwasserschutzprogramme). Angesetzt: "
+            "30 % Reduktion der verknüpften Hochwasserrisiken in den geschützten Zellen; "
+            "Extremereignisse jenseits des Poldervolumens bleiben (Restrisiko). Editierbare "
+            "Modellannahme im belegten Wirkprinzip."),
+        "benefit_per_m2_year": ("Modellannahme (Doppelnutzung Polderfläche)", [],
+            "Direkter Zusatznutzen: Polder-/Speicherflächen sind außerhalb von Einstauereignissen "
+            "land-/grünlandwirtschaftlich nutzbar und können Brauch-/Bewässerungswasser "
+            "bereitstellen → 4 €/(m²·a) als konservative Doppelnutzungs-Annahme; editierbar."),
+    },
+    "INFILTRATION_AREAS": {
+        "default_reduction": ("Versickerungs-Bemessung (DWA-A 138)", ["DWA_A138"],
+            "Wirkmechanismus: Dezentrale Versickerungsflächen nehmen den Abfluss angeschlossener "
+            "Flächen auf und führen ihn dem Grundwasser zu — nach DWA-A 138 auf das Bemessungs"
+            "ereignis dimensioniert. Angesetzt: 25 % Reduktion der verknüpften Überflutungs-/"
+            "hydrologischen Risiken in den abgedeckten Zellen (wie Mulden-Rigolen). Editierbare "
+            "Modellannahme im DWA-Bemessungsprinzip."),
+        "benefit_per_m2_year": ("Gesplittete Abwassergebühr", ["BWB_Niederschlagswasserentgelt"],
+            "Direkter Zusatznutzen: abgekoppelte, versickernde Flächen sparen Niederschlags"
+            "wasserentgelt (1,84 €/m²·a Berlin; ermäßigt −50 % bei bestimmten Versickerungs"
+            "arten, BWB) → 3 €/(m²·a) bezogen auf die Anlagenfläche. Editierbar."),
+    },
+    "RUNOFF_ROUTING_DGM": {
+        "default_reduction": ("Starkregen-Gefahrenkarten-Praxis (Notwasserwege)", ["DWA_A138"],
+            "Wirkmechanismus: DGM-basierte Abflusslenkung (Notwasserwege, Bordsteine, "
+            "Geländemodellierung) leitet den nicht mehr rückhaltbaren Extremabfluss gezielt "
+            "über schadarme Korridore ab — Standardbaustein kommunaler Starkregen-Gefahren"
+            "kartenkonzepte ergänzend zur DWA-Bemessung. Angesetzt: 20 % Reduktion der "
+            "verknüpften Überflutungsrisiken (lenkt, speichert aber nicht). Editierbare, "
+            "dokumentierte Modellannahme."),
+        "benefit_per_m2_year": ("Modellannahme (multifunktionale Flächen)", [],
+            "Direkter Zusatznutzen: Notwasserwege/multifunktionale Retentionsflächen sind im "
+            "Normalfall als Straßenraum, Grün- oder Spielfläche nutzbar → 2 €/(m²·a) als "
+            "konservative Mehrfachnutzungs-Annahme; editierbar."),
+    },
+    "GROUNDWATER_RECHARGE": {
+        "default_reduction": ("Dargebotssicherung (DVGW-Wirkprinzip)", ["DVGW_W392"],
+            "Wirkmechanismus: Gezielte Grundwasseranreicherung (Versickerung von Überschuss"
+            "wasser, Uferfiltrat-Management) stützt das nutzbare Dargebot und die Grundwasser"
+            "stände in Trockenperioden — der Puffer senkt hydrologischen Stress und Nutzungs"
+            "konflikte in Dürrejahren. Angesetzt: 20 % Reduktion der verknüpften Wasser"
+            "stressrisiken in den Anreicherungsgebieten. Editierbare, dokumentierte "
+            "Modellannahme (Wirkung stark standortabhängig, Hydrogeologie)."),
+        "benefit_per_m2_year": ("Modellannahme (gesichertes Rohwasser)", [],
+            "Direkter Zusatznutzen: stabilere Rohwasserverfügbarkeit der Wasserversorgung "
+            "(vermiedene Ersatzbeschaffung/Fernwasser in Dürrejahren) → 2 €/(m²·a) bezogen "
+            "auf die Anreicherungsfläche; konservative Modellannahme, editierbar."),
+    },
+    # ── Gebäude/Begrünung ────────────────────────────────────────────────────────
+    "GREEN_ROOFS_FACADES": {
+        "default_reduction": ("BuGG (Retention/Kühlwirkung Gebäudegrün)", ["BuGG_Marktreport_2024", "co2online_Dachbegruenung"],
+            "Wirkmechanismus: Extensive Gründächer halten 50-90 % des Jahresniederschlags "
+            "zurück (BuGG) und senken die sommerliche Aufheizung des Gebäudes und der Umgebung "
+            "(Verdunstung + Dämmwirkung; co2online). Auf die verknüpften Risiken (Wärme"
+            "belastung, Gebäudeschäden) wirkt nur der begrünte Flächenanteil der Zelle → 18 % "
+            "Reduktion angesetzt. Editierbare Modellannahme im belegten Wirkprinzip."),
+        "benefit_per_m2_year": ("co2online/BuGG (Energie) + gespl. Abwassergebühr", ["co2online_Dachbegruenung", "BWB_Niederschlagswasserentgelt"],
+            "Direkter Zusatznutzen: Dämm-/Kühlwirkung spart Heiz- und Kühlenergie (co2online: "
+            "spürbare Reduktion des Energiebedarfs der obersten Geschosse, grob 2-5 €/m²·a) "
+            "und Gründächer mindern das Niederschlagswasserentgelt (Berlin: −50 % von "
+            "1,84 €/m²·a, BWB) zzgl. verlängerter Dachlebensdauer → Punktwert 6 €/(m²·a). "
+            "Editierbar."),
+    },
+    "FLOOD_PROTECTION_BUILDING": {
+        "default_reduction": ("BBK-Hochwasserschutzfibel (Objektschutz)", ["BBK_Hochwasserschutzfibel"],
+            "Wirkmechanismus: Objektschutz am Gebäude (Rückstauklappen, druckdichte Fenster/"
+            "Schotts, Abdichtung, angepasste Haustechnik) verhindert das Eindringen von Wasser "
+            "bis zum Bemessungsniveau — die BBK-Hochwasserschutzfibel weist für konsequenten "
+            "Objektschutz Schadensminderungen bis ~80 % am Einzelgebäude aus. Da je Zelle nur "
+            "ein Teil der Gebäude nachgerüstet wird und Extremereignisse Schutzhöhen "
+            "überschreiten, werden 35 % Reduktion des Gebäudeschadensrisikos angesetzt — "
+            "höchster Wert der Gebäudemaßnahmen. Editierbar (BBK-Wirkprinzip)."),
+        "benefit_per_m2_year": ("Modellannahme (Versicherbarkeit/Prämien)", [],
+            "Direkter Zusatznutzen: Objektgeschützte Gebäude erreichen bessere Versicherbarkeit "
+            "und niedrigere Elementarschaden-Prämien/Selbstbehalte (GDV-Zonierungslogik ZÜRS); "
+            "grob 5-10 €/m² Wohnfläche·a Prämienvorteil in gefährdeten Lagen → Punktwert "
+            "9 €/(m²·a) auf die geschützte Grundfläche. Modellannahme, editierbar."),
+    },
+    # ── Küste/Fluss/Boden ────────────────────────────────────────────────────────
+    "LEVEE_REINFORCEMENT": {
+        "default_reduction": ("NLWKN Generalplan (Bemessungsschutz)", ["NLWKN_Generalplan_Kuestenschutz"],
+            "Wirkmechanismus: Deicherhöhung/-verstärkung stellt den Schutz auf das Bemessungs"
+            "hochwasser (Küste: Bemessungswasserstand + Wellenauflauf, NLWKN-Generalplan) "
+            "wieder her — hinter einem intakten Bemessungsdeich sinkt die Überflutungswahr"
+            "scheinlichkeit drastisch. Angesetzt: 35 % Reduktion der verknüpften Hochwasser-/"
+            "Sturmflutrisiken in den geschützten Zellen — bewusst nicht höher, weil Deiche "
+            "binär versagen können (Versagensrisiko jenseits der Bemessung, Restrisiko-"
+            "Prinzip). Editierbar."),
+        "opex_per_unit_year": ("NLWKN/Länderpraxis (Deichunterhaltung)", ["NLWKN_Generalplan_Kuestenschutz", "VDI_2067_Blatt1"],
+            "Deichunterhaltung ist Daueraufgabe (Mahd/Beweidung, Grasnarben-/Wühltierkontrolle, "
+            "Deichschau, kleinere Instandsetzungen): Länderpraxis liegt in der Größenordnung "
+            "5.000-15.000 €/km·a je nach Deichtyp. Punktwert 10.000 €/(km·a) ≈ 0,8 % der "
+            "Investition — ohne diesen Posten wäre der Deich unrealistisch unterhaltsfrei."),
+    },
+    "SALTWATER_BARRIERS": {
+        "default_reduction": ("Küstenschutz-Wirkprinzip (Sperrwerke/Siele)", ["NLWKN_Generalplan_Kuestenschutz"],
+            "Wirkmechanismus: Sperrwerke, Siele und Rückschlagklappen blockieren das Eindringen "
+            "von Salzwasser in Vorfluter und Entwässerungssysteme bei Sturmflut/hohen Tiden — "
+            "Standardbausteine des Küstenschutzes (NLWKN). Angesetzt: 25 % Reduktion des "
+            "Salzwasserintrusions-Risikos im geschützten Einzugsbereich; die schleichende "
+            "Intrusion über Grundwasserleiter wird nur teilweise erfasst. Editierbare, "
+            "dokumentierte Modellannahme."),
+        "opex_per_unit_year": ("VDI 2067 (bewegl. Verschlussorgane)", ["VDI_2067_Blatt1", "NLWKN_Generalplan_Kuestenschutz"],
+            "Bewegliche Verschlussorgane (Tore, Klappen, Antriebe) erfordern Wartung, Funktions"
+            "proben und Korrosionsschutz: VDI-2067-Größenordnung ~2 % der Investition/Jahr → "
+            "3.000 €/(Anlage·a) bei 150.000 € Investition."),
+    },
+    "EROSION_PROTECTION": {
+        "default_reduction": ("LfL (konservierende Bodenbearbeitung/ABAG)", ["LfL_Pflanzenbau"],
+            "Wirkmechanismus: Erosionsschutz (Begrünung, Zwischenfrüchte, konservierende "
+            "Bearbeitung, Hangrinnen-Begrünung) senkt den Bodenabtrag über den Bedeckungs- und "
+            "Bearbeitungsfaktor der Allgemeinen Bodenabtragsgleichung (ABAG) — konservierende "
+            "Verfahren reduzieren den C-Faktor und damit den Abtrag um deutlich über 50 % "
+            "(LfL-Pflanzenbau-Kennwerte). Angesetzt: 25 % Reduktion der verknüpften Erosions-/"
+            "Bodenrisiken (nicht alle Flächen/Kulturen umstellbar). Editierbar."),
+        "benefit_per_m2_year": ("Modellannahme (erhaltene Bodenfruchtbarkeit)", ["TEEB_DE_Naturkapital"],
+            "Direkter Zusatznutzen: vermiedener Verlust an Bodenfruchtbarkeit und Nährstoffen "
+            "(Oberboden-Neubildung dauert Jahrhunderte; TEEB DE bewertet Bodenfunktionen) "
+            "0,02 €/(m²·a) = 200 €/ha·a als Werterhalt je Hektar Ackerfläche — von zuvor "
+            "2 €/m² (= 20.000 €/ha, unplausibel) herabgesetzt; editierbar."),
+    },
+    "FLOODPLAIN_RENATURATION": {
+        "default_reduction": ("UBA (Gewässer-/Auenrenaturierung)", ["UBA_Gewaesserrenaturierung"],
+            "Wirkmechanismus: Reaktivierte Auen und rückverlegte Deiche geben dem Fluss "
+            "Retentionsraum zurück — der Hochwasserscheitel wird gedämpft und verzögert "
+            "(UBA-Renaturierungsleitfäden; Praxis der Aktionsprogramme an Elbe/Rhein). "
+            "Angesetzt: 30 % Reduktion der verknüpften Hochwasserrisiken für die profitierenden "
+            "Zellen; wirkt zusätzlich als Dürre-Puffer (Grundwasserstützung). Editierbare "
+            "Modellannahme im belegten Wirkprinzip."),
+        "benefit_per_m2_year": ("TEEB DE / UBA (Auen-Ökosystemleistungen)", ["TEEB_DE_Naturkapital", "UBA_Gewaesserrenaturierung"],
+            "Direkter Zusatznutzen: intakte Auen liefern Ökosystemleistungen (Nährstoff"
+            "rückhalt, Kohlenstoffspeicherung, Habitat/Erholung), die TEEB DE für Auen mit "
+            "mehreren hundert €/ha·a bewertet. 0,03 €/(m²·a) = 300 €/ha·a entspricht dieser "
+            "Spanne — von zuvor 3 €/m² (= 30.000 €/ha, unplausibel) herabgesetzt; editierbar."),
+    },
+    # ── Land-/Forstwirtschaft ────────────────────────────────────────────────────
+    "MIXED_FORESTS": {
+        "default_reduction": ("AGDW/Waldumbau (Mischbestands-Resilienz)", ["AGDW_Wiederbewaldung"],
+            "Wirkmechanismus: Standortgerechte Mischbestände sind gegenüber Dürre, Sturmwurf, "
+            "Borkenkäfer und Kronenfeuer deutlich widerstandsfähiger als Nadel-Reinbestände — "
+            "der Kern der Wiederbewaldungs-/Waldumbauprogramme nach den Dürrejahren 2018-2020 "
+            "(AGDW; Waldzustandserhebungen zeigen die höchsten Schäden in Fichten-Monokulturen). "
+            "Angesetzt: 25 % Reduktion der verknüpften Wald-/Feuerrisiken auf den umgebauten "
+            "Flächen über den Bestandszyklus. Editierbare Modellannahme."),
+        "benefit_per_m2_year": ("Modellannahme (stabilere Erträge/Senke)", ["TEEB_DE_Naturkapital"],
+            "Direkter Zusatznutzen: stabilere Holzerträge (geringere Kalamitätsverluste) und "
+            "kontinuierliche Senken-/Ökosystemleistung des Waldes (TEEB DE bewertet Wald-"
+            "Ökosystemleistungen mit mehreren hundert €/ha·a). 0,02 €/(m²·a) = 200 €/ha·a "
+            "innerhalb der TEEB-Spanne — von zuvor 1,5 €/m² (= 15.000 €/ha, unplausibel) "
+            "herabgesetzt; editierbar."),
+    },
+    "HUMUS_BUILDUP": {
+        "default_reduction": ("LfL (Humus-Wasserspeicher)", ["LfL_Pflanzenbau"],
+            "Wirkmechanismus: Humusaufbau (Zwischenfrüchte, Mulch, organische Düngung) erhöht "
+            "die nutzbare Feldkapazität — je zusätzlichem Prozent Humus speichert der Boden "
+            "grob 20-40 mm mehr pflanzenverfügbares Wasser (LfL-Kennwerte) und übersteht "
+            "Trockenphasen länger. Angesetzt: 15 % Reduktion der verknüpften Dürre-/Boden"
+            "risiken auf den aufgebauten Flächen — bewusst niedrig, da Humusaufbau Jahre "
+            "braucht und langsam wirkt. Editierbar."),
+        "benefit_per_m2_year": ("KTBL/LfL (Ertragsstabilität)", ["LfL_Pflanzenbau", "KTBL_Feldbewaesserung"],
+            "Direkter Zusatznutzen: stabilere Erträge in Trockenjahren und eingesparte "
+            "Düngung/Bewässerung (bessere Nährstoff- und Wasserhaltung; KTBL/LfL) → "
+            "0,02 €/(m²·a) = 200 €/ha·a als Deckungsbeitrags-Vorteil in Trockenjahren — von "
+            "zuvor 1,5 €/m² (= 15.000 €/ha, unplausibel) herabgesetzt; editierbar."),
+    },
+    "DROUGHT_RESISTANT_VARIETIES": {
+        "default_reduction": ("LfL-Sortenversuche (Trockentoleranz)", ["LfL_Pflanzenbau"],
+            "Wirkmechanismus: Trockentolerante Arten/Sorten (tiefwurzelnd, hitzetolerant, "
+            "früh abreifend) halten die Ertragsbildung in Trockenjahren länger aufrecht — "
+            "die LfL-Sortenversuche zeigen in Dürrejahren deutliche Ertragsunterschiede "
+            "zwischen Sorten derselben Kultur. Angesetzt: 18 % Reduktion des dürregetriebenen "
+            "Ertragsrisikos auf den umgestellten Flächen. Editierbare Modellannahme."),
+        "benefit_per_m2_year": ("Modellannahme (Ertragsstabilität)", ["LfL_Pflanzenbau"],
+            "Direkter Zusatznutzen: stabilere Erträge/Qualitäten in Trockenjahren ohne "
+            "nennenswerte Mehrkosten des Saatguts. 0,02 €/(m²·a) = 200 €/ha·a als vorsichtiger "
+            "Deckungsbeitrags-Vorteil im Feldmaßstab — von zuvor 1,5 €/m² (= 15.000 €/ha, "
+            "unplausibel) herabgesetzt; editierbar."),
+    },
+    "WATER_STORAGE_EFFICIENT_IRRIGATION": {
+        "default_reduction": ("KTBL (Tröpfchenbewässerung/Speicher)", ["KTBL_Feldbewaesserung"],
+            "Wirkmechanismus: Effiziente Bewässerung (Tropf-/Mikrobewässerung spart gegenüber "
+            "Beregnung 30-50 % Wasser, KTBL) kombiniert mit Speicherbecken überbrückt "
+            "Trockenphasen und Entnahmeverbote — der Ertrag bleibt auch bei Niedrigwasser "
+            "gesichert. Angesetzt: 22 % Reduktion des dürregetriebenen Ertragsrisikos auf den "
+            "erschlossenen Flächen. Editierbare Modellannahme auf KTBL-Basis."),
+        "benefit_per_m2_year": ("KTBL (Wasser-/Energieeinsparung)", ["KTBL_Feldbewaesserung"],
+            "Direkter Zusatznutzen: 30-50 % geringerer Wasser- und Pumpenergieeinsatz "
+            "gegenüber konventioneller Beregnung (KTBL: Bewässerung kostet mehrere hundert "
+            "€/ha·a). 0,05 €/(m²·a) = 500 €/ha·a Einsparung bewässerungsintensiver Kulturen — "
+            "von zuvor 2 €/m² (= 20.000 €/ha, unplausibel) herabgesetzt; editierbar."),
+    },
+    "WILDFIRE_PREVENTION": {
+        "default_reduction": ("Waldbrandprävention (Länderpraxis)", ["AGDW_Wiederbewaldung"],
+            "Wirkmechanismus: Waldbrandprävention (Brandschutzstreifen, Totholz-/Streu-"
+            "Management, Löschwasserentnahmestellen, Früherkennung) senkt Zündwahrschein"
+            "lichkeit und v. a. die Ausbreitungsgeschwindigkeit — kleingehaltene Brände "
+            "statt Großfeuer (Waldbrandschutzkonzepte der Länder; Laub-/Mischwaldanteil "
+            "wirkt zusätzlich brandhemmend, AGDW). Angesetzt: 25 % Reduktion des Waldbrand"
+            "risikos in den gemanagten Zellen. Editierbare, dokumentierte Modellannahme."),
+        "benefit_per_m2_year": ("Modellannahme (erhaltener Waldwert)", ["TEEB_DE_Naturkapital"],
+            "Direkter Zusatznutzen: anteiliger Werterhalt von Holzvorrat und Waldfunktionen "
+            "auch ohne Brandereignis (Versicherbarkeit, kontinuierliche Ökosystemleistung; "
+            "TEEB DE). 0,01 €/(m²·a) = 100 €/ha·a — von zuvor 1 €/m² (= 10.000 €/ha, "
+            "unplausibel) herabgesetzt; editierbar."),
+    },
+    "HABITAT_CONNECTIVITY": {
+        "default_reduction": ("BfN-Biotopverbund-Prinzip", ["TEEB_DE_Naturkapital"],
+            "Wirkmechanismus: Biotopverbund (Trittsteine, Korridore, Hecken) ermöglicht Arten "
+            "das Ausweichen und Nachwandern bei Klimastress — fragmentierte Populationen "
+            "sterben lokal aus, vernetzte können sich verschieben (Kernargument des bundes"
+            "weiten Biotopverbunds nach § 21 BNatSchG). Angesetzt: 20 % Reduktion der "
+            "verknüpften Biodiversitäts-/Fragmentierungsrisiken in den vernetzten Zellen. "
+            "Editierbare, dokumentierte Modellannahme."),
+        "benefit_per_m2_year": ("TEEB DE (Leistungen vernetzter Flächen)", ["TEEB_DE_Naturkapital"],
+            "Direkter Zusatznutzen: Verbundstrukturen (Hecken, Säume) liefern Bestäubung, "
+            "Schädlingsregulation, Windschutz und Erosionsminderung für angrenzende Nutz"
+            "flächen (TEEB DE). 0,02 €/(m²·a) = 200 €/ha·a der Verbundfläche — von zuvor "
+            "1,5 €/m² (= 15.000 €/ha, unplausibel) herabgesetzt; editierbar."),
+    },
+    # ── Fischerei/Aquakultur & Anreizprogramme ──────────────────────────────────
+    "ADAPTIVE_FISHERIES_MANAGEMENT": {
+        "default_reduction": ("Modellannahme (Befischungsdruck als Stellhebel)", [],
+            "Wirkmechanismus: Unter Wärme-/Sauerstoffstress ist der Befischungsdruck der am "
+            "schnellsten steuerbare Stressor — angepasste Fangquoten, Schonzeiten in Hitze"
+            "phasen und Echtzeit-Monitoring senken die Gesamtbelastung der Bestände und "
+            "sichern die Reproduktion. Angesetzt: 20 % Reduktion des Bestandsstress-/Ertrags"
+            "risikos im bewirtschafteten Gebiet. Keine Kalibrierstudie — editierbare, "
+            "dokumentierte Modellannahme."),
+    },
+    "AQUACULTURE_RESILIENCE_SYSTEMS": {
+        "default_reduction": ("Modellannahme (Technik gegen O₂-/Hitzeverluste)", [],
+            "Wirkmechanismus: Belüfter, Sauerstoffeintrag, Beschattung/Kühlung und Sensorik "
+            "verhindern die typischen Sommerverluste in Teich-/Kreislaufanlagen (Sauerstoff"
+            "mangel und Temperaturspitzen sind die Hauptschadensursachen der Aquakultur in "
+            "Hitzejahren). Angesetzt: 25 % Reduktion des Aquakultur-Schadensrisikos in den "
+            "ausgerüsteten Anlagenzellen. Editierbare, dokumentierte Modellannahme."),
+        "opex_per_unit_year": ("VDI 2067 + Energie (Belüftung/Sensorik)", ["VDI_2067_Blatt1"],
+            "Belüfter/Pumpen/Sensorik laufen im Sommer dauerhaft: Wartung nach VDI-2067-"
+            "Größenordnung plus erheblicher Stromverbrauch → ~6-8 % der Investition/Jahr; "
+            "Punktwert 4.000 €/(Anlage·a) bei 60.000 € Investition."),
+    },
+    "FISHERIES_SPAWNING_HABITAT_RESTORATION": {
+        "default_reduction": ("UBA/LfU (Laichhabitat-Renaturierung)", ["UBA_Gewaesserrenaturierung", "LfU_Bayern_Fischaufstieg"],
+            "Wirkmechanismus: Wiederhergestellte Kieslaichplätze, Flachwasser- und Beschattungs"
+            "zonen erhöhen Reproduktionserfolg und bieten Temperatur-Refugien — Renaturierung "
+            "ist der Kernhebel der WRRL-Programme für klimastabile Fischbestände (UBA/LfU). "
+            "Angesetzt: 22 % Reduktion des Bestandsstressrisikos in den renaturierten "
+            "Gewässerzellen. Editierbare Modellannahme im belegten Wirkprinzip."),
+        "benefit_per_m2_year": ("TEEB/UBA (Gewässer-Ökosystemleistungen)", ["TEEB_DE_Naturkapital", "UBA_Gewaesserrenaturierung"],
+            "Direkter Zusatznutzen: renaturierte Gewässerabschnitte liefern Selbstreinigung, "
+            "Habitat- und Erholungsleistungen (TEEB DE/UBA). 0,02 €/(m²·a) = 200 €/ha·a der "
+            "renaturierten Fläche — von zuvor 2 €/m² (= 20.000 €/ha, unplausibel) "
+            "herabgesetzt; editierbar."),
+    },
+    "FISHERIES_WATER_QUALITY_PROTECTION": {
+        "default_reduction": ("Modellannahme (O₂-Haushalt in Warmphasen)", ["UBA_Gewaesserrenaturierung"],
+            "Wirkmechanismus: Warmes Wasser hält weniger Sauerstoff — Nährstoff- und "
+            "Einleitungsmanagement (Uferrandstreifen, Kläranlagen-Feinsteuerung, Einleit"
+            "stopps in Hitzephasen) senkt die Sauerstoffzehrung genau dann, wenn die Bestände "
+            "am verwundbarsten sind. Angesetzt: 20 % Reduktion der verknüpften Gewässergüte-/"
+            "Bestandsrisiken. Editierbare, dokumentierte Modellannahme."),
+    },
+    "FISH_PASSAGE_RESTORATION": {
+        "default_reduction": ("LfU Bayern (Durchgängigkeit/Ausweichwanderung)", ["LfU_Bayern_Fischaufstieg"],
+            "Wirkmechanismus: Durchgängige Gewässer ermöglichen Fischen die Ausweichwanderung "
+            "in kühlere, sauerstoffreichere Ober-/Nebenläufe während Hitze- und Niedrigwasser"
+            "phasen — ohne Durchgängigkeit kollabieren eingeschlossene Populationen in "
+            "aufgeheizten Stauräumen (LfU-Praxishandbuch Fischaufstieg; WRRL-Kernmaßnahme). "
+            "Angesetzt: 22 % Reduktion des Bestandsstressrisikos im wieder angebundenen "
+            "Gewässersystem. Editierbare Modellannahme."),
+        "opex_per_unit_year": ("LfU/VDI 2067 (Unterhaltung Fischaufstieg)", ["LfU_Bayern_Fischaufstieg", "VDI_2067_Blatt1"],
+            "Fischaufstiegsanlagen brauchen laufende Unterhaltung (Geschwemmsel-Räumung, "
+            "Kontrolle der Leitströmung, Funktionsmonitoring nach LfU-Handbuch): VDI-2067-"
+            "Größenordnung ~1,5 % der Investition/Jahr → 3.000 €/(Anlage·a) bei 200.000 €."),
+    },
+    "PREVENTION_INCENTIVES": {
+        "default_reduction": ("Modellannahme (Anreizprogramm, Teilnahmequote)", ["BBK_Hochwasserschutzfibel"],
+            "Wirkmechanismus: Förder-/Prämienanreize aktivieren private Eigenvorsorge "
+            "(Objektschutz, Elementarversicherung — Maßnahmen der BBK-Fibel), aber nur bei "
+            "einem Teil der Eigentümer (Teilnahmequoten und Mitnahmeeffekte begrenzen die "
+            "Wirkung). Angesetzt: 12 % Reduktion der verknüpften Gebäudeschadensrisiken — "
+            "bewusst der niedrigste Wert aller Maßnahmen (indirekter Wirkpfad). Editierbare, "
+            "dokumentierte Modellannahme."),
+    },
+    "RISK_BASED_INVESTMENTS": {
+        "default_reduction": ("Modellannahme (risikobasierte Priorisierung)", [],
+            "Wirkmechanismus: Risikobasierte Investitionsplanung lenkt begrenzte kommunale "
+            "Mittel dorthin, wo je Euro die größte Schadensminderung entsteht (Priorisierung "
+            "nach Risikokarten statt Gießkanne) — die Wirkung entsteht indirekt über besser "
+            "platzierte Folgeinvestitionen. Angesetzt: 15 % Reduktion der verknüpften Risiken "
+            "im priorisierten Gebiet. Keine Kalibrierstudie — editierbare, dokumentierte "
+            "Modellannahme."),
+    },
+}
+
+
+def _enrich_measure_effect_docs() -> None:
+    """Verdrahtet die zentralen Wirkungs-/Nutzen-Herleitungen in die Maßnahmen-Dicts.
+
+    Inline gepflegte ``sources``/``source_details``/``source_refs`` je Maßnahme haben
+    Vorrang; hier wird nur ergänzt, was dort fehlt.
+    """
+    for m in MEASURES:
+        fields = _MEASURE_EFFECT_DOCS.get(m["code"])
+        if not fields:
+            continue
+        sources_map = m.setdefault("sources", {})
+        details = m.setdefault("source_details", {})
+        refs_map = m.setdefault("source_refs", {})
+        for field, (label, refs, text) in fields.items():
+            sources_map.setdefault(field, label)
+            details.setdefault(field, text)
+            if refs and field not in refs_map:
+                refs_map[field] = refs
+
+
+_enrich_measure_effect_docs()
 
 
 # ── Kategorisierung (Karten-Layerspalte: Zwischenebene) ──────────────────────────

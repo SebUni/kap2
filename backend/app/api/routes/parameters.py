@@ -3,9 +3,9 @@ from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.models.models import ConfigParameter, Kommune
+from app.models.models import ConfigParameter, Kommune, RiskZone, RiskZoneCell
 from app.schemas.schemas import ParameterUpdate
-from app.services import parameter_registry
+from app.services import aggregate_cache, parameter_registry
 from app.services.export_service import export_parameters_xlsx
 
 router = APIRouter()
@@ -18,18 +18,32 @@ def _find_default(parameter_id: str) -> dict | None:
     return None
 
 
+# Live wirksame Modell-Parameter (Aggregation/Zonen/Maßnahmen-Rechnung zur Laufzeit,
+# kein materialisierter Zellwert betroffen).
+_LIVE_MODEL_PARAMS = {
+    "model.risk_threshold",
+    "model.measure_coverage_saturation",
+    "model.measure_reduction_cap",
+}
+
+
 def _needs_recalc(parameter_id: str) -> bool:
     """True, wenn ein Parameter-Override eine Neuberechnung der CellAssessment erfordert.
 
     LIVE wirksam (keine Neuberechnung): Kostensätze ``*.cost_per_outcome`` (aggregate
-    monetarisiert live aus dem gespeicherten Outcome) und ``*.ref_value`` (für Schicht-B-
-    Risiken nur noch Sanity-Anker, für flat-Risiken live in der Aggregation).
+    monetarisiert live aus dem gespeicherten Outcome), ``*.ref_value`` (für Schicht-B-
+    Risiken nur noch Sanity-Anker, für flat-Risiken live in der Aggregation) sowie die
+    Modell-Stellschrauben Risikozonen-Schwelle und Maßnahmen-Sättigung/-Kappung
+    (werden je Request/Aggregation neu gelesen).
 
     Alles, was den beim Lauf materialisierten Per-Zell-Wert (Index oder Outcome) bestimmt,
     braucht dagegen eine Neuberechnung: Normgrenzen (``*.norm_min/max``), Impact-Parameter
-    (``risks.*.impact.*`` / ``impact.*``), Pfadgewichte, UHI-/Formelparameter (§8/B2).
+    (``risks.*.impact.*`` / ``impact.*``), UHI-/Formelparameter, regionale Fallbacks
+    (``regional.*``) und die Referenzskalierung ``model.ref_*`` (§8/B2).
     """
     if parameter_id.endswith(".cost_per_outcome") or parameter_id.endswith(".ref_value"):
+        return False
+    if parameter_id in _LIVE_MODEL_PARAMS:
         return False
     return True
 
@@ -108,6 +122,17 @@ def update_parameters(
         })
 
     db.commit()
+    # Kostensatz-/Modell-Overrides fließen live in die Aggregat-Kosten ein.
+    aggregate_cache.invalidate(kommune_id)
+    # Geänderte Risikozonen-Schwelle: bestehende Zonen der Kommune verwerfen —
+    # sie werden beim nächsten Abruf mit der neuen Schwelle lazy neu geclustert.
+    if any(u.parameter_id == "model.risk_threshold" for u in updates):
+        zone_ids = [z.id for z in db.query(RiskZone.id).filter(RiskZone.kommune_id == kommune_id)]
+        if zone_ids:
+            db.query(RiskZoneCell).filter(RiskZoneCell.risk_zone_id.in_(zone_ids)).delete(
+                synchronize_session=False)
+            db.query(RiskZone).filter(RiskZone.id.in_(zone_ids)).delete(synchronize_session=False)
+            db.commit()
     return {
         "results": results,
         # Sammelsignal fürs Frontend: mindestens ein geänderter Parameter wirkt erst nach

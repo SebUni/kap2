@@ -1,4 +1,4 @@
-import type { LineageEdgeData, LineageGraph, LineageNodeData } from '../types'
+import type { LineageGraph, LineageNodeData } from '../types'
 import {
   COL_GAP,
   ROW_PAD,
@@ -6,242 +6,28 @@ import {
   estimateNodeWidth,
 } from './lineageLayout'
 
-export function findTerminalNode(graph: LineageGraph): LineageNodeData | undefined {
-  const outcome = graph.nodes.find(n => n.type === 'outcome' && n.id.startsWith('out:'))
-  if (outcome) return outcome
-  const outcomes = graph.nodes.filter(n => n.type === 'outcome')
-  if (outcomes.length === 1) return outcomes[0]
-  if (outcomes.length > 1) {
-    return outcomes.reduce((a, b) => (a.column >= b.column ? a : b))
-  }
-  return graph.nodes.filter(n => n.type === 'norm').sort((a, b) => b.column - a.column)[0]
+// Ein Wirkungsdiagramm hat eine einzige Ansicht: der Backend-DAG wird zu einem
+// WALD aufgefächert (jeder Knoten hat höchstens EINEN Pfeil nach rechts; geteilte
+// Eingaben werden je Zweig dupliziert). Wurzeln sind die Ergebnisknoten
+// (KWRA-Index, natives Ergebnis, Monetärer Schaden). Beim Ausblenden von
+// Detailstufen werden Kanten überbrückt (bridgeHiddenTypes) und entstehende
+// Duplikate wieder verschmolzen (mergeDuplicates) — die Out-Grad-≤-1-Regel
+// bleibt dabei immer erhalten.
+
+/** Ergebnisknoten sind nie ausblendbar. */
+export function isPinnedNode(node: LineageNodeData): boolean {
+  return node.type === 'outcome'
 }
 
-export function isPinnedNode(node: LineageNodeData, graph: LineageGraph): boolean {
-  const terminal = findTerminalNode(graph)
-  if (terminal && node.id === terminal.id) return true
-  if (node.type === 'aggregation') return true
-  return false
+/** Alle Ergebnisknoten (für Hervorhebung/Reihenfolge). */
+export function findResultNodes(graph: LineageGraph): LineageNodeData[] {
+  return graph.nodes.filter(n => n.type === 'outcome')
 }
 
 function combineLabels(a?: string | null, b?: string | null): string | undefined {
   const parts = [a, b].filter(Boolean) as string[]
   if (parts.length === 0) return undefined
   return parts.join(' · ')
-}
-
-function contractHiddenNodes(
-  nodes: LineageNodeData[],
-  edges: LineageEdgeData[],
-  hidden: Set<string>,
-  graph: LineageGraph,
-): LineageEdgeData[] {
-  const nodeById = new Map(nodes.map(n => [n.id, n]))
-  const activeHidden = new Set(
-    [...hidden].filter(id => {
-      const n = nodeById.get(id)
-      return n && !isPinnedNode(n, graph)
-    }),
-  )
-  if (activeHidden.size === 0) return edges
-
-  const out = new Map<string, LineageEdgeData[]>()
-  for (const e of edges) {
-    if (!out.has(e.source)) out.set(e.source, [])
-    out.get(e.source)!.push(e)
-  }
-
-  const result: LineageEdgeData[] = []
-  const seen = new Set<string>()
-
-  function addEdge(
-    source: string,
-    target: string,
-    label?: string,
-    parameter_id?: string | null,
-    meta?: Record<string, unknown>,
-  ) {
-    const key = `${source}|${target}|${label ?? ''}`
-    if (seen.has(key)) return
-    seen.add(key)
-    const edge: LineageEdgeData = {
-      id: `bridge:${source}:${target}:${result.length}`,
-      source,
-      target,
-      label: label ?? null,
-      parameter_id: parameter_id ?? null,
-    }
-    if (meta) edge.meta = meta
-    result.push(edge)
-  }
-
-  function expandForward(
-    startId: string,
-    labelSoFar?: string,
-    paramId?: string | null,
-    edgeMeta?: Record<string, unknown>,
-    visited: Set<string> = new Set(),
-  ): { target: string; label?: string; parameter_id?: string | null; meta?: Record<string, unknown> }[] {
-    if (visited.has(startId)) return []
-    visited.add(startId)
-
-    if (!activeHidden.has(startId)) {
-      return [{ target: startId, label: labelSoFar, parameter_id: paramId, meta: edgeMeta }]
-    }
-
-    const outs = out.get(startId) ?? []
-    const acc: { target: string; label?: string; parameter_id?: string | null; meta?: Record<string, unknown> }[] = []
-    for (const e of outs) {
-      const nextLabel = combineLabels(labelSoFar, e.label)
-      const nextParam = e.parameter_id ?? paramId
-      const nextMeta = e.meta ?? edgeMeta
-      acc.push(...expandForward(e.target, nextLabel, nextParam, nextMeta, visited))
-    }
-    return acc
-  }
-
-  for (const e of edges) {
-    if (!activeHidden.has(e.source) && !activeHidden.has(e.target)) {
-      addEdge(e.source, e.target, e.label ?? undefined, e.parameter_id, e.meta)
-      continue
-    }
-    if (activeHidden.has(e.source)) continue
-    if (!activeHidden.has(e.source) && activeHidden.has(e.target)) {
-      for (const t of expandForward(e.target, e.label ?? undefined, e.parameter_id, e.meta)) {
-        addEdge(e.source, t.target, t.label, t.parameter_id, t.meta)
-      }
-    }
-  }
-
-  return result
-}
-
-export interface FilteredLineage {
-  nodes: LineageNodeData[]
-  edges: LineageEdgeData[]
-}
-
-export function filterHiddenTypes(
-  filtered: FilteredLineage,
-  fullGraph: LineageGraph,
-  hiddenTypes: ReadonlySet<string>,
-): FilteredLineage {
-  if (hiddenTypes.size === 0) return filtered
-
-  const hidden = new Set(
-    filtered.nodes
-      .filter(n => hiddenTypes.has(n.type))
-      .map(n => n.id),
-  )
-  if (hidden.size === 0) return filtered
-
-  const visibleNodes = filtered.nodes.filter(
-    n => !hidden.has(n.id) || isPinnedNode(n, fullGraph),
-  )
-  const visibleIds = new Set(visibleNodes.map(n => n.id))
-  const bridged = contractHiddenNodes(filtered.nodes, filtered.edges, hidden, fullGraph)
-  const edges = bridged.filter(e => visibleIds.has(e.source) && visibleIds.has(e.target))
-
-  return { nodes: visibleNodes, edges }
-}
-
-export function filterLineageGraph(
-  graph: LineageGraph,
-  focusColumn: number | null,
-): FilteredLineage {
-  const hidden = new Set<string>()
-  if (focusColumn !== null) {
-    for (const n of graph.nodes) {
-      if (n.column < focusColumn) hidden.add(n.id)
-    }
-  }
-
-  const visibleNodes = graph.nodes.filter(n => !hidden.has(n.id) || isPinnedNode(n, graph))
-  const visibleIds = new Set(visibleNodes.map(n => n.id))
-  const bridged = contractHiddenNodes(graph.nodes, graph.edges, hidden, graph)
-  const edges = bridged.filter(e => visibleIds.has(e.source) && visibleIds.has(e.target))
-
-  return { nodes: visibleNodes, edges }
-}
-
-function columnXPositions(nodes: LineageNodeData[]): Map<number, number> {
-  const byCol = new Map<number, LineageNodeData[]>()
-  for (const n of nodes) {
-    if (!byCol.has(n.column)) byCol.set(n.column, [])
-    byCol.get(n.column)!.push(n)
-  }
-  const sortedCols = [...byCol.keys()].sort((a, b) => a - b)
-  const colWidths = new Map<number, number>()
-  for (const col of sortedCols) {
-    const list = byCol.get(col)!
-    colWidths.set(col, Math.max(72, ...list.map(estimateNodeWidth)) + 12)
-  }
-  const xByCol = new Map<number, number>()
-  let x = 0
-  for (const col of sortedCols) {
-    xByCol.set(col, x)
-    x += (colWidths.get(col) ?? 180) + COL_GAP
-  }
-  return xByCol
-}
-
-const ROW_HEIGHT = 52
-
-function hasLayoutRow(n: LineageNodeData): boolean {
-  return typeof n.meta?.layout_row === 'number'
-}
-
-function layoutRowOf(n: LineageNodeData): number {
-  const row = n.meta?.layout_row
-  if (typeof row === 'number') return row
-  if (n.type === 'intermediate' && n.id.startsWith('int:')) {
-    return n.id.charCodeAt(4) % 12
-  }
-  return 0
-}
-
-export function assignColumnPositions(
-  nodes: LineageNodeData[],
-  viewport?: { width: number; height: number },
-): Map<string, { x: number; y: number }> {
-  const xByCol = columnXPositions(nodes)
-  const positions = new Map<string, { x: number; y: number }>()
-
-  const withRow = nodes.filter(hasLayoutRow)
-  const withoutRow = nodes.filter(n => !hasLayoutRow(n))
-
-  if (withRow.length) {
-    const rows = [...new Set(withRow.map(layoutRowOf))].sort((a, b) => a - b)
-    const rowOffset = -(rows.length - 1) * ROW_HEIGHT / 2
-    for (const n of withRow) {
-      const y = rowOffset + layoutRowOf(n) * ROW_HEIGHT
-      positions.set(n.id, {
-        x: xByCol.get(n.column) ?? n.column * 130,
-        y,
-      })
-    }
-  }
-
-  const byCol = new Map<number, LineageNodeData[]>()
-  for (const n of withoutRow) {
-    if (!byCol.has(n.column)) byCol.set(n.column, [])
-    byCol.get(n.column)!.push(n)
-  }
-
-  for (const [col, list] of byCol) {
-    const sorted = [...list].sort((a, b) => a.label.localeCompare(b.label, 'de'))
-    const heights = sorted.map(n => estimateNodeHeight(n) + ROW_PAD)
-    const totalH = heights.reduce((a, b) => a + b, 0)
-    let yCursor = -totalH / 2
-    sorted.forEach((n, i) => {
-      const h = heights[i]
-      yCursor += h / 2
-      positions.set(n.id, { x: xByCol.get(col) ?? col * 130, y: yCursor })
-      yCursor += h / 2
-    })
-  }
-
-  return positions
 }
 
 export interface TreeNode {
@@ -265,18 +51,39 @@ export interface TreeResult {
   edges: TreeEdge[]
 }
 
-export function unfoldToTree(
+function resultRank(n: LineageNodeData): number {
+  const kind = n.meta?.result_kind as string | undefined
+  if (kind === 'index') return 0
+  if (kind === 'native') return 1
+  if (kind === 'eur') return 2
+  return 3
+}
+
+/** Wurzeln des Waldes: Knoten ohne ausgehende Kante (Ergebnisse zuerst sortiert). */
+function findRoots(graph: LineageGraph): LineageNodeData[] {
+  const hasOutgoing = new Set(graph.edges.map(e => e.source))
+  const roots = graph.nodes.filter(n => !hasOutgoing.has(n.id))
+  return roots.sort(
+    (a, b) => resultRank(a) - resultRank(b) || a.id.localeCompare(b.id),
+  )
+}
+
+/**
+ * Fächert den DAG zu einem Wald auf: jeder Zweig dupliziert geteilte Eingaben
+ * (Out-Grad ≤ 1 per Konstruktion). Eine Wurzel je Ergebnisknoten.
+ */
+export function unfoldToForest(
   graph: LineageGraph,
   isCollapsed: (instanceId: string, node: LineageNodeData) => boolean,
 ): TreeResult {
-  const terminal = findTerminalNode(graph)
-  if (!terminal) return { nodes: [], edges: [] }
+  const roots = findRoots(graph)
+  if (roots.length === 0) return { nodes: [], edges: [] }
 
   const nodeById = new Map(graph.nodes.map(n => [n.id, n]))
-  const incoming = new Map<string, LineageEdgeData[]>()
+  const incoming = new Map<string, { source: string; label?: string | null; meta?: Record<string, unknown> }[]>()
   for (const e of graph.edges) {
     if (!incoming.has(e.target)) incoming.set(e.target, [])
-    incoming.get(e.target)!.push(e)
+    incoming.get(e.target)!.push({ source: e.source, label: e.label, meta: e.meta })
   }
 
   const nodes: TreeNode[] = []
@@ -316,32 +123,195 @@ export function unfoldToTree(
     }
   }
 
-  visit(terminal.id, terminal.id, null, new Set([terminal.id]))
+  for (const root of roots) {
+    visit(root.id, root.id, null, new Set([root.id]))
+  }
   return { nodes, edges }
 }
 
+/**
+ * Blendet Knotentypen aus, indem sie ÜBERBRÜCKT werden: die Kinder eines
+ * ausgeblendeten Knotens hängen sich an dessen sichtbaren Vorfahren, Kanten-
+ * Attribute (Label, Gewichts-Meta) werden dabei kombiniert. Ergebnisknoten
+ * sind gepinnt und werden nie ausgeblendet.
+ */
+export function bridgeHiddenTypes(
+  tree: TreeResult,
+  hiddenTypes: ReadonlySet<string>,
+): TreeResult {
+  if (hiddenTypes.size === 0) return tree
+
+  const children = new Map<string, TreeNode[]>()
+  const roots: TreeNode[] = []
+  for (const n of tree.nodes) {
+    if (n.parentInstanceId === null) {
+      roots.push(n)
+    } else {
+      if (!children.has(n.parentInstanceId)) children.set(n.parentInstanceId, [])
+      children.get(n.parentInstanceId)!.push(n)
+    }
+  }
+  const edgeByChild = new Map(tree.edges.map(e => [e.source, e]))
+
+  const nodes: TreeNode[] = []
+  const edges: TreeEdge[] = []
+  const isHidden = (n: TreeNode) => hiddenTypes.has(n.data.type) && !isPinnedNode(n.data)
+
+  interface Carried {
+    label?: string | null
+    meta?: Record<string, unknown>
+  }
+
+  function combineCarried(edge: TreeEdge | undefined, carried: Carried | null): Carried {
+    if (!edge) return carried ?? {}
+    return {
+      label: combineLabels(edge.label, carried?.label) ?? null,
+      meta: edge.meta ?? carried?.meta,
+    }
+  }
+
+  function visit(n: TreeNode, effectiveParent: string | null, carried: Carried | null) {
+    const ownEdge = edgeByChild.get(n.instanceId)
+    if (isHidden(n) && effectiveParent !== null) {
+      const next = combineCarried(ownEdge, carried)
+      for (const c of children.get(n.instanceId) ?? []) visit(c, effectiveParent, next)
+      return
+    }
+    nodes.push({ ...n, parentInstanceId: effectiveParent })
+    if (effectiveParent !== null) {
+      const merged = combineCarried(ownEdge, carried)
+      edges.push({
+        id: `te:${n.instanceId}`,
+        source: n.instanceId,
+        target: effectiveParent,
+        label: merged.label ?? null,
+        meta: merged.meta,
+      })
+    }
+    for (const c of children.get(n.instanceId) ?? []) visit(c, n.instanceId, null)
+  }
+
+  for (const r of roots) visit(r, null, null)
+  return { nodes, edges }
+}
+
+function edgeSignature(e: TreeEdge | undefined): string {
+  if (!e) return ''
+  const meta = (e.meta ?? {}) as Record<string, unknown>
+  return [
+    e.label ?? '',
+    meta.op_kind ?? '',
+    meta.weight ?? '',
+    meta.parameter_id ?? '',
+  ].join('|')
+}
+
+/**
+ * Vereinfachung nach dem Ausblenden: Instanzen DESSELBEN Backend-Knotens, die
+ * (nach Überbrückung bzw. vorherigen Merges) auf dasselbe Ziel zeigen, werden
+ * zu einer Instanz verschmolzen — z. B. eine Quelle, die ohne die Zwischenwerte
+ * mehrfach in dasselbe Ergebnis flösse, erscheint nur einmal mit einem Pfeil.
+ * Tragen die verschmolzenen Kanten unterschiedliche mitgeführte Attribute
+ * (z. B. Ketten-Gewichte ausgeblendeter Wirkungsketten), werden diese verworfen —
+ * sie gehören zur ausgeblendeten Detailstufe. Fixpunkt-Iteration; Out-Grad ≤ 1
+ * bleibt erhalten. Voll ausgeklappt greift der Merge nie (jeder Zweig hat eine
+ * eigene Elternkette, Duplikate teilen nie ein Ziel).
+ */
+export function mergeDuplicates(tree: TreeResult): TreeResult {
+  const nodes = new Map(tree.nodes.map(n => [n.instanceId, { ...n }]))
+  let edges = tree.edges.map(e => ({ ...e }))
+
+  let changed = true
+  while (changed) {
+    changed = false
+    const edgeByChild = new Map(edges.map(e => [e.source, e]))
+    const groups = new Map<string, TreeNode[]>()
+    for (const n of nodes.values()) {
+      if (n.parentInstanceId === null) continue
+      const key = [n.parentInstanceId, n.data.id, n.collapsed ? 1 : 0].join('§')
+      if (!groups.has(key)) groups.set(key, [])
+      groups.get(key)!.push(n)
+    }
+    for (const group of groups.values()) {
+      if (group.length < 2) continue
+      group.sort((a, b) => a.instanceId.localeCompare(b.instanceId))
+      const canonical = group[0]
+      const dupIds = new Set(group.slice(1).map(d => d.instanceId))
+      const sigs = new Set(group.map(n => edgeSignature(edgeByChild.get(n.instanceId))))
+      for (const n of nodes.values()) {
+        if (n.parentInstanceId && dupIds.has(n.parentInstanceId)) {
+          n.parentInstanceId = canonical.instanceId
+        }
+      }
+      edges = edges.filter(e => !dupIds.has(e.source))
+      for (const e of edges) {
+        if (dupIds.has(e.target)) e.target = canonical.instanceId
+        if (e.source === canonical.instanceId && sigs.size > 1) {
+          // Uneinheitliche Kanten-Attribute stammen aus ausgeblendeten Ebenen.
+          e.label = null
+          e.meta = undefined
+        }
+      }
+      for (const d of dupIds) nodes.delete(d)
+      changed = true
+    }
+  }
+  return { nodes: [...nodes.values()], edges }
+}
+
+/** Instanz-IDs aller Wirkungsketten-Knoten (für „Alle Ketten ausklappen“). */
 export function pathwayInstanceIds(graph: LineageGraph): string[] {
-  const { nodes } = unfoldToTree(
+  const { nodes } = unfoldToForest(
     graph,
     (_id, node) => node.type === 'pathway',
   )
   return nodes.filter(n => n.data.type === 'pathway').map(n => n.instanceId)
 }
 
-export function treeLayout(
+function columnXPositions(nodes: LineageNodeData[]): Map<number, number> {
+  const byCol = new Map<number, LineageNodeData[]>()
+  for (const n of nodes) {
+    if (!byCol.has(n.column)) byCol.set(n.column, [])
+    byCol.get(n.column)!.push(n)
+  }
+  const sortedCols = [...byCol.keys()].sort((a, b) => a - b)
+  const colWidths = new Map<number, number>()
+  for (const col of sortedCols) {
+    const list = byCol.get(col)!
+    colWidths.set(col, Math.max(72, ...list.map(estimateNodeWidth)) + 12)
+  }
+  // Knoten sind an x ZENTRIERT: der Abstand zweier Spalten muss daher die halben
+  // Breiten BEIDER Spalten überbrücken, sonst ragen breite Boxen (Wirkungsketten)
+  // in schmale Nachbarspalten (Quellen, Operatoren) hinein.
+  const xByCol = new Map<number, number>()
+  let x = 0
+  let prevHalf = 0
+  sortedCols.forEach((col, i) => {
+    const half = (colWidths.get(col) ?? 180) / 2
+    if (i > 0) x += prevHalf + COL_GAP + half
+    xByCol.set(col, x)
+    prevHalf = half
+  })
+  return xByCol
+}
+
+const TREE_GAP = ROW_PAD * 3
+
+/** Layout des Waldes: Spalten → x, Blatt-Cursor je Teilbaum → y (Wurzeln gestapelt). */
+export function forestLayout(
   tree: TreeResult,
-  viewport?: { width: number; height: number },
 ): Map<string, { x: number; y: number }> {
   const children = new Map<string, TreeNode[]>()
-  let root: TreeNode | undefined
+  const roots: TreeNode[] = []
   for (const n of tree.nodes) {
     if (n.parentInstanceId === null) {
-      root = n
+      roots.push(n)
     } else {
       if (!children.has(n.parentInstanceId)) children.set(n.parentInstanceId, [])
       children.get(n.parentInstanceId)!.push(n)
     }
   }
+  roots.sort((a, b) => resultRank(a.data) - resultRank(b.data))
 
   const xByCol = columnXPositions(tree.nodes.map(n => n.data))
 
@@ -362,7 +332,10 @@ export function treeLayout(
     yById.set(n.instanceId, y)
     return y
   }
-  if (root) place(root)
+  roots.forEach((r, i) => {
+    if (i > 0) leafCursor += TREE_GAP
+    place(r)
+  })
 
   const positions = new Map<string, { x: number; y: number }>()
   for (const n of tree.nodes) {
@@ -377,8 +350,11 @@ export function treeLayout(
 export function layoutContentHeight(tree: TreeResult): number {
   let maxY = 0
   const children = new Map<string, TreeNode[]>()
+  const roots: TreeNode[] = []
   for (const n of tree.nodes) {
-    if (n.parentInstanceId) {
+    if (n.parentInstanceId === null) {
+      roots.push(n)
+    } else {
       if (!children.has(n.parentInstanceId)) children.set(n.parentInstanceId, [])
       children.get(n.parentInstanceId)!.push(n)
     }
@@ -393,7 +369,33 @@ export function layoutContentHeight(tree: TreeResult): number {
       ch.forEach(walk)
     }
   }
-  const root = tree.nodes.find(n => n.parentInstanceId === null)
-  if (root) walk(root)
+  roots.forEach((r, i) => {
+    if (i > 0) leafCursor += TREE_GAP
+    walk(r)
+  })
   return Math.max(420, maxY + 80)
+}
+
+/**
+ * Dev-Prüfung der Kern-Invarianten: Out-Grad ≤ 1 und Pfeile strikt
+ * links→rechts (Spalte des Kindes < Spalte des Ziels).
+ */
+export function assertForestInvariants(tree: TreeResult, context: string): void {
+  const nodeById = new Map(tree.nodes.map(n => [n.instanceId, n]))
+  const outCount = new Map<string, number>()
+  for (const e of tree.edges) {
+    outCount.set(e.source, (outCount.get(e.source) ?? 0) + 1)
+    const src = nodeById.get(e.source)
+    const tgt = nodeById.get(e.target)
+    if (src && tgt && src.data.column >= tgt.data.column) {
+      console.warn(
+        `[lineage:${context}] Kante nicht links→rechts: ${src.data.id} (Spalte ${src.data.column}) → ${tgt.data.id} (Spalte ${tgt.data.column})`,
+      )
+    }
+  }
+  for (const [id, count] of outCount) {
+    if (count > 1) {
+      console.warn(`[lineage:${context}] Out-Grad > 1 bei ${id} (${count} ausgehende Pfeile)`)
+    }
+  }
 }

@@ -73,3 +73,36 @@ ENVIRONMENT_IMPACTS = {
     "EXPECTED_SOIL_DEGRADATION": soil_degradation,
     "EXPECTED_VEGETATION_DAMAGE": vegetation_damage,
 }
+
+
+# ── Lineage-Spezifikation (Wirkungsdiagramm) ───────────────────────────────────
+# Deklariert je Risiko, was die Funktion oben rechnet (exponierte Fläche · Verlustrate ·
+# Intensität · g(V̂)), damit ``lineage_graph`` den Schicht-B-Zweig exakt aus der
+# tatsächlichen Rechnung baut. Key-Gleichheit mit ENVIRONMENT_IMPACTS wird in
+# tests/test_lineage_graph.py geprüft.
+LINEAGE_SPECS: dict[str, dict] = {
+    "EXPECTED_BIODIVERSITY_LOSS": {
+        "area_keys": ["forest_frac", "green_frac"],
+        "rate_param": "species_loss_per_ha",
+        "driver": {"kind": "intensity",
+                   "hazards": ["MEAN_TEMPERATURE_RISE", "DROUGHT", "WILDFIRE"]},
+    },
+    "EXPECTED_HABITAT_LOSS": {
+        "area_keys": ["forest_frac", "green_frac", "water_frac"],
+        "rate_param": "loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["DROUGHT", "WILDFIRE", "SEA_LEVEL_RISE"]},
+    },
+    "EXPECTED_SOIL_DEGRADATION": {
+        "area_keys": ["farmland_frac"],
+        "rate_param": "loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["DROUGHT", "HEAVY_RAIN_FLOOD", "SOIL_SALINIZATION"]},
+    },
+    "EXPECTED_VEGETATION_DAMAGE": {
+        "area_keys": ["forest_frac", "farmland_frac"],
+        "rate_param": "loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["DROUGHT", "HEAT_WAVE", "WILDFIRE"]},
+    },
+}

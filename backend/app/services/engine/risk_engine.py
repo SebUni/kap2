@@ -15,15 +15,16 @@ Kommune-Aggregation: 90.-Perzentil der Zell-Indizes je Risiko (statt Mittelwert)
 damit belastete Zellen in Dashboard/Spinnendiagrammen sichtbar bleiben.
 Kartenlayer: absolute Outcome-Werte pro Zelle via ``cell_outcome``.
 
-Pathway-Gewichte: ``catalog.PATHWAY_WEIGHTS`` (degressiv je Pfadtyp, override-fähig).
-Compound/Cascade sind als Hazards mit ``max_of_constituent_hazards`` bzw.
-Konstantwert hinterlegt (siehe indicators.py).
+Pathway-Gewichte: ``catalog.PATHWAY_WEIGHTS`` (degressiv je Pfadtyp; beim Import fest
+eingelesene Modellkonstanten — bewusst KEINE Registry-Parameter, ein Override wäre
+wegen ``_PATHWAYS`` wirkungslos). Compound/Cascade sind als Hazards mit
+``max_of_constituent_hazards`` bzw. Konstantwert hinterlegt (siehe indicators.py).
 """
 
 from __future__ import annotations
 
 from app.data import catalog
-from app.services.engine import override_context
+from app.services.engine import override_context, tunables
 
 CELL_AREA_KM2 = 0.01  # 100 m × 100 m Rasterzelle
 AGGREGATION_PERCENTILE = 90.0
@@ -72,9 +73,9 @@ def cell_risk_indices(hev_norm: dict) -> dict:
 def _scale_factor(risk: dict, pop: float, area_km2: float) -> float:
     scale = risk.get("scale", "pop")
     if scale == "pop":
-        return (pop or 0.0) / 100_000.0
+        return (pop or 0.0) / tunables.effective_ref_population()
     if scale == "area":
-        return (area_km2 or 0.0) / 50.0
+        return (area_km2 or 0.0) / tunables.effective_ref_area_km2()
     return 1.0  # flat (Index-Outcomes)
 
 
@@ -141,7 +142,7 @@ def estimate_outcome_and_cost(risk: dict, agg_index: float, total_pop: float, ar
     # kalibriert und skaliert daher mit der Bevölkerung — sonst zahlt eine 5.000-Ew.-
     # Gemeinde denselben €-Ausfall wie eine Großstadt (MODELL_KRITIK §8, Befund B6).
     if risk.get("scale", "pop") not in ("pop", "area") and total_pop and total_pop > 0:
-        cost *= total_pop / 100_000.0
+        cost *= total_pop / tunables.effective_ref_population()
     return {"outcome": round(outcome, 2), "cost_eur": round(cost, 2)}
 
 
@@ -174,10 +175,8 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
     from app.services.engine import impact  # lazy: Zyklus impact→risk_engine vermeiden
     from app.services.engine.impact import sanity  # lazy (impact/__init__ importiert risk_engine)
 
-    try:
-        from app.services.risk_zone_service import RISK_THRESHOLD as _THR
-    except Exception:  # pragma: no cover - defensiver Fallback
-        _THR = 50.0
+    # Live-Parameter model.risk_threshold (läuft innerhalb des Override-Scopes).
+    _THR = tunables.effective_risk_threshold()
 
     n_cells = len(cell_data_list)
     indices_by_code: dict[str, list[float]] = {}

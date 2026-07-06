@@ -14,7 +14,7 @@ from app.models.models import (
 )
 from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
-from app.services import osm_service, grid_service, layer_cache
+from app.services import aggregate_cache, kommune_profile_service, osm_service, grid_service, layer_cache
 
 router = APIRouter()
 
@@ -55,6 +55,7 @@ async def create_kommune(data: KommuneCreate, db: Session = Depends(get_db)):
         osm_id=data.osm_id,
         boundary=from_shape(shape, srid=4326),
         area_km2=round(area_km2, 2),
+        bundesland=data.bundesland or osm_service.bundesland_from_address(data.address),
     )
     db.add(kommune)
     db.commit()
@@ -72,6 +73,29 @@ def get_kommune(kommune_id: int, db: Session = Depends(get_db)):
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
     return _kommune_to_out(kommune)
+
+
+@router.get("/{kommune_id}/profile")
+async def get_kommune_profile(kommune_id: int, db: Session = Depends(get_db)):
+    """Kommunen-Profil: Basisdaten + Klimakennzahlen mit Deutschland-Vergleich.
+
+    Funktioniert auch ohne abgeschlossene Berechnung (dann ohne Höhenlage/
+    ggf. ohne Einwohner). Fehlendes Bundesland wird einmalig per Nominatim-
+    Reverse-Geocoding nachgetragen (Lazy-Backfill, degradiert bei Fehlschlag).
+    """
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+
+    if not kommune.bundesland:
+        centroid = kommune_profile_service.centroid_of(kommune)
+        if centroid:
+            bl = await osm_service.reverse_bundesland(lat=centroid[1], lon=centroid[0])
+            if bl:
+                kommune.bundesland = bl
+                db.commit()
+
+    return kommune_profile_service.build_profile(db, kommune)
 
 
 @router.get("")
@@ -92,6 +116,7 @@ def generate_grid(kommune_id: int, req: GridGenerateRequest = GridGenerateReques
     count = grid_service.generate_grid(
         db, kommune_id, cell_size_m=req.cell_size_m, force=req.force,
     )
+    aggregate_cache.invalidate(kommune_id)
     layer_cache.invalidate(kommune_id)
     return {"kommune_id": kommune_id, "cells_created": count, "cell_size_m": req.cell_size_m}
 
@@ -163,7 +188,8 @@ def reset_kommune(kommune_id: int, db: Session = Depends(get_db)):
     if os.path.isdir(export_dir):
         shutil.rmtree(export_dir, ignore_errors=True)
 
-    # Karten-Layer-Cache verwerfen
+    # Karten-Layer- und Aggregat-Cache verwerfen
+    aggregate_cache.invalidate(kommune_id)
     layer_cache.invalidate(kommune_id)
 
     return {"message": "Zurückgesetzt", "kommune_id": kommune_id}

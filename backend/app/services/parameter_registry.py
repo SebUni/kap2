@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from app.data import catalog, sources
-from app.services.engine import formulas
+from app.services.engine import formulas, tunables
 from app.services.engine.impact.params import IMPACT_PARAM_SPECS, IMPACT_GLOBAL_SPECS
 
 # Impact-Parameter (Schicht B) je Risiko gruppiert für die Emission in der Risiko-Schleife.
@@ -13,17 +13,9 @@ _IMPACT_SPECS_BY_RISK: dict[str, list[dict]] = {}
 for _spec in IMPACT_PARAM_SPECS:
     _IMPACT_SPECS_BY_RISK.setdefault(_spec["risk"], []).append(_spec)
 
-PATHWAY_WEIGHT_LABELS = {
-    "primary": "Gewicht primärer Pfad",
-    "aligned": "Gewicht paralleler Pfade",
-    "alternate_hazard": "Gewicht alternativer Klimatreiber",
-    "alternate_exposure": "Gewicht alternativer Exposition",
-    "alternate_vulnerability": "Gewicht alternativer Sensitivität",
-    "compound_he": "Gewicht verbundener H·E-Pfade",
-    "compound_hv": "Gewicht verbundener H·V-Pfade",
-    "compound_ev": "Gewicht verbundener E·V-Pfade",
-    "compound_multi": "Gewicht Compound-Pfade",
-}
+# Hinweis: Die Pfadgewichte (catalog.PATHWAY_WEIGHTS) werden bewusst NICHT mehr als
+# Parameter emittiert — die Engine liest sie beim Import fest ein (risk_engine._PATHWAYS),
+# ein Override wäre wirkungslos (toter Parameter). Sie bleiben Modellkonstanten des Katalogs.
 
 # Symmetrisches CAPEX/OPEX-Kostenmodell (je fix/Stück/Fläche) + Wirkungs-/Dichte-Parameter.
 MEASURE_PARAM_SPECS: tuple[tuple[str, str, str], ...] = (
@@ -164,32 +156,24 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                     references=sources.resolve(m.get("source_refs")),
                 ))
 
-    for ptype, label in PATHWAY_WEIGHT_LABELS.items():
-        if layer_category and layer_category != "risks":
-            continue
-        if layer_code and layer_category != "risks":
-            continue
-        val = float(catalog.PATHWAY_WEIGHTS.get(ptype, 0.0))
-        params.append(_base_param(
-            f"pathway_weights.{ptype}",
-            layer_code="", layer_category="model",
-            label=label,
-            value=val,
-            unit="Gewicht",
-            source=catalog.PATHWAY_WEIGHT_SOURCE,
-            source_detail=getattr(catalog, "PATHWAY_WEIGHT_SOURCE_DETAIL", ""),
-        ))
-
     for code, recipe in formulas.DETAILED.items():
         cat = "hazards" if code in catalog.HAZARDS_BY_CODE else (
             "exposures" if code in catalog.EXPOSURES_BY_CODE else "vulnerabilities"
         )
-        if not match(code, cat):
+        # Bei Risiko-Filter ebenfalls mitliefern: Risiko-Wirkungsdiagramme betten die
+        # H/E/V-Teilbäume samt deren Rezeptparametern ein.
+        if not match(code, cat) and layer_category != "risks":
             continue
         for inp in recipe.get("inputs", []):
             if inp.get("prov") != "param":
                 continue
-            if "value" not in inp:
+            # Nur explizit als override-fähig markierte Formel-Parameter emittieren
+            # (formulas._i(..., overridable=True)): alle anderen ``param``-Inputs sind
+            # in indicators.py fest verdrahtete Literale — als editierbare Parameter
+            # wären sie wirkungslos (tote Parameter).
+            if not inp.get("overridable"):
+                continue
+            if inp.get("value") is None:
                 continue
             key = inp.get("key", "value")
             params.append(_base_param(
@@ -227,12 +211,19 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 applicable=applicable,
             ))
 
-    uhi_defaults = {"alpha": 6.0, "beta": 2.0, "gamma": 3.5, "delta": 2.0}
+    def emit_globals(cat: str) -> bool:
+        """Layer-lose Parametergruppen: ohne Filter immer, mit Kategorie-Filter passend."""
+        return not layer_code and (layer_category is None or layer_category == cat)
+
+    uhi_defaults = {"alpha": 6.0, "beta": 2.0, "gamma": 3.5, "delta": 2.0,
+                    "epsilon": 1.5, "tree_cooling": 0.3}
     uhi_labels = {
         "alpha": "UHI-Koeffizient α",
         "beta": "UHI-Koeffizient β",
         "gamma": "UHI-Koeffizient γ",
         "delta": "UHI-Koeffizient δ",
+        "epsilon": "UHI-Koeffizient ε (Straßenschluchten)",
+        "tree_cooling": "UHI-Koeffizient Baumkronen-Kühlung",
     }
     uhi_details = {
         "alpha": "Skaliert den Versiegelungs-/Bebauungsbeitrag zur Wärmeinselintensität. "
@@ -248,8 +239,17 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
         "delta": "Gewichtet die Belüftung/Kaltluftzufuhr (Frischluftschneisen). "
             "Qualitativ belegt durch VDI 3787 Bl.1 (Stadtklima/Kaltluft). Dokumentierte "
             "Modellwahl, editierbar.",
+        "epsilon": "Skaliert den Straßenschluchten-Beitrag: ΔT-Zuschlag ∝ (1 − Sky-View-"
+            "Faktor) · Gebäudehöhenfaktor. Die Schluchtengeometrie (Sky-View) ist der "
+            "klassische Treiber der nächtlichen UHI (Oke 1982, canyon geometry; VDI 3787 "
+            "Bl.1). Dokumentierte Modellwahl im belegten Wirkbereich, editierbar.",
+        "tree_cooling": "Kühlwirkung des Baumkronenanteils: ΔT-Abschlag = Koeffizient · "
+            "Kronenanteil · 10 (d. h. 0,3 K je 10 % Kronenschluss). Größenordnung aus der "
+            "Stadtbaum-/Beschattungsliteratur: dichte Kronen senken die lokale Lufttemperatur "
+            "um ~1-3 K (VDI 3787 Bl.1; Stewart & Oke 2012). Dokumentierte Modellwahl, "
+            "editierbar.",
     }
-    if not layer_code and not layer_category:
+    if emit_globals("uhi"):
         for key, val in uhi_defaults.items():
             params.append(_base_param(
                 f"uhi.{key}",
@@ -261,12 +261,45 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source_detail=uhi_details[key],
                 references=sources.resolve(["VDI3787_Stadtklima", "StewartOke_LCZ_2012"]),
             ))
-        # Globale Schicht-B-Parameter (Assetwerte, k_indirekt, Kurvenexponent).
+
+    # Globale Schicht-B-Parameter (Assetwerte, k_indirekt, Kurvenexponent): auch bei
+    # Risiko-Layer-Filter mitliefern — das Wirkungsdiagramm referenziert sie als
+    # editierbare Parameterknoten (impact.<key>) im Schicht-B-Zweig.
+    if emit_globals("impact") or layer_category == "risks":
         for spec in IMPACT_GLOBAL_SPECS:
             params.append(_base_param(
                 f"impact.{spec['key']}",
                 layer_code="", layer_category="impact",
                 label=f"Schadensfunktion: {spec['label']}",
+                value=spec["value"],
+                unit=spec.get("unit", ""),
+                source=spec.get("source", ""),
+                source_detail=spec.get("source_detail", ""),
+                references=sources.resolve(spec.get("source_refs")),
+            ))
+
+    # Modellweite Stellschrauben (Referenzskalierung, Risikozonen-Schwelle,
+    # Maßnahmen-Sättigung/-Kappung) — Single Source: engine/tunables.py.
+    if emit_globals("model"):
+        for spec in tunables.MODEL_PARAM_SPECS:
+            params.append(_base_param(
+                f"model.{spec['key']}",
+                layer_code="", layer_category="model",
+                label=spec["label"],
+                value=spec["value"],
+                unit=spec.get("unit", ""),
+                source=spec.get("source", ""),
+                source_detail=spec.get("source_detail", ""),
+                references=sources.resolve(spec.get("source_refs")),
+            ))
+
+    # Regionale Proxy-/Fallback-Klimatreiber (inputs.build_regional_context).
+    if emit_globals("regional"):
+        for spec in tunables.REGIONAL_FALLBACK_SPECS:
+            params.append(_base_param(
+                f"regional.{spec['key']}",
+                layer_code="", layer_category="regional",
+                label=spec["label"],
                 value=spec["value"],
                 unit=spec.get("unit", ""),
                 source=spec.get("source", ""),

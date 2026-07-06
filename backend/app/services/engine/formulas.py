@@ -10,10 +10,18 @@ from __future__ import annotations
 from typing import Any
 
 from app.data import catalog
+from app.services.engine import tunables
 
 EXTERN = "extern"
 PARAM = "param"
 COMPUTED = "computed"
+
+
+def _fmt_de(n: float) -> str:
+    """Ganzzahlen mit Tausenderpunkt (deutsch), sonst Komma-Dezimal."""
+    if float(int(n)) == float(n):
+        return f"{int(n):,}".replace(",", ".")
+    return f"{n}".replace(".", ",")
 
 
 def _i(
@@ -26,6 +34,9 @@ def _i(
     coastal_only: bool = False,
     coastal_split: tuple[Any, Any] | None = None,
     doc_source: str | None = None,
+    overridable: bool = False,
+    source_detail: str = "",
+    source_refs: list[str] | None = None,
 ) -> dict:
     d: dict = {
         "key": key,
@@ -43,6 +54,15 @@ def _i(
         # Anzeigbare Herkunft für die Parameter-Registry (``source`` steuert die
         # Wertauflösung in ``_resolve_single`` und ist dafür reserviert).
         d["doc_source"] = doc_source
+    if overridable:
+        # Nur Inputs mit diesem Flag werden als editierbare Registry-Parameter emittiert.
+        # Es darf ausschließlich dort gesetzt sein, wo indicators.py den Wert tatsächlich
+        # per get_override liest — sonst entstünde ein wirkungsloser "toter" Parameter.
+        d["overridable"] = True
+    if source_detail:
+        d["source_detail"] = source_detail
+    if source_refs:
+        d["source_refs"] = source_refs
     return d
 
 
@@ -70,6 +90,15 @@ _COMPUTED_RESOLVERS: dict[str, Any] = {
     "pop_density": _computed_pop_density,
 }
 
+
+# Gemeinsame Herleitung der KRITIS-Sektorgewichte (INFRA_CRITICALITY).
+_KRITIS_W_DETAIL = (
+    "Relative Priorisierung der KRITIS-Sektoren nach der BBK-Sektorenlogik (KRITIS-"
+    "Dachgesetz/BBK-Sektorenübersicht): Die Zell-Kritikalität ist die gewichtete Summe der "
+    "OSM-gezählten Anlagen je Sektor, gekappt bei 100. Die Gewichte (Skala ~1–10) sind eine "
+    "dokumentierte Modellwahl auf Basis der BBK-Einstufung, keine amtliche Quantifizierung — "
+    "das BBK publiziert Sektoren und Schutzziele, aber keine numerischen Gewichte; editierbar."
+)
 
 # ── Detaillierte Rezepte (abgeleitet aus indicators.py) ───────────────────────
 
@@ -132,7 +161,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "HEAVY_RAIN_FLOOD": {
-        "formula": "clamp(Starkregen · (0,4+Versieg.) · TWI · Senke ; 0…100)",
+        "formula": "clamp(Starkregen · (0,4 + Versiegelung) · TWI · Senke ; 0…100)",
         "inputs": [
             _i("heavy_rain_index", "Starkregenindex (DWD)", EXTERN, "Index", "regional"),
             _i("imp_frac", "Versiegelungsgrad (OSM)", EXTERN, "", "cell"),
@@ -197,7 +226,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "COMPOUND_EVENT": {
-        "formula": "max(norm(Hitze), norm(Dürre), norm(Starkregen))",
+        "formula": "max(Hitze; Dürre; Starkregen) — jeweils normiert 0…1",
         "inputs": [
             _i("heat_wave", "Hitzeextreme (berechnet)", COMPUTED, "Tage", "hev", "HEAT_WAVE"),
             _i("drought", "Dürren (berechnet)", COMPUTED, "Tage", "hev", "DROUGHT"),
@@ -216,7 +245,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "LOW_FLOW_NIEDRIGWASSER": {
-        "formula": "clamp(Niedrigwasser · (0,6+0,4·Trocken) · (1+0,3·Gewässernähe) ; 0…60)",
+        "formula": "clamp(Niedrigwasser · (0,6 + 0,4·Trockenheit) · (1 + 0,3·Gewässernähe) ; 0…60)",
         "inputs": [
             _i("low_flow_days", "Niedrigwasser-Tage (PEGELONLINE, nächster Pegel)", EXTERN, "Tage", "regional"),
             _i("dry_index", "Trockenheitsindex", EXTERN, "", "regional"),
@@ -292,7 +321,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "HEALTHCARE_INFRASTRUCTURE": {
-        "formula": "100 · (0,5·prox(KH) + 0,35·prox(Arzt) + 0,15·prox(Apo))",
+        "formula": "100 · (0,5·Nähe(Krankenhaus) + 0,35·Nähe(Arzt) + 0,15·Nähe(Apotheke))",
         "inputs": [
             _i("healthcare_access_score", "Erreichbarkeits-Score (OSM)", EXTERN, "", "cell"),
             _i("dist_hospital_m", "Distanz Krankenhaus (OSM)", EXTERN, "m", "cell"),
@@ -390,7 +419,7 @@ DETAILED: dict[str, dict] = {
     },
     # Vulnerabilities
     "BUILDING_STABILITY": {
-        "formula": "clamp(50 + Gebäude·20 + (10 wenn H>18m) + Altersfaktor ; 0…100)",
+        "formula": "clamp(50 + Gebäudeanteil·20 + (10 wenn Höhe > 18 m) + Altersfaktor ; 0…100)",
         "inputs": [
             _i("bldg_cov", "Gebäudeanteil (OSM)", EXTERN, "", "cell"),
             _i("avg_height", "Ø Gebäudehöhe (OSM)", EXTERN, "m", "cell"),
@@ -418,7 +447,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "HEALTHCARE_ACCESS": {
-        "formula": "100 · (1 − (0,5·prox(KH) + 0,35·prox(Arzt) + 0,15·prox(Apo)))",
+        "formula": "100 · (1 − (0,5·Nähe(Krankenhaus) + 0,35·Nähe(Arzt) + 0,15·Nähe(Apotheke)))",
         "inputs": [
             _i("healthcare_access_score", "Erreichbarkeits-Score (OSM)", EXTERN, "", "cell"),
             _i("dist_hospital_m", "Distanz Krankenhaus × 1,3 (OSM)", EXTERN, "m", "cell"),
@@ -461,22 +490,46 @@ DETAILED: dict[str, dict] = {
             _i("financial_adaptation", "Sozioökonomie-Index (BBSR INKAR)", EXTERN, "Index", "socio"),
             _i("__const", "Finanzielle Kapazität (invers, Fallback)", PARAM, "Index", "const", 50.0,
                doc_source="BBSR INKAR / Regionalstatistik (per AGS); "
-                          "Fallback: Modellannahme (mangels lokaler Daten)"),
+                          "Fallback: Modellannahme (mangels lokaler Daten)",
+               overridable=True, source_refs=["BBSR_INKAR"],
+               source_detail="Vulnerabilität (invers: hoch = geringe Kapazität) aus BBSR-"
+               "INKAR-Sozioökonomie je Gemeinde (Steuerkraft, Arbeitslosigkeit). Der Wert 50 "
+               "ist der NEUTRALE Fallback der 0–100-Skala, wenn für die Kommune keine INKAR-"
+               "Kennzahlen auflösbar sind (Skalenmitte = keine Aussage nach oben oder unten). "
+               "Ein Override ersetzt in allen Zellen auch den INKAR-abgeleiteten Wert "
+               "(Reihenfolge: Override > Ableitung > Fallback)."),
         ],
     },
     "INFRA_CRITICALITY": {
-        "formula": "clamp(w_E·Energie + w_W·Wasser + w_K·Komm + w_G·Gesundheit + w_V·Verkehr ; 0…100)",
+        "formula": "clamp(w_E·Energie + w_W·Wasser + w_K·Kommunikation + w_G·Gesundheit + w_V·Verkehr ; 0…100)",
         "inputs": [
             _i("energy_infra_count", "Energieinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
             _i("water_wastewater_count", "Wasser/Abwasser (OSM)", EXTERN, "Anzahl", "cell"),
             _i("communication_count", "Kommunikationsinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
             _i("healthcare_access_score", "Gesundheits-Erreichbarkeit (OSM)", EXTERN, "", "cell"),
             _i("transport_hub_count", "Verkehrsknoten (OSM)", EXTERN, "Anzahl", "cell"),
-            _i("w_energy", "Gewicht Energie (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 8.0),
-            _i("w_water", "Gewicht Wasser (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 8.0),
-            _i("w_comm", "Gewicht IT/TK (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 6.0),
-            _i("w_health", "Gewicht Gesundheit (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 10.0),
-            _i("w_transport", "Gewicht Verkehr (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 6.0),
+            _i("w_energy", "Gewicht Energie (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 8.0,
+               overridable=True, source_refs=["BBK_KRITIS"],
+               source_detail=_KRITIS_W_DETAIL + " Energie: hohes Gewicht (8), da Strom-/"
+               "Gasausfall unmittelbar alle anderen Sektoren kaskadiert (BBK-Leitszenario "
+               "Stromausfall)."),
+            _i("w_water", "Gewicht Wasser (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 8.0,
+               overridable=True, source_refs=["BBK_KRITIS"],
+               source_detail=_KRITIS_W_DETAIL + " Wasser/Abwasser: hohes Gewicht (8), "
+               "lebensnotwendige Grundversorgung ohne kurzfristigen Ersatz."),
+            _i("w_comm", "Gewicht IT/TK (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 6.0,
+               overridable=True, source_refs=["BBK_KRITIS"],
+               source_detail=_KRITIS_W_DETAIL + " IT/Telekommunikation: mittleres Gewicht (6), "
+               "kritisch für Koordination/Warnung, aber mit Teil-Redundanzen (Mobilfunk/"
+               "Festnetz/Behördenfunk)."),
+            _i("w_health", "Gewicht Gesundheit (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 10.0,
+               overridable=True, source_refs=["BBK_KRITIS"],
+               source_detail=_KRITIS_W_DETAIL + " Gesundheit: höchstes Gewicht (10), direkter "
+               "Lebensschutz (Krankenhäuser/Pflege) ohne Substitutionsmöglichkeit im Ereignisfall."),
+            _i("w_transport", "Gewicht Verkehr (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 6.0,
+               overridable=True, source_refs=["BBK_KRITIS"],
+               source_detail=_KRITIS_W_DETAIL + " Transport/Verkehr: mittleres Gewicht (6), "
+               "wichtig für Erreichbarkeit/Evakuierung, aber räumlich meist umfahrbar."),
         ],
     },
     "REDUNDANCY_BACKUP": {
@@ -503,7 +556,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "DISEASE_VECTOR_SUSCEPTIBILITY": {
-        "formula": "clamp(Wasser · 100 · Mitteltemp/12 ; 0…100)",
+        "formula": "clamp(Wasser · 100 · Mitteltemperatur/12 ; 0…100)",
         "inputs": [
             _i("water_frac", "Wasseranteil (OSM)", EXTERN, "", "cell"),
             _i("mean_temp", "Jahresmitteltemperatur (DWD)", EXTERN, "°C", "regional"),
@@ -517,7 +570,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "WATER_STRESS_INDEX": {
-        "formula": "clamp(Versieg.·40 + Bev.dichte/4000·40 + Trocken·20 ; 0…100)",
+        "formula": "clamp(Versiegelung·40 + (Bevölkerungsdichte/4.000)·40 + Trockenheit·20 ; 0…100)",
         "inputs": [
             _i("imp_frac", "Versiegelungsgrad (OSM)", EXTERN, "", "cell"),
             _i("pop_density", "Bevölkerungsdichte", COMPUTED, "Pers./km²", "computed", "pop_density"),
@@ -543,8 +596,17 @@ DETAILED: dict[str, dict] = {
         "inputs": [
             _i("dyke_prox", "Nähe Deich/Damm (OSM man_made=dyke/embankment)", EXTERN, "", "cell"),
             _i("water_prox", "Gewässernähe", EXTERN, "", "cell"),
-            _i("__const", "Deichzustand (invers, Basis-Fallback)", PARAM, "Index", "const", None,
-               coastal_split=(50.0, 30.0), doc_source="OSM man_made=dyke/embankment"),
+            # value=30.0 (Binnen-Basis) statt None: der Registry-Parameter braucht einen
+            # anzeigbaren Default; die Karten-Tooltips lösen weiterhin über coastal_split auf.
+            _i("__const", "Deichzustand (invers, Basis-Fallback)", PARAM, "Index", "const", 30.0,
+               coastal_split=(50.0, 30.0), doc_source="OSM man_made=dyke/embankment",
+               overridable=True, source_refs=["OSM_Data"],
+               source_detail="Basiswert des (inversen) Deichzustands-Index ohne lokale "
+               "Deichdaten: 30 im Binnenland, 50 an der Küste (coastal_split; angezeigt wird "
+               "die Binnen-Basis). Ortsaufgelöst wird der Wert aus OSM man_made=dyke/"
+               "embankment und der Hochwasserexposition der Zelle moduliert (Basis + "
+               "40·Exposition·(1−Deichnähe) − 25·Deichnähe). Ein Override ersetzt den Wert "
+               "in ALLEN Zellen — auch die OSM-Ableitung und den Küstenaufschlag."),
         ],
     },
     "SALTWATER_INTRUSION_RISK": {
@@ -564,11 +626,18 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("green_frac", "Grünanteil (OSM)", EXTERN, "", "cell")],
     },
     "EARLY_WARNING_SYSTEMS": {
-        "formula": "50 + (EMERGENCY − 50)·0,6 (OSM-Notfall-Proxy, gedämpft); Fallback 40",
+        "formula": "clamp(50 + (Katastrophenschutz − 50)·0,6 ; 0…100); Fallback 40",
         "inputs": [
             _i("emergency_access_score", "Nähe Feuerwehr/Rettung (OSM, Proxy)", EXTERN, "", "cell"),
             _i("__const", "Frühwarnsysteme (invers, Fallback)", PARAM, "Index", "const", 40.0,
-               doc_source="OSM amenity=fire_station / emergency=* (Proxy)"),
+               doc_source="OSM amenity=fire_station / emergency=* (Proxy)",
+               overridable=True, source_refs=["OSM_Data"],
+               source_detail="Vulnerabilität (invers: hoch = schwache Frühwarnung) aus dem "
+               "OSM-Notfall-Proxy, zur Skalenmitte 50 gedämpft (Faktor 0,6), weil Feuerwehr-"
+               "Nähe Frühwarnsysteme (Sirenen, Warn-Apps, Pegelmessnetze) nur schwach "
+               "abbildet. Der Wert 40 ist der Fallback ohne OSM-Notfalldaten: leicht besser "
+               "als neutral (50), da Deutschland flächendeckend über MoWaS/Cell Broadcast/"
+               "Sirenen grundversorgt ist. Ein Override ersetzt den Wert in allen Zellen."),
         ],
     },
     "EMERGENCY_MANAGEMENT": {
@@ -576,7 +645,14 @@ DETAILED: dict[str, dict] = {
         "inputs": [
             _i("emergency_access_score", "Nähe Feuerwehr/Rettung (OSM)", EXTERN, "", "cell"),
             _i("__const", "Katastrophenschutz (invers, Fallback)", PARAM, "Index", "const", 40.0,
-               doc_source="OSM amenity=fire_station / emergency=*"),
+               doc_source="OSM amenity=fire_station / emergency=*",
+               overridable=True, source_refs=["OSM_Data"],
+               source_detail="Vulnerabilität (invers: hoch = schwacher Katastrophenschutz) "
+               "aus der OSM-Erreichbarkeit von Feuerwehr/Rettungsdiensten je Zelle "
+               "(100·(1−Erreichbarkeit)). Der Wert 40 ist der Fallback ohne OSM-Notfall-"
+               "daten: leicht besser als neutral (50) wegen des flächendeckenden deutschen "
+               "Feuerwehrsystems (~95 % der Bevölkerung in <10 min Hilfsfrist erreichbar). "
+               "Ein Override ersetzt den Wert in allen Zellen."),
         ],
     },
     "PLANNING_IMPLEMENTATION_CAPACITY": {
@@ -585,7 +661,13 @@ DETAILED: dict[str, dict] = {
             _i("planning_capacity", "Finanzkraft-Index (BBSR INKAR)", EXTERN, "Index", "socio"),
             _i("__const", "Planungskapazität (invers, Fallback)", PARAM, "Index", "const", 50.0,
                doc_source="BBSR INKAR / Regionalstatistik (per AGS); "
-                          "Fallback: Modellannahme (mangels lokaler Daten)"),
+                          "Fallback: Modellannahme (mangels lokaler Daten)",
+               overridable=True, source_refs=["BBSR_INKAR"],
+               source_detail="Vulnerabilität (invers: hoch = geringe Planungs-/Umsetzungs-"
+               "kapazität) aus der BBSR-INKAR-Finanzkraft (Steuerkraft je Einwohner) der "
+               "Gemeinde. Der Wert 50 ist der NEUTRALE Fallback der 0–100-Skala ohne "
+               "auflösbare INKAR-Kennzahl (Skalenmitte = keine Aussage). Ein Override "
+               "ersetzt in allen Zellen auch den INKAR-abgeleiteten Wert."),
         ],
     },
     "FISHERIES_TEMPERATURE_SENSITIVITY": {
@@ -777,7 +859,8 @@ def _outcome_factor_meta(risk: dict) -> list[dict]:
         ref_source = (
             "Schadenskosten-Schätzung (Risikokatalog)"
             if is_monetary
-            else "Referenz-Outcome bei Index 100 / 100.000 Ew. (Risikokatalog)"
+            else ("Referenz-Outcome bei Index 100 / "
+                  f"{_fmt_de(tunables.effective_ref_population())} Ew. (Risikokatalog)")
         )
         ref_label = "Referenzwert (Index = 100)"
     factors: list[dict] = [{
@@ -795,7 +878,7 @@ def _outcome_factor_meta(risk: dict) -> list[dict]:
         factors.append({
             "key": "scale_factor",
             "label": "Bevölkerungsfaktor",
-            "formula": "Einwohner_zelle / 100.000",
+            "formula": f"Einwohner_zelle / {_fmt_de(tunables.effective_ref_population())}",
             "source": "Zensus / OSM (räumlich aufgelöst)",
             "prov": "extern",
         })
@@ -803,7 +886,7 @@ def _outcome_factor_meta(risk: dict) -> list[dict]:
         factors.append({
             "key": "scale_factor",
             "label": "Flächenfaktor",
-            "formula": "Zellfläche / 50 km²",
+            "formula": f"Zellfläche / {_fmt_de(tunables.effective_ref_area_km2())} km²",
             "source": "Rastergeometrie (100 × 100 m)",
             "prov": "computed",
         })
@@ -832,23 +915,38 @@ def risk_recipe(risk: dict) -> dict:
         else "Index = 0"
     )
     from app.services.engine import impact
-    if impact.has(risk["code"]):
+    kind = impact.lineage_kind(risk)
+    if kind == "health":
         outcome = (
-            f"Outcome = Schadensfunktion je Zelle (Betroffene · Rate · Dosis-Wirkung · g(V̂)), "
-            f"summiert über Zellen  →  {unit}. Der Index bleibt Screening-Kennzahl."
+            f"Outcome = Betroffene · Rate · Treiber(AF/Intensität) · g(V̂), Σ Zellen"
+            f"  →  {unit};  € = Outcome × Kostensatz. Der Index bleibt Screening-Kennzahl."
         )
-    elif scale == "pop":
+    elif kind == "environment":
         outcome = (
-            f"Outcome = Referenz · (Index/100) · (Einwohner_zelle/100.000)"
-            f"  →  {unit}"
+            f"Outcome = exponierte Fläche · Verlustrate · Intensität · g(V̂), Σ Zellen"
+            f"  →  {unit};  € = Outcome × Kostensatz. Der Index bleibt Screening-Kennzahl."
         )
-    elif scale == "area":
+    elif kind == "monetary":
         outcome = (
-            f"Outcome = Referenz · (Index/100) · (Zellfläche/50 km²)"
-            f"  →  {unit}"
+            "€ = Assetwert · Verlustrate · Schadenskurve(Intensität) · g(V̂), Σ Zellen. "
+            "Der Index bleibt Screening-Kennzahl."
         )
-    else:
-        outcome = f"Outcome = Referenz · (Index/100)  →  {unit}"
+    elif kind == "indirect":
+        outcome = "€ = k_indirekt · Σ direkte Sektorschäden (konsolidierte Folgekosten)."
+    elif kind == "restoration":
+        outcome = (
+            "€ = Restaurierungsquote · Σ direkte Sektorschäden — Teilkennzahl, "
+            "nicht additiv zur Gesamtsumme."
+        )
+    elif kind == "consolidated_zero":
+        outcome = "0 € — in k_indirekt (Indirekte wirtschaftliche Verluste) konsolidiert."
+    elif kind == "index_only":
+        outcome = "Kein €-Outcome: reines Screening (Index), Doppelzählung vermieden."
+    else:   # flat
+        outcome = (
+            f"Outcome = Referenz · (P90-Index/100), kommunenweit  →  {unit};  "
+            f"€ = Outcome × Kostensatz × Einwohner/{_fmt_de(tunables.effective_ref_population())}."
+        )
     return {
         "formula_index": formula_index,
         "formula_index_header": (

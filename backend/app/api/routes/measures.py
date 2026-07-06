@@ -7,6 +7,7 @@ from app.db.database import get_db
 from app.models.models import AdaptationMeasure, MeasureImpact
 from app.schemas.schemas import MeasureCreate, MeasureUpdate
 from app.services.measure_service import compute_impact
+from app.services import aggregate_cache
 from app.data import catalog
 
 router = APIRouter()
@@ -91,6 +92,7 @@ def create_measure(
     db.commit()
     db.refresh(measure)
 
+    aggregate_cache.invalidate(kommune_id)
     return _measure_to_dict(measure)
 
 
@@ -132,6 +134,7 @@ def update_measure(measure_id: int, data: MeasureUpdate, db: Session = Depends(g
 
     db.commit()
     db.refresh(measure)
+    aggregate_cache.invalidate(measure.kommune_id)
     return _measure_to_dict(measure)
 
 
@@ -140,18 +143,24 @@ def delete_measure(measure_id: int, db: Session = Depends(get_db)):
     measure = db.query(AdaptationMeasure).filter(AdaptationMeasure.id == measure_id).first()
     if not measure:
         raise HTTPException(404, "Maßnahme nicht gefunden")
+    kommune_id = measure.kommune_id
     db.delete(measure)
     db.commit()
+    aggregate_cache.invalidate(kommune_id)
     return {"message": "Maßnahme gelöscht"}
 
 
 @router.post("/measures/{measure_id}/calculate-impact")
 def calculate_impact(measure_id: int, db: Session = Depends(get_db)):
     """Calculate the climate impact of a measure."""
+    measure = db.query(AdaptationMeasure).filter(AdaptationMeasure.id == measure_id).first()
+    if not measure:
+        raise HTTPException(404, "Maßnahme nicht gefunden")
     try:
         result = compute_impact(db, measure_id)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
+    aggregate_cache.invalidate(measure.kommune_id)
     return result
 
 

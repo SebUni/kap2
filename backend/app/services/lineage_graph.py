@@ -9,6 +9,16 @@ from app.data.lineage_operators import CELL_DIRECT, CELL_OPERATORS, formula_oper
 from app.data.pathway_descriptions import chain_label, get_pathway_description
 from app.services.engine import formulas
 from app.services.engine.formulas import risk_pathway_meta, risk_recipe
+from app.services.engine.impact.environment import LINEAGE_SPECS as ENV_SPECS
+from app.services.engine.impact.health import LINEAGE_SPECS as HEALTH_SPECS
+from app.services.engine.impact.monetary import LINEAGE_SPECS as MONETARY_SPECS
+from app.services.engine.impact.params import IMPACT_GLOBAL_SPECS, IMPACT_PARAM_SPECS
+
+# Label/Einheit/Quelle der Schicht-B-Parameter für die Parameterknoten im Diagramm
+_IMPACT_PARAM_BY_KEY: dict[tuple[str, str], dict] = {
+    (s["risk"], s["key"]): s for s in IMPACT_PARAM_SPECS
+}
+_IMPACT_GLOBAL_BY_KEY: dict[str, dict] = {s["key"]: s for s in IMPACT_GLOBAL_SPECS}
 
 # ── Kanonische Quellen ────────────────────────────────────────────────────────
 
@@ -67,6 +77,22 @@ INTERMEDIATE_LABELS: dict[str, str] = {
     "snow_days": "Schneedeckentage",
     "mean_temp": "Jahresmitteltemperatur",
     "sea_level_rise": "Meeresspiegelanstieg",
+    "area_m2": "Zellfläche (m²)",
+    "share_over_65": "Anteil ≥ 65 Jahre",
+    "share_under_18": "Anteil < 18 Jahre",
+    "living_area_per_person": "Wohnfläche je Person",
+    "owner_share": "Eigentümerquote",
+    "net_cold_rent": "Nettokaltmiete",
+    "building_age_mean": "Mittleres Gebäudealter",
+    "dist_hospital_m": "Distanz Krankenhaus",
+    "dist_doctor_m": "Distanz Arzt/Klinik",
+    "dist_pharmacy_m": "Distanz Apotheke",
+    "dyke_prox": "Deichnähe",
+    "emergency_access_score": "Notfall-Erreichbarkeit",
+    "bldg_count": "Gebäudeanzahl",
+    "energy_infra_count": "Energieanlagen (Anzahl)",
+    "water_wastewater_count": "Wasser-/Abwasseranlagen (Anzahl)",
+    "communication_count": "Kommunikationsanlagen (Anzahl)",
 }
 
 # cell_key → (intermediate_keys, source_ids)
@@ -94,8 +120,9 @@ CELL_INPUT_LINEAGE: dict[str, tuple[list[str], list[str]]] = {
         ["bldg_cov", "road_cov", "green_frac", "forest_frac", "water_frac", "canopy_frac", "svf"],
         ["osm", "param"],
     ),
-    "slope_factor": (["slope_deg", "vent_score"], ["dem", "osm"]),
-    "slope_proxy": (["slope_deg", "vent_score"], ["dem", "osm"]),
+    # Quellen fließen über die Teil-Zwischenwerte (slope_deg ← DEM, vent_score ← OSM)
+    "slope_factor": (["slope_deg", "vent_score"], []),
+    "slope_proxy": (["slope_deg", "vent_score"], []),
     "slope_deg": ([], ["dem"]),
     "vent_score": ([], ["osm"]),
     "mean_elevation_m": ([], ["dem"]),
@@ -122,6 +149,18 @@ CELL_INPUT_LINEAGE: dict[str, tuple[list[str], list[str]]] = {
     "snow_decline_rate_pct": ([], ["dwd"]),
     "snow_days": ([], ["dwd"]),
     "sea_level_rise": ([], ["bsh"]),
+    "area_m2": ([], []),
+    "share_over_65": ([], ["zensus"]),
+    "share_under_18": ([], ["zensus"]),
+    "living_area_per_person": ([], ["zensus"]),
+    "owner_share": ([], ["zensus"]),
+    "net_cold_rent": ([], ["zensus"]),
+    "building_age_mean": ([], ["zensus"]),
+    "dist_hospital_m": ([], ["osm"]),
+    "dist_doctor_m": ([], ["osm"]),
+    "dist_pharmacy_m": ([], ["osm"]),
+    "dyke_prox": ([], ["osm"]),
+    "emergency_access_score": ([], ["osm"]),
 }
 
 # Kurzbeschreibung, wie Zwischenwerte aus Eingaben berechnet werden
@@ -172,6 +211,18 @@ INTERMEDIATE_TOOLTIPS: dict[str, str] = {
     "snow_decline_rate_pct": "Trend Schneedecken-Rückgang (DWD, regional).",
     "snow_days": "Schneedeckentage pro Jahr (DWD, regional).",
     "sea_level_rise": "Meeresspiegelanstieg (BSH, regional).",
+    "area_m2": "Zellfläche in m² aus der Rastergeometrie (100 × 100 m).",
+    "share_over_65": "Anteil der Bevölkerung ab 65 Jahren (Zensus-Raster).",
+    "share_under_18": "Anteil der Bevölkerung unter 18 Jahren (Zensus-Raster).",
+    "living_area_per_person": "Wohnfläche je Person (Zensus-Raster).",
+    "owner_share": "Eigentümerquote der Wohnungen (Zensus-Raster).",
+    "net_cold_rent": "Mittlere Nettokaltmiete (Zensus-Raster).",
+    "building_age_mean": "Mittleres Gebäudealter (Zensus-/OSM-Daten).",
+    "dist_hospital_m": "Distanz zum nächsten Krankenhaus in Metern (OSM).",
+    "dist_doctor_m": "Distanz zur nächsten Arztpraxis/Klinik in Metern (OSM).",
+    "dist_pharmacy_m": "Distanz zur nächsten Apotheke in Metern (OSM).",
+    "dyke_prox": "Nähe-Score zu Deich-/Küstenschutzanlagen aus der Distanz (OSM).",
+    "emergency_access_score": "Erreichbarkeit von Feuerwehr/Rettung als Score aus der Distanz (OSM).",
 }
 
 COMPUTED_TOOLTIPS: dict[str, str] = {
@@ -186,6 +237,14 @@ COMPUTED_RESOLVER_LINEAGE: dict[str, tuple[list[str], list[str]]] = {
     "area_ha": ([], []),
     "area_km2": ([], []),
     "pop_density": (["pop", "area_km2"], ["zensus"]),
+}
+
+# Benannte Modellparameter, die als "param"-Quelle in CELL_INPUT_LINEAGE auftauchen
+CELL_PARAM_LABELS: dict[str, tuple[str, str]] = {
+    "uhi_delta": (
+        "UHI-Koeffizienten (α, β, γ, δ)",
+        "VDI 3787 Bl.1 / Oke 1982 — editierbar in der Konfiguration (uhi.*)",
+    ),
 }
 
 COLLAPSE_GROUPS = [
@@ -275,6 +334,22 @@ class LineageBuilder:
         for i, step in enumerate(steps):
             op_id = f"op:{step['op_kind']}:{prefix}:{i}"
             _add_operator_compute(self, op_id, step)
+            # Skalierungs-Konstanten ohne Registry-Parameter sind am Operator
+            # nicht editierbar — der Faktor erscheint deshalb als benannter
+            # (schreibgeschützter) Parameterknoten vor dem Operator.
+            if (
+                step.get("op_kind") in ("scaling", "scale_factor")
+                and not step.get("parameter_id")
+            ):
+                factor = step.get("value", step.get("factor"))
+                if factor is not None:
+                    pnid = self.ensure_const_parameter(
+                        f"const:{prefix}:{i}",
+                        step.get("param_label") or "Skalierungsfaktor",
+                        value=factor, unit=step.get("unit", "×"),
+                        source="Modellkonstante (fest im Rechenmodell verdrahtet)",
+                    )
+                    self.add_edge(pnid, op_id)
             input_keys = step.get("input_keys")
 
             if input_keys:
@@ -321,6 +396,34 @@ class LineageBuilder:
         )
         return nid
 
+    def ensure_const_parameter(
+        self,
+        node_key: str,
+        label: str,
+        *,
+        value: Any = None,
+        unit: str = "",
+        source: str = "",
+        parameter_id: str | None = None,
+    ) -> str:
+        """Benannter Parameterknoten für Modellkonstanten.
+
+        Zeigt Namen + Wert im Diagramm; editierbar nur, wenn eine
+        ``parameter_id`` auf einen Registry-Parameter verweist (override-fähig).
+        """
+        nid = f"src:param:{node_key}"
+        meta: dict[str, Any] = {
+            "unit": unit,
+            "description": source or "Modellannahme",
+            "prov": "param",
+        }
+        if parameter_id:
+            meta["parameter_id"] = parameter_id
+        if value is not None:
+            meta["value"] = value
+        self.add_node(nid, "parameter", label, column=0, collapse_group="sources", meta=meta)
+        return nid
+
     def expand_cell_key(self, key: str, *, _visited: set[str] | None = None) -> str:
         """Expandiert Zell-Schlüssel → Zwischenknoten → Quellen. Gibt Knoten-ID zurück."""
         if _visited is None:
@@ -347,7 +450,12 @@ class LineageBuilder:
                 intermediates, sources = spec
                 for src in sources:
                     if src == "param":
-                        input_ids.append(self.ensure_source("param"))
+                        p_label, p_desc = CELL_PARAM_LABELS.get(
+                            key, ("Modellparameter", "Modellannahme"),
+                        )
+                        input_ids.append(self.ensure_const_parameter(
+                            f"cell:{key}", p_label, source=p_desc,
+                        ))
                     else:
                         input_ids.append(self.ensure_source(src))
                 for sub in intermediates:
@@ -415,17 +523,27 @@ class LineageBuilder:
         key = inp.get("key", "")
 
         if src_type == "const" or prov == formulas.PARAM:
+            # Jeder Formel-Parameter wird benannt (Label + Wert) angezeigt;
+            # editierbar (parameter_id) nur, wenn override-fähig in der Registry.
+            label = inp.get("label") or key or "Modellannahme"
             if key.startswith("__") or not key:
-                return self.ensure_source("param")
-            if indicator_code and indicator_category:
-                pid = f"{indicator_category}.{indicator_code}.param.{key}"
-            else:
-                pid = key
-            return self.ensure_parameter(
-                pid,
-                inp.get("label", key),
-                unit=inp.get("unit", ""),
-                source=inp.get("source") or "Modellannahme (Formelrezept)",
+                return self.ensure_const_parameter(
+                    f"const:{indicator_code or 'global'}:{label}", label,
+                    value=inp.get("value"), unit=inp.get("unit", ""),
+                    source=inp.get("doc_source") or "Modellannahme (Formelrezept)",
+                )
+            pid: str | None = None
+            if inp.get("overridable"):
+                pid = (
+                    f"{indicator_category}.{indicator_code}.param.{key}"
+                    if indicator_code and indicator_category
+                    else key
+                )
+            return self.ensure_const_parameter(
+                f"param:{indicator_category or ''}.{indicator_code or ''}.{key}", label,
+                value=inp.get("value"), unit=inp.get("unit", ""),
+                source=inp.get("doc_source") or "Modellannahme (Formelrezept)",
+                parameter_id=pid,
             )
 
         if src_type == "regional":
@@ -585,11 +703,11 @@ def _tooltip_for_node(
             lines = ["Skalierung", f"Referenzwert: {val:g} {unit}".strip()]
             if src:
                 lines.append(f"Quelle: {src}")
-            lines.append(_SCALE_FORMULAS.get(scale, _SCALE_FORMULAS["flat"]))
+            lines.append(f"Berechnung: {_SCALE_FORMULAS.get(scale, _SCALE_FORMULAS['flat'])}")
             return "\n".join(lines)
         if kind == "multiply":
             return tooltip or "Multiplikation: Gefahr × Betroffenheit × Empfindlichkeit"
-        if kind in ("average", "max"):
+        if kind == "max":
             return tooltip or (
                 "Stärkste Wirkungskette (0–100): Index = 100 · max(Gewicht · Ĥ · Ê · V̂)."
             )
@@ -639,12 +757,25 @@ def _tooltip_for_node(
         formula = meta.get("formula", "")
         ref = meta.get("ref_value")
         unit = meta.get("unit", "")
+        result_kind = meta.get("result_kind")
         lines = [label]
+        if result_kind == "index":
+            header = meta.get("formula_header", "")
+            lines.append("Screening-Ergebnis (Schicht A), dimensionslos 0–100.")
+            if header:
+                lines.append(header)
+        elif result_kind == "native":
+            lines.append(f"Absolutes Ergebnis (Schicht B) in {unit}".strip() + ".")
+        elif result_kind == "eur":
+            lines.append("Monetäres Ergebnis (Schicht B) in €/Jahr.")
+            cost_src = meta.get("cost_source", "")
+            if cost_src:
+                lines.append(f"Kostensatz-Quelle: {cost_src}")
         if ref is not None:
             lines.append(f"Referenzfall: {ref:g} {unit}".strip())
         if formula:
             lines.append(f"Berechnung: {formula}")
-        elif incoming:
+        elif incoming and result_kind is None:
             lines.append(f"Eingaben: {', '.join(incoming)}")
         return "\n".join(lines)
 
@@ -675,13 +806,13 @@ def _add_operator_compute(
 _SCALE_FORMULAS = {
     "pop": "Index/100 · Einwohner_zelle/100.000",
     "area": "Index/100 · Fläche/50 km²",
-    "flat": "Index/100 · ×1",
+    "flat": "Outcome = Referenz · (P90-Index/100)",
 }
 
 _SCALE_SOURCES = {
     "pop": "Referenz-Outcome bei Index 100 / 100.000 Ew. (Risikokatalog)",
     "area": "Referenz-Outcome bei Index 100 / 50 km² (Risikokatalog)",
-    "flat": "Referenz-Outcome bei Index 100 (Index-Outcome, Risikokatalog)",
+    "flat": "Referenz-Outcome bei P90-Index 100, kommunenweit (Risikokatalog)",
 }
 
 
@@ -716,13 +847,17 @@ def _add_operator_multiply(b: "LineageBuilder", op_id: str) -> str:
         meta={
             "op_kind": "multiply",
             "label": "×",
-            "tooltip": "Gefahr × Betroffenheit × Empfindlichkeit",
+            "tooltip": (
+                "Gefahr × Betroffenheit × Empfindlichkeit (jeweils normiert 0…1; "
+                "Normierungsgrenzen im Diagramm des jeweiligen Einflusses).\n"
+                r"$$\hat{H} \cdot \hat{E} \cdot \hat{V}$$"
+            ),
         },
     )
     return op_id
 
 
-def _add_operator_average(b: "LineageBuilder") -> str:
+def _add_operator_max(b: "LineageBuilder") -> str:
     op_id = "op:max:index"
     b.add_node(
         op_id, "operator", "",
@@ -731,9 +866,9 @@ def _add_operator_average(b: "LineageBuilder") -> str:
             "op_kind": "max",
             "label": "Maximum",
             "tooltip": (
-                "Stärkste Wirkungskette (0–100): Index = 100 · max(Gewicht · Ĥ · Ê · V̂). "
-                "Die Kette mit dem höchsten gewichteten Produkt bestimmt den Index; die "
-                "Kettenzahl beeinflusst ihn nicht."
+                "Stärkste Wirkungskette (0–100): Die Kette mit dem höchsten gewichteten "
+                "Produkt bestimmt den Index; die Kettenzahl beeinflusst ihn nicht.\n"
+                r"$$\mathrm{Index} = 100 \cdot \max_{p}\,\bigl(w_{p} \cdot \hat{H} \cdot \hat{E} \cdot \hat{V}\bigr)$$"
             ),
         },
     )
@@ -782,103 +917,10 @@ def _add_operator_weight(
     pathway_type: str,
     weight: float,
 ) -> str:
-    """Gewichte werden auf Kanten (Pfad → Mittelung) gelegt."""
+    """Gewichte werden auf Kanten (Pfad → Maximum) gelegt."""
     return f"op:weight:{pathway_idx}"
 
 
-PIPELINE_OP_KINDS = frozenset({
-    "count", "coverage", "neighbor", "divide", "add", "clamp",
-    "scale_factor", "max", "min", "weighted_sum", "formula", "multiply",
-})
-
-
-def _is_pipeline_node(n: dict) -> bool:
-    t = n.get("type")
-    if t in ("source", "intermediate", "parameter"):
-        return True
-    if t == "operator":
-        kind = (n.get("meta") or {}).get("op_kind")
-        cg = n.get("collapse_group", "")
-        if cg == "intermediates" and kind in PIPELINE_OP_KINDS:
-            return True
-    return False
-
-
-def _assign_pipeline_columns(graph: dict) -> dict:
-    """Links→rechts-Spalten für Quellen, Operatoren und Zwischenwerte."""
-    nodes = graph.get("nodes", [])
-    edges = graph.get("edges", [])
-    nodes_by_id = {n["id"]: n for n in nodes}
-    pipeline_ids = {n["id"] for n in nodes if _is_pipeline_node(n)}
-
-    cols: dict[str, int] = {}
-    for n in nodes:
-        if n["id"] in pipeline_ids and n["type"] in ("source", "parameter"):
-            cols[n["id"]] = 0
-
-    for _ in range(len(pipeline_ids) + 8):
-        changed = False
-        for e in edges:
-            tgt = e["target"]
-            src = e["source"]
-            if tgt not in pipeline_ids:
-                continue
-            src_node = nodes_by_id.get(src)
-            if not src_node:
-                continue
-            if src not in pipeline_ids and src_node["type"] not in ("source", "parameter", "intermediate", "operator"):
-                continue
-            pred_col = cols.get(src)
-            if pred_col is None:
-                if src_node["type"] in ("source", "parameter"):
-                    pred_col = 0
-                else:
-                    continue
-            new_col = pred_col + 1
-            if new_col > cols.get(tgt, -1):
-                cols[tgt] = new_col
-                changed = True
-        if not changed:
-            break
-
-    for n in nodes:
-        if n["id"] in cols:
-            n["column"] = cols[n["id"]]
-
-    max_pipe = max(cols.values()) if cols else 1
-    max_int = max(
-        (cols[n["id"]] for n in nodes if n["type"] == "intermediate" and n["id"] in cols),
-        default=max_pipe,
-    )
-    has_pathways = any(n["type"] == "pathway" for n in nodes)
-
-    for n in nodes:
-        t = n["type"]
-        if t in ("hazard", "exposure", "vulnerability"):
-            n["column"] = max_int + 1
-        elif t == "pathway":
-            n["column"] = max_int + 3
-        elif t == "operator":
-            kind = (n.get("meta") or {}).get("op_kind")
-            oid = n["id"]
-            if n["id"] in cols:
-                continue
-            if kind == "multiply" and oid.startswith("op:mul:path:"):
-                n["column"] = max_int + 2
-            elif kind == "average":
-                n["column"] = max_int + 4
-            elif kind in ("scaling", "multiplier"):
-                n["column"] = max_int + 6 if has_pathways else 4
-            elif kind == "norm":
-                n["column"] = max_int + 2
-        elif t == "aggregation":
-            n["column"] = max_int + 5 if has_pathways else 3
-        elif t == "outcome":
-            n["column"] = max_int + 7 if has_pathways else 4
-        elif t == "norm":
-            n["column"] = max_int + 2
-
-    return graph
 
 
 def _assign_layout_rows(graph: dict) -> dict:
@@ -962,49 +1004,38 @@ def _assign_layout_rows(graph: dict) -> dict:
     return graph
 
 
-def _assign_formula_chain_columns(graph: dict) -> dict:
-    """Spalten für Formelketten: Indikator → Operator → Indikator."""
+def _assign_columns(graph: dict) -> dict:
+    """Longest-Path-Layering: col(n) = max(col(pred)) + 1 (Quellen/Parameter = 0).
+
+    Garantiert col(src) < col(tgt) für JEDE Kante (Pfeile strikt links→rechts);
+    Ergebnisknoten ohne ausgehende Kante werden rechtsbündig auf die maximale
+    Spalte gesetzt (Index-/€-Ergebnis nebeneinander am rechten Rand).
+    """
     nodes = graph.get("nodes", [])
     edges = graph.get("edges", [])
-    nodes_by_id = {n["id"]: n for n in nodes}
-
+    cols: dict[str, int] = {n["id"]: 0 for n in nodes}
     for _ in range(len(nodes) + 4):
         changed = False
         for e in edges:
-            src_n = nodes_by_id.get(e["source"])
-            tgt_n = nodes_by_id.get(e["target"])
-            if not src_n or not tgt_n:
-                continue
-            src_col = src_n.get("column")
-            if src_col is None:
-                continue
-            if tgt_n["type"] == "operator" and src_n["type"] in (
-                "hazard", "exposure", "vulnerability", "intermediate",
-            ):
-                new_col = src_col + 1
-                if new_col > tgt_n.get("column", -1):
-                    tgt_n["column"] = new_col
-                    changed = True
-            if src_n["type"] == "operator" and tgt_n["type"] in (
-                "hazard", "exposure", "vulnerability",
-            ):
-                new_col = src_col + 1
-                if new_col > tgt_n.get("column", -1):
-                    tgt_n["column"] = new_col
+            src, tgt = e["source"], e["target"]
+            if src in cols and tgt in cols:
+                new_col = cols[src] + 1
+                if new_col > cols[tgt]:
+                    cols[tgt] = new_col
                     changed = True
         if not changed:
             break
+    has_outgoing = {e["source"] for e in edges}
+    max_col = max(cols.values(), default=0)
+    for n in nodes:
+        if n["type"] == "outcome" and n["id"] not in has_outgoing:
+            cols[n["id"]] = max_col
+        n["column"] = cols.get(n["id"], 0)
     return graph
 
 
-def _assign_intermediate_columns(graph: dict) -> dict:
-    """Staffelt Zwischenwerte und Pipeline-Knoten (delegiert an _assign_pipeline_columns)."""
-    return _assign_pipeline_columns(graph)
-
-
 def _finalize_graph(graph: dict) -> dict:
-    graph = _assign_pipeline_columns(graph)
-    graph = _assign_formula_chain_columns(graph)
+    graph = _assign_columns(graph)
     graph = _assign_layout_rows(graph)
     return _enrich_tooltips(graph)
 
@@ -1020,28 +1051,29 @@ def _enrich_tooltips(graph: dict) -> dict:
     return graph
 
 
-def _find_terminal_id(nodes: list[dict]) -> str | None:
-    for n in nodes:
-        if n["type"] == "outcome":
-            return n["id"]
+def _find_result_ids(nodes: list[dict]) -> list[str]:
+    """Alle Ergebnisknoten (Outcome); Fallback: rechtester Norm-Op/Norm-Knoten."""
+    result_ids = [n["id"] for n in nodes if n["type"] == "outcome"]
+    if result_ids:
+        return result_ids
     norm_ops = [
         n for n in nodes
         if n["type"] == "operator" and (n.get("meta") or {}).get("op_kind") == "norm"
     ]
     if norm_ops:
-        return max(norm_ops, key=lambda n: n.get("column", 0))["id"]
+        return [max(norm_ops, key=lambda n: n.get("column", 0))["id"]]
     norms = [n for n in nodes if n["type"] == "norm"]
     if norms:
-        return max(norms, key=lambda n: n.get("column", 0))["id"]
-    return None
+        return [max(norms, key=lambda n: n.get("column", 0))["id"]]
+    return []
 
 
 def _prune_lineage(graph: dict) -> dict:
-    """Entfernt Knoten, die nicht auf dem Pfad zum Endknoten (Outcome/Norm) liegen."""
+    """Entfernt Knoten, die auf keinem Pfad zu einem Ergebnisknoten liegen."""
     nodes = graph.get("nodes", [])
     edges = graph.get("edges", [])
-    terminal_id = _find_terminal_id(nodes)
-    if not terminal_id:
+    result_ids = _find_result_ids(nodes)
+    if not result_ids:
         return _finalize_graph(graph)
 
     rev: dict[str, list[str]] = {}
@@ -1049,7 +1081,7 @@ def _prune_lineage(graph: dict) -> dict:
         rev.setdefault(e["target"], []).append(e["source"])
 
     reachable: set[str] = set()
-    stack = [terminal_id]
+    stack = list(result_ids)
     while stack:
         nid = stack.pop()
         if nid in reachable:
@@ -1083,7 +1115,9 @@ def build_indicator_lineage(code: str, category: str, *, include_norm: bool = Tr
     )
 
     recipe = formulas.get_recipe(code)
+    steps = formula_operators_for(code, recipe.get("formula", ""))
     input_ids: list[str] = []
+    param_ids: list[str] = []
     cell_key_map: dict[str, str] = {}
     for inp in recipe.get("inputs", []):
         if inp.get("key") == "__source":
@@ -1096,16 +1130,19 @@ def build_indicator_lineage(code: str, category: str, *, include_norm: bool = Tr
                 sid = b.ensure_source("param")
             input_ids.append(sid)
             continue
-        if inp.get("prov") == formulas.PARAM and inp.get("key", "").startswith("__"):
-            continue
         if inp.get("prov") == formulas.PARAM:
-            pid = f"{category}.{code}.param.{inp.get('key', 'value')}"
-            b.ensure_parameter(
-                pid,
-                inp.get("label", inp.get("key", "")),
-                unit=inp.get("unit", ""),
-                source=inp.get("source") or "Modellannahme (Formelrezept)",
+            # Trägt ein Operator-Schritt den Wert bereits sichtbar (z. B. Skalierung
+            # ×1,5 bei HEAT_WAVE), keinen doppelten Parameterknoten erzeugen.
+            val = inp.get("value")
+            if val is not None and any(
+                st.get("factor") == val or st.get("value") == val for st in steps
+            ):
+                continue
+            pnid = b.expand_recipe_input_to_id(
+                inp, indicator_code=code, indicator_category=category,
             )
+            param_ids.append(pnid)
+            input_ids.append(pnid)
             continue
         iid = b.expand_recipe_input_to_id(inp, indicator_code=code, indicator_category=category)
         key = inp.get("key", "")
@@ -1113,7 +1150,6 @@ def build_indicator_lineage(code: str, category: str, *, include_norm: bool = Tr
             cell_key_map[key] = iid
         input_ids.append(iid)
 
-    steps = formula_operators_for(code, recipe.get("formula", ""))
     if steps and input_ids:
         b._wire_operator_chain(
             f"ind:{code}", steps, input_ids, ind_id, cell_key_map=cell_key_map,
@@ -1129,6 +1165,13 @@ def build_indicator_lineage(code: str, category: str, *, include_norm: bool = Tr
                 )
                 op_id = f"op:{step['op_kind']}:ind:{code}:{i}"
                 b.add_edge(param_nid, op_id)
+        # Parameterknoten, die die Verkettung über input_keys nicht angeschlossen
+        # hat, explizit an den ersten Operator hängen (sonst hingen sie lose).
+        first_op_id = f"op:{steps[0]['op_kind']}:ind:{code}:0"
+        connected = {e["source"] for e in b.edges}
+        for pnid in param_ids:
+            if pnid not in connected:
+                b.add_edge(pnid, first_op_id)
     else:
         for iid in input_ids:
             b.add_edge(iid, ind_id)
@@ -1140,6 +1183,18 @@ def build_indicator_lineage(code: str, category: str, *, include_norm: bool = Tr
             b, code, category, lo, hi, unit, meta.get("source", ""),
         )
         b.add_edge(ind_id, op_id)
+        out_id = f"out:norm:{code}"
+        b.add_node(
+            out_id, "outcome", "Normierter Wert",
+            column=0, collapse_group="outcome",
+            meta={
+                "result_kind": "index",
+                "unit": "0–1",
+                "formula": f"normiert({lo}…{hi} {unit}) → 0…1".strip(),
+                "is_outcome": True,
+            },
+        )
+        b.add_edge(op_id, out_id)
 
     return _prune_lineage(b.build())
 
@@ -1161,13 +1216,397 @@ def _merge_builder(target: LineageBuilder, other: dict) -> None:
         )
 
 
+# ── Schicht B: Bausteine für den Impact-Zweig des Wirkungsdiagramms ─────────────
+
+def _risk_lineage_kind(risk: dict) -> str:
+    """Kategorisiert das Risiko nach seinem tatsächlichen Schicht-B-Rechenweg."""
+    from app.services.engine import impact
+    return impact.lineage_kind(risk)
+
+
+def _impact_param_node(b: LineageBuilder, risk_code: str, key: str) -> str:
+    spec = _IMPACT_PARAM_BY_KEY.get((risk_code, key), {})
+    return b.ensure_parameter(
+        f"risks.{risk_code}.impact.{key}",
+        spec.get("label", key),
+        unit=spec.get("unit", ""),
+        source=spec.get("source", "Modellannahme (Schicht B)"),
+    )
+
+
+def _global_param_node(b: LineageBuilder, key: str) -> str:
+    spec = _IMPACT_GLOBAL_BY_KEY.get(key, {})
+    return b.ensure_parameter(
+        f"impact.{key}",
+        spec.get("label", key),
+        unit=spec.get("unit", ""),
+        source=spec.get("source", "Modellannahme (Schicht B)"),
+    )
+
+
+def _add_op(
+    b: LineageBuilder,
+    op_id: str,
+    op_kind: str,
+    label: str,
+    tooltip: str,
+    *,
+    collapse_group: str = "outcome",
+) -> str:
+    b.add_node(op_id, "operator", "", column=0, collapse_group=collapse_group,
+               meta={"op_kind": op_kind, "label": label, "tooltip": tooltip})
+    return op_id
+
+
+def _add_intensity_op(
+    b: LineageBuilder, code: str, hazards: list[str], *, op_id: str | None = None,
+) -> str:
+    op_id = op_id or f"op:intensity:{code}"
+    _add_op(
+        b, op_id, "intensity", "Intensität",
+        "Normierte Hazard-Intensität (0–1) mit FIXEN Katalog-Referenzgrenzen — "
+        "unabhängig von der editierbaren Screening-Normierung (§3.3). Bei mehreren "
+        "Gefahren zählt die stärkste (Maximum).",
+    )
+    for h in hazards:
+        b.add_edge(b.ensure_indicator(h, "hazards"), op_id)
+    return op_id
+
+
+def _add_af_op(b: LineageBuilder, code: str, driver: dict) -> str:
+    op_id = f"op:af:{code}"
+    _add_op(
+        b, op_id, "af", "AF",
+        "Attributable Fraktion: Anteil des Outcomes, der den Hitzetagen zuzurechnen "
+        "ist (0…1). Unterhalb der Schwelle 0, oberhalb sättigend (RKI/Winklmayr 2022).\n"
+        r"$$AF = 1 - e^{-\beta\,(H_{\mathrm{Tage}} - H_{0})_{+}}$$",
+    )
+    b.add_edge(b.ensure_indicator(driver["hazard"], "hazards"), op_id)
+    for pkey in driver.get("params", []):
+        b.add_edge(_impact_param_node(b, code, pkey), op_id)
+    return op_id
+
+
+def _add_driver_op(b: LineageBuilder, code: str, driver: dict) -> str:
+    """Treiber-Operator des Schicht-B-Zweigs, exakt nach ``LINEAGE_SPECS``."""
+    kind = driver["kind"]
+    if kind == "intensity":
+        return _add_intensity_op(b, code, driver["hazards"])
+    if kind == "af":
+        return _add_af_op(b, code, driver)
+    if kind == "ratio":
+        op_id = f"op:ratio:{code}"
+        _add_op(
+            b, op_id, "ratio", "÷ Referenz",
+            "Linearer Treiber: Hitzetage der Zelle ÷ Referenz-Hitzetage.\n"
+            r"$$\mathrm{Treiber} = H_{\mathrm{Tage}} / H_{\mathrm{Referenz}}$$",
+        )
+        b.add_edge(b.ensure_indicator(driver["hazard"], "hazards"), op_id)
+        for pkey in driver.get("params", []):
+            b.add_edge(_impact_param_node(b, code, pkey), op_id)
+        return op_id
+    if kind == "af_plus_event":
+        af_id = _add_af_op(b, code, driver)
+        ev_id = _add_intensity_op(
+            b, code, driver["event_hazards"], op_id=f"op:eventintensity:{code}",
+        )
+        add_id = f"op:afevent:{code}"
+        _add_op(
+            b, add_id, "add", "+",
+            "Treiber = AF + Ereignis-Anteil · Ereignisintensität (gedeckelt bei 1).",
+        )
+        b.add_edge(af_id, add_id)
+        b.add_edge(ev_id, add_id)
+        # Ereignis-Anteil als editierbarer Parameterknoten (risks.<code>.impact.<key>).
+        share_param = driver.get("event_share_param")
+        if share_param:
+            b.add_edge(_impact_param_node(b, code, share_param), add_id)
+        return add_id
+    raise ValueError(f"Unbekannter Schicht-B-Treiber: {kind}")
+
+
+def _add_gv_op(b: LineageBuilder, risk: dict) -> str:
+    op_id = f"op:gv:{risk['code']}"
+    _add_op(
+        b, op_id, "gv", "g(V̂)",
+        "Vulnerabilitäts-Modifikator aus dem Mittel der normierten Sensitivitäten des "
+        "Risikos: hebt/senkt den Zell-Outcome um Faktor 0,5…1,5.\n"
+        r"$$g(\hat{V}) = 0{,}5 + \overline{\hat{V}}$$",
+    )
+    for vcode in risk.get("vulnerabilities", []):
+        b.add_edge(b.ensure_indicator(vcode, "vulnerabilities"), op_id)
+    return op_id
+
+
+def _add_sum_cells_op(b: LineageBuilder, code: str) -> str:
+    return _add_op(
+        b, f"op:sumcells:{code}", "sum_cells", "Σ Zellen",
+        "Summe der Zell-Outcomes über alle 100×100-m-Rasterzellen der Kommune (Schicht B).\n"
+        r"$$O = \sum_{\mathrm{Zellen}} O_{z}$$",
+    )
+
+
+def _add_cost_op(b: LineageBuilder, risk: dict, *, extra_tooltip: str = "") -> str:
+    code = risk["code"]
+    rate = catalog.risk_default_cost_per_outcome(risk)
+    unit = catalog.cost_unit_label(risk.get("outcome_unit", ""))
+    src = risk.get("cost_source") or ""
+    tooltip = (
+        "Monetarisierung des Outcomes über den editierbaren Kostensatz.\n"
+        r"$$\text{€} = O \cdot \text{Kostensatz}$$"
+    )
+    if src:
+        tooltip += f"\nQuelle: {src}"
+    if extra_tooltip:
+        tooltip += f"\n{extra_tooltip}"
+    op_id = f"op:cost:{code}"
+    b.add_node(
+        op_id, "operator", "",
+        column=0, collapse_group="outcome",
+        meta={
+            "op_kind": "scaling",
+            "label": "Kostensatz",
+            "parameter_id": f"risks.{code}.cost_per_outcome",
+            "value": rate,
+            "unit": unit,
+            "scale": "cost",
+            "source": src or "Kostensatz (Risikokatalog)",
+            "tooltip": tooltip,
+        },
+    )
+    return op_id
+
+
+def _area_basis(b: LineageBuilder, code: str, keys: list[str], label: str) -> str:
+    if len(keys) == 1:
+        return b.expand_cell_key(keys[0])
+    labels = [INTERMEDIATE_LABELS.get(k, k) for k in keys]
+    area_id = f"int:area:{code}"
+    b.add_node(
+        area_id, "intermediate", label,
+        column=1, collapse_group="intermediates",
+        meta={"tooltip": f"{label} = {' + '.join(labels)} (× 1 ha Zellfläche)."},
+    )
+    op_id = _add_op(
+        b, f"op:addarea:{code}", "add", "+",
+        f"Summe der Flächenanteile: {' + '.join(labels)}.",
+        collapse_group="intermediates",
+    )
+    for k in keys:
+        b.add_edge(b.expand_cell_key(k), op_id)
+    b.add_edge(op_id, area_id)
+    return area_id
+
+
+def _asset_basis(b: LineageBuilder, code: str, asset: dict) -> str:
+    kind = asset["kind"]
+    label = asset.get("label", "Assetwert (Zelle)")
+    if kind == "building":
+        tip = ("Gebäude-Assetwert = Geschossfläche (Gebäudeanteil × Zellfläche × "
+               "Geschosse aus mittlerer Höhe) × Gebäudewert je m².")
+    elif kind == "count":
+        tip = "Assetwert = Anzahl Anlagen in der Zelle × Ersatzwert je Stück."
+    else:
+        tip = "Assetwert = Flächenanteil × 1 ha Zellfläche × Wert je ha."
+    asset_id = f"int:asset:{code}"
+    b.add_node(
+        asset_id, "intermediate", label,
+        column=1, collapse_group="intermediates",
+        meta={"tooltip": tip},
+    )
+    op_id = _add_op(b, f"op:asset:{code}", "multiply", "×", tip,
+                    collapse_group="intermediates")
+    for k in asset["cell_keys"]:
+        b.add_edge(b.expand_cell_key(k), op_id)
+    b.add_edge(_global_param_node(b, asset["value_param"]), op_id)
+    b.add_edge(op_id, asset_id)
+    return asset_id
+
+
+def _build_impact_branch(
+    b: LineageBuilder, risk: dict, kind: str, idx_id: str,
+) -> None:
+    """Schicht-B-Zweig: Quellen → Schadensfunktion → (natives Ergebnis) → €."""
+    code = risk["code"]
+    unit = risk.get("outcome_unit", "")
+
+    def add_eur(formula: str, *, non_additive: bool = False) -> str:
+        meta: dict[str, Any] = {
+            "result_kind": "eur",
+            "unit": "€/Jahr",
+            "formula": formula,
+            "is_outcome": True,
+            "cost_source": risk.get("cost_source", ""),
+        }
+        if non_additive:
+            meta["non_additive"] = True
+        b.add_node("out:eur", "outcome", "Monetärer Schaden",
+                   column=0, collapse_group="outcome", meta=meta)
+        return "out:eur"
+
+    def add_native(formula: str) -> str:
+        b.add_node(
+            "out:native", "outcome", unit or "Outcome",
+            column=0, collapse_group="outcome",
+            meta={"result_kind": "native", "unit": unit, "formula": formula,
+                  "is_outcome": True},
+        )
+        return "out:native"
+
+    if kind == "index_only":
+        return
+
+    if kind in ("health", "environment"):
+        if kind == "health":
+            spec = HEALTH_SPECS[code]
+            basis = b.expand_cell_key("pop")
+            product = "Bevölkerung · Rate · Treiber · g(V̂)"
+            latex = r"$$O_{z} = \text{Bevölkerung}_{z} \cdot \text{Rate} \cdot \text{Treiber}_{z} \cdot g(\hat{V})$$"
+        else:
+            spec = ENV_SPECS[code]
+            basis = _area_basis(b, code, spec["area_keys"], "Exponierte Naturfläche (Zelle)")
+            product = "exponierte Fläche · Verlustrate · Intensität · g(V̂)"
+            latex = r"$$O_{z} = \text{Fläche}_{z} \cdot \text{Verlustrate} \cdot I_{z} \cdot g(\hat{V})$$"
+        mul_id = _add_op(b, f"op:mulB:{code}", "multiply", "×",
+                         f"Zell-Outcome = {product}.\n{latex}")
+        b.add_edge(basis, mul_id)
+        b.add_edge(_impact_param_node(b, code, spec["rate_param"]), mul_id)
+        b.add_edge(_add_driver_op(b, code, spec["driver"]), mul_id)
+        b.add_edge(_add_gv_op(b, risk), mul_id)
+        sum_id = _add_sum_cells_op(b, code)
+        b.add_edge(mul_id, sum_id)
+        native_id = add_native(f"Outcome = {product}, Σ Zellen")
+        b.add_edge(sum_id, native_id)
+        cost_id = _add_cost_op(b, risk)
+        b.add_edge(native_id, cost_id)
+        b.add_edge(cost_id, add_eur("€ = Outcome × Kostensatz"))
+        return
+
+    if kind == "monetary":
+        spec = MONETARY_SPECS[code]
+        if spec.get("basis_pop"):
+            # Klimamigration: Bevölkerungs-Muster, Outcome ist direkt €.
+            mul_id = _add_op(
+                b, f"op:mulB:{code}", "multiply", "×",
+                "Zell-Kosten (€) = (Einwohner/100.000) · Referenzkosten · Intensität · g(V̂).\n"
+                r"$$K_{z} = \frac{\text{Einwohner}_{z}}{100\,000} \cdot \text{Referenzkosten} \cdot I_{z} \cdot g(\hat{V})$$",
+            )
+            b.add_edge(b.expand_cell_key("pop"), mul_id)
+            b.add_edge(_impact_param_node(b, code, spec["rate_param"]), mul_id)
+            b.add_edge(_add_driver_op(b, code, spec["driver"]), mul_id)
+            b.add_edge(_add_gv_op(b, risk), mul_id)
+            sum_id = _add_sum_cells_op(b, code)
+            b.add_edge(mul_id, sum_id)
+            b.add_edge(sum_id, add_eur(
+                "€ = (Einwohner/100.000) · Referenzkosten · Intensität · g(V̂), Σ Zellen"))
+            return
+        basis = _asset_basis(b, code, spec["asset"])
+        damage_id = _add_op(
+            b, f"op:damage:{code}", "damage_curve", "Schadenskurve",
+            "Konvexe Schadenskurve: überproportionaler Schaden bei hoher Intensität "
+            "(HOWAS21/JRC).\n"
+            r"$$s = I^{\,\gamma},\quad \gamma > 1$$",
+        )
+        b.add_edge(_add_intensity_op(b, code, spec["driver"]["hazards"]), damage_id)
+        b.add_edge(_global_param_node(b, "damage_exponent"), damage_id)
+        mul_id = _add_op(
+            b, f"op:mulB:{code}", "multiply", "×",
+            "Zell-Schaden (€) = Assetwert · max. Verlustrate · Schadenskurve(Intensität) · g(V̂).\n"
+            r"$$S_{z} = A_{z} \cdot r_{\max} \cdot s(I_{z}) \cdot g(\hat{V})$$",
+        )
+        b.add_edge(basis, mul_id)
+        b.add_edge(_impact_param_node(b, code, spec["loss_param"]), mul_id)
+        b.add_edge(damage_id, mul_id)
+        b.add_edge(_add_gv_op(b, risk), mul_id)
+        sum_id = _add_sum_cells_op(b, code)
+        b.add_edge(mul_id, sum_id)
+        b.add_edge(sum_id, add_eur(
+            "€ = Assetwert · Verlustrate · Schadenskurve(Intensität) · g(V̂), Σ Zellen"))
+        return
+
+    if kind in ("indirect", "restoration"):
+        direct_id = "int:direct_sum"
+        names = [
+            catalog.RISKS_BY_CODE[c]["name"]
+            for c in sorted(catalog.DIRECT_SECTOR_RISK_CODES)
+        ]
+        b.add_node(
+            direct_id, "intermediate", "Direkte Sektorschäden (Σ €)",
+            column=1, collapse_group="intermediates",
+            meta={"tooltip": "Summe der direkten Sektorschäden je Zelle (Schicht B): "
+                             + ", ".join(names) + "."},
+        )
+        sum_direct_id = _add_op(
+            b, f"op:sumdirect:{code}", "sum_cells", "Σ",
+            "Summiert die €-Zellschäden der zehn direkten Sektorrisiken.",
+            collapse_group="intermediates",
+        )
+        b.add_edge(b.ensure_source("computed"), sum_direct_id)
+        b.add_edge(sum_direct_id, direct_id)
+        if kind == "indirect":
+            param = _global_param_node(b, "k_indirect")
+            mul_id = _add_op(
+                b, f"op:kfactor:{code}", "multiply", "×",
+                "Indirekte Folgekosten = k_indirekt · Σ direkte Sektorschäden "
+                "(konsolidiert Betriebsunterbrechung, Lieferketten, Standortnachteil, "
+                "verzögerte Schäden; Prognos 2023).",
+            )
+            formula = "€ = k_indirekt · Σ direkte Sektorschäden"
+            non_additive = False
+        else:
+            param = _global_param_node(b, "restoration_share")
+            mul_id = _add_op(
+                b, f"op:kfactor:{code}", "multiply", "×",
+                "Restaurierungskosten = Restaurierungsquote · Σ direkte Sektorschäden. "
+                "Teilkennzahl (Teilmenge der direkten Schäden) — nicht additiv zur "
+                "Gesamtsumme.",
+            )
+            formula = "€ = Restaurierungsquote · Σ direkte Sektorschäden (nicht additiv)"
+            non_additive = True
+        b.add_edge(direct_id, mul_id)
+        b.add_edge(param, mul_id)
+        b.add_edge(mul_id, add_eur(formula, non_additive=non_additive))
+        return
+
+    if kind == "consolidated_zero":
+        add_eur("0 € — in k_indirekt (Indirekte wirtschaftliche Verluste) konsolidiert, "
+                "um Doppelzählung zu vermeiden (§3.7)")
+        return
+
+    # "flat": kommunenweiter Outcome aus dem P90-Index (estimate_outcome_and_cost).
+    # Einziger Fall, in dem sich der €-Wert tatsächlich aus dem Index ableitet.
+    p90_id = _add_op(
+        b, f"op:p90:{code}", "p90", "P90",
+        "90. Perzentil der Zell-Indizes → kommunenweiter Screening-Index (0–100).\n"
+        r"$$P_{90}(\text{Zell-Indizes})$$",
+    )
+    b.add_edge(idx_id, p90_id)
+    ref = float(risk.get("ref_value", 0.0))
+    scale_id = _add_operator_scaling(b, code, ref, unit, "flat")
+    b.add_edge(p90_id, scale_id)
+    native_id = add_native("Outcome = Referenz · (P90-Index/100), kommunenweit")
+    b.add_edge(scale_id, native_id)
+    cost_id = _add_cost_op(
+        b, risk,
+        extra_tooltip="€-Bewertung skaliert mit Einwohner/100.000 (VoLL-Kalibrierung, §8/B6).",
+    )
+    b.add_edge(native_id, cost_id)
+    b.add_edge(cost_id, add_eur("€ = Outcome × Kostensatz × Einwohner/100.000"))
+
+
 def build_risk_lineage(code: str) -> dict:
-    """Deduzierter Graph: Quellen → Zwischen → H/E/V → Pfade → Aggregation → Outcome."""
+    """Zwei-Schichten-Graph eines Risikos (Wirkungsdiagramm).
+
+    Schicht A: Quellen → Zwischen → H/E/V → Wirkungsketten → Maximum → KWRA-Index.
+    Schicht B: Quellen → Schadensfunktion → natives Ergebnis → Kostensatz → €
+    (Struktur je Risikokategorie, siehe ``_risk_lineage_kind``).
+    """
     risk = catalog.RISKS_BY_CODE[code]
     recipe = risk_recipe(risk)
+    kind = _risk_lineage_kind(risk)
     b = LineageBuilder()
 
-    # Expand all H/E/V used in pathways (deduplicated via shared ind: IDs)
+    # Schicht A: alle H/E/V der kuratierten Ketten (dedupliziert über ind:-IDs)
     hev_codes: set[tuple[str, str]] = set()
     for p in catalog.build_pathways(risk):
         hev_codes.add(("hazards", p["hazard"]))
@@ -1179,78 +1618,69 @@ def build_risk_lineage(code: str) -> dict:
         _merge_builder(b, sub)
 
     pathways_meta = risk_pathway_meta(risk)
-    avg_id = _add_operator_average(b)
-    agg_id = "agg:index"
+    idx_id = "out:index"
     b.add_node(
-        agg_id, "aggregation",
-        "Gesamt-Index",
-        column=4, collapse_group="outcome",
+        idx_id, "outcome", "KWRA-Index",
+        column=0, collapse_group="outcome",
         meta={
+            "result_kind": "index",
+            "unit": "0–100",
             "formula": recipe.get("formula_index", ""),
+            "formula_header": recipe.get("formula_index_header", ""),
             "pathway_count": len(pathways_meta),
-        },
-    )
-    b.add_edge(avg_id, agg_id)
-
-    for i, p in enumerate(pathways_meta):
-        h_id = f"ind:{p['hazard']}"
-        e_id = f"ind:{p['exposure']}"
-        v_id = f"ind:{p['vulnerability']}"
-        mul_id = f"op:mul:path:{i}"
-        path_id = f"pathway:{i}"
-        title = get_pathway_description(
-            code, p["hazard"], p["exposure"], p["vulnerability"],
-            p["type"],
-            p["hazard_name"], p["exposure_name"], p["vulnerability_name"],
-        )
-        _add_operator_multiply(b, mul_id)
-        b.add_node(
-            path_id, "pathway", title,
-            column=3, collapse_group="pathways",
-            meta={
-                "pathway_type": p["type"],
-                "type_label": p["type_label"],
-                "weight": p["weight"],
-                "chain_label": chain_label(p["hazard_name"], p["exposure_name"], p["vulnerability_name"]),
-                "hazard_name": p["hazard_name"],
-                "exposure_name": p["exposure_name"],
-                "vulnerability_name": p["vulnerability_name"],
-                "justification": p.get("justification"),
-                "justification_ref": p.get("justification_ref"),
-                "cluster": p.get("cluster"),
-            },
-        )
-        b.add_edge(h_id, mul_id)
-        b.add_edge(e_id, mul_id)
-        b.add_edge(v_id, mul_id)
-        b.add_edge(mul_id, path_id)
-        b.add_edge(
-            path_id, avg_id,
-            meta={
-                "op_kind": "weight",
-                "weight": p["weight"],
-                "parameter_id": f"pathway_weights.{p['type']}",
-                "source": "pathway_weight_defaults (Risikokatalog)",
-            },
-        )
-
-    out_id = "out:come"
-    ref = float(risk.get("ref_value", 0.0))
-    unit = risk.get("outcome_unit", "")
-    risk_name = risk.get("name", code)
-    scale_id = _add_operator_scaling(b, code, ref, unit, risk.get("scale", "pop"))
-    b.add_node(
-        out_id, "outcome",
-        risk_name,
-        column=5, collapse_group="outcome",
-        meta={
-            "formula": recipe.get("formula_outcome", ""),
-            "unit": unit,
             "is_outcome": True,
         },
     )
-    b.add_edge(agg_id, scale_id)
-    b.add_edge(scale_id, out_id)
+
+    if pathways_meta:
+        max_id = _add_operator_max(b)
+        b.add_edge(max_id, idx_id)
+        for i, p in enumerate(pathways_meta):
+            h_id = f"ind:{p['hazard']}"
+            e_id = f"ind:{p['exposure']}"
+            v_id = f"ind:{p['vulnerability']}"
+            mul_id = f"op:mul:path:{i}"
+            path_id = f"pathway:{i}"
+            title = get_pathway_description(
+                code, p["hazard"], p["exposure"], p["vulnerability"],
+                p["type"],
+                p["hazard_name"], p["exposure_name"], p["vulnerability_name"],
+            )
+            _add_operator_multiply(b, mul_id)
+            b.add_node(
+                path_id, "pathway", title,
+                column=3, collapse_group="pathways",
+                meta={
+                    "pathway_type": p["type"],
+                    "type_label": p["type_label"],
+                    "weight": p["weight"],
+                    "chain_label": chain_label(p["hazard_name"], p["exposure_name"], p["vulnerability_name"]),
+                    "hazard_name": p["hazard_name"],
+                    "exposure_name": p["exposure_name"],
+                    "vulnerability_name": p["vulnerability_name"],
+                    "justification": p.get("justification"),
+                    "justification_ref": p.get("justification_ref"),
+                    "cluster": p.get("cluster"),
+                },
+            )
+            b.add_edge(h_id, mul_id)
+            b.add_edge(e_id, mul_id)
+            b.add_edge(v_id, mul_id)
+            b.add_edge(mul_id, path_id)
+            b.add_edge(
+                path_id, max_id,
+                meta={
+                    "op_kind": "weight",
+                    "weight": p["weight"],
+                    # bewusst KEINE parameter_id: Pfadgewichte sind beim Import fest
+                    # eingelesene Modellkonstanten (risk_engine._PATHWAYS) — kein
+                    # editierbarer Registry-Parameter (Override wäre wirkungslos).
+                    "source": "Pfadgewicht (Modellkonstante, Risikokatalog)",
+                },
+            )
+
+    # Schicht B: absoluter Outcome + € (bzw. nur Index bei Screening-Risiken)
+    _build_impact_branch(b, risk, kind, idx_id)
 
     return _prune_lineage(b.build())
 

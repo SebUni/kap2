@@ -156,6 +156,15 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
             ))
         update_progress(FINALIZE[1], "Speichere Ergebnisse")
 
+        # Kommunen-Bevölkerung als Zensus-Summe der Zellen persistieren
+        # (korrekter als der nie gesetzte Anlage-Wert; Basis fürs Kommunen-Profil)
+        pop_sum = sum(
+            float((r["data"].get("inputs") or {}).get("pop", 0.0) or 0.0)
+            for r in results
+        )
+        if kommune is not None and pop_sum > 0:
+            kommune.population = int(round(pop_sum))
+
         status.status = AssessmentStatus.DONE
         status.progress_pct = 100.0
         status.finished_at = datetime.utcnow()
@@ -179,7 +188,8 @@ def _run_assessment(kommune_id: int, cancel_event: threading.Event):
 
         # Karten-Layer-Cache neu bauen (fertige gzip-Dateien auf Platte)
         try:
-            from app.services import layer_cache
+            from app.services import aggregate_cache, layer_cache
+            aggregate_cache.invalidate(kommune_id)
             layer_cache.invalidate(kommune_id)
             layer_cache.precompute(db, kommune_id)
         except Exception:

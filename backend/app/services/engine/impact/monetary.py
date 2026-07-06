@@ -22,7 +22,7 @@ from app.services.engine.impact.curves import damage_fraction
 
 CELL_AREA_M2 = 10_000.0   # 100 m × 100 m
 CELL_AREA_HA = 1.0
-_FLOOR_HEIGHT_M = 3.5      # mittlere Geschosshöhe für die Geschossflächen-Schätzung
+_FLOOR_HEIGHT_M_DEFAULT = 3.5   # Default der Geschosshöhe; editierbar als impact.floor_height_m
 
 
 def _result(outcome: float) -> dict:
@@ -45,7 +45,9 @@ def _sector(ctx: CellContext, risk: dict, asset_value: float,
 # ── Assetwert-Helfer (aus realen Zell-Rohgrößen × €-Parameter) ─────────────────
 
 def _building_asset(ctx: CellContext) -> float:
-    floors = max(1.0, ctx.inp("avg_height", _FLOOR_HEIGHT_M) / _FLOOR_HEIGHT_M)
+    fh = ctx.pg("floor_height_m", _FLOOR_HEIGHT_M_DEFAULT)
+    fh = fh if fh > 0 else _FLOOR_HEIGHT_M_DEFAULT
+    floors = max(1.0, ctx.inp("avg_height", fh) / fh)
     floor_area = ctx.inp("bldg_cov") * CELL_AREA_M2 * floors
     return floor_area * ctx.pg("building_value_eur_m2", 2000.0)
 
@@ -135,6 +137,105 @@ MONETARY_IMPACTS = {
     "EXPECTED_FISHERIES_ECONOMIC_LOSS_EUR": fisheries_loss,
     "EXPECTED_AQUACULTURE_DAMAGE_EUR": aquaculture_damage,
     "EXPECTED_CLIMATE_MIGRATION_COSTS_EUR": migration_costs,
+}
+
+
+# ── Lineage-Spezifikation (Wirkungsdiagramm) ───────────────────────────────────
+# Deklariert je Sektorschaden, was die Funktion oben rechnet (Assetwert · Verlustrate ·
+# Schadenskurve(Intensität) · g(V̂)), damit ``lineage_graph`` den Schicht-B-Zweig exakt
+# aus der tatsächlichen Rechnung baut. ``asset.kind``: building (Geschossfläche ×
+# €/m²), count (Anzahl × €/Stück), area (Flächenanteile × €/ha). Migration folgt dem
+# Bevölkerungs-Muster (Bevölkerung · Referenzkosten · Intensität · g(V̂)) und liefert
+# direkt €. Key-Gleichheit mit MONETARY_IMPACTS wird in tests/test_lineage_graph.py geprüft.
+LINEAGE_SPECS: dict[str, dict] = {
+    "EXPECTED_BUILDING_DAMAGE_EUR": {
+        "asset": {"kind": "building", "cell_keys": ["bldg_cov", "avg_height"],
+                  "value_param": "building_value_eur_m2",
+                  "label": "Gebäude-Assetwert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["HEAVY_RAIN_FLOOD", "EXTRATROPICAL_STORM", "HEAT_WAVE"]},
+    },
+    "EXPECTED_TRANSPORT_DAMAGE_EUR": {
+        "asset": {"kind": "count", "cell_keys": ["transport_hub_count"],
+                  "value_param": "transport_asset_value_eur",
+                  "label": "Verkehrs-Assetwert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["HEAVY_RAIN_FLOOD", "HEAT_WAVE", "DROUGHT"]},
+    },
+    "EXPECTED_ENERGY_INFRA_DAMAGE_EUR": {
+        "asset": {"kind": "count", "cell_keys": ["energy_infra_count"],
+                  "value_param": "energy_asset_value_eur",
+                  "label": "Energie-Assetwert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD", "HEAT_WAVE"]},
+    },
+    "EXPECTED_TELECOM_DAMAGE_EUR": {
+        "asset": {"kind": "count", "cell_keys": ["communication_count"],
+                  "value_param": "telecom_asset_value_eur",
+                  "label": "Telekom-Assetwert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD"]},
+    },
+    "EXPECTED_WATER_WASTEWATER_DAMAGE_EUR": {
+        "asset": {"kind": "count", "cell_keys": ["water_wastewater_count"],
+                  "value_param": "water_asset_value_eur",
+                  "label": "Wasser-/Abwasser-Assetwert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["HEAVY_RAIN_FLOOD", "DROUGHT", "HEAT_WAVE"]},
+    },
+    "EXPECTED_AGRICULTURAL_DAMAGE_EUR": {
+        "asset": {"kind": "area", "cell_keys": ["farmland_frac"],
+                  "value_param": "agri_value_eur_ha",
+                  "label": "Agrar-Ertragswert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["DROUGHT", "HEAT_WAVE", "HEAVY_RAIN_FLOOD"]},
+    },
+    "EXPECTED_SOIL_LOSS_DEGRADATION_EUR": {
+        "asset": {"kind": "area", "cell_keys": ["farmland_frac"],
+                  "value_param": "soil_value_eur_ha",
+                  "label": "Bodenwert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["DROUGHT", "HEAVY_RAIN_FLOOD", "SOIL_SALINIZATION"]},
+    },
+    "EXPECTED_ECOSYSTEM_SERVICE_LOSS": {
+        "asset": {"kind": "area", "cell_keys": ["forest_frac", "green_frac"],
+                  "value_param": "esl_value_eur_ha",
+                  "label": "Ökosystemleistungswert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["DROUGHT", "HEAVY_RAIN_FLOOD", "SEA_LEVEL_RISE"]},
+    },
+    "EXPECTED_FISHERIES_ECONOMIC_LOSS_EUR": {
+        "asset": {"kind": "area", "cell_keys": ["water_frac"],
+                  "value_param": "fisheries_value_eur_ha",
+                  "label": "Fischereiwert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["SURFACE_WATER_HEATING", "LOW_FLOW_NIEDRIGWASSER",
+                                "DROUGHT", "HEAT_WAVE"]},
+    },
+    "EXPECTED_AQUACULTURE_DAMAGE_EUR": {
+        "asset": {"kind": "area", "cell_keys": ["water_frac"],
+                  "value_param": "fisheries_value_eur_ha",
+                  "label": "Aquakulturwert (Zelle)"},
+        "loss_param": "max_loss_rate",
+        "driver": {"kind": "intensity",
+                   "hazards": ["SURFACE_WATER_HEATING", "LOW_FLOW_NIEDRIGWASSER",
+                                "HEAVY_RAIN_FLOOD"]},
+    },
+    "EXPECTED_CLIMATE_MIGRATION_COSTS_EUR": {
+        "basis_pop": True,
+        "rate_param": "cost_ref_per_100k",
+        "driver": {"kind": "intensity",
+                   "hazards": ["SEA_LEVEL_RISE", "HEAVY_RAIN_FLOOD", "DROUGHT"]},
+    },
 }
 
 

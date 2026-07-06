@@ -269,6 +269,9 @@ export interface LineageNodeData {
   label: string
   column: number
   collapse_group: string
+  // Ergebnisknoten (type 'outcome') tragen meta.result_kind:
+  // 'index' (KWRA-Index 0–100) | 'native' (absolutes Ergebnis, z. B. Todesfälle/Jahr)
+  // | 'eur' (Monetärer Schaden €/Jahr). Ergebnisse sind im Diagramm nie ausblendbar.
   meta?: Record<string, unknown>
 }
 
@@ -524,6 +527,64 @@ export interface RiskProjection {
     rcp45: number[]; rcp85: number[]
   }[]
   source: string
+}
+
+// ── Kommunen-Profil (GET /kommune/{id}/profile) ─────────────────────────────
+
+export interface ClimateMetric {
+  code: string
+  label: string
+  unit: string
+  value: number | null
+  data_basis: 'dwd_cdc_raster' | 'regional_fallback' | 'unavailable'
+  germany: { value: number; period: string | null } | null
+  delta: number | null
+  delta_pct: number | null
+  references: SourceReference[]
+}
+
+export interface KommuneProfile {
+  id: number
+  name: string
+  bundesland: string | null
+  lat: number | null
+  lon: number | null
+  area_km2: number | null
+  population: number | null
+  population_source: string | null
+  elevation: { mean_m: number; min_m: number; max_m: number; source: string } | null
+  climate: ClimateMetric[]
+  sources_note: string
+}
+
+// ── Kosten-Projektion (GET /kommune/{id}/cost-projection) ───────────────────
+
+export interface CostProjectionSeries {
+  annual: number[]
+  cumulative: number[]
+}
+
+export interface CostProjectionScenario {
+  label: string
+  no_measures: CostProjectionSeries
+  with_measures: CostProjectionSeries & {
+    components: { damages: number[]; opex: number[]; capex: number[] }
+  }
+}
+
+export interface CostProjection {
+  years: number[]
+  base_year_damages_eur: number
+  has_measures: boolean
+  scenarios: { rcp45: CostProjectionScenario; rcp85: CostProjectionScenario }
+  by_group_base: Record<string, number>
+  measures: {
+    id: number; name: string; implementation_year: number
+    capex_eur: number; opex_annual_eur: number
+  }[]
+  assumptions: string[]
+  warnings: string[]
+  source?: string
 }
 
 export const GROUP_ORDER: { key: GroupKey; label: string }[] = [

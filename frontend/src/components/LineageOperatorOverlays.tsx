@@ -72,24 +72,6 @@ function ComputeOpBody({ kind, meta, label }: { kind: string; meta: Record<strin
   )
 }
 
-function ParameterBox({
-  label,
-  value,
-  unit,
-}: {
-  label: string
-  value: string
-  unit: string
-}) {
-  return (
-    <div className="kap-param-node">
-      <div className="kap-param-node-name">{label}</div>
-      <div className="kap-param-node-value">{value}</div>
-      {unit ? <div className="kap-param-node-unit">{unit}</div> : null}
-    </div>
-  )
-}
-
 function samePositions(a: Record<string, NodePos>, b: Record<string, NodePos>): boolean {
   const aKeys = Object.keys(a)
   const bKeys = Object.keys(b)
@@ -225,8 +207,13 @@ export default function LineageOperatorOverlays({
         if (!pos) return null
         const pid = dn.data.meta?.parameter_id as string | undefined
         const param = pid ? parameters.find(p => p.id === pid) : undefined
-        const val = param ? fmtNum(param.value) : '—'
+        const metaValue = dn.data.meta?.value
+        const val = param
+          ? fmtNum(param.value)
+          : metaValue != null ? fmtNum(metaValue) : '—'
         const unit = param?.unit || String(dn.data.meta?.unit ?? '')
+        const editable = !!param?.editable && !!pid
+        const key = `param:${dn.id}`
         return (
           <div
             key={dn.id}
@@ -234,7 +221,37 @@ export default function LineageOperatorOverlays({
             style={overlayStyle(pos.x, pos.y, viewScale)}
             onPointerDown={e => e.stopPropagation()}
           >
-            <ParameterBox label={dn.data.label} value={val} unit={unit} />
+            <div className="kap-param-node">
+              <div className="kap-param-node-name">{dn.data.label}</div>
+              {editingKey === key && editable ? (
+                <input
+                  className="kap-op-input kap-op-input--value"
+                  value={draft}
+                  autoFocus
+                  disabled={saving}
+                  onChange={ev => setDraft(ev.target.value)}
+                  onBlur={() => pid && void saveField(pid, editable)}
+                  onKeyDown={ev => {
+                    if (ev.key === 'Enter' && pid) void saveField(pid, editable)
+                    if (ev.key === 'Escape') setEditingKey(null)
+                  }}
+                />
+              ) : (
+                <button
+                  type="button"
+                  className={`kap-param-node-value kap-op-value--btn${editable ? ' kap-op-value--editable' : ''}`}
+                  onClick={() => {
+                    if (editable && param) {
+                      setEditingKey(key)
+                      setDraft(String(param.value))
+                    }
+                  }}
+                >
+                  {val}
+                </button>
+              )}
+              {unit ? <div className="kap-param-node-unit">{unit}</div> : null}
+            </div>
           </div>
         )
       })}
@@ -257,7 +274,7 @@ export default function LineageOperatorOverlays({
             >
               {(kind === 'scaling' || kind === 'multiplier') && (
                 <div className="kap-op kap-op--scaling">
-                  <div className="kap-op-kind">Skalierung</div>
+                  <div className="kap-op-kind">{operatorKindLabel(kind, meta)}</div>
                   {editingKey === dn.id && fields[0]?.editable ? (
                     <input
                       className="kap-op-input kap-op-input--value"

@@ -519,6 +519,8 @@ function GroupedParameterList({
 
   const modelCount = byCategory('model').length
   const uhiCount = byCategory('uhi').length
+  const impactCount = byCategory('impact').length
+  const regionalCount = byCategory('regional').length
   const hazardCount = parameters.filter(p => p.layer_category === 'hazards').length
   const exposureCount = parameters.filter(p => p.layer_category === 'exposures').length
   const vulnCount = parameters.filter(p => p.layer_category === 'vulnerabilities').length
@@ -565,6 +567,32 @@ function GroupedParameterList({
           onToggle={toggleSection}
         >
           {renderTable(byCategory('uhi'))}
+        </CollapsibleParamSection>
+      )}
+
+      {impactCount > 0 && (
+        <CollapsibleParamSection
+          sectionKey="impact"
+          title="Schadensfunktionen (global)"
+          anchorId={paramSectionId('impact')}
+          count={impactCount}
+          expanded={expandedSections.has('impact')}
+          onToggle={toggleSection}
+        >
+          {renderTable(byCategory('impact'))}
+        </CollapsibleParamSection>
+      )}
+
+      {regionalCount > 0 && (
+        <CollapsibleParamSection
+          sectionKey="regional"
+          title="Regionale Klimatreiber (Fallbacks)"
+          anchorId={paramSectionId('regional')}
+          count={regionalCount}
+          expanded={expandedSections.has('regional')}
+          onToggle={toggleSection}
+        >
+          {renderTable(byCategory('regional'))}
         </CollapsibleParamSection>
       )}
 

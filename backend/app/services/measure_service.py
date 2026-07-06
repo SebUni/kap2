@@ -30,8 +30,8 @@ from app.data import catalog, sources
 from app.models.models import (
     AdaptationMeasure, CellAssessment, GridCell, MeasureImpact, Kommune,
 )
-from app.services import parameter_registry
-from app.services.engine import impact, override_context, risk_engine
+from app.services import aggregate_cache, parameter_registry
+from app.services.engine import impact, override_context, risk_engine, tunables
 
 log = logging.getLogger(__name__)
 
@@ -117,11 +117,11 @@ def _reduction_factor(mdef: dict, fraction: float, unit_factor: float = 1.0) -> 
     """
     base_r = float(mdef.get("default_reduction", 0.0))
     if mdef.get("coverage_scaling") == "saturating":
-        r = base_r * min(1.0, fraction * 1.5)
+        r = base_r * min(1.0, fraction * tunables.effective_measure_saturation())
     else:
         r = base_r * fraction
     r = r * unit_factor
-    r = max(0.0, min(0.95, r))
+    r = max(0.0, min(tunables.effective_measure_reduction_cap(), r))
     n = max(1, len(mdef.get("effect_target", []) or []))
     return (1.0 - r) ** n
 
@@ -262,6 +262,17 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     mdef = parameter_registry.resolve_measure_def(mdef, overrides)
     mdef = {**mdef, "custom_sources": _measure_custom_sources(db_overrides, measure.measure_type)}
 
+    # Kommune-Overrides für alle Live-Reads dieses Laufs installieren (k_indirekt,
+    # Kostensätze in _cell_cost, Sättigung/Kappung in _reduction_factor): ohne Scope
+    # läse dieser Request-Pfad die Overrides der zuletzt gerechneten Kommune
+    # (Cross-Kommune-Leak, MODELL_KRITIK §8/B2).
+    with override_context.override_scope(overrides):
+        return _compute_impact_scoped(db, measure, mdef)
+
+
+def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict) -> dict:
+    """Kern von ``compute_impact`` — läuft innerhalb des Override-Scopes der Kommune."""
+    measure_id = measure.id
     coverage, covered_area_m2 = _coverage(db, measure)
     if not coverage:
         db.query(MeasureImpact).filter(MeasureImpact.measure_id == measure_id).delete()
@@ -287,9 +298,9 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     # und verknüpftem Risiko  Zellkosten · (1 − factor). Für pop-/area-skalierte Risiken
     # ist das exakt der Beitrag dieser Maßnahme zu „Vermiedene Schäden" (Σ-über-Zellen im
     # Aggregat), weil dieselbe Zellkosten-Basis (``_cell_cost`` = Aggregat-Basis) und
-    # derselbe multiplikative Zell-Faktor benutzt werden. Flache Ausfall-/Screening-
-    # Risiken sind nicht zell-additiv (Aggregat rechnet sie P90-basiert) und tragen hier
-    # nichts bei; ihre Minderung erscheint im Kommunen-Aggregat „mit Maßnahmen".
+    # derselbe multiplikative Zell-Faktor benutzt werden. Flache Ausfall-Risiken
+    # (kommunenweiter P90-Einzelwert) sind nicht zell-additiv — ihr Nutzen wird unten
+    # separat als Delta der kommunenweiten P90-Outcome-Kosten gerechnet.
     covered_base_index: dict[str, float] = {}
     covered_new_index: dict[str, float] = {}
     annual_benefit_damage = 0.0
@@ -325,6 +336,47 @@ def compute_impact(db: Session, measure_id: int) -> dict:
                     annual_benefit_damage += k_indirect * reduced
         db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid, indicator_deltas=deltas))
 
+    # Flat-skalierte verknüpfte Risiken (z. B. Ausfallstunden bei Netzverstärkung):
+    # Das Aggregat rechnet sie als kommunenweiten P90-Outcome — der Nutzen dieser
+    # Maßnahme ist die Differenz der P90-Outcome-Kosten ohne/mit ihrem Zell-Faktor
+    # (identische Logik wie ``_adjusted_cell_data``/``aggregate``, inkl. Pop-Skalierung
+    # der flat-€-Bewertung). Vorher zeigten solche Maßnahmen hier 0 € Nutzen trotz
+    # CAPEX. Deckt die Maßnahme zu wenige Zellen ab, um das P90 zu bewegen, bleibt der
+    # Nutzen ehrlich 0 (konsistent: auch das Aggregat würde sich nicht ändern).
+    annual_benefit_flat = 0.0
+    flat_linked = [
+        catalog.RISKS_BY_CODE[c] for c in linked
+        if c in catalog.RISKS_BY_CODE
+        and catalog.RISKS_BY_CODE[c].get("scale", "pop") not in ("pop", "area")
+        and catalog.risk_contributes_to_total(catalog.RISKS_BY_CODE[c])
+    ]
+    if flat_linked:
+        kommune = db.query(Kommune).filter(Kommune.id == measure.kommune_id).first()
+        total_pop = float(kommune.population or 0) if kommune else 0.0
+        kommune_area_km2 = float(kommune.area_km2 or 0) if kommune else 0.0
+        all_rows = db.query(CellAssessment).filter(
+            CellAssessment.kommune_id == measure.kommune_id).all()
+        for risk in flat_linked:
+            rcode = risk["code"]
+            base_indices: list[float] = []
+            adj_indices: list[float] = []
+            for ca in all_rows:
+                idx = float((ca.data or {}).get("risks", {}).get(rcode, {}).get("index", 0.0))
+                base_indices.append(idx)
+                frac = coverage.get(ca.grid_cell_id)
+                if frac:
+                    idx *= _reduction_factor(mdef, frac, unit_factor)
+                adj_indices.append(idx)
+            base_p90 = risk_engine._percentile(base_indices)
+            adj_p90 = risk_engine._percentile(adj_indices)
+            if adj_p90 >= base_p90:
+                continue
+            base_cost = risk_engine.estimate_outcome_and_cost(
+                risk, base_p90, total_pop, kommune_area_km2)["cost_eur"]
+            adj_cost = risk_engine.estimate_outcome_and_cost(
+                risk, adj_p90, total_pop, kommune_area_km2)["cost_eur"]
+            annual_benefit_flat += max(0.0, base_cost - adj_cost)
+
     # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente)
     cost_breakdown = compute_costs(mdef, count, covered_area_m2)
     capex = cost_breakdown["capex"]["total_eur"]
@@ -346,7 +398,10 @@ def compute_impact(db: Session, measure_id: int) -> dict:
         "avg_index_reduction_pct": avg_reduction,
         "capex_eur": round(capex, 2),
         "opex_annual_eur": round(opex_annual, 2),
-        "annual_benefit_eur": round(annual_benefit_direct + annual_benefit_damage, 2),
+        "annual_benefit_eur": round(
+            annual_benefit_direct + annual_benefit_damage + annual_benefit_flat, 2),
+        # transparente Aufschlüsselung: flat-Anteil (kommunenweite P90-Risiken)
+        "annual_benefit_flat_eur": round(annual_benefit_flat, 2),
         "count": count,
         "count_is_default": count_is_default,
         "recommended_count": recommended_count,
@@ -424,15 +479,8 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
     return out
 
 
-def get_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool = False) -> dict:
-    """Aggregiertes Risiko (mit/ohne Maßnahmen) inkl. Kosten.
-
-    Die Kommune-Overrides werden für die Dauer der Aggregation als aktiver Engine-Scope
-    gesetzt (``override_scope``) — sonst läsen Kostensatz-/Legacy-Fallback-Pfade die
-    Overrides der zuletzt gerechneten Kommune (Cross-Kommune-Leak, §8/B2). So wirken
-    Kostensatz-Overrides zudem live auf die Aggregatsumme (``aggregate`` monetarisiert
-    aus dem gespeicherten Outcome).
-    """
+def _compute_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool) -> dict:
+    """Rechnet das Aggregat aus der DB (ohne Cache) — die eigentliche Arbeit."""
     kommune = db.query(Kommune).filter_by(id=kommune_id).first()
     total_pop = float(kommune.population or 0) if kommune else 0.0
     area_km2 = float(kommune.area_km2 or 0) if kommune else 0.0
@@ -441,3 +489,25 @@ def get_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool = Fals
     with override_context.override_scope(overrides):
         cell_data = _adjusted_cell_data(db, kommune_id, apply_measures)
         return risk_engine.aggregate(cell_data, total_pop, area_km2)
+
+
+def get_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool = False) -> dict:
+    """Aggregiertes Risiko (mit/ohne Maßnahmen) inkl. Kosten — mit Datei-Cache.
+
+    Das Aggregat lädt alle CellAssessment-Zeilen und aggregiert darüber; pro
+    Dashboard-Load geschieht das mehrfach mit identischen Eingaben. Der
+    ``aggregate_cache`` materialisiert das Ergebnis je ``(kommune_id,
+    apply_measures)`` und wird an allen Mutationspunkten explizit invalidiert.
+
+    Die Kommune-Overrides werden für die Dauer der Aggregation als aktiver Engine-Scope
+    gesetzt (``override_scope``) — sonst läsen Kostensatz-/Legacy-Fallback-Pfade die
+    Overrides der zuletzt gerechneten Kommune (Cross-Kommune-Leak, §8/B2). So wirken
+    Kostensatz-Overrides zudem live auf die Aggregatsumme (``aggregate`` monetarisiert
+    aus dem gespeicherten Outcome).
+    """
+    cached = aggregate_cache.load(kommune_id, apply_measures)
+    if cached is not None:
+        return cached
+    result = _compute_risk_aggregate(db, kommune_id, apply_measures)
+    aggregate_cache.store(kommune_id, apply_measures, result)
+    return result

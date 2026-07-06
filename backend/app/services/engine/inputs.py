@@ -14,15 +14,12 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
 
+from app.services.engine import tunables
+
 log = logging.getLogger(__name__)
 
-# UHI-Standardkoeffizienten (identisch zum Hitze-Assessor)
-UHI_ALPHA = 6.0
-UHI_BETA = 2.0
-UHI_GAMMA = 3.5
-UHI_DELTA = 2.0
-UHI_EPSILON = 1.5
-UHI_TREE = 0.3
+# UHI-Koeffizienten: sämtlich override-fähig über override_context.uhi_coefficients()
+# (Registry-IDs uhi.alpha…delta, uhi.epsilon, uhi.tree_cooling) — keine Modul-Literale.
 
 _w: dict = {}
 _nw: dict = {}
@@ -83,8 +80,8 @@ def compute_uhi_delta(lu: dict, bm: dict) -> float:
     uhi = uhi_coefficients()
     green_cooling = uhi["gamma"] * forest * 1.8 + uhi["gamma"] * meadow + uhi["gamma"] * farmland * 0.5
     water_cooling = uhi["delta"] * water
-    tree_cooling = UHI_TREE * canopy * 10.0
-    canyon = UHI_EPSILON * (1.0 - svf) * height_factor
+    tree_cooling = uhi["tree_cooling"] * canopy * 10.0
+    canyon = uhi["epsilon"] * (1.0 - svf) * height_factor
 
     uhi_base = uhi["alpha"] * (1.0 - albedo_lu) * imp + uhi["beta"] * bldg_factor
     delta = uhi_base - green_cooling - water_cooling - tree_cooling + canyon
@@ -325,8 +322,8 @@ def build_regional_context(
             low_flow_days = real_lfd
 
     # storm_days: ERA5-Sturmtage-Raster am Zentroid (falls vom Betreiber erzeugt),
-    # sonst regionaler Konstantwert (dokumentierter Fallback).
-    storm_days = 6.0
+    # sonst regionaler Konstantwert (dokumentierter, editierbarer Fallback).
+    storm_days = tunables.regional_fallback("storm_days", 6.0)
     real_storm = era5_storm.storm_days_at(lon, lat) if lon is not None else None
     if real_storm is not None:
         storm_days = real_storm
@@ -344,7 +341,9 @@ def build_regional_context(
     # (MODELL_KRITIK: heavy_rain aus mean_temp abgeleitet war fachlich unhaltbar).
     # Kalibrierung: DE-typisch ~8 Tage ≥20 mm + ~2 Tage ≥30 mm → Index ≈ 44 (nahe
     # dem bisherigen Baseline 40). Fallback: bisheriger Proxy.
-    heavy_rain_index = round(40.0 + (mean_temp - 9.5) * 4.0, 1)
+    heavy_rain_index = round(
+        tunables.regional_fallback("heavy_rain_base", 40.0)
+        + (mean_temp - 9.5) * tunables.regional_fallback("heavy_rain_slope", 4.0), 1)
     provenance["heavy_rain_index"] = "proxy_mean_temp"
     if lon is not None:
         p20 = dwd_cdc_grid.precip_days_ge20_at(lon, lat)
@@ -364,17 +363,21 @@ def build_regional_context(
         "mean_temp": mean_temp,
         "tropical_nights": float(regional_clim["tropical_nights_per_year"]),
         "is_coastal": is_coastal,
-        "drought_days": round(8.0 + hot_days * 1.2, 1),
-        "dry_index": round(min(1.0, hot_days / 25.0), 3),
+        "drought_days": round(
+            tunables.regional_fallback("drought_base", 8.0)
+            + hot_days * tunables.regional_fallback("drought_factor", 1.2), 1),
+        "dry_index": round(
+            min(1.0, hot_days / max(1.0, tunables.regional_fallback("dry_index_divisor", 25.0))), 3),
         "frost_days": frost_days,
         "storm_days": storm_days,
         "heavy_rain_index": heavy_rain_index,
-        "mean_temp_rise": round(1.6 + (mean_temp - 9.5) * 0.1, 2),
+        "mean_temp_rise": round(
+            tunables.regional_fallback("mean_temp_rise_base", 1.6) + (mean_temp - 9.5) * 0.1, 2),
         "soil_moisture_decline": round(20.0 + hot_days, 1),
         "low_flow_days": low_flow_days,
         "surface_water_heating": round(1.5 + (mean_temp - 9.5) * 0.2, 2),
-        "sea_level_rise": 4.5 if is_coastal else 0.0,
-        "glacier_loss_rate": 0.5,
+        "sea_level_rise": tunables.regional_fallback("sea_level_rise", 4.5) if is_coastal else 0.0,
+        "glacier_loss_rate": tunables.regional_fallback("glacier_loss_rate", 0.5),
         "snow_days": float(snow_clim["snow_days_per_year"]),
         "snow_decline_rate_pct": float(snow_clim["snow_decline_rate_pct"]),
         "demographics": demo,

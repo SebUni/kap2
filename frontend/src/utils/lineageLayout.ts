@@ -29,7 +29,7 @@ const TYPE_WIDTH: Record<string, number> = {
 const OP_HEIGHT: Record<string, number> = {
   scaling: 72,
   norm: 88,
-  average: 56,
+  max: 56,
   multiply: 48,
   weight: 64,
   count: 56,
@@ -38,6 +38,13 @@ const OP_HEIGHT: Record<string, number> = {
   add: 44,
   clamp: 48,
   formula: 52,
+  af: 48,
+  gv: 48,
+  damage_curve: 48,
+  sum_cells: 48,
+  p90: 48,
+  intensity: 48,
+  ratio: 48,
 }
 
 export function labelLineCount(label: string, type: string): number {
@@ -62,8 +69,9 @@ export function estimateNodeWidth(node: LineageNodeData): number {
   if (node.type === 'operator') {
     const kind = meta.op_kind as string
     if (kind === 'multiply' || kind === 'divide' || kind === 'scale_factor') return 48
-    if (kind === 'scaling' || kind === 'norm') return 80
-    if (kind === 'average') return 88
+    if (kind === 'scaling' || kind === 'norm') return 96
+    if (kind === 'max' || kind === 'intensity' || kind === 'damage_curve' || kind === 'ratio') return 92
+    if (kind === 'sum_cells' || kind === 'gv' || kind === 'p90' || kind === 'af') return 72
     return TYPE_WIDTH.operator
   }
   if (node.type === 'pathway') {

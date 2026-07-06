@@ -4,6 +4,7 @@ import type {
   Kommune, AssessmentStatus, ConfigParameter, Measure,
   GeoJSONFeatureCollection, GeoJSONFeature, LayerMeta, MeasureImpactSummary,
   Catalog, RiskAggregate, CostSummary, RiskProjection, RiskHistogram,
+  KommuneProfile, CostProjection,
   LayerCategory,
 } from '../types'
 
@@ -88,15 +89,23 @@ interface AppState {
   configScrollAnchor: string | null
   requestConfigPanel: (scrollAnchor?: string) => void
 
+  // Konfigurations-Vollbild (ersetzt Tab-Inhalt + blendet Tab-Band aus)
+  showConfig: boolean
+  setShowConfig: (v: boolean) => void
+
   // Risk / cost aggregates
   riskSummary: RiskAggregate | null
   costSummary: CostSummary | null
   riskProjection: RiskProjection | null
   riskHistogram: RiskHistogram | null
+  kommuneProfile: KommuneProfile | null
+  costProjection: CostProjection | null
   loadRiskSummary: (kommuneId: number) => Promise<void>
   loadCostSummary: (kommuneId: number) => Promise<void>
   loadRiskProjection: (kommuneId: number) => Promise<void>
   loadRiskHistogram: (kommuneId: number) => Promise<void>
+  loadKommuneProfile: (kommuneId: number) => Promise<void>
+  loadCostProjection: (kommuneId: number) => Promise<void>
 
   // Climate data (DWD)
   climateHistory: Record<string, unknown> | null
@@ -142,12 +151,15 @@ export const useStore = create<AppState>((set, get) => ({
     if (get().kommune?.id !== id) {
       set({
         riskSummary: null, costSummary: null, riskHistogram: null,
+        kommuneProfile: null, costProjection: null,
         gridGeometry: null, gridGeometryKommuneId: null,
         layerValueCache: {}, layerGeoJson: null,
       })
     }
     const data = await api.getKommune(id)
     set({ kommune: data as unknown as Kommune })
+    // Profil unabhängig vom Assessment-Status laden (funktioniert auch ohne)
+    get().loadKommuneProfile(id).catch(() => {})
   },
 
   // Grid
@@ -259,11 +271,17 @@ export const useStore = create<AppState>((set, get) => ({
     configScrollAnchor: scrollAnchor ?? null,
   }),
 
+  // Konfigurations-Vollbild
+  showConfig: false,
+  setShowConfig: (v) => set({ showConfig: v }),
+
   // Aggregates
   riskSummary: null,
   costSummary: null,
   riskProjection: null,
   riskHistogram: null,
+  kommuneProfile: null,
+  costProjection: null,
   loadRiskSummary: async (kommuneId) => {
     const data = await api.getRiskSummary(kommuneId)
     set({ riskSummary: data as unknown as RiskAggregate })
@@ -279,6 +297,14 @@ export const useStore = create<AppState>((set, get) => ({
   loadRiskHistogram: async (kommuneId) => {
     const data = await api.getRiskHistogram(kommuneId)
     set({ riskHistogram: data as unknown as RiskHistogram })
+  },
+  loadKommuneProfile: async (kommuneId) => {
+    const data = await api.getKommuneProfile(kommuneId)
+    set({ kommuneProfile: data as unknown as KommuneProfile })
+  },
+  loadCostProjection: async (kommuneId) => {
+    const data = await api.getCostProjection(kommuneId)
+    set({ costProjection: data as unknown as CostProjection })
   },
 
   // Climate data
@@ -362,6 +388,8 @@ export const useStore = create<AppState>((set, get) => ({
       costSummary: null,
       riskProjection: null,
       riskHistogram: null,
+      kommuneProfile: null,
+      costProjection: null,
       measures: [],
       selectedMeasure: null,
       climateHistory: null,

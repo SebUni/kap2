@@ -82,4 +82,6 @@ def uhi_coefficients() -> dict[str, float]:
         "beta": float(get_override("uhi.beta", 2.0)),
         "gamma": float(get_override("uhi.gamma", 3.5)),
         "delta": float(get_override("uhi.delta", 2.0)),
+        "epsilon": float(get_override("uhi.epsilon", 1.5)),
+        "tree_cooling": float(get_override("uhi.tree_cooling", 0.3)),
     }

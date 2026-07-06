@@ -4,13 +4,12 @@ import { Network, type Edge, type Node, type Options } from 'vis-network'
 import 'vis-network/styles/vis-network.min.css'
 import type { LineageGraph, LineageNodeData, LineageNodeType } from '../types'
 import {
-  assignColumnPositions,
-  filterHiddenTypes,
-  filterLineageGraph,
-  findTerminalNode,
+  assertForestInvariants,
+  bridgeHiddenTypes,
+  forestLayout,
+  mergeDuplicates,
   pathwayInstanceIds,
-  treeLayout,
-  unfoldToTree,
+  unfoldToForest,
   type TreeNode,
 } from '../utils/lineageFilter'
 import { estimateNodeWidth } from '../utils/lineageLayout'
@@ -42,10 +41,22 @@ const LEGEND_LABELS: Record<LineageNodeType, string> = {
 const LEGEND_GROUPS: LegendGroup[] = [
   { label: 'Eingaben', types: ['source', 'parameter'] },
   { label: 'Zwischenergebnisse', types: ['intermediate'] },
-  { label: 'Risiko-Ebenen', types: ['hazard', 'exposure', 'vulnerability', 'pathway', 'aggregation'] },
-  { label: 'Ergebnis', types: ['outcome'] },
+  { label: 'Risiko-Ebenen', types: ['hazard', 'exposure', 'vulnerability', 'pathway'] },
   { label: 'Operatoren', types: ['operator'], rounded: true },
+  { label: 'Ergebnisse', types: ['outcome'] },
 ]
+
+// Startzustand: Quellen, Wirkungsketten und Ergebnisse sichtbar; alle weiteren
+// Detailstufen werden über die Legenden-Chips zugeschaltet. Ergebnisse sind
+// gepinnt und nie ausblendbar.
+const DEFAULT_HIDDEN_TYPES: ReadonlySet<LineageNodeType> = new Set([
+  'parameter',
+  'intermediate',
+  'hazard',
+  'exposure',
+  'vulnerability',
+  'operator',
+] as LineageNodeType[])
 
 function truncate(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text
@@ -130,7 +141,10 @@ function toVisData(
       if (isParam) {
         const pid = dn.data.meta?.parameter_id as string | undefined
         const param = pid ? parameters.find(p => p.id === pid) : undefined
-        const val = param ? String(param.value) : '—'
+        const metaValue = dn.data.meta?.value
+        const val = param
+          ? String(param.value)
+          : metaValue != null ? String(metaValue) : '—'
         const unit = param?.unit || String(dn.data.meta?.unit ?? '')
         const node: Record<string, unknown> = {
           id: dn.id,
@@ -283,8 +297,6 @@ function bindTooltipHandlers(
   }
 }
 
-type ViewMode = 'compact' | 'tree'
-
 interface Props {
   lineage: LineageGraph
   parameters?: ModelParameter[]
@@ -309,34 +321,31 @@ export default function LineageFlowDiagram({
   const tooltipCleanupRef = useRef<(() => void) | null>(null)
   const [networkReady, setNetworkReady] = useState(false)
 
-  const [mode, setMode] = useState<ViewMode>('compact')
-  const [focusColumn, setFocusColumn] = useState<number | null>(null)
-  const [hiddenTypes, setHiddenTypes] = useState<Set<LineageNodeType>>(new Set())
-  // Baum-Modus: Overrides gegenüber der Standard-Regel (Ketten eingeklappt).
+  const [hiddenTypes, setHiddenTypes] = useState<Set<LineageNodeType>>(
+    () => new Set(DEFAULT_HIDDEN_TYPES),
+  )
+  // Klick-Overrides gegenüber der Standard-Regel (alles ausgeklappt).
   const [expandedSet, setExpandedSet] = useState<Set<string>>(new Set())
   const [collapsedSet, setCollapsedSet] = useState<Set<string>>(new Set())
 
-  const terminal = useMemo(() => findTerminalNode(lineage), [lineage])
   const hasPathways = useMemo(
     () => lineage.nodes.some(n => n.type === 'pathway'),
     [lineage],
   )
 
-  // Baum-Modus: Wirkungskette → nur H/E/V; H/E/V → Zwischenschritte
+  // Standard: ausgeklappt; ausgeblendete Typen werden beim Auffächern nie als
+  // eingeklappt behandelt (sonst verschwänden ihre Teilbäume statt überbrückt zu werden).
   const isCollapsed = useCallback(
     (instanceId: string, node: LineageNodeData): boolean => {
+      if (hiddenTypes.has(node.type)) return false
       if (expandedSet.has(instanceId)) return false
-      if (collapsedSet.has(instanceId)) return true
-      if (node.type === 'pathway') return true
-      if (node.type === 'hazard' || node.type === 'exposure' || node.type === 'vulnerability') {
-        return true
-      }
-      return false
+      return collapsedSet.has(instanceId)
     },
-    [expandedSet, collapsedSet],
+    [expandedSet, collapsedSet, hiddenTypes],
   )
 
   const toggleLegendType = useCallback((type: LineageNodeType) => {
+    if (type === 'outcome') return
     setHiddenTypes(prev => {
       const next = new Set(prev)
       if (next.has(type)) next.delete(type)
@@ -346,54 +355,23 @@ export default function LineageFlowDiagram({
   }, [])
 
   const { displayNodes, displayEdges } = useMemo(() => {
-    if (mode === 'tree') {
-      const tree = unfoldToTree(lineage, isCollapsed)
-      const pos = treeLayout(tree)
-      const nodes: DisplayNode[] = tree.nodes.map((tn: TreeNode) => {
-        const p = pos.get(tn.instanceId) ?? { x: 0, y: 0 }
-        return {
-          id: tn.instanceId,
-          data: tn.data,
-          x: p.x,
-          y: p.y,
-          isTerminal: tn.parentInstanceId === null,
-          collapsed: tn.collapsed,
-          childCount: tn.childCount,
-        }
-      })
-      const edges: DisplayEdge[] = tree.edges.map(e => ({
-        id: e.id,
-        source: e.source,
-        target: e.target,
-        label: e.label,
-        meta: e.meta,
-      }))
-      if (hiddenTypes.size > 0) {
-        const hiddenIds = new Set(nodes.filter(n => hiddenTypes.has(n.data.type)).map(n => n.id))
-        const visNodes = nodes.filter(n => !hiddenIds.has(n.id))
-        const visIds = new Set(visNodes.map(n => n.id))
-        return {
-          displayNodes: visNodes,
-          displayEdges: edges.filter(e => visIds.has(e.source) && visIds.has(e.target)),
-        }
-      }
-      return { displayNodes: nodes, displayEdges: edges }
-    }
-
-    const columnFiltered = filterLineageGraph(lineage, focusColumn)
-    const filtered = filterHiddenTypes(columnFiltered, lineage, hiddenTypes)
-    const pos = assignColumnPositions(filtered.nodes)
-    const nodes: DisplayNode[] = filtered.nodes.map(n => {
-      const p = pos.get(n.id) ?? { x: 0, y: 0 }
+    const forest = unfoldToForest(lineage, isCollapsed)
+    const visible = mergeDuplicates(bridgeHiddenTypes(forest, hiddenTypes))
+    if (import.meta.env.DEV) assertForestInvariants(visible, 'diagram')
+    const pos = forestLayout(visible)
+    const nodes: DisplayNode[] = visible.nodes.map((tn: TreeNode) => {
+      const p = pos.get(tn.instanceId) ?? { x: 0, y: 0 }
       return {
-        id: n.id,
-        data: n,
+        id: tn.instanceId,
+        data: tn.data,
         x: p.x,
         y: p.y,
-        isTerminal: !!terminal && n.id === terminal.id,
+        isTerminal: tn.data.type === 'outcome',
+        collapsed: tn.collapsed,
+        childCount: tn.childCount,
       }
     })
-    const edges: DisplayEdge[] = filtered.edges.map(e => ({
+    const edges: DisplayEdge[] = visible.edges.map(e => ({
       id: e.id,
       source: e.source,
       target: e.target,
@@ -401,7 +379,7 @@ export default function LineageFlowDiagram({
       meta: e.meta,
     }))
     return { displayNodes: nodes, displayEdges: edges }
-  }, [mode, lineage, focusColumn, hiddenTypes, isCollapsed, terminal])
+  }, [lineage, hiddenTypes, isCollapsed])
 
   const fitNetwork = useCallback(() => {
     const net = networkRef.current
@@ -457,49 +435,39 @@ export default function LineageFlowDiagram({
   }, [])
 
   const fitRevision = useMemo(
-    () => `${mode}|${lineage.nodes.length}|${lineage.edges.length}`,
-    [mode, lineage.nodes.length, lineage.edges.length],
+    () => `${lineage.nodes.length}|${lineage.edges.length}`,
+    [lineage.nodes.length, lineage.edges.length],
   )
 
   const handleNodeClick = useCallback((nodeId: string) => {
-    if (mode === 'tree') {
-      const tn = displayNodes.find(d => d.id === nodeId)
-      if (!tn || tn.data.type === 'operator' || (tn.childCount ?? 0) === 0) return
-      const currentlyCollapsed = !!tn.collapsed
-      setExpandedSet(prev => {
-        const next = new Set(prev)
-        if (currentlyCollapsed) next.add(nodeId)
-        else next.delete(nodeId)
-        return next
-      })
-      setCollapsedSet(prev => {
-        const next = new Set(prev)
-        if (currentlyCollapsed) next.delete(nodeId)
-        else next.add(nodeId)
-        return next
-      })
-      return
-    }
-    const node = lineage.nodes.find(n => n.id === nodeId)
-    if (!node || node.type === 'operator') return
-    if (terminal && node.id === terminal.id) {
-      setFocusColumn(null)
-      return
-    }
-    setFocusColumn(prev => (prev === node.column ? null : node.column))
-  }, [mode, displayNodes, lineage.nodes, terminal])
+    const tn = displayNodes.find(d => d.id === nodeId)
+    if (!tn || tn.data.type === 'operator' || (tn.childCount ?? 0) === 0) return
+    const currentlyCollapsed = !!tn.collapsed
+    setExpandedSet(prev => {
+      const next = new Set(prev)
+      if (currentlyCollapsed) next.add(nodeId)
+      else next.delete(nodeId)
+      return next
+    })
+    setCollapsedSet(prev => {
+      const next = new Set(prev)
+      if (currentlyCollapsed) next.delete(nodeId)
+      else next.add(nodeId)
+      return next
+    })
+  }, [displayNodes])
 
   clickHandlerRef.current = handleNodeClick
 
   const expandAll = useCallback(() => {
-    setExpandedSet(new Set(pathwayInstanceIds(lineage)))
-    setCollapsedSet(new Set())
-  }, [lineage])
-
-  const collapseAll = useCallback(() => {
     setExpandedSet(new Set())
     setCollapsedSet(new Set())
   }, [])
+
+  const collapseAll = useCallback(() => {
+    setExpandedSet(new Set())
+    setCollapsedSet(new Set(pathwayInstanceIds(lineage)))
+  }, [lineage])
 
   useEffect(() => {
     const el = containerRef.current
@@ -585,55 +553,38 @@ export default function LineageFlowDiagram({
             <div key={group.label} className="kap-lineage-legend-group">
               <span className="kap-lineage-legend-group-label">{group.label}</span>
               <div className="kap-lineage-legend-chips">
-                {group.types.map(type => (
-                  <button
-                    key={type}
-                    type="button"
-                    className={`kap-lineage-chip kap-lineage-node--${type}${group.rounded ? ' kap-lineage-chip--rounded' : ' kap-lineage-chip--square'}${hiddenTypes.has(type) ? ' is-off' : ''}`}
-                    onClick={() => toggleLegendType(type)}
-                    aria-pressed={!hiddenTypes.has(type)}
-                    title={hiddenTypes.has(type) ? `${LEGEND_LABELS[type]} einblenden` : `${LEGEND_LABELS[type]} ausblenden`}
-                  >
-                    {LEGEND_LABELS[type]}
-                  </button>
-                ))}
+                {group.types.map(type => {
+                  const pinned = type === 'outcome'
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      className={`kap-lineage-chip kap-lineage-node--${type}${group.rounded ? ' kap-lineage-chip--rounded' : ' kap-lineage-chip--square'}${hiddenTypes.has(type) ? ' is-off' : ''}`}
+                      onClick={() => toggleLegendType(type)}
+                      aria-pressed={!hiddenTypes.has(type)}
+                      disabled={pinned}
+                      title={pinned
+                        ? 'Ergebnisse sind immer sichtbar'
+                        : hiddenTypes.has(type)
+                          ? `${LEGEND_LABELS[type]} einblenden`
+                          : `${LEGEND_LABELS[type]} ausblenden`}
+                    >
+                      {LEGEND_LABELS[type]}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           ))}
         </div>
         <div className="kap-lineage-actions">
-          <div className="kap-lineage-modeswitch" role="tablist" aria-label="Ansicht">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === 'compact'}
-              className={mode === 'compact' ? 'active' : ''}
-              onClick={() => setMode('compact')}
-            >
-              Kompakt
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === 'tree'}
-              className={mode === 'tree' ? 'active' : ''}
-              onClick={() => setMode('tree')}
-            >
-              Aufgefächert
-            </button>
-          </div>
-          {mode === 'compact' && focusColumn !== null && (
-            <button type="button" className="kap-lineage-reset" onClick={() => setFocusColumn(null)}>
-              Alles zeigen
-            </button>
-          )}
-          {mode === 'tree' && hasPathways && (
+          {hasPathways && (
             <>
               <button type="button" className="kap-lineage-reset" onClick={expandAll}>
-                Alle Ketten ausklappen
+                Alles ausklappen
               </button>
               <button type="button" className="kap-lineage-reset" onClick={collapseAll}>
-                Einklappen
+                Ketten einklappen
               </button>
             </>
           )}

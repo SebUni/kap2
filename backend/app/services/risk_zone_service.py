@@ -14,6 +14,7 @@ from geoalchemy2 import functions as func
 from sqlalchemy.orm import Session
 
 from app.models.models import CellAssessment, GridCell, RiskZone, RiskZoneCell
+from app.services.engine import tunables
 
 log = logging.getLogger(__name__)
 
@@ -21,8 +22,20 @@ log = logging.getLogger(__name__)
 # Max-Kombination (Stufe 1, MODELL_KRITIK §3.1): der Index bildet jetzt die stärkste
 # Wirkungskette ab (früher gewichteter Mittelwert, ~Faktor 1,5–2 niedriger). Die
 # Schwelle bleibt damit auf demselben realen Belastungsniveau wie zuvor.
-RISK_THRESHOLD = 50.0
+# Editierbar je Kommune als Registry-Parameter ``model.risk_threshold`` (tunables).
+RISK_THRESHOLD = tunables.RISK_THRESHOLD_DEFAULT
 LEVEL = 1
+
+
+def _effective_threshold(db: Session, kommune_id: int) -> float:
+    """Kommune-Override der Risikozonen-Schwelle (Request-Pfad ohne globalen Scope)."""
+    from app.services import parameter_registry
+
+    ov = parameter_registry.overrides_map(parameter_registry.load_db_overrides(db, kommune_id))
+    try:
+        return float(ov.get("model.risk_threshold", RISK_THRESHOLD))
+    except (TypeError, ValueError):
+        return RISK_THRESHOLD
 
 
 def _load_cell_risk(db: Session, kommune_id: int, risk_code: str):
@@ -42,7 +55,9 @@ def _load_cell_risk(db: Session, kommune_id: int, risk_code: str):
 
 
 def compute_risk_zones(db: Session, kommune_id: int, risk_code: str,
-                       threshold: float = RISK_THRESHOLD) -> list[dict]:
+                       threshold: float | None = None) -> list[dict]:
+    if threshold is None:
+        threshold = _effective_threshold(db, kommune_id)
     cell_map, grid_idx = _load_cell_risk(db, kommune_id, risk_code)
     if not cell_map:
         return []

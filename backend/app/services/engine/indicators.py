@@ -9,7 +9,7 @@ den (i)-Tooltips dokumentiert.
 from __future__ import annotations
 
 from app.data import catalog
-from app.services.engine import override_context
+from app.services.engine import override_context, tunables
 
 
 def _clamp(x: float, lo: float, hi: float) -> float:
@@ -79,9 +79,11 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
     coastal = regional["is_coastal"]
     dry = regional["dry_index"]
     share_old = float(ci.get("share_over_65") if ci.get("share_over_65") is not None
-                    else regional["demographics"].get("share_over_65", 22.0))
+                    else regional["demographics"].get(
+                        "share_over_65", tunables.regional_fallback("share_over_65", 22.0)))
     share_young = float(ci.get("share_under_18") if ci.get("share_under_18") is not None
-                      else regional["demographics"].get("share_under_18", 18.0))
+                      else regional["demographics"].get(
+                          "share_under_18", tunables.regional_fallback("share_under_18", 18.0)))
     share_vuln = float(ci.get("share_vulnerable") if ci.get("share_vulnerable") is not None
                        else min(100.0, share_old + share_young))
 

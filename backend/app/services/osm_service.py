@@ -49,6 +49,51 @@ async def search_kommune(query: str, limit: int = 10) -> list[dict]:
     return out
 
 
+#: Die 16 Bundesländer — Referenz für die Ableitung aus Nominatim-Adressen.
+BUNDESLAENDER = frozenset({
+    "Baden-Württemberg", "Bayern", "Berlin", "Brandenburg", "Bremen",
+    "Hamburg", "Hessen", "Mecklenburg-Vorpommern", "Niedersachsen",
+    "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland", "Sachsen",
+    "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen",
+})
+
+
+def bundesland_from_address(address: dict | None) -> Optional[str]:
+    """Bundesland aus einem Nominatim-``address``-Objekt ableiten.
+
+    Flächenländer liefern ``state``; bei Stadtstaaten fehlt ``state`` teils und
+    der Landesname steht in ``city`` (Berlin/Hamburg/Bremen).
+    """
+    if not address:
+        return None
+    for key in ("state", "city", "county"):
+        val = address.get(key)
+        if val in BUNDESLAENDER:
+            return val
+    return None
+
+
+async def reverse_bundesland(lat: float, lon: float) -> Optional[str]:
+    """Bundesland per Nominatim-Reverse-Geocoding am Punkt bestimmen (Backfill)."""
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                f"{settings.NOMINATIM_URL}/reverse",
+                params={
+                    "lat": lat, "lon": lon,
+                    "format": "json", "zoom": 5, "addressdetails": 1,
+                },
+                headers={"User-Agent": settings.NOMINATIM_USER_AGENT},
+                timeout=10.0,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+        return bundesland_from_address(data.get("address"))
+    except Exception as e:
+        logger.warning("Reverse-Geocoding (Bundesland) fehlgeschlagen: %s", e)
+        return None
+
+
 async def fetch_kommune_boundary(osm_id: str, osm_type: str = "relation",
                                   nominatim_geojson: Optional[dict] = None) -> Optional[dict]:
     """Fetch municipality boundary as GeoJSON.

@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 
 from app.data import catalog
+from app.services.engine import tunables
 
 log = logging.getLogger(__name__)
 
@@ -19,13 +20,17 @@ TOLERANCE = 5.0  # zulässiger Faktor Abweichung zwischen Summe und Referenzsch�
 
 
 def ref_estimate(risk: dict, total_pop: float, area_km2: float) -> float:
-    """Grobe Referenzschätzung des Outcomes (ref_value × Kommune-Skalierung)."""
+    """Grobe Referenzschätzung des Outcomes (ref_value × Kommune-Skalierung).
+
+    Nutzt dieselbe Referenzbevölkerung/-fläche wie die Engine (tunables) — sonst
+    liefe der Sanity-Anker bei editierter Referenz gegen einen anderen Maßstab.
+    """
     ref = float(risk.get("ref_value", 0.0))
     scale = risk.get("scale", "pop")
     if scale == "pop":
-        return ref * (total_pop / 100_000.0)
+        return ref * (total_pop / tunables.effective_ref_population())
     if scale == "area":
-        return ref * (area_km2 / 50.0)
+        return ref * (area_km2 / tunables.effective_ref_area_km2())
     return ref
 
 

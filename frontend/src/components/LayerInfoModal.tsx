@@ -5,6 +5,7 @@ import type {
   LayerRecipeMeta, ModelParameter, PathwayRecipeMeta, RiskRecipe,
 } from '../types'
 import LineageFlowDiagram from './LineageFlowDiagram'
+import { renderFormulaHtml } from '../utils/formulaLatex'
 import { useStore } from '../store'
 
 interface Props {
@@ -22,10 +23,27 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<InfoTab>('logic')
+  const [fullscreen, setFullscreen] = useState(false)
 
-  const load = async () => {
+  // Vollbild: Escape beendet nur das Vollbild, nicht das Modal.
+  useEffect(() => {
+    if (!fullscreen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        setFullscreen(false)
+      }
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [fullscreen])
+
+  const load = async (opts?: { silent?: boolean }) => {
     if (!kommune) return
-    setLoading(true)
+    // silent: Parameter-Update aus dem Diagramm — Daten im Hintergrund
+    // aktualisieren, ohne das Diagramm über loading=true zu unmounten
+    // (das wirkte wie ein Neuladen des ganzen Fensters).
+    if (!opts?.silent) setLoading(true)
     setError(null)
     try {
       const [recipeRes, paramsRes] = await Promise.all([
@@ -55,7 +73,7 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
   return (
     <div className="help-overlay" onClick={onClose}>
       <div
-        className="help-overlay-content layer-info-modal"
+        className={`help-overlay-content layer-info-modal${fullscreen ? ' layer-info-modal--fullscreen' : ''}`}
         onClick={e => e.stopPropagation()}
       >
         <div className="help-overlay-header layer-info-header">
@@ -63,7 +81,18 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
             <span className="layer-info-kicker">Wirkungsdiagramm</span>
             <h2>{title}</h2>
           </div>
-          <button type="button" onClick={onClose} className="help-overlay-close">✕</button>
+          <div className="layer-info-header-actions">
+            <button
+              type="button"
+              onClick={() => setFullscreen(f => !f)}
+              className="help-overlay-close layer-info-fullscreen-btn"
+              title={fullscreen ? 'Vollbild beenden (Esc)' : 'Als Vollbild anzeigen'}
+              aria-pressed={fullscreen}
+            >
+              {fullscreen ? '⤡' : '⛶'}
+            </button>
+            <button type="button" onClick={onClose} className="help-overlay-close">✕</button>
+          </div>
         </div>
 
         {!loading && !error && meta && hasReasoning && (
@@ -103,7 +132,7 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
                   lineage={meta.lineage}
                   parameters={parameters}
                   kommuneId={kommune?.id}
-                  onParametersUpdated={load}
+                  onParametersUpdated={() => load({ silent: true })}
                   embedded
                 />
               ) : (
@@ -135,6 +164,20 @@ export default function LayerInfoModal({ layer, onClose, onOpenConfig }: Props) 
 
 function isRiskRecipe(r: LayerRecipeMeta['recipe'] | undefined): r is RiskRecipe {
   return !!r && Array.isArray((r as RiskRecipe).pathways)
+}
+
+/** Formelzeile: als LaTeX gerendert, wenn der Text mathematisch ist. */
+function FormulaLine({ text }: { text: string }) {
+  const html = renderFormulaHtml(text)
+  if (html) {
+    return (
+      <p
+        className="kap-pathway-justify-formula"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    )
+  }
+  return <p className="kap-pathway-justify-formula">{text}</p>
 }
 
 const PATHWAY_TYPE_ORDER: Record<string, number> = {
@@ -201,7 +244,7 @@ function PathwayJustifications({
         })}
       </ol>
       {isRiskRecipe(recipe) && recipe.formula_index_header && (
-        <p className="kap-pathway-justify-formula">{recipe.formula_index_header}</p>
+        <FormulaLine text={recipe.formula_index_header} />
       )}
     </section>
   )
