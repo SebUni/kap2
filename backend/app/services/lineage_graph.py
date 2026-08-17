@@ -5,7 +5,13 @@ from __future__ import annotations
 from typing import Any
 
 from app.data import catalog
-from app.data.lineage_operators import CELL_DIRECT, CELL_OPERATORS, formula_operators_for
+from app.data.lineage_operators import (
+    AUX_LINEAGE,
+    CELL_DIRECT,
+    CELL_OPERATORS,
+    aux_formula_text,
+    formula_operators_for,
+)
 from app.data.pathway_descriptions import chain_label, get_pathway_description
 from app.services.engine import formulas
 from app.services.engine.formulas import risk_pathway_meta, risk_recipe
@@ -24,10 +30,14 @@ _IMPACT_GLOBAL_BY_KEY: dict[str, dict] = {s["key"]: s for s in IMPACT_GLOBAL_SPE
 
 SOURCE_IDS = {
     "osm": ("OSM", "OpenStreetMap"),
-    "dwd": ("DWD", "Deutscher Wetterdienst"),
-    "zensus": ("Zensus", "Zensus / Bevölkerungsdaten"),
-    "dem": ("DEM", "Digitales Geländemodell"),
+    "lod2": ("LoD2", "Amtliche 3D-Gebäudemodelle der Länder (LoD2, CityGML)"),
+    "dwd": ("DWD", "Deutscher Wetterdienst (CDC-Klimaraster)"),
+    "zensus": ("Zensus", "Zensus 2022 (100-m-Gitter, Destatis)"),
+    "dem": ("DEM", "AWS Terrarium DEM (digitales Geländemodell)"),
     "bsh": ("BSH", "Bundesamt für Seeschifffahrt"),
+    "pegelonline": ("PEGELONLINE", "Pegeldaten der Wasserstraßen- und Schifffahrtsverwaltung"),
+    "era5": ("ERA5", "ECMWF-Reanalyse (Böenklimatologie)"),
+    "inkar": ("INKAR", "BBSR INKAR / Regionalstatistik (sozioökonomische Kennzahlen je Gemeinde)"),
     "param": ("Parameter", "Modellannahme"),
     "computed": ("Berechnet", "Abgeleitet aus Zellgrößen"),
 }
@@ -44,19 +54,37 @@ INTERMEDIATE_LABELS: dict[str, str] = {
     "water_adj": "Gewässernähe (Nachbarschaft)",
     "water_prox": "Gewässernähe (Distanz)",
     "uhi_delta": "UHI-ΔT",
+    "uhi_delta_night": "UHI-ΔT (Nacht)",
+    "uhi_delta_mean": "UHI-ΔT (Tagesmittel)",
+    "summer_temp_raster": "Sommertemperatur (DWD-Raster)",
+    "summer_temp_uhi_dev": "Wärmeinsel-Abweichung",
+    "summer_temp_lapse": "Höhenkorrektur",
+    "summer_temp_cell": "Zell-Sommertemperatur",
+    "summer_night_temp": "Sommer-Nachttemperatur",
+    "pop_age_bands": "Bevölkerung je Altersband",
     "canopy_frac": "Baumkronenanteil",
-    "svf": "Himmelsichtfaktor",
+    "svf": "Himmelssichtfaktor",
     "avg_height": "Mittlere Gebäudehöhe",
     "vent_score": "Belüftungsgrad",
     "slope_deg": "Hangneigung",
-    "slope_factor": "Hangneigung (Proxy)",
-    "slope_proxy": "Hangneigung (Proxy)",
+    "slope_factor": "Hangfaktor",
+    "slope_proxy": "Hangfaktor (Proxy)",
     "mean_elevation_m": "Mittlere Höhe",
     "snow_elevation_factor": "Höhenfaktor Schnee",
     "depression_factor": "Senkenfaktor",
     "depression_proxy": "Senken-Proxy",
-    "twi_norm": "Topographisches Feuchte-Index",
+    "twi": "Feuchteindex (TWI)",
+    "twi_norm": "Feuchteindex (TWI), normiert",
+    "sink_depth_m": "Senkentiefe",
     "flow_accum": "Flussakkumulation",
+    "water_dist_m": "Gewässerdistanz",
+    "albedo": "Albedo",
+    "building_count_zensus": "Gebäudeanzahl (Zensus)",
+    "pop_over_65": "Einwohner ≥ 65",
+    "pop_under_18": "Einwohner < 18",
+    "drought_days": "Trockentage",
+    "dry_index": "Trockenheitsindex",
+    "low_flow_days": "Niedrigwasser-Tage",
     "pop": "Einwohner (Zelle)",
     "pop_density": "Bevölkerungsdichte",
     "area_km2": "Zellfläche",
@@ -80,6 +108,7 @@ INTERMEDIATE_LABELS: dict[str, str] = {
     "area_m2": "Zellfläche (m²)",
     "share_over_65": "Anteil ≥ 65 Jahre",
     "share_under_18": "Anteil < 18 Jahre",
+    "share_vulnerable": "Anteil vulnerable Gruppen",
     "living_area_per_person": "Wohnfläche je Person",
     "owner_share": "Eigentümerquote",
     "net_cold_rent": "Nettokaltmiete",
@@ -90,9 +119,14 @@ INTERMEDIATE_LABELS: dict[str, str] = {
     "dyke_prox": "Deichnähe",
     "emergency_access_score": "Notfall-Erreichbarkeit",
     "bldg_count": "Gebäudeanzahl",
-    "energy_infra_count": "Energieanlagen (Anzahl)",
-    "water_wastewater_count": "Wasser-/Abwasseranlagen (Anzahl)",
-    "communication_count": "Kommunikationsanlagen (Anzahl)",
+    "energy_infra_count": "Energie-Kritikalität (Punkte)",
+    "water_wastewater_count": "Wasser-/Abwasser-Kritikalität (Punkte)",
+    "communication_count": "Kommunikations-Kritikalität (Punkte)",
+    "transport_hub_count": "Verkehrsknoten-Kritikalität (Punkte)",
+    "energy_infra_classes": "Energieanlagen je Klasse (OSM)",
+    "water_wastewater_classes": "Wasser-/Abwasseranlagen je Klasse (OSM)",
+    "communication_classes": "Kommunikationsanlagen je Klasse (OSM)",
+    "transport_hub_classes": "Verkehrsknoten je Klasse (OSM)",
 }
 
 # cell_key → (intermediate_keys, source_ids)
@@ -105,12 +139,14 @@ CELL_INPUT_LINEAGE: dict[str, tuple[list[str], list[str]]] = {
     "forest_frac": ([], ["osm"]),
     "farmland_frac": ([], ["osm"]),
     "water_frac": ([], ["osm"]),
-    "water_adj": ([], ["osm"]),
-    "water_prox": ([], ["osm"]),
+    "water_adj": (["water_prox", "water_frac"], ["osm"]),
+    "water_prox": (["water_dist_m"], []),
+    "water_dist_m": ([], ["osm"]),
     "glacier_frac": ([], ["osm"]),
+    "albedo": ([], ["osm"]),
     "canopy_frac": ([], ["osm"]),
-    "svf": ([], ["osm"]),
-    "avg_height": ([], ["osm"]),
+    "svf": ([], ["lod2", "osm"]),
+    "avg_height": ([], ["lod2", "osm"]),
     "bldg_count": ([], ["osm"]),
     "energy_infra_count": ([], ["osm"]),
     "water_wastewater_count": ([], ["osm"]),
@@ -120,31 +156,50 @@ CELL_INPUT_LINEAGE: dict[str, tuple[list[str], list[str]]] = {
         ["bldg_cov", "road_cov", "green_frac", "forest_frac", "water_frac", "canopy_frac", "svf"],
         ["osm", "param"],
     ),
+    "uhi_delta_night": (["bldg_cov", "avg_height", "svf", "water_prox"], ["osm", "param"]),
+    "uhi_delta_mean": (["uhi_delta", "uhi_delta_night", "vent_score"], ["param"]),
+    "summer_temp_raster": ([], ["dwd"]),
+    "summer_night_temp": ([], ["dwd"]),
+    "summer_temp_uhi_dev": (["uhi_delta_mean"], []),
+    "summer_temp_lapse": (["mean_elevation_m"], []),
+    "summer_temp_cell": (
+        ["summer_temp_raster", "summer_temp_uhi_dev", "summer_temp_lapse"], []),
+    "pop_age_bands": (["pop", "share_over_65"], ["zensus"]),
     # Quellen fließen über die Teil-Zwischenwerte (slope_deg ← DEM, vent_score ← OSM)
-    "slope_factor": (["slope_deg", "vent_score"], []),
-    "slope_proxy": (["slope_deg", "vent_score"], []),
+    "slope_factor": (["slope_deg"], []),
+    "slope_proxy": (["vent_score"], []),
     "slope_deg": ([], ["dem"]),
     "vent_score": ([], ["osm"]),
     "mean_elevation_m": ([], ["dem"]),
     "snow_elevation_factor": (["mean_elevation_m"], ["dem"]),
-    "depression_factor": (["imp_frac", "water_adj", "vent_score"], ["osm", "dem"]),
+    "depression_factor": (["twi_norm", "sink_depth_m"], []),
     "depression_proxy": (["imp_frac", "water_adj", "vent_score"], ["osm", "dem"]),
-    "twi_norm": ([], ["dem"]),
+    "twi": (["flow_accum", "slope_deg"], []),
+    "twi_norm": (["twi"], []),
+    "sink_depth_m": ([], ["dem"]),
     "flow_accum": ([], ["dem"]),
     "pop": ([], ["zensus"]),
+    "pop_over_65": (["pop", "share_over_65"], []),
+    "pop_under_18": (["pop", "share_under_18"], []),
+    "building_count_zensus": ([], ["zensus"]),
     "pop_density": (["pop", "area_km2"], ["zensus", "computed"]),
     "area_km2": ([], []),
     "area_ha": ([], []),
     "industrial": (["bldg_cov", "road_cov", "imp_frac"], ["osm"]),
-    "healthcare_access_score": ([], ["osm"]),
+    "healthcare_access_score": (
+        ["dist_hospital_m", "dist_doctor_m", "dist_pharmacy_m"], [],
+    ),
     "hot_days": ([], ["dwd"]),
     "frost_days": ([], ["dwd"]),
     "heavy_rain_index": ([], ["dwd"]),
-    "storm_days": ([], ["dwd"]),
-    "mean_temp_rise": ([], ["dwd"]),
+    "storm_days": ([], ["era5"]),
+    "mean_temp_rise": (["mean_temp"], []),
     "mean_temp": ([], ["dwd"]),
-    "soil_moisture_decline": ([], ["dwd"]),
-    "surface_water_heating": ([], ["dwd"]),
+    "soil_moisture_decline": (["hot_days"], []),
+    "surface_water_heating": (["mean_temp"], []),
+    "drought_days": (["hot_days"], []),
+    "dry_index": (["hot_days"], []),
+    "low_flow_days": ([], ["pegelonline"]),
     "glacier_loss_rate": ([], ["dwd"]),
     "snow_decline_rate_pct": ([], ["dwd"]),
     "snow_days": ([], ["dwd"]),
@@ -152,6 +207,7 @@ CELL_INPUT_LINEAGE: dict[str, tuple[list[str], list[str]]] = {
     "area_m2": ([], []),
     "share_over_65": ([], ["zensus"]),
     "share_under_18": ([], ["zensus"]),
+    "share_vulnerable": (["share_over_65", "share_under_18"], []),
     "living_area_per_person": ([], ["zensus"]),
     "owner_share": ([], ["zensus"]),
     "net_cold_rent": ([], ["zensus"]),
@@ -163,72 +219,131 @@ CELL_INPUT_LINEAGE: dict[str, tuple[list[str], list[str]]] = {
     "emergency_access_score": ([], ["osm"]),
 }
 
-# Kurzbeschreibung, wie Zwischenwerte aus Eingaben berechnet werden
+# Kurzbeschreibung, wie Zwischenwerte aus Eingaben berechnet werden.
+# Keine Quellenangaben in Tooltips — die Quelle steht sichtbar als Box im
+# Diagramm (Nutzerwunsch).
 INTERMEDIATE_TOOLTIPS: dict[str, str] = {
-    "imp_frac": "Versiegelungsgrad = Gebäude- + Straßenanteil (OSM), ggf. mit Landnutzungs-Fallback.",
-    "imp_lu": "Versiegelungsanteil aus OSM-Landnutzungsklassen der Zelle.",
-    "bldg_cov": "Anteil der Zellfläche, die von Gebäudegrundrissen bedeckt ist (OSM).",
-    "road_cov": "Anteil der Zellfläche, der von Straßen bedeckt ist (OSM).",
-    "green_frac": "Anteil Grünflächen (Wiesen, Parks, Gärten) in der Zelle (OSM).",
-    "forest_frac": "Waldanteil der Zelle (OSM natural=wood/forest).",
-    "farmland_frac": "Acker- und landwirtschaftlicher Anteil (OSM).",
-    "water_frac": "Wasserflächenanteil der Zelle (OSM).",
-    "water_adj": "Wasseranteil in der 8-Nachbarschaft (max. benachbarter Wasseranteil).",
-    "water_prox": "Gewässernähe als Score aus Distanz zum nächsten Gewässer (OSM).",
-    "canopy_frac": "Baumkronenanteil aus OSM-Baumdaten.",
-    "svf": "Himmelsichtfaktor aus Gebäudehöhen und -anordnung (OSM).",
-    "avg_height": "Mittlere Gebäudehöhe in der Zelle (OSM).",
+    "imp_frac": "Versiegelungsgrad = Gebäude- + Straßenanteil, ggf. mit Landnutzungs-Fallback.",
+    "imp_lu": "Versiegelungsanteil aus den Landnutzungsklassen der Zelle.",
+    "bldg_cov": "Anteil der Zellfläche, die von Gebäudegrundrissen bedeckt ist.",
+    "road_cov": "Anteil der Zellfläche, der von Straßen bedeckt ist.",
+    "green_frac": "Anteil Grünflächen — Wiesen, Parks, Gärten — in der Zelle.",
+    "forest_frac": "Waldanteil der Zelle.",
+    "farmland_frac": "Acker- und landwirtschaftlicher Anteil der Zelle.",
+    "water_frac": "Wasserflächenanteil der Zelle.",
+    "water_adj": ("Kombinierte Gewässernähe: Maximum aus Nachbar-Wasseranteil, "
+                  "Gewässernähe-Score und Wasseranteil der Zelle."),
+    "water_prox": ("Gewässernähe als Score 0…1 aus der Distanz zum nächsten "
+                   "echten Gewässer: max(0; 1 − Distanz/500 m)."),
+    "water_dist_m": "Entfernung zum nächsten echten Gewässer in Metern (ohne Gräben).",
+    "canopy_frac": "Baumkronenanteil der Zelle.",
+    "svf": ("Himmelssichtfaktor (Horizontwinkel-Verfahren) aus dem "
+            "Gebäudehöhenraster; LoD2-Höhen wo verfügbar, sonst OSM."),
+    "avg_height": ("Mittlere Gebäudehöhe der Zelle (flächengewichtet); "
+                   "LoD2-Höhen wo verfügbar, sonst OSM-Heuristik."),
     "vent_score": "Frischluft-Anteil: offene/grüne Nachbarzellen / 8 Nachbarn.",
     "uhi_delta": (
-        "Städtische Wärmeinsel ΔT (K): Versiegelung, Gebäude, Albedo, "
-        "abzüglich Kühlung durch Grün, Wasser, Bäume und Straßenschlucht."
+        "Städtische Wärmeinsel ΔT in Kelvin: Aufheizung durch Versiegelung und "
+        "Gebäude, abzüglich Kühlung durch Grün, Wasser, Bäume und Himmelssicht."
     ),
-    "slope_deg": "Hangneigung aus Digitalem Geländemodell (DEM).",
-    "slope_factor": "Hangneigung normiert als Risikofaktor (DEM + Belüftung).",
-    "slope_proxy": "Hangneigung als Proxy (DEM + Belüftung).",
-    "mean_elevation_m": "Mittlere Geländehöhe der Zelle (DEM).",
-    "snow_elevation_factor": "Höhenmodulation für Schnee/Gletscher (aus Geländehöhe).",
-    "depression_factor": "Senkenneigung: Versiegelung + Gewässernähe − Belüftung.",
+    "uhi_delta_night": (
+        "Nächtliche Wärmeinsel: enge Straßenschluchten halten die Ausstrahlung "
+        "zurück, die Gebäudemasse gibt gespeicherte Wärme ab; Gewässer dämpfen."
+    ),
+    "uhi_delta_mean": (
+        "Wärmeinsel im 24-h-Mittel — die Größe, mit der die Expositions-Wirkungs-"
+        "Kurve rechnet, denn diese läuft über die Wochenmitteltemperatur (Tag und "
+        "Nacht). Zusätzlich durch den Luftaustausch mit dem Umland gedämpft."
+    ),
+    "summer_temp_raster": (
+        "Sommermitteltemperatur Juni–August aus dem DWD-Monatsraster (1 km), am "
+        "Zellmittelpunkt abgegriffen."
+    ),
+    "summer_night_temp": (
+        "Mittlere sommerliche Tagesminimum-Temperatur (DWD-Monatsraster)."
+    ),
+    "summer_temp_uhi_dev": (
+        "Abweichung der Wärmeinsel dieser Zelle vom Mittel ihrer 1-km-Rasterzelle. "
+        "Mittelwerttreu, damit der im DWD-Raster bereits enthaltene Wärmeinsel-"
+        "Anteil nicht doppelt gezählt wird."
+    ),
+    "summer_temp_lapse": (
+        "Höhenkorrektur gegenüber der mittleren Höhe der 1-km-Rasterzelle "
+        "(0,65 K je 100 Höhenmeter)."
+    ),
+    "summer_temp_cell": (
+        "Sommermitteltemperatur der Zelle: Rasterwert plus Wärmeinsel-Abweichung "
+        "plus Höhenkorrektur. Bezugsgröße der Expositions-Wirkungs-Kurve."
+    ),
+    "pop_age_bands": (
+        "Bevölkerung je Altersband (<65, 65–74, 75–84, 85+). Menge der 65+ aus dem "
+        "Zensus-Anteil, Binnenaufteilung aus den 5-Jahres-Gruppen."
+    ),
+    "slope_deg": "Hangneigung des Geländes in Grad.",
+    "slope_factor": ("Hangneigung min-max-normiert über alle Zellen der Kommune "
+                     "→ 0…1; ohne Geländemodell Fallback aus der Belüftung."),
+    "slope_proxy": "Hangfaktor-Proxy ohne Geländemodell: 0,3 + 0,4 · (1 − Belüftung).",
+    "mean_elevation_m": "Mittlere Geländehöhe der Zelle.",
+    "snow_elevation_factor": "Höhenmodulation für Schnee/Gletscher aus der Geländehöhe.",
+    "depression_factor": ("Senkenneigung: min(1; 0,55 · TWI normiert + 0,45 · "
+                          "Senkentiefe normiert); ohne Geländemodell Fallback aus "
+                          "Versiegelung, Gewässernähe und Belüftung."),
     "depression_proxy": "Senken-Proxy aus Versiegelung, Gewässernähe und Belüftung.",
-    "twi_norm": "Topographischer Feuchteindex (TWI) aus DEM, normiert.",
-    "flow_accum": "Flussakkumulation aus DEM (Wasserfluss-Akkumulation).",
-    "pop": "Einwohnerzahl der Zelle, anteilig aus Zensus-Raster verteilt.",
-    "pop_density": "Bevölkerungsdichte = Einwohner / Zellfläche (km²).",
-    "area_km2": "Zellfläche in km² aus Zellgröße (m).",
-    "area_ha": "Zellfläche in Hektar aus Zellgröße (m).",
+    "twi": ("Topographischer Feuchteindex: TWI = ln(A / tan β) mit A = "
+            "Flussakkumulation · Zellfläche und β = Hangneigung."),
+    "twi_norm": "TWI min-max-normiert über alle Zellen der Kommune → 0…1.",
+    "sink_depth_m": "Senkentiefe: max(0; mittlere Nachbarhöhe − Zellhöhe) in Metern.",
+    "flow_accum": "Dem Geländegefälle folgend akkumulierter Wasserfluss (D8).",
+    "albedo": "Flächengewichteter Albedo-Mittelwert der Landnutzungsklassen der Zelle.",
+    "pop": "Einwohnerzahl der Zelle, direkt aus dem Zensus-100-m-Gitter.",
+    "pop_over_65": "Einwohner ≥ 65 Jahre: Einwohner der Zelle · Anteil ≥ 65 / 100.",
+    "pop_under_18": "Einwohner < 18 Jahre: Einwohner der Zelle · Anteil < 18 / 100.",
+    "building_count_zensus": "Gebäudeanzahl der Zelle aus dem Zensus-Raster.",
+    "pop_density": "Bevölkerungsdichte = Einwohner / Zellfläche in km².",
+    "area_km2": "Zellfläche in km² aus der Zellgröße.",
+    "area_ha": "Zellfläche in Hektar aus der Zellgröße.",
     "industrial": "Industrieflächen-Proxy aus Gebäude-, Straßen- und Versiegelungsanteil.",
-    "healthcare_access_score": "Gesundheitszugang aus Distanz zu Ärzten/Krankenhäusern (OSM).",
-    "hot_days": "Anzahl heißer Tage pro Jahr (DWD, regional).",
-    "frost_days": "Anzahl Frosttage pro Jahr (DWD, regional).",
-    "heavy_rain_index": "Starkregenindex (DWD, regional).",
-    "storm_days": "Sturmtage pro Jahr (DWD, regional).",
-    "mean_temp_rise": "Temperaturanstieg gegenüber Referenzperiode (DWD, regional).",
-    "mean_temp": "Jahresmitteltemperatur (DWD, regional).",
-    "soil_moisture_decline": "Bodenfeuchte-Rückgang (DWD, regional).",
-    "surface_water_heating": "Gewässererwärmung (DWD, regional).",
-    "glacier_loss_rate": "Gletscherschwund-Rate (Parameter/DWD).",
-    "glacier_frac": "Gletscheranteil der Zelle (OSM).",
-    "snow_decline_rate_pct": "Trend Schneedecken-Rückgang (DWD, regional).",
-    "snow_days": "Schneedeckentage pro Jahr (DWD, regional).",
-    "sea_level_rise": "Meeresspiegelanstieg (BSH, regional).",
-    "area_m2": "Zellfläche in m² aus der Rastergeometrie (100 × 100 m).",
-    "share_over_65": "Anteil der Bevölkerung ab 65 Jahren (Zensus-Raster).",
-    "share_under_18": "Anteil der Bevölkerung unter 18 Jahren (Zensus-Raster).",
-    "living_area_per_person": "Wohnfläche je Person (Zensus-Raster).",
-    "owner_share": "Eigentümerquote der Wohnungen (Zensus-Raster).",
-    "net_cold_rent": "Mittlere Nettokaltmiete (Zensus-Raster).",
-    "building_age_mean": "Mittleres Gebäudealter (Zensus-/OSM-Daten).",
-    "dist_hospital_m": "Distanz zum nächsten Krankenhaus in Metern (OSM).",
-    "dist_doctor_m": "Distanz zur nächsten Arztpraxis/Klinik in Metern (OSM).",
-    "dist_pharmacy_m": "Distanz zur nächsten Apotheke in Metern (OSM).",
-    "dyke_prox": "Nähe-Score zu Deich-/Küstenschutzanlagen aus der Distanz (OSM).",
-    "emergency_access_score": "Erreichbarkeit von Feuerwehr/Rettung als Score aus der Distanz (OSM).",
+    "healthcare_access_score": ("Gesundheitszugang 0…1: 0,50 · Nähe Krankenhaus + "
+                                "0,35 · Nähe Arzt + 0,15 · Nähe Apotheke."),
+    "hot_days": "Anzahl heißer Tage pro Jahr (DWD-CDC-Raster am Zentroid), regional.",
+    "frost_days": "Anzahl Frosttage pro Jahr (DWD-CDC-Raster am Zentroid), regional.",
+    "heavy_rain_index": "Starkregenindex aus DWD-CDC-Niederschlagsrastern, regional.",
+    "storm_days": "Sturmtage pro Jahr aus der ERA5-Böenklimatologie, regional.",
+    "mean_temp_rise": ("Temperaturanstieg gegenüber der Referenzperiode — Proxy "
+                       "aus der Jahresmitteltemperatur, regional."),
+    "mean_temp": "Jahresmitteltemperatur, regional.",
+    "soil_moisture_decline": "Bodenfeuchte-Rückgang — Proxy aus heißen Tagen, regional.",
+    "surface_water_heating": ("Gewässererwärmung — Proxy aus der "
+                              "Jahresmitteltemperatur, regional."),
+    "drought_days": "Trockentage — Proxy aus heißen Tagen (8 + 1,2 · heiße Tage), regional.",
+    "dry_index": "Trockenheitsindex 0…1 — Proxy: min(1; heiße Tage / 25), regional.",
+    "low_flow_days": "Tage unter mittlerem Niedrigwasser am nächsten Pegel, regional.",
+    "glacier_loss_rate": "Gletscherschwund-Rate, regional.",
+    "glacier_frac": "Gletscheranteil der Zelle.",
+    "snow_decline_rate_pct": "Trend des Schneedecken-Rückgangs, regional.",
+    "snow_days": "Schneedeckentage pro Jahr, regional.",
+    "sea_level_rise": "Meeresspiegelanstieg, regional.",
+    "area_m2": "Zellfläche in m² aus der Rastergeometrie: 100 × 100 m.",
+    "share_over_65": "Anteil der Bevölkerung ab 65 Jahren in der Zelle.",
+    "share_under_18": "Anteil der Bevölkerung unter 18 Jahren in der Zelle.",
+    "share_vulnerable": ("Anteil vulnerabler Personen an der Zellbevölkerung: "
+                         "Ältere ab 65 und Kinder unter 18, gedeckelt bei 100 %."),
+    "living_area_per_person": "Wohnfläche je Person, direkt aus dem Zensus-Raster.",
+    "owner_share": "Eigentümerquote, direkt aus dem Zensus-Raster.",
+    "net_cold_rent": "Mittlere Nettokaltmiete je m², direkt aus dem Zensus-Raster.",
+    "building_age_mean": ("Mittleres Baujahr aus den Zensus-Baujahrsklassen "
+                          "(gebäudegewichtete Klassenmitten)."),
+    "dist_hospital_m": "Distanz zum nächsten Krankenhaus in Metern.",
+    "dist_doctor_m": "Distanz zur nächsten Arztpraxis/Klinik in Metern.",
+    "dist_pharmacy_m": "Distanz zur nächsten Apotheke in Metern.",
+    "dyke_prox": "Nähe-Score zu Deich-/Küstenschutzanlagen aus der Distanz.",
+    "emergency_access_score": "Erreichbarkeit von Feuerwehr/Rettung als Score aus der Distanz.",
 }
 
 COMPUTED_TOOLTIPS: dict[str, str] = {
-    "pop_density": "Einwohner (Zensus) geteilt durch Zellfläche (km²).",
-    "area_km2": "Zellgröße (m)² umgerechnet in km².",
-    "area_ha": "Zellgröße (m)² umgerechnet in Hektar.",
+    "pop_density": "Einwohner geteilt durch Zellfläche in km².",
+    "area_km2": "Zellgröße² umgerechnet in km².",
+    "area_ha": "Zellgröße² umgerechnet in Hektar.",
     "industrial": "Kombination aus Gebäude-, Straßen- und Versiegelungsanteil.",
 }
 
@@ -242,8 +357,19 @@ COMPUTED_RESOLVER_LINEAGE: dict[str, tuple[list[str], list[str]]] = {
 # Benannte Modellparameter, die als "param"-Quelle in CELL_INPUT_LINEAGE auftauchen
 CELL_PARAM_LABELS: dict[str, tuple[str, str]] = {
     "uhi_delta": (
-        "UHI-Koeffizienten (α, β, γ, δ)",
-        "VDI 3787 Bl.1 / Oke 1982 — editierbar in der Konfiguration (uhi.*)",
+        "UHI-Koeffizienten (α…ε, τ)",
+        "Übersetzen die dimensionslosen Flächenanteile in Kelvin — "
+        "editierbar in der Konfiguration (uhi.*)",
+    ),
+    "uhi_delta_night": (
+        "UHI-Nachtkoeffizienten (ε, ζ)",
+        "Straßenschluchten- und Wärmespeicher-Beitrag der Nacht — "
+        "editierbar in der Konfiguration (uhi.*)",
+    ),
+    "uhi_delta_mean": (
+        "Tagesmittel- und Lüftungsfaktoren",
+        "Nachtgewicht, Umrechnung auf das Tagesmittel und Dämpfung durch "
+        "Durchlüftung — editierbar in der Konfiguration (uhi.*)",
     ),
 }
 
@@ -265,6 +391,28 @@ def _regional_source(label: str) -> str:
     if "dwd" in ll or "wetter" in ll or "temperatur" in ll or "schnee" in ll or "regen" in ll:
         return "dwd"
     return "dwd"
+
+
+# Quell-Label → kanonische Quell-ID (Reihenfolge = Priorität). Verhindert, dass
+# benannte Quellen wie "AWS Terrarium DEM" als anonymer "Parameter"-Kasten enden.
+_SOURCE_LABEL_PATTERNS: list[tuple[str, tuple[str, ...]]] = [
+    ("osm", ("osm", "openstreetmap")),
+    ("dwd", ("dwd", "wetterdienst")),
+    ("zensus", ("zensus", "destatis")),
+    ("dem", ("dem", "terrarium", "gelände")),
+    ("lod2", ("lod2",)),
+    ("bsh", ("bsh",)),
+    ("pegelonline", ("pegelonline", "pegel")),
+    ("era5", ("era5",)),
+]
+
+
+def _resolve_source_id(label: str) -> str:
+    ll = label.lower()
+    for sid, patterns in _SOURCE_LABEL_PATTERNS:
+        if any(p in ll for p in patterns):
+            return sid
+    return "param"
 
 
 class LineageBuilder:
@@ -547,9 +695,23 @@ class LineageBuilder:
             )
 
         if src_type == "regional":
+            # Regionale Größen durch die Zellkey-Maschinerie routen — sonst
+            # erscheint statt der echten Kette (z. B. low_flow_days ←
+            # PEGELONLINE) nur eine per Label-Heuristik geratene Quellbox.
+            if key in CELL_OPERATORS or key in CELL_INPUT_LINEAGE or key in CELL_DIRECT:
+                return self.expand_cell_key(key)
             return self.ensure_source(_regional_source(inp.get("label", "")))
 
+        if src_type == "socio":
+            # BBSR-INKAR-Kennzahlen (Sozioökonomie je Gemeinde) — vorher
+            # fiel dieser Zweig fälschlich auf die OSM-Quellbox durch.
+            return self.ensure_source("inkar")
+
         if src_type == "demo":
+            # Bekannte Zell-Schlüssel (z. B. share_vulnerable) als echte
+            # Ableitungskette zeigen statt als anonyme Zensus-Direktquelle.
+            if key in CELL_OPERATORS or key in CELL_INPUT_LINEAGE:
+                return self.expand_cell_key(key)
             return self.ensure_source("zensus")
 
         if src_type == "computed":
@@ -609,12 +771,20 @@ def _incoming_labels(
     edges: list[dict],
     nodes_by_id: dict[str, dict],
 ) -> list[str]:
+    """Fachliche Eingaben eines Knotens für die "Eingaben:"-Tooltip-Zeile.
+
+    Quell-Boxen (OSM/DWD/…) werden nicht aufgezählt — sie stehen sichtbar im
+    Diagramm und sind keine inhaltliche Erklärung. Vorgelagerte Operatoren
+    sind Verkettung, keine Eingabe; ihre Labels sind ohnehin leer/symbolisch.
+    """
     labels: list[str] = []
     for e in edges:
         if e["target"] != node_id:
             continue
         src = nodes_by_id.get(e["source"])
-        if src:
+        if not src or src["type"] in ("source", "operator") or not src["label"]:
+            continue
+        if src["label"] not in labels:
             labels.append(src["label"])
     return labels
 
@@ -639,6 +809,70 @@ def _indicator_tooltip(code: str, unit: str) -> str:
     return "\n".join(lines)
 
 
+# Tooltip-Titel: Symbol-/Kürzel-Labels der Operator-Pills ausgeschrieben.
+# Regel: Kein unerklärtes Kürzel als alleiniger Titel — das Symbol bleibt in
+# Klammern erhalten (Wiedererkennung zur Pill und zu den Formeln).
+_SYMBOL_TITLES: dict[str, str] = {
+    "+": "Addition",
+    "×": "Multiplikation",
+    "÷": "Division",
+    "AF": "Attributable Fraktion (AF)",
+    "g(V̂)": "Vulnerabilitäts-Modifikator g(V̂)",
+    "Σ Zellen": "Summe über Zellen (Σ)",
+    "Σ": "Summe (Σ)",
+    "÷ Referenz": "Verhältnis zur Referenz",
+    "P90": "90. Perzentil (P90)",
+}
+
+# Fallback-Titel je Operator-Klasse (wenn kein beschreibendes Label vorliegt)
+_KIND_TITLES: dict[str, str] = {
+    "add": "Addition",
+    "multiply": "Multiplikation",
+    "divide": "Division",
+    "max": "Maximum",
+    "min": "Minimum",
+    "scale_factor": "Skalierung",
+    "scaling": "Skalierung",
+    "formula": "Formel",
+    "count": "Zählung",
+    "ratio": "Verhältnis",
+    "neighbor": "Nachbarschaftsanalyse",
+    "distance": "Distanzmessung",
+    "distance_score": "Nähe-Score",
+    "mean": "Mittelwert",
+    "lookup": "Regionalwert",
+    "constant": "Konstantwert",
+    "derived_index": "Ableitung",
+    "weighted_sum": "Gewichtete Summe",
+    "sum_cells": "Summe über Zellen (Σ)",
+    "p90": "90. Perzentil (P90)",
+    "af": "Attributable Fraktion (AF)",
+    "gv": "Vulnerabilitäts-Modifikator g(V̂)",
+    "damage_curve": "Schadenskurve",
+    "intensity": "Hazard-Intensität",
+    "norm": "Normierung",
+    "clamp": "Begrenzung",
+    "coverage": "Anteil",
+}
+
+
+def _operator_title(kind: str, label: str) -> str:
+    if label in _SYMBOL_TITLES:
+        return _SYMBOL_TITLES[label]
+    return label or _KIND_TITLES.get(kind, kind or "Operator")
+
+
+def _fmt_de(val: Any) -> str:
+    """Zahl deutsch formatiert, nie wissenschaftliche Notation (3.5e+06)."""
+    try:
+        f = float(val)
+    except (TypeError, ValueError):
+        return str(val)
+    if f == int(f) and abs(f) >= 1000:
+        return f"{int(f):,}".replace(",", ".")
+    return f"{f:g}".replace(".", ",")
+
+
 def _tooltip_for_node(
     node: dict,
     nodes_by_id: dict[str, dict],
@@ -654,9 +888,18 @@ def _tooltip_for_node(
         desc = meta.get("description", "Externe Datenquelle")
         return f"{label}\n{desc}\nWird als Eingabe in nachfolgende Merkmale eingespeist."
 
+    if ntype == "parameter":
+        lines = [label, meta.get("description", "Modellannahme")]
+        val = meta.get("value")
+        if val is not None:
+            lines.append(f"Wert: {_fmt_de(val)} {meta.get('unit', '')}".strip())
+        return "\n".join(lines)
+
     if ntype == "intermediate":
         cell_key = meta.get("cell_key", "")
-        if nid.startswith("int:computed:"):
+        if meta.get("note"):
+            base = str(meta["note"])
+        elif nid.startswith("int:computed:"):
             resolver = nid.split("int:computed:", 1)[-1]
             base = COMPUTED_TOOLTIPS.get(resolver, f"Berechneter Zwischenwert ({label}).")
         else:
@@ -693,48 +936,46 @@ def _tooltip_for_node(
 
     if ntype == "operator":
         kind = meta.get("op_kind", "")
-        tooltip = meta.get("tooltip", "")
+        note = meta.get("note", "")
         label_op = meta.get("label", "")
+        if kind == "multiplier":
+            return _tooltip_for_node(
+                {**node, "meta": {**meta, "op_kind": "scaling"}}, nodes_by_id, edges,
+            )
         if kind == "scaling":
-            src = meta.get("source", "")
             val = meta.get("value")
             unit = meta.get("unit", "")
             scale = meta.get("scale", "pop")
-            lines = ["Skalierung", f"Referenzwert: {val:g} {unit}".strip()]
-            if src:
-                lines.append(f"Quelle: {src}")
-            lines.append(f"Berechnung: {_SCALE_FORMULAS.get(scale, _SCALE_FORMULAS['flat'])}")
+            lines = [label_op or "Skalierung"]
+            if note:
+                lines.append(note)
+            if val is not None:
+                value_label = "Kostensatz" if scale == "cost" else "Referenzwert"
+                lines.append(f"{value_label}: {_fmt_de(val)} {unit}".strip())
+            if scale in _SCALE_FORMULAS:
+                lines.append(f"Berechnung: {_SCALE_FORMULAS[scale]}")
+            if incoming:
+                lines.append(f"Eingaben: {', '.join(incoming)}")
             return "\n".join(lines)
-        if kind == "multiply":
-            return tooltip or "Multiplikation: Gefahr × Betroffenheit × Empfindlichkeit"
-        if kind == "max":
-            return tooltip or (
-                "Stärkste Wirkungskette (0–100): Index = 100 · max(Gewicht · Ĥ · Ê · V̂)."
-            )
         if kind == "norm":
             lo, hi = meta.get("norm_min"), meta.get("norm_max")
             unit = meta.get("unit", "")
-            src = meta.get("source", "")
             lines = [
                 "Normierung",
                 f"Untergrenze {lo} {unit} → normiert 0".strip(),
                 f"Obergrenze {hi} {unit} → normiert 1".strip(),
             ]
-            if src:
-                lines.append(f"Quelle: {src}")
-            return "\n".join(lines)
-        if kind in ("count", "coverage", "neighbor", "clamp", "add", "divide",
-                    "scale_factor", "max", "min", "weighted_sum", "formula"):
-            lines = [label_op or kind]
-            if tooltip:
-                lines.append(tooltip)
             if incoming:
                 lines.append(f"Eingaben: {', '.join(incoming)}")
             return "\n".join(lines)
-        if kind == "multiplier":
-            return _tooltip_for_node(
-                {**node, "meta": {**meta, "op_kind": "scaling"}}, nodes_by_id, edges,
-            )
+        # Einheitliche Komposition für alle übrigen Operator-Klassen:
+        # Titel (Kürzel ausgeschrieben) → Notiz/Formel → Eingaben.
+        lines = [_operator_title(kind, label_op)]
+        if note:
+            lines.append(note)
+        if incoming:
+            lines.append(f"Eingaben: {', '.join(incoming)}")
+        return "\n".join(lines)
 
     if ntype == "aggregation":
         short = meta.get("short", "stärkste Wirkungskette (Maximum)")
@@ -768,11 +1009,13 @@ def _tooltip_for_node(
             lines.append(f"Absolutes Ergebnis (Schicht B) in {unit}".strip() + ".")
         elif result_kind == "eur":
             lines.append("Monetäres Ergebnis (Schicht B) in €/Jahr.")
-            cost_src = meta.get("cost_source", "")
-            if cost_src:
-                lines.append(f"Kostensatz-Quelle: {cost_src}")
+        elif result_kind == "raw":
+            lines.append(
+                (f"Kartenwert in {unit} — " if unit else "Kartenwert — ")
+                + "Rohwert, nicht normiert."
+            )
         if ref is not None:
-            lines.append(f"Referenzfall: {ref:g} {unit}".strip())
+            lines.append(f"Referenzfall: {_fmt_de(ref)} {unit}".strip())
         if formula:
             lines.append(f"Berechnung: {formula}")
         elif incoming and result_kind is None:
@@ -794,10 +1037,10 @@ def _add_operator_compute(
     meta: dict[str, Any] = {
         "op_kind": step["op_kind"],
         "label": step.get("label", ""),
-        "tooltip": step.get("tooltip", ""),
+        "note": step.get("note", ""),
     }
     for k, v in step.items():
-        if k not in ("op_kind", "label", "tooltip", "input_keys"):
+        if k not in ("op_kind", "label", "note", "input_keys"):
             meta[k] = v
     b.add_node(op_id, "operator", "", column=0, collapse_group=collapse_group, meta=meta)
     return op_id
@@ -834,7 +1077,7 @@ def _add_operator_scaling(
             "unit": unit,
             "scale": scale,
             "source": _SCALE_SOURCES.get(scale, _SCALE_SOURCES["flat"]),
-            "tooltip": "Skalierung des Indexes auf den Referenz-Outcome.",
+            "note": "Skalierung des Indexes auf den Referenz-Outcome.",
         },
     )
     return op_id
@@ -847,7 +1090,7 @@ def _add_operator_multiply(b: "LineageBuilder", op_id: str) -> str:
         meta={
             "op_kind": "multiply",
             "label": "×",
-            "tooltip": (
+            "note": (
                 "Gefahr × Betroffenheit × Empfindlichkeit (jeweils normiert 0…1; "
                 "Normierungsgrenzen im Diagramm des jeweiligen Einflusses).\n"
                 r"$$\hat{H} \cdot \hat{E} \cdot \hat{V}$$"
@@ -865,7 +1108,7 @@ def _add_operator_max(b: "LineageBuilder") -> str:
         meta={
             "op_kind": "max",
             "label": "Maximum",
-            "tooltip": (
+            "note": (
                 "Stärkste Wirkungskette (0–100): Die Kette mit dem höchsten gewichteten "
                 "Produkt bestimmt den Index; die Kettenzahl beeinflusst ihn nicht.\n"
                 r"$$\mathrm{Index} = 100 \cdot \max_{p}\,\bigl(w_{p} \cdot \hat{H} \cdot \hat{E} \cdot \hat{V}\bigr)$$"
@@ -1041,13 +1284,17 @@ def _finalize_graph(graph: dict) -> dict:
 
 
 def _enrich_tooltips(graph: dict) -> dict:
+    """Einzige Schreibquelle für meta["tooltip"] — komponiert IMMER neu.
+
+    Autorentexte liegen unter meta["note"]; Titel und die maschinelle
+    "Eingaben:"-Zeile (aus den echten Kanten) kommen aus _tooltip_for_node.
+    So kann die Eingaben-Legende nicht vergessen werden oder veralten.
+    """
     nodes = graph.get("nodes", [])
     edges = graph.get("edges", [])
     nodes_by_id = {n["id"]: n for n in nodes}
     for n in nodes:
-        meta = n.setdefault("meta", {})
-        if not meta.get("tooltip"):
-            meta["tooltip"] = _tooltip_for_node(n, nodes_by_id, edges)
+        n.setdefault("meta", {})["tooltip"] = _tooltip_for_node(n, nodes_by_id, edges)
     return graph
 
 
@@ -1121,14 +1368,7 @@ def build_indicator_lineage(code: str, category: str, *, include_norm: bool = Tr
     cell_key_map: dict[str, str] = {}
     for inp in recipe.get("inputs", []):
         if inp.get("key") == "__source":
-            src_label = inp.get("label", "")
-            if "OSM" in src_label:
-                sid = b.ensure_source("osm")
-            elif "DWD" in src_label:
-                sid = b.ensure_source("dwd")
-            else:
-                sid = b.ensure_source("param")
-            input_ids.append(sid)
+            input_ids.append(b.ensure_source(_resolve_source_id(inp.get("label", ""))))
             continue
         if inp.get("prov") == formulas.PARAM:
             # Trägt ein Operator-Schritt den Wert bereits sichtbar (z. B. Skalierung
@@ -1199,6 +1439,58 @@ def build_indicator_lineage(code: str, category: str, *, include_norm: bool = Tr
     return _prune_lineage(b.build())
 
 
+def build_auxiliary_lineage(code: str) -> dict:
+    """Sonstige-Ebene: echte Quellen → Zellwert-Kette → Rohwert-Ergebnis.
+
+    Bewusst OHNE Normierungs-Schritt — die Karten zeigen für Sonstige-Ebenen
+    Rohwerte; norm_min/norm_max dienen nur der Farbskala. Ebenen mit inhärent
+    normiertem Kartenwert (z. B. TWI_NORMALIZED) erklären das in ihrem
+    Ableitungsschritt.
+    """
+    meta = catalog.AUXILIARY_BY_CODE.get(code)
+    if not meta:
+        return {"nodes": [], "edges": [], "collapse_groups": COLLAPSE_GROUPS}
+
+    b = LineageBuilder()
+    out_id = f"out:aux:{code}"
+    b.add_node(
+        out_id, "outcome", meta.get("name", code),
+        column=3, collapse_group="outcome",
+        meta={
+            "code": code,
+            "unit": meta.get("unit", ""),
+            "result_kind": "raw",
+            "formula": aux_formula_text(code, meta.get("source", "")),
+            "is_outcome": True,
+        },
+    )
+
+    spec = AUX_LINEAGE.get(code)
+    if not spec:
+        # Sicherheitsnetz für neue Codes ohne Eintrag: benannte Quelle statt
+        # anonymem Parameter-Kasten (Vollständigkeit erzwingt der Ratchet-Test).
+        b.add_edge(b.ensure_source(_resolve_source_id(meta.get("source", ""))), out_id)
+        return _prune_lineage(b.build())
+
+    input_ids: list[str] = []
+    cell_key_map: dict[str, str] = {}
+    for key in spec["keys"]:
+        iid = b.expand_cell_key(key)
+        cell_key_map[key] = iid
+        input_ids.append(iid)
+
+    steps = spec.get("steps")
+    if steps:
+        b._wire_operator_chain(
+            f"aux:{code}", steps, input_ids, out_id, cell_key_map=cell_key_map,
+        )
+    else:
+        for iid in input_ids:
+            b.add_edge(iid, out_id)
+
+    return _prune_lineage(b.build())
+
+
 def _merge_builder(target: LineageBuilder, other: dict) -> None:
     for n in other["nodes"]:
         target.add_node(
@@ -1249,12 +1541,14 @@ def _add_op(
     op_id: str,
     op_kind: str,
     label: str,
-    tooltip: str,
+    note: str,
     *,
     collapse_group: str = "outcome",
 ) -> str:
+    # Autorentext liegt unter "note"; der finale Tooltip (Titel + Notiz +
+    # Eingaben) wird zentral in _enrich_tooltips/_tooltip_for_node komponiert.
     b.add_node(op_id, "operator", "", column=0, collapse_group=collapse_group,
-               meta={"op_kind": op_kind, "label": label, "tooltip": tooltip})
+               meta={"op_kind": op_kind, "label": label, "note": note})
     return op_id
 
 
@@ -1278,7 +1572,7 @@ def _add_af_op(b: LineageBuilder, code: str, driver: dict) -> str:
     _add_op(
         b, op_id, "af", "AF",
         "Attributable Fraktion: Anteil des Outcomes, der den Hitzetagen zuzurechnen "
-        "ist (0…1). Unterhalb der Schwelle 0, oberhalb sättigend (RKI/Winklmayr 2022).\n"
+        "ist (0…1). Unterhalb der Schwelle 0, oberhalb sättigend.\n"
         r"$$AF = 1 - e^{-\beta\,(H_{\mathrm{Tage}} - H_{0})_{+}}$$",
     )
     b.add_edge(b.ensure_indicator(driver["hazard"], "hazards"), op_id)
@@ -1305,6 +1599,20 @@ def _add_driver_op(b: LineageBuilder, code: str, driver: dict) -> str:
         for pkey in driver.get("params", []):
             b.add_edge(_impact_param_node(b, code, pkey), op_id)
         return op_id
+    if kind == "erf":
+        op_id = f"op:erf:{code}"
+        _add_op(
+            b, op_id, "erf", "Wirkungskurve",
+            "Expositions-Wirkungs-Kurve nach RKI/Winklmayr: relatives Sterberisiko über "
+            "der Wochenmitteltemperatur, je Altersband und Region. Die Kurve wird über "
+            "die Verteilung der Sommerwochen summiert — nicht am Mittelwert ausgewertet, "
+            "denn das deutsche Sommermittel liegt unter der Wirkschwelle.\n"
+            r"$$\mathrm{Exzess} = \sum_{w} \left(e^{\beta_a\,(T_w - T_0)_{+}} - 1\right)$$",
+        )
+        b.add_edge(b.ensure_indicator(driver["hazard"], "hazards"), op_id)
+        for pkey in driver.get("params", []):
+            b.add_edge(_impact_param_node(b, code, pkey), op_id)
+        return op_id
     if kind == "af_plus_event":
         af_id = _add_af_op(b, code, driver)
         ev_id = _add_intensity_op(
@@ -1323,6 +1631,25 @@ def _add_driver_op(b: LineageBuilder, code: str, driver: dict) -> str:
             b.add_edge(_impact_param_node(b, code, share_param), add_id)
         return add_id
     raise ValueError(f"Unbekannter Schicht-B-Treiber: {kind}")
+
+
+def _add_modifier_op(b: LineageBuilder, code: str, mod: dict) -> str:
+    """Zell-Modifikator, der von g(V̂) ABWEICHT (Schicht-B-Gesundheitskanäle).
+
+    Für die Mortalitätskanäle ist g(V̂) sachlich falsch: Hitze rechnet mit dem
+    Versorgungszugang, Flut mit Warnzeit×Alter, Sturm mit Bäumen×Straßen. Das
+    Diagramm muss zeigen, was gerechnet wird — sonst behauptet es Eingänge
+    (etwa HEAT_SENSITIVITY), die den Outcome gar nicht berühren.
+    """
+    op_id = f"op:modifier:{code}"
+    _add_op(b, op_id, "gv", mod["label"], mod["note"])
+    for vcode in mod.get("vulnerabilities", []):
+        b.add_edge(b.ensure_indicator(vcode, "vulnerabilities"), op_id)
+    for ckey in mod.get("cell_keys", []):
+        b.add_edge(b.expand_cell_key(ckey), op_id)
+    for pkey in mod.get("params", []):
+        b.add_edge(_impact_param_node(b, code, pkey), op_id)
+    return op_id
 
 
 def _add_gv_op(b: LineageBuilder, risk: dict) -> str:
@@ -1351,14 +1678,14 @@ def _add_cost_op(b: LineageBuilder, risk: dict, *, extra_tooltip: str = "") -> s
     rate = catalog.risk_default_cost_per_outcome(risk)
     unit = catalog.cost_unit_label(risk.get("outcome_unit", ""))
     src = risk.get("cost_source") or ""
-    tooltip = (
+    # Quelle NICHT in die Note: die Skalierungs-Komposition (_tooltip_for_node)
+    # hängt sie aus meta["source"] an — sonst stünde sie doppelt im Tooltip.
+    note = (
         "Monetarisierung des Outcomes über den editierbaren Kostensatz.\n"
         r"$$\text{€} = O \cdot \text{Kostensatz}$$"
     )
-    if src:
-        tooltip += f"\nQuelle: {src}"
     if extra_tooltip:
-        tooltip += f"\n{extra_tooltip}"
+        note += f"\n{extra_tooltip}"
     op_id = f"op:cost:{code}"
     b.add_node(
         op_id, "operator", "",
@@ -1371,7 +1698,7 @@ def _add_cost_op(b: LineageBuilder, risk: dict, *, extra_tooltip: str = "") -> s
             "unit": unit,
             "scale": "cost",
             "source": src or "Kostensatz (Risikokatalog)",
-            "tooltip": tooltip,
+            "note": note,
         },
     )
     return op_id
@@ -1385,7 +1712,7 @@ def _area_basis(b: LineageBuilder, code: str, keys: list[str], label: str) -> st
     b.add_node(
         area_id, "intermediate", label,
         column=1, collapse_group="intermediates",
-        meta={"tooltip": f"{label} = {' + '.join(labels)} (× 1 ha Zellfläche)."},
+        meta={"note": f"{label} = {' + '.join(labels)} (× 1 ha Zellfläche)."},
     )
     op_id = _add_op(
         b, f"op:addarea:{code}", "add", "+",
@@ -1404,21 +1731,23 @@ def _asset_basis(b: LineageBuilder, code: str, asset: dict) -> str:
     if kind == "building":
         tip = ("Gebäude-Assetwert = Geschossfläche (Gebäudeanteil × Zellfläche × "
                "Geschosse aus mittlerer Höhe) × Gebäudewert je m².")
-    elif kind == "count":
-        tip = "Assetwert = Anzahl Anlagen in der Zelle × Ersatzwert je Stück."
+    elif kind == "class_count":
+        tip = ("Assetwert = Σ Anzahl je Anlagenklasse in der Zelle × Ersatzwert "
+               "der Klasse (editierbare impact-Parameter je Anlagenklasse).")
     else:
         tip = "Assetwert = Flächenanteil × 1 ha Zellfläche × Wert je ha."
     asset_id = f"int:asset:{code}"
     b.add_node(
         asset_id, "intermediate", label,
         column=1, collapse_group="intermediates",
-        meta={"tooltip": tip},
+        meta={"note": tip},
     )
     op_id = _add_op(b, f"op:asset:{code}", "multiply", "×", tip,
                     collapse_group="intermediates")
     for k in asset["cell_keys"]:
         b.add_edge(b.expand_cell_key(k), op_id)
-    b.add_edge(_global_param_node(b, asset["value_param"]), op_id)
+    for p in asset.get("value_params", ([asset["value_param"]] if "value_param" in asset else [])):
+        b.add_edge(_global_param_node(b, p), op_id)
     b.add_edge(op_id, asset_id)
     return asset_id
 
@@ -1457,11 +1786,17 @@ def _build_impact_branch(
         return
 
     if kind in ("health", "environment"):
+        mod_spec = None
         if kind == "health":
             spec = HEALTH_SPECS[code]
-            basis = b.expand_cell_key("pop")
-            product = "Bevölkerung · Rate · Treiber · g(V̂)"
-            latex = r"$$O_{z} = \text{Bevölkerung}_{z} \cdot \text{Rate} \cdot \text{Treiber}_{z} \cdot g(\hat{V})$$"
+            mod_spec = spec.get("modifier")
+            basis_label = spec.get("basis_label", "Bevölkerung")
+            basis = b.expand_cell_key(spec.get("basis_key", "pop"))
+            mod_term = mod_spec["term"] if mod_spec else "g(V̂)"
+            mod_latex = r"M_{z}" if mod_spec else r"g(\hat{V})"
+            product = f"{basis_label} · Rate · Treiber · {mod_term}"
+            latex = (r"$$O_{z} = \text{" + basis_label + r"}_{z} \cdot \text{Rate}"
+                     r" \cdot \text{Treiber}_{z} \cdot " + mod_latex + "$$")
         else:
             spec = ENV_SPECS[code]
             basis = _area_basis(b, code, spec["area_keys"], "Exponierte Naturfläche (Zelle)")
@@ -1472,7 +1807,8 @@ def _build_impact_branch(
         b.add_edge(basis, mul_id)
         b.add_edge(_impact_param_node(b, code, spec["rate_param"]), mul_id)
         b.add_edge(_add_driver_op(b, code, spec["driver"]), mul_id)
-        b.add_edge(_add_gv_op(b, risk), mul_id)
+        b.add_edge(_add_modifier_op(b, code, mod_spec) if mod_spec
+                   else _add_gv_op(b, risk), mul_id)
         sum_id = _add_sum_cells_op(b, code)
         b.add_edge(mul_id, sum_id)
         native_id = add_native(f"Outcome = {product}, Σ Zellen")
@@ -1503,8 +1839,7 @@ def _build_impact_branch(
         basis = _asset_basis(b, code, spec["asset"])
         damage_id = _add_op(
             b, f"op:damage:{code}", "damage_curve", "Schadenskurve",
-            "Konvexe Schadenskurve: überproportionaler Schaden bei hoher Intensität "
-            "(HOWAS21/JRC).\n"
+            "Konvexe Schadenskurve: überproportionaler Schaden bei hoher Intensität.\n"
             r"$$s = I^{\,\gamma},\quad \gamma > 1$$",
         )
         b.add_edge(_add_intensity_op(b, code, spec["driver"]["hazards"]), damage_id)
@@ -1533,15 +1868,28 @@ def _build_impact_branch(
         b.add_node(
             direct_id, "intermediate", "Direkte Sektorschäden (Σ €)",
             column=1, collapse_group="intermediates",
-            meta={"tooltip": "Summe der direkten Sektorschäden je Zelle (Schicht B): "
-                             + ", ".join(names) + "."},
+            meta={"note": "Summe der direkten Sektorschäden je Zelle (Schicht B): "
+                          + ", ".join(names) + "."},
         )
         sum_direct_id = _add_op(
             b, f"op:sumdirect:{code}", "sum_cells", "Σ",
             "Summiert die €-Zellschäden der zehn direkten Sektorrisiken.",
             collapse_group="intermediates",
         )
-        b.add_edge(b.ensure_source("computed"), sum_direct_id)
+        # Keine anonyme "Berechnet"-Box: die Eingaben sind die Schicht-B-
+        # €-Zellschäden der zehn direkten Sektorrisiken (je eigenes
+        # Wirkungsdiagramm) — benannt statt als generische Quelle.
+        b.add_node(
+            "src:direct_sectors", "source", "Sektorrisiken (Schicht B)",
+            column=0, collapse_group="sources",
+            meta={
+                "description": ("€-Zellschäden der zehn direkten Sektorrisiken, "
+                                "je mit eigenem Wirkungsdiagramm: "
+                                + ", ".join(names)),
+                "prov": "computed",
+            },
+        )
+        b.add_edge("src:direct_sectors", sum_direct_id)
         b.add_edge(sum_direct_id, direct_id)
         if kind == "indirect":
             param = _global_param_node(b, "k_indirect")
@@ -1549,7 +1897,7 @@ def _build_impact_branch(
                 b, f"op:kfactor:{code}", "multiply", "×",
                 "Indirekte Folgekosten = k_indirekt · Σ direkte Sektorschäden "
                 "(konsolidiert Betriebsunterbrechung, Lieferketten, Standortnachteil, "
-                "verzögerte Schäden; Prognos 2023).",
+                "verzögerte Schäden).",
             )
             formula = "€ = k_indirekt · Σ direkte Sektorschäden"
             non_additive = False
@@ -1710,6 +2058,8 @@ def build_for_layer(code: str, category: str) -> dict:
         return build_risk_lineage(code)
     if category == "measures":
         return build_measure_lineage(code)
-    if category in ("hazards", "exposures", "vulnerabilities", "auxiliary"):
+    if category == "auxiliary":
+        return build_auxiliary_lineage(code)
+    if category in ("hazards", "exposures", "vulnerabilities"):
         return build_indicator_lineage(code, category)
     return {"nodes": [], "edges": [], "collapse_groups": COLLAPSE_GROUPS}

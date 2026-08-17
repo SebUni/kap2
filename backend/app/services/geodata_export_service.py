@@ -108,14 +108,15 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
         geometry_type=boundary_type,
     )
 
+    # Streaming (yield_per): der Export läuft als Thread im API-Prozess —
+    # zehntausende gejointe ORM-Zeilen nicht zusätzlich zu den Spalten-Arrays
+    # im Speicher halten. Leerheits-Check nach der Schleife (s. u.).
     rows = (
         db.query(CellAssessment, GridCell)
         .join(GridCell, CellAssessment.grid_cell_id == GridCell.id)
         .filter(CellAssessment.kommune_id == kommune_id)
-        .all()
+        .yield_per(500)
     )
-    if not rows:
-        raise ValueError("Keine Bewertungsdaten vorhanden")
 
     hazard_codes = [h["code"] for h in catalog.HAZARDS]
     exposure_codes = [e["code"] for e in catalog.EXPOSURES]
@@ -163,6 +164,9 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
         for code in auxiliary_codes:
             val = auxiliary.get(code)
             auxiliary_cols[code].append(float(val) if val is not None else None)
+
+    if not geometries:
+        raise ValueError("Keine Bewertungsdaten vorhanden")
 
     # Layer: bewertung_100m
     field_data: list = [gitter_ids, x3035_vals, y3035_vals]

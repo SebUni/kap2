@@ -39,6 +39,16 @@ backend/data/pegelonline/
 # Karten-Layer Datei-Cache (gzip GeoJSON, wird bei Berechnung neu gebaut)
 backend/.cache/
 
+# OSM/Terrain Laufzeit-Caches (reine Caches, siehe backend/data/README.md)
+backend/data/osm_cache/
+backend/data/terrain_tiles/
+
+# VG250 Rohdaten-Download (Verwaltungsgebiete, ~300MB)
+backend/data/vg250/
+
+# Lite-Batch-Artefakte (generiert, nationaler Batch-Lauf)
+backend/data/lite/
+
 # Jupyter
 .ipynb_checkpoints/
 
@@ -57,3 +67,6 @@ backend/.cache/
 
 # Local notes
 TODO.md
+
+# Local Claude Code permissions (user-specific)
+.claude/settings.local.json

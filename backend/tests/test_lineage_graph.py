@@ -237,9 +237,55 @@ def _all_graphs():
         ("hazards", catalog.HAZARDS),
         ("exposures", catalog.EXPOSURES),
         ("vulnerabilities", catalog.VULNERABILITIES),
+        ("auxiliary", catalog.AUXILIARY),
     ):
         for it in items:
             yield it["code"], _graph(it["code"], cat)
+
+
+# ── (h) Sonstige-Ebenen: ehrliche Graphen ohne Normierung ──────────────────────
+
+def test_auxiliary_graphs_are_honest():
+    """Ratchet für alle Sonstige-Ebenen (Nutzer-Feedback Layer-Review).
+
+    Jede Sonstige-Ebene zeigt (1) mindestens eine ECHTE benannte Quelle (nie
+    den anonymen "Parameter/Modellannahme"-Kasten), (2) KEINEN Normierungs-
+    Schritt und keinen Knoten "Normierter Wert" — die Karten zeigen Rohwerte —
+    und (3) genau einen Ergebnisknoten mit dem Layer-Code. Zudem muss jeder
+    AUXILIARY-Code einen AUX_LINEAGE-Eintrag haben (Vollständigkeits-Ratchet).
+    """
+    from app.data.lineage_operators import AUX_LINEAGE
+
+    for a in catalog.AUXILIARY:
+        code = a["code"]
+        assert code in AUX_LINEAGE, f"{code}: AUX_LINEAGE-Eintrag fehlt"
+        g = _graph(code, "auxiliary")
+        nodes = {n["id"]: n for n in g["nodes"]}
+        assert g["nodes"], f"{code}: leerer Graph"
+        assert _is_acyclic(g), f"{code}: Zyklus im Graph"
+
+        sources = [n for n in g["nodes"] if n["type"] == "source"]
+        assert sources, f"{code}: keine Quell-Box im Graph"
+        assert "src:param" not in nodes, \
+            f"{code}: anonyme Parameter-Quelle statt benannter Datenquelle"
+
+        for n in g["nodes"]:
+            meta = n.get("meta") or {}
+            assert meta.get("op_kind") != "norm", \
+                f"{code}: Normierungs-Operator {n['id']} (Karte zeigt Rohwerte)"
+            assert n["label"] != "Normierter Wert", \
+                f"{code}: Knoten 'Normierter Wert' (Karte zeigt Rohwerte)"
+
+        outs = [n for n in g["nodes"] if n["type"] == "outcome"]
+        assert len(outs) == 1, f"{code}: erwartet genau einen Ergebnisknoten"
+        assert (outs[0].get("meta") or {}).get("code") == code, \
+            f"{code}: Ergebnisknoten ohne Layer-Code"
+
+        for e in g["edges"]:
+            assert e["source"] in nodes and e["target"] in nodes, \
+                f"{code}: Kante mit unbekanntem Knoten {e}"
+            assert nodes[e["source"]]["column"] < nodes[e["target"]]["column"], \
+                f"{code}: Kante nicht links→rechts: {e['source']} → {e['target']}"
 
 
 def test_scaling_without_registry_param_has_parameter_node():
@@ -268,22 +314,234 @@ def test_scaling_without_registry_param_has_parameter_node():
 
 
 def test_formula_fallback_tooltips_latexifiable():
-    """Generische Formel-Operatoren tragen das „Berechnung:“-Präfix.
+    """Der generische Formel-Fallback trägt das „Berechnung:“-Präfix.
 
     Nur so rendert das Frontend die Rezeptformel als LaTeX statt als Rohtext
     (Nutzer-Feedback: „clamp(Vulnerable + UHI·6 + …)“ war unlesbar).
+    Synthetischer Unit-Test — der Fallback selbst wird durch den Honesty-
+    Ratchet (test_indicator_graphs_are_honest) ausgedünnt, das Präfix-
+    Verhalten muss trotzdem stabil bleiben.
     """
-    checked = 0
-    for code, g in _all_graphs():
+    from app.data.lineage_operators import formula_operators_for
+
+    steps = formula_operators_for("__TEST__", "x + y")
+    assert steps[0]["op_kind"] == "formula"
+    assert steps[0].get("generic") is True
+    assert steps[0]["note"].startswith("Berechnung: ")
+    assert formula_operators_for("__TEST__", "")[0]["note"] == "Berechnung für __TEST__."
+
+
+# ── (i) H/E/V-Indikatoren: ehrliche Operator-Ketten (Honesty-Ratchet) ──────────
+
+# Codes, deren Diagramm noch den generischen "Formel"-Kasten zeigt.
+# RATCHET: Diese Liste darf nur SCHRUMPFEN (Gleichheits-Assertion unten) —
+# jeder abgearbeitete Code wird hier entfernt und erhält stattdessen einen
+# expliziten FORMULA_OPERATORS-Eintrag, der der echten Rechnung in
+# engine/indicators.py entspricht.
+_GENERIC_FORMULA_REMAINING: set[str] = set()
+
+
+# Indikatoren, deren Rezept nur ein fester Annahmewert ist — ehrlich als
+# Platzhalter gekennzeichnet (op_kind constant, meta.placeholder).
+_CONSTANT_INDICATORS: dict[str, list[str]] = {
+    "hazards": [
+        "OCEAN_WARMING", "OCEAN_ACIDIFICATION", "PERMAFROST_THAW",
+        "TROPICAL_CYCLONE", "STORM_SURGE", "SALTWATER_INTRUSION",
+        "COASTAL_EROSION", "CASCADE_EVENT",
+    ],
+    "vulnerabilities": [
+        "CRITICAL_INFRA_CONDITION", "SUPPLY_CHAIN_DEPENDENCY",
+        "REDUNDANCY_BACKUP", "INFRA_DEPENDENCY_CHAIN",
+        "SALTWATER_INTRUSION_RISK", "AQUACULTURE_TECHNICAL_VULNERABILITY",
+        "FISHERIES_MANAGEMENT_CAPACITY",
+    ],
+}
+
+
+def test_constant_indicators_are_marked_placeholder():
+    """Konstantwert-Indikatoren sind ehrlich als Platzhalter gekennzeichnet.
+
+    Genau ein constant-Operator mit meta.placeholder, die Notiz benennt den
+    Platzhalter-Charakter, und der Wert erscheint als benannter
+    Parameterknoten. Kein anderer H/E/V-Code trägt die Kennzeichnung.
+    """
+    const_codes = {c for codes in _CONSTANT_INDICATORS.values() for c in codes}
+    for cat, items in (
+        ("hazards", catalog.HAZARDS),
+        ("exposures", catalog.EXPOSURES),
+        ("vulnerabilities", catalog.VULNERABILITIES),
+    ):
+        for it in items:
+            code = it["code"]
+            g = _graph(code, cat)
+            nodes = {n["id"]: n for n in g["nodes"]}
+            const_ops = [
+                n for n in g["nodes"]
+                if n["type"] == "operator"
+                and (n.get("meta") or {}).get("op_kind") == "constant"
+                and n["id"].startswith(f"op:constant:ind:{code}:")
+            ]
+            if code not in const_codes:
+                assert not const_ops, f"{code}: unerwarteter Konstantwert-Operator"
+                continue
+            assert len(const_ops) == 1, f"{code}: erwartet genau einen constant-Operator"
+            op = const_ops[0]
+            meta = op.get("meta") or {}
+            assert meta.get("placeholder") is True, f"{code}: placeholder-Flag fehlt"
+            assert "Platzhalter" in meta.get("note", ""), \
+                f"{code}: Notiz benennt den Platzhalter nicht"
+            in_types = {
+                nodes[e["source"]]["type"]
+                for e in g["edges"] if e["target"] == op["id"]
+            }
+            assert "parameter" in in_types, \
+                f"{code}: Konstantwert ohne benannten Parameterknoten"
+
+
+def test_indicator_graphs_are_honest():
+    """Ratchet für H/E/V-Diagramme (Schwester-Test zu test_auxiliary_graphs_are_honest).
+
+    Der generische "Formel"-Kasten (formula_operators_for-Fallback,
+    meta.generic) erklärt nichts — jeder Indikator soll explizite, der echten
+    Rechnung in engine/indicators.py entsprechende Operator-Schritte zeigen.
+    Die Gleichheits-Assertion verhindert beides: neue Codes ohne explizite
+    Schritte UND stilles Zurückfallen bereits abgearbeiteter Codes.
+    Risiko-Graphen betten die Indikator-Untergraphen ein und werden mitgeprüft.
+    """
+    offenders: set[str] = set()
+    for _code, g in _all_graphs():
         for n in g["nodes"]:
             meta = n.get("meta") or {}
-            if meta.get("op_kind") != "formula" or not n["id"].startswith("op:formula:ind:"):
+            if n["type"] == "operator" and meta.get("generic"):
+                assert n["id"].startswith("op:formula:ind:"), \
+                    f"generischer Operator mit unerwarteter ID {n['id']}"
+                offenders.add(n["id"].split(":")[3])
+    assert offenders == _GENERIC_FORMULA_REMAINING, (
+        "Honesty-Ratchet verletzt.\n"
+        f"Neu ohne explizite Schritte: {sorted(offenders - _GENERIC_FORMULA_REMAINING)}\n"
+        f"Erledigt (aus Liste entfernen): {sorted(_GENERIC_FORMULA_REMAINING - offenders)}"
+    )
+
+
+def test_regional_inputs_use_cell_keys():
+    """Regionale Rezept-Eingaben laufen durch die Zellkey-Maschinerie.
+
+    Vorher zeigte z. B. LOW_FLOW_NIEDRIGWASSER eine nackte DWD-Quellbox,
+    obwohl die Daten von PEGELONLINE stammen; der "Regionalwert abrufen"-
+    Schritt und das Zwischenwert-Label fehlten ganz.
+    """
+    g = _graph("LOW_FLOW_NIEDRIGWASSER", "hazards")
+    ids = {n["id"] for n in g["nodes"]}
+    assert "int:low_flow_days" in ids, "Niedrigwasser-Zwischenknoten fehlt"
+    assert "src:pegelonline" in ids, "PEGELONLINE-Quelle fehlt"
+    assert "src:dwd" not in ids or any(
+        n["id"] == "int:dry_index" for n in g["nodes"]
+    ), "DWD-Quelle ohne zugehörige Kette"
+
+    g = _graph("DROUGHT", "hazards")
+    ids = {n["id"] for n in g["nodes"]}
+    assert "int:drought_days" in ids, "Trockentage-Zwischenknoten fehlt"
+
+
+# ── Beschreibungskonzept: Operator-Klassen + Tooltip-Komposition ───────────────
+
+# Feste Taxonomie der Operator-Klassen (siehe lineage_operators.py-Docstring).
+# Neue op_kinds müssen bewusst klassifiziert werden — kein Durchrutschen.
+_ALLOWED_OP_KINDS = {
+    # Zell-Ebene
+    "count", "ratio", "neighbor", "distance", "distance_score", "mean",
+    "lookup", "constant", "derived_index", "weighted_sum",
+    # Arithmetik/Verkettung
+    "add", "multiply", "divide", "max", "min", "scale_factor",
+    "scaling", "multiplier", "formula", "norm",
+    # Schicht B (Schadensfunktionen)
+    "af", "gv", "damage_curve", "sum_cells", "p90", "intensity",
+    # Expositions-Wirkungs-Kurve (RKI/Winklmayr): Summe über die Sommerwochen
+    "erf",
+}
+
+# Kürzel, die in Tooltip-Titeln in Klammern an den ausgeschriebenen Namen
+# angehängt werden dürfen — sonst sind Klammern im Titel verboten.
+_TITLE_ABBREV_PARENS = ("(AF)", "(P90)", "(Σ)", "(TWI)", "(SVF)", "g(V̂)")
+
+# Nackte Kürzel, die NIE allein als Titel stehen dürfen (Nutzer-Feedback:
+# "Woher soll der Mandant wissen was AF bedeutet?").
+_BARE_ABBREVS = {"AF", "g(V̂)", "P90", "Σ", "Σ Zellen", "TWI", "SVF"}
+
+
+def test_operator_kind_taxonomy():
+    for code, g in _all_graphs():
+        for n in g["nodes"]:
+            if n["type"] != "operator":
                 continue
-            tooltip = meta.get("tooltip", "")
-            assert "Berechnung" in tooltip, \
-                f"{code}: Formel-Operator {n['id']} ohne Berechnung:-Zeile: {tooltip!r}"
-            checked += 1
-    assert checked > 0, "kein generischer Formel-Operator gefunden"
+            kind = (n.get("meta") or {}).get("op_kind")
+            assert kind in _ALLOWED_OP_KINDS, \
+                f"{code}: unklassifizierter op_kind {kind!r} an {n['id']}"
+
+
+def test_operator_tooltips_have_eingaben_line():
+    """Jeder Operator mit fachlichen Eingaben listet sie im Tooltip.
+
+    Die "Eingaben:"-Zeile wird maschinell aus den echten Kanten erzeugt
+    (_enrich_tooltips komponiert IMMER) — dieser Test fixiert, dass kein
+    handgeschriebener Tooltip die Komposition wieder aushebelt. Quell-Boxen
+    (OSM/DWD/…) und vorgelagerte Operatoren zählen nicht als Eingaben
+    (Nutzerwunsch: keine Quellen in Tooltips).
+    """
+    for code, g in _all_graphs():
+        nodes = {n["id"]: n for n in g["nodes"]}
+        for n in g["nodes"]:
+            if n["type"] != "operator":
+                continue
+            preds = [
+                nodes[e["source"]] for e in g["edges"]
+                if e["target"] == n["id"] and e["source"] in nodes
+            ]
+            expects_line = any(
+                p["type"] not in ("source", "operator") and p["label"]
+                for p in preds
+            )
+            tooltip = (n.get("meta") or {}).get("tooltip", "")
+            if expects_line:
+                assert "Eingaben:" in tooltip, \
+                    f"{code}: Operator {n['id']} ohne Eingaben-Zeile: {tooltip!r}"
+            # nie eine leere Eingaben-Zeile
+            for line in tooltip.split("\n"):
+                if line.startswith("Eingaben:"):
+                    assert line.removeprefix("Eingaben:").strip(), \
+                        f"{code}: leere Eingaben-Zeile an {n['id']}"
+
+
+def test_tooltips_contain_no_source_rows():
+    """Keine "Quelle:"-Zeilen in Tooltips (Nutzerwunsch).
+
+    Quellen stehen sichtbar als Boxen im Diagramm; Tooltips erklären nur
+    die Rechnung.
+    """
+    for code, g in _all_graphs():
+        for n in g["nodes"]:
+            if n["type"] == "source":
+                continue
+            tooltip = (n.get("meta") or {}).get("tooltip", "")
+            for line in tooltip.split("\n"):
+                assert not line.strip().startswith("Quelle:"), \
+                    f"{code}: Quellen-Zeile im Tooltip von {n['id']}: {line!r}"
+
+
+def test_operator_titles_follow_style_rules():
+    """Titelzeile: kein nacktes Kürzel, Klammern nur für Kürzel-Erklärungen."""
+    for code, g in _all_graphs():
+        for n in g["nodes"]:
+            if n["type"] != "operator":
+                continue
+            tooltip = (n.get("meta") or {}).get("tooltip", "")
+            title = tooltip.split("\n", 1)[0].strip()
+            assert title, f"{code}: Operator {n['id']} ohne Titel"
+            assert title not in _BARE_ABBREVS, \
+                f"{code}: nacktes Kürzel als Titel an {n['id']}: {title!r}"
+            if "(" in title:
+                assert any(a in title for a in _TITLE_ABBREV_PARENS), \
+                    f"{code}: unerlaubte Klammer im Titel an {n['id']}: {title!r}"
 
 
 if __name__ == "__main__":
@@ -295,6 +553,14 @@ if __name__ == "__main__":
     test_cost_operator_wiring()
     test_all_graph_parameters_available()
     test_indicator_graphs_have_norm_result()
+    test_auxiliary_graphs_are_honest()
     test_scaling_without_registry_param_has_parameter_node()
     test_formula_fallback_tooltips_latexifiable()
+    test_indicator_graphs_are_honest()
+    test_regional_inputs_use_cell_keys()
+    test_constant_indicators_are_marked_placeholder()
+    test_operator_kind_taxonomy()
+    test_operator_tooltips_have_eingaben_line()
+    test_tooltips_contain_no_source_rows()
+    test_operator_titles_follow_style_rules()
     print("Alle lineage_graph-Tests OK")

@@ -44,7 +44,7 @@ export default function ProjectStatusPanel() {
   }, [kommune])
 
   useEffect(() => {
-    if (status?.status === 'running' && !polling) setPolling(true)
+    if ((status?.status === 'running' || status?.status === 'queued') && !polling) setPolling(true)
   }, [status?.status])
 
   useEffect(() => {
@@ -70,6 +70,7 @@ export default function ProjectStatusPanel() {
 
   if (!kommune) return null
   const running = status?.status === 'running'
+  const queued = status?.status === 'queued'
   const done = status?.status === 'done'
   const steps = status?.step_history ?? []
   const showStepLog = steps.length > 0 && (running || done || status?.status === 'error')
@@ -98,7 +99,7 @@ export default function ProjectStatusPanel() {
       className="card"
       style={{
         marginBottom: '1.5rem',
-        borderColor: done ? 'var(--success)' : running ? 'var(--primary)' : 'var(--warning)',
+        borderColor: done ? 'var(--success)' : (running || queued) ? 'var(--primary)' : 'var(--warning)',
         display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap',
       }}
     >
@@ -120,6 +121,15 @@ export default function ProjectStatusPanel() {
                 {runningLabel}
                 {currentStep?.detail && (
                   <span style={{ marginLeft: 6, opacity: 0.75 }}>{currentStep.detail}</span>
+                )}
+              </span>
+            )
+            : queued ? (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <InlineSpinner size={12} />
+                {status?.message || 'Wartet auf freien Berechnungs-Slot …'}
+                {status?.queue_position != null && status.queue_position > 1 && (
+                  <span style={{ opacity: 0.75 }}>(Position {status.queue_position})</span>
                 )}
               </span>
             )
@@ -169,7 +179,7 @@ export default function ProjectStatusPanel() {
           </div>
         )}
       </div>
-      {running ? (
+      {(running || queued) ? (
         <button className="btn btn-danger btn-sm" onClick={() => kommune && abortAssessment(kommune.id)}>✕ Abbrechen</button>
       ) : (
         <button

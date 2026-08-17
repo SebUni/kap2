@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { api } from '../api/client'
+import { api, type DemoMeta } from '../api/client'
 import type {
   Kommune, AssessmentStatus, ConfigParameter, Measure,
   GeoJSONFeatureCollection, GeoJSONFeature, LayerMeta, MeasureImpactSummary,
@@ -47,14 +47,21 @@ interface AppState {
   activeTab: number
   setActiveTab: (tab: number) => void
 
+  // Demo-Modus (öffentliche Demo-Kommune, serverseitig eingeschränkt)
+  demoMode: boolean
+  demoMeta: DemoMeta | null
+  demoEnabledLayers: Set<string>
+  bootstrapDemo: () => Promise<number>
+  /** Demo verlassen: Demo-Flags + alle demo-behafteten Session-Daten verwerfen,
+   *  damit das Produkt frisch (login-skopiert) lädt. No-op außerhalb der Demo. */
+  exitDemo: () => void
+
   // Kommune
   kommune: Kommune | null
   setKommune: (k: Kommune | null) => void
   loadKommune: (id: number) => Promise<void>
 
   // Grid
-  gridGeoJson: GeoJSONFeatureCollection | null
-  loadGrid: (kommuneId: number) => Promise<void>
   generateGrid: (kommuneId: number, cellSize?: number, force?: boolean) => Promise<void>
 
   // Catalog (single source of truth, loaded once)
@@ -125,6 +132,7 @@ interface AppState {
   selectedMeasure: Measure | null
   setSelectedMeasure: (m: Measure | null) => void
   loadMeasures: (kommuneId: number) => Promise<void>
+  refreshMeasureDependents: (kommuneId: number) => Promise<void>
   createMeasure: (kommuneId: number, data: Record<string, unknown>) => Promise<Measure>
   updateMeasure: (id: number, data: Record<string, unknown>) => Promise<Measure>
   deleteMeasure: (id: number) => Promise<void>
@@ -144,6 +152,56 @@ export const useStore = create<AppState>((set, get) => ({
   activeTab: 0,
   setActiveTab: (tab) => set({ activeTab: tab }),
 
+  // Demo-Modus
+  demoMode: false,
+  demoMeta: null,
+  demoEnabledLayers: new Set<string>(),
+  bootstrapDemo: async () => {
+    // Session-Cookie sicherstellen + Konfiguration laden, dann Demo-Kommune.
+    const meta = await api.demo.startSession()
+    set({
+      demoMode: true,
+      demoMeta: meta,
+      demoEnabledLayers: new Set(meta.enabled_layers),
+    })
+    await get().loadCatalog()
+    await get().loadKommune(meta.kommune_id)
+    await get().loadStatus(meta.kommune_id)
+    return meta.kommune_id
+  },
+  exitDemo: () => {
+    if (!get().demoMode) return
+    // Auth-Kontext wechselt (Demo → Produkt). Der Store ist ein Modul-Singleton;
+    // ohne dieses Reset behielte das Produkt die Demo-Sperren (demoMode) und die
+    // demo-session-gebundenen Maßnahmen/Aggregate. Alles Session-behaftete leeren,
+    // damit das Produkt login-skopiert frisch nachlädt.
+    set({
+      demoMode: false,
+      demoMeta: null,
+      demoEnabledLayers: new Set<string>(),
+      kommune: null,
+      status: null,
+      hasAssessment: false,
+      activeLayer: null,
+      layerGeoJson: null,
+      gridGeometry: null,
+      gridGeometryKommuneId: null,
+      layerValueCache: {},
+      riskSummary: null,
+      costSummary: null,
+      riskProjection: null,
+      riskHistogram: null,
+      kommuneProfile: null,
+      costProjection: null,
+      configParams: [],
+      measures: [],
+      selectedMeasure: null,
+      climateHistory: null,
+      regionalClimate: null,
+      climateProjection: null,
+    })
+  },
+
   // Kommune
   kommune: null,
   setKommune: (k) => set({ kommune: k }),
@@ -162,15 +220,10 @@ export const useStore = create<AppState>((set, get) => ({
     get().loadKommuneProfile(id).catch(() => {})
   },
 
-  // Grid
-  gridGeoJson: null,
-  loadGrid: async (kommuneId) => {
-    const data = await api.getGrid(kommuneId)
-    set({ gridGeoJson: data as unknown as GeoJSONFeatureCollection })
-  },
+  // Grid — die Kartengeometrie kommt über gridGeometry (layer_cache-Datei);
+  // das frühere loadGrid/gridGeoJson lud ein ungenutztes Voll-GeoJSON.
   generateGrid: async (kommuneId, cellSize = 100, force = false) => {
     await api.generateGrid(kommuneId, cellSize, force)
-    await get().loadGrid(kommuneId)
   },
 
   // Catalog
@@ -343,24 +396,39 @@ export const useStore = create<AppState>((set, get) => ({
     const data = await api.listMeasures(kommuneId)
     set({ measures: data as unknown as Measure[] })
   },
+  // Maßnahmen-Mutationen verändern die maßnahmen-abhängigen Aggregate
+  // (vermiedene Schäden, Kostenprojektion). Das Dashboard lädt Aggregate nur,
+  // wenn sie noch null sind — ohne diesen Refresh bliebe z. B. die Wirkung einer
+  // gelöschten Maßnahme im Dashboard stehen.
+  refreshMeasureDependents: async (kommuneId) => {
+    await get().loadMeasures(kommuneId)
+    await Promise.all([
+      get().loadCostSummary(kommuneId).catch(() => {}),
+      get().loadCostProjection(kommuneId).catch(() => {}),
+    ])
+  },
   createMeasure: async (kommuneId, data) => {
     const m = await api.createMeasure(kommuneId, data) as unknown as Measure
-    await get().loadMeasures(kommuneId)
+    await get().refreshMeasureDependents(kommuneId)
     return m
   },
   updateMeasure: async (id, data) => {
     const m = await api.updateMeasure(id, data) as unknown as Measure
     const k = get().kommune
-    if (k) await get().loadMeasures(k.id)
+    if (k) await get().refreshMeasureDependents(k.id)
     return m
   },
   deleteMeasure: async (id) => {
     await api.deleteMeasure(id)
     const k = get().kommune
-    if (k) await get().loadMeasures(k.id)
+    if (k) await get().refreshMeasureDependents(k.id)
   },
   calculateImpact: async (measureId) => {
     const result = await api.calculateImpact(measureId) as unknown as MeasureImpactSummary
+    // impact_summary hängt an den Maßnahmen (Tabelle/KPIs lesen es von dort) —
+    // Liste + Aggregate nachladen, damit der Stand konsistent bleibt.
+    const k = get().kommune
+    if (k) get().refreshMeasureDependents(k.id).catch(() => {})
     return result
   },
 
@@ -376,7 +444,6 @@ export const useStore = create<AppState>((set, get) => ({
     set({
       status: null,
       hasAssessment: false,
-      gridGeoJson: null,
       activeLayer: null,
       layerGeoJson: null,
       gridGeometry: null,

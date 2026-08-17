@@ -8,6 +8,8 @@ den (i)-Tooltips dokumentiert.
 
 from __future__ import annotations
 
+from datetime import date
+
 from app.data import catalog
 from app.services.engine import override_context, tunables
 
@@ -22,7 +24,7 @@ def _building_stability(ci: dict) -> float:
     base = 50.0 + bldg_cov * 20.0 + (10.0 if avg_h > 18 else 0.0)
     age = ci.get("building_age_mean")
     if age is not None:
-        base += min(30.0, max(0.0, (2024.0 - float(age)) / 100.0 * 30.0))
+        base += min(30.0, max(0.0, (float(date.today().year) - float(age)) / 100.0 * 30.0))
     return round(_clamp(base, 0, 100), 1)
 
 
@@ -104,7 +106,12 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         ),
         "PERMAFROST_THAW": 0.0,
         "SOIL_MOISTURE_DECLINE": round(regional["soil_moisture_decline"] * (0.5 + 0.6 * (farmland + green)), 1),
-        "HEAT_WAVE": round(_clamp(regional["hot_days"] + uhi * 1.5, 0, 40), 1),
+        # Kein Clamp auf 40 mehr: Das war der Katalog-``norm_max`` und damit eine
+        # SCREENING-Grenze, die hier in den ABSOLUTEN Hazard-Wert leckte — in sehr
+        # heißen Stadtzellen wurden die Hitzetage gekappt und damit auch die daraus
+        # abgeleiteten absoluten Schäden (MODELL_KRITIK §3.3). Die Normierung auf
+        # 0…1 kappt weiterhin an der Katalogobergrenze, aber erst im Index-Pfad.
+        "HEAT_WAVE": round(max(0.0, regional["hot_days"] + uhi * 1.5), 1),
         "COLD_EXTREME": round(regional["frost_days"] * (1.0 - 0.3 * min(uhi / 5.0, 1.0)), 1),
         "HEAVY_RAIN_FLOOD": round(
             _clamp(regional["heavy_rain_index"] * (0.4 + imp) * (0.5 + 0.5 * twi_norm) * (0.6 + depression), 0, 100), 1

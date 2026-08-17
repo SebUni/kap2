@@ -9,11 +9,10 @@ gespeichert werden.
 from __future__ import annotations
 
 import logging
-import multiprocessing
-import os
 from typing import Any
 
 from app.services.engine.inputs import gather_cell_inputs
+from app.services.engine.parallel import cow_pool, n_workers
 from app.services.engine.indicators import compute_cell_hev
 from app.services.engine.auxiliary import build_auxiliary
 from app.services.engine import impact, risk_engine
@@ -28,8 +27,6 @@ COASTAL_BUNDESLAENDER = {
 }
 
 _rw: dict = {}
-_N_WORKERS = min(os.cpu_count() or 4, 8)
-_MP = multiprocessing.get_context("fork")
 _CHUNK = 50
 
 
@@ -111,13 +108,13 @@ def run_full_assessment(
     if progress_callback:
         progress_callback(
             RISK_COMPOSE[0],
-            f"Berechne klimatische Einflüsse, räumliche Expositionen & Sensitivitäten ({_N_WORKERS} Kerne)",
+            f"Berechne klimatische Einflüsse, räumliche Expositionen & Sensitivitäten ({n_workers()} Kerne)",
         )
 
     _rw["cell_inputs"] = cell_inputs
     _rw["regional"] = regional
     try:
-        with _MP.Pool(_N_WORKERS) as pool:
+        with cow_pool() as pool:
             for done, (idx, result) in enumerate(
                 pool.imap_unordered(_risk_worker, range(total), chunksize=_CHUNK)
             ):

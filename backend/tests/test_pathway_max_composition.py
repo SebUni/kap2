@@ -70,7 +70,13 @@ def test_primary_dominates_at_equal_values(monkeypatch):
 # ── (c) Zahlenbeispiel MODELL_KRITIK §3.1 → 13,5 ───────────────────────────────
 
 def test_mortality_example_matches_primary_signal():
-    """Die Werte aus §3.1 ergeben mit der Max-Formel 13,5 (Primärsignal), nicht 7,4."""
+    """Der Index folgt der stärksten Einzelkette, nicht dem Mittel über alle Ketten.
+
+    Die Primärkette der Hitzemortalität ist seit der Umstellung auf die
+    altersgeschichtete Wirkungskurve HEAT_WAVE×AGE_STRUCTURE×HEALTHCARE_ACCESS:
+    Die Altersstruktur ist die Leitgröße, weil laut RKI rund 55 % der
+    hitzebedingten Sterbefälle auf die Gruppe ab 85 Jahren entfallen.
+    """
     hev = _norm(
         {"HEAT_WAVE": 0.60, "COLD_EXTREME": 0.20, "COMPOUND_EVENT": 0.30},
         {"POPULATION_DENSITY": 0.375, "VULNERABLE_GROUPS_POPULATION": 0.30,
@@ -79,8 +85,8 @@ def test_mortality_example_matches_primary_signal():
          "VULNERABLE_GROUPS_SHARE": 0.35},
     )
     idx = risk_engine.cell_risk_indices(hev)
-    # Primärkette HEAT_WAVE×POPULATION_DENSITY×HEAT_SENSITIVITY: 100·1,0·0,6·0,375·0,6 = 13,5
-    assert abs(idx["EXPECTED_ANNUAL_MORTALITY"] - 13.5) < 0.01
+    # Primärkette HEAT_WAVE×AGE_STRUCTURE×HEALTHCARE_ACCESS: 100·1,0·0,6·0,40·0,40 = 9,6
+    assert abs(idx["EXPECTED_ANNUAL_MORTALITY"] - 9.6) < 0.01
 
 
 # ── (d) genau ein Primärpfad je Risiko ─────────────────────────────────────────

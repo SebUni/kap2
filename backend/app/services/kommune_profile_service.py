@@ -20,6 +20,7 @@ from geoalchemy2.shape import to_shape
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.data import sources
 from app.data.germany_climate_reference import GERMANY_CLIMATE_REFERENCE
 from app.models.models import CellAssessment, Kommune
@@ -148,14 +149,62 @@ def _climate_metrics(bundesland: Optional[str], centroid: Optional[tuple[float, 
     ]
 
 
-def build_profile(db: Session, kommune: Kommune) -> dict:
+def _finance_sections(
+    finance: dict | None, population: int | None = None
+) -> tuple[dict | None, dict | None]:
+    """finance_loader-Payload → Profil-Blöcke ``economy``/``municipal_budget``.
+
+    BIP liegt amtlich nur auf Kreisebene vor; für den Kopf wird es zusätzlich auf
+    die Kommune GESCHÄTZT (BIP je Einwohner des Kreises × Einwohner der Kommune) —
+    ``estimated_municipal_eur``. Der amtliche Kreiswert (``gdp_meur``) bleibt für
+    den Tooltip erhalten. Der kommunale Haushalt (Auszahlungen) liegt echt auf
+    Gemeindeebene vor (Ø der letzten Jahre).
+    """
+    refs = sources.resolve(["Regionalstatistik_GENESIS"])
+    economy = None
+    budget = None
+    gdp = (finance or {}).get("gdp")
+    if gdp and gdp.get("gdp_meur") is not None:
+        pc = gdp.get("gdp_per_capita_eur")
+        estimated = round(pc * population) if (pc and population) else None
+        economy = {
+            "gdp_meur": gdp["gdp_meur"],
+            "gdp_per_capita_eur": pc,
+            "estimated_municipal_eur": estimated,
+            "gdp_year": gdp.get("gdp_year"),
+            "level": "kreis",
+            "source": ("Regionalstatistik (GENESIS), Tabelle "
+                       f"{settings.REGIONALSTATISTIK_TABLE_GDP} — BIP in jeweiligen "
+                       "Preisen, Kreisebene"),
+            "references": refs,
+        }
+    b = (finance or {}).get("budget")
+    if b and b.get("avg_expenditure_eur") is not None:
+        budget = {
+            "avg_expenditure_eur": b["avg_expenditure_eur"],
+            "years": b.get("years") or [],
+            "level": "gemeinde",
+            "source": ("Regionalstatistik (GENESIS), Tabelle "
+                       f"{settings.REGIONALSTATISTIK_TABLE_BUDGET} — Auszahlungen "
+                       "insgesamt (bereinigt) der kommunalen Kernhaushalte, "
+                       "Gemeinde-/Berichtsebene"),
+            "references": refs,
+        }
+    return economy, budget
+
+
+def build_profile(db: Session, kommune: Kommune, finance: dict | None = None) -> dict:
     centroid = centroid_of(kommune)
     lon, lat = centroid if centroid else (None, None)
     population = ensure_population(db, kommune)
+    economy, municipal_budget = _finance_sections(finance, population)
     return {
         "id": kommune.id,
         "name": kommune.name,
         "bundesland": kommune.bundesland,
+        "landkreis": kommune.landkreis,
+        "economy": economy,
+        "municipal_budget": municipal_budget,
         "lat": round(lat, 4) if lat is not None else None,
         "lon": round(lon, 4) if lon is not None else None,
         "area_km2": kommune.area_km2,

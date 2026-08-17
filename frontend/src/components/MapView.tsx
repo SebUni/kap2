@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useStore } from '../store'
+import { kangClusterColor, KANG_CLUSTER_COLORS } from '../utils/kangColors'
+import { gridAlignBearing, firstPolygonRing } from '../utils/gridBearing'
 import type {
   CellOutcomeBreakdown, CellPathwayBreakdown, HevRecipeMeta, IndicatorRecipe,
   LayerMeta, LayerRecipe, OutcomeFactorMeta, ResolvedInput, RiskRecipe,
@@ -17,6 +19,69 @@ const CHOROPLETH_GOOD_HIGH = new Set([
 function choroplethColors(code?: string) {
   return CHOROPLETH_GOOD_HIGH.has(code ?? '') ? [...CHOROPLETH_COLORS].reverse() : CHOROPLETH_COLORS
 }
+/** Kartenbeschriftung: laufende Nummer (#N) und Flächen-Suffix „(… ha/m²)" entfernen. */
+function measureMapLabel(name: string): string {
+  return name
+    .replace(/\s*#\d+/, '')
+    .replace(/\s*\([^)]*\)\s*$/, '')
+    .trim()
+}
+
+/** Abgerundetes Rechteck als Nine-Patch-Hintergrund (Ecken bleiben beim Strecken scharf). */
+function roundedRectImage(color: string): {
+  image: ImageData
+  stretchX: [number, number][]
+  stretchY: [number, number][]
+  content: [number, number, number, number]
+} {
+  const w = 48, h = 32, r = 12 // Gerätepixel (pixelRatio 2 → logisch 24×16)
+  const cv = document.createElement('canvas')
+  cv.width = w; cv.height = h
+  const ctx = cv.getContext('2d')!
+  ctx.fillStyle = color
+  ctx.beginPath()
+  ctx.moveTo(r, 0)
+  ctx.arcTo(w, 0, w, h, r)
+  ctx.arcTo(w, h, 0, h, r)
+  ctx.arcTo(0, h, 0, 0, r)
+  ctx.arcTo(0, 0, w, 0, r)
+  ctx.closePath()
+  ctx.fill()
+  return {
+    image: ctx.getImageData(0, 0, w, h),
+    stretchX: [[r, w - r]],
+    stretchY: [[r, h - r]],
+    content: [r, r, w - r, h - r],
+  }
+}
+
+/** Schwerpunkt (Mittel der Außenring-Ecken) einer Polygon-Geometrie – ein Label-Punkt je Maßnahme. */
+function polygonCentroid(geom: GeoJSON.Geometry | undefined): [number, number] | null {
+  if (!geom) return null
+  let ring: number[][] | undefined
+  if (geom.type === 'Polygon') ring = geom.coordinates[0]
+  else if (geom.type === 'MultiPolygon') ring = geom.coordinates[0]?.[0]
+  if (!ring || ring.length < 3) return null
+  // letzten (geschlossenen) Punkt weglassen, damit er nicht doppelt zählt
+  const pts = ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]
+    ? ring.slice(0, -1) : ring
+  let x = 0, y = 0
+  for (const p of pts) { x += p[0]; y += p[1] }
+  return [x / pts.length, y / pts.length]
+}
+
+/** Registriert je KAnG-Cluster ein farbiges Box-Bild (einmalig pro Map). */
+function ensureMeasureBgImages(map: maplibregl.Map) {
+  for (const [code, color] of Object.entries(KANG_CLUSTER_COLORS)) {
+    const id = `measure-bg-${code}`
+    if (map.hasImage(id)) continue
+    const box = roundedRectImage(color)
+    map.addImage(id, box.image, {
+      pixelRatio: 2, stretchX: box.stretchX, stretchY: box.stretchY, content: box.content,
+    })
+  }
+}
+
 type TooltipMode = 'off' | 'short' | 'detail'
 const TOOLTIP_MODE_KEY = 'map-tooltip-mode'
 
@@ -178,6 +243,12 @@ function buildTooltipHtml(
   h += `<div style="font-weight:700;font-size:12px;margin-bottom:2px">${meta.label}</div>`
   h += `<div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">${fmtNum(value)} ${meta.unit}</div>`
 
+  // Zellreferenz (INSPIRE-Gitter-ID, EPSG:3035) — erlaubt den direkten Abgleich
+  // mit der Original-Zensus-CSV (Spalte GITTER_ID_100m). Ein-Klick-selektierbar.
+  const gitterId = typeof props.gitter_id === 'string' ? props.gitter_id : null
+  if (gitterId)
+    h += `<div class="kap-tooltip-cellref" title="Zensus 100m-Gitterzelle (INSPIRE, EPSG:3035) – zum Abgleich mit der Original-CSV (Spalte GITTER_ID_100m)">Zelle: <code>${gitterId}</code></div>`
+
   const r = meta.recipe
   if (r && isRiskRecipe(r)) {
     const idx = props.index != null ? Number(props.index) : null
@@ -261,8 +332,27 @@ function buildTooltipHtml(
         gridRow(inp.label, `${disp}${provBadge(prov)}`, '', inp.source || '')
       })
       h += gridHtml()
+
+      // Debug: welche OSM-Objekte begründen die Wasserannahme dieser Zelle?
+      const waterSrc = parseProp<Array<{
+        osm_id: number; osm_type: string; tag: string; name?: string | null
+        kind?: string; minor?: boolean; dist_m: number
+      }>>(props.water_src)
+      if (waterSrc && waterSrc.length) {
+        h += `<div style="margin-top:6px;font-weight:700;font-size:10px;color:#334155">OSM-Gewässer-Objekte (Debug)</div>`
+        h += `<div style="font-size:10px;color:#475569">`
+        for (const s of waterSrc) {
+          const url = `https://www.openstreetmap.org/${s.osm_type}/${s.osm_id}`
+          const nm = s.name ? ` „${s.name}“` : ''
+          const flag = s.minor ? ' · <span style="color:#94a3b8">Graben (schwach)</span>' : ''
+          h += `<div style="margin:1px 0">• <a href="${url}" target="_blank" rel="noopener" style="color:#2563eb">${s.osm_type}/${s.osm_id}</a>` +
+            ` — ${s.tag}${nm} · ${fmtNum(s.dist_m)} m${flag}</div>`
+        }
+        h += `</div>`
+      }
     }
   }
+  h += `<div class="kap-tooltip-hint">Leertaste: Inspektor fixieren / lösen – dann mit der Maus hineinfahren</div>`
   h += '</div>'
   return h
 }
@@ -271,8 +361,10 @@ export default function MapView() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const popupRef = useRef<maplibregl.Popup | null>(null)
+  const frozenRef = useRef(false)  // Inspektor per Leertaste fixiert?
+  const gridBearingRef = useRef(0) // Bearing, das das EPSG:3035-Raster viewport-parallel stellt
   const {
-    kommune, measures, layerGeoJson, showMeasures,
+    kommune, measures, layerGeoJson, showMeasures, catalog,
     setIsDrawing, setDrawnGeometry, setSelectedMeasure, drawnGeometry,
     mapLoading, mapProgress,
   } = useStore()
@@ -307,6 +399,7 @@ export default function MapView() {
       container: mapContainer.current,
       style: {
         version: 8,
+        glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
         sources: {
           osm: {
             type: 'raster',
@@ -350,7 +443,7 @@ export default function MapView() {
         if (lng < minLng) minLng = lng; if (lng > maxLng) maxLng = lng
         if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat
       }
-      map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 40 })
+      map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 40, bearing: gridBearingRef.current })
     } catch (err) { console.warn('MapView: boundary layer error', err) }
   }, [kommune, mapLoaded])
 
@@ -369,6 +462,15 @@ export default function MapView() {
           })),
         }
       : empty
+
+    // Karte so drehen, dass die LAEA-Gitterkanten viewport-parallel sind.
+    // Der Guard macht Layer-Wechsel innerhalb derselben Kommune zum No-Op
+    // (eine manuelle Rotation wird nur bei echtem Kommunenwechsel ersetzt).
+    const bearing = gridAlignBearing(firstPolygonRing(layerGeoJson?.features))
+    if (bearing != null && Math.abs(bearing - gridBearingRef.current) > 0.05) {
+      gridBearingRef.current = bearing
+      map.rotateTo(bearing, { duration: 400 })
+    }
 
     const { lo, hi } = layerScaleBounds(meta)
     const colors = choroplethColors(meta?.code)
@@ -420,6 +522,9 @@ export default function MapView() {
     if (!map || !mapLoaded) return
 
     const onMove = (e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) => {
+      // Fixiert (Leertaste): Position/Inhalt einfrieren, damit die Maus in das
+      // Fenster fahren kann (Text markieren, Zellreferenz kopieren, scrollen).
+      if (frozenRef.current) return
       if (tooltipMode === 'off' || drawMode) {
         popupRef.current?.remove()
         return
@@ -453,15 +558,39 @@ export default function MapView() {
         .setHTML(buildTooltipHtml(m, props, Number(v), tooltipMode))
         .addTo(map)
     }
-    const onLeave = () => popupRef.current?.remove()
+    const onLeave = () => {
+      if (frozenRef.current) return  // fixiert: nicht entfernen, wenn Maus die Zelle verlässt
+      popupRef.current?.remove()
+    }
+
+    // Leertaste umschalten → Inspektor fixieren / lösen (interaktiv, Maus frei).
+    const setFrozen = (on: boolean) => {
+      frozenRef.current = on
+      const el = popupRef.current?.getElement()
+      el?.classList.toggle('kap-tooltip-frozen', on)
+    }
+    const onKeyDown = (ev: KeyboardEvent) => {
+      if (ev.code !== 'Space' || ev.repeat) return
+      // Zum Fixieren muss ein Inspektor sichtbar sein; Lösen geht immer.
+      if (!frozenRef.current && !popupRef.current?.isOpen()) return
+      ev.preventDefault()  // Seiten-Scroll durch Leertaste unterdrücken
+      setFrozen(!frozenRef.current)
+    }
+    // Pan/Zoom hebt die Fixierung auf (die Zelle wandert unter dem Popup weg).
+    const onMoveStart = () => { if (frozenRef.current) setFrozen(false) }
 
     if (!map.getLayer('active-layer-fill')) return
 
     map.on('mousemove', 'active-layer-fill', onMove)
     map.on('mouseleave', 'active-layer-fill', onLeave)
+    map.on('movestart', onMoveStart)
+    window.addEventListener('keydown', onKeyDown)
     return () => {
       map.off('mousemove', 'active-layer-fill', onMove)
       map.off('mouseleave', 'active-layer-fill', onLeave)
+      map.off('movestart', onMoveStart)
+      window.removeEventListener('keydown', onKeyDown)
+      frozenRef.current = false
     }
   }, [mapLoaded, layerGeoJson, tooltipMode, drawMode])
 
@@ -470,23 +599,64 @@ export default function MapView() {
     const map = mapRef.current
     if (!map || !mapLoaded) return
     try {
-      const features = measures.filter(m => m.geometry_geojson).map(m => ({
-        type: 'Feature' as const,
-        properties: { id: m.id, name: m.name, type: m.measure_type },
-        geometry: m.geometry_geojson as unknown as GeoJSON.Geometry,
-      }))
+      // Maßnahme-Code → KAnG-Cluster (für Einfärbung nach Cluster)
+      const clusterByCode: Record<string, string> = {}
+      catalog?.measures.forEach(m => { clusterByCode[m.code] = m.kang_cluster || 'crosscutting' })
+      const features = measures.filter(m => m.geometry_geojson).map(m => {
+        const cluster = clusterByCode[m.measure_type] || 'crosscutting'
+        return {
+          type: 'Feature' as const,
+          properties: {
+            id: m.id, name: m.name, label: measureMapLabel(m.name), type: m.measure_type,
+            cluster, color: kangClusterColor(cluster),
+          },
+          geometry: m.geometry_geojson as unknown as GeoJSON.Geometry,
+        }
+      })
       const geojson: GeoJSON.GeoJSON = { type: 'FeatureCollection', features }
+      // Ein Label-Punkt je Maßnahme (Schwerpunkt) → keine Kachel-Duplikate
+      const labelFeatures = features.map(f => {
+        const c = polygonCentroid(f.geometry)
+        if (!c) return null
+        return {
+          type: 'Feature' as const,
+          properties: { label: f.properties.label, cluster: f.properties.cluster },
+          geometry: { type: 'Point' as const, coordinates: c },
+        }
+      }).filter((f): f is NonNullable<typeof f> => f !== null)
+      const labelGeojson: GeoJSON.GeoJSON = { type: 'FeatureCollection', features: labelFeatures }
       const src = map.getSource('measures') as maplibregl.GeoJSONSource
-      if (src) src.setData(geojson)
-      else {
+      if (src) {
+        src.setData(geojson)
+        ;(map.getSource('measures-labels') as maplibregl.GeoJSONSource)?.setData(labelGeojson)
+      } else {
         map.addSource('measures', { type: 'geojson', data: geojson })
+        map.addSource('measures-labels', { type: 'geojson', data: labelGeojson })
         map.addLayer({
           id: 'measures-fill', type: 'fill', source: 'measures',
-          paint: { 'fill-color': '#7c3aed', 'fill-opacity': 0.3 },
+          paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.3 },
         })
         map.addLayer({
           id: 'measures-line', type: 'line', source: 'measures',
-          paint: { 'line-color': '#7c3aed', 'line-width': 2 },
+          paint: { 'line-color': ['get', 'color'], 'line-width': 2 },
+        })
+        ensureMeasureBgImages(map)
+        map.addLayer({
+          id: 'measures-label', type: 'symbol', source: 'measures-labels',
+          layout: {
+            'text-field': ['get', 'label'],
+            'text-size': 11,
+            'text-max-width': 8,
+            'text-font': ['Open Sans Regular', 'Noto Sans Regular'],
+            'text-allow-overlap': false,
+            'icon-image': ['concat', 'measure-bg-', ['get', 'cluster']],
+            'icon-text-fit': 'both',
+            'icon-text-fit-padding': [3, 7, 3, 7],
+            'icon-allow-overlap': false,
+          },
+          paint: {
+            'text-color': '#111111',
+          },
         })
         map.on('click', 'measures-fill', (e) => {
           if (!e.features?.[0]) return
@@ -496,13 +666,13 @@ export default function MapView() {
         })
       }
     } catch (err) { console.warn('MapView: measures layer error', err) }
-  }, [measures, mapLoaded])
+  }, [measures, mapLoaded, catalog])
 
   // Measures visibility
   useEffect(() => {
     const map = mapRef.current
     if (!map || !mapLoaded) return
-    for (const id of ['measures-fill', 'measures-line']) {
+    for (const id of ['measures-fill', 'measures-line', 'measures-label']) {
       if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', showMeasures ? 'visible' : 'none')
     }
   }, [showMeasures, mapLoaded, measures])
@@ -673,6 +843,10 @@ export default function MapView() {
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', marginTop: 2 }}>
             <span>{fmt(scaleBounds.lo)}</span>
             <span>{fmt(scaleBounds.hi)}</span>
+          </div>
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 4 }}>
+            Farbskala relativ zum Min/Max dieser Gemeinde — sie zeigt lokale
+            Brennpunkte, nicht die absolute Höhe des Risikos.
           </div>
           {meta.code === 'HEALTHCARE_ACCESS_INDEX' && (
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 4 }}>

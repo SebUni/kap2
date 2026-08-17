@@ -95,10 +95,28 @@ _COMPUTED_RESOLVERS: dict[str, Any] = {
 _KRITIS_W_DETAIL = (
     "Relative Priorisierung der KRITIS-Sektoren nach der BBK-Sektorenlogik (KRITIS-"
     "Dachgesetz/BBK-Sektorenübersicht): Die Zell-Kritikalität ist die gewichtete Summe der "
-    "OSM-gezählten Anlagen je Sektor, gekappt bei 100. Die Gewichte (Skala ~1–10) sind eine "
+    "Kritikalitätspunkte je Sektor (anlagenklassen-gewichtete OSM-Zählung, siehe "
+    "Exposure-Layer), gekappt bei 100. Die Gewichte (Skala ~1–10) sind eine "
     "dokumentierte Modellwahl auf Basis der BBK-Einstufung, keine amtliche Quantifizierung — "
     "das BBK publiziert Sektoren und Schutzziele, aber keine numerischen Gewichte; editierbar."
 )
+
+
+def _infra_weight_inputs(sector: str) -> list[dict]:
+    """Override-fähige Klassengewicht-Parameter eines KRITIS-Sektors.
+
+    Generiert aus der zentralen Taxonomie (app/data/infra_assets.py), damit
+    Parameter-Registry und Zähl-Resolver (resolve_weights) nie divergieren.
+    """
+    from app.data import infra_assets
+
+    return [
+        _i(f"w_{cls}", f"Gewicht {spec['label']}", PARAM, "Punkte", "const",
+           spec["weight"], overridable=True,
+           source_refs=list(infra_assets.WEIGHT_SOURCE_REFS),
+           source_detail=spec["source_detail"])
+        for cls, spec in infra_assets.ASSET_CLASSES[sector].items()
+    ]
 
 # ── Detaillierte Rezepte (abgeleitet aus indicators.py) ───────────────────────
 
@@ -124,9 +142,10 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("__const", "Ozeanversauerung", PARAM, "ΔpH", "const", 0.1, coastal_only=True)],
     },
     "GLACIER_SNOW_LOSS": {
-        "formula": "0,5·Gletscher + Schneerückgang(DWD) · Höhe · Schneetage",
+        "formula": ("Gletscherschwund·Gletscheranteil + Schneerückgang·"
+                    "(0,25 + 0,75·Höhenfaktor)·min(1; Schneetage/45)"),
         "inputs": [
-            _i("glacier_loss_rate", "Gletscherschwund (Parameter)", PARAM, "%/Jahr", "regional"),
+            _i("glacier_loss_rate", "Gletscherschwund (DWD, regional)", EXTERN, "%/Jahr", "regional"),
             _i("glacier_frac", "Gletscheranteil (OSM natural=glacier)", EXTERN, "", "cell"),
             _i("snow_decline_rate_pct", "Schneedecken-Rückgang (DWD-Trend)", EXTERN, "%/Jahr", "regional"),
             _i("snow_days", "Schneedeckentage (DWD, regional)", EXTERN, "Tage", "regional"),
@@ -138,7 +157,7 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("__const", "Permafrosttauung", PARAM, "Index", "const", 0.0)],
     },
     "SOIL_MOISTURE_DECLINE": {
-        "formula": "clamp(Regional · (0,5 + 0,6·(Acker+Grün)) ; 0…80)",
+        "formula": "Regional · (0,5 + 0,6·(Ackeranteil + Grünanteil))",
         "inputs": [
             _i("soil_moisture_decline", "Bodenfeuchte-Rückgang (regional)", EXTERN, "mm", "regional"),
             _i("farmland_frac", "Ackeranteil (OSM)", EXTERN, "", "cell"),
@@ -146,7 +165,9 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "HEAT_WAVE": {
-        "formula": "clamp(Heiße Tage + 1,5·UHI-ΔT ; 0…40)",
+        # Ohne obere Kappung: Die 40 war der Katalog-norm_max (Screening-Grenze) und
+        # kappte zuvor auch die absoluten Schadenswerte heißer Stadtzellen (§3.3).
+        "formula": "max(0 ; Heiße Tage + 1,5·UHI-ΔT)",
         "inputs": [
             _i("hot_days", "Heiße Tage/Jahr (DWD CDC, am Zentroid)", EXTERN, "Tage", "cell"),
             _i("uhi_delta", "UHI-ΔT (OSM-Modell)", COMPUTED, "K", "cell"),
@@ -154,14 +175,14 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "COLD_EXTREME": {
-        "formula": "Frosttage · (1 − 0,3·min(UHI/5 ; 1))",
+        "formula": "Frosttage · (1 − 0,3·min(UHI-ΔT/5 ; 1))",
         "inputs": [
             _i("frost_days", "Frosttage (DWD CDC, am Zentroid)", EXTERN, "Tage", "regional"),
             _i("uhi_delta", "UHI-ΔT (OSM-Modell)", COMPUTED, "K", "cell"),
         ],
     },
     "HEAVY_RAIN_FLOOD": {
-        "formula": "clamp(Starkregen · (0,4 + Versiegelung) · TWI · Senke ; 0…100)",
+        "formula": "clamp(Starkregen · (0,4 + Versiegelung) · (0,5 + 0,5·TWI) · (0,6 + Senke) ; 0…100)",
         "inputs": [
             _i("heavy_rain_index", "Starkregenindex (DWD)", EXTERN, "Index", "regional"),
             _i("imp_frac", "Versiegelungsgrad (OSM)", EXTERN, "", "cell"),
@@ -170,7 +191,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "DROUGHT": {
-        "formula": "clamp(Trockentage · (0,6 + 0,7·(Acker+Grün)) ; 0…60)",
+        "formula": "clamp(Trockentage · (0,6 + 0,7·(Ackeranteil + Grünanteil)) ; 0…60)",
         "inputs": [
             _i("drought_days", "Trockentage (regional)", EXTERN, "Tage", "regional"),
             _i("farmland_frac", "Ackeranteil (OSM)", EXTERN, "", "cell"),
@@ -215,7 +236,8 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("__const", "Küstenerosion", PARAM, "m/Jahr", "const", 1.0, coastal_only=True)],
     },
     "SOIL_SALINIZATION": {
-        "formula": "Basis(Küste/Binnen) · Senke · Acker · Trockenheit · (Gewässer|Höhe)",
+        "formula": ("min(1; Basis(Küste 0,4/Binnen 0,05) · (0,35+0,65·Senke) · "
+                    "(0,45+0,55·Acker) · (0,55+0,45·Trockenheit) · Küsten-/Höhenfaktor)"),
         "inputs": [
             _i("__const", "Basis (Küste 0,4 / Binnen 0,05)", PARAM, "Index", "const", None, coastal_split=(0.4, 0.05)),
             _i("depression_factor", "Senkentiefe (DEM)", COMPUTED, "", "cell"),
@@ -290,7 +312,7 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("bldg_count", "Gebäudeanzahl (OSM)", EXTERN, "Anzahl", "cell")],
     },
     "LOCATION_HAZARD_ZONES": {
-        "formula": "Fläche(ha) · Gebäudeanteil · max(Senke, UHI/6)",
+        "formula": "Fläche(ha) · Gebäudeanteil · max(Senke; min(UHI-ΔT/6; 1))",
         "inputs": [
             _i("area_ha", "Zellfläche", COMPUTED, "ha", "computed", "area_ha"),
             _i("bldg_cov", "Gebäudeanteil (OSM)", EXTERN, "", "cell"),
@@ -299,25 +321,39 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "ENERGY_INFRASTRUCTURE": {
-        "formula": "Punkte(power=*) + 0,5 · Leitungssegmente(power=line/cable/…)",
+        "formula": "w_max + 0,5 · (Σ w(Anlagenklasse) · Anzahl − w_max); Leitungen je "
+                   "kV-Klasse pro Zellquerung; Masten/Tragwerke = 0 (Bestandteil der Leitung)",
         "inputs": [
-            _i("energy_infra_count", "Energieinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
+            _i("energy_infra_count", "Energie-Kritikalität (OSM, gewichtet)", EXTERN,
+               "Punkte", "cell"),
+            *_infra_weight_inputs("energy"),
         ],
     },
     "WATER_WASTEWATER_INFRA": {
-        "formula": "Anzahl OSM Wasser-/Abwasseranlagen",
+        "formula": "w_max + 0,5 · (Σ w(Anlagenklasse) · Anzahl − w_max) "
+                   "(Kläranlage/Wasserwerk/Pumpwerk/Speicher)",
         "inputs": [
-            _i("water_wastewater_count", "Wasser/Abwasser (OSM)", EXTERN, "Anzahl", "cell"),
+            _i("water_wastewater_count", "Wasser/Abwasser-Kritikalität (OSM, gewichtet)",
+               EXTERN, "Punkte", "cell"),
+            *_infra_weight_inputs("water"),
         ],
     },
     "TRANSPORT_HUBS": {
-        "formula": "Anzahl OSM-Verkehrsknoten (Bahnhof/Halt/ÖPNV)",
-        "inputs": [_i("transport_hub_count", "Verkehrsknoten (OSM)", EXTERN, "Anzahl", "cell")],
+        "formula": "w_max + 0,5 · (Σ w(Anlagenklasse) · Anzahl − w_max) "
+                   "(Bahnhof/Halt/ÖPNV/Busbahnhof)",
+        "inputs": [
+            _i("transport_hub_count", "Verkehrsknoten-Kritikalität (OSM, gewichtet)",
+               EXTERN, "Punkte", "cell"),
+            *_infra_weight_inputs("transport"),
+        ],
     },
     "COMMUNICATION_INFRA": {
-        "formula": "Anzahl OSM Mobilfunk-/Kommunikationsmasten",
+        "formula": "w_max + 0,5 · (Σ w(Anlagenklasse) · Anzahl − w_max) "
+                   "(RZ/Vermittlung/Funkturm/Mast)",
         "inputs": [
-            _i("communication_count", "Kommunikationsinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
+            _i("communication_count", "Kommunikations-Kritikalität (OSM, gewichtet)",
+               EXTERN, "Punkte", "cell"),
+            *_infra_weight_inputs("comm"),
         ],
     },
     "HEALTHCARE_INFRASTRUCTURE": {
@@ -344,7 +380,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "SUPPLY_CHAIN_NODES": {
-        "formula": "Industrie · 6 + Gebäude · 0,004",
+        "formula": "Industrieanteil · 6 + Gebäudeanzahl · 0,004",
         "inputs": [
             _i("industrial", "Industrieanteil (OSM)", COMPUTED, "", "computed", "industrial"),
             _i("bldg_count", "Gebäudeanzahl (OSM)", EXTERN, "", "cell"),
@@ -366,7 +402,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "EROSION_PRONE_SOILS": {
-        "formula": "Fläche(ha) · Acker · Hangneigung",
+        "formula": "Fläche(ha) · Ackeranteil · Hangneigung",
         "inputs": [
             _i("area_ha", "Zellfläche", COMPUTED, "ha", "computed", "area_ha"),
             _i("farmland_frac", "Ackeranteil (OSM)", EXTERN, "", "cell"),
@@ -382,7 +418,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "FLOODPLAINS": {
-        "formula": "Fläche(ha) · Senke · Gewässernähe",
+        "formula": "Fläche(ha) · Senke · max(Gewässernähe; 0,3 bei Ufernähe, sonst 0,1)",
         "inputs": [
             _i("area_ha", "Zellfläche", COMPUTED, "ha", "computed", "area_ha"),
             _i("depression_factor", "Senkentiefe (DEM)", COMPUTED, "", "cell"),
@@ -397,7 +433,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "GROUNDWATER_DEPENDENT_ECOSYSTEMS": {
-        "formula": "Fläche(ha) · (Wald+Grün) · (0,3+Gewässernähe)",
+        "formula": "Fläche(ha) · (Waldanteil + Grünanteil) · (0,3 + Gewässernähe)",
         "inputs": [
             _i("area_ha", "Zellfläche", COMPUTED, "ha", "computed", "area_ha"),
             _i("forest_frac", "Waldanteil (OSM)", EXTERN, "", "cell"),
@@ -410,7 +446,7 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("water_frac", "Wasseranteil (OSM)", EXTERN, "", "cell")],
     },
     "FISH_SPAWNING_HABITATS": {
-        "formula": "Fläche(ha) · max(Wasser, Gewässernähe·0,5)",
+        "formula": "Fläche(ha) · max(Wasseranteil; Gewässernähe·0,5)",
         "inputs": [
             _i("area_ha", "Zellfläche", COMPUTED, "ha", "computed", "area_ha"),
             _i("water_frac", "Wasseranteil (OSM)", EXTERN, "", "cell"),
@@ -419,7 +455,8 @@ DETAILED: dict[str, dict] = {
     },
     # Vulnerabilities
     "BUILDING_STABILITY": {
-        "formula": "clamp(50 + Gebäudeanteil·20 + (10 wenn Höhe > 18 m) + Altersfaktor ; 0…100)",
+        "formula": ("clamp(50 + 20·Gebäudeanteil + (10 wenn Höhe > 18 m) + "
+                    "min(30; (heute−Baujahr)/100·30) ; 0…100)"),
         "inputs": [
             _i("bldg_cov", "Gebäudeanteil (OSM)", EXTERN, "", "cell"),
             _i("avg_height", "Ø Gebäudehöhe (OSM)", EXTERN, "m", "cell"),
@@ -456,21 +493,21 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "WILDFIRE_SUSCEPTIBILITY": {
-        "formula": "clamp(Wald · 100 · (0,5 + Trockenheit/2) ; 0…100)",
+        "formula": "clamp(Waldanteil · 100 · (0,5 + Trockenheit/2) ; 0…100)",
         "inputs": [
             _i("forest_frac", "Waldanteil (OSM)", EXTERN, "", "cell"),
             _i("dry_index", "Trockenheitsindex (regional)", EXTERN, "", "regional"),
         ],
     },
     "BIODIVERSITY_RESILIENCE": {
-        "formula": "clamp(100 − (Wald+Grün)·100·0,6 ; 0…100)",
+        "formula": "clamp(100 − (Waldanteil + Grünanteil)·100·0,6 ; 0…100)",
         "inputs": [
             _i("forest_frac", "Waldanteil (OSM)", EXTERN, "", "cell"),
             _i("green_frac", "Grünanteil (OSM)", EXTERN, "", "cell"),
         ],
     },
     "SOIL_SENSITIVITY": {
-        "formula": "clamp(Hang·60 + Acker·40 ; 0…100)",
+        "formula": "clamp(60·Hangneigung + 40·Ackeranteil ; 0…100)",
         "inputs": [
             _i("slope_factor", "Hangneigung (DEM)", EXTERN, "", "cell"),
             _i("farmland_frac", "Ackeranteil (OSM)", EXTERN, "", "cell"),
@@ -503,30 +540,30 @@ DETAILED: dict[str, dict] = {
     "INFRA_CRITICALITY": {
         "formula": "clamp(w_E·Energie + w_W·Wasser + w_K·Kommunikation + w_G·Gesundheit + w_V·Verkehr ; 0…100)",
         "inputs": [
-            _i("energy_infra_count", "Energieinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
-            _i("water_wastewater_count", "Wasser/Abwasser (OSM)", EXTERN, "Anzahl", "cell"),
-            _i("communication_count", "Kommunikationsinfrastruktur (OSM)", EXTERN, "Anzahl", "cell"),
+            _i("energy_infra_count", "Energie-Kritikalität (OSM, gewichtet)", EXTERN, "Punkte", "cell"),
+            _i("water_wastewater_count", "Wasser/Abwasser-Kritikalität (OSM, gewichtet)", EXTERN, "Punkte", "cell"),
+            _i("communication_count", "Kommunikations-Kritikalität (OSM, gewichtet)", EXTERN, "Punkte", "cell"),
             _i("healthcare_access_score", "Gesundheits-Erreichbarkeit (OSM)", EXTERN, "", "cell"),
-            _i("transport_hub_count", "Verkehrsknoten (OSM)", EXTERN, "Anzahl", "cell"),
-            _i("w_energy", "Gewicht Energie (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 8.0,
+            _i("transport_hub_count", "Verkehrsknoten-Kritikalität (OSM, gewichtet)", EXTERN, "Punkte", "cell"),
+            _i("w_energy", "Gewicht Energie (BBK-KRITIS)", PARAM, "", "const", 8.0,
                overridable=True, source_refs=["BBK_KRITIS"],
                source_detail=_KRITIS_W_DETAIL + " Energie: hohes Gewicht (8), da Strom-/"
                "Gasausfall unmittelbar alle anderen Sektoren kaskadiert (BBK-Leitszenario "
                "Stromausfall)."),
-            _i("w_water", "Gewicht Wasser (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 8.0,
+            _i("w_water", "Gewicht Wasser (BBK-KRITIS)", PARAM, "", "const", 8.0,
                overridable=True, source_refs=["BBK_KRITIS"],
                source_detail=_KRITIS_W_DETAIL + " Wasser/Abwasser: hohes Gewicht (8), "
                "lebensnotwendige Grundversorgung ohne kurzfristigen Ersatz."),
-            _i("w_comm", "Gewicht IT/TK (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 6.0,
+            _i("w_comm", "Gewicht IT/TK (BBK-KRITIS)", PARAM, "", "const", 6.0,
                overridable=True, source_refs=["BBK_KRITIS"],
                source_detail=_KRITIS_W_DETAIL + " IT/Telekommunikation: mittleres Gewicht (6), "
                "kritisch für Koordination/Warnung, aber mit Teil-Redundanzen (Mobilfunk/"
                "Festnetz/Behördenfunk)."),
-            _i("w_health", "Gewicht Gesundheit (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 10.0,
+            _i("w_health", "Gewicht Gesundheit (BBK-KRITIS)", PARAM, "", "const", 10.0,
                overridable=True, source_refs=["BBK_KRITIS"],
                source_detail=_KRITIS_W_DETAIL + " Gesundheit: höchstes Gewicht (10), direkter "
                "Lebensschutz (Krankenhäuser/Pflege) ohne Substitutionsmöglichkeit im Ereignisfall."),
-            _i("w_transport", "Gewicht Verkehr (BBK-KRITIS)", PARAM, "", "BBK KRITIS-Sektoren", 6.0,
+            _i("w_transport", "Gewicht Verkehr (BBK-KRITIS)", PARAM, "", "const", 6.0,
                overridable=True, source_refs=["BBK_KRITIS"],
                source_detail=_KRITIS_W_DETAIL + " Transport/Verkehr: mittleres Gewicht (6), "
                "wichtig für Erreichbarkeit/Evakuierung, aber räumlich meist umfahrbar."),
@@ -541,7 +578,7 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("__const", "Infrastrukturabhängigkeit", PARAM, "Index", "const", 50.0)],
     },
     "HEAT_SENSITIVITY": {
-        "formula": "clamp(Vulnerable + UHI·6 + (1−Grün)·20 ; 0…100)",
+        "formula": "clamp(Anteil Vulnerable + 6·UHI-ΔT + 20·(1−Grünanteil) ; 0…100)",
         "inputs": [
             _i("share_vulnerable", "Anteil vulnerable Gruppen (Zensus)", EXTERN, "%", "demo"),
             _i("uhi_delta", "UHI-ΔT (OSM)", COMPUTED, "K", "cell"),
@@ -549,21 +586,21 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "AIR_QUALITY_RISK": {
-        "formula": "clamp(Versiegelung·60 + Straße·200 ; 0…100)",
+        "formula": "clamp(60·Versiegelung + 200·Straßenanteil ; 0…100)",
         "inputs": [
             _i("imp_frac", "Versiegelungsgrad (OSM)", EXTERN, "", "cell"),
             _i("road_cov", "Straßenanteil (OSM)", EXTERN, "", "cell"),
         ],
     },
     "DISEASE_VECTOR_SUSCEPTIBILITY": {
-        "formula": "clamp(Wasser · 100 · Mitteltemperatur/12 ; 0…100)",
+        "formula": "clamp(Wasseranteil · 100 · Mitteltemperatur/12 ; 0…100)",
         "inputs": [
             _i("water_frac", "Wasseranteil (OSM)", EXTERN, "", "cell"),
             _i("mean_temp", "Jahresmitteltemperatur (DWD)", EXTERN, "°C", "regional"),
         ],
     },
     "GROUNDWATER_DEPENDENCY": {
-        "formula": "clamp((Acker + Grün) · 50 ; 0…100)",
+        "formula": "clamp((Ackeranteil + Grünanteil) · 50 ; 0…100)",
         "inputs": [
             _i("farmland_frac", "Ackeranteil (OSM)", EXTERN, "", "cell"),
             _i("green_frac", "Grünanteil (OSM)", EXTERN, "", "cell"),
@@ -578,14 +615,14 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "IRRIGATION_DEPENDENCY": {
-        "formula": "clamp(Acker · 100 · (0,5 + Trockenheit/2) ; 0…100)",
+        "formula": "clamp(Ackeranteil · 100 · (0,5 + Trockenheit/2) ; 0…100)",
         "inputs": [
             _i("farmland_frac", "Ackeranteil (OSM)", EXTERN, "", "cell"),
             _i("dry_index", "Trockenheitsindex (regional)", EXTERN, "", "regional"),
         ],
     },
     "EROSION_SUSCEPTIBILITY": {
-        "formula": "clamp(Hang · 100 · (1−Grün) ; 0…100)",
+        "formula": "clamp(Hangneigung · 100 · (1−Grünanteil) ; 0…100)",
         "inputs": [
             _i("slope_factor", "Hangneigung (DEM)", EXTERN, "", "cell"),
             _i("green_frac", "Grünanteil (OSM)", EXTERN, "", "cell"),
@@ -622,7 +659,7 @@ DETAILED: dict[str, dict] = {
         "inputs": [_i("uhi_delta", "UHI-ΔT (OSM-Modell)", COMPUTED, "K", "cell")],
     },
     "GREEN_SPACE_SHARE": {
-        "formula": "clamp(100 − Grün · 100 ; 0…100)",
+        "formula": "clamp(100 − Grünanteil · 100 ; 0…100)",
         "inputs": [_i("green_frac", "Grünanteil (OSM)", EXTERN, "", "cell")],
     },
     "EARLY_WARNING_SYSTEMS": {
@@ -671,7 +708,7 @@ DETAILED: dict[str, dict] = {
         ],
     },
     "FISHERIES_TEMPERATURE_SENSITIVITY": {
-        "formula": "clamp(Wasser · 100 · Gewässererwärmung/3 ; 0…100)",
+        "formula": "clamp(Wasseranteil · 100 · Gewässererwärmung/3 ; 0…100)",
         "inputs": [
             _i("water_frac", "Wasseranteil (OSM)", EXTERN, "", "cell"),
             _i("surface_water_heating", "Gewässererwärmung (DWD)", EXTERN, "°C", "regional"),
@@ -689,8 +726,15 @@ DETAILED: dict[str, dict] = {
 
 
 def _input_meta(inp: dict) -> dict:
-    meta = {k: v for k, v in inp.items() if k in ("key", "label", "prov", "unit", "source", "coastal_only")}
-    if inp.get("source") in ("const", "hev", "computed") and "value" in inp and inp["value"] is not None:
+    meta = {
+        k: v for k, v in inp.items()
+        if k in ("key", "label", "prov", "unit", "source", "coastal_only", "overridable")
+    }
+    # Wert für die Anzeige/Lineage behalten: für Konstanten/HEV/Computed sowie für
+    # jeden override-fähigen Formel-Parameter (dieser braucht seinen Default als
+    # sichtbaren Fallback und damit die Lineage seine parameter_id verdrahten kann).
+    keep_value = inp.get("source") in ("const", "hev", "computed") or inp.get("overridable")
+    if keep_value and "value" in inp and inp["value"] is not None:
         meta["value"] = inp["value"]
     return meta
 
@@ -706,6 +750,11 @@ def get_recipe(code: str) -> dict:
     m = catalog.INDICATOR_BY_CODE.get(code, {})
     spatial = m.get("spatial", False)
     proxy = m.get("proxy") or m.get("description") or "—"
+    if code in catalog.AUXILIARY_BY_CODE:
+        # Sonstige-Ebenen: ehrlicher Berechnungstext statt des generischen
+        # Katalog-Proxys "Direkt aus Datenquelle (siehe Quelle)".
+        from app.data.lineage_operators import aux_formula_text
+        proxy = aux_formula_text(code, m.get("source", ""))
     source = m.get("source")
     prov = EXTERN if spatial else PARAM
     label = "Datenquelle" if spatial else "Annahme (Parameter)"
@@ -1039,9 +1088,10 @@ def recipe_for_layer(code: str, category: str) -> dict:
     if category == "risks":
         return risk_recipe(catalog.RISKS_BY_CODE[code])
     if category == "auxiliary":
+        from app.data.lineage_operators import aux_formula_text
         m = catalog.AUXILIARY_BY_CODE[code]
         return {
-            "formula": f"Direkt aus {m.get('source', 'Quelle')}",
+            "formula": aux_formula_text(code, m.get("source", "Quelle")),
             "inputs": [
                 _i(code, m["name"], EXTERN, m.get("unit", ""), "auxiliary"),
             ],

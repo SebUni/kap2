@@ -1,23 +1,23 @@
 import logging
-import os
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, HTTPException, Request
 from geoalchemy2.shape import to_shape
 from shapely.geometry import mapping
 from sqlalchemy.orm import Session
 
+from app.api.deps import demo_session_id_of, require_admin
+from app.api.gzip_files import file_etag, gzip_json_file_response
 from app.db.database import get_db
 from app.data import catalog
-from app.services import layer_cache
+from app.models.auth_models import User
+from app.services import dashboard_cache, layer_cache
 from app.models.models import (
     Kommune, CellAssessment, GridCell, ProjectStatus, AssessmentStatus,
 )
 from app.tasks.assessment_task import (
-    run_assessment_background, abort_assessment, TASK_KEY,
+    run_assessment_background, abort_assessment, is_row_alive, TASK_KEY,
 )
-from app.services.measure_service import get_risk_aggregate
 from app.services.engine import risk_engine
 from app.services.engine import formulas
 from app.services.engine.inputs import build_regional_context
@@ -42,42 +42,33 @@ def _layer_category(code: str) -> str | None:
 
 
 @router.post("/kommune/{kommune_id}/assess")
-def start_assessment(kommune_id: int, db: Session = Depends(get_db)):
-    """Startet die vollständige KAP3-Bewertung im Hintergrund."""
+def start_assessment(
+    kommune_id: int,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Reiht die vollständige KAP3-Bewertung ein (läuft als eigener Prozess). (Admin)"""
     cell_count = db.query(GridCell).filter(GridCell.kommune_id == kommune_id).count()
     if cell_count == 0:
         raise HTTPException(400, "Keine Grid-Zellen vorhanden. Bitte zuerst Grid generieren.")
 
-    ps = (db.query(ProjectStatus)
-          .filter(ProjectStatus.kommune_id == kommune_id, ProjectStatus.task_key == TASK_KEY)
-          .first())
-    if not ps:
-        ps = ProjectStatus(kommune_id=kommune_id, task_key=TASK_KEY, level=1)
-        db.add(ps)
-    ps.status = AssessmentStatus.RUNNING
-    ps.progress_pct = 0.0
-    ps.message = "Berechnung wird vorbereitet …"
-    ps.started_at = datetime.utcnow()
-    ps.finished_at = None
-    ps.step_history = []
-    ps.eta_seconds = None
-    db.commit()
-
     run_assessment_background(kommune_id)
-    return {"message": "Berechnung gestartet", "kommune_id": kommune_id}
+    return {"message": "Berechnung eingereiht", "kommune_id": kommune_id}
 
 
 @router.post("/kommune/{kommune_id}/assess/abort")
-def abort_running_assessment(kommune_id: int, db: Session = Depends(get_db)):
-    aborted = abort_assessment(kommune_id)
+def abort_running_assessment(
+    kommune_id: int,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Bricht laufende/eingereihte Berechnung ab (Kind-Prozess via DB-Flag+SIGTERM).
+
+    ``abort_assessment`` heilt auch tote RUNNING-Zeilen autoritativ, damit der
+    Abbrechen-Knopf nach Standby/Neustart nicht scheinbar wirkungslos bleibt.
+    """
+    aborted = abort_assessment(db, kommune_id)
     if aborted:
-        ps = (db.query(ProjectStatus)
-              .filter(ProjectStatus.kommune_id == kommune_id, ProjectStatus.task_key == TASK_KEY)
-              .first())
-        if ps:
-            ps.status = AssessmentStatus.ERROR
-            ps.message = "Berechnung abgebrochen"
-            db.commit()
         return {"message": "Berechnung wird abgebrochen", "aborted": True}
     return {"message": "Keine laufende Berechnung gefunden", "aborted": False}
 
@@ -89,7 +80,26 @@ def get_status(kommune_id: int, db: Session = Depends(get_db)):
           .first())
     if not ps:
         return {"status": None, "progress_pct": 0.0, "message": None,
-                "step_history": [], "eta_seconds": None}
+                "step_history": [], "eta_seconds": None,
+                "queue_position": None, "recalc_recommended": False}
+    # Selbstheilung: Status RUNNING, aber der Kind-Prozess lebt nicht mehr
+    # (PID+Start-Ticks) → Lauf ist tot (SIGKILL/OOM/Absturz). Verwaiste Kinder
+    # eines früheren API-Prozesses (--reload) gelten korrekt als lebendig.
+    if ps.status == AssessmentStatus.RUNNING and not is_row_alive(ps):
+        ps.status = AssessmentStatus.ERROR
+        ps.message = "Berechnung unterbrochen (Standby/Neustart) – bitte neu starten"
+        ps.finished_at = datetime.utcnow()
+        ps.worker_pid = None
+        db.commit()
+    queue_position = None
+    if ps.status == AssessmentStatus.QUEUED and ps.queued_at is not None:
+        queue_position = 1 + (
+            db.query(ProjectStatus)
+            .filter(ProjectStatus.task_key == TASK_KEY,
+                    ProjectStatus.status == AssessmentStatus.QUEUED,
+                    ProjectStatus.queued_at < ps.queued_at)
+            .count()
+        )
     return {
         "status": ps.status.value if ps.status else None,
         "progress_pct": ps.progress_pct,
@@ -98,39 +108,14 @@ def get_status(kommune_id: int, db: Session = Depends(get_db)):
         "finished_at": ps.finished_at.isoformat() if ps.finished_at else None,
         "step_history": ps.step_history or [],
         "eta_seconds": ps.eta_seconds,
+        "queue_position": queue_position,
+        "recalc_recommended": bool(ps.recalc_recommended),
     }
 
 
-def _gzip_uncompressed_size(path: str) -> int:
-    """Liest die unkomprimierte Groesse aus dem gzip-Trailer (ISIZE, mod 2^32)."""
-    import struct
-    with open(path, "rb") as fh:
-        fh.seek(-4, os.SEEK_END)
-        return struct.unpack("<I", fh.read(4))[0]
-
-
-def _gzip_json_response(path: str, download_name: str) -> FileResponse:
-    """Streamt eine gzip-JSON-Datei; der Browser dekomprimiert via Content-Encoding.
-
-    ``X-Uncompressed-Length`` erlaubt dem Frontend eine echte Fortschrittsanzeige
-    (die dekomprimierten Bytes werden gegen diese Groesse gemessen).
-    """
-    headers = {"Content-Encoding": "gzip", "Cache-Control": "no-cache"}
-    try:
-        headers["X-Uncompressed-Length"] = str(_gzip_uncompressed_size(path))
-    except Exception:
-        pass
-    return FileResponse(
-        path,
-        media_type="application/json",
-        headers=headers,
-        filename=download_name,
-    )
-
-
 @router.get("/kommune/{kommune_id}/grid-geometry")
-def get_grid_geometry(kommune_id: int, db: Session = Depends(get_db)):
-    """Statische Zellgeometrie (einmal je Kommune) als gzip-GeoJSON.
+def get_grid_geometry(kommune_id: int, request: Request, db: Session = Depends(get_db)):
+    """Statische Zellgeometrie (einmal je Kommune) als gzip-GeoJSON (ETag/304).
 
     Nur ``grid_cell_id`` (+ gitter_id/row/col) und Geometrie; die Layer-Werte
     kommen getrennt ueber ``/layer/{code}/values``.
@@ -141,12 +126,15 @@ def get_grid_geometry(kommune_id: int, db: Session = Depends(get_db)):
     path = layer_cache.geometry_file(db, kommune_id)
     if not path:
         return {"type": "FeatureCollection", "features": []}
-    return _gzip_json_response(path, f"grid-geometry-{kommune_id}.json")
+    return gzip_json_file_response(
+        request, path, etag=file_etag(path),
+        download_name=f"grid-geometry-{kommune_id}.json",
+    )
 
 
 @router.get("/kommune/{kommune_id}/layer/{code}/values")
-def get_layer_values(kommune_id: int, code: str, db: Session = Depends(get_db)):
-    """Layer-Werte ohne Geometrie (klein) als gzip-JSON.
+def get_layer_values(kommune_id: int, code: str, request: Request, db: Session = Depends(get_db)):
+    """Layer-Werte ohne Geometrie (klein) als gzip-JSON (ETag/304).
 
     ``cells`` enthaelt je Zelle ``grid_cell_id``, ``value`` und die
     Inspektor-Detailfelder; ``meta`` liefert Min/Max/Label/Unit/Recipe.
@@ -163,16 +151,25 @@ def get_layer_values(kommune_id: int, code: str, db: Session = Depends(get_db)):
         raise HTTPException(500, f"Layer konnte nicht geladen werden: {exc}") from exc
     if not path:
         raise HTTPException(404, f"Unbekannter Code: {code}")
-    return _gzip_json_response(path, f"layer-{code}-{kommune_id}.json")
+    return gzip_json_file_response(
+        request, path, etag=file_etag(path),
+        download_name=f"layer-{code}-{kommune_id}.json",
+    )
 
 
 @router.get("/kommune/{kommune_id}/layer/{code}")
 def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
     """GeoJSON einer einzelnen Ebene (H/E/V-Code oder Risiko-Code).
 
+    DEPRECATED: Das Frontend nutzt ``/grid-geometry`` + ``/layer/{code}/values``
+    (vorgebaute gzip-Dateien). Dieser Per-Request-Vollbau bleibt eine Version
+    lang für externe Nutzer erhalten und wird dann entfernt.
+
     Property ``value`` enthält den darzustellenden Wert in absoluter Einheit
     (H/E/V und Risiken). ``meta`` liefert Min/Max für die Legende.
     """
+    log.warning("DEPRECATED: GET /kommune/%s/layer/%s — bitte /grid-geometry + "
+                "/layer/{code}/values verwenden", kommune_id, code)
     category = _layer_category(code)
     if not category:
         raise HTTPException(404, f"Unbekannter Code: {code}")
@@ -269,85 +266,43 @@ def get_layer(kommune_id: int, code: str, db: Session = Depends(get_db)):
 
 
 @router.get("/kommune/{kommune_id}/risk-summary")
-def risk_summary(kommune_id: int, db: Session = Depends(get_db)):
-    """Aggregiertes Risiko (Basis, ohne Maßnahmen): Gruppen + Einzelrisiken."""
-    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
-    if not kommune:
-        raise HTTPException(404, "Kommune nicht gefunden")
-    return get_risk_aggregate(db, kommune_id, apply_measures=False)
+def risk_summary(kommune_id: int, request: Request, db: Session = Depends(get_db)):
+    """Aggregiertes Risiko (Basis, ohne Maßnahmen): Gruppen + Einzelrisiken.
 
-
-@router.get("/kommune/{kommune_id}/risk-histogram")
-def risk_histogram(kommune_id: int, db: Session = Depends(get_db)):
-    """Häufigkeitsverteilung der Risiko-Index-Höhen je Risiko (20 Bins à 5, 0-100).
-
-    Liefert pro Risiko die Zellanzahl je Index-Klasse plus Outcome-/Index-Kennzahlen.
-    Botschaft: wenige hohe Zellen → punktuelle Maßnahmen; viele hohe → flächendeckend.
+    Payload wird im Hintergrund vorgebaut (``dashboard_cache``); hier nur
+    Datei-Auslieferung mit ETag/304, Lazy-Build bei Miss/Stale.
     """
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
-
-    N_BINS = 20
-    WIDTH = 5.0  # 0..100
-    bins_labels = [f"{int(i * WIDTH)}-{int((i + 1) * WIDTH)}" for i in range(N_BINS)]
-    bin_centers = [round((i + 0.5) * WIDTH, 1) for i in range(N_BINS)]
-
-    rows = (
-        db.query(CellAssessment)
-        .filter(CellAssessment.kommune_id == kommune_id)
-        .all()
+    art = dashboard_cache.artifact_file(db, kommune_id, "risk_summary")
+    if not art:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    path, etag = art
+    return gzip_json_file_response(
+        request, path, etag=etag, download_name=f"risk-summary-{kommune_id}.json",
     )
-    total_cells = len(rows)
 
-    counts: dict[str, list[int]] = {r["code"]: [0] * N_BINS for r in catalog.RISKS}
-    nonzero: dict[str, int] = {r["code"]: 0 for r in catalog.RISKS}
-    for ca in rows:
-        risks = (ca.data or {}).get("risks", {})
-        for code, r in risks.items():
-            if code not in counts:
-                continue
-            idx = float(r.get("index", 0.0))
-            b = min(N_BINS - 1, max(0, int(idx // WIDTH)))
-            counts[code][b] += 1
-            if idx > 0.0:
-                nonzero[code] += 1
 
-    # Outcome/Index-Kennzahlen aus dem Aggregat (mit/ohne Maßnahmen = Basis)
-    agg = get_risk_aggregate(db, kommune_id, apply_measures=False)
+@router.get("/kommune/{kommune_id}/risk-histogram")
+def risk_histogram(kommune_id: int, request: Request, db: Session = Depends(get_db)):
+    """Häufigkeitsverteilung der Risiko-Index-Höhen je Risiko (20 Bins à 5, 0-100).
 
-    risks_out: dict[str, dict] = {}
-    for risk in catalog.RISKS:
-        code = risk["code"]
-        a = agg["risks"].get(code, {})
-        risks_out[code] = {
-            "name": risk["name"],
-            "group": risk["group"],
-            "outcome_unit": risk["outcome_unit"],
-            "cost_dimension": risk["cost_dimension"],
-            "counts": counts[code],
-            "nonzero_cells": nonzero[code],
-            "p90_index": a.get("index", 0.0),
-            "max_index": a.get("max_index", 0.0),
-            "outcome": a.get("outcome", 0.0),
-            "outcome_sum": a.get("outcome_sum", 0.0),
-            "cost_eur": a.get("cost_eur", 0.0),
-            # Schicht-B-Aggregationskennzahlen (Σ über Zellen vs. P90; Konzentration/Fläche)
-            "aggregation": a.get("aggregation", "sum"),
-            "top5_share": a.get("top5_share", 0.0),
-            "area_km2_affected": a.get("area_km2_affected", 0.0),
-            "share_above_threshold": a.get("share_above_threshold", 0.0),
-            # Plausibilitätsanker (Σ/ref_value-Schätzung); Anzeige folgt in Prompt 7.
-            "sanity_ratio": a.get("sanity_ratio"),
-        }
-
-    return {
-        "total_cells": total_cells,
-        "bin_labels": bins_labels,
-        "bin_centers": bin_centers,
-        "bin_width": WIDTH,
-        "risks": risks_out,
-    }
+    Botschaft: wenige hohe Zellen → punktuelle Maßnahmen; viele hohe →
+    flächendeckend. Builder: ``dashboard_cache._build_risk_histogram`` (streamt
+    die Zell-Blobs) — vorher scannte dieser Endpoint bei JEDEM Aufruf alle
+    ``CellAssessment``-Zeilen.
+    """
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    art = dashboard_cache.artifact_file(db, kommune_id, "risk_histogram")
+    if not art:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    path, etag = art
+    return gzip_json_file_response(
+        request, path, etag=etag, download_name=f"risk-histogram-{kommune_id}.json",
+    )
 
 
 @router.get("/kommune/{kommune_id}/risk-zones/{risk_code}")
@@ -398,14 +353,26 @@ def get_risk_projection(kommune_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/kommune/{kommune_id}/cost-projection")
-def get_cost_projection(kommune_id: int, db: Session = Depends(get_db)):
+def get_cost_projection(kommune_id: int, request: Request, db: Session = Depends(get_db)):
     """Erwartete Jahresschäden 2025–2065 (RCP4.5/8.5), mit/ohne Maßnahmen.
 
     „Mit Maßnahmen" preist die Maßnahmenkosten ein: OPEX jährlich ab
-    Umsetzungsjahr, CAPEX einmalig im Umsetzungsjahr.
+    Umsetzungsjahr, CAPEX einmalig im Umsetzungsjahr. Payload vorgebaut
+    (``dashboard_cache``), hier nur Datei-Auslieferung mit ETag/304.
+    Demo: live gerechnet mit Session-Maßnahmenfilter (kein geteiltes Artefakt).
     """
-    from app.services.cost_projection_service import project_costs
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
-    return project_costs(db, kommune_id, kommune.bundesland or "Sachsen")
+    demo_sid = demo_session_id_of(request)
+    if demo_sid:
+        from app.services.cost_projection_service import project_costs
+        return project_costs(db, kommune_id, kommune.bundesland or "Sachsen",
+                             demo_session_id=demo_sid)
+    art = dashboard_cache.artifact_file(db, kommune_id, "cost_projection")
+    if not art:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    path, etag = art
+    return gzip_json_file_response(
+        request, path, etag=etag, download_name=f"cost-projection-{kommune_id}.json",
+    )

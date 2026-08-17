@@ -13,6 +13,22 @@ import {
 import { fmtParamValue } from '../utils/layerInfoFormat'
 import InfoTooltip from './InfoTooltip'
 
+/** Demo: Wert/Quelle gesperrter Ebenen verborgen (nur in der Vollversion sichtbar). */
+function HiddenChip() {
+  return (
+    <span
+      title="In der Vollversion sichtbar"
+      style={{
+        display: 'inline-block', background: 'repeating-linear-gradient(45deg, var(--border), var(--border) 3px, transparent 3px, transparent 6px)',
+        color: 'var(--text-muted)', fontSize: '0.68rem', padding: '0 6px',
+        borderRadius: 4, letterSpacing: '0.05em',
+      }}
+    >
+      Vollversion
+    </span>
+  )
+}
+
 interface Props {
   kommuneId: number
   parameters: ModelParameter[]
@@ -161,7 +177,7 @@ export default function ParameterTable({
                       style={{ width: '100%', fontSize: '0.75rem' }}
                     />
                   ) : (
-                    <span className="kap-param-value">{notApplicable ? '—' : fmtParamValue(p.value)}</span>
+                    <span className="kap-param-value">{p.demo_hidden ? <HiddenChip /> : notApplicable ? '—' : fmtParamValue(p.value)}</span>
                   )}
                 </td>
                 <td className="kap-param-td-unit">{p.unit}</td>
@@ -179,11 +195,15 @@ export default function ParameterTable({
                     />
                   ) : (
                     <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span className="kap-param-cell-text" style={{ flex: 1, minWidth: 0 }} title={notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source || '')}>
-                        {notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source)}
-                      </span>
-                      {!notApplicable && (p.source_detail || (p.references && p.references.length > 0)) && (
-                        <InfoTooltip title={p.custom_source || p.source || 'Quelle'} description={p.source_detail} references={p.references} />
+                      {p.demo_hidden ? <HiddenChip /> : (
+                        <>
+                          <span className="kap-param-cell-text" style={{ flex: 1, minWidth: 0 }} title={notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source || '')}>
+                            {notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source)}
+                          </span>
+                          {!notApplicable && (p.source_detail || (p.references && p.references.length > 0)) && (
+                            <InfoTooltip title={p.custom_source || p.source || 'Quelle'} description={p.source_detail} references={p.references} />
+                          )}
+                        </>
                       )}
                     </span>
                   )}
@@ -344,10 +364,10 @@ function ParameterRows({
                   style={{ width: '100%', fontSize: '0.75rem' }}
                 />
               ) : (
-                <span className="kap-param-value">{notApplicable ? '—' : fmtParamValue(p.value)}</span>
+                <span className="kap-param-value">{p.demo_hidden ? <HiddenChip /> : notApplicable ? '—' : fmtParamValue(p.value)}</span>
               )}
             </td>
-            <td className="kap-param-td-unit">{p.unit}</td>
+            <td className="kap-param-td-unit">{p.demo_hidden ? '' : p.unit}</td>
             <td>
               {editing ? (
                 <input
@@ -360,6 +380,8 @@ function ParameterRows({
                   })}
                   style={{ width: '100%', fontSize: '0.75rem' }}
                 />
+              ) : p.demo_hidden ? (
+                <HiddenChip />
               ) : (
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span className="kap-param-cell-text" style={{ flex: 1, minWidth: 0 }} title={notApplicable ? 'nicht anwendbar' : (p.custom_source || p.source || '')}>

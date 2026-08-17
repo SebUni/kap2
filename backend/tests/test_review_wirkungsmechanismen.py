@@ -140,18 +140,99 @@ def test_pathway_descriptions_do_not_contradict_curation():
 # (py-Literal im indicators.py-Code der Zeile ; deutscher Formelstring-Baustein)
 _CONSTANT_MAP: dict[str, list[tuple[str, str]]] = {
     "MEAN_TEMPERATURE_RISE": [("0.08", "0,08")],
-    "HEAT_WAVE": [("1.5", "1,5"), ("40", "40")],
+    # Die obere Kappung bei 40 ist entfallen: Das war der Katalog-norm_max, also
+    # eine Screening-Grenze, die zuvor auch die absoluten Schadenswerte heißer
+    # Stadtzellen kappte (MODELL_KRITIK §3.3).
+    "HEAT_WAVE": [("1.5", "1,5")],
     "COLD_EXTREME": [("0.3", "0,3")],
     "DROUGHT": [("0.6", "0,6"), ("0.7", "0,7"), ("60", "60")],
     "EXTRATROPICAL_STORM": [("0.8", "0,8"), ("0.5", "0,5")],
+    "HEAVY_RAIN_FLOOD": [("0.4", "0,4"), ("0.5", "0,5"), ("0.6", "0,6"), ("100", "100")],
+    "GLACIER_SNOW_LOSS": [("0.25", "0,25"), ("0.75", "0,75"), ("45", "45")],
+    "SOIL_MOISTURE_DECLINE": [("0.5", "0,5"), ("0.6", "0,6")],
+    "WILDFIRE": [("0.4", "0,4"), ("100", "100")],
+    "LANDSLIDE": [("100", "100")],
+    "SURFACE_WATER_HEATING": [("0.5", "0,5")],
+    "LOW_FLOW_NIEDRIGWASSER": [("0.6", "0,6"), ("0.4", "0,4"), ("0.3", "0,3"), ("60", "60")],
+    "SOIL_SALINIZATION": [("0.35", "0,35"), ("0.65", "0,65"),
+                          ("0.45", "0,45"), ("0.55", "0,55")],
+    # Exposures
+    "BIODIVERSITY_HOTSPOTS": [("0.5", "0,5")],
+    "OUTDOOR_THERMAL_EXPOSURE": [("2.0", "2"), ("3.0", "3")],
+    "FISHERIES_AQUACULTURE_AREAS": [("5.0", "5")],
+    # Vulnerabilities
+    "HEAT_SENSITIVITY": [("6.0", "6"), ("20.0", "20")],
+    "AIR_QUALITY_RISK": [("60.0", "60"), ("200.0", "200")],
+    "WATER_STRESS_INDEX": [("40.0", "40"), ("4000", "4.000"), ("20.0", "20")],
+    "SOIL_SENSITIVITY": [("60.0", "60"), ("40.0", "40")],
+    "IRRIGATION_DEPENDENCY": [("0.5", "0,5")],
+    "WILDFIRE_SUSCEPTIBILITY": [("0.5", "0,5")],
+    "SINGLE_SITE_DEPENDENCY": [("200.0", "200")],
+    "GROUNDWATER_DEPENDENCY": [("50.0", "50")],
+    "BIODIVERSITY_RESILIENCE": [("0.6", "0,6")],
 }
 
 
 def _indicator_code_line(code: str) -> str:
-    """Zeile(n) der H-Zuweisung ``"CODE": ...`` in indicators.py."""
-    m = re.search(rf'"{re.escape(code)}":.*', _INDICATORS_SRC)
+    """Codeabschnitt der Zuweisung ``"CODE": ...`` in indicators.py.
+
+    Erfasst auch mehrzeilige Zuweisungen (z. B. HEAVY_RAIN_FLOOD,
+    SOIL_SALINIZATION) — bis zum nächsten Dict-Key oder Blockende.
+    """
+    m = re.search(
+        rf'"{re.escape(code)}":.*?(?=\n\s+"[A-Z_]+":|\n    \}})',
+        _INDICATORS_SRC,
+        re.S,
+    )
     assert m, f"{code} nicht in indicators.py gefunden"
     return m.group(0)
+
+
+def test_pathway_tooltips_show_actual_weight():
+    """B6.5: Der Wirkungsketten-Tooltip nennt das echte Kettengewicht.
+
+    Früher stand dort nur das Wort "Gewicht" — jetzt der Zahlenwert aus der
+    Kuratierung (z. B. "1 · normierte Gefahr · …").
+    """
+    for code in ("EXPECTED_ANNUAL_MORTALITY", "AGRICULTURAL_YIELD_LOSS_EUR"):
+        risk = catalog.RISKS_BY_CODE.get(code)
+        if not risk:
+            continue
+        g = lineage_graph.build_for_layer(code, "risks")
+        pathway_nodes = [n for n in g["nodes"] if n["type"] == "pathway"]
+        assert pathway_nodes, f"{code}: keine Wirkungsketten-Knoten"
+        for n in pathway_nodes:
+            meta = n.get("meta") or {}
+            w = meta.get("weight")
+            assert isinstance(w, (int, float)), f"{code}: Kette ohne Gewicht"
+            tooltip = meta.get("tooltip", "")
+            assert f"Berechnung: {w:g} · normierte Gefahr" in tooltip, \
+                f"{code}: Tooltip nennt das Gewicht nicht: {tooltip!r}"
+
+
+def test_formula_operator_factors_match_indicator_constants():
+    """B6.4 auf Operator-Ebene: scale_factor/scaling-Faktoren der expliziten
+    FORMULA_OPERATORS-Schritte müssen als Literal im indicators.py-Code des
+    jeweiligen Indikators vorkommen (kein Drift zwischen Diagramm und Rechnung).
+    """
+    from app.data.lineage_operators import FORMULA_OPERATORS
+
+    mismatches: list[str] = []
+    for code, steps in FORMULA_OPERATORS.items():
+        factor_steps = [
+            s for s in steps
+            if s.get("op_kind") in ("scale_factor", "scaling")
+            and s.get("factor") is not None
+        ]
+        if not factor_steps:
+            continue
+        code_segment = _indicator_code_line(code)
+        for step in factor_steps:
+            literal = f"{step['factor']:g}"
+            if literal not in code_segment:
+                mismatches.append(
+                    f"{code}: Faktor {literal} fehlt im Code «{code_segment[:80]}…»")
+    assert not mismatches, "Operator-Faktoren driften:\n" + "\n".join(mismatches)
 
 
 def test_formula_string_constants_match_indicator_constants():
@@ -165,6 +246,135 @@ def test_formula_string_constants_match_indicator_constants():
             if py_literal not in code_line:
                 mismatches.append(f"{code}: '{py_literal}' fehlt in indicators.py-Zeile «{code_line}»")
     assert not mismatches, "Formel/Code driften:\n" + "\n".join(mismatches)
+
+
+def _code_only(src: str) -> str:
+    """Quelltext OHNE Docstrings und Kommentare.
+
+    Zwingend für die Substring-Prüfungen unten: ``_healthcare_modifier`` begründet
+    in seinem Docstring, warum HEAT_SENSITIVITY hier gerade NICHT eingeht — eine
+    naive Suche im Rohquelltext fände den Namen und ließe damit genau den Fehler
+    durch, den dieser Test fangen soll (per Mutationsprobe verifiziert).
+    """
+    import ast
+    import textwrap
+
+    tree = ast.parse(textwrap.dedent(src))
+    for node in ast.walk(tree):
+        body = getattr(node, "body", None)
+        if not isinstance(body, list) or not body:
+            continue
+        first = body[0]
+        if (isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant)
+                and isinstance(first.value.value, str)):
+            node.body = body[1:] or [ast.Pass()]
+    return ast.unparse(tree)  # unparse verwirft Kommentare von sich aus
+
+
+def _health_impact_source(code: str) -> str:
+    """Code der Impact-Funktion INKLUSIVE der Helfer aus demselben Modul.
+
+    Nötig, weil die Verletzten-Kanäle über ``_injuries`` delegieren — ohne das
+    Auflösen sähe der Test dort fälschlich kein ``ctx.g(risk)``.
+    """
+    import inspect
+
+    from app.services.engine.impact import health as health_mod
+
+    fn = health_mod.HEALTH_IMPACTS[code]
+    src = inspect.getsource(fn)
+    for name in re.findall(r"\b(_[a-z_]+)\s*\(", src):
+        helper = getattr(health_mod, name, None)
+        if callable(helper):
+            try:
+                src += "\n" + inspect.getsource(helper)
+            except (OSError, TypeError):
+                pass
+    return _code_only(src)
+
+
+def test_health_modifier_node_matches_computation():
+    """Der Modifikator-Knoten im Wirkungsdiagramm muss zeigen, was gerechnet wird.
+
+    Vorher behauptete das Diagramm für ALLE Gesundheitskanäle ``g(V̂)`` — auch für
+    die drei Mortalitätskanäle, die stattdessen Versorgungszugang (Hitze),
+    Warnzeit×Alter (Flut) bzw. Bäume×Straßen (Sturm) rechnen. Es zeichnete damit
+    Eingänge wie HEAT_SENSITIVITY ein, die den Outcome gar nicht berühren.
+
+    Abdeckung (per Mutationsprobe geprüft): fängt entfernte Modifikatoren, falsche
+    und verschwiegene Vulnerabilitäten sowie erfundene Parameter.
+
+    BEWUSSTE LÜCKE: Für ``cell_keys`` prüft der Test nur die Richtung
+    deklariert ⊆ Code, nicht umgekehrt. Ein weggelassener Zellwert (das Diagramm
+    zeigt weniger als der Code liest) fällt hier nicht auf. Die Gegenrichtung
+    bräuchte eine Zuordnung, WELCHE ``ctx.ci``-Zugriffe zum Modifikator gehören
+    und welche zu Rate oder Treiber — sonst meldete sie bei der Flut-Mortalität
+    fälschlich ``slope_factor``/``depression_factor``, die zur Rate gehören.
+    """
+    from app.services.engine.impact.health import LINEAGE_SPECS
+
+    problems: list[str] = []
+    for code, spec in LINEAGE_SPECS.items():
+        src = _health_impact_source(code)
+        uses_gv = "ctx.g(risk)" in src
+        mod = spec.get("modifier")
+        if uses_gv and mod:
+            problems.append(f"{code}: rechnet g(V̂), Spec deklariert aber einen Modifikator")
+        if not uses_gv and not mod:
+            problems.append(f"{code}: rechnet KEIN g(V̂), Spec deklariert aber auch keinen "
+                            f"Modifikator — das Diagramm zeigt dann ein falsches g(V̂)")
+        if not mod:
+            continue
+        # Jede im Diagramm gezeichnete Vulnerabilität muss die Funktion auch lesen …
+        declared = set(mod.get("vulnerabilities", []))
+        for vcode in declared:
+            if vcode not in src:
+                problems.append(f"{code}: Modifikator zeichnet {vcode}, der Code liest ihn nicht")
+        # … und umgekehrt: keine still gelesene Vulnerabilität, die das Diagramm
+        # verschweigt. Ohne diese Richtung wäre der Test halbblind.
+        for vcode in catalog.VULNERABILITIES_BY_CODE:
+            if vcode in src and vcode not in declared:
+                problems.append(f"{code}: Code liest {vcode}, der Modifikator zeichnet ihn nicht")
+        for ckey in mod.get("cell_keys", []):
+            if ckey not in src:
+                problems.append(f"{code}: Modifikator zeichnet Zellwert {ckey}, "
+                                f"der Code liest ihn nicht")
+        for pkey in mod.get("params", []):
+            # ast.unparse normalisiert auf einfache Anführungszeichen.
+            if f"'{pkey}'" not in src and f'"{pkey}"' not in src:
+                problems.append(f"{code}: Modifikator zeichnet Parameter {pkey}, "
+                                f"der Code liest ihn nicht")
+    assert not problems, "Modifikator-Knoten ⇄ Rechnung driften:\n" + "\n".join(problems)
+
+
+def test_health_modifier_vulnerabilities_are_drawn_once():
+    """Kein Kanal darf eine Vulnerabilität zeichnen, die er nicht verwendet.
+
+    Gegenprobe zum obigen Test aus Sicht des fertigen Graphen: Die Kanten in den
+    Modifikator-Knoten müssen exakt den deklarierten Vulnerabilitäten entsprechen,
+    nicht der (breiteren) ``vulnerabilities``-Liste des Katalogs.
+    """
+    from app.services.engine.impact.health import LINEAGE_SPECS
+
+    problems: list[str] = []
+    for code, spec in LINEAGE_SPECS.items():
+        mod = spec.get("modifier")
+        if not mod:
+            continue
+        g = lineage_graph.build_for_layer(code, "risks")
+        byid = {n["id"]: n for n in g["nodes"]}
+        op_id = f"op:modifier:{code}"
+        assert op_id in byid, f"{code}: Modifikator-Knoten fehlt im Graphen"
+        drawn = {byid[e["source"]]["meta"].get("code")
+                 for e in g["edges"] if e["target"] == op_id
+                 and byid[e["source"]].get("type") == "vulnerability"}
+        drawn.discard(None)
+        expected = set(mod.get("vulnerabilities", []))
+        if drawn != expected:
+            problems.append(f"{code}: gezeichnet {sorted(drawn)} != deklariert {sorted(expected)}")
+        assert f"op:gv:{code}" not in byid, \
+            f"{code}: g(V̂)-Knoten trotz eigenem Modifikator im Graphen"
+    assert not problems, "Modifikator-Kanten driften:\n" + "\n".join(problems)
 
 
 if __name__ == "__main__":

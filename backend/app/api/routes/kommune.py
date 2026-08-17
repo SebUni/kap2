@@ -1,12 +1,16 @@
+import asyncio
 import os
 import shutil
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import shape as shapely_shape, mapping
 from sqlalchemy.orm import Session
 
+from app.api.deps import require_admin, require_user, user_kommune_ids
+from app.api.gzip_files import file_etag, gzip_json_file_response
 from app.db.database import get_db
+from app.models.auth_models import User
 from app.models.models import (
     Kommune, ConfigParameter,
     CellAssessment, GridCell, AdaptationMeasure,
@@ -14,7 +18,10 @@ from app.models.models import (
 )
 from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
-from app.services import aggregate_cache, kommune_profile_service, osm_service, grid_service, layer_cache
+from app.services import (
+    aggregate_cache, artifact_rebuild, dashboard_cache, kommune_profile_service,
+    osm_service, grid_service, layer_cache,
+)
 
 router = APIRouter()
 
@@ -29,8 +36,12 @@ async def search(q: str, limit: int = 10):
 
 
 @router.post("", response_model=KommuneOut)
-async def create_kommune(data: KommuneCreate, db: Session = Depends(get_db)):
-    """Create a municipality by fetching its boundary from OSM."""
+async def create_kommune(
+    data: KommuneCreate,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Create a municipality by fetching its boundary from OSM. (Admin)"""
     existing = db.query(Kommune).filter(Kommune.osm_id == data.osm_id).first()
     if existing:
         return _kommune_to_out(existing)
@@ -56,6 +67,7 @@ async def create_kommune(data: KommuneCreate, db: Session = Depends(get_db)):
         boundary=from_shape(shape, srid=4326),
         area_km2=round(area_km2, 2),
         bundesland=data.bundesland or osm_service.bundesland_from_address(data.address),
+        landkreis=osm_service.landkreis_from_address(data.address),
     )
     db.add(kommune)
     db.commit()
@@ -76,39 +88,64 @@ def get_kommune(kommune_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{kommune_id}/profile")
-async def get_kommune_profile(kommune_id: int, db: Session = Depends(get_db)):
+async def get_kommune_profile(kommune_id: int, request: Request, db: Session = Depends(get_db)):
     """Kommunen-Profil: Basisdaten + Klimakennzahlen mit Deutschland-Vergleich.
 
-    Funktioniert auch ohne abgeschlossene Berechnung (dann ohne Höhenlage/
-    ggf. ohne Einwohner). Fehlendes Bundesland wird einmalig per Nominatim-
-    Reverse-Geocoding nachgetragen (Lazy-Backfill, degradiert bei Fehlschlag).
+    Payload wird im Hintergrund vorgebaut (``dashboard_cache``, inkl. BIP/
+    Kommunalhaushalt via finance_loader); hier nur Datei-Auslieferung mit
+    ETag/304 (Lazy-Build im Thread, damit der erste, langsame GENESIS-Abruf den
+    Event-Loop nicht blockiert). Fehlendes Bundesland/Landkreis wird vorab
+    einmalig per Nominatim-Reverse-Geocoding nachgetragen (Lazy-Backfill) —
+    das Bundesland speist den Regionalkontext, deshalb danach Rebuild anstoßen.
     """
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
 
-    if not kommune.bundesland:
+    if not kommune.bundesland or not kommune.landkreis:
         centroid = kommune_profile_service.centroid_of(kommune)
         if centroid:
-            bl = await osm_service.reverse_bundesland(lat=centroid[1], lon=centroid[0])
-            if bl:
+            bl, lk = await osm_service.reverse_admin(lat=centroid[1], lon=centroid[0])
+            if bl and not kommune.bundesland:
                 kommune.bundesland = bl
+            if lk and not kommune.landkreis:
+                kommune.landkreis = lk
+            if bl or lk:
                 db.commit()
+                artifact_rebuild.invalidate_and_schedule(kommune_id)
 
-    return kommune_profile_service.build_profile(db, kommune)
+    art = await asyncio.to_thread(dashboard_cache.artifact_file, db, kommune_id, "profile")
+    if not art:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    path, etag = art
+    return gzip_json_file_response(
+        request, path, etag=etag, download_name=f"profile-{kommune_id}.json",
+    )
 
 
 @router.get("")
-def list_kommunen(calculated: bool = False, db: Session = Depends(get_db)):
+def list_kommunen(
+    calculated: bool = False,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_user),
+):
     kommunen = db.query(Kommune).order_by(Kommune.name).all()
+    if not user.is_admin:
+        allowed = user_kommune_ids(db, user)
+        kommunen = [k for k in kommunen if k.id in allowed]
     if calculated:
         kommunen = [k for k in kommunen if assessment_is_done(db, k.id)]
     return [_kommune_to_out(k, include_boundary=False) for k in kommunen]
 
 
 @router.post("/{kommune_id}/grid")
-def generate_grid(kommune_id: int, req: GridGenerateRequest = GridGenerateRequest(), db: Session = Depends(get_db)):
-    """Generate a grid over the municipality boundary."""
+def generate_grid(
+    kommune_id: int,
+    req: GridGenerateRequest = GridGenerateRequest(),
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Generate a grid over the municipality boundary. (Admin)"""
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
@@ -116,20 +153,32 @@ def generate_grid(kommune_id: int, req: GridGenerateRequest = GridGenerateReques
     count = grid_service.generate_grid(
         db, kommune_id, cell_size_m=req.cell_size_m, force=req.force,
     )
+    # Kein Rebuild anstoßen: nach Grid-Neubau gibt es noch keine Zellwerte.
     aggregate_cache.invalidate(kommune_id)
     layer_cache.invalidate(kommune_id)
+    dashboard_cache.invalidate(kommune_id)
     return {"kommune_id": kommune_id, "cells_created": count, "cell_size_m": req.cell_size_m}
 
 
 @router.get("/{kommune_id}/grid")
-def get_grid(kommune_id: int, db: Session = Depends(get_db)):
-    """Return grid cells as GeoJSON FeatureCollection."""
-    return grid_service.get_grid_geojson(db, kommune_id)
+def get_grid(kommune_id: int, request: Request, db: Session = Depends(get_db)):
+    """Zellgeometrie als gzip-GeoJSON (Legacy-Pfad; identische Datei wie
+    ``/grid-geometry`` aus dem layer_cache statt teurem Per-Request-Build)."""
+    path = layer_cache.geometry_file(db, kommune_id)
+    if not path:
+        return {"type": "FeatureCollection", "features": []}
+    return gzip_json_file_response(
+        request, path, etag=file_etag(path), download_name=f"grid-{kommune_id}.json",
+    )
 
 
 @router.post("/{kommune_id}/reset")
-def reset_kommune(kommune_id: int, db: Session = Depends(get_db)):
-    """Reset all assessment, grid, and measure data for a municipality.
+def reset_kommune(
+    kommune_id: int,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """Reset all assessment, grid, and measure data for a municipality. (Admin)
 
     Keeps the municipality entry (boundary, name, config) but deletes:
     climate assessments, grid cells, adaptation measures, project statuses,
@@ -188,9 +237,10 @@ def reset_kommune(kommune_id: int, db: Session = Depends(get_db)):
     if os.path.isdir(export_dir):
         shutil.rmtree(export_dir, ignore_errors=True)
 
-    # Karten-Layer- und Aggregat-Cache verwerfen
+    # Alle Datei-Caches verwerfen (kein Rebuild: es gibt keine Daten mehr)
     aggregate_cache.invalidate(kommune_id)
     layer_cache.invalidate(kommune_id)
+    dashboard_cache.invalidate(kommune_id)
 
     return {"message": "Zurückgesetzt", "kommune_id": kommune_id}
 
@@ -203,6 +253,7 @@ def _kommune_to_out(k: Kommune, include_boundary: bool = True) -> dict:
         "id": k.id,
         "name": k.name,
         "bundesland": k.bundesland,
+        "landkreis": k.landkreis,
         "osm_id": k.osm_id,
         "area_km2": k.area_km2,
         "population": k.population,

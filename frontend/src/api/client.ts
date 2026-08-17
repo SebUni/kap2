@@ -1,11 +1,25 @@
 const BASE = '/api'
 
+/** Wird vom authStore registriert: 401 auf geschützten Pfaden → Login-Redirect. */
+let onUnauthorized: (() => void) | null = null
+export function setUnauthorizedHandler(handler: (() => void) | null) {
+  onUnauthorized = handler
+}
+
+function handleUnauthorized(path: string) {
+  // Auth- und öffentliche Endpunkte lösen keinen Redirect aus.
+  if (!path.startsWith('/auth/') && !path.startsWith('/public/')) {
+    onUnauthorized?.()
+  }
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     ...options,
   })
   if (!res.ok) {
+    if (res.status === 401) handleUnauthorized(path)
     const body = await res.text()
     if (res.status === 500 && !body.trim()) {
       throw new Error('Backend nicht erreichbar (Port 8000). Bitte Backend starten: cd backend && python3 -m uvicorn app.main:app --reload')
@@ -25,6 +39,7 @@ export type ProgressCallback = (fraction: number) => void
 async function requestWithProgress<T>(path: string, onProgress?: ProgressCallback): Promise<T> {
   const res = await fetch(`${BASE}${path}`)
   if (!res.ok) {
+    if (res.status === 401) handleUnauthorized(path)
     const body = await res.text()
     throw new Error(`API ${res.status}: ${body || res.statusText}`)
   }
@@ -61,7 +76,231 @@ async function requestWithProgress<T>(path: string, onProgress?: ProgressCallbac
   return JSON.parse(new TextDecoder().decode(bytes)) as T
 }
 
+export interface AuthUser {
+  id: number
+  email: string
+  display_name: string | null
+  role: 'admin' | 'user'
+}
+
+export interface DemoMeta {
+  kommune_id: number
+  risks: { code: string; name: string; group: string | null; unit: string }[]
+  enabled_layers: string[]
+  measure_limit: number
+}
+
+export interface LiteRiskMeta {
+  code: string
+  name: string
+  group: string | null
+  unit: string
+  description: string
+  source_refs: { key: string; ieee: string; url?: string; archive_url?: string }[]
+}
+
+export interface LiteMeta {
+  risks: LiteRiskMeta[]
+  gemeinde_count: number
+  vg250_stand: string | null
+  choropleth_colors: string[]
+}
+
+export interface AdminUser {
+  id: number
+  email: string
+  display_name: string | null
+  role: 'admin' | 'user'
+  is_active: boolean
+  kommunen: { id: number; name: string }[]
+  last_login_at: string | null
+}
+
+export interface LiteBatchRun {
+  id: number
+  status: string
+  phase: string | null
+  progress_pct: number
+  processed: number
+  total: number
+  message: string | null
+  error_count: number
+  params: { bundesland?: string | null; force_zensus?: boolean } | null
+  started_at: string | null
+  finished_at: string | null
+}
+
+export interface DemoConfig {
+  kommune_id: number | null
+  risk_codes: string[]
+  measure_limit: number
+  session_ttl_h: number
+  kommune: { id: number; name: string } | null
+  active_sessions: number
+  risk_options: { code: string; name: string; group: string | null }[]
+}
+
+export interface LiteGemeindeRisk {
+  code: string
+  name: string
+  group: string | null
+  index: number
+  outcome: number
+  unit: string
+  cost_eur: number
+  drivers: Record<string, unknown>
+  sources: { key: string; ieee: string; url?: string; archive_url?: string }[]
+}
+
+export interface LiteGemeinde {
+  ags: string
+  name: string
+  bez: string | null
+  bundesland: string | null
+  population: number | null
+  area_km2: number | null
+  risks: LiteGemeindeRisk[]
+}
+
+// ── KI-Assistent (Mistral) ────────────────────────────────────────────
+export interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export interface AiSettings {
+  api_key_set: boolean
+  api_key_hint: string | null
+  model: string
+  monthly_token_limit: number
+  daily_token_limit: number
+}
+
+export interface AiUsageScope { used: number; limit: number }
+export interface AiUsage {
+  day: AiUsageScope
+  month: AiUsageScope
+  blocked: boolean
+}
+
+/** Strukturierter Fehler des /ai/chat-Endpunkts (vor Stream-Start). */
+export class ChatError extends Error {
+  code: 'no_api_key' | 'quota_exceeded' | 'forbidden' | 'unknown'
+  scope?: 'day' | 'month'
+  constructor(code: ChatError['code'], message: string, scope?: 'day' | 'month') {
+    super(message)
+    this.code = code
+    this.scope = scope
+  }
+}
+
+/**
+ * Streamt eine Chat-Antwort (SSE). Ruft ``onToken`` je Text-Fragment und
+ * ``onUsage`` mit dem finalen Verbrauch. Wirft ChatError bei 400/429/403.
+ * Abbruch via ``signal`` (AbortController).
+ */
+export async function chatStream(
+  payload: { messages: ChatMessage[]; kommune_id?: number | null },
+  handlers: {
+    onToken: (text: string) => void
+    onUsage?: (usage: { day: AiUsageScope; month: AiUsageScope }) => void
+    onError?: (message: string) => void
+  },
+  signal?: AbortSignal,
+): Promise<void> {
+  const res = await fetch(`${BASE}/ai/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal,
+  })
+  if (!res.ok) {
+    if (res.status === 401) { handleUnauthorized('/ai/chat'); throw new ChatError('unknown', 'Nicht angemeldet.') }
+    let body: Record<string, unknown> = {}
+    try { body = await res.json() } catch { /* leer */ }
+    const code = body.code as string | undefined
+    if (code === 'no_api_key')
+      throw new ChatError('no_api_key', 'Es ist kein KI-Schlüssel hinterlegt. Bitte an eine Administratorin/einen Administrator wenden.')
+    if (code === 'quota_exceeded')
+      throw new ChatError('quota_exceeded', 'Das Token-Kontingent ist erschöpft.', body.scope as 'day' | 'month')
+    if (res.status === 403)
+      throw new ChatError('forbidden', 'Kein Zugriff auf diese Kommune.')
+    throw new ChatError('unknown', `Fehler ${res.status}`)
+  }
+  if (!res.body) return
+
+  const reader = res.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+    let idx: number
+    while ((idx = buffer.indexOf('\n\n')) !== -1) {
+      const frame = buffer.slice(0, idx).trim()
+      buffer = buffer.slice(idx + 2)
+      if (!frame.startsWith('data:')) continue
+      let evt: Record<string, unknown>
+      try { evt = JSON.parse(frame.slice(5).trim()) } catch { continue }
+      if (evt.type === 'token') handlers.onToken(String(evt.content ?? ''))
+      else if (evt.type === 'usage') handlers.onUsage?.({ day: evt.day as AiUsageScope, month: evt.month as AiUsageScope })
+      else if (evt.type === 'error') handlers.onError?.(String(evt.message ?? 'Unbekannter Fehler'))
+    }
+  }
+}
+
 export const api = {
+  // ── Auth ────────────────────────────────────────────────────────────
+  auth: {
+    login: (email: string, password: string) =>
+      request<AuthUser>('/auth/login', {
+        method: 'POST', body: JSON.stringify({ email, password }),
+      }),
+    logout: () => request<{ message: string }>('/auth/logout', { method: 'POST' }),
+    me: () => request<{ authenticated: boolean; user?: AuthUser }>('/auth/me'),
+    changePassword: (currentPassword: string, newPassword: string) =>
+      request<{ message: string }>('/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+      }),
+  },
+
+  // ── Demo ────────────────────────────────────────────────────────────
+  demo: {
+    meta: () => request<DemoMeta>('/demo/meta'),
+    startSession: () => request<DemoMeta & { session_id: string }>('/demo/session', { method: 'POST' }),
+  },
+
+  // ── Deutschland-Karte (öffentlich) ──────────────────────────────────
+  lite: {
+    meta: () => request<LiteMeta>('/public/lite/meta'),
+    values: () => request<Record<string, Record<string, number>>>('/public/lite/values'),
+    gemeinde: (ags: string) => request<LiteGemeinde>(`/public/lite/gemeinde/${ags}`),
+    geojsonIndex: () => request<Record<string, { slug: string; count: number }>>('/public/lite/geojson-index'),
+    geojsonUrl: (slug: string) => `${BASE}/public/lite/geojson/${slug}`,
+  },
+
+  // ── Admin ───────────────────────────────────────────────────────────
+  admin: {
+    listUsers: () => request<AdminUser[]>('/admin/users'),
+    createUser: (data: Record<string, unknown>) =>
+      request<AdminUser & { initial_password?: string }>('/admin/users', {
+        method: 'POST', body: JSON.stringify(data),
+      }),
+    updateUser: (id: number, data: Record<string, unknown>) =>
+      request<AdminUser>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    listLiteBatches: () => request<LiteBatchRun[]>('/admin/lite-batch'),
+    startLiteBatch: (data: { bundesland?: string | null; force_zensus?: boolean }) =>
+      request<LiteBatchRun>('/admin/lite-batch', { method: 'POST', body: JSON.stringify(data) }),
+    abortLiteBatch: (id: number) =>
+      request<{ aborted: boolean }>(`/admin/lite-batch/${id}/abort`, { method: 'POST' }),
+    getDemoConfig: () => request<DemoConfig>('/admin/demo/config'),
+    updateDemoConfig: (data: Record<string, unknown>) =>
+      request<Record<string, unknown>>('/admin/demo/config', { method: 'PUT', body: JSON.stringify(data) }),
+    cleanupDemo: () => request<{ removed: number }>('/admin/demo/cleanup', { method: 'POST' }),
+  },
+
   // ── Kommune ─────────────────────────────────────────────────────────
   searchKommune: (q: string) =>
     request<Record<string, unknown>[]>(`/kommune/search?q=${encodeURIComponent(q)}`),
@@ -81,7 +320,6 @@ export const api = {
     request<{ cells_created: number }>(`/kommune/${kommuneId}/grid`, {
       method: 'POST', body: JSON.stringify({ cell_size_m: cellSizeM, force }),
     }),
-  getGrid: (kommuneId: number) => request<Record<string, unknown>>(`/kommune/${kommuneId}/grid`),
 
   // ── Katalog ─────────────────────────────────────────────────────────
   getCatalog: () => request<Record<string, unknown>>('/catalog'),
@@ -115,8 +353,6 @@ export const api = {
   getStatus: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/status`),
 
-  getLayer: (kommuneId: number, code: string) =>
-    request<Record<string, unknown>>(`/kommune/${kommuneId}/layer/${code}`),
   getGridGeometry: (kommuneId: number, onProgress?: ProgressCallback) =>
     requestWithProgress<Record<string, unknown>>(`/kommune/${kommuneId}/grid-geometry`, onProgress),
   getLayerValues: (kommuneId: number, code: string, onProgress?: ProgressCallback) =>
@@ -189,4 +425,11 @@ export const api = {
   // ── Reset ───────────────────────────────────────────────────────────
   resetKommune: (kommuneId: number) =>
     request<{ message: string }>(`/kommune/${kommuneId}/reset`, { method: 'POST' }),
+
+  // ── KI-Assistent ────────────────────────────────────────────────────
+  getAiSettings: () => request<AiSettings>('/ai/settings'),           // admin-only
+  updateAiSettings: (payload: Partial<{ api_key: string; model: string; monthly_token_limit: number; daily_token_limit: number }>) =>
+    request<AiSettings>('/ai/settings', { method: 'PUT', body: JSON.stringify(payload) }),  // admin-only
+  getAiUsage: () => request<AiUsage>('/ai/usage'),
+  chatStream,
 }

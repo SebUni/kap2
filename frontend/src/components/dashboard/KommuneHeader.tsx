@@ -56,9 +56,11 @@ function ClimateChip({ m }: { m: ClimateMetric }) {
 }
 
 /**
- * Hero-Kopf des Dashboards: Kommunenname, Basisdaten, drei Euro-Kernzahlen
- * (heute / 2065 ohne Maßnahmen / 2065 mit Maßnahmen inkl. Maßnahmenkosten)
- * und die Klima-Chip-Zeile mit Deutschland-Vergleich.
+ * Hero-Kopf des Dashboards: Kommunenname, Meta-Zeile (Bundesland · Landkreis ·
+ * Höhe · Einwohner · Fläche · BIP Kreisebene · Kommunalhaushalt Ø — die beiden
+ * Wirtschafts-/Finanz-Kennzahlen aus der Regionalstatistik mit Quellen-Tooltip),
+ * drei Euro-Kernzahlen (heute / 2065 ohne Maßnahmen / 2065 mit Maßnahmen inkl.
+ * Maßnahmenkosten) sowie die Klima-Chips mit Deutschland-Vergleich.
  */
 export default function KommuneHeader({ className = '' }: { className?: string }) {
   const { kommune, kommuneProfile, riskSummary, costProjection } = useStore()
@@ -71,17 +73,78 @@ export default function KommuneHeader({ className = '' }: { className?: string }
 
   const metaParts: string[] = []
   if (p?.bundesland) metaParts.push(p.bundesland)
-  if (p?.lat != null && p?.lon != null) metaParts.push(`${p.lat.toFixed(2)}°N ${p.lon.toFixed(2)}°O`)
+  // Nominatim liefert je nach Zoom mal „Landkreis Nordsachsen", mal nur
+  // „Nordsachsen" — ohne Bezeichner Präfix ergänzen, damit der Eintrag nicht
+  // wie ein zweites Bundesland liest. Eigenbezeichner (Kreis/Region/Stadt,
+  // z. B. „Städteregion Aachen") bleiben unangetastet.
+  if (p?.landkreis) {
+    metaParts.push(/kreis|region|stadt/i.test(p.landkreis)
+      ? p.landkreis : `Landkreis ${p.landkreis}`)
+  }
   if (p?.elevation) metaParts.push(`${fmtNum(p.elevation.mean_m, 0)} m ü. NN (${fmtNum(p.elevation.min_m, 0)}–${fmtNum(p.elevation.max_m, 0)} m)`)
   if (p?.population) metaParts.push(`${p.population.toLocaleString('de-DE')} Einwohner`)
   if (p?.area_km2) metaParts.push(`${fmtNum(p.area_km2)} km²`)
+
+  // Wirtschafts-/Finanz-Kennzahlen (Regionalstatistik) als eigene Meta-Einträge
+  // mit Quellen-Tooltip — direkt in der „·"-Zeile neben den Strukturdaten.
+  const econParts: { text: string; title: string }[] = []
+  if (p?.economy) {
+    const e = p.economy
+    const kreisLine = `Kreis-BIP${e.gdp_year ? ` (${e.gdp_year})` : ''}: ${fmtEurCompact(e.gdp_meur * 1e6)}`
+    if (e.estimated_municipal_eur != null) {
+      econParts.push({
+        text: `BIP ≈ ${fmtEurCompact(e.estimated_municipal_eur)}`,
+        title: [
+          'Geschätztes BIP der Kommune: BIP je Einwohner des Kreises'
+          + (e.gdp_per_capita_eur ? ` (${fmtNum(e.gdp_per_capita_eur, 0)} €)` : '')
+          + (p.population ? ` × ${p.population.toLocaleString('de-DE')} Einwohner` : '')
+          + '. Amtlich wird das BIP nur auf Kreisebene ausgewiesen.',
+          kreisLine,
+          `Quelle: ${e.source}`,
+          e.references[0]?.ieee ?? null,
+        ].filter(Boolean).join('\n'),
+      })
+    } else {
+      econParts.push({
+        text: `BIP ${fmtEurCompact(e.gdp_meur * 1e6)} (Kreis)`,
+        title: [
+          'Bruttoinlandsprodukt in jeweiligen Preisen — amtlich nur auf '
+          + 'Kreisebene verfügbar (kein Gemeindewert).',
+          e.gdp_year ? `Jahr: ${e.gdp_year}` : null,
+          `Quelle: ${e.source}`,
+          e.references[0]?.ieee ?? null,
+        ].filter(Boolean).join('\n'),
+      })
+    }
+  }
+  if (p?.municipal_budget) {
+    const yrs = p.municipal_budget.years
+    econParts.push({
+      text: `Haushalt ${fmtEurCompact(p.municipal_budget.avg_expenditure_eur)}/a`,
+      title: [
+        'Auszahlungen insgesamt (bereinigt) der kommunalen Kernhaushalte '
+        + `(Gemeindeebene), Ø der Jahre ${yrs[0]}–${yrs[yrs.length - 1]}.`,
+        `Quelle: ${p.municipal_budget.source}`,
+        p.municipal_budget.references[0]?.ieee ?? null,
+      ].filter(Boolean).join('\n'),
+    })
+  }
 
   return (
     <section className={`dashboard-section kommune-hero ${className}`}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
         <h1 className="hero-name">{kommune.name}</h1>
         <div className="hero-meta" title={p?.population_source ?? undefined}>
-          {metaParts.length ? metaParts.join(' · ') : p ? '' : 'Profil wird geladen …'}
+          {metaParts.length || econParts.length
+            ? (<>
+                {metaParts.join(' · ')}
+                {econParts.map((e, i) => (
+                  <span key={i} className="hero-meta-econ" title={e.title}>
+                    {(metaParts.length || i > 0) ? ' · ' : ''}{e.text}
+                  </span>
+                ))}
+              </>)
+            : p ? '' : 'Profil wird geladen …'}
         </div>
       </div>
 

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.models import ConfigParameter
 from app.schemas.schemas import ConfigParameterOut, ConfigParameterUpdate
-from app.services import aggregate_cache
+from app.services import artifact_rebuild
 
 router = APIRouter()
 
@@ -63,6 +63,7 @@ def update_config(
         results.append({"category": u.category, "key": u.key, "status": "updated"})
 
     db.commit()
-    # Overrides (z. B. UHI-Koeffizienten, Kostensätze) beeinflussen das Aggregat.
-    aggregate_cache.invalidate(kommune_id)
+    # Overrides (z. B. UHI-Koeffizienten, Kostensätze) beeinflussen das Aggregat →
+    # Datei-Caches invalidieren + entprellter Hintergrund-Rebuild.
+    artifact_rebuild.invalidate_and_schedule(kommune_id)
     return results

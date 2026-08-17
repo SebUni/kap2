@@ -85,7 +85,7 @@ Regel für den Umsetzer: Jeder `ref_value` und jedes `cost_per_outcome_eur` erh�
 
 | Risiko | Differenziert heute über | Nach Fix zusätzlich |
 |---|---|---|
-| Hitze/Mortalität | Dichte, UHI, Grün, Alter (Zensus) ✅ | ortsaufgelöste heiße Tage (B2.1) |
+| Hitze/Mortalität | Dichte, UHI, Grün, Altersbänder (Zensus), **Zell-Sommertemperatur aus DWD-Monatsrastern** ✅ | B2.1 auf dem Mortalitätspfad erledigt: die Dosis-Wirkungs-Kurve läuft über die je Zelle abgegriffene Sommertemperatur (`SUMMER_MEAN_TEMP` → `CELL_SUMMER_TEMP`), nicht über `hot_days`. `HOT_DAYS` bleibt Zentroid-basiert und trägt nur noch den Screening-Index |
 | Fischerei/Gewässer | Wasseranteil E/V ✅ (Kommune ohne Gewässer → ~0) | — (bereits sachlogisch) |
 | Kritische Infrastruktur | heute kaum (Konstanten 50) ❌ | KRITIS-Assetdichte (B4), Zustand via Gebäudealter (B3.5) |
 | Sozioökonomie/Anpassung | heute gar nicht (Konstanten) ❌ | INKAR (B3.2) |

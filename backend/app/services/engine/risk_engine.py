@@ -32,6 +32,13 @@ AGGREGATION_PERCENTILE = 90.0
 # Pathways je Risiko einmalig vorbauen
 _PATHWAYS: dict[str, list[dict]] = {r["code"]: catalog.build_pathways(r) for r in catalog.RISKS}
 
+# Expositions-Codes je Risiko (für das Expositions-Gate des Belastungs-P90):
+# Zellen ohne relevante Exposition (unbewohnte Flur bei pop-skalierten Risiken,
+# Zellen ohne Nutzfläche/Assets sonst) verdünnen das kommunale P90 sonst gegen 0.
+_EXPOSURE_CODES: dict[str, set[str]] = {
+    code: {p["exposure"] for p in paths} for code, paths in _PATHWAYS.items()
+}
+
 
 def normalize_hev(hev: dict) -> dict:
     """Normalisiert absolute H/E/V-Werte einer Zelle auf 0..1 (nur fürs Risiko)."""
@@ -146,6 +153,25 @@ def estimate_outcome_and_cost(risk: dict, agg_index: float, total_pop: float, ar
     return {"outcome": round(outcome, 2), "cost_eur": round(cost, 2)}
 
 
+def _cell_is_exposed(code: str, cell_pop: float, cell_exposures: dict | None) -> bool:
+    """Expositions-Gate des Belastungs-P90: zählt die Zelle für dieses Risiko?
+
+    pop-skalierte Risiken: nur bewohnte Zellen. area-/flat-Risiken: mindestens eine
+    Pfad-Exposition > 0 (absolute Werte; der >0-Test ist einheitenunabhängig).
+    Fallback für Zelldaten ohne ``exposures``-Key (adjustierte With-Measures-Daten,
+    Alt-Bestände): pop-Gate bzw. kein Gate — nie strenger als die Datenlage erlaubt.
+    """
+    risk = catalog.RISKS_BY_CODE.get(code)
+    if risk is not None and risk.get("scale", "pop") == "pop":
+        return cell_pop > 0.0
+    if cell_exposures is None:
+        return True
+    codes = _EXPOSURE_CODES.get(code)
+    if not codes:
+        return True
+    return any(float(cell_exposures.get(e, 0.0) or 0.0) > 0.0 for e in codes)
+
+
 def _top_share(weights: list[float], frac: float = 0.05) -> float:
     """Anteil der Summe, der auf die stärksten ``frac`` der Zellen entfällt (Konzentration)."""
     total = sum(weights)
@@ -180,6 +206,7 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
 
     n_cells = len(cell_data_list)
     indices_by_code: dict[str, list[float]] = {}
+    exposed_indices_by_code: dict[str, list[float]] = {}  # nur expositionsrelevante Zellen
     sum_outcome: dict[str, float] = {}
     sum_cost: dict[str, float] = {}
     weights_by_code: dict[str, list[float]] = {}   # Zell-Beitrag (für top5_share)
@@ -188,9 +215,12 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
     for cd in cell_data_list:
         risks = cd.get("risks", {})
         cell_pop = float(cd.get("inputs", {}).get("pop", 0.0) or 0.0)
+        cell_exposures = cd.get("exposures")
         for code, r in risks.items():
             idx = float(r.get("index", 0.0))
             indices_by_code.setdefault(code, []).append(idx)
+            if _cell_is_exposed(code, cell_pop, cell_exposures):
+                exposed_indices_by_code.setdefault(code, []).append(idx)
             if idx >= _THR:
                 above_thr[code] = above_thr.get(code, 0) + 1
             risk = catalog.RISKS_BY_CODE.get(code)
@@ -210,12 +240,30 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             sum_cost[code] = sum_cost.get(code, 0.0) + c
             weights_by_code.setdefault(code, []).append(c if c else o)
 
+    _class_bounds = tunables.risk_class_bounds()
+
     risk_out: dict[str, dict] = {}
     for risk in catalog.RISKS:
         code = risk["code"]
         vals = indices_by_code.get(code, [])
         p90_idx = round(_percentile(vals), 2)
         max_idx = round(max(vals) if vals else 0.0, 2)
+        # Belastungs-P90: P90 nur über expositionsrelevante Zellen — unbewohnte/
+        # nutzungsfreie Flur verdünnt die Anzeige-Leitgröße nicht mehr (§ Dashboard).
+        exp_vals = exposed_indices_by_code.get(code, [])
+        if exp_vals:
+            exposed_p90 = round(_percentile(exp_vals), 2)
+            exposure_share = round(len(exp_vals) / n_cells, 4) if n_cells else 0.0
+            # Zusatz-Perzentile für die gestuften Radar-Bänder (Dashboard-Netzgrafik):
+            # 0–P80 / P80–P85 / P85–P90 / P90–P95 / P95–Max. Über dieselbe exponierte
+            # Zell-Verteilung, damit unbewohnte Flur die Stufen nicht verwässert.
+            exposed_p80 = round(_percentile(exp_vals, 80.0), 2)
+            exposed_p85 = round(_percentile(exp_vals, 85.0), 2)
+            exposed_p95 = round(_percentile(exp_vals, 95.0), 2)
+        else:
+            exposed_p90 = p90_idx  # Gate matcht keine Zelle → ehrlicher Fallback
+            exposure_share = 0.0
+            exposed_p80 = exposed_p85 = exposed_p95 = exposed_p90
         if risk.get("scale", "pop") in ("pop", "area"):
             outcome = round(sum_outcome.get(code, 0.0), 2)
             cost = round(sum_cost.get(code, 0.0), 2)
@@ -234,6 +282,12 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
         risk_out[code] = {
             "index": p90_idx,
             "p90_index": p90_idx,
+            "exposed_p90_index": exposed_p90,
+            "exposed_p80_index": exposed_p80,
+            "exposed_p85_index": exposed_p85,
+            "exposed_p95_index": exposed_p95,
+            "exposure_share": exposure_share,
+            "risk_class": tunables.classify_index(exposed_p90, _class_bounds),
             "max_index": max_idx,
             "outcome": outcome,
             "outcome_sum": outcome,
@@ -249,14 +303,26 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             "sanity_ratio": sanity_ratio,
         }
 
-    # Gruppen-P90: Mittel der Einzelrisiko-P90-Indizes je KWRA-Gruppe
+    # Gruppen-P90: Mittel der Einzelrisiko-P90-Indizes je KWRA-Gruppe;
+    # exposed_index analog aus den Belastungs-P90-Werten (Anzeige-Leitgröße).
     groups: dict[str, dict] = {}
     for g in catalog.KWRA_GROUPS:
         codes = [r["code"] for r in catalog.RISKS if r["group"] == g["code"]]
         vals = [risk_out[c]["index"] for c in codes] if codes else [0.0]
+        exp_vals_g = [risk_out[c]["exposed_p90_index"] for c in codes] if codes else [0.0]
+        exposed_index = round(sum(exp_vals_g) / len(exp_vals_g), 2)
+        # Gruppen-Bänder analog exposed_index: Mittel der jeweiligen Einzelrisiko-
+        # Perzentile. Mittelwerte erhalten die Monotonie (P80 ≤ P85 ≤ P90 ≤ P95).
+        _grp_mean = lambda key: round(
+            sum(risk_out[c][key] for c in codes) / len(codes), 2) if codes else 0.0
         groups[g["code"]] = {
             "label": g["label"], "color": g["color"],
             "index": round(sum(vals) / len(vals), 2),
+            "exposed_index": exposed_index,
+            "exposed_p80_index": _grp_mean("exposed_p80_index"),
+            "exposed_p85_index": _grp_mean("exposed_p85_index"),
+            "exposed_p95_index": _grp_mean("exposed_p95_index"),
+            "risk_class": tunables.classify_index(exposed_index, _class_bounds),
             "risk_codes": codes,
             "aggregation": f"P{int(AGGREGATION_PERCENTILE)}",
         }
@@ -265,6 +331,7 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
         [{"code": c, "name": r["name"], "cost_eur": r["cost_eur"],
           "outcome": r["outcome"], "outcome_unit": r["outcome_unit"],
           "cost_dimension": r["cost_dimension"], "index": r["index"],
+          "exposed_p90_index": r["exposed_p90_index"], "risk_class": r["risk_class"],
           "aggregation": r["aggregation"], "top5_share": r["top5_share"]}
          for c, r in risk_out.items()],
         key=lambda x: x["cost_eur"], reverse=True,
@@ -281,4 +348,11 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
         "risks": risk_out,
         "groups": groups,
         "cost": {"total_eur": total_cost, "by_risk": by_risk},
+        # Server-Wahrheit für die Frontend-Chips/Ringe: Grenzen + Labels der
+        # Risikoklassen (abgeleitet aus model.risk_threshold, keine Hardcodes im UI).
+        "classification": {
+            "basis": "exposed_p90_index",
+            "bounds": _class_bounds,
+            "labels": tunables.RISK_CLASS_LABELS,
+        },
     }

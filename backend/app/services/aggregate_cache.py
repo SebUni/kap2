@@ -14,13 +14,11 @@ Config-/Parameter-Änderung, Reset, Grid-Neubau) sowie automatisch bei einer
 
 from __future__ import annotations
 
-import gzip
-import json
 import logging
 import os
-import shutil
 
 from app.data import catalog
+from app.services import file_cache
 
 log = logging.getLogger(__name__)
 
@@ -48,23 +46,7 @@ def _version_path(kommune_id: int) -> str:
 
 def _ensure_model_version(kommune_id: int) -> None:
     """Leert den Cache, wenn er unter einer alten Modellversion gebaut wurde."""
-    vpath = _version_path(kommune_id)
-    current = catalog.MODEL_VERSION
-    stored = None
-    if os.path.exists(vpath):
-        try:
-            with open(vpath, encoding="utf-8") as fh:
-                stored = fh.read().strip()
-        except OSError:
-            stored = None
-    if stored == current:
-        return
-    invalidate(kommune_id)
-    os.makedirs(_cache_dir(kommune_id), exist_ok=True)
-    tmp = vpath + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as fh:
-        fh.write(current)
-    os.replace(tmp, vpath)
+    file_cache.ensure_version_stamp(_cache_dir(kommune_id), catalog.MODEL_VERSION)
 
 
 # ── Öffentliche API ──────────────────────────────────────────────────────────────
@@ -72,31 +54,28 @@ def _ensure_model_version(kommune_id: int) -> None:
 def load(kommune_id: int, apply_measures: bool) -> dict | None:
     """Zwischengespeichertes Aggregat oder ``None`` bei Miss/defektem Cache."""
     _ensure_model_version(kommune_id)
-    path = _agg_path(kommune_id, apply_measures)
-    if not os.path.exists(path):
-        return None
-    try:
-        with gzip.open(path, "rt", encoding="utf-8") as fh:
-            return json.load(fh)
-    except (OSError, json.JSONDecodeError):
-        # Defekte/halb geschriebene Datei: als Miss behandeln, wird neu gebaut.
-        return None
+    return file_cache.read_gzip_json(_agg_path(kommune_id, apply_measures))
 
 
 def store(kommune_id: int, apply_measures: bool, result: dict) -> None:
     """Aggregat atomar als gzip-JSON ablegen (best effort)."""
     _ensure_model_version(kommune_id)
-    path = _agg_path(kommune_id, apply_measures)
     try:
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        tmp = path + ".tmp"
-        with gzip.open(tmp, "wt", encoding="utf-8") as fh:
-            json.dump(result, fh, separators=(",", ":"))
-        os.replace(tmp, path)
+        file_cache.write_gzip_json(_agg_path(kommune_id, apply_measures), result)
     except OSError as exc:
         log.debug("aggregate_cache store übersprungen kommune=%s: %s", kommune_id, exc)
 
 
-def invalidate(kommune_id: int) -> None:
-    """Verwirft das Aggregat-Cache-Verzeichnis der Kommune (beide Varianten)."""
-    shutil.rmtree(_cache_dir(kommune_id), ignore_errors=True)
+def invalidate(kommune_id: int, *, only_with_measures: bool = False) -> None:
+    """Verwirft den Aggregat-Cache der Kommune.
+
+    ``only_with_measures=True`` löscht nur die „mit Maßnahmen"-Variante:
+    Maßnahmen-Mutationen lassen das (teure) Basis-Aggregat unberührt.
+    """
+    if only_with_measures:
+        try:
+            os.unlink(_agg_path(kommune_id, apply_measures=True))
+        except OSError:
+            pass
+        return
+    file_cache.invalidate_dir(_cache_dir(kommune_id))

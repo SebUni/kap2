@@ -30,6 +30,7 @@ import logging
 import os
 import threading
 import time
+from collections import OrderedDict
 from datetime import datetime
 
 import httpx
@@ -62,10 +63,41 @@ _PARAM_DIR: dict[str, str] = {
 # Verzeichnis-Listing opendata.dwd.de, 2026-07-05).
 _PARAM_NO_UNDERSCORE: frozenset[str] = frozenset({"precipitation"})
 
+# ── Monatsraster (Lufttemperatur) ─────────────────────────────────────────────
+# Andere Ablage als die Jahresraster: ``monthly/<dir>/<MM_Mon>/
+# grids_germany_monthly_<stem>_<YYYY><MM>.asc.gz``. Header-Aufbau ist identisch
+# (6 Zeilen, GK3, 1 km), daher greift ``_parse_grid`` unverändert.
+# ACHTUNG: Die Werte stehen in **1/10 °C** (verifiziert 2026-08-02 an
+# air_temp_mean 2024-07: Gebietsmittel 188 → 18,8 °C). Ohne ``_MONTHLY_SCALE``
+# wären alle Temperaturen um den Faktor 10 zu hoch.
+_MONTHLY_PARAM: dict[str, tuple[str, str]] = {
+    "air_temp_mean": ("air_temperature_mean", "air_temp_mean"),
+    "air_temp_min": ("air_temperature_min", "air_temp_min"),
+    "air_temp_max": ("air_temperature_max", "air_temp_max"),
+}
+_MONTHLY_SCALE = 0.1
+_MONTH_DIR = {
+    1: "01_Jan", 2: "02_Feb", 3: "03_Mar", 4: "04_Apr", 5: "05_May", 6: "06_Jun",
+    7: "07_Jul", 8: "08_Aug", 9: "09_Sep", 10: "10_Oct", 11: "11_Nov", 12: "12_Dec",
+}
+# Sommerhalbjahr-Kernmonate für die Hitze-Expositionsrechnung (Juni–August).
+SUMMER_MONTHS: tuple[int, ...] = (6, 7, 8)
+
+
+def _split_monthly(param: str) -> tuple[str, int] | None:
+    """``"air_temp_mean_07"`` → ``("air_temp_mean", 7)``; ``None`` für Jahresraster."""
+    base, _, mm = param.rpartition("_")
+    if base in _MONTHLY_PARAM and mm.isdigit():
+        return base, int(mm)
+    return None
+
 # Mem-Caches: WGS84→GK3-Transformer, geparste Grids je (param, year),
 # abgeleitete Zentroid-Werte je (param, gerundeter Zentroid).
+# Grid-Cache als kleines LRU: ein Deutschland-Raster ≈ 4-5 MB; ohne Deckel
+# sammelten sich hier ~Parameter×Klimatologie-Jahre ≈ hunderte MB an.
+_GRID_LRU_MAX = 6
 _transformer: Transformer | None = None
-_grid_cache: dict[tuple[str, int], tuple[dict, np.ndarray] | None] = {}
+_grid_cache: "OrderedDict[tuple[str, int], tuple[dict, np.ndarray] | None]" = OrderedDict()
 _value_cache: dict[str, tuple[float, float | None]] = {}
 _cache_lock = threading.Lock()
 
@@ -84,6 +116,13 @@ def _get_transformer() -> Transformer:
 # ── Grid-Download (Disk-Cache) und -Parsing (Mem-Cache) ───────────────────────
 
 def _grid_url(param: str, year: int) -> str:
+    monthly = _split_monthly(param)
+    if monthly is not None:
+        base_param, month = monthly
+        d, stem = _MONTHLY_PARAM[base_param]
+        base = settings.DWD_CDC_MONTHLY_BASE.rstrip("/")
+        return (f"{base}/{d}/{_MONTH_DIR[month]}/"
+                f"grids_germany_monthly_{stem}_{year}{month:02d}.asc.gz")
     d = _PARAM_DIR[param]
     base = settings.DWD_CDC_GRID_BASE.rstrip("/")
     suffix = f"{year}17.asc.gz" if param in _PARAM_NO_UNDERSCORE else f"{year}_17.asc.gz"
@@ -132,6 +171,7 @@ def _parse_grid(param: str, year: int) -> tuple[dict, np.ndarray] | None:
     key = (param, year)
     with _cache_lock:
         if key in _grid_cache:
+            _grid_cache.move_to_end(key)
             return _grid_cache[key]
 
     result: tuple[dict, np.ndarray] | None = None
@@ -152,6 +192,9 @@ def _parse_grid(param: str, year: int) -> tuple[dict, np.ndarray] | None:
 
     with _cache_lock:
         _grid_cache[key] = result
+        _grid_cache.move_to_end(key)
+        while len(_grid_cache) > _GRID_LRU_MAX:
+            _grid_cache.popitem(last=False)
     return result
 
 
@@ -171,7 +214,10 @@ def _sample_year(param: str, year: int, lon: float, lat: float) -> float | None:
         if not (0 <= row < nrows and 0 <= col < ncols):
             return None
         val = float(arr[row, col])
-        return None if val == nodata else val
+        if val == nodata:
+            return None
+        # Monatsraster liefern 1/10 °C — hier auf °C bringen.
+        return val * _MONTHLY_SCALE if _split_monthly(param) is not None else val
     except Exception as exc:
         log.warning("DWD CDC Sampling %s %s fehlgeschlagen: %s", param, year, exc)
         return None
@@ -193,7 +239,7 @@ def sample_climatology(
     ``n_years`` gültige Stichproben. Ergebnis wird je gerundetem Zentroid im Mem-
     und Disk-Cache gehalten. ``None``, wenn kein Jahr auswertbar ist.
     """
-    if param not in _PARAM_DIR:
+    if param not in _PARAM_DIR and _split_monthly(param) is None:
         return None
     n_years = n_years or settings.DWD_CDC_CLIMATOLOGY_YEARS
     lon_r, lat_r = round(lon, 3), round(lat, 3)
@@ -279,3 +325,115 @@ def summer_days_at(lon: float, lat: float) -> float | None:
 def precipitation_at(lon: float, lat: float) -> float | None:
     """Mittlere Jahresniederschlagssumme (mm) am Zentroid (DWD-CDC-Klimatologie)."""
     return sample_climatology("precipitation", lon, lat)
+
+
+# ── Klimatologie-Grid (für zellscharfes Sampling) ─────────────────────────────
+# ``sample_climatology`` cacht je *Zentroid*; bei 100-m-Zellen entstünden
+# tausende Cache-Einträge, die jeweils erneut über alle Jahresraster liefen.
+# Für flächige Auswertung wird das Klimatologie-Mittel daher **einmal** als
+# Array gebaut und anschließend vektorisiert abgetastet.
+
+_clim_grid_cache: "OrderedDict[tuple[str, tuple[int, ...], int], tuple[dict, np.ndarray] | None]" = OrderedDict()
+
+
+def climatology_grid(
+    param: str, months: tuple[int, ...] | None = None, n_years: int | None = None,
+) -> tuple[dict, np.ndarray] | None:
+    """Über Monate und die letzten N Jahre gemitteltes Raster (Header, Array).
+
+    ``months=None`` → Jahresraster (``param`` aus ``_PARAM_DIR``). Sonst werden
+    die Monatsraster ``param_MM`` gemittelt. NODATA-Zellen bleiben ``np.nan``.
+    """
+    months = tuple(months or ())
+    n_years = n_years or settings.DWD_CDC_CLIMATOLOGY_YEARS
+    key = (param, months, n_years)
+    with _cache_lock:
+        if key in _clim_grid_cache:
+            _clim_grid_cache.move_to_end(key)
+            return _clim_grid_cache[key]
+
+    param_keys = [f"{param}_{m:02d}" for m in months] if months else [param]
+    total: np.ndarray | None = None
+    count: np.ndarray | None = None
+    header: dict | None = None
+
+    for pk in param_keys:
+        collected = 0
+        year = datetime.utcnow().year - 1
+        attempts, max_attempts = 0, n_years + 5
+        while collected < n_years and attempts < max_attempts and year > 1950:
+            parsed = _parse_grid(pk, year)
+            year -= 1
+            attempts += 1
+            if parsed is None:
+                continue
+            hdr, arr = parsed
+            vals = np.where(arr == hdr["NODATA_VALUE"], np.nan, arr.astype(float))
+            if _split_monthly(pk) is not None:
+                vals = vals * _MONTHLY_SCALE
+            if total is None:
+                header = hdr
+                total = np.zeros_like(vals)
+                count = np.zeros_like(vals)
+            elif vals.shape != total.shape:
+                log.warning("DWD CDC Klimatologie %s: abweichende Rastergröße %s",
+                            pk, vals.shape)
+                continue
+            valid = ~np.isnan(vals)
+            total[valid] += vals[valid]
+            count[valid] += 1
+            collected += 1
+
+    result: tuple[dict, np.ndarray] | None = None
+    if total is not None and count is not None and header is not None:
+        with np.errstate(invalid="ignore"):
+            mean = np.where(count > 0, total / np.maximum(count, 1), np.nan)
+        result = (header, mean)
+
+    with _cache_lock:
+        _clim_grid_cache[key] = result
+        _clim_grid_cache.move_to_end(key)
+        while len(_clim_grid_cache) > 4:
+            _clim_grid_cache.popitem(last=False)
+    return result
+
+
+def sample_grid_points(
+    grid: tuple[dict, np.ndarray] | None, points: list[tuple[float, float]],
+) -> list[float | None]:
+    """Rasterwerte für viele (lon, lat)-Punkte; ``None`` außerhalb/NODATA."""
+    if grid is None:
+        return [None] * len(points)
+    hdr, arr = grid
+    ncols, nrows = int(hdr["NCOLS"]), int(hdr["NROWS"])
+    xll, yll, cs = hdr["XLLCORNER"], hdr["YLLCORNER"], hdr["CELLSIZE"]
+    out: list[float | None] = []
+    if not points:
+        return out
+    tr = _get_transformer()
+    lons = [p[0] for p in points]
+    lats = [p[1] for p in points]
+    xs, ys = tr.transform(lons, lats)
+    for x, y in zip(xs, ys):
+        col = int((x - xll) / cs)
+        row = nrows - 1 - int((y - yll) / cs)
+        if not (0 <= row < nrows and 0 <= col < ncols):
+            out.append(None)
+            continue
+        val = float(arr[row, col])
+        out.append(None if np.isnan(val) else val)
+    return out
+
+
+def summer_mean_temp_at(lon: float, lat: float) -> float | None:
+    """Mittlere Sommer-Lufttemperatur (Jun–Aug, °C) am Punkt."""
+    vals = [sample_climatology(f"air_temp_mean_{m:02d}", lon, lat) for m in SUMMER_MONTHS]
+    ok = [v for v in vals if v is not None]
+    return round(sum(ok) / len(ok), 2) if ok else None
+
+
+def summer_night_temp_at(lon: float, lat: float) -> float | None:
+    """Mittlere Sommer-Nachttemperatur (Tmin Jun–Aug, °C) am Punkt."""
+    vals = [sample_climatology(f"air_temp_min_{m:02d}", lon, lat) for m in SUMMER_MONTHS]
+    ok = [v for v in vals if v is not None]
+    return round(sum(ok) / len(ok), 2) if ok else None

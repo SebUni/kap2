@@ -34,6 +34,11 @@ const OP_HEIGHT: Record<string, number> = {
   weight: 64,
   count: 56,
   coverage: 56,
+  distance: 56,
+  distance_score: 56,
+  mean: 56,
+  lookup: 56,
+  derived_index: 56,
   divide: 48,
   add: 44,
   clamp: 48,
@@ -44,7 +49,7 @@ const OP_HEIGHT: Record<string, number> = {
   sum_cells: 48,
   p90: 48,
   intensity: 48,
-  ratio: 48,
+  ratio: 56,
 }
 
 export function labelLineCount(label: string, type: string): number {

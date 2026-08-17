@@ -46,13 +46,19 @@ export function formatLineageTooltip(text: string): string {
     if (colon > 0 && colon < 24) {
       const key = line.slice(0, colon)
       const val = line.slice(colon + 1).trim()
-      const mathHtml = FORMULA_KEYS.has(key) ? renderFormulaHtml(val) : null
+      if (FORMULA_KEYS.has(key)) {
+        // "Berechnung:"/"Formel:" ist nur der Latexify-Marker — im Tooltip
+        // steht die Formel ohne Schlüsselwort (Nutzerwunsch).
+        const mathHtml = renderFormulaHtml(val)
+        parts.push(mathHtml
+          ? `<div class="kap-lineage-tip-math">${mathHtml}</div>`
+          : `<div class="kap-lineage-tip-text">${esc(val)}</div>`)
+        continue
+      }
       parts.push(
         `<div class="kap-lineage-tip-row">`
         + `<span class="kap-lineage-tip-key">${esc(key)}:</span> `
-        + (mathHtml
-          ? `<span class="kap-lineage-tip-math">${mathHtml}</span>`
-          : `<span>${esc(val)}</span>`)
+        + `<span>${esc(val)}</span>`
         + `</div>`,
       )
     } else {

@@ -21,12 +21,14 @@ gereicht — Sozioökonomie ist optionaler Zusatz, kein harter Berechnungsschrit
 
 from __future__ import annotations
 
+import io
 import json
 import logging
 import os
 import re
 import threading
 import time
+import zipfile
 from typing import Any
 
 import httpx
@@ -160,78 +162,145 @@ def _write_disk_cache(ags: str, data: dict) -> None:
 
 
 def _auth_headers() -> dict | None:
-    """GENESIS-Auth per HTTP-Header ``username``/``password`` (verifizierter Transport).
+    """GENESIS-Auth als HTTP-Header (GENESIS-WS 2020, verifiziert live 7/2026).
 
-    Ein API-Token wird als Passwort übergeben (Destatis-Muster „Token statt
-    Passwort"); der Nutzername bleibt der Account-Name. Ein separater
-    ``token``-Header wird von diesem GENESIS-Stand ignoriert (Login als GAST).
+    Dokumentiertes Muster: Der **API-Token wird im Feld ``username``** übermittelt,
+    ``password`` bleibt leer — und ``Content-Type: application/x-www-form-urlencoded``
+    ist PFLICHT. Ohne diesen Content-Type (oder mit einem unbekannten Nutzernamen
+    im ``username``-Header) hängt der Server die Anfrage bis zum Timeout, statt
+    einen Fehler zu liefern (reproduziert: 150 s Read-Timeout).
+
+    Ohne Token fällt der Login klassisch auf ``username``/``password`` zurück
+    (echter Account-Name, nicht der Token). Fehlen beide → ``None`` (Login als
+    GAST, kein Datenabruf).
     """
-    u = settings.REGIONALSTATISTIK_USERNAME
+    ct = {"Content-Type": "application/x-www-form-urlencoded"}
     tok = settings.REGIONALSTATISTIK_TOKEN
-    if u and tok:
-        return {"username": u, "password": tok}
+    if tok:
+        return {**ct, "username": _hdr(tok), "password": b""}
+    u = settings.REGIONALSTATISTIK_USERNAME
     p = settings.REGIONALSTATISTIK_PASSWORD
     if u and p:
-        return {"username": u, "password": p}
+        return {**ct, "username": _hdr(u), "password": _hdr(p)}
     return None
+
+
+def _hdr(value: str) -> bytes:
+    """Header-Wert als latin-1-Bytes. HTTP-Header sind ISO-8859-1; httpx kodiert
+    str-Werte sonst als ASCII und bricht bei Sonderzeichen (z. B. ``§`` im
+    regionalstatistik.de-Passwort) mit ``UnicodeEncodeError`` ab, bevor die
+    Anfrage überhaupt rausgeht."""
+    return value.encode("latin-1", "replace")
+
+
+def _genesis_download_ffcsv(table_code: str, regionalkey: str) -> str | None:
+    """ffcsv-Text einer GENESIS-Tabelle über ``data/tablefile``, best-effort.
+
+    Verifiziertes Protokoll (GENESIS-WS 2020, regionalstatistik.de/Destatis):
+    POST ``data/tablefile`` mit Header-Auth aus :func:`_auth_headers`,
+    ``format=ffcsv`` + ``compress=true`` liefert ein ZIP mit genau EINER
+    ``;``-separierten Flatfile-CSV (BOM-behaftet, deutsche Dezimalzahlen);
+    ``regionalkey`` filtert auf AGS/Kreis. Der ältere ``data/table``-Dialog
+    scheidet aus: er verpackt die Daten in JSON und wird hier als Fehler
+    behandelt.
+
+    Fehler meldet GENESIS als JSON ``{Code, Content, Type: ERROR}`` (HTTP 4xx) →
+    ``None`` mit Log. Auth-/Netz-/Zip-Fehler ebenfalls → ``None``; es wird nie
+    eine Exception nach oben gereicht.
+    """
+    headers = _auth_headers()
+    if headers is None:
+        return None
+    url = f"{settings.REGIONALSTATISTIK_API_BASE.rstrip('/')}/data/tablefile"
+    data = {
+        "name": table_code,
+        "area": "all",
+        "format": "ffcsv",
+        "compress": "true",
+        "transpose": "false",
+        "regionalkey": regionalkey,
+        "language": "de",
+    }
+    try:
+        with httpx.Client(
+            timeout=settings.REGIONALSTATISTIK_TIMEOUT_S, follow_redirects=True
+        ) as client:
+            resp = client.post(url, data=data, headers=headers)
+            ctype = resp.headers.get("content-type", "")
+            if "json" in ctype:  # GENESIS meldet Fehler als JSON {Code, Type: ERROR}
+                log.warning("GENESIS %s: %s", table_code, resp.json())
+                return None
+            if resp.status_code != 200:
+                log.warning("GENESIS %s: HTTP %s", table_code, resp.status_code)
+                return None
+            body = resp.content
+            if body[:2] == b"PK":  # ZIP mit genau einer CSV (compress=true)
+                with zipfile.ZipFile(io.BytesIO(body)) as zf:
+                    return zf.read(zf.namelist()[0]).decode("utf-8-sig", "replace")
+            return body.decode("utf-8-sig", "replace")
+    except Exception as exc:
+        log.warning("GENESIS-Abfrage %s fehlgeschlagen: %s", table_code, exc)
+        return None
 
 
 def _genesis_table_value(table_code: str, ags: str) -> float | None:
     """Zahlenwert für einen AGS aus einer GENESIS-Tabelle (ffcsv), best-effort.
 
-    Verifiziertes Protokoll (regionalstatistik.de, genesisws/rest/2020):
-    POST ``/data/table``, Auth via HTTP-Header, ``regionalkey`` filtert auf den
-    AGS, ``format=ffcsv`` liefert eine ``;``-separierte Flat-Datei. Bei
-    Auth-/Netz-/Parsing-Fehlern → ``None`` (neutraler Fallback in indicators.py).
+    Lädt die Tabelle über :func:`_genesis_download_ffcsv` (data/tablefile) und
+    liest die erste passende numerische Zelle. Bei Auth-/Netz-/Parsing-Fehlern
+    → ``None`` (neutraler Fallback in indicators.py).
     """
-    headers = _auth_headers()
-    if headers is None:
+    text = _genesis_download_ffcsv(table_code, ags)
+    if text is None:
         return None
-    url = f"{settings.REGIONALSTATISTIK_API_BASE.rstrip('/')}/data/table"
-    data = {
-        "name": table_code,
-        "area": "all",
-        "format": "ffcsv",
-        "language": "de",
-        "compress": "false",
-        "transpose": "false",
-        "regionalkey": ags,
-    }
-    try:
-        with httpx.Client(timeout=settings.REGIONALSTATISTIK_TIMEOUT_S) as client:
-            resp = client.post(url, data=data, headers=headers)
-            resp.raise_for_status()
-            ctype = resp.headers.get("content-type", "")
-            if "json" in ctype:  # GENESIS meldet Fehler als JSON {Code, Type: ERROR}
-                body = resp.json()
-                log.warning("GENESIS %s: %s", table_code, body.get("Content", body))
-                return None
-            text = resp.text
-    except Exception as exc:
-        log.warning("GENESIS-Abfrage %s fehlgeschlagen: %s", table_code, exc)
-        return None
-
     return _parse_ffcsv_value(text, ags)
 
 
 def _parse_ffcsv_value(text: str, ags: str) -> float | None:
-    """Erste numerische Zelle der Zeile, deren Regionalschlüssel zu ``ags`` passt."""
+    """Wert der jüngsten passenden Zeile aus dem spaltenbenannten ffcsv.
+
+    Das ``data/tablefile``-ffcsv hat feste Spaltenköpfe: ``value`` (Messwert),
+    ``time`` (Jahr) und je Merkmal ``N_variable_attribute_code`` (u. a. der
+    Regionalschlüssel). Gesucht wird die Zeile, deren Regionalschlüssel exakt zu
+    ``ags`` passt (oder — als Kreis-Fallback — zu dessen 5-stelligem Kreis); bei
+    mehreren Jahren gewinnt das jüngste. ``None``, wenn nichts passt oder der
+    ``value``-Spaltenkopf fehlt (neutraler Fallback in indicators.py).
+    """
     ags = re.sub(r"\D", "", ags)
     kreis = ags[:5]
-    best: float | None = None
-    for line in text.splitlines():
+    lines = [ln for ln in text.splitlines() if ln.strip()]
+    if len(lines) < 2:
+        return None
+    header = [c.strip().strip('"') for c in lines[0].split(";")]
+    col = {name: i for i, name in enumerate(header)}
+    value_i = col.get("value")
+    time_i = col.get("time")
+    if value_i is None:
+        return None
+    attr_is = [i for name, i in col.items() if name.endswith("_variable_attribute_code")]
+
+    def _hit(k: str) -> bool:
+        if not k:
+            return False
+        if k == ags:
+            return True  # exakter Gemeinde-/Kreisschlüssel
+        return len(k) >= 5 and k[:5] == kreis and set(k[5:] or "0") == {"0"}
+
+    best_year, best = -1, None
+    for line in lines[1:]:
         cells = [c.strip().strip('"') for c in line.split(";")]
-        # Regionalschlüssel steht i.d.R. in einer der ersten Spalten.
-        row_keys = [re.sub(r"\D", "", c) for c in cells[:4] if re.sub(r"\D", "", c)]
-        if not any(k == ags or (len(k) >= 5 and k[:5] == kreis) for k in row_keys):
+        if value_i >= len(cells):
             continue
-        for c in cells:
-            num = _to_float(c)
-            if num is not None:
-                best = num
-                break
-        if best is not None:
-            break
+        keys = [re.sub(r"\D", "", cells[a]) for a in attr_is if a < len(cells)]
+        if not any(_hit(k) for k in keys):
+            continue
+        val = _to_float(cells[value_i])
+        if val is None:
+            continue
+        year = (int(cells[time_i]) if time_i is not None and time_i < len(cells)
+                and re.match(r"^(19|20)\d{2}$", cells[time_i]) else 0)
+        if year >= best_year:
+            best_year, best = year, val
     return best
 
 

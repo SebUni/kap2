@@ -23,7 +23,11 @@ from app.config import settings
 
 log = logging.getLogger(__name__)
 
-MISSING_MARKERS = {"–", "-", "", "…", "..."}
+# Destatis-Wertekennzeichen. Der Gedankenstrich „–"/„-" bedeutet **genau Null**
+# (nichts vorhanden / auf Null geändert) → als 0 hinterlegen, NICHT als fehlend.
+# Nur echt fehlende/geheime Werte („…", leer) werden zu None.
+ZERO_MARKERS = {"–", "-"}
+MISSING_MARKERS = {"", "…", "..."}
 # Spaltennamen gemäß Destatis CSV „Gebaeude_nach_Baujahr_in_Mikrozensus_Klassen“
 BUILDING_AGE_CLASSES: list[tuple[str, int]] = [
     ("Vor1919", 1900),
@@ -36,6 +40,41 @@ BUILDING_AGE_CLASSES: list[tuple[str, int]] = [
     ("a2020undspaeter", 2022),
 ]
 
+# Zensus-2022-Altersgruppen im 100-m-Gitter (5-Jahres-Klassen) → die vier
+# Altersbänder der RKI-/Winklmayr-Expositions-Wirkungs-Kurven.
+#
+# WICHTIG — abweichende Bedeutung von „–" in diesem Datensatz: Destatis
+# unterdrückt Besetzungszahlen < 3, der kleinste je publizierte Bandwert ist 3
+# (verifiziert 2026-08-02 über alle 3.088.037 Zellen: Werte 0/1/2 kommen nicht
+# vor). „–" heißt hier also „0, 1 oder 2" und NICHT „genau Null" wie in den
+# übrigen Zensus-Datensätzen. Die Bandsummen decken deshalb nur 89,8 % der
+# Bevölkerung ab (100 % in Zellen ≥150 Ew., 30 % in Zellen <10 Ew.).
+#
+# Zusätzlich sind Bänder und ``Insgesamt_Bevoelkerung`` NICHT additiv konsistent
+# (Destatis perturbiert beide unabhängig; 875.414 Zellen haben ein negatives
+# Residuum). Ein „Restbevölkerung = Insgesamt − Σ Bänder" ist daher nicht
+# rekonstruierbar.
+#
+# Konsequenz für die Nutzung: Die Bänder liefern ausschließlich die
+# **Zusammensetzung**, das **Niveau** kommt aus dem ``population``-Datensatz.
+# Das ist messbar korrekt — der 65+-Anteil an der Bevölkerung beträgt in den
+# rohen Bandsummen nur 19,6 %, der 65+-Anteil *innerhalb* der Bänder aber
+# 21,9 % und trifft damit den amtlichen Wert (~22 %).
+AGE_BAND_COLUMNS: dict[str, tuple[str, ...]] = {
+    "u65": ("unter5", "a5bis9", "a10bis14", "a15bis19", "a20bis24", "a25bis29",
+            "a30bis34", "a35bis39", "a40bis44", "a45bis49", "a50bis54",
+            "a55bis59", "a60bis64"),
+    "a65_74": ("a65bis69", "a70bis74"),
+    "a75_84": ("a75bis79", "a80bis84"),
+    "a85p": ("a85bis89", "a90undaelter"),
+}
+ALL_AGE_COLUMNS: tuple[str, ...] = tuple(
+    c for cols in AGE_BAND_COLUMNS.values() for c in cols
+)
+# Unterhalb dieses Deckungsgrades (Σ Bänder / Einwohner) ist die Zusammensetzung
+# der Zelle zu stark von der Unterdrückung verzerrt → regionaler Rückfall.
+AGE_BAND_MIN_COVERAGE = 0.5
+
 REQUIRED_KEYS = (
     "population",
     "share_over_65",
@@ -46,7 +85,11 @@ REQUIRED_KEYS = (
     "building_age",
 )
 
-OPTIONAL_KEYS = ("avg_age", "avg_household_size")
+OPTIONAL_KEYS = ("avg_age", "avg_household_size", "age_groups")
+
+# Beim Assessment tatsächlich geladene Datensätze: alle Pflichtdatensätze plus
+# die Altersgruppen (optional, mit Rückfall auf die gebietsweite Aufteilung).
+DEFAULT_LOAD_KEYS = (*REQUIRED_KEYS, "age_groups")
 
 
 @dataclass
@@ -125,9 +168,28 @@ ZENSUS_DATASETS: dict[str, ZensusDatasetDef] = {
         required=False,
         value_columns=["DurchschnHHGroesse"],
     ),
+    # 5-Jahres-Altersgruppen — Grundlage der altersgeschichteten Hitzemortalität.
+    # ``required=False``: fällt der Download aus, greift der Rückfall über
+    # ``share_over_65`` (siehe ``_age_bands_from_share``), statt das Assessment
+    # zu blockieren. Siehe AGE_BAND_COLUMNS zur Unterdrückungs-Semantik.
+    "age_groups": ZensusDatasetDef(
+        key="age_groups",
+        zip_url="https://www.destatis.de/static/DE/zensus/gitterdaten/Alter_5er-Jahresgruppen_100mGitter.zip",
+        csv_glob="100m",
+        csv_filename="Zensus2022_Alter_5er-Jahresgruppen_100m-Gitter.csv",
+        required=False,
+        value_columns=["Insgesamt_Bevoelkerung", *ALL_AGE_COLUMNS],
+    ),
 }
 
+# In-RAM-Zellcache: je Dataset nur EIN bbox-Eintrag (Within-Run-Sharing);
+# über Läufe hinweg dienen die CSVs auf Platte als Quelle (Streaming-Read).
 _bbox_cache: dict[str, dict[str, dict[str, Any]]] = {}
+
+
+def clear_bbox_cache() -> None:
+    """Leert den In-RAM-Zellcache (Aufräumen am Ende eines Assessment-Laufs)."""
+    _bbox_cache.clear()
 
 
 def _dataset_dir(key: str) -> str:
@@ -139,10 +201,13 @@ def _dataset_path(key: str) -> str:
     return os.path.join(_dataset_dir(key), d.csv_filename)
 
 
-def _parse_float(raw: str | None) -> float | None:
+def _parse_float(raw: str | None, *, dash_zero: bool = False) -> float | None:
     if raw is None:
         return None
     s = str(raw).strip()
+    if s in ZERO_MARKERS:
+        # „–" = genau Null: bei Messwerten 0, bei IDs/Koordinaten weiterhin fehlend.
+        return 0.0 if dash_zero else None
     if s in MISSING_MARKERS:
         return None
     s = s.replace(".", "").replace(",", ".") if "," in s and s.count(",") == 1 else s.replace(",", ".")
@@ -152,8 +217,8 @@ def _parse_float(raw: str | None) -> float | None:
         return None
 
 
-def _parse_int(raw: str | None) -> int | None:
-    v = _parse_float(raw)
+def _parse_int(raw: str | None, *, dash_zero: bool = False) -> int | None:
+    v = _parse_float(raw, dash_zero=dash_zero)
     if v is None:
         return None
     return int(v)
@@ -215,6 +280,14 @@ def _extract_100m_csv(zip_path: str, dest_csv: str, csv_hint: str) -> None:
     with open(tmp, "wb") as f:
         f.write(raw)
     os.replace(tmp, dest_csv)
+
+
+def dataset_mtime(key: str) -> float | None:
+    """mtime der lokalen CSV (None = fehlt) — Änderungsdetektion für /zensus/sync."""
+    try:
+        return os.path.getmtime(_dataset_path(key))
+    except OSError:
+        return None
 
 
 def ensure_zensus_dataset(key: str) -> str:
@@ -295,24 +368,65 @@ def load_dataset_bbox(key: str, bbox: tuple[int, int, int, int]) -> dict[str, di
             if uncertain:
                 parsed["statistically_uncertain"] = True
             d = ZENSUS_DATASETS[key]
+            # „–" = genau Null bei Zähl-/Anteilsgrößen (0 Personen, 0 % Anteil, 0 Gebäude).
+            # Bei Durchschnittswerten (Nettokaltmiete, Wohnfläche/Person) bedeutet „–"
+            # mangels Fällen „kein Wert" (nicht 0 €/m²) → weiterhin None, damit der
+            # Resilienz-Index nicht durch implausible Nullen verzerrt wird.
+            dz = key not in ("net_cold_rent", "living_area_per_person")
             for col in d.value_columns:
                 if col == "Insgesamt_Gebaeude":
-                    parsed[col] = _parse_int(row.get(col))
+                    parsed[col] = _parse_int(row.get(col), dash_zero=True)
                 elif col in {c[0] for c in BUILDING_AGE_CLASSES}:
-                    parsed[col] = _parse_int(row.get(col))
+                    parsed[col] = _parse_int(row.get(col), dash_zero=True)
                 else:
-                    parsed[col] = _parse_float(row.get(col))
+                    parsed[col] = _parse_float(row.get(col), dash_zero=dz)
             if key == "building_age":
                 parsed["building_age_mean"] = _mean_building_year(parsed)
-            # Nur echte Geheimhaltung (–) zählt als fehlend — nicht KLAMMERN-Werte.
+            # „–" ist jetzt 0 (genau Null, wird behalten); nur echt fehlende/geheime
+            # Werte („…"/leer → None) lassen die Zelle entfallen.
             if key != "building_age" and key != "population":
                 primary = d.value_columns[0]
                 if parsed.get(primary) is None:
                     continue
             out[gid] = parsed
 
-    _bbox_cache.setdefault(key, {})[cache_key] = out
+    _bbox_cache[key] = {cache_key: out}  # Single-Entry je Dataset (RAM-Deckel)
     return out
+
+
+def _senior_band_counts(parsed: dict[str, Any]) -> dict[str, float]:
+    """Veröffentlichte Besetzungszahlen der drei Senioren-Bänder einer Zelle."""
+    out: dict[str, float] = {}
+    for band in ("a65_74", "a75_84", "a85p"):
+        out[band] = sum(
+            float(parsed.get(col) or 0.0) for col in AGE_BAND_COLUMNS[band]
+        )
+    return out
+
+
+# Nationale Binnenaufteilung der 65+-Bevölkerung, direkt aus dem Zensus-Gitter
+# aggregiert (2026-08-02: 8.109.078 / 5.761.381 / 2.336.663 = 16.207.122).
+# Letzter Rückfall, wenn weder Zelle noch Gebiet genug besetzte Bänder haben.
+NATIONAL_SENIOR_SPLIT: dict[str, float] = {
+    "a65_74": 0.5003, "a75_84": 0.3555, "a85p": 0.1442,
+}
+
+
+def _senior_split(counts: dict[str, float], fallback: dict[str, float]) -> dict[str, float]:
+    """Anteile der drei Senioren-Bänder an 65+; ``fallback`` bei zu dünner Besetzung."""
+    total = sum(counts.values())
+    if total <= 0:
+        return dict(fallback)
+    return {b: counts[b] / total for b in counts}
+
+
+def _area_senior_split(ages: dict[str, dict[str, Any]]) -> dict[str, float]:
+    """Gebietsweite 65+-Binnenaufteilung als Rückfall für dünn besetzte Zellen."""
+    acc = {"a65_74": 0.0, "a75_84": 0.0, "a85p": 0.0}
+    for parsed in ages.values():
+        for band, n in _senior_band_counts(parsed).items():
+            acc[band] += n
+    return _senior_split(acc, NATIONAL_SENIOR_SPLIT)
 
 
 def _mean_building_year(parsed: dict[str, Any]) -> float | None:
@@ -332,18 +446,62 @@ def _mean_building_year(parsed: dict[str, Any]) -> float | None:
     return weighted / count
 
 
+def _building_year_fallbacks(
+    bage: dict[str, dict[str, Any]],
+) -> tuple[dict[tuple[int, int], float], float | None]:
+    """Baujahr-Rückfallwerte aus dem gröberen 1km-Gitter.
+
+    Viele 100m-Zellen tragen zwar Gebäude, aber (Zensus-Datenschutz) keine
+    besetzten Baujahrsklassen → dort liefert ``_mean_building_year`` ``None``.
+    Diese Lücken werden über das umgebende 1km-INSPIRE-Gitter aufgefüllt: je
+    1km-Zelle wird das gewichtete mittlere Baujahr über ALLE 100m-Zellen mit
+    bekanntem Baujahr gebildet (Gewicht = Gebäude je Klasse). Zusätzlich ein
+    gebietsweiter Mittelwert als letzter Rückfall, falls auch die 1km-Zelle leer
+    ist.
+
+    Gibt ``(km_index, area_mean)`` zurück; Schlüssel des Index ist
+    ``(x_mp // 1000, y_mp // 1000)``.
+    """
+    acc: dict[tuple[int, int], list[float]] = {}  # km-Zelle -> [gewichtete Summe, Anzahl]
+    tot_w, tot_n = 0.0, 0
+    for parsed in bage.values():
+        x, y = parsed.get("x"), parsed.get("y")
+        if x is None or y is None:
+            continue
+        km = (int(x) // 1000, int(y) // 1000)
+        a = acc.setdefault(km, [0.0, 0])
+        for col, mid_year in BUILDING_AGE_CLASSES:
+            n = parsed.get(col)
+            if n and n > 0:
+                a[0] += n * mid_year
+                a[1] += n
+                tot_w += n * mid_year
+                tot_n += n
+    km_index = {km: w / n for km, (w, n) in acc.items() if n > 0}
+    area_mean = (tot_w / tot_n) if tot_n > 0 else None
+    return km_index, area_mean
+
+
 def load_zensus_for_cells(
     grid_cells: list[dict],
     keys: list[str] | None = None,
 ) -> dict[str, dict[str, dict[str, Any]]]:
     """Load all Zensus datasets for the bbox of grid cells."""
-    keys = list(keys or REQUIRED_KEYS)
+    keys = list(keys or DEFAULT_LOAD_KEYS)
     geoms = [c["geometry"] for c in grid_cells]
     bbox = bbox_3035_from_wgs_geoms(geoms)
     workers = min(len(keys), 4)
 
     def _load(key: str) -> tuple[str, dict[str, dict[str, Any]]]:
-        return key, load_dataset_bbox(key, bbox)
+        try:
+            return key, load_dataset_bbox(key, bbox)
+        except Exception as exc:
+            # Optionale Datensätze dürfen das Assessment nicht blockieren; die
+            # Aufrufer haben für jeden davon einen dokumentierten Rückfall.
+            if ZENSUS_DATASETS[key].required:
+                raise
+            log.warning("Optionaler Zensus-Datensatz '%s' nicht verfügbar: %s", key, exc)
+            return key, {}
 
     with ThreadPoolExecutor(max_workers=workers) as ex:
         pairs = list(ex.map(_load, keys))
@@ -367,6 +525,12 @@ def apply_zensus_to_cell_inputs(
     owner = zensus.get("owner_share", {})
     rent = zensus.get("net_cold_rent", {})
     bage = zensus.get("building_age", {})
+    ages = zensus.get("age_groups", {})
+
+    # 1km-Rückfallwerte für Zellen mit Gebäuden, aber ohne besetzte Baujahrsklassen.
+    km_year_index, area_year_mean = _building_year_fallbacks(bage)
+    # Gebietsweite 65+-Binnenaufteilung als Rückfall für unterdrückte Zellen.
+    area_split = _area_senior_split(ages) if ages else dict(NATIONAL_SENIOR_SPLIT)
 
     for idx, ci in enumerate(cell_inputs):
         gid = gid_by_idx.get(idx) or ci.get("gitter_id")
@@ -391,6 +555,17 @@ def apply_zensus_to_cell_inputs(
         ci["net_cold_rent"] = rt.get("durchschnMieteQM")
         ci["building_count_zensus"] = ba.get("Insgesamt_Gebaeude")
         ci["building_age_mean"] = ba.get("building_age_mean")
+        # Imputation: Zelle hat Gebäude, aber kein Baujahr (Zensus-Datenschutz) →
+        # mittleres Baujahr aus der umgebenden 1km-Zelle (bzw. gebietsweit) ansetzen,
+        # damit der Layer nicht flächig Löcher zeigt, wo nachweislich Gebäude stehen.
+        if ci["building_age_mean"] is None and (ba.get("Insgesamt_Gebaeude") or 0) > 0:
+            x, y = ba.get("x"), ba.get("y")
+            fb = km_year_index.get((int(x) // 1000, int(y) // 1000)) if x is not None and y is not None else None
+            if fb is None:
+                fb = area_year_mean
+            if fb is not None:
+                ci["building_age_mean"] = fb
+                ci["building_age_imputed"] = True
         ci["zensus_uncertain"] = any(
             z.get("statistically_uncertain")
             for z in (o65, u18, la, ow, rt, ba)
@@ -404,6 +579,20 @@ def apply_zensus_to_cell_inputs(
         pop = ci.get("pop") or 0.0
         ci["pop_over_65"] = pop * share_o / 100.0 if pop > 0 else 0.0
         ci["pop_under_18"] = pop * share_u / 100.0 if pop > 0 else 0.0
+
+        # Altersbänder für die Expositions-Wirkungs-Rechnung. Bewusst aus ZWEI
+        # Quellen: ``share_over_65`` (gut besetzt) legt die 65+-Menge fest, die
+        # 5-Jahres-Gruppen nur deren Binnenaufteilung. So trägt jeder Datensatz
+        # das, was er belastbar hergibt — siehe AGE_BAND_COLUMNS.
+        senior_counts = _senior_band_counts(ages.get(gid, {})) if ages else {}
+        split = _senior_split(senior_counts, area_split) if senior_counts else dict(area_split)
+        pop_65p = ci["pop_over_65"]
+        ci["pop_age_bands"] = {
+            "u65": max(0.0, pop - pop_65p),
+            "a65_74": pop_65p * split["a65_74"],
+            "a75_84": pop_65p * split["a75_84"],
+            "a85p": pop_65p * split["a85p"],
+        }
 
 
 def demographic_shares() -> dict:

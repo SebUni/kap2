@@ -51,6 +51,7 @@ Code: `backend/app/services/engine/{inputs,indicators,risk_engine,runner}.py`.
 | **Zensus 2022** (Destatis INSPIRE 100m-Gitter, EPSG:3035) | Bevölkerung, Altersanteile (≥65, **<18**), Wohnfläche/Bewohner, Eigentümerquote, Nettokaltmiete, Gebäudealter je Zelle — Pflichtdaten, kein OSM-Proxy |
 | **AWS Terrarium DEM** | Mittelhöhe, Hangneigung, Senkentiefe, D8-Abfluss, TWI je Zelle |
 | **OSM Gewässer** | `natural=water`, `waterway` → Distanz/Proximität zu Fließ- und Stillgewässern |
+| **Regionalstatistik (GENESIS)** | Dashboard-Kopf (`finance_loader`): **BIP** in jeweiligen Preisen (Kreisebene, Tabelle `82111-01-01-4`, Mio. €, letztes Jahr) und **kommunale Auszahlungen** (Gemeindeebene, Tabelle `71147-01-02-4`, 1000 €, Ø der letzten 5 verfügbaren Jahre); außerdem (bestehend, `inkar_loader`) Steuereinnahmekraft/Arbeitslosenquote für die Sozioökonomie-Indizes. **Zugang erforderlich:** kostenloser regionalstatistik.de-Account — `REGIONALSTATISTIK_USERNAME` (die bei der Registrierung vergebene *Kennung*, nicht die E-Mail) + `PASSWORD` bzw. `TOKEN` in `backend/.env`. Ohne gültigen Zugang bleiben die Kopf-Chips ausgeblendet (leeres Ergebnis wird 24 h gecacht, volle 30 Tage). Tabellencodes sind Settings; bei GENESIS-Fehlern (Log) im Katalog `catalogue/tables?selection=82111*`/`71147*` nachschlagen. Der **Landkreis** im Kopf kommt aus Nominatim (`address.county`, Lazy-Backfill wie Bundesland). |
 
 **Provenienz der regionalen Klimatreiber** (`build_regional_context`, Feld
 `provenance`): Jeder Treiber ist als echte Quelle (`dwd_cdc_raster`, `pegelonline`)
@@ -118,6 +119,36 @@ Tag-UHI nach KAP2/KAP3-Formel (`inputs.compute_uhi_delta`). Eingaben aus OSM
 
 **Koeffizienten:** α = 6.0, β = 2.0, γ = 3.5, δ = 2.0, ε = 1.5, Baum = 0.3
 
+### 3a. Tag, Nacht und Tagesmittel — und die Zelltemperatur
+
+`compute_uhi_components` liefert drei Größen (`inputs.py`):
+
+| Größe | Bedeutung | Treiber |
+|---|---|---|
+| `day` | Tagesmaximum, unverändert die Formel oben | Albedo, Versiegelung, Bebauung, Grün, Wasser, Kronen |
+| `night` | nächtliche Überwärmung | Straßenschluchten (1 − SVF), Gebäudemasse (ζ), Gewässernähe |
+| `mean` | 24-h-Mittel — **die Größe der Wirkungskurve** | Tag/Nacht-Gewichtung, Umrechnungsfaktor, **Dämpfung durch Durchlüftung** |
+
+Die Expositions-Wirkungs-Kurven laufen über die *Wochenmittel*temperatur und damit
+über Tag **und** Nacht — nicht über das Tagesmaximum. Neu ist außerdem, dass der
+Frischluft-Anteil (`vent_score`) überhaupt in den Hitzepfad einfließt; zuvor speiste
+er nur Sturm und Luftqualität.
+
+**Zelltemperatur (`apply_cell_temperature`):**
+
+```
+T_Zelle = T_DWD-Raster(1 km) + [ΔT_mittel − Mittel(ΔT_mittel je 1-km-Zelle)] − 0,0065·(h − h̄)
+```
+
+Beide Zuschläge wirken **mittelwerttreu innerhalb der 1-km-Rasterzelle**. Grund: Das
+DWD-Raster wird aus Stationsdaten interpoliert und enthält die Wärmeinsel bereits
+teilweise — allerdings ohne Urbanisierungs-Prädiktor und damit unzuverlässig. Addierte
+man das volle ΔT, zählte man den erfassten Anteil doppelt. So bleibt der 1-km-Mittelwert
+exakt der gemessene, und nur die Feinstruktur darunter stammt aus dem Stadtmodell.
+
+**Datenquelle:** DWD-CDC-Monatsraster `air_temperature_mean` (Jun/Jul/Aug, 1 km).
+Achtung: Die Rasterwerte stehen in **1/10 °C**.
+
 | Größe | Formel |
 |---|---|
 | `imp` (Versiegelung) | `clamp(bldg_cov + road_cov·0.95, 0.02, 0.98)` (Fallback Landnutzung) |
@@ -135,6 +166,30 @@ $$\Delta T = \max\!\bigl(0,\ \text{Aufheizung} - \text{green} - \text{water} - \
 $$T_{\text{Zelle}} = T_{\text{ref}} + \Delta T \quad (T_{\text{ref}} = \text{DWD-Sommer-Tagesmaximum})$$
 
 Daraus speisen sich u. a. `HEAT_WAVE`, `UHI_INTENSITY`, `MEAN_TEMPERATURE_RISE`.
+
+### SVF (Himmelssichtfaktor) und Gebäudehöhe
+
+`avg_height` ist das **flächengewichtete** Mittel der Gebäudehöhen der Zelle
+(Gewicht = Grundriss∩Zelle). Die Höhen stammen aus den **amtlichen
+LoD2-3D-Gebäudemodellen der Länder** (`bldg:measuredHeight`, CityGML;
+`services/geodata/lod2/`), wo eine Landesquelle angebunden ist — sonst greift
+die OSM-Heuristik (`height`-Tag, sonst `building:levels·3 m`, sonst 6 m).
+Die verwendete Quelle steht je Lauf in `provenance.building_height`
+(`lod2:<Land>` bzw. `osm_heuristic`).
+
+`svf` ist ein **echtes geometrisches SVF** nach dem Horizontwinkel-Verfahren
+(Oke 1981; Zakšek, Oštir & Kokalj 2011):
+
+$$\mathrm{SVF} = 1 - \frac{1}{N}\sum_{i=1}^{N}\sin^2\gamma_i,\qquad
+\gamma_i = \max_{d \le R}\ \arctan\frac{h(d)}{d}$$
+
+mit N = 16 Azimutrichtungen, Suchradius R = 100 m auf einem
+5-m-Gebäudehöhenraster (LoD2- bzw. OSM-Höhen), Beobachter auf Bodenniveau,
+gemittelt über die nicht überbauten Pixel der Zelle (Straßenniveau). Gelände
+ist bewusst ausgeschlossen — der Canyon-Term erwartet das reine Gebäude-SVF.
+Analytischer Prüfwert: Im unendlichen Straßencanyon (Breite W, Wandhöhe H)
+ergibt die Formel in Straßenmitte $\cos(\arctan(2H/W))$, z. B. W=20 m/H=10 m
+→ SVF ≈ 0{,}707.
 
 ---
 
@@ -233,9 +288,38 @@ Kosten; Risiken ohne registrierte Funktion rechnen den linearen `legacy_cell_imp
 (= `ref·Index/100·Skalierung`, aber je Zelle). Der Runner materialisiert je Zelle
 `{index, outcome, cost_eur}`.
 
-- **Gesundheit** (`impact/health.py`): `Betroffene · Rate · Dosis-Wirkung · g(V̂)`.
-  Hitzegetrieben über die nichtlineare attributable Fraktion
-  `AF = 1 − exp(−β·(Intensität − Schwelle)₊)` (überproportional durch die Schwelle).
+- **Gesundheit** (`impact/health.py`): zwei Bauarten, weil die Gefahren verschieden
+  funktionieren.
+  - *Hitzemortalität* — **altersgeschichtete Expositions-Wirkungs-Kurve** nach
+    RKI/Winklmayr u. a. 2022 statt einer pauschalen attributablen Fraktion:
+
+    ```
+    D = calib · h · Σ_Band  pop_a · m_a/100k · (1/52) · Σ_Woche (RR_a(T_w) − 1)
+    RR_a(T) = exp(β_a · (T − T_0,Region)₊)
+    ```
+
+    Vier Altersbänder (<65, 65–74, 75–84, 85+), drei Regionen mit eigenen
+    Wirkschwellen (19,7/20,2/20,8 °C). **Entscheidend:** Die Kurve wird über die
+    *Verteilung* der 13 Sommerwochen summiert, nicht am Mittelwert ausgewertet —
+    das deutsche Sommermittel liegt mit ~18,5 °C **unter** der Wirkschwelle, am
+    Mittelwert käme fast überall null heraus. Die Todesfälle entstehen in den
+    wenigen heißen Wochen. Statt `g(V̂)` wirkt nur noch ein Versorgungs-Modifikator:
+    Mit expliziten Altersbändern zählte `g` die Demografie ein zweites und drittes
+    Mal (Review V-E).
+  - *Flut/Sturm* — selten und tail-lastig, daher `Exposition · bedingte Letalität`.
+    Bei Flut entscheidet das **Regime** (Sturzflut vs. langsamer Anstieg): Ahr 2021
+    über 180 Todesopfer, Elbe 2002 rund 21 bei weit größerer überfluteter Fläche.
+    Ohne Hydraulik ist das Gelände (Hangneigung × Senkenlage) der Unterscheider.
+    Auch hier **kein** `g(V̂)`, sondern die Größen, die tatsächlich entscheiden:
+    bei Flut Vorwarnzeit × Altersüberhang der Opfer, bei Sturm die Interaktion
+    Baumkronen × Straßenanteil plus Bausubstanz (Sturmtote fallen draußen und
+    unterwegs, nicht in der Wohnung). Die Wirkungsdiagramme zeichnen genau diese
+    Eingänge — der Modifikator-Knoten folgt `LINEAGE_SPECS[...]["modifier"]`, und
+    zwei Tests in `test_review_wirkungsmechanismen.py` halten Diagramm und
+    Rechnung deckungsgleich.
+  - *Übrige Gesundheitskanäle* (Morbidität, Verletzte, Betroffene, Belastungs-
+    stunden) weiterhin `Betroffene · Rate · AF(Hitzetage) · g(V̂)`
+    mit `AF = 1 − exp(−β·(Intensität − Schwelle)₊)`.
 - **Monetäre Sektorschäden** (`impact/monetary.py`): `Assetwert · Jahresverlustrate ·
   Schadenskurve(Intensität) · g(V̂)`; Assetwert aus realen Zell-Rohgrößen ×
   editierbaren €-Parametern. Schadenskurve konvex (`curves.py`, Exponent > 1).
@@ -287,8 +371,25 @@ Je Risiko (Schicht B):
   Hotspot-Signal), `area_km2_affected` und `share_above_threshold` (Zellen ≥
   Risikozonen-Schwelle). **Robuster Fallback:** Alt-Zelldaten ohne materialisierten
   Outcome werden je Zelle über `legacy_cell_impact` nachgerechnet (kein 500er).
+- **Belastungs-P90 (`exposed_p90_index`, Anzeige-Leitgröße des Dashboards):** P90 nur
+  über die **expositionsrelevanten** Zellen — pop-skalierte Risiken zählen nur bewohnte
+  Zellen (`inputs.pop > 0`), area-/flat-Risiken nur Zellen mit mindestens einer
+  Pfad-Exposition > 0 (`_EXPOSURE_CODES`). Hintergrund (MODELL_KRITIK §9): das
+  klassische P90 über ALLE Zellen wird vom unbewohnten Umland verdünnt (Oschatz:
+  611/5825 Zellen bewohnt → P90 pop-skalierter Risiken ≈ 0 trotz belasteter Ortslagen).
+  `exposure_share` (Anteil expositionsrelevanter Zellen) macht die Basis transparent;
+  Fallback ohne matchende Zellen bzw. ohne `exposures`-Key: `exposed_p90 = p90`.
+  `index`/`p90_index` bleiben unverändert (Screening-Kennzahl, keine stille
+  Semantikänderung).
+- **Risikoklasse (`risk_class`, gering/mittel/hoch):** klassifiziert den Belastungs-P90.
+  Grenzen aus `tunables.risk_class_bounds()`: hoch ≥ Risikozonen-Schwelle
+  (`model.risk_threshold`, Default 50 — „hoch" im Dashboard ≙ Risikozonen-Kriterium
+  der Karte), mittel ≥ 0,4·Schwelle (Default 20). Abgeleitete Konstanten, keine
+  eigenen Registry-Parameter; der Meta-Block `classification` (basis/bounds/labels)
+  liefert dem Frontend die Server-Wahrheit für Chips und Klassen-Ringe.
 
-Je KWRA-Gruppe: Mittelwert der Risiko-P90-Indizes (übergreifende Spinnen-Metrik).
+Je KWRA-Gruppe: Mittelwert der Risiko-P90-Indizes (übergreifende Spinnen-Metrik);
+analog `exposed_index` = Mittel der Belastungs-P90-Werte (+ `risk_class`).
 `total_eur` = Summe der Einzel-`cost_eur` **ohne** `NON_ADDITIVE_RISK_CODES`.
 
 ### Modellversion & Cache-Invalidierung
@@ -414,6 +515,26 @@ $$\text{OPEX/a} = \text{opex\_fixed\_year} + \text{Anzahl} \times \text{opex\_pe
   Maßnahmen** und summiert `capex_eur` / `opex_annual_eur` je Maßnahme; dieselbe
   Fläche/Anzahl/`unit_factor`-Herleitung wie `compute_impact`, damit Dashboard,
   Tabellen und Sidebar nicht divergieren (`_adjusted_cell_data`).
+- **Nutzen-Aufschlüsselung (MODELL_KRITIK §9):** `annual_benefit_eur` wird zusätzlich
+  in `annual_benefit_damage_eur` (vermiedene Zellschäden inkl. `k·Reduktion`),
+  `annual_benefit_flat_eur` (P90-Ausfallrisiken) und `annual_benefit_direct_eur`
+  (direkter **Zusatznutzen** `benefit_per_m2_year · Fläche` — zusätzlich
+  erwirtschafteter Ertrag, KEIN vermiedener Schaden) ausgewiesen; `cost-summary`
+  führt die Summen (`total_benefit_*_eur`). Die Dashboard-KPI „Jährlicher Nutzen"
+  = `damage_reduction_eur` (belastbare Aggregat-Differenz) + `total_benefit_direct_eur`.
+  Defense-in-depth: der Schadens-Nutzen je Maßnahme ist am Gesamt-Basisschaden ihrer
+  verknüpften Risiken gekappt (`benefit_capped`), und `benefit_consistency_warning`
+  meldet, wenn Σ Pro-Maßnahmen-Schadensnutzen > ±25 % von der Aggregat-Differenz
+  abweicht.
+- **Staleness-Schutz (`params_fingerprint`):** `compute_impact` stempelt jedes
+  `impact_summary` mit einem SHA1-Fingerprint über die aufgelösten kosten-/nutzen-
+  relevanten mdef-Felder, alle Kommune-Overrides, `MODEL_VERSION`, den Zelldaten-
+  Stand (`max(calculated_at)`) und die Maßnahmen-Konfiguration.
+  `ensure_fresh_impact_summary` prüft ihn in **allen Lesepfaden** (cost-summary,
+  Maßnahmenliste/-detail, Excel-Export) und rechnet bei Mismatch neu — zuvor konnte
+  eine Katalog-Rekalibrierung (z. B. `benefit_per_m2_year` 1,5 → 0,02 €/m²) gespeicherte
+  Nutzen-Zahlen um Größenordnungen verfälschen, weil nur der manuelle
+  `calculate-impact`-Endpunkt neu rechnete.
 
 ### Quellen & Provenienz (`sources`, `source_details`, `source_refs`)
 

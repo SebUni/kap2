@@ -8,7 +8,7 @@ import ProjectStatusPanel from './dashboard/ProjectStatusPanel'
 export default function ConfigPanelTab() {
   const {
     kommune, catalog, status, loadStatus, loadCatalog,
-    configPanelRequested, configScrollAnchor, setShowConfig,
+    configPanelRequested, configScrollAnchor, setShowConfig, demoMode,
   } = useStore()
   const [parameters, setParameters] = useState<ModelParameter[]>([])
   const [loading, setLoading] = useState(false)
@@ -53,16 +53,20 @@ export default function ConfigPanelTab() {
   return (
     <div className="kap-config-panel">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h2 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>Konfiguration</h2>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>
+          {demoMode ? 'Parameter (Demo — schreibgeschützt)' : 'Konfiguration'}
+        </h2>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <a
-            className="btn btn-secondary"
-            href={api.exportParametersUrl(kommune.id)}
-            download
-            style={{ fontSize: '0.8rem', textDecoration: 'none' }}
-          >
-            Parameter exportieren (xlsx)
-          </a>
+          {!demoMode && (
+            <a
+              className="btn btn-secondary"
+              href={api.exportParametersUrl(kommune.id)}
+              download
+              style={{ fontSize: '0.8rem', textDecoration: 'none' }}
+            >
+              Parameter exportieren (xlsx)
+            </a>
+          )}
           <button
             className="btn btn-primary"
             style={{ fontSize: '0.8rem' }}
@@ -72,12 +76,20 @@ export default function ConfigPanelTab() {
               : 'Erst verfügbar, wenn die Berechnung abgeschlossen ist'}
             onClick={() => setShowConfig(false)}
           >
-            Konfiguration schließen
+            Schließen
           </button>
         </div>
       </div>
 
-      <ProjectStatusPanel />
+      {demoMode ? (
+        <div className="demo-banner" style={{ marginBottom: '1rem' }}>
+          🔒 Parameter sind in der Demo gesperrt und können nur in der
+          Vollversion angepasst werden. Für gesperrte Ebenen sind Wert und
+          Quelle ausgeblendet.
+        </div>
+      ) : (
+        <ProjectStatusPanel />
+      )}
 
       {loading && <p style={{ color: 'var(--text-muted)' }}>Parameter werden geladen …</p>}
       {error && !loading && (

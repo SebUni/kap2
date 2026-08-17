@@ -1,47 +1,52 @@
-"""Hintergrund-Assessment (ein Lauf je Kommune) mit Status-Tracking & Abbruch."""
+"""Parent-Seite der Hintergrund-Bewertung: Warteschlange + Kind-Prozesse.
+
+Assessments laufen NICHT mehr als Thread im API-Prozess, sondern als detachte
+Kind-Prozesse (``app.tasks.assessment_worker``): Der API-Prozess bleibt klein,
+und der Rechen-RAM geht mit dem Kind-Exit vollständig ans OS zurück.
+
+Wahrheit über Läufe liegt in der DB (``ProjectStatus``: Status, ``worker_pid``
++ ``worker_start_ticks`` gegen PID-Reuse, ``abort_requested``, ``queued_at``).
+Dieses Modul hält nur Popen-Handles zum Zombie-Reaping/Exit-Code-Lesen sowie
+einen Scheduler-Thread, der Slots (``ASSESSMENT_MAX_CONCURRENT``) FIFO vergibt.
+Damit überstehen Läufe Reload/Neustart des API-Prozesses: verwaiste Kinder
+rechnen weiter und bleiben über PID+Ticks korrekt als „läuft" erkennbar.
+"""
+
+from __future__ import annotations
 
 import logging
+import os
+import signal
+import subprocess
+import sys
 import threading
-import traceback
+import time
 from datetime import datetime
 
-from geoalchemy2.shape import to_shape
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.db.database import SessionLocal
-from app.models.models import (
-    Kommune, GridCell, CellAssessment, ProjectStatus, AssessmentStatus,
-)
-from app.services.engine.progress import FINALIZE, MonotonicProgress
-from app.services.engine.runner import run_full_assessment
+from app.models.models import AssessmentStatus, ProjectStatus
+from app.tasks.memory_watchdog import pid_alive, proc_start_ticks
 
 log = logging.getLogger(__name__)
 
 TASK_KEY = "assessment"
 LEVEL = 1
 
-_running_tasks: dict[int, threading.Event] = {}
+_BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_LOG_DIR = os.path.join(_BACKEND_DIR, "logs")
 
+_SCHEDULER_TICK_S = 3.0
+_ABORT_KILL_GRACE_S = 30.0
 
-def run_assessment_background(kommune_id: int):
-    """Startet einen Hintergrund-Thread für die vollständige Bewertung."""
-    if kommune_id in _running_tasks:
-        _running_tasks[kommune_id].set()
-    cancel_event = threading.Event()
-    _running_tasks[kommune_id] = cancel_event
-    thread = threading.Thread(
-        target=_run_assessment, args=(kommune_id, cancel_event), daemon=True,
-    )
-    thread.start()
-    log.info("[TASK] Assessment-Thread gestartet für kommune=%s", kommune_id)
-
-
-def abort_assessment(kommune_id: int) -> bool:
-    event = _running_tasks.get(kommune_id)
-    if event:
-        event.set()
-        return True
-    return False
+_lock = threading.RLock()
+_procs: dict[int, subprocess.Popen] = {}          # kommune_id → Popen (nur Reaping)
+_last_exit: dict[int, int] = {}                   # kommune_id → letzter Exit-Code
+_kill_deadlines: dict[int, float] = {}            # kommune_id → SIGKILL-Frist nach Abort
+_wake = threading.Event()
+_scheduler_started = False
 
 
 def _get_status(db: Session, kommune_id: int) -> ProjectStatus:
@@ -56,158 +61,245 @@ def _get_status(db: Session, kommune_id: int) -> ProjectStatus:
     return status
 
 
-def _run_assessment(kommune_id: int, cancel_event: threading.Event):
-    db: Session = SessionLocal()
-    status = None
+def is_row_alive(status: ProjectStatus) -> bool:
+    """True, wenn der zur Status-Zeile gehörende Kind-Prozess lebt."""
+    return pid_alive(status.worker_pid, status.worker_start_ticks)
+
+
+def is_task_alive(db: Session, kommune_id: int) -> bool:
+    status = (
+        db.query(ProjectStatus)
+        .filter(ProjectStatus.kommune_id == kommune_id, ProjectStatus.task_key == TASK_KEY)
+        .first()
+    )
+    return bool(status and is_row_alive(status))
+
+
+def _signal_pid(pid: int | None, sig: int) -> None:
+    if not pid:
+        return
+    try:
+        os.kill(pid, sig)
+    except (ProcessLookupError, PermissionError):
+        pass
+
+
+def run_assessment_background(kommune_id: int) -> None:
+    """Reiht die Kommune ein; der Scheduler startet, sobald ein Slot frei ist.
+
+    Läuft für dieselbe Kommune bereits ein Prozess, wird er abgebrochen und die
+    Kommune neu eingereiht (bisherige Neustart-Semantik). Die Status-Zeile
+    gehört ab jetzt dem NEUEN Lauf — der alte Kind-Prozess erkennt das an
+    Status ≠ RUNNING/fremder PID und schreibt kein ERROR mehr hinein.
+    """
+    db = SessionLocal()
     try:
         status = _get_status(db, kommune_id)
-        status.status = AssessmentStatus.RUNNING
+        restarting = is_row_alive(status)
+        if restarting:
+            _signal_pid(status.worker_pid, signal.SIGTERM)
+            with _lock:
+                _kill_deadlines[kommune_id] = time.monotonic() + _ABORT_KILL_GRACE_S
+        status.status = AssessmentStatus.QUEUED
+        status.queued_at = datetime.utcnow()
         status.progress_pct = 0.0
-        status.started_at = datetime.utcnow()
+        status.message = (
+            "Neustart angefordert – wartet auf freien Berechnungs-Slot …"
+            if restarting else "Wartet auf freien Berechnungs-Slot …"
+        )
+        status.started_at = None
         status.finished_at = None
-        status.message = "Berechnung gestartet..."
         status.step_history = []
         status.eta_seconds = None
+        status.abort_requested = restarting  # Signal an den ALTEN Prozess
         db.commit()
-
-        cells = db.query(GridCell).filter(GridCell.kommune_id == kommune_id).all()
-        if not cells:
-            status.status = AssessmentStatus.ERROR
-            status.message = "Keine Grid-Zellen gefunden. Bitte zuerst Grid generieren."
-            status.finished_at = datetime.utcnow()
-            db.commit()
-            return
-
-        grid_cell_dicts = [{
-            "id": c.id,
-            "gitter_id": c.gitter_id,
-            "x_3035": c.x_3035,
-            "y_3035": c.y_3035,
-            "row": c.row_idx,
-            "col": c.col_idx,
-            "cell_size_m": c.cell_size_m,
-            "geometry": to_shape(c.geometry),
-        } for c in cells]
-
-        kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
-        bundesland = kommune.bundesland if kommune else None
-        population = kommune.population if kommune else None
-        area_km2 = kommune.area_km2 if kommune else None
-        osm_id = kommune.osm_id if kommune else None
-
-        # Kommune-Zentroid (lon, lat) für ortsaufgelöste regionale Treiber (§B2).
-        centroid = None
-        if kommune is not None and kommune.boundary is not None:
-            try:
-                c = to_shape(kommune.boundary).centroid
-                centroid = (c.x, c.y)
-            except Exception:
-                centroid = None
-
-        _last_pct = [0.0]
-        _last_phase = [""]
-        _steps: list[dict] = []
-        _start = datetime.utcnow()
-
-        def update_progress(pct: float, phase: str | None = None, detail: str | None = None):
-            if cancel_event.is_set():
-                raise InterruptedError("Berechnung abgebrochen")
-            status.progress_pct = round(pct, 1)
-            now = datetime.utcnow()
-            elapsed = (now - _start).total_seconds()
-            status.eta_seconds = round(elapsed * (100.0 - pct) / pct, 1) if pct > 0 else None
-            if phase and phase != _last_phase[0]:
-                iso = now.isoformat()
-                if _steps:
-                    _steps[-1]["finished"] = iso
-                    _steps[-1]["pct_end"] = round(pct, 1)
-                _steps.append({"label": phase, "detail": detail or "", "started": iso,
-                               "finished": None, "pct_start": round(pct, 1), "pct_end": None})
-                _last_phase[0] = phase
-                status.step_history = list(_steps)
-            elif detail and _steps:
-                _steps[-1]["detail"] = detail
-                status.step_history = list(_steps)
-            status.message = f"{round(pct):.0f}% – {_last_phase[0] or 'Berechnung'}"
-            if pct - _last_pct[0] >= 1.0 or pct >= 100.0 or phase:
-                db.commit()
-                _last_pct[0] = pct
-
-        progress = MonotonicProgress(update_progress)
-        from app.services import parameter_registry
-        from app.services.engine.override_context import set_overrides
-
-        overrides = parameter_registry.overrides_map(
-            parameter_registry.load_db_overrides(db, kommune_id)
-        )
-        set_overrides(overrides)
-        results = run_full_assessment(
-            grid_cell_dicts, bundesland, population, area_km2, progress, overrides, osm_id,
-            centroid,
-        )
-
-        update_progress(FINALIZE[0], "Speichere Ergebnisse")
-        db.query(CellAssessment).filter(CellAssessment.kommune_id == kommune_id).delete()
-        now = datetime.utcnow()
-        for r in results:
-            db.add(CellAssessment(
-                kommune_id=kommune_id, grid_cell_id=r["grid_cell_id"],
-                data=r["data"], calculated_at=now,
-            ))
-        update_progress(FINALIZE[1], "Speichere Ergebnisse")
-
-        # Kommunen-Bevölkerung als Zensus-Summe der Zellen persistieren
-        # (korrekter als der nie gesetzte Anlage-Wert; Basis fürs Kommunen-Profil)
-        pop_sum = sum(
-            float((r["data"].get("inputs") or {}).get("pop", 0.0) or 0.0)
-            for r in results
-        )
-        if kommune is not None and pop_sum > 0:
-            kommune.population = int(round(pop_sum))
-
-        status.status = AssessmentStatus.DONE
-        status.progress_pct = 100.0
-        status.finished_at = datetime.utcnow()
-        finished_iso = status.finished_at.isoformat()
-        status.message = f"100% – Abgeschlossen"
-        status.eta_seconds = 0.0
-        if _steps:
-            _steps[-1]["finished"] = finished_iso
-            _steps[-1]["pct_end"] = round(FINALIZE[1], 1)
-        _steps.append({
-            "label": "Abgeschlossen",
-            "detail": f"{len(results)} Zellen berechnet",
-            "started": finished_iso,
-            "finished": finished_iso,
-            "pct_start": 100.0,
-            "pct_end": 100.0,
-        })
-        status.step_history = list(_steps)
-        db.commit()
-        log.info("[TASK] Assessment DONE: %d Zellen", len(results))
-
-        # Karten-Layer-Cache neu bauen (fertige gzip-Dateien auf Platte)
-        try:
-            from app.services import aggregate_cache, layer_cache
-            aggregate_cache.invalidate(kommune_id)
-            layer_cache.invalidate(kommune_id)
-            layer_cache.precompute(db, kommune_id)
-        except Exception:
-            log.exception("[TASK] layer_cache precompute failed kommune=%s", kommune_id)
-
-    except InterruptedError:
-        if status:
-            status.status = AssessmentStatus.ERROR
-            status.message = "Berechnung wurde abgebrochen"
-            status.finished_at = datetime.utcnow()
-            db.commit()
-    except Exception as e:
-        log.error("[TASK] Assessment FAILED:\n%s", traceback.format_exc())
-        if status:
-            status.status = AssessmentStatus.ERROR
-            status.message = f"Fehler: {str(e)[:500]}"
-            status.finished_at = datetime.utcnow()
-            db.commit()
     finally:
-        _running_tasks.pop(kommune_id, None)
         db.close()
+    ensure_scheduler_started()
+    _wake.set()
+
+
+def abort_assessment(db: Session, kommune_id: int) -> bool:
+    """Bricht einen laufenden oder eingereihten Lauf ab. True = etwas abgebrochen."""
+    status = (
+        db.query(ProjectStatus)
+        .filter(ProjectStatus.kommune_id == kommune_id, ProjectStatus.task_key == TASK_KEY)
+        .first()
+    )
+    if not status:
+        return False
+    alive = is_row_alive(status)
+    if status.status in (AssessmentStatus.RUNNING, AssessmentStatus.QUEUED) and alive:
+        status.abort_requested = True
+        db.commit()
+        _signal_pid(status.worker_pid, signal.SIGTERM)
+        with _lock:
+            _kill_deadlines[kommune_id] = time.monotonic() + _ABORT_KILL_GRACE_S
+        ensure_scheduler_started()
+        _wake.set()
+        return True
+    if status.status in (AssessmentStatus.RUNNING, AssessmentStatus.QUEUED):
+        # Kein lebender Prozess (Neustart/Standby/tot) → autoritativ beenden,
+        # sonst bliebe der Lauf für immer als „läuft/wartet" hängen.
+        status.status = AssessmentStatus.ERROR
+        status.message = "Berechnung abgebrochen"
+        status.finished_at = datetime.utcnow()
+        status.queued_at = None
+        status.worker_pid = None
+        db.commit()
+        return True
+    return False
+
+
+def ensure_scheduler_started() -> None:
+    """Startet den Scheduler-Thread genau einmal (idempotent)."""
+    global _scheduler_started
+    with _lock:
+        if _scheduler_started:
+            return
+        _scheduler_started = True
+    thread = threading.Thread(target=_scheduler_loop, daemon=True, name="assessment-scheduler")
+    thread.start()
+    log.info("[TASK] Assessment-Scheduler gestartet (max_concurrent=%s)",
+             settings.ASSESSMENT_MAX_CONCURRENT)
+
+
+def recover_on_startup() -> None:
+    """Nach API-Start: tote RUNNING-Zeilen heilen, Warteschlange wieder anwerfen.
+
+    RUNNING-Zeilen mit LEBENDEM Prozess bleiben unangetastet — das sind
+    verwaiste Kinder eines früheren API-Prozesses (z. B. ``--reload``), die
+    weiterrechnen und ihren Status selbst pflegen.
+    """
+    try:
+        db = SessionLocal()
+        try:
+            rows = (
+                db.query(ProjectStatus)
+                .filter(ProjectStatus.task_key == TASK_KEY,
+                        ProjectStatus.status == AssessmentStatus.RUNNING)
+                .all()
+            )
+            for row in rows:
+                if not is_row_alive(row):
+                    row.status = AssessmentStatus.ERROR
+                    row.message = "Berechnung unterbrochen (Standby/Neustart) – bitte neu starten"
+                    row.finished_at = datetime.utcnow()
+                    row.worker_pid = None
+            db.commit()
+        finally:
+            db.close()
+    except Exception:
+        log.exception("[TASK] recover_on_startup fehlgeschlagen")
+    ensure_scheduler_started()
+    _wake.set()
+
+
+def _scheduler_loop() -> None:  # pragma: no cover - Endlosschleife; Logik in _scheduler_tick
+    while True:
+        _wake.wait(timeout=_SCHEDULER_TICK_S)
+        _wake.clear()
+        try:
+            _scheduler_tick()
+        except Exception:
+            log.exception("[TASK] Scheduler-Tick fehlgeschlagen")
+
+
+def _scheduler_tick() -> None:
+    now = time.monotonic()
+    with _lock:
+        for kid, proc in list(_procs.items()):
+            rc = proc.poll()
+            if rc is None:
+                continue
+            _procs.pop(kid, None)
+            _kill_deadlines.pop(kid, None)
+            _last_exit[kid] = rc
+            log.info("[TASK] Assessment-Kindprozess beendet kommune=%s exit=%s", kid, rc)
+        deadlines = dict(_kill_deadlines)
+
+    db = SessionLocal()
+    try:
+        rows = (
+            db.query(ProjectStatus)
+            .filter(ProjectStatus.task_key == TASK_KEY,
+                    ProjectStatus.status.in_([AssessmentStatus.RUNNING, AssessmentStatus.QUEUED]))
+            .all()
+        )
+        occupied = 0
+        startable: list[ProjectStatus] = []
+        for row in rows:
+            alive = is_row_alive(row)
+            if row.status == AssessmentStatus.RUNNING:
+                if alive:
+                    occupied += 1
+                    if row.abort_requested:
+                        deadline = deadlines.get(row.kommune_id)
+                        if deadline is not None and now > deadline:
+                            # Sanfter Abbruch greift nicht → ganze Prozessgruppe
+                            # töten (Kind ist Session-Leader: pgid == pid).
+                            log.warning("[TASK] SIGKILL für hängenden Lauf kommune=%s pid=%s",
+                                        row.kommune_id, row.worker_pid)
+                            try:
+                                os.killpg(row.worker_pid, signal.SIGKILL)
+                            except (ProcessLookupError, PermissionError):
+                                pass
+                else:
+                    # Prozess starb, ohne seinen Status zu schreiben (SIGKILL/
+                    # Kernel-OOM/Crash) → Zeile heilen, mit Exit-Code wenn bekannt.
+                    rc = _last_exit.pop(row.kommune_id, None)
+                    row.status = AssessmentStatus.ERROR
+                    row.message = (
+                        f"Berechnung unerwartet beendet (Exit {rc}, evtl. RAM/OOM)"
+                        if rc is not None
+                        else "Berechnung unterbrochen (Prozess beendet) – bitte neu starten"
+                    )
+                    row.finished_at = datetime.utcnow()
+                    row.worker_pid = None
+            else:  # QUEUED
+                if alive:
+                    # Neustart-Übergang: der ALTE Prozess wickelt noch ab und
+                    # belegt den Slot; erst starten, wenn er weg ist.
+                    occupied += 1
+                else:
+                    startable.append(row)
+
+        startable.sort(key=lambda r: r.queued_at or datetime.min)
+        slots = max(0, int(settings.ASSESSMENT_MAX_CONCURRENT) - occupied)
+        for row in startable[:slots]:
+            _spawn(row)
+        db.commit()
+    finally:
+        db.close()
+
+
+def _spawn(row: ProjectStatus) -> None:
+    """Startet den Kind-Prozess und markiert die Zeile sofort als RUNNING.
+
+    Das sofortige Setzen von PID/Ticks im Parent schließt das Fenster, in dem
+    ein zweiter Scheduler-Tick dieselbe QUEUED-Zeile noch einmal starten könnte.
+    """
+    kid = row.kommune_id
+    os.makedirs(_LOG_DIR, exist_ok=True)
+    log_path = os.path.join(_LOG_DIR, f"worker-{kid}.log")
+    with open(log_path, "ab") as log_fh:
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "app.tasks.assessment_worker", str(kid)],
+            cwd=_BACKEND_DIR,
+            stdout=log_fh,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,   # eigene Prozessgruppe: überlebt --reload; killpg möglich
+            close_fds=True,
+        )
+    with _lock:
+        _procs[kid] = proc
+    row.status = AssessmentStatus.RUNNING
+    row.message = "Berechnungsprozess gestartet …"
+    row.progress_pct = 0.0
+    row.started_at = datetime.utcnow()
+    row.finished_at = None
+    row.worker_pid = proc.pid
+    row.worker_start_ticks = proc_start_ticks(proc.pid)
+    row.abort_requested = False
+    log.info("[TASK] Assessment-Kindprozess gestartet kommune=%s pid=%s (log: %s)",
+             kid, proc.pid, log_path)

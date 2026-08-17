@@ -3,8 +3,8 @@ from datetime import datetime
 
 from geoalchemy2 import Geometry
 from sqlalchemy import (
-    Column, Integer, String, Float, DateTime, Enum, ForeignKey, JSON, Text,
-    UniqueConstraint
+    BigInteger, Boolean, Column, Integer, String, Float, DateTime, Enum,
+    ForeignKey, JSON, Text, UniqueConstraint
 )
 from sqlalchemy.orm import relationship
 
@@ -15,6 +15,7 @@ from app.db.database import Base
 
 class AssessmentStatus(str, enum.Enum):
     PENDING = "pending"
+    QUEUED = "queued"    # wartet auf freien Assessment-Slot (ASSESSMENT_MAX_CONCURRENT)
     RUNNING = "running"
     DONE = "done"
     ERROR = "error"
@@ -35,6 +36,8 @@ class Kommune(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     bundesland = Column(String(100))
+    # Landkreis aus Nominatim address.county (kreisfreie Städte: NULL).
+    landkreis = Column(String(150))
     osm_id = Column(String(50), unique=True)
     boundary = Column(Geometry("MULTIPOLYGON", srid=4326))
     area_km2 = Column(Float)
@@ -125,6 +128,10 @@ class AdaptationMeasure(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     kommune_id = Column(Integer, ForeignKey("kommunen.id", ondelete="CASCADE"), nullable=False)
+    # Demo-Sitzung (NULL = echte Produkt-Maßnahme). Produktpfade filtern
+    # demo_session_id IS NULL; Demo-Pfade auf die eigene Session.
+    demo_session_id = Column(String(36), ForeignKey("demo_sessions.id", ondelete="CASCADE"),
+                             nullable=True, index=True)
     name = Column(String(255), nullable=False)
     measure_type = Column(String(100), nullable=False)
     geometry = Column(Geometry("POLYGON", srid=4326), nullable=False)
@@ -178,6 +185,16 @@ class ProjectStatus(Base):
     finished_at = Column(DateTime)
     step_history = Column(JSON, default=list)   # [{label, detail, started, finished, pct_start, pct_end}]
     eta_seconds = Column(Float)                 # estimated seconds remaining
+    # Kind-Prozess-Verwaltung: das Assessment läuft als eigener OS-Prozess
+    # (app/tasks/assessment_worker.py); Liveness = PID + Start-Ticks statt
+    # In-Prozess-Threadliste, damit Status auch Reload/Neustart übersteht.
+    worker_pid = Column(Integer)
+    worker_start_ticks = Column(BigInteger)     # /proc/<pid>/stat Feld 22 (gegen PID-Reuse)
+    abort_requested = Column(Boolean, nullable=False, default=False, server_default="false")
+    queued_at = Column(DateTime)                # FIFO-Ordnung der Warteschlange
+    # Quelldaten (z. B. Zensus) haben sich geändert → Neuberechnung empfohlen,
+    # wird aber nie automatisch gestartet (bewusste Entscheidung des Nutzers).
+    recalc_recommended = Column(Boolean, nullable=False, default=False, server_default="false")
 
     kommune = relationship("Kommune", back_populates="project_statuses")
 
@@ -234,3 +251,29 @@ class GeoExportJob(Base):
     finished_at = Column(DateTime)
 
     kommune = relationship("Kommune", back_populates="geo_exports")
+
+
+# ── KI-Assistent (Mistral) ──────────────────────────────────────────────────────
+#
+# Der KI-Schlüssel/Modell/Limits liegen im bestehenden globalen Key-Value-Store
+# ``AppSetting`` (app/models/demo_models.py), Zugriff über app_settings_service.
+# Sicherheitshinweis: 'ai_api_key' wird dort im Klartext gespeichert — in der
+# Single-Tenant-Installation bewusst akzeptiert; der Schlüssel wird nie über die
+# API zurückgegeben (nur Vorhanden-Flag + letzte 4 Zeichen).
+
+class AiUsage(Base):
+    """Token-Verbrauchs-Ledger je abgeschlossener KI-Anfrage.
+
+    Eine Zeile pro Anfrage (statt fortlaufender Zähler): liefert Audit-Trail und
+    Verbrauchsanzeige und bleibt robust, wenn Limits nachträglich geändert werden.
+    Tages-/Monatsverbrauch = SUM(total_tokens) gefiltert über created_at.
+    """
+    __tablename__ = "ai_usage"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    kommune_id = Column(Integer, nullable=True)  # bewusst ohne FK: Log überlebt Kommune-Löschung
+    model = Column(String(50), nullable=False, default="")
+    prompt_tokens = Column(Integer, nullable=False, default=0)
+    completion_tokens = Column(Integer, nullable=False, default=0)
+    total_tokens = Column(Integer, nullable=False, default=0, index=True)

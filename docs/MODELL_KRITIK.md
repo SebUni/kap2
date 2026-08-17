@@ -659,3 +659,78 @@ Schaden, KOSTRA, UFZ-SMI) speisen die Schadenskurven erst als spätere Verfeiner
 eine bewusste Näherung (Maßnahmen wirken auf den Screening-Index, nicht auf die Hazard-
 Intensität); die Dashboard-Anzeige der neuen Kennzahlen (``sanity_ratio``, Top-5 %,
 Fläche) folgt in Prompt 7.
+
+## 9. Dashboard-Review „Risikokommunikation" (Juli 2026)
+
+Anlass: Kommunen-Feedback — Radar „Risikofelder (KWRA)" zeigte Mini-Werte
+(Verbund & Kaskaden 0,55/100) neben Millionenschäden; die Karte zeigte für dieselben
+Risiken Hotspots. Drei entkoppelte Skalen sendeten widersprüchliche Botschaften.
+Alle Befunde an Oschatz (Kommune 2) verifiziert.
+
+| # | Befund | Schwere | Behebung |
+|---|--------|---------|----------|
+| **D1** | **P90-Verdünnung durch unexponierte Zellen.** Der Kommune-Index je Risiko war das P90 über ALLE Rasterzellen — in Oschatz sind nur 611 von 5825 Zellen (10,5 %) bewohnt, das P90 pop-skalierter Risiken landete strukturell im unbewohnten Umland. Beispiel Psychische Belastung: P90 über alle Zellen **0,0**, über bewohnte Zellen **13,6**, Max **29,8**. Der Radar zeigte „kein Problem", die (lokal min/max-gestreckte) Karte „Brennpunkte" — beides aus denselben Daten. | hoch | **Belastungs-P90** (`exposed_p90_index`): P90 nur über expositionsrelevante Zellen (pop-Risiken: `pop > 0`; area/flat: mindestens eine Pfad-Exposition > 0), plus `exposure_share`. `index`/`p90_index` unverändert (keine stille Semantikänderung). Dashboard zeigt Belastung (gefüllt) + Hotspot-Maximum (gestrichelt) — der Karteneindruck ist damit im Radar sichtbar. |
+| **D2** | **Keine Einordnung der Indexhöhe.** 0–100-Werte ohne Klassen: Kommunen konnten „13,6" nicht deuten; €-Millionenbeträge daneben suggerierten Dramatik, die der modelleigene Sanity-Anker teils als Überkalibrierung ausweist (Gebäude 25×, indirekte Verluste 35× der Referenz). | mittel | **Risikoklassen** gering/mittel/hoch an EINER Stelle (`tunables.classify_index`): hoch ≥ Risikozonen-Schwelle (50) → „hoch" ≙ Risikozonen-Kriterium der Karte; mittel ≥ 0,4·Schwelle (20). Abgeleitete Konstanten (kein Registry-Parameter); Meta-Block `classification` liefert dem Frontend die Grenzen. Chips im Dashboard, Klassen-Ringe im Radar, Index↔€-Toggle je Risikofeld. |
+| **D3** | **Stale `impact_summary` verfälschte Nutzen um Faktor ~80.** „Trockenresistente Sorten" (Oschatz) wies 7,94 Mio €/a Nutzen aus = 5,24 Mio m² × **1,5 €/m²** (ALTER Katalogwert) + 82 k € Schadens-Nutzen — der Katalog war längst auf 0,02 €/m²/a rekalibriert (CAPEX nutzte bereits den neuen Wert). Ursache: Summaries wurden nur vom manuellen `calculate-impact`-Endpunkt neu gerechnet; Katalog-/Parameter-/Zelldaten-Änderungen invalidierten nichts. `cost-summary`/Export/Tabellen reichten die Zahl ungeprüft durch (Σ Nutzen 7,96 Mio €/a neben belastbaren 100 k €/a Aggregat-Differenz). | **kritisch** | **`params_fingerprint`** (SHA1 über aufgelöste mdef-Kostenfelder + Overrides + MODEL_VERSION + Zelldaten-Stand + Maßnahmen-Config) im Summary; `ensure_fresh_impact_summary` prüft in allen Lesepfaden und rechnet bei Mismatch neu. |
+| **D4** | **„Nutzen" vermengte zwei Konzepte.** `annual_benefit_eur` addierte vermiedene Schäden und direkten Zusatznutzen (`benefit_per_m2_year·Fläche`, z. B. Mehrertrag) zu einer Zahl; das Dashboard zeigte daneben „Vermiedene Schäden" aus dem anderen Rechenweg — Addition beider hätte doppelt gezählt. | mittel | Aufschlüsselung `annual_benefit_damage/flat/direct_eur` (+ Totale in `cost-summary`); Dashboard-KPI „Jährlicher Nutzen" = Aggregat-Differenz (belastbar) + Σ Zusatznutzen, mit Subline „davon vermiedene Schäden / Zusatznutzen". Defense-in-depth: Schadens-Nutzen je Maßnahme am Gesamtschaden der verknüpften Risiken gekappt (`benefit_capped`); `benefit_consistency_warning` bei > ±25 % Abweichung der Pfade. |
+| **D5** | **Karte ohne Skalen-Ehrlichkeit.** Die Raster-Färbung streckt auf das lokale Min/Max der Gemeinde (`layer_cache`) — sie zeigt IMMER Hotspots, auch bei absolut winzigen Werten (Psychische Belastung: Max-Outcome 0,03 Fälle/Zelle tiefrot). | klein | Legenden-Hinweis „Farbskala relativ zum Min/Max dieser Gemeinde — zeigt lokale Brennpunkte, nicht die absolute Höhe". |
+
+Bewusst offen: die per Sanity-Anker markierten Überkalibrierungen der €-Schadensfunktionen
+(Gebäude 25×, indirekt 35×) sind ein eigenes Kalibrierungsthema (§6.6) und wurden hier
+nur sichtbar gemacht, nicht neu kalibriert.
+
+## 10. Umbau der Mortalitätsrechnung (August 2026)
+
+Anlass: Der RKI meldete für 2026 rund 9.800 hitzebedingte Sterbefälle bis KW 29 —
+mehr als in jedem Gesamtjahr seit 2016. Die bis dahin verwendete Formel zitierte
+zwar die RKI-Literatur, bildete deren Struktur aber nicht ab:
+
+```
+Outcome = pop · Basissterblichkeit/100k · AF(Hitzetage) · g(V̂)
+```
+
+| # | Befund | Schwere | Behebung |
+|---|--------|---------|----------|
+| **M1** | **Keine Altersschichtung.** Das Alter wirkte nur über `g(V̂) ∈ [0,5; 1,5]`. Laut RKI entfallen ~55 % der Hitzetoten auf die Gruppe ab 85 Jahren bei ~3 % Bevölkerungsanteil — ein ±50 %-Multiplikator kann einen ~86-fachen Unterschied der Basissterblichkeit nicht abbilden. `pop_over_65` wurde berechnet und nie verwendet. | **kritisch** | Vier Altersbänder je Zelle aus dem Zensus-Gitter „Alter in 5-Jahresgruppen"; altersspezifische Basissterblichkeit statt pauschal 1.130/100k. Bandspezifische Kurvensteigungen **aus der publizierten Altersverteilung zurückgerechnet**, nicht gewählt. Kontrolle: Das Modell trifft die RKI-Verteilung auf <1 Prozentpunkt. |
+| **M2** | **Alter wurde dort, wo es wirkte, doppelt gezählt.** `g(V̂)` mittelte u. a. `HEAT_SENSITIVITY` und `VULNERABLE_GROUPS_SHARE` — beide enthalten `share_vuln` (Review V-E). Mit expliziten Altersbändern wäre daraus eine Dreifachzählung geworden. | hoch | `g(V̂)` für die Mortalität durch einen rein nicht-demografischen Versorgungs-Modifikator ersetzt. Die Demografie steckt jetzt genau einmal in `pop_a`. Für die Verletzten-Kanäle bleibt `g(V̂)` — deren Vulnerabilitäten (Notfallmanagement, Frühwarnung) sind nicht demografisch. |
+| **M3** | **Hitzetage sind ein schwacher Stellvertreter.** Die RKI-Kurve läuft über die Wochenmitteltemperatur. Gegenprobe an der eigenen Datenlage (RKI-Reihe 1992–2021 gegen `dwd_data`-Zeitreihen): Jahresmitteltemperatur erklärt **r² = 0,09** der Varianz, Hitzetage 0,70, sommerliche Tagesmaxima 0,68. 2003 war ein *kühles* Jahr im Jahresmittel (9,4 °C) mit 9.500 Hitzetoten. | hoch | Zellscharfe **Sommermitteltemperatur** aus den DWD-CDC-Monatsrastern (Jun–Aug, 1 km) statt eines Kommune-Werts am Zentroid. Behebt zugleich die offene Lücke B2.1 aus REVIEW_WIRKUNGSMECHANISMEN. |
+| **M4** | **Die Schwelle hätte das Ergebnis genullt.** Die Wirkschwellen liegen bei 19,7–20,8 °C, das deutsche Sommermittel bei **18,5 °C** (gemessen im Raster). Am Mittelwert ausgewertet läge fast jede Zelle unter der Schwelle. | **kritisch** | Die Kurve wird über die *Verteilung* der 13 Sommerwochen summiert (deterministische Quantile, kein Zufall). Die Streuung σ = 2,0 K ist aus den Monatsrastern abgeleitet (1,03 K zwischen Monaten/Jahren + ~1,7 K synoptisch), **nicht** auf den Zielwert getrimmt. |
+| **M5** | **Nur Hitze erzeugte Todesfälle.** Flut und Sturm lieferten ausschließlich Verletzte und Evakuierte; Ertrinkende und Sturmopfer fehlten vollständig. | hoch | Eigene Kanäle für Flut- und Sturmmortalität. Bei Flut entscheidet das **Regime**: Ahr 2021 über 180 Todesopfer gegen Elbe 2002 rund 21 bei weit größerer Fläche — ohne Hydraulik bildet das Gelände (Hangneigung × Senkenlage) diesen Unterschied ab. |
+| **M6** | **`max()` über Gefahren war falsch, nicht nur unsauber.** `EXPECTED_ANNUAL_INJURIES` verknüpfte Flut, Sturm und Hangrutsch mit einem Maximum. Verletzte aus verschiedenen Gefahren sind aber additive Ereignisse; Mehrgefahren-Kommunen wurden systematisch untererfasst, und die beiden `alternate_hazard`-Ketten trugen zum absoluten Outcome gar nichts bei. | mittel | Auftrennung in drei Risiken mit je eigener Primärkette. Raten neu hergeleitet aus den ICD-10-Außenursachen X36/X37/X38 (in der deutschen Kodierpraxis **Neben**diagnosen — daher DRG-Statistik 23141, nicht die Hauptdiagnose-Tabelle). Die Raten zählen ausschließlich nicht-tödlich Verletzte, damit die neuen Todesfall-Kanäle nicht doppelt bewertet werden. |
+| **M7** | **Screening-Norm leckte in absolute Werte.** `HEAT_WAVE` war auf 0…40 geklemmt — das ist der Katalog-`norm_max`, also eine Screening-Grenze. In sehr heißen Stadtzellen kappte sie auch die absoluten Schäden (§3.3-Restlücke). | mittel | Kappung entfernt; die Normierung auf 0…1 begrenzt weiterhin, aber erst im Index-Pfad. |
+| **M8** | **Projektion umging die Nichtlinearität.** `scenario_factors` skalierte EINEN €-Gesamtwert linear mit dem Hitzetage-Trend — für alle Gefahrengruppen gleich. | hoch | Gefahrengruppen-spezifische Faktoren; für Hitze das Verhältnis der Wirkungskurve bei projizierter gegenüber heutiger Temperatur. Wirkung: Unter RCP8.5 ergibt sich für 2065 Faktor **9,55** statt linear 2,67 — die alte Rechnung unterschätzte künftige Hitzetote um das ~3,6-Fache. |
+
+### Kalibrierung
+
+Einziger freier Parameter der Hitzemortalität ist `calibration`; alle übrigen
+Koeffizienten stammen aus der Literatur oder sind aus ihr zurückgerechnet.
+Bestimmt aus einer bundesweiten Rechnung über 208.622 besiedelte 1-km-Zellen:
+Die **bevölkerungsgewichtete** Sommertemperatur beträgt 19,01 °C gegenüber 18,55 °C
+im Flächenmittel — Menschen wohnen in den wärmeren Lagen, und das zählt, weil die
+Kurve konvex ist. Das Modell liefert damit ~4.625 Sterbefälle, das Mittel der
+signifikanten RKI-Hitzejahre liegt bei ~6.656 → `calibration = 1,44`. Der Rest deckt
+die im 1-km-Raster nicht aufgelöste Wärmeinsel-Konvexität, die Randwochen des
+RKI-Sommerhalbjahrs (KW 15–40 gegenüber Jun–Aug hier) und die Nachlaufwochen der
+RKI-Methodik ab — alle drei wirken in dieselbe Richtung.
+
+### Bewusst offen
+
+- **Kältemortalität.** Zurückgestellt. Es gibt **keine** RKI-Zeitreihe (der
+  Wochenbericht ist reiner Sommerbetrieb); deutscher Anker wäre Rau/Dietrich/Köppen
+  „Hitze- und kälteassoziierte Sterblichkeit 2000–2023“. Zu beachten: Referenz wäre
+  die Minimum-Mortalitäts-Temperatur, nicht Frosttage; Lags 2–4 Wochen; das Niveau
+  ist durch Influenza-/RSV-Saisonalität konfundiert, weshalb nur das Delta belastbar
+  wäre. Und das Vorzeichen dreht sich — dieselbe Versiegelung, die Hitzetote erhöht,
+  senkt Kältetote.
+- **Einheitlicher VSL über alle Todesarten.** 3,5 Mio € bewerten einen Hitzetod
+  (weit überwiegend 85+, kurze Restlebenserwartung) und einen Fluttod (breites
+  Altersspektrum) gleich. Nach Lebensjahren gerechnet wäre ein Fluttod ein
+  Vielfaches wert. Die Wahl verschiebt das €-Ranking zwischen Maßnahmen und ist
+  bewusst so getroffen, nicht übersehen.
+- **`HEAT_WAVE` selbst** wird weiterhin als `Hitzetage + 1,5·UHI` gebildet und
+  speist die übrigen Hitzekanäle (Morbidität, Belastungsstunden). Eine Herleitung
+  aus derselben Temperaturverteilung wäre konsistenter, verschöbe aber deren
+  Kalibrierung ohne eigenen Validierungsanker.
+- **Sturm-Treiberpanel.** Für ein Bundesland×Jahr-Panel der Sturmtage fehlt eine
+  Jahresreihe (`era5_storm` ist eine Klimatologie). Flut und Hitze sind über die
+  DWD-Jahresraster panelfähig, Sturm nicht.

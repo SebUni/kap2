@@ -1,61 +1,54 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import shape as shapely_shape, mapping
 from sqlalchemy.orm import Session
 
+from app.api.deps import Actor, DemoActor, assert_measure_access, demo_session_id_of, require_actor
+from app.api.gzip_files import gzip_json_file_response
 from app.db.database import get_db
 from app.models.models import AdaptationMeasure, MeasureImpact
 from app.schemas.schemas import MeasureCreate, MeasureUpdate
 from app.services.measure_service import compute_impact
-from app.services import aggregate_cache
+from app.services import artifact_rebuild, dashboard_cache
 from app.data import catalog
 
 router = APIRouter()
 
 
 @router.get("/measure-catalog")
-def measure_catalog():
-    """Verfügbare Maßnahmentypen aus dem festen KAP3-Katalog."""
+def measure_catalog(request: Request):
+    """Verfügbare Maßnahmentypen aus dem festen KAP3-Katalog.
+
+    Demo: nur Maßnahmen, deren Wirkung eines der freigeschalteten Demo-
+    Risiken trifft — alles andere hätte in der Demo sichtbar keinen Effekt.
+    """
+    demo_risks = getattr(request.state, "demo_risk_codes", None)
+    if demo_risks:
+        wanted = set(demo_risks)
+        return [m for m in catalog.MEASURES
+                if wanted.intersection(m.get("linked_risk_codes", []))]
     return catalog.MEASURES
 
 
 @router.get("/kommune/{kommune_id}/cost-summary")
-def cost_summary(kommune_id: int, db: Session = Depends(get_db)):
-    """Kostenübersicht: Schäden (mit/ohne Maßnahmen) + Maßnahmen-CAPEX/OPEX/Nutzen."""
-    from app.services.measure_service import get_risk_aggregate
-    base = get_risk_aggregate(db, kommune_id, apply_measures=False)
-    withm = get_risk_aggregate(db, kommune_id, apply_measures=True)
+def cost_summary(kommune_id: int, request: Request, db: Session = Depends(get_db)):
+    """Kostenübersicht (siehe ``measure_service.build_cost_summary``).
 
-    measures = db.query(AdaptationMeasure).filter(
-        AdaptationMeasure.kommune_id == kommune_id).all()
-    total_capex = total_opex = total_benefit = 0.0
-    measure_rows = []
-    for m in measures:
-        summary = m.impact_summary or {}
-        capex = summary.get("capex_eur", 0.0)
-        opex = summary.get("opex_annual_eur", 0.0)
-        ben = summary.get("annual_benefit_eur", 0.0)
-        total_capex += capex
-        total_opex += opex
-        total_benefit += ben
-        measure_rows.append({"id": m.id, "name": m.name, "measure_type": m.measure_type,
-                             "capex_eur": round(capex, 2), "opex_annual_eur": round(opex, 2),
-                             "annual_benefit_eur": round(ben, 2)})
-
-    damages_base = base["cost"]["total_eur"]
-    damages_with = withm["cost"]["total_eur"]
-    return {
-        "damages_base_eur": damages_base,
-        "damages_with_measures_eur": damages_with,
-        "damage_reduction_eur": round(damages_base - damages_with, 2),
-        "by_risk": withm["cost"]["by_risk"],
-        "measures": {
-            "total_capex_eur": round(total_capex, 2),
-            "total_opex_annual_eur": round(total_opex, 2),
-            "total_annual_benefit_eur": round(total_benefit, 2),
-            "rows": measure_rows,
-        },
-    }
+    Produkt: Datei-Auslieferung aus dem ``dashboard_cache`` (ETag/304).
+    Demo: live gerechnet mit Session-Maßnahmenfilter — Demo-Sessions dürfen
+    weder gemeinsame Artefakte lesen (falsche Maßnahmen) noch bauen.
+    """
+    demo_sid = demo_session_id_of(request)
+    if demo_sid:
+        from app.services.measure_service import build_cost_summary
+        return build_cost_summary(db, kommune_id, demo_session_id=demo_sid)
+    art = dashboard_cache.artifact_file(db, kommune_id, "cost_summary")
+    if not art:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    path, etag = art
+    return gzip_json_file_response(
+        request, path, etag=etag, download_name=f"cost-summary-{kommune_id}.json",
+    )
 
 
 @router.post("/kommune/{kommune_id}/measures")
@@ -63,8 +56,18 @@ def create_measure(
     kommune_id: int,
     data: MeasureCreate,
     db: Session = Depends(get_db),
+    actor: Actor = Depends(require_actor),
 ):
     """Create a new adaptation measure with geometry."""
+    is_demo = isinstance(actor, DemoActor)
+    if is_demo:
+        from app.services import demo_service
+        if demo_service.measure_count(db, actor.session_id) >= actor.measure_limit:
+            raise HTTPException(
+                429,
+                f"Demo-Limit erreicht: maximal {actor.measure_limit} Maßnahmen je Sitzung.",
+            )
+
     # Parse GeoJSON geometry
     try:
         shape = shapely_shape(data.geometry_geojson)
@@ -81,6 +84,7 @@ def create_measure(
 
     measure = AdaptationMeasure(
         kommune_id=kommune_id,
+        demo_session_id=actor.session_id if is_demo else None,
         name=data.name,
         measure_type=data.measure_type,
         geometry=from_shape(shape, srid=4326),
@@ -92,34 +96,47 @@ def create_measure(
     db.commit()
     db.refresh(measure)
 
-    aggregate_cache.invalidate(kommune_id)
+    # Basis-Aggregat hängt nicht von Maßnahmen ab → nur „mit Maßnahmen"-Variante
+    # invalidieren; Dashboard-Artefakte werden entprellt im Hintergrund neu gebaut.
+    # Demo-Maßnahmen berühren die gemeinsamen Artefakte nicht (Session-Filter).
+    if not is_demo:
+        artifact_rebuild.invalidate_and_schedule(kommune_id, only_with_measures=True)
     return _measure_to_dict(measure)
 
 
 @router.get("/kommune/{kommune_id}/measures")
-def list_measures(kommune_id: int, db: Session = Depends(get_db)):
-    """List all measures for a municipality."""
-    measures = (
-        db.query(AdaptationMeasure)
-        .filter(AdaptationMeasure.kommune_id == kommune_id)
-        .all()
-    )
+def list_measures(kommune_id: int, request: Request, db: Session = Depends(get_db)):
+    """List all measures for a municipality (Demo: nur die eigene Sitzung)."""
+    from app.services.measure_service import ensure_fresh_impact_summary
+    demo_sid = demo_session_id_of(request)
+    q = db.query(AdaptationMeasure).filter(AdaptationMeasure.kommune_id == kommune_id)
+    if demo_sid:
+        q = q.filter(AdaptationMeasure.demo_session_id == demo_sid)
+    else:
+        q = q.filter(AdaptationMeasure.demo_session_id.is_(None))
+    measures = q.all()
+    for m in measures:
+        ensure_fresh_impact_summary(db, m)
     return [_measure_to_dict(m) for m in measures]
 
 
 @router.get("/measures/{measure_id}")
-def get_measure(measure_id: int, db: Session = Depends(get_db)):
+def get_measure(measure_id: int, db: Session = Depends(get_db), actor: Actor = Depends(require_actor)):
+    from app.services.measure_service import ensure_fresh_impact_summary
     measure = db.query(AdaptationMeasure).filter(AdaptationMeasure.id == measure_id).first()
     if not measure:
         raise HTTPException(404, "Maßnahme nicht gefunden")
+    assert_measure_access(db, actor, measure)
+    ensure_fresh_impact_summary(db, measure)
     return _measure_to_dict(measure)
 
 
 @router.put("/measures/{measure_id}")
-def update_measure(measure_id: int, data: MeasureUpdate, db: Session = Depends(get_db)):
+def update_measure(measure_id: int, data: MeasureUpdate, db: Session = Depends(get_db), actor: Actor = Depends(require_actor)):
     measure = db.query(AdaptationMeasure).filter(AdaptationMeasure.id == measure_id).first()
     if not measure:
         raise HTTPException(404, "Maßnahme nicht gefunden")
+    assert_measure_access(db, actor, measure)
 
     if data.name is not None:
         measure.name = data.name
@@ -134,39 +151,58 @@ def update_measure(measure_id: int, data: MeasureUpdate, db: Session = Depends(g
 
     db.commit()
     db.refresh(measure)
-    aggregate_cache.invalidate(measure.kommune_id)
+    if measure.demo_session_id is None:
+        artifact_rebuild.invalidate_and_schedule(measure.kommune_id, only_with_measures=True)
     return _measure_to_dict(measure)
 
 
 @router.delete("/measures/{measure_id}")
-def delete_measure(measure_id: int, db: Session = Depends(get_db)):
+def delete_measure(measure_id: int, db: Session = Depends(get_db), actor: Actor = Depends(require_actor)):
     measure = db.query(AdaptationMeasure).filter(AdaptationMeasure.id == measure_id).first()
     if not measure:
         raise HTTPException(404, "Maßnahme nicht gefunden")
+    assert_measure_access(db, actor, measure)
     kommune_id = measure.kommune_id
+    was_demo = measure.demo_session_id is not None
     db.delete(measure)
     db.commit()
-    aggregate_cache.invalidate(kommune_id)
+    if not was_demo:
+        artifact_rebuild.invalidate_and_schedule(kommune_id, only_with_measures=True)
     return {"message": "Maßnahme gelöscht"}
 
 
 @router.post("/measures/{measure_id}/calculate-impact")
-def calculate_impact(measure_id: int, db: Session = Depends(get_db)):
-    """Calculate the climate impact of a measure."""
+def calculate_impact(measure_id: int, db: Session = Depends(get_db), actor: Actor = Depends(require_actor)):
+    """Calculate the climate impact of a measure.
+
+    Invalidiert die Caches NUR, wenn sich das Ergebnis tatsächlich geändert hat
+    (Vergleich ohne den ``params_fingerprint``). Sonst warf jeder Aufruf —
+    etwa der frühere Maßnahmen-Tab, der beim Öffnen für JEDE Maßnahme POSTete —
+    das Aggregat weg und das Dashboard rechnete anschließend alles neu.
+    """
     measure = db.query(AdaptationMeasure).filter(AdaptationMeasure.id == measure_id).first()
     if not measure:
         raise HTTPException(404, "Maßnahme nicht gefunden")
+    assert_measure_access(db, actor, measure)
+    previous = {k: v for k, v in (measure.impact_summary or {}).items()
+                if k != "params_fingerprint"}
     try:
         result = compute_impact(db, measure_id)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
-    aggregate_cache.invalidate(measure.kommune_id)
+    current = {k: v for k, v in result.items() if k != "params_fingerprint"}
+    if current != previous and measure.demo_session_id is None:
+        artifact_rebuild.invalidate_and_schedule(measure.kommune_id, only_with_measures=True)
     return result
 
 
 @router.get("/measures/{measure_id}/impacts")
-def get_impacts(measure_id: int, db: Session = Depends(get_db)):
+def get_impacts(measure_id: int, db: Session = Depends(get_db), actor: Actor = Depends(require_actor)):
     """Get cell-level impacts for a measure."""
+    measure = db.query(AdaptationMeasure).filter(AdaptationMeasure.id == measure_id).first()
+    if not measure:
+        raise HTTPException(404, "Maßnahme nicht gefunden")
+    assert_measure_access(db, actor, measure)
     impacts = db.query(MeasureImpact).filter(MeasureImpact.measure_id == measure_id).all()
     return [
         {

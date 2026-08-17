@@ -20,10 +20,13 @@ Schäden"-Kennzahl des Kommunen-Aggregats (dieselbe Σ-über-Zellen-Basis).
 
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
 
 from geoalchemy2 import functions as func
 from sqlalchemy import case, literal
+from sqlalchemy import func as sa_func
 from sqlalchemy.orm import Session
 
 from app.data import catalog, sources
@@ -234,6 +237,69 @@ def compute_costs(mdef: dict, count: int, area_m2: float) -> dict:
     }
 
 
+# Kosten-/nutzenrelevante Felder der (aufgelösten) Maßnahmendefinition: ändert sich
+# eines davon (Katalog-Rekalibrierung oder Override), ist ein gespeichertes
+# impact_summary veraltet und muss neu gerechnet werden.
+_FINGERPRINT_MDEF_FIELDS = (
+    "capex_fixed", "capex_per_unit", "capex_per_m2",
+    "opex_fixed_year", "opex_per_unit_year", "opex_per_m2_year",
+    "benefit_per_m2_year", "default_reduction", "coverage_scaling",
+    "effect_target", "linked_risk_codes", "unit_density_per_ha", "unit_label",
+)
+
+
+def _params_fingerprint(db: Session, measure: AdaptationMeasure, mdef: dict,
+                        overrides: dict) -> str:
+    """Fingerprint der Rechengrundlage eines impact_summary (Staleness-Erkennung).
+
+    Deckt ab: (a) Katalog-/Override-Änderungen an den kosten-/nutzenrelevanten
+    mdef-Feldern, (b) alle übrigen Kommune-Overrides (k_indirekt, Kostensätze,
+    Sättigung/Kappung wirken in _cell_cost/_reduction_factor), (c) Modellversion,
+    (d) Zelldaten-Stand (assessment_task baut Zellen neu, rechnet Impacts aber
+    nicht neu) und (e) die Maßnahmen-Konfiguration (Stückzahl).
+    """
+    cells_marker = db.query(sa_func.max(CellAssessment.calculated_at)).filter(
+        CellAssessment.kommune_id == measure.kommune_id).scalar()
+    payload = {
+        "mdef": {k: mdef.get(k) for k in _FINGERPRINT_MDEF_FIELDS},
+        "overrides": sorted((str(k), str(v)) for k, v in (overrides or {}).items()),
+        "config": measure.config or {},
+        "model_version": catalog.MODEL_VERSION,
+        "cells": str(cells_marker),
+    }
+    return hashlib.sha1(
+        json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+
+
+def ensure_fresh_impact_summary(db: Session, measure: AdaptationMeasure) -> dict:
+    """Liefert das impact_summary der Maßnahme, bei veralteter Rechengrundlage
+    (Fingerprint-Mismatch) wird es zuerst per ``compute_impact`` neu berechnet.
+
+    Zentrale Absicherung aller Lesepfade (cost-summary, Export, Maßnahmenliste):
+    ohne sie reichte z. B. eine Katalog-Rekalibrierung (benefit_per_m2_year
+    1,5 → 0,02 €/m²) aus, um Nutzen-Zahlen um Größenordnungen zu verfälschen,
+    weil nur der manuelle calculate-impact-Endpunkt neu rechnet.
+    """
+    summary = measure.impact_summary or {}
+    mbase = catalog.MEASURES_BY_CODE.get(measure.measure_type)
+    if mbase is None:
+        return summary
+    db_overrides = parameter_registry.load_db_overrides(db, measure.kommune_id)
+    overrides = parameter_registry.overrides_map(db_overrides)
+    mdef = parameter_registry.resolve_measure_def(mbase, overrides)
+    fp = _params_fingerprint(db, measure, mdef, overrides)
+    if summary.get("params_fingerprint") == fp:
+        return summary
+    log.info("Impact-Summary von Maßnahme %s (%s) veraltet — wird neu berechnet.",
+             measure.id, measure.measure_type)
+    try:
+        # Kein aggregate_cache.invalidate nötig: die Aggregate rechnen die Maßnahmen-
+        # Faktoren live aus der Definition und lesen impact_summary nicht.
+        return compute_impact(db, measure.id)
+    except ValueError:
+        return summary
+
+
 def _measure_custom_sources(db_overrides: list[dict], measure_code: str) -> dict[str, str]:
     """Per-Feld ``custom_source``-Overrides einer Maßnahme (measures.<code>.<field>)."""
     prefix = f"measures.{measure_code}."
@@ -261,22 +327,26 @@ def compute_impact(db: Session, measure_id: int) -> dict:
     overrides = parameter_registry.overrides_map(db_overrides)
     mdef = parameter_registry.resolve_measure_def(mdef, overrides)
     mdef = {**mdef, "custom_sources": _measure_custom_sources(db_overrides, measure.measure_type)}
+    fingerprint = _params_fingerprint(db, measure, mdef, overrides)
 
     # Kommune-Overrides für alle Live-Reads dieses Laufs installieren (k_indirekt,
     # Kostensätze in _cell_cost, Sättigung/Kappung in _reduction_factor): ohne Scope
     # läse dieser Request-Pfad die Overrides der zuletzt gerechneten Kommune
     # (Cross-Kommune-Leak, MODELL_KRITIK §8/B2).
     with override_context.override_scope(overrides):
-        return _compute_impact_scoped(db, measure, mdef)
+        return _compute_impact_scoped(db, measure, mdef, fingerprint)
 
 
-def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict) -> dict:
+def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
+                           fingerprint: str) -> dict:
     """Kern von ``compute_impact`` — läuft innerhalb des Override-Scopes der Kommune."""
     measure_id = measure.id
     coverage, covered_area_m2 = _coverage(db, measure)
     if not coverage:
         db.query(MeasureImpact).filter(MeasureImpact.measure_id == measure_id).delete()
-        no_coverage = {"measure_id": measure_id, "affected_cells": 0, "message": "Keine überlappenden Zellen"}
+        no_coverage = {"measure_id": measure_id, "affected_cells": 0,
+                       "message": "Keine überlappenden Zellen",
+                       "params_fingerprint": fingerprint}
         measure.impact_summary = no_coverage
         db.commit()
         return no_coverage
@@ -377,6 +447,33 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict) 
                 risk, adj_p90, total_pop, kommune_area_km2)["cost_eur"]
             annual_benefit_flat += max(0.0, base_cost - adj_cost)
 
+    # Defense-in-depth: Der Schadens-Nutzen einer Maßnahme kann strukturell nicht über
+    # dem Gesamt-Basisschaden ihrer verknüpften Risiken liegen (Zell-Deltas ⊆ Zellsumme).
+    # Die Kappung fängt künftige Fehlkalibrierungen/Inkonsistenzen ab, statt sie als
+    # Millionen-Nutzen ins Dashboard durchzureichen.
+    benefit_capped = False
+    if annual_benefit_damage > 0.0:
+        base_agg = get_risk_aggregate(db, measure.kommune_id, apply_measures=False)
+        k = float(override_context.get_override("impact.k_indirect", _K_INDIRECT_DEFAULT))
+        cap = 0.0
+        for code in linked:
+            risk = catalog.RISKS_BY_CODE.get(code)
+            entry = base_agg.get("risks", {}).get(code)
+            if not risk or not entry or not catalog.risk_contributes_to_total(risk):
+                continue
+            if risk.get("scale", "pop") in ("pop", "area"):
+                cost = float(entry.get("cost_eur") or 0.0)
+                cap += cost
+                if code in catalog.DIRECT_SECTOR_RISK_CODES:
+                    cap += k * cost  # gekoppelte Folgekosten zählen zum Nutzen dazu
+        if cap > 0.0 and annual_benefit_damage > cap:
+            log.warning(
+                "Maßnahme %s: Schadens-Nutzen %.0f € über Gesamtschaden der verknüpften "
+                "Risiken (%.0f €) — gekappt (Parameter prüfen).",
+                measure_id, annual_benefit_damage, cap)
+            annual_benefit_damage = cap
+            benefit_capped = True
+
     # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente)
     cost_breakdown = compute_costs(mdef, count, covered_area_m2)
     capex = cost_breakdown["capex"]["total_eur"]
@@ -400,8 +497,16 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict) 
         "opex_annual_eur": round(opex_annual, 2),
         "annual_benefit_eur": round(
             annual_benefit_direct + annual_benefit_damage + annual_benefit_flat, 2),
-        # transparente Aufschlüsselung: flat-Anteil (kommunenweite P90-Risiken)
+        # Transparente Aufschlüsselung: vermiedene Zellschäden (inkl. gekoppelter
+        # Folgekosten), flat-Anteil (kommunenweite P90-Risiken) und direkter
+        # Zusatznutzen (benefit_per_m2_year · Fläche, z. B. Mehrertrag/Erlöse) —
+        # zwei konzeptionell verschiedene Dinge: nicht eintretender Schaden vs.
+        # zusätzlich erwirtschafteter Nutzen.
+        "annual_benefit_damage_eur": round(annual_benefit_damage, 2),
         "annual_benefit_flat_eur": round(annual_benefit_flat, 2),
+        "annual_benefit_direct_eur": round(annual_benefit_direct, 2),
+        "benefit_capped": benefit_capped,
+        "params_fingerprint": fingerprint,
         "count": count,
         "count_is_default": count_is_default,
         "recommended_count": recommended_count,
@@ -420,11 +525,28 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict) 
     return summary
 
 
-def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> list[dict]:
+def kommune_measures_query(db: Session, kommune_id: int, demo_session_id: str | None = None):
+    """Maßnahmen einer Kommune, session-korrekt gefiltert.
+
+    Produktpfad (``demo_session_id=None``): nur echte Maßnahmen
+    (``demo_session_id IS NULL``) — Demo-Sitzungen verschmutzen nie Aggregate,
+    Exporte oder Fingerprints. Demo-Pfad: nur die Maßnahmen DIESER Sitzung.
+    """
+    q = db.query(AdaptationMeasure).filter(AdaptationMeasure.kommune_id == kommune_id)
+    if demo_session_id:
+        return q.filter(AdaptationMeasure.demo_session_id == demo_session_id)
+    return q.filter(AdaptationMeasure.demo_session_id.is_(None))
+
+
+def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
+                        demo_session_id: str | None = None) -> list[dict]:
     """Liefert Per-Zell-Daten (ggf. mit angewandten Maßnahmen) für Aggregation."""
-    assessments = db.query(CellAssessment).filter(
-        CellAssessment.kommune_id == kommune_id).all()
-    base = {ca.grid_cell_id: (ca.data or {}) for ca in assessments}
+    # Streaming (yield_per): nur die data-Blobs behalten, nicht zusätzlich
+    # zehntausende ORM-Instanzen — halbiert grob den RAM-Peak der Aggregation.
+    base: dict[int, dict] = {}
+    for ca in db.query(CellAssessment).filter(
+            CellAssessment.kommune_id == kommune_id).yield_per(500):
+        base[ca.grid_cell_id] = ca.data or {}
 
     if not apply_measures:
         return [dict(d) for d in base.values()]
@@ -433,8 +555,7 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
     # und unit_factor werden pro Maßnahme genauso bestimmt wie in compute_impact,
     # damit Dashboard ("mit Maßnahmen") und Sidebar nicht divergieren.
     factors: dict[int, dict[str, float]] = {}
-    measures = db.query(AdaptationMeasure).filter(
-        AdaptationMeasure.kommune_id == kommune_id).all()
+    measures = kommune_measures_query(db, kommune_id, demo_session_id).all()
     overrides = parameter_registry.overrides_map(
         parameter_registry.load_db_overrides(db, kommune_id)
     )
@@ -456,6 +577,11 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
     for cid, data in base.items():
         cell_pop = float(data.get("inputs", {}).get("pop", 0.0) or 0.0)
         new_data = {"risks": {}, "inputs": {"pop": cell_pop}}
+        # Expositions-Gate des Belastungs-P90 (risk_engine._cell_is_exposed) braucht
+        # die Zell-Expositionen auch im With-Measures-Aggregat — Maßnahmen ändern
+        # Indizes/Outcomes, nicht die Exposition selbst (Referenzkopie genügt).
+        if "exposures" in data:
+            new_data["exposures"] = data["exposures"]
         risks = data.get("risks", {})
         cell_factors = factors.get(cid, {})
         for code, r in risks.items():
@@ -479,7 +605,8 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool) -> l
     return out
 
 
-def _compute_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool) -> dict:
+def _compute_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool,
+                            demo_session_id: str | None = None) -> dict:
     """Rechnet das Aggregat aus der DB (ohne Cache) — die eigentliche Arbeit."""
     kommune = db.query(Kommune).filter_by(id=kommune_id).first()
     total_pop = float(kommune.population or 0) if kommune else 0.0
@@ -487,11 +614,12 @@ def _compute_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool) 
     overrides = parameter_registry.overrides_map(
         parameter_registry.load_db_overrides(db, kommune_id))
     with override_context.override_scope(overrides):
-        cell_data = _adjusted_cell_data(db, kommune_id, apply_measures)
+        cell_data = _adjusted_cell_data(db, kommune_id, apply_measures, demo_session_id)
         return risk_engine.aggregate(cell_data, total_pop, area_km2)
 
 
-def get_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool = False) -> dict:
+def get_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool = False,
+                       demo_session_id: str | None = None) -> dict:
     """Aggregiertes Risiko (mit/ohne Maßnahmen) inkl. Kosten — mit Datei-Cache.
 
     Das Aggregat lädt alle CellAssessment-Zeilen und aggregiert darüber; pro
@@ -504,10 +632,87 @@ def get_risk_aggregate(db: Session, kommune_id: int, apply_measures: bool = Fals
     Overrides der zuletzt gerechneten Kommune (Cross-Kommune-Leak, §8/B2). So wirken
     Kostensatz-Overrides zudem live auf die Aggregatsumme (``aggregate`` monetarisiert
     aus dem gespeicherten Outcome).
+
+    Demo-Sessions (``demo_session_id``) umgehen den geteilten Cache vollständig:
+    ihre Maßnahmen sind sitzungsprivat, ein gemeinsames Artefakt würde fremde
+    Sitzungen (oder das Produkt) verunreinigen. Die Basis-Variante (ohne
+    Maßnahmen) ist für Demo und Produkt identisch und darf den Cache nutzen.
     """
+    if demo_session_id and apply_measures:
+        return _compute_risk_aggregate(db, kommune_id, apply_measures, demo_session_id)
     cached = aggregate_cache.load(kommune_id, apply_measures)
     if cached is not None:
         return cached
     result = _compute_risk_aggregate(db, kommune_id, apply_measures)
     aggregate_cache.store(kommune_id, apply_measures, result)
     return result
+
+
+def build_cost_summary(db: Session, kommune_id: int, demo_session_id: str | None = None) -> dict:
+    """Kostenübersicht: Schäden (mit/ohne Maßnahmen) + Maßnahmen-CAPEX/OPEX/Nutzen.
+
+    ``damage_reduction_eur`` (Aggregat-Differenz ohne/mit Maßnahmen, inkl. flat-Risiken
+    und rekonsolidierter Folgekosten) ist die belastbare Kennzahl „vermiedene Schäden";
+    ``total_benefit_direct_eur`` (benefit_per_m2_year · Fläche) ist echter Zusatznutzen
+    (Erträge/Erlöse) und dazu additiv. Die Pro-Maßnahmen-Schadens-/flat-Nutzen sind
+    Diagnostik — weicht ihre Summe grob von der Aggregat-Differenz ab, meldet
+    ``benefit_consistency_warning`` das, statt es zu verstecken.
+
+    Wird von ``dashboard_cache`` als Datei vorgebaut; der Endpoint liefert nur
+    noch die gzip-Datei aus.
+    """
+    base = get_risk_aggregate(db, kommune_id, apply_measures=False)
+    withm = get_risk_aggregate(db, kommune_id, apply_measures=True,
+                               demo_session_id=demo_session_id)
+
+    measures = kommune_measures_query(db, kommune_id, demo_session_id).all()
+    total_capex = total_opex = total_benefit = 0.0
+    total_ben_damage = total_ben_flat = total_ben_direct = 0.0
+    measure_rows = []
+    for m in measures:
+        summary = ensure_fresh_impact_summary(db, m)
+        capex = summary.get("capex_eur", 0.0)
+        opex = summary.get("opex_annual_eur", 0.0)
+        ben = summary.get("annual_benefit_eur", 0.0)
+        ben_damage = summary.get("annual_benefit_damage_eur", 0.0) or 0.0
+        ben_flat = summary.get("annual_benefit_flat_eur", 0.0) or 0.0
+        ben_direct = summary.get("annual_benefit_direct_eur", 0.0) or 0.0
+        total_capex += capex
+        total_opex += opex
+        total_benefit += ben
+        total_ben_damage += ben_damage
+        total_ben_flat += ben_flat
+        total_ben_direct += ben_direct
+        measure_rows.append({"id": m.id, "name": m.name, "measure_type": m.measure_type,
+                             "capex_eur": round(capex, 2), "opex_annual_eur": round(opex, 2),
+                             "annual_benefit_eur": round(ben, 2),
+                             "annual_benefit_damage_eur": round(ben_damage, 2),
+                             "annual_benefit_flat_eur": round(ben_flat, 2),
+                             "annual_benefit_direct_eur": round(ben_direct, 2),
+                             "benefit_capped": bool(summary.get("benefit_capped", False))})
+
+    damages_base = base["cost"]["total_eur"]
+    damages_with = withm["cost"]["total_eur"]
+    damage_reduction = round(damages_base - damages_with, 2)
+    per_measure_damage_ben = total_ben_damage + total_ben_flat
+    consistency_warning = (
+        abs(per_measure_damage_ben - damage_reduction)
+        / max(abs(damage_reduction), 1.0) > 0.25
+        if (per_measure_damage_ben or damage_reduction) else False
+    )
+    return {
+        "damages_base_eur": damages_base,
+        "damages_with_measures_eur": damages_with,
+        "damage_reduction_eur": damage_reduction,
+        "by_risk": withm["cost"]["by_risk"],
+        "measures": {
+            "total_capex_eur": round(total_capex, 2),
+            "total_opex_annual_eur": round(total_opex, 2),
+            "total_annual_benefit_eur": round(total_benefit, 2),
+            "total_benefit_damage_eur": round(total_ben_damage, 2),
+            "total_benefit_flat_eur": round(total_ben_flat, 2),
+            "total_benefit_direct_eur": round(total_ben_direct, 2),
+            "benefit_consistency_warning": consistency_warning,
+            "rows": measure_rows,
+        },
+    }

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>KAP2 — Katalog-Kritik (Präsentation)</title>
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --surface: #fcfcfb; --plane: #f9f9f7; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --baseline: #c3c2b7; --border: rgba(11,11,11,.10);
+    --good: #0ca30c; --warn: #fab219; --crit: #d03b3b; --nr: #b5b3ac;
+    --accent: #2a78d6; --accent-dark: #1c5cab;
+  }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  .slide { width: 1280px; height: 720px; background: var(--surface); padding: 56px 72px 48px;
+           display: flex; flex-direction: column; break-after: page; position: relative; overflow: hidden; }
+  .slide:last-child { break-after: auto; }
+  .kicker { font-size: 15px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: var(--accent-dark); margin-bottom: 10px; }
+  h1 { font-size: 54px; font-weight: 700; letter-spacing: -.015em; line-height: 1.12; }
+  h2 { font-size: 36px; font-weight: 700; letter-spacing: -.01em; line-height: 1.15; margin-bottom: 26px; }
+  h2 .sub { display: block; font-size: 19px; font-weight: 400; color: var(--ink-2); margin-top: 8px; letter-spacing: 0; }
+  p { font-size: 19px; line-height: 1.5; }
+  .pagenum { position: absolute; bottom: 22px; right: 32px; font-size: 13px; color: var(--muted);
+             font-variant-numeric: tabular-nums; }
+  .foot { position: absolute; bottom: 22px; left: 72px; font-size: 13px; color: var(--muted); }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .88em; background: #f2f1ee;
+         padding: 1px 5px; border-radius: 4px; }
+  strong { font-weight: 700; }
+  em { font-style: italic; }
+  .cols { display: flex; gap: 36px; flex: 1; min-height: 0; }
+  .col { flex: 1; min-width: 0; }
+  /* Kacheln */
+  .tiles { display: flex; gap: 20px; }
+  .tile { flex: 1; border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; background: #fff; }
+  .tile .v { font-size: 52px; font-weight: 700; line-height: 1.05; letter-spacing: -.02em; }
+  .tile .l { font-size: 15.5px; color: var(--ink-2); margin-top: 10px; line-height: 1.4; }
+  .tile.hot .v { color: var(--crit); }
+  /* Tabellen */
+  table { border-collapse: collapse; width: 100%; }
+  th { text-align: left; font-weight: 700; color: var(--ink-2); font-size: 15px;
+       border-bottom: 2px solid var(--baseline); padding: 8px 14px 8px 0; }
+  td { font-size: 16.5px; border-bottom: 1px solid var(--grid); padding: 8px 14px 8px 0; vertical-align: top; line-height: 1.4; }
+  .rating { font-family: ui-monospace, Menlo, monospace; font-size: 17px; }
+  /* Balken */
+  .barrow { display: flex; align-items: center; gap: 12px; margin: 6.5px 0; }
+  .barlabel { width: 250px; font-size: 15.5px; color: var(--ink-2); text-align: right; flex: none; }
+  .bartrack { flex: none; display: flex; gap: 2px; height: 24px; }
+  .seg { border-radius: 5px; display: flex; align-items: center; justify-content: center;
+         font-size: 13px; font-weight: 700; color: #fff; }
+  .seg.g { background: var(--good); } .seg.w { background: var(--warn); color: #4a3400; }
+  .seg.c { background: var(--crit); } .seg.n { background: var(--nr); color: #3a3935; }
+  .bartotal { width: 30px; font-size: 14px; color: var(--muted); flex: none; font-variant-numeric: tabular-nums; }
+  .legend { display: flex; gap: 26px; margin: 0 0 18px 262px; font-size: 15px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+  /* Karten/Listen */
+  .card { border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; background: #fff; margin-bottom: 16px; }
+  .card h3 { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+  .card p { font-size: 16.5px; color: var(--ink-2); }
+  ul.big { margin-left: 26px; }
+  ul.big li { font-size: 19px; line-height: 1.5; margin: 10px 0; }
+  ul.mid li { font-size: 17px; line-height: 1.45; margin: 8px 0; }
+  .verdictbox { border-left: 6px solid var(--accent); background: #f4f8fd; padding: 18px 24px;
+                border-radius: 0 10px 10px 0; }
+  .verdictbox p { font-size: 19px; }
+  .pill { display: inline-block; border-radius: 999px; padding: 2px 12px; font-size: 14px; font-weight: 700; }
+  .pill.crit { background: #fbe8e8; color: #a02020; }
+  .pill.good { background: #e6f5e6; color: #076907; }
+  .pill.blue { background: #e8f1fc; color: var(--accent-dark); }
+</style>
+</head>
+<body>
+
+<!-- ─── Folie 1: Titel ─── -->
+<section class="slide" style="justify-content: center; background: linear-gradient(180deg, #fcfcfb 0%, #f4f8fd 100%);">
+  <div class="kicker">KAP2 · Interne Entscheidungsvorlage · August 2026</div>
+  <h1>Katalog-Kritik:<br>Struktur des Risiko- und Maßnahmenkatalogs</h1>
+  <p style="margin-top: 26px; font-size: 23px; color: var(--ink-2); max-width: 900px;">
+    MECE oder spezifische Picks? Abgleich mit KWRA 2021 und KAnG,
+    sechs Strukturvarianten, eine Empfehlung.
+  </p>
+  <p style="margin-top: 40px; font-size: 16px; color: var(--muted);">
+    Basis: docs/KATALOG_KRITIK.md · Reine Analyse, keine Code-Änderung · Testfassung als Foliensatz
+  </p>
+  <div class="pagenum">1</div>
+</section>
+
+<!-- ─── Folie 2: Problem ─── -->
+<section class="slide">
+  <h2>Das Problem: vier Taxonomien, keine Primärachse
+    <span class="sub">Jede Achse ist für sich sinnvoll — nebeneinander erzeugen sie den Eindruck willkürlicher Einzel-Picks.</span></h2>
+  <table style="margin-top: 6px;">
+    <tr><th style="width:300px;">Achse</th><th style="width:330px;">Werte</th><th style="width:190px;">Gilt für</th><th>Problem</th></tr>
+    <tr><td><code>group</code> — „KWRA-Risikofelder"</td><td>5: heat <strong>4</strong> · drought 13 · flood <strong>15</strong> · gradual 6 · compound 13</td><td>Risiken</td><td>Primärachse in UI und Radar, stark unsymmetrisch — und eine KAP2-Eigenschöpfung, keine KWRA-Kategorie</td></tr>
+    <tr><td><code>cost_dimension</code></td><td>4: monetary 16 · health 13 · operational 11 · environment 11</td><td>Risiken</td><td>In der UI unsichtbar — obwohl es die Logik ist, die der PO „beim Draufsehen" erkennt</td></tr>
+    <tr><td>KAnG-Cluster / Handlungsfeld</td><td>7 Cluster / 17 Handlungsfelder</td><td><strong>nur Maßnahmen</strong></td><td>Risiken haben kein Gegenstück → zwei getrennte Einstiege im Maßnahmen-Dialog</td></tr>
+    <tr><td>KWRA-Handlungsfeld</td><td>39 Freitext-Varianten</td><td>Risiken</td><td>Nur Tooltip-Text: nicht filterbar, nicht testbar</td></tr>
+  </table>
+  <div class="tiles" style="margin-top: 28px;">
+    <div class="tile"><div class="v">51 / 47</div><div class="l">Risiken / Maßnahmen im Katalog</div></div>
+    <div class="tile"><div class="v">18</div><div class="l">Risiken ohne einzige verknüpfte Maßnahme</div></div>
+    <div class="tile"><div class="v">25</div><div class="l">Risiken im linearen Legacy-Rechenpfad</div></div>
+    <div class="tile"><div class="v">9</div><div class="l">verschiedene Outcome-Einheiten (Todesfälle … Index)</div></div>
+  </div>
+  <div class="pagenum">2</div>
+</section>
+
+<!-- ─── Folie 3: Befunde ─── -->
+<section class="slide">
+  <h2>Acht Befunde — das Referenzsystem des Berichts</h2>
+  <table>
+    <tr><th style="width:56px;">Nr.</th><th>Befund</th><th style="width:420px;">Konsequenz</th></tr>
+    <tr><td><strong>B1</strong></td><td>Hitze-Schiefstand: 4/51 Risiken in <code>heat</code>, hitzegetriebene €-Schäden unter <code>flood</code></td><td>Radar verzerrt beim Kommunen-Pain #1</td></tr>
+    <tr><td><strong>B2</strong></td><td>18/51 Risiken ohne verknüpfte Maßnahme</td><td>Kernversprechen entfällt für ⅓ des Katalogs</td></tr>
+    <tr><td><strong>B3</strong></td><td>Proxy-Verknüpfungen mangels Zielrisiko</td><td>Risiken sammeln Wirkung fremder Maßnahmen</td></tr>
+    <tr><td><strong>B4</strong></td><td>25/51 Risiken im Legacy-Linearpfad</td><td>Absolutwerte dort nicht verteidigbar</td></tr>
+    <tr><td><strong>B5</strong></td><td>14 Risiken tragen 0 € zur Schadenssumme bei</td><td>Unsichtbare Zweiklassigkeit</td></tr>
+    <tr><td><strong>B6</strong></td><td>Drei Namenslogiken gemischt (Outcome / Zustand / Service)</td><td>Der „unstrukturiert"-Eindruck des PO</td></tr>
+    <tr><td><strong>B7</strong></td><td>Maßnahmen haben KAnG-Taxonomie, Risiken nicht</td><td>Produkt spricht zwei Sprachen</td></tr>
+    <tr><td><strong>B8</strong></td><td>Doku-Drift: „47 Risiken" (real 51), „22 ohne Maßnahme" (real 18)</td><td>Ohne Struktur rechnet niemand nach</td></tr>
+  </table>
+  <div class="pagenum">3</div>
+</section>
+
+<!-- ─── Folie 4: Normativer Rahmen ─── -->
+<section class="slide">
+  <h2>Normativer Rahmen: Gesetz ≠ Strategie ≠ Analysewerk</h2>
+  <div class="cols">
+    <div class="col card">
+      <h3>KAnG <span class="pill blue">Gesetz</span></h3>
+      <p><strong>§ 12:</strong> Kommunale Konzepte auf Basis einer Klimarisikoanalyse mit Feststellung <em>„sehr dringlicher Handlungserfordernisse"</em> — exakt der KWRA-Terminus.<br><br>
+      <strong>§ 3 Abs. 2:</strong> 7 Cluster — sie strukturieren Strategie und Maßnahmen, <strong>nicht die Risikoanalyse</strong>.<br><br>
+      <strong>§ 8:</strong> Berücksichtigungsgebot (Starkregen, Trockenheit, Erosion, Wärmeinseln).</p>
+    </div>
+    <div class="col card">
+      <h3>DAS 2024 <span class="pill blue">Strategie</span></h3>
+      <p>Dieselben 7 Cluster, 33 messbare Ziele, &gt;180 Maßnahmen.<br><br>
+      Führt zusätzlich die <strong>Tourismuswirtschaft</strong> im Cluster Wirtschaft — die KAP2 weder bei Maßnahmen noch bei Risiken kennt.</p>
+    </div>
+    <div class="col card">
+      <h3>KWRA 2021 <span class="pill blue">Analysewerk</span></h3>
+      <p><strong>102 Klimawirkungen · 13 Handlungsfelder · 5 Cluster</strong> — und selbst mehrachsig:<br><br>
+      <strong>4 Schutzgüter</strong> (Mensch, Volkswirtschaft, Umwelt, kulturelles Erbe) + <strong>5 Systembereiche</strong>.<br><br>
+      <strong>Die gesuchte MECE-Achse existiert beim Bund bereits.</strong></p>
+    </div>
+  </div>
+  <div class="pagenum">4</div>
+</section>
+
+<!-- ─── Folie 5: MECE vs. Picks ─── -->
+<section class="slide">
+  <h2>MECE vs. spezifische Picks — die Frage ist falsch gestellt</h2>
+  <div class="cols" style="flex: none;">
+    <div class="col card">
+      <h3>Pro MECE</h3>
+      <ul class="mid">
+        <li>Verteidigbarkeit: nur die Systematik begründen, nicht jede Aufnahme</li>
+        <li>§-12-Anschluss: eine Betroffenheitsanalyse braucht einen definierten Suchraum</li>
+        <li>Lückenfindung wird automatisch, Wachstum kontrolliert</li>
+      </ul>
+    </div>
+    <div class="col card">
+      <h3>Contra MECE / Pro Picks</h3>
+      <ul class="mid">
+        <li>Matrix erzeugt Zellen ohne Daten → Scheinpräzision (MODELL_KRITIK §3)</li>
+        <li>Picks sind ehrlich: ausgewählt, weil rechenbar</li>
+        <li>Aber: Auswahllogik undokumentiert → von Willkür nicht unterscheidbar</li>
+      </ul>
+    </div>
+  </div>
+  <div class="verdictbox" style="margin-top: 24px;">
+    <p><strong>Auflösung:</strong> „Haben wir an alles gedacht?" fragt den <strong>Suchraum</strong> — „Können wir diese Zahl verteidigen?" fragt die <strong>Datengrundlage</strong>. Ein flacher Katalog muss beides gleichzeitig beantworten und scheitert an einem davon. Die Spannung erzwingt <strong>zwei Ebenen</strong> — dieselbe Trennung, die MODELL_KRITIK §7 für die Rechenlogik bereits entschieden hat (Screening ≠ Absolutwerte).</p>
+  </div>
+  <div class="pagenum">5</div>
+</section>
+
+<!-- ─── Folie 6: Lückenanalyse ─── -->
+<section class="slide">
+  <h2>Abgleich mit dem Bund: 102 KWRA-Klimawirkungen
+    <span class="sub">Vollständige Abdeckungsmatrix in Anhang A der Vollfassung — jede Zeile einzeln geprüft.</span></h2>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--good)"></span> abgedeckt (15)</span>
+    <span><span class="sw" style="background:var(--warn)"></span> teilweise (36)</span>
+    <span><span class="sw" style="background:var(--crit)"></span> fehlt (36)</span>
+    <span><span class="sw" style="background:var(--nr)"></span> kommunal n. r. (15)</span>
+  </div>
+  <div>
+    <div class="barrow"><div class="barlabel">Industrie und Gewerbe</div><div class="bartrack" style="width:67.2%"><div class="seg w" style="flex:5">5</div><div class="seg c" style="flex:3">3</div><div class="seg n" style="flex:4">4</div></div><div class="bartotal">12</div></div>
+    <div class="barrow"><div class="barlabel">Wasserhaushalt, Wasserwirtschaft</div><div class="bartrack" style="width:61.6%"><div class="seg g" style="flex:2">2</div><div class="seg w" style="flex:8">8</div><div class="seg c" style="flex:1">1</div></div><div class="bartotal">11</div></div>
+    <div class="barrow"><div class="barlabel">Boden</div><div class="bartrack" style="width:56.0%"><div class="seg g" style="flex:1">1</div><div class="seg w" style="flex:4">4</div><div class="seg c" style="flex:4">4</div><div class="seg n" style="flex:1">1</div></div><div class="bartotal">10</div></div>
+    <div class="barrow"><div class="barlabel">Küsten- und Meeresschutz</div><div class="bartrack" style="width:56.0%"><div class="seg w" style="flex:6">6</div><div class="seg c" style="flex:1">1</div><div class="seg n" style="flex:3">3</div></div><div class="bartotal">10</div></div>
+    <div class="barrow"><div class="barlabel">Biologische Vielfalt</div><div class="bartrack" style="width:50.4%"><div class="seg g" style="flex:2">2</div><div class="seg w" style="flex:4">4</div><div class="seg c" style="flex:1">1</div><div class="seg n" style="flex:2">2</div></div><div class="bartotal">9</div></div>
+    <div class="barrow"><div class="barlabel">Menschliche Gesundheit</div><div class="bartrack" style="width:44.8%"><div class="seg g" style="flex:2">2</div><div class="seg w" style="flex:2">2</div><div class="seg c" style="flex:4">4</div></div><div class="bartotal">8</div></div>
+    <div class="barrow"><div class="barlabel">Landwirtschaft</div><div class="bartrack" style="width:39.2%"><div class="seg g" style="flex:1">1</div><div class="seg w" style="flex:1">1</div><div class="seg c" style="flex:5">5</div></div><div class="bartotal">7</div></div>
+    <div class="barrow"><div class="barlabel">Verkehr, Verkehrsinfrastruktur</div><div class="bartrack" style="width:39.2%"><div class="seg g" style="flex:1">1</div><div class="seg w" style="flex:2">2</div><div class="seg c" style="flex:3">3</div><div class="seg n" style="flex:1">1</div></div><div class="bartotal">7</div></div>
+    <div class="barrow"><div class="barlabel">Wald- und Forstwirtschaft</div><div class="bartrack" style="width:33.6%"><div class="seg w" style="flex:2">2</div><div class="seg c" style="flex:4">4</div></div><div class="bartotal">6</div></div>
+    <div class="barrow"><div class="barlabel">Bauwesen</div><div class="bartrack" style="width:33.6%"><div class="seg g" style="flex:3">3</div><div class="seg c" style="flex:2">2</div><div class="seg n" style="flex:1">1</div></div><div class="bartotal">6</div></div>
+    <div class="barrow"><div class="barlabel">Energiewirtschaft</div><div class="bartrack" style="width:33.6%"><div class="seg g" style="flex:1">1</div><div class="seg w" style="flex:1">1</div><div class="seg c" style="flex:3">3</div><div class="seg n" style="flex:1">1</div></div><div class="bartotal">6</div></div>
+    <div class="barrow"><div class="barlabel">Fischerei</div><div class="bartrack" style="width:28.0%"><div class="seg g" style="flex:2">2</div><div class="seg w" style="flex:1">1</div><div class="seg n" style="flex:2">2</div></div><div class="bartotal">5</div></div>
+    <div class="barrow"><div class="barlabel">Tourismuswirtschaft</div><div class="bartrack" style="width:28.0%"><div class="seg c" style="flex:5">5</div></div><div class="bartotal">5</div></div>
+  </div>
+  <p style="margin-top: 14px; font-size: 17px; color: var(--ink-2);">Von 87 kommunal relevanten Klimawirkungen: 51 ganz/teilweise abgedeckt (59 %), <strong style="color:var(--ink);">36 fehlen (41 %)</strong> · Tourismus: 0 von 5 · Schutzgut „kulturelles Erbe": 0 Risiken.</p>
+  <div class="pagenum">6</div>
+</section>
+
+<!-- ─── Folie 7: Top 10 ─── -->
+<section class="slide">
+  <h2>Der härteste Befund <span class="pill crit" style="font-size:17px; vertical-align: middle;">10 von 31 „sehr dringend" fehlen</span>
+    <span class="sub">§ 12 KAnG verlangt die Feststellung „sehr dringlicher Handlungserfordernisse" — der Bund listet 31 (KWRA TB6, Tab. 25). KAP2 fehlen zehn:</span></h2>
+  <div class="cols">
+    <div class="col">
+      <div class="card"><h3>Sehr hoher kommunaler Hebel</h3>
+        <ul class="mid">
+          <li><strong>Vegetation in Siedlungen</strong> — Maßnahme <code>URBAN_GREEN</code> existiert, das Zielrisiko nicht</li>
+          <li><strong>Innenraumklima</strong> — Schulen, Kitas, Pflegeheime in kommunaler Trägerschaft</li>
+          <li><strong>Versagen von Hochwasserschutzsystemen</strong> — <code>LEVEE_REINFORCEMENT</code> existiert, das Versagensrisiko nicht</li>
+        </ul>
+      </div>
+      <div class="card"><h3>Hoher Hebel</h3>
+        <ul class="mid">
+          <li><strong>UV-Gesundheitsschädigungen</strong> · <strong>Aeroallergene</strong></li>
+          <li><strong>Wald: Schädlinge/Krankheiten</strong> · <strong>Holzertrag</strong> (Kommunalwald!)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card"><h3>Mittlerer Hebel</h3>
+        <ul class="mid">
+          <li>Binnenschifffahrt bei Niedrigwasser · Warenverkehr über Wasserstraßen (Hafen-/Anrainerkommunen)</li>
+          <li>Ausbreitung invasiver Arten (Grünflächen, Gewässerunterhaltung)</li>
+        </ul>
+      </div>
+      <div class="card"><h3>Muster</h3>
+        <p>Zweimal existiert bereits die <strong>Maßnahme ohne das Risiko</strong> — die Lücke ist strukturell (fehlende Zielrisiken), nicht inhaltliches Desinteresse. Dazu: ganzes Handlungsfeld Tourismus fehlt; Nutztiere fehlen („Schäden an Tieren", wie vom PO vermutet).</p>
+      </div>
+    </div>
+  </div>
+  <div class="pagenum">7</div>
+</section>
+
+<!-- ─── Folie 8: Varianten ─── -->
+<section class="slide">
+  <h2>Sechs Strukturvarianten — und was sie wirklich sind</h2>
+  <table>
+    <tr><th style="width:340px;">Variante</th><th style="width:210px;">Rolle im Lösungsraum</th><th>Ein-Satz-Urteil</th></tr>
+    <tr><td><strong>A</strong> — Status quo reparieren <span style="color:var(--muted)">(S–M)</span></td><td>Zeitachsen-Entscheidung</td><td>Notwendige Sofortmaßnahme, kein Zielbild</td></tr>
+    <tr><td><strong>B</strong> — KWRA: 13 Handlungsfelder / 102 Wirkungen <span style="color:var(--muted)">(L)</span></td><td><strong>Suchraum</strong></td><td>Richtiges Universum, falsche Präsentationsachse (13 Radar-Achsen)</td></tr>
+    <tr><td><strong>C</strong> — KAnG-Symmetrie: eine Taxonomie für beides <span style="color:var(--muted)">(M–L)</span></td><td>Sekundärachse (Tag)</td><td>Als Tag unverzichtbar; als Primärachse nicht MECE (Akteurs- ≠ Schadensraum)</td></tr>
+    <tr><td><strong>D</strong> — Gefahr × Schutzgut-Matrix <span style="color:var(--muted)">(L–XL)</span></td><td><strong>Ordnung im Suchraum</strong></td><td>Beste innere Logik — als Alleinlösung datenblind (~40 Zellen Füll-Druck)</td></tr>
+    <tr><td style="background:#f4f8fd;"><strong>E</strong> — Zwei Ebenen: Screening + Kern <span style="color:var(--muted)">(M → XL)</span></td><td style="background:#f4f8fd;"><strong>Schichtung</strong></td><td style="background:#f4f8fd;"><strong>Das Zielbild — löst die MECE-vs-Daten-Spannung, statt sie zu verschieben</strong></td></tr>
+    <tr><td><strong>F</strong> — Wirkungsdimensionen (<code>cost_dimension</code>) <span style="color:var(--muted)">(M)</span></td><td>Sekundärachse (Pivot)</td><td>Starke Innenarchitektur des Kerns, keine Außentaxonomie</td></tr>
+  </table>
+  <div class="verdictbox" style="margin-top: 22px;">
+    <p><strong>Nur B und D konkurrieren wirklich</strong> — und der Konflikt ist auflösbar: B liefert die Bezugsmenge für Ebene 1, D die Systematik für Ebene 2. A, C und F sind mit allem kombinierbar.</p>
+  </div>
+  <div class="pagenum">8</div>
+</section>
+
+<!-- ─── Folie 9: Vergleich ─── -->
+<section class="slide">
+  <h2>Vergleich <span class="sub">Bewertung ++ / + / o / − / −− · vollständige 12-Kriterien-Tabelle in der Vollfassung, §6</span></h2>
+  <table>
+    <tr><th>Kriterium</th><th style="width:110px;">A</th><th style="width:110px;">B</th><th style="width:110px;">C</th><th style="width:110px;">D</th><th style="width:130px; background:#f4f8fd;">E</th><th style="width:110px;">F</th></tr>
+    <tr><td>MECE / Vollständigkeit</td><td class="rating">−−</td><td class="rating">++</td><td class="rating">−</td><td class="rating">++</td><td class="rating" style="background:#f4f8fd;">++</td><td class="rating">o</td></tr>
+    <tr><td>KWRA-Konformität</td><td class="rating">−</td><td class="rating">++</td><td class="rating">o</td><td class="rating">+</td><td class="rating" style="background:#f4f8fd;">++</td><td class="rating">o</td></tr>
+    <tr><td>KAnG-/DAS-Anschluss</td><td class="rating">o</td><td class="rating">+</td><td class="rating">++</td><td class="rating">o</td><td class="rating" style="background:#f4f8fd;">++</td><td class="rating">−</td></tr>
+    <tr><td>Ehrliche Quantifizierbarkeit</td><td class="rating">+</td><td class="rating">o</td><td class="rating">+</td><td class="rating">−−</td><td class="rating" style="background:#f4f8fd;">++</td><td class="rating">+</td></tr>
+    <tr><td>Risiko↔Maßnahme-Lücke</td><td class="rating">−</td><td class="rating">−</td><td class="rating">++</td><td class="rating">o</td><td class="rating" style="background:#f4f8fd;">++</td><td class="rating">−</td></tr>
+    <tr><td>Deckt die 36 Lücken auf</td><td class="rating">−</td><td class="rating">++</td><td class="rating">−</td><td class="rating">+</td><td class="rating" style="background:#f4f8fd;">++</td><td class="rating">−−</td></tr>
+    <tr><td>Migrationsaufwand</td><td><strong>S–M</strong></td><td><strong>L</strong></td><td><strong>M–L</strong></td><td><strong>L–XL</strong></td><td style="background:#f4f8fd;"><strong>M → XL</strong></td><td><strong>M</strong></td></tr>
+  </table>
+  <p style="margin-top: 18px; font-size: 18px; color: var(--ink-2);"><strong style="color:var(--ink);">E ist die einzige Spalte ohne ein einziges Minus</strong> — weil sie Vollständigkeit und Datenehrlichkeit auf verschiedene Ebenen legt, statt sie gegeneinander zu optimieren. Ihr XL-Anteil (Kern-Vollausbau) ist über die ROADMAP ohnehin beschlossen.</p>
+  <div class="pagenum">9</div>
+</section>
+
+<!-- ─── Folie 10: Empfehlung ─── -->
+<section class="slide">
+  <h2>Empfehlung: Variante E-stufig <span class="pill good" style="font-size:17px; vertical-align:middle;">analog „Option C-stufig", MODELL_KRITIK §7</span></h2>
+  <div class="cols" style="flex: none; margin-bottom: 20px;">
+    <div class="col card" style="background:#f4f8fd; border-color:#c9ddf5;">
+      <h3>Ebene 1 — Screening (MECE)</h3>
+      <p>87 kommunal relevante KWRA-Klimawirkungen als Bezugsmenge, mit Dringlichkeitsstufe. Status je Wirkung: quantifiziert / nur Screening / n. r. — die 11 Index-Risiken sind der Grundstock.</p>
+    </div>
+    <div class="col card" style="background:#f4f8fd; border-color:#c9ddf5;">
+      <h3>Ebene 2 — Quantifizierter Kern</h3>
+      <p>Risiken als Zelle <em>Gefahr × Schutzgut × Outcome</em>, konsistent benannt; nur mit belastbarer Schadensfunktion. 5 Schutzgüter = 5 Radar-Achsen → B1 behoben ohne Achsenwechsel.</p>
+    </div>
+    <div class="col card">
+      <h3>Sekundärachsen</h3>
+      <p><code>kang_field</code>-Tag an jedem Risiko (schließt B7, macht Maßnahmenlücken messbar) · <code>cost_dimension</code> als Pivot-Sicht (Variante F) bleibt erhalten.</p>
+    </div>
+  </div>
+  <table>
+    <tr><th style="width:180px;">Stufe</th><th>Inhalt</th><th style="width:110px;">Aufwand</th><th style="width:150px;">ROADMAP</th></tr>
+    <tr><td><strong>1 — sofort</strong></td><td>Variante A: Hitze-Umgruppierung, Kürzung auf 45, Doku-Korrektur</td><td><strong>S–M</strong></td><td>vor M1</td></tr>
+    <tr><td><strong>2 — kurzfristig</strong></td><td>Abdeckungsmatrix in den Katalog, Screening-Ebene deklarieren, Risiko-Tagging</td><td><strong>M</strong></td><td>M1–M2</td></tr>
+    <tr><td><strong>3 — mittelfristig</strong></td><td>Die 10 fehlenden sehr dringenden Klimawirkungen ergänzen</td><td><strong>M–L</strong></td><td>M2–M3</td></tr>
+    <tr><td><strong>4 — Zielbild</strong></td><td>Kern risikoweise validiert nach Gefahr × Schutzgut aufbauen</td><td><strong>XL</strong></td><td>M3–M4 (eingeplant)</td></tr>
+  </table>
+  <div class="pagenum">10</div>
+</section>
+
+<!-- ─── Folie 11: Entscheidung ─── -->
+<section class="slide">
+  <h2>Entscheidung &amp; nächste Schritte</h2>
+  <div class="cols">
+    <div class="col" style="flex: 1.35;">
+      <table>
+        <tr><th style="width:44px;"></th><th style="width:290px;">Option</th><th>Konsequenz in einem Satz</th></tr>
+        <tr><td>☐</td><td><strong>A</strong> — Nur reparieren</td><td>Picks mit besserer Frisur; 36 Lücken bleiben</td></tr>
+        <tr><td>☐</td><td><strong>B</strong> — KWRA-Handlungsfelder primär</td><td>Konform, aber 13 Achsen sprengen die UI</td></tr>
+        <tr><td>☐</td><td><strong>C</strong> — KAnG-Symmetrie primär</td><td>Maßnahmenlücke zu, MECE-Frage bleibt offen</td></tr>
+        <tr><td>☐</td><td><strong>D</strong> — Schutzgut-Matrix solo</td><td>Sauber, aber ~40 Zellen ohne Datengrundlage</td></tr>
+        <tr><td style="background:#f4f8fd;">☒</td><td style="background:#f4f8fd;"><strong>E-stufig (EMPFOHLEN)</strong></td><td style="background:#f4f8fd;">Vollständig und datenehrlich zugleich; §-12-konform herleitbar</td></tr>
+        <tr><td>☐</td><td><strong>F</strong> — Wirkungsdimensionen primär</td><td>Saubere Aggregation, blind für Lücken</td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>Unabhängig von der Option</h3>
+        <p>Die <strong>10 fehlenden sehr dringenden Klimawirkungen</strong> als eigenen Arbeitsstrang priorisieren — einziger Befund mit direkter Außenwirkung auf den KAnG-Konformitätsanspruch der Produktbeschreibung. <strong>Empfehlung: ja.</strong></p>
+      </div>
+      <div class="card">
+        <h3>Vertriebseffekt des Zielbilds</h3>
+        <p>„Wir screenen alle <strong>87</strong> kommunal relevanten Klimawirkungen des Bundes und rechnen <strong>26</strong> monetär durch"<br>schlägt<br>„wir haben 51 Risiken".</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">Vollfassung mit Belegen, 102-Zeilen-Abdeckungsmatrix und 51-Risiken-Mapping: docs/KATALOG_KRITIK.md</div>
+  <div class="pagenum">11</div>
+</section>
+
+</body>
+</html>

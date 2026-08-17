@@ -255,24 +255,30 @@ EXPOSURES: list[dict] = [
      "proxy": "Bebaute Fläche (OSM) in Senken-/UHI-Lage (Topografie + UHI).",
      "source": "OSM + Topografie"},
     {"code": "ENERGY_INFRASTRUCTURE", "name": "Energieanlagen",
-     "unit": "Anzahl", "norm_min": 0.0, "norm_max": 20.0, "spatial": True,
-     "description": "Energieinfrastruktur als exponiertes Sachgut.",
-     "proxy": "OSM power=* (Umspannwerke, Leitungen, Anlagen) pro Zelle.",
+     "unit": "Punkte", "norm_min": 0.0, "norm_max": 15.0, "spatial": True,
+     "description": "Energieinfrastruktur als exponiertes Sachgut (Kritikalitätspunkte).",
+     "proxy": "OSM power=*, gewichtet nach Anlagenklasse und Spannungsebene (Umspannwerk/"
+              "Kraftwerk hoch, Leitung je kV-Klasse pro Zellquerung); Masten/Tragwerke "
+              "zählen nicht (Bestandteil der Leitung). Sättigung je Zelle: stärkstes "
+              "Asset voll, Restsumme zu 50 %.",
      "source": "OSM"},
     {"code": "WATER_WASTEWATER_INFRA", "name": "Wasser/Abwasseranlagen",
-     "unit": "Anzahl", "norm_min": 0.0, "norm_max": 20.0, "spatial": True,
-     "description": "Wasser- und Abwasserinfrastruktur.",
-     "proxy": "OSM man_made=water_works/wastewater_plant u. ä. pro Zelle.",
+     "unit": "Punkte", "norm_min": 0.0, "norm_max": 15.0, "spatial": True,
+     "description": "Wasser- und Abwasserinfrastruktur (Kritikalitätspunkte).",
+     "proxy": "OSM man_made=water_works/wastewater_plant/pumping_station u. ä., "
+              "gewichtet nach Anlagenklasse (Kläranlage/Wasserwerk hoch).",
      "source": "OSM"},
     {"code": "TRANSPORT_HUBS", "name": "Verkehrsknotenpunkte",
-     "unit": "Anzahl", "norm_min": 0.0, "norm_max": 20.0, "spatial": True,
-     "description": "Verkehrsknoten und -kritikalität.",
-     "proxy": "OSM Bahnhöfe/Haltestellen/ÖPNV-Stationen (Knoten) pro Zelle.",
+     "unit": "Punkte", "norm_min": 0.0, "norm_max": 12.0, "spatial": True,
+     "description": "Verkehrsknoten und -kritikalität (Kritikalitätspunkte).",
+     "proxy": "OSM Bahnhöfe/Haltestellen/ÖPNV-Stationen, gewichtet nach Knotenklasse "
+              "(Bahnhof hoch, Haltepunkt niedriger).",
      "source": "OSM"},
     {"code": "COMMUNICATION_INFRA", "name": "Kommunikationsinfrastruktur",
-     "unit": "Anzahl", "norm_min": 0.0, "norm_max": 10.0, "spatial": True,
-     "description": "Telekommunikations- und Kommunikationsanlagen.",
-     "proxy": "OSM communication/tower=communication pro Zelle.",
+     "unit": "Punkte", "norm_min": 0.0, "norm_max": 12.0, "spatial": True,
+     "description": "Telekommunikations- und Kommunikationsanlagen (Kritikalitätspunkte).",
+     "proxy": "OSM telecom/tower=communication/man_made=mast, gewichtet nach Anlagenklasse "
+              "(Rechenzentrum/Vermittlung hoch, Mast/Antenne niedriger).",
      "source": "OSM"},
     {"code": "HEALTHCARE_INFRASTRUCTURE", "name": "Gesundheitsversorgung (Erreichbarkeit)",
      "unit": "Index", "norm_min": 0.0, "norm_max": 100.0, "spatial": True,
@@ -514,32 +520,86 @@ VULNERABILITIES: list[dict] = [
 # Für cost_dimension=='monetary' ist ref_value in €/Jahr (Schadenkosten).
 
 RISKS: list[dict] = [
-    {"code": "EXPECTED_ANNUAL_MORTALITY", "name": "Erwartete jährliche Mortalität",
+    {"code": "EXPECTED_ANNUAL_MORTALITY", "name": "Erwartete Mortalität (Hitze)",
      "outcome_unit": "Todesfälle/Jahr", "group": "heat", "cost_dimension": "health",
-     "hazards": ["HEAT_WAVE", "COLD_EXTREME", "COMPOUND_EVENT"],
+     # Gefahrenliste = was die Schadensfunktion TATSÄCHLICH rechnet. Vorher standen
+     # hier zusätzlich COLD_EXTREME und COMPOUND_EVENT, die nie in die Rechnung
+     # eingingen — der Name „(Hitze)“ und die Metadaten stimmen jetzt überein.
+     "hazards": ["HEAT_WAVE"],
      "exposures": ["POPULATION_DENSITY", "VULNERABLE_GROUPS_POPULATION", "AGE_STRUCTURE"],
-     "vulnerabilities": ["HEAT_SENSITIVITY", "HEALTHCARE_ACCESS", "VULNERABLE_GROUPS_SHARE"],
-     # Herleitung: Worst-Case-Anker 18/100k bei Index=100 ≈ 1,7× schlimmstes beobachtetes Jahr (2018: ~8.700 Tote = 10,5/100k; RKI/Winklmayr 2022). Typische Kommune P90-Index 20-40 ⇒ 3,6-7,2/100k (statistikkonform, UBA GE-I-2).
-     # cost_per_outcome_eur: VSL-Punktwert 3,5 Mio € im gängigen EU/OECD-Band (~1-4 Mio); UBA MK3.1 nennt keinen einzelnen VSL-Wert (bewertet nur Luftschadstoff-/Lärmeffekte), daher Punktwert im Band statt exaktem UBA-Wert.
-     "ref_value": 18.0, "scale": "pop", "cost_per_outcome_eur": 3500000.0, "source": "RKI 2022 / Winklmayr u.a. 2022 / UBA MK3.1 2020",
-     "description": "Erwartete jährliche Mortalität durch klimatische Belastungen.",
+     "vulnerabilities": ["HEALTHCARE_ACCESS"],
+     # Herleitung: Anker 18/100k ≈ 1,7× schlimmstes beobachtetes Jahr (2018: ~8.700 Tote = 10,5/100k; RKI/Winklmayr 2022).
+     # cost_per_outcome_eur: VSL-Punktwert 3,5 Mio € im gängigen EU/OECD-Band (~1-4 Mio); UBA MK3.1 nennt keinen einzelnen VSL-Wert.
+     "ref_value": 18.0, "scale": "pop", "cost_per_outcome_eur": 3500000.0, "source": "Winklmayr u.a. 2022 / RKI / UBA MK3.1 2020",
+     "description": "Hitzebedingte Sterbefälle nach der altersgeschichteten Expositions-"
+                    "Wirkungs-Kurve des RKI (Wochenmitteltemperatur, vier Altersbänder, "
+                    "drei Regionen).",
      "priority": 1},
-    {"code": "EXPECTED_ANNUAL_MORBIDITY", "name": "Erwartete jährliche Morbidität",
+    {"code": "EXPECTED_ANNUAL_MORTALITY_FLOOD", "name": "Erwartete Mortalität (Flut)",
+     "outcome_unit": "Todesfälle/Jahr", "group": "flood", "cost_dimension": "health",
+     "hazards": ["HEAVY_RAIN_FLOOD"],
+     "exposures": ["POPULATION_DENSITY", "LOCATION_HAZARD_ZONES"],
+     "vulnerabilities": ["EARLY_WARNING_SYSTEMS", "EMERGENCY_MANAGEMENT"],
+     # Anker: annualisiertes Mittel der kuratierten Ereignisliste (~6 Tote/Jahr bundesweit
+     # = ~0,007/100k). ref_value ist der Wert bei Index=100, also der Ereignisfall.
+     "ref_value": 0.6, "scale": "pop", "cost_per_outcome_eur": 3500000.0,
+     "source": "Jonkman 2008 / CEDIM 2021 / Destatis ICD-10 X38",
+     "description": "Todesfälle durch Hochwasser und Sturzfluten (Ertrinken). Der "
+                    "Geländetyp entscheidet: Sturzfluten in engen Steiltälern sind um "
+                    "Größenordnungen tödlicher als langsam steigende Auenhochwasser.",
+     "priority": 2},
+    {"code": "EXPECTED_ANNUAL_MORTALITY_STORM", "name": "Erwartete Mortalität (Sturm)",
+     "outcome_unit": "Todesfälle/Jahr", "group": "flood", "cost_dimension": "health",
+     "hazards": ["EXTRATROPICAL_STORM"],
+     "exposures": ["POPULATION_DENSITY", "LOCATION_HAZARD_ZONES"],
+     "vulnerabilities": ["BUILDING_STABILITY", "EARLY_WARNING_SYSTEMS"],
+     "ref_value": 0.15, "scale": "pop", "cost_per_outcome_eur": 3500000.0,
+     "source": "DWD-Sturmereignisse / Destatis ICD-10 X37",
+     "description": "Sturmbedingte Todesfälle — überwiegend durch umstürzende Bäume, "
+                    "fliegende Trümmer und Bauteilversagen; die Opfer fallen draußen und "
+                    "unterwegs, nicht in der Wohnung.",
+     "priority": 2},
+    {"code": "EXPECTED_ANNUAL_MORBIDITY", "name": "Erwartete Morbidität (Hitze)",
      "outcome_unit": "Fälle/Jahr", "group": "heat", "cost_dimension": "health",
-     "hazards": ["HEAT_WAVE", "DROUGHT", "HEAVY_RAIN_FLOOD"],
+     # Gefahrenliste an die Formel angeglichen: gerechnet wird ausschließlich mit HEAT_WAVE.
+     "hazards": ["HEAT_WAVE"],
      "exposures": ["POPULATION_DENSITY", "VULNERABLE_GROUPS_POPULATION"],
      "vulnerabilities": ["HEAT_SENSITIVITY", "DISEASE_VECTOR_SUSCEPTIBILITY", "HEALTHCARE_ACCESS"],
      # Modellannahme (Punktwert, editierbar): kalibriert gegen Größenordnung der UBA-MK3.1-Morbiditätskostensätze; keine belastbare nationale Pro-Kopf-Fallstatistik ⇒ als Annahme gekennzeichnet, nicht als Herleitung.
      "ref_value": 320.0, "scale": "pop", "cost_per_outcome_eur": 5000.0, "source": "UBA MK3.1 2020 / RKI JoHM",
-     "description": "Erwartete jährliche Morbidität (Erkrankungen).", "priority": 1},
-    {"code": "EXPECTED_ANNUAL_INJURIES", "name": "Erwartete jährliche Verletztenzahlen",
+     "description": "Hitzeassoziierte Erkrankungsfälle.", "priority": 1},
+    {"code": "EXPECTED_ANNUAL_INJURIES", "name": "Erwartete Verletzte (Flut)",
      "outcome_unit": "Verletzte/Jahr", "group": "flood", "cost_dimension": "health",
-     "hazards": ["HEAVY_RAIN_FLOOD", "EXTRATROPICAL_STORM", "LANDSLIDE"],
+     # Vorher lief EIN Risiko mit max() über Flut/Sturm/Hangrutsch. Verletzte aus
+     # verschiedenen Gefahren sind additiv, nicht alternativ — daher aufgetrennt.
+     "hazards": ["HEAVY_RAIN_FLOOD"],
      "exposures": ["POPULATION_DENSITY", "LOCATION_HAZARD_ZONES"],
      "vulnerabilities": ["EMERGENCY_MANAGEMENT", "EARLY_WARNING_SYSTEMS"],
-     # Modellannahme (Punktwert, editierbar): Größenordnung Verletztenzahlen bei Extremereignissen (Sturm/Starkregen); keine belastbare nationale Pro-Kopf-Statistik ⇒ als Annahme gekennzeichnet.
-     "ref_value": 45.0, "scale": "pop", "cost_per_outcome_eur": 12000.0, "source": "UBA MK3.1 2020 / RKI JoHM",
-     "description": "Erwartete jährliche Verletztenzahlen durch Extremereignisse.", "priority": 2},
+     "ref_value": 30.0, "scale": "pop", "cost_per_outcome_eur": 12000.0,
+     "source": "Destatis ICD-10 X38 / BBK",
+     "description": "Nicht-tödlich Verletzte durch Hochwasser und Starkregen, "
+                    "einschließlich der Verletzungen bei den Aufräumarbeiten.",
+     "priority": 2},
+    {"code": "EXPECTED_ANNUAL_INJURIES_STORM", "name": "Erwartete Verletzte (Sturm)",
+     "outcome_unit": "Verletzte/Jahr", "group": "flood", "cost_dimension": "health",
+     "hazards": ["EXTRATROPICAL_STORM"],
+     "exposures": ["POPULATION_DENSITY", "LOCATION_HAZARD_ZONES"],
+     "vulnerabilities": ["BUILDING_STABILITY", "EARLY_WARNING_SYSTEMS"],
+     "ref_value": 18.0, "scale": "pop", "cost_per_outcome_eur": 12000.0,
+     "source": "Destatis ICD-10 X37/X33 / DWD",
+     "description": "Nicht-tödlich Verletzte durch Stürme (Baumsturz, Trümmer, "
+                    "Dachreparaturen nach dem Ereignis).",
+     "priority": 2},
+    {"code": "EXPECTED_ANNUAL_INJURIES_LANDSLIDE", "name": "Erwartete Verletzte (Hangrutsch)",
+     "outcome_unit": "Verletzte/Jahr", "group": "flood", "cost_dimension": "health",
+     "hazards": ["LANDSLIDE"],
+     "exposures": ["POPULATION_DENSITY", "LOCATION_HAZARD_ZONES"],
+     "vulnerabilities": ["EMERGENCY_MANAGEMENT", "EARLY_WARNING_SYSTEMS"],
+     "ref_value": 1.5, "scale": "pop", "cost_per_outcome_eur": 12000.0,
+     "source": "Destatis ICD-10 X36",
+     "description": "Nicht-tödlich Verletzte durch Hangrutschungen. Außerhalb steilen "
+                    "Geländes nahe null.",
+     "priority": 3},
     {"code": "EXPECTED_ANNUAL_MENTAL_HEALTH", "name": "Psychische Belastungsfälle",
      "outcome_unit": "Fälle/Jahr", "group": "compound", "cost_dimension": "health",
      "hazards": ["HEAT_WAVE", "DROUGHT", "COMPOUND_EVENT", "CASCADE_EVENT"],
@@ -562,7 +622,7 @@ RISKS: list[dict] = [
      "exposures": ["OUTDOOR_THERMAL_EXPOSURE", "POPULATION_DENSITY"],
      "vulnerabilities": ["HEAT_SENSITIVITY", "UHI_INTENSITY", "GREEN_SPACE_SHARE"],
      # Kostensatz wird in _RISK_COST_RATES gesetzt (Arbeitsproduktivität, ohne klinische
-     # Behandlung — die zählt „Erwartete jährliche Morbidität"; Abgrenzung dort/hier).
+     # Behandlung — die zählt „Erwartete Morbidität (Hitze)"; Abgrenzung dort/hier).
      "ref_value": 400.0, "scale": "pop", "source": "Modellannahme (Belastungsstunden, unbelegt)",
      "description": "Erwartete jährliche Stunden thermischer Belastung.", "priority": 1},
     {"code": "EXPECTED_POLLUTANT_EXPOSURE_HOURS", "name": "Schadstoffexpositionsstunden",
@@ -973,6 +1033,47 @@ def _enrich_risk_sources() -> None:
             "separaten, editierbaren Kostensatz-Parameter „Kostensatz (Monetarisierung)“ "
             "– nicht mehr über diesen Referenzwert.",
             ["RKI_Hitzemortalitaet", "UBA_KWRA_2021"]),
+        "EXPECTED_ANNUAL_MORTALITY_FLOOD": (
+            "Anker aus der kuratierten nationalen Ereignisliste: 2021 Ahr/Erft 189, "
+            "2002 Elbe 21, 2013 rund 4 Todesopfer — annualisiert über 1990–2024 rund "
+            "6 Todesfälle/Jahr bundesweit (≈ 0,007/100.000). Der Referenzwert 0,6/100.000 "
+            "beschreibt den Ereignisfall (Index = 100), nicht das Jahresmittel. WICHTIG: "
+            "Die Verteilung ist extrem tail-lastig — allein 2021 trägt rund 80 % der "
+            "Todesfälle des Zeitraums; ein Erwartungswert beschreibt hier keine typische "
+            "Jahreslage. Nicht zu verwechseln mit der DLRG-Ertrinkungsstatistik (~400/Jahr): "
+            "Die betrifft nahezu ausschließlich Freizeitertrinken ohne Hochwasserbezug und "
+            "würde die Flutmortalität um zwei Größenordnungen überschätzen.",
+            ["CEDIM_Hochwasser_2021", "Jonkman_2008_LossOfLife", "Destatis_Todesursachen_23211"]),
+        "EXPECTED_ANNUAL_MORTALITY_STORM": (
+            "Anker aus der kuratierten Sturm-Ereignisliste: Kyrill 2007 mit 13 Todesopfern "
+            "in Deutschland (europaweit 47), Friederike 2018 mit 8–10, Sabine 2020 mit "
+            "wenigen. Größenordnung 5–15 in einem schweren Sturmjahr, annualisiert rund "
+            "1/Jahr. Amtliche Gegenprobe: ICD-10 X37 (Opfer eines Sturms) in der "
+            "Todesursachenstatistik.",
+            ["DWD_Sturmereignisse", "Destatis_Todesursachen_23211"]),
+        "EXPECTED_ANNUAL_INJURIES": (
+            "NICHT-TÖDLICH Verletzte durch Hochwasser/Starkregen; die Todesfälle stehen im "
+            "eigenen Kanal, damit nichts doppelt bewertet wird. Amtliche Bezugsgröße ist "
+            "die ICD-10-Außenursache X38 (Opfer einer Überschwemmung) in der "
+            "Krankenhausstatistik — in der deutschen Kodierpraxis als Nebendiagnose, "
+            "weshalb die DRG-Nebendiagnosen-Tabelle (23141) und nicht die "
+            "Hauptdiagnose-Tabelle die belastbare Quelle ist. Ein erheblicher Teil der "
+            "Verletzungen entsteht erst bei den Aufräumarbeiten.",
+            ["Destatis_Krankenhausdiagnosen_23131", "BBK_Hochwasserschutzfibel"]),
+        "EXPECTED_ANNUAL_INJURIES_STORM": (
+            "Nicht-tödlich Verletzte durch Stürme (ICD-10 X37 Sturm, X33 Blitzschlag). "
+            "Das Verhältnis Verletzte je Todesfall ist bei Sturm hoch — viele Verletzte, "
+            "wenige Tote — und schließt Verletzungen bei Dachreparaturen nach dem Ereignis "
+            "ein. Bis Modellversion 6 war dieser Kanal mit Flut und Hangrutsch in EIN "
+            "Risiko gefaltet, verknüpft über ein Maximum; das unterschätzte Kommunen, die "
+            "mehreren Gefahren ausgesetzt sind, weil Verletzte aus verschiedenen Gefahren "
+            "additiv und nicht alternativ auftreten.",
+            ["Destatis_Krankenhausdiagnosen_23131", "DWD_Sturmereignisse"]),
+        "EXPECTED_ANNUAL_INJURIES_LANDSLIDE": (
+            "Nicht-tödlich Verletzte durch Hangrutschungen (ICD-10 X36). Außerhalb steilen "
+            "Geländes liegt der Kanal nahe null — das ist ehrlich und informativ, kein "
+            "Mangel. Zuvor Teil des zusammengefassten Verletzten-Risikos.",
+            ["Destatis_Krankenhausdiagnosen_23131"]),
         "EXPECTED_BUILDING_DAMAGE_EUR": (
             "Nationale jährliche Gebäudeschäden (Hochwasser + Sturm/Hagel) ~3,5 Mrd €/a ÷ 832 "
             "(100.000-Einwohner-Einheiten in DE) ≈ 4,2 Mio €/100.000 → 4,5 Mio € bei Index=100. "
@@ -1087,7 +1188,26 @@ _RISK_COST_RATES: dict[str, tuple[float, str, list[str], str]] = {
         12_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
         "12.000 € je Verletztem (Behandlung, Reha, temporärer Erwerbsausfall) als "
         "editierbarer Punktwert; Größenordnung an den Gesundheits-/Unfallkostensätzen der "
-        "UBA-Methodenkonvention 3.1 orientiert."),
+        "UBA-Methodenkonvention 3.1 orientiert. Zählt ausschließlich NICHT-TÖDLICH "
+        "Verletzte — die Todesfälle sind über eigene Risiken mit dem VSL bewertet."),
+    "EXPECTED_ANNUAL_INJURIES_STORM": (
+        12_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
+        "Wie Verletzte (Flut): 12.000 € je nicht-tödlich Verletztem."),
+    "EXPECTED_ANNUAL_INJURIES_LANDSLIDE": (
+        12_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
+        "Wie Verletzte (Flut): 12.000 € je nicht-tödlich Verletztem."),
+    "EXPECTED_ANNUAL_MORTALITY_FLOOD": (
+        3_500_000.0, "OECD 2012 (VSL)", ["OECD_VSL_2012", "Jonkman_2008_LossOfLife"],
+        "VSL-Punktwert 3,5 Mio € wie bei der Hitzemortalität. Dokumentierte Folge dieser "
+        "Wahl: Ein einheitlicher VSL bewertet einen Fluttod und einen Hitzetod gleich, "
+        "obwohl Hitzetote weit überwiegend im Band 85+ mit kurzer Restlebenserwartung "
+        "auftreten und Flutopfer ein breites Altersspektrum treffen. Nach Lebensjahren "
+        "gerechnet wäre ein Fluttod ein Vielfaches wert — die Wahl verschiebt damit das "
+        "€-Ranking zwischen Anpassungsmaßnahmen und ist bewusst so getroffen."),
+    "EXPECTED_ANNUAL_MORTALITY_STORM": (
+        3_500_000.0, "OECD 2012 (VSL)", ["OECD_VSL_2012", "DWD_Sturmereignisse"],
+        "VSL-Punktwert 3,5 Mio € wie bei der Hitzemortalität (gleiche Einschränkung zur "
+        "Altersstruktur wie bei der Flut-Mortalität)."),
     "EXPECTED_ANNUAL_MENTAL_HEALTH": (
         4_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
         "4.000 € je psychischem Belastungsfall (Diagnostik, Therapie, Ausfallzeiten) als "
@@ -1104,7 +1224,7 @@ _RISK_COST_RATES: dict[str, tuple[float, str, list[str], str]] = {
         "der ARBEITSPRODUKTIVITÄTS-/Komfortverlust thermischer Belastung, an den "
         "Produktivitätskosten-Ansätzen der UBA-Methodenkonvention 3.1 orientiert. Abgrenzung "
         "gegen Doppelzählung (§8/B4): Der klinische Behandlungs-/Krankheitsanteil ist im "
-        "Risiko „Erwartete jährliche Morbidität“ (Kostensatz je Fall) erfasst und hier "
+        "Risiko „Erwartete Morbidität (Hitze)“ (Kostensatz je Fall) erfasst und hier "
         "ausgeklammert — Belastungsstunden zählen nur die subklinische Produktivitätslast."),
     "EXPECTED_POLLUTANT_EXPOSURE_HOURS": (
         300.0, "UBA MK3.1 2020 (Modellannahme)", ["UBA_Methodenkonvention_MK3.1"],
@@ -2026,7 +2146,15 @@ MEASURES: list[dict] = [
     {"code": "EARLY_WARNING_MEASURE", "name": "Frühwarnsysteme (Maßnahme)",
      "description": "Ausbau von Frühwarnsystemen.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "saturating",
-     "linked_risk_codes": ["EXPECTED_ANNUAL_AFFECTED_EVACUATED", "EXPECTED_ANNUAL_INJURIES"],
+     # Frühwarnung wirkt auf alle ereignisgetriebenen Personenschäden — seit der
+     # Auftrennung der Verletzten nach Gefahr sind das mehrere Kanäle. Die
+     # Todesfall-Kanäle sind der wichtigste Hebel: An der Ahr 2021 war das
+     # Warnversagen ausschlaggebend.
+     "linked_risk_codes": ["EXPECTED_ANNUAL_AFFECTED_EVACUATED",
+                           "EXPECTED_ANNUAL_INJURIES", "EXPECTED_ANNUAL_INJURIES_STORM",
+                           "EXPECTED_ANNUAL_INJURIES_LANDSLIDE",
+                           "EXPECTED_ANNUAL_MORTALITY_FLOOD",
+                           "EXPECTED_ANNUAL_MORTALITY_STORM"],
      "capex_fixed": 60000.0, "capex_per_unit": None, "capex_per_m2": None,
      "opex_fixed_year": 35000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
      "unit_label": None, "unit_density_per_ha": None,
@@ -3454,4 +3582,4 @@ def group_label(code: str) -> str:
 # Wird bei strukturellen Modelländerungen (Risiko-Set, Kostensätze, Aggregation)
 # erhöht. Der Layer-Cache stempelt seine Dateien mit dieser Version und invalidiert
 # automatisch, wenn sich die Version ändert (siehe services/layer_cache.py).
-MODEL_VERSION = "2026.07-schichtB-nachbesserung-n6"
+MODEL_VERSION = "2026.08-mortalitaet-erf"

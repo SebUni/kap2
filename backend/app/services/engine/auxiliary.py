@@ -22,6 +22,68 @@ def _norm_index(value: float | None, lo: float, hi: float, invert: bool = False)
     return round(t * 100.0, 1)
 
 
+def _age_band(ci: dict, band: str) -> float | None:
+    bands = ci.get("pop_age_bands")
+    if not isinstance(bands, dict):
+        return None
+    v = bands.get(band)
+    return round(float(v), 2) if v is not None else None
+
+
+def _cell_temp(ci: dict, regional: dict) -> float | None:
+    t = ci.get("summer_temp_cell")
+    if t is not None:
+        return float(t)
+    base = regional.get("summer_temp_mean")
+    return float(base) + float(ci.get("uhi_delta_mean") or 0.0) if base is not None else None
+
+
+def _heat_excess_weeks(ci: dict, regional: dict) -> float | None:
+    """Übertemperatur-Wochen über der regionalen Wirkschwelle (K·Wochen)."""
+    from app.services.engine.impact import health
+    t = _cell_temp(ci, regional)
+    if t is None:
+        return None
+    region = health.region_for(regional.get("bundesland"))
+    return round(health.heat_excess_weeks(
+        t, 2.0, 13, health.REGION_THRESHOLD[region]), 3)
+
+
+def _heat_relative_risk(ci: dict, regional: dict) -> float | None:
+    """Bevölkerungsgewichtetes relatives Sterberisiko der Zelle (Faktor ≥ 1)."""
+    from math import exp
+
+    from app.services.engine.impact import health
+    t = _cell_temp(ci, regional)
+    if t is None:
+        return None
+    region = health.region_for(regional.get("bundesland"))
+    thr = health.REGION_THRESHOLD[region]
+    beta85 = health.REGION_BETA_85P[region]
+    temps = health.weekly_temperatures(t, 2.0, 13)
+
+    bands = ci.get("pop_age_bands")
+    if not isinstance(bands, dict) or not sum(float(v or 0.0) for v in bands.values()):
+        bands = {b: 1.0 for b in health.AGE_BANDS}
+    total = sum(float(bands.get(b) or 0.0) for b in health.AGE_BANDS)
+    if total <= 0:
+        return None
+
+    acc = 0.0
+    for band in health.AGE_BANDS:
+        beta = beta85 * health.AGE_BETA_FACTOR[band]
+        rr = sum(exp(beta * max(0.0, x - thr)) for x in temps) / len(temps)
+        acc += float(bands.get(band) or 0.0) * rr
+    return round(acc / total, 4)
+
+
+def _flood_regime(ci: dict) -> float:
+    """Sturzflut-Anteil aus Hangneigung und Senkenlage (0 = Aue, 1 = Sturzflut)."""
+    slope = float(ci.get("slope_factor", ci.get("slope_proxy", 0.0)) or 0.0)
+    depression = float(ci.get("depression_factor", ci.get("depression_proxy", 0.0)) or 0.0)
+    return round(max(0.0, min(1.0, slope * (0.5 + 0.5 * depression))), 4)
+
+
 def build_auxiliary(ci: dict, regional: dict) -> dict[str, float | None]:
     """Map cell inputs + regional context to AUXILIARY catalog codes."""
     pop = float(ci.get("pop") or 0.0)
@@ -95,6 +157,20 @@ def build_auxiliary(ci: dict, regional: dict) -> dict[str, float | None]:
         "LOW_FLOW_DAYS": regional.get("low_flow_days"),
         "SURFACE_WATER_HEATING_REGIONAL": regional.get("surface_water_heating"),
         "SEA_LEVEL_RISE": regional.get("sea_level_rise"),
+        # Hitzemodell: die Zwischenschritte der Sterbefall-Rechnung, damit die
+        # Kette Temperatur → Wärmeinsel → Zelltemperatur → Übertemperatur →
+        # Altersbänder als eigene Karten prüfbar ist.
+        "SUMMER_MEAN_TEMP": ci.get("summer_temp_raster"),
+        "SUMMER_NIGHT_TEMP": ci.get("summer_night_temp"),
+        "UHI_DELTA_DAY": ci.get("uhi_delta"),
+        "UHI_DELTA_MEAN": ci.get("uhi_delta_mean"),
+        "CELL_SUMMER_TEMP": ci.get("summer_temp_cell"),
+        "HEAT_EXCESS_WEEKS": _heat_excess_weeks(ci, regional),
+        "HEAT_RELATIVE_RISK": _heat_relative_risk(ci, regional),
+        "FLOOD_REGIME": _flood_regime(ci),
+        "POPULATION_65_74": _age_band(ci, "a65_74"),
+        "POPULATION_75_84": _age_band(ci, "a75_84"),
+        "POPULATION_85_PLUS": _age_band(ci, "a85p"),
     }
 
     for code in catalog.AUXILIARY_BY_CODE:

@@ -216,7 +216,9 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
         return not layer_code and (layer_category is None or layer_category == cat)
 
     uhi_defaults = {"alpha": 6.0, "beta": 2.0, "gamma": 3.5, "delta": 2.0,
-                    "epsilon": 1.5, "tree_cooling": 0.3}
+                    "epsilon": 1.5, "tree_cooling": 0.3,
+                    "zeta": 1.2, "delta_night": 1.5, "night_weight": 0.55,
+                    "mean_factor": 0.45, "vent_ratio": 0.30}
     uhi_labels = {
         "alpha": "UHI-Koeffizient α",
         "beta": "UHI-Koeffizient β",
@@ -224,6 +226,11 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
         "delta": "UHI-Koeffizient δ",
         "epsilon": "UHI-Koeffizient ε (Straßenschluchten)",
         "tree_cooling": "UHI-Koeffizient Baumkronen-Kühlung",
+        "zeta": "UHI-Koeffizient ζ (Wärmespeicher Gebäudemasse, Nacht)",
+        "delta_night": "UHI-Koeffizient Gewässerkühlung (Nacht)",
+        "night_weight": "Nachtgewicht im UHI-Tagesmittel",
+        "mean_factor": "Umrechnung Tagesmaximum → Tagesmittel",
+        "vent_ratio": "Dämpfung der Wärmeinsel durch Durchlüftung",
     }
     uhi_details = {
         "alpha": "Skaliert den Versiegelungs-/Bebauungsbeitrag zur Wärmeinselintensität. "
@@ -248,6 +255,28 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             "Stadtbaum-/Beschattungsliteratur: dichte Kronen senken die lokale Lufttemperatur "
             "um ~1-3 K (VDI 3787 Bl.1; Stewart & Oke 2012). Dokumentierte Modellwahl, "
             "editierbar.",
+        "zeta": "Nächtlicher ΔT-Beitrag der gespeicherten Wärme in der Gebäudemasse: "
+            "Koeffizient · Gebäudeanteil · Höhenfaktor. Die Wärmespeicherung des "
+            "Baukörpers ist neben der Schluchtengeometrie der zweite klassische Treiber "
+            "der nächtlichen UHI (Oke 1982; VDI 3787 Bl.1). Modellwahl, editierbar.",
+        "delta_night": "Nächtliche Kühlwirkung von Gewässern in der Umgebung "
+            "(Wärmekapazität/Verdunstung), skaliert mit der Gewässernähe der Zelle — "
+            "bewusst über die Zellgrenze hinaus, weil die Kühlfahne eines Gewässers "
+            "nicht an der 100-m-Kante endet (VDI 3787 Bl.1). Modellwahl, editierbar.",
+        "night_weight": "Gewicht der Nacht-UHI im 24-h-Mittel (Rest: Tages-UHI). Über "
+            "0,5, weil die städtische Wärmeinsel in Mitteleuropa nachts stärker ausgeprägt "
+            "ist als tagsüber (Oke 1982; DWD-Projekt „Städtische Wärmeinsel“). Die "
+            "Expositions-Wirkungs-Kurve läuft über die Wochenmitteltemperatur und damit "
+            "auch über die Nächte. Modellwahl, editierbar.",
+        "mean_factor": "Umrechnung des modellierten Tagesmaximums der Wärmeinsel auf den "
+            "24-h-Mittelwert, den die RKI-/Winklmayr-Expositions-Wirkungs-Kurven als "
+            "Wochenmitteltemperatur voraussetzen. Das Tagesmittel liegt deutlich unter "
+            "dem Maximum; ohne diese Umrechnung wäre der Hitzezuschlag je Zelle "
+            "systematisch zu hoch. Modellwahl, editierbar.",
+        "vent_ratio": "Dämpfung der Wärmeinsel durch Luftaustausch mit dem Umland: "
+            "ΔT wird mit (1 − Koeffizient · Frischluft-Anteil) skaliert. Kaltluftzufuhr "
+            "und Durchlüftung sind ein anerkannter Minderungsfaktor der städtischen "
+            "Überwärmung (VDI 3787 Bl.1, Kaltluftbahnen). Modellwahl, editierbar.",
     }
     if emit_globals("uhi"):
         for key, val in uhi_defaults.items():

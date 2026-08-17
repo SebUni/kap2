@@ -15,6 +15,8 @@ python-multipart==0.0.18
 pyogrio==0.12.1
 numpy>=1.26.0
 Pillow>=10.0.0
+bcrypt>=4.1
+mistralai==1.12.4  # KI-Assistent (EU-Anbieter, La Plateforme)
 
 # Optional, nur für scripts/fetch_era5_storm.py (einmaliger ERA5-Sturmtage-Raster-Bau
 # mit kostenlosem CDS-Key). Die App läuft ohne diese Pakete; der Loader fällt dann auf

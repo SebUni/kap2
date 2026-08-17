@@ -55,6 +55,8 @@ _REMOVED_DEAD_IDS = {
     "vulnerabilities.FISHERIES_MANAGEMENT_CAPACITY.param.__const",
 }
 
+from app.data import infra_assets  # noqa: E402
+
 # Lebende Formel-Parameter (indicators.py liest sie per get_override).
 _LIVE_FORMULA_IDS = {
     "vulnerabilities.INFRA_CRITICALITY.param.w_energy",
@@ -67,6 +69,14 @@ _LIVE_FORMULA_IDS = {
     "vulnerabilities.LEVEE_CONDITION.param.__const",
     "vulnerabilities.FINANCIAL_ADAPTATION_CAPACITY.param.__const",
     "vulnerabilities.PLANNING_IMPLEMENTATION_CAPACITY.param.__const",
+}
+# KRITIS-Klassengewichte der vier Infrastruktur-Layer (resolve_weights liest sie
+# per get_override; generiert aus der Taxonomie, damit der Ratchet automatisch
+# jede neue Anlagenklasse erfasst).
+_LIVE_FORMULA_IDS |= {
+    f"exposures.{infra_assets.SECTOR_EXPOSURE[sector]}.param.w_{cls}"
+    for sector, classes in infra_assets.ASSET_CLASSES.items()
+    for cls in classes
 }
 
 # Neue Stellschrauben aus Phase A (müssen vorhanden UND dokumentiert sein).
@@ -168,6 +178,43 @@ def test_wiring_uhi_epsilon_and_tree_cooling():
     with override_context.override_scope({"uhi.epsilon": 6.0}):
         hotter = compute_uhi_delta(lu, bm)
     assert hotter > base, "uhi.epsilon-Override wirkungslos"
+
+
+def test_wiring_uhi_mean_components():
+    """Die Parameter des 24-h-Wärmeinsel-Mittels müssen die Rechnung verändern.
+
+    ``mean`` speist die Zelltemperatur und damit die Hitzemortalität; ``day``
+    bleibt unverändert der Treiber von HEAT_WAVE/UHI_INTENSITY.
+    """
+    from app.services.engine.inputs import compute_uhi_components
+
+    lu = {"impervious_fraction": 0.85, "albedo": 0.15, "green_fraction": 0.05,
+          "water_fraction": 0.0, "forest_fraction": 0.0, "farmland_fraction": 0.0}
+    bm = {"building_coverage": 0.45, "avg_building_height": 20.0, "road_coverage": 0.2,
+          "tree_canopy_fraction": 0.05, "sky_view_factor": 0.4}
+    base = compute_uhi_components(lu, bm, vent_score=0.5, water_prox=0.0)
+
+    with override_context.override_scope({"uhi.mean_factor": 0.9}):
+        assert compute_uhi_components(lu, bm, 0.5, 0.0)["mean"] > base["mean"], \
+            "uhi.mean_factor-Override wirkungslos"
+    with override_context.override_scope({"uhi.vent_ratio": 0.9}):
+        assert compute_uhi_components(lu, bm, 0.5, 0.0)["mean"] < base["mean"], \
+            "uhi.vent_ratio-Override wirkungslos (Durchlüftung muss dämpfen)"
+    with override_context.override_scope({"uhi.zeta": 4.0}):
+        assert compute_uhi_components(lu, bm, 0.5, 0.0)["night"] > base["night"], \
+            "uhi.zeta-Override wirkungslos"
+    with override_context.override_scope({"uhi.night_weight": 0.95}):
+        assert compute_uhi_components(lu, bm, 0.5, 0.0)["mean"] != base["mean"], \
+            "uhi.night_weight-Override wirkungslos"
+    with override_context.override_scope({"uhi.delta_night": 5.0}):
+        assert compute_uhi_components(lu, bm, 0.5, 1.0)["night"] < base["night"], \
+            "uhi.delta_night-Override wirkungslos (Gewässer müssen kühlen)"
+
+    # Durchlüftung darf das Tagesmaximum NICHT verändern — sonst verschöbe sich
+    # HEAT_WAVE und mit ihm die Kalibrierung aller übrigen Hitzekanäle.
+    calm = compute_uhi_components(lu, bm, vent_score=0.0, water_prox=0.0)
+    assert calm["day"] == base["day"]
+    assert calm["mean"] > base["mean"]
 
 
 def test_wiring_measure_saturation_and_cap():

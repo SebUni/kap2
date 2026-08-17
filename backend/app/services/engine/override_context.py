@@ -84,4 +84,10 @@ def uhi_coefficients() -> dict[str, float]:
         "delta": float(get_override("uhi.delta", 2.0)),
         "epsilon": float(get_override("uhi.epsilon", 1.5)),
         "tree_cooling": float(get_override("uhi.tree_cooling", 0.3)),
+        # Nacht-UHI und Umrechnung auf das 24-h-Mittel (Expositions-Wirkungs-Pfad)
+        "zeta": float(get_override("uhi.zeta", 1.2)),
+        "delta_night": float(get_override("uhi.delta_night", 1.5)),
+        "night_weight": float(get_override("uhi.night_weight", 0.55)),
+        "mean_factor": float(get_override("uhi.mean_factor", 0.45)),
+        "vent_ratio": float(get_override("uhi.vent_ratio", 0.30)),
     }

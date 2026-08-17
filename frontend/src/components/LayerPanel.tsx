@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '../store'
 import LayerInfoButton from './LayerInfoButton'
+import { KANG_CLUSTER_COLORS } from '../utils/kangColors'
 import type {
   CatalogIndicator, CatalogMeasure, CategoryDef, LayerCategory,
 } from '../types'
@@ -19,6 +20,7 @@ export default function LayerPanel() {
     catalog, activeLayer, setActiveLayer,
     showMeasures, setShowMeasures, measures,
     selectedMeasure, setSelectedMeasure, setInfoLayer,
+    demoMode, demoEnabledLayers,
   } = useStore()
   // Gruppen-Kollaps (oberste Ebene)
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({
@@ -50,6 +52,28 @@ export default function LayerPanel() {
     info: React.ReactNode, spatial?: boolean,
   ) => {
     const active = activeLayer?.code === code
+    // Demo: nicht freigeschaltete Ebene → sichtbar, aber gesperrt (grau, 🔒,
+    // kein Info-Button/Wirkungsmechanismus, nicht klickbar).
+    const locked = demoMode && !demoEnabledLayers.has(code)
+    if (locked) {
+      return (
+        <div
+          key={code}
+          className="layer-item layer-locked"
+          title="In der Demo nicht freigeschaltet — in der Vollversion verfügbar"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px 4px 18px',
+            fontSize: '0.78rem', borderRadius: 6, cursor: 'not-allowed',
+            color: 'var(--text-muted)', opacity: 0.6,
+          }}
+        >
+          <input type="checkbox" checked={false} readOnly tabIndex={-1}
+            disabled style={{ flexShrink: 0, pointerEvents: 'none', margin: 0 }} />
+          <span style={{ flex: 1 }}>{name}</span>
+          <span style={{ fontSize: '0.72rem' }}>🔒</span>
+        </div>
+      )
+    }
     return (
       <div
         key={code}
@@ -77,7 +101,7 @@ export default function LayerPanel() {
   // Eine einklappbare Kategorie-Zwischenebene rendern
   const renderCategory = (
     groupKey: string, catCode: string, catLabel: string,
-    count: number, children: React.ReactNode,
+    count: number, children: React.ReactNode, swatch?: string,
   ) => {
     if (count === 0) return null
     const key = `${groupKey}:${catCode}`
@@ -93,6 +117,7 @@ export default function LayerPanel() {
           }}
         >
           <span style={{ fontSize: '0.6rem', transform: collapsed ? 'rotate(-90deg)' : 'none', transition: 'transform 0.15s', color: 'var(--text-muted)' }}>▾</span>
+          {swatch && <span style={{ width: 10, height: 10, borderRadius: 3, background: swatch, flexShrink: 0 }} />}
           <span style={{ flex: 1 }}>{catLabel}</span>
           <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{count}</span>
         </div>
@@ -178,7 +203,7 @@ export default function LayerPanel() {
                             </div>
                           )
                         })
-                      ))
+                      ), KANG_CLUSTER_COLORS[cluster.code])
                     })}
                   </>
                 )}

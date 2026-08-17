@@ -49,6 +49,32 @@ def effective_measure_reduction_cap() -> float:
     return float(get_override("model.measure_reduction_cap", MEASURE_REDUCTION_CAP_DEFAULT))
 
 
+# ── Risikoklassen (gering/mittel/hoch) ──────────────────────────────────────────
+# Abgeleitete Konstanten, KEINE Registry-Parameter: beide Grenzen hängen an der
+# Risikozonen-Schwelle, damit "hoch" im Dashboard exakt das Risikozonen-Kriterium
+# der Karte bedeutet und Kommune-Overrides (model.risk_threshold) alle Sichten
+# gemeinsam verschieben. mittel-Grenze = 0,4 · Schwelle (Index 20 bei Default 50:
+# alle drei Faktoren der dominanten Wirkungskette ≈ 0,58 — klar über Grundrauschen).
+RISK_CLASS_MEDIUM_FACTOR = 0.4
+RISK_CLASS_LABELS = {"gering": "Gering", "mittel": "Mittel", "hoch": "Hoch"}
+
+
+def risk_class_bounds() -> dict:
+    """Klassengrenzen aus der effektiven Risikozonen-Schwelle (Override-fähig)."""
+    thr = effective_risk_threshold()
+    return {"medium_min": round(RISK_CLASS_MEDIUM_FACTOR * thr, 2), "high_min": thr}
+
+
+def classify_index(value: float, bounds: dict | None = None) -> str:
+    """Ordnet einen Index (0..100) der Risikoklasse gering/mittel/hoch zu."""
+    b = bounds or risk_class_bounds()
+    if value >= b["high_min"]:
+        return "hoch"
+    if value >= b["medium_min"]:
+        return "mittel"
+    return "gering"
+
+
 def regional_fallback(key: str, default: float) -> float:
     """Override-fähiger regionaler Proxy-/Fallback-Wert (ID ``regional.<key>``)."""
     return float(get_override(f"regional.{key}", default))

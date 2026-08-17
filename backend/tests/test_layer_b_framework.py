@@ -85,13 +85,87 @@ def test_new_aggregate_fields_present():
     agg = risk_engine.aggregate(cells, total_pop=1000.0, area_km2=10.0)
     r = agg["risks"][MORT]
     for key in ("p90_index", "outcome_sum", "aggregation", "top5_share",
-                "area_km2_affected", "share_above_threshold"):
+                "area_km2_affected", "share_above_threshold",
+                "exposed_p90_index", "exposure_share", "risk_class"):
         assert key in r, key
     # 1 von 10 Zellen über der Schwelle (Index 80 ≥ 50) → 10 %.
     assert r["share_above_threshold"] == 0.1
     assert r["area_km2_affected"] == round(1 * risk_engine.CELL_AREA_KM2, 4)
     # Konzentration: die eine Hotspot-Zelle trägt den Großteil → top5_share hoch.
     assert r["top5_share"] > 0.5
+    # Gruppen tragen die Anzeige-Leitgröße + Klasse; Meta-Block liefert die Grenzen.
+    grp = agg["groups"][catalog.RISKS_BY_CODE[MORT]["group"]]
+    assert "exposed_index" in grp and "risk_class" in grp
+    assert agg["classification"]["basis"] == "exposed_p90_index"
+    assert agg["classification"]["bounds"]["high_min"] == 50.0
+    assert agg["classification"]["bounds"]["medium_min"] == 20.0
+
+
+# ── (c2) Belastungs-P90: Expositions-Gate gegen Verdünnung ─────────────────────
+
+def test_exposed_p90_ignores_unpopulated_cells():
+    """Oschatz-Befund: 90 % unbewohnte Flur drücken das P90 pop-skalierter Risiken
+    auf ~0, obwohl bewohnte Zellen deutlich belastet sind. Der Belastungs-P90
+    (exposed_p90_index) rechnet nur über bewohnte Zellen."""
+    override_context.set_overrides({})
+    # 90 unbewohnte Zellen ohne Belastung + 10 bewohnte mit Index 30.
+    cells = ([_cell(0.0, 0.0) for _ in range(90)]
+             + [_cell(30.0, 100.0) for _ in range(10)])
+    agg = risk_engine.aggregate(cells, total_pop=1000.0, area_km2=1.0)
+    r = agg["risks"][MORT]
+    assert r["p90_index"] < 5.0            # alter Wert: verdünnt (interpolierter P90)
+    assert r["exposed_p90_index"] == 30.0  # Leitgröße: nur bewohnte Zellen
+    assert r["exposure_share"] == 0.1
+    assert r["exposed_p90_index"] > r["p90_index"]
+    assert r["risk_class"] == "mittel"
+
+
+def test_exposed_p90_falls_back_without_exposures_key():
+    """Zellen ohne ``exposures``-Dict (adjustierte With-Measures-Daten, Alt-Bestände):
+    area-/flat-Risiken bekommen kein Gate — exposed_p90 == p90 (nie strenger als
+    die Datenlage erlaubt)."""
+    override_context.set_overrides({})
+    area_risk = next(r for r in catalog.RISKS if r.get("scale") == "area")
+    cells = [_cell(15.0, 50.0) for _ in range(10)]  # _cell erzeugt kein "exposures"
+    agg = risk_engine.aggregate(cells, total_pop=500.0, area_km2=1.0)
+    r = agg["risks"][area_risk["code"]]
+    assert r["exposed_p90_index"] == r["p90_index"]
+
+
+def test_exposed_p90_gates_area_risk_on_pathway_exposure():
+    """area-Risiken zählen nur Zellen mit mindestens einer Pfad-Exposition > 0."""
+    override_context.set_overrides({})
+    area_risk = next(r for r in catalog.RISKS
+                     if r.get("scale") == "area"
+                     and risk_engine._EXPOSURE_CODES.get(r["code"]))
+    exp_code = next(iter(risk_engine._EXPOSURE_CODES[area_risk["code"]]))
+    exposed = [_cell(40.0, 0.0) for _ in range(2)]
+    for c in exposed:
+        c["exposures"] = {exp_code: 1.0}
+    unexposed = [_cell(0.0, 0.0) for _ in range(18)]
+    for c in unexposed:
+        c["exposures"] = {exp_code: 0.0}
+    agg = risk_engine.aggregate(exposed + unexposed, total_pop=100.0, area_km2=1.0)
+    r = agg["risks"][area_risk["code"]]
+    assert r["p90_index"] < 5.0  # verdünnt (interpolierter P90 über 20 Zellen)
+    assert r["exposed_p90_index"] == 40.0
+    assert r["exposure_share"] == 0.1
+
+
+def test_risk_class_boundaries():
+    from app.services.engine import tunables
+    override_context.set_overrides({})
+    assert tunables.classify_index(19.99) == "gering"
+    assert tunables.classify_index(20.0) == "mittel"
+    assert tunables.classify_index(49.99) == "mittel"
+    assert tunables.classify_index(50.0) == "hoch"
+    # Grenzen folgen einem Kommune-Override der Risikozonen-Schwelle.
+    override_context.set_overrides({"model.risk_threshold": 40.0})
+    try:
+        assert tunables.risk_class_bounds() == {"medium_min": 16.0, "high_min": 40.0}
+        assert tunables.classify_index(45.0) == "hoch"
+    finally:
+        override_context.set_overrides({})
 
 
 # ── (d) flat-Risiken bleiben P90 ───────────────────────────────────────────────

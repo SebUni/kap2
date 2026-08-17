@@ -1,0 +1,1089 @@
+{
+  "nodes": [
+    {
+      "id": "src:osm",
+      "type": "source",
+      "label": "OSM",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "description": "OpenStreetMap",
+        "prov": "extern",
+        "layout_row": 10,
+        "tooltip": "OSM\nOpenStreetMap\nWird als Eingabe in nachfolgende Merkmale eingespeist."
+      }
+    },
+    {
+      "id": "ind:REDUNDANCY_BACKUP",
+      "type": "vulnerability",
+      "label": "Redundanzen / Backup (invers)",
+      "column": 2,
+      "collapse_group": "indicators",
+      "meta": {
+        "code": "REDUNDANCY_BACKUP",
+        "unit": "Index",
+        "formula": "Regionaler Annahmewert",
+        "norm_min": 0.0,
+        "norm_max": 100.0,
+        "tooltip": "Berechnung: Regionaler Annahmewert\nEingaben: Redundanz (invers)\nEinheit: Index\nNormierung: Skala 0.0…100.0"
+      }
+    },
+    {
+      "id": "src:param:const:REDUNDANCY_BACKUP:Redundanz (invers)",
+      "type": "parameter",
+      "label": "Redundanz (invers)",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "unit": "Index",
+        "description": "Modellannahme (Formelrezept)",
+        "prov": "param",
+        "value": 50.0,
+        "tooltip": "Redundanz (invers)\nModellannahme (Formelrezept)\nWert: 50 Index"
+      }
+    },
+    {
+      "id": "op:formula:ind:REDUNDANCY_BACKUP:0",
+      "type": "operator",
+      "label": "",
+      "column": 1,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "formula",
+        "label": "Formel",
+        "note": "Berechnung: Regionaler Annahmewert",
+        "tooltip": "Formel\nBerechnung: Regionaler Annahmewert\nEingaben: Redundanz (invers)"
+      }
+    },
+    {
+      "id": "ind:HEAVY_RAIN_FLOOD",
+      "type": "hazard",
+      "label": "Starkniederschlag und Fluten",
+      "column": 9,
+      "collapse_group": "indicators",
+      "meta": {
+        "code": "HEAVY_RAIN_FLOOD",
+        "unit": "Index",
+        "formula": "clamp(Starkregen · (0,4 + Versiegelung) · TWI · Senke ; 0…100)",
+        "norm_min": 0.0,
+        "norm_max": 100.0,
+        "tooltip": "Berechnung: clamp(Starkregen · (0,4 + Versiegelung) · TWI · Senke ; 0…100)\nEingaben: Starkregenindex (DWD), Versiegelungsgrad (OSM), TWI normiert (Terrarium-DEM), Senkentiefe (DEM)\nEinheit: Index\nNormierung: Skala 0.0…100.0"
+      }
+    },
+    {
+      "id": "src:dwd",
+      "type": "source",
+      "label": "DWD",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "description": "Deutscher Wetterdienst",
+        "prov": "extern",
+        "layout_row": 0,
+        "tooltip": "DWD\nDeutscher Wetterdienst\nWird als Eingabe in nachfolgende Merkmale eingespeist."
+      }
+    },
+    {
+      "id": "int:imp_frac",
+      "type": "intermediate",
+      "label": "Versiegelungsgrad (Zelle)",
+      "column": 5,
+      "collapse_group": "intermediates",
+      "meta": {
+        "cell_key": "imp_frac",
+        "layout_row": 10,
+        "tooltip": "Versiegelungsgrad = Gebäude- + Straßenanteil, ggf. mit Landnutzungs-Fallback."
+      }
+    },
+    {
+      "id": "int:bldg_cov",
+      "type": "intermediate",
+      "label": "Gebäudeanteil",
+      "column": 2,
+      "collapse_group": "intermediates",
+      "meta": {
+        "cell_key": "bldg_cov",
+        "layout_row": 1,
+        "tooltip": "Anteil der Zellfläche, die von Gebäudegrundrissen bedeckt ist."
+      }
+    },
+    {
+      "id": "op:ratio:bldg_cov:0",
+      "type": "operator",
+      "label": "",
+      "column": 1,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "ratio",
+        "label": "Gebäude-Anteil berechnen",
+        "note": "Berechnung: Gebäudegrundrissfläche / Zellfläche",
+        "layout_row": 10,
+        "tooltip": "Gebäude-Anteil berechnen\nBerechnung: Gebäudegrundrissfläche / Zellfläche"
+      }
+    },
+    {
+      "id": "int:road_cov",
+      "type": "intermediate",
+      "label": "Straßenanteil",
+      "column": 2,
+      "collapse_group": "intermediates",
+      "meta": {
+        "cell_key": "road_cov",
+        "layout_row": 6,
+        "tooltip": "Anteil der Zellfläche, der von Straßen bedeckt ist."
+      }
+    },
+    {
+      "id": "op:ratio:road_cov:0",
+      "type": "operator",
+      "label": "",
+      "column": 1,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "ratio",
+        "label": "Straßen-Anteil berechnen",
+        "note": "Berechnung: Straßenfläche / Zellfläche",
+        "layout_row": 10,
+        "tooltip": "Straßen-Anteil berechnen\nBerechnung: Straßenfläche / Zellfläche"
+      }
+    },
+    {
+      "id": "int:imp_lu",
+      "type": "intermediate",
+      "label": "Versiegelung (Landnutzung)",
+      "column": 2,
+      "collapse_group": "intermediates",
+      "meta": {
+        "cell_key": "imp_lu",
+        "layout_row": 9,
+        "tooltip": "Versiegelungsanteil aus den Landnutzungsklassen der Zelle."
+      }
+    },
+    {
+      "id": "op:ratio:imp_lu:0",
+      "type": "operator",
+      "label": "",
+      "column": 1,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "ratio",
+        "label": "Versiegelungs-Anteil berechnen",
+        "note": "Versiegelung aus den Landnutzungsklassen der Zelle.\nBerechnung: versiegelte Landnutzungsfläche / Zellfläche",
+        "layout_row": 10,
+        "tooltip": "Versiegelungs-Anteil berechnen\nVersiegelung aus den Landnutzungsklassen der Zelle.\nBerechnung: versiegelte Landnutzungsfläche / Zellfläche"
+      }
+    },
+    {
+      "id": "op:scale_factor:imp_frac:0",
+      "type": "operator",
+      "label": "",
+      "column": 3,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "scale_factor",
+        "label": "×",
+        "note": "Straßenanteil mit 0,95 gewichten — nur die Fahrbahn zählt als versiegelt, nicht der gesamte Straßenraum.",
+        "factor": 0.95,
+        "param_label": "Fahrbahnanteil an Straßenfläche",
+        "layout_row": 6,
+        "tooltip": "Multiplikation\nStraßenanteil mit 0,95 gewichten — nur die Fahrbahn zählt als versiegelt, nicht der gesamte Straßenraum.\nEingaben: Fahrbahnanteil an Straßenfläche, Straßenanteil"
+      }
+    },
+    {
+      "id": "src:param:const:imp_frac:0",
+      "type": "parameter",
+      "label": "Fahrbahnanteil an Straßenfläche",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "unit": "×",
+        "description": "Modellkonstante (fest im Rechenmodell verdrahtet)",
+        "prov": "param",
+        "value": 0.95,
+        "layout_row": 6,
+        "tooltip": "Fahrbahnanteil an Straßenfläche\nModellkonstante (fest im Rechenmodell verdrahtet)\nWert: 0,95 ×"
+      }
+    },
+    {
+      "id": "op:add:imp_frac:1",
+      "type": "operator",
+      "label": "",
+      "column": 4,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "add",
+        "label": "+",
+        "note": "Berechnung: Versiegelung = Gebäude-Anteil + 0,95 · Straßen-Anteil\nFällt auf den Landnutzungs-Anteil zurück, wenn Gebäude-/Straßendaten fehlen; Untergrenze 2 %.",
+        "layout_row": 9,
+        "tooltip": "Addition\nBerechnung: Versiegelung = Gebäude-Anteil + 0,95 · Straßen-Anteil\nFällt auf den Landnutzungs-Anteil zurück, wenn Gebäude-/Straßendaten fehlen; Untergrenze 2 %.\nEingaben: Gebäudeanteil, Versiegelung (Landnutzung)"
+      }
+    },
+    {
+      "id": "int:twi_norm",
+      "type": "intermediate",
+      "label": "Topographisches Feuchte-Index",
+      "column": 2,
+      "collapse_group": "intermediates",
+      "meta": {
+        "cell_key": "twi_norm",
+        "layout_row": 8,
+        "tooltip": "Topographischer Feuchteindex (TWI), normiert 0…1."
+      }
+    },
+    {
+      "id": "src:dem",
+      "type": "source",
+      "label": "DEM",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "description": "Digitales Geländemodell",
+        "prov": "extern",
+        "layout_row": 10,
+        "tooltip": "DEM\nDigitales Geländemodell\nWird als Eingabe in nachfolgende Merkmale eingespeist."
+      }
+    },
+    {
+      "id": "op:derived_index:twi_norm:0",
+      "type": "operator",
+      "label": "",
+      "column": 1,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "derived_index",
+        "label": "Feuchteindex (TWI) ableiten",
+        "note": "Topographischer Feuchteindex (TWI): Neigung des Geländes, Wasser zu sammeln — aus Hangneigung und Einzugsgebiet, normiert 0…1.",
+        "layout_row": 10,
+        "tooltip": "Feuchteindex (TWI) ableiten\nTopographischer Feuchteindex (TWI): Neigung des Geländes, Wasser zu sammeln — aus Hangneigung und Einzugsgebiet, normiert 0…1."
+      }
+    },
+    {
+      "id": "int:depression_factor",
+      "type": "intermediate",
+      "label": "Senkenfaktor",
+      "column": 7,
+      "collapse_group": "intermediates",
+      "meta": {
+        "cell_key": "depression_factor",
+        "layout_row": 5,
+        "tooltip": "Senkenneigung: Versiegelung + Gewässernähe − Belüftung."
+      }
+    },
+    {
+      "id": "int:water_adj",
+      "type": "intermediate",
+      "label": "Gewässernähe (Nachbarschaft)",
+      "column": 2,
+      "collapse_group": "intermediates",
+      "meta": {
+        "cell_key": "water_adj",
+        "layout_row": 2,
+        "tooltip": "Wasseranteil in der 8-Nachbarschaft — maximaler benachbarter Wasseranteil."
+      }
+    },
+    {
+      "id": "op:neighbor:water_adj:0",
+      "type": "operator",
+      "label": "",
+      "column": 1,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "neighbor",
+        "label": "Wasseranteil der Nachbarzellen",
+        "note": "Maximaler Wasserflächen-Anteil der 8 Nachbarzellen.",
+        "layout_row": 10,
+        "tooltip": "Wasseranteil der Nachbarzellen\nMaximaler Wasserflächen-Anteil der 8 Nachbarzellen."
+      }
+    },
+    {
+      "id": "int:vent_score",
+      "type": "intermediate",
+      "label": "Belüftungsgrad",
+      "column": 2,
+      "collapse_group": "intermediates",
+      "meta": {
+        "cell_key": "vent_score",
+        "layout_row": 0,
+        "tooltip": "Frischluft-Anteil: offene/grüne Nachbarzellen / 8 Nachbarn."
+      }
+    },
+    {
+      "id": "op:neighbor:vent_score:0",
+      "type": "operator",
+      "label": "",
+      "column": 1,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "neighbor",
+        "label": "Anteil offener Nachbarzellen",
+        "note": "Frischluftzufuhr aus dem Umfeld.\nBerechnung: offene oder grüne Nachbarzellen / 8 Nachbarn",
+        "layout_row": 10,
+        "tooltip": "Anteil offener Nachbarzellen\nFrischluftzufuhr aus dem Umfeld.\nBerechnung: offene oder grüne Nachbarzellen / 8 Nachbarn"
+      }
+    },
+    {
+      "id": "op:add:depression_factor:0",
+      "type": "operator",
+      "label": "",
+      "column": 6,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "add",
+        "label": "+",
+        "note": "Senkenneigung — sammelt sich Wasser in der Zelle?\nBerechnung: Senke = Versiegelung + Gewässernähe − Belüftung",
+        "layout_row": 10,
+        "tooltip": "Addition\nSenkenneigung — sammelt sich Wasser in der Zelle?\nBerechnung: Senke = Versiegelung + Gewässernähe − Belüftung\nEingaben: Versiegelungsgrad (Zelle), Gewässernähe (Nachbarschaft), Belüftungsgrad"
+      }
+    },
+    {
+      "id": "op:multiply:ind:HEAVY_RAIN_FLOOD:0",
+      "type": "operator",
+      "label": "",
+      "column": 8,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "multiply",
+        "label": "×",
+        "note": "Starkregen × Versiegelung × Feuchteindex × Senke; Ergebnis auf 0…100 begrenzt.\n$$\\min\\bigl(100,\\ \\text{Starkregen} \\cdot (0{,}4 + \\text{Versiegelung}) \\cdot \\mathrm{TWI} \\cdot \\text{Senke}\\bigr)$$",
+        "layout_row": 10,
+        "tooltip": "Multiplikation\nStarkregen × Versiegelung × Feuchteindex × Senke; Ergebnis auf 0…100 begrenzt.\n$$\\min\\bigl(100,\\ \\text{Starkregen} \\cdot (0{,}4 + \\text{Versiegelung}) \\cdot \\mathrm{TWI} \\cdot \\text{Senke}\\bigr)$$\nEingaben: Versiegelungsgrad (Zelle), Topographisches Feuchte-Index, Senkenfaktor"
+      }
+    },
+    {
+      "id": "ind:EXTRATROPICAL_STORM",
+      "type": "hazard",
+      "label": "Extratropische Stürme & Starkwind",
+      "column": 4,
+      "collapse_group": "indicators",
+      "meta": {
+        "code": "EXTRATROPICAL_STORM",
+        "unit": "Anzahl/Jahr",
+        "formula": "Sturmtage · (0,8 + 0,5·Frischluft-Anteil)",
+        "norm_min": 0.0,
+        "norm_max": 12.0,
+        "tooltip": "Berechnung: Sturmtage · (0,8 + 0,5·Frischluft-Anteil)\nEingaben: Sturmtage (DWD), Frischluft-Anteil (8 Nachbarzellen, offen/grün)\nEinheit: Anzahl/Jahr\nNormierung: Skala 0.0…12.0"
+      }
+    },
+    {
+      "id": "op:formula:ind:EXTRATROPICAL_STORM:0",
+      "type": "operator",
+      "label": "",
+      "column": 3,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "formula",
+        "label": "Formel",
+        "note": "Berechnung: Sturmtage · (0,8 + 0,5·Frischluft-Anteil)",
+        "layout_row": 0,
+        "tooltip": "Formel\nBerechnung: Sturmtage · (0,8 + 0,5·Frischluft-Anteil)\nEingaben: Belüftungsgrad"
+      }
+    },
+    {
+      "id": "ind:CRITICAL_INFRA_CONDITION",
+      "type": "vulnerability",
+      "label": "Zustand kritischer Infrastruktur",
+      "column": 2,
+      "collapse_group": "indicators",
+      "meta": {
+        "code": "CRITICAL_INFRA_CONDITION",
+        "unit": "Index",
+        "formula": "Fester Annahmewert",
+        "norm_min": 0.0,
+        "norm_max": 100.0,
+        "tooltip": "Berechnung: Fester Annahmewert\nEingaben: Zustand kritischer Infrastruktur\nEinheit: Index\nNormierung: Skala 0.0…100.0"
+      }
+    },
+    {
+      "id": "src:param:const:CRITICAL_INFRA_CONDITION:Zustand kritischer Infrastruktur",
+      "type": "parameter",
+      "label": "Zustand kritischer Infrastruktur",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "unit": "Index",
+        "description": "Modellannahme (Formelrezept)",
+        "prov": "param",
+        "value": 50.0,
+        "tooltip": "Zustand kritischer Infrastruktur\nModellannahme (Formelrezept)\nWert: 50 Index"
+      }
+    },
+    {
+      "id": "op:formula:ind:CRITICAL_INFRA_CONDITION:0",
+      "type": "operator",
+      "label": "",
+      "column": 1,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "formula",
+        "label": "Formel",
+        "note": "Berechnung: Fester Annahmewert",
+        "tooltip": "Formel\nBerechnung: Fester Annahmewert\nEingaben: Zustand kritischer Infrastruktur"
+      }
+    },
+    {
+      "id": "int:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "type": "intermediate",
+      "label": "Telekom-Assetwert (Zelle)",
+      "column": 4,
+      "collapse_group": "intermediates",
+      "meta": {
+        "note": "Assetwert = Σ Anzahl je Anlagenklasse in der Zelle × Ersatzwert der Klasse (editierbare impact-Parameter je Anlagenklasse).",
+        "layout_row": 7,
+        "tooltip": "Assetwert = Σ Anzahl je Anlagenklasse in der Zelle × Ersatzwert der Klasse (editierbare impact-Parameter je Anlagenklasse)."
+      }
+    },
+    {
+      "id": "op:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "type": "operator",
+      "label": "",
+      "column": 3,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "multiply",
+        "label": "×",
+        "note": "Assetwert = Σ Anzahl je Anlagenklasse in der Zelle × Ersatzwert der Klasse (editierbare impact-Parameter je Anlagenklasse).",
+        "layout_row": 4,
+        "tooltip": "Multiplikation\nAssetwert = Σ Anzahl je Anlagenklasse in der Zelle × Ersatzwert der Klasse (editierbare impact-Parameter je Anlagenklasse).\nEingaben: Kommunikationsanlagen je Klasse (OSM), Ersatzwert Rechenzentrum, Ersatzwert Vermittlungsstelle, Ersatzwert Fernmeldeturm, Ersatzwert Mobilfunkmast, Ersatzwert Antennenstandort"
+      }
+    },
+    {
+      "id": "int:communication_classes",
+      "type": "intermediate",
+      "label": "Kommunikationsanlagen je Klasse (OSM)",
+      "column": 2,
+      "collapse_group": "intermediates",
+      "meta": {
+        "cell_key": "communication_classes",
+        "layout_row": 4,
+        "tooltip": "Zellbezogener Zwischenwert (Kommunikationsanlagen je Klasse (OSM))."
+      }
+    },
+    {
+      "id": "op:count:communication_classes:0",
+      "type": "operator",
+      "label": "",
+      "column": 1,
+      "collapse_group": "intermediates",
+      "meta": {
+        "op_kind": "count",
+        "label": "Kommunikationsanlagen je Klasse zählen",
+        "note": "Anzahl der Kommunikationsanlagen je Anlagenklasse in der Zelle.",
+        "layout_row": 10,
+        "tooltip": "Kommunikationsanlagen je Klasse zählen\nAnzahl der Kommunikationsanlagen je Anlagenklasse in der Zelle."
+      }
+    },
+    {
+      "id": "src:param:impact.comm_value_data_center_eur",
+      "type": "parameter",
+      "label": "Ersatzwert Rechenzentrum",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "parameter_id": "impact.comm_value_data_center_eur",
+        "unit": "€/Stück",
+        "description": "Prognos/BBK (Modellannahme je Anlagenklasse)",
+        "prov": "param",
+        "layout_row": 4,
+        "tooltip": "Ersatzwert Rechenzentrum\nPrognos/BBK (Modellannahme je Anlagenklasse)"
+      }
+    },
+    {
+      "id": "src:param:impact.comm_value_exchange_eur",
+      "type": "parameter",
+      "label": "Ersatzwert Vermittlungsstelle",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "parameter_id": "impact.comm_value_exchange_eur",
+        "unit": "€/Stück",
+        "description": "Prognos/BBK (Modellannahme je Anlagenklasse)",
+        "prov": "param",
+        "layout_row": 4,
+        "tooltip": "Ersatzwert Vermittlungsstelle\nPrognos/BBK (Modellannahme je Anlagenklasse)"
+      }
+    },
+    {
+      "id": "src:param:impact.comm_value_comm_tower_eur",
+      "type": "parameter",
+      "label": "Ersatzwert Fernmeldeturm",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "parameter_id": "impact.comm_value_comm_tower_eur",
+        "unit": "€/Stück",
+        "description": "Prognos/BBK (Modellannahme je Anlagenklasse)",
+        "prov": "param",
+        "layout_row": 4,
+        "tooltip": "Ersatzwert Fernmeldeturm\nPrognos/BBK (Modellannahme je Anlagenklasse)"
+      }
+    },
+    {
+      "id": "src:param:impact.comm_value_mast_eur",
+      "type": "parameter",
+      "label": "Ersatzwert Mobilfunkmast",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "parameter_id": "impact.comm_value_mast_eur",
+        "unit": "€/Stück",
+        "description": "Prognos/BBK (Modellannahme je Anlagenklasse)",
+        "prov": "param",
+        "layout_row": 4,
+        "tooltip": "Ersatzwert Mobilfunkmast\nPrognos/BBK (Modellannahme je Anlagenklasse)"
+      }
+    },
+    {
+      "id": "src:param:impact.comm_value_antenna_eur",
+      "type": "parameter",
+      "label": "Ersatzwert Antennenstandort",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "parameter_id": "impact.comm_value_antenna_eur",
+        "unit": "€/Stück",
+        "description": "Prognos/BBK (Modellannahme je Anlagenklasse)",
+        "prov": "param",
+        "layout_row": 4,
+        "tooltip": "Ersatzwert Antennenstandort\nPrognos/BBK (Modellannahme je Anlagenklasse)"
+      }
+    },
+    {
+      "id": "op:damage:EXPECTED_TELECOM_DAMAGE_EUR",
+      "type": "operator",
+      "label": "",
+      "column": 11,
+      "collapse_group": "outcome",
+      "meta": {
+        "op_kind": "damage_curve",
+        "label": "Schadenskurve",
+        "note": "Konvexe Schadenskurve: überproportionaler Schaden bei hoher Intensität.\n$$s = I^{\\,\\gamma},\\quad \\gamma > 1$$",
+        "layout_row": 7,
+        "tooltip": "Schadenskurve\nKonvexe Schadenskurve: überproportionaler Schaden bei hoher Intensität.\n$$s = I^{\\,\\gamma},\\quad \\gamma > 1$$\nEingaben: Schadenskurven-Exponent"
+      }
+    },
+    {
+      "id": "op:intensity:EXPECTED_TELECOM_DAMAGE_EUR",
+      "type": "operator",
+      "label": "",
+      "column": 10,
+      "collapse_group": "outcome",
+      "meta": {
+        "op_kind": "intensity",
+        "label": "Intensität",
+        "note": "Normierte Hazard-Intensität (0–1) mit FIXEN Katalog-Referenzgrenzen — unabhängig von der editierbaren Screening-Normierung (§3.3). Bei mehreren Gefahren zählt die stärkste (Maximum).",
+        "layout_row": 7,
+        "tooltip": "Intensität\nNormierte Hazard-Intensität (0–1) mit FIXEN Katalog-Referenzgrenzen — unabhängig von der editierbaren Screening-Normierung (§3.3). Bei mehreren Gefahren zählt die stärkste (Maximum).\nEingaben: Extratropische Stürme & Starkwind, Starkniederschlag und Fluten"
+      }
+    },
+    {
+      "id": "src:param:impact.damage_exponent",
+      "type": "parameter",
+      "label": "Schadenskurven-Exponent",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "parameter_id": "impact.damage_exponent",
+        "unit": "–",
+        "description": "HOWAS21/JRC (Größenordnung)",
+        "prov": "param",
+        "layout_row": 7,
+        "tooltip": "Schadenskurven-Exponent\nHOWAS21/JRC (Größenordnung)"
+      }
+    },
+    {
+      "id": "op:mulB:EXPECTED_TELECOM_DAMAGE_EUR",
+      "type": "operator",
+      "label": "",
+      "column": 12,
+      "collapse_group": "outcome",
+      "meta": {
+        "op_kind": "multiply",
+        "label": "×",
+        "note": "Zell-Schaden (€) = Assetwert · max. Verlustrate · Schadenskurve(Intensität) · g(V̂).\n$$S_{z} = A_{z} \\cdot r_{\\max} \\cdot s(I_{z}) \\cdot g(\\hat{V})$$",
+        "layout_row": 7,
+        "tooltip": "Multiplikation\nZell-Schaden (€) = Assetwert · max. Verlustrate · Schadenskurve(Intensität) · g(V̂).\n$$S_{z} = A_{z} \\cdot r_{\\max} \\cdot s(I_{z}) \\cdot g(\\hat{V})$$\nEingaben: Telekom-Assetwert (Zelle), Max. Jahresverlustrate"
+      }
+    },
+    {
+      "id": "src:param:risks.EXPECTED_TELECOM_DAMAGE_EUR.impact.max_loss_rate",
+      "type": "parameter",
+      "label": "Max. Jahresverlustrate",
+      "column": 0,
+      "collapse_group": "sources",
+      "meta": {
+        "parameter_id": "risks.EXPECTED_TELECOM_DAMAGE_EUR.impact.max_loss_rate",
+        "unit": "Anteil/a",
+        "description": "Prognos (Modellannahme)",
+        "prov": "param",
+        "layout_row": 7,
+        "tooltip": "Max. Jahresverlustrate\nPrognos (Modellannahme)"
+      }
+    },
+    {
+      "id": "op:gv:EXPECTED_TELECOM_DAMAGE_EUR",
+      "type": "operator",
+      "label": "",
+      "column": 3,
+      "collapse_group": "outcome",
+      "meta": {
+        "op_kind": "gv",
+        "label": "g(V̂)",
+        "note": "Vulnerabilitäts-Modifikator aus dem Mittel der normierten Sensitivitäten des Risikos: hebt/senkt den Zell-Outcome um Faktor 0,5…1,5.\n$$g(\\hat{V}) = 0{,}5 + \\overline{\\hat{V}}$$",
+        "layout_row": 7,
+        "tooltip": "Vulnerabilitäts-Modifikator g(V̂)\nVulnerabilitäts-Modifikator aus dem Mittel der normierten Sensitivitäten des Risikos: hebt/senkt den Zell-Outcome um Faktor 0,5…1,5.\n$$g(\\hat{V}) = 0{,}5 + \\overline{\\hat{V}}$$\nEingaben: Zustand kritischer Infrastruktur, Redundanzen / Backup (invers)"
+      }
+    },
+    {
+      "id": "op:sumcells:EXPECTED_TELECOM_DAMAGE_EUR",
+      "type": "operator",
+      "label": "",
+      "column": 13,
+      "collapse_group": "outcome",
+      "meta": {
+        "op_kind": "sum_cells",
+        "label": "Σ Zellen",
+        "note": "Summe der Zell-Outcomes über alle 100×100-m-Rasterzellen der Kommune (Schicht B).\n$$O = \\sum_{\\mathrm{Zellen}} O_{z}$$",
+        "layout_row": 7,
+        "tooltip": "Summe über Zellen (Σ)\nSumme der Zell-Outcomes über alle 100×100-m-Rasterzellen der Kommune (Schicht B).\n$$O = \\sum_{\\mathrm{Zellen}} O_{z}$$"
+      }
+    },
+    {
+      "id": "out:eur",
+      "type": "outcome",
+      "label": "Monetärer Schaden",
+      "column": 14,
+      "collapse_group": "outcome",
+      "meta": {
+        "result_kind": "eur",
+        "unit": "€/Jahr",
+        "formula": "€ = Assetwert · Verlustrate · Schadenskurve(Intensität) · g(V̂), Σ Zellen",
+        "is_outcome": true,
+        "cost_source": "",
+        "tooltip": "Monetärer Schaden\nMonetäres Ergebnis (Schicht B) in €/Jahr.\nBerechnung: € = Assetwert · Verlustrate · Schadenskurve(Intensität) · g(V̂), Σ Zellen"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e:src:param:const:REDUNDANCY_BACKUP:Redundanz (invers):op:formula:ind:REDUNDANCY_BACKUP:0:9",
+      "source": "src:param:const:REDUNDANCY_BACKUP:Redundanz (invers)",
+      "target": "op:formula:ind:REDUNDANCY_BACKUP:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:formula:ind:REDUNDANCY_BACKUP:0:ind:REDUNDANCY_BACKUP:10",
+      "source": "op:formula:ind:REDUNDANCY_BACKUP:0",
+      "target": "ind:REDUNDANCY_BACKUP",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:osm:op:ratio:bldg_cov:0:11",
+      "source": "src:osm",
+      "target": "op:ratio:bldg_cov:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:ratio:bldg_cov:0:int:bldg_cov:12",
+      "source": "op:ratio:bldg_cov:0",
+      "target": "int:bldg_cov",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:osm:op:ratio:road_cov:0:13",
+      "source": "src:osm",
+      "target": "op:ratio:road_cov:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:ratio:road_cov:0:int:road_cov:14",
+      "source": "op:ratio:road_cov:0",
+      "target": "int:road_cov",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:osm:op:ratio:imp_lu:0:15",
+      "source": "src:osm",
+      "target": "op:ratio:imp_lu:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:ratio:imp_lu:0:int:imp_lu:16",
+      "source": "op:ratio:imp_lu:0",
+      "target": "int:imp_lu",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:param:const:imp_frac:0:op:scale_factor:imp_frac:0:17",
+      "source": "src:param:const:imp_frac:0",
+      "target": "op:scale_factor:imp_frac:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:road_cov:op:scale_factor:imp_frac:0:18",
+      "source": "int:road_cov",
+      "target": "op:scale_factor:imp_frac:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:bldg_cov:op:add:imp_frac:1:19",
+      "source": "int:bldg_cov",
+      "target": "op:add:imp_frac:1",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:scale_factor:imp_frac:0:op:add:imp_frac:1:20",
+      "source": "op:scale_factor:imp_frac:0",
+      "target": "op:add:imp_frac:1",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:imp_lu:op:add:imp_frac:1:21",
+      "source": "int:imp_lu",
+      "target": "op:add:imp_frac:1",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:add:imp_frac:1:int:imp_frac:22",
+      "source": "op:add:imp_frac:1",
+      "target": "int:imp_frac",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:dem:op:derived_index:twi_norm:0:23",
+      "source": "src:dem",
+      "target": "op:derived_index:twi_norm:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:derived_index:twi_norm:0:int:twi_norm:24",
+      "source": "op:derived_index:twi_norm:0",
+      "target": "int:twi_norm",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:osm:op:neighbor:water_adj:0:25",
+      "source": "src:osm",
+      "target": "op:neighbor:water_adj:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:neighbor:water_adj:0:int:water_adj:26",
+      "source": "op:neighbor:water_adj:0",
+      "target": "int:water_adj",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:osm:op:neighbor:vent_score:0:27",
+      "source": "src:osm",
+      "target": "op:neighbor:vent_score:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:neighbor:vent_score:0:int:vent_score:28",
+      "source": "op:neighbor:vent_score:0",
+      "target": "int:vent_score",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:osm:op:add:depression_factor:0:29",
+      "source": "src:osm",
+      "target": "op:add:depression_factor:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:dem:op:add:depression_factor:0:30",
+      "source": "src:dem",
+      "target": "op:add:depression_factor:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:imp_frac:op:add:depression_factor:0:31",
+      "source": "int:imp_frac",
+      "target": "op:add:depression_factor:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:water_adj:op:add:depression_factor:0:32",
+      "source": "int:water_adj",
+      "target": "op:add:depression_factor:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:vent_score:op:add:depression_factor:0:33",
+      "source": "int:vent_score",
+      "target": "op:add:depression_factor:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:add:depression_factor:0:int:depression_factor:34",
+      "source": "op:add:depression_factor:0",
+      "target": "int:depression_factor",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:dwd:op:multiply:ind:HEAVY_RAIN_FLOOD:0:35",
+      "source": "src:dwd",
+      "target": "op:multiply:ind:HEAVY_RAIN_FLOOD:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:imp_frac:op:multiply:ind:HEAVY_RAIN_FLOOD:0:36",
+      "source": "int:imp_frac",
+      "target": "op:multiply:ind:HEAVY_RAIN_FLOOD:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:twi_norm:op:multiply:ind:HEAVY_RAIN_FLOOD:0:37",
+      "source": "int:twi_norm",
+      "target": "op:multiply:ind:HEAVY_RAIN_FLOOD:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:depression_factor:op:multiply:ind:HEAVY_RAIN_FLOOD:0:38",
+      "source": "int:depression_factor",
+      "target": "op:multiply:ind:HEAVY_RAIN_FLOOD:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:multiply:ind:HEAVY_RAIN_FLOOD:0:ind:HEAVY_RAIN_FLOOD:39",
+      "source": "op:multiply:ind:HEAVY_RAIN_FLOOD:0",
+      "target": "ind:HEAVY_RAIN_FLOOD",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:dwd:op:formula:ind:EXTRATROPICAL_STORM:0:40",
+      "source": "src:dwd",
+      "target": "op:formula:ind:EXTRATROPICAL_STORM:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:vent_score:op:formula:ind:EXTRATROPICAL_STORM:0:41",
+      "source": "int:vent_score",
+      "target": "op:formula:ind:EXTRATROPICAL_STORM:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:formula:ind:EXTRATROPICAL_STORM:0:ind:EXTRATROPICAL_STORM:42",
+      "source": "op:formula:ind:EXTRATROPICAL_STORM:0",
+      "target": "ind:EXTRATROPICAL_STORM",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:param:const:CRITICAL_INFRA_CONDITION:Zustand kritischer Infrastruktur:op:formula:ind:CRITICAL_INFRA_CONDITION:0:43",
+      "source": "src:param:const:CRITICAL_INFRA_CONDITION:Zustand kritischer Infrastruktur",
+      "target": "op:formula:ind:CRITICAL_INFRA_CONDITION:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:formula:ind:CRITICAL_INFRA_CONDITION:0:ind:CRITICAL_INFRA_CONDITION:44",
+      "source": "op:formula:ind:CRITICAL_INFRA_CONDITION:0",
+      "target": "ind:CRITICAL_INFRA_CONDITION",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:osm:op:count:communication_classes:0:56",
+      "source": "src:osm",
+      "target": "op:count:communication_classes:0",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:count:communication_classes:0:int:communication_classes:57",
+      "source": "op:count:communication_classes:0",
+      "target": "int:communication_classes",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:communication_classes:op:asset:EXPECTED_TELECOM_DAMAGE_EUR:58",
+      "source": "int:communication_classes",
+      "target": "op:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:param:impact.comm_value_data_center_eur:op:asset:EXPECTED_TELECOM_DAMAGE_EUR:59",
+      "source": "src:param:impact.comm_value_data_center_eur",
+      "target": "op:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:param:impact.comm_value_exchange_eur:op:asset:EXPECTED_TELECOM_DAMAGE_EUR:60",
+      "source": "src:param:impact.comm_value_exchange_eur",
+      "target": "op:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:param:impact.comm_value_comm_tower_eur:op:asset:EXPECTED_TELECOM_DAMAGE_EUR:61",
+      "source": "src:param:impact.comm_value_comm_tower_eur",
+      "target": "op:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:param:impact.comm_value_mast_eur:op:asset:EXPECTED_TELECOM_DAMAGE_EUR:62",
+      "source": "src:param:impact.comm_value_mast_eur",
+      "target": "op:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:param:impact.comm_value_antenna_eur:op:asset:EXPECTED_TELECOM_DAMAGE_EUR:63",
+      "source": "src:param:impact.comm_value_antenna_eur",
+      "target": "op:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:asset:EXPECTED_TELECOM_DAMAGE_EUR:int:asset:EXPECTED_TELECOM_DAMAGE_EUR:64",
+      "source": "op:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "target": "int:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:ind:EXTRATROPICAL_STORM:op:intensity:EXPECTED_TELECOM_DAMAGE_EUR:65",
+      "source": "ind:EXTRATROPICAL_STORM",
+      "target": "op:intensity:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:ind:HEAVY_RAIN_FLOOD:op:intensity:EXPECTED_TELECOM_DAMAGE_EUR:66",
+      "source": "ind:HEAVY_RAIN_FLOOD",
+      "target": "op:intensity:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:intensity:EXPECTED_TELECOM_DAMAGE_EUR:op:damage:EXPECTED_TELECOM_DAMAGE_EUR:67",
+      "source": "op:intensity:EXPECTED_TELECOM_DAMAGE_EUR",
+      "target": "op:damage:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:param:impact.damage_exponent:op:damage:EXPECTED_TELECOM_DAMAGE_EUR:68",
+      "source": "src:param:impact.damage_exponent",
+      "target": "op:damage:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:int:asset:EXPECTED_TELECOM_DAMAGE_EUR:op:mulB:EXPECTED_TELECOM_DAMAGE_EUR:69",
+      "source": "int:asset:EXPECTED_TELECOM_DAMAGE_EUR",
+      "target": "op:mulB:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:src:param:risks.EXPECTED_TELECOM_DAMAGE_EUR.impact.max_loss_rate:op:mulB:EXPECTED_TELECOM_DAMAGE_EUR:70",
+      "source": "src:param:risks.EXPECTED_TELECOM_DAMAGE_EUR.impact.max_loss_rate",
+      "target": "op:mulB:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:damage:EXPECTED_TELECOM_DAMAGE_EUR:op:mulB:EXPECTED_TELECOM_DAMAGE_EUR:71",
+      "source": "op:damage:EXPECTED_TELECOM_DAMAGE_EUR",
+      "target": "op:mulB:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:ind:CRITICAL_INFRA_CONDITION:op:gv:EXPECTED_TELECOM_DAMAGE_EUR:72",
+      "source": "ind:CRITICAL_INFRA_CONDITION",
+      "target": "op:gv:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:ind:REDUNDANCY_BACKUP:op:gv:EXPECTED_TELECOM_DAMAGE_EUR:73",
+      "source": "ind:REDUNDANCY_BACKUP",
+      "target": "op:gv:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:gv:EXPECTED_TELECOM_DAMAGE_EUR:op:mulB:EXPECTED_TELECOM_DAMAGE_EUR:74",
+      "source": "op:gv:EXPECTED_TELECOM_DAMAGE_EUR",
+      "target": "op:mulB:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:mulB:EXPECTED_TELECOM_DAMAGE_EUR:op:sumcells:EXPECTED_TELECOM_DAMAGE_EUR:75",
+      "source": "op:mulB:EXPECTED_TELECOM_DAMAGE_EUR",
+      "target": "op:sumcells:EXPECTED_TELECOM_DAMAGE_EUR",
+      "label": null,
+      "parameter_id": null
+    },
+    {
+      "id": "e:op:sumcells:EXPECTED_TELECOM_DAMAGE_EUR:out:eur:76",
+      "source": "op:sumcells:EXPECTED_TELECOM_DAMAGE_EUR",
+      "target": "out:eur",
+      "label": null,
+      "parameter_id": null
+    }
+  ],
+  "collapse_groups": [
+    {
+      "id": "sources",
+      "label": "Quellen",
+      "default_collapsed": false
+    },
+    {
+      "id": "intermediates",
+      "label": "Zwischenergebnisse",
+      "default_collapsed": false
+    },
+    {
+      "id": "indicators",
+      "label": "H / E / V",
+      "default_collapsed": false
+    },
+    {
+      "id": "outcome",
+      "label": "Ergebnis",
+      "default_collapsed": false
+    }
+  ]
+}

@@ -14,11 +14,8 @@ einmalig aus der DB gebaut und geschrieben (Lazy-Build).
 
 from __future__ import annotations
 
-import gzip
-import json
 import logging
 import os
-import shutil
 
 from geoalchemy2.shape import to_shape
 from shapely.geometry import mapping
@@ -26,6 +23,7 @@ from sqlalchemy.orm import Session
 
 from app.data import catalog
 from app.models.models import CellAssessment, GridCell, Kommune
+from app.services import file_cache
 from app.services.engine import formulas, override_context, risk_engine
 from app.services.engine.inputs import build_regional_context
 from app.services.engine.runner import COASTAL_BUNDESLAENDER
@@ -80,23 +78,7 @@ def _ensure_model_version(kommune_id: int) -> None:
     gelöschte EAD-Layer) mehr ausgeliefert werden. Die Dateien werden anschließend
     lazy neu gebaut.
     """
-    vpath = _version_path(kommune_id)
-    current = catalog.MODEL_VERSION
-    stored = None
-    if os.path.exists(vpath):
-        try:
-            with open(vpath, encoding="utf-8") as fh:
-                stored = fh.read().strip()
-        except OSError:
-            stored = None
-    if stored == current:
-        return
-    invalidate(kommune_id)
-    os.makedirs(_cache_dir(kommune_id), exist_ok=True)
-    tmp = vpath + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as fh:
-        fh.write(current)
-    os.replace(tmp, vpath)
+    file_cache.ensure_version_stamp(_cache_dir(kommune_id), catalog.MODEL_VERSION)
 
 
 def layer_category(code: str) -> str | None:
@@ -116,11 +98,7 @@ def layer_category(code: str) -> str | None:
 # ── Schreiben ──────────────────────────────────────────────────────────────────
 
 def _write_gzip_json(path: str, obj: dict) -> None:
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    tmp = path + ".tmp"
-    with gzip.open(tmp, "wt", encoding="utf-8") as fh:
-        json.dump(obj, fh, separators=(",", ":"))
-    os.replace(tmp, path)
+    file_cache.write_gzip_json(path, obj)
 
 
 # ── Builder ────────────────────────────────────────────────────────────────────
@@ -193,6 +171,12 @@ def _build_values_package(rows, regional: dict, code: str, category: str) -> dic
             value = float(raw)
             ci = data.get("inputs", {})
             props["inputs"] = formulas.resolve_inputs(recipe, ci, regional, data)
+            # Debug-Herkunft für die Gewässer-Layer: welche OSM-Objekte begründen
+            # die Wasserannahme der Zelle (osm_id/-typ + Tag + Distanz)?
+            if code in ("WATER_PROXIMITY", "WATER_DISTANCE", "WATER_ADJACENCY"):
+                src = ci.get("water_src")
+                if src:
+                    props["water_src"] = src
         vmin = value if vmin is None else min(vmin, value)
         vmax = value if vmax is None else max(vmax, value)
         props["value"] = round(value, 3)
@@ -236,7 +220,13 @@ def values_file(db: Session, kommune_id: int, code: str) -> str | None:
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         return None
-    rows = db.query(CellAssessment).filter(CellAssessment.kommune_id == kommune_id).all()
+    # Einzel-Layer-Lazy-Build (läuft ggf. im API-Prozess): Zeilen streamen
+    # statt alle ORM-Instanzen zu materialisieren (Ein-Pass-Konsument).
+    rows = (
+        db.query(CellAssessment)
+        .filter(CellAssessment.kommune_id == kommune_id)
+        .yield_per(500)
+    )
     with _override_scope_for(db, kommune_id):
         regional = _regional_for(kommune)
         pkg = _build_values_package(rows, regional, code, category)
@@ -256,6 +246,9 @@ def precompute(db: Session, kommune_id: int) -> None:
             return
         _write_gzip_json(_geometry_path(kommune_id), geom)
 
+        # Bewusst .all(): precompute iteriert die Zeilen je Layer-Code (~40×)
+        # und läuft ausschließlich in Wegwerf-Kindprozessen (assessment_worker/
+        # artifact_rebuild) — der RAM geht mit dem Prozessende ans OS zurück.
         rows = db.query(CellAssessment).filter(CellAssessment.kommune_id == kommune_id).all()
         if not rows:
             return
@@ -278,4 +271,4 @@ def precompute(db: Session, kommune_id: int) -> None:
 
 def invalidate(kommune_id: int) -> None:
     """Loescht das Cache-Verzeichnis der Kommune."""
-    shutil.rmtree(_cache_dir(kommune_id), ignore_errors=True)
+    file_cache.invalidate_dir(_cache_dir(kommune_id))

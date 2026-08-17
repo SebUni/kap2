@@ -9,12 +9,11 @@ UHI-Formel aus dem Hitze-Assessor.
 from __future__ import annotations
 
 import logging
-import multiprocessing
-import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
 
 from app.services.engine import tunables
+from app.services.engine.parallel import cow_pool, n_workers
 
 log = logging.getLogger(__name__)
 
@@ -23,8 +22,6 @@ log = logging.getLogger(__name__)
 
 _w: dict = {}
 _nw: dict = {}
-_N_WORKERS = min(os.cpu_count() or 4, 8)
-_MP = multiprocessing.get_context("fork")
 _CHUNK = 50
 _NEIGHBOR_OFFSETS = (
     (1, 0), (-1, 0), (0, 1), (0, -1),
@@ -32,18 +29,61 @@ _NEIGHBOR_OFFSETS = (
 )
 
 
+# Straßen werden in compute_cell_buildings um ihre halbe Breite gepuffert.
+# Für die STRtree-Vorfilterung fragen wir die Zelle daher mit einem kleinen
+# Sicherheitsrand (≈15 m in Grad) ab, damit knapp außerhalb liegende Straßen,
+# die erst nach dem Puffern in die Zelle ragen, nicht verloren gehen.
+_ROAD_QUERY_MARGIN_DEG = 15.0 / 111_320.0
+
+
+def _build_geom_tree(geoms: list):
+    """STRtree über eine Geometrie-Liste; ``None`` bei leerer Liste."""
+    if not geoms:
+        return None
+    from shapely.strtree import STRtree
+    return STRtree(geoms)
+
+
+def _query_subset(tree, items: list, cell_geom, margin: float = 0.0) -> list:
+    """Kandidaten (Bounding-Box-Überlappung mit der Zelle) via STRtree.
+
+    Fällt auf die volle Liste zurück, falls kein Index vorhanden ist. Der
+    ``intersects``/``contains``-Test in den compute_cell_*-Funktionen bleibt
+    erhalten, d. h. die Vorfilterung ist eine reine Obermenge → identisches
+    Ergebnis, nur ohne den O(Zellen×Features)-Volldurchlauf.
+    """
+    if tree is None:
+        return items
+    query_geom = cell_geom.buffer(margin) if margin else cell_geom
+    return [items[i] for i in tree.query(query_geom)]
+
+
 def _cell_worker(idx: int):
     from app.services.climate.heat.osm_data import (
-        compute_cell_landuse,
+        compute_cell_composition,
         compute_cell_buildings,
         compute_cell_infrastructure,
     )
     g = _w["cells"][idx]["geometry"]
-    lu = compute_cell_landuse(g, _w["lu"])
-    bm = compute_cell_buildings(g, _w["bldgs"], _w["roads"], _w["trees"])
+    bldgs = _query_subset(_w["bldg_tree"], _w["bldgs"], g)
+    roads = _query_subset(_w["road_tree"], _w["roads"], g, _ROAD_QUERY_MARGIN_DEG)
+    paved = _query_subset(_w["paved_tree"], _w["paved"], g)
+    # Flächenkomposition (Schichtmodell, 100%-Budget): Gebäude → Verkehr/Plätze →
+    # Wasser → spezifische → großflächige Landnutzung → Fallback.
+    lu = compute_cell_composition(
+        g, bldgs, roads, paved, _query_subset(_w["lu_tree"], _w["lu"], g),
+    )
+    bm = compute_cell_buildings(
+        g, bldgs, roads, _query_subset(_w["tree_tree"], _w["trees"], g),
+    )
     infra = compute_cell_infrastructure(g, _w["infra"])
     bm.update(infra)
     return idx, lu, bm
+
+
+# Klimatologischer Abstand sommerliches Tagesmaximum → Tagesmittel (K).
+# Nur Rückfall, wenn das DWD-Monatsraster am Zentroid nicht auswertbar ist.
+SUMMER_MAX_TO_MEAN_OFFSET_K = 6.3
 
 
 def _snow_elevation_factor(elev_m: float) -> float:
@@ -53,9 +93,58 @@ def _snow_elevation_factor(elev_m: float) -> float:
     return round(min(1.0, 0.2 + 0.8 * min(1.0, (elev_m - 50) / 1500.0)), 4)
 
 
+def _clamp_impervious(imp: float) -> float:
+    """Versiegelungsgrad auf den physikalisch sinnvollen Bereich [0,02; 0,98] klemmen."""
+    return max(0.02, min(float(imp), 0.98))
+
+
+def compute_uhi_components(
+    lu: dict, bm: dict, vent_score: float = 0.0, water_prox: float | None = None,
+) -> dict[str, float]:
+    """Wärmeinsel-ΔT als Tages-, Nacht- und Tagesmittelwert (K).
+
+    ``day`` ist unverändert die bisherige KAP2/KAP3-Formel (Tagesmaximum) — sie
+    speist weiterhin HEAT_WAVE, UHI_INTENSITY und HEAT_SENSITIVITY.
+
+    ``night`` bildet die nächtliche Überwärmung ab: Straßenschluchten halten
+    langwellige Ausstrahlung zurück (1 − SVF) und die Gebäudemasse gibt
+    tagsüber gespeicherte Wärme ab. Gewässer in der Nähe dämpfen das.
+
+    ``mean`` ist der 24-h-Mittelwert, den die Expositions-Wirkungs-Rechnung
+    braucht: Die RKI-/Winklmayr-Kurven laufen über die **Wochenmitteltemperatur**
+    (Tag und Nacht), nicht über das Tagesmaximum. Zusätzlich dämpft der
+    Luftaustausch mit dem Umland (``vent_score``) die Wärmeinsel — bis hierher
+    floss die Durchlüftung überhaupt nicht in den Hitzepfad ein.
+    """
+    from app.services.engine.override_context import uhi_coefficients
+    uhi = uhi_coefficients()
+
+    day = compute_uhi_delta(lu, bm)
+
+    bldg_cov = bm["building_coverage"]
+    height_factor = min(bm["avg_building_height"] / 15.0, 2.0)
+    svf = bm["sky_view_factor"]
+    # Gewässernähe wirkt über die Zellgrenze hinaus (Verdunstung/Wärmekapazität);
+    # daher water_prox statt nur des Wasseranteils der Zelle selbst.
+    wp = float(lu.get("water_fraction", 0.0) if water_prox is None else water_prox)
+
+    night = (
+        uhi["epsilon"] * (1.0 - svf) * height_factor
+        + uhi["zeta"] * bldg_cov * height_factor
+        - uhi["delta_night"] * wp
+    )
+    night = max(0.0, night)
+
+    w_night = uhi["night_weight"]
+    combined = (1.0 - w_night) * day + w_night * night
+    damping = max(0.0, 1.0 - uhi["vent_ratio"] * max(0.0, min(1.0, vent_score)))
+    mean = max(0.0, combined * uhi["mean_factor"] * damping)
+
+    return {"day": round(day, 3), "night": round(night, 3), "mean": round(mean, 3)}
+
+
 def compute_uhi_delta(lu: dict, bm: dict) -> float:
     """Tag-UHI ΔT (K) nach der KAP2/KAP3-Formel (siehe Handbuch)."""
-    imp_lu = lu["impervious_fraction"]
     albedo_lu = lu["albedo"]
     green = lu["green_fraction"]
     water = lu["water_fraction"]
@@ -64,13 +153,12 @@ def compute_uhi_delta(lu: dict, bm: dict) -> float:
 
     bldg_cov = bm["building_coverage"]
     avg_h = bm["avg_building_height"]
-    road_cov = bm["road_coverage"]
     canopy = bm["tree_canopy_fraction"]
     svf = bm["sky_view_factor"]
 
-    imp_detail = bldg_cov + road_cov * 0.95
-    imp = min(imp_detail, 0.98) if imp_detail > 0.01 else imp_lu
-    imp = max(0.02, min(imp, 0.98))
+    # Versiegelungsgrad kommt aus der Flächenkomposition (Schichtmodell); die
+    # frühere ad-hoc-Ableitung aus Gebäude-/Straßendeckung entfällt.
+    imp = _clamp_impervious(lu["impervious_fraction"])
 
     height_factor = min(avg_h / 15.0, 2.0)
     bldg_factor = bldg_cov * height_factor
@@ -97,6 +185,8 @@ def _assemble_cell_input(
     terrain: dict,
     water_features: list[dict],
     water_index: tuple[Any, list[Any]] | None,
+    ditch_features: list[dict],
+    ditch_index: tuple[Any, list[Any]] | None,
     infra_features: dict,
     healthcare_indexes: dict[str, tuple[Any, list] | None],
     emergency_index: tuple[Any, list] | None,
@@ -106,6 +196,8 @@ def _assemble_cell_input(
     from app.services.climate.heat.osm_data import (
         compute_water_distance_m,
         water_proximity_score,
+        compute_ditch_density_score,
+        describe_cell_water_sources,
         compute_cell_healthcare_access,
         compute_cell_emergency_access,
         compute_cell_dyke_proximity,
@@ -132,17 +224,36 @@ def _assemble_cell_input(
     vent_score = open_n / max(total_n, 1)
 
     uhi = compute_uhi_delta(lu, bm)
-    imp_detail = bm["building_coverage"] + bm["road_coverage"] * 0.95
-    imp = max(0.02, min(imp_detail if imp_detail > 0.01 else lu["impervious_fraction"], 0.98))
+    # Versiegelungsgrad direkt aus der Flächenkomposition (Schichtmodell).
+    imp = _clamp_impervious(lu["impervious_fraction"])
 
     cell_size_m = cell.get("cell_size_m", 100)
     area_m2 = float(cell_size_m) ** 2
 
+    # Distanz/Nähe nur gegen echte Gewässer; Kleinstgräben liefern einen sehr
+    # schwachen, über die Grabendichte der Zelle skalierten Zusatzbeitrag.
     water_dist_m = compute_water_distance_m(
         cell["geometry"], water_features, cell_size_m, water_index,
     )
-    water_prox = water_proximity_score(water_dist_m)
+    water_prox_real = water_proximity_score(water_dist_m)
+    ditch_score = compute_ditch_density_score(
+        cell["geometry"], ditch_features, cell_size_m, ditch_index,
+    )
+    water_prox = max(water_prox_real, ditch_score)
     water_adj_combined = max(water_adj, water_prox, lu["water_fraction"])
+
+    # Wärmeinsel-Komponenten: ``uhi`` (Tagesmaximum) bleibt der bisherige Treiber
+    # von HEAT_WAVE/UHI_INTENSITY; ``uhi_mean`` ist der 24-h-Mittelwert für die
+    # Expositions-Wirkungs-Rechnung und berücksichtigt Durchlüftung + Gewässernähe.
+    uhi_parts = compute_uhi_components(lu, bm, vent_score, water_prox)
+
+    # Debug/Inspektor: welche konkreten OSM-Objekte begründen die Wasserannahme?
+    water_src = (
+        describe_cell_water_sources(
+            cell["geometry"], water_features, cell_size_m, water_index)
+        + describe_cell_water_sources(
+            cell["geometry"], ditch_features, cell_size_m, ditch_index)
+    )
 
     depression_factor = terrain.get("depression_factor")
     slope_factor = terrain.get("slope_factor")
@@ -175,6 +286,7 @@ def _assemble_cell_input(
         "water_adj": round(water_adj_combined, 3),
         "water_dist_m": round(water_dist_m, 1),
         "water_prox": round(water_prox, 3),
+        "water_src": water_src,
         "forest_frac": lu.get("forest_fraction", 0.0),
         "glacier_frac": lu.get("glacier_fraction", 0.0),
         "snow_elevation_factor": _snow_elevation_factor(terrain.get("mean_elevation_m", 0.0)),
@@ -182,9 +294,15 @@ def _assemble_cell_input(
         "bldg_cov": bm["building_coverage"],
         "bldg_count": bm.get("building_count", 0),
         "energy_infra_count": bm.get("energy_infra_count", 0.0),
-        "water_wastewater_count": bm.get("water_wastewater_count", 0),
-        "communication_count": bm.get("communication_count", 0),
-        "transport_hub_count": bm.get("transport_hub_count", 0),
+        "water_wastewater_count": bm.get("water_wastewater_count", 0.0),
+        "communication_count": bm.get("communication_count", 0.0),
+        "transport_hub_count": bm.get("transport_hub_count", 0.0),
+        # Rohe Klassen-Zählungen (Anlagenklasse → Anzahl) für den monetären
+        # Pfad mit klassenspezifischen Ersatzwerten (impact/monetary.py).
+        "energy_infra_classes": bm.get("energy_infra_classes", {}),
+        "water_wastewater_classes": bm.get("water_wastewater_classes", {}),
+        "communication_classes": bm.get("communication_classes", {}),
+        "transport_hub_classes": bm.get("transport_hub_classes", {}),
         "emergency_access_score": emergency_access_score,
         "dyke_prox": dyke_prox,
         "dist_hospital_m": hc["dist_hospital_m"],
@@ -200,6 +318,8 @@ def _assemble_cell_input(
         "svf": bm["sky_view_factor"],
         "vent_score": vent_score,
         "uhi_delta": uhi,
+        "uhi_delta_night": uhi_parts["night"],
+        "uhi_delta_mean": uhi_parts["mean"],
         "mean_elevation_m": terrain.get("mean_elevation_m", 0.0),
         "slope_deg": terrain.get("slope_deg", 0.0),
         "sink_depth_m": terrain.get("sink_depth_m", 0.0),
@@ -223,6 +343,8 @@ def _neighbor_worker(idx: int):
         _nw["terrain"].get(idx, {}),
         _nw["water_features"],
         _nw["water_index"],
+        _nw["ditch_features"],
+        _nw["ditch_index"],
         _nw["infra_features"],
         _nw["healthcare_indexes"],
         _nw["emergency_index"],
@@ -234,8 +356,13 @@ def _neighbor_worker(idx: int):
 def _fetch_osm_data_parallel(
     grid_cells: list[dict],
     progress_callback: Any = None,
+    bundesland: str | None = None,
 ) -> tuple[list, dict, list, dict]:
-    """Lädt Landnutzung, Gebäude, Gewässer und Infrastruktur parallel."""
+    """Lädt Landnutzung, Gebäude, Gewässer und Infrastruktur parallel.
+
+    ``bundesland`` steuert die LoD2-Quelle für Gebäudehöhen (amtliche
+    3D-Modelle ersetzen die OSM-Höhenheuristik, wo angebunden).
+    """
     from app.services.climate.heat.osm_data import (
         fetch_landuse, fetch_buildings_and_roads, fetch_water_features, fetch_infrastructure,
     )
@@ -243,7 +370,7 @@ def _fetch_osm_data_parallel(
 
     jobs = {
         "landuse": fetch_landuse,
-        "buildings": fetch_buildings_and_roads,
+        "buildings": lambda cells: fetch_buildings_and_roads(cells, bundesland),
         "water": fetch_water_features,
         "infra": fetch_infrastructure,
     }
@@ -258,6 +385,7 @@ def _fetch_osm_data_parallel(
     landuse_features, _ = results["landuse"]
     detail = results["buildings"]
     buildings, roads, trees = detail["buildings"], detail["roads"], detail["trees"]
+    paved_areas = detail.get("paved_areas", [])
     water_features = results["water"]
     infra_features = results["infra"]
 
@@ -267,7 +395,14 @@ def _fetch_osm_data_parallel(
         progress_callback(OSM_WATER[1], "OSM Gewässer geladen")
         progress_callback(OSM_INFRA[1], "OSM-Daten geladen")
 
-    return landuse_features, {"buildings": buildings, "roads": roads, "trees": trees}, water_features, infra_features
+    return (
+        landuse_features,
+        {"buildings": buildings, "roads": roads, "paved_areas": paved_areas,
+         "trees": trees,
+         "building_source": detail.get("building_source", "osm")},
+        water_features,
+        infra_features,
+    )
 
 
 def build_regional_context(
@@ -313,6 +448,17 @@ def build_regional_context(
         real_frost = dwd_cdc_grid.frost_days_at(lon, lat)
         if real_frost is not None:
             frost_days = real_frost
+
+    # Sommermitteltemperatur (Jun–Aug) am Zentroid — Bezugsgröße der Expositions-
+    # Wirkungs-Kurven (Wochenmitteltemperatur). Rückfall: aus dem Bundesland-Mittel
+    # der sommerlichen Tagesmaxima, vermindert um den klimatologischen Abstand
+    # Tagesmaximum→Tagesmittel (DWD-Gebietsmittel: ~25 °C Maxima vs. ~18,5 °C Mittel).
+    summer_temp_mean = round(
+        float(regional_clim["summer_max_temp_avg"]) - SUMMER_MAX_TO_MEAN_OFFSET_K, 2)
+    if lon is not None:
+        real_smt = dwd_cdc_grid.summer_mean_temp_at(lon, lat)
+        if real_smt is not None:
+            summer_temp_mean = real_smt
 
     # low_flow_days: nächster PEGELONLINE-Pegel (Tage < MNW), sonst Proxy aus hot_days.
     low_flow_days = round(10.0 + hot_days, 1)
@@ -360,6 +506,7 @@ def build_regional_context(
         "socioeconomic": socioeconomic,
         "hot_days": hot_days,
         "summer_temp": float(regional_clim["summer_max_temp_avg"]),
+        "summer_temp_mean": summer_temp_mean,
         "mean_temp": mean_temp,
         "tropical_nights": float(regional_clim["tropical_nights_per_year"]),
         "is_coastal": is_coastal,
@@ -424,9 +571,19 @@ def gather_cell_inputs(
         progress_callback(OSM_LANDUSE[0], "Lade OSM-Daten parallel (4 Abfragen)")
 
     landuse_features, bldg_detail, water_features, infra_features = _fetch_osm_data_parallel(
-        grid_cells, progress_callback,
+        grid_cells, progress_callback, bundesland,
     )
     buildings, roads, trees = bldg_detail["buildings"], bldg_detail["roads"], bldg_detail["trees"]
+    paved_areas = bldg_detail.get("paved_areas", [])
+    building_source = bldg_detail.get("building_source", "osm")
+
+    # Provenienz: amtliche LoD2-Höhen vs. OSM-Heuristik (height/levels·3m/6m)
+    regional["provenance"]["building_height"] = (
+        f"lod2:{bundesland}" if building_source == "lod2" else "osm_heuristic"
+    )
+    regional["provenance"]["svf"] = f"horizon_raster_{building_source}"
+    log.info("Gebäudehöhen-Quelle: %s (%d Gebäude)",
+             regional["provenance"]["building_height"], len(buildings))
 
     total = len(grid_cells)
     lu_bm: list[tuple | None] = [None] * total
@@ -434,16 +591,27 @@ def gather_cell_inputs(
     terrain_by_idx = compute_terrain_for_cells(grid_cells, progress_callback)
 
     if progress_callback:
-        progress_callback(CELL_SURFACE[0], f"Analyse Oberflächen ({_N_WORKERS} Kerne) für {total} Zellen")
+        progress_callback(CELL_SURFACE[0], f"Analyse Oberflächen ({n_workers()} Kerne) für {total} Zellen")
 
+    # STRtree-Indizes einmalig im Elternprozess aufbauen; per fork werden sie
+    # copy-on-write an die Worker vererbt (read-only Zugriff). Bäume sind
+    # Punkt-Features (lon/lat) → als Points indizieren, passend zum
+    # contains()-Test in compute_cell_buildings.
+    from shapely.geometry import Point
     _w["lu"] = landuse_features
+    _w["lu_tree"] = _build_geom_tree([f["geometry"] for f in landuse_features])
     _w["bldgs"] = buildings
+    _w["bldg_tree"] = _build_geom_tree([b["geometry"] for b in buildings])
     _w["roads"] = roads
+    _w["road_tree"] = _build_geom_tree([r["geometry"] for r in roads])
+    _w["paved"] = paved_areas
+    _w["paved_tree"] = _build_geom_tree([p["geometry"] for p in paved_areas])
     _w["trees"] = trees
+    _w["tree_tree"] = _build_geom_tree([Point(t["lon"], t["lat"]) for t in trees])
     _w["infra"] = infra_features
     _w["cells"] = grid_cells
     try:
-        with _MP.Pool(_N_WORKERS) as pool:
+        with cow_pool() as pool:
             for done, (idx, lu, bm) in enumerate(
                 pool.imap_unordered(_cell_worker, range(total), chunksize=_CHUNK)
             ):
@@ -454,11 +622,26 @@ def gather_cell_inputs(
     finally:
         _w.clear()
 
+    # Echtes Horizontwinkel-SVF (Raster über die gesamte bbox, einmalig im
+    # Elternprozess — Nachbargebäude AUSSERHALB der Zelle prägen das SVF,
+    # deshalb ist es im Zell-Worker nicht berechenbar). Überschreibt den
+    # Platzhalter aus compute_cell_buildings.
+    from app.services.geodata.lod2.svf import compute_svf_for_cells
+    try:
+        svf_by_idx = compute_svf_for_cells(grid_cells, buildings, building_source)
+    except Exception:  # noqa: BLE001 — SVF darf ein Assessment nie kippen
+        log.exception("SVF-Rasterberechnung fehlgeschlagen — Zellen behalten 1.0")
+        svf_by_idx = [1.0] * total
+    for idx in range(total):
+        pair = lu_bm[idx]
+        if pair is not None:
+            pair[1]["sky_view_factor"] = svf_by_idx[idx]
+
     # Nachbarschaftsindex (Zensus-Gitter: ±100 m in EPSG:3035)
     if progress_callback:
         progress_callback(
             CELL_NEIGHBORS[0],
-            f"Nachbarschaft & Zell-Eingaben ({_N_WORKERS} Kerne) für {total} Zellen",
+            f"Nachbarschaft & Zell-Eingaben ({n_workers()} Kerne) für {total} Zellen",
         )
 
     coord_idx: dict[tuple[int, int], int] = {}
@@ -468,7 +651,12 @@ def gather_cell_inputs(
         y = cell.get("y_3035", cell.get("row", 0) * step)
         coord_idx[(x, y)] = idx
 
-    water_index = build_water_spatial_index(water_features)
+    # Echte Gewässer von Kleinstgräben (ditch/drain) trennen: nur echte Gewässer
+    # bestimmen Distanz/Nähe, Gräben fließen sehr schwach & dichteskaliert ein.
+    real_water_features = [f for f in water_features if not f.get("minor")]
+    ditch_features = [f for f in water_features if f.get("minor")]
+    water_index = build_water_spatial_index(real_water_features)
+    ditch_index = build_water_spatial_index(ditch_features)
     healthcare_indexes = build_healthcare_indexes(infra_features)
     emergency_index = build_emergency_spatial_index(infra_features)
     dyke_index = build_dyke_spatial_index(infra_features)
@@ -479,14 +667,16 @@ def gather_cell_inputs(
     _nw["coord_idx"] = coord_idx
     _nw["terrain"] = terrain_by_idx
     _nw["water_index"] = water_index
-    _nw["water_features"] = water_features
+    _nw["water_features"] = real_water_features
+    _nw["ditch_index"] = ditch_index
+    _nw["ditch_features"] = ditch_features
     _nw["infra_features"] = infra_features
     _nw["healthcare_indexes"] = healthcare_indexes
     _nw["emergency_index"] = emergency_index
     _nw["dyke_index"] = dyke_index
     _nw["step"] = step
     try:
-        with _MP.Pool(_N_WORKERS) as pool:
+        with cow_pool() as pool:
             for done, (idx, ci) in enumerate(
                 pool.imap_unordered(_neighbor_worker, range(total), chunksize=_CHUNK)
             ):
@@ -497,6 +687,8 @@ def gather_cell_inputs(
     finally:
         _nw.clear()
 
+    apply_cell_temperature(list(cell_inputs), grid_cells, regional)
+
     if progress_callback:
         progress_callback(ZENSUS_APPLY[0], "Zensus-Daten anwenden")
     zensus = load_zensus_for_cells(grid_cells)
@@ -505,3 +697,69 @@ def gather_cell_inputs(
         progress_callback(ZENSUS_APPLY[1], "Zensus-Daten anwenden")
 
     return list(cell_inputs), regional
+
+
+# Trockenadiabatischer Temperaturgradient (K je Meter Höhenunterschied).
+LAPSE_RATE_K_PER_M = 0.0065
+
+
+def apply_cell_temperature(
+    cell_inputs: list[dict], grid_cells: list[dict], regional: dict,
+) -> None:
+    """Setzt ``summer_temp_cell`` (und Bausteine) je Zelle — in-place.
+
+    ``T_Zelle = T_Raster(1 km) + [ΔT_UHI − Mittel(ΔT_UHI je 1-km-Zelle)] + Höhenterm``
+
+    Beide Zuschläge werden **mittelwerttreu innerhalb der 1-km-Rasterzelle**
+    angesetzt: Das DWD-Raster wird aus Stationsdaten interpoliert und enthält die
+    Wärmeinsel bereits teilweise (allerdings ohne Urbanisierungs-Prädiktor, also
+    unzuverlässig). Würde man das volle ΔT_UHI aufaddieren, zählte man den
+    erfassten Anteil doppelt. Indem nur die **Abweichung vom Rasterzellen-Mittel**
+    addiert wird, bleibt der 1-km-Mittelwert exakt der gemessene und lediglich die
+    Feinstruktur darunter kommt aus dem UHI-Modell. Analog beim Höhenterm.
+    """
+    from app.services.climate import dwd_cdc_grid
+
+    cells = [ci for ci in cell_inputs if ci is not None]
+    if not cells:
+        return
+
+    fallback = float(regional.get("summer_temp_mean") or 0.0)
+    points: list[tuple[float, float]] = []
+    for cell in grid_cells:
+        c = cell["geometry"].centroid
+        points.append((float(c.x), float(c.y)))
+
+    try:
+        grid = dwd_cdc_grid.climatology_grid("air_temp_mean", dwd_cdc_grid.SUMMER_MONTHS)
+        sampled = dwd_cdc_grid.sample_grid_points(grid, points)
+    except Exception:  # noqa: BLE001 — Rasterfehler darf kein Assessment kippen
+        log.exception("Sommertemperatur-Raster nicht verfügbar — Bundesland-Mittel")
+        grid, sampled = None, [None] * len(points)
+
+    # 1-km-Rasterzelle je 100-m-Zelle (INSPIRE-Koordinaten ganzzahlig teilen).
+    groups: dict[tuple[int, int], list[int]] = {}
+    for idx, cell in enumerate(grid_cells):
+        x = int(cell.get("x_3035", cell.get("col", 0) * 100))
+        y = int(cell.get("y_3035", cell.get("row", 0) * 100))
+        groups.setdefault((x // 1000, y // 1000), []).append(idx)
+
+    n = len(cell_inputs)
+    for _key, idxs in groups.items():
+        valid = [i for i in idxs if i < n and cell_inputs[i] is not None]
+        if not valid:
+            continue
+        uhi_vals = [float(cell_inputs[i].get("uhi_delta_mean") or 0.0) for i in valid]
+        elev_vals = [float(cell_inputs[i].get("mean_elevation_m") or 0.0) for i in valid]
+        uhi_mean = sum(uhi_vals) / len(uhi_vals)
+        elev_mean = sum(elev_vals) / len(elev_vals)
+        for i in valid:
+            ci = cell_inputs[i]
+            base = sampled[i] if i < len(sampled) and sampled[i] is not None else fallback
+            uhi_dev = float(ci.get("uhi_delta_mean") or 0.0) - uhi_mean
+            elev_dev = float(ci.get("mean_elevation_m") or 0.0) - elev_mean
+            lapse = -LAPSE_RATE_K_PER_M * elev_dev
+            ci["summer_temp_raster"] = round(float(base), 2)
+            ci["summer_temp_uhi_dev"] = round(uhi_dev, 3)
+            ci["summer_temp_lapse"] = round(lapse, 3)
+            ci["summer_temp_cell"] = round(float(base) + uhi_dev + lapse, 2)

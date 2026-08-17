@@ -28,6 +28,7 @@ class KommuneOut(BaseModel):
     id: int
     name: str
     bundesland: Optional[str] = None
+    landkreis: Optional[str] = None
     osm_id: Optional[str] = None
     area_km2: Optional[float] = None
     population: Optional[int] = None
@@ -245,6 +246,13 @@ class MeasureImpactSummary(BaseModel):
     capex_eur: Optional[float] = None
     opex_annual_eur: Optional[float] = None
     annual_benefit_eur: Optional[float] = None
+    # Aufschlüsselung des Nutzens: vermiedene Zellschäden (damage, inkl. gekoppelter
+    # Folgekosten), kommunenweite flat-Risiken, direkter Zusatznutzen (Erträge/Erlöse).
+    annual_benefit_damage_eur: Optional[float] = None
+    annual_benefit_flat_eur: Optional[float] = None
+    annual_benefit_direct_eur: Optional[float] = None
+    benefit_capped: Optional[bool] = None
+    params_fingerprint: Optional[str] = None
     count: Optional[int] = None
     count_is_default: Optional[bool] = None
     recommended_count: Optional[int] = None

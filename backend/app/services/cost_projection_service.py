@@ -15,9 +15,8 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.data import catalog
-from app.models.models import AdaptationMeasure
 from app.services.climate.dwd_data import get_climate_projection
-from app.services.measure_service import get_risk_aggregate
+from app.services.measure_service import get_risk_aggregate, kommune_measures_query
 from app.services.projection_service import scenario_factors
 
 
@@ -34,9 +33,11 @@ def _group_costs(agg: dict) -> dict[str, float]:
     return {g: round(v, 2) for g, v in out.items()}
 
 
-def project_costs(db: Session, kommune_id: int, bundesland: str) -> dict:
+def project_costs(db: Session, kommune_id: int, bundesland: str,
+                  demo_session_id: str | None = None) -> dict:
     base = get_risk_aggregate(db, kommune_id, apply_measures=False)
-    withm = get_risk_aggregate(db, kommune_id, apply_measures=True)
+    withm = get_risk_aggregate(db, kommune_id, apply_measures=True,
+                               demo_session_id=demo_session_id)
 
     total_base = float(base["cost"]["total_eur"] or 0.0)
     total_with = float(withm["cost"]["total_eur"] or 0.0)
@@ -47,11 +48,7 @@ def project_costs(db: Session, kommune_id: int, bundesland: str) -> dict:
 
     # ── Maßnahmen: Kostenzeitpunkte bestimmen ─────────────────────────────
     default_impl_year = datetime.utcnow().year + 1
-    measures = (
-        db.query(AdaptationMeasure)
-        .filter(AdaptationMeasure.kommune_id == kommune_id)
-        .all()
-    )
+    measures = kommune_measures_query(db, kommune_id, demo_session_id).all()
     warnings: list[str] = []
     measure_rows: list[dict] = []
     for m in measures:
@@ -93,9 +90,31 @@ def project_costs(db: Session, kommune_id: int, bundesland: str) -> dict:
         return out
 
     def _scenario_block(scenario: str) -> dict:
-        f = scenario_factors(proj, scenario)
-        damages_no = [round(total_base * fy, 2) for fy in f]
-        damages_with = [round(total_with * fy, 2) for fy in f]
+        # Gefahrengruppen-spezifisch fortschreiben statt EINEN Gesamtwert linear zu
+        # skalieren: Der Hitzeanteil folgt der konvexen Expositions-Wirkungs-Kurve,
+        # die übrigen Gruppen dem Hitzetage-Trend. Vorher trug der Hitzetrend auch
+        # Flut- und Sturmschäden — und die Konvexität fiel ganz unter den Tisch.
+        groups_base = _group_costs(base)
+        groups_with = _group_costs(withm)
+        factors = {g: scenario_factors(proj, scenario, g) for g in set(groups_base) | set(groups_with)}
+        n_years = len(years)
+
+        def _series(group_costs: dict[str, float], total: float) -> list[float]:
+            covered = sum(group_costs.values())
+            # Nicht gruppierbarer Rest (nicht-additive Sammelrisiken) folgt dem
+            # übergreifenden Klimasignal.
+            rest = total - covered
+            rest_f = scenario_factors(proj, scenario, None)
+            out = []
+            for i in range(n_years):
+                v = rest * rest_f[i]
+                for g, c in group_costs.items():
+                    v += c * factors[g][i]
+                out.append(round(v, 2))
+            return out
+
+        damages_no = _series(groups_base, total_base)
+        damages_with = _series(groups_with, total_with)
         annual_with = [
             round(d + o + c, 2)
             for d, o, c in zip(damages_with, opex_by_year, capex_by_year)

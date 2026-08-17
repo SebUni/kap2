@@ -303,6 +303,9 @@ interface Props {
   kommuneId?: number
   onParametersUpdated?: () => void
   embedded?: boolean
+  /** Anfänglich ausgeblendete Knotentypen (Standard: `DEFAULT_HIDDEN_TYPES`).
+   *  Erlaubt Aufrufern, für einen bestimmten Graphen mehr/weniger vorab zu zeigen. */
+  initialHiddenTypes?: readonly LineageNodeType[]
 }
 
 export default function LineageFlowDiagram({
@@ -311,6 +314,7 @@ export default function LineageFlowDiagram({
   kommuneId,
   onParametersUpdated,
   embedded = false,
+  initialHiddenTypes = [...DEFAULT_HIDDEN_TYPES],
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasWrapRef = useRef<HTMLDivElement>(null)
@@ -322,7 +326,7 @@ export default function LineageFlowDiagram({
   const [networkReady, setNetworkReady] = useState(false)
 
   const [hiddenTypes, setHiddenTypes] = useState<Set<LineageNodeType>>(
-    () => new Set(DEFAULT_HIDDEN_TYPES),
+    () => new Set(initialHiddenTypes),
   )
   // Klick-Overrides gegenüber der Standard-Regel (alles ausgeklappt).
   const [expandedSet, setExpandedSet] = useState<Set<string>>(new Set())

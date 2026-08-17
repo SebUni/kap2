@@ -9,10 +9,10 @@ from __future__ import annotations
 import io
 import logging
 import math
-import multiprocessing
 import os
 import threading
 import time as _time
+from collections import OrderedDict
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
@@ -23,6 +23,7 @@ from shapely.geometry import Point
 from shapely.ops import unary_union
 
 from app.config import settings
+from app.services.engine.parallel import cow_pool, n_workers
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +32,11 @@ TILE_SIZE = 256
 _CACHE_TTL = 3600  # 1 h
 
 _cache_lock = threading.Lock()
-_tile_cache: dict[tuple[int, int, int], tuple[float, np.ndarray]] = {}
+# RAM-Kachel-Cache als kleines LRU (float32, ~256 KB je Kachel → ≤ ~32 MB);
+# die dauerhafte Ablage sind PNG-Dateien unter TERRAIN_TILE_CACHE_DIR.
+_TILE_LRU_MAX = 128
+_tile_cache: OrderedDict[tuple[int, int, int], np.ndarray] = OrderedDict()
+# DEM-Ergebnisse je bbox: max 1 Eintrag (nur Within-Run-Wiederverwendung).
 _dem_cache: dict[str, tuple[float, dict]] = {}
 
 # D8-Nachbarn: (d_row, d_col, Distanzfaktor für Hang)
@@ -42,17 +47,15 @@ _D8 = (
 )
 
 _tw: dict = {}
-_N_WORKERS = min(os.cpu_count() or 4, 8)
-_MP = multiprocessing.get_context("fork")
 _ELEV_CHUNK = 50
 
 
 def _decode_terrarium(rgb: np.ndarray) -> np.ndarray:
-    """RGB-Array (H×W×3) → Höhen in Metern."""
-    r = rgb[:, :, 0].astype(np.float64)
-    g = rgb[:, :, 1].astype(np.float64)
-    b = rgb[:, :, 2].astype(np.float64)
-    elev = (r * 256.0 + g + b / 256.0) - 32768.0
+    """RGB-Array (H×W×3) → Höhen in Metern (float32: ±9 km bei ~2 mm Auflösung)."""
+    r = rgb[:, :, 0].astype(np.float32)
+    g = rgb[:, :, 1].astype(np.float32)
+    b = rgb[:, :, 2].astype(np.float32)
+    elev = (r * np.float32(256.0) + g + b / np.float32(256.0)) - np.float32(32768.0)
     elev[elev < -500.0] = np.nan
     return elev
 
@@ -75,26 +78,68 @@ def _tile_bounds(zoom: int, x: int, y: int) -> tuple[float, float, float, float]
     return west, south, east, north
 
 
+def _tile_disk_path(zoom: int, x: int, y: int) -> str:
+    return os.path.join(settings.TERRAIN_TILE_CACHE_DIR, str(zoom), str(x), f"{y}.png")
+
+
+def _lru_put(key: tuple[int, int, int], elev: np.ndarray) -> None:
+    """Muss unter ``_cache_lock`` aufgerufen werden."""
+    _tile_cache[key] = elev
+    _tile_cache.move_to_end(key)
+    while len(_tile_cache) > _TILE_LRU_MAX:
+        _tile_cache.popitem(last=False)
+
+
 def _fetch_tile(zoom: int, x: int, y: int) -> np.ndarray:
     key = (zoom, x, y)
     with _cache_lock:
         cached = _tile_cache.get(key)
-        if cached and _time.time() - cached[0] < _CACHE_TTL:
-            return cached[1]
+        if cached is not None:
+            _tile_cache.move_to_end(key)
+            return cached
+
+    # Platten-Cache: Terrarium-DEM ist quasi statisch (TTL 1 Jahr).
+    disk_path = _tile_disk_path(zoom, x, y)
+    try:
+        if (
+            os.path.exists(disk_path)
+            and _time.time() - os.path.getmtime(disk_path) < settings.TERRAIN_TILE_CACHE_TTL_S
+        ):
+            with Image.open(disk_path) as img:
+                elev = _decode_terrarium(np.array(img.convert("RGB")))
+            with _cache_lock:
+                _lru_put(key, elev)
+            return elev
+    except Exception as exc:
+        log.warning("Terrain-Kachel-Cache %s unlesbar (%s) — lade neu", disk_path, exc)
 
     url = TERRARIUM_URL.format(z=zoom, x=x, y=y)
+    png_bytes: bytes | None = None
     try:
         with httpx.Client(timeout=30.0) as client:
             resp = client.get(url, headers={"User-Agent": settings.NOMINATIM_USER_AGENT})
             resp.raise_for_status()
-            img = Image.open(io.BytesIO(resp.content)).convert("RGB")
+            png_bytes = resp.content
+            img = Image.open(io.BytesIO(png_bytes)).convert("RGB")
             elev = _decode_terrarium(np.array(img))
     except Exception as exc:
         log.warning("Terrarium tile %s failed: %s", url, exc)
-        elev = np.full((TILE_SIZE, TILE_SIZE), np.nan)
+        # Fehlkacheln nicht persistieren, sonst bliebe das Loch bis TTL-Ablauf.
+        elev = np.full((TILE_SIZE, TILE_SIZE), np.nan, dtype=np.float32)
+        png_bytes = None
+
+    if png_bytes is not None:
+        try:
+            os.makedirs(os.path.dirname(disk_path), exist_ok=True)
+            tmp = f"{disk_path}.tmp.{os.getpid()}"
+            with open(tmp, "wb") as fh:
+                fh.write(png_bytes)
+            os.replace(tmp, disk_path)
+        except Exception as exc:
+            log.warning("Terrain-Kachel %s nicht persistierbar: %s", disk_path, exc)
 
     with _cache_lock:
-        _tile_cache[key] = (_time.time(), elev)
+        _lru_put(key, elev)
     return elev
 
 
@@ -118,7 +163,7 @@ def _build_dem_mosaic(
 
     rows = len(ys) * TILE_SIZE
     cols = len(xs) * TILE_SIZE
-    mosaic = np.full((rows, cols), np.nan)
+    mosaic = np.full((rows, cols), np.nan, dtype=np.float32)
 
     tile_jobs = [
         (yi, xi, ty, tx)
@@ -376,7 +421,7 @@ def compute_terrain_for_cells(
     _tw["row_i"] = row_i
     _tw["col_i"] = col_i
     try:
-        with _MP.Pool(_N_WORKERS) as pool:
+        with cow_pool() as pool:
             for done, (idx, r, c, e) in enumerate(
                 pool.imap_unordered(_elev_worker, range(n_cells), chunksize=_ELEV_CHUNK)
             ):
@@ -385,7 +430,7 @@ def compute_terrain_for_cells(
                 valid[r, c] = True
                 if progress_callback and (done % 300 == 0 or done + 1 == n_cells):
                     pct = lerp(TERRAIN_ELEV[0], TERRAIN_ELEV[1], (done + 1) / n_cells)
-                    progress_callback(pct, f"Zellhöhen ({_N_WORKERS} Kerne)", f"{done + 1}/{n_cells}")
+                    progress_callback(pct, f"Zellhöhen ({n_workers()} Kerne)", f"{done + 1}/{n_cells}")
     finally:
         _tw.clear()
 
@@ -429,6 +474,8 @@ def compute_terrain_for_cells(
         }
 
     with _cache_lock:
+        # Max. 1 Eintrag: nur Wiederverwendung innerhalb desselben Laufs/Bbox.
+        _dem_cache.clear()
         _dem_cache[cache_key] = (_time.time(), results)
 
     if progress_callback:

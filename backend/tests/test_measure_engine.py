@@ -230,6 +230,69 @@ def test_flat_risk_is_p90_and_excluded_from_cell_benefit():
     assert FLAT_RISK.get("scale", "pop") not in ("pop", "area")
 
 
+# ── Staleness-Fingerprint (DB-frei über Fakes) ─────────────────────────────────
+
+class _FakeQuery:
+    def __init__(self, value):
+        self._value = value
+
+    def filter(self, *args, **kwargs):
+        return self
+
+    def scalar(self):
+        return self._value
+
+
+class _FakeDB:
+    """Minimal-Session für _params_fingerprint (max(calculated_at)-Query)."""
+
+    def __init__(self, cells_marker):
+        self.cells_marker = cells_marker
+
+    def query(self, *args):
+        return _FakeQuery(self.cells_marker)
+
+
+class _FakeMeasure:
+    kommune_id = 1
+    config: dict = {}
+
+
+def _mdef() -> dict:
+    return dict(next(m for m in catalog.MEASURES if m.get("benefit_per_m2_year")))
+
+
+def test_fingerprint_changes_on_benefit_recalibration():
+    """Oschatz-Befund: Katalog-Rekalibrierung (benefit_per_m2_year 1,5 → 0,02) muss
+    den Fingerprint ändern, damit gespeicherte impact_summaries neu gerechnet werden."""
+    db, m = _FakeDB("2026-07-01"), _FakeMeasure()
+    mdef = _mdef()
+    fp_old = measure_service._params_fingerprint(db, m, {**mdef, "benefit_per_m2_year": 1.5}, {})
+    fp_new = measure_service._params_fingerprint(db, m, {**mdef, "benefit_per_m2_year": 0.02}, {})
+    assert fp_old != fp_new
+
+
+def test_fingerprint_stable_without_changes():
+    db, m = _FakeDB("2026-07-01"), _FakeMeasure()
+    mdef = _mdef()
+    assert (measure_service._params_fingerprint(db, m, mdef, {"a": 1})
+            == measure_service._params_fingerprint(db, m, dict(mdef), {"a": 1}))
+
+
+def test_fingerprint_changes_on_overrides_cells_and_config():
+    db, m = _FakeDB("2026-07-01"), _FakeMeasure()
+    mdef = _mdef()
+    base = measure_service._params_fingerprint(db, m, mdef, {})
+    # Kommune-Override (wirkt in _cell_cost/_reduction_factor) → neu rechnen.
+    assert measure_service._params_fingerprint(db, m, mdef, {"impact.k_indirect": 0.3}) != base
+    # Zelldaten neu gebaut (assessment_task) → neu rechnen.
+    assert measure_service._params_fingerprint(_FakeDB("2026-07-02"), m, mdef, {}) != base
+    # Stückzahl geändert → neu rechnen.
+    m2 = _FakeMeasure()
+    m2.config = {"count": 7}
+    assert measure_service._params_fingerprint(db, m2, mdef, {}) != base
+
+
 if __name__ == "__main__":
     import sys
     sys.exit(pytest.main([__file__, "-q"]))

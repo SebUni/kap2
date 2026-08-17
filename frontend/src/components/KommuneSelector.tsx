@@ -4,7 +4,7 @@ import { api } from '../api/client'
 import type { KommuneSearchResult, Kommune } from '../types'
 
 export default function KommuneSelector() {
-  const { kommune, loadKommune, loadGrid, loadStatus, loadMeasures, loadConfig } = useStore()
+  const { kommune, loadKommune, loadStatus, loadMeasures, loadConfig } = useStore()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<KommuneSearchResult[]>([])
   const [open, setOpen] = useState(false)
@@ -45,7 +45,6 @@ export default function KommuneSelector() {
     try {
       await loadKommune(id)
       await Promise.all([
-        loadGrid(id),
         loadStatus(id),
         loadMeasures(id),
         loadConfig(id),
@@ -61,16 +60,23 @@ export default function KommuneSelector() {
   const selectResult = async (r: KommuneSearchResult) => {
     setOpen(false)
     setGebieteOpen(false)
+    // Ladeanzeige sofort setzen: bei großen Städten (z. B. Leipzig, ~30k
+    // Rasterzellen) dauern createKommune + Grid mehrere Sekunden – ohne
+    // Feedback wirkt der Klick, als würde nichts passieren.
+    setLoading(true)
+    setError('')
+    setQuery(r.name)
     try {
       const k = await api.createKommune(r.osm_id, r.name, r.osm_type, r.geojson, r.address) as unknown as Kommune
-      const grid = await api.getGrid(k.id) as { features?: unknown[] }
-      if (!grid.features?.length) {
-        await api.generateGrid(k.id)
-      }
+      // Grid anlegen, falls noch nicht vorhanden. generateGrid ist idempotent
+      // und ohne force günstig (nur COUNT), wenn das Raster bereits existiert –
+      // das spart den teuren Voll-Fetch des kompletten Grid-GeoJSON.
+      await api.generateGrid(k.id)
       await loadKommuneData(k.id, k.name)
     } catch (e) {
       console.error('Failed to load kommune:', e)
       setError(e instanceof Error ? e.message : 'Laden fehlgeschlagen')
+    } finally {
       setLoading(false)
     }
   }

@@ -2,9 +2,9 @@
 
 Kern je direktem Sektorschaden und Zelle:
     ``Schaden = Assetwert · max. Jahresverlustrate · Schadenskurve(Intensität) · g(V̂)``
-Der **Assetwert** kommt aus den realen Zell-Rohgrößen (Gebäudefläche, Infrastruktur-
-Anzahl, Agrar-/Wald-/Gewässerfläche) × editierbaren €-Parametern statt aus dem
-abstrakten ``ref_value``. Die **Schadenskurve** ist konvex in der normierten Hazard-
+Der **Assetwert** kommt aus den realen Zell-Rohgrößen (Gebäudefläche, KRITIS-
+Anlagenklassen-Zählung, Agrar-/Wald-/Gewässerfläche) × editierbaren €-Parametern
+statt aus dem abstrakten ``ref_value``. Die **Schadenskurve** ist konvex in der normierten Hazard-
 Intensität der Zelle (``curves.damage_fraction``).
 
 Folgekosten werden NICHT einzeln additiv gerechnet, sondern in
@@ -16,7 +16,7 @@ Folgekosten werden NICHT einzeln additiv gerechnet, sondern in
 
 from __future__ import annotations
 
-from app.data import catalog
+from app.data import catalog, infra_assets
 from app.services.engine.impact.base import CellContext
 from app.services.engine.impact.curves import damage_fraction
 
@@ -52,8 +52,22 @@ def _building_asset(ctx: CellContext) -> float:
     return floor_area * ctx.pg("building_value_eur_m2", 2000.0)
 
 
-def _count_asset(ctx: CellContext, count_key: str, value: float) -> float:
-    return ctx.inp(count_key) * value
+def _class_asset(ctx: CellContext, classes_key: str, sector: str) -> float:
+    """Assetwert = Σ Anzahl je Anlagenklasse × klassenspezifischer Ersatzwert.
+
+    Nutzt die rohen Klassen-Zählungen (``*_classes``) statt der gewichteten
+    Kritikalitätspunkte: ein Umspannwerk und ein Ortsnetztrafo haben andere
+    Ersatzwerte als ein Sektor-Mittelwert je Stück abbilden könnte.
+    """
+    classes = ctx.ci.get(classes_key) or {}
+    total = 0.0
+    for cls, count in classes.items():
+        spec = infra_assets.ASSET_CLASSES[sector].get(cls)
+        if spec is None:
+            continue
+        value = ctx.pg(infra_assets.value_param_key(sector, cls), spec["value_eur"])
+        total += float(count) * value
+    return total
 
 
 def _area_asset(ctx: CellContext, frac_key: str, value_ha: float) -> float:
@@ -68,22 +82,22 @@ def building_damage(risk, ctx):
 
 
 def transport_damage(risk, ctx):
-    asset = _count_asset(ctx, "transport_hub_count", ctx.pg("transport_asset_value_eur", 500_000.0))
+    asset = _class_asset(ctx, "transport_hub_classes", "transport")
     return _sector(ctx, risk, asset, ["HEAVY_RAIN_FLOOD", "HEAT_WAVE", "DROUGHT"], 0.02)
 
 
 def energy_damage(risk, ctx):
-    asset = _count_asset(ctx, "energy_infra_count", ctx.pg("energy_asset_value_eur", 800_000.0))
+    asset = _class_asset(ctx, "energy_infra_classes", "energy")
     return _sector(ctx, risk, asset, ["EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD", "HEAT_WAVE"], 0.02)
 
 
 def telecom_damage(risk, ctx):
-    asset = _count_asset(ctx, "communication_count", ctx.pg("telecom_asset_value_eur", 400_000.0))
+    asset = _class_asset(ctx, "communication_classes", "comm")
     return _sector(ctx, risk, asset, ["EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD"], 0.02)
 
 
 def water_damage(risk, ctx):
-    asset = _count_asset(ctx, "water_wastewater_count", ctx.pg("water_asset_value_eur", 600_000.0))
+    asset = _class_asset(ctx, "water_wastewater_classes", "water")
     return _sector(ctx, risk, asset, ["HEAVY_RAIN_FLOOD", "DROUGHT", "HEAT_WAVE"], 0.015)
 
 
@@ -144,9 +158,18 @@ MONETARY_IMPACTS = {
 # Deklariert je Sektorschaden, was die Funktion oben rechnet (Assetwert · Verlustrate ·
 # Schadenskurve(Intensität) · g(V̂)), damit ``lineage_graph`` den Schicht-B-Zweig exakt
 # aus der tatsächlichen Rechnung baut. ``asset.kind``: building (Geschossfläche ×
-# €/m²), count (Anzahl × €/Stück), area (Flächenanteile × €/ha). Migration folgt dem
+# €/m²), class_count (Σ Anzahl je Anlagenklasse × Ersatzwert der Klasse, Parameter in
+# ``value_params``), area (Flächenanteile × €/ha). Migration folgt dem
 # Bevölkerungs-Muster (Bevölkerung · Referenzkosten · Intensität · g(V̂)) und liefert
 # direkt €. Key-Gleichheit mit MONETARY_IMPACTS wird in tests/test_lineage_graph.py geprüft.
+
+def _class_value_params(sector: str) -> list[str]:
+    return [
+        infra_assets.value_param_key(sector, cls)
+        for cls in infra_assets.ASSET_CLASSES[sector]
+    ]
+
+
 LINEAGE_SPECS: dict[str, dict] = {
     "EXPECTED_BUILDING_DAMAGE_EUR": {
         "asset": {"kind": "building", "cell_keys": ["bldg_cov", "avg_height"],
@@ -157,32 +180,32 @@ LINEAGE_SPECS: dict[str, dict] = {
                    "hazards": ["HEAVY_RAIN_FLOOD", "EXTRATROPICAL_STORM", "HEAT_WAVE"]},
     },
     "EXPECTED_TRANSPORT_DAMAGE_EUR": {
-        "asset": {"kind": "count", "cell_keys": ["transport_hub_count"],
-                  "value_param": "transport_asset_value_eur",
+        "asset": {"kind": "class_count", "cell_keys": ["transport_hub_classes"],
+                  "value_params": _class_value_params("transport"),
                   "label": "Verkehrs-Assetwert (Zelle)"},
         "loss_param": "max_loss_rate",
         "driver": {"kind": "intensity",
                    "hazards": ["HEAVY_RAIN_FLOOD", "HEAT_WAVE", "DROUGHT"]},
     },
     "EXPECTED_ENERGY_INFRA_DAMAGE_EUR": {
-        "asset": {"kind": "count", "cell_keys": ["energy_infra_count"],
-                  "value_param": "energy_asset_value_eur",
+        "asset": {"kind": "class_count", "cell_keys": ["energy_infra_classes"],
+                  "value_params": _class_value_params("energy"),
                   "label": "Energie-Assetwert (Zelle)"},
         "loss_param": "max_loss_rate",
         "driver": {"kind": "intensity",
                    "hazards": ["EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD", "HEAT_WAVE"]},
     },
     "EXPECTED_TELECOM_DAMAGE_EUR": {
-        "asset": {"kind": "count", "cell_keys": ["communication_count"],
-                  "value_param": "telecom_asset_value_eur",
+        "asset": {"kind": "class_count", "cell_keys": ["communication_classes"],
+                  "value_params": _class_value_params("comm"),
                   "label": "Telekom-Assetwert (Zelle)"},
         "loss_param": "max_loss_rate",
         "driver": {"kind": "intensity",
                    "hazards": ["EXTRATROPICAL_STORM", "HEAVY_RAIN_FLOOD"]},
     },
     "EXPECTED_WATER_WASTEWATER_DAMAGE_EUR": {
-        "asset": {"kind": "count", "cell_keys": ["water_wastewater_count"],
-                  "value_param": "water_asset_value_eur",
+        "asset": {"kind": "class_count", "cell_keys": ["water_wastewater_classes"],
+                  "value_params": _class_value_params("water"),
                   "label": "Wasser-/Abwasser-Assetwert (Zelle)"},
         "loss_param": "max_loss_rate",
         "driver": {"kind": "intensity",

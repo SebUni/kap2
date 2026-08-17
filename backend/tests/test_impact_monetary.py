@@ -43,8 +43,13 @@ def _ctx(pop=250.0, flood=0.4, vnorm=0.5, bldg_cov=0.2, avg_height=7.0):
         for v in r["vulnerabilities"]:
             hn["vulnerabilities"][v] = vnorm
     ci = {"pop": pop, "bldg_cov": bldg_cov, "avg_height": avg_height, "area_m2": 10000,
-          "transport_hub_count": 1, "energy_infra_count": 1, "communication_count": 1,
-          "water_wastewater_count": 1, "farmland_frac": 0.3, "forest_frac": 0.2,
+          "transport_hub_count": 8.0, "energy_infra_count": 4.0, "communication_count": 2.0,
+          "water_wastewater_count": 10.0,
+          "transport_hub_classes": {"railway_station": 1},
+          "energy_infra_classes": {"substation_distribution": 1},
+          "communication_classes": {"mast": 1},
+          "water_wastewater_classes": {"wastewater_plant": 1},
+          "farmland_frac": 0.3, "forest_frac": 0.2,
           "green_frac": 0.2, "water_frac": 0.1}
     return CellContext(ci=ci, hev=hev, hev_norm=hn, indices={}, regional={})
 

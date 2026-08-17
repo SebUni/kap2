@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.data import catalog
 from app.models.models import AdaptationMeasure, MeasureImpact
+from app.services import measure_service
 
 
 def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
@@ -43,10 +44,10 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
             shape = to_shape(m.geometry)
             geom_wkt = shape.wkt
 
-        # Kosten/Nutzen kommen aus dem zuletzt berechneten compute_impact()-Ergebnis
-        # (measure.impact_summary); nur die Index-Deltas sind echte Pro-Zelle-Daten.
+        # Kosten/Nutzen kommen aus dem compute_impact()-Ergebnis; ensure_fresh rechnet
+        # bei veralteter Grundlage (Katalog-/Parameteränderung) vor dem Export neu.
         impacts = db.query(MeasureImpact).filter(MeasureImpact.measure_id == m.id).all()
-        summary = m.impact_summary or {}
+        summary = measure_service.ensure_fresh_impact_summary(db, m)
         total_capex = summary.get("capex_eur", 0)
         total_opex = summary.get("opex_annual_eur", 0)
         total_savings = summary.get("annual_benefit_eur", 0)

@@ -5,8 +5,9 @@ Metadaten einmalig (Labels, Einheiten, Gruppen, Beschreibungen, Proxys) und
 nutzt sie für Layer-Spalte, Tooltips und Dashboard.
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 
+from app.api.deps import demo_session_id_of
 from app.data import catalog
 from app.services.engine import formulas
 from app.services import lineage_graph
@@ -29,8 +30,8 @@ def _layer_category(code: str) -> str | None:
 
 
 @router.get("/catalog")
-def get_catalog():
-    return {
+def get_catalog(request: Request):
+    payload = {
         "groups": catalog.KWRA_GROUPS,
         "hazards": catalog.HAZARDS,
         "exposures": catalog.EXPOSURES,
@@ -44,11 +45,22 @@ def get_catalog():
         "auxiliary": catalog.AUXILIARY,
         "auxiliary_categories": catalog.AUXILIARY_CATEGORIES,
     }
+    if demo_session_id_of(request):
+        from app.services import demo_service
+        enabled = getattr(request.state, "demo_enabled_layers", set())
+        risk_codes = getattr(request.state, "demo_risk_codes", [])
+        return demo_service.filter_catalog(payload, enabled, risk_codes)
+    return payload
 
 
 @router.get("/catalog/layer/{code}/recipe")
-def get_layer_recipe(code: str, category: str | None = Query(None)):
+def get_layer_recipe(code: str, request: Request, category: str | None = Query(None)):
     """Rezept-Metadaten einer Ebene (ohne Assessment / Zellwerte)."""
+    # Demo: Wirkungsmechanismus nur für freigeschaltete Ebenen (Plan §3.6).
+    if demo_session_id_of(request):
+        enabled = getattr(request.state, "demo_enabled_layers", set())
+        if code not in enabled:
+            raise HTTPException(403, "Diese Ebene ist in der Demo nicht freigeschaltet")
     cat = category or _layer_category(code)
     if not cat:
         raise HTTPException(404, f"Unbekannter Code: {code}")

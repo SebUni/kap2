@@ -21,13 +21,21 @@ export function operatorKindLabel(kind: string, meta: Record<string, unknown>): 
   if (kind === 'divide') return '÷'
   if (kind === 'add') return '+'
   if (kind === 'weight') return 'Gewicht'
+  if (kind === 'distance') return String(meta.label || 'Distanz messen')
+  if (kind === 'distance_score') return String(meta.label || 'Nähe-Score')
+  if (kind === 'mean') return String(meta.label || 'Mittelwert')
+  if (kind === 'lookup') return String(meta.label || 'Regionalwert')
+  if (kind === 'constant') return String(meta.label || 'Konstantwert')
+  if (kind === 'derived_index') return String(meta.label || 'Ableitung')
   return String(meta.label || kind)
 }
 
 const SINGLE_LABEL_KINDS = new Set([
   'count', 'coverage', 'neighbor', 'weighted_sum', 'formula', 'max', 'min',
+  // Zell-Operator-Klassen (Beschreibungskonzept): Label kommt aus dem Backend-Meta.
+  'distance', 'distance_score', 'mean', 'lookup', 'constant', 'derived_index',
   // Schicht-B-Operatoren (Schadensfunktionen): Label kommt aus dem Backend-Meta.
-  'af', 'gv', 'damage_curve', 'sum_cells', 'p90', 'intensity', 'ratio',
+  'af', 'gv', 'damage_curve', 'sum_cells', 'p90', 'intensity', 'ratio', 'erf',
 ])
 
 export function operatorShowsSingleLabel(kind: string): boolean {

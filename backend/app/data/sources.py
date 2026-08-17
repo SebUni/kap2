@@ -25,6 +25,14 @@ from __future__ import annotations
 # Kurz-Key -> Bibliografie-Eintrag. Keys sind stabil (werden aus catalog.source_refs
 # referenziert); Umbenennen erfordert Anpassung der referenzierenden Maßnahmen.
 SOURCE_REFERENCES: dict[str, dict[str, str]] = {
+    "Regionalstatistik_GENESIS": {
+        "ieee": "Statistische Ämter des Bundes und der Länder, „Regionaldatenbank "
+                "Deutschland (GENESIS-Online),“ Düsseldorf, Deutschland. [Online]. "
+                "Verfügbar: https://www.regionalstatistik.de. [Zugriff: 6. Juli 2026].",
+        "url": "https://www.regionalstatistik.de",
+        "archive_url": "https://web.archive.org/web/2026/https://www.regionalstatistik.de/",
+        "accessed": "2026-07-06",
+    },
     "BuGG_Marktreport_2024": {
         "ieee": "Bundesverband GebäudeGrün e.V. (BuGG), „BuGG-Marktreport Gebäudegrün "
                 "2024,“ Berlin, Deutschland, 2024. [Online]. Verfügbar: "
@@ -394,6 +402,132 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "JHealthMonit_2023_S4_Hitze_Sachstandsbericht_Klimawandel_Gesundheit.pdf",
         "accessed": "2026-07-04",
     },
+    "Winklmayr_2022": {
+        "ieee": "C. Winklmayr, S. Muthers, H. Niemann, H.-G. Mücke und M. an der Heiden, "
+                "„Heat-Related Mortality in Germany From 1992 to 2021,“ Dtsch. Arztebl. Int., "
+                "Bd. 119, Nr. 26, S. 451–457, 2022, doi:10.3238/arztebl.m2022.0202. "
+                "Generalisiertes additives Modell über Wochenmitteltemperatur und "
+                "wöchentliche Gesamtsterblichkeit, geschichtet nach vier Altersgruppen "
+                "(<65, 65–74, 75–84, ≥85) und drei Regionen (Nord/Mitte/Süd); liefert die "
+                "Wirkschwellen 19,7/20,2/20,8 °C sowie die Jahresschätzungen 1992–2021. "
+                "[Zugriff: 2. August 2026].",
+        "url": "https://www.aerzteblatt.de/int/archive/article/225956",
+        "archive_url": "https://web.archive.org/web/20240921163435/"
+                       "https://www.aerzteblatt.de/int/archive/article/225956",
+        "accessed": "2026-08-02",
+    },
+    "RKI_Wochenbericht_Hitzemortalitaet": {
+        "ieee": "Robert Koch-Institut (RKI), „Wochenbericht zur hitzebedingten Mortalität,“ "
+                "Berlin, Deutschland, fortlaufend (Sommermonate). Wöchentliche Schätzung der "
+                "hitzebedingten Sterbefälle nach Altersgruppen; Datengrundlage Destatis-"
+                "Sterbefallzahlen und DWD-Lufttemperatur. Ein Winter-/Kältependant wird "
+                "nicht veröffentlicht. [Zugriff: 2. August 2026].",
+        "url": "https://www.rki.de/DE/Themen/Gesundheit-und-Gesellschaft/"
+               "Gesundheitliche-Einflussfaktoren-A-Z/H/Hitze/Bericht_Hitzemortalitaet.html",
+        "archive_url": "https://web.archive.org/web/20260712131020/"
+                       "https://www.rki.de/DE/Themen/Gesundheit-und-Gesellschaft/"
+                       "Gesundheitliche-Einflussfaktoren-A-Z/H/Hitze/Bericht_Hitzemortalitaet.html",
+        "accessed": "2026-08-02",
+    },
+    "Iungman_2023_UHI": {
+        "ieee": "T. Iungman, M. Cirach, F. Marando u. a., „Cooling cities through urban green "
+                "infrastructure: a health impact assessment of European cities,“ The Lancet, "
+                "Bd. 401, Nr. 10376, S. 577–589, 2023, doi:10.1016/S0140-6736(22)02585-5. "
+                "Schätzt 4,33 % [3,37; 5,27] der sommerlichen Sterbefälle in 93 europäischen "
+                "Städten als der städtischen Wärmeinsel zurechenbar — hier als unabhängige "
+                "Gegenprobe des ΔT-Modells genutzt. [Zugriff: 2. August 2026].",
+        "url": "https://www.isglobal.org/en/-/"
+               "4-of-summer-mortality-is-attributable-to-urban-heat-islands",
+        "archive_url": "https://web.archive.org/web/20260801234533/"
+                       "https://www.isglobal.org/en/-/"
+                       "4-of-summer-mortality-is-attributable-to-urban-heat-islands",
+        "accessed": "2026-08-02",
+    },
+    "DWD_CDC_Monatsraster_Temperatur": {
+        "ieee": "Deutscher Wetterdienst (DWD), Climate Data Center (CDC), „Monatliche "
+                "Rasterdaten der Lufttemperatur für Deutschland (1 km, air_temperature_mean / "
+                "_min / _max),“ Offenbach, Deutschland. Gzip-komprimierte ESRI-ASCII-Raster "
+                "in Gauß-Krüger Zone 3 (EPSG:31467); Werte in 1/10 °C. [Zugriff: 2. August 2026].",
+        "url": "https://opendata.dwd.de/climate_environment/CDC/grids_germany/monthly/"
+               "air_temperature_mean/",
+        "archive_url": "https://web.archive.org/web/20260801234443/"
+                       "https://opendata.dwd.de/climate_environment/CDC/grids_germany/monthly/"
+                       "air_temperature_mean/",
+        "accessed": "2026-08-02",
+    },
+    "Destatis_Sterbefaelle_Altersgruppen": {
+        "ieee": "Statistisches Bundesamt (Destatis), „Todesursachenstatistik – Gestorbene nach "
+                "Altersgruppen,“ Wiesbaden, Deutschland. Grundlage der altersspezifischen "
+                "Basissterblichkeit je 100.000 Einwohner. [Zugriff: 2. August 2026].",
+        "url": "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Gesundheit/"
+               "Todesursachen/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20260801234410/"
+                       "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Gesundheit/"
+                       "Todesursachen/_inhalt.html",
+        "accessed": "2026-08-02",
+    },
+    "Destatis_Todesursachen_23211": {
+        "ieee": "Statistisches Bundesamt (Destatis), „Todesursachenstatistik (GENESIS-Bereich "
+                "23211), ICD-10-Positionen X30–X39 (Einwirkung von Naturgewalten),“ Wiesbaden, "
+                "Deutschland. X37 (Sturm/Unwetter) und X38 (Überschwemmung) sind hier als "
+                "Grundleiden kodiert und dienen als amtliche Gegenprobe zu den kuratierten "
+                "Ereignislisten. [Zugriff: 2. August 2026].",
+        "url": "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Gesundheit/"
+               "Todesursachen/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20260801234410/"
+                       "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Gesundheit/"
+                       "Todesursachen/_inhalt.html",
+        "accessed": "2026-08-02",
+    },
+    "Destatis_Krankenhausdiagnosen_23131": {
+        "ieee": "Statistisches Bundesamt (Destatis), „Krankenhausdiagnosestatistik "
+                "(GENESIS-Bereich 23131) und fallpauschalenbezogene Krankenhausstatistik "
+                "(DRG, 23141, Nebendiagnosen),“ Wiesbaden, Deutschland. Witterungsbedingte "
+                "Verletzungen erscheinen als ICD-10-Außenursachen X30–X39; da diese in der "
+                "deutschen Kodierpraxis **Neben**diagnosen sind, ist die DRG-Nebendiagnosen-"
+                "Tabelle (23141BJ015, nach Altersgruppen) die belastbare Quelle, während die "
+                "Hauptdiagnose-Tabelle deutlich untererfasst. [Zugriff: 2. August 2026].",
+        "url": "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Gesundheit/"
+               "Krankenhauser/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20260801234830/"
+                       "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Gesundheit/"
+                       "Krankenhauser/_inhalt.html",
+        "accessed": "2026-08-02",
+    },
+    "Jonkman_2008_LossOfLife": {
+        "ieee": "S. N. Jonkman und E. Penning-Rowsell, „Loss of life due to floods,“ J. Flood "
+                "Risk Manage., Bd. 1, Nr. 1, S. 43–56, 2008, doi:10.1111/j.1753-318X.2008.00006.x. "
+                "Zoniert das Überflutungsgebiet nach Fließgeschwindigkeit, Anstiegsrate und "
+                "Restzone; die Letalität je exponierter Person unterscheidet sich zwischen "
+                "Sturzflut- und Langsam-Anstiegs-Regime um Größenordnungen. [Zugriff: 2. August 2026].",
+        "url": "https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1753-318X.2008.00006.x",
+        "archive_url": "https://web.archive.org/web/2026/"
+                       "https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1753-318X.2008.00006.x",
+        "accessed": "2026-08-02",
+    },
+    "CEDIM_Hochwasser_2021": {
+        "ieee": "Center for Disaster Management and Risk Reduction Technology (CEDIM), "
+                "Karlsruher Institut für Technologie, „Hochwasser Mitteleuropa, Juli 2021 – "
+                "Bericht Nr. 1: Nordrhein-Westfalen und Rheinland-Pfalz,“ Karlsruhe, "
+                "Deutschland, 2021. Ereignisdokumentation der Ahr-/Erft-Flut mit Todesopfern "
+                "und Schadensbild. [Zugriff: 2. August 2026].",
+        "url": "https://www.cedim.kit.edu/download/FDA_HochwasserJuli2021_Bericht1.pdf",
+        "archive_url": "https://web.archive.org/web/2026/"
+                       "https://www.cedim.kit.edu/download/FDA_HochwasserJuli2021_Bericht1.pdf",
+        "accessed": "2026-08-02",
+    },
+    "DWD_Sturmereignisse": {
+        "ieee": "Deutscher Wetterdienst (DWD), „Besondere Ereignisse – Stürme (u. a. Kyrill "
+                "2007, Friederike 2018),“ Offenbach, Deutschland. Ereignisdokumentation mit "
+                "Windfeld und Schadensbild; Grundlage der kuratierten Sturm-Ereignisliste. "
+                "[Zugriff: 2. August 2026].",
+        "url": "https://www.dwd.de/DE/leistungen/besondereereignisse/stuerme/"
+               "20180123_friederike_europa.pdf",
+        "archive_url": "https://web.archive.org/web/2026/"
+                       "https://www.dwd.de/DE/leistungen/besondereereignisse/stuerme/"
+                       "20180123_friederike_europa.pdf",
+        "accessed": "2026-08-02",
+    },
     "OECD_VSL_2012": {
         "ieee": "Organisation für wirtschaftliche Zusammenarbeit und Entwicklung (OECD), "
                 "„Mortality Risk Valuation in Environment, Health and Transport Policies,“ "
@@ -631,6 +765,81 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
         "archive_url": "https://web.archive.org/web/20260706052927/https://www.bwb.de/de/"
                        "bestandsaufnahme-von-versiegelten-flaechen-auf-privatgrundstuecken.php",
         "accessed": "2026-07-06",
+    },
+    # ── LoD2: amtliche 3D-Gebäudemodelle der Länder (Gebäudehöhen + SVF) ──────
+    "LoD2_NW": {
+        "ieee": "Geobasis NRW, Bezirksregierung Köln, „3D-Gebäudemodelle LoD2 "
+                "(CityGML), OpenGeodata.NRW,“ Köln, Deutschland, dl-de/zero-2-0. "
+                "[Online]. Verfügbar: https://www.opengeodata.nrw.de/produkte/"
+                "geobasis/3dg/lod2_gml/. [Zugriff: 14. Juli 2026].",
+        "url": "https://www.opengeodata.nrw.de/produkte/geobasis/3dg/lod2_gml/",
+        "archive_url": "https://web.archive.org/web/2026/https://www.opengeodata"
+                       ".nrw.de/produkte/geobasis/3dg/lod2_gml/",
+        "accessed": "2026-07-14",
+    },
+    "LoD2_BY": {
+        "ieee": "Landesamt für Digitalisierung, Breitband und Vermessung Bayern, "
+                "„3D-Gebäudemodelle LoD2 (CityGML), OpenData Bayern,“ München, "
+                "Deutschland, CC BY 4.0. [Online]. Verfügbar: https://geodaten."
+                "bayern.de/opengeodata/OpenDataDetail.html?pn=lod2. "
+                "[Zugriff: 14. Juli 2026].",
+        "url": "https://geodaten.bayern.de/opengeodata/OpenDataDetail.html?pn=lod2",
+        "archive_url": "https://web.archive.org/web/2026/https://geodaten.bayern"
+                       ".de/opengeodata/OpenDataDetail.html?pn=lod2",
+        "accessed": "2026-07-14",
+    },
+    "LoD2_BB": {
+        "ieee": "Landesvermessung und Geobasisinformation Brandenburg (LGB), "
+                "„3D-Gebäudemodelle LoD2 (CityGML), Geobasis-BB,“ Potsdam, "
+                "Deutschland, dl-de/by-2-0. [Online]. Verfügbar: https://data."
+                "geobasis-bb.de/geobasis/daten/3d_gebaeude/. [Zugriff: 14. Juli 2026].",
+        "url": "https://data.geobasis-bb.de/geobasis/daten/3d_gebaeude/",
+        "archive_url": "https://web.archive.org/web/2026/https://data.geobasis-bb"
+                       ".de/geobasis/daten/3d_gebaeude/",
+        "accessed": "2026-07-14",
+    },
+    "LoD2_HH": {
+        "ieee": "Landesbetrieb Geoinformation und Vermessung Hamburg, "
+                "„3D-Gebäudemodell LoD2-DE Hamburg (CityGML), Transparenzportal,“ "
+                "Hamburg, Deutschland, dl-de/by-2-0. [Online]. Verfügbar: "
+                "https://suche.transparenz.hamburg.de/dataset/"
+                "3d-gebaeudemodell-lod2-de-hamburg. [Zugriff: 14. Juli 2026].",
+        "url": "https://suche.transparenz.hamburg.de/dataset/"
+               "3d-gebaeudemodell-lod2-de-hamburg",
+        "archive_url": "https://web.archive.org/web/2026/https://suche.transparenz"
+                       ".hamburg.de/dataset/3d-gebaeudemodell-lod2-de-hamburg",
+        "accessed": "2026-07-14",
+    },
+    "LoD2_Laender_Sammel": {
+        "ieee": "Arbeitsgemeinschaft der Vermessungsverwaltungen der Länder (AdV), "
+                "„3D-Gebäudemodelle LoD2 der Länder (CityGML) — Open-Data-Portale "
+                "der Landesvermessungen (BW, NI, SH, BE, MV, SN, ST, TH, HE, RP, "
+                "SL, HB),“ Deutschland, DL-DE/BY-2.0 bzw. CC BY 4.0. [Online]. "
+                "Verfügbar: https://www.adv-online.de/AdV-Produkte/Standards-und-"
+                "Produktblaetter/. [Zugriff: 14. Juli 2026].",
+        "url": "https://www.adv-online.de/AdV-Produkte/Standards-und-Produktblaetter/",
+        "archive_url": "https://web.archive.org/web/2026/https://www.adv-online.de/"
+                       "AdV-Produkte/Standards-und-Produktblaetter/",
+        "accessed": "2026-07-14",
+    },
+    "Zaksek_2011_SVF": {
+        "ieee": "K. Zakšek, K. Oštir und Ž. Kokalj, „Sky-View Factor as a Relief "
+                "Visualization Technique,“ Remote Sensing, Bd. 3, Nr. 2, "
+                "S. 398–415, 2011. doi: 10.3390/rs3020398.",
+        "url": "https://www.mdpi.com/2072-4292/3/2/398",
+        "archive_url": "https://web.archive.org/web/2026/https://www.mdpi.com/"
+                       "2072-4292/3/2/398",
+        "accessed": "2026-07-14",
+    },
+    "Oke_1981_Canyon": {
+        "ieee": "T. R. Oke, „Canyon geometry and the nocturnal urban heat island: "
+                "Comparison of scale model and field observations,“ Journal of "
+                "Climatology, Bd. 1, Nr. 3, S. 237–254, 1981. "
+                "doi: 10.1002/joc.3370010304.",
+        "url": "https://onlinelibrary.wiley.com/doi/10.1002/joc.3370010304",
+        "archive_url": "https://web.archive.org/web/2026/https://onlinelibrary"
+                       ".wiley.com/doi/10.1002/joc.3370010304",
+        "accessed": "2026-07-14",
     },
 }
 

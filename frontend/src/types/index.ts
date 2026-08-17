@@ -30,13 +30,15 @@ export interface StepHistoryEntry {
 }
 
 export interface AssessmentStatus {
-  status: 'pending' | 'running' | 'done' | 'error' | null
+  status: 'pending' | 'queued' | 'running' | 'done' | 'error' | null
   progress_pct: number
   message?: string | null
   started_at?: string | null
   finished_at?: string | null
   step_history: StepHistoryEntry[]
   eta_seconds?: number | null
+  queue_position?: number | null
+  recalc_recommended?: boolean
 }
 
 export interface GeoExportJob {
@@ -66,6 +68,8 @@ export interface Measure {
   implementation_year?: number
   description?: string
   created_at: string
+  /** Serverseitig frisch gehaltene Wirkung (GET /measures läuft ensure_fresh_impact_summary). */
+  impact_summary?: MeasureImpactSummary | null
 }
 
 export interface SourceReference {
@@ -109,6 +113,14 @@ export interface MeasureImpactSummary {
   capex_eur?: number
   opex_annual_eur?: number
   annual_benefit_eur?: number
+  /** Vermiedene Zellschäden (inkl. gekoppelter Folgekosten). */
+  annual_benefit_damage_eur?: number
+  /** Vermiedene Ausfallkosten kommunenweiter P90-Risiken. */
+  annual_benefit_flat_eur?: number
+  /** Direkter Zusatznutzen (Erträge/Erlöse, benefit_per_m2_year · Fläche). */
+  annual_benefit_direct_eur?: number
+  /** true, wenn der Schadens-Nutzen am Gesamtschaden der verknüpften Risiken gekappt wurde. */
+  benefit_capped?: boolean
   count?: number
   count_is_default?: boolean
   recommended_count?: number
@@ -312,6 +324,9 @@ export interface ModelParameter {
   overridden: boolean
   custom_source?: string | null
   applicable?: boolean
+  // Demo: read-only (demo_locked) bzw. Wert/Quelle verborgen (demo_hidden)
+  demo_locked?: boolean
+  demo_hidden?: boolean
 }
 
 export interface ResolvedInput {
@@ -461,10 +476,22 @@ export interface RiskHistogram {
 
 // ── Aggregierte Risiken / Kosten ─────────────────────────────────────────────
 
+/** Risikoklasse aus Server-Klassifikation (Grenzen in RiskAggregate.classification). */
+export type RiskClass = 'gering' | 'mittel' | 'hoch'
+
 export interface RiskAggregateEntry {
   index: number
   /** = index (P90 der Zell-Indizes, Screening-Kennzahl). */
   p90_index?: number
+  /** Belastungs-P90: P90 nur über expositionsrelevante Zellen (Anzeige-Leitgröße). */
+  exposed_p90_index?: number
+  /** Exponierte Perzentile P80/P85/P95 für die gestuften Radar-Bänder. */
+  exposed_p80_index?: number
+  exposed_p85_index?: number
+  exposed_p95_index?: number
+  /** Anteil expositionsrelevanter Zellen an allen Zellen (0..1). */
+  exposure_share?: number
+  risk_class?: RiskClass
   max_index: number
   outcome: number
   /** Aggregierter Outcome (Summe der Zell-Outcomes für pop/area, sonst P90-basiert). */
@@ -488,6 +515,13 @@ export interface RiskGroupEntry {
   label: string
   color: string
   index: number
+  /** Mittel der Belastungs-P90-Werte der Einzelrisiken (Anzeige-Leitgröße). */
+  exposed_index?: number
+  /** Gruppen-Mittel der exponierten Perzentile P80/P85/P95 (gestufte Radar-Bänder). */
+  exposed_p80_index?: number
+  exposed_p85_index?: number
+  exposed_p95_index?: number
+  risk_class?: RiskClass
   risk_codes: string[]
 }
 
@@ -499,8 +533,15 @@ export interface RiskAggregate {
     by_risk: {
       code: string; name: string; cost_eur: number; outcome: number
       outcome_unit: string; cost_dimension: string; index: number
+      exposed_p90_index?: number; risk_class?: RiskClass
       aggregation?: 'sum' | 'p90'; top5_share?: number
     }[]
+  }
+  /** Server-Wahrheit der Risikoklassen (Grenzen folgen model.risk_threshold). */
+  classification?: {
+    basis: string
+    bounds: { medium_min: number; high_min: number }
+    labels: Record<RiskClass, string>
   }
 }
 
@@ -513,9 +554,19 @@ export interface CostSummary {
     total_capex_eur: number
     total_opex_annual_eur: number
     total_annual_benefit_eur: number
+    /** Vermiedene Zellschäden (Diagnostik; belastbar ist damage_reduction_eur). */
+    total_benefit_damage_eur?: number
+    /** Vermiedene Ausfallkosten kommunenweiter P90-Risiken. */
+    total_benefit_flat_eur?: number
+    /** Direkter Zusatznutzen (Erträge/Erlöse), additiv zu vermiedenen Schäden. */
+    total_benefit_direct_eur?: number
+    /** true, wenn Σ Pro-Maßnahmen-Schadensnutzen grob von der Aggregat-Differenz abweicht. */
+    benefit_consistency_warning?: boolean
     rows: {
       id: number; name: string; measure_type: string
       capex_eur: number; opex_annual_eur: number; annual_benefit_eur: number
+      annual_benefit_damage_eur?: number; annual_benefit_flat_eur?: number
+      annual_benefit_direct_eur?: number; benefit_capped?: boolean
     }[]
   }
 }
@@ -547,12 +598,27 @@ export interface KommuneProfile {
   id: number
   name: string
   bundesland: string | null
+  landkreis: string | null
   lat: number | null
   lon: number | null
   area_km2: number | null
   population: number | null
   population_source: string | null
   elevation: { mean_m: number; min_m: number; max_m: number; source: string } | null
+  /** BIP (amtlich nur Kreisebene, Regionalstatistik); null ohne GENESIS-Zugang.
+   *  `estimated_municipal_eur` = auf die Kommune geschätzt (BIP je Einwohner des
+   *  Kreises × Einwohner); `gdp_meur` bleibt der amtliche Kreiswert (Mio €). */
+  economy: {
+    gdp_meur: number; gdp_year: number | null; level: 'kreis'
+    gdp_per_capita_eur: number | null
+    estimated_municipal_eur: number | null
+    source: string; references: SourceReference[]
+  } | null
+  /** Kommunaler Haushalt: Auszahlungen, Ø der letzten verfügbaren Jahre (Gemeindeebene). */
+  municipal_budget: {
+    avg_expenditure_eur: number; years: number[]; level: 'gemeinde'
+    source: string; references: SourceReference[]
+  } | null
   climate: ClimateMetric[]
   sources_note: string
 }

@@ -73,25 +73,53 @@ def bundesland_from_address(address: dict | None) -> Optional[str]:
     return None
 
 
-async def reverse_bundesland(lat: float, lon: float) -> Optional[str]:
-    """Bundesland per Nominatim-Reverse-Geocoding am Punkt bestimmen (Backfill)."""
+def landkreis_from_address(address: dict | None) -> Optional[str]:
+    """Landkreis aus einem Nominatim-``address``-Objekt ableiten.
+
+    Landkreise stehen in ``county`` (bereits mit Präfix, z. B. „Landkreis
+    Nordsachsen"); Fallbacks ``district``/``city_district``. Bundesland-Werte
+    werden abgelehnt (Stadtstaaten liefern dort teils den Landesnamen).
+    Kreisfreie Städte haben kein ``county`` → None (Anzeige entfällt).
+    """
+    if not address:
+        return None
+    for key in ("county", "district", "city_district"):
+        val = address.get(key)
+        if val and val not in BUNDESLAENDER:
+            return val
+    return None
+
+
+async def reverse_admin(lat: float, lon: float) -> tuple[Optional[str], Optional[str]]:
+    """(Bundesland, Landkreis) per Nominatim-Reverse-Geocoding am Punkt (Backfill).
+
+    Ein Aufruf mit ``zoom=8`` (Kreisebene) — ``state`` ist dort weiterhin in den
+    addressdetails enthalten, ``county`` kommt dazu.
+    """
     try:
         async with httpx.AsyncClient() as client:
             resp = await client.get(
                 f"{settings.NOMINATIM_URL}/reverse",
                 params={
                     "lat": lat, "lon": lon,
-                    "format": "json", "zoom": 5, "addressdetails": 1,
+                    "format": "json", "zoom": 8, "addressdetails": 1,
                 },
                 headers={"User-Agent": settings.NOMINATIM_USER_AGENT},
                 timeout=10.0,
             )
             resp.raise_for_status()
             data = resp.json()
-        return bundesland_from_address(data.get("address"))
+        address = data.get("address")
+        return bundesland_from_address(address), landkreis_from_address(address)
     except Exception as e:
-        logger.warning("Reverse-Geocoding (Bundesland) fehlgeschlagen: %s", e)
-        return None
+        logger.warning("Reverse-Geocoding (Bundesland/Landkreis) fehlgeschlagen: %s", e)
+        return None, None
+
+
+async def reverse_bundesland(lat: float, lon: float) -> Optional[str]:
+    """Bundesland per Nominatim-Reverse-Geocoding am Punkt bestimmen (Backfill)."""
+    bundesland, _ = await reverse_admin(lat, lon)
+    return bundesland
 
 
 async def fetch_kommune_boundary(osm_id: str, osm_type: str = "relation",

@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, Response
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -79,14 +79,11 @@ def download_export(kommune_id: int, export_id: int, db: Session = Depends(get_d
     if not job.file_path or not os.path.isfile(job.file_path):
         raise HTTPException(404, "Exportdatei nicht gefunden")
 
-    with open(job.file_path, "rb") as f:
-        content = f.read()
-
-    filename = os.path.basename(job.file_path)
-    return Response(
-        content=content,
+    # FileResponse streamt von Platte, statt die ganze .gpkg in den RAM zu lesen.
+    return FileResponse(
+        job.file_path,
         media_type="application/geopackage+sqlite3",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        filename=os.path.basename(job.file_path),
     )
 
 

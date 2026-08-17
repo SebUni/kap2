@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
+from app.api.deps import demo_session_id_of
 from app.db.database import get_db
 from app.models.models import ConfigParameter, Kommune, RiskZone, RiskZoneCell
 from app.schemas.schemas import ParameterUpdate
-from app.services import aggregate_cache, parameter_registry
+from app.services import artifact_rebuild, parameter_registry
 from app.services.export_service import export_parameters_xlsx
 
 router = APIRouter()
@@ -51,6 +52,7 @@ def _needs_recalc(parameter_id: str) -> bool:
 @router.get("/kommune/{kommune_id}/parameters")
 def list_parameters(
     kommune_id: int,
+    request: Request,
     layer: str | None = Query(None),
     category: str | None = Query(None),
     db: Session = Depends(get_db),
@@ -61,15 +63,25 @@ def list_parameters(
 
     params = parameter_registry.catalog_parameters(layer_code=layer, layer_category=category)
     overrides = parameter_registry.load_db_overrides(db, kommune_id)
-    return parameter_registry.merge_overrides(params, overrides)
+    merged = parameter_registry.merge_overrides(params, overrides)
+
+    # Demo: alles read-only; für gesperrte Ebenen Wert/Quelle entfernen.
+    if demo_session_id_of(request):
+        from app.services import demo_service
+        enabled = getattr(request.state, "demo_enabled_layers", set())
+        return demo_service.filter_parameters(merged, enabled)
+    return merged
 
 
 @router.put("/kommune/{kommune_id}/parameters")
 def update_parameters(
     kommune_id: int,
     updates: list[ParameterUpdate],
+    request: Request,
     db: Session = Depends(get_db),
 ):
+    if demo_session_id_of(request):
+        raise HTTPException(403, "Parameter sind in der Demo nicht veränderbar")
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
@@ -122,8 +134,16 @@ def update_parameters(
         })
 
     db.commit()
-    # Kostensatz-/Modell-Overrides fließen live in die Aggregat-Kosten ein.
-    aggregate_cache.invalidate(kommune_id)
+    # Kostensatz-/Modell-Overrides fließen live in die Aggregat-Kosten ein →
+    # Datei-Caches invalidieren + entprellter Hintergrund-Rebuild. layers=True,
+    # wenn Live-Parameter betroffen sind, die in die Karten-Werte-Dateien
+    # gebacken werden (€-Sätze/ref_value in Tooltips/Outcome-Breakdown) —
+    # sonst zeigten Karten-Tooltips bis zur nächsten Voll-Berechnung alte Werte.
+    live_layer_params = any(
+        u.parameter_id.endswith(".cost_per_outcome") or u.parameter_id.endswith(".ref_value")
+        for u in updates
+    )
+    artifact_rebuild.invalidate_and_schedule(kommune_id, layers=live_layer_params)
     # Geänderte Risikozonen-Schwelle: bestehende Zonen der Kommune verwerfen —
     # sie werden beim nächsten Abruf mit der neuen Schwelle lazy neu geclustert.
     if any(u.parameter_id == "model.risk_threshold" for u in updates):

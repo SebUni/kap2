@@ -6,8 +6,6 @@ import type { Measure, MeasureImpactSummary } from '../types'
 export default function MeasuresTableTab() {
   const { kommune, measures, catalog, loadMeasures, loadCatalog, setActiveTab, setSelectedMeasure, deleteMeasure } = useStore()
   const [filterType, setFilterType] = useState<string>('')
-  const [impacts, setImpacts] = useState<Record<number, MeasureImpactSummary>>({})
-  const [loadingImpacts, setLoadingImpacts] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { loadCatalog().catch(() => {}) }, [])
@@ -19,20 +17,18 @@ export default function MeasuresTableTab() {
   const fieldLabel = (clusterCode: string, fieldCode?: string) =>
     catalog?.kang_clusters.find(c => c.code === clusterCode)?.fields.find(f => f.code === fieldCode)?.label || ''
 
-  useEffect(() => {
-    if (!measures.length) return
-    setLoadingImpacts(true)
-    Promise.all(
-      measures.map(m =>
-        api.calculateImpact(m.id)
-          .then(r => ({ id: m.id, impact: r as unknown as MeasureImpactSummary }))
-          .catch(() => null)
-      )
-    ).then(results => {
-      const map: Record<number, MeasureImpactSummary> = {}
-      for (const r of results) if (r) map[r.id] = r.impact
-      setImpacts(map)
-    }).finally(() => setLoadingImpacts(false))
+  // Wirkungen kommen direkt aus GET /measures (impact_summary — der Server
+  // hält sie über ensure_fresh_impact_summary aktuell). Der frühere
+  // calculate-impact-POST pro Maßnahme warf bei jedem Tab-Öffnen den
+  // Aggregat-Cache weg, wonach das Dashboard alles neu rechnen musste.
+  const impacts = useMemo(() => {
+    const map: Record<number, MeasureImpactSummary> = {}
+    for (const m of measures) {
+      if (m.impact_summary && Object.keys(m.impact_summary).length) {
+        map[m.id] = m.impact_summary
+      }
+    }
+    return map
   }, [measures])
 
   // Cluster → Handlungsfeld → Maßnahmen (zweistufig, gefiltert nach Cluster)
@@ -84,6 +80,10 @@ export default function MeasuresTableTab() {
   const sumCapex = allImpacts.reduce((s, i) => s + (i.capex_eur || 0), 0)
   const sumOpex = allImpacts.reduce((s, i) => s + (i.opex_annual_eur || 0), 0)
   const sumBenefit = allImpacts.reduce((s, i) => s + (i.annual_benefit_eur || 0), 0)
+  // Gleiche Aufschlüsselung wie die Dashboard-KPI: vermiedene Schäden vs. Zusatznutzen.
+  const sumBenefitAvoided = allImpacts.reduce((s, i) =>
+    s + (i.annual_benefit_damage_eur || 0) + (i.annual_benefit_flat_eur || 0), 0)
+  const sumBenefitDirect = allImpacts.reduce((s, i) => s + (i.annual_benefit_direct_eur || 0), 0)
   const netAnnual = sumBenefit - sumOpex
 
   const usedClusters = [...new Set(measures.map(m => clusterOf(m)))]
@@ -117,6 +117,11 @@ export default function MeasuresTableTab() {
           <div className="kpi-card" style={{ flex: '1 1 140px' }}>
             <div className="kpi-label">Nutzen/Jahr</div>
             <div className="kpi-value success" style={{ fontSize: '1rem' }}>{fmtCurrency(sumBenefit)}</div>
+            {(sumBenefitAvoided > 0 || sumBenefitDirect > 0) && (
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                davon vermiedene Schäden {fmtCurrency(sumBenefitAvoided)} · Zusatznutzen {fmtCurrency(sumBenefitDirect)}
+              </div>
+            )}
           </div>
           <div className="kpi-card" style={{ flex: '1 1 140px' }}>
             <div className="kpi-label">Netto-Nutzen/Jahr</div>
@@ -126,8 +131,6 @@ export default function MeasuresTableTab() {
           </div>
         </div>
       )}
-
-      {loadingImpacts && <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 8 }}>Berechne Wirkungen…</div>}
 
       {measures.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>

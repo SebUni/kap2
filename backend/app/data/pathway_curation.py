@@ -37,19 +37,44 @@ CURATED_PATHWAYS: dict[str, dict] = {
         "cluster": "Menschliche Gesundheit (KWRA 2021, Teilbericht 5)",
         "ref": _KWRA,
         "chains": [
-            ("HEAT_WAVE", "POPULATION_DENSITY", "HEAT_SENSITIVITY", "primary",
+            ("HEAT_WAVE", "AGE_STRUCTURE", "HEALTHCARE_ACCESS", "primary",
              "Hitzewellen sind laut KWRA die Klimawirkung mit dem höchsten und am besten "
-             "belegten Mortalitätsrisiko in Deutschland; besonders betroffen sind dicht "
-             "besiedelte, wärmebelastete Räume mit hitzeempfindlichen Personen."),
-            ("HEAT_WAVE", "VULNERABLE_GROUPS_POPULATION", "HEAT_SENSITIVITY", "alternate_exposure",
+             "belegten Mortalitätsrisiko in Deutschland. Die Altersstruktur ist die "
+             "Leitgröße: Laut RKI entfallen rund 55 % der hitzebedingten Sterbefälle auf "
+             "die Gruppe ab 85 Jahren, die nur rund 3 % der Bevölkerung stellt."),
+            ("HEAT_WAVE", "VULNERABLE_GROUPS_POPULATION", "HEALTHCARE_ACCESS", "alternate_exposure",
              "Die Exzessmortalität konzentriert sich auf vulnerable Gruppen (Hochbetagte, "
-             "Vorerkrankte); dieselbe Hitze trifft hier auf höhere Sensitivität."),
-            ("COLD_EXTREME", "AGE_STRUCTURE", "HEALTHCARE_ACCESS", "alternate_hazard",
-             "Kälteextreme bleiben laut KWRA eine relevante, stark von Alter und "
-             "Versorgungslage abhängige Todesursache — als eigene, gedämpfte Kette geführt."),
-            ("COMPOUND_EVENT", "POPULATION_DENSITY", "VULNERABLE_GROUPS_SHARE", "compound_hv",
-             "Kombinierte Ereignisse (Hitze + schlechte Luft) erhöhen die Sterblichkeit "
-             "überadditiv; hergeleitet nach dem H×E×V-Schema.", _GIZ),
+             "Vorerkrankte); die Versorgungslage entscheidet über den Verlauf."),
+            ("HEAT_WAVE", "POPULATION_DENSITY", "HEALTHCARE_ACCESS", "alternate_exposure",
+             "Dicht besiedelte, wärmebelastete Räume tragen die höchste absolute Last — "
+             "dort verstärkt die städtische Wärmeinsel die Exposition."),
+        ],
+    },
+    "EXPECTED_ANNUAL_MORTALITY_FLOOD": {
+        "cluster": "Menschliche Gesundheit / Bevölkerungsschutz (KWRA 2021, Teilbericht 5)",
+        "ref": _KWRA,
+        "chains": [
+            ("HEAVY_RAIN_FLOOD", "POPULATION_DENSITY", "EARLY_WARNING_SYSTEMS", "primary",
+             "Sturzfluten in engen Steiltälern sind die tödlichste Ausprägung des "
+             "Hochwasserrisikos; die Ahr-Flut 2021 forderte über 180 Todesopfer, während "
+             "die flächenmäßig weit größere Elbeflut 2002 rund 21 forderte. Entscheidend "
+             "sind Vorwarnzeit und Fluchtmöglichkeit."),
+            ("HEAVY_RAIN_FLOOD", "LOCATION_HAZARD_ZONES", "EMERGENCY_MANAGEMENT", "alternate_exposure",
+             "Bebauung in Gefahrenzonen erhöht die Zahl der Eingeschlossenen; das "
+             "Notfallmanagement bestimmt, wie viele rechtzeitig erreicht werden."),
+        ],
+    },
+    "EXPECTED_ANNUAL_MORTALITY_STORM": {
+        "cluster": "Menschliche Gesundheit / Bevölkerungsschutz (KWRA 2021, Teilbericht 5)",
+        "ref": _KWRA,
+        "chains": [
+            ("EXTRATROPICAL_STORM", "POPULATION_DENSITY", "BUILDING_STABILITY", "primary",
+             "Sturmtote entstehen überwiegend im Freien und unterwegs — durch umstürzende "
+             "Bäume, fliegende Trümmer und Bauteilversagen. Kyrill 2007 forderte in "
+             "Deutschland 13 Todesopfer, Friederike 2018 acht bis zehn."),
+            ("EXTRATROPICAL_STORM", "LOCATION_HAZARD_ZONES", "EARLY_WARNING_SYSTEMS", "alternate_exposure",
+             "Exponierte Lagen und kurze Vorwarnzeiten erhöhen die Zahl der im Freien "
+             "Überraschten."),
         ],
     },
     "EXPECTED_ANNUAL_MORBIDITY": {
@@ -62,24 +87,48 @@ CURATED_PATHWAYS: dict[str, dict] = {
             ("HEAT_WAVE", "VULNERABLE_GROUPS_POPULATION", "DISEASE_VECTOR_SUSCEPTIBILITY", "alternate_exposure",
              "Wärmere Bedingungen begünstigen Krankheitsüberträger (Vektoren); vulnerable "
              "Gruppen sind dafür anfälliger — KWRA-Handlungsfeld Gesundheit."),
-            ("DROUGHT", "VULNERABLE_GROUPS_POPULATION", "HEALTHCARE_ACCESS", "alternate_hazard",
-             "Dürre-/Trockenperioden verstärken Atemwegs- und Allergiebelastung; Wirkung "
-             "hängt von der Versorgungslage ab. Hergeleitet nach H×E×V-Schema.", _GIZ),
+            # Die frühere DROUGHT-Kette ist entfallen: Die Schadensfunktion rechnet
+            # ausschließlich mit HEAT_WAVE, und der Risikoname sagt das jetzt auch.
+            # Eine Kette, die im absoluten Outcome nicht vorkommt, gehört nicht in
+            # die Kuratierung.
         ],
     },
+    # Die drei Verletzten-Kanäle waren bis Modellversion 6 EIN Risiko mit einem
+    # max() über drei Gefahren. Verletzte aus Flut und Sturm sind aber additive
+    # Ereignisse — die Ketten sind daher auf je ein eigenes Risiko aufgeteilt,
+    # jede mit eigener primary-Kette.
     "EXPECTED_ANNUAL_INJURIES": {
         "cluster": "Menschliche Gesundheit / Bevölkerungsschutz (KWRA 2021, Teilbericht 5)",
         "ref": _KWRA,
         "chains": [
             ("HEAVY_RAIN_FLOOD", "POPULATION_DENSITY", "EMERGENCY_MANAGEMENT", "primary",
              "Starkregen und Sturzfluten sind laut KWRA die Hauptursache klimabedingter "
-             "Verletzungen; Schadensausmaß hängt von Betroffenheit und Notfallmanagement ab."),
-            ("EXTRATROPICAL_STORM", "LOCATION_HAZARD_ZONES", "EARLY_WARNING_SYSTEMS", "alternate_hazard",
+             "Verletzungen; Schadensausmaß hängt von Betroffenheit und Notfallmanagement ab. "
+             "Ein erheblicher Teil entsteht erst bei den Aufräumarbeiten."),
+            ("HEAVY_RAIN_FLOOD", "LOCATION_HAZARD_ZONES", "EARLY_WARNING_SYSTEMS", "alternate_exposure",
+             "Bebauung in Gefahrenzonen erhöht die Zahl der Betroffenen; Frühwarnung "
+             "reduziert sie."),
+        ],
+    },
+    "EXPECTED_ANNUAL_INJURIES_STORM": {
+        "cluster": "Menschliche Gesundheit / Bevölkerungsschutz (KWRA 2021, Teilbericht 5)",
+        "ref": _KWRA,
+        "chains": [
+            ("EXTRATROPICAL_STORM", "LOCATION_HAZARD_ZONES", "EARLY_WARNING_SYSTEMS", "primary",
              "Stürme verursachen Verletzungen v. a. in exponierten Lagen; wirksame "
              "Frühwarnung reduziert die Betroffenheit."),
-            ("LANDSLIDE", "POPULATION_DENSITY", "EMERGENCY_MANAGEMENT", "alternate_hazard",
-             "Hangrutschungen nach Starkregen gefährden bebaute Hanglagen — regional "
-             "relevante Nebenkette."),
+            ("EXTRATROPICAL_STORM", "POPULATION_DENSITY", "BUILDING_STABILITY", "alternate_exposure",
+             "Dichte Bebauung mit älterer Bausubstanz erhöht das Risiko durch gelöste "
+             "Bauteile und Dachschäden."),
+        ],
+    },
+    "EXPECTED_ANNUAL_INJURIES_LANDSLIDE": {
+        "cluster": "Menschliche Gesundheit / Bevölkerungsschutz (KWRA 2021, Teilbericht 5)",
+        "ref": _KWRA,
+        "chains": [
+            ("LANDSLIDE", "POPULATION_DENSITY", "EMERGENCY_MANAGEMENT", "primary",
+             "Hangrutschungen nach Starkregen gefährden bebaute Hanglagen — außerhalb "
+             "steilen Geländes nahe null."),
         ],
     },
     "EXPECTED_ANNUAL_MENTAL_HEALTH": {
