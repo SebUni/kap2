@@ -142,18 +142,18 @@ RISKS: list[dict] = [
      "exposures": ["POPULATION_DENSITY", "VULNERABLE_GROUPS_POPULATION", "AGE_STRUCTURE"],
      "vulnerabilities": ["HEALTHCARE_ACCESS"],
      # Herleitung ref_value (Sanity-Anker, YLL/100k): 18 Todesfälle/100k (≈ 1,7×
-     # schlimmstes beobachtetes Jahr, 2018: ~8.700 Tote) × mittlere Restlebens-
-     # erwartung je Hitze-Sterbefall 8,79 Jahre (RKI-Altersanteile 6,5/12,9/25,2/
-     # 55,5 % × L̄_a 23,39/15,59/8,90/5,44) ≈ 158 YLL/100k.
+     # schlimmstes beobachtetes Jahr, 2018 revidiert: 8.500 ≈ 10,2/100k) × mittlere
+     # Restlebenserwartung je Hitze-Sterbefall 8,08 Jahre (RKI-Altersanteile
+     # 6,5/12,9/25,2/55,5 % × L̄_a 23,39/15,59/8,90/4,16 — Rev. 8) ≈ 145 YLL/100k.
      # cost_per_outcome_eur: VOLY 160.800 €₂₀₂₄ (UBA MK 4.0; Herleitung s. _RISK_COST_RATES).
-     "ref_value": 158.0, "scale": "pop", "cost_per_outcome_eur": 160800.0,
+     "ref_value": 145.0, "scale": "pop", "cost_per_outcome_eur": 160800.0,
      "source": "Bericht #95 Rev. 7 (Winklmayr 2022 / RKI EB 19/2025 / UBA MK 4.0)",
      "source_detail": "Sanity-Anker in YLL je 100.000 EW: 18 Todesfälle/100k (≈ 1,7× "
                       "schlimmstes beobachtetes Jahr; 2018 revidiert: 8.500 ≈ 10,2/100k) "
-                      "× mittlere Restlebenserwartung je Hitze-Sterbefall 8,79 Jahre "
+                      "× mittlere Restlebenserwartung je Hitze-Sterbefall 8,08 Jahre "
                       "(RKI-Altersanteile 6,5/12,9/25,2/55,5 % × L̄_a 23,39/15,59/8,90/"
-                      "5,44) ≈ 158 YLL/100k. Kein Rechenweg — Schicht B rechnet die "
-                      "Schadensfunktion; der Anker dient der Sanity-Prüfung (Faktor 5).",
+                      "4,16 — Rev. 8) ≈ 145 YLL/100k. Kein Rechenweg — Schicht B rechnet "
+                      "die Schadensfunktion; der Anker dient der Sanity-Prüfung (Faktor 5).",
      "source_refs": ["RKI_EpidBull_19_2025", "Winklmayr_2022",
                      "Destatis_Sterbetafeln_2022_2024"],
      "description": "Verlorene Lebensjahre (YLL) durch hitzebedingte Sterblichkeit nach "
@@ -2066,7 +2066,10 @@ def group_label(code: str) -> str:
 # Wird bei strukturellen Modelländerungen (Risiko-Set, Kostensätze, Aggregation)
 # erhöht. Der Layer-Cache stempelt seine Dateien mit dieser Version und invalidiert
 # automatisch, wenn sich die Version ändert (siehe services/layer_cache.py).
-# 2026.08-m0-95rev7: Integration Methodik #95 Rev. 7 (YLL × VOLY, empirische
-# Wochenquantile, v_vers, c_kal 0,581, Morbidität r_0,a × HD-Term) — invalidiert
-# Layer-Caches, die den alten Todesfall-/VSL-Stand materialisiert haben.
-MODEL_VERSION = "2026.08-m0-95rev7"
+# 2026.08-m0-95rev8: #95 Rev. 8 (L̄_85+ exakt sterbefallgewichtet 4,16 statt
+# 5,44 → YLL/€ ≈ −8 %; neue Zellebene CARE_HOME_SHARE_85P). Davor 95rev7:
+# Integration Rev. 7 (YLL × VOLY, empirische Wochenquantile, v_vers,
+# c_kal 0,581, Morbidität r_0,a × HD-Term).
+# rev8b: Befund 93 — Producer-Zellzuordnung der CARE_HOME_SHARE_85P-Ebene
+# gefixt (Mittelpunkts- vs. Ursprungs-Key); Stände mit leerer Ebene invalidieren.
+MODEL_VERSION = "2026.08-m0-95rev8b"

@@ -195,6 +195,13 @@ AUXILIARY: list[dict] = [
     _aux("POPULATION_85_PLUS", "Einwohner ≥85", "Pers.", "zensus",
          "Zensus 2022 (100m-Gitter): 65+-Menge × Binnenaufteilung der 5-Jahres-Gruppen",
          norm_max=200, feeds=["EXPECTED_ANNUAL_MORTALITY", "AGE_STRUCTURE"]),
+    # Methodik #95 Rev. 8 (§3.6, Log 35): Heimbewohner-Anteil an der
+    # 85+-Bevölkerung — Zellgröße des β_pfl-Terms (v_vers, nur D-Pfad).
+    _aux("CARE_HOME_SHARE_85P", "Heimbewohner-Anteil 85+ (q_pfl)", "Anteil", "zensus",
+         "OSM-Pflegeeinrichtungen (nursing_home/assisted_living), kommunen-"
+         "erwartungstreu auf das Bundesmittel q̄_pfl = 0,149 normiert "
+         "(Pflegestatistik 2023; Methodik #95 §3.6)",
+         norm_max=1.0, feeds=["EXPECTED_ANNUAL_MORTALITY"]),
 ]
 
 AUXILIARY_BY_CODE = {a["code"]: a for a in AUXILIARY}

@@ -259,7 +259,167 @@ Abnahme-/Integrationsblocker; Bericht §3.6/§4/Kap. 9):
 
 | Nr | Vermerk | Kat. | Status |
 |---|---|---|---|
-| I-1 | Zellwerte q_1P/q_pfl nicht verfügbar (kein 1P-Gitter im offenen Zensus-2022-Bestand; OSM-Pflegeeinrichtungen nicht als Zellebene geladen) — Zellen rechnen mit Bundesmitteln (Faktor 1, kalibrierneutral); Verifikationssatz in §3.6 des Berichts ergänzt | C | offen — Datenebenen anlegen, sobald Quelle verfügbar/OSM-Pflege-Layer gebaut |
-| I-2 | Zell-Lauf als finaler Kalibrier-Abgleich (Produktionszellen national; §4 Fortschreibungsvermerk, nicht abnahmerelevant) | C | offen — nach erster nationaler 100-m-Batchrechnung |
-| I-3 | L̄_85+-Neurechnung mit GENESIS-Altersjahren (Sterbefallgewichte; Bericht §3.5, Befund 22 — würde L̄_85+ um ~0,3–0,5 J senken) | C | offen — Modelländerung, braucht Berichts-Fortschreibung + Review, nicht still im Code |
+| I-1 | Zellwerte q_1P/q_pfl nicht verfügbar — Zellen rechnen mit Bundesmitteln (kalibrierneutral) | C | **geschlossen (Rev.-8-Nachzug, 30.08.2026):** q_pfl-Ebene `CARE_HOME_SHARE_85P` angelegt — Producer `apply_care_home_share` (inputs.py; OSM-Ingest „infra3": nursing_home/assisted_living; 400 m²-Mindestgewicht; Verteilung nur über pop_85+ > 0; kommunen-erwartungstreu auf q̄), Kartenebene + AUX_LINEAGE, Consumer `_v_vers`. q_1P-Ebene `SINGLE_HH_SHARE_65P` bleibt **geparkt** mit Watchlist (keine offene Quelle; §3.1-konform) |
+| I-2 | Zell-Lauf als finaler Kalibrier-Abgleich (national) | C | **geschlossen (Rev. 8, Log 34 / Aufgaben-Fortschreibung 30.08.2026):** nationale 100-m-Vollraster-Läufe sind per §3.4-Ressourcen-Regel unzulässig; ersetzt durch kommunale Stichproben-Abgleiche (Fortschreibungsvermerk §4/§6 des Berichts) |
+| I-3 | L̄_85+-Neurechnung mit Sterbefallgewichten (Bericht §3.5, Befund 22) | C | **geschlossen (Rev.-8-Nachzug, 30.08.2026):** 4,16 J in params.py/health.py/catalog.py (ref_value 145)/Golden-Tests; MODEL_VERSION 2026.08-m0-95rev8; Gesamtsuite 282 grün — keine Divergenz Bericht ↔ Code mehr (Befund 92 ✓) |
 | I-4 | Raten-Darstellung: Backend liefert rate_per_1000 + rate_unit im Risiko-Layer (layer_cache); Karten-UI-Umschalter (Rate/Absolut) ist Frontend-Ausbau | C | offen (Frontend) |
+
+## Runde 6 — Delta-Review Rev. 8 (frische Session, 30.08.2026): neue Befunde 86–90
+
+Delta-Prüfung der Rev.-8-Bereiche (L̄_85+ §3.5/Log 36 · Ressourcen-Regel-Bereinigung/Log 34 ·
+Datenebenen §3.6/Log 35 · Log 34–36/Header/[50]) + Regression; Kalibrierung §4 unverändert
+(Anlagen-mtimes vor Rev. 8; c_kal-Zahlen Zeichentabelle/YAML synchron — nur Regressions-Stichprobe).
+Lint-Stand: Beispiel-Blöcke **10/10 grün** ✓ · Zeichentabelle L̄_a = 4,16 + Band [4,16, 4,20],
+YAML `heat.l_restlebenserwartung` synchron ✓ · Preisstand €2024 unberührt ✓ · LF-14-Stichprobe
+RM Z100/Z103/Z106 direkt gegen die xlsx (alle YLL × VOLY) ✓. **L̄_85+ unabhängig nachgerechnet**
+(eigener Parser gegen die Quell-XLSX aus ~/.cache, nicht die Skriptfunktionen): Einzeljahre 85–94
+m/w ✓ · 95+-Rest 15.251/48.899 ✓ · Kreuzcheck 12613-02↔-03 **exakt** (m 161.178, w 259.771,
+Σ 420.949 = m_a-Basis) ✓ · ē(95+) tafelintern 2,151/2,455 ✓ · L̄ m 3,9627 / w 4,2814 ✓ ·
+kombiniert (Sterbefallgewichte) 4,1594 → **4,16** ✓ · Sensitivität e(95)-Stützstelle 4,2021 →
+Band [4,16, 4,20] ✓ · Log-36-Alternative „Stützstellen-Variante" 4,833 → 4,83 ✓ · YLL-Summen-
+Effekt mit Ist-Bandanteilen −8,3 % ≈ „≈ −8 %" ✓ · Kopplung `beispiel_95_zelle_yll`
+(0,075 YLL/12.040 €) ✓. Richtungslogik des Bands (ē(95+) < e(95), e fällt mit x) plausibel;
+Restnäherung gekennzeichnet. **Ressourcen-Regel:** kein lasttragender Vollraster-Plan mehr im
+Bericht (Grep „Zell-Lauf/Vollraster/Batch": nur Regel-/Historien-/Log-Alternativ-Stellen;
+§4-Restabsätze, #beta-sued und §6 Modellgrenze 4 auf kommunale Stichproben-Abgleiche
+umgestellt ✓; „das löst erst das Zellmodell" [BY] = Produktionsmodell je Kommune, zulässig).
+**Datenebenen §3.6:** CARE_HOME_SHARE_85P mit Quelle/keyless/Ableitungsregel/Normierung/
+Kappungs-Restfehler/Fallback vollständig nach §3.1; Erwartungstreue Σ q·pop = q̄·pop je Kommune
+arithmetisch bestätigt; Kovarianz-Rest (v_vers × UHI) bereits in §4 dokumentiert (Befund 67);
+Befund-25(b)-Fortschreibung (Kommunen-Erwartungstreue statt Kreis-Skalierung) plausibel —
+Tab. 22421 je Kreis nicht keyless (deckt sich mit dem dokumentierten
+Regionalstatistik-Zugangsstand), als Proxy gekennzeichnet ✓; SINGLE_HH_SHARE_65P „geparkt" +
+Watchlist + dokumentierter Neutralwert §3.1-konform ✓. **Entscheidungslog 34–36** plausibel
+(34/35 ⚠ mit Nutzer-Entscheid/Regelbezug; 36 deterministische Auflösung von Befund 22 wie
+terminiert); Header/Revisionsvermerk konsistent; [50]-Ergänzung vorhanden (aber Pfad → Befund 86).
+**Produktcode bewusst nicht still gefixt geprüft:** params.py/health.py/Golden-Test rechnen
+weiter den Rev.-7-Stand 5,44 (erwartete Divergenz bis Re-Integration — Tracking-Lücke → Befund 90).
+Regression 77–85 Stichproben (80/83/85: Band-/Anker-Texte unverändert konsistent) tragen.
+Alle 14 Leitfragen mit Verdikt: LF 1/2/3/4/5/7/8/9/13 bestanden (Delta bzw. Regression),
+LF 6 bestanden mit Befund 87 (staler Kopplungs-Rest), LF 10 bestanden mit Befund 86
+(Anlagen-Pfad), LF 11 bestanden mit Befund 88 (Kommentar-Label), LF 12 bestanden mit
+Befund 89 (Randdetails der neuen Ebene), LF 14 bestanden mit Befund 90 (Ledger-Vermerke
+I-2/I-3 nicht fortgeschrieben).
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Status |
+|---|---|---|---|---|---|---|
+| 86 | Kap. 8 [50] · Kopf-Anlagenblock · §3.5 `#l-a` · `l85_sterbefallgewichtung.py` (ROOT/DATA) | Fehler (Reproduzierbarkeit/Bundle; §2.7) | Die Rev.-8-Anlagen liegen nicht am dokumentierten Pfad: Skript-Docstring und [50] nennen `backend/data/kalibrierung/`, das Skript schreibt nach **`backend/scripts/data/kalibrierung/`** (ROOT = `dirname(__file__)/".."` — ein `..` zu wenig gegenüber der rev7-Konvention `"..", ".."`); im dokumentierten Anlagenverzeichnis fehlen `l85_sterbefallgewichtung.csv`/`.md`. Nebenbefund: das `.replace(",", ".")` der MD-Ausgabe erzeugt „(2023. DE)" statt „(2023, DE)". Inhaltlich reproduziert die Anlage exakt (s. o.) | ROOT auf `("..", "..")` korrigieren, Skript neu laufen lassen (Anlagen an den dokumentierten Pfad), Fehlstand in `backend/scripts/data/` entfernen; replace-Artefakt fixen | B | behoben (Autor-Revision R6): ROOT-Pfad im Skript korrigiert (`"..", ".."`), fehlplatzierte Dateien unter backend/scripts/data/ entfernt, Anlagen neu erzeugt am dokumentierten Pfad backend/data/kalibrierung/ · **✓ R7 bestätigt** (ROOT Z40 = `"..", ".."`; `backend/scripts/data/` existiert nicht mehr; Anlagen am dokumentierten Pfad, CSV unabhängig nachgerechnet: m 3,9627 / w 4,2814 / kombiniert 4,1594 → 4,16, Band [4,16, 4,20], Sterbefälle 161.178/259.771/420.949 — identisch zur R6-Verifikation); **Rest (replace-Artefakt „(2023. DE)") → Befund 91** |
+| 87 | §4 Unsicherheiten-Bullet „\(\bar L_{85+}\)-Approximation (§3.5)" | Lücke (Rev.-8-Kopplung nicht nachgezogen) | Der Bullet listet weiter die „L̄_85+-Approximation" als Unsicherheit — die ist per Log 36 durch die exakte Rechnung ersetzt; verbleibend ist nur die gekennzeichnete ē(95+)-Restnäherung (Band [4,16, 4,20]). §3.5 nennt als neu gerechnete Kopplungen Beispiel/Zeichentabelle/§7/Sanity-Anker, nicht diesen §4-Satz | Bullet umformulieren: „ē(95+)-Restnäherung der L̄_85+-Rechnung (Band [4,16, 4,20], §3.5)" | C | behoben (Autor-Revision R6): §4-Unsicherheiten-Bullet auf die ē(95+)-Restnäherung (Band [4,16, 4,20]) umgestellt · **✓ R7 bestätigt** (Bericht Z649 f.: „ē(95+)-Restnäherung der exakten L̄_85+-Rechnung … die frühere Approximation ist per Log 36 ersetzt") |
+| 88 | `beispiel_95_basisraten`, Einordnungs-Kommentar der Alt-Kette | Lücke (Kennzeichnung) | Kommentar „Alte Rev.-7-Kette … zur Einordnung: **5,44**" steht über einer Assert-Zeile, die den **Männer**-Pfad **4,97** rechnet; die Rev.-7-Labels (männlich 4,97 · weiblich 5,69 · kombiniert 5,44) sind beim Kürzen verloren — genannte Zahl ≠ gerechnete Zahl | Kommentar präzisieren: „Männer-Pfad 4,97 (m/w-kombiniert ergab 5,44)" | C | behoben (Autor-Revision R6): Kommentar präzisiert (Männer-Pfad 4,97, w 5,69, kombiniert 5,44) + zusätzliche Assert-Zeile für die 5,44-Kombination · **✓ R7 bestätigt** (beide Asserts nachgerechnet: Männer-Pfad 4,966 → 4,97; Kombination (990.292·4,97 + 1.853.921·5,69)/2.844.213 = 5,439 → 5,44; genannte Zahl = gerechnete Zahl je Zeile) |
+| 89 | §3.6 `CARE_HOME_SHARE_85P`, Zell-Ableitungsregel | Lücke (§3.1 Spezifikationstiefe; Randfälle) | Zwei Randdetails unspezifiziert: (a) „Punkte mit Mindestgewicht" ohne Zahlenwert/Regel; (b) Zellen mit Heim, aber \(\text{pop}_{85+,z}=0\) (Zensus-Gitter-Geheimhaltung kleiner Besetzungen) — wohin die zugeteilten Heimbewohner fließen (Verlust analog Kappung? Nachbarzellen?), bleibt offen und berührt die Erwartungstreue-Aussage in Heim-Zellen | (a) Mindestgewicht beziffern oder ausdrücklich als Integrations-Festlegung kennzeichnen; (b) Randfall-Regel ergänzen (z. B. Umverteilung auf Nachbarzellen; Rest wie Kappung als dokumentierter Restfehler) | C | behoben (Autor-Revision R6): Mindestgewicht 400 m² beziffert (gekennzeichnete Setzung); Verteilung nur über Zellen mit pop_85+ > 0 (kein stiller Verlust) — §3.6 präzisiert · **✓ R7 bestätigt** (§3.6: 400 m² als gekennzeichnete Setzung inkl. Polygon-Anhebung; Heim-Gewichte in pop_85+ = 0-Zellen werden der Gewichtssumme entzogen → Kommunen-Erwartungstreue bleibt; Kappung weiterhin dokumentierter Restfehler) |
+| 90 | Ledger-Vermerke I-2/I-3 (↔ Rev. 8 Log 34/36) · Produktcode `impact/params.py` Z234, `impact/health.py` Z96, `test_methodik_95_golden.py` Z79 | Widerspruch/Lücke (Eiserne Regel 5; §3.4-Ressourcen-Regel) | (a) I-2 plant weiterhin einen „Zell-Lauf als finalen Kalibrier-Abgleich … nach erster nationaler 100-m-Batchrechnung" — per Aufgaben-Fortschreibung/Log 34 unzulässig; als offener Aktionspunkt riskiert er genau die ausgeschlossene Vollraster-Rechnung. (b) I-3 ist berichtsseitig durch Rev. 8 erledigt, führt aber weiter „~0,3–0,5 J"/„offen" ohne Rev.-8-Verweis (real −1,28 J); die jetzt bestehende Divergenz Bericht ↔ Code (L̄_85+ 4,16 vs. 5,44; zusätzlich fehlende Ebene CARE_HOME_SHARE_85P) ist nirgends aktuell getrackt | I-2 auf kommunale Stichproben-Abgleiche (Log 34) umschreiben bzw. schließen; I-3 fortschreiben: „Berichtsseite Rev. 8 erledigt (−1,28 J); offen: Re-Integration 4,16 + Golden-Test + CARE_HOME_SHARE_85P — kein stiller Code-Fix" | B | behoben (Autor-Revision R6): I-2 geschlossen (Ressourcen-Regel), I-3 auf Rev.-8-Stand fortgeschrieben (Code-Nachzug mit der Rev.-8-Integration; Divergenz bis dahin dokumentiert), I-1 auf die Ebenen-Spezifikation umgestellt · **✓ R7 bestätigt (Ledger-Seite: I-1/I-2/I-3 wie gefordert)**; der unmittelbar anschließende Code-Nachzug (mtimes 22:43–22:44, nach dem Ledger-Stand 22:42) macht die I-3-Divergenz-Aussage jedoch bereits wieder stale und blieb ohne Integrationsvermerk **→ Befund 92** |
+
+### Autor-Revision nach Runde 6 (30.08.2026)
+
+Befunde 86–90 behoben (Details je Zeile). Anlagen neu erzeugt (Pfad korrekt),
+Beispiel-Blöcke 10/10 grün. Prüfung durch Re-Review Runde 7.
+
+## Runde 7 — Delta-Re-Review nach Runde-6-Revision (frische Session, 30.08.2026): neue Befunde 91–92
+
+Delta-Prüfung der Befunde 86–90 (Status je Zeile oben ergänzt) + Regressionscheck der Edits.
+Lint-Stand: Beispiel-Blöcke **10/10 grün** ✓ · `backend/scripts/data/` existiert nicht mehr ✓ ·
+Anlagen `l85_sterbefallgewichtung.csv`/`.md` am dokumentierten Pfad `backend/data/kalibrierung/`,
+alle Bericht-Pfadangaben (Kopf, §3.5 `#l-a`, [50]) konsistent ✓ · **CSV unabhängig
+nachgerechnet** (Zeilensummen, nicht Skriptfunktionen): m 3,9627 / w 4,2814 / kombiniert
+4,1594 → 4,16, Band [4,16, 4,20], Sterbefälle 161.178 / 259.771 / 420.949, ē(95+) 2,151/2,455 —
+identisch zur Runde-6-Verifikation ✓ · Befund-88-Asserts nachgerechnet (4,966 → 4,97;
+5,439 → 5,44) ✓ · §3.6-Randregeln (400 m², pop_85+ > 0) erwartungstreu-konsistent ✓ ·
+§4-Bullet auf ē(95+)-Restnäherung umgestellt ✓ · Ressourcen-Regel-Stellen unverändert (Grep:
+nur Regel-/Historien-Stellen) ✓ · `pytest test_methodik_95_golden.py test_impact_health.py`:
+27/27 grün ✓. **Regression:** Der Rev.-8-**Code-Nachzug wurde bereits ausgeführt**
+(engine/impact/params.py Z234 und health.py Z98 auf 4,16; Golden-Test Z79 auf 4,16;
+`MODEL_VERSION = "2026.08-m0-95rev8"`; mtimes 22:43–22:44, unmittelbar **nach** dem
+Ledger-Stand 22:42) — Werte-Divergenz Bericht ↔ Code besteht damit nicht mehr, aber das
+Tracking hinkt hinterher und die Versions-Annotation behauptet eine nicht angelegte
+Zellebene (→ Befund 92). Befunde 86–90: bestätigt (86 mit C-Rest → 91).
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Status |
+|---|---|---|---|---|---|---|
+| 91 | `l85_sterbefallgewichtung.py` Z204 f. · Anlage `l85_sterbefallgewichtung.md` Z8 | Lücke (Rest von Befund 86, Nebenbefund) | Das im Befund-86-Vorschlag mitgenannte replace-Artefakt ist nicht gefixt: `.replace(",", ".")` läuft über den ganzen f-String und macht aus „(2023, DE)" weiterhin „**(2023. DE)**"; zudem erzeugt die MD durchgängig Punkt-Dezimalen (3.963, 4.159) im sonst komma-dezimalen Anlagenbestand. Rein kosmetisch, Zahlen korrekt | Tausender-Formatierung nur auf die Zahl anwenden (z. B. `f"{x:,.0f}".replace(",", ".")` je Wert) statt auf den Satz; optional Dezimalkomma für die J-Werte | C | behoben (Autor-Revision R7): Tausendertrenner-Ersetzung je Zahl statt über den ganzen Satz; Ergebnis-MD neu erzeugt („(2023, DE)" korrekt) · **✓ R8 bestätigt** (Skript Z204–206: replace läuft nur über den reinen Zahlen-String; MD Z8 „(2023, DE)" korrekt; CSV unabhängig nachgerechnet: m 3,9627 / w 4,2814 / kombiniert 4,1594 → 4,16, Sterbefälle 161.178/259.771/420.949 — Zahlen unverändert) |
+| 92 | Ledger I-3 + fehlender Rev.-8-Integrationsvermerk · `catalog.py` Z2069 f. (MODEL_VERSION-Kommentar) ↔ `health.py` Z203 ff./Bericht §3.6 | Widerspruch/Lücke (Eiserne Regel 5 / LF 14 Tracking; Workflow „Null-Runde → integriere-risiko") | Der Rev.-8-Code-Nachzug (5,44 → 4,16 in params/health/Golden-Test; MODEL_VERSION-Bump auf 95rev8) wurde **vor** der Runde-7-Bestätigung und ohne Ledger-Fortschreibung ausgeführt: (a) I-3 behauptet weiter eine „bestehende Divergenz Bericht ↔ Code bis zum Nachzug" — sie existiert nicht mehr; ein Integrationsvermerk nach Rev.-7-Vorbild (Abschnitt mit Testnachweis) fehlt; (b) der MODEL_VERSION-Kommentar behauptet „neue Zellebene CARE_HOME_SHARE_85P" — es existiert **kein Producer** (nur der Consumer-Hook `ctx.ci.get("share_care_home_85p")` mit q̄-Fallback; health.py-Docstring sagt selbst „OSM-Pflegeeinrichtungen nicht geladen"; Bericht §3.6: „wird von /integriere-risiko angelegt"); wird die Ebene später ohne erneuten Bump angelegt, invalidiert der Layer-Cache nicht (bekannte Stale-Falle). Werte selbst konsistent (Tests 27/27 grün) | I-3 schließen bzw. fortschreiben („Code-Nachzug 30.08.2026 ausgeführt, 4,16 verdrahtet; offen: CARE_HOME_SHARE_85P-Producer") + Rev.-8-Integrationsvermerk mit Testnachweis; MODEL_VERSION-Kommentar korrigieren („Zellebene spezifiziert, Producer folgt") und beim Anlegen der Ebene erneut bumpen | B | behoben (Autor-Revision R7): Race Review ↔ Nachzug aufgelöst — parallel zur Runde 7 wurde auch der Ebenen-Producer angelegt (apply_care_home_share + OSM-Ingest „infra3" + Kartenebene/AUX_LINEAGE im selben MODEL_VERSION-Bump → keine Cache-Falle); I-1/I-3 geschlossen, Rev.-8-Integrationsvermerk unten; stale Texte in health._v_vers-Docstring und params.py (beta_iso/beta_pfl) nachgezogen · **✓ R8 teilbestätigt:** (a) I-1/I-3 mit Nachweis geschlossen + Rev.-8-Integrationsvermerk mit Testnachweis ✓; (c) MODEL_VERSION-Kommentar konsistent (Ebene + Bump im selben Stand) ✓; (d) health._v_vers-Docstring + params.py beta_iso/beta_pfl nachgezogen ✓; Suite 282 grün, Beispiel-Blöcke 10/10 ✓; **(b) Rückfall:** der Producer entspricht zwar textuell der §3.6-Spezifikation, ist aber in Produktion funktional tot (Koordinaten-Mismatch Mittelpunkt vs. Zellursprung — kein Heim matcht je eine Zelle) **→ Befund 93** |
+
+### Integration Rev. 8 → Produkt (30.08.2026, Nachzug zur Rev.-8-Revision)
+
+- **Werte:** L̄_85+ 5,44 → **4,16** (params.py `life_years_a85p`, health.py
+  `AGE_LIFE_YEARS`, Golden-Test); Sanity-Anker `ref_value` 158 → **145 YLL/100k**
+  (mittlere L̄ je Hitze-Sterbefall 8,08 J); MODEL_VERSION `2026.08-m0-95rev8`
+  (invalidiert Layer-/Dashboard-Caches; Ebene und Bump im selben Stand).
+- **Ebene `CARE_HOME_SHARE_85P` angelegt** (§3.1-Anlagepflicht, exakt nach §3.6
+  Rev. 8): OSM-Ingest um nursing_home/assisted_living erweitert (Cache-Generation
+  „infra3"), Producer `apply_care_home_share` (Grundfläche EPSG:3035, Mindest-
+  gewicht 400 m², Verteilung nur über Zellen mit pop_85+ > 0, kommunen-
+  erwartungstreu auf q̄_pfl, Kappung bei 1, Fallback Bundesmittel), Kartenebene
+  in catalog_auxiliary + build_auxiliary + AUX_LINEAGE; Consumer `_v_vers`.
+- **Tests:** Gesamtsuite 282 grün; Beispiel-Blöcke 10/10; Ratchet 0 offen.
+
+## Runde 8 — Delta-Re-Review nach Runde-7-Revision (frische Session, 30.08.2026): neuer Befund 93
+
+Delta-Prüfung der Befunde 91/92 (Status je Zeile oben ergänzt) + Regression. Lint-Stand:
+`pytest tests/ -q` **282 passed** ✓ · Beispiel-Blöcke **10/10 grün** (Golden-Test
+`test_report_example_blocks_green` extrahiert alle 10 Blöcke aus dem Bericht) ✓ ·
+Anlage `l85_sterbefallgewichtung.md` neu erzeugt, Z8 korrekt „(2023, DE)", CSV unabhängig
+nachgerechnet (m 3,9627 / w 4,2814 / kombiniert 4,1594 → 4,16, Band [4,16, 4,20],
+Sterbefälle 161.178/259.771/420.949 — identisch zu R6/R7) ✓. **Befund-92-Abgleich Code ↔
+§3.6 (Rev. 8):** OSM-Ingest (Overpass-Query nursing_home node/way + social_facility
+nursing_home|assisted_living, Cache-Kind „infra3" → Query-Digest im Dateinamen, kein
+Stale-Cache; Dedup über care_home_ids; `care_home_geoms` in `_empty_infra_features`) ✓ ·
+Producer-Logik textuell spezifikationskonform (max(Fläche, 400 m²) in EPSG:3035 inkl.
+Polygon-Anhebung; Verteilung q̄·Σpop85 proportional w nur über pop_85+ > 0-Zellen,
+explizite 0-Werte für heimlose Zellen ⇒ Erwartungstreue vor Kappung; min(1,·);
+Fallback ohne OSM-Heim = kein Key → Faktor 1; q̄ aus Registry `qbar_pfl` 0,149) ✓ ·
+Aufruf nach `apply_zensus_to_cell_inputs` ✓ · Consumer `_v_vers` + Kartenebene
+(catalog_auxiliary/auxiliary) + AUX_LINEAGE vorhanden und formelkonsistent ✓ ·
+MODEL_VERSION-Kommentar (catalog.py Z2069 f.) konsistent ✓ · stale Texte nachgezogen
+(health._v_vers-Docstring Rev.-8-Stand; params.py beta_iso „GEPARKT"-/beta_pfl-Ebenen-Text) ✓.
+**Aber:** die Producer-Verdrahtung ist defekt — per Minimalreproduktion belegt (Heim exakt
+im Zellmittelpunkt ⇒ `share_care_home_85p = None`): `coord_idx` wird mit `x_3035`/`y_3035`
+gefüllt, das sind **Zellmittelpunkte** (grid_service.py Z62 f., x0+50; assessment_worker.py
+Z180 reicht sie unverändert durch), der Heim-Zentroid-Key floort auf den **Zellursprung**
+(`int(c.x // 100) * 100`) — Mittelpunkt ≡ 50 mod 100 vs. Ursprung ≡ 0 mod 100 matchen nie
+→ Befund 93 (A). Übrige Regression (91, 87/88-Asserts in der Suite, Golden-/Kontrakt-Tests)
+trägt.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Status |
+|---|---|---|---|---|---|---|
+| 93 | `engine/inputs.py` `apply_care_home_share` (coord_idx Z740–742 vs. Zentroid-Key Z762) ↔ Bericht §3.6 / Ledger I-1 / Log 35 / MODEL_VERSION-Kommentar | Fehler (Rückfall zu Befund 92(b)/I-1; Eiserne Regel 5; §3.1-Anlagepflicht) | Die Ebene `CARE_HOME_SHARE_85P` ist in Produktion **funktional tot**: `coord_idx` indiziert die Zellen über die Mittelpunkts-Koordinaten `x_3035`/`y_3035` (= Zellursprung + 50; grid_service.py Z62 f./assessment_worker.py Z180), der Heim-Lookup-Key ist auf den Zellursprung gefloort (`int(c.x // step) * step`) — die Keys liegen auf disjunkten Restklassen (50 vs. 0 mod 100) und matchen **nie** (Minimalreproduktion: Heim im Zellmittelpunkt ⇒ kein Wert gesetzt). Folge: `weights` bleibt leer → Early Return → jede Kommune läuft in den q̄-Fallback (Faktor 1), die Kartenebene ist überall None — genau der „dauerhafte Neutral-Fallback", den Log 35 als per §3.1 unzulässig verworfen hat; Ledger-I-1-Schließung („intra-kommunale 85+-Differenzierung aktiv") und MODEL_VERSION-Kommentar („neue Zellebene") treffen funktional nicht zu. €-Ausweis unverändert (Fallback kalibrierneutral); kein Test deckt den Producer (Suite deshalb grün — nur der Consumer `_v_vers` ist getestet) | **Kein stiller Fix** — Autor-Session: coord_idx-Keys auf dieselbe Konvention flooren wie den Zentroid-Key (`(int(x // step) * step, int(y // step) * step)` beim Befüllen) oder den Zentroid-Key auf Mittelpunkte heben; **Producer-Unit-Test** ergänzen (Key-Matching + Kommunen-Erwartungstreue Σ q·pop85 = q̄·Σpop85 vor Kappung); da sich Zellwerte ändern: **erneuter MODEL_VERSION-Bump** im selben Stand (Cache-Falle aus Befund 92); Ledger I-1/92(b) erst danach als bestätigt führen | A | behoben (Autor-Revision R8): Zellzuordnung auf konventions-unabhängige Index-Quantisierung int(v // 100) umgestellt (matcht Mittelpunkts- UND Ursprungs-Koordinaten); Producer-Unit-Tests ergänzt (test_care_home_share_producer_expectation_true: Mittelpunkts-Minimalreproduktion, Erwartungstreue Σ share·pop85 = q̄·Σpop85, pop85=0-Ausschluss, Kappung; + Fallback-Test ohne OSM-Heim); MODEL_VERSION erneut gebumpt (2026.08-m0-95rev8b — Stände mit leerer Ebene invalidiert); Gesamtsuite 284 grün · **✓ R9 bestätigt** (Index-Quantisierung `int(v // 100)` auf beiden Seiten verifiziert; R8-Minimalreproduktion [Heim exakt im Zellmittelpunkt] matcht jetzt: share 0,745 ✓; eigene Stichproben: Randlage x₀+0,3/y₀+99,7 → 0,745 ✓, Ursprungs-Fallback `col·step` → 0,745 ✓, Kappung p85=5 → 1,0 ✓, Heim in pop85=0-Zelle bei zweitem Heim → Gewicht entzogen, Rest erwartungstreu 0,149 ✓; grid_service-Mittelpunkts-Konvention x₀+50 und 100-m-Gitterausrichtung x_start = ⌊minx/100⌋·100 verifiziert — Quantisierung konventions-unabhängig korrekt; einziger Produktions-Caller Z701; MODEL_VERSION 2026.08-m0-95rev8b + Kommentar konsistent; Suite 284 passed / 10 skipped, Beispiel-Blöcke 10/10); **Rest (Nachweis-Claim „Kappung" ohne bindenden Testfall) → Befund 94** |
+
+### Autor-Revision nach Runde 8 (30.08.2026)
+
+Befund 93 (A) behoben — Details in der Statuszeile. Prüfung durch Re-Review Runde 9.
+
+## Runde 9 — Delta-Re-Review nach Runde-8-Revision (frische Session, 30.08.2026): neuer Befund 94
+
+Eng gescopter Delta-Re-Review Befund 93 + Regression (Bericht unverändert seit Runde 7,
+mtime 22:41 vor der R8-Revision verifiziert). **Fix bestätigt:** Zellzuordnung in
+`apply_care_home_share` jetzt per Index-Quantisierung `int(v // 100)` auf beiden Seiten —
+Zellseite `(int(x_3035 // 100), int(y_3035 // 100))` (Mittelpunkt x₀+50 → x₀/100, da
+grid_service-Gitter 100-m-ausgerichtet: x_start = ⌊minx/100⌋·100), Heimseite Zentroid
+beliebig in [x₀, x₀+100) → derselbe Key; Fallback `col·step` (Ursprungs-Konvention) landet
+ebenfalls auf `col`. Neuer Producer-Test `test_care_home_share_producer_expectation_true`
+ausgeführt ✓ (Mittelpunkts-Minimalreproduktion = exakt der R8-Repro-Fall; Erwartungstreue
+Σ share·pop85 = q̄·Σpop85 = 14,9; expliziter 0-Wert cis[1]; pop85=0-Zelle ohne Key) und
+`test_care_home_share_no_osm_leaves_fallback` ✓. **Eigene Stichproben** (unabhängig vom
+Test): Heim-Randlage (x₀+0,3 / y₀+99,7) → 0,745 ✓ · Ursprungs-Konvention-Zellen (nur
+col/row, kein x_3035) → 0,745 ✓ · Kappung (p85=5, residents 14,9) → 1,0 ✓ · Heim in
+pop85=0-Zelle einer Kommune mit zweitem Heim → Gewicht entzogen, verbleibende Zelle
+erwartungstreu 0,149 ✓. MODEL_VERSION `2026.08-m0-95rev8b` gebumpt, Kommentar korrekt
+(Ebene-Fix + Invalidierung leerer Stände) ✓ — Cache-Falle geschlossen. **Regression:**
+`pytest backend/tests/ -q` **284 passed, 10 skipped** ✓ (282 + 2 neue Producer-Tests);
+Beispiel-Blöcke 10/10 (Golden-Test zählt und exekutiert alle ```python test:``-Blöcke,
+Grep bestätigt 10) ✓; Stichprobe 91 (Anlage „(2023, DE)" korrekt) ✓; Consumer-Verdrahtung
+`_v_vers`/auxiliary/AUX_LINEAGE unverändert ✓. Einziger neuer Befund: 94 (C, Nachweis-
+Präzision — Muster Befund 88). Keine neuen A-/B-Befunde.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Status |
+|---|---|---|---|---|---|---|
+| 94 | Ledger-Statuszeile 93 (Umsetzungsnachweis) · `test_methodik_95_golden.py` Abschnitt 4 | Lücke (Nachweis-Präzision; Muster Befund 88: genannter Prüfumfang ≠ geprüfter Umfang) | Der Umsetzungsnachweis zu 93 führt „**Kappung**" als vom Producer-Test abgedeckte Eigenschaft; im Test wird die Kappung aber nie bindend (Maximum share = 0,745 = min(1, 0,745) — der min-Aufruf läuft durch, der Kappungsast ist nicht regressionsgeschützt). Verhalten selbst korrekt (eigene Stichprobe: p85 = 5, residents 14,9 → share exakt 1,0), aber ein künftiger Regressionsbruch im Kappungsast bliebe testseitig unentdeckt | Bindenden Kappungs-Fall in den Producer-Test aufnehmen (z. B. Zelle p85 = 5 → share == 1.0) **oder** „Kappung" aus dem Nachweis-Claim streichen | C | behoben (Autor, nach R9): eigener Testfall test_care_home_share_cap_binds (pop85 = 5, Bewohner 12,7 → share exakt 1,0; Kappungs-Verlust als dokumentierter Restfehler mitgeprüft); Gesamtsuite 285 grün |
+
+### Abschluss nach Runde 9 (30.08.2026)
+
+Runde 9 ergab **keine neuen A-/B-Befunde** (§6-Konvergenzkriterium 3 erfüllt);
+der einzige C-Befund 94 wurde unmittelbar behoben (Kappungs-Regressionstest,
+Suite 285 grün). Der Bericht Rev. 8 ist damit **abnahmereif** und der
+Produkt-Nachzug vollzogen (Integrationsvermerke Rev. 7/Rev. 8 oben): Werte,
+Ebene CARE_HOME_SHARE_85P (Producer-getestet), Ledger konsistent — **keine
+offenen Befunde** (I-1/I-2/I-3 geschlossen; q_1P-Ebene regulär geparkt mit
+Watchlist).

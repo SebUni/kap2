@@ -43,6 +43,9 @@ pauschal „nichts gefunden". Rechne Herleitungen stichprobenhaft nach (Python):
 Kalibrierketten, Umrechnungen, Bandobergrenzen. Prüfe besonders die bekannten Fehlerklassen:
 Kalibriermodell ≠ Produktionsmodell, Band-/Endpunkt-Zuordnung von Modifikatoren, unzentrierte
 Faktoren, Fall-Kontroll-OR als Maßnahmeneffekt, Kategorienfehler (Korrelation als Anteil),
+Ressourcen-Regel-Verstoß (§3.4: geplanter nationaler 100-m-Vollraster-Lauf als
+Prüfstein/Abgleich = Befund), fehlende Datenebenen-Spezifikation (§3.1-Anlagepflicht:
+benötigte Zellgröße ohne „neu anzulegen"-Ebene bzw. „geparkt"-Watchlist = Befund),
 Referenzwert-Doppelzählung, Quellen-Synchronität (LF 14).
 
 ## 3 · Ledger und Regression

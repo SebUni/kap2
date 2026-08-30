@@ -1470,7 +1470,16 @@ def _empty_infra_features() -> dict:
         "healthcare_hospital": [],
         "healthcare_doctor": [],
         "healthcare_pharmacy": [],
+        # Pflegeeinrichtungen (Geometrie in lon/lat: Point oder Polygon) — Basis
+        # der Zellebene CARE_HOME_SHARE_85P (Methodik #95 Rev. 8, §3.6).
+        "care_home_geoms": [],
     }
+
+
+def _is_care_home(tags: dict) -> bool:
+    """OSM-Pflegeeinrichtung: amenity=nursing_home oder social_facility-Wohnformen."""
+    return (tags.get("amenity") == "nursing_home"
+            or tags.get("social_facility") in ("nursing_home", "assisted_living"))
 
 
 def _add_healthcare_geometry(
@@ -1531,6 +1540,10 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
       node["emergency"~"ambulance_station|water_rescue_station|disaster_response|lifeguard_base"]({bbox});
       way["emergency"~"ambulance_station|water_rescue_station|disaster_response|lifeguard_base"]({bbox});
       way["man_made"~"dyke|embankment"]({bbox});
+      node["amenity"="nursing_home"]({bbox});
+      way["amenity"="nursing_home"]({bbox});
+      node["social_facility"~"nursing_home|assisted_living"]({bbox});
+      way["social_facility"~"nursing_home|assisted_living"]({bbox});
       node["amenity"~"hospital|clinic|doctors|pharmacy"]({bbox});
       way["amenity"~"hospital|clinic|doctors|pharmacy"]({bbox});
       node["healthcare"~"hospital|clinic|doctor|pharmacy|centre"]({bbox});
@@ -1542,9 +1555,10 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
     out skel qt;
     """
 
-    # Kind "infra2": Query-/Klassifikationsstand mit KRITIS-Gewichtung (Tags
-    # pumping_station/reservoir/telecom); alte "infra"-Dateien altern per TTL weg.
-    data = _overpass_query_cached("infra2", bbox, query)
+    # Kind "infra3": + Pflegeeinrichtungen (nursing_home/assisted_living) für die
+    # Zellebene CARE_HOME_SHARE_85P (Methodik #95 Rev. 8, §3.6); ältere
+    # "infra"/"infra2"-Dateien altern per TTL weg.
+    data = _overpass_query_cached("infra3", bbox, query)
     response_bytes = data.get("_response_bytes", 0)
     elements = data.get("elements", [])
 
@@ -1559,6 +1573,7 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
     transport_node_ids: set[int] = set()
     emergency_ids: set[int | tuple[str, int]] = set()
     healthcare_ids: set[int | tuple[str, int]] = set()
+    care_home_ids: set[int | tuple[str, int]] = set()
 
     for el in elements:
         tags = el.get("tags", {})
@@ -1625,6 +1640,11 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
             _add_healthcare_geometry(
                 result, tags, Point(nodes[el["id"]]), healthcare_ids, el_id,
             )
+            if _is_care_home(tags) and el_id not in care_home_ids:
+                care_home_ids.add(el_id)
+                result["care_home_geoms"].append(
+                    {"geometry": Point(nodes[el["id"]])}
+                )
 
         elif el_type == "way":
             water_cls = infra_assets.classify_water(tags)
@@ -1669,6 +1689,17 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
                         _add_healthcare_geometry(
                             result, tags, Point(lon, lat), healthcare_ids, ("way", el_id),
                         )
+            if _is_care_home(tags) and ("way", el_id) not in care_home_ids:
+                geom = _element_to_polygon(el, nodes, elements)
+                if geom is None:
+                    nds = el.get("nodes", [])
+                    coords = [nodes[n] for n in nds if n in nodes]
+                    geom = (Point(sum(c[0] for c in coords) / len(coords),
+                                  sum(c[1] for c in coords) / len(coords))
+                            if coords else None)
+                if geom is not None:
+                    care_home_ids.add(("way", el_id))
+                    result["care_home_geoms"].append({"geometry": geom})
 
     result["energy_lines"] = _merge_energy_lines(result["energy_lines"])
 
@@ -1676,14 +1707,14 @@ def fetch_infrastructure(grid_cells: list[dict]) -> dict:
         "Fetched infrastructure from OSM: %d energy pts, %d lines, %d areas, "
         "%d water pts, %d water areas, %d comm pts, %d transport pts, "
         "%d emergency pts, %d dyke geoms, "
-        "%d hospital, %d doctor, %d pharmacy (%.2f MB)",
+        "%d hospital, %d doctor, %d pharmacy, %d care homes (%.2f MB)",
         len(result["energy_points"]), len(result["energy_lines"]),
         len(result["energy_areas"]), len(result["water_points"]),
         len(result["water_areas"]), len(result["comm_points"]),
         len(result["transport_points"]),
         len(result["emergency_points"]), len(result["dyke_geoms"]),
         len(result["healthcare_hospital"]), len(result["healthcare_doctor"]),
-        len(result["healthcare_pharmacy"]),
+        len(result["healthcare_pharmacy"]), len(result["care_home_geoms"]),
         response_bytes / 1_048_576,
     )
 

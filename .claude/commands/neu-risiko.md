@@ -50,7 +50,14 @@ Du legst den Erstaufschlag eines Methodik-Berichts an. Verbindliche Instruktions
      wiederverwendbare Zeilen (Alter, Pflege, Isolation, Außenberufe …) und referenziere sie;
      existiert die Datei noch nicht, lege sie mit diesem Bericht an.
    - **Kap. 3–8:** leere Abschnitte mit den Pflichtinhalten als Kommentar
-     (inkl. Parameter-Block-Beispiel und Beispiel-Test-Block aus §4).
+     (inkl. Parameter-Block-Beispiel und Beispiel-Test-Block aus §4). Zwei
+     Pflichtregeln als Kommentar in Kap. 3 bzw. Kap. 4 vermerken:
+     (a) **Datenebenen-Anlagepflicht (§3.1):** jede benötigte Zellgröße, die das
+     Produkt nicht führt, wird als Ebene vollständig spezifiziert („neu anzulegen";
+     ohne offene Quelle: „geparkt" + Watchlist) — kein dauerhafter, unspezifizierter
+     Neutral-Fallback; (b) **Ressourcen-Regel (§3.4):** Kalibrierung/Validierung/
+     Abgleiche nie über nationale 100-m-Vollraster-Läufe planen — zulässig sind
+     Bundesland-, Gemeindepunkt- und kommunale Stichproben-Ebene.
 6. **Ledger anlegen:** `reviews/BEFUNDE_<nr>.md` mit leerer Befund-Tabelle
    (Befund · Kategorie · Status · Umsetzungsnachweis · Begründung bei Abweichung).
 

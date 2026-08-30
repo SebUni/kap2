@@ -1431,6 +1431,27 @@ AUX_LINEAGE: dict[str, dict[str, Any]] = {
         }],
         "formula": "Bevölkerungsgewichtetes relatives Sterberisiko der Zelle",
     },
+    "CARE_HOME_SHARE_85P": {
+        "keys": ["share_care_home_85p"],
+        "steps": [{
+            "op_kind": "ratio",
+            "label": "verteilen & normieren",
+            "note": ("Heimbewohner-Anteil an der 85+-Bevölkerung der Zelle "
+                     "(Methodik #95 Rev. 8, §3.6): OSM-Pflegeeinrichtungen "
+                     "(nursing_home/assisted_living) liefern Zell-Gewichte "
+                     "(Grundfläche, Mindestgewicht 400 m²); die Heimbewohner der "
+                     "Kommune (q̄ · pop85) werden proportional über die Zellen mit "
+                     "85+-Bevölkerung verteilt — kommunen-erwartungstreu, "
+                     "kalibrierneutral. Ohne OSM-Heim rechnet die Zelle mit dem "
+                     "Bundesmittel (Faktor 1 im v_vers-Term).\n"
+                     r"$$q_{pfl,z} = \min\Bigl(1,\; \frac{\bar q_{pfl}\,"
+                     r"\mathrm{pop}_{85+}\cdot w_z/\sum w}{\mathrm{pop}_{85+,z}}"
+                     r"\Bigr)$$"),
+            "input_keys": ["share_care_home_85p"],
+        }],
+        "formula": ("OSM-Heim-Gewichte je Zelle, kommunen-erwartungstreu auf das "
+                    "Bundesmittel q̄_pfl normiert"),
+    },
     "FLOOD_REGIME": {
         "keys": ["slope_factor", "depression_factor"],
         "steps": [{

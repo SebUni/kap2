@@ -1,13 +1,23 @@
 # Methodik-Bericht #95 — Hitzebelastung
 
-Status: **Rev. 7 (Kalibrier-Revision: bevölkerungsgewichtete Kalibrierbasis +
-Süd-ERF-Nachschätzung; Kalibrier-Prüfstein 12/16 bestanden, auch in der
-Voll-Holdout-Variante) — ABNAHMEREIF (Null-Runde: Review Runde 5; Befunde 77–85
-behoben)** · 30.08.2026 ·
+Status: **Rev. 8 (Fortschreibungs-Revision: §3.4-Ressourcen-Regel — kein
+nationaler Zell-Lauf; §3.1-Datenebenen-Anlagepflicht — q_pfl-Ebene angelegt,
+q_1P geparkt; L̄_85+ exakt sterbefallgewichtet 4,16 J) — ABNAHMEREIF & INTEGRIERT
+(Review Runden 6–9: Befunde 86–94 behoben, Runde 9 ohne neue A/B-Befunde)** ·
+30.08.2026 · Rev. 7 war abnahmereif (Null-Runde Runde 5) und ist integriert ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 95-A** (RKI-Expositions-Wirkungs-Funktion, bottom-up; Entscheidungslog Nr. 1)
 
-> **Revisionsstand.** Rev. 7 = Auflösung der §6-Eskalation aus Rev. 6 (Kalibrier-
+> **Revisionsstand.** Rev. 8 = Fortschreibung nach der Integration (30.08.2026,
+> Nutzer-Entscheid + Fortschreibung der Aufgabe v2 vom 30.08.2026): (1) die
+> **Ressourcen-Regel** (§3.4 der Aufgabe) ersetzt den früher vorgesehenen
+> nationalen 100-m-Zell-Lauf als finalen Abgleich durch **kommunale
+> Stichproben-Abgleiche** (Log 34); (2) die **Datenebenen-Anlagepflicht** (§3.1
+> der Aufgabe) — die q_pfl-Ebene ist vollständig als „neu anzulegen"
+> spezifiziert, q_1P als „geparkt" mit Watchlist (Log 35, §3.6); (3) die
+> \(\bar L_{85+}\)-Approximation (Befund 22) ist durch die **exakte
+> sterbefallgewichtete Rechnung** ersetzt: 4,16 J statt 5,44 J (Log 36, §3.5,
+> Anlage `l85_sterbefallgewichtung.md`). Rev. 7 = Auflösung der §6-Eskalation aus Rev. 6 (Kalibrier-
 > Prüfstein) über die in §4 benannte keyless Messung — bevölkerungsgewichtete
 > Kalibrier-Zeitreihen (Gemeindepunkt × Zensus-Bevölkerung) statt Flächenmittel — plus
 > Holdout-Nachschätzung der Süd-ERF; Entscheidungslog Nr. 31–33. Rev. 6 = Migration des
@@ -263,10 +273,10 @@ assert abs(rr_minus_1 * 40 - 7.6) < 0.1
 
 ```python test: beispiel_95_zelle_yll
 # Beispielzelle Region Mitte: 15 Personen 85+, D=0,018 Faelle/Jahr
-# => 0,097 YLL; x VOLY 160.800 => ~15.700 EUR/Jahr
-yll = 0.018 * 5.44
-assert abs(yll - 0.097) < 0.001
-assert abs(yll * 160_800 - 15_700) < 100
+# => 0,075 YLL (L_85+ = 4,16, Rev. 8); x VOLY 160.800 => ~12.040 EUR/Jahr
+yll = 0.018 * 4.16
+assert abs(yll - 0.0749) < 0.0005
+assert abs(yll * 160_800 - 12_040) < 50
 # Sensitivitaet VSL-Weg: 0,018 x 4,7 Mio. = 84.600 EUR (korrigiert, Befund 57)
 assert abs(0.018 * 4_700_000 - 84_600) < 1
 ```
@@ -379,28 +389,40 @@ assert abs(6_996 * 119.3 / 116.7 - 7_152) < 2
 for tote, ew, soll in [(138_024, 64_747_448, 213.2), (166_312, 9_569_640, 1_737.9),
                        (302_921, 6_294_744, 4_812.3), (420_949, 2_844_213, 14_800.2)]:
     assert abs(tote / ew * 100_000 - soll) < 0.5
-# L_85+ (Anker #l-a): maennlich bevoelkerungsgewichtet ueber e(85), e(90), e(95) => 4,97;
-# weiblich analog => 5,69; m/w-Kombination mit Bevoelkerung 31.12.2023 => 5,44
-lm = (754_258 * 5.47 + 197_380 * 3.55 + 38_654 * 2.37) / 990_292
-assert abs(lm - 4.97) < 0.01
-pop_m, pop_ges = 990_292, 2_844_213
-lg = (pop_m * 4.97 + (pop_ges - pop_m) * 5.69) / pop_ges
-assert abs(lg - 5.44) < 0.01
+# L_85+ (Anker #l-a, Rev. 8 EXAKT sterbefallgewichtet; Anlage
+# l85_sterbefallgewichtung.csv): Einzeljahres-Summen 85-94 + 95+-Rest je
+# Geschlecht (12613-02) x e(x) (12613-b01/-b02) => m 3,963 / w 4,281;
+# m/w-Kombination mit STERBEFAELLEN 2023 (161.178 M / 259.771 F) => 4,16
+lm, lw = 3.963, 4.281
+d_m, d_w = 161_178, 259_771
+assert d_m + d_w == 420_949   # Kreuzcheck: Summe 85+ == Tab. 12613-03
+lg = (d_m * lm + d_w * lw) / (d_m + d_w)
+assert abs(lg - 4.159) < 0.002
+# Alte Rev.-7-Kette zur Einordnung (Bevoelkerungsgewichte, Untergrenzen-
+# Stuetzstellen; beide Naeherungsfehler wirkten aufwaerts, Befund 22): der
+# MAENNER-Pfad ergab 4,97; mit weiblich 5,69 bevoelkerungsgewichtet kombiniert
+# war der Rev.-7-Berichtswert 5,44
+assert abs((754_258 * 5.47 + 197_380 * 3.55 + 38_654 * 2.37) / 990_292 - 4.97) < 0.01
+assert abs((990_292 * 4.97 + 1_853_921 * 5.69) / 2_844_213 - 5.44) < 0.01
 ```
 
-**\(\bar L_a\)-Kette** (Anker `#l-a`; Befund 60ii): Stützstellenwahl — u65: \(e(60)\)
-(86 % der u65-Sterbefälle entfallen auf 50–64); 65–74: \(e(70)\); 75–84: \(e(80)\); 85+:
-bevölkerungsgewichtet über \(e(85), e(90), e(95)\). Geschlechter-Kombination je Band mit der
-Bevölkerung 31.12.2023: 85+ männlich 4,97 (Test oben), weiblich 5,69 (analoge Gewichtung,
-Sterbetafel-Blätter [48]), kombiniert (990.292 M / 1.853.921 F) = **5,44**. Übrige Bänder
-analog aus den Blättern 12613-b01/-b02 [48].
-
-\(\bar L_{85+}\)-Approximation (Befund 22, gekennzeichnet): Die 85+-Mittelung nutzt
-**Bevölkerungs**gewichte; verlorene Lebensjahre je Sterbefall verlangen **Sterbefall**gewichte
-(liegen weiter oben) — Richtung: Überschätzung um grob 0,3–0,5 Jahre (≈ −6…−9 % auf
-\(\bar L_{85+}\), ≈ −4 % auf die YLL-Bundessumme). Exakte Neurechnung mit den
-GENESIS-Altersjahren (12613) bei Integration (Registry-Vermerk); bis dahin dokumentierte
-Perioden-Approximation mit Band.
+**\(\bar L_a\)-Kette** (Anker `#l-a`; Befund 60ii; **Rev. 8**): u65: \(e(60)\)
+(86 % der u65-Sterbefälle entfallen auf 50–64); 65–74: \(e(70)\); 75–84: \(e(80)\)
+(bandmittige Stützstellen, m/w bevölkerungsgewichtet — unverändert). **85+ exakt
+sterbefallgewichtet** (löst Befund 22): reale Sterbefälle 2023 nach
+Einzelaltersjahren 85–94 (Tab. 12613-02 [49]) × \(e(x)\) der Sterbetafel
+2022/2024 [48]; die 95+-Restzeile („95 und älter") mit tafelintern
+sterbefallgewichtetem \(\bar e(95{+})\) = 2,151 (m) / 2,455 (w) — die einzige
+verbleibende, gekennzeichnete Restnäherung. Geschlechter-Kombination mit
+**Sterbefällen** (161.178 M / 259.771 F; Kreuzcheck gegen Tab. 12613-03 exakt):
+männlich 3,963 · weiblich 4,281 ⇒ **4,16 J** (Band [4,16, 4,20]: Obergrenze mit
+e(95)-Stützstelle statt \(\bar e(95{+})\)). Die Rev.-7-Kette (5,44) trug zwei
+gleichgerichtete Näherungsfehler — Bevölkerungs- statt Sterbefallgewichte und
+Untergrenzen-Stützstellen —, daher fällt die Korrektur (−1,28 J, ≈ −8 % auf die
+YLL-Bundessumme) größer aus als die frühere Abschätzung −0,3…−0,5 J.
+Reproduzierbar: Skript `l85_sterbefallgewichtung.py`, Anlagen
+`l85_sterbefallgewichtung.csv`/`.md` [50]. Kopplungen (§3.9) neu gerechnet:
+Beispiel `beispiel_95_zelle_yll`, Zeichentabelle, §7-Block, Sanity-Anker.
 
 ### 3.6 Zeichentabelle (alphabetisch; §3.2-Form)
 
@@ -414,7 +436,7 @@ Perioden-Approximation mit Band.
 | \(f_a\) | Altersfaktor der RR-Steigung rel. zu 85+ | — | 0,357 / 0,588 / 0,631 / 1,0 — Rückrechnung §3.3a (lineare Näherung, gekennzeichnet); herleitung:#f-a |
 | \(F_{\text{Zelle}}\) | hitzeassoziierte Erkrankungsfälle (Teil-Ausweis) | 1/Jahr | Ergebnis |
 | \(\text{HD},\ \text{HD}_{\text{ref}}\) | Hitzetage der Zelle (DWD-CDC hot_days 1 km, ohne UHI — §3.4) / Referenz = K&Z-Basisperiode | Tage/Jahr | HD: DWD-CDC [33]; \(\text{HD}_{\text{ref}}\) = **7,2** (Ø 1999–2008 [18]); herleitung:#hd-ref |
-| \(\bar L_a\) | Restlebenserwartung je Band (Sterbetafel 2022/2024, Stützstellen e(60)/e(70)/e(80); 85+ bevölkerungsgewichtet — **Perioden-Approximation, §3.5**) | Jahre | 23,39 / 15,59 / 8,90 / 5,44 (85+: −0,3…−0,5 J bei Sterbefallgewichtung) [48]; herleitung:#l-a |
+| \(\bar L_a\) | Restlebenserwartung je Band (Sterbetafel 2022/2024; u65–75–84 Stützstellen e(60)/e(70)/e(80); **85+ exakt sterbefallgewichtet, Rev. 8**) | Jahre | 23,39 / 15,59 / 8,90 / **4,16** (85+-Band [4,16, 4,20]; Anlage l85_sterbefallgewichtung.csv) [48,49]; herleitung:#l-a |
 | \(m_a\) | Basissterberate je Band (Sterbefälle 2023 ÷ Bev. 31.12.2023) | 1/100.000·a | 213,2 / 1.737,9 / 4.812,3 / 14.800,2 [49]; herleitung:#m-a |
 | \(\text{pop}_a\) | Bevölkerung der Zelle je Band | Personen | Zensus 2022, 100 m; register:95-R35-01 |
 | \(q_{\text{1P}},\ \bar q_{\text{1P}}\) | Anteil allein lebender 65+ der Zelle / Bundesmittel | — | Zelle: Zensus-2022-Haushaltsgitter (Fallback s. u.); \(\bar q\) = **0,346** (Mikrozensus 2023 [63]); Zensus-Gitterwert ersetzt bei Integration; herleitung:#qbar-1p |
@@ -434,19 +456,45 @@ Perioden-Approximation mit Band.
 | \(\beta_{\text{pfl}}\) | Pflegeheim-Effekt (nur Band 85+, nur D-Pfad) | — | (3,0−1)/[1+0,149·2,0] = **1,54** (Band 1,0–2,9); Kette §3.3b [41,44,60,61]; register:95-S153-01 |
 | \(\delta_{\text{HAP}}\) | Hitzeaktionsplan-Dämpfung — multiplikativ auf den Wochen-Exzess (RR−1); Maßnahme §5 | — | 0,95 (0,85–1,00) [45,47]; register:95-S158-01 |
 
-**Fallback-Definitionen** (Befund 25): (a) Liegt die Kreuzung „Einpersonenhaushalte × 65+"
-im offenen Zensus-100-m-Gitter nicht vor, gilt \(q_{\text{1P}}\) = Gesamt-1P-Anteil der
-Zelle × Kreis-Alterskorrektur (Verhältnis 1P-65+/1P-gesamt des Kreises) — als Proxy
-gekennzeichnet. (b) \(q_{\text{pfl}}\): OSM-Pflegeeinrichtungen je Zelle, skaliert auf die
-Kreis-Summe der Pflegestatistik (fängt regionale OSM-Unvollständigkeit); Proxy-Eigenschaft
-dokumentiert. Beide Verfügbarkeiten werden bei Integration verifiziert (ein Satz Ergebnis
-in den Bericht). **Verifikationsergebnis (Integration 30.08.2026):** Beide Zellgrößen
-sind derzeit nicht verfügbar — das offene Zensus-2022-Gitter enthält weder die Kreuzung
-1P×65+ noch einen Gesamt-1P-Anteil (nur `Durchschnittliche_Haushaltsgroesse`), und
-OSM-Pflegeeinrichtungen sind produktseitig nicht als Zellebene geladen; die Zellen
-rechnen daher mit den Bundesmitteln \(\bar q\) (Faktor exakt 1, kalibrierneutral —
-Zentrierungs-Eigenschaft §3.2), bis die beiden Datenebenen angelegt sind
-(Fortschreibungsvermerk; Ledger).
+**Datenebenen der \(v_{\text{vers}}\)-Zellgrößen** (Rev. 8; §3.1-Datenebenen-
+Anlagepflicht der Aufgabe, ersetzt die Rev.-5-Fallback-Definitionen aus Befund 25 —
+Verifikationsergebnis der Integration 30.08.2026: keine der beiden Zellgrößen war
+produktseitig verfügbar):
+
+- **\(q_{\text{pfl}}\) — Ebene `CARE_HOME_SHARE_85P` („neu anzulegen"; wird von
+  `/integriere-risiko` angelegt):** Quelle OSM-Pflegeeinrichtungen
+  (`amenity=nursing_home` sowie `social_facility=nursing_home|assisted_living`),
+  keyless über den bestehenden kommunalen OSM-Ingest (kein nationaler Lauf).
+  Zell-Ableitungsregel: Einrichtungs-Gewicht \(w_z\) je Zelle — Polygone mit
+  ihrer Grundfläche in m², Punkt-Features mit dem **Mindestgewicht 400 m²**
+  (typische Grundfläche eines kleinen Pflegeheims; auch Polygone werden auf
+  dieses Minimum angehoben, damit Punkt- und Flächen-Tagging vergleichbar
+  wiegen — gekennzeichnete Setzung); verteilt wird **nur über Zellen mit
+  \(\text{pop}_{85+,z} > 0\)** (Heim-Gewichte in Zellen ohne erfasste
+  85+-Bevölkerung — Zensus-Geheimhaltung kleiner Besetzungen — werden der
+  Gewichtssumme entzogen, kein stiller Verlust an der Kappung); die
+  Heimbewohner der Kommune
+  \(\bar q_{\text{pfl}} \cdot \text{pop}_{85+,\text{Kommune}}\) werden
+  proportional \(w_z\) auf diese Zellen verteilt; \(q_{\text{pfl},z} =
+  \min(1, \text{Heimbewohner}_z / \text{pop}_{85+,z})\). **Normierung:** per
+  Konstruktion kommunen-erwartungstreu (\(\sum_z q_{\text{pfl},z}\,
+  \text{pop}_{85+,z} = \bar q_{\text{pfl}}\,\text{pop}_{85+}\), vor Kappung) —
+  kalibrierneutral je Kommune; die Kappung bei 1 ist ein kleiner, dokumentierter
+  Restfehler. **Bewusste Fortschreibung von Befund 25(b):** statt Skalierung auf
+  Kreis-Summen der Pflegestatistik (Tab. 22421 je Kreis ist nicht keyless
+  abrufbar) die Kommunen-Erwartungstreue mit dem Bundesmittel — regionale
+  Heimquoten-Unterschiede zwischen Kommunen bleiben ununterschieden (Proxy,
+  gekennzeichnet; Log 35). Fallback: Kommune ohne OSM-Pflegeeinrichtung →
+  \(q_{\text{pfl}} = \bar q\) (OSM-Lücke nicht von „keine Heime"
+  unterscheidbar — dokumentiert).
+- **\(q_{\text{1P}}\) — Ebene `SINGLE_HH_SHARE_65P` („geparkt — Datenquelle
+  fehlt"; §3.1):** Es existiert keine offene Zellquelle (Zensus-2022-Gitter ohne
+  1P×65+-Kreuzung und ohne Gesamt-1P-Anteil; Mikrozensus nur Bundesebene).
+  Bis zur Beschaffung gilt \(q_{\text{1P}} = \bar q_{\text{1P}}\) (Faktor 1,
+  kalibrierneutral). **Watchlist:** Zensus-Gitterdaten-Nachlieferungen
+  (destatis.de/gitterdaten) und Zensus-Datenbank-Haushaltstabellen auf
+  Gemeinde-/100-m-Ebene; bei Verfügbarkeit greift Befund 25(a)
+  (Gesamt-1P-Anteil × Alterskorrektur) bzw. die direkte Kreuzung.
 
 ### 3.7 Schicht A (getrennt; nie auf €-Pfaden)
 
@@ -485,13 +533,15 @@ das Landes-Flächenmittel) **direkt gemessen statt pauschal korrigiert** — die
 Flächenmittel, Ø 1992–2024): **Deutschland +0,53 K**; stark heterogen (Hessen +1,05 ·
 BW +0,84 · Berlin +0,85 · BY +0,57 · MV +0,01 K) — die Rev.-6-Abschätzung (+0,2…+0,4 K)
 war zu niedrig, genau wie der Kovarianz-Vorbehalt (Befund 67) vermutete.
-**Verbleibender dokumentierter Rest** (Fortschreibungsvermerk Zell-Lauf, nicht mehr
-abnahmerelevant): UHI-Feinstruktur unterhalb der Gemeinde — Konvexitätsbeitrag als
+**Verbleibender dokumentierter Rest** (Fortschreibungsvermerk **kommunale
+Stichproben-Abgleiche** — §3.4-Ressourcen-Regel: ein nationaler
+100-m-Vollraster-Lauf ist als Prüf-/Abgleichinstrument unzulässig (Log 34);
+nicht abnahmerelevant): UHI-Feinstruktur unterhalb der Gemeinde — Konvexitätsbeitrag als
 **Modellrechnung gegen die weiterhin gesetzte** Streuung σ = 0,5 K: ×1,023–1,024
 (mittelwerttreu; σ-Abschätzung wie in Rev. 6 aus der ±1-K-Spanne der Zellabweichungen um
 das Gebietsmittel, Gleichverteilungsannahme ⇒ σ ≈ 2/√12 ≈ 0,5 K — **keine Messung**;
-der Messpfad „σ aus dem Stadtmodell" gehört zum Zell-Lauf) — sowie intra-kommunale
-Bevölkerungsgewichtung.
+der Messpfad „σ aus dem Stadtmodell" gehört zum Stichproben-Abgleich) — sowie
+intra-kommunale Bevölkerungsgewichtung.
 
 **Kalibrierlauf Rev. 7** (Ergebnis `c_kal_rev7_ergebnis.md` [50]; Produktionsnähe:
 Gemeindepunkt-Temperaturen aus derselben DWD-Rasterfamilie, die das Produkt je Zelle
@@ -539,8 +589,9 @@ nutzt):
   25 °C Wochenmittel ≈ 1,45 statt publiziert 1,25). Epidemiologisch ist das darum
   **nicht** als korrigierte Süd-ERF lesbar, sondern nur als Kompensationsparameter für
   Süd-spezifische Skalenstruktur (Topographie-Mischung kühler Voralpen- und warmer
-  Ballungsräume selbst im bevölkerungsgewichteten Landesmittel); der Zell-Lauf prüft,
-  welcher Anteil davon Topographie ist. Physikalische Deutung des BY/BW-Kontrasts
+  Ballungsräume selbst im bevölkerungsgewichteten Landesmittel); kommunale
+  Stichproben-Abgleiche (Anker-Kommunen im Alpenvorland/Oberrheingraben, §3.4-
+  Ressourcen-Regel) prüfen, welcher Anteil davon Topographie ist. Physikalische Deutung des BY/BW-Kontrasts
   (Alpenvorland vs. Oberrheingraben) siehe Verteilungsprüfung.
 
 ```python test: beispiel_95_beta_sued_nachschaetzung
@@ -592,10 +643,13 @@ assert abs(0.0634 * 1.0 - 0.0634) < 1e-9 and abs(0.0625 * 1.0 - 0.0625) < 1e-9
   Verteilschlüssel-Logik (kein nationaler Topf wird verteilt; die Zellrate ist lokal
   definiert).
 - **Unsicherheiten:** Rest-Bias UHI-Feinstruktur (×1,02-Konvexität + intra-kommunale
-  Gewichtung; Zell-Lauf als finaler Abgleich bei Integration, Fortschreibungsvermerk);
+  Gewichtung; kommunale Stichproben-Abgleiche als Fortschreibungsvermerk — §3.4-
+  Ressourcen-Regel, kein nationaler Vollraster-Lauf);
   \(s_{\text{Süd}}\)-Profil-Band 1,45–1,85 (⇒ \(c_{\text{kal}}\) 0,604–0,559, Gegenläufigkeit,
   Bundessumme stabil); σ-Schätzgüte der Wochenquantile; Skalentransfer Region→Zelle;
-  \(\bar L_{85+}\)-Approximation (§3.5); Harvesting (Jahresaggregat). Der
+  \(\bar e(95{+})\)-Restnäherung der exakten \(\bar L_{85+}\)-Rechnung (Band
+  [4,16, 4,20], §3.5 — die frühere Approximation ist per Log 36 ersetzt);
+  Harvesting (Jahresaggregat). Der
   Kovarianz-Vorbehalt (Befund 67) ist durch die direkte Messung der
   Bevölkerungsgewichtung materiell aufgelöst; die verbleibende Kovarianz
   (\(v_{\text{vers}}\) × UHI-Feinstruktur) wandert in den Rest-Bias.
@@ -652,7 +706,7 @@ Ist-Klima aus**; Szenariofähigkeit folgt mit der Klimaprojektions-Anbindung (St
    Wirkung, Sensitivität ausgewiesen.
 3. Skalentransfer: ERF auf Regions-Gebietsmitteln geschätzt, auf Zelltemperaturen
    angewendet; \(c_{\text{kal}}\) fängt das Niveau, nicht die Form.
-4. Kalibrier-Rest-Bias: UHI-Feinstruktur unterhalb der Gemeinde (Konvexität ×1,02, intra-kommunale Gewichtung) — Zell-Lauf als finaler Abgleich bei Integration (§4); Süd-ERF-Nachschätzung ist modellintern (Profil-Band 1,45–1,85).
+4. Kalibrier-Rest-Bias: UHI-Feinstruktur unterhalb der Gemeinde (Konvexität ×1,02, intra-kommunale Gewichtung) — kommunale Stichproben-Abgleiche als Fortschreibungsvermerk (§4; §3.4-Ressourcen-Regel: kein nationaler Vollraster-Lauf); Süd-ERF-Nachschätzung ist modellintern (Profil-Band 1,45–1,85).
 5. UHI-Modellgüte als gemeinsamer Treiber der #95-Feinstruktur; HD ohne UHI-Verschiebung
    (Unterschätzung der Morbidität in UHI-Lagen, §3.4).
 
@@ -727,9 +781,9 @@ parameter:
   endpunkt: mortalitaet
 parameter:
   id: heat.l_restlebenserwartung
-  wert: {u65: 23.39, 65-74: 15.59, 75-84: 8.90, 85+: 5.44}
+  wert: {u65: 23.39, 65-74: 15.59, 75-84: 8.90, 85+: 4.16}
   einheit: "Jahre"
-  band: {85+: [4.9, 5.44]}   # Perioden-Approximation §3.5 (Sterbefallgewichtung senkt 85+)
+  band: {85+: [4.16, 4.20]}   # Rev. 8 exakt sterbefallgewichtet; Obergrenze: e(95)-Stuetzstelle statt e-quer(95+)
   herkunft: herleitung:#l-a
   quelle: destatis_sterbetafel2224
   preisstand: null
@@ -951,7 +1005,8 @@ DOI-Links die persistenten Referenzen.
   VG250-Gemeindepunkte × Zensus-Gemeindebevölkerung) + `backend/data/kalibrierung/`
   (RKI-Anhang EB 19/2025, CC BY 4.0; `c_kal_rev7_ergebnis.md`, `c_kal_rev7_verteilung.csv`,
   `sommermittel_bundesland_povw.csv`, `temperatur_offsets_bundesland.csv`;
-  Rev.-6-Stände zur Reproduzierbarkeit).
+  Rev.-6-Stände zur Reproduzierbarkeit); Rev. 8: `l85_sterbefallgewichtung.py`
+  (+ `.csv`/`.md` — L̄_85+ exakt aus Statistischen Berichten [48]/[49], keyless).
 - **[60]** A. Fouillet u. a., Int Arch Occup Environ Health 80:16–24, 2006.
   doi:10.1007/s00420-006-0089-4, Tab. 2 (O/E nach Sterbeort: Heime 1,9 [1,7–2,1],
   Wohnung ≥ 75: 1,9, Kliniken 1,5).
@@ -1041,3 +1096,6 @@ Revision nach Review-Runde 1 (Befunde 58/59/62); Einträge 31–33: Rev.-7-Kalib
 | 31 ⚠ | Kalibrierbasis Rev. 7? | **bevölkerungsgewichtete Sommermittel je Land** (DWD-JJA-Raster × Gemeindepunkt × Zensus-Bevölkerung; Skript rev7) statt Flächenmittel + Pauschalkorrektur | setzt die in §4 (Rev. 6) benannte keyless Messung um; löst die Befund-1-Hauptkomponente direkt (DE +0,53 K, regional heterogen); §6-Eskalation ohne Zell-Lauf auflösbar | Zell-Lauf sofort (braucht Produktionsimplementierung — Kausalschleife mit der Abnahme) | c_kal 0,742 → 0,581; Prüfstein-Basis |
 | 32 ⚠ | Regionale ERF-Nachschätzung? | **nur Süd**: \(s_{\text{Süd}}\) = 1,65 (Holdout-Fit ohne 2018/19/22; Profil-Band 1,45–1,85, Bandregel +10 % Zielfunktion) ⇒ \(\beta_{85+,\text{Süd}}\) = 0,0876 K⁻¹; Nord nicht identifizierbar (0 Fit-Jahre), Mitte-Optimum 1,0 | §3.4 („Wirkungsfunktion regional nachschätzen"); minimal-invasiv genau dort, wo Diagnose + Identifikation zusammenkommen; Einbrenn-Einwand aus Nr. 26 durch messungsbasierte Kalibrierbasis entkräftet | 3-Regionen-Nachschätzung (verworfen: Nord-Skalar läuft mangels Daten an den Gitterrand und zerstört die Nord-Prüfung) | Prüfstein 10/16 → **12/16 (bestanden)** |
 | 33 | Regionale Übergangsfaktoren? | **entfallen** — Produktausweis mit genau einem nationalen Skalar | Prüfstein mit einem Skalar bestanden; §3.4-Ideal erreicht | c_reg beibehalten (unnötig geworden) | Süden im Ausweis über \(\beta_{\text{Süd}}\) statt Faktor ×1,6 |
+| 34 ⚠ | Finaler Kalibrier-Abgleich ohne Zell-Lauf? | **kommunale Stichproben-Abgleiche** (Anker-Kommunen, Produktionsmodell) ersetzen den nationalen 100-m-Vollraster-Lauf überall im Bericht | Nutzer-Entscheid 30.08.2026 + §3.4-Ressourcen-Regel (Aufgaben-Fortschreibung): Vollraster-Läufe fressen zu viele Ressourcen und dürfen nie Prüf-/Abgleichvoraussetzung sein | nationaler Zell-Lauf (verworfen per Regel) | Rest-Bias-Prüfung (×1,02, Topographie-Anteil Süd) läuft über Stichproben statt Vollraster |
+| 35 ⚠ | q_pfl-Ebene ohne Kreis-Pflegestatistik? | `CARE_HOME_SHARE_85P` aus OSM, **kommunen-erwartungstreu** auf q̄_pfl normiert (statt Kreis-Skalierung); q_1P-Ebene **geparkt** (keine offene Quelle) | §3.1-Anlagepflicht; Tab. 22421 je Kreis nicht keyless; Erwartungstreue hält die Kalibrierneutralität je Kommune | Kreis-Skalierung (nicht keyless) · dauerhafter Neutral-Fallback (per §3.1 unzulässig) | intra-kommunale 85+-Differenzierung aktiv; zwischen Kommunen weiter q̄ |
+| 36 | L̄_85+ exakt statt Approximation? | **4,16 J** — Einzeljahres-Sterbefälle 85–94 × e(x), 95+-Rest tafelintern gewichtet, m/w sterbefallgewichtet kombiniert | Befund-22-Auflösung wie in §3.5 terminiert; Kreuzcheck 12613-02↔-03 exakt | Stützstellen-Variante (4,83 — behebt nur den Gewichte-Fehler, nicht die Untergrenzen-Stützstellen) | YLL-Bundessumme ≈ −8 %; €-Ausweis sinkt entsprechend (konservativ) |

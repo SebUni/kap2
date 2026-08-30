@@ -11,8 +11,9 @@ Mittelwert ausgewertet: Das deutsche Sommermittel liegt bei rund 18,5 °C und da
 *unter* der Wirkschwelle — am Mittelwert ausgewertet käme fast überall null heraus.
 Die Todesfälle entstehen in den wenigen heißen Wochen.
 
-Stand: **Methodik-Bericht #95 Rev. 7** (docs/methodik/95_hitzebelastung.md,
-abgenommen; Integration schließt Ledger-Befund 76). Kernpunkte: empirische
+Stand: **Methodik-Bericht #95 Rev. 8** (docs/methodik/95_hitzebelastung.md;
+Rev. 7 abgenommen + integriert, Rev. 8 = Fortschreibung: L̄_85+ exakt 4,16,
+Ressourcen-Regel, Datenebenen-Spezifikation). Kernpunkte: empirische
 intra-saisonale Wochenquantile je Region statt Gauß-Annahme (§3.2); native
 Ergebnisgröße **YLL** (verlorene Lebensjahre) mit Todesfällen als Teil-Ausweis
 (§3.3/§3.5); mittelwertzentrierte, bandweise v_vers-Modifikatoren (β_iso 65+,
@@ -91,9 +92,10 @@ AGE_BETA_FACTOR: dict[str, float] = {
 AGE_BANDS: tuple[str, ...] = ("u65", "a65_74", "a75_84", "a85p")
 
 # Restlebenserwartung je Band (Jahre je Sterbefall) — YLL-Bewertung nach
-# UBA MK 4.0 (Bericht #95 §3.5, Anker #l-a; Sterbetafeln 2022/2024).
+# UBA MK 4.0 (Bericht #95 §3.5, Anker #l-a; Sterbetafeln 2022/2024; 85+ exakt
+# sterbefallgewichtet, Rev. 8 — Skript l85_sterbefallgewichtung.py).
 AGE_LIFE_YEARS: dict[str, float] = {
-    "u65": 23.39, "a65_74": 15.59, "a75_84": 8.90, "a85p": 5.44,
+    "u65": 23.39, "a65_74": 15.59, "a75_84": 8.90, "a85p": 4.16,
 }
 
 # Baseline-Einweisungsraten je Band (Fälle/100.000·Jahr) — Morbiditätspfad
@@ -197,11 +199,13 @@ def _v_vers(ctx: CellContext, code: str, band: str) -> float:
 
     ``v = [1 + 1_{a≥65}·β_iso·(q_1P − q̄_1P)] · [1 + 1_{85+}·β_pfl·(q_pfl − q̄_pfl)]``
 
-    Mittelwertzentriert (Bundesmittel ⇒ Faktor 1, kalibrierneutral). Die
-    Zellgrößen sind produktseitig noch nicht verfügbar (Zensus-Haushaltsgitter
-    ohne 1P×65+-Kreuzung; OSM-Pflegeeinrichtungen nicht geladen — bei der
-    Integration verifiziert, Bericht §3.6): fehlt der ci-Wert, rechnet die Zelle
-    mit dem Bundesmittel (Faktor exakt 1).
+    Mittelwertzentriert (Bundesmittel ⇒ Faktor 1, kalibrierneutral). Zellgrößen
+    (Bericht §3.6, Rev. 8): ``share_care_home_85p`` liefert die Ebene
+    CARE_HOME_SHARE_85P (OSM-Pflegeeinrichtungen, kommunen-erwartungstreu auf q̄
+    normiert — ``inputs.apply_care_home_share``); ``share_single_65p`` ist als
+    Ebene GEPARKT (keine offene Zellquelle, Watchlist). Fehlt der ci-Wert
+    (q_1P immer; q_pfl in Kommunen ohne OSM-Heim), rechnet die Zelle mit dem
+    Bundesmittel (Faktor exakt 1).
     """
     v = 1.0
     if band != "u65":

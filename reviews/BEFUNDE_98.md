@@ -102,3 +102,10 @@ Prüfumfang gemäß §6 (Re-Review): Umsetzungen 211/212, Regression 201–210 +
   GP-9, 15, 16, 37, 41, 43).
 
 Damit sind alle Befunde 201–212 geschlossen und verifiziert; keine offenen A-/B-Befunde.
+
+## Fortschreibungs-Konformität (30.08.2026)
+
+Prüfung gegen die Aufgaben-Fortschreibung vom 30.08.2026 (§3.4-Ressourcen-Regel:
+kein nationaler Vollraster-Lauf; §3.1-Datenebenen-Anlagepflicht): Bericht #98
+**konform** — Konformitätsvermerk im Berichtskopf ergänzt (redaktionell, keine
+Modellwert-Änderung; kein Review-Loop erforderlich). Kern: die SSD-Ebene (DWD sunshine_duration 1 km, Register 98-E20-01) und die Branchenanteils-Ebene (98-OUT-01, Proxy) sind als „neu anzulegen“ spezifiziert und werden von /integriere-risiko verpflichtend angelegt (§3.1-Anlagepflicht); alle übrigen Zellgrößen sind vorhanden oder regional/national.

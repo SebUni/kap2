@@ -22,7 +22,10 @@ Berichts.
    Herleitungen stichprobenhaft nachrechnen (Python). Bekannte Fehlerklassen besonders:
    Kalibriermodell ≠ Produktionsmodell, Band-/Endpunkt-Zuordnung, unzentrierte Modifikatoren,
    Fall-Kontroll-OR als Maßnahmeneffekt, Kategorienfehler, Referenzwert-Doppelzählung,
-   Quellen-Synchronität.
+   Quellen-Synchronität, **Ressourcen-Regel-Verstoß** (§3.4: ein geplanter nationaler
+   100-m-Vollraster-Lauf als Prüfstein/Abgleich = Befund) und **fehlende
+   Datenebenen-Spezifikation** (§3.1: benötigte Zellgröße ohne vollständige
+   „neu anzulegen"-Ebene bzw. ohne „geparkt"-Kennzeichnung mit Watchlist = Befund).
 4. **Entscheidungslog prüfen:** ✅-Entscheidungen gegen die E-Regeln (falsche Regelanwendung
    = Befund); ⚠️-Entscheidungen auf Plausibilität der angewendeten Empfehlung (unplausible
    Empfehlung oder verschwiegene bessere Alternative = Befund). Ein Befund „hier fehlt eine

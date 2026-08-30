@@ -474,7 +474,8 @@ def _graph_95_plan() -> tuple[dict, list[dict]]:
                   r"$$\mathrm{YLL}_z = \sum_a D_a \cdot \bar L_a$$")
     b.add_edge("int:d_faelle", mul_yll)
     P("heat.l_restlebenserwartung", "Restlebenserwartung L̄_a",
-      "23,39 / 15,59 / 8,90 / 5,44", "Jahre", "Sterbetafel 2022/2024 (§3.5)", mul_yll)
+      "23,39 / 15,59 / 8,90 / 4,16", "Jahre",
+      "Sterbetafel 2022/2024 × Sterbefälle 2023 (§3.5; 85+ exakt sterbefallgewichtet, Rev. 8)", mul_yll)
     b.add_node("out:native", "outcome", "Verlorene Lebensjahre (YLL)",
                column=5, collapse_group="outcome",
                meta={"result_kind": "native", "unit": "Jahre/Jahr", "is_outcome": True,

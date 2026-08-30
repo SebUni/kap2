@@ -696,7 +696,100 @@ def gather_cell_inputs(
     if progress_callback:
         progress_callback(ZENSUS_APPLY[1], "Zensus-Daten anwenden")
 
+    # Heimbewohner-Anteil 85+ je Zelle (CARE_HOME_SHARE_85P) — braucht die
+    # Zensus-Altersbänder, deshalb NACH apply_zensus_to_cell_inputs.
+    apply_care_home_share(list(cell_inputs), grid_cells, infra_features)
+
     return list(cell_inputs), regional
+
+
+def apply_care_home_share(
+    cell_inputs: list[dict | None],
+    grid_cells: list[dict],
+    infra_features: dict,
+) -> None:
+    """Zellebene ``share_care_home_85p`` (Methodik #95 Rev. 8, §3.6, Log 35).
+
+    Heimbewohner-Anteil an der 85+-Bevölkerung je Zelle aus OSM-Pflege-
+    einrichtungen, **kommunen-erwartungstreu** auf das Bundesmittel q̄_pfl
+    normiert (Registry ``risks.EXPECTED_ANNUAL_MORTALITY.impact.qbar_pfl``):
+
+    - Einrichtungs-Gewicht w_z: Polygon-Grundfläche in m² (EPSG:3035,
+      flächentreu), Punkt-Features und kleine Polygone mit Mindestgewicht
+      400 m² (gekennzeichnete Setzung des Berichts).
+    - Verteilt wird q̄·Σpop85 proportional w_z — **nur über Zellen mit
+      pop_85+ > 0** (Heim-Gewichte in Zellen ohne erfasste 85+-Bevölkerung
+      werden der Gewichtssumme entzogen, kein stiller Verlust an der Kappung);
+      q_z = min(1, Bewohner_z/pop85_z), Kappung = kleiner dokumentierter
+      Restfehler.
+    - Kommune ohne OSM-Pflegeeinrichtung: Schlüssel bleibt ungesetzt → der
+      v_vers-Modifikator rechnet mit q̄ (Faktor 1; OSM-Lücke nicht von
+      „keine Heime" unterscheidbar — dokumentierter Fallback).
+    """
+    from pyproj import Transformer
+
+    from app.services.engine import override_context
+
+    care_homes = (infra_features or {}).get("care_home_geoms") or []
+    if not care_homes:
+        return
+
+    # Zellzuordnung über Zellindex-Quantisierung int(v // 100): ``x_3035`` ist
+    # der Zell-MITTELPUNKT (Ursprung + 50, grid_service) — die Quantisierung
+    # bildet Mittelpunkt UND jeden Punkt innerhalb der Zelle auf denselben Key
+    # ab und ist damit unabhängig von der Ecken-/Mittelpunkt-Konvention
+    # (Ledger #95 Befund 93: ein Ursprungs-Key matchte nie).
+    step = 100
+    coord_idx: dict[tuple[int, int], int] = {}
+    for idx, cell in enumerate(grid_cells):
+        x = cell.get("x_3035", cell.get("col", 0) * step)
+        y = cell.get("y_3035", cell.get("row", 0) * step)
+        coord_idx[(int(float(x) // step), int(float(y) // step))] = idx
+
+    def pop85(ci: dict | None) -> float:
+        bands = (ci or {}).get("pop_age_bands")
+        return float(bands.get("a85p") or 0.0) if isinstance(bands, dict) else 0.0
+
+    MIN_WEIGHT_M2 = 400.0
+    tr = Transformer.from_crs(4326, 3035, always_xy=True)
+    weights: dict[int, float] = {}
+    for feat in care_homes:
+        geom = feat.get("geometry")
+        if geom is None:
+            continue
+        try:
+            from shapely.ops import transform as _shp_transform
+            geom_m = _shp_transform(tr.transform, geom)
+        except Exception:  # noqa: BLE001 — eine kaputte Geometrie kippt nichts
+            continue
+        w = max(float(getattr(geom_m, "area", 0.0)), MIN_WEIGHT_M2)
+        c = geom_m.centroid
+        key = (int(c.x // step), int(c.y // step))
+        idx = coord_idx.get(key)
+        if idx is None or cell_inputs[idx] is None:
+            continue
+        if pop85(cell_inputs[idx]) <= 0.0:
+            # §3.6: Zellen ohne erfasste 85+-Bevölkerung nehmen nicht an der
+            # Verteilung teil (Zensus-Geheimhaltung kleiner Besetzungen).
+            continue
+        weights[idx] = weights.get(idx, 0.0) + w
+
+    total_w = sum(weights.values())
+    total_p85 = sum(pop85(ci) for ci in cell_inputs)
+    if total_w <= 0.0 or total_p85 <= 0.0:
+        return
+
+    qbar = float(override_context.get_override(
+        "risks.EXPECTED_ANNUAL_MORTALITY.impact.qbar_pfl", 0.149) or 0.149)
+    residents_total = qbar * total_p85
+    for idx, ci in enumerate(cell_inputs):
+        if ci is None:
+            continue
+        p85 = pop85(ci)
+        if p85 <= 0.0:
+            continue
+        residents = residents_total * weights.get(idx, 0.0) / total_w
+        ci["share_care_home_85p"] = round(min(1.0, residents / p85), 4)
 
 
 # Trockenadiabatischer Temperaturgradient (K je Meter Höhenunterschied).

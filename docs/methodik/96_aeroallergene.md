@@ -6,6 +6,11 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 **Ansatz 96-A** (Prävalenz × gemessene Pollensaison-Spreizung, bottom-up; Entscheidungslog Nr. 1)
 · Familie: **K1-Gesundheit bottom-up** (Prototyp #95; §2.6 — kein erneuter Drei-Ansätze-Vergleich)
 
+> **Konformitätsvermerk zur Aufgaben-Fortschreibung 30.08.2026** (Ressourcen-Regel
+> §3.4, Datenebenen-Anlagepflicht §3.1; Nutzer-Entscheid, vgl. #95 Rev. 8):
+> Dieser Bericht ist geprüft konform — er plant **keinen** nationalen
+> 100-m-Vollraster-Lauf als Prüf-/Abgleichinstrument; POLLEN_LOAD (OSM-Vegetation, §3.3) und Zensusband u20 (§3.2) sind als „neu anzulegen“ spezifiziert und werden von /integriere-risiko verpflichtend angelegt (§3.1-Anlagepflicht); alle übrigen Zellgrößen sind vorhanden oder regional/national (keine Zellgröße auf unspezifiziertem Neutral-Fallback).
+
 > **Revisionsstand.** Rev. 1 = Migration des #96-Anteils von M0 Rev. 5
 > (`docs/render/METHODIK_M0_GESUNDHEIT.html`, Kap. 3) in das §4-Format **plus** Abarbeitung
 > der #96-relevanten Befunde aus `reviews/Gegenpruefung_Rev5_Befundliste.md`

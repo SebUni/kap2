@@ -165,8 +165,9 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "= 1,3/1,4498 = 0,90 (Band 0,3–1,4). Wirkt mittelwertzentriert "
                       "1+β·(q_1P − q̄) nur in den Bändern 65+ und nur auf die Mortalität "
                       "(für Einweisungen keine Evidenz — Bericht #95 §3.3, Log 28). "
-                      "Zellwert q_1P: Zensus-Haushaltsgitter, bei Integration nicht "
-                      "verfügbar → Zelle rechnet mit q̄ (Faktor 1, kalibrierneutral).",
+                      "Zellwert q_1P: Ebene SINGLE_HH_SHARE_65P ist GEPARKT (keine "
+                      "offene Zellquelle, §3.1-Watchlist) → Zelle rechnet mit q̄ "
+                      "(Faktor 1, kalibrierneutral).",
      "source_refs": ["Semenza_1996_Chicago",
                      "Destatis_Mikrozensus_2023_Einpersonenhaushalte"]},
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_pfl", "value": 1.54,
@@ -178,9 +179,10 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "Übersetzung β = (3,0−1)/[1+0,149·2,0] = 1,54 (Band 1,0–2,9; "
                       "Stützen Bouchama 2007, Klenk 2010). Wirkt mittelwertzentriert "
                       "1+β·(q_pfl − q̄) nur im Band 85+ und nur auf die Mortalität "
-                      "(Gegenevidenz für Einweisungen). Zellwert q_pfl: OSM-Pflege"
-                      "einrichtungen × Pflegestatistik, bei Integration nicht verfügbar "
-                      "→ Zelle rechnet mit q̄ (Faktor 1, kalibrierneutral).",
+                      "(Gegenevidenz für Einweisungen). Zellwert q_pfl: Ebene "
+                      "CARE_HOME_SHARE_85P (OSM-Pflegeeinrichtungen, kommunen-"
+                      "erwartungstreu auf q̄ normiert — Rev. 8 §3.6); Kommunen ohne "
+                      "OSM-Heim rechnen mit q̄ (Faktor 1, kalibrierneutral).",
      "source_refs": ["Fouillet_2006_Frankreich", "Destatis_Pflegestatistik_2023",
                      "Bouchama_2007_Meta", "Klenk_2010_Heime"]},
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "qbar_1p", "value": 0.346,
@@ -231,15 +233,19 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_detail": "Verlorene Lebensjahre je Sterbefall im Band 75–84 (Stützstelle "
                       "e(80), m/w bevölkerungsgewichtet; Bericht #95 §3.5).",
      "source_refs": ["Destatis_Sterbetafeln_2022_2024"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "life_years_a85p", "value": 5.44,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "life_years_a85p", "value": 4.16,
      "label": "Restlebenserwartung 85+", "unit": "Jahre",
-     "source": "Destatis Sterbetafeln 2022/2024, e(85)/e(90)/e(95) gewichtet",
-     "source_detail": "Bevölkerungsgewichtet über e(85), e(90), e(95): männlich 4,97, "
-                      "weiblich 5,69, kombiniert (990.292 M / 1.853.921 F) = 5,44 "
-                      "(Band 4,9–5,44: Perioden-Approximation mit Bevölkerungs- statt "
-                      "Sterbefallgewichten überschätzt um ~0,3–0,5 Jahre — Bericht #95 "
-                      "§3.5, Befund 22; Golden-Test beispiel_95_basisraten).",
-     "source_refs": ["Destatis_Sterbetafeln_2022_2024"]},
+     "source": "Sterbetafeln 2022/2024 × Sterbefälle 2023 (exakt; Bericht #95 Rev. 8)",
+     "source_detail": "EXAKT sterbefallgewichtet (Rev. 8, löst Befund 22): reale "
+                      "Sterbefälle 2023 nach Einzelaltersjahren 85–94 × e(x); 95+-Rest "
+                      "mit tafelintern gewichtetem ē(95+); m/w mit Sterbefällen "
+                      "kombiniert (161.178 M / 259.771 F) = 4,16 (Band [4,16, 4,20]: "
+                      "Obergrenze mit e(95)-Stützstelle). Ersetzt den Rev.-7-Wert 5,44 "
+                      "(Bevölkerungsgewichte + Untergrenzen-Stützstellen — beide Fehler "
+                      "wirkten aufwärts). Reproduzierbar: backend/scripts/kalibrierung/"
+                      "l85_sterbefallgewichtung.py; Golden-Test beispiel_95_basisraten.",
+     "source_refs": ["Destatis_Sterbetafeln_2022_2024",
+                     "Destatis_Sterbefaelle_Altersgruppen"]},
 
     # ── Hitzemorbidität (Rev. 7: F = Σ_a pop_a · r_0,a/100k · max(0, 1+e_HD·(HD−HD_ref))) ─
     {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "r0_u65", "value": 1.9,

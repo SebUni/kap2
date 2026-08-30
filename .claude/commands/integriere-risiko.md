@@ -36,8 +36,13 @@ Bericht es verlangt, und dokumentiere die Abweichung.
 Die Formeln aus Kap. 3 implementieren — ausschließlich gegen Registry-Parameter (keine
 hartkodierten Zahlen), inklusive Aggregation Zelle → Kommune, nativer Ergebnisgröße und
 Teil-Ausweisen. Schicht-A-Index getrennt (nie Screening-Normierung auf €-Pfaden). Als „neu
-anzulegen" gekennzeichnete Ebenen (Kartenebenen, Struktur-Ebenen) anlegen; Ergebnis-Layer als
-Raten (je 1.000 EW / je ha) gemäß §3.6.
+anzulegen" gekennzeichnete Ebenen (Kartenebenen, Struktur-Ebenen, **Modifikator-Zellgrößen**)
+**verpflichtend anlegen** (§3.1-Anlagepflicht) — ein Neutral-Fallback ist nur für Ebenen
+zulässig, die der Bericht ausdrücklich als „geparkt (Datenquelle fehlt)" mit
+Beschaffungs-Watchlist führt; das Verifikationsergebnis kommt als ein Satz in den Bericht.
+Ergebnis-Layer als Raten (je 1.000 EW / je ha) gemäß §3.6. **Ressourcen-Regel (§3.4):**
+kein Integrationsschritt darf einen nationalen 100-m-Vollraster-Lauf erfordern oder
+einplanen; Abgleiche laufen auf Bundesland-/Gemeindepunkt-/Stichproben-Ebene.
 
 ## 4 · Tests aus dem Bericht generieren
 

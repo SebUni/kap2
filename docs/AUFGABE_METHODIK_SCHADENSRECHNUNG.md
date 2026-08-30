@@ -1,7 +1,15 @@
 # Aufgabenbeschreibung: Methodik zur Schadensrechnung von Klimarisiken — v2 (konsolidiert)
 
 Stand: 25.08.2026 · **Einzige Instruktionsquelle** für Herleitung, Review und Integration von
-Risiko-Methodiken. v2 konsolidiert die Aufgabenbeschreibung v1 (22.08.2026) und
+Risiko-Methodiken.
+
+> **Fortschreibung 30.08.2026 (Nutzer-Entscheid, aus der #95-Integration):**
+> (1) §3.4 **Ressourcen-Regel** — nationale 100-m-Vollraster-Läufe („Zell-Läufe")
+> dürfen nie Prüf-, Abnahme- oder Abgleichvoraussetzung einer Methodik sein;
+> (2) §3.1 **Datenebenen-Anlagepflicht** — fehlt eine benötigte Zellgröße im
+> Produkt, spezifiziert der Bericht die neue Ebene vollständig und
+> `/integriere-risiko` legt sie an (oder parkt sie mit Beschaffungs-Watchlist,
+> wenn keine offene Quelle existiert). v2 konsolidiert die Aufgabenbeschreibung v1 (22.08.2026) und
 `docs/METHODIK_GRUNDSAETZE.md` (G1–G14) **inklusive der Review-Fortschreibungen aus der
 M0-Gegenprüfung** (Kalibrierfaktor-Regel ex G1/G5, G14-Geltungsbereich, G11-Begründung).
 `METHODIK_GRUNDSAETZE.md` entfällt; die Datei bleibt nur als Ein-Zeilen-Verweis hierher bestehen.
@@ -163,6 +171,15 @@ G12 → 3.4 (Verteilungsprüfung) · G13 → 3.2 (Kein-Doppelkanal) · G14 → 3
 - Jede Größe trägt: Schadensbaum-Knoten, Datenquelle, Auflösung, Beschaffungsweg (offen, keyless),
   Kennzeichnung „vorhanden / neu anzulegen / geparkt"; Proxies als Proxies (auch: Durchschnitts-
   Kostensätze für spezifische Fallmixe).
+- **Datenebenen-Anlagepflicht (Fortschreibung 30.08.2026):** Braucht eine Formel eine
+  Zellgröße, die das Produkt nicht führt, spezifiziert der Bericht die neue Datenebene
+  **vollständig** (Quelle, Beschaffungsweg keyless, Zell-Ableitungsregel, Fallback,
+  Normierung/Zentrierung) und kennzeichnet sie „neu anzulegen" — `/integriere-risiko`
+  **legt sie an**; ein dauerhafter Neutral-Fallback ohne spezifizierte Ebene ist
+  unzulässig. Existiert nachweislich keine offene Quelle, wird die Ebene als
+  „**geparkt** (Datenquelle fehlt)" mit Beschaffungs-Watchlist geführt und der
+  Parameter läuft dokumentiert auf dem Zentrierungs-Neutralwert (Bundesmittel ⇒
+  Faktor 1) — nie still.
 - **Bottom-up-Grundsatz:** Bundes-/Landesstatistik wird **nie** zur räumlichen Verteilung benutzt.
   Lackmustest: *Eine Kommune ohne lokalen Treiber muss ~0 erhalten* (keine Flussaue → keine
   Flutopfer, kein Hitzesignal → keine Hitzetoten).
@@ -227,6 +244,15 @@ G12 → 3.4 (Verteilungsprüfung) · G13 → 3.2 (Kein-Doppelkanal) · G14 → 3
 - **Kalibriermodell = Produktionsmodell.** Faktoren aus Näherungsläufen (gröbere Auflösung, ohne
   Teilmodelle) sind unzulässig, sobald das Produktionsmodell konvexe Wirkungsfunktionen oder
   bevölkerungsgewichtete Exposition hat — sonst brennt der Näherungsfehler ins Produkt ein.
+- **Ressourcen-Regel (Fortschreibung 30.08.2026):** Kalibrierung, Validierung und jeder
+  Abgleich müssen **ohne nationalen 100-m-Vollraster-Lauf** auskommen — ein solcher
+  „Zell-Lauf" darf in keiner Methodik als Prüfstein, Abnahmevoraussetzung oder
+  „finaler Abgleich" geplant werden (Rechenressourcen; das Produkt rechnet Zellen je
+  Kommune on-demand). Zulässige Auflösungen für Kalibrier-/Prüfläufe: Bundesland-,
+  Gemeinde-/Gemeindepunkt- und **kommunale Stichproben**-Ebene (ausgewählte Kommunen
+  mit dem Produktionsmodell, z. B. dokumentierte Anker-Kommunen). Restfehler unterhalb
+  der Kalibrier-Auflösung werden quantifiziert abgeschätzt und als dokumentierte
+  Näherung geführt (§3.9), nicht auf einen Vollraster-Lauf vertagt.
 - Anker-Zeitreihe mit Revisionsstand; laufende/vorläufige Jahre gesondert (nicht ins
   Kalibrier-Mittel); Sensitivität ohne vorläufige Werte ausweisen.
 - **Kalibrierung ist kein Verteilungsnachweis:** mindestens eine unabhängige Prüfung auf der

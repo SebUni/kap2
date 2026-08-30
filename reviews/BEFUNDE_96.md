@@ -125,3 +125,10 @@ bestanden. Entscheidungslog: Log 12 (aktualisiert) plausibel, Alternative (Verh�
 | Nr | Stelle | Art | Befund & Begründung | Vorschlag | Kat. | Status |
 |---|---|---|---|---|---|---|
 | 114 | Quelle [51], YAML `pollen.l_saison`, Zeichentabelle L_B/L_G; Ledger Befund 111 | Widerspruch (Rest) — **Teilumsetzung Befund 111** (zuvor 107) | Die Kennzeichnung aus Befund 111 ist nur in §3.5 eingebaut: die Quellenzeile [51] lautet weiterhin wörtlich „(Saisonkriterien/**-längen** Birke, Gräser)" — exakt die von 111 monierte, als Direktwerte lesbare Annotation — und widerspricht jetzt **intern** dem neuen §3.5-Satz „die Quelle definiert das Kriterium (Pollenschwellen), publiziert aber keine festen Längenwerte"; der Parameter-Block `pollen.l_saison` trägt (anders als `pollen.p_sens_gruppen`) keinen Abschätzungs-Kommentar, die Zeichentabellen-Zeile L_B/L_G keinen Abschätzungs-Vermerk (beide nur via `herleitung:#d-saison` gedeckt). Wirkung 0 (kein Zahlenwert betroffen); reine Traceability | [51]-Zeile auf „(definiert das EAACI-Saisonkriterium; Längenwerte = gekennzeichnete Abschätzung §3.5)" ändern; im YAML-Band-Kommentar und der Zeichentabellen-Zeile „gekennzeichnete Abschätzung (§3.5)" ergänzen | C |**übernommen** — Quelle [51] präzisiert (Kriterium, keine Längenwerte); YAML `pollen.l_saison` und Zeichentabellen-Zeile mit Abschätzungs-Kennzeichnung |
+
+## Fortschreibungs-Konformität (30.08.2026)
+
+Prüfung gegen die Aufgaben-Fortschreibung vom 30.08.2026 (§3.4-Ressourcen-Regel:
+kein nationaler Vollraster-Lauf; §3.1-Datenebenen-Anlagepflicht): Bericht #96
+**konform** — Konformitätsvermerk im Berichtskopf ergänzt (redaktionell, keine
+Modellwert-Änderung; kein Review-Loop erforderlich). Kern: POLLEN_LOAD (OSM-Vegetation, §3.3) und Zensusband u20 (§3.2) sind als „neu anzulegen“ spezifiziert und werden von /integriere-risiko verpflichtend angelegt (§3.1-Anlagepflicht); alle übrigen Zellgrößen sind vorhanden oder regional/national (keine Zellgröße auf unspezifiziertem Neutral-Fallback).

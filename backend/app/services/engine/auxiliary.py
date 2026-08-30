@@ -171,6 +171,9 @@ def build_auxiliary(ci: dict, regional: dict) -> dict[str, float | None]:
         "POPULATION_65_74": _age_band(ci, "a65_74"),
         "POPULATION_75_84": _age_band(ci, "a75_84"),
         "POPULATION_85_PLUS": _age_band(ci, "a85p"),
+        # None = Kommune ohne OSM-Pflegeeinrichtungen (v_vers rechnet dann mit
+        # dem Bundesmittel q̄ — Faktor 1; Methodik #95 §3.6).
+        "CARE_HOME_SHARE_85P": ci.get("share_care_home_85p"),
     }
 
     for code in catalog.AUXILIARY_BY_CODE:

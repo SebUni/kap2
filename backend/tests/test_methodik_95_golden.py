@@ -76,7 +76,7 @@ def test_registry_matches_report_parameters():
                      ("baseline_mort_a75_84", 4812.3), ("baseline_mort_a85p", 14800.2)):
         assert _spec(MORT, key)["value"] == val
     for key, val in (("life_years_u65", 23.39), ("life_years_a65_74", 15.59),
-                     ("life_years_a75_84", 8.90), ("life_years_a85p", 5.44)):
+                     ("life_years_a75_84", 8.90), ("life_years_a85p", 4.16)):
         assert _spec(MORT, key)["value"] == val
     assert _spec(MORT, "beta_iso")["value"] == 0.90
     assert _spec(MORT, "beta_pfl")["value"] == 1.54
@@ -195,3 +195,74 @@ def test_measure_hap_marginal_effect():
 if __name__ == "__main__":
     import pytest
     sys.exit(pytest.main([__file__, "-q"]))
+
+
+# ── 4. Producer-Test der Ebene CARE_HOME_SHARE_85P (Rev. 8 §3.6; Befund 93) ──
+
+def _mk_cells_and_inputs():
+    """Drei Zellen mit Mittelpunkts-Koordinaten (grid_service-Konvention: +50)."""
+    from pyproj import Transformer
+    tr = Transformer.from_crs(3035, 4326, always_xy=True)
+    cells, cis = [], []
+    # Zelle 0: Heimstandort, pop85 = 20 · Zelle 1: pop85 = 80 · Zelle 2: pop85 = 0
+    for i, p85 in enumerate((20.0, 80.0, 0.0)):
+        x0, y0 = 4_300_000 + i * 100, 3_000_000
+        cells.append({"x_3035": x0 + 50, "y_3035": y0 + 50})
+        cis.append({"pop": 100.0, "pop_age_bands": {"u65": 50.0, "a65_74": 0.0,
+                                                    "a75_84": 0.0, "a85p": p85}})
+    # Heim-Punkt exakt im Mittelpunkt von Zelle 0 (Minimalreproduktion Befund 93)
+    lon, lat = tr.transform(4_300_050.0, 3_000_050.0)
+    return cells, cis, lon, lat
+
+
+def test_care_home_share_producer_expectation_true():
+    """Producer (inputs.apply_care_home_share): Zellzuordnung trifft die
+    Mittelpunkts-Konvention (Befund 93), Verteilung ist kommunen-erwartungstreu
+    auf q̄_pfl und Zellen mit pop_85+ = 0 bleiben außen vor (§3.6)."""
+    from shapely.geometry import Point
+
+    from app.services.engine import override_context
+    from app.services.engine.inputs import apply_care_home_share
+
+    override_context.set_overrides({})
+    cells, cis, lon, lat = _mk_cells_and_inputs()
+    infra = {"care_home_geoms": [{"geometry": Point(lon, lat)}]}
+    apply_care_home_share(cis, cells, infra)
+
+    # Zelle 0 trägt das gesamte Heim-Gewicht: Bewohner = q̄·(20+80) = 14,9
+    # → share = min(1, 14,9/20) = 0,745; Zelle 1 explizit 0 (Kommune HAT Heimdaten);
+    # Zelle 2 (pop85 = 0) bekommt keinen Wert.
+    assert abs(cis[0]["share_care_home_85p"] - 0.745) < 1e-6, cis[0]
+    assert cis[1]["share_care_home_85p"] == 0.0
+    assert "share_care_home_85p" not in cis[2]
+    # Erwartungstreue (vor Kappung): Σ share·pop85 = q̄ · Σ pop85
+    got = sum((ci.get("share_care_home_85p") or 0.0)
+              * ci["pop_age_bands"]["a85p"] for ci in cis)
+    assert abs(got - 0.149 * 100.0) < 1e-6
+
+
+def test_care_home_share_cap_binds():
+    """Kappung min(1, ·) bindend (Befund 94): kleine 85+-Zelle mit Heim → exakt 1,0."""
+    from shapely.geometry import Point
+
+    from app.services.engine import override_context
+    from app.services.engine.inputs import apply_care_home_share
+
+    override_context.set_overrides({})
+    cells, cis, lon, lat = _mk_cells_and_inputs()
+    cis[0]["pop_age_bands"]["a85p"] = 5.0   # Bewohner 0,149·85 = 12,7 > 5 → Kappung
+    apply_care_home_share(cis, cells, {"care_home_geoms": [{"geometry": Point(lon, lat)}]})
+    assert cis[0]["share_care_home_85p"] == 1.0
+    # Kappungs-Verlust ist der dokumentierte Restfehler: Σ share·pop85 < q̄·Σpop85.
+    got = sum((ci.get("share_care_home_85p") or 0.0)
+              * ci["pop_age_bands"]["a85p"] for ci in cis)
+    assert got < 0.149 * 85.0
+
+
+def test_care_home_share_no_osm_leaves_fallback():
+    """Kommune ohne OSM-Heim: Schlüssel bleibt ungesetzt → v_vers rechnet mit q̄."""
+    from app.services.engine.inputs import apply_care_home_share
+
+    cells, cis, _, _ = _mk_cells_and_inputs()
+    apply_care_home_share(cis, cells, {"care_home_geoms": []})
+    assert all("share_care_home_85p" not in ci for ci in cis)
