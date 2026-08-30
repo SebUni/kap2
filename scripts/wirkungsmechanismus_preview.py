@@ -358,8 +358,9 @@ def build_payload(nr: str) -> dict:
         from app.data import catalog
         params = parameter_registry.catalog_parameters()
         tabs = []
-        for code, label in (("EXPECTED_ANNUAL_MORTALITY", "Mortalität (YLL)"),
-                            ("EXPECTED_ANNUAL_MORBIDITY", "Erkrankungen")):
+        for code, label in (
+                ("EXPECTED_ANNUAL_MORTALITY", "Mortalität (Produktstand: Todesfälle/Jahr)"),
+                ("EXPECTED_ANNUAL_MORBIDITY", "Erkrankungen")):
             if code in catalog.RISKS_BY_CODE:
                 tabs.append({
                     "label": label,
@@ -368,8 +369,14 @@ def build_payload(nr: str) -> dict:
                 })
         return {
             "title": "#95 Hitzebelastung",
-            "subtitle": "Integrierter Produktstand — Graphen und Parameter kommen "
-                        "direkt aus Backend-Registry und Lineage-Builder.",
+            "subtitle": "Ist-Produktstand — Graphen und Parameter kommen direkt aus "
+                        "Backend-Registry und Lineage-Builder.",
+            "banner": "Achtung, dokumentierte Divergenz (Ledger-Befund 76): Das Produkt "
+                      "rechnet noch den Vor-Rev.-6-Stand — native Größe Todesfälle/Jahr "
+                      "statt YLL × VOLY, Rev.-5-Altersfaktoren, Gauß-Verteilung statt "
+                      "empirischer Wochenquantile, Kalibrierfaktor 1,44 statt 0,742. "
+                      "/integriere-risiko 95 stellt auf den abgenommenen Bericht Rev. 6 "
+                      "um und schließt den Befund.",
             "generated": today,
             "tabs": tabs,
         }
