@@ -11,6 +11,16 @@ Pipeline: pandoc (Markdown → HTML, KaTeX aus `frontend/node_modules`) → Play
 (HTML → A4-PDF). Stil: `scripts/methodik_report.css` (angelehnt an
 `docs/render/METHODIK_M0_GESUNDHEIT.html`); Druck-Treiber: `scripts/html_to_pdf.py`.
 
+Das Skript erzeugt anschließend automatisch die **Wirkungsmechanismus-Vorschau**
+`docs/methodik/<slug>_wirkungsmechanismus.html` (`scripts/wirkungsmechanismus_preview.py`):
+eine eigenständige HTML-Datei, die das echte Produkt-Wirkungsdiagramm (KAP3,
+`LineageFlowDiagram`) rendert — für integrierte Risiken direkt aus Backend/Registry, für
+noch nicht integrierte aus dem im Bericht hergeleiteten Modell (Banner kennzeichnet das).
+Melde auch diesen Pfad. Für ein neues Risiko ohne Vorschau-Definition erscheint nur ein
+Hinweis — dann im Generator einen Graph-Builder ergänzen. Frontend-Bundle:
+`frontend/vite.preview.config.ts` (baut automatisch, falls `frontend/preview-dist/` fehlt;
+nach Änderungen an Diagramm-Komponenten einmal neu bauen).
+
 Fehlerbehandlung:
 
 - **Abhängigkeiten fehlen:** melde den fehlenden Baustein samt Installationsbefehl

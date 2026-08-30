@@ -70,3 +70,4 @@ TODO.md
 
 # Local Claude Code permissions (user-specific)
 .claude/settings.local.json
+frontend/preview-dist/

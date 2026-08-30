@@ -51,3 +51,11 @@ pandoc "$MD" -o "$TMP/report.html" \
 "$PY" "$ROOT/scripts/html_to_pdf.py" "$TMP/report.html" "$OUT"
 
 echo "PDF erzeugt: $OUT"
+
+# Wirkungsmechanismus-Vorschau (Produkt-Diagramm, KAP3-Look) neben dem PDF erzeugen.
+# Nutzt das Repo-venv (Backend-Importe); bei Risiken ohne Vorschau-Definition nur Hinweis.
+NR="$(basename "$MD" | cut -d_ -f1)"
+PREVIEW_PY="$ROOT/.venv/bin/python"
+[[ -x "$PREVIEW_PY" ]] || PREVIEW_PY="python3"
+"$PREVIEW_PY" "$ROOT/scripts/wirkungsmechanismus_preview.py" "$NR" || \
+  echo "WARNUNG: Wirkungsmechanismus-Vorschau fehlgeschlagen (PDF ist unabhängig davon erzeugt)." >&2
