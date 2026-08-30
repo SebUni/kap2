@@ -259,7 +259,10 @@ const NETWORK_OPTIONS: Options = {
   physics: { enabled: false },
   interaction: {
     zoomView: false,
-    dragView: true,
+    // Panning läuft wie der Zoom als eigener Pointer-Handler auf dem Wrap
+    // (handleCanvasPan): das native dragView greift nicht zuverlässig, sobald
+    // Overlays/Einbettungen im Spiel sind, und pannt nie über den Kacheln.
+    dragView: false,
     dragNodes: false,
     hover: true,
     tooltipDelay: 300,
@@ -438,6 +441,86 @@ export default function LineageFlowDiagram({
     })
   }, [])
 
+  // Eigenes Panning (analog zum eigenen Wheel-Zoom): Ziehen auf dem Canvas
+  // verschiebt die Ansicht — auch wenn der Zug über einer Parameter-/Operator-
+  // Kachel beginnt. Interaktive Elemente (Buttons/Inputs der Overlays) bleiben
+  // ausgenommen; Klicks (< 4 px Bewegung) erreichen weiterhin vis-network.
+  const panStateRef = useRef<{
+    startX: number
+    startY: number
+    viewX: number
+    viewY: number
+    moved: boolean
+  } | null>(null)
+
+  const suppressClickRef = useRef(false)
+
+  const handlePanDown = useCallback((e: PointerEvent) => {
+    if (e.button !== 0) return
+    const target = e.target as HTMLElement | null
+    // Nur Texteingaben ausnehmen (Drag = Textselektion); Buttons/Kacheln dürfen
+    // Pan-Startpunkt sein — der Klick wird nach echtem Zug unterdrückt (s. u.).
+    if (target?.closest('input, select, textarea')) return
+    const net = networkRef.current
+    if (!net) return
+    const view = net.getViewPosition()
+    panStateRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      viewX: view.x,
+      viewY: view.y,
+      moved: false,
+    }
+  }, [])
+
+  const handlePanMove = useCallback((e: PointerEvent) => {
+    const st = panStateRef.current
+    const net = networkRef.current
+    const wrap = canvasWrapRef.current
+    if (!st || !net || !wrap) return
+    const dx = e.clientX - st.startX
+    const dy = e.clientY - st.startY
+    if (!st.moved && Math.abs(dx) + Math.abs(dy) < 4) return
+    if (!st.moved) {
+      st.moved = true
+      wrap.classList.add('is-panning')
+      try {
+        wrap.setPointerCapture(e.pointerId)
+      } catch {
+        /* Capture ist Komfort, kein Muss */
+      }
+    }
+    e.preventDefault()
+    const scale = net.getScale() || 1
+    net.moveTo({
+      position: { x: st.viewX - dx / scale, y: st.viewY - dy / scale },
+      animation: false,
+    })
+  }, [])
+
+  const handlePanEnd = useCallback((e: PointerEvent) => {
+    const wrap = canvasWrapRef.current
+    if (panStateRef.current?.moved && wrap) {
+      // Nach echtem Zug den nachlaufenden Klick schlucken, sonst öffnete ein
+      // Pan, der auf einer Kachel begann, deren Edit-Popover.
+      suppressClickRef.current = true
+      wrap.classList.remove('is-panning')
+      try {
+        wrap.releasePointerCapture(e.pointerId)
+      } catch {
+        /* s. o. */
+      }
+    }
+    panStateRef.current = null
+  }, [])
+
+  const handleClickCapture = useCallback((e: MouseEvent) => {
+    if (!suppressClickRef.current) return
+    suppressClickRef.current = false
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
   const fitRevision = useMemo(
     () => `${lineage.nodes.length}|${lineage.edges.length}`,
     [lineage.nodes.length, lineage.edges.length],
@@ -516,8 +599,21 @@ export default function LineageFlowDiagram({
     const wrap = canvasWrapRef.current
     if (!wrap) return
     wrap.addEventListener('wheel', handleCanvasWheel, { passive: false })
-    return () => wrap.removeEventListener('wheel', handleCanvasWheel)
-  }, [handleCanvasWheel, networkReady])
+    wrap.addEventListener('pointerdown', handlePanDown)
+    wrap.addEventListener('pointermove', handlePanMove)
+    wrap.addEventListener('pointerup', handlePanEnd)
+    wrap.addEventListener('pointercancel', handlePanEnd)
+    wrap.addEventListener('click', handleClickCapture, { capture: true })
+    return () => {
+      wrap.removeEventListener('wheel', handleCanvasWheel)
+      wrap.removeEventListener('pointerdown', handlePanDown)
+      wrap.removeEventListener('pointermove', handlePanMove)
+      wrap.removeEventListener('pointerup', handlePanEnd)
+      wrap.removeEventListener('pointercancel', handlePanEnd)
+      wrap.removeEventListener('click', handleClickCapture, { capture: true })
+    }
+  }, [handleCanvasWheel, handlePanDown, handlePanMove, handlePanEnd,
+      handleClickCapture, networkReady])
 
   useEffect(() => {
     if (!networkReady) return

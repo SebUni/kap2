@@ -33,11 +33,23 @@ declare global {
   }
 }
 
+// Vorschau nutzt die volle Bildschirmhöhe/-breite (Produkt-CSS begrenzt das
+// Diagramm auf 560 px — hier bewusst übersteuert, nur im Preview-Scope).
+const PREVIEW_CSS = `
+  .wm-preview .kap-lineage-canvas-wrap {
+    height: calc(100vh - 235px);
+    max-height: none;
+    min-height: 480px;
+  }
+  body { background: var(--bg, #f8fafc); }
+`
+
 function PreviewApp({ payload }: { payload: PreviewPayload }) {
   const [active, setActive] = useState(0)
   const tab = payload.tabs[active]
   return (
-    <div style={{ maxWidth: 1400, margin: '0 auto', padding: '16px 20px 32px' }}>
+    <div className="wm-preview" style={{ margin: '0 auto', padding: '12px 18px 24px' }}>
+      <style>{PREVIEW_CSS}</style>
       <header style={{ marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
           <h1 style={{ fontSize: '1.25rem', margin: 0 }}>{payload.title}</h1>
