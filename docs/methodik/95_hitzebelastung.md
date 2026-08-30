@@ -1,18 +1,26 @@
 # Methodik-Bericht #95 — Hitzebelastung
 
-Status: **Rev. 6 (Autor-Revision nach Gegenprüfung Rev. 5; Review-Runde 1 eingearbeitet)
-— im Review** · 26.08.2026 ·
+Status: **Rev. 7 (Kalibrier-Revision: bevölkerungsgewichtete Kalibrierbasis +
+Süd-ERF-Nachschätzung; Kalibrier-Prüfstein 12/16 bestanden, auch in der
+Voll-Holdout-Variante) — ABNAHMEREIF (Null-Runde: Review Runde 5; Befunde 77–85
+behoben)** · 30.08.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 95-A** (RKI-Expositions-Wirkungs-Funktion, bottom-up; Entscheidungslog Nr. 1)
 
-> **Revisionsstand.** Rev. 6 = Migration des #95-Anteils von M0 Rev. 5
+> **Revisionsstand.** Rev. 7 = Auflösung der §6-Eskalation aus Rev. 6 (Kalibrier-
+> Prüfstein) über die in §4 benannte keyless Messung — bevölkerungsgewichtete
+> Kalibrier-Zeitreihen (Gemeindepunkt × Zensus-Bevölkerung) statt Flächenmittel — plus
+> Holdout-Nachschätzung der Süd-ERF; Entscheidungslog Nr. 31–33. Rev. 6 = Migration des
+> #95-Anteils von M0 Rev. 5
 > (`docs/render/METHODIK_M0_GESUNDHEIT.html`) in das §4-Format **plus** Abarbeitung der
 > Befunde aus `reviews/Gegenpruefung_Rev5_Befundliste.md`; Status je Befund in
 > `reviews/BEFUNDE_95.md`. Diese Markdown-Datei ist die Quelle für #95 (§2.7).
 > Alle Ermessensentscheidungen im **Entscheidungslog** (Ende der Datei).
 > Anlagen: `backend/scripts/kalibrierung/` (Rev. 5: `calibrate_heat_mortality.py`,
-> Rev. 6: `calibrate_heat_mortality_rev6.py`) + `backend/data/kalibrierung/`
-> (`c_kal_rev6_ergebnis.md`, `c_kal_rev6_verteilung.csv`, `wochenquantile_region.csv`).
+> Rev. 6: `calibrate_heat_mortality_rev6.py`, Rev. 7: `calibrate_heat_mortality_rev7.py`)
+> + `backend/data/kalibrierung/` (`c_kal_rev7_ergebnis.md`, `c_kal_rev7_verteilung.csv`,
+> `sommermittel_bundesland_povw.csv`, `temperatur_offsets_bundesland.csv`,
+> `wochenquantile_region.csv`; Rev.-6-Stände bleiben zur Reproduzierbarkeit).
 
 ## 1 Wirkungskette & Knoten-Bilanz (§2.1)
 
@@ -171,7 +179,10 @@ Befund 60i): Winklmayr Abb. 3 publiziert Kurven, keine Steigungszahlen. Ableseke
 relatives Risiko der 85+-Kurve bei 25 °C Wochenmittel je Region (2012–2021): RR ≈ 1,40
 (Nord) / 1,35 (Mitte) / 1,25 (Süd); mit \(\beta = \ln(\text{RR})/(25 - T_0)\):
 Nord \(\ln 1{,}40/5{,}3 = 0{,}0634\) · Mitte \(\ln 1{,}35/4{,}8 = 0{,}0625\) ·
-Süd \(\ln 1{,}25/4{,}2 = 0{,}0531\) K⁻¹.
+Süd \(\ln 1{,}25/4{,}2 = 0{,}0531\) K⁻¹. **Rev. 7:** Der Süd-Wert ist per
+Holdout-Nachschätzung modellintern auf \(0{,}0531 \times 1{,}65 = \mathbf{0{,}0876}\)
+K⁻¹ angehoben (Verfahren, Identifikation und Band in §4, Anker `#beta-sued`;
+Nord/Mitte unverändert — Basiswerte der Formeln sind 0,0634/0,0625/0,0876).
 
 ```python test: beispiel_95_beta_ablesekette
 # beta = ln(RR bei 25 °C) / (25 - T0) je Region (Anker #beta-erf)
@@ -397,8 +408,7 @@ Perioden-Approximation mit Band.
 |---|---|---|---|
 | \(a\) | Altersband u65 · 65–74 · 75–84 · 85+ | — | Zensus-Altersbänder |
 | \(c_{\text{Fall}}\) | Behandlungskostensatz je Fall (**Proxy**: Ø aller KH-Fälle) | €₂₀₂₄ | 7.152 = 6.996 €₂₀₂₃ × 119,3/116,7 [17,19]; register:95-E02-02 |
-| \(c_{\text{kal}}\) | Kalibrierfaktor, **ein nationaler Skalar** (§3.4; Herleitung §4) = Fit \(c_{\text{fit}}\) 0,905 (Fenster 2012–2024) × zentrale Befund-1-Korrektur 0,82 | — | **0,742** (Band 0,70–0,79; obere Sensitivität 0,905 unkorrigiert; Vollreihe-Fit 1,042, inkl. vorl. 2025: 1,029); herleitung:#c-kal [50] |
-| \(c_{\text{reg}}\) | befristete regionale Übergangsfaktoren für den Produktausweis (§4; §3.4-Übergangsregel, Ablauf: Zell-Kalibrierlauf bei Integration), inkl. ×0,82-Korrektur | — | Norden 0,690 · Osten 0,721 · Westen 0,873 · Süden 1,636 (Fit: 0,841/0,879/1,064/1,995; RKI-4-Zuschnitt, einheitl. Signifikanzfilter); herleitung:#c-kal |
+| \(c_{\text{kal}}\) | Kalibrierfaktor, **ein nationaler Skalar** (§3.4; Herleitung §4) — Fit auf bevölkerungsgewichteten Reihen, keine Pauschalkorrektur | — | **0,581** (Fenster 2012–2024, in-sample; Sensitivitäten: ohne Süd-Nachschätzung 0,661, Vollreihe 0,660, inkl. vorl. 2025 0,651, Voll-Holdout 0,567 → Prüfstein ebenfalls 12/16); herleitung:#c-kal, #t-povw [50] |
 | \(D_a\) | hitzebedingte Todesfälle der Zelle im Band \(a\) (Teil-Ausweis) | 1/Jahr | berechnet |
 | \(e_{\text{HD}}\) | rel. Mehr-Einweisungen je Hitzetag (> 30 °C), **konditional** | 1/Tag | 0,024 (Band 0,024–0,061; unkond. 0,054), K&Z Tab. 1 [18,62]; register:95-E02-02; Log 19 |
 | \(f_a\) | Altersfaktor der RR-Steigung rel. zu 85+ | — | 0,357 / 0,588 / 0,631 / 1,0 — Rückrechnung §3.3a (lineare Näherung, gekennzeichnet); herleitung:#f-a |
@@ -418,7 +428,7 @@ Perioden-Approximation mit Band.
 | \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | 160.800 (Band 136,4–165,6 T€; Herleitung §3.5 [19]); herleitung:#voly |
 | \(\text{YLL}_{\text{Zelle}}\) | verlorene Lebensjahre — **nativer Ausweis** | Jahre/Jahr | Ergebnis |
 | \((x)_+,\ \mathbb{1}\) | Positivteil \(\max(0,x)\); Band-Indikator | — | Notation |
-| \(\beta_a,\ \beta_{85+,\text{Region}}\) | RR-Steigung je Band; Basiswert 85+ je Region | K⁻¹ | 0,0634 / 0,0625 / 0,0531 (N/M/S) [11]; register:95-E02-01 |
+| \(\beta_a,\ \beta_{85+,\text{Region}}\) | RR-Steigung je Band; Basiswert 85+ je Region (Süd: Rev.-7-Nachschätzung) | K⁻¹ | **0,0634 / 0,0625 / 0,0876** (N/M/S; Süd = 0,0531 [11] × 1,65, Band 1,45–1,85); register:95-E02-01; herleitung:#beta-sued |
 | \(\beta_d\) | Distanz-Effekt — **Sensitivitätsband, nicht im Basiswert** (Log 20) | 1/km | ≈ 0,001 (0–0,002) [38]; register:95-R36-01; Hilfsfrist [39] nur Screening |
 | \(\beta_{\text{iso}}\) | Isolations-Effekt, OR-übersetzt: \((\text{OR}-1)/[1+\bar q(\text{OR}-1)]\); nur D-Pfad, Bänder 65+ | — | (2,3−1)/[1+0,346·1,3] = **0,90** (Band 0,3–1,4 = Übersetzung eines OR-Bands ≈ 1,4–3,7 — KI-Approximation, gekennzeichnete Abschätzung §3.9) [40,63]; register:95-S152-02 |
 | \(\beta_{\text{pfl}}\) | Pflegeheim-Effekt (nur Band 85+, nur D-Pfad) | — | (3,0−1)/[1+0,149·2,0] = **1,54** (Band 1,0–2,9); Kette §3.3b [41,44,60,61]; register:95-S153-01 |
@@ -455,75 +465,115 @@ jeweiligen Fensters — 13 bzw. 26 Jahre, Einzeljahre in `c_kal_rev6_ergebnis.md
 Prädiktionsgrenze > 0. Kommunale Zusatz-Anker: Hessen 2018 ≈ 920 / Berlin 2018 ≈ 460
 (85+: 260–320 je 100.000 [14]) [11–14].
 
-**Kalibrierlauf Rev. 6** (Skript `calibrate_heat_mortality_rev6.py`, Ergebnis
-`c_kal_rev6_ergebnis.md` [50]; neue \(f_a\), Näherungslauf Bundesland-Ebene):
+**Kalibrierbasis Rev. 7 — bevölkerungsgewichtete Sommermittel** (Anker `#t-povw`;
+Auflösung der Befund-1-Hauptkomponente ohne Zell-Lauf): Die Kalibrier-Zeitreihen sind ab
+Rev. 7 **bevölkerungsgewichtete** Sommermitteltemperaturen je Bundesland und Jahr —
+DWD-CDC-JJA-Raster (1 km) am Repräsentanzpunkt jeder der **10.853** Gemeinden mit
+Zensus-2022-Bevölkerung [65, 66] (96 VG250-Gemeinden ohne Zensus-Eintrag übersprungen; Daten-Pins
+im Ergebnis-MD: `zensus_gemeinde.json` sha256 `124fd7a7a15b`, `DE_VG250.gpkg` sha256
+`f229550c8018`) (Skript `calibrate_heat_mortality_rev7.py`, Anlagen
+`sommermittel_bundesland_povw.csv`, `temperatur_offsets_bundesland.csv` [50]). Damit ist
+die dominante Näherungsfehler-Komponente des Rev.-6-Laufs (Bevölkerung wohnt wärmer als
+das Landes-Flächenmittel) **direkt gemessen statt pauschal korrigiert** — die
+×0,82-Zentralkorrektur und ihr Band entfallen. Gemessene Offsets (bevölkerungsgewichtet −
+Flächenmittel, Ø 1992–2024): **Deutschland +0,53 K**; stark heterogen (Hessen +1,05 ·
+BW +0,84 · Berlin +0,85 · BY +0,57 · MV +0,01 K) — die Rev.-6-Abschätzung (+0,2…+0,4 K)
+war zu niedrig, genau wie der Kovarianz-Vorbehalt (Befund 67) vermutete.
+**Verbleibender dokumentierter Rest** (Fortschreibungsvermerk Zell-Lauf, nicht mehr
+abnahmerelevant): UHI-Feinstruktur unterhalb der Gemeinde — Konvexitätsbeitrag als
+**Modellrechnung gegen die weiterhin gesetzte** Streuung σ = 0,5 K: ×1,023–1,024
+(mittelwerttreu; σ-Abschätzung wie in Rev. 6 aus der ±1-K-Spanne der Zellabweichungen um
+das Gebietsmittel, Gleichverteilungsannahme ⇒ σ ≈ 2/√12 ≈ 0,5 K — **keine Messung**;
+der Messpfad „σ aus dem Stadtmodell" gehört zum Zell-Lauf) — sowie intra-kommunale
+Bevölkerungsgewichtung.
 
-- **Fit: ein nationaler Skalar \(c_{\text{fit}}\) = 0,905** — Kleinste Quadrate durch den
-  Ursprung, **Fenster 2012–2024** (13 signifikante Jahre; R² = 0,64; 8/13 Jahre im RKI-PI).
-  Begründung der Fensterwahl (Befund 21, empirisch): Die \(\beta\) stammen aus der Dekade
-  2012–2021; der **zeitliche Holdout** (Befund 19: Fit 1992–2015 → \(c\) = 1,300; Prüfung
-  2016–2024) trifft out-of-sample nur 2/9 Jahre im PI und überschätzt systematisch
-  (+17…+161 %) — die Vollreihe extrapoliert die heutige ERF-Ära schlecht; für den Ausweis
-  „erwarteter Jahresschaden heute" ist das Fenster die sachgerechte Basis. Sensitivitäten:
-  Vollreihe 1992–2024: 1,042 (obere Sensitivität, R² 0,56); inkl. vorläufigem 2025: 1,029
-  (Befund 24: Wirkung des vorläufigen Werts −1,2 %).
-- **Kalibriermodell ≠ Produktionsmodell** (Befund 1, quantifiziert; Befund 62, Korrektur im
-  Ausweis): Der Näherungslauf (Landes-Flächenmittel, ohne UHI-Feinstruktur) unterschätzt die
-  Modellsumme, weil (a) sich Bevölkerung in wärmeren Lagen konzentriert (+0,2…+0,4 K
-  bevölkerungsgewichtet → Modellsumme ×1,11–1,26) und (b) die mittelwerttreue UHI-Streuung
-  über die konvexe ERF die Summe hebt (σ = 0,5 K → ×1,03). **Eingangsgrößen der Korrektur —
-  gekennzeichnete Abschätzungen (§3.9; Befund 69):** (a) Offset +0,2…+0,4 K: DE-Bevölkerung
-  lebt zu ≈ 77 % städtisch (Weltbank-Indikator „urban population % of total", DE ≈ 77,8 %,
-  data.worldbank.org — Größenordnungs-Stütze); sommerliche UHI-Intensität im Saisonmittel (24-h, Stadtmodell
-  §3.1) ≈ 0,3–0,5 K über dem Umland-Flächenmittel ⇒ Offset ≈ 0,77 × (0,3–0,5) ≈ 0,2–0,4 K.
-  (b) σ_UHI = 0,5 K: aus der Feinstruktur-Spanne des §3.1-Beispiels (±1 K um das
-  1-km-Mittel; ≈ Spanne/√12 ≈ 0,5 K); der Konvexitätsbeitrag ist mit ×1,03 klein (Fehler
-  zweiter Ordnung). Beide Größen sind mit vorhandenen keyless Daten **messbar**
-  (DWD-CDC-Sommermittel am Kommune-Zentroid × Einwohner; σ aus dem implementierten
-  Stadtmodell) — Messung als Teil des Zell-Laufs (Ablaufdatum unten); die
-  Ergebnis-Sensitivität ist das ausgewiesene Band 0,70–0,79. (c) **Regionalannahme:** Der
-  Bias ist urbanisierungsabhängig (Stadtstaaten > Flächenländer); die einheitliche
-  ×0,82-Skalierung der \(c_{\text{reg}}\) ist eine dokumentierte Annahme, die der Zell-Lauf
-  regional auflöst. \(c_{\text{fit}}\) ist damit um ca. 15–30 % überhöht.
-  **Die Korrektur wird zentral angewendet** (Log 30 — Konsequenz aus
-  „konservativ = unterschätzend" und der Untergrenzen-Zusage des Infokastens):
-  **\(c_{\text{kal}} = c_{\text{fit}} \times 0{,}82 = 0{,}742\)** (Band 0,70–0,79 aus dem
-  Korrekturband ×0,77–0,87; obere Sensitivität 0,905 unkorrigiert). Die Rev.-5-Kennzeichnung
-  „Näherung konservativ" war falschherum. Fortschreibungsvermerk: Kalibrierlauf mit dem
-  Zellmodell (Bundeslauf-Infrastruktur der Lite-Karte) **bei Integration — Ablaufdatum der
-  Näherung**; er ersetzt Fit und Korrektur zugleich.
-- **Verteilungsprüfung** (RKI-4-Zuschnitt, diagnostisch; einheitlicher Signifikanzfilter
-  BL-PI > 0, Befund 47): Mit einem Skalar bleibt eine Nord-Süd-Schieflage (regionale
-  Diagnose-Faktoren Fenster: Norden 0,841 · Osten 0,879 · Westen 1,064 · **Süden 1,995**;
-  Vollreihe: 0,886/1,101/1,235/1,907). §3.4-konforme Konsequenz: **nicht** die Kalibrierung
-  regionalisieren, sondern die **Wirkungsfunktion regional nachschätzen** — nach dem
-  Zell-Lauf (vorher würde der Befund-1-Bias in die ERF eingebrannt; Reihenfolge Log 26).
-  Für den **Produktausweis bis dahin**: \(c_{\text{reg}}\) als **dokumentierte, befristete
-  Übergangslösung** (§3.4-Übergangsregel; Fortschreibungsvermerk, Ablauf: Zell-Kalibrierlauf)
-  — sonst wäre der Süden im Ausweis um Faktor ≈ 2 zu niedrig. Fit-Werte (Fenster):
-  0,841/0,879/1,064/1,995; **mit der zentralen Befund-1-Korrektur ×0,82** (gleicher
-  Näherungslauf, gleicher Bias): Norden **0,690** · Osten **0,721** · Westen **0,873** ·
-  Süden **1,636**.
-  Länder-Verhältnisse (Σ 2018/2019/2022, **mit den Fit-Faktoren vor ×0,82** — Befund 71;
-  mit den korrigierten \(c_{\text{reg}}\) wären es 10/16): 8/16 im Band 0,75–1,35;
-  Restausreißer physikalisch erklärt (HH/SH 2,4–2,6: kleine Fallzahlen, Küstenklima,
-  DWD-Kombi-Gebietsmittel; BY 2,0 vs. BW 1,1: Alpenvorland vs. Oberrheingraben — ein
-  Landesmittel kann das nicht auflösen, das Zellmodell schon). **Der Kalibrier-Prüfstein
-  (≥ 11/16 ohne Sonderfaktoren) ist mit dem Näherungsmodell nicht erfüllt** — Eskalation
-  gemäß §6: Modellentscheid „Zell-Lauf + regionale ERF-Nachschätzung" statt Nachkalibrierung;
-  Daten: `c_kal_rev6_verteilung.csv`.
-- **Validierung Altersverteilung** (Befund 20 — Ist-Ergebnis): modellierte Bandanteile
-  (Fenster 2012–2024): **6,2 / 12,7 / 24,8 / 56,3 %** vs. RKI 6,5 / 12,9 / 25,2 / 55,5 % —
-  alle Bänder < 1 Prozentpunkt Abweichung (Toleranz ±5 pp, vorab fixiert: bestanden).
-  Einschränkung: teilzirkulär, da \(f_a\) aus derselben RKI-Verteilung rückgerechnet ist
-  (§3.3a); unabhängige Achse daher zusätzlich:
-- **Zusatz-Anker** Berlin 2018, Band 85+ (Befund 64 — **teil-in-sample** gekennzeichnet:
-  \(c_{\text{reg}}\) Osten ist auf den Bundesland-Jahren inkl. Berlin 2018 gefittet;
-  unabhängig ist nur die 85+-Band-Aufteilung): Näherungsmodell mit Fit-Faktor Osten 0,879 =
-  **232 je 100.000**, mit nationalem Fit-Skalar 0,905 = **239** — gegen die RKI-Referenz
-  260–320 [14] leicht unterschätzend (−11 %). Die Befund-1-Korrektur gilt dem
-  Zellmodell-Transfer, nicht diesem Näherungsvergleich; das Zellmodell wird für Berlin
-  (starke UHI) über dem Näherungswert liegen.
+**Kalibrierlauf Rev. 7** (Ergebnis `c_kal_rev7_ergebnis.md` [50]; Produktionsnähe:
+Gemeindepunkt-Temperaturen aus derselben DWD-Rasterfamilie, die das Produkt je Zelle
+nutzt):
+
+- **Fit: ein nationaler Skalar \(c_{\text{kal}}\) = 0,581** (Anker `#c-kal`) — Kleinste
+  Quadrate durch den Ursprung, **Fenster 2012–2024** (13 signifikante Jahre; R² = 0,65;
+  8/13 Jahre im RKI-PI), mit nachgeschätzter Süd-ERF (s. u.). Das Fenster enthält die
+  Prüfjahre 2018/2019/2022 — der Niveau-Skalar selbst ist damit **in-sample** gefittet
+  (präzise Kennzeichnung, Befund 78; Voll-Holdout-Variante s. Verteilungsprüfung).
+  Sensitivitäten: ohne Süd-Nachschätzung 0,661; Vollreihe 1992–2024: 0,660; inkl.
+  vorläufigem 2025: **0,651** (povw-Reihe hierfür bis 2025 verlängert — 2025 bleibt
+  außerhalb der Basis; Befund 77); Voll-Holdout (Fenster ohne 2018/19/22): **0,567**.
+  **Band [0,55, 0,67]** — außenrundend aus der Stützen-Spanne 0,559–0,661: Untergrenze
+  aus dem \(s_{\text{Süd}}\)-Profil-Band (s_Süd = 1,85 → c = 0,559; 1,45 → 0,604),
+  Obergrenze aus ohne-Süd-/Vollreihen-Sensitivität (0,661/0,660); die Voll-Holdout-Stütze
+  0,567 liegt im Band (Befund 80). Begründung der
+  Fensterwahl unverändert (Befund 21, empirisch): der **zeitliche Holdout** (Fit
+  1992–2015 → Prüfung 2016–2024) trifft out-of-sample nur 2/9 Jahre im PI und überschätzt
+  systematisch (+7…+185 %) — die Vollreihe extrapoliert die heutige ERF-Ära schlecht.
+  Es gibt **keine Pauschalkorrektur und keine regionalen Übergangsfaktoren mehr** —
+  genau ein Skalar (§3.4).
+
+- **ERF-Nachschätzung Süd** (Anker `#beta-sued`; §3.4-konforme Antwort auf die
+  Rev.-6-Schieflage — „Wirkungsfunktion regional nachschätzen, nicht die Kalibrierung
+  regionalisieren"): Ein multiplikativer Skalar \(s_R\) auf \(\beta_{85+,R}\),
+  gefittet per Kleinste-Quadrate auf den Log-Verhältnissen der signifikanten
+  Bundesland-Jahre 2012–2024 **ohne die Validierungsjahre 2018/2019/2022** (Holdout).
+  **Identifikationsdiagnose** (Zielfunktionsprofile im Ergebnis-MD): Nord hat im Fit-Set
+  **0** signifikante Land-Jahre (Profil flach — nicht identifizierbar, bleibt 1,0);
+  Mitte-Optimum liegt exakt bei 1,0 (bleibt 1,0; 12 Beobachtungen); Süd ist mit 7
+  Beobachtungen klar identifiziert (parabolisches Minimum): \(s_{\text{Süd}}\) =
+  **1,65** (Profil-Band 1,45–1,85 — gekennzeichnete Bandregel nach §3.9, kein formales
+  Konfidenzintervall: Bandränder dort, wo die Fit-Zielfunktion höchstens +10 % über dem
+  Minimum liegt — Profilwerte 1,51 / 1,38 / 1,48 bei s = 1,45 / 1,65 / 1,85; die nächsten
+  Gitterpunkte 1,35 / 1,95 liegen mit +20 / +16 % klar darüber) ⇒
+  \(\beta_{85+,\text{Süd}} = 0{,}0531 \times 1{,}65 = \mathbf{0{,}0876}\) K⁻¹
+  (Nord/Mitte unverändert 0,0634/0,0625). Einordnung: Die Nachschätzung ist ein
+  **modellinterner** Parameter (ERF im Kontext bevölkerungsgewichteter Wochenmittel und
+  empirischer Quantile), keine Korrektur der Winklmayr-Kurve; der Ablesewert 0,0531
+  bleibt als Kettenstart dokumentiert (§3.3, Test `beispiel_95_beta_ablesekette`).
+  **Benannter Widerspruch (§3.8, Befund 79):** die Nachschätzung **kehrt die publizierte
+  Regionen-Rangfolge um** — bei Winklmayr ist Süd die flachste Kurve (0,0531;
+  Adaptions-Deutung), nachgeschätzt die mit Abstand steilste (0,0876; effektives RR bei
+  25 °C Wochenmittel ≈ 1,45 statt publiziert 1,25). Epidemiologisch ist das darum
+  **nicht** als korrigierte Süd-ERF lesbar, sondern nur als Kompensationsparameter für
+  Süd-spezifische Skalenstruktur (Topographie-Mischung kühler Voralpen- und warmer
+  Ballungsräume selbst im bevölkerungsgewichteten Landesmittel); der Zell-Lauf prüft,
+  welcher Anteil davon Topographie ist. Physikalische Deutung des BY/BW-Kontrasts
+  (Alpenvorland vs. Oberrheingraben) siehe Verteilungsprüfung.
+
+```python test: beispiel_95_beta_sued_nachschaetzung
+# Rev. 7: beta_85+,Sued = Winklmayr-Ablesewert x Nachschaetzungs-Skalar (Holdout-Fit, §4)
+assert abs(0.0531 * 1.65 - 0.0876) < 0.0001
+# Nord/Mitte unveraendert (Identifikation: Nord 0 Fit-Jahre, Mitte-Optimum 1,0)
+assert abs(0.0634 * 1.0 - 0.0634) < 1e-9 and abs(0.0625 * 1.0 - 0.0625) < 1e-9
+```
+
+- **Verteilungsprüfung / Kalibrier-Prüfstein — BESTANDEN** (Prüfgröße: Σ der Hitzejahre
+  2018/2019/2022; ein nationaler Skalar, einheitlicher Signifikanzfilter): **12/16 Länder
+  im Band 0,75–1,35** (Anforderung ≥ 11/16; Daten `c_kal_rev7_verteilung.csv`).
+  **Out-of-sample-Kennzeichnung präzise (Befund 78):** out-of-sample ist die
+  **Süd-Nachschätzung** (Fit-Jahre disjunkt von 2018/19/22); der Niveau-Skalar 0,581 ist
+  auf dem Fenster **einschließlich** der Prüfjahre gefittet. Die strenge
+  **Voll-Holdout-Variante** — auch der Niveau-Skalar ohne 2018/19/22 gefittet
+  (c = 0,567) — besteht den Prüfstein ebenfalls mit **12/16**; das Bestehen hängt damit
+  nicht an der In-Sample-Niveauwahl und ist in dieser Variante vollständig
+  out-of-sample belegt. Die vier Restausreißer sind
+  physikalisch erklärt: **SH 1,80 / HH 1,60** (kleine Fallzahlen, Küstenklima,
+  DWD-Kombi-Gebietsmittel — wie in Rev. 6), **BY 1,43** (Alpenvorland-Feinstruktur:
+  selbst das bevölkerungsgewichtete Landesmittel mischt kühle Voralpen- und warme
+  Ballungsräume — das löst erst das Zellmodell), **BB 1,42** (knapp; Berlin-Umland-
+  Pendlerstruktur). Die Rev.-6-Süd-Schieflage (Faktor ≈ 2) ist aufgelöst: BW 0,90 ✓.
+  Die regionalen Diagnose-Faktoren (0,66–0,77) dienen nur noch der Beobachtung — **kein
+  Produktausweis über Übergangsfaktoren mehr**.
+
+- **Validierung Altersverteilung** (Ist-Ergebnis, Fenster 2012–2024): modellierte
+  Bandanteile **6,3 / 12,6 / 24,7 / 56,4 %** vs. RKI 6,5 / 12,9 / 25,2 / 55,5 % — alle
+  Bänder < 1 Prozentpunkt Abweichung (Toleranz ±5 pp, vorab fixiert: **bestanden**).
+  Einschränkung unverändert: teilzirkulär (\(f_a\)-Rückrechnung), daher zusätzlich:
+
+- **Zusatz-Anker** Berlin 2018, Band 85+ (nationaler Skalar 0,581): Modell =
+  **221 je 100.000** gegen die RKI-Referenz 260–320 [14] — **unterschätzend (−15 %)**,
+  etwas stärker als in Rev. 6 (−11 %). Richtung erklärt und ehrlich ausgewiesen: der
+  Berlin-Gemeindepunkt trägt keine UHI-Feinstruktur; das Zellmodell wird für Berlin
+  (starke Wärmeinsel) über dem Gemeindepunkt-Wert liegen. Konsistent mit
+  „konservativ = unterschätzend".
+
 - **Anker Morbidität / Sanity-Band:** Untergrenze Destatis T67 (Ø 1.400–1.500/Jahr, 2003:
   2.600); Obergrenze K&Z ≈ +2.500 Einweisungen/Hitzetag (Größenordnung 20.000±/Jahr).
   Modell-Bundessumme: Baseline 83,456 Mio. × 3,54/100.000 ≈ **2.950 Fälle/Jahr**; in einem
@@ -535,14 +585,14 @@ Prädiktionsgrenze > 0. Kommunale Zusatz-Anker: Hessen 2018 ≈ 920 / Berlin 201
   über den HD-Term nur moduliert (HD = 0 → ×0,83) — dokumentierte Grenze §3.4, keine
   Verteilschlüssel-Logik (kein nationaler Topf wird verteilt; die Zellrate ist lokal
   definiert).
-- **Unsicherheiten:** Befund-1-Band (s. o.), σ-Schätzgüte (Stationsdichte), UHI-Modellgüte,
-  Skalentransfer Region→Zelle, \(\bar L_{85+}\)-Approximation (§3.5), Harvesting
-  (Jahresaggregat; RKI-Wochenmethodik robust). **Kovarianz-Vorbehalt** (Befund 67): Die
-  Kalibrierneutralität der zentrierten Modifikatoren gilt nur bei Unabhängigkeit von
-  \(v_{\text{vers}}\) und Hitze-Exzess; \(q_{\text{1P}}\)/Heimdichte korrelieren räumlich
-  mit UHI-Lagen — die Kovarianz hebt die Zellmodell-Summe zusätzlich und ist im
-  Befund-1-Band nicht enthalten (tendenzielle Unterschätzung des Näherungsfehlers); beim
-  Zell-Lauf mit ausweisen.
+- **Unsicherheiten:** Rest-Bias UHI-Feinstruktur (×1,02-Konvexität + intra-kommunale
+  Gewichtung; Zell-Lauf als finaler Abgleich bei Integration, Fortschreibungsvermerk);
+  \(s_{\text{Süd}}\)-Profil-Band 1,45–1,85 (⇒ \(c_{\text{kal}}\) 0,604–0,559, Gegenläufigkeit,
+  Bundessumme stabil); σ-Schätzgüte der Wochenquantile; Skalentransfer Region→Zelle;
+  \(\bar L_{85+}\)-Approximation (§3.5); Harvesting (Jahresaggregat). Der
+  Kovarianz-Vorbehalt (Befund 67) ist durch die direkte Messung der
+  Bevölkerungsgewichtung materiell aufgelöst; die verbleibende Kovarianz
+  (\(v_{\text{vers}}\) × UHI-Feinstruktur) wandert in den Rest-Bias.
 
 ## 5 Maßnahmen-Hebel (§2.5/§3.5)
 
@@ -596,7 +646,7 @@ Ist-Klima aus**; Szenariofähigkeit folgt mit der Klimaprojektions-Anbindung (St
    Wirkung, Sensitivität ausgewiesen.
 3. Skalentransfer: ERF auf Regions-Gebietsmitteln geschätzt, auf Zelltemperaturen
    angewendet; \(c_{\text{kal}}\) fängt das Niveau, nicht die Form.
-4. Kalibrier-Näherung: Befund-1-Korrekturband ×0,77–0,87 bis zum Zell-Lauf (§4).
+4. Kalibrier-Rest-Bias: UHI-Feinstruktur unterhalb der Gemeinde (Konvexität ×1,02, intra-kommunale Gewichtung) — Zell-Lauf als finaler Abgleich bei Integration (§4); Süd-ERF-Nachschätzung ist modellintern (Profil-Band 1,45–1,85).
 5. UHI-Modellgüte als gemeinsamer Treiber der #95-Feinstruktur; HD ohne UHI-Verschiebung
    (Unterschätzung der Morbidität in UHI-Lagen, §3.4).
 
@@ -641,11 +691,11 @@ parameter:
   endpunkt: mortalitaet
 parameter:
   id: heat.beta_85plus_region
-  wert: {nord: 0.0634, mitte: 0.0625, sued: 0.0531}
+  wert: {nord: 0.0634, mitte: 0.0625, sued: 0.0876}
   einheit: "1/K"
-  band: null
-  herkunft: register:95-E02-01
-  quelle: winklmayr2022
+  band: {sued: [0.0770, 0.0982]}   # Profil-Band s_Sued 1,45-1,85 (Bandregel +10 % Zielfunktion, Abschaetzung; §4 #beta-sued); Nord/Mitte Ablesekette
+  herkunft: register:95-E02-01   # Sued zusaetzlich herleitung:#beta-sued (Rev.-7-Nachschaetzung)
+  quelle: winklmayr2022_rev7_nachschaetzung
   preisstand: null
   bandzuordnung: [85+]
   endpunkt: mortalitaet
@@ -701,19 +751,9 @@ parameter:
   endpunkt: morbiditaet
 parameter:
   id: heat.c_kal
-  wert: 0.742   # = Fit 0,905 (Fenster 2012-2024) x zentrale Befund-1-Korrektur 0,82 (Log 30)
+  wert: 0.581   # Fit Fenster 2012-2024 auf bevoelkerungsgewichteten Reihen (Rev. 7, Log 31)
   einheit: "-"
-  band: [0.70, 0.905]   # Korrekturband x0,77-0,87; Obergrenze = unkorrigierter Fit
-  herkunft: herleitung:#c-kal
-  quelle: rki_eb19_2025
-  preisstand: null
-  bandzuordnung: [u65, 65-74, 75-84, 85+]
-  endpunkt: mortalitaet
-parameter:
-  id: heat.c_reg_uebergang
-  wert: {norden: 0.690, osten: 0.721, westen: 0.873, sueden: 1.636}
-  einheit: "-"
-  band: null   # befristete Uebergangsloesung (§3.4) inkl. x0,82; Ablauf: Zell-Kalibrierlauf
+  band: [0.55, 0.67]   # Herleitung §4 #c-kal, aussenrundend aus 0,559 (s_Sued=1,85) und 0,661 (ohne Sued); Voll-Holdout 0,567 im Band
   herkunft: herleitung:#c-kal
   quelle: rki_eb19_2025
   preisstand: null
@@ -900,9 +940,12 @@ DOI-Links die persistenten Referenzen.
 - **[49]** Destatis, Statistischer Bericht „Sterbefälle 2023", Tab. 12613-03 (Gestorbene
   nach Altersgruppen; M+F = 1.028.206), destatis.de ÷ Bevölkerung 31.12.2023 (83.456.045).
 - **[50]** Kalibrierläufe: `backend/scripts/kalibrierung/calibrate_heat_mortality.py`
-  (Rev. 5) und `calibrate_heat_mortality_rev6.py` (Rev. 6) + `backend/data/kalibrierung/`
-  (RKI-Anhang EB 19/2025, CC BY 4.0; DWD-Gebietsmittel; `c_kal_rev6_ergebnis.md`,
-  `c_kal_rev6_verteilung.csv`, `bundesland_validierung_*.csv`).
+  (Rev. 5), `calibrate_heat_mortality_rev6.py` (Rev. 6) und
+  `calibrate_heat_mortality_rev7.py` (Rev. 7: DWD-CDC-JJA-Raster 1 km [33] ×
+  VG250-Gemeindepunkte × Zensus-Gemeindebevölkerung) + `backend/data/kalibrierung/`
+  (RKI-Anhang EB 19/2025, CC BY 4.0; `c_kal_rev7_ergebnis.md`, `c_kal_rev7_verteilung.csv`,
+  `sommermittel_bundesland_povw.csv`, `temperatur_offsets_bundesland.csv`;
+  Rev.-6-Stände zur Reproduzierbarkeit).
 - **[60]** A. Fouillet u. a., Int Arch Occup Environ Health 80:16–24, 2006.
   doi:10.1007/s00420-006-0089-4, Tab. 2 (O/E nach Sterbeort: Heime 1,9 [1,7–2,1],
   Wohnung ≥ 75: 1,9, Kliniken 1,5).
@@ -919,6 +962,12 @@ DOI-Links die persistenten Referenzen.
   A Case-Crossover Study", Int J Environ Res Public Health 18(20):10697, 2021.
   doi:10.3390/ijerph182010697 (Flandern, 10 Heime 2013–2017; Mortalität OR 1,61 [1,10–2,37],
   Hospitalisierung OR 0,96 [0,67–1,36] n. s.).
+- **[65]** BKG, Verwaltungsgebiete 1:250.000 (VG250), GeoPackage `DE_VG250.gpkg`
+  (Repo-Bestand `backend/data/vg250/`, sha256-Pin s. §4 `#t-povw`), gdz.bkg.bund.de —
+  Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2-0), © GeoBasis-DE / BKG.
+- **[66]** Statistische Ämter des Bundes und der Länder, Zensus 2022 — Bevölkerung je
+  Gemeinde; Repo-Aufbereitung `backend/data/lite/zensus_gemeinde.json` (sha256-Pin
+  s. §4 `#t-povw`), zensus2022.de — dl-de/by-2-0.
 
 ## 9 Ansatz-Vergleich (§3.7 — erster Vertreter der Familie „K1-Gesundheit bottom-up")
 
@@ -937,16 +986,17 @@ hier die Entscheidungssubstanz (Parameter der Alternativen bis zur Quelle, §3.9
   bereits hat). Kriterien: ●● / ●● / ●● / ●●● / ●● / ●●● · Aufwand mittel.
 
 Begründung der Empfehlung: Die publizierte RKI-Kurve ist implementiert, empirisch kalibriert
-(Rev. 6: nationaler Skalar 0,742 = Fit 0,905 × Befund-1-Korrektur, Fenster 2012–2024;
-Übergangs-Regionalfaktoren §4) und über Altersverteilung + Berlin-Anker validiert — jeder
-andere Ansatz wäre ein Rückschritt.
+(Rev. 7: **ein** nationaler Skalar 0,581 auf bevölkerungsgewichteter Kalibrierbasis, ohne
+Pauschalkorrektur und ohne Regionalfaktoren; Kalibrier-Prüfstein 12/16 bestanden §4) und
+über Altersverteilung + Berlin-Anker validiert — jeder andere Ansatz wäre ein Rückschritt.
 Folge-Risiken der Familie erben diese Struktur (§2.6).
 
 ## Entscheidungslog
 
 Einträge 1–18: in M0 (Rev. 1–5) getroffene Setzungen (rückwirkend dokumentiert bei der
 Migration). Einträge 19–27: Rev.-6-Entscheidungen (`/risiko-auto`, Gate 1); Einträge 28–30:
-Revision nach Review-Runde 1 (Befunde 58/59/62).
+Revision nach Review-Runde 1 (Befunde 58/59/62); Einträge 31–33: Rev.-7-Kalibrier-Revision
+(Auflösung der §6-Eskalation, 30.08.2026).
 **Überstimmungsweg für alle Einträge:** „Entscheidung Nr. X ändern auf …" → Delta-Lauf
 (Neurechnung betroffener Kopplungen + Re-Review). ⚠ = Ermessensfall.
 
@@ -977,8 +1027,11 @@ Revision nach Review-Runde 1 (Befunde 58/59/62).
 | 23 ⚠ | Pflegeheim-OR? | **3,0** (Band 2,2–6,0), Kette §3.3b; \(\beta_{\text{pfl}}\) = 1,54, nur 85+, nur D-Pfad | reproduzierbare Kette (Befund 9); Bänder = Evidenz (Befunde 8/44); F-Gegenevidenz [64] (Befund 7) | 3,5 (Rev.-5-Wahl, Kette nicht reproduzierbar) | 85+-Spreizung ±23 % statt ±27 % |
 | 24 | \(\beta_{\text{pfl}}\)/\(\beta_d\) im F-Pfad? | **Default 1** (nur \(\beta_{\text{iso}}\) wirkt auf F) | Flandern-Studie: kein Hospitalisierungseffekt [64] | Rev.-5: volles \(v_{\text{vers}}\) auf F | F-Verteilung plausibler |
 | 25 ⚠ | HD-Datenquelle? | **DWD-CDC hot_days ohne UHI-Verschiebung** (Ist-Stand Produkt) | keine implementierte Umrechnungsregel; Rev.-5-Text beschrieb Nicht-Implementiertes (Befund 38) | UHI→hot_days-Regel definieren und implementieren (Fortschreibung) | Morbidität in UHI-Lagen Untergrenze |
-| 26 ⚠ | Kalibrierung: Skalar, Fenster, Regionen? | **ein nationaler Skalar (Fenster 2012–2024, ohne vorl. 2025; Fit 0,905 — Ausweiswert per Nr. 30 auf 0,742 korrigiert)**; \(c_{\text{reg}}\) nur als befristete Übergangslösung für den Produktausweis (Ablauf: Zell-Lauf); ERF-Nachschätzung erst **nach** dem Zell-Lauf | §3.4 („EIN Skalar"; Übergangsregel); Holdout belegt Fensterwahl empirisch (2/9 out-of-sample bei Vollreihen-Fit); ERF-Fit auf Näherungsdaten würde Befund-1-Bias einbrennen | Vollreihe 1,042 als Basis; sofortige 4-Regionen-ERF-Nachschätzung | Bundessumme −13 % ggü. Vollreihe; Süden im Ausweis ×2 via Übergangsfaktor |
+| 26 ⚠ | Kalibrierung: Skalar, Fenster, Regionen? | (Fensterwahl bleibt; Skalar-/Regionen-Teil **ersetzt durch Nr. 31–33**) ein nationaler Skalar, Fenster 2012–2024, ohne vorl. 2025 | §3.4; Holdout belegt Fensterwahl (2/9 out-of-sample bei Vollreihen-Fit) | Vollreihe als Basis | Fensterwahl unverändert in Rev. 7 |
 | 27 | (ersetzt durch Nr. 30 nach Review-Runde 1, Befund 62) | — | — | — | — |
 | 28 ⚠ | \(\beta_{\text{iso}}\) im F-Pfad? | **Default 1** — nur D-Pfad (Bänder 65+) | Semenza misst Todesfälle; für Einweisungen keine Evidenz (§3.2: unbelegte Modulatoren Default 1; Befund 58) | Morbiditätsevidenz nachtragen (Kandidat: Chicago-Einweisungsdaten) und Register-Zeile je Endpunkt trennen | F ohne Isolations-Spreizung |
 | 29 ⚠ | F-Formel: HD-Term? | **zweiseitig linear, bei 0 gedeckelt**: \(\max(0,\,1+e_{\text{HD}}(\text{HD}-\text{HD}_{\text{ref}}))\); Lackmustest-Aussage auf Mortalität eingeschränkt, Morbiditäts-Sockel als dokumentierte Grenze | behebt den Jensen-Rest des Positivteils (Befund 59b); Sockel = nicht-wetterlicher T67-Kern | Klimaanteil-Zerlegung des Sockels (hitzeproportionaler Anteil ≈ 0,51 aus #r0-a) — dokumentierte Fortschreibungsoption | Zellen unter HD_ref bis −17 %; keine Doppelzählung |
-| 30 ⚠ | Befund-1-Behandlung im Ausweis? | **Korrektur zentral angewendet**: \(c_{\text{kal}} = 0{,}905 × 0{,}82 = 0{,}742\) (Band 0,70–0,79; obere Sensitivität 0,905); \(c_{\text{reg}}\) konsistent ×0,82; Zell-Lauf ersetzt Fit + Korrektur (Ablaufdatum) | „konservativ = unterschätzend" + Infokasten-Zusage („nie kleiner") verlangen, die bekannte ~15–30-%-Überhöhung nicht in den Ausweis zu übernehmen (Befund 62) | nur als Unsicherheitsband ausweisen, Ausweis mit 0,905 (Rev.-6-Erstfassung, Nr. 27 — verworfen) | Mortalitäts-€ −18 % ggü. Erstfassung; Zell-Lauf hebt eher, als dass er senkt |
+| 30 ⚠ | Befund-1-Behandlung im Ausweis? | (**ersetzt durch Nr. 31**: die Pauschalkorrektur ×0,82 entfällt — die Bias-Komponente ist in Rev. 7 direkt gemessen) | Befund 62-Logik bleibt gültig, Umsetzung nun messungsbasiert | — | — |
+| 31 ⚠ | Kalibrierbasis Rev. 7? | **bevölkerungsgewichtete Sommermittel je Land** (DWD-JJA-Raster × Gemeindepunkt × Zensus-Bevölkerung; Skript rev7) statt Flächenmittel + Pauschalkorrektur | setzt die in §4 (Rev. 6) benannte keyless Messung um; löst die Befund-1-Hauptkomponente direkt (DE +0,53 K, regional heterogen); §6-Eskalation ohne Zell-Lauf auflösbar | Zell-Lauf sofort (braucht Produktionsimplementierung — Kausalschleife mit der Abnahme) | c_kal 0,742 → 0,581; Prüfstein-Basis |
+| 32 ⚠ | Regionale ERF-Nachschätzung? | **nur Süd**: \(s_{\text{Süd}}\) = 1,65 (Holdout-Fit ohne 2018/19/22; Profil-Band 1,45–1,85, Bandregel +10 % Zielfunktion) ⇒ \(\beta_{85+,\text{Süd}}\) = 0,0876 K⁻¹; Nord nicht identifizierbar (0 Fit-Jahre), Mitte-Optimum 1,0 | §3.4 („Wirkungsfunktion regional nachschätzen"); minimal-invasiv genau dort, wo Diagnose + Identifikation zusammenkommen; Einbrenn-Einwand aus Nr. 26 durch messungsbasierte Kalibrierbasis entkräftet | 3-Regionen-Nachschätzung (verworfen: Nord-Skalar läuft mangels Daten an den Gitterrand und zerstört die Nord-Prüfung) | Prüfstein 10/16 → **12/16 (bestanden)** |
+| 33 | Regionale Übergangsfaktoren? | **entfallen** — Produktausweis mit genau einem nationalen Skalar | Prüfstein mit einem Skalar bestanden; §3.4-Ideal erreicht | c_reg beibehalten (unnötig geworden) | Süden im Ausweis über \(\beta_{\text{Süd}}\) statt Faktor ×1,6 |

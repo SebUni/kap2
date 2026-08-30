@@ -350,7 +350,7 @@ def _graph_98() -> tuple[dict, list[dict]]:
 
 
 
-# ── #95 Hitzebelastung (Ziel-Modell laut Bericht Rev. 6) ─────────────────────
+# ── #95 Hitzebelastung (Ziel-Modell laut Bericht Rev. 7) ─────────────────────
 
 def _graph_95_plan() -> tuple[dict, list[dict]]:
     b = LineageBuilder()
@@ -421,7 +421,9 @@ def _graph_95_plan() -> tuple[dict, list[dict]]:
     P("heat.t0_region", "Wirkschwelle T₀ (N/M/S)", "19,7 / 20,2 / 20,8", "°C",
       "Winklmayr 2022", mul_ex)
     P("heat.beta_85plus_region", "ERF-Steigung β₈₅₊ (N/M/S)",
-      "0,0634 / 0,0625 / 0,0531", "1/K", "Winklmayr 2022 (Ablesekette §3.3)", mul_ex)
+      "0,0634 / 0,0625 / 0,0876", "1/K",
+      "Winklmayr 2022 (Ablesekette §3.3); Süd = 0,0531 × 1,65 "
+      "(Rev.-7-Nachschätzung, Holdout-Fit §4)", mul_ex)
     P("heat.f_alter", "Altersfaktoren f_a", "0,357 / 0,588 / 0,631 / 1,0", "—",
       "Rückrechnung Rev. 6 (§3.3a — ersetzt 0,404/0,577/0,62)", mul_ex)
     b.add_node("int:exzess", "intermediate", "Hitze-Exzess je Band (Jahressumme)",
@@ -456,10 +458,12 @@ def _graph_95_plan() -> tuple[dict, list[dict]]:
     P("heat.m_basissterberate", "Basissterberaten m_a",
       "213,2 / 1.737,9 / 4.812,3 / 14.800,2", "1/100.000·a",
       "Destatis 2023 (ersetzt 180/1.800/4.600/15.500)", mul_d)
-    P("heat.c_kal", "Kalibrierfaktor c_kal", 0.742, "—",
-      "RKI-Reihe, Fenster 2012–2024 × Befund-1-Korrektur (ersetzt 1,44)", mul_d,
-      "Ein nationaler Skalar (Band 0,70–0,79); c_reg nur befristeter "
-      "Übergangs-Ausweis (Bericht §4).")
+    P("heat.c_kal", "Kalibrierfaktor c_kal", 0.581, "—",
+      "RKI-Reihe, Fenster 2012–2024, Fit auf bevölkerungsgewichteten "
+      "Sommermitteln (Rev. 7; ersetzt 0,742)", mul_d,
+      "Genau ein nationaler Skalar (Band 0,55–0,66); Pauschalkorrektur und "
+      "c_reg-Übergangsfaktoren sind in Rev. 7 entfallen (Bericht §4, "
+      "Prüfstein 12/16).")
     b.add_node("int:d_faelle", "intermediate", "Hitzebedingte Todesfälle D (Teil-Ausweis)",
                column=4, collapse_group="intermediates",
                meta={"unit": "1/Jahr"})
@@ -526,10 +530,11 @@ def build_payload(nr: str) -> dict:
         from app.data import catalog
         g, p = _graph_95_plan()
         tabs = [{
-            "label": "Ziel-Modell (Bericht Rev. 6): YLL & €",
+            "label": "Ziel-Modell (Bericht Rev. 7): YLL & €",
             "note": "So wird #95 nach /integriere-risiko 95 im Produkt gerechnet und "
-                    "dargestellt (YLL × VOLY, empirische Wochenquantile, c_kal 0,742, "
-                    "neue Altersketten).",
+                    "dargestellt (YLL × VOLY, empirische Wochenquantile, ein nationaler "
+                    "Skalar c_kal 0,581 auf bevölkerungsgewichteter Kalibrierbasis, "
+                    "β_Süd nachgeschätzt 0,0876, neue Altersketten).",
             "lineage": g, "parameters": p,
         }]
         params = parameter_registry.catalog_parameters()
@@ -548,11 +553,11 @@ def build_payload(nr: str) -> dict:
                 })
         return {
             "title": "#95 Hitzebelastung",
-            "subtitle": "Ziel-Modell laut Methodik-Bericht Rev. 6 "
+            "subtitle": "Ziel-Modell laut Methodik-Bericht Rev. 7 "
                         "(docs/methodik/95_hitzebelastung.md); Ist-Produktstand als "
                         "Vergleichstabs.",
             "banner": "Der erste Tab zeigt das künftige Modell aus dem abgenommenen "
-                      "Bericht Rev. 6. Das Produkt rechnet bis zur Integration noch den "
+                      "Bericht Rev. 7. Das Produkt rechnet bis zur Integration noch den "
                       "alten Stand (Vergleichstabs; dokumentiert als Ledger-Befund 76) — "
                       "/integriere-risiko 95 gleicht beides ab und schließt den Befund.",
             "generated": today,
