@@ -46,7 +46,7 @@ def _heat_excess_weeks(ci: dict, regional: dict) -> float | None:
         return None
     region = health.region_for(regional.get("bundesland"))
     return round(health.heat_excess_weeks(
-        t, 2.0, 13, health.REGION_THRESHOLD[region]), 3)
+        t, region, health.REGION_THRESHOLD[region]), 3)
 
 
 def _heat_relative_risk(ci: dict, regional: dict) -> float | None:
@@ -60,7 +60,7 @@ def _heat_relative_risk(ci: dict, regional: dict) -> float | None:
     region = health.region_for(regional.get("bundesland"))
     thr = health.REGION_THRESHOLD[region]
     beta85 = health.REGION_BETA_85P[region]
-    temps = health.weekly_temperatures(t, 2.0, 13)
+    temps = health.weekly_temperatures(t, region)
 
     bands = ci.get("pop_age_bands")
     if not isinstance(bands, dict) or not sum(float(v or 0.0) for v in bands.values()):

@@ -27,28 +27,34 @@ from __future__ import annotations
 # Dtsch Arztebl Int 119:451-7), fortgeschrieben aus den RKI-Wochenberichten.
 # Nicht signifikante Jahre sind bewusst nicht enthalten — sie sind mit Null
 # verträglich und würden als „Messwerte“ missverstanden.
+# Revidierte Reihe (RKI Epid Bull 19/2025; Rev.-7-Integration): ausgeprägte
+# Hitzejahre der revidierten Jahresreihe 1992–2024 (Anlage
+# backend/data/kalibrierung/rki_eb19_2025_anhang_bundeslaender.xlsx).
 HEAT_DEATHS_BY_YEAR: dict[int, int] = {
-    1994: 10_100,
-    2003: 9_500,
-    2006: 7_500,
-    2010: 4_500,
-    2013: 3_000,
-    2015: 6_000,
-    2018: 8_700,
-    2019: 6_900,
+    1994: 10_200,
+    2003: 10_200,
+    2006: 7_700,
+    2010: 4_090,
+    2013: 3_500,
+    2015: 7_000,
+    2018: 8_500,
+    2019: 6_800,
     2020: 3_700,
+    2022: 4_500,
+    2023: 3_100,
+    2024: 2_800,
 }
 
-# Referenzband für die Kalibrierung: Mittel der signifikanten Hitzejahre.
+# Referenzband für die Kalibrierung: Mittel der ausgeprägten Hitzejahre.
 # Der nationale Modellsummenwert soll hier hineinfallen.
 HEAT_DEATHS_REFERENCE: dict = {
     "value": round(sum(HEAT_DEATHS_BY_YEAR.values()) / len(HEAT_DEATHS_BY_YEAR)),
-    "min": 3_000,
-    "max": 10_100,
+    "min": 2_800,
+    "max": 10_200,
     "unit": "Todesfälle/Jahr",
-    "period": "1992–2020 (signifikante Hitzejahre)",
+    "period": "1992–2024 (ausgeprägte Hitzejahre, revidierte RKI-Reihe)",
     "label": "Hitzebedingte Sterbefälle Deutschland",
-    "source_refs": ["Winklmayr_2022", "RKI_Hitzemortalitaet"],
+    "source_refs": ["RKI_EpidBull_19_2025", "Winklmayr_2022"],
 }
 
 # ── Altersverteilung der hitzebedingten Sterbefälle ───────────────────────────
@@ -130,10 +136,12 @@ STORM_DEATHS_REFERENCE: dict = {
 # Die 85+-Gruppe stellt rund 3 % der Bevölkerung, aber rund 55 % der Hitzetoten.
 # Werte: Destatis-Sterbefälle je 100.000 Einwohner der jeweiligen Altersgruppe.
 BASELINE_MORTALITY_PER_100K: dict[str, float] = {
-    "u65": 180.0,
-    "a65_74": 1_800.0,
-    "a75_84": 4_600.0,
-    "a85p": 15_500.0,
+    # Sterbefälle 2023 (Tab. 12613-03) ÷ Bevölkerung 31.12.2023 — Bericht #95
+    # §3.5 (Golden-Test beispiel_95_basisraten): 138.024/64.747.448 usw.
+    "u65": 213.2,
+    "a65_74": 1_737.9,
+    "a75_84": 4_812.3,
+    "a85p": 14_800.2,
 }
 BASELINE_MORTALITY_REFERENCE: dict = {
     "value": BASELINE_MORTALITY_PER_100K,

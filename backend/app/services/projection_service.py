@@ -56,7 +56,7 @@ def _erf_factors(mean_temps: list[float]) -> list[float]:
     thr, beta85 = H.REGION_THRESHOLD["mitte"], H.REGION_BETA_85P["mitte"]
 
     def deaths(summer_temp: float) -> float:
-        temps = H.weekly_temperatures(summer_temp, 2.0, 13)
+        temps = H.weekly_temperatures(summer_temp, "mitte")
         total = 0.0
         for band in H.AGE_BANDS:
             beta = beta85 * H.AGE_BETA_FACTOR[band]

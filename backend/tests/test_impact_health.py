@@ -100,21 +100,27 @@ def _ctx(pop=100_000.0, summer_temp=19.0, hd=20.0, flood_norm=0.3, vnorm=0.5,
 # ── (a) Handrechnung ───────────────────────────────────────────────────────────
 
 def test_mortality_matches_hand_calc():
+    """Rev. 7 (Bericht #95 §3.3/§3.5): YLL nativ, Todesfälle als Teil-Ausweis."""
     override_context.set_overrides({})
     ctx = _ctx(pop=100_000.0, summer_temp=19.0, vnorm=0.5)
     region = "mitte"
     thr, b85 = H.REGION_THRESHOLD[region], H.REGION_BETA_85P[region]
-    temps = H.weekly_temperatures(19.0, 2.0, 13)
-    expected = 0.0
+    temps = H.weekly_temperatures(19.0, region)
+    exp_deaths, exp_yll = 0.0, 0.0
     for band in H.AGE_BANDS:
         pop_a = _bands(100_000.0)[band]
         m_a = ghr.BASELINE_MORTALITY_PER_100K[band]
         beta = b85 * H.AGE_BETA_FACTOR[band]
         exc = sum(exp(beta * max(0.0, t - thr)) - 1.0 for t in temps)
-        expected += pop_a * (m_a / 100_000.0) * (1 / 52) * exc
-    expected *= 1.44 * 1.0   # calibration · Versorgungsmodifikator bei vnorm=0,5
-    got = impact.compute_all_cell_impacts(ctx)[MORT]["outcome"]
-    assert abs(got - expected) < 1e-6
+        # v_vers = 1 (keine Zellwerte für q_1P/q_pfl → Bundesmittel, §3.3)
+        d_a = 0.581 * pop_a * (m_a / 100_000.0) * (1 / 52) * exc
+        exp_deaths += d_a
+        exp_yll += d_a * H.AGE_LIFE_YEARS[band]
+    got = impact.compute_all_cell_impacts(ctx)[MORT]
+    assert abs(got["outcome"] - exp_yll) < 1e-6
+    assert abs(got["deaths"] - exp_deaths) < 1e-6
+    # €-Bewertung: YLL × VOLY (160.800 €₂₀₂₄)
+    assert abs(got["cost_eur"] - exp_yll * 160_800.0) < 1e-3
 
 
 # ── (b) Nationale Kalibrierung gegen die RKI-Jahresreihe ──────────────────────
@@ -128,8 +134,11 @@ def test_heat_mortality_national_sum_in_rki_band():
     Wirkungskurve ist konvex.
     """
     override_context.set_overrides({})
-    ctx = _ctx(pop=82_570_995.0, summer_temp=19.01, vnorm=0.5)
-    total = impact.compute_all_cell_impacts(ctx)[MORT]["outcome"]
+    # Rev. 7: bevölkerungsgewichtetes DE-Sommermittel = Flächenmittel + 0,53 K
+    # (gemessen, Bericht #95 §4 #t-povw) ≈ 19,08 °C. Geprüft wird der
+    # Todesfälle-Teil-Ausweis (das RKI-Band ist in Todesfällen definiert).
+    ctx = _ctx(pop=82_570_995.0, summer_temp=19.08, vnorm=0.5)
+    total = impact.compute_all_cell_impacts(ctx)[MORT]["deaths"]
     lo, hi = ghr.heat_deaths_reference_band()
     assert lo <= total <= hi, (
         f"Bundessumme {total:.0f} liegt außerhalb des RKI-Bands {lo:.0f}–{hi:.0f}")
@@ -145,7 +154,7 @@ def test_heat_mortality_age_distribution_matches_rki():
     override_context.set_overrides({})
     region = "mitte"
     thr, b85 = H.REGION_THRESHOLD[region], H.REGION_BETA_85P[region]
-    temps = H.weekly_temperatures(19.01, 2.0, 13)
+    temps = H.weekly_temperatures(19.08, region)
     bands = _bands(82_570_995.0)
     per = {}
     for band in H.AGE_BANDS:
@@ -153,10 +162,11 @@ def test_heat_mortality_age_distribution_matches_rki():
         exc = sum(exp(beta * max(0.0, t - thr)) - 1.0 for t in temps)
         per[band] = bands[band] * (ghr.BASELINE_MORTALITY_PER_100K[band] / 1e5) * (1 / 52) * exc
     total = sum(per.values())
+    # Toleranz ±5 Prozentpunkte — im Bericht #95 §4 vorab fixiert (Ist < 1 pp).
     for band, ref in ghr.HEAT_DEATH_AGE_SHARES.items():
         got = per[band] / total
-        assert abs(got - ref) < 0.03, (
-            f"{band}: Modell {got:.1%} vs. RKI {ref:.1%} — Abweichung > 3 Prozentpunkte")
+        assert abs(got - ref) < 0.05, (
+            f"{band}: Modell {got:.1%} vs. RKI {ref:.1%} — Abweichung > 5 Prozentpunkte")
 
 
 # ── (c) Schwellenwirkung / Nichtlinearität ────────────────────────────────────
@@ -191,10 +201,11 @@ def test_uhi_attributable_share_plausible():
     24-h-Zuschlag von rund 1,5–2 K liefert.
     """
     override_context.set_overrides({})
-    base_t, uhi = 19.01, 1.5
-    without = impact.compute_all_cell_impacts(_ctx(summer_temp=base_t))[MORT]["outcome"]
+    base_t, uhi = 19.08, 1.5
+    # Der Iungman-Anteil ist in TODESFÄLLEN definiert — Teil-Ausweis nutzen.
+    without = impact.compute_all_cell_impacts(_ctx(summer_temp=base_t))[MORT]["deaths"]
     with_uhi = impact.compute_all_cell_impacts(
-        _ctx(summer_temp=base_t + uhi))[MORT]["outcome"]
+        _ctx(summer_temp=base_t + uhi))[MORT]["deaths"]
 
     bands = _bands(100_000.0)
     summer_all = sum(bands[b] * ghr.BASELINE_MORTALITY_PER_100K[b] / 1e5
@@ -261,7 +272,8 @@ def test_registry_emits_impact_params():
         layer_code=MORT, layer_category="risks")
     ids = {p["id"] for p in params}
     for key in ("baseline_mort_a85p", "beta_85p_mitte", "threshold_mitte",
-                "weekly_temp_sd", "calibration"):
+                "calibration", "beta_iso", "beta_pfl", "qbar_1p", "qbar_pfl",
+                "life_years_a85p"):
         assert f"risks.{MORT}.impact.{key}" in ids, key
     beta = next(p for p in params if p["id"].endswith(".impact.beta_85p_mitte"))
     assert beta["editable"] is True
@@ -299,20 +311,51 @@ def test_call_site_defaults_match_registry_specs():
 def test_impact_param_override_changes_outcome():
     override_context.set_overrides({})
     base = impact.compute_all_cell_impacts(_ctx())[MORT]["outcome"]
-    override_context.set_overrides({f"risks.{MORT}.impact.calibration": 2.88})
+    override_context.set_overrides({f"risks.{MORT}.impact.calibration": 1.162})
     doubled = impact.compute_all_cell_impacts(_ctx())[MORT]["outcome"]
     override_context.set_overrides({})
     assert abs(doubled - 2.0 * base) < 1e-6
 
 
-def test_healthcare_modifier_scales_outcome():
-    """Der Versorgungsmodifikator wirkt — und ist der EINZIGE Zellmodifikator der
-    Mortalität. Die Demografie steckt in den Altersbändern, nicht mehr zusätzlich
-    in g(V̂) (behebt die Dreifachzählung, REVIEW_BERECHNUNGSLOGIK V-E)."""
+def test_v_vers_modifier_bandwise_and_centered():
+    """v_vers (Rev. 7, Bericht #95 §3.3): bandweise, mittelwertzentriert, nur D-Pfad.
+
+    Golden-Werte aus dem Bericht (beispiel_95_or_uebersetzungen): 85+-Zelle ohne
+    Heim ⇒ ×0,77; q_pfl = 0,30 ⇒ ×1,23. Ohne Zellwerte rechnet die Zelle mit dem
+    Bundesmittel (Faktor exakt 1) — und der frühere pauschale g(V̂)-Ersatz über
+    HEALTHCARE_ACCESS ist entfallen (vnorm darf die Mortalität nicht mehr ändern).
+    """
     override_context.set_overrides({})
+    base = impact.compute_all_cell_impacts(_ctx())[MORT]["outcome"]
+
+    # (1) Zentrierung: Zellwerte exakt auf Bundesmittel ⇒ identisches Ergebnis.
+    centered = impact.compute_all_cell_impacts(
+        _ctx(share_single_65p=0.346, share_care_home_85p=0.149))[MORT]["outcome"]
+    assert abs(centered - base) < 1e-9
+
+    # (2) 85+-Zelle ohne Heim: nur das 85+-Band skaliert mit 1 + 1,54·(0−0,149) = 0,77.
+    pop = 100_000.0
+    only85 = {"u65": 0.0, "a65_74": 0.0, "a75_84": 0.0, "a85p": pop * 0.03}
+    b0 = impact.compute_all_cell_impacts(
+        _ctx(pop_age_bands=only85))[MORT]["outcome"]
+    no_home = impact.compute_all_cell_impacts(
+        _ctx(pop_age_bands=only85, share_care_home_85p=0.0))[MORT]["outcome"]
+    many = impact.compute_all_cell_impacts(
+        _ctx(pop_age_bands=only85, share_care_home_85p=0.30))[MORT]["outcome"]
+    assert abs(no_home / b0 - (1 + 1.54 * (0.0 - 0.149))) < 0.005
+    assert abs(many / b0 - (1 + 1.54 * (0.30 - 0.149))) < 0.005
+
+    # (3) β_iso wirkt nicht auf u65 (Bandzuordnung 65+).
+    only_u65 = {"u65": pop, "a65_74": 0.0, "a75_84": 0.0, "a85p": 0.0}
+    u0 = impact.compute_all_cell_impacts(_ctx(pop_age_bands=only_u65))[MORT]["outcome"]
+    u1 = impact.compute_all_cell_impacts(
+        _ctx(pop_age_bands=only_u65, share_single_65p=0.9))[MORT]["outcome"]
+    assert abs(u1 - u0) < 1e-9
+
+    # (4) Kein pauschaler Versorgungsmodifikator mehr.
     low = impact.compute_all_cell_impacts(_ctx(vnorm=0.0))[MORT]["outcome"]
     high = impact.compute_all_cell_impacts(_ctx(vnorm=1.0))[MORT]["outcome"]
-    assert abs(high / low - 1.25 / 0.75) < 1e-6
+    assert abs(high - low) < 1e-9
 
 
 def test_region_thresholds_differ():

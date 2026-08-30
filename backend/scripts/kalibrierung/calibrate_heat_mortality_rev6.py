@@ -32,8 +32,14 @@ DATA = os.path.join(ROOT, "data", "kalibrierung")
 
 from calibrate_heat_mortality import RKI4_BY_BUNDESLAND, RKI_2025, _read, _rki  # noqa: E402
 from app.services.engine.impact.health import (  # noqa: E402
-    AGE_BANDS, REGION_BY_BUNDESLAND, REGION_BETA_85P, REGION_THRESHOLD,
+    AGE_BANDS, REGION_BY_BUNDESLAND, REGION_THRESHOLD,
 )
+
+# Winklmayr-ABLESEWERTE (Bericht #95 §3.3, Anker #beta-erf) — bewusst NICHT aus
+# health.py importiert: Das Produkt trägt seit der Rev.-7-Integration die
+# nachgeschätzte Süd-Steigung (0,0876 = 0,0531 × 1,65); die Kalibrierskripte
+# skalieren selbst (β = Ablesewert × s) und würden sonst doppelt skalieren.
+REGION_BETA_85P = {"nord": 0.0634, "mitte": 0.0625, "sued": 0.0531}
 
 BASELINE_MORTALITY_PER_100K = {"u65": 213.2, "a65_74": 1737.9, "a75_84": 4812.3, "a85p": 14800.2}
 RKI_AGE_SHARES = {"u65": 0.065, "a65_74": 0.129, "a75_84": 0.252, "a85p": 0.555}   # RKI 2026 [12]

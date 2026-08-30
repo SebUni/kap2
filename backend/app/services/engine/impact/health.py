@@ -11,6 +11,15 @@ Mittelwert ausgewertet: Das deutsche Sommermittel liegt bei rund 18,5 °C und da
 *unter* der Wirkschwelle — am Mittelwert ausgewertet käme fast überall null heraus.
 Die Todesfälle entstehen in den wenigen heißen Wochen.
 
+Stand: **Methodik-Bericht #95 Rev. 7** (docs/methodik/95_hitzebelastung.md,
+abgenommen; Integration schließt Ledger-Befund 76). Kernpunkte: empirische
+intra-saisonale Wochenquantile je Region statt Gauß-Annahme (§3.2); native
+Ergebnisgröße **YLL** (verlorene Lebensjahre) mit Todesfällen als Teil-Ausweis
+(§3.3/§3.5); mittelwertzentrierte, bandweise v_vers-Modifikatoren (β_iso 65+,
+β_pfl 85+; nur D-Pfad); ein nationaler Kalibrierskalar c_kal = 0,581 auf
+bevölkerungsgewichteter Kalibrierbasis (§4); Morbidität als altersgeschichtete
+Baseline × HD-Term (§3.4).
+
 **Flut und Sturm — selten, geclustert, tail-lastig.** Zu wenige Ereignisse für eine
 gefittete Kurve; Struktur daher ``Exposition × bedingte Letalität``, wobei die
 Letalität aus der Loss-of-Life-Literatur kommt und nur ein Skalierungsfaktor
@@ -29,7 +38,7 @@ eingetragen; ``compute_all_cell_impacts`` verteilt darauf, sonst auf
 
 from __future__ import annotations
 
-from math import exp, log, sqrt
+from math import exp
 
 from app.services.engine import risk_engine
 from app.services.engine.impact.base import CellContext, attributable_fraction
@@ -63,85 +72,92 @@ REGION_BY_BUNDESLAND: dict[str, str] = {
 # Wirkschwellen der Wochenmitteltemperatur je Region (°C), Winklmayr Abb. 3.
 REGION_THRESHOLD: dict[str, float] = {"nord": 19.7, "mitte": 20.2, "sued": 20.8}
 
-# Steigung der Kurve für das Band 85+ je Region (1/K), aus den publizierten
-# Expositions-Wirkungs-Kurven für 2012–2021: RR ≈ 1,4 (Nord) / 1,35 (Mitte) /
-# 1,25 (Süd) bei 25 °C, bezogen auf die jeweilige Schwelle.
-REGION_BETA_85P: dict[str, float] = {"nord": 0.0634, "mitte": 0.0625, "sued": 0.0531}
+# Steigung der Kurve für das Band 85+ je Region (1/K). Nord/Mitte: Ablesekette aus
+# den publizierten Kurven 2012–2021 (RR ≈ 1,4/1,35 bei 25 °C über der Schwelle).
+# Süd: Ablesewert 0,0531 × Nachschätzungs-Skalar 1,65 aus dem Rev.-7-Holdout-Fit
+# (Bericht #95 §4, Anker #beta-sued) — modellinterner Kompensationsparameter.
+REGION_BETA_85P: dict[str, float] = {"nord": 0.0634, "mitte": 0.0625, "sued": 0.0876}
 
 # Steigung der übrigen Altersbänder relativ zu 85+. NICHT frei gewählt, sondern
 # aus der publizierten Altersverteilung der hitzebedingten Sterbefälle
 # zurückgerechnet: Für kleine β·Δ gilt Todesfälle_a ∝ pop_a · m_a · β_a, also
-# β_a ∝ Anteil_a / (pop_a · m_a). Mit den RKI-Anteilen 2026 (6,5/12,9/25,2/55,5 %),
-# der Zensus-Altersstruktur und den altersspezifischen Basissterberaten ergeben
-# sich die folgenden Faktoren (Herleitung in germany_health_reference.py).
+# β_a ∝ Anteil_a / (pop_a · m_a). Mit den RKI-Anteilen 2026 (6,5/12,9/25,2/55,5 %)
+# und den Sterbefällen 2023 je Band (Bericht #95 §3.3a, Golden-Test
+# beispiel_95_fa_rueckrechnung).
 AGE_BETA_FACTOR: dict[str, float] = {
-    "u65": 0.404, "a65_74": 0.577, "a75_84": 0.620, "a85p": 1.0,
+    "u65": 0.357, "a65_74": 0.588, "a75_84": 0.631, "a85p": 1.0,
 }
 
 AGE_BANDS: tuple[str, ...] = ("u65", "a65_74", "a75_84", "a85p")
+
+# Restlebenserwartung je Band (Jahre je Sterbefall) — YLL-Bewertung nach
+# UBA MK 4.0 (Bericht #95 §3.5, Anker #l-a; Sterbetafeln 2022/2024).
+AGE_LIFE_YEARS: dict[str, float] = {
+    "u65": 23.39, "a65_74": 15.59, "a75_84": 8.90, "a85p": 5.44,
+}
+
+# Baseline-Einweisungsraten je Band (Fälle/100.000·Jahr) — Morbiditätspfad
+# (Bericht #95 §3.4, Anker #r0-a; bevölkerungsgewichtete Summe 3,54).
+AGE_MORBIDITY_R0: dict[str, float] = {
+    "u65": 1.9, "a65_74": 6.3, "a75_84": 10.8, "a85p": 15.6,
+}
 
 
 def region_for(bundesland: str | None) -> str:
     return REGION_BY_BUNDESLAND.get(bundesland or "", "mitte")
 
 
-def _norm_quantile(p: float) -> float:
-    """Standardnormal-Quantil (inverse CDF), Acklam-Approximation."""
-    p = min(max(p, 1e-9), 1 - 1e-9)
-    a = (-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
-         1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00)
-    b = (-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
-         6.680131188771972e+01, -1.328068155288572e+01)
-    c = (-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
-         -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00)
-    d = (7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
-         3.754408661907416e+00)
-    plow, phigh = 0.02425, 1 - 0.02425
-    if p < plow:
-        q = sqrt(-2 * log(p))
-        return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / \
-               ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)
-    if p > phigh:
-        q = sqrt(-2 * log(1 - p))
-        return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / \
-                ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)
-    q = p - 0.5
-    r = q * q
-    return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / \
-           (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1)
+# ── Wochenverteilung: empirische intra-saisonale Anomalie-Quantile (Rev. 7) ──
+# Gemessen aus 7 DWD-Stationen je Region × 30 Sommer (1991–2020), Quantile an
+# p_w = (w−0,5)/13 (Bericht #95 §3.2; Skript dwd_wochenquantile.py). Die
+# Konstanten sind die Berichtstabelle; liegt die gepinnte Anlage
+# ``wochenquantile_region.csv`` vor, werden deren (feiner aufgelöste) Werte
+# geladen — Kalibriermodell = Produktionsmodell (§3.4).
+_WEEK_ANOMALIES_REPORT: dict[str, tuple[float, ...]] = {
+    "nord": (-4.17, -2.81, -2.00, -1.45, -0.99, -0.50, 0.00,
+             0.42, 0.89, 1.54, 2.10, 2.83, 4.22),
+    "mitte": (-4.59, -3.04, -2.27, -1.64, -1.12, -0.57, -0.04,
+              0.51, 1.05, 1.65, 2.32, 3.16, 4.60),
+    "sued": (-4.67, -2.99, -2.23, -1.65, -1.11, -0.57, -0.03,
+             0.51, 1.12, 1.75, 2.36, 3.18, 4.46),
+}
 
 
-def weekly_temperatures(mean_temp: float, sd: float, n_weeks: int) -> list[float]:
-    """Wochenmitteltemperaturen der Sommerwochen als deterministische Quantile.
+def _load_week_anomalies() -> dict[str, tuple[float, ...]]:
+    import csv
+    import os
 
-    Die Wochenmittel des Sommers streuen um das Sommermittel ``mean_temp``. Statt
-    zu simulieren werden die ``n_weeks`` Quantile der Normalverteilung genommen —
-    reproduzierbar, ohne Zufall, und die oberen Quantile bilden genau die heißen
-    Wochen ab, aus denen die Sterbefälle stammen.
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..",
+                        "data", "kalibrierung", "wochenquantile_region.csv")
+    try:
+        rows: dict[str, dict[int, float]] = {}
+        with open(os.path.abspath(path), newline="") as fh:
+            for row in csv.DictReader(fh):
+                rows.setdefault(row["region"], {})[int(row["w"])] = float(row["q_w_emp"])
+        loaded = {r: tuple(v[w] for w in sorted(v)) for r, v in rows.items()}
+        if all(len(loaded.get(r, ())) == 13 for r in _WEEK_ANOMALIES_REPORT):
+            return loaded
+    except OSError:
+        pass
+    return _WEEK_ANOMALIES_REPORT
+
+
+REGION_WEEK_ANOMALIES: dict[str, tuple[float, ...]] = _load_week_anomalies()
+
+
+def weekly_temperatures(mean_temp: float, region: str) -> list[float]:
+    """Wochenmitteltemperaturen der 13 Sommerwochen: T_w = T̄ + q_w,Region.
+
+    Deterministisch und reproduzierbar (keine Simulation); die oberen Quantile
+    bilden genau die heißen Wochen ab, aus denen die Sterbefälle stammen.
     """
-    if n_weeks <= 0 or sd <= 0:
-        return [mean_temp] * max(0, n_weeks)
-    return [mean_temp + sd * _norm_quantile((k + 0.5) / n_weeks) for k in range(n_weeks)]
+    return [mean_temp + q for q in
+            REGION_WEEK_ANOMALIES.get(region, REGION_WEEK_ANOMALIES["mitte"])]
 
 
-def heat_excess_weeks(mean_temp: float, sd: float, n_weeks: int, threshold: float) -> float:
+def heat_excess_weeks(mean_temp: float, region: str, threshold: float) -> float:
     """Übertemperatur-Wochen (K·Wochen) über der Wirkschwelle."""
-    return sum(max(0.0, t - threshold) for t in weekly_temperatures(mean_temp, sd, n_weeks))
-
-
-def _healthcare_modifier(ctx: CellContext, code: str) -> float:
-    """Nicht-demografischer Zellmodifikator (Versorgungszugang).
-
-    Ersetzt für die Mortalität bewusst ``g(V̂)``: Mit expliziten Altersbändern
-    zählte ``g`` die Demografie ein zweites und drittes Mal, weil sowohl
-    ``HEAT_SENSITIVITY`` als auch ``VULNERABLE_GROUPS_SHARE`` den
-    Verwundbaren-Anteil enthalten (REVIEW_BERECHNUNGSLOGIK V-E). Hier geht
-    ausschließlich der Gesundheitszugang ein; die Demografie steckt genau einmal
-    in ``pop_a``.
-    """
-    span = ctx.p(code, "healthcare_modifier_span", 0.5)
-    v = float(ctx.hev_norm.get("vulnerabilities", {}).get("HEALTHCARE_ACCESS", 0.5) or 0.0)
-    return max(0.0, 1.0 - span / 2.0 + span * v)
+    return sum(max(0.0, t - threshold) for t in weekly_temperatures(mean_temp, region))
 
 
 def cell_summer_temp(ctx: CellContext) -> float:
@@ -174,12 +190,38 @@ def _age_bands(ctx: CellContext) -> dict[str, float]:
     }
 
 
-# ── 1. Hitzemortalität ─────────────────────────────────────────────────────────
+# ── 1. Hitzemortalität (Bericht #95 §3.3/§3.5 — nativer Ausweis YLL) ──────────
+
+def _v_vers(ctx: CellContext, code: str, band: str) -> float:
+    """Bandweiser Versorgungs-/Isolations-Modifikator v_vers,a (§3.3, nur D-Pfad).
+
+    ``v = [1 + 1_{a≥65}·β_iso·(q_1P − q̄_1P)] · [1 + 1_{85+}·β_pfl·(q_pfl − q̄_pfl)]``
+
+    Mittelwertzentriert (Bundesmittel ⇒ Faktor 1, kalibrierneutral). Die
+    Zellgrößen sind produktseitig noch nicht verfügbar (Zensus-Haushaltsgitter
+    ohne 1P×65+-Kreuzung; OSM-Pflegeeinrichtungen nicht geladen — bei der
+    Integration verifiziert, Bericht §3.6): fehlt der ci-Wert, rechnet die Zelle
+    mit dem Bundesmittel (Faktor exakt 1).
+    """
+    v = 1.0
+    if band != "u65":
+        b_iso = ctx.p(code, "beta_iso", 0.90)
+        qbar = ctx.p(code, "qbar_1p", 0.346)
+        q = ctx.ci.get("share_single_65p")
+        v *= 1.0 + b_iso * ((float(q) if q is not None else qbar) - qbar)
+    if band == "a85p":
+        b_pfl = ctx.p(code, "beta_pfl", 1.54)
+        qbar = ctx.p(code, "qbar_pfl", 0.149)
+        q = ctx.ci.get("share_care_home_85p")
+        v *= 1.0 + b_pfl * ((float(q) if q is not None else qbar) - qbar)
+    return max(0.0, v)
+
 
 def mortality(risk: dict, ctx: CellContext) -> dict:
-    """Hitzebedingte Sterbefälle je Zelle und Jahr.
+    """Verlorene Lebensjahre (YLL) je Zelle und Jahr; Todesfälle als Teil-Ausweis.
 
-    ``D = calib · h · Σ_Band pop_a · m_a/100k · (1/52) · Σ_Woche (RR_a(T_w) − 1)``
+    ``D_a = c_kal · v_vers,a · pop_a · m_a/100k · (1/52) · Σ_w (e^{β_a(T_w−T_0)⁺} − 1)``
+    ``YLL = Σ_a D_a · L̄_a`` — Bewertung €: YLL × VOLY (Kostensatz des Risikos).
     """
     from app.data.germany_health_reference import BASELINE_MORTALITY_PER_100K
 
@@ -188,16 +230,19 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
 
     thr = ctx.p(code, f"threshold_{region}", REGION_THRESHOLD[region])
     beta85 = ctx.p(code, f"beta_85p_{region}", REGION_BETA_85P[region])
-    sd = ctx.p(code, "weekly_temp_sd", 2.0)
-    n_weeks = int(ctx.p(code, "summer_weeks", 13))
-    # ACHTUNG: Der Default muss mit dem Registry-Spec in impact/params.py
-    # übereinstimmen — die Registry verdrahtet ihn NICHT automatisch hierher.
-    calib = ctx.p(code, "calibration", 1.44)
+    # ACHTUNG: Defaults müssen mit den Registry-Specs in impact/params.py
+    # übereinstimmen — die Registry verdrahtet sie NICHT automatisch hierher.
+    calib = ctx.p(code, "calibration", 0.581)
+    # Distanz-Effekt: Sensitivitätsband, Basiswert 0 (Bericht #95, Log 20);
+    # wirkt nur, wenn ein Nutzer ihn setzt UND die Zelle eine KH-Distanz trägt.
+    beta_d = ctx.p(code, "beta_dist_km", 0.0)
+    dist_km = float(ctx.ci.get("hospital_distance_km") or 0.0)
 
-    temps = weekly_temperatures(cell_summer_temp(ctx), sd, n_weeks)
+    temps = weekly_temperatures(cell_summer_temp(ctx), region)
     bands = _age_bands(ctx)
 
-    outcome = 0.0
+    deaths = 0.0
+    yll = 0.0
     for band in AGE_BANDS:
         pop_a = bands.get(band, 0.0)
         if pop_a <= 0.0:
@@ -205,18 +250,48 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
         m_a = ctx.p(code, f"baseline_mort_{band}", BASELINE_MORTALITY_PER_100K[band])
         beta_a = beta85 * ctx.p(code, f"beta_factor_{band}", AGE_BETA_FACTOR[band])
         excess = sum(exp(beta_a * max(0.0, t - thr)) - 1.0 for t in temps)
-        outcome += pop_a * (m_a / 100_000.0) * (1.0 / 52.0) * excess
+        d_a = (calib * _v_vers(ctx, code, band) * pop_a
+               * (m_a / 100_000.0) * (1.0 / 52.0) * excess)
+        deaths += d_a
+        yll += d_a * ctx.p(code, f"life_years_{band}", AGE_LIFE_YEARS[band])
 
-    return _result(risk, outcome * calib * _healthcare_modifier(ctx, code))
+    if beta_d > 0.0 and dist_km > 0.0:
+        factor = 1.0 + beta_d * dist_km
+        deaths *= factor
+        yll *= factor
+
+    out = _result(risk, yll)
+    out["deaths"] = max(0.0, deaths)
+    return out
 
 
-# ── 2. Hitzemorbidität ─────────────────────────────────────────────────────────
+# ── 2. Hitzemorbidität (Bericht #95 §3.4 — Einweisungen) ──────────────────────
 
 def morbidity(risk: dict, ctx: CellContext) -> dict:
+    """Hitzeassoziierte Erkrankungsfälle je Zelle und Jahr.
+
+    ``F = Σ_a pop_a · r_0,a/100k · max(0, 1 + e_HD·(HD − HD_ref))``
+
+    HD-Term zweiseitig linear, bei 0 gedeckelt (Befund 59): Zellen unter der
+    Referenzlast reduzieren die Baseline anteilig — bevölkerungsgewichtet
+    erwartungstreu um die Referenz, keine Doppelzählung des in r_0 enthaltenen
+    Durchschnittseffekts. Keine Modifikatoren im F-Pfad (Gegen-/fehlende
+    Evidenz; Bericht §3.4). Dokumentierte Grenze: der nicht-wetterliche
+    Baseline-Sockel ist bevölkerungsproportional (§3.1-Lackmustest gilt für die
+    Mortalität).
+    """
     code = risk["code"]
-    rate = ctx.p(code, "rate_per_100k", 8000.0)
-    af = _heat_af(ctx, code, 0.0016, 8.0)
-    outcome = ctx.pop * (rate / 100_000.0) * af * ctx.g(risk)
+    hd = ctx.haz("HEAT_WAVE")
+    e_hd = ctx.p(code, "excess_per_hotday", 0.024)
+    hd_ref = ctx.p(code, "hotday_ref_days", 7.2)
+    factor = max(0.0, 1.0 + e_hd * (hd - hd_ref))
+
+    bands = _age_bands(ctx)
+    outcome = sum(
+        bands.get(band, 0.0) * (ctx.p(code, f"r0_{band}", AGE_MORBIDITY_R0[band])
+                                / 100_000.0) * factor
+        for band in AGE_BANDS
+    )
     return _result(risk, outcome)
 
 
@@ -404,21 +479,28 @@ LINEAGE_SPECS: dict[str, dict] = {
         # Basis ist NICHT die Gesamtbevölkerung: die Kurve läuft je Altersband.
         "basis_key": "pop_age_bands",
         "basis_label": "Bevölkerung je Altersband (Zelle)",
+        # Rev. 7: empirische Wochenquantile je Region (REGION_WEEK_ANOMALIES)
+        # statt Gauß-Streuung; YLL-Bewertung über life_years_* × VOLY-Kostensatz.
         "driver": {"kind": "erf", "hazard": "HEAT_WAVE",
-                   "params": ["weekly_temp_sd", "summer_weeks", "calibration"]},
+                   "params": ["calibration", "life_years_a85p"]},
         # Kein g(V̂): mit expliziten Altersbändern zählte es die Demografie ein
-        # zweites und drittes Mal (siehe ``_healthcare_modifier``).
+        # zweites und drittes Mal; stattdessen die bandweisen, mittelwert-
+        # zentrierten v_vers-Faktoren (Bericht #95 §3.3).
         "modifier": {
-            "term": "Versorgungs-Modifikator",
-            "label": "Versorgungszugang",
-            "vulnerabilities": ["HEALTHCARE_ACCESS"],
-            "params": ["healthcare_modifier_span"],
-            "note": ("Ersetzt hier bewusst g(V̂): Die Demografie steckt bereits in den "
-                     "Altersbändern, ein Vulnerabilitätsmittel würde sie ein zweites und "
-                     "drittes Mal zählen (HEAT_SENSITIVITY und VULNERABLE_GROUPS_SHARE "
-                     "enthalten beide den Verwundbaren-Anteil). Es geht ausschließlich der "
-                     "Gesundheitszugang ein.\n"
-                     r"$$h = 1 - \tfrac{s}{2} + s\,\hat{V}_{\mathrm{Versorgung}}$$"),
+            "term": "v_vers-Modifikator",
+            "label": "Isolation & Pflegeheim je Band",
+            # Keine Schicht-A-Vulnerabilität mehr im D-Pfad: v_vers liest
+            # ausschließlich Zellanteile (mit Bundesmittel-Fallback) + Parameter.
+            "vulnerabilities": [],
+            "cell_keys": ["share_single_65p", "share_care_home_85p"],
+            "params": ["beta_iso", "beta_pfl", "qbar_1p", "qbar_pfl"],
+            "note": ("Bandweiser, mittelwertzentrierter Versorgungs-/Isolations-"
+                     "Modifikator (Bundesmittel = 1, kalibrierneutral; nur D-Pfad — "
+                     "β_iso: Bänder 65+, β_pfl: nur 85+). Die Demografie steckt genau "
+                     "einmal in den Altersbändern.\n"
+                     r"$$v_{vers,a} = [1 + \mathbb{1}_{a\ge 65}\,\beta_{iso}"
+                     r"(q_{1P}-\bar q_{1P})]\,[1 + \mathbb{1}_{85+}\,\beta_{pfl}"
+                     r"(q_{pfl}-\bar q_{pfl})]$$"),
         },
     },
     "EXPECTED_ANNUAL_MORTALITY_FLOOD": {
@@ -456,9 +538,16 @@ LINEAGE_SPECS: dict[str, dict] = {
         },
     },
     "EXPECTED_ANNUAL_MORBIDITY": {
-        "rate_param": "rate_per_100k",
-        "driver": {"kind": "af", "hazard": "HEAT_WAVE",
-                   "params": ["beta_per_hotday", "hotday_threshold"]},
+        "rate_param": "r0_a85p",
+        "basis_key": "pop_age_bands",
+        "basis_label": "Bevölkerung je Altersband (Zelle)",
+        # Rev. 7: altersgeschichtete Baseline × zweiseitig linearer HD-Term
+        # (bei 0 gedeckelt) statt AF-Exponentialform; F-Pfad bewusst OHNE
+        # Modifikatoren (Gegen-/fehlende Evidenz, Bericht #95 §3.4/Log 28) —
+        # no_modifier verhindert, dass das Diagramm ein g(V̂) erfindet.
+        "no_modifier": True,
+        "driver": {"kind": "hd_linear", "hazard": "HEAT_WAVE",
+                   "params": ["excess_per_hotday", "hotday_ref_days"]},
     },
     "EXPECTED_ANNUAL_INJURIES": {
         "rate_param": "rate_per_100k",

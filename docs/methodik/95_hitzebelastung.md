@@ -440,7 +440,13 @@ Zelle × Kreis-Alterskorrektur (Verhältnis 1P-65+/1P-gesamt des Kreises) — al
 gekennzeichnet. (b) \(q_{\text{pfl}}\): OSM-Pflegeeinrichtungen je Zelle, skaliert auf die
 Kreis-Summe der Pflegestatistik (fängt regionale OSM-Unvollständigkeit); Proxy-Eigenschaft
 dokumentiert. Beide Verfügbarkeiten werden bei Integration verifiziert (ein Satz Ergebnis
-in den Bericht).
+in den Bericht). **Verifikationsergebnis (Integration 30.08.2026):** Beide Zellgrößen
+sind derzeit nicht verfügbar — das offene Zensus-2022-Gitter enthält weder die Kreuzung
+1P×65+ noch einen Gesamt-1P-Anteil (nur `Durchschnittliche_Haushaltsgroesse`), und
+OSM-Pflegeeinrichtungen sind produktseitig nicht als Zellebene geladen; die Zellen
+rechnen daher mit den Bundesmitteln \(\bar q\) (Faktor exakt 1, kalibrierneutral —
+Zentrierungs-Eigenschaft §3.2), bis die beiden Datenebenen angelegt sind
+(Fortschreibungsvermerk; Ledger).
 
 ### 3.7 Schicht A (getrennt; nie auf €-Pfaden)
 

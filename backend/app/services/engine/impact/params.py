@@ -28,8 +28,9 @@ _BETA_FACTOR = (
     "Steigung dieses Altersbands relativ zum Band 85+. Nicht frei gewählt, sondern aus "
     "der publizierten Altersverteilung zurückgerechnet: Für kleine β·Δ gilt "
     "Todesfälle_a ∝ pop_a · m_a · β_a, also β_a ∝ Anteil_a / (pop_a · m_a). Mit den "
-    "RKI-Anteilen 2026 (6,5/12,9/25,2/55,5 %), der Zensus-Altersstruktur und den "
-    "altersspezifischen Basissterberaten ergeben sich die hinterlegten Faktoren. "
+    "RKI-Anteilen 2026 (6,5/12,9/25,2/55,5 %) und den Sterbefällen 2023 je Band "
+    "(138.024/166.312/302.921/420.949) ergeben sich die Faktoren 0,357/0,588/0,631/1,0 "
+    "(Bericht #95 §3.3a, Rev. 6 — Kopplung an die Basissterberaten neu gerechnet). "
     "Kontrolle: Das Modell reproduziert die RKI-Altersverteilung auf <1 Prozentpunkt.")
 
 IMPACT_PARAM_SPECS: list[dict] = [
@@ -68,23 +69,28 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_detail": "Aus der publizierten Kurve: RR ≈ 1,35 bei 25 °C über der "
                       "Mitte-Schwelle 20,2 °C. " + _ERF,
      "source_refs": ["Winklmayr_2022"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_85p_sued", "value": 0.0531,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_85p_sued", "value": 0.0876,
      "label": "Kurvensteigung 85+ (Süd)", "unit": "1/K",
-     "source": "Winklmayr u. a. 2022, Abb. 3/4",
-     "source_detail": "Aus der publizierten Kurve: RR ≈ 1,25 bei 25 °C über der "
-                      "Süd-Schwelle 20,8 °C — die flachste der drei Regionen. " + _ERF,
-     "source_refs": ["Winklmayr_2022"]},
+     "source": "Winklmayr 2022 × Rev.-7-Nachschätzung (Bericht #95 §4)",
+     "source_detail": "Ablesewert der publizierten Kurve 0,0531 (RR ≈ 1,25 bei 25 °C über "
+                      "der Süd-Schwelle 20,8 °C) × Nachschätzungs-Skalar 1,65 aus dem "
+                      "Holdout-Fit der Rev.-7-Kalibrierung (Fit ohne die Prüfjahre "
+                      "2018/19/22; Profil-Band 1,45–1,85 ⇒ β-Band 0,0770–0,0982). "
+                      "Modellinterner Kompensationsparameter — kehrt die publizierte "
+                      "Regionen-Rangfolge um (§3.8-Widerspruch im Bericht benannt); der "
+                      "Zell-Lauf prüft den Topographie-Anteil. " + _ERF,
+     "source_refs": ["Winklmayr_2022", "RKI_EpidBull_19_2025"]},
 
     # ── Hitzemortalität: Altersband-Steigungsfaktoren ──────────────────────────
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_factor_u65", "value": 0.404,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_factor_u65", "value": 0.357,
      "label": "Steigungsfaktor Band <65", "unit": "Faktor",
      "source": "Hergeleitet aus RKI-Altersverteilung", "source_detail": _BETA_FACTOR,
      "source_refs": ["RKI_Wochenbericht_Hitzemortalitaet", "Winklmayr_2022"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_factor_a65_74", "value": 0.577,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_factor_a65_74", "value": 0.588,
      "label": "Steigungsfaktor Band 65–74", "unit": "Faktor",
      "source": "Hergeleitet aus RKI-Altersverteilung", "source_detail": _BETA_FACTOR,
      "source_refs": ["RKI_Wochenbericht_Hitzemortalitaet", "Winklmayr_2022"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_factor_a75_84", "value": 0.620,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_factor_a75_84", "value": 0.631,
      "label": "Steigungsfaktor Band 75–84", "unit": "Faktor",
      "source": "Hergeleitet aus RKI-Altersverteilung", "source_detail": _BETA_FACTOR,
      "source_refs": ["RKI_Wochenbericht_Hitzemortalitaet", "Winklmayr_2022"]},
@@ -98,27 +104,26 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_refs": ["Winklmayr_2022"]},
 
     # ── Hitzemortalität: altersspezifische Basissterblichkeit ──────────────────
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "baseline_mort_u65", "value": 180.0,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "baseline_mort_u65", "value": 213.2,
      "label": "Basissterblichkeit <65", "unit": "Tote/100k·a",
-     "source": "Destatis Todesursachenstatistik",
-     "source_detail": "Altersspezifische rohe Sterberate. Ersetzt die frühere pauschale "
-                      "Rate von 1.130/100k: Ohne Altersdifferenzierung ist die "
+     "source": "Destatis, Sterbefälle 2023 (Tab. 12613-03) ÷ Bevölkerung 31.12.2023",
+     "source_detail": "Altersspezifische rohe Sterberate: 138.024 Sterbefälle u65 ÷ "
+                      "64.747.448 EW = 213,2/100.000·a (Bericht #95 §3.5, Golden-Test "
+                      "beispiel_95_basisraten). Ohne Altersdifferenzierung ist die "
                       "Altersverteilung der Hitzetoten nicht darstellbar — die 85+-Gruppe "
-                      "hat die ~86-fache Basissterblichkeit der unter 65-Jährigen. "
-                      "Kontrolle: Die vier Bänder summieren sich mit der Zensus-"
-                      "Altersstruktur auf ~977.000 Sterbefälle/Jahr (DE-Ist ~1,02 Mio).",
+                      "hat die ~69-fache Basissterblichkeit der unter 65-Jährigen.",
      "source_refs": ["Destatis_Sterbefaelle_Altersgruppen"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "baseline_mort_a65_74", "value": 1800.0,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "baseline_mort_a65_74", "value": 1737.9,
      "label": "Basissterblichkeit 65–74", "unit": "Tote/100k·a",
      "source": "Destatis Todesursachenstatistik",
      "source_detail": "Altersspezifische rohe Sterberate des Bands 65–74.",
      "source_refs": ["Destatis_Sterbefaelle_Altersgruppen"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "baseline_mort_a75_84", "value": 4600.0,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "baseline_mort_a75_84", "value": 4812.3,
      "label": "Basissterblichkeit 75–84", "unit": "Tote/100k·a",
      "source": "Destatis Todesursachenstatistik",
      "source_detail": "Altersspezifische rohe Sterberate des Bands 75–84.",
      "source_refs": ["Destatis_Sterbefaelle_Altersgruppen"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "baseline_mort_a85p", "value": 15500.0,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "baseline_mort_a85p", "value": 14800.2,
      "label": "Basissterblichkeit 85+", "unit": "Tote/100k·a",
      "source": "Destatis Todesursachenstatistik",
      "source_detail": "Altersspezifische rohe Sterberate des Bands 85+ — der mit Abstand "
@@ -126,67 +131,167 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_refs": ["Destatis_Sterbefaelle_Altersgruppen"]},
 
     # ── Hitzemortalität: Verteilungs- und Kalibrierparameter ───────────────────
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "weekly_temp_sd", "value": 2.0,
-     "label": "Streuung der Sommer-Wochenmittel", "unit": "K",
-     "source": "DWD-CDC-Monatsraster (abgeleitet)",
-     "source_detail": "Standardabweichung der Wochenmitteltemperaturen im Sommer. Aus den "
-                      "DWD-Monatsrastern abgeleitet: Streuung der Monatsmittel über "
-                      "Monate und Jahre = 1,03 K (davon 0,40 K zwischen den Monaten, "
-                      "1,01 K zwischen den Jahren), zuzüglich der synoptischen "
-                      "Wochenstreuung innerhalb eines Monats (~1,7 K) ergibt ~2,0 K. "
-                      "Der Parameter ist wirkungsstark, weil die Kurve konvex ist — "
-                      "deshalb datengestützt hergeleitet und nicht auf den Zielwert "
-                      "getrimmt.",
-     "source_refs": ["DWD_CDC_Monatsraster_Temperatur"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "summer_weeks", "value": 13.0,
-     "label": "Zahl der Sommerwochen", "unit": "Wochen",
-     "source": "Modellabgrenzung (Juni–August)",
-     "source_detail": "Die Expositionsrechnung läuft über die 13 Wochen der Monate Juni "
-                      "bis August — konsistent zur Sommermitteltemperatur aus den "
-                      "DWD-Monatsrastern (Jun/Jul/Aug). Das RKI rechnet über das längere "
-                      "Sommerhalbjahr (KW 15–40); der Beitrag der kühleren Randwochen "
-                      "steckt im Kalibrierfaktor.",
-     "source_refs": ["Winklmayr_2022"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "calibration", "value": 1.44,
+    # weekly_temp_sd ENTFERNT (Rev. 7): Die Wochenverteilung kommt jetzt aus den
+    # empirischen intra-saisonalen Anomalie-Quantilen je Region (Bericht #95 §3.2,
+    # Anlage backend/data/kalibrierung/wochenquantile_region.csv; Konstanten in
+    # impact/health.py REGION_WEEK_ANOMALIES) — gemessen statt Gauß-Annahme.
+    # summer_weeks ENTFERNT (Rev. 7): Die 13 Sommerwochen (Juni–August) stecken
+    # strukturell in den 13 empirischen Wochenquantilen (§3.2) — kein freier Parameter.
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "calibration", "value": 0.581,
      "label": "Nationaler Kalibrierfaktor", "unit": "Faktor",
-     "source": "Kalibrierung gegen die RKI-Jahresreihe",
-     "source_detail": "EINZIGER freier Parameter der Hitzemortalität — alle übrigen "
-                      "Koeffizienten stammen aus der Literatur. Bestimmt aus einer "
-                      "bundesweiten Rechnung über 208.622 besiedelte 1-km-Zellen "
-                      "(bevölkerungsgewichtete Sommertemperatur 19,01 °C gegenüber "
-                      "18,55 °C im Flächenmittel): Das Modell liefert ~4.625 Sterbefälle, "
-                      "das Mittel der signifikanten RKI-Hitzejahre liegt bei ~6.656. "
-                      "Der Rest von 1,44 deckt die im 1-km-Raster nicht aufgelöste "
-                      "Wärmeinsel-Konvexität, die Randwochen des Sommerhalbjahrs und die "
-                      "Nachlaufwochen der RKI-Methodik ab — alle drei wirken in dieselbe "
-                      "Richtung.",
-     "source_refs": ["Winklmayr_2022", "RKI_Wochenbericht_Hitzemortalitaet"]},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "healthcare_modifier_span", "value": 0.5,
-     "label": "Spannweite Versorgungs-Modifikator", "unit": "Faktor",
-     "source": "Modellannahme (dokumentiert)",
-     "source_detail": "Der Zellmodifikator läuft von 1 − Spanne/2 bis 1 + Spanne/2 über "
-                      "den normierten Gesundheitszugang. Er ersetzt bewusst g(V̂): Mit "
-                      "expliziten Altersbändern zählte g die Demografie ein zweites und "
-                      "drittes Mal (HEAT_SENSITIVITY und VULNERABLE_GROUPS_SHARE enthalten "
-                      "beide den Verwundbaren-Anteil — REVIEW_BERECHNUNGSLOGIK V-E). "
-                      "Jetzt steckt die Demografie genau einmal in der Altersschichtung.",
-     "source_refs": ["RKI_Hitzemortalitaet"]},
+     "source": "Rev.-7-Kalibrierung gegen die RKI-Jahresreihe (Bericht #95 §4)",
+     "source_detail": "EINZIGER freier Niveau-Parameter der Hitzemortalität (§3.4: genau "
+                      "ein nationaler Skalar; keine Pauschalkorrektur, keine "
+                      "Regionalfaktoren). Kleinste Quadrate durch den Ursprung auf "
+                      "bevölkerungsgewichteten Sommermittel-Reihen (DWD-JJA-Raster × "
+                      "Gemeindepunkt × Zensus-Bevölkerung), Fenster 2012–2024, gegen die "
+                      "revidierte RKI-Reihe (EB 19/2025). Band [0,55, 0,67] (Stützen: "
+                      "ohne Süd-Nachschätzung 0,661; Vollreihe 0,660; Voll-Holdout 0,567; "
+                      "s_Süd-Profilband 0,559–0,604). Kalibrier-Prüfstein: 12/16 Länder "
+                      "im Band 0,75–1,35, auch in der Voll-Holdout-Variante. "
+                      "Reproduzierbar: backend/scripts/kalibrierung/"
+                      "calibrate_heat_mortality_rev7.py.",
+     "source_refs": ["RKI_EpidBull_19_2025", "Winklmayr_2022"]},
+    # healthcare_modifier_span ENTFERNT (Rev. 7): Der pauschale Versorgungszugangs-
+    # Modifikator ist durch die evidenzbasierten, mittelwertzentrierten und bandweisen
+    # v_vers-Faktoren ersetzt (β_iso 65+/β_pfl 85+; Bericht #95 §3.3); der Distanz-
+    # Effekt ist Sensitivitätsband mit Basiswert 0 (beta_dist_km).
 
-    # ── Hitzemorbidität ─────────────────────────────────────────────────────────
-    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "rate_per_100k", "value": 8000.0,
-     "label": "Basis-Morbiditätsrate", "unit": "Fälle/100k·a",
-     "source": "UBA MK3.1 / RKI (Modellannahme)",
-     "source_detail": "Basisrate hitzeassoziierter Behandlungsfälle je 100k; die attributable "
-                      "Fraktion (Hitzetage) reduziert sie auf die klimabedingten Fälle. "
-                      "Dokumentierte, editierbare Modellannahme.",
-     "source_refs": ["RKI_Hitzemortalitaet"]},
-    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "beta_per_hotday", "value": 0.0016,
-     "label": "AF-Steigung je Hitzetag", "unit": "1/Hitzetag", "source": "RKI/Winklmayr",
-     "source_detail": _HEAT_AF, "source_refs": ["RKI_Hitzemortalitaet"]},
-    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "hotday_threshold", "value": 8.0,
-     "label": "Hitzetage-Schwelle", "unit": "Hitzetage/Jahr", "source": "RKI/Winklmayr",
-     "source_detail": "Akklimatisierungsschwelle für hitzeassoziierte Morbidität.",
-     "source_refs": ["RKI_Hitzemortalitaet"]},
+    # ── Hitzemortalität: v_vers-Modifikatoren (mittelwertzentriert, nur D-Pfad) ─
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_iso", "value": 0.90,
+     "label": "Isolations-Effekt β_iso (Bänder 65+)", "unit": "Faktor",
+     "source": "Semenza 1996 (OR ≈ 2,3) / Mikrozensus 2023 (q̄ = 0,346)",
+     "source_detail": "OR-Übersetzung über das Bevölkerungsmittel: β = (OR−1)/[1+q̄·(OR−1)] "
+                      "= 1,3/1,4498 = 0,90 (Band 0,3–1,4). Wirkt mittelwertzentriert "
+                      "1+β·(q_1P − q̄) nur in den Bändern 65+ und nur auf die Mortalität "
+                      "(für Einweisungen keine Evidenz — Bericht #95 §3.3, Log 28). "
+                      "Zellwert q_1P: Zensus-Haushaltsgitter, bei Integration nicht "
+                      "verfügbar → Zelle rechnet mit q̄ (Faktor 1, kalibrierneutral).",
+     "source_refs": ["Semenza_1996_Chicago",
+                     "Destatis_Mikrozensus_2023_Einpersonenhaushalte"]},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_pfl", "value": 1.54,
+     "label": "Pflegeheim-Effekt β_pfl (nur 85+)", "unit": "Faktor",
+     "source": "Fouillet 2006 / Pflegestatistik 2023 (Kette Bericht #95 §3.3b)",
+     "source_detail": "OR Heim vs. Nicht-Heim ≈ 3,0 aus Exzess-Verhältnis 1,0 (Fouillet "
+                      "Tab. 2: O/E Heime 1,9 = Wohnung ≥75) × Basissterblichkeits-"
+                      "Verhältnis 2,97 (Heim 0,34/a vs. Nicht-Heim-85+ 0,1144/a); "
+                      "Übersetzung β = (3,0−1)/[1+0,149·2,0] = 1,54 (Band 1,0–2,9; "
+                      "Stützen Bouchama 2007, Klenk 2010). Wirkt mittelwertzentriert "
+                      "1+β·(q_pfl − q̄) nur im Band 85+ und nur auf die Mortalität "
+                      "(Gegenevidenz für Einweisungen). Zellwert q_pfl: OSM-Pflege"
+                      "einrichtungen × Pflegestatistik, bei Integration nicht verfügbar "
+                      "→ Zelle rechnet mit q̄ (Faktor 1, kalibrierneutral).",
+     "source_refs": ["Fouillet_2006_Frankreich", "Destatis_Pflegestatistik_2023",
+                     "Bouchama_2007_Meta", "Klenk_2010_Heime"]},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "qbar_1p", "value": 0.346,
+     "label": "Bundesmittel Allein-Lebende 65+ (q̄_1P)", "unit": "Anteil",
+     "source": "Mikrozensus 2023 (Indikator 132088)",
+     "source_detail": "Anteil der ab 65-Jährigen in Einpersonenhaushalten: 34,6 % "
+                      "(Mikrozensus 2023, Erstergebnisse). Zentrierungsmittel des "
+                      "β_iso-Terms — Bundesmittel ⇒ Faktor exakt 1 (kalibrierneutral, "
+                      "§3.2-Zentrierungsregel des Berichts).",
+     "source_refs": ["Destatis_Mikrozensus_2023_Einpersonenhaushalte"]},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "qbar_pfl", "value": 0.149,
+     "label": "Bundesmittel Heimbewohner-Anteil 85+ (q̄_pfl)", "unit": "Anteil",
+     "source": "Pflegestatistik 2023 / Bevölkerung 31.12.2023 (424.300 ÷ 2.844.213)",
+     "source_detail": "Vollstationär versorgte 85+ (218,7+142,6+63,0 Tsd. = 424.300) ÷ "
+                      "Bevölkerung 85+ (2.844.213) = 0,149. Zentrierungsmittel des "
+                      "β_pfl-Terms (Golden-Test beispiel_95_or_uebersetzungen).",
+     "source_refs": ["Destatis_Pflegestatistik_2023"]},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_dist_km", "value": 0.0,
+     "label": "Distanz-Effekt (Sensitivität)", "unit": "1/km",
+     "source": "Nicholl u. a. 2007 (Sensitivitätsband, Basiswert 0)",
+     "source_detail": "≈ +1 % Mortalität je +10 km Krankenhausdistanz (Nicholl u. a., "
+                      "Emerg Med J 24:665–668, 2007, doi:10.1136/emj.2007.047654 — "
+                      "transportierte Notfälle, UK). Hitzetote versterben überwiegend zu "
+                      "Hause; Übertragbarkeit zu schwach für den Basiswert → "
+                      "Sensitivitätsband 0–0,002, Basiswert 0 (Bericht #95, Log 20). "
+                      "Kein Archiv-Snapshot möglich (Verlag blockt Wayback-Save; "
+                      "dokumentiert).",
+     "source_refs": []},
+
+    # ── Hitzemortalität: Restlebenserwartung je Band (YLL-Bewertung, §3.5) ─────
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "life_years_u65", "value": 23.39,
+     "label": "Restlebenserwartung <65", "unit": "Jahre",
+     "source": "Destatis Sterbetafeln 2022/2024, Stützstelle e(60)",
+     "source_detail": "Verlorene Lebensjahre je Sterbefall im Band u65: Stützstelle "
+                      "e(60) — 86 % der u65-Sterbefälle entfallen auf 50–64; "
+                      "Geschlechter-Kombination mit der Bevölkerung 31.12.2023 "
+                      "(Bericht #95 §3.5, Anker #l-a).",
+     "source_refs": ["Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "life_years_a65_74", "value": 15.59,
+     "label": "Restlebenserwartung 65–74", "unit": "Jahre",
+     "source": "Destatis Sterbetafeln 2022/2024, Stützstelle e(70)",
+     "source_detail": "Verlorene Lebensjahre je Sterbefall im Band 65–74 (Stützstelle "
+                      "e(70), m/w bevölkerungsgewichtet; Bericht #95 §3.5).",
+     "source_refs": ["Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "life_years_a75_84", "value": 8.90,
+     "label": "Restlebenserwartung 75–84", "unit": "Jahre",
+     "source": "Destatis Sterbetafeln 2022/2024, Stützstelle e(80)",
+     "source_detail": "Verlorene Lebensjahre je Sterbefall im Band 75–84 (Stützstelle "
+                      "e(80), m/w bevölkerungsgewichtet; Bericht #95 §3.5).",
+     "source_refs": ["Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "life_years_a85p", "value": 5.44,
+     "label": "Restlebenserwartung 85+", "unit": "Jahre",
+     "source": "Destatis Sterbetafeln 2022/2024, e(85)/e(90)/e(95) gewichtet",
+     "source_detail": "Bevölkerungsgewichtet über e(85), e(90), e(95): männlich 4,97, "
+                      "weiblich 5,69, kombiniert (990.292 M / 1.853.921 F) = 5,44 "
+                      "(Band 4,9–5,44: Perioden-Approximation mit Bevölkerungs- statt "
+                      "Sterbefallgewichten überschätzt um ~0,3–0,5 Jahre — Bericht #95 "
+                      "§3.5, Befund 22; Golden-Test beispiel_95_basisraten).",
+     "source_refs": ["Destatis_Sterbetafeln_2022_2024"]},
+
+    # ── Hitzemorbidität (Rev. 7: F = Σ_a pop_a · r_0,a/100k · max(0, 1+e_HD·(HD−HD_ref))) ─
+    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "r0_u65", "value": 1.9,
+     "label": "Baseline-Einweisungsrate <65", "unit": "Fälle/100k·a",
+     "source": "Destatis T67 + Karlsson & Ziebarth (Herleitung Bericht #95 §3.4)",
+     "source_detail": "Gesamtrate 3,54/100k·a = T67-Kern 1,68 (Ø ≈ 1.400/a ÷ 83,456 Mio.) "
+                      "+ Kreislauf-Kern 1,21–2,66 (11,9 % des Einweisungs-Exzesses je "
+                      "Hitzetag × 7,2 Tage). Altersaufteilung 1,9/6,3/10,8/15,6 "
+                      "(= 1:3,3:5,7:8,2) — gekennzeichnete Abschätzung am Steilheits"
+                      "muster der Kreislauf-Morbidität; Band ×0,6–1,6 (Golden-Tests "
+                      "beispiel_95_r0_kette/_normierung).",
+     "source_refs": ["Destatis_T67_Hitzeeinweisungen", "Karlsson_Ziebarth_2018",
+                     "Karlsson_Ziebarth_IZA_DP7875"]},
+    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "r0_a65_74", "value": 6.3,
+     "label": "Baseline-Einweisungsrate 65–74", "unit": "Fälle/100k·a",
+     "source": "Destatis T67 + Karlsson & Ziebarth (Herleitung Bericht #95 §3.4)",
+     "source_detail": "Band 65–74 der altersgeschichteten Baseline (Herleitung s. r0_u65; "
+                      "bevölkerungsgewichtete Summe = 3,54/100k·a).",
+     "source_refs": ["Destatis_T67_Hitzeeinweisungen", "Karlsson_Ziebarth_2018"]},
+    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "r0_a75_84", "value": 10.8,
+     "label": "Baseline-Einweisungsrate 75–84", "unit": "Fälle/100k·a",
+     "source": "Destatis T67 + Karlsson & Ziebarth (Herleitung Bericht #95 §3.4)",
+     "source_detail": "Band 75–84 der altersgeschichteten Baseline (Herleitung s. r0_u65).",
+     "source_refs": ["Destatis_T67_Hitzeeinweisungen", "Karlsson_Ziebarth_2018"]},
+    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "r0_a85p", "value": 15.6,
+     "label": "Baseline-Einweisungsrate 85+", "unit": "Fälle/100k·a",
+     "source": "Destatis T67 + Karlsson & Ziebarth (Herleitung Bericht #95 §3.4)",
+     "source_detail": "Band 85+ der altersgeschichteten Baseline (Herleitung s. r0_u65).",
+     "source_refs": ["Destatis_T67_Hitzeeinweisungen", "Karlsson_Ziebarth_2018"]},
+    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "excess_per_hotday", "value": 0.024,
+     "label": "Mehr-Einweisungen je Hitzetag (e_HD)", "unit": "1/Hitzetag",
+     "source": "Karlsson & Ziebarth 2018, Tab. 1 (konditional)",
+     "source_detail": "Relativer Einweisungs-Exzess je zusätzlichem Hitzetag (> 30 °C): "
+                      "konditional +2,4 % (Basiswert; misst den marginalen Effekt), "
+                      "Band 0,024–0,061 (unkonditional 0,054, Hitzewellentag 0,061). "
+                      "HD-Term zweiseitig linear, bei 0 gedeckelt (HD = 0 → Faktor "
+                      "0,83) — bevölkerungsgewichtet erwartungstreu um die Referenz, "
+                      "keine Doppelzählung des in r_0 enthaltenen Durchschnittseffekts "
+                      "(Bericht #95 §3.4, Befund 59). Harvesting steckt bereits in den "
+                      "K&Z-Jahresaggregaten. Keine Modifikatoren im F-Pfad (Gegen-/"
+                      "fehlende Evidenz, Log 28).",
+     "source_refs": ["Karlsson_Ziebarth_2018", "Karlsson_Ziebarth_IZA_DP7875"]},
+    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "hotday_ref_days", "value": 7.2,
+     "label": "Referenz-Hitzetage HD_ref", "unit": "Tage/Jahr",
+     "source": "Karlsson & Ziebarth 2018 (Panel-Basisperiode 1999–2008)",
+     "source_detail": "Bundesmittel der Hitzetage (Tmax > 30 °C) der K&Z-Beobachtungs"
+                      "periode — die Hitzetag-Last, unter der die Baseline r_0 gemessen "
+                      "wurde; verhindert Doppelzählung des Durchschnittseffekts "
+                      "(Bericht #95 §3.4, Anker #hd-ref). Räumlich konstanter Parameter; "
+                      "HD der Zelle: DWD-CDC hot_days (1 km), ohne UHI-Verschiebung "
+                      "(dokumentierte Unterschätzung in UHI-Lagen).",
+     "source_refs": ["Karlsson_Ziebarth_2018", "Karlsson_Ziebarth_IZA_DP7875"]},
 
     # ── Todesfälle durch Hochwasser/Sturzfluten ────────────────────────────────
     {"risk": "EXPECTED_ANNUAL_MORTALITY_FLOOD", "key": "fatality_rate_flash_per_100k",

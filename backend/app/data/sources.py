@@ -841,6 +841,161 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        ".wiley.com/doi/10.1002/joc.3370010304",
         "accessed": "2026-07-14",
     },
+
+    # ── Methodik #95 Rev. 7 (Integration; Bericht docs/methodik/95_hitzebelastung.md) ──
+    "RKI_EpidBull_19_2025": {
+        "ieee": "C. Winklmayr und M. an der Heiden, „Hitzebedingte Mortalität in "
+                "Deutschland 2023 und 2024,“ Epidemiologisches Bulletin, Nr. 19/2025, "
+                "S. 3–9, 2025. doi: 10.25646/13135. Revidierte Jahresreihe 1992–2024 "
+                "inkl. Bundesländer-Anhang — Kalibrieranker des #95-Modells.",
+        "url": "https://edoc.rki.de/handle/176904/12682",
+        "archive_url": "https://web.archive.org/web/20250816015512/"
+                       "https://edoc.rki.de/handle/176904/12682",
+        "accessed": "2026-08-30",
+    },
+    "Karlsson_Ziebarth_2018": {
+        "ieee": "M. Karlsson und N. R. Ziebarth, „Population health effects and health-"
+                "related costs of extreme temperatures: Comprehensive evidence from "
+                "Germany,“ J. Environ. Econ. Manage., Bd. 91, S. 93–117, 2018. "
+                "doi: 10.1016/j.jeem.2018.06.004. Quasi-experimentelles Panel "
+                "(170 Mio. Krankenhausfälle, 1999–2008): +2,4 % Einweisungen je "
+                "zusätzlichem Hitzetag (konditional), Ø 7,2 Hitzetage/Jahr.",
+        "url": "https://doi.org/10.1016/j.jeem.2018.06.004",
+        "archive_url": "https://web.archive.org/web/20260514012723/"
+                       "https://doi.org/10.1016/j.jeem.2018.06.004",
+        "accessed": "2026-08-30",
+    },
+    "Karlsson_Ziebarth_IZA_DP7875": {
+        "ieee": "M. Karlsson und N. R. Ziebarth, „Population Health Effects and Health-"
+                "Related Costs of Climate Extremes,“ IZA Discussion Paper Nr. 7875, "
+                "2014, Tab. 1/3, Fig. 9, App. A (Detailtabellen zur JEEM-Publikation: "
+                "Kreislauf-Anteil 11,9 % des Einweisungs-Exzesses).",
+        "url": "https://docs.iza.org/dp7875.pdf",
+        "archive_url": "https://web.archive.org/web/20251224183503/"
+                       "https://docs.iza.org/dp7875.pdf",
+        "accessed": "2026-08-30",
+    },
+    "Semenza_1996_Chicago": {
+        "ieee": "J. C. Semenza u. a., „Heat-Related Deaths during the July 1995 Heat "
+                "Wave in Chicago,“ N. Engl. J. Med., Bd. 335, S. 84–90, 1996. "
+                "doi: 10.1056/NEJM199607113350203. Fall-Kontroll-Studie: OR ≈ 2,3 "
+                "„allein lebend“ (Todesfälle, Ältere).",
+        "url": "https://www.nejm.org/doi/10.1056/NEJM199607113350203",
+        "archive_url": "https://web.archive.org/web/20240120022812/"
+                       "https://www.nejm.org/doi/10.1056/NEJM199607113350203",
+        "accessed": "2026-08-30",
+    },
+    "Fouillet_2006_Frankreich": {
+        "ieee": "A. Fouillet u. a., „Excess mortality related to the August 2003 heat "
+                "wave in France,“ Int. Arch. Occup. Environ. Health, Bd. 80, S. 16–24, "
+                "2006. doi: 10.1007/s00420-006-0089-4. Tab. 2: O/E nach Sterbeort "
+                "(Heime 1,9 [1,7–2,1] vs. Wohnung ≥ 75: 1,9).",
+        "url": "https://link.springer.com/article/10.1007/s00420-006-0089-4",
+        "archive_url": "https://web.archive.org/web/20260123185210/"
+                       "https://link.springer.com/article/10.1007/s00420-006-0089-4",
+        "accessed": "2026-08-30",
+    },
+    "Bouchama_2007_Meta": {
+        "ieee": "A. Bouchama u. a., „Prognostic Factors in Heat Wave–Related Deaths: "
+                "A Meta-analysis,“ Arch. Intern. Med., Bd. 167, Nr. 20, S. 2170–2176, "
+                "2007. doi: 10.1001/archinte.167.20.ira70009 (Stütze der "
+                "β_pfl-Niveaukette, OR „nicht selbstversorgungsfähig“ 2,97).",
+        "url": "https://doi.org/10.1001/archinte.167.20.ira70009",
+        "archive_url": "https://web.archive.org/web/20260820142737/"
+                       "https://doi.org/10.1001/archinte.167.20.ira70009",
+        "accessed": "2026-08-30",
+    },
+    "Klenk_2010_Heime": {
+        "ieee": "J. Klenk, C. Becker und K. Rapp, „Heat-related mortality in residents "
+                "of nursing homes,“ Age Ageing, Bd. 39, Nr. 2, S. 245–251, 2010. "
+                "doi: 10.1093/ageing/afp248 (ERF-Gültigkeit im Heim-Setting: +26 %/+62 % "
+                "bei 32–33,9/≥ 34 °C).",
+        "url": "https://doi.org/10.1093/ageing/afp248",
+        "archive_url": "https://web.archive.org/web/20250629101359/"
+                       "https://doi.org/10.1093/ageing/afp248",
+        "accessed": "2026-08-30",
+    },
+    "Destatis_Sterbetafeln_2022_2024": {
+        "ieee": "Statistisches Bundesamt (Destatis), Statistischer Bericht „Sterbetafeln "
+                "2022/2024“ (Juli 2025), Blätter 12613-b01/-b02 (Restlebenserwartung "
+                "e(x) nach Geschlecht), Wiesbaden. Bevölkerungsgewichte: Fortschreibung "
+                "31.12.2023 (regionalstatistik.de, Tab. 12411-09-01-4-B, Basis "
+                "Zensus 2022).",
+        "url": "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/"
+               "Sterbefaelle-Lebenserwartung/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20260804142846/"
+                       "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/"
+                       "Bevoelkerung/Sterbefaelle-Lebenserwartung/_inhalt.html",
+        "accessed": "2026-08-30",
+    },
+    "Destatis_Kostennachweis_2023": {
+        "ieee": "Statistisches Bundesamt (Destatis), „Kostennachweis der Krankenhäuser "
+                "2023,“ Statistischer Bericht 12-6-4 (bereinigte Kosten je "
+                "Behandlungsfall ≈ 6.996 €₂₀₂₃), Wiesbaden.",
+        "url": "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Gesundheit/"
+               "Krankenhaeuser/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20250812204141/"
+                       "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/"
+                       "Gesundheit/Krankenhaeuser/_inhalt.html",
+        "accessed": "2026-08-30",
+    },
+    "Destatis_T67_Hitzeeinweisungen": {
+        "ieee": "Statistisches Bundesamt (Destatis), Pressemitteilung N035 vom "
+                "15.07.2024: „Hitzebedingte Krankenhausbehandlungen (ICD T67)“ "
+                "(Ø ≈ 1.400–1.500 Fälle/Jahr; 2003: 2.600), Wiesbaden.",
+        "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2024/07/"
+               "PD24_N035_231.html",
+        "archive_url": "https://web.archive.org/web/20250128201850/"
+                       "https://www.destatis.de/DE/Presse/Pressemitteilungen/2024/07/"
+                       "PD24_N035_231.html",
+        "accessed": "2026-08-30",
+    },
+    "Destatis_Pflegestatistik_2023": {
+        "ieee": "Statistisches Bundesamt (Destatis), Pflegestatistik 2023 (GENESIS-"
+                "Online Tab. 22421-0001; PM 478/2024: 0,80 Mio. vollstationär; 85+: "
+                "424.300), Wiesbaden. Ergänzend WIdO-Pflegereport (Sterberate "
+                "Heimbewohner ≈ 0,6–0,7 %/Woche).",
+        "url": "https://www.destatis.de/DE/Presse/Pressemitteilungen/2024/12/"
+               "PD24_478_224.html",
+        "archive_url": "https://web.archive.org/web/20260601145452/"
+                       "https://www.destatis.de/DE/Presse/Pressemitteilungen/2024/12/"
+                       "PD24_478_224.html",
+        "accessed": "2026-08-30",
+    },
+    "Destatis_Mikrozensus_2023_Einpersonenhaushalte": {
+        "ieee": "Statistisches Bundesamt (Destatis)/BMFSFJ-Open-Data, „Anteil von "
+                "Frauen und Männern ab 65 Jahren in Einpersonenhaushalten,“ "
+                "Mikrozensus 2023 (Erstergebnisse): 34,6 % (Indikator 132088).",
+        "url": "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/"
+               "Haushalte-Familien/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20260826040405/"
+                       "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/"
+                       "Bevoelkerung/Haushalte-Familien/_inhalt.html",
+        "accessed": "2026-08-30",
+    },
+    "UBA_MK40_Amann_2020_VOLY": {
+        "ieee": "Umweltbundesamt, „Methodenkonvention 4.0 zur Ermittlung von "
+                "Umweltkosten,“ Abschn. 3.4; M. Amann u. a. (IIASA), 2020a, Tab. 3.15: "
+                "VOLY 79.500 €₂₀₀₅ — Kette auf €₂₀₂₄: × VPI 1,4638 × Raumtransfer "
+                "1,1792 × Einkommensentwicklung 1,1719 = 160.800 € (Bericht #95 §3.5).",
+        "url": "https://www.umweltbundesamt.de/publikationen/methodenkonvention-"
+               "umweltkosten",
+        "archive_url": "https://web.archive.org/web/20260415021252/"
+                       "https://www.umweltbundesamt.de/publikationen/"
+                       "methodenkonvention-umweltkosten",
+        "accessed": "2026-08-30",
+    },
+    "Feldbusch_2025_HHWS": {
+        "ieee": "H. Feldbusch u. a., „Assessing the effectiveness of the heat health "
+                "warning system in preventing mortality in 15 German cities: A "
+                "difference-in-differences approach,“ Environ. Int., Bd. 203, 109746, "
+                "2025. doi: 10.1016/j.envint.2025.109746 (RR 1,00 [0,98–1,01], "
+                "adjustiert 0,85).",
+        "url": "https://doi.org/10.1016/j.envint.2025.109746",
+        "archive_url": "https://web.archive.org/web/20251217031229/"
+                       "https://doi.org/10.1016/j.envint.2025.109746",
+        "accessed": "2026-08-30",
+    },
 }
 
 

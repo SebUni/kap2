@@ -540,14 +540,15 @@ def build_payload(nr: str) -> dict:
         params = parameter_registry.catalog_parameters()
         for code, label in (
                 ("EXPECTED_ANNUAL_MORTALITY",
-                 "Vergleich: Ist-Produktstand Mortalität (Befund 76)"),
+                 "Ist-Produktstand Mortalität (integriert)"),
                 ("EXPECTED_ANNUAL_MORBIDITY",
-                 "Vergleich: Ist-Produktstand Erkrankungen")):
+                 "Ist-Produktstand Erkrankungen (integriert)")):
             if code in catalog.RISKS_BY_CODE:
                 tabs.append({
                     "label": label,
-                    "note": "Ist-Stand aus Backend-Registry/Lineage-Builder — läuft noch "
-                            "auf dem Vor-Rev.-6-Modell (Ledger-Befund 76).",
+                    "note": "Ist-Stand aus Backend-Registry/Lineage-Builder — seit der "
+                            "Integration (30.08.2026) der Rev.-7-Stand (Befund 76 "
+                            "geschlossen).",
                     "lineage": lineage_graph.build_risk_lineage(code),
                     "parameters": params,
                 })
@@ -556,10 +557,11 @@ def build_payload(nr: str) -> dict:
             "subtitle": "Ziel-Modell laut Methodik-Bericht Rev. 7 "
                         "(docs/methodik/95_hitzebelastung.md); Ist-Produktstand als "
                         "Vergleichstabs.",
-            "banner": "Der erste Tab zeigt das künftige Modell aus dem abgenommenen "
-                      "Bericht Rev. 7. Das Produkt rechnet bis zur Integration noch den "
-                      "alten Stand (Vergleichstabs; dokumentiert als Ledger-Befund 76) — "
-                      "/integriere-risiko 95 gleicht beides ab und schließt den Befund.",
+            "banner": "Integration vollzogen (30.08.2026): Das Produkt rechnet den "
+                      "Rev.-7-Stand des abgenommenen Berichts (YLL × VOLY, empirische "
+                      "Wochenquantile, c_kal 0,581). Die Ist-Tabs kommen live aus "
+                      "Backend-Registry/Lineage-Builder; Ledger-Befund 76 ist "
+                      "geschlossen.",
             "generated": today,
             "tabs": tabs,
         }

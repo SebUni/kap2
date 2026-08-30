@@ -61,6 +61,10 @@ def _risk_worker(idx: int) -> tuple[int, dict]:
             "outcome": round(imp.get("outcome", 0.0), 6),
             "cost_eur": round(imp.get("cost_eur", 0.0), 2),
         }
+        # Teil-Ausweis unter der KWRA-Klammer (Bericht #95 §3.6): Hitzemortalität
+        # rechnet nativ YLL und weist die Todesfälle zusätzlich aus.
+        if "deaths" in imp:
+            risks[code]["deaths"] = round(imp["deaths"], 6)
 
     data = {
         "hazards": hev["hazards"],

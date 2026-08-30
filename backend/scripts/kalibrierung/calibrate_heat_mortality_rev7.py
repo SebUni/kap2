@@ -52,10 +52,11 @@ DATA = os.path.join(ROOT, "data", "kalibrierung")
 
 from calibrate_heat_mortality import RKI4_BY_BUNDESLAND, RKI_2025, _read, _rki  # noqa: E402
 from calibrate_heat_mortality_rev6 import (  # noqa: E402
-    BASELINE_MORTALITY_PER_100K, RKI_AGE_SHARES, derive_fa, ls_origin, model_year,
+    BASELINE_MORTALITY_PER_100K, REGION_BETA_85P, RKI_AGE_SHARES, derive_fa,
+    ls_origin, model_year,
 )
 from app.services.engine.impact.health import (  # noqa: E402
-    AGE_BANDS, REGION_BY_BUNDESLAND, REGION_BETA_85P, REGION_THRESHOLD,
+    AGE_BANDS, REGION_BY_BUNDESLAND, REGION_THRESHOLD,
 )
 
 YEARS = range(1992, 2026)  # inkl. 2025 (nur für die Sensitivität "inkl. vorläufig 2025"; Befund 77)

@@ -35,8 +35,15 @@ sys.path.insert(0, ROOT)
 DATA = os.path.join(ROOT, "data", "kalibrierung")
 
 from app.services.engine.impact.health import (  # noqa: E402
-    AGE_BANDS, AGE_BETA_FACTOR, REGION_BETA_85P, REGION_BY_BUNDESLAND, REGION_THRESHOLD,
+    AGE_BANDS, REGION_BY_BUNDESLAND, REGION_THRESHOLD,
 )
+
+# Historischer Rev.-5-Stand, lokal eingefroren (Reproduzierbarkeit des
+# dokumentierten Laufs): β-Ablesewerte Winklmayr und f_a vor der Rev.-6-
+# Neuberechnung. NICHT aus health.py importieren — das Produkt trägt seit der
+# Rev.-7-Integration β_Süd = 0,0876 (nachgeschätzt) und f_a = 0,357/0,588/0,631/1,0.
+REGION_BETA_85P = {"nord": 0.0634, "mitte": 0.0625, "sued": 0.0531}
+AGE_BETA_FACTOR = {"u65": 0.404, "a65_74": 0.577, "a75_84": 0.620, "a85p": 1.0}
 from app.data.germany_health_reference import BASELINE_MORTALITY_PER_100K as _REPO_M_A  # noqa: E402
 
 # Basissterberaten 2023 je Altersband (Destatis Sterbefälle 2023 Tab. 12613-03 ÷ Bevölkerung 31.12.2023;

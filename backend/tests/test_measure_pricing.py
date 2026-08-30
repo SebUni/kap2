@@ -260,7 +260,10 @@ def test_registry_emits_references_for_cited_field():
     params = parameter_registry.catalog_parameters(
         layer_code="HEAT_ACTION_PLANS", layer_category="measures")
     p = next(p for p in params if p["id"].endswith(".default_reduction"))
-    assert [r["key"] for r in p["references"]] == ["Urban_HHAP_Wirksamkeit_2025"]
+    # Rev.-7-Integration (#95 §5): marginale Evidenz (Feldbusch-DiD) zuerst, der
+    # Urban-Einführungseffekt als Kontext des Doppelzählungs-Wächters.
+    assert [r["key"] for r in p["references"]] == [
+        "Feldbusch_2025_HHWS", "Urban_HHAP_Wirksamkeit_2025"]
 
 
 def test_resolve_measure_def_applies_all_nine_override_fields():

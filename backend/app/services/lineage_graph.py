@@ -1605,9 +1605,26 @@ def _add_driver_op(b: LineageBuilder, code: str, driver: dict) -> str:
             b, op_id, "erf", "Wirkungskurve",
             "Expositions-Wirkungs-Kurve nach RKI/Winklmayr: relatives Sterberisiko über "
             "der Wochenmitteltemperatur, je Altersband und Region. Die Kurve wird über "
-            "die Verteilung der Sommerwochen summiert — nicht am Mittelwert ausgewertet, "
-            "denn das deutsche Sommermittel liegt unter der Wirkschwelle.\n"
-            r"$$\mathrm{Exzess} = \sum_{w} \left(e^{\beta_a\,(T_w - T_0)_{+}} - 1\right)$$",
+            "die 13 empirischen Wochenquantile des Sommers summiert (T_w = T̄ + q_w, "
+            "Bericht #95 §3.2) — nicht am Mittelwert ausgewertet, denn das deutsche "
+            "Sommermittel liegt unter der Wirkschwelle. Bewertung: YLL = Σ D_a · L̄_a "
+            "(nativer Ausweis; Todesfälle als Teil-Ausweis).\n"
+            r"$$\mathrm{Exzess} = \sum_{w=1}^{13} \left(e^{\beta_a\,(T_w - T_0)_{+}} - 1\right)$$",
+        )
+        b.add_edge(b.ensure_indicator(driver["hazard"], "hazards"), op_id)
+        for pkey in driver.get("params", []):
+            b.add_edge(_impact_param_node(b, code, pkey), op_id)
+        return op_id
+    if kind == "hd_linear":
+        op_id = f"op:hdlinear:{code}"
+        _add_op(
+            b, op_id, "ratio", "HD-Term",
+            "Zweiseitig linearer Hitzetage-Term um die Referenzlast, bei 0 gedeckelt "
+            "(Bericht #95 §3.4): Zellen unter der Referenz reduzieren die Baseline "
+            "anteilig — erwartungstreu um HD_ref, keine Doppelzählung des bereits in "
+            "r_0 enthaltenen Referenzlast-Effekts.\n"
+            r"$$\mathrm{Treiber} = \max\bigl(0,\; 1 + e_{HD}\,(\mathrm{HD} - "
+            r"\mathrm{HD}_{ref})\bigr)$$",
         )
         b.add_edge(b.ensure_indicator(driver["hazard"], "hazards"), op_id)
         for pkey in driver.get("params", []):
@@ -1787,16 +1804,26 @@ def _build_impact_branch(
 
     if kind in ("health", "environment"):
         mod_spec = None
+        no_mod = False
         if kind == "health":
             spec = HEALTH_SPECS[code]
             mod_spec = spec.get("modifier")
+            # no_modifier: der Kanal rechnet bewusst OHNE Zellmodifikator
+            # (z. B. Hitze-Morbidität, Bericht #95 §3.4) — das Diagramm darf
+            # dann kein g(V̂) erfinden.
+            no_mod = bool(spec.get("no_modifier"))
             basis_label = spec.get("basis_label", "Bevölkerung")
             basis = b.expand_cell_key(spec.get("basis_key", "pop"))
-            mod_term = mod_spec["term"] if mod_spec else "g(V̂)"
-            mod_latex = r"M_{z}" if mod_spec else r"g(\hat{V})"
-            product = f"{basis_label} · Rate · Treiber · {mod_term}"
-            latex = (r"$$O_{z} = \text{" + basis_label + r"}_{z} \cdot \text{Rate}"
-                     r" \cdot \text{Treiber}_{z} \cdot " + mod_latex + "$$")
+            if no_mod:
+                product = f"{basis_label} · Rate · Treiber"
+                latex = (r"$$O_{z} = \text{" + basis_label + r"}_{z} \cdot "
+                         r"\text{Rate} \cdot \text{Treiber}_{z}$$")
+            else:
+                mod_term = mod_spec["term"] if mod_spec else "g(V̂)"
+                mod_latex = r"M_{z}" if mod_spec else r"g(\hat{V})"
+                product = f"{basis_label} · Rate · Treiber · {mod_term}"
+                latex = (r"$$O_{z} = \text{" + basis_label + r"}_{z} \cdot \text{Rate}"
+                         r" \cdot \text{Treiber}_{z} \cdot " + mod_latex + "$$")
         else:
             spec = ENV_SPECS[code]
             basis = _area_basis(b, code, spec["area_keys"], "Exponierte Naturfläche (Zelle)")
@@ -1807,8 +1834,9 @@ def _build_impact_branch(
         b.add_edge(basis, mul_id)
         b.add_edge(_impact_param_node(b, code, spec["rate_param"]), mul_id)
         b.add_edge(_add_driver_op(b, code, spec["driver"]), mul_id)
-        b.add_edge(_add_modifier_op(b, code, mod_spec) if mod_spec
-                   else _add_gv_op(b, risk), mul_id)
+        if not no_mod:
+            b.add_edge(_add_modifier_op(b, code, mod_spec) if mod_spec
+                       else _add_gv_op(b, risk), mul_id)
         sum_id = _add_sum_cells_op(b, code)
         b.add_edge(mul_id, sum_id)
         native_id = add_native(f"Outcome = {product}, Σ Zellen")

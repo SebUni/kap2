@@ -328,9 +328,10 @@ def test_health_modifier_node_matches_computation():
         mod = spec.get("modifier")
         if uses_gv and mod:
             problems.append(f"{code}: rechnet g(V̂), Spec deklariert aber einen Modifikator")
-        if not uses_gv and not mod:
+        if not uses_gv and not mod and not spec.get("no_modifier"):
             problems.append(f"{code}: rechnet KEIN g(V̂), Spec deklariert aber auch keinen "
-                            f"Modifikator — das Diagramm zeigt dann ein falsches g(V̂)")
+                            f"Modifikator — das Diagramm zeigt dann ein falsches g(V̂) "
+                            f"(bewusst modifikatorfreie Kanäle: no_modifier=True)")
         if not mod:
             continue
         # Jede im Diagramm gezeichnete Vulnerabilität muss die Funktion auch lesen …

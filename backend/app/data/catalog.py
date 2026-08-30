@@ -132,19 +132,35 @@ RISKS: list[dict] = [
     # (Präsentations-Fusion; docs/ROADMAP.md §5, Plan AP3a).
     {"code": "EXPECTED_ANNUAL_MORTALITY", "name": "Hitzebelastung — Mortalität",
      "kwra_id": 95, "kwra_name": "Hitzebelastung", "kwra_field": "Menschliche Gesundheit", "stage": 0,
-     "outcome_unit": "Todesfälle/Jahr", "group": "heat", "cost_dimension": "health",
+     # Rev. 7 (Bericht #95 §3.6): native Ergebnisgröße sind verlorene Lebensjahre
+     # (YLL); Todesfälle laufen als Teil-Ausweis (runner materialisiert "deaths").
+     "outcome_unit": "YLL/Jahr", "group": "heat", "cost_dimension": "health",
      # Gefahrenliste = was die Schadensfunktion TATSÄCHLICH rechnet. Vorher standen
      # hier zusätzlich COLD_EXTREME und COMPOUND_EVENT, die nie in die Rechnung
      # eingingen — der Name „(Hitze)“ und die Metadaten stimmen jetzt überein.
      "hazards": ["HEAT_WAVE"],
      "exposures": ["POPULATION_DENSITY", "VULNERABLE_GROUPS_POPULATION", "AGE_STRUCTURE"],
      "vulnerabilities": ["HEALTHCARE_ACCESS"],
-     # Herleitung: Anker 18/100k ≈ 1,7× schlimmstes beobachtetes Jahr (2018: ~8.700 Tote = 10,5/100k; RKI/Winklmayr 2022).
-     # cost_per_outcome_eur: VSL-Punktwert 3,5 Mio € im gängigen EU/OECD-Band (~1-4 Mio); UBA MK3.1 nennt keinen einzelnen VSL-Wert.
-     "ref_value": 18.0, "scale": "pop", "cost_per_outcome_eur": 3500000.0, "source": "Winklmayr u.a. 2022 / RKI / UBA MK3.1 2020",
-     "description": "Hitzebedingte Sterbefälle nach der altersgeschichteten Expositions-"
-                    "Wirkungs-Kurve des RKI (Wochenmitteltemperatur, vier Altersbänder, "
-                    "drei Regionen).",
+     # Herleitung ref_value (Sanity-Anker, YLL/100k): 18 Todesfälle/100k (≈ 1,7×
+     # schlimmstes beobachtetes Jahr, 2018: ~8.700 Tote) × mittlere Restlebens-
+     # erwartung je Hitze-Sterbefall 8,79 Jahre (RKI-Altersanteile 6,5/12,9/25,2/
+     # 55,5 % × L̄_a 23,39/15,59/8,90/5,44) ≈ 158 YLL/100k.
+     # cost_per_outcome_eur: VOLY 160.800 €₂₀₂₄ (UBA MK 4.0; Herleitung s. _RISK_COST_RATES).
+     "ref_value": 158.0, "scale": "pop", "cost_per_outcome_eur": 160800.0,
+     "source": "Bericht #95 Rev. 7 (Winklmayr 2022 / RKI EB 19/2025 / UBA MK 4.0)",
+     "source_detail": "Sanity-Anker in YLL je 100.000 EW: 18 Todesfälle/100k (≈ 1,7× "
+                      "schlimmstes beobachtetes Jahr; 2018 revidiert: 8.500 ≈ 10,2/100k) "
+                      "× mittlere Restlebenserwartung je Hitze-Sterbefall 8,79 Jahre "
+                      "(RKI-Altersanteile 6,5/12,9/25,2/55,5 % × L̄_a 23,39/15,59/8,90/"
+                      "5,44) ≈ 158 YLL/100k. Kein Rechenweg — Schicht B rechnet die "
+                      "Schadensfunktion; der Anker dient der Sanity-Prüfung (Faktor 5).",
+     "source_refs": ["RKI_EpidBull_19_2025", "Winklmayr_2022",
+                     "Destatis_Sterbetafeln_2022_2024"],
+     "description": "Verlorene Lebensjahre (YLL) durch hitzebedingte Sterblichkeit nach "
+                    "der altersgeschichteten Expositions-Wirkungs-Kurve des RKI "
+                    "(empirische Wochenquantile, vier Altersbänder, drei Regionen; "
+                    "Todesfälle als Teil-Ausweis). Bewerteter Schaden — Konto K1 "
+                    "Gesundheit (Modellstand M0, Untergrenze).",
      "priority": 1},
     {"code": "EXPECTED_ANNUAL_MORBIDITY", "name": "Hitzebelastung — Erkrankungen",
      "kwra_id": 95, "kwra_name": "Hitzebelastung", "kwra_field": "Menschliche Gesundheit", "stage": 0,
@@ -155,9 +171,21 @@ RISKS: list[dict] = [
      "hazards": ["HEAT_WAVE"],
      "exposures": ["POPULATION_DENSITY", "VULNERABLE_GROUPS_POPULATION"],
      "vulnerabilities": ["HEAT_SENSITIVITY", "HEALTHCARE_ACCESS"],
-     # Modellannahme (Punktwert, editierbar): kalibriert gegen Größenordnung der UBA-MK3.1-Morbiditätskostensätze; keine belastbare nationale Pro-Kopf-Fallstatistik ⇒ als Annahme gekennzeichnet, nicht als Herleitung.
-     "ref_value": 320.0, "scale": "pop", "cost_per_outcome_eur": 5000.0, "source": "UBA MK3.1 2020 / RKI JoHM",
-     "description": "Hitzeassoziierte Erkrankungsfälle.", "priority": 1},
+     # Herleitung ref_value (Sanity-Anker, Fälle/100k): Baseline 3,54/100k·a
+     # (Bericht #95 §3.4, bevölkerungsgewichtete Summe der r_0,a); Hitzejahr mit
+     # e_HD-Obergrenze ≈ 4,5/100k — Anker auf das Hitzejahr gesetzt.
+     # cost_per_outcome_eur: c_Fall 7.152 €₂₀₂₄ (Destatis-Kostennachweis, Proxy).
+     "ref_value": 4.5, "scale": "pop", "cost_per_outcome_eur": 7152.0,
+     "source": "Bericht #95 Rev. 7 (Destatis T67 / Karlsson & Ziebarth 2018)",
+     "source_detail": "Sanity-Anker in Fällen je 100.000 EW: Baseline 3,54/100k·a "
+                      "(bevölkerungsgewichtete Summe der r_0,a, Bericht #95 §3.4); "
+                      "Hitzejahr mit e_HD-Obergrenze ≈ 4,5/100k. Kein Rechenweg — der "
+                      "Anker dient der Sanity-Prüfung (Faktor 5).",
+     "source_refs": ["Destatis_T67_Hitzeeinweisungen", "Karlsson_Ziebarth_2018"],
+     "description": "Hitzeassoziierte Erkrankungsfälle (Krankenhauseinweisungen): "
+                    "altersgeschichtete Baseline × Hitzetage-Term um die Referenzlast "
+                    "(Bericht #95 §3.4). Bewerteter Schaden — Konto K1 (M0, Untergrenze).",
+     "priority": 1},
     # EXPECTED_TOTAL_DAMAGE_EAD_EUR (Gesamtschäden/EAD) wurde ENTFERNT: Der Gesamtschaden
     # ist kein eigenständiges HxVxE-Risiko mehr, sondern die SUMME der monetär bewerteten
     # Einzelrisiken (risk_engine.aggregate → cost.total_eur). Das eigene EAD-Risiko war per
@@ -758,19 +786,29 @@ _enrich_risk_sources()
 _RISK_COST_RATES: dict[str, tuple[float, str, list[str], str]] = {
     # ── Gesundheit: Personenschäden (Kostensatz je Fall/Person) ──
     "EXPECTED_ANNUAL_MORTALITY": (
-        3_500_000.0, "OECD 2012 (VSL) / RKI 2023", ["OECD_VSL_2012", "RKI_Hitzemortalitaet"],
-        "Wert eines statistischen Lebens (VSL) 3,5 Mio € je vorzeitigem Todesfall – "
-        "Punktwert im international gebräuchlichen Band (OECD 2012: Meta-Analyse "
-        "internationaler Zahlungsbereitschafts-Studien, EU/OECD-Zentralwerte ~1–4 Mio €). "
-        "Editierbarer Kostensatz; ersetzt die frühere Prosa im Referenzwert-Tooltip."),
+        160_800.0, "UBA MK 4.0 / Amann 2020a (VOLY, €2024)",
+        ["UBA_MK40_Amann_2020_VOLY"],
+        "Sterblichkeit wird nach der UBA-Methodenkonvention 4.0 bewertet: verlorene "
+        "Lebensjahre (YLL) × Wert eines Lebensjahres (VOLY) 160.800 €₂₀₂₄. Herleitung "
+        "(Bericht #95 §3.5): Amann 2020a Tab. 3.15: 79.500 €₂₀₀₅ × VPI 2005→2024 "
+        "1,4638 × Kaufkraft-Raumtransfer EU27→DE 1,1792 × Einkommensentwicklung^0,85 "
+        "1,1719; Band 136.400–165.600 €. Preisstand 2024. Das bewertet altersgerecht — "
+        "ein Sterbefall mit 6 verbleibenden Lebensjahren zählt anders als einer mit 40 — "
+        "und fällt bei altenlastigen Risiken (Hitze) rund Faktor 5 vorsichtiger aus als "
+        "der pauschale VSL (Sensitivität: VSL 6,19 Mio €₂₀₂₄ MK-konsistent, ÷ VOLY = "
+        "38,5 Lebensjahre ✓; EU-Referenz 4,7 Mio €). Ersetzt den früheren VSL-Punktwert "
+        "3,5 Mio €/Todesfall (Rev.-7-Integration; Ledger-Befund 76)."),
     "EXPECTED_ANNUAL_MORBIDITY": (
-        5_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
-        "Durchschnittliche Krankheitskosten 5.000 € je klimabedingtem Erkrankungsfall "
-        "(ambulante/stationäre Behandlung + krankheitsbedingter Produktivitätsausfall), "
-        "Größenordnung an den Gesundheits-Kostensätzen der UBA-Methodenkonvention 3.1 "
-        "orientiert. Editierbar. Abgrenzung (§8/B4): erfasst die KLINISCHEN Fälle; die "
-        "subklinische Produktivitätslast thermischer/Schadstoff-Belastung ist getrennt über "
-        "die Belastungsstunden-Risiken bewertet — keine Doppelzählung."),
+        7_152.0, "Destatis Kostennachweis 2023 (indexiert €2024)",
+        ["Destatis_Kostennachweis_2023"],
+        "Behandlungskostensatz je hitzeassoziiertem Krankenhausfall: 6.996 €₂₀₂₃ "
+        "(bereinigte Kosten je Behandlungsfall, Kostennachweis der Krankenhäuser 2023) "
+        "× VPI 119,3/116,7 = 7.152 €₂₀₂₄ (Bericht #95 §3.5). PROXY: Durchschnitt aller "
+        "Krankenhausfälle — hitzeassoziierte Fälle haben einen anderen Fallmix; "
+        "DRG-basierte Sätze als benannte Sensitivität. Abgrenzung (§8/B4): erfasst die "
+        "KLINISCHEN Fälle; die subklinische Produktivitätslast thermischer/Schadstoff-"
+        "Belastung ist getrennt über die Belastungsstunden-Risiken bewertet — keine "
+        "Doppelzählung."),
     "EXPECTED_ANNUAL_INJURIES": (
         12_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
         "12.000 € je Verletztem (Behandlung, Reha, temporärer Erwerbsausfall) als "
@@ -1181,10 +1219,12 @@ MEASURES: list[dict] = [
     # nennen selbst keine Kostenzahlen) → Punktwert 100.000 € (unterer Mittelwert).
     {"code": "HEAT_ACTION_PLANS", "name": "Hitzeaktionspläne",
      "description": "Kommunale Hitzeaktionspläne.", "measure_type": "organizational",
-     # default_reduction 0,25: von 0,20 angehoben gemäß Urban u. a. 2025 (ERL) — europäische
-     # Evaluationsstudie: Hitzeaktionspläne senken die hitzeattributable Übersterblichkeit
-     # um 25,2 % (102 Städte, 14 Länder).
-     "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "saturating",
+     # default_reduction 0,05 (Rev.-7-Integration, Bericht #95 §5): δ_HAP = 0,95 auf den
+     # Wochen-Exzess (RR−1) ⇒ linear −5 % Outcome (Band 0–0,15). Die 25,2 % von Urban
+     # u. a. 2025 sind der EINFÜHRUNGSEFFEKT über drei Jahrzehnte, nicht der marginale
+     # Spielraum gegenüber dem heutigen deutschen Stand — c_kal ist auf Jahre mit
+     # laufendem DWD-Warnsystem kalibriert (Doppelzählungs-Wächter, Befund 33/68).
+     "effect_target": ["vulnerability"], "default_reduction": 0.05, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"],
      "capex_fixed": 100000.0, "capex_per_unit": None, "capex_per_m2": None,
      "opex_fixed_year": 20000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
@@ -1192,16 +1232,19 @@ MEASURES: list[dict] = [
      "source": "klimastadtraum.de (Praxisrichtwert) / Modellannahme",
      "sources": {"opex_fixed_year": "Modellannahme (laufende Fortschreibung/Koordination)",
                  "capex_fixed": "klimastadtraum.de (Praxisrichtwert Hitzeaktionsplan)",
-                 "default_reduction": "Urban u. a. 2025 (ERL): −25,2 % Hitzemortalität"},
-     "source_refs": {"default_reduction": ["Urban_HHAP_Wirksamkeit_2025"]},
+                 "default_reduction": "Bericht #95 §5: δ_HAP = 0,95 (Band 0,85–1,00), marginal"},
+     "source_refs": {"default_reduction": ["Feldbusch_2025_HHWS",
+                                           "Urban_HHAP_Wirksamkeit_2025"]},
      "source_details": {
-        "default_reduction": "Direkt kalibriert auf die europäische Evaluationsstudie von "
-            "Urban u. a. 2025 (Environmental Research Letters): Die Einführung von Hitze"
-            "präventions-/Hitzeaktionsplänen war über 102 Städte in 14 Ländern (1990-2019) mit "
-            "einer Reduktion der hitzeattributablen Übersterblichkeit um 25,2 % (95 %-KI "
-            "19,8-31,9 %) verbunden — das entspricht exakt den hier verknüpften Risiken "
-            "(Hitzemortalität/-morbidität). Wert daher von zuvor 0,20 (unbelegte Annahme) auf "
-            "0,25 angehoben; angesichts des breiten Konfidenzintervalls editierbar.",
+        "default_reduction": "δ_HAP = 0,95 multiplikativ auf den Wochen-Exzess (RR−1) ⇒ "
+            "linear −5 % Outcome (Band 0–15 %; Bericht #95 §5, abgenommen Rev. 7). Evidenz: "
+            "DiD über 15 deutsche Städte (Feldbusch u. a. 2025: RR 1,00 [0,98–1,01], "
+            "adjustiert 0,85) — der MARGINALE Spielraum gegenüber dem heutigen deutschen "
+            "Stand. Die 25,2 % (95 %-KI 19,8–31,9) von Urban u. a. 2025 (102 Städte, "
+            "14 Länder, 1990–2019) sind der Einführungseffekt über drei Jahrzehnte und "
+            "stecken bereits im Basiswert: Der Kalibrierfaktor ist auf Jahre mit laufendem "
+            "DWD-Warnsystem gefittet — ein Hebel in dieser Größe würde doppelt buchen "
+            "(Doppelzählungs-Wächter). Ersetzt den früheren Wert 0,25 (Rev.-7-Integration).",
         "opex_fixed_year":
             "Modellannahme für den laufenden Betrieb des Hitzeaktionsplans: jährliche Fortschreibung, Koordination der Warnkette und saisonaler Betrieb (Hitzetelefon). Entspricht grob der anteiligen halben Personalstelle, die klimastadtraum.de bereits für die Erstellung nennt. Punktwert 20.000 €/a (rund 20 % der einmaligen Erstellungskosten); editierbar.",
         "capex_fixed": "Praxisrichtwert für die Erstellung eines kommunalen "
@@ -2023,4 +2066,7 @@ def group_label(code: str) -> str:
 # Wird bei strukturellen Modelländerungen (Risiko-Set, Kostensätze, Aggregation)
 # erhöht. Der Layer-Cache stempelt seine Dateien mit dieser Version und invalidiert
 # automatisch, wenn sich die Version ändert (siehe services/layer_cache.py).
-MODEL_VERSION = "2026.08-m0-kwra-mvp"
+# 2026.08-m0-95rev7: Integration Methodik #95 Rev. 7 (YLL × VOLY, empirische
+# Wochenquantile, v_vers, c_kal 0,581, Morbidität r_0,a × HD-Term) — invalidiert
+# Layer-Caches, die den alten Todesfall-/VSL-Stand materialisiert haben.
+MODEL_VERSION = "2026.08-m0-95rev7"

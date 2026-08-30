@@ -164,6 +164,14 @@ def _build_values_package(rows, regional: dict, code: str, category: str) -> dic
             props["V"] = breakdown["V"]
             props["outcome"] = risk_engine.cell_outcome_breakdown(rdef, idx, cell_pop)
             props["pathways"] = formulas.risk_pathway_cell_breakdown(rdef, hev_norm)
+            # Raten-Ausweis (§3.6, Bericht #95: Zell-Rohwerte sind unlesbar):
+            # pop-skalierte Risiken zusätzlich als Outcome je 1.000 EW.
+            if rdef.get("scale") == "pop" and cell_pop > 0:
+                props["rate_per_1000"] = round(value / cell_pop * 1000.0, 4)
+            # Teil-Ausweis der Hitzemortalität (Todesfälle neben YLL), sofern
+            # vom Runner materialisiert.
+            if rcell.get("deaths") is not None:
+                props["deaths"] = round(float(rcell["deaths"]), 6)
         else:
             raw = data.get(category, {}).get(code)
             if raw is None:
@@ -186,6 +194,8 @@ def _build_values_package(rows, regional: dict, code: str, category: str) -> dic
     if category == "risks":
         r = catalog.RISKS_BY_CODE[code]
         meta.update({"label": r["name"], "unit": r["outcome_unit"]})
+        if r.get("scale") == "pop":
+            meta["rate_unit"] = f"{r['outcome_unit']} je 1.000 EW"
     else:
         m = catalog.INDICATOR_BY_CODE[code]
         meta.update({"label": m["name"], "unit": m["unit"]})
