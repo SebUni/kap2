@@ -99,8 +99,15 @@ def lite_gemeinde(ags: str, db: Session = Depends(get_db)):
     }
 
 
+def _require_study_enabled() -> None:
+    """M0-Verschlankung: Studien-Endpunkte offline, kehren mit M3½ zurück (410)."""
+    if not settings.STUDY_ENABLED:
+        raise HTTPException(410, "Die Deutschland-Studie ist derzeit offline")
+
+
 @router.get("/studie")
 def lite_studie():
+    _require_study_enabled()
     path = _artifact("studie.json")
     if not os.path.exists(path):
         raise HTTPException(404, "Studie noch nicht generiert")
@@ -110,6 +117,7 @@ def lite_studie():
 
 @router.get("/studie.csv")
 def lite_studie_csv():
+    _require_study_enabled()
     from fastapi.responses import FileResponse
     path = _artifact("studie.csv")
     if not os.path.exists(path):
@@ -120,6 +128,7 @@ def lite_studie_csv():
 @router.get("/study-highlights")
 def study_highlights(db: Session = Depends(get_db)):
     """Kernzahlen für die Landingpage (aus den vorberechneten Ergebnissen)."""
+    _require_study_enabled()
     path = _artifact("study_highlights.json")
     if os.path.exists(path):
         with open(path, encoding="utf-8") as fh:

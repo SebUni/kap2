@@ -1,0 +1,17 @@
+bundesland,region,rki_summe,modell_summe,rki_je_100k,modell_je_100k,verhaeltnis_modell_rki,modell_regional_je_100k,verhaeltnis_regional
+Schleswig-Holstein,nord,180,653,1.5,5.5,3.63,3.3,2.17
+Hamburg,nord,190,619,2.6,8.4,3.26,5.0,1.95
+Mecklenburg-Vorpommern,nord,340,693,5.4,11.0,2.04,6.6,1.22
+Bremen,nord,160,258,5.7,9.2,1.61,5.5,0.96
+Bayern,sued,3080,2875,5.8,5.5,0.93,9.3,1.58
+Niedersachsen,nord,1960,3171,6.1,9.9,1.62,5.9,0.97
+Thüringen,mitte,560,843,6.6,10.0,1.51,9.7,1.47
+Brandenburg,mitte,790,1833,7.7,17.9,2.32,17.5,2.26
+Sachsen,mitte,1340,2270,8.3,14.0,1.69,13.6,1.65
+Sachsen-Anhalt,mitte,760,1527,8.9,17.8,2.01,17.3,1.96
+Berlin,mitte,1340,2068,9.1,14.1,1.54,13.7,1.5
+Nordrhein-Westfalen,mitte,6780,6860,9.4,9.5,1.01,9.3,0.98
+Baden-Württemberg,sued,5760,3176,12.8,7.1,0.55,12.0,0.94
+Hessen,mitte,3620,2635,14.4,10.5,0.73,10.2,0.71
+Saarland,mitte,610,768,15.0,18.9,1.26,18.4,1.22
+Rheinland-Pfalz,mitte,2500,2230,15.2,13.5,0.89,13.2,0.87

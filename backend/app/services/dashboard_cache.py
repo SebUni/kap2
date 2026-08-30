@@ -51,7 +51,7 @@ _WEEKLY_ARTIFACTS = frozenset({"profile", "cost_projection"})
 # v4: Zell-Sommertemperatur aus den DWD-Monatsrastern + Wärmeinsel-Tagesmittel +
 #     Zensus-Altersbänder — alles extern bezogene Felder, die der Eingabe-
 #     Fingerprint nicht erfasst.
-_PROFILE_SCHEMA_VERSION = 4
+_PROFILE_SCHEMA_VERSION = 5
 
 _CACHE_BASE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),

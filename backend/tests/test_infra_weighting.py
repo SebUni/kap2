@@ -129,7 +129,7 @@ def test_resolve_weights_honors_override():
     pid = "exposures.ENERGY_INFRASTRUCTURE.param.w_substation_transmission"
     with override_context.override_scope({pid: 20.0}):
         assert ia.resolve_weights("energy")["substation_transmission"] == 20.0
-    assert ia.resolve_weights("energy")["substation_transmission"] == 10.0
+    assert ia.resolve_weights("energy")["substation_transmission"] == 8.0  # Taxonomie-Default
 
 
 # ── Zell-Zählung (compute_cell_infrastructure) ────────────────────────────────
@@ -158,7 +158,8 @@ def test_compute_cell_weighted_scores_and_classes():
         "transport_points": [{"lon": 0.4, "lat": 0.6, "cls": "railway_halt"}],
     }
     m = compute_cell_infrastructure(_square_cell(), infra)
-    assert m["energy_infra_count"] == 14.0  # 10 (UW Übertragung) + 4 (EHV-Querung)
+    # 8 (UW Übertragung, stärkstes Asset voll) + 0,5·6 (EHV-Querung, SATURATION_ALPHA)
+    assert m["energy_infra_count"] == 11.0
     assert m["energy_infra_classes"] == {"substation_transmission": 1, "line_ehv": 1}
     assert m["water_wastewater_count"] == 10.0
     assert m["communication_count"] == 2.0
@@ -179,7 +180,7 @@ def test_compute_cell_weight_override_wiring():
     pid = "exposures.ENERGY_INFRASTRUCTURE.param.w_substation_transmission"
     with override_context.override_scope({pid: 3.0}):
         assert compute_cell_infrastructure(_square_cell(), infra)["energy_infra_count"] == 3.0
-    assert compute_cell_infrastructure(_square_cell(), infra)["energy_infra_count"] == 10.0
+    assert compute_cell_infrastructure(_square_cell(), infra)["energy_infra_count"] == 8.0
 
 
 def test_merge_energy_lines_joins_split_ways():
@@ -205,7 +206,8 @@ def test_merge_energy_lines_joins_split_ways():
              "transport_points": []}
     m = compute_cell_infrastructure(_square_cell(), infra)
     assert m["energy_infra_classes"] == {"line_hv": 1, "line_mv": 1}
-    assert m["energy_infra_count"] == 2.3  # 2,0 (HV-Zug) + 0,3 (MV-Zug)
+    # 3,0 (HV-Zug, stärkstes Asset voll) + 0,5·0,3 (MV-Zug, SATURATION_ALPHA)
+    assert m["energy_infra_count"] == 3.15
 
 
 # ── Monetär: klassenspezifische Ersatzwerte ───────────────────────────────────

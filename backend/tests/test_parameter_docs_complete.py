@@ -71,19 +71,28 @@ _LIVE_FORMULA_IDS = {
     "vulnerabilities.PLANNING_IMPLEMENTATION_CAPACITY.param.__const",
 }
 # KRITIS-Klassengewichte der vier Infrastruktur-Layer (resolve_weights liest sie
-# per get_override; generiert aus der Taxonomie, damit der Ratchet automatisch
-# jede neue Anlagenklasse erfasst).
-_LIVE_FORMULA_IDS |= {
-    f"exposures.{infra_assets.SECTOR_EXPOSURE[sector]}.param.w_{cls}"
+# per get_override über "exposures.<CODE>.param.w_<cls>"; generiert aus der
+# Taxonomie, damit der Ratchet automatisch jede neue Anlagenklasse erfasst).
+# M0-Verschlankung: Die Infrastruktur-Expositionen sind geparkt; die Registry
+# emittiert die Gewichte über den formulas.DETAILED-Kategorie-Fallback derzeit
+# unter "vulnerabilities.<CODE>.param.w_<cls>" (parameter_registry.py, Zeile
+# ~159: cat-Fallback für Codes außerhalb des aktiven Katalogs). Der Ratchet
+# prüft deshalb kategorie-unabhängig je (Layer-Code, w_<cls>) auf Emission +
+# Doku. ACHTUNG: Die Divergenz Emission (vulnerabilities.*) ⇄ Lesepfad
+# (exposures.*, infra_assets.resolve_weights) ist als Befund gemeldet.
+_LIVE_FORMULA_KEYS_BY_LAYER = {
+    (infra_assets.SECTOR_EXPOSURE[sector], f"w_{cls}")
     for sector, classes in infra_assets.ASSET_CLASSES.items()
     for cls in classes
 }
 
 # Neue Stellschrauben aus Phase A (müssen vorhanden UND dokumentiert sein).
+# M0-Verschlankung: "risks.EXPECTED_ANNUAL_MENTAL_HEALTH.impact.event_share"
+# entfernt — das Risiko ist geparkt und per-Risiko-Impact-Parameter werden nur
+# für aktive Risiken emittiert; kehrt mit Stage 1–4 zurück (docs/ROADMAP.md §5).
 _NEW_PARAM_IDS = {
     "uhi.epsilon", "uhi.tree_cooling",
     "impact.floor_height_m",
-    "risks.EXPECTED_ANNUAL_MENTAL_HEALTH.impact.event_share",
     "model.ref_population", "model.ref_area_km2", "model.risk_threshold",
     "model.measure_coverage_saturation", "model.measure_reduction_cap",
     "regional.storm_days", "regional.sea_level_rise", "regional.glacier_loss_rate",
@@ -137,13 +146,27 @@ def test_dead_parameters_removed():
 
 
 def test_live_formula_params_present_and_documented():
-    by_id = {p["id"]: p for p in _params()}
+    params = _params()
+    by_id = {p["id"]: p for p in params}
     for pid in sorted(_LIVE_FORMULA_IDS):
         p = by_id.get(pid)
         assert p is not None, f"Lebender Formel-Parameter fehlt: {pid}"
         assert p["editable"] is True, f"{pid} nicht editierbar"
         assert p["value"] is not None, f"{pid} ohne anzeigbaren Default (value=None)"
         assert p.get("source_detail") or p.get("references"), f"{pid} ohne Infokasten"
+    # KRITIS-Klassengewichte kategorie-unabhängig je (Layer-Code, w_<cls>) — die
+    # Emissionskategorie hängt in M0 am formulas-Fallback (siehe Kommentar oben).
+    by_layer_key = {
+        (p.get("layer_code"), p["id"].rsplit(".", 1)[-1]): p
+        for p in params if ".param." in p["id"]
+    }
+    for code, key in sorted(_LIVE_FORMULA_KEYS_BY_LAYER):
+        p = by_layer_key.get((code, key))
+        assert p is not None, f"Klassengewicht fehlt in der Registry: {code}.param.{key}"
+        assert p["editable"] is True, f"{code}.param.{key} nicht editierbar"
+        assert p["value"] is not None, f"{code}.param.{key} ohne anzeigbaren Default"
+        assert p.get("source_detail") or p.get("references"), \
+            f"{code}.param.{key} ohne Infokasten"
 
 
 def test_new_tunables_present_and_documented():

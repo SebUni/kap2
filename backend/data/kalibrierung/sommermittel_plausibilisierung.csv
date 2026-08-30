@@ -1,0 +1,6 @@
+bundesland,dwd_spalte,station_id,station,jahre,n,diff_mittel_K,diff_std_K,korrelation
+Hamburg,Niedersachsen/Hamburg/Bremen,1975,Hamburg-Fuhlsbüttel,1992–2020,29,0.05,0.22,0.971
+Bremen,Niedersachsen/Hamburg/Bremen,691,Bremen,1992–2020,29,0.11,0.17,0.985
+Niedersachsen,Niedersachsen,2014,Hannover,1992–2020,29,0.46,0.15,0.987
+Berlin,Brandenburg/Berlin,433,Berlin-Tempelhof,1992–2020,29,0.9,0.18,0.989
+Brandenburg,Brandenburg,3987,Potsdam,1992–2020,29,0.17,0.22,0.987

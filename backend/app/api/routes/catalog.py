@@ -44,6 +44,13 @@ def get_catalog(request: Request):
         "kang_clusters": catalog.KANG_CLUSTERS,
         "auxiliary": catalog.AUXILIARY,
         "auxiliary_categories": catalog.AUXILIARY_CATEGORIES,
+        # Geplante (gesperrte) KWRA-Klimawirkungen inkl. aufgelöstem
+        # Verfügbarkeits-Label — Anzeige im LayerPanel als 🔒-Einträge.
+        "planned_risks": [
+            {**p, "available_from": catalog.planned_available_from(p)}
+            for p in catalog.PLANNED_RISKS
+        ],
+        "stage_labels": catalog.STAGE_LABELS,
     }
     if demo_session_id_of(request):
         from app.services import demo_service

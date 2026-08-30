@@ -4,8 +4,18 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.data import catalog, sources
+from app.data import catalog, catalog_parked, sources
 from app.services.engine import formulas, tunables
+
+# Kategorie-Auflösung auch für geparkte H/E/V-Codes (M0-Verschlankung): Formel-
+# Rezepte (formulas.DETAILED) existieren weiter für geparkte Ebenen; ihre
+# Parameter-IDs müssen die ECHTE Kategorie tragen, sonst lesen Konsumenten wie
+# infra_assets.resolve_weights (exposures.<CODE>.param.w_*) am Override vorbei.
+_PARKED_CATEGORY: dict[str, str] = (
+    {h["code"]: "hazards" for h in catalog_parked._PARKED_HAZARDS}
+    | {e["code"]: "exposures" for e in catalog_parked._PARKED_EXPOSURES}
+    | {v["code"]: "vulnerabilities" for v in catalog_parked._PARKED_VULNERABILITIES}
+)
 from app.services.engine.impact.params import IMPACT_PARAM_SPECS, IMPACT_GLOBAL_SPECS
 
 # Impact-Parameter (Schicht B) je Risiko gruppiert für die Emission in der Risiko-Schleife.
@@ -158,7 +168,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
 
     for code, recipe in formulas.DETAILED.items():
         cat = "hazards" if code in catalog.HAZARDS_BY_CODE else (
-            "exposures" if code in catalog.EXPOSURES_BY_CODE else "vulnerabilities"
+            "exposures" if code in catalog.EXPOSURES_BY_CODE else
+            _PARKED_CATEGORY.get(code, "vulnerabilities")
         )
         # Bei Risiko-Filter ebenfalls mitliefern: Risiko-Wirkungsdiagramme betten die
         # H/E/V-Teilbäume samt deren Rezeptparametern ein.

@@ -20,19 +20,32 @@ import copy
 
 import pytest
 
-from app.data import catalog
+from app.data import catalog, catalog_parked
 from app.services import measure_service
 from app.services.engine import impact, override_context, risk_engine
 
-# Repräsentative Risiken je Skalierung (dynamisch, robust gegen Katalog-Umbenennungen).
+# M0-Verschlankung (docs/ROADMAP.md §5): Der aktive Katalog enthält nur noch die
+# beiden Hitze-Gesundheitsrisiken (pop-skaliert, nicht monetär). Die generische
+# Mechanik (_cell_cost, cost_from_outcome, Fingerprint) nimmt einfache Risiko-
+# Dicts an und wird weiter an den GEPARKTEN Beispiel-Definitionen getestet;
+# aggregate-basierte Tests brauchen aktive Katalog-Mitgliedschaft und laufen auf
+# einem aktiven Risiko bzw. sind bis zur Rückkehr der Stufen 1–4 geskippt.
 # Monetär gewählt, damit cost == outcome gilt (die Reconciliation-Handrechnungen bleiben
 # vom Kostensatz unabhängig; die Live-Kostensatz-Wirkung testet _rate_override separat).
-POP_RISK = next(r for r in catalog.RISKS
+POP_RISK = next(r for r in catalog_parked._PARKED_RISKS
                 if r.get("scale", "pop") == "pop" and catalog.risk_is_monetary(r))
-AREA_RISK = next(r for r in catalog.RISKS
+AREA_RISK = next(r for r in catalog_parked._PARKED_RISKS
                  if r.get("scale", "pop") == "area" and catalog.risk_is_monetary(r))
-FLAT_RISK = next((r for r in catalog.RISKS
+FLAT_RISK = next((r for r in catalog_parked._PARKED_RISKS
                   if r.get("scale", "pop") not in ("pop", "area")), None)
+
+# Aktives pop-Risiko mit €-Beitrag (Kostensatz > 0) für die aggregate-basierten
+# Reconciliation-Tests. Nicht monetär (cost = outcome × Kostensatz) — die
+# Handrechnungen skalieren deshalb mit dem Default-Kostensatz.
+ACTIVE_POP_RISK = next(r for r in catalog.RISKS
+                       if r.get("scale", "pop") == "pop"
+                       and catalog.risk_contributes_to_total(r))
+_ACTIVE_RATE = catalog.risk_default_cost_per_outcome(ACTIVE_POP_RISK)
 
 
 def _cell(code: str, index: float, pop: float, cost: float) -> dict:
@@ -85,9 +98,15 @@ def test_cell_cost_falls_back_to_legacy_without_outcome():
 
 # ── Reconciliation: Nutzen == Aggregat-Delta ────────────────────────────────
 
-@pytest.mark.parametrize("risk", [POP_RISK, AREA_RISK])
+@pytest.mark.parametrize("risk", [
+    pytest.param(ACTIVE_POP_RISK, id="pop"),
+    pytest.param(AREA_RISK, id="area", marks=pytest.mark.skip(
+        reason="M0-Verschlankung: kein aktives area-Risiko (aggregate braucht "
+               "Katalog-Mitgliedschaft); kehrt mit Stage 1–4 zurück (docs/ROADMAP.md §5)")),
+])
 def test_benefit_equals_aggregate_cost_delta(risk):
     """Σ_covered Zellkosten·(1−factor) == Basis-Aggregat − Mit-Maßnahmen-Aggregat."""
+    override_context.set_overrides({})
     code = risk["code"]
     pop, area = 50_000.0, 30.0
     factor = 0.6  # Restfaktor nach der Maßnahme (40 % Reduktion)
@@ -107,14 +126,19 @@ def test_benefit_equals_aggregate_cost_delta(risk):
     # Nur dieses Risiko ist in den Zelldaten → Gesamt-Delta == Risiko-Delta.
     delta_total = base["cost"]["total_eur"] - withm["cost"]["total_eur"]
     assert benefit == pytest.approx(delta_total, abs=0.01)
-    # Handrechnung: (1000+3000+5000)·0.4 = 3600
-    assert benefit == pytest.approx(3600.0, abs=0.01)
+    # Handrechnung: Outcome-Delta (1000+3000+5000)·0.4 = 3600, monetarisiert mit dem
+    # Default-Kostensatz des aktiven (nicht monetären) Risikos (M0: kein aktives
+    # monetäres Risiko mit Kostensatz 1 €/€ mehr).
+    rate = catalog.risk_default_cost_per_outcome(risk) if not catalog.risk_is_monetary(risk) else 1.0
+    assert benefit == pytest.approx(3600.0 * rate, rel=1e-9)
 
 
 def test_partial_coverage_only_reduces_covered_cells():
     """Eine Teilflächen-Maßnahme mindert nur die abgedeckte Zelle; der Nutzen ist
     genau deren Kostenanteil·(1−factor), unbedeckte Zellen bleiben unverändert."""
-    code = POP_RISK["code"]
+    override_context.set_overrides({})
+    risk = ACTIVE_POP_RISK   # M0: aggregate braucht aktive Katalog-Mitgliedschaft
+    code = risk["code"]
     pop, area = 8000.0, 10.0
     factor = 0.5
     cells = [_cell(code, index=20.0, pop=500.0, cost=1000.0 * (i + 1)) for i in range(4)]
@@ -125,8 +149,10 @@ def test_partial_coverage_only_reduces_covered_cells():
                   for i, c in enumerate(cells)]
     withm = risk_engine.aggregate(with_cells, pop, area)
 
-    benefit = _cell_benefit(POP_RISK, cells[1], factor)
-    assert benefit == pytest.approx(cells[1]["risks"][code]["cost_eur"] * (1 - factor), abs=1e-9)
+    benefit = _cell_benefit(risk, cells[1], factor)
+    # Zellkosten live aus dem Outcome monetarisiert (nicht aus dem gespeicherten cost_eur).
+    expected_cell_cost = risk_engine.cost_from_outcome(risk, cells[1]["risks"][code]["outcome"])
+    assert benefit == pytest.approx(expected_cell_cost * (1 - factor), abs=1e-9)
     assert benefit == pytest.approx(
         base["risks"][code]["cost_eur"] - withm["risks"][code]["cost_eur"], abs=0.01)
 
@@ -181,6 +207,9 @@ def test_folgekosten_reconsolidated_from_reduced_direct():
         measure_service._RESTORATION_SHARE_DEFAULT * direct_new)
 
 
+@pytest.mark.skip(reason="M0-Verschlankung: direkte Sektorschadens-Risiken geparkt, "
+                         "aggregate braucht aktive Katalog-Mitgliedschaft; kehrt mit "
+                         "Stage 1–4 zurück (docs/ROADMAP.md §5)")
 def test_measure_benefit_includes_folgekosten_reconciles():
     """Einzelmaßnahmen-Nutzen (direkte Reduktion × (1+k)) == Aggregat-Delta aus direkten
     Schäden + rekonsolidierten Folgekosten (§8/B3)."""
@@ -218,6 +247,9 @@ def test_measure_benefit_includes_folgekosten_reconciles():
     assert benefit == pytest.approx(delta_total, abs=0.01)
 
 
+@pytest.mark.skip(reason="M0-Verschlankung: kein aktives flat-Risiko (aggregate braucht "
+                         "Katalog-Mitgliedschaft); kehrt mit Stage 1–4 zurück "
+                         "(docs/ROADMAP.md §5)")
 def test_flat_risk_is_p90_and_excluded_from_cell_benefit():
     """Flache Ausfall-/Screening-Risiken sind nicht zell-additiv (Aggregat P90-basiert)
     und deshalb bewusst vom Zellkosten-Nutzen ausgenommen (scale ∉ pop/area)."""
@@ -259,7 +291,10 @@ class _FakeMeasure:
 
 
 def _mdef() -> dict:
-    return dict(next(m for m in catalog.MEASURES if m.get("benefit_per_m2_year")))
+    # M0: keine aktive Maßnahme mit benefit_per_m2_year > 0 — _params_fingerprint
+    # nimmt das mdef-Dict direkt, daher geparkte Beispiel-Definition (GREEN_ROOFS…).
+    return dict(next(m for m in (list(catalog.MEASURES) + catalog_parked._PARKED_MEASURES)
+                     if m.get("benefit_per_m2_year")))
 
 
 def test_fingerprint_changes_on_benefit_recalibration():

@@ -9,22 +9,26 @@ import DemoPage from './pages/DemoPage'
 import LiteMapPage from './pages/lite/LiteMapPage'
 import AdminLayout from './pages/admin/AdminLayout'
 import StudyPage from './pages/StudyPage'
+import RoadmapPage from './pages/RoadmapPage'
+import { FEATURES } from './config/features'
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Öffentlich: Landing, Login, Kontakt, Deutschland-Karte, Studie */}
+        {/* Öffentlich: Landing, Login, Kontakt, Roadmap; abgeschaltete
+            Bereiche (M0-Verschlankung) fallen in den Landing-Fallback. */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/kontakt" element={<KontaktPage />} />
-          <Route path="/deutschland" element={<LiteMapPage />} />
-          <Route path="/studie" element={<StudyPage />} />
+          {FEATURES.roadmap && <Route path="/roadmap" element={<RoadmapPage />} />}
+          {FEATURES.deutschlandKarte && <Route path="/deutschland" element={<LiteMapPage />} />}
+          {FEATURES.studie && <Route path="/studie" element={<StudyPage />} />}
         </Route>
 
         {/* Demo: Produkt-Shell im Demo-Modus (öffentlich, ohne Login) */}
-        <Route path="/demo/*" element={<DemoPage />} />
+        {FEATURES.demo && <Route path="/demo/*" element={<DemoPage />} />}
 
         {/* Produkt (Login erforderlich) */}
         <Route

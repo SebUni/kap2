@@ -1,0 +1,18 @@
+bundesland,dwd_spalte,hinweis
+Baden-Württemberg,Baden-Wuerttemberg,eigene DWD-Reihe
+Bayern,Bayern,eigene DWD-Reihe
+Berlin,Brandenburg/Berlin,keine eigene DWD-Reihe; Kombi Brandenburg/Berlin
+Brandenburg,Brandenburg,eigene DWD-Reihe
+Bremen,Niedersachsen/Hamburg/Bremen,keine eigene DWD-Reihe; Kombi Niedersachsen/Hamburg/Bremen
+Hamburg,Niedersachsen/Hamburg/Bremen,keine eigene DWD-Reihe; Kombi Niedersachsen/Hamburg/Bremen
+Hessen,Hessen,eigene DWD-Reihe
+Mecklenburg-Vorpommern,Mecklenburg-Vorpommern,eigene DWD-Reihe
+Niedersachsen,Niedersachsen,eigene DWD-Reihe
+Nordrhein-Westfalen,Nordrhein-Westfalen,eigene DWD-Reihe
+Rheinland-Pfalz,Rheinland-Pfalz,eigene DWD-Reihe
+Saarland,Saarland,eigene DWD-Reihe
+Sachsen,Sachsen,eigene DWD-Reihe
+Sachsen-Anhalt,Sachsen-Anhalt,eigene DWD-Reihe
+Schleswig-Holstein,Schleswig-Holstein,eigene DWD-Reihe
+Thüringen,Thueringen,eigene DWD-Reihe
+Deutschland,Deutschland,DWD-Gebietsmittel Deutschland

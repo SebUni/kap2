@@ -375,6 +375,25 @@ export interface CatalogRisk {
   exposures: string[]
   vulnerabilities: string[]
   priority?: number
+  /** KWRA-1:1-Klammer: mehrere Teil-Ausweise können dieselbe kwra_id tragen. */
+  kwra_id?: number
+  kwra_name?: string
+  stage?: number
+}
+
+/** Geplante (gesperrte) KWRA-Klimawirkung — Anzeige mit 🔒 + „folgt <Stufe>". */
+export interface PlannedRisk {
+  kwra_id: number
+  name: string
+  cluster: string
+  kwra_field: string
+  stage: number
+  available_from: string
+  coastal?: boolean
+  hazard_names: string[]
+  upstream_names: string[]
+  sensitivity_names: string[]
+  exposure_names: string[]
 }
 
 export interface CatalogMeasure {
@@ -439,6 +458,8 @@ export interface Catalog {
   kang_clusters: KangCluster[]
   auxiliary: CatalogIndicator[]
   auxiliary_categories: CategoryDef[]
+  planned_risks?: PlannedRisk[]
+  stage_labels?: Record<number, string>
 }
 
 // ── Risiko-Histogramm (Verteilung Index-Höhen je Risiko) ─────────────────────

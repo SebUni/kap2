@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from math import exp
 
-from app.data import catalog
+from app.data import catalog, catalog_parked
 from app.data import germany_health_reference as ghr
 from app.services import parameter_registry
 from app.services.engine import impact, override_context
@@ -34,6 +34,21 @@ INJ_STORM = "EXPECTED_ANNUAL_INJURIES_STORM"
 INJ_SLIDE = "EXPECTED_ANNUAL_INJURIES_LANDSLIDE"
 HEALTH = list(H.HEALTH_IMPACTS)
 
+# M0-Verschlankung (docs/ROADMAP.md §5): Nur MORT/MORBIDITY sind aktiv; die übrigen
+# 9 Gesundheits-Schadensfunktionen bleiben in der Registry (bewusst unangetastet)
+# und werden hier mit den GEPARKTEN Risiko-Definitionen direkt aufgerufen —
+# compute_all_cell_impacts dispatcht nur über catalog.RISKS.
+_PARKED_BY_CODE = {r["code"]: r for r in catalog_parked._PARKED_RISKS}
+
+
+def _risk(code: str) -> dict:
+    return catalog.RISKS_BY_CODE.get(code) or _PARKED_BY_CODE[code]
+
+
+def _outcome(code: str, ctx: CellContext) -> float:
+    """Outcome einer (auch geparkten) Gesundheitsfunktion — Registry-Direktaufruf."""
+    return H.HEALTH_IMPACTS[code](_risk(code), ctx)["outcome"]
+
 # Bundesweite Altersstruktur (aus dem Zensus-100-m-Gitter aggregiert).
 SHARE_65P = 0.2186
 SENIOR_SPLIT = {"a65_74": 0.5003, "a75_84": 0.3555, "a85p": 0.1442}
@@ -45,20 +60,32 @@ def _bands(pop: float) -> dict[str, float]:
     return out
 
 
+def _abs(code: str, frac: float) -> float:
+    """Absoluter Hazard-Wert, der über die Katalog-Referenzgrenzen auf ``frac``
+    normiert. Geparkte Hazards fehlen in INDICATOR_BY_CODE — ``haz_intensity``
+    fällt dann (wie die Engine selbst) auf die Grenzen 0..1 zurück."""
+    m = catalog.INDICATOR_BY_CODE.get(code, {})
+    lo = float(m.get("norm_min", 0.0))
+    hi = float(m.get("norm_max", 1.0))
+    return lo + frac * (hi - lo)
+
+
 def _ctx(pop=100_000.0, summer_temp=19.0, hd=20.0, flood_norm=0.3, vnorm=0.5,
          event_norm=0.3, slope=0.2, depression=0.3, bundesland="Nordrhein-Westfalen",
          uhi_mean=0.0, **ci_extra):
-    hev = {"hazards": {"HEAT_WAVE": hd, "HEAVY_RAIN_FLOOD": flood_norm * 100,
-                       "EXTRATROPICAL_STORM": 6.0, "LANDSLIDE": 10.0, "STORM_SURGE": 0.0,
-                       "WILDFIRE": 0.0, "COMPOUND_EVENT": event_norm,
-                       "CASCADE_EVENT": event_norm, "DROUGHT": 20.0},
-           "exposures": {}, "vulnerabilities": {}}
     hn = {"hazards": {"HEAVY_RAIN_FLOOD": flood_norm, "EXTRATROPICAL_STORM": 0.4,
                       "LANDSLIDE": 0.1, "STORM_SURGE": 0.0, "WILDFIRE": 0.0,
                       "COMPOUND_EVENT": event_norm, "CASCADE_EVENT": event_norm,
                       "DROUGHT": 0.33},
           "exposures": {}, "vulnerabilities": {}}
-    for r in catalog.RISKS:
+    # Absolute Werte konsistent zu den (Fallback-)Grenzen von haz_intensity;
+    # HEAT_WAVE bleibt absolut (Hitzetage), weil die Hitzefunktionen ctx.haz lesen.
+    hev = {"hazards": {"HEAT_WAVE": hd,
+                       **{c: _abs(c, f) for c, f in hn["hazards"].items()}},
+           "exposures": {}, "vulnerabilities": {}}
+    # Vulnerabilitäts-Normwerte auch für die geparkten Risiken setzen — deren
+    # Funktionen (Flut/Sturm/…) lesen z. B. EARLY_WARNING_SYSTEMS weiter.
+    for r in list(catalog.RISKS) + catalog_parked._PARKED_RISKS:
         for v in r["vulnerabilities"]:
             hn["vulnerabilities"][v] = vnorm
     ci = {"pop": pop, "summer_temp_cell": summer_temp, "pop_age_bands": _bands(pop),
@@ -189,24 +216,21 @@ def test_flood_regime_separates_flash_from_slow():
     abbildet — und der Unterschied, der Ahr 2021 von Elbe 2002 trennt.
     """
     override_context.set_overrides({})
-    flat = impact.compute_all_cell_impacts(
-        _ctx(slope=0.02, depression=0.1))[MORT_FLOOD]["outcome"]
-    steep = impact.compute_all_cell_impacts(
-        _ctx(slope=1.0, depression=1.0))[MORT_FLOOD]["outcome"]
+    flat = _outcome(MORT_FLOOD, _ctx(slope=0.02, depression=0.1))
+    steep = _outcome(MORT_FLOOD, _ctx(slope=1.0, depression=1.0))
     assert steep > 20 * flat, f"Regime-Spreizung zu gering: {steep:.4f} vs {flat:.4f}"
 
 
 def test_flood_mortality_zero_without_hazard():
     override_context.set_overrides({})
-    assert impact.compute_all_cell_impacts(
-        _ctx(flood_norm=0.0))[MORT_FLOOD]["outcome"] == 0.0
+    assert _outcome(MORT_FLOOD, _ctx(flood_norm=0.0)) == 0.0
 
 
 def test_warning_reduces_flood_mortality():
     """Frühwarnung ist der Hebel, den eine Kommune bedienen kann — er muss wirken."""
     override_context.set_overrides({})
-    poor = impact.compute_all_cell_impacts(_ctx(vnorm=1.0))[MORT_FLOOD]["outcome"]
-    good = impact.compute_all_cell_impacts(_ctx(vnorm=0.0))[MORT_FLOOD]["outcome"]
+    poor = _outcome(MORT_FLOOD, _ctx(vnorm=1.0))
+    good = _outcome(MORT_FLOOD, _ctx(vnorm=0.0))
     assert good < poor
 
 
@@ -216,8 +240,8 @@ def test_injuries_are_split_and_additive():
     """Verletzte aus Flut und Sturm addieren sich — früher lieferte ein max() nur
     die schlimmere der beiden Gefahren und unterschätzte Mehrgefahren-Kommunen."""
     override_context.set_overrides({})
-    res = impact.compute_all_cell_impacts(_ctx())
-    flood, storm, slide = (res[c]["outcome"] for c in (INJ_FLOOD, INJ_STORM, INJ_SLIDE))
+    ctx = _ctx()
+    flood, storm, slide = (_outcome(c, ctx) for c in (INJ_FLOOD, INJ_STORM, INJ_SLIDE))
     assert flood > 0 and storm > 0
     total = flood + storm + slide
     assert total > max(flood, storm, slide), "Summe muss über dem Maximum liegen"
@@ -225,9 +249,9 @@ def test_injuries_are_split_and_additive():
 
 def test_injury_channels_follow_their_own_hazard():
     override_context.set_overrides({})
-    no_flood = impact.compute_all_cell_impacts(_ctx(flood_norm=0.0))
-    assert no_flood[INJ_FLOOD]["outcome"] == 0.0
-    assert no_flood[INJ_STORM]["outcome"] > 0.0, "Sturm darf nicht an der Flut hängen"
+    ctx = _ctx(flood_norm=0.0)
+    assert _outcome(INJ_FLOOD, ctx) == 0.0
+    assert _outcome(INJ_STORM, ctx) > 0.0, "Sturm darf nicht an der Flut hängen"
 
 
 # ── (g) Registry / Overrides ──────────────────────────────────────────────────
@@ -261,9 +285,9 @@ def test_call_site_defaults_match_registry_specs():
         if risk not in H.HEALTH_IMPACTS:
             continue
         override_context.set_overrides({})
-        without = impact.compute_all_cell_impacts(_ctx())[risk]["outcome"]
+        without = _outcome(risk, _ctx())
         override_context.set_overrides({f"risks.{risk}.impact.{key}": value})
-        with_spec = impact.compute_all_cell_impacts(_ctx())[risk]["outcome"]
+        with_spec = _outcome(risk, _ctx())
         if abs(without - with_spec) > 1e-9:
             mismatches.append(
                 f"{risk}.{key}: Registry-Wert {value} ergibt {with_spec:.6f}, "
@@ -312,9 +336,12 @@ def test_sanity_ratio_in_tolerance():
     from app.services.engine.impact import sanity
     override_context.set_overrides({})
     ctx = _ctx(pop=100_000.0)
-    res = impact.compute_all_cell_impacts(ctx)
     for code in HEALTH:
-        ratio = sanity.check(code, res[code]["outcome"], 100_000.0, 50.0)
+        # sanity.check schaut nur in catalog.RISKS (für geparkte Codes: None) —
+        # dieselbe Rechnung hier direkt über ref_estimate mit dem (ggf. geparkten)
+        # Risiko-Dict, damit der 5×-Anker für alle 11 Funktionen geprüft bleibt.
+        est = sanity.ref_estimate(_risk(code), 100_000.0, 50.0)
+        ratio = None if est <= 0.0 else round(_outcome(code, ctx) / est, 3)
         assert ratio is None or (1.0 / sanity.TOLERANCE) <= ratio <= sanity.TOLERANCE, (code, ratio)
 
 

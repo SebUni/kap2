@@ -15,6 +15,15 @@ const GROUP_DEFS: { key: 'measures' | LayerCategory; label: string }[] = [
   { key: 'auxiliary', label: 'Sonstige' },
 ]
 
+// KWRA-Cluster der geplanten Klimawirkungen (Farben = Roadmap-Chips).
+const PLANNED_CLUSTERS: { code: string; label: string; color: string }[] = [
+  { code: 'gesundheit', label: 'Menschliche Gesundheit', color: '#ef4444' },
+  { code: 'land', label: 'Land', color: '#22c55e' },
+  { code: 'wasser', label: 'Wasser', color: '#3b82f6' },
+  { code: 'infrastruktur', label: 'Infrastruktur', color: '#8b5cf6' },
+  { code: 'wirtschaft', label: 'Wirtschaft', color: '#f59e0b' },
+]
+
 export default function LayerPanel() {
   const {
     catalog, activeLayer, setActiveLayer,
@@ -47,6 +56,26 @@ export default function LayerPanel() {
     />
   )
 
+  // Gesperrter Eintrag (grau, 🔒, title-Hover, nicht klickbar) — genutzt vom
+  // Demo-Gating und von den geplanten Roadmap-Risiken.
+  const renderLockedItem = (key: string, name: string, title: string) => (
+    <div
+      key={key}
+      className="layer-item layer-locked"
+      title={title}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px 4px 18px',
+        fontSize: '0.78rem', borderRadius: 6, cursor: 'not-allowed',
+        color: 'var(--text-muted)', opacity: 0.6,
+      }}
+    >
+      <input type="checkbox" checked={false} readOnly tabIndex={-1}
+        disabled style={{ flexShrink: 0, pointerEvents: 'none', margin: 0 }} />
+      <span style={{ flex: 1 }}>{name}</span>
+      <span style={{ fontSize: '0.72rem' }}>🔒</span>
+    </div>
+  )
+
   const renderItem = (
     code: string, name: string, category: LayerCategory,
     info: React.ReactNode, spatial?: boolean,
@@ -56,23 +85,8 @@ export default function LayerPanel() {
     // kein Info-Button/Wirkungsmechanismus, nicht klickbar).
     const locked = demoMode && !demoEnabledLayers.has(code)
     if (locked) {
-      return (
-        <div
-          key={code}
-          className="layer-item layer-locked"
-          title="In der Demo nicht freigeschaltet — in der Vollversion verfügbar"
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px 4px 18px',
-            fontSize: '0.78rem', borderRadius: 6, cursor: 'not-allowed',
-            color: 'var(--text-muted)', opacity: 0.6,
-          }}
-        >
-          <input type="checkbox" checked={false} readOnly tabIndex={-1}
-            disabled style={{ flexShrink: 0, pointerEvents: 'none', margin: 0 }} />
-          <span style={{ flex: 1 }}>{name}</span>
-          <span style={{ fontSize: '0.72rem' }}>🔒</span>
-        </div>
-      )
+      return renderLockedItem(code, name,
+        'In der Demo nicht freigeschaltet — in der Vollversion verfügbar')
     }
     return (
       <div
@@ -215,6 +229,29 @@ export default function LayerPanel() {
                       infoButton(r.name, 'risks', r.code)))
                   ))
                 })}
+                {/* Geplante KWRA-Klimawirkungen (Roadmap): sichtbar, aber
+                    gesperrt — Hover nennt die Ausbaustufe. */}
+                {group.key === 'risks' && (catalog.planned_risks?.length ?? 0) > 0 && (
+                  <>
+                    <div style={{
+                      padding: '6px 8px 2px', fontSize: '0.68rem', fontWeight: 600,
+                      color: 'var(--text-muted)', textTransform: 'uppercase',
+                      letterSpacing: '0.03em',
+                    }}>
+                      In Vorbereitung (Roadmap)
+                    </div>
+                    {PLANNED_CLUSTERS.map(cl => {
+                      const inCluster = (catalog.planned_risks ?? [])
+                        .filter(p => p.cluster === cl.code)
+                      return renderCategory('planned', cl.code, cl.label, inCluster.length, (
+                        inCluster.map(p => renderLockedItem(
+                          `kwra-${p.kwra_id}`, p.name,
+                          `Klimarisiko folgt ${p.available_from}`,
+                        ))
+                      ), cl.color)
+                    })}
+                  </>
+                )}
 
                 {group.key === 'hazards' &&
                   renderIndicatorGroup('hazards', catalog.hazards, catalog.hazard_categories)}

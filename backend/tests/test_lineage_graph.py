@@ -42,6 +42,14 @@ def test_lineage_specs_cover_impacts():
 
 
 def test_lineage_spec_hazards_exist():
+    # M0-Verschlankung: Die LINEAGE_SPECS behalten bewusst die Einträge der
+    # geparkten Risiken (Registry unangetastet) — deren Hazards liegen verbatim
+    # in catalog_parked. Gültig ist ein Hazard, wenn er aktiv ODER geparkt
+    # existiert (fängt weiterhin jeden Tippfehler/verwaisten Code).
+    from app.data import catalog_parked
+
+    known = set(catalog.HAZARDS_BY_CODE) | {
+        h["code"] for h in catalog_parked._PARKED_HAZARDS}
     for specs in (HEALTH_SPECS, MONETARY_SPECS, ENV_SPECS):
         for code, spec in specs.items():
             driver = spec["driver"]
@@ -49,7 +57,7 @@ def test_lineage_spec_hazards_exist():
             if driver.get("hazard"):
                 hazards.append(driver["hazard"])
             for h in hazards:
-                assert h in catalog.HAZARDS_BY_CODE, f"{code}: Hazard {h} unbekannt"
+                assert h in known, f"{code}: Hazard {h} unbekannt"
 
 
 # ── Helfer ─────────────────────────────────────────────────────────────────────

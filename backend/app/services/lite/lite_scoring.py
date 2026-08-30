@@ -19,7 +19,11 @@ from app.data import catalog
 from app.data.germany_climate_reference import GERMANY_CLIMATE_REFERENCE
 
 # Die 8 Lite-Risiken (aus den 14 Priorität-1-Risiken; Plan §3-Tabelle).
-LITE_RISK_CODES = [
+# M0-Verschlankung: geparkte Codes werden herausgefiltert, damit Admin-Batch
+# und Scoring nicht auf fehlende Katalog-Einträge laufen; die Deutschland-
+# Karte ist ohnehin offline (frontend FEATURES.deutschlandKarte). Mit der
+# Re-Expansion (Stage 1+) wächst die Liste automatisch wieder mit.
+LITE_RISK_CODES = [c for c in [
     "EXPECTED_ANNUAL_MORTALITY",
     "EXPECTED_ANNUAL_MORBIDITY",
     "EXPECTED_THERMAL_STRESS_HOURS",
@@ -28,7 +32,7 @@ LITE_RISK_CODES = [
     "EXPECTED_ANNUAL_AFFECTED_EVACUATED",
     "EXPECTED_AGRICULTURAL_DAMAGE_EUR",
     "HYDROLOGICAL_STRESS_RISK_INDEX",
-]
+] if c in catalog.RISKS_BY_CODE]
 
 # Nationale Referenzen (für Treiber-Normierung + Anzeige).
 _HOT_MEAN = GERMANY_CLIMATE_REFERENCE["hot_days"]["value"]          # 8.8

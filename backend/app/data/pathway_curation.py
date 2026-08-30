@@ -50,6 +50,47 @@ CURATED_PATHWAYS: dict[str, dict] = {
              "dort verstärkt die städtische Wärmeinsel die Exposition."),
         ],
     },
+    "EXPECTED_ANNUAL_MORBIDITY": {
+        "cluster": "Menschliche Gesundheit (KWRA 2021, Teilbericht 5)",
+        "ref": _KWRA,
+        "chains": [
+            ("HEAT_WAVE", "POPULATION_DENSITY", "HEAT_SENSITIVITY", "primary",
+             "Hitzebedingte Erkrankungen (Herz-Kreislauf, Niere) sind die dominante "
+             "hitzeassoziierte Morbidität; Ballungsräume mit sensiblen Personen führen."),
+            # Die frühere Vektoren-Kette (DISEASE_VECTOR_SUSCEPTIBILITY) ist
+            # entfallen: kein Beleg in der Schadensbaum-Sensitivitätsliste von
+            # #95 (W182: S152–S158); Vektoren gehören zur Klimawirkung #97.
+            ("HEAT_WAVE", "VULNERABLE_GROUPS_POPULATION", "HEALTHCARE_ACCESS", "alternate_exposure",
+             "Vorerkrankte und hochaltrige Menschen tragen die höchste Erkrankungslast "
+             "(S153/S152); Versorgungszugang und gekühlte Aufenthaltsräume (S157/R36) "
+             "entscheiden über den Verlauf."),
+            # Die frühere DROUGHT-Kette ist entfallen: Die Schadensfunktion rechnet
+            # ausschließlich mit HEAT_WAVE, und der Risikoname sagt das jetzt auch.
+            # Eine Kette, die im absoluten Outcome nicht vorkommt, gehört nicht in
+            # die Kuratierung.
+        ],
+    },
+    # Die drei Verletzten-Kanäle waren bis Modellversion 6 EIN Risiko mit einem
+    # max() über drei Gefahren. Verletzte aus Flut und Sturm sind aber additive
+    # Ereignisse — die Ketten sind daher auf je ein eigenes Risiko aufgeteilt,
+    # jede mit eigener primary-Kette.
+
+    # ══ Cluster Infrastrukturen (KWRA TB 4) ══
+
+    # ── Infrastruktur-Ausfälle (Betriebsstunden) — KWRA TB 4, Kaskaden TB 6 ──
+
+    # ══ Cluster Land — Landwirtschaft, Boden, Wald, Biologische Vielfalt (KWRA TB 2) ══
+
+    # ══ Cluster Wasser — Wasserhaushalt, Fischerei (KWRA TB 3) ══
+
+    # ══ Cluster Wirtschaft — Folge-/Sekundärkosten (KWRA TB 5/6) ══
+}
+
+
+# ── Geparkt (M0-Verschlankung): Kuratierungen der stillgelegten Risiken ──
+# Kehren mit den Roadmap-Stufen zurück; bewusst außerhalb von CURATED_PATHWAYS,
+# damit Ratchets und build_pathways nur den aktiven Katalog sehen.
+_PARKED_CURATED_PATHWAYS: dict = {
     "EXPECTED_ANNUAL_MORTALITY_FLOOD": {
         "cluster": "Menschliche Gesundheit / Bevölkerungsschutz (KWRA 2021, Teilbericht 5)",
         "ref": _KWRA,
@@ -77,26 +118,6 @@ CURATED_PATHWAYS: dict[str, dict] = {
              "Überraschten."),
         ],
     },
-    "EXPECTED_ANNUAL_MORBIDITY": {
-        "cluster": "Menschliche Gesundheit (KWRA 2021, Teilbericht 5)",
-        "ref": _KWRA,
-        "chains": [
-            ("HEAT_WAVE", "POPULATION_DENSITY", "HEAT_SENSITIVITY", "primary",
-             "Hitzebedingte Erkrankungen (Herz-Kreislauf, Niere) sind die dominante "
-             "hitzeassoziierte Morbidität; Ballungsräume mit sensiblen Personen führen."),
-            ("HEAT_WAVE", "VULNERABLE_GROUPS_POPULATION", "DISEASE_VECTOR_SUSCEPTIBILITY", "alternate_exposure",
-             "Wärmere Bedingungen begünstigen Krankheitsüberträger (Vektoren); vulnerable "
-             "Gruppen sind dafür anfälliger — KWRA-Handlungsfeld Gesundheit."),
-            # Die frühere DROUGHT-Kette ist entfallen: Die Schadensfunktion rechnet
-            # ausschließlich mit HEAT_WAVE, und der Risikoname sagt das jetzt auch.
-            # Eine Kette, die im absoluten Outcome nicht vorkommt, gehört nicht in
-            # die Kuratierung.
-        ],
-    },
-    # Die drei Verletzten-Kanäle waren bis Modellversion 6 EIN Risiko mit einem
-    # max() über drei Gefahren. Verletzte aus Flut und Sturm sind aber additive
-    # Ereignisse — die Ketten sind daher auf je ein eigenes Risiko aufgeteilt,
-    # jede mit eigener primary-Kette.
     "EXPECTED_ANNUAL_INJURIES": {
         "cluster": "Menschliche Gesundheit / Bevölkerungsschutz (KWRA 2021, Teilbericht 5)",
         "ref": _KWRA,
@@ -212,8 +233,6 @@ CURATED_PATHWAYS: dict[str, dict] = {
              "soziale Resilienz moderiert. Hergeleitet.", _GIZ),
         ],
     },
-
-    # ══ Cluster Infrastrukturen (KWRA TB 4) ══
     "EXPECTED_BUILDING_DAMAGE_EUR": {
         "cluster": "Bauwesen / Gebäude (KWRA 2021, Teilbericht 4)",
         "ref": _KWRA,
@@ -299,8 +318,6 @@ CURATED_PATHWAYS: dict[str, dict] = {
              "relevante Nebenkette."),
         ],
     },
-
-    # ── Infrastruktur-Ausfälle (Betriebsstunden) — KWRA TB 4, Kaskaden TB 6 ──
     "EXPECTED_CI_OUTAGE_HOURS": {
         "cluster": "Kritische Infrastrukturen (KWRA 2021, Teilbericht 4/6)",
         "ref": _KWRA,
@@ -435,8 +452,6 @@ CURATED_PATHWAYS: dict[str, dict] = {
              "dämpft die Ausbreitung."),
         ],
     },
-
-    # ══ Cluster Land — Landwirtschaft, Boden, Wald, Biologische Vielfalt (KWRA TB 2) ══
     "EXPECTED_AGRICULTURAL_DAMAGE_EUR": {
         "cluster": "Landwirtschaft (KWRA 2021, Teilbericht 2)",
         "ref": _KWRA,
@@ -568,8 +583,6 @@ CURATED_PATHWAYS: dict[str, dict] = {
              "Hergeleitet.", _GIZ),
         ],
     },
-
-    # ══ Cluster Wasser — Wasserhaushalt, Fischerei (KWRA TB 3) ══
     "HYDROLOGICAL_STRESS_RISK_INDEX": {
         "cluster": "Wasserhaushalt (KWRA 2021, Teilbericht 3)",
         "ref": _KWRA,
@@ -648,8 +661,6 @@ CURATED_PATHWAYS: dict[str, dict] = {
              "Niedrigwasserstress."),
         ],
     },
-
-    # ══ Cluster Wirtschaft — Folge-/Sekundärkosten (KWRA TB 5/6) ══
     "EXPECTED_INDIRECT_ECONOMIC_LOSS_EUR": {
         "cluster": "Industrie & Gewerbe / Volkswirtschaft (KWRA 2021, Teilbericht 5/6)",
         "ref": _KWRA,

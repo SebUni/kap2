@@ -16,13 +16,21 @@ Läuft mit pytest oder direkt: ``python tests/test_measure_pricing.py``.
 
 from __future__ import annotations
 
-from app.data import catalog, sources
+from app.data import catalog, catalog_parked, sources
 from app.services import parameter_registry
 from app.services.measure_service import (
     _resolve_count,
     _unit_effect_factor,
     compute_costs,
 )
+
+# M0-Verschlankung (docs/ROADMAP.md §5): aktiv sind nur HEAT_ACTION_PLANS und
+# VULNERABLE_GROUP_PROGRAMS; die übrigen 45 Maßnahmen liegen VERBATIM in
+# catalog_parked und kehren mit den Stufen 1–4 zurück. Die Katalog-Konsistenz-
+# und compute_costs-Tests (reine Dict-Helfer, kein Katalog-Lookup) prüfen
+# weiterhin aktive + geparkte Definitionen in voller Strenge.
+_ALL_MEASURES = list(catalog.MEASURES) + list(catalog_parked._PARKED_MEASURES)
+_ALL_BY_CODE = {m["code"]: m for m in _ALL_MEASURES}
 
 _CAPEX_FIELDS = ("capex_fixed", "capex_per_unit", "capex_per_m2")
 _OPEX_FIELDS = ("opex_fixed_year", "opex_per_unit_year", "opex_per_m2_year")
@@ -41,18 +49,21 @@ _CONCEPT_MEASURES_WITH_OPEX_FIXED = {
 # ── Katalog-Konsistenz ──────────────────────────────────────────────────────
 
 def test_measure_count_is_47():
-    assert len(catalog.MEASURES) == 47
+    # M0-Verschlankung: 2 aktive Maßnahmen; wird 4 mit Aktivierung von #96/#98
+    # (docs/ROADMAP.md §5). Die 45 geparkten liegen verbatim in catalog_parked.
+    assert len(catalog.MEASURES) == 2
+    assert len(_ALL_MEASURES) == 47
 
 
 def test_every_measure_has_source():
-    missing = [m["code"] for m in catalog.MEASURES if not m.get("source")]
+    missing = [m["code"] for m in _ALL_MEASURES if not m.get("source")]
     assert not missing, f"Maßnahmen ohne source-Feld: {missing}"
 
 
 def test_every_measure_has_all_cost_field_slots():
     """Jede Maßnahme trägt jedes Kostenfeld (gesetzt oder bewusst None)."""
     bad = []
-    for m in catalog.MEASURES:
+    for m in _ALL_MEASURES:
         for field in _COST_FIELDS:
             if field not in m:
                 bad.append((m["code"], field))
@@ -61,7 +72,7 @@ def test_every_measure_has_all_cost_field_slots():
 
 def test_unit_label_implies_density_and_a_unit_cost_field():
     bad = []
-    for m in catalog.MEASURES:
+    for m in _ALL_MEASURES:
         if m.get("unit_label") is not None:
             if m.get("unit_density_per_ha") is None:
                 bad.append((m["code"], "unit_density_per_ha fehlt trotz unit_label"))
@@ -78,7 +89,7 @@ def test_unit_label_implies_density_and_a_unit_cost_field():
 def test_source_maps_keys_are_valid_field_names():
     """sources/source_details/source_refs dürfen nur auf existierende Feldnamen zeigen."""
     bad = []
-    for m in catalog.MEASURES:
+    for m in _ALL_MEASURES:
         for mapname in ("sources", "source_details", "source_refs"):
             for key in (m.get(mapname) or {}).keys():
                 if key not in _ALL_NUMERIC_FIELDS:
@@ -88,7 +99,7 @@ def test_source_maps_keys_are_valid_field_names():
 
 def test_no_negative_numeric_values():
     bad = []
-    for m in catalog.MEASURES:
+    for m in _ALL_MEASURES:
         for field in _ALL_NUMERIC_FIELDS:
             val = m.get(field)
             if val is not None and val < 0:
@@ -100,7 +111,7 @@ def test_concept_measures_have_fixed_opex():
     """Konzept-/Planungsmaßnahmen haben laufende (mengenunabhängige) OPEX > 0."""
     bad = []
     for code in _CONCEPT_MEASURES_WITH_OPEX_FIXED:
-        m = catalog.MEASURES_BY_CODE[code]
+        m = _ALL_BY_CODE[code]
         val = m.get("opex_fixed_year")
         if val is None or val <= 0:
             bad.append((code, val))
@@ -112,7 +123,7 @@ def test_concept_measures_have_fixed_opex():
 def test_source_refs_resolve_to_bibliography():
     """Jeder in source_refs referenzierte Key existiert in der Bibliografie."""
     bad = []
-    for m in catalog.MEASURES:
+    for m in _ALL_MEASURES:
         for field, keys in (m.get("source_refs") or {}).items():
             for k in keys:
                 if k not in sources.SOURCE_REFERENCES:
@@ -134,7 +145,7 @@ def test_bibliography_entries_are_complete():
 
 def test_green_roofs_capex_has_resolved_references():
     """Das vom Nutzer genannte Gründach-Beispiel liefert klickbare, archivierte Quellen."""
-    mdef = catalog.MEASURES_BY_CODE["GREEN_ROOFS_FACADES"]
+    mdef = _ALL_BY_CODE["GREEN_ROOFS_FACADES"]   # M0: geparkt, compute_costs ist katalogfrei
     result = compute_costs(mdef, count=0, area_m2=1000.0)
     comp = next(c for c in result["capex"]["components"] if c["param"] == "capex_per_m2")
     assert len(comp["references"]) >= 2
@@ -145,14 +156,14 @@ def test_green_roofs_capex_has_resolved_references():
 # ── compute_costs ───────────────────────────────────────────────────────────
 
 def test_compute_costs_drinking_fountains_five_units():
-    mdef = catalog.MEASURES_BY_CODE["DRINKING_FOUNTAINS"]
+    mdef = _ALL_BY_CODE["DRINKING_FOUNTAINS"]   # M0: geparkt
     result = compute_costs(mdef, count=5, area_m2=0.0)
     assert result["capex"]["total_eur"] == 5000.0 + 5 * 14000.0 == 75000.0
     assert result["opex"]["total_eur"] == 5 * 3500.0 == 17500.0
 
 
 def test_compute_costs_area_only_measure_matches_legacy_formula():
-    mdef = catalog.MEASURES_BY_CODE["DECENTRALIZED_ENERGY_PV_STORAGE"]
+    mdef = _ALL_BY_CODE["DECENTRALIZED_ENERGY_PV_STORAGE"]   # M0: geparkt
     assert mdef["unit_label"] is None
     assert mdef["capex_fixed"] == 0.0            # 0.0 = anwendbar, aber ohne Grundkosten
     assert mdef["opex_fixed_year"] is None       # Flächenmaßnahme: keine festen OPEX
@@ -165,7 +176,7 @@ def test_compute_costs_area_only_measure_matches_legacy_formula():
 
 
 def test_compute_costs_none_fields_produce_no_component():
-    mdef = catalog.MEASURES_BY_CODE["DRINKING_FOUNTAINS"]
+    mdef = _ALL_BY_CODE["DRINKING_FOUNTAINS"]   # M0: geparkt
     assert mdef["capex_per_m2"] is None
     assert mdef["opex_per_m2_year"] is None
     assert mdef["opex_fixed_year"] is None
@@ -178,7 +189,7 @@ def test_compute_costs_none_fields_produce_no_component():
 
 
 def test_compute_costs_overridden_flag_on_custom_source():
-    mdef = dict(catalog.MEASURES_BY_CODE["DRINKING_FOUNTAINS"])
+    mdef = dict(_ALL_BY_CODE["DRINKING_FOUNTAINS"])   # M0: geparkt
     mdef["custom_sources"] = {"capex_per_unit": "Kommune-Angebot 2026"}
     result = compute_costs(mdef, count=5, area_m2=0.0)
     by_param = {c["param"]: c for c in result["capex"]["components"]}
@@ -191,7 +202,7 @@ def test_compute_costs_overridden_flag_on_custom_source():
 # ── _resolve_count / _unit_effect_factor ────────────────────────────────────
 
 def test_resolve_count_uses_recommended_as_default():
-    mdef = catalog.MEASURES_BY_CODE["DRINKING_FOUNTAINS"]
+    mdef = _ALL_BY_CODE["DRINKING_FOUNTAINS"]   # M0: geparkt
     covered_area_m2 = 100_000.0  # 10 ha, density 0.5/ha -> recommended 5
     count, is_default, recommended = _resolve_count(mdef, None, covered_area_m2)
     assert recommended == 5
@@ -200,7 +211,7 @@ def test_resolve_count_uses_recommended_as_default():
 
 
 def test_resolve_count_explicit_config_overrides_default():
-    mdef = catalog.MEASURES_BY_CODE["DRINKING_FOUNTAINS"]
+    mdef = _ALL_BY_CODE["DRINKING_FOUNTAINS"]   # M0: geparkt
     covered_area_m2 = 100_000.0
     count, is_default, recommended = _resolve_count(mdef, {"count": 3}, covered_area_m2)
     assert count == 3
@@ -215,7 +226,7 @@ def test_unit_effect_factor_scales_with_count_vs_recommended():
 
 
 def test_area_measure_has_no_count_and_full_unit_factor():
-    mdef = catalog.MEASURES_BY_CODE["DECENTRALIZED_ENERGY_PV_STORAGE"]
+    mdef = _ALL_BY_CODE["DECENTRALIZED_ENERGY_PV_STORAGE"]   # M0: geparkt
     assert mdef["unit_label"] is None
     count, is_default, recommended = _resolve_count(mdef, {"count": 99}, 5000.0)
     assert (count, is_default, recommended) == (0, False, 0)
@@ -243,15 +254,18 @@ def test_registry_applicable_and_editable_match_none_fields():
 
 
 def test_registry_emits_references_for_cited_field():
+    # M0: die Registry emittiert nur AKTIVE Maßnahmen — geprüft am aktiven
+    # HEAT_ACTION_PLANS (source_refs auf default_reduction) statt am geparkten
+    # Gründach-Beispiel.
     params = parameter_registry.catalog_parameters(
-        layer_code="GREEN_ROOFS_FACADES", layer_category="measures")
-    p = next(p for p in params if p["id"].endswith(".capex_per_m2"))
-    assert [r["key"] for r in p["references"]] == ["BuGG_Marktreport_2024", "co2online_Dachbegruenung"]
+        layer_code="HEAT_ACTION_PLANS", layer_category="measures")
+    p = next(p for p in params if p["id"].endswith(".default_reduction"))
+    assert [r["key"] for r in p["references"]] == ["Urban_HHAP_Wirksamkeit_2025"]
 
 
 def test_resolve_measure_def_applies_all_nine_override_fields():
     code = "DRINKING_FOUNTAINS"
-    mdef = catalog.MEASURES_BY_CODE[code]
+    mdef = _ALL_BY_CODE[code]   # M0: geparkt, resolve_measure_def ist katalogfrei
     overrides = {
         f"measures.{code}.{field}": idx + 1.0
         for idx, field in enumerate(parameter_registry.MEASURE_OVERRIDE_FIELDS)

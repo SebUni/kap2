@@ -27,11 +27,12 @@ _SETTINGS_KEY = "demo_config"
 
 DEFAULT_CONFIG = {
     "kommune_id": None,
-    # Default-Auswahl: Hitze-Gesundheit + Starkregen-Gebäude + Landwirtschaft (Dürre)
+    # M0-Verschlankung: nur die beiden aktiven #95-Teil-Ausweise. Sobald #96/#98
+    # aktiviert sind (Methodik-Freigabe), wieder 3 Codes wählen; die Demo selbst
+    # ist bis Stage 2 ohnehin offline (settings.DEMO_ENABLED).
     "risk_codes": [
         "EXPECTED_ANNUAL_MORTALITY",
-        "EXPECTED_BUILDING_DAMAGE_EUR",
-        "EXPECTED_AGRICULTURAL_DAMAGE_EUR",
+        "EXPECTED_ANNUAL_MORBIDITY",
     ],
     "measure_limit": 10,
     "session_ttl_h": 24,
@@ -52,8 +53,9 @@ def set_config(db: Session, updates: dict) -> dict:
     cfg = get_config(db)
     cfg.update({k: v for k, v in updates.items() if k in DEFAULT_CONFIG})
     risk_codes = [c for c in cfg.get("risk_codes", []) if c in catalog.RISKS_BY_CODE]
-    if len(risk_codes) != 3:
-        raise ValueError("Demo braucht genau 3 gültige Risiko-Codes")
+    # M0: der aktive Katalog hat nur 2 Risiken; Zielzustand bleibt 3 (mit #96/#98).
+    if not 2 <= len(risk_codes) <= 3:
+        raise ValueError("Demo braucht 2–3 gültige Risiko-Codes")
     cfg["risk_codes"] = risk_codes
     row = db.query(AppSetting).filter(AppSetting.key == _SETTINGS_KEY).first()
     if row:

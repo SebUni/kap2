@@ -43,7 +43,15 @@ export default function ProductLayout({ demo = false }: Props) {
   const {
     hasAssessment, kommune, status, setActiveTab, resetKommune, loadStatus,
     configPanelRequested, showConfig, setShowConfig, demoMeta, exitDemo,
+    catalog,
   } = useStore()
+  // Gesamtzahl der KWRA-Klimawirkungen (aktiv + Roadmap); Fallback = 52er-Roadmap.
+  const kwraTotal = catalog
+    ? new Set([
+        ...catalog.risks.map(r => r.kwra_id ?? r.code),
+        ...(catalog.planned_risks ?? []).map(p => p.kwra_id),
+      ]).size
+    : 52
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
@@ -140,7 +148,7 @@ export default function ProductLayout({ demo = false }: Props) {
           </div>
         </div>
         <div className="demo-banner">
-          ⓘ Demo: {demoMeta?.risks.length ?? 3} von 47 Risiken freigeschaltet. Ihre
+          ⓘ Demo: {demoMeta?.risks.length ?? 3} von {kwraTotal} KWRA-Klimawirkungen freigeschaltet. Ihre
           Maßnahmen gelten nur in dieser Sitzung und werden danach gelöscht.
         </div>
         {renderTabsAndContent()}

@@ -321,7 +321,12 @@ def compute_impact(db: Session, measure_id: int) -> dict:
 
     mdef = catalog.MEASURES_BY_CODE.get(measure.measure_type)
     if not mdef:
-        raise ValueError(f"Unbekannter Maßnahmentyp: {measure.measure_type}")
+        # M0-Verschlankung: Alt-Maßnahmen geparkter Typen bleiben in der DB,
+        # sind aber bis zur Re-Expansion (Stage 1+) nicht berechenbar.
+        raise ValueError(
+            f"Maßnahmentyp {measure.measure_type} ist derzeit nicht im aktiven "
+            "Katalog (M0-Verschlankung; kehrt mit einer späteren Roadmap-Stufe zurück)"
+        )
 
     db_overrides = parameter_registry.load_db_overrides(db, measure.kommune_id)
     overrides = parameter_registry.overrides_map(db_overrides)

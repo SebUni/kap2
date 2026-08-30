@@ -133,6 +133,14 @@ class Settings(BaseSettings):
     VG250_CACHE_DIR: str = os.path.join(_BACKEND_ROOT, "data", "vg250")
     LITE_DOWNLOAD_TIMEOUT_S: int = 600
 
+    # ── M0-Verschlankung (docs/ROADMAP.md §5): Nicht-Kern-Bereiche offline ───
+    # Frontend-Pendant: frontend/src/config/features.ts. Demo kehrt mit
+    # Stage 2 zurück, Studie mit M3½, SEO-/Lite-Seiten mit der Re-Expansion.
+    # Admin-Router (Demo-Konfiguration, Lite-Batch) bleiben bewusst erreichbar.
+    DEMO_ENABLED: bool = False                   # /api/demo/* (Router-Mount)
+    STUDY_ENABLED: bool = False                  # /api/public/lite/studie*, study-highlights
+    LITE_PAGES_ENABLED: bool = False             # SEO-Gemeindeseiten, sitemap.xml, robots.txt
+
     # ── LoD2-Gebäudemodelle (amtliche 3D-Modelle der Länder, CityGML) ────────
     # Gebäudehöhen (bldg:measuredHeight) + Footprints ersetzen die OSM-Höhen-
     # heuristik, wo ein Land als Phase-1-Quelle angebunden ist (sources.py in

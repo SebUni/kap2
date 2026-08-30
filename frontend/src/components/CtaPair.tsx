@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { FEATURES } from '../config/features'
 
 interface Props {
   demoLabel?: string
@@ -8,9 +9,10 @@ interface Props {
 }
 
 /**
- * Doppel-CTA „Demo + Beratungsgespräch" — tritt auf der Landingpage und den
- * öffentlichen Seiten immer als Paar auf (Plan §2.1c): die selbstständige
- * Demo für die, die klicken wollen, daneben der Gesprächseinstieg.
+ * Doppel-CTA — tritt auf der Landingpage und den öffentlichen Seiten immer
+ * als Paar auf (Plan §2.1c): der selbstständige Einstieg für die, die klicken
+ * wollen, daneben der Gesprächseinstieg. Solange die Demo offline ist
+ * (M0-Verschlankung), übernimmt die Roadmap den ersten Platz.
  */
 export default function CtaPair({
   demoLabel = 'Demo-Kommune ausprobieren',
@@ -19,7 +21,11 @@ export default function CtaPair({
 }: Props) {
   return (
     <div className={`cta-pair${align === 'left' ? ' cta-pair-left' : ''}`}>
-      <Link to="/demo" className="btn-primary cta-demo">► {demoLabel}</Link>
+      {FEATURES.demo ? (
+        <Link to="/demo" className="btn-primary cta-demo">► {demoLabel}</Link>
+      ) : (
+        <Link to="/roadmap" className="btn-primary cta-demo">Roadmap ansehen →</Link>
+      )}
       <Link to="/kontakt" className="cta-contact">{contactLabel} →</Link>
     </div>
   )

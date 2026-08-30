@@ -8,6 +8,7 @@ import MeasureGameWidget from './landing/MeasureGameWidget'
 import ParamSliderWidget from './landing/ParamSliderWidget'
 import ChainWidget from './landing/ChainWidget'
 import PagerDots from './landing/PagerDots'
+import { FEATURES } from '../config/features'
 
 interface StudyHighlights {
   headline_facts?: string[]
@@ -15,9 +16,11 @@ interface StudyHighlights {
 }
 
 export default function LandingPage() {
-  // Studien-Headlines aus dem Deutschland-Batch (Phase 7); bis dahin Fallback.
+  // Studien-Headlines aus dem Deutschland-Batch (Phase 7); nur solange die
+  // Studie öffentlich ist (M0-Verschlankung: abgeschaltet).
   const [study, setStudy] = useState<StudyHighlights | null>(null)
   useEffect(() => {
+    if (!FEATURES.studie) return
     fetch('/api/public/lite/study-highlights')
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => setStudy(d))
@@ -73,7 +76,7 @@ export default function LandingPage() {
             bullets={[
               { title: 'Förderfähig von Haus aus:', text: 'Bewertung nach UBA-KWRA-Leitfaden und DIN EN ISO 14091 — direkt verwendbar für KAnG-Pflichten und DAS-/ANK-Förderanträge, ohne methodische Nacharbeit.' },
               { title: 'Der €-Schalter überzeugt Kämmerei und Rat:', text: 'aus „Hitzerisiko: hoch" wird „2,1 Mio € erwarteter Schaden pro Jahr" — Beschlussvorlagen argumentieren mit Beträgen statt Ampelfarben.' },
-              { title: '47 Risiken, in einer Ratssitzung vermittelbar:', text: 'die Verdichtung auf 5 Felder zeigt in Sekunden, wo der Handlungsdruck liegt — Priorisierung statt 200-Seiten-Gutachten.' },
+              { title: '52 Klimawirkungen nach Bundes-Priorität:', text: 'KAP2 folgt strikt der Dringlichkeitseinstufung der KWRA 2021 — Start mit den drei sehr dringenden Gesundheits-Klimawirkungen, Ausbau nach öffentlicher Roadmap. Die Verdichtung auf Handlungsfelder zeigt in Sekunden, wo der Handlungsdruck liegt.' },
               { title: 'Verteidigbar nach außen:', text: 'einheitliche, dokumentierte Methodik statt Gutachter-Ermessen — Ergebnisse halten Nachfragen von Kreis, Land und Fachöffentlichkeit stand; Büros bewerten alle Mandate vergleichbar.' },
               { title: 'In Stunden statt Monaten:', text: 'der Datenbezug (DWD, Zensus, OSM, INKAR) läuft automatisch — kein vorgelagertes Datensammel-Projekt, keine Zuarbeit aus fünf Ämtern.' },
             ]}
@@ -115,7 +118,7 @@ export default function LandingPage() {
               { title: 'CAPEX und OPEX getrennt, über Jahre:', text: 'Investition und Folgekosten sauber ausgewiesen — belastbare Haushaltsplanung statt böser Überraschungen beim Unterhalt.' },
               { title: 'Vermiedene Schäden in €/Jahr:', text: 'die Sprache von Wirtschaftlichkeitsnachweisen und Fördermittelgebern — das Nutzen-Kosten-Verhältnis für den Antrag liefert KAP2 gleich mit.' },
               { title: 'Standort-Ranking statt Bauchgefühl:', text: 'gleiche Maßnahme, drei Kandidaten-Orte — die Rangfolge nach Nutzen-Kosten ist die fertige Beschlussgrundlage für den Rat.' },
-              { title: '47 Maßnahmen als Startpunkt:', text: 'quellenbelegte Kostensätze und Wirkfaktoren im Katalog — die Planung beginnt nicht bei null, sondern beim Anpassen an die eigene Lage.' },
+              { title: 'Maßnahmen mit belegten Kostensätzen:', text: 'quellenbelegte Kostensätze und Wirkfaktoren im Katalog — zum Start die Gesundheits-Maßnahmen von Hitzeaktionsplan bis UV-Schutz, wachsend mit jeder Roadmap-Stufe.' },
             ]}
             widget={<MeasureGameWidget />}
           />
@@ -131,15 +134,15 @@ export default function LandingPage() {
             <ParamSliderWidget />
             <div className="transparenz-param-text">
               <p className="landing-section-intro">
-                47 Risiken als H×E×V-Wirkungsketten auf dem 100m-Raster — und für
-                jede Kennzahl der komplette Rechenweg: vom Rohdatum über jede Formel
-                und jeden Parameter bis zum Euro-Betrag. Keine Blackbox.
+                Jedes Klimarisiko als H×E×V-Wirkungskette auf dem 100m-Raster — und
+                für jede Kennzahl der komplette Rechenweg: vom Rohdatum über jede
+                Formel und jeden Parameter bis zum Euro-Betrag. Keine Blackbox.
               </p>
               <p>
-                Über 400 Parameter stecken im Modell — jeder mit Wert, Einheit und
-                belegter Quelle. Rechnet Ihre Kämmerei mit anderen Sätzen? Ändern Sie
-                den Wert direkt (nebenan ein Beispiel) — mit eigener Quelle, die im
-                Ergebnis dokumentiert bleibt.
+                Jeder Parameter im Modell trägt Wert, Einheit und belegte Quelle.
+                Rechnet Ihre Kämmerei mit anderen Sätzen? Ändern Sie den Wert direkt
+                (nebenan ein Beispiel) — mit eigener Quelle, die im Ergebnis
+                dokumentiert bleibt.
               </p>
             </div>
           </div>
@@ -149,34 +152,38 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Seite 7 · Deutschland im Klimarisiko-Check (Studie) ──────── */}
-      <div className="pager-page">
-        <section className="landing-section">
-          <h2>Deutschland im Klimarisiko-Check</h2>
-          <div className="study-teaser">
-            <div>
-              <p className="landing-section-intro" style={{ marginBottom: '0.75rem' }}>
-                Wir haben alle rund 11.000 Gemeinden Deutschlands durchgerechnet —
-                als kostenlose Grobschätzung für die wichtigsten Klimarisiken.
-              </p>
-              {study?.headline_facts?.length ? (
-                <ul className="study-facts">
-                  {study.headline_facts.slice(0, 3).map((f, i) => <li key={i}>{f}</li>)}
-                </ul>
-              ) : (
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                  Die KAP2-Deutschlandstudie mit Rankings und Bundesland-Vergleichen
-                  erscheint hier in Kürze.
+      {/* ── Seite 7 · Deutschland im Klimarisiko-Check (Studie) ────────
+          M0-Verschlankung: Studie/Deutschland-Karte sind offline; die Sektion
+          kehrt mit ihnen zurück. */}
+      {(FEATURES.studie || FEATURES.deutschlandKarte) && (
+        <div className="pager-page">
+          <section className="landing-section">
+            <h2>Deutschland im Klimarisiko-Check</h2>
+            <div className="study-teaser">
+              <div>
+                <p className="landing-section-intro" style={{ marginBottom: '0.75rem' }}>
+                  Wir haben alle rund 11.000 Gemeinden Deutschlands durchgerechnet —
+                  als kostenlose Grobschätzung für die wichtigsten Klimarisiken.
                 </p>
-              )}
-              <div className="study-links">
-                <Link to="/studie" className="btn-primary">Zur Studie →</Link>
-                <Link to="/deutschland" className="cta-contact">Ihre Gemeinde nachschlagen →</Link>
+                {study?.headline_facts?.length ? (
+                  <ul className="study-facts">
+                    {study.headline_facts.slice(0, 3).map((f, i) => <li key={i}>{f}</li>)}
+                  </ul>
+                ) : (
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                    Die KAP2-Deutschlandstudie mit Rankings und Bundesland-Vergleichen
+                    erscheint hier in Kürze.
+                  </p>
+                )}
+                <div className="study-links">
+                  {FEATURES.studie && <Link to="/studie" className="btn-primary">Zur Studie →</Link>}
+                  {FEATURES.deutschlandKarte && <Link to="/deutschland" className="cta-contact">Ihre Gemeinde nachschlagen →</Link>}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
+      )}
 
       {/* ── Seite 8 · Für wen + Abschluss + Footer ───────────────────── */}
       <div className="pager-page">
@@ -205,8 +212,9 @@ export default function LandingPage() {
         <section className="landing-closing">
           <h2>Sehen Sie KAP2 an Ihrer Kommune.</h2>
           <p>
-            Die Demo zeigt eine vorberechnete Beispielkommune — im Gespräch
-            rechnen wir über Ihre.
+            Der Start mit den Gesundheits-Klimarisiken ist offen und kostenlos —
+            im Gespräch rechnen wir direkt über Ihre Kommune, und die Roadmap
+            zeigt, was als Nächstes kommt.
           </p>
           <CtaPair />
         </section>

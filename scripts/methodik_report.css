@@ -1,0 +1,91 @@
+/* Stil des Methodik-PDF-Exports — angelehnt an docs/render/METHODIK_M0_GESUNDHEIT.html.
+   Wird von scripts/export_methodik_pdf.sh inline in das Zwischen-HTML eingebettet. */
+:root {
+  --ink: #16202c; --muted: #5a6675; --line: #d8dde4;
+  --accent: #0f5c8c; --soft: #f2f6f9; --code-bg: #f4f6f9;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "DejaVu Sans", Helvetica, Arial, sans-serif;
+  font-size: 9.4pt; color: var(--ink); margin: 0; line-height: 1.45;
+  hyphens: auto;
+}
+
+/* Titelblock (pandoc title-block-header) als Hero wie in M0 */
+header#title-block-header {
+  border-bottom: 3pt solid var(--accent);
+  padding-bottom: 10pt; margin-bottom: 12pt;
+}
+h1.title { font-size: 19pt; margin: 0 0 2pt 0; letter-spacing: -0.4pt; }
+p.date { font-size: 9pt; color: var(--muted); margin: 2pt 0 0 0; }
+
+/* Inhaltsverzeichnis */
+nav#TOC {
+  border: 1pt solid var(--line); border-radius: 3pt;
+  padding: 7pt 12pt; margin: 0 0 12pt 0;
+  font-size: 8.8pt; page-break-inside: avoid;
+}
+nav#TOC::before { content: "Inhalt"; font-weight: bold; color: var(--accent); }
+nav#TOC ul { list-style: none; margin: 3pt 0 0 0; padding-left: 0; }
+nav#TOC ul ul { padding-left: 12pt; }
+nav#TOC li { margin-bottom: 1pt; }
+nav#TOC a { color: var(--ink); text-decoration: none; }
+
+/* Überschriften (H1 der Quelle wird zum Titel; Abschnitte beginnen bei h1) */
+h1 { font-size: 13pt; margin: 15pt 0 6pt 0; color: var(--accent);
+     border-bottom: 0.75pt solid var(--line); padding-bottom: 2pt;
+     page-break-after: avoid; }
+h2 { font-size: 11pt; margin: 11pt 0 4pt 0; page-break-after: avoid; }
+h3 { font-size: 9.8pt; margin: 8pt 0 3pt 0; page-break-after: avoid; }
+h4 { font-size: 9.4pt; margin: 7pt 0 3pt 0; page-break-after: avoid; }
+p { margin: 0 0 5pt 0; }
+a { color: var(--accent); }
+
+/* Tabellen: umbruchfähig, Kopf wiederholt sich je Seite */
+table {
+  border-collapse: collapse; width: 100%; margin: 4pt 0 8pt 0;
+  font-size: 8.4pt;
+}
+thead { display: table-header-group; }
+tr { page-break-inside: avoid; }
+th, td {
+  border: 0.5pt solid var(--line); padding: 2.5pt 5pt;
+  text-align: left; vertical-align: top;
+  overflow-wrap: break-word; hyphens: auto;
+}
+th { background: #eef2f6; font-size: 8.2pt; }
+td code, th code { overflow-wrap: anywhere; }
+
+/* Code */
+code {
+  font-family: "DejaVu Sans Mono", monospace; font-size: 8.4pt;
+  background: var(--code-bg); padding: 0 2pt;
+}
+pre {
+  background: var(--code-bg); border: 0.5pt solid var(--line); border-radius: 3pt;
+  padding: 6pt 9pt; font-size: 8.2pt; line-height: 1.5;
+  margin: 4pt 0 8pt 0; white-space: pre-wrap; overflow-wrap: break-word;
+  /* Lange Blöcke (z. B. §7-Parameter-YAML) müssen über Seiten umbrechen dürfen */
+  page-break-inside: auto;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+
+/* Zitat-/Hinweisblöcke */
+blockquote {
+  background: var(--soft); border-left: 3pt solid var(--accent); border-radius: 3pt;
+  margin: 6pt 0 8pt 0; padding: 6pt 10pt; color: var(--ink);
+  page-break-inside: avoid;
+}
+blockquote p { margin: 0 0 4pt 0; }
+blockquote p:last-child { margin-bottom: 0; }
+
+/* Listen */
+ul, ol { margin: 2pt 0 6pt 0; padding-left: 16pt; }
+li { margin-bottom: 2pt; }
+
+hr { border: none; border-top: 0.75pt solid var(--line); margin: 10pt 0; }
+
+/* Formeln (KaTeX) */
+.katex { font-size: 0.98em; }
+.katex-display { margin: 5pt 0; overflow-x: auto; overflow-y: hidden; }
+span.math.display { display: block; page-break-inside: avoid; }

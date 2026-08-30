@@ -129,9 +129,17 @@ def test_curated_pathways_carry_source_and_display_title():
 def test_pathway_descriptions_do_not_contradict_curation():
     """PATHWAY_DESCRIPTIONS ist nur noch Titel-Override — Einträge müssen zu einer
     existierenden (kuratierten) Kette gehören oder sind unbenutzt (kein harter Fehler),
-    dürfen aber keine nicht existierenden Risiken referenzieren."""
+    dürfen aber keine nicht existierenden Risiken referenzieren.
+
+    M0-Verschlankung: geparkte Risiken (catalog_parked) zählen als existent —
+    ihre Titel-Overrides bleiben für die Rückkehr der Stufen 1–4 erhalten."""
+    from app.data import catalog_parked
+
+    known = (set(catalog.RISKS_BY_CODE)
+             | {r["code"] for r in catalog_parked._PARKED_RISKS}
+             | {"EXPECTED_TOTAL_DAMAGE_EAD_EUR"})
     for (risk_code, _h, _e, _v) in PATHWAY_DESCRIPTIONS:
-        assert risk_code in catalog.RISKS_BY_CODE or risk_code == "EXPECTED_TOTAL_DAMAGE_EAD_EUR", \
+        assert risk_code in known, \
             f"PATHWAY_DESCRIPTIONS referenziert unbekanntes Risiko {risk_code}"
 
 
@@ -360,6 +368,10 @@ def test_health_modifier_vulnerabilities_are_drawn_once():
     for code, spec in LINEAGE_SPECS.items():
         mod = spec.get("modifier")
         if not mod:
+            continue
+        if code not in catalog.RISKS_BY_CODE:
+            # M0-Verschlankung: build_for_layer braucht aktive Katalog-
+            # Mitgliedschaft; geparkte Kanäle kehren mit Stage 1–4 zurück.
             continue
         g = lineage_graph.build_for_layer(code, "risks")
         byid = {n["id"]: n for n in g["nodes"]}

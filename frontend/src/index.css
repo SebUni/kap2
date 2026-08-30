@@ -4119,3 +4119,28 @@ body {
 }
 .chat-input-field:focus { outline: none; border-color: var(--primary); }
 .chat-hint { font-size: 0.75rem; color: var(--text-muted); margin: 4px 0 0; line-height: 1.4; }
+
+/* ── Öffentliche Roadmap-Seite (/roadmap) — Web-Fassung von ROADMAP_PUBLIC ── */
+.roadmap { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+.roadmap-hero { border-bottom: 3px solid var(--primary); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.roadmap-hero h1 { font-size: 1.9rem; margin: 0 0 0.2rem; letter-spacing: -0.02em; }
+.roadmap-claim { font-size: 1.1rem; color: var(--primary); font-weight: 700; margin: 0.2rem 0 0.6rem; }
+.roadmap-hero p { color: var(--text-muted); max-width: 52em; margin: 0 0 0.5rem; }
+.roadmap-chips { margin-top: 0.6rem; }
+.roadmap-chip { display: inline-block; font-size: 0.75rem; font-weight: 700; color: #fff; border-radius: 999px; padding: 0.15rem 0.7rem; margin: 0 0.3rem 0.3rem 0; }
+.roadmap-h2 { font-size: 1.25rem; margin: 1.5rem 0 0.75rem; }
+.roadmap-stage { display: flex; }
+.roadmap-rail { width: 2rem; position: relative; flex: none; }
+.roadmap-dot { width: 1rem; height: 1rem; border-radius: 50%; position: absolute; left: 0; top: 0.25rem; border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--border); }
+.roadmap-bar { position: absolute; left: 0.42rem; top: 1.4rem; bottom: -0.3rem; width: 2px; background: var(--border); }
+.roadmap-stage:last-of-type .roadmap-bar { display: none; }
+.roadmap-body { padding: 0 0 1.1rem 0.4rem; }
+.roadmap-when { font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.07em; }
+.roadmap-body h3 { font-size: 1.05rem; margin: 0.1rem 0 0.3rem; }
+.roadmap-body p { margin: 0 0 0.4rem; }
+.roadmap-risks { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+.roadmap-why { background: #f2f6f9; border-radius: 8px; padding: 0.8rem 1.1rem; margin: 0.5rem 0; }
+.roadmap-why p { margin: 0 0 0.5rem; }
+.roadmap-why p:last-child { margin-bottom: 0; }
+.roadmap-cta { border: 2px solid var(--primary); border-radius: 8px; padding: 0.8rem 1.1rem; margin: 1rem 0 0.5rem; }
+.roadmap-foot { margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-muted); }

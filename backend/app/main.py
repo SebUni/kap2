@@ -4,6 +4,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.deps import require_admin, require_kommune_access
+from app.config import settings
 from app.api.routes import (
     auth as auth_route, contact as contact_route, demo as demo_route,
     admin_demo as admin_demo_route, public_lite as public_lite_route,
@@ -36,12 +37,17 @@ app.add_middleware(
 app.include_router(auth_route.router, prefix="/api/auth", tags=["Auth"])
 # Öffentlich: Kontakt-/Beratungsanfrage (rate-limited).
 app.include_router(contact_route.router, prefix="/api/public", tags=["Public"])
-# Öffentlich: Demo-Session-Bootstrap + Meta.
-app.include_router(demo_route.router, prefix="/api/demo", tags=["Demo"])
+# Öffentlich: Demo-Session-Bootstrap + Meta (M0-Verschlankung: abschaltbar,
+# nicht gemountete Pfade liefern 404; Admin-Demo-Konfiguration bleibt an).
+if settings.DEMO_ENABLED:
+    app.include_router(demo_route.router, prefix="/api/demo", tags=["Demo"])
 # Öffentlich: Deutschland-Karte (statische Artefakte + Gemeinde-Lookup).
+# Bleibt gemountet (Studien-Endpunkte tragen eigene STUDY_ENABLED-Guards);
+# ohne Frontend-Route/Nav und ohne SEO-Seiten ist die Karte nicht verlinkt.
 app.include_router(public_lite_route.router, prefix="/api/public/lite", tags=["Public"])
 # Öffentlich: SEO-Seiten, Sitemap, robots.txt (Root-Pfade, crawlerbar).
-app.include_router(seo_route.router, tags=["SEO"])
+if settings.LITE_PAGES_ENABLED:
+    app.include_router(seo_route.router, tags=["SEO"])
 
 # Produkt-Router: Login erzwungen; Routen mit {kommune_id} zusätzlich auf die
 # Kommune-Zuordnung geprüft (Admin: alles). Details in app/api/deps.py.
@@ -102,7 +108,8 @@ def _start_background_services():
             demo_service.sweep_expired(db)
         if n:
             logging.getLogger("app").info("Auth: %d abgelaufene Sessions entfernt", n)
-        demo_service.ensure_sweeper_started()
+        if settings.DEMO_ENABLED:
+            demo_service.ensure_sweeper_started()
     except Exception as exc:  # pragma: no cover
         logging.getLogger("app").error("Session-Purge/Demo-Sweeper fehlgeschlagen: %s", exc)
     try:

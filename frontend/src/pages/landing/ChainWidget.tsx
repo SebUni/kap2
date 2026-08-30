@@ -29,7 +29,7 @@ export default function ChainWidget() {
         />
       </div>
       <p className="mini-widget-quote">
-        Das ist eine von 47 Wirkungsketten. Im Produkt sehen Sie jede — bis in die einzelne Rasterzelle.
+        So sieht jede Wirkungskette im Produkt aus — bis in die einzelne Rasterzelle.
       </p>
     </div>
   )

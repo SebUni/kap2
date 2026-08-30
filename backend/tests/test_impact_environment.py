@@ -12,11 +12,38 @@ Läuft mit pytest oder direkt: ``python tests/test_impact_environment.py``.
 
 from __future__ import annotations
 
-from app.data import catalog
+import pytest
+
+from app.data import catalog, catalog_parked
 from app.services.engine import impact, override_context, risk_engine
 from app.services.engine.impact.base import CellContext
 
 HABITAT = "EXPECTED_HABITAT_LOSS"
+
+# M0-Verschlankung (docs/ROADMAP.md §5): Die Umweltrisiken sind geparkt; ihre
+# Schadensfunktionen bleiben in der Registry und werden hier mit den geparkten
+# Risiko-Dicts direkt aufgerufen (compute_all_cell_impacts dispatcht nur über
+# catalog.RISKS).
+_PARKED_BY_CODE = {r["code"]: r for r in catalog_parked._PARKED_RISKS}
+
+
+def _risk(code: str) -> dict:
+    r = catalog.RISKS_BY_CODE.get(code)
+    if r is not None:
+        return r
+    r = dict(_PARKED_BY_CODE[code])
+    # Die Kostensatz-Anreicherung (_enrich_risk_cost_sources) läuft nur über die
+    # AKTIVEN RISKS; für geparkte Risiken denselben Katalog-Kostensatz anwenden,
+    # damit die Monetarisierungs-Mechanik unverändert geprüft bleibt.
+    if not catalog.risk_is_monetary(r) and r.get("cost_per_outcome_eur") is None:
+        entry = catalog._RISK_COST_RATES.get(code)
+        if entry:
+            r["cost_per_outcome_eur"] = entry[0]
+    return r
+
+
+def _compute(code: str, ctx: CellContext) -> dict:
+    return impact.IMPACT_FUNCTIONS[code](_risk(code), ctx)
 
 
 def _abs(code: str, frac: float) -> float:
@@ -44,27 +71,30 @@ def _ctx(forest=0.2, drought=0.4, vnorm=0.5):
 
 def test_habitat_loss_scales_with_area():
     override_context.set_overrides({})
-    low = impact.compute_all_cell_impacts(_ctx(forest=0.1))[HABITAT]["outcome"]
-    high = impact.compute_all_cell_impacts(_ctx(forest=0.3))[HABITAT]["outcome"]
+    low = _compute(HABITAT, _ctx(forest=0.1))["outcome"]
+    high = _compute(HABITAT, _ctx(forest=0.3))["outcome"]
     assert high > low > 0.0
 
 
 def test_habitat_loss_scales_with_intensity():
     override_context.set_overrides({})
-    lo = impact.compute_all_cell_impacts(_ctx(drought=0.2))[HABITAT]["outcome"]
-    hi = impact.compute_all_cell_impacts(_ctx(drought=0.8))[HABITAT]["outcome"]
+    lo = _compute(HABITAT, _ctx(drought=0.2))["outcome"]
+    hi = _compute(HABITAT, _ctx(drought=0.8))["outcome"]
     assert abs(hi - 4.0 * lo) < 1e-6   # linearer Driver: 0.8/0.2 = 4
 
 
 def test_environment_is_monetized_via_cost_rate():
     override_context.set_overrides({})
-    r = catalog.RISKS_BY_CODE[HABITAT]
-    res = impact.compute_all_cell_impacts(_ctx())[HABITAT]
+    r = _risk(HABITAT)
+    res = _compute(HABITAT, _ctx())
     rate = catalog.risk_default_cost_per_outcome(r)   # €/ha
     assert abs(res["cost_eur"] - res["outcome"] * rate) < 1e-6
     assert res["cost_eur"] > 0.0
 
 
+@pytest.mark.skip(reason="M0-Verschlankung: Umweltrisiken geparkt, aggregate braucht "
+                         "aktive Katalog-Mitgliedschaft; kehrt mit Stage 1–4 zurück "
+                         "(docs/ROADMAP.md §5)")
 def test_environment_risks_sum_over_cells():
     override_context.set_overrides({})
     def cell():
@@ -112,10 +142,13 @@ def test_impact_coverage_matches_design():
     for code in consolidated | operational_flat | catalog.INDEX_ONLY_RISK_CODES:
         assert not impact.has(code), f"unerwartete Funktion: {code}"
 
-    # Jedes Risiko ist genau in einer der vier Kategorien abgedeckt.
+    # Jedes AKTIVE Risiko ist in einer der vier Kategorien abgedeckt. (M0: die
+    # Registry behält bewusst die Funktionen der geparkten Risiken — covered ist
+    # deshalb eine Obermenge des aktiven Katalogs, keine Gleichheit mehr; die
+    # Gleichheit kehrt mit den Stufen 1–4 zurück, docs/ROADMAP.md §5.)
     covered = expected | consolidated | operational_flat | catalog.INDEX_ONLY_RISK_CODES
     all_codes = {r["code"] for r in catalog.RISKS}
-    assert covered == all_codes, f"nicht zugeordnet: {all_codes - covered}"
+    assert all_codes <= covered, f"nicht zugeordnet: {all_codes - covered}"
 
 
 if __name__ == "__main__":

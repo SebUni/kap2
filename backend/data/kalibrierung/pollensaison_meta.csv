@@ -1,0 +1,25 @@
+kennzahl,region,n_stationen,wert_tage
+verfruehung_hasel,nord,330,-14.77
+verfruehung_hasel,mitte,736,-14.85
+verfruehung_hasel,sued,527,-14.03
+verfruehung_hasel,deutschland,1593,-14.56
+verfruehung_erle,nord,277,-11.39
+verfruehung_erle,mitte,452,-11.58
+verfruehung_erle,sued,432,-11.49
+verfruehung_erle,deutschland,1161,-11.5
+verfruehung_birke,nord,375,-6.98
+verfruehung_birke,mitte,841,-6.87
+verfruehung_birke,sued,551,-5.29
+verfruehung_birke,deutschland,1767,-6.4
+verfruehung_gras_frueh,nord,263,-7.85
+verfruehung_gras_frueh,mitte,586,-9.22
+verfruehung_gras_frueh,sued,504,-8.58
+verfruehung_gras_frueh,deutschland,1353,-8.72
+verfruehung_gras_spaet,nord,276,-3.79
+verfruehung_gras_spaet,mitte,640,-5.42
+verfruehung_gras_spaet,sued,495,-5.38
+verfruehung_gras_spaet,deutschland,1411,-5.09
+birke_offset_bluete_minus_blattentfaltung,deutschland,46027,3.29
+birke_offset_trend_1991_2005_vs_2006_2020,deutschland,23074/15289,4.23 vs 2.92
+min_years_je_periode,-,-,8
+perioden,-,-,1961-1990 vs 1991-2020

@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write",
+      "WebSearch",
+      "WebFetch",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(pytest:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(grep:*)"
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+region,stations,n_stations,n_station_years,n_anomalies,sigma,skew,mean_anomaly,t_sommer_mittel,sigma_interannual,sigma_interannual_station_mean
+nord,1975:Hamburg-Fuhlsbüttel|691:Bremen|2014:Hannover|3631:Norderney|4625:Schwerin|1757:Greifswald|4466:Schleswig,7,210,2730,2.3610,-0.0031,0.0000,17.3330,0.9120,0.9351
+mitte,433:Berlin-Tempelhof|3987:Potsdam|1420:Frankfurt/Main|2667:Köln/Bonn|1048:Dresden-Klotzsche|1270:Erfurt-Weimar|4336:Saarbrücken-Ensheim,7,210,2730,2.5815,-0.0146,0.0000,18.5783,0.9792,1.0240
+sued,3379:München-Stadt|4931:Stuttgart-Echterdingen|3668:Nürnberg|1443:Freiburg|232:Augsburg|4104:Regensburg|2712:Konstanz,7,210,2730,2.5734,-0.0890,-0.0000,18.8268,0.9801,1.0345
+deutschland,1975:Hamburg-Fuhlsbüttel|691:Bremen|2014:Hannover|3631:Norderney|4625:Schwerin|1757:Greifswald|4466:Schleswig|433:Berlin-Tempelhof|3987:Potsdam|1420:Frankfurt/Main|2667:Köln/Bonn|1048:Dresden-Klotzsche|1270:Erfurt-Weimar|4336:Saarbrücken-Ensheim|3379:München-Stadt|4931:Stuttgart-Echterdingen|3668:Nürnberg|1443:Freiburg|232:Augsburg|4104:Regensburg|2712:Konstanz,21,630,8190,2.5071,-0.0382,0.0000,18.2461,0.8959,0.9979

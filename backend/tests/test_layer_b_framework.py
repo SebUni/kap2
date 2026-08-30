@@ -16,11 +16,23 @@ Läuft mit pytest oder direkt: ``python tests/test_layer_b_framework.py``.
 
 from __future__ import annotations
 
+import pytest
+
 from app.data import catalog
 from app.services.engine import impact, override_context, risk_engine
 
 MORT = "EXPECTED_ANNUAL_MORTALITY"   # pop-skaliert, monetär über VSL
-OUTAGE = "EXPECTED_ENERGY_OUTAGE_HOURS"  # flat-skaliert (Stunden/Jahr)
+OUTAGE = "EXPECTED_ENERGY_OUTAGE_HOURS"  # flat-skaliert (Stunden/Jahr) — M0: geparkt
+
+# M0-Verschlankung (docs/ROADMAP.md §5): kein aktives area-/flat-Risiko mehr —
+# aggregate iteriert catalog.RISKS, daher sind die area-/flat-spezifischen Tests
+# bis zur Rückkehr der Stufen 1–4 geskippt (nicht gelöscht).
+_M0_NO_AREA = pytest.mark.skip(
+    reason="M0-Verschlankung: kein aktives area-Risiko, aggregate braucht "
+           "Katalog-Mitgliedschaft; kehrt mit Stage 1–4 zurück (docs/ROADMAP.md §5)")
+_M0_NO_FLAT = pytest.mark.skip(
+    reason="M0-Verschlankung: kein aktives flat-Risiko (OUTAGE geparkt); kehrt "
+           "mit Stage 1–4 zurück (docs/ROADMAP.md §5)")
 
 
 def _cell(index: float, pop: float, materialize: bool = True) -> dict:
@@ -120,6 +132,7 @@ def test_exposed_p90_ignores_unpopulated_cells():
     assert r["risk_class"] == "mittel"
 
 
+@_M0_NO_AREA
 def test_exposed_p90_falls_back_without_exposures_key():
     """Zellen ohne ``exposures``-Dict (adjustierte With-Measures-Daten, Alt-Bestände):
     area-/flat-Risiken bekommen kein Gate — exposed_p90 == p90 (nie strenger als
@@ -132,6 +145,7 @@ def test_exposed_p90_falls_back_without_exposures_key():
     assert r["exposed_p90_index"] == r["p90_index"]
 
 
+@_M0_NO_AREA
 def test_exposed_p90_gates_area_risk_on_pathway_exposure():
     """area-Risiken zählen nur Zellen mit mindestens einer Pfad-Exposition > 0."""
     override_context.set_overrides({})
@@ -174,8 +188,18 @@ def test_flat_risks_stay_p90():
     override_context.set_overrides({})
     cells = [_cell(40.0, 100.0) for _ in range(50)]
     agg = risk_engine.aggregate(cells, total_pop=5000.0, area_km2=5.0)
-    assert agg["risks"][OUTAGE]["aggregation"] == "p90"
+    # M0: kein aktives flat-Risiko — der p90-Zweig selbst ist mit test_flat_cost_
+    # scales_with_population geskippt; die sum-Aggregation der aktiven Risiken
+    # bleibt hier geprüft.
     assert agg["risks"][MORT]["aggregation"] == "sum"
+
+
+@_M0_NO_FLAT
+def test_flat_risks_outage_is_p90():
+    override_context.set_overrides({})
+    cells = [_cell(40.0, 100.0) for _ in range(50)]
+    agg = risk_engine.aggregate(cells, total_pop=5000.0, area_km2=5.0)
+    assert agg["risks"][OUTAGE]["aggregation"] == "p90"
 
 
 # ── (e) Alt-Daten-Fallback ─────────────────────────────────────────────────────
@@ -206,6 +230,7 @@ def test_compute_cell_impacts_is_legacy_even_with_impact_fn():
 
 # ── (h) B6: Flat-Ausfallkosten skalieren mit der Bevölkerung ───────────────────
 
+@_M0_NO_FLAT
 def test_flat_cost_scales_with_population():
     """MODELL_KRITIK §8/B6: Flat-Ausfallkosten (VoLL je 100k-Ew.-Last) skalieren mit der
     Bevölkerung — die Ausfallstunden bleiben kommunenweit gleich, die €-Bewertung nicht."""
@@ -225,6 +250,13 @@ def test_sanity_ratio_present_for_sum_risks():
     cells = [_cell(50.0, 200.0) for _ in range(10)]
     agg = risk_engine.aggregate(cells, total_pop=2000.0, area_km2=10.0)
     assert "sanity_ratio" in agg["risks"][MORT]          # pop/area: float oder None
+
+
+@_M0_NO_FLAT
+def test_sanity_ratio_none_for_flat_risks():
+    override_context.set_overrides({})
+    cells = [_cell(50.0, 200.0) for _ in range(10)]
+    agg = risk_engine.aggregate(cells, total_pop=2000.0, area_km2=10.0)
     assert agg["risks"][OUTAGE]["sanity_ratio"] is None  # flat: kein Anker
 
 

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>KAP2 — Methodik-Bericht M0: Gesundheits-Klimarisiken #95 · #96 · #98</title>
+<link rel="stylesheet" href="../../frontend/node_modules/katex/dist/katex.min.css">
+<script defer src="../../frontend/node_modules/katex/dist/katex.min.js"></script>
+<script defer src="../../frontend/node_modules/katex/dist/contrib/auto-render.min.js"></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+      ],
+      throwOnError: false,
+    });
+    window.__katexDone = true;
+  });
+</script>
+<style>
+  @page { size: A4; margin: 13mm 14mm; }
+  :root {
+    --ink: #16202c; --muted: #5a6675; --line: #d8dde4;
+    --accent: #0f5c8c; --gesundheit: #ef4444;
+    --a: #0e7a4f; --b: #b06c00; --c: #6b4fa3;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "DejaVu Sans", Helvetica, Arial, sans-serif; font-size: 9.4pt; color: var(--ink); margin: 0; line-height: 1.45; }
+  .hero { border-bottom: 3pt solid var(--accent); padding-bottom: 10pt; margin-bottom: 12pt; }
+  .hero h1 { font-size: 19pt; margin: 0 0 2pt 0; letter-spacing: -0.4pt; }
+  .hero .claim { font-size: 11.5pt; color: var(--accent); font-weight: bold; margin: 2pt 0 6pt 0; }
+  .hero p { margin: 0 0 4pt 0; color: var(--muted); max-width: 60em; }
+  h2 { font-size: 13pt; margin: 14pt 0 6pt 0; color: var(--accent); page-break-after: avoid; }
+  h3 { font-size: 11pt; margin: 11pt 0 4pt 0; page-break-after: avoid; }
+  h4 { font-size: 9.8pt; margin: 8pt 0 3pt 0; page-break-after: avoid; }
+  p { margin: 0 0 5pt 0; }
+  .ansatz { border: 1pt solid var(--line); border-left: 4pt solid var(--muted); border-radius: 3pt; padding: 7pt 10pt 6pt 10pt; margin: 7pt 0 9pt 0; }
+  .ansatz.a { border-left-color: var(--a); }
+  .ansatz.b { border-left-color: var(--b); }
+  .ansatz.c { border-left-color: var(--c); }
+  .ansatz > h3 { margin-top: 0; }
+  .ansatz.a > h3 { color: var(--a); }
+  .ansatz.b > h3 { color: var(--b); }
+  .ansatz.c > h3 { color: var(--c); }
+  table { border-collapse: collapse; width: 100%; margin: 4pt 0 7pt 0; font-size: 8.6pt; page-break-inside: avoid; }
+  th, td { border: 0.5pt solid var(--line); padding: 2.5pt 5pt; text-align: left; vertical-align: top; }
+  th { background: #eef2f6; font-size: 8.4pt; }
+  pre.formula { background: #f4f6f9; border: 0.5pt solid var(--line); border-radius: 3pt; padding: 6pt 9pt; font-family: "DejaVu Sans Mono", monospace; font-size: 8.4pt; line-height: 1.5; margin: 4pt 0 7pt 0; white-space: pre-wrap; page-break-inside: avoid; }
+  code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.4pt; background: #f4f6f9; padding: 0 2pt; }
+  .kette { background: #fdf3f3; border: 0.5pt solid #f2c9c9; border-radius: 3pt; padding: 6pt 10pt; margin: 5pt 0 8pt 0; page-break-inside: avoid; }
+  .kette h4 { margin-top: 0; color: var(--gesundheit); }
+  .muted { color: var(--muted); }
+  .small { font-size: 8.3pt; }
+  ul, ol { margin: 2pt 0 6pt 0; padding-left: 16pt; }
+  li { margin-bottom: 2pt; }
+  .pro { color: var(--a); font-weight: bold; }
+  .con { color: #b3261e; font-weight: bold; }
+  .why { background: #f2f6f9; border-radius: 4pt; padding: 8pt 11pt; margin: 6pt 0; page-break-inside: avoid; }
+  .matrix td.best { background: #e7f4ee; font-weight: bold; }
+  .wahl { border: 1.5pt solid var(--accent); border-radius: 4pt; padding: 9pt 12pt; margin: 8pt 0; page-break-inside: avoid; }
+  .wahl b { color: var(--accent); }
+  .box { display: inline-block; width: 9pt; height: 9pt; border: 1pt solid var(--ink); border-radius: 1.5pt; margin-right: 4pt; vertical-align: -1pt; }
+  .chk { background: #fff3cd; border: 0.5pt solid #e0c56e; border-radius: 2pt; padding: 0 3pt; font-size: 8pt; }
+  .math { margin: 4pt 0 6pt 0; page-break-inside: avoid; overflow-x: auto; }
+  .katex { font-size: 0.98em; }
+  .katex-display { margin: 4pt 0; }
+  table.sym { font-size: 8.2pt; }
+  table.sym td:first-child { white-space: nowrap; }
+  /* Ebenen-Kennzeichnung: grün = existiert im Produkt, orange = neu anzulegen,
+     grau = geparkt (kehrt mit Roadmap-Stufe zurück). */
+  .lay { font-family: "DejaVu Sans Mono", monospace; font-size: 7.8pt; padding: 0 3pt; border-radius: 2pt; white-space: nowrap; }
+  .lay-ok { background: #e7f4ee; border: 0.5pt solid #94cbaa; }
+  .lay-new { background: #fdeee0; border: 0.5pt solid #e8b787; }
+  .lay-parked { background: #eef0f3; border: 0.5pt solid #c3c9d1; color: #5a6675; }
+  .refs { font-size: 8pt; color: var(--muted); line-height: 1.5; }
+  .refs li { margin-bottom: 1.5pt; }
+  .foot { margin-top: 10pt; padding-top: 5pt; border-top: 0.75pt solid var(--line); font-size: 8.3pt; color: var(--muted); }
+  .pagebreak { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Methodik-Bericht M0 — Gesundheits-Klimarisiken</h1>
+  <div class="claim">#95 Hitzebelastung · #96 Aeroallergene · #98 UV-Schädigungen — je drei Herleitungsansätze zur Auswahl</div>
+  <p>Entscheidungsvorlage für den M0-Release (Roadmap „Sommer 2026", fix 28.08.2026). Für jede der drei sehr dringenden
+  Gesundheits-Klimawirkungen der KWRA 2021 werden drei methodische Ansätze vollständig beschrieben: <b>(a)&nbsp;Inputs</b>
+  (jede Eingangsgröße mit Datenquelle und Auflösung), <b>(b)&nbsp;Verrechnung auf Zellebene</b> (vollständige Formeln,
+  Aggregation, Maßnahmen-Angriffspunkte) und <b>(c)&nbsp;Kalibrierung der Absolutwerte</b> (Studien, amtliche Zeitreihen,
+  Sanity-Anker). Die Auswahl der einfließenden Größen folgt strikt der Schadensbaum-Arbeitsmappe
+  (<code>KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx</code>); die Bewertungslogik folgt der
+  Monetarisierungs-Arbeitsmappe (<code>KWRA-Monetarisierung.xlsx</code>: Schadenskonten K1–K8, Rechenregeln R1–R11).</p>
+  <p class="small muted">Stand: 22.08.2026 · Revision 5 — Herleitungspflicht (G14) eingelöst: jeder Parameter mit
+  Rechenkette aus Primärdaten (VOLY nach MK-4.0-Regel aus Amann 2020a; Restlebenserwartungen aus der Sterbetafel
+  2022/2024; Basissterberaten 2023; empirische Wochenquantile aus 21 DWD-Stationen; Kalibrierfaktoren je RKI-Region
+  aus dem Bundesländer-Anhang der Epid-Bull-19/2025-Reihe inkl. G12-Verteilungsprüfung). Grundsätze G1–G14:
+  <code>docs/METHODIK_GRUNDSAETZE.md</code> · Kapitel 5 enthält Empfehlungsmatrix und Entscheidungsbogen.</p>
+</div>
+
+<h2>1&nbsp;&nbsp;Rahmen: KWRA-Logik, Schadenskonten, Produktarchitektur</h2>
+
+<h3>1.1&nbsp;&nbsp;Risikologik der KWRA (H×V×E)</h3>
+<p>Die KWRA 2021 versteht ein Klimarisiko als Zusammenwirken von <b>Hazard</b> (klimatischer Einfluss, ggf. über
+vorgelagerte Klimawirkungen), <b>Exposition</b> (räumliches Vorkommen betroffener Systeme) und <b>Vulnerabilität</b>
+(Sensitivitätsfaktoren). Die Schadensbaum-Arbeitsmappe digitalisiert die UBA-Wirkungsketten 2016 knotenscharf:
+25 Einflüsse (E01–E25), 161 Sensitivitäten (S001–S161), 36 räumliche Faktoren (R01–R36), 198 Wirkungen (W001–W198).
+Für jedes Risiko in diesem Bericht sind die Eingangsgrößen exakt die dort hinterlegten Knoten — nicht mehr, nicht weniger.
+Zwei dokumentierte Unschärfen der Quelle: die H/V/E-Zerlegung stammt aus UBA 2016 (nicht Teil der KWRA-2021-Bewertung),
+und die Exposition ist nur je Handlungsfeld definiert (R-Faktoren werden auf alle Wirkungen des Handlungsfelds vererbt).</p>
+
+<h3>1.2&nbsp;&nbsp;Monetarisierung: Schadenskonto K1, Regel R9</h3>
+<p>Alle drei Risiken buchen in <b>K1 Gesundheit</b>. <b>Mortalität wird als <i>verlorene Lebensjahre × Wert eines
+Lebensjahres</i> monetarisiert (YLL × VOLY)</b> — Entscheidung aus Review&nbsp;2: Der native Karten-Ausweis
+„verlorene Lebensjahre" ist kommunizierbarer als Bruchteile von „Todesfällen/Jahr" je Zelle, und der Ansatz ist
+exakt die Methodik der UBA-Methodenkonvention 4.0 (Feb.&nbsp;2026: Mortalität über YLL × VOLY nach Amann u.&nbsp;a.
+2020) [19]. Rechenweg: Die Wirkungsfunktionen liefern Todesfälle <i>je Altersband</i>; multipliziert mit der
+Restlebenserwartung des Bands (Destatis-Sterbetafel) ergeben sich die verlorenen Lebensjahre.
+<b>VOLY = 160.800&nbsp;€₂₀₂₅ je verlorenem Lebensjahr</b>, vollständig nach der MK-4.0-Regel hergeleitet (Rev.&nbsp;5, G14):
+Die MK 4.0 nennt selbst keinen Betrag, sondern verweist auf Amann u.&nbsp;a. 2020a, Tab.&nbsp;3.15: VOLY 79.500&nbsp;€₂₀₀₅
+(VSL 3,06&nbsp;Mio.&nbsp;€₂₀₀₅, OECD-2012-Basis) und beschreibt die Anpassung (Abschn.&nbsp;3.4, Fn.&nbsp;17–19): Preisniveau
+Deutschland 2005→2024 per Destatis-VPI (81,5&nbsp;→&nbsp;119,3; ×1,4638), Kaufkraft-Raumtransfer EU27→DE über das
+BIP/Kopf in KKS 2005 (26.837/22.106 = 1,2140; mit Elastizität 0,85: ×1,1792) und Einkommensentwicklung 2005→2024
+(reales BIP/Kopf 35.770&nbsp;→&nbsp;43.110&nbsp;€, ^0,85: ×1,1719) ⇒ 79.500 × 1,4638 × 1,1792 × 1,1719 =
+<b>160.8&nbsp;T€</b>. Band: 136,4&nbsp;T€ (ohne Raumtransfer) bis 169,5&nbsp;T€ (Raumtransfer ohne Elastizität) — die
+MK 4.0 legt die Elastizität des Raumtransfers nicht offen; die Wahl 0,85 ist konsistent zur Einkommenselastizität
+und dokumentiert. Editierbarer Parameter [19]. Der frühere <i>Todesfälle-×-VSL</i>-Weg (VSL 4,7&nbsp;Mio.&nbsp;€ = EU-Referenzwert, Preisstand
+2024 [19]) bleibt als dokumentierte Sensitivitätsrechnung erhalten. Zur Einordnung: Ein hitzebedingter Sterbefall
+im Band 85+ trägt 5,44 verlorene Lebensjahre (Sterbetafel 2022/2024) ⇒ ≈ 0,87&nbsp;Mio.&nbsp;€ — der YLL-Weg bewertet
+altersabhängig und damit deutlich konservativer als der VSL-Weg; genau diese Differenz und ihre Begründung werden im Produkt
+<b>prominent kommuniziert</b> (Infokasten am Mortalitäts-Kostensatz). Morbidität bucht als <i>Fälle bzw.
+Behandlungstage × Behandlungskostensatz</i> — die konkreten Kostensätze je Risiko stehen in Kap.&nbsp;2–4
+(bestätigt: ≈&nbsp;6.996&nbsp;€ je Krankenhausfall, Destatis-Kostennachweis 2023 [17]).</p>
+<p class="small"><b>Warum nur K1?</b> Die übrigen Schadenskonten (K2 Arbeitsproduktivität, K3–K6 Sach-/Produktions-,
+K8 Vorsorgekosten) werden erst bespielt, wenn ihre Buchungsobjekte als Risiken aktiv sind — z.&nbsp;B. läuft die
+Produktivitätswirkung der Hitze per Regel R9 über die Klimawirkung #87 „Leistungseinbußen von Beschäftigten" (K2),
+die laut Roadmap in Stufe M3 folgt. Der M0-Gesamtschaden ist dadurch bewusst <b>konservativ</b> (nur der
+K1-Anteil); nichts geht verloren, es kommt stufenweise hinzu — und nichts wird doppelt gezählt: K1 ist nach
+<b>Ursachen partitioniert</b> (R9: Hitze · Allergene · UV · …), jeder Todesfall und jeder Behandlungsfall zählt genau einmal.</p>
+<p>Die Kernformel des Schadenskonten-Systems gilt je Endpunkt:</p>
+<pre class="formula">Kommunaler Klimaschaden = Σ über Endpunkte:  Mengengerüst der Kommune (exponierte Einheiten)
+                                            × physische Wirkungsfunktion (je Klimaszenario)
+                                            × Kostensatz des Kontos</pre>
+<p class="small"><b>Was diese Formel wirklich ist:</b> die Buchhaltungs-Normalform <i>Menge × Rate × Preis</i> — und
+damit eine <b>Beweislastregel</b>: Zwischen Klimasignal und € steht immer eine <i>physische</i> Größe (Fälle,
+Lebensjahre, Behandlungstage), die sich unabhängig gegen ZfKD, Destatis oder RKI plausibilisieren lässt. Genau das
+unterscheidet Schicht B von einem Top-down-Kostentopf, dessen €-Wert man nur glauben kann. Beispiel einer
+100-m-Zelle (Region Mitte): Menge = 15 Personen 85+ (Zensus) · Rate = RR-Kurve über 13 Sommerwochen ⇒ 0,018
+zusätzliche Todesfälle/Jahr · Preis = 5,44 Restlebensjahre × 160.800&nbsp;€ ⇒ <b>0,097 verlorene Lebensjahre ≈
+15.700&nbsp;€/Jahr</b>. Zum Vergleich: Der VSL-Weg ergäbe 0,018 × 4,7&nbsp;Mio. ≈ 84.100&nbsp;€ —
+<b>Faktor ≈ 5,4</b>. Die YLL-Umstellung ist fachlich korrekt und konservativ, verschiebt aber die Relation der
+Gesundheits- zu künftigen Sachschadens-Risiken; der erklärende Infokasten ist deshalb <b>Pflichtbestandteil</b>,
+kein Nice-to-have (G8). Konsistenz-Check der Setzungen: Aus derselben Amann-Quelle folgt mit identischer Anpassung ein VSL von
+3,06&nbsp;Mio.&nbsp;€₂₀₀₅ × 2,023 = 6,19&nbsp;Mio.&nbsp;€₂₀₂₅; 6,19&nbsp;Mio. ÷ 160,8&nbsp;T€ = 38,5 Lebensjahre — als
+undiskontierte Annuität plausibel. Die Sensitivitätsrechnung führt deshalb beide VSL-Stützpunkte: 6,19&nbsp;Mio.&nbsp;€
+(MK-konsistent) und 4,7&nbsp;Mio.&nbsp;€ (EU-Referenz, Review-1-Setzung; ÷ 160,8&nbsp;T€ = 29 Lebensjahre).</p>
+<table>
+  <tr><th>Risiko</th><th>Typ im Schadensbaum</th><th>Bewertungsbausteine</th><th>Explizit NICHT hier gebucht (R9)</th></tr>
+  <tr><td><b>#95 Hitzebelastung</b></td><td>Buchungsobjekt Ebene A, K1 (Ursache: Hitze)</td><td>K1-Mortalität + K1-Morbidität</td><td>Produktivitätsverluste → #87 (K2, ab M3) · Systemvorhaltung → #102 (ab M3) · Kühlkosten → #65 (K8, M5)</td></tr>
+  <tr><td><b>#96 Aeroallergene</b></td><td>Buchungsobjekt Ebene B, K1 (Ursache: Allergene)</td><td><b>nur K1-Morbidität</b></td><td>Arbeitsausfall → K2 (#87) · keine Mortalitätskomponente</td></tr>
+  <tr><td><b>#98 UV-Schädigungen</b></td><td>Buchungsobjekt Ebene B, K1 (Ursache: UV)</td><td>K1-Mortalität + K1-Morbidität</td><td>Doppelzählung mit anderen K1-Ursachen ausgeschlossen (R9-Partition)</td></tr>
+</table>
+
+<h3>1.3&nbsp;&nbsp;Abbildung im Produkt: Schicht A (Screening) und Schicht B (absolute Schäden)</h3>
+<p>Das Produkt rechnet auf dem <b>Destatis-INSPIRE-100-m-Gitter</b> (EPSG:3035). Je Zelle liegen vor: Zensus-2022-Bevölkerung
+inkl. Altersbändern, OSM-Rohgrößen (Gebäude, Straßen, Grün, Wasser, Baumkronen), Gelände/SVF (SVF = Himmelssichtfaktor,
+„Sky View Factor"), DWD-Klimagrößen. Die <b>Zelltemperatur</b> ist bereits implementiert und bildet den vorgelagerten
+Knoten „Stadtklima/Wärmeinseln" (W124) ab:</p>
+<div class="math">$$ T_{\text{Zelle}} \;=\; T_{\text{DWD}} \;+\; \bigl[\, \Delta T_{\text{UHI}} - \overline{\Delta T_{\text{UHI}}}^{\,1\,\text{km}} \,\bigr] \;-\; \gamma_h \cdot ( h - \bar{h} ) $$</div>
+<table class="sym">
+  <tr><th>Zeichen</th><th>Name</th><th>Einheit</th><th>Herkunft / Wert</th></tr>
+  <tr><td>\(T_{\text{Zelle}}\)</td><td>Sommer-Zelltemperatur (24-h-Mittel)</td><td>°C</td><td>berechnet</td></tr>
+  <tr><td>\(T_{\text{DWD}}\)</td><td>DWD-CDC-Rasterwert <code>air_temperature_mean</code> (Jun–Aug)</td><td>°C</td><td>DWD, 1-km-Raster (Rohwerte in 1/10&nbsp;°C)</td></tr>
+  <tr><td>\(\Delta T_{\text{UHI}}\)</td><td>Stadtklima-Zuschlag der Zelle (UHI = städtische Wärmeinsel)</td><td>K</td><td>OSM/SVF-Stadtmodell, s.&nbsp;u.</td></tr>
+  <tr><td>\(\overline{\Delta T_{\text{UHI}}}^{\,1\,\text{km}}\)</td><td>Mittel der UHI-Zuschläge aller 100-m-Zellen derselben 1-km-DWD-Zelle</td><td>K</td><td>berechnet (Mittelwerttreue)</td></tr>
+  <tr><td>\(h,\ \bar{h}\)</td><td><b>Geländehöhe</b> der Zelle (DGM) bzw. Mittel der 1-km-Zelle — nicht die Gebäudehöhe</td><td>m</td><td>Geländemodell</td></tr>
+  <tr><td>\(\gamma_h\)</td><td>atmosphärischer Standard-Temperaturgradient</td><td>K/m</td><td>0,0065 (ICAO-Standardatmosphäre)</td></tr>
+</table>
+<p class="small"><b>Was steckt im UHI-Zuschlag?</b> Das Stadtmodell rechnet Tag-, Nacht- und 24-h-Komponente:
+Aufheizung aus <b>Albedo</b> × Versiegelung und Gebäudemasse/-höhe; Kühlung aus Wald/Wiese/Acker, Wasserflächen und
+Baumkronen; Straßenschluchten über (1&nbsp;−&nbsp;SVF) × Höhenfaktor; die <b>Windzirkulation</b> geht als
+Durchlüftungs-Dämpfung (Frischluft-Anteil, <code>vent_score</code>) in das 24-h-Mittel ein. Der Zuschlag ist
+<i>mittelwerttreu</i> innerhalb der 1-km-DWD-Zelle: Das DWD-Raster enthält die Wärmeinsel bereits teilweise —
+volles Addieren wäre Doppelzählung, deshalb verteilt das Stadtmodell nur die Feinstruktur unterhalb von 1&nbsp;km.
+<b>Konkret:</b> Innerhalb jeder 1-km-DWD-Zelle wird vom UHI-Zuschlag jeder 100-m-Zelle der Mittelwert aller 100
+Zuschläge derselben 1-km-Zelle abgezogen. Beispiel: DWD-Wert 21,0&nbsp;°C, Stadtmodell-Zuschläge der 100-m-Zellen
+zwischen +0,5 und +2,5&nbsp;K mit Mittel +1,5&nbsp;K ⇒ die Zellen erhalten 21,0&nbsp;−&nbsp;1,0…21,0&nbsp;+&nbsp;1,0&nbsp;°C.
+Das 1-km-<i>Mittel</i> bleibt exakt der gemessene DWD-Wert (der die Wärmeinsel im Stationsnetz-Interpolat bereits
+teilweise enthält); das Stadtmodell entscheidet nur, <i>welche</i> 100-m-Zellen darüber oder darunter liegen.</p>
+<p>Zwei getrennte Rechenwege:</p>
+<ul>
+  <li><b>Schicht A — Screening-Index</b> über die kuratierten Wirkungsketten \(p\) des Risikos:
+  <div class="math">$$ \text{Index} \;=\; 100 \cdot \max_{p} \bigl( w_p \cdot \hat{H}_p \cdot \hat{E}_p \cdot \hat{V}_p \bigr) $$</div>
+  <table class="sym">
+    <tr><th>Zeichen</th><th>Name</th><th>Einheit</th><th>Herkunft / Wert</th></tr>
+    <tr><td>\(\hat{H}_p,\ \hat{E}_p,\ \hat{V}_p\)</td><td>normierte Hazard-/Expositions-/Vulnerabilitätswerte der Kette \(p\)</td><td>0…1</td><td>Katalog-Normierung (editierbar)</td></tr>
+    <tr><td>\(w_p\)</td><td>Ketten-Gewicht nach Kuratierungstyp (primär 1,0 … Verbund 0,5)</td><td>—</td><td>Modellwahl, dokumentiert</td></tr>
+  </table>
+  <p class="small"><b>Warum Maximum statt Mittel oder Summe?</b> Eigene, dokumentierte Modellwahl (kein externer
+  Standard — die KWRA verrechnet ihre Faktoren bewusst gar nicht, Expertenbeschluss TB5): Die Kuratierung zerlegt ein
+  Risiko in mehrere Wirkungsketten; ein <i>Mittel</i> würde den Index verwässern, sobald zusätzliche Nebenketten
+  dokumentiert werden, eine <i>Summe</i> würde mit der bloßen Anzahl der Ketten wachsen (Doppelzählung derselben
+  Gefahr über Parallelketten). Beides wären Artefakte der Dokumentationstiefe, nicht des Risikos. Das Maximum ist
+  <b>invariant gegen die Kettenanzahl</b> und trifft die Screening-Aussage „maßgeblich ist der stärkste
+  Wirkungspfad" (Worst-Pathway-Prinzip). Die €-Werte hängen davon <i>nicht</i> ab (Schicht-B-Trennung).</p>
+  Normierungen sind editierbar und fließen <b>nicht</b> in €-Werte ein (testseitig erzwungen).</li>
+  <li><b>Schicht B — absolute Schadensfunktion:</b> je Zelle {Outcome, €} aus physischen Wirkungsfunktionen
+  mit fixen Katalog-Intensitätsgrenzen; Kommune = <b>Summe der Zellen</b>. Jeder Koeffizient ist ein editierbarer,
+  quellenbelegter Registry-Parameter (Ratchet-Test erzwingt Quelle je Parameter). <code>ref_value</code> dient nur noch
+  als nationaler Sanity-Anker.</li>
+</ul>
+<p class="small"><b>Ebenen-Kennzeichnung in diesem Bericht:</b>
+<span class="lay lay-ok">CODE</span> = Ebene existiert im Produkt ·
+<span class="lay lay-new">CODE</span> = neu anzulegen ·
+<span class="lay lay-parked">CODE</span> = derzeit geparkt, kehrt mit Roadmap-Stufe zurück.</p>
+<p>Die hier beschriebenen Ansätze betreffen jeweils <b>beide</b> Schichten: der Schicht-A-Index wird aus den
+Excel-Knoten des Risikos gebaut (Screening), die Schicht-B-Funktion liefert die Absolutwerte für K1.</p>
+
+<h3>1.4&nbsp;&nbsp;Bewertungsraster für die Ansätze</h3>
+<p class="small">Jeder Ansatz wird in Kapitel 5 nach sechs Kriterien bewertet: <b>K1 Kausale Treue</b> (bildet die
+KWRA-Wirkungskette mechanistisch ab), <b>K2 Kalibrierbarkeit</b> (Absolutwerte an amtliche Statistik anschließbar),
+<b>K3 Lokale Differenzierung</b> (unterscheidet Kommunen/Zellen aus echten Treibern), <b>K4 Datenverfügbarkeit M0</b>
+(ohne neue Lizenz-/Antragsdaten umsetzbar), <b>K5 Maßnahmen-Anschluss</b> (Sensitivitäten als bedienbare Hebel),
+<b>K6 Architektur-Konformität</b> (respektiert die Trennung Screening-Norm ↔ absolute €-Pfade).</p>
+
+<h3>1.5&nbsp;&nbsp;Abkürzungen</h3>
+<table class="sym">
+  <tr><td><b>AF</b></td><td>attributable Fraktion (anteilig zurechenbarer Anteil einer Krankheitslast)</td>
+      <td><b>KKR</b></td><td>Krankheitskostenrechnung (Destatis)</td></tr>
+  <tr><td><b>BAF</b></td><td>biologischer Verstärkungsfaktor („biological amplification factor": %-Inzidenzänderung je +1&nbsp;% UV-Dosis)</td>
+      <td><b>MM / SCC / BCC</b></td><td>malignes Melanom / Plattenepithel- / Basalzellkarzinom</td></tr>
+  <tr><td><b>DEGS1, GEDA, KiGGS</b></td><td>bundesweite RKI-Gesundheitssurveys (Erwachsene bzw. Kinder)</td>
+      <td><b>NMSC</b></td><td>nicht-melanotischer („heller") Hautkrebs = SCC + BCC (ICD C44)</td></tr>
+  <tr><td><b>DGM</b></td><td>digitales Geländemodell</td>
+      <td><b>RR</b></td><td><b>relatives Risiko</b> (Verhältnis der Sterbe-/Erkrankungsrate zur Rate ohne Exposition)</td></tr>
+  <tr><td><b>DWD / CDC</b></td><td>Deutscher Wetterdienst / dessen Climate Data Center (offene Daten)</td>
+      <td><b>SSD</b></td><td>Sonnenscheindauer</td></tr>
+  <tr><td><b>ERF</b></td><td>Expositions-Wirkungs-Funktion („exposure-response function")</td>
+      <td><b>SVF</b></td><td>Himmelssichtfaktor („sky view factor", 0–1)</td></tr>
+  <tr><td><b>HGT / PGT</b></td><td>Hitzegradtage / Personen-Hitzegradtage</td>
+      <td><b>UHI</b></td><td>städtische Wärmeinsel („urban heat island")</td></tr>
+  <tr><td><b>ICD</b></td><td>internationale Krankheitsklassifikation (z.&nbsp;B. T67 Hitzschlag, C43/C44 Hautkrebs, J30 allergische Rhinopathie)</td>
+      <td><b>VSL / VOLY / YLL</b></td><td>Wert eines statistischen Lebens / Wert eines Lebensjahres / verlorene Lebensjahre</td></tr>
+  <tr><td><b>KWRA</b></td><td>Klimawirkungs- und Risikoanalyse des Bundes (2021)</td>
+      <td><b>ZfKD</b></td><td>Zentrum für Krebsregisterdaten am RKI</td></tr>
+  <tr><td><b>E/S/R/W-Knoten</b></td><td colspan="3">Knotentypen der Schadensbaum-Arbeitsmappe: Einflüsse (E01–E25) · Sensitivitäten (S001–S161) · räumliche Faktoren (R01–R36) · Klimawirkungen (W001–W198)</td></tr>
+</table>
+
+<h3>1.6&nbsp;&nbsp;Berechnungs-Grundsätze</h3>
+<p class="small">Die verbindlichen, <b>risikounabhängigen</b> Berechnungs-Grundsätze <b>G1–G13</b> (Bottom-up statt Verteilschlüssel, Mortalität als YLL&nbsp;×&nbsp;VOLY, Altersstruktur, nur belegte Sensitivitäten, Mittelwertzentrierung mit OR-Übersetzung, Interventionsevidenz für Maßnahmen, empirische Tail-Quantile, Kalibrierung&nbsp;≠&nbsp;Verteilungsnachweis, Kein-Doppelkanal-Prinzip, Kartenebenen/Raten, UI-Abgrenzungen) sind nach <code>docs/METHODIK_GRUNDSAETZE.md</code> ausgelagert und werden dort fortgeschrieben. Dieser Bericht referenziert sie als „G1" … „G13"; in Kap.&nbsp;2–4 steht jeweils, wie ein Grundsatz für das konkrete Risiko umgesetzt ist. <b>Geltungsbereich der Herleitungspflicht (G14):</b> Für den jeweils empfohlenen Ansatz A ist jeder Parameter bis zum
+Zahlenwert hergeleitet; für die nach G1 ausgeschiedenen bzw. nicht empfohlenen Alternativen (95-B/C, 96-B/C, 98-B/C) werden Parameter nur
+bis zur Quelle geführt — sie sind dokumentierte Vergleichsoptionen, nicht Umsetzungsgrundlage.</p>
+
+<div class="pagebreak"></div>
+<h2>2&nbsp;&nbsp;Risiko #95 — Hitzebelastung (sehr dringend; einzige Klimawirkung mit hohem Risiko bereits in der Gegenwart)</h2>
+
+<div class="kette">
+<h4>Wirkungskette laut Schadensbaum (Knoten W182) — verbindliche Eingangsgrößen</h4>
+<ul class="small">
+  <li><b>Hazard:</b> E02 Hitze; vorgelagerte Wirkung W124 Stadtklima/Wärmeinseln (im Produkt: Zelltemperatur, §1.3).
+  Die Netzwerkliste ergänzt <b>#63 Innenraumklima</b> als Eingang — im M0-Modell bereits abgebildet: Die
+  Wirkungsfunktion läuft über das <b>24-h-Mittel</b> der Zelltemperatur, dessen Nachtkomponente (fehlende nächtliche
+  Auskühlung in Straßenschluchten und massiver Bebauung) genau die Innenraum-Belastung treibt, in der die
+  Sterbefälle überwiegend auftreten; zusätzlich wirkt S157 (gekühlte Aufenthaltsräume) als expliziter Hebel.
+  Als <i>eigenes</i> Risiko mit Gebäudephysik folgt #63 in Stufe M1.</li>
+  <li><b>Sensitivitäten:</b> S152 Altersstruktur · S153 Vorerkrankungen/individuelle Sensitivität · S154 Freizeitverhalten · S155 Gefahrenbewusstsein · S157 Verfügbarkeit gekühlter Aufenthaltsräume · S158 Monitoring/Frühwarnsysteme.</li>
+  <li><b>Exposition:</b> R35 Vorkommen von Bevölkerung · R36 Vorkommen von Gesundheitsinfrastruktur.</li>
+  <li><b>KWRA-Indikatoren (intensive Betrachtung „Hitzebelastung älterer, alleinstehender Personen"):</b> GE-KL-01 mittlere Anzahl Hitzeperioden/Jahr · GE-KL-02 mittlere Tage je Hitzeperiode · BAU-KL-05 max. Wärmeinselintensität (UHImax) · GE-SO-03 Einwohner je Fläche · GE-SO-04 Einwohner je Kreis · GE-SO-05 Anteil 65+ · GE-SO-06 Anteil Einpersonenhaushalte.</li>
+  <li><b>Konto:</b> K1 (Ursache Hitze), Mortalität (Übersterblichkeit × VSL) + Morbidität (Fälle × Behandlungskostensatz); Weitergaben an #87 und #101 laut Abgleich.</li>
+</ul>
+</div>
+
+<div class="ansatz a">
+<h3>Ansatz 95-A — Epidemiologische Expositions-Wirkungs-Funktion (RKI/Winklmayr), bottom-up</h3>
+<p><b>Idee.</b> Die Mortalität folgt der publizierten Expositions-Wirkungs-Kurve des RKI (Winklmayr u.&nbsp;a. 2022):
+relatives Sterberisiko über der <i>Wochenmitteltemperatur</i>, geschichtet nach vier Altersbändern und drei Regionen mit
+eigenen Wirkschwellen. Die Morbidität wird von der heutigen Pauschalrate auf dieselbe Systematik gehoben und an
+amtliche Einweisungszahlen (ICD T67) sowie die Hitzetag-Elastizitäten von Karlsson&nbsp;&amp;&nbsp;Ziebarth (2018) kalibriert.
+Dieser Ansatz ist im Produkt für die Mortalität <b>bereits implementiert und national kalibriert</b> — er wird hier
+vollständig dokumentiert und um die Morbiditätsseite ergänzt.</p>
+
+<h4>(a) Inputs</h4>
+<table>
+  <tr><th>Größe</th><th>Excel-Knoten</th><th>Datenquelle</th><th>Auflösung</th></tr>
+  <tr><td>Sommermitteltemperatur je Zelle T̄<sub>Zelle</sub></td><td>E02 + W124</td><td>DWD-CDC-Monatsraster <code>air_temperature_mean</code> (Jun–Aug, 1&nbsp;km, 1/10&nbsp;°C) + UHI-ΔT aus OSM/SVF-Stadtmodell (mittelwerttreu) − Höhenkorrektur</td><td>100&nbsp;m</td></tr>
+  <tr><td>Wochenmittel-Verteilung der 13 Sommerwochen</td><td>E02 (GE-KL-01/02: Häufung in Hitzeperioden)</td><td>Normalverteilungs-Quantile um T̄<sub>Zelle</sub>; Streuung σ<sub>Region</sub> <b>empirisch</b> aus DWD-Wochenmittel-Klimatologie je Region (G5) — T̄<sub>Zelle</sub> verschiebt nur den Mittelwert</td><td>Zelle / Region</td></tr>
+  <tr><td>Bevölkerung je Altersband (u65 / 65–74 / 75–84 / 85+)</td><td>R35 + S152 (GE-SO-03/04/05)</td><td>Zensus 2022, 100-m-Gitter (<code>pop_age_bands</code>; Fallback: 65+-Anteil der Zelle × nationale Senior-Splits)</td><td>100&nbsp;m</td></tr>
+  <tr><td>Basissterberaten m<sub>a</sub> je Altersband</td><td>S152/S153</td><td>Destatis Todesursachen-/Sterbetafelstatistik (hinterlegt in <code>germany_health_reference.py</code>)</td><td>national</td></tr>
+  <tr><td>Kurven des relativen Risikos (RR, §1.5): Schwellen T<sub>0,Region</sub>, Steigungen β<sub>a</sub></td><td>—&nbsp;(Wirkungsfunktion)</td><td>Winklmayr u.&nbsp;a. 2022, Abb.&nbsp;3: Schwellen 19,7 / 20,2 / 20,8&nbsp;°C (Nord/Mitte/Süd); β<sub>85+</sub> = 0,0634 / 0,0625 / 0,0531&nbsp;K<sup>−1</sup>; Altersfaktoren 0,404 / 0,577 / 0,620 / 1,0 aus publizierter Altersverteilung zurückgerechnet [11]</td><td>3 Regionen</td></tr>
+  <tr><td>Versorgung: Krankenhaus-Distanz d<sub>KH</sub> (statt 0–1-Index; G4)</td><td>R36 + S158</td><td>Distanzrechnung der Ebene <span class="lay lay-ok">HEALTHCARE_ACCESS</span>, jetzt als km-Wert mit publizierter Effektgröße (Nicholl u.&nbsp;a. 2007: +≈1&nbsp;% Mortalität je +10&nbsp;km [38]); Rettungsdienst-Hilfsfrist als besserer Ersatz, sobald kommunal verfügbar [39]</td><td>Zelle</td></tr>
+  <tr><td>Soziale Isolation: Anteil Einpersonenhaushalte 65+ (GE-SO-06)</td><td>S152/S153</td><td>Zensus-2022-Haushaltsgitter; Effektgröße: OR ≈ 2,3 „allein lebend" (Semenza u.&nbsp;a. 1996 [40])</td><td>100&nbsp;m</td></tr>
+  <tr><td>Hitzetage je Zelle (Morbidität)</td><td>E02 (GE-KL-01/02)</td><td>DWD-CDC-Raster <code>hot_days</code> (1&nbsp;km) + UHI-Verschiebung</td><td>100&nbsp;m→1&nbsp;km</td></tr>
+  <tr><td>Einweisungs-Baseline + Hitze-Elastizität</td><td>S153</td><td>Karlsson&nbsp;&amp;&nbsp;Ziebarth 2018 (JEEM; 170&nbsp;Mio. Krankenhausfälle 1999–2008): <b>+5,4&nbsp;% Einweisungen ≈ +2.500 Fälle je Hitzetag &gt; 30&nbsp;°C</b> bundesweit (unkonditional; konditional ≈ ¼–½ davon), 4.&nbsp;Hitzetag in Folge: Mortalität ≈ +20&nbsp;%; Harvesting-Korrektur ≈ −25&nbsp;% (30-Tage-Fenster). Destatis ICD-T67 nur als Untergrenze direkter Fälle: Ø ≈ 1.400–1.500/Jahr, 2003: 2.600 [16,18]</td><td>national</td></tr>
+  <tr><td>Kostensätze + Restlebenserwartung L̄<sub>a</sub></td><td>K1</td><td><b>YLL × VOLY</b> (G2): VOLY 160.800&nbsp;€/Lebensjahr (Herleitung §1.2 [19]), L̄<sub>a</sub> = 23,39 / 15,59 / 8,90 / 5,44 Jahre (Sterbetafel 2022/2024 [48]); VSL-Weg (4,7&nbsp;Mio.&nbsp;€) nur Sensitivität · Behandlungskostensatz <b>≈ 6.996&nbsp;€</b>/Fall (bestätigt; Destatis Kostennachweis 2023); Querprüfung: Karlsson&nbsp;&amp;&nbsp;Ziebarth 6–43&nbsp;Mio.&nbsp;€ je Hitzetag [17–19]</td><td>national</td></tr>
+</table>
+
+<h4>(b) Verrechnung auf Zellebene</h4>
+<p class="small" style="margin-bottom:2pt"><b>Wochenmitteltemperaturen</b> der 13 Sommerwochen als <b>empirische
+Anomalie-Quantile</b> (G5/G11), hergeleitet aus DWD-Tageswerten (Rev.&nbsp;5): je Region 7 Stationen × 30 Sommer
+(1991–2020) = 2.730 Wochen-Anomalien (Wochenmittel − Sommermittel desselben Jahres, 13 Siebentageblöcke ab 1.&nbsp;Juni),
+Quantile an \(p_w = (w-0{,}5)/13\). <b>Befund:</b> Die Verteilung ist praktisch symmetrisch (Schiefe −0,003 / −0,015 /
+−0,089 für Nord/Mitte/Süd) — die in Review&nbsp;3 vermutete Rechtsschiefe tritt bei <i>Wochen</i>mitteln nicht auf;
+Gauß- und empirische Quantile weichen maximal 0,12&nbsp;K ab. Entscheidend ist stattdessen die Streuung selbst:
+σ<sub>intra</sub> = 2,36 / 2,58 / 2,57&nbsp;K — die frühere Setzung 2,0&nbsp;K war zu klein. Die zwischenjährliche
+Streuung der Sommermittel (0,91–0,98&nbsp;K) wird nicht verwendet. Die Anomalien enthalten den mittleren Saisongang
+(Woche 1 ≈ −1,9&nbsp;K, Wochen 8–10 ≈ +1,4…+1,8&nbsp;K), der 18–27&nbsp;% der Varianz erklärt — auftragsgemäß, da die
+Kurve über die tatsächlichen Sommerwochen integriert. Restannahme: Der UHI-Zuschlag verschiebt nur den Mittelwert,
+nicht die Streuung (konservativ). Skript/Daten: <code>backend/scripts/kalibrierung/dwd_wochenquantile.py</code>,
+<code>backend/data/kalibrierung/wochenquantile_region.csv</code> [33]:</p>
+<table class="sym">
+  <tr><th>\(w\)</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th></tr>
+  <tr><td>\(q_{w,	ext{Nord}}\) [K]</td><td>−4,17</td><td>−2,81</td><td>−2,00</td><td>−1,45</td><td>−0,99</td><td>−0,50</td><td>0,00</td><td>+0,42</td><td>+0,89</td><td>+1,54</td><td>+2,10</td><td>+2,83</td><td>+4,22</td></tr>
+  <tr><td>\(q_{w,	ext{Mitte}}\) [K]</td><td>−4,59</td><td>−3,04</td><td>−2,27</td><td>−1,64</td><td>−1,12</td><td>−0,57</td><td>−0,04</td><td>+0,51</td><td>+1,05</td><td>+1,65</td><td>+2,32</td><td>+3,16</td><td>+4,60</td></tr>
+  <tr><td>\(q_{w,	ext{Süd}}\) [K]</td><td>−4,67</td><td>−2,99</td><td>−2,23</td><td>−1,65</td><td>−1,11</td><td>−0,57</td><td>−0,03</td><td>+0,51</td><td>+1,12</td><td>+1,75</td><td>+2,36</td><td>+3,18</td><td>+4,46</td></tr>
+</table>
+<p class="small">Stationen — Nord: Hamburg-Fuhlsbüttel, Bremen, Hannover, Norderney, Schwerin, Greifswald, Schleswig ·
+Mitte: Berlin-Tempelhof, Potsdam, Frankfurt/M., Köln/Bonn, Dresden-Klotzsche, Erfurt-Weimar, Saarbrücken-Ensheim ·
+Süd: München-Stadt, Stuttgart-Echterdingen, Nürnberg, Freiburg, Augsburg, Regensburg, Konstanz (alle 30/30 gültige Sommer).</p>
+<p class="small" style="margin-bottom:2pt">Damit:</p>
+<div class="math">$$ T_w \;=\; \bar{T}_{\text{Zelle}} \;+\; q_{w,\text{Region}}, \qquad w = 1,\dots,13 $$</div>
+<p class="small" style="margin-bottom:2pt"><b>Mortalität</b> je Zelle, Altersband und Jahr — nativer Ausweis: verlorene Lebensjahre (G2):</p>
+<div class="math">$$ D_{a} \;=\; c_{\text{kal}} \cdot v_{\text{vers}} \cdot \text{pop}_a \cdot \frac{m_a}{100\,000} \cdot \frac{1}{52} \sum_{w=1}^{13} \left( e^{\,\beta_a \,(T_w - T_{0,\text{Region}})_+} - 1 \right), \qquad \beta_a = \beta_{85+,\text{Region}} \cdot f_a $$</div>
+<div class="math">$$ \text{YLL}_{\text{Zelle}} \;=\; \sum_a D_a \cdot \bar{L}_a $$</div>
+<p class="small" style="margin-bottom:2pt"><b>Versorgungs-/Vulnerabilitäts-Modifikator</b> — nur empirisch belegte Faktoren, <b>alle mittelwertzentriert</b>
+(G4/G9: Bundesmittel jedes Faktors = 1, sonst verschiebt er das nationale Niveau und \(c_{\text{kal}}\) wird
+uninterpretierbar):</p>
+<div class="math">$$ v_{\text{vers}} \;=\; \bigl[\, 1 + \beta_d \cdot ( d_{\text{KH}} - \bar{d}_{\text{KH}} ) \,\bigr] \cdot \bigl[\, 1 + \beta_{\text{iso}} \cdot ( q_{\text{1P}} - \bar{q}_{\text{1P}} ) \,\bigr] \cdot \bigl[\, 1 + \beta_{\text{pfl}} \cdot ( q_{\text{pfl}} - \bar{q}_{\text{pfl}} ) \,\bigr] $$</div>
+<p class="small">Der Distanzterm ist ehrlich als <b>schwacher Effekt</b> gekennzeichnet: Nicholl [38] misst transportierte
+Notfälle — Hitzetote sterben überwiegend zu Hause; 15&nbsp;km Landdistanz ergeben ±1,5&nbsp;%, gegenüber Alter (Faktor
+≈&nbsp;2,5 zwischen Bändern) und Temperatur (Faktor 3–5 zwischen Zellen) nachrangig. Neu und stark: der
+<b>Pflegeheim-Term</b> (Klenk u.&nbsp;a. 2010: +26&nbsp;% / +62&nbsp;% Mortalität bei 32–34 / ≥&nbsp;34&nbsp;°C unter 95.808
+Heimbewohnern; Bouchama [41]: Bettlägerigkeit OR 6,44 — größter Einzelfaktor) — räumlich extrem konzentriert und
+zugleich Andockpunkt der Maßnahme „Hitzeschutzpläne in Pflegeeinrichtungen" [44].
+Weitere geprüfte Kandidaten: <b>Vorerkrankungs-Prävalenzen je Kreis</b> (Zi-Versorgungsatlas/GEDA:
+Herz-Kreislauf, Diabetes) als zentrierter Modifikator — gröber als die Zelle, differenziert aber zwischen Kommunen;
+<b>sozioökonomische Deprivation</b> (GISD, RKI, Gemeindeebene) vorerst als dokumentiertes Sensitivitätsband.
+<b>Ausdrücklich nicht aufgenommen:</b> Grün-/Baumkronenanteil als eigene Vulnerabilität — der steckt bereits im
+UHI-Zuschlag der Zelltemperatur; ein zweiter Kanal wäre Doppelzählung derselben Wirkung (G13-Logik der
+Mittelwerttreue).</p>
+<p class="small" style="margin-bottom:2pt"><b>Morbidität</b> je Zelle und Jahr — jetzt altersgeschichtet (G3; Begründung: die hitzeassoziierten Einweisungen
+konzentrieren sich empirisch auf Ältere — Herz-Kreislauf/Nieren-Diagnosen dominieren, T67-Raten steigen steil mit dem Alter [16,18] —
+eine altersunabhängige Rate wäre nicht plausibel; zusätzlich Klenk u.&nbsp;a. 2010 [44]):</p>
+<div class="math">$$ F_{\text{Zelle}} \;=\; \sum_a \text{pop}_a \cdot \frac{r_{0,a}}{100\,000} \cdot \left[\, 1 + e_{\text{HD},a} \cdot (\text{HD} - \text{HD}_{\text{ref}})_+ \right] \cdot v_{\text{vers}} $$</div>
+<p class="small">Geprüft (Rev.&nbsp;5): Karlsson&nbsp;&amp;&nbsp;Ziebarth (IZA-DP&nbsp;7875, Volltext) weisen keine numerische
+Alters-Subgruppentabelle aus (nur Fig.&nbsp;9 und Text: Effekt „getrieben von über 55-Jährigen, besonders 71–80"; die
+Krankenhausdaten sind oberhalb 75 Jahren top-kodiert) — \(e_{\text{HD},a}\) wird daher im Basisfall als gleiche relative
+Elastizität über alle Bänder geführt (dokumentierte Annahme mit Band aus dem Fouillet-Altersgradienten, s.&nbsp;Zeichentabelle);
+das absolute Altersmuster der Einweisungen entsteht über die altersgeschichtete Baseline \(r_{0,a}\). Fußnote: Die zweite, kleinere Spitze bei jungen Erwachsenen (<i>exertional heat illness</i>,
+Außenberufe/Sport) ist überwiegend ambulant und wird dokumentiert, aber nicht modelliert.</p>
+<p class="small" style="margin-bottom:2pt"><b>Monetarisierung</b> (Konto K1, §1.2) und Aggregation:</p>
+<div class="math">$$ \text{€}_{\text{Zelle}} \;=\; \text{YLL}_{\text{Zelle}} \cdot \text{VOLY} \;+\; F_{\text{Zelle}} \cdot c_{\text{Fall}}, \qquad \text{Kommune} = \sum_{\text{Zellen}} \;\text{(Ausweis: YLL / Fälle / €)} $$</div>
+<p class="small"><b>Was wird in der Wochensumme summiert?</b> Für jede Woche \(w\) ist \(e^{\beta_a (T_w - T_0)_+} - 1\)
+ein <i>Skalar</i>: die relative Übersterblichkeit dieser Woche (RR&nbsp;−&nbsp;1). Multipliziert mit den erwarteten
+Basissterbefällen der Woche (\(\text{pop}_a \cdot m_a / 52\)) ergibt er die zusätzlichen Todesfälle genau dieser Woche;
+die Summe über die 13 Sommerwochen ist der Jahreswert — es wird also keine „Kurve summiert", sondern 13 Wochenbeiträge.
+<b>Mini-Beispiel</b> (Band 85+, Region Mitte: \(T_0 = 20{,}2\) °C, \(\beta = 0{,}0625\)): Eine Woche mit
+\(T_w = 23{,}0\) °C liefert \(e^{0{,}0625 \cdot 2{,}8} - 1 \approx 0{,}19\); bei 40 Basissterbefällen dieser Woche
+⇒ ≈ 7,6 zusätzliche Todesfälle. Wochen mit \(T_w \le T_0\) tragen 0 bei — deshalb käme eine Auswertung am
+Sommer<i>mittel</i> (≈ 18,5&nbsp;°C) fast überall auf null, und deshalb braucht es die Quantil-Verteilung.<br>
+<b>Maßnahmen-Hebel (G4/G10, nicht Teil des Basiswerts) — konservative Interventionseffekte (Rev.&nbsp;4):</b>
+Fall-Kontroll-Odds-Ratios (Bouchama [41]: Klimaanlage OR&nbsp;0,23) beschreiben <i>Unterschiede zwischen Verstorbenen
+und Überlebenden</i>, nicht die Wirkung einer <i>Einführung</i> — moderne Interventionsevidenz ist deutlich nüchterner:
+Klimaanlagen in Pflegeheimen relativer OR ≈ 0,93 an Extremhitzetagen (Ontario-Kohorte, 73.578 Todesfälle [46]);
+Hitzewarnsysteme in 15 deutschen Städten gepoolt RR 1,00 [0,98–1,01], erst nach Kontrolle städtischer Merkmale
+RR 0,85 [0,75–0,97] [45]; Europa-Review Aktionspläne: 2–23&nbsp;% vermieden, sehr heterogen [47].
+<b>Setzung:</b> δ<sub>HAP</sub> zentral 0,95 (Band 0,85–1,00), als <i>marginaler</i> Effekt gegenüber dem heutigen
+deutschen Stand. <b>Doppelzählungs-Wächter:</b> \(c_{\text{kal}}\) ist auf Jahre kalibriert, in denen das
+DWD-Warnsystem bereits lief — die durchschnittliche Warnwirkung steckt im Basiswert; ein Fouillet-großer Hebel
+(≈ 4.400 vermiedene Fälle [42]) würde denselben Effekt doppelt buchen.</p>
+<table class="sym">
+  <tr><th>Zeichen</th><th>Name</th><th>Einheit</th><th>Wert / Herkunft</th></tr>
+  <tr><td>\(a\)</td><td>Altersband: u65 · 65–74 · 75–84 · 85+</td><td>—</td><td>Zensus-Altersbänder</td></tr>
+  <tr><td>\(c_{\text{Fall}}\)</td><td>Behandlungskostensatz je Fall (bestätigt, Review 2)</td><td>€</td><td>≈ 6.996 (Destatis Kostennachweis 2023 [17]; editierbar)</td></tr>
+  <tr><td>\(c_{\text{kal}}\)</td><td>Kalibrierfaktor je RKI-Region — einziger freier Skalar, <b>empirisch</b> (G5/G12): \(c = \sum_{J,\text{BL}} D_{\text{RKI}}\,D_{\text{Mod}} \,/\, \sum_{J,\text{BL}} D_{\text{Mod}}^2\) (Kleinste Quadrate durch den Ursprung über alle Bundesland-Jahre 1992–2024 der Region; Herleitung in (c))</td><td>—</td><td><b>Norden 0,618 · Osten 0,705 · Westen 1,089 · Süden 1,737</b> (national 1,027; Fenster 2012–2025: 0,890 als Sensitivität); ersetzt den früheren Setzwert 1,44 [50]</td></tr>
+  <tr><td>\(d_{\text{KH}}\)</td><td>Distanz der Zelle zum nächsten Krankenhaus (Luftlinie × 1,3)</td><td>km</td><td>OSM (vorhandene Distanzrechnung der Ebene <span class="lay lay-ok">HEALTHCARE_ACCESS</span>)</td></tr>
+  <tr><td>\(D_a\)</td><td>hitzebedingte Todesfälle der Zelle im Altersband \(a\) (interne Zwischengröße, G2)</td><td>1/Jahr</td><td>berechnet</td></tr>
+  <tr><td>\(e_{\text{HD},a}\)</td><td>relative Mehr-Einweisungen je zusätzlichem Hitzetag (Tmax &gt; 30&nbsp;°C) je Altersband — K&amp;Z weisen keine numerische Alterstabelle aus (nur Fig.&nbsp;9: „getrieben von &gt; 55-Jährigen, v.&nbsp;a. 71–80"; Daten top-kodiert &gt; 75): Basisfall gleiche relative Elastizität über alle Bänder (dokumentierte Annahme; das absolute Altersmuster entsteht über \(r_{0,a}\)); Band aus dem Altersgradienten des Hitze-Exzesses bei Fouillet 2006: u65 ab 2,7&nbsp;% bis 85+ 11&nbsp;%</td><td>1/Tag</td><td><b>0,054</b> (unkonditional; konditional 0,024; Hitzewellentag 0,061), K&amp;Z IZA-DP 7875 Tab.&nbsp;1 [18,62]</td></tr>
+  <tr><td>\(f_a\)</td><td>Altersfaktor der RR-Steigung relativ zu 85+</td><td>—</td><td>0,404 / 0,577 / 0,620 / 1,0 — aus publizierter RKI-Altersverteilung zurückgerechnet [11,12]</td></tr>
+  <tr><td>\(F_{\text{Zelle}}\)</td><td>hitzeassoziierte Erkrankungsfälle der Zelle</td><td>1/Jahr</td><td>Ergebnis</td></tr>
+  <tr><td>\(\text{HD},\ \text{HD}_{\text{ref}}\)</td><td>Hitzetage der Zelle bzw. Referenzwert — <b>Kartenebene</b> <span class="lay lay-ok">HEAT_WAVE</span> (G6)</td><td>Tage/Jahr</td><td>DWD-CDC <code>hot_days</code> + UHI [33]</td></tr>
+  <tr><td>\(\bar{L}_a\)</td><td>Restlebenserwartung im Altersband — Herleitung: Sterbetafel 2022/2024 \(e(x)\) an der bandtypischen Altersstütze (u65: \(e(60)\), da 86&nbsp;% der Sterbefälle u65 auf 50–64 entfallen; 65–74: \(e(70)\); 75–84: \(e(80)\); 85+: bevölkerungsgewichtet über \(e(85), e(90), e(95)\)), jeweils geschlechtergewichtet mit der Bevölkerung 31.12.2023</td><td>Jahre</td><td><b>23,39 / 15,59 / 8,90 / 5,44</b> (u65 / 65–74 / 75–84 / 85+); z.&nbsp;B. 85+: M (754.258·5,47 + 197.380·3,55 + 38.654·2,37)/990.292 = 4,97, F = 5,69, gewichtet 5,44 [48]</td></tr>
+  <tr><td>\(m_a\)</td><td>Basissterberate je Altersband = Sterbefälle 2023 ÷ Bevölkerung 31.12.2023 (u65: 138.024 / 64.747.448; 65–74: 166.312 / 9.569.640; 75–84: 302.921 / 6.294.744; 85+: 420.949 / 2.844.213)</td><td>1/100.000·Jahr</td><td><b>213,2 / 1.737,9 / 4.812,3 / 14.800,2</b>; die bisherigen Produkt-Konstanten (180/1.800/4.600/15.500) weichen bei u65 um +18&nbsp;% ab und werden nachgezogen [49]</td></tr>
+  <tr><td>\(\text{pop}_a\)</td><td>Bevölkerung der Zelle je Altersband</td><td>Personen</td><td>Zensus 2022, 100-m-Gitter</td></tr>
+  <tr><td>\(q_{\text{1P}},\ \bar{q}_{\text{1P}}\)</td><td>Anteil Einpersonenhaushalte 65+ der Zelle bzw. Bundesmittel (KWRA-Indikator GE-SO-06, soziale Isolation)</td><td>—</td><td>Zensus 2022 (Haushaltsgitter)</td></tr>
+  <tr><td>\(r_{0,a}\)</td><td>Baseline-Einweisungsrate hitzeassoziierter Fälle <b>je Altersband</b> (G3). Herleitung gesamt: T67 Ø 1.400 Fälle/Jahr (2004–2024) = 1,68/100.000 + anteilige hitzeassoziierte Kreislauf-/Stoffwechsel-Einweisungen (K&amp;Z Tab.&nbsp;3: +0,168 Herz-Kreislauf je 100.000 und Hitzetag = 11,9&nbsp;% des Exzesses; bei Ø 7,2 Hitzetagen/Jahr insgesamt ≈ 22 hitzeassoziierte Einweisungen/100.000/Jahr, T67 erfasst davon nur 8–17&nbsp;%) ⇒ \(r_0\) = 1,68 + 1,21…2,67 = <b>3,5</b> (2,9–4,4)/100.000. Altersaufteilung über Kreislauf-Ratenverhältnis 1 : 5 : 8 : 10 (gekennzeichnete Abschätzung — T67 nach Alter, GENESIS 23131-0002, ist ohne Destatis-Login nicht abrufbar und ersetzt die Aufteilung, sobald verfügbar)</td><td>1/100.000·Jahr</td><td>u65 <b>1,9</b> / 65–74 <b>6,3</b> / 75–84 <b>10,8</b> / 85+ <b>15,6</b> (Band ×0,6–1,6) [16,18,62]</td></tr>
+  <tr><td>\(T_{0,\text{Region}}\)</td><td>Wirkschwelle der Wochenmitteltemperatur</td><td>°C</td><td>19,7 / 20,2 / 20,8 (Nord/Mitte/Süd), Winklmayr 2022 [11]</td></tr>
+  <tr><td>\(T_w\)</td><td>Wochenmitteltemperatur der Sommerwoche \(w\)</td><td>°C</td><td>berechnet</td></tr>
+  <tr><td>\(\bar{T}_{\text{Zelle}}\)</td><td>Sommermitteltemperatur der Zelle (24-h-Mittel, §1.3) — <b>Kartenebene</b> (G6)</td><td>°C</td><td>DWD 1&nbsp;km + UHI-ΔT</td></tr>
+  <tr><td>\(v_{\text{vers}}\)</td><td>Versorgungs-/Isolations-Modifikator — nur empirisch belegte Faktoren (G4); Demografie steckt genau einmal in \(\text{pop}_a\)</td><td>—</td><td>berechnet</td></tr>
+  <tr><td>\(\text{VOLY}\)</td><td>Wert eines verlorenen Lebensjahres (§1.2, G2)</td><td>€/Jahr</td><td><b>160.800</b> (Amann 2020a 79.500&nbsp;€₂₀₀₅ × VPI 1,4638 × Kaufkraft 1,1792 × Einkommen 1,1719; Band 136,4–169,5&nbsp;T€; editierbar) [19]</td></tr>
+  <tr><td>\(\text{YLL}_{\text{Zelle}}\)</td><td>verlorene Lebensjahre der Zelle — <b>nativer Karten-Ausweis</b></td><td>Jahre/Jahr</td><td>Ergebnis</td></tr>
+  <tr><td>\((x)_+\)</td><td>Positivteil: \(\max(0, x)\)</td><td>—</td><td>Notation</td></tr>
+  <tr><td>\(\beta_a,\ \beta_{85+,\text{Region}}\)</td><td>Steigung der RR-Kurve je Altersband; Basiswert 85+ je Region</td><td>K<sup>−1</sup></td><td>0,0634 / 0,0625 / 0,0531 (N/M/S), Winklmayr 2022 [11]</td></tr>
+  <tr><td>\(\beta_d,\ \bar{d}_{\text{KH}}\)</td><td>Distanz-Effekt (mittelwertzentriert um die mittlere Krankenhaus-Distanz \(\bar{d}\)) — <b>bewusst schwacher Faktor</b>, s.&nbsp;Text</td><td>1/km</td><td>≈ 0,001 (Band 0–0,002): +≈1&nbsp;% Mortalität je +10&nbsp;km, gemessen an <i>transportierten</i> Notfällen (Nicholl u.&nbsp;a. 2007 [38]); Rettungsdienst-Hilfsfrist (Kreislaufstillstand −7…−10&nbsp;%/min [39]) gilt nur für den kleinen T67-nahen Akutanteil (~5–15&nbsp;%) und wird als Screening-/Maßnahmen-Größe geführt, nicht im Absolutwert</td></tr>
+  <tr><td>\(\beta_{\text{iso}}\)</td><td>Effekt sozialer Isolation — <b>korrekt über das Bevölkerungsmittel abgeleitet</b> (Rev.&nbsp;4): \(\beta_{\text{iso}} = (\text{OR}-1)\,/\,[1 + \bar{q}\,(\text{OR}-1)]\); der individuelle OR darf nicht direkt als Zellanteils-Steigung übernommen werden</td><td>—</td><td>OR ≈ 2,3 („allein lebend", Semenza u.&nbsp;a. 1996 [40]) und \(\bar{q}_{\text{1P}} \approx 0{,}40\) ⇒ <b>≈ 0,86</b> (Band ≈ 0,3–1,4 nach OR-Konfidenzintervall); editierbar</td></tr>
+  <tr><td>\(q_{w,\text{Region}}\)</td><td>empirisches Anomalie-Quantil der Sommerwoche \(w\) (intra-saisonal; Tabelle oben)</td><td>K</td><td>DWD-Tageswerte 21 Stationen 1991–2020, σ<sub>intra</sub> 2,36/2,58/2,57&nbsp;K (N/M/S); <code>wochenquantile_region.csv</code> [33]</td></tr>
+  <tr><td>\(\beta_{\text{pfl}},\ q_{\text{pfl}},\ \bar{q}_{\text{pfl}}\)</td><td>Pflegeheim-Effekt (Band 85+); \(q\) = Anteil vollstationär versorgter Heimbewohner an der 85+-Bevölkerung der Zelle (OSM-Pflegeeinrichtungen × Destatis-Pflegestatistik), \(\bar q\) = Bundesmittel. Herleitung: \(\bar q\) = 424.300 vollstationär Versorgte 85+ (218,7 + 142,6 + 63,0 Tsd.; Pflegestatistik 2023) ÷ 2.844.213 = <b>0,149</b>. OR Heim vs. Nicht-Heim = relativer Hitze-Exzess (Fouillet 2006, Tab.&nbsp;2: O/E Heime 1,9 vs. Wohnung ≥75 1,9 / Kliniken 1,5 ⇒ Exzess-Faktor 1,32) × Basissterblichkeits-Verhältnis (Heim ≈ 0,34/Jahr aus 0,6–0,7&nbsp;%/Woche vs. Nicht-Heim-85+ 0,119/Jahr aus \(m_{85+}\) = 0,148 und \(\bar q\) ⇒ 2,85) = 3,8 (1,7–6,4); Bouchama: nicht selbstversorgungsfähig OR 2,97, bettlägerig 6,44 (Referenzgruppe selbst zu 56&nbsp;% häuslich pflegebedürftig ⇒ effektiv ≈ 3); Klenk 2010 (+62&nbsp;% bei ≥ 34&nbsp;°C) stützt 1,9 ⇒ gewählt OR = 3,5 (2,2–6,0); \(\beta = 2{,}5/(1 + 0{,}149 \cdot 2{,}5)\)</td><td>—</td><td><b>1,82</b> (Band 1,0–2,9); Wirkung: Zelle ohne Heim 0,73, Zelle mit \(q = 0{,}30\) 1,27 [41,44,60,61]</td></tr>
+</table>
+<p class="small">Schicht-A-Screening-Index (getrennt, §1.3): \(\hat{H}\)(E02: <span class="lay lay-ok">HEAT_WAVE</span>) ×
+\(\hat{E}\)(R35: <span class="lay lay-ok">POPULATION_DENSITY</span> / <span class="lay lay-ok">AGE_STRUCTURE</span> /
+<span class="lay lay-ok">VULNERABLE_GROUPS_POPULATION</span>) × \(\hat{V}\)(S152–S158:
+<span class="lay lay-ok">HEALTHCARE_ACCESS</span> / <span class="lay lay-ok">HEAT_SENSITIVITY</span>).</p>
+<p class="small"><b>Warum Verteilung statt Mittelwert:</b> Das deutsche Sommermittel (≈18,5&nbsp;°C) liegt <i>unter</i> den
+Wirkschwellen — am Mittelwert ausgewertet käme fast überall null heraus. Die Todesfälle entstehen in den wenigen heißen
+Wochen; deshalb wird die Kurve über die Quantil-Verteilung der Sommerwochen summiert (GE-KL-01/02: Hitzeperioden-Logik).<br>
+<b>Maßnahmen-Angriffspunkte:</b> Hitzeaktionsplan → senkt effektive Exposition über Frühwarn-/Verhaltenskette
+(S155/S158, Dämpfungsfaktor auf β bzw. AF); Schutzprogramme vulnerable Gruppen → v_access-Verbesserung und
+Schwellenanhebung für 75+/85+-Bänder (S157 gekühlte Räume).</p>
+
+<h4>(c) Kalibrierung der Absolutwerte</h4>
+<ul>
+  <li><b>Nationaler Anker Mortalität — revidierte RKI-Reihe (Epid Bull 19/2025, Anhang 1, CC BY 4.0; Erwartungswerte
+  Deutschland):</b> 1994: 10.200 · 2003: 10.200 · 2006: 7.700 · 2010: 4.090 · 2013: 3.500 · 2015: 7.000 · 2018: 8.500 ·
+  2019: 6.800 · 2020: 3.700 · 2022: 4.500 · 2023: 3.100 · 2024: 2.800 · 2025: 2.500 (RKI-Wochenbericht KW&nbsp;38) ·
+  <b>2026 (vorläufig, KW&nbsp;32): ≈ 14.000</b> [12.500–15.300] — laufende Saison, aus der Kalibrierung ausgeschlossen.
+  Signifikant = untere Prädiktionsgrenze &gt; 0 ⇒ 27 Jahre 1992–2025. Kommunale Zusatz-Anker: Hessen 2018 ≈ 920 /
+  Berlin 2018 ≈ 460 (Anhang; 85+: 260–320 je 100.000 [14]) [11–14].</li>
+  <li><b>Kalibrierlauf (Rev.&nbsp;5, G5/G14 — Skript und Daten [50]):</b> Nationaler Näherungslauf auf Bundesland-Ebene
+  (DWD-Sommermittel je Land × Bevölkerung je Altersband × \(m_a\) × empirische \(q_w\); ohne UHI, der je 1-km-Zelle
+  mittelwerttreu ist — Näherung konservativ). Kleinste Quadrate durch den Ursprung über die 27 signifikanten Jahre:
+  <b>\(c_{\text{kal}}\) = 1,027</b> (R² = 0,56; 17 von 27 Jahren innerhalb des RKI-Prädiktionsintervalls; mit
+  Gauß-Quantilen 1,057 — die Verteilungsannahme ist unkritisch). Hitzejahre gut getroffen (2003 −6&nbsp;%, 2018 −7&nbsp;%,
+  2019 +11&nbsp;%, 2020 +4&nbsp;%), 2006/2015 unterschätzt (−52 / −42&nbsp;%), <b>2021–2025 systematisch +50…+65&nbsp;%
+  überschätzt</b> — das ist das Anpassungssignal (an der Heiden 2020 [13]): Die β stammen aus der Dekade 2012–2021;
+  ein Fenster 2012–2025 liefert \(c_{\text{kal}}\) = 0,890 (R² 0,63). Offener Punkt (dokumentiert): zeitabhängige
+  Abflachung der ERF ist nicht modelliert — konservativ wird der Vollreihen-Wert geführt, die Fenster-Variante als
+  Sensitivität.</li>
+  <li><b>G12-Verteilungsprüfung mit den Bundesländer-Reihen des Anhangs (Σ 2003/2018/2019/2022, je 100.000 EW und Jahr):</b>
+  Mit nur einem nationalen Skalar passt die Verteilung <i>nicht</i> — Norden ×1,6–3,6 über, Osten ×1,5–2,3 über,
+  Baden-Württemberg ×0,56 unter. Ursache: die drei Winklmayr-Regionen; das RKI rechnet seit 2025 mit vier Regionen
+  (Norden/Osten/Westen/Süden). <b>Beschluss (G5/G12): regionale Kalibrierfaktoren je RKI-Region</b>, Kleinste Quadrate
+  über alle Bundesland-Jahre 1992–2024: <b>Norden 0,618 · Osten 0,705 · Westen 1,089 · Süden 1,737</b> (nationaler
+  Äquivalentwert 1,027). Damit liegen 11 von 16 Ländern im Band 0,75–1,35 (Modell/RKI), darunter die ländlichen Anker
+  Mecklenburg-Vorpommern 1,22 und Thüringen 1,04 gegen Berlin 1,05 — der Stadt-Land-Gradient ist damit geprüft.
+  Restausreißer: Schleswig-Holstein/Hamburg ×1,9–2,2 (kleine Fallzahlen, Küstenklima; Hamburg im DWD-Kombi-Gebietsmittel
+  mit Niedersachsen), Brandenburg/Bayern ×1,6 (BW 12,8 vs. BY 5,8 je 100.000 im RKI — Oberrheingraben vs. Alpenvorland;
+  ein Landesmittel kann das nicht auflösen, das 100-m-Zellmodell mit echten Zelltemperaturen schon). Tabelle:
+  <code>bundesland_validierung_emp_4reg.csv</code> [50].</li>
+  <li><b>Validierung Altersverteilung:</b> modellierte Anteile je Band gegen publizierte RKI-Verteilung
+  (2026: 6,5 / 12,9 / 25,2 / 55,5&nbsp;% für u65/65–74/75–84/85+) — der eigentliche Prüfstein der Schichtung;
+  zusätzlich Anpassungssignal beachten (Expositions-Wirkung 85+ flacht über die Dekaden ab: +110&nbsp;% → +43&nbsp;%
+  je Spitzenwoche, an der Heiden u.&nbsp;a. 2020) [12,13].</li>
+  <li><b>Anker Morbidität:</b> Karlsson&nbsp;&amp;&nbsp;Ziebarth 2018: ≈ +2.500 Einweisungen je Hitzetag bundesweit
+  (alle Diagnosen; konditional ¼–½), Ø 7,2 Hitzetage/Jahr 1999–2008 ⇒ Größenordnung 20.000±&nbsp;Einweisungen/Jahr;
+  Destatis T67 (Ø ≈ 1.400–1.500/Jahr, 2003: 2.600) als harte Untergrenze der direkt kodierten Fälle. Sanity:
+  Bundessumme des Modells zwischen T67-Untergrenze und K&amp;Z-Obergrenze [16,18].</li>
+  <li><b>Keine Verteilschlüssel (G1):</b> Der Ansatz ist strikt bottom-up — jede Zelle rechnet aus ihren eigenen
+  Treibern (Zelltemperatur, Altersstruktur, Distanz, Isolation); die RKI-Bundesreihe geht ausschließlich als
+  <i>ein</i> Kalibrierskalar auf die Deutschland-Summe ein. Eine Kommune ohne Hitzebelastung erhält ~0, unabhängig
+  von ihrem Bevölkerungsanteil — Bundeszahlen werden nie anteilig „verteilt" (das war der Konstruktionsfehler,
+  der Ansatz 95-B disqualifiziert: dort könnte eine treiberfreie Kommune allein über den Schlüssel Fälle erhalten).</li>
+  <li><b>Unsicherheiten:</b> σ<sub>Region</sub>-Schätzgüte (Stationsdichte), UHI-Modellgüte,
+  Übertragbarkeit der Regionen-Kurven auf Zellebene, Harvesting (K&amp;Z: Jahresaggregat &gt; 90&nbsp;% Reduktion der
+  Tageseffekte — die RKI-Wochenmethodik ist dagegen robust, da sie Übersterblichkeit direkt misst).</li>
+</ul>
+
+<h4>(d) Bewertung</h4>
+<p><span class="pro">+</span> kausal fundiert und publiziert; Mortalität bereits implementiert/validiert; volle
+Zell-Differenzierung (Alter × UHI × Versorgung); sauberer Maßnahmen-Anschluss; architektur-konform.<br>
+<span class="con">−</span> Morbiditäts-Evidenz dünner als Mortalität (T67 eng, Kreislauf-Attribution unsicher);
+Wochenverteilung, Basissterberaten, Restlebenserwartungen, VOLY und Kalibrierfaktoren sind seit Rev.&nbsp;5 vollständig aus Primärdaten hergeleitet; offen bleibt der Zeittrend der ERF (Anpassungssignal 2021–2025). <b>Aufwand:</b> klein–mittel.</p>
+</div>
+
+<div class="ansatz b">
+<h3>Ansatz 95-B — Nationaler Anker, top-down (Indexmasse-Verteilung)</h3>
+<p><b>Idee.</b> Der nationale Erwartungswert hitzebedingter Todesfälle wird aus der RKI-Zeitreihe per Regression gegen
+ein nationales Hitzemaß bestimmt; die Kommune erhält ihren Anteil proportional zu einer H×E×V-Indexmasse. Exakt
+kalibriert per Konstruktion — lokale Werte sind aber Verteilschlüssel, keine lokale Kausalrechnung.</p>
+
+<h4>(a) Inputs</h4>
+<table>
+  <tr><th>Größe</th><th>Excel-Knoten</th><th>Datenquelle</th><th>Auflösung</th></tr>
+  <tr><td>RKI-Zeitreihe hitzebedingte Sterbefälle 1992–2026</td><td>Kalibrierziel</td><td>Winklmayr u.&nbsp;a. 2022 + RKI-Wochenberichte</td><td>national/Jahr</td></tr>
+  <tr><td>Nationales Hitzemaß (Hitzegradwochen HGW)</td><td>E02</td><td>DWD-Gebietsmittel Sommer (Zeitreihe), Schwelle 20&nbsp;°C Wochenmittel</td><td>national/Jahr</td></tr>
+  <tr><td>Indexmasse-Komponenten je Zelle</td><td>E02/W124 · R35/R36 · S152–S158</td><td>wie 95-A: Zelltemperatur, Zensus-Altersbänder, Versorgung — aber nur als relative Gewichte</td><td>100&nbsp;m</td></tr>
+  <tr><td>Morbiditäts-Verhältnis r<sub>morb</sub></td><td>S153</td><td>Karlsson&nbsp;&amp;&nbsp;Ziebarth 2018: ≈ 2.500 Einweisungen : 240 Todesfälle je Hitzetag ⇒ r<sub>morb</sub> ≈ 10:1 (unkonditional) [18]</td><td>national</td></tr>
+</table>
+
+<h4>(b) Verrechnung auf Zellebene</h4>
+<div class="math">$$ D_{\text{nat}} = a + b \cdot \text{HGW}_{\text{nat}} \qquad \text{(lineare Regression auf die RKI-Zeitreihe [12])} $$</div>
+<div class="math">$$ M_{\text{Zelle}} = \sum_a w_a \cdot \text{pop}_a \cdot (\bar{T}_{\text{Zelle}} - T_0)_+\,, \qquad D_k = D_{\text{nat}} \cdot \frac{\sum_{\text{Zellen} \in k} M}{\sum_{\text{Zellen} \in \text{DE}} M} $$</div>
+<div class="math">$$ F_k = r_{\text{morb}} \cdot D_k, \qquad \text{€}_k = D_k \cdot \text{VSL} + F_k \cdot c_{\text{Fall}} \quad (\text{K1}); \qquad D_{\text{Zelle}} = D_k \cdot \tfrac{M_{\text{Zelle}}}{\sum_k M} \ \text{(rein anteilig)} $$</div>
+<table class="sym">
+  <tr><th>Zeichen</th><th>Name</th><th>Einheit</th><th>Wert / Herkunft</th></tr>
+  <tr><td>\(D_{\text{nat}}\)</td><td>nationale hitzebedingte Todesfälle (Erwartungswert je Szenariojahr)</td><td>1/Jahr</td><td>Regression</td></tr>
+  <tr><td>\(a,\ b\)</td><td>Regressionskonstante bzw. -steigung</td><td>1/Jahr · je HGW</td><td>OLS auf ~12 signifikante Jahre [12]; Querprüfung: ≈ +240 Todesfälle je Hitzetag [18]</td></tr>
+  <tr><td>\(\text{HGW}_{\text{nat}}\)</td><td>nationale Hitzegradwochen (Σ Überschreitung der 20-°C-Wochenmittel-Schwelle)</td><td>K·Wochen</td><td>DWD-Gebietsmittel; Szenario aus Klimaprojektion</td></tr>
+  <tr><td>\(M_{\text{Zelle}}\)</td><td>Indexmasse der Zelle (Verteilschlüssel) — <b>feste</b> Katalog-Grenzen, nicht der editierbare Schicht-A-Index</td><td>—</td><td>berechnet; erfordert Deutschland-Nenner (einmaliger Bundeslauf)</td></tr>
+  <tr><td>\(w_a\)</td><td>Altersgewicht (RKI-Anteil der Hitzetoten ÷ Bevölkerungsanteil)</td><td>—</td><td>aus [12] abgeleitet</td></tr>
+  <tr><td>\(r_{\text{morb}}\)</td><td>Verhältnis Einweisungen : Todesfälle</td><td>—</td><td>≈ 10 : 1 (Karlsson &amp; Ziebarth [18])</td></tr>
+  <tr><td colspan="4" class="muted">übrige Zeichen wie in Ansatz 95-A (\(\text{pop}_a, T_0, \text{VSL}, c_{\text{Fall}}\))</td></tr>
+</table>
+<p class="small"><b>Architektur-Hinweis:</b> Die Indexmasse darf <i>nicht</i> der editierbare Schicht-A-Screening-Index
+sein (Produktinvariante: keine Screening-Norm auf €-Pfaden — testseitig erzwungen). Es bräuchte eine zweite, fixe
+Indexmasse — Mehraufwand, der den vermeintlich „schnellen" Ansatz relativiert. Zudem braucht die Verteilung eine
+<b>Deutschland-Gesamtsumme</b> als Nenner (nationaler Batch-Lauf, vorhandene Lite-Infrastruktur nutzbar).</p>
+
+<h4>(c) Kalibrierung der Absolutwerte</h4>
+<ul>
+  <li>Kalibrierung ist trivial erfüllt (Σ = Regressionswert). Güte hängt an der OLS auf ~12 signifikanten Jahren
+  der revidierten RKI-Reihe (EB 19/2025); Querprüfung des Steigungskoeffizienten gegen Karlsson&nbsp;&amp;&nbsp;Ziebarth
+  (≈ +240 Todesfälle je Hitzetag bundesweit, unkonditional) [18].</li>
+  <li>Validierung nur relativ möglich (Städte-Vergleich, Altersgradient); keine unabhängige Absolutprüfung je Kommune.</li>
+</ul>
+
+<h4>(d) Bewertung</h4>
+<p><span class="pro">+</span> exakt auf amtliche Bundeswerte kalibriert; wenige Parameter; Szenario-Fortschreibung einfach.<br>
+<span class="con">−</span> keine lokale Kausalrechnung (Maßnahmenwirkung nur als Gewichtsverschiebung im Schlüssel);
+Architektur-Konflikt (zweite Indexmasse nötig, Deutschland-Nenner); Zellwerte sind Anteile, keine Physik;
+Präzedenz für alle Folgerisiken, die dann denselben Nenner-Batch brauchen. <b>Aufwand:</b> mittel (nationaler Lauf + neue Masse).
+<b>Status nach Review 2: nach Grundsatz G1 (kein Verteilschlüssel) ausgeschieden.</b></p>
+</div>
+
+<div class="ansatz c">
+<h3>Ansatz 95-C — Personen-Hitzegradtage-Regression, lokal</h3>
+<p><b>Idee.</b> Mittelweg: Ein national geschätzter Koeffizient β (Todesfälle je alters­gewichtetem Personen-Hitzegradtag)
+wird auf lokal berechnete Personen-Gradtage angewendet. Kalibriert wie B, lokal mechanistisch wie A — aber mit
+linearer Kernannahme statt Exponentialkurve.</p>
+
+<h4>(a) Inputs</h4>
+<table>
+  <tr><th>Größe</th><th>Excel-Knoten</th><th>Datenquelle</th><th>Auflösung</th></tr>
+  <tr><td>Hitzegradtage je Zelle HGT (Σ (T_Tag − 30&nbsp;°C)₊ bzw. Hitzetage-Zählung)</td><td>E02 (GE-KL-01/02)</td><td>DWD-CDC <code>hot_days</code>-Raster + UHI-Verschiebung</td><td>1&nbsp;km→100&nbsp;m</td></tr>
+  <tr><td>Altersgewichte w_a</td><td>S152 (GE-SO-05)</td><td>RKI-Altersverteilung der Hitzetoten ÷ Bevölkerungsanteile (w_85+ ≫ w_u65)</td><td>national</td></tr>
+  <tr><td>β_D, β_F (Todesfälle/Einweisungen je Personen-Hitzegradtag)</td><td>Wirkungsfunktion</td><td>nationale Regression RKI-Reihe (EB 19/2025) ÷ Σ Personen-HGT; Querprüfung Karlsson&nbsp;&amp;&nbsp;Ziebarth 2018: +9,8&nbsp;% Todesfälle (≈ +240) und +5,4&nbsp;% Einweisungen (≈ +2.500) je Hitzetag &gt; 30&nbsp;°C [18]</td><td>national</td></tr>
+  <tr><td>Konvexitäts-Exponent κ</td><td>GE-KL-02 (Dauer)</td><td>Fit an Extremjahre (2003/2018) — Übersterblichkeit wächst überproportional mit Periodendauer</td><td>national</td></tr>
+  <tr><td>V-Modulation</td><td>S155/S157/S158 + R36</td><td>wie 95-A (v_access)</td><td>Zelle</td></tr>
+</table>
+
+<h4>(b) Verrechnung auf Zellebene</h4>
+<div class="math">$$ \text{PGT}_{\text{Zelle}} = \sum_a w_a \cdot \text{pop}_a \cdot \bigl(\text{HGT}_{\text{Zelle}}\bigr)^{\kappa} $$</div>
+<div class="math">$$ D_{\text{Zelle}} = \beta_D \cdot \text{PGT}_{\text{Zelle}} \cdot v_{\text{acc}}, \qquad F_{\text{Zelle}} = \beta_F \cdot \text{PGT}_{\text{Zelle}} \cdot v_{\text{acc}}, \qquad \text{€}_{\text{Zelle}} = D \cdot \text{VSL} + F \cdot c_{\text{Fall}} \ (\text{K1}) $$</div>
+<table class="sym">
+  <tr><th>Zeichen</th><th>Name</th><th>Einheit</th><th>Wert / Herkunft</th></tr>
+  <tr><td>\(\text{PGT}_{\text{Zelle}}\)</td><td>alters­gewichtete Personen-Hitzegradtage der Zelle</td><td>Personen·Tage</td><td>berechnet</td></tr>
+  <tr><td>\(\text{HGT}_{\text{Zelle}}\)</td><td>Hitzegradtage der Zelle (Ebene <span class="lay lay-ok">HEAT_WAVE</span>, DWD + UHI)</td><td>Tage/Jahr</td><td>DWD-CDC [33]</td></tr>
+  <tr><td>\(\kappa\)</td><td>Konvexitäts-Exponent (Überproportionalität langer Hitzeperioden)</td><td>—</td><td>≈ 1,2–1,5 — Fit an Extremjahre 2003/2018/2026 [12]; Modellannahme, editierbar</td></tr>
+  <tr><td>\(\beta_D,\ \beta_F\)</td><td>Todesfälle bzw. Einweisungen je Personen-Hitzegradtag</td><td>1/(Personen·Tag)</td><td>nationale Regression [12]; Querprüfung +9,8&nbsp;% / +5,4&nbsp;% je Hitzetag [18]</td></tr>
+  <tr><td colspan="4" class="muted">übrige Zeichen wie in Ansatz 95-A (\(w_a, \text{pop}_a, v_{\text{acc}}, \text{VSL}, c_{\text{Fall}}\))</td></tr>
+</table>
+<p class="small"><b>Maßnahmen-Angriffspunkte:</b> wie 95-A über v_access und β-Dämpfung; UHI-Maßnahmen wirken über HGT.</p>
+
+<h4>(c) Kalibrierung der Absolutwerte</h4>
+<ul>
+  <li>β_D so, dass Σ Deutschland im RKI-Referenzband liegt (wie 95-A-Anker); κ am Verhältnis 2003/2018 zu Normaljahren.</li>
+  <li>Schwächer als A: Alterskurvenform nicht publiziert-exakt, sondern über Gewichte approximiert; schwächer als B:
+  Kalibrierung nur im Mittel, nicht je Jahr exakt.</li>
+</ul>
+
+<h4>(d) Bewertung</h4>
+<p><span class="pro">+</span> einfach erklärbar; lokal mechanistisch; kalibrierbar; kein Deutschland-Nenner nötig.<br>
+<span class="con">−</span> wirft die publizierte RKI-Kurvenform weg (Ansatz A hat sie bereits!); Konvexität nur aufgesetzt;
+Morbidität gleich unsicher wie in A. <b>Aufwand:</b> mittel (Neubau trotz vorhandener besserer Lösung).</p>
+</div>
+
+<div class="pagebreak"></div>
+<h2>3&nbsp;&nbsp;Risiko #96 — Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft (sehr dringend)</h2>
+
+<div class="kette">
+<h4>Wirkungskette laut Schadensbaum (Knoten W189) — verbindliche Eingangsgrößen</h4>
+<ul class="small">
+  <li><b>Hazard:</b> keine direkten klimatischen Einflüsse — ausschließlich vorgelagerte Wirkungen:
+  W024 „Ausbreitung von Pflanzenarten mit allergenem Potenzial" (← E01 Durchschnittstemperatur; Sensitivitäten
+  S010–S020 Habitat/Landnutzung; R03/R04) und W025 „Pollenflug". Die Netzwerkliste ergänzt als Eingang die
+  Klimawirkung #1 „Veränderung der Länge der Vegetationsperiode und Phänologie".</li>
+  <li><b>Sensitivitäten:</b> S158 Monitoring von Gesundheitsgefahren und Frühwarnsysteme (Wirkungskette 2016);
+  das KWRA-Wirkungsmechanismen-Sheet nennt zusätzlich individuellen Gesundheitszustand und Gefahrenbewusstsein
+  (S152/S153 · S154/S155).</li>
+  <li><b>Exposition:</b> R35 Vorkommen von Bevölkerung · R36 Vorkommen von Gesundheitsinfrastruktur.</li>
+  <li><b>KWRA-Indikator (intensive Betrachtung „Blühbeginn der Erle"):</b> GE-KL-07 „Tag des Blühbeginns der Erle im Jahr".</li>
+  <li><b>Konto:</b> K1 (Ursache: Allergene), <b>nur Morbidität</b> — „zusätzliche Fallzahlen/Behandlungstage ×
+  Behandlungskostensätze"; Produktivität explizit → K2 (#87, ab M3), Regel R9.</li>
+  <li><b>KWRA-Einstufung:</b> Risiko Gegenwart „gering", Mitte des Jahrhunderts „mittel" (bei starkem Wandel „hoch") —
+  Handlungserfordernis dennoch „sehr dringend" (lange Anpassungsvorlaufzeiten: Stadtbaum-Generationen).</li>
+</ul>
+</div>
+
+<div class="ansatz a">
+<h3>Ansatz 96-A — Prävalenz × Pollensaison-Ausweitung (phänologisch kalibriert)</h3>
+<p><b>Idee.</b> Die betroffene Bevölkerung (Prävalenz allergischer Rhinitis) erfährt durch die klimabedingt frühere,
+längere und intensivere Pollensaison zusätzliche Symptom- und Behandlungstage. Das Klimasignal wird exakt über den
+KWRA-Indikator GE-KL-07 (Blühbeginn Erle, DWD-Phänologie) plus Vegetationsperiodenlänge operationalisiert — die
+mechanistische Übersetzung der vorgelagerten Wirkungen W024/W025/#1.</p>
+
+<h4>(a) Inputs</h4>
+<table>
+  <tr><th>Größe</th><th>Excel-Knoten</th><th>Datenquelle</th><th>Auflösung</th></tr>
+  <tr><td>Prävalenz allergischer Rhinitis p<sub>AR</sub></td><td>R35 (Mengengerüst) + S153</td><td>DEGS1 (Langen u.&nbsp;a. 2013): Erwachsene <b>12,0&nbsp;%</b> (12-Monats) / 14,8&nbsp;% (Lebenszeit); KiGGS W2 (Thamm u.&nbsp;a. 2018): Kinder <b>8,8&nbsp;%</b> / 11&nbsp;%; Sensibilisierungs-Obergrenze 33,6&nbsp;% Inhalationsallergene (Haftenberger u.&nbsp;a. 2013) [1–3]</td><td>national, alters­differenziert</td></tr>
+  <tr><td>Blühbeginn Erle: Trend + Klimatologie</td><td>W025/#1 (GE-KL-07)</td><td>DWD-Phänologie (offene CDC-Daten): Hasel/Erle <b>bis zu 26 Tage früher</b> (1961–2017, Endler 2020 / KWRA TB5); DWD-Vorfrühling 3.&nbsp;März → 14.&nbsp;Februar (Normalperioden 1961–90 → 1991–2020); GE-KL-07-Projektion ≈ 2 Wochen früher bis 2100 (RCP8.5) [4,5,15]</td><td>Naturraum/Bundesland</td></tr>
+  <tr><td>Saisonende / Vegetationsperiodenlänge</td><td>#1</td><td>DWD: Vegetationsruhe 120&nbsp;→&nbsp;101 Tage (Normalperioden) ⇒ ≈&nbsp;+19 Tage Vegetationsperiode; „Birkenpollengruppe" beginnt 2–3 Wochen früher; nahezu ganzjähriger Pollenflug möglich (RKI-Sachstandsbericht 2023) [5,6]</td><td>regional</td></tr>
+  <tr><td>Jahres-Behandlungskosten je Patient c<sub>Jahr,direkt</sub></td><td>K1</td><td>Schramm u.&nbsp;a. 2003 (ERJ): saisonale AR gesamt 1.089–1.543&nbsp;€/Patient-Jahr (Preisstand ≈ 2000; nur direkter Anteil ansetzen, inflationsbereinigt); Sanity: Destatis-KKR J30 (exakter Betrag nur interaktiv abrufbar — vor Implementierung ziehen) [7,20]</td><td>national</td></tr>
+  <tr><td>Klimaattribuierter Anteil des Saisontrends a<sub>attr</sub></td><td>W024/W025</td><td>Anderegg u.&nbsp;a. 2021 (PNAS): ≈&nbsp;50&nbsp;% (IQR 19–84&nbsp;%) des Saisontrends anthropogen; Pollenintegral +20,9&nbsp;% (1990–2018, Nordamerika); Ziello u.&nbsp;a. 2012 (Europa: Mehrheit der Reihen steigend) [9,10]</td><td>Literatur-Band</td></tr>
+  <tr><td>Allergene Vegetation lokal (Birken-/Erlen-Anteil, Grünstruktur)</td><td>W024 (S010–S020, R03/R04)</td><td>OSM-Baum-/Grünflächendaten der Zelle (vorhanden); optional kommunales Baumkataster</td><td>100&nbsp;m</td></tr>
+  <tr><td>Pollen-Frühwarnung (Dämpfung)</td><td>S158</td><td>DWD/PID-Pollenflug-Gefahrenindex (Verfügbarkeit als Maßnahmen-Hebel)</td><td>regional</td></tr>
+</table>
+
+<h4>(b) Verrechnung auf Zellebene</h4>
+<p class="small" style="margin-bottom:2pt"><b>Klimasignal</b> (regional, relativ zur Referenzsaison) und lokaler Pollen-Hazard:</p>
+<div class="math">$$ \frac{\Delta S}{S_{\text{ref}}} \;=\; \frac{ \Delta_{\text{Blühbeginn}} + \Delta_{\text{Saisonende}} }{ S_{\text{ref}} } \;\approx\; 0{,}15\text{–}0{,}25 \ \text{(heute)}, \qquad \hat{P}_{\text{Zelle}} \;=\; 1 + \lambda \cdot \bigl( \hat{G}_{\text{allergen}} - \bar{G}_{\text{allergen}} \bigr) $$</div>
+<p class="small" style="margin-bottom:2pt"><b>Zusätzliche Krankheitslast</b> je Zelle und Jahr (K1, nur Morbidität) und nativer Outcome:</p>
+<div class="math">$$ \text{€}_{\text{Zelle}} \;=\; \underbrace{\textstyle\sum_a \text{pop}_a \cdot p_{\text{AR},a}}_{\text{Betroffene (altersspezifisch, G3)}} \cdot\; c_{\text{Jahr}} \cdot \frac{\Delta S}{S_{\text{ref}}} \cdot a_{\text{attr}} \cdot \hat{P}_{\text{Zelle}} $$</div>
+<div class="math">$$ \Delta\text{Tage}_{\text{Zelle}} \;=\; \text{Betroffene} \cdot d_{\text{Saison}} \cdot \frac{\Delta S}{S_{\text{ref}}} \cdot a_{\text{attr}} \qquad \text{(nativer Karten-Ausweis)} $$</div>
+<p class="small"><b>Klartext:</b> Die klimabedingte Mehrbelastung ist das Produkt aus (1) wie viele Menschen der Zelle
+überhaupt allergisch reagieren (Prävalenz × Bevölkerung), (2) um wie viel die Pollensaison länger geworden ist
+(relative Saisonausweitung), (3) welcher Anteil dieses Trends dem Klimawandel zuzurechnen ist (Attribution) und
+(4) wie stark die lokale allergene Vegetation die Belastung moduliert. Kein Verteilschlüssel: Eine Zelle ohne
+Bevölkerung oder ohne Saisonsignal trägt 0 bei (G1); die Destatis-KKR dient nur als Sanity-Obergrenze.
+<b>Monitoring/Frühwarnung (S158) ist per G4 kein Basisfaktor mehr</b> (keine belastbare Effektgröße gefunden),
+sondern Maßnahmen-Hebel der Maßnahme „Pollenmonitoring" mit dokumentierter Annahme.</p>
+<table class="sym">
+  <tr><th>Zeichen</th><th>Name</th><th>Einheit</th><th>Wert / Herkunft</th></tr>
+  <tr><td>\(a_{\text{attr}}\)</td><td>klimaattribuierter Anteil des Saisontrends</td><td>—</td><td>0,50 (Band 0,19–0,84), Anderegg u.&nbsp;a. 2021 [9]; editierbar</td></tr>
+  <tr><td>\(c_{\text{Jahr}}\)</td><td>direkte Behandlungskosten je Patient und Jahr (nur K1-Anteil)</td><td>€/Jahr</td><td>Stütze: Schramm u.&nbsp;a. 2003 (1.089–1.543&nbsp;€ gesamt, Preisstand 2000 — direkter Anteil, inflationsbereinigt) [7]; Sanity: Destatis-KKR J30 [20]</td></tr>
+  <tr><td>\(d_{\text{Saison}}\)</td><td>Symptomtage je Patient und Referenzsaison — Herleitung: \(d = f \cdot (p_G L_G + p_B L_B)\) mit Saisonlängen nach EAACI-Kriterium (Pfaar/Bergmann 2017: Birke ≥ 10 Pollen/m³ an 5 von 7 Tagen; Gräser ≥ 3/m³) \(L_B = 30\) (20–45), \(L_G = 60\) (45–80) Tage, Anteil symptomatischer Saisontage \(f = 0{,}70\) (0,55–0,85; Pollen-Symptom-Korrelation r = 0,48–0,79, Pfaar 2020 Tab.&nbsp;S4), Sensibilisierungsanteile \(p_G = 0{,}75\), \(p_B = 0{,}55\) (DEGS1 [3]) ⇒ 0,70 × (0,75·60 + 0,55·30)</td><td>Tage</td><td><b>43</b> (Band 21–83; Birke+Gräser-Patienten 63) — Saisonlängen und \(f\) sind gekennzeichnete Abschätzungen, ein direkter Messwert „Symptomtage je Patient" ist nicht publiziert [51–53]</td></tr>
+  <tr><td>\(\hat{G}_{\text{allergen}}\)</td><td>normierter Anteil allergener Vegetation (W024-Sensitivitäten S010–S020)</td><td>0…1</td><td>OSM-Grün/Baumkronen; optional kommunales Baumkataster (Birke/Erle/Hasel-Anteil, z.&nbsp;B. Berlin ≈ 2,5&nbsp;% [6])</td></tr>
+  <tr><td>\(p_{\text{AR},a}\)</td><td>Prävalenz allergischer Rhinitis je Altersgruppe (G3)</td><td>—</td><td>Erwachsene 12,0&nbsp;% · Kinder 8,8&nbsp;% (12-Monats; DEGS1/KiGGS [1,2])</td></tr>
+  <tr><td>\(\hat{P}_{\text{Zelle}}\)</td><td>lokaler Pollen-Hazard-Faktor — neue Ebene, <b>Kartenebene</b> (G6) <span class="lay lay-new">POLLEN_LOAD</span></td><td>—</td><td>berechnet</td></tr>
+  <tr><td>\(\Delta S / S_{\text{ref}}\)</td><td>relative Ausweitung der Pollensaison gegen die Referenzperiode (1961–90); das Phänologie-Signal wird als <b>Kartenebene</b> sichtbar (G6)</td><td>—</td><td>DWD-Phänologie: Blühbeginn Erle (KWRA-Indikator GE-KL-07) −17…−26 Tage, Vegetationsperiode +19 Tage [4,5]; regional aus Stationsdaten</td></tr>
+  <tr><td>\(\Delta\text{Tage}_{\text{Zelle}}\)</td><td>zusätzliche Behandlungstage — nativer Karten-Ausweis</td><td>Tage/Jahr</td><td>Ergebnis</td></tr>
+  <tr><td>\(\lambda,\ \bar{G}_{\text{allergen}}\)</td><td>Gewicht der lokalen Vegetations-Modulation (mittelwertzentriert um das Bundesmittel \(\bar{G}\), G9) — Herleitung: intra-urbane Spanne der Pollensedimentation Berlin (Werchan u.&nbsp;a. 2017, 14 Fallen): Birke 245&nbsp;%, Gräser 306&nbsp;% zwischen höchster und niedrigster Falle ⇒ \(\lambda_{\text{roh}} = 2(R-1)/(R+1)\) = 0,84 (R = 2,45) … 1,01 (R = 3,06); davon vegetationserklärter Anteil a = 0,6 (0,4–0,8; Rest: Ferntransport, Wind) ⇒ 0,57; Richtung bestätigt durch Symptomgradient Zentrum→Peripherie (Werchan 2018) und Birkendichte urban 11 vs. Wald 36/ha (Bogawski 2019)</td><td>—</td><td><b>0,6</b> (Band 0,3–0,9); Sensitivität: \(\hat G - \bar G = \pm 0{,}5\) ⇒ \(\hat P\) = 0,70…1,30 [54–56]</td></tr>
+  <tr><td colspan="4" class="muted"><b>Maßnahmen-Hebel (G4):</b> „Allergenarme Stadtbaumwahl" senkt \(\hat{G}_{\text{allergen}}\) (GALK-Liste + allergologische Artenliste [6]); „Pollenmonitoring/Frühwarnung" (S158, Ebene <span class="lay lay-parked">EARLY_WARNING_SYSTEMS</span>) wirkt mit dokumentierter Annahme auf \(d_{\text{Saison}}\)-Behandlungsanteil — im Default neutral. Übrige Zeichen wie 95-A; Aggregation: Kommune = Σ Zellen; Schicht-A-Index: \(\hat H\)(<span class="lay lay-new">POLLEN_LOAD</span>) × \(\hat E\)(R35: <span class="lay lay-ok">POPULATION_DENSITY</span>) × \(\hat V\)(S153/S158)</td></tr>
+</table>
+<p class="small"><b>Konten-Disziplin:</b> Bewertet wird ausschließlich die Behandlungsseite (K1-Morbidität) — Produktivitäts-
+und Arbeitsausfallkosten (der größte Teil der volkswirtschaftlichen Allergie-Last!) bleiben per Excel-Regel R9 bei #87/K2
+und kommen erst in M3. Der M0-Ausweis ist also bewusst konservativ.<br>
+<b>Maßnahmen-Angriffspunkte:</b> Allergenarme Stadtbaumwahl → senkt Ĝ_allergen (W024-Pfad, GALK-Liste);
+Pollenmonitoring/Frühwarnung → v_monitor (S158).</p>
+
+<h4>(c) Kalibrierung der Absolutwerte</h4>
+<ul>
+  <li><b>Prävalenz-Anker:</b> DEGS1: 12,0&nbsp;% (12-Monats) / 14,8&nbsp;% (Lebenszeit) Erwachsene; KiGGS&nbsp;W2: 8,8&nbsp;% / 11&nbsp;%
+  Kinder; Obergrenze 33,6&nbsp;% sensibilisiert (Inhalationsallergene). Hochrechnung DE: ≈ 9–10&nbsp;Mio. aktuell Betroffene [1–3].</li>
+  <li><b>Klimasignal-Anker:</b> Frühblüher (Hasel/Erle) bis zu 26 Tage früher (1961–2017); DWD-Vorfrühling ≈ 17 Tage
+  früher (Normalperiodenvergleich); Vegetationsperiode ≈ +19 Tage; „Birkenpollengruppe" 2–3 Wochen früher.
+  Klima-Attribution des Trends: ≈ 50&nbsp;% (19–84&nbsp;%, Anderegg 2021) [4–6,9].</li>
+  <li><b>Kosten-Sanity:</b> Bundessumme der modellierten ΔKosten ≪ Destatis-KKR J30; <b>Lücke, vor Implementierung zu
+  schließen:</b> die exakten J30/J45-Beträge (2020/2023) sind nur interaktiv über GENESIS-Tabelle 23631 / GBE-Bund
+  abrufbar (belegter Altanker: Asthma J45–J46 im Jahr 2002: 1.837&nbsp;Mio.&nbsp;€). Patientenbezogene Stütze: Schramm
+  u.&nbsp;a. 2003 (1.089–1.543&nbsp;€/SAR-Patient-Jahr, gesamt) — nur der direkte Anteil ist K1-fähig; Zuberbier
+  u.&nbsp;a. 2014 (2.405&nbsp;€/Jahr) betrifft <i>indirekte</i> Kosten und bleibt per R9 bei K2/#87 [7,8,20].</li>
+  <li><b>Unsicherheiten:</b> d_Saison/τ (Symptomtage je Saison) ist die weichste Größe — als dokumentierte, editierbare
+  Modellannahme führen; Intensitätszunahme (Pollenmenge +21&nbsp;%, CO₂-Effekt bis +61…131&nbsp;% bei Ambrosia) konservativ
+  zunächst <i>nicht</i> angesetzt (nur Saisonlänge) — dokumentierte Untererfassung [9,10,21,22].</li>
+</ul>
+
+<h4>(d) Bewertung</h4>
+<p><span class="pro">+</span> deckt das Gesamtrisiko ab; Klimasignal exakt auf dem KWRA-Indikator (GE-KL-07);
+mechanistische Attribution statt normativem Anteil; lokale Differenzierung über allergene Vegetation (W024);
+beide M0-Maßnahmen greifen direkt.<br>
+<span class="con">−</span> \(d_{\text{Saison}}\) und \(f\) sind begründete Abschätzungen mit breitem Band (kein publizierter
+Messwert „Symptomtage je Patient"); Pollen-Hazard je Zelle bleibt Proxy (kein flächiges Pollenmessnetz). <b>Aufwand:</b> mittel.</p>
+</div>
+
+<div class="ansatz b">
+<h3>Ansatz 96-B — Neophyten-Szenario (Ambrosia-Ausbreitung)</h3>
+<p><b>Idee.</b> Fokus auf den W024-Pfad im engeren Sinn: die klimagetriebene Arealausweitung hochallergener Arten
+(v.&nbsp;a. Ambrosia artemisiifolia). Publizierte Europa-Projektionen (Lake u.&nbsp;a. 2017) liefern die Zunahme der
+Sensibilisierung; bewertet werden Neusensibilisierte × Manifestation × Behandlungskosten.</p>
+
+<h4>(a) Inputs</h4>
+<table>
+  <tr><th>Größe</th><th>Excel-Knoten</th><th>Datenquelle</th><th>Auflösung</th></tr>
+  <tr><td>Ambrosia-Sensibilisierungsrate heute → Szenario</td><td>W024</td><td>Lake u.&nbsp;a. 2017 (EHP): Europa 33&nbsp;Mio. (1986–2005) → <b>77&nbsp;Mio.</b> (2041–2060), Band 52–107&nbsp;Mio. je Ausbreitungstempo; <b>66&nbsp;% des Anstiegs klimabedingt</b>; Deutschland: Sensibilisierungsrate 0–10&nbsp;% → 15–25&nbsp;% [23]</td><td>Europa→DE</td></tr>
+  <tr><td>Klimaeignung der Kommune (Temperatur)</td><td>E01 (über W024)</td><td>DWD-Jahresmitteltemperatur-Raster + Szenario-Delta (vorhanden); Pollenlast-Projektion Europa ×4 (×2–×12) bis 2050 (Hamaoui-Laguel u.&nbsp;a. 2015) [24]</td><td>1&nbsp;km</td></tr>
+  <tr><td>Ambrosia-Vorkommen/Funddichte</td><td>R03/R04</td><td>JKI-Aktionsprogramm/Länder-Atlanten (Fundmeldungen); Reizschwelle bereits ~10 Pollen/m³ (vs. 15 Gräser / 30 Birke); Beispiel Drebkau (BB) 2010: ≈ 2.500 Pollen/m³·Jahr vs. 5–6 in West-/Süddeutschland [6,23]</td><td>regional</td></tr>
+  <tr><td>Manifestationsrate Sensibilisierung→Erkrankung, Behandlungskosten je Fall</td><td>S153 / K1</td><td>Born u.&nbsp;a. 2012 (UFZ): Gesundheitskosten bei deutschlandweiter Ambrosia-Etablierung <b>193–1.190&nbsp;Mio.&nbsp;€/Jahr</b> (szenarioabhängig, nur Behandlungsanteil K1-fähig) [25]</td><td>national</td></tr>
+</table>
+
+<h4>(b) Verrechnung auf Zellebene</h4>
+<div class="math">$$ \Delta\text{Sens}_{\text{Zelle}} = \text{pop} \cdot \bigl[ r_{\text{sens}}^{\text{Szen}} - r_{\text{sens}}^{\text{heute}} \bigr] \cdot \hat{E}_{\text{klima}}, \qquad \text{€}_{\text{Zelle}} = \Delta\text{Sens}_{\text{Zelle}} \cdot m_{\text{man}} \cdot c_{\text{Jahr}} \ (\text{K1}) $$</div>
+<table class="sym">
+  <tr><th>Zeichen</th><th>Name</th><th>Einheit</th><th>Wert / Herkunft</th></tr>
+  <tr><td>\(r_{\text{sens}}\)</td><td>Ambrosia-Sensibilisierungsrate heute → Szenario</td><td>—</td><td>DE: 0–10&nbsp;% → 15–25&nbsp;% (2041–2060), Lake u.&nbsp;a. 2017 [23]</td></tr>
+  <tr><td>\(\hat{E}_{\text{klima}}\)</td><td>Klimaeignung der Zelle/Region (Jahresmitteltemperatur E01)</td><td>0…1</td><td>DWD-Raster + Szenario-Delta (vorhanden)</td></tr>
+  <tr><td>\(m_{\text{man}}\)</td><td>Manifestationsrate Sensibilisierung → behandelte Erkrankung</td><td>—</td><td>aus Born u.&nbsp;a. 2012 rückrechenbar [25]; Modellannahme, editierbar</td></tr>
+  <tr><td colspan="4" class="muted">\(c_{\text{Jahr}}\) wie 96-A; Schicht-A-Index: \(\hat H\)(Klimaeignung) × \(\hat E\)(R35) × \(\hat V\)(S158)</td></tr>
+</table>
+
+<h4>(c) Kalibrierung der Absolutwerte</h4>
+<ul>
+  <li>Lake u.&nbsp;a. 2017 als harter Anker (DE: 0–10&nbsp;% → 15–25&nbsp;% Sensibilisierung bis 2041–2060, 66&nbsp;%
+  klimabedingt); nationale Gegenprobe: Born u.&nbsp;a. 2012 (193–1.190&nbsp;Mio.&nbsp;€/Jahr bei voller Etablierung);
+  Obergrenze: „+235&nbsp;% Sensibilisierte DE" (Lake u.&nbsp;a. 2018, nur Konferenz-Abstract — als Bandobergrenze) [23,25,26].</li>
+  <li>Zeithorizont-Inkonsistenz: Projektion 2041–2060 vs. M0-Ausweis „erwarteter Jahresschaden heute" — erfordert
+  Interpolation mit Zusatzannahmen.</li>
+</ul>
+
+<h4>(d) Bewertung</h4>
+<p><span class="pro">+</span> sauber klima-kausal und publiziert; anschlussfähig an Fundkarten.<br>
+<span class="con">−</span> bildet nur einen Teilausschnitt ab (eine Art; Birke/Gräser — die Hauptlast — fehlen):
+systematische Unterschätzung des KWRA-Risikos „Aeroallergene" insgesamt; Maßnahme „allergenarme Stadtbaumwahl"
+greift hier kaum (Ambrosia ist krautig — Stadtbäume irrelevant). Als <i>alleinige</i> M0-Methodik dem Anspruch
+„sehr dringend, häufigste chronische Erkrankung" nicht angemessen. <b>Aufwand:</b> klein–mittel.</p>
+</div>
+
+<div class="ansatz c">
+<h3>Ansatz 96-C — Nationaler Kostenanker, top-down</h3>
+<p><b>Idee.</b> Die amtlichen Krankheitskosten allergischer Atemwegserkrankungen werden mit einem klimaattribuierten
+Anteil multipliziert und über einen Pollen-Index × Bevölkerung auf die Kommunen verteilt.</p>
+
+<h4>(a) Inputs</h4>
+<table>
+  <tr><th>Größe</th><th>Excel-Knoten</th><th>Datenquelle</th><th>Auflösung</th></tr>
+  <tr><td>Krankheitskosten J30 (allergische Rhinopathie), ggf. + Asthma-Anteil J45</td><td>K1-Anker</td><td>Destatis-Krankheitskostenrechnung (Jahre 2015/2020/2023); <b>exakte J30/J45-Beträge nur interaktiv abrufbar</b> (GENESIS 23631 / GBE-Bund) — vor Implementierung ziehen; Altanker J45–J46 (2002): 1.837&nbsp;Mio.&nbsp;€ [20]</td><td>national</td></tr>
+  <tr><td>Klimaattribuierter Anteil a<sub>klima</sub></td><td>W025/#1</td><td>Saisonverlängerung ΔS/S_ref (≈ 0,15–0,25) × Anderegg-Attribution 0,19–0,84 ⇒ a<sub>klima</sub> ≈ 0,03–0,2 (Band; zentral ≈ 0,08–0,10) [4–6,9]</td><td>Literatur-Band</td></tr>
+  <tr><td>Verteilschlüssel</td><td>R35 + W024</td><td>pop × Pollen-Hazard-Proxy (wie 96-A, fixe Grenzen)</td><td>100&nbsp;m</td></tr>
+</table>
+
+<h4>(b) Verrechnung auf Zellebene</h4>
+<div class="math">$$ \text{€}_{\text{nat}} = \text{KK}_{\text{J30}} \cdot a_{\text{klima}}, \qquad \text{€}_{\text{Zelle}} = \text{€}_{\text{nat}} \cdot \frac{ \text{pop} \cdot \hat{P}_{\text{Zelle}} }{ \sum_{\text{DE}} \text{pop} \cdot \hat{P} } \quad \text{(Deutschland-Nenner nötig; kein natives Mengengerüst)} $$</div>
+<table class="sym">
+  <tr><th>Zeichen</th><th>Name</th><th>Einheit</th><th>Wert / Herkunft</th></tr>
+  <tr><td>\(\text{KK}_{\text{J30}}\)</td><td>Destatis-Krankheitskosten allergische Rhinopathie (+ ggf. Asthma-Anteil J45)</td><td>€/Jahr</td><td>exakte Beträge 2020/2023 nur interaktiv abrufbar (GENESIS 23631) [20]</td></tr>
+  <tr><td>\(a_{\text{klima}}\)</td><td>klimaattribuierter Anteil</td><td>—</td><td>≈ 0,03–0,2 (zentral ≈ 0,08–0,10) aus \(\Delta S/S_{\text{ref}}\) × Anderegg-Band [4–6,9]</td></tr>
+  <tr><td colspan="4" class="muted">\(\hat P\) wie 96-A (<span class="lay lay-new">POLLEN_LOAD</span> × R35)</td></tr>
+</table>
+
+<h4>(c) Kalibrierung der Absolutwerte</h4>
+<ul>
+  <li>Per Konstruktion an Destatis gekoppelt; die gesamte Klimawirkungs-Aussage steckt im normativ gesetzten
+  a<sub>klima</sub> — Bandbreite aus Literatur, aber keine mechanische Herleitung.</li>
+  <li>Nur Behandlungskosten-Anteil der Krankheitskosten ansetzen (K1-Disziplin; Destatis-Kosten enthalten keine
+  Produktionsausfälle — die stehen dort separat als „Ressourcenverlust", nicht doppelt buchen).</li>
+</ul>
+
+<h4>(d) Bewertung</h4>
+<p><span class="pro">+</span> schnellste Umsetzung; Gesamtbild per Konstruktion; amtlicher Anker.<br>
+<span class="con">−</span> a_klima ist die dominante, normativ zu setzende Stellschraube (Angriffsfläche in jeder
+fachlichen Prüfung); lokale Differenzierung nur über den Verteilschlüssel; Deutschland-Nenner nötig; Maßnahmenwirkung
+kaum abbildbar. <b>Aufwand:</b> klein.
+<b>Status nach Review 2: nach Grundsatz G1 (kein Verteilschlüssel) ausgeschieden.</b></p>
+</div>
+
+
+
+<div class="pagebreak"></div>
+<h2>4&nbsp;&nbsp;Risiko #98 — UV-bedingte Gesundheitsschädigungen, insbesondere Hautkrebs (sehr dringend)</h2>
+
+<div class="kette">
+<h4>Wirkungskette laut Schadensbaum (Knoten W186) — verbindliche Eingangsgrößen</h4>
+<ul class="small">
+  <li><b>Hazard:</b> E20 UV-Strahlung (direkter klimatischer Einfluss; keine vorgelagerten Wirkungen, Konfidenz „hoch").</li>
+  <li><b>Sensitivitäten:</b> S154 Freizeitverhalten · S155 Gefahrenbewusstsein · S158 Monitoring/Frühwarnsysteme.</li>
+  <li><b>Exposition:</b> R35 Vorkommen von Bevölkerung · R36 Vorkommen von Gesundheitsinfrastruktur.</li>
+  <li><b>KWRA-Charakteristik:</b> extensiv betrachtet (keine eigenen KWRA-Indikatoren); Beschreibung: „verhaltensbedingt
+  steigende Exposition in längeren, sonnigeren Warmphasen" — der Klimapfad läuft wesentlich über das Verhalten (S154),
+  nicht allein über die physikalische Dosis.</li>
+  <li><b>Konto:</b> K1 (Ursache: UV) — „zusätzliche Erkrankungsfälle × Behandlungskosten + Mortalitätsanteil × VSL".</li>
+</ul>
+</div>
+
+<div class="ansatz a">
+<h3>Ansatz 98-A — Amtliche Inzidenz + Trend-Attribution über Verstärkungsfaktoren (BAF)</h3>
+<p><b>Idee.</b> Ausgangspunkt ist die amtliche Hautkrebs-Statistik (ZfKD/RKI), altersadjustiert auf die Kommune skaliert.
+Der klimaattribuierte Zusatzanteil wird über den beobachteten Trend der Sonnenscheindauer/UV-Dosis (DWD/BfS) mit den
+publizierten biologischen Verstärkungsfaktoren (BAF: %-Inzidenzänderung je %-Dosisänderung, je Entität) berechnet und
+über die Verhaltens-Sensitivitäten moduliert. Amtlich verankert, jede Komponente publiziert.</p>
+
+<h4>(a) Inputs</h4>
+<table>
+  <tr><th>Größe</th><th>Excel-Knoten</th><th>Datenquelle</th><th>Auflösung</th></tr>
+  <tr><td>Inzidenz &amp; Mortalität je Entität, alters-/geschlechtsspezifisch</td><td>R35 (Mengengerüst)</td><td>ZfKD/RKI „Krebs in Deutschland 2021–2023" (KID 2025): Melanom C43 2023: <b>≈ 27.430 Neuerkrankungen / 3.169 Sterbefälle</b>; C44 2023: <b>≈ 243.000 / 1.332</b>; Entitäten-Split (2015, BfS): BCC 158.840 · SCC 98.950 · MM 35.495; medianes Erkrankungsalter 64–76&nbsp;J. [27]</td><td>national, altersspezifisch</td></tr>
+  <tr><td>Sonnenscheindauer je Zelle (UV-Proxy) + Trend</td><td>E20</td><td>DWD-CDC-Raster <code>sunshine_duration</code> (1&nbsp;km, jährlich); DWD-Gebietsmittel: Normalperioden 1961–90: 1.544&nbsp;h → 1991–2020: 1.665&nbsp;h (<b>+7,8&nbsp;%</b>); linearer Trend 1951–2025 ≈ +25&nbsp;h/Dekade (eigene Regression aus DWD-Daten, so gekennzeichnet); Rekorde 2022/2018/2003 ≈ 2.015–2.024&nbsp;h [33]</td><td>1&nbsp;km</td></tr>
+  <tr><td>Erythemwirksame Dosis: Referenz + Trend</td><td>E20</td><td>BfS/Lorenz u.&nbsp;a. 2024 (Dortmund 1997–2022): Tagesdosis <b>+4,9&nbsp;%/Dekade</b> (UV-Index-Maximum +3,2&nbsp;%/Dekade; Ursache v.&nbsp;a. Bewölkungsabnahme); satellitengestützt +1,2–3,6&nbsp;%/Dekade (Vitt u.&nbsp;a. 2020); Projektion UV-B +1,3&nbsp;%/Dekade 2050–2100 (Eleftheratos u.&nbsp;a. 2020) [31,32]</td><td>Stationen/Bänder</td></tr>
+  <tr><td>Biologische Verstärkungsfaktoren BAF je Entität</td><td>Wirkungsfunktion</td><td>Slaper u.&nbsp;a. 1996 (Nature) / RIVM 2023: <b>SCC 2,5&nbsp;±&nbsp;0,7 · BCC 1,4&nbsp;±&nbsp;0,4 · Melanom 0,6&nbsp;±&nbsp;0,4</b> (%-Inzidenz je +1&nbsp;% Dosis); unabhängig bestätigt durch Madronich u.&nbsp;a. 2021 (2,6/1,4/0,6); Melanom-BAF mechanistisch am schwächsten belegt [29,30]</td><td>—</td></tr>
+  <tr><td>Verhaltens-Modulation (Freizeit im Freien, Bewusstsein)</td><td>S154/S155</td><td>KWRA-Charakterisierung; kommunale Proxies (Grün-/Freizeitflächenanteil OSM) — konservativ als ±-Band</td><td>Zelle</td></tr>
+  <tr><td>Behandlungskosten je Entität, Letalitätsanteile</td><td>K1</td><td>Destatis-KKR C43/C44: <b>1.823&nbsp;Mio.&nbsp;€ (2023)</b>; 1.492 (2020); ≈&nbsp;692 (2015 — Methodenrevision, nicht voll vergleichbar); Erstjahres-Fallkosten (AOK-Daten): Melanom ≈ 9.038&nbsp;€, NMSC ≈ 5.890&nbsp;€ (Speckemeier u.&nbsp;a. 2022); Letalitätsanteile aus ZfKD: λ_MM ≈ 0,12, λ_C44 ≈ 0,005 (Sterbefälle/Neuerkrankungen p.&nbsp;a.) [27,28,34]</td><td>national</td></tr>
+</table>
+
+<h4>(b) Verrechnung auf Zellebene</h4>
+<p class="small" style="margin-bottom:2pt"><b>Baseline</b> je Zelle (Entitäten \(e \in \{\text{MM}, \text{SCC}, \text{BCC}\}\), §1.5) und <b>klimaattribuierter Zusatz</b>:</p>
+<div class="math">$$ \text{Fälle}_{e,\text{Zelle}} = \sum_a \text{pop}_a \cdot \frac{I_{e,a}}{100\,000}, \qquad \Delta\text{Dosis}_{\text{Zelle}} = \frac{ \text{SSD}_{\text{heute}} - \text{SSD}_{\text{ref}} }{ \text{SSD}_{\text{ref}} } \cdot k_{\text{UV}} $$</div>
+<div class="math">$$ \Delta\text{Fälle}_e = \text{Fälle}_e \cdot \text{BAF}_e \cdot \Delta\text{Dosis}_{\text{Zelle}} \cdot r_{\text{out},e}, \qquad r_{\text{out},e} = \frac{ 1 + q_{\text{out}} (\text{OR}_{\text{out},e} - 1) }{ 1 + \bar{q}_{\text{out}} (\text{OR}_{\text{out},e} - 1) } $$</div>
+<div class="math">$$ \text{YLL}_{\text{Zelle}} = \sum_e \Delta\text{Fälle}_e \cdot \lambda_e \cdot \bar{L}_e, \qquad \text{€}_{\text{Zelle}} = \sum_e \Delta\text{Fälle}_e \cdot c_e + \text{YLL}_{\text{Zelle}} \cdot \text{VOLY} \quad (\text{K1, G2}) $$</div>
+<p class="small"><b>Klartext (G1 — kein Verteilschlüssel):</b> Jede Zelle rechnet aus ihrer eigenen Altersstruktur
+(amtliche Inzidenzraten), ihrem eigenen Sonnenschein-Trend und ihrem Außenberufs-Anteil; Bundeswerte (KKR, ZfKD-Summen)
+dienen nur als Sanity-Anker. <b>Verhaltens-Modulation ist per G4 im Default neutral</b> (v<sub>verh</sub> ≡ 1):
+Für „mehr Aufenthalt im Freien je Komforttag" existiert keine quantifizierte Effektgröße [36] — sie wird als
+dokumentiertes ±-Sensitivitätsband geführt, nicht als Basisfaktor. Empirisch belegt und deshalb aufgenommen (G4)
+ist stattdessen die <b>berufliche Außenexposition</b>: Meta-analytisch ≈ 1,8-faches Plattenepithelkarzinom-Risiko
+bei Außenbeschäftigten [43] — anerkannte Berufskrankheit BK&nbsp;5103. Der Maßnahmen-Hebel „UV-Schutz im
+öffentlichen Raum" wirkt mit publizierten Programm-Evaluationen (Nutzen-Kosten 2,2–8,7&nbsp;:&nbsp;1 [37]).</p>
+<table class="sym">
+  <tr><th>Zeichen</th><th>Name</th><th>Einheit</th><th>Wert / Herkunft</th></tr>
+  <tr><td>\(\text{BAF}_e\)</td><td>biologischer Verstärkungsfaktor je Entität (§1.5)</td><td>—</td><td>SCC 2,5&nbsp;±&nbsp;0,7 · BCC 1,4&nbsp;±&nbsp;0,4 · MM 0,6&nbsp;±&nbsp;0,4 (Slaper 1996 / RIVM 2023 [29,30])</td></tr>
+  <tr><td>\(c_e\)</td><td>Behandlungskosten je Fall und Entität</td><td>€</td><td>Melanom ≈ 9.038 · NMSC ≈ 5.890 (Erstjahr, Speckemeier u.&nbsp;a. 2022 [34])</td></tr>
+  <tr><td>\(\text{Fälle}_{e},\ \Delta\text{Fälle}_e\)</td><td>Baseline- bzw. klimaattribuierte Zusatz-Neuerkrankungen der Zelle je Entität</td><td>1/Jahr</td><td>berechnet</td></tr>
+  <tr><td>\(I_{e,a}\)</td><td>Neuerkrankungsrate je Entität und Altersgruppe (G3)</td><td>1/100.000·Jahr</td><td>ZfKD „Krebs in Deutschland" 2023 [27]</td></tr>
+  <tr><td>\(k_{\text{UV}}\)</td><td>Übersetzung SSD-Trend → erythemwirksame Dosis</td><td>—</td><td>≈ 0,4–0,5 — <b>empirisch gestützt</b> (G5): Dortmund-Messreihe Dosis +4,9&nbsp;%/Dek. bei SSD +11,3&nbsp;%/Dek. (Lorenz u.&nbsp;a. 2024 [31]); editierbar</td></tr>
+  <tr><td>\(\bar{L}_e\)</td><td>verlorene Lebensjahre je Sterbefall und Entität = \(e\)(medianes Sterbealter) aus der Sterbetafel 2022/2024, gewichtet mit den Sterbefällen 2023: Melanom F 78 J./1.318 Fälle, M 76 J./1.851 Fälle ⇒ (1.318·10,92 + 1.851·10,33)/3.169; C44 F 88 J./541, M 85 J./791 ⇒ (541·5,04 + 791·5,47)/1.332</td><td>Jahre</td><td><b>10,58 (Melanom) · 5,30 (C44)</b> — Näherung über das Median-Sterbealter, bei rechtsschiefer Altersverteilung leicht überschätzend [27,48]</td></tr>
+  <tr><td>\(\text{OR}_{\text{out},e},\ q_{\text{out}},\ r_{\text{out},e}\)</td><td>Außenberufs-Risiko (nur SCC: OR ≈ 1,77), Außenbeschäftigten-Anteil der Zelle/Kommune, resultierender Modifikator (G4)</td><td>—</td><td>Meta-Analyse Schmitt u.&nbsp;a. 2011 [43]; \(q_{\text{out}}\) aus Zensus-/INKAR-Branchenanteilen (Land-/Forst-/Bauwirtschaft)</td></tr>
+  <tr><td>\(\text{SSD}\)</td><td>Sonnenscheindauer der Zelle — neue Ebene, <b>Kartenebene</b> (G6) <span class="lay lay-new">UV_RADIATION</span></td><td>h/Jahr</td><td>DWD-CDC <code>sunshine_duration</code>-Raster; Referenz 1961–90 [33]</td></tr>
+  <tr><td>\(\text{VOLY},\ \text{YLL}_{\text{Zelle}}\)</td><td>Wert eines Lebensjahres (§1.2, G2); verlorene Lebensjahre der Zelle — nativer Karten-Ausweis der Mortalität</td><td>€/Jahr · Jahre/Jahr</td><td>VOLY 160.800&nbsp;€ (§1.2) [19]; YLL = Ergebnis</td></tr>
+  <tr><td>\(\Delta\text{Dosis}_{\text{Zelle}}\)</td><td>relative klimabedingte Dosisänderung der Zelle</td><td>—</td><td>berechnet aus SSD-Trend × \(k_{\text{UV}}\)</td></tr>
+  <tr><td>\(\lambda_e\)</td><td>Letalitätsanteil je Entität (Sterbefälle ÷ Neuerkrankungen p.&nbsp;a.)</td><td>—</td><td>MM ≈ 0,12 · C44 ≈ 0,005 (ZfKD 2023 [27])</td></tr>
+  <tr><td colspan="4" class="muted"><b>Latenz-Ausweis:</b> ΔFälle sind das „eingelaufene Risiko" der heutigen Dosislage — Latenz 20–40 Jahre wird im Infokasten dokumentiert (G8) [35]. Verhaltens-Sensitivität \(v_{\text{verh}}\): Default neutral (G4), Band hergeleitet aus Zeitverwendungs- und Dosimetrie-Evidenz — Outdoor-Freizeit steigt ≈ 1,2&nbsp;min/°C (Graff Zivin &amp; Neidell 2014, ATUS n = 42.280: 44&nbsp;min/Tag Mittel; Komforttag Δ ≈ 10&nbsp;°C ⇒ +12&nbsp;min = +27&nbsp;%), Kleidungskomponente +15&nbsp;% (0–35&nbsp;%, Sun 2014 nur Richtung) ⇒ relative Dosiszunahme je Komforttag <b>s ≈ +0,45</b> (Kernband +0,25…+0,60; Hitzetage &gt; 30&nbsp;°C kehren das Vorzeichen um: −5…−13&nbsp;% Aktivität). Nicht in den Basiswert (US-Daten, Übertragbarkeit begrenzt; Ambient-UV-Anteil bereits in ΔDosis — Doppelzählungsschutz) [36,57–59]. Schicht-A-Index: \(\hat H\)(<span class="lay lay-new">UV_RADIATION</span>) × \(\hat E\)(R35: <span class="lay lay-ok">POPULATION_DENSITY</span> / <span class="lay lay-ok">AGE_STRUCTURE</span>) × \(\hat V\)(S154/S155/S158)</td></tr>
+</table>
+<p class="small"><b>Maßnahmen-Angriffspunkte:</b> UV-Schutz im öffentlichen Raum (Verschattung, UV-Index-Kommunikation)
+→ senkt v_verhalten bzw. die effektive Dosis exponierter Personengruppen (S154/S155); Monitoring (S158) → frühere
+Erkennung, geringere Letalität λ (separat dokumentierbar, konservativ zunächst konstant).</p>
+
+<h4>(c) Kalibrierung der Absolutwerte</h4>
+<ul>
+  <li><b>Baseline-Anker:</b> Kommunale Fälle skalieren per Konstruktion auf die ZfKD-Bundesinzidenz; Altersstruktur
+  der Kommune verschiebt die Rate mechanisch (Hautkrebs ist stark altersassoziiert).</li>
+  <li><b>Klimaanteil-Anker:</b> ΔDosis aus DWD-SSD-Trend (+7,8&nbsp;% Normalperiodenvergleich), Übersetzungsfaktor k_UV
+  an den BfS-Messreihen gestützt (Dortmund: Dosis +4,9&nbsp;%/Dekade bei SSD +11,3&nbsp;%/Dekade ⇒ k_UV ≈ 0,4–0,5;
+  konservativ zusätzlich das Satelliten-Band +1,2–3,6&nbsp;%/Dekade); BAF-Exponenten (2,5/1,4/0,6 ± publizierte
+  Unsicherheit) als editierbare Parameter [29–33].</li>
+  <li><b>Kosten-Sanity:</b> Bundessumme ΔFälle × c ≪ Destatis-KKR C43/C44 (1.823&nbsp;Mio.&nbsp;€, 2023); Querprüfung
+  Mortalität: Destatis-Todesursachen 2024: 4.600 Hautkrebs-Sterbefälle (ZfKD 2023: 4.501 = 3.169&nbsp;+&nbsp;1.332);
+  Plausibilitätsband des klimaattribuierten Anteils dokumentieren [27,28].</li>
+  <li><b>Unsicherheiten:</b> Verhalten dominiert die reale Exposition (KWRA-Aussage) — v_verhalten ist als ±-Band
+  auszuweisen; Latenz macht die Jahres-Attribution konzeptionell unscharf (transparent im Infokasten).</li>
+</ul>
+
+<h4>(d) Bewertung</h4>
+<p><span class="pro">+</span> jede Komponente amtlich/publiziert; lokale Differenzierung über SSD-Raster + Altersstruktur;
+DWD-Datenanbindung minimal-invasiv (ein weiteres CDC-Raster im vorhandenen Loader); Maßnahmen andockbar.<br>
+<span class="con">−</span> Verhaltens-Modulation bleibt weich; Latenz-Kommunikation nötig; k_UV (SSD→Dosis) ist ein
+Übersetzungsschritt mit eigener Unsicherheit. <b>Aufwand:</b> mittel.</p>
+</div>
+
+<div class="ansatz b">
+<h3>Ansatz 98-B — Reine Dosis-Wirkungs-Kette (BfS-Klimatologie)</h3>
+<p><b>Idee.</b> Statt vom Inzidenz-Trend auszugehen, wird die erythemwirksame Jahresdosis je Kommune direkt aus einer
+UV-Klimatologie bestimmt und die Inzidenzänderung vollständig über die BAF-Exponenten gerechnet (Δ-Dosis Szenario vs.
+Referenz → Δ-Inzidenz → €). Wissenschaftlich die sauberste Kette — aber datenseitig anspruchsvoller.</p>
+
+<h4>(a) Inputs</h4>
+<table>
+  <tr><th>Größe</th><th>Excel-Knoten</th><th>Datenquelle</th><th>Auflösung</th></tr>
+  <tr><td>Erythemwirksame Jahresdosis (Klimatologie + Szenario)</td><td>E20</td><td>BfS-Messnetz (Stationen, keine freie Rasterklimatologie) bzw. TEMIS/Copernicus-UV-Reanalyse — Beschaffung/Aufbereitung ist ein eigenes Datenprojekt; die Recherche fand <b>keine</b> unmittelbar einbindbare freie Rasterquelle [31,36]</td><td>Stationen / ~0,5°-Raster</td></tr>
+  <tr><td>BAF je Entität, Baseline-Inzidenz, Letalität, Kosten</td><td>—/K1</td><td>wie 98-A</td><td>national</td></tr>
+</table>
+
+<h4>(b) Verrechnung auf Zellebene</h4>
+<div class="math">$$ \Delta D_{\text{rel}} = \frac{ D_{\text{Szen}} - D_{\text{ref}} }{ D_{\text{ref}} }, \qquad \Delta\text{Fälle}_{e,\text{Zelle}} = \sum_a \text{pop}_a \cdot \frac{I_{e,a}}{100\,000} \cdot \text{BAF}_e \cdot \Delta D_{\text{rel}} $$</div>
+<p class="small">\(D\) = erythemwirksame Jahresdosis (kJ/m²) je Kommune/Region aus BfS-/Satelliten-Klimatologie;
+übrige Zeichen wie 98-A. Monetarisierung wie 98-A (K1). Verhalten hier bewusst <b>nicht</b> moduliert — reine
+Physik-Kette.</p>
+
+<h4>(c) Kalibrierung der Absolutwerte</h4>
+<ul>
+  <li>Anker identisch 98-A (ZfKD, Destatis); zusätzlich Validierung der Dosis-Klimatologie gegen BfS-Stationswerte.</li>
+  <li>Ohne Verhaltens-Term fehlt der von der KWRA benannte Hauptpfad („verhaltensbedingt steigende Exposition") —
+  die reine Physik-Dosis ändert sich deutlich schwächer als die effektive Personen-Dosis.</li>
+</ul>
+
+<h4>(d) Bewertung</h4>
+<p><span class="pro">+</span> methodisch strengste Kette; klare Szenario-Fähigkeit.<br>
+<span class="con">−</span> UV-Rasterbeschaffung (BfS-Stationsinterpolation oder Satelliten-Reanalyse) ist für M0 ein
+eigenes Datenprojekt; kleinräumige Differenzierung gering (UV variiert v.&nbsp;a. Nord–Süd ≈ 15–20&nbsp;%); ignoriert den
+KWRA-Verhaltenspfad. <b>Aufwand:</b> groß (Datenbeschaffung) — für Samstag kritisch.</p>
+</div>
+
+<div class="ansatz c">
+<h3>Ansatz 98-C — Nationaler Kostenanker, top-down</h3>
+<p><b>Idee.</b> Nationale Krankheitskosten Hautkrebs plus Mortalität × VSL bilden den Topf; ein normativ gesetzter
+klimaattribuierter Anteil wird über Sonnenschein-Index × Bevölkerung verteilt.</p>
+
+<h4>(a) Inputs</h4>
+<table>
+  <tr><th>Größe</th><th>Excel-Knoten</th><th>Datenquelle</th><th>Auflösung</th></tr>
+  <tr><td>Krankheitskosten C43/C44 + Sterbefälle × VSL</td><td>K1-Anker</td><td>Destatis-KKR 2023: 1.823&nbsp;Mio.&nbsp;€ + 4.501 Sterbefälle (ZfKD 2023) × VSL 4,7&nbsp;Mio.&nbsp;€ (§1.2) ⇒ Topf ≈ 23,0&nbsp;Mrd.&nbsp;€/Jahr [19,27,28]</td><td>national</td></tr>
+  <tr><td>a<sub>klima</sub> (klimaattribuierter Anteil)</td><td>E20</td><td>Band aus BAF × Dosis-Trend: (+1,2…4,9&nbsp;%/Dekade) × (0,6…2,5) ⇒ ≈ +1…12&nbsp;% Inzidenz je Dekade Klimatrend, entitätsgewichtet ≈ 2–5&nbsp;% als zentrale Setzung [29–32]</td><td>Literatur-Band</td></tr>
+  <tr><td>Verteilschlüssel</td><td>R35 + E20</td><td>pop × SSD-Index (fixe Grenzen)</td><td>1&nbsp;km</td></tr>
+</table>
+
+<h4>(b) Verrechnung auf Zellebene</h4>
+<div class="math">$$ \text{€}_{\text{nat}} = \bigl( \text{KK}_{\text{C43/C44}} + \text{Tote}_{\text{HK}} \cdot \text{VSL} \bigr) \cdot a_{\text{klima}}, \qquad \text{€}_{\text{Zelle}} = \text{€}_{\text{nat}} \cdot \frac{ \text{pop} \cdot \hat{S}_{\text{SSD}} }{ \sum_{\text{DE}} \text{pop} \cdot \hat{S}_{\text{SSD}} } $$</div>
+<p class="small">\(\text{KK}_{\text{C43/C44}}\) = 1,82&nbsp;Mrd.&nbsp;€ (2023 [28]); \(\text{Tote}_{\text{HK}}\) = 4.501 (ZfKD 2023 [27]);
+mit VSL 4,7&nbsp;Mio.&nbsp;€ ⇒ Topf ≈ 23,0&nbsp;Mrd.&nbsp;€/Jahr; \(a_{\text{klima}}\) normativ (≈ 2–5&nbsp;%, Herleitung s.
+Eingangstabelle); \(\hat{S}_{\text{SSD}}\) = normierter Sonnenschein-Index — Deutschland-Nenner nötig.</p>
+
+<h4>(c) Kalibrierung der Absolutwerte</h4>
+<ul><li>Amtlicher Topf per Konstruktion; die gesamte Klimaaussage steckt im normativen a<sub>klima</sub>.</li></ul>
+
+<h4>(d) Bewertung</h4>
+<p><span class="pro">+</span> in ~1 Tag umsetzbar; amtlicher Anker.<br>
+<span class="con">−</span> a_klima normativ (fachlich angreifbar); kaum lokale/kausale Tiefe; Deutschland-Nenner;
+Maßnahmen nicht mechanisch andockbar. <b>Aufwand:</b> klein.
+<b>Status nach Review 2: nach Grundsatz G1 (kein Verteilschlüssel) ausgeschieden.</b></p>
+</div>
+
+
+
+<div class="pagebreak"></div>
+<h2>5&nbsp;&nbsp;Empfehlungsmatrix und Entscheidung</h2>
+
+<p class="small">Bewertung nach den Kriterien aus §1.4 (●●● stark · ●● mittel · ● schwach). Hervorhebung = Empfehlung.</p>
+<table class="matrix">
+  <tr><th>Ansatz</th><th>K1 Kausale Treue</th><th>K2 Kalibrierbarkeit</th><th>K3 Lokale Differenzierung</th><th>K4 Daten M0</th><th>K5 Maßnahmen-Anschluss</th><th>K6 Architektur</th><th>Aufwand bis Sa.</th></tr>
+  <tr><td class="best">95-A RKI-ERF (Empfehlung)</td><td class="best">●●●</td><td class="best">●●●</td><td class="best">●●●</td><td class="best">●●● (implementiert)</td><td class="best">●●●</td><td class="best">●●●</td><td class="best">klein–mittel</td></tr>
+  <tr><td>95-B Nationaler Anker</td><td>●</td><td>●●●</td><td>●</td><td>●●</td><td>●</td><td>● (2. Indexmasse, DE-Nenner)</td><td>mittel</td></tr>
+  <tr><td>95-C Gradtage-Regression</td><td>●●</td><td>●●</td><td>●●</td><td>●●●</td><td>●●</td><td>●●●</td><td>mittel</td></tr>
+  <tr><td class="best">96-A Prävalenz × Saison (Empfehlung)</td><td class="best">●●●</td><td class="best">●●</td><td class="best">●●</td><td class="best">●●</td><td class="best">●●●</td><td class="best">●●●</td><td class="best">mittel</td></tr>
+  <tr><td>96-B Ambrosia-Szenario</td><td>●● (Teilausschnitt)</td><td>●●</td><td>●●</td><td>●●</td><td>● (Stadtbaum-Maßnahme greift nicht)</td><td>●●●</td><td>klein–mittel</td></tr>
+  <tr><td>96-C Kostenanker</td><td>●</td><td>●● (a_klima normativ)</td><td>●</td><td>●●●</td><td>●</td><td>●● (DE-Nenner)</td><td>klein</td></tr>
+  <tr><td class="best">98-A Inzidenz + BAF (Empfehlung)</td><td class="best">●●●</td><td class="best">●●●</td><td class="best">●●</td><td class="best">●●● (1 neues DWD-Raster)</td><td class="best">●●</td><td class="best">●●●</td><td class="best">mittel</td></tr>
+  <tr><td>98-B Reine Dosis-Kette</td><td>●● (ohne Verhaltenspfad)</td><td>●●●</td><td>●</td><td>● (UV-Raster-Beschaffung)</td><td>●●</td><td>●●●</td><td>groß</td></tr>
+  <tr><td>98-C Kostenanker</td><td>●</td><td>●●</td><td>●</td><td>●●●</td><td>●</td><td>●● (DE-Nenner)</td><td>klein</td></tr>
+</table>
+
+<div class="why">
+<p><b>Begründung der Empfehlungen.</b> <b>#95 → A:</b> Die publizierte RKI-Kurve ist bereits implementiert, empirisch kalibriert (Rev.&nbsp;5: regionale Faktoren 0,62–1,74 gegen die RKI-Bundesländer-Reihe, national 1,027) und über die Altersverteilung validiert — jeder andere Ansatz wäre ein
+Rückschritt hinter den erreichten Stand; offen ist nur die Morbiditäts-Rekalibrierung. <b>#96 → A:</b> Einziger Ansatz,
+der das Gesamtrisiko abdeckt <i>und</i> den klimaattribuierten Anteil mechanistisch (Saisonverlängerung ΔS/S statt
+normativem Prozentsatz) herleitet — exakt auf dem KWRA-Indikator GE-KL-07; beide M0-Maßnahmen docken an. B ist als
+<i>Ergänzungsmodul</i> für M1 interessant (Ambrosia-Zuschlag), nicht als Ersatz. <b>#98 → A:</b> Volle amtliche
+Verankerung (ZfKD-Inzidenz) bei minimaler neuer Datenanbindung (ein weiteres DWD-CDC-Raster im vorhandenen Loader);
+B scheitert für M0 an der UV-Rasterbeschaffung, C an der normativen Attribution.</p>
+<p class="small">In allen drei Fällen gilt: Jeder Koeffizient wird als editierbarer, quellenbelegter Registry-Parameter
+angelegt (Ratchet), die Bundessumme läuft gegen den jeweiligen amtlichen Sanity-Anker, und der Schicht-A-Screening-Index
+bleibt strikt von den €-Pfaden getrennt. <b>Nach Review 2 (Grundsatz G1) sind die Verteilschlüssel-Ansätze 95-B, 96-C
+und 98-C formal ausgeschieden</b> — es verbleiben je Risiko Ansatz A (empfohlen) sowie 95-C, 96-B und 98-B als
+dokumentierte Alternativen bzw. spätere Ergänzungsmodule (96-B: Ambrosia-Zuschlag ab M1).</p>
+</div>
+
+<div class="wahl">
+<b>Entscheidungsbogen</b> — bitte je Risiko einen Ansatz wählen (Abweichungen/Kombinationen gern mit Notiz):<br><br>
+<span class="box"></span> 95-A RKI-ERF &nbsp;&nbsp; <span class="box"></span> 95-B Nationaler Anker &nbsp;&nbsp; <span class="box"></span> 95-C Gradtage-Regression<br>
+<span class="box"></span> 96-A Prävalenz × Saison &nbsp;&nbsp; <span class="box"></span> 96-B Ambrosia-Szenario &nbsp;&nbsp; <span class="box"></span> 96-C Kostenanker<br>
+<span class="box"></span> 98-A Inzidenz + BAF &nbsp;&nbsp; <span class="box"></span> 98-B Reine Dosis-Kette &nbsp;&nbsp; <span class="box"></span> 98-C Kostenanker
+</div>
+
+
+
+<div class="pagebreak"></div>
+<h2>6&nbsp;&nbsp;Quellenverzeichnis</h2>
+<p class="small muted">Zugriff auf alle URLs: 17./18.08.2026. Bei Übernahme in die Produkt-Quellendatenbank (<code>sources.py</code>)
+erhält jede Quelle zusätzlich einen Wayback-Archiv-Permalink (Ratchet-Anforderung). Explizit offene Datenlücken sind in den
+Abschnitten markiert: Destatis-J30/J45-Beträge (nur interaktiv abrufbar), Tageskosten-Quelle allergischer Rhinitis,
+quantifizierte UV-Verhaltens-Mehrexposition, stadienabhängige Melanom-Fallkosten, freies UV-Dosis-Raster.</p>
+<ol class="refs">
+  <li>U. Langen, R. Schmitz, H. Steppuhn, „Häufigkeit allergischer Erkrankungen in Deutschland (DEGS1)", Bundesgesundheitsblatt 56(5–6):698–706, 2013. doi:10.1007/s00103-012-1652-7</li>
+  <li>R. Thamm u.&nbsp;a., „Allergische Erkrankungen bei Kindern und Jugendlichen in Deutschland (KiGGS Welle 2)", J Health Monit 3(3):3–18, 2018. doi:10.17886/RKI-GBE-2018-075</li>
+  <li>M. Haftenberger u.&nbsp;a., „Prävalenz von Sensibilisierungen gegen Inhalations- und Nahrungsmittelallergene (DEGS1)", Bundesgesundheitsblatt 56(5–6):687–697, 2013. doi:10.1007/s00103-012-1658-1</li>
+  <li>C. Endler (2020), Phänologie-Auswertung zit. n. KWRA 2021 Teilbericht 5, S.&nbsp;174 (Hasel/Erle bis 26 Tage früher 1961–2017; Birke/Gräser 1–1,5 Wochen 1991–2017); K. Kaminski, D. Glod (2010), NW-Deutschland 30 Tage (1988–2009), ebd. S.&nbsp;176</li>
+  <li>DWD, „Thema des Tages: Frühlingsbeginn — phänologische Uhr", 19.03.2023, dwd.de (Vorfrühling 3.&nbsp;März → 14.&nbsp;Februar; Vegetationsruhe 120 → 101 Tage, Normalperioden 1961–90 vs. 1991–2020); DWD Nationaler Klimareport, 6.&nbsp;Aufl. 2022</li>
+  <li>K.-C. Bergmann u.&nbsp;a., „Auswirkungen des Klimawandels auf allergische Erkrankungen in Deutschland", J Health Monit 8(S4):82–110, 2023 (RKI-Sachstandsbericht Klimawandel und Gesundheit). doi:10.25646/11648</li>
+  <li>B. Schramm u.&nbsp;a., „Cost of illness of atopic asthma and seasonal allergic rhinitis in Germany", Eur Respir J 21:116–122, 2003</li>
+  <li>T. Zuberbier u.&nbsp;a., „Economic burden of inadequate management of allergic diseases in the EU: a GA²LEN review", Allergy 69(10):1275–1279, 2014. doi:10.1111/all.12470</li>
+  <li>W. R. L. Anderegg u.&nbsp;a., „Anthropogenic climate change is worsening North American pollen seasons", PNAS 118(7):e2013284118, 2021. doi:10.1073/pnas.2013284118 (Saisonbeginn ≈ −20 Tage, Länge +8 Tage, Pollenintegral +20,9&nbsp;%; ≈ 50&nbsp;% [19–84&nbsp;%] des Saisontrends anthropogen)</li>
+  <li>C. Ziello u.&nbsp;a., „Changes to Airborne Pollen Counts across Europe", PLoS ONE 7(4):e34076, 2012. doi:10.1371/journal.pone.0034076</li>
+  <li>C. Winklmayr, S. Muthers, H. Niemann, H.-G. Mücke, M. an der Heiden, „Heat-related mortality in Germany from 1992 to 2021", Dtsch Arztebl Int 119:451–457, 2022. doi:10.3238/arztebl.m2022.0202</li>
+  <li>C. Winklmayr, M. an der Heiden, „Hitzebedingte Mortalität in Deutschland 2023 und 2024", Epid Bull 19/2025:3–9. doi:10.25646/13135 (revidierte Reihe 1992–2024 inkl. Bundesländer-Excel); RKI-Wochenberichte Hitzemortalität 2025/2026 (2025: ≈ 2.500; 2026 vorläufig ≈ 14.000 [12.500–15.300] bis KW&nbsp;32), rki.de</li>
+  <li>M. an der Heiden u.&nbsp;a., „Hitzebedingte Mortalität — Hitzewellen in Deutschland 1992–2017", Dtsch Arztebl Int 117:603–609, 2020. doi:10.3238/arztebl.2020.0603</li>
+  <li>M. an der Heiden u.&nbsp;a., „Schätzung hitzebedingter Todesfälle in Deutschland 2001–2015", Bundesgesundheitsblatt 62(5):571–579, 2019. doi:10.1007/s00103-019-02932-y; dies., Berlin/Hessen 2018, Epid Bull 23/2019:193–202. doi:10.25646/6178</li>
+  <li>Umweltbundesamt (Hrsg.), „Klimawirkungs- und Risikoanalyse 2021 für Deutschland", Teilbericht 5 (Cluster Wirtschaft &amp; Gesundheit), CC 26/2021, Kap. 4.2.1/4.2.2/4.2.4 (lokal: docs/KWAR/); Teilbericht 6 (Handlungserfordernisse)</li>
+  <li>Destatis, Pressemitteilungen zu hitzebedingten Krankenhausfällen ICD-T67: N035 (15.07.2024), Zahl der Woche 27 (01.07.2025), N045 (02.07.2026), destatis.de</li>
+  <li>Destatis, „Kostennachweis der Krankenhäuser 2023" (bereinigte Kosten je Behandlungsfall ≈ 6.996&nbsp;€), destatis.de</li>
+  <li>M. Karlsson, N. R. Ziebarth, „Population health effects and health-related costs of extreme temperatures: Comprehensive evidence from Germany", J Environ Econ Manage 91:93–117, 2018. doi:10.1016/j.jeem.2018.06.004 (frei: IZA DP 7875)</li>
+  <li>Umweltbundesamt (Eser/Matthey/Bünger), „Handbuch Umweltkosten — Methodenkonvention 4.0", Dez. 2025/Feb. 2026, Abschn.&nbsp;3.4 S.&nbsp;21–22 und Fn.&nbsp;17–19 (Anpassungsregel: VPI 2005→2024, Kaufkraftbereinigung EU27→DE über BIP/Kopf, Einkommensentwicklung mit Elastizität 0,85; kein eigener VOLY-Betrag); M. Amann u.&nbsp;a., „Support to the development of the Second Clean Air Outlook", Final Report, IIASA 2020a, Tab.&nbsp;3.15 S.&nbsp;39–40 (VOLY 79.500&nbsp;€₂₀₀₅, VSL 3,06&nbsp;Mio.&nbsp;€₂₀₀₅; Archiv: web.archive.org/web/2021id_/https://ec.europa.eu/environment/air/pdf/CAO2-MAIN-final-21Dec20.pdf); Destatis VPI lange Reihen (2005: 81,5; 2024: 119,3; 2020 = 100); Eurostat nama_10_pc (reales BIP/Kopf CLV20: 2005 35.770, 2024 43.110&nbsp;€; KKS 2005 DE 26.837 / EU27 22.106). VSL-Referenz 4,7&nbsp;Mio.&nbsp;€ (EU27+UK, Preisstand 2024): EUROCONTROL Standard Inputs, ansperformance.eu/economics/cba/standard-inputs (Zugriff 18./22.08.2026)</li>
+  <li>Destatis, Krankheitskostenrechnung (Berichtsjahre 2015/2020/2023; GENESIS-Tabellen 23631-0001/-0003; Gesamtkosten 2023: 491,6&nbsp;Mrd.&nbsp;€, PM 293 v. 08.08.2025); Altanker Asthma J45–J46 (2002): 1.837&nbsp;Mio.&nbsp;€ (WISTA 12/2004)</li>
+  <li>P. Wayne u.&nbsp;a., „Production of allergenic pollen by ragweed is increased in CO₂-enriched atmospheres", Ann Allergy Asthma Immunol 88:279–282, 2002</li>
+  <li>L. H. Ziska, F. A. Caulfield, „Rising CO₂ and pollen production of common ragweed", Aust J Plant Physiol 27:893–898, 2000</li>
+  <li>I. R. Lake u.&nbsp;a., „Climate Change and Future Pollen Allergy in Europe", Environ Health Perspect 125(3):385–391, 2017. doi:10.1289/EHP173 (Europa 33 → 77&nbsp;Mio. Sensibilisierte; 66&nbsp;% klimabedingt; DE: 0–10&nbsp;% → 15–25&nbsp;%)</li>
+  <li>L. Hamaoui-Laguel u.&nbsp;a., „Effects of climate change and seed dispersal on airborne ragweed pollen loads in Europe", Nat Clim Change 5:766–771, 2015. doi:10.1038/nclimate2652</li>
+  <li>W. Born, O. Gebhardt, J. Gmeiner, F. Ruëff, „Gesundheitskosten der Beifuß-Ambrosie in Deutschland", Umweltmed Forsch Prax 17(2):71–80, 2012 (193–1.190&nbsp;Mio.&nbsp;€/Jahr bei bundesweiter Etablierung)</li>
+  <li>I. Lake, F. Colon, N. Jones, „Quantifying the health effects of climate change upon pollen allergy", Lancet Planet Health 2:S16, 2018 (Konferenz-Abstract — nur als Bandobergrenze)</li>
+  <li>Zentrum für Krebsregisterdaten (ZfKD)/GEKID, „Krebs in Deutschland für 2021–2023" (KID 2025), Kapitel C43/C44, krebsdaten.de; Entitäten-Split 2015 nach S. Baldermann, C. Lorenz (BfS), Bundesgesundheitsblatt 62:639–645, 2019</li>
+  <li>Destatis, Krankheitskostenrechnung C43–C44: 2023: 1.823&nbsp;Mio.&nbsp;€, 2020: 1.492&nbsp;Mio.&nbsp;€ (GENESIS 23631-0003; 2015: ≈ 692&nbsp;Mio.&nbsp;€ zit. n. Baldermann &amp; Weiskopf 2020 — Methodenrevision beachten); Destatis PM N036 (28.05.2026): stationäre Hautkrebsfälle 2004–2024 +94,5&nbsp;%, Sterbefälle 2024: 4.600</li>
+  <li>H. Slaper, G. J. M. Velders, J. S. Daniel, F. R. de Gruijl, J. C. van der Leun, „Estimates of ozone depletion and skin cancer incidence to examine the Vienna Convention achievements", Nature 384:256–258, 1996. doi:10.1038/384256a0; Parameterwerte (BAF SCC 2,5&nbsp;±&nbsp;0,7 · BCC 1,4&nbsp;±&nbsp;0,4 · CM 0,6&nbsp;±&nbsp;0,4) dokumentiert in RIVM Letter Report 2023-0426, S.&nbsp;21&nbsp;f.</li>
+  <li>S. Madronich u.&nbsp;a., „Estimation of Skin and Ocular Damage Avoided in the United States through Implementation of the Montreal Protocol", ACS Earth Space Chem 5(8):1876–1888, 2021. doi:10.1021/acsearthspacechem.1c00183</li>
+  <li>S. Lorenz u.&nbsp;a., „Increasing solar UV radiation in Dortmund, Germany", Photochem Photobiol Sci 23(12):2173–2199, 2024. doi:10.1007/s43630-024-00658-8 (erythemwirksame Tagesdosis +4,9&nbsp;%/Dekade 1997–2022); BfS-PM 017/2024</li>
+  <li>R. Vitt u.&nbsp;a. (2020): UV-Index satellitengestützt +1,2–3,6&nbsp;%/Dekade (zit. n. KWRA TB5); K. Eleftheratos u.&nbsp;a. (2020): UV-B-Projektion +1,3&nbsp;%/Dekade 2050–2100 durch Wolkenrückgang (zit. n. KWRA TB5)</li>
+  <li>DWD Climate Data Center, Gebietsmittel Sonnenscheindauer Deutschland (regional_averages_sd_year.txt, Abruf 18.08.2026): Normalperioden 1.544&nbsp;h (1961–90) → 1.665&nbsp;h (1991–2020); Trendrechnung 1951–2025 ≈ +25&nbsp;h/Dekade (eigene Regression, gekennzeichnet)</li>
+  <li>C. Speckemeier u.&nbsp;a., „One-year follow-up healthcare costs of patients diagnosed with skin cancer in Germany", BMC Health Serv Res 22, 2022. doi:10.1186/s12913-022-08141-9 (Erstjahreskosten Melanom ≈ 9.038&nbsp;€, NMSC ≈ 5.890&nbsp;€)</li>
+  <li>Leitlinienprogramm Onkologie, „S3-Leitlinie Prävention von Hautkrebs", Version 2.1, Sept. 2021 (Latenz „Jahrzehnte"; NMSC-Inzidenz ×4–5 in 30 Jahren)</li>
+  <li>BfS, PM 005/2022 „Klimakrise: UV-Schutz wird immer wichtiger"; S. Baldermann, C. Lorenz, Bundesgesundheitsblatt 62:639–645, 2019 (Verhaltenskomponente; keine quantifizierte Mehr-Exposition je Komforttag publiziert)</li>
+  <li>Präventions-Evidenz: S. T. Shih u.&nbsp;a. (2009/2017, Prev Med), C. M. Doran u.&nbsp;a. (2016, PLOS ONE), L. G. Collins u.&nbsp;a. (2024, Health Promot Int): Benefit-Cost-Verhältnisse 2,2–8,7&nbsp;:&nbsp;1 für UV-Präventionsprogramme (AUS/USA/EU); Baldermann &amp; Weiskopf 2020: keine deutsche Kosten-Nutzen-Studie</li>
+  <li>J. Nicholl u.&nbsp;a., „The relationship between distance to hospital and patient mortality in emergencies", Emerg Med J 24:665–668, 2007 (+≈&nbsp;1&nbsp;% Mortalität je +10&nbsp;km bei lebensbedrohlichen Notfällen)</li>
+  <li>M. P. Larsen u.&nbsp;a., Ann Emerg Med 22:1652–1658, 1993; T. D. Valenzuela u.&nbsp;a. 1997 (Überleben bei Kreislaufstillstand sinkt ≈ 7–10&nbsp;% je Minute ohne Hilfe — Stütze für den Hilfsfrist-Pfad)</li>
+  <li>J. C. Semenza u.&nbsp;a., „Heat-related deaths during the July 1995 heat wave in Chicago", N Engl J Med 335:84–90, 1996 (Risikofaktoren: allein lebend, Wohnung nicht verlassend; OR ≈ 2,3)</li>
+  <li>A. Bouchama u.&nbsp;a., „Prognostic factors in heat wave-related deaths: a meta-analysis", Arch Intern Med 167(20):2170–2176, 2007 (Klimaanlage OR 0,23 · kühle Orte 0,34 · verstärkter sozialer Kontakt 0,40 · Bettlägerigkeit 6,44)</li>
+  <li>A. Fouillet u.&nbsp;a., „Has the impact of heat waves on mortality changed in France since the European heat wave of summer 2003?", Int J Epidemiol 37:309–317, 2008 (Frankreich 2006: ≈ 4.400 weniger Todesfälle als erwartet — Wirkung von Warnsystem/Aktionsplan)</li>
+  <li>J. Schmitt u.&nbsp;a., „Occupational ultraviolet light exposure increases the risk of the development of cutaneous squamous cell carcinoma", Br J Dermatol 164:291–307, 2011 (Meta-Analyse: OR ≈ 1,77 für SCC bei Außenbeschäftigung; Grundlage BK&nbsp;5103)</li>
+  <li>J. Klenk, C. Becker, K. Rapp, „Heat-related mortality in residents of nursing homes", Age and Ageing 39(2):245–251, 2010 (95.808 Pflegeheimbewohner Südwestdeutschland 2001–2005; +26&nbsp;% / +62&nbsp;% Mortalität bei 32–33,9 / ≥&nbsp;34&nbsp;°C, Exzess konzentriert bei hohem Pflegebedarf)</li>
+  <li>Difference-in-Differences-Studie zu Hitzewarnsystemen in 15 deutschen Städten, Environment International, 2025 (gepoolt RR 1,00 [0,98–1,01]; nach Kontrolle städtischer Merkmale RR 0,85 [0,75–0,97]) — ⚠ über Suchergebnisse identifiziert, vor Übernahme im Volltext zu verifizieren</li>
+  <li>Case-Crossover-Studie zu Klimaanlagen in Pflegeheimen (Ontario), 73.578 Todesfälle 2010–2023 (relativer OR ≈ 0,93 an Extremhitzetagen) — ⚠ über Suchergebnisse identifiziert, vor Übernahme im Volltext zu verifizieren</li>
+  <li>„The effectiveness of heat prevention plans in reducing heat-related mortality across Europe", Environ. Res. Lett., 2025 (102 Standorte, 14 Länder, 1990–2019; 2–23&nbsp;% vermiedene Todesfälle, sehr heterogen) — ⚠ über Suchergebnisse identifiziert, vor Übernahme im Volltext zu verifizieren</li>
+</ol>
+<p class="small muted">Die in [38–43] genannten Effektgrößen werden bei der Implementierung gegen die Primärquellen
+verifiziert und mit Wayback-Permalink in die Produkt-Quellendatenbank übernommen (Ratchet-Anforderung).</p>
+<ol class="refs" start="48">
+  <li>Destatis, Statistischer Bericht „Sterbetafeln 2022/2024" (Juli 2025), Blätter 12613-b01/-b02, fernere Lebenserwartung \(e_x\) nach Altersjahren, männlich/weiblich; Bevölkerungsgewichte: Fortschreibung 31.12.2023 (regionalstatistik.de 12411-09-01-4-B, Basis Zensus 2022)</li>
+  <li>Destatis, Statistischer Bericht „Sterbefälle 2023", Tab.&nbsp;12613-03 „Gestorbene nach Altersgruppen und Ländern" (Deutschland, M+F = 1.028.206) ÷ Bevölkerung 31.12.2023 (Summe 83.456.045)</li>
+  <li>Kalibrierlauf: <code>backend/scripts/kalibrierung/calibrate_heat_mortality.py</code> mit Daten in <code>backend/data/kalibrierung/</code> — RKI Anhang 1 zu Epid Bull 19/2025 (Deutschland + Bundesländer 1992–2024, CC BY 4.0, edoc.rki.de/handle/176904/12682); DWD-Gebietsmittel Jun–Aug (regional_averages_tm_06/07/08.txt); DWD-Tageswerte 21 Stationen (wochenquantile_region.csv); Bevölkerung 31.12.2023 je Land und Altersband; Ergebnisdateien c_kal_ergebnis_*.md, bundesland_validierung_*.csv</li>
+  <li>O. Pfaar, K.-C. Bergmann u.&nbsp;a., „Defining pollen exposure times for clinical trials of allergen immunotherapy — an EAACI position paper", Allergy 72:713–722, 2017. doi:10.1111/all.13092 (Saisonkriterien Birke/Gräser)</li>
+  <li>O. Pfaar u.&nbsp;a., „Pollen season is reflected on symptom load for grass and birch pollen-induced allergic rhinitis", Allergy 75:1099, 2020. doi:10.1111/all.14111 (Tab.&nbsp;1, S4: Pollen-Symptom-Korrelationen)</li>
+  <li>K. Bastl, U. Berger, M. Kmenta, „Translating the Burden of Pollen Allergy Into Numbers", J Med Internet Res 22(2):e16767, 2020 (Symptom-Last-Index Deutschland, Tab.&nbsp;2); M. Werchan u.&nbsp;a., „Deutscher Pollenflugkalender 4.0", Allergo J Int 27:69–71, 2018 (Volltext paywalled)</li>
+  <li>B. Werchan u.&nbsp;a., „Spatial distribution of allergenic pollen through a large metropolitan area", Environ Monit Assess 189:169, 2017 (Berlin, 14 Fallen: Birke +245&nbsp;%, Gräser +306&nbsp;% zwischen Extremstandorten)</li>
+  <li>B. Werchan u.&nbsp;a., „Spatial distribution of pollen-induced symptoms within a large metropolitan area — Berlin", Aerobiologia 34:539, 2018</li>
+  <li>P. Bogawski u.&nbsp;a., „Lidar-Derived Tree Crown Parameters … Local Birch Pollen Concentrations", Forests 10:1154, 2019. doi:10.3390/f10121154</li>
+  <li>J. Graff Zivin, M. Neidell, „Temperature and the Allocation of Time", J Labor Econ 32(1):1–26, 2014 (ATUS; Outdoor-Freizeit vs. Temperatur)</li>
+  <li>„Intraday adaptation to extreme temperatures in outdoor activity", Sci Rep 2023 (PMC9832153: −5&nbsp;% &gt; 30&nbsp;°C, −13&nbsp;% &gt; 35&nbsp;°C); US-Dosimeterkohorte Radiologic Technologists (PMC3566166: −3,1&nbsp;% Dosis je Zoll Regen, Temperatur n.&nbsp;s.)</li>
+  <li>J. Sun u.&nbsp;a., „Weekend personal UVR exposure in four cities in Australia", J Photochem Photobiol B 2014 (Kleidung vs. Tmax, Richtung); A. W. Schmalwieser u.&nbsp;a., Br J Dermatol 2021, doi:10.1111/bjd.20703 (Zeit im Freien erklärt persönliche Dosis mit R² 0,75–0,79)</li>
+  <li>A. Fouillet u.&nbsp;a., „Excess mortality related to the August 2003 heat wave in France", Int Arch Occup Environ Health 80:16–24, 2006, Tab.&nbsp;2 (beobachtete/erwartete Sterbefälle nach Sterbeort: Pflegeheime 1,9 [1,7–2,1], Wohnung 1,7 (≥ 75: 1,9), Kliniken 1,5; Altersgradient des Exzesses)</li>
+  <li>Destatis, Pflegestatistik 2023 (GENESIS 22421-0001; PM 478/2024: 0,80&nbsp;Mio. vollstationär; Altersgruppen 85–&lt;90: 218,7 Tsd., 90–&lt;95: 142,6 Tsd., ≥ 95: 63,0 Tsd.); WIdO-Pflegereport (Sterberate Heimbewohner ≈ 0,6–0,7&nbsp;% je Woche)</li>
+  <li>M. Karlsson, N. R. Ziebarth, IZA Discussion Paper 7875 (frei: docs.iza.org/dp7875.pdf), Tab.&nbsp;1 (Hitzetag: +3,106 Einweisungen/100.000/Tag = +5,4&nbsp;%; konditional +1,408 = +2,4&nbsp;%; Mortalität +9,8&nbsp;%), Tab.&nbsp;3 (Diagnosegruppen: Herz-Kreislauf 11,9&nbsp;%, Atemwege 6,7&nbsp;%, Stoffwechsel 6,8&nbsp;% des Einweisungs-Exzesses), Fig.&nbsp;9 und S.&nbsp;34&nbsp;f. (Altersmuster), App.&nbsp;A (Top-Kodierung &gt; 75)</li>
+</ol>
+
+
+
+<p class="foot">KAP2 · Methodik-Bericht M0 · Stand 18.08.2026 · Eingangsgrößen strikt nach
+<code>docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx</code> (Sheets „Klimawirkungsketten",
+„Schadensbaum-Netzwerkliste") und <code>docs/Schadensbaum/KWRA-Monetarisierung.xlsx</code> (K1, R1–R11) ·
+KWRA-Werte aus <code>docs/KWAR/</code> (Teilberichte 1–6, Klimawirkungen-Arbeitsmappe) · Produktarchitektur nach
+<code>docs/BERECHNUNGS_HANDBUCH.md</code>. Alle Zahlenwerte sind per Web-Recherche vom 17./18.08.2026 quellenbelegt
+(Kap.&nbsp;6); verbleibende Datenlücken sind ausdrücklich als solche markiert und werden vor der jeweiligen
+Implementierung geschlossen.</p>
+
+</body>
+</html>

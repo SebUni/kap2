@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { FEATURES } from '../config/features'
 
 const NAV_ITEMS = [
   { label: 'Das ist KAP2', to: '/' },
-  { label: 'Demo', to: '/demo' },
-  { label: 'Deutschland-Karte', to: '/deutschland' },
+  ...(FEATURES.demo ? [{ label: 'Demo', to: '/demo' }] : []),
+  ...(FEATURES.deutschlandKarte ? [{ label: 'Deutschland-Karte', to: '/deutschland' }] : []),
+  ...(FEATURES.roadmap ? [{ label: 'Roadmap', to: '/roadmap' }] : []),
 ]
 
 /**
