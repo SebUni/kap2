@@ -462,6 +462,12 @@ def assemble(payload: dict, out_path: Path) -> None:
         f'<script type="module">\n{js}\n</script>\n</body>')
     out_path.write_text(page, encoding="utf-8")
     print(f"Wirkungsmechanismus-Vorschau erzeugt: {out_path}")
+    # Snap-/Flatpak-Browser dürfen nicht auf /opt zugreifen — falls der Nutzer
+    # ~/kap2-vorschau angelegt hat, dort eine Kopie aktuell halten.
+    mirror = Path.home() / "kap2-vorschau"
+    if mirror.is_dir():
+        (mirror / out_path.name).write_text(page, encoding="utf-8")
+        print(f"  Kopie für den Browser: {mirror / out_path.name}")
 
 
 def main() -> None:
