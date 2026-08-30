@@ -6,13 +6,12 @@ Erzeugt je Risiko eine eigenständige HTML-Datei neben dem Methodik-PDF
 Produkt-Wirkungsdiagramm rendert (Frontend-Komponente LineageFlowDiagram,
 gebaut als Standalone-Bundle via `frontend/vite.preview.config.ts`).
 
-- #95 (Hitze): bereits integriert — die Graphen kommen 1:1 aus dem Backend
-  (`lineage_graph.build_risk_lineage`), Parameter aus der Registry. Die
-  Vorschau zeigt exakt den Produktstand.
-- #96/#98: noch nicht integriert — die Graphen bilden das im Methodik-Bericht
-  hergeleitete Schicht-B-Modell (Rev.-Stand) im Produkt-Schema ab
-  (LineageBuilder + dieselbe Finalisierung wie das Produkt). Banner
-  kennzeichnet die Vorschau als geplanten Stand.
+Die Vorschau speist sich aus der NEU AUSGEARBEITETEN METHODIK: Haupt-Tab ist
+immer das Ziel-Modell laut Methodik-Bericht (LineageBuilder + dieselbe
+Finalisierung wie das Produkt) — sie zeigt, was künftig implementiert wird.
+Ist das Risiko bereits (teilweise) im Produkt, kommen zusätzlich
+Vergleichstabs mit dem Ist-Stand aus Backend/Registry dazu (Divergenzen sind
+Ledger-Befunde, #95: Befund 76).
 
 Aufruf: scripts/wirkungsmechanismus_preview.py <risiko-nr>
 Wird von scripts/export_methodik_pdf.sh nach dem PDF-Export aufgerufen.
@@ -350,33 +349,212 @@ def _graph_98() -> tuple[dict, list[dict]]:
     return _prune_lineage(b.build()), params
 
 
+
+# ── #95 Hitzebelastung (Ziel-Modell laut Bericht Rev. 6) ─────────────────────
+
+def _graph_95_plan() -> tuple[dict, list[dict]]:
+    b = LineageBuilder()
+    params: list[dict] = []
+
+    def P(pid, label, value, unit, source, target, note=""):
+        _param(b, pid, label, value, unit, source, target, note)
+        params.append(_mp(pid, label, value, unit, source))
+
+    # Schicht A (zusammengefasst)
+    b.add_node("ind:HEAT", "hazard", "Hitzewellen (HEAT_WAVE)", column=2,
+               collapse_group="indicators")
+    b.add_node("ind:POP", "exposure", "Bevölkerungsdichte / Altersstruktur",
+               column=2, collapse_group="indicators")
+    b.add_node("ind:VULN", "vulnerability", "Hitzesensitivität / Versorgungszugang",
+               column=2, collapse_group="indicators")
+    for sid, desc, prov in (("src:dwd", "DWD-CDC Klimaraster (Sommertemperatur, hot_days) "
+                             "+ Tages-/Phänologie-Stationsdaten", "dwd"),
+                            ("src:zensus", "Zensus 2022, 100-m-Gitter (Altersbänder, "
+                             "Haushaltsgitter)", "zensus"),
+                            ("src:osm", "OpenStreetMap (Stadtmodell/UHI, "
+                             "Pflegeeinrichtungen)", "osm")):
+        b.add_node(sid, "source", {"src:dwd": "DWD", "src:zensus": "Zensus",
+                                   "src:osm": "OSM"}[sid], column=0,
+                   collapse_group="sources", meta={"description": desc, "prov": prov})
+    b.add_edge("src:dwd", "ind:HEAT")
+    b.add_edge("src:zensus", "ind:POP")
+    mul_path = _op(b, "op:mul:path", "multiply", "×",
+                   "Wirkungskette Schicht A (Worst-Pathway, Bericht §3.7) — "
+                   "nie auf €-Pfaden.")
+    b.add_node("pathway:0", "pathway",
+               "Hitzewellen treffen ältere, alleinlebende Bevölkerung",
+               column=3, collapse_group="pathways",
+               meta={"chain_label": "HEAT_WAVE × Bevölkerung/Alter × Sensitivität"})
+    for nid in ("ind:HEAT", "ind:POP", "ind:VULN"):
+        b.add_edge(nid, mul_path)
+    b.add_edge(mul_path, "pathway:0")
+    b.add_node("out:index", "outcome", "KWRA-Index", column=4,
+               collapse_group="outcome",
+               meta={"result_kind": "index", "unit": "0–100", "is_outcome": True})
+    b.add_edge("pathway:0", "out:index")
+
+    # Schicht B — Temperaturpfad
+    b.add_node("int:t_zelle", "intermediate", "Zell-Sommertemperatur (DWD + UHI)",
+               column=1, collapse_group="intermediates",
+               meta={"unit": "°C",
+                     "note": "DWD 1 km + mittelwerttreuer UHI-Zuschlag + Höhenkorrektur "
+                             "(Bericht §3.1); Grünanteil steckt genau hier — kein "
+                             "Doppelkanal."})
+    b.add_edge("src:dwd", "int:t_zelle")
+    b.add_edge("src:osm", "int:t_zelle")
+    mul_tw = _op(b, "op:add:tw", "compute", "T_w",
+                 "13 Sommerwochen aus empirischen intra-saisonalen Quantilen "
+                 "(21 DWD-Stationen, 1991–2020; ersetzt die frühere Gauß-Setzung).\n"
+                 r"$$T_w = \bar T_{Zelle} + q_{w,Region},\quad w = 1\dots13$$")
+    b.add_edge("int:t_zelle", mul_tw)
+    P("heat.q_wochenquantile", "Wochenquantile q_w (Region)",
+      "CSV (N/M/S × 13)", "K", "eigene DWD-Auswertung (wochenquantile_region.csv)",
+      mul_tw, "Bericht §3.2; σ_intra 2,36–2,58 K gemessen.")
+    b.add_node("int:t_w", "intermediate", "Wochentemperaturen T_w",
+               column=2, collapse_group="intermediates", meta={"unit": "°C"})
+    b.add_edge(mul_tw, "int:t_w")
+
+    mul_ex = _op(b, "op:exp:exzess", "compute", "RR−1",
+                 "Wochen-Exzess der RKI-Expositions-Wirkungs-Funktion je Altersband.\n"
+                 r"$$\sum_{w=1}^{13}\bigl(e^{\beta_a (T_w - T_{0,Region})_+} - 1\bigr)$$")
+    b.add_edge("int:t_w", mul_ex)
+    P("heat.t0_region", "Wirkschwelle T₀ (N/M/S)", "19,7 / 20,2 / 20,8", "°C",
+      "Winklmayr 2022", mul_ex)
+    P("heat.beta_85plus_region", "ERF-Steigung β₈₅₊ (N/M/S)",
+      "0,0634 / 0,0625 / 0,0531", "1/K", "Winklmayr 2022 (Ablesekette §3.3)", mul_ex)
+    P("heat.f_alter", "Altersfaktoren f_a", "0,357 / 0,588 / 0,631 / 1,0", "—",
+      "Rückrechnung Rev. 6 (§3.3a — ersetzt 0,404/0,577/0,62)", mul_ex)
+    b.add_node("int:exzess", "intermediate", "Hitze-Exzess je Band (Jahressumme)",
+               column=3, collapse_group="intermediates")
+    b.add_edge(mul_ex, "int:exzess")
+
+    # Bevölkerung + Basissterblichkeit + Modifikator
+    b.add_node("int:pop_bands", "intermediate", "Bevölkerung je Altersband",
+               column=1, collapse_group="intermediates")
+    b.add_edge("src:zensus", "int:pop_bands")
+    mul_vv = _op(b, "op:mul:vvers", "multiply", "×",
+                 "Bandweiser Versorgungs-/Isolations-Modifikator "
+                 "(mittelwertzentriert, kalibrierneutral).\n"
+                 r"$$v_{vers,a} = [1 + \mathbb{1}_{a\ge 65}\,\beta_{iso}(q_{1P}-\bar q)]\,"
+                 r"[1 + \mathbb{1}_{85+}\,\beta_{pfl}(q_{pfl}-\bar q_{pfl})]$$")
+    b.add_edge("src:zensus", mul_vv)
+    b.add_edge("src:osm", mul_vv)
+    P("heat.beta_iso", "Isolations-Effekt β_iso (65+)", 0.90, "—",
+      "Semenza 1996 / Mikrozensus 2023 (q̄ 0,346)", mul_vv, "nur D-Pfad (Log 28).")
+    P("heat.beta_pfl", "Pflegeheim-Effekt β_pfl (85+)", 1.54, "—",
+      "Fouillet/Bouchama/Klenk (Kette §3.3b; q̄ 0,149)", mul_vv, "nur D-Pfad.")
+    b.add_node("int:v_vers", "intermediate", "Modifikator v_vers (bandweise)",
+               column=2, collapse_group="intermediates")
+    b.add_edge(mul_vv, "int:v_vers")
+
+    mul_d = _op(b, "op:mul:d", "multiply", "×",
+                "Hitzebedingte Todesfälle je Band (Teil-Ausweis).\n"
+                r"$$D_a = c_{kal}\,v_{vers,a}\,\mathrm{pop}_a\,\frac{m_a}{10^5}\,"
+                r"\frac{1}{52}\sum_w (e^{\beta_a\Delta_+}-1)$$")
+    for nid in ("int:exzess", "int:pop_bands", "int:v_vers"):
+        b.add_edge(nid, mul_d)
+    P("heat.m_basissterberate", "Basissterberaten m_a",
+      "213,2 / 1.737,9 / 4.812,3 / 14.800,2", "1/100.000·a",
+      "Destatis 2023 (ersetzt 180/1.800/4.600/15.500)", mul_d)
+    P("heat.c_kal", "Kalibrierfaktor c_kal", 0.742, "—",
+      "RKI-Reihe, Fenster 2012–2024 × Befund-1-Korrektur (ersetzt 1,44)", mul_d,
+      "Ein nationaler Skalar (Band 0,70–0,79); c_reg nur befristeter "
+      "Übergangs-Ausweis (Bericht §4).")
+    b.add_node("int:d_faelle", "intermediate", "Hitzebedingte Todesfälle D (Teil-Ausweis)",
+               column=4, collapse_group="intermediates",
+               meta={"unit": "1/Jahr"})
+    b.add_edge(mul_d, "int:d_faelle")
+
+    mul_yll = _op(b, "op:mul:yll", "multiply", "×",
+                  "Mortalitätsbewertung nach MK 4.0/P52: YLL statt Todesfall-Pauschale.\n"
+                  r"$$\mathrm{YLL}_z = \sum_a D_a \cdot \bar L_a$$")
+    b.add_edge("int:d_faelle", mul_yll)
+    P("heat.l_restlebenserwartung", "Restlebenserwartung L̄_a",
+      "23,39 / 15,59 / 8,90 / 5,44", "Jahre", "Sterbetafel 2022/2024 (§3.5)", mul_yll)
+    b.add_node("out:native", "outcome", "Verlorene Lebensjahre (YLL)",
+               column=5, collapse_group="outcome",
+               meta={"result_kind": "native", "unit": "Jahre/Jahr", "is_outcome": True,
+                     "note": "Native Ergebnisgröße laut Bericht (Log 3); Rate: YLL je "
+                             "1.000 EW·Jahr."})
+    b.add_edge(mul_yll, "out:native")
+
+    # Morbidität (F-Pfad)
+    b.add_node("int:hd", "intermediate", "Hitzetage HD (DWD hot_days)",
+               column=1, collapse_group="intermediates",
+               meta={"unit": "Tage/Jahr", "note": "ohne UHI-Verschiebung (Bericht §3.4)."})
+    b.add_edge("src:dwd", "int:hd")
+    mul_f = _op(b, "op:mul:f", "multiply", "×",
+                "Hitzeassoziierte Erkrankungsfälle (zweiseitig linear, bei 0 gedeckelt).\n"
+                r"$$F_z = \sum_a \mathrm{pop}_a\,\frac{r_{0,a}}{10^5}\,"
+                r"\max(0,\,1 + e_{HD}(\mathrm{HD}-\mathrm{HD}_{ref}))$$")
+    b.add_edge("int:hd", mul_f)
+    b.add_edge("int:pop_bands", mul_f)
+    P("heat.r0_einweisungsrate", "Baseline-Einweisungsraten r₀,a",
+      "1,9 / 6,3 / 10,8 / 15,6", "1/100.000·a", "Destatis T67 + K&Z (§3.4)", mul_f)
+    P("heat.e_hd", "Effekt je Hitzetag e_HD", 0.024, "1/Tag",
+      "Karlsson & Ziebarth (konditional; Band bis 0,061)", mul_f)
+    P("heat.hd_ref", "Referenz-Hitzetage HD_ref", 7.2, "Tage/Jahr",
+      "K&Z-Basisperiode 1999–2008", mul_f)
+    b.add_node("int:f_faelle", "intermediate", "Erkrankungsfälle F (Teil-Ausweis)",
+               column=4, collapse_group="intermediates", meta={"unit": "1/Jahr"})
+    b.add_edge(mul_f, "int:f_faelle")
+
+    # €
+    cost = _op(b, "op:cost", "cost_rate", "Kostensatz",
+               "Monetarisierung K1 (Ursache Hitze).\n"
+               r"$$€_z = \mathrm{YLL}_z \cdot \mathrm{VOLY} + F_z \cdot c_{Fall}$$")
+    b.add_edge("out:native", cost)
+    b.add_edge("int:f_faelle", cost)
+    P("heat.voly", "VOLY", 160800, "€₂₀₂₄/Jahr",
+      "UBA MK 4.0 / Amann 2020a (P52; VSL nur Sensitivität)", cost)
+    P("heat.c_fall", "Behandlungskosten je Fall", 7152, "€₂₀₂₄",
+      "Destatis Kostennachweis (Proxy)", cost)
+    b.add_node("out:eur", "outcome", "Bewerteter Schaden — Konto K1 (Hitze)",
+               column=6, collapse_group="outcome",
+               meta={"result_kind": "eur", "unit": "€/Jahr", "is_outcome": True,
+                     "note": "Untergrenze (nur K1); Infokästen/Raten laut Bericht §6."})
+    b.add_edge(cost, "out:eur")
+
+    return _prune_lineage(b.build()), params
+
+
 # ── Payloads je Risiko ────────────────────────────────────────────────────────
 
 def build_payload(nr: str) -> dict:
     today = datetime.date.today().strftime("%d.%m.%Y")
     if nr == "95":
         from app.data import catalog
+        g, p = _graph_95_plan()
+        tabs = [{
+            "label": "Ziel-Modell (Bericht Rev. 6): YLL & €",
+            "note": "So wird #95 nach /integriere-risiko 95 im Produkt gerechnet und "
+                    "dargestellt (YLL × VOLY, empirische Wochenquantile, c_kal 0,742, "
+                    "neue Altersketten).",
+            "lineage": g, "parameters": p,
+        }]
         params = parameter_registry.catalog_parameters()
-        tabs = []
         for code, label in (
-                ("EXPECTED_ANNUAL_MORTALITY", "Mortalität (Produktstand: Todesfälle/Jahr)"),
-                ("EXPECTED_ANNUAL_MORBIDITY", "Erkrankungen")):
+                ("EXPECTED_ANNUAL_MORTALITY",
+                 "Vergleich: Ist-Produktstand Mortalität (Befund 76)"),
+                ("EXPECTED_ANNUAL_MORBIDITY",
+                 "Vergleich: Ist-Produktstand Erkrankungen")):
             if code in catalog.RISKS_BY_CODE:
                 tabs.append({
                     "label": label,
+                    "note": "Ist-Stand aus Backend-Registry/Lineage-Builder — läuft noch "
+                            "auf dem Vor-Rev.-6-Modell (Ledger-Befund 76).",
                     "lineage": lineage_graph.build_risk_lineage(code),
                     "parameters": params,
                 })
         return {
             "title": "#95 Hitzebelastung",
-            "subtitle": "Ist-Produktstand — Graphen und Parameter kommen direkt aus "
-                        "Backend-Registry und Lineage-Builder.",
-            "banner": "Achtung, dokumentierte Divergenz (Ledger-Befund 76): Das Produkt "
-                      "rechnet noch den Vor-Rev.-6-Stand — native Größe Todesfälle/Jahr "
-                      "statt YLL × VOLY, Rev.-5-Altersfaktoren, Gauß-Verteilung statt "
-                      "empirischer Wochenquantile, Kalibrierfaktor 1,44 statt 0,742. "
-                      "/integriere-risiko 95 stellt auf den abgenommenen Bericht Rev. 6 "
-                      "um und schließt den Befund.",
+            "subtitle": "Ziel-Modell laut Methodik-Bericht Rev. 6 "
+                        "(docs/methodik/95_hitzebelastung.md); Ist-Produktstand als "
+                        "Vergleichstabs.",
+            "banner": "Der erste Tab zeigt das künftige Modell aus dem abgenommenen "
+                      "Bericht Rev. 6. Das Produkt rechnet bis zur Integration noch den "
+                      "alten Stand (Vergleichstabs; dokumentiert als Ledger-Befund 76) — "
+                      "/integriere-risiko 95 gleicht beides ab und schließt den Befund.",
             "generated": today,
             "tabs": tabs,
         }

@@ -14,8 +14,12 @@ Pipeline: pandoc (Markdown → HTML, KaTeX aus `frontend/node_modules`) → Play
 Das Skript erzeugt anschließend automatisch die **Wirkungsmechanismus-Vorschau**
 `docs/methodik/<slug>_wirkungsmechanismus.html` (`scripts/wirkungsmechanismus_preview.py`):
 eine eigenständige HTML-Datei, die das echte Produkt-Wirkungsdiagramm (KAP3,
-`LineageFlowDiagram`) rendert — für integrierte Risiken direkt aus Backend/Registry, für
-noch nicht integrierte aus dem im Bericht hergeleiteten Modell (Banner kennzeichnet das).
+`LineageFlowDiagram`) rendert. **Haupt-Tab ist immer das Ziel-Modell aus dem
+Methodik-Bericht** — die Vorschau zeigt, was künftig implementiert wird. Ist das Risiko
+bereits (teilweise) im Produkt, kommen Vergleichstabs mit dem Ist-Stand aus
+Backend/Registry hinzu; Abweichungen Ziel ↔ Ist sind Ledger-Befunde (Eiserne Regel 5,
+z. B. #95-Befund 76) und werden bei `/integriere-risiko` geschlossen. Nach einer
+Berichts-Revision, die das Modell ändert, den Graph-Builder im Generator mitziehen.
 Melde auch diesen Pfad. Für ein neues Risiko ohne Vorschau-Definition erscheint nur ein
 Hinweis — dann im Generator einen Graph-Builder ergänzen. Frontend-Bundle:
 `frontend/vite.preview.config.ts` (baut automatisch, falls `frontend/preview-dist/` fehlt;
