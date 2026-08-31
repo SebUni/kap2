@@ -71,3 +71,9 @@ TODO.md
 # Local Claude Code permissions (user-specific)
 .claude/settings.local.json
 frontend/preview-dist/
+
+# LoD2-Kachel-Cache (wird zur Laufzeit gefüllt, gehört nicht ins Repo)
+backend/data/lod2/extracted/
+
+# LibreOffice-Sperrdateien
+.~lock.*#
