@@ -51,6 +51,34 @@ def _healthcare_access(ci: dict) -> float:
     return round(_clamp(100.0 * (1.0 - score), 0, 100), 1)
 
 
+def pollen_load(ci: dict) -> float:
+    """Ĝ der Zelle: gewichteter Anteil allergener Vegetation (Methodik #96 §3.3).
+
+    ``Ĝ = w_B · Kronenanteil(Birkengruppe) + (1 − w_B) · Grünanteil``
+
+    Der Kronenanteil der Birkengruppe setzt sich aus den per OSM-Gattungs-Tag
+    gesicherten Kronen und dem ungetaggten Rest zusammen; letzterer wird mit dem
+    dokumentierten Gattungsanteil gewichtet (Registry
+    ``birch_group_share_default``, gekennzeichnete Abschätzung). Ĝ ist eine
+    reine Verteilungsgröße — die Zentrierung über Ḡ (P̂ = 1 + λ(Ĝ/Ḡ − 1)) hebt
+    einen gemeinsamen Faktor auf.
+    """
+    from app.services.engine import override_context
+
+    code = "EXPECTED_ANNUAL_ALLERGY_DAYS"
+
+    def _p(key: str, default: float) -> float:
+        val = override_context.get_override(f"risks.{code}.impact.{key}", default)
+        return float(default if val is None else val)
+
+    w_b = _p("veg_weight_birke", 0.463)
+    share_default = _p("birch_group_share_default", 0.12)
+    birch = float(ci.get("canopy_birch_frac") or 0.0)
+    unknown = float(ci.get("canopy_unknown_frac") or 0.0)
+    green = float(ci.get("green_frac") or 0.0)
+    return max(0.0, w_b * (birch + share_default * unknown) + (1.0 - w_b) * green)
+
+
 def compute_cell_hev(ci: dict, regional: dict) -> dict:
     """Gibt {"hazards":{}, "exposures":{}, "vulnerabilities":{}} für eine Zelle."""
     area_ha = ci["area_m2"] / 10_000.0
@@ -112,6 +140,11 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         # abgeleiteten absoluten Schäden (MODELL_KRITIK §3.3). Die Normierung auf
         # 0…1 kappt weiterhin an der Katalogobergrenze, aber erst im Index-Pfad.
         "HEAT_WAVE": round(max(0.0, regional["hot_days"] + uhi * 1.5), 1),
+        # Pollenlast Ĝ (Methodik #96 §3.3): gewichteter Anteil allergener
+        # Vegetation. Gehölz-Komponente = Kronenfläche der Birkengruppe
+        # (getaggt + ungetaggter Anteil × Gattungsanteil), Gräser-Komponente =
+        # Grün-/Wiesenfläche der Zelle. Gewichte = δ-Beiträge (w_B = 0,463).
+        "POLLEN_LOAD": round(pollen_load(ci), 5),
         "COLD_EXTREME": round(regional["frost_days"] * (1.0 - 0.3 * min(uhi / 5.0, 1.0)), 1),
         "HEAVY_RAIN_FLOOD": round(
             _clamp(regional["heavy_rain_index"] * (0.4 + imp) * (0.5 + 0.5 * twi_norm) * (0.6 + depression), 0, 100), 1

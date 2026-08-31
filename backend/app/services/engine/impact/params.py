@@ -33,6 +33,26 @@ _BETA_FACTOR = (
     "(Bericht #95 §3.3a, Rev. 6 — Kopplung an die Basissterberaten neu gerechnet). "
     "Kontrolle: Das Modell reproduziert die RKI-Altersverteilung auf <1 Prozentpunkt.")
 
+_POLLEN_DS = (
+    "Gemessene Spreizung der Birkengruppen-Saison zwischen den Klimanormalperioden "
+    "1961–1990 und 1991–2020: Front-Marker Erle (Blüte Beginn) gegen Kern-Marker Birke "
+    "(Blattentfaltung), gepaarte DWD-Phänologie-Stationen mit ≥ 8 Spannen-Jahren in "
+    "beiden Perioden. Eine reine Verschiebung der Saison erzeugt KEINE Zusatztage — "
+    "nur die Verlängerung tut das (Bericht #96 §3.1). Anlage "
+    "backend/data/kalibrierung/pollensaison_region.csv, Skript dwd_pollensaison.py.")
+
+_POLLEN_DS_G = (
+    "Gemessene Sukzessions-Spreizung der Gräser-Saison (Wiesen-Fuchsschwanz → "
+    "Wiesen-Knäuelgras, jeweils Vollblüte) zwischen 1961–1990 und 1991–2020; gepaarte "
+    "DWD-Phänologie-Stationen. Das Saisonende bleibt konstant angesetzt (kein "
+    "Phänologie-Marker) — dokumentierte Untergrenze. Anlage pollensaison_region.csv.")
+
+_POLLEN_PAR = (
+    "12-Monats-Prävalenz ärztlich diagnostizierter allergischer Rhinitis, "
+    "bevölkerungsgewichtet auf die Produktbänder (Gewichte: Bevölkerung 31.12.2023 "
+    "nach Altersjahren). Die auf eine Nachkommastelle gerundeten Bandwerte sind die "
+    "verbindlichen Produktwerte (Bericht #96 §3.2, Befund 105).")
+
 IMPACT_PARAM_SPECS: list[dict] = [
     # ── Hitzemortalität: Wirkschwellen je Region ───────────────────────────────
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "threshold_nord", "value": 19.7,
@@ -298,6 +318,161 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "HD der Zelle: DWD-CDC hot_days (1 km), ohne UHI-Verschiebung "
                       "(dokumentierte Unterschätzung in UHI-Lagen).",
      "source_refs": ["Karlsson_Ziebarth_2018", "Karlsson_Ziebarth_IZA_DP7875"]},
+
+    # ── #96 Aeroallergene: klimaattribuierte Symptomtage (Bericht Rev. 1) ──────
+    # δ_R = f · (p_B·ΔS_B,R + p_G·ΔS_G,R) · a_attr;  ΔTage = B · δ_R · P̂
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "delta_s_birke_nord", "value": 3.96,
+     "label": "Saison-Spreizung Birkengruppe (Nord)", "unit": "Tage",
+     "source": "DWD-Phänologie, gepaarte Stationen (Bericht #96 §3.1)",
+     "source_detail": _POLLEN_DS + " Nord: 257 Stationenpaare.",
+     "source_refs": ["DWD_CDC_Phaenologie", "Bergmann_2023_RKI_Allergie_Klima"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "delta_s_birke_mitte", "value": 4.20,
+     "label": "Saison-Spreizung Birkengruppe (Mitte)", "unit": "Tage",
+     "source": "DWD-Phänologie, gepaarte Stationen (Bericht #96 §3.1)",
+     "source_detail": _POLLEN_DS + " Mitte: 421 Stationenpaare.",
+     "source_refs": ["DWD_CDC_Phaenologie", "Bergmann_2023_RKI_Allergie_Klima"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "delta_s_birke_sued", "value": 5.94,
+     "label": "Saison-Spreizung Birkengruppe (Süd)", "unit": "Tage",
+     "source": "DWD-Phänologie, gepaarte Stationen (Bericht #96 §3.1)",
+     "source_detail": _POLLEN_DS + " Süd: 405 Stationenpaare.",
+     "source_refs": ["DWD_CDC_Phaenologie", "Bergmann_2023_RKI_Allergie_Klima"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "delta_s_graeser_nord", "value": 4.78,
+     "label": "Saison-Spreizung Gräser (Nord)", "unit": "Tage",
+     "source": "DWD-Phänologie, gepaarte Stationen (Bericht #96 §3.1)",
+     "source_detail": _POLLEN_DS_G + " Nord: 200 Stationenpaare.",
+     "source_refs": ["DWD_CDC_Phaenologie"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "delta_s_graeser_mitte", "value": 4.08,
+     "label": "Saison-Spreizung Gräser (Mitte)", "unit": "Tage",
+     "source": "DWD-Phänologie, gepaarte Stationen (Bericht #96 §3.1)",
+     "source_detail": _POLLEN_DS_G + " Mitte: 465 Stationenpaare.",
+     "source_refs": ["DWD_CDC_Phaenologie"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "delta_s_graeser_sued", "value": 3.70,
+     "label": "Saison-Spreizung Gräser (Süd)", "unit": "Tage",
+     "source": "DWD-Phänologie, gepaarte Stationen (Bericht #96 §3.1)",
+     "source_detail": _POLLEN_DS_G + " Süd: 420 Stationenpaare.",
+     "source_refs": ["DWD_CDC_Phaenologie"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "a_attr", "value": 0.50,
+     "label": "Klima-Attribution des Saisontrends", "unit": "Anteil",
+     "source": "Anderegg u. a. 2021 (PNAS)",
+     "source_detail": "Anteil des beobachteten Pollensaison-Trends, der dem "
+                      "anthropogenen Klimawandel zurechenbar ist: ≈ 50 % "
+                      "(IQR 19–84 %, Nordamerika — Übertrag auf DE als dokumentierte "
+                      "Annahme, Band = Sensitivitätsspanne des Berichts §4). "
+                      "Multiplikativ auf die gemessene Saison-Spreizung.",
+     "source_refs": ["Anderegg_2021_Pollensaison"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "p_ar_u20", "value": 0.088,
+     "label": "AR-Prävalenz Band u20", "unit": "Anteil",
+     "source": "KiGGS Welle 2 (RKI)", "source_detail": _POLLEN_PAR +
+     " u20 = 8,8 % (KiGGS 0–17; die 18/19-Jährigen erhalten den Kinderwert statt des "
+     "höheren DEGS1-Werts 14,6 % — dokumentiert unterschätzend, Log 10).",
+     "source_refs": ["Thamm_2018_KiGGS_W2"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "p_ar_a20_64", "value": 0.132,
+     "label": "AR-Prävalenz Band 20–64", "unit": "Anteil",
+     "source": "DEGS1 (RKI), bevölkerungsgewichtet", "source_detail": _POLLEN_PAR +
+     " 20–64 = 13,2 %: (9.301.783·14,6 + 10.947.845·17,2 + 10.275.235·14,3 + "
+     "12.293.757·10,1 + 6.345.372·8,2)/49.163.992 = 13,16 %.",
+     "source_refs": ["Langen_2013_DEGS1", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "p_ar_a65_74", "value": 0.067,
+     "label": "AR-Prävalenz Band 65–74", "unit": "Anteil",
+     "source": "DEGS1 (RKI), bevölkerungsgewichtet", "source_detail": _POLLEN_PAR +
+     " 65–74 = 6,7 %: (5.180.675·8,2 + 4.388.965·5,0)/9.569.640 = 6,73 %.",
+     "source_refs": ["Langen_2013_DEGS1", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "p_ar_a75_84", "value": 0.050,
+     "label": "AR-Prävalenz Band 75–84", "unit": "Anteil",
+     "source": "DEGS1 (RKI), Extrapolation ab 80", "source_detail": _POLLEN_PAR +
+     " 75–84 = 5,0 % (DEGS1-Wert 70–79; 80–84 extrapoliert — gekennzeichnet).",
+     "source_refs": ["Langen_2013_DEGS1"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "p_ar_a85p", "value": 0.050,
+     "label": "AR-Prävalenz Band 85+", "unit": "Anteil",
+     "source": "DEGS1 (RKI), Extrapolation", "source_detail": _POLLEN_PAR +
+     " 85+ = 5,0 % (Extrapolation über das DEGS1-Ende 79 hinaus — gekennzeichnete "
+     "Abschätzung; Richtung unklar: Prävalenz fällt mit Alter, Untererfassung bei "
+     "Hochaltrigen möglich).",
+     "source_refs": ["Langen_2013_DEGS1"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "p_sens_birke", "value": 0.55,
+     "label": "Anteil Patienten mit Birkengruppen-Saison", "unit": "Anteil",
+     "source": "Haftenberger u. a. 2013 (DEGS1-Sensibilisierung)",
+     "source_detail": "Anteil der AR-Patienten, deren Symptomfenster die "
+                      "Birkengruppe (Hasel/Erle/Birke, Bet-v-1-Kreuzreaktivität) "
+                      "umfasst: 0,55 (Band 0,4–0,7) — gekennzeichnete Abschätzung aus "
+                      "den DEGS1-Sensibilisierungsprävalenzen (Birke 17,4 %, Gräser "
+                      "19,4 % in der Gesamtbevölkerung; Bericht #96 §3.4).",
+     "source_refs": ["Haftenberger_2013_Sensibilisierung"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "p_sens_graeser", "value": 0.75,
+     "label": "Anteil Patienten mit Gräser-Saison", "unit": "Anteil",
+     "source": "Haftenberger u. a. 2013 (DEGS1-Sensibilisierung)",
+     "source_detail": "Anteil der AR-Patienten mit Gräser-Saison: 0,75 (Band "
+                      "0,6–0,85) — gekennzeichnete Abschätzung (Gräser sind das "
+                      "häufigste Inhalationsallergen; Bericht #96 §3.4). Summe > 1 ist "
+                      "korrekt: Mehrfachsensibilisierung ist die Regel.",
+     "source_refs": ["Haftenberger_2013_Sensibilisierung"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "f_symptomtage", "value": 0.70,
+     "label": "Anteil symptomatischer Saisontage", "unit": "Anteil",
+     "source": "Modellannahme (Bericht #96 §3.4; Pfaar 2020 qualitativ)",
+     "source_detail": "Anteil der Saisontage mit tatsächlicher Symptomlast: 0,70 "
+                      "(Band 0,50–0,85) — Modellannahme; Pfaar 2020 stützt qualitativ "
+                      "(Pollenflug treibt Symptomlast), liefert aber keinen Zahlenwert. "
+                      "WICHTIG: f kürzt sich im €-Pfad vollständig heraus (c_Tag = "
+                      "c_Jahr/d_Saison enthält f im Nenner) — der weichste Parameter "
+                      "beeinflusst den Euro-Ausweis nicht (Golden-Test "
+                      "beispiel_96_f_kuerzung).",
+     "source_refs": ["Pfaar_2020_Symptomlast"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "lambda_veg", "value": 0.70,
+     "label": "Gewicht der Vegetations-Modulation λ", "unit": "Faktor",
+     "source": "Werchan 2017/2018, Bogawski 2019 (Kette Bericht #96 §3.4)",
+     "source_detail": "λ = 2(R−1)/(R+1) × a_veg mit R = Extremstandort-Verhältnis "
+                      "der Berliner Pollenfallen (Birke 3,45 / Gräser 4,06 in der "
+                      "Zuwachs-Lesart) und a_veg = 0,6 (Anteil der räumlichen Varianz, "
+                      "den lokale Vegetation erklärt): 0,66–0,73 ⇒ Basiswert 0,70 "
+                      "(Band 0,3–1,0). Gekennzeichnete Abschätzung; wirkt "
+                      "mittelwertzentriert über P̂ = 1 + λ(Ĝ/Ḡ − 1) auf ΔTage UND €.",
+     "source_refs": ["Werchan_2017_Pollen_Berlin", "Werchan_2018_Symptome_Berlin",
+                     "Bogawski_2019_Baumkronen_Pollen"]},
+    # ── #96: Integrationsparameter der Ebene POLLEN_LOAD (§3.3-Spezifikation) ──
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "g_bar_ref", "value": 0.1775,
+     "label": "Referenz-Vegetationslast Ḡ (Bundesmittel)", "unit": "Anteil",
+     "source": "Kommunale Stichprobe (Bericht #96 §3.3; §3.4-Ressourcen-Regel)",
+     "source_detail": "Betroffenengewichtetes Referenzmittel der Vegetationslast Ĝ, "
+                      "auf das P̂ = 1 + λ(Ĝ/Ḡ − 1) zentriert wird: **0,1775**, "
+                      "gemessen mit dem Produktionsmodell über drei Siedlungstypen "
+                      "(Offenbach am Main 0,1740 · Freising 0,1797 · Weyarn 0,2704; "
+                      "2.896 bewohnte Zellen, 20.408 Betroffene; Anlage "
+                      "pollen_g_bar.csv/.md). Kommunale Stichprobe statt nationalem "
+                      "100-m-Vollraster-Lauf — den verbietet die §3.4-Ressourcen-Regel "
+                      "(Fortschreibung 30.08.2026); der Bericht nennt noch einen "
+                      "„Anlage-Bundeslauf“ (Ledger-Befund 115). Die Zentrierung gilt "
+                      "damit näherungsweise statt exakt; Band = Streuung der "
+                      "Stichprobe 0,174–0,270 (gekennzeichnete Abschätzung §3.9). "
+                      "Metropolen > 4.000 Zellen sind unterrepräsentiert (Aufwand); "
+                      "sie sind grünärmer ⇒ Ḡ eher überschätzt ⇒ P̂ dort konservativ "
+                      "< 1. REFERENZZUSTAND FIXIERT (Befund 113): bleibt bei "
+                      "Maßnahmen-/Szenariorechnungen konstant, Fortschreibung nur mit "
+                      "neuer versionierter Stichprobe.",
+     "source_refs": []},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "veg_weight_birke", "value": 0.463,
+     "label": "Gewicht Gehölz-Anteil in Ĝ", "unit": "Anteil",
+     "source": "Herleitung aus den δ-Beiträgen (Bericht #96 §3.1/§3.3)",
+     "source_detail": "Ĝ mischt Gehölz- und Gräserlast mit denselben Gewichten, mit "
+                      "denen beide Komponenten in δ eingehen: w_B = p_B·ΔS_B,DE / "
+                      "(p_B·ΔS_B,DE + p_G·ΔS_G,DE) = 0,55·4,79/(0,55·4,79 + 0,75·4,06) "
+                      "= 2,6345/5,6795 = 0,4639; w_G = 1 − w_B. Deutschlandweit fixiert "
+                      "(nicht regional), weil Ĝ nur eine relative Verteilungsgröße ist, "
+                      "die über Ḡ zentriert wird — Integrations-Detailspezifikation, "
+                      "die der Bericht §3.3 ausdrücklich der Integration überlässt.",
+     "source_refs": []},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "birch_group_share_default",
+     "value": 0.12,
+     "label": "Birkengruppen-Anteil ungetaggter Bäume", "unit": "Anteil",
+     "source": "Gekennzeichnete Abschätzung (OSM-Tag-Lücke; Bericht #96 §3.3)",
+     "source_detail": "OSM-Bäume tragen nur teilweise genus/species. Für Kronen ohne "
+                      "Gattungs-Tag wird der Birkengruppen-Anteil (Betula/Alnus/Corylus) "
+                      "mit 0,12 angesetzt — Größenordnung des Birken-/Erlen-Anteils "
+                      "deutscher Stadtbaumbestände (Straßenbaum-Erhebungen: Birke "
+                      "typischerweise 3–8 %, Erle/Hasel in Grünanlagen zusätzlich); "
+                      "gekennzeichnete Abschätzung (§3.9). Wirkt NUR auf die räumliche "
+                      "Verteilung (Ĝ), nicht auf das Niveau — die Zentrierung über Ḡ "
+                      "hebt einen gemeinsamen Faktor auf.",
+     "source_refs": []},
 
     # ── Todesfälle durch Hochwasser/Sturzfluten ────────────────────────────────
     {"risk": "EXPECTED_ANNUAL_MORTALITY_FLOOD", "key": "fatality_rate_flash_per_100k",

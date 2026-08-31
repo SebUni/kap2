@@ -1615,6 +1615,22 @@ def _add_driver_op(b: LineageBuilder, code: str, driver: dict) -> str:
         for pkey in driver.get("params", []):
             b.add_edge(_impact_param_node(b, code, pkey), op_id)
         return op_id
+    if kind == "season_spread":
+        op_id = f"op:seasonspread:{code}"
+        _add_op(
+            b, op_id, "erf", "Saison-Spreizung",
+            "Zusätzliche Symptomtage je Betroffenem und Jahr aus der GEMESSENEN "
+            "Verlängerung der Pollensaison (DWD-Phänologie, Normalperioden-Vergleich "
+            "1961–1990 → 1991–2020), gewichtet mit den Sensibilisierungs-Anteilen und "
+            "dem klimaattribuierten Anteil. Eine reine Verschiebung der Saison erzeugt "
+            "keine Zusatztage — nur die Verlängerung tut das.\n"
+            r"$$\delta_R = f\,\bigl(p_B\,\Delta S_{B,R} + p_G\,\Delta S_{G,R}\bigr)"
+            r"\,a_{\mathrm{attr}}$$",
+        )
+        b.add_edge(b.ensure_indicator(driver["hazard"], "hazards"), op_id)
+        for pkey in driver.get("params", []):
+            b.add_edge(_impact_param_node(b, code, pkey), op_id)
+        return op_id
     if kind == "hd_linear":
         op_id = f"op:hdlinear:{code}"
         _add_op(

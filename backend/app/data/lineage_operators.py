@@ -623,6 +623,22 @@ FORMULA_OPERATORS: dict[str, list[OperatorStep]] = {
             "input_keys": ["hot_days", "uhi_delta"],
         },
     ],
+    # Pollenlast Ĝ (Methodik #96 §3.3) — Gehölz- und Gräser-Komponente gewichtet.
+    "POLLEN_LOAD": [
+        {
+            "op_kind": "weighted_sum",
+            "label": "Gehölz + Grün gewichten",
+            "note": ("Anteil allergener Vegetation der Zelle: Kronenfläche der "
+                     "Birkengruppe (OSM genus/species; Kronen ohne Gattungs-Tag mit "
+                     "dem dokumentierten Gattungsanteil) und Grün-/Wiesenfläche als "
+                     "Gräser-Proxy, gewichtet mit ihren Beiträgen zur gemessenen "
+                     "Saison-Spreizung (w_B = 0,463).\n"
+                     r"$$\hat G_{z} = w_B\,\bigl(k_{\mathrm{Birke},z} + "
+                     r"s_{\mathrm{unbek}}\,k_{\mathrm{unbek},z}\bigr)"
+                     r" + (1-w_B)\,\text{Grün}_{z}$$"),
+            "input_keys": ["canopy_birch_frac", "canopy_unknown_frac", "green_frac"],
+        },
+    ],
     "HEAVY_RAIN_FLOOD": [
         {
             "op_kind": "multiply",
@@ -1430,6 +1446,37 @@ AUX_LINEAGE: dict[str, dict[str, Any]] = {
             "input_keys": ["summer_temp_cell", "pop_age_bands"],
         }],
         "formula": "Bevölkerungsgewichtetes relatives Sterberisiko der Zelle",
+    },
+    "POPULATION_U20": {
+        "keys": ["pop", "share_over_65"],
+        "steps": [{
+            "op_kind": "multiply",
+            "label": "×",
+            "note": ("Einwohner unter 20 (Methodik #96 §3.2): Die u65-Menge der "
+                     "Zelle (Einwohner − 65+) wird mit dem u20-Anteil der "
+                     "5-Jahres-Gruppen aufgeteilt — dasselbe Zwei-Quellen-Prinzip "
+                     "wie bei den Senioren-Bändern (gut besetzte Menge legt das "
+                     "Niveau fest, die Feingruppen nur die Binnenaufteilung).\n"
+                     r"$$\mathrm{pop}_{u20} = \mathrm{pop}_{u65}\cdot"
+                     r" s_{u20}$$"),
+            "input_keys": ["pop", "share_over_65"],
+        }],
+        "formula": "u65-Menge × u20-Anteil der Zensus-5-Jahres-Gruppen",
+    },
+    "CANOPY_BIRCH_FRACTION": {
+        "keys": ["canopy_birch_frac"],
+        "steps": [{
+            "op_kind": "ratio",
+            "label": "Kronen ÷ Fläche",
+            "note": ("Kronenfläche der Birkengruppe (Betula/Alnus/Corylus/"
+                     "Carpinus) je Zellfläche, aus OSM-Baumpunkten mit "
+                     "genus/species-Tag und deren Kronendurchmesser. Bäume ohne "
+                     "Gattungs-Tag zählen separat (CANOPY_UNKNOWN) und gehen mit "
+                     "dem dokumentierten Gattungsanteil in die Pollenlast ein "
+                     "(Methodik #96 §3.3)."),
+            "input_keys": ["canopy_birch_frac"],
+        }],
+        "formula": "Σ Kronenflächen der Birkengruppe ÷ Zellfläche",
     },
     "CARE_HOME_SHARE_85P": {
         "keys": ["share_care_home_85p"],

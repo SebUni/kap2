@@ -411,6 +411,34 @@ NATIONAL_SENIOR_SPLIT: dict[str, float] = {
     "a65_74": 0.5003, "a75_84": 0.3555, "a85p": 0.1442,
 }
 
+# ── Band u20 (Methodik #96 §3.2: Prävalenz-Schichtung braucht u20, nicht u18) ──
+# Die 5-Jahres-Gruppen des Zensus liefern u20 direkt; wie beim Senioren-Split
+# legt die gut besetzte Menge (hier: u65) das Niveau fest und die 5-Jahres-
+# Gruppen nur die Binnenaufteilung u20 / 20–64.
+U20_COLUMNS: tuple[str, ...] = ("unter5", "a5bis9", "a10bis14", "a15bis19")
+
+# Nationaler u20-Anteil AN DER u65-BEVÖLKERUNG (Bevölkerung 31.12.2023,
+# Destatis 12411: u20 15.583.456 / u65 64.747.448 = 0,2407) — letzter Rückfall.
+NATIONAL_U20_SHARE_OF_U65: float = 0.2407
+
+
+def _u20_share_of_u65(parsed: dict[str, Any], fallback: float) -> float:
+    """Anteil u20 an u65 aus den 5-Jahres-Gruppen der Zelle (sonst ``fallback``)."""
+    u20 = sum(float(parsed.get(col) or 0.0) for col in U20_COLUMNS)
+    u65 = sum(float(parsed.get(col) or 0.0) for col in AGE_BAND_COLUMNS["u65"])
+    if u65 <= 0.0:
+        return fallback
+    return max(0.0, min(1.0, u20 / u65))
+
+
+def _area_u20_share(ages: dict[str, dict[str, Any]]) -> float:
+    """Gebietsweiter u20-Anteil an u65 als Rückfall für dünn besetzte Zellen."""
+    u20 = u65 = 0.0
+    for parsed in ages.values():
+        u20 += sum(float(parsed.get(col) or 0.0) for col in U20_COLUMNS)
+        u65 += sum(float(parsed.get(col) or 0.0) for col in AGE_BAND_COLUMNS["u65"])
+    return u20 / u65 if u65 > 0 else NATIONAL_U20_SHARE_OF_U65
+
 
 def _senior_split(counts: dict[str, float], fallback: dict[str, float]) -> dict[str, float]:
     """Anteile der drei Senioren-Bänder an 65+; ``fallback`` bei zu dünner Besetzung."""
@@ -531,6 +559,7 @@ def apply_zensus_to_cell_inputs(
     km_year_index, area_year_mean = _building_year_fallbacks(bage)
     # Gebietsweite 65+-Binnenaufteilung als Rückfall für unterdrückte Zellen.
     area_split = _area_senior_split(ages) if ages else dict(NATIONAL_SENIOR_SPLIT)
+    area_u20 = _area_u20_share(ages) if ages else NATIONAL_U20_SHARE_OF_U65
 
     for idx, ci in enumerate(cell_inputs):
         gid = gid_by_idx.get(idx) or ci.get("gitter_id")
@@ -587,8 +616,16 @@ def apply_zensus_to_cell_inputs(
         senior_counts = _senior_band_counts(ages.get(gid, {})) if ages else {}
         split = _senior_split(senior_counts, area_split) if senior_counts else dict(area_split)
         pop_65p = ci["pop_over_65"]
+        pop_u65 = max(0.0, pop - pop_65p)
+        # u20/20–64 (Methodik #96 §3.2): Binnenaufteilung der u65-Menge aus den
+        # 5-Jahres-Gruppen der Zelle, Rückfall Gebiet → national. ``u65`` bleibt
+        # erhalten — die Hitze-Bänder (#95) lesen es unverändert.
+        u20_share = (_u20_share_of_u65(ages.get(gid, {}), area_u20)
+                     if ages else area_u20)
         ci["pop_age_bands"] = {
-            "u65": max(0.0, pop - pop_65p),
+            "u65": pop_u65,
+            "u20": pop_u65 * u20_share,
+            "a20_64": pop_u65 * (1.0 - u20_share),
             "a65_74": pop_65p * split["a65_74"],
             "a75_84": pop_65p * split["a75_84"],
             "a85p": pop_65p * split["a85p"],

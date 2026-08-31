@@ -567,17 +567,34 @@ def build_payload(nr: str) -> dict:
             "tabs": tabs,
         }
     if nr == "96":
+        from app.data import catalog
         g, p = _graph_96()
+        tabs = [{
+            "label": "Ziel-Modell (Bericht Rev. 1): Symptomtage & €",
+            "note": "So rechnet das Produkt #96 seit der Integration (31.08.2026): "
+                    "gemessene Saison-Spreizung × Prävalenz × Klima-Attribution, "
+                    "moduliert mit der lokalen Vegetationslast P̂.",
+            "lineage": g, "parameters": p,
+        }]
+        code = "EXPECTED_ANNUAL_ALLERGY_DAYS"
+        if code in catalog.RISKS_BY_CODE:
+            tabs.append({
+                "label": "Ist-Produktstand (integriert)",
+                "note": "Live aus Backend-Registry/Lineage-Builder — Abweichungen "
+                        "zum Ziel-Modell wären ein Ledger-Befund.",
+                "lineage": lineage_graph.build_risk_lineage(code),
+                "parameters": parameter_registry.catalog_parameters(),
+            })
         return {
             "title": "#96 Aeroallergene pflanzlicher Herkunft",
-            "subtitle": "Geplantes Schicht-B-Modell laut Methodik-Bericht "
-                        "(docs/methodik/96_aeroallergene.md).",
-            "banner": "Vorschau des geplanten Modells — noch nicht integriert. "
-                      "Nach /integriere-risiko 96 erzeugt das Produkt dieses Diagramm "
-                      "aus der Registry; Abweichungen wären ein Befund.",
+            "subtitle": "Schicht-B-Modell laut Methodik-Bericht "
+                        "(docs/methodik/96_aeroallergene.md), integriert 31.08.2026.",
+            "banner": "Integration vollzogen: Symptomtage sind die native "
+                      "Ergebnisgröße (€ = ΔTage × c_Tag 6,20 €₂₀₂₄); die Ebenen "
+                      "POLLEN_LOAD, POPULATION_U20 und CANOPY_BIRCH_FRACTION sind "
+                      "angelegt.",
             "generated": today,
-            "tabs": [{"label": "Symptomtage & € (K1 Allergene)", "lineage": g,
-                      "parameters": p}],
+            "tabs": tabs,
         }
     if nr == "98":
         g, p = _graph_98()

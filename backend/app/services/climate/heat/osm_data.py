@@ -1187,6 +1187,32 @@ def compute_cell_composition(
 
 # ── Level 3: Buildings & detailed surfaces ────────────────────────────────────
 
+# Birkengruppe (Bet-v-1-Kreuzreaktivität Hasel/Erle/Birke) — Gattungen der
+# allergenen Frühblüher, Methodik #96 §3.1/§3.3.
+_BIRCH_GROUP_GENERA = ("betula", "alnus", "corylus", "carpinus", "ostrya")
+
+
+def _is_birch_group(tags: dict) -> bool | None:
+    """True/False bei vorhandenem Gattungs-Tag, sonst None (unbekannt).
+
+    OSM-Bäume tragen ``genus``/``species``/``taxon`` nur teilweise; ``None``
+    signalisiert der Zellrechnung, den dokumentierten Gattungsanteil
+    (Registry ``birch_group_share_default``) anzusetzen.
+    """
+    for key in ("genus", "species", "taxon", "genus:de", "species:de"):
+        val = tags.get(key)
+        if not val:
+            continue
+        low = val.lower()
+        if any(g in low for g in _BIRCH_GROUP_GENERA):
+            return True
+        # Deutsche Namen (genus:de/species:de bzw. eingetragene Trivialnamen)
+        if any(g in low for g in ("birke", "erle", "hasel", "hainbuche")):
+            return True
+        return False
+    return None
+
+
 def fetch_buildings_and_roads(grid_cells: list[dict],
                               bundesland: str | None = None) -> dict:
     """Fetch building footprints, roads, paved areas, and trees from OSM.
@@ -1234,7 +1260,9 @@ def fetch_buildings_and_roads(grid_cells: list[dict],
     out skel qt;
     """
 
-    data = _overpass_query_cached("buildings2", bbox, query)
+    # "buildings3": Bäume tragen jetzt zusätzlich die Birkengruppen-Klassifikation
+    # (genus/species/taxon) für die Ebene POLLEN_LOAD (Methodik #96 §3.3).
+    data = _overpass_query_cached("buildings3", bbox, query)
     response_bytes = data.get("_response_bytes", 0)
     elements = data.get("elements", [])
 
@@ -1321,6 +1349,9 @@ def fetch_buildings_and_roads(grid_cells: list[dict],
                     "crown_diameter": _parse_float(
                         tags.get("diameter_crown"), 8.0
                     ),
+                    # None = ohne Gattungs-Tag (der Regelfall in OSM) → die
+                    # Zellrechnung setzt den dokumentierten Gattungsanteil an.
+                    "birch_group": _is_birch_group(tags),
                 })
 
     log.info(
@@ -1419,12 +1450,20 @@ def compute_cell_buildings(
     from shapely.geometry import Point
     tree_count = 0
     canopy_area = 0.0
+    canopy_area_birch = 0.0     # sicher der Birkengruppe zugeordnet
+    canopy_area_unknown = 0.0   # ohne Gattungs-Tag (Regelfall in OSM)
     for t in trees:
         pt = Point(t["lon"], t["lat"])
         if cell_geom.contains(pt):
             tree_count += 1
             radius_deg = (t["crown_diameter"] / 2.0) * DEGREE_PER_METER
-            canopy_area += 3.14159 * radius_deg ** 2
+            area = 3.14159 * radius_deg ** 2
+            canopy_area += area
+            bg = t.get("birch_group")
+            if bg is True:
+                canopy_area_birch += area
+            elif bg is None:
+                canopy_area_unknown += area
 
     canopy_fraction = min(canopy_area / cell_area, 1.0) if cell_area > 0 else 0.0
 
@@ -1435,6 +1474,13 @@ def compute_cell_buildings(
         "road_coverage": round(road_coverage, 4),
         "tree_count": tree_count,
         "tree_canopy_fraction": round(canopy_fraction, 4),
+        # Kronenanteile der Birkengruppe (Methodik #96 §3.3): getaggt vs. ohne
+        # Gattungs-Tag — die Zellrechnung wichtet den unbekannten Teil mit dem
+        # Registry-Parameter ``birch_group_share_default``.
+        "canopy_birch_fraction": round(
+            min(canopy_area_birch / cell_area, 1.0) if cell_area > 0 else 0.0, 5),
+        "canopy_unknown_fraction": round(
+            min(canopy_area_unknown / cell_area, 1.0) if cell_area > 0 else 0.0, 5),
         # Platzhalter: echtes Horizontwinkel-SVF wird in gather_cell_inputs
         # nach dem Zell-Pool je Zelle gesetzt (Raster-Verfahren, nicht je Zelle
         # isoliert berechenbar — Nachbargebäude außerhalb der Zelle zählen).
@@ -1450,6 +1496,8 @@ def _empty_building_metrics() -> dict:
         "road_coverage": 0.0,
         "tree_count": 0,
         "tree_canopy_fraction": 0.0,
+        "canopy_birch_fraction": 0.0,
+        "canopy_unknown_fraction": 0.0,
         "sky_view_factor": 1.0,
     }
 

@@ -174,6 +174,9 @@ def build_auxiliary(ci: dict, regional: dict) -> dict[str, float | None]:
         # None = Kommune ohne OSM-Pflegeeinrichtungen (v_vers rechnet dann mit
         # dem Bundesmittel q̄ — Faktor 1; Methodik #95 §3.6).
         "CARE_HOME_SHARE_85P": ci.get("share_care_home_85p"),
+        # Methodik #96: Prävalenz-Band u20 und Gehölz-Komponente der Pollenlast.
+        "POPULATION_U20": _age_band(ci, "u20"),
+        "CANOPY_BIRCH_FRACTION": ci.get("canopy_birch_frac"),
     }
 
     for code in catalog.AUXILIARY_BY_CODE:

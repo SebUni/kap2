@@ -29,8 +29,9 @@ _CLUSTERS = {"land", "wasser", "infrastruktur", "wirtschaft", "gesundheit"}
 
 # ── (a) Vollständigkeit ────────────────────────────────────────────────────────
 
-def test_planned_risks_count_is_51():
-    assert len(catalog.PLANNED_RISKS) == 51
+def test_planned_risks_count_is_50():
+    # 50 seit der #96-Integration (31.08.2026): Aeroallergene sind aktiv.
+    assert len(catalog.PLANNED_RISKS) == 50
 
 
 # ── (b) 1:1-Klammer aktiv + geplant = 52 eindeutige KWRA-IDs ───────────────────
@@ -38,11 +39,11 @@ def test_planned_risks_count_is_51():
 def test_kwra_ids_are_52_unique_without_collision():
     active_ids = {r["kwra_id"] for r in catalog.RISKS}
     planned_ids = [p["kwra_id"] for p in catalog.PLANNED_RISKS]
-    # aktive Klammer: beide Teil-Ausweise (Mortalität/Morbidität) tragen die #95.
-    assert active_ids == {95}
-    # geplant: 51 eindeutige IDs, keine davon kollidiert mit der aktiven #95.
-    assert len(planned_ids) == len(set(planned_ids)) == 51
-    assert 95 not in planned_ids
+    # aktive Klammern: #95 (Mortalität + Morbidität) und #96 (Symptomtage).
+    assert active_ids == {95, 96}
+    # geplant: 50 eindeutige IDs, keine davon kollidiert mit einer aktiven.
+    assert len(planned_ids) == len(set(planned_ids)) == 50
+    assert 95 not in planned_ids and 96 not in planned_ids
     assert len(active_ids | set(planned_ids)) == 52
     # Index-Map deckt exakt die geplanten IDs ab.
     assert set(catalog.PLANNED_BY_KWRA_ID) == set(planned_ids)
@@ -87,11 +88,13 @@ def test_every_planned_entry_is_complete():
 
 # ── (f) #96/#98 gehören zum Sommer-Release (Stage 0) ───────────────────────────
 
-def test_kwra_96_and_98_are_stage_0():
-    for kid in (96, 98):
-        p = catalog.PLANNED_BY_KWRA_ID[kid]
-        assert p["stage"] == 0, (kid, p["stage"])
-        assert catalog.planned_available_from(p) == catalog.STAGE_LABELS[0]
+def test_kwra_98_is_stage_0():
+    # #96 ist seit dem 31.08.2026 integriert und daher nicht mehr „geplant";
+    # #98 folgt als letztes Sommer-Release-Risiko.
+    assert 96 not in catalog.PLANNED_BY_KWRA_ID
+    p = catalog.PLANNED_BY_KWRA_ID[98]
+    assert p["stage"] == 0, p["stage"]
+    assert catalog.planned_available_from(p) == catalog.STAGE_LABELS[0]
 
 
 if __name__ == "__main__":

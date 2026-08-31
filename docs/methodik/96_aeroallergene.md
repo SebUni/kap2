@@ -164,7 +164,13 @@ sie (Befund 105).
 **Bänder und Herleitung** (Rev.-5-Befunde 27/35): Das Produkt führt die Zensus-Bänder
 u65/65–74/75–84/85+; für die Prävalenz-Schichtung wird zusätzlich die Ebene **u20 neu
 angelegt** (Zensus-2022-Gitter, 10-Jahres-Klassen 0–9 + 10–19; §3.1-Kennzeichnung „neu
-anzulegen"); das Band 20–64 ergibt sich je Zelle als u65 − u20. Prävalenzwerte (12-Monats,
+anzulegen"); das Band 20–64 ergibt sich je Zelle als u65 − u20.
+**Ergebnis der Integration (31.08.2026):** Ebene `POPULATION_U20` **angelegt** —
+der Zensus-Gitterdatensatz „Alter in 5er-Jahresgruppen" liegt bereits im Produkt;
+u20 wird aus `unter5 + a5bis9 + a10bis14 + a15bis19` als **Binnenaufteilung der
+u65-Menge** gebildet (dasselbe Zwei-Quellen-Prinzip wie bei den Senioren-Bändern:
+die gut besetzte u65-Menge legt das Niveau fest, die Feingruppen nur die
+Aufteilung; Rückfall Zelle → Gebiet → national 0,2407). Prävalenzwerte (12-Monats,
 ärztlich diagnostiziert) aus DEGS1 Tab. 3 [1] und KiGGS W2 [2], bevölkerungsgewichtet auf
 die Produktbänder (Gewichte: Bevölkerung 31.12.2023 nach Altersjahren [48]):
 
@@ -233,6 +239,26 @@ $$ \Delta\text{Tage}_{\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_R \cdot 
   mit neuem Referenz-Bundeslauf (versioniert).
   Bis zur Anlage der Ebene ist \(\hat P \equiv 1\) **kein zulässiger stiller Fallback** —
   die Ebene ist Teil des Integrationsumfangs (Kartenebenen-Pflicht §3.6).
+  **Ergebnis der Integration (31.08.2026; §3.1-Anlagepflicht):** Ebene
+  `POLLEN_LOAD` **angelegt**. Detailspezifikation (vom Bericht ausdrücklich der
+  Integration überlassen): \(\hat G_z = w_B\,[k_{\text{Birke},z} +
+  s_{\text{unbek}}\,k_{\text{unbek},z}] + (1-w_B)\,\text{Grün}_z\) — Kronenflächen
+  aus OSM-Baumpunkten (`natural=tree`) mit Gattungs-Tag `genus`/`species`/`taxon`
+  der Birkengruppe (*Betula/Alnus/Corylus/Carpinus*); Kronen **ohne** Gattungs-Tag
+  (in OSM der Regelfall) gehen mit dem Anteil
+  \(s_{\text{unbek}}\) = 0,12 ein (Registry `birch_group_share_default`,
+  gekennzeichnete Abschätzung §3.9); Gräser-Proxy = Grün-/Wiesenanteil der Zelle;
+  Gewichte aus den δ-Beiträgen: \(w_B\) = 0,55·4,79/(0,55·4,79 + 0,75·4,06) =
+  **0,463**. \(\bar G\) ist als Registry-Parameter `g_bar_ref` fixiert und wurde
+  aus einer **kommunalen Stichprobe** bestimmt: **0,1775** (betroffenengewichtet
+  über drei Siedlungstypen — Offenbach am Main 0,1740 · Freising 0,1797 ·
+  Weyarn 0,2704; 2.896 bewohnte Zellen, 20.408 Betroffene; Band = Streuung
+  0,174–0,270, Metropolen > 4.000 Zellen unterrepräsentiert ⇒ \(\bar G\) eher
+  überschätzt ⇒ \(\hat P\) dort konservativ < 1). Skript `pollen_g_bar.py`,
+  Anlage `pollen_g_bar.csv`/`.md` — statt eines nationalen Vollraster-Laufs — den verbietet
+  die §3.4-Ressourcen-Regel der Aufgabe (Fortschreibung 30.08.2026); die
+  Zentrierungseigenschaft gilt damit **näherungsweise** statt exakt
+  (dokumentierte Näherung §3.9, Ledger-Befund 115).
 - Werte je Region: \(\delta\) = **2,02 / 1,88 / 2,12** Tage je Betroffenem·Jahr (N/M/S;
   DE-gewichtet 1,99) mit den Basiswerten \(f\) = 0,70, \(p_B\) = 0,55, \(p_G\) = 0,75,
   \(a_{\text{attr}}\) = 0,50.

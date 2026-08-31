@@ -315,6 +315,9 @@ def _assemble_cell_input(
         "avg_height": bm["avg_building_height"],
         "road_cov": bm["road_coverage"],
         "canopy_frac": bm["tree_canopy_fraction"],
+        # Birkengruppen-Kronen (Methodik #96 §3.3, Ebene POLLEN_LOAD)
+        "canopy_birch_frac": bm.get("canopy_birch_fraction", 0.0),
+        "canopy_unknown_frac": bm.get("canopy_unknown_fraction", 0.0),
         "svf": bm["sky_view_factor"],
         "vent_score": vent_score,
         "uhi_delta": uhi,

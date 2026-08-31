@@ -50,6 +50,24 @@ CHALLENGE_TO_GROUP = {g["challenge"]: g["code"] for g in KWRA_GROUPS}
 # spatial = ob lokal räumlich auflösbar; proxy/source = Tooltip + Handbuch.
 
 HAZARDS: list[dict] = [
+    # Methodik #96 (Aeroallergene): Vegetations-Pollenlast der Zelle. Hazard im
+    # Sinne des Schadensbaums (W025 Pollenflug/allergene Vegetation); der Wert ist
+    # der gewichtete Anteil allergener Vegetation (Gehölze Birkengruppe + Grün als
+    # Gräser-Proxy) — Zell-Ableitung in engine/indicators.py, Spezifikation
+    # docs/methodik/96_aeroallergene.md §3.3.
+    {"code": "POLLEN_LOAD", "name": "Pollenlast (allergene Vegetation)",
+     "unit": "Anteil", "norm_min": 0.0, "norm_max": 0.5, "spatial": True,
+     "description": "Anteil allergener Vegetation der Zelle (Birke/Erle/Hasel-Kronen "
+                    "und Grünflächen als Gräser-Proxy).",
+     "proxy": "OSM: Baumkronen mit genus/species der Birkengruppe (ungetaggte Kronen "
+              "mit dokumentiertem Gattungsanteil) + Grün-/Wiesenflächen; gewichtet mit "
+              "den δ-Beiträgen (w_B = 0,463).",
+     "source": "OSM (Bäume, Landnutzung) — Methodik #96 §3.3",
+     "source_detail": "Ĝ der Zelle; geht mittelwertzentriert als P̂ = 1 + λ(Ĝ/Ḡ − 1) "
+        "in ΔTage UND € ein. Die Normierungs-Obergrenze 0,5 ist eine reine "
+        "SCREENING-Grenze (Schicht A) — der absolute Ĝ-Wert der Schadensfunktion "
+        "wird nicht gekappt.",
+     "source_refs": ["Werchan_2017_Pollen_Berlin", "Bogawski_2019_Baumkronen_Pollen"]},
     {"code": "HEAT_WAVE", "name": "Hitzeextreme / Hitzewellen",
      "unit": "Tage/Jahr", "norm_min": 0.0, "norm_max": 40.0, "spatial": True,
      "description": "Akute oder anhaltende extreme Hitzeereignisse.",
@@ -186,6 +204,38 @@ RISKS: list[dict] = [
                     "altersgeschichtete Baseline × Hitzetage-Term um die Referenzlast "
                     "(Bericht #95 §3.4). Bewerteter Schaden — Konto K1 (M0, Untergrenze).",
      "priority": 1},
+    {"code": "EXPECTED_ANNUAL_ALLERGY_DAYS",
+     "name": "Aeroallergene — zusätzliche Symptomtage",
+     "kwra_id": 96,
+     "kwra_name": "Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft",
+     "kwra_field": "Menschliche Gesundheit", "stage": 0,
+     # Native Ergebnisgröße (§3.6): klimaattribuierte zusätzliche Symptomtage.
+     # Teil-Ausweise: Betroffene (B) und €.
+     "outcome_unit": "Symptomtage/Jahr", "group": "pollen", "cost_dimension": "health",
+     "hazards": ["POLLEN_LOAD"],
+     "exposures": ["POPULATION_DENSITY", "AGE_STRUCTURE"],
+     # EARLY_WARNING_SYSTEMS (S158) führt der Bericht §5 ausdrücklich als
+     # qualitativen Hebel mit Default 1 (keine Interventions-Effektgröße) — er
+     # geht daher in keine Formel ein und ist im M0-Katalog nicht angelegt.
+     "vulnerabilities": ["HEALTHCARE_ACCESS"],
+     # Herleitung ref_value (Sanity-Anker, Symptomtage je 100.000 EW): Bundessumme
+     # 8,96 Mio Betroffene × 1,988 Tage = 17,8 Mio Tage ÷ 83,456 Mio EW × 100.000
+     # ≈ 21.340 (Bericht §4). cost_per_outcome_eur: c_Tag 6,20 €₂₀₂₄ (s. _RISK_COST_RATES).
+     "ref_value": 21340.0, "scale": "pop", "cost_per_outcome_eur": 6.20,
+     "source": "Bericht #96 Rev. 1 (DWD-Phänologie / DEGS1+KiGGS / TOTALL)",
+     "source_detail": "Sanity-Anker in Symptomtagen je 100.000 EW: 10,74 % "
+        "AR-Prävalenz × 1,988 zusätzliche Symptomtage je Betroffenem·Jahr "
+        "(f 0,70 · (p_B·ΔS_B + p_G·ΔS_G) · a_attr 0,50) = 21.340 Tage/100k. Kein "
+        "Rechenweg — Schicht B rechnet die Schadensfunktion; der Anker dient der "
+        "Sanity-Prüfung (Faktor 5).",
+     "source_refs": ["DWD_CDC_Phaenologie", "Langen_2013_DEGS1",
+                     "Anderegg_2021_Pollensaison"],
+     "description": "Zusätzliche Symptomtage von Pollenallergikerinnen und -allergikern "
+                    "durch die klimabedingt verlängerte Pollensaison (gemessene "
+                    "Saison-Spreizung 1961–90 → 1991–2020 × Prävalenz × "
+                    "Klima-Attribution). Bewerteter Schaden — Konto K1 Gesundheit "
+                    "(Ursache: Allergene), Modellstand M0, Untergrenze.",
+     "priority": 1},
     # EXPECTED_TOTAL_DAMAGE_EAD_EUR (Gesamtschäden/EAD) wurde ENTFERNT: Der Gesamtschaden
     # ist kein eigenständiges HxVxE-Risiko mehr, sondern die SUMME der monetär bewerteten
     # Einzelrisiken (risk_engine.aggregate → cost.total_eur). Das eigene EAD-Risiko war per
@@ -211,17 +261,12 @@ STAGE_LABELS: dict[int, str] = {
 # folgt <Stufe>"). Bewusst NICHT in RISKS/Index-Maps/Engine/Ratchets. Die
 # H/V/E-Namenslisten stammen 1:1 aus docs/KWAR/KWRA-2021_Klimawirkungen.xlsx,
 # Sheet „Wirkungsmechanismen" (= Schadensbaum-Digitalisat); Stufen-Zuordnung aus
-# docs/ROADMAP.md §5. #96/#98 tragen stage 0: Sie gehören zum Sommer-Release und
+# docs/ROADMAP.md §5. #98 trägt stage 0: gehört zum Sommer-Release und
 # wechseln nach der Methodik-Freigabe (docs/METHODIK_M0_GESUNDHEIT.pdf) von hier
-# in RISKS. Zusammen mit kwra_id 95 (aktiv) sind alle 52 Roadmap-Klimawirkungen
-# genau einmal vertreten (Test: tests/test_planned_risks.py).
+# in RISKS. #96 ist seit der Integration (31.08.2026) aktiv; zusammen mit
+# kwra_id 95/96 (aktiv) sind alle 52 Roadmap-Klimawirkungen genau einmal
+# vertreten (Test: tests/test_planned_risks.py).
 PLANNED_RISKS: list[dict] = [
-    {"kwra_id": 96, "name": "Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft",
-     "cluster": "gesundheit", "kwra_field": "Menschliche Gesundheit", "stage": 0,
-     "hazard_names": [],
-     "upstream_names": ["Vegetation", "Ausbreitung von Pflanzenarten mit allergenem Potenzial", "Pollenflug"],
-     "sensitivity_names": ["Individueller Gesundheitszustand", "Individuelles Gefahrenbewusstsein", "Monitoring von Gesundheitsgefahren und Frühwarnsysteme"],
-     "exposure_names": ["Vorkommen von Bevölkerung", "Vorkommen von Gesundheitsinfrastruktur"]},
     {"kwra_id": 98, "name": "UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)",
      "cluster": "gesundheit", "kwra_field": "Menschliche Gesundheit", "stage": 0,
      "hazard_names": ["UV-Strahlung"],
@@ -809,6 +854,21 @@ _RISK_COST_RATES: dict[str, tuple[float, str, list[str], str]] = {
         "KLINISCHEN Fälle; die subklinische Produktivitätslast thermischer/Schadstoff-"
         "Belastung ist getrennt über die Belastungsstunden-Risiken bewertet — keine "
         "Doppelzählung."),
+    "EXPECTED_ANNUAL_ALLERGY_DAYS": (
+        6.20, "TOTALL 2016 / Destatis-VPI (c_Tag, €2024)",
+        ["Cardell_2016_TOTALL", "Pfaar_2017_EAACI_Pollensaison",
+         "Destatis_VPI_lange_Reihen"],
+        "Behandlungskostensatz je zusätzlichem Symptomtag: 6,20 €₂₀₂₄ = "
+        "c_Jahr,direkt 266,90 € ÷ d_Saison 43,05 Tage (Bericht #96 §3.5). "
+        "c_Jahr,direkt = 210,3 €₂₀₁₄ (TOTALL, bevölkerungsbasierte schwedische "
+        "Stichprobe, alle Schweregrade, direkte Kosten je Betroffenem·Jahr) × VPI "
+        "119,3/94,0; d_Saison = f 0,70 × (p_B 0,55 × L_B 30 + p_G 0,75 × L_G 60). "
+        "PROXY (§3.1): Jahreskosten inkl. perennialer AR auf Saisontage umgelegt und "
+        "Durchschnitts- statt Grenzkosten wirken überschätzend, fehlende "
+        "Selbstmedikation Nicht-Diagnostizierter und der Raumtransfer SE→DE ohne "
+        "Kaufkraft-Aufschlag unterschätzend. Band 6,20–23,66 € (Obergrenze = "
+        "Schramm-Kette für moderate–schwere SAR). Golden-Test beispiel_96_kostenkette; "
+        "die Kopplung c_Tag = c_Jahr/d_Saison ist testgebunden."),
     "EXPECTED_ANNUAL_INJURIES": (
         12_000.0, "UBA MK3.1 2020", ["UBA_Methodenkonvention_MK3.1"],
         "12.000 € je Verletztem (Behandlung, Reha, temporärer Erwerbsausfall) als "

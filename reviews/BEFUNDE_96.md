@@ -132,3 +132,16 @@ Prüfung gegen die Aufgaben-Fortschreibung vom 30.08.2026 (§3.4-Ressourcen-Rege
 kein nationaler Vollraster-Lauf; §3.1-Datenebenen-Anlagepflicht): Bericht #96
 **konform** — Konformitätsvermerk im Berichtskopf ergänzt (redaktionell, keine
 Modellwert-Änderung; kein Review-Loop erforderlich). Kern: POLLEN_LOAD (OSM-Vegetation, §3.3) und Zensusband u20 (§3.2) sind als „neu anzulegen“ spezifiziert und werden von /integriere-risiko verpflichtend angelegt (§3.1-Anlagepflicht); alle übrigen Zellgrößen sind vorhanden oder regional/national (keine Zellgröße auf unspezifiziertem Neutral-Fallback).
+
+## Integration → Produkt (31.08.2026, /integriere-risiko 96)
+
+Risiko-Code **EXPECTED_ANNUAL_ALLERGY_DAYS** (nativ: Symptomtage/Jahr; Teil-Ausweis
+Betroffene + €). Angelegt: 19 Registry-Parameter, 14 Quellen mit Wayback-Permalink,
+Schadensfunktion `allergy_symptom_days`, Hazard-Indikator `POLLEN_LOAD`, Kartenebenen
+`POPULATION_U20` und `CANOPY_BIRCH_FRACTION`, Lineage-Specs (Treiber `season_spread`,
+P̂-Modifikator), Golden-Tests `tests/test_methodik_96_golden.py`. Kostensatz
+c_Tag = 6,20 €₂₀₂₄ als Katalog-Kostensatz mit testgebundener Kette c_Jahr/d_Saison.
+
+| Nr | Stelle | Art | Befund & Begründung | Vorschlag | Kat. | Status |
+|---|---|---|---|---|---|---|
+| 115 | §3.3 „Ḡ wird einmalig auf dem Ist-Vegetationszustand des **Anlage-Bundeslaufs** berechnet" ↔ Aufgabe §3.4 (Ressourcen-Regel, Fortschreibung 30.08.2026) | Widerspruch Bericht ↔ übergeordnete Instruktionsquelle | Der Bericht (Rev. 1, vor der Fortschreibung geschrieben) sieht für das Referenzmittel Ḡ einen nationalen Lauf über alle bewohnten 100-m-Zellen vor. Die Ressourcen-Regel verbietet nationale Vollraster-Läufe ausdrücklich als Prüf-/Abgleichinstrument und erlaubt stattdessen kommunale Stichproben mit dem Produktionsmodell. Nicht integrationsblockierend: die Zentrierungs-EIGENSCHAFT (E_Betroffene[P̂] = 1) bleibt erhalten, sie gilt nur näherungsweise statt exakt — die Stichproben-Streuung ist als Band dokumentiert | §3.3 auf „kommunale Stichprobe (Ressourcen-Regel)" fortschreiben und die Näherungs-Eigenschaft samt Band als §3.9-Kennzeichnung aufnehmen; Ḡ bleibt fixierter, versionierter Registry-Parameter | B | **umgesetzt (Integration)**: Ḡ = **0,1775** aus dokumentierter Stichprobe mit dem Produktionsmodell (`pollen_g_bar.py`, Anlagen `pollen_g_bar.csv`/`.md`: Offenbach am Main 0,1740 · Freising 0,1797 · Weyarn 0,2704; 2.896 bewohnte Zellen / 20.408 Betroffene); Registry-Parameter `g_bar_ref` mit vollständiger Herleitung, Band 0,174–0,270 und Kennzeichnung der Metropolen-Untererfassung (Richtung: Ḡ eher überschätzt ⇒ P̂ in Großstädten konservativ < 1). Berichts-§3.3 um das Integrations-Ergebnis ergänzt — die Fortschreibung des Berichtssatzes „Anlage-Bundeslauf" → „kommunale Stichprobe" prüft das nächste Review |

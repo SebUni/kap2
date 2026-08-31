@@ -195,6 +195,16 @@ AUXILIARY: list[dict] = [
     _aux("POPULATION_85_PLUS", "Einwohner ≥85", "Pers.", "zensus",
          "Zensus 2022 (100m-Gitter): 65+-Menge × Binnenaufteilung der 5-Jahres-Gruppen",
          norm_max=200, feeds=["EXPECTED_ANNUAL_MORTALITY", "AGE_STRUCTURE"]),
+    # Methodik #96 (§3.2/§3.3): Bevölkerungsband u20 (Prävalenz-Schichtung) und
+    # die Bestandteile der Pollenlast Ĝ (Ebene POLLEN_LOAD ist ein Hazard-Layer).
+    _aux("POPULATION_U20", "Einwohner unter 20", "Pers.", "zensus",
+         "Zensus 2022 (100m-Gitter): u65-Menge × Binnenaufteilung der "
+         "5-Jahres-Gruppen (unter5 … 15–19); Methodik #96 §3.2",
+         norm_max=400, feeds=["EXPECTED_ANNUAL_ALLERGY_DAYS", "AGE_STRUCTURE"]),
+    _aux("CANOPY_BIRCH_FRACTION", "Kronenanteil Birkengruppe", "Anteil", "osm",
+         "OSM-Bäume mit genus/species der Birkengruppe (Betula/Alnus/Corylus/"
+         "Carpinus); Kronenfläche je Zellfläche — Methodik #96 §3.3",
+         norm_max=0.3, feeds=["POLLEN_LOAD"]),
     # Methodik #95 Rev. 8 (§3.6, Log 35): Heimbewohner-Anteil an der
     # 85+-Bevölkerung — Zellgröße des β_pfl-Terms (v_vers, nur D-Pfad).
     _aux("CARE_HOME_SHARE_85P", "Heimbewohner-Anteil 85+ (q_pfl)", "Anteil", "zensus",

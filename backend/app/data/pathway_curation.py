@@ -50,6 +50,20 @@ CURATED_PATHWAYS: dict[str, dict] = {
              "dort verstärkt die städtische Wärmeinsel die Exposition."),
         ],
     },
+    "EXPECTED_ANNUAL_ALLERGY_DAYS": {
+        "cluster": "Menschliche Gesundheit (KWRA 2021, Teilbericht 5)",
+        "ref": _KWRA,
+        "chains": [
+            ("POLLEN_LOAD", "POPULATION_DENSITY", "HEALTHCARE_ACCESS", "primary",
+             "Die klimabedingt längere Pollensaison (W025) trifft die Bevölkerung dort "
+             "am stärksten, wo viele Menschen neben allergener Vegetation wohnen; der "
+             "Versorgungszugang (R36) entscheidet über Diagnose und Therapie."),
+            ("POLLEN_LOAD", "AGE_STRUCTURE", "HEALTHCARE_ACCESS", "alternate_exposure",
+             "Die Prävalenz der allergischen Rhinitis ist stark altersabhängig "
+             "(Maximum 30–39 Jahre, Kinder/Jugendliche hoch, Hochaltrige niedrig) — "
+             "die Altersstruktur der Zelle bestimmt die Zahl der Betroffenen (R35)."),
+        ],
+    },
     "EXPECTED_ANNUAL_MORBIDITY": {
         "cluster": "Menschliche Gesundheit (KWRA 2021, Teilbericht 5)",
         "ref": _KWRA,

@@ -98,6 +98,20 @@ AGE_LIFE_YEARS: dict[str, float] = {
     "u65": 23.39, "a65_74": 15.59, "a75_84": 8.90, "a85p": 4.16,
 }
 
+# ── #96 Aeroallergene (Methodik-Bericht Rev. 1) ───────────────────────────────
+# Altersbänder der AR-Prävalenz: u20 und 20–64 kommen aus der Zensus-
+# Binnenaufteilung der u65-Menge (zensus_loader), 65+ wie bei #95.
+POLLEN_AGE_BANDS: tuple[str, ...] = ("u20", "a20_64", "a65_74", "a75_84", "a85p")
+
+# 12-Monats-Prävalenz allergische Rhinitis je Band (DEGS1/KiGGS, §3.2).
+POLLEN_PREVALENCE: dict[str, float] = {
+    "u20": 0.088, "a20_64": 0.132, "a65_74": 0.067, "a75_84": 0.050, "a85p": 0.050,
+}
+
+# Gemessene Saison-Spreizung je Region (Tage; DWD-Phänologie, §3.1).
+POLLEN_DELTA_S_BIRKE: dict[str, float] = {"nord": 3.96, "mitte": 4.20, "sued": 5.94}
+POLLEN_DELTA_S_GRAESER: dict[str, float] = {"nord": 4.78, "mitte": 4.08, "sued": 3.70}
+
 # Baseline-Einweisungsraten je Band (Fälle/100.000·Jahr) — Morbiditätspfad
 # (Bericht #95 §3.4, Anker #r0-a; bevölkerungsgewichtete Summe 3,54).
 AGE_MORBIDITY_R0: dict[str, float] = {
@@ -299,6 +313,68 @@ def morbidity(risk: dict, ctx: CellContext) -> dict:
     return _result(risk, outcome)
 
 
+# ── 2b. Aeroallergene: klimaattribuierte Symptomtage (#96) ────────────────────
+
+def _pollen_age_bands(ctx: CellContext) -> dict[str, float]:
+    """Bevölkerung je #96-Band; Rückfall über die u65-Menge und den Bundesanteil."""
+    from app.services.zensus_loader import NATIONAL_U20_SHARE_OF_U65
+
+    bands = ctx.ci.get("pop_age_bands")
+    if isinstance(bands, dict) and bands.get("u20") is not None:
+        return {b: float(bands.get(b) or 0.0) for b in POLLEN_AGE_BANDS}
+    # Alt-Zellen ohne u20-Aufteilung: u65 national in u20/20–64 trennen.
+    base = _age_bands(ctx)
+    u65 = float(base.get("u65") or 0.0)
+    return {
+        "u20": u65 * NATIONAL_U20_SHARE_OF_U65,
+        "a20_64": u65 * (1.0 - NATIONAL_U20_SHARE_OF_U65),
+        "a65_74": float(base.get("a65_74") or 0.0),
+        "a75_84": float(base.get("a75_84") or 0.0),
+        "a85p": float(base.get("a85p") or 0.0),
+    }
+
+
+def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
+    """Zusätzliche Symptomtage durch die klimabedingt längere Pollensaison.
+
+    ``B_z    = Σ_a pop_a · p_AR,a``                                    (§3.2)
+    ``δ_R    = f · (p_B·ΔS_B,R + p_G·ΔS_G,R) · a_attr``                (§3.3)
+    ``P̂_z    = 1 + λ · (Ĝ_z/Ḡ − 1)``   (mittelwertzentriert, §3.3)
+    ``ΔTage_z = B_z · δ_R · P̂_z``      (nativ; € = ΔTage × c_Tag)
+
+    P̂ steht in BEIDEN Pfaden — nativer Ausweis und €-Wert bleiben strikt
+    proportional (Rev.-5-Befund 12). Der Kostensatz c_Tag = c_Jahr/d_Saison
+    hängt am Registry-Kostensatz des Risikos (Herleitung dort; Golden-Test
+    beispiel_96_kostenkette).
+    """
+    code = risk["code"]
+    region = region_for(ctx.regional.get("bundesland"))
+
+    bands = _pollen_age_bands(ctx)
+    betroffene = sum(
+        pop * ctx.p(code, f"p_ar_{band}", POLLEN_PREVALENCE[band])
+        for band, pop in bands.items()
+    )
+
+    f = ctx.p(code, "f_symptomtage", 0.70)
+    p_b = ctx.p(code, "p_sens_birke", 0.55)
+    p_g = ctx.p(code, "p_sens_graeser", 0.75)
+    a_attr = ctx.p(code, "a_attr", 0.50)
+    ds_b = ctx.p(code, f"delta_s_birke_{region}", POLLEN_DELTA_S_BIRKE[region])
+    ds_g = ctx.p(code, f"delta_s_graeser_{region}", POLLEN_DELTA_S_GRAESER[region])
+    delta = f * (p_b * ds_b + p_g * ds_g) * a_attr
+
+    # Vegetations-Modulation: zentriert auf das fixierte Referenzmittel Ḡ.
+    lam = ctx.p(code, "lambda_veg", 0.70)
+    g_bar = ctx.p(code, "g_bar_ref", 0.1775)
+    g_cell = ctx.haz("POLLEN_LOAD")
+    p_hat = max(0.0, 1.0 + lam * (g_cell / g_bar - 1.0)) if g_bar > 0 else 1.0
+
+    out = _result(risk, betroffene * delta * p_hat)
+    out["betroffene"] = max(0.0, betroffene)
+    return out
+
+
 # ── 3. Todesfälle durch Hochwasser/Sturzfluten ────────────────────────────────
 
 def flood_regime(ctx: CellContext) -> float:
@@ -462,6 +538,7 @@ HEALTH_IMPACTS = {
     "EXPECTED_ANNUAL_MORTALITY_FLOOD": mortality_flood,
     "EXPECTED_ANNUAL_MORTALITY_STORM": mortality_storm,
     "EXPECTED_ANNUAL_MORBIDITY": morbidity,
+    "EXPECTED_ANNUAL_ALLERGY_DAYS": allergy_symptom_days,
     "EXPECTED_ANNUAL_INJURIES": injuries_flood,
     "EXPECTED_ANNUAL_INJURIES_STORM": injuries_storm,
     "EXPECTED_ANNUAL_INJURIES_LANDSLIDE": injuries_landslide,
@@ -552,6 +629,27 @@ LINEAGE_SPECS: dict[str, dict] = {
         "no_modifier": True,
         "driver": {"kind": "hd_linear", "hazard": "HEAT_WAVE",
                    "params": ["excess_per_hotday", "hotday_ref_days"]},
+    },
+    "EXPECTED_ANNUAL_ALLERGY_DAYS": {
+        # Rate = Prävalenz des größten Bandes (20–64); Basis = Altersbänder.
+        "rate_param": "p_ar_a20_64",
+        "basis_key": "pop_age_bands",
+        "basis_label": "Bevölkerung je Altersband (Zelle)",
+        "driver": {"kind": "season_spread", "hazard": "POLLEN_LOAD",
+                   "params": ["f_symptomtage", "p_sens_birke", "p_sens_graeser",
+                              "delta_s_birke_mitte", "delta_s_graeser_mitte",
+                              "a_attr"]},
+        "modifier": {
+            "term": "P̂ (Vegetation)",
+            "label": "Lokale Vegetationslast",
+            "vulnerabilities": [],
+            "params": ["lambda_veg", "g_bar_ref"],
+            "note": ("Mittelwertzentrierte Modulation über die lokale Pollenlast: "
+                     "P̂ = 1 + λ(Ĝ/Ḡ − 1) mit dem betroffenengewichteten "
+                     "Referenzmittel Ḡ (fixiert). Steht in BEIDEN Pfaden — "
+                     "Symptomtage und Euro bleiben strikt proportional.\n"
+                     r"$$\hat P_{z} = 1 + \lambda\,\bigl(\hat G_{z}/\bar G - 1\bigr)$$"),
+        },
     },
     "EXPECTED_ANNUAL_INJURIES": {
         "rate_param": "rate_per_100k",

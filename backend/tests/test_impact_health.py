@@ -370,7 +370,8 @@ def test_region_thresholds_differ():
 # ── (h) Abdeckung + Sanity ────────────────────────────────────────────────────
 
 def test_all_health_risks_registered():
-    assert len(HEALTH) == 11
+    # 12 seit der #96-Integration (Aeroallergene-Symptomtage).
+    assert len(HEALTH) == 12
     for code in HEALTH:
         assert impact.has(code), code
 

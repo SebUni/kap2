@@ -985,6 +985,159 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "methodenkonvention-umweltkosten",
         "accessed": "2026-08-30",
     },
+    # ── Methodik #96 Rev. 1 (Aeroallergene; docs/methodik/96_aeroallergene.md) ──
+    "Langen_2013_DEGS1": {
+        "ieee": "U. Langen, R. Schmitz und H. Steppuhn, „Häufigkeit allergischer "
+                "Erkrankungen in Deutschland: Ergebnisse der Studie zur Gesundheit "
+                "Erwachsener in Deutschland (DEGS1),“ Bundesgesundheitsbl., Bd. 56, "
+                "Nr. 5–6, S. 698–706, 2013. doi: 10.1007/s00103-012-1652-7. Tab. 3: "
+                "12-Monats-Prävalenz Heuschnupfen nach Altersdekaden (14,6/17,2/14,3/"
+                "10,1/8,2/5,0 %) — Basis der Band-Prävalenzen p_AR (#96 §3.2).",
+        "url": "https://doi.org/10.1007/s00103-012-1652-7",
+        "archive_url": "https://web.archive.org/web/20251225055737/"
+                       "https://doi.org/10.1007/s00103-012-1652-7",
+        "accessed": "2026-08-30",
+    },
+    "Thamm_2018_KiGGS_W2": {
+        "ieee": "R. Thamm u. a., „Allergische Erkrankungen bei Kindern und Jugendlichen "
+                "in Deutschland — Querschnittergebnisse aus KiGGS Welle 2,“ J. Health "
+                "Monit., Bd. 3, Nr. 3, S. 3–18, 2018. doi: 10.17886/RKI-GBE-2018-075 "
+                "(12-Monats-Prävalenz Heuschnupfen 0–17 Jahre: 8,8 % — Band u20).",
+        "url": "https://doi.org/10.17886/RKI-GBE-2018-075",
+        "archive_url": "https://web.archive.org/web/20251223141607/"
+                       "https://doi.org/10.17886/RKI-GBE-2018-075",
+        "accessed": "2026-08-30",
+    },
+    "Haftenberger_2013_Sensibilisierung": {
+        "ieee": "M. Haftenberger u. a., „Prävalenz von Sensibilisierungen gegen "
+                "Inhalations- und Nahrungsmittelallergene (DEGS1),“ Bundesgesundheitsbl., "
+                "Bd. 56, Nr. 5–6, S. 687–697, 2013. doi: 10.1007/s00103-012-1658-1. "
+                "Tab. 2/Abb. 1: Sensibilisierung Gräserpollen 19,4 %, Birke 17,4 % — "
+                "Stütze der Anteile p_B/p_G (#96 §3.4).",
+        "url": "https://doi.org/10.1007/s00103-012-1658-1",
+        "archive_url": "https://web.archive.org/web/20260831051759/"
+                       "https://doi.org/10.1007/s00103-012-1658-1",
+        "accessed": "2026-08-31",
+    },
+    "Bergmann_2023_RKI_Allergie_Klima": {
+        "ieee": "K.-C. Bergmann u. a., „Auswirkungen des Klimawandels auf allergische "
+                "Erkrankungen in Deutschland,“ J. Health Monit., Bd. 8, Nr. S4, "
+                "S. 82–110, 2023 (RKI-Sachstandsbericht Klimawandel und Gesundheit). "
+                "doi: 10.25646/11648 — beschreibt den Spreizungs-Mechanismus der "
+                "Pollensaison (Konstruktionsprinzip #96 §3.1).",
+        "url": "https://doi.org/10.25646/11648",
+        "archive_url": "https://web.archive.org/web/20260831051824/"
+                       "https://doi.org/10.25646/11648",
+        "accessed": "2026-08-31",
+    },
+    "Anderegg_2021_Pollensaison": {
+        "ieee": "W. R. L. Anderegg u. a., „Anthropogenic climate change is worsening "
+                "North American pollen seasons,“ PNAS, Bd. 118, Nr. 7, e2013284118, "
+                "2021. doi: 10.1073/pnas.2013284118 (Saisonlänge +8 Tage, Pollenintegral "
+                "+20,9 %; klimaattribuierter Anteil ≈ 50 % [IQR 19–84 %] — a_attr).",
+        "url": "https://doi.org/10.1073/pnas.2013284118",
+        "archive_url": "https://web.archive.org/web/20260808163832/"
+                       "https://doi.org/10.1073/pnas.2013284118",
+        "accessed": "2026-08-30",
+    },
+    "Pfaar_2017_EAACI_Pollensaison": {
+        "ieee": "O. Pfaar, K.-C. Bergmann u. a., „Defining pollen exposure times for "
+                "clinical trials of allergen immunotherapy — an EAACI position paper,“ "
+                "Allergy, Bd. 72, S. 713–722, 2017. doi: 10.1111/all.13092 (definiert "
+                "die Saisonkriterien Birke/Gräser; publiziert keine festen Längenwerte "
+                "— L_B/L_G sind gekennzeichnete Abschätzungen, #96 §3.5).",
+        "url": "https://doi.org/10.1111/all.13092",
+        "archive_url": "https://web.archive.org/web/20260206101725/"
+                       "https://doi.org/10.1111/all.13092",
+        "accessed": "2026-08-30",
+    },
+    "Pfaar_2020_Symptomlast": {
+        "ieee": "O. Pfaar u. a., „Pollen season is reflected on symptom load for grass "
+                "and birch pollen-induced allergic rhinitis,“ Allergy, Bd. 75, S. 1099, "
+                "2020. doi: 10.1111/all.14111 — nur qualitative Stütze (Pollen treibt "
+                "Symptomlast); liefert KEINEN Zahlenwert für f (#96 §3.4).",
+        "url": "https://doi.org/10.1111/all.14111",
+        "archive_url": "https://web.archive.org/web/20260414195017/"
+                       "https://doi.org/10.1111/all.14111",
+        "accessed": "2026-08-30",
+    },
+    "Werchan_2017_Pollen_Berlin": {
+        "ieee": "B. Werchan u. a., „Spatial distribution of allergenic pollen through a "
+                "large metropolitan area,“ Environ. Monit. Assess., Bd. 189, 169, 2017. "
+                "doi: 10.1007/s10661-017-5876-8 (Berlin, 14 Pollenfallen: Unterschiede "
+                "zwischen Extremstandorten 245 % Birke / 306 % Gräser — λ-Kette #96 §3.4).",
+        "url": "https://doi.org/10.1007/s10661-017-5876-8",
+        "archive_url": "https://web.archive.org/web/20250916060402/"
+                       "https://doi.org/10.1007/s10661-017-5876-8",
+        "accessed": "2026-08-30",
+    },
+    "Werchan_2018_Symptome_Berlin": {
+        "ieee": "B. Werchan u. a., „Spatial distribution of pollen-induced symptoms "
+                "within a large metropolitan area — Berlin,“ Aerobiologia, Bd. 34, "
+                "S. 539, 2018. doi: 10.1007/s10453-018-9529-3 (räumliche Kopplung "
+                "Vegetation → Symptomlast; Stütze des λ-Terms).",
+        "url": "https://doi.org/10.1007/s10453-018-9529-3",
+        "archive_url": "https://web.archive.org/web/20250803100833/"
+                       "https://doi.org/10.1007/s10453-018-9529-3",
+        "accessed": "2026-08-30",
+    },
+    "Bogawski_2019_Baumkronen_Pollen": {
+        "ieee": "P. Bogawski u. a., „Lidar-Derived Tree Crown Parameters: Are They New "
+                "Variables Explaining Local Birch Pollen Concentrations?,“ Forests, "
+                "Bd. 10, 1154, 2019. doi: 10.3390/f10121154 (Baumkronen-Parameter "
+                "erklären lokale Birkenpollen-Konzentration — Stütze a_veg der λ-Kette).",
+        "url": "https://doi.org/10.3390/f10121154",
+        "archive_url": "https://web.archive.org/web/20250815192249/"
+                       "https://doi.org/10.3390/f10121154",
+        "accessed": "2026-08-30",
+    },
+    "Cardell_2016_TOTALL": {
+        "ieee": "L.-O. Cardell u. a., „TOTALL: high cost of allergic rhinitis — a "
+                "national Swedish population-based questionnaire study,“ npj Prim. Care "
+                "Respir. Med., Bd. 26, 15082, 2016. doi: 10.1038/npjpcrm.2015.82 "
+                "(bevölkerungsbasierte Stichprobe, alle Schweregrade: direkte Kosten "
+                "210,3 € je Betroffenem·Jahr, Preisstand Feb. 2014 — Basis c_Jahr,direkt).",
+        "url": "https://doi.org/10.1038/npjpcrm.2015.82",
+        "archive_url": "https://web.archive.org/web/20260607195246/"
+                       "https://doi.org/10.1038/npjpcrm.2015.82",
+        "accessed": "2026-08-30",
+    },
+    "BT_Drs_19_22797_Allergiekosten": {
+        "ieee": "Deutscher Bundestag, Drucksache 19/22797 (Antwort der Bundesregierung, "
+                "23.09.2020), Antwort zu Frage 5: Krankheitskostenrechnung 2015 — "
+                "Atmungssystem 16,5 Mrd. €, Asthma 1,9 Mrd. €; „Genauere Angaben zu "
+                "Krankheitskosten allergischer Erkrankungen liegen nicht vor“ — Beleg "
+                "der fehlenden J30-Ankerreihe (#96 §4, c_kal ≡ 1).",
+        "url": "https://dserver.bundestag.de/btd/19/227/1922797.pdf",
+        "archive_url": "https://web.archive.org/web/20250624072520/"
+                       "https://dserver.bundestag.de/btd/19/227/1922797.pdf",
+        "accessed": "2026-08-30",
+    },
+    "DWD_CDC_Phaenologie": {
+        "ieee": "DWD Climate Data Center (CDC), Phänologie-Jahresmelder (wildwachsende "
+                "Pflanzen, historisch), opendata.dwd.de — Hasel/Schwarz-Erle/Hänge-Birke "
+                "(Blüte Beginn bzw. Blattentfaltung), Wiesen-Fuchsschwanz/Wiesen-"
+                "Knäuelgras (Vollblüte); Basis der gemessenen Saison-Spreizung ΔS "
+                "(Skript dwd_pollensaison.py).",
+        "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/"
+               "phenology/",
+        "archive_url": "https://web.archive.org/web/20250617091132/"
+                       "https://opendata.dwd.de/climate_environment/CDC/"
+                       "observations_germany/phenology/",
+        "accessed": "2026-08-30",
+    },
+    "Destatis_VPI_lange_Reihen": {
+        "ieee": "Statistisches Bundesamt (Destatis), Verbraucherpreisindex für "
+                "Deutschland — lange Reihen (2020 = 100): 2000 = 75,9 · 2014 = 94,0 · "
+                "2023 = 116,7 · 2024 = 119,3; Wiesbaden. Indexierungsbasis aller "
+                "Kostensätze auf den Preisstand 2024.",
+        "url": "https://www.destatis.de/DE/Themen/Wirtschaft/Preise/"
+               "Verbraucherpreisindex/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20260826041310/"
+                       "https://www.destatis.de/DE/Themen/Wirtschaft/Preise/"
+                       "Verbraucherpreisindex/_inhalt.html",
+        "accessed": "2026-08-30",
+    },
     "Feldbusch_2025_HHWS": {
         "ieee": "H. Feldbusch u. a., „Assessing the effectiveness of the heat health "
                 "warning system in preventing mortality in 15 German cities: A "
