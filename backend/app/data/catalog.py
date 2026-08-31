@@ -50,6 +50,22 @@ CHALLENGE_TO_GROUP = {g["challenge"]: g["code"] for g in KWRA_GROUPS}
 # spatial = ob lokal räumlich auflösbar; proxy/source = Tooltip + Handbuch.
 
 HAZARDS: list[dict] = [
+    # Methodik #98 (UV): Sonnenscheindauer als Proxy der erythemwirksamen
+    # UV-Dosis. Zellwert = Mittel der Klimanormalperiode 1991–2020 aus dem
+    # DWD-Raster (Anlage ssd_normalperioden.npz); die Schadensfunktion nutzt
+    # die relative Änderung gegenüber 1961–1990.
+    {"code": "UV_RADIATION", "name": "UV-Strahlung (Sonnenscheindauer)",
+     "unit": "h/Jahr", "norm_min": 1300.0, "norm_max": 1950.0, "spatial": True,
+     "description": "Jährliche Sonnenscheindauer der Zelle (Klimanormalperiode "
+                    "1991–2020) als Proxy der erythemwirksamen UV-Dosis.",
+     "proxy": "DWD-CDC-Jahresraster sunshine_duration (1 km), Normalperioden-"
+              "Mittel je Zellstandort; Fallback Bundesland-Gebietsmittel.",
+     "source": "DWD CDC (Raster sunshine_duration) — Methodik #98 §3.2",
+     "source_detail": "Normierungsgrenzen 1.300–1.950 h/Jahr umspannen die "
+        "beobachtete Spanne der Normalperioden-Mittel (Raster: 1.131–2.016 h im "
+        "Referenzzeitraum). Das ist eine SCREENING-Grenze; die Schadensfunktion "
+        "rechnet mit der relativen Änderung ΔSSD/SSD und wird nicht gekappt.",
+     "source_refs": ["DWD_CDC_SSD_Raster"]},
     # Methodik #96 (Aeroallergene): Vegetations-Pollenlast der Zelle. Hazard im
     # Sinne des Schadensbaums (W025 Pollenflug/allergene Vegetation); der Wert ist
     # der gewichtete Anteil allergener Vegetation (Gehölze Birkengruppe + Grün als
@@ -236,6 +252,37 @@ RISKS: list[dict] = [
                     "Klima-Attribution). Bewerteter Schaden — Konto K1 Gesundheit "
                     "(Ursache: Allergene), Modellstand M0, Untergrenze.",
      "priority": 1},
+    {"code": "EXPECTED_ANNUAL_UV_YLL",
+     "name": "UV-Schädigungen — verlorene Lebensjahre",
+     "kwra_id": 98,
+     "kwra_name": "UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)",
+     "kwra_field": "Menschliche Gesundheit", "stage": 0,
+     # Native Ergebnisgröße (§3.6): YLL; Teil-Ausweise: Zusatzfälle je Entität
+     # (Melanom/C44) und €.
+     "outcome_unit": "YLL/Jahr", "group": "uv", "cost_dimension": "health",
+     "hazards": ["UV_RADIATION"],
+     "exposures": ["POPULATION_DENSITY", "AGE_STRUCTURE"],
+     "vulnerabilities": ["HEALTHCARE_ACCESS"],
+     # Herleitung ref_value (Sanity-Anker, YLL je 100.000 EW): Bundessumme
+     # ≈ 1.580 YLL/Jahr ÷ 83,456 Mio EW × 100.000 ≈ 1,89.
+     # cost_per_outcome_eur: VOLY 160.800 €₂₀₂₄ wie #95 — ABER der €-Ausweis
+     # enthält zusätzlich die Behandlungskosten je Zusatzfall (§3.4); die
+     # Schadensfunktion setzt cost_eur deshalb selbst (s. impact/health.py).
+     "ref_value": 1.89, "scale": "pop", "cost_per_outcome_eur": 160800.0,
+     "source": "Bericht #98 Rev. 1 (ZfKD KID 2025 / DWD-SSD / Slaper-BAF)",
+     "source_detail": "Sanity-Anker in YLL je 100.000 EW: klimaattribuierte "
+        "Zusatzfälle 814 (Melanom) + 20.118 (C44) × Letalität × "
+        "Restlebenserwartung = 1.580 YLL/Jahr bundesweit ⇒ 1,89 je 100.000 EW "
+        "(Bericht §4). Kein Rechenweg — Schicht B rechnet die Schadensfunktion.",
+     "source_refs": ["ZfKD_KID_2025", "DWD_CDC_SSD_Raster", "Slaper_1996_BAF"],
+     "description": "Verlorene Lebensjahre durch klimabedingt zusätzliche "
+                    "Hautkrebsfälle (malignes Melanom und nicht-melanotischer "
+                    "Hautkrebs): gemessener Anstieg der Sonnenscheindauer "
+                    "1961–90 → 1991–2020 × biologischer Verstärkungsfaktor × "
+                    "altersspezifische Baseline-Inzidenz. Bewerteter Schaden — "
+                    "Konto K1 Gesundheit (Ursache UV), Modellstand M0, "
+                    "Untergrenze.",
+     "priority": 1},
     # EXPECTED_TOTAL_DAMAGE_EAD_EUR (Gesamtschäden/EAD) wurde ENTFERNT: Der Gesamtschaden
     # ist kein eigenständiges HxVxE-Risiko mehr, sondern die SUMME der monetär bewerteten
     # Einzelrisiken (risk_engine.aggregate → cost.total_eur). Das eigene EAD-Risiko war per
@@ -261,18 +308,12 @@ STAGE_LABELS: dict[int, str] = {
 # folgt <Stufe>"). Bewusst NICHT in RISKS/Index-Maps/Engine/Ratchets. Die
 # H/V/E-Namenslisten stammen 1:1 aus docs/KWAR/KWRA-2021_Klimawirkungen.xlsx,
 # Sheet „Wirkungsmechanismen" (= Schadensbaum-Digitalisat); Stufen-Zuordnung aus
-# docs/ROADMAP.md §5. #98 trägt stage 0: gehört zum Sommer-Release und
+# docs/ROADMAP.md §5. #95/#96/#98 sind seit den Integrationen aktiv und
 # wechseln nach der Methodik-Freigabe (docs/METHODIK_M0_GESUNDHEIT.pdf) von hier
 # in RISKS. #96 ist seit der Integration (31.08.2026) aktiv; zusammen mit
 # kwra_id 95/96 (aktiv) sind alle 52 Roadmap-Klimawirkungen genau einmal
 # vertreten (Test: tests/test_planned_risks.py).
 PLANNED_RISKS: list[dict] = [
-    {"kwra_id": 98, "name": "UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)",
-     "cluster": "gesundheit", "kwra_field": "Menschliche Gesundheit", "stage": 0,
-     "hazard_names": ["UV-Strahlung"],
-     "upstream_names": [],
-     "sensitivity_names": ["Individuelles Gefahrenbewusstsein", "Freizeitverhalten"],
-     "exposure_names": ["Vorkommen von Bevölkerung", "Vorkommen von Gesundheitsinfrastruktur"]},
     {"kwra_id": 62, "name": "Stadtklima / Wärmeinseln",
      "cluster": "infrastruktur", "kwra_field": "Bauwesen", "stage": 1,
      "hazard_names": ["Hitze", "Sonnenscheindauer"],
@@ -854,6 +895,16 @@ _RISK_COST_RATES: dict[str, tuple[float, str, list[str], str]] = {
         "KLINISCHEN Fälle; die subklinische Produktivitätslast thermischer/Schadstoff-"
         "Belastung ist getrennt über die Belastungsstunden-Risiken bewertet — keine "
         "Doppelzählung."),
+    "EXPECTED_ANNUAL_UV_YLL": (
+        160_800.0, "UBA MK 4.0 (VOLY, €2024)", ["UBA_MK40_Amann_2020_VOLY"],
+        "Mortalitätsbewertung wie #95: verlorene Lebensjahre × VOLY "
+        "160.800 €₂₀₂₄. ACHTUNG — bei #98 ist der €-Ausweis NICHT allein "
+        "outcome × Kostensatz: Zum YLL-Wert kommen die Behandlungskosten der "
+        "klimaattribuierten Zusatzfälle (6.724 €/Melanom, 5.883 €/C44; "
+        "Bericht §3.4). Die Schadensfunktion setzt cost_eur deshalb selbst; "
+        "dieser Kostensatz bleibt der editierbare VOLY-Hebel des "
+        "Mortalitätsanteils (Golden-Test bindet beide Bestandteile).",
+    ),
     "EXPECTED_ANNUAL_ALLERGY_DAYS": (
         6.20, "TOTALL 2016 / Destatis-VPI (c_Tag, €2024)",
         ["Cardell_2016_TOTALL", "Pfaar_2017_EAACI_Pollensaison",
@@ -2132,4 +2183,8 @@ def group_label(code: str) -> str:
 # c_kal 0,581, Morbidität r_0,a × HD-Term).
 # rev8b: Befund 93 — Producer-Zellzuordnung der CARE_HOME_SHARE_85P-Ebene
 # gefixt (Mittelpunkts- vs. Ursprungs-Key); Stände mit leerer Ebene invalidieren.
-MODEL_VERSION = "2026.08-m0-95rev8b"
+# 96: Integration Methodik #96 (Aeroallergene — Symptomtage, Ebene POLLEN_LOAD,
+# kommunale Ḡ-Referenz). 98: Integration Methodik #98 (UV-Schädigungen — YLL,
+# neue Ebene UV_RADIATION/SSD mit den Zellgrößen ssd_ref/ssd_neu). Alte Stände
+# tragen weder die SSD-Zellgrößen noch die UV-Risikozeile und müssen neu rechnen.
+MODEL_VERSION = "2026.08-m0-96-98"

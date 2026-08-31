@@ -1138,6 +1138,137 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "Verbraucherpreisindex/_inhalt.html",
         "accessed": "2026-08-30",
     },
+    # ── Methodik #98 Rev. 1 (UV-Schädigungen; docs/methodik/98_uv_schaedigungen.md) ──
+    "ZfKD_KID_2025": {
+        "ieee": "Zentrum für Krebsregisterdaten (ZfKD) im Robert Koch-Institut und "
+                "GEKID, „Krebs in Deutschland für 2021/2022“ (KID 2025), Kap. 3.13 "
+                "(malignes Melanom C43) und 3.14 (nicht-melanotischer Hautkrebs C44), "
+                "Berlin. Neuerkrankungen 2023: MM 27.430, C44 242.820; Sterbefälle "
+                "MM 3.169, C44 1.332; altersspezifische Raten als Abbildungen "
+                "(Abb. 3.13.2/3.14.3) — Ablesekette #98 §3.3.",
+        "url": "https://www.krebsdaten.de/Krebs/DE/Content/Publikationen/"
+               "Krebs_in_Deutschland/krebs_in_deutschland_node.html",
+        "archive_url": "https://web.archive.org/web/20260831113349/"
+                       "https://www.krebsdaten.de/Krebs/DE/Home/homepage_node.html",
+        "accessed": "2026-08-31",
+    },
+    "Slaper_1996_BAF": {
+        "ieee": "H. Slaper, G. J. M. Velders, J. S. Daniel, F. R. de Gruijl und "
+                "J. C. van der Leun, „Estimates of ozone depletion and skin cancer "
+                "incidence to examine the Vienna Convention achievements,“ Nature, "
+                "Bd. 384, S. 256–258, 1996. doi: 10.1038/384256a0. Biologische "
+                "Verstärkungsfaktoren (BAF): SCC 2,5 ± 0,7 · BCC 1,4 · MM 0,6 — "
+                "%-Inzidenzänderung je +1 % erythemwirksamer Dosis.",
+        "url": "https://doi.org/10.1038/384256a0",
+        "archive_url": "https://web.archive.org/web/20251231145913/"
+                       "https://doi.org/10.1038/384256a0",
+        "accessed": "2026-08-30",
+    },
+    "Madronich_2021_BAF": {
+        "ieee": "S. Madronich u. a., „Continuing Benefits of the Montreal Protocol "
+                "and Protection of the Stratospheric Ozone Layer for Human Health "
+                "and the Environment,“ ACS Earth Space Chem., Bd. 5, Nr. 8, "
+                "S. 1876–1888, 2021. doi: 10.1021/acsearthspacechem.1c00183 "
+                "(unabhängige BAF-Bestätigung 2,6 / 1,4 / 0,6).",
+        "url": "https://doi.org/10.1021/acsearthspacechem.1c00183",
+        "archive_url": "https://web.archive.org/web/20250505212026/"
+                       "https://doi.org/10.1021/acsearthspacechem.1c00183",
+        "accessed": "2026-08-30",
+    },
+    "Lorenz_2024_UV_Dortmund": {
+        "ieee": "S. Lorenz u. a., „Increasing solar UV radiation in Dortmund, "
+                "Germany: data and trend analyses and comparison to Uccle, "
+                "Belgium,“ Photochem. Photobiol. Sci., 2024. "
+                "doi: 10.1007/s43630-024-00658-8 — erythemwirksamer Dosistrend "
+                "+4,9 %/Dekade (1997–2022, signifikant); Zähler des "
+                "Übersetzungsfaktors k_UV (#98 §3.2).",
+        "url": "https://doi.org/10.1007/s43630-024-00658-8",
+        "archive_url": "https://web.archive.org/web/20260115000235/"
+                       "https://doi.org/10.1007/s43630-024-00658-8",
+        "accessed": "2026-08-30",
+    },
+    "Speckemeier_2022_Hautkrebskosten": {
+        "ieee": "C. Speckemeier u. a., „One-year follow-up healthcare costs of "
+                "patients diagnosed with skin cancer in Germany: a claims data "
+                "analysis,“ BMC Health Serv. Res., Bd. 22, 749, 2022. "
+                "doi: 10.1186/s12913-022-08141-9 — Erstjahreskosten (Kohorte "
+                "2014/2015): MM 5.326 €, C44 4.660 € (SCS-detektiert); "
+                "nicht-SCS-detektiert 9.038 / 5.890 € als Bandobergrenzen.",
+        "url": "https://doi.org/10.1186/s12913-022-08141-9",
+        "archive_url": "https://web.archive.org/web/20251009150514/"
+                       "https://doi.org/10.1186/s12913-022-08141-9",
+        "accessed": "2026-08-30",
+    },
+    "Schmitt_2011_Aussenberufe": {
+        "ieee": "J. Schmitt u. a., „Occupational ultraviolet light exposure "
+                "increases the risk for the development of cutaneous squamous cell "
+                "carcinoma: a systematic review and meta-analysis,“ Br. J. "
+                "Dermatol., Bd. 164, Nr. 2, S. 291–307, 2011. "
+                "doi: 10.1111/j.1365-2133.2010.10118.x — OR 1,77 [1,37–2,30] für "
+                "SCC bei beruflicher UV-Exposition (Sensitivitätsband #98 §3.4).",
+        "url": "https://doi.org/10.1111/j.1365-2133.2010.10118.x",
+        "archive_url": "https://web.archive.org/web/20260827141715/"
+                       "https://doi.org/10.1111/j.1365-2133.2010.10118.x",
+        "accessed": "2026-08-30",
+    },
+    "GraffZivin_2014_Zeitallokation": {
+        "ieee": "J. Graff Zivin und M. Neidell, „Temperature and the Allocation of "
+                "Time: Implications for Climate Change,“ J. Labor Econ., Bd. 32, "
+                "Nr. 1, S. 1–26, 2014. doi: 10.1086/671766 (ATUS, n = 42.280: "
+                "Outdoor-Freizeit ≈ +1,2 min/°C) — Verhaltens-Sensitivität #98 §3.4.",
+        "url": "https://doi.org/10.1086/671766",
+        "archive_url": "https://web.archive.org/web/20260812140609/"
+                       "https://doi.org/10.1086/671766",
+        "accessed": "2026-08-30",
+    },
+    "Schmalwieser_2021_Dosis": {
+        "ieee": "A. W. Schmalwieser u. a., „Review on occupational personal solar "
+                "UV exposure measurements,“ Br. J. Dermatol., 2021. "
+                "doi: 10.1111/bjd.20703 — Zeit im Freien erklärt die persönliche "
+                "UV-Dosis weitgehend (R² 0,75–0,79).",
+        "url": "https://doi.org/10.1111/bjd.20703",
+        "archive_url": "https://web.archive.org/web/20251201014206/"
+                       "https://doi.org/10.1111/bjd.20703",
+        "accessed": "2026-08-30",
+    },
+    "DWD_CDC_SSD_Raster": {
+        "ieee": "DWD Climate Data Center (CDC), Jahresraster Sonnenscheindauer "
+                "(sunshine_duration, 1 km, Gauß-Krüger 3), opendata.dwd.de — "
+                "verfügbar ab 1961; Grundlage der Normalperioden-Mittelraster "
+                "(Skript dwd_ssd_normalperioden.py) und der Gebietsmittel-Reihe "
+                "(dwd_ssd_trend.py). Lizenz GeoNutzV / DL-DE→Zero-2.0.",
+        "url": "https://opendata.dwd.de/climate_environment/CDC/grids_germany/"
+               "annual/sunshine_duration/",
+        "archive_url": "https://web.archive.org/web/20260109002650/"
+                       "https://opendata.dwd.de/climate_environment/CDC/"
+                       "grids_germany/annual/sunshine_duration/",
+        "accessed": "2026-08-31",
+    },
+    "Destatis_Erwerbstaetige_Wirtschaftsbereiche": {
+        "ieee": "Statistisches Bundesamt (Destatis), „Erwerbstätige und Arbeitnehmer "
+                "nach Wirtschaftsbereichen (Inlandskonzept)“, Wiesbaden: 2023 "
+                "insgesamt 45.909 Tsd.; Land-/Forstwirtschaft/Fischerei 572 Tsd.; "
+                "Baugewerbe 2.643 Tsd. ⇒ Außenberufs-Referenzanteil q̄ = 0,070 "
+                "(#98 §3.4, Proxy).",
+        "url": "https://www.destatis.de/DE/Themen/Arbeit/Arbeitsmarkt/"
+               "Erwerbstaetigkeit/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20250528181244/"
+                       "https://www.destatis.de/DE/Themen/Arbeit/Arbeitsmarkt/"
+                       "Erwerbstaetigkeit/Tabellen/wirtschaftsabschnitte.html",
+        "accessed": "2026-08-30",
+    },
+    "Destatis_Krankheitskosten": {
+        "ieee": "Statistisches Bundesamt (Destatis), Krankheitskostenrechnung "
+                "(GENESIS 23631): C43–C44 (Hautkrebs) 2023 = 1.823 Mio. €; "
+                "PM N036 vom 28.05.2026 (stationäre Hautkrebsfälle 2004–2024 "
+                "+94,5 %). Sanity-Obergrenze #98 §4.",
+        "url": "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Gesundheit/"
+               "Krankheitskosten/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20260831112703/"
+                       "https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/"
+                       "Gesundheit/Krankheitskosten/_inhalt.html",
+        "accessed": "2026-08-31",
+    },
     "Feldbusch_2025_HHWS": {
         "ieee": "H. Feldbusch u. a., „Assessing the effectiveness of the heat health "
                 "warning system in preventing mortality in 15 German cities: A "

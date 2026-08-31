@@ -172,6 +172,10 @@ def _build_values_package(rows, regional: dict, code: str, category: str) -> dic
             # vom Runner materialisiert.
             if rcell.get("deaths") is not None:
                 props["deaths"] = round(float(rcell["deaths"]), 6)
+            # Teil-Ausweise der UV-Klammer (#98 §3.4): Zusatzfälle je Entität.
+            for key in ("cases_melanoma", "cases_c44"):
+                if rcell.get(key) is not None:
+                    props[key] = round(float(rcell[key]), 6)
         else:
             raw = data.get(category, {}).get(code)
             if raw is None:

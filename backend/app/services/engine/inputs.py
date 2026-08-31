@@ -703,12 +703,45 @@ def gather_cell_inputs(
     # Zensus-Altersbänder, deshalb NACH apply_zensus_to_cell_inputs.
     apply_care_home_share(list(cell_inputs), grid_cells, infra_features)
 
+    # Sonnenscheindauer beider Klimanormalperioden je Zelle (Methodik #98 §3.2,
+    # Ebene UV_RADIATION) — aus der vorgemittelten Anlage, kein Jahresraster-Lauf.
+    apply_ssd_normalperioden(list(cell_inputs), regional)
+
     # Referenz-Vegetationslast Ḡ der KOMMUNE (Methodik #96 §3.3): Zentrierung des
     # P̂-Terms auf die eigene Betrachtungsebene (Aufgabe §3.2, Fortschreibung
     # 31.08.2026) — kein Bundesbezug.
     regional["pollen_g_bar"] = kommunale_pollen_referenz(list(cell_inputs))
 
     return list(cell_inputs), regional
+
+
+def apply_ssd_normalperioden(
+    cell_inputs: list[dict | None],
+    regional: dict,
+) -> None:
+    """Zellebene UV_RADIATION/SSD (Methodik #98 §3.2/§3.6, Anlagepflicht §3.1).
+
+    Schreibt je Zelle ``ssd_ref`` (Mittel 1961–1990) und ``ssd_neu``
+    (1991–2020) in h/Jahr. Quelle ist die **vorgemittelte** Anlage
+    ``ssd_normalperioden.npz`` (Skript ``dwd_ssd_normalperioden.py``) — das
+    Assessment lädt nie 60 Jahresraster nach (Ressourcen-Regel §3.4). Zellen
+    außerhalb des Rasters (Randlagen, nodata) erben das
+    Bundesland-Gebietsmittel; das ist die im Bericht dokumentierte
+    Fallback-Kette und kein stiller Null-Wert.
+    """
+    from app.services.climate import ssd_normalperioden as ssd
+
+    idx = [i for i, ci in enumerate(cell_inputs) if ci is not None]
+    if not idx:
+        return
+    xs = [float(cell_inputs[i].get("x_3035") or 0.0) for i in idx]
+    ys = [float(cell_inputs[i].get("y_3035") or 0.0) for i in idx]
+    pairs = ssd.ssd_for_cells_3035(xs, ys)
+    fallback = ssd.ssd_for_bundesland(regional.get("bundesland"))
+    for i, pair in zip(idx, pairs):
+        ref, neu = pair if pair is not None else fallback
+        cell_inputs[i]["ssd_ref"] = round(ref, 1)
+        cell_inputs[i]["ssd_neu"] = round(neu, 1)
 
 
 def kommunale_pollen_referenz(cell_inputs: list[dict | None]) -> float | None:

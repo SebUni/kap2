@@ -9,8 +9,9 @@ Deckt ab:
   (e) Jeder Eintrag ist vollständig: Name, Cluster, KWRA-Handlungsfeld und
       mindestens eine nichtleere Treiberliste (hazard_names/upstream_names)
       aus dem KWRA-Schadensbaum-Digitalisat.
-  (f) #96/#98 (Aeroallergene, UV) tragen Stage 0 — sie gehören zum Sommer-Release
-      und wechseln nach der Methodik-Freigabe von PLANNED_RISKS in RISKS.
+  (f) Das Sommer-Release (Stage 0) ist mit #95/#96/#98 vollständig integriert —
+      keine dieser IDs steht noch in PLANNED_RISKS, und die Stufe 0 trägt keine
+      geplante Klimawirkung mehr.
 
 Läuft mit pytest oder direkt: ``python tests/test_planned_risks.py``.
 """
@@ -29,9 +30,10 @@ _CLUSTERS = {"land", "wasser", "infrastruktur", "wirtschaft", "gesundheit"}
 
 # ── (a) Vollständigkeit ────────────────────────────────────────────────────────
 
-def test_planned_risks_count_is_50():
-    # 50 seit der #96-Integration (31.08.2026): Aeroallergene sind aktiv.
-    assert len(catalog.PLANNED_RISKS) == 50
+def test_planned_risks_count_is_49():
+    # 49 seit der #98-Integration (31.08.2026): UV-Schädigungen sind aktiv
+    # (zuvor 50 nach #96, davor 51 nach #95).
+    assert len(catalog.PLANNED_RISKS) == 49
 
 
 # ── (b) 1:1-Klammer aktiv + geplant = 52 eindeutige KWRA-IDs ───────────────────
@@ -39,11 +41,12 @@ def test_planned_risks_count_is_50():
 def test_kwra_ids_are_52_unique_without_collision():
     active_ids = {r["kwra_id"] for r in catalog.RISKS}
     planned_ids = [p["kwra_id"] for p in catalog.PLANNED_RISKS]
-    # aktive Klammern: #95 (Mortalität + Morbidität) und #96 (Symptomtage).
-    assert active_ids == {95, 96}
-    # geplant: 50 eindeutige IDs, keine davon kollidiert mit einer aktiven.
-    assert len(planned_ids) == len(set(planned_ids)) == 50
-    assert 95 not in planned_ids and 96 not in planned_ids
+    # aktive Klammern: #95 (Mortalität + Morbidität), #96 (Symptomtage),
+    # #98 (UV-YLL).
+    assert active_ids == {95, 96, 98}
+    # geplant: 49 eindeutige IDs, keine davon kollidiert mit einer aktiven.
+    assert len(planned_ids) == len(set(planned_ids)) == 49
+    assert not ({95, 96, 98} & set(planned_ids))
     assert len(active_ids | set(planned_ids)) == 52
     # Index-Map deckt exakt die geplanten IDs ab.
     assert set(catalog.PLANNED_BY_KWRA_ID) == set(planned_ids)
@@ -86,15 +89,20 @@ def test_every_planned_entry_is_complete():
     assert not problems, "Unvollständige PLANNED_RISKS-Einträge:\n  " + "\n  ".join(problems)
 
 
-# ── (f) #96/#98 gehören zum Sommer-Release (Stage 0) ───────────────────────────
+# ── (f) Sommer-Release (Stage 0) ist vollständig integriert ───────────────────
 
-def test_kwra_98_is_stage_0():
-    # #96 ist seit dem 31.08.2026 integriert und daher nicht mehr „geplant";
-    # #98 folgt als letztes Sommer-Release-Risiko.
-    assert 96 not in catalog.PLANNED_BY_KWRA_ID
-    p = catalog.PLANNED_BY_KWRA_ID[98]
-    assert p["stage"] == 0, p["stage"]
-    assert catalog.planned_available_from(p) == catalog.STAGE_LABELS[0]
+def test_stage_0_is_fully_integrated():
+    """#95/#96/#98 sind aktiv; Stufe 0 führt keine geplante Klimawirkung mehr.
+
+    Der frühere Test prüfte, dass #98 als geplantes Stage-0-Risiko gelistet ist.
+    Seit der Integration am 31.08.2026 ist die Aussage umgekehrt: Wandert eine
+    Stage-0-Klimawirkung zurück in PLANNED_RISKS oder taucht dort eine neue auf,
+    wird der Test rot.
+    """
+    for kid in (95, 96, 98):
+        assert kid not in catalog.PLANNED_BY_KWRA_ID, kid
+    stage_0 = [p for p in catalog.PLANNED_RISKS if p["stage"] == 0]
+    assert stage_0 == [], [p["kwra_id"] for p in stage_0]
 
 
 if __name__ == "__main__":

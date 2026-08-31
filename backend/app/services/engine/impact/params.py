@@ -491,6 +491,316 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "ersetzbar durch ein kommunales Baumkataster.",
      "source_refs": []},
 
+    # ── #98 UV-Schädigungen: klimaattribuierte Hautkrebsfälle (Bericht Rev. 1) ─
+    # ΔF_e = F_e · BAF_e · ΔDosis;  YLL = Σ_e ΔF_e · λ_e · L̄_e
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "k_uv", "value": 0.84,
+     "label": "Übersetzung SSD-Trend → UV-Dosis", "unit": "Faktor",
+     "source": "Lorenz 2024 (Dosistrend) ÷ eigene SSD-Trendmessung (§3.2)",
+     "source_detail": "Der erythemwirksame Dosistrend steigt langsamer als die "
+                      "Sonnenscheindauer: +4,9 %/Dekade (BfS-Messreihe Dortmund "
+                      "1997–2022, signifikant) ÷ +5,81 %/Dekade (SSD-Trend NRW im "
+                      "SELBEN Fenster und derselben Datenfamilie, die das Produkt "
+                      "nutzt — DWD-Gebietsmittel, Anlage ssd_trend_region.csv) = "
+                      "0,84. Band 0,4–1,0: untere Stütze die frühere Stations-"
+                      "Paarung 0,43, obere Stütze 1,0 (Globalstrahlung ≈ parallel "
+                      "zur Dosis). Plausibilisierung: implizite Dosisänderung DE "
+                      "7,82 % × 0,84 ≈ 6,6 % über den Normalperiodenversatz "
+                      "≈ 2,2 %/Dekade — im Satellitenband 1,2–3,6 %/Dekade.",
+     "source_refs": ["Lorenz_2024_UV_Dortmund", "DWD_CDC_SSD_Raster"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "a_attr", "value": 0.75,
+     "label": "Klima-Attribution des Dosistrends", "unit": "Anteil",
+     "source": "Gekennzeichnete Abschätzung (§3.9; Bericht #98 §3.2)",
+     "source_detail": "Anteil des SSD-/Dosistrends, der dem Klimawandel "
+                      "zuzurechnen ist: 0,75 (Band 0,5–1,0). Für UV existiert "
+                      "KEINE Attributionsstudie (anders als bei #96, dort 0,50 "
+                      "gemessen) — Begründung: Lorenz nennt als Trendursache "
+                      "v. a. die Bewölkungsabnahme (klimasystemisch → hoher Wert), "
+                      "das Aerosol-Brightening seit den 1980ern ist anthropogen, "
+                      "aber keine Klimawirkung im KWRA-Sinn (→ < 1,0). "
+                      "Ersetzungspfad: Wolken-/Aerosol-Zerlegung aus Reanalysen.",
+     "source_refs": ["Lorenz_2024_UV_Dortmund"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "baf_mm", "value": 0.60,
+     "label": "Biologischer Verstärkungsfaktor Melanom", "unit": "Faktor",
+     "source": "Slaper 1996 / Madronich 2021",
+     "source_detail": "%-Änderung der Melanom-Inzidenz je +1 % erythemwirksamer "
+                      "Dosis: 0,6 (± 0,4). Zwei unabhängige Quellen nennen "
+                      "denselben Wert (Slaper 1996 Nature; Madronich 2021 "
+                      "ACS Earth Space Chem).",
+     "source_refs": ["Slaper_1996_BAF", "Madronich_2021_BAF"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "baf_c44", "value": 1.675,
+     "label": "Biologischer Verstärkungsfaktor C44", "unit": "Faktor",
+     "source": "Slaper 1996 × KID-2025-Entitätensplit (§3.1)",
+     "source_detail": "Gewichtetes Mittel der BAF von Basaliom (1,4) und "
+                      "Plattenepithelkarzinom (2,5) mit dem SCC-Anteil w_SCC: "
+                      "0,75·1,4 + 0,25·2,5 = 1,675 (Band 1,675–1,95 über "
+                      "w_SCC = 0,25–0,50). Der Split wird altersinvariant "
+                      "angewendet — dokumentierte Annahme; Richtung: Der "
+                      "SCC-Anteil steigt real mit dem Alter ⇒ Unterschätzung des "
+                      "Zusatzes in alten Kommunen. KOPPLUNG (§3.9): Ändert sich "
+                      "w_SCC, ist BAF_C44 neu zu rechnen (Golden-Test bindet die "
+                      "Kette).",
+     "source_refs": ["Slaper_1996_BAF", "ZfKD_KID_2025"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "w_scc", "value": 0.25,
+     "label": "SCC-Anteil an C44", "unit": "Anteil",
+     "source": "ZfKD KID 2025, Kap. 3.14 (Quellen-Widerspruch benannt)",
+     "source_detail": "Anteil der Plattenepithelkarzinome am nicht-melanotischen "
+                      "Hautkrebs: 0,25 („knapp drei Viertel Basaliome, etwa ein "
+                      "Viertel Plattenepithelkarzinome“, KID 2025 für 2021–2023). "
+                      "WIDERSPRUCH benannt (§3.8): Die 2015er-BfS-Fallzahlen "
+                      "(BCC 158.840 / SCC 98.950) ergäben 0,384 — Band 0,25–0,50 "
+                      "deckt beide ab; Basiswert = aktuelle Registerdaten der "
+                      "Primärquelle. Mögliche Ursache: Untererfassung von "
+                      "SCC-Mehrfachtumoren.",
+     "source_refs": ["ZfKD_KID_2025"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "c_kal_mm", "value": 1.022,
+     "label": "Normierungsskalar Melanom", "unit": "Faktor",
+     "source": "ZfKD 2023 ÷ Ablesekette (§3.3/§3.4)",
+     "source_detail": "EIN Skalar je Entität (§3.4): 27.430 amtliche "
+                      "Neuerkrankungen 2023 ÷ 26.837 aus der Ablesekette = 1,022. "
+                      "Damit reproduziert die Bundes-Baseline die ZfKD-Fallzahlen "
+                      "exakt. Die Ablese-Toleranz (±15 %, vorab fixiert) ist mit "
+                      "−2,2 % eingehalten.",
+     "source_refs": ["ZfKD_KID_2025"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "c_kal_c44", "value": 0.999,
+     "label": "Normierungsskalar C44", "unit": "Faktor",
+     "source": "ZfKD 2023 ÷ Ablesekette (§3.3/§3.4)",
+     "source_detail": "EIN Skalar je Entität (§3.4): 242.820 ÷ 243.158 = 0,999; "
+                      "Ablese-Abweichung vor Normierung +0,1 % (Toleranz ±15 %).",
+     "source_refs": ["ZfKD_KID_2025"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "lambda_mm", "value": 0.1155,
+     "label": "Letalitätsanteil Melanom", "unit": "Anteil",
+     "source": "ZfKD 2023: 3.169 Sterbefälle / 27.430 Neuerkrankungen",
+     "source_detail": "Perioden-Approximation, GEKENNZEICHNET (§3.9): Bei "
+                      "steigender Inzidenz ist das Verhältnis Sterbefälle/"
+                      "Neuerkrankungen desselben Jahres keine Kohorten-Letalität; "
+                      "Richtung: Überschätzung des Mortalitätsanteils.",
+     "source_refs": ["ZfKD_KID_2025"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "lambda_c44", "value": 0.00549,
+     "label": "Letalitätsanteil C44", "unit": "Anteil",
+     "source": "ZfKD 2023: 1.332 / 242.820",
+     "source_detail": "Perioden-Approximation wie lambda_mm (gekennzeichnet).",
+     "source_refs": ["ZfKD_KID_2025"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "l_rest_mm", "value": 10.58,
+     "label": "Restlebenserwartung je Melanom-Sterbefall", "unit": "Jahre",
+     "source": "Sterbetafel 2022/2024 am medianen Sterbealter",
+     "source_detail": "Sterbefallgewichtet über die Geschlechter: "
+                      "(1.318·10,92 + 1.851·10,33)/3.169 = 10,58 Jahre "
+                      "(e(78) Frauen, e(76) Männer). MEDIAN-Approximation, "
+                      "gekennzeichnet: Bei rechtsschiefer Sterbealter-Verteilung "
+                      "leicht überschätzend.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "l_rest_c44", "value": 5.30,
+     "label": "Restlebenserwartung je C44-Sterbefall", "unit": "Jahre",
+     "source": "Sterbetafel 2022/2024 am medianen Sterbealter",
+     "source_detail": "(541·5,04 + 791·5,47)/1.332 = 5,30 Jahre (e(88) Frauen, "
+                      "e(85) Männer); Median-Approximation wie l_rest_mm.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "c_fall_mm", "value": 6724.0,
+     "label": "Behandlungskosten je Melanom-Fall", "unit": "EUR/Fall",
+     "source": "Speckemeier 2022 (Erstjahr, indexiert €2024)",
+     "source_detail": "5.326 €₂₀₁₅ × VPI 119,3/94,5 = 6.724 €₂₀₂₄ (Band bis "
+                      "11.410 € = nicht-SCS-detektierte Fälle). PROXY (§3.1): "
+                      "überschätzend, weil Gesamt- statt Inkrementalkosten "
+                      "(Grundversorgung überwiegend alter Patienten enthalten); "
+                      "unterschätzend, weil nur das Erstjahr (Folgejahre und "
+                      "Metastasentherapien fehlen). Basiswahl folgt der "
+                      "Untergrenzen-Zusage.",
+     "source_refs": ["Speckemeier_2022_Hautkrebskosten",
+                     "Destatis_VPI_lange_Reihen"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "c_fall_c44", "value": 5883.0,
+     "label": "Behandlungskosten je C44-Fall", "unit": "EUR/Fall",
+     "source": "Speckemeier 2022 (Erstjahr, indexiert €2024)",
+     "source_detail": "4.660 €₂₀₁₅ × 119,3/94,5 = 5.883 €₂₀₂₄ (Band bis "
+                      "7.436 €); Proxy-Kennzeichnung wie c_fall_mm.",
+     "source_refs": ["Speckemeier_2022_Hautkrebskosten",
+                     "Destatis_VPI_lange_Reihen"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "or_out", "value": 1.77,
+     "label": "Außenberufs-OR (SCC)", "unit": "Odds Ratio",
+     "source": "Schmitt u. a. 2011 (Meta-Analyse)",
+     "source_detail": "OR 1,77 [1,37–2,30] für Plattenepithelkarzinom bei "
+                      "beruflicher UV-Exposition. Wirkt NUR im Sensitivitätsband "
+                      "(r_out, Default 1 — siehe r_out_enabled): mittelwert"
+                      "zentriert auf den Außenberufs-Bundesanteil q̄ = 0,070 und "
+                      "nur auf den SCC-Anteil am C44-Zusatz (w^Z = 0,373).",
+     "source_refs": ["Schmitt_2011_Aussenberufe"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "qbar_out", "value": 0.070,
+     "label": "Bundesmittel Außenberufs-Anteil", "unit": "Anteil",
+     "source": "Destatis VGR 2023 (Erwerbstätige nach Wirtschaftsbereichen)",
+     "source_detail": "(572 Tsd. Land-/Forstwirtschaft/Fischerei + 2.643 Tsd. "
+                      "Baugewerbe) / 45.909 Tsd. Erwerbstätige = 0,070. PROXY "
+                      "(beide Richtungen): Nicht alle Beschäftigten dieser "
+                      "Branchen arbeiten im Freien; Außenberufe anderer Branchen "
+                      "fehlen. Amtlich publiziertes Zentrierungsmittel — nach "
+                      "Aufgabe §3.2 zulässig, weil die Evidenz (Fall-Kontroll-OR) "
+                      "individuell erhoben ist.",
+     "source_refs": ["Destatis_Erwerbstaetige_Wirtschaftsbereiche"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "r_out_enabled", "value": 0.0,
+     "label": "Außenberufs-Modifikator aktiv (0/1)", "unit": "Schalter",
+     "source": "Bericht #98 §3.4: Sensitivitätsband, nicht im Basiswert",
+     "source_detail": "0 = aus (Basiswert des Berichts), 1 = an. Der "
+                      "Außenberufs-Modifikator ist ausdrücklich ein "
+                      "Sensitivitätsband und geht NICHT in den Basiswert ein "
+                      "(Log 10); der Schalter macht die Sensitivitätsrechnung "
+                      "reproduzierbar, ohne den Basiswert zu verändern. Die "
+                      "Zellgröße (Außenbeschäftigten-Anteil) ist als Ebene "
+                      "GEPARKT — INKAR/SVB-Branchenanteile sind nicht keyless je "
+                      "100-m-Zelle verfügbar (§3.1-Watchlist).",
+     "source_refs": ["Schmitt_2011_Aussenberufe"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "v_verh", "value": 1.0,
+     "label": "Verhaltens-Sensitivität (Default 1)", "unit": "Faktor",
+     "source": "Bericht #98 §3.4: Sensitivitätsband, nicht im Basiswert",
+     "source_detail": "Tages-Multiplikator der persönlichen Dosis an "
+                      "Komforttagen (Band 1,25–1,60 als TAGESWERT): +1,2 min "
+                      "Außenzeit je °C (ATUS) ⇒ +27 % an einem Komforttag; Zeit "
+                      "im Freien erklärt die persönliche Dosis nahezu "
+                      "proportional (R² 0,75–0,79); Kleidungskomponente +15 % ⇒ "
+                      "s ≈ +45 %. Die JAHRESwirkung hängt vom Komforttag-Anteil "
+                      "ab (Szenario-Stellgröße, keine Zellgröße in M0) — deshalb "
+                      "Default 1. Doppelzählungsschutz: Der Ambient-Anteil steckt "
+                      "bereits in ΔDosis.",
+     "source_refs": ["GraffZivin_2014_Zeitallokation", "Schmalwieser_2021_Dosis"]},
+
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_mm_u20", "value": 0.5,
+     "label": "Inzidenz Melanom (C43) Band u20", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.13.2 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_mm zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl. UNTER der Ablesegrenze der Abbildung (< ≈ 15 je 100.000 bei Achse 0–2.500) — angesetzt mit Band 0–5, gekennzeichnete Abschätzung mit < 0,3 % Wirkung auf die Bundes-Baseline.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_mm_a20_64", "value": 24.7,
+     "label": "Inzidenz Melanom (C43) Band 20–64", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.13.2 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_mm zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_mm_a65_74", "value": 64.0,
+     "label": "Inzidenz Melanom (C43) Band 65–74", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.13.2 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_mm zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_mm_a75_84", "value": 94.9,
+     "label": "Inzidenz Melanom (C43) Band 75–84", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.13.2 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_mm zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_mm_a85p", "value": 88.5,
+     "label": "Inzidenz Melanom (C43) Band 85+", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.13.2 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_mm zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_c44_u20", "value": 2.0,
+     "label": "Inzidenz C44 Band u20", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.14.3 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_c44 zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl. UNTER der Ablesegrenze der Abbildung (< ≈ 15 je 100.000 bei Achse 0–2.500) — angesetzt mit Band 0–5, gekennzeichnete Abschätzung mit < 0,3 % Wirkung auf die Bundes-Baseline.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_c44_a20_64", "value": 125.9,
+     "label": "Inzidenz C44 Band 20–64", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.14.3 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_c44 zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_c44_a65_74", "value": 617.6,
+     "label": "Inzidenz C44 Band 65–74", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.14.3 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_c44 zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_c44_a75_84", "value": 1267.2,
+     "label": "Inzidenz C44 Band 75–84", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.14.3 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_c44 zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_c44_a85p", "value": 1479.5,
+     "label": "Inzidenz C44 Band 85+", "unit": "1/100.000·a",
+     "source": "ZfKD KID 2025 Abb. 3.14.3 (Ablesekette, roh)",
+     "source_detail": "Roh-Neuerkrankungsrate vor Normierung: Die "
+                      "altersspezifischen Raten sind in KID 2025 nur als "
+                      "Abbildungen publiziert (ZfKD-Datenbankwerte nicht keyless "
+                      "abrufbar — dokumentierte Datenlücke). Ablesung je "
+                      "5-Jahres-Gruppe und Geschlecht (Toleranz ±15 %, "
+                      "gitterlinien-gestützt; Anlage kid2025_ablesewerte.csv), "
+                      "Aggregation auf die Produktbänder mit "
+                      "geschlechtsspezifischen Bevölkerungsgewichten "
+                      "(31.12.2023). Der Normierungsskalar c_kal_c44 zieht die "
+                      "Bundessumme exakt auf die amtliche Fallzahl.",
+     "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
+
     # ── Todesfälle durch Hochwasser/Sturzfluten ────────────────────────────────
     {"risk": "EXPECTED_ANNUAL_MORTALITY_FLOOD", "key": "fatality_rate_flash_per_100k",
      "value": 9.0, "label": "Letalität Sturzflut-Regime", "unit": "Tote/100k je Intensität",

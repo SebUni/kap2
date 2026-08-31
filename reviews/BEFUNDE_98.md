@@ -109,3 +109,37 @@ Prüfung gegen die Aufgaben-Fortschreibung vom 30.08.2026 (§3.4-Ressourcen-Rege
 kein nationaler Vollraster-Lauf; §3.1-Datenebenen-Anlagepflicht): Bericht #98
 **konform** — Konformitätsvermerk im Berichtskopf ergänzt (redaktionell, keine
 Modellwert-Änderung; kein Review-Loop erforderlich). Kern: die SSD-Ebene (DWD sunshine_duration 1 km, Register 98-E20-01) und die Branchenanteils-Ebene (98-OUT-01, Proxy) sind als „neu anzulegen“ spezifiziert und werden von /integriere-risiko verpflichtend angelegt (§3.1-Anlagepflicht); alle übrigen Zellgrößen sind vorhanden oder regional/national.
+
+## Integration (`/integriere-risiko 98`, 31.08.2026) — neuer Befund 213
+
+| Nr | Befund (Stelle · Art · Kurzfassung) | Kat. | Status | Umsetzungsnachweis | Begründung bei Abweichung |
+|---|---|---|---|---|---|
+| 213 | §3.2 vs. §7 `uv.k_uv` · Rundungsdivergenz **innerhalb des Berichts**: Der maschinenlesbare Parameter-Block gibt `wert: 0.84`, die §3.2-Prosa und die Beispiel-Blöcke rechnen mit der ungerundeten Kette 4,9/5,81 = **0,8434**. Daraus folgt ΔDosis DE = 4,927 % (Kap. 7) statt der im Text genannten 4,95 % — alle Ergebniswerte des Berichts (ΔF, YLL, €) liegen um **0,5 % relativ** über dem, was die Registry-Werte produzieren. | B | **offen (Bericht)** — Integration NICHT blockiert | Die Registry führt `k_uv = 0,84` **exakt wie Kap. 7**; kein stiller Code-Fix (Eiserne Regel 5). Golden-Test `test_delta_dosis_uses_change_not_level` nagelt beide Stände fest (Produktion 4,9266 %, Bericht-Prosa 4,95 %, Abstand < 0,5 %) — die Divergenz kann nicht unbemerkt wachsen. Die Sanity-Anker der Kap.-4-Bänder bleiben mit den Produktionswerten eingehalten (ΔF 810,7 MM / 20.045,5 C44, YLL 1.574,0, € 376,5 Mio ∈ [119, 653] Mio). | Auflösung gehört in den Bericht, nicht in den Code: entweder `uv.k_uv: 0.8434` (Herleitungswert, §3.9-konform) oder die §3.2-Ergebniswerte auf die gerundete Kette umstellen. Ein Review muss das entscheiden. |
+
+**Integrationsergebnis §3.1/§3.2/§3.4 (Verifikation, ein Satz je Punkt):**
+
+- **§3.1-Anlagepflicht — Ebene SSD/UV_RADIATION (98-E20-01) angelegt:** Das
+  DWD-CDC-Jahresraster `sunshine_duration` ist **ab 1961 verfügbar** (verifiziert
+  31.08.2026); die 60 Jahresraster wurden **einmalig** zu zwei Normalperioden-Mitteln
+  vorgemittelt (`scripts/kalibrierung/dwd_ssd_normalperioden.py` →
+  `data/kalibrierung/ssd_normalperioden.npz`; Flächenmittel 1.544,0 → 1.664,7 h,
+  **+7,90 %** — unabhängige Bestätigung der Gebietsmittel-Anlage 1.544,0/1.664,8/+7,82 %),
+  das Produkt liest nur diese Anlage (`climate/ssd_normalperioden.py`,
+  `inputs.apply_ssd_normalperioden` → Zellgrößen `ssd_ref`/`ssd_neu`), und der im
+  Bericht §3.6 dokumentierte Bundesland-Fallback greift nur noch für Zellen außerhalb
+  des Rasters. Der Fallback ist damit **nicht** mehr der Regelfall.
+- **§3.1 — Ebene Außenbeschäftigten-Anteil (98-OUT-01) bleibt geparkt:** Der Bericht
+  führt sie ausdrücklich als Sensitivitätsband ohne keyless Zellquelle (INKAR/SVB);
+  entsprechend ist `r_out_enabled = 0` und der Modifikator **exakt** neutral
+  (Golden-Test `test_r_out_modifier_is_parked_and_neutral` prüft Neutralität, die
+  +1,9-%-Bericht-Rechnung bei eingeschaltetem Schalter und die Zentrierung q = q̄ ⇒ 1).
+- **§3.4-Ressourcen-Regel eingehalten:** Kein Integrationsschritt erforderte einen
+  nationalen 100-m-Vollraster-Lauf; die Vormittelung lief einmalig auf dem
+  1-km-DWD-Raster, die Verifikation auf Gemeindepunkten (Freiburg 1.740 → 1.825 h,
+  Hamburg 1.490 → 1.620 h, Leipzig 1.503 → 1.723 h) und die Sanity-Prüfung analytisch
+  auf der Bundes-Altersstruktur.
+- **§3.2-Geschlossene Betrachtungsebene eingehalten:** #98 bildet **kein**
+  Zentrierungs-/Referenzmittel über eine höhere Ebene. ΔDosis ist je Zelle gemessen
+  (Rasterablesung), die Baseline ist bevölkerungs-/altersproportional, und die einzige
+  Zentrierung (q̄_out des geparkten r_out) stammt aus **amtlicher Statistik**
+  (VGR-Erwerbstätige 2023) — nach §3.2 Buchstabe (a) zulässig.

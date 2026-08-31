@@ -425,6 +425,114 @@ def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     return out
 
 
+# ── 2c. UV-Schädigungen (Bericht #98 §3.2–3.4 — nativer Ausweis YLL) ─────────
+
+# Roh-Neuerkrankungsraten je 100.000 und Jahr, Bänder wie #96 §3.2 (Bericht §3.3,
+# Ablesekette aus KID 2025 Abb. 3.13.2/3.14.3, Anlage kid2025_ablesewerte.csv).
+# Defaults MÜSSEN mit den Registry-Specs in impact/params.py übereinstimmen —
+# die Registry verdrahtet sie nicht automatisch hierher.
+UV_INCIDENCE_MM = {"u20": 0.5, "a20_64": 24.7, "a65_74": 64.0,
+                   "a75_84": 94.9, "a85p": 88.5}
+UV_INCIDENCE_C44 = {"u20": 2.0, "a20_64": 125.9, "a65_74": 617.6,
+                    "a75_84": 1267.2, "a85p": 1479.5}
+
+
+def uv_delta_dosis(ctx: CellContext, code: str) -> float:
+    """Relative klimaattribuierte UV-Dosisänderung der Zelle (Bericht §3.2).
+
+    ``ΔDosis = (SSD_1991–2020 − SSD_1961–1990)/SSD_1961–1990 · k_UV · a_attr · v_verh``
+
+    Die beiden Normalperioden-Mittel stehen als Zellgrößen ``ssd_ref``/``ssd_neu``
+    bereit (Ebene UV_RADIATION, ``inputs.apply_ssd_normalperioden``). Fehlen sie,
+    rechnet die Zelle mit dem Bundesland-Gebietsmittel — die im Bericht §3.6
+    dokumentierte Fallback-Kette, kein stiller Null-Wert.
+    """
+    ref = ctx.ci.get("ssd_ref")
+    neu = ctx.ci.get("ssd_neu")
+    if ref is None or neu is None or float(ref) <= 0.0:
+        from app.services.climate import ssd_normalperioden
+        ref, neu = ssd_normalperioden.ssd_for_bundesland(
+            ctx.regional.get("bundesland"))
+    d_ssd = (float(neu) - float(ref)) / float(ref)
+    # v_verh ist Sensitivitätsband (Default 1, Bericht §3.4): der
+    # Tages-Multiplikator der persönlichen Dosis an Komforttagen. Er steht
+    # bewusst NICHT im Basiswert — die Jahreswirkung hängt am Komforttag-Anteil,
+    # der in M0 keine Zellgröße ist.
+    return (d_ssd * ctx.p(code, "k_uv", 0.84) * ctx.p(code, "a_attr", 0.75)
+            * ctx.p(code, "v_verh", 1.0))
+
+
+def _uv_r_out(ctx: CellContext, code: str) -> float:
+    """Außenberufs-Modifikator auf den SCC-Anteil am C44-Zusatz (Bericht §3.4).
+
+    ``w^Z = w_SCC·2,5/BAF_C44``, ``r_out = (1−w^Z) + w^Z·[1+q(OR−1)]/[1+q̄(OR−1)]``
+
+    Mittelwertzentriert (Bundesmittel ⇒ 1). Die Ebene „Außenbeschäftigten-Anteil"
+    ist **geparkt** (Bericht §3.6/§3.8: INKAR/SVB liefern keine keyless
+    Zellgröße; Beschaffungs-Watchlist) — deshalb ist der Schalter
+    ``r_out_enabled`` im Basiswert 0 und der Modifikator exakt neutral. Er wird
+    erst wirksam, wenn die Ebene angebunden ist UND der Schalter gesetzt wird.
+    """
+    if ctx.p(code, "r_out_enabled", 0.0) <= 0.0:
+        return 1.0
+    q = ctx.ci.get("share_outdoor_workers")
+    qbar = ctx.p(code, "qbar_out", 0.070)
+    if q is None:
+        return 1.0
+    or_out = ctx.p(code, "or_out", 1.77)
+    w_scc = ctx.p(code, "w_scc", 0.25)
+    baf_c44 = ctx.p(code, "baf_c44", 1.675)
+    if baf_c44 <= 0.0:
+        return 1.0
+    w_z = w_scc * 2.5 / baf_c44
+    den = 1.0 + qbar * (or_out - 1.0)
+    if den <= 0.0:
+        return 1.0
+    return max(0.0, (1.0 - w_z)
+               + w_z * (1.0 + float(q) * (or_out - 1.0)) / den)
+
+
+def uv_yll(risk: dict, ctx: CellContext) -> dict:
+    """Verlorene Lebensjahre durch klimabedingte Hautkrebs-Zusatzfälle (§3.3/§3.4).
+
+    ``F_e   = c_kal,e · Σ_a pop_a · I_e,a/100.000``          (Baseline-Fälle)
+    ``ΔF_e  = F_e · BAF_e · ΔDosis``                          (Teil-Ausweis)
+    ``YLL   = Σ_e ΔF_e · λ_e · L̄_e``                          (nativ)
+    ``€     = Σ_e ΔF_e · c_e + YLL · VOLY``                    (Teil-Ausweis)
+
+    Der €-Ausweis ist damit **nicht** allein outcome × Katalog-Kostensatz: zum
+    VOLY-bewerteten Mortalitätsanteil kommen die Behandlungskosten der
+    Zusatzfälle (Bericht §3.4). Beide Bestandteile sind golden-test-gebunden.
+    """
+    code = risk["code"]
+    dd = uv_delta_dosis(ctx, code)
+    # Bänderung wie #96 §3.2 (Bericht §3.5, Zeile ``a``) — dieselbe Herleitung
+    # inkl. u20-Rückfall, damit beide Risiken dieselbe Bevölkerung sehen.
+    bands = _pollen_age_bands(ctx)
+
+    f_mm = ctx.p(code, "c_kal_mm", 1.022) * sum(
+        pop * ctx.p(code, f"i_mm_{b}", UV_INCIDENCE_MM[b]) / 100_000.0
+        for b, pop in bands.items())
+    f_c44 = ctx.p(code, "c_kal_c44", 0.999) * sum(
+        pop * ctx.p(code, f"i_c44_{b}", UV_INCIDENCE_C44[b]) / 100_000.0
+        for b, pop in bands.items())
+
+    d_mm = max(0.0, f_mm * ctx.p(code, "baf_mm", 0.60) * dd)
+    d_c44 = max(0.0, f_c44 * ctx.p(code, "baf_c44", 1.675) * dd
+                * _uv_r_out(ctx, code))
+
+    yll = (d_mm * ctx.p(code, "lambda_mm", 0.1155) * ctx.p(code, "l_rest_mm", 10.58)
+           + d_c44 * ctx.p(code, "lambda_c44", 0.00549)
+           * ctx.p(code, "l_rest_c44", 5.30))
+
+    out = _result(risk, yll)
+    out["cost_eur"] += (d_mm * ctx.p(code, "c_fall_mm", 6724.0)
+                        + d_c44 * ctx.p(code, "c_fall_c44", 5883.0))
+    out["cases_melanoma"] = d_mm
+    out["cases_c44"] = d_c44
+    return out
+
+
 # ── 3. Todesfälle durch Hochwasser/Sturzfluten ────────────────────────────────
 
 def flood_regime(ctx: CellContext) -> float:
@@ -589,6 +697,7 @@ HEALTH_IMPACTS = {
     "EXPECTED_ANNUAL_MORTALITY_STORM": mortality_storm,
     "EXPECTED_ANNUAL_MORBIDITY": morbidity,
     "EXPECTED_ANNUAL_ALLERGY_DAYS": allergy_symptom_days,
+    "EXPECTED_ANNUAL_UV_YLL": uv_yll,
     "EXPECTED_ANNUAL_INJURIES": injuries_flood,
     "EXPECTED_ANNUAL_INJURIES_STORM": injuries_storm,
     "EXPECTED_ANNUAL_INJURIES_LANDSLIDE": injuries_landslide,
@@ -703,6 +812,18 @@ LINEAGE_SPECS: dict[str, dict] = {
                      "bleiben strikt proportional.\n"
                      r"$$\hat P_{z} = 1 + \lambda\,\bigl(\hat G_{z}/\bar G - 1\bigr)$$"),
         },
+    },
+    "EXPECTED_ANNUAL_UV_YLL": {
+        # Rate = Inzidenz des tragenden Bandes (C44 75–84); Basis = Altersbänder.
+        "rate_param": "i_c44_a75_84",
+        "basis_key": "pop_age_bands",
+        "basis_label": "Bevölkerung je Altersband (Zelle)",
+        "driver": {"kind": "dose_change", "hazard": "UV_RADIATION",
+                   "params": ["k_uv", "a_attr", "baf_mm", "baf_c44",
+                              "c_kal_c44", "lambda_c44", "l_rest_c44"]},
+        # Kein g(V̂): die Demografie steckt genau einmal in den Altersbändern,
+        # und der einzige echte Modifikator (Außenberufe) ist geparkt.
+        "no_modifier": True,
     },
     "EXPECTED_ANNUAL_INJURIES": {
         "rate_param": "rate_per_100k",

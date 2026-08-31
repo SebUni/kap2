@@ -65,6 +65,10 @@ def _risk_worker(idx: int) -> tuple[int, dict]:
         # rechnet nativ YLL und weist die Todesfälle zusätzlich aus.
         if "deaths" in imp:
             risks[code]["deaths"] = round(imp["deaths"], 6)
+        # UV (#98 §3.4): nativ YLL, Zusatzfälle je Entität als Teil-Ausweis.
+        for key in ("cases_melanoma", "cases_c44"):
+            if key in imp:
+                risks[code][key] = round(imp[key], 6)
 
     data = {
         "hazards": hev["hazards"],

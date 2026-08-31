@@ -64,6 +64,21 @@ CURATED_PATHWAYS: dict[str, dict] = {
              "die Altersstruktur der Zelle bestimmt die Zahl der Betroffenen (R35)."),
         ],
     },
+    "EXPECTED_ANNUAL_UV_YLL": {
+        "cluster": "Menschliche Gesundheit (KWRA 2021, Teilbericht 5)",
+        "ref": _KWRA,
+        "chains": [
+            ("UV_RADIATION", "AGE_STRUCTURE", "HEALTHCARE_ACCESS", "primary",
+             "Hautkrebs ist eine kumulative Dosis-Erkrankung: Die Inzidenz steigt "
+             "steil mit dem Alter (C44 ab 75 Jahren über 1.200 je 100.000), deshalb "
+             "trägt die Altersstruktur (R35) den klimaattribuierten Zusatz. Der "
+             "Versorgungszugang (R36) entscheidet über Früherkennung und Verlauf."),
+            ("UV_RADIATION", "POPULATION_DENSITY", "HEALTHCARE_ACCESS", "alternate_exposure",
+             "Die absolute Fallzahl folgt der Einwohnerzahl der Zelle; die "
+             "Sonnenscheindauer selbst variiert vor allem großräumig (Nord–Süd), "
+             "nicht kleinräumig."),
+        ],
+    },
     "EXPECTED_ANNUAL_MORBIDITY": {
         "cluster": "Menschliche Gesundheit (KWRA 2021, Teilbericht 5)",
         "ref": _KWRA,

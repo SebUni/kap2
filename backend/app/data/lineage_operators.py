@@ -639,6 +639,20 @@ FORMULA_OPERATORS: dict[str, list[OperatorStep]] = {
             "input_keys": ["canopy_birch_frac", "canopy_unknown_frac", "green_frac"],
         },
     ],
+    # Sonnenscheindauer der Klimanormalperiode (Methodik #98 §3.2) — reine
+    # Rasterablesung, keine Modellrechnung.
+    "UV_RADIATION": [
+        {
+            "op_kind": "lookup",
+            "label": "Rasterwert ablesen",
+            "note": ("Sonnenscheindauer am Zellstandort, gemittelt über die "
+                     "Klimanormalperiode 1991–2020 (DWD-CDC-Jahresraster, 1 km, "
+                     "vorgemittelte Anlage). Die Schadensfunktion nutzt die "
+                     "relative Änderung gegenüber 1961–1990 — nicht den Pegel.\n"
+                     r"$$\mathrm{SSD}_{z} = \overline{\mathrm{SSD}}_{z}^{\,1991-2020}$$"),
+            "input_keys": ["ssd_neu"],
+        },
+    ],
     "HEAVY_RAIN_FLOOD": [
         {
             "op_kind": "multiply",

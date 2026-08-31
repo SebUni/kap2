@@ -111,9 +111,13 @@ $$ \Delta\text{Dosis}_{\text{Zelle}} \;=\; \frac{\text{SSD}_{\text{Zelle}}^{\,19
 - **Mittelungsfenster = Klimanormalperioden je Zelle** (GP-Befund 37; Einzeljahre sind
   wegen der SSD-Variabilität ungeeignet — Rekordjahre ≈ 2.015–2.024 h [33]). Referenzwerte
   (Gebietsmittel, Skript [69]): DE 1.544,0 → 1.664,8 h = **+7,82 %**; Nord +6,26 % ·
-  Mitte +8,42 % · Süd +7,53 %. Datenverfügbarkeit des 1-km-Rasters ab 1961: bei
-  Integration verifizieren; bis dahin Bundesland-Gebietsmittel als Zell-Fallback
-  (dokumentiert).
+  Mitte +8,42 % · Süd +7,53 %. **Verifikation bei der Integration (31.08.2026):**
+  Das 1-km-Raster `sunshine_duration` ist ab 1961 verfügbar; die 60 Jahresraster
+  wurden einmalig zu zwei Normalperioden-Mittelrastern vorgemittelt (Anlage
+  `ssd_normalperioden.npz`, Flächenmittel 1.544,0 → 1.664,7 h = **+7,90 %**,
+  unabhängige Bestätigung der Gebietsmittel-Werte) — der Zellwert ist damit der
+  Regelfall, das Bundesland-Gebietsmittel nur noch Fallback für Zellen außerhalb
+  des Rasters.
 - **\(k_{\text{UV}}\) = 0,84 (Band 0,4–1,0)** — GP-Befund-10-Auflösung (Log 2): Die
   M0-Kette „4,9/11,3 = 0,43" beruhte auf einem **unbelegten** Dortmunder Stations-SSD-Trend.
   Belegt sind: Dosistrend **+4,9 %/Dekade** (Dortmund 1997–2022, signifikant; Lorenz 2024
@@ -331,9 +335,13 @@ assert abs(euro - 4880) < 60               # ~4.900 EUR je 1.000 EW und Jahr
 
 Ebenen: SSD/UV_RADIATION (neu: 1-km-Raster, Normalperioden-Mittel + Δ), u20 (aus #96),
 Außenbeschäftigten-Anteil (neu, nur Sensitivität; INKAR/SVB-Proxy), YLL-Rate (Ergebnis).
-Fallback SSD: solange das 1-km-Raster ab 1961 nicht angebunden ist, gilt das
-Bundesland-Gebietsmittel [69] je Zelle (dokumentiert; Verlust der Feinstruktur — SSD
-variiert v. a. Nord–Süd).
+Fallback SSD (Stand nach der Integration 31.08.2026): Das 1-km-Raster ist angebunden
+(vorgemittelte Normalperioden-Anlage, §3.2), der Zellwert ist der Regelfall; das
+Bundesland-Gebietsmittel [69] greift nur noch für Zellen außerhalb des Rasters oder
+bei fehlender Anlage (dokumentiert; Verlust der Feinstruktur — SSD variiert v. a.
+Nord–Süd). Die Ebene „Außenbeschäftigten-Anteil" bleibt **geparkt** (keine keyless
+Zellquelle; Beschaffungs-Watchlist) — der r_out-Modifikator ist deshalb im Basiswert
+abgeschaltet und exakt neutral.
 
 ### 3.7 Schicht A (getrennt; nie auf €-Pfaden)
 

@@ -1631,6 +1631,25 @@ def _add_driver_op(b: LineageBuilder, code: str, driver: dict) -> str:
         for pkey in driver.get("params", []):
             b.add_edge(_impact_param_node(b, code, pkey), op_id)
         return op_id
+    if kind == "dose_change":
+        op_id = f"op:dosechange:{code}"
+        _add_op(
+            b, op_id, "erf", "Dosisänderung",
+            "Relative Änderung der erythemwirksamen UV-Dosis zwischen den "
+            "Klimanormalperioden (Bericht #98 §3.2): gemessene Änderung der "
+            "Sonnenscheindauer am Zellstandort, übersetzt in Dosis (k_UV) und um "
+            "den klimaattribuierten Anteil gekürzt (a_attr). Der PEGEL der "
+            "Sonnenscheindauer geht NICHT ein — nur ihre Änderung. Die "
+            "Zusatzfälle folgen daraus über den biologischen "
+            "Verstärkungsfaktor: ΔF = F · BAF · ΔDosis.\n"
+            r"$$\Delta\mathrm{Dosis}_{z} = \frac{\mathrm{SSD}_{z}^{1991-2020} - "
+            r"\mathrm{SSD}_{z}^{1961-1990}}{\mathrm{SSD}_{z}^{1961-1990}}"
+            r"\cdot k_{UV} \cdot a_{\mathrm{attr}}$$",
+        )
+        b.add_edge(b.ensure_indicator(driver["hazard"], "hazards"), op_id)
+        for pkey in driver.get("params", []):
+            b.add_edge(_impact_param_node(b, code, pkey), op_id)
+        return op_id
     if kind == "hd_linear":
         op_id = f"op:hdlinear:{code}"
         _add_op(

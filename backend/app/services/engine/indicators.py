@@ -105,6 +105,22 @@ def pollen_load(ci: dict) -> float:
                      + (1.0 - w_b) * green), 5)
 
 
+def uv_radiation(ci: dict, regional: dict) -> float:
+    """Sonnenscheindauer der Zelle (Normalperiode 1991–2020) in h/Jahr (#98 §3.2).
+
+    Ebene UV_RADIATION. Der Wert kommt aus dem vorgemittelten
+    Normalperioden-Raster (``inputs.apply_ssd_normalperioden``); fehlt er —
+    Zelle ohne Producer-Lauf, Anlage nicht vorhanden —, greift das
+    Bundesland-Gebietsmittel der Fallback-Kette (Bericht §3.6). Ein stiller
+    Null-Wert ist ausgeschlossen: er hieße „keine Sonne", nicht „keine Daten".
+    """
+    ssd = ci.get("ssd_neu")
+    if ssd is None:
+        from app.services.climate import ssd_normalperioden
+        ssd = ssd_normalperioden.ssd_for_bundesland(regional.get("bundesland"))[1]
+    return round(float(ssd), 1)
+
+
 def compute_cell_hev(ci: dict, regional: dict) -> dict:
     """Gibt {"hazards":{}, "exposures":{}, "vulnerabilities":{}} für eine Zelle."""
     area_ha = ci["area_m2"] / 10_000.0
@@ -171,6 +187,7 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         # (getaggt + ungetaggter Anteil × Gattungsanteil), Gräser-Komponente =
         # Grün-/Wiesenfläche der Zelle; Gewichte = δ-Beiträge (w_B abgeleitet).
         "POLLEN_LOAD": pollen_load(ci),
+        "UV_RADIATION": uv_radiation(ci, regional),
         "COLD_EXTREME": round(regional["frost_days"] * (1.0 - 0.3 * min(uhi / 5.0, 1.0)), 1),
         "HEAVY_RAIN_FLOOD": round(
             _clamp(regional["heavy_rain_index"] * (0.4 + imp) * (0.5 + 0.5 * twi_norm) * (0.6 + depression), 0, 100), 1
