@@ -15,6 +15,7 @@ Siedlungstypen streut und dass die Referenz nachrechenbar ist.
 - Streuung der kommunalen Referenzen: **0.1740 … 0.2704** (Stichproben-Mittel 0.1775 — nur Kennzahl, kein Modellparameter)
 - Erwartete Richtung bestätigt: dicht bebaute Städte niedrig, ländlich-
   grüne Gemeinden hoch — die Ebene misst, was sie soll.
-- Referenzzustand je Kommune im Baseline-Lauf fixiert (Bericht Befund 113):
-  bleibt bei Maßnahmen-/Szenariorechnungen konstant; nach realer
-  Vegetationsänderung ist der Baseline-Wert zu übernehmen.
+- KEIN eingefrorener Referenzzustand (Bericht Log 19): Ḡ wird in jedem
+  Lauf aus dem aktuellen Vegetationszustand der Kommune gebildet. Ein
+  Pinning würde einem flächigen Programm einen Niveaueffekt zubuchen,
+  den die intra-urbane λ-Evidenz nicht trägt (Modellgrenze 7).

@@ -455,35 +455,40 @@ IMPACT_PARAM_SPECS: list[dict] = [
     # Größenordnung/Streuung von Ĝ zur Plausibilisierung der Ebene.
     # veg_weight_birke ENTFERNT (31.08.2026, Ledger #96 Befund 138): w_B ist eine
     # ABGELEITETE Größe (p_B·ΔS_B,DE / Σ) und kein frei setzbarer Parameter — als
-    # editierbarer Registry-Wert wäre die Kopplung an p_B/p_G tot gewesen. Die
-    # Herleitung rechnet jetzt indicators.pollen_load im Lauf mit den aktuellen
-    # Sensibilisierungs-Anteilen (Bericht #96 §3.3, Anker #p-hat).
+    # editierbarer Registry-Wert wäre die Kopplung an p_B/p_G tot gewesen; eine
+    # Laufzeit-Ableitung hätte den Schicht-A-Hazard bewegt (Befund 142). w_B ist
+    # daher eine Definitionskonstante der Ebene (indicators.POLLEN_G_WEIGHT_BIRKE)
+    # mit TESTGEBUNDENER Kopplung an p_B/p_G/ΔS_DE (Bericht #96 §3.3, #p-hat).
     {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "birch_group_share_default",
      "value": 0.12,
      "label": "Birkengruppen-Anteil ungetaggter Bäume", "unit": "Anteil",
      "source": "ABGESCHÄTZT ohne Primärquelle (§3.9) — Bericht #96 §3.3",
      "source_detail": "OSM-Bäume tragen nur teilweise genus/species. Für Kronen ohne "
                       "Gattungs-Tag wird der Birkengruppen-Anteil (Betula/Alnus/Corylus) "
-                      "mit 0,12 angesetzt — Größenordnung des Birken-/Erlen-Anteils "
-                      "deutscher Stadtbaumbestände (Straßenbaum-Erhebungen: Birke "
-                      "typischerweise 3–8 %, Erle/Hasel in Grünanlagen zusätzlich); "
-                      "gekennzeichnete Abschätzung (§3.9). Wirkt NUR auf die räumliche "
-                      "Verteilung (Ĝ), nicht auf das Niveau — die Zentrierung über Ḡ "
-                      "hebt einen gemeinsamen Faktor auf. §3.9-Kategorie "
+                      "mit 0,12 angesetzt. Wirkung: s_unbek verschiebt die Gewichtung "
+                      "von Kronen gegen Grün INNERHALB der Kommune — die Kommunensumme "
+                      "bleibt unberührt (die Zentrierung über Ḡ macht sie invariant), "
+                      "die Zellverteilung reagiert unterschiedlich stark "
+                      "(gehölzgeprägt zweistellig, vegetationsarm kaum — Zahlen s. u.). "
+                      "§3.9-Kategorie "
                       "ABGESCHÄTZT: Für den Gattungsmix ungetaggter OSM-Bäume "
                       "existiert keine belastbare Primärquelle (Straßenbaumkataster "
                       "sind kommunal, uneinheitlich und nicht keyless aggregierbar) — "
                       "der Wert ist eine dokumentierte Annahme, kein Messwert. "
-                      "Begründung des Zahlenwerts: Birke und Erle liegen in "
-                      "veröffentlichten kommunalen Straßenbaum-Erhebungen typischerweise "
-                      "im einstelligen Prozentbereich, Hasel/Hainbuche kommen in "
-                      "Grün- und Parkanlagen hinzu ⇒ Ansatz 0,12 mit Band 0,05–0,25. "
-                      "GEMESSENE Ergebnis-Sensitivität (Testzellen, s_unbek 0,05 → "
-                      "0,25): Ĝ/Ḡ der gehölzreichen Zelle 0,571 → 0,643 (+12,6 %), "
-                      "der grünlastigen 1,514 → 1,439 (−5,0 %) — die KOMMUNENSUMME "
-                      "bleibt unverändert (Zentrierung), betroffen ist nur die "
-                      "Verteilung innerhalb der Kommune. Produkt-Kennzeichnung als "
-                      "Annahme; ersetzbar durch ein kommunales Baumkataster.",
+                      "Begründung OHNE Fundstelle (§3.8-Datenlücke, es wird bewusst "
+                      "keine Literaturzahl zitiert): Setzung zwischen zwei Ankern — "
+                      "Straßenbaumbestände führen Birke/Erle als Nebenbaumarten "
+                      "(unteres Bandende 0,05), Park-/Gehölzstrukturen mit Hasel und "
+                      "Hainbuche liegen höher (oberes Bandende 0,25); Basiswert 0,12 "
+                      "als Mitte der Spanne. "
+                      "Ergebnis-Sensitivität über den dokumentierten Zelltypen-Satz "
+                      "(s_unbek 0,05 → 0,25): Ĝ/Ḡ Allee/Park 0,665 → 0,752 "
+                      "(+13,0 %), Wohnblock 0,255 → 0,258 (+0,9 %), Grünanlage "
+                      "2,014 → 1,918 (−4,7 %), Mischlage 1,066 → 1,072 (+0,6 %); "
+                      "reproduzierbar im Golden-Test "
+                      "test_s_unbekannt_sensitivity_band. Die KOMMUNENSUMME bleibt "
+                      "unverändert (Zentrierung). Produkt-Kennzeichnung als Annahme; "
+                      "ersetzbar durch ein kommunales Baumkataster.",
      "source_refs": []},
 
     # ── Todesfälle durch Hochwasser/Sturzfluten ────────────────────────────────

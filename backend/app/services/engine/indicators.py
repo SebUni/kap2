@@ -55,6 +55,12 @@ def _healthcare_access(ci: dict) -> float:
 # Anlage backend/data/kalibrierung/pollensaison_region.csv, Zeile „deutschland").
 POLLEN_DELTA_S_DE: dict[str, float] = {"birke": 4.79, "graeser": 4.06}
 
+# Gewicht der Gehölz-Komponente in Ĝ (Gräser: 1 − w_B). Abgeleitet aus den
+# δ-Beiträgen der Basiswerte: 0,55·4,79 / (0,55·4,79 + 0,75·4,06) = 0,46386
+# ⇒ 0,464. Feste Definitionsgröße der Ebene POLLEN_LOAD; die Kopplung an
+# p_B/p_G/ΔS_DE ist testgebunden (test_veg_weight_derives_from_delta_contributions).
+POLLEN_G_WEIGHT_BIRKE: float = 0.464
+
 
 def pollen_load(ci: dict) -> float:
     """Ĝ der Zelle: gewichteter Anteil allergener Vegetation (Methodik #96 §3.3).
@@ -64,9 +70,13 @@ def pollen_load(ci: dict) -> float:
     Der Kronenanteil der Birkengruppe setzt sich aus den per OSM-Gattungs-Tag
     gesicherten Kronen und dem ungetaggten Rest zusammen; letzterer wird mit dem
     dokumentierten Gattungsanteil gewichtet (Registry
-    ``birch_group_share_default``, gekennzeichnete Abschätzung). Ĝ ist eine
-    reine Verteilungsgröße — die Zentrierung über Ḡ (P̂ = 1 + λ(Ĝ/Ḡ − 1)) hebt
-    einen gemeinsamen Faktor auf.
+    ``birch_group_share_default``, gekennzeichnete Abschätzung). Ĝ ist eine reine
+    Verteilungsgröße: Die Zentrierung P̂ = 1 + λ(Ĝ/Ḡ − 1) macht die
+    Kommunensumme invariant, weil Ḡ aus denselben Zellen gebildet wird.
+    ``s_unbek`` verschiebt daher nur die Gewichtung von Kronen gegen Grün
+    innerhalb der Kommune und wirkt auf die ZELLVERTEILUNG — gehölzgeprägte
+    Zellen reagieren zweistellig, vegetationsarme kaum (Bericht §3.3,
+    Golden-Test ``test_s_unbekannt_sensitivity_band``).
     """
     from app.services.engine import override_context
 
@@ -76,17 +86,14 @@ def pollen_load(ci: dict) -> float:
         val = override_context.get_override(f"risks.{code}.impact.{key}", default)
         return float(default if val is None else val)
 
-    # w_B ist ABGELEITET, kein freier Parameter (Ledger #96 Befund 138): Es sind
-    # dieselben Beiträge, mit denen Gehölze und Gräser in δ eingehen. Aus den
-    # aktuellen (editierbaren) Sensibilisierungs-Anteilen und den DE-Spreizungen
-    # gerechnet, damit die Kopplung §3.9 lebendig bleibt: Ändert jemand p_B/p_G,
-    # läuft w_B automatisch mit.
-    p_b = _p("p_sens_birke", 0.55)
-    p_g = _p("p_sens_graeser", 0.75)
-    beitrag_b = p_b * POLLEN_DELTA_S_DE["birke"]
-    beitrag_g = p_g * POLLEN_DELTA_S_DE["graeser"]
-    summe = beitrag_b + beitrag_g
-    w_b = beitrag_b / summe if summe > 0 else 0.5
+    # w_B gehört zur DEFINITION der Ebene (Schicht-A-Hazard POLLEN_LOAD) und ist
+    # deshalb eine feste Modellkonstante — kein editierbarer Parameter (Befund
+    # 138) und auch keine Laufzeit-Ableitung aus p_B/p_G (Befund 142: sonst
+    # verschöbe ein Schicht-B-Parameter den Screening-Index). Die Kopplung an
+    # die δ-Beiträge ist stattdessen TESTGEBUNDEN (§3.9): Ändert jemand p_B/p_G
+    # oder die DE-Spreizungen, ohne die Konstante nachzuziehen, wird der
+    # Golden-Test rot.
+    w_b = POLLEN_G_WEIGHT_BIRKE
     share_default = _p("birch_group_share_default", 0.12)
     birch = float(ci.get("canopy_birch_frac") or 0.0)
     unknown = float(ci.get("canopy_unknown_frac") or 0.0)

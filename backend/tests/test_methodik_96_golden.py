@@ -100,33 +100,49 @@ def test_cost_rate_chain_matches_report():
 
 
 def test_veg_weight_derives_from_delta_contributions():
-    """w_B = p_B·ΔS_B,DE / (p_B·ΔS_B,DE + p_G·ΔS_G,DE) — ABGELEITET, kein Parameter.
+    """w_B: Definitionskonstante der Ebene, an die δ-Beiträge TESTGEBUNDEN.
 
-    Ledger-Befund 138: w_B war als editierbarer Registry-Wert geführt und lief bei
-    einem p_B-Override nicht mit. Jetzt rechnet ``pollen_load`` die Kette im Lauf —
-    der Test bindet genau das (auch unter Override).
+    Historie: w_B war erst ein editierbarer Registry-Parameter (Kopplung tot,
+    Befund 138), dann eine Laufzeit-Ableitung aus p_B/p_G (verschob den
+    Schicht-A-Hazard, Befund 142). Jetzt ist es eine feste Definitionsgröße der
+    Ebene POLLEN_LOAD — und dieser Test hält die Kopplung an §3.9 lebendig:
+    Ändert jemand p_B, p_G oder die DE-Spreizungen ohne die Konstante
+    nachzuziehen, wird er rot.
     """
-    from app.services.engine.indicators import POLLEN_DELTA_S_DE, pollen_load
+    from app.services.engine.indicators import (
+        POLLEN_DELTA_S_DE, POLLEN_G_WEIGHT_BIRKE, pollen_load,
+    )
 
     override_context.set_overrides({})
+    b = _spec("p_sens_birke")["value"] * POLLEN_DELTA_S_DE["birke"]
+    g = _spec("p_sens_graeser")["value"] * POLLEN_DELTA_S_DE["graeser"]
+    assert abs(POLLEN_G_WEIGHT_BIRKE - round(b / (b + g), 3)) < 1e-9
     # Reine Birkenzelle ⇒ Ĝ = w_B; reine Grünzelle ⇒ Ĝ = 1 − w_B.
-    def _w_b(p_b: float, p_g: float) -> float:
-        b = p_b * POLLEN_DELTA_S_DE["birke"]
-        return b / (b + p_g * POLLEN_DELTA_S_DE["graeser"])
-
-    assert abs(pollen_load({"canopy_birch_frac": 1.0}) - round(_w_b(0.55, 0.75), 5)) < 1e-9
-    assert abs(pollen_load({"green_frac": 1.0}) - round(1 - _w_b(0.55, 0.75), 5)) < 1e-9
-    # Basiswert des Berichts (§3.3): 0,464
-    assert abs(round(_w_b(0.55, 0.75), 3) - 0.464) < 1e-9
-    # Kopplung lebendig: p_B-Override verschiebt w_B mit.
-    override_context.set_overrides({f"risks.{CODE}.impact.p_sens_birke": 0.70})
-    assert abs(pollen_load({"canopy_birch_frac": 1.0})
-               - round(_w_b(0.70, 0.75), 5)) < 1e-9
-    override_context.set_overrides({})
-    # w_B ist KEIN Registry-Parameter mehr (sonst wäre die Kopplung tot).
+    assert abs(pollen_load({"canopy_birch_frac": 1.0}) - POLLEN_G_WEIGHT_BIRKE) < 1e-9
+    assert abs(pollen_load({"green_frac": 1.0}) - (1 - POLLEN_G_WEIGHT_BIRKE)) < 1e-9
+    # w_B ist KEIN Registry-Parameter (weder editierbar noch override-fähig).
     from app.services.engine.impact.params import IMPACT_PARAM_SPECS
     assert not [x for x in IMPACT_PARAM_SPECS
                 if x["risk"] == CODE and x["key"] == "veg_weight_birke"]
+
+
+def test_layer_is_independent_of_layer_b_parameters():
+    """Befund 142: Schicht-B-Parameter dürfen den Schicht-A-Hazard nicht bewegen.
+
+    Ĝ (Ebene POLLEN_LOAD) ist eine Vegetationsgröße mit fester Definition; ein
+    Override von p_B/p_G wirkt in δ (Schicht B), NICHT im Screening-Wert.
+    """
+    from app.services.engine.indicators import pollen_load
+
+    ci = {"canopy_birch_frac": 0.03, "canopy_unknown_frac": 0.10, "green_frac": 0.25}
+    override_context.set_overrides({})
+    base = pollen_load(ci)
+    for key, val in ((f"risks.{CODE}.impact.p_sens_birke", 0.40),
+                     (f"risks.{CODE}.impact.p_sens_graeser", 0.85),
+                     (f"risks.{CODE}.impact.f_symptomtage", 0.85)):
+        override_context.set_overrides({key: val})
+        assert pollen_load(ci) == base, key
+    override_context.set_overrides({})
 
 
 # ── 3. Sanity-/Struktur-Anker (Bericht Kap. 4) ───────────────────────────────
@@ -313,12 +329,10 @@ def test_pollen_load_layer_weights_and_unknown_share():
     from app.services.engine.indicators import pollen_load
 
     override_context.set_overrides({})
-    from app.services.engine.indicators import POLLEN_DELTA_S_DE
+    from app.services.engine.indicators import POLLEN_G_WEIGHT_BIRKE
 
     ci = {"canopy_birch_frac": 0.02, "canopy_unknown_frac": 0.10, "green_frac": 0.30}
-    b = 0.55 * POLLEN_DELTA_S_DE["birke"]
-    w_b = b / (b + 0.75 * POLLEN_DELTA_S_DE["graeser"])
-    share = 0.12
+    w_b, share = POLLEN_G_WEIGHT_BIRKE, 0.12
     # Ĝ wird auf 5 NK gerundet (eine Rundungsstelle für BEIDE Pfade — Befund 125).
     assert abs(pollen_load(ci) - round(w_b * (0.02 + share * 0.10)
                                        + (1 - w_b) * 0.30, 5)) < 1e-12
@@ -366,3 +380,70 @@ def test_no_flat_measure_on_allergy_days():
     assert not verknuepft, (
         "Pauschal wirkende Maßnahme auf #96 verknüpft: " + ", ".join(verknuepft)
         + " — siehe Bericht §5/Modellgrenze 7 (flächiger Niveaueffekt unbelegt).")
+
+
+def test_s_unbekannt_sensitivity_band():
+    """Befund 141: die im Bericht §3.3 zitierte s_unbek-Sensitivität ist bindend.
+
+    Der dokumentierte Zelltypen-Satz (Allee/Park, Wohnblock, Grünanlage,
+    Mischlage) wird hier exakt nachgerechnet — so ist die Angabe im Bericht
+    reproduzierbar und kann nicht unbemerkt veralten. **Annahme des Zellsatzes:
+    gleich bevölkerte Zellen** (Ḡ als ungewichtetes Mittel der vier Typen); bei
+    ungleicher Bevölkerung verschieben sich die Ĝ/Ḡ-Werte, die relative Wirkung
+    von s_unbek bleibt aber dieselbe. Der zweite Teil prüft, dass die
+    Kommunensumme unter der ECHTEN betroffenengewichteten Referenz unberührt
+    bleibt (Ledger-Befund 146).
+    """
+    from app.services.engine.indicators import pollen_load
+
+    typen = {
+        "allee": {"canopy_birch_frac": 0.03, "canopy_unknown_frac": 0.15,
+                  "green_frac": 0.10},
+        "wohnblock": {"canopy_birch_frac": 0.00, "canopy_unknown_frac": 0.02,
+                      "green_frac": 0.05},
+        "gruenanlage": {"canopy_birch_frac": 0.00, "canopy_unknown_frac": 0.02,
+                        "green_frac": 0.40},
+        "mischlage": {"canopy_birch_frac": 0.01, "canopy_unknown_frac": 0.08,
+                      "green_frac": 0.20},
+    }
+    rel = {}
+    for s_unbek in (0.05, 0.25):
+        override_context.set_overrides(
+            {f"risks.{CODE}.impact.birch_group_share_default": s_unbek})
+        g = {k: pollen_load(v) for k, v in typen.items()}
+        g_bar = sum(g.values()) / len(g)
+        rel[s_unbek] = {k: v / g_bar for k, v in g.items()}
+    override_context.set_overrides({})
+
+    soll = {"allee": (0.665, 0.752), "wohnblock": (0.255, 0.258),
+            "gruenanlage": (2.014, 1.918), "mischlage": (1.066, 1.072)}
+    for k, (lo, hi) in soll.items():
+        assert abs(rel[0.05][k] - lo) < 0.002, (k, rel[0.05][k])
+        assert abs(rel[0.25][k] - hi) < 0.002, (k, rel[0.25][k])
+    # Bericht: gehölzgeprägt zweistellig, übrige darunter.
+    assert (soll["allee"][1] / soll["allee"][0] - 1) > 0.10
+    assert abs(soll["gruenanlage"][1] / soll["gruenanlage"][0] - 1) < 0.10
+
+    # Zentrierung: mit der ECHTEN (betroffenengewichteten) Kommunen-Referenz
+    # bleibt die Summe unabhängig von s_unbek — die Wirkung ist reine Umverteilung.
+    from app.services.engine.inputs import kommunale_pollen_referenz
+
+    bands = {b: 1000.0 * n / _POP_DE for b, n in _BAND_POP.items()}
+    zellen = [dict(v, pop=1000.0, pop_age_bands=dict(bands)) for v in typen.values()]
+    summen = []
+    for s_unbek in (0.05, 0.25):
+        override_context.set_overrides(
+            {f"risks.{CODE}.impact.birch_group_share_default": s_unbek})
+        g_ref = kommunale_pollen_referenz(zellen)
+        total = 0.0
+        for ci in zellen:
+            total += impact.compute_all_cell_impacts(CellContext(
+                ci=ci,
+                hev={"hazards": {"POLLEN_LOAD": pollen_load(ci)}, "exposures": {},
+                     "vulnerabilities": {}},
+                hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
+                indices={}, regional={"bundesland": "Hessen",
+                                      "pollen_g_bar": g_ref}))[CODE]["outcome"]
+        summen.append(total)
+    override_context.set_overrides({})
+    assert abs(summen[0] / summen[1] - 1.0) < 1e-12

@@ -2,7 +2,8 @@
 
 Status: **Rev. 2 (P̂-Zentrierung auf die eigene Kommune statt auf ein Bundesmittel —
 Aufgabe §3.2 „geschlossene Betrachtungsebene", Nutzer-Entscheid 31.08.2026;
-Log 18/19) — im Review** · 31.08.2026 · Rev. 1 war abnahmereif (Null-Runde
+Log 18/19) — ABNAHMEREIF & INTEGRIERT (Null-Runde: Review Runde 10; Befunde
+116–150 behoben)** · 31.08.2026 · Rev. 1 war abnahmereif (Null-Runde
 Runde 3) und ist integriert ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 96-A** (Prävalenz × gemessene Pollensaison-Spreizung, bottom-up; Entscheidungslog Nr. 1)
@@ -23,7 +24,11 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Registry-/Bundeswert entfällt ersatzlos, und ohne Referenz bleibt P̂ ≡ 1.
 > Folgeentscheidung Log 19: **kein** eingefrorener Referenzzustand — ein
 > flächiger Vegetations-Niveaueffekt bleibt bewusst unbuchbar (§5,
-> Modellgrenze 7). Betroffen: §3.3, §3.4-Sensitivität, §3.6-Zeichentabelle, §5,
+> Modellgrenze 7). Gleiche Linie beim Ĝ-Gewicht \(w_B\): erst
+> Registry-Parameter (Kopplung an \(p_B\)/\(p_G\) tot), dann Laufzeit-Ableitung
+> (verschob den Schicht-A-Hazard), jetzt **Definitionskonstante der Ebene mit
+> testgebundener Kopplung** — editierbar bleibt nur, was die Evidenz hergibt
+> (Ledger-Befunde 138/142/144). Betroffen: §3.3, §3.4-Sensitivität, §3.6-Zeichentabelle, §5,
 > §6, Entscheidungslog 17–19. Rev. 1 = Migration des #96-Anteils von M0 Rev. 5
 > (`docs/render/METHODIK_M0_GESUNDHEIT.html`, Kap. 3) in das §4-Format **plus** Abarbeitung
 > der #96-relevanten Befunde aus `reviews/Gegenpruefung_Rev5_Befundliste.md`
@@ -318,19 +323,35 @@ $$ \Delta\text{Tage}_{\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_R \cdot 
   **§3.9-Kategorie ABGESCHÄTZT — keine Primärquelle:** Für den Gattungsmix
   ungetaggter OSM-Bäume gibt es keine belastbare offene Erhebung
   (Straßenbaumkataster sind kommunal, uneinheitlich, nicht keyless aggregierbar).
-  Begründung des Zahlenwerts: Birke und Erle liegen in veröffentlichten
-  kommunalen Straßenbaum-Erhebungen typischerweise im einstelligen
-  Prozentbereich, Hasel/Hainbuche kommen in Grün- und Parkanlagen hinzu ⇒ 0,12
-  mit Band 0,05–0,25. **Gemessene Ergebnis-Sensitivität** (Testzellen,
-  s_unbek 0,05 → 0,25): \(\hat G/\bar G\) der gehölzreichen Zelle 0,571 → 0,643
-  (+12,6 %), der grünlastigen 1,514 → 1,439 (−5,0 %); die **Kommunensumme bleibt
-  unverändert** (Zentrierung), betroffen ist nur die Verteilung. Ersetzbar durch
-  ein kommunales Baumkataster (Fortschreibungsvermerk); Gräser-Proxy = Grün-/Wiesenanteil der Zelle;
+  **Begründung des Zahlenwerts ohne Fundstelle** (§3.8: Datenlücke ausdrücklich
+  benannt): Eine bundesweite Gattungsstatistik der Siedlungsgehölze existiert
+  nicht, und kommunale Baumkataster sind weder einheitlich noch keyless
+  aggregierbar — es wird daher **keine** Prozentzahl aus der Literatur zitiert.
+  Der Ansatz 0,12 ist eine **Setzung zwischen zwei Ankern**: Straßenbaum-
+  bestände enthalten Birke/Erle als Nebenbaumarten (unteres Bandende 0,05),
+  Park- und Gehölzstrukturen mit Hasel/Hainbuche liegen deutlich höher (oberes
+  Bandende 0,25); der Basiswert ist die Mitte dieser Spanne. Band 0,05–0,25. **Ergebnis-Sensitivität** (Bandbreite über den dokumentierten
+  Zelltypen-Satz Allee/Park · Wohnblock · Grünanlage · Mischlage, jeweils
+  \(\hat G/\bar G\) bei s_unbek 0,05 → 0,25):
+  gehölzreich 0,665 → 0,752 (**+13,0 %**), vegetationsarm 0,255 → 0,258
+  (+0,9 %), grünlastig 2,014 → 1,918 (**−4,7 %**), Mischlage 1,066 → 1,072
+  (+0,6 %) — die Wirkung hängt vom Vegetationsprofil der Zelle ab und liegt für
+  gehölzgeprägte Zellen im **zweistelligen Prozentbereich**, für die übrigen
+  darunter. Die **Kommunensumme bleibt unverändert** (Zentrierung); betroffen ist
+  ausschließlich die Verteilung innerhalb der Kommune. Reproduzierbar mit dem
+  Golden-Test `test_s_unbekannt_sensitivity_band`. Ersetzbar durch ein
+  kommunales Baumkataster (Fortschreibungsvermerk); Gräser-Proxy = Grün-/Wiesenanteil der Zelle;
   Gewichte aus den δ-Beiträgen: \(w_B\) = 0,55·4,79/(0,55·4,79 + 0,75·4,06) =
-  2,6345/5,6795 = **0,464**. Wie \(\bar G\) ist \(w_B\) **kein
-  Registry-Parameter**, sondern eine im Lauf gerechnete abgeleitete Größe
-  (`indicators.pollen_load`) — so bleibt die Kopplung an \(p_B\)/\(p_G\)
-  lebendig (§3.9; Ledger-Befund 138). \(\bar G\) wird im Lauf
+  2,6345/5,6795 = **0,464**. \(w_B\) ist **kein Registry-Parameter**, sondern
+  eine **Definitionskonstante der Ebene** (`indicators.POLLEN_G_WEIGHT_BIRKE`):
+  Sie gehört zur Ebenen-Definition und darf sich zur Laufzeit nicht bewegen —
+  sonst verschöbe ein Schicht-B-Parameter den Schicht-A-Hazard (Ledger-Befunde
+  138/142). Die **Kopplung an \(p_B\)/\(p_G\)/\(\Delta S_{\text{DE}}\) ist
+  testgebunden** (§3.9: Kopplung benennen und bei Änderung neu rechnen) — der
+  Golden-Test `test_veg_weight_derives_from_delta_contributions` wird rot,
+  sobald einer dieser Werte ohne Nachziehen der Konstante geändert wird; ein
+  zweiter Test (`test_layer_is_independent_of_layer_b_parameters`) hält die
+  Schichtentrennung fest. \(\bar G\) dagegen wird im Lauf
   aus den Zellen der jeweiligen Kommune gebildet (`inputs.kommunale_pollen_referenz`;
   Rev. 2, Log 18) — damit gilt \(\sum_z B_z \hat P_z = \sum_z B_z\) **exakt**
   (Golden-Test `test_reference_is_closed_within_the_kommune`) und die Betrachtungsebene
@@ -515,7 +536,7 @@ assert abs(dt * 6.20 - 1252) < 5
 | \(k_{\text{Birke},z},\ k_{\text{unbek},z}\) | Kronenflächenanteil der Zelle: sicher der Birkengruppe zugeordnet bzw. ohne Gattungs-Tag | — | OSM `natural=tree` mit `genus`/`species`/`taxon` (Betula/Alnus/Corylus/Carpinus) × Kronendurchmesser ÷ Zellfläche; Ebenen POLLEN_LOAD/CANOPY_BIRCH_FRACTION (§3.3); herleitung:#p-hat |
 | \(\text{Grün}_z\) | Grün-/Wiesenflächenanteil der Zelle (Gräser-Proxy) | — | OSM-Landnutzung (vorhandene Produktgröße `green_frac`); herleitung:#p-hat |
 | \(s_{\text{unbek}}\) | Birkengruppen-Anteil der Kronen **ohne** OSM-Gattungs-Tag | — | **0,12** (Band 0,05–0,25) — **§3.9 ABGESCHÄTZT, keine Primärquelle**: Straßenbaumkataster sind kommunal und nicht keyless aggregierbar; Begründung + gemessene Sensitivität in §3.3 (`#p-hat`). Wirkt nur auf die Verteilung, nicht auf die Kommunensumme (Zentrierung); herleitung:#p-hat |
-| \(w_B\) | Gewicht der Gehölz-Komponente in \(\hat G\) (Gräser: \(1-w_B\)) | — | **0,464** = \(p_B\Delta S_{B,\text{DE}}/(p_B\Delta S_{B,\text{DE}} + p_G\Delta S_{G,\text{DE}})\) = 2,6345/5,6795 = 0,46386 (auf 3 NK gerundet); **abgeleitete Größe, kein Registry-Parameter** — im Lauf aus den aktuellen \(p_B\)/\(p_G\) gerechnet (`indicators.pollen_load`), damit die Kopplung §3.9 lebendig bleibt (Golden-Test bindet die Kette inkl. Override); herleitung:#p-hat |
+| \(w_B\) | Gewicht der Gehölz-Komponente in \(\hat G\) (Gräser: \(1-w_B\)) | — | **0,464** = \(p_B\Delta S_{B,\text{DE}}/(p_B\Delta S_{B,\text{DE}} + p_G\Delta S_{G,\text{DE}})\) = 2,6345/5,6795 = 0,46386 (auf 3 NK gerundet); **Definitionskonstante der Ebene, kein Registry-Parameter** (`POLLEN_G_WEIGHT_BIRKE`) — zur Laufzeit unveränderlich, damit Schicht-B-Parameter den Schicht-A-Hazard nicht bewegen; die Kopplung an \(p_B\)/\(p_G\)/\(\Delta S_{\text{DE}}\) ist testgebunden (§3.9); herleitung:#p-hat |
 | \(\hat G_{\text{Zelle}}/\bar G\) | Anteil allergener Vegetation, normiert auf das **Kommunenmittel** (Ebene POLLEN_LOAD) | — | OSM-Gehölz-/Grünstruktur; \(\bar G\) = betroffenengewichtetes Mittel der **eigenen Kommune** ⇒ Mittel = 1 per Konstruktion (§3.3, Rev. 2); herleitung:#p-hat |
 | \(J\) | Jultag des Phaseneintritts (DWD-Phänologie) | Tag | DWD-CDC Jahresmelder [33] |
 | \(L_B,\ L_G\) | Saisonlänge Birkengruppe/Gräser (nach EAACI-Kriterium) | Tage | **30** (20–45) / **60** (45–80) — gekennzeichnete Abschätzung §3.5 [51]; herleitung:#d-saison |
@@ -783,9 +804,11 @@ parameter:
   endpunkt: morbiditaet
 parameter:
   # Baustein der Ebene POLLEN_LOAD (Detailspezifikation der Integration, §3.3).
-  # w_B ist KEIN Parameter-Block: als abgeleitete Größe (p_B*dS_B,DE / Summe)
-  # wird es im Lauf gerechnet (indicators.pollen_load) — ein Registry-Wert
-  # haette die Kopplung an p_B/p_G tot gestellt (Ledger-Befund 138).
+  # w_B ist KEIN Parameter-Block: Es ist eine Definitionskonstante der Ebene
+  # (indicators.POLLEN_G_WEIGHT_BIRKE = 0,464, hergeleitet aus den delta-
+  # Beitraegen). Ein Registry-Wert haette die Kopplung an p_B/p_G tot gestellt
+  # (Befund 138), eine Laufzeit-Ableitung haette den Schicht-A-Hazard bewegt
+  # (Befund 142) — die Kopplung ist stattdessen testgebunden (§3.9).
   id: pollen.s_unbekannt
   wert: 0.12     # Birkengruppen-Anteil der OSM-Kronen OHNE genus/species-Tag
   einheit: "-"
