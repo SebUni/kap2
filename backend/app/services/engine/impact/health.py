@@ -108,6 +108,20 @@ POLLEN_PREVALENCE: dict[str, float] = {
     "u20": 0.088, "a20_64": 0.132, "a65_74": 0.067, "a75_84": 0.050, "a85p": 0.050,
 }
 
+# Saisonlängen nach EAACI-Kriterium (Tage; §3.5, gekennzeichnete Abschätzung).
+POLLEN_SAISON_LAENGE: dict[str, float] = {"birke": 30.0, "graeser": 60.0}
+
+# d_Saison der DEFAULT-Parameter: 0,70 · (0,55·30 + 0,75·60) = 43,05 Tage.
+# Bezugswert der Kostensatz-Kopplung: Der Katalog-Kostensatz c_Tag (Default
+# 6,20 €₂₀₂₄) gilt für GENAU diese Kette. Der Jahres-Anker des Berichts folgt
+# implizit: c_Jahr,direkt = c_Tag · d_Saison_ref = 6,20 · 43,05 = 266,91 €₂₀₂₄
+# gegenüber 266,90 € im Bericht (§3.5) — die Differenz von 1 Cent stammt
+# ausschließlich daraus, dass der Produkt-Kostensatz auf Cent gerundet ist
+# (+3,7·10⁻⁵ relativ, testgebunden). Editiert ein Nutzer den Kostensatz, ist
+# das gleichbedeutend mit einem anderen c_Jahr,direkt — die Kette bleibt
+# konsistent (Ledger #96 Befund 137).
+POLLEN_D_SAISON_REF: float = 43.05
+
 # Gemessene Saison-Spreizung je Region (Tage; DWD-Phänologie, §3.1).
 POLLEN_DELTA_S_BIRKE: dict[str, float] = {"nord": 3.96, "mitte": 4.20, "sued": 5.94}
 POLLEN_DELTA_S_GRAESER: dict[str, float] = {"nord": 4.78, "mitte": 4.08, "sued": 3.70}
@@ -315,23 +329,38 @@ def morbidity(risk: dict, ctx: CellContext) -> dict:
 
 # ── 2b. Aeroallergene: klimaattribuierte Symptomtage (#96) ────────────────────
 
-def _pollen_age_bands(ctx: CellContext) -> dict[str, float]:
-    """Bevölkerung je #96-Band; Rückfall über die u65-Menge und den Bundesanteil."""
+def pollen_age_bands(ci: dict) -> dict[str, float]:
+    """Bevölkerung je #96-Band aus den Zell-Eingaben (mit dokumentiertem Rückfall).
+
+    Wird von der Schadensfunktion UND von der kommunalen Referenzbildung
+    (``inputs.kommunale_pollen_referenz``) genutzt — beide müssen dieselben
+    Gewichte sehen, sonst ist die Zentrierung Σ B·P̂ = Σ B nicht exakt
+    (Ledger #96 Befund 126).
+    """
     from app.services.zensus_loader import NATIONAL_U20_SHARE_OF_U65
 
-    bands = ctx.ci.get("pop_age_bands")
+    bands = ci.get("pop_age_bands")
     if isinstance(bands, dict) and bands.get("u20") is not None:
         return {b: float(bands.get(b) or 0.0) for b in POLLEN_AGE_BANDS}
-    # Alt-Zellen ohne u20-Aufteilung: u65 national in u20/20–64 trennen.
-    base = _age_bands(ctx)
-    u65 = float(base.get("u65") or 0.0)
+    # Alt-Zellen ohne u20-Aufteilung: u65 mit dem amtlichen Bundesanteil in
+    # u20/20–64 trennen (Fallback wie bei den Senioren-Bändern).
+    u65 = float((bands or {}).get("u65") or 0.0)
+    if not u65:
+        pop = float(ci.get("pop") or 0.0)
+        share_o = ci.get("share_over_65")
+        u65 = max(0.0, pop - pop * float(share_o or 0.0) / 100.0)
     return {
         "u20": u65 * NATIONAL_U20_SHARE_OF_U65,
         "a20_64": u65 * (1.0 - NATIONAL_U20_SHARE_OF_U65),
-        "a65_74": float(base.get("a65_74") or 0.0),
-        "a75_84": float(base.get("a75_84") or 0.0),
-        "a85p": float(base.get("a85p") or 0.0),
+        "a65_74": float((bands or {}).get("a65_74") or 0.0),
+        "a75_84": float((bands or {}).get("a75_84") or 0.0),
+        "a85p": float((bands or {}).get("a85p") or 0.0),
     }
+
+
+def _pollen_age_bands(ctx: CellContext) -> dict[str, float]:
+    """Bänder aus dem CellContext (Wrapper um ``pollen_age_bands``)."""
+    return pollen_age_bands(ctx.ci)
 
 
 def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
@@ -364,13 +393,34 @@ def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     ds_g = ctx.p(code, f"delta_s_graeser_{region}", POLLEN_DELTA_S_GRAESER[region])
     delta = f * (p_b * ds_b + p_g * ds_g) * a_attr
 
-    # Vegetations-Modulation: zentriert auf das fixierte Referenzmittel Ḡ.
+    # Vegetations-Modulation, zentriert auf die REFERENZ DER EIGENEN KOMMUNE
+    # (Aufgabe §3.2 „geschlossene Betrachtungsebene", Bericht #96 §3.3): Ḡ ist das
+    # betroffenengewichtete Mittel von Ĝ über die Zellen dieser Kommune —
+    # dadurch ist Σ_z B_z·P̂_z = Σ_z B_z exakt und das Ergebnis hängt an keiner
+    # Größe außerhalb der Kommune. Liegt keine Referenz vor (Zelle ohne
+    # Kommunen-Kontext, Alt-Daten), bleibt P̂ NEUTRAL — kein Ersatz-Bundeswert.
     lam = ctx.p(code, "lambda_veg", 0.70)
-    g_bar = ctx.p(code, "g_bar_ref", 0.1775)
+    g_bar = ctx.regional.get("pollen_g_bar")
     g_cell = ctx.haz("POLLEN_LOAD")
-    p_hat = max(0.0, 1.0 + lam * (g_cell / g_bar - 1.0)) if g_bar > 0 else 1.0
+    p_hat = 1.0
+    if g_bar:
+        p_hat = max(0.0, 1.0 + lam * (g_cell / float(g_bar) - 1.0))
 
-    out = _result(risk, betroffene * delta * p_hat)
+    tage = betroffene * delta * p_hat
+    out = _result(risk, tage)
+
+    # Kostensatz-Kopplung (Bericht #96 §3.5, Ledger-Befund 133): Der Ausweis
+    # rechnet € = ΔTage · c_Tag mit c_Tag = c_Jahr,direkt / d_Saison und
+    # d_Saison = f·(p_B·L_B + p_G·L_G). Der Katalog-Kostensatz IST c_Tag im
+    # Default (6,20 €₂₀₂₄ = 266,90/43,05) und bleibt editierbar; ändert der
+    # Nutzer aber f, p_B, p_G oder eine Saisonlänge, muss c_Tag mitlaufen —
+    # sonst bräche die im Bericht tragende f-Kürzung (f steht in ΔTage UND in
+    # d_Saison und kürzt sich im €-Pfad vollständig heraus).
+    l_b = ctx.p(code, "l_saison_birke", POLLEN_SAISON_LAENGE["birke"])
+    l_g = ctx.p(code, "l_saison_graeser", POLLEN_SAISON_LAENGE["graeser"])
+    d_saison = f * (p_b * l_b + p_g * l_g)
+    if d_saison > 0.0:
+        out["cost_eur"] *= POLLEN_D_SAISON_REF / d_saison
     out["betroffene"] = max(0.0, betroffene)
     return out
 
@@ -643,11 +693,14 @@ LINEAGE_SPECS: dict[str, dict] = {
             "term": "P̂ (Vegetation)",
             "label": "Lokale Vegetationslast",
             "vulnerabilities": [],
-            "params": ["lambda_veg", "g_bar_ref"],
+            "params": ["lambda_veg"],
             "note": ("Mittelwertzentrierte Modulation über die lokale Pollenlast: "
-                     "P̂ = 1 + λ(Ĝ/Ḡ − 1) mit dem betroffenengewichteten "
-                     "Referenzmittel Ḡ (fixiert). Steht in BEIDEN Pfaden — "
-                     "Symptomtage und Euro bleiben strikt proportional.\n"
+                     "P̂ = 1 + λ(Ĝ/Ḡ − 1). Das Referenzmittel Ḡ ist das "
+                     "betroffenengewichtete Mittel der EIGENEN KOMMUNE — die "
+                     "Betrachtungsebene bleibt geschlossen (Aufgabe §3.2), und "
+                     "Σ B·P̂ = Σ B gilt exakt: P̂ verteilt nur innerhalb der "
+                     "Kommune um. Steht in BEIDEN Pfaden — Symptomtage und Euro "
+                     "bleiben strikt proportional.\n"
                      r"$$\hat P_{z} = 1 + \lambda\,\bigl(\hat G_{z}/\bar G - 1\bigr)$$"),
         },
     },

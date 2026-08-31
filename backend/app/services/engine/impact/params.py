@@ -417,6 +417,24 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "beeinflusst den Euro-Ausweis nicht (Golden-Test "
                       "beispiel_96_f_kuerzung).",
      "source_refs": ["Pfaar_2020_Symptomlast"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "l_saison_birke", "value": 30.0,
+     "label": "Saisonlänge Birkengruppe L_B", "unit": "Tage",
+     "source": "EAACI-Saisonkriterium (Pfaar 2017) — gekennzeichnete Abschätzung",
+     "source_detail": "Typische Länge der Birkengruppen-Saison nach dem "
+                      "EAACI-Kriterium: 30 Tage (Band 20–45). Die Quelle definiert das "
+                      "Kriterium (Pollenschwellen), publiziert aber KEINE festen "
+                      "Längenwerte — daher gekennzeichnete Abschätzung (§3.9). Geht in "
+                      "d_Saison = f·(p_B·L_B + p_G·L_G) = 43,05 Tage ein und damit in "
+                      "den Kostensatz c_Tag = c_Jahr/d_Saison: Eine Änderung von L_B "
+                      "verschiebt c_Tag mit (Kopplung §3.9, Bericht §3.5).",
+     "source_refs": ["Pfaar_2017_EAACI_Pollensaison"]},
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "l_saison_graeser", "value": 60.0,
+     "label": "Saisonlänge Gräser L_G", "unit": "Tage",
+     "source": "EAACI-Saisonkriterium (Pfaar 2017) — gekennzeichnete Abschätzung",
+     "source_detail": "Typische Länge der Gräser-Saison nach dem EAACI-Kriterium: "
+                      "60 Tage (Band 45–80); gekennzeichnete Abschätzung wie L_B. "
+                      "Geht über d_Saison in den Kostensatz c_Tag ein (Bericht §3.5).",
+     "source_refs": ["Pfaar_2017_EAACI_Pollensaison"]},
     {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "lambda_veg", "value": 0.70,
      "label": "Gewicht der Vegetations-Modulation λ", "unit": "Faktor",
      "source": "Werchan 2017/2018, Bogawski 2019 (Kette Bericht #96 §3.4)",
@@ -429,41 +447,21 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_refs": ["Werchan_2017_Pollen_Berlin", "Werchan_2018_Symptome_Berlin",
                      "Bogawski_2019_Baumkronen_Pollen"]},
     # ── #96: Integrationsparameter der Ebene POLLEN_LOAD (§3.3-Spezifikation) ──
-    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "g_bar_ref", "value": 0.1775,
-     "label": "Referenz-Vegetationslast Ḡ (Bundesmittel)", "unit": "Anteil",
-     "source": "Kommunale Stichprobe (Bericht #96 §3.3; §3.4-Ressourcen-Regel)",
-     "source_detail": "Betroffenengewichtetes Referenzmittel der Vegetationslast Ĝ, "
-                      "auf das P̂ = 1 + λ(Ĝ/Ḡ − 1) zentriert wird: **0,1775**, "
-                      "gemessen mit dem Produktionsmodell über drei Siedlungstypen "
-                      "(Offenbach am Main 0,1740 · Freising 0,1797 · Weyarn 0,2704; "
-                      "2.896 bewohnte Zellen, 20.408 Betroffene; Anlage "
-                      "pollen_g_bar.csv/.md). Kommunale Stichprobe statt nationalem "
-                      "100-m-Vollraster-Lauf — den verbietet die §3.4-Ressourcen-Regel "
-                      "(Fortschreibung 30.08.2026); der Bericht nennt noch einen "
-                      "„Anlage-Bundeslauf“ (Ledger-Befund 115). Die Zentrierung gilt "
-                      "damit näherungsweise statt exakt; Band = Streuung der "
-                      "Stichprobe 0,174–0,270 (gekennzeichnete Abschätzung §3.9). "
-                      "Metropolen > 4.000 Zellen sind unterrepräsentiert (Aufwand); "
-                      "sie sind grünärmer ⇒ Ḡ eher überschätzt ⇒ P̂ dort konservativ "
-                      "< 1. REFERENZZUSTAND FIXIERT (Befund 113): bleibt bei "
-                      "Maßnahmen-/Szenariorechnungen konstant, Fortschreibung nur mit "
-                      "neuer versionierter Stichprobe.",
-     "source_refs": []},
-    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "veg_weight_birke", "value": 0.463,
-     "label": "Gewicht Gehölz-Anteil in Ĝ", "unit": "Anteil",
-     "source": "Herleitung aus den δ-Beiträgen (Bericht #96 §3.1/§3.3)",
-     "source_detail": "Ĝ mischt Gehölz- und Gräserlast mit denselben Gewichten, mit "
-                      "denen beide Komponenten in δ eingehen: w_B = p_B·ΔS_B,DE / "
-                      "(p_B·ΔS_B,DE + p_G·ΔS_G,DE) = 0,55·4,79/(0,55·4,79 + 0,75·4,06) "
-                      "= 2,6345/5,6795 = 0,4639; w_G = 1 − w_B. Deutschlandweit fixiert "
-                      "(nicht regional), weil Ĝ nur eine relative Verteilungsgröße ist, "
-                      "die über Ḡ zentriert wird — Integrations-Detailspezifikation, "
-                      "die der Bericht §3.3 ausdrücklich der Integration überlässt.",
-     "source_refs": []},
+    # g_bar_ref ENTFERNT (31.08.2026, Aufgabe §3.2 „geschlossene Betrachtungsebene"):
+    # Das Referenzmittel Ḡ des P̂-Terms wird NICHT mehr als bundesweiter Parameter
+    # geführt, sondern im Lauf aus den Zellen der jeweiligen Kommune gebildet
+    # (inputs.kommunale_pollen_referenz → regional["pollen_g_bar"]). Ohne Referenz
+    # bleibt P̂ neutral. Die Stichprobe pollen_g_bar.py dokumentiert nur noch die
+    # Größenordnung/Streuung von Ĝ zur Plausibilisierung der Ebene.
+    # veg_weight_birke ENTFERNT (31.08.2026, Ledger #96 Befund 138): w_B ist eine
+    # ABGELEITETE Größe (p_B·ΔS_B,DE / Σ) und kein frei setzbarer Parameter — als
+    # editierbarer Registry-Wert wäre die Kopplung an p_B/p_G tot gewesen. Die
+    # Herleitung rechnet jetzt indicators.pollen_load im Lauf mit den aktuellen
+    # Sensibilisierungs-Anteilen (Bericht #96 §3.3, Anker #p-hat).
     {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "birch_group_share_default",
      "value": 0.12,
      "label": "Birkengruppen-Anteil ungetaggter Bäume", "unit": "Anteil",
-     "source": "Gekennzeichnete Abschätzung (OSM-Tag-Lücke; Bericht #96 §3.3)",
+     "source": "ABGESCHÄTZT ohne Primärquelle (§3.9) — Bericht #96 §3.3",
      "source_detail": "OSM-Bäume tragen nur teilweise genus/species. Für Kronen ohne "
                       "Gattungs-Tag wird der Birkengruppen-Anteil (Betula/Alnus/Corylus) "
                       "mit 0,12 angesetzt — Größenordnung des Birken-/Erlen-Anteils "
@@ -471,7 +469,21 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "typischerweise 3–8 %, Erle/Hasel in Grünanlagen zusätzlich); "
                       "gekennzeichnete Abschätzung (§3.9). Wirkt NUR auf die räumliche "
                       "Verteilung (Ĝ), nicht auf das Niveau — die Zentrierung über Ḡ "
-                      "hebt einen gemeinsamen Faktor auf.",
+                      "hebt einen gemeinsamen Faktor auf. §3.9-Kategorie "
+                      "ABGESCHÄTZT: Für den Gattungsmix ungetaggter OSM-Bäume "
+                      "existiert keine belastbare Primärquelle (Straßenbaumkataster "
+                      "sind kommunal, uneinheitlich und nicht keyless aggregierbar) — "
+                      "der Wert ist eine dokumentierte Annahme, kein Messwert. "
+                      "Begründung des Zahlenwerts: Birke und Erle liegen in "
+                      "veröffentlichten kommunalen Straßenbaum-Erhebungen typischerweise "
+                      "im einstelligen Prozentbereich, Hasel/Hainbuche kommen in "
+                      "Grün- und Parkanlagen hinzu ⇒ Ansatz 0,12 mit Band 0,05–0,25. "
+                      "GEMESSENE Ergebnis-Sensitivität (Testzellen, s_unbek 0,05 → "
+                      "0,25): Ĝ/Ḡ der gehölzreichen Zelle 0,571 → 0,643 (+12,6 %), "
+                      "der grünlastigen 1,514 → 1,439 (−5,0 %) — die KOMMUNENSUMME "
+                      "bleibt unverändert (Zentrierung), betroffen ist nur die "
+                      "Verteilung innerhalb der Kommune. Produkt-Kennzeichnung als "
+                      "Annahme; ersetzbar durch ein kommunales Baumkataster.",
      "source_refs": []},
 
     # ── Todesfälle durch Hochwasser/Sturzfluten ────────────────────────────────
@@ -508,8 +520,17 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source": "Ereignisauswertungen (Modellannahme)",
      "source_detail": "Flutopfer sind überproportional alt und mobilitätseingeschränkt. "
                       "Der Modifikator skaliert mit der Abweichung des 65+-Anteils der "
-                      "Zelle vom Bundesmittel (22 %).",
-     "source_refs": ["CEDIM_Hochwasser_2021"]},
+                      "Zelle vom Zentrierungsmittel **0,22** = amtlicher 65+-Anteil "
+                      "Deutschlands (Zensus 2022/Destatis-Fortschreibung; identisch "
+                      "zum Regional-Fallback in engine/tunables.py). Zentrierung auf "
+                      "ein PUBLIZIERTES Bevölkerungsmittel ist hier der richtige "
+                      "Bezug (Aufgabe §3.2): Die Evidenz (Altersverteilung der "
+                      "Flutopfer, CEDIM-Ereignisauswertung) ist individuell erhoben, "
+                      "nicht intra-kommunal — deshalb darf der Term Kommunen "
+                      "gegeneinander verschieben. Das Mittel ist in "
+                      "impact/health.py hartkodiert (0.22); Registry-Parameter erst "
+                      "bei einer Methodik-Ausarbeitung des Flut-Kanals.",
+     "source_refs": ["CEDIM_Hochwasser_2021", "Destatis_Sterbetafeln_2022_2024"]},
     {"risk": "EXPECTED_ANNUAL_MORTALITY_FLOOD", "key": "calibration", "value": 1.0,
      "label": "Kalibrierfaktor Flut-Mortalität", "unit": "Faktor",
      "source": "Kuratierte Ereignisliste",
@@ -634,9 +655,19 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "skaliert linear mit den Zell-Hitzetagen.",
      "source_refs": ["RKI_Hitzemortalitaet"]},
     {"risk": "EXPECTED_THERMAL_STRESS_HOURS", "key": "reference_hotdays", "value": 20.0,
-     "label": "Referenz-Hitzetage", "unit": "Hitzetage/Jahr", "source": "DWD/Modellannahme",
-     "source_detail": "Bezugsniveau der Hitzetage, bei dem die Referenz-Belastungsstunden gelten.",
-     "source_refs": ["DWD_CDC_Starkregen"]},
+     "label": "Referenz-Hitzetage", "unit": "Hitzetage/Jahr",
+     "source": "Gesetztes Bezugsniveau (Modellannahme, dokumentiert)",
+     "source_detail": "Bezugsniveau der Hitzetage, bei dem die Referenz-Belastungs"
+                      "stunden gelten; der Treiber ist das Verhältnis HD_Zelle / 20. "
+                      "GESETZTE Größe (§3.9, Kategorie Abgeschätzt), KEIN "
+                      "Modellaggregat über "
+                      "Deutschland — Größenordnung an der DWD-Rasterklimatologie "
+                      "heißer Tage orientiert (Bundesmittel ~10–20 Tage/Jahr, "
+                      "Ballungsräume darüber). Als reiner Skalierungsnenner wirkt sie "
+                      "linear auf den Belastungsstunden-Ausweis; eine Herleitung folgt "
+                      "mit der Methodik-Ausarbeitung dieses Screening-nahen Kanals. "
+                      "Quellenzuordnung korrigiert (vorher fälschlich Starkregen-Raster).",
+     "source_refs": ["DWD_CDC_Rasterklimatologie"]},
 
     # ── Schadstoff-Belastungsstunden ────────────────────────────────────────────
     {"risk": "EXPECTED_POLLUTANT_EXPOSURE_HOURS", "key": "hours_ref_per_100k", "value": 250.0,

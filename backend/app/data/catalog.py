@@ -61,7 +61,7 @@ HAZARDS: list[dict] = [
                     "und Grünflächen als Gräser-Proxy).",
      "proxy": "OSM: Baumkronen mit genus/species der Birkengruppe (ungetaggte Kronen "
               "mit dokumentiertem Gattungsanteil) + Grün-/Wiesenflächen; gewichtet mit "
-              "den δ-Beiträgen (w_B = 0,463).",
+              "den δ-Beiträgen (w_B = 0,464, im Lauf aus p_B/p_G abgeleitet).",
      "source": "OSM (Bäume, Landnutzung) — Methodik #96 §3.3",
      "source_detail": "Ĝ der Zelle; geht mittelwertzentriert als P̂ = 1 + λ(Ĝ/Ḡ − 1) "
         "in ΔTage UND € ein. Die Normierungs-Obergrenze 0,5 ist eine reine "

@@ -9,7 +9,17 @@ Risiko-Methodiken.
 > (2) §3.1 **Datenebenen-Anlagepflicht** — fehlt eine benötigte Zellgröße im
 > Produkt, spezifiziert der Bericht die neue Ebene vollständig und
 > `/integriere-risiko` legt sie an (oder parkt sie mit Beschaffungs-Watchlist,
-> wenn keine offene Quelle existiert). v2 konsolidiert die Aufgabenbeschreibung v1 (22.08.2026) und
+> wenn keine offene Quelle existiert).
+>
+> **Fortschreibung 31.08.2026 (Nutzer-Entscheid, aus der #96-Integration):**
+> (3) §3.2 **Geschlossene Betrachtungsebene** — eine Referenz- oder
+> Zentrierungsgröße darf **nie** aus einer modellinternen Aggregation über eine
+> HÖHERE Ebene als die Betrachtungsebene stammen. Zulässig sind nur
+> (a) amtlich/publiziert erhobene Referenzwerte (Mikrozensus, Pflegestatistik …)
+> oder (b) Größen, die **innerhalb der Betrachtungsebene selbst** bestimmbar
+> sind (bei einer Kommune: aus ihren eigenen Zellen). Liegt keine solche
+> Referenz vor, bleibt der Modifikator neutral (Faktor 1) — ein „Bundeslauf"
+> als Bezugsgröße ist unzulässig. v2 konsolidiert die Aufgabenbeschreibung v1 (22.08.2026) und
 `docs/METHODIK_GRUNDSAETZE.md` (G1–G14) **inklusive der Review-Fortschreibungen aus der
 M0-Gegenprüfung** (Kalibrierfaktor-Regel ex G1/G5, G14-Geltungsbereich, G11-Begründung).
 `METHODIK_GRUNDSAETZE.md` entfällt; die Datei bleibt nur als Ein-Zeilen-Verweis hierher bestehen.
@@ -201,10 +211,26 @@ G12 → 3.4 (Verteilungsprüfung) · G13 → 3.2 (Kein-Doppelkanal) · G14 → 3
   Modulatoren Default = 1. Schwache Effekte ehrlich als schwach kennzeichnen. **Bandzuordnung:**
   jeder Modifikator wirkt nur in den Alters-/Strukturbändern und auf die Endpunkte
   (Mortalität/Morbidität getrennt!), für die seine Evidenz gilt.
-- **Alle Modifikatoren mittelwertzentriert** (Bundesmittel = 1, `1 + β·(x − x̄)`), sonst wird der
-  Kalibrierfaktor uninterpretierbar. Individuelle Odds-Ratios über das Bevölkerungsmittel
+- **Alle Modifikatoren mittelwertzentriert** (Referenzmittel = 1, `1 + β·(x − x̄)`), sonst wird
+  der Kalibrierfaktor uninterpretierbar. Individuelle Odds-Ratios über das Bevölkerungsmittel
   übersetzen: `β = (OR−1) / [1 + q̄·(OR−1)]`. Zentrierungs-Mittelwerte (q̄, d̄) sind
   herleitungspflichtige Parameter (3.9).
+- **Geschlossene Betrachtungsebene (Fortschreibung 31.08.2026).** Das Zentrierungsmittel
+  ist entweder ein **amtlich publizierter** Wert (z. B. Mikrozensus-Anteil allein lebender
+  65-Jähriger, Pflegequote) — dann trägt es die individuelle Evidenz und darf die Kommunen
+  gegeneinander verschieben — oder es wird **innerhalb der Betrachtungsebene selbst**
+  gebildet (Kommune: gewichtetes Mittel über ihre eigenen Zellen). **Unzulässig ist eine
+  modellinterne Aggregation über eine höhere Ebene** (etwa ein bundesweiter Zell-Lauf als
+  Bezugswert für eine Zellgröße): Sie verletzt die Ressourcen-Regel (§3.4) und macht das
+  Ergebnis einer Kommune von Daten abhängig, die außerhalb ihrer Betrachtungsebene liegen.
+  Welcher der beiden Wege gilt, entscheidet die **Reichweite der Evidenz**: intra-urban
+  gemessene Effekte (z. B. Vegetations-/Pollengradienten innerhalb einer Stadt) zentrieren
+  auf die Kommune; individuell erhobene Risikoverhältnisse (Fall-Kontroll-/Kohorten-ORs)
+  zentrieren auf das publizierte Bevölkerungsmittel. Fehlt eine zulässige Referenz, bleibt
+  der Modifikator **neutral** (Faktor 1) — keine Ersatzkonstruktion.
+  Fortschreibungs-Regel bei innerhalb der Ebene gebildeten Mitteln: Der Referenzzustand
+  wird im **Baseline-Lauf** bestimmt und für Maßnahmen-/Szenariorechnungen festgehalten,
+  sonst neutralisiert eine mitlaufende Rezentrierung flächige Maßnahmen per Konstruktion.
 - **Kein-Doppelkanal:** jede physikalische Wirkung genau einmal (Grünanteil steckt im
   Stadtklima-Zuschlag — nicht zusätzlich als Vulnerabilität); vor Aufnahme jedes Faktors prüfen,
   ob er implizit schon in einem Eingang steckt.

@@ -703,7 +703,55 @@ def gather_cell_inputs(
     # Zensus-Altersbänder, deshalb NACH apply_zensus_to_cell_inputs.
     apply_care_home_share(list(cell_inputs), grid_cells, infra_features)
 
+    # Referenz-Vegetationslast Ḡ der KOMMUNE (Methodik #96 §3.3): Zentrierung des
+    # P̂-Terms auf die eigene Betrachtungsebene (Aufgabe §3.2, Fortschreibung
+    # 31.08.2026) — kein Bundesbezug.
+    regional["pollen_g_bar"] = kommunale_pollen_referenz(list(cell_inputs))
+
     return list(cell_inputs), regional
+
+
+def kommunale_pollen_referenz(cell_inputs: list[dict | None]) -> float | None:
+    """Betroffenengewichtete Referenz-Vegetationslast Ḡ der Kommune (#96 §3.3).
+
+    ``Ḡ = Σ_z B_z · Ĝ_z / Σ_z B_z`` über die **bewohnten Zellen der Kommune**.
+    Damit gilt ``Σ_z B_z·P̂_z = Σ_z B_z`` EXAKT (P̂ = 1 + λ(Ĝ/Ḡ − 1) verteilt nur
+    innerhalb der Kommune um) und die Betrachtungsebene bleibt geschlossen: Das
+    Ergebnis einer Kommune hängt an keiner Größe außerhalb ihrer selbst
+    (Aufgabe §3.2). ``None``, wenn die Kommune keine bewohnte Zelle mit
+    Vegetationsangabe hat — dann bleibt P̂ neutral (Faktor 1).
+    """
+    from app.services.engine import override_context
+    from app.services.engine.impact.health import (
+        POLLEN_AGE_BANDS, POLLEN_PREVALENCE, pollen_age_bands,
+    )
+    from app.services.engine.indicators import pollen_load
+
+    # Dieselben (editierbaren) Prävalenzen wie die Schadensfunktion — sonst
+    # wichtete die Referenz anders als der Zähler und die Zentrierung wäre bei
+    # editierten p_AR-Werten nicht mehr exakt.
+    code = "EXPECTED_ANNUAL_ALLERGY_DAYS"
+    p_ar = {}
+    for band in POLLEN_AGE_BANDS:
+        val = override_context.get_override(
+            f"risks.{code}.impact.p_ar_{band}", POLLEN_PREVALENCE[band])
+        p_ar[band] = float(POLLEN_PREVALENCE[band] if val is None else val)
+
+    num = den = 0.0
+    for ci in cell_inputs:
+        if ci is None:
+            continue
+        # Dieselbe Bänder-Herleitung wie die Schadensfunktion (inkl. Fallback).
+        bands = pollen_age_bands(ci)
+        betroffene = sum(bands[b] * p_ar[b] for b in POLLEN_AGE_BANDS)
+        if betroffene <= 0.0:
+            continue
+        num += betroffene * pollen_load(ci)
+        den += betroffene
+    if den <= 0.0 or num <= 0.0:
+        return None
+    # KEINE Rundung: Σ B·P̂ = Σ B soll exakt gelten (Golden-Test bindet das).
+    return num / den
 
 
 def apply_care_home_share(

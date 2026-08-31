@@ -46,6 +46,8 @@ Faktoren, Fall-Kontroll-OR als Maßnahmeneffekt, Kategorienfehler (Korrelation a
 Ressourcen-Regel-Verstoß (§3.4: geplanter nationaler 100-m-Vollraster-Lauf als
 Prüfstein/Abgleich = Befund), fehlende Datenebenen-Spezifikation (§3.1-Anlagepflicht:
 benötigte Zellgröße ohne „neu anzulegen"-Ebene bzw. „geparkt"-Watchlist = Befund),
+verletzte Betrachtungsebene (§3.2: Zentrierungsmittel aus modellinterner Aggregation
+über eine höhere Ebene = Befund),
 Referenzwert-Doppelzählung, Quellen-Synchronität (LF 14).
 
 ## 3 · Ledger und Regression

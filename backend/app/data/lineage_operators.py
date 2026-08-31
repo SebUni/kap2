@@ -632,7 +632,7 @@ FORMULA_OPERATORS: dict[str, list[OperatorStep]] = {
                      "Birkengruppe (OSM genus/species; Kronen ohne Gattungs-Tag mit "
                      "dem dokumentierten Gattungsanteil) und Grün-/Wiesenfläche als "
                      "Gräser-Proxy, gewichtet mit ihren Beiträgen zur gemessenen "
-                     "Saison-Spreizung (w_B = 0,463).\n"
+                     "Saison-Spreizung (w_B = 0,464, abgeleitet aus p_B/p_G).,\n"
                      r"$$\hat G_{z} = w_B\,\bigl(k_{\mathrm{Birke},z} + "
                      r"s_{\mathrm{unbek}}\,k_{\mathrm{unbek},z}\bigr)"
                      r" + (1-w_B)\,\text{Grün}_{z}$$"),

@@ -43,6 +43,10 @@ Beschaffungs-Watchlist führt; das Verifikationsergebnis kommt als ein Satz in d
 Ergebnis-Layer als Raten (je 1.000 EW / je ha) gemäß §3.6. **Ressourcen-Regel (§3.4):**
 kein Integrationsschritt darf einen nationalen 100-m-Vollraster-Lauf erfordern oder
 einplanen; Abgleiche laufen auf Bundesland-/Gemeindepunkt-/Stichproben-Ebene.
+**Geschlossene Betrachtungsebene (§3.2):** Referenz-/Zentrierungsmittel kommen
+entweder aus amtlicher Statistik oder werden im Lauf aus der Betrachtungsebene
+selbst gebildet (Kommune: über ihre eigenen Zellen, im Baseline-Lauf
+festgehalten) — niemals aus einer Aggregation über eine höhere Ebene.
 
 ## 4 · Tests aus dem Bericht generieren
 

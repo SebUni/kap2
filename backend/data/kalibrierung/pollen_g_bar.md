@@ -1,7 +1,10 @@
-# Referenz-Vegetationslast Ḡ (Ebene POLLEN_LOAD, Methodik #96 §3.3)
+# Ebene POLLEN_LOAD: Ĝ-Streuung und kommunale Referenz Ḡ (#96 §3.3)
 
-Kommunale Stichprobe mit dem Produktionsmodell (§3.4-Ressourcen-Regel:
-kein nationaler 100-m-Vollraster-Lauf; Ledger-Befund 115).
+Plausibilisierung der Ebene mit dem Produktionsmodell je Kommune.
+**Ḡ ist kein Parameter**: Das Produkt bildet die Referenz seit Rev. 2 im
+Lauf aus den Zellen der jeweiligen Kommune (Aufgabe §3.2, geschlossene
+Betrachtungsebene); die Tabelle zeigt, wie stark Ĝ zwischen
+Siedlungstypen streut und dass die Referenz nachrechenbar ist.
 
 | Kommune | Typ | bewohnte Zellen | Betroffene | Ḡ | Median Ĝ |
 |---|---|---|---|---|---|
@@ -9,9 +12,9 @@ kein nationaler 100-m-Vollraster-Lauf; Ledger-Befund 115).
 | Offenbach am Main | Großstadt, dicht bebaut (Mitte) | 1480 | 14610 | 0.17401 | 0.18714 |
 | Freising | Mittelstadt (Süd) | 1108 | 5369 | 0.17965 | 0.18956 |
 
-- **Ḡ (betroffenengewichtet über die Stichprobe) = 0.1775**
-- Streuung zwischen den Kommunen: 0.1740 … 0.2704 (= Band der
-  gekennzeichneten Abschätzung, §3.9)
-- Referenzzustand FIXIERT (Bericht Befund 113): bleibt bei Maßnahmen-/
-  Szenariorechnungen konstant; Fortschreibung nur mit neuer versionierter
-  Stichprobe.
+- Streuung der kommunalen Referenzen: **0.1740 … 0.2704** (Stichproben-Mittel 0.1775 — nur Kennzahl, kein Modellparameter)
+- Erwartete Richtung bestätigt: dicht bebaute Städte niedrig, ländlich-
+  grüne Gemeinden hoch — die Ebene misst, was sie soll.
+- Referenzzustand je Kommune im Baseline-Lauf fixiert (Bericht Befund 113):
+  bleibt bei Maßnahmen-/Szenariorechnungen konstant; nach realer
+  Vegetationsänderung ist der Baseline-Wert zu übernehmen.

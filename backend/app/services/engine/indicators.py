@@ -51,6 +51,11 @@ def _healthcare_access(ci: dict) -> float:
     return round(_clamp(100.0 * (1.0 - score), 0, 100), 1)
 
 
+# Deutschlandweite Saison-Spreizung (Tage) — Basis der Ĝ-Gewichte (§3.1/§3.3,
+# Anlage backend/data/kalibrierung/pollensaison_region.csv, Zeile „deutschland").
+POLLEN_DELTA_S_DE: dict[str, float] = {"birke": 4.79, "graeser": 4.06}
+
+
 def pollen_load(ci: dict) -> float:
     """Ĝ der Zelle: gewichteter Anteil allergener Vegetation (Methodik #96 §3.3).
 
@@ -71,12 +76,26 @@ def pollen_load(ci: dict) -> float:
         val = override_context.get_override(f"risks.{code}.impact.{key}", default)
         return float(default if val is None else val)
 
-    w_b = _p("veg_weight_birke", 0.463)
+    # w_B ist ABGELEITET, kein freier Parameter (Ledger #96 Befund 138): Es sind
+    # dieselben Beiträge, mit denen Gehölze und Gräser in δ eingehen. Aus den
+    # aktuellen (editierbaren) Sensibilisierungs-Anteilen und den DE-Spreizungen
+    # gerechnet, damit die Kopplung §3.9 lebendig bleibt: Ändert jemand p_B/p_G,
+    # läuft w_B automatisch mit.
+    p_b = _p("p_sens_birke", 0.55)
+    p_g = _p("p_sens_graeser", 0.75)
+    beitrag_b = p_b * POLLEN_DELTA_S_DE["birke"]
+    beitrag_g = p_g * POLLEN_DELTA_S_DE["graeser"]
+    summe = beitrag_b + beitrag_g
+    w_b = beitrag_b / summe if summe > 0 else 0.5
     share_default = _p("birch_group_share_default", 0.12)
     birch = float(ci.get("canopy_birch_frac") or 0.0)
     unknown = float(ci.get("canopy_unknown_frac") or 0.0)
     green = float(ci.get("green_frac") or 0.0)
-    return max(0.0, w_b * (birch + share_default * unknown) + (1.0 - w_b) * green)
+    # Rundung HIER (nicht erst im Hazard-Dict): Schadensfunktion und kommunale
+    # Referenzbildung müssen exakt denselben Ĝ-Wert sehen, sonst ist die
+    # Zentrierung nicht exakt (Ledger #96 Befund 125).
+    return round(max(0.0, w_b * (birch + share_default * unknown)
+                     + (1.0 - w_b) * green), 5)
 
 
 def compute_cell_hev(ci: dict, regional: dict) -> dict:
@@ -143,8 +162,8 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
         # Pollenlast Ĝ (Methodik #96 §3.3): gewichteter Anteil allergener
         # Vegetation. Gehölz-Komponente = Kronenfläche der Birkengruppe
         # (getaggt + ungetaggter Anteil × Gattungsanteil), Gräser-Komponente =
-        # Grün-/Wiesenfläche der Zelle. Gewichte = δ-Beiträge (w_B = 0,463).
-        "POLLEN_LOAD": round(pollen_load(ci), 5),
+        # Grün-/Wiesenfläche der Zelle; Gewichte = δ-Beiträge (w_B abgeleitet).
+        "POLLEN_LOAD": pollen_load(ci),
         "COLD_EXTREME": round(regional["frost_days"] * (1.0 - 0.3 * min(uhi / 5.0, 1.0)), 1),
         "HEAVY_RAIN_FLOOD": round(
             _clamp(regional["heavy_rain_index"] * (0.4 + imp) * (0.5 + 0.5 * twi_norm) * (0.6 + depression), 0, 100), 1

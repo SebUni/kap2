@@ -23,9 +23,13 @@ Berichts.
    Kalibriermodell ≠ Produktionsmodell, Band-/Endpunkt-Zuordnung, unzentrierte Modifikatoren,
    Fall-Kontroll-OR als Maßnahmeneffekt, Kategorienfehler, Referenzwert-Doppelzählung,
    Quellen-Synchronität, **Ressourcen-Regel-Verstoß** (§3.4: ein geplanter nationaler
-   100-m-Vollraster-Lauf als Prüfstein/Abgleich = Befund) und **fehlende
+   100-m-Vollraster-Lauf als Prüfstein/Abgleich = Befund), **fehlende
    Datenebenen-Spezifikation** (§3.1: benötigte Zellgröße ohne vollständige
-   „neu anzulegen"-Ebene bzw. ohne „geparkt"-Kennzeichnung mit Watchlist = Befund).
+   „neu anzulegen"-Ebene bzw. ohne „geparkt"-Kennzeichnung mit Watchlist = Befund)
+   und **verletzte Betrachtungsebene** (§3.2: Zentrierungs-/Referenzmittel aus einer
+   modellinternen Aggregation über eine höhere Ebene — etwa ein Bundeslauf als Bezug
+   für eine Zellgröße — = Befund; zulässig sind amtlich publizierte Werte oder
+   Mittel aus der Betrachtungsebene selbst, sonst Faktor 1).
 4. **Entscheidungslog prüfen:** ✅-Entscheidungen gegen die E-Regeln (falsche Regelanwendung
    = Befund); ⚠️-Entscheidungen auf Plausibilität der angewendeten Empfehlung (unplausible
    Empfehlung oder verschwiegene bessere Alternative = Befund). Ein Befund „hier fehlt eine

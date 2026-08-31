@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""Referenz-Vegetationslast Ḡ für die Ebene POLLEN_LOAD (Methodik #96 §3.3).
+"""Plausibilisierung der Ebene POLLEN_LOAD: Ĝ und die kommunale Referenz Ḡ (#96 §3.3).
 
-Ḡ ist das **betroffenengewichtete** Mittel der Pollenlast Ĝ, auf das der
-Modulationsfaktor P̂ = 1 + λ(Ĝ/Ḡ − 1) zentriert wird. Der Bericht sieht dafür
-einen „Anlage-Bundeslauf" vor; die **§3.4-Ressourcen-Regel** (Fortschreibung der
-Aufgabe vom 30.08.2026) verbietet nationale 100-m-Vollraster-Läufe und erlaubt
-ausdrücklich **kommunale Stichproben mit dem Produktionsmodell** — genau das tut
-dieses Skript (Ledger-Befund 115).
+**Kein Parameter-Skript.** Seit Rev. 2 des Berichts (Aufgabe §3.2 „geschlossene
+Betrachtungsebene", Nutzer-Entscheid 31.08.2026) ist Ḡ **kein bundesweiter Wert
+mehr**: Der Modulationsfaktor P̂ = 1 + λ(Ĝ/Ḡ − 1) zentriert auf das
+betroffenengewichtete Mittel der **jeweiligen Kommune**, das die Engine im Lauf
+selbst bildet (``inputs.kommunale_pollen_referenz``). Dieses Skript rechnet
+dieselbe Größe für ausgewählte Kommunen nach und dokumentiert damit
+(a) die **Größenordnung und Streuung** von Ĝ zwischen Siedlungstypen — die
+Plausibilitätsprüfung der neuen Ebene — und (b) die Nachrechenbarkeit der
+kommunalen Referenz (Prüfpfad für Reviews). Es läuft je Kommune mit dem
+Produktionsmodell und respektiert die §3.4-Ressourcen-Regel (keine nationalen
+Vollraster-Läufe; Ledger-Befund 115/116).
 
 Verfahren je Stichproben-Kommune:
 1. Gemeindegrenze über Nominatim (keyless, wie im Produkt), Gitter im
@@ -15,11 +20,13 @@ Verfahren je Stichproben-Kommune:
    OSM-Landnutzung, Bäume mit Gattungs-Tags, Zensus-Bevölkerung).
 3. Je Zelle: Ĝ (``indicators.pollen_load``) und Betroffene
    B = Σ_a pop_a · p_AR,a (Prävalenzen wie im Produkt).
-4. Ḡ_Stichprobe = Σ B·Ĝ / Σ B (betroffenengewichtet, bewohnte Zellen).
+4. Ḡ_Kommune = Σ B·Ĝ / Σ B (betroffenengewichtet, bewohnte Zellen) — exakt die
+   Größe, die die Engine im Lauf bildet.
 
-Die Kommunen sind so gewählt, dass Siedlungstypen und Regionen streuen; das
-Ergebnis ist eine **gekennzeichnete Abschätzung mit Band** (§3.9), kein
-Vollerhebungswert — die Streuung zwischen den Stichproben-Kommunen ist das Band.
+Die Kommunen sind so gewählt, dass Siedlungstypen und Regionen streuen. Der über
+die Stichprobe gemittelte Wert am Ende der Ausgabe ist **nur eine Kennzahl der
+Streuung**, kein Modellparameter — das Produkt verwendet ausschließlich die
+kommuneneigene Referenz.
 
 Aufruf:  python backend/scripts/kalibrierung/pollen_g_bar.py [--kommunen A,B,C]
 Ausgabe: backend/data/kalibrierung/pollen_g_bar.csv / .md
@@ -207,10 +214,13 @@ def main() -> None:
     _write_csv(rows)
 
     lines = [
-        "# Referenz-Vegetationslast Ḡ (Ebene POLLEN_LOAD, Methodik #96 §3.3)",
+        "# Ebene POLLEN_LOAD: Ĝ-Streuung und kommunale Referenz Ḡ (#96 §3.3)",
         "",
-        "Kommunale Stichprobe mit dem Produktionsmodell (§3.4-Ressourcen-Regel:",
-        "kein nationaler 100-m-Vollraster-Lauf; Ledger-Befund 115).",
+        "Plausibilisierung der Ebene mit dem Produktionsmodell je Kommune.",
+        "**Ḡ ist kein Parameter**: Das Produkt bildet die Referenz seit Rev. 2 im",
+        "Lauf aus den Zellen der jeweiligen Kommune (Aufgabe §3.2, geschlossene",
+        "Betrachtungsebene); die Tabelle zeigt, wie stark Ĝ zwischen",
+        "Siedlungstypen streut und dass die Referenz nachrechenbar ist.",
         "",
         "| Kommune | Typ | bewohnte Zellen | Betroffene | Ḡ | Median Ĝ |",
         "|---|---|---|---|---|---|",
@@ -220,12 +230,13 @@ def main() -> None:
                      f"{r['betroffene']:.0f} | {r['g_bar']:.5f} | {r['g_median']:.5f} |")
     lines += [
         "",
-        f"- **Ḡ (betroffenengewichtet über die Stichprobe) = {g_bar:.4f}**",
-        f"- Streuung zwischen den Kommunen: {lo:.4f} … {hi:.4f} (= Band der",
-        "  gekennzeichneten Abschätzung, §3.9)",
-        "- Referenzzustand FIXIERT (Bericht Befund 113): bleibt bei Maßnahmen-/",
-        "  Szenariorechnungen konstant; Fortschreibung nur mit neuer versionierter",
-        "  Stichprobe.",
+        f"- Streuung der kommunalen Referenzen: **{lo:.4f} … {hi:.4f}** "
+        f"(Stichproben-Mittel {g_bar:.4f} — nur Kennzahl, kein Modellparameter)",
+        "- Erwartete Richtung bestätigt: dicht bebaute Städte niedrig, ländlich-",
+        "  grüne Gemeinden hoch — die Ebene misst, was sie soll.",
+        "- Referenzzustand je Kommune im Baseline-Lauf fixiert (Bericht Befund 113):",
+        "  bleibt bei Maßnahmen-/Szenariorechnungen konstant; nach realer",
+        "  Vegetationsänderung ist der Baseline-Wert zu übernehmen.",
     ]
     with open(os.path.join(DATA, "pollen_g_bar.md"), "w") as fh:
         fh.write("\n".join(lines) + "\n")

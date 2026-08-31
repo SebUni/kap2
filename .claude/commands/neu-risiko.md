@@ -57,7 +57,11 @@ Du legst den Erstaufschlag eines Methodik-Berichts an. Verbindliche Instruktions
      ohne offene Quelle: „geparkt" + Watchlist) — kein dauerhafter, unspezifizierter
      Neutral-Fallback; (b) **Ressourcen-Regel (§3.4):** Kalibrierung/Validierung/
      Abgleiche nie über nationale 100-m-Vollraster-Läufe planen — zulässig sind
-     Bundesland-, Gemeindepunkt- und kommunale Stichproben-Ebene.
+     Bundesland-, Gemeindepunkt- und kommunale Stichproben-Ebene;
+     (c) **Geschlossene Betrachtungsebene (§3.2):** Zentrierungs-/Referenzmittel
+     entweder amtlich publiziert oder aus der Betrachtungsebene selbst (Kommune:
+     eigene Zellen, im Baseline-Lauf festgehalten) — nie aus einer Aggregation
+     über eine höhere Ebene; ohne zulässige Referenz bleibt der Modifikator neutral.
 6. **Ledger anlegen:** `reviews/BEFUNDE_<nr>.md` mit leerer Befund-Tabelle
    (Befund · Kategorie · Status · Umsetzungsnachweis · Begründung bei Abweichung).
 
