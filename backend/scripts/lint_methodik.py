@@ -226,6 +226,21 @@ def registry_abgleich(nr: str, werte: dict[str, str], lint: Lint) -> None:
     lint.ok.append(f"Bericht ⇄ Registry: {len(specs)} Specs, "
                    f"{len(uebersprungen)} zusammengesetzte Blöcke übersprungen")
 
+    # Befund 364: VOLLSTAENDIGKEIT — jede Registry-Spec braucht einen
+    # Parameter-Block. Bis Rev. 14 deckten die Bloecke nur 15 von 28 Specs ab; die
+    # uebrigen 13 (Inzidenzraten, or_out, qbar_out, r_out_enabled) wurden nie
+    # gegen den Bericht abgeglichen, sodass eine Mutation dort unbemerkt blieb.
+    abgedeckt = set()
+    for pid, roh in werte.items():
+        basis = pid[len(praefix):] if pid.startswith(praefix) else pid
+        abgedeckt.add(basis)
+        if roh.startswith("{"):
+            for teil, _ in re.findall(r"([a-z0-9_+\-]+):\s*([0-9.]+)", roh):
+                abgedeckt.add(f"{basis}_{teil.replace('+', 'p').replace('-', '_')}")
+    ohne_block = sorted(k for k in specs if k not in abgedeckt)
+    lint.pruefe(not ohne_block, "Parameter-Block je Registry-Spec",
+                f"{len(ohne_block)} Specs ohne Block im Bericht: {ohne_block[:8]}")
+
     # Befund 344(1): Jeder SYMBOLE-Eintrag muss einem Registry-Key entsprechen.
     # Der Eintrag `voly` war wirkungslos, weil die UV-Specs keinen solchen Key
     # fuehren — `soll is None ⇒ continue` liess ihn stumm durchfallen, und der
@@ -370,10 +385,18 @@ def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> 
     if quelle == "Code lint_methodik.py":
         aktuell = re.sub(r"ABGELOESTE_WERTE.*?\n\}\n",
                          lambda m: "\n" * m.group(0).count("\n"), aktuell, flags=re.S)
-    for _name, _rx in HISTORIE_EINZELN:
-        MUSTER_VORKOMMEN[_name] = MUSTER_VORKOMMEN.get(_name, 0) + len(_rx.findall(aktuell))
-    MUSTER_VORKOMMEN["ergäbe sich (belegt)"] = (
-        MUSTER_VORKOMMEN.get("ergäbe sich (belegt)", 0) + len(GEGENRECHNUNG.findall(aktuell)))
+    # Vorkommen NUR im geprueften Inhalt zaehlen, nicht in der Lint-Datei selbst
+    # (Befund 353): Dort steht jede Ausnahme mit Name UND Muster, was ein
+    # Grundrauschen von 2 Treffern je Ausnahme erzeugt haette — knapp unter
+    # MINDESTVORKOMMEN, aber genug, um eine echte Einzelfreigabe ueber die
+    # Schwelle zu heben und den Ratchet damit wirkungslos zu machen.
+    if quelle != "Code lint_methodik.py":
+        for _name, _rx in HISTORIE_EINZELN:
+            MUSTER_VORKOMMEN[_name] = (MUSTER_VORKOMMEN.get(_name, 0)
+                                       + len(_rx.findall(aktuell)))
+        MUSTER_VORKOMMEN["ergäbe sich (belegt)"] = (
+            MUSTER_VORKOMMEN.get("ergäbe sich (belegt)", 0)
+            + len(GEGENRECHNUNG.findall(aktuell)))
     treffer = 0
     # Zeilen, die als GANZES Historie sind: Entscheidungslog- und Ledger-Tabellen,
     # Kopfvermerke, Korrekturhistorie. Dort ist der alte Wert der Zweck der Zeile.

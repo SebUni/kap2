@@ -9,9 +9,9 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > **Konformitätsvermerk zur Aufgaben-Fortschreibung 30.08.2026** (Ressourcen-Regel
 > §3.4, Datenebenen-Anlagepflicht §3.1; Nutzer-Entscheid, vgl. #95 Rev. 8):
 > Dieser Bericht ist geprüft konform — er plant **keinen** nationalen
-> 100-m-Vollraster-Lauf als Prüf-/Abgleichinstrument. Die beiden benötigten
-> Zellgrößen laufen auf den **zwei verschiedenen** Wegen, die §3.1 vorsieht, und
-> werden im Bericht durchgängig so bezeichnet (Befund 215):
+> 100-m-Vollraster-Lauf als Prüf-/Abgleichinstrument. Die benötigten Zellgrößen
+> laufen auf den **zwei verschiedenen** Wegen, die §3.1 vorsieht, und werden im
+> Bericht durchgängig so bezeichnet (Befunde 215/366):
 > die SSD-Ebene (DWD `sunshine_duration` 1 km, Register 98-E20-01) ist
 > „**neu anzulegen**“, vollständig spezifiziert und inzwischen angelegt (§3.2/§3.6);
 > die Außenbeschäftigten-Ebene (98-OUT-01) ist „**geparkt** (Datenquelle fehlt)“
@@ -102,6 +102,27 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > verschwindendem SSD-Trend (q bis 196) voll durch und hoben den Bundeswert um
 > 2,3 %. Sie sind jetzt ausgeschlossen, die **Aggregationsregel** ist dokumentiert
 > (§3.9) ⇒ q = **0,6683**, \(k_{\text{UV}}\) = **0,7119**, € **339 Mio**.
+> **Rev. 12 (01.09.2026)** = Review-Runde 14 (Befunde 302–318). Keine
+> Modelländerung; abgearbeitet wurden Rückstände, Kennzeichnungen und
+> Lint-Lücken. \(k_{\text{UV}}\) unverändert **0,7119**, € **339 Mio**.
+>
+> **Rev. 13 (02.09.2026)** = Review-Runde 15 (Befunde 319–335). Keine
+> Modelländerung. **Diese Fassung ist bei einem Werkzeugfehler verloren gegangen**
+> (sie lag nur im Arbeitsverzeichnis, nicht in der Versionskontrolle); Rev. 14
+> setzt deshalb auf Rev. 12 auf. Review-Runde 16 hatte festgestellt, dass von den
+> 17 Befunden der Runde 15 nur vier umgesetzt waren — der inhaltliche Verlust ist
+> auf diese vier begrenzt und in Rev. 14 nachgezogen (Befunde 356/357).
+>
+> **Rev. 14 (03.09.2026)** = Review-Runden 16 und 17 (Befunde 336–367). Keine
+> Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
+> € **339 Mio** stehen seit Rev. 11 unverändert und sind sechsmal unabhängig
+> nachgerechnet. Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
+> (Gleichgewichtslesart mit Transient-Faktor \(\tau\) = 0,20–0,48, jetzt größte
+> Achse der §4-Bändertabelle) sowie die vollständig gemessene **Punktmengen-Kette**.
+> Prüfmechanik: Ledger auf eine Zeile je Befund, Status aus **Prüfausdrücken**
+> abgeleitet (W7); Lint-Ratchets gegen zu enge Ausnahmen und gegen Registry-Specs
+> ohne Parameter-Block.
+>
 > Status je Befund in `reviews/BEFUNDE_98.md`. Diese Markdown-Datei ist die Quelle für
 > #98 (§2.7). Alle Ermessensentscheidungen im **Entscheidungslog** (Ende der Datei).
 > Anlagen: `backend/scripts/kalibrierung/dwd_ssd_trend.py` +
@@ -566,7 +587,20 @@ $$ \Delta F_{e,\text{Zelle}} \;=\; F_{e,\text{Zelle}} \cdot \text{BAF}_e \cdot \
 wird auf die bereits dosiserhöhte Baseline des Ankerfensters 2021–2023 angewendet; der
 attributable Anteil wäre exakt
 \(\text{BAF} \cdot \Delta D / (1 + \text{BAF} \cdot \Delta D)\) — Richtung:
-Überschätzung um ≈ +2 % (MM) bzw. ≈ +6 % (C44), innerhalb der Bänder.
+Überschätzung um **+2,73 %** (MM) bzw. **+7,61 %** (C44) — nachgerechnet aus
+\(\text{BAF}\cdot\Delta D\) gegen \(\text{BAF}\cdot\Delta D/(1+\text{BAF}\cdot\Delta D)\)
+mit ΔDosis 4,5436 %; beide innerhalb der Bänder (Befund 359).
+
+**Gekennzeichnete Annahme — unstratifizierte Elastizität (§3.2; Befund 367).**
+Die Baseline ist über fünf Altersbänder geschichtet, der BAF wirkt aber
+**unstratifiziert** auf die Bandsumme: Es gilt dieselbe relative Elastizität in
+allen Bändern. Neutral ist das nicht — die τ-Rechnung unten zeigt, dass die
+Lebenszeitdosis-Elastizität mit dem Alter fällt (\(\tau=(T/2)/a\)), und MM mit
+einem Erkrankungsalter von 63–69 Jahren trägt 64 % der YLL. Eine altersgeschichtete
+Elastizität würde den MM-Pfad also eher anheben, den C44-Pfad eher senken. [30]
+veröffentlicht keine bandweisen BAF; die Annahme bleibt bis dahin bestehen und ist
+über das BAF_MM-Band (±67 % auf den MM-Pfad) mit abgedeckt. **Ersetzungspfad:**
+bandweise BAF, sobald eine Quelle sie beziffert.
 
 **Kumulative Dosis → jährliche Umgebungsdosis: die Gleichgewichtslesart
 (§3.9; Befunde 247/336f).** Die BAF sind in der Primärquelle [30] als Exponenten
@@ -592,10 +626,12 @@ Alter \(a \ge T\) um die Dreiecksfläche erhöht:
 
 $$ \tau \;=\; \frac{\Delta\Phi/\Phi}{\Delta D/D} \;=\; \frac{T/2}{a} $$
 
-Mit dem Mittelpunktabstand der Normalperioden \(T = 30\) Jahre und dem
-Erkrankungsalter \(a = 74\text{–}88\) folgt \(\tau \approx
-0{,}17\text{–}0{,}20\); selbst bei doppelt so langem Anstiegsfenster
-(\(T = 60\)) bleibt \(\tau \le 0{,}41\). **Spanne: 0,17–0,41** — weit
+Maßgeblich ist das **Erkrankungs**alter, nicht das Sterbealter: \(Y(a)\) ist die
+Inzidenz im Alter \(a\). Nach [27] liegt der Median bei MM 63–69 und C44 74–76
+Jahren. Mit dem Mittelpunktabstand der Normalperioden \(T = 30\) Jahre folgt
+\(\tau \approx 0{,}20\text{–}0{,}24\); selbst bei doppelt so langem
+Anstiegsfenster (\(T = 60\)) bleibt \(\tau \le 0{,}48\).
+**Spanne: 0,20–0,48** — weit
 außerhalb des \(k_{\text{UV}}\)-Bandes (±49 %) und damit die **größte**
 Einzelunsicherheit des Modells; sie ist als eigene Achse in der §4-Bändertabelle
 geführt.
@@ -603,8 +639,8 @@ geführt.
 *Abweichung zur Review-Schätzung benannt (§3.8):* Befund 247 veranschlagte
 \(\tau \approx 0{,}4\text{–}0{,}7\). Die hier ausgeschriebene Integration
 ergibt einen kleineren Wert; die Differenz stammt daraus, dass der volle
-Normalperiodenversatz von 30 Jahren gegen ein Erkrankungsalter von rund 80
-Jahren steht. Der Bericht führt die eigene, offengelegte Rechnung.
+Normalperiodenversatz von 30 Jahren gegen ein Erkrankungsalter von 63–76
+Jahren steht — der Review hatte hier zusätzlich das Sterbealter angesetzt. Der Bericht führt die eigene, offengelegte Rechnung.
 
 Der **Ausweis bleibt bewusst die Gleichgewichtslesart** (\(\tau = 1\)), weil sie
 die politisch relevante Größe ist — das bereits eingelaufene Risiko der heutigen
@@ -831,6 +867,10 @@ assert abs(euro - 4365) < 60               # ~4.400 EUR je 1.000 EW und Jahr
 |---|---|---|---|
 | \(a\) | Altersband u20 · 20–64 · 65–74 · 75–84 · 85+ (Ebenen wie #96 §3.2) | — | Zensus-Altersbänder + Ebene u20 |
 | \(a_{\text{attr,UV}}\) | klimaattribuierter Anteil des SSD-/Dosistrends | — | **0,75** (0,5–1,0) — gekennzeichnete Abschätzung §3.2; register:98-E20-03 |
+| \(\Phi(a)\) | kumulierte UV-Dosis bis zum Alter \(a\) (Lebenszeitdosis) | relative Einheit | Definitionsgröße der BAF in [30]; herleitung:#gleichgewicht |
+| \(Y(a)\) | Inzidenz im Alter \(a\); \(Y(a)\sim\Phi(a)^{c}\) mit \(c\) = BAF | 1/100.000·a | Funktionsform aus [30]; herleitung:#gleichgewicht |
+| \(T\) | Dauer des Dosisanstiegs (Mittelpunktabstand der Normalperioden) | Jahre | **30** (1961–1990 ⇒ 1991–2020); herleitung:#gleichgewicht |
+| \(\tau\) | Transient-Faktor: Anteil der Lebenszeitdosis-Erhöhung an der Jahresdosis-Erhöhung, \(\tau=(T/2)/a\) | — | **1,00** im Ausweis (Gleichgewichtslesart); Spanne **0,20–0,48** als §4-Achse; gekennzeichnete Abschätzung §3.9; herleitung:#gleichgewicht |
 | \(\text{BAF}_e\) | biologischer Verstärkungsfaktor (%-Inzidenz je +1 % Dosis) | — | MM **0,6** (±0,4) · C44 **1,675** (1,675–1,95; §3.1) [29,30]; register:98-E20-04 |
 | \(c_e\) | Erstjahres-Behandlungskosten je Fall (**Proxy**, §3.4) | €₂₀₂₄ | MM **6.724** (Band –11.410) · C44 **5.883** (–7.436) = [34]-Werte × 119,3/94,5 [19]; register:98-K1-01; herleitung:#c-e |
 | \(c_{\text{kal},e}\) | Normierungsskalar der Ablesekette (ein Skalar je Entität; wirkt in der §3.3-Formel auf die Roh-Bandraten; Anker 2021–2023) | — | MM **1,0012** · C44 **0,9910**; herleitung:#i-raten |
@@ -1003,7 +1043,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   | \(a_{\text{attr}}\) | 0,50 / 1,00 | 226 – 452 | −33,3 % … +33,3 % |
   | BAF_MM | 0,2 / 1,0 | 241 – 436 | −28,8 % … +28,8 % |
   | \(w_{\text{SCC}}\) (⇒ BAF_C44 1,675/1,95) | 0,25 / 0,50 | 339 – 370 | ±0 % … +9,3 % |
-  | **Transient-Faktor \(\tau\)** (Gleichgewichts- ↔ Jahres-Lesart, §3.4) | 0,17 / 1,00 | **58 – 339** | **−83 % … ±0 %** |
+  | **Transient-Faktor \(\tau\)** (Gleichgewichts- ↔ Jahres-Lesart, §3.4) | 0,20 / 1,00 | **67 – 339** | **−80 % … ±0 %** |
   | \(r_{\text{out}}\) (geparkt) | \(q_{\text{out}}\) ∈ [0; 0,21] | 339 | **±0 %** (zentriert) |
   | \(v_{\text{verh}}\) (geparkt) | \(\phi\) ∈ [0; 0,25] | 339 – 377 | ±0 % … +11,3 % |
 
@@ -1015,12 +1055,17 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   die Anlage [71] alle Zeilen; \(a_{\text{attr}}\) ist seit Rev. 8 als eigene Achse
   ausgewiesen (Befund 261).
 - **Unsicherheiten (nach Größe geordnet, Befunde 250/268):**
-  **k_UV-Messunsicherheit** (Band **0,3622–1,0616** = **±49 %**) — das ist der
+  Die Reihenfolge folgt der Bändertabelle darüber (Befund 361). **Größte Achse ist
+  der Transient-Faktor \(\tau\)** (0,20–1,00 ⇒ **−80 %**, §3.4): Er trennt die
+  ausgewiesene Gleichgewichtslesart von einer reinen Jahres-Attribution und ist
+  einseitig — er kann das Ergebnis nur senken. Danach die
+  **k_UV-Messunsicherheit** (Band **0,3622–1,0616** = **±49 %**) — der
   **Stichprobenfehler der publizierten Trendschätzungen**, *nicht* die räumliche
-  Übertragbarkeit; letztere steht als Modellgrenze 9. Weiterhin der größte
-  Einzeltreiber. Danach: Attribution \(a_{\text{attr}}\) (±33 %); BAF_MM (±28,8 %);
-  die Zeitinvarianz-Annahme der Elastizität (§3.2, Befund 222); BAF_MM (±67 % auf den
-  MM-Pfad ⇒ ±29 % auf die Summe); Ablesekette (±15 % je Ablesung; Altersprofil
+  Übertragbarkeit; letztere steht als Modellgrenze 9. Sie ist der größte
+  *zweiseitige* Treiber. Danach: Attribution \(a_{\text{attr}}\) (±33 %);
+  **BAF_MM** (±67 % auf den MM-Pfad ⇒ ±28,8 % auf die Summe — Befund 356: die Achse
+  steht hier **einmal**, nicht doppelt); die Zeitinvarianz-Annahme der Elastizität
+  (§3.2, Befund 222); Ablesekette (±15 % je Ablesung; Altersprofil
   out-of-sample bestätigt, s. o.); Anker-Auswahlregel (−4,3 … +2,8 %);
   **Binnenheterogenität des Bandes 20–64 (≈ ±4 % je Kommune, Bundessumme unberührt —
   §6 Modellgrenze 7, Befund 225)**; **Populationsbasis Kalibrierung ↔ Produktion
@@ -1114,7 +1159,7 @@ Inzidenz-Baseline stationär (real steigend — Untergrenze); Detektionsmix kons
    Das verschiebt **einzelne Kommunen** gegeneinander. Die Bundessumme ist davon
    **nahezu** unberührt, weil sie den mit Baseline-Fällen × ΔSSD gewichteten Wert
    verwendet — dasselbe Gewicht, mit dem das Produktionsmodell summiert (Befunde
-   266/276). „Nahezu" statt „exakt", weil die beiden Entitäten leicht verschiedene
+   266/278). „Nahezu" statt „exakt", weil die beiden Entitäten leicht verschiedene
    Gewichte hätten (MM 0,6674 · C44 0,6689 gegen den geführten Mittelwert 0,6683);
    die Restdifferenz von < 0,2 % ist als Näherung gekennzeichnet. Deshalb
    steht die Streuung hier als Modellgrenze und **nicht** im Sanity-Band (dieselbe
@@ -1133,8 +1178,12 @@ Inzidenz-Baseline stationär (real steigend — Untergrenze); Detektionsmix kons
 > Vorsorgekosten. Der ausgewiesene Betrag ist deshalb eine bewusste **Untergrenze**; er
 > wird mit jeder Ausbaustufe vollständiger. Innerhalb des heutigen Kontos K1 können
 > einzelne Rechenschritte den Wert auch nach unten korrigieren: Die Methodik weist
-> fünf bewusst *überschätzende* Näherungen aus (PAF-Linearisierung +2/+6 %,
-> Perioden-Letalität, Median-Restlebenserwartung, Ozon-Zeitinvarianz) und mehrere
+> fünf bewusst *überschätzende* Näherungen aus. Die größte ist die
+> **Gleichgewichtslesart der Latenz**: Ausgewiesen wird das mit der heutigen
+> Dosislage *eingelaufene* Risiko; eine Zuordnung allein auf dieses Jahr läge
+> um bis zu 80 % niedriger (Transient-Faktor 0,20–1,00, §3.4). Dazu kommen
+> PAF-Linearisierung +2,7/+7,6 %, Perioden-Letalität,
+> Median-Restlebenserwartung und Ozon-Zeitinvarianz — und mehrere
 > *unterschätzende* (nur Konto K1, nur Erstjahreskosten, geparkte Sensitivitäten).
 > Die Bilanz ist im Bericht §4/§6 beziffert. Berechnet mit Modellstand M0,
 > Stand ⟨Datum⟩."
@@ -1354,6 +1403,66 @@ parameter:
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
 ```
+
+parameter:
+  id: uv.i_mm
+  wert: {u20: 0.5, a20_64: 24.7, a65_74: 64.0, a75_84: 94.9, a85p: 88.5}
+  einheit: "1/100.000·a"
+  band: null   # Ableseunsicherheit der Kette ist in der Struktur-Validierung
+               # abgebildet (2 sigma = +/-10,1 %, Anlage [71]), nicht als
+               # Parameter-Band: die Raten sind gemeinsam abgelesen und korreliert.
+  herkunft: herleitung:#anker
+  quelle: zfkd_kid_2025   # Abb. 3.13.2, altersspezifische Rohraten Melanom (C43)
+  preisstand: null
+  bandzuordnung: struktur   # geht in die Struktur-Validierung, nicht in das Ergebnisband
+  endpunkt: inzidenz_mm
+
+parameter:
+  id: uv.i_c44
+  wert: {u20: 2.0, a20_64: 125.9, a65_74: 617.6, a75_84: 1267.2, a85p: 1479.5}
+  einheit: "1/100.000·a"
+  band: null   # wie uv.i_mm — gemeinsame Ablesekette, Toleranz in der
+               # Struktur-Validierung (Anlage [71]).
+  herkunft: herleitung:#anker
+  quelle: zfkd_kid_2025   # Abb. 3.14.2, altersspezifische Rohraten heller Hautkrebs (C44)
+  preisstand: null
+  bandzuordnung: struktur
+  endpunkt: inzidenz_c44
+
+parameter:
+  id: uv.or_out
+  wert: 1.77
+  einheit: "Odds Ratio"
+  band: [1.37, 2.30]   # 95-%-KI der Meta-Analyse; Kohorten-Teilmenge 1,68 [1,08-2,63]
+  herkunft: register:98-OUT-01
+  quelle: schmitt_2011_aussenberufe   # Meta-Analyse, SCC bei Aussenberufen
+  preisstand: null
+  bandzuordnung: sensitivitaet   # wirkt nur ueber r_out, nicht im Basiswert (§3.4)
+  endpunkt: inzidenz_c44
+
+parameter:
+  id: uv.qbar_out
+  wert: 0.07
+  einheit: "Anteil"
+  band: [0.0, 0.21]   # 0 = Ebene geparkt; 0,21 = dreifacher Bundesanteil als
+                      # Obergrenze fuer stark landwirtschaftlich gepraegte Kommunen
+  herkunft: herleitung:#q-out
+  quelle: destatis_vgr_2023_erwerbstaetige   # (572+2.643)/45.909 Tsd. = 0,070
+  preisstand: null
+  bandzuordnung: sensitivitaet
+  endpunkt: inzidenz_c44
+
+parameter:
+  id: uv.r_out_enabled
+  wert: 0.0
+  einheit: "Schalter"
+  band: [0.0, 1.0]   # 0 = aus (Basiswert, §3.4: Aussenberufs-Ebene ist geparkt);
+                     # 1 = an, sobald eine kommunale Aussenberufs-Quote vorliegt
+  herkunft: register:98-OUT-01
+  quelle: bericht_98_paragraph_3_4   # Sensitivitaetsband, nicht im Basiswert
+  preisstand: null
+  bandzuordnung: sensitivitaet
+  endpunkt: inzidenz_c44
 
 ## 8 Quellen (§3.8 — #98-relevanter Auszug; Nummern = M0-Zählung, [69]–[70] neu)
 
