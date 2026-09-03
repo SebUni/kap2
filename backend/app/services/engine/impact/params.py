@@ -493,20 +493,38 @@ IMPACT_PARAM_SPECS: list[dict] = [
 
     # ── #98 UV-Schädigungen: klimaattribuierte Hautkrebsfälle (Bericht Rev. 1) ─
     # ΔF_e = F_e · BAF_e · ΔDosis;  YLL = Σ_e ΔF_e · λ_e · L̄_e
-    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "k_uv", "value": 0.84,
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "k_uv", "value": 0.7119,
      "label": "Übersetzung SSD-Trend → UV-Dosis", "unit": "Faktor",
      "source": "Lorenz 2024 (Dosistrend) ÷ eigene SSD-Trendmessung (§3.2)",
-     "source_detail": "Der erythemwirksame Dosistrend steigt langsamer als die "
-                      "Sonnenscheindauer: +4,9 %/Dekade (BfS-Messreihe Dortmund "
-                      "1997–2022, signifikant) ÷ +5,81 %/Dekade (SSD-Trend NRW im "
-                      "SELBEN Fenster und derselben Datenfamilie, die das Produkt "
-                      "nutzt — DWD-Gebietsmittel, Anlage ssd_trend_region.csv) = "
-                      "0,84. Band 0,4–1,0: untere Stütze die frühere Stations-"
-                      "Paarung 0,43, obere Stütze 1,0 (Globalstrahlung ≈ parallel "
-                      "zur Dosis). Plausibilisierung: implizite Dosisänderung DE "
-                      "7,82 % × 0,84 ≈ 6,6 % über den Normalperiodenversatz "
-                      "≈ 2,2 %/Dekade — im Satellitenband 1,2–3,6 %/Dekade.",
-     "source_refs": ["Lorenz_2024_UV_Dortmund", "DWD_CDC_SSD_Raster"]},
+     "source_detail": "k_UV uebersetzt eine relative SSD-Aenderung in eine "
+                      "relative Dosisaenderung. Zaehler und Nenner stammen aus ZWEI "
+                      "Messfamilien (Stationsmessung vs. 1-km-Raster), und die "
+                      "Skalendifferenz ist METRIKabhaengig: An der Messzelle (DWD "
+                      "1117 Bochum, wo Lorenz u. a. 2024 GR und SunD messen - die "
+                      "UV-Dosis 10 km entfernt in Dortmund) gibt das Raster die "
+                      "Globalstrahlung zu 0,98 wieder, die Sonnenscheindauer nur zu "
+                      "0,59. Die Globalstrahlung liegt in BEIDEN Familien vor und "
+                      "traegt deshalb die Bruecke: "
+                      "k_UV = (Dosis/Global)|Station x (Global/SSD)|Raster. "
+                      "Stationsquotient 4,9/4,6 = 1,0652 aus [31] Tab. 2 und Tab. 4 "
+                      "(Volltext, Open Access). Rasterquotient 0,6683, gewichtet mit "
+                      "BASELINE-FAELLEN x DeltaSSD_Normalperiode ueber 10.682 "
+                      "Gemeindepunkte - also mit genau der Groesse, die das "
+                      "Produktionsmodell summiert (Ledger #98 Befunde 266/278). "
+                      "Ergebnis 1,0652 x 0,6683 = 0,7119. Band 0,3622-1,0616 = "
+                      "publizierte Standardfehler beider Stationstrends (SE 1,8/4,9 "
+                      "und 1,5/4,6), unkorreliert fortgepflanzt (+/-49,1 %, 1 sigma) "
+                      "- konservativ, weil beide Reihen bewoelkungsgetrieben und "
+                      "damit positiv korreliert sind. Die RAEUMLICHE Streuung des "
+                      "Rasterquotienten ist Modellgrenze 9, KEIN Band der "
+                      "Bundessumme. Plausibilisierung: implizite Dosisaenderung DE "
+                      "8,51 % x 0,7119 ~ 6,2 % ueber den Normalperiodenversatz "
+                      "~ 2,1 %/Dekade. Elastizitaet zeitinvariant angenommen "
+                      "(Befund 222); Anlage k_uv_herleitung.py.",
+     # Beide Raster tragen den Rasterquotienten: SSD den Nenner, Globalstrahlung
+     # den Zaehler. Bis Rev. 13 war nur das SSD-Raster verzeichnet (Befund 336g).
+     "source_refs": ["Lorenz_2024_UV_Dortmund", "DWD_CDC_SSD_Raster",
+                     "DWD_CDC_Globalstrahlung_Raster"]},
     {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "a_attr", "value": 0.75,
      "label": "Klima-Attribution des Dosistrends", "unit": "Anteil",
      "source": "Gekennzeichnete Abschätzung (§3.9; Bericht #98 §3.2)",
@@ -552,48 +570,61 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "Primärquelle. Mögliche Ursache: Untererfassung von "
                       "SCC-Mehrfachtumoren.",
      "source_refs": ["ZfKD_KID_2025"]},
-    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "c_kal_mm", "value": 1.022,
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "c_kal_mm", "value": 1.0012,
      "label": "Normierungsskalar Melanom", "unit": "Faktor",
-     "source": "ZfKD 2023 ÷ Ablesekette (§3.3/§3.4)",
-     "source_detail": "EIN Skalar je Entität (§3.4): 27.430 amtliche "
-                      "Neuerkrankungen 2023 ÷ 26.837 aus der Ablesekette = 1,022. "
-                      "Damit reproduziert die Bundes-Baseline die ZfKD-Fallzahlen "
-                      "exakt. Die Ablese-Toleranz (±15 %, vorab fixiert) ist mit "
-                      "−2,2 % eingehalten.",
+     "source": "ZfKD KID 2025, Mittel 2021–2023 ÷ Ablesekette (§3.3/§3.4)",
+     "source_detail": "EIN Skalar je Entität (§3.4): Anker = MITTEL 2021–2023 "
+                      "(26.140/27.040/27.430 ⇒ 26.870) ÷ 26.837 aus der "
+                      "Ablesekette = 1,0012. Das Ankerfenster ist dasselbe, über "
+                      "das die abgelesenen Altersraten gepoolt sind (Abb. 3.13.2 "
+                      "„Deutschland 2021 – 2023“) — ein Einzeljahres-Anker führte "
+                      "Zähler und Nenner in verschiedenen Fenstern (Ledger #98 "
+                      "Befund 220). Ablese-Toleranz (±15 %, vorab fixiert) mit "
+                      "−0,1 % eingehalten; Altersprofil out-of-sample gegen die "
+                      "amtliche ASR bestätigt (Befund 214).",
      "source_refs": ["ZfKD_KID_2025"]},
-    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "c_kal_c44", "value": 0.999,
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "c_kal_c44", "value": 0.9910,
      "label": "Normierungsskalar C44", "unit": "Faktor",
-     "source": "ZfKD 2023 ÷ Ablesekette (§3.3/§3.4)",
-     "source_detail": "EIN Skalar je Entität (§3.4): 242.820 ÷ 243.158 = 0,999; "
-                      "Ablese-Abweichung vor Normierung +0,1 % (Toleranz ±15 %).",
+     "source": "ZfKD KID 2025, Mittel 2021–2023 ÷ Ablesekette (§3.3/§3.4)",
+     "source_detail": "EIN Skalar je Entität (§3.4): Anker 2021–2023 "
+                      "(236.670/243.430/242.820 ⇒ 240.973) ÷ 243.158 = 0,9910; "
+                      "Ablese-Abweichung vor Normierung +0,9 % (Toleranz ±15 %).",
      "source_refs": ["ZfKD_KID_2025"]},
-    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "lambda_mm", "value": 0.1155,
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "lambda_mm", "value": 0.11466,
      "label": "Letalitätsanteil Melanom", "unit": "Anteil",
-     "source": "ZfKD 2023: 3.169 Sterbefälle / 27.430 Neuerkrankungen",
+     "source": "ZfKD 2021–2023: 3.081,0 Sterbefälle / 26.870 Neuerkrankungen",
      "source_detail": "Perioden-Approximation, GEKENNZEICHNET (§3.9): Bei "
                       "steigender Inzidenz ist das Verhältnis Sterbefälle/"
                       "Neuerkrankungen desselben Jahres keine Kohorten-Letalität; "
                       "Richtung: Überschätzung des Mortalitätsanteils.",
      "source_refs": ["ZfKD_KID_2025"]},
-    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "lambda_c44", "value": 0.00549,
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "lambda_c44", "value": 0.005236,
      "label": "Letalitätsanteil C44", "unit": "Anteil",
-     "source": "ZfKD 2023: 1.332 / 242.820",
+     "source": "ZfKD 2021–2023: 1.261,7 / 240.973",
      "source_detail": "Perioden-Approximation wie lambda_mm (gekennzeichnet).",
      "source_refs": ["ZfKD_KID_2025"]},
-    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "l_rest_mm", "value": 10.58,
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "l_rest_mm", "value": 10.4569,
      "label": "Restlebenserwartung je Melanom-Sterbefall", "unit": "Jahre",
-     "source": "Sterbetafel 2022/2024 am medianen Sterbealter",
-     "source_detail": "Sterbefallgewichtet über die Geschlechter: "
-                      "(1.318·10,92 + 1.851·10,33)/3.169 = 10,58 Jahre "
-                      "(e(78) Frauen, e(76) Männer). MEDIAN-Approximation, "
+     "source": "Sterbetafel 2022/2024 am medianen Sterbealter (Ankerfenster)",
+     "source_detail": "Sterbefallgewichtet über ALLE Jahre UND Geschlechter des "
+                      "Ankerfensters 2021–2023 (Bericht §3.4, Befund 224): "
+                      "Stützstelle ist das mediane Sterbealter DES JEWEILIGEN "
+                      "Jahres — F 78/78/78 ⇒ e(78) = 10,9187; M 76/77/76 ⇒ "
+                      "e(76) = 10,3350 bzw. e(77) = 9,7311. Ergebnis 10,4569 Jahre. "
+                      "Bis Rev. 2 stand hier 10,58 aus dem Einzeljahr 2023 — das "
+                      "widersprach der einheitlichen Jahres-Auswahlregel (§3.4), "
+                      "der auch Anker, c_kal und lambda folgen. MEDIAN-Approximation, "
                       "gekennzeichnet: Bei rechtsschiefer Sterbealter-Verteilung "
                       "leicht überschätzend.",
      "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
-    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "l_rest_c44", "value": 5.30,
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "l_rest_c44", "value": 5.4787,
      "label": "Restlebenserwartung je C44-Sterbefall", "unit": "Jahre",
-     "source": "Sterbetafel 2022/2024 am medianen Sterbealter",
-     "source_detail": "(541·5,04 + 791·5,47)/1.332 = 5,30 Jahre (e(88) Frauen, "
-                      "e(85) Männer); Median-Approximation wie l_rest_mm.",
+     "source": "Sterbetafel 2022/2024 am medianen Sterbealter (Ankerfenster)",
+     "source_detail": "Wie l_rest_mm über das Ankerfenster 2021–2023 (Befund 224): "
+                      "F 88/88/88 ⇒ e(88) = 5,0374; M 84/84/85 ⇒ e(84) = 5,9397 "
+                      "bzw. e(85) = 5,4745. Ergebnis 5,4787 Jahre (bis Rev. 2: "
+                      "5,30 aus dem Einzeljahr 2023, +3,4 % Korrektur); "
+                      "Median-Approximation wie l_rest_mm.",
      "source_refs": ["ZfKD_KID_2025", "Destatis_Sterbetafeln_2022_2024"]},
     {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "c_fall_mm", "value": 6724.0,
      "label": "Behandlungskosten je Melanom-Fall", "unit": "EUR/Fall",
@@ -646,18 +677,36 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "GEPARKT — INKAR/SVB-Branchenanteile sind nicht keyless je "
                       "100-m-Zelle verfügbar (§3.1-Watchlist).",
      "source_refs": ["Schmitt_2011_Aussenberufe"]},
-    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "v_verh", "value": 1.0,
-     "label": "Verhaltens-Sensitivität (Default 1)", "unit": "Faktor",
-     "source": "Bericht #98 §3.4: Sensitivitätsband, nicht im Basiswert",
-     "source_detail": "Tages-Multiplikator der persönlichen Dosis an "
-                      "Komforttagen (Band 1,25–1,60 als TAGESWERT): +1,2 min "
-                      "Außenzeit je °C (ATUS) ⇒ +27 % an einem Komforttag; Zeit "
-                      "im Freien erklärt die persönliche Dosis nahezu "
-                      "proportional (R² 0,75–0,79); Kleidungskomponente +15 % ⇒ "
-                      "s ≈ +45 %. Die JAHRESwirkung hängt vom Komforttag-Anteil "
-                      "ab (Szenario-Stellgröße, keine Zellgröße in M0) — deshalb "
-                      "Default 1. Doppelzählungsschutz: Der Ambient-Anteil steckt "
-                      "bereits in ΔDosis.",
+    # v_verh ist KEIN Parameter (Kein-Doppelkanal §3.2): der Jahresfaktor wird als
+    # v_verh = 1 + phi_komfort·(s_komforttag − 1) gerechnet — Bericht #98 §3.4,
+    # Ledger-Befund 216. Vorher stand hier ein Parameter „v_verh" mit dem Band des
+    # TAGESwerts [1,0–1,6], der unmittelbar auf die JAHRES-ΔDosis multipliziert
+    # wurde (bei ~40 Komforttagen ≈ Faktor 9 zu hoch).
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "s_komforttag", "value": 1.45,
+     "label": "Dosis-Multiplikator an einem Komforttag (Tageswert)",
+     "unit": "Faktor",
+     "source": "Graff Zivin & Neidell 2014; Schmalwieser 2021",
+     "source_detail": "TAGESWERT (Band 1,25–1,60): +1,2 min Außenzeit je °C "
+                      "(ATUS, Basis 44 min/Tag) ⇒ an einem Komforttag "
+                      "(ΔT ≈ +10 °C) +27 % Außenzeit; Zeit im Freien erklärt die "
+                      "persönliche Dosis nahezu proportional (R² 0,75–0,79); "
+                      "Kleidungskomponente +15 % ⇒ s ≈ 1,45. Wirkt NUR über "
+                      "phi_komfort auf das Jahr — nie direkt auf ΔDosis.",
+     "source_refs": ["GraffZivin_2014_Zeitallokation", "Schmalwieser_2021_Dosis"]},
+    {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "phi_komfort", "value": 0.0,
+     "label": "dosisgewichteter Komforttag-Anteil am Jahr", "unit": "Anteil",
+     "source": "Bericht #98 §3.4/§3.6: Ebene GEPARKT (Datenquelle fehlt)",
+     "source_detail": "Anteil der erythemwirksamen Jahresdosis, der auf "
+                      "Komforttage entfällt. Die Zellgröße verlangt "
+                      "DWD-Tagestemperatur UND Tagesdosis in Kombination — dafür "
+                      "existiert keine keyless Quelle, die Ebene ist nach §3.1 "
+                      "GEPARKT mit Beschaffungs-Watchlist. Der Parameter läuft "
+                      "dokumentiert auf dem Neutralwert 0 ⇒ v_verh exakt 1, nie "
+                      "still. Band 0–0,25 (gekennzeichnete Abschätzung: die "
+                      "erythemwirksame Dosis entfällt in DE zu ≈ 70 % auf "
+                      "Mai–August, und dort ist nicht jeder Tag ein Komforttag) "
+                      "⇒ v_verh 1,00–1,11. Doppelzählungsschutz: Der "
+                      "Ambient-Anteil steckt bereits in ΔDosis.",
      "source_refs": ["GraffZivin_2014_Zeitallokation", "Schmalwieser_2021_Dosis"]},
 
     {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "i_mm_u20", "value": 0.5,

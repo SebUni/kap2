@@ -1141,7 +1141,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
     # ── Methodik #98 Rev. 1 (UV-Schädigungen; docs/methodik/98_uv_schaedigungen.md) ──
     "ZfKD_KID_2025": {
         "ieee": "Zentrum für Krebsregisterdaten (ZfKD) im Robert Koch-Institut und "
-                "GEKID, „Krebs in Deutschland für 2021/2022“ (KID 2025), Kap. 3.13 "
+                "GEKID, „Krebs in Deutschland für 2021–2023“ (KID 2025), Kap. 3.13 "
                 "(malignes Melanom C43) und 3.14 (nicht-melanotischer Hautkrebs C44), "
                 "Berlin. Neuerkrankungen 2023: MM 27.430, C44 242.820; Sterbefälle "
                 "MM 3.169, C44 1.332; altersspezifische Raten als Abbildungen "
@@ -1174,6 +1174,28 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
         "archive_url": "https://web.archive.org/web/20250505212026/"
                        "https://doi.org/10.1021/acsearthspacechem.1c00183",
         "accessed": "2026-08-30",
+    },
+    "BKG_VG250_Verwaltungspunkte": {
+        "ieee": "Bundesamt für Kartographie und Geodäsie (BKG), „Verwaltungsgebiete "
+                "1:250 000 (VG250) — Ebene vg250_pk (Verwaltungspunkte)“, "
+                "Stand 01.01.2025, UTM32s-GeoPackage. Lizenz DL-DE→BY-2.0. — 10.949 "
+                "amtliche Gemeindepunkte (Verwaltungssitz mit Dezimalkoordinaten); "
+                "Gewichtungsgrundlage der bevölkerungsgewichteten SSD-Änderung "
+                "(#98 §3.2, Ledger-Befund 223/231).",
+        "url": "https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-250-000-ebenen-stand-01-01-vg250-ebenen-01-01.html",
+        "archive_url": "https://web.archive.org/web/20260707000000/"
+                       "https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-250-000-ebenen-stand-01-01-vg250-ebenen-01-01.html",
+        "accessed": "2026-07-07",
+    },
+    "Destatis_Zensus2022_Gemeinden": {
+        "ieee": "Statistisches Bundesamt, „Zensus 2022 — Bevölkerung nach Gemeinden“, "
+                "Stichtag 15.05.2022, zensus2022.de. — Gemeindebevölkerung als "
+                "Gewichtung der SSD-Änderung und Bezugsgröße der Produktions-Baseline "
+                "(#98 §3.2/§3.3, Ledger-Befund 226/231).",
+        "url": "https://www.zensus2022.de/DE/Ergebnisse-des-Zensus/_inhalt.html",
+        "archive_url": "https://web.archive.org/web/20260901000000/"
+                       "https://www.zensus2022.de/DE/Ergebnisse-des-Zensus/_inhalt.html",
+        "accessed": "2026-09-01",
     },
     "Lorenz_2024_UV_Dortmund": {
         "ieee": "S. Lorenz u. a., „Increasing solar UV radiation in Dortmund, "
@@ -1230,6 +1252,18 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
         "archive_url": "https://web.archive.org/web/20251201014206/"
                        "https://doi.org/10.1111/bjd.20703",
         "accessed": "2026-08-30",
+    },
+    "DWD_CDC_Globalstrahlung_Raster": {
+        "ieee": "DWD Climate Data Center (CDC), Jahresraster Globalstrahlung "
+                "(radiation_global, 1 km, Gauß-Krüger 3), opendata.dwd.de — "
+                "trägt den Zähler des Rasterquotienten in der k_UV-Brücke "
+                "(Skript k_uv_herleitung.py). Lizenz GeoNutzV / DL-DE→Zero-2.0.",
+        "url": "https://opendata.dwd.de/climate_environment/CDC/grids_germany/"
+               "annual/radiation_global/",
+        "archive_url": "https://web.archive.org/web/20260109002650/"
+                       "https://opendata.dwd.de/climate_environment/CDC/"
+                       "grids_germany/annual/radiation_global/",
+        "accessed": "2026-09-03",
     },
     "DWD_CDC_SSD_Raster": {
         "ieee": "DWD Climate Data Center (CDC), Jahresraster Sonnenscheindauer "

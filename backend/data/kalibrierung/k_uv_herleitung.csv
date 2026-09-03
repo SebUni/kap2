@@ -1,0 +1,12 @@
+groesse,wert,einheit,quelle
+dosis_station_prozent_dekade,4.9000,%/Dek. bzw. -,Lorenz 2024 Tab. 2
+global_station_prozent_dekade,4.6000,%/Dek. bzw. -,Lorenz 2024 Tab. 4
+sund_station_prozent_dekade,11.3000,%/Dek. bzw. -,Lorenz 2024 Tab. 4
+ssd_raster_messzelle_prozent_dekade,6.6168,%/Dek. bzw. -,DWD 1 km
+global_raster_messzelle_prozent_dekade,4.5069,%/Dek. bzw. -,DWD 1 km
+rasterquotient_messzelle,0.6811,%/Dek. bzw. -,berechnet
+rasterquotient_de_fallgew,0.6683,%/Dek. bzw. -,"berechnet, Baseline-Faelle x dSSD"
+stationsquotient,1.0652,%/Dek. bzw. -,Tab. 2 / Tab. 4
+k_uv,0.7119,%/Dek. bzw. -,berechnet
+k_uv_band_unten,0.3622,%/Dek. bzw. -,SE-Fortpflanzung
+k_uv_band_oben,1.0616,%/Dek. bzw. -,SE-Fortpflanzung

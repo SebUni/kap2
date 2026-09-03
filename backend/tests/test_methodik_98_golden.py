@@ -1,4 +1,4 @@
-"""Golden-Tests der Methodik #98 (UV-Schädigungen, Bericht Rev. 1).
+"""Golden-Tests der Methodik #98 (UV-Schädigungen, Bericht Rev. 11).
 
 Prüfklassen wie bei #95/#96 (Integrations-Kontrakt, AUFGABE §7 /
 integriere-risiko §4):
@@ -35,9 +35,10 @@ _BAND_POP = {"u20": 15_583_456, "a20_64": 49_163_992, "a65_74": 9_569_640,
              "a75_84": 6_294_744, "a85p": 2_844_213}
 _POP_DE = sum(_BAND_POP.values())
 
-# Amtliche Fallzahlen 2023 (ZfKD KID 2025, Bericht §3.3).
-_FAELLE_MM_DE = 27_430
-_FAELLE_C44_DE = 242_820
+# Anker = Mittel 2021–2023 (ZfKD KID 2025 Tab. 3.13.1/3.14.1, Bericht §3.3/§4;
+# Ledger-Befund 220: dasselbe Fenster, über das die Ablesewerte gepoolt sind).
+_FAELLE_MM_DE = (26_140 + 27_040 + 27_430) / 3        # 26.870
+_FAELLE_C44_DE = (236_670 + 243_430 + 242_820) / 3    # 240.973
 
 
 def _spec(key: str) -> dict:
@@ -48,9 +49,15 @@ def _spec(key: str) -> dict:
     raise AssertionError(f"Registry-Spec fehlt: {CODE}.{key}")
 
 
-def _ctx(pop: float, ssd_ref: float = 1000.0, ssd_neu: float = 1078.2,
+def _ctx(pop: float, ssd_ref: float = 1000.0, ssd_neu: float = 1085.1,
          bundesland: str = "Nordrhein-Westfalen", **ci_extra) -> CellContext:
-    """Zelle im Bundes-Altersmix; ΔSSD-Default = DE-Gebietsmittel +7,82 %."""
+    """Zelle im Bundes-Altersmix; ΔSSD-Default = **bevölkerungsgewichtet** +8,51 %.
+
+    Befund 223: Das Produktionsmodell summiert bevölkerungsgewichtet über Zellen;
+    der nationale Bezugswert ist deshalb das bevölkerungsgewichtete Mittel der
+    relativen Zelländerungen (Anlage ssd_povw.csv, Gemeindepunkt-Ebene), nicht das
+    flächengewichtete DWD-Gebietsmittel 7,82 %.
+    """
     bands = {b: pop * n / _POP_DE for b, n in _BAND_POP.items()}
     bands["u65"] = bands["u20"] + bands["a20_64"]
     ci = {"pop": pop, "pop_age_bands": bands,
@@ -80,14 +87,15 @@ def test_report_example_blocks_green():
 
 def test_registry_matches_report_parameters():
     """Kap.-7-Werte des Berichts == Registry-Specs (Divergenz = Ledger-Fall)."""
-    for key, val in (("k_uv", 0.84), ("a_attr", 0.75),
+    for key, val in (("k_uv", 0.7119), ("a_attr", 0.75),
                      ("baf_mm", 0.60), ("baf_c44", 1.675), ("w_scc", 0.25),
-                     ("c_kal_mm", 1.022), ("c_kal_c44", 0.999),
-                     ("lambda_mm", 0.1155), ("lambda_c44", 0.00549),
-                     ("l_rest_mm", 10.58), ("l_rest_c44", 5.30),
+                     ("c_kal_mm", 1.0012), ("c_kal_c44", 0.9910),
+                     ("lambda_mm", 0.11466), ("lambda_c44", 0.005236),
+                     ("l_rest_mm", 10.4569), ("l_rest_c44", 5.4787),
                      ("c_fall_mm", 6724.0), ("c_fall_c44", 5883.0),
                      ("or_out", 1.77), ("qbar_out", 0.070),
-                     ("r_out_enabled", 0.0), ("v_verh", 1.0)):
+                     ("r_out_enabled", 0.0),
+                     ("s_komforttag", 1.45), ("phi_komfort", 0.0)):
         assert _spec(key)["value"] == val, key
     # Ablese-Kette (§3.3): Roh-Bandraten je Entität.
     for band, val in (("u20", 0.5), ("a20_64", 24.7), ("a65_74", 64.0),
@@ -140,30 +148,30 @@ def test_cost_is_treatment_plus_voly_not_outcome_times_rate():
                   + res["cases_c44"] * _spec("c_fall_c44")["value"])
     mortalitaet = res["outcome"] * 160_800.0
     assert abs(res["cost_eur"] - (behandlung + mortalitaet)) < 1.0
-    assert behandlung > 0.2 * res["cost_eur"]      # ≈ 124 von 378 Mio (Kap. 4)
+    assert behandlung > 0.2 * res["cost_eur"]      # ≈ 113 von 339 Mio (Kap. 4)
 
 
 # ── 3. Sanity-/Struktur-Anker (Bericht Kap. 4) ───────────────────────────────
 
 def test_national_sum_matches_report_sanity_band():
-    """Kap. 4: ΔF ≈ 814 MM + 20.118 C44, YLL ≈ 1.580, € ≈ 378 Mio (Band 119–653)."""
+    """Kap. 4: ΔF ≈ 733 MM + 18.339 C44, YLL ≈ 1.404, € ≈ 339 Mio (Band 115–737)."""
     override_context.set_overrides({})
     res = impact.compute_all_cell_impacts(_ctx(float(_POP_DE)))[CODE]
-    assert abs(res["cases_melanoma"] - 814) < 10, res["cases_melanoma"]
-    assert abs(res["cases_c44"] - 20_118) < 200, res["cases_c44"]
-    assert abs(res["outcome"] - 1580) < 20, res["outcome"]
-    assert abs(res["cost_eur"] / 1e6 - 378) < 6, res["cost_eur"]
+    assert abs(res["cases_melanoma"] - 733) < 10, res["cases_melanoma"]
+    assert abs(res["cases_c44"] - 18_339) < 200, res["cases_c44"]
+    assert abs(res["outcome"] - 1404) < 20, res["outcome"]
+    assert abs(res["cost_eur"] / 1e6 - 339) < 6, res["cost_eur"]
     # Sanity-Band der Kap.-4-Bandkombination.
-    assert 119e6 <= res["cost_eur"] <= 653e6
+    assert 115e6 <= res["cost_eur"] <= 737e6
 
 
 def test_lower_band_combination_stays_positive():
-    """Untergrenze k_UV 0,4 × a_attr 0,5 ⇒ ≈ 119 Mio € (Kap. 4) — messfest > 0."""
-    override_context.set_overrides({f"risks.{CODE}.impact.k_uv": 0.4,
+    """Untergrenze k_UV 0,3622 × a_attr 0,5 ⇒ ≈ 115 Mio € (Kap. 4) — messfest > 0."""
+    override_context.set_overrides({f"risks.{CODE}.impact.k_uv": 0.3622,
                                     f"risks.{CODE}.impact.a_attr": 0.5})
     res = impact.compute_all_cell_impacts(_ctx(float(_POP_DE)))[CODE]
     override_context.set_overrides({})
-    assert abs(res["cost_eur"] / 1e6 - 119) < 6, res["cost_eur"]
+    assert abs(res["cost_eur"] / 1e6 - 115) < 6, res["cost_eur"]
     assert res["cost_eur"] > 0
 
 
@@ -171,7 +179,7 @@ def test_baseline_reproduces_official_case_numbers():
     """Ablese-Validierung (Kap. 4): Roh-Bandraten ±15 %, danach c_kal exakt.
 
     Prüft die PRODUKTIONS-Baseline (nicht eine lokale Nachrechnung): F_e der
-    Bundes-Zelle muss die amtlichen ZfKD-Fallzahlen 2023 treffen. Da ΔF = F·BAF·ΔD
+    Bundes-Zelle muss den ZfKD-Anker 2021–2023 treffen. Da ΔF = F·BAF·ΔD
     linear ist, lässt sich F aus dem Teil-Ausweis zurückrechnen.
     """
     override_context.set_overrides({})
@@ -203,13 +211,13 @@ def test_distribution_key_is_bottom_up():
 
 
 def test_example_cell_matches_report():
-    """§3.4-Beispielzelle: 1.000 EW im Bundesmix, Region Mitte (ΔSSD +8,42 %)."""
+    """§3.4-Beispielzelle: 1.000 EW im Bundesmix, Region Mitte (ΔSSD +9,15 %)."""
     override_context.set_overrides({})
     res = impact.compute_all_cell_impacts(
-        _ctx(1000.0, ssd_ref=1000.0, ssd_neu=1084.2))[CODE]
-    assert abs(res["cases_melanoma"] - 0.0105) < 0.0002, res["cases_melanoma"]
-    assert abs(res["cases_c44"] - 0.2598) < 0.003, res["cases_c44"]
-    assert abs(res["cost_eur"] - 4880) < 60, res["cost_eur"]
+        _ctx(1000.0, ssd_ref=1000.0, ssd_neu=1091.5))[CODE]
+    assert abs(res["cases_melanoma"] - 0.0094) < 0.0002, res["cases_melanoma"]
+    assert abs(res["cases_c44"] - 0.2364) < 0.003, res["cases_c44"]
+    assert abs(res["cost_eur"] - 4365) < 60, res["cost_eur"]
 
 
 # ── 4. Ebene UV_RADIATION: Anlagepflicht, Fallback-Kette, Schichtentrennung ──
@@ -231,21 +239,25 @@ def test_uv_layer_exists_with_fallback_chain():
 def test_delta_dosis_uses_change_not_level():
     """§3.2: die Schadensfunktion hängt an der ÄNDERUNG, nicht am SSD-Pegel."""
     override_context.set_overrides({})
-    a = _ctx(10_000.0, ssd_ref=1400.0, ssd_neu=1400.0 * 1.0782)
-    b = _ctx(10_000.0, ssd_ref=1800.0, ssd_neu=1800.0 * 1.0782)
+    a = _ctx(10_000.0, ssd_ref=1400.0, ssd_neu=1400.0 * 1.0851)
+    b = _ctx(10_000.0, ssd_ref=1800.0, ssd_neu=1800.0 * 1.0851)
     assert abs(H.uv_delta_dosis(a, CODE) - H.uv_delta_dosis(b, CODE)) < 1e-12
     ra = impact.compute_all_cell_impacts(a)[CODE]
     rb = impact.compute_all_cell_impacts(b)[CODE]
     assert abs(ra["outcome"] - rb["outcome"]) < 1e-12
-    # ΔDosis DE = 7,82 % × k_UV × a_attr. Produktion rechnet mit dem
-    # maschinenlesbaren Kap.-7-Wert k_UV = 0,84 ⇒ 4,927 %; die §3.2-Prosa nennt
-    # 4,95 %, weil sie die UNGERUNDETE Kette 4,9/5,81 = 0,8434 einsetzt
-    # (Ledger #98 Befund 213 — berichtsinterne Rundungsdivergenz, 0,5 %
-    # relativ, kein Code-Fix). Beide Stände sind hier festgenagelt, damit die
-    # Differenz sichtbar bleibt und nicht stillschweigend wächst.
-    assert abs(H.uv_delta_dosis(a, CODE) - 0.049266) < 1e-6
-    assert abs(0.0782 * (4.9 / 5.81) * 0.75 - 0.0495) < 0.0001
-    assert abs(H.uv_delta_dosis(a, CODE) / 0.0495 - 1) < 0.005
+    # ΔDosis DE = 8,51 % × k_UV × a_attr (bevölkerungsgewichtet, Befund 223);
+    # k_UV = (4,9/4,6) x 0,6683 — Stationsquotient aus [31] Tab. 2/4 (Befund 252).
+    # Registry und Bericht rechnen beide mit
+    # dem HERLEITUNGSWERT k_UV = (4,9/4,6) x 0,6683 = 0,7119 ⇒ 4,54 %
+    # Befund 213 geschlossen: die frühere gerundete Registry-Zahl 0,84 erzeugte
+    # 0,5 % relative Divergenz auf alle Ergebniswerte).
+    assert abs(_spec("k_uv")["value"] - (4.9 / 4.6) * 0.6683) < 5e-5
+    # Restdivergenz Registry (4 Nachkommastellen) gegen die exakte Kette: 0,003 %
+    # relativ — vorher 0,5 % mit dem gerundeten 0,84. Diese Schranke hält den
+    # geschlossenen Befund 213 fest: sie bricht, sobald jemand wieder rundet.
+    exakt = 0.0851 * (4.9 / 4.6) * 0.6683 * 0.75
+    assert abs(H.uv_delta_dosis(a, CODE) / exakt - 1) < 1e-4
+    assert abs(H.uv_delta_dosis(a, CODE) - 0.0454) < 0.0001
 
 
 def test_screening_norm_override_does_not_move_euro_path():
@@ -283,6 +295,37 @@ def test_r_out_modifier_is_parked_and_neutral():
     zentriert = impact.compute_all_cell_impacts(
         _ctx(10_000.0, share_outdoor_workers=0.070))[CODE]
     assert abs(zentriert["cases_c44"] - aus["cases_c44"]) < 1e-9
+
+
+def test_asr_regression_schranke():
+    """Kap. 4: Regressionsschranke ±3 % auf die Struktur-Validierung (Befund 229).
+
+    Die Abnahmetoleranz ist mit 2σ = ±10,5 % aus der Ablesegenauigkeit hergeleitet
+    (§3.9 gilt auch für Toleranzen). Weil die Ablesekette mit max. 1,9 % deutlich
+    besser ist als ihre Spezifikation, hält dieser Test zusätzlich eine engere
+    Schranke fest — er bricht, sobald sich die Ablesewerte verschlechtern, lange
+    bevor die Abnahmetoleranz reißt.
+    """
+    import csv as _csv
+
+    anlage = os.path.join(os.path.dirname(__file__), "..", "data",
+                          "kalibrierung", "kid2025_ablesewerte.csv")
+    with open(os.path.abspath(anlage), encoding="utf-8") as fh:
+        rows = list(_csv.DictReader(z for z in fh if not z.startswith('"#')))
+    eurostd = {"0-19": 29_000, "20-24": 7_000, "25-29": 7_000, "30-34": 7_000,
+               "35-39": 7_000, "40-44": 7_000, "45-49": 7_000, "50-54": 7_000,
+               "55-59": 6_000, "60-64": 5_000, "65-69": 4_000, "70-74": 3_000,
+               "75-79": 2_000, "80-84": 1_000, "85+": 1_000}
+    assert sum(eurostd.values()) == 100_000
+    # Amtliche ASR (alter Europastandard), Mittel 2021–2023, KID 2025 Tab. 3.13.1/3.14.1
+    soll = {("c43_mm", "frauen"): (20.7 + 21.0 + 21.1) / 3,
+            ("c43_mm", "maenner"): (22.3 + 22.9 + 22.9) / 3,
+            ("c44", "frauen"): (139.0 + 142.8 + 143.8) / 3,
+            ("c44", "maenner"): (173.7 + 175.8 + 172.7) / 3}
+    for (ent, sex), erwartet in soll.items():
+        ist = sum(eurostd[r["altersgruppe"]] * float(r[sex])
+                  for r in rows if r["entitaet"] == ent) / 100_000.0
+        assert abs(ist / erwartet - 1) < 0.03, (ent, sex, ist, erwartet)
 
 
 if __name__ == "__main__":

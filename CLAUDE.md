@@ -39,7 +39,17 @@ Bei jedem Methodik-Thema zuerst dort nachschlagen.
 - `/neu-risiko <nr>` — Erstaufschlag eines Methodik-Berichts aus den Arbeitsmappen
 - `/review-methodik <nr>` — Gegenprüfung nach §5 (Lints + 14 Leitfragen) → Ledger
 - `/integriere-risiko <nr>` — abgenommene Methodik → Registry, Schicht-B-Funktion, Tests
+- `/risiko-auto <nr>` — voller **Erstdurchlauf** ohne Nutzer-Input: Erstaufschlag → Loop
+- `/risiko-fortsetzen <nr> [Anlass]` — **Wiedereinstieg** ohne Nutzer-Input, wenn bei der
+  Integration, im Betrieb oder durch eine Überstimmung methodische Unklarheiten, offene
+  Punkte oder Fehler auftauchen: Triage → Anlass ins Ledger → Loop
+
+Beide teilen sich `.claude/methodik-loop.md` (Grundregel „keine Rückfragen",
+Entscheidungsregeln W1–W6, L1 Revision → L2 Code-Nachzug → L3 Lints/Tests → L4 Review →
+L5 Loop → L6 PDF-/HTML-Export → L7 Statusbericht). Sie unterscheiden sich **nur** im Einstieg;
+Änderungen am Loop gehören in die gemeinsame Datei, nicht in einen der beiden Commands.
 
 Loop: neu-risiko → (Autor füllt Register + Modell) → review-methodik (frische Session) →
 Revision (Autor-Session, Ledger abarbeiten) → review-methodik … bis Null-Runde →
-integriere-risiko.
+integriere-risiko. Bricht die Integration ab oder taucht später ein Befund auf:
+`/risiko-fortsetzen` — derselbe Loop, nur ab dem Ist-Stand statt vom Erstaufschlag.

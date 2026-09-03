@@ -454,18 +454,28 @@ def uv_delta_dosis(ctx: CellContext, code: str) -> float:
         ref, neu = ssd_normalperioden.ssd_for_bundesland(
             ctx.regional.get("bundesland"))
     d_ssd = (float(neu) - float(ref)) / float(ref)
-    # v_verh ist Sensitivitätsband (Default 1, Bericht §3.4): der
-    # Tages-Multiplikator der persönlichen Dosis an Komforttagen. Er steht
-    # bewusst NICHT im Basiswert — die Jahreswirkung hängt am Komforttag-Anteil,
-    # der in M0 keine Zellgröße ist.
-    return (d_ssd * ctx.p(code, "k_uv", 0.84) * ctx.p(code, "a_attr", 0.75)
-            * ctx.p(code, "v_verh", 1.0))
+    # v_verh ist Sensitivitätsband (Default 1, Bericht §3.4/Befund 216): der
+    # JAHRESfaktor 1 + phi·(s−1). s ist der TAGES-Multiplikator an einem
+    # Komforttag (1,45) und darf NICHT direkt auf die Jahres-ΔDosis multipliziert
+    # werden; die Umrechnung leistet phi = dosisgewichteter Komforttag-Anteil.
+    # Dessen Ebene ist GEPARKT (§3.1) ⇒ Neutralwert 0 ⇒ v_verh exakt 1.
+    v_verh = 1.0 + ctx.p(code, "phi_komfort", 0.0) * (
+        ctx.p(code, "s_komforttag", 1.45) - 1.0)
+    return (d_ssd * ctx.p(code, "k_uv", 0.7119) * ctx.p(code, "a_attr", 0.75)
+            * v_verh)
 
 
 def _uv_r_out(ctx: CellContext, code: str) -> float:
     """Außenberufs-Modifikator auf den SCC-Anteil am C44-Zusatz (Bericht §3.4).
 
     ``w^Z = w_SCC·2,5/BAF_C44``, ``r_out = (1−w^Z) + w^Z·[1+q(OR−1)]/[1+q̄(OR−1)]``
+
+    BANDZUORDNUNG (Bericht §3.4, Befund 218): Der Aufrufer wendet den Faktor NUR
+    auf die Bänder ab 20 an — die Effektgröße stammt aus einer Meta-Analyse
+    beruflicher Exposition und ist auf den Erwerbstätigen-Anteil zentriert; für
+    u20 existiert weder Exposition noch tragende Fallzahl. Für 65+ ist die
+    Zuordnung eine gekennzeichnete Kohorten-Approximation (heutiger Anteil als
+    Stellvertreter für die frühere Exposition derselben Kohorte).
 
     Mittelwertzentriert (Bundesmittel ⇒ 1). Die Ebene „Außenbeschäftigten-Anteil"
     ist **geparkt** (Bericht §3.6/§3.8: INKAR/SVB liefern keine keyless
@@ -510,20 +520,29 @@ def uv_yll(risk: dict, ctx: CellContext) -> dict:
     # inkl. u20-Rückfall, damit beide Risiken dieselbe Bevölkerung sehen.
     bands = _pollen_age_bands(ctx)
 
-    f_mm = ctx.p(code, "c_kal_mm", 1.022) * sum(
+    f_mm = ctx.p(code, "c_kal_mm", 1.0012) * sum(
         pop * ctx.p(code, f"i_mm_{b}", UV_INCIDENCE_MM[b]) / 100_000.0
         for b, pop in bands.items())
-    f_c44 = ctx.p(code, "c_kal_c44", 0.999) * sum(
-        pop * ctx.p(code, f"i_c44_{b}", UV_INCIDENCE_C44[b]) / 100_000.0
-        for b, pop in bands.items())
+    # C44 getrennt nach u20 / ab 20, weil r_out nur ab 20 gilt (Bericht §3.4,
+    # Befund 218: die Evidenz ist eine Meta-Analyse BERUFLICHER Exposition,
+    # zentriert auf den Erwerbstätigen-Anteil — u20 trägt keine).
+    c_kal_c44 = ctx.p(code, "c_kal_c44", 0.9910)
+    f_c44_je_band = {
+        b: c_kal_c44 * pop * ctx.p(code, f"i_c44_{b}", UV_INCIDENCE_C44[b]) / 100_000.0
+        for b, pop in bands.items()}
+    f_c44 = sum(f_c44_je_band.values())
+    f_c44_u20 = f_c44_je_band.get("u20", 0.0)
 
     d_mm = max(0.0, f_mm * ctx.p(code, "baf_mm", 0.60) * dd)
-    d_c44 = max(0.0, f_c44 * ctx.p(code, "baf_c44", 1.675) * dd
-                * _uv_r_out(ctx, code))
+    r_out = _uv_r_out(ctx, code)
+    d_c44 = max(0.0, (f_c44_u20 + (f_c44 - f_c44_u20) * r_out)
+                * ctx.p(code, "baf_c44", 1.675) * dd)
 
-    yll = (d_mm * ctx.p(code, "lambda_mm", 0.1155) * ctx.p(code, "l_rest_mm", 10.58)
-           + d_c44 * ctx.p(code, "lambda_c44", 0.00549)
-           * ctx.p(code, "l_rest_c44", 5.30))
+    # L̄_e: Jahresmediane des Ankerfensters 2021–2023 (Bericht §3.4, Befund 224) —
+    # dieselbe Jahres-Auswahlregel wie Anker, c_kal und lambda.
+    yll = (d_mm * ctx.p(code, "lambda_mm", 0.11466) * ctx.p(code, "l_rest_mm", 10.4569)
+           + d_c44 * ctx.p(code, "lambda_c44", 0.005236)
+           * ctx.p(code, "l_rest_c44", 5.4787))
 
     out = _result(risk, yll)
     out["cost_eur"] += (d_mm * ctx.p(code, "c_fall_mm", 6724.0)

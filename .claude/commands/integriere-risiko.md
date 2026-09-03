@@ -15,7 +15,8 @@ Sonderfall M0 (Altbestand): Bericht ist `docs/render/METHODIK_M0_GESUNDHEIT.html
 Lies `reviews/BEFUNDE_<nr>.md` (für M0: `docs/METHODIK_M0_GESUNDHEIT_Gegenpruefung_Rev5.md`).
 Sind offene A-Befunde vorhanden oder fehlt das dokumentierte
 Konvergenz-Verdikt (Null-Runde): **abbrechen** und die Blocker auflisten. Keine Integration
-vor der Abnahme.
+vor der Abnahme. Wiedereinstieg in den Loop: `/risiko-fortsetzen <nr> <Blocker in einem Satz>`
+— arbeitet die Blocker ohne Rückfragen ab und exportiert PDF und HTML neu.
 
 ## 1 · Muster der Codebasis lernen (nichts neu erfinden)
 
@@ -63,3 +64,8 @@ Gesamte Testsuite ausführen. **Bei jeder Divergenz Bericht ↔ Code: nicht stil
 Befund ins Ledger (Kategorie A, „Integration blockiert durch …") und melden; die Methodik ist
 die Wahrheit, bis ein Review sie ändert. Abschlussbericht: angelegte Parameter, Funktionen,
 Ebenen, Tests (grün/rot), offene Punkte.
+
+Bleibt dabei ein methodischer Punkt offen — Divergenz, Unklarheit, Fehler im Bericht —, ist der
+nächste Schritt `/risiko-fortsetzen <nr> <Anlass in einem Satz>`: derselbe Review-/Revisions-Loop
+ab dem Ist-Stand, ohne Nutzer-Input, mit Code-Nachzug und neuem PDF-/HTML-Export. Danach
+`/integriere-risiko <nr>` erneut.
