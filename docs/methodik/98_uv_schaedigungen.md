@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–22, Befunde 336–411) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23, Befunde 336–420) — im Review** ·
 03.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -118,12 +118,14 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 17 Befunden der Runde 15 nur vier umgesetzt waren — der inhaltliche Verlust ist
 > auf diese vier begrenzt und in Rev. 14 nachgezogen (Befunde 356/357).
 >
-> **Rev. 14 (03.09.2026)** = Review-Runden 16 bis 22 (Befunde 336–411). Keine
+> **Rev. 14 (03.09.2026)** = Review-Runden 16 bis 23 (Befunde 336–420). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
 > € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
-> gefahrenen Review-Runde nachgerechnet — bis Runde 21 neunmal unabhängig
-> reproduziert. Die Zahl ist an den Ledger gebunden und wird dort nachgezogen,
-> nicht im Text fortgeschrieben (Befund 400). Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
+> gefahrenen Review-Runde unabhängig nachgerechnet. **Eine Zählung steht hier
+> bewusst nicht** (Befunde 400/407/416): Sie altert mit jeder Runde und ist in
+> neun aufeinanderfolgenden Runden zurückgefallen. Die Zahl der Reproduktionen
+> führt das Ledger, das sie ohnehin belegt — der Bericht verweist darauf,
+> statt sie zu duplizieren. Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
 > (Gleichgewichtslesart mit Transient-Faktor \(\tau\) = 0,20–0,48, jetzt größte
 > Achse der §4-Bändertabelle) sowie die vollständig gemessene **Punktmengen-Kette**.
 > Prüfmechanik: Ledger auf eine Zeile je Befund, Status aus **Prüfausdrücken**
@@ -378,8 +380,8 @@ $$ \Delta\text{Dosis}_{\text{Zelle}} \;=\; \frac{\text{SSD}_{\text{Zelle}}^{\,19
   Befund 266). Rev. 9: 0,7289 (Fallgewichtung, Befund 278). Rev. 11: **0,7119**  <!--hist-->
   (Aggregationsregel — instabile Punkte ausgeschlossen, Befund 297).
   **Alle acht Werte liegen innerhalb des ausgewiesenen Bandes 0,3622–1,0616.**
-  Plausibilisierung: implizite Dosisänderung DE = 8,51 % × 0,7119 ≈ 6,2 % über den
-  Normalperiodenversatz ≈ 2,1 %/Dekade — innerhalb des Satelliten-Bands
+  Plausibilisierung: implizite Dosisänderung DE = 8,51 % × 0,7119 ≈ 6,06 % über den
+  Normalperiodenversatz ≈ 2,02 %/Dekade — innerhalb des Satelliten-Bands
   +1,2–3,6 %/Dekade [32] ✓.
 - **Stationaritätsannahme der Elastizität (gekennzeichnet, Befund 222):**
   \(k_{\text{UV}}\) ist im Fenster **1997–2022** gemessen und wird auf den

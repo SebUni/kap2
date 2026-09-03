@@ -26,6 +26,7 @@ genau das macht den Spaltenversatz unmöglich.
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -466,12 +467,46 @@ def _schiefe_zeilen(text: str) -> list[tuple[int, int, int]]:
     return schief
 
 
+# Rekursionsschutz (Befund 412). Ein Pruefausdruck darf pruefen, dass kein
+# geschlossener Befund einen roten Ausdruck traegt — dafuer fuehrt er die
+# Pruefung selbst aus und waehlt sich dabei mit aus. Seit zurueckgestellte
+# Ausdruecke nicht mehr uebersprungen werden (Befund 406), entsteht daraus
+# unbegrenzte Rekursion: der Lauf terminiert nicht, und jede Bilanz, die
+# angeblich daraus stammt, kann nicht entstanden sein.
+# Der Schutz ist bewusst eine Umgebungsvariable und kein Zaehler: So sieht auch
+# ein von aussen gestarteter Kindprozess, dass er in einer Pruefung laeuft.
+REKURSIONS_FLAG = "KAP2_LEDGER_PRUEFE_LAEUFT"
+
+# Harte Zeitgrenze je Pruefausdruck (Befund 412). Ein Ausdruck, der die Pruefung
+# selbst aufruft, erzeugt sonst unbegrenzte Rekursion — der Lauf terminiert nie,
+# und eine Bilanz, die daraus stammen soll, kann nicht entstanden sein. Die
+# Grenze wirkt unabhaengig davon, WELCHER Ausdruck sich verschachtelt: Ein
+# blockierender Ausdruck ist immer ein Befund, nie ein gruener Beleg.
+AUSDRUCK_TIMEOUT_S = 25
+
+
+def _fuehre_aus(kommando: str) -> tuple[int, str]:
+    """Fuehrt einen Pruefausdruck mit Zeitgrenze und Rekursions-Flag aus."""
+    umgebung = dict(os.environ, **{REKURSIONS_FLAG: "1"})
+    try:
+        r = subprocess.run(kommando, shell=True, cwd=REPO, capture_output=True,
+                           text=True, timeout=AUSDRUCK_TIMEOUT_S, env=umgebung)
+    except subprocess.TimeoutExpired:
+        return 124, (f"TIMEOUT nach {AUSDRUCK_TIMEOUT_S}s — der Ausdruck blockiert; "
+                     f"ruft er die Prüfung selbst auf?")
+    return r.returncode, (r.stderr or r.stdout).strip()[:110]
+
+
 def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     """Leitet den Status aus dem Prüfausdruck ab, statt ihn zu glauben.
 
     Ein Prüfausdruck ist ein Shell-Kommando in Backticks in der Spalte `Prüfausdruck`.
     Exitcode 0 = Befund belegt geschlossen; alles andere = offen.
     """
+    if os.environ.get(REKURSIONS_FLAG):
+        print("  (verschachtelter --pruefe-Aufruf übersprungen — Rekursionsschutz)")
+        return 0
+    os.environ[REKURSIONS_FLAG] = "1"
     befunde = parse(pfad)
     schief = _schiefe_zeilen(pfad.read_text(encoding="utf-8"))
     rot: list[tuple[Befund, str]] = []
@@ -495,16 +530,12 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
             # nur nicht als blockierend, weil §6 die Zurueckstellung zulaesst.
             # Vorher wurden sie uebersprungen, sodass „kein Pruefausdruck
             # schlaegt fehl" auch dann galt, wenn einer fehlschlug.
-            r = subprocess.run(b.pruefausdruck, shell=True, cwd=REPO,
-                               capture_output=True, text=True)
-            if r.returncode != 0:
-                zurueck_rot.append(
-                    (b, (r.stderr or r.stdout).strip()[:110] or f"exit {r.returncode}"))
+            rc, msg = _fuehre_aus(b.pruefausdruck)
+            if rc != 0:
+                zurueck_rot.append((b, msg or f"exit {rc}"))
             continue
-        r = subprocess.run(b.pruefausdruck, shell=True, cwd=REPO,
-                           capture_output=True, text=True)
-        (gruen.append(b) if r.returncode == 0
-         else rot.append((b, (r.stderr or r.stdout).strip()[:120] or f"exit {r.returncode}")))
+        rc, msg = _fuehre_aus(b.pruefausdruck)
+        (gruen.append(b) if rc == 0 else rot.append((b, msg or f"exit {rc}")))
 
     # Ein als geschlossen geführter Befund ohne Prüfausdruck ist unbelegt — genau
     # die Lage, aus der in Runde 16 neun nicht umgesetzte „übernommen" entstanden.
@@ -540,6 +571,7 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
               f"dort, wo sie gesucht werden:")
         for zn, ist, soll in schief[:10]:
             print(f"    Zeile {zn}: {ist} Zellen, Kopf hat {soll}")
+    os.environ.pop(REKURSIONS_FLAG, None)
     if rot or schief:
         print("\nROT — " + ("mindestens ein Prüfausdruck belegt seinen Befund nicht."
                             if rot else "die Tabellenstruktur trägt die Zusicherung nicht."))
@@ -630,8 +662,8 @@ def cmd_schliesse(pfad: Path) -> int:
             bleibt.append((b.nr, "Zeile strukturell fehlerhaft")); continue
         if not b.pruefausdruck:
             bleibt.append((b.nr, "kein Prüfausdruck")); continue
-        r = subprocess.run(b.pruefausdruck, shell=True, cwd=REPO, capture_output=True)
-        if r.returncode != 0:
+        rc, _msg = _fuehre_aus(b.pruefausdruck)
+        if rc != 0:
             bleibt.append((b.nr, "Prüfausdruck rot")); continue
         cells = _zellen(b.roh)
         ziel = None
