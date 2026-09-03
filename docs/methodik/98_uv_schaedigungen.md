@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–20, Befunde 336–399) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–21, Befunde 336–404) — im Review** ·
 03.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -118,10 +118,12 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 17 Befunden der Runde 15 nur vier umgesetzt waren — der inhaltliche Verlust ist
 > auf diese vier begrenzt und in Rev. 14 nachgezogen (Befunde 356/357).
 >
-> **Rev. 14 (03.09.2026)** = Review-Runden 16 bis 20 (Befunde 336–399). Keine
+> **Rev. 14 (03.09.2026)** = Review-Runden 16 bis 21 (Befunde 336–404). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
-> € **339 Mio** stehen seit Rev. 11 unverändert und sind sechsmal unabhängig
-> nachgerechnet. Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
+> € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
+> gefahrenen Review-Runde nachgerechnet — bis Runde 21 neunmal unabhängig
+> reproduziert. Die Zahl ist an den Ledger gebunden und wird dort nachgezogen,
+> nicht im Text fortgeschrieben (Befund 400). Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
 > (Gleichgewichtslesart mit Transient-Faktor \(\tau\) = 0,20–0,48, jetzt größte
 > Achse der §4-Bändertabelle) sowie die vollständig gemessene **Punktmengen-Kette**.
 > Prüfmechanik: Ledger auf eine Zeile je Befund, Status aus **Prüfausdrücken**
@@ -872,30 +874,30 @@ assert abs(euro - 4365) < 60               # ~4.400 EUR je 1.000 EW und Jahr
 |---|---|---|---|
 | \(a\) | Altersband u20 · 20–64 · 65–74 · 75–84 · 85+ (Ebenen wie #96 §3.2) | — | Zensus-Altersbänder + Ebene u20 |
 | \(a_{\text{attr,UV}}\) | klimaattribuierter Anteil des SSD-/Dosistrends | — | **0,75** (0,5–1,0) — gekennzeichnete Abschätzung §3.2; register:98-E20-03 |
-| \(\Phi(a)\) | kumulierte UV-Dosis bis zum Alter \(a\) (Lebenszeitdosis) | relative Einheit | Definitionsgröße der BAF in [30]; herleitung:#gleichgewicht |
-| \(Y(a)\) | Inzidenz im Alter \(a\); \(Y(a)\sim\Phi(a)^{c}\) mit \(c\) = BAF | 1/100.000·a | Funktionsform aus [30]; herleitung:#gleichgewicht |
-| \(T\) | Dauer des Dosisanstiegs (Mittelpunktabstand der Normalperioden) | Jahre | **30** (1961–1990 ⇒ 1991–2020); herleitung:#gleichgewicht |
-| \(\tau\) | Transient-Faktor: Anteil der Lebenszeitdosis-Erhöhung an der Jahresdosis-Erhöhung, \(\tau=(T/2)/a\) | — | **1,00** im Ausweis (Gleichgewichtslesart); Spanne **0,20–0,48** als §4-Achse; gekennzeichnete Abschätzung §3.9; herleitung:#gleichgewicht |
 | \(\text{BAF}_e\) | biologischer Verstärkungsfaktor (%-Inzidenz je +1 % Dosis) | — | MM **0,6** (±0,4) · C44 **1,675** (1,675–1,95; §3.1) [29,30]; register:98-E20-04 |
 | \(c_e\) | Erstjahres-Behandlungskosten je Fall (**Proxy**, §3.4) | €₂₀₂₄ | MM **6.724** (Band –11.410) · C44 **5.883** (–7.436) = [34]-Werte × 119,3/94,5 [19]; register:98-K1-01; herleitung:#c-e |
 | \(c_{\text{kal},e}\) | Normierungsskalar der Ablesekette (ein Skalar je Entität; wirkt in der §3.3-Formel auf die Roh-Bandraten; Anker 2021–2023) | — | MM **1,0012** · C44 **0,9910**; herleitung:#i-raten |
-| \(\Delta\text{Dosis}_{\text{Zelle}}\) | relative klimaattribuierte Dosisänderung | — | SSD-Normalperioden-Δ × \(k_{\text{UV}}\) × \(a_{\text{attr,UV}}\); DE 4,54 % (§3.2, fallgewichtet [72,73]); berechnet |
-| \(\Delta F_{e,\text{Zelle}}\) | klimaattribuierte Zusatzfälle (Teil-Ausweis) | 1/Jahr | berechnet |
-| \(\text{€}_{\text{Zelle}}\) | bewerteter Schaden K1 (Ursache UV) — Teil-Ausweis | €₂₀₂₄/Jahr | Ergebnis (§3.4) |
 | \(F_{e,\text{Zelle}}\) | Baseline-Neuerkrankungen der Zelle | 1/Jahr | berechnet (§3.3) |
 | \(I_{e,a}^{\text{roh}}\) | Roh-Neuerkrankungsrate je Entität und Band (Ablesekette; Anlage-CSV) | 1/100.000·a | Tabelle §3.3 [27,48]; register:98-R35-01; herleitung:#i-raten |
 | \(k_{\text{UV}}\) | Übersetzung SSD-Trend → erythemwirksame Dosis (Elastizität zeitinvariant angenommen, §3.2) | — | **0,7119** (0,3622–1,0616) = (4,9/4,6) × 0,6683, Brücke über die Globalstrahlung; Band = publizierte Standardfehler (§3.2) [31,73]; register:98-E20-02; herleitung:#k-uv |
-| \(\lambda_e\) | Letalitätsanteil (Perioden-Approximation, gekennzeichnet; Anker 2021–2023) | — | MM **0,11466** · C44 **0,005236** [27]; register:98-K1-02 |
 | \(\bar L_e\) | verlorene Lebensjahre je Sterbefall (Median-Approximation, gekennzeichnet; Jahresmediane des Ankerfensters) | Jahre | MM **10,4569** · C44 **5,4787** [27,48]; register:98-K1-02; herleitung:#l-quer |
 | \(\text{OR}_{\text{out}},\ q_{\text{out}},\ \bar q_{\text{out}},\ r_{\text{out}},\ w^Z\) | Außenberufs-Sensitivität (auf den SCC-Anteil am Zusatz \(w^Z\) = 0,373; nur Bänder 20–64…85+, **nicht** u20; **nicht im Basiswert**, §3.4) | — | OR **1,77** [1,37–2,30] [43]; \(\bar q_{\text{out}}\) = **0,070** [70]; \(r_{\text{out}}\) **0,981–1,038** über \(q_{\text{out}}\) ∈ [0; 0,21]; register:98-OUT-01; herleitung:#q-out |
 | \(\text{pop}_a\) | Bevölkerung der Zelle je Band | Personen | Zensus 2022, 100 m (+ u20); register:98-R35-01 |
-| \(\text{SSD}\) | Sonnenscheindauer (Normalperioden-Mittel je Zelle) — Kartenebene **neu anzulegen** (angelegt, §3.6) | h/Jahr | DWD-CDC sunshine_duration 1 km [33]; Gebietsmittel-Referenzen [69]; register:98-E20-01 |
-| \(\phi_{\text{Komfort}}\) | dosisgewichteter Komforttag-Anteil (Ebene **geparkt**, Neutralwert 0) | — | **0** (Band 0–0,25, gekennzeichnete Abschätzung §3.4); herleitung:#v-verh |
 | \(s\) | Tages-Multiplikator der persönlichen Dosis an einem Komforttag | — | **1,45** (1,25–1,60) [57–59]; register:98-S154-01 |
-| \(v_{\text{verh}}\) | Verhaltens-Sensitivität — **Jahres**faktor, **abgeleitet** aus \(s\) und \(\phi_{\text{Komfort}}\) (kein eigener Parameter, §3.2 Kein-Doppelkanal) | — | \(1+\phi_{\text{Komfort}}(s-1)\) = **1,00** (Band 1,00–1,11); herleitung:#v-verh |
+| \(\text{SSD}\) | Sonnenscheindauer (Normalperioden-Mittel je Zelle) — Kartenebene **neu anzulegen** (angelegt, §3.6) | h/Jahr | DWD-CDC sunshine_duration 1 km [33]; Gebietsmittel-Referenzen [69]; register:98-E20-01 |
+| \(T\) | Dauer des Dosisanstiegs (Mittelpunktabstand der Normalperioden) | Jahre | **30** (1961–1990 ⇒ 1991–2020); herleitung:#gleichgewicht |
 | \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136,4–165,6 T€; Kette #95 §3.5) [19]; herleitung:#voly (in #95) |
+| \(v_{\text{verh}}\) | Verhaltens-Sensitivität — **Jahres**faktor, **abgeleitet** aus \(s\) und \(\phi_{\text{Komfort}}\) (kein eigener Parameter, §3.2 Kein-Doppelkanal) | — | \(1+\phi_{\text{Komfort}}(s-1)\) = **1,00** (Band 1,00–1,11); herleitung:#v-verh |
 | \(w_{\text{SCC}}\) | SCC-Anteil an C44 (altersinvariant, dokumentierte Annahme; Quellen-Widerspruch benannt §3.1) | — | **0,25** (Band 0,25–0,50) [27; obere Stütze 2015er-BfS-Split]; herleitung:#baf-c44 |
+| \(Y(a)\) | Inzidenz im Alter \(a\); \(Y(a)\sim\Phi(a)^{c}\) mit \(c\) = BAF | 1/100.000·a | Funktionsform aus [30]; herleitung:#gleichgewicht |
 | \(\text{YLL}_{\text{Zelle}}\) | verlorene Lebensjahre — **nativer Ausweis** | Jahre/Jahr | Ergebnis |
+| \(\Delta\text{Dosis}_{\text{Zelle}}\) | relative klimaattribuierte Dosisänderung | — | SSD-Normalperioden-Δ × \(k_{\text{UV}}\) × \(a_{\text{attr,UV}}\); DE 4,54 % (§3.2, fallgewichtet [72,73]); berechnet |
+| \(\Delta F_{e,\text{Zelle}}\) | klimaattribuierte Zusatzfälle (Teil-Ausweis) | 1/Jahr | berechnet |
+| \(\lambda_e\) | Letalitätsanteil (Perioden-Approximation, gekennzeichnet; Anker 2021–2023) | — | MM **0,11466** · C44 **0,005236** [27]; register:98-K1-02 |
+| \(\tau\) | Transient-Faktor: Anteil der Lebenszeitdosis-Erhöhung an der Jahresdosis-Erhöhung, \(\tau=(T/2)/a\) | — | **1,00** im Ausweis (Gleichgewichtslesart); Spanne **0,20–0,48** als §4-Achse; gekennzeichnete Abschätzung §3.9; herleitung:#gleichgewicht |
+| \(\Phi(a)\) | kumulierte UV-Dosis bis zum Alter \(a\) (Lebenszeitdosis) | relative Einheit | Definitionsgröße der BAF in [30]; herleitung:#gleichgewicht |
+| \(\phi_{\text{Komfort}}\) | dosisgewichteter Komforttag-Anteil (Ebene **geparkt**, Neutralwert 0) | — | **0** (Band 0–0,25, gekennzeichnete Abschätzung §3.4); herleitung:#v-verh |
+| \(\text{€}_{\text{Zelle}}\) | bewerteter Schaden K1 (Ursache UV) — Teil-Ausweis | €₂₀₂₄/Jahr | Ergebnis (§3.4) |
 
 ### 3.6 Kartenebenen und Fallbacks
 
@@ -1256,7 +1258,7 @@ parameter:
                         # 10.682 Gemeindepunkte (Baseline-Fall-Gewichtung).
                         # Historie: Rev. 3 4,9/5,81 = 0,8434 (NRW-Gebietsmittel, Befund 230);
                         # Rev. 4 4,9/6,48 = 0,7562 (halber Mismatch, Befund 238); Rev. 5
-                        # 0,5782 und Rev. 6 0,6667 (Stationsquotient geschaetzt, Befund 252).
+                        # Rev. 5: 0,5782; Rev. 6: 0,6667 (Stationsquotient geschaetzt, Befund 252).
                         # Elastizitaet zeitinvariant angenommen (Befund 222).
   herkunft: register:98-E20-02
   quelle: lorenz2024_dwd_ssd_trend

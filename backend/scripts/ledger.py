@@ -447,6 +447,25 @@ def cmd_kompakt(pfad: Path, runde: int) -> int:
     return 0
 
 
+def _schiefe_zeilen(text: str) -> list[tuple[int, int, int]]:
+    """Zeilen, deren Zellenzahl nicht zur Kopfzeile passt (Befunde 391/401).
+
+    Ein unmaskiertes Trennzeichen im Text verschiebt alle folgenden Zellen —
+    Status und Pruefausdruck stehen dann nicht mehr dort, wo sie gesucht werden.
+    Beide Kommandos muessen das melden: `--schliesse`, damit es nichts falsch
+    schliesst, und `--pruefe`, weil dessen Ausgabe die Abnahme belegt. Fehlte die
+    Pruefung dort, meldete es „GRUEN" fuer eine Zeile, deren echter Ausdruck rot war.
+    """
+    schief = []
+    for _kopfz, spalten, body in tabellen(text.split("\n")):
+        if not ist_befundtabelle(spalten):
+            continue
+        for zeilennr, roh in body:
+            if len(_zellen(roh)) != len(spalten):
+                schief.append((zeilennr, len(_zellen(roh)), len(spalten)))
+    return schief
+
+
 def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     """Leitet den Status aus dem Prüfausdruck ab, statt ihn zu glauben.
 
@@ -454,6 +473,7 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     Exitcode 0 = Befund belegt geschlossen; alles andere = offen.
     """
     befunde = parse(pfad)
+    schief = _schiefe_zeilen(pfad.read_text(encoding="utf-8"))
     rot: list[tuple[Befund, str]] = []
     gruen: list[Befund] = []
     # §6 laesst B-/C-Befunde auch TERMINIERT ZURUECKGESTELLT zu, und §5 kennt
@@ -494,8 +514,15 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     # Nachweise stehen im Archiv und wurden im Review mehrfach gegengeprueft.
     # Rot ist deshalb nur ein FEHLSCHLAGENDER Ausdruck. Die Zahl der unbelegten
     # Altbefunde wird trotzdem ausgewiesen, damit der Bestand sichtbar bleibt.
-    if rot:
-        print("\nROT — mindestens ein Prüfausdruck belegt seinen Befund nicht.")
+    if schief:
+        print(f"\n  STRUKTUR ROT: {len(schief)} Zeile(n) mit falscher Zellenzahl — "
+              f"ihre Zellen sind verschoben, Status und Prüfausdruck stehen nicht "
+              f"dort, wo sie gesucht werden:")
+        for zn, ist, soll in schief[:10]:
+            print(f"    Zeile {zn}: {ist} Zellen, Kopf hat {soll}")
+    if rot or schief:
+        print("\nROT — " + ("mindestens ein Prüfausdruck belegt seinen Befund nicht."
+                            if rot else "die Tabellenstruktur trägt die Zusicherung nicht."))
         return 1
     print(f"\nGRÜN — kein Prüfausdruck schlägt fehl. {len(gruen)} Befunde maschinell "
           f"belegt, {len(unbelegt)} Altbefunde aus den Runden vor W7 tragen ihren "
@@ -559,13 +586,7 @@ def cmd_schliesse(pfad: Path) -> int:
     # verschoben — Status und Pruefausdruck stehen dann nicht mehr dort, wo das
     # Werkzeug sie sucht. Frueher meldete es dafuer „kein Pruefausdruck" und
     # verschluckte den eigentlichen Fehler.
-    schief = []
-    for kopfz, spalten, body in tabellen(text.split("\n")):
-        if not ist_befundtabelle(spalten):
-            continue
-        for zeilennr, roh in body:
-            if len(_zellen(roh)) != len(spalten):
-                schief.append((zeilennr, len(_zellen(roh)), len(spalten)))
+    schief = _schiefe_zeilen(text)
     schiefe_zeilen = {zn for zn, _, _ in schief}
     if schief:
         # Nicht abbrechen: Ein Formfehler in einer Zeile darf die uebrigen nicht

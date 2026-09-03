@@ -68,7 +68,7 @@ Verteilung über 10.682 Gemeindepunkte mit einem SSD-Trend ≥ 1 %/Dekade (darun
 ## 5 Verworfene Ketten
 
 - NRW-Gebietsmittel 5.81 %/Dek. ⇒ 0.8434 (bis Rev. 3): Punkt-Zähler gegen Landesflächenmittel (Befund 230).
-- Raster-SSD an der Messzelle ⇒ 0.7405 (Rechnung mit der Messzelle Bochum; **nicht** der Rev.-4-Stand, der 0,7562 führte): Zähler weiter Station — halber Mismatch (Befund 238).
+- Raster-SSD an der Messzelle ⇒ 0.7405 (Rechnung mit der Messzelle Bochum; **nicht** der Rev.-4-Stand (Rev. 4: 0,7562)): Zähler weiter Station — halber Mismatch (Befund 238).
 - Stationsquotient 0,867 aus 》roughly twice《 ⇒ 0,5782 (Rev. 5) bzw. 1,0 aus 》similarly《 ⇒ 0,6667 (Rev. 6): beides Ersatzkonstruktionen für eine Größe, die der Volltext beziffert (Befund 252).
 
 ## 6 Ozon im Messfenster (Befunde 246/258)

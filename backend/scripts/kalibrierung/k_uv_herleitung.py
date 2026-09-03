@@ -416,7 +416,7 @@ def main() -> None:
              "Landesflächenmittel (Befund 230).")
     p.append(f"- Raster-SSD an der Messzelle ⇒ {DOSIS/t_stat['ssd']:.4f} "
              "(Rechnung mit der Messzelle Bochum; **nicht** der "
-             "Rev.-4-Stand, der 0,7562 führte): Zähler weiter Station — "
+             "Rev.-4-Stand (Rev. 4: 0,7562)): Zähler weiter Station — "
              "halber Mismatch (Befund 238).")
     p.append("- Stationsquotient 0,867 aus 》roughly twice《 ⇒ 0,5782 (Rev. 5) bzw. "
              "1,0 aus 》similarly《 ⇒ 0,6667 (Rev. 6): beides Ersatzkonstruktionen für "

@@ -514,13 +514,29 @@ def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> 
                     f"{wert} — {zeile.strip()[:60]}")
                 treffer += 1
                 continue
-            # Umfeld-Fenster ENG (Befund 392): Die verbliebene Ausnahme deckt die
-            # Aufzaehlungsform „Rev. N: <Wert>" — dort steht der Vermerk direkt vor
-            # dem Wert (gemessen: hoechstens 25 Zeichen bei allen 12 legitimen
-            # Fundstellen). Mit 70 Zeichen deckte sie auch Geltungsbehauptungen wie
-            # „Seit Rev. 8 gilt im Produktionsmodell unveraendert k_UV = <Wert>",
-            # in denen der Vermerk gerade NICHT den Wert historisiert.
-            umfeld = zeile[max(0, treffer_pos - 25):treffer_pos + 20]
+            # STRUKTURELLE Adjazenz statt Schwellenwert (Befund 402). Alle
+            # legitimen Fundstellen haben eine von zwei Formen, in denen der
+            # Revisionsvermerk den Wert unmittelbar historisiert:
+            #     „Rev. 7: 0,6735"        — Vermerk endet direkt vor dem Wert
+            #     „0,5782 (Rev. 5)"       — Vermerk beginnt direkt nach dem Wert
+            # Eine Geltungsbehauptung wie „Rev. 8 gilt: k_UV = <Wert>" oder
+            # „Maßgeblich ist (Rev. 8) k_UV = <Wert>" schiebt Text dazwischen und
+            # faellt damit durch — unabhaengig davon, wie gross ein Fenster ist.
+            # Ein Schwellenwert verschiebt die Luecke nur, er schliesst sie nicht.
+            vor = zeile[:treffer_pos]
+            nach = zeile[treffer_pos + len(f):]
+            umfeld = ""
+            # Zwischen Vermerk und Wert duerfen nur Rechen- und Trennzeichen
+            # stehen, KEIN Wort: „Rev. 4 4,9/6,48 = 0,7562" ist Historie,
+            # „Rev. 8 gilt: k_UV = <abgeloester Wert>" behauptet Geltung. Ein
+            # Fenster nach
+            # Zeichenzahl kann das nicht trennen, diese Regel schon.
+            ZWISCHEN = r"[\s0-9,.:/=×·+()–—-]*"
+            if re.search(r"Rev\.-? ?\d+[:)]?" + ZWISCHEN + r"$", vor):
+                umfeld = vor[-40:]                       # „Rev. N: … <Wert>"
+            elif re.match(ZWISCHEN + r"\(?Rev\.-? ?\d+[):]", nach):
+                umfeld = nach[:40]                       # „<Wert> … (Rev. N)"
+
             klasse = next((name for name, rx in HISTORIE_EINZELN if rx.search(umfeld)),
                           None)
             if klasse:
@@ -598,7 +614,15 @@ def revisionsrueckstaende(nr: str, src: str, baender: set[float],
                 continue
             # Befund 298: `#`-Zeilen sind die Kommentare der Golden-Test-Blöcke —
             # sie waren pauschal ausgenommen und trugen deshalb Rückstände.
-            historie = bool(HISTORIE.search(zeile)) or zeile.lstrip().startswith(">")
+            # Auch hier gilt die Adjazenz-Regel (Befund 402): Ein Revisionsvermerk
+            # IRGENDWO in der Zeile historisiert noch keinen Wert. Frueher machte
+            # `HISTORIE.search(zeile)` die ganze Zeile ausnahmefaehig, sodass eine
+            # Geltungsbehauptung mit beilaeufigem „Rev. N" durchfiel.
+            historie = (bool(re.search(r"Rev\.-? ?\d+[:)]?[\s0-9,.:/=×·+()–—-]{0,40}$",
+                                       zeile))
+                        or bool(re.search(r"(Korrekturhistorie|Historie:|bis Rev\. \d"
+                                          r"|abgelöst|Entscheidungslog|Verworfene)", zeile))
+                        or zeile.lstrip().startswith(">"))
             # Positivprüfung braucht auch kurze Werte (0,75 · 1,45), die
             # Negativprüfung bleibt bei >= 3 Nachkommastellen (weniger Rauschen).
             zahlen = {float(r.replace(",", "."))
