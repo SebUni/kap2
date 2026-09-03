@@ -158,9 +158,15 @@ def parameter_bloecke(src: str, lint: Lint) -> tuple[dict[str, str], set[float]]
         fehlend = [f for f in PFLICHTFELDER
                    if not re.search(rf"^\s*{f}:", blk, re.M)]
         lint.pruefe(not fehlend, f"Parameter-Block {name}", f"fehlt {fehlend}")
-        wert = re.search(r"^\s*wert:\s*(.+)$", blk, re.M)
+        # Mehrzeilige dict-Werte ({mm: {...},\n c44: {...}}) vollstaendig einlesen
+        # (Befund 384): Bis Rev. 14 endete der Wert am Zeilenende, sodass die
+        # zweite Entitaet nie in den Abgleich kam.
+        wert = re.search(r"^\s*wert:\s*(.+?)(?=\n\s*(?:einheit|band|herkunft):)",
+                         blk, re.M | re.S)
         if wert:
-            werte[name] = wert.group(1).split("#")[0].strip()
+            roh_wert = " ".join(z.split("#")[0].strip()
+                                for z in wert.group(1).split("\n"))
+            werte[name] = re.sub(r"\s+", " ", roh_wert).strip()
         bd = re.search(r"^\s*band:\s*\[([^\]]+)\]", blk, re.M)
         if bd:
             for zahl in re.findall(r"[0-9]+\.[0-9]+", bd.group(1)):
@@ -192,6 +198,7 @@ def registry_abgleich(nr: str, werte: dict[str, str], lint: Lint) -> None:
     specs = {s["key"]: s["value"] for s in IMPACT_PARAM_SPECS
              if str(s.get("risk", "")).startswith("EXPECTED_ANNUAL_UV")}
     uebersprungen: list[str] = []
+    abgedeckt_dict: set[str] = set()
     for pid, roh in werte.items():
         if not pid.startswith(praefix):
             continue
@@ -226,6 +233,43 @@ def registry_abgleich(nr: str, werte: dict[str, str], lint: Lint) -> None:
     lint.ok.append(f"Bericht ⇄ Registry: {len(specs)} Specs, "
                    f"{len(uebersprungen)} zusammengesetzte Blöcke übersprungen")
 
+    # Befund 384(a): VERSCHACHTELTE dict-Bloecke ({mm: {...}, c44: {...}}) wurden
+    # vom flachen Parser nicht aufgeloest — `uv.i_raten_roh` fiel deshalb durch
+    # JEDEN Abgleich, eine Mutation 24,7 -> 99,9 blieb gruen.
+    for pid, roh in werte.items():
+        if not roh.startswith("{") or "{" not in roh[1:]:
+            continue
+        basis = pid[len(praefix):] if pid.startswith(praefix) else pid
+        for ent, inhalt in re.findall(r"([a-z0-9_]+):\s*\{([^}]*)\}", roh):
+            for teil, zahl in re.findall(r"([a-z0-9_+\-]+):\s*([0-9.]+)", inhalt):
+                t = teil.replace("+", "p").replace("-", "_")
+                if t[0].isdigit():          # 20_64 -> a20_64, 85p -> a85p
+                    t = "a" + t
+                key = f"i_{ent}_{t}"
+                if key in specs:
+                    lint.pruefe(abs(float(zahl) - float(specs[key])) < 1e-9,
+                                f"Bericht ⇄ Registry {pid}.{ent}.{teil}",
+                                f"Bericht {zahl} ≠ Registry {specs[key]}")
+                    abgedeckt_dict.add(key)
+
+    # Befund 384(b): VOLY traegt zwei Drittel der Bundessumme, steht aber als
+    # risikouebergreifender Parameter im Katalog, nicht in den UV-Specs — und
+    # fiel damit durch den Risiko-Abgleich. Jetzt gegen den Katalogwert geprueft.
+    voly_bericht = werte.get(f"{praefix}voly")
+    if voly_bericht:
+        try:
+            from app.data.catalog import IMPACT_CATALOG  # noqa: F401
+        except Exception:
+            pass
+        kat = os.path.join(ROOT, "app", "data", "catalog.py")
+        if os.path.exists(kat):
+            quelle = open(kat, encoding="utf-8").read()
+            treffer = re.findall(r"160_?800(?:\.0)?", quelle)
+            lint.pruefe(bool(treffer) and float(voly_bericht) == 160800.0,
+                        "Bericht ⇄ Katalog uv.voly",
+                        f"Bericht {voly_bericht}, Katalog fuehrt "
+                        f"{'160800' if treffer else 'keinen passenden Wert'}")
+
     # Befund 364: VOLLSTAENDIGKEIT — jede Registry-Spec braucht einen
     # Parameter-Block. Bis Rev. 14 deckten die Bloecke nur 15 von 28 Specs ab; die
     # uebrigen 13 (Inzidenzraten, or_out, qbar_out, r_out_enabled) wurden nie
@@ -237,6 +281,7 @@ def registry_abgleich(nr: str, werte: dict[str, str], lint: Lint) -> None:
         if roh.startswith("{"):
             for teil, _ in re.findall(r"([a-z0-9_+\-]+):\s*([0-9.]+)", roh):
                 abgedeckt.add(f"{basis}_{teil.replace('+', 'p').replace('-', '_')}")
+    abgedeckt |= abgedeckt_dict
     ohne_block = sorted(k for k in specs if k not in abgedeckt)
     lint.pruefe(not ohne_block, "Parameter-Block je Registry-Spec",
                 f"{len(ohne_block)} Specs ohne Block im Bericht: {ohne_block[:8]}")
@@ -458,6 +503,17 @@ def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> 
             # Lange Anlagen-Zeilen enthalten weiter hinten oft ein "ergaebe sich",
             # das sonst die ganze Zeile — und damit einen echten Rueckstand —
             # entschuldigt.
+            # Befund 383: In BLOCKQUOTES ab Kapitel 1 gilt KEINE Historie-Ausnahme.
+            # Das sind die Infokaesten des Produkts (§3.6: Berichtstext), und die
+            # verbliebene Ausnahme „Rev. N:" ist breit genug, dass dort ein
+            # beliebiger Revisionsverweis im Umfeld jeden abgeloesten Wert deckte.
+            # Der Kopfvermerk bleibt ueber `zeilen_start < kopf_ende` ausgenommen.
+            if zeile.lstrip().startswith(">"):
+                lint.fehler.append(
+                    f"Abgeloester Wert im {quelle}, Zeile {i} (Infokasten): "
+                    f"{wert} — {zeile.strip()[:60]}")
+                treffer += 1
+                continue
             umfeld = zeile[max(0, treffer_pos - 70):treffer_pos + 20]
             klasse = next((name for name, rx in HISTORIE_EINZELN if rx.search(umfeld)),
                           None)

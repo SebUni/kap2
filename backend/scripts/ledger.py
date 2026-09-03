@@ -89,7 +89,31 @@ class Befund:
 
 
 def _zellen(zeile: str) -> list[str]:
-    return [c.strip() for c in zeile.strip().strip("|").split("|")]
+    """Zerlegt eine Markdown-Tabellenzeile in ihre Zellen.
+
+    Splittet NUR an unmaskierten Trennzeichen (Befunde 381/382): Ein `\\|` im
+    Zellinhalt — etwa in einem Prüfausdruck wie `grep -c '^\\| 3[12][0-9] …'` —
+    gehört zum Text und darf die Zeile nicht zerlegen. Tut es das doch, bekommt
+    die Zeile eine Zelle zu viel, der Prüfausdruck wird nicht mehr gefunden und
+    die Status-Zelle rutscht: genau der Spaltenversatz, den dieses Werkzeug
+    verhindern soll.
+    """
+    roh = zeile.strip().strip("|")
+    zellen, puffer, i = [], [], 0
+    while i < len(roh):
+        if roh[i] == "\\" and i + 1 < len(roh) and roh[i + 1] == "|":
+            puffer.append("|")       # maskiertes Trennzeichen: Text, kein Trenner
+            i += 2
+            continue
+        if roh[i] == "|":
+            zellen.append("".join(puffer).strip())
+            puffer = []
+            i += 1
+            continue
+        puffer.append(roh[i])
+        i += 1
+    zellen.append("".join(puffer).strip())
+    return zellen
 
 
 def _entfette(text: str) -> str:

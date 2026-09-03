@@ -10,7 +10,8 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > §3.4, Datenebenen-Anlagepflicht §3.1; Nutzer-Entscheid, vgl. #95 Rev. 8):
 > Dieser Bericht ist geprüft konform — er plant **keinen** nationalen
 > 100-m-Vollraster-Lauf als Prüf-/Abgleichinstrument. Die benötigten Zellgrößen
-> laufen auf den **zwei verschiedenen** Wegen, die §3.1 vorsieht, und werden im
+> laufen auf den **drei** Wegen, die §3.1 vorsieht — *vorhanden*, *neu anzulegen*
+> und *geparkt (Datenquelle fehlt)* — und werden im
 > Bericht durchgängig so bezeichnet (Befunde 215/366):
 > die SSD-Ebene (DWD `sunshine_duration` 1 km, Register 98-E20-01) ist
 > „**neu anzulegen**“, vollständig spezifiziert und inzwischen angelegt (§3.2/§3.6);
@@ -117,10 +118,13 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 17 Befunden der Runde 15 nur vier umgesetzt waren — der inhaltliche Verlust ist
 > auf diese vier begrenzt und in Rev. 14 nachgezogen (Befunde 356/357).
 >
-> **Rev. 14 (03.09.2026)** = Review-Runden 16 und 17 (Befunde 336–367). Keine
+> **Rev. 14 (03.09.2026)** = Review-Runden 16, 17 und 18 (Befunde 336–380). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
-> € **339 Mio** stehen seit Rev. 11 unverändert und sind sechsmal unabhängig
-> nachgerechnet. Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
+> € **339 Mio** stehen seit Rev. 11 unverändert und sind **siebenmal** unabhängig
+> nachgerechnet. Runde 18 hat ausschließlich die Prüfmechanik betroffen: Der
+> Ratchet gegen zu enge Lint-Ausnahmen war wirkungslos, vier Prüfausdrücke
+> belegten ihren Befund nicht, und ein Kalibrierskript war unbemerkt
+> unausführbar geworden — alle drei Klassen sind jetzt maschinell abgesichert. Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
 > (Gleichgewichtslesart mit Transient-Faktor \(\tau\) = 0,20–0,48, jetzt größte
 > Achse der §4-Bändertabelle) sowie die vollständig gemessene **Punktmengen-Kette**.
 > Prüfmechanik: Ledger auf eine Zeile je Befund, Status aus **Prüfausdrücken**
