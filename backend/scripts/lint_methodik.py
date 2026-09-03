@@ -514,7 +514,13 @@ def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> 
                     f"{wert} — {zeile.strip()[:60]}")
                 treffer += 1
                 continue
-            umfeld = zeile[max(0, treffer_pos - 70):treffer_pos + 20]
+            # Umfeld-Fenster ENG (Befund 392): Die verbliebene Ausnahme deckt die
+            # Aufzaehlungsform „Rev. N: <Wert>" — dort steht der Vermerk direkt vor
+            # dem Wert (gemessen: hoechstens 25 Zeichen bei allen 12 legitimen
+            # Fundstellen). Mit 70 Zeichen deckte sie auch Geltungsbehauptungen wie
+            # „Seit Rev. 8 gilt im Produktionsmodell unveraendert k_UV = <Wert>",
+            # in denen der Vermerk gerade NICHT den Wert historisiert.
+            umfeld = zeile[max(0, treffer_pos - 25):treffer_pos + 20]
             klasse = next((name for name, rx in HISTORIE_EINZELN if rx.search(umfeld)),
                           None)
             if klasse:

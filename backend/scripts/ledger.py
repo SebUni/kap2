@@ -215,7 +215,8 @@ def parse(pfad: Path, verlauf: bool = False) -> list[Befund]:
         i_pruef = idx("prüfausdruck")
 
         for zeilennr, roh in body:
-            cells = [_entfette(c) for c in _zellen(roh)]
+            roh_zellen = _zellen(roh)
+            cells = [_entfette(c) for c in roh_zellen]
             if not cells or cells[0].startswith("---"):
                 continue
             m = re.match(r"^((?:GP-)?\d{1,3}(?:\s*[/–-]\s*\d{1,3})?(?:\s*\(≡[^)]*\))?)", cells[0])
@@ -238,7 +239,12 @@ def parse(pfad: Path, verlauf: bool = False) -> list[Befund]:
                     status=get(i_st),
                     nachweis=get(i_nw),
                     bemerkung=get(i_bem),
-                    pruefausdruck=_ausdruck(get(i_pruef)),
+                    # Rohzelle, NICHT entfettet (Befund 391): `_entfette()`
+                    # entfernt Sternchenpaare und veraendert damit das
+                    # auszufuehrende Kommando.
+                    pruefausdruck=_ausdruck(roh_zellen[i_pruef]
+                                            if i_pruef is not None
+                                            and i_pruef < len(roh_zellen) else ""),
                     zeile=zeilennr,
                     tabelle=kopfz,
                     roh=roh,
@@ -450,8 +456,16 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     befunde = parse(pfad)
     rot: list[tuple[Befund, str]] = []
     gruen: list[Befund] = []
+    # §6 laesst B-/C-Befunde auch TERMINIERT ZURUECKGESTELLT zu, und §5 kennt
+    # „abweichend geloest mit Begruendung". Beides ist keine Behauptung, ein
+    # Befund sei umgesetzt — ihr Pruefausdruck DARF rot sein, er beschreibt ja
+    # den zurueckgestellten Sollzustand. Sie werden getrennt ausgewiesen, damit
+    # der offene Rest sichtbar bleibt, statt als Fehler unterzugehen.
+    zurueck = [b for b in befunde
+               if b.lage == "zurückgestellt" or "abweichend" in b.status.lower()]
+    zurueck_nr = {b.nr for b in zurueck}
     for b in befunde:
-        if not b.pruefausdruck:
+        if not b.pruefausdruck or b.nr in zurueck_nr:
             continue
         r = subprocess.run(b.pruefausdruck, shell=True, cwd=REPO,
                            capture_output=True, text=True)
@@ -462,6 +476,8 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     # die Lage, aus der in Runde 16 neun nicht umgesetzte „übernommen" entstanden.
     unbelegt = [b for b in befunde if b.lage == "geschlossen" and not b.pruefausdruck]
     print(f"{pfad.relative_to(REPO)}: {len(befunde)} Befunde")
+    if zurueck:
+        print(f"  zurückgestellt/abw.: {len(zurueck):<4d} ({', '.join(sorted(b.nr for b in zurueck))})")
     print(f"  belegt geschlossen : {len(gruen)}")
     print(f"  Prüfausdruck ROT   : {len(rot)}")
     print(f"  unbelegt geschlossen: {len(unbelegt)}   <- Selbstauskunft, nicht geprüft")
@@ -538,6 +554,30 @@ def cmd_schliesse(pfad: Path) -> int:
     nicht umsortiert — genau daraus sind die Spaltenversaetze entstanden.
     """
     text = pfad.read_text(encoding="utf-8")
+    # Strukturkontrolle VOR dem Schliessen (Befund 391): Eine Zeile mit falscher
+    # Zellenzahl hat ein unmaskiertes Trennzeichen im Text. Ihre Zellen sind
+    # verschoben — Status und Pruefausdruck stehen dann nicht mehr dort, wo das
+    # Werkzeug sie sucht. Frueher meldete es dafuer „kein Pruefausdruck" und
+    # verschluckte den eigentlichen Fehler.
+    schief = []
+    for kopfz, spalten, body in tabellen(text.split("\n")):
+        if not ist_befundtabelle(spalten):
+            continue
+        for zeilennr, roh in body:
+            if len(_zellen(roh)) != len(spalten):
+                schief.append((zeilennr, len(_zellen(roh)), len(spalten)))
+    schiefe_zeilen = {zn for zn, _, _ in schief}
+    if schief:
+        # Nicht abbrechen: Ein Formfehler in einer Zeile darf die uebrigen nicht
+        # blockieren. Die betroffenen Zeilen werden aber NIE geschlossen — ihre
+        # Zellen sind verschoben, Status und Pruefausdruck stehen nicht dort, wo
+        # das Werkzeug sie sucht.
+        print(f"WARNUNG: {len(schief)} Zeile(n) mit falscher Zellenzahl — "
+              f"unmaskiertes Trennzeichen im Text; sie bleiben offen:",
+              file=sys.stderr)
+        for zn, ist, soll in schief[:10]:
+            print(f"  Zeile {zn}: {ist} Zellen, Kopf hat {soll}", file=sys.stderr)
+
     offen = [b for b in parse(pfad) if b.lage in ("offen", "unklar")]
     if not offen:
         print("Keine offenen Befunde.")
@@ -545,6 +585,8 @@ def cmd_schliesse(pfad: Path) -> int:
 
     geschlossen, bleibt = [], []
     for b in offen:
+        if b.zeile in schiefe_zeilen:
+            bleibt.append((b.nr, "Zeile strukturell fehlerhaft")); continue
         if not b.pruefausdruck:
             bleibt.append((b.nr, "kein Prüfausdruck")); continue
         r = subprocess.run(b.pruefausdruck, shell=True, cwd=REPO, capture_output=True)
