@@ -3,6 +3,11 @@
 # (Signal deploy_anforderung) oder von Hand: /opt/overlord/kap2/deploy/test-deploy.sh [main|<commit>]
 # Am Ende schreibt es betrieb/deploy-status.json ins Firmen-Repo und pusht — das ist das Signal.
 set -uo pipefail
+# Aus einer Kopie laufen: git reset weiter unten überschreibt sonst das laufende Skript.
+if [[ -z "${DEPLOY_KOPIE:-}" ]]; then
+  KOPIE=$(mktemp /tmp/test-deploy.XXXXXX.sh); cp "$0" "$KOPIE"; export DEPLOY_KOPIE=1
+  bash "$KOPIE" "$@"; RC=$?; rm -f "$KOPIE"; exit $RC
+fi
 REF="${1:-main}"
 PRODUKT=/opt/overlord/kap2
 FIRMA=/opt/overlord/firma-deploy
