@@ -292,8 +292,8 @@ $$ \Delta\text{Dosis}_{\text{Zelle}} \;=\; \frac{\text{SSD}_{\text{Zelle}}^{\,19
   also mit der Größe, die das Produktionsmodell summiert
   (\(\Delta F = \sum_z F_z \cdot \text{BAF} \cdot \Delta\text{Dosis}_z\)).
   Beide Gewichtungsfragen sind ergebnisrelevant: Mit dem SSD-**Trend** 1997–2022 statt
-  der Normalperioden-ΔSSD ergäbe sich 0,6320 (−8 %; die beiden SSD-Felder korrelieren
-  nur mit **r = 0,24**, Befund 266); mit **Köpfen** statt Fällen 0,6644, der
+  der Normalperioden-ΔSSD ergäbe sich 0,6320, der geführte Wert liegt also **+5,7 %**
+  darüber (die beiden SSD-Felder korrelieren nur mit **r = 0,24**, Befund 266); mit **Köpfen** statt Fällen 0,6644, der
   geführte Wert liegt also **+0,6 %** darüber (Befund 278). Beide Sensitivitäten
   stammen aus der Anlage [73], sie werden nicht im Text fortgeschrieben.
 

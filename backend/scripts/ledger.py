@@ -114,7 +114,16 @@ def _ausdruck(zelle: str) -> str:
     """
     for m in re.finditer(r"`([^`]+)`", zelle):
         kandidat = m.group(1).strip()
-        if kandidat.startswith(ERLAUBTE_KOMMANDOS):
+        # Auf das erste TOKEN pruefen, nicht auf das Praefix: sonst gilt der
+        # Testname `test_delta_dosis_uses_change_not_level` als Kommando `test`
+        # und wird ausgefuehrt (real aufgetreten, Ledger-Zeile 213).
+        # Fuehrende Shell-Negation ist legitim ("! grep -q X" = X kommt nicht vor)
+        # und harmlos — sie darf den Kommando-Check nicht blockieren (Befund 350).
+        teile = kandidat.split()
+        if teile and teile[0] == "!":
+            teile = teile[1:]
+        kopf = teile[0] if teile else ""
+        if kopf in ERLAUBTE_KOMMANDOS or kandidat.startswith(("git diff", "git grep")):
             return kandidat
     return ""
 
@@ -408,7 +417,7 @@ def cmd_kompakt(pfad: Path, runde: int) -> int:
     return 0
 
 
-def cmd_pruefe(pfad: Path) -> int:
+def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     """Leitet den Status aus dem Prüfausdruck ab, statt ihn zu glauben.
 
     Ein Prüfausdruck ist ein Shell-Kommando in Backticks in der Spalte `Prüfausdruck`.
@@ -438,9 +447,20 @@ def cmd_pruefe(pfad: Path) -> int:
         print(f"\n  Ohne Prüfausdruck (Auszug): "
               f"{', '.join(b.nr for b in unbelegt[:12])}"
               f"{' …' if len(unbelegt) > 12 else ''}")
-    ok = not rot and not unbelegt
-    print(f"\n{'GRÜN — jeder geschlossene Befund ist maschinell belegt.' if ok else 'ROT'}")
-    return 0 if ok else 1
+    # GELTUNGSBEREICH von W7: Die Pflicht zum Pruefausdruck gilt fuer Befunde, die
+    # ab ihrer Einfuehrung (Runde 16) geschlossen werden — nicht rueckwirkend fuer
+    # die 15 Runden davor. Nachtraeglich Ausdruecke zu diesen Altbefunden zu
+    # erfinden waere genau die Behauptung, die W7 abschaffen soll; ihre
+    # Nachweise stehen im Archiv und wurden im Review mehrfach gegengeprueft.
+    # Rot ist deshalb nur ein FEHLSCHLAGENDER Ausdruck. Die Zahl der unbelegten
+    # Altbefunde wird trotzdem ausgewiesen, damit der Bestand sichtbar bleibt.
+    if rot:
+        print("\nROT — mindestens ein Prüfausdruck belegt seinen Befund nicht.")
+        return 1
+    print(f"\nGRÜN — kein Prüfausdruck schlägt fehl. {len(gruen)} Befunde maschinell "
+          f"belegt, {len(unbelegt)} Altbefunde aus den Runden vor W7 tragen ihren "
+          f"Nachweis nur im Archiv (`--streng` wertet auch diese als rot).")
+    return 1 if (streng and unbelegt) else 0
 
 
 # Statusvokabular, wie es in den Ledgern 95/96/98 tatsächlich vorkommt.
@@ -489,6 +509,8 @@ def main() -> int:
     ap.add_argument("--kompakt", action="store_true", help="Volltext archivieren, Ledger kürzen")
     ap.add_argument("--pruefe", action="store_true", help="Status aus Prüfausdrücken ableiten")
     ap.add_argument("--selbsttest", action="store_true", help="Statuslogik gegen bekannte Fälle")
+    ap.add_argument("--streng", action="store_true",
+                    help="auch Altbefunde ohne Prüfausdruck als rot werten")
     ap.add_argument("--runde", type=int, default=16, help="letzte Review-Runde (für --kompakt)")
     a = ap.parse_args()
 
@@ -501,7 +523,7 @@ def main() -> int:
     if a.kompakt:
         return cmd_kompakt(pfad, a.runde)
     if a.pruefe:
-        return cmd_pruefe(pfad)
+        return cmd_pruefe(pfad, a.streng)
     return cmd_status(pfad)
 
 

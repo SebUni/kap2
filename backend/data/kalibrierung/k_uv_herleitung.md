@@ -18,10 +18,33 @@ Das Raster gibt die **Globalstrahlung** nahezu exakt wieder, die **Sonnenscheind
 $$ k_{UV} = \frac{\Delta Dosis}{\Delta Global}\bigg|_{Station} \times \frac{\Delta Global}{\Delta SSD}\bigg|_{Raster} $$
 
 - **Stationsquotient = 4.9 ÷ 4.6 = 1.0652** — beide Werte publiziert (Tab. 2 bzw. Tab. 4). Das ist die quantitative Fassung der Abstract-Aussage 》Global radiation increases similarly to the UV data《.
-- **Rasterquotient = 0.6683**, gewichtet mit ``Baseline-Fällen × ΔSSD_Normalperiode`` über 10.682 Gemeindepunkten, also mit genau der Größe, die das Produktionsmodell summiert (Befund 266/278; Kopfgewichtung ergäbe 0.6644, MM allein 0.6674, C44 allein 0.6689 — geführt wird das €-gewichtete Mittel bei einem MM-Anteil von 0.4316 — hergeleitet, nicht gesetzt (Befund 290) —, Restdifferenz < 0,2 % als Näherung gekennzeichnet). An der Messzelle allein: 0.6811. Mit dem SSD-**Trend** gewichtet ergäbe sich 0.6320 (+5.7%); die beiden SSD-Felder korrelieren nur mit r = 0.24, die Wahl des Gewichts ist also nicht neutral.
+- **Rasterquotient = 0.6683**, gewichtet mit ``Baseline-Fällen × ΔSSD_Normalperiode`` über 10.682 Gemeindepunkten, also mit der Größe, die das Produktionsmodell summiert (Befund 266/278; Kopfgewichtung ergäbe 0.6644, MM allein 0.6674, C44 allein 0.6689 — geführt wird das €-gewichtete Mittel bei einem MM-Anteil von 0.4316 — hergeleitet, nicht gesetzt (Befund 290) —, Restdifferenz < 0,2 % als Näherung gekennzeichnet). An der Messzelle allein: 0.6811. Mit dem SSD-**Trend** gewichtet ergäbe sich 0.6320 (+5.7%); die beiden SSD-Felder korrelieren nur mit r = 0.24, die Wahl des Gewichts ist also nicht neutral.
+- **Gekennzeichnete Näherung (§3.9):** Die Fallgewichte bilden die kommunale Altersstruktur über ``share_over_65`` ab; die Aufteilung innerhalb u65 und 65+ folgt einem bundesweit konstanten Schlüssel (``NATIONAL_SENIOR_SPLIT``), nicht den fünf Bändern des Produktionsmodells. Wirkung gegen reine Kopfgewichtung: +0.6%.
+
+### Punktmengen-Kette
+
+Alle drei Stufen gemessen, nicht fortgeschrieben (Befund 338):
+
+- **10.853** Gemeindepunkte mit Einwohnerzahl (BKG VG250 ``vg250_pk`` × Zensus-Aggregat)
+- **10.739** davon mit auswertbaren Trendreihen in beiden Rastern (endlicher SSD- und Globalstrahlungstrend, ΔSSD > 0)
+- **10.682** nach dem Stabilitätsausschluss (SSD-Trend ≥ 1 %/Dekade) — die Menge, über die q und die Perzentile der Modellgrenze 9 laufen
+
+### Ausschluss-Schwelle für instabile Punktquotienten
+
+Punkte mit verschwindendem SSD-Trend erzeugen numerisch instabile Quotienten (der Nenner geht gegen null), nicht kleine. Die Schwelle ist eine **gekennzeichnete Abschätzung** (§3.9); geführt wird 1 %/Dekade. Alle Werte €-gewichtet wie q selbst:
+
+| Schwelle SSD-Trend | Punkte | q | Abweichung zur geführten Wahl |
+|---|---|---|---|
+| ≥ 0.00 %/Dek. | 10.739 | 0.6843 | +2.40% |
+| ≥ 0.25 %/Dek. | 10.712 | 0.6698 | +0.22% |
+| ≥ 0.50 %/Dek. | 10.705 | 0.6691 | +0.13% |
+| ≥ 1.00 %/Dek. **(geführt)** | 10.682 | 0.6683 | +0.00% |
+| ≥ 2.00 %/Dek. | 10.589 | 0.6626 | -0.85% |
+| ≥ 3.00 %/Dek. | 10.196 | 0.6499 | -2.75% |
+
 - **k_UV = 1.0652 × 0.6683 = 0.7119**
 
-Der bevölkerungsgewichtete Bundeswert ist der richtige Bezug für die Bundessumme — dieselbe Logik, die Befund 223 für ΔSSD festgestellt hat.
+Der fallgewichtete Bundeswert ist der richtige Bezug für die Bundessumme — dieselbe Logik, die Befund 223 für ΔSSD festgestellt hat.
 
 ## 3 Band aus den publizierten Standardfehlern
 
@@ -45,7 +68,7 @@ Verteilung über 10.682 Gemeindepunkte mit einem SSD-Trend ≥ 1 %/Dekade (darun
 ## 5 Verworfene Ketten
 
 - NRW-Gebietsmittel 5.81 %/Dek. ⇒ 0.8434 (bis Rev. 3): Punkt-Zähler gegen Landesflächenmittel (Befund 230).
-- Raster-SSD an der Messzelle ⇒ 0.7405 (Rev. 4): Zähler weiter Station — halber Mismatch (Befund 238).
+- Raster-SSD an der Messzelle ⇒ 0.7405 (Rechnung mit der Messzelle Bochum; **nicht** der Rev.-4-Stand, der 0,7562 führte): Zähler weiter Station — halber Mismatch (Befund 238).
 - Stationsquotient 0,867 aus 》roughly twice《 ⇒ 0,5782 (Rev. 5) bzw. 1,0 aus 》similarly《 ⇒ 0,6667 (Rev. 6): beides Ersatzkonstruktionen für eine Größe, die der Volltext beziffert (Befund 252).
 
 ## 6 Ozon im Messfenster (Befunde 246/258)
