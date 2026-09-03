@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runde 16, Befunde 336–352) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–18, Befunde 336–380) — im Review** ·
 03.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -17,7 +17,11 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > die Außenbeschäftigten-Ebene (98-OUT-01) ist „**geparkt** (Datenquelle fehlt)“
 > mit Beschaffungs-Watchlist — für sie existiert keine keyless Zellquelle, und ihr
 > Parameter \(r_{\text{out}}\) läuft dokumentiert auf dem Zentrierungs-Neutralwert
-> \(q = \bar q\) ⇒ Faktor 1. Alle übrigen Zellgrößen sind vorhanden oder
+> \(q = \bar q\) ⇒ Faktor 1. **Ebenso geparkt ist die Verhaltens-Ebene**
+> \(\varphi_{\text{Komfort}}\) (98-S154-01, Befund 378): auch für sie fehlt eine
+> keyless kommunale Quelle, ihr Parameter \(v_{\text{verh}}\) läuft auf dem
+> Neutralwert 1 und ist als eigene Achse in §4 ausgewiesen. Es sind also **zwei**
+> geparkte Ebenen, nicht eine. Alle übrigen Zellgrößen sind vorhanden oder
 > regional/national.
 
 > **Revisionsstand.** Rev. 1 (30.08.2026) = Migration des #98-Anteils von M0 Rev. 5
@@ -1048,14 +1052,16 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   | \(v_{\text{verh}}\) (geparkt) | \(\phi\) ∈ [0; 0,25] | 339 – 377 | ±0 % … +11,3 % |
 
   **Gesamtband ≈ 115–737 Mio €** = nur die \(k_{\text{UV}}\)/\(a_{\text{attr}}\)/\(c_e\)-Kombination;
-  die übrigen Zeilen sind **nicht** hineinmultipliziert. Dominanter Treiber ist die
+  die übrigen Zeilen sind **nicht** hineinmultipliziert. Größte Achse ist der
+  einseitige Transient-Faktor \(\tau\) (§3.4); größter **zweiseitiger** Treiber ist die
   \(k_{\text{UV}}\)-Messunsicherheit (±49 %); danach folgen \(a_{\text{attr}}\)
   (±33,3 %) und BAF_MM (±28,8 %) — die Reihenfolge entspricht der Tabelle darüber
   (Befund 282; bis Rev. 8 stand hier eine abweichende Rangfolge). Seit Rev. 3 erzeugt
   die Anlage [71] alle Zeilen; \(a_{\text{attr}}\) ist seit Rev. 8 als eigene Achse
   ausgewiesen (Befund 261).
 - **Unsicherheiten (nach Größe geordnet, Befunde 250/268):**
-  Die Reihenfolge folgt der Bändertabelle darüber (Befund 361). **Größte Achse ist
+  Aufgezählt wird hier **nach Größe**; die Bändertabelle darüber ist nach Sachgruppen
+  geordnet, nicht nach Größe (Befunde 361/370). **Größte Achse ist
   der Transient-Faktor \(\tau\)** (0,20–1,00 ⇒ **−80 %**, §3.4): Er trennt die
   ausgewiesene Gleichgewichtslesart von einer reinen Jahres-Attribution und ist
   einseitig — er kann das Ergebnis nur senken. Danach die
@@ -1402,7 +1408,6 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
-```
 
 parameter:
   id: uv.i_mm
@@ -1412,10 +1417,12 @@ parameter:
                # abgebildet (2 sigma = +/-10,1 %, Anlage [71]), nicht als
                # Parameter-Band: die Raten sind gemeinsam abgelesen und korreliert.
   herkunft: herleitung:#anker
-  quelle: zfkd_kid_2025   # Abb. 3.13.2, altersspezifische Rohraten Melanom (C43)
+  quelle: zfkd_kid2025   # Abb. 3.13.2, altersspezifische Rohraten Melanom (C43)
   preisstand: null
-  bandzuordnung: struktur   # geht in die Struktur-Validierung, nicht in das Ergebnisband
-  endpunkt: inzidenz_mm
+  bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]   # bandweise Raten;
+               # die Ableseunsicherheit wirkt ueber die Struktur-Validierung,
+               # nicht als eigenes Ergebnisband (Befund 373)
+  endpunkt: beide
 
 parameter:
   id: uv.i_c44
@@ -1424,10 +1431,10 @@ parameter:
   band: null   # wie uv.i_mm — gemeinsame Ablesekette, Toleranz in der
                # Struktur-Validierung (Anlage [71]).
   herkunft: herleitung:#anker
-  quelle: zfkd_kid_2025   # Abb. 3.14.2, altersspezifische Rohraten heller Hautkrebs (C44)
+  quelle: zfkd_kid2025   # Abb. 3.14.2, altersspezifische Rohraten heller Hautkrebs (C44)
   preisstand: null
-  bandzuordnung: struktur
-  endpunkt: inzidenz_c44
+  bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
+  endpunkt: beide
 
 parameter:
   id: uv.or_out
@@ -1435,10 +1442,11 @@ parameter:
   einheit: "Odds Ratio"
   band: [1.37, 2.30]   # 95-%-KI der Meta-Analyse; Kohorten-Teilmenge 1,68 [1,08-2,63]
   herkunft: register:98-OUT-01
-  quelle: schmitt_2011_aussenberufe   # Meta-Analyse, SCC bei Aussenberufen
+  quelle: schmitt2011_destatis_vgr   # Meta-Analyse, SCC bei Aussenberufen
   preisstand: null
-  bandzuordnung: sensitivitaet   # wirkt nur ueber r_out, nicht im Basiswert (§3.4)
-  endpunkt: inzidenz_c44
+  bandzuordnung: [20-64, 65-74, 75-84, 85+]   # Aussenberufe: nicht u20
+               # (Befunde 218/373); wirkt nur ueber r_out, nicht im Basiswert (§3.4)
+  endpunkt: beide
 
 parameter:
   id: uv.qbar_out
@@ -1447,10 +1455,10 @@ parameter:
   band: [0.0, 0.21]   # 0 = Ebene geparkt; 0,21 = dreifacher Bundesanteil als
                       # Obergrenze fuer stark landwirtschaftlich gepraegte Kommunen
   herkunft: herleitung:#q-out
-  quelle: destatis_vgr_2023_erwerbstaetige   # (572+2.643)/45.909 Tsd. = 0,070
+  quelle: schmitt2011_destatis_vgr   # (572+2.643)/45.909 Tsd. = 0,070
   preisstand: null
-  bandzuordnung: sensitivitaet
-  endpunkt: inzidenz_c44
+  bandzuordnung: [20-64, 65-74, 75-84, 85+]   # nicht u20 (Befund 218)
+  endpunkt: beide
 
 parameter:
   id: uv.r_out_enabled
@@ -1459,10 +1467,13 @@ parameter:
   band: [0.0, 1.0]   # 0 = aus (Basiswert, §3.4: Aussenberufs-Ebene ist geparkt);
                      # 1 = an, sobald eine kommunale Aussenberufs-Quote vorliegt
   herkunft: register:98-OUT-01
-  quelle: bericht_98_paragraph_3_4   # Sensitivitaetsband, nicht im Basiswert
+  quelle: schmitt2011_destatis_vgr   # Schalter der r_out-Ebene; Evidenz wie or_out
+          # (Befund 374: keine Selbstreferenz auf den eigenen Bericht)
   preisstand: null
-  bandzuordnung: sensitivitaet
-  endpunkt: inzidenz_c44
+  bandzuordnung: [20-64, 65-74, 75-84, 85+]   # nicht u20 (Befund 218)
+  endpunkt: beide
+```
+
 
 ## 8 Quellen (§3.8 — #98-relevanter Auszug; Nummern = M0-Zählung, [69]–[70] neu)
 
@@ -1678,11 +1689,11 @@ Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 | 11 | Verhaltens-Modulation (S154)? | **Default 1**, Band +0,25…+0,60 je Komforttag dokumentiert | keine DE-Effektgröße [36]; US-Evidenz nur Band; Ambient-Anteil schon in ΔDosis (Doppelzählungsschutz) | v_verh im Basiswert | Untergrenze der KWRA-Verhaltens-These |
 | 12 | Maßnahmen-Hebel? | **beide qualitativ** (aktualisiert nach Befund 203): UV-Schutz/Kommunikation ohne Effektgröße; SCS-Förderung mit belegtem Sparpotenzial, aber Kostenwirkung bereits im Basiswert (Untergrenzen-\(c_e\)) | GP-Befunde 26/34 + Befund 203 (LF-4-Wächter); Detektionsmix-Parameter als Ersetzungspfad | Mix-Parameter sofort einführen (Datenlücke: kommunale SCS-Quoten) | Hebelliste ehrlich; kein Doppelzählungsrisiko |
 | 13 | R36 im Basiswert? | **Default 1** (nur Schicht A) | keine Evidenz; Zugangseffekt steckt im SCS-Hebel | Distanz-Sensitivität | Basiswert schlanker |
-| 14 ⚠ | Latenz-Behandlung? | **Gleichgewichtslesart** („eingelaufenes Risiko") + Pflicht-Infokasten; kein Latenz-Discounting | [35] nennt „Jahrzehnte" ohne Bezifferung; der Rechenschritt kumulative → jährliche Dosis steht in §3.4 mit Transient-Faktor \(\tau\) = 0,17–0,41 | Kohorten-Latenzmodell (M2+) | **Ergebnis wird gegenüber einer Jahres-Attribution überschätzt** — größte Einzelachse der §4-Bändertabelle (58–339 Mio) |
+| 14 ⚠ | Latenz-Behandlung? | **Gleichgewichtslesart** („eingelaufenes Risiko") + Pflicht-Infokasten; kein Latenz-Discounting | [35] nennt „Jahrzehnte" ohne Bezifferung; der Rechenschritt kumulative → jährliche Dosis steht in §3.4 mit Transient-Faktor \(\tau\) = 0,20–0,48 | Kohorten-Latenzmodell (M2+) | **Ergebnis wird gegenüber einer Jahres-Attribution überschätzt** — größte Einzelachse der §4-Bändertabelle (67–339 Mio) |
 | 15 ⚠ | Kalibrierung? | **ein Normierungsskalar je Entität** an der ZfKD-Inzidenz (Werte s. Nr. 16); keine Zeitreihen-Kalibrierung des Klimaanteils (keine amtliche Reihe existiert — dokumentierte Ausnahme analog #96) | §3.4 („EIN Skalar"); Klimaanteil messungsbasiert (SSD/Dosis/BAF) | Fit an KKR-Kostenreihe (konfundiert durch Screening/Kodierung — verworfen) | Baseline amtlich exakt; Klimaanteil über Bänder |
 | 16 ⚠ | Ankerfenster der Baseline? | **Mittel 2021–2023** (MM 26.870 · C44 240.973) statt Einzeljahr 2023 ⇒ c_kal 1,0012/0,9910, λ 0,11466/0,005236 | Befund 220: Die abgelesenen Altersraten sind laut Abbildungstitel über **genau diese drei Jahre gepoolt** — ein Einzeljahres-Anker hätte Zähler und Nenner in verschiedenen Fenstern geführt (§3.4 einheitliche Auswahlregel, §3.9 keine Kategorienfehler). Nebenbefund: Die Ablese-Validierung verbessert sich von −2,2 %/+0,1 % auf −0,1 %/+0,9 % | Einzeljahr 2023 beibehalten und die Differenz nur als Sensitivität ausweisen (Vorschlag des Befunds) | **€-Summe 378 → 367 Mio (−2,8 %)**; ΔF 20.900 → 20.760; YLL 1.580 → 1.521; alle Golden-Tests und die Registry nachgezogen |
 | 17 ⚠ | Wirkungsort von v_verh? | **Jahresfaktor** \(v_{\text{verh}} = 1+\phi_{\text{Komfort}}(s-1)\); der Tageswert s = 1,45 bleibt Register-Zeile und ist **kein** Registry-Parameter; \(\phi\)-Ebene **geparkt**, Neutralwert 0 | Befund 216: Rev. 1 stellte ein Registry-Band [1,0–1,6] bereit, das als Tageswert definiert, im Modell aber auf die **Jahres**-ΔDosis multipliziert wurde — bei ~40 Komforttagen rund Faktor 9 zu hoch. §3.5 verlangt einen definierten Wirkungsort, §3.6 einen editierbaren Parameter mit gültiger Semantik | \(\phi\) sofort als Zellgröße bauen (DWD-Tagestemperatur × Tagesdosis — kein keyless Kombinationsdatensatz); oder v_verh ganz aus der Registry nehmen | Basiswert unverändert (Default 1); Band jetzt einstellbar und korrekt: 1,00–1,11 ⇒ € bis 409 Mio |
-| 18 | k_UV in der Registry? | **0,8434** (Herleitungswert 4,9/5,81) statt gerundet 0,84 | Befund 213: Die gerundete Registry-Zahl erzeugte 0,5 % relative Divergenz zwischen Bericht und Produktion. §3.9 verlangt den Rechenschritt; die Gegenvariante (alle Prosa-Ergebniswerte auf die gerundete Kette umstellen) wäre teurer und ungenauer | Prosa auf 0,84 umstellen | Divergenz geschlossen; Ergebniswerte des Berichts sind aus der Registry exakt reproduzierbar |
+| 18 | k_UV in der Registry? | **0,8434** (Herleitungswert 4,9/5,81) statt gerundet 0,84 — **abgelöst durch Nr. 23–25 und 27; geltend ist 0,7119** (Befund 380) | Befund 213: Die gerundete Registry-Zahl erzeugte 0,5 % relative Divergenz zwischen Bericht und Produktion. §3.9 verlangt den Rechenschritt; die Gegenvariante (alle Prosa-Ergebniswerte auf die gerundete Kette umstellen) wäre teurer und ungenauer | Prosa auf 0,84 umstellen | Divergenz geschlossen; Ergebniswerte des Berichts sind aus der Registry exakt reproduzierbar |
 | 19 ⚠ | Gewichtung der nationalen ΔSSD? | **Bevölkerungsgewichtet auf Gemeindepunkt-Ebene** (DE 8,51 % statt flächengewichtet 7,82 %); neue Anlage [72], die die SSD über die Produktfunktion liest | Befund 223 (**A**): Das Produktionsmodell summiert bevölkerungsgewichtet über Zellen; §3.4 erklärt Näherungswerte bei bevölkerungsgewichteter Exposition für unzulässig. **W1** (saubere Lösung erreichbar) + **W4** (Gemeindepunkt-Ebene statt Vollraster, Lesen über die Produktfunktion) | Flächenmittel beibehalten und die Abweichung nur als Näherung ausweisen — verworfen, weil §3.4 die Klasse ausdrücklich ausschließt und #95 sie in Rev. 8 bereits gelöst hat | **€ 367 → 401 Mio (+8,8 %)**; YLL 1.521 → 1.664; ΔF 20.763 → 22.595; Band 116–636 → 127–694 Mio |
 | 20 | Fenster von L̄_e? | **Jahresmediane des Ankerfensters**, sterbefallgewichtet über alle Jahre und Geschlechter ⇒ MM 10,4569 · C44 5,4787 | Befund 224 (**B**): Bis Rev. 2 stand das Sterbealter des Einzeljahrs 2023 dort, begründet mit einer Konstanz, die Tab. 3.13.1/3.14.1 nicht hergeben (M 76/**77**/76 bzw. 84/84/**85**). §3.4 verlangt eine einheitliche Jahres-Auswahlregel, §3.9 die Neurechnung bei geänderter Basis. **W1** (Sterbetafel liegt vor) | 2023-Wahl beibehalten und als Auswahlregel begründen — verworfen, weil sie dann von Anker/c_kal/λ abwiche | L̄_MM −1,16 %, L̄_C44 **+3,37 %**; YLL netto +0,5 % |
 | 21 ⚠ | Band 20–64 feiner führen? | **Nein — Restfehler beziffert und als Modellgrenze 7 geführt** (≈ ±4 % je Kommune); Bänderung unverändert | Befund 225 (**B**): Die feinere Lösung wäre fachlich richtig und die Daten liegen je Zelle vor — sie greift aber in `pollen_age_bands`/`zensus_loader`, also in die von #96 mitgenutzte Kette. **W2** (risikolokal vor Produktumbau) verlangt hier die risikolokale Variante; ein #98-eigener Zellsplit ohne Loader-Eingriff ist nicht möglich, weil die 5-Jahres-Gruppen nicht im CellContext ankommen. §3.9 deckt die bezifferte Näherung | Bänderung produktweit auf 20–44/45–64 umstellen (Ersetzungspfad, §6 Modellgrenze 7) — als **produktweiter** Schritt zu führen, nicht als #98-Alleingang | Bundessumme unberührt; kommunale Differenzierung ±4 % dokumentiert statt still |

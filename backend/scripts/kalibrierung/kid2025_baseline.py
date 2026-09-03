@@ -99,12 +99,16 @@ I_ROH = {
 # Modellparameter (Bericht §3.1–§3.4)
 K_UV = (4.9 / 4.6) * 0.6683   # = 0,7119 — Bruecke ueber die Globalstrahlung;
                               # Stationsquotient 4,9/4,6 aus Lorenz 2024 Tab. 2 und Tab. 4
-                              # (Volltext); Rasterquotient bevoelkerungsgewichtet ueber
+                              # (Volltext); Rasterquotient fallgewichtet (Baseline-Faelle x dSSD) ueber
                               # 10.682 Gemeindepunkte (Anlage k_uv_herleitung.py)
-                                                      K_UV_BAND = (0.3622, 1.0616)   # publizierte Standardfehler beider Stationstrends,
+K_UV_BAND = (0.3622, 1.0616)   # publizierte Standardfehler beider Stationstrends,
                                # unkorreliert fortgepflanzt (+/-49,1 %, 1 sigma);
                                # Befunde 255/256 — die raeumliche Streuung ist eine
                                # MODELLGRENZE, kein Band der Bundessumme
+# Transient-Faktor (Befunde 247/362/371): tau = (T/2)/a mit T = 30 Jahren
+# Normalperiodenversatz und dem ERKRANKUNGSalter a = 63-76 ([27])
+# => 0,1974 .. 0,2381. Gefuehrt wird die untere Stuetze als Achsen-Endpunkt.
+TAU_UNTEN = round((30 / 2) / 76, 4)
 A_ATTR = 0.75
 BAF = {"mm": 0.6, "c44": 0.75 * 1.4 + 0.25 * 2.5}
 C_FALL = {"mm": 6_724.0, "c44": 5_883.0}
@@ -424,6 +428,11 @@ def main() -> None:
         ("r_out (geparkt, zentriert)", "q_out ∈ [0; 0,21]", euro, euro),
         ("v_verh (geparkt)", f"φ ∈ [0; {PHI_BAND_OBEN:.2f}]",
          sums(phi=0.0)[3], sums(phi=PHI_BAND_OBEN)[3]),
+        # Einseitige Achse: tau kann das Ergebnis nur senken. Sie ist die groesste
+        # Einzelachse und wurde bis Rev. 14 nur im Bericht behauptet (Befund 371).
+        ("Transient-Faktor τ (Gleichgewicht ↔ Jahres-Lesart)",
+         f"{TAU_UNTEN:.2f} / 1,00".replace(".", ","),
+         euro * TAU_UNTEN, euro),
     ]
     for name, spanne, lo, hi in spannen:
         if hi is None or abs(hi - lo) < 1.0:

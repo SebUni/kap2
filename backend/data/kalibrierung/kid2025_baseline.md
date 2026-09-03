@@ -83,6 +83,7 @@ Alle Zeilen der Berichts-Tabelle §4 werden hier erzeugt — auch die beiden zen
 | w_SCC | 0,25 / 0,50 | 339 – 370 | +0.0% … +9.3% |
 | r_out (geparkt, zentriert) | q_out ∈ [0; 0,21] | 339 | +0.0% |
 | v_verh (geparkt) | φ ∈ [0; 0.25] | 339 – 377 | +0.0% … +11.3% |
+| Transient-Faktor τ (Gleichgewicht ↔ Jahres-Lesart) | 0,20 / 1,00 | 67 – 339 | -80.3% … +0.0% |
 
 ## 5 Beispielzelle (1.000 EW im Bundesmix, Region Mitte)
 

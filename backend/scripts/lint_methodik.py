@@ -54,17 +54,17 @@ VERBOTEN = ("Platzhalter", "wird bei Implementierung", "wird später",
 # eine Klasse, die die ganze Korrekturhistorie deckt — nicht sieben Ausnahmen,
 # die je eine Zeile decken.
 HISTORIE_MUSTER: tuple[tuple[str, str], ...] = (
-    ("Korrekturhistorie", r"Korrekturhistorie"),   # Kapitel abgeloester Staende
-    ("Historie:", r"Historie:"),                   # Inline-Historienvermerk
-    ("bis Rev. N", r"bis Rev\. \d"),               # „galt bis Rev. 7"
-    ("Rev. N:", r"Rev\.-? ?\d+[-:) ]"),           # datierter Revisionsvermerk
-    ("abgelöst", r"abgelöst"),                     # ausdrueckliche Abloesung
-    ("Entscheidungslog", r"Entscheidungslog"),     # Log-Tabelle
-    ("Ledger-Tabellenzeile", r"^\s*\| ?\d+ ?⚠?\s*\|"),
-    ("Verworfene", r"Verworfene"),                 # Verworfen-Listen der Anlagen
-    ("statt gerundet", r"statt gerundet"),         # Rundungs-Gegenueberstellung
-    ("Gegenvariante", r"Gegenvariante"),
-    ("Alternative", r"Alternative"))
+    # NUR NOCH EINE Ausnahme (Befund 375). Gemessen wurde, was jede Ausnahme im
+    # Ist-Dokument tatsaechlich deckt: „Rev. N:" deckte 12 Fundstellen, die zehn
+    # uebrigen deckten NULL — sie waren reiner Ballast und zugleich Angriffsflaeche.
+    # Ein Negativtest hat das belegt: eine eingeschleuste Zeile, die einen
+    # abgeloesten k_UV-Wert als geltend ausgab, blieb gruen — das haeufige
+    # Fliesstext-Wort „Alternative" im Umfeld deckte sie. Jede Ausnahme ist eine Luecke; eine, die nichts
+    # deckt, ist eine Luecke ohne Gegenwert. Strukturelle Faelle (Ledger-Tabellen,
+    # Kopfvermerk, Verworfen-Kapitel) traegt `ganz_historie` bzw.
+    # `historie_abschnitt` — sie brauchen keinen Fliesstext-Treffer im Umfeld.
+    ("Rev. N:", r"Rev\.-? ?\d+[-:) ]"),          # datierter Revisionsvermerk
+)
 HISTORIE = re.compile("(" + "|".join(m for _, m in HISTORIE_MUSTER) + ")", re.M)
 HISTORIE_EINZELN = tuple((name, re.compile(muster, re.M))
                          for name, muster in HISTORIE_MUSTER)
@@ -348,6 +348,13 @@ def ausnahmen_zu_eng(lint: Lint) -> None:
     # Kommt ihr Muster im ganzen Pruefgut kaum vor und verdeckt dabei einen
     # abgeloesten Wert, ist sie eine getarnte Einzelfreigabe.
     MINDESTVORKOMMEN = 3
+    # Eine Ausnahme, die im Ist-Dokument NICHTS deckt, ist Ballast: Sie kann nur
+    # kuenftige Funde verdecken, nie einen berechtigten Fall retten (Befund 375).
+    for name, _ in HISTORIE_MUSTER:
+        if name not in UNTERDRUECKT and MUSTER_VORKOMMEN.get(name, 0):
+            lint.fehler.append(
+                f"Historie-Ausnahme ohne Gegenwert: \u201e{name}\u201c deckt im "
+                f"Pruefgut keine einzige Fundstelle — entfernen (Befund 375)")
     for muster, funde in sorted(UNTERDRUECKT.items()):
         vorkommen = MUSTER_VORKOMMEN.get(muster, 0)
         if vorkommen < MINDESTVORKOMMEN:
@@ -742,6 +749,25 @@ def pruefe_bericht(pfad: str) -> bool:
         if os.path.exists(pfad_q):
             abgeloeste_werte(nr, open(pfad_q, encoding="utf-8").read(), lint,
                              quelle=f"Code {os.path.basename(rel)}")
+    # Kalibrierskripte muessen wenigstens syntaktisch lauffaehig sein. Anlass: Ein
+    # verrutschter Patch hatte kid2025_baseline.py unausfuehrbar gemacht, und das
+    # fiel nicht auf — der Lint prueft die ERZEUGTEN Anlagen, nicht die Erzeuger,
+    # und die Anlage lag noch vom letzten funktionierenden Lauf vor.
+    import ast as _ast
+    for rel in ("scripts/kalibrierung/k_uv_herleitung.py",
+                "scripts/kalibrierung/kid2025_baseline.py",
+                "scripts/kalibrierung/ssd_povw.py"):
+        pfad_s = os.path.join(ROOT, rel)
+        if not os.path.exists(pfad_s):
+            continue
+        try:
+            _ast.parse(open(pfad_s, encoding="utf-8").read())
+            lint.ok.append(f"Kalibrierskript parsebar: {os.path.basename(rel)}")
+        except SyntaxError as exc:
+            lint.fehler.append(
+                f"Kalibrierskript {os.path.basename(rel)} nicht ausfuehrbar: "
+                f"Zeile {exc.lineno} — {exc.msg}")
+
     # Erst wenn alle Quellen gelesen sind, laesst sich sagen, ob eine Ausnahme im
     # gesamten Pruefgut nur eine Stelle deckt (Befund 343).
     ausnahmen_zu_eng(lint)

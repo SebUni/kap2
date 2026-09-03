@@ -501,6 +501,88 @@ def cmd_selbsttest() -> int:
     return 1 if fehler else 0
 
 
+def cmd_schliesse(pfad: Path) -> int:
+    """Schliesst offene Befunde, deren Pruefausdruck gruen ist (W7).
+
+    Der Status wird nicht gesetzt, sondern ABGELEITET: Nur was sein eigener
+    Pruefausdruck belegt, gilt als geschlossen. Ohne Ausdruck oder mit rotem
+    Ausdruck bleibt ein Befund offen.
+
+    Gearbeitet wird **positionsunabhaengig**: `parse()` findet die Befundzeile,
+    wo immer sie steht (Runden-Abschnitte am Dateiende eingeschlossen), und nur
+    ihre Status-Zelle wird ersetzt. Zeilen werden nicht verschoben und Zellen
+    nicht umsortiert — genau daraus sind die Spaltenversaetze entstanden.
+    """
+    text = pfad.read_text(encoding="utf-8")
+    offen = [b for b in parse(pfad) if b.lage in ("offen", "unklar")]
+    if not offen:
+        print("Keine offenen Befunde.")
+        return 0
+
+    geschlossen, bleibt = [], []
+    for b in offen:
+        if not b.pruefausdruck:
+            bleibt.append((b.nr, "kein Prüfausdruck")); continue
+        r = subprocess.run(b.pruefausdruck, shell=True, cwd=REPO, capture_output=True)
+        if r.returncode != 0:
+            bleibt.append((b.nr, "Prüfausdruck rot")); continue
+        cells = _zellen(b.roh)
+        ziel = None
+        for i, c in enumerate(cells):
+            if _entfette(c).strip().lower() in ("offen", "**offen**"):
+                ziel = i
+                break
+        if ziel is None:
+            bleibt.append((b.nr, "keine Status-Zelle 'offen' gefunden")); continue
+        cells[ziel] = "geschlossen"
+        neu_zeile = "| " + " | ".join(cells) + " |"
+        if b.roh not in text:
+            bleibt.append((b.nr, "Zeile nicht mehr auffindbar")); continue
+        text = text.replace(b.roh, neu_zeile, 1)
+        geschlossen.append(b.nr)
+
+    if not geschlossen:
+        for nr, grund in bleibt:
+            print(f"  offen ({grund}): {nr}")
+        print("Nichts zu schliessen.")
+        return 0
+
+    pfad.write_text(text, encoding="utf-8")
+    for nr, grund in bleibt:
+        print(f"  offen ({grund}): {nr}")
+
+    # Ueberschriften-Zahlen nachziehen, damit Kopf und Inhalt nicht auseinanderlaufen.
+    nach = parse(pfad)
+    n_offen = sum(1 for x in nach if x.lage in ("offen", "unklar"))
+    n_zu = sum(1 for x in nach if x.lage == "geschlossen")
+    t = pfad.read_text(encoding="utf-8")
+    t = re.sub(r"## Offene Befunde \(\d+\)", f"## Offene Befunde ({n_offen})", t)
+    t = re.sub(r"## Geschlossene Befunde \(\d+\)", f"## Geschlossene Befunde ({n_zu})", t)
+    pfad.write_text(t, encoding="utf-8")
+
+    vor = {x.nr.split(" (")[0] for x in parse_text(text)}
+    ist = {x.nr.split(" (")[0] for x in parse(pfad)}
+    print(f"\nGeschlossen: {len(geschlossen)} · noch offen: {n_offen}")
+    if vor - ist:
+        print(f"VERIFIKATION ROT — verlorene Nummern: {sorted(vor - ist)}", file=sys.stderr)
+        return 1
+    print("Verifikation GRÜN: keine Befundnummer verloren.")
+    return 0
+
+
+def parse_text(text: str) -> list[Befund]:
+    """parse() auf einen String — fuer den Vorher/Nachher-Abgleich."""
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", suffix=".md", encoding="utf-8",
+                                     delete=False) as fh:
+        fh.write(text)
+        tmp = Path(fh.name)
+    try:
+        return parse(tmp)
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -509,6 +591,8 @@ def main() -> int:
     ap.add_argument("--kompakt", action="store_true", help="Volltext archivieren, Ledger kürzen")
     ap.add_argument("--pruefe", action="store_true", help="Status aus Prüfausdrücken ableiten")
     ap.add_argument("--selbsttest", action="store_true", help="Statuslogik gegen bekannte Fälle")
+    ap.add_argument("--schliesse", action="store_true",
+                    help="offene Befunde mit grünem Prüfausdruck schließen (W7)")
     ap.add_argument("--streng", action="store_true",
                     help="auch Altbefunde ohne Prüfausdruck als rot werten")
     ap.add_argument("--runde", type=int, default=16, help="letzte Review-Runde (für --kompakt)")
@@ -522,6 +606,8 @@ def main() -> int:
         return 1
     if a.kompakt:
         return cmd_kompakt(pfad, a.runde)
+    if a.schliesse:
+        return cmd_schliesse(pfad)
     if a.pruefe:
         return cmd_pruefe(pfad, a.streng)
     return cmd_status(pfad)
