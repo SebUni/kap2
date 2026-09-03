@@ -377,8 +377,12 @@ def main() -> None:
     for _sw in SCHWELLEN:
         _q, _n = _q_bei(_sw)
         _mark = " **(geführt)**" if _sw == 1.0 else ""
+        # Ohne Schwelle ist q der abgeloeste Rev.-9-Stand (Befund 297); die Zeile
+        # traegt deshalb Revisionsvermerk und Historie-Marker (Befunde 414/419).
+        _hist = (" (Rev.-9-Stand: ohne Schwelle, Befund 297) <!--hist-->"
+                 if _sw == 0.0 else "")
         p.append(f"| ≥ {_sw:.2f} %/Dek.{_mark} | {_tsd(_n)} | {_q:.4f} | "
-                 f"{_q/_q_ref-1:+.2%} |")
+                 f"{_q/_q_ref-1:+.2%}{_hist} |")
     p.append("")
     p.append(f"- **k_UV = {stationsquotient:.4f} × {q_de:.4f} = {k_uv:.4f}**\n")
     p.append("Der fallgewichtete Bundeswert ist der richtige Bezug für die "
@@ -411,16 +415,19 @@ def main() -> None:
              "es gehört deshalb in die Modellgrenzen (wie die Binnenheterogenität des "
              "Bandes 20–64), nicht in das Sanity-Band.\n")
     p.append("## 5 Verworfene Ketten\n")
+    # Jede Zeile nennt einen abgeloesten Wert mit Revisionsvermerk und traegt den
+    # Historie-Marker (Befunde 414/419): Der Lint kennt keine Abschnitts-Ausnahme
+    # mehr, Historie ist nur, was es zeilenweise sagt.
     p.append(f"- NRW-Gebietsmittel {NRW_GEBIETSMITTEL:.2f} %/Dek. ⇒ "
              f"{DOSIS/NRW_GEBIETSMITTEL:.4f} (bis Rev. 3): Punkt-Zähler gegen "
-             "Landesflächenmittel (Befund 230).")
+             "Landesflächenmittel (Befund 230). <!--hist-->")
     p.append(f"- Raster-SSD an der Messzelle ⇒ {DOSIS/t_stat['ssd']:.4f} "
              "(Rechnung mit der Messzelle Bochum; **nicht** der "
              "Rev.-4-Stand (Rev. 4: 0,7562)): Zähler weiter Station — "  # <!--hist-->
-             "halber Mismatch (Befund 238).")
+             "halber Mismatch (Befund 238). <!--hist-->")
     p.append("- Stationsquotient 0,867 aus 》roughly twice《 ⇒ 0,5782 (Rev. 5) bzw. "  # <!--hist-->
              "1,0 aus 》similarly《 ⇒ 0,6667 (Rev. 6): beides Ersatzkonstruktionen für "  # <!--hist-->
-             "eine Größe, die der Volltext beziffert (Befund 252).\n")
+             "eine Größe, die der Volltext beziffert (Befund 252). <!--hist-->\n")
     p.append("## 6 Ozon im Messfenster (Befunde 246/258)\n")
     p.append(f"Tab. 4 weist für Bochum einen **signifikanten** sommerlichen "
              f"Gesamtozon-Trend von **{TCO_SOMMER:+.1f} %/Dekade** (Apr–Sept, "

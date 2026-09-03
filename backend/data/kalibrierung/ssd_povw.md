@@ -6,6 +6,8 @@ Erzeugt von `backend/scripts/kalibrierung/ssd_povw.py`. Gewichtung auf der
 mit Zensus-2022-Gemeindebevölkerung; SSD über die **Produktfunktion**
 `ssd_normalperioden.ssd_at` gelesen (Kalibriermodell = Produktionsmodell).
 
+**Punktmengen-Kette (Befund 396):** VG250 `vg250_pk` führt 10.949 amtliche Gemeindepunkte; davon 10.853 mit Zensus-2022-Einwohnerzahl (96 ohne) und davon 10.824 mit SSD-Rasterwert (29 ohne) — diese gehen in die Gewichtung ein.
+
 ## 1 Nationale ΔSSD
 
 | Aggregation | ΔSSD DE | Bezug |

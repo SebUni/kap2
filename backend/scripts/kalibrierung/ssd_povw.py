@@ -160,6 +160,15 @@ def main() -> None:
          + " amtliche Gemeindepunkte (BKG VG250 `vg250_pk`, Gebietsstand 01.01.2025)",
          "mit Zensus-2022-Gemeindebevölkerung; SSD über die **Produktfunktion**",
          "`ssd_normalperioden.ssd_at` gelesen (Kalibriermodell = Produktionsmodell).\n",
+         # Punktmengen-Kette gemessen, nicht fortgeschrieben (Befund 396): Der
+         # Bericht nennt alle Stufen; die ersten beiden entstehen hier beim Join.
+         "**Punktmengen-Kette (Befund 396):** VG250 `vg250_pk` führt "
+         + f"{len(punkte):,}".replace(",", ".")
+         + " amtliche Gemeindepunkte; davon "
+         + f"{len(punkte) - ohne_pop:,}".replace(",", ".")
+         + f" mit Zensus-2022-Einwohnerzahl ({ohne_pop} ohne) und davon "
+         + f"{int(de[3]):,}".replace(",", ".")
+         + f" mit SSD-Rasterwert ({ohne_raster} ohne) — diese gehen in die Gewichtung ein.\n",
          "## 1 Nationale ΔSSD\n",
          "| Aggregation | ΔSSD DE | Bezug |",
          "|---|---|---|",

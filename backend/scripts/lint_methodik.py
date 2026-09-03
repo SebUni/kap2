@@ -38,6 +38,10 @@ DOCS = os.path.abspath(os.path.join(ROOT, "..", "docs", "methodik"))
 
 PFLICHTFELDER = ("id", "wert", "einheit", "band", "herkunft", "quelle",
                  "preisstand", "bandzuordnung", "endpunkt")
+# Herkunft und Band je Parameter-Block (Befund 395): `registry_abgleich()` braucht
+# sie, um Bloecke OHNE Registry-Spec einzuordnen — Pfad, abgeleitete Groesse
+# oder ungekennzeichnet. Gefuellt von `parameter_bloecke()`.
+BLOCK_META: dict[str, dict[str, object]] = {}
 VERBOTEN = ("Platzhalter", "wird bei Implementierung", "wird später",
             "später hergeleitet", "wird nachgezogen")
 # Abschnitte, in denen abgeloeste Werte legitim stehen (Historie, Log, Ledger-Bezug).
@@ -62,15 +66,47 @@ VERBOTEN = ("Platzhalter", "wird bei Implementierung", "wird später",
 # versehentlich formulieren; wer einen abgeloesten Wert als geltend schreibt,
 # muesste ihn wissentlich danebensetzen. Zwoelf Zeilen im gesamten Pruefgut
 # tragen ihn — der Aufwand ist klein, die Zusicherung dafuer eindeutig.
-# Gedeckte Fundstellen je Lauf — nur noch zur Ausgabe, nicht zur Entscheidung.
+# Gedeckte Fundstellen je Lauf. Sie werden am Ende von `pruefe_bericht()`
+# AUSGEGEBEN (Befund 419: bis Runde 23 wurden sie gesammelt und nie gezeigt, sodass
+# im Lauf nicht erkennbar war, welche Funde der Marker gedeckt hat).
 UNTERDRUECKT: dict[str, list[tuple[str, int, str]]] = {}
 
 HISTORIE_MARKER = "<!--hist-->"
+
+# Der Marker ist keine bedingungslose Freigabe (Befund 419): Eine markierte Zeile
+# muss zusaetzlich einen REVISIONSVERMERK tragen — »Rev. N«, »bis Rev. N«,
+# »Rev.-N-Stand«, »Befund N« oder »Nr. N« (Entscheidungslog). Eine Zeile wie
+# »Der Bundesschaden betraegt <abgeloester Wert> und gilt heute.« mit blossem
+# Marker bleibt damit rot: Der Marker allein historisiert nichts, er bestaetigt
+# nur, dass die Zeile ihren Revisionsvermerk absichtlich traegt.
+REVISIONSVERMERK = re.compile(
+    r"Rev\.\s?-?\s?\d|Rev\.-\d|bis Rev|Befunde? \d|Nr\. \d")
+
+# Ratchet auf die Zahl der markierten Zeilen im gesamten Pruefgut (Befund 419):
+# Wer eine Zeile neu markiert, traegt die Zahl hier bewusst nach — sonst ist der
+# Marker eine stille Einzelfreigabe. Gezaehlt werden Zeilen mit Marker in allen
+# gelesenen Quellen ausser der Lint-Datei selbst (ihre Konstantendefinition traegt
+# den Marker per Definition; der Commit zu Runde 22 hatte sie faelschlich
+# mitgezaehlt). Aktueller Bestand, Rev. 14 nach Runde 23 (gemessen): Bericht 21 —
+# Korrekturhistorie §3.2 (7 Zeilen), §7-Historie-Kommentar (3), Entscheidungslog
+# (11 Zeilen: Nr. 2, 16, 18, 19, 23–29); Anlage k_uv_herleitung.md (4: Schwellen-
+# reihe ohne Schwelle, drei Verworfen-Zeilen); Code k_uv_herleitung.py (7: die
+# Quellzeilen, die diese vier Anlagenzeilen erzeugen).
+HISTORIE_MARKER_SOLL: dict[str, int] = {"98": 32}
+MARKER_ZAEHLER: dict[str, int] = {}
 
 
 def ist_historie(zeile: str) -> bool:
     """Traegt die Zeile den ausdruecklichen Historie-Marker?"""
     return HISTORIE_MARKER in zeile
+
+
+def zaehle_marker(nr: str, src: str, quelle: str) -> None:
+    """Zaehlt markierte Zeilen je Quelle fuer den Marker-Ratchet (Befund 419)."""
+    if quelle == "Code lint_methodik.py":
+        return
+    MARKER_ZAEHLER[nr] = MARKER_ZAEHLER.get(nr, 0) + sum(
+        1 for z in src.split("\n") if HISTORIE_MARKER in z)
 
 
 
@@ -153,9 +189,14 @@ def parameter_bloecke(src: str, lint: Lint) -> tuple[dict[str, str], set[float]]
                                 for z in wert.group(1).split("\n"))
             werte[name] = re.sub(r"\s+", " ", roh_wert).strip()
         bd = re.search(r"^\s*band:\s*\[([^\]]+)\]", blk, re.M)
+        eigenes_band: list[float] = []
         if bd:
             for zahl in re.findall(r"[0-9]+\.[0-9]+", bd.group(1)):
                 baender.add(float(zahl))
+                eigenes_band.append(float(zahl))
+        hk = re.search(r"^\s*herkunft:\s*(\S+)", blk, re.M)
+        BLOCK_META[name] = {"herkunft": hk.group(1) if hk else "",
+                            "band": eigenes_band}
         ps = re.search(r"^\s*preisstand:\s*\"?([^\s\"#]+)", blk, re.M)
         einheit = re.search(r"^\s*einheit:\s*\"?([^\s\"#]+)", blk, re.M)
         ist_kostensatz = bool(einheit and "EUR" in einheit.group(1).upper())
@@ -213,10 +254,48 @@ def registry_abgleich(nr: str, werte: dict[str, str], lint: Lint) -> None:
                                 f"Bericht {zahl} ≠ Registry {specs[kandidat]}")
                     break
 
-    # Befund 344(4): Uebersprungene Bloecke nicht mehr still verschlucken — sonst
-    # sieht ein gruener Lauf nach voller Abdeckung aus, obwohl er es nicht ist.
-    lint.ok.append(f"Bericht ⇄ Registry: {len(specs)} Specs, "
-                   f"{len(uebersprungen)} zusammengesetzte Blöcke übersprungen")
+    # Befund 344(4)/395: Uebersprungene Bloecke nicht still verschlucken — und
+    # jeden Block ohne Spec EINORDNEN statt nur zaehlen. Ein Mutations-Sweep
+    # (Runde 20) fand zwei Bloecke, die durch jeden Zweig fielen:
+    #   * Pfad-Werte (`uv.ssd_delta_region`) → Existenz der Datei pruefen;
+    #   * abgeleitete Groessen (`uv.r_out_sensitivitaet`, herkunft `herleitung:`)
+    #     → der Wert muss im eigenen Band liegen (1,0 → 2,0 ist damit rot);
+    #   * alles andere ohne Spec ist ungekennzeichnet → rot, namentlich.
+    dict_bloecke, pfad_bloecke, abgeleitet, ungekennzeichnet = [], [], [], []
+    for pid in uebersprungen:
+        roh = werte[pid].strip().strip('"').strip("'")
+        meta = BLOCK_META.get(pid, {})
+        if roh.startswith("{"):
+            dict_bloecke.append(pid)
+            continue
+        if pid == f"{praefix}voly":
+            continue                 # Katalog-Parameter, eigener Abgleich unten (384b)
+        if re.fullmatch(r"[\w./-]+\.(csv|npz|json|md|gpkg)", roh):
+            pfad_bloecke.append(pid)
+            voll = os.path.join(ROOT, "..", roh)
+            lint.pruefe(os.path.exists(voll), f"Pfad-Block {pid} zeigt auf eine Datei",
+                        f"{roh} existiert nicht")
+            continue
+        herkunft = str(meta.get("herkunft", ""))
+        band = list(meta.get("band", []))
+        try:
+            zahl = float(roh)
+        except ValueError:
+            zahl = None
+        if herkunft.startswith("herleitung:") and zahl is not None and len(band) >= 2:
+            abgeleitet.append(pid)
+            lint.pruefe(min(band) - 1e-9 <= zahl <= max(band) + 1e-9,
+                        f"Abgeleiteter Block {pid} liegt im eigenen Band",
+                        f"Wert {zahl} ausserhalb {band} — Herleitung {herkunft} "
+                        f"traegt den Wert nicht")
+            continue
+        ungekennzeichnet.append(pid)
+    lint.pruefe(not ungekennzeichnet, "Parameter-Blöcke ohne Registry-Spec gekennzeichnet",
+                f"weder Spec noch Pfad noch `herleitung:`-Band: {ungekennzeichnet}")
+    lint.ok.append(f"Bericht ⇄ Registry: {len(specs)} Specs; ohne Spec: "
+                   f"{len(dict_bloecke)} Dict-Blöcke (unten abgeglichen) "
+                   f"{dict_bloecke}, {len(pfad_bloecke)} Pfad-Blöcke {pfad_bloecke}, "
+                   f"{len(abgeleitet)} abgeleitete {abgeleitet}")
 
     # Befund 384(a): VERSCHACHTELTE dict-Bloecke ({mm: {...}, c44: {...}}) wurden
     # vom flachen Parser nicht aufgeloest — `uv.i_raten_roh` fiel deshalb durch
@@ -323,7 +402,12 @@ ABGELOESTE_WERTE: dict[str, tuple[str, ...]] = {
         "401 Mio", "YLL 1.141", "YLL 1.315", "YLL 1.329", "YLL 1.423", "YLL 1.438",
         "YLL 1.492", "YLL 1.521", "YLL 1.664", "YLL ≈ 1.141", "YLL ≈ 1.315",
         "YLL ≈ 1.329", "YLL ≈ 1.423", "YLL ≈ 1.438", "YLL ≈ 1.492",
-        "10.808", "347 Mio", "5,01 %"),
+        "10.808", "347 Mio", "5,01 %",
+        # Abgeleitete Plausibilisierungswerte (Befund 418): 8,51 % x 0,7289 = 6,2 %
+        # bzw. 2,1 %/Dek. gehoeren zum abgeloesten k_UV = 0,7289 (Rev. 9); geltend
+        # sind 6,06 % und 2,02 %/Dek. Bewusst mit Praefix, weil »6,2 %« an
+        # anderer Stelle legitim vorkommt (Behandlungs-€-Anteil an der KKR).
+        "≈ 6,2 %", "~ 6,2 %", "2,1 %/Dek"),
 }
 
 ZWISCHENWERTE: dict[str, dict[str, tuple[float, ...]]] = {
@@ -388,19 +472,14 @@ def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> 
     # MINDESTVORKOMMEN, aber genug, um eine echte Einzelfreigabe ueber die
     # Schwelle zu heben und den Ratchet damit wirkungslos zu machen.
     treffer = 0
-    # Zeilen, die als GANZES Historie sind: Entscheidungslog- und Ledger-Tabellen,
-    # Kopfvermerke, Korrekturhistorie. Dort ist der alte Wert der Zweck der Zeile.
-    ganz_historie = re.compile(
-        r"^\s*\|\s*\d+\s*⚠?\s*\||Korrekturhistorie|Historie:|abgelöst durch")
-    # Ganze ABSCHNITTE, in denen abgeloeste Werte der Zweck sind: Verworfen-Listen
-    # und Sensitivitaets-/Schwellenreihen stellen den geltenden Wert bewusst
-    # frueheren oder verworfenen Varianten gegenueber. Bis Rev. 13 galt die
-    # Ausnahme nur zeilenweise, sodass eine Tabellenzeile unter der Ueberschrift
-    # „Verworfene Ketten" als Rueckstand gemeldet wurde (Befund 343: Ausnahmen
-    # gehoeren an die Klasse, nicht an die Einzelzeile).
-    historie_abschnitt = re.compile(
-        r"^#+ .*(Verworfene|Korrekturhistorie|Sensitivität|Schwelle|Gegenrechnung)",
-        re.I)
+    zaehle_marker(nr, aktuell, quelle)
+    # KEINE Stichwort- und KEINE Abschnitts-Heuristik mehr (Befund 414): Bis Runde 23
+    # galten Zeilen mit »Korrekturhistorie«, »Historie:« oder »abgelöst durch«
+    # irgendwo im Text sowie ganze Abschnitte (»Verworfene …«, »Schwelle …«) als
+    # Historie — »Ungeachtet der Korrekturhistorie gilt k_UV = <abgeloester
+    # Wert>.« lief deshalb gruen. Historie ist jetzt ausschliesslich, was den Marker traegt;
+    # Entscheidungslog-Zeilen, Korrekturhistorie und Verworfen-Listen sind
+    # zeilenweise markiert.
     # Blockquote-Ausnahme NUR fuer den Kopfvermerk (Befund 345): Der mehrzeilige
     # Revisionsstand vor der ersten Kapitelueberschrift nennt abgeloeste Werte zu
     # Recht. Ab der ersten „## "-Ueberschrift sind Blockquotes normaler Berichtstext
@@ -410,16 +489,9 @@ def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> 
     if kopf_ende < 0:
         kopf_ende = len(aktuell)
     offset = 0
-    in_historie_abschnitt = False
     for i, zeile in enumerate(aktuell.split("\n"), start=1):
         zeilen_start, offset = offset, offset + len(zeile) + 1
-        if zeile.startswith("#"):
-            in_historie_abschnitt = bool(historie_abschnitt.search(zeile))
-        if in_historie_abschnitt:
-            continue
         if zeile.lstrip().startswith(">") and zeilen_start < kopf_ende:
-            continue
-        if ganz_historie.search(zeile):
             continue
         for wert in werte:
             # Anlagen schreiben Dezimalzahlen mit PUNKT (f-Strings), der Bericht mit
@@ -458,6 +530,13 @@ def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> 
             # gefundene Luecke geschlossen und eine neue geoeffnet.
 
             if ist_historie(zeile):
+                if not REVISIONSVERMERK.search(zeile):
+                    # Befund 419: Marker ohne Revisionsvermerk ist keine Historie.
+                    lint.fehler.append(
+                        f"Historie-Marker ohne Revisionsvermerk im {quelle}, "
+                        f"Zeile {i}: {wert} — {zeile.strip()[:60]}")
+                    treffer += 1
+                    continue
                 UNTERDRUECKT.setdefault(HISTORIE_MARKER, []).append(
                     (quelle, i, wert))
                 continue
@@ -518,6 +597,17 @@ def revisionsrueckstaende(nr: str, src: str, baender: set[float],
     # Lint genau die Definitionsgleichungen NICHT (Befund 274).
     zeilen = [z.replace("{,}", ",").replace("{.}", ".")
               for z in aktuell.split("\n")]
+    # Kopfvermerk = Blockquote VOR der ersten Kapitelueberschrift (Befund 345):
+    # dort stehen Revisionsstand und abgeloeste Werte zu Recht. Ab Kapitel 1 ist
+    # ein Blockquote normaler Berichtstext (Infokaesten) — keine Ausnahme mehr
+    # (Befund 414: die pauschale Blockquote-Ausnahme dieser Funktion hatte
+    # aufgehoben, was Befund 383 fuer die Infokaesten gerade abgeschafft hatte).
+    kopf_ende_zeile = next((i for i, z in enumerate(zeilen, start=1)
+                            if z.startswith("## ")), len(zeilen) + 1)
+
+    def im_kopf(i: int, zeile: str) -> bool:
+        return zeile.lstrip().startswith(">") and i < kopf_ende_zeile
+
     for key, muster in symbole.items():
         soll = specs.get(key)
         if soll is None or not isinstance(soll, (int, float)):
@@ -528,15 +618,10 @@ def revisionsrueckstaende(nr: str, src: str, baender: set[float],
                 continue
             # Befund 298: `#`-Zeilen sind die Kommentare der Golden-Test-Blöcke —
             # sie waren pauschal ausgenommen und trugen deshalb Rückstände.
-            # Auch hier gilt die Adjazenz-Regel (Befund 402): Ein Revisionsvermerk
-            # IRGENDWO in der Zeile historisiert noch keinen Wert. Frueher machte
-            # `HISTORIE.search(zeile)` die ganze Zeile ausnahmefaehig, sodass eine
-            # Geltungsbehauptung mit beilaeufigem „Rev. N" durchfiel.
-            historie = (bool(re.search(r"Rev\.-? ?\d+[:)]?[\s0-9,.:/=×·+()–—-]{0,40}$",
-                                       zeile))
-                        or bool(re.search(r"(Korrekturhistorie|Historie:|bis Rev\. \d"
-                                          r"|abgelöst|Entscheidungslog|Verworfene)", zeile))
-                        or zeile.lstrip().startswith(">"))
+            # Historie NUR ueber den expliziten Marker (Befunde 405/414). Bis
+            # Runde 23 galten hier noch »Rev. N« am Zeilenende, eine Stichwort-
+            # liste und jeder Blockquote — »k_UV = 0,9000 (Rev. 8)« lief gruen.
+            historie = ist_historie(zeile) or im_kopf(i, zeile)
             # Positivprüfung braucht auch kurze Werte (0,75 · 1,45), die
             # Negativprüfung bleibt bei >= 3 Nachkommastellen (weniger Rauschen).
             zahlen = {float(r.replace(",", "."))
@@ -572,7 +657,7 @@ def revisionsrueckstaende(nr: str, src: str, baender: set[float],
         # fängt den Fall, den die Positivprüfung durchlässt: Der richtige Wert
         # steht irgendwo, die Definitionsgleichung trägt aber den alten (274).
         for i, zeile in enumerate(zeilen, start=1):
-            if ist_historie(zeile) or zeile.lstrip().startswith(">"):
+            if ist_historie(zeile) or im_kopf(i, zeile):
                 continue
             if "=" not in zeile or not any(re.search(m, zeile) for m in muster):
                 continue
@@ -716,6 +801,7 @@ def pruefe_bericht(pfad: str) -> bool:
     src = open(pfad, encoding="utf-8").read()
     lint = Lint()
     UNTERDRUECKT.clear()
+    MARKER_ZAEHLER.clear()
     beispiel_bloecke(src, lint)
     zeichentabelle(src, lint)
     werte, baender = parameter_bloecke(src, lint)
@@ -771,8 +857,23 @@ def pruefe_bericht(pfad: str) -> bool:
     # gesamten Pruefgut nur eine Stelle deckt (Befund 343).
     quellen_ratchet(lint)
 
+    # Marker-Ratchet (Befund 419): Zahl der markierten Zeilen im Pruefgut muss der
+    # bewusst gepflegten Konstante entsprechen — nach oben UND nach unten, damit
+    # weder eine stille neue Freigabe noch ein verlorener Marker durchgeht.
+    soll = HISTORIE_MARKER_SOLL.get(nr)
+    ist = MARKER_ZAEHLER.get(nr, 0)
+    if soll is not None:
+        lint.pruefe(ist == soll, f"Historie-Marker-Ratchet ({ist} markierte Zeilen)",
+                    f"{ist} markierte Zeilen im Prüfgut, HISTORIE_MARKER_SOLL sagt "
+                    f"{soll} — bewusst nachtragen, nicht still")
+
     print(f"\n=== #{nr} · {os.path.basename(pfad)} ===")
     print(f"  {len(lint.ok)} Checks grün")
+    gedeckt = UNTERDRUECKT.get(HISTORIE_MARKER, [])
+    print(f"  Historie-Marker: {ist} markierte Zeilen (Ratchet {soll}), "
+          f"{len(gedeckt)} gedeckte Fundstellen abgelöster Werte:")
+    for quelle, zeile, wert in gedeckt:
+        print(f"    {quelle} Z. {zeile}: {wert}")
     for f in lint.fehler:
         print(f"  ROT  {f}")
     return not lint.fehler

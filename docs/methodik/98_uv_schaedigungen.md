@@ -1,7 +1,7 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
 Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23, Befunde 336–420) — im Review** ·
-03.09.2026 ·
+04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
 · Familie: **K1-Gesundheit bottom-up** (Prototyp #95; §2.6 — kein erneuter Drei-Ansätze-Vergleich)
@@ -18,7 +18,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > die Außenbeschäftigten-Ebene (98-OUT-01) ist „**geparkt** (Datenquelle fehlt)“
 > mit Beschaffungs-Watchlist — für sie existiert keine keyless Zellquelle, und ihr
 > Parameter \(r_{\text{out}}\) läuft dokumentiert auf dem Zentrierungs-Neutralwert
-> \(q = \bar q\) ⇒ Faktor 1. **Ebenso geparkt ist die Verhaltens-Ebene**
+> \(q_{\text{out}} = \bar q_{\text{out}}\) ⇒ Faktor 1. **Ebenso geparkt ist die Verhaltens-Ebene**
 > \(\varphi_{\text{Komfort}}\) (98-S154-01, Befund 378): auch für sie fehlt eine
 > keyless kommunale Quelle, ihr Parameter \(v_{\text{verh}}\) läuft auf dem
 > Neutralwert 1 und ist als eigene Achse in §4 ausgewiesen. Es sind also **zwei**
@@ -118,7 +118,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 17 Befunden der Runde 15 nur vier umgesetzt waren — der inhaltliche Verlust ist
 > auf diese vier begrenzt und in Rev. 14 nachgezogen (Befunde 356/357).
 >
-> **Rev. 14 (03.09.2026)** = Review-Runden 16 bis 23 (Befunde 336–420). Keine
+> **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 23 (Befunde 336–420). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
 > € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
 > gefahrenen Review-Runde unabhängig nachgerechnet. **Eine Zählung steht hier
@@ -339,9 +339,10 @@ $$ \Delta\text{Dosis}_{\text{Zelle}} \;=\; \frac{\text{SSD}_{\text{Zelle}}^{\,19
   < 0,2 % ist gegen das Band (±49 %) vernachlässigbar. An der Messzelle allein:
   0,6811.
 
-  **Aggregationsregel (§3.9; Befund 338).** \(q\) ist das mit diesen Fällen
-  **gewichtete Mittel der Punktquotienten** \(q_z = \Delta\text{Global}_z /
-  \Delta\text{SSD}_z\) — nicht der Quotient getrennt summierter Zähler und
+  **Aggregationsregel (§3.9; Befund 338).** Der Rasterquotient \(q_{\text{R}}\)
+  ist das mit diesen Fällen **gewichtete Mittel der Punktquotienten**
+  \(q_{\text{R},z} = \Delta\text{Global}_z / \Delta\text{SSD}_z\) über die
+  Gemeindepunkte \(z\) — nicht der Quotient getrennt summierter Zähler und
   Nenner. Damit schlagen Punkte mit verschwindendem SSD-Trend voll durch: Ihr
   Quotient ist numerisch instabil, nicht klein. Ausgeschlossen werden deshalb
   Punkte mit einem SSD-Trend < 1 %/Dekade — eine **gekennzeichnete Abschätzung**,
@@ -354,11 +355,11 @@ $$ \Delta\text{Dosis}_{\text{Zelle}} \;=\; \frac{\text{SSD}_{\text{Zelle}}^{\,19
 
   | Stufe | Punkte | verwendet in |
   |---|---|---|
-  | amtliche Gemeindepunkte, BKG VG250 `vg250_pk` (Gebietsstand 01.01.2025) | **10.949** | — |
-  | davon mit Zensus-2022-Einwohnerzahl (96 ohne) | **10.853** | — |
+  | amtliche Gemeindepunkte, BKG VG250 `vg250_pk` (Gebietsstand 01.01.2025) | **10.949** | Ausgangsmenge, Anlage [72] (Befund 396) |
+  | davon mit Zensus-2022-Einwohnerzahl (96 ohne) | **10.853** | Anlage [72] |
   | davon mit SSD-Rasterwert (29 ohne) | **10.824** | ΔSSD-Lauf, Anlage [72] |
   | davon mit auswertbaren Trendreihen in **beiden** Rastern | **10.739** | k_UV-Lauf, Anlage [73] |
-  | davon nach Stabilitätsausschluss (SSD-Trend ≥ 1 %/Dek.) | **10.682** | \(q\) und Perzentile der Modellgrenze 9 |
+  | davon nach Stabilitätsausschluss (SSD-Trend ≥ 1 %/Dek.) | **10.682** | \(q_{\text{R}}\) und Perzentile der Modellgrenze 9 |
 
   Der ΔSSD-Lauf braucht nur das SSD-Raster und führt deshalb mehr Punkte als der
   k_UV-Lauf, der beide Raster paart.
@@ -371,7 +372,7 @@ $$ \Delta\text{Dosis}_{\text{Zelle}} \;=\; \frac{\text{SSD}_{\text{Zelle}}^{\,19
   Städte — eine *räumliche* Streuung, fälschlich als Band der *Bundes*summe gebucht.
   Die räumliche Streuung ist jetzt **Modellgrenze 9**, nicht Bandquelle.
 
-  **Korrekturhistorie.** Rev. 3: 0,8434 (Nenner = NRW-*Gebietsmittel*, Skalen-Mismatch,
+  **Korrekturhistorie.** Rev. 3: 0,8434 (Nenner = NRW-*Gebietsmittel*, Skalen-Mismatch,  <!--hist-->
   Befund 230). Rev. 4: 0,7562 (Nenner rasterskaliert, Zähler weiter Station — halber  <!--hist-->
   Mismatch, Befund 238). Rev. 5: 0,5782 (Brücke, Stationsquotient aus „roughly twice" <!--hist-->
   geschätzt). Rev. 6: 0,6667 (Stationsquotient aus „similarly" als 1,0 gelesen).  <!--hist-->
@@ -446,7 +447,7 @@ for r, v in dssd.items():
 assert abs(7.76 / 7.82 - 1) < 0.01
 assert abs(8.51 / 7.82 - 1 - 0.088) < 0.002
 # Plausibilisierung: implizite Dosisaenderung im Satelliten-Rahmen (1,2-3,6 %/Dekade x ~3 Dekaden Versatz)
-assert 1.2 * 3 * 0.5 <= 8.51 * k_uv <= 3.6 * 3   # 6,2 % zwischen 1,8 und 10,8
+assert 1.2 * 3 * 0.5 <= 8.51 * k_uv <= 3.6 * 3   # 6,06 % zwischen 1,8 und 10,8 (Befund 418)
 ```
 
 ### 3.3 Baseline-Fälle: altersspezifische Inzidenz (Anker `#i-raten`)
@@ -604,7 +605,7 @@ mit ΔDosis 4,5436 %; beide innerhalb der Bänder (Befund 359).
 Die Baseline ist über fünf Altersbänder geschichtet, der BAF wirkt aber
 **unstratifiziert** auf die Bandsumme: Es gilt dieselbe relative Elastizität in
 allen Bändern. Neutral ist das nicht — die τ-Rechnung unten zeigt, dass die
-Lebenszeitdosis-Elastizität mit dem Alter fällt (\(\tau=(T/2)/a\)), und MM mit
+Lebenszeitdosis-Elastizität mit dem Alter fällt (\(\tau=(T/2)/a_{\text{erk}}\)), und MM mit
 einem Erkrankungsalter von 63–69 Jahren trägt 64 % der YLL. Eine altersgeschichtete
 Elastizität würde den MM-Pfad also eher anheben, den C44-Pfad eher senken. [30]
 veröffentlicht keine bandweisen BAF; die Annahme bleibt bis dahin bestehen und ist
@@ -613,8 +614,9 @@ bandweise BAF, sobald eine Quelle sie beziffert.
 
 **Kumulative Dosis → jährliche Umgebungsdosis: die Gleichgewichtslesart
 (§3.9; Befunde 247/336f).** Die BAF sind in der Primärquelle [30] als Exponenten
-der **Lebenszeit**dosis definiert (\(Y(a) \sim \Phi(a)^{c}\) mit \(\Phi\) =
-kumulierte Dosis bis zum Alter \(a\)); \(\Delta\text{Dosis}\) misst dagegen
+der **Lebenszeit**dosis definiert (\(Y(a_{\text{erk}}) \sim \Phi(a_{\text{erk}})^{c}\) mit \(\Phi\) =
+kumulierte Dosis bis zum Erkrankungsalter \(a_{\text{erk}}\) in Jahren — nicht zu
+verwechseln mit dem Altersband-Index \(a\) der §3.3-Summen, Befund 397); \(\Delta\text{Dosis}\) misst dagegen
 die Änderung der **jährlichen** Umgebungsdosis. Der Übergang ist ein eigener
 Rechenschritt und wird ausdrücklich als Annahme geführt:
 
@@ -631,12 +633,12 @@ Kohorten haben den größten Teil ihrer Lebenszeitdosis vor dem Anstieg
 akkumuliert. **Abschätzung des Transient-Faktors** \(\tau\) (gekennzeichnete
 Abschätzung, §3.9): Steigt die Jahresdosis über \(T\) Jahre linear um
 \(\Delta D\) und war davor konstant, ist die kumulative Dosis einer Person im
-Alter \(a \ge T\) um die Dreiecksfläche erhöht:
+Erkrankungsalter \(a_{\text{erk}} \ge T\) um die Dreiecksfläche erhöht:
 
-$$ \tau \;=\; \frac{\Delta\Phi/\Phi}{\Delta D/D} \;=\; \frac{T/2}{a} $$
+$$ \tau \;=\; \frac{\Delta\Phi/\Phi}{\Delta D/D} \;=\; \frac{T/2}{a_{\text{erk}}} $$
 
-Maßgeblich ist das **Erkrankungs**alter, nicht das Sterbealter: \(Y(a)\) ist die
-Inzidenz im Alter \(a\). Nach [27] liegt der Median bei MM 63–69 und C44 74–76
+Maßgeblich ist das **Erkrankungs**alter, nicht das Sterbealter: \(Y(a_{\text{erk}})\) ist die
+Inzidenz im Erkrankungsalter \(a_{\text{erk}}\). Nach [27] liegt der Median bei MM 63–69 und C44 74–76
 Jahren. Mit dem Mittelpunktabstand der Normalperioden \(T = 30\) Jahre folgt
 \(\tau \approx 0{,}20\text{–}0{,}24\); selbst bei doppelt so langem
 Anstiegsfenster (\(T = 60\)) bleibt \(\tau \le 0{,}48\).
@@ -816,7 +818,7 @@ r_out = lambda q: (1 - w_z) + w_z * (1 + q*(1.77-1)) / (1 + 0.070*(1.77-1))
 assert abs(r_out(0.14) - 1.019) < 0.001
 # Bandgrenzen aus der q_out-Spanne [0; 0,21] statt gesetzt (Befund 219)
 assert abs(r_out(0.0) - 0.981) < 0.001 and abs(r_out(0.21) - 1.038) < 0.001
-assert abs(r_out(0.070) - 1.0) < 1e-12          # Zentrierung: q = q_quer => 1
+assert abs(r_out(0.070) - 1.0) < 1e-12          # Zentrierung: q_out = q_quer_out => 1
 # v_verh ist der JAHRESfaktor, nicht der Tageswert (Befund 216)
 v_verh = lambda phi, s=1.45: 1 + phi*(s - 1)
 assert abs(v_verh(0.0) - 1.0) < 1e-12           # Ebene geparkt => neutral
@@ -876,28 +878,32 @@ assert abs(euro - 4365) < 60               # ~4.400 EUR je 1.000 EW und Jahr
 |---|---|---|---|
 | \(a\) | Altersband u20 · 20–64 · 65–74 · 75–84 · 85+ (Ebenen wie #96 §3.2) | — | Zensus-Altersbänder + Ebene u20 |
 | \(a_{\text{attr,UV}}\) | klimaattribuierter Anteil des SSD-/Dosistrends | — | **0,75** (0,5–1,0) — gekennzeichnete Abschätzung §3.2; register:98-E20-03 |
+| \(a_{\text{erk}}\) | Erkrankungsalter (Median je Entität; Argument von \(Y\), \(\Phi\) und \(\tau\) in §3.4 — **nicht** der Altersband-Index \(a\), Befund 397) | Jahre | MM **63–69** · C44 **74–76** [27]; herleitung:#gleichgewicht |
 | \(\text{BAF}_e\) | biologischer Verstärkungsfaktor (%-Inzidenz je +1 % Dosis) | — | MM **0,6** (±0,4) · C44 **1,675** (1,675–1,95; §3.1) [29,30]; register:98-E20-04 |
 | \(c_e\) | Erstjahres-Behandlungskosten je Fall (**Proxy**, §3.4) | €₂₀₂₄ | MM **6.724** (Band –11.410) · C44 **5.883** (–7.436) = [34]-Werte × 119,3/94,5 [19]; register:98-K1-01; herleitung:#c-e |
 | \(c_{\text{kal},e}\) | Normierungsskalar der Ablesekette (ein Skalar je Entität; wirkt in der §3.3-Formel auf die Roh-Bandraten; Anker 2021–2023) | — | MM **1,0012** · C44 **0,9910**; herleitung:#i-raten |
 | \(F_{e,\text{Zelle}}\) | Baseline-Neuerkrankungen der Zelle | 1/Jahr | berechnet (§3.3) |
-| \(I_{e,a}^{\text{roh}}\) | Roh-Neuerkrankungsrate je Entität und Band (Ablesekette; Anlage-CSV) | 1/100.000·a | Tabelle §3.3 [27,48]; register:98-R35-01; herleitung:#i-raten |
+| \(I_{e,a}^{\text{roh}}\) | Roh-Neuerkrankungsrate je Entität und Band (Ablesekette; Anlage-CSV) | 1/(100.000 · Jahr) | Tabelle §3.3 [27,48]; register:98-R35-01; herleitung:#i-raten |
 | \(k_{\text{UV}}\) | Übersetzung SSD-Trend → erythemwirksame Dosis (Elastizität zeitinvariant angenommen, §3.2) | — | **0,7119** (0,3622–1,0616) = (4,9/4,6) × 0,6683, Brücke über die Globalstrahlung; Band = publizierte Standardfehler (§3.2) [31,73]; register:98-E20-02; herleitung:#k-uv |
 | \(\bar L_e\) | verlorene Lebensjahre je Sterbefall (Median-Approximation, gekennzeichnet; Jahresmediane des Ankerfensters) | Jahre | MM **10,4569** · C44 **5,4787** [27,48]; register:98-K1-02; herleitung:#l-quer |
 | \(\text{OR}_{\text{out}},\ q_{\text{out}},\ \bar q_{\text{out}},\ r_{\text{out}},\ w^Z\) | Außenberufs-Sensitivität (auf den SCC-Anteil am Zusatz \(w^Z\) = 0,373; nur Bänder 20–64…85+, **nicht** u20; **nicht im Basiswert**, §3.4) | — | OR **1,77** [1,37–2,30] [43]; \(\bar q_{\text{out}}\) = **0,070** [70]; \(r_{\text{out}}\) **0,981–1,038** über \(q_{\text{out}}\) ∈ [0; 0,21]; register:98-OUT-01; herleitung:#q-out |
 | \(\text{pop}_a\) | Bevölkerung der Zelle je Band | Personen | Zensus 2022, 100 m (+ u20); register:98-R35-01 |
+| \(q_{\text{R}}\) | Rasterquotient ΔGlobal/ΔSSD — fallgewichtetes Mittel der Punktquotienten \(q_{\text{R},z}\) über 10.682 Gemeindepunkte (Aggregationsregel §3.2; **nicht** der Außenberufsanteil \(q_{\text{out}}\), Befund 397) | — | **0,6683** (MM 0,6674 · C44 0,6689; Messzelle Bochum 0,6811) [73]; herleitung:#k-uv |
+| \(q_{\text{R},z}\) | Punktquotient \(\Delta\text{Global}_z/\Delta\text{SSD}_z\) am Gemeindepunkt \(z\) (Trends 1997–2022 beider DWD-Raster) | — | berechnet je Punkt, Anlage [73]; herleitung:#k-uv |
 | \(s\) | Tages-Multiplikator der persönlichen Dosis an einem Komforttag | — | **1,45** (1,25–1,60) [57–59]; register:98-S154-01 |
 | \(\text{SSD}\) | Sonnenscheindauer (Normalperioden-Mittel je Zelle) — Kartenebene **neu anzulegen** (angelegt, §3.6) | h/Jahr | DWD-CDC sunshine_duration 1 km [33]; Gebietsmittel-Referenzen [69]; register:98-E20-01 |
 | \(T\) | Dauer des Dosisanstiegs (Mittelpunktabstand der Normalperioden) | Jahre | **30** (1961–1990 ⇒ 1991–2020); herleitung:#gleichgewicht |
 | \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136,4–165,6 T€; Kette #95 §3.5) [19]; herleitung:#voly (in #95) |
 | \(v_{\text{verh}}\) | Verhaltens-Sensitivität — **Jahres**faktor, **abgeleitet** aus \(s\) und \(\phi_{\text{Komfort}}\) (kein eigener Parameter, §3.2 Kein-Doppelkanal) | — | \(1+\phi_{\text{Komfort}}(s-1)\) = **1,00** (Band 1,00–1,11); herleitung:#v-verh |
 | \(w_{\text{SCC}}\) | SCC-Anteil an C44 (altersinvariant, dokumentierte Annahme; Quellen-Widerspruch benannt §3.1) | — | **0,25** (Band 0,25–0,50) [27; obere Stütze 2015er-BfS-Split]; herleitung:#baf-c44 |
-| \(Y(a)\) | Inzidenz im Alter \(a\); \(Y(a)\sim\Phi(a)^{c}\) mit \(c\) = BAF | 1/100.000·a | Funktionsform aus [30]; herleitung:#gleichgewicht |
+| \(Y(a_{\text{erk}})\) | Inzidenz im Erkrankungsalter \(a_{\text{erk}}\); \(Y(a_{\text{erk}})\sim\Phi(a_{\text{erk}})^{c}\) mit \(c\) = BAF | 1/(100.000 · Jahr) | Funktionsform aus [30]; herleitung:#gleichgewicht |
 | \(\text{YLL}_{\text{Zelle}}\) | verlorene Lebensjahre — **nativer Ausweis** | Jahre/Jahr | Ergebnis |
+| \(z\) | Index der Gemeindepunkte (Kalibrierung, Anlagen [72,73]) bzw. der 100-m-Zellen (Produktion, §3.4-Summen) | — | BKG VG250 `vg250_pk` × Zensus 2022 [72]; berechnet |
 | \(\Delta\text{Dosis}_{\text{Zelle}}\) | relative klimaattribuierte Dosisänderung | — | SSD-Normalperioden-Δ × \(k_{\text{UV}}\) × \(a_{\text{attr,UV}}\); DE 4,54 % (§3.2, fallgewichtet [72,73]); berechnet |
 | \(\Delta F_{e,\text{Zelle}}\) | klimaattribuierte Zusatzfälle (Teil-Ausweis) | 1/Jahr | berechnet |
 | \(\lambda_e\) | Letalitätsanteil (Perioden-Approximation, gekennzeichnet; Anker 2021–2023) | — | MM **0,11466** · C44 **0,005236** [27]; register:98-K1-02 |
-| \(\tau\) | Transient-Faktor: Anteil der Lebenszeitdosis-Erhöhung an der Jahresdosis-Erhöhung, \(\tau=(T/2)/a\) | — | **1,00** im Ausweis (Gleichgewichtslesart); Spanne **0,20–0,48** als §4-Achse; gekennzeichnete Abschätzung §3.9; herleitung:#gleichgewicht |
-| \(\Phi(a)\) | kumulierte UV-Dosis bis zum Alter \(a\) (Lebenszeitdosis) | relative Einheit | Definitionsgröße der BAF in [30]; herleitung:#gleichgewicht |
+| \(\tau\) | Transient-Faktor: Anteil der Lebenszeitdosis-Erhöhung an der Jahresdosis-Erhöhung, \(\tau=(T/2)/a_{\text{erk}}\) | — | **1,00** im Ausweis (Gleichgewichtslesart); Spanne **0,20–0,48** als §4-Achse; gekennzeichnete Abschätzung §3.9; herleitung:#gleichgewicht |
+| \(\Phi(a_{\text{erk}})\) | kumulierte UV-Dosis bis zum Erkrankungsalter \(a_{\text{erk}}\) (Lebenszeitdosis) | relative Einheit | Definitionsgröße der BAF in [30]; herleitung:#gleichgewicht |
 | \(\phi_{\text{Komfort}}\) | dosisgewichteter Komforttag-Anteil (Ebene **geparkt**, Neutralwert 0) | — | **0** (Band 0–0,25, gekennzeichnete Abschätzung §3.4); herleitung:#v-verh |
 | \(\text{€}_{\text{Zelle}}\) | bewerteter Schaden K1 (Ursache UV) — Teil-Ausweis | €₂₀₂₄/Jahr | Ergebnis (§3.4) |
 
@@ -910,7 +916,7 @@ berichtsweit einheitlich (Befund 215):
 |---|---|---|---|---|---|
 | SSD / UV_RADIATION | **neu anzulegen** (angelegt 31.08.2026) | DWD-CDC Jahresraster `sunshine_duration`, 1 km, ab 1961 [33] | zwei Normalperioden-Mittel je Zelle (1961–90, 1991–2020), einmalig vorgemittelt | Bundesland-Gebietsmittel [69] | Verlust der Feinstruktur (SSD variiert v. a. Nord–Süd) |
 | u20 | vorhanden (aus #96) | Zensus 2022 | Altersband-Aggregation | — | — |
-| Außenbeschäftigten-Anteil \(q_{\text{out}}\) | **geparkt (Datenquelle fehlt)** — Watchlist | INKAR/SVB-Branchenanteile: **keine** keyless Zellquelle | (offen) | — | \(q = \bar q\) ⇒ \(r_{\text{out}}\) = **exakt 1** (Zentrierungs-Neutralwert, §3.1) |
+| Außenbeschäftigten-Anteil \(q_{\text{out}}\) | **geparkt (Datenquelle fehlt)** — Watchlist | INKAR/SVB-Branchenanteile: **keine** keyless Zellquelle | (offen) | — | \(q_{\text{out}} = \bar q_{\text{out}}\) ⇒ \(r_{\text{out}}\) = **exakt 1** (Zentrierungs-Neutralwert, §3.1) |
 | Komforttag-Anteil \(\phi_{\text{Komfort}}\) | **geparkt (Datenquelle fehlt)** — Watchlist | DWD-Tagesraster Temperatur × Tagesdosis; die **Kombination** ist nicht keyless verfügbar | (offen) | — | \(\phi = 0\) ⇒ \(v_{\text{verh}}\) = **exakt 1** (§3.4; Befund 216) |
 | YLL-Rate | Ergebnisebene | — | YLL je 1.000 EW | — | — |
 
@@ -1064,9 +1070,10 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   (Befund 282; bis Rev. 8 stand hier eine abweichende Rangfolge). Seit Rev. 3 erzeugt
   die Anlage [71] alle Zeilen; \(a_{\text{attr}}\) ist seit Rev. 8 als eigene Achse
   ausgewiesen (Befund 261).
-- **Unsicherheiten (nach Größe geordnet, Befunde 250/268):**
-  Aufgezählt wird hier **nach Größe**; die Bändertabelle darüber ist nach Sachgruppen
-  geordnet, nicht nach Größe (Befunde 361/370). **Größte Achse ist
+- **Unsicherheiten (nach Größe geordnet, Befunde 250/268/398):**
+  Aufgezählt wird hier **nach Größe** der bezifferten Ergebniswirkung (Spalte »Δ gegen
+  Basiswert« der Bändertabelle darüber, maximaler Betrag); die Bändertabelle selbst ist
+  nach Sachgruppen geordnet, nicht nach Größe (Befunde 361/370). **Größte Achse ist
   der Transient-Faktor \(\tau\)** (0,20–1,00 ⇒ **−80 %**, §3.4): Er trennt die
   ausgewiesene Gleichgewichtslesart von einer reinen Jahres-Attribution und ist
   einseitig — er kann das Ergebnis nur senken. Danach die
@@ -1075,13 +1082,20 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   Übertragbarkeit; letztere steht als Modellgrenze 9. Sie ist der größte
   *zweiseitige* Treiber. Danach: Attribution \(a_{\text{attr}}\) (±33 %);
   **BAF_MM** (±67 % auf den MM-Pfad ⇒ ±28,8 % auf die Summe — Befund 356: die Achse
-  steht hier **einmal**, nicht doppelt); die Zeitinvarianz-Annahme der Elastizität
-  (§3.2, Befund 222); Ablesekette (±15 % je Ablesung; Altersprofil
-  out-of-sample bestätigt, s. o.); Anker-Auswahlregel (−4,3 … +2,8 %);
+  steht hier **einmal**, nicht doppelt); **Verhaltens-Sensitivität \(v_{\text{verh}}\)**
+  (geparkte Ebene, \(\phi\) ∈ [0; 0,25] ⇒ ±0 … **+11,3 %**, einseitig nach oben);
+  **VOLY** (136.400–165.600 € ⇒ **−10,1 … +2,0 %**); Entitäten-Split
+  \(w_{\text{SCC}}\) (0,25–0,50 ⇒ BAF_C44 1,675–1,95 ⇒ ±0 … +9,3 %); \(c_e\)-Proxy
+  (obere Kostenbänder beider Entitäten ⇒ Behandlungs-€ 113 → 145 Mio ⇒ +9,3 % auf die
+  Summe, einseitig); Anker-Auswahlregel (−4,3 … +2,8 %);
   **Binnenheterogenität des Bandes 20–64 (≈ ±4 % je Kommune, Bundessumme unberührt —
   §6 Modellgrenze 7, Befund 225)**; **Populationsbasis Kalibrierung ↔ Produktion
-  (−1,19 %, §3.3, Befund 226)**; Latenz (§6); Entitäten-Split altersinvariant;
-  \(c_e\)-Proxy; Augenschäden fehlen.
+  (−1,19 %, §3.3, Befund 226)**; \(r_{\text{out}}\) (geparkt, zentriert ⇒ ±0 %).
+  **Nicht als Ergebnisachse beziffert** und deshalb hier am Ende, nicht der Größe
+  nach eingeordnet: die Zeitinvarianz-Annahme der Elastizität (§3.2, Befund 222);
+  die Ablesekette (±15 % je Ablesung, wirkt über \(c_{\text{kal}}\) auf den Anker
+  und ist dort out-of-sample gegen die ASR bestätigt, s. o.); Latenz (§6);
+  Augenschäden fehlen (§6).
 
 ## 5 Maßnahmen-Hebel (§2.5/§3.5)
 
@@ -1258,8 +1272,8 @@ parameter:
                         # RASTERskala. Stationsquotient 4,9/4,6 aus [31] Tab. 2 und Tab. 4
                         # (Volltext); Rasterquotient 0,6683 bevoelkerungsgewichtet ueber
                         # 10.682 Gemeindepunkte (Baseline-Fall-Gewichtung).
-                        # Historie: Rev. 3 4,9/5,81 = 0,8434 (NRW-Gebietsmittel, Befund 230);
-                        # Rev. 4 4,9/6,48 = 0,7562 (halber Mismatch, Befund 238); Rev. 5  <!--hist-->
+                        # Historie: Rev. 3 4,9/5,81 = 0,8434 (NRW-Gebietsmittel, Befund 230);  <!--hist-->
+                        # Rev. 4 4,9/6,48 = 0,7562 (halber Mismatch, Befund 238).  <!--hist-->
                         # Rev. 5: 0,5782; Rev. 6: 0,6667 (Stationsquotient geschaetzt, Befund 252).  <!--hist-->
                         # Elastizitaet zeitinvariant angenommen (Befund 222).
   herkunft: register:98-E20-02
@@ -1376,8 +1390,10 @@ parameter:
   band: [0.981, 1.038]   # HERGELEITET aus q_out in [0; 0,21] statt gesetzt (Befund 219);
                          # 0,21 = 3x Bundesmittel, gekennzeichnete Abschaetzung solange die
                          # Ebene geparkt ist. Basiswert-Default 1 (GP-Befund 9, Ebene
-                         # geparkt => q = q_quer); Formel §3.4 (w_Z = 0,373; Befund 206)
-  herkunft: register:98-OUT-01
+                         # geparkt => q_out = q_quer_out); Formel §3.4 (w_Z = 0,373; Befund 206)
+  herkunft: herleitung:#q-out   # abgeleitete Groesse ohne Registry-Spec (Befund 395):
+                                # r_out = 1 exakt bei q_out = q_quer_out; der Lint prueft,
+                                # dass der Wert im eigenen Band liegt. Evidenz: register:98-OUT-01
   quelle: schmitt2011_destatis_vgr
   preisstand: null
   bandzuordnung: [20-64, 65-74, 75-84, 85+]   # NICHT u20: die Evidenz ist eine Meta-Analyse
@@ -1595,26 +1611,15 @@ verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Inte
   (Inlandskonzept)", destatis.de (Abruf 30.08.2026): 2023 gesamt 45.909 Tsd.;
   Land-/Forstwirtschaft/Fischerei 572 Tsd.; Baugewerbe 2.643 Tsd. ⇒
   \(\bar q_{\text{out}}\) = 0,0700.
-- **[74]** S. Lorenz u. a., „Increasing Solar UV Radiation in Dortmund, Germany, and
-  Uccle, Belgium", **Konferenz-Abstract** IUPB/MEPSA 2024,
-  iupb-mepsa-2024.m.asnevents.com.au/schedule/session/23372/abstract/104789
-  (Zugriff 01.09.2026). **Nicht mehr wertetragend** (Rev. 7): Alle in Rev. 5/6 von
-  hier bezogenen Angaben stehen im **Volltext** von [31] (Tab. 2/4, Kap. 2), der seit
-  01.09.2026 vorliegt. Der Konferenz-Abstract bleibt als Zweitfundstelle zitiert.
-- **[73]** \(k_{\text{UV}}\)-Herleitung auf Rasterskala (Befunde 230/238/239/245/252/255/256):
-  `backend/scripts/kalibrierung/k_uv_herleitung.py` →
-  `backend/data/kalibrierung/k_uv_herleitung.{csv,md}` (Lauf 01.09.2026):
-  SSD- **und** Globalstrahlungstrend 1997–2022 aus den DWD-CDC-1-km-Jahresrastern
-  ([33] bzw. `grids_germany/annual/radiation_global`, DL-DE→Zero-2.0), abgelesen an
-  der **Messzelle Bochum** (SSD 6,62 · GR 4,51 %/Dek.) und an **10.682
-  Gemeindepunkten** (BKG VG250 × Zensus 2022). Der geführte Quotient **0,6683**
-  ist **fallgewichtet** (Baseline-Fälle × ΔSSD, Befund 278) — *nicht*
-  bevölkerungsgewichtet; Median der Punktverteilung 0,6305. Beide Raster sind
-  einzeln verzeichnet: Sonnenscheindauer [33] für den Nenner, Globalstrahlung
-  (Registry-Quelle `DWD_CDC_Globalstrahlung_Raster`, Zugriff 03.09.2026, Archiv
-  dort) für den Zähler. \(k_{\text{UV}}\) = (4,9/4,6) × 0,6683 = **0,7119**;
-  Band **0,3622–1,0616** aus den publizierten Standardfehlern (±49,1 %, 1 σ).
-  Ersetzt die Rev.-4-bis-6-Anlage `ssd_dortmund_k_uv.py`.
+- **[71]** Baseline-Verankerung und Struktur-Validierung:
+  `backend/scripts/kalibrierung/kid2025_baseline.py` →
+  `backend/data/kalibrierung/kid2025_baseline.md` (Lauf 31.08.2026): Anker 2021–2023,
+  \(c_{\text{kal}}\), \(\lambda_e\), \(\bar L_e\), ASR-Vergleich gegen [27],
+  Bundessummen und die Einzelbänder (§4). Standardbevölkerung: **alter Europastandard**
+  (0–19 = 29.000; 20–54 je 7.000; 55–59 6.000; 60–64 5.000; 65–69 4.000; 70–74 3.000;
+  75–79 2.000; 80–84 und 85+ je 1.000 — Summe 100.000), wie in der [27]-Fußnote
+  bezeichnet.
+
 - **[72]** Bevölkerungsgewichtete SSD-Normalperiodenänderung (Befund 223):
   `backend/scripts/kalibrierung/ssd_povw.py` →
   `backend/data/kalibrierung/ssd_povw.{csv,md}` (Lauf 01.09.2026). Gewichtung auf der
@@ -1640,14 +1645,26 @@ verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Inte
   „Punktmittel ≈ Flächenmittel" belegt sie **nicht** (sie mittelt über Gemeinden, nicht
   über Fläche: RP 2.266 Punkte für 4,1 Mio EW gegen NRW 395 Punkte für 17,8 Mio EW) —
   sie zeigt nur, dass die Punktablesung als solche unverzerrt ist.
-- **[71]** Baseline-Verankerung und Struktur-Validierung:
-  `backend/scripts/kalibrierung/kid2025_baseline.py` →
-  `backend/data/kalibrierung/kid2025_baseline.md` (Lauf 31.08.2026): Anker 2021–2023,
-  \(c_{\text{kal}}\), \(\lambda_e\), \(\bar L_e\), ASR-Vergleich gegen [27],
-  Bundessummen und die Einzelbänder (§4). Standardbevölkerung: **alter Europastandard**
-  (0–19 = 29.000; 20–54 je 7.000; 55–59 6.000; 60–64 5.000; 65–69 4.000; 70–74 3.000;
-  75–79 2.000; 80–84 und 85+ je 1.000 — Summe 100.000), wie in der [27]-Fußnote
-  bezeichnet.
+- **[73]** \(k_{\text{UV}}\)-Herleitung auf Rasterskala (Befunde 230/238/239/245/252/255/256):
+  `backend/scripts/kalibrierung/k_uv_herleitung.py` →
+  `backend/data/kalibrierung/k_uv_herleitung.{csv,md}` (Lauf 01.09.2026):
+  SSD- **und** Globalstrahlungstrend 1997–2022 aus den DWD-CDC-1-km-Jahresrastern
+  ([33] bzw. `grids_germany/annual/radiation_global`, DL-DE→Zero-2.0), abgelesen an
+  der **Messzelle Bochum** (SSD 6,62 · GR 4,51 %/Dek.) und an **10.682
+  Gemeindepunkten** (BKG VG250 × Zensus 2022). Der geführte Quotient **0,6683**
+  ist **fallgewichtet** (Baseline-Fälle × ΔSSD, Befund 278) — *nicht*
+  bevölkerungsgewichtet; Median der Punktverteilung 0,6305. Beide Raster sind
+  einzeln verzeichnet: Sonnenscheindauer [33] für den Nenner, Globalstrahlung
+  (Registry-Quelle `DWD_CDC_Globalstrahlung_Raster`, Zugriff 03.09.2026, Archiv
+  dort) für den Zähler. \(k_{\text{UV}}\) = (4,9/4,6) × 0,6683 = **0,7119**;
+  Band **0,3622–1,0616** aus den publizierten Standardfehlern (±49,1 %, 1 σ).
+  Ersetzt die Rev.-4-bis-6-Anlage `ssd_dortmund_k_uv.py`.
+- **[74]** S. Lorenz u. a., „Increasing Solar UV Radiation in Dortmund, Germany, and
+  Uccle, Belgium", **Konferenz-Abstract** IUPB/MEPSA 2024,
+  iupb-mepsa-2024.m.asnevents.com.au/schedule/session/23372/abstract/104789
+  (Zugriff 01.09.2026). **Nicht mehr wertetragend** (Rev. 7): Alle in Rev. 5/6 von
+  hier bezogenen Angaben stehen im **Volltext** von [31] (Tab. 2/4, Kap. 2), der seit
+  01.09.2026 vorliegt. Der Konferenz-Abstract bleibt als Zweitfundstelle zitiert.
 
 ## 9 Familien-Einordnung & Verworfen-Liste (§2.6 — kein erneuter Drei-Ansätze-Vergleich)
 
@@ -1676,13 +1693,15 @@ Entscheidungsregeln W1–W6 aus `.claude/methodik-loop.md` zitiert).
 **Eintrag 27: Rev.-8-Entscheidung** (Review-Runde 10, Gate 1, 01.09.2026).
 **Eintrag 28: Rev.-9-Entscheidung** (Review-Runde 11, Gate 1, 01.09.2026).
 **Eintrag 29: Rev.-11-Entscheidung** (Review-Runde 13, Gate 1, 01.09.2026).
+**Einträge 30–32: Rev.-14-Entscheidungen** (Revision nach Review-Runde 23, Gate 1,
+04.09.2026; W-Regeln aus `.claude/methodik-loop.md` zitiert).
 **Überstimmungsweg:** „Entscheidung Nr. X ändern auf …" → Delta-Lauf (Neurechnung +
 Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 
 | Nr | Frage | angewendete Entscheidung | Begründung | Alternative | Auswirkung |
 |---|---|---|---|---|---|
 | 1 | Methodischer Ansatz für #98? | **98-A** amtliche Inzidenz + BAF-Trend-Attribution (Familie K1-Gesundheit bottom-up) | jede Komponente amtlich/publiziert; minimale Datenanbindung (M0 Kap. 5) | 98-B (UV-Datenprojekt, M1+); 98-C ausgeschieden | Gesamtmodell |
-| 2 ⚠ | k_UV-Paarung? | **abgelöst durch Nr. 23** (Rev. 4). Stand Rev. 3: 0,8434 = Dosistrend 4,9 [31] ÷ NRW-Gebietsmittel 5,81 [69] (gleiches Fenster, gleiche Datenfamilie wie das Produkt); Band 0,4–1,0 | M0-Kette 4,9/11,3 = 0,43 beruhte auf unbelegtem Stationstrend (GP-Befund 10/16); Raster-konsistente Paarung; Satelliten-Plausibilisierung ✓ | 0,43 (Stations-Paarung — untere Bandstütze; Volltext-Fundstelle als Ersetzungspfad) | Klimasignal ×1,95 ggü. M0; dominanter Bandtreiber |
+| 2 ⚠ | k_UV-Paarung? | **abgelöst durch Nr. 23** (Rev. 4). Stand Rev. 3: 0,8434 = Dosistrend 4,9 [31] ÷ NRW-Gebietsmittel 5,81 [69] (gleiches Fenster, gleiche Datenfamilie wie das Produkt); Band 0,4–1,0 | M0-Kette 4,9/11,3 = 0,43 beruhte auf unbelegtem Stationstrend (GP-Befund 10/16); Raster-konsistente Paarung; Satelliten-Plausibilisierung ✓ | 0,43 (Stations-Paarung — untere Bandstütze; Volltext-Fundstelle als Ersetzungspfad) | Klimasignal ×1,95 ggü. M0; dominanter Bandtreiber <!--hist--> |
 | 3 ⚠ | Attribution des SSD-Trends? | **a_attr,UV = 0,75** (0,5–1,0), gekennzeichnete Abschätzung | GP-Befund 15 (Konsistenz zur #96-Logik); Lorenz-Wolkenbefund hoch, Aerosol-Brightening < 1,0 | 1,0 (M0, unattribuiert — verworfen) | −25 % ggü. M0-Logik; Band ±33 % |
 | 4 | SSD-Fenster? | **Klimanormalperioden je Zelle** (1961–90 vs. 1991–2020) | GP-Befund 37; Einzeljahre zu variabel | gleitende Fenster | reproduzierbar |
 | 5 ⚠ | Altersspezifische Inzidenz? | **Ablesekette aus KID-Abb.** (Roh-Ablesewerte als Anlage-CSV; geschlechtsspezifische Bevölkerungsgewichte [48]) + Normierung auf amtliche Rohraten (ein Skalar je Entität, wirkt in der Formel — Befunde 201/204) | ZfKD-Datenbank nicht keyless (dokumentierte Lücke); Winklmayr-Ablese-Präzedenz #95; Validierung −2,2 %/+0,1 % ∈ ±15 % (nach Befund 212) | warten auf ZfKD-Abfrage (blockiert M0) | Baseline exakt ZfKD-verankert |
@@ -1696,17 +1715,20 @@ Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 | 13 | R36 im Basiswert? | **Default 1** (nur Schicht A) | keine Evidenz; Zugangseffekt steckt im SCS-Hebel | Distanz-Sensitivität | Basiswert schlanker |
 | 14 ⚠ | Latenz-Behandlung? | **Gleichgewichtslesart** („eingelaufenes Risiko") + Pflicht-Infokasten; kein Latenz-Discounting | [35] nennt „Jahrzehnte" ohne Bezifferung; der Rechenschritt kumulative → jährliche Dosis steht in §3.4 mit Transient-Faktor \(\tau\) = 0,20–0,48 | Kohorten-Latenzmodell (M2+) | **Ergebnis wird gegenüber einer Jahres-Attribution überschätzt** — größte Einzelachse der §4-Bändertabelle (67–339 Mio) |
 | 15 ⚠ | Kalibrierung? | **ein Normierungsskalar je Entität** an der ZfKD-Inzidenz (Werte s. Nr. 16); keine Zeitreihen-Kalibrierung des Klimaanteils (keine amtliche Reihe existiert — dokumentierte Ausnahme analog #96) | §3.4 („EIN Skalar"); Klimaanteil messungsbasiert (SSD/Dosis/BAF) | Fit an KKR-Kostenreihe (konfundiert durch Screening/Kodierung — verworfen) | Baseline amtlich exakt; Klimaanteil über Bänder |
-| 16 ⚠ | Ankerfenster der Baseline? | **Mittel 2021–2023** (MM 26.870 · C44 240.973) statt Einzeljahr 2023 ⇒ c_kal 1,0012/0,9910, λ 0,11466/0,005236 | Befund 220: Die abgelesenen Altersraten sind laut Abbildungstitel über **genau diese drei Jahre gepoolt** — ein Einzeljahres-Anker hätte Zähler und Nenner in verschiedenen Fenstern geführt (§3.4 einheitliche Auswahlregel, §3.9 keine Kategorienfehler). Nebenbefund: Die Ablese-Validierung verbessert sich von −2,2 %/+0,1 % auf −0,1 %/+0,9 % | Einzeljahr 2023 beibehalten und die Differenz nur als Sensitivität ausweisen (Vorschlag des Befunds) | **€-Summe 378 → 367 Mio (−2,8 %)**; ΔF 20.900 → 20.760; YLL 1.580 → 1.521; alle Golden-Tests und die Registry nachgezogen |
+| 16 ⚠ | Ankerfenster der Baseline? | **Mittel 2021–2023** (MM 26.870 · C44 240.973) statt Einzeljahr 2023 ⇒ c_kal 1,0012/0,9910, λ 0,11466/0,005236 | Befund 220: Die abgelesenen Altersraten sind laut Abbildungstitel über **genau diese drei Jahre gepoolt** — ein Einzeljahres-Anker hätte Zähler und Nenner in verschiedenen Fenstern geführt (§3.4 einheitliche Auswahlregel, §3.9 keine Kategorienfehler). Nebenbefund: Die Ablese-Validierung verbessert sich von −2,2 %/+0,1 % auf −0,1 %/+0,9 % | Einzeljahr 2023 beibehalten und die Differenz nur als Sensitivität ausweisen (Vorschlag des Befunds) | **€-Summe 378 → 367 Mio (−2,8 %)**; ΔF 20.900 → 20.760; YLL 1.580 → 1.521; alle Golden-Tests und die Registry nachgezogen <!--hist--> |
 | 17 ⚠ | Wirkungsort von v_verh? | **Jahresfaktor** \(v_{\text{verh}} = 1+\phi_{\text{Komfort}}(s-1)\); der Tageswert s = 1,45 bleibt Register-Zeile und ist **kein** Registry-Parameter; \(\phi\)-Ebene **geparkt**, Neutralwert 0 | Befund 216: Rev. 1 stellte ein Registry-Band [1,0–1,6] bereit, das als Tageswert definiert, im Modell aber auf die **Jahres**-ΔDosis multipliziert wurde — bei ~40 Komforttagen rund Faktor 9 zu hoch. §3.5 verlangt einen definierten Wirkungsort, §3.6 einen editierbaren Parameter mit gültiger Semantik | \(\phi\) sofort als Zellgröße bauen (DWD-Tagestemperatur × Tagesdosis — kein keyless Kombinationsdatensatz); oder v_verh ganz aus der Registry nehmen | Basiswert unverändert (Default 1); Band jetzt einstellbar und korrekt: 1,00–1,11 ⇒ € bis 409 Mio |
-| 18 | k_UV in der Registry? | **0,8434** (Herleitungswert 4,9/5,81) statt gerundet 0,84 — **abgelöst durch Nr. 23–25 und 27; geltend ist 0,7119** (Befund 380) | Befund 213: Die gerundete Registry-Zahl erzeugte 0,5 % relative Divergenz zwischen Bericht und Produktion. §3.9 verlangt den Rechenschritt; die Gegenvariante (alle Prosa-Ergebniswerte auf die gerundete Kette umstellen) wäre teurer und ungenauer | Prosa auf 0,84 umstellen | Divergenz geschlossen; Ergebniswerte des Berichts sind aus der Registry exakt reproduzierbar |
-| 19 ⚠ | Gewichtung der nationalen ΔSSD? | **Bevölkerungsgewichtet auf Gemeindepunkt-Ebene** (DE 8,51 % statt flächengewichtet 7,82 %); neue Anlage [72], die die SSD über die Produktfunktion liest | Befund 223 (**A**): Das Produktionsmodell summiert bevölkerungsgewichtet über Zellen; §3.4 erklärt Näherungswerte bei bevölkerungsgewichteter Exposition für unzulässig. **W1** (saubere Lösung erreichbar) + **W4** (Gemeindepunkt-Ebene statt Vollraster, Lesen über die Produktfunktion) | Flächenmittel beibehalten und die Abweichung nur als Näherung ausweisen — verworfen, weil §3.4 die Klasse ausdrücklich ausschließt und #95 sie in Rev. 8 bereits gelöst hat | **€ 367 → 401 Mio (+8,8 %)**; YLL 1.521 → 1.664; ΔF 20.763 → 22.595; Band 116–636 → 127–694 Mio |
+| 18 | k_UV in der Registry? | **0,8434** (Herleitungswert 4,9/5,81) statt gerundet 0,84 — **abgelöst durch Nr. 23–25 und 27; geltend ist 0,7119** (Befund 380) | Befund 213: Die gerundete Registry-Zahl erzeugte 0,5 % relative Divergenz zwischen Bericht und Produktion. §3.9 verlangt den Rechenschritt; die Gegenvariante (alle Prosa-Ergebniswerte auf die gerundete Kette umstellen) wäre teurer und ungenauer | Prosa auf 0,84 umstellen | Divergenz geschlossen; Ergebniswerte des Berichts sind aus der Registry exakt reproduzierbar <!--hist--> |
+| 19 ⚠ | Gewichtung der nationalen ΔSSD? | **Bevölkerungsgewichtet auf Gemeindepunkt-Ebene** (DE 8,51 % statt flächengewichtet 7,82 %); neue Anlage [72], die die SSD über die Produktfunktion liest | Befund 223 (**A**): Das Produktionsmodell summiert bevölkerungsgewichtet über Zellen; §3.4 erklärt Näherungswerte bei bevölkerungsgewichteter Exposition für unzulässig. **W1** (saubere Lösung erreichbar) + **W4** (Gemeindepunkt-Ebene statt Vollraster, Lesen über die Produktfunktion) | Flächenmittel beibehalten und die Abweichung nur als Näherung ausweisen — verworfen, weil §3.4 die Klasse ausdrücklich ausschließt und #95 sie in Rev. 8 bereits gelöst hat | **€ 367 → 401 Mio (+8,8 %)**; YLL 1.521 → 1.664; ΔF 20.763 → 22.595; Band 116–636 → 127–694 Mio <!--hist--> |
 | 20 | Fenster von L̄_e? | **Jahresmediane des Ankerfensters**, sterbefallgewichtet über alle Jahre und Geschlechter ⇒ MM 10,4569 · C44 5,4787 | Befund 224 (**B**): Bis Rev. 2 stand das Sterbealter des Einzeljahrs 2023 dort, begründet mit einer Konstanz, die Tab. 3.13.1/3.14.1 nicht hergeben (M 76/**77**/76 bzw. 84/84/**85**). §3.4 verlangt eine einheitliche Jahres-Auswahlregel, §3.9 die Neurechnung bei geänderter Basis. **W1** (Sterbetafel liegt vor) | 2023-Wahl beibehalten und als Auswahlregel begründen — verworfen, weil sie dann von Anker/c_kal/λ abwiche | L̄_MM −1,16 %, L̄_C44 **+3,37 %**; YLL netto +0,5 % |
 | 21 ⚠ | Band 20–64 feiner führen? | **Nein — Restfehler beziffert und als Modellgrenze 7 geführt** (≈ ±4 % je Kommune); Bänderung unverändert | Befund 225 (**B**): Die feinere Lösung wäre fachlich richtig und die Daten liegen je Zelle vor — sie greift aber in `pollen_age_bands`/`zensus_loader`, also in die von #96 mitgenutzte Kette. **W2** (risikolokal vor Produktumbau) verlangt hier die risikolokale Variante; ein #98-eigener Zellsplit ohne Loader-Eingriff ist nicht möglich, weil die 5-Jahres-Gruppen nicht im CellContext ankommen. §3.9 deckt die bezifferte Näherung | Bänderung produktweit auf 20–44/45–64 umstellen (Ersetzungspfad, §6 Modellgrenze 7) — als **produktweiter** Schritt zu führen, nicht als #98-Alleingang | Bundessumme unberührt; kommunale Differenzierung ±4 % dokumentiert statt still |
 | 22 | ASR-Toleranz? | **Hergeleitet: 2σ = ±10,1 %** (Rundung auf ±10,5 % in Rev. 4 zurückgenommen, Befund 234) aus der Ablesegenauigkeit, plus **Regressionsschranke ±3 %** im Golden-Test | Befund 229 (**C**): ±10 % waren in derselben Revision gesetzt worden, die das Ergebnis erzeugte. Die Fehlerfortpflanzung (σ = ±5,07 %) zeigt: der Wert war sachlich richtig, nur unbelegt. §3.9 gilt auch für Toleranzen | Toleranz willkürlich enger setzen — verworfen, weil sie dann nicht mehr die Ablesegenauigkeit abbildet | Toleranz belegt; zusätzlich eine Schranke, die eine Verschlechterung sichtbar macht |
-| 23 ⚠ | Nenner von k_UV? (**abgelöst durch Nr. 24**) | **Ortsgleicher Raster-SSD-Trend** an der Dortmunder Messzelle (6,48 %/Dek., Mittel dreier Standorte, Anlage [73]) ⇒ \(k_{\text{UV}}\) = 4,9/6,48 = **0,7562**; Band **0,4336–1,0** mit der jetzt **belegten** Stations-Paarung als unterer Stütze | Befund 230 (**A**): (1) Der bis Rev. 3 verwendete Nenner war das **Bundesland**-Gebietsmittel NRW — Punktmessung im Zähler gegen Landesflächenmittel im Nenner, also derselbe Skalen-Mismatch, den Befund 223 für die nationale ΔSSD behoben hat, hier im ergebnissteigernden Sinn. (2) Der fünffach als „unbelegt" bezeichnete Stationstrend 11,3 %/Dek. steht im **Abstract der eigenen Primärquelle** [31] („Sunshine duration in Dortmund increases by 11.3 % per decade") — die tragende Begründung der alten Paarung war damit widerlegt. **W1** (saubere Lösung mit vorhandenen Daten erreichbar: 62 gecachte Jahresraster) + **W4** (drei Punktablesungen statt Vollraster) | Quellinterne Paarung 4,9/11,3 = 0,4336 — verworfen als **Basiswert**, weil das Produkt Raster-ΔSSD liest und ein Stationsnenner die Dosis systematisch unterschätzte; sie ist die untere Bandstütze | **€ 401 → 360 Mio (−10,3 %)**; YLL 1.664 → 1.492; ΔF 22.595 → 20.258; Band 127–694 → **138–694 Mio**; Ledger-Befund 16 (≡ GP-10) wieder geöffnet und neu geschlossen |
-| 24 ⚠ | Skalenbruch zwischen k_UV-Zähler und -Nenner? (**Stationsquotient abgelöst durch Nr. 25**) | **Brücke über die Globalstrahlung**: \(k_{\text{UV}}\) = (Dosis/Global)\|Station × (Global/SSD)\|Raster = (4,9/5,65) × (4,32/6,48) = **0,5782**; Bandstützen **0,4336** (alles Station) und **0,6667** (alles Raster), beide gerechnet | Befund 238 (**A**) + 239 (**B**): Nr. 23 hatte nur den Nenner auf Rasterskala gezogen; Zähler und Nenner blieben in zwei Messfamilien, und die Register-Zeile behauptete fälschlich „gleiche Datenfamilie". Eigene Messung aus denselben 1-km-Rastern (26 Jahre, drei Standorte): Globalstrahlung **4,32 %/Dek.** gegen SSD 6,48 %/Dek. — das Raster gibt den Stations-**Globalstrahlungs**trend auf 0,76 wieder, den **SSD**-Trend nur auf 0,57. Die Differenz ist also metrik-, nicht glättungsbedingt, und die Primärquelle nennt die Brücke selbst („roughly twice as much as global radiation"; „primarily driven by changes in global radiation"). Beide Quotienten sind skalenfrei ⇒ ihr Produkt ist die Elastizität auf Rasterskala. **W1** (mit 26 Jahresrastern und drei Punktablesungen erreichbar) | (a) Quellinterne Stations-Paarung 4,9/11,3 = 0,4336 als Basiswert — verworfen, weil sie die Stationsskala auf die Zelle überträgt; sie ist die **untere** Stütze. (b) Reine Rasterkette 4,32/6,48 = 0,6667 (Dosis ≡ Globalstrahlung) — verworfen als Basiswert, weil sie die gemessene Dosis (4,9) verwirft; sie ist die **obere** Stütze | **€ 360 → 275 Mio (−23,6 %)**; YLL 1.492 → 1.141; ΔF 20.258 → 15.490; Band 138–694 → **138–463 Mio** (die obere Stütze 1,0 war nirgends hergeleitet und widersprach [31] — Befund 239) |
-| 25 ⚠ | Stationsquotient Dosis/Globalstrahlung und k_UV-Band? (**abgelöst durch Nr. 26**) | **1,0 aus der Quelle** statt 0,867 geschätzt ⇒ k_UV = 1,0 × (4,32/6,48) = **0,6667**; **Band 0,3656–0,9187** aus der räumlichen Streuung über acht Standorte statt aus zwei Skalen-Grenzfällen | Befund 245 (**A**) + 239: [31] beziffert den Quotienten direkt — »Global radiation increases similarly to the UV data« —, Rev. 5 hatte ihn aus »roughly twice as much« zu 4,9/5,65 geschätzt und beide Sätze zudem dem **Abstract** zugeschrieben; sie stehen im Fließtext. **W1** verlangt die belegte Größe statt der Ersatzkonstruktion. Das alte Band bildete die tatsächlich dominierende Unsicherheit — die räumliche Übertragbarkeit — nicht ab: Über acht Standorte streut Global/SSD von 0,366 (Stuttgart) bis 0,919 (Freiburg) | Bundesweiter Median 0,700 als Basiswert — verworfen, weil der Stationsquotient nur in Dortmund belegt ist und die Ortsgleichheit die Kette trägt; die Streuung steht stattdessen im Band | **€ 275 → 317 Mio (+15,3 %)**; YLL 1.141 → 1.315; ΔF 15.490 → 17.860; Band 138–463 → **116–638 Mio**; die reine Stations-Paarung 0,4336 liegt innerhalb des Bandes |
-| 26 ⚠ | k_UV nach Vorliegen des Volltexts? (**Gewichtung korrigiert in Nr. 27**) | **Stationsquotient 4,9/4,6 = 1,0652** aus [31] Tab. 2 und Tab. 4; **Rasterquotient 0,6683 bevölkerungsgewichtet** über 10.682 Gemeindepunkte an der richtigen Messzelle (**Bochum**) ⇒ k_UV = **0,7119**. Band aus den **publizierten Standardfehlern** (±49,1 %, 1 σ ⇒ 0,3622–1,0616); die räumliche Streuung wird **Modellgrenze 9** | Befunde 252 (**A**) und 255/256 (**B**): Der Nutzer hat den Volltext beschafft. Er beziffert beide Größen, die Rev. 5/6 geschätzt hatten, und zeigt, dass GR und SunD **nicht in Dortmund**, sondern an DWD-Station 1117 Bochum gemessen wurden. Die Metrikabhängigkeit ist damit direkt belegt: Das Raster gibt an der Messzelle die Globalstrahlung zu **0,98**, die Sonnenscheindauer nur zu **0,59** wieder. Das alte Band (Min/Max über acht handverlesene Städte) buchte eine *räumliche* Streuung als Band der *Bundes*summe — dieselbe Klasse, die der Bericht bei r_out korrekt als »Bundessumme unberührt« führt. **W1** | Rasterquotient an der Messzelle allein (0,6811 ⇒ k_UV 0,7256) — verworfen, weil für die **Bundessumme** der bevölkerungsgewichtete Wert zählt (Logik von Befund 223); der Messzellenwert steht als Vergleich in der Anlage | **€ 317 → 320 Mio (+1,0 %)**; YLL 1.315 → 1.329; Band 116–638 → **109–697 Mio**; Modellgrenze 9 neu; Befunde 16 und 252 endgültig geschlossen |
-| 27 ⚠ | Womit wird der Rasterquotient gewichtet? (**präzisiert in Nr. 28**) | **pop × ΔSSD_Normalperiode** statt pop × SSD-Trend ⇒ q = **0,6683** (statt 0,6320), k_UV = **0,7119** | Befund 266 (**A**): Das Produktionsmodell multipliziert k_UV mit der Normalperioden-ΔSSD (1961–90 → 1991–2020), nicht mit dem Trend 1997–2022. Der nationale k_UV muss deshalb mit genau diesem Feld gewichtet sein — sonst summiert die Kalibrierung anders als die Produktion (§3.4). Die beiden SSD-Felder korrelieren nur mit **r = 0,24**, die Wahl ist also nicht neutral: +7,2 % auf den Quotienten. **W1** (mit den vorhandenen Rastern und `ssd_at` in einem Lauf erreichbar) | Gewichtung mit dem SSD-Trend beibehalten und die Differenz als Näherung ausweisen — verworfen, weil §3.4 die Übereinstimmung von Kalibrier- und Produktionsgewicht verlangt und die Lösung verfügbar ist | **€ 320 → 343 Mio (+7,2 %)**; YLL 1.329 → 1.423; ΔF 18.045 → 19.332; Band 109–697 → **116–747 Mio**; Modellgrenze 9 auf das richtige Gewicht gezogen |
-| 28 | Kopf- oder Fallgewichtung des Rasterquotienten? | **Baseline-Fälle × ΔSSD** statt pop × ΔSSD ⇒ q = **0,6843**, k_UV = **0,7289**; die Entitätsdifferenz (MM 0,6674 · C44 0,6689) wird als €-gewichtetes Mittel geführt und die Restdifferenz < 0,2 % als Näherung gekennzeichnet | Befund 278 (**B**): Das Produktionsmodell summiert ΔF = Σ F_z · BAF · ΔDosis_z — gewichtet wird also mit **Fällen**, nicht mit Köpfen. Weil die Altersstruktur regional variiert, sind beide nicht identisch (+0,8 % MM / +1,2 % C44). Damit trägt auch die Exaktheitszusage in Modellgrenze 9 wieder (»nahezu unberührt« statt »unberührt«). **W1** | Zwei entitätsspezifische k_UV führen — verworfen, weil die Differenz (< 0,2 %) gegen das Band (±49 %) verschwindet und der Modellaufbau je Entität einen zweiten Parameter bräuchte | **€ 343 → 347 Mio (+1,0 %)**; YLL 1.423 → 1.438; Band 116–747 → **118–754 Mio** |
-| 29 | Aggregationsregel des Rasterquotienten? | **Punkte mit SSD-Trend < 1 %/Dekade ausgeschlossen**; Regel in der Anlage dokumentiert und die Ergebnis-Sensitivität ausgewiesen ⇒ q = **0,6683**, k_UV = **0,7119** | Befund 297 (**B**): Seit der Fallgewichtung (Nr. 28) ist q ein gewichtetes **Mittel der Punktquotienten**, nicht mehr ein Quotient getrennt summierter Zähler und Nenner. Der Code-Kommentar rechtfertigte die Einbeziehung instabiler Punkte noch mit der alten Formel. 57 Punkte (0,08 % Gewicht) erreichen q bis **196** und hoben den Bundeswert um **+2,3 %** — ein numerisches Artefakt, kein Messergebnis. §3.9 verlangt die Aggregationsregel ausdrücklich | Instabile Punkte behalten und die Verzerrung als Näherung ausweisen — verworfen, weil q dort durch Division durch ~0 entsteht und keine physikalische Bedeutung hat | **€ 347 → 339 Mio (−2,3 %)**; YLL 1.438 → 1.404; Band 118–754 → **115–737 Mio** |
+| 23 ⚠ | Nenner von k_UV? (**abgelöst durch Nr. 24**) | **Ortsgleicher Raster-SSD-Trend** an der Dortmunder Messzelle (6,48 %/Dek., Mittel dreier Standorte, Anlage [73]) ⇒ \(k_{\text{UV}}\) = 4,9/6,48 = **0,7562**; Band **0,4336–1,0** mit der jetzt **belegten** Stations-Paarung als unterer Stütze | Befund 230 (**A**): (1) Der bis Rev. 3 verwendete Nenner war das **Bundesland**-Gebietsmittel NRW — Punktmessung im Zähler gegen Landesflächenmittel im Nenner, also derselbe Skalen-Mismatch, den Befund 223 für die nationale ΔSSD behoben hat, hier im ergebnissteigernden Sinn. (2) Der fünffach als „unbelegt" bezeichnete Stationstrend 11,3 %/Dek. steht im **Abstract der eigenen Primärquelle** [31] („Sunshine duration in Dortmund increases by 11.3 % per decade") — die tragende Begründung der alten Paarung war damit widerlegt. **W1** (saubere Lösung mit vorhandenen Daten erreichbar: 62 gecachte Jahresraster) + **W4** (drei Punktablesungen statt Vollraster) | Quellinterne Paarung 4,9/11,3 = 0,4336 — verworfen als **Basiswert**, weil das Produkt Raster-ΔSSD liest und ein Stationsnenner die Dosis systematisch unterschätzte; sie ist die untere Bandstütze | **€ 401 → 360 Mio (−10,3 %)**; YLL 1.664 → 1.492; ΔF 22.595 → 20.258; Band 127–694 → **138–694 Mio**; Ledger-Befund 16 (≡ GP-10) wieder geöffnet und neu geschlossen <!--hist--> |
+| 24 ⚠ | Skalenbruch zwischen k_UV-Zähler und -Nenner? (**Stationsquotient abgelöst durch Nr. 25**) | **Brücke über die Globalstrahlung**: \(k_{\text{UV}}\) = (Dosis/Global)\|Station × (Global/SSD)\|Raster = (4,9/5,65) × (4,32/6,48) = **0,5782**; Bandstützen **0,4336** (alles Station) und **0,6667** (alles Raster), beide gerechnet | Befund 238 (**A**) + 239 (**B**): Nr. 23 hatte nur den Nenner auf Rasterskala gezogen; Zähler und Nenner blieben in zwei Messfamilien, und die Register-Zeile behauptete fälschlich „gleiche Datenfamilie". Eigene Messung aus denselben 1-km-Rastern (26 Jahre, drei Standorte): Globalstrahlung **4,32 %/Dek.** gegen SSD 6,48 %/Dek. — das Raster gibt den Stations-**Globalstrahlungs**trend auf 0,76 wieder, den **SSD**-Trend nur auf 0,57. Die Differenz ist also metrik-, nicht glättungsbedingt, und die Primärquelle nennt die Brücke selbst („roughly twice as much as global radiation"; „primarily driven by changes in global radiation"). Beide Quotienten sind skalenfrei ⇒ ihr Produkt ist die Elastizität auf Rasterskala. **W1** (mit 26 Jahresrastern und drei Punktablesungen erreichbar) | (a) Quellinterne Stations-Paarung 4,9/11,3 = 0,4336 als Basiswert — verworfen, weil sie die Stationsskala auf die Zelle überträgt; sie ist die **untere** Stütze. (b) Reine Rasterkette 4,32/6,48 = 0,6667 (Dosis ≡ Globalstrahlung) — verworfen als Basiswert, weil sie die gemessene Dosis (4,9) verwirft; sie ist die **obere** Stütze | **€ 360 → 275 Mio (−23,6 %)**; YLL 1.492 → 1.141; ΔF 20.258 → 15.490; Band 138–694 → **138–463 Mio** (die obere Stütze 1,0 war nirgends hergeleitet und widersprach [31] — Befund 239) <!--hist--> |
+| 25 ⚠ | Stationsquotient Dosis/Globalstrahlung und k_UV-Band? (**abgelöst durch Nr. 26**) | **1,0 aus der Quelle** statt 0,867 geschätzt ⇒ k_UV = 1,0 × (4,32/6,48) = **0,6667**; **Band 0,3656–0,9187** aus der räumlichen Streuung über acht Standorte statt aus zwei Skalen-Grenzfällen | Befund 245 (**A**) + 239: [31] beziffert den Quotienten direkt — »Global radiation increases similarly to the UV data« —, Rev. 5 hatte ihn aus »roughly twice as much« zu 4,9/5,65 geschätzt und beide Sätze zudem dem **Abstract** zugeschrieben; sie stehen im Fließtext. **W1** verlangt die belegte Größe statt der Ersatzkonstruktion. Das alte Band bildete die tatsächlich dominierende Unsicherheit — die räumliche Übertragbarkeit — nicht ab: Über acht Standorte streut Global/SSD von 0,366 (Stuttgart) bis 0,919 (Freiburg) | Bundesweiter Median 0,700 als Basiswert — verworfen, weil der Stationsquotient nur in Dortmund belegt ist und die Ortsgleichheit die Kette trägt; die Streuung steht stattdessen im Band | **€ 275 → 317 Mio (+15,3 %)**; YLL 1.141 → 1.315; ΔF 15.490 → 17.860; Band 138–463 → **116–638 Mio**; die reine Stations-Paarung 0,4336 liegt innerhalb des Bandes <!--hist--> |
+| 26 ⚠ | k_UV nach Vorliegen des Volltexts? (**Gewichtung korrigiert in Nr. 27**) | **Stationsquotient 4,9/4,6 = 1,0652** aus [31] Tab. 2 und Tab. 4; **Rasterquotient 0,6683 bevölkerungsgewichtet** über 10.682 Gemeindepunkte an der richtigen Messzelle (**Bochum**) ⇒ k_UV = **0,7119**. Band aus den **publizierten Standardfehlern** (±49,1 %, 1 σ ⇒ 0,3622–1,0616); die räumliche Streuung wird **Modellgrenze 9** | Befunde 252 (**A**) und 255/256 (**B**): Der Nutzer hat den Volltext beschafft. Er beziffert beide Größen, die Rev. 5/6 geschätzt hatten, und zeigt, dass GR und SunD **nicht in Dortmund**, sondern an DWD-Station 1117 Bochum gemessen wurden. Die Metrikabhängigkeit ist damit direkt belegt: Das Raster gibt an der Messzelle die Globalstrahlung zu **0,98**, die Sonnenscheindauer nur zu **0,59** wieder. Das alte Band (Min/Max über acht handverlesene Städte) buchte eine *räumliche* Streuung als Band der *Bundes*summe — dieselbe Klasse, die der Bericht bei r_out korrekt als »Bundessumme unberührt« führt. **W1** | Rasterquotient an der Messzelle allein (0,6811 ⇒ k_UV 0,7256) — verworfen, weil für die **Bundessumme** der bevölkerungsgewichtete Wert zählt (Logik von Befund 223); der Messzellenwert steht als Vergleich in der Anlage | **€ 317 → 320 Mio (+1,0 %)**; YLL 1.315 → 1.329; Band 116–638 → **109–697 Mio**; Modellgrenze 9 neu; Befunde 16 und 252 endgültig geschlossen <!--hist--> |
+| 27 ⚠ | Womit wird der Rasterquotient gewichtet? (**präzisiert in Nr. 28**) | **pop × ΔSSD_Normalperiode** statt pop × SSD-Trend ⇒ q = **0,6683** (statt 0,6320), k_UV = **0,7119** | Befund 266 (**A**): Das Produktionsmodell multipliziert k_UV mit der Normalperioden-ΔSSD (1961–90 → 1991–2020), nicht mit dem Trend 1997–2022. Der nationale k_UV muss deshalb mit genau diesem Feld gewichtet sein — sonst summiert die Kalibrierung anders als die Produktion (§3.4). Die beiden SSD-Felder korrelieren nur mit **r = 0,24**, die Wahl ist also nicht neutral: +7,2 % auf den Quotienten. **W1** (mit den vorhandenen Rastern und `ssd_at` in einem Lauf erreichbar) | Gewichtung mit dem SSD-Trend beibehalten und die Differenz als Näherung ausweisen — verworfen, weil §3.4 die Übereinstimmung von Kalibrier- und Produktionsgewicht verlangt und die Lösung verfügbar ist | **€ 320 → 343 Mio (+7,2 %)**; YLL 1.329 → 1.423; ΔF 18.045 → 19.332; Band 109–697 → **116–747 Mio**; Modellgrenze 9 auf das richtige Gewicht gezogen <!--hist--> |
+| 28 | Kopf- oder Fallgewichtung des Rasterquotienten? | **Baseline-Fälle × ΔSSD** statt pop × ΔSSD ⇒ q = **0,6843**, k_UV = **0,7289**; die Entitätsdifferenz (MM 0,6674 · C44 0,6689) wird als €-gewichtetes Mittel geführt und die Restdifferenz < 0,2 % als Näherung gekennzeichnet | Befund 278 (**B**): Das Produktionsmodell summiert ΔF = Σ F_z · BAF · ΔDosis_z — gewichtet wird also mit **Fällen**, nicht mit Köpfen. Weil die Altersstruktur regional variiert, sind beide nicht identisch (+0,8 % MM / +1,2 % C44). Damit trägt auch die Exaktheitszusage in Modellgrenze 9 wieder (»nahezu unberührt« statt »unberührt«). **W1** | Zwei entitätsspezifische k_UV führen — verworfen, weil die Differenz (< 0,2 %) gegen das Band (±49 %) verschwindet und der Modellaufbau je Entität einen zweiten Parameter bräuchte | **€ 343 → 347 Mio (+1,0 %)**; YLL 1.423 → 1.438; Band 116–747 → **118–754 Mio** <!--hist--> |
+| 29 | Aggregationsregel des Rasterquotienten? | **Punkte mit SSD-Trend < 1 %/Dekade ausgeschlossen**; Regel in der Anlage dokumentiert und die Ergebnis-Sensitivität ausgewiesen ⇒ q = **0,6683**, k_UV = **0,7119** | Befund 297 (**B**): Seit der Fallgewichtung (Nr. 28) ist q ein gewichtetes **Mittel der Punktquotienten**, nicht mehr ein Quotient getrennt summierter Zähler und Nenner. Der Code-Kommentar rechtfertigte die Einbeziehung instabiler Punkte noch mit der alten Formel. 57 Punkte (0,08 % Gewicht) erreichen q bis **196** und hoben den Bundeswert um **+2,3 %** — ein numerisches Artefakt, kein Messergebnis. §3.9 verlangt die Aggregationsregel ausdrücklich | Instabile Punkte behalten und die Verzerrung als Näherung ausweisen — verworfen, weil q dort durch Division durch ~0 entsteht und keine physikalische Bedeutung hat | **€ 347 → 339 Mio (−2,3 %)**; YLL 1.438 → 1.404; Band 118–754 → **115–737 Mio** <!--hist--> |
+| 30 | `/risiko-auto 98` trifft auf einen bestehenden Bericht (23 Review-Runden) — Neuaufschlag oder Wiedereinstieg? | **Wiedereinstieg in den gemeinsamen Loop ab dem Ist-Stand** (L1 mit den offenen Befunden 412–420); kein Schritt A | Ein Neuaufschlag hätte Bericht, Ledger und 29 Log-Einträge überschrieben (Eiserne Regel 2, Grundregel »keine Rückfragen«); die Loop-Schritte L1–L7 sind für beide Commands identisch | Abbruch mit Rückfrage; oder Neuaufschlag unter neuem Slug | keine — Modellkern unverändert |
+| 31 ⚠ | Zurückgestellte C-Befunde 394–399: Sammelbegründung je Befund individualisieren (Vorschlag 417) oder die Befunde beheben? | **Alle sechs behoben** (W1: die saubere Lösung ist mit vorhandenen Daten erreichbar — Punktmengen-Kette in Anlage [72] mitausgegeben, Zeichentabelle um \(a_{\text{erk}}\), \(q_{\text{R}}\), \(q_{\text{R},z}\), \(z\) ergänzt, Unsicherheiten-Liste vollständig geordnet, Lint-Einordnung der Blöcke ohne Spec, Ledger-Texte 336–352 aus dem Archiv restauriert, 353–367 als gekappt offengelegt) | Die Zurückstellung hatte in vier Runden (408/417) jeweils neue Formbefunde erzeugt; Beheben kostet weniger als eine vierte Begründung und beendet die Klasse | Begründung individualisieren, Befunde bis zur Integration offen lassen | keine — kein Modellwert berührt; Symbolumbenennung \(a\) → \(a_{\text{erk}}\) und \(q\) → \(q_{\text{R}}\) rein notational |
+| 32 ⚠ | Historie-Erkennung im Lint: Marker in **beiden** Funktionen zur einzigen Ausnahme machen (414) — auch für Entscheidungslog, Verworfen-Listen und Anlagen? | **Ja, ausnahmslos**: Stichwortliste, Abschnitts-Heuristik und pauschale Blockquote-Ausnahme gestrichen; 14 Log-Zeilen, die Korrekturhistorie, der §7-Kommentar und vier Anlagen-Zeilen tragen jetzt Marker **plus** Revisionsvermerk; Zahl der Marker als Ratchet festgeschrieben, gedeckte Fundstellen werden ausgegeben (419). Einzige verbleibende Ausnahme ist der Kopfvermerk vor Kapitel 1 (Befund 345) | Achte Runde derselben Klasse; jede Heuristik hatte eine neue Lücke geöffnet. Der Marker ist bewusst gesetzt und maschinell zählbar | Abschnitts-Ausnahme für Anlagen behalten (weniger Marker, aber die von 414 gemessene Lücke bliebe) | keine — reine Prüfmechanik |

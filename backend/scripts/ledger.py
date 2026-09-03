@@ -467,15 +467,22 @@ def _schiefe_zeilen(text: str) -> list[tuple[int, int, int]]:
     return schief
 
 
-# Rekursionsschutz (Befund 412). Ein Pruefausdruck darf pruefen, dass kein
+# Wiedereintritts-Sperre (Befund 412). Ein Pruefausdruck darf pruefen, dass kein
 # geschlossener Befund einen roten Ausdruck traegt — dafuer fuehrt er die
 # Pruefung selbst aus und waehlt sich dabei mit aus. Seit zurueckgestellte
 # Ausdruecke nicht mehr uebersprungen werden (Befund 406), entsteht daraus
 # unbegrenzte Rekursion: der Lauf terminiert nicht, und jede Bilanz, die
 # angeblich daraus stammt, kann nicht entstanden sein.
-# Der Schutz ist bewusst eine Umgebungsvariable und kein Zaehler: So sieht auch
-# ein von aussen gestarteter Kindprozess, dass er in einer Pruefung laeuft.
-REKURSIONS_FLAG = "KAP2_LEDGER_PRUEFE_LAEUFT"
+#
+# Die Sperre ist eine Umgebungsvariable, die den PFAD des gerade geprueften
+# Ledgers traegt — kein blosses Ja/Nein-Flag. Grund: Mehrere Pruefausdruecke
+# (401, 413) rufen `cmd_pruefe()` bewusst auf einer temporaeren Ein-Zeilen-
+# Ledgerkopie auf, um die Statuslogik per Negativtest zu belegen. Ein globales
+# Flag haette genau diese Belege unter `--pruefe` stumm auf 0 gesetzt (401 lief
+# deshalb im Gesamtlauf rot, allein gruen). Uebersprungen wird nur ein
+# verschachtelter Lauf auf DEMSELBEN Ledger — das ist die Rekursion; ein Lauf
+# auf einer anderen Datei ist ein legitimer Test.
+REKURSIONS_FLAG = "KAP2_LEDGER_PRUEFE_AKTIV"
 
 # Harte Zeitgrenze je Pruefausdruck (Befund 412). Ein Ausdruck, der die Pruefung
 # selbst aufruft, erzeugt sonst unbegrenzte Rekursion — der Lauf terminiert nie,
@@ -486,8 +493,12 @@ AUSDRUCK_TIMEOUT_S = 25
 
 
 def _fuehre_aus(kommando: str) -> tuple[int, str]:
-    """Fuehrt einen Pruefausdruck mit Zeitgrenze und Rekursions-Flag aus."""
-    umgebung = dict(os.environ, **{REKURSIONS_FLAG: "1"})
+    """Fuehrt einen Pruefausdruck mit Zeitgrenze und Wiedereintritts-Sperre aus.
+
+    Die Sperre steht bereits in `os.environ` (gesetzt von `cmd_pruefe`, mit dem
+    Pfad des laufenden Ledgers) und wird an den Kindprozess vererbt.
+    """
+    umgebung = dict(os.environ)
     try:
         r = subprocess.run(kommando, shell=True, cwd=REPO, capture_output=True,
                            text=True, timeout=AUSDRUCK_TIMEOUT_S, env=umgebung)
@@ -503,10 +514,25 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     Ein Prüfausdruck ist ein Shell-Kommando in Backticks in der Spalte `Prüfausdruck`.
     Exitcode 0 = Befund belegt geschlossen; alles andere = offen.
     """
-    if os.environ.get(REKURSIONS_FLAG):
-        print("  (verschachtelter --pruefe-Aufruf übersprungen — Rekursionsschutz)")
+    kennung = str(pfad.resolve())
+    vorher = os.environ.get(REKURSIONS_FLAG)
+    if vorher == kennung:
+        print(f"  (verschachtelter --pruefe-Aufruf auf {pfad.name} übersprungen — "
+              f"Wiedereintritts-Sperre, Befund 412)")
         return 0
-    os.environ[REKURSIONS_FLAG] = "1"
+    os.environ[REKURSIONS_FLAG] = kennung
+    try:
+        return _pruefe_inhalt(pfad, streng)
+    finally:
+        # Vorherigen Zustand wiederherstellen — ein verschachtelter Lauf auf einer
+        # Testkopie darf die Sperre des aeusseren Laufs nicht loeschen.
+        if vorher is None:
+            os.environ.pop(REKURSIONS_FLAG, None)
+        else:
+            os.environ[REKURSIONS_FLAG] = vorher
+
+
+def _pruefe_inhalt(pfad: Path, streng: bool) -> int:
     befunde = parse(pfad)
     schief = _schiefe_zeilen(pfad.read_text(encoding="utf-8"))
     rot: list[tuple[Befund, str]] = []
@@ -516,8 +542,15 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     # Befund sei umgesetzt — ihr Pruefausdruck DARF rot sein, er beschreibt ja
     # den zurueckgestellten Sollzustand. Sie werden getrennt ausgewiesen, damit
     # der offene Rest sichtbar bleibt, statt als Fehler unterzugehen.
-    zurueck = [b for b in befunde
-               if b.lage == "zurückgestellt" or "abweichend" in b.status.lower()]
+    # Befund 413: Massgeblich ist allein `Befund.lage`, also der STATUSKOPF vor
+    # dem ersten Doppelpunkt/Gedankenstrich — nie die Nachweisprosa. Die alte
+    # Substring-Suche `"abweichend" in status` las auch »Umsetzung nicht
+    # abweichend vom Vorschlag« als Zurueckstellung und legte damit einen roten
+    # Ausdruck still. Ausserdem gilt §5 woertlich: »Abweichend geloest« ist nur
+    # mit ERFUELLTER Anforderung zulaessig — der Befund ist geschlossen, sein
+    # Ausdruck belegt den abweichenden Sollzustand und muss deshalb GRUEN sein.
+    # Nicht-blockierend rot duerfen nur terminiert zurueckgestellte Befunde sein.
+    zurueck = [b for b in befunde if b.lage == "zurückgestellt"]
     zurueck_nr = {b.nr for b in zurueck}
     zurueck_rot: list[tuple[Befund, str]] = []
     for b in befunde:
@@ -542,7 +575,7 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     unbelegt = [b for b in befunde if b.lage == "geschlossen" and not b.pruefausdruck]
     print(f"{pfad.relative_to(REPO)}: {len(befunde)} Befunde")
     if zurueck:
-        print(f"  zurückgestellt/abw.: {len(zurueck):<4d} "
+        print(f"  zurückgestellt     : {len(zurueck):<4d} "
               f"({', '.join(sorted(b.nr for b in zurueck))})")
         for b, msg in zurueck_rot:
             print(f"    offen laut Ausdruck: {b.nr} -> {msg}")
@@ -571,14 +604,19 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
               f"dort, wo sie gesucht werden:")
         for zn, ist, soll in schief[:10]:
             print(f"    Zeile {zn}: {ist} Zellen, Kopf hat {soll}")
-    os.environ.pop(REKURSIONS_FLAG, None)
     if rot or schief:
         print("\nROT — " + ("mindestens ein Prüfausdruck belegt seinen Befund nicht."
                             if rot else "die Tabellenstruktur trägt die Zusicherung nicht."))
         return 1
-    print(f"\nGRÜN — kein Prüfausdruck schlägt fehl. {len(gruen)} Befunde maschinell "
-          f"belegt, {len(unbelegt)} Altbefunde aus den Runden vor W7 tragen ihren "
-          f"Nachweis nur im Archiv (`--streng` wertet auch diese als rot).")
+    # Befund 413: Die Schlusszeile darf nichts behaupten, was oben widerlegt
+    # steht — ein roter Ausdruck eines zurueckgestellten Befunds ist zulaessig,
+    # aber er IST ein fehlschlagender Ausdruck.
+    rest = (f" {len(zurueck_rot)} Ausdrücke zurückgestellter Befunde sind rot "
+            f"(zulässiger Sollzustand, s. o.)." if zurueck_rot else "")
+    print(f"\nGRÜN — kein Prüfausdruck eines geschlossenen Befunds schlägt fehl. "
+          f"{len(gruen)} Befunde maschinell belegt, {len(unbelegt)} Altbefunde aus den "
+          f"Runden vor W7 tragen ihren Nachweis nur im Archiv (`--streng` wertet auch "
+          f"diese als rot).{rest}")
     return 1 if (streng and unbelegt) else 0
 
 
@@ -598,6 +636,11 @@ SELBSTTEST: tuple[tuple[str, str], ...] = (
     ("zurückgestellt (Termin: Rev. 3)", "zurückgestellt"),
     # Nachsatzprosa enthält „offengelegt" — darf nicht auf offen ziehen (Ledger 95/76):
     ("geschlossen (Integration 30.08.2026): Produktcode offengelegt", "geschlossen"),
+    # Befund 413: das Wort „abweichend" in der PROSA macht keinen Befund zur
+    # Zurueckstellung — nur der Statuskopf zaehlt, und der sagt „geschlossen".
+    ("geschlossen — Umsetzung nicht abweichend vom Vorschlag", "geschlossen"),
+    ("zurückgestellt (Termin: erste Revision nach der Integration) — Kategorie C",
+     "zurückgestellt"),
     # Verlauf mit Pfeil: Endzustand zählt (Ledger 98, Befund 16):
     ("wieder geöffnet (Runde 6, Befund 230) → in Rev. 4 neu geschlossen", "geschlossen"),
     ("wieder geöffnet (Runde 9)", "offen"),
