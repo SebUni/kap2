@@ -1,0 +1,19 @@
+[Unit]
+Description=KAP2 Testumgebung (uvicorn)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=overlord
+Group=overlord
+WorkingDirectory=/opt/overlord/kap2/backend
+EnvironmentFile=/etc/overlord/kap2-test.env
+ExecStart=/opt/overlord/kap2-venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8010
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
