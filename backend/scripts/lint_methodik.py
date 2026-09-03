@@ -47,46 +47,31 @@ VERBOTEN = ("Platzhalter", "wird bei Implementierung", "wird später",
 # genau eine Zeile — ausgerechnet die mit dem seit fuenf Runden beanstandeten
 # abgeloesten Kopfgewichtungs-Wert. Eine Ausnahme, die genau einen Fund
 # unterdrueckt, ist keine Ausnahme, sondern eine Whitelist fuer diesen Fund.
-# Der Check `ausnahmen_zu_eng()` erzwingt die Regel maschinell.
 #
-# Jede Ausnahme steht einzeln mit ihrem Namen, damit `ausnahmen_zu_eng()` nach
-# der KLASSE zaehlen kann und nicht nach dem Treffertext: „Rev. \d+[:) ]" ist
-# eine Klasse, die die ganze Korrekturhistorie deckt — nicht sieben Ausnahmen,
-# die je eine Zeile decken.
-HISTORIE_MUSTER: tuple[tuple[str, str], ...] = (
-    # NUR NOCH EINE Ausnahme (Befund 375). Gemessen wurde, was jede Ausnahme im
-    # Ist-Dokument tatsaechlich deckt: „Rev. N:" deckte 12 Fundstellen, die zehn
-    # uebrigen deckten NULL — sie waren reiner Ballast und zugleich Angriffsflaeche.
-    # Ein Negativtest hat das belegt: eine eingeschleuste Zeile, die einen
-    # abgeloesten k_UV-Wert als geltend ausgab, blieb gruen — das haeufige
-    # Fliesstext-Wort „Alternative" im Umfeld deckte sie. Jede Ausnahme ist eine Luecke; eine, die nichts
-    # deckt, ist eine Luecke ohne Gegenwert. Strukturelle Faelle (Ledger-Tabellen,
-    # Kopfvermerk, Verworfen-Kapitel) traegt `ganz_historie` bzw.
-    # `historie_abschnitt` — sie brauchen keinen Fliesstext-Treffer im Umfeld.
-    ("Rev. N:", r"Rev\.-? ?\d+[-:) ]"),          # datierter Revisionsvermerk
-)
-HISTORIE = re.compile("(" + "|".join(m for _, m in HISTORIE_MUSTER) + ")", re.M)
-HISTORIE_EINZELN = tuple((name, re.compile(muster, re.M))
-                         for name, muster in HISTORIE_MUSTER)
-
-# Ueber alle Quellen (Bericht, Anlagen, Code) gesammelt: welche Ausnahme hat
-# welche Fundstelle unterdrueckt. Erst am Ende ausgewertet, weil eine Ausnahme
-# im Bericht viele und in einer kurzen Anlage nur eine Stelle decken kann —
-# gemeint ist die Klasse ueber das ganze Pruefgut.
+# EXPLIZITER HISTORIE-MARKER statt Heuristik (Befunde 343/353/375/383/392/402/405).
+#
+# Sechs Runden lang wurde geraten, ob eine Zeile einen abgeloesten Wert
+# historisiert oder ihn behauptet: erst ueber Stichwoerter, dann ueber
+# Umfeld-Fenster (70 -> 25 Zeichen), zuletzt ueber eine Adjazenz-Regel. Jede
+# Verfeinerung schloss die zuletzt gefundene Luecke und oeffnete eine neue —
+# die Adjazenz-Regel pruefte, was ZWISCHEN Vermerk und Wert steht, und liess
+# einen NACHGESTELLTEN Vermerk bedingungslos gelten (Befund 405).
+#
+# Die Serie endet hier: Eine Zeile ist genau dann Historie, wenn sie es
+# ausdruecklich SAGT. Der Marker wird bewusst gesetzt und laesst sich nicht
+# versehentlich formulieren; wer einen abgeloesten Wert als geltend schreibt,
+# muesste ihn wissentlich danebensetzen. Zwoelf Zeilen im gesamten Pruefgut
+# tragen ihn — der Aufwand ist klein, die Zusicherung dafuer eindeutig.
+# Gedeckte Fundstellen je Lauf — nur noch zur Ausgabe, nicht zur Entscheidung.
 UNTERDRUECKT: dict[str, list[tuple[str, int, str]]] = {}
-# Wie oft das Muster im gesamten Pruefgut ueberhaupt vorkommt — die eigentliche
-# Kennzahl fuer „zu eng": Ein struktureller Historie-Marker („bis Rev. 7",
-# „Rev. 9:") steht an vielen Stellen und deckt dort nur zufaellig einen
-# abgeloesten Wert. Der geloeschte Prosa-Schnipsel „statt Fällen" existierte im
-# gesamten Pruefgut genau einmal — an der Fundstelle, die er verdeckte.
-MUSTER_VORKOMMEN: dict[str, int] = {}
 
-# „ergäbe sich" leitet eine Sensitivitaets-Gegenrechnung ein. Als freie Ausnahme
-# entschuldigte es geltende Prosa mitsamt falscher Sensitivitaet (Befund 341/343),
-# deshalb gilt es nur noch, wenn die Zeile die Revision oder den Befund nennt,
-# auf die sich die Gegenrechnung bezieht.
-GEGENRECHNUNG = re.compile(r"ergäbe sich")
-GEGENRECHNUNG_BELEG = re.compile(r"(Rev\. \d+|Befund \d+)")
+HISTORIE_MARKER = "<!--hist-->"
+
+
+def ist_historie(zeile: str) -> bool:
+    """Traegt die Zeile den ausdruecklichen Historie-Marker?"""
+    return HISTORIE_MARKER in zeile
+
 
 
 class Lint:
@@ -375,46 +360,6 @@ SYMBOLE: dict[str, tuple[str, ...]] = {
 }
 
 
-def ausnahmen_zu_eng(lint: Lint) -> None:
-    """Meldet Historie-Ausnahmen, die genau eine Fundstelle decken (Befund 343).
-
-    Der Fehler, der diesen Lauf dreimal ueberlebt hat, hat immer dieselbe Form:
-    Eine Ausnahme wird formuliert, waehrend der Fehler vor Augen liegt — und faellt
-    dadurch punktgenau um ihn herum aus. „statt Fällen" deckte genau die eine
-    Berichtszeile mit dem abgeloesten Kopfgewichtungs-Wert; die Whitelist
-    ZWISCHENWERTE enthielt einmal alle elf abgeloesten k_UV-Werte (Befund 298).
-
-    Eine echte Ausnahme beschreibt eine Zeilenklasse und deckt deshalb mehrere
-    Stellen. Deckt sie nur eine, ist sie eine getarnte Einzelfreigabe und der
-    Lint sagt es. Die Schwelle ist bewusst hart: lieber ein Muster praezisieren,
-    als eine Einzelfreigabe uebersehen.
-    """
-    # Eine echte Ausnahme beschreibt eine Zeilenklasse und kommt deshalb oft vor.
-    # Kommt ihr Muster im ganzen Pruefgut kaum vor und verdeckt dabei einen
-    # abgeloesten Wert, ist sie eine getarnte Einzelfreigabe.
-    MINDESTVORKOMMEN = 3
-    # Eine Ausnahme, die im Ist-Dokument NICHTS deckt, ist Ballast: Sie kann nur
-    # kuenftige Funde verdecken, nie einen berechtigten Fall retten (Befund 375).
-    for name, _ in HISTORIE_MUSTER:
-        if name not in UNTERDRUECKT and MUSTER_VORKOMMEN.get(name, 0):
-            lint.fehler.append(
-                f"Historie-Ausnahme ohne Gegenwert: \u201e{name}\u201c deckt im "
-                f"Pruefgut keine einzige Fundstelle — entfernen (Befund 375)")
-    for muster, funde in sorted(UNTERDRUECKT.items()):
-        vorkommen = MUSTER_VORKOMMEN.get(muster, 0)
-        if vorkommen < MINDESTVORKOMMEN:
-            quelle, zeile, wert = funde[0]
-            lint.fehler.append(
-                f"Historie-Ausnahme zu eng: „{muster}“ kommt im gesamten "
-                f"Pruefgut nur {vorkommen}× vor und verdeckt dabei einen "
-                f"abgeloesten Wert ({quelle} Zeile {zeile}, Wert {wert}) — "
-                f"Einzelfreigabe statt Zeilenklasse, siehe Befund 343")
-        else:
-            lint.ok.append(
-                f"Historie-Ausnahme „{muster}“: {vorkommen} Vorkommen, "
-                f"{len(funde)} gedeckte Stellen")
-
-
 def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> None:
     """Abgeloeste Werte im geltenden Teil (Befunde 283/294/295/296).
 
@@ -442,13 +387,6 @@ def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> 
     # Grundrauschen von 2 Treffern je Ausnahme erzeugt haette — knapp unter
     # MINDESTVORKOMMEN, aber genug, um eine echte Einzelfreigabe ueber die
     # Schwelle zu heben und den Ratchet damit wirkungslos zu machen.
-    if quelle != "Code lint_methodik.py":
-        for _name, _rx in HISTORIE_EINZELN:
-            MUSTER_VORKOMMEN[_name] = (MUSTER_VORKOMMEN.get(_name, 0)
-                                       + len(_rx.findall(aktuell)))
-        MUSTER_VORKOMMEN["ergäbe sich (belegt)"] = (
-            MUSTER_VORKOMMEN.get("ergäbe sich (belegt)", 0)
-            + len(GEGENRECHNUNG.findall(aktuell)))
     treffer = 0
     # Zeilen, die als GANZES Historie sind: Entscheidungslog- und Ledger-Tabellen,
     # Kopfvermerke, Korrekturhistorie. Dort ist der alte Wert der Zweck der Zeile.
@@ -514,37 +452,13 @@ def abgeloeste_werte(nr: str, src: str, lint: Lint, quelle: str = "Bericht") -> 
                     f"{wert} — {zeile.strip()[:60]}")
                 treffer += 1
                 continue
-            # STRUKTURELLE Adjazenz statt Schwellenwert (Befund 402). Alle
-            # legitimen Fundstellen haben eine von zwei Formen, in denen der
-            # Revisionsvermerk den Wert unmittelbar historisiert:
-            #     „Rev. 7: 0,6735"        — Vermerk endet direkt vor dem Wert
-            #     „0,5782 (Rev. 5)"       — Vermerk beginnt direkt nach dem Wert
-            # Eine Geltungsbehauptung wie „Rev. 8 gilt: k_UV = <Wert>" oder
-            # „Maßgeblich ist (Rev. 8) k_UV = <Wert>" schiebt Text dazwischen und
-            # faellt damit durch — unabhaengig davon, wie gross ein Fenster ist.
-            # Ein Schwellenwert verschiebt die Luecke nur, er schliesst sie nicht.
-            vor = zeile[:treffer_pos]
-            nach = zeile[treffer_pos + len(f):]
-            umfeld = ""
-            # Zwischen Vermerk und Wert duerfen nur Rechen- und Trennzeichen
-            # stehen, KEIN Wort: „Rev. 4 4,9/6,48 = 0,7562" ist Historie,
-            # „Rev. 8 gilt: k_UV = <abgeloester Wert>" behauptet Geltung. Ein
-            # Fenster nach
-            # Zeichenzahl kann das nicht trennen, diese Regel schon.
-            ZWISCHEN = r"[\s0-9,.:/=×·+()–—-]*"
-            if re.search(r"Rev\.-? ?\d+[:)]?" + ZWISCHEN + r"$", vor):
-                umfeld = vor[-40:]                       # „Rev. N: … <Wert>"
-            elif re.match(ZWISCHEN + r"\(?Rev\.-? ?\d+[):]", nach):
-                umfeld = nach[:40]                       # „<Wert> … (Rev. N)"
+            # Historie NUR ueber den expliziten Marker (Befund 405). Die
+            # frueheren Heuristiken — Stichwortliste, Umfeld-Fenster, zuletzt
+            # eine Adjazenz-Regel — haben ueber sechs Runden je die zuletzt
+            # gefundene Luecke geschlossen und eine neue geoeffnet.
 
-            klasse = next((name for name, rx in HISTORIE_EINZELN if rx.search(umfeld)),
-                          None)
-            if klasse:
-                UNTERDRUECKT.setdefault(klasse, []).append((quelle, i, wert))
-                continue
-            # Gegenrechnung nur mit Beleg (Befund 343).
-            if GEGENRECHNUNG.search(umfeld) and GEGENRECHNUNG_BELEG.search(zeile):
-                UNTERDRUECKT.setdefault("ergäbe sich (belegt)", []).append(
+            if ist_historie(zeile):
+                UNTERDRUECKT.setdefault(HISTORIE_MARKER, []).append(
                     (quelle, i, wert))
                 continue
             lint.fehler.append(
@@ -658,7 +572,7 @@ def revisionsrueckstaende(nr: str, src: str, baender: set[float],
         # fängt den Fall, den die Positivprüfung durchlässt: Der richtige Wert
         # steht irgendwo, die Definitionsgleichung trägt aber den alten (274).
         for i, zeile in enumerate(zeilen, start=1):
-            if HISTORIE.search(zeile) or zeile.lstrip().startswith(">"):
+            if ist_historie(zeile) or zeile.lstrip().startswith(">"):
                 continue
             if "=" not in zeile or not any(re.search(m, zeile) for m in muster):
                 continue
@@ -802,7 +716,6 @@ def pruefe_bericht(pfad: str) -> bool:
     src = open(pfad, encoding="utf-8").read()
     lint = Lint()
     UNTERDRUECKT.clear()
-    MUSTER_VORKOMMEN.clear()
     beispiel_bloecke(src, lint)
     zeichentabelle(src, lint)
     werte, baender = parameter_bloecke(src, lint)
@@ -856,7 +769,6 @@ def pruefe_bericht(pfad: str) -> bool:
 
     # Erst wenn alle Quellen gelesen sind, laesst sich sagen, ob eine Ausnahme im
     # gesamten Pruefgut nur eine Stelle deckt (Befund 343).
-    ausnahmen_zu_eng(lint)
     quellen_ratchet(lint)
 
     print(f"\n=== #{nr} · {os.path.basename(pfad)} ===")

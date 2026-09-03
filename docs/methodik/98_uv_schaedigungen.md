@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–21, Befunde 336–404) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–22, Befunde 336–411) — im Review** ·
 03.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -118,7 +118,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 17 Befunden der Runde 15 nur vier umgesetzt waren — der inhaltliche Verlust ist
 > auf diese vier begrenzt und in Rev. 14 nachgezogen (Befunde 356/357).
 >
-> **Rev. 14 (03.09.2026)** = Review-Runden 16 bis 21 (Befunde 336–404). Keine
+> **Rev. 14 (03.09.2026)** = Review-Runden 16 bis 22 (Befunde 336–411). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
 > € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
 > gefahrenen Review-Runde nachgerechnet — bis Runde 21 neunmal unabhängig
@@ -354,7 +354,7 @@ $$ \Delta\text{Dosis}_{\text{Zelle}} \;=\; \frac{\text{SSD}_{\text{Zelle}}^{\,19
   |---|---|---|
   | amtliche Gemeindepunkte, BKG VG250 `vg250_pk` (Gebietsstand 01.01.2025) | **10.949** | — |
   | davon mit Zensus-2022-Einwohnerzahl (96 ohne) | **10.853** | — |
-  | davon mit SSD-Rasterwert (29 ohne) | **10.824** | ΔSSD-Lauf, Anlage [69] |
+  | davon mit SSD-Rasterwert (29 ohne) | **10.824** | ΔSSD-Lauf, Anlage [72] |
   | davon mit auswertbaren Trendreihen in **beiden** Rastern | **10.739** | k_UV-Lauf, Anlage [73] |
   | davon nach Stabilitätsausschluss (SSD-Trend ≥ 1 %/Dek.) | **10.682** | \(q\) und Perzentile der Modellgrenze 9 |
 
@@ -370,12 +370,12 @@ $$ \Delta\text{Dosis}_{\text{Zelle}} \;=\; \frac{\text{SSD}_{\text{Zelle}}^{\,19
   Die räumliche Streuung ist jetzt **Modellgrenze 9**, nicht Bandquelle.
 
   **Korrekturhistorie.** Rev. 3: 0,8434 (Nenner = NRW-*Gebietsmittel*, Skalen-Mismatch,
-  Befund 230). Rev. 4: 0,7562 (Nenner rasterskaliert, Zähler weiter Station — halber
-  Mismatch, Befund 238). Rev. 5: 0,5782 (Brücke, Stationsquotient aus „roughly twice"
-  geschätzt). Rev. 6: 0,6667 (Stationsquotient aus „similarly" als 1,0 gelesen).
-  Rev. 7: 0,6735 (Stationsquotient aus dem Volltext **beziffert**, Rasterquotient
-  bevölkerungsgewichtet). Rev. 8: 0,7216 (Gewichtung auf die Normalperioden-ΔSSD,
-  Befund 266). Rev. 9: 0,7289 (Fallgewichtung, Befund 278). Rev. 11: **0,7119**
+  Befund 230). Rev. 4: 0,7562 (Nenner rasterskaliert, Zähler weiter Station — halber  <!--hist-->
+  Mismatch, Befund 238). Rev. 5: 0,5782 (Brücke, Stationsquotient aus „roughly twice" <!--hist-->
+  geschätzt). Rev. 6: 0,6667 (Stationsquotient aus „similarly" als 1,0 gelesen).  <!--hist-->
+  Rev. 7: 0,6735 (Stationsquotient aus dem Volltext **beziffert**, Rasterquotient  <!--hist-->
+  bevölkerungsgewichtet). Rev. 8: 0,7216 (Gewichtung auf die Normalperioden-ΔSSD,  <!--hist-->
+  Befund 266). Rev. 9: 0,7289 (Fallgewichtung, Befund 278). Rev. 11: **0,7119**  <!--hist-->
   (Aggregationsregel — instabile Punkte ausgeschlossen, Befund 297).
   **Alle acht Werte liegen innerhalb des ausgewiesenen Bandes 0,3622–1,0616.**
   Plausibilisierung: implizite Dosisänderung DE = 8,51 % × 0,7119 ≈ 6,2 % über den
@@ -740,7 +740,7 @@ $$ \text{€}_{\text{Zelle}} \;=\; \sum_e \Delta F_{e,\text{Zelle}} \cdot c_e \;
   belegte kommunale Verteilung der Außenberufs-Anteile existiert nicht, solange die
   Ebene geparkt ist; drei Kommunaltypen stützen die Größenordnung (reine
   Agrar-/Baugemeinden erreichen ein Vielfaches des Bundesmittels, Großstädte liegen
-  darunter). Ergebnis-Sensitivität: ±3,8 % auf den C44-Zusatz, ±2,1 % auf die €-Summe
+  darunter). Ergebnis-Sensitivität: **−1,9 … +3,8 %** auf den C44-Zusatz, **−1,0 … +2,1 %** auf die €-Summe
   einer Einzelkommune — **null** auf die Bundessumme (Zentrierung). Ersetzungspfad:
   INKAR-Perzentile der Branchenanteile, sobald die Ebene beschafft ist.
 - **Sensitivitätsband \(v_{\text{verh}}\)** (Default 1; Log 11/17; Register 98-S154-01;
@@ -1257,8 +1257,8 @@ parameter:
                         # (Volltext); Rasterquotient 0,6683 bevoelkerungsgewichtet ueber
                         # 10.682 Gemeindepunkte (Baseline-Fall-Gewichtung).
                         # Historie: Rev. 3 4,9/5,81 = 0,8434 (NRW-Gebietsmittel, Befund 230);
-                        # Rev. 4 4,9/6,48 = 0,7562 (halber Mismatch, Befund 238); Rev. 5
-                        # Rev. 5: 0,5782; Rev. 6: 0,6667 (Stationsquotient geschaetzt, Befund 252).
+                        # Rev. 4 4,9/6,48 = 0,7562 (halber Mismatch, Befund 238); Rev. 5  <!--hist-->
+                        # Rev. 5: 0,5782; Rev. 6: 0,6667 (Stationsquotient geschaetzt, Befund 252).  <!--hist-->
                         # Elastizitaet zeitinvariant angenommen (Befund 222).
   herkunft: register:98-E20-02
   quelle: lorenz2024_dwd_ssd_trend
@@ -1478,7 +1478,7 @@ parameter:
 ```
 
 
-## 8 Quellen (§3.8 — #98-relevanter Auszug; Nummern = M0-Zählung, [69]–[70] neu)
+## 8 Quellen (§3.8 — #98-relevanter Auszug; Nummern = M0-Zählung, [69]–[74] neu)
 
 Zugriff 17./18.08.2026 ([27], [31], [34], [43], [70]: 30.08.2026 primär
 verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Integration).

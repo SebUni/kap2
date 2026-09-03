@@ -484,8 +484,22 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     zurueck = [b for b in befunde
                if b.lage == "zurückgestellt" or "abweichend" in b.status.lower()]
     zurueck_nr = {b.nr for b in zurueck}
+    zurueck_rot: list[tuple[Befund, str]] = []
     for b in befunde:
-        if not b.pruefausdruck or b.nr in zurueck_nr:
+        if not b.pruefausdruck:
+            continue
+        if b.nr in zurueck_nr:
+            # Befund 406: Ein Statuswort darf einen roten Ausdruck nicht
+            # STILLLEGEN. Zurueckgestellte und abweichend geloeste Befunde
+            # werden ausgefuehrt und ihr Ergebnis wird ausgewiesen — sie zaehlen
+            # nur nicht als blockierend, weil §6 die Zurueckstellung zulaesst.
+            # Vorher wurden sie uebersprungen, sodass „kein Pruefausdruck
+            # schlaegt fehl" auch dann galt, wenn einer fehlschlug.
+            r = subprocess.run(b.pruefausdruck, shell=True, cwd=REPO,
+                               capture_output=True, text=True)
+            if r.returncode != 0:
+                zurueck_rot.append(
+                    (b, (r.stderr or r.stdout).strip()[:110] or f"exit {r.returncode}"))
             continue
         r = subprocess.run(b.pruefausdruck, shell=True, cwd=REPO,
                            capture_output=True, text=True)
@@ -497,7 +511,13 @@ def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
     unbelegt = [b for b in befunde if b.lage == "geschlossen" and not b.pruefausdruck]
     print(f"{pfad.relative_to(REPO)}: {len(befunde)} Befunde")
     if zurueck:
-        print(f"  zurückgestellt/abw.: {len(zurueck):<4d} ({', '.join(sorted(b.nr for b in zurueck))})")
+        print(f"  zurückgestellt/abw.: {len(zurueck):<4d} "
+              f"({', '.join(sorted(b.nr for b in zurueck))})")
+        for b, msg in zurueck_rot:
+            print(f"    offen laut Ausdruck: {b.nr} -> {msg}")
+        if zurueck_rot:
+            print(f"    ({len(zurueck_rot)} davon mit rotem Ausdruck — das ist der "
+                  f"zurückgestellte Sollzustand, kein Fehler)")
     print(f"  belegt geschlossen : {len(gruen)}")
     print(f"  Prüfausdruck ROT   : {len(rot)}")
     print(f"  unbelegt geschlossen: {len(unbelegt)}   <- Selbstauskunft, nicht geprüft")

@@ -416,10 +416,10 @@ def main() -> None:
              "Landesflächenmittel (Befund 230).")
     p.append(f"- Raster-SSD an der Messzelle ⇒ {DOSIS/t_stat['ssd']:.4f} "
              "(Rechnung mit der Messzelle Bochum; **nicht** der "
-             "Rev.-4-Stand (Rev. 4: 0,7562)): Zähler weiter Station — "
+             "Rev.-4-Stand (Rev. 4: 0,7562)): Zähler weiter Station — "  # <!--hist-->
              "halber Mismatch (Befund 238).")
-    p.append("- Stationsquotient 0,867 aus 》roughly twice《 ⇒ 0,5782 (Rev. 5) bzw. "
-             "1,0 aus 》similarly《 ⇒ 0,6667 (Rev. 6): beides Ersatzkonstruktionen für "
+    p.append("- Stationsquotient 0,867 aus 》roughly twice《 ⇒ 0,5782 (Rev. 5) bzw. "  # <!--hist-->
+             "1,0 aus 》similarly《 ⇒ 0,6667 (Rev. 6): beides Ersatzkonstruktionen für "  # <!--hist-->
              "eine Größe, die der Volltext beziffert (Befund 252).\n")
     p.append("## 6 Ozon im Messfenster (Befunde 246/258)\n")
     p.append(f"Tab. 4 weist für Bochum einen **signifikanten** sommerlichen "
