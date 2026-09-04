@@ -210,6 +210,24 @@ def test_distribution_key_is_bottom_up():
     assert flach["cases_melanoma"] == 0.0 and flach["cases_c44"] == 0.0
 
 
+def test_negative_ssd_change_clips_to_zero():
+    """§3.4 Klipp-Regel (Befund 426): ΔSSD < 0 ⇒ Zusatz exakt 0, nie negativ.
+
+    Betroffen sind 1.133 Rasterzellen (0,32 %) bzw. 40 Gemeindepunkte mit 0,131 %
+    der Bevölkerung; der Kalibrierlauf mittelt unklippt (+0,021 % auf die
+    Bundessumme). Der Test bindet die im Bericht gekennzeichnete Regel an den Code.
+    """
+    override_context.set_overrides({})
+    neg = impact.compute_all_cell_impacts(
+        _ctx(10_000.0, ssd_ref=1600.0, ssd_neu=1557.8))[CODE]   # ΔSSD −2,64 %
+    assert neg["outcome"] == 0.0 and neg["cost_eur"] == 0.0
+    assert neg["cases_melanoma"] == 0.0 and neg["cases_c44"] == 0.0
+    # Gegenprobe: dieselbe Zelle mit positivem ΔSSD liefert einen Zusatz > 0.
+    pos = impact.compute_all_cell_impacts(
+        _ctx(10_000.0, ssd_ref=1600.0, ssd_neu=1642.2))[CODE]
+    assert pos["outcome"] > 0.0 and pos["cases_c44"] > 0.0
+
+
 def test_example_cell_matches_report():
     """§3.4-Beispielzelle: 1.000 EW im Bundesmix, Region Mitte (ΔSSD +9,15 %)."""
     override_context.set_overrides({})

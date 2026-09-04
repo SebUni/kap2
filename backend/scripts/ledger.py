@@ -72,15 +72,27 @@ class Befund:
         # Ein „→" im Statusbereich markiert einen Verlauf („wieder geöffnet → in
         # Rev. 4 neu geschlossen"); maßgeblich ist dann der Endzustand.
         kopf = re.split(r"[(]|—|–", bereich.split("→")[-1], maxsplit=1)[0].strip().lower()
-        # Priorität: geschlossen schlägt offen. „wieder geöffnet → neu geschlossen"
-        # ist geschlossen; „offen" allein bleibt offen.
-        if re.search(r"geschlossen|gelöst|behoben|übernommen|umgesetzt|erledigt"
-                     r"|gegenstandslos|entfällt|akzeptiert|bestätigt", kopf):
-            return "geschlossen"
-        if re.search(r"geöffnet|\boffen\b", kopf):
-            return "offen"
-        if re.search(r"zurückgestellt|terminiert|vertagt", kopf):
-            return "zurückgestellt"
+        # Befund 423: Es entscheidet das ERSTE Statuswort des Kopfes, nicht
+        # irgendein Schliesswort irgendwo darin — „offen, behoben in Rev. 15"
+        # ist offen, „zurückgestellt, wird umgesetzt bei der Integration" ist
+        # zurückgestellt. Eine Negation unmittelbar davor („nicht behoben",
+        # „kein … umgesetzt") zieht auf offen.
+        woerter = re.findall(r"[a-zäöüß]+", kopf)
+        for i, w in enumerate(woerter):
+            lage = None
+            if re.fullmatch(r"geschlossen|gelöst|behoben|übernommen|umgesetzt|erledigt"
+                            r"|gegenstandslos|entfällt|akzeptiert|bestätigt", w):
+                lage = "geschlossen"
+            elif re.fullmatch(r"geöffnet|offen", w):
+                lage = "offen"
+            elif re.fullmatch(r"zurückgestellt|terminiert|vertagt", w):
+                lage = "zurückgestellt"
+            if lage is None:
+                continue
+            if lage == "geschlossen" and any(
+                    v in ("nicht", "kein", "keine", "nie") for v in woerter[max(0, i - 2):i]):
+                return "offen"
+            return lage
         return "unklar"
 
     @property
@@ -126,6 +138,27 @@ def _entfette(text: str) -> str:
 # Kommandos beginnt. Ein Dateiname in Backticks (`ssd_povw.csv`) ist damit kein
 # Kommando mehr, und ein `rm` im Fließtext wird nie ausgeführt.
 ERLAUBTE_KOMMANDOS = ("grep", "rg", "test", "python3", "pytest", "git diff", "git grep")
+
+# GELTUNGSBEREICH von W7 — als Code, nicht als Kommentar (Befund 422). Ein
+# geschlossener Befund ab dieser Nummer MUSS einen ausfuehrbaren Pruefausdruck
+# tragen; fehlt er (leer, Prosa, nicht freigegebenes Kommando), ist das ROT und
+# blockierend — nicht „Altbefund aus den Runden vor W7". Fuer #98 gilt W7 seit
+# Runde 16 (Befund 336); jeder neue Ledger steht von seinem ersten Befund an
+# unter W7. Die Altbefunde davor tragen ihren Nachweis im Archiv und werden
+# weiter nur gezaehlt (`--streng` wertet auch sie als rot).
+W7_AB_NR: dict[str, int] = {"98": 336}
+W7_AB_NR_DEFAULT = 1
+
+
+def w7_grenze(pfad: Path) -> int:
+    m = re.search(r"BEFUNDE_(\w+)\.md", pfad.name)
+    return W7_AB_NR.get(m.group(1) if m else "", W7_AB_NR_DEFAULT)
+
+
+def unter_w7(b: "Befund", grenze: int) -> bool:
+    """Faellt der Befund (nach seiner Nummer) unter die Pruefausdruck-Pflicht?"""
+    m = re.match(r"^(\d+)", b.nr)
+    return bool(m) and int(m.group(1)) >= grenze
 
 
 def _ausdruck(zelle: str) -> str:
@@ -572,7 +605,13 @@ def _pruefe_inhalt(pfad: Path, streng: bool) -> int:
 
     # Ein als geschlossen geführter Befund ohne Prüfausdruck ist unbelegt — genau
     # die Lage, aus der in Runde 16 neun nicht umgesetzte „übernommen" entstanden.
-    unbelegt = [b for b in befunde if b.lage == "geschlossen" and not b.pruefausdruck]
+    # Befund 422: Ab der W7-Grenze ist das ROT (blockierend), davor nur gezaehlt.
+    grenze = w7_grenze(pfad)
+    ohne = [b for b in befunde if b.lage == "geschlossen" and not b.pruefausdruck]
+    unbelegt = [b for b in ohne if not unter_w7(b, grenze)]
+    for b in ohne:
+        if unter_w7(b, grenze):
+            rot.append((b, f"geschlossen ohne gültigen Prüfausdruck (W7 gilt ab Nr. {grenze})"))
     print(f"{pfad.relative_to(REPO)}: {len(befunde)} Befunde")
     if zurueck:
         print(f"  zurückgestellt     : {len(zurueck):<4d} "
@@ -584,7 +623,8 @@ def _pruefe_inhalt(pfad: Path, streng: bool) -> int:
                   f"zurückgestellte Sollzustand, kein Fehler)")
     print(f"  belegt geschlossen : {len(gruen)}")
     print(f"  Prüfausdruck ROT   : {len(rot)}")
-    print(f"  unbelegt geschlossen: {len(unbelegt)}   <- Selbstauskunft, nicht geprüft")
+    print(f"  unbelegt geschlossen: {len(unbelegt)}   <- Altbefunde vor W7 (Nr. < {grenze}), "
+          f"Selbstauskunft, nicht geprüft")
     for b, msg in rot:
         print(f"  ROT  {b.nr:>9s}  {b.text[:64]}  -> {msg}")
     if unbelegt:
@@ -641,6 +681,12 @@ SELBSTTEST: tuple[tuple[str, str], ...] = (
     ("geschlossen — Umsetzung nicht abweichend vom Vorschlag", "geschlossen"),
     ("zurückgestellt (Termin: erste Revision nach der Integration) — Kategorie C",
      "zurückgestellt"),
+    # Befund 423: erstes Statuswort entscheidet; Negation zieht auf offen.
+    ("nicht behoben", "offen"),
+    ("offen, behoben in Rev. 15", "offen"),
+    ("zurückgestellt, wird umgesetzt bei der Integration", "zurückgestellt"),
+    ("kein Prüfausdruck, nicht umgesetzt", "offen"),
+    ("wieder geöffnet → in Rev. 4 neu geschlossen", "geschlossen"),
     # Verlauf mit Pfeil: Endzustand zählt (Ledger 98, Befund 16):
     ("wieder geöffnet (Runde 6, Befund 230) → in Rev. 4 neu geschlossen", "geschlossen"),
     ("wieder geöffnet (Runde 9)", "offen"),

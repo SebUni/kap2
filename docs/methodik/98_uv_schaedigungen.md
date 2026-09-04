@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23, Befunde 336–420) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–24, Befunde 336–430) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -118,7 +118,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 17 Befunden der Runde 15 nur vier umgesetzt waren — der inhaltliche Verlust ist
 > auf diese vier begrenzt und in Rev. 14 nachgezogen (Befunde 356/357).
 >
-> **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 23 (Befunde 336–420). Keine
+> **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 24 (Befunde 336–430). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
 > € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
 > gefahrenen Review-Runde unabhängig nachgerechnet. **Eine Zählung steht hier
@@ -433,8 +433,9 @@ assert abs(4.51/4.6 - 0.98) < 0.01 and abs(6.62/11.3 - 0.59) < 0.01
 rel = ((1.8/4.9)**2 + (1.5/4.6)**2) ** 0.5
 assert abs(rel - 0.491) < 0.002
 assert abs(k_uv*(1-rel) - 0.3622) < 0.001 and abs(k_uv*(1+rel) - 1.0616) < 0.001
-# Quellen-Widerspruch (§3.8): Stations-SSD 11,3 %/Dek. [31] = Faktor 1,74 ueber
-# dem Raster am selben Ort; daraus die untere Bandstuetze.
+# Quellen-Widerspruch (§3.8): Stations-SSD 11,3 %/Dek. [31] = Faktor 1,71 ueber
+# dem Raster an der Messzelle Bochum (6,62 %/Dek.) — Modellgrenze 2 (§6), KEINE
+# Bandstuetze: das Band kommt allein aus den Standardfehlern oben (Befunde 336d/421).
 # Befund 223: BEVOELKERUNGSgewichtete Delta-SSD (Anlage ssd_povw.csv, Gemeindepunkte) —
 # das Produktionsmodell summiert bevoelkerungsgewichtet ueber Zellen, nicht flaechengewichtet.
 dssd = {"nord": 7.82, "mitte": 9.15, "sued": 7.77, "de": 8.51}
@@ -611,6 +612,22 @@ Elastizität würde den MM-Pfad also eher anheben, den C44-Pfad eher senken. [30
 veröffentlicht keine bandweisen BAF; die Annahme bleibt bis dahin bestehen und ist
 über das BAF_MM-Band (±67 % auf den MM-Pfad) mit abgedeckt. **Ersetzungspfad:**
 bandweise BAF, sobald eine Quelle sie beziffert.
+
+**Gekennzeichnete Regel — Klippung bei ΔSSD < 0 (§3.9; Eiserne Regel 5; Befund 426).**
+Die Produktion setzt den klimaattribuierten Zusatz auf **null**, wenn die
+Normalperiodenänderung der Zelle negativ ist: \(\Delta F_{e,\text{Zelle}} = \max(0,\;
+F_{e,\text{Zelle}}\cdot\text{BAF}_e\cdot\Delta\text{Dosis}_{\text{Zelle}})\)
+(`health.py`). Ein negativer Zusatz — weniger Fälle durch weniger Sonne — wird
+also nicht ausgewiesen. Betroffenheit gemessen (Anlage-Raster `ssd_normalperioden.npz`,
+Gemeindepunkte [72]): **1.133 von 358.303** Rasterzellen (0,32 %, minimal −4,9 %) und
+**40 von 10.824** Gemeindepunkten mit **0,131 %** der Bevölkerung (größter Punkt AGS
+08327046, 13.547 EW, −2,64 %). Der Kalibrierlauf [72] mittelt **unklippt**
+(8,5100 %); die Produktion summiert wie 8,5118 % — Abweichung **+0,021 %** auf die
+Bundessumme, gegen das Band (±49 %) vernachlässigbar, aber benannt. Richtung: Für
+die betroffenen Kommunen weist das Produkt 0 statt eines negativen Zusatzes aus
+(Untergrenze). **Ersetzungspfad:** die Klippung entfällt, sobald ein negativer Zusatz
+als Ausweis gewollt ist; dann Kalibrierlauf und Produktion identisch. Golden-Test:
+`test_negative_ssd_change_clips_to_zero`.
 
 **Kumulative Dosis → jährliche Umgebungsdosis: die Gleichgewichtslesart
 (§3.9; Befunde 247/336f).** Die BAF sind in der Primärquelle [30] als Exponenten
@@ -1033,7 +1050,8 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
 - **Verteilschlüssel-Test (§3.1):** strikt bottom-up — Zelle ohne Bevölkerung → 0; das
   Klimasignal ist je Zelle/Region gemessen (kein Deutschland-Nenner). **Baseline-Fälle
   sind bevölkerungs-/altersproportional (kein Klimasignal); der klimaattribuierte
-  Zusatz \(\Delta F\) trägt den vollen ΔDosis-Faktor** — Kommune ohne SSD-Anstieg → ~0 ✓
+  Zusatz \(\Delta F\) trägt den vollen ΔDosis-Faktor** — Kommune ohne SSD-Anstieg → **exakt 0**
+  (ΔSSD ≤ 0 ⇒ Klipp-Regel §3.4, Befund 426) ✓
   (der native YLL-Ausweis und € enthalten nur den Zusatz, keinen Sockel).
 - **Sanity-Bänder (Unter- und Obergrenze):**
   Bundessummen (Basiswerte): \(\Delta F\) = **733 MM + 18.339 C44 ≈ 19.072 Fälle/Jahr**,
@@ -1434,10 +1452,11 @@ parameter:
   id: uv.i_mm
   wert: {u20: 0.5, a20_64: 24.7, a65_74: 64.0, a75_84: 94.9, a85p: 88.5}
   einheit: "1/100.000·a"
-  band: null   # Ableseunsicherheit der Kette ist in der Struktur-Validierung
-               # abgebildet (2 sigma = +/-10,1 %, Anlage [71]), nicht als
-               # Parameter-Band: die Raten sind gemeinsam abgelesen und korreliert.
-  herkunft: herleitung:#anker
+  band: null   # Ableseunsicherheit der Kette: +/-15 % je Rate (Ablesetoleranz vor
+               # der Normierung, §3.3); in der Struktur-Validierung abgebildet
+               # (Anlage [71]), nicht als Parameter-Band: die Raten sind gemeinsam
+               # abgelesen und korreliert (Befund 429).
+  herkunft: register:98-R35-01   # wertgleich mit uv.i_raten_roh (Befund 429)
   quelle: zfkd_kid2025   # Abb. 3.13.2, altersspezifische Rohraten Melanom (C43)
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]   # bandweise Raten;
@@ -1449,10 +1468,10 @@ parameter:
   id: uv.i_c44
   wert: {u20: 2.0, a20_64: 125.9, a65_74: 617.6, a75_84: 1267.2, a85p: 1479.5}
   einheit: "1/100.000·a"
-  band: null   # wie uv.i_mm — gemeinsame Ablesekette, Toleranz in der
-               # Struktur-Validierung (Anlage [71]).
-  herkunft: herleitung:#anker
-  quelle: zfkd_kid2025   # Abb. 3.14.2, altersspezifische Rohraten heller Hautkrebs (C44)
+  band: null   # wie uv.i_mm — gemeinsame Ablesekette, +/-15 % je Rate, Toleranz
+               # in der Struktur-Validierung (Anlage [71]).
+  herkunft: register:98-R35-01   # wertgleich mit uv.i_raten_roh (Befund 429)
+  quelle: zfkd_kid2025   # Abb. 3.14.3, altersspezifische Rohraten heller Hautkrebs (C44)
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
@@ -1695,6 +1714,7 @@ Entscheidungsregeln W1–W6 aus `.claude/methodik-loop.md` zitiert).
 **Eintrag 29: Rev.-11-Entscheidung** (Review-Runde 13, Gate 1, 01.09.2026).
 **Einträge 30–32: Rev.-14-Entscheidungen** (Revision nach Review-Runde 23, Gate 1,
 04.09.2026; W-Regeln aus `.claude/methodik-loop.md` zitiert).
+**Eintrag 33: Rev.-14-Entscheidung** (Revision nach Review-Runde 24, Gate 1, 04.09.2026).
 **Überstimmungsweg:** „Entscheidung Nr. X ändern auf …" → Delta-Lauf (Neurechnung +
 Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 
@@ -1716,7 +1736,7 @@ Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 | 14 ⚠ | Latenz-Behandlung? | **Gleichgewichtslesart** („eingelaufenes Risiko") + Pflicht-Infokasten; kein Latenz-Discounting | [35] nennt „Jahrzehnte" ohne Bezifferung; der Rechenschritt kumulative → jährliche Dosis steht in §3.4 mit Transient-Faktor \(\tau\) = 0,20–0,48 | Kohorten-Latenzmodell (M2+) | **Ergebnis wird gegenüber einer Jahres-Attribution überschätzt** — größte Einzelachse der §4-Bändertabelle (67–339 Mio) |
 | 15 ⚠ | Kalibrierung? | **ein Normierungsskalar je Entität** an der ZfKD-Inzidenz (Werte s. Nr. 16); keine Zeitreihen-Kalibrierung des Klimaanteils (keine amtliche Reihe existiert — dokumentierte Ausnahme analog #96) | §3.4 („EIN Skalar"); Klimaanteil messungsbasiert (SSD/Dosis/BAF) | Fit an KKR-Kostenreihe (konfundiert durch Screening/Kodierung — verworfen) | Baseline amtlich exakt; Klimaanteil über Bänder |
 | 16 ⚠ | Ankerfenster der Baseline? | **Mittel 2021–2023** (MM 26.870 · C44 240.973) statt Einzeljahr 2023 ⇒ c_kal 1,0012/0,9910, λ 0,11466/0,005236 | Befund 220: Die abgelesenen Altersraten sind laut Abbildungstitel über **genau diese drei Jahre gepoolt** — ein Einzeljahres-Anker hätte Zähler und Nenner in verschiedenen Fenstern geführt (§3.4 einheitliche Auswahlregel, §3.9 keine Kategorienfehler). Nebenbefund: Die Ablese-Validierung verbessert sich von −2,2 %/+0,1 % auf −0,1 %/+0,9 % | Einzeljahr 2023 beibehalten und die Differenz nur als Sensitivität ausweisen (Vorschlag des Befunds) | **€-Summe 378 → 367 Mio (−2,8 %)**; ΔF 20.900 → 20.760; YLL 1.580 → 1.521; alle Golden-Tests und die Registry nachgezogen <!--hist--> |
-| 17 ⚠ | Wirkungsort von v_verh? | **Jahresfaktor** \(v_{\text{verh}} = 1+\phi_{\text{Komfort}}(s-1)\); der Tageswert s = 1,45 bleibt Register-Zeile und ist **kein** Registry-Parameter; \(\phi\)-Ebene **geparkt**, Neutralwert 0 | Befund 216: Rev. 1 stellte ein Registry-Band [1,0–1,6] bereit, das als Tageswert definiert, im Modell aber auf die **Jahres**-ΔDosis multipliziert wurde — bei ~40 Komforttagen rund Faktor 9 zu hoch. §3.5 verlangt einen definierten Wirkungsort, §3.6 einen editierbaren Parameter mit gültiger Semantik | \(\phi\) sofort als Zellgröße bauen (DWD-Tagestemperatur × Tagesdosis — kein keyless Kombinationsdatensatz); oder v_verh ganz aus der Registry nehmen | Basiswert unverändert (Default 1); Band jetzt einstellbar und korrekt: 1,00–1,11 ⇒ € bis 409 Mio |
+| 17 ⚠ | Wirkungsort von v_verh? | **Jahresfaktor** \(v_{\text{verh}} = 1+\phi_{\text{Komfort}}(s-1)\); der Tageswert s = 1,45 bleibt Register-Zeile und ist **kein** Registry-Parameter; \(\phi\)-Ebene **geparkt**, Neutralwert 0 | Befund 216: Rev. 1 stellte ein Registry-Band [1,0–1,6] bereit, das als Tageswert definiert, im Modell aber auf die **Jahres**-ΔDosis multipliziert wurde — bei ~40 Komforttagen rund Faktor 9 zu hoch. §3.5 verlangt einen definierten Wirkungsort, §3.6 einen editierbaren Parameter mit gültiger Semantik | \(\phi\) sofort als Zellgröße bauen (DWD-Tagestemperatur × Tagesdosis — kein keyless Kombinationsdatensatz); oder v_verh ganz aus der Registry nehmen | Basiswert unverändert (Default 1); Band jetzt einstellbar und korrekt: 1,00–1,11 ⇒ € bis 409 Mio (Rev.-2-Stand: 367 × 1,1125; heute 339 × 1,1125 = **377 Mio**, §4-Bändertabelle) <!--hist--> |
 | 18 | k_UV in der Registry? | **0,8434** (Herleitungswert 4,9/5,81) statt gerundet 0,84 — **abgelöst durch Nr. 23–25 und 27; geltend ist 0,7119** (Befund 380) | Befund 213: Die gerundete Registry-Zahl erzeugte 0,5 % relative Divergenz zwischen Bericht und Produktion. §3.9 verlangt den Rechenschritt; die Gegenvariante (alle Prosa-Ergebniswerte auf die gerundete Kette umstellen) wäre teurer und ungenauer | Prosa auf 0,84 umstellen | Divergenz geschlossen; Ergebniswerte des Berichts sind aus der Registry exakt reproduzierbar <!--hist--> |
 | 19 ⚠ | Gewichtung der nationalen ΔSSD? | **Bevölkerungsgewichtet auf Gemeindepunkt-Ebene** (DE 8,51 % statt flächengewichtet 7,82 %); neue Anlage [72], die die SSD über die Produktfunktion liest | Befund 223 (**A**): Das Produktionsmodell summiert bevölkerungsgewichtet über Zellen; §3.4 erklärt Näherungswerte bei bevölkerungsgewichteter Exposition für unzulässig. **W1** (saubere Lösung erreichbar) + **W4** (Gemeindepunkt-Ebene statt Vollraster, Lesen über die Produktfunktion) | Flächenmittel beibehalten und die Abweichung nur als Näherung ausweisen — verworfen, weil §3.4 die Klasse ausdrücklich ausschließt und #95 sie in Rev. 8 bereits gelöst hat | **€ 367 → 401 Mio (+8,8 %)**; YLL 1.521 → 1.664; ΔF 20.763 → 22.595; Band 116–636 → 127–694 Mio <!--hist--> |
 | 20 | Fenster von L̄_e? | **Jahresmediane des Ankerfensters**, sterbefallgewichtet über alle Jahre und Geschlechter ⇒ MM 10,4569 · C44 5,4787 | Befund 224 (**B**): Bis Rev. 2 stand das Sterbealter des Einzeljahrs 2023 dort, begründet mit einer Konstanz, die Tab. 3.13.1/3.14.1 nicht hergeben (M 76/**77**/76 bzw. 84/84/**85**). §3.4 verlangt eine einheitliche Jahres-Auswahlregel, §3.9 die Neurechnung bei geänderter Basis. **W1** (Sterbetafel liegt vor) | 2023-Wahl beibehalten und als Auswahlregel begründen — verworfen, weil sie dann von Anker/c_kal/λ abwiche | L̄_MM −1,16 %, L̄_C44 **+3,37 %**; YLL netto +0,5 % |
@@ -1731,4 +1751,5 @@ Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 | 29 | Aggregationsregel des Rasterquotienten? | **Punkte mit SSD-Trend < 1 %/Dekade ausgeschlossen**; Regel in der Anlage dokumentiert und die Ergebnis-Sensitivität ausgewiesen ⇒ q = **0,6683**, k_UV = **0,7119** | Befund 297 (**B**): Seit der Fallgewichtung (Nr. 28) ist q ein gewichtetes **Mittel der Punktquotienten**, nicht mehr ein Quotient getrennt summierter Zähler und Nenner. Der Code-Kommentar rechtfertigte die Einbeziehung instabiler Punkte noch mit der alten Formel. 57 Punkte (0,08 % Gewicht) erreichen q bis **196** und hoben den Bundeswert um **+2,3 %** — ein numerisches Artefakt, kein Messergebnis. §3.9 verlangt die Aggregationsregel ausdrücklich | Instabile Punkte behalten und die Verzerrung als Näherung ausweisen — verworfen, weil q dort durch Division durch ~0 entsteht und keine physikalische Bedeutung hat | **€ 347 → 339 Mio (−2,3 %)**; YLL 1.438 → 1.404; Band 118–754 → **115–737 Mio** <!--hist--> |
 | 30 | `/risiko-auto 98` trifft auf einen bestehenden Bericht (23 Review-Runden) — Neuaufschlag oder Wiedereinstieg? | **Wiedereinstieg in den gemeinsamen Loop ab dem Ist-Stand** (L1 mit den offenen Befunden 412–420); kein Schritt A | Ein Neuaufschlag hätte Bericht, Ledger und 29 Log-Einträge überschrieben (Eiserne Regel 2, Grundregel »keine Rückfragen«); die Loop-Schritte L1–L7 sind für beide Commands identisch | Abbruch mit Rückfrage; oder Neuaufschlag unter neuem Slug | keine — Modellkern unverändert |
 | 31 ⚠ | Zurückgestellte C-Befunde 394–399: Sammelbegründung je Befund individualisieren (Vorschlag 417) oder die Befunde beheben? | **Alle sechs behoben** (W1: die saubere Lösung ist mit vorhandenen Daten erreichbar — Punktmengen-Kette in Anlage [72] mitausgegeben, Zeichentabelle um \(a_{\text{erk}}\), \(q_{\text{R}}\), \(q_{\text{R},z}\), \(z\) ergänzt, Unsicherheiten-Liste vollständig geordnet, Lint-Einordnung der Blöcke ohne Spec, Ledger-Texte 336–352 aus dem Archiv restauriert, 353–367 als gekappt offengelegt) | Die Zurückstellung hatte in vier Runden (408/417) jeweils neue Formbefunde erzeugt; Beheben kostet weniger als eine vierte Begründung und beendet die Klasse | Begründung individualisieren, Befunde bis zur Integration offen lassen | keine — kein Modellwert berührt; Symbolumbenennung \(a\) → \(a_{\text{erk}}\) und \(q\) → \(q_{\text{R}}\) rein notational |
-| 32 ⚠ | Historie-Erkennung im Lint: Marker in **beiden** Funktionen zur einzigen Ausnahme machen (414) — auch für Entscheidungslog, Verworfen-Listen und Anlagen? | **Ja, ausnahmslos**: Stichwortliste, Abschnitts-Heuristik und pauschale Blockquote-Ausnahme gestrichen; 14 Log-Zeilen, die Korrekturhistorie, der §7-Kommentar und vier Anlagen-Zeilen tragen jetzt Marker **plus** Revisionsvermerk; Zahl der Marker als Ratchet festgeschrieben, gedeckte Fundstellen werden ausgegeben (419). Einzige verbleibende Ausnahme ist der Kopfvermerk vor Kapitel 1 (Befund 345) | Achte Runde derselben Klasse; jede Heuristik hatte eine neue Lücke geöffnet. Der Marker ist bewusst gesetzt und maschinell zählbar | Abschnitts-Ausnahme für Anlagen behalten (weniger Marker, aber die von 414 gemessene Lücke bliebe) | keine — reine Prüfmechanik |
+| 32 ⚠ | Historie-Erkennung im Lint: Marker in **beiden** Funktionen zur einzigen Ausnahme machen (414) — auch für Entscheidungslog, Verworfen-Listen und Anlagen? | **Ja, ausnahmslos**: Stichwortliste, Abschnitts-Heuristik und pauschale Blockquote-Ausnahme gestrichen; 12 Log-Zeilen (Nr. 2, 16–19, 23–29; Nr. 17 seit Befund 427), die Korrekturhistorie, der §7-Kommentar und vier Anlagen-Zeilen tragen jetzt Marker **plus** Revisionsvermerk; Zahl der Marker als Ratchet festgeschrieben, gedeckte Fundstellen werden ausgegeben (419). Einzige verbleibende Ausnahme ist der Kopfvermerk vor Kapitel 1 (Befund 345) | Achte Runde derselben Klasse; jede Heuristik hatte eine neue Lücke geöffnet. Der Marker ist bewusst gesetzt und maschinell zählbar | Abschnitts-Ausnahme für Anlagen behalten (weniger Marker, aber die von 414 gemessene Lücke bliebe) | keine — reine Prüfmechanik |
+| 33 ⚠ | Geltungsbereich von W7 im Werkzeug (Befund 422): rückwirkend für alle Befunde oder ab der Einführung? | **Ab der Einführung, als Code**: `W7_AB_NR = {"98": 336}`, neue Ledger ab Befund 1; ein geschlossener Befund ab der Grenze ohne gültigen Prüfausdruck ist blockierend rot, Altbefunde davor werden nur gezählt (`--streng` wertet sie rot). 343 und 353 (Runde 16/17) tragen jetzt Ausdrücke | Die Statusregel des Ledgers sagt genau das seit Befund 355; nachträglich erfundene Ausdrücke für 145 Altbefunde wären die Selbstauskunft, die W7 abschaffen soll — ihre Nachweise stehen im Archiv und wurden mehrfach gegengeprüft | W7 rückwirkend (145 Altbefunde rot, Abnahme unmöglich ohne Ausdrucks-Nacherfindung); oder Grenze weiter nur als Kommentar | keine — Prüfmechanik; `--pruefe` bleibt grün, weil 343/353 belegt sind |

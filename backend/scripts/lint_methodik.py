@@ -87,12 +87,14 @@ REVISIONSVERMERK = re.compile(
 # Marker eine stille Einzelfreigabe. Gezaehlt werden Zeilen mit Marker in allen
 # gelesenen Quellen ausser der Lint-Datei selbst (ihre Konstantendefinition traegt
 # den Marker per Definition; der Commit zu Runde 22 hatte sie faelschlich
-# mitgezaehlt). Aktueller Bestand, Rev. 14 nach Runde 23 (gemessen): Bericht 21 —
+# mitgezaehlt). Aktueller Bestand, Rev. 14 nach Runde 24 (gemessen): Bericht 22 —
 # Korrekturhistorie §3.2 (7 Zeilen), §7-Historie-Kommentar (3), Entscheidungslog
-# (11 Zeilen: Nr. 2, 16, 18, 19, 23–29); Anlage k_uv_herleitung.md (4: Schwellen-
-# reihe ohne Schwelle, drei Verworfen-Zeilen); Code k_uv_herleitung.py (7: die
-# Quellzeilen, die diese vier Anlagenzeilen erzeugen).
-HISTORIE_MARKER_SOLL: dict[str, int] = {"98": 32}
+# (12 Zeilen: Nr. 2, 16, 17, 18, 19, 23–29; Nr. 17 seit Befund 427); Anlage
+# k_uv_herleitung.md (4: Schwellenreihe ohne Schwelle, drei Verworfen-Zeilen);
+# Code k_uv_herleitung.py (7: die Quellzeilen, die diese vier Anlagenzeilen
+# erzeugen). Das risikouebergreifende Register (docs/evidenz/register.md) traegt
+# keinen Marker.
+HISTORIE_MARKER_SOLL: dict[str, int] = {"98": 33}
 MARKER_ZAEHLER: dict[str, int] = {}
 
 
@@ -407,7 +409,13 @@ ABGELOESTE_WERTE: dict[str, tuple[str, ...]] = {
         # bzw. 2,1 %/Dek. gehoeren zum abgeloesten k_UV = 0,7289 (Rev. 9); geltend
         # sind 6,06 % und 2,02 %/Dek. Bewusst mit Praefix, weil »6,2 %« an
         # anderer Stelle legitim vorkommt (Behandlungs-€-Anteil an der KKR).
-        "≈ 6,2 %", "~ 6,2 %", "2,1 %/Dek"),
+        "≈ 6,2 %", "~ 6,2 %", "2,1 %/Dek",
+        # Befund 421: 1,74 = 11,3/6,48 ist der Dortmunder Rev.-4-bis-6-Rasternenner;
+        # geltend ist 1,71 = 11,3/6,62 an der Messzelle Bochum (Modellgrenze 2).
+        "1,74", "11,3/6,48",
+        # Befund 427: 409 Mio = 367 × 1,1125 war die v_verh-Obergrenze der Rev. 2;
+        # geltend ist 377 Mio (339 × 1,1125).
+        "409 Mio"),
 }
 
 ZWISCHENWERTE: dict[str, dict[str, tuple[float, ...]]] = {
@@ -810,6 +818,13 @@ def pruefe_bericht(pfad: str) -> bool:
     knoten_abgleich(nr, src, lint)
     revisionshistorie(src, lint)
     abgeloeste_werte(nr, src, lint)
+    # Das risikouebergreifende Evidenz-Register (Befund 425): Es fuehrte fuer
+    # 98-E20-02 zehn Revisionen lang den seit Rev. 4 abgeloesten Basiswert, weil
+    # kein Lint es las — ein Folge-Risiko haette den falschen Wert uebernommen.
+    register = os.path.join(ROOT, "..", "docs", "evidenz", "register.md")
+    if os.path.exists(register):
+        abgeloeste_werte(nr, open(register, encoding="utf-8").read(), lint,
+                         quelle="Register docs/evidenz/register.md")
     # Anlagen-Ausgaben ...
     for anlage in ("k_uv_herleitung.md", "ssd_povw.md", "kid2025_baseline.md"):
         pfad_a = os.path.join(ROOT, "data", "kalibrierung", anlage)
