@@ -137,9 +137,9 @@ def beispiel_bloecke(src: str, lint: Lint) -> None:
 
 
 def zeichentabelle(src: str, lint: Lint) -> None:
-    m = re.search(r"### 3\.5 Zeichentabelle.*?\n(.*?)\n### ", src, re.S)
+    m = re.search(r"### \S+ Zeichentabelle.*?\n(.*?)\n### ", src, re.S)
     if not m:
-        lint.fehler.append("Zeichentabelle: Abschnitt 3.5 nicht gefunden")
+        lint.fehler.append("Zeichentabelle: Abschnitt nicht gefunden")
         return
     zeilen = [z for z in m.group(1).split("\n") if z.strip().startswith("|")][2:]
     lint.pruefe(bool(zeilen), "Zeichentabelle nicht leer")
