@@ -1,4 +1,5 @@
-"""Golden-Tests der Methodik #98 (UV-Schädigungen, Bericht Rev. 11).
+"""Golden-Tests der Methodik #98 (UV-Schädigungen; Revisionsstand im Kopfvermerk
+der Markdown-Quelle, Befund 434).
 
 Prüfklassen wie bei #95/#96 (Integrations-Kontrakt, AUFGABE §7 /
 integriere-risiko §4):
@@ -289,6 +290,27 @@ def test_screening_norm_override_does_not_move_euro_path():
     assert abs(base - after) < 1e-9
 
 
+def test_qbar_out_is_centering_mean_without_decentering_band():
+    """§3.2/§7 (Befund 433): q̄_out ist das amtliche Zentrierungsmittel, kein Band.
+
+    Ein Band an q̄_out erlaubte eine Dezentrierung innerhalb der deklarierten
+    Spanne (q̄ = 0,21 bei q = 0,07 ⇒ r_out = 0,965). Der Kap.-7-Block führt deshalb
+    ``band: null``; die q_out-Spanne [0; 0,21] steht bei ``uv.r_out_sensitivitaet``.
+    """
+    src = open(REPORT, encoding="utf-8").read()
+    block = src.split("id: uv.qbar_out")[1].split("parameter:")[0]
+    band = [z for z in block.splitlines() if z.strip().startswith("band:")][0]
+    assert band.split("#")[0].strip() == "band: null", band
+    assert _spec("qbar_out")["value"] == 0.070
+    # Zentrierung am Basiswert: q = q̄ ⇒ r_out exakt 1 (bei aktivem Schalter).
+    override_context.set_overrides({f"impact.{CODE}.r_out_enabled": 1.0})
+    try:
+        a = _ctx(10_000.0, share_outdoor_workers=0.070)
+        assert abs(H._uv_r_out(a, CODE) - 1.0) < 1e-12
+    finally:
+        override_context.set_overrides({})
+
+
 def test_r_out_modifier_is_parked_and_neutral():
     """§3.6: Außenbeschäftigten-Ebene ist GEPARKT ⇒ r_out exakt neutral.
 
@@ -318,7 +340,8 @@ def test_r_out_modifier_is_parked_and_neutral():
 def test_asr_regression_schranke():
     """Kap. 4: Regressionsschranke ±3 % auf die Struktur-Validierung (Befund 229).
 
-    Die Abnahmetoleranz ist mit 2σ = ±10,5 % aus der Ablesegenauigkeit hergeleitet
+    Die Abnahmetoleranz ist mit 2σ = ±10,1 % aus der Ablesegenauigkeit hergeleitet
+    (ohne Aufrundung, Befund 234/434)
     (§3.9 gilt auch für Toleranzen). Weil die Ablesekette mit max. 1,9 % deutlich
     besser ist als ihre Spezifikation, hält dieser Test zusätzlich eine engere
     Schranke fest — er bricht, sobald sich die Ablesewerte verschlechtern, lange

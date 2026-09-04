@@ -77,22 +77,31 @@ class Befund:
         # ist offen, „zurückgestellt, wird umgesetzt bei der Integration" ist
         # zurückgestellt. Eine Negation unmittelbar davor („nicht behoben",
         # „kein … umgesetzt") zieht auf offen.
-        woerter = re.findall(r"[a-zäöüß]+", kopf)
-        for i, w in enumerate(woerter):
-            lage = None
-            if re.fullmatch(r"geschlossen|gelöst|behoben|übernommen|umgesetzt|erledigt"
-                            r"|gegenstandslos|entfällt|akzeptiert|bestätigt", w):
-                lage = "geschlossen"
-            elif re.fullmatch(r"geöffnet|offen", w):
-                lage = "offen"
-            elif re.fullmatch(r"zurückgestellt|terminiert|vertagt", w):
-                lage = "zurückgestellt"
-            if lage is None:
-                continue
-            if lage == "geschlossen" and any(
-                    v in ("nicht", "kein", "keine", "nie") for v in woerter[max(0, i - 2):i]):
-                return "offen"
-            return lage
+        # Befund 439: Negation und Qualifizierer („teilweise", „unvollständig",
+        # „halb") gelten nur im selben, durch Komma/Semikolon begrenzten Segment
+        # — „kein Handlungsbedarf, geschlossen" ist geschlossen, „teilweise
+        # umgesetzt" ist offen.
+        for segment in re.split(r"[,;]", kopf):
+            woerter = re.findall(r"[a-zäöüß]+", segment)
+            for i, w in enumerate(woerter):
+                lage = None
+                if re.fullmatch(r"geschlossen|gelöst|behoben|übernommen|umgesetzt"
+                                r"|erledigt|gegenstandslos|entfällt|akzeptiert"
+                                r"|bestätigt", w):
+                    lage = "geschlossen"
+                elif re.fullmatch(r"geöffnet|offen", w):
+                    lage = "offen"
+                elif re.fullmatch(r"zurückgestellt|terminiert|vertagt", w):
+                    lage = "zurückgestellt"
+                if lage is None:
+                    continue
+                davor = woerter[:i]
+                if lage == "geschlossen" and any(
+                        v in ("nicht", "kein", "keine", "nie", "teilweise",
+                              "unvollständig", "halb", "unvollstaendig")
+                        for v in davor):
+                    return "offen"
+                return lage
         return "unklar"
 
     @property
@@ -612,6 +621,14 @@ def _pruefe_inhalt(pfad: Path, streng: bool) -> int:
     for b in ohne:
         if unter_w7(b, grenze):
             rot.append((b, f"geschlossen ohne gültigen Prüfausdruck (W7 gilt ab Nr. {grenze})"))
+    # Befund 439: Ein Status, den die Statusregel nicht kennt („abgelehnt",
+    # „verworfen"), ist `unklar` — er wird ausgewiesen und zaehlt ab der
+    # W7-Grenze als rot; vorher lief er in keiner Zahl mit und der Lauf war gruen.
+    unklar = [b for b in befunde if b.lage == "unklar"]
+    for b in unklar:
+        if unter_w7(b, grenze):
+            rot.append((b, "Status unklar — kennt die Statusregel nicht "
+                           "(offen · zurückgestellt · geschlossen)"))
     print(f"{pfad.relative_to(REPO)}: {len(befunde)} Befunde")
     if zurueck:
         print(f"  zurückgestellt     : {len(zurueck):<4d} "
@@ -621,6 +638,9 @@ def _pruefe_inhalt(pfad: Path, streng: bool) -> int:
         if zurueck_rot:
             print(f"    ({len(zurueck_rot)} davon mit rotem Ausdruck — das ist der "
                   f"zurückgestellte Sollzustand, kein Fehler)")
+    if unklar:
+        print(f"  Status unklar      : {len(unklar):<4d} "
+              f"({', '.join(sorted(b.nr for b in unklar))})")
     print(f"  belegt geschlossen : {len(gruen)}")
     print(f"  Prüfausdruck ROT   : {len(rot)}")
     print(f"  unbelegt geschlossen: {len(unbelegt)}   <- Altbefunde vor W7 (Nr. < {grenze}), "
@@ -687,6 +707,12 @@ SELBSTTEST: tuple[tuple[str, str], ...] = (
     ("zurückgestellt, wird umgesetzt bei der Integration", "zurückgestellt"),
     ("kein Prüfausdruck, nicht umgesetzt", "offen"),
     ("wieder geöffnet → in Rev. 4 neu geschlossen", "geschlossen"),
+    # Befund 439: Qualifizierer wie Negation; Negationsfenster endet am Komma.
+    ("teilweise umgesetzt", "offen"),
+    ("nur teilweise behoben", "offen"),
+    ("unvollständig umgesetzt", "offen"),
+    ("kein Handlungsbedarf, geschlossen", "geschlossen"),
+    ("abgelehnt", "unklar"),
     # Verlauf mit Pfeil: Endzustand zählt (Ledger 98, Befund 16):
     ("wieder geöffnet (Runde 6, Befund 230) → in Rev. 4 neu geschlossen", "geschlossen"),
     ("wieder geöffnet (Runde 9)", "offen"),

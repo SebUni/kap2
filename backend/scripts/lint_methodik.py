@@ -87,14 +87,14 @@ REVISIONSVERMERK = re.compile(
 # Marker eine stille Einzelfreigabe. Gezaehlt werden Zeilen mit Marker in allen
 # gelesenen Quellen ausser der Lint-Datei selbst (ihre Konstantendefinition traegt
 # den Marker per Definition; der Commit zu Runde 22 hatte sie faelschlich
-# mitgezaehlt). Aktueller Bestand, Rev. 14 nach Runde 24 (gemessen): Bericht 22 —
+# mitgezaehlt). Aktueller Bestand, Rev. 14 nach Runde 25 (gemessen): Bericht 23 —
 # Korrekturhistorie §3.2 (7 Zeilen), §7-Historie-Kommentar (3), Entscheidungslog
-# (12 Zeilen: Nr. 2, 16, 17, 18, 19, 23–29; Nr. 17 seit Befund 427); Anlage
-# k_uv_herleitung.md (4: Schwellenreihe ohne Schwelle, drei Verworfen-Zeilen);
-# Code k_uv_herleitung.py (7: die Quellzeilen, die diese vier Anlagenzeilen
-# erzeugen). Das risikouebergreifende Register (docs/evidenz/register.md) traegt
-# keinen Marker.
-HISTORIE_MARKER_SOLL: dict[str, int] = {"98": 33}
+# (13 Zeilen: Nr. 2, 16, 17, 18, 19, 22, 23–29; Nr. 17 seit Befund 427, Nr. 22
+# seit Befund 434); Anlage k_uv_herleitung.md (4: Schwellenreihe ohne Schwelle,
+# drei Verworfen-Zeilen); Code k_uv_herleitung.py (7: die Quellzeilen, die diese
+# vier Anlagenzeilen erzeugen). Das risikouebergreifende Register
+# (docs/evidenz/register.md) traegt keinen Marker.
+HISTORIE_MARKER_SOLL: dict[str, int] = {"98": 34}
 MARKER_ZAEHLER: dict[str, int] = {}
 
 
@@ -415,7 +415,10 @@ ABGELOESTE_WERTE: dict[str, tuple[str, ...]] = {
         "1,74", "11,3/6,48",
         # Befund 427: 409 Mio = 367 × 1,1125 war die v_verh-Obergrenze der Rev. 2;
         # geltend ist 377 Mio (339 × 1,1125).
-        "409 Mio"),
+        "409 Mio",
+        # Befund 434: ±10,5 % war die Rev.-4-Rundung der ASR-Abnahmetoleranz;
+        # hergeleitet und geltend sind 2 sigma = ±10,1 % (Befund 234).
+        "10,5 %"),
 }
 
 ZWISCHENWERTE: dict[str, dict[str, tuple[float, ...]]] = {
@@ -780,6 +783,24 @@ def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
                 f"Bericht behauptet Kanten {ohne_deckung}, die Netzwerkliste nicht führt")
 
 
+def herleitungsanker(src: str, lint: Lint) -> None:
+    """Jeder `herleitung:#x` zeigt auf einen deklarierten Anker (Befunde 429/435).
+
+    Deklariert ist ein Anker, wenn er in einer Zeile mit dem Wort „Anker" in
+    Backticks steht (Ueberschrift oder Absatz-Lead-in). Fremdanker anderer
+    Berichte (VOLY-Kette in #95) sind als solche gekennzeichnet und ausgenommen.
+    """
+    verweise = set(re.findall(r"herleitung:#([a-z0-9-]+)", src))
+    fremd = {"voly"}
+    deklariert = set()
+    for zeile in src.split("\n"):
+        if "Anker" in zeile:
+            deklariert.update(re.findall(r"`#([a-z0-9-]+)`", zeile))
+    fehlend = sorted(verweise - fremd - deklariert)
+    lint.pruefe(not fehlend, f"Herleitungs-Anker deklariert ({len(verweise)} Verweise)",
+                f"undeklarierte Anker: {fehlend}")
+
+
 def revisionshistorie(src: str, lint: Lint) -> None:
     """Jede Revisionsnotiz nennt genau einen — und einen eigenen — Wert (Befund 309/310).
 
@@ -817,6 +838,7 @@ def pruefe_bericht(pfad: str) -> bool:
     revisionsrueckstaende(nr, src, baender, lint)
     knoten_abgleich(nr, src, lint)
     revisionshistorie(src, lint)
+    herleitungsanker(src, lint)
     abgeloeste_werte(nr, src, lint)
     # Das risikouebergreifende Evidenz-Register (Befund 425): Es fuehrte fuer
     # 98-E20-02 zehn Revisionen lang den seit Rev. 4 abgeloesten Basiswert, weil

@@ -85,6 +85,10 @@ VOLY = 160_800.0
 D_SSD_FLAECHE = 0.0782                            # DWD-Gebietsmittel [69]
 
 
+def _tsd(n: int) -> str:
+    return f"{n:,}".replace(",", ".")
+
+
 def gemeindepunkte() -> list[tuple[str, float, float]]:
     """AGS + Dezimalkoordinaten der amtlichen Gemeindepunkte (VG250 ``vg250_pk``)."""
     con = sqlite3.connect(GPKG)
@@ -107,6 +111,12 @@ def main() -> None:
     # Akkumulatoren je Gebiet: [Σ pop, Σ pop·Δrel, Σ Δrel, n]
     acc: dict[str, list[float]] = {}
     ohne_raster = ohne_pop = 0
+    # Klipp-Regel der Produktion (Befunde 426/431): health.py setzt den Zusatz bei
+    # dSSD < 0 auf null, dieser Lauf mittelt UNKLIPPT. Beides wird hier gemessen
+    # und in der Anlage gedruckt, damit der Bericht die Naeherung aus der Anlage
+    # zitiert und nicht aus einer Einmal-Rechnung.
+    negativ: list[tuple[str, float, float]] = []      # (AGS, pop, d) mit d < 0
+    pop_geklippt = 0.0                                 # Σ pop · max(0, d), DE
     for ags, lon, lat in punkte:
         pop = pop_je_ags.get(ags)
         if pop is None or pop <= 0:
@@ -118,6 +128,9 @@ def main() -> None:
             continue
         ref, neu = paar
         d = (neu - ref) / ref
+        if d < 0:
+            negativ.append((ags, pop, d))
+        pop_geklippt += pop * max(0.0, d)
         for gebiet in ("deutschland", f"land:{LAND[ags[:2]]}",
                        f"region:{REGION[ags[:2]]}"):
             a = acc.setdefault(gebiet, [0.0, 0.0, 0.0, 0.0])
@@ -204,6 +217,40 @@ def main() -> None:
     z.append("")
     z.append(f"Nicht zugeordnet: {ohne_pop} Gemeindepunkte ohne Zensus-Bevölkerung, "
              f"{ohne_raster} ohne Rasterwert (beide gehen nicht in die Gewichtung ein).")
+
+    # ── Klipp-Regel der Produktion (Befunde 426/431) ──────────────────────────
+    import numpy as np
+    with np.load(ssd._NPZ) as npz:
+        ref_g, neu_g, nodata = npz["ref"], npz["neu"], float(npz["nodata"])
+    gueltig = (ref_g != nodata) & (neu_g != nodata) & (ref_g > 0)
+    rel = np.where(gueltig, (neu_g - ref_g) / np.where(gueltig, ref_g, 1.0), 0.0)
+    n_gueltig = int(gueltig.sum())
+    n_neg_zellen = int(((rel < 0) & gueltig).sum())
+    min_rel = float(rel[gueltig].min()) if n_gueltig else 0.0
+    pop_neg = sum(p for _, p, _ in negativ)
+    groesster = max(negativ, key=lambda t: t[1]) if negativ else None
+    povw_klipp = pop_geklippt / de[0]
+    z.append("\n## 4 Klipp-Regel der Produktion (Befunde 426/431)\n")
+    z.append("`health.py` setzt den klimaattribuierten Zusatz bei ΔSSD < 0 auf **null** "
+             "(max(0, ·)); dieser Lauf mittelt **unklippt**. Betroffenheit und Wirkung, "
+             "hier gemessen:\n")
+    z.append("| Größe | Wert |")
+    z.append("|---|---|")
+    z.append(f"| Rasterzellen (`ssd_normalperioden.npz`) mit gültigem Wert | "
+             f"{_tsd(n_gueltig)} |")
+    z.append(f"| davon ΔSSD < 0 | **{_tsd(n_neg_zellen)}** "
+             f"({n_neg_zellen / n_gueltig:.2%}), Minimum {min_rel:+.1%} |")
+    z.append(f"| Gemeindepunkte in der Gewichtung | {_tsd(int(de[3]))} |")
+    z.append(f"| davon ΔSSD < 0 | **{len(negativ)}** mit {_tsd(int(pop_neg))} EW "
+             f"= **{pop_neg / de[0]:.3%}** der gewichteten Bevölkerung |")
+    if groesster:
+        z.append(f"| größter betroffener Punkt | AGS {groesster[0]}, "
+                 f"{_tsd(int(groesster[1]))} EW, ΔSSD {groesster[2]:+.2%} |")
+    z.append(f"| ΔSSD DE bevölkerungsgewichtet, unklippt (Basiswert) | {povw_de:.4%} |")
+    z.append(f"| ΔSSD DE bevölkerungsgewichtet, geklippt wie die Produktion | "
+             f"{povw_klipp:.4%} |")
+    z.append(f"| Wirkung der Klippung auf die Bundessumme | "
+             f"**{povw_klipp / povw_de - 1:+.3%}** |")
 
     out = "\n".join(z)
     with open(os.path.join(DATA, "ssd_povw.md"), "w", encoding="utf-8") as fh:

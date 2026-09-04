@@ -57,3 +57,18 @@ Nordostländer unterdurchschnittliche.
 | € Mio | 311 | **339** | +8.8% |
 
 Nicht zugeordnet: 96 Gemeindepunkte ohne Zensus-Bevölkerung, 29 ohne Rasterwert (beide gehen nicht in die Gewichtung ein).
+
+## 4 Klipp-Regel der Produktion (Befunde 426/431)
+
+`health.py` setzt den klimaattribuierten Zusatz bei ΔSSD < 0 auf **null** (max(0, ·)); dieser Lauf mittelt **unklippt**. Betroffenheit und Wirkung, hier gemessen:
+
+| Größe | Wert |
+|---|---|
+| Rasterzellen (`ssd_normalperioden.npz`) mit gültigem Wert | 358.303 |
+| davon ΔSSD < 0 | **1.133** (0.32%), Minimum -4.9% |
+| Gemeindepunkte in der Gewichtung | 10.824 |
+| davon ΔSSD < 0 | **40** mit 107.897 EW = **0.131%** der gewichteten Bevölkerung |
+| größter betroffener Punkt | AGS 08327046, 13.547 EW, ΔSSD -2.64% |
+| ΔSSD DE bevölkerungsgewichtet, unklippt (Basiswert) | 8.5100% |
+| ΔSSD DE bevölkerungsgewichtet, geklippt wie die Produktion | 8.5118% |
+| Wirkung der Klippung auf die Bundessumme | **+0.021%** |
