@@ -61,6 +61,44 @@ def test_ohne_zeichentabellen_ueberschrift_genau_ein_fehler():
     assert len(zeichentabelle_fehler) == 1
 
 
+def test_notation_ohne_datenquelle_mit_geviertstrich_einheit_ist_zulaessig():
+    """T-0007 #3: Mathematische Notation (\\((x)_+,\\ \\mathbb{1}\\)) hat per
+    Definition keine Datenquelle. Die Ausnahme greift nur mit Einheit "—"."""
+    tabelle = (
+        "\n| Zeichen | Name | Einheit | Wert / Herkunft |\n"
+        "|---|---|---|---|\n"
+        "| \\((x)_+\\) | Positivteil | — | Notation |\n"
+    )
+    bericht = (
+        "### 3.5 Zeichentabelle\n"
+        f"{tabelle}\n"
+        "### 4 Naechster Abschnitt\n"
+    )
+    lint = Lint()
+    zeichentabelle(bericht, lint)
+    ohne_herkunft = [f for f in lint.fehler if "ohne Herkunft" in f]
+    assert ohne_herkunft == []
+
+
+def test_notation_mit_dimensionsbehafteter_einheit_bleibt_rot():
+    """Die Ausnahme darf nicht als Ausweg fuer echte Modellparameter dienen —
+    nur eine Einheit "—" (Geviertstrich) zaehlt."""
+    tabelle = (
+        "\n| Zeichen | Name | Einheit | Wert / Herkunft |\n"
+        "|---|---|---|---|\n"
+        "| \\(T\\) | Temperatur | °C | Notation |\n"
+    )
+    bericht = (
+        "### 3.5 Zeichentabelle\n"
+        f"{tabelle}\n"
+        "### 4 Naechster Abschnitt\n"
+    )
+    lint = Lint()
+    zeichentabelle(bericht, lint)
+    ohne_herkunft = [f for f in lint.fehler if "ohne Herkunft" in f]
+    assert len(ohne_herkunft) == 1
+
+
 def test_malformed_zeile_mit_drei_zellen_erzeugt_fehler():
     kaputte_tabelle = """
 | Zeichen | Name | Einheit | Wert / Herkunft |

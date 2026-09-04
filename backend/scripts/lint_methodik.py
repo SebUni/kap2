@@ -149,17 +149,61 @@ def zeichentabelle(src: str, lint: Lint) -> None:
             lint.fehler.append(f"Zeichentabelle malformed: {z[:60]}")
             continue
         herkunft = zellen[3]
+        einheit = zellen[2]
         # Befund 344(2): Ein blosses "[" akzeptierte auch "[offen]" als Herkunft.
         # Verlangt wird jetzt ein Register-/Herleitungs-Anker oder eine
         # nummerierte Quellenangabe [12] bzw. ein benannter Datensatz.
+        # Ticket T-0007 #3: Mathematische Notation (z. B. Positivteil, Indikator)
+        # hat per Definition keine Datenquelle. Die Ausnahme greift nur, wenn die
+        # Herkunft EXAKT "Notation" heisst UND die Einheit EXAKT "—" ist — ein
+        # dimensionsbehafteter Modellparameter kann sich damit nicht vor der
+        # Belegpflicht druecken.
         hat = (any(k in herkunft for k in ("register:", "herleitung:", "Zensus",
                                            "berechnet", "Ergebnis", "Tabelle"))
-               or bool(re.search(r"\[\d+\]", herkunft)))
+               or bool(re.search(r"\[\d+\]", herkunft))
+               or (herkunft == "Notation" and einheit == "—"))
         lint.pruefe(hat, f"Zeichentabelle {zellen[0][:24]}",
                     f"ohne Herkunft: {herkunft[:50]}")
-    for wort in VERBOTEN:
-        lint.pruefe(wort not in src, f"verbotene Formulierung „{wort}“",
-                    "kommt im Bericht vor")
+
+
+def verbotene_formulierungen(src: str, lint: Lint) -> None:
+    """Verbotene Formulierungen zeilengenau, mit Historie-Ausnahme (Ticket T-0007).
+
+    Frueher lief dieser Check im Rumpf von `zeichentabelle()` — und damit NUR,
+    wenn deren Abschnitt gefunden wurde. Ein Bericht ohne (auffindbare)
+    Zeichentabelle wurde auf Verbotswoerter nie geprueft. Ausserdem verglich er
+    `wort not in src`, also einen Teilstring-Treffer ueber den GESAMTEN Bericht:
+    Das schlug auch INNERHALB laengerer Woerter an (»Platzhalterzitat« enthaelt
+    »Platzhalter«) und nannte nie, WO im Bericht der Treffer sitzt.
+
+    Jetzt zeilenweise und mit derselben Historie-Marker-Mechanik wie
+    `abgeloeste_werte()` (Befunde 405/419): Eine Zeile mit `HISTORIE_MARKER` UND
+    einem `REVISIONSVERMERK` dokumentiert einen behobenen Befund und wird
+    unterdrueckt (gezaehlt in `UNTERDRUECKT`); der Marker OHNE Vermerk bleibt rot.
+    """
+    quelle = "Bericht"
+    treffer = 0
+    for i, zeile in enumerate(src.split("\n"), start=1):
+        for wort in VERBOTEN:
+            if wort not in zeile:
+                continue
+            if ist_historie(zeile):
+                if not REVISIONSVERMERK.search(zeile):
+                    lint.fehler.append(
+                        f"Historie-Marker ohne Revisionsvermerk im {quelle}, "
+                        f"Zeile {i}: verbotene Formulierung „{wort}“ — "
+                        f"{zeile.strip()[:60]}")
+                    treffer += 1
+                    continue
+                UNTERDRUECKT.setdefault(HISTORIE_MARKER, []).append(
+                    (quelle, i, wort))
+                continue
+            lint.fehler.append(
+                f"verbotene Formulierung „{wort}“ in Zeile {i}: "
+                f"{zeile.strip()[:60]}")
+            treffer += 1
+    if not treffer:
+        lint.ok.append("Verbotene Formulierungen")
 
 
 def parameter_bloecke(src: str, lint: Lint) -> tuple[dict[str, str], set[float]]:
@@ -804,6 +848,7 @@ def pruefe_bericht(pfad: str) -> bool:
     MARKER_ZAEHLER.clear()
     beispiel_bloecke(src, lint)
     zeichentabelle(src, lint)
+    verbotene_formulierungen(src, lint)
     werte, baender = parameter_bloecke(src, lint)
     registry_abgleich(nr, werte, lint)
     revisionsrueckstaende(nr, src, baender, lint)
