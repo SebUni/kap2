@@ -19,8 +19,6 @@
     "@deck.gl/layers": "^9.2.11",
     "@deck.gl/mapbox": "^9.2.11",
     "@deck.gl/react": "^9.2.11",
-    "@nebula.gl/edit-modes": "^1.0.4",
-    "@nebula.gl/layers": "^1.0.4",
     "@tanstack/react-table": "^8.21.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
