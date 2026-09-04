@@ -9,6 +9,7 @@ from app.api.routes import (
     auth as auth_route, contact as contact_route, demo as demo_route,
     admin_demo as admin_demo_route, public_lite as public_lite_route,
     admin_lite as admin_lite_route, admin_users as admin_users_route,
+    admin_leads as admin_leads_route,
     seo as seo_route,
     kommune, assessment, measures, config, export,
     catalog as catalog_route, admin, parameters,
@@ -63,6 +64,7 @@ app.include_router(admin.router, prefix="/api/admin", tags=["Admin"], dependenci
 app.include_router(admin_demo_route.router, prefix="/api/admin", tags=["Admin"], dependencies=[Depends(require_admin)])
 app.include_router(admin_lite_route.router, prefix="/api/admin", tags=["Admin"], dependencies=[Depends(require_admin)])
 app.include_router(admin_users_route.router, prefix="/api/admin", tags=["Admin"], dependencies=[Depends(require_admin)])
+app.include_router(admin_leads_route.router, prefix="/api/admin", tags=["Admin"], dependencies=[Depends(require_admin)])
 # KI-Assistent: eigene Auth je Endpunkt (settings=admin, usage/chat=eingeloggt) → kein Router-Guard.
 app.include_router(ai_route.router, prefix="/api/ai", tags=["KI-Assistent"])
 
