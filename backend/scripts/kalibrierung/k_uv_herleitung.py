@@ -196,7 +196,7 @@ def main() -> None:
     # +2,3 %. Sie werden deshalb AUSGESCHLOSSEN — ihr Quotient ist numerisch
     # instabil, nicht klein. Schwelle: SSD-Trend >= 1 %/Dekade.
     gilt = np.isfinite(t_ssd) & np.isfinite(t_rad) & (t_ssd > 0)
-    stabil = gilt & (t_ssd > 1.0)      # >= 1 %/Dekade SSD-Trend
+    stabil = gilt & (t_ssd >= 1.0)     # >= 1 %/Dekade SSD-Trend, inklusiv wie Bericht §3.2 (Befund 445)
     # Auf vier Nachkommastellen gefuehrt: Bericht, Registry und Anlage rechnen damit
     # dieselbe Kette (keine Rundungsdivergenz, Befund-213-Klasse).
     # Befund 266: Gewichtet wird mit pop x Normalperioden-DeltaSSD — dem Feld, mit

@@ -775,7 +775,19 @@ def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
     # ihn immer gruen, sobald die Mappe keine Kanten fuehrt. Damit fiel eine im
     # BERICHT behauptete Kante, die die Mappe nicht kennt, nie auf. Jetzt beide
     # Richtungen:
-    behauptet_kanten = set(re.findall(r"\b([ERSW]\d{2,3})\b", weitergaben))
+    # Befund 446: Die Weitergaben-Tabelle ist nach §2.1 ZWEISPALTIG — links die
+    # Output-Kanten (Behauptung gegen die Netzwerkliste), rechts Konto-Ausschluesse
+    # und verwandte Buchungen, in denen auch NICHT gebuchte Ketten-Weitergaben
+    # (W186 -> W196/W197 der Klimawirkungsketten) benannt werden. Als behauptete
+    # Kante zaehlt deshalb nur, was in der ERSTEN Spalte oder in Prosa steht.
+    behauptung = []
+    for zeile in weitergaben.split("\n"):
+        if zeile.lstrip().startswith("|"):
+            zellen = zeile.strip().strip("|").split("|")
+            behauptung.append(zellen[0])
+        else:
+            behauptung.append(zeile)
+    behauptet_kanten = set(re.findall(r"\b([ERSW]\d{2,3})\b", "\n".join(behauptung)))
     lint.pruefe(not (kanten and behauptet_keine), f"Kanten-Abgleich {nr} (Mappe → Bericht)",
                 f"Netzwerkliste führt {sorted(kanten)}, Bericht behauptet keine")
     ohne_deckung = sorted(behauptet_kanten - kanten - {knoten_id})
@@ -787,11 +799,12 @@ def herleitungsanker(src: str, lint: Lint) -> None:
     """Jeder `herleitung:#x` zeigt auf einen deklarierten Anker (Befunde 429/435).
 
     Deklariert ist ein Anker, wenn er in einer Zeile mit dem Wort „Anker" in
-    Backticks steht (Ueberschrift oder Absatz-Lead-in). Fremdanker anderer
-    Berichte (VOLY-Kette in #95) sind als solche gekennzeichnet und ausgenommen.
+    Backticks steht (Ueberschrift oder Absatz-Lead-in). Keine Fremdanker-Ausnahme
+    (Befund 444): Ein `herleitung:#x` zeigt immer in den eigenen Bericht; auf
+    Herleitungen anderer Berichte wird textlich verwiesen (Entscheidungslog Nr. 35).
     """
     verweise = set(re.findall(r"herleitung:#([a-z0-9-]+)", src))
-    fremd = {"voly"}
+    fremd: set[str] = set()
     deklariert = set()
     for zeile in src.split("\n"):
         if "Anker" in zeile:

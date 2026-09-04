@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–25, Befunde 336–440) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–26, Befunde 336–447) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -118,7 +118,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 17 Befunden der Runde 15 nur vier umgesetzt waren — der inhaltliche Verlust ist
 > auf diese vier begrenzt und in Rev. 14 nachgezogen (Befunde 356/357).
 >
-> **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 25 (Befunde 336–440). Keine
+> **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 26 (Befunde 336–447). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
 > € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
 > gefahrenen Review-Runde unabhängig nachgerechnet. **Eine Zählung steht hier
@@ -163,7 +163,7 @@ in längeren, sonnigeren Warmphasen" — Monetarisierung ID 98, Blattzeile 103).
 | Knoten | Name | rechnet in | Wo (Formel/Ebene) | falls inaktiv: Begründung |
 |---|---|---|---|---|
 | E20 | UV-Strahlung (direkter Hazard) | Schicht A + B | \(\Delta\text{Dosis}\) über SSD-Normalperiodenvergleich × \(k_{\text{UV}}\) × \(a_{\text{attr}}\) (§3.2); Ebene UV_RADIATION/SSD (neu) | — |
-| S154 | Freizeitverhalten | **Sensitivitätsband** (Default 1) | \(v_{\text{verh}}\)-Band +0,25…+0,60 je Komforttag (§3.5) | keine quantifizierte Effektgröße „Mehr-Exposition je Komforttag" für DE [36]; US-Zeitverwendungs-Evidenz nur Band (§3.2: unbelegte Modulatoren Default 1; Log 11) |
+| S154 | Freizeitverhalten | **Sensitivitätsband** (Default 1) | \(s\)-Tagesband 1,25–1,60 ⇒ \(v_{\text{verh}}\) 1,00–1,11 (§3.4, Anker `#v-verh`; Befund 447) | keine quantifizierte Effektgröße „Mehr-Exposition je Komforttag" für DE [36]; US-Zeitverwendungs-Evidenz nur Band (§3.2: unbelegte Modulatoren Default 1; Log 11) |
 | S155 | Gefahrenbewusstsein | Maßnahmen-Hebel (**qualitativ**) | UV-Schutz im öffentlichen Raum / UV-Index-Kommunikation (§5) | Basiswert: Nutzen-Kosten-Verhältnisse sind keine Effektgröße auf Dosis/Inzidenz (GP-26/34; Log 12) |
 | S158 | Monitoring / Frühwarnsysteme | Maßnahmen-Hebel (**qualitativ**; Kostenwirkung bereits im Basiswert) | Früherkennungs-Förderung (SCS-Teilnahme); §5 — Befund 203 | Basiswert setzt bereits SCS-Kosten für alle Fälle an — additiver Hebel hätte kein Headroom; quantifizierbar erst mit Detektionsmix-Parameter (Ersetzungspfad) |
 | R35 | Vorkommen von Bevölkerung | Schicht A + B | \(\text{pop}_a\) (Zensus 2022; Ebene u20 aus #96 mitgenutzt) | — |
@@ -174,7 +174,7 @@ in längeren, sonnigeren Warmphasen" — Monetarisierung ID 98, Blattzeile 103).
 
 | Output-Kanten (Abgleich-Protokoll) | Konto-Ausschlüsse / verwandte Buchungen (K1-Definition) |
 |---|---|
-| **keine** — die Netzwerkliste führt für #98 keine Output-Kanten, das Abgleich-Protokoll keinen Punkt zu #98 (einzige K1-weite Fortschreibung: **P52** Mortalitätsbewertung YLL × VOLY, gilt für alle K1-Buchungsobjekte) | **R9-Partition** (Monetarisierung ID 98: „Doppelzählung mit anderen K1-Ursachen"): jeder Fall zählt genau einmal unter der Ursache UV; **Produktionsausfälle → K2** (K1-Definition), **Systemvorhaltung → K8 via ID 102** (K1-Definition; keine Kante von #98) |
+| **keine** — die Netzwerkliste führt für #98 keine Output-Kanten, das Abgleich-Protokoll keinen Punkt zu #98 (einzige K1-weite Fortschreibung: **P52** Mortalitätsbewertung YLL × VOLY, gilt für alle K1-Buchungsobjekte) | **R9-Partition** (Monetarisierung ID 98: „Doppelzählung mit anderen K1-Ursachen"): jeder Fall zählt genau einmal unter der Ursache UV; **Produktionsausfälle → K2** (K1-Definition), **Systemvorhaltung → K8 via ID 102** (K1-Definition; keine Kante von #98). **Ketten-Weitergabe W186 → W196/W197** (Klimawirkungsketten Z419/420: Krankenstand/Rettungsdienste, Überwachungssysteme) — in der Netzwerkliste **nicht** als Kante geführt (ID 102 IN: 49); Behandlungskosten laut ID 102 bereits in K1, Systemvorhaltung K8 ⇒ **keine Buchung aus #98** (Befund 446) |
 
 ### Konto-Einbettung
 
@@ -407,8 +407,9 @@ $$ \Delta\text{Dosis}_{\text{Zelle}} \;=\; \frac{\text{SSD}_{\text{Zelle}}^{\,19
   Aerosol-„Brightening" seit den 1980ern ist anthropogen, aber keine Klimawirkung im
   KWRA-Sinn (→ < 1,0). Zentral 0,75, beide Grenzen im Band; Ersetzungspfad:
   Wolken-/Aerosol-Zerlegung aus Reanalysen.
-- Resultierende \(\Delta\text{Dosis}\) (Basiswerte): **DE 4,54 %** · Nord 4,17 % ·
-  Mitte 4,89 % · Süd 4,14 %.
+- Resultierende \(\Delta\text{Dosis}\) (Basiswerte): **DE 4,54 %** · Nord 4,18 % ·
+  Mitte 4,89 % · Süd 4,15 % (Regionswerte: ΔSSD auf zwei Dezimalen × 0,7119 × 0,75,
+  auf zwei Dezimalen gerundet; Befund 441).
 
 ```python test: beispiel_98_klimasignal
 # k_UV uebersetzt eine relative SSD-Aenderung in eine relative Dosisaenderung.
@@ -439,9 +440,12 @@ assert abs(k_uv*(1-rel) - 0.3622) < 0.001 and abs(k_uv*(1+rel) - 1.0616) < 0.001
 # Befund 223: BEVOELKERUNGSgewichtete Delta-SSD (Anlage ssd_povw.csv, Gemeindepunkte) —
 # das Produktionsmodell summiert bevoelkerungsgewichtet ueber Zellen, nicht flaechengewichtet.
 dssd = {"nord": 7.82, "mitte": 9.15, "sued": 7.77, "de": 8.51}
-soll = {"nord": 4.17, "mitte": 4.89, "sued": 4.14, "de": 4.54}
+# Rundungskonvention (Befund 441): Regionswert = DeltaSSD (zwei Dezimalen) x k_UV
+# (Registry-Wert 0,7119, vier Dezimalen) x a_attr, auf zwei Dezimalen gerundet —
+# EXAKT geprueft, damit ein Fehler in der letzten Stelle sichtbar wird.
+soll = {"nord": 4.18, "mitte": 4.89, "sued": 4.15, "de": 4.54}
 for r, v in dssd.items():
-    assert abs(v/100 * k_uv * 0.75 * 100 - soll[r]) < 0.01
+    assert round(v * 0.7119 * 0.75 + 1e-12, 2) == soll[r], (r, v * 0.7119 * 0.75)
 # Die flaechengewichteten Werte bleiben die Kontrollgroesse: ungewichtetes
 # Gemeindepunkt-Mittel 7,76 % liegt am DWD-Gebietsmittel 7,82 % (Ablesung unverzerrt),
 # die Bevoelkerungsgewichtung hebt den Wert um knapp 9 %.
@@ -607,7 +611,8 @@ Die Baseline ist über fünf Altersbänder geschichtet, der BAF wirkt aber
 **unstratifiziert** auf die Bandsumme: Es gilt dieselbe relative Elastizität in
 allen Bändern. Neutral ist das nicht — die τ-Rechnung unten zeigt, dass die
 Lebenszeitdosis-Elastizität mit dem Alter fällt (\(\tau=(T/2)/a_{\text{erk}}\)), und MM mit
-einem Erkrankungsalter von 63–69 Jahren trägt 64 % der YLL. Eine altersgeschichtete
+einem Erkrankungsalter von 63–69 Jahren trägt 62,5 % der YLL (733 × 0,11466 × 10,4569
+= 878 von 1.404 YLL, Kette §3.4 mit den ΔF der Anlage [72] §3; Befund 442). Eine altersgeschichtete
 Elastizität würde den MM-Pfad also eher anheben, den C44-Pfad eher senken. [30]
 veröffentlicht keine bandweisen BAF; die Annahme bleibt bis dahin bestehen und ist
 über das BAF_MM-Band (±67 % auf den MM-Pfad) mit abgedeckt. **Ersetzungspfad:**
@@ -913,7 +918,7 @@ assert abs(euro - 4365) < 60               # ~4.400 EUR je 1.000 EW und Jahr
 | \(s\) | Tages-Multiplikator der persönlichen Dosis an einem Komforttag | — | **1,45** (1,25–1,60) [57–59]; register:98-S154-01 |
 | \(\text{SSD}\) | Sonnenscheindauer (Normalperioden-Mittel je Zelle) — Kartenebene **neu anzulegen** (angelegt, §3.6) | h/Jahr | DWD-CDC sunshine_duration 1 km [33]; Gebietsmittel-Referenzen [69]; register:98-E20-01 |
 | \(T\) | Dauer des Dosisanstiegs (Mittelpunktabstand der Normalperioden) | Jahre | **30** (1961–1990 ⇒ 1991–2020); herleitung:#gleichgewicht |
-| \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136,4–165,6 T€; Kette #95 §3.5) [19]; herleitung:#voly (Fremdanker, #95 §3.5) |
+| \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136,4–165,6 T€; Kette #95 §3.5) [19]; Herleitung in #95 §3.5 (VOLY-Kette, dort im Text ohne Anker — Befund 444); Registry-Quelle `uba_mk40_amann2020a` |
 | \(v_{\text{verh}}\) | Verhaltens-Sensitivität — **Jahres**faktor, **abgeleitet** aus \(s\) und \(\phi_{\text{Komfort}}\) (kein eigener Parameter, §3.2 Kein-Doppelkanal) | — | \(1+\phi_{\text{Komfort}}(s-1)\) = **1,00** (Band 1,00–1,11); herleitung:#v-verh |
 | \(w_{\text{SCC}}\) | SCC-Anteil an C44 (altersinvariant, dokumentierte Annahme; Quellen-Widerspruch benannt §3.1) | — | **0,25** (Band 0,25–0,50) [27; obere Stütze 2015er-BfS-Split]; herleitung:#baf-c44 |
 | \(Y(a_{\text{erk}})\) | Inzidenz im Erkrankungsalter \(a_{\text{erk}}\); \(Y(a_{\text{erk}})\sim\Phi(a_{\text{erk}})^{c}\) mit \(c\) = BAF | 1/(100.000 · Jahr) | Funktionsform aus [30]; herleitung:#gleichgewicht |
@@ -1387,7 +1392,8 @@ parameter:
   wert: 160800
   einheit: "EUR/Jahr"
   band: [136400, 165600]
-  herkunft: herleitung:#voly   # Kette in #95 §3.5 (P52)
+  herkunft: "#95 §3.5 (VOLY-Kette, P52)"   # risikouebergreifend; #95 deklariert dafuer
+                                            # keinen Anker (Befund 444, Log Nr. 35)
   quelle: uba_mk40_amann2020a
   preisstand: "2024"
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
@@ -1650,7 +1656,9 @@ verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Inte
 
 - **[72]** Bevölkerungsgewichtete SSD-Normalperiodenänderung (Befund 223):
   `backend/scripts/kalibrierung/ssd_povw.py` →
-  `backend/data/kalibrierung/ssd_povw.{csv,md}` (Lauf 01.09.2026). Gewichtung auf der
+  `backend/data/kalibrierung/ssd_povw.{csv,md}` (Lauf 04.09.2026; CSV byte-identisch zum
+  Lauf 01.09.2026, MD um §4 »Klipp-Regel der Produktion« erweitert — Befunde 431/443).
+  Gewichtung auf der
   **Gemeindepunkt-Ebene** (§3.4 ausdrücklich zulässig): 10.824 amtliche Gemeindepunkte
   aus **BKG VG250** — Bundesamt für Kartographie und Geodäsie, „Verwaltungsgebiete
   1:250 000 (VG250), Ebene `vg250_pk` (Verwaltungspunkte)", **Stand 01.01.2025**, UTM32s-GPKG,
@@ -1675,7 +1683,9 @@ verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Inte
   sie zeigt nur, dass die Punktablesung als solche unverzerrt ist.
 - **[73]** \(k_{\text{UV}}\)-Herleitung auf Rasterskala (Befunde 230/238/239/245/252/255/256):
   `backend/scripts/kalibrierung/k_uv_herleitung.py` →
-  `backend/data/kalibrierung/k_uv_herleitung.{csv,md}` (Lauf 01.09.2026):
+  `backend/data/kalibrierung/k_uv_herleitung.{csv,md}` (Lauf 04.09.2026; CSV byte-identisch
+  zum Lauf 01.09.2026, MD nur um Historie-Marker ergänzt, Schwelle im Code inklusiv —
+  Befunde 414/445):
   SSD- **und** Globalstrahlungstrend 1997–2022 aus den DWD-CDC-1-km-Jahresrastern
   ([33] bzw. `grids_germany/annual/radiation_global`, DL-DE→Zero-2.0), abgelesen an
   der **Messzelle Bochum** (SSD 6,62 · GR 4,51 %/Dek.) und an **10.682
@@ -1725,6 +1735,7 @@ Entscheidungsregeln W1–W6 aus `.claude/methodik-loop.md` zitiert).
 04.09.2026; W-Regeln aus `.claude/methodik-loop.md` zitiert).
 **Eintrag 33: Rev.-14-Entscheidung** (Revision nach Review-Runde 24, Gate 1, 04.09.2026).
 **Eintrag 34: Rev.-14-Entscheidung** (Revision nach Review-Runde 25, Gate 1, 04.09.2026).
+**Eintrag 35: Rev.-14-Entscheidung** (Revision nach Review-Runde 26, Gate 1, 04.09.2026).
 **Überstimmungsweg:** „Entscheidung Nr. X ändern auf …" → Delta-Lauf (Neurechnung +
 Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 
@@ -1764,3 +1775,4 @@ Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 | 32 ⚠ | Historie-Erkennung im Lint: Marker in **beiden** Funktionen zur einzigen Ausnahme machen (414) — auch für Entscheidungslog, Verworfen-Listen und Anlagen? | **Ja, ausnahmslos**: Stichwortliste, Abschnitts-Heuristik und pauschale Blockquote-Ausnahme gestrichen; 13 Log-Zeilen (Nr. 2, 16–19, 22–29; Nr. 17 seit Befund 427, Nr. 22 seit Befund 434), die Korrekturhistorie, der §7-Kommentar und vier Anlagen-Zeilen tragen jetzt Marker **plus** Revisionsvermerk; Zahl der Marker als Ratchet festgeschrieben, gedeckte Fundstellen werden ausgegeben (419). Einzige verbleibende Ausnahme ist der Kopfvermerk vor Kapitel 1 (Befund 345) | Achte Runde derselben Klasse; jede Heuristik hatte eine neue Lücke geöffnet. Der Marker ist bewusst gesetzt und maschinell zählbar | Abschnitts-Ausnahme für Anlagen behalten (weniger Marker, aber die von 414 gemessene Lücke bliebe) | keine — reine Prüfmechanik |
 | 33 ⚠ | Geltungsbereich von W7 im Werkzeug (Befund 422): rückwirkend für alle Befunde oder ab der Einführung? | **Ab der Einführung, als Code**: `W7_AB_NR = {"98": 336}`, neue Ledger ab Befund 1; ein geschlossener Befund ab der Grenze ohne gültigen Prüfausdruck ist blockierend rot, Altbefunde davor werden nur gezählt (`--streng` wertet sie rot). 343 und 353 (Runde 16/17) tragen jetzt Ausdrücke | Die Statusregel des Ledgers sagt genau das seit Befund 355; nachträglich erfundene Ausdrücke für 145 Altbefunde wären die Selbstauskunft, die W7 abschaffen soll — ihre Nachweise stehen im Archiv und wurden mehrfach gegengeprüft | W7 rückwirkend (145 Altbefunde rot, Abnahme unmöglich ohne Ausdrucks-Nacherfindung); oder Grenze weiter nur als Kommentar | keine — Prüfmechanik; `--pruefe` bleibt grün, weil 343/353 belegt sind |
 | 34 ⚠ | Band an \(\bar q_{\text{out}}\) (Befund 433): Proxy-Unsicherheit der Branchenabgrenzung beziffern oder kein Band? | **`band: null`** mit Herleitungsvermerk; die Registry führt für \(\bar q_{\text{out}}\) kein Band, der Wert bleibt das amtliche Zentrierungsmittel 0,070; Golden-Test sichert, dass der Kap.-7-Block kein Band trägt und r_out(q = q̄) = 1 | Ein Band am Referenzmittel erlaubte eine Dezentrierung im deklarierten Rahmen (q̄ = 0,21 ⇒ r_out 0,965) und bräche §3.2 »Referenzmittel = 1«; die Proxy-Unsicherheit (nicht alle Beschäftigten im Freien; Außenberufe anderer Branchen fehlen) wirkt in beide Richtungen und ist ohne Branchen-Expositionsanteile nicht bezifferbar — sie steht als Kennzeichnung in `source_detail` | Band aus Branchen-Stützen (nur Land-/Forstwirtschaft 0,012 als untere Stütze; obere Stütze bräuchte Expositionsanteile je Branche, die keine Quelle liefert) | keine — r_out ist geparkt (Basiswert 1); betrifft nur die Umsetzungsgrundlage der Ebene |
+| 35 ⚠ | VOLY-Herleitung liegt in #95 §3.5 ohne Anker (Befund 444): Fremdanker in #95 deklarieren und im Lint dateiübergreifend auflösen — oder risikolokal ohne Anker-Syntax verweisen? | **Risikolokal** (W2): #98 verweist in Zeichentabelle und Kap.-7-Block textlich auf #95 §3.5 und die Registry-Quelle; die Ausnahme `fremd = {"voly"}` im Lint entfällt, jeder Herleitungs-Verweis muss im eigenen Bericht als Anker deklariert sein | Ein Umbau von #95 und ein dateiübergreifender Lint sind Produktumbau in einem abgenommenen Bericht — nicht Sache dieses Laufs | #95 §3.5 deklariert `#voly`, `herleitungsanker()` liest Fremddateien (bei der nächsten #95-Revision nachholen) | keine — VOLY 160.800 € unverändert, Registry-Abgleich (Katalog) besteht |
