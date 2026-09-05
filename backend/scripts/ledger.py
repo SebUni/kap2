@@ -443,6 +443,8 @@ def cmd_kompakt(pfad: Path, runde: int) -> int:
         print(f"\nVERIFIKATION ROT — {len(fehler)} Abweichung(en):", file=sys.stderr)
         for f in fehler[:40]:
             print(f"  {f}", file=sys.stderr)
+        if len(fehler) > 40:
+            print(f"  ({len(fehler) - 40} weitere nicht angezeigt)", file=sys.stderr)
         return 1
     print("\nVerifikation GRÜN: jede Befundnummer genau einmal, Kategorie und Lage unverändert.")
     return 0
@@ -505,7 +507,8 @@ def _fuehre_aus(kommando: str) -> tuple[int, str]:
     except subprocess.TimeoutExpired:
         return 124, (f"TIMEOUT nach {AUSDRUCK_TIMEOUT_S}s — der Ausdruck blockiert; "
                      f"ruft er die Prüfung selbst auf?")
-    return r.returncode, (r.stderr or r.stdout).strip()[:110]
+    ausgabe = re.sub(r"[\r\n]+", " ", (r.stderr or r.stdout).strip())
+    return r.returncode, ausgabe[:110]
 
 
 def cmd_pruefe(pfad: Path, streng: bool = False) -> int:
@@ -604,6 +607,8 @@ def _pruefe_inhalt(pfad: Path, streng: bool) -> int:
               f"dort, wo sie gesucht werden:")
         for zn, ist, soll in schief[:10]:
             print(f"    Zeile {zn}: {ist} Zellen, Kopf hat {soll}")
+        if len(schief) > 10:
+            print(f"    ({len(schief) - 10} weitere nicht angezeigt)")
     if rot or schief:
         print("\nROT — " + ("mindestens ein Prüfausdruck belegt seinen Befund nicht."
                             if rot else "die Tabellenstruktur trägt die Zusicherung nicht."))
@@ -693,6 +698,8 @@ def cmd_schliesse(pfad: Path) -> int:
               file=sys.stderr)
         for zn, ist, soll in schief[:10]:
             print(f"  Zeile {zn}: {ist} Zellen, Kopf hat {soll}", file=sys.stderr)
+        if len(schief) > 10:
+            print(f"  ({len(schief) - 10} weitere nicht angezeigt)", file=sys.stderr)
 
     offen = [b for b in parse(pfad) if b.lage in ("offen", "unklar")]
     if not offen:
