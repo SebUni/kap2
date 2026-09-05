@@ -140,7 +140,8 @@ def filter_catalog(catalog_payload: dict, enabled: set[str], risk_codes: list[st
     if "measures" in out:
         wanted = set(risk_codes)
         out["measures"] = [m for m in out["measures"]
-                           if wanted.intersection(m.get("linked_risk_codes", []))]
+                           if wanted.intersection(m.get("linked_risk_codes", []))
+                           or wanted.intersection(m.get("qualitative_risk_codes", []))]
     return out
 
 

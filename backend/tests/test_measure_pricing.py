@@ -49,10 +49,12 @@ _CONCEPT_MEASURES_WITH_OPEX_FIXED = {
 # ── Katalog-Konsistenz ──────────────────────────────────────────────────────
 
 def test_measure_count_is_47():
-    # M0-Verschlankung: 2 aktive Maßnahmen; wird 4 mit Aktivierung von #96/#98
-    # (docs/ROADMAP.md §5). Die 45 geparkten liegen verbatim in catalog_parked.
-    assert len(catalog.MEASURES) == 2
-    assert len(_ALL_MEASURES) == 47
+    # M0-Verschlankung: 3 aktive Maßnahmen seit Ticket T-0015 (POLLEN_EARLY_WARNING,
+    # #96 S158 — Maßnahmen-Hebel qualitativ, kein linked_risk_codes-Kanal, Befund 124);
+    # wird 4 mit Aktivierung der #98-Hebel. Die 45 geparkten liegen verbatim in
+    # catalog_parked (unverändert, daher bleibt die Gesamtzahl bei 48).
+    assert len(catalog.MEASURES) == 3
+    assert len(_ALL_MEASURES) == 48
 
 
 def test_every_measure_has_source():

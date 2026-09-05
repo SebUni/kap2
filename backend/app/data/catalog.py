@@ -1213,7 +1213,17 @@ def build_pathways(risk: dict) -> list[dict]:
 # effect_target: Liste aus {hazard, exposure, vulnerability} – worauf die Maßnahme wirkt.
 # default_reduction: Reduktion der normalisierten Zielkomponente bei VOLLER Abdeckung
 #   der Zelle (0..1). coverage_scaling: 'linear' oder 'saturating'.
-# linked_risk_codes: Risiken, die neu berechnet werden.
+# linked_risk_codes: Risiken, die neu berechnet werden (measure_service wendet
+#   default_reduction als Faktor auf den gespeicherten Zell-Outcome an — siehe
+#   _reduction_factor). NIE befüllen ohne quantifizierte Effektgröße/Integrationsfreigabe.
+# qualitative_risk_codes: Risiken, denen die Maßnahme fachlich zugeordnet ist, OHNE dass
+#   ein Rechenweg sie liest (kein Kanal in measure_service, insbesondere KEINE Nutzung in
+#   _reduction_factor/compute_impact). Für Hebel ohne publizierte Interventions-
+#   Effektgröße (Aufgabe §3.5: "laufen ehrlich als qualitativ") oder mit gesperrtem
+#   linked_risk_codes-Kanal (z. B. Befund 124/#96: zellunscharfer Pauschalfaktor auf ein
+#   Risiko, dessen Evidenz nur intra-urbane Umverteilung trägt). Nur die beiden
+#   Zuordnungsfilter (routes/measures.py, demo_service.py) lesen diesen Schlüssel; er
+#   darf sich mit linked_risk_codes NICHT überschneiden (test_measure_qualitative_risk_codes).
 #
 # Kostenmodell — symmetrisch CAPEX (einmalig) / OPEX (jährlich), je fix / Stück / Fläche.
 # MECE: jeder Euro ist entweder einmalige Investition (CAPEX) oder wiederkehrende Betriebs-
@@ -1467,6 +1477,71 @@ MEASURES: list[dict] = [
             "aufsuchende Betreuung, Aufklärung in Pflegeeinrichtungen) sind organisatorisch "
             "ohne baulichen Anteil; ein einheitlicher Kennwert existiert nicht. Modellannahme "
             "als einmaliges Programmbudget (Konzeption/Koordination) → 35.000 €."}},
+    # Maßnahmen-Hebel (qualitativ) — Ticket T-0015 / Befund 124 (reviews/BEFUNDE_96.md):
+    # #96 darf keinen linked_risk_codes-Wirkungskanal bekommen (verbietet den flächigen,
+    # zellunscharfen Pauschalfaktor auf EXPECTED_ANNUAL_ALLERGY_DAYS, Modellgrenze 7). Die
+    # Zuordnung zum Risiko läuft deshalb ausschließlich über qualitative_risk_codes — ein
+    # rein deklaratives Feld, das kein Rechenweg liest (measure_service kennt nur
+    # linked_risk_codes). Herleitung siehe docs/methodik/96_aeroallergene.md §5 (Z. 657)
+    # und Registerzeile 96-S158-01 (Z. 110, Log 15): keine publizierte
+    # Interventions-Effektgröße für kommunale Pollen-Frühwarnung → §3.5-Regel „qualitativ“.
+    # Herleitung capex_per_unit/opex_per_unit_year: für kommunale Pollen-Messstationen
+    # (Fallenkopf + Auswertungs-/Datenanbindung an das DWD-/PID-Frühwarnsystem) ist keine
+    # belastbare öffentliche Kostenquelle je Station auffindbar — Modellannahme, angelehnt
+    # an die Größenordnung anderer kommunaler Frühwarn-Sensorik (vgl. das geparkte
+    # EARLY_WARNING_MEASURE: ~60.000 €/35.000 € p.a. für ein GANZES Starkregen-/
+    # Hochwasser-Frühwarnsystem); eine einzelne Pollenmessstation liegt deutlich darunter.
+    # Punktwert 15.000 €/Station Anschaffung, 4.000 €/(Station·a) laufender Betrieb
+    # (Kalibrierung, Probenauswertung, Datenanbindung) — Modellannahme mangels
+    # belastbarer Quelle.
+    {"code": "POLLEN_EARLY_WARNING", "name": "Pollen-Frühwarnung",
+     "description": "Kommunales Pollenmonitoring/-frühwarnsystem (S158): informiert "
+                    "Allergikerinnen und Allergiker über die aktuelle Pollenbelastung "
+                    "(DWD-/PID-Gefahrenindex). Wirkt nicht auf die zellscharfe "
+                    "Vegetations-/Symptomlast der Schadensfunktion — keine publizierte "
+                    "Interventions-Effektgröße; Maßnahmen-Hebel (qualitativ), Register-ID "
+                    "96-S158-01.",
+     "measure_type": "organizational",
+     "effect_target": ["vulnerability"], "default_reduction": 0.0, "coverage_scaling": "saturating",
+     "linked_risk_codes": [],
+     "qualitative_risk_codes": ["EXPECTED_ANNUAL_ALLERGY_DAYS"],
+     "capex_fixed": None, "capex_per_unit": 15000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": 4000.0, "opex_per_m2_year": None,
+     "benefit_per_m2_year": 0.0,
+     "unit_label": "Station", "unit_density_per_ha": 0.001,
+     "source": "Modellannahme (mangels öffentlicher Kostenkennwerte je Pollenmessstation)",
+     "sources": {
+        "capex_per_unit": "Modellannahme (mangels belastbarer Quelle je Pollenmessstation)",
+        "opex_per_unit_year": "Modellannahme (Kalibrierung/Auswertung/Datenanbindung je Station)",
+        "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
+     "source_refs": {},
+     "source_details": {
+        "capex_per_unit": "Für kommunale Pollen-Messstationen (Fallenkopf + Auswertungs-/"
+            "Datenanbindung an das DWD-/PID-Frühwarnsystem) ist keine belastbare öffentliche "
+            "Kostenquelle je Station auffindbar. Modellannahme, angelehnt an die "
+            "Größenordnung anderer kommunaler Frühwarn-Sensorik (vgl. das geparkte "
+            "EARLY_WARNING_MEASURE: rund 60.000 € Aufbau für ein GANZES Starkregen-/"
+            "Hochwasser-Frühwarnsystem); eine einzelne Pollenmessstation liegt deutlich "
+            "darunter → Punktwert 15.000 €/Station.",
+        "opex_per_unit_year": "Laufender Betrieb (Kalibrierung, Probenauswertung, "
+            "Datenanbindung) je Pollenmessstation; kein Marktkennwert auffindbar. "
+            "Modellannahme → Punktwert 4.000 €/(Station·a).",
+        "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: eine "
+            "Pollenmessstation deckt ein großes Stadtgebiet ab (≈ 1.000 ha je Station) "
+            "→ 0,001 Stationen/ha.",
+        "default_reduction": "Registerzeile 96-S158-01 (docs/evidenz/register.md, "
+            "übertragen aus Bericht #96, Registerzeile Z. 110 sowie §5 Z. 657): „keine "
+            "quantifizierte Interventions-Effektgröße publiziert“ für die Wirkung "
+            "kommunaler Pollen-Frühwarnung auf die Symptomtage der Aeroallergene-"
+            "Schadensfunktion — die Vegetations-Symptom-Kopplung (Ebene POLLEN_LOAD) ist "
+            "nur beobachtend belegt, kein Interventions-RCT (Log 15). default_reduction "
+            "bleibt deshalb bei 0,0, und EXPECTED_ANNUAL_ALLERGY_DAYS ist bewusst NICHT in "
+            "linked_risk_codes geführt: Befund 124/Modellgrenze 7 (reviews/BEFUNDE_96.md) "
+            "verbietet jeden flächigen, zellunscharfen Pauschalfaktor auf #96 (die "
+            "λ-Evidenz ist intra-urban, kein Beleg für einen kommunenweiten "
+            "Niveaueffekt). Die Zuordnung zum Risiko läuft stattdessen rein deklarativ "
+            "über qualitative_risk_codes (Aufgabe §3.5: Hebel ohne quantifizierte "
+            "Effektgröße laufen ehrlich als „qualitativ“)."}},
     # Herleitung capex_fixed: angepasste Arbeitszeitmodelle bei Hitze verursachen im Kern nur
     # organisatorischen Aufwand (Dienstplanung, Betriebsvereinbarung); kein Marktkennwert.
     # Modellannahme als geringes Einführungs-/Konzeptbudget → 10.000 €.
@@ -2086,6 +2161,7 @@ _MEASURE_KANG_MAP: dict[str, tuple[str, str]] = {
     "MIXED_FORESTS": ("land", "forestry"),
     "WILDFIRE_PREVENTION": ("land", "forestry"),
     "HEAT_ACTION_PLANS": ("health", "health"),
+    "POLLEN_EARLY_WARNING": ("health", "health"),
     "COOLING_ROOMS_DRINKING_WATER": ("health", "health"),
     "DRINKING_FOUNTAINS": ("health", "health"),
     "EARLY_WARNING_MEASURE": ("urban", "civil_protection"),
