@@ -19,14 +19,17 @@ router = APIRouter()
 def measure_catalog(request: Request):
     """Verfügbare Maßnahmentypen aus dem festen KAP3-Katalog.
 
-    Demo: nur Maßnahmen, deren Wirkung eines der freigeschalteten Demo-
-    Risiken trifft — alles andere hätte in der Demo sichtbar keinen Effekt.
+    Demo: nur Maßnahmen, die einem der freigeschalteten Demo-Risiken zugeordnet
+    sind (``linked_risk_codes`` — Wirkung — oder ``qualitative_risk_codes`` —
+    Zuordnung ohne Rechenwirkung, T-0015) — alles andere hätte in der Demo
+    sichtbar keinen Bezug.
     """
     demo_risks = getattr(request.state, "demo_risk_codes", None)
     if demo_risks:
         wanted = set(demo_risks)
         return [m for m in catalog.MEASURES
-                if wanted.intersection(m.get("linked_risk_codes", []))]
+                if wanted.intersection(m.get("linked_risk_codes", []))
+                or wanted.intersection(m.get("qualitative_risk_codes", []))]
     return catalog.MEASURES
 
 
