@@ -10,7 +10,7 @@ Aktiver Stand nach Review-Runde 16. Der **vollständige Verlauf der Runden 1–1
 
 ## Offene Befunde (0)
 
-**Runde 23: Befunde 412–420** (A:1 · B:6 · C:2) sind abgearbeitet; ihr Status ist jetzt aus dem Prüfausdruck abgeleitet (W7), nicht behauptet — `ledger.py 98 --schliesse` hat alle acht von `offen` auf `geschlossen` gezogen. Kein Befund ist mehr abnahmeblockierend, dessen Prüfausdruck grün ist. `ledger.py 98 --pruefe` weist im aktuellen Stand vier als *geschlossen* geführte Befunde mit `Prüfausdruck ROT` aus, deren Ausdruck ihren Befund nicht belegt: **344, 357, 403, 406**.
+**Runde 23: Befunde 412–420** (A:1 · B:6 · C:2) sind abgearbeitet; ihr Status ist jetzt aus dem Prüfausdruck abgeleitet (W7), nicht behauptet — `ledger.py 98 --schliesse` hat alle acht von `offen` auf `geschlossen` gezogen. Kein Befund ist mehr abnahmeblockierend, dessen Prüfausdruck grün ist. `ledger.py 98 --pruefe` weist im aktuellen Stand drei als *geschlossen* geführte Befunde mit `Prüfausdruck ROT` aus, deren Ausdruck ihren Befund nicht belegt: **357, 403, 406**.
 
 ## Geschlossene Befunde (227)
 
