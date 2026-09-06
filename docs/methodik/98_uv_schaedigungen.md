@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23, Befunde 336–420) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23, Befunde 336–421) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -118,7 +118,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 17 Befunden der Runde 15 nur vier umgesetzt waren — der inhaltliche Verlust ist
 > auf diese vier begrenzt und in Rev. 14 nachgezogen (Befunde 356/357).
 >
-> **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 23 (Befunde 336–420). Keine
+> **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 23 (Befunde 336–421). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
 > € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
 > gefahrenen Review-Runde unabhängig nachgerechnet. **Eine Zählung steht hier
@@ -131,6 +131,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Prüfmechanik: Ledger auf eine Zeile je Befund, Status aus **Prüfausdrücken**
 > abgeleitet (W7); Lint-Ratchets gegen zu enge Ausnahmen und gegen Registry-Specs
 > ohne Parameter-Block.
+> Befund **421** stammt nicht aus einer Review-Runde, sondern ist ein Code-Nachzug aus der Ticketarbeit: ein Herleitungstext im Code war gegenüber dem Bericht stehen geblieben. Am Modell und an der Herleitung im Bericht ändert er nichts — er ist nur in der Befundspanne mitgezählt.
 >
 > Status je Befund in `reviews/BEFUNDE_98.md`. Diese Markdown-Datei ist die Quelle für
 > #98 (§2.7). Alle Ermessensentscheidungen im **Entscheidungslog** (Ende der Datei).
