@@ -19,7 +19,20 @@ Risiko-Methodiken.
 > oder (b) Größen, die **innerhalb der Betrachtungsebene selbst** bestimmbar
 > sind (bei einer Kommune: aus ihren eigenen Zellen). Liegt keine solche
 > Referenz vor, bleibt der Modifikator neutral (Faktor 1) — ein „Bundeslauf"
-> als Bezugsgröße ist unzulässig. v2 konsolidiert die Aufgabenbeschreibung v1 (22.08.2026) und
+> als Bezugsgröße ist unzulässig.
+>
+> **Fortschreibung 06.09.2026 (Aufsichtsrats-Entscheid, Freigabe F-0007; Vorgaben P1/P2 in
+> `CLAUDE.md`):** (4) §3.5 — ein Maßnahmen-Hebel ohne publizierte Interventions-Effektgröße
+> läuft **nicht mehr als „qualitativ“ mit Wirkung null**, sondern erhält eine **begründete
+> Abschätzung** nach §3.9 „Abgeschätzt“ (Zahlenwert mit Begründung, Bandbreite, Sensitivität),
+> die im Produkt ausdrücklich als „Abschätzung von KAP3“ mit Herleitung ausgewiesen wird.
+> Bauform-Grenzen (z. B. kommunenweiter Pauschalfaktor statt zellscharfer Wirkung) werden als
+> Modellgrenze der Abschätzung dokumentiert, nicht als Grund für eine Null. Bestehende Berichte,
+> die einen Hebel als „qualitativ“ führen (#96 S158 Pollen-Frühwarnung, Log 15), werden über
+> `/risiko-fortsetzen` als bewusste Überstimmung im Ledger fortgeschrieben.
+> (5) §3.6 — die nutzersichtbare Parameterliste trägt je Parameter entweder die Quelle oder den
+> Vermerk „Abschätzung von KAP3“ samt Herleitung; eine Herleitung, die nur als Code-Kommentar
+> existiert, erfüllt die Pflicht nicht. v2 konsolidiert die Aufgabenbeschreibung v1 (22.08.2026) und
 `docs/METHODIK_GRUNDSAETZE.md` (G1–G14) **inklusive der Review-Fortschreibungen aus der
 M0-Gegenprüfung** (Kalibrierfaktor-Regel ex G1/G5, G14-Geltungsbereich, G11-Begründung).
 `METHODIK_GRUNDSAETZE.md` entfällt; die Datei bleibt nur als Ein-Zeilen-Verweis hierher bestehen.
@@ -293,8 +306,14 @@ G12 → 3.4 (Verteilungsprüfung) · G13 → 3.2 (Kein-Doppelkanal) · G14 → 3
   Studien (Fall-Kontroll-ORs messen nicht die Wirkung einer Einführung — regelmäßig Faktor 5–10
   zu optimistisch); marginal gegenüber dem heutigen Stand; **Doppelzählungs-Wächter** gegen die
   Kalibrierjahre; **Wirkungsort definieren** (z. B. multiplikativ auf den Exzess (RR−1), nicht
-  vage „auf β"); R7-Weiche referenzieren, wo einschlägig. Hebel ohne quantifizierte Effektgröße
-  laufen ehrlich als „qualitativ".
+  vage „auf β"); R7-Weiche referenzieren, wo einschlägig.
+- **Hebel ohne quantifizierte Effektgröße (Vorgabe P2, 06.09.2026):** nicht als „qualitativ" mit
+  Wirkung null führen, sondern eine begründete Abschätzung nach §3.9 „Abgeschätzt" erarbeiten
+  (Zahlenwert mit Begründung, Bandbreite, Ergebnis-Sensitivität) und im Produkt als „Abschätzung
+  von KAP3" mit Herleitung ausweisen. Die Abschätzung ist marginal und an eine Ketten-Sensitivität
+  gebunden wie jeder andere Hebel; Bauform-Grenzen werden als Modellgrenze der Abschätzung
+  dokumentiert. Wo der Bericht das Fehlen einer Effektgröße feststellt, ist das der Anlass für die
+  Abschätzung, nicht ihr Ersatz.
 
 ### 3.6 Architektur- und Produktkonformität
 
@@ -307,6 +326,10 @@ G12 → 3.4 (Verteilungsprüfung) · G13 → 3.2 (Kein-Doppelkanal) · G14 → 3
   („Stufe M0: 1 von 8 Konten aktiv" + Roadmap-Aufklappliste), (3) Versionsstempel
   („berechnet mit Modellstand Mx — Untergrenze"). Infokasten-Texte sind Teil des Berichts.
 - Jeder Parameter editierbar und bequellt (Ratchet); neue Datenquellen keyless.
+- **Nutzersichtbare Parameterliste (Vorgabe P1, 06.09.2026):** je Parameter steht dort entweder
+  die Quelle oder der Vermerk „Abschätzung von KAP3" samt Herleitung, wie der Wert zustande kommt.
+  Gilt für alle Parameter, auch Defaults, Kostensätze und Wirkungsfaktoren; eine Herleitung nur
+  als Code-Kommentar genügt nicht.
 
 ### 3.7 Ansatz-Vergleich (nur wo nach §2.6 gefordert)
 

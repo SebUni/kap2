@@ -30,9 +30,30 @@ Bei jedem Methodik-Thema zuerst dort nachschlagen.
    (beim Altbestand M0 ist die HTML-Render-Quelle in `docs/render/` maßgeblich).
 2. **Arbeitsmappen nie still ändern oder überstimmen.** Bewusste Fortschreibungen gehören in
    die Quelle + Abgleich-Protokoll (Aufgabe §1/LF 14).
-3. **Kein Parameter ohne Quelle** (Ratchet); kein Formelzeichen ohne Herleitung (§3.9).
+3. **Kein Parameter ohne Quelle oder ausgewiesene Abschätzung** (Ratchet; Abschätzung nach §3.9
+   „Abgeschätzt" und Vorgabe P1); kein Formelzeichen ohne Herleitung (§3.9).
 4. **Review nur in frischer Session** — nie in der Session, die den Bericht geschrieben hat.
 5. Divergenz Bericht ↔ Code wird nie still im Code gefixt: Befund ins Ledger.
+
+## Vorgaben des Aufsichtsrats für das Produkt
+
+Entscheidungen des Aufsichtsrats (Firmen-Repo `firma`, Freigabe F-0007, Meetings 05./06.09.2026).
+Sie gehen den Methodik-Regeln vor; ein Widerspruch zu einer bestehenden Regel oder einem
+abgenommenen Bericht wird als **bewusste Überstimmung im Befund-Ledger** geführt
+(`/risiko-fortsetzen <nr>`), nie still im Code gelöst und nie als Grund, die Vorgabe nicht umzusetzen.
+
+- **P1 — Parameterliste mit Quelle oder Abschätzung.** Das Produkt führt eine nutzersichtbare
+  Parameterliste. Je Parameter steht dort entweder die Quelle oder der Vermerk, dass es eine
+  begründete Abschätzung von KAP3 ist, samt Herleitung, wie sie zustande kommt. Gilt für alle
+  Parameter (Defaults, Kostensätze, Wirkungsfaktoren). Eine Herleitung nur als Code-Kommentar
+  erfüllt die Vorgabe nicht. (Aufgabe §3.6, §3.9)
+- **P2 — Abschätzung statt Nullwirkung.** Für Maßnahmen ohne publizierte Effektgröße wird keine
+  Wirkung null stehen gelassen, sondern eine begründete Abschätzung erarbeitet (Zahlenwert,
+  Bandbreite, Sensitivität) und im Produkt klar als Abschätzung ausgewiesen. Bauform-Grenzen werden
+  als Modellgrenze der Abschätzung dokumentiert. (Aufgabe §3.5; betrifft zuerst #96 S158
+  Pollen-Frühwarnung.)
+
+Prüfer prüfen Produkt-Tickets auch gegen P1 und P2.
 
 ## Workflow-Commands
 
