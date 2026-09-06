@@ -16,6 +16,7 @@ Befund 124 bleibt exklusiv in ``test_methodik_96_golden.py::test_no_flat_measure
 from __future__ import annotations
 
 import copy
+import inspect
 import os
 import sys
 
@@ -98,6 +99,33 @@ def test_qualitative_measure_does_not_change_cell_outcome_or_cost():
     # default_reduction > 0 wäre. Wir bestätigen daher zusätzlich, dass der Code schlicht
     # nie in die Faktor-Schleife gelangt:
     assert CODE not in cell_factors
+
+
+def test_measure_service_does_not_read_qualitative_risk_codes():
+    """Zusicherung (Punkt 9, Runde 1): kein Rechenweg in ``measure_service`` liest
+    ``qualitative_risk_codes``.
+
+    Warum als Quelltextprüfung statt als Verhaltenstest: Der bestehende Test
+    ``test_qualitative_measure_does_not_change_cell_outcome_or_cost`` (oben) bildet die
+    Faktor-Schleife aus ``_adjusted_cell_data`` (Z. 575–579) NACH, statt sie
+    aufzurufen — er prüft damit seine eigene Kopie und bliebe grün, wenn jemand
+    ``qualitative_risk_codes`` später tatsächlich in ``measure_service`` verdrahten
+    würde. Genau das ist die Zeitbombe, gegen die Punkt 3 des Tickets schützen sollte
+    (Befund 124: Zuordnung ohne Wirkung darf nicht zur Wirkung werden, auch nicht durch
+    eine spätere, unbedachte Erweiterung derselben Schleife). Diese Prüfung ruft daher
+    NICHT die Engine auf, sondern liest den tatsächlichen Quelltext des Moduls: sie wird
+    rot, sobald der String ``qualitative_risk_codes`` dort irgendwo auftaucht — egal in
+    welcher Funktion, egal ob get()/in/Vergleich. Das ist für diesen Zweck (eine
+    Zusicherung ÜBER den Code, nicht über sein Verhalten in einem Einzelfall) der
+    ehrlichste verfügbare Weg.
+    """
+    src = inspect.getsource(measure_service)
+    assert "qualitative_risk_codes" not in src, (
+        "measure_service.py liest 'qualitative_risk_codes' — das verdrahtet die "
+        "Zuordnung versehentlich zu einer Wirkung und verletzt die Sperre aus "
+        "Befund 124 (reviews/BEFUNDE_96.md). qualitative_risk_codes darf ausschließlich "
+        "von den Zuordnungsfiltern (routes/measures.py, demo_service.py) gelesen werden."
+    )
 
 
 if __name__ == "__main__":
