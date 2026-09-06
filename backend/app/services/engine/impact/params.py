@@ -518,8 +518,8 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "damit positiv korreliert sind. Die RAEUMLICHE Streuung des "
                       "Rasterquotienten ist Modellgrenze 9, KEIN Band der "
                       "Bundessumme. Plausibilisierung: implizite Dosisaenderung DE "
-                      "8,51 % x 0,7119 ~ 6,2 % ueber den Normalperiodenversatz "
-                      "~ 2,1 %/Dekade. Elastizitaet zeitinvariant angenommen "
+                      "8,51 % x 0,7119 ~ 6,06 % ueber den Normalperiodenversatz "
+                      "~ 2,02 %/Dekade. Elastizitaet zeitinvariant angenommen "
                       "(Befund 222); Anlage k_uv_herleitung.py.",
      # Beide Raster tragen den Rasterquotienten: SSD den Nenner, Globalstrahlung
      # den Zaehler. Bis Rev. 13 war nur das SSD-Raster verzeichnet (Befund 336g).
