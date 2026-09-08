@@ -61,6 +61,22 @@ def _param_doc_source(inp: dict) -> str:
     return "Modellannahme (mangels lokaler Daten)"
 
 
+#: Zulässige Werte der maschinenlesbaren Evidenzklasse (Vorgabe P1).
+EVIDENCE_CLASSES = ("belegt", "abgeschaetzt")
+
+
+def _evidence_class(explicit: Any, references: list[dict] | None) -> str:
+    """Auflösungsregel der Evidenzklasse (verbindliche Reihenfolge, Vorgabe P1).
+
+    1. ein explizit im Datensatz hinterlegter Wert gewinnt,
+    2. sonst "belegt", wenn aufgelöste ``references`` vorliegen,
+    3. sonst "abgeschaetzt" (Abschätzung von KAP3 — braucht eine Herleitung).
+    """
+    if explicit in EVIDENCE_CLASSES:
+        return str(explicit)
+    return "belegt" if references else "abgeschaetzt"
+
+
 def _base_param(
     pid: str,
     *,
@@ -75,6 +91,8 @@ def _base_param(
     prov: str = "param",
     editable: bool = True,
     applicable: bool = True,
+    evidence_class: Any = None,
+    evidence_derivation: dict | None = None,
 ) -> dict:
     return {
         "id": pid,
@@ -92,6 +110,11 @@ def _base_param(
         "overridden": False,
         "custom_source": None,
         "applicable": applicable,
+        # Vorgabe P1: maschinenlesbar, ob der Wert belegt oder eine begründete
+        # Abschätzung von KAP3 ist — samt Herleitung als Datenfeld (nicht als Kommentar).
+        "evidence_class": _evidence_class(evidence_class, references),
+        "evidence_note": source_detail,
+        "evidence_derivation": evidence_derivation or None,
     }
 
 
@@ -118,6 +141,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             source=r.get("source") or "Modellannahme (kein Kurz-Key hinterlegt)",
             source_detail=r.get("source_detail", ""),
             references=sources.resolve(r.get("source_refs")),
+            evidence_class=r.get("evidence_class"),
+            evidence_derivation=r.get("evidence_derivation"),
         ))
         # Monetarisierungs-Kostensatz je nicht-monetärem Risiko: eigenständiger,
         # editierbarer Parameter (€ je Outcome-Einheit). Monetäre Risiken (ref_value
@@ -132,6 +157,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source=r.get("cost_source") or "Modellannahme (Kostensatz, unbelegt)",
                 source_detail=r.get("cost_source_detail", ""),
                 references=sources.resolve(r.get("cost_source_refs")),
+                evidence_class=r.get("cost_evidence_class"),
+                evidence_derivation=r.get("cost_evidence_derivation"),
             ))
         # Schicht-B-Schadensfunktions-Parameter (baseline_mort, β, Schwellen, Raten …).
         for spec in _IMPACT_SPECS_BY_RISK.get(r["code"], []):
@@ -144,6 +171,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source=spec.get("source", ""),
                 source_detail=spec.get("source_detail", ""),
                 references=sources.resolve(spec.get("source_refs")),
+                evidence_class=spec.get("evidence_class"),
+                evidence_derivation=spec.get("evidence_derivation"),
             ))
 
     for cat_key, items in (
@@ -164,6 +193,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                     source=m.get("source") or "Modellannahme (Normierungsskala, unbelegt)",
                     source_detail=m.get("source_detail", ""),
                     references=sources.resolve(m.get("source_refs")),
+                    evidence_class=m.get("evidence_class"),
+                    evidence_derivation=m.get("evidence_derivation"),
                 ))
 
     for code, recipe in formulas.DETAILED.items():
@@ -196,6 +227,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source=_param_doc_source(inp),
                 source_detail=inp.get("source_detail", ""),
                 references=sources.resolve(inp.get("source_refs")),
+                evidence_class=inp.get("evidence_class"),
+                evidence_derivation=inp.get("evidence_derivation"),
             ))
 
     for m in catalog.MEASURES:
@@ -209,6 +242,9 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 or "Modellannahme (Maßnahmenkosten, unbelegt)"
             source_detail = (m.get("source_details") or {}).get(field) or ""
             refs = sources.resolve((m.get("source_refs") or {}).get(field))
+            # Evidenzklasse/Herleitung je Kostenfeld (parallel zu sources/source_details).
+            ev_class = (m.get("evidence_classes") or {}).get(field)
+            ev_derivation = (m.get("evidence_derivations") or {}).get(field)
             params.append(_base_param(
                 f"measures.{m['code']}.{field}",
                 layer_code=m["code"], layer_category="measures",
@@ -220,6 +256,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 references=refs,
                 editable=applicable,
                 applicable=applicable,
+                evidence_class=ev_class,
+                evidence_derivation=ev_derivation,
             ))
 
     def emit_globals(cat: str) -> bool:
@@ -316,6 +354,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source=spec.get("source", ""),
                 source_detail=spec.get("source_detail", ""),
                 references=sources.resolve(spec.get("source_refs")),
+                evidence_class=spec.get("evidence_class"),
+                evidence_derivation=spec.get("evidence_derivation"),
             ))
 
     # Modellweite Stellschrauben (Referenzskalierung, Risikozonen-Schwelle,
@@ -331,6 +371,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source=spec.get("source", ""),
                 source_detail=spec.get("source_detail", ""),
                 references=sources.resolve(spec.get("source_refs")),
+                evidence_class=spec.get("evidence_class"),
+                evidence_derivation=spec.get("evidence_derivation"),
             ))
 
     # Regionale Proxy-/Fallback-Klimatreiber (inputs.build_regional_context).
@@ -345,6 +387,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source=spec.get("source", ""),
                 source_detail=spec.get("source_detail", ""),
                 references=sources.resolve(spec.get("source_refs")),
+                evidence_class=spec.get("evidence_class"),
+                evidence_derivation=spec.get("evidence_derivation"),
             ))
 
     return params
