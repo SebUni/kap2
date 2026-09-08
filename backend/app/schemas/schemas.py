@@ -132,6 +132,10 @@ class ModelParameter(BaseModel):
     overridden: bool = False
     custom_source: Optional[str] = None
     applicable: Optional[bool] = None
+    # Vorgabe P1: belegt vs. begründete Abschätzung von KAP3, samt Herleitung.
+    evidence_class: str = "abgeschaetzt"
+    evidence_note: str = ""
+    evidence_derivation: Optional[dict] = None
 
 
 # ── Measures ───────────────────────────────────────────────────────────────────
