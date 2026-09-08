@@ -1,6 +1,9 @@
 # Methodik-Bericht #96 — Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft
 
-Status: **Rev. 2 (P̂-Zentrierung auf die eigene Kommune statt auf ein Bundesmittel —
+Status: **Rev. 3 (08.09.2026, Revision nach Vorgabe P2 des Aufsichtsrats — F-0007 Punkt 1:
+Wirkungsabschätzung des S158-Hebels statt „qualitativ"/Wirkung null, §5.1 + Modellgrenze 8 +
+Entscheidungslog 20; Review der Rev. 3 steht aus, Ledger-Befund 151)** · Rev. 2 abgenommen ·
+Rev. 2: **(P̂-Zentrierung auf die eigene Kommune statt auf ein Bundesmittel —
 Aufgabe §3.2 „geschlossene Betrachtungsebene", Nutzer-Entscheid 31.08.2026;
 Log 18/19) — ABNAHMEREIF & INTEGRIERT (Null-Runde: Review Runde 10; Befunde
 116–150 behoben)** · 31.08.2026 · Rev. 1 war abnahmereif (Null-Runde
@@ -16,7 +19,15 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 100-m-Vollraster-Lauf als Prüf-/Abgleichinstrument; die P̂-Zentrierung nutzt
 > seit Rev. 2 ausschließlich das Mittel der **eigenen Kommune** (§3.3, Log 18/19); die Ebenen POLLEN_LOAD (OSM-Vegetation, §3.3), POPULATION_U20 (§3.2) und CANOPY_BIRCH_FRACTION **sind mit der Integration am 31.08.2026 angelegt** (§3.1-Anlagepflicht erfüllt); alle übrigen Zellgrößen sind vorhanden oder regional/national — keine Zellgröße läuft auf einem unspezifizierten Neutral-Fallback.
 
-> **Revisionsstand.** **Rev. 2 (31.08.2026)** = Bezugsebene der P̂-Zentrierung:
+> **Revisionsstand.** **Rev. 3 (08.09.2026)** = Wirkungsabschätzung des S158-Hebels
+> (Pollen-Frühwarnung): Der Hebel läuft nicht mehr „qualitativ" mit Wirkung null, sondern
+> mit \(r_{\text{S158}}\) = 0,03 (Band 0,005–0,10) als §3.9-Abschätzung — **Vorgabe P2 des
+> Aufsichtsrats (F-0007 Punkt 1)**, Aufgabe §3.5 i. d. F. 06.09.2026. Betroffen: Kap. 1
+> (Knoten-Bilanz S158), §2 (Register 96-S158-01), §3.6-Zeichentabelle, **§5.1 (neu)**,
+> §6 Modellgrenze 8 (neu), §7 (`pollen.r_s158`), Entscheidungslog 15/20. Der Katalogwert
+> `default_reduction` bleibt in dieser Revision 0,0 (Code-Nachzug L2 als eigener Schritt);
+> die Sperre aus Befund 124 (kein pauschaler `linked_risk_codes`-Kanal) bleibt bestehen.
+> **Rev. 2 (31.08.2026)** = Bezugsebene der P̂-Zentrierung:
 > \(\bar G\) ist nicht mehr ein bundesweites Referenzmittel, sondern das
 > betroffenengewichtete Mittel der **betrachteten Kommune**, im Lauf aus ihren
 > eigenen Zellen gebildet (Aufgabe §3.2 „geschlossene Betrachtungsebene",
@@ -60,7 +71,7 @@ S010–S020 Habitat/Landnutzung, R03/R04).
 | E09 | Trockenheit (eine Ebene tief, Eingang von W025) | **bewusst inaktiv** | — | keine quantifizierte Trockenheit→Pollen-ERF; Wirkrichtung intensitätserhöhend — konsistent zur konservativen Nicht-Ansetzung der Intensität (Log 14; Rev.-5-Befund 52) |
 | S010–S020 | Habitat-/Landnutzungs-Sensitivitäten (Eingänge W024) | teilweise Schicht B | nicht separat parametrisiert; wirken über die lokale allergene Vegetation \(\hat G\) (analog W124-Komponenten-Logik in #95) | — |
 | R03/R04 | Vorkommen von Arealen/Arten bzw. Biotopen (Eingänge W024/W025) | Schicht B (via \(\hat G\)) | OSM-Vegetationsdaten der Zelle | — |
-| S158 | Monitoring von Gesundheitsgefahren / Frühwarnsysteme | Maßnahmen-Hebel (**qualitativ**) | Pollen-Frühwarnung (DWD/PID-Gefahrenindex); Ebene EARLY_WARNING_SYSTEMS (§5) | im Basiswert Default 1: keine quantifizierte Interventions-Effektgröße (§3.5; Log 15) |
+| S158 | Monitoring von Gesundheitsgefahren / Frühwarnsysteme | Maßnahmen-Hebel (**abgeschätzt**, §5.1) | Pollen-Frühwarnung (DWD/PID-Gefahrenindex); Ebene EARLY_WARNING_SYSTEMS (§5); Wirkungsfaktor \(r_{\text{S158}}\) = 0,03 (0,005–0,10), §3.9 ABGESCHÄTZT | wirkt **nur** im Maßnahmen-Modul, nicht im Basiswert des Schadens (dort weiterhin Default 1); keine publizierte Interventions-Effektgröße — deshalb Abschätzung statt Nullwirkung (Log 15/20, Vorgabe P2) |
 | R35 | Vorkommen von Bevölkerung | Schicht A + B | \(\text{pop}_a\) (Zensus 2022, 100 m; neue Ebene u20 — §3.2) | — |
 | R36 | Vorkommen von Gesundheitsinfrastruktur | Schicht A (Screening) | Ebene HEALTHCARE_ACCESS im Index (§3.6) | Basiswert Default 1: AR ist ein ambulantes Krankheitsbild; für einen Distanz-Effekt auf AR-Behandlungstage existiert keine Evidenz (§3.2: unbelegte Modulatoren Default 1; Log 16) |
 
@@ -107,7 +118,7 @@ Spalte verweist auf die Entscheidungslog-Nummer.
 | 96-R35-02 | Sensibilisierungsprofil der AR-Patienten (Birkengruppe/Gräser) | \(p_B\) = 0,55 (0,4–0,7) · \(p_G\) = 0,75 (0,6–0,85) | **gekennzeichnete Abschätzung** (§3.9); Stütze: Bevölkerungs-Sensibilisierung Gräser 19,4 % > Birke 17,4 % (Rangfolge) | Haftenberger 2013, Tab. 2/Abb. 1 [3] | Anteil *unter AR-Patienten* nicht direkt publiziert (Rev.-5-Befund 36a); Ersetzungspfad: PID-/Versorgungsdaten | national | **Basiswert** (Sensitivität §3.4) | Log 8 |
 | 96-K1-01 | Behandlungskosten je Betroffenem und Jahr (direkt) | 210,3 €₂₀₁₄ (populationsbasiert, alle Schweregrade) ⇒ 266,90 €₂₀₂₄ (§3.5) | Bevölkerungs-Fragebogenstudie (n = 3.501) | Cardell 2016 (TOTALL) [65] | Schweden 18–65, Preisstand Feb. 2014 (CPI-adjustiert); Raumtransfer SE→DE 1:1 dokumentiert | national | **Basiswert** | Log 9 |
 | 96-K1-02 | Behandlungskosten moderate–schwere SAR (direkt) | Erwachsene 42 % × 1.543 = 648 €₂₀₀₀ ⇒ 1.019 €₂₀₂₄; Kinder 60–78 % × 1.089 ⇒ 1.027–1.335 €₂₀₂₄ | Querschnitt (500 Patienten, fachärztlich) | Schramm 2003 [7] (Abstract-Zahlen primärverifiziert) | DE; **moderate–schwere** SAR — Überschätzungsrichtung je Durchschnittspatient | national | **Sensitivitätsband** (Obergrenze \(c_{\text{Tag}}\)) | Log 9 |
-| 96-S158-01 | S158 Pollen-Frühwarnung → Symptomlast | keine quantifizierte Interventions-Effektgröße publiziert | — | DWD/PID-Gefahrenindex (Ebene) | — | kommunal | **Maßnahmen-Hebel (qualitativ)** | Log 15 |
+| 96-S158-01 | S158 Pollen-Frühwarnung → Symptomlast | keine quantifizierte Interventions-Effektgröße publiziert ⇒ **Abschätzung** \(r_{\text{S158}}\) = 0,03 (Band 0,005–0,10) aus der offengelegten Dreifaktor-Kette §5.1 | — (keine Interventionsstudie; §3.8-Datenlücke ausdrücklich benannt) | Wirkungsort/Kette: §5.1 (`#s158-wirkung`); Ebene EARLY_WARNING_SYSTEMS (DWD/PID-Gefahrenindex) | Setzung für deutsche Kommunen; **§3.9 ABGESCHÄTZT**, im Produkt als „Abschätzung von KAP3" gekennzeichnet | kommunal (Pauschalfaktor — Modellgrenze 8 der Abschätzung) | **Maßnahmen-Hebel (abgeschätzt, §5.1)** — kein Basiswert der Schadensformel | Log 15/20 |
 | 96-R36-01 | R36 Gesundheitsinfrastruktur → AR-Outcome | keine Evidenz für Distanz-/Kapazitätseffekt auf ambulante AR-Behandlung | — | — | AR wird ambulant/selbstmediziert behandelt | HEALTHCARE_ACCESS (Schicht A) | **bewusst inaktiv** (Basiswert Default 1) | Log 16 |
 
 ## 3 Modell (§2.3) — Ansatz 96-A, Schicht B
@@ -545,6 +556,7 @@ assert abs(dt * 6.20 - 1252) < 5
 | \(p_B,\ p_G\) | Anteil der AR-Patienten mit Birkengruppen-/Gräser-Saison | — | **0,55** (0,4–0,7) / **0,75** (0,6–0,85) — gekennzeichnete Abschätzung (§3.4) [3]; register:96-R35-02; herleitung:#p-sens |
 | \(\hat P_{\text{Zelle}}\) | lokaler Pollen-Hazard-Faktor (auf die **Kommune** zentriert; in ΔTage **und** €) | — | \(1+\lambda(\hat G/\bar G - 1)\); Spanne bei \(\hat G/\bar G\) = 0,5…1,5: 0,65…1,35; ohne Kommunen-Referenz \(\hat P \equiv 1\) (§3.3); berechnet |
 | \(\text{pop}_a\) | Bevölkerung der Zelle je Band | Personen | Zensus 2022, 100 m (+ Ebene u20 neu); register:96-R35-01 |
+| \(r_{\text{S158}}\) | Wirkungsfaktor der Pollen-Frühwarnung (**nur Maßnahmen-Modul**, nicht im Basiswert) | — | **0,03** (Band 0,005–0,10) = \(q_{\text{reich}} q_{\text{handel}} e_{\text{Tag}}\) = 0,35·0,40·0,20 — **§3.9 ABGESCHÄTZT, keine Primärquelle** (Vorgabe P2); Kette, Bandenden und Sensitivität in §5.1; register:96-S158-01; herleitung:#s158-wirkung |
 
 ### 3.7 Schicht A (getrennt; nie auf €-Pfaden)
 
@@ -654,15 +666,145 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   Vegetations-Symptom-Kopplung ist beobachtend belegt [54–56] — **kein**
   Interventions-RCT; als mechanischer Hebel mit gekennzeichneter Effektkette geführt
   (Doppelzählungs-Wächter: wirkt nur über \(\hat G\), kein zweiter Vegetationskanal).
-- **Pollenmonitoring / Frühwarnung (S158): qualitativ** (§3.5-Regel: Hebel ohne
-  quantifizierte Effektgröße laufen ehrlich als „qualitativ"; Rev.-5-Befunde 26/34):
-  keine publizierte Interventions-Effektgröße für Einführung/Ausbau kommunaler
-  Pollen-Frühwarnung auf Symptomtage; Ebene EARLY_WARNING_SYSTEMS (DWD/PID-Gefahrenindex)
-  wird als Screening-/Informationsebene geführt, im Basiswert Default 1.
+- **Pollenmonitoring / Frühwarnung (S158): abgeschätzt** — bis Rev. 2 als „qualitativ"
+  (Wirkung null) geführt; seit der Fortschreibung der Aufgabe §3.5 (06.09.2026, Vorgabe P2
+  des Aufsichtsrats) mit einer begründeten Abschätzung \(r_{\text{S158}}\) = **0,03**
+  (Band 0,005–0,10) hinterlegt. Vollständige Herleitung, Bandenden, Sensitivität und
+  Modellgrenze: **§5.1** (`#s158-wirkung`). Die Ebene EARLY_WARNING_SYSTEMS
+  (DWD/PID-Gefahrenindex) bleibt zugleich Screening-/Informationsebene der Schicht A und
+  geht **nicht** in den Basiswert der Schadensformel ein (dort weiterhin Default 1).
 - **R7-Weiche:** nicht einschlägig — keine Vorsorge-Buchung berührt (#96 hat keine
   K8-Gegenbuchung in der Netzwerkliste); Stadtbaum-Programmkosten sind kommunale
   Maßnahmenkosten außerhalb der Schadenskonten (Anzeige im Maßnahmen-Modul, keine
   K-Buchung).
+
+### 5.1 Wirkungsabschätzung S158 Pollen-Frühwarnung (Anker `#s158-wirkung`) — §3.9 **ABGESCHÄTZT**
+
+**Anlass und Geltung.** Vorgabe P2 des Aufsichtsrats (Freigabe F-0007, 06.09.2026) und die
+daraus folgende Fortschreibung der Aufgabe §3.5: Ein Maßnahmen-Hebel ohne publizierte
+Interventions-Effektgröße läuft **nicht mehr als „qualitativ" mit Wirkung null**, sondern
+erhält eine begründete Abschätzung nach §3.9 (Zahlenwert mit Begründung, Bandbreite,
+Ergebnis-Sensitivität), die im Produkt als „Abschätzung von KAP3" mit Herleitung ausgewiesen
+wird. Die Registerfeststellung 96-S158-01 („keine quantifizierte Interventions-Effektgröße
+publiziert") bleibt sachlich unverändert richtig — sie ist ab hier der **Anlass** der
+Abschätzung, nicht ihr Ersatz. Die Entscheidung Log 15 („qualitativ") wird damit bewusst
+überstimmt; Entscheidungslog **Nr. 20**, Ledger-Befund **151**.
+
+**§3.9-Kategorie ABGESCHÄTZT — keine Primärquelle.** Für Einführung oder Ausbau kommunaler
+Pollen-Frühwarnung existiert keine Interventions- oder quasi-experimentelle Studie mit einer
+Effektgröße auf Symptomtage; anders als beim Hitzewarnsystem (#95, Register 95-S158-01:
+Feldbusch 2025, Urban 2025) ist die Evidenzlage hier leer. Deshalb wird — wie bei
+\(s_{\text{unbek}}\) (§3.3) — **keine Effektzahl aus der Literatur zitiert** (§3.8-Datenlücke,
+ausdrücklich benannt). Der Zahlenwert entsteht aus einer offengelegten Wirkungskette; jeder
+ihrer drei Faktoren ist eine **Setzung zwischen zwei benannten Ankern**, der Basiswert die
+Mitte der jeweiligen Spanne. Kategorien-Disziplin (§3.9): Keiner der Faktoren ist eine aus
+einer fremden Größe umgedeutete Zahl — es sind ausgewiesene Annahmen, keine
+Beobachtungswerte.
+
+**Wirkungsort (§3.5, definiert).** Die Warnung ändert weder die Pollenmenge noch die
+Vegetation \(\hat G\), sondern das Verhalten der Betroffenen an den belasteten Tagen
+(Lüften/Aufenthalt im Freien, rechtzeitig statt nachlaufend begonnene Bedarfsmedikation).
+Sie wirkt daher **multiplikativ auf den klimaattribuierten Zusatzblock**
+\(\Delta\text{Tage}_{\text{Zelle}}\) — und über die strikte Proportionalität (§3.3) im
+gleichen Verhältnis auf €:
+
+$$ \Delta\text{Tage}^{\,\text{mit S158}} \;=\; \Delta\text{Tage} \cdot \bigl(1 - r_{\text{S158}} \cdot \text{Abdeckung}\bigr), \qquad r_{\text{S158}} \;=\; q_{\text{reich}} \cdot q_{\text{handel}} \cdot e_{\text{Tag}} $$
+
+Sie wirkt **nicht** auf \(\Delta S\) (gemessenes Klimasignal), **nicht** auf \(B\) (Prävalenz)
+und **nicht** über \(\hat G/\lambda\). **Doppelzählungs-Wächter:** kein zweiter Kanal zur
+allergenarmen Stadtbaumwahl (die wirkt ausschließlich über \(\hat G\)) und keine
+Überschneidung mit R36 (HEALTHCARE_ACCESS, Default 1); die Kalibrierjahre enthalten keinen
+Frühwarn-Effekt, der bereits eingerechnet wäre (\(c_{\text{kal}} \equiv 1\), kein Fit).
+
+**Kette und Zahlenwert.**
+
+| Faktor | Bedeutung | Basiswert | unterer Anker | oberer Anker |
+|---|---|---|---|---|
+| \(q_{\text{reich}}\) | Anteil der AR-Betroffenen einer Kommune, den das Warnangebot in der Saison tatsächlich erreicht | **0,35** | 0,20 — bereitgestellter Index ohne aktive Kanäle | 0,55 — aktive Kanäle (App-Push, Presse, Schul-/Kita-Information) |
+| \(q_{\text{handel}}\) | Anteil der Erreichten, der die Information in eine Handlung übersetzt | **0,40** | 0,25 — Kenntnisnahme ohne Verhaltensänderung | 0,60 — Betroffene mit hohem Leidensdruck und eingeübter Bedarfsmedikation |
+| \(e_{\text{Tag}}\) | relative Minderung der Symptomlast an den zusätzlichen Saisontagen bei tatsächlich geändertem Verhalten | **0,20** | 0,10 — Expositionsvermeidung deckt nur einen Teil des Tages ab | 0,30 — Expositionsvermeidung **und** rechtzeitig begonnene Bedarfsmedikation |
+
+\(r_{\text{S158}} = 0{,}35 \cdot 0{,}40 \cdot 0{,}20 = 0{,}028\) ⇒ **Basiswert
+\(r_{\text{S158}}\) = 0,03 (3 %)** — ausdrücklich **größer null**: Die fehlende
+Interventionsstudie begründet die Kennzeichnung als Abschätzung, nicht eine Nullwirkung.
+
+**Bandbreite mit zwei benannten Bandenden:**
+
+- unteres Bandende **„Aushang-Fall"** (Index wird bereitgestellt, aber nicht aktiv verteilt,
+  keine eingeübte Handlung): 0,20 · 0,25 · 0,10 = **0,005 (0,5 %)**;
+- oberes Bandende **„aktivierte Warnkette"** (aktive Kanäle, eingeübte Bedarfsmedikation,
+  hohe Handlungsbereitschaft): 0,55 · 0,60 · 0,30 = 0,099 ⇒ **0,10 (10 %)**.
+
+Band \(r_{\text{S158}} \in [0{,}005;\ 0{,}10]\); der Basiswert liegt bewusst näher am unteren
+Ende (Untergrenzen-Zusage Kap. 1).
+
+**Ergebnis-Sensitivität (§3.9).** \(r_{\text{S158}}\) wirkt linear: Der Ausweis der Maßnahme
+skaliert 1:1 mit dem Faktor, der Schadenswert selbst bleibt unberührt, solange die Maßnahme
+nicht gewählt ist. Bezogen auf die §4-Bundessumme von ≈ 110 Mio. €₂₀₂₄/Jahr entspricht der
+Basiswert **≈ 3,3 Mio. €/Jahr** vermiedener Behandlungskosten bei flächendeckender
+Umsetzung; das Band spannt **0,55 bis 11,0 Mio. €/Jahr** (Faktor 6 nach unten, Faktor 3,3
+nach oben). Für eine Kommune mit 100.000 EW im Bundes-Altersmix (≈ 10.735 Betroffene,
+≈ 132.300 €/Jahr) sind das ≈ **3.970 €/Jahr** (Band ≈ 660–13.230 €/Jahr). Einordnung, ehrlich
+benannt: Gegen die Vorhaltekosten des Messnetzes (15.000 €/Station Anschaffung,
+4.000 €/(Station·Jahr) Betrieb, Katalog `POLLEN_EARLY_WARNING`) trägt sich die Maßnahme über
+den K1-Nutzen allein in keinem Punkt des Bands — die Abschätzung ändert also die
+Vorteilhaftigkeits-Aussage nicht, macht die Wirkung aber sichtbar und diskutierbar, statt sie
+als Null auszuweisen.
+
+```python test: beispiel_96_s158_wirkung
+# Dreifaktor-Kette der S158-Abschaetzung (§3.9 ABGESCHAETZT, keine Primaerquelle)
+q_reich, q_handel, e_tag = 0.35, 0.40, 0.20
+r = q_reich * q_handel * e_tag
+assert abs(r - 0.028) < 1e-9 and round(r, 2) == 0.03      # Basiswert 0,03 > 0
+# Bandenden: "Aushang-Fall" (unten) und "aktivierte Warnkette" (oben)
+unten = 0.20 * 0.25 * 0.10
+oben = 0.55 * 0.60 * 0.30
+assert abs(unten - 0.005) < 1e-9
+assert abs(oben - 0.099) < 1e-9 and round(oben, 2) == 0.10
+assert unten < r < oben                                    # Basiswert im eigenen Band
+# Ergebnis-Sensitivitaet: linear auf DeltaTage und (proportional) auf EUR
+bund_eur = 110e6                                           # §4-Sanity: ~110 Mio EUR_2024/Jahr
+assert abs(0.03 * bund_eur / 1e6 - 3.3) < 0.01
+assert abs(unten * bund_eur / 1e6 - 0.55) < 0.01
+assert abs(0.10 * bund_eur / 1e6 - 11.0) < 0.01
+# Beispielkommune 100.000 EW im Bundes-Altersmix (§3.2-Konvention)
+ew, betroffene_de, pop_de = 100_000, 8_959_105, 83_456_045
+betroffene = ew * betroffene_de / pop_de
+euro = betroffene * 1.988 * 6.20
+assert abs(betroffene - 10_735) < 5
+assert abs(euro - 132_300) < 200
+assert abs(0.03 * euro - 3_970) < 20
+assert abs(unten * euro - 660) < 10 and abs(0.10 * euro - 13_230) < 30
+```
+
+**Modellgrenze der Abschätzung (Bauform) — nicht Grund für eine Null.** Die Abschätzung wirkt
+als **kommunenweiter Pauschalfaktor**, nicht zellscharf: Reichweite und Handlungsbereitschaft
+sind je Zelle nicht beobachtbar, und die Verhaltenswirkung ist nicht an die
+Vegetationsstruktur der Zelle gebunden. Der Faktor verteilt daher **nicht** innerhalb der
+Kommune um, sondern senkt den Ausweis aller Zellen gleichmäßig. Das ist die **Modellgrenze
+der Abschätzung** (§6, Modellgrenze 8) — sie wird dokumentiert, nicht als Argument für
+Wirkung null verwendet (Aufgabe §3.5, Fortschreibung 06.09.2026). **Ersetzungspfad:** eine
+Vorher-Nachher-/DiD-Auswertung von Symptomtagebuch-Daten (Patient's Hayfever Diary) gegen die
+Einführung kommunaler Warnkanäle ersetzt die Abschätzung durch eine gemessene Effektgröße;
+bis dahin bleibt die Kette oben der vollständige Nachweis des Werts.
+
+**Abgrenzung zu Modellgrenze 7 / Ledger-Befund 124 — die Sperre bleibt bestehen.**
+Modellgrenze 7 verbietet einen **Vegetations-Niveaueffekt**: Ein flächiges Pflanzprogramm
+darf nicht über \(\hat G/\lambda\) gebucht werden, weil die λ-Evidenz intra-urban ist.
+\(r_{\text{S158}}\) ist kein Vegetationskanal, sondern eine Verhaltens-/Expositionsminderung —
+inhaltlich also keine Verletzung von Modellgrenze 7. Die Sperre aus Befund 124 bleibt
+trotzdem **unangetastet**: `linked_risk_codes` für `EXPECTED_ANNUAL_ALLERGY_DAYS` bleibt
+leer, der Golden-Test `test_no_flat_measure_on_allergy_days` gilt unverändert, und der
+Katalogwert `default_reduction` steht in diesem Revisionsschritt weiterhin auf 0,0. Die
+Wertänderung im Produkt ist ein **eigener, nachgelagerter Code-Nachzug (L2)** — erst muss die
+Oberfläche den Faktor als „Abschätzung von KAP3" samt dieser Herleitung ausweisen (Vorgabe
+P1), dann darf er rechnen (Vorgabe P2). Die Divergenz Bericht ⇄ Code ist damit **ausgewiesen
+und im Ledger geführt** (Befund 151), nicht still (Eiserne Regel 5).
+
+**Produkt-Kennzeichnung (§3.6/Vorgabe P1).** In der nutzersichtbaren Parameterliste trägt der
+Wirkungsfaktor den Vermerk „Abschätzung von KAP3" mit dieser Herleitung (drei Faktoren, je
+zwei Anker, Band 0,005–0,10, Sensitivität, Modellgrenze 8, Ersetzungspfad) — eine Herleitung
+allein als Code-Kommentar genügt nicht.
 
 ## 6 Szenario-Anwendung & Modellgrenzen (§3.2/§3.6)
 
@@ -701,6 +843,14 @@ gegenläufige Evidenz (Neophyten [23], CO₂ [21,22]) macht das zur Untergrenze;
    (Pollenquellstärke je Vegetationsfläche × Ausbreitungsmodell) würde einen
    quantifizierten Niveaueffekt tragen und wäre dann ein eigener, zu belegender
    Modellterm — bis dahin bleibt die Kommunensumme vegetationsunabhängig.
+8. **Bauform der S158-Abschätzung: kommunenweiter Pauschalfaktor** (§5.1, Vorgabe P2):
+   \(r_{\text{S158}}\) = 0,03 (0,005–0,10) senkt den Ausweis aller Zellen gleichmäßig und
+   differenziert **nicht** zellscharf — Reichweite und Handlungsbereitschaft sind je Zelle
+   nicht beobachtbar. Das ist eine **Modellgrenze der Abschätzung**, kein Grund für eine
+   Nullwirkung; Ersetzungspfad: gemessene Effektgröße aus einer Vorher-Nachher-/DiD-Auswertung
+   von Symptomtagebuch-Daten. Abgrenzung zu Grenze 7: \(r_{\text{S158}}\) läuft **nicht** über
+   \(\hat G/\lambda\) (Verhaltens-, kein Vegetationskanal); die Befund-124-Sperre gegen einen
+   pauschalen `linked_risk_codes`-Kanal auf #96 bleibt bestehen (§5.1).
 
 **Infokasten-/UI-Texte (§3.6 — Teil des Berichts):**
 
@@ -815,6 +965,22 @@ parameter:
   band: [0.05, 0.25]   # §3.9 ABGESCHAETZT: keine Primaerquelle (s. #p-hat)
   herkunft: herleitung:#p-hat
   quelle: modellannahme   # bewusst KEIN Quellen-Key: es gibt keine Primaerquelle
+  preisstand: null
+  bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
+  endpunkt: morbiditaet
+parameter:
+  # Maßnahmen-Wirkungsfaktor S158 (Vorgabe P2 / Aufgabe §3.5 i. d. F. 06.09.2026).
+  # KEIN Parameter der Schadensformel: wirkt ausschliesslich im Maßnahmen-Modul
+  # (Katalog POLLEN_EARLY_WARNING, default_reduction). Der Katalogwert steht in
+  # dieser Revision noch auf 0,0 — Code-Nachzug als eigener Schritt (L2), damit
+  # die Parameterliste den Faktor vorher als „Abschätzung von KAP3" kennzeichnet
+  # (Vorgabe P1); Divergenz Bericht ⇄ Code ausgewiesen im Ledger (Befund 151).
+  id: pollen.r_s158
+  wert: 0.03     # = 0,35 x 0,40 x 0,20 (Dreifaktor-Kette §5.1)
+  einheit: "-"
+  band: [0.005, 0.10]   # §3.9 ABGESCHAETZT: "Aushang-Fall" ... "aktivierte Warnkette"
+  herkunft: herleitung:#s158-wirkung
+  quelle: modellannahme   # bewusst KEIN Quellen-Key: keine Interventionsstudie publiziert
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
@@ -973,6 +1139,8 @@ Einträge 1: M0-Entscheidung (rückwirkend dokumentiert). Einträge 2–16: Rev.
 (`/risiko-auto 96`, Gate 1, 30.08.2026); Eintrag 17: Revision nach Review-Runde 1 (Befund 101);
 **Einträge 18–19: Rev. 2 (31.08.2026)** — Bezugsebene der P̂-Zentrierung (Nutzer-Entscheid,
 Aufgabe §3.2) und die daraus folgende Fixierungs-/Maßnahmenfrage.
+**Eintrag 20: Rev. 3 (08.09.2026)** — Wirkungsabschätzung des S158-Hebels nach Vorgabe P2 des
+Aufsichtsrats (F-0007 Punkt 1); bewusste Überstimmung von Eintrag 15 (Ledger-Befund 151).
 **Überstimmungsweg für alle Einträge:** „Entscheidung Nr. X ändern auf …" → Delta-Lauf
 (Neurechnung betroffener Kopplungen + Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 
@@ -992,8 +1160,9 @@ Aufgabe §3.2) und die daraus folgende Fixierungs-/Maßnahmenfrage.
 | 12 | Vegetations-Modulation? | **λ = 0,7 (0,3–1,0)** (aktualisiert Runde 2, Befund 110: wörtliche Zuwachs-Lesart der Werchan-Prozente; Verhältnis-Lesart im Band), P̂ in beiden Pfaden; Ḡ-Zentrierung §3.3 | Kette #lambda-veg reproduzierbar; Bundessumme λ-invariant — Lesart wirkt nur verteilend | Verhältnis-Lesart (M0): λ = 0,6 | lokale Differenzierung ±35 % |
 | 13 | Ambrosia (W024)? | **bewusst inaktiv in M0**, Modul 96-B ab M1 | Zeithorizont 2041–2060 ≠ „heute"; Teilausschnitt | sofortiges Zusatzmodul | Untergrenze |
 | 14 | E09 Trockenheit / Intensität? | **bewusst inaktiv** (Register 96-W025-03/-04) | keine quantifizierte ERF; Wirkrichtung erhöhend → konservativ | Sensitivitätsband nach Literatur | Untergrenze |
-| 15 | S158 Pollenmonitoring? | **Maßnahmen-Hebel qualitativ** (§3.5); Stadtbaumwahl als mechanischer Hebel über Ĝ quantifiziert | keine Interventions-Effektgröße publiziert (Befunde 26/34); ehrlich statt gesetzt | gesetzte Dämpfungsannahme (Rev.-5-„v_monitor" — gestrichen, Befund 32) | Hebelliste ehrlich |
+| 15 | S158 Pollenmonitoring? | **Maßnahmen-Hebel qualitativ** (§3.5); Stadtbaumwahl als mechanischer Hebel über Ĝ quantifiziert — **durch Nr. 20 überstimmt (08.09.2026, Vorgabe P2)**: der Hebel ist jetzt abgeschätzt statt null | keine Interventions-Effektgröße publiziert (Befunde 26/34); ehrlich statt gesetzt | gesetzte Dämpfungsannahme (Rev.-5-„v_monitor" — gestrichen, Befund 32) | Hebelliste ehrlich; Wirkung bis Rev. 2 null |
 | 16 | R36 im Basiswert? | **Default 1** (nur Schicht A) | ambulantes Krankheitsbild; keine Evidenz für Distanzeffekt (§3.2) | Sensitivitätsband analog #95-β_d | Basiswert schlanker |
 | 17 ⚠ | Ḡ-Gewichtsregel (P̂-Zentrierung)? | **betroffenengewichtetes Mittel über bewohnte Zellen** (Formel §3.3; Bezugsebene in Rev. 2 durch Log 18 auf die Kommune festgelegt) | macht die Bundessumme per Konstruktion invariant gegen λ und Ĝ×pop-Korrelation (Befund 101); c_kal ≡ 1 hat keinen nachgeschalteten Fit, der eine Fehlgewichtung auffangen würde | flächen-/zellgewichtetes Mittel (Bundessumme würde mit Ĝ×pop-Korrelation driften) | Sanity-Rechnung §4 exakt; P̂ verteilt nur um |
 | 18 ⚠ | Bezugsebene der P̂-Zentrierung: Bund oder Kommune? | **die eigene Kommune** — Ḡ = betroffenengewichtetes Mittel über die Zellen der betrachteten Kommune, im Lauf gebildet (kein Registry-/Bundeswert); ohne Referenz P̂ ≡ 1 | (a) **Evidenz-Reichweite**: λ stammt aus intra-urbanen Messungen (Werchan Berlin [54,55], Bogawski [56]) — sie tragen Umverteilung INNERHALB einer Stadt, nicht interkommunale Niveauunterschiede; (b) **Aufgabe §3.2 „geschlossene Betrachtungsebene"** (Fortschreibung 31.08.2026, Nutzer-Entscheid): Referenzmittel nie aus Aggregation über eine höhere Ebene; (c) ein Bundesmittel wäre nur mit einem per §3.4 unzulässigen Bundeslauf bestimmbar | Bundesmittel aus Stichprobe (Rev. 1; verworfen: Skalentransfer unbelegt + Ebenenbruch) · amtlicher Vegetations-Referenzwert (existiert nicht) | Kommunensumme jetzt EXAKT invariant gegen λ (statt näherungsweise); Vegetationsstruktur verschiebt nur INNERHALB der Kommune — interkommunal wirkt sie nicht mehr; die Wirkung ist **nullsummig umverteilend** (betroffenengewichtet erwartungstreu), NICHT „konservativ" im Sinne einer Unterschätzung (§3.3(3), Modellgrenze 7) |
 | 19 ⚠ | Ḡ-Fixierung (Befund 113) unter der kommunalen Zentrierung? | **kein Pinning** — Ḡ wird in jedem Lauf aus dem aktuellen Vegetationszustand der Kommune gebildet; der flächige Niveaueffekt bleibt bewusst unbuchbar (§5, Modellgrenze 7) | Ein eingefrorener Referenzwert würde einem flächigen Programm einen Niveaueffekt zubuchen, den die λ-Evidenz (intra-urbane Gradienten) nicht trägt — Befund 113 war an das Bundesmittel gebunden und ist mit der kommunalen Zentrierung keine Fixierungs-, sondern eine Evidenzfrage; die Produktmechanik (measure_service skaliert gespeicherte Outcomes) ist KEIN Beleg, sondern begründet die Integrationsauflage: keine pauschal verknüpfte Maßnahme, sonst würde genau der unbelegte Niveaueffekt gebucht (Befund 124/129; Test test_no_flat_measure_on_allergy_days) | Baseline-Pinning je Kommune (verworfen: bucht unbelegten Niveaueffekt) · Emissions-/Ausbreitungsmodell (Ersetzungspfad §6, Datenlage fehlt) | Maßnahme wirkt als Umverteilung (gezielte Hotspot-Entschärfung), nicht als flächiger Niveauhebel |
+| 20 ⚠ | S158-Hebel: „qualitativ" (Wirkung null) beibehalten oder abschätzen? | **Abschätzung statt Nullwirkung** — \(r_{\text{S158}}\) = 0,03 (Band 0,005–0,10), Dreifaktor-Kette §5.1, §3.9 ABGESCHÄTZT; Wirkungsort multiplikativ auf ΔTage (Maßnahmen-Modul), Bauform-Grenze als Modellgrenze 8 dokumentiert; Katalogwert `default_reduction` bleibt in diesem Schritt 0,0 (Code-Nachzug L2 nach der P1-Kennzeichnung) | **Vorgabe P2 des Aufsichtsrats (F-0007 Punkt 1)** und Aufgabe §3.5 i. d. F. 06.09.2026: Ein Hebel ohne publizierte Effektgröße läuft nicht mehr als „qualitativ" mit Wirkung null; das Fehlen der Studie ist der Anlass der Abschätzung, nicht ihr Ersatz. Bewusste Überstimmung von Log 15 (Ledger-Befund 151) | Log 15 beibehalten (verworfen: widerspricht P2) · Effektzahl aus fremder Domäne übertragen, z. B. Hitzewarn-Effekt aus #95 (verworfen: Kategorienfehler §3.9 — anderer Endpunkt, andere Handlungskette) | Maßnahmen-Ausweis ≈ 3 % des K1-Werts (bundesweit ≈ 3,3 Mio. €/a; Band 0,55–11,0); Schadenswert selbst unverändert; Befund-124-Sperre (linked_risk_codes leer) bleibt bestehen |
