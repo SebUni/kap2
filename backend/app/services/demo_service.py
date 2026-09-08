@@ -97,6 +97,11 @@ def filter_parameters(params: list[dict], enabled: set[str]) -> list[dict]:
     - alle: ``editable=False``, ``demo_locked=True`` (Hinweis „nur Vollversion")
     - Ebene nicht freigeschaltet: Wert/Einheit/Quelle/Referenzen entfernen
       (``demo_hidden=True``) — sichtbar, DASS es sie gibt, aber nicht der Inhalt.
+
+    Zum Inhalt zählen auch die Evidenz-Angaben ``evidence_note`` (Klartext der
+    Quelle bzw. Abschätzung) und ``evidence_derivation`` (Herleitung); sie
+    werden für gesperrte Ebenen mitgefiltert. ``evidence_class`` bleibt stehen:
+    im Demo ist sichtbar, DASS es die Angabe gibt, nicht ihr Inhalt.
     """
     out: list[dict] = []
     for p in params:
@@ -106,7 +111,8 @@ def filter_parameters(params: list[dict], enabled: set[str]) -> list[dict]:
         if p.get("layer_code") and p["layer_code"] not in enabled:
             q["demo_hidden"] = True
             for k in ("value", "default_value", "unit", "source", "source_detail",
-                      "references", "custom_source"):
+                      "references", "custom_source",
+                      "evidence_note", "evidence_derivation"):
                 q.pop(k, None)
         out.append(q)
     return out
