@@ -1356,6 +1356,7 @@ MEASURES: list[dict] = [
                  "default_reduction": "Bericht #95 §5: δ_HAP = 0,95 (Band 0,85–1,00), marginal"},
      "source_refs": {"default_reduction": ["Feldbusch_2025_HHWS",
                                            "Urban_HHAP_Wirksamkeit_2025"]},
+     "evidence_classes": {"default_reduction": "belegt"},
      "source_details": {
         "default_reduction": "δ_HAP = 0,95 multiplikativ auf den Wochen-Exzess (RR−1) ⇒ "
             "linear −5 % Outcome (Band 0–15 %; Bericht #95 §5, abgenommen Rev. 7). Evidenz: "
@@ -1515,6 +1516,10 @@ MEASURES: list[dict] = [
         "opex_per_unit_year": "Modellannahme (Kalibrierung/Auswertung/Datenanbindung je Station)",
         "unit_density_per_ha": "Modellannahme (Richtwert-Dichte, unbelegt)"},
      "source_refs": {},
+     "evidence_classes": {"default_reduction": "abgeschaetzt",
+                          "capex_per_unit": "abgeschaetzt",
+                          "opex_per_unit_year": "abgeschaetzt",
+                          "unit_density_per_ha": "abgeschaetzt"},
      "source_details": {
         "capex_per_unit": "Für kommunale Pollen-Messstationen (Fallenkopf + Auswertungs-/"
             "Datenanbindung an das DWD-/PID-Frühwarnsystem) ist keine belastbare öffentliche "
