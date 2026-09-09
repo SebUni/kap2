@@ -42,6 +42,25 @@ MEASURE_PARAM_SPECS: tuple[tuple[str, str, str], ...] = (
 
 MEASURE_OVERRIDE_FIELDS = tuple(field for field, _, _ in MEASURE_PARAM_SPECS)
 
+#: Standard-Herleitung (Vorgabe P1) für Kostenfelder, die eine Maßnahme gar nicht
+#: ansetzt (Katalogwert ``None`` → nicht anwendbar, nicht editierbar, Anzeige 0).
+#: Ein parameterindividueller Beleg wäre hier sinnlos: Es gibt keinen Beitrag zur
+#: Kosten-Nutzen-Rechnung, also auch keine Bandbreite und keine Sensitivität.
+_NOT_APPLICABLE_DERIVATION: dict[str, str] = {
+    "wert": (
+        "Die Maßnahme setzt diese Kostenart nicht an (Katalogwert None); "
+        "angezeigt wird 0."
+    ),
+    "band": (
+        "Keine Bandbreite: Die Kostenart entfällt für diese Maßnahme und "
+        "liefert keinen Beitrag zur Kosten-Nutzen-Rechnung."
+    ),
+    "sensitivitaet": (
+        "Keine Sensitivität: Ohne Beitrag zur Kosten-Nutzen-Rechnung ändert "
+        "eine Variation dieses Feldes kein Ergebnis."
+    ),
+}
+
 # ``source`` in formulas._i steuert die Wertauflösung (const/cell/regional/…); diese Marker
 # sind keine belegbaren Quellen. Für die Anzeige greift dann ``doc_source`` oder ein
 # ehrlicher Modellannahme-Hinweis.
@@ -246,6 +265,13 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             ev_class = (m.get("evidence_classes") or {}).get(field)
             ev_derivation = (m.get("evidence_derivations")
                              or m.get("evidence_derivation") or {}).get(field)
+            # Nicht anwendbares Kostenfeld (Katalogwert None) ohne feldspezifische
+            # Herleitung: Standard-Herleitung nach P1, damit die Anzeige begründet
+            # ist, warum hier 0 steht. Knüpft ausschließlich an ``applicable`` an —
+            # nie an den Wert 0.0 (anwendbare Nullwerte behalten ihre eigene
+            # Herleitung).
+            if not applicable and not ev_derivation:
+                ev_derivation = dict(_NOT_APPLICABLE_DERIVATION)
             params.append(_base_param(
                 f"measures.{m['code']}.{field}",
                 layer_code=m["code"], layer_category="measures",
