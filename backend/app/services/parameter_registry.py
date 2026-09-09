@@ -244,7 +244,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             refs = sources.resolve((m.get("source_refs") or {}).get(field))
             # Evidenzklasse/Herleitung je Kostenfeld (parallel zu sources/source_details).
             ev_class = (m.get("evidence_classes") or {}).get(field)
-            ev_derivation = (m.get("evidence_derivations") or {}).get(field)
+            ev_derivation = (m.get("evidence_derivations")
+                             or m.get("evidence_derivation") or {}).get(field)
             params.append(_base_param(
                 f"measures.{m['code']}.{field}",
                 layer_code=m["code"], layer_category="measures",
