@@ -38,6 +38,7 @@ export default function MeasureSidebar() {
   if (!selectedMeasure) return null
 
   const def = catalog?.measures.find(m => m.code === selectedMeasure.measure_type)
+  const reductionIsEstimated = def?.evidence_classes?.default_reduction === 'abgeschaetzt'
   const linkedRisks = (def?.linked_risk_codes || [])
     .map(c => catalog?.risks.find(r => r.code === c)?.name || c)
 
@@ -95,6 +96,11 @@ export default function MeasureSidebar() {
           ]} />}
         </h3>
         <div className="value" style={{ fontSize: '1rem' }}>{def?.name || selectedMeasure.measure_type}</div>
+        {reductionIsEstimated && (
+          <div style={{ fontSize: '0.75rem', color: 'var(--warning, #b45309)', marginTop: 4, lineHeight: 1.4 }}>
+            Wirkung: begründete Abschätzung von KAP3, keine belegte Effektgröße
+          </div>
+        )}
       </div>
 
       <div className="card">

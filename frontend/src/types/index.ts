@@ -422,6 +422,7 @@ export interface CatalogMeasure {
   source: string
   sources?: Record<string, string>
   source_details?: Record<string, string>
+  evidence_classes?: Record<string, 'belegt' | 'abgeschaetzt'>
   kang_cluster?: string
   kang_field?: string
 }
