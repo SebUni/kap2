@@ -29,11 +29,8 @@ from app.services import parameter_registry  # noqa: E402
 
 # ── Ratchet-Bestand (gemessene Ausgangslage, wird in Folgetickets abgebaut) ─────
 KNOWN_WITHOUT_DERIVATION: set[str] = {
-    "impact.floor_height_m",
     "measures.POLLEN_EARLY_WARNING.benefit_per_m2_year",
     "measures.POLLEN_EARLY_WARNING.default_reduction",
-    "risks.EXPECTED_ANNUAL_ALLERGY_DAYS.impact.birch_group_share_default",
-    "risks.EXPECTED_ANNUAL_MORTALITY.impact.beta_dist_km",
 }
 
 VALID_CLASSES = {"belegt", "abgeschaetzt"}
