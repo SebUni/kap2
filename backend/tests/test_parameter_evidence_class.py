@@ -30,14 +30,8 @@ from app.services import parameter_registry  # noqa: E402
 # ── Ratchet-Bestand (gemessene Ausgangslage, wird in Folgetickets abgebaut) ─────
 KNOWN_WITHOUT_DERIVATION: set[str] = {
     "impact.floor_height_m",
-    "measures.HEAT_ACTION_PLANS.benefit_per_m2_year",
-    "measures.HEAT_ACTION_PLANS.capex_fixed",
-    "measures.HEAT_ACTION_PLANS.opex_fixed_year",
     "measures.POLLEN_EARLY_WARNING.benefit_per_m2_year",
     "measures.POLLEN_EARLY_WARNING.default_reduction",
-    "measures.VULNERABLE_GROUP_PROGRAMS.benefit_per_m2_year",
-    "measures.VULNERABLE_GROUP_PROGRAMS.capex_fixed",
-    "measures.VULNERABLE_GROUP_PROGRAMS.opex_fixed_year",
     "model.measure_coverage_saturation",
     "model.risk_threshold",
     "regional.glacier_loss_rate",

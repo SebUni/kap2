@@ -1357,6 +1357,70 @@ MEASURES: list[dict] = [
      "source_refs": {"default_reduction": ["Feldbusch_2025_HHWS",
                                            "Urban_HHAP_Wirksamkeit_2025"]},
      "evidence_classes": {"default_reduction": "belegt"},
+     # Herleitungen der Abschätzungen nach P1/§3.9 (Zahlenwert, Bandbreite,
+     # Sensitivität) als Datenfeld — ein Code-Kommentar allein genügt nicht.
+     "evidence_derivations": {
+        "capex_fixed": {
+            "wert": "100.000 € einmalig für die Erstellung eines kommunalen "
+                "Hitzeaktionsplans (Mittelstadt ~80.000 EW). Abgeschätzt von KAP3 aus dem "
+                "Praxisrichtwert 80.000–150.000 € zzgl. rund einer halben Personalstelle "
+                "(klimastadtraum.de, Kommunalberatung); die einschlägigen Leitfäden "
+                "(UBA-Projekt \"HAP-DE\", Fulda-Arbeitshilfe) nennen selbst keine "
+                "Kostenzahlen, deshalb Abschätzung statt Beleg. Angesetzt wird der untere "
+                "Mittelwert der Spanne.",
+            "band": "80.000–150.000 € (Spanne des Praxisrichtwerts). Kleinstädte mit "
+                "schlankem Plan liegen eher am unteren Rand, Großstädte mit "
+                "Beteiligungsprozess und externer Begleitung darüber; Werte über "
+                "150.000 € enthalten in der Regel schon Umsetzungsmaßnahmen und gehören "
+                "nicht in dieses Feld.",
+            "sensitivitaet": "Einmalkosten neben laufenden 20.000 €/a: über einen "
+                "Betrachtungszeitraum von 30 Jahren trägt capex_fixed rund ein Sechstel "
+                "der Lebenszykluskosten. Eine Variation über die volle Bandbreite "
+                "(80.000–150.000 €) verschiebt die Gesamtkosten um etwa −3 % bis +7 % und "
+                "die Kosten-Nutzen-Kennzahl entsprechend gegenläufig — die Rangfolge "
+                "gegenüber baulichen Maßnahmen ändert sich dadurch nicht.",
+        },
+        "opex_fixed_year": {
+            "wert": "20.000 €/a für den laufenden Betrieb (jährliche Fortschreibung, "
+                "Koordination der Warnkette, saisonaler Betrieb Hitzetelefon). "
+                "Abgeschätzt von KAP3 als rund 20 % der einmaligen Erstellungskosten; "
+                "das entspricht grob der anteiligen halben Personalstelle, die "
+                "klimastadtraum.de bereits für die Erstellung nennt. Ein publizierter "
+                "Betriebskostenkennwert existiert nicht.",
+            "band": "10.000–40.000 €/a (10–40 % der Erstellungskosten). Unterer Rand: "
+                "Plan wird nur fortgeschrieben und im Regelbetrieb mitgeführt; oberer "
+                "Rand: dauerhaft besetzte Koordinationsstelle inkl. Öffentlichkeitsarbeit.",
+            "sensitivitaet": "Dominante Kostengröße: über 30 Jahre stellen die "
+                "Betriebskosten rund fünf Sechstel der Lebenszykluskosten. Eine "
+                "Verdopplung auf 40.000 €/a nahezu verdoppelt die Gesamtkosten und "
+                "halbiert die Kosten-Nutzen-Kennzahl; eine Halbierung auf 10.000 €/a wirkt "
+                "spiegelbildlich. Dieses Feld ist der wichtigste Stellhebel der Maßnahme "
+                "und sollte kommunal geprüft überschrieben werden.",
+        },
+        "benefit_per_m2_year": {
+            "wert": "0,00 €/(m²·a). Der Hitzeaktionsplan ist eine organisatorische "
+                "Maßnahme (Warnkette, Beratung, Verhaltensanpassung) ohne baulichen "
+                "Eingriff in die Fläche; ein direkter, flächenproportionaler monetärer "
+                "Zusatznutzen (etwa Energieeinsparung, Aufwertung, Ertrag) entsteht nicht. "
+                "Das Feld ist anwendbar und bewusst mit null angesetzt — nicht "
+                "\"unbelegt\". Der eigentliche Nutzen der Maßnahme läuft vollständig über "
+                "die Risikominderung (default_reduction) und wird dort verbucht; ein "
+                "Flächennutzen zusätzlich anzusetzen wäre Doppelzählung.",
+            "band": "0,00–0,10 €/(m²·a). Denkbar wäre allenfalls ein kleiner indirekter "
+                "Anteil, wenn ein Hitzeaktionsplan investive Nebeneffekte auslöst "
+                "(Trinkbrunnen, beschattete Aufenthaltsflächen). Solche Nebeneffekte sind "
+                "im Katalog eigene bauliche Maßnahmen; deshalb bleibt der Punktwert null. "
+                "Werte über 0,10 €/(m²·a) sind für eine rein organisatorische Maßnahme "
+                "nicht begründbar.",
+            "sensitivitaet": "Streng linear: Der Nutzenbeitrag wächst mit "
+                "benefit_per_m2_year × Maßnahmenfläche. Da Hitzeaktionspläne "
+                "gesamtstädtisch angesetzt werden, schlägt schon ein kleiner positiver "
+                "Wert stark durch — bei 0,10 €/(m²·a) und 1 km² Bezugsfläche entstünden "
+                "100.000 €/a und damit ein Vielfaches der Betriebskosten; die "
+                "Kosten-Nutzen-Kennzahl würde sprunghaft steigen. Genau diese "
+                "Scheinwirtschaftlichkeit vermeidet der Ansatz null.",
+        },
+     },
      "source_details": {
         "default_reduction": "δ_HAP = 0,95 multiplikativ auf den Wochen-Exzess (RR−1) ⇒ "
             "linear −5 % Outcome (Band 0–15 %; Bericht #95 §5, abgenommen Rev. 7). Evidenz: "
@@ -1464,6 +1528,66 @@ MEASURES: list[dict] = [
                  "capex_fixed": "Modellannahme (organisatorisches Programmbudget)",
                  "default_reduction": "Urban u. a. 2025 (HHAP-Kernbaustein) / RKI-Risikogruppen"},
      "source_refs": {"default_reduction": ["Urban_HHAP_Wirksamkeit_2025", "RKI_Hitzemortalitaet"]},
+     # Herleitungen der Abschätzungen nach P1/§3.9 (Zahlenwert, Bandbreite,
+     # Sensitivität) als Datenfeld — ein Code-Kommentar allein genügt nicht.
+     "evidence_derivations": {
+        "capex_fixed": {
+            "wert": "35.000 € einmalig als Programmbudget (Konzeption, Aufbau der "
+                "Zielgruppen- und Trägernetzwerke, Schulungsmaterial, Koordination). "
+                "Abgeschätzt von KAP3: gezielte Schutzprogramme für vulnerable Gruppen "
+                "(Hitzetelefon, aufsuchende Betreuung, Aufklärung in Pflegeeinrichtungen) "
+                "sind rein organisatorisch ohne baulichen Anteil, ein publizierter "
+                "Kostenkennwert existiert nicht. Angesetzt in der Größenordnung eines "
+                "Konzept-/Aufsetzbudgets und damit deutlich unter der Erstellung eines "
+                "vollständigen Hitzeaktionsplans (100.000 €), weil das Programm als "
+                "Baustein auf dessen Analyse aufsetzt.",
+            "band": "20.000–60.000 €. Unterer Rand: Programm wird von vorhandenem Personal "
+                "im Gesundheits-/Sozialamt aufgesetzt; oberer Rand: externe Konzeption "
+                "inkl. Bedarfserhebung und Schulung von Pflege- und Rettungsdiensten.",
+            "sensitivitaet": "Einmalkosten neben laufenden 10.000 €/a: über 30 Jahre rund "
+                "ein Zehntel der Lebenszykluskosten. Die volle Bandbreite verschiebt die "
+                "Gesamtkosten um etwa −4 % bis +7 %; die Kosten-Nutzen-Kennzahl bleibt "
+                "robust, weil die angesetzte Risikominderung (0,22) den Nutzen dominiert.",
+        },
+        "opex_fixed_year": {
+            "wert": "10.000 €/a für den laufenden Programmbetrieb (aufsuchende Beratung, "
+                "Netzwerkpflege, saisonale Ansprache der Zielgruppen). Abgeschätzt von "
+                "KAP3 als anteiliger Personalaufwand von grob einem Zehntel einer Stelle; "
+                "ein belastbarer Kostenkennwert für solche Programme ist nicht "
+                "veröffentlicht. Bewusst niedriger als beim Hitzeaktionsplan "
+                "(20.000 €/a), da das Programm dessen Warnkette mitnutzt.",
+            "band": "5.000–50.000 €/a. Unterer Rand: ehrenamtlich getragene "
+                "Nachbarschaftsstrukturen mit kommunaler Koordination; oberer Rand: "
+                "dauerhaft besetzte Stelle für aufsuchende Betreuung in einer Großstadt. "
+                "Die Spanne ist breiter als beim Hitzeaktionsplan, weil der "
+                "Betreuungsumfang direkt mit der Zahl erreichter Personen skaliert.",
+            "sensitivitaet": "Dominante Kostengröße: über 30 Jahre rund neun Zehntel der "
+                "Lebenszykluskosten. Am oberen Bandrand (50.000 €/a) steigen die "
+                "Gesamtkosten auf gut das Vierfache und die Kosten-Nutzen-Kennzahl sinkt "
+                "entsprechend auf etwa ein Viertel. Wichtigster Stellhebel; kommunal "
+                "geprüfte Werte sollten hier überschrieben werden.",
+        },
+        "benefit_per_m2_year": {
+            "wert": "0,00 €/(m²·a). Schutzprogramme für vulnerable Gruppen wirken über "
+                "Personen, nicht über Flächen: kein baulicher Eingriff, keine "
+                "flächenproportionale Einsparung oder Aufwertung. Das Feld ist anwendbar "
+                "und begründet mit null angesetzt — nicht \"unbelegt\". Der Nutzen steckt "
+                "vollständig in der Risikominderung (default_reduction 0,22 auf "
+                "Mortalität/Morbidität); ein zusätzlicher Flächennutzen wäre "
+                "Doppelzählung.",
+            "band": "0,00–0,10 €/(m²·a). Ein positiver Wert ließe sich nur konstruieren, "
+                "wenn man vermiedene Behandlungs- oder Pflegekosten auf die Stadtfläche "
+                "umlegte; diese Größen sind bereits im monetarisierten Risiko enthalten. "
+                "Für die Maßnahme selbst ist kein eigenständiger Flächennutzen "
+                "begründbar.",
+            "sensitivitaet": "Streng linear mit benefit_per_m2_year × Maßnahmenfläche. Bei "
+                "gesamtstädtischem Ansatz würde bereits 0,10 €/(m²·a) auf 1 km² einen "
+                "Zusatznutzen von 100.000 €/a erzeugen — das Zehnfache der jährlichen "
+                "Programmkosten — und die Kosten-Nutzen-Kennzahl unrealistisch nach oben "
+                "verzerren. Der Ansatz null hält die Kennzahl auf dem tatsächlich "
+                "begründeten Wirkungskanal.",
+        },
+     },
      "source_details": {
         "default_reduction": "Wirkmechanismus: Hitzemortalität konzentriert sich stark auf "
             "Risikogruppen (Hochaltrige, Pflegebedürftige, Vorerkrankte — RKI/Winklmayr); "
