@@ -1546,7 +1546,81 @@ MEASURES: list[dict] = [
             "λ-Evidenz ist intra-urban, kein Beleg für einen kommunenweiten "
             "Niveaueffekt). Die Zuordnung zum Risiko läuft stattdessen rein deklarativ "
             "über qualitative_risk_codes (Aufgabe §3.5: Hebel ohne quantifizierte "
-            "Effektgröße laufen ehrlich als „qualitativ“)."}},
+            "Effektgröße laufen ehrlich als „qualitativ“)."},
+     # Herleitung je Kostenparameter nach Aufgabe §3.9 (Vorgabe P1): Punktwert,
+     # zwei benannte Bandenden mit Begründung, Sensitivität der ausgewiesenen
+     # Maßnahmenkosten. Zahlenwerte unverändert (Eiserne Regel 2: eine
+     # Wertänderung wäre eine Fortschreibung und gehört in Bericht + Ledger).
+     "evidence_derivation": {
+        "capex_per_unit": {
+            "wert": "15.000 €/Station (Punktwert, Modellannahme). Anker: das geparkte "
+                "EARLY_WARNING_MEASURE veranschlagt rund 60.000 € Aufbau für ein GANZES "
+                "Starkregen-/Hochwasser-Frühwarnsystem (Sensorik + Zentrale + "
+                "Warnkanäle). Eine einzelne Pollenmessstation (Fallenkopf, Aufstellort, "
+                "Anbindung an das bestehende DWD-/PID-Frühwarnsystem) ist ein Bruchteil "
+                "davon; angesetzt ist rund ein Viertel des Gesamtsystems.",
+            "band": "8.000–30.000 €/Station. Unteres Bandende 8.000 €: Mitnutzung eines "
+                "vorhandenen Standorts (Dach/Mast einer kommunalen Liegenschaft), reine "
+                "Gerätebeschaffung plus Datenanbindung ohne eigenes Bauwerk. Oberes "
+                "Bandende 30.000 €: eigener erschlossener Standort mit Strom-/"
+                "Datenanschluss, Einhausung und Erstkalibrierung — die Hälfte des "
+                "60.000-€-Ankers für ein komplettes Frühwarnsystem gilt als Obergrenze "
+                "für eine einzelne Station, weil eine Station nie teurer sein kann als "
+                "das System, in das sie sich einfügt.",
+            "sensitivitaet": "CAPEX skaliert linear mit dem Wert (CAPEX = Anzahl · "
+                "capex_per_unit). Je Station: 15.000 € → 8.000 € (−47 %) am unteren, "
+                "→ 30.000 € (+100 %) am oberen Bandende. Auf die Lebenszykluskosten "
+                "einer Station über 10 Jahre (15.000 + 10 · 4.000 = 55.000 €) wirkt das "
+                "gedämpft: 48.000 € (−13 %) bzw. 70.000 € (+27 %). Die jährlichen "
+                "Betriebskosten bleiben unberührt.",
+        },
+        "opex_per_unit_year": {
+            "wert": "4.000 €/(Station·a) (Punktwert, Modellannahme). Kein Marktkennwert "
+                "für den laufenden Betrieb einer kommunalen Pollenmessstation "
+                "auffindbar. Anker ist deshalb der Investitionswert derselben Station: "
+                "angesetzt sind rund 27 % von 15.000 €/Station pro Jahr für "
+                "Kalibrierung, Probenauswertung während der Saison, Datenanbindung und "
+                "Instandhaltung — ein für personalgetragene kommunale Messsensorik "
+                "plausibler Anteil, bei dem der Betrieb über die Nutzungsdauer schwerer "
+                "wiegt als die Anschaffung.",
+            "band": "2.000–8.000 €/(Station·a). Unteres Bandende 2.000 € (≈ 13 % der "
+                "Investition): vollautomatischer Messkopf, dessen Daten ohne manuelle "
+                "Auswertung in das DWD-/PID-System laufen — es bleiben Wartung, "
+                "Kalibrierung und Datenpflege. Oberes Bandende 8.000 € (≈ 53 % der "
+                "Investition): manuelle Pollenfalle mit mikroskopischer Auszählung über "
+                "die gesamte Saison, bei der der Personalanteil dominiert.",
+            "sensitivitaet": "OPEX skaliert linear mit dem Wert (OPEX/a = Anzahl · "
+                "opex_per_unit_year). Je Station: 4.000 €/a → 2.000 €/a (−50 %) bzw. "
+                "8.000 €/a (+100 %). Über 10 Jahre verschieben sich die "
+                "Lebenszykluskosten einer Station von 55.000 € auf 35.000 € (−36 %) "
+                "bzw. 95.000 € (+73 %) — dieser Parameter dominiert die "
+                "Kostenunsicherheit der Maßnahme deutlicher als der CAPEX-Wert. Die "
+                "einmalige Investition bleibt unberührt.",
+        },
+        "unit_density_per_ha": {
+            "wert": "0,001 Stationen/ha (Punktwert, Modellannahme) = eine Station je "
+                "1.000 ha. Anker ist die aerobiologische Reichweite einer Pollenfalle: "
+                "Pollen werden über Kilometer verfrachtet, eine Messstelle gilt für ein "
+                "großes zusammenhängendes Siedlungsgebiet als repräsentativ. Der Wert "
+                "setzt nur die Richtwert-Anzahl (Default-Vorschlag); die Kommune kann "
+                "die Stückzahl im Maßnahmenmodul überschreiben.",
+            "band": "0,0005–0,002 Stationen/ha (eine Station je 2.000 ha bis je 500 ha). "
+                "Unteres Bandende 0,0005: Netzlogik des überregionalen Messnetzes — eine "
+                "Station deckt eine ganze Stadt samt Umland ab, weitere Stationen "
+                "liefern kaum zusätzliche Information. Oberes Bandende 0,002: "
+                "innerstädtische Auflösung, bei der Stadtteile mit deutlich "
+                "unterschiedlichem Gehölzbestand je eine eigene Messstelle bekommen "
+                "(Anschluss an die intra-urbane Streuung der Pollenlast aus Bericht "
+                "#96 §3.3).",
+            "sensitivitaet": "Der Wert bestimmt die vorgeschlagene Stationszahl "
+                "(Richtwert = Dichte · abgedeckte Fläche, mindestens 1) und damit CAPEX "
+                "und OPEX proportional. Beispiel 2.000 ha abgedeckte Fläche: Richtwert "
+                "2 Stationen (30.000 € CAPEX, 8.000 €/a OPEX) → 1 Station am unteren "
+                "Bandende (−50 % Kosten) bzw. 4 Stationen am oberen Bandende (+100 %). "
+                "Bei Kommunen unter 1.000 ha greift die Untergrenze von einer Station, "
+                "dort wirkt nur das obere Bandende. Gibt die Kommune die Stückzahl "
+                "selbst vor, ist der Parameter für die Kosten wirkungslos.",
+        }}},
     # Herleitung capex_fixed: angepasste Arbeitszeitmodelle bei Hitze verursachen im Kern nur
     # organisatorischen Aufwand (Dienstplanung, Betriebsvereinbarung); kein Marktkennwert.
     # Modellannahme als geringes Einführungs-/Konzeptbudget → 10.000 €.
