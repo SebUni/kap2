@@ -116,7 +116,24 @@ MODEL_PARAM_SPECS: list[dict] = [
         "1,5–2 höher als beim früheren gewichteten Mittel; die Schwelle wurde von 40 auf 50 "
         "angehoben, um dasselbe reale Belastungsniveau zu markieren. Wirkt live (keine "
         "Neuberechnung), Risikozonen werden beim nächsten Abruf neu geclustert.",
-     "source_refs": []},
+     "source_refs": [],
+     "evidence_derivation": {
+        "wert": "50 Index (Punktwert, Modellwahl). Abgeschätzt von KAP3 aus der Umstellung "
+            "der Index-Komposition auf die Max-Wirkungskette (MODELL_KRITIK §3.1): diese "
+            "hebt die Risikoindizes gegenüber dem früheren gewichteten Mittel um Faktor "
+            "1,5-2, die alte Schwelle 40 würde dasselbe reale Belastungsniveau nicht mehr "
+            "markieren. 40 · 1,25 ≈ 50 als runder Wert innerhalb der Faktor-1,5-2-Spanne.",
+        "band": "40-80 Index (Faktor 1,5-2 auf den alten Schwellenwert 40 angewandt). "
+            "Unteres Bandende 40: keine Anpassung, würde die Screening-Schwelle real "
+            "absenken. Oberes Bandende 80: volle Anhebung um Faktor 2, am oberen Rand der "
+            "aus der Max-Komposition beobachteten Spannbreite.",
+        "sensitivitaet": "Wirkt auf die Risikozonen-Clusterung (risk_zone_service, "
+            "Connected-Component-Cluster) und auf share_above_threshold im Aggregat: eine "
+            "höhere Schwelle verkleinert die geclusterten Risikozonen und senkt den "
+            "ausgewiesenen Flächenanteil oberhalb der Schwelle, eine niedrigere Schwelle "
+            "wirkt gegenläufig. Reine Screening-Größe ohne Rückwirkung auf Indexwerte "
+            "oder €-Schadenssummen; wirkt live ohne Neuberechnung.",
+     }},
     {"key": "measure_coverage_saturation", "value": MEASURE_COVERAGE_SATURATION_DEFAULT,
      "label": "Sättigungsfaktor Flächendeckung (Maßnahmen)", "unit": "–",
      "source": "Modellwahl (abnehmender Grenznutzen, dokumentiert)",
@@ -126,7 +143,24 @@ MODEL_PARAM_SPECS: list[dict] = [
         "System-/Netzwerkmaßnahmen ab (z. B. Netzredundanz, Frühwarnung: Wirkung entsteht "
         "aus der Systemabdeckung, nicht aus dem letzten Flächenprozent). Dokumentierte "
         "Modellwahl, editierbar; 1,0 = strikt proportionale Wirkung.",
-     "source_refs": []},
+     "source_refs": [],
+     "evidence_derivation": {
+        "wert": "1,5 (Punktwert, Modellwahl). Abgeschätzt von KAP3, damit die volle Wirkung "
+            "bereits bei 1/1,5 ≈ 67 % Flächendeckung erreicht ist statt erst bei 100 %: "
+            "System-/Netzwerkmaßnahmen (z. B. Netzredundanz, Frühwarnung) entfalten ihren "
+            "Nutzen aus der Systemabdeckung, nicht aus dem letzten Flächenprozent — ein "
+            "publizierter Kennwert für diesen Sättigungspunkt existiert nicht.",
+        "band": "1,0-2,0. Unteres Bandende 1,0: keine Sättigung, strikt proportionale "
+            "Wirkung bis 100 % Deckung (Referenzfall ohne Modellannahme). Oberes Bandende "
+            "2,0: volle Wirkung bereits ab 50 % Flächendeckung, plausible Obergrenze für "
+            "Netzwerkeffekte, ab der eine weitere Erhöhung kaum noch begründbar wäre.",
+        "sensitivitaet": "Wirkt ausschließlich auf Maßnahmen mit coverage_scaling="
+            "\"saturating\" (r = Risikoreduktion · min(1; Deckungsgrad · Faktor)): bei "
+            "Faktor 1,0 statt 1,5 braucht dieselbe Maßnahme volle 100 % Flächendeckung für "
+            "die gleiche Wirkung, bei Faktor 2,0 genügen 50 %. Bei Deckungsgraden ≥ 67 % "
+            "(Sättigungspunkt bei 1,5) ist die Wirkung ohnehin gedeckelt und unempfindlich "
+            "gegenüber dem Faktor; unterhalb davon skaliert die Wirkung linear mit ihm.",
+     }},
     {"key": "measure_reduction_cap", "value": MEASURE_REDUCTION_CAP_DEFAULT,
      "label": "Obergrenze Risikoreduktion je Zelle (Maßnahmen)", "unit": "Anteil",
      "source": "Modellwahl (Restrisiko-Prinzip, dokumentiert)",
@@ -169,7 +203,22 @@ REGIONAL_FALLBACK_SPECS: list[dict] = [
         "1–3 % Fläche/Volumen pro Jahr (Bayerischer Gletscherbericht; starke Jahres-"
         "schwankungen). 0,5 %/Jahr als konservativer Modellwert; wirkt nur auf Zellen mit "
         "OSM natural=glacier und ist für fast alle Kommunen irrelevant." + _REGIONAL_NOTE,
-     "source_refs": []},
+     "source_refs": [],
+     "evidence_derivation": {
+        "wert": "0,5 %/Jahr (Punktwert, konservativ). Abgeschätzt von KAP3 als unterer "
+            "Rand der im Bayerischen Gletscherbericht dokumentierten Verlustraten "
+            "1-3 %/Jahr für die verbliebenen deutschen Alpengletscher: die konservative "
+            "Wahl vermeidet eine Überschätzung des Rückgangs bei den starken "
+            "Jahresschwankungen der Berichte.",
+        "band": "0,5-3 %/Jahr (aus dem Bayerischen Gletscherbericht). Unteres Bandende "
+            "0,5 %: angesetzter konservativer Modellwert. Oberes Bandende 3 %: oberer Rand "
+            "der berichteten Jahresschwankung in besonders verlustreichen Jahren.",
+        "sensitivitaet": "Wirkt ausschließlich auf Zellen mit OSM-Tag natural=glacier — für "
+            "die weit überwiegende Zahl deutscher Kommunen ohne solche Zellen ist der Wert "
+            "wirkungslos. Auf betroffenen Zellen skaliert der modellierte Gletscherschwund "
+            "linear mit der Rate: eine Anhebung auf den oberen Bandwert (3 %) versechsfacht "
+            "den ausgewiesenen jährlichen Flächen-/Volumenverlust dieser Zellen.",
+     }},
     {"key": "heavy_rain_base", "value": 40.0,
      "label": "Proxy: Starkregenindex-Basis", "unit": "Index",
      "source": "Kalibrierung auf DWD-CDC-Starkregenraster (Fallback-Proxy)",

@@ -32,9 +32,6 @@ KNOWN_WITHOUT_DERIVATION: set[str] = {
     "impact.floor_height_m",
     "measures.POLLEN_EARLY_WARNING.benefit_per_m2_year",
     "measures.POLLEN_EARLY_WARNING.default_reduction",
-    "model.measure_coverage_saturation",
-    "model.risk_threshold",
-    "regional.glacier_loss_rate",
     "risks.EXPECTED_ANNUAL_ALLERGY_DAYS.impact.birch_group_share_default",
     "risks.EXPECTED_ANNUAL_MORTALITY.impact.beta_dist_km",
 }
