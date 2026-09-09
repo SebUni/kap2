@@ -230,7 +230,17 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "Sensitivitätsband 0–0,002, Basiswert 0 (Bericht #95, Log 20). "
                       "Kein Archiv-Snapshot möglich (Verlag blockt Wayback-Save; "
                       "dokumentiert).",
-     "source_refs": []},
+     "source_refs": [],
+     "evidence_derivation": {
+         "wert": "Basiswert 0 (Übertragbarkeit von Nicholl u. a. 2007 auf zu Hause "
+                 "versterbende Hitzetote zu schwach für einen Effekt ungleich null).",
+         "band": "Sensitivitätsband 0–0,002 pro km, abgeleitet aus ≈ +1 % Mortalität "
+                 "je +10 km Krankenhausdistanz (Nicholl u. a., Emerg Med J 24:665–668, "
+                 "2007, doi:10.1136/emj.2007.047654, transportierte Notfälle UK).",
+         "sensitivitaet": "Bericht #95, Log 20: Basiswert bleibt 0, das Band dient der "
+                          "Sensitivitätsprüfung der Distanz-Wirkung; kein Archiv-Snapshot "
+                          "möglich (Verlag blockt Wayback-Save, dokumentiert).",
+     }},
 
     # ── Hitzemortalität: Restlebenserwartung je Band (YLL-Bewertung, §3.5) ─────
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "life_years_u65", "value": 23.39,
@@ -489,7 +499,21 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "test_s_unbekannt_sensitivity_band. Die KOMMUNENSUMME bleibt "
                       "unverändert (Zentrierung). Produkt-Kennzeichnung als Annahme; "
                       "ersetzbar durch ein kommunales Baumkataster.",
-     "source_refs": []},
+     "source_refs": [],
+     "evidence_derivation": {
+         "wert": "0,12 als Mitte der Spanne zwischen Straßenbaumbeständen (Birke/Erle "
+                 "als Nebenbaumart, unteres Bandende) und Park-/Gehölzstrukturen mit "
+                 "Hasel/Hainbuche (oberes Bandende) — §3.9-Kategorie ABGESCHÄTZT, keine "
+                 "Primärquelle für den Gattungsmix ungetaggter OSM-Bäume verfügbar "
+                 "(Bericht #96 §3.3).",
+         "band": "0,05 (Straßenbaumbestände) bis 0,25 (Park-/Gehölzstrukturen).",
+         "sensitivitaet": "Ergebnis-Sensitivität über den Zelltypen-Satz (s_unbek "
+                          "0,05 → 0,25): Ĝ/Ḡ Allee/Park 0,665 → 0,752 (+13,0 %), "
+                          "Wohnblock 0,255 → 0,258 (+0,9 %), Grünanlage 2,014 → 1,918 "
+                          "(−4,7 %), Mischlage 1,066 → 1,072 (+0,6 %); reproduzierbar "
+                          "im Golden-Test test_s_unbekannt_sensitivity_band. Die "
+                          "Kommunensumme bleibt wegen der Zentrierung über Ḡ invariant.",
+     }},
 
     # ── #98 UV-Schädigungen: klimaattribuierte Hautkrebsfälle (Bericht Rev. 1) ─
     # ΔF_e = F_e · BAF_e · ΔDosis;  YLL = Σ_e ΔF_e · λ_e · L̄_e
@@ -1168,7 +1192,20 @@ IMPACT_GLOBAL_SPECS: list[dict] = [
                       "Decken), Gewerbe-/Altbauten 3,5-4,5 m; 3,5 m als Mittel über den "
                       "gemischten Bestand. Kleinere Werte erhöhen die geschätzte "
                       "Geschossfläche und damit die Gebäudeschäden.",
-     "source_refs": []},
+     "source_refs": [],
+     "evidence_derivation": {
+         "wert": "3,5 m als Mittel über den gemischten Gebäudebestand (Wohn-, "
+                 "Gewerbe- und Altbau), da die Bruttogeschossfläche (Basis des "
+                 "Gebäude-Assetwerts) aus OSM-Gebäudehöhe / Geschosshöhe geschätzt "
+                 "wird und keine bundesweite Vermessung der Geschosshöhe vorliegt.",
+         "band": "~2,6-3,0 m lichte Geschosshöhe (zzgl. Decken) im Wohnbau, "
+                 "3,5-4,5 m bei Gewerbe- und Altbauten.",
+         "sensitivitaet": "Kleinere Geschosshöhen erhöhen die geschätzte "
+                          "Geschossfläche (Geschosse = max(1; Gebäudehöhe / "
+                          "Geschosshöhe)) und damit den geschätzten Gebäude-Assetwert "
+                          "und die Gebäudeschäden; größere Geschosshöhen wirken "
+                          "entsprechend dämpfend.",
+     }},
 ]
 
 
