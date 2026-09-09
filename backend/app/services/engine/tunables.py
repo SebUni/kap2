@@ -208,14 +208,15 @@ REGIONAL_FALLBACK_SPECS: list[dict] = [
         "OSM natural=glacier und ist für fast alle Kommunen irrelevant." + _REGIONAL_NOTE,
      "source_refs": [],
      "evidence_derivation": {
-        "wert": "0,5 %/Jahr (Punktwert, konservativ). Abgeschätzt von KAP3 als unterer "
-            "Rand der im Bayerischen Gletscherbericht dokumentierten Verlustraten "
-            "1-3 %/Jahr für die verbliebenen deutschen Alpengletscher: die konservative "
-            "Wahl vermeidet eine Überschätzung des Rückgangs bei den starken "
-            "Jahresschwankungen der Berichte.",
-        "band": "0,5-3 %/Jahr (aus dem Bayerischen Gletscherbericht). Unteres Bandende "
-            "0,5 %: angesetzter konservativer Modellwert. Oberes Bandende 3 %: oberer Rand "
-            "der berichteten Jahresschwankung in besonders verlustreichen Jahren.",
+        "wert": "0,5 %/Jahr (Punktwert). Abgeschätzt von KAP3 bewusst konservativ "
+            "unterhalb der im Bayerischen Gletscherbericht berichteten Verlustraten von "
+            "1-3 %/Jahr für die verbliebenen deutschen Alpengletscher: der Ansatz halbiert "
+            "den unteren Berichtswert und vermeidet so bei den starken Jahresschwankungen "
+            "der Berichte eine Überschätzung des Rückgangs.",
+        "band": "0,5-3 %/Jahr. Unteres Bandende 0,5 %: konservativer Modellwert von KAP3, "
+            "kein Berichtswert. Der Bereich 1-3 %/Jahr entstammt dem Bayerischen "
+            "Gletscherbericht, wobei 3 % dem oberen Rand der berichteten "
+            "Jahresschwankung in besonders verlustreichen Jahren entspricht.",
         "sensitivitaet": "Wirkt ausschließlich auf Zellen mit OSM-Tag natural=glacier — für "
             "die weit überwiegende Zahl deutscher Kommunen ohne solche Zellen ist der Wert "
             "wirkungslos. Auf betroffenen Zellen skaliert der modellierte Gletscherschwund "
