@@ -122,10 +122,13 @@ MODEL_PARAM_SPECS: list[dict] = [
             "der Index-Komposition auf die Max-Wirkungskette (MODELL_KRITIK §3.1): diese "
             "hebt die Risikoindizes gegenüber dem früheren gewichteten Mittel um Faktor "
             "1,5-2, die alte Schwelle 40 würde dasselbe reale Belastungsniveau nicht mehr "
-            "markieren. 40 · 1,25 ≈ 50 als runder Wert innerhalb der Faktor-1,5-2-Spanne.",
-        "band": "40-80 Index (Faktor 1,5-2 auf den alten Schwellenwert 40 angewandt). "
-            "Unteres Bandende 40: keine Anpassung, würde die Screening-Schwelle real "
-            "absenken. Oberes Bandende 80: volle Anhebung um Faktor 2, am oberen Rand der "
+            "markieren. Die rechnerisch konsistente Spanne 40 · 1,5 bis 40 · 2 = 60-80 wird "
+            "bewusst nicht ausgeschöpft: 50 ist eine konservative Teilanhebung unterhalb "
+            "dieser Spanne, um das Screening nicht zu eng zu fassen.",
+        "band": "50-80 Index (50 als konservativer Punktwert unterhalb der aus MODELL_KRITIK "
+            "§3.1 abgeleiteten Spanne 60-80, oberes Bandende bei Faktor 2 auf den alten "
+            "Schwellenwert 40 angewandt). Unteres Bandende 50: die gewählte konservative "
+            "Teilanhebung. Oberes Bandende 80: volle Anhebung um Faktor 2, am oberen Rand der "
             "aus der Max-Komposition beobachteten Spannbreite.",
         "sensitivitaet": "Wirkt auf die Risikozonen-Clusterung (risk_zone_service, "
             "Connected-Component-Cluster) und auf share_above_threshold im Aggregat: eine "
