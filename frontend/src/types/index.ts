@@ -324,6 +324,11 @@ export interface ModelParameter {
   overridden: boolean
   custom_source?: string | null
   applicable?: boolean
+  // Vorgabe P1: Beleglage je Parameter — belegt (Quelle) oder begründete
+  // Abschätzung von KAP3 samt Herleitung (Wert, Bandbreite, Sensitivität).
+  evidence_class: 'belegt' | 'abgeschaetzt'
+  evidence_note?: string
+  evidence_derivation?: { wert: string; band: string; sensitivitaet: string } | null
   // Demo: read-only (demo_locked) bzw. Wert/Quelle verborgen (demo_hidden)
   demo_locked?: boolean
   demo_hidden?: boolean

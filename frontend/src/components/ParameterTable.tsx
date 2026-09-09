@@ -29,6 +29,37 @@ function HiddenChip() {
   )
 }
 
+/**
+ * Beleglage je Parameter (Vorgabe P1): ohne Klick und ohne Hover lesbar, ob der
+ * Wert belegt ist oder eine begründete Abschätzung von KAP3. Der Wert kommt aus
+ * dem Backend-Feld `evidence_class` — keine Heuristik über den Freitext `source`.
+ * Die Herleitung steht zusätzlich (nicht ersatzweise) im Tooltip.
+ */
+function EvidenceCell({ p }: { p: ModelParameter }) {
+  // Demo: bei verborgenen Ebenen bleibt die Spalte leer (demo_hidden nicht umgehen).
+  if (p.demo_hidden) return null
+  const abgeschaetzt = p.evidence_class === 'abgeschaetzt'
+  const d = p.evidence_derivation
+  return (
+    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <span className={`kap-param-evidence ${abgeschaetzt ? 'is-estimated' : 'is-sourced'}`}>
+        {abgeschaetzt ? 'abgeschätzt (KAP3)' : 'belegt'}
+      </span>
+      {d && (
+        <InfoTooltip
+          title={abgeschaetzt ? 'Abschätzung KAP3 — Herleitung' : 'Beleglage — Herleitung'}
+          description={p.evidence_note}
+          rows={[
+            { label: 'Wert', value: d.wert },
+            { label: 'Bandbreite', value: d.band },
+            { label: 'Sensitivität', value: d.sensitivitaet },
+          ]}
+        />
+      )}
+    </span>
+  )
+}
+
 interface Props {
   kommuneId: number
   parameters: ModelParameter[]
@@ -153,6 +184,7 @@ export default function ParameterTable({
             <th className="kap-param-th-value">Wert</th>
             <th>Einheit</th>
             <th>Quelle</th>
+            <th>Beleglage</th>
             <th>Status</th>
             {!compact && <th />}
           </tr>
@@ -208,6 +240,7 @@ export default function ParameterTable({
                     </span>
                   )}
                 </td>
+                <td className="kap-param-td-evidence"><EvidenceCell p={p} /></td>
                 <td>
                   <span className={`kap-param-status ${p.overridden ? 'is-override' : ''}`}>
                     {p.overridden ? 'Override' : 'Default'}
@@ -268,6 +301,7 @@ const PARAM_TABLE_COLGROUP = (
     <col className="kap-param-col-value" />
     <col className="kap-param-col-unit" />
     <col className="kap-param-col-source" />
+    <col className="kap-param-col-evidence" />
     <col className="kap-param-col-status" />
     <col className="kap-param-col-actions" />
   </colgroup>
@@ -393,6 +427,7 @@ function ParameterRows({
                 </span>
               )}
             </td>
+            <td className="kap-param-td-evidence"><EvidenceCell p={p} /></td>
             <td>
               <span className={`kap-param-status ${p.overridden ? 'is-override' : ''}`}>
                 {p.overridden ? 'Override' : 'Default'}
@@ -506,6 +541,7 @@ function GroupedParameterList({
         <th className="kap-param-th-value">Wert</th>
         <th>Einheit</th>
         <th>Quelle</th>
+        <th>Beleglage</th>
         <th>Status</th>
         <th />
       </tr>
