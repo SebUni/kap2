@@ -55,7 +55,11 @@ def test_pollen_measure_is_assigned_qualitatively_not_linked():
     """Die neue Pollen-Frühwarnung ist #96 zugeordnet, aber nicht verknüpft."""
     m = _pollen_measure()
     assert CODE not in (m.get("linked_risk_codes") or [])
-    assert m.get("default_reduction") == 0.0
+    # T-0061 (Freigabe F-0007 Punkt 1 / Vorgabe P2, Ledger-Befund 151): Der Hebel läuft
+    # nicht mehr mit Wirkung null, sondern mit der ausgewiesenen Abschätzung
+    # r_S158 = 0,03 aus Bericht #96 §5.1. Weil der Code nicht in linked_risk_codes steht
+    # (Zusicherung oben, Befund 124), bleibt der Wert rein deklarativ.
+    assert (m.get("default_reduction") or 0.0) > 0.0
 
 
 def test_qualitative_measure_does_not_change_cell_outcome_or_cost():
@@ -93,11 +97,11 @@ def test_qualitative_measure_does_not_change_cell_outcome_or_cost():
 
     assert base["risks"][CODE]["outcome"] == with_measure["risks"][CODE]["outcome"]
     assert base["risks"][CODE]["cost_eur"] == with_measure["risks"][CODE]["cost_eur"]
-    # Gegenprobe: die Maßnahme hat überhaupt eine (potenziell) wirksame Konfiguration
-    # (default_reduction 0.0 allein wäre ein zu schwacher Test) — mit einem
-    # HYPOTHETISCH linked Code würde derselbe Mechanismus sehr wohl skalieren, sobald
-    # default_reduction > 0 wäre. Wir bestätigen daher zusätzlich, dass der Code schlicht
-    # nie in die Faktor-Schleife gelangt:
+    # Gegenprobe: die Maßnahme hat seit T-0061 eine wirksame Konfiguration
+    # (default_reduction = 0,03 > 0) — mit einem HYPOTHETISCH linked Code würde derselbe
+    # Mechanismus sehr wohl skalieren. Dass outcome/cost_eur trotzdem bitgleich bleiben,
+    # liegt allein an der leeren linked_risk_codes-Liste; wir bestätigen daher
+    # zusätzlich, dass der Code schlicht nie in die Faktor-Schleife gelangt:
     assert CODE not in cell_factors
 
 
