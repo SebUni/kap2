@@ -45,15 +45,24 @@ if benutzer:
     d["zugang"] = {"benutzer": benutzer, "passwort": passwort, "hinweis": "HTTP Basic Auth der Testumgebung"}
 print(json.dumps(d, ensure_ascii=False, indent=1))
 PY
+  local versuch push_rc=1
   for versuch in 1 2 3 4 5; do
     git -C "$FIRMA" fetch -q origin && git -C "$FIRMA" reset -q --hard origin/main || true
-    mv "$FIRMA/betrieb/deploy-status.json.neu" "$FIRMA/betrieb/deploy-status.json" 2>/dev/null || cp "$FIRMA/betrieb/deploy-status.json.neu" "$FIRMA/betrieb/deploy-status.json"
+    # cp statt mv: die .neu-Datei muss fuer jeden der bis zu 5 Versuche erhalten bleiben,
+    # sonst bricht der Wiederholungsversuch nach dem ersten Durchlauf an einer fehlenden
+    # Quelldatei ab, statt tatsaechlich erneut zu pushen.
+    cp "$FIRMA/betrieb/deploy-status.json.neu" "$FIRMA/betrieb/deploy-status.json"
     git -C "$FIRMA" add betrieb/deploy-status.json
     git -C "$FIRMA" commit -q -m "Deploy-Status: $st ($COMMIT)" || true
-    if git -C "$FIRMA" push -q origin main:main; then break; fi
+    git -C "$FIRMA" push -q origin main:main && push_rc=0 || push_rc=$?
+    if [[ $push_rc -eq 0 ]]; then break; fi
     sleep $((versuch * 3))
   done
   rm -f "$FIRMA/betrieb/deploy-status.json.neu"
+  if [[ $push_rc -ne 0 ]]; then
+    echo "!! Status konnte nicht veroeffentlicht werden nach $versuch Versuchen (Rueckgabewert letzter Versuch: $push_rc)"
+    exit 1
+  fi
 }
 fehler_abbruch() {
   local rc=$?
