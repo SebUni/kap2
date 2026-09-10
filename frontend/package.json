@@ -7,7 +7,8 @@
     "dev": "vite",
     "dev:clean": "rm -rf node_modules/.vite && vite",
     "build": "NODE_OPTIONS=--max-old-space-size=768 vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "keywords": [],
   "author": "",
