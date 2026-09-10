@@ -28,9 +28,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from app.services import parameter_registry  # noqa: E402
 
 # ── Ratchet-Bestand (gemessene Ausgangslage, wird in Folgetickets abgebaut) ─────
-KNOWN_WITHOUT_DERIVATION: set[str] = {
-    "measures.POLLEN_EARLY_WARNING.default_reduction",
-}
+KNOWN_WITHOUT_DERIVATION: set[str] = set(
+    # T-0061: measures.POLLEN_EARLY_WARNING.default_reduction hat seit dem Nachzug der
+    # S158-Abschätzung (Bericht #96 §5.1, Ledger-Befund 151) eine Herleitung im Katalog
+    # — Ratchet entsprechend festgezogen (Regel oben: jede Herleitungs-Batch schrumpft
+    # diese Menge). Der Bestand ist damit leer.
+)
 
 VALID_CLASSES = {"belegt", "abgeschaetzt"}
 DERIVATION_FIELDS = ("wert", "band", "sensitivitaet")

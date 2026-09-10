@@ -1624,10 +1624,11 @@ MEASURES: list[dict] = [
                     "Allergikerinnen und Allergiker über die aktuelle Pollenbelastung "
                     "(DWD-/PID-Gefahrenindex). Wirkt nicht auf die zellscharfe "
                     "Vegetations-/Symptomlast der Schadensfunktion — keine publizierte "
-                    "Interventions-Effektgröße; Maßnahmen-Hebel (qualitativ), Register-ID "
-                    "96-S158-01.",
+                    "Interventions-Effektgröße; Maßnahmen-Hebel mit ausgewiesener "
+                    "Abschätzung r_S158 = 0,03 (Bericht #96 §5.1, Vorgabe P2), "
+                    "Register-ID 96-S158-01.",
      "measure_type": "organizational",
-     "effect_target": ["vulnerability"], "default_reduction": 0.0, "coverage_scaling": "saturating",
+     "effect_target": ["vulnerability"], "default_reduction": 0.03, "coverage_scaling": "saturating",
      "linked_risk_codes": [],
      "qualitative_risk_codes": ["EXPECTED_ANNUAL_ALLERGY_DAYS"],
      "capex_fixed": None, "capex_per_unit": 15000.0, "capex_per_m2": None,
@@ -1659,24 +1660,69 @@ MEASURES: list[dict] = [
         "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle: eine "
             "Pollenmessstation deckt ein großes Stadtgebiet ab (≈ 1.000 ha je Station) "
             "→ 0,001 Stationen/ha.",
-        "default_reduction": "Registerzeile 96-S158-01 (docs/evidenz/register.md, "
-            "übertragen aus Bericht #96, Registerzeile Z. 110 sowie §5 Z. 657): „keine "
-            "quantifizierte Interventions-Effektgröße publiziert“ für die Wirkung "
-            "kommunaler Pollen-Frühwarnung auf die Symptomtage der Aeroallergene-"
-            "Schadensfunktion — die Vegetations-Symptom-Kopplung (Ebene POLLEN_LOAD) ist "
-            "nur beobachtend belegt, kein Interventions-RCT (Log 15). default_reduction "
-            "bleibt deshalb bei 0,0, und EXPECTED_ANNUAL_ALLERGY_DAYS ist bewusst NICHT in "
-            "linked_risk_codes geführt: Befund 124/Modellgrenze 7 (reviews/BEFUNDE_96.md) "
-            "verbietet jeden flächigen, zellunscharfen Pauschalfaktor auf #96 (die "
-            "λ-Evidenz ist intra-urban, kein Beleg für einen kommunenweiten "
-            "Niveaueffekt). Die Zuordnung zum Risiko läuft stattdessen rein deklarativ "
-            "über qualitative_risk_codes (Aufgabe §3.5: Hebel ohne quantifizierte "
-            "Effektgröße laufen ehrlich als „qualitativ“)."},
+        "default_reduction": "Abschätzung von KAP3 (§3.9 ABGESCHÄTZT, keine Primärquelle) "
+            "aus Bericht #96 §5.1 „Wirkungsabschätzung S158“ (Anker #s158-wirkung), "
+            "Registerzeile 96-S158-01: Für die Wirkung kommunaler Pollen-Frühwarnung auf "
+            "die Symptomtage ist „keine quantifizierte Interventions-Effektgröße "
+            "publiziert“ — nach Vorgabe P2 des Aufsichtsrats (F-0007 Punkt 1) ist das der "
+            "Anlass einer begründeten Abschätzung, nicht ihr Ersatz; die frühere "
+            "Nullwirkung (Log 15) ist damit bewusst überstimmt (Befund 151, "
+            "reviews/BEFUNDE_96.md). Punktwert r_S158 = 0,03 aus der Dreifaktor-Kette "
+            "0,35 (Reichweite) · 0,40 (Handlungsumsetzung) · 0,20 (Tageswirkung) = 0,028. "
+            "EXPECTED_ANNUAL_ALLERGY_DAYS bleibt bewusst NICHT in linked_risk_codes: "
+            "Befund 124/Modellgrenze 7 verbietet jeden flächigen, zellunscharfen "
+            "Pauschalfaktor auf #96 (die λ-Evidenz ist intra-urban, kein Beleg für einen "
+            "kommunenweiten Niveaueffekt). Der Faktor wird deshalb ausschließlich "
+            "ausgewiesen und ändert keine Karten- oder Ergebniswerte; die Zuordnung zum "
+            "Risiko läuft weiterhin deklarativ über qualitative_risk_codes."},
      # Herleitung je Kostenparameter nach Aufgabe §3.9 (Vorgabe P1): Punktwert,
      # zwei benannte Bandenden mit Begründung, Sensitivität der ausgewiesenen
      # Maßnahmenkosten. Zahlenwerte unverändert (Eiserne Regel 2: eine
      # Wertänderung wäre eine Fortschreibung und gehört in Bericht + Ledger).
      "evidence_derivation": {
+        # Wirkungsfaktor: Zahlenwert, Band und Sensitivität wörtlich aus Bericht #96
+        # §5.1 (Ledger-Befund 151, reviews/BEFUNDE_96.md — bewusste Überstimmung von
+        # Log 15 nach Vorgabe P2). Der Wert wird hier nicht erfunden, sondern nachgezogen.
+        "default_reduction": {
+            "wert": "0,03 (3 %) — Abschätzung von KAP3 nach §3.9, keine Primärquelle "
+                "(Befund 151, reviews/BEFUNDE_96.md; Bericht #96 §5.1, Register "
+                "96-S158-01). Für die Wirkung einer kommunalen Pollen-Frühwarnung auf "
+                "die Symptomtage existiert keine Interventions- oder quasi-"
+                "experimentelle Studie; nach Vorgabe P2 ist das der Anlass der "
+                "Abschätzung, nicht ihr Ersatz (die frühere Wirkung null, Log 15, ist "
+                "damit bewusst überstimmt). Offengelegte Dreifaktor-Kette: Reichweite "
+                "des Warnangebots unter den Betroffenen q_reich = 0,35 · Anteil, der "
+                "die Information in eine Handlung übersetzt q_handel = 0,40 · relative "
+                "Minderung der Symptomlast an den betroffenen Tagen bei tatsächlich "
+                "geändertem Verhalten e_Tag = 0,20 = 0,028 ⇒ gerundet 0,03. Der Faktor "
+                "wirkt allein auf den klimaattribuierten Zusatzblock ΔTage im "
+                "Maßnahmen-Modul, nicht auf das gemessene Klimasignal, nicht auf die "
+                "Prävalenz und nicht über die Vegetation (Ĝ/λ).",
+            "band": "0,005–0,10 (0,5–10 %), zwei benannte Bandenden aus derselben "
+                "Kette. Unteres Bandende „Aushang-Fall“ 0,20 · 0,25 · 0,10 = 0,005: der "
+                "Gefahrenindex wird bereitgestellt, aber nicht aktiv verteilt, und es "
+                "gibt keine eingeübte Handlung. Oberes Bandende „aktivierte Warnkette“ "
+                "0,55 · 0,60 · 0,30 = 0,099 ⇒ 0,10: aktive Kanäle (App-Push, Presse, "
+                "Schul-/Kita-Information), hohe Handlungsbereitschaft und rechtzeitig "
+                "begonnene Bedarfsmedikation. Der Punktwert liegt bewusst näher am "
+                "unteren Ende (Untergrenzen-Zusage des Berichts).",
+            "sensitivitaet": "Der Faktor wirkt linear: Der ausgewiesene Maßnahmennutzen "
+                "skaliert 1:1 mit ihm, der Schadenswert selbst bleibt unberührt "
+                "(EXPECTED_ANNUAL_ALLERGY_DAYS steht nicht in linked_risk_codes, "
+                "Befund 124 — Karten- und Ergebniswerte ändern sich durch diesen Wert "
+                "nicht). Bezogen auf die Bundessumme von rund 110 Mio. €₂₀₂₄/Jahr "
+                "entspricht der Punktwert ≈ 3,3 Mio. €/Jahr vermiedener "
+                "Behandlungskosten bei flächendeckender Umsetzung; das Band spannt "
+                "0,55–11,0 Mio. €/Jahr. Für eine Kommune mit 100.000 EW im Bundes-"
+                "Altersmix (≈ 132.300 €/Jahr) sind das ≈ 3.970 €/Jahr (Band "
+                "≈ 660–13.230 €/Jahr). Gegen die Vorhaltekosten des Messnetzes "
+                "(15.000 €/Station, 4.000 €/(Station·Jahr)) trägt sich die Maßnahme "
+                "über diesen Nutzen in keinem Punkt des Bands — die Abschätzung ändert "
+                "die Vorteilhaftigkeits-Aussage also nicht, macht die Wirkung aber "
+                "sichtbar statt sie als Null auszuweisen. Modellgrenze der Abschätzung "
+                "(Bericht #96 §6, Grenze 8): kommunenweiter Pauschalfaktor, keine "
+                "zellscharfe Bauform.",
+        },
         "capex_per_unit": {
             "wert": "15.000 €/Station (Punktwert, Modellannahme). Anker: das geparkte "
                 "EARLY_WARNING_MEASURE veranschlagt rund 60.000 € Aufbau für ein GANZES "
