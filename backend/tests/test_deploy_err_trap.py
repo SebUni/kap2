@@ -9,7 +9,9 @@ gepusht, der zuletzt gemeldete Status blieb stehen und wurde weiter als aktuell
 gelesen.
 
 Der Test baut aus dem echten Skript eine Werkbank: er übernimmt die `set`-Zeile und
-den Block `status_schreiben`/`fehler_abbruch`/`trap` wörtlich aus
+den Block von `speicher_zeile` bis zum `trap` (also auch `aufseher_zeile`,
+`status_lokal_schreiben`, `status_veroeffentlichen`, `status_schreiben`,
+`fehler_abbruch`, `signal_abbruch`) wörtlich aus
 `deploy/test-deploy.sh` und ersetzt nur die Pfade sowie `python3` durch eine
 Attrappe, die beim ersten Aufruf scheitert — also genau im Aufruf
 `status_schreiben fertig ""`.
@@ -49,7 +51,12 @@ def _set_zeile() -> str:
 
 def _funktionsblock() -> str:
     text = SKRIPT.read_text(encoding="utf-8")
-    anfang = text.index("status_schreiben() {")
+    # Anker ist die *erste* Funktion des Blocks, nicht status_schreiben: seit T-0132 ist
+    # status_schreiben in status_lokal_schreiben (JSON + lokal festschreiben) und
+    # status_veroeffentlichen (Push-Schleife) aufgeteilt, und fehler_abbruch ruft
+    # zusaetzlich aufseher_zeile. Wird weiter unten ausgeschnitten, fehlen diese Helfer
+    # in der Werkbank und der Lauf endet in "command not found" statt im Fehlerstatus.
+    anfang = text.index("speicher_zeile() {")
     ende = text.index("trap fehler_abbruch ERR") + len("trap fehler_abbruch ERR")
     return text[anfang:ende]
 
