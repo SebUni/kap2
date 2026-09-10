@@ -80,7 +80,7 @@ SCHRITT="backend-abhaengigkeiten"
 
 SCHRITT="frontend-build"
 cd "$PRODUKT/frontend"
-npm ci --legacy-peer-deps --no-audit --no-fund --loglevel=error
+npm ci --no-audit --no-fund --loglevel=error
 npm run build --silent
 
 SCHRITT="datenbank"
