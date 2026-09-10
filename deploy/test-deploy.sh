@@ -2,7 +2,10 @@
 # Test-Deployment von kap2 auf dem Server. Läuft als Benutzer overlord, gestartet vom Watcher
 # (Signal deploy_anforderung) oder von Hand: /opt/overlord/kap2/deploy/test-deploy.sh [main|<commit>]
 # Am Ende schreibt es betrieb/deploy-status.json ins Firmen-Repo und pusht — das ist das Signal.
-set -euo pipefail
+# -E: der ERR-Trap gilt auch innerhalb von Shell-Funktionen (status_schreiben, fehler_abbruch).
+# Ohne -E blieb ein Fehler dort stumm bzw. brach seit T-0120 wortlos ab: kein Status im
+# Firmen-Repo, der zuletzt gemeldete Status blieb stehen und wurde weiter als aktuell gelesen.
+set -Eeuo pipefail
 # Aus einer Kopie laufen: git reset weiter unten überschreibt sonst das laufende Skript.
 if [[ -z "${DEPLOY_KOPIE:-}" ]]; then
   KOPIE=$(mktemp /tmp/test-deploy.XXXXXX.sh); cp "$0" "$KOPIE"; export DEPLOY_KOPIE=1
@@ -42,8 +45,9 @@ PY
   rm -f "$FIRMA/betrieb/deploy-status.json.neu"
 }
 fehler_abbruch() {
+  local rc=$?
   local zeilen; zeilen=$(tail -n 25 "$PROTOKOLL" 2>/dev/null | tr -d '\r' || true)
-  echo "!! Fehler im Schritt $SCHRITT"
+  echo "!! Fehler im Schritt $SCHRITT (Rueckgabewert $rc)"
   status_schreiben fehler "Schritt $SCHRITT fehlgeschlagen. Letzte Protokollzeilen:
 $zeilen"
   exit 1
@@ -82,6 +86,7 @@ for i in $(seq 1 60); do
 done
 
 SCHRITT="status"
-trap - ERR
+# Trap bleibt bewusst aktiv: scheitert das Schreiben oder Pushen des Status, ist der Lauf nicht
+# bestaetigt -- dann darf er nicht stumm enden und den vorherigen Status stehen lassen.
 status_schreiben fertig ""
 echo "== fertig: ${KAP2_TEST_URL:-} ($COMMIT)"
