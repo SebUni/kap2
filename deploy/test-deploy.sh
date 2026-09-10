@@ -12,8 +12,17 @@ if [[ -z "${DEPLOY_KOPIE:-}" ]]; then
   # Signale an die Kopie weiterreichen (T-0132): trifft ein TERM/INT/HUP nur diesen
   # Elternprozess, liefe die Kopie sonst weiter und die Signalfallen unten kaemen nie
   # zum Zug -- der Lauf endete wortlos, genau die Luecke aus T-0132.
+  # Fallen VOR dem Start setzen: sonst toetet ein Signal in der Luecke zwischen "&" und
+  # "trap" nur diesen Elternprozess und laesst die Kopie verwaist weiterlaufen.
+  KIND=""
+  for SIG in TERM INT HUP; do trap "[[ -n \$KIND ]] && kill -$SIG \$KIND 2>/dev/null; true" "$SIG"; done
+  # Jobsteuerung einschalten (set -m): ohne sie setzt Bash in einer nicht-interaktiven
+  # Shell bei "&" im Kind SIGINT/SIGQUIT auf SIG_IGN; ein beim Start ignoriertes Signal
+  # laesst sich in der Kindshell nicht mehr per trap belegen -- die INT-Falle unten waere
+  # in genau dem Prozess wirkungslos, der den Statuseintrag schreiben soll.
+  set -m
   bash "$KOPIE" "$@" & KIND=$!
-  for SIG in TERM INT HUP; do trap "kill -$SIG $KIND 2>/dev/null || true" "$SIG"; done
+  set +m
   RC=0
   # wait bricht mit >128 ab, sobald eine der Fallen zuschlaegt: dann erneut warten,
   # bis die Kopie ihren Status geschrieben hat und wirklich beendet ist.
