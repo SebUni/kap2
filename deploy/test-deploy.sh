@@ -23,6 +23,17 @@ set -a; source "$ENV_DATEI"; set +a
 
 status_schreiben() {  # $1 = fertig|fehler, $2 = Fehlertext
   local st="$1" fehler="$2" zeit adresse
+  # Vorabpruefung (T-0126): FIRMA muss ein eigenes Repository sein, sonst sucht
+  # "git -C $FIRMA" aufwaerts und trifft im Zweifel den umgebenden Arbeitsklon von
+  # kap2 -- dort duerfen reset --hard/add/commit/push nie stattfinden.
+  local firma_eltern top
+  firma_eltern=$(dirname -- "$FIRMA")
+  if ! top=$(GIT_CEILING_DIRECTORIES="$firma_eltern" git -C "$FIRMA" rev-parse --show-toplevel 2>&1) \
+     || [[ "$(readlink -f -- "$top" 2>/dev/null)" != "$(readlink -f -- "$FIRMA" 2>/dev/null)" ]]; then
+    echo "!! FIRMA ist kein eigenes Repository: $FIRMA (git rev-parse --show-toplevel liefert: ${top:-<kein Treffer>})"
+    exit 1
+  fi
+  export GIT_CEILING_DIRECTORIES="$firma_eltern"
   zeit=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   adresse="${KAP2_TEST_URL:-http://localhost}"
   python3 - "$st" "$fehler" "$zeit" "$adresse" "$COMMIT" "$PROTOKOLL" "${KAP2_TEST_BENUTZER:-}" "${KAP2_TEST_PASSWORT:-}" > "$FIRMA/betrieb/deploy-status.json.neu" <<'PY'
