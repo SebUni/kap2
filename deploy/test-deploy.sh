@@ -118,14 +118,23 @@ $zeilen"
 signal_abbruch() {  # $1 = Signalname (TERM|INT|HUP), $2 = Signalnummer -- T-0132
   local sig="$1" num="$2"
   # Fallen sofort loesen: der Abbruchpfad darf sich nicht selbst erneut ausloesen.
-  trap - ERR TERM INT HUP
+  # Weitere Signale werden ignoriert (trap ''), nicht auf Vorgabe zurueckgesetzt (trap -):
+  # sonst toetet ein zweites TERM den Abbruchpfad genau in dem Fenster, in dem
+  # status_veroeffentlichen per "git reset --hard origin/main" den soeben lokal
+  # geschriebenen Eintrag kurzzeitig zurueckdreht -- der Eintrag waere dann wieder weg.
+  trap - ERR
+  trap '' TERM INT HUP
   echo "!! abgebrochen durch Signal $sig im Schritt $SCHRITT"
   speicher_zeile "abbruch"
   aufseher_zeile
   # Erst lokal schreiben, dann pushen: ein zweites Signal waehrend des Pushens kann den
   # Eintrag dann nicht mehr verhindern.
   status_lokal_schreiben fehler "abgebrochen durch Signal $sig im Schritt $SCHRITT"
-  status_veroeffentlichen fehler || true
+  # In einer Unter-Shell: status_veroeffentlichen beendet bei endgueltig gescheitertem
+  # Push mit "exit 1"; das darf hier nur die Unter-Shell treffen. Sonst waere das "|| true"
+  # wirkungslos und der Signalabbruch endete mit 1 statt mit 128+Signalnummer. Der
+  # Statuseintrag liegt zu diesem Zeitpunkt bereits lokal fest.
+  ( status_veroeffentlichen fehler ) || echo "!! Veroeffentlichen nach Signal $sig fehlgeschlagen; Eintrag liegt lokal vor"
   exit $((128 + num))
 }
 trap fehler_abbruch ERR
