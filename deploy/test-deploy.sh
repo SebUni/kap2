@@ -2,11 +2,12 @@
 # Test-Deployment von kap2 auf dem Server. Läuft als Benutzer overlord, gestartet vom Watcher
 # (Signal deploy_anforderung) oder von Hand: /opt/overlord/kap2/deploy/test-deploy.sh [main|<commit>]
 # Am Ende schreibt es betrieb/deploy-status.json ins Firmen-Repo und pusht — das ist das Signal.
-set -uo pipefail
+set -euo pipefail
 # Aus einer Kopie laufen: git reset weiter unten überschreibt sonst das laufende Skript.
 if [[ -z "${DEPLOY_KOPIE:-}" ]]; then
   KOPIE=$(mktemp /tmp/test-deploy.XXXXXX.sh); cp "$0" "$KOPIE"; export DEPLOY_KOPIE=1
-  bash "$KOPIE" "$@"; RC=$?; rm -f "$KOPIE"; exit $RC
+  if bash "$KOPIE" "$@"; then RC=0; else RC=$?; fi
+  rm -f "$KOPIE"; exit $RC
 fi
 REF="${1:-main}"
 PRODUKT=/opt/overlord/kap2
@@ -31,17 +32,17 @@ if benutzer:
 print(json.dumps(d, ensure_ascii=False, indent=1))
 PY
   for versuch in 1 2 3 4 5; do
-    git -C "$FIRMA" fetch -q origin && git -C "$FIRMA" reset -q --hard origin/main
+    git -C "$FIRMA" fetch -q origin && git -C "$FIRMA" reset -q --hard origin/main || true
     mv "$FIRMA/betrieb/deploy-status.json.neu" "$FIRMA/betrieb/deploy-status.json" 2>/dev/null || cp "$FIRMA/betrieb/deploy-status.json.neu" "$FIRMA/betrieb/deploy-status.json"
     git -C "$FIRMA" add betrieb/deploy-status.json
     git -C "$FIRMA" commit -q -m "Deploy-Status: $st ($COMMIT)" || true
-    git -C "$FIRMA" push -q origin main:main && break
+    if git -C "$FIRMA" push -q origin main:main; then break; fi
     sleep $((versuch * 3))
   done
   rm -f "$FIRMA/betrieb/deploy-status.json.neu"
 }
 fehler_abbruch() {
-  local zeilen; zeilen=$(tail -n 25 "$PROTOKOLL" 2>/dev/null | tr -d '\r')
+  local zeilen; zeilen=$(tail -n 25 "$PROTOKOLL" 2>/dev/null | tr -d '\r' || true)
   echo "!! Fehler im Schritt $SCHRITT"
   status_schreiben fehler "Schritt $SCHRITT fehlgeschlagen. Letzte Protokollzeilen:
 $zeilen"
@@ -76,7 +77,7 @@ SCHRITT="dienst"
 sudo /bin/systemctl restart kap2-test
 for i in $(seq 1 60); do
   if curl -sf http://127.0.0.1:8010/api/health >/dev/null; then echo "Backend gesund nach ${i}x2s"; break; fi
-  [[ $i -eq 60 ]] && { echo "Backend antwortet nicht"; false; }
+  if [[ $i -eq 60 ]]; then echo "Backend antwortet nicht"; false; fi
   sleep 2
 done
 
