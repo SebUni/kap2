@@ -1643,7 +1643,8 @@ MEASURES: list[dict] = [
      "evidence_classes": {"default_reduction": "abgeschaetzt",
                           "capex_per_unit": "abgeschaetzt",
                           "opex_per_unit_year": "abgeschaetzt",
-                          "unit_density_per_ha": "abgeschaetzt"},
+                          "unit_density_per_ha": "abgeschaetzt",
+                          "benefit_per_m2_year": "abgeschaetzt"},
      "source_details": {
         "capex_per_unit": "Für kommunale Pollen-Messstationen (Fallenkopf + Auswertungs-/"
             "Datenanbindung an das DWD-/PID-Frühwarnsystem) ist keine belastbare öffentliche "
@@ -1744,6 +1745,35 @@ MEASURES: list[dict] = [
                 "Bei Kommunen unter 1.000 ha greift die Untergrenze von einer Station, "
                 "dort wirkt nur das obere Bandende. Gibt die Kommune die Stückzahl "
                 "selbst vor, ist der Parameter für die Kosten wirkungslos.",
+        },
+        "benefit_per_m2_year": {
+            "wert": "0,0 €/(m²·a) — bewusst kein direkter monetärer Flächennutzen "
+                "angesetzt. Ein kommunales Pollenmonitoring erzeugt keinen Ertrag oder "
+                "keine eingesparten Kosten je Quadratmeter Fläche (anders als z. B. "
+                "PV-Ertrag oder eingesparte Kühlenergie bei anderen Maßnahmen); die "
+                "Maßnahme wirkt punktuell über Messstationen (unit_label „Station“), "
+                "nicht flächenbezogen. Ihr eigentlicher Nutzen liegt in der Wirkung auf "
+                "die Symptomtage der Aeroallergene-Schadensfunktion "
+                "(EXPECTED_ANNUAL_ALLERGY_DAYS) — dafür fehlt aber, wie bei "
+                "default_reduction begründet, eine publizierte Interventions-"
+                "Effektgröße; die Verknüpfung läuft deshalb rein qualitativ über "
+                "qualitative_risk_codes und nicht über eine quantifizierte "
+                "Kosten-Nutzen-Rechnung.",
+            "band": "Keine Bandbreite um 0,0 €/(m²·a): Ein Flächen-Nutzenkennwert wäre "
+                "für diese punktuelle, stationsbasierte Maßnahme methodisch unpassend, "
+                "unabhängig vom Zahlenwert. Sollte künftig eine belastbare "
+                "Interventions-Effektgröße auf die Symptomtage vorliegen (Register "
+                "#96), wäre der Nutzen über vermiedene Symptomtage × monetärer "
+                "Tageswert herzuleiten — nicht als €/m²·a — und würde dann als eigener, "
+                "erneut zu belegender Parameter geführt.",
+            "sensitivitaet": "benefit_per_m2_year geht multiplikativ mit der "
+                "abgedeckten Fläche in den direkten Zusatznutzen ein "
+                "(annual_benefit_direct = benefit_per_m2_year · Fläche, "
+                "measure_service). Jeder Wert größer null würde den Nutzen und damit "
+                "die Kosten-Nutzen-Kennzahl der Maßnahme anheben, ohne dass eine "
+                "belegte oder abgeschätzte Wirkung dahintersteht — ein rein "
+                "rechnerischer Effekt ohne fachliche Grundlage. Der Wert bleibt deshalb "
+                "bei 0,0, bis eine solche Grundlage vorliegt.",
         }}},
     # Herleitung capex_fixed: angepasste Arbeitszeitmodelle bei Hitze verursachen im Kern nur
     # organisatorischen Aufwand (Dienstplanung, Betriebsvereinbarung); kein Marktkennwert.

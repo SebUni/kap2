@@ -29,7 +29,6 @@ from app.services import parameter_registry  # noqa: E402
 
 # ── Ratchet-Bestand (gemessene Ausgangslage, wird in Folgetickets abgebaut) ─────
 KNOWN_WITHOUT_DERIVATION: set[str] = {
-    "measures.POLLEN_EARLY_WARNING.benefit_per_m2_year",
     "measures.POLLEN_EARLY_WARNING.default_reduction",
 }
 
