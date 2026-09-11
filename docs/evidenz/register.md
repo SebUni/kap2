@@ -105,3 +105,27 @@ R25 haben dort ein anderes Outcome (Überflutung/Gebäudeschaden), hier Grünunt
 | 61-R24-01 | R24 Gebäude → Mengengerüst Gebäudegrün | offen | offen | offen | offen | offen (Ebene §3.1) | #61 (offen) |
 | 61-R25-01 | R25 Siedlungsinfrastrukturen → Mengengerüst Straßenbegleitgrün (K4) | offen | offen | offen | offen | offen (Ebene §3.1) | #61 (offen) |
 
+### #50 — Belastung oder Versagen von Hochwasserschutzsystemen (Erstaufschlag 11.09.2026)
+
+Skelett aus `/neu-risiko 50`: eine Zeile je Knoten der Kette W103 samt W085/W087 (Bericht
+`docs/methodik/50_hochwasserschutzsysteme.md`, Kap. 1/2). Evidenz ist noch nicht recherchiert;
+Entscheidungen stehen im Bericht auf `offen`. Einzige bezifferte Zeile: 50-S076-01 (Abschätzung von
+KAP3 nach Vorgabe P2). **Keine Zeile aus #60 wiederverwendet:** Die gemeinsamen Knoten W085, W087, E07,
+E08, E12, S072–S074, R17–R19 haben dort das Outcome Überflutung/Gebäudeschaden, hier Belastung bzw.
+Versagen des Schutzsystems.
+
+| Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | verwendet in |
+|---|---|---|---|---|---|---|---|
+| 50-W085-01 | W085 Hochwasser → Belastung des Schutzsystems | offen | offen | offen | offen | offen (Ebene §3.1) | #50 (offen) |
+| 50-W087-01 | W087 Sturzfluten → Belastung des Überflutungsschutzes | offen | offen | offen | offen | offen | #50 (offen) |
+| 50-E12-01 | E12 Schneeschmelze → W085 | offen | offen | offen | offen | offen | #50 (offen) |
+| 50-E07-01 | E07 Nässe → W085 / Durchfeuchtung Deichkörper | offen | offen | offen | offen | offen | #50 (offen) |
+| 50-E08-01 | E08 Starkregen → W085/W087 | offen | offen | offen | offen | offen | #50 (offen) |
+| 50-S072-01 | S072 Boden-/Vegetationsbedeckung → Abfluss | offen | offen | offen | offen | offen | #50 (offen) |
+| 50-S073-01 | S073 Flächenversiegelung → Abfluss | offen | offen | offen | offen | offen | #50 (offen) |
+| 50-S074-01 | S074 Topographie → geschützte Fläche hinter der Schutzlinie | offen | offen | offen | offen | offen | #50 (offen) |
+| 50-S076-01 | S076 Art und Zustand der Schutzinfrastruktur → Versagenswahrscheinlichkeit | Basis offen; Maßnahmen: keine nach §3.5 zulässige Effektgröße belegt ⇒ **Abschätzung** r_deich = 0,35 (Band 0,15–0,63; a_def 0,50 × e_def 0,70) · r_ret = 0,24 (Band 0,08–0,48; s_vol 0,60 × e_ret 0,40) | — (keine Interventionsstudie belegt) | Herleitung: Bericht #50 §5.1 (`#s076-wirkung`) | §3.9 ABGESCHÄTZT — im Produkt als „Abschätzung von KAP3" auszuweisen (Vorgabe P2) | kommunal (Pauschalfaktor — Modellgrenze der Abschätzung) | #50 (Vorschlag Vulnerabilität + Maßnahmen-Hebel, abgeschätzt; R7-Weiche) |
+| 50-R17-01 | R17 Oberflächengewässer → Exposition | offen | offen | offen | offen | offen | #50 (offen) |
+| 50-R18-01 | R18 Entwässerungssysteme → Versagen Überflutungsschutz | offen | offen | offen | offen | offen | #50 (offen) |
+| 50-R19-01 | R19 Infrastruktur an Binnengewässern → Mengengerüst (Schutzanlagen) | offen | offen | offen | offen | offen (Ebene §3.1) | #50 (offen) |
+
