@@ -73,3 +73,35 @@ recherchiert; Entscheidungen stehen im Bericht auf `offen`. Einzige bezifferte Z
 | 60-R23-01 | R23 Bau- und Immobilienunternehmen → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
 | 60-R25-01 | R25 Siedlungsinfrastrukturen → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
 
+### #61 — Vegetation in Siedlungen (Erstaufschlag 11.09.2026)
+
+Skelett aus `/neu-risiko 61`: eine Zeile je Knoten der Kette W127 samt W030 (Bericht
+`docs/methodik/61_vegetation_in_siedlungen.md`, Kap. 1/2). Evidenz ist noch nicht recherchiert;
+Entscheidungen stehen im Bericht auf `offen`. Einzige bezifferte Zeile: 61-S099-01 (Abschätzung von
+KAP3 nach Vorgabe P2). **Keine Zeile aus #60 wiederverwendet:** Die gemeinsamen Knoten S096, R23, R24,
+R25 haben dort ein anderes Outcome (Überflutung/Gebäudeschaden), hier Grünunterhalt-Mehrkosten.
+
+| Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | verwendet in |
+|---|---|---|---|---|---|---|---|
+| 61-W030-01 | W030 Arealverschiebung / Standortstress → Vitalitätsverlust Stadtvegetation | offen | offen | offen | offen | offen (Ebene §3.1) | #61 (offen) |
+| 61-E01-01 | E01 Durchschnittstemperatur → W030 | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-E06-01 | E06 Durchschnittlicher Niederschlag → W030 | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S010-01 | S010 Habitat-/Biotoptyp → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S011-01 | S011 Habitat-/Biotopzustand → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S012-01 | S012 Tierart → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S013-01 | S013 Pflanzenart → Ausfall-/Ersatzpflanzungsrate | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S014-01 | S014 Topographie → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S015-01 | S015 Boden-/Vegetationsbedeckung → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S016-01 | S016 Flächenversiegelung → Standortstress Straßenbäume | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S017-01 | S017 Zerschneidung durch Verkehrswege → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S018-01 | S018 Anthropogene Verbreitung von Arten → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S019-01 | S019 Ausbreitungskorridore → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S020-01 | S020 Landwirtschaftliche Nutzung → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-R03-01 | R03 Areale, Arten, Populationen → Mengengerüst | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-R04-01 | R04 Biotope, Habitate, Ökosysteme → Mengengerüst | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-S096-01 | S096 Vorsorge öffentliche Hand → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen; R7) |
+| 61-S099-01 | S099 Begrünung von Städten/Siedlungen → Mengengerüst und Mehrkosten neuer Flächen | Maßnahmen: keine Effektgröße belegt ⇒ **Abschätzung** v_neu = 0,60 (Band 0,40–0,90, Stadtgrün) · v_geb = 0,30 (Band 0,10–0,60, Dach-/Fassadengrün); Mengengerüst offen | — (keine Studie belegt) | Herleitung: Bericht #61 §5.1 (`#s099-wirkung`) | §3.9 ABGESCHÄTZT — im Produkt als „Abschätzung von KAP3" auszuweisen (Vorgabe P2) | kommunal (Pauschalfaktor — Modellgrenze der Abschätzung) | #61 (Vorschlag Mengengerüst + Maßnahmen-Hebel, abgeschätzt) |
+| 61-R23-01 | R23 Bau- und Immobilienunternehmen → Grünunterhalt-Mehrkosten | offen | offen | offen | offen | offen | #61 (offen) |
+| 61-R24-01 | R24 Gebäude → Mengengerüst Gebäudegrün | offen | offen | offen | offen | offen (Ebene §3.1) | #61 (offen) |
+| 61-R25-01 | R25 Siedlungsinfrastrukturen → Mengengerüst Straßenbegleitgrün (K4) | offen | offen | offen | offen | offen (Ebene §3.1) | #61 (offen) |
+
