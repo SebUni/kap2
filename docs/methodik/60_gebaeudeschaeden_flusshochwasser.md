@@ -16,7 +16,7 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 
 - **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`.
 - **Offen:** (1) alle 32 Entscheidungen; (2) Ergebnisgröße und Ansatz (Kap. 9); (3) Datenebenen nach §3.1; (4) R9-Partitionen in K3 mit #92/#102/#55 und R5 über „Wie ID 59“; (5) Volltext-Evidenz zu S092.
-- **Aufwand Erstaufschlag:** 1 Nacharbeitsrunde (Planungszahl korrigiert, Platzhalter-Code-Zaun entfernt). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: rund 0,3 USD. Keine Websuche, also keine externe Evidenz.
+- **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Planungszahl korrigiert, Beispiel-Code-Zaun im Kommentar entfernt; R2: Lint-Funde behoben, Zeichentabelle S092 als eigener Abschnitt, Verweis korrigiert). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: je rund 0,3 USD. Keine Websuche, also keine externe Evidenz.
 - **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
 ## 1 Wirkungskette & Knoten-Bilanz (§2.1)
@@ -97,7 +97,7 @@ KWK = Sheet „Klimawirkungsketten“, NW = „Schadensbaum-Netzwerkliste“, Mo
 - **Rechenregeln:** R7, R9 (Mon. Z65, Spalte „Regeln“); dazu Annahme A5 Ereignislogik (Rechenregeln
   Z20): „Eintrittswahrscheinlichkeit × Schadensfunktion × Bestand; Schutzsysteme über die
   R7-Erwartungswert-Weiche“. R5 ist über „Wie ID 59“ inhaltlich einbezogen, steht aber nicht in der
-  Regelspalte (offener Punkt 5).
+  Regelspalte (offener Punkt 4).
 - **Handlungserfordernis:** sehr dringend (Mon. Z65, NW Z61).
 - **Nur K3 aktiv:** Folgen desselben Ereignisses in K1 (#101), K4 (#74), K5 und K8 (#50) sind nicht
   enthalten — Untergrenze, im Infokasten zu benennen (§3.6).
@@ -224,11 +224,30 @@ Objektschutzes sind K8-Maßnahmenkosten und schließen den verhinderten Schaden 
 
 **Kette.** \(r_{\text{S092}} = \Delta q \cdot s_{\text{bem}} \cdot e_{\text{bem}}\)
 
-| Zeichen | Name | Einheit | Wert (Band) | Herleitung — alle drei Werte sind Abschätzungen von KAP3, keine Primärquelle |
-|---|---|---|---|---|
-| \(\Delta q\) | zusätzlich nachgerüsteter Anteil exponierter Gebäude (marginal gegenüber heute) | – | 0,10 (0,05–0,20) | Annahme: Ein kommunales Förder- und Beratungsprogramm erreicht in einem Planungszeitraum jedes zehnte exponierte Gebäude. Untere Bandgrenze: halbe Reichweite. Obere: doppelte. Marginal, weil vorhandener Objektschutz bereits im Basisschaden steckt (Doppelzählungs-Wächter). |
-| \(e_{\text{bem}}\) | Schadensminderung am nachgerüsteten Gebäude, solange der Wasserstand das Bemessungsniveau nicht übersteigt | – | 0,70 (0,50–0,80) | Annahme: Objektschutz (Abdichtung, Rückstausicherung, angepasste Nutzung) hält Wasser bis zur Schutzhöhe weitgehend fern. Restschaden durch Feuchte, Ausführungsmängel und nicht verschlossene Öffnungen. Obergrenze unter 1, weil kein Objektschutz vollständig dicht ist. |
-| \(s_{\text{bem}}\) | Anteil der Schadenssumme aus Ereignissen unterhalb des Bemessungsniveaus | – | 0,50 (0,30–0,70) | Annahme: Schadenssummen verteilen sich auf häufige flache und seltene tiefe Überflutungen. Oberhalb der Schutzhöhe wird Objektschutz überströmt und wirkt praktisch nicht. Ohne gemessene Tiefenverteilung wird die Mitte gesetzt, Band symmetrisch. |
+### 5.1.1 Zeichentabelle (Kette S092)
+
+| Zeichen | Name | Einheit | Wert/Herkunft |
+|---|---|---|---|
+| \(\Delta q\) | zusätzlich nachgerüsteter Anteil exponierter Gebäude (marginal gegenüber heute) | – | 0,10 (Band 0,05–0,20) · herleitung:#s092-wirkung — Abschätzung von KAP3, keine Primärquelle (§5.1.2) |
+| \(e_{\text{bem}}\) | Schadensminderung am nachgerüsteten Gebäude, solange der Wasserstand das Bemessungsniveau nicht übersteigt | – | 0,70 (Band 0,50–0,80) · herleitung:#s092-wirkung — Abschätzung von KAP3, keine Primärquelle (§5.1.2) |
+| \(r_{\text{S092}}\) | relative Minderung des K3-Erwartungsschadens von #60 durch S092 | – | 0,035 (Band 0,0075–0,112) · berechnet: \(\Delta q \cdot s_{\text{bem}} \cdot e_{\text{bem}}\) (§5.1.2) |
+| \(s_{\text{bem}}\) | Anteil der Schadenssumme aus Ereignissen unterhalb des Bemessungsniveaus | – | 0,50 (Band 0,30–0,70) · herleitung:#s092-wirkung — Abschätzung von KAP3, keine Primärquelle (§5.1.2) |
+
+### 5.1.2 Herleitung, Rechnung und Sensitivität
+
+**Herleitung je Faktor** (alle drei Werte sind Abschätzungen von KAP3, keine Primärquelle):
+
+- \(\Delta q\) = 0,10 (0,05–0,20). Annahme: Ein kommunales Förder- und Beratungsprogramm erreicht in
+  einem Planungszeitraum jedes zehnte exponierte Gebäude. Untere Bandgrenze: halbe Reichweite.
+  Obere: doppelte. Marginal, weil vorhandener Objektschutz bereits im Basisschaden steckt
+  (Doppelzählungs-Wächter).
+- \(e_{\text{bem}}\) = 0,70 (0,50–0,80). Annahme: Objektschutz (Abdichtung, Rückstausicherung,
+  angepasste Nutzung) hält Wasser bis zur Schutzhöhe weitgehend fern. Restschaden durch Feuchte,
+  Ausführungsmängel und nicht verschlossene Öffnungen. Obergrenze unter 1, weil kein Objektschutz
+  vollständig dicht ist.
+- \(s_{\text{bem}}\) = 0,50 (0,30–0,70). Annahme: Schadenssummen verteilen sich auf häufige flache
+  und seltene tiefe Überflutungen. Oberhalb der Schutzhöhe wird Objektschutz überströmt und wirkt
+  praktisch nicht. Ohne gemessene Tiefenverteilung wird die Mitte gesetzt, Band symmetrisch.
 
 Rechnung: \(r_{\text{S092}}\) = 0,10 · 0,50 · 0,70 = **0,035**. Band (alle Enden gleichgerichtet):
 0,05 · 0,30 · 0,50 = **0,0075** bis 0,20 · 0,70 · 0,80 = **0,112**.
