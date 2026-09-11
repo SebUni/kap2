@@ -14,10 +14,10 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 
 ## Ergebnis
 
-- **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`, eine je Knoten), gespiegelt in `docs/evidenz/register.md`; wiederverwendbare Zeilen gab es dort keine (bisher nur K1).
-- **Ausdrücklich offen:** (1) alle 32 Register- und Bilanz-Entscheidungen; (2) native Ergebnisgröße und Wahl des Ansatzes (Kap. 9, Familie K3/K4 neu); (3) HQ-/Wassertiefen-Datenebene und Gebäudebestandswerte nach §3.1 (Quelle, keyless-Status); (4) R9-Partitionen im Konto K3 mit #92/#102 (Hochwasser-Kanten P15/P16) und mit der K3-Direktbuchung von #55 (P5) — die Arbeitsmappe nennt dafür keine Partitionsregel; (5) R5 (Versicherung = Transfer) wird über „Wie ID 59“ geerbt, steht aber nicht in den Regeln der Zeile 65; (6) Zuordnung ID 60 → W117 fehlt im Knoten-Abgleich des Lints; (7) Volltext-Verifikation der Kandidaten-Evidenz zu S092.
-- **Nacharbeitsrunden:** 0 — Gegenprüfung und Revision sind nicht Teil dieses Tickets, die Nacharbeit ist also noch nicht gemessen. **Aufwand des Erstaufschlags:** eine Autor-Session mit 26 Werkzeugaufrufen (davon 3 Schreibvorgänge, 2 Selbstprüfungen, 4 an Rechte-/Syntaxgrenzen gescheitert), rund 3,2 USD Modellbudget. Die Websuche war nicht freigegeben, deshalb ist keine externe Evidenz eingeholt.
-- **Planungshinweis:** Das Beispiel #98 (Familien-Folgerisiko) brauchte laut `reviews/BEFUNDE_98.md` bis zur Null-Runde 23 Review-Runden. #60 gründet eine neue Familie; mit mindestens so vielen Runden ist zu rechnen, plus Evidenz-Recherche, die hier noch fehlt.
+- **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`.
+- **Offen:** (1) alle 32 Entscheidungen; (2) Ergebnisgröße und Ansatz (Kap. 9); (3) Datenebenen nach §3.1; (4) R9-Partitionen in K3 mit #92/#102/#55 und R5 über „Wie ID 59“; (5) Volltext-Evidenz zu S092.
+- **Aufwand Erstaufschlag:** 1 Nacharbeitsrunde (Planungszahl korrigiert, Platzhalter-Code-Zaun entfernt). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: rund 0,3 USD. Keine Websuche, also keine externe Evidenz.
+- **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
 ## 1 Wirkungskette & Knoten-Bilanz (§2.1)
 
@@ -180,10 +180,8 @@ Parameter-Block-Beispiel (Format §4; Werte erst nach Herleitung eintragen):
     bandzuordnung: [<Gebäudetyp/Band>]
     endpunkt: <K3-Wiederherstellung>
 
-Beispiel-Test-Block (Format §4):
-  ```python test: beispiel_60_<name>
+Beispiel-Test-Block (Format §4; im echten Block mit Code-Zaun „python test: beispiel_60_<name>“):
   assert abs(<rechnung> - <erwartet>) < 1e-9
-  ```
 -->
 
 ## 4 Kalibrierung & Validierung (§2.4/§3.4)
