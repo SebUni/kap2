@@ -31,3 +31,45 @@ Ketten-Knoten ist eine Zeile mit Entscheidung „bewusst inaktiv" — keine stil
 | 98-OUT-01 | Berufliche Außenexposition → SCC | OR 1,77 [1,37–2,30] (Fall-Kontrolle), 1,68 [1,08–2,63] (Kohorten); q̄_out 0,070 (VGR 2023) | Meta-Analyse (BK-5103-Grundlage) | Schmitt 2011 (Br J Dermatol 164:291); Destatis VGR | DE; kein Knoten der W186-Kette (Bericht Kap. 1) | INKAR/SVB-Branchen (Ebene neu) | #98 (Sensitivitätsband, Default 1) — wiederverwendbar (#87/K2, Außenberufe-Hitze) |
 | 98-K1-01 | Hautkrebs-Fall → Erstjahres-Behandlungskosten | MM 5.326/9.038 €₂₀₁₅ (SCS-/nicht-SCS-detektiert) ⇒ 6.724/11.410 €₂₀₂₄; NMSC 4.660/5.890 ⇒ 5.883/7.436; SCS-DiD −18,8 % [8,4–23,1] | Krankenkassen-Routinedaten (DiD) | Speckemeier 2022 (BMC Health Serv Res 22:749) | DE, Kohorte 2014/15; Proxy-Kennzeichnung (Bericht §3.4) | national | #98 (Basiswert + Band; Maßnahmen-Hebel SCS) |
 
+### #60 — Schäden an Gebäuden aufgrund von Flusshochwasser (Erstaufschlag 11.09.2026)
+
+Skelett aus `/neu-risiko 60`: eine Zeile je Knoten der Kette W117 samt W085 (Bericht
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, Kap. 1/2). Evidenz ist noch nicht
+recherchiert; Entscheidungen stehen im Bericht auf `offen`. Einzige bezifferte Zeile: 60-S092-01
+(Abschätzung von KAP3 nach Vorgabe P2).
+
+| Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | verwendet in |
+|---|---|---|---|---|---|---|---|
+| 60-W085-01 | W085 Hochwasser → Überflutungswahrscheinlichkeit/-tiefe am Gebäude | offen | offen | offen | offen | offen (Ebene §3.1) | #60 (offen) |
+| 60-E12-01 | E12 Schneeschmelze → W085 | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-E07-01 | E07 Nässe → W085 | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-E08-01 | E08 Starkregen → W085 / Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-S072-01 | S072 Boden-/Vegetationsbedeckung → Abfluss | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-S073-01 | S073 Flächenversiegelung → Abfluss | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-S074-01 | S074 Topographie → Wassertiefe am Gebäude | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-R17-01 | R17 Oberflächengewässer → Exposition | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-R18-01 | R18 Entwässerungssysteme → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-R19-01 | R19 Infrastruktur an Binnengewässern → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-E10-01 | E10 Hagel → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-E17-01 | E17 Starkwind → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-E14-01 | E14 Schnee- und Eisdruck → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-E02-01 | E02 Hitze → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-E03-01 | E03 Kälte / Frost → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-W074-01 | W074 Meeresspiegelhöhe → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-W077-01 | W077 Sturmfluten → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-W087-01 | W087 Sturzfluten → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-W008-01 | W008 Bergsturz, Felssturz, Steinschlag → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-W006-01 | W006 Rutschungen und Muren → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-W091-01 | W091 Grundwasserstand → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-W100-01 | W100 Kanalnetze/Vorfluter → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-S092-01 | S092 Objektschutz der Eigentümer → Gebäudeschaden (K3) | keine nach §3.5 zulässige Effektgröße belegt ⇒ **Abschätzung** r_S092 = 0,035 (Band 0,0075–0,112; Kette Δq 0,10 × s_bem 0,50 × e_bem 0,70) | — (keine Interventionsstudie belegt) | Herleitung: Bericht #60 §5.1 (`#s092-wirkung`) | §3.9 ABGESCHÄTZT — im Produkt als „Abschätzung von KAP3" auszuweisen (Vorgabe P2) | kommunal (Pauschalfaktor — Modellgrenze der Abschätzung) | #60 (Vorschlag Maßnahmen-Hebel, abgeschätzt) |
+| 60-S093-01 | S093 Gebäudezustand → Schadensgrad | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-S094-01 | S094 Baumaterialien → Schadensgrad | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-S096-01 | S096 Vorsorge öffentliche Hand → Überflutungswahrscheinlichkeit | offen | offen | offen | offen | offen | #60 (offen; R7 mit #50) |
+| 60-S097-01 | S097 Zustand Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | #60 (offen; R7 mit #50) |
+| 60-S098-01 | S098 Baumaterialien Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | #60 (offen; R7 mit #50) |
+| 60-S104-01 | S104 Investitionen in exponierten Gebieten → Bestandsentwicklung | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-R24-01 | R24 Gebäude → Mengengerüst (Gebäudewerte) | offen | offen | offen | offen | offen (Ebene §3.1) | #60 (offen) |
+| 60-R23-01 | R23 Bau- und Immobilienunternehmen → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+| 60-R25-01 | R25 Siedlungsinfrastrukturen → Gebäudeschaden | offen | offen | offen | offen | offen | #60 (offen) |
+
