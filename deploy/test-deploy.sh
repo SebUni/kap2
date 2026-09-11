@@ -175,10 +175,13 @@ speicher_zeile "nach frontend-build"
 SCHRITT="datenbank"
 cd "$PRODUKT/backend"
 mkdir -p logs
-"$VENV/bin/alembic" upgrade head || echo "Warnung: alembic upgrade head fehlgeschlagen — Tabellen werden beim Start per create_all angelegt"
+if ! "$VENV/bin/alembic" upgrade head; then
+  echo "Warnung: alembic upgrade head fehlgeschlagen — Tabellen werden beim Start per create_all angelegt"
+  echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head), Fortsetzung mit create_all-Fallback"
+fi
 
 SCHRITT="dienst"
-sudo /bin/systemctl restart kap2-test
+/bin/systemctl restart kap2-test
 for i in $(seq 1 60); do
   if curl -sf http://127.0.0.1:8010/api/health >/dev/null; then echo "Backend gesund nach ${i}x2s"; break; fi
   if [[ $i -eq 60 ]]; then echo "Backend antwortet nicht"; false; fi
