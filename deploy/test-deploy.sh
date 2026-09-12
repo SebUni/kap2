@@ -181,7 +181,15 @@ if ! "$VENV/bin/alembic" upgrade head; then
 fi
 
 SCHRITT="dienst"
-/bin/systemctl restart kap2-test
+# T-0195: kap2-test.service ist eine systemd-USER-Unit von "overlord" (siehe deploy/kap2-test.service),
+# kein System-Dienst mehr -- ein Neustart braucht dadurch keine Rechteausweitung mehr (weder sudo,
+# das an der "no new privileges"-Sperre des Deploy-Laufs zuverlaessig scheitert, noch eine
+# Polkit-Regel fuer den System-Dienst). XDG_RUNTIME_DIR wird defensiv gesetzt, falls der Lauf ohne
+# vollstaendige Anmeldesitzung von "overlord" gestartet wird (Watcher/Cron); ohne "loginctl
+# enable-linger overlord" (einmalig auf dem Server, siehe deploy/README.md) faende systemctl --user
+# sonst keinen laufenden User-Bus.
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+systemctl --user restart kap2-test
 for i in $(seq 1 60); do
   if curl -sf http://127.0.0.1:8010/api/health >/dev/null; then echo "Backend gesund nach ${i}x2s"; break; fi
   if [[ $i -eq 60 ]]; then echo "Backend antwortet nicht"; false; fi
