@@ -1,4 +1,8 @@
 import logging
+import os
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -200,6 +204,38 @@ def _migrate_status_columns(engine):
             conn.execute(text("ALTER TYPE assessmentstatus ADD VALUE IF NOT EXISTS 'QUEUED'"))
 
 
+# T-0197: Zeitpunkt des Prozessstarts und ausgelieferter Commit. Der Deploy-Lauf prueft damit,
+# dass auf Port 8010 wirklich der neu gestartete Prozess mit dem gerade ausgerollten Stand
+# antwortet -- vorher konnte ein weiterlaufender alter Prozess den Health-Check gruen faerben
+# und das Deployment faelschlich als "fertig" melden.
+PROZESS_START = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _commit() -> str | None:
+    """Kurzform des ausgelieferten Git-Standes; None, wenn nicht ermittelbar."""
+    gesetzt = os.environ.get("KAP2_DEPLOY_COMMIT")
+    if gesetzt:
+        return gesetzt
+    try:
+        ergebnis = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=Path(__file__).resolve().parents[2],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except Exception:  # pragma: no cover - kein git im Bild
+        return None
+    if ergebnis.returncode != 0:
+        return None
+    return ergebnis.stdout.strip() or None
+
+
+# Einmal beim Prozessstart ermitteln: /api/health darf kein git aufrufen (Laufzeit, Nebenwirkungen).
+COMMIT = _commit()
+
+
 @app.get("/api/health")
 def health():
-    return {"status": "ok"}
+    # Rein additiv: "status" bleibt unveraendert, Bestandsaufrufer merken die Erweiterung nicht.
+    return {"status": "ok", "commit": COMMIT, "gestartet": PROZESS_START}

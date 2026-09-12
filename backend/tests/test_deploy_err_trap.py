@@ -121,6 +121,11 @@ def _werkbank(tmp_path: Path, set_zeile: str) -> tuple[Path, dict[str, str]]:
                 'COMMIT="4fa6eeb8"',
                 'SCHRITT="status"',
                 'KAP2_TEST_URL="http://kap2-test.example"',
+                # Seit T-0169 liest status_lokal_schreiben PASSWORT_QUELLE; die Zuweisung steht
+                # im echten Skript oberhalb des uebernommenen Funktionsblocks. Ohne sie bricht
+                # die Werkbank unter "set -u" mit "unbound variable" ab, bevor der ERR-Trap
+                # ueberhaupt zum Zug kommt -- gepruefte Wirkung waere dann eine andere.
+                'PASSWORT_QUELLE="/etc/overlord/kap2-test.env"',
                 _funktionsblock(),
                 'status_schreiben fertig ""',
                 'echo "== fertig: $KAP2_TEST_URL ($COMMIT)"',

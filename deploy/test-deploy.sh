@@ -187,10 +187,63 @@ if ! "$VENV/bin/alembic" upgrade head; then
 fi
 
 SCHRITT="dienst"
-/bin/systemctl restart kap2-test
+# T-0197: kap2-test.service ist eine System-Unit und wird ohne sudo neu gestartet. "systemctl
+# restart" schickt dazu eine D-Bus-Anfrage an PID 1, die polkit fragt; die Berechtigung liegt auf
+# dem Server als .pkla-Regel (polkit 0.105 kennt keine JavaScript-Regeln). Das funktioniert auch
+# unter der "no new privileges"-Sperre des Deploy-Laufs, an der sudo scheitert, weil kein
+# setuid-Programm ausgefuehrt wird.
+# Vorbedingung ausdruecklich pruefen: fehlt die Unit, soll der Lauf mit einer verstaendlichen
+# Anweisung abbrechen statt mit einer nackten systemctl-Fehlermeldung. Die polkit-Regel wird
+# bewusst NICHT vorab geprueft (sie kann als .pkla oder .rules vorliegen) -- ihr Fehlen zeigt
+# sich am abgelehnten Neustart, und dort steht der noetige Handgriff woertlich.
+if ! /bin/systemctl list-unit-files kap2-test.service >/dev/null 2>&1 \
+   || ! /bin/systemctl cat kap2-test.service >/dev/null 2>&1; then
+  echo "!! kap2-test.service ist auf diesem Server nicht installiert."
+  echo "   Einmalig als root: cp $PRODUKT/deploy/kap2-test.service /etc/systemd/system/kap2-test.service &&"
+  echo "   systemctl daemon-reload && systemctl enable --now kap2-test"
+  false
+fi
+ALT_PID=$(/bin/systemctl show -p MainPID --value kap2-test 2>/dev/null || echo 0)
+if ! /bin/systemctl restart kap2-test; then
+  echo "!! Neustart von kap2-test abgelehnt (fehlendes Recht oder kein D-Bus-Zugang)."
+  echo "   Einmalig als root die polkit-Regel anlegen (polkit 0.105, deshalb .pkla, nicht .rules):"
+  echo "   /etc/polkit-1/localauthority/50-local.d/50-kap2-test.pkla -- sie erlaubt dem Benutzer"
+  echo "   overlord org.freedesktop.systemd1.manage-units fuer die Unit-Datei"
+  echo "   /etc/systemd/system/kap2-test.service; danach: systemctl restart polkit"
+  echo "   Der Schritt wird bewusst NICHT uebersprungen -- ohne Neustart laeuft der alte Stand."
+  false
+fi
+# Beweis, dass wirklich ein neuer Prozess laeuft: MainPID muss sich geaendert haben und != 0 sein.
+NEU_PID=""
+for i in $(seq 1 30); do
+  NEU_PID=$(/bin/systemctl show -p MainPID --value kap2-test 2>/dev/null || echo 0)
+  if [[ -n "$NEU_PID" && "$NEU_PID" != "0" && "$NEU_PID" != "$ALT_PID" ]]; then break; fi
+  if [[ $i -eq 30 ]]; then
+    echo "!! kap2-test hat nach dem Neustart keinen neuen Hauptprozess (alt=$ALT_PID, jetzt=${NEU_PID:-leer})"
+    false
+  fi
+  sleep 1
+done
+echo "kap2-test neu gestartet: MainPID $ALT_PID -> $NEU_PID"
+# Health-Check gegen die Identitaet des neuen Prozesses: /api/health meldet seit T-0197 den
+# ausgelieferten Commit. Antwortet noch ein alter Prozess auf Port 8010 (etwa eine vergessene
+# zweite Unit), meldet er einen anderen Commit -- der Lauf gilt dann als gescheitert, statt
+# faelschlich "fertig" zu melden.
 for i in $(seq 1 60); do
-  if curl -sf http://127.0.0.1:8010/api/health >/dev/null; then echo "Backend gesund nach ${i}x2s"; break; fi
-  if [[ $i -eq 60 ]]; then echo "Backend antwortet nicht"; false; fi
+  ANTWORT=$(curl -sf http://127.0.0.1:8010/api/health || true)
+  if [[ -n "$ANTWORT" ]]; then
+    GEMELDET=$(printf '%s' "$ANTWORT" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("commit") or "")' 2>/dev/null || true)
+    if [[ "$GEMELDET" == "$COMMIT" ]]; then echo "Backend gesund nach ${i}x2s (Commit $GEMELDET)"; break; fi
+  fi
+  if [[ $i -eq 60 ]]; then
+    if [[ -z "$ANTWORT" ]]; then
+      echo "Backend antwortet nicht"
+    else
+      echo "!! Auf 127.0.0.1:8010 antwortet nicht der neu ausgerollte Stand:"
+      echo "   erwartet Commit $COMMIT, gemeldet '${GEMELDET:-unbekannt}' (Antwort: $ANTWORT)"
+    fi
+    false
+  fi
   sleep 2
 done
 
