@@ -10,7 +10,6 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 import geoalchemy2
-from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
@@ -25,7 +24,7 @@ def upgrade() -> None:
     op.create_table('risk_zones',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('kommune_id', sa.Integer(), nullable=False),
-    sa.Column('climate_type', postgresql.ENUM('HEAT', 'HEAVY_RAIN', 'RIVER_FLOOD', 'DROUGHT', 'FOREST_FIRE', 'AGRICULTURE', 'STORMS', 'SEA_LEVEL', 'HEALTH', name='climatetype', create_type=False), nullable=False),
+    sa.Column('layer_code', sa.String(64), nullable=False),
     sa.Column('level', sa.Integer(), nullable=False),
     sa.Column('zone_index', sa.Integer(), nullable=False),
     sa.Column('cell_count', sa.Integer(), nullable=False),
@@ -36,7 +35,7 @@ def upgrade() -> None:
     sa.Column('calculated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['kommune_id'], ['kommunen.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('kommune_id', 'climate_type', 'level', 'zone_index', name='uq_risk_zone_kommune_type_level_idx')
+    sa.UniqueConstraint('kommune_id', 'layer_code', 'level', 'zone_index', name='uq_risk_zone_kommune_layer_level_idx')
     )
     op.create_index(op.f('ix_risk_zones_id'), 'risk_zones', ['id'], unique=False)
     op.create_table('risk_zone_cells',
