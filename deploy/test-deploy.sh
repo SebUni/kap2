@@ -39,10 +39,10 @@ FIRMA=/opt/overlord/firma-deploy
 VENV=/opt/overlord/kap2-venv
 ENV_DATEI=/etc/overlord/kap2-test.env
 PROTOKOLL=/var/log/overlord/deploy.log
-# Pfad der Datei auf dem Server, in der das Zugangspasswort der Testumgebung liegt (Rechte 600).
-# Die Quelle des Passworts selbst bleibt unveraendert (ENV_DATEI); nur dieser Pfad -- nie der
-# Passwortwert -- geht in die Statusdatei des Firmen-Repos (T-0169).
-PASSWORT_QUELLE=/etc/overlord/testumgebung.env
+# Passwort selbst geht nie in die Statusdatei des Firmen-Repos (T-0169): nur der Pfad der
+# Datei auf dem Server, in der es tatsaechlich liegt -- das ist ENV_DATEI (Rechte 600),
+# aus der es unten per "source" bezogen wird.
+PASSWORT_QUELLE="$ENV_DATEI"
 SCHRITT="start"; COMMIT=""
 set -a; source "$ENV_DATEI"; set +a
 
