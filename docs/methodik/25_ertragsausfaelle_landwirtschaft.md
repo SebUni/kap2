@@ -17,7 +17,7 @@ Prototyp, dieser Bericht ist der erste Vertreter** (§2.6; Entscheidungslog Nr. 
 - **Slug:** `25_ertragsausfaelle_landwirtschaft`. **Registerzeilen:** 31 (`25-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`.
 - **Offen:** (1) alle 31 Entscheidungen; (2) Ergebnisgröße und Ansatz (Kap. 9); (3) Datenebenen nach §3.1 (Anbaufläche/Fruchtarten, Deckungsbeiträge, Bodenwasser); (4) R9-Partition in K6 gegenüber #26 (Preis), #19 (Bestand, R1), #20 (Tier) und dem K6-Zweig von #47; (5) Ausgangskante 25 → 20 (Abgleich P19): Wirkungsweg und Doppelzählungsschutz sind in den Mappen nicht beziffert; (6) Mon. Z26 (#21) nennt als Ziele „Menge (ID 26) und Qualität (ID 27)“ — gegen NW Z26/Z27 um eins verschoben, wörtlich übernommen, nicht korrigiert (eiserne Regel 2).
 - **Meilenstein M1:** Die Knoten-Bilanz (Abschnitt „Zehn Treiber, ein Sammelpunkt“) beantwortet die Ticket-Frage: **alle zehn Eingänge (Rolle „Treiber (0 €)“) erreichen ihren Euro über #25**; für #13, #21 und #23 ist #25 der einzige Mengen-Euro-Weg, #56 hängt über die R7-Weiche daran.
-- **Aufwand Erstaufschlag:** 0 Nacharbeitsrunden (eine Session, 11 Werkzeugaufrufe). Keine Websuche, also keine externe Evidenz.
+- **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Fundstellen-Korrektur „Konten Z31“ → „Konten Z4“ in Kap. 1 und Kap. 8; R2: Aufwand-Zeile auf die tatsächlich gelaufenen Nacharbeitsrunden gesetzt). Keine Websuche, also keine externe Evidenz.
 - **Planung:** Gegenprüfung, Revision, Integration und PDF-Export sind nicht Teil des Tickets.
 
 ## 1 Wirkungskette & Knoten-Bilanz (§2.1)
