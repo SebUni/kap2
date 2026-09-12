@@ -153,3 +153,47 @@ zwei Zustände einer R7-Weiche, die Herleitung steht im Bericht Kap. 1.3.
 | 47-R15-01 | R15 Vorkommen von Meeren → Exposition | offen | offen | offen | offen | offen | #47 (offen; Kandidat bewusst inaktiv, redundant zu R14) |
 | 47-R16-01 | R16 Bauwerke und Infrastruktur in der Küstenzone → Mengengerüst (Siele, Schöpfwerke, entwässerte Niederungsfläche) | offen | offen | offen | offen | offen (Ebene §3.1) | #47 (offen) |
 
+### #25 — Ertragsausfälle (Landwirtschaft) (Erstaufschlag 12.09.2026)
+
+Skelett aus `/neu-risiko 25`: eine Zeile je Knoten der Kette W052 samt den drei Netzwerklisten-Eingängen
+ohne W052-Kante (Bericht `docs/methodik/25_ertragsausfaelle_landwirtschaft.md`, Kap. 1/2). Evidenz ist
+noch nicht recherchiert; Entscheidungen stehen im Bericht auf `offen`. Einzige bezifferte Zeile:
+25-S027-01 (Abschätzung von KAP3 nach Vorgabe P2). **Keine Zeile aus #47 wiederverwendet:** #47 trägt
+denselben Baustein „K6-Mengeneffekt Pflanze“, dort ist das Outcome die vernässte Niederungsfläche, hier
+der Mengenverlust je Fruchtart. Sammel-Buchungsobjekt (R9) von zehn Treibern — Nachweis im Bericht
+Kap. 1 („Zehn Treiber, ein Sammelpunkt“).
+
+| Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | verwendet in |
+|---|---|---|---|---|---|---|---|
+| 25-W003-01 | W003 Wassermangel im Boden → Mengenverlust je Fruchtart | offen | offen | offen | offen | offen (Ebene §3.1) | #25 (offen) |
+| 25-W004-01 | W004 Vernässung → Mengenverlust / Bewirtschaftungsausfall | offen | offen | offen | offen | offen (Ebene §3.1) | #25 (offen) |
+| 25-W044-01 | W044 Schädlinge und Krankheiten → Mengenverlust | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-W045-01 | W045 Abiotischer Stress (Hitze, Spätfrost, Hagel) → Mengenverlust | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-W046-01 | W046 Agrophänologische Phasen → Mengenverlust | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-W047-01 | W047 Verschiebung von Anbaugebieten → Deckungsbeitrags-Differenz | offen | offen | offen | offen | offen | #25 (offen; R8-Vorzeichen) |
+| 25-W048-01 | W048 Anbau neuer Sorten → Mengenverlust | offen | offen | offen | offen | offen | #25 (offen; Kandidat bewusst inaktiv/Hebel) |
+| 25-W096-01 | W096 Bewässerungswasser → Mengenverlust unbewässerter Flächen | offen | offen | offen | offen | offen | #25 (offen; R7-Weiche mit #56) |
+| 25-W017-01 | W017 Filter-/Pufferfunktionen → Mengenverlust | offen | offen | offen | offen | offen | #25 (offen; Kandidat bewusst inaktiv, → K7) |
+| 25-W019-01 | W019 Produktionsfunktionen → Mengenverlust (Strom) | offen | offen | offen | offen | offen | #25 (offen; R1-Weiche mit #19) |
+| 25-W020-01 | W020 Nährstoffspeicherfunktionen → Mengenverlust | offen | offen | offen | offen | offen | #25 (offen; Kandidat bewusst inaktiv, R10) |
+| 25-W009-01 | W009 Bodenerosion durch Wasser → Mengenverlust on-site | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-W010-01 | W010 Bodenerosion durch Wind → Mengenverlust on-site | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-W021-01 | W021 Länge der Vegetationsperiode → Mengenverlust | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-W022-01 | W022 Phänologie → W046/W047 | offen | offen | offen | offen | offen | #25 (offen; Doppelkanal §3.2) |
+| 25-S021-01 | S021 Bodenart und Bodentyp → Stressempfindlichkeit des Ertrags | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-S022-01 | S022 Bodenfruchtbarkeit → Ertragsniveau | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-S023-01 | S023 Wasserrückhaltekapazität → Trockenstress-Ertragsverlust | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-S024-01 | S024 Infiltrationskapazität → Vernässungs-/Erosions-Ertragsverlust | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-S025-01 | S025 Anbaufrucht → Deckungsbeitrag und Stresstoleranz (Bandzuordnung) | offen | offen | offen | offen | offen (Ebene §3.1) | #25 (offen) |
+| 25-S026-01 | S026 Tierart → Mengenverlust Pflanze | offen | offen | offen | offen | offen | #25 (offen; Kandidat bewusst inaktiv, → #20) |
+| 25-S027-01 | S027 Bewässerung → Mengenverlust (Hebel Wasserspeicher, effiziente Bewässerung) | keine nach §3.5 zulässige Effektgröße belegt ⇒ **Abschätzung** r_S027 = 0,0264 (Band 0,0056–0,09; Kette Δa 0,08 × s_tr 0,55 × e_bew 0,60) | — (keine Interventionsstudie belegt) | Herleitung: Bericht #25 §5.1 (`#s027-wirkung`) | §3.9 ABGESCHÄTZT — im Produkt als „Abschätzung von KAP3" auszuweisen (Vorgabe P2); Bauformgrenze Dauer-/Sonderkulturen dokumentiert | kommunal (Pauschalfaktor — Modellgrenze der Abschätzung) | #25 (Vorschlag Maßnahmen-Hebel, abgeschätzt; R7-Weiche mit #56) |
+| 25-S028-01 | S028 Art der Bewirtschaftung → Mengenverlust | offen | offen | offen | offen | offen | #25 (offen) |
+| 25-S029-01 | S029 Dünger- und Pestizideinsatz → Mengenverlust | offen | offen | offen | offen | offen | #25 (offen; R7 mit K8) |
+| 25-S030-01 | S030 Züchterischer Fortschritt → Referenzertrags-Trend | offen | offen | offen | offen | offen | #25 (offen; Kalibrierung) |
+| 25-S031-01 | S031 Möglichkeiten der Veterinärmedizin → Mengenverlust Pflanze | offen | offen | offen | offen | offen | #25 (offen; Kandidat bewusst inaktiv, → #20) |
+| 25-S032-01 | S032 Vorhandensein von Hagelschutz → Mengenverlust (Hagel) | offen | offen | offen | offen | offen | #25 (offen; Kandidat Hebel) |
+| 25-R05-01 | R05 Landwirtschaftliche Nutzfläche → Mengengerüst (ha) | offen | offen | offen | offen | offen (Ebene §3.1) | #25 (offen) |
+| 25-R06-01 | R06 Anbauart → Mengengerüst je Fruchtart | offen | offen | offen | offen | offen (Ebene §3.1) | #25 (offen) |
+| 25-R07-01 | R07 Tierhaltung → Mengenverlust Pflanze | offen | offen | offen | offen | offen | #25 (offen; Kandidat bewusst inaktiv, → #20) |
+| 25-R08-01 | R08 Landwirtschaftliche Infrastruktur → Bewässerungs-/Speicherkapazität | offen | offen | offen | offen | offen | #25 (offen) |
+
