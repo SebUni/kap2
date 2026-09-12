@@ -13,6 +13,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.config import settings
 from app.db.database import Base
 from app.models.models import *  # noqa: F401,F403 – register all models
+from app.models.auth_models import *  # noqa: F401,F403 – users, user_sessions, user_kommunen
+from app.models.demo_models import *  # noqa: F401,F403 – demo_sessions, app_settings
+from app.models.lite_models import *  # noqa: F401,F403 – gemeinden, lite-Ergebnisse/-Batches
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
