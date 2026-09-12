@@ -1,0 +1,34 @@
+/* T-0195 -- Installation: als root nach /etc/polkit-1/rules.d/50-kap2-test.rules
+ * (Datei root:root 0644), danach "systemctl restart polkit". Siehe deploy/README.md.
+ *
+ * Zweck: Der Deploy-Lauf (deploy/test-deploy.sh, Benutzer "overlord", nicht interaktiv)
+ * muss kap2-test.service neu starten duerfen. Ueber sudo geht das nicht: der aufrufende
+ * Prozess traegt die "no new privileges"-Sperre, unter der sudo grundsaetzlich nicht mehr
+ * nach root wechseln kann -- das laesst sich durch keine sudoers-Zeile beheben.
+ * "systemctl restart" ohne sudo schickt dagegen eine D-Bus-Anfrage an PID 1; PID 1 fragt
+ * Polkit, ob der Aufrufer das darf. Dabei wird kein setuid-Programm ausgefuehrt, die Sperre
+ * greift also nicht. Diese Regel ist damit der kleinste Eingriff, der den Fehler behebt:
+ * die Unit bleibt eine System-Unit (Boot-Start, Ordnung gegen postgresql.service,
+ * User=overlord bleibt erhalten), und es wird genau ein Dienst fuer genau einen Benutzer
+ * freigegeben -- keine allgemeine Rechteausweitung.
+ *
+ * Bewusst eng gefasst: nur der Benutzer "overlord", nur die Unit "kap2-test.service", nur
+ * start/stop/restart/reload und Statusabfragen. "auth_admin" waere im nicht interaktiven
+ * Lauf wirkungslos (niemand kann ein Passwort eingeben), deshalb "yes".
+ */
+polkit.addRule(function (action, subject) {
+    if (subject.user !== "overlord") {
+        return polkit.Result.NOT_HANDLED;
+    }
+    if (action.id !== "org.freedesktop.systemd1.manage-units") {
+        return polkit.Result.NOT_HANDLED;
+    }
+    if (action.lookup("unit") !== "kap2-test.service") {
+        return polkit.Result.NOT_HANDLED;
+    }
+    var verb = action.lookup("verb");
+    if (["start", "stop", "restart", "try-restart", "reload-or-restart", "status"].indexOf(verb) < 0) {
+        return polkit.Result.NOT_HANDLED;
+    }
+    return polkit.Result.YES;
+});

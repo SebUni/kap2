@@ -1,22 +1,21 @@
-# T-0195: als systemd-USER-Unit fuer "overlord" installiert (~/.config/systemd/user/kap2-test.service),
-# nicht mehr als System-Unit unter /etc/systemd/system. Ein Neustart per System-Unit braucht
-# root-Rechte, die der nicht-interaktive Deploy-Lauf nur ueber sudo oder eine Polkit-Regel
-# bekommen koennte; sudo scheitert dort zuverlaessig an der "no new privileges"-Sperre des
-# aufrufenden Prozesses (das Deploy-Skript kann diese Sperre nicht aufheben), und eine fehlende
-# oder unvollstaendige Polkit-Regel liegt ausserhalb dieses Repos. Als User-Unit verwaltet
-# "overlord" den Dienst ueber seine eigene systemd-Instanz (systemctl --user) -- das braucht
-# keinerlei Rechteausweitung. Einmalig auf dem Server noetig: "loginctl enable-linger overlord",
-# damit die User-Instanz auch ohne aktive Anmeldesitzung laeuft (siehe deploy/README.md).
-# "After=postgresql.service" entfaellt: eine User-Unit kann nicht gegen eine System-Unit ordnen
-# (kein gemeinsamer Bus/keine gemeinsame Transaktion); Restart=on-failure faengt einen zu fruehen
-# Start bereits ab, da Postgres auf diesem Server durchgehend laeuft.
+# System-Unit nach /etc/systemd/system/kap2-test.service.
+# T-0195: Der Neustart aus dem Deploy-Lauf braucht keine Rechteausweitung per sudo mehr
+# (sudo scheitert dort an der "no new privileges"-Sperre des aufrufenden Prozesses und laesst
+# sich per sudoers nicht reparieren), sondern laeuft ueber die Polkit-Regel
+# deploy/polkit-kap2-test.rules: "systemctl restart kap2-test" spricht per D-Bus mit PID 1,
+# und PID 1 fragt Polkit -- das ist von NoNewPrivileges nicht betroffen, weil kein setuid-Programm
+# ausgefuehrt wird. Deshalb bleibt dies bewusst eine System-Unit: sie startet beim Boot ohne
+# "loginctl enable-linger", kann gegen postgresql.service ordnen und behaelt User=/Group=overlord.
+# User=/Group= sind zwingend: ohne sie liefe uvicorn hier als root.
 [Unit]
 Description=KAP2 Testumgebung (uvicorn)
-After=network-online.target
+After=network-online.target postgresql.service
 Wants=network-online.target
 
 [Service]
 Type=simple
+User=overlord
+Group=overlord
 WorkingDirectory=/opt/overlord/kap2/backend
 EnvironmentFile=/etc/overlord/kap2-test.env
 ExecStart=/opt/overlord/kap2-venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8010
@@ -26,4 +25,4 @@ KillMode=mixed
 TimeoutStopSec=30
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

@@ -181,18 +181,59 @@ if ! "$VENV/bin/alembic" upgrade head; then
 fi
 
 SCHRITT="dienst"
-# T-0195: kap2-test.service ist eine systemd-USER-Unit von "overlord" (siehe deploy/kap2-test.service),
-# kein System-Dienst mehr -- ein Neustart braucht dadurch keine Rechteausweitung mehr (weder sudo,
-# das an der "no new privileges"-Sperre des Deploy-Laufs zuverlaessig scheitert, noch eine
-# Polkit-Regel fuer den System-Dienst). XDG_RUNTIME_DIR wird defensiv gesetzt, falls der Lauf ohne
-# vollstaendige Anmeldesitzung von "overlord" gestartet wird (Watcher/Cron); ohne "loginctl
-# enable-linger overlord" (einmalig auf dem Server, siehe deploy/README.md) faende systemctl --user
-# sonst keinen laufenden User-Bus.
-export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-systemctl --user restart kap2-test
+# T-0195: kap2-test.service ist eine System-Unit und wird ohne sudo neu gestartet. "systemctl
+# restart" schickt dazu eine D-Bus-Anfrage an PID 1, die Polkit fragt (deploy/polkit-kap2-test.rules
+# gibt genau diese Unit fuer den Benutzer overlord frei). Das funktioniert auch unter der
+# "no new privileges"-Sperre des Deploy-Laufs, an der sudo scheitert, weil kein setuid-Programm
+# ausgefuehrt wird.
+# Vorbedingungen ausdruecklich pruefen: fehlt Unit oder Recht, soll der Lauf mit einer
+# verstaendlichen Anweisung abbrechen statt mit einer nackten systemctl-Fehlermeldung.
+if ! systemctl list-unit-files kap2-test.service >/dev/null 2>&1 \
+   || ! systemctl cat kap2-test.service >/dev/null 2>&1; then
+  echo "!! kap2-test.service ist auf diesem Server nicht installiert."
+  echo "   Einmalig als root: cp $PRODUKT/deploy/kap2-test.service /etc/systemd/system/ &&"
+  echo "   systemctl daemon-reload && systemctl enable --now kap2-test"
+  false
+fi
+ALT_PID=$(systemctl show -p MainPID --value kap2-test 2>/dev/null || echo 0)
+if ! systemctl restart kap2-test; then
+  echo "!! Neustart von kap2-test abgelehnt (fehlendes Recht oder kein D-Bus-Zugang)."
+  echo "   Einmalig als root: cp $PRODUKT/deploy/polkit-kap2-test.rules \\"
+  echo "     /etc/polkit-1/rules.d/50-kap2-test.rules && systemctl restart polkit"
+  echo "   Der Schritt wird bewusst NICHT uebersprungen -- ohne Neustart laeuft der alte Stand."
+  false
+fi
+# Beweis, dass wirklich ein neuer Prozess laeuft: MainPID muss sich geaendert haben und != 0 sein.
+NEU_PID=""
+for i in $(seq 1 30); do
+  NEU_PID=$(systemctl show -p MainPID --value kap2-test 2>/dev/null || echo 0)
+  if [[ -n "$NEU_PID" && "$NEU_PID" != "0" && "$NEU_PID" != "$ALT_PID" ]]; then break; fi
+  if [[ $i -eq 30 ]]; then
+    echo "!! kap2-test hat nach dem Neustart keinen neuen Hauptprozess (alt=$ALT_PID, jetzt=${NEU_PID:-leer})"
+    false
+  fi
+  sleep 1
+done
+echo "kap2-test neu gestartet: MainPID $ALT_PID -> $NEU_PID"
+# Health-Check gegen die Identitaet des neuen Prozesses: /api/health meldet seit T-0195 den
+# ausgelieferten Commit. Antwortet noch ein alter Prozess auf Port 8010 (etwa eine vergessene
+# zweite Unit), meldet er einen anderen Commit -- der Lauf gilt dann als gescheitert, statt
+# faelschlich "fertig" zu melden.
 for i in $(seq 1 60); do
-  if curl -sf http://127.0.0.1:8010/api/health >/dev/null; then echo "Backend gesund nach ${i}x2s"; break; fi
-  if [[ $i -eq 60 ]]; then echo "Backend antwortet nicht"; false; fi
+  ANTWORT=$(curl -sf http://127.0.0.1:8010/api/health || true)
+  if [[ -n "$ANTWORT" ]]; then
+    GEMELDET=$(printf '%s' "$ANTWORT" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("commit") or "")' 2>/dev/null || true)
+    if [[ "$GEMELDET" == "$COMMIT" ]]; then echo "Backend gesund nach ${i}x2s (Commit $GEMELDET)"; break; fi
+  fi
+  if [[ $i -eq 60 ]]; then
+    if [[ -z "$ANTWORT" ]]; then
+      echo "Backend antwortet nicht"
+    else
+      echo "!! Auf 127.0.0.1:8010 antwortet nicht der neu ausgerollte Stand:"
+      echo "   erwartet Commit $COMMIT, gemeldet '${GEMELDET:-unbekannt}' (Antwort: $ANTWORT)"
+    fi
+    false
+  fi
   sleep 2
 done
 
