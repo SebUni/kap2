@@ -129,3 +129,27 @@ Versagen des Schutzsystems.
 | 50-R18-01 | R18 Entwässerungssysteme → Versagen Überflutungsschutz | offen | offen | offen | offen | offen | #50 (offen) |
 | 50-R19-01 | R19 Infrastruktur an Binnengewässern → Mengengerüst (Schutzanlagen) | offen | offen | offen | offen | offen (Ebene §3.1) | #50 (offen) |
 
+### #47 — Überlastung der Entwässerungseinrichtungen in überflutungsgefährdeten Gebieten (Erstaufschlag 12.09.2026)
+
+Skelett aus `/neu-risiko 47`: eine Zeile je Knoten der Kette W082 samt W074/W077 (Bericht
+`docs/methodik/47_entwaesserung_kuestenniederungen.md`, Kap. 1/2). Evidenz ist noch nicht
+recherchiert; Entscheidungen stehen im Bericht auf `offen`. Einzige bezifferte Zeile: 47-S062-01
+(Abschätzung von KAP3 nach Vorgabe P2). **Keine Zeile aus #60 wiederverwendet:** Die gemeinsamen
+Knoten W074, W077 haben dort das Outcome Gebäudeschaden, hier die Überlastung der
+Niederungsentwässerung. Erstes Buchungsobjekt mit **zwei** Konten (K8 + K6) — die Zweige sind die
+zwei Zustände einer R7-Weiche, die Herleitung steht im Bericht Kap. 1.3.
+
+| Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | verwendet in |
+|---|---|---|---|---|---|---|---|
+| 47-W074-01 | W074 Meeresspiegelhöhe → Sielzugdauer / Sperrzeit am Siel | offen | offen | offen | offen | offen (Ebene §3.1) | #47 (offen) |
+| 47-W077-01 | W077 Sturmfluten → Dauer des Sielschlusses (Ereignisspitze) | offen | offen | offen | offen | offen (Ebene §3.1) | #47 (offen) |
+| 47-W075-01 | W075 Strömungen und Gezeitendynamik → W077 / Tidehub | offen | offen | offen | offen | offen | #47 (offen) |
+| 47-E01-01 | E01 Durchschnittstemperatur → W074 | offen | offen | offen | offen | offen | #47 (offen) |
+| 47-E17-01 | E17 Starkwind → W077 | offen | offen | offen | offen | offen | #47 (offen) |
+| 47-S059-01 | S059 Meerestopographie → Außenwasserstand (über W074/W077) | offen | offen | offen | offen | offen | #47 (offen; Kandidat bewusst inaktiv) |
+| 47-S060-01 | S060 Wasseraustausch mit anderen Meeren → Außenwasserstand | offen | offen | offen | offen | offen | #47 (offen; Kandidat bewusst inaktiv) |
+| 47-S062-01 | S062 Art und Zustand von Bauwerken und Küsteninfrastruktur → Leistungsfähigkeit der Siel-/Schöpfwerksentwässerung (Gewicht p der R7-Weiche) | Basis offen; Maßnahmen: keine nach §3.5 zulässige Effektgröße belegt ⇒ **Abschätzung** r_ret = 0,175 (Band 0,06–0,385; s_ret 0,35 × e_ret 0,50) · r_vers = 0,08 (Band 0,016–0,21; s_vers 0,20 × e_vers 0,40) | — (keine Interventionsstudie belegt) | Herleitung: Bericht #47 §5.1 (`#s062-wirkung`) | §3.9 ABGESCHÄTZT — im Produkt als „Abschätzung von KAP3" auszuweisen (Vorgabe P2); Marsch-Bauformgrenze der Versickerung dokumentiert | kommunal (Pauschalfaktor — Modellgrenze der Abschätzung) | #47 (Vorschlag Vulnerabilität + Maßnahmen-Hebel, abgeschätzt; R7-Weiche, wirkt auf beide Konten über ΔV) |
+| 47-R14-01 | R14 Küsten, Wattenmeere, Ästuare → Exposition (Lackmustest §3.1) | offen | offen | offen | offen | offen | #47 (offen) |
+| 47-R15-01 | R15 Vorkommen von Meeren → Exposition | offen | offen | offen | offen | offen | #47 (offen; Kandidat bewusst inaktiv, redundant zu R14) |
+| 47-R16-01 | R16 Bauwerke und Infrastruktur in der Küstenzone → Mengengerüst (Siele, Schöpfwerke, entwässerte Niederungsfläche) | offen | offen | offen | offen | offen (Ebene §3.1) | #47 (offen) |
+
