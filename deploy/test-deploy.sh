@@ -39,6 +39,10 @@ FIRMA=/opt/overlord/firma-deploy
 VENV=/opt/overlord/kap2-venv
 ENV_DATEI=/etc/overlord/kap2-test.env
 PROTOKOLL=/var/log/overlord/deploy.log
+# Pfad der Datei auf dem Server, in der das Zugangspasswort der Testumgebung liegt (Rechte 600).
+# Die Quelle des Passworts selbst bleibt unveraendert (ENV_DATEI); nur dieser Pfad -- nie der
+# Passwortwert -- geht in die Statusdatei des Firmen-Repos (T-0169).
+PASSWORT_QUELLE=/etc/overlord/testumgebung.env
 SCHRITT="start"; COMMIT=""
 set -a; source "$ENV_DATEI"; set +a
 
@@ -76,13 +80,15 @@ status_lokal_schreiben() {  # $1 = fertig|fehler, $2 = Fehlertext -- schreibt nu
   export GIT_CEILING_DIRECTORIES="$firma_eltern"
   zeit=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   adresse="${KAP2_TEST_URL:-http://localhost}"
-  python3 - "$st" "$fehler" "$zeit" "$adresse" "$COMMIT" "$PROTOKOLL" "${KAP2_TEST_BENUTZER:-}" "${KAP2_TEST_PASSWORT:-}" > "$FIRMA/betrieb/deploy-status.json.neu" <<'PY'
+  # Passwort selbst geht nie in die Statusdatei des Firmen-Repos (T-0169): nur der Pfad der
+  # Datei auf dem Server, in der es liegt.
+  python3 - "$st" "$fehler" "$zeit" "$adresse" "$COMMIT" "$PROTOKOLL" "${KAP2_TEST_BENUTZER:-}" "$PASSWORT_QUELLE" > "$FIRMA/betrieb/deploy-status.json.neu" <<'PY'
 import json, sys
-st, fehler, zeit, adresse, commit, protokoll, benutzer, passwort = sys.argv[1:9]
+st, fehler, zeit, adresse, commit, protokoll, benutzer, passwort_quelle = sys.argv[1:9]
 d = {"zeit": zeit, "status": st, "adresse": adresse, "commit": commit or None,
      "fehler": (fehler[:1500] if st == "fehler" else None), "protokoll": protokoll}
 if benutzer:
-    d["zugang"] = {"benutzer": benutzer, "passwort": passwort, "hinweis": "HTTP Basic Auth der Testumgebung"}
+    d["zugang"] = {"benutzer": benutzer, "passwort_quelle": passwort_quelle, "hinweis": "HTTP Basic Auth der Testumgebung"}
 print(json.dumps(d, ensure_ascii=False, indent=1))
 PY
   # Erst lokal festschreiben, dann veroeffentlichen (T-0132): trifft waehrend des Pushens
