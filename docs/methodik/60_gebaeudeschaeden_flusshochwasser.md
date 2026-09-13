@@ -137,13 +137,13 @@ aus #95/#96/#98). In Formeln (§3) dürfen später nur Zeilen mit Entscheidung *
 
 | Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | Entscheidung |
 |---|---|---|---|---|---|---|---|
-| 60-W085-01 | W085 Hochwasser → Überflutungswahrscheinlichkeit/-tiefe am Gebäude | offen | offen | offen (Mon. Z65: HQ-Szenarien) | offen | offen — Datenebene nach §3.1 zu spezifizieren | offen |
+| 60-W085-01 | W085 Hochwasser → Überflutungswahrscheinlichkeit/-tiefe am Gebäude | p(HQ) je Pflicht-Szenario der Hochwassergefahrenkarte: HQhäufig 1,0·10⁻¹ a⁻¹ (Kartenfall HQ10; Spanne HQ5–HQ20 = 2,0·10⁻¹ bis 5,0·10⁻² a⁻¹), HQ100 1,0·10⁻² a⁻¹, HQextrem 5,0·10⁻³ bis 1,0·10⁻³ a⁻¹ (WHG-Mindestvorgabe 200 a gegen Länderpraxis ≈ HQ1000); je Szenario liefert die Karte flächendeckend die Wassertiefe in den Klassen 0–0,5 / >0,5–1 / >1–2 / >2–4 / >4 m | amtliche Kartengrundlage nach HWRM-RL (Pegel- bzw. Regionalisierungsstatistik plus hydrodynamische Berechnung) auf rechtlich normierter Szenariendefinition | LAWA 2024, „Empfehlungen zur Aufstellung von Hochwassergefahrenkarten und Hochwasserrisikokarten“, S. 4 und 16, https://www.lawa.de/documents/2024-01-lawa-empfehlungen-aufstellung-hochwassergefahrenkarten-barrierefrei_1739980622.pdf, Zugriff 13.09.2026; § 74 Abs. 2/3 WHG, https://www.gesetze-im-internet.de/whg_2009/__74.html, Zugriff 13.09.2026; LfU Bayern, „FAQ: Hochwassergefahren- und -risikokarten“, https://www.lfu.bayern.de/wasser/hw_risikomanagement_umsetzung/faq_karten/index.htm, Zugriff 13.09.2026 — Volltext geprüft; Langbeleg **B1** unter der Tabelle | DE-weit für die Risikogebiete nach § 73 WHG, da die Szenarien bundeseinheitlich normiert sind; **Modellgrenze:** außerhalb der kartierten Risikogebiete trifft die Karte keine Aussage, und das Wiederkehrintervall des Extremszenarios ist bundesweit uneinheitlich (mindestens 200 a nach WHG gegen ≈ 1000 a in der Länderpraxis) — als Band geführt, nicht geglättet | HWGK-Raster der Länder über den BfG-Kartendienst WasserBLIcK; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Basiswert** — FS-Hazard: die drei Szenario-Stützstellen p(HQ) samt zugehöriger Wassertiefe; die Spannen von HQhäufig und HQextrem laufen als Sensitivitätsband mit |
 | 60-E12-01 | E12 Schneeschmelze → W085 | offen | offen | offen | offen | offen | offen |
 | 60-E07-01 | E07 Nässe → W085 | offen | offen | offen | offen | offen | offen |
 | 60-E08-01 | E08 Starkregen → W085 / Gebäudeschaden | offen | offen | offen | offen | offen | offen |
 | 60-S072-01 | S072 Boden-/Vegetationsbedeckung → Abfluss (W085) | offen | offen | offen | offen | offen | offen |
 | 60-S073-01 | S073 Flächenversiegelung → Abfluss (W085) | offen | offen | offen | offen | offen | offen |
-| 60-S074-01 | S074 Topographie → Wassertiefe am Gebäude | offen | offen | offen | offen | offen | offen |
+| 60-S074-01 | S074 Topographie → Wassertiefe am Gebäude | h(Gebäude) = max(0; Wasserspiegellage − Geländehöhe DGM1); der Höhenfehler des DGM1 (σ_z = 0,15–0,20 m) schlägt 1:1 auf die Wassertiefe durch; Schadenswirkung der Wassertiefe: 5,3–6,2 % Schadensänderung je 10 cm (Mittel ≈ 6 %/10 cm) ⇒ σ_z = 0,20 m entspricht ±10,6 bis ±12,4 % Schaden; ±0,5 m ⇒ Faktor 1,35–1,44; ein Faktor 2 erfordert 0,95–1,1 m | amtliche Produktspezifikation eines Geobasisdatensatzes (Airborne Laserscanning) plus publizierte Unsicherheits- und Sensitivitätsrechnung eines Hochwasserschadensmodells (systematische Variation der Überflutungstiefe) | LAIV MV (Landesamt für innere Verwaltung Mecklenburg-Vorpommern), „Geländemodelle“ (Höhengenauigkeit DGM1 0,15–0,2 m), https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/, Zugriff 13.09.2026; de Moel, H. & Aerts, J. C. J. H. 2011, „Effect of uncertainty in land use, damage models and inundation depth on flood damage estimates“, Natural Hazards 58(1), 407–425, DOI 10.1007/s11069-010-9675-6, Zugriff 13.09.2026 — Volltext geprüft (Tab. 4, S. 421; Abschn. 4.3, S. 420); Langbeleg **B2** unter der Tabelle | DGM1 flächendeckend in DE verfügbar; die Tiefen-Sensitivität stammt aus einer niederländischen Fallstudie (Rheindelta, flaches Relief, Landnutzungs-Schadensmodelle). **Modellgrenze:** der Wert gilt für aggregierte Landnutzungsklassen, nicht für das Einzelgebäude, und ist in Mittelgebirgs- und Steillagen eine Untergrenze, weil dort derselbe Höhenfehler größere Tiefenfehler erzeugt | DGM1 (1 m Rasterweite) der Landesvermessungen; Prüfung nach §3.4 auf Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Sensitivitätsband** — Kein-Doppelkanal §3.2: die Geländehöhe wirkt bereits über die HWGK-Wassertiefe der Zeile 60-W085-01 und geht deshalb nicht als eigener Faktor in FS-Exposition ein; ihr eigener Beitrag ist das Tiefen-Unsicherheitsband ±0,20 m ⇒ ±12 % um den Basiswert |
 | 60-R17-01 | R17 Oberflächengewässer → Exposition | offen | offen | offen | offen | offen | offen |
 | 60-R18-01 | R18 Entwässerungssysteme → Gebäudeschaden (flussseitig) | offen | offen | offen | offen | offen | offen |
 | 60-R19-01 | R19 Infrastruktur an Binnengewässern → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
@@ -169,6 +169,68 @@ aus #95/#96/#98). In Formeln (§3) dürfen später nur Zeilen mit Entscheidung *
 | 60-R24-01 | R24 Gebäude → Mengengerüst (Gebäudewerte) | offen | offen | offen (Mon. Z65: Gebäudewerte) | offen | offen — Datenebene nach §3.1 zu spezifizieren | offen |
 | 60-R23-01 | R23 Bau- und Immobilienunternehmen → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
 | 60-R25-01 | R25 Siedlungsinfrastrukturen → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
+
+### Belege zu den entschiedenen Registerzeilen (§3.8, Volltext geprüft am 13.09.2026)
+
+**B1 — 60-W085-01 (Hazard-Szenarien und Überflutungstiefe).**
+Quellen: (1) **LAWA — Bund/Länder-Arbeitsgemeinschaft Wasser (2024):** „Empfehlungen zur
+Aufstellung von Hochwassergefahrenkarten und Hochwasserrisikokarten“, Stand Januar 2024,
+beschlossen durch die 167. LAWA-Vollversammlung am 21./22.03.2024 in Potsdam, Herausgeber LAWA,
+Potsdam; URL
+`https://www.lawa.de/documents/2024-01-lawa-empfehlungen-aufstellung-hochwassergefahrenkarten-barrierefrei_1739980622.pdf`,
+Zugriff 13.09.2026. S. 4 wörtlich: „Hochwasser mit niedriger Wahrscheinlichkeit oder Szenarien für
+Extremereignisse“ · „Hochwasser mit mittlerer Wahrscheinlichkeit (Ereignisse, die im statistischen
+Mittel einmal in 100 Jahren auftreten)“ · „gegebenenfalls Hochwasser mit hoher Wahrscheinlichkeit“;
+anzugeben sind „Ausmaß der Überflutung (Fläche)“ und „Wassertiefe bzw. gegebenenfalls
+Wasserstand“. S. 16 wörtlich: „Für jedes Hochwasserszenario sind sowohl das Ausmaß der Überflutung
+(Überflutungsgebiet) als auch die Wassertiefen in den Karten darzustellen.“ und zu den Klassen:
+„0–0,5 m, >0,5–1 m, >1–2 m, >2–4 m und >4 m“. S. 10 wörtlich zum Klimabezug: „Der bisher wirksam
+gewordene Einfluss von Klimaveränderungen ist in den Daten der hydrologischen Statistiken
+enthalten.“ (2) **§ 74 Abs. 2/3 WHG**, Fassung abgerufen unter
+`https://www.gesetze-im-internet.de/whg_2009/__74.html`, Zugriff 13.09.2026; Abs. 2 Nr. 1 wörtlich:
+„Hochwasser mit niedriger Wahrscheinlichkeit (voraussichtliches Wiederkehrintervall mindestens 200
+Jahre) oder bei Extremereignissen“. (3) **Bayerisches Landesamt für Umwelt (LfU), „FAQ:
+Hochwassergefahren- und -risikokarten“**, URL
+`https://www.lfu.bayern.de/wasser/hw_risikomanagement_umsetzung/faq_karten/index.htm`,
+Zugriff 13.09.2026; wörtlich: HQhäufig ist „ein Abfluss (Q) verstanden, der statistisch gesehen im
+Mittel alle 5 bis 20 Jahre auftritt“ (die Karten zeigen ein HQ10), HQ100 ist „ein Abfluss (Q), der
+im Mittel alle hundert Jahre erreicht oder überschritten wird“, HQextrem entspricht ungefähr einem
+HQ1000. **Rechenschritt (§3.9 Übernommen):** p = 1/T mit T aus den zitierten Wiederkehrintervallen
+— für das häufige Szenario gilt der kartierte Fall HQ10, also T = 10 a ⇒ p = 1,0·10⁻¹ a⁻¹;
+die von LfU genannte Bandbreite der Praxis (T = 5 a bis T = 20 a ⇒ 2,0·10⁻¹ a⁻¹ bis
+5,0·10⁻² a⁻¹) läuft als Sensitivitätsband mit. Für das mittlere Szenario gilt T = 100 a ⇒
+p = 1,0·10⁻² a⁻¹. Für das Extremszenario
+**benennt der Bericht den Widerspruch der Quellen, statt ihn zu glätten** (§3.8): das WHG verlangt
+mindestens 200 a (⇒ 5,0·10⁻³ a⁻¹), die Länderpraxis kartiert ≈ HQ1000 (⇒ 1,0·10⁻³ a⁻¹); beide
+Enden bilden das Band. **Datenlücke (§3.8):** eine bundesweit einheitliche Angabe des tatsächlich
+kartierten Extrem-Wiederkehrintervalls je Land liegt nicht vor; sie ist bei der Datenanbindung je
+Land zu erheben.
+
+**B2 — 60-S074-01 (Geländehöhe → Wassertiefe am Gebäude).**
+Quellen: (1) **LAIV MV — Landesamt für innere Verwaltung Mecklenburg-Vorpommern, „Geländemodelle“**,
+URL `https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/`, Zugriff 13.09.2026;
+wörtlich zur Höhengenauigkeit des DGM1: „0,15 – 0,2 m“, zur Erfassung: „Dominierende
+Erfassungsmethoden für die Erhebung der Messdaten sind das Airborne Laserscanning und die
+Bildkorrelation auf Basis orientierter Luftbildpaare.“ (2) **de Moel, H.; Aerts, J. C. J. H.
+(2011):** „Effect of uncertainty in land use, damage models and inundation depth on flood damage
+estimates“, *Natural Hazards* 58(1), 407–425, Springer, DOI `10.1007/s11069-010-9675-6`
+(Verlagsfassung, Open Access), Zugriff 13.09.2026. Volltext gegengelesen, Abschn. 4.3 (S. 420)
+wörtlich: „a 0.5-m reduction in inundation depth corresponds to a factor 1.35–1.44 difference in
+the resulting damage estimate“ · „A variation in inundation depth of more than 1 m (0.95 m using
+DM1 to 1.1 m using DM3) is necessary to cause a factor 2 difference“; Tab. 4 (S. 421):
+proportionale Schadensänderung je 10 cm Überflutungstiefe 5,3 %–6,2 % (Streuung zwischen den drei
+Schadensmodellen Faktor 1,14, zwischen den Landnutzungskarten Faktor 1,04), im Fließtext (S. 421)
+„almost 6 % … per 10 cm inundation depth change“. **Rechenschritt (§3.9 Abgeleitet):** der
+DGM1-Höhenfehler geht als Tiefenfehler ein (h = Wasserspiegellage − Geländehöhe), also
+σ_z = 0,20 m = 2,0 × 10 cm; mit 5,3 %/10 cm bzw. 6,2 %/10 cm folgt 2,0 × 5,3 % = 10,6 % bzw.
+2,0 × 6,2 % = 12,4 % Schadensänderung, gerundet ±12 % als Bandmitte-nahe Obergrenze. Die Linearität
+ist nur im geprüften Bereich der Quelle (−0,5 m bis 0 m) belegt und wird nicht extrapoliert.
+**Kopplung (§3.9):** das Band hängt an der Wassertiefe aus 60-W085-01; ändert sich dort die
+Tiefenquelle, wird es neu gerechnet. **Abgrenzung zur Knoten-Bilanz:** S074 bleibt der
+Formelstelle FS-Exposition zugeordnet, wirkt dort aber über die bereits topographiebasierte
+HWGK-Wassertiefe; ein zweiter Topographie-Faktor wäre ein Doppelkanal (§3.2). **Datenlücke
+(§3.8):** eine deutsche Sensitivitätsrechnung derselben Bauart (Schaden je 10 cm Tiefe) wurde nicht
+gefunden; die niederländische Fallstudie wird als dokumentierte Übertragung geführt.
 
 ## 3 Modell (§2.3)
 
