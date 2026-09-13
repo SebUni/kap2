@@ -522,6 +522,31 @@ publizierte Achse über die Klassen hinweg multiplikativ und nicht additiv wäch
 die Klassenmitten; für die oben offene Klasse ist 1,75 m gesetzt (Abschätzung von KAP3, Richtung:
 unterschätzt tiefe Überflutungen, damit Untergrenze).
 
+*Gültigkeitsbereich und Deckelung (P1).* Die log-lineare Form gilt **ausschließlich** im belegten
+Intervall \(h_1 = 0{,}10\) m … \(h_5 = 1{,}75\) m; unterhalb \(h_1\) wird sie auf \(d = 0{,}035\)
+und oberhalb \(h_5\) auf \(d = 0{,}250\) **konstant fortgesetzt**, formal
+\(d(h) = 0{,}035\) für \(h < 0{,}10\) m, \(d(h) = 0{,}250\) für \(h > 1{,}75\) m. Ohne diese
+Deckelung liefe die Formel über das belegte obere Ende hinaus und ergäbe für tiefe Zellen
+Schadensquoten über 100 % des Wiederherstellungswerts (\(d(3{,}0) = 1{,}109\),
+\(d(4{,}0) = 3{,}65\)), also einen Euro-Betrag oberhalb des Gebäudewerts — sachlich ausgeschlossen.
+Die Deckelung ist keine Extrapolation, sondern die Weigerung zu extrapolieren: Sie setzt jenseits
+des Belegs genau den obersten belegten Wert an und ist damit dieselbe Konstruktion wie die
+konstante Tail-Fortsetzung in Schritt 2 von §3.4. Sie ist eine **Abschätzung von KAP3** (§3.9,
+Vorgabe P1); Richtung: **unterschätzt** den Schaden sehr tiefer Überflutungen, weil die
+FLEMOps-Achse oberhalb 150 cm nicht endet, sondern nur nicht mehr differenziert wird — damit eine
+Untergrenze im Sinne §3.6. Als obere Sensitivitätsgrenze läuft die ungedeckelte Interpolation bis
+zur physischen Schranke \(d \le 1{,}00\) mit; das Band der Zellen mit \(h > 1{,}75\) m ist damit
+0,250 … 1,000 und wird in Kap. 7 als eigener Unsicherheitsbeitrag geführt.
+
+*Abbildung der beiden Tiefenraster (§3.1).* Die Ebene HQ_TIEFE liefert nach LAWA 2024 die Klassen
+0–0,5 / >0,5–1 / >1–2 / >2–4 / >4 m, die Schadensfunktion ist auf der feineren FLEMOps-Achse
+(<21 / 21–60 / 61–100 / 101–150 / >150 cm) belegt; in \(d(h)\) geht deshalb **nicht** eine
+Klassennummer ein, sondern die aus §3.2 abgeleitete metrische Tiefe \(h_{z,s}\) in Metern
+(flächengewichtetes Mittel der LAWA-Klassenmitten 0,25 / 0,75 / 1,50 / 3,00 m, offene Klasse >4 m
+mit ihrer Untergrenze 4,00 m), die dann in \(d(h)\) mit Deckelung eingesetzt wird — die beiden
+obersten LAWA-Klassen (3,00 m und 4,00 m) fallen dadurch beide auf den gedeckelten Wert
+\(d = 0{,}250\).
+
 | Klasse (FLEMOps) | < 21 cm | 21–60 cm | 61–100 cm | 101–150 cm | > 150 cm |
 |---|---|---|---|---|---|
 | repräsentative Tiefe \(h\) [m] | 0,10 | 0,405 | 0,805 | 1,255 | 1,75 |
@@ -591,17 +616,22 @@ nationalen Größe, die räumlich verteilt würde.
 **Rechenbeispiel (eine Zelle).** Reines Einfamilienhausgebiet in der Aue,
 \(W_z = 1.200\) m² Wohnfläche, \(\theta_{\text{EFH/ZFH}} = 1{,}0\) ⇒
 \(w_z = 1{,}30 \cdot 1.950 = 2.535\) €₂₀₂₆/m² Wohnfläche. Szenarien: HQhäufig
-\(a = 0{,}25\), \(h = 0{,}30\) m ⇒ \(d = 0{,}050\); HQ100 \(a = 0{,}80\), \(h = 0{,}80\) m ⇒
-\(d = 0{,}081\); HQextrem \(a = 1{,}00\), \(h = 1{,}60\) m ⇒ \(d = 0{,}250\). Physische
+\(a = 0{,}25\), \(h = 0{,}405\) m ⇒ \(d = 0{,}050\); HQ100 \(a = 0{,}80\), \(h = 0{,}805\) m ⇒
+\(d = 0{,}081\); HQextrem \(a = 1{,}00\), \(h = 1{,}80\) m ⇒ \(d = 0{,}250\) (gedeckelt, da
+\(h > h_5\)). Physische
 Zwischengrößen: 15,0 / 77,8 / 300,0 m² je Ereignis, daraus \(\bar A_z = 6{,}31\) m²/a und
 \(\text{EAD}_z \approx 16.000\) €₂₀₂₆/a.
 
 ```python test: beispiel_60_kernformel_zelle
-# Schadensfunktion: log-lineare Interpolation zwischen den belegten Enden (B5)
+# Schadensfunktion: log-lineare Interpolation zwischen den belegten Enden (B5),
+# ausserhalb des belegten Intervalls [h1, h5] konstant fortgesetzt (Deckelung)
 d1, d5, h1, h5 = 0.035, 0.250, 0.10, 1.75
-d = lambda h: d1 * (d5 / d1) ** ((h - h1) / (h5 - h1))
+d = lambda h: d1 * (d5 / d1) ** ((min(max(h, h1), h5) - h1) / (h5 - h1))
 assert abs(d(0.405) - 0.0503) < 5e-4 and abs(d(0.805) - 0.0811) < 5e-4
 assert abs(d(1.255) - 0.1386) < 5e-4 and abs(d(1.75) - 0.250) < 1e-9
+# Deckelung: oberhalb 1,75 m bleibt die Quote auf dem obersten belegten Wert,
+# insbesondere fuer die LAWA-Klassen >2-4 m (3,00 m) und >4 m (Untergrenze 4,00 m)
+assert d(3.00) == 0.250 and d(4.00) == 0.250 and d(0.05) == 0.035
 # Zelle: Menge x Rate -> physische Zwischengroesse (m2), erst danach der Preis
 W, f093, f094 = 1200.0, 1.00, 1.00
 A = [W * a * d_s * f093 * f094 for a, d_s in ((0.25, 0.050), (0.80, 0.081), (1.00, 0.250))]
