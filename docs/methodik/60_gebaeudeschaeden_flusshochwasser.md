@@ -9,13 +9,15 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 > Weitergaben, Konto) und Kap. 2 (Evidenz-Register-Skelett) aus den beiden Arbeitsmappen unter
 > `docs/Schadensbaum/`; Kap. 3–9 tragen die Pflichtinhalte als Kommentar. Einzige bezifferte
 > Größe ist die P2-Abschätzung zum Maßnahmen-Hebel S092 (§5.1, `#s092-wirkung`), ausdrücklich als
-> **Abschätzung von KAP3** gekennzeichnet. Alle übrigen Entscheidungen stehen auf `offen`.
-> Befund-Ledger: `reviews/BEFUNDE_60.md` (leer).
+> **Abschätzung von KAP3** gekennzeichnet. Die Knoten-Bilanz in Kap. 1 ist entschieden
+> (32/32 Zeilen tragen eine Formelstelle oder `inaktiv` mit Zitat); die übrigen Punkte
+> (Ergebnisgröße/Ansatz, Datenebenen, Volltext-Evidenz) stehen weiterhin auf `offen`.
+> Befund-Ledger: `reviews/BEFUNDE_60.md`.
 
 ## Ergebnis
 
 - **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`.
-- **Offen:** (1) alle 32 Entscheidungen; (2) Ergebnisgröße und Ansatz (Kap. 9); (3) Datenebenen nach §3.1; (4) R9-Partitionen in K3 mit #92/#102/#55 und R5 über „Wie ID 59“; (5) Volltext-Evidenz zu S092.
+- **Offen:** (1) Ergebnisgröße und Ansatz (Kap. 9); (2) Datenebenen nach §3.1; (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) Volltext-Evidenz zu S092.
 - **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Planungszahl korrigiert, Beispiel-Code-Zaun im Kommentar entfernt; R2: Lint-Funde behoben, Zeichentabelle S092 als eigener Abschnitt, Verweis korrigiert). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: je rund 0,3 USD. Keine Websuche, also keine externe Evidenz.
 - **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
@@ -37,43 +39,53 @@ genau die Namenslisten von W117 — der Umschnitt geht vom selben Knoten aus.
 
 ### Knoten-Bilanz
 
-Spalte „rechnet in“ ist im Erstaufschlag durchgängig `offen`. Die Spalte „Vorschlag“ nennt nur, was
-die Arbeitsmappen selbst hergeben (Blatt + Zeile); sie ist keine Entscheidung.
+**Entscheidungsstand (T-0235).** Spalte „rechnet in” trägt ab dieser Fassung je Zeile entweder eine
+der sieben benannten **Formelstellen**, an die Kapitel 3 die Größe künftig bindet, oder den Wert
+`inaktiv` mit einem wörtlichen Zitat aus `KWRA-Monetarisierung.xlsx` (Blatt und Zelle). Die
+Formelstellen sind **Namen, keine Formeln**: Kapitel 3 selbst bleibt unverändert im
+Kommentar-Zustand des Erstaufschlags und wird in einem eigenen Ticket nachgezogen — diese
+Zeile ist die Vorbedingung dafür, nicht der Formelbau selbst. Benannte Formelstellen: **FS-Hazard**
+(Eintrittswahrscheinlichkeit p(HQ) inkl. der Kein-Doppelkanal-Zuflüsse), **FS-Exposition**
+(Wassertiefe am Gebäude), **FS-Schadensgrad** (Wassertiefe-Schadensfunktion nach Bauart/Zustand),
+**FS-Mengengerüst** (Gebäudewerte/Bestand), **FS-Schutzsystem** (R7-Erwartungswert-Weiche mit #50),
+**FS-Bestandsdynamik** (Kap. 6, Szenario-Dynamik des Bestands) und **FS-Vorsorge** (Maßnahmen-Hebel
+S092, bereits in §5.1 beziffert). Die Spalte „Vorschlag” bleibt unverändert als Beleg aus der
+Arbeitsmappe stehen; sie ist weiterhin keine eigene Entscheidung.
 
 | Knoten | Name | Blatt/Zeile | rechnet in | Vorschlag laut Arbeitsmappe |
 |---|---|---|---|---|
-| W085 | Hochwasser (= Id 49) | KWK Z208; NW Z50 | offen | Hazard des Endpunkts (einzige Input-Kante, NW Z61); Id 49 selbst „Rein vorgelagert (0 €)“, R2 — Bewertung „HQ-Szenarien × Schadensfunktionen (Wassertiefe-Schaden) × Gebäudewerte“ (Mon. Z65) |
-| E12 | Schneeschmelze (über W085) | KWK Z13 | offen | wirkt nur über W085 (Kein-Doppelkanal §3.2): Szenario-Verschiebung des Hazards, kein eigener Faktor |
-| E07 | Nässe (über W085) | KWK Z8 | offen | wie E12 |
-| E08 | Starkregen (direkt auf W117 und über W085) | KWK Z9 | offen | über W085 wie E12; direkter Gebäudeschaden durch Starkregen gehört zu #59 (Mon. Z64 „Sachschäden durch Starkregen/Rückstau“) — R9 |
-| S072 | Boden-/Vegetationsbedeckung (über W085) | KWK Z197 | offen | wirkt auf Abflussbildung in W085; bewusst inaktiv, falls der Hazard-Datensatz den Abfluss schon enthält (Kein-Doppelkanal) |
-| S073 | Flächenversiegelung (über W085) | KWK Z198 | offen | wie S072 |
-| S074 | Topographie (Geländeform, Höhe) (über W085) | KWK Z199 | offen | Kandidat für die Zell-Exposition (Geländehöhe → Wassertiefe); Doppelkanal prüfen, falls HQ-Karten Wassertiefen bereits führen |
-| R17 | Vorkommen von Oberflächengewässer und Grundwasser (über W085) | KWK Z204 | offen | Kandidat Exposition; Lackmustest §3.1: keine Flussaue → ~0 |
-| R18 | Vorkommen von Abwasser- und Entwässerungssystemen (über W085) | KWK Z205 | offen | Rückstau gehört zu #59 (Mon. Z64), Kanalnetz zu #52 (K4) — voraussichtlich bewusst inaktiv |
-| R19 | Vorkommen von Infrastruktur an Binnengewässern (über W085) | KWK Z206 | offen | Infrastruktur → K4 (K3-Definition, Konten Z28) — voraussichtlich bewusst inaktiv |
-| E10 | Hagel | KWK Z11 | offen | keine Kante auf #60 (NW Z61 Input nur 49); Gegenstand Mon. Z65 „Sachschäden flussseitiger Überflutung“ — voraussichtlich bewusst inaktiv |
-| E17 | Starkwind | KWK Z18 | offen | wie E10 |
-| E14 | Schnee- und Eisdruck | KWK Z15 | offen | wie E10 |
-| E02 | Hitze | KWK Z3 | offen | wie E10 |
-| E03 | Kälte / Frost | KWK Z4 | offen | wie E10 |
-| W074 | Meeresspiegelhöhe (= Id 40) | KWK Z181 | offen | seeseitig → #46 (Mon. Z65 „Nicht enthalten: Seeseitige Schäden (ID 46)“) — R9 |
-| W077 | Sturmfluten (= Id 43) | KWK Z184 | offen | wie W074 |
-| W087 | Sturzfluten (= Id 51) | KWK Z210 | offen | Gebäudeschäden über #59 (Mon. Z56: „Schäden laufen über Gebäude-Starkregen (K3)“) — R9 |
-| W008 | Bergsturz, Felssturz, Steinschlag | KWK Z45 | offen | Massenbewegungen → #12 (NW Z13, K3) — R9 |
-| W006 | Rutschungen und Muren (= Id 12) | KWK Z43 | offen | wie W008 |
-| W091 | Grundwasserstand (= Id 55) | KWK Z214 | offen | Id 55 bucht direkt in K3 (Abgleich-Protokoll P5) — Partition gegenüber #60 offen (R9) |
-| W100 | Einschränkungen Kanalnetze und Vorfluter (= Id 52) | KWK Z223 | offen | Id 52 bucht K4 (NW Z53) — voraussichtlich bewusst inaktiv |
-| S092 | Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer | KWK Z256 | offen | Kandidat **Maßnahmen-Hebel** (Objektschutz); P2-Abschätzung §5.1 |
-| S093 | Zustand von Gebäuden und Infrastrukturen | KWK Z257 | offen | Kandidat Vulnerabilität der Schadensfunktion; Evidenz und Zellgröße offen |
-| S094 | Verwendete Baumaterialien auf Gebäudeebene | KWK Z258 | offen | wie S093 |
-| S096 | Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand | KWK Z260 | offen | Schutzsysteme über R7-Weiche mit #50 (Mon. Z65 „Schutzkosten (ID 50, R7)“; Z55) |
-| S097 | Zustand von (Schutz-)Infrastrukturen | KWK Z261 | offen | wie S096 (Versagensfall, Erwartungswert R7) |
-| S098 | Verwendete Baumaterialien von (Schutz-)Infrastrukturen | KWK Z262 | offen | wie S096 |
-| S104 | Investitionen der Bau- und Immobilienwirtschaft in exponierten Gebieten | KWK Z268 | offen | Kandidat Szenario-Dynamik des Gebäudebestands (Kap. 6) |
-| R24 | Vorkommen von Gebäuden | KWK Z270 | offen | **Mengengerüst** (Gebäudewerte, Mon. Z65) |
-| R23 | Vorkommen von Bau- und Immobilienunternehmen | KWK Z269 | offen | laut W117-Anmerkung pauschal nach Regel 4 eingetragen; kein Bezug zu Gebäudeschäden — voraussichtlich bewusst inaktiv |
-| R25 | Vorkommen von Siedlungsinfrastrukturen | KWK Z271 | offen | Infrastruktur → K4 (Konten Z28) — voraussichtlich bewusst inaktiv |
+| W085 | Hochwasser (= Id 49) | KWK Z208; NW Z50 | **FS-Hazard** — Hazard-Term p(HQ); alleiniger Input der Bilanz (NW Z61) | Hazard des Endpunkts (einzige Input-Kante, NW Z61); Id 49 selbst „Rein vorgelagert (0 €)”, R2 — Bewertung „HQ-Szenarien × Schadensfunktionen (Wassertiefe-Schaden) × Gebäudewerte” (Mon. Z65) |
+| E12 | Schneeschmelze (über W085) | KWK Z13 | **FS-Hazard** (enthalten, kein eigener Faktor — Kein-Doppelkanal §3.2) | wirkt nur über W085 (Kein-Doppelkanal §3.2): Szenario-Verschiebung des Hazards, kein eigener Faktor |
+| E07 | Nässe (über W085) | KWK Z8 | **FS-Hazard** (enthalten, kein eigener Faktor — Kein-Doppelkanal §3.2) | wie E12 |
+| E08 | Starkregen (direkt auf W117 und über W085) | KWK Z9 | **FS-Hazard** (Anteil über W085, kein eigener Faktor); direkter Kanal **inaktiv** — R9 (Rechenregeln Z11): „Innerhalb eines Kontos zählt jede Einheit (…Gebäude) genau einmal; verschiedene Konten desselben Ereignisses sind additiv.” i. V. m. Mon. Z64 (Nicht enthalten): „Flusshochwasserschäden (ID 60)” (#59 bucht den direkten Starkregen-Gebäudeschaden) | über W085 wie E12; direkter Gebäudeschaden durch Starkregen gehört zu #59 (Mon. Z64 „Sachschäden durch Starkregen/Rückstau”) — R9 |
+| S072 | Boden-/Vegetationsbedeckung (über W085) | KWK Z197 | **FS-Hazard** (enthalten im Hazard-Datensatz, kein eigener Faktor — Kein-Doppelkanal §3.2) | wirkt auf Abflussbildung in W085; bewusst inaktiv, falls der Hazard-Datensatz den Abfluss schon enthält (Kein-Doppelkanal) |
+| S073 | Flächenversiegelung (über W085) | KWK Z198 | **FS-Hazard** (enthalten im Hazard-Datensatz, kein eigener Faktor — Kein-Doppelkanal §3.2) | wie S072 |
+| S074 | Topographie (Geländeform, Höhe) (über W085) | KWK Z199 | **FS-Exposition** — Geländehöhe → Wassertiefe am Gebäude | Kandidat für die Zell-Exposition (Geländehöhe → Wassertiefe); Doppelkanal prüfen, falls HQ-Karten Wassertiefen bereits führen |
+| R17 | Vorkommen von Oberflächengewässer und Grundwasser (über W085) | KWK Z204 | **FS-Exposition** — Lackmustest §3.1: keine Flussaue → ~0 | Kandidat Exposition; Lackmustest §3.1: keine Flussaue → ~0 |
+| R18 | Vorkommen von Abwasser- und Entwässerungssystemen (über W085) | KWK Z205 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)”; Mon. Z57 (Id 52, Spalte „Nicht enthalten”): „Gebäudeschäden durch Rückstau (ID 59).” | Rückstau gehört zu #59 (Mon. Z64), Kanalnetz zu #52 (K4) — voraussichtlich bewusst inaktiv |
+| R19 | Vorkommen von Infrastruktur an Binnengewässern (über W085) | KWK Z206 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” | Infrastruktur → K4 (K3-Definition, Konten Z28) — voraussichtlich bewusst inaktiv |
+| E10 | Hagel | KWK Z11 | **inaktiv** — keine Kante auf #60 (NW Z61 Input nur 49); Mon. Z65 (Spalte „Wird hier bepreist (enthalten)”): „Sachschäden flussseitiger Überflutung.” | keine Kante auf #60 (NW Z61 Input nur 49); Gegenstand Mon. Z65 „Sachschäden flussseitiger Überflutung” — voraussichtlich bewusst inaktiv |
+| E17 | Starkwind | KWK Z18 | **inaktiv** — wie E10; Mon. Z65: „Sachschäden flussseitiger Überflutung.” | wie E10 |
+| E14 | Schnee- und Eisdruck | KWK Z15 | **inaktiv** — wie E10; Mon. Z65: „Sachschäden flussseitiger Überflutung.” | wie E10 |
+| E02 | Hitze | KWK Z3 | **inaktiv** — wie E10; Mon. Z65: „Sachschäden flussseitiger Überflutung.” | wie E10 |
+| E03 | Kälte / Frost | KWK Z4 | **inaktiv** — wie E10; Mon. Z65: „Sachschäden flussseitiger Überflutung.” | wie E10 |
+| W074 | Meeresspiegelhöhe (= Id 40) | KWK Z181 | **inaktiv** — Mon. Z65 (Spalte „Nicht enthalten”): „Seeseitige Schäden (ID 46); Verkehrsinfrastruktur (ID 74); Schutzkosten (ID 50, R7).” | seeseitig → #46 (Mon. Z65 „Nicht enthalten: Seeseitige Schäden (ID 46)”) — R9 |
+| W077 | Sturmfluten (= Id 43) | KWK Z184 | **inaktiv** — wie W074; Mon. Z65 (Spalte „Nicht enthalten”): „Seeseitige Schäden (ID 46); Verkehrsinfrastruktur (ID 74); Schutzkosten (ID 50, R7).” | wie W074 |
+| W087 | Sturzfluten (= Id 51) | KWK Z210 | **inaktiv** — Mon. Z56 (Spalte „Wird hier bepreist (enthalten)”): „Schäden laufen über Gebäude-Starkregen (K3), Verkehr (K4), Personen (K1); Räumung/Instandsetzung der Entwässerung über ID 52 (K4).” | Gebäudeschäden über #59 (Mon. Z56: „Schäden laufen über Gebäude-Starkregen (K3)”) — R9 |
+| W008 | Bergsturz, Felssturz, Steinschlag | KWK Z45 | **inaktiv** — R9 (Rechenregeln Z11): „Innerhalb eines Kontos zählt jede Einheit (…Gebäude) genau einmal”; Schadenskonten-System Z29 führt „12 Rutschungen und Muren” als eigenständiges K3-Buchungsobjekt | Massenbewegungen → #12 (NW Z13, K3) — R9 |
+| W006 | Rutschungen und Muren (= Id 12) | KWK Z43 | **inaktiv** — wie W008; zusätzlich Mon. Z17 (Id 12, Spalte „Regeln”): „R7, R9” und Spalte „Bewertungsansatz”: „Wiederherstellungskosten beschädigter Gebäude (K3) …” (eigener Bewertungsansatz von #12, nicht #60) | wie W008 |
+| W091 | Grundwasserstand (= Id 55) | KWK Z214 | **inaktiv** — Abgleich-Protokoll Punkt 5 (Zeile 10): Ziel-Name/Konto „Direktbuchung Konto K3” — Id 55 bucht eigenständig direkt in K3, außerhalb der #60-Formel (R9, Rechenregeln Z11) | Id 55 bucht direkt in K3 (Abgleich-Protokoll P5) — Partition gegenüber #60 offen (R9) |
+| W100 | Einschränkungen Kanalnetze und Vorfluter (= Id 52) | KWK Z223 | **inaktiv** — Mon. Z57 (Id 52, Spalte „Schadenskonto”): „K4”; Spalte „Nicht enthalten”: „Gebäudeschäden durch Rückstau (ID 59).” | Id 52 bucht K4 (NW Z53) — voraussichtlich bewusst inaktiv |
+| S092 | Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer | KWK Z256 | **FS-Vorsorge** — Maßnahmen-Hebel, bereits beziffert (§5.1: r_S092 = 0,035, Band 0,0075–0,112, §3.9 Abgeschätzt) | Kandidat **Maßnahmen-Hebel** (Objektschutz); P2-Abschätzung §5.1 |
+| S093 | Zustand von Gebäuden und Infrastrukturen | KWK Z257 | **FS-Schadensgrad** — Vulnerabilität der Wassertiefe-Schadensfunktion (Mon. Z65) | Kandidat Vulnerabilität der Schadensfunktion; Evidenz und Zellgröße offen |
+| S094 | Verwendete Baumaterialien auf Gebäudeebene | KWK Z258 | **FS-Schadensgrad** — wie S093 | wie S093 |
+| S096 | Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand | KWK Z260 | **FS-Schutzsystem** — R7-Erwartungswert-Weiche mit #50 (Mon. Z65 Spalte „Regeln”: „R7, R9”; Rechenregeln Z9 R7) | Schutzsysteme über R7-Weiche mit #50 (Mon. Z65 „Schutzkosten (ID 50, R7)”; Z55) |
+| S097 | Zustand von (Schutz-)Infrastrukturen | KWK Z261 | **FS-Schutzsystem** — wie S096 (Versagensfall, Erwartungswert R7) | wie S096 (Versagensfall, Erwartungswert R7) |
+| S098 | Verwendete Baumaterialien von (Schutz-)Infrastrukturen | KWK Z262 | **FS-Schutzsystem** — wie S096 | wie S096 |
+| S104 | Investitionen der Bau- und Immobilienwirtschaft in exponierten Gebieten | KWK Z268 | **FS-Bestandsdynamik** — Szenario-Dynamik des Gebäudebestands (Kap. 6) | Kandidat Szenario-Dynamik des Gebäudebestands (Kap. 6) |
+| R24 | Vorkommen von Gebäuden | KWK Z270 | **FS-Mengengerüst** — Gebäudewerte (Mon. Z65: „HQ-Szenarien × Schadensfunktionen × Gebäudewerte”) | **Mengengerüst** (Gebäudewerte, Mon. Z65) |
+| R23 | Vorkommen von Bau- und Immobilienunternehmen | KWK Z269 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” — Unternehmensschäden (Betriebsausfall der Bauwirtschaft) sind kein K3-Gebäudeschaden | laut W117-Anmerkung pauschal nach Regel 4 eingetragen; kein Bezug zu Gebäudeschäden — voraussichtlich bewusst inaktiv |
+| R25 | Vorkommen von Siedlungsinfrastrukturen | KWK Z271 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” | Infrastruktur → K4 (Konten Z28) — voraussichtlich bewusst inaktiv |
 
 KWK = Sheet „Klimawirkungsketten“, NW = „Schadensbaum-Netzwerkliste“, Mon. = „Risiken-Monetarisierung“
 (Blattzeile), Konten = „Schadenskonten-System“. Zusätzlich, kein Knoten der W117-Kette: W103
@@ -83,7 +95,7 @@ KWK = Sheet „Klimawirkungsketten“, NW = „Schadensbaum-Netzwerkliste“, Mo
 
 | Output-Kanten (Netzwerkliste / Abgleich-Protokoll mit Punkt-Nr.) | Konto-Ausschlüsse / verwandte Buchungen (Konten-Definition, Monetarisierung) |
 |---|---|
-| **keine** — NW Z61 führt keine Output-IDs; das Abgleich-Protokoll hat keinen Punkt mit Quelle oder Ziel 60. Eingehend: **49 → 60** ist eine Originalkante (NW Z50, Mon. Z54 „→ 60, 74, 50, 101“), kein Abgleich-Punkt. | **K3 schließt aus** (Konten Z28): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)“. **#60 schließt aus** (Mon. Z65): „Seeseitige Schäden (ID 46); Verkehrsinfrastruktur (ID 74); Schutzkosten (ID 50, R7)“. **Partitionsregel-Zitate, K3 geteilt:** #59 (Mon. Z64) „Nicht enthalten: Flusshochwasserschäden (ID 60)“; #46 (Mon. Z51) „Nicht enthalten: … flussseitige/Starkregenschäden (ID 59/60)“; R9 (Rechenregeln Z11): „Innerhalb eines Kontos zählt jede Einheit (… Gebäude) genau einmal“. **Ohne Partitionsregel in der Mappe (offen):** #92 touristische Infrastruktur (K3; Kante 49→92, P15), #102 Gesundheitsinfrastruktur (K3; 49→102, P16), Id 55 Direktbuchung K3 (P5). Personen-Folgen desselben Ereignisses: #101 (K1, andere Konten zulässig, Mon. Z106). |
+| **keine** — NW Z61 führt keine Output-IDs; das Abgleich-Protokoll hat keinen Punkt mit Quelle oder Ziel 60. Eingehend: **49 → 60** ist eine Originalkante (NW Z50, Mon. Z54 „→ 60, 74, 50, 101”), kein Abgleich-Punkt. | **K3 schließt aus** (Konten Z28): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)”. **#60 schließt aus** (Mon. Z65): „Seeseitige Schäden (ID 46); Verkehrsinfrastruktur (ID 74); Schutzkosten (ID 50, R7)”. **Partitionsregel-Zitate, K3 geteilt:** #59 (Mon. Z64) „Nicht enthalten: Flusshochwasserschäden (ID 60)”; #46 (Mon. Z51) „Nicht enthalten: … flussseitige/Starkregenschäden (ID 59/60)”; **#37** Schäden an Aquakulturen — Kante **49 → 37** (Abgleich-Protokoll Punkt 3, Zeile 7: Quelle-ID 49 „Hochwasser” → Ziel 37 „Schäden an Aquakulturen”, Art „Kante”) mit R9-Zitat (Rechenregeln Z11): „Innerhalb eines Kontos zählt jede Einheit (… Gebäude) genau einmal; verschiedene Konten desselben Ereignisses sind additiv” i. V. m. Mon. Z42 (Spalte „Bewertungsansatz”): „… Sachschäden an Anlagen (K3)” — Teichwirtschafts-Anlagenschäden zählen unter #37, flussseitige Gebäudeschäden unter #60; **#12** Rutschungen und Muren — eigenständiges K3-Buchungsobjekt (Schadenskonten-System Z29: „12 Rutschungen und Muren”), R9-Zitat wie vor i. V. m. Mon. Z17 (Id 12, Spalte „Regeln”: „R7, R9”; Spalte „Bewertungsansatz”: „Wiederherstellungskosten beschädigter Gebäude (K3) …”) — Massenbewegungsschäden zählen unter #12, flussseitige Gebäudeschäden unter #60. **Ohne Partitionsregel in der Mappe (offen):** #92 touristische Infrastruktur (K3; Kante 49→92, P15), #102 Gesundheitsinfrastruktur (K3; 49→102, P16), Id 55 Direktbuchung K3 (P5). Personen-Folgen desselben Ereignisses: #101 (K1, andere Konten zulässig, Mon. Z106). |
 
 ### Konto-Einbettung
 
@@ -93,11 +105,26 @@ KWK = Sheet „Klimawirkungsketten“, NW = „Schadensbaum-Netzwerkliste“, Mo
   Schadensfunktionen × Bestandswerte“.
 - **Bewertungsbaustein:** K3-Wiederherstellung (NW Z61). Bewertungsansatz (Mon. Z65): „Wie ID 59,
   ereignisbezogen flussseitig; HQ-Szenarien × Schadensfunktionen (Wassertiefe-Schaden) ×
-  Gebäudewerte.“ Gegenstand: „Sachschäden flussseitiger Überflutung.“
-- **Rechenregeln:** R7, R9 (Mon. Z65, Spalte „Regeln“); dazu Annahme A5 Ereignislogik (Rechenregeln
-  Z20): „Eintrittswahrscheinlichkeit × Schadensfunktion × Bestand; Schutzsysteme über die
-  R7-Erwartungswert-Weiche“. R5 ist über „Wie ID 59“ inhaltlich einbezogen, steht aber nicht in der
-  Regelspalte (offener Punkt 4).
+  Gebäudewerte.” Gegenstand: „Sachschäden flussseitiger Überflutung.”
+- **Preisstandjahr (Abschätzung von KAP3, §3.9 ABGESCHÄTZT):** 2026. Herleitung: Keine der beiden
+  Arbeitsmappen beziffert für K3-Wiederherstellungskosten ein Preisstandjahr (anders als K1/VOLY,
+  Konten Z11: „Preisstand 2024”); Rechenregeln Z19 (A4) verlangt: „Konkrete Zahlen sind vor
+  Produktivsetzung zu belegen.” Bis ein K3-eigener Kostensatz mit Quelle vorliegt (Kap. 3/7), wird
+  das Erstellungsjahr dieses Berichtsteils als Preisstandjahr gesetzt und bei Bezifferung ersetzt
+  (Ersetzungspfad, W1) — kein dauerhafter unspezifizierter Wert ohne Kennzeichnung als Abschätzung
+  (Eiserne Regel 3, P1).
+- **Rechenregeln:** R5 (übernommen), R7, R9 (Mon. Z65, Spalte „Regeln”: „R7, R9”); dazu Annahme A5
+  Ereignislogik (Rechenregeln Z20): „Eintrittswahrscheinlichkeit × Schadensfunktion × Bestand;
+  Schutzsysteme über die R7-Erwartungswert-Weiche”. **R5-Entscheidung (schließt offenen Punkt 4 des
+  Erstaufschlags):** R5 (Rechenregeln Z7): „Versicherungsleistungen, Preisänderungen und
+  Nachfrageverlagerungen zwischen Regionen sind (überwiegend) Umverteilung. Kommunal zählt die
+  lokale reale Änderung; national wäre vieles davon Transfer.” wird **übernommen**. Die
+  K3-Kontodefinition selbst trägt den Satz „Versicherungsleistungen sind Transfers” (Konten Z26);
+  der Bewertungsansatz von #60 verweist mit „Wie ID 59” (Mon. Z65) auf #59, dessen eigener
+  Bewertungsansatz R5 ausdrücklich anwendet (Mon. Z64: „… Versicherungsleistungen sind Transfers und
+  mindern den Schaden nicht (R5).”). Dass die Regelspalte von Mon. Z65 nur „R7, R9” nennt, schließt
+  R5 nicht aus — es ist bereits Bestandteil der Kontodefinition (Konten Z26) und wird deshalb dort
+  nicht wiederholt.
 - **Handlungserfordernis:** sehr dringend (Mon. Z65, NW Z61).
 - **Nur K3 aktiv:** Folgen desselben Ereignisses in K1 (#101), K4 (#74), K5 und K8 (#50) sind nicht
   enthalten — Untergrenze, im Infokasten zu benennen (§3.6).
