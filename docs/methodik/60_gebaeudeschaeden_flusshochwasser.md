@@ -826,17 +826,267 @@ sondern steht neben ihm.
 
 ## 4 Kalibrierung & Validierung (§2.4/§3.4)
 
-<!--
-Pflichtinhalte: nationaler Anker als EIN Niveau-Skalar (Anker-Zeitreihe mit Revisionsstand;
-vorläufige Jahre gesondert); Kalibriermodell = Produktionsmodell; unabhängige Verteilungsprüfung
-auf der kritischsten Achse — bei Flut das EREIGNISREGIME — mit vorab fixierter Toleranz,
-out-of-sample; Sanity-Bänder mit Unter- und Obergrenze aus amtlicher Statistik; Skripte/CSVs als
-Anlage verlinkt. Anker-Kandidaten und Zahlen: offen (keine Zahl ohne Quelle, P1).
+Kalibriert wird das Niveau, geprüft wird die Verteilung. Beides ist getrennt: Das Niveau wird über
+**genau einen** nationalen Skalar \(\lambda\) an einen benannten Anker gebunden (§2.4: ein
+Niveau-Skalar, nicht mehrere), und die Verteilung über die Ereignisse wird gegen eine Größe
+geprüft, die in die Bestimmung von \(\lambda\) **nicht** eingeht. Das Kalibriermodell ist das
+Produktionsmodell: Es läuft mit derselben Kernformel, denselben Stützstellen und demselben
+Beispielcode wie Kapitel 3; es gibt keinen zweiten, „kalibrierten" Rechenweg.
 
-(b) RESSOURCEN-REGEL (§3.4): Kalibrierung, Validierung und Abgleiche nie über nationale
-    100-m-Vollraster-Läufe planen — zulässig sind Bundesland-, Gemeinde-/Gemeindepunkt- und
-    kommunale Stichproben-Ebene (dokumentierte Anker-Kommunen mit dem Produktionsmodell).
--->
+### 4.1 Nationaler Anker: GDV-Naturgefahrenstatistik, Teilreihe Überschwemmung/Starkregen
+
+**Anker \(A_{\text{ver}}\) (namentlich).** Die jährlich veröffentlichte
+**GDV-Naturgefahrenstatistik** (Gesamtverband der Deutschen Versicherer), Teilreihe **„Starkregen
+und Überschwemmung" in der Sachversicherung**, ausgewiesen im *Datenservice zum
+Naturgefahrenreport*. Sie ist der einzige bundesweit durchgehend geführte Schadensdatensatz zu
+Überflutungsschäden an Gebäuden; eine amtliche Hochwasser-Schadensbilanz des Bundes mit
+Jahreswerten existiert nicht (die Wiederaufbaufonds nach 2002, 2013 und 2021 sind Ereignis-, keine
+Zeitreihenwerte und werden deshalb nicht als Anker verwendet).
+
+- **Zeitreihe.** Elementargefahren in der Sachversicherung werden **seit 2002** erhoben (Sturm und
+  Hagel seit 1973). Die Reihe ist damit 23 abgeschlossene Schadenjahre lang (2002–2024).
+- **Revisionsstand.** Verwendet wird der Stand *Datenservice zum Naturgefahrenreport 2025*;
+  Aktualisierungsvermerke der genutzten Grafiken: **10.10.2025** (Elementarschäden an Wohngebäuden
+  nach Bundesländern) und **30.12.2025** (Übersichtsreihe, „bezogen auf Bestand und Preise 2024"
+  — die Reihe ist also bestands- und preisnormiert, nicht nominal).
+- **Vorläufige Jahre gesondert.** Das Schadenjahr **2025** liegt nur als vorläufige Mitteilung vor
+  (Sachversicherung 1,4 Mrd. € Naturgefahren) und geht in die Kalibrierung **nicht** ein; es dient
+  ausschließlich als nachlaufende Kontrolle.
+- **Ankerwert.** Für 2024 nennt der GDV **2,6 Mrd. €** versicherte Schäden durch Starkregen und
+  Überschwemmung, „rund eine Milliarde Euro mehr als im langjährigen Durchschnitt". Daraus folgt
+  der hier verwendete Mittelwert der Reihe: \(A_{\text{ver}}\) = **1,6 Mrd. €** je Jahr
+  (Bestands-/Preisstand 2024), **Band 1,4–1,8 Mrd. €** — das Band bildet allein die Rundung „rund
+  eine Milliarde" ab. Quelle: GDV, „GDV-Naturgefahrenstatistik 2024: Hochwasserschäden mehr als
+  verdoppelt" (Medieninformation), sowie GDV, „Versicherungsquote bei Elementarschadenversicherung
+  steigt kontinuierlich" (Datenservice, Versicherungsdichte 2024: 57 %, 10,2 Mio. versicherte
+  Wohngebäude) — Zugriff 13.09.2026; vollständige Belege in Kap. 8.
+
+**Was der Anker nicht ist.** Er misst *gezahlte Versicherungsleistungen* für *alle*
+Überschwemmungen (fluvial **und** pluvial) in *allen* Sachsparten. Der Berichtsgegenstand von #60
+ist enger (Wohngebäude, flussseitig) und zugleich weiter (auch nicht versicherte Schäden). Die
+Lücke wird nicht weggerundet, sondern in 4.2 Schritt für Schritt überbrückt.
+
+### 4.2 Vom Anker zum Modellumfang — Zielwert der Bundessumme
+
+\(A^{*} = A_{\text{ver}} \cdot w_{\text{wg}} \cdot u \cdot \varphi_{\text{fluss}} \cdot \kappa \cdot \pi\)
+
+| Schritt | Zeichen | Wert (Band) | Herkunft |
+|---|---|---|---|
+| Anker, Mittel 2002–2024 | \(A_{\text{ver}}\) | 1,6 Mrd. € (1,4–1,8) | **Quelle:** GDV-Naturgefahrenstatistik 2024 (§4.1) |
+| Anteil Wohngebäude an der Sach-Schadensumme | \(w_{\text{wg}}\) | 0,65 (0,55–0,75) | **Abschätzung von KAP3** (§3.9), Herleitung unten |
+| Hochrechnung auf den unversicherten Bestand | \(u\) | 1,54 (1,33–1,75) | **Abschätzung von KAP3** aus der belegten Versicherungsdichte 57 % |
+| Anteil flussseitig an Starkregen + Überschwemmung | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3** (§3.9), Herleitung unten |
+| Leistung → Wiederherstellungskosten | \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3** (§3.9), Herleitung unten |
+| Preisstand 2024 → 2026 | \(\pi\) | 1,07 (1,04–1,11) | **Abschätzung von KAP3**, abgeleitet aus B4 (Register 60-R24-01) |
+
+**Herleitung der vier abgeschätzten Faktoren** (alle vier sind Abschätzungen von KAP3, keine
+Primärquelle; sie werden im Produkt nach Vorgabe P1 mit genau dieser Herleitung ausgewiesen):
+
+- \(w_{\text{wg}}\) = 0,65. 2024 entfielen von 5,7 Mrd. € versicherten Naturgefahrenschäden
+  4,4 Mrd. € auf die Sachversicherung und 1,3 Mrd. € auf Kraftfahrt (GDV, §4.1). Innerhalb der
+  Sachversicherung trägt die Wohngebäudeversicherung den größten Teil, weil die Gebäudesubstanz
+  die teuerste betroffene Position ist; Hausrat sowie Gewerbe/Industrie teilen sich den Rest.
+  Untergrenze 0,55 (Gewerbeanteil hoch), Obergrenze 0,75 (Gewerbeanteil niedrig). Eine
+  spartenscharfe Aufteilung der Teilreihe ist nicht publiziert — deshalb abgeschätzt.
+- \(u\) = 1,54 = \(1/0{,}65\). Belegt ist eine Versicherungsdichte Elementar von **57 %**
+  (10,2 Mio. von 19,7 Mio. Wohngebäuden, Stand 2024; 2017: 41 %). Der Deckungsgrad **exponierter**
+  Gebäude liegt darüber, weil betroffene Regionen deutlich höhere Quoten erreichen (Baden-
+  Württemberg historisch 94 %, Rheinland-Pfalz nach 2021 von 37 % auf 59 %). Deshalb wird nicht
+  mit 0,57, sondern mit einem effektiven Deckungsgrad 0,65 gerechnet; Band 0,57 (keine
+  Selbstselektion, \(u\) = 1,75) bis 0,75 (starke Selbstselektion, \(u\) = 1,33).
+- \(\varphi_{\text{fluss}}\) = 0,50. Der GDV führt Starkregen und Überschwemmung in **einer**
+  Position. #60 rechnet nur flussseitige Überflutung; Sturzfluten und Kanalrückstau sind W087 bzw.
+  W100 und gehören nicht hierher. Für eine hälftige Teilung spricht, dass die Spitzenjahre beide
+  Regime abbilden: 2024 dominierte das Juni-Hochwasser in Bayern und Baden-Württemberg (je
+  ≈ 1,6 Mrd. € Landesschaden, flussseitig), 2021 die Sturzflut „Bernd" (pluvial). Band 0,35–0,65.
+- \(\kappa\) = 1,15. Gezahlte Leistungen liegen unter den Wiederherstellungskosten
+  (Selbstbehalte, Unterversicherung, nicht gedeckte Positionen), aber nicht weit darunter, weil
+  Wohngebäudeverträge zum gleitenden Neuwert decken. Band 1,05–1,30. Gegenrichtung ausdrücklich
+  benannt: Regulierungskosten und Kulanz wirken umgekehrt, deshalb kein höherer Zentralwert.
+- \(\pi\) = 1,07. Das Register führt für 2023 → 2026 den Baupreisfaktor 1,105 (B4, Band
+  1,07–1,16). Abzüglich rund 3 % Baupreisanstieg 2023 → 2024 ergibt sich \(1{,}105/1{,}03 \approx
+  1{,}073\); Band 1,04–1,11.
+
+**Zielwert.** \(A^{*}\) = 1,6 · 0,65 · 1,54 · 0,50 · 1,15 · 1,07 = **0,99 Mrd. €₂₀₂₆/a**
+(Band, alle Enden gleichgerichtet: **0,39–2,22 Mrd. €₂₀₂₆/a**). Das ist der bundesweite
+Erwartungsschaden des Kontos K3 an Wohngebäuden aus flussseitiger Überflutung, den der Anker nahe
+legt — die Größe, gegen die die Modellsumme gestellt wird.
+
+### 4.3 Modellsumme vor Kalibrierung — und die verwendete Auflösung (§3.4)
+
+Die unkalibrierte Bundessumme \(M_0\) entsteht aus drei Größen, die alle bereits im Bericht
+stehen:
+
+1. **Exponierte Wohngebäude, flussnah:** 339.000 Adressen in ZÜRS-GK3+GK4 (Register 60-R17-01;
+   Modellgrenze: Adressen sind keine Gebäude, ein Gebäude je Adresse ist eine Untergrenze).
+2. **Wert je exponiertem Wohngebäude:** 208 m² Wohnfläche · 1,30 BGF/Wohnfläche · 1.950 €₂₀₂₆/m²
+   BGF = **527.280 €₂₀₂₆** (Register 60-R24-01).
+3. **Mittlerer Jahresschadensgrad** aus dem Produktionsmodell: 6,311 m²/a je 1.200 m² exponierter
+   Wohnfläche = **0,526 %/a** (Beispielblock `beispiel_60_kernformel`, §3.6). Dieser Wert ist der
+   **Vorab-Wert aus der Beispielzelle** und ausdrücklich eine Abschätzung von KAP3 (§3.9); er
+   stammt aus einer Zelle und nicht aus der Anker-Stichprobe. Mit dem Stichprobenlauf der
+   Integration tritt der dort gemessene Mittelwert an seine Stelle, und \(\lambda\) wird mit
+   derselben Rechnung neu bestimmt.
+
+\(M_0\) = 339.000 · 527.280 € · 0,00526/a = **0,94 Mrd. €₂₀₂₆/a**.
+
+**Auflösung (Ressourcen-Regel §3.4).** Alle Schritte dieses Kapitels laufen auf **Bundesland-Ebene
+(16 Werte), auf Gemeindepunkt-Ebene und auf einer dokumentierten Stichprobe von Anker-Kommunen**;
+**kein Schritt dieses Kapitels erfordert einen nationalen 100-m-Vollraster-Lauf** — weder die
+Bestimmung von \(\lambda\) (drei nationale Aggregate, siehe oben) noch die Verteilungsprüfung
+(Länderwerte) noch das Sanity-Band (Bestandsstatistik). Die Anker-Stichprobe umfasst je
+Ereignisjahr die am stärksten betroffenen Kommunen der betroffenen Länder; für den Erstlauf sind
+das **Grimma, Dresden, Deggendorf, Passau, Halle (Saale), Hitzacker, Rosenheim und Reichertshofen**
+— acht Kommunen mit Hochwassergefahrenkarten-Deckung, auf denen das Produktionsmodell vollständig
+gerechnet wird. Die Auswahlregel steht damit im Bericht und ist nachvollziehbar erweiterbar.
+
+### 4.4 Der Niveau-Skalar
+
+\(\lambda = A^{*}/M_0\) = 0,99 / 0,94 = **1,05** (Band aus dem Ankerband: **0,42–2,36**).
+
+**Anwendungsregel.** \(\lambda\) ist ein **einziger, bundesweit konstanter** Faktor auf
+\(\text{EAD}_k\) jeder Kommune. Er ist kein Verteilungsschlüssel: Die relative Verteilung zwischen
+Kommunen bleibt unverändert, eine Kommune ohne Flussaue bleibt bei 0 (Lackmustest §3.4). Es gibt
+keinen zweiten Skalar, keinen bundeslandspezifischen Korrekturfaktor und keine Nachkalibrierung
+einzelner Kommunen.
+
+**Plausibilitätsschranke.** Ergibt eine Neubestimmung \(\lambda < 0{,}50\) oder \(\lambda >
+2{,}00\), wird **nicht** der Skalar gesetzt, sondern das Modell gilt als fehlerhaft: Dann trägt
+eine Eingangsgröße den Fehler (Exponiertenzahl, Wertdichte, Schadensfunktion), und der Befund geht
+ins Ledger, bevor gerechnet wird. Dass \(\lambda\) = 1,05 nahe bei 1 liegt, ist das erste
+Ergebnis dieser Kalibrierung: Das aus Karte, Bestand und Schadensfunktion aufgebaute Modell trifft
+das Anker-Niveau ohne nennenswerte Korrektur.
+
+### 4.5 Unabhängige Verteilungsprüfung: Achse Ereignisregime
+
+**Prüfgröße.** Anteil der Schadenssumme, der aus dem **seltenen Regime** (Ereignisse ab HQ100
+einschließlich HQextrem) stammt — die kritischste Achse dieses Risikos, weil die Schadensfunktion
+dort gedeckelt und die Jährlichkeit dort am unsichersten ist.
+
+**Toleranz — vorab fixiert: ±15 Prozentpunkte** (absolut, auf den Regime-Anteil). Herleitung
+(Abschätzung von KAP3, §3.9): Die modellseitige Streuung aus dem belegten HQextrem-Band
+(5,0·10⁻³ bis 1,0·10⁻³ a⁻¹, Register 60-W085-01) beträgt 32,4–36,9 %, also ±2,3 Prozentpunkte. Die
+ankerseitige Unschärfe ist größer: gepoolte fluviale und pluviale Ereignisse, nur ein
+ausgewertetes Ereignisjahr, versicherte statt gesamter Schäden — dafür ±12,5 Prozentpunkte. Summe
+≈ ±15 Prozentpunkte. Die Toleranz ist festgelegt, **bevor** der Ist-Wert unten gerechnet wird, und
+sie wird bei einer Nichterfüllung nicht nachträglich geweitet.
+
+**Unabhängigkeit.** \(\lambda\) wird allein aus dem **Mittelwert** der Reihe bestimmt; der
+Regime-Anteil ist eine Form-, keine Niveaugröße und geht in \(\lambda\) an keiner Stelle ein. Die
+Überlappung wird beziffert statt behauptet: Das Prüfjahr 2024 steuert 1 von 23 Kalibrierjahren
+bei, also 4,3 % der Ankerbasis.
+
+**Ist-Ergebnis.** Modellseite: aus den Stützstellen von §3.6 entfallen auf HQhäufig 66,1 %, auf
+HQ100 23,2 % und auf das Extremregime 10,6 % des Erwartungswerts, also **33,9 %** auf das seltene
+Regime ab HQ100. Ankerseite: Im Großereignis-Jahr 2024 lagen 2,6 Mrd. € gegenüber einem
+langjährigen Mittel von 1,6 Mrd. €; der auf das Großereignis entfallende Überschuss beträgt
+1,0/2,6 = **38,5 %** der Jahressumme. **Differenz 4,6 Prozentpunkte < 15 Prozentpunkte — Prüfung
+bestanden.**
+
+**Grenzen der Prüfung** (nicht geglättet, §3.8): Der Ankerwert stützt sich auf ein einziges
+Ereignisjahr und auf die Gleichsetzung „Überschuss über dem Mittel" ≈ „Beitrag des seltenen
+Regimes". Sobald die Jahreswerte der Reihe 2002–2024 einzeln vorliegen, tritt der über alle
+23 Jahre gebildete Regime-Anteil an die Stelle dieses Einjahres-Werts; die Toleranz von
+±15 Prozentpunkten bleibt dabei unverändert und wird enger gefasst, wenn der ankerseitige
+Unsicherheitsbeitrag sinkt.
+
+### 4.6 Sanity-Band der Bundessumme
+
+| Grenze | Wert | Herleitung |
+|---|---|---|
+| Untergrenze \(U\) | **0,56 Mrd. €₂₀₂₆/a** | 1,6 Mrd. € · 0,65 (Wohngebäude) · 0,50 (flussseitig) · 1,07 (Preisstand) — die im Mittel **tatsächlich gezahlten** Versicherungsleistungen für flussseitige Wohngebäudeschäden. Der gesamtwirtschaftliche Schaden kann nicht kleiner sein als die dafür gezahlten Leistungen, weil unversicherte Schäden zwingend hinzukommen (Hochrechnung \(u\) entfällt hier bewusst). |
+| Obergrenze \(O\) | **2,26 Mrd. €₂₀₂₆/a** | Bestandsschranke: 7,6 % von 22,6 Mio. Adressen = 1,72 Mio. exponierte Adressen (GK2–GK4, Register 60-R17-01) · 527.280 € = 0,91 Bio. € exponierter Bestandswert; multipliziert mit der **gedeckelten** Schadensquote 0,250 (§3.3) und einer mittleren Betroffenheit von 1/100 Jahren: 0,91 Bio. € · 0,250 · 0,01. Mehr kann selbst dann nicht entstehen, wenn jedes exponierte Gebäude im Hundertjahresrhythmus mit maximaler Quote getroffen wird. |
+
+Beide Grenzen sind aus belegten Bestandszahlen abgeleitet, nicht gesetzt; abgeschätzt sind nur die
+in 4.2 ausgewiesenen Anteile \(w_{\text{wg}}\) und \(\varphi_{\text{fluss}}\) (Untergrenze) sowie
+die Betroffenheitsannahme 1/100 a (Obergrenze, Abschätzung von KAP3 — sie ist die Jährlichkeit des
+Bemessungsereignisses und damit die großzügigste noch sinnvolle Annahme).
+
+**Ist:** \(\lambda \cdot M_0\) = 0,99 Mrd. €₂₀₂₆/a liegt innerhalb von [0,56; 2,26]. Das Band ist
+zugleich die Vorlage für den Sanity-Band-Test der Integration: Eine Bundessumme außerhalb dieser
+Grenzen ist ein roter Test, kein Hinweis.
+
+### 4.7 Kalibrierjahre und Doppelzählungs-Wächter (Bindung von §5.1)
+
+**Kalibrierjahre, namentlich:** **2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023 und 2024** — 23
+abgeschlossene Schadenjahre. **2025 ist ausgeschlossen** (vorläufig, §4.1). Das **letzte
+Kalibrierjahr ist 2024**; auf dieses Jahr sind Bestands- und Preisnormierung des Ankers bezogen.
+
+**Wächter.** Der Objektschutz, der in den Kalibrierjahren 2002–2024 bereits an den Gebäuden
+vorhanden war, steckt in den Schadenzahlen des Ankers und damit in \(\lambda\). \(\Delta q\) aus
+§5.1.2 zählt deshalb **ausschließlich Nachrüstungen nach dem letzten Kalibrierjahr 2024**; jede
+vor 2025 realisierte bauliche Vorsorge ist Teil des Basisschadens und darf nicht erneut als
+Minderung gebucht werden. Operativ: Ein Hebelwert gilt nur für den Zuwachs gegenüber dem
+Ausstattungsstand 31.12.2024, und er verfällt, sobald ein Kalibrierjahr nach 2024 in den Anker
+aufgenommen wird — dann verschiebt sich der Referenzzustand mit.
+
+**Heutiger Objektschutz-Anteil \(q_0\): geparkt (Datenquelle fehlt).** Eine bundesweite Statistik
+des Ausstattungsgrads mit baulicher Objektvorsorge existiert nicht; die verfügbaren Angaben
+stammen aus Betroffenenbefragungen nach einzelnen Ereignissen und sind weder bundesweit noch
+volltextgeprüft (§3.8). \(q_0\) wird deshalb **nicht gesetzt**, sondern als geparkt geführt —
+mit Beschaffungs-Watchlist: (1) Zusatzmodul einer künftigen Zensus-Gebäudeerhebung, (2)
+Auswertung kommunaler Förderprogramme zur Objektvorsorge, (3) Schadenstatistik der
+Wohngebäudeversicherung nach Vorsorgemerkmal. Die Marginalitätsaussage von §5.1.2 stützt sich
+solange **nicht** auf \(q_0\), sondern allein auf die Jahresbindung oben: Was vor 2025 gebaut
+wurde, ist im kalibrierten Niveau enthalten, unabhängig davon, wie viel es war. Das ist die
+prüfbare Form des Wächters; die Bezifferung von \(q_0\) bleibt offen und ist als solche
+gekennzeichnet.
+
+### 4.8 Parameter dieses Kapitels (Vorgabe P1)
+
+| Parameter | Wert (Band) | Quelle **oder** Abschätzung von KAP3 |
+|---|---|---|
+| \(A_{\text{ver}}\) Anker | 1,6 Mrd. € (1,4–1,8) | **Quelle:** GDV-Naturgefahrenstatistik 2024, Datenservice Naturgefahrenreport 2025 (Stand 10.10./30.12.2025), §4.1 |
+| \(w_{\text{wg}}\) | 0,65 (0,55–0,75) | **Abschätzung von KAP3**, Herleitung §4.2 |
+| \(u\) | 1,54 (1,33–1,75) | **Abschätzung von KAP3** auf belegter Versicherungsdichte 57 %, Herleitung §4.2 |
+| \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3**, Herleitung §4.2 |
+| \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3**, Herleitung §4.2 |
+| \(\pi\) | 1,07 (1,04–1,11) | **Abschätzung von KAP3** aus B4 (Baupreisindex), Herleitung §4.2 |
+| \(\lambda\) Niveau-Skalar | 1,05 (0,42–2,36) | **berechnet** aus \(A^{*}/M_0\), §4.4 |
+| Toleranz Verteilungsprüfung | ±15 Prozentpunkte | **Abschätzung von KAP3**, Herleitung §4.5 (±2,3 modellseitig + ±12,5 ankerseitig) |
+| \(U\) Sanity-Untergrenze | 0,56 Mrd. €₂₀₂₆/a | **berechnet** aus Anker und Bestandsanteilen, Herleitung §4.6 |
+| \(O\) Sanity-Obergrenze | 2,26 Mrd. €₂₀₂₆/a | **berechnet** aus Bestandswert, Deckelquote und 1/100 a, Herleitung §4.6 |
+| \(q_0\) Objektschutz-Anteil heute | **geparkt (Datenquelle fehlt)** | keine Quelle; Watchlist §4.7 — nicht gesetzt, nicht geschätzt |
+
+```python test: beispiel_60_kalibrierung
+# 4.2 Zielwert aus dem Anker (Mrd. EUR2026/a)
+A_ver, w_wg, u, phi, kappa, pi = 1.6, 0.65, 1.54, 0.50, 1.15, 1.07
+A_stern = A_ver * w_wg * u * phi * kappa * pi
+assert abs(A_stern - 0.985) < 5e-3
+lo = 1.4 * 0.55 * 1.33 * 0.35 * 1.05 * 1.04
+hi = 1.8 * 0.75 * 1.75 * 0.65 * 1.30 * 1.11
+assert abs(lo - 0.391) < 5e-3 and abs(hi - 2.216) < 5e-3
+
+# 4.3 Modellsumme vor Kalibrierung und 4.4 Niveau-Skalar
+wert_geb = 208.0 * 1.30 * 1950.0                 # EUR2026 je exponiertem Wohngebaeude
+assert abs(wert_geb - 527280.0) < 1.0
+M0 = 339_000 * wert_geb * (6.311 / 1200.0) / 1e9
+assert abs(M0 - 0.940) < 5e-3
+lam = A_stern / M0
+assert abs(lam - 1.05) < 5e-3 and 0.50 <= lam <= 2.00   # Plausibilitaetsschranke 4.4
+
+# 4.5 Verteilungspruefung Ereignisregime: Anteil ab HQ100 gegen Ankerbefund
+A = [15.0, 77.76, 300.0]
+def regime(p_extrem):
+    p = [1.0e-1, 1.0e-2, p_extrem]
+    t1 = (p[0] - p[1]) * (A[0] + A[1]) / 2
+    t2 = (p[1] - p[2]) * (A[1] + A[2]) / 2
+    t3 = p[2] * A[2]
+    return (t2 + t3) / (t1 + t2 + t3)
+anteil = regime((5.0e-3 * 1.0e-3) ** 0.5)
+assert abs(anteil - 0.339) < 5e-4
+assert abs(regime(1.0e-3) - 0.324) < 5e-4 and abs(regime(5.0e-3) - 0.369) < 5e-4
+anker = 1.0 / 2.6                                        # Ueberschuss 2024 ueber dem Mittel
+assert abs(anker - 0.385) < 5e-4
+assert abs(anker - anteil) * 100 < 15.0                  # Toleranz vorab: 15 Prozentpunkte
+
+# 4.6 Sanity-Band und Lage der kalibrierten Bundessumme
+U = A_ver * w_wg * phi * pi
+O = 0.076 * 22.6e6 * wert_geb * 0.250 * 0.01 / 1e9
+assert abs(U - 0.556) < 5e-3 and abs(O - 2.264) < 5e-3
+assert U <= lam * M0 <= O
+```
 
 ## 5 Maßnahmen-Hebel (§2.5/§3.5)
 
@@ -894,6 +1144,11 @@ Wirkungsformel \(\text{EAD}_{\text{mit}} = \text{EAD}\cdot(1 - r_{\text{S092}})\
 - \(s_{\text{bem}}\) = 0,50 (0,30–0,70). Annahme: Schadenssummen verteilen sich auf häufige flache
   und seltene tiefe Überflutungen. Oberhalb der Schutzhöhe wird Objektschutz überströmt und wirkt
   praktisch nicht. Ohne gemessene Tiefenverteilung wird die Mitte gesetzt, Band symmetrisch.
+
+Die Marginalität von \(\Delta q\) ist an die Kalibrierjahre gebunden: Gezählt wird allein die
+Nachrüstung **nach dem letzten Kalibrierjahr 2024**, weil der bis dahin vorhandene Objektschutz im
+Anker und damit im Niveau-Skalar steckt (Doppelzählungs-Wächter, §4.7; der heutige
+Ausstattungsgrad \(q_0\) ist dort als geparkt ausgewiesen).
 
 Rechnung: \(r_{\text{S092}}\) = 0,10 · 0,50 · 0,70 = **0,035**. Band (alle Enden gleichgerichtet):
 0,05 · 0,30 · 0,50 = **0,0075** bis 0,20 · 0,70 · 0,80 = **0,112**.
