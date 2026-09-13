@@ -9,13 +9,15 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 > Weitergaben, Konto) und Kap. 2 (Evidenz-Register-Skelett) aus den beiden Arbeitsmappen unter
 > `docs/Schadensbaum/`; Kap. 3–9 tragen die Pflichtinhalte als Kommentar. Einzige bezifferte
 > Größe ist die P2-Abschätzung zum Maßnahmen-Hebel S092 (§5.1, `#s092-wirkung`), ausdrücklich als
-> **Abschätzung von KAP3** gekennzeichnet. Alle übrigen Entscheidungen stehen auf `offen`.
-> Befund-Ledger: `reviews/BEFUNDE_60.md` (leer).
+> **Abschätzung von KAP3** gekennzeichnet. Die Knoten-Bilanz in Kap. 1 ist entschieden
+> (32/32 Zeilen tragen eine Formelstelle oder `inaktiv` mit Zitat); die übrigen Punkte
+> (Ergebnisgröße/Ansatz, Datenebenen, Volltext-Evidenz) stehen weiterhin auf `offen`.
+> Befund-Ledger: `reviews/BEFUNDE_60.md`.
 
 ## Ergebnis
 
 - **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`.
-- **Offen:** (1) alle 32 Entscheidungen; (2) Ergebnisgröße und Ansatz (Kap. 9); (3) Datenebenen nach §3.1; (4) R9-Partitionen in K3 mit #92/#102/#55 und R5 über „Wie ID 59“; (5) Volltext-Evidenz zu S092.
+- **Offen:** (1) Ergebnisgröße und Ansatz (Kap. 9); (2) Datenebenen nach §3.1; (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) Volltext-Evidenz zu S092.
 - **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Planungszahl korrigiert, Beispiel-Code-Zaun im Kommentar entfernt; R2: Lint-Funde behoben, Zeichentabelle S092 als eigener Abschnitt, Verweis korrigiert). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: je rund 0,3 USD. Keine Websuche, also keine externe Evidenz.
 - **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
