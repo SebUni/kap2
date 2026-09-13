@@ -126,6 +126,82 @@ legt beides über den `create_all`-Guard auch selbst an.) Logs der
 Kind-Prozesse: `backend/logs/worker-<kommune_id>.log` und
 `backend/logs/artifact-rebuild.log`.
 
+Für eine **Bestandsdatenbank**, die noch über `Base.metadata.create_all()`
+beim Dienststart entstanden ist, gilt zuerst
+[Bestandsdatenbank auf die Migrationskette heben](#bestandsdatenbank-auf-die-migrationskette-heben)
+— erst danach ist `alembic upgrade head` der normale Weg.
+
+## Bestandsdatenbank auf die Migrationskette heben
+
+Die Migrationskette hat mit der Basis-Migration **`b1aadda418b4`**
+(`b1aadda418b4_baseline_schema.py`) eine neue Wurzel; `head` ist
+**`f1a2b3c4d5e6`**. Bestandsdatenbanken (Testdatenbank, spätere
+Kundendatenbanken) sind über `Base.metadata.create_all()` beim Dienststart
+entstanden: ihre Tabelle `alembic_version` steht entweder auf `f1a2b3c4d5e6`
+oder existiert gar nicht. Alle Befehle laufen aus `backend/`.
+
+In **keinem der drei Fälle wird eine Tabelle gelöscht und keine Migration
+rückwärts gefahren** — es gibt kein `downgrade`, kein `DROP`, kein
+Neuanlegen des Schemas. Der Übergang ist reine Buchführung in
+`alembic_version` bzw. ein Vorwärts-Upgrade.
+
+1. **Sicherung** — vor jedem weiteren Schritt, ohne Ausnahme:
+
+   ```bash
+   pg_dump -Fc -f ~/kap2_vor_basismigration.dump kap2
+   ```
+
+2. **Ist-Stand feststellen:**
+
+   ```bash
+   psql -d kap2 -c "select version_num from alembic_version"
+   ```
+
+3. **Fall A — Ausgabe ist `f1a2b3c4d5e6`:** nichts zu tun. **Kein `stamp`.**
+   Die neue Wurzel `b1aadda418b4` liegt unterhalb des aktuellen Standes; die
+   Datenbank ist damit schon über die Basis-Migration hinaus und hängt korrekt
+   in der Kette. Weiter mit Schritt 6.
+
+4. **Fall B — `alembic_version` fehlt oder ist leer** (Fehler
+   `relation "alembic_version" does not exist` bzw. `0 rows`): erst prüfen, ob
+   das vorhandene Schema zum Modell passt:
+
+   ```bash
+   ../.venv/bin/alembic check
+   ```
+
+   - **Nur bei leerer Ausgabe** (keine gemeldeten Unterschiede) die Datenbank
+     als auf dem aktuellen Stand markieren:
+
+     ```bash
+     ../.venv/bin/alembic stamp head
+     ```
+
+   - **Meldet `check` einen Unterschied: ausdrücklich kein `stamp`.** Ein
+     `stamp head` auf ein abweichendes Schema markiert Migrationen als
+     gelaufen, die nie gelaufen sind — genau der stille Datenverlust, den
+     dieses Runbook verhindert. Stattdessen den Befund festhalten (Ausgabe von
+     `alembic check` samt Datenbank und Datum) und eskalieren, bevor irgendein
+     weiterer Schritt erfolgt.
+
+5. **Fall C — der Stand ist eine der mittleren Revisionen der Kette**
+   (`861a0419ccf8`, `b2c3d4e5f6a7`, `c4d5e6f7a8b9`, `aa0fe1d8c95e`,
+   `d5e6f7a8b9c0`, `e6f7a8b9c0d1`): vorwärts bis zum Kopf fahren:
+
+   ```bash
+   ../.venv/bin/alembic upgrade head
+   ```
+
+   Danach **Schritt 2 wiederholen** und den Stand `f1a2b3c4d5e6` bestätigen.
+
+6. **Gegenprobe** in allen drei Fällen:
+
+   ```bash
+   ../.venv/bin/alembic current
+   ```
+
+   Erwarteter Stand: `f1a2b3c4d5e6 (head)`.
+
 ## Grenzen (bewusst so gelassen)
 
 - Ein uvicorn-Worker; Multi-Worker bräuchte DB-basierte Queue-Slots
