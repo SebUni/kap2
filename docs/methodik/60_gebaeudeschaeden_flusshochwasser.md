@@ -1175,14 +1175,64 @@ assert abs(0.05 * s_bem * e_bem - 0.0175) < 1e-12 and abs(0.20 * s_bem * e_bem -
 
 ## 6 Szenario-Anwendung & Modellgrenzen (§3.2/§3.6)
 
-<!--
-Pflichtinhalte: je empfohlenem Ansatz ein Absatz „Szenario-Anwendung“ (verschobene Größe — z. B.
-HQ-Jährlichkeiten über E12/E07/E08 in W085 —, konstante Größen, Stationaritätsannahmen,
-Bestandsdynamik S104); Modellgrenzen nummeriert; Infokasten-Texte: Benennung „bewerteter Schaden
-— Konto K3“ (nie „Gesamtschaden“), Vollständigkeitsanzeige, Versionsstempel „Untergrenze“;
-Hinweis, dass K1 (#101), K4 (#74), K5 und K8 (#50) desselben Ereignisses nicht enthalten sind;
-Ausweis als Raten (je 1.000 EW / je ha) plus aggregierte Ebene.
--->
+**Szenario-Anwendung 60-A.** Verschoben wird ausschließlich die Hazard-Achse **FS-Hazard**: die
+drei Szenario-Stützstellen \(p(\text{HQ})\) und die zugehörige Wassertiefe je Zelle (Register
+60-W085-01), fortgeschrieben auf die im Szenariojahr projizierten Jährlichkeiten der
+HQ-Kartierung — der Kanal, über den E12 (Schneeschmelze), E07 (Nässe) und E08 (Starkregen, Anteil
+über W085) laut Knoten-Bilanz in Kapitel 1 ausschließlich wirken (Kein-Doppelkanal §3.2). **Konstant
+gehalten** werden: die Geländehöhe/Topographie S074 (die Wassertiefe entsteht nach Abschnitt 3.3
+zellweise aus Wasserspiegellage minus DGM1; das DGM1 selbst schreibt sich nicht mit dem Szenario
+fort), der Gebäudebestand R24 in seiner heutigen Menge und Wertdichte (Mengengerüst 60-R24-01), die
+Wassertiefe-Schadensfunktion \(d(h)\) samt ihrer Zustands- und Materialbänder S093/S094 und der
+Maßnahmen-Hebel S092 (§5.1). **Stationaritätsannahmen:** (1) die HWGK-Wassertiefenklassen und das
+DGM1 werden für das Szenariojahr unverändert aus der heutigen Kartierung übernommen (Kap. 2,
+60-W085-01/60-S074-01) — ein Wandel der Gewässermorphologie oder der Deichlinien liegt außerhalb
+des Modells und wird nicht unterstellt; (2) die Schadensfunktion \(d(h)\) gilt als zeitinvariant,
+ihre Zustands- und Materialbänder bilden nur den heutigen Bestandsmix ab, nicht eine künftige
+Bauweise. **Bestandsdynamik S104** (Formelstelle FS-Bestandsdynamik, Registerzeile 60-S104-01,
+Stand „offen"): Investitionen der Bau- und Immobilienwirtschaft in exponierten Gebieten fließen im
+heutigen Modellstand **nicht** als eigener Pfad ein — der Gebäudebestand R24 wird für das
+Szenariojahr auf dem zuletzt fortgeschriebenen Stand konstant gehalten, nicht mit einer eigenen
+Wachstums- oder Rückbaurate versehen. Das ist eine bewusste Vereinfachung mangels belegter oder
+abgeschätzter Größe, keine Aussage, dass Investitionstätigkeit die Exposition nicht verändert:
+Sobald 60-S104-01 eine Entscheidung trägt, bindet sie an FS-Bestandsdynamik und geht als eigener
+Faktor in die Aggregation nach Abschnitt 3.6 ein, ohne die Kernformel aus Abschnitt 3.4 selbst zu
+ändern.
+
+**Modellgrenzen (dokumentiert):**
+
+1. **Untergrenze (Konto):** Nur K3 ist aktiv. Folgen desselben Hochwasser-Ereignisses in K1
+   (Personenschäden, #101), K4 (Infrastruktur, #74), K5 (Betriebsunterbrechung) und K8
+   (Schutzkosten, #50) sind **nicht enthalten** (Kap. 1, Abschnitt „Konto-Einbettung"; §3.6).
+2. **Bauform-Grenze der Abschätzung S094 (Vorgabe P2):** Die Materialachse der Schadensfunktion ist
+   eine Abschätzung von KAP3 (Register 60-S094-01, Band 0,89–1,12), weil die zugrunde liegende
+   Schadensgradskala „zunächst für die allgemeine Bebauung vornehmlich in Mauerwerksbauweise" gilt
+   (Maiwald & Schwarz 2018); für Holz-, Fachwerk- und Leichtbaukonstruktionen ist das Band deshalb
+   eine Untergrenze und wird nicht stillschweigend verallgemeinert (Modellgrenze der Abschätzung).
+3. Nichtwohngebäude (Gewerbe, öffentliche Gebäude) sind im Mengengerüst nicht enthalten (60-R24-01)
+   — die Mengenbasis ist insoweit eine weitere Untergrenze.
+4. Der bundeseinheitliche NHK-Wertsatz streut ohne Regionalfaktor der Gutachterausschüsse
+   schätzungsweise ±20 % zwischen Hoch- und Niedrigpreisregionen (60-R24-01).
+5. Der DGM1-Höhenfehler (σ_z = 0,15–0,20 m) schlägt auf die Wassertiefe durch; die zugehörige
+   Sensitivitätskette 60-S074-01 stammt aus einer Fallstudie im flachen Relief, in Mittelgebirgs-
+   und Steillagen erzeugt derselbe Höhenfehler größere Tiefenfehler — dort ist das Band ebenfalls
+   eine Untergrenze.
+6. Die ZÜRS-Zonierung (60-R17-01) und die amtlichen Risikogebiete nach § 73 WHG sind nicht
+   deckungsgleich; der Widerspruch dient nur als bundesweites Abgleichband (§3.4), nicht als eigenes
+   Multiplikativglied der Zellrechnung.
+7. Die Zustandsfunktion FLEMOps (60-S093-01) ist an einem Extremereignis kalibriert und validiert;
+   für HQhäufig ist ihre Anwendbarkeit von der Quelle selbst infrage gestellt — auch hier ist das
+   Band eine Untergrenze (§3.8).
+8. Die Bestandsdynamik S104 wird konstant gehalten (s. o.): Zu- oder Abnahme der exponierten
+   Bausubstanz zwischen Bezugsjahr und Szenariojahr wird im heutigen Modellstand nicht abgebildet.
+
+**Infokasten-Texte (§3.6 — Teil des Berichts):**
+
+> **Benennung nach Geltungsbereich:** „bewerteter Schaden — Konto K3" (nie „Gesamtschaden").
+>
+> **Vollständigkeitsanzeige:** „Stufe M0: 1 von 8 Konten aktiv" mit Roadmap-Aufklappliste.
+>
+> **Versionsstempel:** „berechnet mit Modellstand M0 — Untergrenze".
 
 ## 7 Parameter-Blöcke (maschinenlesbar, §4)
 
