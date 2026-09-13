@@ -144,7 +144,7 @@ aus #95/#96/#98). In Formeln (§3) dürfen später nur Zeilen mit Entscheidung *
 | 60-S072-01 | S072 Boden-/Vegetationsbedeckung → Abfluss (W085) | offen | offen | offen | offen | offen | offen |
 | 60-S073-01 | S073 Flächenversiegelung → Abfluss (W085) | offen | offen | offen | offen | offen | offen |
 | 60-S074-01 | S074 Topographie → Wassertiefe am Gebäude | h(Gebäude) = max(0; Wasserspiegellage − Geländehöhe DGM1); der Höhenfehler des DGM1 (σ_z = 0,15–0,20 m) schlägt 1:1 auf die Wassertiefe durch; Schadenswirkung der Wassertiefe: 5,3–6,2 % Schadensänderung je 10 cm (Mittel ≈ 6 %/10 cm) ⇒ σ_z = 0,20 m entspricht ±10,6 bis ±12,4 % Schaden; ±0,5 m ⇒ Faktor 1,35–1,44; ein Faktor 2 erfordert 0,95–1,1 m | amtliche Produktspezifikation eines Geobasisdatensatzes (Airborne Laserscanning) plus publizierte Unsicherheits- und Sensitivitätsrechnung eines Hochwasserschadensmodells (systematische Variation der Überflutungstiefe) | LAIV MV (Landesamt für innere Verwaltung Mecklenburg-Vorpommern), „Geländemodelle“ (Höhengenauigkeit DGM1 0,15–0,2 m), https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/, Zugriff 13.09.2026; de Moel, H. & Aerts, J. C. J. H. 2011, „Effect of uncertainty in land use, damage models and inundation depth on flood damage estimates“, Natural Hazards 58(1), 407–425, DOI 10.1007/s11069-010-9675-6, Zugriff 13.09.2026 — Volltext geprüft (Tab. 4, S. 421; Abschn. 4.3, S. 420); Langbeleg **B2** unter der Tabelle | DGM1 flächendeckend in DE verfügbar; die Tiefen-Sensitivität stammt aus einer niederländischen Fallstudie (Rheindelta, flaches Relief, Landnutzungs-Schadensmodelle). **Modellgrenze:** der Wert gilt für aggregierte Landnutzungsklassen, nicht für das Einzelgebäude, und ist in Mittelgebirgs- und Steillagen eine Untergrenze, weil dort derselbe Höhenfehler größere Tiefenfehler erzeugt | DGM1 (1 m Rasterweite) der Landesvermessungen; Prüfung nach §3.4 auf Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Sensitivitätsband** — Kein-Doppelkanal §3.2: die Geländehöhe wirkt bereits über die HWGK-Wassertiefe der Zeile 60-W085-01 und geht deshalb nicht als eigener Faktor in FS-Exposition ein; ihr eigener Beitrag ist das Tiefen-Unsicherheitsband ±0,20 m ⇒ ±12 % um den Basiswert |
-| 60-R17-01 | R17 Oberflächengewässer → Exposition | offen | offen | offen | offen | offen | offen |
+| 60-R17-01 | R17 Oberflächengewässer → Exposition | Exponiertenquote der Adressen am Gewässernetz (ZÜRS Geo, Stand 2025; Bezugsgröße 22,6 Mio bundesweit bewertete Adressen): GK1 92,4 % (≈ 20,88 Mio) „statistisch nach gegenwärtiger Datenlage nicht von Hochwasser größerer Gewässer betroffen“, GK2 6,1 % (≈ 1,38 Mio; seltener als HQ100, einschließlich deichgeschützter Objekte), GK3 1,1 % (≈ 249.000; HQ10–HQ100), GK4 0,4 % (≈ 90.400; „Hochwasser statistisch mindestens einmal in 10 Jahren“) ⇒ exponiert GK2–GK4 = 7,6 % ≈ 1,72 Mio Adressen, flussnah im HQ100-Band GK3+GK4 = 1,5 % ≈ 339.000 Adressen | Bestandsstatistik (adressscharfe Vollzonierung des versicherten Bestands auf Basis der wasserwirtschaftlichen Länderdaten) — keine Studie | GDV (Gesamtverband der Deutschen Versicherer) 2025, „Geringe Gefahr für Fluss-Hochwasser bei den meisten Wohngebäuden“, Datenservice zum Naturgefahrenreport, Stand ZÜRS Geo 2025, https://www.gdv.de/gdv/statistik/datenservice-zum-naturgefahrenreport/sachversicherung-elementar/geringe-gefahr-fuer-fluss-hochwasser-bei-den-meisten-wohngebaeuden--147672, Zugriff 13.09.2026; GDV, „ZÜRS Geo — Zonierungssystem für Überschwemmungsrisiko und Einschätzung von Umweltrisiken“, https://www.gdv.de/gdv/themen/klima/-zuers-geo-zonierungssystem-fuer-ueberschwemmungsrisiko-und-einschaetzung-von-umweltrisiken-11656, Zugriff 13.09.2026 — Volltext geprüft (GK1 92,4 %, GK4 0,4 %, 22,6 Mio Adressen wörtlich; GK2/GK3-Aufteilung aus der GDV-Klassengrafik, Residualprobe unten); Langbeleg **B3** unter der Tabelle | DE-weit adressscharf, Stand 2025. **Modellgrenzen:** (a) ZÜRS zählt versicherbare **Adressen**, nicht Gebäude — je Adresse können mehrere Gebäude stehen, die Quote ist deshalb keine Gebäudequote; (b) die ZÜRS-Klassen und die Risikogebiete nach § 73 WHG sind **nicht deckungsgleich** (ZÜRS zoniert bundesweit alle bewerteten Adressen, die HWGK nur Gewässer mit signifikantem Risiko) — der Widerspruch wird benannt, nicht geglättet (§3.8); (c) GK2 enthält ausdrücklich deichgeschützte Objekte, ist also keine Restrisiko-freie Klasse | ZÜRS Geo ist nicht offen (Zugang nur für Versicherer) ⇒ die Zellgröße bildet das Produkt aus der HWGK-Überflutungsfläche (60-W085-01) × Gebäudebestand (60-R24-01); die ZÜRS-Quote dient als bundes- und bundeslandweites Abgleichsband nach §3.4 (Stichprobe, kein Vollraster-Lauf) | **Sensitivitätsband** — Kein-Doppelkanal §3.2: die zellgenaue Exposition entsteht bereits aus 60-W085-01 × 60-R24-01; R17 liefert kein zweites Multiplikativglied, sondern das nationale Prüfband (7,6 % aller Adressen in GK2–GK4, davon 1,5 % im HQ100-nahen Band) für den Abgleich nach §3.4 |
 | 60-R18-01 | R18 Entwässerungssysteme → Gebäudeschaden (flussseitig) | offen | offen | offen | offen | offen | offen |
 | 60-R19-01 | R19 Infrastruktur an Binnengewässern → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
 | 60-E10-01 | E10 Hagel → Gebäudeschaden (flussseitig) | offen | offen | offen | offen | offen | offen |
@@ -166,7 +166,7 @@ aus #95/#96/#98). In Formeln (§3) dürfen später nur Zeilen mit Entscheidung *
 | 60-S097-01 | S097 Zustand Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
 | 60-S098-01 | S098 Baumaterialien Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
 | 60-S104-01 | S104 Investitionen in exponierten Gebieten → Bestandsentwicklung | offen | offen | offen | offen | offen | offen |
-| 60-R24-01 | R24 Gebäude → Mengengerüst (Gebäudewerte) | offen | offen | offen (Mon. Z65: Gebäudewerte) | offen | offen — Datenebene nach §3.1 zu spezifizieren | offen |
+| 60-R24-01 | R24 Gebäude → Mengengerüst (Gebäudewerte) | **Menge:** 19,7 Mio Wohngebäude (13,5 Mio Einfamilien-, 2,7 Mio Zweifamilien-, 3,5 Mio Mehrfamilienhäuser), 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche (31.12.2024) ⇒ 208 m² Wohnfläche je Wohngebäude; Fortschreibung 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m². **Wertsatz (Wiederherstellung/Neubauwert):** NHK 2010 Standardstufe 3 (mittlerer Standard) = 1.050 €₂₀₁₀/m² BGF (freistehende Ein-/Zweifamilienhäuser, Geb.-Art 1.01) bzw. 825 €₂₀₁₀/m² BGF (Mehrfamilienhäuser ≤ 6 WE), je inkl. Umsatzsteuer und Baunebenkosten; Indexierung mit dem Baupreisindex Wohngebäude (2015 = 100: 2010 = 89,1 → 2023 = 149,8, Faktor 1,681) ⇒ 1.765 bzw. 1.387 €₂₀₂₃/m² BGF; Fortschreibung 2023 → Preisstand 2026 mit Faktor 1,105 (Band 1,07–1,16; §3.9 **abgeschätzt**, Kette in B4) ⇒ **1.950 €₂₀₂₆/m² BGF (Band 1.889–2.047)** bzw. **1.533 €₂₀₂₆/m² BGF (Band 1.484–1.609)**; BGF je m² Wohnfläche = 1,30 (Band 1,25–1,40; §3.9 **abgeschätzt**) ⇒ Wertdichte 1.993–2.535 €₂₀₂₆/m² Wohnfläche ⇒ Wiederherstellungswert des Wohngebäudebestands 8,2–10,4 Bio. €₂₀₂₆ (Sensitivität: ±10 % auf den Indexfaktor verschieben den Bestandswert um ±0,8–1,0 Bio. €) | amtliche Statistik (Fortschreibung des Wohngebäude- und Wohnungsbestands auf Zensus-2022-Basis) + normierter Kostenkennwert aus Rechtsverordnung (ImmoWertV Anlage 4), fortgeschrieben mit amtlichem Preisindex | Destatis 2025, Pressemitteilung Nr. 336 vom 17.09.2025, „43,8 Millionen Wohnungen in Deutschland zum Jahresende 2024“, https://www.destatis.de/DE/Presse/Pressemitteilungen/2025/09/PD25_336_31231.html, Zugriff 13.09.2026; Destatis, Themenseite „Wohnen“ (Fortschreibung zum 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m²), https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html, Zugriff 13.09.2026; ImmoWertV, Anlage 4 (zu § 36 Abs. 1) „Normalherstellungskosten 2010 (NHK 2010)“, https://www.gesetze-im-internet.de/immowertv_2022/anlage_4.html, Zugriff 13.09.2026; Destatis, Fachserie 17 Reihe 4 „Preisindizes für die Bauwirtschaft“ (Basis 2015 = 100), https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile, Zugriff 13.09.2026; Destatis 2026, PM Nr. 241 vom 10.07.2026 (Baupreise Wohngebäude Mai 2026: +5,0 % gg. Vj.), https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/07/PD26_241_61261.html, Zugriff 13.09.2026 — Volltext geprüft; Langbeleg **B4** unter der Tabelle (Mon. Z65: „Gebäudewerte“) | DE-weit. **Modellgrenzen:** (a) NHK-Standardstufe 3 als bundesweiter Einheitssatz — ohne Regionalfaktor der Gutachterausschüsse streut der Wertsatz zwischen Hoch- und Niedrigpreisregionen um schätzungsweise ±20 %; (b) **Nichtwohngebäude** (Gewerbe, öffentliche Gebäude) sind im Mengengerüst nicht enthalten — die Mengenbasis ist insoweit eine Untergrenze (§3.6); (c) NHK sind **Neubau-/Wiederherstellungswerte**; die Zeitwert-Lesart (Alterswertminderung nach ImmoWertV) liegt je nach Restnutzungsdauer deutlich darunter — der Unterschied wird als Band geführt, nicht geglättet (§3.8) | Gebäudezahl und Wohnfläche je Zelle aus dem Zensus-2022-Gitter (100 m) bzw. den amtlichen Hausumringen; Datenebene GEBAEUDEWERT **neu anzulegen** (§3.1, Spezifikation in Kap. 3), Fortschreibung über die Destatis-Bestandsfortschreibung; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Basiswert** — FS-Mengengerüst: Wohnfläche je Zelle × Wertdichte €₂₀₂₆/m²; die Zeitwert-Lesart sowie die abgeschätzten Faktoren (Indexierung 2023→2026, BGF/Wohnfläche) laufen als Sensitivitätsband mit und werden im Produkt nach Vorgabe P1/P2 als Abschätzung von KAP3 ausgewiesen |
 | 60-R23-01 | R23 Bau- und Immobilienunternehmen → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
 | 60-R25-01 | R25 Siedlungsinfrastrukturen → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
 
@@ -231,6 +231,103 @@ Formelstelle FS-Exposition zugeordnet, wirkt dort aber über die bereits topogra
 HWGK-Wassertiefe; ein zweiter Topographie-Faktor wäre ein Doppelkanal (§3.2). **Datenlücke
 (§3.8):** eine deutsche Sensitivitätsrechnung derselben Bauart (Schaden je 10 cm Tiefe) wurde nicht
 gefunden; die niederländische Fallstudie wird als dokumentierte Übertragung geführt.
+
+**B3 — 60-R17-01 (Exposition am Gewässernetz).**
+Quellen: (1) **GDV — Gesamtverband der Deutschen Versicherer (2025):** „Geringe Gefahr für
+Fluss-Hochwasser bei den meisten Wohngebäuden“, Datenservice zum Naturgefahrenreport,
+Stand ZÜRS Geo 2025; URL
+`https://www.gdv.de/gdv/statistik/datenservice-zum-naturgefahrenreport/sachversicherung-elementar/geringe-gefahr-fuer-fluss-hochwasser-bei-den-meisten-wohngebaeuden--147672`,
+Zugriff 13.09.2026. Wörtlich zur Gefährdungsklasse 1 (92,4 %): „statistisch nach gegenwärtiger
+Datenlage nicht von Hochwasser größerer Gewässer betroffen“; wörtlich zur Gefährdungsklasse 4
+(0,4 %): „Hochwasser statistisch mindestens einmal in 10 Jahren“; Bezugsgröße: 22,6 Mio erfasste
+Adressen. (2) **GDV, „ZÜRS Geo — Zonierungssystem für Überschwemmungsrisiko und Einschätzung von
+Umweltrisiken“**, URL
+`https://www.gdv.de/gdv/themen/klima/-zuers-geo-zonierungssystem-fuer-ueberschwemmungsrisiko-und-einschaetzung-von-umweltrisiken-11656`,
+Zugriff 13.09.2026; wörtlich zur Klasse 2: in ihr sind „auch Objekte enthalten, die durch einen
+Deich geschützt sind“, sofern dieser mindestens einem hundertjährlichen Hochwasser standhält;
+Objekte im Umkreis von 100 m zu einem Bach tragen zusätzlich den Vermerk „Bachzone“.
+**Rechenschritt (§3.9 Abgeleitet):** aus den beiden wörtlich belegten Anteilen folgt die
+Exponiertenquote als Residuum 100 % − 92,4 % = **7,6 %** (GK2–GK4) und daraus GK2 + GK3 =
+7,6 % − 0,4 % = **7,2 %**. Die Aufteilung dieses Residuums auf GK2 = 6,1 % und GK3 = 1,1 % stammt
+aus der GDV-Klassengrafik („Gefährdung durch Hochwasser“, Anteile 92,4 / 6,1 / 1,1 / 0,4 %);
+sie ist mit dem Residuum konsistent (6,1 + 1,1 = 7,2 ✓). Absolutzahlen aus 22,6 Mio Adressen:
+GK4 0,004 × 22,6 Mio = 90.400; GK3 0,011 × 22,6 Mio = 248.600 ≈ 249.000; GK2 0,061 × 22,6 Mio =
+1.378.600 ≈ 1,38 Mio; GK2–GK4 0,076 × 22,6 Mio = 1.717.600 ≈ 1,72 Mio; GK3 + GK4 = 1,5 % =
+339.000. **Widerspruch (§3.8, benannt statt geglättet):** ZÜRS zoniert alle bundesweit bewerteten
+Adressen, die Hochwassergefahrenkarten (60-W085-01) nur die Risikogebiete nach § 73 WHG; die
+Exponiertenzahlen beider Quellen sind deshalb **nicht** ineinander überführbar und werden
+nebeneinander geführt. **Datenlücke (§3.8):** der GDV veröffentlicht keine Absolutzahlen je Klasse
+und keine maschinenlesbare Fassung der Klassengrafik; die Prozentanteile der Klassen 2 und 3 sind
+nur grafisch belegt, die Residualprobe ist die einzige verfügbare Gegenrechnung. Eine offene,
+adressscharfe Exponiertenstatistik der amtlichen Statistik existiert nicht — die Zellgröße des
+Produkts wird deshalb aus HWGK × Gebäudebestand gebildet, ZÜRS bleibt Abgleichsband.
+
+**B4 — 60-R24-01 (Mengengerüst der Gebäudewerte).**
+Quellen: (1) **Statistisches Bundesamt (2025):** Pressemitteilung Nr. 336 vom 17.09.2025,
+„43,8 Millionen Wohnungen in Deutschland zum Jahresende 2024“, URL
+`https://www.destatis.de/DE/Presse/Pressemitteilungen/2025/09/PD25_336_31231.html`,
+Zugriff 13.09.2026; Stichtag 31.12.2024: 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche,
+19,7 Mio Wohngebäude (13,5 Mio Einfamilien-, 2,7 Mio Zweifamilien-, 3,5 Mio Mehrfamilienhäuser).
+(2) **Statistisches Bundesamt, Themenseite „Wohnen“**, URL
+`https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html`, Zugriff 13.09.2026;
+wörtlich: „44,0 Millionen Wohnungen in Deutschland zum Jahresende 2025“, Gesamtwohnfläche
+4,1 Mrd m² (Fortschreibung des Wohngebäude- und Wohnungsbestandes auf Zensus-2022-Basis).
+(3) **ImmoWertV, Anlage 4 (zu § 36 Abs. 1) „Normalherstellungskosten 2010“**, URL
+`https://www.gesetze-im-internet.de/immowertv_2022/anlage_4.html`, Zugriff 13.09.2026; wörtlich:
+die NHK erfassen „die Kostengruppen 300 und 400 der DIN 276, die Umsatzsteuer und die
+üblicherweise entstehenden Baunebenkosten (Kostengruppen 730 und 771 der DIN 276)“ und beziehen
+sich „auf den im Jahresdurchschnitt bestehenden Kostenstand des Jahres 2010“, angegeben „in Euro
+pro Quadratmeter Grundfläche“ (Brutto-Grundfläche). Kostenkennwerte Gebäudeart 1.01 (freistehende
+Ein- und Zweifamilienhäuser), Standardstufen 1–5: 600 / 800 / **1.050** / 1.300 / 1.600 €/m² BGF;
+Mehrfamilienhäuser bis 6 WE, Standardstufen 3–5: **825** / 985 / 1.190 €/m² BGF. Verwendet wird
+Standardstufe 3 (mittlerer Standard) als bundesweiter Bestandsmittelwert. (4) **Statistisches
+Bundesamt, Fachserie 17 Reihe 4 „Preisindizes für die Bauwirtschaft“ (Basis 2015 = 100)**, URL
+`https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile`,
+Zugriff 13.09.2026; Jahresdurchschnitte Neubau konventionell gefertigter Wohngebäude:
+2010 = 89,1 · 2015 = 100,0 · 2020 = 114,0 · 2021 = 121,9 · 2022 = 139,4 · 2023 = 149,8.
+(5) **Statistisches Bundesamt (2026):** Pressemitteilung Nr. 241 vom 10.07.2026, URL
+`https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/07/PD26_241_61261.html`,
+Zugriff 13.09.2026; wörtlich: „Die Preise für den Neubau konventionell gefertigter Wohngebäude in
+Deutschland sind im Mai 2026 gegenüber Mai 2025 um 5,0 % gestiegen.“; Februar 2026 gegenüber dem
+Vorjahresmonat +3,3 %; ferner PM Nr. 011 vom 15.01.2026 für November 2025: +3,2 % gegenüber
+November 2024.
+
+**Rechenschritt 1 (§3.9 Abgeleitet) — Indexierung 2010 → 2023:** Faktor = 149,8 ÷ 89,1 = 1,6813.
+Ein-/Zweifamilienhaus: 1.050 €₂₀₁₀/m² × 1,6813 = 1.765,4 ⇒ **1.765 €₂₀₂₃/m² BGF**;
+Mehrfamilienhaus: 825 €₂₀₁₀/m² × 1,6813 = 1.387,1 ⇒ **1.387 €₂₀₂₃/m² BGF**.
+
+**Rechenschritt 2 (§3.9 Abgeschätzt) — Fortschreibung 2023 → Preisstand 2026 (Befund 12).**
+Eine Jahresdurchschnitts-Indexreihe bis 2026 liegt in der geprüften Fachserie nicht vor; die
+amtlichen Veränderungsraten sind punktuell veröffentlicht (November 2025 +3,2 %, Februar 2026
++3,3 %, Mai 2026 +5,0 % gegenüber dem jeweiligen Vorjahresmonat). Angesetzt werden drei
+Jahresschritte (2024, 2025, 2026) mit je 3,4 % ⇒ 1,034³ = 1,1055 ⇒ **Faktor 1,105**. Bandbreite:
+unteres Ende drei Schritte à 2,3 % (1,023³ = 1,071), oberes Ende drei Schritte à 5,0 %
+(1,050³ = 1,158) ⇒ **Band 1,07–1,16**. Ergebnis: 1.765 × 1,105 = 1.950,3 ⇒
+**1.950 €₂₀₂₆/m² BGF** (Band 1.889–2.047); 1.387 × 1,105 = 1.532,6 ⇒ **1.533 €₂₀₂₆/m² BGF**
+(Band 1.484–1.609). **Produkt-Kennzeichnung (Vorgabe P1/P2):** der Fortschreibungsfaktor ist eine
+begründete Abschätzung von KAP3, keine Quellenangabe, und wird in der nutzersichtbaren
+Parameterliste als solche geführt.
+
+**Rechenschritt 3 (§3.9 Abgeschätzt) — BGF je m² Wohnfläche.** Die amtliche Bestandsstatistik
+führt Wohnfläche, die NHK je m² Brutto-Grundfläche; eine bundesweite amtliche BGF-Statistik des
+Bestands existiert nicht (**Datenlücke §3.8**). Angesetzt wird BGF/Wohnfläche = **1,30**
+(Band 1,25–1,40) — begründet damit, dass Wohnfläche weder Konstruktionsflächen (Außen- und
+Innenwände) noch Erschließungs-, Keller- und Nebenflächen enthält, die in der BGF mitzählen.
+Ergebnis: 1.533 × 1,30 = 1.992,9 ⇒ **1.993 €₂₀₂₆/m² Wohnfläche** (Mehrfamilienhaus) und
+1.950 × 1,30 = 2.535 ⇒ **2.535 €₂₀₂₆/m² Wohnfläche** (Ein-/Zweifamilienhaus).
+
+**Rechenschritt 4 (§3.9 Abgeleitet) — Bestandsprobe und Sensitivität.** 4,1 Mrd m² Wohnfläche ×
+1.993 bis 2.535 €₂₀₂₆/m² = 8,17 bis 10,39 ⇒ **8,2 bis 10,4 Bio. €₂₀₂₆** Wiederherstellungswert des
+Wohngebäudebestands; je Wohngebäude 4,1 Mrd m² ÷ 19,7 Mio = **208 m² Wohnfläche**. Sensitivität:
+±10 % auf den Fortschreibungsfaktor verschieben den Bestandswert um ±0,8 bis 1,0 Bio. €; der
+BGF-Faktor 1,25 statt 1,40 verschiebt ihn um −11 %. **Kopplung (§3.9):** die Wertdichte hängt am
+Baupreisindex; erscheint die Jahresdurchschnittsreihe bis 2026, wird Rechenschritt 2 durch den
+gemessenen Indexstand ersetzt und der Wertsatz neu gerechnet. **Widerspruch (§3.8, benannt statt
+geglättet):** die NHK sind Neubau-/Wiederherstellungswerte, die Schadensrechnung K3 kann je nach
+Regulierungspraxis auch Zeitwerte ansetzen (Alterswertminderung nach ImmoWertV); beide Lesarten
+werden nebeneinander geführt, die Zeitwert-Lesart als Sensitivitätsband. **Modellgrenze:**
+Nichtwohngebäude sind im Mengengerüst nicht enthalten — die Mengenbasis ist insoweit eine
+Untergrenze (§3.6).
 
 ## 3 Modell (§2.3)
 
