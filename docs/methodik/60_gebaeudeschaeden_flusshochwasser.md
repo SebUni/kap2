@@ -650,6 +650,180 @@ A0 = [0.0, 0.0, 0.0]
 assert sum((p[i] - p[i + 1]) * (A0[i] + A0[i + 1]) / 2 for i in range(2)) + p[2] * A0[2] == 0.0
 ```
 
+### 3.5 Zeichentabelle (alle Formelzeichen der Kapitel 3 und 5, §3.2/§3.9)
+
+Die Tabelle führt **jedes** Formelzeichen, das in diesem Kapitel oder in Kapitel 5 vorkommt, mit
+Bedeutung, Einheit und Herkunft. Die Herkunftsspalte nennt je Zeichen entweder die Registerzeile
+des Evidenz-Registers (Kap. 2) oder die Berichtsstelle, an der das Zeichen hergeleitet wird — nach
+Vorgabe P1 genügt ein Code-Kommentar als Herleitung nicht. Reine Laufindizes tragen keine Einheit
+und keine Datenquelle; sie sind als **Notation** gekennzeichnet. Zahlenwerte und Bänder stehen bei
+den Zeichen der S092-Kette zusätzlich in der Zeichentabelle §5.1.1, die Parameter-Blöcke in Kap. 7
+tragen sie maschinenlesbar.
+
+| Zeichen | Bedeutung | Einheit | Herkunft |
+|---|---|---|---|
+| \(z\) | Laufindex der 100-m-Zelle innerhalb der Kommune | — | Notation |
+| \(k\) | Laufindex der Kommune — die deklarierte Betrachtungsebene (§3.1) | — | Notation |
+| \(s\), \(i\) | Laufindex des HQ-Szenarios (HQhäufig, HQ100, HQextrem); \(i\) ist derselbe Index in der Trapezsumme, absteigend nach \(p\) sortiert | — | Notation |
+| \(t\) | Laufindex des Gebäudetyps (EFH/ZFH, MFH) | — | Notation |
+| \(n\) | Zahl der kartierten Szenario-Stützstellen; hier \(n = 3\), \(p_n\) ist die kleinste davon (HQextrem) | — | Notation |
+| \(W_z\), \(W_k\) | Wohnfläche der Zelle \(z\) bzw. ihre Summe über alle Zellen der Kommune \(k\) | m² | register: 60-R24-01 — Ebene GEBAEUDEWERT aus dem Zensus-2022-100-m-Gitter (§3.2) |
+| \(a_{z,s}\) | überfluteter Flächenanteil der Zelle im Szenario \(s\), Wertebereich [0, 1] | – | register: 60-W085-01 — Ebene HQ_FLAECHE, Verschnitt der Gefahrenkarte mit der Zelle (§3.2, Langbeleg B1) |
+| \(h_{z,s}\), \(h\) | Wassertiefe der Zelle im Szenario \(s\); \(h\) ist dasselbe Zeichen als Argument der Schadensfunktion | m | register: 60-W085-01 — Ebene HQ_TIEFE, flächengewichtetes Mittel der LAWA-Klassenmitten (§3.2) |
+| \(d(h)\) | Schadensquote: Anteil des Wiederherstellungswerts, der bei der Tiefe \(h\) verloren geht | – | herleitung: §3.3 — Enden belegt (register: 60-S093-01, Langbeleg B5), Zwischenwerte und Deckelung sind Abschätzung von KAP3 (§3.9) |
+| \(d_1\), \(d_5\) | belegte Endwerte der Schadensfunktion: \(d_1 = 0{,}035\) bei \(h_1\), \(d_5 = 0{,}250\) bei \(h_5\) | – | register: 60-S093-01 — FLEMOps-Enden, Langbeleg B5 (Thieken u. a. 2008) |
+| \(h_1\), \(h_5\) | Grenzen des belegten Tiefenintervalls: 0,10 m und 1,75 m | m | herleitung: §3.3 — \(h_1\) Klassenmitte der untersten, \(h_5\) gesetzte Repräsentanz der offenen obersten FLEMOps-Klasse (Abschätzung von KAP3, §3.9) |
+| \(f_{S093}\), \(f_{S094}\) | mittelwertzentrierte Zustands- und Baustoffachse des Gebäudebestands | – | register: 60-S093-01 bzw. 60-S094-01 — Ebene geparkt, Neutralwert 1,00, Band 0,71–1,40 als Unsicherheitsbeitrag (§3.2) |
+| \(A_{z,s}\) | schadensäquivalente Wohnfläche der Zelle im Ereignis \(s\) — die physische Zwischengröße vor jedem Euro-Betrag | m² | herleitung: §3.4 Schritt 1 — Menge \(W_z a_{z,s}\) × Rate \(d(h_{z,s}) f_{S093} f_{S094}\) |
+| \(\bar A\) (\(\bar A_z\), \(\bar A_k\)) | jährlich erwartete schadensäquivalente Wohnfläche — indexfrei \(\bar A\) als Gattungszeichen (§3.1), mit Index für die Zelle bzw. die Kommune — physischer Teil-Ausweis | m²/a | herleitung: §3.4 Schritt 2 (Trapezsumme über die Szenarien) und §3.6 (Summe über die Zellen der Kommune) |
+| \(p_i\) (\(p_1\), \(p_2\), \(p_3\)) | jährliche Überschreitungswahrscheinlichkeit des Szenarios \(i\) | a⁻¹ | register: 60-W085-01 — \(p_1\), \(p_2\) belegt (Langbeleg B1); \(p_3\) herleitung: §3.4 Schritt 2, geometrisches Mittel der beiden Enden (Abschätzung von KAP3, §3.9) |
+| \(T\) | Wiederkehrintervall eines Szenarios, \(T = 1/p\); für \(p_3\) rund 447 a | a | herleitung: §3.4 Schritt 2 — Kehrwert der Jährlichkeit, nur zur Lesbarkeit ausgewiesen |
+| \(\theta_{z,t}\) | Anteil der Wohnfläche der Zelle, der auf den Gebäudetyp \(t\) entfällt; \(\sum_t \theta_{z,t} = 1\) | – | register: 60-R24-01 — Gebäudetyp des Zensus 2022 im 100-m-Gitter (§3.2) |
+| \(n_t\) | Wertsatz je Gebäudetyp: 1.950 (EFH/ZFH), 1.533 (MFH) | €₂₀₂₆/m² BGF | register: 60-R24-01 — NHK 2010 nach ImmoWertV Anlage 4, mit Baupreisindex auf den Preisstand 2026 fortgeschrieben (Langbeleg B4) |
+| \(k_{\text{BGF}}\) | Brutto-Grundfläche je m² Wohnfläche: 1,30 (Band 1,25–1,40) | m²/m² | herleitung: §3.4 Schritt 3 mit register: 60-R24-01 — Abschätzung von KAP3 (§3.9), Band aus der Spannweite kompakter bis gegliederter Bauformen |
+| \(w_z\) | Wertdichte der Zelle — der Preis, mit dem die physische Zwischengröße bewertet wird | €₂₀₂₆/m² Wohnfläche | herleitung: §3.4 Schritt 3 — \(w_z = k_{\text{BGF}} \sum_t \theta_{z,t} n_t\) |
+| \(\text{EAD}\), \(\text{EAD}_z\), \(\text{EAD}_k\) | native Ergebnisgröße: jährlicher Erwartungsschaden des Kontos K3 aus flussseitiger Überflutung. Bezugsjahr und Preisstand **2026**; deklarierte Betrachtungsebene ist die **Kommune**, also \(\text{EAD} = \text{EAD}_k\); \(\text{EAD}_z\) ist das Zell-Zwischenergebnis und kein eigener Ausweis (§3.6) | €₂₀₂₆/a | herleitung: §3.1 (Deklaration) und §3.4 Schritt 3 — \(\text{EAD}_z = \bar A_z \cdot w_z\), Kommune als Summe über ihre Zellen (§3.6) |
+| \(\text{EAD}_{\text{mit}}\) | Erwartungsschaden derselben Kommune, desselben Kontos K3 und desselben Bezugsjahres 2026 **nach** Umsetzung des Hebels S092; Betrachtungsebene Kommune | €₂₀₂₆/a | herleitung: §5.1 — \(\text{EAD}_{\text{mit}} = \text{EAD}\cdot(1 - r_{\text{S092}})\), Wirkungsort und Ausschluss der K8-Kosten dort begründet |
+| \(r_{\text{S092}}\) | relative Minderung des K3-Erwartungsschadens durch den Hebel S092 | – | herleitung:#s092-wirkung — Kette \(\Delta q \cdot s_{\text{bem}} \cdot e_{\text{bem}}\), Wert 0,035 (Band 0,0075–0,112) in §5.1.1/§5.1.2 |
+| \(\Delta q\) | zusätzlich nachgerüsteter Anteil exponierter Gebäude, marginal gegenüber heute | – | herleitung:#s092-wirkung — Abschätzung von KAP3 (§3.9), Wert 0,10 (Band 0,05–0,20) in §5.1.1/§5.1.2 |
+| \(s_{\text{bem}}\) | Anteil der Schadenssumme aus Ereignissen unterhalb des Bemessungsniveaus | – | herleitung:#s092-wirkung — Abschätzung von KAP3 (§3.9), Wert 0,50 (Band 0,30–0,70) in §5.1.1/§5.1.2 |
+| \(e_{\text{bem}}\) | Schadensminderung am nachgerüsteten Gebäude unterhalb des Bemessungsniveaus | – | herleitung:#s092-wirkung — Abschätzung von KAP3 (§3.9), Wert 0,70 (Band 0,50–0,80) in §5.1.1/§5.1.2 |
+| \(x_k\) | exponierter Wohnflächenanteil der Kommune im HQ100 — die einzige Eingangsgröße des Schicht-A-Index | – | herleitung: §3.7 — \(x_k = \sum_z W_z a_{z,\text{HQ100}} / W_k\) aus den Ebenen HQ_FLAECHE und GEBAEUDEWERT |
+| \(I_{60,k}\) | Schicht-A-Index „Betroffenheit durch Flusshochwasser" der Kommune, Skala 0–100 | Punkte (0–100) | herleitung: §3.7 — Perzentilrang von \(x_k\) im ausgewiesenen Vergleichsraum; kein Euro-Pfad |
+
+### 3.6 Aggregation von der Zelle zur Kommune und Teil-Ausweise (§3.2/§3.6)
+
+Gerechnet wird auf 100-m-Zellen, ausgewiesen wird die Kommune. Die Aggregation ist die
+**einfache Summe über die Zellen der Kommune**, ohne Gewicht, ohne Skalar und ohne Rest aus einer
+höheren Ebene:
+
+$$ \bar A_k \;=\; \sum_{z \in k} \bar A_z \quad [\text{m}^2/\text{a}], \qquad \text{EAD}_k \;=\; \sum_{z \in k} \text{EAD}_z \;=\; \sum_{z \in k} \bar A_z \cdot w_z \quad [\text{€}_{2026}/\text{a}] $$
+
+**Reihenfolge der Operationen.** Erwartungswertbildung (Schritt 2) und Aggregation sind beide
+linear und deshalb vertauschbar: \(\sum_z \bar A_z\) ist identisch mit der Trapezsumme über die
+zellsummierten Ereignisflächen \(\sum_z A_{z,s}\). Nichtlinear ist ausschließlich die
+Schadensfunktion \(d(h)\) samt Deckelung — sie wird deshalb **immer auf der Zelle** ausgewertet und
+**nie** auf einem Kommunenmittel der Wassertiefe. Ein kommunal gemitteltes \(h\) würde die
+Krümmung von \(d\) glätten und in Kommunen mit wenigen tiefen und vielen flachen Zellen den
+Schaden verzerren; die Formel sieht diesen Weg nicht vor.
+
+**Geschlossene Betrachtungsebene (§3.2).** Jeder Zentrierungs-, Median- oder Mix-Rückgriff dieses
+Kapitels bildet sich aus den **eigenen Zellen derselben Kommune**: der Tiefen-Median bei fehlender
+Tiefenangabe (Ebene HQ_TIEFE) und der Gebäudetyp-Mix bei fehlender Typaufteilung (Ebene
+GEBAEUDEWERT). Erst wenn die Kommune selbst keine Deckung hat, greift als zweiter Fallback eine
+amtlich publizierte Verteilung des Bundeslandes — und dann als ausgewiesener Fallback, nicht als
+stiller Standardwert. Ein Mittel über eine höhere Ebene wird an keiner Stelle gebildet und kein
+nationaler Betrag wird auf Kommunen verteilt; der Lackmustest aus Abschnitt 3.4 bleibt dadurch
+exakt erfüllt: Eine Kommune ohne Flussaue erhält 0, nicht einen kleinen Rest.
+
+**Teil-Ausweise je Kommune.** Ausgewiesen werden vier Größen, jede mit ihrer eigenen Einheit, damit
+der physische Teil nicht im Euro-Betrag verschwindet (§3.6):
+
+1. **Physischer Teil-Ausweis:** \(\bar A_k\) in m²/a — die jährlich erwartete
+   schadensäquivalente Wohnfläche der Kommune.
+2. **Exponierte Wohnfläche je Szenario:** \(\sum_{z \in k} W_z\,a_{z,s}\) in m², getrennt für
+   HQhäufig, HQ100 und HQextrem. Diese Größe ist reine Exposition, ohne Schadensquote und ohne
+   Preis, und damit die Zahl, die sich unmittelbar gegen die Hochwassergefahrenkarte prüfen lässt.
+3. **Monetärer Ausweis:** \(\text{EAD}_k\) in €₂₀₂₆/a, benannt als „bewerteter Schaden — Konto K3",
+   mit dem Vermerk, dass K1, K4, K5 und K8 nicht enthalten sind (Untergrenze, §3.6).
+4. **Szenario-Beiträge:** der Anteil jedes Szenarios an \(\bar A_k\) beziehungsweise
+   \(\text{EAD}_k\). Er zeigt, ob eine Kommune ihren Erwartungsschaden aus häufigen flachen oder
+   aus seltenen tiefen Ereignissen bezieht — dieselbe Information, die Abschnitt 5.1.2 für
+   \(s_{\text{bem}}\) heute abschätzen muss und später messen kann.
+
+**Vollständigkeitsanzeige.** Zu jedem Ausweis gehört der Anteil der Wohnfläche der Kommune in
+Zellen **ohne Kartenabdeckung** (\(a_{z,s}\) nachrichtlich „nicht kartiert", §3.2). Er ist kein
+Schaden und wird nicht hochgerechnet, sondern als Deckungsgrad des Ausweises angezeigt: Ein
+niedriger Deckungsgrad bedeutet, dass die ausgewiesene Untergrenze weiter unten liegt als in einer
+vollständig kartierten Kommune.
+
+**Kein Ausweis unterhalb der Kommune.** \(\text{EAD}_z\) und \(A_{z,s}\) sind Zwischenergebnisse.
+Sie werden nicht je Zelle publiziert, weil die Genauigkeit der Gefahrenkarten und der
+Zensus-Gitterwerte auf der einzelnen 100-m-Zelle deutlich geringer ist als im kommunalen Summenwert
+(Zufallsrundung im Gitter, Kartenkanten). Aggregate **oberhalb** der Kommune (Kreis, Land) entstehen
+ausschließlich als Summe der \(\text{EAD}_k\), nie als Mittel von Indexwerten.
+
+**Ressourcen-Regel (§3.4).** Die Summe läuft über die Zellen genau der Kommune, die berechnet wird;
+kein Schritt dieses Abschnitts verlangt einen nationalen 100-m-Vollraster-Lauf. Das folgende
+Beispiel rechnet dementsprechend eine einzelne Zelle und eine Kommune aus zwei Zellen durch.
+
+```python test: beispiel_60_kernformel
+# Kernformel aus 3.4 an einer Beispielzelle, danach Aggregation auf die Kommune (3.6).
+d1, d5, h1, h5 = 0.035, 0.250, 0.10, 1.75
+d = lambda h: d1 * (d5 / d1) ** ((min(max(h, h1), h5) - h1) / (h5 - h1))
+p = [1.0e-1, 1.0e-2, (5.0e-3 * 1.0e-3) ** 0.5]   # HQhaeufig, HQ100, HQextrem
+k_bgf, n_efh = 1.30, 1950.0                      # Preisstand 2026 (Register 60-R24-01)
+
+def zelle(W, theta_efh, szenarien, f093=1.00, f094=1.00):
+    """Schritt 1 Menge x Rate [m2] -> Schritt 2 Erwartungswert [m2/a] -> Schritt 3 Preis [EUR/a]."""
+    A = [W * a * q * f093 * f094 for a, q in szenarien]
+    A_bar = (sum((p[i] - p[i + 1]) * (A[i] + A[i + 1]) / 2 for i in range(len(p) - 1))
+             + p[-1] * A[-1])
+    w = k_bgf * theta_efh * n_efh                # reines EFH/ZFH-Gebiet: theta_EFH = 1,0
+    return A, A_bar, A_bar * w
+
+# Die gerundeten Quoten der Stuetzstellentabelle 3.3 stimmen mit d(h) ueberein,
+# die oberste Zelle liegt oberhalb h5 und ist deshalb gedeckelt.
+assert abs(d(0.405) - 0.050) < 5e-4 and abs(d(0.805) - 0.081) < 5e-4
+assert d(1.80) == 0.250
+A1, A1_bar, ead_z1 = zelle(1200.0, 1.0, ((0.25, 0.050), (0.80, 0.081), (1.00, 0.250)))
+assert [round(x, 2) for x in A1] == [15.0, 77.76, 300.0]   # physische Zwischengroesse [m2]
+assert abs(A1_bar - 6.311) < 1e-3                          # [m2/a]
+assert abs(ead_z1 - 16000.0) < 1.0                         # [EUR2026/a]
+
+# Zweite Zelle der Kommune liegt ausserhalb der Aue: a = 0 in jedem Szenario -> exakt 0
+A2, A2_bar, ead_z2 = zelle(800.0, 1.0, ((0.0, 0.050), (0.0, 0.081), (0.0, 0.250)))
+assert A2_bar == 0.0 and ead_z2 == 0.0
+
+# Aggregation Zelle -> Kommune: einfache Summe, kein Rest aus einer hoeheren Ebene
+A_bar_k = A1_bar + A2_bar
+ead_k = ead_z1 + ead_z2
+assert abs(ead_k - 16000.0) < 1.0
+# Linearitaet: Erwartungswert und Aggregation sind vertauschbar (gleiche Wertdichte)
+assert abs(ead_k - A_bar_k * k_bgf * n_efh) < 1e-9
+
+# Schicht-A-Index (3.7): dimensionsloser Anteil, der in keinen Euro-Wert eingeht
+W_k = 1200.0 + 800.0
+x_k = (1200.0 * 0.80 + 800.0 * 0.0) / W_k
+assert abs(x_k - 0.48) < 1e-12 and 0.0 <= x_k <= 1.0
+assert abs(ead_k - A_bar_k * k_bgf * n_efh) < 1e-9         # unveraendert ohne x_k
+```
+
+### 3.7 Schicht-A-Index — getrennt vom Euro-Pfad (§3.2/§3.6)
+
+Neben dem bewerteten Schaden führt das Produkt für dieses Risiko einen **Schicht-A-Index**
+\(I_{60,k}\): eine Betroffenheitskennzahl auf der Skala 0–100, die Kommunen **vergleichbar** macht,
+ohne einen Geldbetrag zu behaupten. Er ist hier bewusst in einem eigenen Abschnitt beschrieben,
+weil er eine andere Konstruktion, eine andere Einheit und eine andere Lesart hat als
+\(\text{EAD}_k\).
+
+**Konstruktion.** Eingangsgröße ist genau eine Größe, der exponierte Wohnflächenanteil im HQ100:
+
+$$ x_k \;=\; \frac{\sum_{z \in k} W_z\,a_{z,\text{HQ100}}}{W_k} \quad [-], \qquad I_{60,k} \;=\; 100 \cdot \operatorname{Perzentilrang}\bigl(x_k\bigr) \quad [\text{Punkte}] $$
+
+Der Perzentilrang wird über einen **ausgewiesenen Vergleichsraum** gebildet — alle Kommunen, für
+die dieselbe Kartengrundlage vorliegt —, und der Vergleichsraum steht am Indexwert. Ohne diese
+Angabe ist ein Rang bedeutungslos: Dieselbe Kommune erhält im Bundesvergleich einen anderen Rang
+als im Landesvergleich.
+
+**Warum getrennt vom Euro-Pfad.** \(I_{60,k}\) ist eine **Ordnungsgröße**. Sie enthält keine
+Schadensquote, keinen Preis und keine Jährlichkeit; ein doppelt so hoher Indexwert bedeutet
+keinen doppelt so hohen Schaden, und Indexwerte lassen sich nicht addieren. Der Perzentilrang
+bezieht sich zudem notwendig auf eine Menge **anderer** Kommunen und verlässt damit die
+geschlossene Betrachtungsebene, die für die Euro-Rechnung nach §3.2 gilt. **Der Schicht-A-Index
+wird nie auf Euro-Pfaden verwendet.** Konkret heißt das: \(I_{60,k}\) geht in keine Formel dieses
+Kapitels ein, wird nicht mit \(\text{EAD}\) oder \(\text{EAD}_{\text{mit}}\) multipliziert, nicht
+zur Verteilung nationaler Beträge auf Kommunen benutzt und nicht als Gewicht in der Aggregation
+nach Abschnitt 3.6 verwendet; umgekehrt fließt kein Euro-Betrag in \(I_{60,k}\) ein. Die beiden
+Pfade teilen sich ausschließlich die Datenebenen HQ_FLAECHE und GEBAEUDEWERT.
+
+**Anzeige und Grenzen.** Der Index wird getrennt vom Euro-Ausweis angezeigt, mit dem
+Vergleichsraum, dem Kartenstand und derselben Vollständigkeitsanzeige wie in Abschnitt 3.6. Seine
+Grenzen: Er bildet nur die Exposition im HQ100 ab, nicht die Tiefe und nicht den Gebäudewert; zwei
+Kommunen mit gleichem \(x_k\), aber sehr verschiedenen Wassertiefen erhalten denselben Indexwert
+und deutlich verschiedene \(\text{EAD}_k\). Genau deshalb ersetzt er den bewerteten Schaden nicht,
+sondern steht neben ihm.
+
 ## 4 Kalibrierung & Validierung (§2.4/§3.4)
 
 <!--
@@ -692,11 +866,17 @@ Objektschutzes sind K8-Maßnahmenkosten und schließen den verhinderten Schaden 
 
 ### 5.1.1 Zeichentabelle (Kette S092)
 
+Die vollständige Zeichentabelle beider Kapitel steht in Abschnitt 3.5; hier stehen dieselben
+Zeichen der S092-Kette noch einmal mit ihren Werten und Bändern, ergänzt um die beiden Zeichen der
+Wirkungsformel \(\text{EAD}_{\text{mit}} = \text{EAD}\cdot(1 - r_{\text{S092}})\).
+
 | Zeichen | Name | Einheit | Wert/Herkunft |
 |---|---|---|---|
+| \(\text{EAD}\) | jährlicher Erwartungsschaden des Kontos K3 aus flussseitiger Überflutung **ohne** den Hebel — native Ergebnisgröße, Bezugsjahr und Preisstand 2026, Betrachtungsebene Kommune | €₂₀₂₆/a | herleitung: §3.1 und §3.4 Schritt 3 — \(\text{EAD} = \text{EAD}_k = \sum_{z \in k} \bar A_z w_z\) (Aggregation §3.6); Zeichentabelle §3.5 |
+| \(\text{EAD}_{\text{mit}}\) | Erwartungsschaden derselben Kommune, desselben Kontos K3 und desselben Bezugsjahres 2026 **nach** Umsetzung von S092 | €₂₀₂₆/a | herleitung: §5.1 — \(\text{EAD}\cdot(1 - r_{\text{S092}})\), Wirkungsort nur K3 (K8-Kosten ausgeschlossen, R7); Zeichentabelle §3.5 |
 | \(\Delta q\) | zusätzlich nachgerüsteter Anteil exponierter Gebäude (marginal gegenüber heute) | – | 0,10 (Band 0,05–0,20) · herleitung:#s092-wirkung — Abschätzung von KAP3, keine Primärquelle (§5.1.2) |
 | \(e_{\text{bem}}\) | Schadensminderung am nachgerüsteten Gebäude, solange der Wasserstand das Bemessungsniveau nicht übersteigt | – | 0,70 (Band 0,50–0,80) · herleitung:#s092-wirkung — Abschätzung von KAP3, keine Primärquelle (§5.1.2) |
-| \(r_{\text{S092}}\) | relative Minderung des K3-Erwartungsschadens von #60 durch S092 | – | 0,035 (Band 0,0075–0,112) · berechnet: \(\Delta q \cdot s_{\text{bem}} \cdot e_{\text{bem}}\) (§5.1.2) |
+| \(r_{\text{S092}}\) | relative Minderung des K3-Erwartungsschadens von #60 durch S092 | – | 0,035 (Band 0,0075–0,112) · herleitung:#s092-wirkung — berechnet aus \(\Delta q \cdot s_{\text{bem}} \cdot e_{\text{bem}}\) (§5.1.2) |
 | \(s_{\text{bem}}\) | Anteil der Schadenssumme aus Ereignissen unterhalb des Bemessungsniveaus | – | 0,50 (Band 0,30–0,70) · herleitung:#s092-wirkung — Abschätzung von KAP3, keine Primärquelle (§5.1.2) |
 
 ### 5.1.2 Herleitung, Rechnung und Sensitivität
