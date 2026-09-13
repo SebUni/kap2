@@ -9,16 +9,18 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 > **Geltungsbereich.** Befüllt sind Kap. 1 (Wirkungskette, Knoten-Bilanz, Weitergaben, Konto) und
 > Kap. 2 (Evidenz-Register) aus den beiden Arbeitsmappen unter `docs/Schadensbaum/` und aus
 > volltextgeprüfter externer Evidenz (Langbelege B1–B6 unter der Registertabelle); befüllt ist
-> zudem Kap. 9 (Ansatz-Vergleich, entschieden mit T-0237). Kap. 3–8 tragen
+> zudem Kap. 9 (Ansatz-Vergleich, entschieden mit T-0237) sowie Kap. 3 bis einschließlich der
+> Kernformel (native Ergebnisgröße, Datenebenen nach §3.1, Tiefen-Schadensfunktion, Schicht-B-Formel
+> auf Zellebene; T-0238). Kap. 4–8 tragen
 > die Pflichtinhalte als Kommentar. Die Knoten-Bilanz in Kap. 1 ist entschieden (32/32 Zeilen
 > tragen eine Formelstelle oder `inaktiv` mit Zitat). Im Evidenz-Register sind **sieben** der
 > 32 Zeilen belegt beziehungsweise entschieden: **60-W085-01** (Basiswert, Hazard),
 > **60-R24-01** (Basiswert, Mengengerüst), **60-S074-01** und **60-R17-01**
 > (Sensitivitätsbänder der Exposition), **60-S093-01** und **60-S094-01** (Sensitivitätsbänder
 > des Schadensgrads, abgeschätzt) sowie **60-S092-01** (Maßnahmen-Hebel, abgeschätzt; Herleitung
-> §5.1, `#s092-wirkung`). Die **übrigen 25 Registerzeilen stehen auf `offen`**. Ebenso offen
-> bleiben die native Ergebnisgröße (Kap. 3) sowie die Datenebenen nach §3.1; der Ansatz ist
-> entschieden (Kap. 9, Ansatz (a)). Jeder als
+> §5.1, `#s092-wirkung`). Die **übrigen 25 Registerzeilen stehen auf `offen`**. Entschieden sind
+> der Ansatz (Kap. 9, Ansatz (a)), die native Ergebnisgröße (Kap. 3.1) und die vier Datenebenen
+> nach §3.1 (Kap. 3.2). Jeder als
 > **Abschätzung von KAP3** geführte Wert ist in seiner Registerzeile als solcher gekennzeichnet
 > (§3.9; Vorgaben P1/P2), samt Bandbreite, Sensitivität und Modellgrenze.
 > Befund-Ledger: `reviews/BEFUNDE_60.md`.
@@ -27,7 +29,8 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 
 - **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`. Davon **7 belegt bzw. entschieden** — 60-W085-01, 60-R24-01, 60-S074-01, 60-R17-01, 60-S093-01, 60-S094-01 und 60-S092-01 (Maßnahmen-Hebel, abgeschätzt) —, die **übrigen 25 stehen auf `offen`**.
 - **Entschieden (T-0237):** Ansatz-Vergleich Kap. 9 — Umsetzungsgrundlage ist Ansatz **(a)** (Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle); (b) aggregierte Flächenschadensrate bleibt als Ergänzungsmodul, (c) Schadensgradmodell am Einzelgebäude ist ausgeschieden.
-- **Offen:** (1) die native Ergebnisgröße (Kap. 3); (2) Datenebenen nach §3.1; (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
+- **Entschieden (T-0238):** Kap. 3 bis zur Kernformel — native Ergebnisgröße (EAD in €₂₀₂₆/a, Ebene Kommune), vier Datenebenen nach §3.1 (drei „neu anzulegen", eine „geparkt"), Tiefen-Schadensfunktion und Schicht-B-Kernformel Menge × Rate × Preis je 100-m-Zelle.
+- **Offen:** (1) Zeichentabelle, Aggregation Zelle → Kommune und Schicht A in Kap. 3; (2) Kap. 4, 6, 8; (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
 - **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Planungszahl korrigiert, Beispiel-Code-Zaun im Kommentar entfernt; R2: Lint-Funde behoben, Zeichentabelle S092 als eigener Abschnitt, Verweis korrigiert). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: je rund 0,3 USD. Die Evidenz der sieben belegten Registerzeilen ist in eigenen Runden recherchiert und im Volltext geprüft (Quellen und Langbelege B1–B6 in Kap. 2).
 - **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
@@ -440,44 +443,182 @@ Parameterliste.
 
 ## 3 Modell (§2.3)
 
-<!--
-Pflichtinhalte (§2.3/§3.1/§3.2/§3.6):
-- Native Ergebnisgröße deklarieren (genau eine je Risiko-Code; weitere als Teil-Ausweise).
-  Kandidat laut A5/Mon. Z65: Erwartungsschaden K3 je Jahr über HQ-Szenarien — Entscheidung offen.
-- Schicht-B-Formel Menge × Rate × Preis auf Zellebene, nur aus Register-Zeilen „Basiswert“ und
-  hergeleiteten Parametern; physische Zwischengröße vor dem Euro (z. B. betroffene Gebäude,
-  Wassertiefe, Schadensgrad); Aggregation Zelle → Kommune.
-- Je Formel alphabetische Zeichentabelle (Zeichen · Name · Einheit · Wert/Herkunft mit Register-ID
-  oder Herleitungs-Anker); Mini-Rechenbeispiele als Golden-Test-Blöcke.
-- Lackmustest §3.1: Kommune ohne Flussaue/Überflutungsfläche → ~0.
-- Schicht-A-Index aus denselben Knoten, nie auf Euro-Pfaden.
+Umsetzungsgrundlage ist Ansatz **(a)** aus Kap. 9: Szenario-Erwartungswert mit typisierter
+Tiefen-Schadensfunktion je 100-m-Zelle. Dieses Kapitel deklariert die native Ergebnisgröße (§3.6),
+spezifiziert die dafür benötigten Datenebenen (§3.1) und schreibt die Schicht-B-Kernformel
+Menge × Rate × Preis auf Zellebene aus (§3.2), mit einer physischen Zwischengröße vor dem
+Euro-Betrag.
 
-(a) DATENEBENEN-ANLAGEPFLICHT (§3.1): Jede benötigte Zellgröße, die das Produkt nicht führt
-    (voraussichtlich HQ-Überflutungsflächen/Wassertiefen und Gebäudebestandswerte), wird als Ebene
-    vollständig spezifiziert — Quelle, Beschaffungsweg keyless, Zell-Ableitungsregel, Fallback,
-    Normierung/Zentrierung — und „neu anzulegen“ gekennzeichnet. Ohne offene Quelle: „geparkt
-    (Datenquelle fehlt)“ mit Beschaffungs-Watchlist. Kein dauerhafter, unspezifizierter
-    Neutral-Fallback.
-(c) GESCHLOSSENE BETRACHTUNGSEBENE (§3.2): Zentrierungs-/Referenzmittel entweder amtlich publiziert
-    oder aus der Betrachtungsebene selbst (Kommune: eigene Zellen, im Baseline-Lauf festgehalten) —
-    nie aus einer Aggregation über eine höhere Ebene; ohne zulässige Referenz bleibt der
-    Modifikator neutral.
+### 3.1 Native Ergebnisgröße, Einheit, Bezugsjahr, Betrachtungsebene (§3.6)
 
-Parameter-Block-Beispiel (Format §4; Werte erst nach Herleitung eintragen):
-  parameter:
-    id: flood_bldg.<name>
-    wert: <Herleitungswert>
-    einheit: "<Einheit>"
-    band: [<unten>, <oben>]
-    herkunft: register:60-<Knoten>-01      # oder herleitung:#<anker>
-    quelle: <quellen-id>
-    preisstand: <Jahr>                     # Pflichtfeld bei Kostensätzen
-    bandzuordnung: [<Gebäudetyp/Band>]
-    endpunkt: <K3-Wiederherstellung>
+**Native Ergebnisgröße (deklariert, genau eine je Risiko-Code):** der **jährliche
+Erwartungsschaden des Kontos K3 aus flussseitiger Überflutung**, Zeichen \(\text{EAD}\).
 
-Beispiel-Test-Block (Format §4; im echten Block mit Code-Zaun „python test: beispiel_60_<name>“):
-  assert abs(<rechnung> - <erwartet>) < 1e-9
--->
+- **Einheit:** Euro je Jahr, im Preisstand des Berichts — **€₂₀₂₆/a**.
+- **Bezugsjahr (Preisstand):** **2026**, einheitlich für alle Kostensätze dieses Berichts
+  (Kap. 1, „Konto-Einbettung“: Preisstandjahr 2026, §3.9 abgeschätzt, mit Ersetzungspfad). Die
+  Wertsätze der Ebene GEBAEUDEWERT sind auf genau diesen Preisstand indexiert (Register
+  60-R24-01, Langbeleg B4).
+- **Betrachtungsebene:** die **Kommune**; gerechnet wird auf 100-m-Zellen innerhalb der Kommune,
+  der deklarierte Ausweis ist die Kommune. Referenz- und Zentrierungsmittel dieses Kapitels stammen
+  nach §3.2 entweder aus amtlicher Statistik oder aus der Betrachtungsebene selbst (die Zellen
+  derselben Kommune), nie aus einer Aggregation über eine höhere Ebene.
+- **Physischer Teil-Ausweis (Zwischengröße vor dem Euro):** die **schadensäquivalente Wohnfläche**
+  \(\bar A\) in **m²/a** — diejenige Wohnfläche, deren vollständige Wiederherstellung dem
+  erwarteten Schaden der Zelle beziehungsweise der Kommune entspricht. Sie entsteht in der Formel
+  vor jedem Euro-Betrag und trägt ihn: \(\text{EAD} = \bar A \cdot w\).
+- **Begrenzung des Ausweises (§3.6):** \(\text{EAD}\) ist der bewertete Schaden des Kontos K3 und
+  damit eine Untergrenze des Gesamtschadens desselben Ereignisses; K1 (#101), K4 (#74), K5 und K8
+  (#50) sind nicht enthalten (Kap. 1, „Nur K3 aktiv“).
+
+### 3.2 Datenebenen nach §3.1
+
+Vier Zellgrößen trägt das Produkt heute nicht. Jede ist hier vollständig spezifiziert — Quelle,
+keyless Beschaffungsweg, Zell-Ableitungsregel, Fallback, Normierung/Zentrierung — und entweder
+„neu anzulegen“ oder „geparkt (Datenquelle fehlt)“ gekennzeichnet.
+
+| Ebene | §3.1-Status | Quelle / Beschaffungsweg (keyless) | Zell-Ableitungsregel | Fallback | Normierung/Zentrierung |
+|---|---|---|---|---|---|
+| **HQ_FLAECHE** — überfluteter Flächenanteil \(a_{z,s}\) je Zelle und Szenario | **neu anzulegen** | Hochwassergefahrenkarten der Länder nach § 74 WHG / HWRM-RL; Kartendienste und Downloads der Landesämter sowie der Bund/Länder-Zusammenführung WasserBLIcK (BfG), ohne Schlüssel oder Nutzerkonto abrufbar; Szenariendefinition LAWA 2024 (Register 60-W085-01, Langbeleg B1) | Verschnitt der Überflutungsfläche des Szenarios \(s\) mit der 100-m-Zelle; \(a_{z,s}\) = überflutete Teilfläche / Zellfläche, Werte in [0, 1] | Zelle ohne Kartenabdeckung (Gewässer ohne signifikantes Risiko nach § 73 WHG): \(a_{z,s} = 0\), nachrichtlich als „nicht kartiert“ geführt — kein Neutralwert, sondern der Lackmustest-Fall (§3.1) | keine Zentrierung: \(a_{z,s}\) ist ein Anteil mit physischer Bedeutung, kein Modifikator |
+| **HQ_TIEFE** — Wassertiefe \(h_{z,s}\) je Zelle und Szenario | **neu anzulegen** | dieselbe Quelle; die Tiefenklassen 0–0,5 / >0,5–1 / >1–2 / >2–4 / >4 m sind nach LAWA 2024, S. 16 Pflichtbestandteil jeder Karte (B1) | flächengewichtetes Mittel der Tiefenklassen-Mittelwerte über den überfluteten Teil der Zelle; offene oberste Klasse mit ihrer Untergrenze angesetzt (Untergrenze, §3.6) | Zelle mit \(a_{z,s} > 0\), aber ohne Tiefenangabe: Median der Tiefenklasse **derselben Kommune im selben Szenario** (Betrachtungsebene selbst, §3.2); fehlt auch der, die amtlich publizierte Klassenverteilung des Bundeslandes | keine Zentrierung; die Tiefe geht über die Schadensfunktion §3.3 ein |
+| **GEBAEUDEWERT** — Wohnfläche \(W_z\), Gebäudetyp-Mix \(\theta_{z,t}\), Wertdichte \(w_z\) | **neu anzulegen** | Zensus 2022, Gebäude- und Wohnungszählung, 100-m-Gitter (offener Download ohne Schlüssel) für Wohnfläche und Gebäudetyp; Wertsätze aus ImmoWertV Anlage 4 (NHK 2010) und Destatis-Baupreisindex, Fortschreibung nach Register 60-R24-01 (B4) | \(W_z\) = Summe der Wohnfläche der Gitterzelle; \(\theta_{z,t}\) = Anteil der Wohnfläche je Gebäudetyp \(t\) (Ein-/Zweifamilien- gegen Mehrfamilienhaus); \(w_z = k_{\text{BGF}} \sum_t \theta_{z,t} n_t\) | Zelle mit Gebäudebestand, aber ohne Typaufteilung: Typ-Mix **der übrigen Zellen derselben Kommune** (§3.2); fehlt auch der, der amtlich publizierte Bestandsmix des Bundeslandes | \(w_z\) ist ein Preis, kein Modifikator — keine Zentrierung; Preisstand 2026 einheitlich |
+| **GEBAEUDEZUSTAND_BAUSTOFF** — Zustands- und Materialachse \(f_{S093}\), \(f_{S094}\) | **geparkt (Datenquelle fehlt)** — Beschaffungs-Watchlist | keine bundesweite offene Erhebung von Bauzustand oder Baumaterial je Zelle; Zensus 2022 führt Baujahrsklasse und Gebäudetyp, nicht den Bauzustand und nicht den Baustoff (Register 60-S093-01, 60-S094-01) | entfällt, solange die Ebene geparkt ist | \(f_{S093} = f_{S094} = 1{,}00\) — der Zentrierungs-Neutralwert, dokumentiert und nicht still (§3.1) | mittelwertzentriert auf den Bestandsmix (§3.2); die Bänder 0,80–1,25 und 0,89–1,12 laufen als Struktur-Unsicherheit mit (multiplikativ 0,71–1,40) |
+
+**Beschaffungs-Watchlist zu GEBAEUDEZUSTAND_BAUSTOFF (§3.1).** Beobachtet werden drei Wege, jeder
+mit dem Kriterium „zellscharf, bundesweit, keyless“: (1) eine Fortschreibung der Zensus-Gebäude-
+und Wohnungszählung um ein Zustands- oder Baustoffmerkmal; (2) die Gebäudemodelle LoD2 der
+Landesvermessungen, sofern sie ein Konstruktionsmerkmal führen; (3) Energieausweis- oder
+Sanierungsstandsregister mit Gitterausweis. Solange keiner der drei Wege das Kriterium erfüllt,
+bleiben beide Faktoren auf exakt 1,00, und ihr Band bleibt der ausgewiesene Unsicherheitsbeitrag.
+
+**Ressourcen-Regel (§3.4).** Keine der vier Ebenen verlangt einen nationalen
+100-m-Vollraster-Lauf, und keiner der beschriebenen Schritte plant einen ein: Der Verschnitt nach
+HQ_FLAECHE und HQ_TIEFE läuft auf dem Zuschnitt der jeweils berechneten Kommune, der
+GEBAEUDEWERT-Aufbau ebenso. Jeder Abgleich dieses Kapitels — insbesondere die Prüfung der
+Exponiertenquote gegen das ZÜRS-Band aus Register 60-R17-01 (7,6 % der Adressen in GK2–GK4,
+1,5 % im HQ100-nahen Band) — läuft auf **Bundesland-, Gemeindepunkt- oder Stichprobenebene**,
+nicht auf dem Vollraster.
+
+**Kein-Doppelkanal (§3.2).** Die Geländehöhe (S074) und die Gewässernähe (R17) stecken bereits in
+den Karten der Ebenen HQ_FLAECHE und HQ_TIEFE; sie treten deshalb in der Kernformel **nicht** als
+eigene Faktoren auf, sondern nur als Sensitivitätsbänder (±12 % aus dem DGM1-Höhenfehler,
+Register 60-S074-01; nationales Prüfband, Register 60-R17-01). Ebenso wirken Bodenbedeckung
+(S072) und Versiegelung (S073) ausschließlich über den Hazard-Datensatz.
+
+### 3.3 Tiefen-Schadensfunktion \(d(h)\) — Stützstellen und Herleitung (P1)
+
+Die Schadensfunktion gibt die Schadensquote eines Gebäudes bei der Wassertiefe \(h\) an, also den
+Anteil des Wiederherstellungswerts. Belegt sind die beiden **Enden** der FLEMOps-Wasserstandsachse
+(Register 60-S093-01, Langbeleg B5, Thieken u. a. 2008): ≈ 3,5 % in der untersten Klasse (< 21 cm)
+und ≈ 25 % in der obersten (> 150 cm). Die Werte **zwischen** den Enden und die repräsentativen
+Tiefen der Klassen sind in der Quelle nicht als Zahlentabelle publiziert; sie sind deshalb eine
+**begründete Abschätzung von KAP3** (§3.9, Vorgabe P1) mit der folgenden, im Berichtstext
+ausgeschriebenen Herleitung.
+
+*Herleitung.* Zwischen den beiden belegten Enden wird **log-linear** interpoliert, weil die
+publizierte Achse über die Klassen hinweg multiplikativ und nicht additiv wächst:
+\(d(h) = d_1 \cdot (d_5/d_1)^{(h - h_1)/(h_5 - h_1)}\) mit \(d_1 = 0{,}035\) bei
+\(h_1 = 0{,}10\) m und \(d_5 = 0{,}250\) bei \(h_5 = 1{,}75\) m. Die repräsentativen Tiefen sind
+die Klassenmitten; für die oben offene Klasse ist 1,75 m gesetzt (Abschätzung von KAP3, Richtung:
+unterschätzt tiefe Überflutungen, damit Untergrenze).
+
+| Klasse (FLEMOps) | < 21 cm | 21–60 cm | 61–100 cm | 101–150 cm | > 150 cm |
+|---|---|---|---|---|---|
+| repräsentative Tiefe \(h\) [m] | 0,10 | 0,405 | 0,805 | 1,255 | 1,75 |
+| Schadensquote \(d(h)\) | **0,035** (belegt, B5) | 0,050 (abgeschätzt) | 0,081 (abgeschätzt) | 0,139 (abgeschätzt) | **0,250** (belegt, B5) |
+
+*Gegenprobe und benannter Widerspruch (§3.8).* Die Interpolation entspricht einem Zuwachs von
+**12,7 % je 10 cm** Wassertiefe. Die unabhängige Sensitivitätsrechnung aus Register 60-S074-01
+(de Moel & Aerts 2011, Langbeleg B2) misst 5,3–6,2 % je 10 cm. Der Unterschied wird benannt und
+nicht geglättet: Die niederländische Zahl gilt für **aggregierte Landnutzungsklassen** über ein
+ganzes Untersuchungsgebiet, die deutsche Achse für das **einzelne Wohngebäude** in fünf Klassen.
+Als Sensitivitätsband der Schadensfunktion läuft deshalb der flachere Verlauf mit
+(untere Bandgrenze: Zuwachs 6 % je 10 cm ab demselben belegten Startwert 0,035, obere Bandgrenze:
+die Stützstellen oben), zusätzlich zu den mittelwertzentrierten Achsen \(f_{S093}\) und
+\(f_{S094}\) mit ihrem gemeinsamen Band 0,71–1,40.
+
+### 3.4 Kernformel auf Zellebene (Menge × Rate × Preis)
+
+**Schritt 1 — Menge × Rate: geschädigte Wohnfläche je Ereignis (physische Zwischengröße).**
+Für die Zelle \(z\) und das Szenario \(s\)
+
+$$ A_{z,s} \;=\; \underbrace{W_z \cdot a_{z,s}}_{\text{Menge: überflutete Wohnfläche } [\text{m}^2]} \;\cdot\; \underbrace{d(h_{z,s}) \cdot f_{S093} \cdot f_{S094}}_{\text{Rate: Schadensquote } [-]} \qquad [\text{m}^2] $$
+
+\(A_{z,s}\) ist die **schadensäquivalente Wohnfläche** der Zelle im Ereignis \(s\): die Wohnfläche,
+deren vollständige Wiederherstellung dem Schaden entspricht. Sie ist die physische Zwischengröße
+und existiert unabhängig von jedem Preis.
+
+**Schritt 2 — Erwartungswert über die Szenarien (Rate der Zeit).** Die drei Stützstellen der
+Hochwassergefahrenkarte (Register 60-W085-01) spannen eine Schaden-Wahrscheinlichkeits-Kurve auf;
+der Jahreserwartungswert ist ihre Fläche, trapezförmig integriert, mit konstanter Fortsetzung
+oberhalb des Extremszenarios:
+
+$$ \bar A_z \;=\; \sum_{i=1}^{n-1} \bigl(p_i - p_{i+1}\bigr)\cdot\frac{A_{z,i} + A_{z,i+1}}{2} \;+\; p_n \cdot A_{z,n} \qquad [\text{m}^2/\text{a}] $$
+
+mit \(n = 3\) und \(p_1 > p_2 > p_3\): \(p_1 = 1{,}0\cdot10^{-1}\,\text{a}^{-1}\) (HQhäufig,
+Kartenfall HQ10), \(p_2 = 1{,}0\cdot10^{-2}\,\text{a}^{-1}\) (HQ100), beide belegt (B1);
+\(p_3 = 2{,}236\cdot10^{-3}\,\text{a}^{-1}\) (HQextrem) als **Abschätzung von KAP3** (§3.9).
+*Herleitung \(p_3\):* Die Quellen geben für das Extremszenario keine einheitliche Jährlichkeit,
+sondern zwei Enden — mindestens 200 a nach § 74 Abs. 2 WHG (\(5{,}0\cdot10^{-3}\)) gegen ≈ 1000 a
+in der Länderpraxis (\(1{,}0\cdot10^{-3}\), LfU Bayern). Da beide Enden Größenordnungsenden sind,
+ist der Basiswert ihr **geometrisches Mittel**
+\(\sqrt{5{,}0\cdot10^{-3}\cdot1{,}0\cdot10^{-3}} = 2{,}236\cdot10^{-3}\,\text{a}^{-1}\)
+(\(T \approx 447\) a); das volle Band \(5{,}0\cdot10^{-3}\)…\(1{,}0\cdot10^{-3}\) läuft als
+Sensitivität mit und ist je Land durch die tatsächlich kartierte Jährlichkeit ersetzbar
+(Ersetzungspfad, W1; Datenlücke in B1). Ereignisse häufiger als \(p_1\) sind nicht kartiert und
+tragen deshalb 0 — eine ausgewiesene Untergrenze (§3.6). Der letzte Summand \(p_n A_{z,n}\) setzt
+den Schaden oberhalb des Extremszenarios konstant fort; das ist ebenfalls eine Abschätzung von
+KAP3, Richtung: unterschätzt den Tail, weil dort die Schadensquote noch steigt.
+
+**Schritt 3 — Preis: Euro-Betrag.** Erst hier entsteht der Euro:
+
+$$ \text{EAD}_z \;=\; \bar A_z \cdot w_z, \qquad w_z \;=\; k_{\text{BGF}} \cdot \sum_t \theta_{z,t}\, n_t \qquad [\text{€}_{2026}/\text{a}] $$
+
+Die Wertsätze \(n_t\) sind belegt und auf den Preisstand 2026 indexiert (Register 60-R24-01, B4):
+\(n_{\text{EFH/ZFH}} = 1.950\) €₂₀₂₆/m² BGF (Band 1.889–2.047),
+\(n_{\text{MFH}} = 1.533\) €₂₀₂₆/m² BGF (Band 1.484–1.609). Der Umrechnungsfaktor
+\(k_{\text{BGF}} = 1{,}30\) m² BGF je m² Wohnfläche (Band 1,25–1,40) ist eine **Abschätzung von
+KAP3** (§3.9, Herleitung in Register 60-R24-01: Verhältnis von Brutto-Grundfläche zu Wohnfläche
+im Wohnungsbau, Band aus der Spannweite zwischen kompakten Mehrfamilien- und gegliederten
+Einfamilienbauten). Der Preis trägt die Zeitwert-Lesart als Band (Alterswertminderung nach
+ImmoWertV, B4), nicht als Glättung.
+
+**Lackmustest (§3.1).** Eine Kommune ohne Flussaue erhält in jedem Szenario \(a_{z,s} = 0\) für
+alle ihre Zellen, damit \(A_{z,s} = 0\), \(\bar A_z = 0\) und \(\text{EAD}_z = 0\) — ohne
+Sonderregel und ohne Rest aus einer höheren Ebene. Kein Summand der Formel stammt aus einer
+nationalen Größe, die räumlich verteilt würde.
+
+**Rechenbeispiel (eine Zelle).** Reines Einfamilienhausgebiet in der Aue,
+\(W_z = 1.200\) m² Wohnfläche, \(\theta_{\text{EFH/ZFH}} = 1{,}0\) ⇒
+\(w_z = 1{,}30 \cdot 1.950 = 2.535\) €₂₀₂₆/m² Wohnfläche. Szenarien: HQhäufig
+\(a = 0{,}25\), \(h = 0{,}30\) m ⇒ \(d = 0{,}050\); HQ100 \(a = 0{,}80\), \(h = 0{,}80\) m ⇒
+\(d = 0{,}081\); HQextrem \(a = 1{,}00\), \(h = 1{,}60\) m ⇒ \(d = 0{,}250\). Physische
+Zwischengrößen: 15,0 / 77,8 / 300,0 m² je Ereignis, daraus \(\bar A_z = 6{,}31\) m²/a und
+\(\text{EAD}_z \approx 16.000\) €₂₀₂₆/a.
+
+```python test: beispiel_60_kernformel_zelle
+# Schadensfunktion: log-lineare Interpolation zwischen den belegten Enden (B5)
+d1, d5, h1, h5 = 0.035, 0.250, 0.10, 1.75
+d = lambda h: d1 * (d5 / d1) ** ((h - h1) / (h5 - h1))
+assert abs(d(0.405) - 0.0503) < 5e-4 and abs(d(0.805) - 0.0811) < 5e-4
+assert abs(d(1.255) - 0.1386) < 5e-4 and abs(d(1.75) - 0.250) < 1e-9
+# Zelle: Menge x Rate -> physische Zwischengroesse (m2), erst danach der Preis
+W, f093, f094 = 1200.0, 1.00, 1.00
+A = [W * a * d_s * f093 * f094 for a, d_s in ((0.25, 0.050), (0.80, 0.081), (1.00, 0.250))]
+assert abs(A[0] - 15.0) < 1e-9 and abs(A[2] - 300.0) < 1e-9
+# Szenario-Erwartungswert: Trapeze + konstante Fortsetzung oberhalb HQextrem
+p3 = (5.0e-3 * 1.0e-3) ** 0.5          # geometrisches Mittel des WHG/Laenderpraxis-Bandes
+assert abs(p3 - 2.236e-3) < 1e-6
+p = [1.0e-1, 1.0e-2, p3]
+A_bar = sum((p[i] - p[i + 1]) * (A[i] + A[i + 1]) / 2 for i in range(2)) + p[2] * A[2]
+assert abs(A_bar - 6.311) < 1e-3
+# Preis: erst hier entsteht der Euro
+w = 1.30 * 1950.0
+assert abs(A_bar * w - 16000.0) < 1.0
+# Lackmustest: Kommune ohne Flussaue -> exakt 0
+A0 = [0.0, 0.0, 0.0]
+assert sum((p[i] - p[i + 1]) * (A0[i] + A0[i + 1]) / 2 for i in range(2)) + p[2] * A0[2] == 0.0
+```
 
 ## 4 Kalibrierung & Validierung (§2.4/§3.4)
 
