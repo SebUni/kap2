@@ -160,8 +160,8 @@ aus #95/#96/#98). In Formeln (§3) dürfen später nur Zeilen mit Entscheidung *
 | 60-W091-01 | W091 Grundwasserstand → Gebäudeschaden (flussseitig) | offen | offen | offen | offen | offen | offen |
 | 60-W100-01 | W100 Kanalnetze/Vorfluter → Gebäudeschaden (flussseitig) | offen | offen | offen | offen | offen | offen |
 | 60-S092-01 | S092 Vorsorge der Eigentümer (Objektschutz) → Gebäudeschaden | im Erstaufschlag **keine nach §3.5 zulässige** (Interventions-/quasi-experimentelle) Effektgröße belegt ⇒ **Abschätzung von KAP3** \(r_{\text{S092}}\) = 0,035 (Band 0,0075–0,112), Kette §5.1 | — (keine Interventionsstudie belegt; Befragungen nach Ereignissen sind nur Kandidat, im Volltext nicht verifiziert, gehen nicht in den Wert ein) | Herleitung §5.1 (`#s092-wirkung`) | §3.9 ABGESCHÄTZT; Setzung für deutsche Kommunen | kommunal (Pauschalfaktor — Modellgrenze der Abschätzung) | offen (Vorschlag: Maßnahmen-Hebel, abgeschätzt) |
-| 60-S093-01 | S093 Gebäudezustand → Schadensgrad | offen | offen | offen | offen | offen | offen |
-| 60-S094-01 | S094 Baumaterialien → Schadensgrad | offen | offen | offen | offen | offen | offen |
+| 60-S093-01 | S093 Gebäudezustand → Schadensgrad | Zustands-/Qualitätsachse der Wassertiefe-Schadensfunktion: FLEMOps führt die Gebäudequalität als eigene Eingangsachse mit **zwei Klassen** („Low/medium quality“ / „high quality“) neben Wasserstand (5 Klassen: <21 / 21–60 / 61–100 / 101–150 / >150 cm) und Gebäudetyp (3 Klassen); die Schadensquote des Gebäudes steigt über diese Wasserstandsklassen von ≈ 3,5 % auf ≈ 25 %, die Qualitätsachse ist jedoch **nur grafisch** (Fig. 1) und ohne Zahlentabelle je Qualitätsklasse publiziert ⇒ **Abschätzung von KAP3** \(f_{\text{S093}}\) = 1,00 (mittelwertzentriert auf den Bestandsmix), **Band 0,80–1,25** (Spannweitenfaktor 1,57 zwischen den beiden Zustandsklassen), Kette in B5; Sensitivität: ±25 % auf den Schadensgrad je Zelle (gegen ±12 % Tiefenband aus 60-S074-01) | empirische Mehrfaktor-Schadensfunktion aus Betroffenenbefragung (1.697 im August 2002 betroffene Haushalte), validiert an Instandsetzungskosten von 1.274 Einzelgebäuden in drei sächsischen Kommunen; die Zustandsachse selbst ist in der Quelle nur als Grafik ausgewiesen, der Bandwert ist deshalb eine Abschätzung von KAP3 (§3.9) | Thieken, A. H.; Olschewski, A.; Kreibich, H.; Kobsch, S.; Merz, B. 2008, „Development and evaluation of FLEMOps – a new Flood Loss Estimation MOdel for the private sector“, WIT Transactions on Ecology and the Environment 118, 315–324, WIT Press, DOI 10.2495/FRIAR080301, https://www.witpress.com/elibrary/wit-transactions-on-ecology-and-the-environment/118/19311, Zugriff 13.09.2026 — Volltext geprüft (Tab. 1 S. 317; Fig. 1 und Tab. 2 S. 318; S. 319 und S. 323); Elmer, F.; Thieken, A. H.; Pech, I.; Kreibich, H. 2010, „Influence of flood frequency on residential building losses“, Natural Hazards and Earth System Sciences 10, 2145–2159, DOI 10.5194/nhess-10-2145-2010, https://nhess.copernicus.org/articles/10/2145/2010/, Zugriff 13.09.2026 — Volltext geprüft (S. 2151) — Langbeleg **B5** unter der Tabelle | DE (Elbe- und Donaueinzugsgebiet, Ereignisse 2002 sowie 2005/2006). **Modellgrenzen:** (a) die Qualitätsklassen stammen aus den INFAS-Ausstattungsklassen („value of the equipment, windows, doors etc.“, sechs Klassen), nicht aus einer bautechnischen Zustandserhebung — die Lesart „Gebäudezustand“ ist eine dokumentierte Annahme; (b) die **Richtung** der Achse ist aus der Quelle nicht auflösbar: die Beschriftung von Fig. 1 ordnet die höheren Schadensquoten der Klasse „high building quality“ zu, was der erwarteten Richtung widerspricht, und eine Zahlentabelle zur Auflösung fehlt — der Widerspruch wird benannt, nicht geglättet (§3.8); das Band läuft deshalb symmetrisch um 1; (c) die Quelle stellt selbst infrage, ob ein an einem Extremereignis abgeleitetes Schadensmodell auf häufigere Hochwasser anwendbar ist — für HQhäufig ist das Band eine Untergrenze | keine bundesweite offene Zustandserhebung des Gebäudebestands (Datenlücke §3.8); als schwacher Proxy je 100-m-Zelle stehen Baujahrsklasse und Gebäudetyp der Zensus-2022-Gebäude- und Wohnungszählung zur Verfügung (der Bauzustand selbst wird dort nicht erhoben); die Achse läuft deshalb als bundesweit einheitliches Band auf der Ebene GEBAEUDEWERT (60-R24-01) mit; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Sensitivitätsband, abgeschätzt** — mittelwertzentriert \(f_{\text{S093}}\) = 1,00 für den Bestandsmix (§3.2), also kein eigenes Multiplikativglied im Basiswert; das Band 0,80–1,25 läuft als Struktur-Unsicherheit der Schadensfunktion mit und wird im Produkt nach Vorgabe P1/P2 als „Abschätzung von KAP3“ samt Herleitung (B5) ausgewiesen |
+| 60-S094-01 | S094 Baumaterialien → Schadensgrad | Materialachse der Wassertiefe-Schadensfunktion: die empirischen deutschen Wohngebäude-Schadensmodelle führen **keine** Baustoffachse (FLEMOps-Eingangsgrößen: Wasserstand, Gebäudetyp, Gebäudequalität, Kontamination, private Vorsorge), und die ingenieurmäßige Schadensgradskala D1–D6 gilt laut Quelle „zunächst für die allgemeine Bebauung vornehmlich in Mauerwerksbauweise“; jedes von der Einwirkung betroffene Bauwerk ist dort mindestens D1 (reiner Durchfeuchtungsschaden) ⇒ **Abschätzung von KAP3** \(f_{\text{S094}}\) = 1,00 (mittelwertzentriert), **Band 0,89–1,12** (halber logarithmischer Anteil der Zustandsachse S093), Kette in B6; Sensitivität: ±12 % auf den Schadensgrad, gemeinsam mit 60-S093-01 multiplikativ **0,71–1,40** | ingenieurmäßige Klassifikation real beobachteter Schadensbilder aus Feldeinsätzen (Hochwasser Sachsen 2002/2006/2010/2013, Sturzflut Braunsbach 2015) mit sechs- bzw. siebenstufiger Schadensgradskala D0–D6; der Zahlenwert selbst ist keine publizierte Effektgröße, sondern eine Abschätzung von KAP3 (§3.9) | Maiwald, H.; Schwarz, J. 2018, „Vereinheitlichte Schadensbeschreibung und Risikobewertung von Bauwerken unter extremen Naturgefahren“, Bautechnik 95(10), 743–753, Ernst & Sohn, DOI 10.1002/bate.201800009, https://edac.biz/fileadmin/Dokumente/06_Publikationen/Bautechnik_1018_Maiwald_Schwarz.pdf, Zugriff 13.09.2026 — Volltext geprüft (Tab. 1 und Abschn. 3.1 S. 744–745, Tab. 2 S. 745, Tab. 3 S. 746, Tab. 4 S. 747); Thieken u. a. 2008 (Fundstelle wie 60-S093-01, Tab. 1 S. 317), DOI 10.2495/FRIAR080301, Zugriff 13.09.2026 — Volltext geprüft — Langbeleg **B6** unter der Tabelle | DE (Sachsen, Baden-Württemberg). **Modellgrenzen — Bauform-Grenze der Abschätzung (Vorgabe P2):** (a) die Schadensgradbeschreibungen sind mauerwerksbasiert, materialspezifische Schadensbilder für Holz-, Fachwerk- und Leichtbaukonstruktionen sind nach eigener Aussage der Quelle „in weiterführenden Arbeiten im Detail noch herauszuarbeiten“ — für diese Bauformen ist das Band eine Untergrenze und wird nicht stillschweigend verallgemeinert; (b) die Skala ist an Extremereignissen einschließlich einer Sturzflut kalibriert (dort Dislokation ganzer Bauwerke, Schadensgrad D6), das Produkt rechnet Flusshochwasser mit deutlich geringerer Fließgeschwindigkeit; (c) die Skala beschreibt Schadensgrade, nicht Schadensquoten in Euro — die Umrechnung ist nicht Bestandteil der Quelle und bleibt Teil der Abschätzung | Baumaterial ist in der amtlichen Statistik (Zensus 2022, Hausumringe, ALKIS) bundesweit nicht als Merkmal geführt — ausdrückliche Datenlücke (§3.8); nutzbar sind je 100-m-Zelle nur Baujahrsklasse und Gebäudetyp als schwacher Materialproxy; die Achse läuft deshalb als bundesweit einheitliches Band auf der Ebene GEBAEUDEWERT (60-R24-01) mit; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Sensitivitätsband, abgeschätzt** — mittelwertzentriert \(f_{\text{S094}}\) = 1,00 für den Bestandsmix (§3.2), kein eigenes Multiplikativglied im Basiswert; das Band 0,89–1,12 läuft als Struktur-Unsicherheit mit und wird im Produkt nach Vorgabe P1/P2 als „Abschätzung von KAP3“ samt Herleitung (B6) ausgewiesen |
 | 60-S096-01 | S096 Vorsorge der öffentlichen Hand → Überflutungswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
 | 60-S097-01 | S097 Zustand Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
 | 60-S098-01 | S098 Baumaterialien Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
@@ -328,6 +328,105 @@ Regulierungspraxis auch Zeitwerte ansetzen (Alterswertminderung nach ImmoWertV);
 werden nebeneinander geführt, die Zeitwert-Lesart als Sensitivitätsband. **Modellgrenze:**
 Nichtwohngebäude sind im Mengengerüst nicht enthalten — die Mengenbasis ist insoweit eine
 Untergrenze (§3.6).
+
+**B5 — 60-S093-01 (Gebäudezustand → Schadensgrad).**
+Quellen: (1) **Thieken, A. H.; Olschewski, A.; Kreibich, H.; Kobsch, S.; Merz, B. (2008):**
+„Development and evaluation of FLEMOps – a new *F*lood *L*oss *E*stimation *MO*del for the
+*p*rivate *s*ector“, in: *Flood Recovery, Innovation and Response I*, WIT Transactions on Ecology
+and the Environment, Vol. 118, S. 315–324, WIT Press, Southampton, DOI `10.2495/FRIAR080301`,
+URL `https://www.witpress.com/elibrary/wit-transactions-on-ecology-and-the-environment/118/19311`,
+Zugriff 13.09.2026 (Volltext gegengelesen). Tab. 1 (S. 317) wörtlich zu den Eingangsgrößen:
+Water level „<21 cm, 21-60 cm, 61-100 cm, 101-150 cm, >150 cm“ · Building type „One-family homes,
+(semi-)detached houses, multifamily houses“ · Building quality „Low/medium quality, high quality“ ·
+Contamination „None, medium, heavy (i.e. oil or multiple) contamination“ · Private precaution
+„None, good, very good precaution“. Fig. 1 (S. 318) trägt die Achse „Loss ratio of a building [%]“
+über den fünf Wasserstandsklassen und ist mit „poor/average building quality“ und „high building
+quality“ beschriftet; abgelesen steigt die Schadensquote von ≈ 3,5 % (< 21 cm) auf ≈ 25 %
+(> 150 cm). Tab. 2 (S. 318) wörtlich, Skalierungsfaktoren „Loss at residential buildings“:
+C0P0 0,92 · C0P1 0,64 · C0P2 **0,41** · C1P0 1,20 · C1P1 0,86 · C1P2 0,71 · C2P0 **1,58**.
+S. 319 wörtlich zur Herkunft der Qualitätsklassen: „the information about the building quality in
+INFAS Geodaten (i.e. value of the equipment, windows, doors etc.), which is distinguished in six
+classes (from 1 ‚exclusive building quality‘ to 6 ‚very poor quality‘)“. S. 323 wörtlich zur
+Übertragbarkeit: „it has to be questioned whether loss models that were derived from data of an
+extreme flood such as the 2002 event can be applied to more frequent floods“. Datenbasis:
+1697 befragte Haushalte (Fig. 1); Validierung an 379 + 550 + 345 = 1.274 Schadensfällen in Döbeln,
+Eilenburg und Grimma (Tab. 4, S. 321). (2) **Elmer, F.; Thieken, A. H.; Pech, I.; Kreibich, H.
+(2010):** „Influence of flood frequency on residential building losses“, *Natural Hazards and Earth
+System Sciences* 10, S. 2145–2159, DOI `10.5194/nhess-10-2145-2010`,
+URL `https://nhess.copernicus.org/articles/10/2145/2010/`, Zugriff 13.09.2026 (Volltext
+gegengelesen); S. 2151 wörtlich: „In the basic FLEMOps model, five water level classes, three
+building types and two building quality classes are used as input.“
+**Datenlücke (§3.8):** eine Zahlentabelle der Schadensquoten je Qualitätsklasse ist in beiden
+Quellen nicht publiziert; die Qualitätsachse ist ausschließlich grafisch ausgewiesen. Eine
+bautechnische, bundesweite Zustandserhebung des Wohngebäudebestands existiert ebenfalls nicht.
+**Widerspruch (§3.8, benannt statt geglättet):** die Beschriftung von Fig. 1 ordnet die **höheren**
+Schadensquoten der Klasse „high building quality“ zu; fachlich erwartet würde die umgekehrte
+Richtung. Ohne Zahlentabelle ist der Widerspruch aus der Quelle nicht auflösbar; das abgeschätzte
+Band wird deshalb **symmetrisch** um 1 geführt und die Richtung nicht gesetzt.
+**Rechenschritt (§3.9 Abgeschätzt) — Band der Zustandsachse.** Belegt ist die Spannweite der
+gebäude- und bewohnerseitigen Modifikatoren derselben Datenbasis: 0,41 bis 1,58 (Tab. 2, S. 318),
+Verhältnis 1,58 ÷ 0,41 = 3,854 ⇒ ln 3,854 = 1,349. Diese Spannweite verteilt sich auf die beiden
+dort abgebildeten Achsen Kontamination und Vorsorge; die Gebäudequalität ist in Tab. 1 als dritte,
+gleichrangige gebäudeseitige Achse geführt, ohne eigenen Zahlenwert. KAP3 setzt deshalb **gleichen
+logarithmischen Anteil je gebäudeseitiger Achse** an: 1,349 ÷ 3 = 0,450 ⇒ Spannweitenfaktor
+e^0,450 = 1,568 ≈ **1,57** zwischen den beiden Zustandsklassen. Mittelwertzentriert (§3.2) auf den
+Bestandsmix: √1,568 = 1,252 ⇒ **1,25** für die schlechtere, 1 ÷ 1,252 = 0,799 ⇒ **0,80** für die
+bessere Klasse, Zentralwert **1,00**. **Sensitivität:** das Band verschiebt den Erwartungsschaden
+je Zelle um −20 % bis +25 % und ist damit größer als das Tiefenband aus 60-S074-01 (±12 %);
+ein Wechsel der Anteilsannahme auf „halber Anteil“ (0,225) ergäbe 0,89–1,12, auf „voller Anteil“
+(1,349) ergäbe 0,52–1,96 — die Gleichverteilungsannahme ist damit die mittlere der drei Lesarten.
+**Kopplung (§3.9):** erscheint eine Zahlentabelle der FLEMOps-Qualitätsachse oder eine deutsche
+Zustandsstatistik, wird dieser Schritt durch die gemessenen Werte ersetzt und das Band neu
+gerechnet. **Produkt-Kennzeichnung (Vorgabe P1/P2):** \(f_{\text{S093}}\) ist eine begründete
+Abschätzung von KAP3, keine Quellenangabe, und steht mit dieser Herleitung in der nutzersichtbaren
+Parameterliste.
+
+**B6 — 60-S094-01 (Baumaterialien → Schadensgrad).**
+Quellen: (1) **Maiwald, H.; Schwarz, J. (2018):** „Vereinheitlichte Schadensbeschreibung und
+Risikobewertung von Bauwerken unter extremen Naturgefahren“, *Bautechnik* 95(10), S. 743–753,
+Ernst & Sohn, Berlin, DOI `10.1002/bate.201800009`, Sonderdruck-URL
+`https://edac.biz/fileadmin/Dokumente/06_Publikationen/Bautechnik_1018_Maiwald_Schwarz.pdf`,
+Zugriff 13.09.2026 (Volltext gegengelesen). Tab. 1 (S. 744): ausgewertete Schadensdokumentationen
+Hochwasser — Sachsen 2002 (Mulde), 2006 (Elbe), 2010 (Neiße, Spree), 2013 (Mulde) sowie Braunsbach
+2015 (Baden-Württemberg), je EDAC-Feldeinsatz mit Schadensdokumentation. Tab. 2 (S. 745)
+definiert die Schadensgrade D0–D6; für Hochwasser sind D1–D6 belegt, D0 ist ausdrücklich nicht
+belegt. S. 745 wörtlich: „Ein Bauwerk unterliegt also entweder der Einwirkung in unterschiedlicher
+Intensität (und weist hier zumindest Durchfeuchtungsschäden im Sinne nicht struktureller Schäden
+auf) oder ist nicht von der Einwirkung betroffen. Der Schadensgrad D0 muss hier nicht
+berücksichtigt werden, da alle betroffenen Bauwerke mind. dem Schadensgrad D1 zuzuordnen sind.“
+S. 745 wörtlich zur Bauform: „Es ist anzumerken, dass die Beschreibungen der Schadensgrade zunächst
+für die allgemeine Bebauung vornehmlich in Mauerwerksbauweise gelten. Sie sind aber auch auf andere
+Bauweisen anwendbar, wobei spezifische Schadensbilder analog zu EMS-98 in weiterführenden Arbeiten
+im Detail noch herauszuarbeiten wären.“ Tab. 4 (S. 747) ordnet den Graden die Schadensbilder zu:
+D1 „reiner Durchfeuchtungsschaden“, D2 „leichte Risse in tragenden Wänden“ / „Unterspülung von
+Fundamenten“, D3 „Einsturz nicht tragender Wände“, D4 „Einsturz von tragenden Wänden, Decken“,
+D5 „Kollaps bzw. Einsturz von größeren Gebäudeteilen“, D6 „Dislokation: Bauwerk vollständig
+weggeschwemmt, umgestürzt oder vom Fundament verschoben“. (2) **Thieken u. a. (2008)**, Fundstelle
+und Zugriff wie B5: Tab. 1 (S. 317) führt als Eingangsgrößen Wasserstand, Gebäudetyp,
+Gebäudequalität, Kontamination und Vorsorge — **kein Baustoffmerkmal**.
+**Datenlücke (§3.8):** eine publizierte, nach Baumaterial differenzierte Wassertiefe-Schadensfunktion
+für deutsche Wohngebäude wurde nicht gefunden; die materialspezifischen Schadensbilder sind in der
+geprüften Quelle ausdrücklich noch nicht ausgearbeitet, und die amtliche Statistik führt kein
+bundesweites Baustoffmerkmal des Bestands. Die in `backend/app/data/sources.py` geführte
+Hochwasserschutzfibel (BMWSB 2022) ist Kandidat für die bauliche Vorsorge (60-S092-01); sie wurde
+für diese Zeile nicht im Volltext geprüft und geht nach §3.8 deshalb nicht in den Wert ein.
+**Rechenschritt (§3.9 Abgeschätzt) — Band der Materialachse.** Ausgangspunkt ist der in B5
+hergeleitete logarithmische Achsenanteil 0,450. Das Baumaterial ist in **keinem** der beiden
+empirischen Modelle eine eigene Achse, obwohl sie auf 1.697 (Thieken u. a. 2008) bzw. 2.158
+Schadensfällen (Elmer u. a. 2010) beruhen; hätte es eine mit Zustand, Kontamination oder Vorsorge
+vergleichbare Wirkung, wäre es dort als Achse aufgetaucht. KAP3 setzt den Materialbeitrag deshalb
+auf den **halben logarithmischen Anteil** der Zustandsachse: 0,450 ÷ 2 = 0,225 ⇒ Spannweitenfaktor
+e^0,225 = 1,252; mittelwertzentriert √1,252 = 1,119 ⇒ **1,12** (schadensanfälligere Bauweise) bzw.
+1 ÷ 1,119 = 0,894 ⇒ **0,89** (unempfindlichere Bauweise), Zentralwert **1,00**.
+**Sensitivität:** allein ±12 % auf den Schadensgrad; multiplikativ mit dem Zustandsband aus B5
+(0,80 × 0,89 = 0,712 bis 1,25 × 1,12 = 1,40) spannt die Strukturachse insgesamt **0,71–1,40**.
+**Bauform-Grenze als Modellgrenze der Abschätzung (Vorgabe P2):** der Wert ist an
+Mauerwerksbauweise kalibriert; für Holz-, Fachwerk- und Leichtbaukonstruktionen sowie für
+Lehmmörtel-Mauerwerk ist 1,12 eine Untergrenze, und die Übertragung wird nicht stillschweigend
+verallgemeinert. **Kopplung (§3.9):** das Band hängt an B5; ändert sich dort der Achsenanteil,
+wird es neu gerechnet. **Produkt-Kennzeichnung (Vorgabe P1/P2):** \(f_{\text{S094}}\) ist eine
+begründete Abschätzung von KAP3 und steht mit dieser Herleitung in der nutzersichtbaren
+Parameterliste.
 
 ## 3 Modell (§2.3)
 
