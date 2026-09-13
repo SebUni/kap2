@@ -1,13 +1,15 @@
 # Methodik-Bericht #60 — Schäden an Gebäuden aufgrund von Flusshochwasser
 
 Status: **Erstaufschlag (`/neu-risiko 60`) — noch nicht gegengeprüft** · 11.09.2026 ·
-Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage: **offen**
-(Ansatz-Vergleich Kap. 9) · Familie: **K3/K4-Ereignisschäden — noch kein Prototyp, dieser Bericht ist
+Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
+**Ansatz (a) — Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle**
+(entschieden im Ansatz-Vergleich Kap. 9; Entscheidungslog Nr. 5) · Familie: **K3/K4-Ereignisschäden — noch kein Prototyp, dieser Bericht ist
 der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 
 > **Geltungsbereich.** Befüllt sind Kap. 1 (Wirkungskette, Knoten-Bilanz, Weitergaben, Konto) und
 > Kap. 2 (Evidenz-Register) aus den beiden Arbeitsmappen unter `docs/Schadensbaum/` und aus
-> volltextgeprüfter externer Evidenz (Langbelege B1–B6 unter der Registertabelle); Kap. 3–9 tragen
+> volltextgeprüfter externer Evidenz (Langbelege B1–B6 unter der Registertabelle); befüllt ist
+> zudem Kap. 9 (Ansatz-Vergleich, entschieden mit T-0237). Kap. 3–8 tragen
 > die Pflichtinhalte als Kommentar. Die Knoten-Bilanz in Kap. 1 ist entschieden (32/32 Zeilen
 > tragen eine Formelstelle oder `inaktiv` mit Zitat). Im Evidenz-Register sind **sieben** der
 > 32 Zeilen belegt beziehungsweise entschieden: **60-W085-01** (Basiswert, Hazard),
@@ -15,7 +17,8 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 > (Sensitivitätsbänder der Exposition), **60-S093-01** und **60-S094-01** (Sensitivitätsbänder
 > des Schadensgrads, abgeschätzt) sowie **60-S092-01** (Maßnahmen-Hebel, abgeschätzt; Herleitung
 > §5.1, `#s092-wirkung`). Die **übrigen 25 Registerzeilen stehen auf `offen`**. Ebenso offen
-> bleiben Ergebnisgröße und Ansatz (Kap. 9) sowie die Datenebenen nach §3.1. Jeder als
+> bleiben die native Ergebnisgröße (Kap. 3) sowie die Datenebenen nach §3.1; der Ansatz ist
+> entschieden (Kap. 9, Ansatz (a)). Jeder als
 > **Abschätzung von KAP3** geführte Wert ist in seiner Registerzeile als solcher gekennzeichnet
 > (§3.9; Vorgaben P1/P2), samt Bandbreite, Sensitivität und Modellgrenze.
 > Befund-Ledger: `reviews/BEFUNDE_60.md`.
@@ -23,7 +26,8 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 ## Ergebnis
 
 - **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`. Davon **7 belegt bzw. entschieden** — 60-W085-01, 60-R24-01, 60-S074-01, 60-R17-01, 60-S093-01, 60-S094-01 und 60-S092-01 (Maßnahmen-Hebel, abgeschätzt) —, die **übrigen 25 stehen auf `offen`**.
-- **Offen:** (1) Ergebnisgröße und Ansatz (Kap. 9); (2) Datenebenen nach §3.1; (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
+- **Entschieden (T-0237):** Ansatz-Vergleich Kap. 9 — Umsetzungsgrundlage ist Ansatz **(a)** (Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle); (b) aggregierte Flächenschadensrate bleibt als Ergänzungsmodul, (c) Schadensgradmodell am Einzelgebäude ist ausgeschieden.
+- **Offen:** (1) die native Ergebnisgröße (Kap. 3); (2) Datenebenen nach §3.1; (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
 - **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Planungszahl korrigiert, Beispiel-Code-Zaun im Kommentar entfernt; R2: Lint-Funde behoben, Zeichentabelle S092 als eigener Abschnitt, Verweis korrigiert). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: je rund 0,3 USD. Die Evidenz der sieben belegten Registerzeilen ist in eigenen Runden recherchiert und im Volltext geprüft (Quellen und Langbelege B1–B6 in Kap. 2).
 - **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
@@ -650,19 +654,85 @@ Kalibrierbarkeit · lokale Differenzierung · Datenverfügbarkeit · Maßnahmen-
 Architektur-Konformität · Aufwand; Empfehlung begründet; Verworfenes ggf. als Ergänzungsmodul.
 Aus der Arbeitsmappe vorgegebener Kandidat (a): Erwartungswert über HQ-Szenarien —
 Eintrittswahrscheinlichkeit × Wassertiefe-Schadensfunktion × Gebäudewert (A5, Mon. Z65).
-Weitere Kandidaten (b), (c): offen. Negativ-Beispiel (§2.6/§3.1): Verteilschlüssel
+Negativ-Beispiel (§2.6/§3.1): Verteilschlüssel
 „nationaler Schadenstopf × Anteil“ — ausgeschieden.
 -->
 
-| Kriterium | (a) HQ-Szenarien × Schadensfunktion × Bestand | (b) offen | (c) offen |
+**Entscheidungsstand (T-0237).** Die drei verglichenen Ansätze sind benannt, das Raster ist in
+jeder Zelle bewertet, und der Ansatz der Umsetzungsgrundlage ist am Ende dieses Kapitels
+festgelegt. Die Bewertung ist nach §3.4 **argumentativ und anhand von Stichproben** geführt:
+kein Kriterium verlangt als Nachweis einen nationalen 100-m-Vollraster-Lauf; die
+Ressourcenverträglichkeit auf Bundesland-, Gemeindepunkt- und Stichprobenebene ist selbst
+Kriterium („Aufwand“). Das Ausschreiben des gewählten Ansatzes (Kernformel, Zeichentabelle,
+native Ergebnisgröße) ist **nicht** Gegenstand dieses Kapitels, sondern von Kapitel 3.
+
+### Die drei verglichenen Ansätze
+
+- **(a) Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle.**
+  EAD = Σ über die drei HQ-Szenarien: p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp ·
+  Gebäudequalität) × Gebäudewert der Zelle. Achsen und Klassen nach FLEMOps-Bauart
+  (Register 60-S093-01/60-S094-01), Tiefe und Eintrittswahrscheinlichkeit aus der
+  Hochwassergefahrenkarte (60-W085-01), Wertdichte aus Bestand × Normalherstellungskosten
+  (60-R24-01). Dies ist der aus der Arbeitsmappe vorgegebene Kandidat (A5, Mon. Z65:
+  „HQ-Szenarien × Schadensfunktionen (Wassertiefe-Schaden) × Gebäudewerte“).
+- **(b) Szenario-Erwartungswert mit aggregierter Flächenschadensrate je Landnutzungsklasse.**
+  EAD = Σ über die drei HQ-Szenarien: p(HQ) × überflutete Siedlungsfläche der Zelle ×
+  Schadensrate in €/m² je Landnutzungsklasse, tiefengestuft nach den fünf Tiefenklassen der
+  Hochwassergefahrenkarte. Der Gebäudebestand geht nur über die Landnutzungsklasse ein, nicht
+  über Typ und Zustand des einzelnen Gebäudes; Bauart der Schadensmodelle in de Moel & Aerts 2011
+  (Langbeleg B2).
+- **(c) Ingenieurmäßiges Schadensgradmodell am Einzelgebäude.** Je Hausumring wird aus Wassertiefe,
+  Fließgeschwindigkeit und Bauweise ein Schadensgrad D0–D6 nach Maiwald & Schwarz 2018
+  (Langbeleg B6) bestimmt und anschließend in Wiederherstellungskosten des jeweiligen Gebäudes
+  umgerechnet; Aggregation Gebäude → Zelle → Kommune.
+
+### Kriterienraster
+
+| Kriterium | (a) Szenario-Erwartungswert, typisierte Tiefen-Schadensfunktion je Zelle | (b) Szenario-Erwartungswert, aggregierte Flächenschadensrate | (c) Schadensgradmodell D0–D6 am Einzelgebäude |
 |---|---|---|---|
-| kausale Treue | offen | offen | offen |
-| Kalibrierbarkeit | offen | offen | offen |
-| lokale Differenzierung | offen | offen | offen |
-| Datenverfügbarkeit | offen | offen | offen |
-| Maßnahmen-Anschluss | offen | offen | offen |
-| Architektur-Konformität | offen | offen | offen |
-| Aufwand | offen | offen | offen |
+| kausale Treue | **hoch** — bildet die drei Wirkungsglieder der Kette einzeln ab (Hazard W085, Exposition S074/R17, Vulnerabilität S093/S094 auf Mengengerüst R24) und entspricht der Ereignislogik A5 (Rechenregeln Z20) | **mittel** — Hazard und Exposition bleiben getrennt, die Vulnerabilität ist jedoch in der Flächenrate mit dem Mengengerüst verschmolzen; S093/S094 haben keinen eigenen Angriffspunkt | **sehr hoch** — modelliert das Schadensbild physisch am Bauwerk; erfasst zusätzlich die Fließgeschwindigkeit, die #60 laut B6 nur in Sturzflut-Lagen braucht (Modellgrenze der Quelle) |
+| Kalibrierbarkeit | **hoch** — ein einziger Niveau-Skalar auf den nationalen Anker (§3.4) wirkt multiplikativ auf alle Zellen; die Tiefenachse bleibt als unabhängige Prüfachse „Ereignisregime“ frei | **hoch** — dieselbe Skalar-Kalibrierung möglich, aber die Flächenrate ist selbst schon ein Kalibrierergebnis: Anker und Parameter sind schwer trennbar (Gefahr der Selbstbestätigung, §3.4) | **gering** — Schadensgrade sind Klassen, keine Euro-Größen; die Umrechnung Grad → Kosten ist laut B6 nicht Bestandteil der Quelle und müsste vollständig selbst kalibriert werden |
+| lokale Differenzierung | **hoch** — unterscheidet Zellen nach Tiefe, Gebäudetyp-Mix und Wertdichte; der Lackmustest §3.1 (Kommune ohne Flussaue → ~0) ist über die Überflutungsfläche unmittelbar erfüllt | **mittel** — unterscheidet nur nach Tiefe und Landnutzungsklasse; zwei Kommunen mit gleicher Siedlungsfläche im selben Tiefenband erhalten denselben Schaden, unabhängig vom Bestand | **sehr hoch** — Auflösung bis zum einzelnen Bauwerk, allerdings auf einer Merkmalsbasis, die bundesweit nicht vorliegt (siehe Datenverfügbarkeit) |
+| Datenverfügbarkeit | **hoch** — alle vier Eingänge sind frei zugänglich und im Register belegt: HWGK-Raster der Länder (60-W085-01), DGM1 (60-S074-01), Zensus-2022-Gitter mit Gebäudetyp und Wohnfläche (60-R24-01), NHK 2010 aus ImmoWertV Anlage 4; die Zustands- und Materialachsen sind als Bänder geführt, nicht als Zelldaten (60-S093-01/60-S094-01) | **hoch** — Landnutzung aus ATKIS/CORINE plus HWGK; die Schadensraten selbst stammen jedoch aus der niederländischen Fallstudie B2 und sind für Deutschland nicht belegt (§3.8 Datenlücke) | **gering** — Bauweise, Fließgeschwindigkeit und Bauzustand je Gebäude sind bundesweit **nicht** erhoben (ausdrückliche Datenlücken in 60-S093-01 und 60-S094-01); es bliebe ein Modell mit gesetzten Merkmalen, das Vorgabe P1 nur über eine Kette von Abschätzungen erfüllte |
+| Maßnahmen-Anschluss | **hoch** — der Objektschutz-Hebel S092 greift als Faktor auf den Schadensgrad (§5.1, r_S092), die Schutzsysteme S096–S098 über die R7-Weiche mit #50 am Hazard-Term; beide Angriffspunkte existieren in der Formel bereits | **gering** — Objektschutz wirkt am Gebäude, die Flächenrate kennt kein Gebäude: S092 ließe sich nur als pauschaler Abschlag auf das Gesamtergebnis anhängen, ohne Wirkungsort (§3.5) | **hoch** — feinster Angriffspunkt für Objektschutz denkbar, aber nur nutzbar, wenn die Gebäudemerkmale vorlägen; ohne sie fällt der Hebel auf dieselbe Pauschale zurück wie bei (b) |
+| Architektur-Konformität | **hoch** — Schicht-B-Form Menge × Rate × Preis auf Zellebene mit physischer Zwischengröße (überflutete Gebäude, Wassertiefe, Schadensgrad) vor dem Euro; Schicht-A-Index aus denselben Knoten ableitbar | **mittel** — formal Menge × Rate × Preis, aber die physische Zwischengröße vor dem Euro fehlt: die Flächenrate springt von Quadratmetern direkt in Euro | **gering** — Aggregationsebene Einzelgebäude liegt unterhalb der Zellebene des Produkts; es entstünde eine zusätzliche Objektebene samt eigener Fortschreibung |
+| Aufwand (Ressourcenverträglichkeit §3.4) — *umgekehrte Skala: gering = günstig, hoch = teuer* | **mittel** — vier Datenebenen, davon zwei neu anzulegen (HQ-Tiefen, GEBAEUDEWERT); Kalibrierung und Abgleich laufen auf Bundesland- und Gemeindepunkt-Stichproben, ein nationaler 100-m-Vollraster-Lauf ist zu keinem Zeitpunkt nötig | **gering** — zwei Datenebenen, Stichprobenprüfung ebenso auf Gemeindepunktebene möglich; der günstigste Ansatz, aber der Aufwandsvorteil beruht auf der weggelassenen Bestandsachse | **hoch** — Objektebene für rund 19,7 Mio Wohngebäude mit Merkmalen, die erst erhoben werden müssten; eine Stichprobenprüfung genügte für die Kalibrierung nicht, weil die Merkmalsverteilung selbst das Ergebnis trägt |
+
+### Umsetzungsgrundlage
+
+**Gewählt ist Ansatz (a)** — Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je
+100-m-Zelle. Er ist damit die Umsetzungsgrundlage für Kapitel 3 und zugleich der Prototyp der
+Familie **K3/K4-Ereignisschäden** (§2.6), an dem sich #50 und #47 künftig messen.
+Das Raster ist dabei in zwei Skalenrichtungen zu lesen: Die sechs Güte-Kriterien (kausale Treue,
+Kalibrierbarkeit, lokale Differenzierung, Datenverfügbarkeit, Maßnahmen-Anschluss,
+Architektur-Konformität) laufen von „gering“ bis „sehr hoch“, wobei mehr besser ist; das siebte
+Kriterium „Aufwand“ läuft umgekehrt — „gering“ ist dort **günstig**, „hoch“ ist teuer. Ein
+geringer Aufwand zählt also nicht als Schwäche.
+
+Ausschlaggebend ist, dass (a) als einziger Ansatz in den sechs Güte-Kriterien durchgehend „hoch“
+trägt und in keinem von ihnen unter „mittel“ liegt, ohne an einer Stelle auf nicht vorhandene
+Daten oder auf einen Vollraster-Lauf angewiesen zu sein. Beim Aufwand ist (a) mit „mittel“ nicht
+der günstigste Ansatz — (b) ist billiger —, bleibt aber deutlich unter dem Objektaufwand von (c)
+und ist auf Bundesland-, Gemeindepunkt- und Stichprobenebene ressourcenverträglich (§3.4). Der
+Aufwandsvorteil von (b) wird damit gesehen und ausdrücklich in Kauf genommen; er wiegt die beiden
+folgenden Gründe nicht auf.
+
+Gegen **(b)** sprechen zwei Gründe, die schwerer wiegen als sein Aufwandsvorteil: Erstens hat der
+Maßnahmen-Hebel S092 dort keinen Wirkungsort — der bereits nach Vorgabe P2 bezifferte
+Objektschutz (§5.1) ließe sich nur als pauschaler Abschlag anhängen, was §3.5 ausdrücklich
+verlangt zu vermeiden. Zweitens fehlt die physische Zwischengröße vor dem Euro, und die einzige
+belegte Flächenschadensrate stammt aus einer niederländischen Fallstudie (B2), deren
+Übertragbarkeit der Bericht bereits als Modellgrenze führt; sie würde hier vom Sensitivitätsband
+zum tragenden Basiswert aufsteigen. (b) bleibt als **Ergänzungsmodul** vorgesehen: als grober
+Plausibilitätsrahmen für Kommunen, in denen der Zensus-Bestand je Zelle lückenhaft ist.
+
+Gegen **(c)** spricht die Datenlage, nicht die Modellidee: Bauweise und Bauzustand je Gebäude sind
+bundesweit nicht erhoben (Datenlücken in 60-S093-01 und 60-S094-01), die Skala ist laut B6
+mauerwerksbasiert und an Extremereignissen einschließlich einer Sturzflut kalibriert, und die
+Umrechnung Schadensgrad → Euro ist nicht Bestandteil der Quelle. Der Ansatz wäre in der Fläche nur
+mit gesetzten Merkmalen zu betreiben und damit eine Scheingenauigkeit unterhalb der Zellebene des
+Produkts. Seine Stärke bleibt im Modell erhalten: die Schadensgradskala trägt weiterhin das
+Materialband \(f_{\text{S094}}\) = 1,00 (0,89–1,12) in Ansatz (a).
 
 ## Entscheidungslog
 
@@ -672,3 +742,4 @@ Weitere Kandidaten (b), (c): offen. Negativ-Beispiel (§2.6/§3.1): Verteilschl�
 | 2 | Familie? | neue Familie K3/K4-Ereignisschäden, Kap. 9 angelegt | kein K3-Bericht in `docs/methodik/` | Übernahme der K1-Struktur (#95) — passt nicht zu Ereignislogik A5 | Drei-Ansätze-Vergleich Pflicht |
 | 3 | S092 ohne zulässige Effektgröße | P2-Abschätzung r = 0,035 (0,0075–0,112) | Vorgabe P2, §3.5; Querschnittsbefragungen sind keine Maßnahmen-Effektgröße | Wirkung null (unzulässig nach P2) | Maßnahmen-Modul, kein Basiswert |
 | 4 | Slug | `gebaeudeschaeden_flusshochwasser` | kurz, eindeutig gegen #59 (Starkregen) und #46 (Küste) | `flusshochwasser` (verwechselbar mit Id 49) | Dateinamen Bericht/Ledger |
+| 5 | Welcher Ansatz wird umgesetzt? (Ansatz-Vergleich §2.6/§3.7) | **13.09.2026 (T-0237):** Ansatz **(a)** Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle — p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp · Gebäudequalität) × Gebäudewert | einziger Ansatz, der in den sechs Güte-Kriterien durchgehend „hoch“ trägt (das siebte Kriterium Aufwand läuft umgekehrt: dort ist „gering“ günstig, (a) liegt mit „mittel“ über (b) und weit unter (c) und ist nach §3.4 ressourcenverträglich): vollständig aus frei zugänglichen, im Register belegten Datenebenen speisbar, Wirkungsort für S092 und die R7-Weiche vorhanden, Schicht-B-Form mit physischer Zwischengröße vor dem Euro, Kalibrierung und Abgleich auf Stichprobenebene ohne nationalen Vollraster-Lauf (§3.4) | (b) aggregierte Flächenschadensrate — kein Wirkungsort für den Maßnahmen-Hebel, tragender Wert nur aus niederländischer Fallstudie (B2); als Ergänzungsmodul vorgesehen. (c) Schadensgradmodell D0–D6 am Einzelgebäude — Bauweise/Bauzustand bundesweit nicht erhoben, Umrechnung Grad → Euro nicht belegt | Umsetzungsgrundlage für Kap. 3 und Prototyp der Familie K3/K4-Ereignisschäden (bindet später #50 und #47); Kopfzeile und Kap. 9 nachgezogen |
