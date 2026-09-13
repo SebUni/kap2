@@ -25,3 +25,14 @@
   `KAP2_DEPLOY_COMMIT`) und `gestartet` (Prozessstart, ISO 8601).
 - `apache-kap2-test.conf`: Apache-VHost, statisches `frontend/dist` plus Proxy für `/api`, HTTP-Basic-Auth.
 - Nie auf eine Live-Umgebung. Kein FTP.
+
+## Berechtigung für den Dienstneustart
+
+- Welche Datei gilt, hängt von der polkit-Fassung auf dem Server ab: `deploy/polkit-kap2-test.rules`
+  gilt für polkit ab 0.106 (JavaScript-Regeln); `deploy/polkit-kap2-test.pkla` gilt für polkit 0.105
+  (`localauthority`, keine JavaScript-Regeln) — das ist die heute auf dem Server aktive Fassung.
+- Die polkit-Fassung wird mit `dpkg -s policykit-1 | grep Version` festgestellt.
+- Ablageort: `deploy/polkit-kap2-test.rules` gehört nach `/etc/polkit-1/rules.d/50-kap2-test.rules`,
+  `deploy/polkit-kap2-test.pkla` gehört nach `/etc/polkit-1/localauthority/50-local.d/50-kap2-test.pkla`.
+- Die `.pkla`-Regel öffnet dem Benutzer `overlord` **alle** systemd-Einheiten und ist deshalb beim
+  nächsten Betriebssystem-Sprung durch die `.rules`-Datei zu ersetzen.

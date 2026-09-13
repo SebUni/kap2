@@ -1,0 +1,21 @@
+/* T-0199 -- Enge polkit-Regel fuer den Dienstneustart, vorbereitet fuer eine polkit-Fassung
+ * mit JavaScript-Regeln (>= 0.106). Ablageort und Geltung: siehe Abschnitt
+ * "Berechtigung fuer den Dienstneustart" in deploy/README.md.
+ *
+ * Der Server faehrt heute polkit 0.105 (kennt keine .rules-Dateien); dort gilt stattdessen
+ * deploy/polkit-kap2-test.pkla. Diese Datei liegt bereit, damit die enge Fassung beim naechsten
+ * Betriebssystem-Sprung sofort einsetzbar ist, statt erneut hergeleitet werden zu muessen.
+ *
+ * Bewusst eng gefasst: Ergebnis ist nur dann polkit.Result.YES, wenn alle drei Bedingungen
+ * zutreffen -- action.id ist "org.freedesktop.systemd1.manage-units", die betroffene Unit
+ * (action.lookup("unit")) ist "kap2-test.service", und der anfragende Benutzer
+ * (subject.user) ist "overlord". Sonst NOT_HANDLED (keine Aussage, keine Rechteausweitung).
+ */
+polkit.addRule(function (action, subject) {
+    if (action.id === "org.freedesktop.systemd1.manage-units" &&
+        action.lookup("unit") === "kap2-test.service" &&
+        subject.user === "overlord") {
+        return polkit.Result.YES;
+    }
+    return polkit.Result.NOT_HANDLED;
+});
