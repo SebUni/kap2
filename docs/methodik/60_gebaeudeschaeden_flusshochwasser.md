@@ -47,8 +47,15 @@ Infrastrukturen“ = Sheet „Klimawirkungsketten“ Z272, Knoten **W117 „Sch�
 Infrastrukturen“** (Konfidenz **mittel**: drei Container-Expansionen in der Wirkungs-Labelliste).
 Der Hochwasser-Eingang ist dort **W085 „Hochwasser“** (Z208 = KWRA-Id 49). W085 ist ein vorgelagerter
 W-Knoten; seine Eingänge sind eine Ebene tief mit aufgenommen (Konfidenz mittel, Sensitivitätspfeil
-auf den Container). Der Code-Bestand (`backend/app/data/catalog.py`, Eintrag `kwra_id: 60`) trägt
-genau die Namenslisten von W117 — der Umschnitt geht vom selben Knoten aus.
+auf den Container). **Divergenz Bericht ↔ Code (Befund 13, eiserne Regel 5).** Der Code-Bestand
+(`backend/app/data/catalog.py`, Eintrag `kwra_id: 60`) trägt **nicht** genau die Namenslisten von
+W117, sondern nur eine **Teilmenge mit abweichender Namensquelle**: nachgerechnet führt der Eintrag
+fünf statt sieben Sensitivitäten (`sensitivity_names`) und fünf statt acht Wirkungs-Eingänge
+(`upstream_names`) gegenüber den 7 Sensitivitäten bzw. 8 Wirkungs-Eingängen, die die Knoten-Bilanz
+unten aus W117 (KWK Z272) zieht; die vorhandenen Einträge sind zudem teils umformuliert statt
+wörtlich aus der Arbeitsmappe übernommen. Der Umschnitt geht vom selben Knoten aus, die Namenslisten
+selbst sind aber nicht deckungsgleich. Diese Divergenz wird hier **nicht** im Code gefixt, sondern
+als Integrationspunkt für `/integriere-risiko 60` geführt (Entscheidungslog Nr. 6).
 
 ### Knoten-Bilanz
 
@@ -1444,17 +1451,42 @@ still im Code gefixt" wird das über den Befund-Ledger geführt.
 
 ## 8 Quellen (§3.8)
 
-1. KWRA-Schadensbaum × UBA-Klimawirkungsketten, Arbeitsmappe
+Format je Quelle: Vollzitat, DOI/URL, Zugriffsdatum, Archiv-Snapshot; bei den beiden Arbeitsmappen
+statt DOI/URL/Archiv-Snapshot Dateistand (Commit-Hash, Datum) und Prüfsumme (SHA-256) mit
+Zugriffsdatum. Die Angaben zu Quelle 3 sind wörtlich aus `backend/app/data/sources.py`
+(`BBK_Hochwasserschutzfibel`) übernommen, ohne dass diese Datei geändert wurde; Volltextverifikation
+vor Übernahme (§3.8) hat für diese Quelle bereits bei ihrer Aufnahme in `sources.py` stattgefunden,
+für #60 ist sie hier weiterhin **nicht erneut** im Volltext geprüft (sie geht nicht in einen Wert
+dieses Berichts ein — vgl. B6, „Hochwasserschutzfibel … hier nicht im Volltext geprüft“).
+
+1. **KWRA-Schadensbaum × UBA-Klimawirkungsketten**, Arbeitsmappe
    `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` — Sheets
    „Klimawirkungsketten“ (Z3–Z271 wie in Kap. 1 zitiert) und „Schadensbaum-Netzwerkliste“ (Z13, Z50,
-   Z51, Z53, Z60, Z61).
-2. KWRA-Monetarisierung, Arbeitsmappe `docs/Schadensbaum/KWRA-Monetarisierung.xlsx` — Sheets
+   Z51, Z53, Z60, Z61). **Dateistand:** Git-Commit `1a89a2e8a69539eb15aa48aec214a44a05567137`
+   (2026-08-17). **Prüfsumme (SHA-256):**
+   `2faac648aade047f274f6b305a73c44ef3727f16a379124bf35eb590c0735a28`. **Zugriffsdatum:**
+   13.09.2026 (Repository-Arbeitskopie, Volltext im Original geprüft — Sheet-/Zeilenbezüge oben
+   und in Kap. 1/2 einzeln verifiziert).
+2. **KWRA-Monetarisierung**, Arbeitsmappe `docs/Schadensbaum/KWRA-Monetarisierung.xlsx` — Sheets
    „Risiken-Monetarisierung“ (Z51, Z54–Z56, Z64, Z65, Z106), „Schadenskonten-System“ (Z26–Z30),
-   „Rechenregeln“ (Z9, Z11, Z20), „Abgleich-Protokoll“ (P5, P15, P16).
-3. Evidenz-Quellen: offen. Für S092 ist keine Primärquelle verwendet (§5.1 ABGESCHÄTZT). Der
-   Code-Bestand zitiert für Objektschutz die „Hochwasserschutzfibel“ des BMWSB (2022;
-   `backend/app/data/sources.py`, `BBK_Hochwasserschutzfibel`). Sie ist hier nicht im Volltext
-   geprüft und geht in keinen Wert ein.
+   „Rechenregeln“ (Z9, Z11, Z20), „Abgleich-Protokoll“ (P5, P15, P16). **Dateistand:** Git-Commit
+   `68442ca12689045730c349c4160abe963096f733` (2026-08-30). **Prüfsumme (SHA-256):**
+   `4383882d3a935f09abe891b6f60ec6f8843e28da627813eaaed31fe15308ce2d`. **Zugriffsdatum:**
+   13.09.2026 (Repository-Arbeitskopie, Volltext im Original geprüft — Sheet-/Zeilenbezüge oben
+   und in Kap. 1/2 einzeln verifiziert).
+3. **Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen (BMWSB) (2022):**
+   „Hochwasserschutzfibel – Objektschutz und bauliche Vorsorge“, Berlin, Deutschland. URL
+   `https://www.bmwsb.bund.de/SharedDocs/downloads/DE/publikationen/raumordnung/hochwasserschutzfibel.html`,
+   Archiv-Snapshot
+   `https://web.archive.org/web/20251121213733/https://www.bmwsb.bund.de/SharedDocs/downloads/DE/publikationen/raumordnung/hochwasserschutzfibel.html`,
+   Zugriff 4. Juli 2026 (Angaben wörtlich übernommen aus `backend/app/data/sources.py`,
+   Eintrag `BBK_Hochwasserschutzfibel`, ohne diese Datei zu ändern). Kandidat für die bauliche
+   Vorsorge (60-S092-01, Register-Zeile Kap. 2; B6, Kap. 1 „Konto-Einbettung“); **für #60 nicht im
+   Volltext geprüft** und geht deshalb nach §3.8 in keinen Wert dieses Berichts ein.
+4. Evidenz-Quellen der belegten Registerzeilen: siehe die Langbelege B1–B6 unter der Tabelle in
+   Kap. 2, dort jeweils mit Vollzitat, DOI/URL, Zugriffsdatum 13.09.2026 und dem Vermerk
+   „Volltext geprüft“ bzw. „Volltext gegengelesen“. Für S092 ist keine Primärquelle verwendet
+   (§5.1 ABGESCHÄTZT, Quelle 3 oben ist nur Kandidat, nicht Basis der Zahl).
 
 <!-- Format je Quelle: Autor, Jahr, Titel, Organ, DOI/URL, Zugriffsdatum, Archiv-Snapshot;
 Sekundärfunde vor Übernahme im Volltext verifizieren; Widersprüche benennen. -->
@@ -1552,8 +1584,9 @@ Materialband \(f_{\text{S094}}\) = 1,00 (0,89–1,12) in Ansatz (a).
 
 | Nr | Frage | angewendete Entscheidung | Begründung | Alternative | Auswirkung |
 |---|---|---|---|---|---|
-| 1 | Welcher W-Knoten trägt #60? | W117 (KWK Z272), mit W085 eine Ebene tief | einziger Bauwesen-Knoten für Gebäudeschäden mit Hochwasser-Eingang; NW Z61 Input 49 = W085; Code-Bestand nutzt dieselben Namenslisten | nur W085 als Kette (dann fehlten S092–S104 und R24, also Vulnerabilität und Mengengerüst) | 32 Knoten in Bilanz und Register |
+| 1 | Welcher W-Knoten trägt #60? | W117 (KWK Z272), mit W085 eine Ebene tief | einziger Bauwesen-Knoten für Gebäudeschäden mit Hochwasser-Eingang; NW Z61 Input 49 = W085; Code-Bestand geht vom selben Knoten aus, trägt aber nur eine Teilmenge mit abweichender Namensquelle (Befund 13, → Log Nr. 6) | nur W085 als Kette (dann fehlten S092–S104 und R24, also Vulnerabilität und Mengengerüst) | 32 Knoten in Bilanz und Register |
 | 2 | Familie? | neue Familie K3/K4-Ereignisschäden, Kap. 9 angelegt | kein K3-Bericht in `docs/methodik/` | Übernahme der K1-Struktur (#95) — passt nicht zu Ereignislogik A5 | Drei-Ansätze-Vergleich Pflicht |
 | 3 | S092 ohne zulässige Effektgröße | P2-Abschätzung r = 0,035 (0,0075–0,1056) | Vorgabe P2, §3.5; Querschnittsbefragungen sind keine Maßnahmen-Effektgröße | Wirkung null (unzulässig nach P2) | Maßnahmen-Modul, kein Basiswert |
 | 4 | Slug | `gebaeudeschaeden_flusshochwasser` | kurz, eindeutig gegen #59 (Starkregen) und #46 (Küste) | `flusshochwasser` (verwechselbar mit Id 49) | Dateinamen Bericht/Ledger |
 | 5 | Welcher Ansatz wird umgesetzt? (Ansatz-Vergleich §2.6/§3.7) | **13.09.2026 (T-0237):** Ansatz **(a)** Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle — p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp · Gebäudequalität) × Gebäudewert | einziger Ansatz, der in den sechs Güte-Kriterien durchgehend „hoch“ trägt (das siebte Kriterium Aufwand läuft umgekehrt: dort ist „gering“ günstig, (a) liegt mit „mittel“ über (b) und weit unter (c) und ist nach §3.4 ressourcenverträglich): vollständig aus frei zugänglichen, im Register belegten Datenebenen speisbar, Wirkungsort für S092 und die R7-Weiche vorhanden, Schicht-B-Form mit physischer Zwischengröße vor dem Euro, Kalibrierung und Abgleich auf Stichprobenebene ohne nationalen Vollraster-Lauf (§3.4) | (b) aggregierte Flächenschadensrate — kein Wirkungsort für den Maßnahmen-Hebel, tragender Wert nur aus niederländischer Fallstudie (B2); als Ergänzungsmodul vorgesehen. (c) Schadensgradmodell D0–D6 am Einzelgebäude — Bauweise/Bauzustand bundesweit nicht erhoben, Umrechnung Grad → Euro nicht belegt | Umsetzungsgrundlage für Kap. 3 und Prototyp der Familie K3/K4-Ereignisschäden (bindet später #50 und #47); Kopfzeile und Kap. 9 nachgezogen |
+| 6 | Divergenz Bericht ↔ Code bei den Namenslisten von #60 (Befund 13) | **13.09.2026 (T-0243):** Bericht auf den belegbaren Stand korrigiert (Kap. 1: Teilmenge mit abweichender Namensquelle statt „genau"); Code (`backend/app/data/catalog.py`, `kwra_id: 60`) bleibt unverändert | eiserne Regel 5 — Divergenz Bericht ↔ Code wird nie still im Code gefixt; Angleichen des Codes ist Aufgabe der Integration, nicht dieses Berichtsschritts | Code stillschweigend an W117 nachziehen (verstieße gegen eiserne Regel 4/5, kein Prüfmittel im Rahmen dieses Pakets) | Divergenz als Integrationspunkt für `/integriere-risiko 60` geführt: `sensitivity_names` und `upstream_names` in `catalog.py` müssen dort gegen die 7 Sensitivitäten und 8 Wirkungs-Eingänge von W117 abgeglichen werden |
