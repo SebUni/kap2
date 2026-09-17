@@ -971,3 +971,205 @@ besteht**. Am 17.09.2026 wurden alle acht ausgeführt, alle acht endeten mit Exi
   `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und `docs/evidenz/register.md` sind
   byte-gleich geblieben; `backend/scripts/lint_methodik.py` wurde in diesem Paket nicht ausgeführt
   (Ausgabe aus Abschnitt 0.1 übernommen).
+
+### 4 · Paket T-0274 — Leitfragen 9, 10 und 12 gegen Kapitel 6 bis 9
+
+Fünftes Paket der Runde 2 (17.09.2026), eigene Sitzung. Sie hat den geprüften Stand nicht
+geschrieben: Die Kapitel 6 bis 9 stammen aus T-0240 bis T-0243 und liegen im Endstatus (eiserne
+Regel 4). Das Bundle nach §1 gilt unverändert (Abschnitt 0 dieser Runde). Die Lint-Ausgabe aus
+Abschnitt 0.1 wird **übernommen und nicht neu vorhergesagt**; der Lint wurde in diesem Paket nicht
+ausgeführt. Die Arbeitsmappen wurden mit der Standardbibliothek gelesen (zipfile/XML), nur gelesen
+und nie geändert (eiserne Regel 2).
+
+**Prüfumfang dieses Pakets:** genau Kapitel 6 „Szenario-Anwendung & Modellgrenzen" (Z. 1262–1322),
+Kapitel 7 „Parameter-Blöcke" samt 7.1 (Z. 1323–1451), Kapitel 8 „Quellen" (Z. 1452–1493) und
+Kapitel 9 „Ansatz-Vergleich" (Z. 1494–1582). Nachgemessen mit
+`python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();print([len(re.sub('<!--.*?-->','',s.split(chr(10)+'## %d '%n)[1].split(chr(10)+'## ')[0],flags=re.S)) for n in (6,7,8,9)])"`
+→ `[4568, 6390, 3073, 9486]`, Summe 23.517. Die Abweichung von je drei Zeichen gegenüber den im
+Ticket genannten **4.571 / 6.393 / 3.076 / 9.489** (Summe **23.529**) kommt allein von der
+Schnittkante (Kapitelnummer und Leerzeichen der Überschriftszeile); gemessen ist ohne HTML-Kommentare
+(Kap. 8 und 9 tragen je einen Pflichtinhalte-Kommentar). Der geprüfte Textkörper ist derselbe. Andere
+Kapitel wurden nur dort gelesen, wo die Kapitel 6 bis 9 ausdrücklich auf sie verweisen: Kap. 7
+verweist für „alle weiteren Blöcke" auf Kap. 3/4, deshalb sind die Kostensätze aus Langbeleg B4,
+§3.4 und §4.2/§4.3 für LF 9 nachgerechnet; Kap. 6 Modellgrenze 2 und 7.1 verweisen auf §5.1.2 und
+die Kontenblätter. Sie sind hier nicht Prüfgegenstand. Ein **nationaler 100-m-Vollraster-Lauf
+nach §3.4 war nicht verlangt und wurde nicht gefahren**; alle Nachrechnungen laufen auf den
+Zahlenwerten der Blöcke und der Kostensätze.
+
+#### 4.1 · Nachrechnung der Kostensätze (LF 9 — gerechnet, nicht gelesen)
+
+**Kostensätze in den Parameter-Blöcken des Kapitels 7: null.** Kapitel 7 führt genau vier Blöcke,
+maschinell ausgelesen (`id`, `einheit`, `preisstand`):
+
+| Block | Einheit | preisstand | Kostensatz? |
+|---|---|---|---|
+| `flood_bldg.dq_s092` | `"-"` | `null` | nein (Anteil) |
+| `flood_bldg.s_bem` | `"-"` | `null` | nein (Anteil) |
+| `flood_bldg.e_bem` | `"-"` | `null` | nein (Anteil) |
+| `flood_bldg.r_s092` | `"-"` | `null` | nein (Minderungsrate) |
+
+Eine Umrechnung auf einen Preisstand ist deshalb **für keinen Block** nachzurechnen. Einheitlich
+ist der Preisstand über die Blöcke nur in dem leeren Sinn, dass alle vier `preisstand: null`
+tragen, was bei dimensionslosen Größen zutrifft. Kein Block trägt einen Preisstand, deshalb kann
+kein Ratchet-Test nach §4 die Einheitlichkeit maschinell prüfen. Die Kostensätze, auf denen der
+Euro-Pfad tatsächlich rechnet, stehen **nur** im Fließtext der Kapitel 2 bis 4. Kap. 7 sagt dazu
+selbst: „Alle weiteren Blöcke entstehen mit der Herleitung in Kap. 3/4". Sie wurden deshalb
+nachgerechnet (Python, ungerundet), damit das Verdikt nicht am leeren Kapitel hängt:
+
+| Kostensatz / Umrechnung | Fundstelle | Bericht | nachgerechnet | Ergebnis |
+|---|---|---|---|---|
+| Indexfaktor 2010 → 2023 | B4, Rechenschritt 1 | 149,8 ÷ 89,1 = 1,6813 | **1,68126** | trifft zu |
+| \(n_{\text{EFH/ZFH}}\) auf Preisstand 2023 | B4, Rechenschritt 1 | 1.050 × 1,6813 = 1.765,4 | **1.765,3** (mit 1,6813: 1.765,37) | trifft zu |
+| \(n_{\text{MFH}}\) auf Preisstand 2023 | B4, Rechenschritt 1 | 825 × 1,6813 = 1.387,1 | **1.387,0** | trifft zu |
+| Fortschreibung 2023 → 2026 | B4, Rechenschritt 2 | 1,034³ = 1,1055 (Band 1,07–1,16) | **1,10551** (1,023³ = 1,07061; 1,05³ = 1,15763) | trifft zu |
+| \(n_{\text{EFH/ZFH}}\) Preisstand 2026 | B4 / §3.4 | 1.765 × 1,105 = **1.950 €₂₀₂₆/m² BGF** (1.889–2.047) | **1.950,3** (1.888,6–2.047,4); ungerundete Kette 1.050 · 149,8/89,1 · 1,034³ = 1.951,6 | trifft zu (Rundungskette −0,07 %) |
+| \(n_{\text{MFH}}\) Preisstand 2026 | B4 / §3.4 | 1.387 × 1,105 = **1.533 €₂₀₂₆/m² BGF** (1.484–1.609) | **1.532,6** (1.484,1–1.608,9); ungerundet 1.533,4 | trifft zu |
+| Gesamtfaktor 2010 → 2026 je Satz | §3.3 „Umrechnungsfaktor je Satz in der Zeichentabelle" | nicht als Zahl ausgewiesen (Zeichentabelle §3.5, Zeile \(n_t\): „mit Baupreisindex … fortgeschrieben") | **1,6813 × 1,105 = 1,8578** | fehlt in Zeichentabelle und Block → Befund 40 |
+| Wertdichte \(w\) je m² Wohnfläche | B4, Rechenschritt 3 | 1.950 × 1,30 = 2.535; 1.533 × 1,30 = 1.993 €₂₀₂₆ | **2.535,0 / 1.992,9** | trifft zu |
+| Wert je exponiertem Wohngebäude | §4.3 Punkt 2 | 208 · 1,30 · 1.950 = 527.280 €₂₀₂₆ | **527.280** | trifft zu |
+| \(\pi\) Preisstand 2024 → 2026 | §4.2 | 1,07 | **1,105/1,03 = 1,0728**; aus der Kette von Rechenschritt 2 (zwei Schritte à 3,4 %) 1,034² = **1,0692** | beide gerundet 1,07; Band bereits Befund 38, kein neuer Befund |
+
+**Einheitlichkeit des Preisstands (über den ganzen Bericht, weil die Blöcke keinen tragen):**
+`€₂₀₂₆` kommt 34-mal vor, `€₂₀₂₄` 0-mal. `€₂₀₂₃` (3-mal) und `€₂₀₁₀` (4-mal) stehen nur als
+Zwischenstufen der Rechenschritte 1 und 2 in B4. Der GDV-Anker im Preisstand 2024 wird über
+\(\pi\) auf 2026 gehoben (§4.2). Jeder Euro-Wert, der in \(\text{EAD}\), \(M_0\), \(A^{*}\), \(U\) oder
+\(O\) eingeht, steht damit auf **Preisstand 2026**. Inhaltlich ist der Preisstand einheitlich.
+Maschinenlesbar ist er es nicht, weil kein Kostensatz einen Block hat (Befund 40).
+
+#### 4.2 · Leitfragen dieses Pakets (§5) — einzeln mit Verdikt und Beleg
+
+**LF 9 — Kostensätze: Preisstand einheitlich, Quellen, VSL/VOLY-Konsistenz, Konto-Zuordnung?
+Verdikt: Befund** (→ neue Befunde **40** und **41**).
+- **Preisstand einheitlich: inhaltlich bestanden, in den Blöcken nicht belegbar.** Alle Euro-Werte
+  stehen auf 2026, alle Umrechnungen rechnen auf (Abschnitt 4.1). Kapitel 7 trägt aber keinen
+  einzigen Kostensatz. Das Pflichtfeld `preisstand` („Pflichtfeld bei Kostensätzen", §4) ist in
+  keinem Block belegt. Den Umrechnungsfaktor je Satz (§3.3) nennt weder eine Zeichentabelle noch
+  ein Block als Zahl (1,8578). → **Befund 40**.
+- **Quellen der Kostensätze: bestanden.** NHK 2010 nach ImmoWertV Anlage 4 und Destatis
+  Fachserie 17 Reihe 4 sowie die Pressemitteilungen Nr. 241/2026 und Nr. 011/2026 stehen in B4 mit
+  URL, Zugriffsdatum und wörtlichem Zitat. Der Fortschreibungsfaktor 2023 → 2026 und
+  \(k_{\text{BGF}}\) sind als Abschätzung von KAP3 gekennzeichnet. Die fehlenden Archiv-Snapshots
+  gehören zu LF 10 (Befund 42).
+- **VSL/VOLY-Konsistenz: bestanden (nicht einschlägig).** #60 bucht nur K3. Kein Kostensatz des
+  Berichts ist ein VSL- oder VOLY-Wert; Personenfolgen gehen nach Kap. 6, Modellgrenze 1, an #101
+  (K1). Der VOLY-Preisstand 2024 aus Konten **C11** wird deshalb nirgends mit €₂₀₂₆-Werten
+  vermischt.
+- **Konto-Zuordnung: im Konto bestanden, im Kostensatz-Typ Befund.** Buchung in K3 stimmt mit
+  Mon. **I65** („K3") und Konten **C29** (Buchungsobjekt 60) überein. Die Mappe schreibt für dieses
+  Konto aber einen Kostensatz-Typ vor, den der Bericht nicht umsetzt: Mon. **J64** „…; Zeitwertansatz;
+  Versicherungsleistungen sind Transfers …", von **J65** mit „Wie ID 59" für #60 übernommen, und
+  Konten **C27** „Wiederherstellungs-/Zeitwertkosten". Der Bericht bewertet mit NHK-Neuwerten.
+  „Zeitwertansatz" kommt im Bericht 0-mal vor. Die Zeitwert-Lesart wird nur als „Band" behauptet
+  (B4, §3.4), ohne Zahlenwert oder Alterswertminderungsfaktor. → **Befund 41**.
+
+**LF 10 — Quellen: fehlend, veraltet, falsch zugeordnet, unverifiziert; Zahlen ≠ Primärquelle?
+Verdikt: Befund** (→ neue Befunde **42** und **43**).
+- **Arbeitsmappen: bestanden.** Commit-Hashes und Prüfsummen in Kap. 8 wurden gegen das Repository
+  nachgerechnet. `sha256sum` ergibt `4383882d…8ce2d` (Monetarisierung) und `2faac648…35a28`
+  (Schadensbaum), identisch mit Kap. 8. `git log` auf die Dateien ergibt den letzten Commit
+  `68442ca1…` vom 2026-08-30 und `1a89a2e8…` vom 2026-08-17, ebenfalls identisch.
+- **Quelle 3 (Hochwasserschutzfibel): bestanden.** URL, Archiv-Snapshot und Zugriffsdatum sind
+  vorhanden. Der Vermerk „nicht im Volltext geprüft, geht in keinen Wert ein" ist ehrlich
+  (§3.8 Datenlücke benannt).
+- **Fehlend: Befund.** Kap. 4.1 schließt die Angabe des nationalen Ankers mit „vollständige Belege
+  in Kap. 8". In Kapitel 8 kommt `GDV` aber **0-mal** vor, und Kapitel 4 enthält **0** URLs. Die
+  Quelle, auf der \(A_{\text{ver}}\), \(\lambda\) und das Sanity-Band hängen, hat im Bericht weder
+  URL noch Archiv-Snapshot. Dazu kommt: Der gesamte Bericht führt 31 `http`-Angaben, aber nur **einen**
+  `web.archive.org`-Snapshot (Quelle 3). Die Langbelege B1 bis B6, auf die Kap. 8 Punkt 4 alle
+  Evidenzquellen verweist, tragen keinen Archiv-Snapshot. Kap. 8 Punkt 4 zählt bei ihnen den
+  Snapshot auch nicht auf („Vollzitat, DOI/URL, Zugriffsdatum"). → **Befund 42**.
+- **Falsch zugeordnet: Befund.** 7.1 belegt den Endpunkt `K3-Wiederherstellung` mit
+  „`KWRA-Monetarisierung.xlsx`, Blatt ‚Schadenskonten-System' Z28". Zelle **C28** lautet aber
+  „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)" (Spalte „Ausgeschlossen"). Die
+  Zeichenfolge `K3-Wiederherstellung` steht in den Zeilen 25–30 dieses Blatts nicht; sie steht in
+  der Netzwerkliste **J61** (so von T-0270, Stichprobe 7, gelesen). Zusätzlich führt Kap. 8 Quelle 2
+  die Blätter nur mit einer Auswahl der Zellen, die der Bericht zitiert: „Rechenregeln (Z9, Z11,
+  Z20)". Zitiert werden aber auch Rechenregeln Z7 (R5) und Z19 (A4) je einmal. Bei
+  „Risiken-Monetarisierung (Z51, Z54–Z56, Z64, Z65, Z106)" fehlen Z17 (2-mal zitiert), Z42 und
+  Z57. → **Befund 43**.
+- **Zahlen ≠ Primärquelle:** Im Prüfumfang steht keine Zahl, die einer Primärquelle widerspricht.
+  Die Kostensätze in B4 rechnen gegen die zitierten Indexwerte auf (Abschnitt 4.1). Die
+  Volltextprüfung von B1 bis B6 selbst gehört zu LF 5/6 (Paket T-0272) und ist hier nicht
+  wiederholt.
+
+**LF 12 — Umsetzbarkeit: Daten offen/keyless; Parameter-Blöcke vollständig; Architektur-vereinbar;
+benötigte neue Ebenen als solche gekennzeichnet? Verdikt: Befund** (→ neue Befunde **40**, **44**
+und **45**).
+- **Parameter-Blöcke vollständig: Befund.** Vier Blöcke, alle für den Hebel S092. Für die
+  Parameter der Kernformel und der Kalibrierung gibt es keinen Block: \(n_{\text{EFH/ZFH}}\),
+  \(n_{\text{MFH}}\), \(k_{\text{BGF}}\), \(p_1\)–\(p_3\), die Stützstellen von \(d(h)\), \(f_{S093}\),
+  \(f_{S094}\), \(\lambda\), \(\pi\), \(\kappa\), \(u\), \(w_{\text{wg}}\) und \(\varphi_{\text{fluss}}\).
+  Kap. 3 und 4 sind seit T-0236/T-0238 hergeleitet. Der Satz „Alle weiteren Blöcke entstehen mit
+  der Herleitung in Kap. 3/4" ist also überholt, ohne eingelöst zu sein. Nach §4 wird die
+  Produkt-Registry aus diesen Blöcken extrahiert; ohne sie entsteht dort kein Euro-Pfad und keine
+  P1-Parameterliste für Kostensätze. → **Befund 40**.
+- **P1-Kennzeichnung in den vorhandenen Blöcken: bestanden.** Alle vier Blöcke tragen
+  `kennzeichnung: abschaetzung_kap3` und einen `herleitung_anker`. Die Anker `s092-wirkung`,
+  `s-bem-naeherung` und `fortschreibung-endpunkt-k3` sind im Text als `<a id=…>` gesetzt. Die
+  Beanstandung von Befund 15 (Kennzeichnung nur als YAML-Kommentar) trifft auf diesen Stand nicht
+  mehr zu. Die Regression selbst führt das Geschwisterpaket. Die Bänder rechnen auf: 0,10 · 0,50 · 0,70
+  = 0,035, 0,05 · 0,30 · 0,50 = 0,0075, 0,20 · 0,66 · 0,80 = 0,1056.
+- **Wertebereich §4: bestanden als Antrag.** `endpunkt` und `bandzuordnung` liegen außerhalb des
+  §4-Wertebereichs. Das ist in 7.1 als datierter Antrag auf Fortschreibung ausgewiesen und nicht
+  still überstimmt. Über den Antrag entscheidet nicht die Gegenprüfung (§5: „Anforderungsänderungen
+  nur per Fortschreibung"). Das Fehlzitat darin steht in Befund 43.
+- **Architektur-vereinbar (§3.6): bestanden.** Die drei Infokasten-Texte stehen wörtlich in
+  Kap. 6: Benennung „bewerteter Schaden — Konto K3", Vollständigkeitsanzeige „Stufe M0: 1 von 8
+  Konten aktiv" und Versionsstempel „… — Untergrenze". Die Zahl 8 stimmt mit der Kernsumme aus
+  Konten **A2** (K1–K6 + K8, K7 nachrichtlich: sieben Kernkonten plus K7 = acht Konten) überein.
+  Die Kontogrenze steht als Modellgrenze 1.
+- **P2-Bauform-Grenze in Kap. 6: Befund.** Die einzige Maßnahme ohne publizierte Effektgröße ist
+  S092. §5.1.2 nennt ihre Bauform-Grenze ausdrücklich („Kommunenweiter Pauschalfaktor statt
+  zellscharfer Wirkung (Bauform-Grenze)"). In der Modellgrenzen-Liste von Kap. 6 fehlt sie:
+  `Pauschal` kommt dort 0-mal vor, S092 nur als konstant gehaltene Größe. Stattdessen ist
+  Modellgrenze 2 mit „Vorgabe P2" an S094 gehängt, obwohl S094 kein Maßnahmen-Hebel ist, sondern
+  eine Vulnerabilitätsachse. → **Befund 44**.
+- **Daten offen/keyless und neue Ebenen gekennzeichnet: im Modellkapitel bestanden, in Kap. 9
+  Befund.** Kap. 9 („Aufwand", Ansatz (a)) nennt „vier Datenebenen, davon zwei neu anzulegen
+  (HQ-Tiefen, GEBAEUDEWERT)". §3.2 führt aber drei Ebenen als „neu anzulegen" (HQ_FLAECHE,
+  HQ_TIEFE, GEBAEUDEWERT) und eine als „geparkt (Datenquelle fehlt)" (GEBAEUDEZUSTAND_BAUSTOFF).
+  Die Datenverfügbarkeit von (a) heißt „hoch — alle vier Eingänge sind frei zugänglich". Das Wort
+  „geparkt" kommt in Kap. 9 nicht vor. Das Raster, auf dem die Ansatzwahl beruht, unterzeichnet
+  damit den Aufbauaufwand und verschweigt die geparkte Ebene. → **Befund 45**. Die Aussage in
+  Kap. 9, die R7-Weiche existiere „in der Formel bereits", ist schon Befund 20 und wird hier nicht
+  doppelt gezählt.
+- **Ansatz-Vergleich §3.7 (Pflicht für den ersten Familienvertreter): formal vollständig.** Drei
+  Ansätze, alle sieben Kriterien in 21 Zellen bewertet, begründete Empfehlung, Verworfenes als
+  Ergänzungsmodul ((b)) bzw. als erhaltenes Materialband ((c)) benannt. Die inhaltlichen Mängel
+  stehen in den Befunden 20 und 45.
+
+#### 4.3 · Neue Befunde dieses Pakets (40–45)
+
+Format nach §5: Stelle · Art (Lücke/Fehler/Widerspruch) · Begründung · Vorschlag · Kategorie. Das
+Ticket nennt die Nummern 1–19 und als erste neue Nummer 20; das war der Stand beim Ticketschnitt.
+Die vorlaufenden Pakete T-0270 (20–22), T-0271 (23–26), T-0272 (27–31) und T-0273 (32–39) haben
+seither weiter vergeben. Nach der Regel „fortlaufend ab der nächsthöheren freien Nummer" ist die
+erste neue Nummer deshalb **40**. **Dieses Paket behebt keinen Befund**, weder einen neuen noch
+einen alten. Die Kurzform-Tabelle „Offene Befunde" am Kopf bleibt bewusst unberührt; sie schreibt
+die Befund-Regression dieser Runde fort. Jeder Prüfausdruck endet mit Exit 0, **solange der Befund
+besteht**. Am 17.09.2026 wurden alle sechs ausgeführt, alle sechs endeten mit Exit 0.
+
+| Nr | Kat. | Befund (Stelle · Art · Begründung · Vorschlag) | Prüfausdruck | Status |
+|---|---|---|---|---|
+| 40 | A | Bericht Kap. 7 (Z. 1323–1406), Einleitungssatz „Nur der Hebel aus §5.1 ist beziffert. Alle weiteren Blöcke entstehen mit der Herleitung in Kap. 3/4" gegen §3.4 (Z. 607–612), Zeichentabelle §3.5 (Z. 689–690), §4.2/§4.8 · **Lücke (§4 „Parameter-Block-Format … wird per Skript in die Produkt-Registry extrahiert", „preisstand: Pflichtfeld bei Kostensätzen"; §3.3 „alle Kostensätze eines Berichts auf einen gemeinsamen Preisstand indexiert (Umrechnungsfaktor je Satz in der Zeichentabelle)"; Vorgabe P1 „gilt für alle Parameter (Defaults, Kostensätze, Wirkungsfaktoren)"; §5 LF 9/12)** — Kapitel 7 führt vier Blöcke, alle dimensionslos und alle für den Hebel S092. Für **keinen** Kostensatz gibt es einen Block: \(n_{\text{EFH/ZFH}}\) = 1.950 und \(n_{\text{MFH}}\) = 1.533 €₂₀₂₆/m² BGF fehlen. Ebenso fehlen alle übrigen Parameter der Kernformel und der Kalibrierung (\(k_{\text{BGF}}\), \(p_1\)–\(p_3\), Stützstellen von \(d(h)\), \(f_{S093}\), \(f_{S094}\), \(\lambda\), \(\pi\), \(\kappa\), \(u\), \(w_{\text{wg}}\), \(\varphi_{\text{fluss}}\)). Das Pflichtfeld `preisstand` ist in keinem Block belegt. Die Einheitlichkeit des Preisstands lässt sich deshalb nicht maschinell prüfen, obwohl sie inhaltlich gegeben ist (nachgerechnet in Abschnitt 4.1). Der Umrechnungsfaktor je Satz (NHK 2010 → Preisstand 2026 = 1,6813 × 1,105 = **1,8578**) steht nicht als Zahl in einer Zeichentabelle. Kap. 3 und 4 sind hergeleitet, der Verweis „entstehen mit der Herleitung" ist also überholt, ohne eingelöst zu sein. Folge für das Produkt: Die Registry-Extraktion nach §4 liefert keinen Euro-Pfad, und die nutzersichtbare Parameterliste (P1) enthielte keinen Kostensatz. Kategorie A, weil ohne diese Blöcke weder Integration noch P1-Nachweis möglich sind. **Vorschlag:** je Parameter aus §3.5 und §4.8 einen Block anlegen. Kostensätze bekommen `preisstand: 2026`, `einheit` (€₂₀₂₆/m² BGF), `band`, `herkunft: register:60-R24-01`, `kennzeichnung` (NHK-Grundwert `quelle`, Fortschreibung `abschaetzung_kap3`) und den Umrechnungsfaktor. Dazu kommt eine Spalte „Umrechnungsfaktor" in der Zeichentabelle §3.5, und der Einleitungssatz von Kap. 7 wird gestrichen. | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 7 ')[1].split(chr(10)+'## 8 ')[0];bl=re.split('^parameter:$',k,flags=re.M)[1:];raise SystemExit(0 if (all('preisstand: null' in b for b in bl) and 'Alle weiteren Blöcke entstehen' in k) else 1)"` | offen |
+| 41 | B | Bericht B4 „Widerspruch" (Z. 345–348) und §3.4 (Z. 615–616) gegen `KWRA-Monetarisierung.xlsx`, Blatt „Risiken-Monetarisierung" **J64** („Wiederherstellungskosten (Gebäude, Hausrat, Fahrzeuge) je Ereignis; **Zeitwertansatz**; …"), **J65** („Wie ID 59, …") und Blatt „Schadenskonten-System" **C27** („Wiederherstellungs-/Zeitwertkosten") · **Widerspruch/Lücke (§5 LF 9 Konto-Zuordnung und Kostensatz; LF 14; eiserne Regel 2 „Arbeitsmappen nie still überstimmen"; §3.9 Abgeschätzt „Bandbreite, Ergebnis-Sensitivität")** — Die Mappe schreibt für #60 über J65 → J64 den Zeitwertansatz vor. Der Bericht bewertet mit NHK-Neuwerten (Wiederherstellungswert 527.280 €₂₀₂₆ je Wohngebäude). Er benennt den Gegensatz zwar als „Widerspruch" und sagt, die Zeitwert-Lesart werde „als Sensitivitätsband" bzw. „als Band" geführt. Ein solches Band gibt es aber nirgends: kein Alterswertminderungsfaktor, kein Zahlenwert, kein Parameter-Block. Das Wort „Zeitwertansatz" kommt im Bericht 0-mal vor. Damit weicht der Basiswert von der Mappenvorgabe ab, ohne Fortschreibung im Abgleich-Protokoll und ohne quantifizierte Sensitivität. Die Richtung ist bekannt: Neuwert ≥ Zeitwert, also ist der K3-Betrag eher überschätzt. Das widerspricht der Untergrenzen-Aussage im Versionsstempel von Kap. 6. **Vorschlag:** entweder den Zeitwertansatz aus J64 umsetzen (Alterswertminderung nach ImmoWertV als Faktor mit Quelle oder Abschätzung, Band, Block) oder den Neuwert als bewusste Fortschreibung der Mappe begründen. Dann gehört sie in die Quelle mit Eintrag ins Abgleich-Protokoll (§1/LF 14). In beiden Fällen die Zeitwert-Lesart als beziffertes Band mit Ergebnis-Sensitivität ausweisen und die Untergrenzen-Aussage prüfen. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if ('Zeitwertansatz' not in s and 'Zeitwert-Lesart als Band' in s) else 1)"` | offen |
+| 42 | B | Bericht Kap. 8 (Z. 1452–1493), Punkt 4, gegen Kap. 4.1 „Ankerwert" (Z. 866–869, „vollständige Belege in Kap. 8") und die Langbelege B1–B6 in Kap. 2 · **Lücke (§3.8 „Jede Zahl mit Quelle (Autor, Jahr, Titel, Organ, DOI/URL, Zugriffsdatum, Archiv-Snapshot)"; §5 LF 10 „fehlend")** — (a) Die Quelle des nationalen Ankers (GDV-Naturgefahrenstatistik 2024, Medieninformation; GDV-Datenservice zum Naturgefahrenreport 2025 mit den Grafikständen 10.10.2025 und 30.12.2025) trägt \(A_{\text{ver}}\), \(\lambda\) und das Sanity-Band. Kap. 4.1 verweist für ihre „vollständigen Belege" auf Kap. 8, dort kommt `GDV` aber 0-mal vor. Kapitel 4 selbst enthält 0 URLs. Die Quelle hat im Bericht also weder URL noch Archiv-Snapshot, und eine Nachprüfung der Zahlen 2,6 Mrd. € und „rund eine Milliarde mehr" ist ohne Suche nicht möglich. (b) Der Bericht führt 31 `http`-Angaben, aber nur **einen** Archiv-Snapshot (`web.archive.org`, Quelle 3). Die Langbelege B1–B6, an die Kap. 8 Punkt 4 alle Evidenzquellen delegiert, tragen keinen. Punkt 4 nennt als Format selbst nur „Vollzitat, DOI/URL, Zugriffsdatum". Bei Webseiten und Pressemitteilungen (Destatis-PM, GDV, Länderportale) ist gerade der Snapshot die Absicherung gegen stille Änderung. **Vorschlag:** die GDV-Quellen mit Vollzitat, URL, Zugriffsdatum und Archiv-Snapshot in Kap. 8 aufnehmen. Je externer Quelle in B1–B6 einen Archiv-Snapshot ergänzen oder die Lücke ausdrücklich begründen (z. B. DOI-Quelle, Snapshot entbehrlich). Das Format in Punkt 4 an §3.8 angleichen. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 8 ')[1].split(chr(10)+'## 9 ')[0];raise SystemExit(0 if ('GDV' not in k and s.count('web.archive.org')==1) else 1)"` | offen |
+| 43 | C | Bericht §7.1 „Begründung" (Z. 1420–1422) und Kap. 8 Quelle 2 (Z. 1470–1472) gegen `KWRA-Monetarisierung.xlsx`, Blatt „Schadenskonten-System" **C28**, und Netzwerkliste **J61** · **Fehler (§5 LF 10 „falsch zugeordnet"; §3.8 exakte Fundstelle)** — (a) 7.1 belegt den Endpunkt `K3-Wiederherstellung` mit „Blatt ‚Schadenskonten-System' Z28". Zelle C28 ist aber die Zeile „Ausgeschlossen": „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)". Der Baustein-Name `K3-Wiederherstellung` steht in den K3-Zeilen 25–30 dieses Blatts nicht, sondern in der Netzwerkliste J61. Der Antrag auf Fortschreibung beruft sich damit auf eine Zelle, die seine Aussage nicht trägt. Eine Fortschreibung, die „Baustein-Name des Schadenskontos nach Blatt ‚Schadenskonten-System'" als Wertebereich beantragt, bezieht sich zudem auf ein Blatt, das keine Baustein-Namen führt. (b) Kap. 8 Quelle 2 listet die zitierten Zellen unvollständig: Rechenregeln nur „Z9, Z11, Z20", obwohl der Bericht Rechenregeln Z7 (R5) und Z19 (A4) zitiert; Risiken-Monetarisierung ohne Z17, Z42 und Z57, die ebenfalls zitiert werden. Die Aufzählung wirkt abschließend und ist es nicht. **Vorschlag:** in 7.1 die Fundstelle auf NW J61 (Baustein-Name) plus Konten C26/C27 (Kontodefinition, Kostensatz-Typ) korrigieren und den beantragten Wertebereich auf das Blatt beziehen, das die Namen führt. Die Zellenliste in Kap. 8 vervollständigen oder als „u. a." kennzeichnen. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 7.1 ')[1].split(chr(10)+'## 8 ')[0];k=s.split(chr(10)+'## 8 ')[1].split(chr(10)+'## 9 ')[0];raise SystemExit(0 if ('Z28, wie in' in t and '(Z9, Z11, Z20)' in k) else 1)"` | offen |
+| 44 | C | Bericht Kap. 6 „Modellgrenzen (dokumentiert)", Punkt 2 (Z. 1293–1297), gegen §5.1.2 „Modellgrenzen der Abschätzung" · **Lücke/Fehler (Vorgabe P2 „Bauform-Grenzen werden als Modellgrenze der Abschätzung dokumentiert"; §3.5; §5 LF 12)** — Die einzige Maßnahme ohne publizierte Effektgröße ist S092 (Entscheidungslog Nr. 3). Ihre Bauform-Grenze steht in §5.1.2 („Kommunenweiter Pauschalfaktor statt zellscharfer Wirkung (Bauform-Grenze)"), ebenso der Näherungscharakter von \(s_{\text{bem}}\) mit Richtung „überschätzt den Hebel" (§5.1.3). In der Modellgrenzen-Liste von Kap. 6, der nutzernahen Zusammenstellung, fehlt beides: `Pauschal` kommt dort 0-mal vor, S092 nur als konstant gehaltene Größe. Stattdessen trägt Modellgrenze 2 die Überschrift „Bauform-Grenze der Abschätzung S094 (Vorgabe P2)". S094 ist aber eine Vulnerabilitätsachse der Schadensfunktion, kein Maßnahmen-Hebel; P2 ist dort falsch zugeordnet, auch wenn die Material-Grenze als solche zutrifft. **Vorschlag:** in Kap. 6 eine eigene Modellgrenze für S092 aufnehmen (Pauschalfaktor, Richtung der \(s_{\text{bem}}\)-Näherung, Band 0,0075–0,1056). Punkt 2 als Modellgrenze der Materialabschätzung S094 nach §3.9 umbenennen, ohne Verweis auf P2. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 6 ')[1].split(chr(10)+'## 7 ')[0];raise SystemExit(0 if ('Pauschal' not in k and 'Abschätzung S094 (Vorgabe P2)' in k) else 1)"` | offen |
+| 45 | C | Bericht Kap. 9 „Kriterienraster", Zeilen „Aufwand" und „Datenverfügbarkeit", Spalte (a) (Z. 1542, 1545), gegen §3.2 Ebenentabelle (Z. 487–492) · **Widerspruch (§5 LF 12 „benötigte neue Ebenen als solche gekennzeichnet"; §3.7 Kriterienraster Datenverfügbarkeit/Aufwand)** — Kap. 9 nennt für (a) „vier Datenebenen, davon zwei neu anzulegen (HQ-Tiefen, GEBAEUDEWERT)" und bei der Datenverfügbarkeit „alle vier Eingänge sind frei zugänglich". Nach §3.2 sind aber **drei** Ebenen „neu anzulegen" (HQ_FLAECHE, HQ_TIEFE, GEBAEUDEWERT) und eine „geparkt (Datenquelle fehlt)" (GEBAEUDEZUSTAND_BAUSTOFF, Neutralwert 1,00). „geparkt" kommt in Kap. 9 nicht vor. Das Raster, das die Ansatzwahl trägt (Entscheidungslog Nr. 5), unterzeichnet damit den Aufbauaufwand von (a) und stellt die Datenlage günstiger dar als das Modellkapitel. Die Wahl von (a) kippt dadurch voraussichtlich nicht, weil (c) an derselben Datenlücke stärker leidet, aber ihre Begründung stimmt an dieser Stelle nicht. **Vorschlag:** die Zellen „Aufwand" und „Datenverfügbarkeit" für (a) auf den Stand von §3.2 ziehen (drei neu anzulegende Ebenen, eine geparkt mit Neutralwert) und prüfen, ob die Bewertung „hoch" bei der Datenverfügbarkeit so bestehen bleibt. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 9 ')[1].split(chr(10)+'## Entscheidungslog')[0];raise SystemExit(0 if ('davon zwei neu anzulegen' in k and 'geparkt' not in k) else 1)"` | offen |
+
+#### 4.4 · Abgrenzung und Status dieses Pakets
+
+- **Beantwortet:** LF 9 (Verdikt Befund), LF 10 (Verdikt Befund) und LF 12 (Verdikt Befund), jede
+  mit Beleg. LF 9 wurde nachgerechnet statt gelesen: Kapitel 7 trägt null Kostensätze (vier
+  dimensionslose Blöcke, alle `preisstand: null`). Die Kostensätze, die der Euro-Pfad tatsächlich
+  nutzt, sind je Satz mit Zahlenwert auf den Preisstand 2026 nachgerechnet (1.950,3 und 1.532,6
+  €₂₀₂₆/m² BGF, Gesamtfaktor 1,8578, 527.280 € je Wohngebäude). Die Einheitlichkeit des
+  Preisstands ist über den ganzen Bericht belegt (Abschnitt 4.1).
+- **Nicht Gegenstand dieses Pakets:** die übrigen Leitfragen, die Kapitel außer 6 bis 9, die
+  Volltextprüfung der Langbelege B1–B6 (LF 5/6, Paket T-0272) und die Regression der Befunde 1–19.
+  Ein nationaler 100-m-Vollraster-Lauf nach §3.4 war nicht verlangt und wurde nicht gefahren.
+- **Kein Befund behoben**, und kein Bericht, Register, Code, Lint oder keine Arbeitsmappe geändert:
+  `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und `docs/evidenz/register.md` sind
+  byte-gleich geblieben; `backend/scripts/lint_methodik.py` wurde in diesem Paket nicht ausgeführt
+  (Ausgabe aus Abschnitt 0.1 übernommen).
