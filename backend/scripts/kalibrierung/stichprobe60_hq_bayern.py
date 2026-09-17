@@ -20,9 +20,10 @@ Datenquelle (ohne Schlüssel, ohne Konto) — WMS über Legendenfarben, Pixel 5 
 Hochwassergefahrenkarten nach § 74 WHG, Bayerisches Landesamt für Umwelt (LfU),
 Darstellungsdienste des UmweltAtlas Bayern (Nutzung über Dienste geldleistungsfrei):
   Fläche: https://www.lfu.bayern.de/gdi/wms/wasser/ueberschwemmungsgebiete
-          Ebenen hwgf_hqhaeufig, hwgf_hq100, hwgf_hqextrem („Hochwassergefahrenflächen …“)
+          Ebenen hwgf_hqhaeufig, hwgf_hq100, hwgf_hqextrem („Hochwassergefahrenflächen …“),
+          dazu hwgg_hq100 („Hochwassergeschützte Gebiete HQ100“)
   Tiefe:  https://www.lfu.bayern.de/gdi/wms/wasser/wassertiefen
-          Ebenen wt_hqhaeufig, wt_hq100, wt_hqextrem („Wassertiefen für …“)
+          Ebenen wt_hqhaeufig, wt_hq100, wt_hqextrem, wt_hwgg_hq100 („Wassertiefen für …“)
           Legenden https://www.lfu.bayern.de/gdi/legende/wasser/wassertiefen/<ebene>.png
 Warum WMS: Das LfU bietet für die Hochwassergefahrenflächen und Wassertiefen weder
 WFS noch Download an (geprüft 17.09.2026: Übersicht Downloaddienste
@@ -40,9 +41,28 @@ Format image/bmp (unkomprimiert, weißer Hintergrund), Kacheln 1000 × 1000 px.
     (Toleranz TOLERANZ je Farbkanal, Reihenfolge der Legendenfelder von oben:
     >0–0,5 · >0,5–1 · >1–2 · >2–4 · >4 · „nicht ermittelt“). Pixel ohne passende Farbe
     (Kantenglättung, Beschriftung) und „nicht ermittelt“ tragen keine Tiefe.
+  * HQ100 mit hochwassergeschützten Gebieten (Nacharbeit R1, wie stichprobe60_hq_sachsen.py,
+    dort HWS = „ja“): Fläche = pixelweise Vereinigung von hwgf_hq100 und hwgg_hq100
+    („Hochwassergeschützte Gebiete HQ100“), beide im selben Kachelraster, jedes Pixel
+    höchstens einmal. Tiefe = Klasse aus wt_hq100; zeigt wt_hq100 dort nichts oder
+    „nicht ermittelt“, gilt die Klasse aus wt_hwgg_hq100 („Wassertiefen für HQ100 in
+    geschützten Gebieten“, eigene Legendenfarben mit denselben fünf Klassengrenzen,
+    ohne Feld „nicht ermittelt“; die Farben werden je Ebene aus ihrer Legende gelesen).
+    Modellgrenze: Die geschützten Flächen gehören zur veröffentlichten Überflutungsfläche
+    des Szenarios und gelten damit als überflutet bei Versagen des Schutzes.
 Modellgrenzen: Pixelzuordnung über den Pixelmittelpunkt; Überdeckung durch Signaturen
-der Karte ist nicht auszuschließen. HQ100 ohne die Ebenen der hochwassergeschützten
-Gebiete (hwgg_hq100, wt_hwgg_hq100): gezählt wird die veröffentlichte Gefahrenfläche.
+der Karte ist nicht auszuschließen.
+Befund zur Tiefenlücke (Lauf 17.09.2026, Ersatztiefe fallback_kommune bei HQ100):
+  * Deggendorf 2 082 von 2 351 Zellen. 892 davon liegen in hwgf_hq100, dort zeigt
+    wt_hq100 weder eine Klasse noch „nicht ermittelt“ (Ebene leer), während wt_hqhaeufig
+    und wt_hqextrem an denselben Stellen Tiefen führen (Stichprobe UTM32 794180/5411633:
+    Fläche voll, wt_hq100 leer). Ursache ist eine Lücke der veröffentlichten HQ100-
+    Tiefenkarte, kein Deichschutz. 6 Zellen „nicht ermittelt“. 1 184 Zellen liegen nur in
+    hwgg_hq100; wt_hwgg_hq100 ist dort leer (im 20-km-Rechteck 0,0016 km²).
+  * Passau 107 von 964 Zellen, alle „nicht ermittelt“ (nach LfU-Beschreibung z. B.
+    Staustufen).
+  Die Ersatzregel des Tickets wird unverändert angewandt; andere Szenarien werden nicht
+  zur Tiefe herangezogen.
 
 Regeln (§3.2)
 -------------
@@ -110,9 +130,10 @@ KOMMUNEN = [
     ("Rosenheim", "09163000", "Rosenheim"),
     ("Reichertshofen", "09186147", "Reichertshofen"),
 ]
-SZENARIEN = [("HQhäufig", "hwgf_hqhaeufig", "wt_hqhaeufig"),
-             ("HQ100", "hwgf_hq100", "wt_hq100"),
-             ("HQextrem", "hwgf_hqextrem", "wt_hqextrem")]
+# Szenario → (Flächenebenen, Tiefenebenen in Vorrangreihenfolge)
+SZENARIEN = [("HQhäufig", ["hwgf_hqhaeufig"], ["wt_hqhaeufig"]),
+             ("HQ100", ["hwgf_hq100", "hwgg_hq100"], ["wt_hq100", "wt_hwgg_hq100"]),
+             ("HQextrem", ["hwgf_hqextrem"], ["wt_hqextrem"])]
 # Legendenfelder von oben → Klassenmittel (None = „nicht ermittelt“)
 KLASSEN_LEGENDE = [0.25, 0.75, 1.5, 3.0, 4.0, None]
 
@@ -206,8 +227,9 @@ def legendenfarben(ebene: str) -> list[tuple[tuple[int, int, int], float | None]
         if c is not None and c != letzte and c not in farben:
             farben.append(c)
         letzte = c
-    if len(farben) != len(KLASSEN_LEGENDE):
-        raise SystemExit(f"Legende {ebene}: {len(farben)} Felder {farben}, erwartet 6")
+    # wt_hwgg_hq100 führt kein Feld „nicht ermittelt“ (5 Felder, gleiche Klassengrenzen)
+    if len(farben) not in (len(KLASSEN_LEGENDE) - 1, len(KLASSEN_LEGENDE)):
+        raise SystemExit(f"Legende {ebene}: {len(farben)} Felder {farben}, erwartet 5 oder 6")
     return list(zip(farben, KLASSEN_LEGENDE))
 
 
@@ -237,9 +259,16 @@ def bmp_pixel(data: bytes):
 # Abruf und Verdichtung je Kommune und Ebene
 # ---------------------------------------------------------------------------
 
-def ebene_verdichten(kommune: str, wms: str, ebene: str, bbox_utm, farben) -> tuple[dict, str]:
-    """{'pixel': n, 'zellen': {'x0,y0': {klasse|'f': anzahl}}} — farben None = Flächenebene."""
-    pfad = os.path.join(CACHE, f"hq_by_{kommune}_{ebene}.json")
+def ebene_verdichten(kommune: str, quellen, bbox_utm, farben) -> tuple[dict, str]:
+    """{'pixel': n, 'zellen': {'x0,y0': {klasse|'f'|'n': anzahl}}}.
+
+    quellen: Liste (WMS, Ebene) in Vorrangreihenfolge, alle im selben Kachelraster abgerufen.
+    farben None = Flächenebenen, sonst je Quelle eine Legendenfarbliste: ein Pixel zählt einmal, wenn es in irgendeiner Ebene nicht
+    weiß ist (pixelweises ODER, keine Doppelzählung). Sonst Tiefenebenen: es gilt die erste
+    Ebene mit einer Tiefenklasse; „nicht ermittelt“ ('n') nur, wenn keine Ebene eine Klasse hat.
+    """
+    name = "+".join(e for _, e in quellen)
+    pfad = os.path.join(CACHE, f"hq_by_{kommune}_{name}.json")
     if os.path.isfile(pfad):
         with open(pfad, encoding="utf-8") as f:
             return json.load(f), zs._zugriff(pfad)
@@ -247,39 +276,50 @@ def ebene_verdichten(kommune: str, wms: str, ebene: str, bbox_utm, farben) -> tu
     zellen: dict[str, dict[str, int]] = {}
     pixel = unklassiert = 0
     weiss = b"\xff\xff\xff"
-    cache_farbe: dict[bytes, str | None] = {}
+    cache_farbe: dict[tuple[int, bytes], str | None] = {}
+
+    def klasse(i: int, px: bytes) -> str | None:
+        if (i, px) not in cache_farbe:
+            b, g, r = px
+            best = None
+            for (fr, fg, fb), kl in farben[i]:
+                if max(abs(r - fr), abs(g - fg), abs(b - fb)) <= TOLERANZ:
+                    best = "n" if kl is None else str(kl)
+                    break
+            cache_farbe[(i, px)] = best
+        return cache_farbe[(i, px)]
+
     for ke in range(e0, e1, KACHEL * PIXEL):
         for kn in range(n0, n1, KACHEL * PIXEL):
-            data = _get(wms, {
-                "SERVICE": "WMS", "VERSION": "1.3.0", "REQUEST": "GetMap", "LAYERS": ebene,
-                "STYLES": "", "CRS": "EPSG:25832",
-                "BBOX": f"{ke},{kn},{ke + KACHEL * PIXEL},{kn + KACHEL * PIXEL}",
-                "WIDTH": str(KACHEL), "HEIGHT": str(KACHEL), "FORMAT": "image/bmp",
-                "TRANSPARENT": "FALSE", "BGCOLOR": "0xFFFFFF"})
-            w, h, zeile = bmp_pixel(data)
-            assert (w, h) == (KACHEL, KACHEL), (w, h)
-            leer = weiss * w
-            for y in range(h):
-                z = zeile(y)
-                if z == leer:
+            bilder = []
+            for wms, ebene in quellen:
+                data = _get(wms, {
+                    "SERVICE": "WMS", "VERSION": "1.3.0", "REQUEST": "GetMap", "LAYERS": ebene,
+                    "STYLES": "", "CRS": "EPSG:25832",
+                    "BBOX": f"{ke},{kn},{ke + KACHEL * PIXEL},{kn + KACHEL * PIXEL}",
+                    "WIDTH": str(KACHEL), "HEIGHT": str(KACHEL), "FORMAT": "image/bmp",
+                    "TRANSPARENT": "FALSE", "BGCOLOR": "0xFFFFFF"})
+                w, h, zeile = bmp_pixel(data)
+                assert (w, h) == (KACHEL, KACHEL), (w, h)
+                bilder.append(zeile)
+            leer = weiss * KACHEL
+            for y in range(KACHEL):
+                zz_ = [(i, z) for i, z in enumerate(zeile(y) for zeile in bilder) if z != leer]
+                if not zz_:
                     continue
                 north = kn + KACHEL * PIXEL - (y + 0.5) * PIXEL
-                for x in range(w):
-                    px = z[3 * x:3 * x + 3]
-                    if px == weiss:
+                for x in range(KACHEL):
+                    werte = [(i, z[3 * x:3 * x + 3]) for i, z in zz_]
+                    werte = [(i, px) for i, px in werte if px != weiss]
+                    if not werte:
                         continue
                     if farben is None:
                         schl = "f"
                     else:
-                        if px not in cache_farbe:
-                            b, g, r = px
-                            best = None
-                            for (fr, fg, fb), kl in farben:
-                                if max(abs(r - fr), abs(g - fg), abs(b - fb)) <= TOLERANZ:
-                                    best = "n" if kl is None else str(kl)
-                                    break
-                            cache_farbe[px] = best
-                        schl = cache_farbe[px]
+                        kls = [klasse(i, px) for i, px in werte]
+                        schl = next((k for k in kls if k not in (None, "n")), None)
+                        if schl is None:
+                            schl = "n" if "n" in kls else None
                         if schl is None:
                             unklassiert += 1
                             continue
@@ -288,7 +328,7 @@ def ebene_verdichten(kommune: str, wms: str, ebene: str, bbox_utm, farben) -> tu
                     key = f"{int(math.floor(ex / ZELLE) * ZELLE)},{int(math.floor(ey / ZELLE) * ZELLE)}"
                     zz = zellen.setdefault(key, {})
                     zz[schl] = zz.get(schl, 0) + 1
-            print(f"  {kommune} {ebene}: Kachel {ke},{kn} — {pixel} Pixel", file=sys.stderr)
+            print(f"  {kommune} {name}: Kachel {ke},{kn} — {pixel} Pixel", file=sys.stderr)
     erg = {"pixel": pixel, "unklassiert": unklassiert, "bbox_utm": list(bbox_utm), "zellen": zellen}
     os.makedirs(CACHE, exist_ok=True)
     with open(pfad + ".tmp", "w", encoding="utf-8") as f:
@@ -332,10 +372,11 @@ def main() -> int:
         fl = gem[name]
         bb = bbox_utm(gpkg, ags)
         for szen, ef, et in SZENARIEN:
-            df, zf = ebene_verdichten(name, WMS_F, ef, bb, None)
-            dtf, zt = ebene_verdichten(name, WMS_T, et, bb, legendenfarben(et))
-            url_f = f"{WMS_F}?SERVICE=WMS&REQUEST=GetMap&LAYERS={ef}"
-            url_t = f"{WMS_T}?SERVICE=WMS&REQUEST=GetMap&LAYERS={et}"
+            farben = [legendenfarben(e) for e in et]
+            df, zf = ebene_verdichten(name, [(WMS_F, e) for e in ef], bb, None)
+            dtf, zt = ebene_verdichten(name, [(WMS_T, e) for e in et], bb, farben)
+            url_f = f"{WMS_F}?SERVICE=WMS&REQUEST=GetMap&LAYERS={','.join(ef)}"
+            url_t = f"{WMS_T}?SERVICE=WMS&REQUEST=GetMap&LAYERS={','.join(et)}"
             zugriff = max(zf, zt)
             if df["pixel"] == 0:
                 zeilen.append([name, szen, "keine", "0", "0", "nicht_kartiert", url_f, url_t, zugriff])
