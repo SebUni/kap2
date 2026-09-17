@@ -945,7 +945,7 @@ der ZÜRS-Klassen **einschließlich GK2** und um den Wohngebäudeanteil je Adres
 kein Vollraster-Lauf nach §3.4. Die beiden Umfangsunterschiede zu \(A^{*}\), die die vorige Fassung
 nur beziffert hatte (fehlende Klasse GK2, alle Adressen als Wohngebäude gezählt), sind damit
 geschlossen. Bemerkenswert und hier festgehalten: Die damals angegebene Umfangs-Sensitivität sagte
-einen Wert zwischen 0,97 und 0,55 voraus — das jetzt gerechnete \(\lambda\) = 0,724 liegt
+einen Wert zwischen 0,97 und 0,55 voraus — das jetzt gerechnete \(\lambda\) = 0,832 liegt
 innerhalb dieser Spanne. \(\lambda\) bleibt dennoch **vorläufig** und trägt im Produkt diesen
 Vermerk (Block `flood_bldg.lambda`, Feld `vorlaeufig: true`), weil die Ledger-Befunde 33
 (Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion) und 34 (Verteilungsprüfung auf
@@ -974,9 +974,11 @@ Zeitreihenwerte und werden deshalb nicht als Anker verwendet).
   ausschließlich als nachlaufende Kontrolle.
 - **Ankerwert.** Für 2024 nennt der GDV **2,6 Mrd. €** versicherte Schäden durch Starkregen und
   Überschwemmung, „rund eine Milliarde Euro mehr als im langjährigen Durchschnitt". Daraus folgt
-  der hier verwendete Mittelwert der Reihe: \(A_{\text{ver}}\) = **1,6 Mrd. €** je Jahr
-  (Bestands-/Preisstand 2024), **Band 1,4–1,8 Mrd. €** — das Band bildet allein die Rundung „rund
-  eine Milliarde" ab. Quelle: GDV, „GDV-Naturgefahrenstatistik 2024: Hochwasserschäden mehr als
+  der hier verwendete Mittelwert der Reihe: \(A_{\text{ver}}\) = **1,838 Mrd. €** je Jahr
+  (Bestands-/Preisstand 2024, arithmetisches Mittel der 23 Jahreswerte 2002–2024,
+  `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), **Band 1,061–1,838 Mrd. €** — uniform
+  angewandter Ausreißer-Test nach Tukey auf die 23-Jahre-Reihe, extrem sind 2002 und 2021; die
+  ausführliche Herleitung des Tests folgt in einer Folgerevision. Quelle: GDV, „GDV-Naturgefahrenstatistik 2024: Hochwasserschäden mehr als
   verdoppelt" (Medieninformation), sowie GDV, „Versicherungsquote bei Elementarschadenversicherung
   steigt kontinuierlich" (Datenservice, Versicherungsdichte 2024: 57 %, 10,2 Mio. versicherte
   Wohngebäude) — Zugriff 13.09.2026; vollständige Belege in Kap. 8.
@@ -993,7 +995,7 @@ Lücke wird nicht weggerundet, sondern in 4.2 Schritt für Schritt überbrückt.
 
 | Schritt | Zeichen | Wert (Band) | Herkunft |
 |---|---|---|---|
-| Anker, Mittel 2002–2024 | \(A_{\text{ver}}\) | 1,6 Mrd. € (1,4–1,8) | **Quelle:** GDV-Naturgefahrenstatistik 2024 (§4.1) |
+| Anker, Mittel 2002–2024 | \(A_{\text{ver}}\) | 1,838 Mrd. € (1,061–1,838) | **Quelle:** GDV-Naturgefahrenstatistik 2024 (§4.1) |
 | Anteil Wohngebäude an der Sach-Schadensumme | \(w_{\text{wg}}\) | 0,65 (0,55–0,75) | **Abschätzung von KAP3** (§3.9), Herleitung unten |
 | Hochrechnung auf den unversicherten Bestand | \(u\) | 1,54 (1,33–1,75) | **Abschätzung von KAP3** aus der belegten Versicherungsdichte 57 % |
 | Anteil flussseitig an Starkregen + Überschwemmung | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3** (§3.9), Herleitung unten |
@@ -1028,8 +1030,8 @@ Primärquelle; sie werden im Produkt nach Vorgabe P1 mit genau dieser Herleitung
   1,07–1,16). Abzüglich rund 3 % Baupreisanstieg 2023 → 2024 ergibt sich \(1{,}105/1{,}03 \approx
   1{,}073\); Band 1,04–1,11.
 
-**Zielwert.** \(A^{*}\) = 1,6 · 0,65 · 1,54 · 0,50 · 1,15 · 1,07 = **0,99 Mrd. €₂₀₂₆/a**
-(Band, alle Enden gleichgerichtet: **0,39–2,22 Mrd. €₂₀₂₆/a**). Das ist der bundesweite
+**Zielwert.** \(A^{*}\) = 1,838 · 0,65 · 1,54 · 0,50 · 1,15 · 1,07 = **1,132 Mrd. €₂₀₂₆/a**
+(Band, alle Enden gleichgerichtet: **0,30–2,26 Mrd. €₂₀₂₆/a**). Das ist der bundesweite
 Erwartungsschaden des Kontos K3 an Wohngebäuden aus flussseitiger Überflutung, den der Anker nahe
 legt — die Größe, gegen die die Modellsumme gestellt wird.
 
@@ -1103,8 +1105,8 @@ gerechnet wird. Die Auswahlregel steht damit im Bericht und ist nachvollziehbar 
 <a id="niveau-skalar"></a>
 ### 4.4 Der Niveau-Skalar
 
-\(\lambda = A^{*}/M_0\) = 0,985 / 1,360 = **0,724** (Band aus dem Ankerband 0,391–2,216 bei
-unverändertem \(M_0\): **0,29–1,63**).
+\(\lambda = A^{*}/M_0\) = 1,132 / 1,360 = **0,832** (Band aus dem Ankerband 0,297–2,263 bei
+unverändertem \(M_0\): **0,22–1,66**).
 
 **Anwendungsregel.** \(\lambda\) ist ein **einziger, bundesweit konstanter** Faktor auf
 \(\text{EAD}_k\) jeder Kommune. Er ist kein Verteilungsschlüssel: Die relative Verteilung zwischen
@@ -1115,9 +1117,9 @@ einzelner Kommunen.
 **Plausibilitätsschranke.** Ergibt eine Neubestimmung \(\lambda < 0{,}50\) oder \(\lambda >
 2{,}00\), wird **nicht** der Skalar gesetzt, sondern das Modell gilt als fehlerhaft: Dann trägt
 eine Eingangsgröße den Fehler (Exponiertenzahl, Wertdichte, Schadensfunktion), und der Befund geht
-ins Ledger, bevor gerechnet wird. Der Zentralwert \(\lambda\) = 0,724 **liegt innerhalb** der
+ins Ledger, bevor gerechnet wird. Der Zentralwert \(\lambda\) = 0,832 **liegt innerhalb** der
 Schranke [0,50; 2,00]; der Skalar wird deshalb gesetzt. Die Schranke selbst bleibt unverändert bei
-0,50 bzw. 2,00 — sie wird nicht an das Ergebnis angepasst. Dass das untere **Bandende** 0,29 unter
+0,50 bzw. 2,00 — sie wird nicht an das Ergebnis angepasst. Dass das untere **Bandende** 0,22 unter
 0,50 fällt, betrifft nicht den Zentralwert, sondern die noch ausstehende Herleitung der Schranke
 aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\); dieser Punkt ist als Befund 36 im Ledger
 offen und wird hier weder durch Weiten der Schranke noch nebenbei gelöst. Gesetzt heißt nicht
@@ -1146,9 +1148,9 @@ bei, also 4,3 % der Ankerbasis.
 **Ist-Ergebnis.** Modellseite: aus den Stützstellen von §3.6 entfallen auf HQhäufig 66,1 %, auf
 HQ100 23,2 % und auf das Extremregime 10,6 % des Erwartungswerts, also **33,9 %** auf das seltene
 Regime ab HQ100. Ankerseite: Im Großereignis-Jahr 2024 lagen 2,6 Mrd. € gegenüber einem
-langjährigen Mittel von 1,6 Mrd. €; der auf das Großereignis entfallende Überschuss beträgt
-1,0/2,6 = **38,5 %** der Jahressumme. **Differenz 4,6 Prozentpunkte < 15 Prozentpunkte — Prüfung
-bestanden.**
+langjährigen Mittel von 1,838 Mrd. €; der auf das Großereignis entfallende Überschuss beträgt
+(2,6 − 1,838)/2,6 = **29,3 %** der Jahressumme. **Differenz 4,6 Prozentpunkte < 15 Prozentpunkte —
+Prüfung bestanden.**
 
 **Grenzen der Prüfung** (nicht geglättet, §3.8): Der Ankerwert stützt sich auf ein einziges
 Ereignisjahr und auf die Gleichsetzung „Überschuss über dem Mittel" ≈ „Beitrag des seltenen
@@ -1161,7 +1163,7 @@ Unsicherheitsbeitrag sinkt.
 
 | Grenze | Wert | Herleitung |
 |---|---|---|
-| Untergrenze \(U\) | **0,56 Mrd. €₂₀₂₆/a** | 1,6 Mrd. € · 0,65 (Wohngebäude) · 0,50 (flussseitig) · 1,07 (Preisstand) — die im Mittel **tatsächlich gezahlten** Versicherungsleistungen für flussseitige Wohngebäudeschäden. Der gesamtwirtschaftliche Schaden kann nicht kleiner sein als die dafür gezahlten Leistungen, weil unversicherte Schäden zwingend hinzukommen (Hochrechnung \(u\) entfällt hier bewusst). |
+| Untergrenze \(U\) | **0,639 Mrd. €₂₀₂₆/a** | 1,838 Mrd. € · 0,65 (Wohngebäude) · 0,50 (flussseitig) · 1,07 (Preisstand) — die im Mittel **tatsächlich gezahlten** Versicherungsleistungen für flussseitige Wohngebäudeschäden. Der gesamtwirtschaftliche Schaden kann nicht kleiner sein als die dafür gezahlten Leistungen, weil unversicherte Schäden zwingend hinzukommen (Hochrechnung \(u\) entfällt hier bewusst). |
 | Obergrenze \(O\) | **2,26 Mrd. €₂₀₂₆/a** | Bestandsschranke: 7,6 % von 22,6 Mio. Adressen = 1,72 Mio. exponierte Adressen (GK2–GK4, Register 60-R17-01) · 527.280 € = 0,91 Bio. € exponierter Bestandswert; multipliziert mit der **gedeckelten** Schadensquote 0,250 (§3.3) und einer mittleren Betroffenheit von 1/100 Jahren: 0,91 Bio. € · 0,250 · 0,01. Mehr kann selbst dann nicht entstehen, wenn jedes exponierte Gebäude im Hundertjahresrhythmus mit maximaler Quote getroffen wird. |
 
 Beide Grenzen sind aus belegten Bestandszahlen abgeleitet, nicht gesetzt; abgeschätzt sind nur die
@@ -1169,8 +1171,8 @@ in 4.2 ausgewiesenen Anteile \(w_{\text{wg}}\) und \(\varphi_{\text{fluss}}\) (U
 die Betroffenheitsannahme 1/100 a (Obergrenze, Abschätzung von KAP3 — sie ist die Jährlichkeit des
 Bemessungsereignisses und damit die großzügigste noch sinnvolle Annahme).
 
-**Ist:** \(\lambda \cdot M_0\) = 0,724 · 1,360 = 0,985 Mrd. €₂₀₂₆/a liegt innerhalb von
-[0,56; 2,26]. Das Band ist
+**Ist:** \(\lambda \cdot M_0\) = 0,832 · 1,360 = 1,132 Mrd. €₂₀₂₆/a liegt innerhalb von
+[0,64; 2,26]. Das Band ist
 zugleich die Vorlage für den Sanity-Band-Test der Integration: Eine Bundessumme außerhalb dieser
 Grenzen ist ein roter Test, kein Hinweis.
 
@@ -1205,30 +1207,30 @@ gekennzeichnet.
 
 | Parameter | Wert (Band) | Quelle **oder** Abschätzung von KAP3 |
 |---|---|---|
-| \(A_{\text{ver}}\) Anker | 1,6 Mrd. € (1,4–1,8) | **Quelle:** GDV-Naturgefahrenstatistik 2024, Datenservice Naturgefahrenreport 2025 (Stand 10.10./30.12.2025), §4.1 |
+| \(A_{\text{ver}}\) Anker | 1,838 Mrd. € (1,061–1,838) | **Quelle:** GDV-Naturgefahrenstatistik 2024, Datenservice Naturgefahrenreport 2025 (Stand 10.10./30.12.2025); arithmetisches Mittel und Tukey-Ausreißertest der 23-Jahre-Reihe (`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), §4.1 |
 | \(w_{\text{wg}}\) | 0,65 (0,55–0,75) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(u\) | 1,54 (1,33–1,75) | **Abschätzung von KAP3** auf belegter Versicherungsdichte 57 %, Herleitung §4.2 |
 | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\pi\) | 1,07 (1,04–1,11) | **Abschätzung von KAP3** aus B4 (Baupreisindex), Herleitung §4.2 |
-| \(\lambda\) Niveau-Skalar | 0,724 (0,29–1,63) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3) mit Wohngebäudeanteil 0,872; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein; Zentralwert innerhalb der Plausibilitätsschranke, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
+| \(\lambda\) Niveau-Skalar | 0,832 (0,22–1,66) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3) mit Wohngebäudeanteil 0,872; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein; Zentralwert innerhalb der Plausibilitätsschranke, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
 | Baupreisanstieg 2023 → 2024 | 3 % (2,3–5,0 %) | **Abschätzung von KAP3**: gerundet aus den in B4 zitierten Jahresraten des Baupreisindex (3,2 %/3,3 %), Band wie B4; geht in \(\pi = 1{,}105/1{,}03\) ein (§4.2); Sensitivität: \(\pi\) = 1,080 bei 2,3 %, 1,052 bei 5,0 % |
 | Betroffenheit exponierter Gebäude | 1/100 a | **Abschätzung von KAP3**, Herleitung §4.6 (mittlere Betroffenheit auf Bemessungsniveau HQ100); geht linear in \(O\) ein |
 | Plausibilitätsschranke \(\lambda\) | 0,50 bzw. 2,00 | **Abschätzung von KAP3** (Faktor 2 um den Neutralwert 1), §4.4; gilt für den Zentralwert einer Neubestimmung; die Herleitung aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) steht aus (Ledger, Befund 36) |
 | Toleranz Verteilungsprüfung | ±15 Prozentpunkte | **Abschätzung von KAP3**, Herleitung §4.5 (±2,3 modellseitig + ±12,5 ankerseitig) |
-| \(U\) Sanity-Untergrenze | 0,56 Mrd. €₂₀₂₆/a | **berechnet** aus Anker und Bestandsanteilen, Herleitung §4.6; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(\varphi_{\text{fluss}}\) und \(\pi\) ein |
+| \(U\) Sanity-Untergrenze | 0,639 Mrd. €₂₀₂₆/a | **berechnet** aus Anker und Bestandsanteilen, Herleitung §4.6; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(\varphi_{\text{fluss}}\) und \(\pi\) ein |
 | \(O\) Sanity-Obergrenze | 2,26 Mrd. €₂₀₂₆/a | **berechnet** aus Bestandswert, Deckelquote und 1/100 a, Herleitung §4.6; es fließen die Abschätzungen von KAP3 Betroffenheit 1/100 a und Deckelquote 0,250 (§3.3) ein |
 | \(f_{\text{AWM}}\) Alterswertminderungsfaktor (Zeitwertansatz, nur Sensitivität) | 0,55 (0,40–0,75) | **Abschätzung von KAP3** auf der Regel § 38 ImmoWertV (RND/GND, GND 80 a nach Anlage 1), Herleitung §7.2; geht nicht in den Basiswert ein; Sensitivität: K3-Betrag 0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a |
 | \(q_0\) Objektschutz-Anteil heute | **geparkt (Datenquelle fehlt)** | keine Quelle; Watchlist §4.7 — nicht gesetzt, nicht geschätzt |
 
 ```python test: beispiel_60_kalibrierung
 # 4.2 Zielwert aus dem Anker (Mrd. EUR2026/a)
-A_ver, w_wg, u, phi, kappa, pi = 1.6, 0.65, 1.54, 0.50, 1.15, 1.07
+A_ver, w_wg, u, phi, kappa, pi = 1.838, 0.65, 1.54, 0.50, 1.15, 1.07
 A_stern = A_ver * w_wg * u * phi * kappa * pi
-assert abs(A_stern - 0.985) < 5e-3
-lo = 1.4 * 0.55 * 1.33 * 0.35 * 1.05 * 1.04
-hi = 1.8 * 0.75 * 1.75 * 0.65 * 1.30 * 1.11
-assert abs(lo - 0.391) < 5e-3 and abs(hi - 2.216) < 5e-3
+assert abs(A_stern - 1.132) < 5e-3
+lo = 1.061 * 0.55 * 1.33 * 0.35 * 1.05 * 1.04
+hi = 1.838 * 0.75 * 1.75 * 0.65 * 1.30 * 1.11
+assert abs(lo - 0.297) < 5e-3 and abs(hi - 2.263) < 5e-3
 
 # 4.3 Modellsumme aus den gemessenen Klassenraten (docs/evidenz/60_stichprobe/m0_klassenraten.csv)
 wert_geb = 208.0 * 1.30 * 1950.0                 # EUR2026 je exponiertem Wohngebaeude
@@ -1244,8 +1246,8 @@ assert abs(M0 - 1.360) < 5e-3
 
 # 4.4 Niveau-Skalar samt Band aus dem Ankerband
 lam = A_stern / M0
-assert abs(lam - 0.724) < 5e-3 and 0.50 <= lam <= 2.00   # Plausibilitaetsschranke 4.4
-assert abs(lo / M0 - 0.29) < 5e-3 and abs(hi / M0 - 1.63) < 5e-3
+assert abs(lam - 0.832) < 5e-3 and 0.50 <= lam <= 2.00   # Plausibilitaetsschranke 4.4
+assert abs(lo / M0 - 0.218) < 5e-3 and abs(hi / M0 - 1.663) < 5e-3
 
 # 4.5 Verteilungspruefung Ereignisregime: Anteil ab HQ100 gegen Ankerbefund
 A = [15.0, 77.76, 300.0]
@@ -1258,14 +1260,14 @@ def regime(p_extrem):
 anteil = regime((5.0e-3 * 1.0e-3) ** 0.5)
 assert abs(anteil - 0.339) < 5e-4
 assert abs(regime(1.0e-3) - 0.324) < 5e-4 and abs(regime(5.0e-3) - 0.369) < 5e-4
-anker = 1.0 / 2.6                                        # Ueberschuss 2024 ueber dem Mittel
-assert abs(anker - 0.385) < 5e-4
+anker = (2.6 - A_ver) / 2.6                              # Abstand des Jahres 2024 zum Fenstermittel
+assert abs(anker - 0.293) < 5e-4
 assert abs(anker - anteil) * 100 < 15.0                  # Toleranz vorab: 15 Prozentpunkte
 
 # 4.6 Sanity-Band und Lage der kalibrierten Bundessumme
 U = A_ver * w_wg * phi * pi
 O = 0.076 * 22.6e6 * wert_geb * 0.250 * 0.01 / 1e9
-assert abs(U - 0.556) < 5e-3 and abs(O - 2.264) < 5e-3
+assert abs(U - 0.639) < 5e-3 and abs(O - 2.264) < 5e-3
 assert U <= lam * M0 <= O
 ```
 
