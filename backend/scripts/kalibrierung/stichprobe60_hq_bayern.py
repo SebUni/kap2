@@ -36,9 +36,18 @@ REP_YEAR 2013 (Import 2015) und ohne Wassertiefen; sie ist damit nicht die gelte
 Karte und wird nicht verwendet.
 Verfahren nach Ticket-Vorgabe: GetMap in EPSG:25832, Pixel genau 5 m × 5 m,
 Format image/bmp (unkomprimiert, weißer Hintergrund), Kacheln 1000 × 1000 px.
-  * Fläche: jedes nicht weiße Pixel der hwgf-Ebene gilt als überflutet (25 m²).
-  * Tiefe: Pixel der wt-Ebene werden der nächstliegenden Legendenfarbe zugeordnet
-    (Toleranz TOLERANZ je Farbkanal, Reihenfolge der Legendenfelder von oben:
+  * Fläche: jedes nicht weiße Pixel der Flächenebene gilt als überflutet (25 m²).
+    Schraffur (Nacharbeit R2): hwgg_hq100 wird im Standardstil (einziger Stil „default“)
+    mit gestrichelten waagerechten Linien und Umriss gezeichnet; gezählt würden nur die
+    Linien (Deggendorf-Rechteck 15 × 15 km bei 30 m: 5,48 statt 17,32 km²). Die
+    Flächenebenen werden deshalb mit SLD_BODY (SLD 1.0, PolygonSymbolizer mit Vollfüllung,
+    vom Dienst per GET angenommen) abgerufen. Für hwgf_hqhaeufig, hwgf_hq100 und
+    hwgf_hqextrem ist das Ergebnis mit und ohne SLD identisch (geprüft im selben Rechteck).
+    Die Tiefenebenen bleiben im Standardstil, weil die Klasse aus der Farbe kommt; sie sind
+    nicht schraffiert (wt_hq100 und wt_hqextrem mit und ohne Füllung gleich).
+  * Tiefe: Pixel der wt-Ebene erhalten die erste Legendenfarbe, deren Kanäle alle
+    innerhalb TOLERANZ liegen (die Legendenfarben liegen weiter als 2 × TOLERANZ
+    auseinander, die Zuordnung ist damit eindeutig; Reihenfolge der Legendenfelder von oben:
     >0–0,5 · >0,5–1 · >1–2 · >2–4 · >4 · „nicht ermittelt“). Pixel ohne passende Farbe
     (Kantenglättung, Beschriftung) und „nicht ermittelt“ tragen keine Tiefe.
   * HQ100 mit hochwassergeschützten Gebieten (Nacharbeit R1, wie stichprobe60_hq_sachsen.py,
@@ -53,12 +62,19 @@ Format image/bmp (unkomprimiert, weißer Hintergrund), Kacheln 1000 × 1000 px.
 Modellgrenzen: Pixelzuordnung über den Pixelmittelpunkt; Überdeckung durch Signaturen
 der Karte ist nicht auszuschließen.
 Befund zur Tiefenlücke (Lauf 17.09.2026, Ersatztiefe fallback_kommune bei HQ100):
-  * Deggendorf 2 082 von 2 351 Zellen. 892 davon liegen in hwgf_hq100, dort zeigt
-    wt_hq100 weder eine Klasse noch „nicht ermittelt“ (Ebene leer), während wt_hqhaeufig
-    und wt_hqextrem an denselben Stellen Tiefen führen (Stichprobe UTM32 794180/5411633:
-    Fläche voll, wt_hq100 leer). Ursache ist eine Lücke der veröffentlichten HQ100-
-    Tiefenkarte, kein Deichschutz. 6 Zellen „nicht ermittelt“. 1 184 Zellen liegen nur in
-    hwgg_hq100; wt_hwgg_hq100 ist dort leer (im 20-km-Rechteck 0,0016 km²).
+  * Deggendorf 2 078 von 2 347 Zellen (HQ100-Fläche mit Vollfüllung 20,51 km²).
+    898 davon liegen in hwgf_hq100 (Zerlegung aus dem Lauf vor R2; hwgf_hq100 ist mit
+    und ohne SLD gleich): 892 zeigen in wt_hq100 weder eine Klasse noch „nicht
+    ermittelt“ (Ebene leer), während wt_hqhaeufig und wt_hqextrem an denselben Stellen
+    Tiefen führen (Stichprobe UTM32 794180/5411633: Fläche voll, wt_hq100 leer) — eine
+    Lücke der veröffentlichten HQ100-Tiefenkarte; 6 zeigen „nicht ermittelt“. Die übrigen
+    rund 1 180 Zellen liegen nur in hwgg_hq100. wt_hwgg_hq100 ist dort wirklich leer und
+    nicht nur unsichtbar gezeichnet: auch mit SLD-Vollfüllung weiß, sowohl bei 5 m
+    (Fenster 500 m um UTM32 788835/5414872, hwgg_hq100 dort mit Füllung 98 % bedeckt)
+    als auch bei 30 m im Rechteck 15 × 15 km (0,000 km²); der Dienst hat für diese
+    Ebene keinen Maßstabsbereich außer MaxScaleDenominator 708 705.
+    Innenzellen der geschützten Fläche haben a = 1 (Reihe N2860500, E4535100–E4537700,
+    zuvor schraffiert a ≈ 0,25); 1 552 der 2 078 Ersatzzellen haben a = 1.
   * Passau 107 von 964 Zellen, alle „nicht ermittelt“ (nach LfU-Beschreibung z. B.
     Staustufen).
   Die Ersatzregel des Tickets wird unverändert angewandt; andere Szenarien werden nicht
@@ -122,6 +138,12 @@ LEGENDE = "https://www.lfu.bayern.de/gdi/legende/wasser/wassertiefen/{}.png"
 ZELLE = 100
 PIXEL = 5
 KACHEL = 1000
+# SLD für Flächenebenen: jedes Polygon voll gefüllt, ohne Schraffur und Umriss
+SLD_FUELLUNG = ('<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld">'
+                "<NamedLayer><Name>{ebene}</Name><UserStyle><FeatureTypeStyle><Rule>"
+                '<PolygonSymbolizer><Fill><CssParameter name="fill">#FF0000</CssParameter>'
+                "</Fill></PolygonSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer>"
+                "</StyledLayerDescriptor>")
 TOLERANZ = 12
 
 KOMMUNEN = [
@@ -293,12 +315,17 @@ def ebene_verdichten(kommune: str, quellen, bbox_utm, farben) -> tuple[dict, str
         for kn in range(n0, n1, KACHEL * PIXEL):
             bilder = []
             for wms, ebene in quellen:
-                data = _get(wms, {
+                par = {
                     "SERVICE": "WMS", "VERSION": "1.3.0", "REQUEST": "GetMap", "LAYERS": ebene,
                     "STYLES": "", "CRS": "EPSG:25832",
                     "BBOX": f"{ke},{kn},{ke + KACHEL * PIXEL},{kn + KACHEL * PIXEL}",
                     "WIDTH": str(KACHEL), "HEIGHT": str(KACHEL), "FORMAT": "image/bmp",
-                    "TRANSPARENT": "FALSE", "BGCOLOR": "0xFFFFFF"})
+                    "TRANSPARENT": "FALSE", "BGCOLOR": "0xFFFFFF"}
+                if farben is None:
+                    # Flächenebenen mit Vollfüllung zeichnen (hwgg_hq100 ist im Standardstil
+                    # schraffiert, die Schraffur deckt nur rund ein Drittel der Fläche)
+                    par["SLD_BODY"] = SLD_FUELLUNG.format(ebene=ebene)
+                data = _get(wms, par)
                 w, h, zeile = bmp_pixel(data)
                 assert (w, h) == (KACHEL, KACHEL), (w, h)
                 bilder.append(zeile)
