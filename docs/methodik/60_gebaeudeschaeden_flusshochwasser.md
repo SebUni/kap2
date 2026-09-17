@@ -1909,7 +1909,8 @@ umzurechnen; das läuft über den Befund-Ledger, nicht still im Code.
 
 ## 8 Quellen (§3.8)
 
-Format je Quelle: Vollzitat, DOI/URL, Zugriffsdatum, Archiv-Snapshot; bei den beiden Arbeitsmappen
+Format je Quelle nach §3.8: Autor/Organ, Jahr, Titel, DOI/URL, Zugriffsdatum, Archiv-Snapshot —
+fehlt ein Archiv-Snapshot, wird die Lücke im Eintrag ausdrücklich begründet; bei den beiden Arbeitsmappen
 statt DOI/URL/Archiv-Snapshot Dateistand (Commit-Hash, Datum) und Prüfsumme (SHA-256) mit
 Zugriffsdatum. Die Angaben zu Quelle 3 sind wörtlich aus `backend/app/data/sources.py`
 (`BBK_Hochwasserschutzfibel`) übernommen, ohne dass diese Datei geändert wurde; Volltextverifikation
@@ -1944,7 +1945,46 @@ dieses Berichts ein — vgl. B6, „Hochwasserschutzfibel … hier nicht im Voll
 4. Evidenz-Quellen der belegten Registerzeilen: siehe die Langbelege B1–B6 unter der Tabelle in
    Kap. 2, dort jeweils mit Vollzitat, DOI/URL, Zugriffsdatum 13.09.2026 und dem Vermerk
    „Volltext geprüft“ bzw. „Volltext gegengelesen“. Für S092 ist keine Primärquelle verwendet
-   (§5.1 ABGESCHÄTZT, Quelle 3 oben ist nur Kandidat, nicht Basis der Zahl).
+   (§5.1 ABGESCHÄTZT, Quelle 3 oben ist nur Kandidat, nicht Basis der Zahl). **Format der
+   Langbelege (§3.8):** Autor/Organ, Jahr, Titel, DOI/URL, Zugriffsdatum **und Archiv-Snapshot**;
+   der Archiv-Snapshot ist dort noch **nicht** nachgetragen — bei DOI-gebundenen
+   Zeitschriftenquellen ist er entbehrlich (die DOI ist der persistente Nachweis), bei den
+   Webseiten- und Pressemitteilungsquellen der Langbelege ist er offen und als Rest von Befund 42
+   (Teil b) im Ledger geführt.
+5. **Gesamtverband der Deutschen Versicherungswirtschaft e. V. (GDV) (2025):**
+   „GDV-Naturgefahrenstatistik 2024: Hochwasserschäden mehr als verdoppelt“, Medieninformation
+   vom 31.05.2025 (Feld „Zuletzt aktualisiert“), Berlin. URL
+   `https://www.gdv.de/gdv/medien/medieninformationen/gdv-naturgefahrenstatistik-2024-hochwasserschaeden-mehr-als-verdoppelt-188734`,
+   Archiv-Snapshot
+   `https://web.archive.org/web/20260510141613/https://www.gdv.de/gdv/medien/medieninformationen/gdv-naturgefahrenstatistik-2024-hochwasserschaeden-mehr-als-verdoppelt-188734`,
+   Zugriff 17.09.2026 (über den genannten Snapshot). Trägt in §4.1 den Ankerwert: „Allein
+   Starkregenereignisse und Überschwemmungen schlugen mit 2,6 Mrd. Euro zu Buche – rund eine
+   Milliarde Euro mehr als im langjährigen Durchschnitt“, dazu 5,7 Mrd. € Gesamtschaden 2024,
+   4,4 Mrd. € Sachversicherung und 1,3 Mrd. € Kraftfahrt. **Volltext geprüft** (Zitate am
+   Snapshot wörtlich abgeglichen, 17.09.2026).
+6. **Gesamtverband der Deutschen Versicherungswirtschaft e. V. (GDV) (2025):**
+   „Versicherungsquote bei Elementarschadenversicherung steigt kontinuierlich“, Statistikseite des
+   *Datenservice zum Naturgefahrenreport*, Rubrik „Sachversicherung Elementar“, Stand der Grafik
+   10.10.2025 (Feld „Zuletzt aktualisiert“), Berlin. URL
+   `https://www.gdv.de/gdv/statistik/datenservice-zum-naturgefahrenreport/sachversicherung-elementar/versicherungsquote-bei-elementarschadenversicherung-steigt-kontinuierlich--147644`,
+   Archiv-Snapshot
+   `https://web.archive.org/web/20260417162956/https://www.gdv.de/gdv/statistik/datenservice-zum-naturgefahrenreport/sachversicherung-elementar/versicherungsquote-bei-elementarschadenversicherung-steigt-kontinuierlich--147644`,
+   Zugriff 17.09.2026 (über den genannten Snapshot). Trägt in §4.1 die Versicherungsdichte 2024:
+   „2024 sind 10,2 Mio. Wohngebäude gegen Überschwemmung durch Starkregen und Hochwasser sowie
+   andere Naturgefahren versichert. Das entspricht einer Versicherungsdichte von immerhin 57 %
+   bezogen auf Wohngebäude-Feuer“. **Volltext geprüft** (Zitate am Snapshot wörtlich abgeglichen,
+   17.09.2026).
+7. **Gesamtverband der Deutschen Versicherungswirtschaft e. V. (GDV) (2025):** „Datenservice zum
+   Naturgefahrenreport 2025 — Tabellen · Grafiken · Karten“, Broschüre, Berlin. URL
+   `https://www.gdv.de/resource/blob/193410/e09858f310a1f7b4d3c2135df59369ce/naturgefahrenreport-2025-datenservice-data.pdf`,
+   Archiv-Snapshot
+   `http://web.archive.org/web/20260107031605/https://www.gdv.de/resource/blob/193410/e09858f310a1f7b4d3c2135df59369ce/naturgefahrenreport-2025-datenservice-data.pdf`,
+   Zugriff 17.09.2026. Quelle der Jahresreihe 2002–2024 (S. 17, Grafik „Zeitreihe
+   Naturgefahrenschäden – Hochrechnung auf Bestand und Preise 2024“, Balken Elementar) und damit
+   des Revisionsstands in §4.1 (Aktualisierungsvermerke 10.10.2025 und 30.12.2025). URL,
+   Snapshot und Zugriffsdatum sind wörtlich aus `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`
+   (Spalten `quelle_url`, `archiv`, `zugriff`) übernommen, wo die abgelesenen Jahreswerte
+   einzeln mit Fundstelle stehen.
 
 <!-- Format je Quelle: Autor, Jahr, Titel, Organ, DOI/URL, Zugriffsdatum, Archiv-Snapshot;
 Sekundärfunde vor Übernahme im Volltext verifizieren; Widersprüche benennen. -->
