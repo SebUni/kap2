@@ -32,7 +32,7 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 - **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`. Davon **7 belegt bzw. entschieden** — 60-W085-01, 60-R24-01, 60-S074-01, 60-R17-01, 60-S093-01, 60-S094-01 und 60-S092-01 (Maßnahmen-Hebel, abgeschätzt) —, die **übrigen 25 stehen auf `offen`**.
 - **Entschieden (T-0237):** Ansatz-Vergleich Kap. 9 — Umsetzungsgrundlage ist Ansatz **(a)** (Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle); (b) aggregierte Flächenschadensrate bleibt als Ergänzungsmodul, (c) Schadensgradmodell am Einzelgebäude ist ausgeschieden.
 - **Entschieden (T-0238):** Kap. 3 bis zur Kernformel — native Ergebnisgröße (EAD in €₂₀₂₆/a, Ebene Kommune), vier Datenebenen nach §3.1 (drei „neu anzulegen", eine „geparkt"), Tiefen-Schadensfunktion und Schicht-B-Kernformel Menge × Rate × Preis je 100-m-Zelle.
-- **Offen (Stand 17.09.2026, nach Review-Runde 2):** (1) Kalibrierung mit dem Produktionsmodell auf den Anker-Kommunen und eine out-of-sample-Verteilungsprüfung (Kap. 4, \(\lambda\) bis dahin vorläufig; offene Befunde im Ledger); (2) R7-Weiche mit #50 (FS-Schutzsystem, geparkt); (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
+- **Offen (Stand 17.09.2026, nach Review-Runde 2):** (1) \(M_0\) = 1,360 Mrd. €₂₀₂₆/a und \(\lambda\) = 0,724 sind aus dem Stichprobenlauf des Produktionsmodells auf den acht Anker-Kommunen gerechnet (Kap. 4); offen sind daraus nur noch die out-of-sample-Verteilungsprüfung und der Fit über die Jahresreihe der Ankerwerte statt über deren Mittelwert (Ledger-Befunde 34 und 33), bis dahin bleibt \(\lambda\) vorläufig; (2) R7-Weiche mit #50 (FS-Schutzsystem, geparkt); (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
 - **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Planungszahl korrigiert, Beispiel-Code-Zaun im Kommentar entfernt; R2: Lint-Funde behoben, Zeichentabelle S092 als eigener Abschnitt, Verweis korrigiert). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: je rund 0,3 USD. Die Evidenz der sieben belegten Registerzeilen ist in eigenen Runden recherchiert und im Volltext geprüft (Quellen und Langbelege B1–B6 in Kap. 2).
 - **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
@@ -1858,15 +1858,16 @@ parameter:
 ---
 parameter:
   id: flood_bldg.lambda
-  wert: 1.05
+  wert: 0.724
   einheit: "-"
-  band: [0.42, 2.36]
+  band: [0.29, 1.63]
   herkunft: herleitung:§4.4
   kennzeichnung: abschaetzung_kap3
   herleitung_anker: "#niveau-skalar"
   quelle: null
   preisstand: null
   vorlaeufig: true
+  vorlaeufig_grund: "Stand nach dem Stichprobenlauf (17.09.2026): berechnet als A*/M0 = 0,985 / 1,360 aus den auf den acht Anker-Kommunen gemessenen Klassenraten (docs/evidenz/60_stichprobe/m0_klassenraten.csv, §4.3); Band aus dem Ankerband bei unveraendertem M0. Weiterhin vorlaeufig, weil die Ledger-Befunde 33 (Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion) und 34 (Verteilungspruefung auf weiteren Achsen) offen sind und den Wert verschieben koennen."
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -1937,10 +1938,11 @@ fortzuschreiben. Begründung:
 1. **Der Anker ist ein Neuwert-Anker.** \(\lambda = A^{*}/M_0\) (§4.4) stellt die Modellsumme gegen
    gezahlte Wohngebäude-Leistungen, und Wohngebäudeverträge decken zum gleitenden Neuwert (§4.2,
    Herleitung von \(\kappa\)). Würde nur der Basiswert je Gebäude auf den Zeitwert gesetzt, bliebe der
-   kalibrierte K3-Betrag \(\lambda M_0 \equiv A^{*}\) **unverändert** — \(\lambda\) nähme die
-   Alterswertminderung auf (Zentralwert 0,985 / 0,517 = **1,91**, am unteren Faktor-Ende
-   0,985 / 0,376 = **2,62** und damit jenseits der Plausibilitätsschranke 2,00 aus §4.4). Die Umstellung
-   hätte dann keine Wirkung auf das Ergebnis, sondern verzerrte nur den Skalar.
+   kalibrierte K3-Betrag \(\lambda M_0 \equiv A^{*}\) **unverändert** — \(\lambda\) nähme allein die
+   Alterswertminderung auf (Zentralwert 0,985 / (1,360 · 0,55) = **1,32**, am unteren Faktor-Ende
+   0,985 / (1,360 · 0,40) = **1,81**). Die Umstellung hätte dann keine Wirkung auf das Ergebnis,
+   sondern verzerrte nur den Skalar: Derselbe Anker würde durch einen kleineren Nenner geteilt, ohne
+   dass sich an der bewerteten Sache etwas ändert.
 2. **Ein konsistenter Zeitwertansatz braucht eine Anker-Umrechnung ohne Quelle.** Erst wenn auch
    \(A^{*}\) und die Sanity-Grenzen (§4.6) mit demselben Faktor auf den Zeitwert umgerechnet werden,
    sinkt der Betrag. Für diese Umrechnung gibt es keine Quelle, nur die Abschätzung unten; nach W1 wird
@@ -1980,7 +1982,7 @@ auf **0,54 Mrd. €₂₀₂₆/a** (Band **0,39–0,74 Mrd. €₂₀₂₆/a**
 −45 %** (Band −25 % bis −60 %). Dieselbe Verschiebung gilt je Kommune, weil \(f_{\text{AWM}}\)
 bundesweit einheitlich wirkt. Die Sanity-Untergrenze fiele mit auf 0,556 · 0,55 = **0,31 Mrd. €₂₀₂₆/a**.
 Werden nur die Gebäudewerte umgestellt, der Anker aber nicht, bleibt der Betrag bei 0,99 Mrd. €₂₀₂₆/a
-und nur \(\lambda\) steigt (Begründung 1). Im Produkt wird der Faktor nach Vorgabe P1 als
+und nur \(\lambda\) steigt — auf 1,32 (Begründung 1). Im Produkt wird der Faktor nach Vorgabe P1 als
 „Abschätzung von KAP3" mit dieser Herleitung in der Parameterliste geführt (§4.8).
 
 ```python test: beispiel_60_zeitwert
@@ -1991,10 +1993,15 @@ assert (f_mid, f_lo, f_hi) == (0.55, 0.40, 0.75)
 wert_geb = 208.0 * 1.30 * 1950.0
 assert abs(wert_geb * f_mid - 290004.0) < 1.0
 A_stern = 1.6 * 0.65 * 1.54 * 0.50 * 1.15 * 1.07
-M0 = 339_000 * wert_geb * (6.311 / 1200.0) / 1e9
+# M0 wie in 4.3: gemessene Klassenraten, Wohngebaeudeanteil, nationales Mengengeruest
+w_wohn = 0.872
+r_gk34 = 0.005979599550826
+r_gk2 = 0.000675151053693
+M0 = (w_wohn * wert_geb * 339_000 * r_gk34 + w_wohn * wert_geb * 1_380_000 * r_gk2) / 1e9
+assert abs(M0 - 1.360) < 5e-3
 # nur Basiswert umgestellt: Betrag unveraendert, lambda steigt
-assert abs(A_stern / (M0 * f_mid) - 1.91) < 5e-3
-assert A_stern / (M0 * f_lo) > 2.00
+assert abs(A_stern / (M0 * f_mid) - 1.32) < 5e-3
+assert abs(A_stern / (M0 * f_lo) - 1.81) < 5e-3
 # konsistent umgestellt: K3-Betrag und Band
 assert abs(A_stern * f_mid - 0.542) < 5e-3
 assert abs(A_stern * f_lo - 0.394) < 5e-3 and abs(A_stern * f_hi - 0.739) < 5e-3
@@ -2194,4 +2201,4 @@ Materialband \(f_{\text{S094}}\) = 1,00 (0,84–1,18) in Ansatz (a).
 | 4 | Slug | `gebaeudeschaeden_flusshochwasser` | kurz, eindeutig gegen #59 (Starkregen) und #46 (Küste) | `flusshochwasser` (verwechselbar mit Id 49) | Dateinamen Bericht/Ledger |
 | 5 | Welcher Ansatz wird umgesetzt? (Ansatz-Vergleich §2.6/§3.7) | **13.09.2026 (T-0237):** Ansatz **(a)** Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle — p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp · Gebäudequalität) × Gebäudewert | einziger Ansatz, der in den sechs Güte-Kriterien durchgehend „hoch“ trägt (das siebte Kriterium Aufwand läuft umgekehrt: dort ist „gering“ günstig, (a) liegt mit „mittel“ über (b) und weit unter (c) und ist nach §3.4 ressourcenverträglich): vollständig aus frei zugänglichen, im Register belegten Datenebenen speisbar, Wirkungsort für S092 und die R7-Weiche vorhanden, Schicht-B-Form mit physischer Zwischengröße vor dem Euro, Kalibrierung und Abgleich auf Stichprobenebene ohne nationalen Vollraster-Lauf (§3.4) | (b) aggregierte Flächenschadensrate — kein Wirkungsort für den Maßnahmen-Hebel, tragender Wert nur aus niederländischer Fallstudie (B2); als Ergänzungsmodul vorgesehen. (c) Schadensgradmodell D0–D6 am Einzelgebäude — Bauweise/Bauzustand bundesweit nicht erhoben, Umrechnung Grad → Euro nicht belegt | Umsetzungsgrundlage für Kap. 3 und Prototyp der Familie K3/K4-Ereignisschäden (bindet später #50 und #47); Kopfzeile und Kap. 9 nachgezogen |
 | 6 | Divergenz Bericht ↔ Code bei den Namenslisten von #60 (Befund 13) | **13.09.2026 (T-0243):** Bericht auf den belegbaren Stand korrigiert (Kap. 1: Teilmenge mit abweichender Namensquelle statt „genau"); Code (`backend/app/data/catalog.py`, `kwra_id: 60`) bleibt unverändert | eiserne Regel 5 — Divergenz Bericht ↔ Code wird nie still im Code gefixt; Angleichen des Codes ist Aufgabe der Integration, nicht dieses Berichtsschritts | Code stillschweigend an W117 nachziehen (verstieße gegen eiserne Regel 4/5, kein Prüfmittel im Rahmen dieses Pakets) | Divergenz als Integrationspunkt für `/integriere-risiko 60` geführt: `sensitivity_names` und `upstream_names` in `catalog.py` müssen dort gegen die 7 Sensitivitäten und 8 Wirkungs-Eingänge von W117 abgeglichen werden |
-| 7 | Neuwert oder Zeitwertansatz der Arbeitsmappe (Mon. J65 → J64) als Basiswert K3? (Befund 41) | **17.09.2026 (T-0285):** Neuwert (NHK, indexiert, 527.280 €₂₀₂₆ je Wohngebäude) bleibt Basiswert; Zeitwertansatz als Sensitivitätsband mit \(f_{\text{AWM}}\) = 0,55 (0,40–0,75, Abschätzung von KAP3); Abweichung von J64 als Antrag auf Fortschreibung in §7.2 | W1/W6: der Anker \(A^{*}\) ist neuwertbasiert (gleitender Neuwert, §4.2); eine Umstellung nur des Basiswerts ließe den kalibrierten Betrag unverändert und höbe \(\lambda\) auf 1,91 (bis 2,62); ein konsistenter Zeitwertansatz braucht eine quellenlose Anker-Umrechnung | Zeitwertansatz übernehmen und \(A^{*}\), \(U\), \(O\) mit \(f_{\text{AWM}}\) umrechnen | Basiswert, \(M_0\) und \(\lambda\) unverändert; Sensitivität K3-Betrag 0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a (−45 %); Kap. 6 Modellgrenze 9 und Versionsstempel präzisiert |
+| 7 | Neuwert oder Zeitwertansatz der Arbeitsmappe (Mon. J65 → J64) als Basiswert K3? (Befund 41) | **17.09.2026 (T-0285):** Neuwert (NHK, indexiert, 527.280 €₂₀₂₆ je Wohngebäude) bleibt Basiswert; Zeitwertansatz als Sensitivitätsband mit \(f_{\text{AWM}}\) = 0,55 (0,40–0,75, Abschätzung von KAP3); Abweichung von J64 als Antrag auf Fortschreibung in §7.2 | W1/W6: der Anker \(A^{*}\) ist neuwertbasiert (gleitender Neuwert, §4.2); eine Umstellung nur des Basiswerts ließe den kalibrierten Betrag unverändert und höbe \(\lambda\) auf 1,32 (bis 1,81) (**nachgezogen 17.09.2026 (T-0313)** auf die M0-Revision aus Befund 32: \(M_0\) = 1,360 statt 0,940 Mrd. €₂₀₂₆/a, \(\lambda\) = 0,724; die Entscheidung selbst bleibt unberührt); ein konsistenter Zeitwertansatz braucht eine quellenlose Anker-Umrechnung | Zeitwertansatz übernehmen und \(A^{*}\), \(U\), \(O\) mit \(f_{\text{AWM}}\) umrechnen | Basiswert, \(M_0\) und \(\lambda\) unverändert; Sensitivität K3-Betrag 0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a (−45 %); Kap. 6 Modellgrenze 9 und Versionsstempel präzisiert |
