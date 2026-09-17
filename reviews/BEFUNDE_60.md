@@ -1466,3 +1466,84 @@ Befunde“ ist nicht angefasst (sie schreibt allein T-0296 fort).
 | Nr | Kat. | Vorgenommene Änderung | Prüfausdruck | Status danach |
 |---|---|---|---|---|
 | 42 | B | **Teil (b) für B4–B6 erledigt; Befund damit in allen drei Teilen abgeschlossen** (Kap. 8 aus T-0306, B1–B3 aus T-0307, B4–B6 hier). Fundstellen: Bericht Kap. 2, Langbelege **B4 — 60-R24-01** (Quelle 1 **Destatis-PM Nr. 336 vom 17.09.2025**: Snapshot `…/web/20250917161544/…PD25_336_31231.html` vom 17.09.2025, im CDX-Index mit Statuscode 200 geführt, mit dem ausdrücklichen Vermerk, dass die Wayback-Wiedergabe von Destatis-Pressemitteilungen zurzeit HTTP 403 liefert und der Snapshot deshalb indexiert, aber nicht abrufbar ist; Quelle 2 **Destatis-Themenseite „Wohnen“**: Snapshot `…/web/20260831100304/…Wohnen/_inhalt.html` vom 31.08.2026, abgerufen HTTP 200; Quelle 3 **ImmoWertV Anlage 4**: Snapshot `…/web/20250901000456/…immowertv_2022/anlage_4.html` vom 01.09.2025, HTTP 200, mit dem Vermerk zur laufend gepflegten Rechtsverordnung wie beim § 74 WHG in B1; Quelle 4 **Destatis-Baupreis-PDF Fachserie 17 Reihe 4**: Snapshot `…/web/20250416003519/…bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile` vom 16.04.2025, Rohdatei über den Zusatz `id_` als `application/pdf` (626.170 Byte, Kopf `%PDF-1.6`) abgerufen; Quelle 5 **Destatis-PM Nr. 241 vom 10.07.2026**: **ausdrücklich begründeter Verzicht** — die Wayback Machine führt zu dieser Adresse genau einen Abruf (10.07.2026) mit Statuscode 403, die Wiedergabe von Destatis-Pressemitteilungen ist archivseitig gesperrt und „Save Page Now“ scheitert (HTTP 500), ein inhaltstragender Snapshot ist also nicht herstellbar), **B5 — 60-S093-01** (**WIT-Press-Seite** zu FLEMOps: Snapshot `…/web/20250118023945/…118/19311` vom 18.01.2025, HTTP 200, persistenter Nachweis bleibt die DOI `10.2495/FRIAR080301`; **NHESS-Seite** Elmer u. a. 2010: Snapshot `…/web/20260305025018/…nhess.copernicus.org/articles/10/2145/2010/` vom 05.03.2026, HTTP 200, DOI `10.5194/nhess-10-2145-2010`) und **B6 — 60-S094-01** (**EDAC-Sonderdruck-PDF** Maiwald/Schwarz 2018: Snapshot `…/web/20231107034021/…Bautechnik_1018_Maiwald_Schwarz.pdf` vom 07.11.2023, Rohdatei über `id_` als `application/pdf` (2.434.200 Byte, Kopf `%PDF-1.6`) abgerufen, DOI `10.1002/bate.201800009`). Damit trägt jede der acht externen http-Quellen in B4–B6 unmittelbar bei ihrer URL entweder einen Archiv-Snapshot mit Datum (sieben) oder die ausdrückliche Begründung des Verzichts (eine). Die Snapshots wurden über die Wayback-Zeitpunktauflösung (`web.archive.org/web/20260917120000/…`) ermittelt und einzeln abgerufen; für die beiden Destatis-Pressemitteilungen wurde zusätzlich der CDX-Index ausgewertet. Kap. 8 Punkt 4 weist den Stand jetzt geschlossen aus (B1–B3 und B4–B6 nachgetragen, der Verzicht bei PM 241/2026 benannt). Zitate, Zahlen und Herleitungen sind unverändert. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();c=s.split('**B4 — ')[1].split(chr(10)+'## 3 Modell (§2.3)')[0];raise SystemExit(0 if (c.count('web.archive.org')==7 and c.count('kein Archiv-Snapshot — Verzicht begründet')==1 and 'Zugriff 13.09.2026' in c) else 1)"` | behoben — Teil (a) (Kap. 8, T-0306), Teil (b/B1–B3) (T-0307) und Teil (b/B4–B6) (T-0308) erledigt |
+
+**17.09.2026 · T-0311** (Ersatz für das an der Budgetgrenze eskalierte T-0310, Schritt 1 von 3;
+Schritt L1 aus `.claude/methodik-loop.md`, aber ausdrücklich nur der Rechenweg für Befund 32 —
+Bericht `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` wird in diesem Paket **nicht**
+angefasst; keine Gegenprüfung, kein `/risiko-fortsetzen`, kein L4 nach eiserner Regel 4). Geändert
+wurde ausschließlich dieses Ledger.
+
+| Nr | Kat. | Vorgenommene Änderung | Status danach |
+|---|---|---|---|
+| 32 | A | Rechenweg für M₀ und λ aus den gemessenen Klassenraten in `docs/evidenz/60_stichprobe/m0_klassenraten.csv` festgehalten (Nenner-Begründung, Zahlen, Restfehler-Positionen — Details unten). Der Nachzug im Bericht erfolgt in den beiden Folgepaketen. | offen — Rechenweg steht, Nachzug in den beiden Folgepaketen |
+
+**(a) Wahl des Ratennenners.** `m0_klassenraten.csv` liefert je Klasse zwei Raten:
+`rate_zellen_1_pro_a` (Ereignisse je Zelle, bezogen auf die gesamte Wohnfläche der Zelle) und
+`rate_exponiert_hqextrem_1_pro_a` (bezogen auf die Wohnfläche der im HQ-extrem-Raster tatsächlich
+exponierten Gebäude). Das Mengengerüst aus Register 60-R17-01 zählt 339.000 (GK3+GK4) bzw.
+1,38 Mio. (GK2) **exponierte Adressen**, nicht die Adressen ganzer Zellen; 339.000 × 208 m² ist
+damit die Wohnfläche der exponierten Gebäude, nicht die der Zelle. Konsistent zu diesem
+Mengengerüst ist deshalb `rate_exponiert_hqextrem_1_pro_a`, nicht `rate_zellen_1_pro_a` (Quelle:
+`m0_klassenraten.csv`, Zeilen `klasse=gk3_gk4/kommune=alle` und `klasse=gk2/kommune=alle`). Als
+Sensitivität (P1) ist die Gegenrechnung mit dem Alternativnenner zu nennen: Mit
+`rate_zellen_1_pro_a` (gk3_gk4 0,004197318695391/a, gk2 0,000436059863136/a) ergäbe sich
+**M₀ = 0,931** Mrd. €₂₀₂₆/a und **λ = 1,058** statt der Werte unter (b) und (c) — die Spannweite
+zwischen beiden Nennern ist damit beziffert, nicht verschwiegen.
+
+**(b) M₀ aus den gemessenen Klassenraten.** r(gk3_gk4) = 0,0059796/a (genauer:
+0,005979599550826/a) und r(gk2) = 0,00067515/a (genauer: 0,000675151053693/a), beide aus
+`m0_klassenraten.csv`, Zeilen `klasse=gk3_gk4/kommune=alle` bzw. `klasse=gk2/kommune=alle`
+(Quelle). Wert je exponiertem Wohngebäude 527.280 EUR₂₀₂₆ (208 m² × 1,30 × 1.950 EUR₂₀₂₆, Register
+60-R24-01, unverändert) und Wohngebäudeanteil je Adresse 0,872 (= 19,7/22,6, unverändert).
+Exponierte Adressen 339.000 (GK3+GK4) und 1,38 Mio. (GK2 = 6,1 % von 22,6 Mio.), Register
+60-R17-01 (Quelle).
+
+M₀ = 0,872 × 527.280 EUR × (339.000 × 0,0059796 + 1.380.000 × 0,00067515)
+  = 0,872 × 527.280 EUR × (2.027,08 + 931,71)
+  = 459.768,16 EUR × 2.958,79
+  = 1.360.417.852 EUR₂₀₂₆/a ≈ **1,360** Mrd. EUR₂₀₂₆/a
+
+Klassenbeiträge (absolute Anteile an M₀, keine Prozentanteile): GK3+GK4 = 0,872 × 527.280 EUR ×
+339.000 × 0,0059796 ≈ **0,932** Mrd. €₂₀₂₆/a; GK2 = 0,872 × 527.280 EUR × 1.380.000 × 0,00067515
+≈ **0,428** Mrd. €₂₀₂₆/a (0,932 + 0,428 = 1,360, rundungsbedingt exakt).
+
+**(c) λ aus A\* und M₀.** A\* = 0,985 Mrd. €₂₀₂₆/a (Band 0,391–2,216, §4.2, unverändert —
+GDV-Ankerwert, Quelle). λ = A\*/M₀ = 0,985/1,360417852 = 0,72432 → **λ = 0,724**. Band:
+0,391/1,360417852 = 0,2877 → **0,29**; 2,216/1,360417852 = 1,6288 → **1,63**; Band **0,29–1,63**.
+Der Zentralwert 0,724 liegt innerhalb der Plausibilitätsschranke [0,50; 2,00] (§4.8, Abschätzung
+von KAP3). λ bleibt trotzdem **vorläufig** — Befunde 33 und 34 (GDV-Jahresreihe bzw.
+Verteilungsprüfung auf weiteren Achsen) sind offen und könnten den Wert noch verschieben.
+
+**(d) Restfehler-Positionen unterhalb der Stichprobenauflösung** (aus dem Skriptkopf des
+Vorgängerpakets T-0309 und aus `m0_klassenraten.csv`):
+
+1. **Fallback-Anteil Tiefe, Deggendorf: 88,5 %** (Spalte `anteil_fallback_tiefe`, Zeile
+   `klasse=gk3_gk4/kommune=Deggendorf` = 0,885385598636557 → 88,5 %). Quelle:
+   `m0_klassenraten.csv`. Für 88,5 % der Deggendorfer Stichprobenfläche in dieser Klasse stammt
+   die HQ-Tiefe aus dem Fallback, nicht aus einer gemessenen Tiefenebene — ein Restfehler, den die
+   Stichprobenauflösung nicht abbildet.
+2. **Streuung der Rate über die acht Kommunen: 0,0033 (Deggendorf) bis 0,0103 (Grimma), Faktor
+   3,1** (Spalte `rate_exponiert_hqextrem_1_pro_a`, Klasse gk3_gk4: Deggendorf 0,003321970442220
+   → 0,0033; Grimma 0,010321282711722 → 0,0103; 0,0103/0,0033 = 3,12 → Faktor 3,1). Quelle:
+   `m0_klassenraten.csv`. Der bundesweit einheitlich angesetzte Klassenwert glättet diese
+   kommunale Spannweite; wie groß der dadurch entstehende Fehler am nationalen M₀ ausfällt, ist
+   nicht gemessen, sondern eine **Abschätzung von KAP3**: Bei einer Spannweite von Faktor 3,1
+   zwischen den Extremkommunen ist ein einstelliger Prozentfehler am Gesamtwert plausibel, eine
+   belastbare Fehlerschranke fehlt aber, solange nur acht Kommunen in der Stichprobe stehen
+   (Herleitung: Anzahl der Stichprobenkommunen gegen die gemessene Streuweite, kein statistischer
+   Test).
+3. **Fallback-Anteil Zensus, Klasse gk3_gk4/alle: 79,5 %** (Spalte `anteil_fallback_zensus`,
+   Zeile `klasse=gk3_gk4/kommune=alle` = 0,794915759654093 → 79,5 %). Quelle:
+   `m0_klassenraten.csv`. Für rund vier Fünftel der Wohnfläche in dieser Klasse stammt die
+   Gebäude-/Bewohnerzuordnung aus dem Zensus-Fallback statt aus einer originären Quelle — ein
+   weiterer Restfehler unterhalb der Auflösung der acht Anker-Kommunen.
+4. **Unschärfe des Nenners selbst** (siehe (a)): M₀ = 0,931 statt 1,360 Mrd. €₂₀₂₆/a bei
+   `rate_zellen_1_pro_a` — eine Spanne von rund 32 %, die keine Messung, sondern eine
+   **Abschätzung von KAP3** zur Konsistenz des Mengengerüsts auflöst (Herleitung: Adress- versus
+   Zellbezug, siehe (a)).
+
+**(e) Status.** Befund 32 bleibt **offen**. Der hier festgehaltene Rechenweg (Nenner-Begründung,
+M₀, λ samt Band und Restfehler-Positionen) wird in den beiden Folgepaketen an den über ein Dutzend
+Fundstellen im Bericht (Kap. 4 Einleitung, §4.2–§4.4, §4.8, Block `flood_bldg.lambda`,
+Zeichentabelle §3.5, Kopf-Statuszeile) sowie im Parameter-Block nachgezogen; dieses Paket schreibt
+bewusst nur ins Ledger, der Bericht bleibt byte-gleich.
