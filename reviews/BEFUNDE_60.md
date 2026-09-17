@@ -648,3 +648,125 @@ die Befund-Regression dieser Runde fort.
   `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und `docs/evidenz/register.md` sind
   byte-gleich geblieben; `backend/scripts/lint_methodik.py` wurde in diesem Paket nicht einmal
   ausgeführt (Ausgabe aus Abschnitt 0.1 übernommen).
+
+### 2 · Paket T-0272 — Leitfragen 5 und 6 gegen Kapitel 2 (Evidenz-Register)
+
+Drittes Paket der Runde 2 (17.09.2026), eigene Sitzung: Sie hat den geprüften Stand nicht
+geschrieben — Kapitel 2 mit seinen 32 Registerzeilen und den Langbelegen B1–B6 stammt aus T-0237
+und den Folgepaketen, alle im Endstatus (eiserne Regel 4). Das Bundle nach §1 gilt unverändert
+(Abschnitt 0 dieser Runde); die Lint-Ausgabe aus Abschnitt 0.1 wird **übernommen, nicht neu
+vorhergesagt**, der Lint wurde in diesem Paket nicht ausgeführt.
+
+**Prüfumfang dieses Pakets:** genau Kapitel 2 „Evidenz-Register (§2.2)" (Z. 152–450, einschließlich
+„Belege zu den entschiedenen Registerzeilen"). Nachgemessen mit
+`python3 -c "L=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read().split(chr(10));print(len(chr(10).join(L[151:450])))"`:
+**43.426** Zeichen; die Abweichung von zwei Zeichen gegenüber den im Ticket genannten **43.424**
+rührt allein aus der Schnittkante (Zeilenumbrüche an Überschrift und Leerzeile vor Kapitel 3), der
+geprüfte Textkörper ist derselbe. Summe des Pakets: 43.424 Zeichen (ein Kapitel). Kapitel 3, 5 und 7
+wurden nur dort gelesen, wo eine Registerzeile ausdrücklich auf sie verweist (Bandenden von
+60-S092-01 in §5.1.2, Stützstellen von \(d(h)\) in §3.3, \(p_3\) in §3.4) — sie sind nicht
+Prüfgegenstand. Ein nationaler 100-m-Vollraster-Lauf nach §3.4 war nicht verlangt und wurde
+**nicht** gefahren; alle Nachrechnungen laufen auf den Zahlenwerten der Registerzeilen und der
+Langbelege.
+
+#### 2.1 · Leitfragen dieses Pakets (§5) — einzeln mit Verdikt und Beleg
+
+**LF 5 — Modifikatoren: zentriert, OR-Übersetzung korrekt, richtige Studienart, richtige Band- und
+Endpunkt-Zuordnung (nachgerechnet statt gelesen). Verdikt: Befund** (→ neue Befunde **27**, **28**,
+**29** und **31**).
+
+*Vorbemerkung zur OR-/RR-Übersetzung.* Keine der sieben entschiedenen Registerzeilen führt eine
+Odds Ratio oder ein relatives Risiko. Die Effektgrößen sind Wiederkehrintervalle (W085),
+Prozent-Schadensänderungen je Tiefe (S074), Klassenanteile (R17), Kostenkennwerte mit Index (R24),
+Skalierungsfaktoren einer Schadensfunktion (S093/S094) und eine lineare Abschätzungskette (S092).
+Nachgerechnet wurde deshalb jeweils die **tatsächliche Übersetzung** der Quellgröße in den
+Registerwert (1/T, Tiefe × Rate, Residuum × Bezugsgröße, Index × Kennwert, log-Anteil →
+Faktor); eine OR→RR-Umrechnung ist nirgends nötig und nirgends fälschlich angewendet — insoweit
+**bestanden**. Nachgerechnet mit Python 3, je Zeile ein Ausdruck; die Zahlen stehen unten.
+
+*Zeile-für-Zeile-Nachrechnung (sieben Registerzeilen mit Modifikator oder Band):*
+
+| Registerzeile | Zentrierung | Übersetzung Quelle → Registerwert (nachgerechnet) | Band- und Endpunkt-Zuordnung (nachgerechnet) | Studienart | Ergebnis |
+|---|---|---|---|---|---|
+| 60-W085-01 | — (Wahrscheinlichkeiten, kein Faktor) | p = 1/T: 1/10 = 0,100 · 1/100 = 0,0100 · 1/200 = 0,00500 · 1/1000 = 0,00100 a⁻¹ ✓ | HQhäufig: 1/5 = 0,200 und 1/20 = 0,0500 a⁻¹ ✓ als Band, Zentralwert HQ10 = kartierter Fall ✓. HQextrem: Band 5,0·10⁻³ bis 1,0·10⁻³ ✓, Endpunkte korrekt dem WHG (≥ 200 a) bzw. der Länderpraxis (≈ HQ1000) zugeordnet — **aber kein Zentralwert im Register**, obwohl die Entscheidung „Basiswert — die drei Szenario-Stützstellen p(HQ)" lautet; der rechnende Wert \(p_3 = (5{,}0\cdot10^{-3}\cdot1{,}0\cdot10^{-3})^{1/2} = 2{,}236\cdot10^{-3}\) steht erst in §3.4, die Zeichenfolge „2,236" kommt in Kapitel 2 null mal vor | amtliche Kartengrundlage, normiert ✓ | **Befund 31** |
+| 60-S074-01 | symmetrisch um den Basiswert ✓ | 2,0 × 5,3 % = 10,6 %; 2,0 × 6,2 % = 12,4 % ✓. Gegenprobe des zitierten Quellfaktors „0,5 m Reduktion ⇒ Faktor 1,35–1,44": 1/(1 − 5 × 0,053) = 1,361 und 1/(1 − 5 × 0,062) = 1,449 ✓ — Register-Rate und Quellfaktor sind untereinander konsistent | Entscheidung „±0,20 m ⇒ ±12 %": 12,4 → 12 gerundet, damit 0,4 Prozentpunkte unter dem oberen Ende des eigenen Bandes (10,6–12,4 %); unerheblich, kein Befund. Endpunkt ±0,20 m = obere Höhengenauigkeit des DGM1 (0,15–0,2 m) ✓ | amtliche Produktspezifikation + publizierte Sensitivitätsrechnung (NL) — als dokumentierte Übertragung geführt ✓ | bestanden |
+| 60-R17-01 | — (Prüfband, kein Multiplikativglied) | 100 − 92,4 = 7,6 %; 7,6 − 0,4 = 7,2 % = 6,1 + 1,1 ✓. × 22,6 Mio: GK1 20,882 · GK2 1,3786 · GK3 0,2486 · GK4 0,0904 · GK2–4 1,7176 · GK3+4 0,339 Mio ✓ (alle Rundungen im Register treffen) | GK4 „≥ einmal in 10 Jahren", GK3 HQ10–HQ100 ⇒ GK3+GK4 = „HQ100-Band" ✓; GK2 „seltener als HQ100, inkl. deichgeschützt" ✓. Endpunkte korrekt den Klassen zugeordnet | Bestandsstatistik, ausdrücklich „keine Studie" ✓ | bestanden |
+| 60-R24-01 | — (Mengengerüst) | 149,8 ÷ 89,1 = 1,68126; 1.050 × 1,68126 = 1.765,3; 825 × 1,68126 = 1.387,0 ✓; 1,034³ = 1,10551 ✓; 1.765 × 1,105 = 1.950,3 ✓; 1.533 × 1,30 = 1.992,9 ✓; 1.950 × 1,30 = 2.535 ✓; 4,1 Mrd m² × 1.993 / 2.535 = 8,171 / 10,394 Bio. € ✓; 1,25 ÷ 1,40 = 0,893 ⇒ −10,7 % ≈ −11 % ✓ | (a) Bandenden aus **gerundeten** Faktoren: 1.765 × 1,16 = **2.047,4** (Register 2.047), mit dem hergeleiteten 1,050³ = 1,157625 aber **2.043,2**; MFH 1.387 × 1,16 = 1.608,9 (Register 1.609) gegen 1.605,6. (b) Die Jahresraten der Endpunkte **2,3 %** (unten) und **3,4 %** (Zentralwert) sind aus keinem der in B4 zitierten Werte (3,2 / 3,3 / 5,0 %) abgeleitet; die Zeichenfolge „2,3" steht in den zitierten Quellen-Absätzen nicht. (c) Die „Wertdichte 1.993–2.535 €₂₀₂₆/m²" und der „Wiederherstellungswert 8,2–10,4 Bio. €" sind **Typ-Endpunkte** (reiner MFH- gegen reinen EFH-Satz), nicht das Unsicherheitsband der beiden abgeschätzten Faktoren; mit Index 1,07–1,16 und BGF 1,25–1,40 gegengerechnet spannt die Wertdichte 1.387 × 1,07 × 1,25 = **1.855** bis 1.765 × 1,16 × 1,40 = **2.866** €₂₀₂₆/m², der Bestand **7,6–11,8 Bio. €** | amtliche Statistik + Rechtsverordnung ✓ | **Befund 27** |
+| 60-S093-01 | geometrisch um 1: √1,5678 = 1,2521, 1/1,2521 = 0,7986 ✓ rechnerisch — **aber** das arithmetische Mittel der beiden Klassen bei 50 : 50 ist (0,7986 + 1,2521)/2 = **1,0254**, und Anteile des Bestandsmix je Klasse nennt die Zeile nicht; „mittelwertzentriert auf den Bestandsmix" ist damit nicht nachgewiesen | 1,58 ÷ 0,41 = 3,8537; ln = 1,3490; ÷ 3 = 0,4497; e^0,4497 = 1,5678 ✓. Lesart „halber Anteil" 0,225 ⇒ 0,894–1,119 ✓. Lesart „voller Anteil" 1,349 ⇒ e^±0,6745 = **0,509–1,963**, der Bericht schreibt **0,52–1,96** (unteres Ende falsch gerundet) | (a) B5 schreibt, die Spannweite 1,349 verteile sich auf die **zwei** Achsen Kontamination und Vorsorge, teilt dann aber durch **drei**; bei gleichem Anteil je Achse wäre der Achsenanteil 1,349 ÷ 2 = 0,6745, also Band 0,71–1,40 statt 0,80–1,25. (b) Die Spannweite 0,41–1,58 ist die Diagonale C0P2 ↔ C2P0 über zwei Achsen, nicht die Summe zweier Einzelachsen-Spannen. (c) Vorsorge ist bewohnerseitig (B5 selbst: „gebäude- und bewohnerseitigen Modifikatoren"), die Teilung „je gebäudeseitiger Achse" stimmt mit der eigenen Zuordnung nicht. (d) Sensitivitätsangabe „±25 %" gegen das Band −20 % / +25 % | empirische Mehrfaktor-Schadensfunktion aus Befragung, als Abschätzung von KAP3 gekennzeichnet ✓ (P1/P2 ausgewiesen) | **Befund 28** |
+| 60-S094-01 | geometrisch um 1: e^0,1124 = 1,1190, 0,8937 ✓; arithmetisches Mittel 1,0063 | 0,4497 ÷ 2 = 0,2248; e^0,2248 = 1,2521 ✓ | kombiniert 0,7986 × 0,8937 = 0,7137 ⇒ 0,71 und 1,2521 × 1,1190 = 1,4011 ⇒ 1,40 ✓ (Endpunkte gleichgerichtet, also Vollkorrelation — als konservativ zulässig). Mittel des Produkts bei 50 : 50 je Achse: 1,0254 × 1,0063 = **1,0319** — die beiden „mittelwertzentrierten" Achsen heben den Basiswert zusammen um ≈ +3,2 %, sofern der Bestand je Achse hälftig verteilt ist. Die Zeile erbt Befund 28 über die Kopplung an 0,450 | ingenieurmäßige Schadensgradskala, als Abschätzung von KAP3 gekennzeichnet, Bauform-Grenze nach P2 ausgewiesen ✓ | bestanden (Rechenschritt selbst); Kopplung → Befund 28 |
+| 60-S092-01 | — (Reduktionsfaktor, Zentralwert 0,035) | 0,10 × 0,50 × 0,70 = 0,0350 ✓ | 0,05 × 0,30 × 0,50 = 0,0075 ✓; 0,20 × 0,66 × 0,80 = 0,1056 ✓ (Bandenden gleichgerichtet, übereinstimmend mit §5.1.2). Wert, Band und Kennzeichnung „Abschätzung von KAP3" stehen in der Zeile — P2 ist bedient, die Wirkung steht nicht auf null. Die Divergenz zu `docs/evidenz/register.md` Z. 65 (dort weiter „0,0075–0,112") wurde gelesen und besteht fort; ihr Status gehört zur Regression von Befund 19 und wird hier nicht bewertet | Studienart: die Zeile schließt Befragungen nach §3.5 zu Recht als Wertquelle aus, behauptet aber, sie seien „im Volltext nicht verifiziert" — dieselbe Kapitel-2-Quelle Thieken u. a. 2008 ist in B5 „Volltext gegengelesen" und trägt in Tab. 2 Vorsorge-Skalierungsfaktoren (C0P1 0,64 ÷ C0P0 0,92 = **0,696**, C0P2 0,41 ÷ 0,92 = **0,446**, also −30 % bzw. −55 % je Gebäude mit guter bzw. sehr guter Vorsorge) | **Befund 29** |
+
+Damit sind **sieben** Registerzeilen mit Modifikator bzw. Band Zeile für Zeile nachgerechnet
+(Mindestmaß des Tickets: fünf). Die übrigen 25 Zeilen stehen auf „offen" und tragen keinen
+Modifikator, den man nachrechnen könnte.
+
+**LF 6 — Struktur: überall verwendet, wo die Evidenz strukturabhängig ist; Kopplungen zwischen
+abgeleiteten Parametern neu gerechnet? Verdikt: Befund** (→ neuer Befund **30**; die ausgewiesenen
+Kopplungen selbst sind neu gerechnet und stimmen, soweit nicht Befund 28 greift).
+
+*Kopplungen — einzeln nachgerechnet.* (1) **S094 → S093** (Achsenanteil 0,450): 0,450 ÷ 2 = 0,225
+⇒ 0,89–1,12, kombiniert 0,71–1,40 — neu gerechnet ✓; die Kopplung ist in B6 ausdrücklich benannt.
+Folge: jede Korrektur aus Befund 28 muss S094 und das kombinierte Band mitziehen (bei Anteil 0,6745
+würde S094 zu e^±0,1686 = 0,845–1,184 und das kombinierte Band zu 0,60–1,66). (2) **S074 → W085**
+(Tiefenquelle): in B2 benannt, Rechenweg 2,0 × Rate neu gerechnet ✓. (3) **R24 → Baupreisindex**:
+in B4 benannt, Kette 1,68126 × 1,105 × 1,30 neu gerechnet ✓ (Bandenden siehe Befund 27).
+(4) **R17 → W085 × R24** (Kein-Doppelkanal): R17 liefert nur Prüfband, kein Multiplikativglied ✓.
+(5) **S092 ↔ S093 — nicht benannt:** B5 bildet die Spannweite der Zustandsachse aus der Tab.-2-
+Spannweite, in der die **Vorsorge**-Achse steckt; S092 ist die Vorsorge-Wirkung. Ändert sich die
+Vorsorge-Evidenz, ändern sich beide Zeilen — diese Kopplung steht weder in B5 noch in der
+S092-Zeile (→ Teil von **Befund 29**).
+
+*Struktur — wo ist die Evidenz strukturabhängig, und wird die Struktur verwendet?*
+- **Gebäudetyp → Mengengerüst/Preis:** verwendet ✓ — R24 trennt EFH/ZFH (1.950 €₂₀₂₆/m² BGF)
+  und MFH (1.533 €₂₀₂₆/m² BGF), Zellbezug über Zensus-2022-Gitter.
+- **Gebäudetyp → Schadensquote: nicht verwendet, nicht als Modellgrenze ausgewiesen.** Die
+  Zeile 60-S093-01 selbst nennt FLEMOps mit der Eingangsachse „Gebäudetyp (3 Klassen)" neben
+  Wasserstand und Qualität; die Schadensquote der Quelle ist also typabhängig. Kapitel 2 führt aber
+  in keiner Registerzeile eine typabhängige Schadensquote und vermerkt die Nichtverwendung auch nicht
+  als Modellgrenze (Kapitel 2: „je Gebäudetyp" 0 Treffer, „typabhängig" 0 Treffer). Die
+  verweisende Stelle §3.3 bestätigt, dass \(d(h)\) eine einzige, typunabhängige Stützstellenreihe ist
+  (≈ 3,5 % … ≈ 25 %), und die Registerzeile ordnet diese beiden Endpunkte weder einem Gebäudetyp
+  noch einer Qualitätsklasse von Fig. 1 zu. Die Struktur-Proxy-Daten dafür nennt das Register
+  selbst („Baujahrsklasse und Gebäudetyp der Zensus-2022-Gebäude- und Wohnungszählung" je
+  100-m-Zelle) → **Befund 30**.
+- **Bauform/Material → Schadensgrad:** strukturabhängig nach Quelle; mangels Merkmal (Datenlücke
+  §3.8) als bundesweit einheitliches Band geführt und als Bauform-Grenze nach P2 ausgewiesen ✓.
+- **Relief → Tiefenfehler (S074):** strukturabhängig; als Modellgrenze „in Mittelgebirgs- und
+  Steillagen Untergrenze" ausgewiesen, nicht verwendet — für ein Sensitivitätsband ohne
+  Multiplikativglied zulässig ✓.
+- **Adresse gegen Gebäude (R17):** als Modellgrenze (a) benannt; R17 rechnet nicht ✓.
+- **Objektschutz (S092):** kommunaler Pauschalfaktor, als Modellgrenze der Abschätzung benannt ✓
+  (die fehlende Typ-/Kellerdifferenzierung ist damit ausgewiesen, P2 bedient).
+
+#### 2.2 · Neue Befunde dieses Pakets (27–31)
+
+Format §5: Stelle · Art (Lücke/Fehler/Widerspruch) · Begründung · Vorschlag · Kategorie. Das
+Ledger trug bei Ticketschnitt die Nummern 1–19; die vorlaufenden Pakete T-0270 (20–22) und T-0271
+(23–26) haben inzwischen weiter vergeben, die nächsthöhere freie Nummer ist deshalb **27** (Regel
+„fortlaufend ab der nächsthöheren freien Nummer"). **Dieses Paket behebt keinen Befund** — weder
+einen neuen noch einen alten. Die Kurzform-Tabelle „Offene Befunde" am Kopf des Ledgers ist bewusst
+nicht angefasst; sie schreibt die Befund-Regression dieser Runde fort. Jeder Prüfausdruck endet mit
+Exit 0, **solange der Befund besteht** (am 17.09.2026 ausgeführt: alle fünf Exit 0).
+
+| Nr | Kat. | Befund (Stelle · Art · Begründung · Vorschlag) | Prüfausdruck | Status |
+|---|---|---|---|---|
+| 27 | C | Bericht Kap. 2, Registerzeile 60-R24-01 (Z. 189) und Langbeleg B4, Rechenschritte 2–4 (Z. 319–350) · **Fehler/Lücke (§5 LF 5 „richtige Band- und Endpunkt-Zuordnung"; §3.9 Abgeschätzt; Vorgabe P1 „samt Herleitung")** — (a) die Jahresraten der Fortschreibung, **3,4 %** (Zentralwert) und **2,3 %** (unteres Bandende), sind aus keinem der in B4 zitierten amtlichen Werte (+3,2 % Nov. 2025, +3,3 % Feb. 2026, +5,0 % Mai 2026) hergeleitet; nur das obere Ende 5,0 % ist belegt; (b) die Bandenden 1.889–2.047 bzw. 1.484–1.609 €₂₀₂₆/m² BGF sind mit den gerundeten Faktoren 1,07/1,16 gerechnet, der hergeleitete Faktor 1,050³ = 1,1576 ergibt 2.043,2 bzw. 1.605,6; (c) „Wertdichte 1.993–2.535 €₂₀₂₆/m²" und „Wiederherstellungswert 8,2–10,4 Bio. €" sind Typ-Endpunkte (reiner MFH- gegen reinen EFH-Satz), werden in der Zeile aber wie ein Band gelesen; die Bänder der beiden abgeschätzten Faktoren (Index 1,07–1,16, BGF/Wohnfläche 1,25–1,40) sind darin nicht fortgepflanzt — gerechnet spannt die Wertdichte 1.855–2.866 €₂₀₂₆/m², der Bestand 7,6–11,8 Bio. €. **Vorschlag:** die Raten 3,4 % und 2,3 % aus den zitierten Monatswerten herleiten (oder die Quelle nennen), die Bandenden mit den ungerundeten Faktoren rechnen, und Typ-Spanne und Unsicherheitsband in Zeile und B4 getrennt ausweisen. | `python3 -c "L=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read().split(chr(10));r=L[188];b=chr(10).join(L[284:350]);q=chr(10).join(L[305:313]);raise SystemExit(0 if ('1.889–2.047' in r and '1.993–2.535' in r and '2,3 %' in b and '2,3' not in q and abs(1765*1.05**3-2047)>3) else 1)"` | offen |
+| 28 | B | Bericht Kap. 2, Registerzeile 60-S093-01 (Z. 183) und Langbeleg B5, Absatz „Rechenschritt (§3.9 Abgeschätzt) — Band der Zustandsachse" (Z. 386–397); gekoppelt 60-S094-01 (Z. 184, B6 Z. 433–442) · **Fehler (§5 LF 5 „zentriert", „Band- und Endpunkt-Zuordnung"; §3.2 Mittelwertzentrierung)** — (a) B5 schreibt, die Spannweite ln(1,58/0,41) = 1,349 verteile sich auf die **zwei** Achsen Kontamination und Vorsorge, teilt dann aber durch **drei** (0,450); bei gleichem Anteil je Achse wäre der Anteil 0,6745 und das Band 0,71–1,40 statt 0,80–1,25 (S094 dann 0,845–1,184, kombiniert 0,60–1,66); zudem ist 0,41–1,58 die Diagonale C0P2 ↔ C2P0, nicht die Summe zweier Einzelachsen, und Vorsorge ist nach B5 selbst bewohner-, nicht gebäudeseitig; (b) „mittelwertzentriert auf den Bestandsmix" ist nicht nachgewiesen: die Werte sind geometrisch um 1 gesetzt, ohne Bestandsanteile je Klasse; bei 50 : 50 liegt das arithmetische Mittel bei 1,0254 (S093) bzw. 1,0063 (S094), zusammen +3,2 % auf den Basiswert; auch welcher Kurve von Fig. 1 die Endpunkte 3,5 %/25 % gehören, ist nicht zugeordnet; (c) Rechenfehler in der Sensitivitätslesart „voller Anteil": e^−0,6745 = 0,509 ⇒ **0,51**, nicht 0,52; (d) Sensitivitätsangabe der Zeile „±25 %" gegen das eigene Band −20 %/+25 %. **Vorschlag:** den Achsenanteil konsistent zur eigenen Prämisse herleiten (Teiler und Achsenzuordnung begründen), die Zentrierung mit ausgewiesenen Klassenanteilen rechnen oder als geometrische Zentrierung benennen, die Fig.-1-Kurve der Endpunkte zuordnen, 0,52 → 0,51 und „±25 %" → „−20 %/+25 %" korrigieren und S094 samt kombiniertem Band über die Kopplung neu rechnen. | `python3 -c "import math as m;L=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read().split(chr(10));b=chr(10).join(L[351:402]);l=m.log(1.58/.41);a=l/3;raise SystemExit(0 if ('1,349 ÷ 3' in b and 'Kontamination und Vorsorge' in b and '0,52–1,96' in b and round(m.exp(-l/2),2)==0.51 and (m.exp(a/2)+m.exp(-a/2))/2>1.02) else 1)"` | offen |
+| 29 | C | Bericht Kap. 2, Registerzeile 60-S092-01 (Z. 182), Spalte Studientyp, gegen Langbeleg B5 (Z. 365–366) · **Widerspruch (§5 LF 5 „richtige Studienart"; LF 6 „Kopplungen"; §3.8)** — die Zeile begründet den Verzicht auf eine Effektgröße u. a. damit, Befragungen nach Ereignissen seien „nur Kandidat, im Volltext nicht verifiziert". Im selben Kapitel ist Thieken u. a. 2008 (FLEMOps, Befragung von 1.697 Haushalten) als „Volltext gegengelesen" geführt und trägt in Tab. 2 Vorsorge-Skalierungsfaktoren: C0P1 0,64 ÷ C0P0 0,92 = 0,696 und C0P2 0,41 ÷ 0,92 = 0,446, also −30 % bzw. −55 % Schaden je Gebäude mit guter bzw. sehr guter Vorsorge. Der Ausschluss als Wertquelle nach §3.5 (keine Interventionsstudie) bleibt richtig; falsch ist die Aussage „nicht verifiziert", und es fehlt der Vergleich als Plausibilitätsband für \(r_{\text{S092}}\) sowie die Kopplung: dieselbe Tab.-2-Spannweite, die die Vorsorge-Achse enthält, dimensioniert in B5 das Band von 60-S093-01. **Vorschlag:** in der S092-Zeile Thieken u. a. 2008 Tab. 2 als volltextgeprüfte, nach §3.5 nicht zulässige Befragungsevidenz nennen, die Werte 0,70/0,45 als Plausibilitätsprobe der Kette §5.1 ausweisen (nicht als Wert) und die Kopplung S092 ↔ S093 in B5 und in der Zeile vermerken. | `python3 -c "L=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read().split(chr(10));b=chr(10).join(L[351:402]);raise SystemExit(0 if ('im Volltext nicht verifiziert' in L[181] and 'C0P2 **0,41**' in b and 'Thieken' not in L[181]) else 1)"` | offen |
+| 30 | C | Bericht Kap. 2, Registerzeile 60-S093-01 (Z. 183, Effektgröße „Gebäudetyp (3 Klassen)") und Kapitel 2 insgesamt; verweisende Stelle §3.3 (Stützstellentabelle Z. 557–559) · **Lücke (§5 LF 6 „Struktur überall verwendet, wo die Evidenz strukturabhängig ist")** — die zitierte Schadensfunktion FLEMOps ist nach Gebäudetyp (Einfamilien-, Doppel-/Reihen-, Mehrfamilienhaus) strukturiert; das Register nutzt die Typstruktur nur für den Preis (R24: EFH/ZFH 1.950, MFH 1.533 €₂₀₂₆/m² BGF), nicht für die Schadensquote, und weist die Nichtverwendung auch nicht als Modellgrenze aus (Kapitel 2: „je Gebäudetyp" und „typabhängig" je 0 Treffer). Die Endpunkte 3,5 %/25 % sind keinem Typ zugeordnet, obwohl das Register für jede 100-m-Zelle den Gebäudetyp aus dem Zensus 2022 als verfügbar nennt. **Vorschlag:** entweder eine Registerzeile (oder Spalte in 60-S093-01) für die typabhängige Schadensquote mit Zuordnung der Fig.-1-Endpunkte anlegen und die Typstruktur je Zelle nutzen, oder die typunabhängige Schadensquote ausdrücklich als Modellgrenze mit Richtung und Größenordnung ausweisen (Vorgabe P1/P2: als Abschätzung von KAP3). | `python3 -c "L=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read().split(chr(10));k=chr(10).join(L[151:450]);raise SystemExit(0 if ('Gebäudetyp (3 Klassen)' in L[182] and 'je Gebäudetyp' not in k and 'typabhängig' not in k) else 1)"` | offen |
+| 31 | C | Bericht Kap. 2, Registerzeile 60-W085-01 (Z. 160), Spalten Effektgröße und Entscheidung, gegen §3.4 Schritt 2 (Z. 592) · **Lücke (§5 LF 5 „Band- und Endpunkt-Zuordnung"; §3.2 Sensitivitäten ausschließlich über das Register; §2.2 „In Formeln dürfen nur Zeilen mit Entscheidung Basiswert stehen")** — die Entscheidung lautet „Basiswert — die drei Szenario-Stützstellen p(HQ)", für HQextrem führt die Zeile aber nur das Band 5,0·10⁻³ bis 1,0·10⁻³ a⁻¹ ohne Zentralwert; der in der Kernformel rechnende Wert \(p_3 = 2{,}236\cdot10^{-3}\) a⁻¹ (geometrisches Mittel der Bandenden, als Abschätzung von KAP3 gekennzeichnet) steht erst in §3.4 und kommt in Kapitel 2 null mal vor. Damit ist die Zuordnung „Endpunkte = Sensitivität, Zentralwert = Basiswert" für die dritte Stützstelle im Register nicht vollständig. **Vorschlag:** in der Zeile 60-W085-01 den Zentralwert \(p_3 = 2{,}236\cdot10^{-3}\) a⁻¹ mit Vermerk „§3.9 Abgeschätzt, geometrisches Mittel der Bandenden" nachtragen und in B1 den Rechenschritt ergänzen. | `python3 -c "L=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read().split(chr(10));k=chr(10).join(L[151:450]);raise SystemExit(0 if ('HQextrem 5,0·10⁻³ bis 1,0·10⁻³' in L[159] and '2,236' not in k) else 1)"` | offen |
+
+#### 2.3 · Abgrenzung und Status dieses Pakets
+
+- **Beantwortet:** LF 5 (Verdikt Befund) und LF 6 (Verdikt Befund) — jede mit Beleg. LF 5
+  nachgerechnet statt gelesen: sieben Registerzeilen mit Modifikator bzw. Band (60-W085-01,
+  60-S074-01, 60-R17-01, 60-R24-01, 60-S093-01, 60-S094-01, 60-S092-01), je Zeile Zentrierung,
+  Übersetzung und Band-/Endpunkt-Zuordnung mit Zahlenwert in der Tabelle von Abschnitt 2.1.
+- **Nicht Gegenstand dieses Pakets:** die übrigen Leitfragen, die Kapitel außer Kapitel 2 und die
+  Regression der Befunde 1–19 — insbesondere der Status von Befund 19 (`docs/evidenz/register.md`
+  Z. 65), der ins Regressionspaket gehört. Ein nationaler 100-m-Vollraster-Lauf nach §3.4 war nicht
+  verlangt und wurde nicht gefahren.
+- **Kein Befund behoben**, kein Bericht, kein Register, kein Code, kein Lint, keine Arbeitsmappe
+  geändert: `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und `docs/evidenz/register.md`
+  sind byte-gleich geblieben; `backend/scripts/lint_methodik.py` wurde in diesem Paket nicht
+  ausgeführt (Ausgabe aus Abschnitt 0.1 übernommen).
