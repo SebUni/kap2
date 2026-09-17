@@ -32,7 +32,7 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 - **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`. Davon **7 belegt bzw. entschieden** — 60-W085-01, 60-R24-01, 60-S074-01, 60-R17-01, 60-S093-01, 60-S094-01 und 60-S092-01 (Maßnahmen-Hebel, abgeschätzt) —, die **übrigen 25 stehen auf `offen`**.
 - **Entschieden (T-0237):** Ansatz-Vergleich Kap. 9 — Umsetzungsgrundlage ist Ansatz **(a)** (Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle); (b) aggregierte Flächenschadensrate bleibt als Ergänzungsmodul, (c) Schadensgradmodell am Einzelgebäude ist ausgeschieden.
 - **Entschieden (T-0238):** Kap. 3 bis zur Kernformel — native Ergebnisgröße (EAD in €₂₀₂₆/a, Ebene Kommune), vier Datenebenen nach §3.1 (drei „neu anzulegen", eine „geparkt"), Tiefen-Schadensfunktion und Schicht-B-Kernformel Menge × Rate × Preis je 100-m-Zelle.
-- **Offen (Stand 17.09.2026, nach Review-Runde 2):** (1) \(M_0\) = 1,360 Mrd. €₂₀₂₆/a und \(\lambda\) = 0,724 sind aus dem Stichprobenlauf des Produktionsmodells auf den acht Anker-Kommunen gerechnet (Kap. 4); offen sind daraus nur noch die out-of-sample-Verteilungsprüfung und der Fit über die Jahresreihe der Ankerwerte statt über deren Mittelwert (Ledger-Befunde 34 und 33), bis dahin bleibt \(\lambda\) vorläufig; (2) R7-Weiche mit #50 (FS-Schutzsystem, geparkt); (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
+- **Offen (Stand 17.09.2026, nach Review-Runde 2):** (1) \(M_0\) = 1,360 Mrd. €₂₀₂₆/a und \(\lambda\) = 0,724 sind aus dem Stichprobenlauf des Produktionsmodells auf den acht Anker-Kommunen gerechnet (Kap. 4); die out-of-sample-Verteilungsprüfung (Jahresauslassung, §4.5) und der Fit über die Jahresreihe (§4.1a) sind seither nachgezogen (Ledger-Befunde 33 und 34); \(\lambda\) bleibt vorläufig, weil die Verteilungsprüfung als Modellentscheid **nicht bestanden** ausgewiesen ist (§4.5) und die Befunde 35 und 36 offen sind; (2) R7-Weiche mit #50 (FS-Schutzsystem, geparkt); (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
 - **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Planungszahl korrigiert, Beispiel-Code-Zaun im Kommentar entfernt; R2: Lint-Funde behoben, Zeichentabelle S092 als eigener Abschnitt, Verweis korrigiert). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: je rund 0,3 USD. Die Evidenz der sieben belegten Registerzeilen ist in eigenen Runden recherchiert und im Volltext geprüft (Quellen und Langbelege B1–B6 in Kap. 2).
 - **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
@@ -947,8 +947,9 @@ nur beziffert hatte (fehlende Klasse GK2, alle Adressen als Wohngebäude gezähl
 geschlossen. Bemerkenswert und hier festgehalten: Die damals angegebene Umfangs-Sensitivität sagte
 einen Wert zwischen 0,97 und 0,55 voraus — das jetzt gerechnete \(\lambda\) = 0,832 liegt
 innerhalb dieser Spanne. \(\lambda\) bleibt dennoch **vorläufig** und trägt im Produkt diesen
-Vermerk (Block `flood_bldg.lambda`, Feld `vorlaeufig: true`), weil die Ledger-Befunde 33
-(Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion), 35 und 36 offen sind und den Wert
+Vermerk (Block `flood_bldg.lambda`, Feld `vorlaeufig: true`), weil die Verteilungsprüfung in 4.5
+seit dieser Revision außerhalb der Anpassungsdaten liegt und dort **nicht bestanden** wird
+(Modellentscheid, Ledger-Befund 33) und weil die Ledger-Befunde 35 und 36 offen sind und den Wert
 noch verschieben können; der Produkt-Block in Kap. 7 trägt zum Stand dieser Revision denselben
 Wert.
 
@@ -1211,41 +1212,96 @@ Schranke [0,50; 2,00]; der Skalar wird deshalb gesetzt. Die Schranke selbst blei
 0,50 fällt, betrifft nicht den Zentralwert, sondern die noch ausstehende Herleitung der Schranke
 aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\); dieser Punkt ist als Befund 36 im Ledger
 offen und wird hier weder durch Weiten der Schranke noch nebenbei gelöst. Gesetzt heißt nicht
-endgültig: \(\lambda\) ist **weiterhin vorläufig**, weil die Ledger-Befunde 33 und 34 offen sind
-(Einleitung Kap. 4).
+endgültig: \(\lambda\) ist **weiterhin vorläufig** — die Verteilungsprüfung in 4.5 wird nicht
+bestanden (Modellentscheid), und die Ledger-Befunde 35 und 36 sind offen (Einleitung Kap. 4).
 
-### 4.5 Unabhängige Verteilungsprüfung: Achse Ereignisregime
+### 4.5 Unabhängige Verteilungsprüfung: Achse Ereignisregime (Jahresauslassung über die Ankerreihe)
 
-**Prüfgröße.** Anteil der Schadenssumme, der aus dem **seltenen Regime** (Ereignisse ab HQ100
-einschließlich HQextrem) stammt — die kritischste Achse dieses Risikos, weil die Schadensfunktion
-dort gedeckelt und die Jährlichkeit dort am unsichersten ist.
+**Prüfgröße.** Anteil des **Erwartungswerts** der Jahresschadensumme, der aus dem **seltenen
+Regime** (Ereignisse ab HQ100 einschließlich HQextrem) stammt — die kritischste Achse dieses
+Risikos, weil die Schadensfunktion dort gedeckelt und die Jährlichkeit dort am unsichersten ist.
+Beide Seiten der Prüfung sind damit **dieselbe Größe**: ein Anteil am Erwartungswert, nicht der
+Überschuss eines Einzeljahres über ein Mittel (abgelöste Fassung, Ledger-Befund 33).
 
-**Toleranz — vorab fixiert: ±15 Prozentpunkte** (absolut, auf den Regime-Anteil). Herleitung
-(Abschätzung von KAP3, §3.9): Die modellseitige Streuung aus dem belegten HQextrem-Band
-(5,0·10⁻³ bis 1,0·10⁻³ a⁻¹, Register 60-W085-01) beträgt 32,4–36,9 %, also ±2,3 Prozentpunkte. Die
-ankerseitige Unschärfe ist größer: gepoolte fluviale und pluviale Ereignisse, nur ein
-ausgewertetes Ereignisjahr, versicherte statt gesamter Schäden — dafür ±12,5 Prozentpunkte. Summe
-≈ ±15 Prozentpunkte. Die Toleranz ist festgelegt, **bevor** der Ist-Wert unten gerechnet wird, und
-sie wird bei einer Nichterfüllung nicht nachträglich geweitet.
+**Ankerseitige Prüfgröße (Jahresauslassung, Leave-one-out).** Aus der Jahresreihe
+\(A_t\), \(t \in T\) = 2002–2024 (`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`, Spalte
+`wert_mrd_eur`, 23 Werte, Bestands- und Preisstand 2024):
 
-**Unabhängigkeit.** \(\lambda\) wird allein aus dem **Mittelwert** der Reihe bestimmt; der
-Regime-Anteil ist eine Form-, keine Niveaugröße und geht in \(\lambda\) an keiner Stelle ein. Die
-Überlappung wird beziffert statt behauptet: Das Prüfjahr 2024 steuert 1 von 23 Kalibrierjahren
-bei, also 4,3 % der Ankerbasis.
+\[
+R_{\text{anker}} = \frac{\sum_{t \in T} \max\!\left(0,\; A_t - \bar{A}_{-t}\right)}{\sum_{t \in T} A_t},
+\qquad
+\bar{A}_{-t} = \frac{1}{|T|-1} \sum_{s \in T,\, s \neq t} A_s .
+\]
+
+Gelesen wird das so: \(\bar{A}_{-t}\) ist das **ohne das Jahr \(t\) selbst** gebildete Normaljahr;
+\(\max(0, A_t - \bar{A}_{-t})\) ist der Teil des Jahres \(t\), den ein Normaljahr nicht erklärt,
+also der Beitrag seltener Ereignisse. Zähler und Nenner sind Summen über dieselben 23 Jahre; geteilt
+durch 23 stehen dort Erwartungswert des Überschusses und Erwartungswert der Jahressumme.
+\(R_{\text{anker}}\) ist deshalb ein **Erwartungswertanteil** und direkt mit dem modellseitigen
+Regime-Anteil vergleichbar.
+
+**Unabhängigkeit von der Kalibrierung (§3.4).** Zwei Eigenschaften, beide nachrechenbar statt
+behauptet. (1) **Skaleninvarianz:** Zähler und Nenner sind homogen vom Grad 1 in den \(A_t\), also
+gilt \(R_{\text{anker}}(c \cdot A) = R_{\text{anker}}(A)\) für jedes \(c > 0\). Die Prüfgröße trägt
+damit **keine** Niveauinformation; \(\lambda\) folgt allein aus dem Niveau (Mittel der Reihe,
+§4.1a) und könnte sich beliebig ändern, ohne \(R_{\text{anker}}\) zu bewegen. (2)
+**Jahresauslassung:** Der Bezugswert eines Jahres enthält dieses Jahr nicht, kein Jahr prüft sich
+gegen sich selbst. Die frühere Überlappung — das Prüfjahr war zugleich die einzige Quelle des
+Ankermittels — ist damit aufgehoben; geprüft wird die **Form** der Reihe, angepasst wurde ihr
+**Niveau**.
+
+**Toleranz — vorab fixiert: ±11,5 Prozentpunkte** (absolut, auf den Regime-Anteil). Sie ist
+festgelegt, **bevor** der Ist-Wert unten gerechnet wird, und sie wird bei einer Nichterfüllung
+nicht geweitet; gegenüber der abgelösten Fassung (±15, ankerseitig gesetzt statt hergeleitet) ist
+sie **enger**. Herleitung aus drei voneinander unabhängigen Beiträgen, quadratisch
+zusammengesetzt (Abschätzung von KAP3, §3.9, mit gerechneten Bestandteilen):
+
+| Beitrag | Wert | Herkunft |
+|---|---|---|
+| Ankerseitige Stichprobenstreuung | **±11,2 Pp** | **berechnet:** Jackknife über die 23 Jahre — für jedes Jahr wird \(R_{\text{anker}}\) auf den übrigen 22 Jahren neu gerechnet (Replikate 37,6 % bis 49,9 %), Standardfehler \(\sqrt{\tfrac{n-1}{n}\sum_i (R_{(i)} - \bar{R})^2}\) = 11,16 Pp. Er ist groß, weil wenige Jahre den Überschuss tragen — das ist die reale Unsicherheit einer 23-Jahre-Reihe, nicht ein Zuschlag. |
+| Ankerseitige Ableseunschärfe | **±1,7 Pp** | **berechnet:** je Balken ±0,05 Mrd. € (Ablesegenauigkeit der Grafik, CSV-Spalte `anmerkung`), im ungünstigsten Muster angesetzt (alle Jahre über ihrem Auslassungsmittel nach oben und alle übrigen nach unten, und umgekehrt): \(R_{\text{anker}}\) zwischen 46,1 % und 49,5 %. |
+| Modellseitiges Band | **±2,3 Pp** | **berechnet:** belegtes HQextrem-Band 5,0·10⁻³ bis 1,0·10⁻³ a⁻¹ (Register 60-W085-01) ergibt einen Regime-Anteil von 32,4 % bis 36,9 %. |
+
+Ankerseitiges Toleranzbudget: \(\sqrt{11{,}16^2 + 1{,}73^2}\) = **±11,3 Pp**; mit dem
+modellseitigen Band \(\sqrt{11{,}29^2 + 2{,}30^2}\) = **±11,5 Pp**. Quadratisch und nicht linear,
+weil die drei Beiträge unabhängige Fehlerquellen sind (Standardfehler bzw. Bänder, keine
+systematisch gleichgerichteten Zuschläge); die Kombinationsregel ist zusammen mit der Toleranz
+vorab gewählt und wird nicht nach dem Ergebnis gewechselt. Zwei Unschärfen gehen **nicht** ins
+Budget ein, weil sie nicht als Streuung beziffert werden können: die gepoolten fluvialen und
+pluvialen Ereignisse der GDV-Position und der Unterschied zwischen versicherten und gesamten
+Schäden. Beide stehen unten als Modellgrenze.
 
 **Ist-Ergebnis.** Modellseite: aus den Stützstellen von §3.6 entfallen auf HQhäufig 66,1 %, auf
 HQ100 23,2 % und auf das Extremregime 10,6 % des Erwartungswerts, also **33,9 %** auf das seltene
-Regime ab HQ100. Ankerseite: Im Großereignis-Jahr 2024 lagen 2,6 Mrd. € gegenüber einem
-langjährigen Mittel von 1,838 Mrd. €; der auf das Großereignis entfallende Überschuss beträgt
-(2,6 − 1,838)/2,6 = **29,3 %** der Jahressumme. **Differenz 4,6 Prozentpunkte < 15 Prozentpunkte —
-Prüfung bestanden.**
+Regime ab HQ100. Ankerseite: Von der Summe 42,28 Mrd. € der 23 Jahre liegen 20,19 Mrd. € über dem
+jeweils ohne das Jahr gebildeten Normaljahr; dieser Überschuss verteilt sich auf fünf Jahre —
+2021 (11,25), 2002 (5,82), 2013 (2,16), 2024 (0,80) und 2016 (0,17). Daraus
+\(R_{\text{anker}}\) = 20,19/42,28 = **47,7 %**. **Differenz 13,9 Prozentpunkte > 11,5
+Prozentpunkte — Prüfung nicht bestanden.**
 
-**Grenzen der Prüfung** (nicht geglättet, §3.8): Der Ankerwert stützt sich auf ein einziges
-Ereignisjahr und auf die Gleichsetzung „Überschuss über dem Mittel" ≈ „Beitrag des seltenen
-Regimes". Sobald die Jahreswerte der Reihe 2002–2024 einzeln vorliegen, tritt der über alle
-23 Jahre gebildete Regime-Anteil an die Stelle dieses Einjahres-Werts; die Toleranz von
-±15 Prozentpunkten bleibt dabei unverändert und wird enger gefasst, wenn der ankerseitige
-Unsicherheitsbeitrag sinkt.
+**Modellentscheid (§3.8, nicht geglättet).** Das Ergebnis wird weder durch Weiten der Toleranz noch
+durch Nachziehen des Modells an den Anker geheilt. Es wird als Entscheid ausgewiesen und im Ledger
+geführt: (1) **Richtung.** Das Modell legt rund 14 Prozentpunkte **zu wenig** Gewicht auf das
+seltene Regime; seine Tiefen-Schadensfunktion ist im Extrem gedeckelt (§3.3) und die HQextrem-Rate
+niedrig angesetzt. (2) **Kein Nachfitten der Form.** Die drei Stützstellen bleiben unverändert; ein
+Anpassen der Jährlichkeiten oder der Deckelquote an den Ankerbefund wäre ein zweiter, verdeckter
+Kalibrierschritt und ist nach §2.4 unzulässig. (3) **\(\lambda\) bleibt gesetzt, aber vorläufig.**
+Die Prüfgröße ist skaleninvariant und berührt das Niveau nicht; die Bundessumme bleibt an den Anker
+gebunden. Betroffen ist die **Aufteilung** des Erwartungsschadens auf die Szenarien — und damit
+jede Größe, die auf dem Regime-Anteil steht, zuerst \(s_{\text{bem}}\) in §5.1.3 (der Hebel S092
+wird eher überschätzt, wenn das Modell dem seltenen Regime zu wenig Gewicht gibt). (4) **Was die
+Prüfung bestehen ließe**, ist benannt, nicht gesetzt: eine höhere HQextrem-Jährlichkeit oder eine
+weniger stark gedeckelte Schadensfunktion. Beides braucht Evidenz, nicht die Prüfung als Begründung.
+
+**Trennschärfe und Grenzen der Prüfung** (nicht geglättet, §3.8): Gegen den Ankerwert 47,7 %
+bestünde eine Verdopplung des HQextrem-Schadens (\(A_3\) = 600 m², Regime-Anteil 48,8 %, Abstand
+1,0 Pp) und ebenso eine Verdreifachung (58,2 %, Abstand 10,4 Pp); eine Halbierung (22,6 %, Abstand
+25,1 Pp) bestünde nicht. Die Prüfung trennt also **nach unten** scharf und nach oben schwach — eine
+Folge des großen ankerseitigen Stichprobenfehlers, nicht der Toleranzwahl. Weiter offen bleiben:
+die GDV-Position poolt fluviale und pluviale Ereignisse (2021 ist pluvial dominiert und trägt
+allein 56 % des Überschusses), sie misst versicherte statt gesamter Schäden, und das Normaljahr
+\(\bar{A}_{-t}\) ist ein Mittel, keine gemessene Trennung nach Jährlichkeit. Eine engere Prüfung
+verlangt Ereignis- statt Jahreswerte; sie ist nicht publiziert (§4.1).
 
 ### 4.6 Sanity-Band der Bundessumme
 
@@ -1305,7 +1361,7 @@ gekennzeichnet.
 | Baupreisanstieg 2023 → 2024 | 3 % (2,3–5,0 %) | **Abschätzung von KAP3**: gerundet aus den in B4 zitierten Jahresraten des Baupreisindex (3,2 %/3,3 %), Band wie B4; geht in \(\pi = 1{,}105/1{,}03\) ein (§4.2); Sensitivität: \(\pi\) = 1,080 bei 2,3 %, 1,052 bei 5,0 % |
 | Betroffenheit exponierter Gebäude | 1/100 a | **Abschätzung von KAP3**, Herleitung §4.6 (mittlere Betroffenheit auf Bemessungsniveau HQ100); geht linear in \(O\) ein |
 | Plausibilitätsschranke \(\lambda\) | 0,50 bzw. 2,00 | **Abschätzung von KAP3** (Faktor 2 um den Neutralwert 1), §4.4; gilt für den Zentralwert einer Neubestimmung; die Fenster-Sensitivität in §4.1a prüft die Schranke an vier \(\lambda\)-Werten, drei davon innerhalb; die Herleitung aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) steht aus (Ledger, Befund 36) |
-| Toleranz Verteilungsprüfung | ±15 Prozentpunkte | **Abschätzung von KAP3**, Herleitung §4.5 (±2,3 modellseitig + ±12,5 ankerseitig) |
+| Toleranz Verteilungsprüfung | ±11,5 Prozentpunkte | **berechnet**, Herleitung §4.5: quadratische Zusammensetzung aus Jackknife-Standardfehler der Ankerreihe ±11,2 (gerechnet aus `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), Ableseunschärfe ±1,7 und modellseitigem HQextrem-Band ±2,3; **Abschätzung von KAP3** ist daran nur die Wahl der Kombinationsregel (unabhängige Beiträge, quadratisch), vorab festgelegt. Ist-Ergebnis: Abstand 13,9 Pp, **Prüfung nicht bestanden** (Modellentscheid §4.5) |
 | \(U\) Sanity-Untergrenze | 0,639 Mrd. €₂₀₂₆/a | **berechnet** aus Anker und Bestandsanteilen, Herleitung §4.6; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(\varphi_{\text{fluss}}\) und \(\pi\) ein |
 | \(O\) Sanity-Obergrenze | 2,26 Mrd. €₂₀₂₆/a | **berechnet** aus Bestandswert, Deckelquote und 1/100 a, Herleitung §4.6; es fließen die Abschätzungen von KAP3 Betroffenheit 1/100 a und Deckelquote 0,250 (§3.3) ein |
 | \(f_{\text{AWM}}\) Alterswertminderungsfaktor (Zeitwertansatz, nur Sensitivität) | 0,55 (0,40–0,75) | **Abschätzung von KAP3** auf der Regel § 38 ImmoWertV (RND/GND, GND 80 a nach Anlage 1), Herleitung §7.2; geht nicht in den Basiswert ein; Sensitivität: K3-Betrag 0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a |
@@ -1348,9 +1404,33 @@ def regime(p_extrem):
 anteil = regime((5.0e-3 * 1.0e-3) ** 0.5)
 assert abs(anteil - 0.339) < 5e-4
 assert abs(regime(1.0e-3) - 0.324) < 5e-4 and abs(regime(5.0e-3) - 0.369) < 5e-4
-anker = (2.6 - A_ver) / 2.6                              # Abstand des Jahres 2024 zum Fenstermittel
-assert abs(anker - 0.293) < 5e-4
-assert abs(anker - anteil) * 100 < 15.0                  # Toleranz vorab: 15 Prozentpunkte
+# Ankerseite: Jahresauslassung (Leave-one-out) ueber die 23 Jahreswerte
+# docs/evidenz/60_gdv_jahresreihe_2002_2024.csv, Spalte wert_mrd_eur (2002 ... 2024)
+reihe = [7.4, 0.5, 0.4, 0.9, 0.9, 1.0, 0.9, 0.68, 1.5, 1.1, 0.4, 3.9,
+         1.2, 0.3, 2.0, 0.7, 1.0, 0.5, 0.4, 12.6, 0.3, 1.1, 2.6]
+assert len(reihe) == 23 and abs(sum(reihe) / 23 - A_ver) < 5e-4   # Mittel = Anker aus 4.1
+def loo_anteil(werte):                                   # Erwartungswertanteil ueber dem Normaljahr
+    s, m = sum(werte), len(werte)
+    return sum(max(0.0, x - (s - x) / (m - 1)) for x in werte) / s
+anker = loo_anteil(reihe)
+assert abs(anker - 0.4774) < 5e-4
+assert abs(loo_anteil([3.0 * x for x in reihe]) - anker) < 1e-12   # skaleninvariant: kein Niveau
+# Toleranz vorab: Jackknife-Streuung + Ableseunschaerfe + Modellband, quadratisch (4.5)
+repl = [loo_anteil(reihe[:i] + reihe[i + 1:]) for i in range(23)]
+mittel = sum(repl) / 23
+se = (22 / 23 * sum((x - mittel) ** 2 for x in repl)) ** 0.5 * 100
+assert abs(se - 11.16) < 5e-2
+def versetzt(vz):                                        # +-0,05 Mrd. EUR je Balken, unguenstigstes Muster
+    s = sum(reihe)
+    return [max(0.0, x + vz * 0.05) if x > (s - x) / 22 else max(0.0, x - vz * 0.05)
+            for x in reihe]
+ablese = max(abs(loo_anteil(versetzt(1)) - anker), abs(loo_anteil(versetzt(-1)) - anker)) * 100
+assert abs(ablese - 1.73) < 5e-2
+toleranz = (se ** 2 + ablese ** 2 + 2.3 ** 2) ** 0.5
+assert abs(toleranz - 11.5) < 5e-2
+# Ergebnis: Abstand groesser als die Toleranz -> Pruefung nicht bestanden (Modellentscheid 4.5)
+abstand = abs(anker - anteil) * 100
+assert abs(abstand - 13.88) < 5e-2 and abstand > toleranz
 
 # 4.6 Sanity-Band und Lage der kalibrierten Bundessumme
 U = A_ver * w_wg * phi * pi
@@ -1486,16 +1566,22 @@ Bandende.
 \(s_{\text{bem}}\) wird als **kommunenweiter Pauschalfaktor** geführt (Modellgrenze 1 in §5.1.2),
 seine Bandgrenze muss also für den Durchschnitt der Schadenssumme gelten, nicht für eine Zelle. Den
 einzigen zellunabhängigen Messwert für den Anteil des seltenen Regimes liefert die **Ankerseite**
-der Verteilungsprüfung in Abschnitt 4.5: Der Überschuss des Großereignis-Jahres 2024 über das
-langjährige Mittel beträgt 1,0/2,6 = 38,5 % der Jahressumme (GDV-Naturgefahrenstatistik, §4.1).
-Auf die Ereignisse unterhalb des seltenen Regimes entfallen damit 1 − 0,385 = 0,615 der
-Schadenssumme. Weil \(s_{\text{bem}}\) nach der Ungleichung oben nicht über diesem Anteil liegen
-kann, setzt KAP3 die **obere Bandgrenze auf 0,62** (0,615 auf zwei Stellen gerundet). Diese Grenze
-ist eine **Abschätzung von KAP3 (§3.9)**, keine harte Grenze: Sie erbt die in §4.5 genannten
-Grenzen des Ankerwerts (ein Ereignisjahr, gepoolte fluviale und pluviale Schäden, „Überschuss über
-dem Mittel“ ≈ „Beitrag des seltenen Regimes“, ankerseitige Unschärfe ±12,5 Prozentpunkte), und
-einzelne Kommunen mit tiefem Auenprofil können darüber liegen (Illustration oben: 0,856). Das ist
-eine Modellgrenze des Pauschalfaktors, nicht der Kette. Die untere Bandgrenze 0,30 bildet die
+der Verteilungsprüfung: Der Überschuss des Großereignis-Jahres 2024 über das langjährige Mittel
+beträgt 1,0/2,6 = 38,5 % der Jahressumme (GDV-Naturgefahrenstatistik, §4.1). Auf die Ereignisse
+unterhalb des seltenen Regimes entfallen damit 1 − 0,385 = 0,615 der Schadenssumme. Weil
+\(s_{\text{bem}}\) nach der Ungleichung oben nicht über diesem Anteil liegen kann, setzt KAP3 die
+**obere Bandgrenze auf 0,62** (0,615 auf zwei Stellen gerundet). Diese Grenze ist eine
+**Abschätzung von KAP3 (§3.9)**, keine harte Grenze: Sie stützt sich auf ein Ereignisjahr, auf
+gepoolte fluviale und pluviale Schäden und auf die Gleichsetzung „Überschuss über dem Mittel“ ≈
+„Beitrag des seltenen Regimes“, und einzelne Kommunen mit tiefem Auenprofil können darüber liegen
+(Illustration oben: 0,856). Das ist eine Modellgrenze des Pauschalfaktors, nicht der Kette.
+**Nachtrag dieser Revision (nicht still nachgezogen):** Die Ankerseite von §4.5 ist mit
+Ledger-Befund 33 auf eine Jahresauslassung über die Reihe 2002–2024 umgestellt und liefert dort
+jetzt 47,7 % statt der hier verwendeten 38,5 % aus dem Einzeljahr 2024; die obere Bandgrenze läge
+mit dem neuen Wert bei 1 − 0,477 = 0,52 statt 0,62. Der Nachzug betrifft \(s_{\text{bem}}\),
+\(r_{\text{S092}}\) und alle davon abhängigen Stellen (Kap. 1, Kap. 2, §3.5, §5.1.1, §5.1.2,
+Kap. 7) und wird deshalb nicht in diesem Paket vollzogen, sondern ist im Ledger als Restpunkt
+vermerkt. Die untere Bandgrenze 0,30 bildet die
 Fehlerrichtung ab (nächster Absatz).
 
 **Folge für das Band.** \(s_{\text{bem}}\) = 0,50 (Band **0,30–0,62**) und daraus
