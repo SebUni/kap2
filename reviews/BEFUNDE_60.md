@@ -1419,9 +1419,9 @@ A^{*}/M_0\):
 | 2002–2024 ohne 2021 | 1,349 · 0,615865 = 0,831 | 0,831 / 1,360 = **0,611** |
 | 2014–2024 ohne 2021 | 1,010 · 0,615865 = 0,622 | 0,622 / 1,360 = **0,457** |
 
-Alle vier λ-Werte liegen innerhalb der Plausibilitätsschranke [0,50; 2,00] aus §4.4 — bis auf das
-kürzeste Fenster (0,457 < 0,50), was Grund (b) für die Wahl des Hauptfensters ist. Das
-Hauptfenster liefert \(\lambda\) = 0,832 und liegt damit **höher** als das bisher im Bericht
+**Drei der vier** λ-Werte liegen innerhalb der Plausibilitätsschranke [0,50; 2,00] aus §4.4; nur
+das kürzeste Fenster (0,457) unterschreitet sie mit 0,457 < 0,50 — genau das ist Grund (b) für die
+Wahl des Hauptfensters. Das Hauptfenster liefert \(\lambda\) = 0,832 und liegt damit **höher** als das bisher im Bericht
 gesetzte \(\lambda\) = 0,724 (Befund 32, T-0311–T-0313): Der bisherige Wert beruhte auf
 \(A_{\text{ver}}\) = 1,6 (Einzeljahr-Rundung 2024), nicht auf dem Kleinste-Quadrate-Mittel der
 Reihe. Diese Verschiebung wird hier festgehalten, nicht in den Bericht gezogen — das macht Paket 3.
@@ -1429,19 +1429,33 @@ Reihe. Diese Verschiebung wird hier festgehalten, nicht in den Bericht gezogen �
 **(e) Neues Band von A_ver (Vorgabe P1).** Das bisherige Band 1,4–1,8 Mrd. € stammte allein aus der
 Rundungsformulierung „rund eine Milliarde mehr" des Einzeljahres 2024 und entfällt mit der
 Kleinste-Quadrate-Bestimmung aus (a) — es beschreibt keine Unsicherheit des jetzt verwendeten
-Mittelwerts. Herleitung des neuen Bands: Die einzige mit dem Hauptfenster bereits methodisch
-verbundene, nicht neu erfundene Unsicherheit ist die aus (b) beschriebene Empfindlichkeit gegenüber
-dem einen dominanten Ausreißerjahr 2021 (12,6 Mrd. €, mehr als das Fünffache des zweithöchsten
-Jahreswerts) **bei unveränderter Fensterlänge** — also der Unterschied zwischen den beiden bereits
-gerechneten 23-Jahre-Varianten in (c): mit 2021 (1,838) und ohne 2021 (1,349). Das ergibt das neue
-**Band \(A_{\text{ver}}\) = 1,349–1,838 Mrd. €₂₀₂₆-Preisstand-2024** um den Zentralwert 1,838
-(Zentralwert = Hauptfenster nach Auswahlregel (b), Untergrenze = dieselbe Reihe ohne den
-Ausreißer 2021). Die Fensterlängen-Sensitivität (2014–2024, mit und ohne 2021) ist bewusst **nicht**
-Teil dieses Bands, weil sie laut (b) eine andere Auswahlregel wäre, nicht eine Unsicherheit
-innerhalb der geltenden Regel; sie bleibt als eigenständig ausgewiesene Sensitivität in (c)/(d)
-stehen. Das Band ist damit nach P1 hergeleitet (kein Parameter ohne ausgewiesene Herleitung) und
-enger als die zuvor über die volle Fenster-Bandbreite denkbare Spanne, weil es die durch (b)
-ausdrücklich verworfene Fensterlängen-Wahl nicht mit einrechnet.
+Mittelwerts. **Korrektur einer vorherigen Fassung dieses Abschnitts:** Dort stand als Begründung,
+2021 (12,6 Mrd. €) sei „mehr als das Fünffache" des zweithöchsten Jahreswerts. Das ist falsch — der
+zweithöchste Wert der Reihe ist 2002 mit 7,4 Mrd. €, das Verhältnis beträgt 12,6/7,4 = 1,7. Diese
+Zahl ist hiermit richtiggestellt; die auf ihr aufgebaute Begründung, weshalb ausgerechnet nur 2021
+und nicht auch 2002 aus der Reihe genommen wird, trägt damit nicht mehr.
+
+Herleitung des neuen Bands: Statt ein einzelnes Jahr freihändig als „der" Ausreißer zu benennen,
+wird ein **benannter, uniform auf die gesamte Hauptfenster-Reihe angewandter Ausreißertest**
+verwendet — die Tukey-Fence (Whisker-Regel des Boxplots), die keine Kenntnis des Ergebnisses
+voraussetzt und deshalb zur Auswahlregel aus (b) passt. Aus der sortierten 23-Jahre-Reihe:
+\(Q_1\) = 0,5, \(Q_3\) = 1,5, \(IQR = Q_3 - Q_1\) = 1,0 (Mrd. €). Werte oberhalb
+\(Q_3 + 3 \cdot IQR\) = 4,5 Mrd. € gelten in dieser Regel als „extreme Werte". Das trifft auf
+**zwei** Jahre zu, nicht auf eines: **2002** (7,4) und **2021** (12,6). Das Jahr 2013 (3,9) liegt
+zwischen der milden Schwelle \(Q_3 + 1{,}5 \cdot IQR\) = 3,0 und der extremen Schwelle 4,5 und
+bleibt damit in der Reihe. Derselbe, ergebnisunabhängige Test liefert also zwei auszuschließende
+Jahre statt eines: Die Untergrenze des Bands ist das Mittel der 21 verbleibenden Jahre ohne 2002
+und 2021 = **1,061** Mrd. €; die Obergrenze bleibt der Zentralwert des Hauptfensters (alle 23
+Jahre) = **1,838** Mrd. €. Damit ergibt sich das neue
+**Band \(A_{\text{ver}}\) = 1,061–1,838 Mrd. €₂₀₂₆-Preisstand-2024** um den Zentralwert 1,838.
+
+Dieses Band ist von der Fenster-Sensitivität aus (c)/(d) zu unterscheiden: Dort wird bei fester
+Auswahlregel gezielt die Fensterlänge variiert bzw. nur 2021 herausgerechnet, um die in Befund 34
+verlangte Sensitivität je Zeitfenster offenzulegen (keine Bandbreite des Zentralwerts) — die dort
+verwendeten 1,349 (2002–2024 ohne 2021) sind deshalb bewusst nicht mit dem hier hergeleiteten
+1,061 (2002–2024 ohne 2002 und 2021, nach dem Ausreißertest) zu verwechseln. Das Band ist damit
+nach P1 hergeleitet (kein Parameter ohne ausgewiesene Herleitung) und beruht auf einem uniform
+angewandten, benannten Test statt auf einer freihändigen Auswahl eines einzelnen Jahres.
 
 **Status.** Befund 34 bleibt **offen**. Dieses Paket schreibt bewusst nur ins Ledger: der Bericht
 (§4.1, §4.2, §4.4, Kap. 7, Kopf-Statuszeile) und der Lint werden in Schritt 3 nachgezogen, Schritt 4
