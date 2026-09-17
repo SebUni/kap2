@@ -1237,3 +1237,101 @@ besteht**. Am 17.09.2026 ausgeführt: Exit 0.
   Bericht, Register, Code, Lint und Arbeitsmappen: `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`
   und `docs/evidenz/register.md` sind byte-gleich (SHA-256 vor und nach dem Paket verglichen).
   `backend/scripts/lint_methodik.py` wurde nur gelesen, nicht ausgeführt.
+
+### 6 · Paket T-0276 — Regression der Befunde 11 bis 19 und Konvergenz-Verdikt der Runde 2
+
+Siebtes und letztes Paket der Runde 2 (17.09.2026). Die Sitzung arbeitet nach
+`.claude/commands/review-methodik.md`. Eiserne Regel 4: Diese Sitzung hat keinen der geprüften
+Umsetzungsnachweise geschrieben (die Revisionen stammen aus T-0235…T-0243 und T-0256…T-0259, alle im
+Endstatus) und keine der Leitfragen dieser Runde beantwortet. **Dieses Paket beantwortet keine
+Leitfrage aus §5 und gibt zu keiner Leitfrage ein Verdikt ab.** Es beurteilt, ob die Befunde 11–19
+heute geschlossen sind, und liest danach das Konvergenz-Verdikt nach §5.4 aus diesem Abschnitt ab.
+Die Zeilennummern beziehen sich auf den Bericht mit SHA-256 `b8bde6ac…c65e4` und auf
+`docs/evidenz/register.md` mit SHA-256 `b2c96697…58575` (beide Stand 17.09.2026, vor und nach dem
+Paket gleich).
+
+**Prüfweise.** Jeder Umsetzungsnachweis wurde am Ist-Stand nachgelesen, nicht abgeschrieben. Die
+Befunde 13, 14, 15 und 17 haben einen Prüfausdruck; alle vier wurden am 17.09.2026 aus der
+Befundtabelle ausgeführt und endeten mit Exit 0. Der Ausdruck zu Befund 13 prüft nichts
+(`b.count('"')//2>=0` ist immer wahr); die Zählung wurde deshalb eigens am Code nachgerechnet
+(`ast.literal_eval` des Eintrags `kwra_id: 60` in `backend/app/data/catalog.py`: 5
+`sensitivity_names`, 5 `upstream_names`). Die Befunde 11, 12, 16, 18 und 19 haben keinen
+Prüfausdruck und wurden zeilenweise gelesen. Wie im Paket zu den Befunden 1–10 gilt: Hat ein
+Geschwisterpaket dieser Runde die Substanz einer Schließung schon widerlegt, verweist das Urteil
+auf dessen Befund, statt ihn zu doppeln. Für die Befunde 17 und 19 (Status „offen", kein
+Umsetzungsnachweis) kennt die Urteilsskala kein eigenes „nicht geschlossen"; sie stehen auf
+„unvollständig geschlossen", und die Begründung sagt ausdrücklich, dass keine Schließung
+stattgefunden hat.
+
+Der Lint wurde zur Beurteilung von Befund 17 erneut ausgeführt (nur ausgeführt, nicht geändert).
+Ausgabe von `python3 backend/scripts/lint_methodik.py 60` am 17.09.2026, wörtlich, Exit 0:
+
+```
+=== #60 · 60_gebaeudeschaeden_flusshochwasser.md ===
+  115 Checks grün
+  Historie-Marker: 0 markierte Zeilen (Ratchet None), 0 gedeckte Fundstellen abgelöster Werte:
+
+ALLE LINTS GRÜN
+```
+
+#### 6.1 · Regression Runde 2 — Befunde 11 bis 19
+
+| Befund | Urteil | Fundstelle | Begründung |
+|---|---|---|---|
+| 11 | unvollständig geschlossen | `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Kap. 8 „Quellen (§3.8)" Z. 1452–1492: Formatsatz Z. 1454–1460, Quelle 1 Z. 1462–1469, Quelle 2 Z. 1470–1476, Quelle 3 Z. 1477–1485, Punkt 4 Z. 1486–1489 | Die drei beim Befund vorhandenen Quellen sind nachgezogen: Die beiden Arbeitsmappen tragen Commit-Hash, Datum, SHA-256 und Zugriffsdatum 13.09.2026 (Z. 1465–1476), die Hochwasserschutzfibel Vollzitat, URL, Archiv-Snapshot (`web.archive.org`, Z. 1481) und Zugriffsdatum (Z. 1482), wörtlich aus `sources.py`. Kap. 8 enthält jetzt 3 `http`-Angaben statt 0. Vollständig sind die Pflichtangaben nach §3.8 im Quellenkapitel aber nicht: Punkt 4 (Z. 1486–1489) delegiert alle Evidenzquellen an die Langbelege B1–B6 und nennt als Format selbst nur „Vollzitat, DOI/URL, Zugriffsdatum", ohne Archiv-Snapshot; die Quelle des nationalen Ankers (GDV) fehlt in Kap. 8 ganz (Befund 42), und Quelle 2 listet die zitierten Zellen unvollständig (Befund 43 b). Die Fibel ist für #60 nicht im Volltext geprüft, geht aber ausdrücklich in keinen Wert ein (Z. 1459–1460, 1484–1485); das genügt §3.8. Kein neuer Befund. |
+| 12 | unvollständig geschlossen | `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Kap. 1 „Konto-Einbettung" Z. 120–151: Kostensatz-Typ Z. 124–125, Preisstandjahr Z. 129–135, R5-Entscheidung Z. 136–147 · §3.5 Zeichentabelle Z. 689 (\(n_t\)) · `KWRA-Monetarisierung.xlsx`, Blatt „Schadenskonten-System" C27, Blatt „Risiken-Monetarisierung" J64/J65 | Zwei der drei Teile sind erledigt. **R5** ist mit wörtlichem Zitat (Rechenregeln Z7, Konten Z26, Mon. Z64) als „übernommen" entschieden, samt Begründung, warum die Regelspalte Mon. Z65 sie nicht nennt (Z. 136–147). **Preisstandjahr** 2026 ist als Abschätzung von KAP3 mit Herleitung und Ersetzungspfad ausgewiesen (Z. 129–135). Der **Kostensatz-Typ** ist dagegen nicht festgelegt: Z. 124–125 zitiert nur die Mappe („Wiederherstellungs-/Zeitwertkosten"), während das Modell mit NHK-Neuwerten rechnet (Z. 689) und den über J65 → J64 vorgeschriebenen Zeitwertansatz weder übernimmt noch als Fortschreibung führt (Befund 41). Außerdem ist der Satz „Bis ein K3-eigener Kostensatz mit Quelle vorliegt (Kap. 3/7), wird das Erstellungsjahr … gesetzt" (Z. 132–134) überholt: \(n_t\) = 1.950 / 1.533 €₂₀₂₆/m² BGF steht mit Quelle in §3.5 Z. 689, ein Parameter-Block mit Pflichtfeld `preisstand` fehlt aber (Befund 40). Kein neuer Befund. |
+| 13 | bestätigt geschlossen | `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Kap. 1 „W-Knoten" Z. 44–58, besonders Z. 50–56; Entscheidungslog Nr. 1 Z. 1587 und Nr. 6 Z. 1592 · `backend/app/data/catalog.py` Z. 335–340 · `KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt „Klimawirkungsketten" F272/H272 | Die falsche Behauptung „genau die Namenslisten" ist ersetzt durch „**nicht** genau …, sondern nur eine **Teilmenge mit abweichender Namensquelle**" (Z. 50–52). Die Zahlen treffen zu: Nachgerechnet trägt `catalog.py` Z. 339 fünf `sensitivity_names` (S096 und S098 fehlen) und Z. 338 fünf `upstream_names`; W117 führt nach F272/H272 sieben Sensitivitäten und acht Wirkungs-Eingänge (in 0.2, Stichprobe 2 und Bilanzumfang, bestätigt). Die Divergenz steht als Integrationspunkt im Entscheidungslog Nr. 6 (Z. 1592); `catalog.py` ist unverändert (eiserne Regel 5). Prüfausdruck Exit 0, aber ohne Aussagekraft (siehe Prüfweise). Dass der Bericht selbst drei Knotennamen ungekennzeichnet kürzt, ist eigener Befund 21 und keine Divergenz zum Code. |
+| 14 | bestätigt geschlossen | `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Kap. 6 „Szenario-Anwendung & Modellgrenzen" Z. 1262–1321: Absatz „Szenario-Anwendung 60-A" Z. 1264–1286, Modellgrenzen 1–8 Z. 1288–1313, Infokasten-Texte Z. 1315–1321 | Alle verlangten Bestandteile stehen da: die verschobene Größe (FS-Hazard, Z. 1264–1269), die konstant gehaltenen Größen (S074, R24, \(d(h)\) mit S093/S094, S092; Z. 1269–1273), zwei nummerierte Stationaritätsannahmen (Z. 1273–1278) und die Bestandsdynamik S104 (Z. 1278–1286); die nummerierte Modellgrenzen-Liste mit der Untergrenzen-Aussage K1/K4/K5/K8 als Punkt 1 (Z. 1290–1292); die drei wörtlichen Infokasten-Texte „bewerteter Schaden — Konto K3", „Stufe M0: 1 von 8 Konten aktiv" und „berechnet mit Modellstand M0 — Untergrenze" (Z. 1317–1321). Prüfausdruck Exit 0. Dass Modellgrenze 2 (Z. 1293) P2 der Vulnerabilitätsachse S094 zuordnet und die Bauform-Grenze des eigentlichen P2-Hebels S092 in Kap. 6 fehlt, ist eigener Befund 44 und nicht Gegenstand von Befund 14. |
+| 15 | bestätigt geschlossen | `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Kap. 7 „Parameter-Blöcke" Z. 1323–1409 (Blöcke `flood_bldg.dq_s092` Z. 1349, `flood_bldg.s_bem` Z. 1363, `flood_bldg.e_bem` Z. 1379, `flood_bldg.r_s092` Z. 1393) und §7.1 „Antrag auf Fortschreibung des §4-Wertebereichs" Z. 1410–1451 | Beide Teile des Befunds sind umgesetzt. (1) Vorgabe P1: Alle vier Blöcke tragen `kennzeichnung:` mit zugelassenem Wert, `herleitung_anker:` auf einen im sichtbaren Text gesetzten Anker (`#s092-wirkung`, `#s-bem-naeherung`) und `wertebereich_abweichung: "#fortschreibung-endpunkt-k3"`; die Kennzeichnung steht nicht mehr als YAML-Kommentar, sondern als Feld, und die Herleitung liegt im Berichtstext. (2) Die Überschreitung von `endpunkt`/`bandzuordnung` ist in §7.1 mit Begründung und Datum 13.09.2026 als Antrag auf Fortschreibung ausgewiesen statt still überstimmt. Prüfausdruck Exit 0. Nicht Gegenstand von Befund 15 und eigens verbucht: Für alle übrigen Parameter, insbesondere die Kostensätze, fehlen Blöcke (Befund 40, A), und §7.1 belegt den Endpunkt mit der falschen Zelle C28 (Befund 43 a). |
+| 16 | bestätigt geschlossen | `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Kap. 9 „Ansatz-Vergleich" Z. 1494–1582: „Die drei verglichenen Ansätze" ab Z. 1515, „Kriterienraster" Z. 1535–1545 (Zeilen Z. 1539–1545), „Umsetzungsgrundlage" ab Z. 1547; Kopf Z. 4–5; Entscheidungslog Nr. 5 | Die Ansätze (b) aggregierte Flächenschadensrate und (c) Schadensgradmodell am Einzelgebäude sind benannt, das Raster hat sieben Kriterienzeilen × drei Ansätze = 21 bewertete Zellen (Z. 1539–1545) ohne „offen", und (a) ist mit Begründung als Umsetzungsgrundlage gewählt (ab Z. 1547), nachgezogen im Kopf (Z. 4–5) und im Entscheidungslog Nr. 5. Damit ist der Befund („Raster offen, (b)/(c) nicht benannt, Umsetzungsgrundlage offen") geschlossen. Inhaltliche Mängel des gefüllten Rasters sind eigene Befunde: Die Zellen „Datenverfügbarkeit" (Z. 1542) und „Aufwand" (Z. 1545) für (a) widersprechen §3.2 (Befund 45), und die Zelle „Maßnahmen-Anschluss" behauptet eine R7-Weiche, die in der Formel fehlt (Befund 20). |
+| 17 | unvollständig geschlossen | `backend/scripts/lint_methodik.py` (ganze Datei; Suche nach `Pflichtkapitel` 0 Treffer, `<!--` nur Z. 74 als `HISTORIE_MARKER`) · Lint-Ausgabe oben in Paket 6 und in 0.1 · gegen Bericht Kap. 3/4/6 | **Keine Schließung erfolgt** — Status „offen", kein Umsetzungsnachweis; der Befund gehört T-0234. Der Lint meldet heute „115 Checks grün" statt 83, prüft aber weiterhin keine Pflichtkapitel-Vollständigkeit außerhalb von HTML-Kommentaren: Das Wort `Pflichtkapitel` kommt in der Datei nicht vor, und HTML-Kommentare kennt sie nur als Historie-Marker (Z. 74), nicht als Ort verbotener Formulierungen. Eine Zählung übersprungener Checks gibt die Ausgabe nicht aus. Der Prüfausdruck endet mit Exit 0, weil heute jedes Kapitel des **Berichts** über 200 Zeichen trägt — er misst die Revision des Berichts, nicht die Lücke im Lint. Der Anlass (leere Kapitel bei grünem Lint) ist durch die Füllung der Kapitel entschärft; die Lücke im Werkzeug besteht fort. Kein neuer Befund. |
+| 18 | bestätigt geschlossen | `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Kap. 2, Registerzeile 60-S092-01 Z. 182, Spalte „Entscheidung"; Kopf „Geltungsbereich" Z. 17–21; Kap. 7 Z. 1323–1409 · `docs/evidenz/register.md` Z. 65, letzte Spalte | Die Spalte „Entscheidung" trägt jetzt „**Maßnahmen-Hebel (abgeschätzt)** — FS-Vorsorge" (Z. 182) statt „offen (Vorschlag: …)"; die Parameter-Blöcke in Kap. 7 leiten also aus einer entschiedenen Zeile ab (§2.2). Die Kennzeichnung „§3.9 ABGESCHÄTZT" und die Modellgrenze „kommunal (Pauschalfaktor — Modellgrenze der Abschätzung)" stehen in derselben Zeile (Vorgabe P2). Der Kopf widerspricht nicht mehr: Er führt 60-S092-01 unter den sieben entschiedenen Zeilen und nur „die übrigen 25" als offen (Z. 17–21). Die Spiegelung `register.md` Z. 65 trägt dieselbe Entscheidung. Dass die Spalte Studientyp dieser Zeile Thieken u. a. 2008 als „nicht verifiziert" führt, ist eigener Befund 29. |
+| 19 | unvollständig geschlossen | `docs/evidenz/register.md` Z. 65 (Zeile 60-S092-01, Spalte Effektgröße: „Band 0,0075–0,112") · gegen `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Z. 182, §3.5 Z. 694, §5.1.1 Z. 1138, §5.1.2 Z. 1165, §5.1.3 Z. 1217, Entscheidungslog Nr. 3 Z. 1589 (jeweils „0,0075–0,1056") | **Keine Schließung erfolgt** — Status „offen", kein Umsetzungsnachweis. Die Divergenz besteht unverändert: `register.md` Z. 65 führt am 17.09.2026 weiter „Band 0,0075–0,112", der Bericht an allen genannten Stellen 0,0075–0,1056. Kein Lint liest `register.md`; die Divergenz fällt also weiterhin nur beim Lesen auf. Die Datei wurde nur gelesen und ist byte-gleich. Für Vorgabe P2 ist das erheblich, weil `register.md` die Bandbreite der Abschätzung von KAP3 risikoübergreifend spiegelt. Hinweis für die Revision: Das Bandende 0,1056 hängt an der Einzelzellen-Obergrenze 0,661, die Befund 26 bestreitet; ein Nachzug in `register.md` sollte deshalb erst nach der Entscheidung zu Befund 26 erfolgen. Kein neuer Befund. |
+
+**Zählung:** bestätigt geschlossen 5 (13, 14, 15, 16, 18) · unvollständig geschlossen 4 (11, 12, 17,
+19; davon 17 und 19 ohne jede Schließung) · zurückgefallen 0. Keine spätere Revision hat einen der
+Befunde 11–19 auf einen früheren Stand zurückgesetzt. Die Kurzform-Tabelle „Offene Befunde" am Kopf
+und die Statusspalten bleiben unverändert; ob die Status fortgeschrieben werden, entscheidet die
+Revision (T-0245).
+
+#### 6.2 · Neue Befunde dieses Pakets (keine)
+
+Das Ticket nennt 20 als erste freie Nummer; das war der Stand beim Ticketschnitt. Die vorlaufenden
+Pakete dieser Runde haben die Nummern 20–46 vergeben, die nächste freie Nummer wäre **47**. Dieses
+Paket vergibt **keine** neue Nummer: Jede bei der Regression gefundene Lücke ist bereits als Befund
+dieser Runde verbucht (20, 21, 26, 29, 40, 41, 42, 43, 44, 45) oder ist der unveränderte Fortbestand
+der Befunde 17 und 19.
+
+#### 6.3 · Abgrenzung und Status dieses Pakets
+
+- **Beurteilt:** die Befunde 11–19, je genau ein Urteil mit Fundstelle (Datei plus Kapitel und
+  Zeilennummer, bei den Befunden 12 und 13 zusätzlich Blatt und Zelle der Arbeitsmappe).
+- **Nicht Gegenstand dieses Pakets:** jede Leitfrage aus §5 (null Leitfragen beantwortet, kein
+  Leitfragen-Verdikt). Für das Konvergenz-Verdikt werden die Leitfragen-Verdikte der Pakete T-0270
+  bis T-0274 nur abgezählt. Ein nationaler 100-m-Vollraster-Lauf nach §3.4 wurde nicht gefahren.
+- **Kein Befund behoben**, kein Status geändert. Nicht geändert wurden Bericht, Register, Code, Lint
+  und Arbeitsmappen: `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und
+  `docs/evidenz/register.md` sind byte-gleich (SHA-256 vor und nach dem Paket verglichen).
+  `backend/scripts/lint_methodik.py` wurde nur ausgeführt.
+
+#### 6.4 · Konvergenz-Verdikt der Runde 2 (§5.4)
+
+Abgelesen über den gesamten Abschnitt „Review-Runde 2" (Pakete T-0270 bis T-0276), nicht neu geprüft.
+
+- **Lints grün: ja.** Die in 0.1 wörtlich zitierte Ausgabe von `python3 backend/scripts/lint_methodik.py 60`
+  meldet „115 Checks grün" und „ALLE LINTS GRÜN", und der erneute Lauf in Paket 6 am 17.09.2026
+  ergibt wörtlich dieselbe Ausgabe mit Exit 0 (Reichweite eingeschränkt, siehe Befund 17 in 6.1).
+- **Alle 14 Leitfragen mit Verdikt beantwortet: ja.** Jede Leitfrage trägt genau ein ausdrückliches
+  Verdikt, alle „Befund": LF 1 und LF 14 in 0.2 (T-0270), LF 2, 3, 11 und 13 in 1.1 (T-0271), LF 5
+  und 6 in 2.1 (T-0272), LF 4, 7 und 8 in 3.2 (T-0273), LF 9, 10 und 12 in 4.2 (T-0274) — 2 + 4 + 2
+  + 3 + 3 = 14; die Pakete T-0275 und T-0276 geben keines ab.
+- **Neue A- oder B-Befunde in dieser Runde: ja.** In diesem Abschnitt sind die Befunde 20–46 neu
+  vergeben, davon vier A (20, 32, 33, 40) und zwölf B (22, 23, 26, 28, 34, 35, 36, 37, 39, 41, 42,
+  46), dazu elf C (21, 24, 25, 27, 29, 30, 31, 38, 43, 44, 45).
+- **Null-Runde: nein.** Die Tabellen 0.3, 1.2, 2.2, 3.3, 4.3 und 5.2 führen zusammen 16 neue A- oder
+  B-Befunde dieser Runde, und eine Null-Runde verlangt null.
+
+Folge nach §5.4/§6: Die Runde konvergiert **nicht**; damit ist auch die vierte Bedingung
+„Abnahmekriterien erfüllt" nicht gegeben, und der Bericht #60 ist nicht abnahmereif. Die vier
+A-Befunde blockieren die Abnahme, `/integriere-risiko 60` bleibt gesperrt. Das ist das Ergebnis der
+Runde, kein Mangel dieses Pakets; die Revision liegt bei T-0245, Runde 3 bei T-0246.
