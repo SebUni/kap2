@@ -1,6 +1,6 @@
 # Methodik-Bericht #60 — Schäden an Gebäuden aufgrund von Flusshochwasser
 
-Status: **Erstaufschlag (`/neu-risiko 60`) — noch nicht gegengeprüft** · 11.09.2026 ·
+Status: **in Revision nach Review-Runde 2** (Erstaufschlag 11.09.2026; Review-Runde 1 13.09.2026, Review-Runde 2 17.09.2026; Autor-Revision nach Runde 2 am 17.09.2026, Ledger `reviews/BEFUNDE_60.md`) · Stand 17.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz (a) — Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle**
 (entschieden im Ansatz-Vergleich Kap. 9; Entscheidungslog Nr. 5) · Familie: **K3/K4-Ereignisschäden — noch kein Prototyp, dieser Bericht ist
@@ -9,10 +9,12 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 > **Geltungsbereich.** Befüllt sind Kap. 1 (Wirkungskette, Knoten-Bilanz, Weitergaben, Konto) und
 > Kap. 2 (Evidenz-Register) aus den beiden Arbeitsmappen unter `docs/Schadensbaum/` und aus
 > volltextgeprüfter externer Evidenz (Langbelege B1–B6 unter der Registertabelle); befüllt ist
-> zudem Kap. 9 (Ansatz-Vergleich, entschieden mit T-0237) sowie Kap. 3 bis einschließlich der
-> Kernformel (native Ergebnisgröße, Datenebenen nach §3.1, Tiefen-Schadensfunktion, Schicht-B-Formel
-> auf Zellebene; T-0238). Kap. 4–8 tragen
-> die Pflichtinhalte als Kommentar. Die Knoten-Bilanz in Kap. 1 ist entschieden (32/32 Zeilen
+> zudem Kap. 9 (Ansatz-Vergleich, entschieden mit T-0237), Kap. 3 vollständig (3.1–3.7: native
+> Ergebnisgröße, Datenebenen, Tiefen-Schadensfunktion, Kernformel, Zeichentabelle, Aggregation,
+> Schicht-A-Index), Kap. 4 (Kalibrierung; der Niveau-Skalar \(\lambda\) ist **vorläufig**, siehe
+> Einleitung Kap. 4), Kap. 5 (Hebel S092), Kap. 6 (Modellgrenzen), Kap. 7 (Parameter-Blöcke aller
+> rechnenden Parameter) und Kap. 8 (Quellen). Die Formelstelle FS-Schutzsystem (R7-Weiche mit #50)
+> ist inaktiv geparkt (§3.4). Die Knoten-Bilanz in Kap. 1 ist entschieden (32/32 Zeilen
 > tragen eine Formelstelle oder `inaktiv` mit Zitat). Im Evidenz-Register sind **sieben** der
 > 32 Zeilen belegt beziehungsweise entschieden: **60-W085-01** (Basiswert, Hazard),
 > **60-R24-01** (Basiswert, Mengengerüst), **60-S074-01** und **60-R17-01**
@@ -30,7 +32,7 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 - **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`. Davon **7 belegt bzw. entschieden** — 60-W085-01, 60-R24-01, 60-S074-01, 60-R17-01, 60-S093-01, 60-S094-01 und 60-S092-01 (Maßnahmen-Hebel, abgeschätzt) —, die **übrigen 25 stehen auf `offen`**.
 - **Entschieden (T-0237):** Ansatz-Vergleich Kap. 9 — Umsetzungsgrundlage ist Ansatz **(a)** (Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle); (b) aggregierte Flächenschadensrate bleibt als Ergänzungsmodul, (c) Schadensgradmodell am Einzelgebäude ist ausgeschieden.
 - **Entschieden (T-0238):** Kap. 3 bis zur Kernformel — native Ergebnisgröße (EAD in €₂₀₂₆/a, Ebene Kommune), vier Datenebenen nach §3.1 (drei „neu anzulegen", eine „geparkt"), Tiefen-Schadensfunktion und Schicht-B-Kernformel Menge × Rate × Preis je 100-m-Zelle.
-- **Offen:** (1) Zeichentabelle, Aggregation Zelle → Kommune und Schicht A in Kap. 3; (2) Kap. 4, 6, 8; (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
+- **Offen (Stand 17.09.2026, nach Review-Runde 2):** (1) Kalibrierung mit dem Produktionsmodell auf den Anker-Kommunen und eine out-of-sample-Verteilungsprüfung (Kap. 4, \(\lambda\) bis dahin vorläufig; offene Befunde im Ledger); (2) R7-Weiche mit #50 (FS-Schutzsystem, geparkt); (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
 - **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Planungszahl korrigiert, Beispiel-Code-Zaun im Kommentar entfernt; R2: Lint-Funde behoben, Zeichentabelle S092 als eigener Abschnitt, Verweis korrigiert). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: je rund 0,3 USD. Die Evidenz der sieben belegten Registerzeilen ist in eigenen Runden recherchiert und im Volltext geprüft (Quellen und Langbelege B1–B6 in Kap. 2).
 - **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
@@ -62,12 +64,12 @@ als Integrationspunkt für `/integriere-risiko 60` geführt (Entscheidungslog Nr
 **Entscheidungsstand (T-0235).** Spalte „rechnet in” trägt ab dieser Fassung je Zeile entweder eine
 der sieben benannten **Formelstellen**, an die Kapitel 3 die Größe künftig bindet, oder den Wert
 `inaktiv` mit einem wörtlichen Zitat aus `KWRA-Monetarisierung.xlsx` (Blatt und Zelle). Die
-Formelstellen sind **Namen, keine Formeln**: Kapitel 3 selbst bleibt unverändert im
-Kommentar-Zustand des Erstaufschlags und wird in einem eigenen Ticket nachgezogen — diese
-Zeile ist die Vorbedingung dafür, nicht der Formelbau selbst. Benannte Formelstellen: **FS-Hazard**
+Formelstellen sind **Namen, keine Formeln**: Kapitel 3 ist inzwischen ausgeschrieben (§3.1–§3.7);
+jede Zeile unten rechnet dort an einer Formelstelle, wirkt als Sensitivitätsband über eine andere
+Formelstelle oder ist ausdrücklich inaktiv geführt. Benannte Formelstellen: **FS-Hazard**
 (Eintrittswahrscheinlichkeit p(HQ) inkl. der Kein-Doppelkanal-Zuflüsse), **FS-Exposition**
 (Wassertiefe am Gebäude), **FS-Schadensgrad** (Wassertiefe-Schadensfunktion nach Bauart/Zustand),
-**FS-Mengengerüst** (Gebäudewerte/Bestand), **FS-Schutzsystem** (R7-Erwartungswert-Weiche mit #50),
+**FS-Mengengerüst** (Gebäudewerte/Bestand), **FS-Schutzsystem** (R7-Erwartungswert-Weiche mit #50 — **in dieser Fassung inaktiv, geparkt**: die Kernformel trägt den Term noch nicht, §3.4),
 **FS-Bestandsdynamik** (Kap. 6, Szenario-Dynamik des Bestands) und **FS-Vorsorge** (Maßnahmen-Hebel
 S092, bereits in §5.1 beziffert). Die Spalte „Vorschlag” bleibt unverändert als Beleg aus der
 Arbeitsmappe stehen; sie ist weiterhin keine eigene Entscheidung.
@@ -80,8 +82,8 @@ Arbeitsmappe stehen; sie ist weiterhin keine eigene Entscheidung.
 | E08 | Starkregen (direkt auf W117 und über W085) | KWK Z9 | **FS-Hazard** (Anteil über W085, kein eigener Faktor); direkter Kanal **inaktiv** — R9 (Rechenregeln Z11): „Innerhalb eines Kontos zählt jede Einheit (…Gebäude) genau einmal; verschiedene Konten desselben Ereignisses sind additiv.” i. V. m. Mon. Z64 (Nicht enthalten): „Flusshochwasserschäden (ID 60)” (#59 bucht den direkten Starkregen-Gebäudeschaden) | über W085 wie E12; direkter Gebäudeschaden durch Starkregen gehört zu #59 (Mon. Z64 „Sachschäden durch Starkregen/Rückstau”) — R9 |
 | S072 | Boden-/Vegetationsbedeckung (über W085) | KWK Z197 | **FS-Hazard** (enthalten im Hazard-Datensatz, kein eigener Faktor — Kein-Doppelkanal §3.2) | wirkt auf Abflussbildung in W085; bewusst inaktiv, falls der Hazard-Datensatz den Abfluss schon enthält (Kein-Doppelkanal) |
 | S073 | Flächenversiegelung (über W085) | KWK Z198 | **FS-Hazard** (enthalten im Hazard-Datensatz, kein eigener Faktor — Kein-Doppelkanal §3.2) | wie S072 |
-| S074 | Topographie (Geländeform, Höhe) (über W085) | KWK Z199 | **FS-Exposition** — Geländehöhe → Wassertiefe am Gebäude | Kandidat für die Zell-Exposition (Geländehöhe → Wassertiefe); Doppelkanal prüfen, falls HQ-Karten Wassertiefen bereits führen |
-| R17 | Vorkommen von Oberflächengewässer und Grundwasser (über W085) | KWK Z204 | **FS-Exposition** — Lackmustest §3.1: keine Flussaue → ~0 | Kandidat Exposition; Lackmustest §3.1: keine Flussaue → ~0 |
+| S074 | Topographie (Geländeform, Höhe) (über W085) | KWK Z199 | **Sensitivitätsband** (Kein-Doppelkanal §3.2; Register 60-S074-01/60-R17-01) — wirkt über FS-Hazard (Wassertiefe der Gefahrenkarte), keine eigene Formelstelle; früher: FS-Exposition — Geländehöhe → Wassertiefe am Gebäude | Kandidat für die Zell-Exposition (Geländehöhe → Wassertiefe); Doppelkanal prüfen, falls HQ-Karten Wassertiefen bereits führen |
+| R17 | Vorkommen von Oberflächengewässer und Grundwasser (über W085) | KWK Z204 | **Sensitivitätsband** (Kein-Doppelkanal §3.2; Register 60-S074-01/60-R17-01) — wirkt über FS-Hazard (Wassertiefe der Gefahrenkarte), keine eigene Formelstelle; früher: FS-Exposition — Lackmustest §3.1: keine Flussaue → ~0 | Kandidat Exposition; Lackmustest §3.1: keine Flussaue → ~0 |
 | R18 | Vorkommen von Abwasser- und Entwässerungssystemen (über W085) | KWK Z205 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)”; Mon. Z57 (Id 52, Spalte „Nicht enthalten”): „Gebäudeschäden durch Rückstau (ID 59).” | Rückstau gehört zu #59 (Mon. Z64), Kanalnetz zu #52 (K4) — voraussichtlich bewusst inaktiv |
 | R19 | Vorkommen von Infrastruktur an Binnengewässern (über W085) | KWK Z206 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” | Infrastruktur → K4 (K3-Definition, Konten Z28) — voraussichtlich bewusst inaktiv |
 | E10 | Hagel | KWK Z11 | **inaktiv** — keine Kante auf #60 (NW Z61 Input nur 49); Mon. Z65 (Spalte „Wird hier bepreist (enthalten)”): „Sachschäden flussseitiger Überflutung.” | keine Kante auf #60 (NW Z61 Input nur 49); Gegenstand Mon. Z65 „Sachschäden flussseitiger Überflutung” — voraussichtlich bewusst inaktiv |
@@ -99,9 +101,9 @@ Arbeitsmappe stehen; sie ist weiterhin keine eigene Entscheidung.
 | S092 | Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer | KWK Z256 | **FS-Vorsorge** — Maßnahmen-Hebel, bereits beziffert (§5.1: r_S092 = 0,035, Band 0,0075–0,1056, §3.9 Abgeschätzt) | Kandidat **Maßnahmen-Hebel** (Objektschutz); P2-Abschätzung §5.1 |
 | S093 | Zustand von Gebäuden und Infrastrukturen | KWK Z257 | **FS-Schadensgrad** — Vulnerabilität der Wassertiefe-Schadensfunktion (Mon. Z65) | Kandidat Vulnerabilität der Schadensfunktion; Evidenz und Zellgröße offen |
 | S094 | Verwendete Baumaterialien auf Gebäudeebene | KWK Z258 | **FS-Schadensgrad** — wie S093 | wie S093 |
-| S096 | Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand | KWK Z260 | **FS-Schutzsystem** — R7-Erwartungswert-Weiche mit #50 (Mon. Z65 Spalte „Regeln”: „R7, R9”; Rechenregeln Z9 R7) | Schutzsysteme über R7-Weiche mit #50 (Mon. Z65 „Schutzkosten (ID 50, R7)”; Z55) |
-| S097 | Zustand von (Schutz-)Infrastrukturen | KWK Z261 | **FS-Schutzsystem** — wie S096 (Versagensfall, Erwartungswert R7) | wie S096 (Versagensfall, Erwartungswert R7) |
-| S098 | Verwendete Baumaterialien von (Schutz-)Infrastrukturen | KWK Z262 | **FS-Schutzsystem** — wie S096 | wie S096 |
+| S096 | Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand | KWK Z260 | **inaktiv (geparkt: Formelstelle FS-Schutzsystem ohne Term in §3.4, Modul #50 fehlt)** — Ziel: R7-Erwartungswert-Weiche mit #50 (Mon. Z65 Spalte „Regeln”: „R7, R9”; Rechenregeln Z9 R7) | Schutzsysteme über R7-Weiche mit #50 (Mon. Z65 „Schutzkosten (ID 50, R7)”; Z55) |
+| S097 | Zustand von (Schutz-)Infrastrukturen | KWK Z261 | **inaktiv (geparkt: Formelstelle FS-Schutzsystem ohne Term in §3.4, Modul #50 fehlt)** — Ziel: wie S096 (Versagensfall, Erwartungswert R7) | wie S096 (Versagensfall, Erwartungswert R7) |
+| S098 | Verwendete Baumaterialien von (Schutz-)Infrastrukturen | KWK Z262 | **inaktiv (geparkt: Formelstelle FS-Schutzsystem ohne Term in §3.4, Modul #50 fehlt)** — Ziel: wie S096 | wie S096 |
 | S104 | Investitionen der Bau- und Immobilienwirtschaft in exponierten Gebieten | KWK Z268 | **FS-Bestandsdynamik** — Szenario-Dynamik des Gebäudebestands (Kap. 6) | Kandidat Szenario-Dynamik des Gebäudebestands (Kap. 6) |
 | R24 | Vorkommen von Gebäuden | KWK Z270 | **FS-Mengengerüst** — Gebäudewerte (Mon. Z65: „HQ-Szenarien × Schadensfunktionen × Gebäudewerte”) | **Mengengerüst** (Gebäudewerte, Mon. Z65) |
 | R23 | Vorkommen von Bau- und Immobilienunternehmen | KWK Z269 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” — Unternehmensschäden (Betriebsausfall der Bauwirtschaft) sind kein K3-Gebäudeschaden | laut W117-Anmerkung pauschal nach Regel 4 eingetragen; kein Bezug zu Gebäudeschäden — voraussichtlich bewusst inaktiv |
@@ -512,6 +514,7 @@ eigene Faktoren auf, sondern nur als Sensitivitätsbänder (±12 % aus dem DGM1-
 Register 60-S074-01; nationales Prüfband, Register 60-R17-01). Ebenso wirken Bodenbedeckung
 (S072) und Versiegelung (S073) ausschließlich über den Hazard-Datensatz.
 
+<a id="tiefen-schadensfunktion"></a>
 ### 3.3 Tiefen-Schadensfunktion \(d(h)\) — Stützstellen und Herleitung (P1)
 
 Die Schadensfunktion gibt die Schadensquote eines Gebäudes bei der Wassertiefe \(h\) an, also den
@@ -569,6 +572,7 @@ Als Sensitivitätsband der Schadensfunktion läuft deshalb der flachere Verlauf 
 die Stützstellen oben), zusätzlich zu den mittelwertzentrierten Achsen \(f_{S093}\) und
 \(f_{S094}\) mit ihrem gemeinsamen Band 0,71–1,40.
 
+<a id="kernformel-zelle"></a>
 ### 3.4 Kernformel auf Zellebene (Menge × Rate × Preis)
 
 **Schritt 1 — Menge × Rate: geschädigte Wohnfläche je Ereignis (physische Zwischengröße).**
@@ -614,6 +618,20 @@ KAP3** (§3.9, Herleitung in Register 60-R24-01: Verhältnis von Brutto-Grundfl�
 im Wohnungsbau, Band aus der Spannweite zwischen kompakten Mehrfamilien- und gegliederten
 Einfamilienbauten). Der Preis trägt die Zeitwert-Lesart als Band (Alterswertminderung nach
 ImmoWertV, B4), nicht als Glättung.
+
+**Formelstelle FS-Schutzsystem — in dieser Fassung inaktiv (geparkt).** Die Arbeitsmappe verlangt
+für #60 die Einbindung öffentlicher Schutzsysteme über die R7-Erwartungswert-Weiche
+(`KWRA-Monetarisierung.xlsx`, Blatt „Rechenregeln", C20 (A5): „Schutzsysteme über die
+R7-Erwartungswert-Weiche"; C9 (R7): „Erwartungswert über Halte- und Versagensfall,
+wahrscheinlichkeitsgewichtet"). Die Kernformel trägt diesen Term noch nicht: \(p_i\) wird unverändert
+aus den Szenarien der Gefahrenkarte übernommen, ohne Aufteilung in Halte- und Versagensfall. Die
+Knoten S096, S097 und S098 sind deshalb in Kap. 1 als inaktiv (geparkt) geführt; beziffert wird
+die Weiche erst mit dem Schutzsystem-Modul #50, das Halte- und Versagenswahrscheinlichkeiten
+liefert. **Modellgrenze:** Bis dahin rechnet \(\text{EAD}\) mit dem Schutzstand, den die
+Gefahrenkarte im jeweiligen Szenario abbildet; eine Änderung am Schutzsystem verändert das Ergebnis
+nicht, und Maßnahmen an öffentlichen Schutzanlagen haben in #60 keinen Hebel. Das ist keine
+Nullwirkung im Sinne von P2, sondern ein fehlender Anschluss: Die Wirkung wird im Modul #50
+abgeschätzt und nicht hier auf null gesetzt.
 
 **Lackmustest (§3.1).** Eine Kommune ohne Flussaue erhält in jedem Szenario \(a_{z,s} = 0\) für
 alle ihre Zellen, damit \(A_{z,s} = 0\), \(\bar A_z = 0\) und \(\text{EAD}_z = 0\) — ohne
@@ -686,7 +704,7 @@ tragen sie maschinenlesbar.
 | \(p_i\) (\(p_1\), \(p_2\), \(p_3\)) | jährliche Überschreitungswahrscheinlichkeit des Szenarios \(i\) | a⁻¹ | register: 60-W085-01 — \(p_1\), \(p_2\) belegt (Langbeleg B1); \(p_3\) herleitung: §3.4 Schritt 2, geometrisches Mittel der beiden Enden (Abschätzung von KAP3, §3.9) |
 | \(T\) | Wiederkehrintervall eines Szenarios, \(T = 1/p\); für \(p_3\) rund 447 a | a | herleitung: §3.4 Schritt 2 — Kehrwert der Jährlichkeit, nur zur Lesbarkeit ausgewiesen |
 | \(\theta_{z,t}\) | Anteil der Wohnfläche der Zelle, der auf den Gebäudetyp \(t\) entfällt; \(\sum_t \theta_{z,t} = 1\) | – | register: 60-R24-01 — Gebäudetyp des Zensus 2022 im 100-m-Gitter (§3.2) |
-| \(n_t\) | Wertsatz je Gebäudetyp: 1.950 (EFH/ZFH), 1.533 (MFH) | €₂₀₂₆/m² BGF | register: 60-R24-01 — NHK 2010 nach ImmoWertV Anlage 4, mit Baupreisindex auf den Preisstand 2026 fortgeschrieben (Langbeleg B4) |
+| \(n_t\) | Wertsatz je Gebäudetyp: 1.950 (EFH/ZFH), 1.533 (MFH) | €₂₀₂₆/m² BGF | register: 60-R24-01 — NHK 2010 nach ImmoWertV Anlage 4, mit Baupreisindex auf den Preisstand 2026 fortgeschrieben (Langbeleg B4); Umrechnungsfaktor NHK 2010 → Preisstand 2026: 1,6813 × 1,105 = **1,8578** (Blöcke `flood_bldg.n_efh_zfh` und `flood_bldg.n_mfh`, Kap. 7) |
 | \(k_{\text{BGF}}\) | Brutto-Grundfläche je m² Wohnfläche: 1,30 (Band 1,25–1,40) | m²/m² | herleitung: §3.4 Schritt 3 mit register: 60-R24-01 — Abschätzung von KAP3 (§3.9), Band aus der Spannweite kompakter bis gegliederter Bauformen |
 | \(w_z\) | Wertdichte der Zelle — der Preis, mit dem die physische Zwischengröße bewertet wird | €₂₀₂₆/m² Wohnfläche | herleitung: §3.4 Schritt 3 — \(w_z = k_{\text{BGF}} \sum_t \theta_{z,t} n_t\) |
 | \(\text{EAD}\), \(\text{EAD}_z\), \(\text{EAD}_k\) | native Ergebnisgröße: jährlicher Erwartungsschaden des Kontos K3 aus flussseitiger Überflutung. Bezugsjahr und Preisstand **2026**; deklarierte Betrachtungsebene ist die **Kommune**, also \(\text{EAD} = \text{EAD}_k\); \(\text{EAD}_z\) ist das Zell-Zwischenergebnis und kein eigener Ausweis (§3.6) | €₂₀₂₆/a | herleitung: §3.1 (Deklaration) und §3.4 Schritt 3 — \(\text{EAD}_z = \bar A_z \cdot w_z\), Kommune als Summe über ihre Zellen (§3.6) |
@@ -813,6 +831,14 @@ die dieselbe Kartengrundlage vorliegt —, und der Vergleichsraum steht am Index
 Angabe ist ein Rang bedeutungslos: Dieselbe Kommune erhält im Bundesvergleich einen anderen Rang
 als im Landesvergleich.
 
+**Nullanker und Bindungsregel.** Kommunen mit \(x_k = 0\) (keine exponierte Wohnfläche im HQ100)
+erhalten den Indexwert \(I_{60,k} = 0\) und gehören nicht zum Vergleichsraum; der Perzentilrang
+wird nur über die Kommunen mit \(x_k > 0\) gebildet, gleiche Werte erhalten den mittleren Rang
+(Durchschnittsrang). Damit hängt der Indexwert einer Kommune ohne Aue an keiner Rangkonvention, und
+der Lackmustest aus §3.4 gilt auch für diesen Ausweis: Eine Kommune ohne Flussaue trägt
+\(\text{EAD}_k = 0\) €₂₀₂₆/a **und** \(I_{60,k} = 0\). Bei 100 Kommunen, davon 60 mit
+\(x_k = 0\), erhalten die 60 Kommunen 0 Punkte und die übrigen 40 ihren Rang unter sich.
+
 **Warum getrennt vom Euro-Pfad.** \(I_{60,k}\) ist eine **Ordnungsgröße**. Sie enthält keine
 Schadensquote, keinen Preis und keine Jährlichkeit; ein doppelt so hoher Indexwert bedeutet
 keinen doppelt so hohen Schaden, und Indexwerte lassen sich nicht addieren. Der Perzentilrang
@@ -836,9 +862,22 @@ sondern steht neben ihm.
 Kalibriert wird das Niveau, geprüft wird die Verteilung. Beides ist getrennt: Das Niveau wird über
 **genau einen** nationalen Skalar \(\lambda\) an einen benannten Anker gebunden (§2.4: ein
 Niveau-Skalar, nicht mehrere), und die Verteilung über die Ereignisse wird gegen eine Größe
-geprüft, die in die Bestimmung von \(\lambda\) **nicht** eingeht. Das Kalibriermodell ist das
-Produktionsmodell: Es läuft mit derselben Kernformel, denselben Stützstellen und demselben
-Beispielcode wie Kapitel 3; es gibt keinen zweiten, „kalibrierten" Rechenweg.
+geprüft, die in die Bestimmung von \(\lambda\) **nicht** eingeht.
+
+**Vorläufiger Stand — \(\lambda\) ist noch kein Kalibrierergebnis.** §2.4 verlangt, dass der
+Kalibrierlauf mit dem Produktionsmodell gerechnet wird. Diese Fassung erfüllt das noch nicht: Die
+Modellsumme \(M_0\) in 4.3 ist eine Näherung aus nationalen Einheitswerten und dem Schadensgrad der
+Beispielzelle aus §3.4; die acht Anker-Kommunen sind nicht mit der Kernformel gerechnet. Zwei
+Umfangsunterschiede zu \(A^{*}\) sind bekannt und beziffert: (a) Die ZÜRS-Klasse GK2 fehlt in
+\(M_0\), obwohl sie im Modell bei HQextrem nass ist; ihr Beitrag liegt bei 0,222 Mrd. €₂₀₂₆/a
+(Schadensgrad 0,050) bis 1,112 Mrd. €₂₀₂₆/a (Schadensgrad 0,250), also 24 % bis 118 % von
+\(M_0\) = 0,94. (b) Alle Adressen zählen als Wohngebäude; der Wohngebäudeanteil je Adresse ist
+19,7/22,6 = 0,872. **Sensitivität:** Mit beiden Korrekturen wird
+\(\lambda = 1{,}05 \cdot (1/0{,}872) / (1{,}24 \ldots 2{,}18)\) = **0,97 bis 0,55**. \(\lambda\) = 1,05
+ist deshalb **vorläufig**, trägt im Produkt diesen Vermerk (Block `flood_bldg.lambda`, Feld
+`vorlaeufig: true`) und wird ersetzt, sobald \(M_0\) mit dem Produktionsmodell auf den
+Anker-Kommunen gerechnet ist (hochgerechnet über die ZÜRS-Klassen einschließlich GK2; kein
+Vollraster-Lauf nach §3.4).
 
 ### 4.1 Nationaler Anker: GDV-Naturgefahrenstatistik, Teilreihe Überschwemmung/Starkregen
 
@@ -873,6 +912,7 @@ Zeitreihenwerte und werden deshalb nicht als Anker verwendet).
 ist enger (Wohngebäude, flussseitig) und zugleich weiter (auch nicht versicherte Schäden). Die
 Lücke wird nicht weggerundet, sondern in 4.2 Schritt für Schritt überbrückt.
 
+<a id="kalibrierung-zielwert"></a>
 ### 4.2 Vom Anker zum Modellumfang — Zielwert der Bundessumme
 
 \(A^{*} = A_{\text{ver}} \cdot w_{\text{wg}} \cdot u \cdot \varphi_{\text{fluss}} \cdot \kappa \cdot \pi\)
@@ -947,6 +987,7 @@ das **Grimma, Dresden, Deggendorf, Passau, Halle (Saale), Hitzacker, Rosenheim u
 — acht Kommunen mit Hochwassergefahrenkarten-Deckung, auf denen das Produktionsmodell vollständig
 gerechnet wird. Die Auswahlregel steht damit im Bericht und ist nachvollziehbar erweiterbar.
 
+<a id="niveau-skalar"></a>
 ### 4.4 Der Niveau-Skalar
 
 \(\lambda = A^{*}/M_0\) = 0,99 / 0,94 = **1,05** (Band aus dem Ankerband: **0,42–2,36**).
@@ -960,9 +1001,9 @@ einzelner Kommunen.
 **Plausibilitätsschranke.** Ergibt eine Neubestimmung \(\lambda < 0{,}50\) oder \(\lambda >
 2{,}00\), wird **nicht** der Skalar gesetzt, sondern das Modell gilt als fehlerhaft: Dann trägt
 eine Eingangsgröße den Fehler (Exponiertenzahl, Wertdichte, Schadensfunktion), und der Befund geht
-ins Ledger, bevor gerechnet wird. Dass \(\lambda\) = 1,05 nahe bei 1 liegt, ist das erste
-Ergebnis dieser Kalibrierung: Das aus Karte, Bestand und Schadensfunktion aufgebaute Modell trifft
-das Anker-Niveau ohne nennenswerte Korrektur.
+ins Ledger, bevor gerechnet wird. Dass \(\lambda\) = 1,05 nahe bei 1 liegt, ist **kein**
+Kalibrierergebnis: \(M_0\) ist eine Näherung mit anderem Umfang als \(A^{*}\) (Einleitung Kap. 4),
+und mit den bezifferten Umfangskorrekturen fällt \(\lambda\) auf 0,97 bis 0,55.
 
 ### 4.5 Unabhängige Verteilungsprüfung: Achse Ereignisregime
 
@@ -1050,10 +1091,13 @@ gekennzeichnet.
 | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\pi\) | 1,07 (1,04–1,11) | **Abschätzung von KAP3** aus B4 (Baupreisindex), Herleitung §4.2 |
-| \(\lambda\) Niveau-Skalar | 1,05 (0,42–2,36) | **berechnet** aus \(A^{*}/M_0\), §4.4 |
+| \(\lambda\) Niveau-Skalar | 1,05 (0,42–2,36) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\), §4.4; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) und der Schadensgrad der Beispielzelle (§3.4) ein; Umfangs-Sensitivität 0,97–0,55 (Einleitung Kap. 4) |
+| Baupreisanstieg 2023 → 2024 | 3 % (2,3–5,0 %) | **Abschätzung von KAP3**: gerundet aus den in B4 zitierten Jahresraten des Baupreisindex (3,2 %/3,3 %), Band wie B4; geht in \(\pi = 1{,}105/1{,}03\) ein (§4.2); Sensitivität: \(\pi\) = 1,080 bei 2,3 %, 1,052 bei 5,0 % |
+| Betroffenheit exponierter Gebäude | 1/100 a | **Abschätzung von KAP3**, Herleitung §4.6 (mittlere Betroffenheit auf Bemessungsniveau HQ100); geht linear in \(O\) ein |
+| Plausibilitätsschranke \(\lambda\) | 0,50 bzw. 2,00 | **Abschätzung von KAP3** (Faktor 2 um den Neutralwert 1), §4.4; gilt für den Zentralwert einer Neubestimmung; die Herleitung aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) steht aus (Ledger, Befund 36) |
 | Toleranz Verteilungsprüfung | ±15 Prozentpunkte | **Abschätzung von KAP3**, Herleitung §4.5 (±2,3 modellseitig + ±12,5 ankerseitig) |
-| \(U\) Sanity-Untergrenze | 0,56 Mrd. €₂₀₂₆/a | **berechnet** aus Anker und Bestandsanteilen, Herleitung §4.6 |
-| \(O\) Sanity-Obergrenze | 2,26 Mrd. €₂₀₂₆/a | **berechnet** aus Bestandswert, Deckelquote und 1/100 a, Herleitung §4.6 |
+| \(U\) Sanity-Untergrenze | 0,56 Mrd. €₂₀₂₆/a | **berechnet** aus Anker und Bestandsanteilen, Herleitung §4.6; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(\varphi_{\text{fluss}}\) und \(\pi\) ein |
+| \(O\) Sanity-Obergrenze | 2,26 Mrd. €₂₀₂₆/a | **berechnet** aus Bestandswert, Deckelquote und 1/100 a, Herleitung §4.6; es fließen die Abschätzungen von KAP3 Betroffenheit 1/100 a und Deckelquote 0,250 (§3.3) ein |
 | \(q_0\) Objektschutz-Anteil heute | **geparkt (Datenquelle fehlt)** | keine Quelle; Watchlist §4.7 — nicht gesetzt, nicht geschätzt |
 
 ```python test: beispiel_60_kalibrierung
@@ -1322,7 +1366,7 @@ Faktor in die Aggregation nach Abschnitt 3.6 ein, ohne die Kernformel aus Abschn
 
 ## 7 Parameter-Blöcke (maschinenlesbar, §4)
 
-Nur der Hebel aus §5.1 ist beziffert. Alle weiteren Blöcke entstehen mit der Herleitung in Kap. 3/4.
+Kap. 7 führt je rechnendem Parameter aus §3.5 und §4.8 einen Block: die Kostensätze mit Pflichtfeld `preisstand: 2026` und Umrechnungsfaktor, die Parameter der Kernformel und der Kalibrierung sowie die vier Blöcke des Hebels S092.
 
 **Kennzeichnung nach Vorgabe P1 — im Block, nicht im Kommentar.** Jeder Block dieses Kapitels trägt
 drei zusätzliche, maschinenlesbare Felder. Eine Kennzeichnung als YAML-Kommentar hinter `herkunft`
@@ -1331,7 +1375,7 @@ deshalb sind die früheren Kommentare durch echte Felder ersetzt:
 
 - **`kennzeichnung:`** — genau einer von zwei Werten: `quelle` (der Wert stammt aus einer belegten
   Quelle; das Feld `quelle:` nennt sie) oder `abschaetzung_kap3` (begründete Abschätzung von KAP3
-  nach §3.9, Vorgaben P1/P2). Alle vier Blöcke dieses Kapitels stehen auf `abschaetzung_kap3`;
+  nach §3.9, Vorgaben P1/P2). Die vier Blöcke des Hebels S092 stehen auf `abschaetzung_kap3`;
   `flood_bldg.r_s092` ist aus den drei übrigen berechnet, und weil alle drei Faktoren Abschätzungen
   sind, ist das Produkt als Ganzes ebenfalls eine Abschätzung (Feld `abgeleitet_aus:` nennt die
   Faktoren).
@@ -1400,6 +1444,261 @@ parameter:
   herleitung_anker: "#s092-wirkung"
   quelle: null
   preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.n_efh_zfh
+  wert: 1950
+  einheit: "EUR2026/m2 BGF"
+  band: [1889, 2047]
+  herkunft: register:60-R24-01
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kernformel-zelle"
+  quelle: "NHK 2010, ImmoWertV Anlage 4; Fortschreibung mit Baupreisindex (Langbeleg B4)"
+  preisstand: 2026
+  umrechnungsfaktor: 1.8578
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.n_mfh
+  wert: 1533
+  einheit: "EUR2026/m2 BGF"
+  band: [1484, 1609]
+  herkunft: register:60-R24-01
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kernformel-zelle"
+  quelle: "NHK 2010, ImmoWertV Anlage 4; Fortschreibung mit Baupreisindex (Langbeleg B4)"
+  preisstand: 2026
+  umrechnungsfaktor: 1.8578
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.k_bgf
+  wert: 1.3
+  einheit: "m2/m2"
+  band: [1.25, 1.40]
+  herkunft: register:60-R24-01
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kernformel-zelle"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.p_hq_haeufig
+  wert: 0.1
+  einheit: "1/a"
+  band: null
+  herkunft: register:60-W085-01
+  kennzeichnung: quelle
+  herleitung_anker: null
+  quelle: "Langbeleg B1"
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.p_hq100
+  wert: 0.01
+  einheit: "1/a"
+  band: null
+  herkunft: register:60-W085-01
+  kennzeichnung: quelle
+  herleitung_anker: null
+  quelle: "Langbeleg B1"
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.p_hq_extrem
+  wert: 0.002236
+  einheit: "1/a"
+  band: [0.001, 0.005]
+  herkunft: register:60-W085-01
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kernformel-zelle"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.d_1
+  wert: 0.035
+  einheit: "-"
+  band: null
+  herkunft: register:60-S093-01
+  kennzeichnung: quelle
+  herleitung_anker: null
+  quelle: "Thieken u. a. 2008, FLEMOps (Langbeleg B5)"
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.d_5
+  wert: 0.25
+  einheit: "-"
+  band: null
+  herkunft: register:60-S093-01
+  kennzeichnung: quelle
+  herleitung_anker: null
+  quelle: "Thieken u. a. 2008, FLEMOps (Langbeleg B5)"
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.h_1
+  wert: 0.1
+  einheit: "m"
+  band: null
+  herkunft: herleitung:§3.3
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#tiefen-schadensfunktion"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.h_5
+  wert: 1.75
+  einheit: "m"
+  band: null
+  herkunft: herleitung:§3.3
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#tiefen-schadensfunktion"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.f_s093
+  wert: 1.0
+  einheit: "-"
+  band: [0.71, 1.40]
+  herkunft: register:60-S093-01
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#tiefen-schadensfunktion"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.f_s094
+  wert: 1.0
+  einheit: "-"
+  band: [0.71, 1.40]
+  herkunft: register:60-S094-01
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#tiefen-schadensfunktion"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.w_wg
+  wert: 0.65
+  einheit: "-"
+  band: [0.55, 0.75]
+  herkunft: herleitung:§4.2
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kalibrierung-zielwert"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.u
+  wert: 1.54
+  einheit: "-"
+  band: [1.33, 1.75]
+  herkunft: herleitung:§4.2
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kalibrierung-zielwert"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.phi_fluss
+  wert: 0.5
+  einheit: "-"
+  band: [0.35, 0.65]
+  herkunft: herleitung:§4.2
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kalibrierung-zielwert"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.kappa
+  wert: 1.15
+  einheit: "-"
+  band: [1.05, 1.30]
+  herkunft: herleitung:§4.2
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kalibrierung-zielwert"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.pi
+  wert: 1.07
+  einheit: "-"
+  band: [1.04, 1.11]
+  herkunft: herleitung:§4.2
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kalibrierung-zielwert"
+  quelle: null
+  preisstand: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.lambda
+  wert: 1.05
+  einheit: "-"
+  band: [0.42, 2.36]
+  herkunft: herleitung:§4.4
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#niveau-skalar"
+  quelle: null
+  preisstand: null
+  vorlaeufig: true
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -1540,7 +1839,7 @@ native Ergebnisgröße) ist **nicht** Gegenstand dieses Kapitels, sondern von Ka
 | Kalibrierbarkeit | **hoch** — ein einziger Niveau-Skalar auf den nationalen Anker (§3.4) wirkt multiplikativ auf alle Zellen; die Tiefenachse bleibt als unabhängige Prüfachse „Ereignisregime“ frei | **hoch** — dieselbe Skalar-Kalibrierung möglich, aber die Flächenrate ist selbst schon ein Kalibrierergebnis: Anker und Parameter sind schwer trennbar (Gefahr der Selbstbestätigung, §3.4) | **gering** — Schadensgrade sind Klassen, keine Euro-Größen; die Umrechnung Grad → Kosten ist laut B6 nicht Bestandteil der Quelle und müsste vollständig selbst kalibriert werden |
 | lokale Differenzierung | **hoch** — unterscheidet Zellen nach Tiefe, Gebäudetyp-Mix und Wertdichte; der Lackmustest §3.1 (Kommune ohne Flussaue → ~0) ist über die Überflutungsfläche unmittelbar erfüllt | **mittel** — unterscheidet nur nach Tiefe und Landnutzungsklasse; zwei Kommunen mit gleicher Siedlungsfläche im selben Tiefenband erhalten denselben Schaden, unabhängig vom Bestand | **sehr hoch** — Auflösung bis zum einzelnen Bauwerk, allerdings auf einer Merkmalsbasis, die bundesweit nicht vorliegt (siehe Datenverfügbarkeit) |
 | Datenverfügbarkeit | **hoch** — alle vier Eingänge sind frei zugänglich und im Register belegt: HWGK-Raster der Länder (60-W085-01), DGM1 (60-S074-01), Zensus-2022-Gitter mit Gebäudetyp und Wohnfläche (60-R24-01), NHK 2010 aus ImmoWertV Anlage 4; die Zustands- und Materialachsen sind als Bänder geführt, nicht als Zelldaten (60-S093-01/60-S094-01) | **hoch** — Landnutzung aus ATKIS/CORINE plus HWGK; die Schadensraten selbst stammen jedoch aus der niederländischen Fallstudie B2 und sind für Deutschland nicht belegt (§3.8 Datenlücke) | **gering** — Bauweise, Fließgeschwindigkeit und Bauzustand je Gebäude sind bundesweit **nicht** erhoben (ausdrückliche Datenlücken in 60-S093-01 und 60-S094-01); es bliebe ein Modell mit gesetzten Merkmalen, das Vorgabe P1 nur über eine Kette von Abschätzungen erfüllte |
-| Maßnahmen-Anschluss | **hoch** — der Objektschutz-Hebel S092 greift als Faktor auf den Schadensgrad (§5.1, r_S092), die Schutzsysteme S096–S098 über die R7-Weiche mit #50 am Hazard-Term; beide Angriffspunkte existieren in der Formel bereits | **gering** — Objektschutz wirkt am Gebäude, die Flächenrate kennt kein Gebäude: S092 ließe sich nur als pauschaler Abschlag auf das Gesamtergebnis anhängen, ohne Wirkungsort (§3.5) | **hoch** — feinster Angriffspunkt für Objektschutz denkbar, aber nur nutzbar, wenn die Gebäudemerkmale vorlägen; ohne sie fällt der Hebel auf dieselbe Pauschale zurück wie bei (b) |
+| Maßnahmen-Anschluss | **hoch** — der Objektschutz-Hebel S092 greift als Faktor auf den Schadensgrad (§5.1, r_S092), die Schutzsysteme S096–S098 sollen über die R7-Weiche mit #50 am Hazard-Term anschließen; in der Formel existiert heute nur der Angriffspunkt für S092 (§5.1), die R7-Weiche ist als FS-Schutzsystem inaktiv geparkt (§3.4) — die Bewertung stützt sich für die Schutzsysteme auf den vorgesehenen, noch nicht gerechneten Anschluss, den (b) und (c) nicht besser bedienen | **gering** — Objektschutz wirkt am Gebäude, die Flächenrate kennt kein Gebäude: S092 ließe sich nur als pauschaler Abschlag auf das Gesamtergebnis anhängen, ohne Wirkungsort (§3.5) | **hoch** — feinster Angriffspunkt für Objektschutz denkbar, aber nur nutzbar, wenn die Gebäudemerkmale vorlägen; ohne sie fällt der Hebel auf dieselbe Pauschale zurück wie bei (b) |
 | Architektur-Konformität | **hoch** — Schicht-B-Form Menge × Rate × Preis auf Zellebene mit physischer Zwischengröße (überflutete Gebäude, Wassertiefe, Schadensgrad) vor dem Euro; Schicht-A-Index aus denselben Knoten ableitbar | **mittel** — formal Menge × Rate × Preis, aber die physische Zwischengröße vor dem Euro fehlt: die Flächenrate springt von Quadratmetern direkt in Euro | **gering** — Aggregationsebene Einzelgebäude liegt unterhalb der Zellebene des Produkts; es entstünde eine zusätzliche Objektebene samt eigener Fortschreibung |
 | Aufwand (Ressourcenverträglichkeit §3.4) — *umgekehrte Skala: gering = günstig, hoch = teuer* | **mittel** — vier Datenebenen, davon zwei neu anzulegen (HQ-Tiefen, GEBAEUDEWERT); Kalibrierung und Abgleich laufen auf Bundesland- und Gemeindepunkt-Stichproben, ein nationaler 100-m-Vollraster-Lauf ist zu keinem Zeitpunkt nötig | **gering** — zwei Datenebenen, Stichprobenprüfung ebenso auf Gemeindepunktebene möglich; der günstigste Ansatz, aber der Aufwandsvorteil beruht auf der weggelassenen Bestandsachse | **hoch** — Objektebene für rund 19,7 Mio Wohngebäude mit Merkmalen, die erst erhoben werden müssten; eine Stichprobenprüfung genügte für die Kalibrierung nicht, weil die Merkmalsverteilung selbst das Ergebnis trägt |
 
