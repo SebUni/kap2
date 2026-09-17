@@ -1338,6 +1338,116 @@ Runde, kein Mangel dieses Pakets; die Revision liegt bei T-0245, Runde 3 bei T-0
 
 ## Autor-Revision nach Runde 2
 
+**17.09.2026 · T-0315** (Befund 34 an 60, Schritt 2 von 4 zur Auflösung von T-0291; Schritt L1 aus
+`.claude/methodik-loop.md`, Autor-Revision — keine Gegenprüfung. Geändert wird ausschließlich
+dieses Ledger; der Bericht `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` bleibt
+byte-gleich, das zieht Schritt 3 nach. Gelesen, nicht verändert:
+`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv` und `docs/evidenz/60_gdv_wohngebaeude_2024.csv`
+(aus T-0314).)
+
+**(a) Kleinste-Quadrate-Schätzer bei zeitkonstanter Modellsumme.** §3.4 verlangt, dass \(\lambda\)
+über eine **Kleinste Quadrate**-Bestimmung aus der Anker-Zeitreihe folgt, nicht aus einem einzelnen
+Jahr oder einer einzelnen Medienangabe. Der Ansatz: Für jedes Kalibrierjahr \(t\) der gewählten
+Jahresmenge \(T\) trägt die Modellsumme \(M_t\) und die (auf den Modellumfang übertragene)
+Ankerangabe \(A_t\); \(\lambda\) minimiert die Fehlerquadratsumme
+\[
+S(\lambda) = \sum_{t \in T} (A_t - \lambda M_t)^2 .
+\]
+Die Bedingung erster Ordnung liefert
+\[
+\frac{dS}{d\lambda} = -2 \sum_{t \in T} M_t (A_t - \lambda M_t) = 0
+\;\Longrightarrow\;
+\lambda \sum_{t \in T} M_t^2 = \sum_{t \in T} M_t A_t .
+\]
+Dieser Bericht rechnet mit **einer** national konstanten Modellsumme \(M_0\) (§4.3: kein
+Jahres-Lauf des Produktionsmodells, \(M_t \equiv M_0\) für alle \(t\)). Eingesetzt:
+\[
+\lambda \sum_{t \in T} M_0^2 = M_0 \sum_{t \in T} A_t
+\;\Longrightarrow\;
+\lambda \cdot |T| \cdot M_0^2 = M_0 \sum_{t \in T} A_t
+\;\Longrightarrow\;
+\lambda = \frac{\sum_{t \in T} A_t}{|T| \cdot M_0} = \frac{\text{Mittel}(A_t)}{M_0} .
+\]
+Bei zeitkonstanter Modellsumme fällt der Kleinste-Quadrate-Schätzer also auf das arithmetische
+Mittel der Ankerreihe geteilt durch \(M_0\) zusammen — exakt die Rechnung, die 4.2/4.4 mit einem
+einzelnen Jahr (2024: „rund eine Milliarde mehr") statt mit dem Mittel vorwegnehmen. Das ist der
+Grund, warum die fehlende Kleinste-Quadrate-Bestimmung in Befund 34 kein bloßer Formsatz ist: Sie
+ändert den Zahlenwert von \(A_{\text{ver}}\) gegenüber dem bisherigen 1,6 (Band 1,4–1,8).
+
+**(b) Jahres-Auswahlregel.** §3.4 verlangt eine **einheitliche Auswahlregel statt einer Auswahl
+nach Ergebnis**. Die hier festgelegte Jahres-Auswahlregel lautet: Hauptfenster ist die
+**vollständige, abgeschlossene Reihe 2002–2024** (23 Jahre, §4.1), ohne ein einzelnes Jahr
+auszulassen — auch das Jahr 2009 bleibt drin, obwohl seine Lesart in der Quelldatei als
+„Abschätzung KAP3" statt als direkt abgelesener Grafikwert ausgewiesen ist (siehe
+`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`, Spalte `lesart`): Die abweichende Lesart betrifft
+nur, **wie** der Jahreswert 2009 gewonnen wurde (Grafik-Interpolation aus den Nachbarjahren statt
+Direktablesung), nicht, **ob** er zur Reihe zählt — eine begründete Abschätzung eines fehlenden
+Einzelwerts ist kein Ausreißer und wird nicht gesondert behandelt. Zwei Gründe tragen die Wahl des
+Hauptfensters auf die volle Reihe statt auf ein kürzeres: Erstens verlangt §3.4 eine Regel, die
+unabhängig vom Ergebnis gilt, nicht eine nach dem günstigsten \(\lambda\) gewählte Fensterlänge.
+Zweitens fiele mit dem kürzesten der vier geprüften Fenster (2014–2024 ohne 2021) \(\lambda\) auf
+0,457 und damit unter die Plausibilitätsschranke 0,50 aus §4.4 — das wäre ein Modellentscheid
+(Verdikt „Modell fehlerhaft" statt „Skalar gesetzt"), den Befund 34 nicht verlangt und der hier
+nicht nebenbei getroffen wird. Die übrigen drei Fenster (2014–2024, 2002–2024 ohne 2021, 2014–2024
+ohne 2021) laufen als **Sensitivität** mit, wie es Befund 34 ausdrücklich fordert.
+
+**(c) A_ver je Fenster.** Alle vier Werte sind das arithmetische Mittel der Jahreswerte aus
+`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv` (Spalte `wert_mrd_eur`, Stand „Bestand und Preise
+2024"), je Fenster gerundet auf drei Nachkommastellen:
+
+| Fenster | Jahre (n) | \(A_{\text{ver}}\) (Mrd. €₂₀₂₆-Preisstand 2024) |
+|---|---|---|
+| 2002–2024 (Hauptfenster) | 23 | **1,838** |
+| 2014–2024 | 11 | **2,064** |
+| 2002–2024 ohne 2021 | 22 | **1,349** |
+| 2014–2024 ohne 2021 | 10 | **1,010** |
+
+**(d) A\* und λ je Fenster.** Übrige Faktoren aus §4.2 (unverändert, alle vier Abschätzungen von
+KAP3): \(w_{\text{wg}}\) = 0,65, \(u\) = 1,54, \(\varphi_{\text{fluss}}\) = 0,50, \(\kappa\) = 1,15,
+\(\pi\) = 1,07 — Produkt der vier Folgefaktoren
+\(0{,}65 \cdot 1{,}54 \cdot 0{,}50 \cdot 1{,}15 \cdot 1{,}07 = 0{,}615865\). \(M_0\) = 1,360
+Mrd. €₂₀₂₆/a (§4.3, unverändert, aus dem w_wg-Stand von
+`docs/evidenz/60_gdv_wohngebaeude_2024.csv`: diese Datei belegt, dass \(w_{\text{wg}}\) weiterhin
+nur als Abschätzung von KAP3 geführt werden kann, siehe deren Zeile `w_wg`, und ändert deshalb
+keinen der fünf Faktoren aus §4.2). \(A^{*} = A_{\text{ver}} \cdot 0{,}615865\), \(\lambda =
+A^{*}/M_0\):
+
+| Fenster | \(A^{*}\) (Mrd. €₂₀₂₆/a) | \(\lambda = A^{*}/M_0\) |
+|---|---|---|
+| 2002–2024 (Hauptfenster) | 1,838 · 0,615865 = 1,132 | 1,132 / 1,360 = **0,832** |
+| 2014–2024 | 2,064 · 0,615865 = 1,271 | 1,271 / 1,360 = **0,935** |
+| 2002–2024 ohne 2021 | 1,349 · 0,615865 = 0,831 | 0,831 / 1,360 = **0,611** |
+| 2014–2024 ohne 2021 | 1,010 · 0,615865 = 0,622 | 0,622 / 1,360 = **0,457** |
+
+Alle vier λ-Werte liegen innerhalb der Plausibilitätsschranke [0,50; 2,00] aus §4.4 — bis auf das
+kürzeste Fenster (0,457 < 0,50), was Grund (b) für die Wahl des Hauptfensters ist. Das
+Hauptfenster liefert \(\lambda\) = 0,832 und liegt damit **höher** als das bisher im Bericht
+gesetzte \(\lambda\) = 0,724 (Befund 32, T-0311–T-0313): Der bisherige Wert beruhte auf
+\(A_{\text{ver}}\) = 1,6 (Einzeljahr-Rundung 2024), nicht auf dem Kleinste-Quadrate-Mittel der
+Reihe. Diese Verschiebung wird hier festgehalten, nicht in den Bericht gezogen — das macht Paket 3.
+
+**(e) Neues Band von A_ver (Vorgabe P1).** Das bisherige Band 1,4–1,8 Mrd. € stammte allein aus der
+Rundungsformulierung „rund eine Milliarde mehr" des Einzeljahres 2024 und entfällt mit der
+Kleinste-Quadrate-Bestimmung aus (a) — es beschreibt keine Unsicherheit des jetzt verwendeten
+Mittelwerts. Herleitung des neuen Bands: Die einzige mit dem Hauptfenster bereits methodisch
+verbundene, nicht neu erfundene Unsicherheit ist die aus (b) beschriebene Empfindlichkeit gegenüber
+dem einen dominanten Ausreißerjahr 2021 (12,6 Mrd. €, mehr als das Fünffache des zweithöchsten
+Jahreswerts) **bei unveränderter Fensterlänge** — also der Unterschied zwischen den beiden bereits
+gerechneten 23-Jahre-Varianten in (c): mit 2021 (1,838) und ohne 2021 (1,349). Das ergibt das neue
+**Band \(A_{\text{ver}}\) = 1,349–1,838 Mrd. €₂₀₂₆-Preisstand-2024** um den Zentralwert 1,838
+(Zentralwert = Hauptfenster nach Auswahlregel (b), Untergrenze = dieselbe Reihe ohne den
+Ausreißer 2021). Die Fensterlängen-Sensitivität (2014–2024, mit und ohne 2021) ist bewusst **nicht**
+Teil dieses Bands, weil sie laut (b) eine andere Auswahlregel wäre, nicht eine Unsicherheit
+innerhalb der geltenden Regel; sie bleibt als eigenständig ausgewiesene Sensitivität in (c)/(d)
+stehen. Das Band ist damit nach P1 hergeleitet (kein Parameter ohne ausgewiesene Herleitung) und
+enger als die zuvor über die volle Fenster-Bandbreite denkbare Spanne, weil es die durch (b)
+ausdrücklich verworfene Fensterlängen-Wahl nicht mit einrechnet.
+
+**Status.** Befund 34 bleibt **offen**. Dieses Paket schreibt bewusst nur ins Ledger: der Bericht
+(§4.1, §4.2, §4.4, Kap. 7, Kopf-Statuszeile) und der Lint werden in Schritt 3 nachgezogen, Schritt 4
+setzt den Befund auf „behoben". Die Kopftabelle „Offene Befunde" bleibt unberührt (schreibt allein
+T-0296 fort).
+
 **17.09.2026 · T-0245** (Schritt L1 aus `.claude/methodik-loop.md`; ohne Gegenprüfung, ohne Export, ohne Integration).
 Geändert wurden nur `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und dieses Ledger.
 `docs/evidenz/register.md`, Code, Arbeitsmappen und `backend/scripts/lint_methodik.py` sind
