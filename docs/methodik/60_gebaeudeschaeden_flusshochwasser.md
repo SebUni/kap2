@@ -304,14 +304,25 @@ Produkts wird deshalb aus HWGK × Gebäudebestand gebildet, ZÜRS bleibt Abgleic
 Quellen: (1) **Statistisches Bundesamt (2025):** Pressemitteilung Nr. 336 vom 17.09.2025,
 „43,8 Millionen Wohnungen in Deutschland zum Jahresende 2024“, URL
 `https://www.destatis.de/DE/Presse/Pressemitteilungen/2025/09/PD25_336_31231.html`,
-Zugriff 13.09.2026; Stichtag 31.12.2024: 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche,
+Archiv-Snapshot
+`https://web.archive.org/web/20250917161544/https://www.destatis.de/DE/Presse/Pressemitteilungen/2025/09/PD25_336_31231.html`
+(Snapshot vom 17.09.2025, im Wayback-Index mit Statuscode 200 geführt; die Wiedergabe von
+Destatis-Pressemitteilungen beantwortet die Wayback Machine zurzeit mit HTTP 403 — geprüft
+17.09.2026 —, der Snapshot ist deshalb indexiert, aber nicht abrufbar), Zugriff 13.09.2026;
+Stichtag 31.12.2024: 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche,
 19,7 Mio Wohngebäude (13,5 Mio Einfamilien-, 2,7 Mio Zweifamilien-, 3,5 Mio Mehrfamilienhäuser).
 (2) **Statistisches Bundesamt, Themenseite „Wohnen“**, URL
-`https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html`, Zugriff 13.09.2026;
+`https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html`, Archiv-Snapshot
+`https://web.archive.org/web/20260831100304/https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html`
+(Snapshot vom 31.08.2026), Zugriff 13.09.2026;
 wörtlich: „44,0 Millionen Wohnungen in Deutschland zum Jahresende 2025“, Gesamtwohnfläche
 4,1 Mrd m² (Fortschreibung des Wohngebäude- und Wohnungsbestandes auf Zensus-2022-Basis).
 (3) **ImmoWertV, Anlage 4 (zu § 36 Abs. 1) „Normalherstellungskosten 2010“**, URL
-`https://www.gesetze-im-internet.de/immowertv_2022/anlage_4.html`, Zugriff 13.09.2026; wörtlich:
+`https://www.gesetze-im-internet.de/immowertv_2022/anlage_4.html`, Archiv-Snapshot
+`https://web.archive.org/web/20250901000456/https://www.gesetze-im-internet.de/immowertv_2022/anlage_4.html`
+(Snapshot vom 01.09.2025; laufend gepflegte Rechtsverordnung — der Snapshot belegt den Wortlaut
+zum Snapshot-Zeitpunkt, maßgeblich bleibt die am Zugriffstag abgerufene Fassung),
+Zugriff 13.09.2026; wörtlich:
 die NHK erfassen „die Kostengruppen 300 und 400 der DIN 276, die Umsatzsteuer und die
 üblicherweise entstehenden Baunebenkosten (Kostengruppen 730 und 771 der DIN 276)“ und beziehen
 sich „auf den im Jahresdurchschnitt bestehenden Kostenstand des Jahres 2010“, angegeben „in Euro
@@ -321,11 +332,20 @@ Mehrfamilienhäuser bis 6 WE, Standardstufen 3–5: **825** / 985 / 1.190 €/m�
 Standardstufe 3 (mittlerer Standard) als bundesweiter Bestandsmittelwert. (4) **Statistisches
 Bundesamt, Fachserie 17 Reihe 4 „Preisindizes für die Bauwirtschaft“ (Basis 2015 = 100)**, URL
 `https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile`,
-Zugriff 13.09.2026; Jahresdurchschnitte Neubau konventionell gefertigter Wohngebäude:
+Archiv-Snapshot
+`https://web.archive.org/web/20250416003519/https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile`
+(Snapshot vom 16.04.2025; die PDF-Datei selbst liegt unter derselben Adresse mit dem Zusatz `id_`
+hinter dem Zeitstempel), Zugriff 13.09.2026; Jahresdurchschnitte Neubau konventionell gefertigter Wohngebäude:
 2010 = 89,1 · 2015 = 100,0 · 2020 = 114,0 · 2021 = 121,9 · 2022 = 139,4 · 2023 = 149,8.
 (5) **Statistisches Bundesamt (2026):** Pressemitteilung Nr. 241 vom 10.07.2026, URL
 `https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/07/PD26_241_61261.html`,
-Zugriff 13.09.2026; wörtlich: „Die Preise für den Neubau konventionell gefertigter Wohngebäude in
+**kein Archiv-Snapshot — Verzicht begründet:** die Wayback Machine führt zu dieser Adresse genau
+einen Abruf (10.07.2026), und der ist mit Statuscode 403 gespeichert; die Wiedergabe von
+Destatis-Pressemitteilungen ist archivseitig gesperrt, ein Neuabruf über „Save Page Now“ scheitert
+ebenfalls (beides geprüft 17.09.2026). Ein inhaltstragender Snapshot ist damit nicht herstellbar;
+die Meldung bleibt über Pressemitteilungsnummer und Datum im Destatis-Pressearchiv adressierbar,
+und die hier zitierten Veränderungsraten sind mit den Vorjahresmonatswerten der Fachserie
+gegenprüfbar. Zugriff 13.09.2026; wörtlich: „Die Preise für den Neubau konventionell gefertigter Wohngebäude in
 Deutschland sind im Mai 2026 gegenüber Mai 2025 um 5,0 % gestiegen.“; Februar 2026 gegenüber dem
 Vorjahresmonat +3,3 %; ferner PM Nr. 011 vom 15.01.2026 für November 2025: +3,2 % gegenüber
 November 2024.
@@ -376,7 +396,10 @@ Quellen: (1) **Thieken, A. H.; Olschewski, A.; Kreibich, H.; Kobsch, S.; Merz, B
 *p*rivate *s*ector“, in: *Flood Recovery, Innovation and Response I*, WIT Transactions on Ecology
 and the Environment, Vol. 118, S. 315–324, WIT Press, Southampton, DOI `10.2495/FRIAR080301`,
 URL `https://www.witpress.com/elibrary/wit-transactions-on-ecology-and-the-environment/118/19311`,
-Zugriff 13.09.2026 (Volltext gegengelesen). Tab. 1 (S. 317) wörtlich zu den Eingangsgrößen:
+Archiv-Snapshot
+`https://web.archive.org/web/20250118023945/https://www.witpress.com/elibrary/wit-transactions-on-ecology-and-the-environment/118/19311`
+(Snapshot vom 18.01.2025; der Snapshot sichert die Verlagsseite, der persistente Nachweis des
+Beitrags ist die DOI), Zugriff 13.09.2026 (Volltext gegengelesen). Tab. 1 (S. 317) wörtlich zu den Eingangsgrößen:
 Water level „<21 cm, 21-60 cm, 61-100 cm, 101-150 cm, >150 cm“ · Building type „One-family homes,
 (semi-)detached houses, multifamily houses“ · Building quality „Low/medium quality, high quality“ ·
 Contamination „None, medium, heavy (i.e. oil or multiple) contamination“ · Private precaution
@@ -394,7 +417,10 @@ extreme flood such as the 2002 event can be applied to more frequent floods“. 
 Eilenburg und Grimma (Tab. 4, S. 321). (2) **Elmer, F.; Thieken, A. H.; Pech, I.; Kreibich, H.
 (2010):** „Influence of flood frequency on residential building losses“, *Natural Hazards and Earth
 System Sciences* 10, S. 2145–2159, DOI `10.5194/nhess-10-2145-2010`,
-URL `https://nhess.copernicus.org/articles/10/2145/2010/`, Zugriff 13.09.2026 (Volltext
+URL `https://nhess.copernicus.org/articles/10/2145/2010/`, Archiv-Snapshot
+`https://web.archive.org/web/20260305025018/https://nhess.copernicus.org/articles/10/2145/2010/`
+(Snapshot vom 05.03.2026; der persistente Nachweis ist auch hier die DOI),
+Zugriff 13.09.2026 (Volltext
 gegengelesen); S. 2151 wörtlich: „In the basic FLEMOps model, five water level classes, three
 building types and two building quality classes are used as input.“
 **Datenlücke (§3.8):** eine Zahlentabelle der Schadensquoten je Qualitätsklasse ist in beiden
@@ -445,6 +471,10 @@ Quellen: (1) **Maiwald, H.; Schwarz, J. (2018):** „Vereinheitlichte Schadensbe
 Risikobewertung von Bauwerken unter extremen Naturgefahren“, *Bautechnik* 95(10), S. 743–753,
 Ernst & Sohn, Berlin, DOI `10.1002/bate.201800009`, Sonderdruck-URL
 `https://edac.biz/fileadmin/Dokumente/06_Publikationen/Bautechnik_1018_Maiwald_Schwarz.pdf`,
+Archiv-Snapshot
+`https://web.archive.org/web/20231107034021/https://edac.biz/fileadmin/Dokumente/06_Publikationen/Bautechnik_1018_Maiwald_Schwarz.pdf`
+(Snapshot vom 07.11.2023; die PDF-Datei selbst liegt unter derselben Adresse mit dem Zusatz `id_`
+hinter dem Zeitstempel; der persistente Nachweis des Aufsatzes ist die DOI),
 Zugriff 13.09.2026 (Volltext gegengelesen). Tab. 1 (S. 744): ausgewertete Schadensdokumentationen
 Hochwasser — Sachsen 2002 (Mulde), 2006 (Elbe), 2010 (Neiße, Spree), 2013 (Mulde) sowie Braunsbach
 2015 (Baden-Württemberg), je EDAC-Feldeinsatz mit Schadensdokumentation. Tab. 2 (S. 745)
@@ -1961,11 +1991,15 @@ dieses Berichts ein — vgl. B6, „Hochwasserschutzfibel … hier nicht im Voll
    „Volltext geprüft“ bzw. „Volltext gegengelesen“. Für S092 ist keine Primärquelle verwendet
    (§5.1 ABGESCHÄTZT, Quelle 3 oben ist nur Kandidat, nicht Basis der Zahl). **Format der
    Langbelege (§3.8):** Autor/Organ, Jahr, Titel, DOI/URL, Zugriffsdatum **und Archiv-Snapshot**;
-   der Archiv-Snapshot ist für die sechs externen Webquellen in **B1–B3** nachgetragen
-   (T-0307, 17.09.2026), für **B4–B6** noch **nicht** — bei DOI-gebundenen
-   Zeitschriftenquellen ist er entbehrlich (die DOI ist der persistente Nachweis), bei den
-   Webseiten- und Pressemitteilungsquellen von B4–B6 ist er offen und als Rest von Befund 42
-   (Teil b) im Ledger geführt.
+   der Archiv-Snapshot ist für die externen Webquellen in **B1–B3** (T-0307, 17.09.2026) und in
+   **B4–B6** (T-0308, 17.09.2026) nachgetragen; damit trägt jede externe Webquelle der Langbelege
+   entweder einen Snapshot mit Datum oder eine ausdrückliche Begründung des Verzichts. Bei
+   DOI-gebundenen Zeitschriftenquellen ist der Snapshot entbehrlich (die DOI ist der persistente
+   Nachweis) und dort, wo er vorliegt, nur zusätzliche Absicherung der Verlagsseite. Verzichtet
+   wird auf einen Snapshot bei der Destatis-Pressemitteilung Nr. 241/2026 (B4 Quelle 5): die
+   Wayback Machine führt dort nur einen Abruf mit Statuscode 403, und die Wiedergabe von
+   Destatis-Pressemitteilungen ist archivseitig gesperrt — der bei Quelle 1 genannte Snapshot ist
+   aus demselben Grund indexiert, aber nicht abrufbar. Befund 42 ist damit abgeschlossen.
 5. **Gesamtverband der Deutschen Versicherungswirtschaft e. V. (GDV) (2025):**
    „GDV-Naturgefahrenstatistik 2024: Hochwasserschäden mehr als verdoppelt“, Medieninformation
    vom 31.05.2025 (Feld „Zuletzt aktualisiert“), Berlin. URL
