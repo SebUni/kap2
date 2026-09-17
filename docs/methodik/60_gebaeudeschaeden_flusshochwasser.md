@@ -948,10 +948,9 @@ geschlossen. Bemerkenswert und hier festgehalten: Die damals angegebene Umfangs-
 einen Wert zwischen 0,97 und 0,55 voraus — das jetzt gerechnete \(\lambda\) = 0,832 liegt
 innerhalb dieser Spanne. \(\lambda\) bleibt dennoch **vorläufig** und trägt im Produkt diesen
 Vermerk (Block `flood_bldg.lambda`, Feld `vorlaeufig: true`), weil die Ledger-Befunde 33
-(Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion) und 34 (Verteilungsprüfung auf
-weiteren Achsen) offen sind und den Wert noch verschieben können; der Zahlenwert im Produkt-Block
-in Kap. 7 steht zum Stand dieser Revision noch auf dem abgelösten Wert und ist im Ledger als
-Restpunkt von Befund 32 geführt.
+(Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion), 35 und 36 offen sind und den Wert
+noch verschieben können; der Produkt-Block in Kap. 7 trägt zum Stand dieser Revision denselben
+Wert.
 
 ### 4.1 Nationaler Anker: GDV-Naturgefahrenstatistik, Teilreihe Überschwemmung/Starkregen
 
@@ -1949,16 +1948,16 @@ parameter:
 ---
 parameter:
   id: flood_bldg.lambda
-  wert: 0.724
+  wert: 0.832
   einheit: "-"
-  band: [0.29, 1.63]
+  band: [0.22, 1.66]
   herkunft: herleitung:§4.4
   kennzeichnung: abschaetzung_kap3
   herleitung_anker: "#niveau-skalar"
   quelle: null
   preisstand: null
   vorlaeufig: true
-  vorlaeufig_grund: "Stand nach dem Stichprobenlauf (17.09.2026): berechnet als A*/M0 = 0,985 / 1,360 aus den auf den acht Anker-Kommunen gemessenen Klassenraten (docs/evidenz/60_stichprobe/m0_klassenraten.csv, §4.3); Band aus dem Ankerband bei unveraendertem M0. Weiterhin vorlaeufig, weil die Ledger-Befunde 33 (Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion) und 34 (Verteilungspruefung auf weiteren Achsen) offen sind und den Wert verschieben koennen."
+  vorlaeufig_grund: "Stand nach der Kleinste-Quadrate-Ankerbestimmung (17.09.2026): berechnet als A*/M0 = 1,132 / 1,360 aus der GDV-Jahresreihe 2002–2024 (§4.1/§4.4). Weiterhin vorlaeufig, weil die Ledger-Befunde 33 (Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion), 35 und 36 offen sind und den Wert verschieben koennen."
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2030,8 +2029,8 @@ fortzuschreiben. Begründung:
    gezahlte Wohngebäude-Leistungen, und Wohngebäudeverträge decken zum gleitenden Neuwert (§4.2,
    Herleitung von \(\kappa\)). Würde nur der Basiswert je Gebäude auf den Zeitwert gesetzt, bliebe der
    kalibrierte K3-Betrag \(\lambda M_0 \equiv A^{*}\) **unverändert** — \(\lambda\) nähme allein die
-   Alterswertminderung auf (Zentralwert 0,985 / (1,360 · 0,55) = **1,32**, am unteren Faktor-Ende
-   0,985 / (1,360 · 0,40) = **1,81**). Die Umstellung hätte dann keine Wirkung auf das Ergebnis,
+   Alterswertminderung auf (Zentralwert 1,132 / (1,360 · 0,55) = **1,51**, am unteren Faktor-Ende
+   1,132 / (1,360 · 0,40) = **2,08**). Die Umstellung hätte dann keine Wirkung auf das Ergebnis,
    sondern verzerrte nur den Skalar: Derselbe Anker würde durch einen kleineren Nenner geteilt, ohne
    dass sich an der bewerteten Sache etwas ändert.
 2. **Ein konsistenter Zeitwertansatz braucht eine Anker-Umrechnung ohne Quelle.** Erst wenn auch
@@ -2293,3 +2292,4 @@ Materialband \(f_{\text{S094}}\) = 1,00 (0,84–1,18) in Ansatz (a).
 | 5 | Welcher Ansatz wird umgesetzt? (Ansatz-Vergleich §2.6/§3.7) | **13.09.2026 (T-0237):** Ansatz **(a)** Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle — p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp · Gebäudequalität) × Gebäudewert | einziger Ansatz, der in den sechs Güte-Kriterien durchgehend „hoch“ trägt (das siebte Kriterium Aufwand läuft umgekehrt: dort ist „gering“ günstig, (a) liegt mit „mittel“ über (b) und weit unter (c) und ist nach §3.4 ressourcenverträglich): vollständig aus frei zugänglichen, im Register belegten Datenebenen speisbar, Wirkungsort für S092 und die R7-Weiche vorhanden, Schicht-B-Form mit physischer Zwischengröße vor dem Euro, Kalibrierung und Abgleich auf Stichprobenebene ohne nationalen Vollraster-Lauf (§3.4) | (b) aggregierte Flächenschadensrate — kein Wirkungsort für den Maßnahmen-Hebel, tragender Wert nur aus niederländischer Fallstudie (B2); als Ergänzungsmodul vorgesehen. (c) Schadensgradmodell D0–D6 am Einzelgebäude — Bauweise/Bauzustand bundesweit nicht erhoben, Umrechnung Grad → Euro nicht belegt | Umsetzungsgrundlage für Kap. 3 und Prototyp der Familie K3/K4-Ereignisschäden (bindet später #50 und #47); Kopfzeile und Kap. 9 nachgezogen |
 | 6 | Divergenz Bericht ↔ Code bei den Namenslisten von #60 (Befund 13) | **13.09.2026 (T-0243):** Bericht auf den belegbaren Stand korrigiert (Kap. 1: Teilmenge mit abweichender Namensquelle statt „genau"); Code (`backend/app/data/catalog.py`, `kwra_id: 60`) bleibt unverändert | eiserne Regel 5 — Divergenz Bericht ↔ Code wird nie still im Code gefixt; Angleichen des Codes ist Aufgabe der Integration, nicht dieses Berichtsschritts | Code stillschweigend an W117 nachziehen (verstieße gegen eiserne Regel 4/5, kein Prüfmittel im Rahmen dieses Pakets) | Divergenz als Integrationspunkt für `/integriere-risiko 60` geführt: `sensitivity_names` und `upstream_names` in `catalog.py` müssen dort gegen die 7 Sensitivitäten und 8 Wirkungs-Eingänge von W117 abgeglichen werden |
 | 7 | Neuwert oder Zeitwertansatz der Arbeitsmappe (Mon. J65 → J64) als Basiswert K3? (Befund 41) | **17.09.2026 (T-0285):** Neuwert (NHK, indexiert, 527.280 €₂₀₂₆ je Wohngebäude) bleibt Basiswert; Zeitwertansatz als Sensitivitätsband mit \(f_{\text{AWM}}\) = 0,55 (0,40–0,75, Abschätzung von KAP3); Abweichung von J64 als Antrag auf Fortschreibung in §7.2 | W1/W6: der Anker \(A^{*}\) ist neuwertbasiert (gleitender Neuwert, §4.2); eine Umstellung nur des Basiswerts ließe den kalibrierten Betrag unverändert und höbe \(\lambda\) auf 1,32 (bis 1,81) (**nachgezogen 17.09.2026 (T-0313)** auf die M0-Revision aus Befund 32: \(M_0\) = 1,360 statt 0,940 Mrd. €₂₀₂₆/a, \(\lambda\) = 0,724; die Entscheidung selbst bleibt unberührt); ein konsistenter Zeitwertansatz braucht eine quellenlose Anker-Umrechnung | Zeitwertansatz übernehmen und \(A^{*}\), \(U\), \(O\) mit \(f_{\text{AWM}}\) umrechnen | Basiswert, \(M_0\) und \(\lambda\) unverändert; Sensitivität K3-Betrag 0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a (−45 %); Kap. 6 Modellgrenze 9 und Versionsstempel präzisiert |
+| 8 | Anker \(A^{*}\) aus dem Einzeljahr 2024 oder aus dem Mehrjahresmittel 2002–2024 der GDV-Reihe? (Befund 34) | **17.09.2026 (T-0320):** Mehrjahresmittel per Kleinste-Quadrate-Ankerbestimmung (§4.1/§4.4): \(A^{*}\) = 1,132 Mrd. €₂₀₂₆/a | ein Einzeljahr trägt die volle Jahreswitterung (Hochwasserereignisse streuen stark zwischen den Jahren) und wäre kein robuster Anker für einen langfristigen Skalar; die Kleinste-Quadrate-Bestimmung über die gesamte Reihe 2002–2024 glättet diese Streuung und ist reproduzierbar aus den veröffentlichten Jahreswerten | Anker aus dem letzten verfügbaren Einzeljahr (2024) | \(A^{*}\) = 1,132 (statt 0,985 nach dem verworfenen Stichprobenlauf), \(\lambda\) = 0,832, Band 0,22–1,66; §7.2 Zeitwert-Sensitivität 1,51 (2,08) |
