@@ -770,3 +770,204 @@ Exit 0, **solange der Befund besteht** (am 17.09.2026 ausgeführt: alle fünf Ex
   geändert: `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und `docs/evidenz/register.md`
   sind byte-gleich geblieben; `backend/scripts/lint_methodik.py` wurde in diesem Paket nicht
   ausgeführt (Ausgabe aus Abschnitt 0.1 übernommen).
+
+### 3 · Paket T-0273 — Leitfragen 4, 7 und 8 gegen Kapitel 4 (Kalibrierung & Validierung)
+
+Viertes Paket der Runde 2 (17.09.2026), eigene Sitzung. Sie hat den geprüften Stand nicht
+geschrieben: Kapitel 4 stammt aus T-0238 und den Nachschnittpaketen T-0256 bis T-0259, alle im
+Endstatus (eiserne Regel 4). Das Bundle nach §1 gilt unverändert (Abschnitt 0 dieser Runde). Die
+Lint-Ausgabe aus Abschnitt 0.1 wird **übernommen und nicht neu vorhergesagt**; der Lint wurde in
+diesem Paket nicht ausgeführt. Nach §6 ist die Prüfung **voll**, weil Kalibrierung und
+Modellstruktur neu sind. Toleranzen werden nicht geweitet: Ein Prüfstein, der nicht trägt, ist ein
+Befund und kein Anlass, ein Band anzupassen.
+
+**Prüfumfang dieses Pakets:** genau Kapitel 4 „Kalibrierung & Validierung (§2.4/§3.4)"
+(Z. 834–1097, Abschnitte 4.1–4.8 samt Block `beispiel_60_kalibrierung`). Nachgemessen mit
+`python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();L=s.split(chr(10));print(len(s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0]),len(chr(10).join(L[833:1097])))"`
+→ `18692 18697`. Die Abweichung von drei bzw. zwei Zeichen gegenüber den im Ticket genannten
+**18.695** Zeichen kommt allein von der Schnittkante (Überschriftszeile, Leerzeile vor Kapitel 5).
+Der geprüfte Textkörper ist derselbe; **Summe des Pakets: 18.695 Zeichen, ein Kapitel**. Andere
+Kapitel wurden nur dort gelesen, wo Kapitel 4 ausdrücklich auf sie verweist: Registerzeilen
+60-W085-01, 60-R17-01 und 60-R24-01, den Block `beispiel_60_kernformel` in §3.6 und \(\Delta q\) in
+§5.1.2. Sie sind hier nicht Prüfgegenstand. Ein **nationaler 100-m-Vollraster-Lauf nach §3.4 war
+nicht verlangt und wurde nicht gefahren**. Alle Nachrechnungen laufen auf den nationalen
+Aggregaten des Kapitels, auf der Beispielzelle aus §3.6 und auf ZÜRS-Klassen als Stichprobe. Die
+Arbeitsmappen wurden mit der Standardbibliothek gelesen (zipfile/XML, in dieser Umgebung ist
+openpyxl nicht installiert), nur gelesen und nie geändert (eiserne Regel 2).
+
+#### 3.1 · Nachrechnung der Rechenblöcke (LF 8 — gerechnet, nicht gelesen)
+
+Der Block `beispiel_60_kalibrierung` wurde aus dem Bericht herausgelöst und mit `exec` ausgeführt.
+**Alle Zusicherungen halten (grün).** Die Zwischenwerte wurden ungerundet ausgegeben:
+
+| Schritt | Größe | Bericht | nachgerechnet | Ergebnis |
+|---|---|---|---|---|
+| 4.2 Zielwert | \(A^{*}\) = 1,6 · 0,65 · 1,54 · 0,50 · 1,15 · 1,07 | 0,99 Mrd. €₂₀₂₆/a | **0,9854** | trifft zu |
+| 4.2 Band | alle Enden gleichgerichtet | 0,39–2,22 | **0,3914–2,2159** | trifft zu (rechnerisch); oberes Ende von \(\pi\) falsch → Befund 38 |
+| 4.3 Modellsumme | \(M_0\) = 339.000 · 527.280 € · 6,311/1.200 a⁻¹ | 0,94 Mrd. €₂₀₂₆/a | **0,9401** | rechnet auf; Umfang und Herkunft des Schadensgrads → Befund 32 |
+| 4.4 Niveau-Skalar | \(\lambda = A^{*}/M_0\) | 1,05 (0,42–2,36) | **1,0482** (0,416–2,357) | rechnet auf; Band liegt an beiden Enden außerhalb der eigenen Schranke 0,50–2,00 → Befund 36 |
+| 4.5 Modellseite | Regime-Anteil ab HQ100 aus \(A = [15{,}0;\ 77{,}76;\ 300{,}0]\) m², \(p_3 = 2{,}236\cdot10^{-3}\) | 66,1 / 23,2 / 10,6 %, Summe 33,9 % | **66,14 / 23,23 / 10,63 %, 33,86 %** | trifft zu; die Stützstellen sind identisch mit der Beispielzelle `zelle(1200, …)` aus §3.6 (Ausgabe `[15.0, 77.76, 300.0]`, \(\bar A\) = 6,311) |
+| 4.5 Ankerseite | Überschuss 2024 = 1,0/2,6 | 38,5 % | **38,46 %**, Differenz **4,6** Prozentpunkte | rechnet auf; nicht out-of-sample → Befund 33 |
+| 4.6 Untergrenze | \(U\) = 1,6 · 0,65 · 0,50 · 1,07 | 0,56 | **0,5564** | rechnet auf; zirkulär → Befund 35 |
+| 4.6 Obergrenze | \(O\) = 0,076 · 22,6 Mio · 527.280 € · 0,250 · 0,01 | 2,26 | **2,2641** | rechnet auf; keine obere Schranke → Befund 35 |
+| 4.6 Lage | \(U \le \lambda M_0 \le O\) | 0,99 ∈ [0,56; 2,26] | **0,5564 ≤ 0,9854 ≤ 2,2641** | formal eingehalten, aber per Konstruktion (\(\lambda M_0 \equiv A^{*}\)) |
+
+Die Gegenproben laufen mit `python3 -c` und stehen je Befund in Abschnitt 3.3. Die wichtigsten
+Zahlen:
+- **GK2-Lücke in \(M_0\):** Ein Gebäude in GK2 wird im Modell erst beim HQextrem nass.
+  Trapez-Erwartungswert: \((p_2-p_3)\cdot q/2 + p_3 q\) = 0,000306 a⁻¹ bei \(q\) = 0,050 und
+  0,001530 a⁻¹ bei \(q\) = 0,250. Multipliziert mit 1.378.600 Adressen · 527.280 € ergibt das
+  **0,222 bis 1,112 Mrd. €₂₀₂₆/a, also 24 % bis 118 % von \(M_0\)**.
+- **Obergrenze:** Die Modellrate beträgt 6,311/1.200 = **0,526 %/a** und liegt damit beim
+  **2,10-Fachen** der „Höchstrate" von \(O\) (0,250 · 0,01 = 0,25 %/a). Setzt man für GK4 und
+  GK3 \(p\) = 0,1 und für GK2 \(p\) = 0,01 an, entstehen **6,29 Mrd. €₂₀₂₆/a**; GK4 allein mit
+  \(p\) = 0,1 ergibt 1,19 Mrd.
+- **Untergrenze:** \(U/A^{*} = 1/(u\kappa)\) = **0,5647**. Mit den unteren Bandenden aus 4.2
+  sinkt \(U\) auf **0,28**.
+- **Trennschärfe der Verteilungsprüfung:** Eine Verdopplung des HQextrem-Schadens (\(A_3\) = 600)
+  ergibt 48,8 % und **besteht**. Eine Verdreifachung ergibt 58,2 % und besteht nicht. Eine
+  Halbierung ergibt 22,6 % und besteht knapp nicht.
+- **\(\pi\):** 1,16/1,03 = **1,126** und 1,05³/1,03 = 1,124. Das Bandende 1,11 im Bericht liegt
+  darunter.
+
+#### 3.2 · Leitfragen dieses Pakets (§5) — einzeln mit Verdikt und Beleg
+
+**LF 4 — Doppelzählung: zwei Kanäle? zwei Konten? Maßnahmeneffekt schon im Basiswert?
+Referenzwerte doppeln Baseline-Anteile? Verdikt: Befund** (→ neuer Befund **39**).
+
+Geprüft wurden vier Punkte. Drei bestehen, einer nicht.
+- **Zwei Konten: bestanden.** \(A^{*}\) bleibt in K3 (Konten C26 „Wiederherstellungskosten an
+  Gebäuden, Hausrat, Fahrzeugen …"). Kraftfahrt (1,3 von 5,7 Mrd. €) liegt außerhalb der
+  Sachsumme, Hausrat und Gewerbe fallen über \(w_{\text{wg}}\) heraus. Versicherungsleistungen
+  dienen **als Messung** des Schadens und werden über \(u\) und \(\kappa\) auf den Bruttoschaden
+  hochgerechnet, nicht vom Schaden abgezogen. Das entspricht Mon. **J64** („Versicherungsleistungen
+  sind Transfers und mindern den Schaden nicht (R5)"), das Mon. **J65** mit „Wie ID 59" übernimmt,
+  und Rechenregeln **C7**. Dass ein GDV-Anker gewählt wird, deckt Rechenregeln **C19** („ergänzt um
+  GDV-Schadensstatistiken").
+- **Zwei Kanäle: bestanden.** \(\varphi_{\text{fluss}}\) schneidet Sturzflut (W087) und
+  Kanalrückstau (W100) aus der gepoolten GDV-Position heraus (4.2). Kein anderer Bericht
+  kalibriert heute auf dieselbe Reihe: `grep -c GDV` ergibt 0 in `25_…`, `47_…`, `50_…` und `61_…`.
+  Eine Doppelbuchung derselben Anker-Euro gibt es heute also nicht.
+- **Referenzwerte doppeln Baseline-Anteile (HD_ref-Klasse): bestanden.** \(A^{*}\) steht auf
+  Bestand und Preisen 2024, \(\pi\) führt nur den Preisstand fort, \(M_0\) rechnet mit Preisen 2026.
+  Kein Faktor steht doppelt im Produkt \(A^{*}\). Dass \(U\) dieselben Faktoren wiederverwendet,
+  ist eine Frage der Sanity-Prüfung und steht unter LF 8.
+- **Maßnahmeneffekt schon im Basiswert: Befund.** Der Doppelzählungs-Wächter aus 4.7 ist mit den
+  Kalibrierjahren **formal verbunden** (2002–2024 einzeln benannt, 2025 ausgeschlossen, Stichtag
+  31.12.2024, Befund 7 insoweit erledigt). In der vorliegenden Form lässt er sich aber **nicht
+  operationalisieren**. \(\lambda\) hängt am **Mittel über 23 Jahre**. Der Ausstattungsstand vom
+  31.12.2024 ist darin nicht enthalten, enthalten ist der mittlere Stand der Periode. Eine
+  Nachrüstung aus dem Jahr \(t\) geht nur mit dem Gewicht \((2024-t+1)/23\) ins Mittel ein: für 2020
+  mit **21,7 %**, für 2014 mit **47,8 %**. Nachrüstungen aus 2002–2024 stecken deshalb nur teilweise
+  im kalibrierten Niveau. Sie werden über \(\Delta q\) aber vollständig ausgeschlossen. Auch die
+  Verfallsregel („verfällt, sobald ein Kalibrierjahr nach 2024 aufgenommen wird") ist
+  uneinheitlich: Der Referenzzustand rückt um ein volles Jahr, das Mittel nur um 1/24 →
+  **Befund 39**.
+
+**LF 7 — Tails/Parameter: Verteilungsannahmen, wo empirische Quantile verfügbar wären; gesetzte
+Werte, die messbar wären; Kalibriermodell = Produktionsmodell? Verdikt: Befund** (→ neue Befunde
+**32** und **34**).
+- **Kalibriermodell = Produktionsmodell: nicht erfüllt.** Der Einleitungssatz von Kapitel 4
+  behauptet es. Tatsächlich entsteht \(M_0\) jedoch aus dem „Vorab-Wert aus der Beispielzelle"
+  (4.3, Punkt 3), also aus **einer erfundenen Zelle** mit \(W\) = 1.200 m² und den Anteilen
+  \(a\) = 0,25/0,80/1,00, dazu einem Einheitswert je Adresse. Die acht Anker-Kommunen sind nur
+  benannt und nicht gerechnet, die angekündigten „16 Werte" auf Bundesland-Ebene kommen im Kapitel
+  nicht vor. Die Näherung hat zudem einen anderen **Umfang** als das Produktionsmodell: GK2 fehlt
+  (0,22–1,11 Mrd. €, 24–118 % von \(M_0\), Abschnitt 3.1), und Adressen werden als Wohngebäude
+  gezählt (19,7 Mio Wohngebäude auf 22,6 Mio Adressen = 0,872). §3.4 verbietet Faktoren aus
+  Näherungsläufen, sobald das Produktionsmodell konvexe Wirkungsfunktionen hat. \(d(h)\) wächst
+  multiplikativ (§3.3). → **Befund 32**.
+- **Gesetzte Werte, die messbar wären: Befund.** Der Bericht verwendet laut 4.1 die Grafiken
+  „Elementarschäden **an Wohngebäuden** nach Bundesländern" (10.10.2025) und die Übersichtsreihe
+  (30.12.2025). Trotzdem setzt er \(w_{\text{wg}}\) = 0,65 („spartenscharfe Aufteilung … nicht
+  publiziert") und leitet den Mittelwert \(A_{\text{ver}}\) aus dem Satz einer Pressemitteilung ab
+  („rund eine Milliarde mehr"). Der ankerseitige Regime-Anteil stammt aus einem einzigen Jahr,
+  „sobald die Jahreswerte … vorliegen" (4.5). Nach der eigenen Quellenangabe liegen die Jahreswerte
+  und der Wohngebäude-Schnitt aber im zitierten Datenservice vor. Die Kleinste-Quadrate-Bestimmung
+  über die Anker-Zeitreihe und die Sensitivität je Zeitfenster, die §3.4 verlangt, fehlen
+  (`Kleinste Quadrate` und `Zeitfenster` kommen in Kapitel 4 je 0 mal vor). → **Befund 34**.
+- **Verteilungsannahmen statt empirischer Quantile: Befund (in Befund 33 aufgenommen).** Der
+  modellseitige Regime-Anteil ist ein reines Tail-Maß. Er stammt aus drei gesetzten Stützstellen
+  der Beispielzelle mit einer flachen Fortsetzung \(p_3 \cdot A_3\), nicht aus gemessenen
+  Tiefenverteilungen der Anker-Kommunen. Das modellseitige ±2,3 zeigt nur die Streuung über das
+  \(p_3\)-Band.
+
+**LF 8 — Kalibrierung: ein Skalar; Revisionsstand; unabhängige Verteilungsprüfung mit
+Ist-Ergebnis, out-of-sample? Verdikt: Befund** (→ neue Befunde **32**, **33**, **35**, **36**,
+**37**, **38**).
+- **Ein Skalar: bestanden.** Es gibt genau ein \(\lambda\), bundesweit konstant, ohne Länder- oder
+  Kommunalfaktor (4.4, „Anwendungsregel"). Gegenprobe: Eine Kommune mit \(a\) = 0 bleibt bei 0,
+  denn \(\lambda \cdot 0 = 0\). Das Paket T-0271 hat \(\text{EAD}_k\) = 0,00 bereits nachgerechnet.
+- **Revisionsstand: bestanden.** Datenservice Naturgefahrenreport 2025, Grafikstände 10.10.2025 und
+  30.12.2025, Normierung „Bestand und Preise 2024"; das vorläufige Jahr 2025 ist aus dem Mittel
+  herausgenommen (4.1). Die Sensitivität ohne vorläufige Werte ist damit trivial erfüllt. Die
+  fehlende Sensitivität je Zeitfenster steht in Befund 34.
+- **Nachgerechnete Zahlen:** Zielwert 0,9854, Modellsumme 0,9401, Skalar 1,0482, Regime-Anteil
+  33,86 % gegen 38,46 %, Lage 0,5564 ≤ 0,9854 ≤ 2,2641 — **die Arithmetik stimmt vollständig**
+  (Abschnitt 3.1).
+- **Unabhängige Verteilungsprüfung mit Ist-Ergebnis: vorhanden, aber nicht out-of-sample.** Das
+  Prüfjahr 2024 ist **selbst die Quelle des Ankermittels**: \(A_{\text{ver}}\) = 2,6 − 1,0 = 1,6,
+  und die Ankerseite der Prüfung lautet 1,0/2,6. Beide Seiten beruhen auf denselben zwei Zahlen
+  aus derselben Medieninformation. Die bezifferte Überlappung „1 von 23 Kalibrierjahren, 4,3 %"
+  beschreibt das nicht. Die Prüfung vergleicht außerdem den Anteil an einem **Erwartungswert**
+  (Modell) mit dem Überschuss eines **Einzeljahres** (Anker). Das ankerseitige ±12,5 ist gesetzt,
+  nicht hergeleitet („dafür ±12,5 Prozentpunkte"). Eine Verdopplung des Extremschadens besteht die
+  Prüfung noch (48,8 %). → **Befund 33**.
+- **Kalibrierung mit dem Produktionsmodell:** nicht erfüllt → **Befund 32** (siehe LF 7).
+- **Sanity-Band: formal eingehalten, als Prüfstein nicht tragfähig.** \(U\) ist zirkulär, denn
+  \(U \le \lambda M_0\) gilt für jedes \(u\kappa \ge 1\). \(O\) ist keine Obergrenze, weil die
+  eigene Modellrate 2,10-mal so hoch liegt. Die §3.4-Forderung nach „amtlicher Statistik" ist ohne
+  begründete Ausnahme nicht erfüllt, da der GDV keine amtliche Stelle ist. → **Befund 35**.
+- **Plausibilitätsschranke 0,50–2,00:** ungeleitet und im Widerspruch zum eigenen \(\lambda\)-Band
+  0,42–2,36 → **Befund 36**.
+- **Vorgabe P1, gemessen an 4.8:** Die Tabelle trennt Quelle und Abschätzung sauber für elf
+  Zeilen. Es fehlen jedoch die Betroffenheitsannahme 1/100 a, die Schranke 0,50/2,00 und der
+  Baupreisanstieg 2023 → 2024 von „rund 3 %". Das sind Parameter, die im Kapitel rechnen und
+  nutzersichtbar ausgewiesen werden müssen. Die Toleranzzeile führt ±2,3/±12,5 zwar, doch ±12,5 hat
+  keine Herleitung (Befund 33). → **Befund 37**.
+- **Bandende von \(\pi\) falsch gerechnet** → **Befund 38**.
+
+*Formelzeichen (Abgrenzung zu LF 13):* Alle zwölf Formelzeichen von Kapitel 4 haben im Kapitel
+eine Herleitungsstelle: \(A_{\text{ver}}\) (4.1), \(w_{\text{wg}}, u, \varphi_{\text{fluss}},
+\kappa, \pi, A^{*}\) (4.2), \(M_0\) (4.3), \(\lambda\) (4.4), \(U, O\) (4.6) und \(q_0\) (4.7,
+ausdrücklich geparkt). Ein Formelzeichen **ohne** Herleitung gibt es nicht, **deshalb kein eigener
+Befund**. Ob Kapitel 4 eine eigene Zeichentabelle braucht, ist eine Formfrage (LF 11/13) und wird
+hier nicht beurteilt.
+
+#### 3.3 · Neue Befunde dieses Pakets (32–39)
+
+Format nach §5: Stelle · Art (Lücke/Fehler/Widerspruch) · Begründung · Vorschlag · Kategorie. Das
+Ticket nennt die Nummern 1–19 und als erste neue Nummer 20; das war der Stand beim Ticketschnitt.
+Die vorlaufenden Pakete T-0270 (20–22), T-0271 (23–26) und T-0272 (27–31) haben seither weiter
+vergeben. Nach der Regel „fortlaufend ab der nächsthöheren freien Nummer" ist die erste neue Nummer
+deshalb **32**. **Dieses Paket behebt keinen Befund**, weder einen neuen noch einen alten. Die
+Kurzform-Tabelle „Offene Befunde" am Kopf bleibt bewusst unberührt, sie schreibt die
+Befund-Regression dieser Runde fort. Jeder Prüfausdruck endet mit Exit 0, **solange der Befund
+besteht**. Am 17.09.2026 wurden alle acht ausgeführt, alle acht endeten mit Exit 0.
+
+| Nr | Kat. | Befund (Stelle · Art · Begründung · Vorschlag) | Prüfausdruck | Status |
+|---|---|---|---|---|
+| 32 | A | Bericht Kap. 4, Einleitung (Z. 839–841) gegen 4.3 (Z. 924–948) · **Widerspruch/Fehler (§2.4 „Kalibrierlauf immer mit dem Produktionsmodell", §3.4 „Kalibriermodell = Produktionsmodell", §5 LF 7/8)** — Die Einleitung behauptet, das Kalibriermodell sei das Produktionsmodell. \(M_0\) entsteht aber aus drei nationalen Einheitswerten, und der Schadensgrad 0,526 %/a ist der „Vorab-Wert aus der Beispielzelle" (W = 1.200 m², \(a\) = 0,25/0,80/1,00). Die acht benannten Anker-Kommunen sind nicht gerechnet, die angekündigten 16 Länderwerte fehlen. Die Näherung hat einen anderen Umfang als \(A^{*}\): (a) GK2 (1,38 Mio Adressen, im Modell bei HQextrem nass) fehlt in \(M_0\). Nachgerechnet ergibt das 0,222 Mrd. € (\(q\) = 0,050) bis 1,112 Mrd. € (\(q\) = 0,250) je Jahr, also **24–118 % von \(M_0\)**. \(A^{*}\) enthält diese Schäden, deshalb nimmt \(\lambda\) den fehlenden Umfang auf, statt ein Niveau zu korrigieren. (b) Alle 339.000 Adressen zählen als Wohngebäude mit 208 m²; Wohngebäude je Adresse = 19,7/22,6 = 0,872. Das ist entgegen der Behauptung keine Untergrenze. (c) \(d(h)\) wächst multiplikativ, damit trifft das Näherungsverbot aus §3.4 zu. Der Satz „das Modell trifft das Anker-Niveau ohne nennenswerte Korrektur" (4.4) ist deshalb kein Kalibrierergebnis. **Vorschlag:** \(M_0\) mit dem Produktionsmodell auf der dokumentierten Stichprobe rechnen (acht Anker-Kommunen, hochgerechnet über ZÜRS-Klassen **einschließlich GK2**, Adressen über den Wohngebäudeanteil umgerechnet), \(\lambda\) daraus bestimmen und den Restfehler unterhalb der Stichprobenauflösung nach §3.4/§3.9 quantifiziert ausweisen. Bis dahin \(\lambda\) = 1,05 ausdrücklich als vorläufig kennzeichnen und die Einleitung korrigieren. Kein Vollraster-Lauf. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('Vorab-Wert aus der Beispielzelle' in k and 'ZÜRS-GK3+GK4' in k and 'Das Kalibriermodell ist das' in k) else 1)"` | offen |
+| 33 | A | Bericht Kap. 4.5 (Z. 973–998) und 4.1 „Ankerwert" (Z. 862–865) · **Fehler (§3.4 „Prüfdaten dürfen nicht dieselben sein, auf denen Faktoren gefittet wurden", §5 LF 8 „out-of-sample", §6 Kalibrier-Prüfstein)** — (a) Die Ankerseite der Verteilungsprüfung (1,0/2,6 = 38,46 %) und das Ankermittel \(A_{\text{ver}}\) = 2,6 − 1,0 = 1,6, aus dem \(\lambda\) bestimmt wird, beruhen auf **denselben zwei Zahlen** aus derselben GDV-Medieninformation zu 2024. Die ausgewiesene Überlappung „1 von 23 Kalibrierjahren, 4,3 %" gibt das nicht wieder, denn aus den anderen 22 Jahren geht kein Wert ein. (b) Die Größen passen nicht zusammen: Das Modell misst den Anteil des seltenen Regimes am **Erwartungswert**, der Anker misst den Überschuss eines **Einzeljahres** über das Mittel. Pluviale Anteile sind darin gepoolt. (c) Das ankerseitige ±12,5 ist gesetzt, nicht hergeleitet (§3.9), und legt die Toleranz fast allein fest. Die Prüfung trennt schwach: Eine Verdopplung des HQextrem-Schadens (\(A_3\) = 600 m²) ergibt 48,76 % und **besteht**. (d) Der modellseitige Anteil 33,86 % kommt aus den gesetzten Stützstellen einer Beispielzelle, nicht aus gemessenen Tiefen der Anker-Kommunen (§3.2 Tails). Der Kalibrier-Prüfstein nach §6 ist damit nicht bestanden. Die Toleranz wird **nicht** geweitet oder verengt, der Befund geht in einen Modellentscheid. **Vorschlag:** Die Prüfung auf Daten stellen, die nicht zur Bestimmung von \(\lambda\) dienen. Möglich sind ein Leave-one-out über die Jahreswerte 2002–2024 (Anteil der Jahre über einer Ereignisschwelle, gerechnet ohne das jeweilige Jahr im Mittel) oder die Länderwerte der Wohngebäude-Grafik gegen die Modellverteilung auf Länderebene. Den Ankerwert als Erwartungswertanteil definieren, das ankerseitige Toleranzbudget herleiten und die Toleranz vor der Rechnung neu fixieren. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('1,0/2,6' in k and '1 von 23 Kalibrierjahren' in k and 'dafür ±12,5 Prozentpunkte' in k) else 1)"` | offen |
+| 34 | B | Bericht Kap. 4.1 (Z. 855–865), 4.2 Herleitung \(w_{\text{wg}}\) (Z. 892–897), 4.4 (Z. 952) und 4.5 „Grenzen der Prüfung" (Z. 993–998) · **Lücke (§3.4 Kalibrierfaktor-Regel „Kleinste Quadrate Anker ÷ Modellsumme über die Anker-Zeitreihe; einheitliche Jahres-Auswahlregel, Sensitivitäten je Zeitfenster", §5 LF 7 „gesetzte Werte, die messbar wären")** — \(\lambda\) ist ein einfacher Quotient aus einem Mittelwert, den ein Presse-Satz liefert („rund eine Milliarde mehr als im langjährigen Durchschnitt"). Er wird nicht über die Zeitreihe gefittet, und eine Sensitivität je Zeitfenster fehlt (in Kap. 4 kommen `Kleinste Quadrate` und `Zeitfenster` je 0 mal vor). Nach 4.1 verwendet der Bericht selbst die Übersichtsreihe (30.12.2025) und die Grafik „Elementarschäden **an Wohngebäuden** nach Bundesländern" (10.10.2025). Trotzdem gelten die Jahreswerte als noch nicht vorliegend (4.5), und \(w_{\text{wg}}\) = 0,65 wird als „nicht publiziert" gesetzt. Beide Größen sind nach der eigenen Quellenangabe messbar. Außerdem ist offen, ob GDVs „langjähriger Durchschnitt" 2002–2024 umfasst. **Vorschlag:** die 23 Jahreswerte aus dem zitierten Datenservice mit Grafik und Zugriffsdatum übernehmen, \(A_{\text{ver}}\) als deren Mittel rechnen (und \(\lambda\) nach §3.4 fitten), Sensitivitäten für mindestens zwei Zeitfenster ausweisen (z. B. 2002–2024 und 2014–2024, mit und ohne 2021), \(w_{\text{wg}}\) aus dem Wohngebäude-Schnitt messen oder begründen, warum er dort nicht abgelesen werden kann. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('Kleinste Quadrate' not in k and 'Zeitfenster' not in k and 'an Wohngebäuden' in k and 'nicht publiziert' in k) else 1)"` | offen |
+| 35 | B | Bericht Kap. 4.6 (Z. 1002–1014) · **Fehler (§3.4 „Sanity-Bänder mit Unter- und Obergrenze aus amtlicher Statistik (oder begründete Ausnahme)", §6 „ein zu weit gewordenes Band ist ein Befund")** — (a) **Untergrenze zirkulär:** \(U = A_{\text{ver}} w_{\text{wg}} \varphi \pi\) und \(\lambda M_0 \equiv A^{*} = U \cdot u\kappa\). Die Prüfung \(U \le \lambda M_0\) gilt also für **jedes** \(u\kappa \ge 1\) (nachgerechnet \(U/A^{*}\) = 0,5647) und kann nicht scheitern. Als „harte" Grenze beruht sie zudem auf den Mittelwerten zweier Abschätzungen; mit deren unteren Bandenden sinkt \(U\) auf 0,28. (b) **Obergrenze ist keine Schranke:** Die Begründung „Mehr kann selbst dann nicht entstehen, wenn jedes exponierte Gebäude im Hundertjahresrhythmus mit maximaler Quote getroffen wird" übersieht, dass GK4 nach ZÜRS-Definition und nach dem eigenen \(p_1\) = 0,1 a⁻¹ mindestens alle zehn Jahre nass wird. Die eigene Modellrate (6,311/1.200 = 0,526 %/a) liegt beim **2,10-Fachen** der angesetzten Höchstrate 0,25 %/a. Klassengerecht (GK4 und GK3 mit 0,1 a⁻¹, GK2 mit 0,01 a⁻¹, Quote 0,250) ergibt sich **6,29 Mrd. €₂₀₂₆/a**, GK4 allein 1,19 Mrd. Dass die Lage „eingehalten" ist, liegt daran, dass \(O\) fünfmal so viele Adressen zählt. (c) Beide Grenzen stammen aus GDV-Zahlen, ZÜRS und Abschätzungen, keine aus amtlicher Statistik; eine begründete Ausnahme fehlt. **Vorschlag:** die Untergrenze unabhängig vom Ankerfaktorsatz herleiten (z. B. aus amtlichen Wiederaufbauhilfen 2013/2021 als Ereignis-Mindestschaden, umgelegt auf die Wiederkehrzeit), die Obergrenze klassengerecht mit den Überflutungswahrscheinlichkeiten der ZÜRS-Klassen bilden, die Ausnahme vom Amtlichkeitsgebot begründen. Das Band danach vorab fixieren und nicht wieder weiten. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('mittleren Betroffenheit von 1/100 Jahren' in k and 'Hochrechnung \\\\(u\\\\) entfällt hier bewusst' in k and 6.311/1200>0.25*0.01) else 1)"` | offen |
+| 36 | B | Bericht Kap. 4.4 „Plausibilitätsschranke" (Z. 960–963) gegen 4.4 Band (Z. 952) und 4.8 (Z. 1053) · **Widerspruch/Lücke (§3.9 Herleitungspflicht; §6 Prüfsteine)** — Die Schranke \(\lambda\) < 0,50 oder > 2,00 („Modell gilt als fehlerhaft") ist ohne Herleitung gesetzt und in 4.8 nicht aufgeführt. Das eigene \(\lambda\)-Band 0,42–2,36 (nachgerechnet 0,416–2,357) liegt **an beiden Enden außerhalb** dieser Schranke. Der Bericht erklärt damit Teile seines eigenen Unsicherheitsbandes für modellfehlerhaft, ohne diese Fälle zu entscheiden. Zudem enthält das \(\lambda\)-Band nur die Ankerunsicherheit, \(M_0\) trägt kein Band (208 m², 1,30, 1.950 €, 6,311/1.200 und 339.000 gehen ungestreut ein). **Vorschlag:** die Schranke aus dem vollständig fortgepflanzten Band von \(A^{*}\) **und** \(M_0\) herleiten und in 4.8 führen oder ausdrücklich begründen, warum Bandenden jenseits der Schranke zulässig sind. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];t=k.split('### 4.8 ')[1];raise SystemExit(0 if ('0,42–2,36' in k and '2{,}00' in k and '2,00' not in t and '2{,}00' not in t) else 1)"` | offen |
+| 37 | B | Bericht Kap. 4.8 Parametertabelle (Z. 1045–1057) gegen 4.2 (Z. 913–915), 4.5 (Z. 973–978), 4.4 (Z. 960–961) und 4.6 (Z. 1005/1009) · **Lücke (Vorgabe P1 „Gilt für alle Parameter", §3.9 „Unzulässig: … Bandgrenzen, Referenzwerte")** — Drei Werte, die in Kapitel 4 rechnen, fehlen in der P1-Tabelle: die Betroffenheit **1/100 a** (in 4.6 selbst „Abschätzung von KAP3" genannt; in 4.8 kommt sie nur als Wort in der Herleitungsspalte von \(O\) vor, ohne eigene Zeile und Kennzeichnung), die Plausibilitätsschranke **0,50/2,00** und der Baupreisanstieg **„rund 3 %" 2023 → 2024**, aus dem \(\pi\) folgt (ohne Quelle, ohne Abschätzungsvermerk). Außerdem heißen \(\lambda\), \(U\) und \(O\) „berechnet". Sie hängen jedoch an Abschätzungen von KAP3 (\(w_{\text{wg}}\), \(\varphi\), 1/100 a), und P1 kennt nur Quelle oder Abschätzung samt Herleitung. Ein Nutzer sähe „berechnet", ohne zu erkennen, dass eine Abschätzung trägt. **Vorschlag:** die drei Parameter mit Wert, Band und Kennzeichnung (Quelle oder Abschätzung von KAP3 samt Herleitungsanker) in 4.8 aufnehmen, bei \(\lambda\), \(U\) und \(O\) vermerken, welche Abschätzungen einfließen. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 4.8 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('Betroffenheit' not in t and '2,00' not in t and 'rund 3' not in t and 'Baupreisanstieg' not in t) else 1)"` | offen |
+| 38 | C | Bericht Kap. 4.2 Tabellenzeile \(\pi\) (Z. 887), Herleitung (Z. 913–915) und 4.8 (Z. 1052); gerechnet im Block `beispiel_60_kalibrierung` (Z. 1064–1065) · **Fehler (Rechenfehler im Band)** — \(\pi = 1{,}105/1{,}03 = 1{,}0728\) trifft zu. Die Bandenden folgen aus dem B4-Band 1,07–1,16 aber als 1,07/1,03 = **1,039** und 1,16/1,03 = **1,126** (mit dem ungerundeten 1,05³ = 1,1576, vgl. Befund 27: **1,124**), nicht als 1,04–**1,11**. Dadurch ist das obere Ende von \(A^{*}\) mit 2,216 zu niedrig; mit 1,126 wären es 2,248 Mrd. €, dicht an \(O\) = 2,264. Der Beispielblock prüft nur die eigene Rundung und fängt den Fehler deshalb nicht. **Vorschlag:** das Band von \(\pi\) aus dem Band von B4 rechnen (nach Befund 27), \(A^{*}\)-Band, \(\lambda\)-Band und die Zusicherung `hi` nachziehen. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('1,07 (1,04–1,11)' in k and round(1.16/1.03,2)>1.11) else 1)"` | offen |
+| 39 | B | Bericht Kap. 4.7 „Wächter" (Z. 1023–1029) gegen 4.4 (\(\lambda\) aus dem Mittel 2002–2024) und §5.1.2 (\(\Delta q\)) · **Lücke (§3.5 „Doppelzählungs-Wächter gegen die Kalibrierjahre", §5 LF 4 „Maßnahmeneffekt schon im Basiswert?")** — Der Wächter setzt als Referenz den „Ausstattungsstand 31.12.2024" und schließt alle Nachrüstungen bis 2024 aus \(\Delta q\) aus. \(\lambda\) bildet aber den **mittleren** Ausstattungsstand der Jahre 2002–2024 ab, nicht den Stand zum Stichtag. Eine Nachrüstung aus dem Jahr \(t\) geht nur mit dem Gewicht \((2024-t+1)/23\) ins Niveau ein (2020: 21,7 %, 2014: 47,8 %). Solche Nachrüstungen sind im Basisschaden also nur teilweise enthalten, werden als Hebel aber vollständig gesperrt. Das Niveau liegt dadurch über dem Stand 2024, der Hebel ist unterzählt. Die Verfallsregel verschiebt den Referenzzustand je neu aufgenommenem Jahr um ein ganzes Jahr, das Kalibriermittel nur um 1/24. Ohne \(q_0\) lässt sich außerdem nicht prüfen, ob \(\Delta q\) = 0,10 ein Zuwachs nach 2024 ist. Befund 7 ist formal abgearbeitet, der Wächter selbst aber nicht operationalisiert. **Vorschlag:** den Referenzzustand als das über die Kalibrierjahre gewichtete Ausstattungsmittel definieren (oder das Kalibrierfenster so kurz wählen, dass der Stichtag das Mittel repräsentiert, mit Sensitivität je Zeitfenster nach §3.4, vgl. Befund 34) und die Verfallsregel auf die tatsächliche Gewichtsverschiebung umstellen. Richtung und Größenordnung der Verzerrung als Modellgrenze ausweisen, solange \(q_0\) geparkt ist. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 4.7 ')[1].split('### 4.8 ')[0];raise SystemExit(0 if ('Ausstattungsstand 31.12.2024' in t and 'gewicht' not in t.lower()) else 1)"` | offen |
+
+#### 3.4 · Abgrenzung und Status dieses Pakets
+
+- **Beantwortet:** LF 4 (Verdikt Befund), LF 7 (Verdikt Befund) und LF 8 (Verdikt Befund), jede mit
+  Beleg. LF 8 wurde nachgerechnet statt gelesen: Zielwert 0,9854, Modellsumme 0,9401,
+  Niveau-Skalar 1,0482, Regime-Anteil 33,86 % gegen 38,46 % (Differenz 4,6 Prozentpunkte) und die
+  Lage 0,5564 ≤ 0,9854 ≤ 2,2641 stammen aus dem ausgeführten Block `beispiel_60_kalibrierung`
+  (grün) und sind mit Gegenproben ergänzt (Abschnitt 3.1).
+- **Nicht Gegenstand dieses Pakets:** die übrigen Leitfragen, die Kapitel außer Kapitel 4, die
+  Prüfung der GDV-Primärquelle gegen Kapitel 8 (LF 10), die Kostensatz-Frage Neuwert gegen den
+  „Zeitwertansatz" aus Mon. J64 (LF 9) und die Regression der Befunde 1–19. Ein nationaler
+  100-m-Vollraster-Lauf nach §3.4 war nicht verlangt und wurde nicht gefahren.
+- **Kein Befund behoben**, und kein Bericht, Register, Code, Lint oder keine Arbeitsmappe geändert:
+  `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und `docs/evidenz/register.md` sind
+  byte-gleich geblieben; `backend/scripts/lint_methodik.py` wurde in diesem Paket nicht ausgeführt
+  (Ausgabe aus Abschnitt 0.1 übernommen).
