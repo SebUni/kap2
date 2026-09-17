@@ -98,7 +98,7 @@ Arbeitsmappe stehen; sie ist weiterhin keine eigene Entscheidung.
 | W006 | Rutschungen und Muren (= Id 12) | KWK Z43 | **inaktiv** — wie W008; zusätzlich Mon. Z17 (Id 12, Spalte „Regeln”): „R7, R9” und Spalte „Bewertungsansatz”: „Wiederherstellungskosten beschädigter Gebäude (K3) …” (eigener Bewertungsansatz von #12, nicht #60) | wie W008 |
 | W091 | Grundwasserstand (= Id 55) | KWK Z214 | **inaktiv** — Abgleich-Protokoll Punkt 5 (Zeile 10): Ziel-Name/Konto „Direktbuchung Konto K3” — Id 55 bucht eigenständig direkt in K3, außerhalb der #60-Formel (R9, Rechenregeln Z11) | Id 55 bucht direkt in K3 (Abgleich-Protokoll P5) — Partition gegenüber #60 offen (R9) |
 | W100 | Einschränkungen Kanalnetze und Vorfluter (= Id 52) | KWK Z223 | **inaktiv** — Mon. Z57 (Id 52, Spalte „Schadenskonto”): „K4”; Spalte „Nicht enthalten”: „Gebäudeschäden durch Rückstau (ID 59).” | Id 52 bucht K4 (NW Z53) — voraussichtlich bewusst inaktiv |
-| S092 | Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer | KWK Z256 | **FS-Vorsorge** — Maßnahmen-Hebel, bereits beziffert (§5.1: r_S092 = 0,035, Band 0,0075–0,1056, §3.9 Abgeschätzt) | Kandidat **Maßnahmen-Hebel** (Objektschutz); P2-Abschätzung §5.1 |
+| S092 | Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer | KWK Z256 | **FS-Vorsorge** — Maßnahmen-Hebel, bereits beziffert (§5.1: r_S092 = 0,035, Band 0,0075–0,0992, §3.9 Abgeschätzt) | Kandidat **Maßnahmen-Hebel** (Objektschutz); P2-Abschätzung §5.1 |
 | S093 | Zustand von Gebäuden und Infrastrukturen | KWK Z257 | **FS-Schadensgrad** — Vulnerabilität der Wassertiefe-Schadensfunktion (Mon. Z65) | Kandidat Vulnerabilität der Schadensfunktion; Evidenz und Zellgröße offen |
 | S094 | Verwendete Baumaterialien auf Gebäudeebene | KWK Z258 | **FS-Schadensgrad** — wie S093 | wie S093 |
 | S096 | Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand | KWK Z260 | **inaktiv (geparkt: Formelstelle FS-Schutzsystem ohne Term in §3.4, Modul #50 fehlt)** — Ziel: R7-Erwartungswert-Weiche mit #50 (Mon. Z65 Spalte „Regeln”: „R7, R9”; Rechenregeln Z9 R7) | Schutzsysteme über R7-Weiche mit #50 (Mon. Z65 „Schutzkosten (ID 50, R7)”; Z55) |
@@ -183,7 +183,7 @@ aus #95/#96/#98). In Formeln (§3) dürfen später nur Zeilen mit Entscheidung *
 | 60-W006-01 | W006 Rutschungen und Muren → Gebäudeschaden (flussseitig) | offen | offen | offen | offen | offen | offen |
 | 60-W091-01 | W091 Grundwasserstand → Gebäudeschaden (flussseitig) | offen | offen | offen | offen | offen | offen |
 | 60-W100-01 | W100 Kanalnetze/Vorfluter → Gebäudeschaden (flussseitig) | offen | offen | offen | offen | offen | offen |
-| 60-S092-01 | S092 Vorsorge der Eigentümer (Objektschutz) → Gebäudeschaden | im Erstaufschlag **keine nach §3.5 zulässige** (Interventions-/quasi-experimentelle) Effektgröße belegt ⇒ **Abschätzung von KAP3** \(r_{\text{S092}}\) = 0,035 (Band 0,0075–0,1056), Kette §5.1 | — (keine Interventionsstudie belegt; Befragungen nach Ereignissen sind nur Kandidat, im Volltext nicht verifiziert, gehen nicht in den Wert ein) | Herleitung §5.1 (`#s092-wirkung`) | §3.9 ABGESCHÄTZT; Setzung für deutsche Kommunen | kommunal (Pauschalfaktor — Modellgrenze der Abschätzung) | **Maßnahmen-Hebel (abgeschätzt)** — FS-Vorsorge; wirkt multiplikativ auf den Erwartungsschaden (§5.1), Wert und Band sind die Abschätzung von KAP3 nach §3.9/Vorgabe P2, Herleitung §5.1 (`#s092-wirkung`) |
+| 60-S092-01 | S092 Vorsorge der Eigentümer (Objektschutz) → Gebäudeschaden | im Erstaufschlag **keine nach §3.5 zulässige** (Interventions-/quasi-experimentelle) Effektgröße belegt ⇒ **Abschätzung von KAP3** \(r_{\text{S092}}\) = 0,035 (Band 0,0075–0,0992), Kette §5.1 | — (keine Interventionsstudie belegt; Befragungen nach Ereignissen sind nur Kandidat, im Volltext nicht verifiziert, gehen nicht in den Wert ein) | Herleitung §5.1 (`#s092-wirkung`) | §3.9 ABGESCHÄTZT; Setzung für deutsche Kommunen | kommunal (Pauschalfaktor — Modellgrenze der Abschätzung) | **Maßnahmen-Hebel (abgeschätzt)** — FS-Vorsorge; wirkt multiplikativ auf den Erwartungsschaden (§5.1), Wert und Band sind die Abschätzung von KAP3 nach §3.9/Vorgabe P2, Herleitung §5.1 (`#s092-wirkung`) |
 | 60-S093-01 | S093 Gebäudezustand → Schadensgrad | Zustands-/Qualitätsachse der Wassertiefe-Schadensfunktion: FLEMOps führt die Gebäudequalität als eigene Eingangsachse mit **zwei Klassen** („Low/medium quality“ / „high quality“) neben Wasserstand (5 Klassen: <21 / 21–60 / 61–100 / 101–150 / >150 cm) und Gebäudetyp (3 Klassen); die Schadensquote des Gebäudes steigt über diese Wasserstandsklassen von ≈ 3,5 % auf ≈ 25 %, die Qualitätsachse ist jedoch **nur grafisch** (Fig. 1) und ohne Zahlentabelle je Qualitätsklasse publiziert ⇒ **Abschätzung von KAP3** \(f_{\text{S093}}\) = 1,00 (geometrisch zentriert, Klassenanteile des Bestands nicht belegt), **Band 0,71–1,40** (Spannweitenfaktor 1,96 zwischen den beiden Zustandsklassen = mittlere Einzelachsen-Spannweite von Kontamination und Vorsorge aus FLEMOps Tab. 2), Kette in B5; Sensitivität: −29 %/+40 % auf den Schadensgrad je Zelle (gegen ±12 % Tiefenband aus 60-S074-01) | empirische Mehrfaktor-Schadensfunktion aus Betroffenenbefragung (1.697 im August 2002 betroffene Haushalte), validiert an Instandsetzungskosten von 1.274 Einzelgebäuden in drei sächsischen Kommunen; die Zustandsachse selbst ist in der Quelle nur als Grafik ausgewiesen, der Bandwert ist deshalb eine Abschätzung von KAP3 (§3.9) | Thieken, A. H.; Olschewski, A.; Kreibich, H.; Kobsch, S.; Merz, B. 2008, „Development and evaluation of FLEMOps – a new Flood Loss Estimation MOdel for the private sector“, WIT Transactions on Ecology and the Environment 118, 315–324, WIT Press, DOI 10.2495/FRIAR080301, https://www.witpress.com/elibrary/wit-transactions-on-ecology-and-the-environment/118/19311, Zugriff 13.09.2026 — Volltext geprüft (Tab. 1 S. 317; Fig. 1 und Tab. 2 S. 318; S. 319 und S. 323); Elmer, F.; Thieken, A. H.; Pech, I.; Kreibich, H. 2010, „Influence of flood frequency on residential building losses“, Natural Hazards and Earth System Sciences 10, 2145–2159, DOI 10.5194/nhess-10-2145-2010, https://nhess.copernicus.org/articles/10/2145/2010/, Zugriff 13.09.2026 — Volltext geprüft (S. 2151) — Langbeleg **B5** unter der Tabelle | DE (Elbe- und Donaueinzugsgebiet, Ereignisse 2002 sowie 2005/2006). **Modellgrenzen:** (a) die Qualitätsklassen stammen aus den INFAS-Ausstattungsklassen („value of the equipment, windows, doors etc.“, sechs Klassen), nicht aus einer bautechnischen Zustandserhebung — die Lesart „Gebäudezustand“ ist eine dokumentierte Annahme; (b) die **Richtung** der Achse ist aus der Quelle nicht auflösbar: die Beschriftung von Fig. 1 ordnet die höheren Schadensquoten der Klasse „high building quality“ zu, was der erwarteten Richtung widerspricht, und eine Zahlentabelle zur Auflösung fehlt — der Widerspruch wird benannt, nicht geglättet (§3.8); das Band läuft deshalb symmetrisch um 1; (c) die Quelle stellt selbst infrage, ob ein an einem Extremereignis abgeleitetes Schadensmodell auf häufigere Hochwasser anwendbar ist — für HQhäufig ist das Band eine Untergrenze | keine bundesweite offene Zustandserhebung des Gebäudebestands (Datenlücke §3.8); als schwacher Proxy je 100-m-Zelle stehen Baujahrsklasse und Gebäudetyp der Zensus-2022-Gebäude- und Wohnungszählung zur Verfügung (der Bauzustand selbst wird dort nicht erhoben); die Achse läuft deshalb als bundesweit einheitliches Band auf der Ebene GEBAEUDEWERT (60-R24-01) mit; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Sensitivitätsband, abgeschätzt** — geometrisch zentriert \(f_{\text{S093}}\) = 1,00 (§3.2; Klassenanteile nicht belegt, bei hälftigem Bestand läge das arithmetische Mittel bei 1,057), also kein eigenes Multiplikativglied im Basiswert; das Band 0,71–1,40 läuft als Struktur-Unsicherheit der Schadensfunktion mit und wird im Produkt nach Vorgabe P1/P2 als „Abschätzung von KAP3“ samt Herleitung (B5) ausgewiesen |
 | 60-S094-01 | S094 Baumaterialien → Schadensgrad | Materialachse der Wassertiefe-Schadensfunktion: die empirischen deutschen Wohngebäude-Schadensmodelle führen **keine** Baustoffachse (FLEMOps-Eingangsgrößen: Wasserstand, Gebäudetyp, Gebäudequalität, Kontamination, private Vorsorge), und die ingenieurmäßige Schadensgradskala D1–D6 gilt laut Quelle „zunächst für die allgemeine Bebauung vornehmlich in Mauerwerksbauweise“; jedes von der Einwirkung betroffene Bauwerk ist dort mindestens D1 (reiner Durchfeuchtungsschaden) ⇒ **Abschätzung von KAP3** \(f_{\text{S094}}\) = 1,00 (geometrisch zentriert), **Band 0,84–1,18** (halber logarithmischer Anteil der Zustandsachse S093), Kette in B6; Sensitivität: −16 %/+18 % auf den Schadensgrad, gemeinsam mit 60-S093-01 multiplikativ **0,60–1,66** | ingenieurmäßige Klassifikation real beobachteter Schadensbilder aus Feldeinsätzen (Hochwasser Sachsen 2002/2006/2010/2013, Sturzflut Braunsbach 2015) mit sechs- bzw. siebenstufiger Schadensgradskala D0–D6; der Zahlenwert selbst ist keine publizierte Effektgröße, sondern eine Abschätzung von KAP3 (§3.9) | Maiwald, H.; Schwarz, J. 2018, „Vereinheitlichte Schadensbeschreibung und Risikobewertung von Bauwerken unter extremen Naturgefahren“, Bautechnik 95(10), 743–753, Ernst & Sohn, DOI 10.1002/bate.201800009, https://edac.biz/fileadmin/Dokumente/06_Publikationen/Bautechnik_1018_Maiwald_Schwarz.pdf, Zugriff 13.09.2026 — Volltext geprüft (Tab. 1 und Abschn. 3.1 S. 744–745, Tab. 2 S. 745, Tab. 3 S. 746, Tab. 4 S. 747); Thieken u. a. 2008 (Fundstelle wie 60-S093-01, Tab. 1 S. 317), DOI 10.2495/FRIAR080301, Zugriff 13.09.2026 — Volltext geprüft — Langbeleg **B6** unter der Tabelle | DE (Sachsen, Baden-Württemberg). **Modellgrenzen — Bauform-Grenze der Abschätzung (Vorgabe P2):** (a) die Schadensgradbeschreibungen sind mauerwerksbasiert, materialspezifische Schadensbilder für Holz-, Fachwerk- und Leichtbaukonstruktionen sind nach eigener Aussage der Quelle „in weiterführenden Arbeiten im Detail noch herauszuarbeiten“ — für diese Bauformen ist das Band eine Untergrenze und wird nicht stillschweigend verallgemeinert; (b) die Skala ist an Extremereignissen einschließlich einer Sturzflut kalibriert (dort Dislokation ganzer Bauwerke, Schadensgrad D6), das Produkt rechnet Flusshochwasser mit deutlich geringerer Fließgeschwindigkeit; (c) die Skala beschreibt Schadensgrade, nicht Schadensquoten in Euro — die Umrechnung ist nicht Bestandteil der Quelle und bleibt Teil der Abschätzung | Baumaterial ist in der amtlichen Statistik (Zensus 2022, Hausumringe, ALKIS) bundesweit nicht als Merkmal geführt — ausdrückliche Datenlücke (§3.8); nutzbar sind je 100-m-Zelle nur Baujahrsklasse und Gebäudetyp als schwacher Materialproxy; die Achse läuft deshalb als bundesweit einheitliches Band auf der Ebene GEBAEUDEWERT (60-R24-01) mit; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Sensitivitätsband, abgeschätzt** — geometrisch zentriert \(f_{\text{S094}}\) = 1,00 (§3.2; Anteile der Bauweisen nicht belegt), kein eigenes Multiplikativglied im Basiswert; das Band 0,84–1,18 läuft als Struktur-Unsicherheit mit und wird im Produkt nach Vorgabe P1/P2 als „Abschätzung von KAP3“ samt Herleitung (B6) ausgewiesen |
 | 60-S096-01 | S096 Vorsorge der öffentlichen Hand → Überflutungswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
@@ -737,9 +737,9 @@ tragen sie maschinenlesbar.
 | \(w_z\) | Wertdichte der Zelle — der Preis, mit dem die physische Zwischengröße bewertet wird | €₂₀₂₆/m² Wohnfläche | herleitung: §3.4 Schritt 3 — \(w_z = k_{\text{BGF}} \sum_t \theta_{z,t} n_t\) |
 | \(\text{EAD}\), \(\text{EAD}_z\), \(\text{EAD}_k\) | native Ergebnisgröße: jährlicher Erwartungsschaden des Kontos K3 aus flussseitiger Überflutung. Bezugsjahr und Preisstand **2026**; deklarierte Betrachtungsebene ist die **Kommune**, also \(\text{EAD} = \text{EAD}_k\); \(\text{EAD}_z\) ist das Zell-Zwischenergebnis und kein eigener Ausweis (§3.6) | €₂₀₂₆/a | herleitung: §3.1 (Deklaration) und §3.4 Schritt 3 — \(\text{EAD}_z = \bar A_z \cdot w_z\), Kommune als Summe über ihre Zellen (§3.6) |
 | \(\text{EAD}_{\text{mit}}\) | Erwartungsschaden derselben Kommune, desselben Kontos K3 und desselben Bezugsjahres 2026 **nach** Umsetzung des Hebels S092; Betrachtungsebene Kommune | €₂₀₂₆/a | herleitung: §5.1 — \(\text{EAD}_{\text{mit}} = \text{EAD}\cdot(1 - r_{\text{S092}})\), Wirkungsort und Ausschluss der K8-Kosten dort begründet |
-| \(r_{\text{S092}}\) | relative Minderung des K3-Erwartungsschadens durch den Hebel S092 | – | herleitung:#s092-wirkung — Kette \(\Delta q \cdot s_{\text{bem}} \cdot e_{\text{bem}}\), Wert 0,035 (Band 0,0075–0,1056) in §5.1.1/§5.1.2 |
+| \(r_{\text{S092}}\) | relative Minderung des K3-Erwartungsschadens durch den Hebel S092 | – | herleitung:#s092-wirkung — Kette \(\Delta q \cdot s_{\text{bem}} \cdot e_{\text{bem}}\), Wert 0,035 (Band 0,0075–0,0992) in §5.1.1/§5.1.2 |
 | \(\Delta q\) | zusätzlich nachgerüsteter Anteil exponierter Gebäude, marginal gegenüber heute | – | herleitung:#s092-wirkung — Abschätzung von KAP3 (§3.9), Wert 0,10 (Band 0,05–0,20) in §5.1.1/§5.1.2 |
-| \(s_{\text{bem}}\) | Anteil der Schadenssumme aus Ereignissen unterhalb des Bemessungsniveaus | – | herleitung:#s-bem-naeherung — Abschätzung von KAP3 (§3.9), ausgewiesene Näherung (Richtung: überschätzt den Hebel, §5.1.3), Wert 0,50 (Band 0,30–0,66, gekappt an der harten Obergrenze §5.1.3) in §5.1.1/§5.1.2 |
+| \(s_{\text{bem}}\) | Anteil der Schadenssumme aus Ereignissen unterhalb des Bemessungsniveaus | – | herleitung:#s-bem-naeherung — Abschätzung von KAP3 (§3.9), ausgewiesene Näherung (Richtung: überschätzt den Hebel, §5.1.3), Wert 0,50 (Band 0,30–0,62, obere Bandgrenze aus dem Ankerwert der Verteilungsprüfung §4.5, keine harte Grenze, §5.1.3) in §5.1.1/§5.1.2 |
 | \(e_{\text{bem}}\) | Schadensminderung am nachgerüsteten Gebäude unterhalb des Bemessungsniveaus | – | herleitung:#s092-wirkung — Abschätzung von KAP3 (§3.9), Wert 0,70 (Band 0,50–0,80) in §5.1.1/§5.1.2 |
 | \(x_k\) | exponierter Wohnflächenanteil der Kommune im HQ100 — die einzige Eingangsgröße des Schicht-A-Index | – | herleitung: §3.7 — \(x_k = \sum_z W_z a_{z,\text{HQ100}} / W_k\) aus den Ebenen HQ_FLAECHE und GEBAEUDEWERT |
 | \(I_{60,k}\) | Schicht-A-Index „Betroffenheit durch Flusshochwasser" der Kommune, Skala 0–100 | Punkte (0–100) | herleitung: §3.7 — Perzentilrang von \(x_k\) im ausgewiesenen Vergleichsraum; kein Euro-Pfad |
@@ -1208,8 +1208,8 @@ Wirkungsformel \(\text{EAD}_{\text{mit}} = \text{EAD}\cdot(1 - r_{\text{S092}})\
 | \(\text{EAD}_{\text{mit}}\) | Erwartungsschaden derselben Kommune, desselben Kontos K3 und desselben Bezugsjahres 2026 **nach** Umsetzung von S092 | €₂₀₂₆/a | herleitung: §5.1 — \(\text{EAD}\cdot(1 - r_{\text{S092}})\), Wirkungsort nur K3 (K8-Kosten ausgeschlossen, R7); Zeichentabelle §3.5 |
 | \(\Delta q\) | zusätzlich nachgerüsteter Anteil exponierter Gebäude (marginal gegenüber heute) | – | 0,10 (Band 0,05–0,20) · herleitung:#s092-wirkung — Abschätzung von KAP3, keine Primärquelle (§5.1.2) |
 | \(e_{\text{bem}}\) | Schadensminderung am nachgerüsteten Gebäude, solange der Wasserstand das Bemessungsniveau nicht übersteigt | – | 0,70 (Band 0,50–0,80) · herleitung:#s092-wirkung — Abschätzung von KAP3, keine Primärquelle (§5.1.2) |
-| \(r_{\text{S092}}\) | relative Minderung des K3-Erwartungsschadens von #60 durch S092 | – | 0,035 (Band 0,0075–0,1056) · herleitung:#s092-wirkung — berechnet aus \(\Delta q \cdot s_{\text{bem}} \cdot e_{\text{bem}}\) (§5.1.2) |
-| \(s_{\text{bem}}\) | Anteil der Schadenssumme aus Ereignissen unterhalb des Bemessungsniveaus | – | 0,50 (Band 0,30–0,66) · herleitung:#s-bem-naeherung — Abschätzung von KAP3, keine Primärquelle; ausdrücklich **Näherung**, Richtung: **überschätzt** den Hebel (§5.1.3) |
+| \(r_{\text{S092}}\) | relative Minderung des K3-Erwartungsschadens von #60 durch S092 | – | 0,035 (Band 0,0075–0,0992) · herleitung:#s092-wirkung — berechnet aus \(\Delta q \cdot s_{\text{bem}} \cdot e_{\text{bem}}\) (§5.1.2) |
+| \(s_{\text{bem}}\) | Anteil der Schadenssumme aus Ereignissen unterhalb des Bemessungsniveaus | – | 0,50 (Band 0,30–0,62) · herleitung:#s-bem-naeherung — Abschätzung von KAP3, keine Primärquelle; ausdrücklich **Näherung**, Richtung: **überschätzt** den Hebel (§5.1.3) |
 
 ### 5.1.2 Herleitung, Rechnung und Sensitivität
 
@@ -1223,10 +1223,10 @@ Wirkungsformel \(\text{EAD}_{\text{mit}} = \text{EAD}\cdot(1 - r_{\text{S092}})\
   angepasste Nutzung) hält Wasser bis zur Schutzhöhe weitgehend fern. Restschaden durch Feuchte,
   Ausführungsmängel und nicht verschlossene Öffnungen. Obergrenze unter 1, weil kein Objektschutz
   vollständig dicht ist.
-- \(s_{\text{bem}}\) = 0,50 (0,30–0,66). Annahme: Schadenssummen verteilen sich auf häufige flache
+- \(s_{\text{bem}}\) = 0,50 (0,30–0,62). Annahme: Schadenssummen verteilen sich auf häufige flache
   und seltene tiefe Überflutungen. Oberhalb der Schutzhöhe wird Objektschutz überströmt und wirkt
   praktisch nicht. Der Wert ist **nicht empirisch bestimmt, sondern ausdrücklich eine Näherung**;
-  ihr Status, ihre Obergrenze aus der Szenario-Zerlegung und die **Richtung** ihres Fehlers stehen in
+  ihr Status, die Begründung ihrer oberen Bandgrenze und die **Richtung** ihres Fehlers stehen in
   Abschnitt 5.1.3 (`#s-bem-naeherung`).
 
 Die Marginalität von \(\Delta q\) ist an die Kalibrierjahre gebunden: Gezählt wird allein die
@@ -1235,12 +1235,12 @@ Anker und damit im Niveau-Skalar steckt (Doppelzählungs-Wächter, §4.7; der he
 Ausstattungsgrad \(q_0\) ist dort als geparkt ausgewiesen).
 
 Rechnung: \(r_{\text{S092}}\) = 0,10 · 0,50 · 0,70 = **0,035**. Band (alle Enden gleichgerichtet):
-0,05 · 0,30 · 0,50 = **0,0075** bis 0,20 · 0,66 · 0,80 = **0,1056**.
+0,05 · 0,30 · 0,50 = **0,0075** bis 0,20 · 0,62 · 0,80 = **0,0992**.
 
 **Ergebnis-Sensitivität.** Der ausgewiesene Maßnahmeneffekt ist −3,5 % des K3-Erwartungsschadens
-von #60 (Band −0,75 % bis −10,56 %). Die Kette ist linear, jeder Faktor hat Elastizität 1. Einzeln
-variiert: \(\Delta q\) 0,05–0,20 ⇒ r 0,0175–0,070 (größte Achse); \(s_{\text{bem}}\) 0,30–0,66 ⇒ r
-0,021–0,046; \(e_{\text{bem}}\) 0,50–0,80 ⇒ r 0,025–0,040.
+von #60 (Band −0,75 % bis −9,92 %). Die Kette ist linear, jeder Faktor hat Elastizität 1. Einzeln
+variiert: \(\Delta q\) 0,05–0,20 ⇒ r 0,0175–0,070 (größte Achse); \(s_{\text{bem}}\) 0,30–0,62 ⇒ r
+0,021–0,043; \(e_{\text{bem}}\) 0,50–0,80 ⇒ r 0,025–0,040.
 
 **Modellgrenzen der Abschätzung.** (1) Kommunenweiter Pauschalfaktor statt zellscharfer Wirkung
 (Bauform-Grenze). (2) \(s_{\text{bem}}\) ist messbar, sobald Wassertiefen je HQ-Szenario als Ebene
@@ -1253,10 +1253,10 @@ ganze Abschätzung, sobald eine Interventions- oder quasi-experimentelle Effektg
 dq, s_bem, e_bem = 0.10, 0.50, 0.70
 r = dq * s_bem * e_bem
 assert abs(r - 0.035) < 1e-12
-lo, hi = 0.05 * 0.30 * 0.50, 0.20 * 0.66 * 0.80
-assert abs(lo - 0.0075) < 1e-12 and abs(hi - 0.1056) < 1e-12
-# obere Bandgrenze von s_bem ist an der harten Obergrenze 0,66 gekappt (5.1.3)
-assert abs(0.10 * 0.66 * 0.70 - 0.0462) < 1e-12
+lo, hi = 0.05 * 0.30 * 0.50, 0.20 * 0.62 * 0.80
+assert abs(lo - 0.0075) < 1e-12 and abs(hi - 0.0992) < 1e-12
+# obere Bandgrenze von s_bem aus dem Ankerwert der Verteilungspruefung 4.5 (5.1.3)
+assert abs(0.10 * 0.62 * 0.70 - 0.0434) < 1e-12
 assert abs(0.05 * s_bem * e_bem - 0.0175) < 1e-12 and abs(0.20 * s_bem * e_bem - 0.070) < 1e-12
 ```
 
@@ -1274,30 +1274,52 @@ sondern ausdrücklich als Näherung** — mit Obergrenze und Fehlerrichtung. Wir
 geschieht das auf **Stichproben** der HQ-Szenarien, nie in einem nationalen 100-m-Vollraster-Lauf
 (Ressourcen-Regel §3.4; vgl. Abschnitt 4.3).
 
-**Obergrenze aus der Szenario-Zerlegung (Zahlen aus Abschnitt 4.5).** Die drei HQ-Stützstellen mit
-ihren Jährlichkeiten liefern die Beiträge zum Erwartungsschaden \(t_1 = 4{,}174\) (zwischen
-HQhäufig und HQ100), \(t_2 = 1{,}466\) und \(t_3 = 0{,}671\) (jeweils jenseits HQ100), Summe
-\(6{,}311\). Der Anteil der Schadenssumme **unterhalb HQ100** ist damit
-\(t_1 / (t_1+t_2+t_3) = 4{,}174 / 6{,}311 = \mathbf{0{,}661}\). Selbst wenn Objektschutz bis zum
-HQ100-Wasserstand trüge, wäre \(s_{\text{bem}} \le 0{,}66\) — das ist eine harte Obergrenze der
-Näherung, kein Punktwert.
+**Profilabhängige Illustration: Anteil unterhalb HQ100 in der Beispielzelle (Befund 26).** Allgemein
+gilt nur die Ungleichung, nicht ihr Zahlenwert: Solange das Bemessungsniveau privaten
+Objektschutzes nicht über dem HQ100-Wasserstand liegt (Absatz „Richtung des Fehlers“), kann
+\(s_{\text{bem}}\) den Anteil der Schadenssumme **unterhalb HQ100** nicht übersteigen. Wie groß
+dieser Anteil ist, hängt aber vom Betroffenheits- und Tiefenprofil der Zelle ab und ist **keine
+Eigenschaft der Formel**. Zur Veranschaulichung dient die Beispielzelle aus Abschnitt 3.4
+(„Rechenbeispiel (eine Zelle)“, physische Zwischengrößen 15,0 / 77,76 / 300,0 m² je Ereignis;
+Trapez-Erwartungswert über die drei HQ-Stützstellen wie in §3.4 Schritt 2): Sie liefert die
+Beiträge zum Erwartungsschaden \(t_1 = 4{,}174\) (zwischen HQhäufig und HQ100), \(t_2 = 1{,}466\)
+und \(t_3 = 0{,}671\) (jeweils jenseits HQ100), Summe \(6{,}311\) (= \(\bar A_z\) = 6,31 m²/a aus
+§3.4), und damit einen Anteil unterhalb HQ100 von \(4{,}174 / 6{,}311 = 0{,}661\). Derselbe Ausdruck
+ergibt für andere Profile mit denselben Jährlichkeiten und derselben Schadensfunktion 0,856 (Zelle
+durchgehend in der Aue, \(a = 1{,}0\) in allen drei Szenarien), 0,327 (Auenrand,
+\(a\) = 0,02 / 0,20 / 1,00) und 0,000 (nur im Extremfall betroffen). Der Wert 0,661 ist deshalb
+**eine profilabhängige Illustration, keine Obergrenze** von \(s_{\text{bem}}\); er trägt kein
+Bandende.
 
-**Folge für das Band.** Weil die Obergrenze hart ist, darf kein Bandende darüber liegen: Die obere
-Bandgrenze von \(s_{\text{bem}}\) ist auf **0,66** gekappt (früher 0,70, was über der hier
-hergeleiteten Grenze lag und damit ein unmögliches Szenario ausgewiesen hätte). Nachgezogen sind
-damit das Band von \(s_{\text{bem}}\) (0,30–0,66) in §5.1.1/§5.1.2 und im Parameter-Block
-`flood_bldg.s_bem`, das daraus berechnete Band von \(r_{\text{S092}}\)
-(0,0075–**0,1056** statt 0,0075–0,112, also −0,75 % bis −10,56 % statt −11,2 %) an allen
-Fundstellen des Berichts (Kap. 1 Knoten-Bilanz, Register 60-S092-01, Zeichentabellen §3.5/§5.1.1,
-§5.1.2 samt Beispielblock `beispiel_60_s092_abschaetzung`, Parameter-Block `flood_bldg.r_s092`,
-Entscheidungslog Nr. 3) und die Einzelachsen-Sensitivität (\(s_{\text{bem}}\) 0,30–0,66 ⇒ r
-0,021–0,046). Die untere Bandgrenze 0,30 bildet die Fehlerrichtung ab, die obere ist jetzt keine
-Überschreitung der eigenen Herleitung mehr, sondern liegt genau auf ihr.
+**Tragende Begründung der oberen Bandgrenze: Ankerwert der Verteilungsprüfung (§4.5).**
+\(s_{\text{bem}}\) wird als **kommunenweiter Pauschalfaktor** geführt (Modellgrenze 1 in §5.1.2),
+seine Bandgrenze muss also für den Durchschnitt der Schadenssumme gelten, nicht für eine Zelle. Den
+einzigen zellunabhängigen Messwert für den Anteil des seltenen Regimes liefert die **Ankerseite**
+der Verteilungsprüfung in Abschnitt 4.5: Der Überschuss des Großereignis-Jahres 2024 über das
+langjährige Mittel beträgt 1,0/2,6 = 38,5 % der Jahressumme (GDV-Naturgefahrenstatistik, §4.1).
+Auf die Ereignisse unterhalb des seltenen Regimes entfallen damit 1 − 0,385 = 0,615 der
+Schadenssumme. Weil \(s_{\text{bem}}\) nach der Ungleichung oben nicht über diesem Anteil liegen
+kann, setzt KAP3 die **obere Bandgrenze auf 0,62** (0,615 auf zwei Stellen gerundet). Diese Grenze
+ist eine **Abschätzung von KAP3 (§3.9)**, keine harte Grenze: Sie erbt die in §4.5 genannten
+Grenzen des Ankerwerts (ein Ereignisjahr, gepoolte fluviale und pluviale Schäden, „Überschuss über
+dem Mittel“ ≈ „Beitrag des seltenen Regimes“, ankerseitige Unschärfe ±12,5 Prozentpunkte), und
+einzelne Kommunen mit tiefem Auenprofil können darüber liegen (Illustration oben: 0,856). Das ist
+eine Modellgrenze des Pauschalfaktors, nicht der Kette. Die untere Bandgrenze 0,30 bildet die
+Fehlerrichtung ab (nächster Absatz).
+
+**Folge für das Band.** \(s_{\text{bem}}\) = 0,50 (Band **0,30–0,62**) und daraus
+\(r_{\text{S092}}\) = 0,035 (Band 0,0075–**0,0992**, also −0,75 % bis −9,92 % des
+K3-Erwartungsschadens), Einzelachsen-Sensitivität \(s_{\text{bem}}\) 0,30–0,62 ⇒ r 0,021–0,043.
+Diese Werte stehen gleichlautend in Kap. 1 (Knoten-Bilanz), Kap. 2 (Registerzeile 60-S092-01), den
+Zeichentabellen §3.5/§5.1.1, §5.1.2 samt Beispielblock `beispiel_60_s092_abschaetzung`, den
+Parameter-Blöcken `flood_bldg.s_bem` und `flood_bldg.r_s092` in Kap. 7 und im Entscheidungslog
+Nr. 3. Die Wirkung von S092 bleibt eine ausgewiesene Abschätzung mit Zahlenwert, Band und
+Sensitivität (Vorgabe P2); nur die Herleitung der oberen Bandgrenze ist neu.
 
 **Richtung des Fehlers: die Näherung überschätzt den Hebel.** Das Bemessungsniveau privaten
 Objektschutzes (Abdichtung, Rückstausicherung, angepasste Nutzung) liegt bei wenigen Dezimetern
 Wassertiefe und damit deutlich unterhalb des HQ100-Wasserstands; der Anteil der Schadenssumme
-unterhalb dieses Niveaus ist zwangsläufig **kleiner** als die eben berechneten 0,661. Hinzu kommt,
+unterhalb dieses Niveaus ist zwangsläufig **kleiner** als der Anteil unterhalb HQ100 desselben Profils. Hinzu kommt,
 dass die Schadensfunktion \(d(h)\) über die Tiefenachse multiplikativ wächst (Abschnitt 3.3: 0,035
 bei 0,10 m auf 0,250 bei 1,75 m, +12,7 % je 10 cm) und das flächengewichtete Tiefenmittel der
 LAWA-Klassen schon in der zweiten Klasse über 0,5 m liegt — der Euro-Schaden ist also zu den tiefen,
@@ -1311,25 +1333,33 @@ private Einzelmaßnahmen ausgeschlossen (dafür stehen die Schutzsysteme #50, R7
 
 **Was die Näherung ablöst.** Sobald HQ_TIEFE vorliegt, wird \(s_{\text{bem}}\) aus den
 szenariogewichteten Schadenssummen unterhalb des unterstellten Bemessungsniveaus **gemessen**
-(Rechenweg: derselbe Trapez-Aufbau wie in Abschnitt 4.5, nur mit dem Bemessungsniveau als
+(Rechenweg: derselbe Trapez-Aufbau wie in Abschnitt 3.4 Schritt 2, nur mit dem Bemessungsniveau als
 Schnittgrenze statt HQ100) und ersetzt Wert **und** Band; der Ersetzungspfad ist in den
 Modellgrenzen dieses Abschnitts (Punkt 2) und als W1-Fall geführt.
 
 ```python test: beispiel_60_s_bem_obergrenze
-# Obergrenze der Naeherung s_bem aus der Szenario-Zerlegung 4.5 (Anteil unterhalb HQ100)
-A = [15.0, 77.76, 300.0]
+# Anteil unterhalb HQ100 ist profilabhaengig (Illustration, Beispielzelle 3.4) -> traegt kein Bandende
 p = [1.0e-1, 1.0e-2, (5.0e-3 * 1.0e-3) ** 0.5]
-t1 = (p[0] - p[1]) * (A[0] + A[1]) / 2
-t2 = (p[1] - p[2]) * (A[1] + A[2]) / 2
-t3 = p[2] * A[2]
-s_max = t1 / (t1 + t2 + t3)
-assert abs(t1 - 4.174) < 5e-4 and abs(t1 + t2 + t3 - 6.311) < 5e-4
-assert abs(s_max - 0.661) < 5e-4
-assert 0.50 < s_max          # Naeherung liegt unter der Obergrenze, aber ueber dem erwarteten Wahrwert
+def anteil_unter_hq100(A):
+    t1 = (p[0] - p[1]) * (A[0] + A[1]) / 2
+    t2 = (p[1] - p[2]) * (A[1] + A[2]) / 2
+    t3 = p[2] * A[2]
+    return t1 / (t1 + t2 + t3), t1, t1 + t2 + t3
+s_zelle, t1, summe = anteil_unter_hq100([15.0, 77.76, 300.0])      # Beispielzelle 3.4
+assert abs(t1 - 4.174) < 5e-4 and abs(summe - 6.311) < 5e-4 and abs(s_zelle - 0.661) < 5e-4
+s_aue = anteil_unter_hq100([1200 * 1.00 * 0.081, 1200 * 1.00 * 0.250, 1200 * 1.00 * 0.250])[0]
+s_rand = anteil_unter_hq100([1200 * 0.02 * 0.050, 1200 * 0.20 * 0.081, 1200 * 1.00 * 0.250])[0]
+s_extrem = anteil_unter_hq100([0.0, 0.0, 300.0])[0]
+assert abs(s_aue - 0.856) < 5e-4 and abs(s_rand - 0.327) < 5e-4 and s_extrem == 0.0
+# tragende obere Bandgrenze: Ankerwert der Verteilungspruefung 4.5 (zellunabhaengig)
+anteil_unter_selten = 1 - 1.0 / 2.6
+assert abs(anteil_unter_selten - 0.615) < 5e-4
+s_bem_band = (0.30, round(anteil_unter_selten, 2))   # Band aus 5.1.1 / Parameter-Block flood_bldg.s_bem
+assert s_bem_band == (0.30, 0.62)
+assert s_bem_band[0] < 0.50 < s_bem_band[1]      # Naeherung liegt im Band
 assert abs(0.10 * 0.30 * 0.70 - 0.021) < 1e-12   # untere Bandgrenze bildet die Richtung ab
-s_bem_band = (0.30, 0.66)    # Band aus 5.1.1 / Parameter-Block flood_bldg.s_bem
-assert s_bem_band[1] <= s_max + 5e-4             # kein Bandende ueber der harten Obergrenze
-assert abs(0.20 * s_bem_band[1] * 0.80 - 0.1056) < 1e-12   # obere Grenze von r_S092
+assert abs(0.20 * s_bem_band[1] * 0.80 - 0.0992) < 1e-12   # obere Grenze von r_S092
+assert abs(0.10 * s_bem_band[1] * 0.70 - 0.0434) < 1e-12   # Einzelachse s_bem, obere Grenze
 ```
 
 ## 6 Szenario-Anwendung & Modellgrenzen (§3.2/§3.6)
@@ -1444,7 +1474,7 @@ parameter:
   id: flood_bldg.s_bem
   wert: 0.50
   einheit: "-"
-  band: [0.30, 0.66]
+  band: [0.30, 0.62]
   herkunft: herleitung:#s-bem-naeherung
   kennzeichnung: abschaetzung_kap3
   herleitung_anker: "#s-bem-naeherung"
@@ -1474,7 +1504,7 @@ parameter:
   id: flood_bldg.r_s092
   wert: 0.035
   einheit: "-"
-  band: [0.0075, 0.1056]
+  band: [0.0075, 0.0992]
   herkunft: herleitung:#s092-wirkung
   kennzeichnung: abschaetzung_kap3
   abgeleitet_aus: [flood_bldg.dq_s092, flood_bldg.s_bem, flood_bldg.e_bem]
@@ -2014,7 +2044,7 @@ Materialband \(f_{\text{S094}}\) = 1,00 (0,84–1,18) in Ansatz (a).
 |---|---|---|---|---|---|
 | 1 | Welcher W-Knoten trägt #60? | W117 (KWK Z272), mit W085 eine Ebene tief | einziger Bauwesen-Knoten für Gebäudeschäden mit Hochwasser-Eingang; NW Z61 Input 49 = W085; Code-Bestand geht vom selben Knoten aus, trägt aber nur eine Teilmenge mit abweichender Namensquelle (Befund 13, → Log Nr. 6) | nur W085 als Kette (dann fehlten S092–S104 und R24, also Vulnerabilität und Mengengerüst) | 32 Knoten in Bilanz und Register |
 | 2 | Familie? | neue Familie K3/K4-Ereignisschäden, Kap. 9 angelegt | kein K3-Bericht in `docs/methodik/` | Übernahme der K1-Struktur (#95) — passt nicht zu Ereignislogik A5 | Drei-Ansätze-Vergleich Pflicht |
-| 3 | S092 ohne zulässige Effektgröße | P2-Abschätzung r = 0,035 (0,0075–0,1056) | Vorgabe P2, §3.5; Querschnittsbefragungen sind keine Maßnahmen-Effektgröße | Wirkung null (unzulässig nach P2) | Maßnahmen-Modul, kein Basiswert |
+| 3 | S092 ohne zulässige Effektgröße | P2-Abschätzung r = 0,035 (0,0075–0,0992) | Vorgabe P2, §3.5; Querschnittsbefragungen sind keine Maßnahmen-Effektgröße | Wirkung null (unzulässig nach P2) | Maßnahmen-Modul, kein Basiswert |
 | 4 | Slug | `gebaeudeschaeden_flusshochwasser` | kurz, eindeutig gegen #59 (Starkregen) und #46 (Küste) | `flusshochwasser` (verwechselbar mit Id 49) | Dateinamen Bericht/Ledger |
 | 5 | Welcher Ansatz wird umgesetzt? (Ansatz-Vergleich §2.6/§3.7) | **13.09.2026 (T-0237):** Ansatz **(a)** Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle — p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp · Gebäudequalität) × Gebäudewert | einziger Ansatz, der in den sechs Güte-Kriterien durchgehend „hoch“ trägt (das siebte Kriterium Aufwand läuft umgekehrt: dort ist „gering“ günstig, (a) liegt mit „mittel“ über (b) und weit unter (c) und ist nach §3.4 ressourcenverträglich): vollständig aus frei zugänglichen, im Register belegten Datenebenen speisbar, Wirkungsort für S092 und die R7-Weiche vorhanden, Schicht-B-Form mit physischer Zwischengröße vor dem Euro, Kalibrierung und Abgleich auf Stichprobenebene ohne nationalen Vollraster-Lauf (§3.4) | (b) aggregierte Flächenschadensrate — kein Wirkungsort für den Maßnahmen-Hebel, tragender Wert nur aus niederländischer Fallstudie (B2); als Ergänzungsmodul vorgesehen. (c) Schadensgradmodell D0–D6 am Einzelgebäude — Bauweise/Bauzustand bundesweit nicht erhoben, Umrechnung Grad → Euro nicht belegt | Umsetzungsgrundlage für Kap. 3 und Prototyp der Familie K3/K4-Ereignisschäden (bindet später #50 und #47); Kopfzeile und Kap. 9 nachgezogen |
 | 6 | Divergenz Bericht ↔ Code bei den Namenslisten von #60 (Befund 13) | **13.09.2026 (T-0243):** Bericht auf den belegbaren Stand korrigiert (Kap. 1: Teilmenge mit abweichender Namensquelle statt „genau"); Code (`backend/app/data/catalog.py`, `kwra_id: 60`) bleibt unverändert | eiserne Regel 5 — Divergenz Bericht ↔ Code wird nie still im Code gefixt; Angleichen des Codes ist Aufgabe der Integration, nicht dieses Berichtsschritts | Code stillschweigend an W117 nachziehen (verstieße gegen eiserne Regel 4/5, kein Prüfmittel im Rahmen dieses Pakets) | Divergenz als Integrationspunkt für `/integriere-risiko 60` geführt: `sensitivity_names` und `upstream_names` in `catalog.py` müssen dort gegen die 7 Sensitivitäten und 8 Wirkungs-Eingänge von W117 abgeglichen werden |
