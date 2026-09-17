@@ -978,7 +978,7 @@ Zeitreihenwerte und werden deshalb nicht als Anker verwendet).
   (Bestands-/Preisstand 2024, arithmetisches Mittel der 23 Jahreswerte 2002–2024,
   `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), **Band 1,061–1,838 Mrd. €** — uniform
   angewandter Ausreißer-Test nach Tukey auf die 23-Jahre-Reihe, extrem sind 2002 und 2021; die
-  ausführliche Herleitung des Tests folgt in einer Folgerevision. Quelle: GDV, „GDV-Naturgefahrenstatistik 2024: Hochwasserschäden mehr als
+  ausführliche Herleitung des Mittelwerts, der Jahres-Auswahlregel und des Tukey-Tests steht in 4.1a. Quelle: GDV, „GDV-Naturgefahrenstatistik 2024: Hochwasserschäden mehr als
   verdoppelt" (Medieninformation), sowie GDV, „Versicherungsquote bei Elementarschadenversicherung
   steigt kontinuierlich" (Datenservice, Versicherungsdichte 2024: 57 %, 10,2 Mio. versicherte
   Wohngebäude) — Zugriff 13.09.2026; vollständige Belege in Kap. 8.
@@ -987,6 +987,95 @@ Zeitreihenwerte und werden deshalb nicht als Anker verwendet).
 Überschwemmungen (fluvial **und** pluvial) in *allen* Sachsparten. Der Berichtsgegenstand von #60
 ist enger (Wohngebäude, flussseitig) und zugleich weiter (auch nicht versicherte Schäden). Die
 Lücke wird nicht weggerundet, sondern in 4.2 Schritt für Schritt überbrückt.
+
+### 4.1a Kleinste-Quadrate-Herleitung, Jahres-Auswahlregel und Fenster-Sensitivität (Ledger-Befund 34)
+
+**Warum eine Kleinste-Quadrate-Bestimmung.** §3.4 verlangt, dass \(\lambda\) über eine
+**Kleinste Quadrate**-Bestimmung aus der Anker-Zeitreihe folgt, nicht aus einem einzelnen Jahr
+oder einer einzelnen Medienangabe. Für jedes Kalibrierjahr \(t\) der gewählten Jahresmenge \(T\)
+trägt die Modellsumme \(M_t\) und die (auf den Modellumfang übertragene) Ankerangabe \(A_t\);
+\(\lambda\) minimiert die Fehlerquadratsumme
+\[
+S(\lambda) = \sum_{t \in T} (A_t - \lambda M_t)^2 .
+\]
+Die Bedingung erster Ordnung liefert
+\[
+\frac{dS}{d\lambda} = -2 \sum_{t \in T} M_t (A_t - \lambda M_t) = 0
+\;\Longrightarrow\;
+\lambda \sum_{t \in T} M_t^2 = \sum_{t \in T} M_t A_t .
+\]
+Dieser Bericht rechnet mit **einer** national konstanten Modellsumme \(M_0\) (§4.3: kein
+Jahres-Lauf des Produktionsmodells, \(M_t \equiv M_0\) für alle \(t\)). Eingesetzt:
+\[
+\lambda \sum_{t \in T} M_0^2 = M_0 \sum_{t \in T} A_t
+\;\Longrightarrow\;
+\lambda \cdot |T| \cdot M_0^2 = M_0 \sum_{t \in T} A_t
+\;\Longrightarrow\;
+\lambda = \frac{\sum_{t \in T} A_t}{|T| \cdot M_0} = \frac{\text{Mittel}(A_t)}{M_0} .
+\]
+Bei zeitkonstanter Modellsumme fällt der Kleinste-Quadrate-Schätzer also auf das arithmetische
+Mittel der Ankerreihe geteilt durch \(M_0\) zusammen. Das ist der Grund, warum der in 4.1
+verwendete Ankerwert \(A_{\text{ver}}\) nicht mehr aus dem Einzeljahr 2024 kommt, sondern aus dem
+Mittel der Jahresreihe: Die einfache Formel ist keine Abkürzung, sondern das Ergebnis der
+Kleinste-Quadrate-Bestimmung unter der (in 4.3 begründeten) Annahme einer zeitkonstanten
+Modellsumme.
+
+**Jahres-Auswahlregel.** §3.4 verlangt eine **einheitliche Auswahlregel** statt einer Auswahl nach
+Ergebnis. Die hier festgelegte Regel: Hauptfenster ist die **vollständige, abgeschlossene Reihe
+2002–2024** (23 Jahre, §4.1), ohne ein einzelnes Jahr auszulassen — auch das Jahr 2009 bleibt drin,
+obwohl seine Lesart in `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv` (Spalte `lesart`) als
+„Abschätzung KAP3" statt als direkt abgelesener Grafikwert ausgewiesen ist: Die abweichende Lesart
+betrifft nur, **wie** der Jahreswert 2009 gewonnen wurde (Grafik-Interpolation aus den
+Nachbarjahren statt Direktablesung), nicht, **ob** er zur Reihe zählt — eine begründete Abschätzung
+eines fehlenden Einzelwerts ist kein Ausreißer und wird nicht gesondert behandelt. Die Regel gilt
+**ergebnisunabhängig**: Sie ist unabhängig davon festgelegt, welches Zeitfenster das für den
+Bericht günstigste \(\lambda\) liefert.
+
+**Sensitivität je Zeitfenster.** Neben dem Hauptfenster laufen drei weitere Zeitfenster als
+Sensitivität mit (Mittelwert \(A_{\text{ver}}\) je Fenster aus
+`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`, Spalte `wert_mrd_eur`; Folgefaktoren wie 4.2:
+\(w_{\text{wg}} \cdot u \cdot \varphi_{\text{fluss}} \cdot \kappa \cdot \pi = 0{,}65 \cdot 1{,}54
+\cdot 0{,}50 \cdot 1{,}15 \cdot 1{,}07 = 0{,}615865\); \(M_0\) = 1,360 Mrd. €₂₀₂₆/a unverändert,
+§4.3):
+
+| Zeitfenster | Jahre (n) | \(A_{\text{ver}}\) (Mrd. €) | \(A^{*}\) (Mrd. €₂₀₂₆/a) | \(\lambda = A^{*}/M_0\) |
+|---|---|---|---|---|
+| 2002–2024 (Hauptfenster) | 23 | **1,838** | 1,132 | **0,832** |
+| 2014–2024 | 11 | **2,064** | 1,271 | **0,935** |
+| 2002–2024 ohne 2021 | 22 | **1,349** | 0,831 | **0,611** |
+| 2014–2024 ohne 2021 | 10 | **1,010** | 0,622 | **0,457** |
+
+Drei der vier \(\lambda\)-Werte liegen innerhalb der Plausibilitätsschranke [0,50; 2,00] aus §4.4;
+nur das kürzeste Fenster (2014–2024 ohne 2021, \(\lambda\) = 0,457) unterschreitet sie. Genau das
+ist der zweite Grund für die Wahl des Hauptfensters: Mit dem kürzesten der vier geprüften Fenster
+fiele \(\lambda\) unter die Plausibilitätsschranke und das Modell gälte nach §4.4 als fehlerhaft
+statt kalibrierbar — ein Modellentscheid, den die Wahl des Hauptfensters nicht nach diesem Ergebnis
+trifft, sondern vorab über die ergebnisunabhängige Auswahlregel oben.
+
+**Herleitung des Ausreißerbands (Tukey-Fence).** Statt ein einzelnes Jahr freihändig als „den"
+Ausreißer zu benennen, wird ein benannter, uniform auf die gesamte Hauptfenster-Reihe angewandter
+Ausreißertest verwendet: die Tukey-Fence (Whisker-Regel des Boxplots). Aus der sortierten
+23-Jahre-Reihe (`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`): \(Q_1\) = 0,5, \(Q_3\) = 1,5,
+\(IQR = Q_3 - Q_1\) = 1,0 (Mrd. €). Werte oberhalb der extremen Schwelle \(Q_3 + 3 \cdot IQR\) =
+4,5 Mrd. € gelten als extrem. Das trifft auf zwei Jahre zu: **2002** (7,4 Mrd. €) und **2021**
+(12,6 Mrd. €). Das Jahr 2013 (3,9 Mrd. €) liegt zwischen der milden Schwelle \(Q_3 + 1{,}5 \cdot
+IQR\) = 3,0 und der extremen Schwelle 4,5 und bleibt damit in der Reihe. Die Untergrenze des
+in 4.1 genannten Bands ist das Mittel der 21 verbleibenden Jahre ohne 2002 und 2021 = **1,061**
+Mrd. €; die Obergrenze bleibt der Zentralwert des Hauptfensters (alle 23 Jahre) = **1,838** Mrd. €.
+Dieses Band ist von der Fenster-Sensitivität oben zu unterscheiden: Dort wird bei fester
+Auswahlregel gezielt die Fensterlänge variiert bzw. nur 2021 herausgerechnet, um die Sensitivität
+je Zeitfenster offenzulegen (keine Bandbreite des Zentralwerts) — der dort verwendete Wert 1,349
+(2002–2024 ohne 2021) ist deshalb bewusst nicht mit dem hier hergeleiteten Wert 1,061 (2002–2024
+ohne 2002 **und** 2021, nach dem Ausreißertest) zu verwechseln.
+
+**Stand von \(w_{\text{wg}}\).** `docs/evidenz/60_gdv_wohngebaeude_2024.csv` dokumentiert, dass die
+GDV-Bundesländer-Grafik zu Elementarschäden an Wohngebäuden nur Verhältniszahlen (Schadensatz,
+Schadenhäufigkeit, Schadendurchschnitt je Bundesland) führt, aber weder den Zähler
+(Wohngebäude-Elementarschaden in Euro) noch einen jahresgleichen Nenner (Sach-Elementarschaden
+gesamt) liefert, aus denen sich ein Anteil errechnen ließe (Zeile `w_wg`, Spalte `lesart`: „nicht
+ablesbar"). \(w_{\text{wg}}\) = 0,65 (Band 0,55–0,75) bleibt deshalb weiterhin eine **Abschätzung
+von KAP3** (Herleitung 4.2); die Datei belegt nur, dass die genannte Grafik diese Abschätzung nicht
+durch eine Messung ersetzen kann, und ändert keinen der fünf Faktoren aus 4.2.
 
 <a id="kalibrierung-zielwert"></a>
 ### 4.2 Vom Anker zum Modellumfang — Zielwert der Bundessumme
@@ -1207,16 +1296,16 @@ gekennzeichnet.
 
 | Parameter | Wert (Band) | Quelle **oder** Abschätzung von KAP3 |
 |---|---|---|
-| \(A_{\text{ver}}\) Anker | 1,838 Mrd. € (1,061–1,838) | **Quelle:** GDV-Naturgefahrenstatistik 2024, Datenservice Naturgefahrenreport 2025 (Stand 10.10./30.12.2025); arithmetisches Mittel und Tukey-Ausreißertest der 23-Jahre-Reihe (`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), §4.1 |
+| \(A_{\text{ver}}\) Anker | 1,838 Mrd. € (1,061–1,838) | **Quelle:** GDV-Naturgefahrenstatistik 2024, Datenservice Naturgefahrenreport 2025 (Stand 10.10./30.12.2025); Kleinste-Quadrate-Mittelwert der Jahres-Auswahlregel-Reihe und Tukey-Ausreißertest der 23-Jahre-Reihe (`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), §4.1/§4.1a |
 | \(w_{\text{wg}}\) | 0,65 (0,55–0,75) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(u\) | 1,54 (1,33–1,75) | **Abschätzung von KAP3** auf belegter Versicherungsdichte 57 %, Herleitung §4.2 |
 | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\pi\) | 1,07 (1,04–1,11) | **Abschätzung von KAP3** aus B4 (Baupreisindex), Herleitung §4.2 |
-| \(\lambda\) Niveau-Skalar | 0,832 (0,22–1,66) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3) mit Wohngebäudeanteil 0,872; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein; Zentralwert innerhalb der Plausibilitätsschranke, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
+| \(\lambda\) Niveau-Skalar | 0,832 (0,22–1,66) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\) als Kleinste-Quadrate-Schätzer der Jahres-Auswahlregel-Reihe (§4.1a), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3) mit Wohngebäudeanteil 0,872; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein; Zentralwert innerhalb der Plausibilitätsschranke, Sensitivität je Zeitfenster in §4.1a, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
 | Baupreisanstieg 2023 → 2024 | 3 % (2,3–5,0 %) | **Abschätzung von KAP3**: gerundet aus den in B4 zitierten Jahresraten des Baupreisindex (3,2 %/3,3 %), Band wie B4; geht in \(\pi = 1{,}105/1{,}03\) ein (§4.2); Sensitivität: \(\pi\) = 1,080 bei 2,3 %, 1,052 bei 5,0 % |
 | Betroffenheit exponierter Gebäude | 1/100 a | **Abschätzung von KAP3**, Herleitung §4.6 (mittlere Betroffenheit auf Bemessungsniveau HQ100); geht linear in \(O\) ein |
-| Plausibilitätsschranke \(\lambda\) | 0,50 bzw. 2,00 | **Abschätzung von KAP3** (Faktor 2 um den Neutralwert 1), §4.4; gilt für den Zentralwert einer Neubestimmung; die Herleitung aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) steht aus (Ledger, Befund 36) |
+| Plausibilitätsschranke \(\lambda\) | 0,50 bzw. 2,00 | **Abschätzung von KAP3** (Faktor 2 um den Neutralwert 1), §4.4; gilt für den Zentralwert einer Neubestimmung; die Fenster-Sensitivität in §4.1a prüft die Schranke an vier \(\lambda\)-Werten, drei davon innerhalb; die Herleitung aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) steht aus (Ledger, Befund 36) |
 | Toleranz Verteilungsprüfung | ±15 Prozentpunkte | **Abschätzung von KAP3**, Herleitung §4.5 (±2,3 modellseitig + ±12,5 ankerseitig) |
 | \(U\) Sanity-Untergrenze | 0,639 Mrd. €₂₀₂₆/a | **berechnet** aus Anker und Bestandsanteilen, Herleitung §4.6; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(\varphi_{\text{fluss}}\) und \(\pi\) ein |
 | \(O\) Sanity-Obergrenze | 2,26 Mrd. €₂₀₂₆/a | **berechnet** aus Bestandswert, Deckelquote und 1/100 a, Herleitung §4.6; es fließen die Abschätzungen von KAP3 Betroffenheit 1/100 a und Deckelquote 0,250 (§3.3) ein |
