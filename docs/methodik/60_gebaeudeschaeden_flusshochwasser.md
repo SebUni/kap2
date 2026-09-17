@@ -936,20 +936,22 @@ Kalibriert wird das Niveau, geprüft wird die Verteilung. Beides ist getrennt: D
 Niveau-Skalar, nicht mehrere), und die Verteilung über die Ereignisse wird gegen eine Größe
 geprüft, die in die Bestimmung von \(\lambda\) **nicht** eingeht.
 
-**Vorläufiger Stand — \(\lambda\) ist noch kein Kalibrierergebnis.** §2.4 verlangt, dass der
-Kalibrierlauf mit dem Produktionsmodell gerechnet wird. Diese Fassung erfüllt das noch nicht: Die
-Modellsumme \(M_0\) in 4.3 ist eine Näherung aus nationalen Einheitswerten und dem Schadensgrad der
-Beispielzelle aus §3.4; die acht Anker-Kommunen sind nicht mit der Kernformel gerechnet. Zwei
-Umfangsunterschiede zu \(A^{*}\) sind bekannt und beziffert: (a) Die ZÜRS-Klasse GK2 fehlt in
-\(M_0\), obwohl sie im Modell bei HQextrem nass ist; ihr Beitrag liegt bei 0,222 Mrd. €₂₀₂₆/a
-(Schadensgrad 0,050) bis 1,112 Mrd. €₂₀₂₆/a (Schadensgrad 0,250), also 24 % bis 118 % von
-\(M_0\) = 0,94. (b) Alle Adressen zählen als Wohngebäude; der Wohngebäudeanteil je Adresse ist
-19,7/22,6 = 0,872. **Sensitivität:** Mit beiden Korrekturen wird
-\(\lambda = 1{,}05 \cdot (1/0{,}872) / (1{,}24 \ldots 2{,}18)\) = **0,97 bis 0,55**. \(\lambda\) = 1,05
-ist deshalb **vorläufig**, trägt im Produkt diesen Vermerk (Block `flood_bldg.lambda`, Feld
-`vorlaeufig: true`) und wird ersetzt, sobald \(M_0\) mit dem Produktionsmodell auf den
-Anker-Kommunen gerechnet ist (hochgerechnet über die ZÜRS-Klassen einschließlich GK2; kein
-Vollraster-Lauf nach §3.4).
+**Stand nach dem Stichprobenlauf — \(\lambda\) ist gesetzt und bleibt vorläufig.** §2.4 verlangt,
+dass der Kalibrierlauf mit dem Produktionsmodell gerechnet wird. Diese Fassung erfüllt das: Die
+Modellsumme \(M_0\) in 4.3 entsteht aus den Jahresschadensraten, die das Produktionsmodell auf den
+acht Anker-Kommunen je ZÜRS-Klasse gemessen hat
+(`docs/evidenz/60_stichprobe/m0_klassenraten.csv`), hochgerechnet über das nationale Mengengerüst
+der ZÜRS-Klassen **einschließlich GK2** und um den Wohngebäudeanteil je Adresse (0,872) bereinigt —
+kein Vollraster-Lauf nach §3.4. Die beiden Umfangsunterschiede zu \(A^{*}\), die die vorige Fassung
+nur beziffert hatte (fehlende Klasse GK2, alle Adressen als Wohngebäude gezählt), sind damit
+geschlossen. Bemerkenswert und hier festgehalten: Die damals angegebene Umfangs-Sensitivität sagte
+einen Wert zwischen 0,97 und 0,55 voraus — das jetzt gerechnete \(\lambda\) = 0,724 liegt
+innerhalb dieser Spanne. \(\lambda\) bleibt dennoch **vorläufig** und trägt im Produkt diesen
+Vermerk (Block `flood_bldg.lambda`, Feld `vorlaeufig: true`), weil die Ledger-Befunde 33
+(Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion) und 34 (Verteilungsprüfung auf
+weiteren Achsen) offen sind und den Wert noch verschieben können; der Zahlenwert im Produkt-Block
+in Kap. 7 steht zum Stand dieser Revision noch auf dem abgelösten Wert und ist im Ledger als
+Restpunkt von Befund 32 geführt.
 
 ### 4.1 Nationaler Anker: GDV-Naturgefahrenstatistik, Teilreihe Überschwemmung/Starkregen
 
@@ -1033,26 +1035,65 @@ legt — die Größe, gegen die die Modellsumme gestellt wird.
 
 ### 4.3 Modellsumme vor Kalibrierung — und die verwendete Auflösung (§3.4)
 
-Die unkalibrierte Bundessumme \(M_0\) entsteht aus drei Größen, die alle bereits im Bericht
-stehen:
+Die unkalibrierte Bundessumme \(M_0\) entsteht aus drei Größen: dem Mengengerüst der ZÜRS-Klassen,
+dem Wert je exponiertem Wohngebäude und den **gemessenen** Jahresschadensraten je Klasse aus dem
+Stichprobenlauf auf den acht Anker-Kommunen.
 
-1. **Exponierte Wohngebäude, flussnah:** 339.000 Adressen in ZÜRS-GK3+GK4 (Register 60-R17-01;
-   Modellgrenze: Adressen sind keine Gebäude, ein Gebäude je Adresse ist eine Untergrenze).
-2. **Wert je exponiertem Wohngebäude:** 208 m² Wohnfläche · 1,30 BGF/Wohnfläche · 1.950 €₂₀₂₆/m²
-   BGF = **527.280 €₂₀₂₆** (Register 60-R24-01).
-3. **Mittlerer Jahresschadensgrad** aus dem Produktionsmodell: 6,311 m²/a je 1.200 m² exponierter
-   Wohnfläche = **0,526 %/a** (Beispielblock `beispiel_60_kernformel`, §3.6). Dieser Wert ist der
-   **Vorab-Wert aus der Beispielzelle** und ausdrücklich eine Abschätzung von KAP3 (§3.9); er
-   stammt aus einer Zelle und nicht aus der Anker-Stichprobe. Mit dem Stichprobenlauf der
-   Integration tritt der dort gemessene Mittelwert an seine Stelle, und \(\lambda\) wird mit
-   derselben Rechnung neu bestimmt.
+1. **Exponierte Wohngebäude-Adressen je ZÜRS-Klasse:** 339.000 Adressen in **GK3+GK4** und
+   1,38 Mio. Adressen in **GK2** (6,1 % von 22,6 Mio. Adressen; Register 60-R17-01, **Quelle**).
+   GK2 wird mitgerechnet, weil die Klasse im Modell bei HQextrem nass ist. Modellgrenze: Adressen
+   sind keine Gebäude, ein Gebäude je Adresse ist eine Untergrenze.
+2. **Wert je exponiertem Wohngebäude und Wohngebäudeanteil:** 208 m² Wohnfläche · 1,30
+   BGF/Wohnfläche · 1.950 €₂₀₂₆/m² BGF = **527.280 €₂₀₂₆** (Register 60-R24-01, **Quelle**),
+   multipliziert mit dem **Wohngebäudeanteil je Adresse 0,872** (= 19,7 Mio. Wohngebäude /
+   22,6 Mio. Adressen, Register 60-R17-01, **Quelle**) — nicht jede exponierte Adresse trägt ein
+   Wohngebäude, und #60 rechnet nur Wohngebäude.
+3. **Gemessene Jahresschadensrate je Klasse** aus dem Lauf des Produktionsmodells über die acht
+   Anker-Kommunen: \(r_{\text{GK3+GK4}}\) = **0,0059796/a** und \(r_{\text{GK2}}\) =
+   **0,00067515/a**. **Quelle:** `docs/evidenz/60_stichprobe/m0_klassenraten.csv`, Zeilen
+   `klasse=gk3_gk4/kommune=alle` bzw. `klasse=gk2/kommune=alle`, Spalte
+   `rate_exponiert_hqextrem_1_pro_a`. **Wahl des Nenners** (gehört sichtbar in den Bericht, nicht
+   in einen Code-Kommentar): Die Datei führt je Klasse zwei Raten — bezogen auf die gesamte
+   Wohnfläche der Rasterzelle (`rate_zellen_1_pro_a`) oder auf die Wohnfläche der im
+   HQextrem-Raster tatsächlich exponierten Gebäude (`rate_exponiert_hqextrem_1_pro_a`). Das
+   Mengengerüst aus Punkt 1 zählt **exponierte Adressen**, nicht die Adressen ganzer Zellen;
+   339.000 · 208 m² ist also exponierte Wohnfläche. Konsistent dazu ist die zweite Rate. Die
+   Gegenrechnung mit dem Alternativnenner (0,0041973/a bzw. 0,00043606/a) ergäbe
+   \(M_0\) = 0,931 Mrd. €₂₀₂₆/a und \(\lambda\) = 1,058; die Spannweite zwischen beiden Nennern ist
+   damit beziffert statt verschwiegen.
 
-\(M_0\) = 339.000 · 527.280 € · 0,00526/a = **0,94 Mrd. €₂₀₂₆/a**.
+\(M_0\) = 0,872 · 527.280 € · (339.000 · 0,0059796/a + 1.380.000 · 0,00067515/a) =
+**1,360 Mrd. €₂₀₂₆/a** — Klassenbeiträge: GK3+GK4 **0,932 Mrd. €₂₀₂₆/a**, GK2 **428 Mio. €₂₀₂₆/a**
+(zusammen 1,360 Mrd. €₂₀₂₆/a).
+
+**Restfehler unterhalb der Stichprobenauflösung (§3.8, Vorgabe P1).** Die acht Anker-Kommunen
+lösen nicht alles auf, was in die Klassenraten eingeht. Die vier bekannten Positionen werden
+beziffert, nicht geglättet:
+
+1. **Fallback-Anteil Tiefe, Deggendorf: 88,5 %** (**Quelle:** `m0_klassenraten.csv`, Spalte
+   `anteil_fallback_tiefe`, Zeile `klasse=gk3_gk4/kommune=Deggendorf`). Für diesen Flächenanteil
+   stammt die Überflutungstiefe aus dem Fallback statt aus einer gemessenen Tiefenebene.
+2. **Fallback-Anteil Zensus, Klasse GK3+GK4: 79,5 %** (**Quelle:** `m0_klassenraten.csv`, Spalte
+   `anteil_fallback_zensus`, Zeile `klasse=gk3_gk4/kommune=alle`). Für rund vier Fünftel der
+   Wohnfläche dieser Klasse kommt die Gebäude-/Wohnflächenzuordnung aus dem Zensus-Fallback.
+3. **Streuung der Klassenrate über die acht Kommunen: 0,0033/a (Deggendorf) bis 0,0103/a (Grimma),
+   Faktor 3,1** (**Quelle:** `m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`,
+   Klasse `gk3_gk4`). Der bundesweit einheitlich angesetzte Klassenwert glättet diese Spannweite.
+   Wie groß der daraus entstehende Fehler am nationalen \(M_0\) ist, ist **nicht gemessen**,
+   sondern eine **Abschätzung von KAP3** (§3.9): bei Faktor 3,1 zwischen den Extremkommunen ein
+   einstelliger Prozentfehler am Gesamtwert; eine belastbare Fehlerschranke fehlt, solange nur acht
+   Kommunen in der Stichprobe stehen (Herleitung: Zahl der Stichprobenkommunen gegen die gemessene
+   Streuweite, kein statistischer Test).
+4. **Unschärfe des Nenners selbst: 0,931 gegenüber 1,360 Mrd. €₂₀₂₆/a**, also rund 32 % Spanne
+   (Wahl des Nenners, Punkt 3 der Größen-Aufzählung oben). Welcher Nenner richtig ist, entscheidet keine Messung, sondern eine
+   **Abschätzung von KAP3** zur Konsistenz mit dem Mengengerüst (Herleitung: Adress- statt
+   Zellbezug der 339.000 bzw. 1,38 Mio. Adressen).
 
 **Auflösung (Ressourcen-Regel §3.4).** Alle Schritte dieses Kapitels laufen auf **Bundesland-Ebene
 (16 Werte), auf Gemeindepunkt-Ebene und auf einer dokumentierten Stichprobe von Anker-Kommunen**;
 **kein Schritt dieses Kapitels erfordert einen nationalen 100-m-Vollraster-Lauf** — weder die
-Bestimmung von \(\lambda\) (drei nationale Aggregate, siehe oben) noch die Verteilungsprüfung
+Bestimmung von \(\lambda\) (zwei gemessene Klassenraten und das nationale Mengengerüst, siehe
+oben) noch die Verteilungsprüfung
 (Länderwerte) noch das Sanity-Band (Bestandsstatistik). Die Anker-Stichprobe umfasst je
 Ereignisjahr die am stärksten betroffenen Kommunen der betroffenen Länder; für den Erstlauf sind
 das **Grimma, Dresden, Deggendorf, Passau, Halle (Saale), Hitzacker, Rosenheim und Reichertshofen**
@@ -1062,7 +1103,8 @@ gerechnet wird. Die Auswahlregel steht damit im Bericht und ist nachvollziehbar 
 <a id="niveau-skalar"></a>
 ### 4.4 Der Niveau-Skalar
 
-\(\lambda = A^{*}/M_0\) = 0,99 / 0,94 = **1,05** (Band aus dem Ankerband: **0,42–2,36**).
+\(\lambda = A^{*}/M_0\) = 0,985 / 1,360 = **0,724** (Band aus dem Ankerband 0,391–2,216 bei
+unverändertem \(M_0\): **0,29–1,63**).
 
 **Anwendungsregel.** \(\lambda\) ist ein **einziger, bundesweit konstanter** Faktor auf
 \(\text{EAD}_k\) jeder Kommune. Er ist kein Verteilungsschlüssel: Die relative Verteilung zwischen
@@ -1073,9 +1115,14 @@ einzelner Kommunen.
 **Plausibilitätsschranke.** Ergibt eine Neubestimmung \(\lambda < 0{,}50\) oder \(\lambda >
 2{,}00\), wird **nicht** der Skalar gesetzt, sondern das Modell gilt als fehlerhaft: Dann trägt
 eine Eingangsgröße den Fehler (Exponiertenzahl, Wertdichte, Schadensfunktion), und der Befund geht
-ins Ledger, bevor gerechnet wird. Dass \(\lambda\) = 1,05 nahe bei 1 liegt, ist **kein**
-Kalibrierergebnis: \(M_0\) ist eine Näherung mit anderem Umfang als \(A^{*}\) (Einleitung Kap. 4),
-und mit den bezifferten Umfangskorrekturen fällt \(\lambda\) auf 0,97 bis 0,55.
+ins Ledger, bevor gerechnet wird. Der Zentralwert \(\lambda\) = 0,724 **liegt innerhalb** der
+Schranke [0,50; 2,00]; der Skalar wird deshalb gesetzt. Die Schranke selbst bleibt unverändert bei
+0,50 bzw. 2,00 — sie wird nicht an das Ergebnis angepasst. Dass das untere **Bandende** 0,29 unter
+0,50 fällt, betrifft nicht den Zentralwert, sondern die noch ausstehende Herleitung der Schranke
+aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\); dieser Punkt ist als Befund 36 im Ledger
+offen und wird hier weder durch Weiten der Schranke noch nebenbei gelöst. Gesetzt heißt nicht
+endgültig: \(\lambda\) ist **weiterhin vorläufig**, weil die Ledger-Befunde 33 und 34 offen sind
+(Einleitung Kap. 4).
 
 ### 4.5 Unabhängige Verteilungsprüfung: Achse Ereignisregime
 
@@ -1122,7 +1169,8 @@ in 4.2 ausgewiesenen Anteile \(w_{\text{wg}}\) und \(\varphi_{\text{fluss}}\) (U
 die Betroffenheitsannahme 1/100 a (Obergrenze, Abschätzung von KAP3 — sie ist die Jährlichkeit des
 Bemessungsereignisses und damit die großzügigste noch sinnvolle Annahme).
 
-**Ist:** \(\lambda \cdot M_0\) = 0,99 Mrd. €₂₀₂₆/a liegt innerhalb von [0,56; 2,26]. Das Band ist
+**Ist:** \(\lambda \cdot M_0\) = 0,724 · 1,360 = 0,985 Mrd. €₂₀₂₆/a liegt innerhalb von
+[0,56; 2,26]. Das Band ist
 zugleich die Vorlage für den Sanity-Band-Test der Integration: Eine Bundessumme außerhalb dieser
 Grenzen ist ein roter Test, kein Hinweis.
 
@@ -1163,7 +1211,7 @@ gekennzeichnet.
 | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\pi\) | 1,07 (1,04–1,11) | **Abschätzung von KAP3** aus B4 (Baupreisindex), Herleitung §4.2 |
-| \(\lambda\) Niveau-Skalar | 1,05 (0,42–2,36) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\), §4.4; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) und der Schadensgrad der Beispielzelle (§3.4) ein; Umfangs-Sensitivität 0,97–0,55 (Einleitung Kap. 4) |
+| \(\lambda\) Niveau-Skalar | 0,724 (0,29–1,63) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3) mit Wohngebäudeanteil 0,872; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein; Zentralwert innerhalb der Plausibilitätsschranke, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
 | Baupreisanstieg 2023 → 2024 | 3 % (2,3–5,0 %) | **Abschätzung von KAP3**: gerundet aus den in B4 zitierten Jahresraten des Baupreisindex (3,2 %/3,3 %), Band wie B4; geht in \(\pi = 1{,}105/1{,}03\) ein (§4.2); Sensitivität: \(\pi\) = 1,080 bei 2,3 %, 1,052 bei 5,0 % |
 | Betroffenheit exponierter Gebäude | 1/100 a | **Abschätzung von KAP3**, Herleitung §4.6 (mittlere Betroffenheit auf Bemessungsniveau HQ100); geht linear in \(O\) ein |
 | Plausibilitätsschranke \(\lambda\) | 0,50 bzw. 2,00 | **Abschätzung von KAP3** (Faktor 2 um den Neutralwert 1), §4.4; gilt für den Zentralwert einer Neubestimmung; die Herleitung aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) steht aus (Ledger, Befund 36) |
@@ -1182,13 +1230,22 @@ lo = 1.4 * 0.55 * 1.33 * 0.35 * 1.05 * 1.04
 hi = 1.8 * 0.75 * 1.75 * 0.65 * 1.30 * 1.11
 assert abs(lo - 0.391) < 5e-3 and abs(hi - 2.216) < 5e-3
 
-# 4.3 Modellsumme vor Kalibrierung und 4.4 Niveau-Skalar
+# 4.3 Modellsumme aus den gemessenen Klassenraten (docs/evidenz/60_stichprobe/m0_klassenraten.csv)
 wert_geb = 208.0 * 1.30 * 1950.0                 # EUR2026 je exponiertem Wohngebaeude
 assert abs(wert_geb - 527280.0) < 1.0
-M0 = 339_000 * wert_geb * (6.311 / 1200.0) / 1e9
-assert abs(M0 - 0.940) < 5e-3
+w_wohn = 0.872                                   # Wohngebaeudeanteil je Adresse (19,7/22,6)
+r_gk34 = 0.005979599550826                       # klasse=gk3_gk4/kommune=alle
+r_gk2 = 0.000675151053693                        # klasse=gk2/kommune=alle
+beitrag_gk34 = w_wohn * wert_geb * 339_000 * r_gk34 / 1e9
+beitrag_gk2 = w_wohn * wert_geb * 1_380_000 * r_gk2 / 1e9
+assert abs(beitrag_gk34 - 0.932) < 5e-3 and abs(beitrag_gk2 - 0.428) < 5e-3
+M0 = beitrag_gk34 + beitrag_gk2
+assert abs(M0 - 1.360) < 5e-3
+
+# 4.4 Niveau-Skalar samt Band aus dem Ankerband
 lam = A_stern / M0
-assert abs(lam - 1.05) < 5e-3 and 0.50 <= lam <= 2.00   # Plausibilitaetsschranke 4.4
+assert abs(lam - 0.724) < 5e-3 and 0.50 <= lam <= 2.00   # Plausibilitaetsschranke 4.4
+assert abs(lo / M0 - 0.29) < 5e-3 and abs(hi / M0 - 1.63) < 5e-3
 
 # 4.5 Verteilungspruefung Ereignisregime: Anteil ab HQ100 gegen Ankerbefund
 A = [15.0, 77.76, 300.0]
