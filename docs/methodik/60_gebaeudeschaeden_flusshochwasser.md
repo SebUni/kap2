@@ -202,7 +202,9 @@ Aufstellung von Hochwassergefahrenkarten und Hochwasserrisikokarten“, Stand Ja
 beschlossen durch die 167. LAWA-Vollversammlung am 21./22.03.2024 in Potsdam, Herausgeber LAWA,
 Potsdam; URL
 `https://www.lawa.de/documents/2024-01-lawa-empfehlungen-aufstellung-hochwassergefahrenkarten-barrierefrei_1739980622.pdf`,
-Zugriff 13.09.2026. S. 4 wörtlich: „Hochwasser mit niedriger Wahrscheinlichkeit oder Szenarien für
+Archiv-Snapshot
+`https://web.archive.org/web/20250914171101/https://www.lawa.de/documents/2024-01-lawa-empfehlungen-aufstellung-hochwassergefahrenkarten-barrierefrei_1739980622.pdf`
+(Snapshot vom 14.09.2025), Zugriff 13.09.2026. S. 4 wörtlich: „Hochwasser mit niedriger Wahrscheinlichkeit oder Szenarien für
 Extremereignisse“ · „Hochwasser mit mittlerer Wahrscheinlichkeit (Ereignisse, die im statistischen
 Mittel einmal in 100 Jahren auftreten)“ · „gegebenenfalls Hochwasser mit hoher Wahrscheinlichkeit“;
 anzugeben sind „Ausmaß der Überflutung (Fläche)“ und „Wassertiefe bzw. gegebenenfalls
@@ -211,12 +213,18 @@ Wasserstand“. S. 16 wörtlich: „Für jedes Hochwasserszenario sind sowohl da
 „0–0,5 m, >0,5–1 m, >1–2 m, >2–4 m und >4 m“. S. 10 wörtlich zum Klimabezug: „Der bisher wirksam
 gewordene Einfluss von Klimaveränderungen ist in den Daten der hydrologischen Statistiken
 enthalten.“ (2) **§ 74 Abs. 2/3 WHG**, Fassung abgerufen unter
-`https://www.gesetze-im-internet.de/whg_2009/__74.html`, Zugriff 13.09.2026; Abs. 2 Nr. 1 wörtlich:
+`https://www.gesetze-im-internet.de/whg_2009/__74.html`, Archiv-Snapshot
+`https://web.archive.org/web/20250323111437/https://www.gesetze-im-internet.de/whg_2009/__74.html`
+(Snapshot vom 23.03.2025; laufend gepflegte Gesetzesfassung — der Snapshot belegt den Wortlaut zum
+Snapshot-Zeitpunkt, maßgeblich bleibt die am Zugriffstag abgerufene Fassung),
+Zugriff 13.09.2026; Abs. 2 Nr. 1 wörtlich:
 „Hochwasser mit niedriger Wahrscheinlichkeit (voraussichtliches Wiederkehrintervall mindestens 200
 Jahre) oder bei Extremereignissen“. (3) **Bayerisches Landesamt für Umwelt (LfU), „FAQ:
 Hochwassergefahren- und -risikokarten“**, URL
 `https://www.lfu.bayern.de/wasser/hw_risikomanagement_umsetzung/faq_karten/index.htm`,
-Zugriff 13.09.2026; wörtlich: HQhäufig ist „ein Abfluss (Q) verstanden, der statistisch gesehen im
+Archiv-Snapshot
+`https://web.archive.org/web/20260314134744/https://www.lfu.bayern.de/wasser/hw_risikomanagement_umsetzung/faq_karten/index.htm`
+(Snapshot vom 14.03.2026), Zugriff 13.09.2026; wörtlich: HQhäufig ist „ein Abfluss (Q) verstanden, der statistisch gesehen im
 Mittel alle 5 bis 20 Jahre auftritt“ (die Karten zeigen ein HQ10), HQ100 ist „ein Abfluss (Q), der
 im Mittel alle hundert Jahre erreicht oder überschritten wird“, HQextrem entspricht ungefähr einem
 HQ1000. **Rechenschritt (§3.9 Übernommen):** p = 1/T mit T aus den zitierten Wiederkehrintervallen
@@ -232,7 +240,9 @@ Land zu erheben.
 
 **B2 — 60-S074-01 (Geländehöhe → Wassertiefe am Gebäude).**
 Quellen: (1) **LAIV MV — Landesamt für innere Verwaltung Mecklenburg-Vorpommern, „Geländemodelle“**,
-URL `https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/`, Zugriff 13.09.2026;
+URL `https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/`, Archiv-Snapshot
+`https://web.archive.org/web/20260515142234/https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/`
+(Snapshot vom 15.05.2026), Zugriff 13.09.2026;
 wörtlich zur Höhengenauigkeit des DGM1: „0,15 – 0,2 m“, zur Erfassung: „Dominierende
 Erfassungsmethoden für die Erhebung der Messdaten sind das Airborne Laserscanning und die
 Bildkorrelation auf Basis orientierter Luftbildpaare.“ (2) **de Moel, H.; Aerts, J. C. J. H.
@@ -261,13 +271,17 @@ Quellen: (1) **GDV — Gesamtverband der Deutschen Versicherer (2025):** „Geri
 Fluss-Hochwasser bei den meisten Wohngebäuden“, Datenservice zum Naturgefahrenreport,
 Stand ZÜRS Geo 2025; URL
 `https://www.gdv.de/gdv/statistik/datenservice-zum-naturgefahrenreport/sachversicherung-elementar/geringe-gefahr-fuer-fluss-hochwasser-bei-den-meisten-wohngebaeuden--147672`,
-Zugriff 13.09.2026. Wörtlich zur Gefährdungsklasse 1 (92,4 %): „statistisch nach gegenwärtiger
+Archiv-Snapshot
+`https://web.archive.org/web/20260417160705/https://www.gdv.de/gdv/statistik/datenservice-zum-naturgefahrenreport/sachversicherung-elementar/geringe-gefahr-fuer-fluss-hochwasser-bei-den-meisten-wohngebaeuden--147672`
+(Snapshot vom 17.04.2026), Zugriff 13.09.2026. Wörtlich zur Gefährdungsklasse 1 (92,4 %): „statistisch nach gegenwärtiger
 Datenlage nicht von Hochwasser größerer Gewässer betroffen“; wörtlich zur Gefährdungsklasse 4
 (0,4 %): „Hochwasser statistisch mindestens einmal in 10 Jahren“; Bezugsgröße: 22,6 Mio erfasste
 Adressen. (2) **GDV, „ZÜRS Geo — Zonierungssystem für Überschwemmungsrisiko und Einschätzung von
 Umweltrisiken“**, URL
 `https://www.gdv.de/gdv/themen/klima/-zuers-geo-zonierungssystem-fuer-ueberschwemmungsrisiko-und-einschaetzung-von-umweltrisiken-11656`,
-Zugriff 13.09.2026; wörtlich zur Klasse 2: in ihr sind „auch Objekte enthalten, die durch einen
+Archiv-Snapshot
+`https://web.archive.org/web/20260902211622/https://www.gdv.de/gdv/themen/klima/-zuers-geo-zonierungssystem-fuer-ueberschwemmungsrisiko-und-einschaetzung-von-umweltrisiken-11656`
+(Snapshot vom 02.09.2026), Zugriff 13.09.2026; wörtlich zur Klasse 2: in ihr sind „auch Objekte enthalten, die durch einen
 Deich geschützt sind“, sofern dieser mindestens einem hundertjährlichen Hochwasser standhält;
 Objekte im Umkreis von 100 m zu einem Bach tragen zusätzlich den Vermerk „Bachzone“.
 **Rechenschritt (§3.9 Abgeleitet):** aus den beiden wörtlich belegten Anteilen folgt die
@@ -1947,9 +1961,10 @@ dieses Berichts ein — vgl. B6, „Hochwasserschutzfibel … hier nicht im Voll
    „Volltext geprüft“ bzw. „Volltext gegengelesen“. Für S092 ist keine Primärquelle verwendet
    (§5.1 ABGESCHÄTZT, Quelle 3 oben ist nur Kandidat, nicht Basis der Zahl). **Format der
    Langbelege (§3.8):** Autor/Organ, Jahr, Titel, DOI/URL, Zugriffsdatum **und Archiv-Snapshot**;
-   der Archiv-Snapshot ist dort noch **nicht** nachgetragen — bei DOI-gebundenen
+   der Archiv-Snapshot ist für die sechs externen Webquellen in **B1–B3** nachgetragen
+   (T-0307, 17.09.2026), für **B4–B6** noch **nicht** — bei DOI-gebundenen
    Zeitschriftenquellen ist er entbehrlich (die DOI ist der persistente Nachweis), bei den
-   Webseiten- und Pressemitteilungsquellen der Langbelege ist er offen und als Rest von Befund 42
+   Webseiten- und Pressemitteilungsquellen von B4–B6 ist er offen und als Rest von Befund 42
    (Teil b) im Ledger geführt.
 5. **Gesamtverband der Deutschen Versicherungswirtschaft e. V. (GDV) (2025):**
    „GDV-Naturgefahrenstatistik 2024: Hochwasserschäden mehr als verdoppelt“, Medieninformation
