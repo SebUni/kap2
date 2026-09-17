@@ -1705,3 +1705,23 @@ Nicht angefasst (Dateirahmen): `backend/scripts/lint_methodik.py` (byte-gleich m
 gehört T-0234), `docs/evidenz/register.md`, `backend/`, die Stichprobendateien unter
 `docs/evidenz/60_stichprobe/`, **Kapitel 4 des Berichts** (in Schritt 2 mit T-0312 nachgezogen) und
 die Kopftabelle „Offene Befunde“ dieses Ledgers (schreibt allein T-0296 fort).
+
+**17.09.2026 · T-0321** (Befund 34 an 60, Schritt 4 von 4 zur Auflösung von T-0291; Ersatz für den
+zweiten Teil des an der Budgetgrenze eskalierten T-0317; Schritt L1 aus
+`.claude/methodik-loop.md`, Autor-Revision — keine Gegenprüfung, kein `/risiko-fortsetzen`, kein L4
+nach eiserner Regel 4; die Gegenprüfung fährt T-0246 in eigener Sitzung). Geändert wird
+ausschließlich dieses Ledger; nichts wurde neu hergeleitet oder neu gerechnet — der Rechenweg steht
+bereits im Block **17.09.2026 · T-0315** oben (Punkte (a) bis (e): Kleinste-Quadrate-Schätzer,
+Jahres-Auswahlregel, Fenster-Sensitivität, Tukey-Fence-Bandherleitung), die Zahlen stehen bereits im
+Bericht `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (Kapitel 4 aus T-0318/T-0319, Kapitel
+7 und §7.2 aus Paket 4a/T-0313). Dieses Paket fasst nur zusammen und belegt, damit die Statuszeile
+für Befund 34 in diesem Ledger den bereits vollzogenen Nachzug wörtlich abbildet.
+
+| Nr | Kat. | Vorgenommene Änderung | Prüfausdruck | Status danach |
+|---|---|---|---|---|
+| 34 | A | **Zusammenfassung und Beleg der bereits im Bericht vollzogenen Kleinste-Quadrate-Ankerbestimmung.** \(A_{\text{ver}}\) = 1,838 Mrd. €₂₀₂₆-Preisstand-2024 aus dem Kleinste-Quadrate-Mittel der vollständigen GDV-Jahresreihe 2002–2024 (§4.1); \(A^{*}\) = \(A_{\text{ver}} \cdot w_{\text{wg}} \cdot u \cdot \varphi_{\text{fluss}} \cdot \kappa \cdot \pi\) = 1,838 · 0,615865 = **1,132** Mrd. €₂₀₂₆/a (§4.2); \(\lambda = A^{*}/M_0\) = 1,132 / 1,360 = **0,832** (Band **0,22–1,66**, Tukey-Fence-Herleitung aus (e)). \(w_{\text{wg}}\) = 0,65 bleibt eine Abschätzung von KAP3, belegt über `docs/evidenz/60_gdv_wohngebaeude_2024.csv` (§4.1, Zeile `w_wg`). Fundstellen im Bericht: **§4.1** (Ankerreihe, Kleinste-Quadrate-Mittel, Quelle), **§4.2** (Zielwert der Bundessumme, \(w_{\text{wg}}\)-Herleitung), **§4.4** (Niveau-Skalar \(\lambda\) = 0,832, Plausibilitätsschranke), **Kap. 7** Block `flood_bldg.lambda` (`wert: 0.832`), **§7.2** (Zeitwert-Sensitivität mit dem nachgezogenen Anker), **Entscheidungslog Nr. 8** (Mehrjahresmittel statt Einzeljahr 2024, mit Begründung). | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('1,838','1,132','0,832','0,22','1,66','w_wg','wert: 0.832')) else 1)"` und `python3 backend/scripts/lint_methodik.py 60` | **behoben** — \(A_{\text{ver}}\) = 1,838, \(A^{*}\) = 1,132, \(\lambda\) = 0,832 (Band 0,22–1,66) tragen durchgängig in §4.1, §4.2, §4.4, Kap. 7 (Block `flood_bldg.lambda`) und §7.2; \(w_{\text{wg}}\) = 0,65 bleibt über `docs/evidenz/60_gdv_wohngebaeude_2024.csv` belegte Abschätzung von KAP3 |
+
+Nicht angefasst (Dateirahmen): `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`,
+`docs/evidenz/register.md`, `backend/`, `backend/scripts/lint_methodik.py` und die Kopftabelle
+„Offene Befunde“ am Kopf dieses Ledgers (schreibt allein T-0296 fort). Die Befunde 33, 35, 36, 26,
+28, 39, 41 und 42 sind in ihrem Status nicht angerührt.
