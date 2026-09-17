@@ -76,6 +76,17 @@ Formeln aus stichprobe60_zensus.py von EPSG:25832 nach EPSG:3035 gerechnet und m
 Gitterverschnitt aus stichprobe60_hq_sachsen.py (Sutherland–Hodgman, Gaußsche
 Trapezformel mit Vorzeichen; Shapefile-Außenringe im Uhrzeigersinn) je Zelle verdichtet.
 
+Schutz gegen vertauschte Szenarien (Nacharbeit R1)
+-------------------------------------------------
+Jede Szenarioseite hat einen eigenen Download-Endpunkt; die Kachel-IDs sind auf allen
+Seiten gleich. Der erste Lauf forderte alle Szenarien über den HQ100-Endpunkt an und
+schrieb drei identische Blöcke. Deshalb: (a) die Shapefile-Namen im ZIP müssen zum
+Szenario passen (wt_max10_ / wt_max100_ / wt_max200_); (b) der verdichtete
+Zwischenstand trägt Szenario und Dateinamen und wird beim Laden dagegen geprüft;
+(c) Abbruch, wenn zwei Szenarien dieselben Zellen mit denselben Anteilen und Tiefen
+liefern oder nicht Fläche(HQhäufig) ≤ Fläche(HQ100) ≤ Fläche(HQextrem) mit
+Fläche(HQhäufig) < Fläche(HQextrem) gilt.
+
 Ressourcen-Regel §3.4
 ---------------------
 Nur die 10-km-Kacheln, die das Begrenzungsrechteck der Gemeinde schneiden; nur Ringe in
@@ -241,15 +252,27 @@ def szenario_verdichten(kommune: str, kennung: str, bb) -> tuple[dict, str]:
     pfad = os.path.join(CACHE, f"hq_st_zellen_{kommune.split()[0]}_{kennung}.json")
     if os.path.isfile(pfad):
         with open(pfad, encoding="utf-8") as f:
-            return json.load(f), zs._zugriff(pfad)
+            erg = json.load(f)
+        # Zwischenstand nur verwenden, wenn er nachweislich aus den Dateien dieses Szenarios stammt
+        dateien = erg.get("dateien")
+        if (erg.get("kennung") != kennung or not isinstance(dateien, list)
+                or (erg.get("polygone") and not dateien)
+                or not all(os.path.basename(n).startswith(DATEI[kennung]) for n in dateien)):
+            raise SystemExit(f"{pfad}: Zwischenstand gehört nicht zum Szenario {kennung} "
+                             f"(kennung {erg.get('kennung')!r}, dateien {dateien!r}) — Datei löschen, neu laufen")
+        return erg, zs._zugriff(pfad)
     x0, y0, x1, y1 = bb
     endpunkt, alle = kacheln(kennung)
     treffer = [k for k in alle
                if k[2][0] < x1 and k[2][2] > x0 and k[2][1] < y1 and k[2][3] > y0]
     zellen: dict[str, dict[str, float]] = {}
     polygone = 0
+    dateien: list[str] = []
     for kid, label, _ in sorted(treffer, key=lambda k: k[1]):
-        for klasse, ringe in shp_lesen(kachel_zip(kennung, endpunkt, kid, label)):
+        zpfad = kachel_zip(kennung, endpunkt, kid, label)
+        with zipfile.ZipFile(zpfad) as z:
+            dateien += [n for n in z.namelist() if n.lower().endswith(".shp")]
+        for klasse, ringe in shp_lesen(zpfad):
             if klasse not in KLASSEN:
                 raise SystemExit(f"{kennung} {label}: unbekannte Klasse {klasse}")
             roh: dict = {}
@@ -270,7 +293,8 @@ def szenario_verdichten(kommune: str, kennung: str, bb) -> tuple[dict, str]:
                 z = zellen.setdefault(f"{cx},{cy}", {})
                 z[str(klasse)] = z.get(str(klasse), 0.0) + fl
         print(f"  {kommune} {kennung} {label}: {len(zellen)} Zellen", file=sys.stderr)
-    erg = {"kacheln": len(treffer), "polygone": polygone, "bbox": list(bb), "zellen": zellen}
+    erg = {"kennung": kennung, "dateien": sorted(dateien), "kacheln": len(treffer),
+           "polygone": polygone, "bbox": list(bb), "zellen": zellen}
     os.makedirs(CACHE, exist_ok=True)
     with open(pfad + ".tmp", "w", encoding="utf-8") as f:
         json.dump(erg, f)
@@ -283,6 +307,25 @@ def _selbsttest() -> None:
     roh: dict = {}
     sn.ring_zellflaechen([(50, 50), (50, 200), (200, 200), (200, 50)], roh)
     assert abs(-roh[(0, 0)] - 2500) < 1e-6 and abs(-sum(roh.values()) - 22500) < 1e-6, roh
+
+
+def plausibel(name: str, plausi: dict[str, tuple[float, frozenset]]) -> None:
+    """Bricht ab, wenn Szenarien identisch sind oder die Flächen nicht mit der Seltenheit wachsen.
+
+    Fehlerbild des ersten Laufs: alle drei Szenarien aus denselben HQ100-Kacheln.
+    Verlangt: Fläche(HQhäufig) ≤ Fläche(HQ100) ≤ Fläche(HQextrem), nicht alle gleich,
+    und keine zwei Szenarien mit denselben Zellen, Anteilen und Tiefen.
+    """
+    namen = [s for s, _ in SZENARIEN if s in plausi]
+    for i, s1 in enumerate(namen):
+        for s2 in namen[i + 1:]:
+            if plausi[s1][1] and plausi[s1][1] == plausi[s2][1]:
+                raise SystemExit(f"{name}: {s1} und {s2} liefern dieselben Zellen, Anteile und "
+                                 "Tiefen — vermutlich dieselben Kacheln geladen; Cache prüfen.")
+    fl = [plausi[s][0] if s in plausi else 0.0 for s, _ in SZENARIEN]
+    if not (fl[0] <= fl[1] <= fl[2]) or fl[0] == fl[2]:
+        raise SystemExit(f"{name}: Flächen je Szenario unplausibel "
+                         + ", ".join(f"{s} {f:.3f} km²" for (s, _), f in zip(SZENARIEN, fl)))
 
 
 def main() -> int:
@@ -304,6 +347,7 @@ def main() -> int:
     for name, ags, _gen in KOMMUNEN:
         fl = gem[name]
         bb = bbox_utm(gpkg, ags)
+        plausi: dict[str, tuple[float, frozenset]] = {}
         for szen, kennung in SZENARIEN:
             daten, zugriff = szenario_verdichten(name, kennung, bb)
             url = seite_url(kennung)
@@ -348,9 +392,11 @@ def main() -> int:
                 stat[herk] += 1
                 zeilen.append([name, szen, gid, f"{a:.6f}", f"{h:.4f}", herk, url, url, zugriff])
             summe = sum(z[1] for z in zell) * ZELLE * ZELLE / 1e6
+            plausi[szen] = (summe, frozenset((g, round(a, 6), round(h or 0.0, 4)) for g, a, h, _ in zell))
             print(f"{name} {szen:9s} Zellen {len(zell):6d} {stat} gekappt {kapp} "
                   f"Fläche {summe:7.3f} km²  Median-Klasse {median}  Kacheln {daten['kacheln']}",
                   file=sys.stderr)
+        plausibel(name, plausi)
 
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, "w", encoding="utf-8", newline="") as f:
