@@ -124,7 +124,9 @@ KWK = Sheet „Klimawirkungsketten“, NW = „Schadensbaum-Netzwerkliste“, Mo
 - **Konto:** K3 Gebäude und Sachwerte — Definition (Konten Z26): „Wiederherstellungskosten an
   Gebäuden, Hausrat, Fahrzeugen, Anlagen und Grundstücken (inkl. Landverlust), ereignisbezogen;
   Versicherungsleistungen sind Transfers.“ Kostensatz-Typ (Z27): „Wiederherstellungs-/Zeitwertkosten;
-  Schadensfunktionen × Bestandswerte“.
+  Schadensfunktionen × Bestandswerte“. **Entschieden (17.09.2026):** Kostensatz-Typ ist der Neuwert
+  (Wiederherstellungskosten); der Zeitwertansatz aus Mon. J64 wird als Band geführt und die
+  Abweichung als Antrag auf Fortschreibung in §7.2 ausgewiesen.
 - **Bewertungsbaustein:** K3-Wiederherstellung (NW Z61). Bewertungsansatz (Mon. Z65): „Wie ID 59,
   ereignisbezogen flussseitig; HQ-Szenarien × Schadensfunktionen (Wassertiefe-Schaden) ×
   Gebäudewerte.” Gegenstand: „Sachschäden flussseitiger Überflutung.”
@@ -188,7 +190,7 @@ aus #95/#96/#98). In Formeln (§3) dürfen später nur Zeilen mit Entscheidung *
 | 60-S097-01 | S097 Zustand Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
 | 60-S098-01 | S098 Baumaterialien Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
 | 60-S104-01 | S104 Investitionen in exponierten Gebieten → Bestandsentwicklung | offen | offen | offen | offen | offen | offen |
-| 60-R24-01 | R24 Gebäude → Mengengerüst (Gebäudewerte) | **Menge:** 19,7 Mio Wohngebäude (13,5 Mio Einfamilien-, 2,7 Mio Zweifamilien-, 3,5 Mio Mehrfamilienhäuser), 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche (31.12.2024) ⇒ 208 m² Wohnfläche je Wohngebäude; Fortschreibung 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m². **Wertsatz (Wiederherstellung/Neubauwert):** NHK 2010 Standardstufe 3 (mittlerer Standard) = 1.050 €₂₀₁₀/m² BGF (freistehende Ein-/Zweifamilienhäuser, Geb.-Art 1.01) bzw. 825 €₂₀₁₀/m² BGF (Mehrfamilienhäuser ≤ 6 WE), je inkl. Umsatzsteuer und Baunebenkosten; Indexierung mit dem Baupreisindex Wohngebäude (2015 = 100: 2010 = 89,1 → 2023 = 149,8, Faktor 1,681) ⇒ 1.765 bzw. 1.387 €₂₀₂₃/m² BGF; Fortschreibung 2023 → Preisstand 2026 mit Faktor 1,105 (Band 1,07–1,16; §3.9 **abgeschätzt**, Kette in B4) ⇒ **1.950 €₂₀₂₆/m² BGF (Band 1.889–2.047)** bzw. **1.533 €₂₀₂₆/m² BGF (Band 1.484–1.609)**; BGF je m² Wohnfläche = 1,30 (Band 1,25–1,40; §3.9 **abgeschätzt**) ⇒ Wertdichte 1.993–2.535 €₂₀₂₆/m² Wohnfläche ⇒ Wiederherstellungswert des Wohngebäudebestands 8,2–10,4 Bio. €₂₀₂₆ (Sensitivität: ±10 % auf den Indexfaktor verschieben den Bestandswert um ±0,8–1,0 Bio. €) | amtliche Statistik (Fortschreibung des Wohngebäude- und Wohnungsbestands auf Zensus-2022-Basis) + normierter Kostenkennwert aus Rechtsverordnung (ImmoWertV Anlage 4), fortgeschrieben mit amtlichem Preisindex | Destatis 2025, Pressemitteilung Nr. 336 vom 17.09.2025, „43,8 Millionen Wohnungen in Deutschland zum Jahresende 2024“, https://www.destatis.de/DE/Presse/Pressemitteilungen/2025/09/PD25_336_31231.html, Zugriff 13.09.2026; Destatis, Themenseite „Wohnen“ (Fortschreibung zum 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m²), https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html, Zugriff 13.09.2026; ImmoWertV, Anlage 4 (zu § 36 Abs. 1) „Normalherstellungskosten 2010 (NHK 2010)“, https://www.gesetze-im-internet.de/immowertv_2022/anlage_4.html, Zugriff 13.09.2026; Destatis, Fachserie 17 Reihe 4 „Preisindizes für die Bauwirtschaft“ (Basis 2015 = 100), https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile, Zugriff 13.09.2026; Destatis 2026, PM Nr. 241 vom 10.07.2026 (Baupreise Wohngebäude Mai 2026: +5,0 % gg. Vj.), https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/07/PD26_241_61261.html, Zugriff 13.09.2026 — Volltext geprüft; Langbeleg **B4** unter der Tabelle (Mon. Z65: „Gebäudewerte“) | DE-weit. **Modellgrenzen:** (a) NHK-Standardstufe 3 als bundesweiter Einheitssatz — ohne Regionalfaktor der Gutachterausschüsse streut der Wertsatz zwischen Hoch- und Niedrigpreisregionen um schätzungsweise ±20 %; (b) **Nichtwohngebäude** (Gewerbe, öffentliche Gebäude) sind im Mengengerüst nicht enthalten — die Mengenbasis ist insoweit eine Untergrenze (§3.6); (c) NHK sind **Neubau-/Wiederherstellungswerte**; die Zeitwert-Lesart (Alterswertminderung nach ImmoWertV) liegt je nach Restnutzungsdauer deutlich darunter — der Unterschied wird als Band geführt, nicht geglättet (§3.8) | Gebäudezahl und Wohnfläche je Zelle aus dem Zensus-2022-Gitter (100 m) bzw. den amtlichen Hausumringen; Datenebene GEBAEUDEWERT **neu anzulegen** (§3.1, Spezifikation in Kap. 3), Fortschreibung über die Destatis-Bestandsfortschreibung; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Basiswert** — FS-Mengengerüst: Wohnfläche je Zelle × Wertdichte €₂₀₂₆/m²; die Zeitwert-Lesart sowie die abgeschätzten Faktoren (Indexierung 2023→2026, BGF/Wohnfläche) laufen als Sensitivitätsband mit und werden im Produkt nach Vorgabe P1/P2 als Abschätzung von KAP3 ausgewiesen |
+| 60-R24-01 | R24 Gebäude → Mengengerüst (Gebäudewerte) | **Menge:** 19,7 Mio Wohngebäude (13,5 Mio Einfamilien-, 2,7 Mio Zweifamilien-, 3,5 Mio Mehrfamilienhäuser), 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche (31.12.2024) ⇒ 208 m² Wohnfläche je Wohngebäude; Fortschreibung 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m². **Wertsatz (Wiederherstellung/Neubauwert):** NHK 2010 Standardstufe 3 (mittlerer Standard) = 1.050 €₂₀₁₀/m² BGF (freistehende Ein-/Zweifamilienhäuser, Geb.-Art 1.01) bzw. 825 €₂₀₁₀/m² BGF (Mehrfamilienhäuser ≤ 6 WE), je inkl. Umsatzsteuer und Baunebenkosten; Indexierung mit dem Baupreisindex Wohngebäude (2015 = 100: 2010 = 89,1 → 2023 = 149,8, Faktor 1,681) ⇒ 1.765 bzw. 1.387 €₂₀₂₃/m² BGF; Fortschreibung 2023 → Preisstand 2026 mit Faktor 1,105 (Band 1,07–1,16; §3.9 **abgeschätzt**, Kette in B4) ⇒ **1.950 €₂₀₂₆/m² BGF (Band 1.889–2.047)** bzw. **1.533 €₂₀₂₆/m² BGF (Band 1.484–1.609)**; BGF je m² Wohnfläche = 1,30 (Band 1,25–1,40; §3.9 **abgeschätzt**) ⇒ Wertdichte 1.993–2.535 €₂₀₂₆/m² Wohnfläche ⇒ Wiederherstellungswert des Wohngebäudebestands 8,2–10,4 Bio. €₂₀₂₆ (Sensitivität: ±10 % auf den Indexfaktor verschieben den Bestandswert um ±0,8–1,0 Bio. €) | amtliche Statistik (Fortschreibung des Wohngebäude- und Wohnungsbestands auf Zensus-2022-Basis) + normierter Kostenkennwert aus Rechtsverordnung (ImmoWertV Anlage 4), fortgeschrieben mit amtlichem Preisindex | Destatis 2025, Pressemitteilung Nr. 336 vom 17.09.2025, „43,8 Millionen Wohnungen in Deutschland zum Jahresende 2024“, https://www.destatis.de/DE/Presse/Pressemitteilungen/2025/09/PD25_336_31231.html, Zugriff 13.09.2026; Destatis, Themenseite „Wohnen“ (Fortschreibung zum 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m²), https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html, Zugriff 13.09.2026; ImmoWertV, Anlage 4 (zu § 36 Abs. 1) „Normalherstellungskosten 2010 (NHK 2010)“, https://www.gesetze-im-internet.de/immowertv_2022/anlage_4.html, Zugriff 13.09.2026; Destatis, Fachserie 17 Reihe 4 „Preisindizes für die Bauwirtschaft“ (Basis 2015 = 100), https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile, Zugriff 13.09.2026; Destatis 2026, PM Nr. 241 vom 10.07.2026 (Baupreise Wohngebäude Mai 2026: +5,0 % gg. Vj.), https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/07/PD26_241_61261.html, Zugriff 13.09.2026 — Volltext geprüft; Langbeleg **B4** unter der Tabelle (Mon. Z65: „Gebäudewerte“) | DE-weit. **Modellgrenzen:** (a) NHK-Standardstufe 3 als bundesweiter Einheitssatz — ohne Regionalfaktor der Gutachterausschüsse streut der Wertsatz zwischen Hoch- und Niedrigpreisregionen um schätzungsweise ±20 %; (b) **Nichtwohngebäude** (Gewerbe, öffentliche Gebäude) sind im Mengengerüst nicht enthalten — die Mengenbasis ist insoweit eine Untergrenze (§3.6); (c) NHK sind **Neubau-/Wiederherstellungswerte**; der Zeitwertansatz der Arbeitsmappe (Mon. J64; Alterswertminderung nach § 38 ImmoWertV) liegt darunter — entschieden: Neuwert bleibt Basiswert, Antrag auf Fortschreibung in §7.2, Zeitwertansatz als Band mit Alterswertminderungsfaktor 0,55 (0,40–0,75; Abschätzung von KAP3), nicht geglättet (§3.8) | Gebäudezahl und Wohnfläche je Zelle aus dem Zensus-2022-Gitter (100 m) bzw. den amtlichen Hausumringen; Datenebene GEBAEUDEWERT **neu anzulegen** (§3.1, Spezifikation in Kap. 3), Fortschreibung über die Destatis-Bestandsfortschreibung; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Basiswert** — FS-Mengengerüst: Wohnfläche je Zelle × Wertdichte €₂₀₂₆/m²; der Zeitwertansatz (§7.2) sowie die abgeschätzten Faktoren (Indexierung 2023→2026, BGF/Wohnfläche) laufen als Sensitivitätsband mit und werden im Produkt nach Vorgabe P1/P2 als Abschätzung von KAP3 ausgewiesen |
 | 60-R23-01 | R23 Bau- und Immobilienunternehmen → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
 | 60-R25-01 | R25 Siedlungsinfrastrukturen → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
 
@@ -346,8 +348,11 @@ BGF-Faktor 1,25 statt 1,40 verschiebt ihn um −11 %. **Kopplung (§3.9):** die 
 Baupreisindex; erscheint die Jahresdurchschnittsreihe bis 2026, wird Rechenschritt 2 durch den
 gemessenen Indexstand ersetzt und der Wertsatz neu gerechnet. **Widerspruch (§3.8, benannt statt
 geglättet):** die NHK sind Neubau-/Wiederherstellungswerte, die Schadensrechnung K3 kann je nach
-Regulierungspraxis auch Zeitwerte ansetzen (Alterswertminderung nach ImmoWertV); beide Lesarten
-werden nebeneinander geführt, die Zeitwert-Lesart als Sensitivitätsband. **Modellgrenze:**
+Regulierungspraxis auch Zeitwerte ansetzen (Alterswertminderung nach ImmoWertV); die Arbeitsmappe
+schreibt über Mon. J65 → J64 den Zeitwertansatz vor. **Entschieden:** Der Neuwert bleibt Basiswert,
+die Abweichung von J64 steht als Antrag auf Fortschreibung in §7.2 (Anker `#fortschreibung-neuwert-k3`);
+der Zeitwertansatz läuft dort als beziffertes Band mit (Alterswertminderungsfaktor 0,55, Band
+0,40–0,75, Abschätzung von KAP3; K3-Betrag −45 %). **Modellgrenze:**
 Nichtwohngebäude sind im Mengengerüst nicht enthalten — die Mengenbasis ist insoweit eine
 Untergrenze (§3.6).
 
@@ -616,8 +621,10 @@ Die Wertsätze \(n_t\) sind belegt und auf den Preisstand 2026 indexiert (Regist
 \(k_{\text{BGF}} = 1{,}30\) m² BGF je m² Wohnfläche (Band 1,25–1,40) ist eine **Abschätzung von
 KAP3** (§3.9, Herleitung in Register 60-R24-01: Verhältnis von Brutto-Grundfläche zu Wohnfläche
 im Wohnungsbau, Band aus der Spannweite zwischen kompakten Mehrfamilien- und gegliederten
-Einfamilienbauten). Der Preis trägt die Zeitwert-Lesart als Band (Alterswertminderung nach
-ImmoWertV, B4), nicht als Glättung.
+Einfamilienbauten). Die Wertsätze sind Neuwerte. Der von der Arbeitsmappe (Mon. J64) vorgesehene
+Zeitwertansatz wird nicht übernommen, sondern mit dem Alterswertminderungsfaktor
+\(f_{\text{AWM}}\) = 0,55 (Band 0,40–0,75, Abschätzung von KAP3) als Sensitivitätsband geführt;
+Entscheidung, Herleitung und Ergebnis-Sensitivität in §7.2 (Antrag auf Fortschreibung).
 
 **Formelstelle FS-Schutzsystem — in dieser Fassung inaktiv (geparkt).** Die Arbeitsmappe verlangt
 für #60 die Einbindung öffentlicher Schutzsysteme über die R7-Erwartungswert-Weiche
@@ -1098,6 +1105,7 @@ gekennzeichnet.
 | Toleranz Verteilungsprüfung | ±15 Prozentpunkte | **Abschätzung von KAP3**, Herleitung §4.5 (±2,3 modellseitig + ±12,5 ankerseitig) |
 | \(U\) Sanity-Untergrenze | 0,56 Mrd. €₂₀₂₆/a | **berechnet** aus Anker und Bestandsanteilen, Herleitung §4.6; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(\varphi_{\text{fluss}}\) und \(\pi\) ein |
 | \(O\) Sanity-Obergrenze | 2,26 Mrd. €₂₀₂₆/a | **berechnet** aus Bestandswert, Deckelquote und 1/100 a, Herleitung §4.6; es fließen die Abschätzungen von KAP3 Betroffenheit 1/100 a und Deckelquote 0,250 (§3.3) ein |
+| \(f_{\text{AWM}}\) Alterswertminderungsfaktor (Zeitwertansatz, nur Sensitivität) | 0,55 (0,40–0,75) | **Abschätzung von KAP3** auf der Regel § 38 ImmoWertV (RND/GND, GND 80 a nach Anlage 1), Herleitung §7.2; geht nicht in den Basiswert ein; Sensitivität: K3-Betrag 0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a |
 | \(q_0\) Objektschutz-Anteil heute | **geparkt (Datenquelle fehlt)** | keine Quelle; Watchlist §4.7 — nicht gesetzt, nicht geschätzt |
 
 ```python test: beispiel_60_kalibrierung
@@ -1355,6 +1363,13 @@ Faktor in die Aggregation nach Abschnitt 3.6 ein, ohne die Kernformel aus Abschn
    Band eine Untergrenze (§3.8).
 8. Die Bestandsdynamik S104 wird konstant gehalten (s. o.): Zu- oder Abnahme der exponierten
    Bausubstanz zwischen Bezugsjahr und Szenariojahr wird im heutigen Modellstand nicht abgebildet.
+9. **Bewertung zum Neuwert — Untergrenzen-Aussage geprüft.** Der Betrag rechnet mit Neuwerten; der
+   Zeitwertansatz der Arbeitsmappe (Mon. J64) läge um 45 % niedriger (0,54 statt 0,99 Mrd. €₂₀₂₆/a,
+   Band 0,39–0,74; §7.2). Ergebnis der Prüfung: Der Betrag ist eine **Untergrenze nur im
+   Konto- und Mengenumfang** (Modellgrenzen 1 und 3: K1, K4, K5, K8 und Nichtwohngebäude fehlen).
+   Auf der Bewertungsachse ist er **keine Untergrenze**, sondern gegenüber dem Zeitwertansatz die
+   obere Lesart. Eine Untergrenze des K3-Betrags nach Mappenvorgabe ist er damit nicht; der
+   Versionsstempel unten nennt deshalb beide Richtungen.
 
 **Infokasten-Texte (§3.6 — Teil des Berichts):**
 
@@ -1362,7 +1377,8 @@ Faktor in die Aggregation nach Abschnitt 3.6 ein, ohne die Kernformel aus Abschn
 >
 > **Vollständigkeitsanzeige:** „Stufe M0: 1 von 8 Konten aktiv" mit Roadmap-Aufklappliste.
 >
-> **Versionsstempel:** „berechnet mit Modellstand M0 — Untergrenze".
+> **Versionsstempel:** „berechnet mit Modellstand M0 — Untergrenze im Kontoumfang (nur K3, nur
+> Wohngebäude); bewertet zum Neuwert, zum Zeitwert rund 45 % niedriger".
 
 ## 7 Parameter-Blöcke (maschinenlesbar, §4)
 
@@ -1748,6 +1764,98 @@ Abweichung an beiden Stellen ausgewiesen: hier im Berichtstext und maschinenlesb
 beiden Felder (und nicht ihre stille Beibehaltung) die Folge; nach der Regel „Divergenz wird nie
 still im Code gefixt" wird das über den Befund-Ledger geführt.
 
+<a id="fortschreibung-neuwert-k3"></a>
+
+### 7.2 Antrag auf Fortschreibung der Arbeitsmappe: Neuwert statt Zeitwertansatz (Mon. J64/J65) (Anker `#fortschreibung-neuwert-k3`) — beantragt am 17.09.2026
+
+**Sachverhalt.** `KWRA-Monetarisierung.xlsx`, Blatt „Risiken-Monetarisierung", schreibt für #60 über
+J65 („Wie ID 59, …") → J64 („Wiederherstellungskosten (Gebäude, Hausrat, Fahrzeuge) je Ereignis;
+**Zeitwertansatz**; …") den **Zeitwertansatz** vor. Das Blatt „Schadenskonten-System" C27 lässt für K3
+beide Lesarten zu („Wiederherstellungs-/Zeitwertkosten"), die Kontodefinition Z26 spricht von
+„Wiederherstellungskosten". Dieser Bericht bewertet mit **NHK-Neuwerten**: Wiederherstellungswert
+**527.280 €₂₀₂₆** je exponiertem Wohngebäude (§4.3, Register 60-R24-01). Die Arbeitsmappe wird nicht
+verändert (eiserne Regel 2); dieser Abschnitt ist der Antrag, nicht die Änderung (Befund 41 in
+`reviews/BEFUNDE_60.md`).
+
+**Entscheidung (W1, W6).** Der **Neuwert bleibt Basiswert** von #60; der Zeitwertansatz aus J64 wird
+**nicht** übernommen, sondern als beziffertes Sensitivitätsband geführt. Beantragt wird, J64/J65 für
+#60 auf „Wiederherstellungskosten zum Neuwert (NHK, indexiert); Zeitwertansatz als Sensitivitätsband"
+fortzuschreiben. Begründung:
+
+1. **Der Anker ist ein Neuwert-Anker.** \(\lambda = A^{*}/M_0\) (§4.4) stellt die Modellsumme gegen
+   gezahlte Wohngebäude-Leistungen, und Wohngebäudeverträge decken zum gleitenden Neuwert (§4.2,
+   Herleitung von \(\kappa\)). Würde nur der Basiswert je Gebäude auf den Zeitwert gesetzt, bliebe der
+   kalibrierte K3-Betrag \(\lambda M_0 \equiv A^{*}\) **unverändert** — \(\lambda\) nähme die
+   Alterswertminderung auf (Zentralwert 0,985 / 0,517 = **1,91**, am unteren Faktor-Ende
+   0,985 / 0,376 = **2,62** und damit jenseits der Plausibilitätsschranke 2,00 aus §4.4). Die Umstellung
+   hätte dann keine Wirkung auf das Ergebnis, sondern verzerrte nur den Skalar.
+2. **Ein konsistenter Zeitwertansatz braucht eine Anker-Umrechnung ohne Quelle.** Erst wenn auch
+   \(A^{*}\) und die Sanity-Grenzen (§4.6) mit demselben Faktor auf den Zeitwert umgerechnet werden,
+   sinkt der Betrag. Für diese Umrechnung gibt es keine Quelle, nur die Abschätzung unten; nach W1 wird
+   eine Abschätzung nicht an die Stelle des belegten Werts gesetzt, wenn sie den Basiswert trägt.
+3. **Die Mappe ist selbst nicht eindeutig.** C27 nennt „Wiederherstellungs-/Zeitwertkosten", Z26
+   „Wiederherstellungskosten"; der Antrag beseitigt den Widerspruch für #60 in Richtung der Lesart,
+   die mit dem Anker übereinstimmt.
+
+**Alterswertminderungsfaktor \(f_{\text{AWM}}\) = 0,55, Band 0,40–0,75 — Abschätzung von KAP3
+(§3.9 Abgeschätzt).** Herleitung:
+
+- **Regel (Quelle):** § 38 ImmoWertV: „Der Alterswertminderungsfaktor entspricht dem Verhältnis der
+  Restnutzungsdauer zur Gesamtnutzungsdauer." Die Gesamtnutzungsdauer (GND) für Ein- und
+  Zweifamilienhäuser, Doppel-, Reihen- und Mehrfamilienhäuser beträgt nach ImmoWertV Anlage 1
+  **80 Jahre**. Die Restnutzungsdauer (RND) ist ohne Modernisierung GND − Alter und verlängert sich
+  nach ImmoWertV Anlage 2 („Modell zur Ermittlung der Restnutzungsdauer von Wohngebäuden bei
+  Modernisierungen") mit der Modernisierungspunktzahl. ImmoWertV § 38 und Anlagen 1/2,
+  https://www.gesetze-im-internet.de/immowertv_2022/__38.html,
+  https://www.gesetze-im-internet.de/immowertv_2022/anlage_1.html,
+  https://www.gesetze-im-internet.de/immowertv_2022/anlage_2.html, Zugriff 17.09.2026.
+- **Abgeschätzt (keine Quelle):** Eine bundesweite Statistik der Restnutzungsdauer exponierter
+  Wohngebäude existiert nicht (Datenlücke §3.8). Angesetzt wird ein mittleres Gebäudealter des
+  flussnahen Bestands von rund 50 Jahren (überwiegend Nachkriegsbestand; flussnahe Lagen sind eher
+  früh bebaut) und eine durch Teilmodernisierung verlängerte mittlere RND von **44 Jahren** ⇒
+  44 / 80 = **0,55**. **Unteres Bandende 0,40:** weitgehend unmodernisierter Altbestand, RND 32 Jahre
+  (32 / 80). **Oberes Bandende 0,75:** jüngerer oder umfassend modernisierter Bestand, RND 60 Jahre
+  (60 / 80).
+- **Modellgrenze der Abschätzung:** Der Faktor gilt für das Gebäude als Ganzes. Hochwasser trifft vor
+  allem Ausbauteile mit kürzerer Nutzungsdauer (Estrich, Putz, Bodenbeläge, Haustechnik); auf sie
+  bezogen läge der Faktor eher am unteren Bandende.
+
+**Zeitwert je Gebäude:** 527.280 € · 0,55 = **290.004 €₂₀₂₆** (Band 210.912–395.460 €₂₀₂₆).
+
+**Ergebnis-Sensitivität auf den K3-Betrag.** Bei konsistentem Zeitwertansatz (Basiswert, Anker und
+Sanity-Grenzen mit demselben Faktor) sinkt die kalibrierte Bundessumme K3 von **0,99 Mrd. €₂₀₂₆/a**
+auf **0,54 Mrd. €₂₀₂₆/a** (Band **0,39–0,74 Mrd. €₂₀₂₆/a**), also um **−0,44 Mrd. €₂₀₂₆/a bzw.
+−45 %** (Band −25 % bis −60 %). Dieselbe Verschiebung gilt je Kommune, weil \(f_{\text{AWM}}\)
+bundesweit einheitlich wirkt. Die Sanity-Untergrenze fiele mit auf 0,556 · 0,55 = **0,31 Mrd. €₂₀₂₆/a**.
+Werden nur die Gebäudewerte umgestellt, der Anker aber nicht, bleibt der Betrag bei 0,99 Mrd. €₂₀₂₆/a
+und nur \(\lambda\) steigt (Begründung 1). Im Produkt wird der Faktor nach Vorgabe P1 als
+„Abschätzung von KAP3" mit dieser Herleitung in der Parameterliste geführt (§4.8).
+
+```python test: beispiel_60_zeitwert
+# 7.2 Zeitwertansatz als Sensitivitaetsband (Abschaetzung von KAP3)
+GND = 80.0
+f_mid, f_lo, f_hi = 44.0 / GND, 32.0 / GND, 60.0 / GND
+assert (f_mid, f_lo, f_hi) == (0.55, 0.40, 0.75)
+wert_geb = 208.0 * 1.30 * 1950.0
+assert abs(wert_geb * f_mid - 290004.0) < 1.0
+A_stern = 1.6 * 0.65 * 1.54 * 0.50 * 1.15 * 1.07
+M0 = 339_000 * wert_geb * (6.311 / 1200.0) / 1e9
+# nur Basiswert umgestellt: Betrag unveraendert, lambda steigt
+assert abs(A_stern / (M0 * f_mid) - 1.91) < 5e-3
+assert A_stern / (M0 * f_lo) > 2.00
+# konsistent umgestellt: K3-Betrag und Band
+assert abs(A_stern * f_mid - 0.542) < 5e-3
+assert abs(A_stern * f_lo - 0.394) < 5e-3 and abs(A_stern * f_hi - 0.739) < 5e-3
+assert abs(A_stern * (1 - f_mid) - 0.443) < 5e-3
+U = 1.6 * 0.65 * 0.50 * 1.07
+assert abs(U * f_mid - 0.306) < 5e-3
+```
+
+**Status.** Beantragt am **17.09.2026**, noch nicht entschieden. Bis zur Entscheidung rechnet #60 mit
+dem Neuwert und weist den Zeitwertansatz als Band aus (hier, §3.4, §4.8, Kap. 6 Modellgrenze 9).
+Wird der Antrag abgelehnt, sind Basiswert, \(A^{*}\), \(U\) und \(O\) mit \(f_{\text{AWM}}\)
+umzurechnen; das läuft über den Befund-Ledger, nicht still im Code.
+
 ## 8 Quellen (§3.8)
 
 Format je Quelle: Vollzitat, DOI/URL, Zugriffsdatum, Archiv-Snapshot; bei den beiden Arbeitsmappen
@@ -1889,3 +1997,4 @@ Materialband \(f_{\text{S094}}\) = 1,00 (0,89–1,12) in Ansatz (a).
 | 4 | Slug | `gebaeudeschaeden_flusshochwasser` | kurz, eindeutig gegen #59 (Starkregen) und #46 (Küste) | `flusshochwasser` (verwechselbar mit Id 49) | Dateinamen Bericht/Ledger |
 | 5 | Welcher Ansatz wird umgesetzt? (Ansatz-Vergleich §2.6/§3.7) | **13.09.2026 (T-0237):** Ansatz **(a)** Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle — p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp · Gebäudequalität) × Gebäudewert | einziger Ansatz, der in den sechs Güte-Kriterien durchgehend „hoch“ trägt (das siebte Kriterium Aufwand läuft umgekehrt: dort ist „gering“ günstig, (a) liegt mit „mittel“ über (b) und weit unter (c) und ist nach §3.4 ressourcenverträglich): vollständig aus frei zugänglichen, im Register belegten Datenebenen speisbar, Wirkungsort für S092 und die R7-Weiche vorhanden, Schicht-B-Form mit physischer Zwischengröße vor dem Euro, Kalibrierung und Abgleich auf Stichprobenebene ohne nationalen Vollraster-Lauf (§3.4) | (b) aggregierte Flächenschadensrate — kein Wirkungsort für den Maßnahmen-Hebel, tragender Wert nur aus niederländischer Fallstudie (B2); als Ergänzungsmodul vorgesehen. (c) Schadensgradmodell D0–D6 am Einzelgebäude — Bauweise/Bauzustand bundesweit nicht erhoben, Umrechnung Grad → Euro nicht belegt | Umsetzungsgrundlage für Kap. 3 und Prototyp der Familie K3/K4-Ereignisschäden (bindet später #50 und #47); Kopfzeile und Kap. 9 nachgezogen |
 | 6 | Divergenz Bericht ↔ Code bei den Namenslisten von #60 (Befund 13) | **13.09.2026 (T-0243):** Bericht auf den belegbaren Stand korrigiert (Kap. 1: Teilmenge mit abweichender Namensquelle statt „genau"); Code (`backend/app/data/catalog.py`, `kwra_id: 60`) bleibt unverändert | eiserne Regel 5 — Divergenz Bericht ↔ Code wird nie still im Code gefixt; Angleichen des Codes ist Aufgabe der Integration, nicht dieses Berichtsschritts | Code stillschweigend an W117 nachziehen (verstieße gegen eiserne Regel 4/5, kein Prüfmittel im Rahmen dieses Pakets) | Divergenz als Integrationspunkt für `/integriere-risiko 60` geführt: `sensitivity_names` und `upstream_names` in `catalog.py` müssen dort gegen die 7 Sensitivitäten und 8 Wirkungs-Eingänge von W117 abgeglichen werden |
+| 7 | Neuwert oder Zeitwertansatz der Arbeitsmappe (Mon. J65 → J64) als Basiswert K3? (Befund 41) | **17.09.2026 (T-0285):** Neuwert (NHK, indexiert, 527.280 €₂₀₂₆ je Wohngebäude) bleibt Basiswert; Zeitwertansatz als Sensitivitätsband mit \(f_{\text{AWM}}\) = 0,55 (0,40–0,75, Abschätzung von KAP3); Abweichung von J64 als Antrag auf Fortschreibung in §7.2 | W1/W6: der Anker \(A^{*}\) ist neuwertbasiert (gleitender Neuwert, §4.2); eine Umstellung nur des Basiswerts ließe den kalibrierten Betrag unverändert und höbe \(\lambda\) auf 1,91 (bis 2,62); ein konsistenter Zeitwertansatz braucht eine quellenlose Anker-Umrechnung | Zeitwertansatz übernehmen und \(A^{*}\), \(U\), \(O\) mit \(f_{\text{AWM}}\) umrechnen | Basiswert, \(M_0\) und \(\lambda\) unverändert; Sensitivität K3-Betrag 0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a (−45 %); Kap. 6 Modellgrenze 9 und Versionsstempel präzisiert |
