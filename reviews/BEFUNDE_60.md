@@ -1806,3 +1806,155 @@ gehört T-0234), `docs/evidenz/` (nicht gelesen, nicht verändert), `backend/` u
 „Offene Befunde" am Kopf dieses Ledgers (schreibt allein T-0296 fort). §5.1.2 verweist unverändert
 auf §4.7 (Doppelzählungs-Wächter); \(\Delta q\), \(e_{\text{bem}}\), \(s_{\text{bem}}\), Kap. 1,
 Kap. 2, §3.5, §5.1.1, §5.1.3, Kap. 7 und das Evidenz-Register sind von diesem Paket nicht berührt.
+
+**18.09.2026 · T-0322** (Befund 36 an 60, Schritt 1 von 4; Ersatz für das an der Budgetgrenze
+abgebrochene T-0293, das Ledger und Bericht in einem Lauf verlangte; Schritt L1 aus
+`.claude/methodik-loop.md`, aber ausdrücklich nur der Rechenweg für Befund 36 — Bericht
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` wird in diesem Paket **nicht** angefasst;
+keine Gegenprüfung, kein `/risiko-fortsetzen`, kein L4 nach eiserner Regel 4. Der Bericht bleibt
+byte-gleich, das zieht Schritt 2 nach.) Geändert wurde ausschließlich dieses Ledger.
+
+| Nr | Kat. | Vorgenommene Änderung | Status danach |
+|---|---|---|---|
+| 36 | B | Rechenweg für ein M₀-Band aus den Eingangsgrößen des Stichprobenlaufs, das daraus fortgepflanzte λ-Band und die daraus hergeleitete Plausibilitätsschranke festgehalten (Details unten). Der Nachzug im Bericht (§4.1a, §4.4, §4.8, `beispiel_60_kalibrierung`, Kap. 7 `flood_bldg.lambda`, Entscheidungslog Nr. 8) erfolgt in den Folgepaketen. | offen — Rechenweg steht, Nachzug in den Folgepaketen |
+
+**(a) Bandenden der Eingangsgrößen von M₀.** M₀ = Wohngebäudeanteil · (Wohnfläche · BGF-Faktor ·
+Wertsatz) · (Adressen_GK3+GK4 · Klassenrate_GK3+GK4 + Adressen_GK2 · Klassenrate_GK2), §4.3. Jede
+der acht Eingangsgrößen erhält ein unteres und ein oberes Bandende:
+
+| Eingangsgröße | Zentralwert | Unteres Bandende | Oberes Bandende | Quelle bzw. Abschätzung |
+|---|---|---|---|---|
+| Wohnfläche je Wohngebäude | 208 m² | **208 m²** | **208 m²** | **Quelle:** Register 60-R24-01 (4,1 Mrd. m² ÷ 19,7 Mio. Wohngebäude, amtliche Bestandsstatistik). Kein Band ausgewiesen — die Größe ist der Quotient zweier amtlicher Summen, keine Abschätzung von KAP3; sie geht deshalb unten wie oben mit demselben Punktwert ein, statt ihr ohne Beleg eine Streuung zu unterstellen. |
+| BGF-Faktor | 1,30 | **1,25** | **1,40** | **Quelle:** Register 60-R24-01, §3.9 „Abgeschätzt" (Rechenschritt 3, Bericht Z. 371–373: „Band 1,25–1,40"). |
+| Wertsatz | 1.950 EUR₂₀₂₆/m² BGF | **1.889 EUR₂₀₂₆/m² BGF** | **2.047 EUR₂₀₂₆/m² BGF** | **Quelle:** Register 60-R24-01 (Fortschreibungsfaktor 2023→2026, Band 1,07–1,16; Bericht Z. 364: „Band 1.889–2.047"). |
+| Wohngebäudeanteil je Adresse | 0,872 | **0,872** | **0,872** | **Quelle:** Register 60-R17-01/60-R24-01 (19,7 Mio. Wohngebäude ÷ 22,6 Mio. Adressen, beides amtliche Bestandsstatistik, §4.3 Punkt 2). Kein Band ausgewiesen — Quotient zweier amtlicher Summen ohne publizierte Unsicherheit; Punktwert unten wie oben. |
+| Klassenrate GK3+GK4 | 0,0059796/a | **0,0033/a** | **0,0103/a** | Restfehler-Position 3 aus Paragraf 4.3 (Streuung der Klassenrate über die acht Anker-Kommunen, Faktor 3,1; `m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Klasse `gk3_gk4`: Minimum Deggendorf 0,0033, Maximum Grimma 0,0103). |
+| Klassenrate GK2 | 0,00067515/a | **0,000301/a** | **0,001154/a** | **Abschätzung von KAP3**, hergeleitet analog zu Restfehler-Position 3: `m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Klasse `gk2` — Minimum Reichertshofen 0,000301000488605, Maximum Halle (Saale) 0,001154174448010. Für GK2 beziffert Paragraf 4.3 diese Streuung nicht als eigene Restfehler-Position; das Minimum/Maximum der acht Kommunenwerte wird deshalb hier als KAP3-Abschätzung nach demselben Verfahren übernommen, nicht als Restfehler-Position im Bericht zitiert. |
+| Exponierte Adressen GK3+GK4 | 339.000 | **339.000** | **339.000** | **Quelle:** Register 60-R17-01 (ZÜRS Geo 2025, GK3 1,1 % + GK4 0,4 % von 22,6 Mio. Adressen; §4.3 Punkt 1). Kein Band ausgewiesen — die Zonierungsquote ist eine Bestandsstatistik, keine Abschätzung; Punktwert unten wie oben. |
+| Exponierte Adressen GK2 | 1.380.000 | **1.380.000** | **1.380.000** | **Quelle:** Register 60-R17-01 (ZÜRS Geo 2025, GK2 6,1 % von 22,6 Mio. Adressen; §4.3 Punkt 1). Kein Band ausgewiesen, aus demselben Grund wie oben. |
+
+**(b) M₀-Band.** Aus den Bandenden in (a), alle Enden gleichgerichtet (wie in §4.2 für \(A^{*}\)
+— multiplikative Bandenden, keine Verteilungsannahme, Anweisung A-0034):
+
+Wert je exponiertem Wohngebäude: unten 208 · 1,25 · 1.889 = 491.140 EUR₂₀₂₆; Zentralwert
+208 · 1,30 · 1.950 = 527.280 EUR₂₀₂₆ (unverändert, §4.3); oben 208 · 1,40 · 2.047 = 596.086,4
+EUR₂₀₂₆.
+
+Summenterm (Adressen × Klassenrate): unten 339.000 · 0,0033 + 1.380.000 · 0,000301 = 1.118,7 +
+415,38 = 1.534,08/a; Zentralwert 339.000 · 0,005979599550826 + 1.380.000 · 0,000675151053693 =
+2.958,79/a (unverändert, §4.3); oben 339.000 · 0,0103 + 1.380.000 · 0,001154 = 3.491,7 + 1.592,52 =
+5.084,22/a.
+
+M₀_unten = 0,872 · 491.140 EUR · 1.534,08/a = 656.945.337 EUR₂₀₂₆/a ≈ **0,657 Mrd. EUR₂₀₂₆/a**
+M₀_zentral = 0,872 · 527.280 EUR · 2.958,79/a = 1.360.417.852 EUR₂₀₂₆/a ≈ **1,360 Mrd. EUR₂₀₂₆/a**
+(unverändert, §4.3)
+M₀_oben = 0,872 · 596.086,4 EUR · 5.084,22/a = 2.642.713.194 EUR₂₀₂₆/a ≈ **2,643 Mrd. EUR₂₀₂₆/a**
+
+Das Band ist damit **M₀ = 0,657–2,643 Mrd. EUR₂₀₂₆/a** um den Zentralwert 1,360.
+
+**(c) Fortgepflanztes λ-Band.** §4.2 beziffert das Band von \(A^{*}\) bereits als „alle Enden
+gleichgerichtet: 0,297–2,263 Mrd. €₂₀₂₆/a" (Bericht §4.2, Zeile „Zielwert"; identisch in
+`beispiel_60_kalibrierung`, `lo`/`hi`). Mit dem M₀-Band aus (b) fällt das vollständig
+fortgepflanzte λ-Band — Zähler und Nenner unabhängig an ihren jeweiligen Extremen — auf
+
+λ_unten = A*_unten / M₀_oben = 0,297 / 2,642713194 = 0,112384… → **0,11**
+λ_oben = A*_oben / M₀_unten = 2,263 / 0,657006701 = 3,444409… → **3,44**
+
+**Fortgepflanztes λ-Band: 0,11–3,44** (Rundungsregel siehe (d)). Das ist deutlich breiter als das
+bisher im Bericht geführte λ-Band 0,22–1,66 (§4.4), weil jenes nur die Ankerunsicherheit von
+\(A^{*}\) bei **unverändertem** M₀ fortpflanzt — genau die Lücke, die Befund 36 benennt.
+
+**(d) Herleitung der Plausibilitätsschranke.** Die bisherige Schranke [0,50; 2,00] (§4.4/§4.8) war
+eine freihändig gesetzte Abschätzung von KAP3 („Faktor 2 um den Neutralwert 1") ohne Bezug zu
+einem gerechneten Band. Statt sie an das Ergebnis anzupassen, wird sie hier durch das in (c)
+vollständig fortgepflanzte λ-Band **ersetzt**: Eine Neubestimmung von λ, die außerhalb der Spanne
+läge, die aus den eigenen, in (a) benannten Bandenden aller Eingangsgrößen folgt, wäre mit dem
+eigenen Modell nicht mehr verträglich — das ist die einzige ergebnisunabhängige Bezugsgröße, die
+ohne eine zusätzliche, nicht durch A-0034 gedeckte Verteilungsannahme zur Verfügung steht.
+
+**Plausibilitätsschranke λ = [0,11; 3,44].**
+
+**Rundungsregel:** zwei Nachkommastellen, kaufmännisch gerundet (dieselbe Regel wie für das
+bestehende λ-Band 0,22/1,66 in §4.4) — nicht auf die nächste „glatte" Zahl aufgerundet bzw.
+abgerundet, damit die Schranke exakt der Rechnung aus (c) entspricht und nicht nachträglich
+verengt oder geweitet wird.
+
+**Entscheidungsregel** (unverändert zu §4.4, jetzt mit hergeleiteter statt gesetzter Schranke):
+Ergibt eine Neubestimmung λ < 0,11 oder λ > 3,44, wird **nicht** der Skalar gesetzt, sondern das
+Modell gilt als fehlerhaft — dann trägt eine Eingangsgröße den Fehler, und der Befund geht ins
+Ledger, bevor gerechnet wird. Der Zentralwert wird weiterhin gegen dieselbe Schranke geprüft wie
+bisher; geändert hat sich nur, dass die Schranke jetzt aus dem eigenen fortgepflanzten Band folgt
+statt gesetzt zu sein.
+
+**Beurteilung des bestehenden λ-Bands gegen die neue Schranke.** Das untere Bandende des bisher im
+Bericht geführten λ-Bands (0,22, §4.4, aus dem Ankerband bei unverändertem M₀) liegt **innerhalb**
+der neuen Schranke [0,11; 3,44], weil 0,22 > 0,11 ist. Das obere Bandende (1,66) liegt ebenfalls
+**innerhalb** der neuen Schranke, weil 1,66 < 3,44 ist — kein Bandende des bisherigen λ-Bands muss
+also als Ausnahme von der Schranke begründet werden.
+
+**(e) Nachzug im Bericht (Folgepaket).** Fünf Fundstellen sind auf den neuen Rechenweg zu ziehen:
+
+1. **§4.1a, Absatz unter der Fenstertabelle** (Bericht Z. 1048–1053, beginnend „Drei der vier
+   λ-Werte liegen innerhalb der Plausibilitätsschranke [0,50; 2,00] … nur das kürzeste Fenster …
+   unterschreitet sie. Genau das ist der zweite Grund für die Wahl des Hauptfensters …"). Gegen die
+   neue Schranke [0,11; 3,44] liegen **alle vier** Fenster-λ (0,832 / 0,935 / 0,611 / 0,457)
+   innerhalb — auch das kürzeste Fenster mit 0,457 > 0,11. Der Satz ist deshalb zu ersetzen durch
+   eine Fassung, die (i) die neue Schranke nennt, (ii) feststellt, dass alle vier Fenster innerhalb
+   liegen, und (iii) die Wahl des Hauptfensters **allein** auf die ergebnisunabhängige
+   Auswahlregel stützt (der erste, tragende Grund im Absatz zuvor), weil das bisherige zweite
+   Argument („unterschreitet die Schranke") mit der neuen, breiteren Schranke nicht mehr trägt.
+2. **§4.4, λ-Zeile und Absatz „Plausibilitätsschranke"**: „[0,50; 2,00]" wird durch „[0,11; 3,44]"
+   ersetzt, mit Verweis auf die Herleitung aus dem fortgepflanzten Band von \(A^{*}\) (§4.2) und
+   \(M_0\) (§4.3, neu: Band 0,657–2,643). Der Satz „Dass das untere Bandende 0,22 unter 0,50 fällt
+   … ist als Befund 36 im Ledger offen" entfällt, weil 0,22 innerhalb der neuen Schranke liegt;
+   Befund 36 schließt damit inhaltlich erst mit dem Nachzug in diesem Bericht (Schritt 2).
+3. **§4.8, Zeilen „λ Niveau-Skalar" und „Plausibilitätsschranke λ"**: Erstere ergänzt den Verweis
+   auf das M₀-Band 0,657–2,643 in der Herkunftsspalte; letztere trägt „0,11 bzw. 3,44" statt „0,50
+   bzw. 2,00" und in der Quellspalte „berechnet aus dem fortgepflanzten Band von \(A^{*}\) und
+   \(M_0\) (§4.4), Rundungsregel und Entscheidungsregel wie (d)" statt „Abschätzung von KAP3
+   (Faktor 2 um den Neutralwert 1)".
+4. **Block `beispiel_60_kalibrierung`**: neue Zusicherungen für `wg_lo`/`wg_hi` (491.140,0 /
+   596.086,4), `term_lo`/`term_hi` (1.534,08 / 5.084,22), `M0` gebunden auf 0,657–2,643 sowie
+   `lam_lo`/`lam_hi` = `lo`/`M0_hi` bzw. `hi`/`M0_lo`, gerundet auf 0,11/3,44; die Zusicherung
+   `0.50 <= lam <= 2.00` wird durch `0.11 <= lam <= 3.44` ersetzt (der Zentralwert 0,832 bleibt
+   innerhalb beider Schranken, die Zusicherung wechselt nur die Grenzen).
+5. **Kap. 7, Produkt-Block `flood_bldg.lambda`**: neues Feld `plausibilitaetsschranke: [0.11,
+   3.44]` mit `herleitung_anker` auf den neuen Absatz in §4.4, an die Stelle des bisher nur in
+   §4.8 geführten Zahlenpaars; **Entscheidungslog Zeile 8** (Mehrjahresmittel statt Einzeljahr
+   2024, Befund 34) erhält einen Nachtrag, dass die in §4.4 seit T-0245 gesetzte Schranke mit
+   diesem Paket durch die hergeleitete Schranke [0,11; 3,44] ersetzt ist (Befund 36).
+
+**(f) Prüfausdruck (rechnet (b), (c) und (d) allein aus den Bandenden aus (a) nach).**
+
+```bash
+python3 -c "wf=208.0
+bgf_lo,bgf_c,bgf_hi=1.25,1.30,1.40
+ws_lo,ws_c,ws_hi=1889.0,1950.0,2047.0
+w_wohn=0.872
+n34,n2=339000,1380000
+r34_lo,r34_c,r34_hi=0.0033,0.005979599550826,0.0103
+r2_lo,r2_c,r2_hi=0.000301,0.000675151053693,0.001154
+wg_lo=wf*bgf_lo*ws_lo; wg_c=wf*bgf_c*ws_c; wg_hi=wf*bgf_hi*ws_hi
+term_lo=n34*r34_lo+n2*r2_lo; term_c=n34*r34_c+n2*r2_c; term_hi=n34*r34_hi+n2*r2_hi
+M0_lo=w_wohn*wg_lo*term_lo/1e9; M0_c=w_wohn*wg_c*term_c/1e9; M0_hi=w_wohn*wg_hi*term_hi/1e9
+assert abs(M0_c-1.360)<5e-3 and abs(M0_lo-0.657)<5e-3 and abs(M0_hi-2.643)<5e-3
+A_lo,A_hi=0.297,2.263
+lam_lo=A_lo/M0_hi; lam_hi=A_hi/M0_lo
+schranke=(round(lam_lo,2),round(lam_hi,2))
+assert schranke==(0.11,3.44)
+lam_band=(0.22,1.66)
+assert schranke[0]<=lam_band[0]<=schranke[1] and schranke[0]<=lam_band[1]<=schranke[1]
+print('OK M0', round(M0_lo,3), round(M0_c,3), round(M0_hi,3), 'schranke', schranke)"
+```
+
+Ausgeführt am 18.09.2026: `OK M0 0.657 1.36 2.643 schranke (0.11, 3.44)`, Exit 0.
+
+**Status.** Befund 36 bleibt **offen**. Dieses Paket schreibt bewusst nur ins Ledger: Der Bericht
+(§4.1a, §4.4, §4.8, `beispiel_60_kalibrierung`, Kap. 7 `flood_bldg.lambda`, Entscheidungslog Nr. 8)
+wird in Schritt 2 nachgezogen. Die Kopftabelle „Offene Befunde" bleibt unberührt (schreibt allein
+T-0296 fort).
+
+Nicht angefasst (Dateirahmen): `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`,
+`docs/evidenz/register.md`, `backend/scripts/lint_methodik.py`, `backend/`, die Stichprobendateien
+unter `docs/evidenz/60_stichprobe/` (gelesen, nicht verändert) und die Kopftabelle „Offene Befunde"
+dieses Ledgers.
