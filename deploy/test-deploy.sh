@@ -45,6 +45,10 @@ PROTOKOLL=/var/log/overlord/deploy.log
 PASSWORT_QUELLE="$ENV_DATEI"
 SCHRITT="start"; COMMIT=""
 set -a; source "$ENV_DATEI"; set +a
+# Rueckfallweg fuer den Dienst-Neustart (T-0342). Der Lauf arbeitet aus einer Kopie in /tmp
+# (siehe oben), deshalb wird die Bibliothek ueber $PRODUKT geladen und nicht ueber $0 -- sonst
+# suchte "source" im Ablageverzeichnis der Kopie.
+source "$PRODUKT/deploy/lib-neustart.sh"
 
 speicher_zeile() {  # $1 = Marke (vorher|nachher|...) -- Beweismittel im Protokoll (T-0132)
   local mb
@@ -244,13 +248,26 @@ if ! /bin/systemctl list-unit-files kap2-test.service >/dev/null 2>&1 \
 fi
 ALT_PID=$(/bin/systemctl show -p MainPID --value kap2-test 2>/dev/null || echo 0)
 if ! /bin/systemctl restart kap2-test; then
-  echo "!! Neustart von kap2-test abgelehnt (fehlendes Recht oder kein D-Bus-Zugang)."
-  echo "   Einmalig als root die polkit-Regel anlegen (polkit 0.105, deshalb .pkla, nicht .rules):"
-  echo "   /etc/polkit-1/localauthority/50-local.d/50-kap2-test.pkla -- sie erlaubt dem Benutzer"
-  echo "   overlord org.freedesktop.systemd1.manage-units fuer die Unit-Datei"
-  echo "   /etc/systemd/system/kap2-test.service; danach: systemctl restart polkit"
-  echo "   Der Schritt wird bewusst NICHT uebersprungen -- ohne Neustart laeuft der alte Stand."
-  false
+  # T-0342: Erst der Rueckfallweg ueber den eigenen Prozess, bevor der Schritt scheitert.
+  # Die Unit faehrt unter derselben Kennung wie dieser Lauf; ein SIGKILL an ihren Hauptprozess
+  # braucht kein polkit, und systemd zieht die Unit wegen Restart=on-failure von selbst wieder
+  # hoch. "systemctl restart" bleibt der erste Versuch, dieser Weg ist nur der Rueckfall.
+  echo "-- systemctl restart abgelehnt; Rueckfall: Signal an den eigenen Dienstprozess (T-0342)"
+  NEUSTART_RC=0
+  neustart_ueber_eigenen_prozess kap2-test || NEUSTART_RC=$?
+  if [[ $NEUSTART_RC -ne 0 ]]; then
+    echo "!! Neustart von kap2-test abgelehnt (fehlendes Recht oder kein D-Bus-Zugang),"
+    echo "   und der Rueckfall ueber den eigenen Prozess trug nicht (Rueckgabewert $NEUSTART_RC)."
+    echo "   Einmalig als root die polkit-Regel anlegen (polkit 0.105, deshalb .pkla, nicht .rules):"
+    echo "   /etc/polkit-1/localauthority/50-local.d/50-kap2-test.pkla -- sie erlaubt dem Benutzer"
+    echo "   overlord org.freedesktop.systemd1.manage-units fuer die Unit-Datei"
+    echo "   /etc/systemd/system/kap2-test.service; danach: systemctl restart polkit"
+    echo "   Der Schritt wird bewusst NICHT uebersprungen -- ohne Neustart laeuft der alte Stand."
+    false
+  fi
+  # Ob der Rueckfall wirklich getragen hat, entscheidet nicht dieser Zweig, sondern die
+  # Pruefung auf eine gewechselte MainPID und der Health-Check gegen den ausgelieferten Commit.
+  echo "-- warte auf den von systemd nachgezogenen Neustart (Restart=on-failure, RestartSec=5)"
 fi
 # Beweis, dass wirklich ein neuer Prozess laeuft: MainPID muss sich geaendert haben und != 0 sein.
 NEU_PID=""

@@ -10,14 +10,18 @@ Punkt b). Zweiter Befund: `sudo` scheitert im Deploy-Lauf grundsätzlich an der 
 
 from __future__ import annotations
 
+import os
 import re
+import signal
 import subprocess
+import time
 from pathlib import Path
 
 WURZEL = Path(__file__).resolve().parents[2]
 SKRIPT = WURZEL / "deploy" / "test-deploy.sh"
 UNIT = WURZEL / "deploy" / "kap2-test.service"
 MAIN = WURZEL / "backend" / "app" / "main.py"
+LIB = WURZEL / "deploy" / "lib-neustart.sh"
 
 
 def _dienst_block() -> str:
@@ -97,6 +101,95 @@ def test_health_meldet_commit_und_startzeit():
     assert '"commit": COMMIT' in gesundheit
     assert '"gestartet": PROZESS_START' in gesundheit
     assert 'os.environ.get("KAP2_DEPLOY_COMMIT")' in text
+
+
+def _stub_systemctl(verzeichnis: Path, mainpid: str) -> Path:
+    """Legt ein `systemctl` in `verzeichnis` ab, das eine feste MainPID meldet (T-0342).
+
+    Nur `show -p MainPID --value <unit>` wird beantwortet; alles andere endet mit 1. Damit
+    läuft der Test ohne Serverrechte, ohne D-Bus und ohne echte Unit.
+    """
+    stub = verzeichnis / "systemctl"
+    stub.write_text(
+        "#!/bin/sh\n"
+        'if [ "$1" = "show" ]; then printf "%s\\n" ' + f"'{mainpid}'" + "; exit 0; fi\n"
+        "exit 1\n",
+        encoding="utf-8",
+    )
+    stub.chmod(0o755)
+    return stub
+
+
+def _funktion_ausfuehren(pfad_vorne: Path) -> subprocess.CompletedProcess:
+    """Führt `neustart_ueber_eigenen_prozess kap2-test` wirklich aus, mit Stub-PATH."""
+    umgebung = dict(os.environ)
+    umgebung["PATH"] = f"{pfad_vorne}:{umgebung.get('PATH', '')}"
+    return subprocess.run(
+        ["bash", "-c", f'source "{LIB}"; neustart_ueber_eigenen_prozess kap2-test'],
+        capture_output=True,
+        text=True,
+        env=umgebung,
+        timeout=30,
+    )
+
+
+def test_eigenprozess_neustart_toetet_den_gemeldeten_prozess(tmp_path):
+    """(a) Echter Wegwerfprozess als MainPID: Rückgabewert 0 und der Prozess ist danach beendet."""
+    opfer = subprocess.Popen(["sleep", "300"])
+    try:
+        _stub_systemctl(tmp_path, str(opfer.pid))
+        ergebnis = _funktion_ausfuehren(tmp_path)
+        assert ergebnis.returncode == 0, ergebnis.stderr + ergebnis.stdout
+        assert opfer.wait(timeout=10) != 0
+        assert opfer.returncode == -signal.SIGKILL, opfer.returncode
+    finally:
+        if opfer.poll() is None:  # Sicherheitsnetz, falls die Funktion nichts gesendet hat
+            opfer.kill()
+            opfer.wait(timeout=10)
+
+
+def test_eigenprozess_neustart_bricht_ohne_hauptprozess_ab(tmp_path):
+    """(b) MainPID=0: Rückgabewert 1, und es wird kein Signal gesendet."""
+    unbeteiligt = subprocess.Popen(["sleep", "300"])
+    try:
+        _stub_systemctl(tmp_path, "0")
+        ergebnis = _funktion_ausfuehren(tmp_path)
+        assert ergebnis.returncode == 1, ergebnis.stderr + ergebnis.stdout
+        # Beweis, dass kein Signal flog: der nebenher laufende Prozess lebt unverändert weiter.
+        time.sleep(0.2)
+        assert unbeteiligt.poll() is None
+    finally:
+        unbeteiligt.kill()
+        unbeteiligt.wait(timeout=10)
+
+
+def test_eigenprozess_neustart_bricht_bei_fremder_pid_ab(tmp_path):
+    """(c) Gemeldete PID gehört nicht dem laufenden Benutzer (hier: existiert nicht) → 2."""
+    tot = subprocess.Popen(["sleep", "300"])
+    tot.kill()
+    tot.wait(timeout=10)  # abernten, damit die PID wirklich verschwunden ist
+    try:
+        os.kill(tot.pid, 0)
+    except OSError:
+        pass
+    else:  # PID sofort wiederverwendet — dann trägt der Test nicht, was er tragen soll
+        raise AssertionError(f"PID {tot.pid} existiert noch; Test nicht aussagekräftig")
+    _stub_systemctl(tmp_path, str(tot.pid))
+    ergebnis = _funktion_ausfuehren(tmp_path)
+    assert ergebnis.returncode == 2, ergebnis.stderr + ergebnis.stdout
+
+
+def test_dienst_faellt_auf_eigenen_prozess_zurueck():
+    """(T-0342) Der Dienst-Schritt bricht nach abgelehntem `restart` nicht mehr sofort ab."""
+    text = SKRIPT.read_text(encoding="utf-8")
+    assert 'source "$PRODUKT/deploy/lib-neustart.sh"' in text
+    block = _dienst_block()
+    zweig = block[block.index("if ! /bin/systemctl restart kap2-test; then"):]
+    zweig = zweig.split("\nfi", 1)[0]
+    assert "neustart_ueber_eigenen_prozess kap2-test" in zweig
+    # Das `false` liegt hinter der Prüfung des Rückgabewerts, nicht davor.
+    assert zweig.index("neustart_ueber_eigenen_prozess kap2-test") < zweig.index("NEUSTART_RC -ne 0")
+    assert zweig.index("NEUSTART_RC -ne 0") < zweig.rindex("false")
 
 
 def test_commit_ermittlung_liefert_kurz_hash():
