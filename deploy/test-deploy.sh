@@ -181,9 +181,48 @@ speicher_zeile "nach frontend-build"
 SCHRITT="datenbank"
 cd "$PRODUKT/backend"
 mkdir -p logs
-if ! "$VENV/bin/alembic" upgrade head; then
-  echo "Warnung: alembic upgrade head fehlgeschlagen — Tabellen werden beim Start per create_all angelegt"
-  echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head), Fortsetzung mit create_all-Fallback"
+# T-0339: Der bisherige Rückfall ("Warnung ... Fortsetzung mit create_all-Fallback") hat den Fehler
+# verschluckt statt ihn zu beheben. app/main.py legt beim Start ohnehin alle Tabellen per
+# Base.metadata.create_all an, setzt dabei aber NIE die Alembic-Versionstabelle. Damit beginnt
+# "alembic upgrade head" beim naechsten Deploy wieder bei der Basis-Migration und scheitert dort
+# dauerhaft an 'relation "app_settings" already exists' -- ein Zustand, der sich nicht von selbst
+# loest und jeden weiteren Deploy rot faerbt. Genau dieser eine Fall ist heilbar: Sieht der Fehler
+# nach "existiert bereits" aus UND kennt die Datenbank noch keinen Alembic-Stand (Tabelle
+# alembic_version fehlt oder ist leer), dann ist das Schema durch einen frueheren create_all-
+# Rueckfall schon vorhanden -- einmal auf den Kopf stempeln (ohne die SQL-Anweisungen erneut
+# auszufuehren) und danach regulaer hochziehen. Jeder andere Fehler bricht den Schritt fatal ab;
+# still weiterlaufen tut der Schritt nicht mehr, auch nicht mit create_all als Rueckfall.
+ALEMBIC_LOG=$(mktemp)
+if "$VENV/bin/alembic" upgrade head >"$ALEMBIC_LOG" 2>&1; then
+  cat "$ALEMBIC_LOG"
+  rm -f "$ALEMBIC_LOG"
+else
+  cat "$ALEMBIC_LOG"
+  ALEMBIC_DOPPELT=0
+  if grep -qiE 'DuplicateTable|DuplicateColumn|already exists' "$ALEMBIC_LOG"; then ALEMBIC_DOPPELT=1; fi
+  rm -f "$ALEMBIC_LOG"
+  # Den Alembic-Stand nur abfragen, wenn der Fehler ueberhaupt nach Doppelanlage aussieht:
+  # sonst waere es ein zusaetzlicher Aufruf gegen eine Datenbank, die gerade nicht antwortet.
+  ALEMBIC_STAND="nicht_geprueft"
+  if [[ "$ALEMBIC_DOPPELT" == "1" ]]; then
+    # Leere Ausgabe heisst: keine Tabelle alembic_version oder kein Eintrag darin.
+    ALEMBIC_STAND=$("$VENV/bin/alembic" current 2>/dev/null | tr -d '[:space:]' || true)
+  fi
+  if [[ "$ALEMBIC_DOPPELT" == "1" && -z "$ALEMBIC_STAND" ]]; then
+    echo "Schema vorhanden, aber ohne Alembic-Stand (fruehere create_all-Anlage) -- stemple einmalig auf head."
+    if ! "$VENV/bin/alembic" stamp head; then
+      echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic stamp head)"
+      false
+    fi
+    if ! "$VENV/bin/alembic" upgrade head; then
+      echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head nach stamp head)"
+      false
+    fi
+    echo "Datenbank nach dem Stempel regulaer auf head hochgezogen."
+  else
+    echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head), kein heilbarer Doppelanlage-Fall -- Abbruch ohne create_all-Rueckfall"
+    false
+  fi
 fi
 
 SCHRITT="dienst"
