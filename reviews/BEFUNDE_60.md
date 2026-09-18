@@ -3666,3 +3666,114 @@ vertieft geprüften §3.2 gar keine, im Kernformel-Text „belegt", im Parameter
   byte-gleich geblieben; `backend/scripts/lint_methodik.py` (T-0234) wurde nicht angefasst.
 - **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
   T-0359); das Konvergenz-Verdikt der Runde trägt T-0373.
+
+### Leitfrage 12 — Umsetzbarkeit und Parameter-Blöcke
+
+Paket T-0380 der Runde 3 (18.09.2026, Teil der Auflösung von T-0365), eigene frische Sitzung: Sie
+hat den geprüften Stand nicht geschrieben (eiserne Regel 4; geschrieben haben T-0235 bis T-0243,
+T-0256 bis T-0259 und die Revisionspakete aus T-0281, alle im Endstatus). Die Lint-Ausgabe der
+Runde wird aus Abschnitt 0.1 (T-0359) **übernommen, nicht neu erhoben**. Maßstab sind
+ausschließlich §3 (insbesondere §3.6 und §3.9), §4 (Parameter-Block-Format, Aufgabe Z. 396–408)
+und §5 der Aufgabe, nicht der Berichtstext. Dieses Paket trägt davon **Leitfrage 12**
+(„Umsetzbarkeit: Daten offen/keyless; Parameter-Blöcke vollständig; Architektur-vereinbar;
+benötigte neue Ebenen als solche gekennzeichnet (inkl. Struktur-Ebenen wie u18)?", Aufgabe §5
+Z. 451–452).
+
+**Prüfumfang.** Vertieft geprüft sind genau der **Kopf des Kapitels 7** (Z. 1843–1866: Einleitung
+und die drei P1-Zusatzfelder) und die **maschinenlesbaren Parameter-Blöcke** (Z. 1867–2182,
+22 Blöcke in einem YAML-Fence) von
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`. Gemessen in dieser Sitzung mit
+`python3 -c "... len(re.sub(r'<!--.*?-->','','\n'.join(L[1842:2185]),flags=re.S))"` →
+**10.109 Zeichen** ohne HTML-Kommentare, identisch mit der Messung des Planungslaufs. §7.1, §7.2,
+der Abschnitt `## Ergebnis` und Kapitel 5 gehören zu Schwesterpaketen und sind hier **nur als
+Fundstelle zitiert**; die Leitfragen 5 und 11 werden hier nicht beantwortet.
+
+**Verdikt: Befund.** Vier neue Befunde, Nummern **83 bis 86**. Formal sind die Blöcke sauber: alle
+22 tragen die neun Pflichtfelder des §4-Templates (in dieser Sitzung geprüft, s. u.), alle sieben
+in `herleitung_anker`/`wertebereich_abweichung` genannten Anker existieren im Bericht, und die
+drei nachgerechneten Werte stimmen. Zu beanstanden ist (a) die Vollständigkeit gegenüber dem
+eigenen Anspruch des Kapitel-7-Kopfs — neun der 15 in §4.8 geführten rechnenden Parameter haben
+keinen Block (Befund 83, Kategorie B); (b) ein Band, das das Register führt und der Block auf
+`null` setzt (Befund 84, Kategorie B); (c) ein maschinenlesbarer Offen-Stand, der dem Berichtstext
+widerspricht (Befund 85, Kategorie C); (d) der in §3.2 gekennzeichnete Status „neu anzulegen /
+geparkt" der Datenebenen, der in den Blöcken maschinell nicht ankommt (Befund 86, Kategorie C).
+
+**Die vier Teilaussagen der Leitfrage 12 einzeln.**
+
+| # | Teilaussage | Urteil | Fundstelle |
+|---|---|---|---|
+| 1 | Daten offen/keyless | **ja** | Jeder Block führt seine Herkunft auf eine Registerzeile oder einen Langbeleg zurück (`herkunft: register:60-W085-01`, Z. 1976; `register:60-S093-01`, Z. 2018; `register:60-R24-01`, Z. 1932); die zugehörigen Beschaffungswege sind in §3.2 ausdrücklich als keyless spezifiziert (Spaltenüberschrift „Quelle / Beschaffungsweg (keyless)" Z. 559, Zensus-Zeile „offener Download ohne Schlüssel"; nur zitiert, nicht vertieft geprüft). Kein Block nennt eine Quelle, die einen Schlüssel oder eine Registrierung verlangt; `quelle:` steht entweder auf `null` oder auf einer Rechtsverordnung, einem amtlichen Index bzw. einer Publikation (Z. 1935, 1979, 2021). |
+| 2 | Parameter-Blöcke vollständig | **nein** | Pflichtfelder: vollständig — in dieser Sitzung mit `python3 -c "... re.match(r'  ([a-z_]+):',l)"` über Z. 1843–2185 geprüft, alle neun Feldnamen des §4-Templates (`id, wert, einheit, band, herkunft, quelle, preisstand, bandzuordnung, endpunkt`) sind in der Feldmenge, und der Lint erhebt zu keinem Block „fehlt" (`backend/scripts/lint_methodik.py` Z. 223–225, PFLICHTFELDER Z. 40). Der **Bestand** ist dagegen unvollständig: neun der 15 Parameter aus §4.8 haben keinen Block → **Befund 83**. Zusätzlich fehlt an `flood_bldg.p_hq_haeufig` das im Register geführte Band → **Befund 84**. |
+| 3 | Architektur-vereinbar | **ja, mit ausgewiesener Abweichung** | Format und Extraktionsweg passen: ein `parameter:`-Dokument je Block, `---`-getrennt in einem Fence, genau so, wie der Extraktor sie liest (`re.split(r"^parameter:$", …)`, `lint_methodik.py` Z. 217). Die einzige Abweichung vom §4-Wertebereich (`endpunkt: K3-Wiederherstellung` statt `mortalitaet\|morbiditaet\|beide`, z. B. Z. 1879) ist in **jedem** Block über `wertebereich_abweichung: "#fortschreibung-endpunkt-k3"` maschinenlesbar auf den Fortschreibungsantrag §7.1 verwiesen (Anker existiert, Z. 2184; §7.1 gehört zum Schwesterpaket und wird hier nur zitiert). §3.6 „jeder Parameter editierbar und bequellt" ist über `wert`/`band`/`herkunft` erfüllt. |
+| 4 | Benötigte neue Ebenen als solche gekennzeichnet | **nein (nur im Text, nicht im Block)** | §3.2 kennzeichnet die vier Zellgrößen als „neu anzulegen" bzw. „geparkt (Datenquelle fehlt)" (Z. 559–566, nur zitiert). In Kapitel 7 trägt kein Block ein Feld, das diesen Status mitführt: `flood_bldg.f_s093` (Z. 2069–2081) und `flood_bldg.f_s094` (Z. 2083–2095) stehen auf `wert: 1.0`, ohne dass maschinell erkennbar wäre, dass beide auf der **geparkten** Ebene GEBAEUDEZUSTAND_BAUSTOFF beruhen und der Wert ein Platzhalter ist → **Befund 86**. Struktur-Ebenen im Sinne von u18 kommen bei #60 nicht vor (reiner Sachschaden K3, Kap. 1 Z. 153). |
+
+**Abgleich statt Lektüre** (fünf Größen, jede mit dem in dieser Sitzung ausgeführten Ausdruck;
+§3.4 Ressourcen-Regel eingehalten — gerechnet auf ausgewiesenen Zahlen und Stichproben, kein
+nationaler 100-m-Vollraster-Lauf; die CSVs unter `docs/evidenz/60_stichprobe/` wurden nicht
+gelesen).
+
+| Größe (Block) | Wert im Parameter-Block | Vergleichswert + ausgeführter Ausdruck | Abweichung |
+|---|---|---|---|
+| `flood_bldg.d_1`, `d_5`, `h_1`, `h_5` (Z. 2015, 2029, 2043, 2057) | 0.035 · 0.25 · 0.1 · 1.75 | Produktionscode: `D1, D5, H1, H5 = 0.035, 0.250, 0.10, 1.75` — `grep -rn "0\.035" backend/scripts/kalibrierung/stichprobe60_kernformel.py` → Z. 120 | **0** (Bericht ↔ Code identisch; eiserne Regel 5 nicht berührt) |
+| `flood_bldg.r_s092` (Z. 1914, Band Z. 1916) | 0.035, Band [0.0075, 0.0992] | `python3 -c "print(0.10*0.50*0.70, 0.05*0.30*0.50, 0.20*0.62*0.80)"` → `0.034999999999999996 0.0075 0.09920000000000001`, aus den drei Faktor-Blöcken Z. 1870/1884/1900 und deren Bändern Z. 1872/1886/1902; Gegenprobe Register: `grep -n "60-S092-01" docs/evidenz/register.md` → Z. 65 „r_S092 = 0,035 (Band 0,0075–0,0992)" | **0** (nur Gleitkomma-Rest 4·10⁻¹⁷); `abgeleitet_aus:` Z. 1919 nennt genau diese drei Faktoren |
+| `flood_bldg.lambda` (Z. 2169) | 0.832 | `python3 -c "print(round(1.132/1.360,4))"` → `0.8324`, Ausgangszahlen aus §4.4 Z. 1230 („\(\lambda = A^{*}/M_0\) = 1,132 / 1,360 = **0,832**"), Gegenprobe §4.8 Z. 1467 („0,832 (0,11–3,44) — **vorläufig**") | **−0,05 %** (Rundung auf drei Stellen); Wert und Band stimmen — beanstandet ist allein der Begründungstext, s. **Befund 85** |
+| `flood_bldg.p_hq_haeufig` (Z. 1973, Band Z. 1975) | 0.1, `band: null` | `grep -n "HQhäufig" docs/evidenz/register.md` → Z. 43 (60-W085-01): „HQhäufig 1,0·10⁻¹ a⁻¹ (Kartenfall HQ10; **Spanne HQ5–HQ20 = 2,0·10⁻¹ bis 5,0·10⁻² a⁻¹**)" | Zentralwert **0**, **Band fehlt** (Register führt Faktor 4 Spannweite, Block `null`) → **Befund 84** |
+| `flood_bldg.n_efh_zfh` (Z. 1929, Band Z. 1931) | 1950, Band [1889, 2047] | `grep -n "1\.950" docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` → Z. 363–364 („1.765 × 1,105 = 1.950,3 ⇒ **1.950 €₂₀₂₆/m² BGF** (Band 1.889–2.047)") und Z. 684 | **0** (Kennzeichnungsfrage derselben Größe liegt bereits als Befund 82 vor, hier nicht doppelt verbucht) |
+
+**Vorgabe P1 je geprüftem Parameter** (steht im **sichtbaren Berichtstext** Quelle oder
+ausgewiesene Abschätzung samt Herleitung?).
+
+| Parameter | `kennzeichnung:` | P1 im sichtbaren Text | Fundstelle |
+|---|---|---|---|
+| `d_1`, `d_5` | `quelle` (Z. 2019, 2033) | **ja** — Quelle „Thieken u. a. 2008, FLEMOps (Langbeleg B5)" im Block und Stützstellen-Herleitung im Text | Z. 2021/2035; §3.3 Stützstellentabelle Z. 632–633 (nur zitiert) |
+| `h_1`, `h_5` | `abschaetzung_kap3` (Z. 2047, 2061) | **ja** — Anker `#tiefen-schadensfunktion` existiert (maschinell geprüft) und §3.3 schreibt die Herleitung aus | Z. 2048/2062; Anker-Prüfung s. o. |
+| `r_s092`, `dq_s092`, `s_bem`, `e_bem` | `abschaetzung_kap3` (Z. 1874, 1888, 1904, 1918) | **ja** — Anker `#s092-wirkung` bzw. `#s-bem-naeherung` vorhanden, Herleitung, Sensitivität und Näherungsrichtung in §5.1/§5.1.2/§5.1.3 (Kapitel 5 = Schwesterpaket, nur als Fundstelle); `naeherung: true` + `naeherung_richtung` machen die Näherung zusätzlich maschinenlesbar | Z. 1875, 1889–1891, 1920; Kopf Z. 1858–1861 |
+| `lambda` | `abschaetzung_kap3` (Z. 2173) | **ja** — §4.8 Z. 1467 schreibt Rechenweg, Bandfortpflanzung und Vorläufigkeit im Fließtext aus; keine Herleitung „nur im Kommentar" | Z. 2174 (`#niveau-skalar`), §4.8 Z. 1467 |
+| `w_wg`, `u`, `phi_fluss`, `kappa`, `pi` | `abschaetzung_kap3` (Z. 2103, 2117, 2131, 2145, 2159) | **ja** — §4.8 Z. 1462–1466 führt je Größe Wert, Band und Herleitungsspalte | Anker `#kalibrierung-zielwert` |
+| `p_hq_haeufig`, `p_hq100` | `quelle` (Z. 1977, 1991) | **ja** für Wert und Quelle (Langbeleg B1, wörtliches Zitat Z. 227), **Lücke** beim Band: die im Register ausgewiesene Spanne erscheint weder im Block noch als Sensitivität im Text | Z. 1979/1993; Register Z. 43 → **Befund 84** |
+| `n_efh_zfh`, `n_mfh`, `k_bgf` | `abschaetzung_kap3` mit `quelle:` ≠ null (Z. 1933/1935, 1948/1950, 1963/1965) | **ja im Block**, im Text uneinheitlich | bereits **Befund 82** (§3.2 Z. 563 vs. §3.4 Z. 683) — hier nur bestätigt, nicht neu verbucht |
+| `f_s093`, `f_s094` | `abschaetzung_kap3` (Z. 2075, 2089) | **ja** für Wert und Band, **nein** für den Platzhalter-Charakter (Ebene geparkt) | Z. 2076/2090 → **Befund 86** |
+
+Vorgabe **P2** ist im Prüfumfang nur mittelbar einschlägig: Der einzige Maßnahmen-Hebel S092 steht
+mit `wert: 0.10/0.50/0.70/0.035` gerade **nicht** auf Null und ist als Abschätzung gekennzeichnet
+(Z. 1870–1925) — P2 ist damit an dieser Stelle erfüllt; die Prüfung der Herleitung selbst gehört
+zu Leitfrage 5. Vorgabe **P3** ist an Kapitel 7 nicht verletzt: die Blöcke enthalten keine Formel
+und keine Verteilungsfunktion, nur Skalare mit Band.
+
+| Nr. | Kat. | Befund |
+|---|---|---|
+| 83 | **B** | **Stelle:** Bericht Kapitel 7 Kopf **Z. 1845** („Kap. 7 führt **je rechnendem Parameter aus §3.5 und §4.8** einen Block: die Kostensätze …, die Parameter der Kernformel und der Kalibrierung sowie die vier Blöcke des Hebels S092"), gegen die Parametertabelle §4.8 **Z. 1459–1475** und gegen den Bestand der Blöcke Z. 1867–2182. · **Art: Lücke/Widerspruch (Vollständigkeit der Parameter-Blöcke)** (Aufgabe §4 Parameter-Block-Format Z. 396–408 „wird per Skript in die Produkt-Registry extrahiert"; §3.6 „jeder Parameter editierbar und bequellt"; Vorgabe P1; §5 LF 12 „Parameter-Blöcke vollständig"). · **Begründung:** In dieser Sitzung maschinell gegenübergestellt — `python3 -c "…[l.split('id:')[1] for l in L[1842:2185] if l.strip().startswith('id:')]"` liefert **22** Block-IDs, die §4.8-Tabelle führt **15** rechnende Parameter des Kalibrierkapitels. Von diesen 15 haben nur **sechs** einen Block (`w_wg`, `u`, `phi_fluss`, `kappa`, `pi`, `lambda`). Ohne Block sind: \(A_{\text{ver}}\) Anker 1,838 Mrd. € (Z. 1461), Baupreisanstieg 2023 → 2024 3 % (Z. 1468), Klassenraten der Bestandsschranke 0,1/0,01 a⁻¹ (Z. 1469), **Plausibilitätsschranke \(\lambda\) 0,11/3,44** (Z. 1470), **Toleranz der Verteilungsprüfung ±11,5 Prozentpunkte** (Z. 1471), **\(U\) Sanity-Untergrenze 0,0103** und **\(O\) Sanity-Obergrenze 6,29 Mrd. €₂₀₂₆/a** (Z. 1472–1473), \(f_{\text{AWM}}\) 0,55 (Z. 1474) und \(q_0\) (Z. 1475, geparkt). Mindestens die vier hervorgehobenen sind **rechnende Schwellen**: An 0,11/3,44 entscheidet sich, ob \(\lambda\) überhaupt gesetzt wird (§4.4 Z. 1258), an \(U\)/\(O\) das Sanity-Verdikt (§4.6), an ±11,5 pp das Bestehen der Verteilungsprüfung (§4.5). Sie steuern also Modellentscheide, sind aber weder extrahierbar noch im Produkt editierbar oder anzeigbar — genau das, was §4 mit dem maschinenlesbaren Kapitel verhindern soll. Kategorie B: kein ausgewiesener Zahlenwert ist falsch, aber die Zusage des Kapitels und die Grundlage der Produkt-Registry stimmen nicht (bei der Extraktion entstünde eine unvollständige Parameterliste, P1). · **Vorschlag:** (a) Für die vier Schwellen (`flood_bldg.lambda_schranke_min/max`, `flood_bldg.sanity_u`, `flood_bldg.sanity_o`, `flood_bldg.toleranz_verteilungspruefung`) sowie für \(A_{\text{ver}}\), den Baupreisanstieg, die Klassenraten und \(f_{\text{AWM}}\) je einen Block anlegen, mit `herkunft: herleitung:#…` auf den jeweiligen Abschnitt (§4.1/§4.2/§4.5/§4.6/§7.2) und `kennzeichnung` nach §3.9. (b) \(q_0\) als geparkten Block mit `wert: null` und Parkgrund führen oder den Satz in Z. 1845 auf den tatsächlichen Umfang einschränken — still stehen lassen darf man die Differenz nicht. (c) Den Vollständigkeits-Check in T-0234 um den Abgleich „jede Zeile der P1-Parametertabellen hat einen Block gleicher Größe" erweitern (hier nur verbucht, nicht umgesetzt). |
+| 84 | **B** | **Stelle:** Bericht Kapitel 7, Block `flood_bldg.p_hq_haeufig` **Z. 1971–1983**, Feld `band: null` (**Z. 1975**) bei `wert: 0.1` (Z. 1973) und `herkunft: register:60-W085-01` (Z. 1976); gegen Registerzeile **60-W085-01**, `docs/evidenz/register.md` **Z. 43** („HQhäufig 1,0·10⁻¹ a⁻¹ (Kartenfall HQ10; Spanne HQ5–HQ20 = 2,0·10⁻¹ bis 5,0·10⁻² a⁻¹)", im Bericht gespiegelt Z. 164) und gegen den Schwesterblock `flood_bldg.p_hq_extrem` (Z. 1999–2011), der sein Registerband **mitführt** (`band: [0.001, 0.005]`, Z. 2003). · **Art: Lücke (Unsicherheitsband der Quelle geht beim Übergang ins Maschinenformat verloren)** (§3.9 Herleitungs- und Bandpflicht; §3.4 Sensitivität; Aufgabe §4 Feld `band`; §5 LF 12). · **Begründung:** Der Kartenfall HQ10 ist nicht bundesweit gesetzt — die Länder kartieren „häufig" zwischen HQ5 und HQ20, das Register beziffert die Spanne mit 2,0·10⁻¹ bis 5,0·10⁻² a⁻¹, also **Faktor 4** um den gesetzten Wert. In der Trapezsumme über die drei Szenarien trägt HQhäufig nach §4.5 Z. 1319 rund **66 %** des Modellbetrags; die Eintrittswahrscheinlichkeit geht dort linear ein. Ein `band: null` erklärt diese Größe maschinell für punktgenau und schließt sie aus jeder automatisierten Bandfortpflanzung und aus der nutzersichtbaren Bandanzeige (P1/§3.6) aus, obwohl die Quelle die Spanne ausdrücklich führt und der Nachbarblock sie führt. Kategorie B: der Zentralwert stimmt (oben abgeglichen, Abweichung 0), aber die Unsicherheit des dominierenden Szenarios fehlt im Maschinenformat. · **Vorschlag:** (a) `band: [0.05, 0.2]` eintragen (aufsteigend, wie in allen übrigen Blöcken) und im Text die Wirkung des Bandes auf den K3-Betrag einmal beziffern; (b) prüfen, ob `p_hq100` bei `band: null` bleiben soll — dort ist der Wert definitorisch, das wäre im Block als `band_grund: "definitorisch (HQ100)"` festzuhalten, damit `null` nicht wie eine Auslassung aussieht; (c) in den Lint aufnehmen, dass ein Block mit `herkunft: register:*` kein `band: null` tragen darf, wenn die Registerzeile eine Spanne führt. |
+| 85 | **C** | **Stelle:** Bericht Kapitel 7, Block `flood_bldg.lambda`, Feld `vorlaeufig_grund` **Z. 2178** („Weiterhin vorlaeufig, weil die Ledger-Befunde **33** (Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion), **35 und 36** offen sind"), gegen §4.8 **Z. 1467** („**vorläufig** wegen der offenen Ledger-Befunde **33 und 34**") und gegen `## Ergebnis` **Z. 35** („λ bleibt vorläufig, weil die Verteilungsprüfung … **nicht bestanden** ausgewiesen ist (§4.5) und die Befunde **35 und 36** offen sind"; Z. 35 gehört zum Schwesterpaket und ist nur zitiert). · **Art: Widerspruch (drei Stellen, drei verschiedene Begründungen desselben Vorläufigkeitsvermerks)** (§4 Parameter-Block als maschinenlesbare Spiegelung des Textes; §6 Prozess; §5 LF 12/LF 14). · **Begründung:** Der Zahlenwert ist geprüft und stimmt (`python3 -c "print(round(1.132/1.360,4))"` → 0,8324 gegen 0,832, Abweichung −0,05 %), ebenso das Band [0.11, 3.44] gegen §4.8 Z. 1467. Auseinander laufen die **Gründe**: Der Block nennt 33/35/36, §4.8 nennt 33/34, `## Ergebnis` nennt 35/36 **und** zusätzlich die nicht bestandene Verteilungsprüfung, die im Block gar nicht vorkommt. Der Block ist die Fassung, die per Skript in die Produkt-Registry wandert (Aufgabe §4) — ein Nutzer, der dort den Vorläufigkeitsgrund liest, bekommt eine dritte Variante, und keiner der drei Stände lässt sich ohne Ledger-Lektüre prüfen. Verschärfend: das Datum im Feld („Stand nach der Kleinste-Quadrate-Ankerbestimmung (17.09.2026)") ist durch die Revisionspakete vom 18.09.2026 überholt (vgl. Befund 73 zur selben Alterungsart an Kopf und „Ergebnis"; dort ist die Stelle eine andere, deshalb hier eigener Befund). Kategorie C, weil weder Wert noch Band noch Rechenweg betroffen sind. · **Vorschlag:** (a) Genau **eine** Quelle der Wahrheit festlegen — `vorlaeufig_grund` auf einen Satz kürzen und per Anker auf §4.4/§4.8 verweisen, statt die Befundnummern im Block zu duplizieren; (b) die drei Stellen auf denselben Stand ziehen (offen ist nach diesem Ledger die Verteilungsprüfung; 33, 35 und 36 sind am 18.09.2026 nachgezogen, Z. 1973 und Z. 2145 dieses Ledgers); (c) Lint-Regel: kommt in einem Parameter-Block eine Ledger-Befundnummer vor, muss dieselbe Nummer im zugehörigen P1-Textabschnitt stehen. |
+| 86 | **C** | **Stelle:** Bericht Kapitel 7, Blöcke `flood_bldg.f_s093` **Z. 2069–2081** und `flood_bldg.f_s094` **Z. 2083–2095** (`wert: 1.0`, `band: [0.71, 1.40]` bzw. `[0.84, 1.18]`, `kennzeichnung: abschaetzung_kap3`), gegen §3.2 **Z. 559–566**, wo die tragende Datenebene **GEBAEUDEZUSTAND_BAUSTOFF** ausdrücklich als „**geparkt (Datenquelle fehlt)** — Beschaffungs-Watchlist" geführt ist und dort steht: „Solange keiner der drei Wege das Kriterium erfüllt, bleiben beide Faktoren auf exakt 1,00" (§3.2, nur zitiert — Schwesterpaket). · **Art: Lücke (Status „neu anzulegen/geparkt" der Datenebene wird nicht ins Maschinenformat übernommen)** (§5 LF 12, Teilaussage „benötigte neue Ebenen als solche gekennzeichnet"; §3.1/§3.6; Vorgabe P1). · **Begründung:** Kapitel 7 ist die Schnittstelle zur Produkt-Registry; was dort nicht als Feld steht, kommt im Produkt nicht an. Die beiden Faktoren sind **keine gemessenen Einsen**, sondern Platzhalter mangels bundesweiter, keyless verfügbarer Daten — ihr Band ist reiner Unsicherheitsausweis. Im Block ist das nicht erkennbar: `wert: 1.0` mit `kennzeichnung: abschaetzung_kap3` liest sich wie eine abgeschätzte Wirkung, nicht wie ein neutralisierter Faktor auf geparkter Ebene. Dasselbe gilt schwächer für die drei Blöcke, die auf den **neu anzulegenden** Ebenen HQ_FLAECHE/HQ_TIEFE/GEBAEUDEWERT beruhen (`p_hq_*`, `n_*`, `k_bgf`): Auch bei ihnen steht der Ebenen-Status nur im Fließtext des §3.2. Für einen Umsetzer — die Adressatenfrage der Leitfrage 12 — fehlt damit im maschinenlesbaren Teil die Antwort auf „welche Ebene muss ich erst bauen, und welcher Parameter ist ohne sie wirkungslos". Kategorie C: kein Zahlenwert ist falsch, die Kennzeichnung existiert im Text; sie erreicht nur das Maschinenformat nicht. · **Vorschlag:** (a) Ein Feld `datenebene:` je Block ergänzen (`HQ_FLAECHE`, `HQ_TIEFE`, `GEBAEUDEWERT`, `GEBAEUDEZUSTAND_BAUSTOFF`) plus `ebene_status:` mit genau einem der Werte `vorhanden` / `neu_anzulegen` / `geparkt`; (b) bei `geparkt` zusätzlich `platzhalter: true` setzen, damit im Produkt neben dem Wert 1,00 nicht „Abschätzung von KAP3", sondern „neutral gesetzt, Datenebene fehlt (§3.2)" erscheint; (c) den Kapitel-7-Kopf (Z. 1847–1865) um diese Felder ergänzen, da er die Zusatzfelder abschließend aufzählt. |
+
+**Abgrenzung und Status dieses Pakets.**
+
+- **Kein Befund behoben, keiner umnummeriert.** Die zu Laufbeginn höchste im Ledger vergebene
+  Nummer war **82** (ermittelt mit
+  `grep -o "^| [0-9]\+ |" reviews/BEFUNDE_60.md | grep -o "[0-9]\+" | sort -n | tail -3`);
+  die erste neue Nummer dieses Pakets ist deshalb **83**, vergeben sind **83 bis 86**.
+- **Nur Leitfrage 12 beantwortet**, am Kopf und an den maschinenlesbaren Blöcken des Kapitels 7
+  (Z. 1843–2185, 10.109 Zeichen ohne HTML-Kommentare, in dieser Sitzung nachgemessen).
+  §7.1, §7.2, `## Ergebnis` und Kapitel 5 tragen die Schwesterpakete (Reihenfolgeplätze 7 und 17)
+  und sind hier nur als Fundstelle zitiert; die Leitfragen 5 und 11 sind hier nicht beantwortet.
+- **Vorgaben P1/P2/P3 am Prüfgegenstand mitgeprüft** (Tabelle oben): P1 ist für alle 22 Blöcke über
+  `kennzeichnung`, `quelle` und `herleitung_anker` formal erfüllt — alle sieben genannten Anker
+  existieren im Bericht (maschinell geprüft) —, inhaltlich offen bleiben die Kennzeichnung der
+  Platzhalter (Befund 86) und die bereits als Befund 82 verbuchte Mischkennzeichnung von \(n_t\).
+  P2 ist am Hebel S092 erfüllt (keine Nullwirkung, Band und Näherungsrichtung im Block). P3 ist an
+  Kapitel 7 nicht verletzt (keine Formel, keine Verteilungsfunktion im Prüfumfang).
+- **Ressourcen-Regel §3.4 eingehalten:** verglichen wurde auf fünf Stichprobengrößen und den im
+  Bericht ausgewiesenen Zahlen; die Stichproben-CSVs unter `docs/evidenz/60_stichprobe/` wurden
+  nicht gelesen, kein nationaler 100-m-Vollraster-Lauf.
+- **Eiserne Regeln 2, 4 und 5 eingehalten:** Arbeitsmappen nur gelesen; frische Sitzung, die den
+  geprüften Stand nicht geschrieben hat; die Bericht-↔-Code-Gegenüberstellung
+  (`stichprobe60_kernformel.py` Z. 120) ergab keine Divergenz und hätte andernfalls einen Befund
+  gegeben, keine stille Code-Änderung.
+- **Geänderte Dateien:** ausschließlich diese.
+  `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (SHA-256 `d36326bd5678…`) und
+  `docs/evidenz/register.md` (SHA-256 `29a90539c30b…`) sind byte-gleich geblieben;
+  `backend/scripts/lint_methodik.py` (T-0234) wurde nur gelesen, nicht geändert, und der
+  Lint-Lauf der Runde aus Abschnitt 0.1 (T-0359) wurde nicht wiederholt.
+- **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
+  T-0359); das Konvergenz-Verdikt der Runde trägt das Abschlusspaket.
