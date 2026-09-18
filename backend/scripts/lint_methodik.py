@@ -961,12 +961,48 @@ def pruefe_bericht(pfad: str) -> bool:
     return not lint.fehler
 
 
+# Steckbriefe (Aufsichtsrats-Freigabe F-0030, Ticket T-0403) sind KEINE
+# Euro-Berichte: sieben Abschnitte statt der neun Pflichtkapitel, eine schlichte
+# Parametertabelle statt Parameter-Bloecken mit neun Pflichtfeldern. Sie fallen
+# unter dieselben Glob-Muster wie die Berichte und wuerden sonst von jedem Lauf
+# fuer ein Format beanstandet, das so beschlossen ist.
+#
+# Erkennungsmerkmal ist AUSSCHLIESSLICH das Dateinamen-Suffix — kein inhaltliches
+# Raten und keine Ausnahme fuer eine Einzeldatei (Regel zu Whitelists, Befund 343:
+# eine Ausnahme, die genau einen Fund unterdrueckt, ist keine Ausnahme). Und sie
+# verschwinden nicht still: jeder uebersprungene Steckbrief bekommt eine
+# Ausgabezeile.
+STECKBRIEF_SUFFIX = "_steckbrief.md"
+
+
+def ist_steckbrief(pfad: str) -> bool:
+    """Steckbrief allein am Dateinamen-Suffix erkennen."""
+    return os.path.basename(pfad).endswith(STECKBRIEF_SUFFIX)
+
+
+def berichtsauswahl(ziel: str | None = None) -> tuple[list[str], list[str]]:
+    """Treffer des Glob-Musters in Euro-Berichte und Steckbriefe trennen."""
+    muster = f"{ziel}_*.md" if ziel else "*.md"
+    treffer = [p for p in sorted(glob.glob(os.path.join(DOCS, muster)))
+               if not p.endswith(".pdf")]
+    berichte = [p for p in treffer if not ist_steckbrief(p)]
+    steckbriefe = [p for p in treffer if ist_steckbrief(p)]
+    return berichte, steckbriefe
+
+
 def main() -> int:
     ziel = sys.argv[1] if len(sys.argv) > 1 else None
     muster = f"{ziel}_*.md" if ziel else "*.md"
-    berichte = [p for p in sorted(glob.glob(os.path.join(DOCS, muster)))
-                if not p.endswith(".pdf")]
+    berichte, steckbriefe = berichtsauswahl(ziel)
+    for pfad in steckbriefe:
+        print(f"UEBERSPRUNGEN (Steckbrief): {os.path.basename(pfad)} — "
+              f"Kurzformat ohne Pflichtkapitel und Parameter-Blöcke, "
+              f"nicht als Euro-Bericht geprüft")
     if not berichte:
+        if steckbriefe:
+            # Nur Steckbriefe getroffen: nichts zu pruefen ist kein Fehler.
+            print("\nALLE LINTS GRÜN")
+            return 0
         print(f"Kein Bericht gefunden: {os.path.join(DOCS, muster)}")
         return 1
     alle_gruen = all(pruefe_bericht(p) for p in berichte)
