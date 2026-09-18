@@ -32,6 +32,11 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 18 | Optional kann die Anpassungskapazität eines betroffenen Systems analysiert und bewertet werden, unterschieden nach mehreren Komponenten (u. a. organisationsbezogene Fähigkeit, technisches Vermögen, finanzielle Fähigkeit, Fähigkeit des Ökosystems) und nach unterschiedlichen Reifegraden, um abzuleiten, wie stark sich das Klimarisiko durch Anpassung verringern lässt. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6, Anhang G und H (Abschnitt 2.2.5 "Optional: Anpassungskapazität analysieren und bewerten", S. 28f.) | teilweise | docs/methodik/95_hitzebelastung.md, docs/methodik/61_vegetation_in_siedlungen.md | Die vorliegenden Methodik-Berichte unterscheiden Klimarisiko ohne und mit Anpassung, aber es fehlt eine systematische, nach mehreren Komponenten (organisatorisch, technisch, finanziell, ökosystemisch) untergliederte Bewertung der Anpassungskapazität, wie sie die Norm für diesen optionalen Analyseschritt vorsieht. |
 | 19 | Bei der Interpretation der Analyseergebnisse sind bestehende Unsicherheiten in den zugrunde liegenden Informationen und Daten explizit zu berücksichtigen, ebenso handlungsfeld- und regionsübergreifende Abhängigkeiten, bevor daraus Handlungsoptionen formuliert werden. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6 (Abschnitt 2.2.6 "Ergebnisse interpretieren", S. 29f.) | teilweise | docs/evidenz/register.md, docs/methodik/95_hitzebelastung.md | Das Evidenz-Register weist Unsicherheiten je Parameter aus, aber es gibt im Produkt keine zusammenfassende Interpretationsschicht, die diese Unsicherheiten handlungsfeld- und regionsübergreifend bei der Formulierung von Handlungsoptionen einbezieht; die Interpretation bleibt je Klimawirkung isoliert. |
 | 20 | Die Ergebnisse der Risikobewertung sind zielgruppenspezifisch zu kommunizieren, etwa durch einen ausführlichen Bericht mit Datengrundlagen und Methodik für die Fachöffentlichkeit sowie durch leicht verständliche, prägnante Kommunikationsprodukte (z. B. Karten, Zusammenfassungen) für politische Entscheidungsträger und die breite Öffentlichkeit. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 7 (Abschnitt 2.3.2 "Ergebnisse zielgruppenspezifisch kommunizieren", S. 31) | teilweise | docs/methodik/95_hitzebelastung.md, frontend/src/components/MeasuresTableTab.tsx | Das Produkt liefert ausführliche Methodik-Berichte für die Fachöffentlichkeit und eine Maßnahmentabelle für Nutzer*innen in der Kommune, aber es fehlen eigenständige, stark vereinfachte Kommunikationsprodukte (z. B. Kartendarstellungen oder Kurzzusammenfassungen) speziell für politische Entscheidungsträger oder die breite Öffentlichkeit. |
+| 21 | Die Monetarisierung von Umweltauswirkungen soll durchgängig auf dem Schadenskostenansatz beruhen; Vermeidungs- oder Wiederherstellungskosten sollen nicht als Ersatz für Schadenskosten verwendet werden, um Datenlücken zu schließen, da sie vom Minderungsziel abhängen bzw. real oder virtuell sein können und daher kein aussagekräftiger Ersatzwert sind. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 1 (S. 8f.) und Kap. 2.2.1 (S. 12) | teilweise | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, backend/app/data/catalog.py | Für Gesundheitswirkungen (z. B. hitzebedingte Mortalität) folgt das Produkt dem Schadenskostenansatz (VSL/VOLY-artige Kostensätze), für Gebäudeschäden bei Flusshochwasser (#60) wird jedoch ausdrücklich mit Wiederherstellungskosten zum Neuwert (NHK, indexiert) bewertet (docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, Konto K3); das Produkt wendet damit je nach Schadenskategorie unterschiedliche, nicht vereinheitlichte Kostenkonzepte an, statt durchgängig den von der Methodenkonvention empfohlenen Schadenskostenansatz zu verwenden, und dokumentiert diesen Methodenwechsel nicht als bewusste Abweichung von der Konvention. |
+| 22 | Zukünftige Kosten und Nutzen sind unter Verwendung einer Diskontrate (u. a. der Reinen Zeitpräferenzrate) auf den heutigen Tag abzuzinsen; es werden mindestens zwei Werte (0 % und 1 % RZPR) berichtet, um die Sensitivität der Ergebnisse gegenüber der Zeitpräferenz zu zeigen. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 2.2.3 (S. 14f.) | teilweise | backend/app/services/cost_projection_service.py, frontend/src/components/dashboard/CostTimelineSection.tsx | Die mehrjährige Kosten-Projektion des Produkts (2025–2065) diskontiert zukünftige Schadens- und Maßnahmenkosten nicht; die fehlende Diskontierung/Annualisierung ist als bewusste Vereinfachung im Code benannt und wird über das Feld `assumptions` auch im Frontend angezeigt, es gibt aber keine wählbare Diskontrate und keine Sensitivitätsdarstellung mit mehreren Zeitpräferenzraten, wie sie die Methodenkonvention vorsieht. |
+| 23 | Kostensätze sind einem eindeutigen Preisbasisjahr zuzuordnen; für die Anwendung auf Aktivitäten oder Emissionen anderer Jahre ist eine Preisanpassung anhand eines Preis- bzw. Verbraucherpreisindexes vorzunehmen. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 1 (S. 9) | erfüllt | docs/evidenz/register.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | — |
+| 24 | Ergebnisse der Monetarisierung sind als Schätzungen mit ausgewiesener Unsicherheit (Bandbreiten, Größenordnung statt Scheingenauigkeit) darzustellen; Modelle mit stochastischen Komponenten sollen die Unsicherheit einzelner Bestandteile und des Gesamtprozesses systematisch abbilden. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 1 (S. 9) und Kap. 2.2.2 (S. 13) | erfüllt | docs/evidenz/register.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | — |
+| 25 | Wirkungskategorien, die im gewählten Bewertungsmodell nicht oder nicht vollständig erfasst werden (z. B. Biodiversität, weitere nicht abgedeckte Klimafolgen), sind zu benennen; die resultierenden Kostensätze sind dann als konservative Schätzung bzw. Untergrenze der tatsächlichen Auswirkungen kenntlich zu machen, statt die fehlende Wirkung stillschweigend weg­zulassen. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 2.2.2 (S. 13f.) und Kap. 3.1, Fn. 14 (S. 17) | teilweise | backend/app/data/catalog.py, docs/MODELL_KRITIK.md | Der Katalog kennzeichnet Risiken, die aus Doppelzählungsgründen bewusst mit Kostensatz 0 € geführt werden, mit einer erklärenden `cost_source`/`cost_source_detail` (Verweis auf docs/MODELL_KRITIK.md §6); für nicht bewusst ausgeschlossene, sondern methodisch schlicht (noch) nicht abgedeckte Wirkungen greift dagegen das im Code selbst so benannte „Sicherheitsnetz“ (`cost_per_outcome_eur` Default 0,0, Quelle „Modellannahme (Kostensatz, unbelegt)“), ohne dass die daraus resultierende Gesamtsumme im Produkt als konservative Untergrenze ausgewiesen wird. |
 
 ## Ergebnis
 
@@ -217,4 +222,44 @@ frontend/src/components/MeasuresTableTab.tsx
 ```
 
 Kein Pfad wurde als `No such file` gemeldet; alle fünf zitierten Belegpfade der Zeilen 16–20
+existieren im Produkt-Repo.
+
+### Nachtrag: Zeilen 21–25 (Teilpaket 5, UBA Methodenkonvention 4.0 — Monetarisierung)
+
+Fünf weitere Anforderungen (Zeilen 21–25) wurden aus dem UBA Handbuch Umweltkosten -
+Methodenkonvention 4.0 erfasst (`docs/UBA/UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf`,
+gelesen mit `scripts/pdf_text.py`, siehe T-0351). Erfasst wurden: eine (Zeile 23, Preisbasisjahr)
+und eine (Zeile 24, Ausweis von Unsicherheit) als `erfüllt`, drei (Zeilen 21, 22, 25) als
+`teilweise`. Grund: Das Produkt führt für Gesundheitswirkungen den Schadenskostenansatz, weicht
+aber für Gebäudeschäden bei Flusshochwasser auf Wiederherstellungskosten aus (Zeile 21); die
+mehrjährige Kosten-Projektion diskontiert nicht, benennt das aber offen als Annahme (Zeile 22);
+Preisbasisjahr und Bandbreiten sind im Evidenz-Register durchgängig und nachvollziehbar geführt
+(Zeilen 23, 24 erfüllt); nicht (vollständig) monetarisierbare Wirkungen werden nur dort explizit
+gekennzeichnet, wo sie bewusst zur Vermeidung von Doppelzählung ausgeschlossen sind, nicht aber
+dort, wo schlicht noch kein belegter Kostensatz vorliegt (Zeile 25). Keine Lücke wurde behoben,
+kein Produktcode wurde angefasst — das war nicht Aufgabe dieses Pakets.
+
+Für das Inhaltsverzeichnis wurden die Seiten 1–7 gelesen, für die Kapitelinhalte die Seiten 8–17
+(Kapitel 1, 2.2.1–2.2.4, Anfang Kapitel 3.1). Insgesamt 16 PDF-Seiten, innerhalb des Rahmens von
+höchstens 40 Seiten; das Read-Werkzeug mit `pages` wurde nicht benötigt, `scripts/pdf_text.py`
+hat auf allen gelesenen Seiten Text geliefert.
+
+Prüflauf der in Zeilen 21–25 genannten Belegpfade (`ls -d` je Pfad):
+
+```
+$ ls -d docs/methodik/60_gebaeudeschaeden_flusshochwasser.md
+docs/methodik/60_gebaeudeschaeden_flusshochwasser.md
+$ ls -d backend/app/data/catalog.py
+backend/app/data/catalog.py
+$ ls -d backend/app/services/cost_projection_service.py
+backend/app/services/cost_projection_service.py
+$ ls -d frontend/src/components/dashboard/CostTimelineSection.tsx
+frontend/src/components/dashboard/CostTimelineSection.tsx
+$ ls -d docs/evidenz/register.md
+docs/evidenz/register.md
+$ ls -d docs/MODELL_KRITIK.md
+docs/MODELL_KRITIK.md
+```
+
+Kein Pfad wurde als `No such file` gemeldet; alle sechs zitierten Belegpfade der Zeilen 21–25
 existieren im Produkt-Repo.
