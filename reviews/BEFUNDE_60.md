@@ -2985,3 +2985,113 @@ gerundeten Endwerte 0,11 / 3,44 / 0,657 ändern sich nicht).
   stammen aus den im Bericht ausgewiesenen Zahlen. Im Code wurde nichts geändert (eiserne Regel 5).
 - **Nicht Gegenstand dieses Pakets:** die Leitfragen 1 bis 5, 7 und 9 bis 14, die Abschnitte 4.5 bis
   4.8, die Kapitel 1, 2, 3, 5, 7, 8 und 9 sowie die Regression der Befunde 1–57.
+
+### Leitfrage 7 — Teil 1: Verteilungsannahmen und Sanity-Band
+
+**Prüfumfang dieses Pakets (T-0376).** Erster Teil der Leitfrage 7 aus §5 der Aufgabe
+(„**Tails/Parameter:** Verteilungsannahmen, wo empirische Quantile verfügbar wären; gesetzte Werte,
+die messbar wären; Kalibriermodell = Produktionsmodell?", `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md`
+**Z. 440–441**), vertieft geprüft an genau zwei Abschnitten des Berichts: §4.5 (Z. 1263–1350) und
+§4.6 (Z. 1351–1386). Umfangsmessung in dieser Sitzung, ausgeführt:
+`python3 -c 'import re; t=open("docs/methodik/60_gebaeudeschaeden_flusshochwasser.md").read().split(chr(10)); m=lambda a,b: len(re.sub(r"<!--.*?-->","",chr(10).join(t[a-1:b]),flags=re.S)); print(m(1263,1350), m(1351,1386))'`
+→ **7.079** und **5.028** Zeichen, zusammen **12.107** — identisch mit dem Planungsstand vom
+18.09.2026, keine Abweichung auszuweisen. §4.1–§4.4, §4.7 und Kapitel 9 gehören zu Schwesterpaketen
+und sind hier nur als Fundstelle zitiert. **Das Gesamtverdikt zu Leitfrage 7 wird nicht hier
+gezogen, sondern im Paket auf Reihenfolgeplatz 15 (Teil 2, §4.8); es ist hier nicht vorweggenommen.**
+
+**Zwischenverdikt für diesen Teil: Befund** (Befunde 63, 64 und 65). Die Prüfgröße von §4.5 ist
+sauber aus der Ankerreihe gebildet und ihre Toleranz ist nachrechenbar (Nachrechnung 1); die
+Sanity-Obergrenze von §4.6 ist rechnerisch exakt (Nachrechnung 2). Nicht erfüllt sind drei Punkte:
+die nach LF 7 verfügbaren **empirischen Jahresquantile** der Ankerreihe werden an keiner Stelle als
+Prüfgröße benutzt (Befund 63, Fundstelle §4.5 Z. 1271–1286 und Z. 1341–1349), die Obergrenze \(O\)
+ist — anders als die eigens dafür neu gefasste Untergrenze \(U\) — **kein von der Modellseite
+unabhängiger** Wert und kann nie ansprechen (Befund 64, Fundstelle §4.6 Z. 1363 gegen §4.3 Z. 1157),
+und der Regime-Anteil der Modellseite ist in §4.5 in sich widersprüchlich gerundet (Befund 65,
+Fundstelle §4.5 Z. 1319–1325).
+
+#### (b) Empirische Quantile oder gesetzte Verteilungsannahme? — ausdrückliche Feststellung
+
+| Seite der Prüfung | Woher die Verteilungsaussage stammt | Fundstelle |
+|---|---|---|
+| Ankerseite \(R_{\text{anker}}\) = 47,7 % | **Empirisch, aber kein Quantil:** ein Mittelwert-Aggregat über alle 23 Jahre (Summe der Überschüsse über das jeweilige Auslassungsmittel ÷ Summe der Reihe). Keine Rangstatistik, keine Plotting-Position, kein Quantil der Reihe. | Bericht §4.5 **Z. 1276–1278** (Formel), **Z. 1321–1324** (Ist-Wert); Datei `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv` (24 Zeilen = Kopfzeile + 23 Jahreswerte, Spalte `wert_mrd_eur`) |
+| Modellseite 33,9 % (bzw. 33,8 %) | **Gesetzte Verteilungsannahme:** drei Stützstellen mit gesetzten Jährlichkeiten aus §3.6; das Extremband stammt aus Register 60-W085-01, nicht aus der Reihe. | Bericht §4.5 **Z. 1319–1321** („aus den Stützstellen von §3.6"), **Z. 1308** (Band 5,0·10⁻³–1,0·10⁻³ a⁻¹) |
+| Selbstaussage des Berichts | Der Bericht benennt die Lücke selbst: „das Normaljahr \(\bar A_{-t}\) ist ein Mittel, **keine gemessene Trennung nach Jährlichkeit**"; eine engere Prüfung verlange Ereignis- statt Jahreswerte, die nicht publiziert seien. | Bericht §4.5 **Z. 1347–1349** |
+
+**Feststellung.** Die Verteilungsaussage in §4.5 stammt auf der Ankerseite aus einer **empirischen,
+aber quantilfreien** Mittelwertstatistik und auf der Modellseite aus einer **gesetzten**
+Verteilungsannahme. Empirische Quantile der Ankerreihe wären verfügbar — 23 Jahreswerte tragen
+Rang-Plotting-Positionen bis herab zu rund 1/24 a⁻¹ — und werden nirgends gebildet; das ist genau
+die Konstellation, auf die LF 7 zielt. Daraus **Befund 63**.
+
+#### (c) Zwei Nachrechnungen statt Lektüre
+
+**Nachrechnung 1 — Toleranz der Verteilungsprüfung (§4.5 Z. 1298–1311).** Einzelbeiträge aus dem
+Bericht: ±11,16 Pp (Jackknife, **Z. 1306**), ±1,73 Pp (Ableseunschärfe, **Z. 1307**), ±2,30 Pp
+(modellseitiges Band, **Z. 1308**); Kombinationsregel quadratisch (**Z. 1310–1312**). Ausgeführt:
+`python3 -c 'import math; print(math.sqrt(11.16**2+1.73**2), math.sqrt(11.29**2+2.30**2))'`
+→ `11.293294470613967 11.521896545274133`. Zusätzlich aus der Ankerreihe selbst nachgerechnet
+(Leave-one-out und Jackknife-Standardfehler über die CSV, in dieser Sitzung ausgeführt):
+23 Werte, Summe 42,28 Mrd. €, Überschuss 20,186 Mrd. €, \(R_{\text{anker}}\) = **47,74 %**,
+Replikate **37,61 %–49,87 %**, Standardfehler **11,156 Pp**.
+
+| Größe | Wert im Bericht | nachgerechnet | Abweichung |
+|---|---|---|---|
+| Ankerseitiges Teilbudget \(\sqrt{11{,}16^2+1{,}73^2}\) | ±11,3 Pp (Z. 1310) | 11,29329 → **11,3** | 0 |
+| Gesamttoleranz \(\sqrt{11{,}29^2+2{,}30^2}\) | ±11,5 Pp (Z. 1298, 1311) | 11,52190 → **11,5** | 0 |
+| Jackknife-Standardfehler | 11,16 Pp (Z. 1306) | **11,156** | −0,04 % |
+| Replikate-Spanne | 37,6 %–49,9 % (Z. 1306) | **37,61 %–49,87 %** | 0 (auf eine Nachkommastelle) |
+| \(R_{\text{anker}}\) | 47,7 % (Z. 1324) | **47,74 %** | +0,08 % |
+
+**Ergebnis:** Die Toleranz ist aus ihren im Bericht genannten Einzelbeiträgen vollständig
+reproduzierbar, ebenso die ankerseitige Prüfgröße; dieser Teil ist rechnerisch **bestanden**. Der
+Kombinationsweg ist vorab fixiert und wird nicht nachträglich geweitet (Z. 1299–1300, Z. 1313–1314).
+Auffällig bleibt die Modellseite: 23,2 + 10,6 = **33,8**, ausgewiesen ist 33,9 (Z. 1320–1321), und
+die ausgewiesene Differenz 13,9 Pp (Z. 1324) folgt aus 47,7 − 33,8, nicht aus 47,7 − 33,9 (= 13,8).
+Daraus **Befund 65**.
+
+**Nachrechnung 2 — Sanity-Obergrenze \(O\) (§4.6 Z. 1363).** Eingänge aus dem Bericht: 339.000
+Adressen GK3/GK4 mit Klassenrate 0,1 a⁻¹, 1.380.000 Adressen GK2 mit Klassenrate 0,01 a⁻¹
+(Register 60-R17-01), Gebäudewert 527.280 €₂₀₂₆ (Register 60-R24-01), gedeckelte Schadensquote
+0,250 (§3.3). Ausgeführt:
+`python3 -c 'r=339000*0.1+1380000*0.01; print(r, r*527280*0.250)'` → `47700.0 6287814000.0`.
+
+| Größe | Wert im Bericht | nachgerechnet | Abweichung |
+|---|---|---|---|
+| getroffene Adressen je Jahr | 47.700 (Z. 1363) | **47.700,0** | 0 |
+| Obergrenze \(O\) | 6,29 Mrd. €₂₀₂₆/a (Z. 1363) | **6,287814** Mrd. €₂₀₂₆/a | −0,03 % (reine Rundung auf zwei Stellen) |
+| Lage des Ist-Werts \(\lambda M_0\) = 1,132 | innerhalb [0,0103; 6,29] (Z. 1381–1382) | **bestätigt** (1,132 < 6,288) | 0 |
+
+**Ergebnis:** \(O\) ist rechnerisch korrekt. Die Prüfung, die \(O\) tragen soll, ist es nicht:
+`python3 -c 'M0=0.872*527280*2958.7914; print(47700*527280*0.250/M0)'` → `4.62197460611665`, d. h.
+\(O = 4{,}622 \cdot M_0\) mit **denselben** Registergrößen (339.000, 1.380.000, 527.280 €) als
+Faktoren wie \(M_0\) (§4.3 Z. 1157). Der Test \(\lambda M_0 \le O\) ist damit äquivalent zu
+\(\lambda \le 4{,}62\) und liegt vollständig innerhalb der ohnehin geltenden Plausibilitätsschranke
+\(\lambda \le 3{,}44\) (§4.4 Z. 1240–1258). Daraus **Befund 64**.
+
+#### Neue Befunde dieses Pakets (63 bis 65)
+
+| Nr | Kat. | Befund |
+|---|---|---|
+| 63 | **B** | **Stelle:** Bericht §4.5, Prüfgröße Z. 1271–1286 und Grenzen-Absatz Z. 1341–1349, gegen `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv` (23 Jahreswerte, Spalte `wert_mrd_eur`) und die in Z. 1319–1321 zitierten §3.6-Stützstellen. · **Art: Lücke** (§5 LF 7 „Verteilungsannahmen, wo empirische Quantile verfügbar wären"). · **Begründung:** Die einzige unabhängige Verteilungsprüfung des Berichts vergleicht ein **Mittelwert-Aggregat** der Ankerreihe mit einem **gesetzten** Regime-Anteil aus drei Stützstellen. Ein Quantil der Reihe kommt an keiner Stelle vor, obwohl 23 Jahreswerte vorliegen und daraus empirische Jahres-Überschreitungsquantile bis rund 1/24 a⁻¹ bildbar wären — genau der Bereich, in dem die Prüfung nach eigener Aussage am unsichersten ist (Z. 1266–1267). Der Bericht begründet die Beschränkung mit fehlenden Ereigniswerten (Z. 1348–1349); das trifft die Ereignisebene, nicht die Jahresebene: Der Vergleich „modellierte Jahresschadenverteilung gegen die 23 beobachteten Jahressummen" braucht keine Ereignisdaten. Wirkung: Die Prüfung trennt nach eigener Aussage „nach oben schwach" (Z. 1344–1345 — Verdopplung **und** Verdreifachung des Extremschadens bestünden beide); genau diese Schwäche würde ein Quantilvergleich im oberen Bereich adressieren. Kategorie B: kein ausgewiesener Zahlenwert ändert sich, aber die Aussagekraft der einzigen Verteilungsprüfung bleibt hinter dem zurück, was die vorhandenen Daten hergeben. · **Vorschlag:** In §4.5 eine zweite, quantilbasierte Prüfgröße ergänzen — die 23 Jahressummen nach Rang mit Plotting-Position (z. B. Weibull \(i/(n+1)\)) gegen die aus den drei Stützstellen implizierte Jahresschadenverteilung, ausgewiesen als kurze Tabelle der drei bis vier höchsten Ränge mit Modell- und Beobachtungswert —, oder die Nichtverfügbarkeit ausdrücklich auf die **Ereignis**ebene beschränken und begründen, warum die Jahresquantile nicht herangezogen werden. Die neue Prüfgröße nach §3.9 mit eigener, vorab fixierter Toleranz führen, nicht als Ersatz für \(R_{\text{anker}}\). Lesbar halten (P3): Rangtabelle statt angepasster Extremwertverteilung. |
+| 64 | **B** | **Stelle:** Bericht §4.6, Obergrenze \(O\) Z. 1363 („\(O = (339.000 \cdot 0{,}1 + 1.380.000 \cdot 0{,}01) \cdot 527.280 \cdot 0{,}250\) = **6,29** Mrd. €₂₀₂₆/a … Mehr kann selbst dann nicht entstehen …") und Ist-Absatz Z. 1381–1385 („eine echte, aus unabhängigen Zahlen folgende Aussage statt einer Tautologie"), gegen §4.3 Z. 1157 (\(M_0\) = 0,872 · 527.280 € · (339.000 · 0,0059796 + 1.380.000 · 0,00067515)) und §4.4 Z. 1240–1258 (Plausibilitätsschranke \(\lambda \le 3{,}44\)). · **Art: Fehler (Zirkelschluss, nur halbseitig behoben)** (§5 LF 7 „gesetzte Werte, die messbar wären"; §3.4; §8/P3). · **Begründung:** Die Neufassung nach Befund 35 (Z. 1353–1358) hat die **Untergrenze** aus der Zirkularität geholt und weist das im Text ausdrücklich nach („In dieses \(U\) geht keine der sechs Ankergrößen … als Faktor ein", Z. 1362); für die **Obergrenze** fehlt derselbe Nachweis, und er ließe sich nicht führen: \(O\) und \(M_0\) teilen die Adresszahlen 339.000/1.380.000 und den Gebäudewert 527.280 €, sodass \(O = 4{,}622 \cdot M_0\) gilt (Ausdruck oben). Damit ist \(\lambda M_0 \le O\) identisch mit \(\lambda \le 4{,}62\) und liegt vollständig innerhalb der ohnehin geprüften Schranke \(\lambda \le 3{,}44\) — die Obergrenze kann kein Ergebnis zurückweisen, das §4.4 passiert hat. Der zusammenfassende Satz „aus unabhängigen Zahlen folgende Aussage" (Z. 1383) trifft deshalb nur auf das untere Bandende zu. Verschärfend für den angekündigten Integrationstest (Z. 1384–1385, „Eine Bundessumme außerhalb dieser Grenzen ist ein roter Test"): Er wäre nach oben strukturell blind, weil beide Seiten mit denselben Registerzahlen skalieren. Abgrenzung zu Befund 61: Dort ist die \(\lambda\)-Schranke aus ihren eigenen Bändern gebildet; hier ist die Bundessummen-Obergrenze ein festes Vielfaches der Modellsumme — dieselbe Ursache, andere Stelle. Kategorie B, weil kein ausgewiesener Zahlenwert falsch ist, aber eine Prüfung ihre im Text zugewiesene Funktion nicht erfüllen kann. · **Vorschlag:** \(O\) nach dem Muster von \(U\) aus modellfremden Größen bilden — etwa aus dem größeren amtlichen Fondsvolumen 2021 (`docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv`), fortgeschrieben, mit Wohnanteil und Wiederkehrzeit analog zu \(U\), oder aus der oberen Ankerbandgrenze \(A^{*}_{o}\) — und die heutige Bestandsschranke daneben als **Modellschranke** kennzeichnen, mit dem Vermerk, dass sie ein festes Vielfaches von \(M_0\) ist und nur grobe Fehler in den Registergrößen aufdecken kann. Im Integrationstest beide Grenzen getrennt benennen (unabhängig / modellabhängig), damit ein grüner Test nicht mehr Sicherheit vorspiegelt, als er trägt. |
+| 65 | **C** | **Stelle:** Bericht §4.5 Ist-Ergebnis Z. 1319–1325: „auf HQhäufig 66,1 %, auf HQ100 23,2 % und auf das Extremregime 10,6 % …, also **33,9 %** auf das seltene Regime" und „**Differenz 13,9 Prozentpunkte**". · **Art: Fehler (Rundung/innerer Widerspruch)** (§5 LF 7; §8/E3, P3). · **Begründung:** Die beiden genannten Einzelanteile summieren sich zu 23,2 + 10,6 = **33,8**, nicht 33,9; 33,9 entsteht nur als 100 − 66,1, also aus der Gegenrichtung, und die drei Anteile summieren sich zu 99,9 statt 100,0. Die ausgewiesene Differenz folgt der jeweils anderen Zahl: 47,7 − 33,8 = **13,9** (so ausgewiesen), 47,7 − 33,9 = **13,8**. Mit dem ungerundeten Ankerwert dieser Sitzung (47,74 %) sind es 13,94 bzw. 13,84 Pp. Auf das Verdikt wirkt das nicht — beide Werte liegen über der Toleranz 11,5 Pp, die Prüfung ist so oder so nicht bestanden —, deshalb Kategorie C. Der Befund gilt trotzdem, weil §4.5 den Rechenweg ausdrücklich zum Nachrechnen anbietet und ein Leser nach §8/E3 hier auf einen Widerspruch stößt; zudem wird der Regime-Anteil in §5.1.3 weiterverwendet (Z. 1336–1337). · **Vorschlag:** Die drei Anteile aus dem Ausdruck übernehmen, der sie erzeugt, auf eine Nachkommastelle konsistent runden (Summe 100,0) und den seltenen Anteil als Summe seiner beiden Einzelanteile ausweisen; die Differenz daraus neu setzen. Für den Lint: eine Regel, die im Bericht ausgewiesene Anteilstripel auf 100 % und ausgewiesene Differenzen gegen ihre Summanden prüft. |
+
+#### Abgrenzung und Status dieses Pakets
+
+- **Geändert wurde ausschließlich `reviews/BEFUNDE_60.md`** (angehängt).
+  `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, `docs/evidenz/register.md`,
+  `backend/scripts/lint_methodik.py` und `backend/` sind byte-gleich; die Arbeitsmappen und die
+  Evidenz-CSV wurden nur gelesen (eiserne Regel 2).
+- **Kein Befund behoben, keiner umnummeriert.** Höchste vorhandene Nummer zu Laufbeginn: **62**;
+  neu vergeben sind **63–65**. Die Befunde 33 (abgelöste Verteilungsprüfung), 35 (abgelöste,
+  zirkuläre Untergrenze) und 61 (\(\lambda\)-Schranke) sind nur als Gegenstelle eingeordnet.
+- **Gesamtverdikt zu Leitfrage 7 nicht gezogen** — es entsteht im Paket auf Reihenfolgeplatz 15
+  (Teil 2, §4.8) zusammen mit dem dritten Teil der Leitfrage („Kalibriermodell = Produktionsmodell").
+- **Ressourcen-Regel §3.4 eingehalten:** kein nationaler 100-m-Vollraster-Lauf; nachgerechnet wurde
+  aus den im Bericht ausgewiesenen Zahlen und der 23-zeiligen Ankerreihe. Im Code wurde nichts
+  geändert, die Divergenzen sind als Befunde verbucht (eiserne Regel 5).
+- **Frische Sitzung** (eiserne Regel 4): Diese Gegenprüfung ist nicht die Sitzung, die den geprüften
+  Stand geschrieben hat.
+- **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
+  T-0359); der Lint-Lauf der Runde steht im Eröffnungsabschnitt und wurde nicht wiederholt.
+- **Nicht Gegenstand dieses Pakets:** §4.1–§4.4, §4.7, §4.8, Kapitel 9 sowie alle übrigen Leitfragen.
