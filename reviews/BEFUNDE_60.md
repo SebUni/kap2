@@ -2443,3 +2443,163 @@ Das Ledger trug vor diesem Paket die Nummern 1 bis 46; die erste hier vergebene 
 - **Kein Befund behoben, keiner umnummeriert.** Befund 21 (Knotennamen) wird nur als fortbestehend bestätigt und behält Nummer und Status `bewusst offen`.
 - **Kopftabelle „Offene Befunde (19)" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete, festgelegt im Eröffnungspaket T-0359). Sie trägt ihren Stand-Vermerk „nach der Autor-Revision der Runde 2" und zählt die Nummern 1–46; mit den Befunden 47–49 wäre sie bei 22 offenen Zeilen. Diese Zahl steht hier, damit die Lücke sichtbar ist und nicht still altert; nachgezogen wird die Kopftabelle im Abschlusspaket der Runde 3.
 - **Nicht Gegenstand dieses Pakets:** die Leitfragen 3 bis 14, die Langbelege B1–B6, die Kapitel 3 bis 9 und die Regression der Befunde 1–46. Sie liegen bei den Geschwisterpaketen der Runde 3.
+
+### Leitfragen 10 und 14
+
+Paket T-0361 der Runde 3 (18.09.2026), eigene frische Sitzung: Sie hat den geprüften Stand nicht
+geschrieben — Kapitel 2 Teil B und Kapitel 8 stammen aus T-0235 bis T-0243, T-0256 bis T-0259 und
+den Revisionspaketen aus T-0281 (darunter die Snapshot-Nachträge T-0307/T-0308), alle im Endstatus
+(eiserne Regel 4). Das Bundle nach §1 lag ab dem ersten Turn vor (Abschnitt 0 dieser Runde,
+unverändert gültig); die Lint-Ausgabe aus Abschnitt 0.1 wird **übernommen, nicht neu erhoben**
+(§5, Schritt „zuerst die deterministischen Lints"). Maßstab sind ausschließlich §3 und §5 der
+Aufgabe, nicht der Berichtstext. Nach §6 ist die volle Prüfung erneut zu fahren, weil seit Runde 2
+Kalibrierung und Modellstruktur geändert wurden; dieses Paket trägt davon die Leitfragen **10**
+und **14**.
+
+**Prüfumfang dieses Pakets.** Vertieft geprüft sind Kapitel 2 **Teil B**, also der Abschnitt
+`### Belege zu den entschiedenen Registerzeilen (§3.8, Volltext geprüft am 13.09.2026)`
+(Z. 197–522, Langbelege B1–B6), und Kapitel 8 `## 8 Quellen (§3.8)` (Z. 2326–2411). Nachgemessen,
+nicht aus dem Ticket übernommen:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();i3=s.index('### Belege zu den entschiedenen');i4=s.index(chr(10)+'## 3 ');i8=s.index('## 8 Quellen');i9=s.index(chr(10)+'## 9 ');print(i4-i3+1,i9-i8+1,(i4-i3)+(i9-i8)+2)"
+28396 7438 35834
+```
+
+Kapitel 2 Teil B misst **28.396** statt der im Ticket genannten 28.465 Zeichen, Kapitel 8 **7.438**
+statt 7.267, zusammen **35.834** statt 35.732. Der geprüfte Textkörper ist derselbe — die Grenzen
+sind die Überschriften `### Belege …` bis ausschließlich `## 3 Modell` und `## 8 Quellen` bis
+ausschließlich `## 9 Ansatz-Vergleich`, und zwischen ihnen liegt kein anderer Text. Die Differenzen
+(−69 und +171 Zeichen) stammen aus der Schnittkante der Zählung im Ticket und stehen hier als
+Messwert, statt die Ticketzahl zu wiederholen. Kapitel 1 und Kapitel 2 Teil A liegen beim
+Geschwisterpaket T-0360, die übrigen Kapitel bei den anderen Paketen der Runde; sie werden hier nur
+als Gegenstelle zitiert, nicht geprüft. Ein nationaler 100-m-Vollraster-Lauf ist nach §3.4 nicht
+zulässig und wurde **nicht** gefahren: Alle Rechnungen laufen zellweise und auf Stichproben. Die
+Arbeitsmappen wurden ausschließlich gelesen (eiserne Regel 2, Prüfsummen unten unverändert); im
+Code wurde nichts geändert (eiserne Regel 5).
+
+#### LF 10 — Quellen: fehlend, veraltet, falsch zugeordnet, unverifiziert; Zahlen ≠ Primärquelle?
+
+**Verdikt: Befund** (→ neue Befunde **50**, **51**, **52**; die geprüften **Zahlen** stimmen
+ausnahmslos mit ihren Primärquellen überein, die Mängel liegen in der Fundstellenführung).
+
+*Stichprobe gegen die Primärquelle — sechs Quellenangaben, je mit Fundstelle im Bericht.* Geprüft
+wurde nicht, ob der Bericht sich selbst treu ist, sondern ob die zitierte Zahl in der genannten
+Quelle so steht. Die externen Quellen wurden am 18.09.2026 am Original abgerufen, die Arbeitsmappe
+zellweise gelesen.
+
+| # | Quellenangabe (Fundstelle im Bericht) | Zitierter Wert | Befund am Original |
+|---|---|---|---|
+| S1 | **B4 Quelle 3**, ImmoWertV Anlage 4 (NHK 2010) · Kap. 2 Teil B Z. 320–332 | 825 / 985 / 1.190 €/m² BGF (MFH ≤ 6 WE, Stufen 3–5); Wortlaut „Kostengruppen 300 und 400 der DIN 276, die Umsatzsteuer und die üblicherweise entstehenden Baunebenkosten (Kostengruppen 730 und 771 …)", „auf den im Jahresdurchschnitt bestehenden Kostenstand des Jahres 2010" | **trifft zu**, wörtlich und zahlengleich (gesetze-im-internet.de, Anlage 4, abgerufen 18.09.2026). Die Kennwerte der Gebäudeart 1.01 (u. a. 1.050 €/m²) stehen dort nur als eingebettete Tabellengrafik und waren in dieser Sitzung nicht maschinell auslesbar — **nicht widerlegt, aber auch nicht gegengelesen**; hier als offene Teilprobe ausgewiesen statt als bestätigt. |
+| S2 | **B1 Quelle 2**, § 74 Abs. 2 Nr. 1 WHG · Z. 215–222 | „Hochwasser mit niedriger Wahrscheinlichkeit (voraussichtliches Wiederkehrintervall mindestens 200 Jahre)" | **trifft zu**, wörtlich (gesetze-im-internet.de/whg_2009/__74.html, abgerufen 18.09.2026); Abs. 3 nennt dort ebenfalls Ausmaß der Überflutung und Wassertiefe. |
+| S3 | **B4 Quelle 1**, Destatis PM Nr. 336 vom 17.09.2025 · Z. 304–313 | 43,8 Mio Wohnungen · 4,1 Mrd m² Wohnfläche · 13,5 / 2,7 / 3,5 Mio Ein-, Zwei-, Mehrfamilienhäuser | **trifft zu**, alle fünf Zahlen wörtlich in der Pressemitteilung (destatis.de, abgerufen 18.09.2026). Die im selben Satz geführten **19,7 Mio Wohngebäude** sind die Summe der drei Gebäudetypen (13,5 + 2,7 + 3,5 = 19,7) und in dieser Form keine Zahl der Meldung — rechnerisch korrekt, als abgeleiteter Wert aber nicht gekennzeichnet (kein eigener Befund: die drei Summanden stehen mit Quelle daneben). |
+| S4 | **Kap. 8 Quelle 5**, GDV-Naturgefahrenstatistik 2024 · Z. 2378–2389 | „Allein Starkregenereignisse und Überschwemmungen schlugen mit 2,6 Mrd. Euro zu Buche"; 4,4 Mrd. € Sachversicherung, 1,3 Mrd. € Kraftfahrt, Stand „Zuletzt aktualisiert 31.05.2025" | **trifft zu**, wörtlich und zahlengleich (gdv.de, Medieninformation, abgerufen 18.09.2026); die im Bericht genannten 5,7 Mrd. € sind die Summe 4,4 + 1,3 und stehen in der Quelle als Gesamtbetrag. |
+| S5 | **Kap. 8 Quelle 6**, GDV-Versicherungsdichte · Z. 2390–2401 | „2024 sind 10,2 Mio. Wohngebäude … versichert. Das entspricht einer Versicherungsdichte von immerhin 57 % bezogen auf Wohngebäude-Feuer"; Stand der Grafik 10.10.2025 | **trifft zu**, wörtlich, samt Aktualisierungsdatum (gdv.de, Datenservice, abgerufen 18.09.2026). |
+| S6 | **Kap. 8 Quellen 1 und 2**, beide Arbeitsmappen mit Commit und Prüfsumme · Z. 2333–2350 | KWK `1a89a2e8…` (2026-08-17), SHA-256 `2faac648aade047f…`; Mon. `68442ca12689…` (2026-08-30), SHA-256 `4383882d3a935f09…` | **trifft zu**, gemessen: `sha256sum` beider Mappen und `git log -1` je Datei geben genau diese Summen und Commits/Daten. Die tragenden Zellen sind ebenfalls wörtlich: Mon. **J64** „… Zeitwertansatz; Versicherungsleistungen sind Transfers und mindern den Schaden nicht (R5).", **J65** „Wie ID 59, ereignisbezogen flussseitig; …", Konten **C27** „Wiederherstellungs-/Zeitwertkosten; Schadensfunktionen × Bestandswerte", Rechenregeln **A7/B7** „R5 · Transfers sind keine Schäden". |
+
+*Nicht verifizierbare Quelle — ausgewiesen, nicht stillschweigend als geprüft geführt.* Die
+Sekundärzahl des Tiefenbands (**B2 Quelle 2**, de Moel/Aerts 2011, Z. 248–257: „a 0.5-m reduction …
+factor 1.35–1.44", Tab. 4 „5,3 %–6,2 % je 10 cm") ließ sich in dieser Sitzung **nicht** am Volltext
+gegenlesen: Die Verlagsfassung antwortet mit einer Anmelde-Weiterleitung, und für die frei
+zugängliche Repositoriumsfassung fehlt in dieser Umgebung ein PDF-Textextraktor (`pdftotext` nicht
+installiert, PDF-Seitenrendering ohne `poppler-utils` nicht möglich). Der Bericht führt die Stelle
+als „Volltext gegengelesen" (Z. 251); diese Angabe wird hier **weder bestätigt noch bestritten**.
+Kein Befund — die Prüfmittellücke liegt bei der Review-Umgebung, nicht am Bericht; der abgeleitete
+Rechenschritt ist dagegen nachgerechnet: 2,0 × 5,3 % = **10,6 %** und 2,0 × 6,2 % = **12,4 %**,
+gerundet ±12 % wie im Bericht.
+
+*Nachgerechnet statt gelesen — alle Zahlenketten des Prüfumfangs.* Die Rechenschritte in B3 bis B6
+reproduzieren sich aus den zitierten Quellwerten (eigener Lauf in dieser Sitzung):
+
+```
+Indexfaktor 149,8/89,1 = 1,6813 · 1.050 × 1,6813 = 1.765,32 · 825 × 1,6813 = 1.387,04
+1,034³ = 1,10551 (Faktor 1,105) · 1,023³ = 1,0706 · 1,050³ = 1,15763 (Band 1,07–1,16)
+1.765 × 1,105 = 1.950,3 · 1.387 × 1,105 = 1.532,6 · Bandenden 1.765 × 1,07/1,16 = 1.888,6/2.047,4
+   und 1.387 × 1,07/1,16 = 1.484,1 / 1.608,9  (Bericht: 1.889–2.047 bzw. 1.484–1.609 ✓)
+1.533 × 1,30 = 1.992,9 · 1.950 × 1,30 = 2.535,0 · 4,1 Mrd × 1.993/2.535 = 8,17/10,39 Bio.
+4,1 Mrd ÷ 19,7 Mio = 208,1 m²
+B3: 100 − 92,4 = 7,6 · 7,6 − 0,4 = 7,2 = 6,1 + 1,1 ✓ · 0,011 × 22,6 Mio = 248.600
+   · 0,061 × 22,6 Mio = 1.378.600 · 0,076 × 22,6 Mio = 1.717.600 · 0,015 × 22,6 Mio = 339.000
+B5: ln(1,58/0,92) = 0,5408 · ln(0,92/0,41) = 0,8082 · Mittel 0,67451 · e^0,67451 = 1,9631
+   · √ = 1,40110 / 0,71373       B6: 0,67451/2 = 0,33726 · e^ = 1,40110 · √ = 1,18368 / 0,84482
+   · 0,7137 × 0,8448 = 0,6029 · 1,4011 × 1,1837 = 1,6585 (Bericht: 0,60–1,66 ✓)
+Zeitwert je Gebäude 527.280 × 0,55 = 290.004 (Band 210.912–395.460) ✓
+```
+
+Keine Abweichung. Insbesondere die Bandenden 1.889–2.047 und 1.484–1.609 sind **nicht** aus den
+ungerundeten Zwischenwerten, sondern aus dem ausgewiesenen gerundeten Band 1,07–1,16 gerechnet —
+das ist im Bericht so angegeben und deshalb kein Befund.
+
+*(1) Die Fundstellenlisten des Quellenkapitels treffen den Bericht nicht → Befund **50**.*
+Kapitel 8 Quelle 1 führt für die Wirkungsketten-Mappe „Z3–Z271 **wie in Kap. 1 zitiert**"; gemessen
+zitiert der Bericht auch **KWK Z272**, und das ist die Zeile des Zielknotens W117, also die
+tragendste Fundstelle überhaupt. Umgekehrt nennt dieselbe Angabe für die Netzwerkliste Z13, Z50,
+**Z51**, Z53, **Z60**, Z61 — Z51 und Z60 kommen im ganzen Bericht nicht vor. In Quelle 2 fehlen die
+im Bericht tragenden Zellen Mon. Z17, Z42 und Z57, Rechenregeln Z7 (R5-Zitat) und Z19 sowie
+Abgleich-Protokoll Punkt 3.
+
+*(2) Fünf Quellenangaben ohne Jahresangabe → Befund **51**.* §3.8 verlangt „Autor, Jahr, Titel,
+Organ, DOI/URL, Zugriffsdatum, Archiv-Snapshot"; fünf Einträge in Teil B tragen kein Jahr und keine
+Fassungsangabe (LAIV MV, LfU-FAQ, GDV-ZÜRS-Seite, Destatis-Themenseite, Fachserie 17 Reihe 4).
+
+*(3) Das Prüfdatum in der Abschnittsüberschrift ist überholt → Befund **52**.* Die Überschrift
+nennt „Volltext geprüft am 13.09.2026", während Teile desselben Abschnitts am **17.09.2026** geprüft
+und nachgetragen wurden (Snapshots B1–B6 aus T-0307/T-0308, Snapshot-Fehlversuch B4 Quelle 5
+„beides geprüft 17.09.2026", Zugriff 17.09.2026 bei Kap. 8 Quellen 5–7).
+
+*Regression, kein neuer Befund.* Der in Befund 48 (Paket T-0360) erfasste Satz in B2 („S074 bleibt
+der Formelstelle FS-Exposition zugeordnet", Z. 263–264) liegt zwar im Prüfumfang dieses Pakets,
+ist dort aber bereits nummeriert und wird hier **nicht** doppelt geführt. Befund 42
+(Archiv-Snapshots) ist im Prüfumfang gegengeprüft und besteht nicht fort: Jede externe Webquelle in
+B1–B6 und Kap. 8 trägt entweder einen Snapshot mit Datum oder — bei B4 Quelle 5 — die ausdrückliche
+Begründung des Verzichts, und die Begründung ist am Original nachvollziehbar (Destatis-Snapshots
+antworten mit HTTP 403).
+
+#### LF 14 — Quellen-Synchronität: Widerspruch zu Arbeitsmappen oder Aufgabe? Fortschreibungen nachgezogen und im Abgleich-Protokoll dokumentiert?
+
+**Verdikt: Befund** (→ neuer Befund **53**; der erste Teil der Leitfrage — Widerspruch in einem
+verbindlichen Punkt — ist im Prüfumfang **bestanden**, der zweite Teil nicht).
+
+*Teil 1: Widerspricht der Bericht den Arbeitsmappen oder der Aufgabe in einem verbindlichen Punkt
+(Bewertungslogik, Kanten, Konten, Rollen)?* Geprüft wurden alle Mappenbezüge, die in Kapitel 2
+Teil B und Kapitel 8 stehen, gegen die Zellen selbst:
+
+| Verbindlicher Punkt | Zelle (gelesen, nicht geändert) | Aussage im Prüfumfang | Ergebnis |
+|---|---|---|---|
+| Bewertungslogik K3 für #60 | Mon. **J65** → **J64**: „Wie ID 59, ereignisbezogen flussseitig; HQ-Szenarien × Schadensfunktionen (Wassertiefe-Schaden) × Gebäudewerte." / „Wiederherstellungskosten (Gebäude, Hausrat, Fahrzeuge) je Ereignis; **Zeitwertansatz**; Versicherungsleistungen sind Transfers und mindern den Schaden nicht (R5)." | B4 Z. 383–389: Neuwert bleibt Basiswert, Zeitwert als beziffertes Band (0,55; 0,40–0,75), Abweichung als Antrag §7.2 | Abweichung **benannt, beziffert und nicht geglättet** (§3.8) — kein Widerspruch im Sinne von „still überstimmt"; der Nachzug in die Quelle fehlt aber, siehe Teil 2 |
+| Kostensatz-Typ K3 | Konten **C27** „Wiederherstellungs-/Zeitwertkosten; Schadensfunktionen × Bestandswerte" | B4 Z. 384–386 zitiert beide Lesarten | trifft zu, wörtlich |
+| Rolle der Versicherungsleistungen (R5) | Rechenregeln **A7/B7/C7** „R5 · Transfers sind keine Schäden · Versicherungsleistungen … sind (überwiegend) Umverteilung" | Teil B führt keinen Abzug von Versicherungsleistungen; der Ankerwert in Kap. 4 wird hochgerechnet, nicht abgezogen | konsistent |
+| Ereignislogik (A5) | Rechenregeln **Z20** „Ereignisschäden (K3/K4/K1-Extremereignisse) werden je Ereignisklasse als Erwartungswert gerechnet: Eintrittswahrscheinlichkeit × Schadensfunktion × Bestand" | B1 (p = 1/T je Szenario) und B4 (Bestandswert) liefern genau diese drei Faktoren | konsistent |
+| Kanten/Konto-Zuordnung | Abgleich-Protokoll, Spalten **B** und **D** über alle 152 Zeilen | Kapitel 8 nennt die Mappe als Quelle, Teil B führt keine Kante ein | keine Zeile mit Quelle-ID oder Ziel 60 (gemessen) — es wird auch keine behauptet |
+| Aufgabe §3.8 (Widersprüche benennen, Lücken ausweisen) | — | B1 (WHG 200 a ↔ Praxis HQ1000), B3 (ZÜRS ↔ HWGK nicht überführbar), B5 (Fig.-1-Beschriftung gegen die fachliche Erwartung) je als „Widerspruch … benannt statt geglättet"; sechs ausdrückliche Datenlücken | erfüllt |
+
+*Teil 2: Ist jede bewusste Fortschreibung in der Quelle nachgezogen und im Abgleich-Protokoll
+dokumentiert?* Gemessen, nicht gelesen: Das Blatt „Abgleich-Protokoll" hat 152 Zeilen; genau **eine**
+davon ist eine Fortschreibung der Bewertungslogik — Z151, Punkt 52, Spalte F „Fortschreibung
+Bewertungslogik (keine Kante)", Inhalt „VSL 3,5 Mio. €/Fall → YLL × VOLY …, Beschluss Review 2,
+umgesetzt Methodik-Bericht #95 Rev. 6". Für #60 gibt es keine solche Zeile, und die Spalten B/D
+tragen über alle 152 Zeilen keinen Eintrag 60. Die Abweichung vom Zeitwertansatz wirkt aber seit
+dem 17.09.2026 im Basiswert. Das ist genau die Lage, die LF 14 im zweiten Halbsatz abfragt — daher
+Befund **53**.
+
+#### Neue Befunde dieses Pakets (50–53)
+
+**Nummernvergabe.** Das Ticket geht vom Ledgerstand 1–46 aus und nennt 47 als erste freie Nummer;
+zwischenzeitlich hat das parallel laufende Geschwisterpaket T-0360 die Nummern **47–49** vergeben
+(Abschnitt „Leitfragen 1 und 2" dieser Runde). Die nächsthöhere **freie** Nummer ist damit **50**;
+ab ihr wird hier fortlaufend vergeben, damit keine Nummer doppelt belegt wird.
+**Kein Befund wird in diesem Paket behoben** — die Einträge sind reine Gegenprüfung.
+
+| Nr | Kat. | Stelle · Art · Begründung · Vorschlag |
+|---|---|---|
+| 50 | **C** | **Stelle:** Bericht Kap. 8, Quelle 1 (Z. 2333–2341: „Sheets „Klimawirkungsketten" (Z3–Z271 wie in Kap. 1 zitiert) und „Schadensbaum-Netzwerkliste" (Z13, Z50, Z51, Z53, Z60, Z61)") und Quelle 2 (Z. 2342–2350: „„Risiken-Monetarisierung" (Z51, Z54–Z56, Z64, Z65, Z106), „Schadenskonten-System" (Z26–Z30), „Rechenregeln" (Z9, Z11, Z20), „Abgleich-Protokoll" (P5, P15, P16)") — gegen die tatsächlich im Bericht zitierten Zellen. · **Art: Lücke/falsche Zuordnung** (§3.8 „Jede Zahl mit Quelle … exakte Fundstelle"; §5 LF 10 „falsch zugeordnet"). · **Begründung:** Gemessen (Zitatsammlung über den ganzen Bericht) zitiert der Bericht **KWK Z272** — die Zeile des Zielknotens W117 und damit die tragendste Fundstelle der Kette —, die Quellenangabe endet aber bei Z271. Umgekehrt nennt sie für die Netzwerkliste **Z51** und **Z60**, die im Bericht nirgends vorkommen. In Quelle 2 fehlen **Mon. Z17** (Buchungsobjekt 12, Partitionsabgrenzung), **Mon. Z42** (Buchungsobjekt 37, „Sachschäden an Anlagen (K3)"), **Mon. Z57**, **Rechenregeln Z7** (R5-Zitat, das die Transfer-Entscheidung trägt), **Rechenregeln Z19** (A4 Kostensätze) und **Abgleich-Protokoll Punkt 3** (Kante 49 → 37, tragend für die Weitergaben und für Befund 6). Wer die Quellenangabe als Fundstellenverzeichnis benutzt — und dafür steht sie da —, wird an den tragenden Zellen vorbeigeführt und findet zugleich zwei Zellen angeboten, die nichts tragen. Kategorie C, weil kein Zahlenwert betroffen ist und jede Einzelstelle im Fließtext von Kap. 1/2 korrekt zitiert wird. · **Vorschlag:** Die beiden Zellbereiche aus den Zitaten des Berichts erzeugen statt sie zu pflegen (Skript-Zeile im Lint: alle `KWK Z…`, `Mon. Z…`, `Konten Z…`, `Rechenregeln Z…`, `NW Z…`, `Abgleich-Protokoll Punkt …` einsammeln, Bereich in Kap. 8 dagegen prüfen), mindestens aber Z272, Mon. Z17/Z42/Z57, Rechenregeln Z7/Z19 und Abgleich-Punkt 3 aufnehmen und Z51/Z60 der Netzwerkliste streichen. |
+| 51 | **C** | **Stelle:** Bericht Kap. 2 Teil B — B1 Quelle 3 (LfU-FAQ, Z. 222–227), B2 Quelle 1 (LAIV MV „Geländemodelle", Z. 242–246), B3 Quelle 2 (GDV „ZÜRS Geo", Z. 279–284), B4 Quelle 2 (Destatis-Themenseite „Wohnen", Z. 314–317), B4 Quelle 4 (Destatis Fachserie 17 Reihe 4, Z. 332–338). · **Art: Lücke** (§3.8 „Jede Zahl mit Quelle (Autor, **Jahr**, Titel, Organ, DOI/URL, Zugriffsdatum, Archiv-Snapshot)"; §5 LF 10 „fehlend … veraltet"). · **Begründung:** Diese fünf Einträge tragen weder ein Erscheinungs-/Standjahr noch eine Fassungsangabe; belegt ist nur der Zugriffstag 13.09.2026 und der Snapshot. Bei laufend gepflegten Webseiten ist genau das Jahr die Angabe, die einen späteren Leser erkennen lässt, ob sich der Stand geändert hat — der Bericht führt diese Disziplin bei anderen Einträgen vor (Kap. 8 Quellen 5 und 6 nennen „Zuletzt aktualisiert" 31.05.2025 bzw. 10.10.2025, in dieser Prüfung am Original bestätigt). Bei B4 Quelle 4 wiegt die Lücke etwas schwerer, weil die Fachserie jahrgangsweise erscheint und die entnommenen Indexwerte (2010 = 89,1 … 2023 = 149,8) an den Jahrgang gebunden sind. Kategorie C, weil die Zahlen selbst belegt und über den Snapshot adressierbar sind. · **Vorschlag:** Je Eintrag das Stand-/Erscheinungsjahr (bei Webseiten: das Feld „Stand"/„Zuletzt aktualisiert", ersatzweise das Snapshot-Datum als „Stand laut Snapshot") ergänzen; bei der Fachserie zusätzlich Erscheinungsjahr und Berichtsjahrgang der verwendeten Ausgabe. |
+| 52 | **C** | **Stelle:** Bericht Kap. 2, Überschrift des Teils B Z. 197: „### Belege zu den entschiedenen Registerzeilen (§3.8, **Volltext geprüft am 13.09.2026**)" — gegen die Inhalte desselben Abschnitts: Archiv-Snapshots B1–B6, nachgetragen am 17.09.2026 (T-0307/T-0308), und B4 Quelle 5 Z. 342–348 („beides geprüft 17.09.2026"). · **Art: veraltete Angabe** (§5 LF 10 „veraltet"; §3.8 Zugriffsdatum). · **Begründung:** Die Überschrift datiert die Prüfung des gesamten Abschnitts auf den 13.09.2026. Tatsächlich ist ein Teil der Quellenarbeit vier Tage jünger; im Abschnitt selbst stehen Prüfvermerke vom 17.09.2026, und Kap. 8 führt für die Quellen 5 bis 7 den Zugriff 17.09.2026. Eine zusammenfassende Datumsangabe im Überschriftstext altert still, während die Einzelnachweise fortgeschrieben werden — derselbe Mechanismus wie bei Befund 42. Kategorie C: keine Zahl, kein Rechenweg betroffen, aber das ausgewiesene Prüfdatum ist die Angabe, an der ein Gegenprüfer die Aktualität misst. · **Vorschlag:** Die Überschrift auf „Volltext geprüft 13.09.2026, Quellen- und Snapshot-Stand 17.09.2026" ziehen (oder das Datum aus der Überschrift nehmen und je Beleg führen, wo es ohnehin steht) und die Angabe in den Lint aufnehmen, damit sie beim nächsten Nachtrag mitwandert. |
+| 53 | **B** | **Stelle:** Bericht Kap. 2 Teil B, B4 Z. 383–389 („die Arbeitsmappe schreibt über Mon. J65 → J64 den Zeitwertansatz vor. **Entschieden:** Der Neuwert bleibt Basiswert, die Abweichung von J64 steht als Antrag auf Fortschreibung in §7.2") und Kap. 8 Quelle 2 Z. 2342–2350 (Mappe mit Commit `68442ca12689…` und Prüfsumme, ohne Hinweis auf die anhängige Abweichung) · gegen `KWRA-Monetarisierung.xlsx`, Blatt „Abgleich-Protokoll": **keine** Zeile zu #60 (Spalten B und D über alle 152 Zeilen gemessen), während **Z151** (Punkt 52, Spalte F „Fortschreibung Bewertungslogik (keine Kante)") zeigt, wie eine beschlossene Fortschreibung dort geführt wird — dort für #95 mit Beschluss-, Umsetzungs- und Nachzugsdatum. · **Art: Lücke** (§5 LF 14 „Jede bewusste Fortschreibung in der Quelle nachgezogen und im Abgleich-Protokoll dokumentiert?"; §1/LF 14 und eiserne Regel 2 „bewusste Fortschreibungen gehören in die Quelle + Abgleich-Protokoll"; §6 führt Quellen-Synchronität als Abnahmekriterium). · **Begründung:** Der Bericht rechnet seinen Basiswert seit dem 17.09.2026 bewusst abweichend von der verbindlichen Vorgabe J65 → J64 (Zeitwertansatz). Die Entscheidung ist sauber begründet, beziffert und nicht geglättet — das ist der Teil, den Befund 41 verlangt hat und der geschlossen ist. Offen ist der zweite Halbsatz von LF 14: In der Quelle ist nichts nachgezogen. Das Abgleich-Protokoll kennt die passende Zeilenart und führt sie für #95 vor; für #60 fehlt sie, und Kapitel 8 nennt die Mappe als Quelle, ohne zu vermerken, dass der Bericht in einem verbindlichen Punkt von ihr abweicht und ein Antrag anhängig ist. Für jeden, der die Mappe als führende Quelle liest, ist die Abweichung damit unsichtbar; für #60 fehlt außerdem jede Angabe, bis wann und durch wen über den Antrag entschieden wird (§7.2 trägt nur „beantragt am 17.09.2026"). Abgrenzung: **kein** Wiederaufgreifen von Befund 41 (dort fehlten Band und Bezifferung — beides steht heute), sondern der in dessen Vorschlag ausdrücklich genannte, noch nicht erledigte Teil „Dann gehört sie in die Quelle mit Eintrag ins Abgleich-Protokoll (§1/LF 14)". · **Vorschlag:** (a) Im Blatt „Abgleich-Protokoll" durch den Eigner der Mappe eine Zeile nach dem Muster Z151 anlegen: Punkt-Nr. fortlaufend, Quelle-ID 60, Ziel J64/J65, Art „Fortschreibung Bewertungslogik (keine Kante)", Inhalt „Neuwert (NHK, indexiert) statt Zeitwertansatz für #60; Zeitwert als Sensitivitätsband f_AWM = 0,55 (0,40–0,75); beantragt 17.09.2026" — der Bericht selbst darf die Mappe nicht ändern (eiserne Regel 2). (b) Solange der Eintrag fehlt, in Kap. 8 beim Mappen-Eintrag und in B4 den Status des Antrags mit Datum, Entscheider und Frist führen, damit die Abweichung an der Quelle sichtbar ist. (c) Den Zustand in die Abnahme-Checkliste ziehen: §6 nennt Quellen-Synchronität ausdrücklich als Abnahmekriterium, die Abnahme von #60 ist bis zum Nachzug insoweit blockiert. |
+
+#### Abgrenzung und Status dieses Pakets
+
+- **Geändert wurde ausschließlich `reviews/BEFUNDE_60.md`.** `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, `docs/evidenz/register.md`, `backend/scripts/lint_methodik.py` und `backend/` sind unangetastet; die Arbeitsmappen wurden nur gelesen (eiserne Regel 2) — gemessen an den unveränderten Prüfsummen `2faac648aade047f…` und `4383882d3a935f09…` nach Abschluss der Prüfung.
+- **Kein Befund behoben, keiner umnummeriert.** Befund 48 (FS-Exposition in B2) und Befund 42 (Archiv-Snapshots) werden nur eingeordnet, nicht neu vergeben.
+- **Kopftabelle „Offene Befunde (19)" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete, festgelegt im Eröffnungspaket T-0359). Mit 47–49 aus T-0360 und 50–53 aus diesem Paket wären es 26 offene Zeilen; nachgezogen wird die Kopftabelle im Abschlusspaket der Runde 3.
+- **Nicht Gegenstand dieses Pakets:** die Leitfragen 1 bis 9 und 11 bis 13, die Registertabelle in Kapitel 2 Teil A, die Kapitel 1 und 3 bis 7 sowie 9 und die Regression der Befunde 1–46. Sie liegen bei den Geschwisterpaketen der Runde 3.
