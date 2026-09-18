@@ -2254,3 +2254,192 @@ mit eigenem Zitat auszuweisen.
 Nicht angefasst (Dateirahmen dieses Pakets): `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`,
 `docs/evidenz/register.md`, `backend/scripts/lint_methodik.py`, `backend/` und die Kopftabelle
 „Offene Befunde" am Kopf dieses Ledgers. Geändert wurde ausschließlich diese Datei.
+
+### Leitfragen 1 und 2
+
+Paket T-0360 der Runde 3 (18.09.2026), eigene frische Sitzung: Sie hat den geprüften Stand nicht
+geschrieben — Kapitel 1 und 2 stammen aus T-0235/T-0237 und den Revisionspaketen aus T-0281, alle
+im Endstatus (eiserne Regel 4). Das Bundle nach §1 lag ab dem ersten Turn vor (Abschnitt 0 dieser
+Runde, unverändert gültig); die Lint-Ausgabe aus Abschnitt 0.1 wird **übernommen, nicht neu
+erhoben** (§5, Schritt „zuerst die deterministischen Lints"). Maßstab sind ausschließlich §3 und §5
+der Aufgabe, nicht der Berichtstext. Nach §6 ist die volle Prüfung erneut zu fahren, weil seit
+Runde 2 Kalibrierung und Modellstruktur geändert wurden; dieses Paket trägt davon die Leitfragen
+**1** und **2**.
+
+**Prüfumfang dieses Pakets.** Vertieft geprüft sind Kapitel 1 „Wirkungskette & Knoten-Bilanz"
+(Z. 39–155) und Kapitel 2 **Teil A**, also der Abschnitt `## 2 Evidenz-Register (§2.2)` bis
+ausschließlich `### Belege zu den entschiedenen Registerzeilen` (Z. 156–196) — die Registertabelle
+mit ihren 32 Zeilen ohne die Langbelege B1–B6. Nachgemessen, nicht geschätzt:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();i1=s.index('## 1 Wirkungskette');i2=s.index('## 2 Evidenz-Register');i3=s.index('### Belege zu den entschiedenen');print(i2-i1,i3-i2,i3-i1)"
+16540 21581 38121
+```
+
+Kapitel 1 trifft die im Ticket genannten **16.540** Zeichen exakt; Kapitel 2 Teil A misst **21.581**
+statt der dort genannten 21.512 Zeichen (Summe 38.121 statt 38.052). Der geprüfte Textkörper ist
+derselbe — die Grenzen sind die beiden Überschriften, und zwischen ihnen liegt heute kein anderer
+Text; die Differenz von 69 Zeichen stammt aus der Schnittkante der Zählung im Ticket und wird hier
+als Messwert ausgewiesen, statt die Ticketzahl zu wiederholen. Die Langbelege B1–B6 (ab Z. 197)
+sind **nicht** Prüfgegenstand dieses Pakets; sie werden nur dort gelesen, wo eine Zeile des
+Prüfumfangs ausdrücklich auf sie verweist (B2 zu 60-S074-01, siehe Befund 48). Kapitel 3 bis 9
+werden nur als Gegenstelle zitiert, nicht geprüft. Ein nationaler 100-m-Vollraster-Lauf ist nach
+§3.4 nicht zulässig und wurde **nicht** gefahren: Alle Rechnungen laufen zellweise und auf
+Stichproben. Die Arbeitsmappen wurden ausschließlich gelesen (eiserne Regel 2); im Code wurde
+nichts geändert (eiserne Regel 5).
+
+#### LF 1 — Kette: alle Knoten verarbeitet oder begründet inaktiv? Eingänge, die nirgends rechnen?
+
+**Verdikt: Befund** (→ neue Befunde **47**, **48**, **49**; die Knotenmenge selbst ist vollständig
+und deckungsgleich mit der Arbeitsmappe).
+
+*Nachgerechnet statt gelesen — zellweiser Abgleich gegen
+`docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`.* Die Knotenmenge wurde nicht
+aus den Behauptungen des Berichts übernommen, sondern aus den Zellen der Arbeitsmappe aufgebaut:
+Blatt „Klimawirkungsketten", Zeile 272 (Knoten **W117** „Schäden an Gebäuden und Infrastrukturen",
+Zelle A272/B272) mit den vier Eingangsspalten **E272** (Einflüsse: `E10; E08; E17; E14; E02; E03`),
+**F272** (Sensitivitäten: `S092; S093; S094; S096; S097; S098; S104`), **G272** (räumlich:
+`R23; R24; R25`) und **H272** (Wirkungen: `W074; W077; W085; W087; W008; W006; W091; W100`) = 24
+Knoten; dazu die eine Ebene tiefer aufgenommenen Eingänge des Hochwasser-Knotens **W085** (Zeile
+208, A208/B208) aus **E208** (`E12; E07; E08`), **F208** (`S072; S073; S074`) und **G208**
+(`R17; R18; R19`) = 9 Knoten, davon E08 bereits in E272 enthalten. Vereinigung: **32** Knoten.
+H208 ist leer — W085 hat keine Wirkungs-Eingänge, die Ein-Ebenen-Expansion ist also vollständig.
+
+```
+$ python3 <<'EOF'   # Kern: Mappen-Knotenmenge aus E272/F272/G272/H272 + E208/F208/G208 gegen die Knoten-Bilanz
+… (Parser: inlineStr-Zellen aus xl/worksheets/sheet1.xml; Bilanz-Zeilen aus Kapitel 1) …
+EOF
+Mappe   KWK E272/F272/G272/H272 + E208/F208/G208 : 32 Knoten
+Bericht Knoten-Bilanz Kap. 1                     : 32 Zeilen
+nur in der Mappe : []
+nur im Bericht   : []
+verarbeitet        : 13 ['E07', 'E08', 'E12', 'R17', 'R24', 'S072', 'S073', 'S074', 'S092', 'S093', 'S094', 'S104', 'W085']
+begruendet inaktiv : 19 ['E02', 'E03', 'E10', 'E14', 'E17', 'R18', 'R19', 'R23', 'R25', 'S096', 'S097', 'S098', 'W006', 'W008', 'W074', 'W077', 'W087', 'W091', 'W100']
+nicht zugeordnet   : 0
+Zeilenzuordnung Bericht -> Mappe abweichend : []
+Name != Mappe (Spalte B) : [('W100', 'Einschränkungen Kanalnetze und Vorfluter (= Id 52)', 'Einschränkungen der Funktionsfähigkeit von Kanalnetzen und Vorflutern'), ('S092', 'Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer', 'Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer von Gebäuden und Infrastrukturen')]
+Registerzeilen mit Entscheidung 'offen' : 25
+  davon in Kap. 1 inaktiv      : ['E02', 'E03', 'E10', 'E14', 'E17', 'R18', 'R19', 'R23', 'R25', 'S096', 'S097', 'S098', 'W006', 'W008', 'W074', 'W077', 'W087', 'W091', 'W100']
+  davon in Kap. 1 verarbeitet  : ['E07', 'E08', 'E12', 'S072', 'S073', 'S104']
+```
+
+Die Ausgabe ist wörtlich die des Laufs in dieser Sitzung; im Block oben ist allein der Parser
+gekürzt (er liest die `inlineStr`-Zellen aus `xl/worksheets/sheet1.xml` der Arbeitsmappe, weil
+`openpyxl` in dieser Umgebung nicht installiert ist, und zerlegt die Tabellenzeilen von Kapitel 1
+und Kapitel 2 des Berichts). Die Zahlen darunter sind einzeln aus denselben Zellen nachvollziehbar
+und stehen in der folgenden Tabelle mit ihrem Zellbezug.
+
+**Zählung (mit Zellbezügen).**
+
+| Größe | Zahl | Zellbezug / Fundstelle |
+|---|---|---|
+| Knoten gesamt (Arbeitsmappe) | **32** | KWK **E272, F272, G272, H272** (24) ∪ **E208, F208, G208** (9, davon E08 Dublette) |
+| Zeilen der Knoten-Bilanz (Bericht) | **32** | Bericht Kap. 1, Tabelle nach „Entscheidungsstand (T-0235)", Z. 79–110 |
+| nicht zugeordnet (Mappe ohne Bilanzzeile) | **0** | Mengenvergleich oben, `nur in der Mappe : []` |
+| ohne Deckung in der Mappe (Bilanz ohne Mappenknoten) | **0** | `nur im Bericht : []` |
+| verarbeitet (Formelstelle oder Sensitivitätsband) | **13** | Bericht Z. 79–86 (W085, E12, E07, E08, S072, S073, S074, R17), Z. 101–103 (S092, S093, S094), Z. 107 (S104), Z. 108 (R24) |
+| begründet inaktiv (mit wörtlichem Zitat) | **19** | Bericht Z. 87–100 (R18, R19, E10, E17, E14, E02, E03, W074, W077, W087, W008, W006, W091, W100), Z. 104–106 (S096–S098, geparkt), Z. 109–110 (R23, R25) |
+| Zeilenverweis „KWK Zxxx" der Bilanz gegen Spalte A der Mappe | **32/32 richtig** | z. B. W085→**A208**, S074→**A199**, R17→**A204**, S092→**A256**, S104→**A268**, R24→**A270**, W100→**A223** |
+
+Damit ist der Mengenteil der Leitfrage **bestanden**: Kein Knoten der Arbeitsmappe fehlt, kein
+Knoten der Bilanz ist erfunden, keine Zeile steht ohne Eintrag in „rechnet in", und jeder
+Zeilenverweis trifft die Zelle, die er nennt. Der Befundteil liegt bei der zweiten Hälfte der
+Leitfrage — **Eingänge, die nirgends rechnen** — und bei der Spiegelung in Kapitel 2 Teil A.
+
+*(1) S104 steht als verarbeitet in der Bilanz, rechnet aber nirgends → Befund **47**.* Z. 107 führt
+S104 (KWK **A268/B268** „Investitionen der Bau- und Immobilienwirtschaft in exponierten Gebieten")
+mit **FS-Bestandsdynamik** in derselben Fettschreibung wie die tatsächlich rechnenden
+Formelstellen. Kapitel 6 sagt an der einzigen Stelle, die diese Formelstelle einlöst (Z. 1790–1798),
+das Gegenteil: Investitionen fließen „im heutigen Modellstand **nicht** als eigener Pfad ein", der
+Bestand wird konstant gehalten; die zugehörige Registerzeile 60-S104-01 (Z. 192) steht auf `offen`.
+Das ist derselbe Fehlertyp wie Befund 20 (FS-Schutzsystem) und Befund 46 (FS-Exposition), beide
+behoben, aber ein dritter, dort nicht erfasster Knoten.
+
+*(2) Formelstelle FS-Exposition ohne Knoten, mit widersprechendem Beleg → Befund **48**.* Die
+Präambel der Bilanz (Z. 69–74) führt FS-Exposition weiter als eine der sieben „benannten
+Formelstellen", „an die Kapitel 3 die Größe künftig bindet". Nach der Behebung von Befund 46 trägt
+sie keine Zeile mehr (Z. 85/86: „keine eigene Formelstelle; früher: FS-Exposition"), und in
+Kapitel 3 kommt sie kein einziges Mal vor. Der Langbeleg B2 (Z. 263–265) behauptet zusätzlich
+weiterhin: „S074 bleibt der Formelstelle FS-Exposition zugeordnet".
+
+*(3) Die Inaktiv-Entscheidung der Bilanz ist im Register nicht gespiegelt → Befund **49**.* §2.2 (d)
+verlangt für einen Ketten-Knoten ohne Evidenz eine Registerzeile mit Entscheidung „bewusst inaktiv"
+— „keine stillen Lücken"; zulässige Entscheidungen sind allein Basiswert / Maßnahmen-Hebel /
+Sensitivitätsband / bewusst inaktiv. Gemessen stehen **25** der 32 Registerzeilen auf `offen`,
+darunter alle **19** in Kapitel 1 begründet inaktiv geführten Knoten und **6** dort als verarbeitet
+geführte (E07, E08, E12, S072, S073, S104).
+
+*Regression, kein neuer Befund: Befund 21 (Knotennamen) besteht fort.* Der Namensabgleich gegen
+Spalte B der Mappe zeigt weiterhin verkürzte Namen ohne Kürzungszeichen: **B223** „Einschränkungen
+der Funktionsfähigkeit von Kanalnetzen und Vorflutern" gegen Bericht Z. 100 „Einschränkungen
+Kanalnetze und Vorfluter"; **B256** „… der Eigentümer und Nutzer von Gebäuden und Infrastrukturen"
+gegen Z. 101 „… der Eigentümer und Nutzer". Der dritte Fall aus Befund 21, **B199** „Topographie
+(Geländeform, Höhe, etc.)" gegen Z. 85 „Topographie (Geländeform, Höhe)", erscheint in der Ausgabe
+oben nicht, weil der Vergleich dort den Klammerzusatz abschneidet (der Bericht hängt an denselben
+Namen „(über W085)" an); er wurde zusätzlich von Hand an B199 geprüft und besteht ebenfalls fort.
+Befund 21 steht auf `bewusst offen` und wird hier **nicht** neu nummeriert.
+
+#### LF 2 — Verteilschlüssel-Test: Kommune ohne Treiber > 0 möglich?
+
+**Verdikt: bestanden** (für den Prüfumfang dieses Pakets: Kapitel 1 und Kapitel 2 Teil A).
+
+*Was geprüft wurde.* §3.1 verbietet, Bundes- oder Landesstatistik zur räumlichen Verteilung zu
+benutzen; der Lackmustest lautet: eine Kommune ohne lokalen Treiber muss ~0 erhalten. In Kapitel 1
+und Kapitel 2 Teil A stehen keine Formeln, wohl aber die Größen, aus denen die Formel komponiert
+wird — geprüft wurde deshalb zeilenweise, ob eine der 32 Registerzeilen einen nationalen Betrag
+kommunal verteilt oder additiv in den Zellwert eingeht.
+
+*Zeile für Zeile (alle sieben entschiedenen Zeilen; die 25 offenen tragen keinen Wert).*
+
+| Registerzeile | Fundstelle | Treiber lokal? | Wirkt wie? |
+|---|---|---|---|
+| 60-W085-01 (Basiswert, FS-Hazard) | Z. 164 | ja — p(HQ) und Wassertiefe je Zelle aus der HWGK; außerhalb der kartierten Gebiete „trifft die Karte keine Aussage" | multiplikativ (Fläche × Wahrscheinlichkeit) |
+| 60-R24-01 (Basiswert, FS-Mengengerüst) | Z. 193 | ja — Gebäudezahl und Wohnfläche je Zelle aus dem Zensus-2022-Gitter bzw. den Hausumringen; national ist allein der **Preis** (NHK 2010 × Baupreisindex), keine Verteilgröße | multiplikativ (Preis je m²) |
+| 60-S074-01 (Sensitivitätsband) | Z. 170 | — | multiplikatives Band ±12 %, kein eigener Faktor |
+| 60-R17-01 (Sensitivitätsband) | Z. 171 | — | **kein** Multiplikativglied; die nationale ZÜRS-Quote dient ausdrücklich nur als Abgleichsband nach §3.4 |
+| 60-S093-01 / 60-S094-01 (Bänder, abgeschätzt) | Z. 187/188 | — | geometrisch auf 1,00 zentriert, multiplikativ |
+| 60-S092-01 (Maßnahmen-Hebel) | Z. 186 | — | multiplikativ auf den Erwartungsschaden (1 − r) |
+
+Der einzige nationale Datenkörper im Prüfumfang ist damit die ZÜRS-Quote in 60-R17-01, und sie ist
+in derselben Zelle ausdrücklich aus dem Rechenweg herausgehalten. *Nachgerechnet statt gelesen:*
+Die Klassenanteile der Zeile sind in sich geschlossen — 92,4 + 6,1 + 1,1 + 0,4 = **100,0 %**;
+22,6 Mio × 7,6 % = **1.717.600** ≈ die im Bericht genannten 1,72 Mio (GK2–GK4), 22,6 Mio × 1,5 % =
+**339.000** (GK3+GK4), 22,6 Mio × 0,4 % = **90.400** — die Quote ist also eine vollständige
+Bundesaufteilung und wäre als Verteilschlüssel unmittelbar tauglich; genau das schließt die
+Entscheidungsspalte aus. Ebenso nachgerechnet für 60-R24-01: 13,5 + 2,7 + 3,5 = **19,7** Mio
+Wohngebäude, 4,1 Mrd m² ÷ 19,7 Mio = **208,1** m², 149,8 ÷ 89,1 = **1,6813**, 1.050 × 1,6813 ×
+1,105 = **1.950,7** €₂₀₂₆/m² BGF und 825 × 1,6813 × 1,105 = **1.532,7** €₂₀₂₆/m² BGF, Wertdichte ×
+1,30 = **1.992–2.536** €₂₀₂₆/m² Wohnfläche, Bestandswert 4,1 Mrd m² × Wertdichte = **8,17–10,4**
+Bio. €₂₀₂₆ — die Zeilenwerte reproduzieren sich (Abweichungen ≤ 1 in der letzten Stelle aus der
+Rundungsreihenfolge des Berichts). Alle Größen sind Preise und Bänder, keine Schlüssel.
+
+*Nullprobe.* Mit den Werten dieser Zeilen und einer Kommune, deren Zellen in allen drei Szenarien
+\(a_{z,s} = 0\) tragen, ergibt die Kette aus Menge × Rate × Preis exakt **0,0** €₂₀₂₆/a — auch mit
+beiden Bandenden von S093/S094 (0,71/0,84 wie 1,40/1,18) und nach dem Niveau-Skalar λ = 0,724, der
+multiplikativ wirkt; die Gegenprobe mit a = 15 m² liefert **2,99** €₂₀₂₆/a, die Null ist also nicht
+durch einen Rechenfehler erzwungen. Ein additiver Rest existiert in keiner der sieben Zeilen. Die
+Aussage deckt sich mit dem Lackmustest, den Runde 2 an Kapitel 3 selbst gerechnet hat (Abschnitt 1
+der Runde 2, LF 2).
+
+*Abgrenzung, damit das Verdikt nicht mehr behauptet, als es prüft:* Für die **25 offenen**
+Registerzeilen ist die Frage nicht entscheidbar — sie tragen keinen Wert und können den Test
+weder bestehen noch verletzen; sobald eine von ihnen eine Entscheidung bekommt, ist LF 2 für sie
+neu zu stellen. Das ist kein eigener Befund, sondern die Folge von Befund 49.
+
+#### Neue Befunde dieses Pakets (47–49)
+
+Das Ledger trug vor diesem Paket die Nummern 1 bis 46; die erste hier vergebene Nummer ist deshalb
+**47**. **Kein Befund wird in diesem Paket behoben** — die Einträge sind reine Gegenprüfung.
+
+| Nr | Kat. | Stelle · Art · Begründung · Vorschlag |
+|---|---|---|
+| 47 | **B** | **Stelle:** Bericht Kap. 1, Knoten-Bilanz Z. 107 (Knoten S104, KWK **A268/B268**), Spalte „rechnet in" = **FS-Bestandsdynamik**, gegen Kap. 6 Z. 1790–1798 und Registerzeile 60-S104-01 (Z. 192). · **Art: Widerspruch/Lücke** (§2.1 „jeder Knoten → rechnet in … bewusst inaktiv **mit Begründung**"; §5 LF 1 „Eingänge, die nirgends rechnen?"). · **Begründung:** Die Bilanz weist S104 als verarbeitet aus und nennt Kapitel 6 als Einlösestelle. Kapitel 6 sagt dort wörtlich, die Investitionen flössen „im heutigen Modellstand **nicht** als eigener Pfad ein"; der Bestand R24 werde für das Szenariojahr konstant gehalten. Die Registerzeile 60-S104-01 steht auf `offen`, trägt also auch keinen Wert, aus dem die Formelstelle rechnen könnte. Damit behauptet die Bilanz eine Verarbeitung, die das Modell nicht leistet — dieselbe Fehlerart wie bei den behobenen Befunden 20 (FS-Schutzsystem) und 46 (FS-Exposition), aber an einem dort nicht erfassten Knoten. Für einen Leser der Bilanz ist nicht erkennbar, dass die Bestandsdynamik im Ergebnis fehlt. · **Vorschlag:** S104 in der Bilanz als „**inaktiv (geparkt: FS-Bestandsdynamik ohne Term, 60-S104-01 offen)**" mit Zitat der Kap.-6-Stelle führen — analog zur heutigen Formulierung bei S096–S098 — und die Formelstelle erst dann wieder als aktiv ausweisen, wenn 60-S104-01 eine Entscheidung trägt. |
+| 48 | **C** | **Stelle:** Bericht Kap. 1, Präambel der Knoten-Bilanz Z. 69–74 („Benannte Formelstellen: … **FS-Exposition** (Wassertiefe am Gebäude) …"), gegen die Bilanzzeilen Z. 85/86 (S074, R17: „keine eigene Formelstelle; früher: FS-Exposition"), gegen Kapitel 3 (kein Vorkommen von FS-Exposition) und gegen Langbeleg B2 Z. 263–265 („S074 bleibt der Formelstelle FS-Exposition zugeordnet"). · **Art: Widerspruch** (Redaktionsrest der Behebung von Befund 46; §2.1, §5 LF 1). · **Begründung:** Nach der Revision bindet keine Zeile der Bilanz mehr an FS-Exposition, und im Modell kommt die Formelstelle nicht vor; die Präambel führt sie gleichwohl weiter als eine der sieben Stellen, „an die Kapitel 3 die Größe künftig bindet" (gemessen: fünf der sieben Formelstellen tragen Zeilen, FS-Exposition null, FS-Schutzsystem drei geparkte). Der Langbeleg B2 behauptet zusätzlich unverändert die Zuordnung, die die Bilanz und die Registerzeile 60-S074-01 ausdrücklich aufgehoben haben. Wer B2 zuerst liest, bekommt das Gegenteil der Bilanz. Kategorie C, weil kein Zahlenwert und keine Rechnung betroffen ist. · **Vorschlag:** FS-Exposition aus der Liste der benannten Formelstellen streichen (oder als „aufgehoben, Befund 46" kennzeichnen) und den Satz in B2 auf den Ist-Stand ziehen: S074 wirkt als Sensitivitätsband über die HWGK-Tiefe, nicht an einer eigenen Formelstelle. |
+| 49 | **B** | **Stelle:** Bericht Kap. 2 Teil A, Registertabelle Z. 165–195, Spalte „Entscheidung": 25 der 32 Zeilen tragen `offen` — Z. 165–169 (60-E12-01, 60-E07-01, 60-E08-01, 60-S072-01, 60-S073-01), Z. 172–185, Z. 189–192, Z. 194/195; gegen Kap. 1 Z. 87–110 (dieselben Knoten dort „inaktiv" **mit** Zitat) und gegen §2.2 (d). · **Art: Lücke/Widerspruch** (§2.2: zulässige Entscheidungen sind Basiswert / Maßnahmen-Hebel / Sensitivitätsband / bewusst inaktiv; §2.2 (d) „fehlt Evidenz für einen Ketten-Knoten, ist das eine Register-Zeile mit Entscheidung ‚bewusst inaktiv' — keine stillen Lücken"; §2.3 „ausschließlich aus Register-Zeilen komponiert"; §5 LF 1). · **Begründung:** `offen` ist keine der vier zulässigen Entscheidungen. Für die **19** Knoten, die Kapitel 1 begründet inaktiv führt (E02, E03, E10, E14, E17, R18, R19, R23, R25, S096, S097, S098, W006, W008, W074, W077, W087, W091, W100), existiert die Begründung bereits wörtlich in der Bilanz — sie ist nur nicht ins Register gezogen, wo §2.2 sie verlangt und wo sie risikoübergreifend wiederverwendbar wäre. Für die **6** Knoten, die Kapitel 1 als verarbeitet ausweist (E07, E08, E12, S072, S073 an FS-Hazard, S104 an FS-Bestandsdynamik), ist die Lücke schwerer: Das Modell darf nach §2.3 nur aus Registerzeilen komponiert werden, ihre Registerzeilen tragen aber keine Entscheidung. Abgrenzung: Befund 3 (A, behoben) betraf die Evidenzlage der rechnenden Zeilen („keine Zeile mit Entscheidung Basiswert") und ist mit den sieben entschiedenen Zeilen geschlossen; hier geht es um die **Spiegelung der Inaktiv-Entscheidung** aus Kapitel 1, die Befund 3 nicht erfasst. · **Vorschlag:** Die 19 Zeilen der in Kapitel 1 inaktiven Knoten auf Entscheidung „**bewusst inaktiv**" setzen und die Ein-Satz-Begründung samt Zitat aus der Bilanz übernehmen (Spalten Effektgröße/Studientyp/Quelle dürfen dabei „entfällt — kein Rechenpfad" tragen); für E07, E08, E12, S072, S073 die Entscheidung „bewusst inaktiv (im Hazard-Datensatz enthalten, Kein-Doppelkanal §3.2)" eintragen und S104 gemeinsam mit Befund 47 entscheiden. |
+
+#### Abgrenzung und Status dieses Pakets
+
+- **Geändert wurde ausschließlich `reviews/BEFUNDE_60.md`.** `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, `docs/evidenz/register.md`, `backend/scripts/lint_methodik.py` und `backend/` sind unangetastet; die Arbeitsmappen wurden nur gelesen (eiserne Regel 2).
+- **Kein Befund behoben, keiner umnummeriert.** Befund 21 (Knotennamen) wird nur als fortbestehend bestätigt und behält Nummer und Status `bewusst offen`.
+- **Kopftabelle „Offene Befunde (19)" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete, festgelegt im Eröffnungspaket T-0359). Sie trägt ihren Stand-Vermerk „nach der Autor-Revision der Runde 2" und zählt die Nummern 1–46; mit den Befunden 47–49 wäre sie bei 22 offenen Zeilen. Diese Zahl steht hier, damit die Lücke sichtbar ist und nicht still altert; nachgezogen wird die Kopftabelle im Abschlusspaket der Runde 3.
+- **Nicht Gegenstand dieses Pakets:** die Leitfragen 3 bis 14, die Langbelege B1–B6, die Kapitel 3 bis 9 und die Regression der Befunde 1–46. Sie liegen bei den Geschwisterpaketen der Runde 3.
