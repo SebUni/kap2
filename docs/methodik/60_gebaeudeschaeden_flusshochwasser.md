@@ -1350,20 +1350,39 @@ verlangt Ereignis- statt Jahreswerte; sie ist nicht publiziert (§4.1).
 
 ### 4.6 Sanity-Band der Bundessumme
 
+**Neufassung nach Befund 35 (Ledger-Schritt T-0333, 18.09.2026).** Die frühere Untergrenze
+\(U = A_{\text{ver}} \cdot w_{\text{wg}} \cdot \varphi_{\text{fluss}} \cdot \pi\) war ein
+Teilprodukt derselben Faktoren, aus denen \(\lambda M_0 \equiv A^{*} = U \cdot u\kappa\) gebildet
+wird; die Prüfung \(U \le \lambda M_0\) war damit für jedes \(u\kappa \ge 1\) trivial erfüllt und
+konnte nicht scheitern. Die Untergrenze ist deshalb hier durch einen von der Ankerseite
+unabhängigen Rechenweg ersetzt, die frühere Obergrenze durch eine klassengerechte Fassung.
+
 | Grenze | Wert | Herleitung |
 |---|---|---|
-| Untergrenze \(U\) | **0,639 Mrd. €₂₀₂₆/a** | 1,838 Mrd. € · 0,65 (Wohngebäude) · 0,50 (flussseitig) · 1,07 (Preisstand) — die im Mittel **tatsächlich gezahlten** Versicherungsleistungen für flussseitige Wohngebäudeschäden. Der gesamtwirtschaftliche Schaden kann nicht kleiner sein als die dafür gezahlten Leistungen, weil unversicherte Schäden zwingend hinzukommen (Hochrechnung \(u\) entfällt hier bewusst). |
-| Obergrenze \(O\) | **2,26 Mrd. €₂₀₂₆/a** | Bestandsschranke: 7,6 % von 22,6 Mio. Adressen = 1,72 Mio. exponierte Adressen (GK2–GK4, Register 60-R17-01) · 527.280 € = 0,91 Bio. € exponierter Bestandswert; multipliziert mit der **gedeckelten** Schadensquote 0,250 (§3.3) und einer mittleren Betroffenheit von 1/100 Jahren: 0,91 Bio. € · 0,250 · 0,01. Mehr kann selbst dann nicht entstehen, wenn jedes exponierte Gebäude im Hundertjahresrhythmus mit maximaler Quote getroffen wird. |
+| Untergrenze \(U\) | **0,0103 Mrd. €₂₀₂₆/a** | amtlicher Ereignis-Mindestschaden aus den Wiederaufbauhilfe-Gesetzen (`docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv`): das kleinere, vollständig feststehende Fondsvolumen 8 Mrd. € (2013, AufbhG § 4 Abs. 1 Satz 1), auf 2026 fortgeschrieben mit 2 %/a über 13 Jahre (\(1{,}02^{13} = 1{,}294\)) zu \(E_{\min,2026}\) = 8 · 1,294 = **10,35 Mrd. €₂₀₂₆**; davon der Wohngebäude-/Wohnanteil \(w\) = 1/3 · 1/3 ≈ 0,11 (**Abschätzung von KAP3**: der Gesetzestext beziffert weder den auf Privathaushalte noch den auf die Gebäudesubstanz entfallenden Anteil; angesetzt ist eine grobe Drittelung der Mittel auf die drei Fördergruppen private Haushalte, Infrastruktur und Wirtschaft/Landwirtschaft, und davon ein weiteres Drittel für die Gebäudesubstanz selbst, ohne Hausrat und Fahrzeuge) und der flussseitige Anteil \(f_{\text{fluss}}\) = 0,90 (**Abschätzung von KAP3**: beide geförderten Ereignisse — Elbe-/Donauhochwasser 2013, Ahrtal-Flut 2021 — sind dokumentierte Flusshochwasserereignisse; der Abschlag von 10 Prozentpunkten trägt nicht getrennt ausgewiesenen Siel- und Sturzflutanteilen innerhalb derselben Schadenssummen Rechnung), umgelegt auf eine Wiederkehrzeit \(T\) = 100 Jahre (**Abschätzung von KAP3**: beide Ereignisse gelten als Jahrhundertereignisse, keine eigene Quelle beziffert ihre Wiederkehrzeit): \(U = \dfrac{E_{\min,2026} \cdot w \cdot f_{\text{fluss}}}{T} = \dfrac{10{,}35 \cdot 0{,}11 \cdot 0{,}90}{100}\) = **0,0103 Mrd. €₂₀₂₆/a**. In dieses \(U\) geht keine der sechs Ankergrößen \(A_{\text{ver}}\), \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\) und \(\pi\) als Faktor ein — alle vier Eingangsgrößen stammen aus den Wiederaufbauhilfe-Gesetzen und aus eigenen, von den Ankerfaktoren unabhängigen Abschätzungen von KAP3. |
+| Obergrenze \(O\) | **6,29 Mrd. €₂₀₂₆/a** | klassengerechte Bestandsschranke aus Register 60-R17-01: 339.000 exponierte Adressen der Klassen GK3 und GK4 mit Jährlichkeit **0,1 a⁻¹** sowie 1.380.000 Adressen der Klasse GK2 mit Jährlichkeit **0,01 a⁻¹** (Register-Mengen und -Raten unverändert, keine abweichende Klassenrate angesetzt), mit dem Gebäudewert 527.280 €₂₀₂₆ je exponiertem Wohngebäude (Register 60-R24-01) und der gedeckelten Schadensquote 0,250 (§3.3): \(O = (339.000 \cdot 0{,}1 + 1.380.000 \cdot 0{,}01) \cdot 527.280 \cdot 0{,}250 = 47.700 \cdot 527.280 \cdot 0{,}250\) = **6,29 Mrd. €₂₀₂₆/a**. Mehr kann selbst dann nicht entstehen, wenn jedes exponierte Gebäude klassengerecht — GK3/GK4 alle zehn, GK2 alle hundert Jahre — mit maximaler Quote getroffen wird. |
 
-Beide Grenzen sind aus belegten Bestandszahlen abgeleitet, nicht gesetzt; abgeschätzt sind nur die
-in 4.2 ausgewiesenen Anteile \(w_{\text{wg}}\) und \(\varphi_{\text{fluss}}\) (Untergrenze) sowie
-die Betroffenheitsannahme 1/100 a (Obergrenze, Abschätzung von KAP3 — sie ist die Jährlichkeit des
-Bemessungsereignisses und damit die großzügigste noch sinnvolle Annahme).
+**Ausnahme vom Amtlichkeitsgebot (§3.4).** Bei \(U\) sind die beiden zugrunde liegenden
+Fondsvolumina amtlich (Bundesgesetze, BGBl.); nicht amtlich sind dagegen der Wohngebäude-/
+Wohnanteil, der flussseitige Anteil und die Umlage auf die Wiederkehrzeit — für sie existiert keine
+amtliche Statistik, die die Aufbauhilfe-Mittel zweier Einzelereignisse auf Wohngebäude, Flussanteil
+und Jährlichkeit herunterbricht, deshalb tritt an ihre Stelle eine ausgewiesene Abschätzung von
+KAP3. Bei \(O\) sind die Adresszahlen 339.000/1.380.000 aus der ZÜRS-Klassifikation und der
+Gebäudewert 527.280 €₂₀₂₆ Branchenstatistik des GDV bzw. eine Registerabschätzung, ebenfalls keine
+amtliche Statistik im engeren Sinn; die Ausnahme ist dieselbe wie an den übrigen Fundstellen des
+Berichts, an denen ZÜRS- und GDV-Zahlen bereits als Abschätzung von KAP3 statt als amtliche Quelle
+geführt werden (z. B. §4.1 für den GDV-Anker), weil für die bundesweite Betroffenheits- und
+Wertstruktur von Wohngebäuden keine amtliche Vollerhebung existiert und ZÜRS/GDV die einzigen
+verfügbaren, branchenweit einheitlichen Klassifikationen sind. Für beide Bandenden gilt dieselbe
+Ausnahmebegründung: Wo keine amtliche Statistik die gesuchte Aufteilung liefert, tritt eine
+ausgewiesene, nachvollziehbare Abschätzung von KAP3 an ihre Stelle, nicht eine stillschweigende
+Ersatzquelle.
 
-**Ist:** \(\lambda \cdot M_0\) = 0,832 · 1,360 = 1,132 Mrd. €₂₀₂₆/a liegt innerhalb von
-[0,64; 2,26]. Das Band ist
-zugleich die Vorlage für den Sanity-Band-Test der Integration: Eine Bundessumme außerhalb dieser
-Grenzen ist ein roter Test, kein Hinweis.
+**Ist:** \(\lambda \cdot M_0\) = 0,832 · 1,360 = **1,132 Mrd. €₂₀₂₆/a** (derselbe Wert wie in §4.4)
+liegt innerhalb von [0,0103; 6,29] Mrd. €₂₀₂₆/a — anders als bei der abgelösten, zirkulären
+Untergrenze ist diese Lage jetzt eine echte, aus unabhängigen Zahlen folgende Aussage statt einer
+Tautologie. Das Band ist zugleich die Vorlage für den Sanity-Band-Test der Integration: Eine
+Bundessumme außerhalb dieser Grenzen ist ein roter Test, kein Hinweis.
 
 ### 4.7 Kalibrierjahre und Doppelzählungs-Wächter (Bindung von §5.1)
 
@@ -1541,10 +1560,14 @@ assert abs(toleranz - 11.5) < 5e-2
 abstand = abs(anker - anteil) * 100
 assert abs(abstand - 13.88) < 5e-2 and abstand > toleranz
 
-# 4.6 Sanity-Band und Lage der kalibrierten Bundessumme
-U = A_ver * w_wg * phi * pi
-O = 0.076 * 22.6e6 * wert_geb * 0.250 * 0.01 / 1e9
-assert abs(U - 0.639) < 5e-3 and abs(O - 2.264) < 5e-3
+# 4.6 Sanity-Band und Lage der kalibrierten Bundessumme (Befund 35, ankerunabhaengiges U)
+E_nom, faktor_2026 = 8.0, 1.02 ** 13
+E_min_2026 = E_nom * faktor_2026
+w_u, f_fluss, T_u = (1 / 3) * (1 / 3), 0.90, 100
+U = E_min_2026 * w_u * f_fluss / T_u
+n_gk34, n_gk2 = 339_000 * 0.1, 1_380_000 * 0.01
+O = (n_gk34 + n_gk2) * wert_geb * 0.250 / 1e9
+assert abs(U - 0.0103) < 2e-3 and abs(O - 6.29) < 5e-2
 assert U <= lam * M0 <= O
 ```
 
