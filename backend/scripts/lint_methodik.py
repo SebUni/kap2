@@ -255,6 +255,42 @@ def parameter_bloecke(src: str, lint: Lint) -> tuple[dict[str, str], set[float]]
     return werte, baender
 
 
+# Pflichtkapitel-Substanzschwelle (Befund 17 zu #60, T-0234): 83 grüne Checks bei
+# drei Zeichen Substanz in Kapitel 3, 4 und 6 zeigten, dass der Lint Kommentare
+# nicht sieht und die Pflichtkapitel nie auf Fuellung prueft. Kapitel 3 traegt die
+# Schicht-B-Kernformel — die Stelle, an der der Euro-Betrag entsteht; ein Lint, der
+# dort bei leerem Kern gruen meldet, erzeugt Zutrauen, das nichts traegt.
+PFLICHTKAPITEL_MIN_ZEICHEN = 500
+
+
+def pflichtkapitel_gefuellt(src: str, lint: Lint) -> None:
+    """Kapitel 1–9 des §4-Templates auf tatsaechliche Substanz pruefen.
+
+    Gezaehlt wird je Kapitel die Zahl der Zeichen AUSSERHALB von HTML-Kommentaren
+    (`<!-- ... -->`) und ausserhalb der Kapitelueberschrift selbst — reiner
+    Kommentartext (etwa ein abgeloester Entwurf) traegt damit kein Kapitel.
+    Kapitel unter der Schwelle gelten als leer und erzeugen einen roten Check mit
+    Kapitelnummer, Kapitelname und gezaehlter Zeichenzahl; Kapitel 9 ist nach §4
+    nur beim ersten Vertreter einer Methodik-Familie Pflicht und wird uebersprungen,
+    wenn es im Bericht fehlt.
+    """
+    for n in range(1, 10):
+        m = re.search(rf"^## {n} (.+?)\n(.*?)(?=^## \d+ |\Z)", src, re.S | re.M)
+        if not m:
+            if n == 9:
+                continue  # §4: Kapitel 9 nur beim ersten Familien-Vertreter Pflicht.
+            lint.fehler.append(f"Pflichtkapitel {n}: Überschrift nicht gefunden")
+            continue
+        name = m.group(1).strip()
+        rumpf = re.sub(r"<!--.*?-->", "", m.group(2), flags=re.S)
+        substanz = len(rumpf.strip())
+        lint.pruefe(
+            substanz >= PFLICHTKAPITEL_MIN_ZEICHEN,
+            f"Pflichtkapitel {n} ({name}) gefüllt",
+            f"{substanz} Zeichen Substanz außerhalb von HTML-Kommentaren — "
+            f"unter der Schwelle von {PFLICHTKAPITEL_MIN_ZEICHEN}")
+
+
 def registry_abgleich(nr: str, werte: dict[str, str], lint: Lint) -> None:
     """Bericht ⇄ Registry (Eiserne Regel 5)."""
     try:
@@ -847,6 +883,7 @@ def pruefe_bericht(pfad: str) -> bool:
     UNTERDRUECKT.clear()
     MARKER_ZAEHLER.clear()
     beispiel_bloecke(src, lint)
+    pflichtkapitel_gefuellt(src, lint)
     zeichentabelle(src, lint)
     verbotene_formulierungen(src, lint)
     werte, baender = parameter_bloecke(src, lint)
