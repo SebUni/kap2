@@ -263,3 +263,58 @@ docs/MODELL_KRITIK.md
 
 Kein Pfad wurde als `No such file` gemeldet; alle sechs zitierten Belegpfade der Zeilen 21–25
 existieren im Produkt-Repo.
+
+## Zusammenfassung
+
+Die Tabelle umfasst alle 25 Anforderungszeilen. Ausgezählt nach Status: 6 Zeilen `erfüllt`,
+14 Zeilen `teilweise` und 5 Zeilen `offen`; 6 + 14 + 5 = 25 entspricht der Gesamtzahl der
+Anforderungszeilen.
+
+Zähllauf über die Datei (`grep -c`, wörtliche Ausgabe):
+
+```
+$ grep -c '| erfüllt |' docs/KONFORMITAET_CHECKLISTE.md
+6
+$ grep -c '| teilweise |' docs/KONFORMITAET_CHECKLISTE.md
+14
+$ grep -c '| offen |' docs/KONFORMITAET_CHECKLISTE.md
+5
+$ grep -c '^| [0-9]' docs/KONFORMITAET_CHECKLISTE.md
+25
+```
+
+Gegenprüflauf sämtlicher Belegpfade aller Zeilen mit Status `erfüllt` oder `teilweise`
+(12 verschiedene Pfade insgesamt, aus 20 Zeilen mit teils wiederkehrenden Pfaden; `ls -d`
+je Pfad):
+
+```
+$ ls -d docs/methodik/95_hitzebelastung.md
+docs/methodik/95_hitzebelastung.md
+$ ls -d docs/methodik/61_vegetation_in_siedlungen.md
+docs/methodik/61_vegetation_in_siedlungen.md
+$ ls -d docs/evidenz/register.md
+docs/evidenz/register.md
+$ ls -d docs/methodik/60_gebaeudeschaeden_flusshochwasser.md
+docs/methodik/60_gebaeudeschaeden_flusshochwasser.md
+$ ls -d frontend/src/pages/roadmap/roadmapData.ts
+frontend/src/pages/roadmap/roadmapData.ts
+$ ls -d docs/KATALOG_KRITIK.md
+docs/KATALOG_KRITIK.md
+$ ls -d frontend/src/components/ParameterTable.tsx
+frontend/src/components/ParameterTable.tsx
+$ ls -d backend/app/data/catalog.py
+backend/app/data/catalog.py
+$ ls -d frontend/src/components/MeasuresTableTab.tsx
+frontend/src/components/MeasuresTableTab.tsx
+$ ls -d backend/app/services/cost_projection_service.py
+backend/app/services/cost_projection_service.py
+$ ls -d frontend/src/components/dashboard/CostTimelineSection.tsx
+frontend/src/components/dashboard/CostTimelineSection.tsx
+$ ls -d docs/MODELL_KRITIK.md
+docs/MODELL_KRITIK.md
+```
+
+Kein Pfad wurde als `No such file` gemeldet; alle Belegpfade aller Zeilen mit Status `erfüllt`
+oder `teilweise` existieren im Produkt-Repo. Die Checkliste ist damit für alle 25 Zeilen
+vollständig erfasst und die zitierten Belegpfade sind gegengeprüft; keine Lücke wurde behoben,
+kein Produktcode wurde angefasst — das war nicht Aufgabe dieses Pakets.
