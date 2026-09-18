@@ -2930,7 +2930,7 @@ ausgewiesenen Wert 0,832: **Abweichung +0,042 %**. Gegenprobe mit ungerundeten E
 identisch mit dem in §4.1a Z. 1037–1038 ausgewiesenen 0,615865); \(M_0\) aus seinen Eingängen
 (§4.3 Z. 1157) = 0,872 · 527.280 € · (339.000 · 0,0059796/a + 1.380.000 · 0,00067515/a) =
 0,872 · 527.280 € · 2.958,7914/a = 1.360.417.254 €₂₀₂₆/a = 1,360417 Mrd.; daraus \(\lambda\) =
-1,1319603295 / 1,360417254 = 0,8323237717 → **0,832**, **Abweichung +0,039 %**. Auch die
+1,1319603295 / 1,360417254 = 0,8320684896 → **0,832**, **Abweichung +0,008 %**. Auch die
 Klassenbeiträge stimmen (GK3+GK4 0,9320 gegen ausgewiesene 0,932 Mrd.; GK2 428,39 gegen
 ausgewiesene 428 Mio.). Der produktive Skalar ist damit korrekt gerechnet; **dieser Teil ist
 bestanden**, und der Befund liegt nicht am Zentralwert.
