@@ -10,6 +10,13 @@ Du legst den Erstaufschlag eines Methodik-Berichts an. Verbindliche Instruktions
 @docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md — lies sie zuerst vollständig, insbesondere §2
 (Aufgabe je Klimawirkung), §3 (Anforderungskatalog) und §4 (Berichtsstruktur-Template).
 
+## Rolle und Auftrag
+
+Ausführende Rolle ist der `methodik_consultant`; Auftraggeber ist der `methodik_manager`,
+der das Risiko zugeteilt hat. Die Liste der offenen menschlichen Entscheidungen aus dem Ergebnis geht an den `methodik_manager`, nicht an einen Nutzer.
+Wer welchen Schritt verantwortet, steht im Abschnitt „Rollen im Loop“ in
+`.claude/methodik-loop.md`.
+
 ## Schritte
 
 1. **Arbeitsmappen einlesen** (per Python/openpyxl, `read_only=True`):
