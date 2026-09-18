@@ -1958,3 +1958,21 @@ Nicht angefasst (Dateirahmen): `docs/methodik/60_gebaeudeschaeden_flusshochwasse
 `docs/evidenz/register.md`, `backend/scripts/lint_methodik.py`, `backend/`, die Stichprobendateien
 unter `docs/evidenz/60_stichprobe/` (gelesen, nicht verändert) und die Kopftabelle „Offene Befunde"
 dieses Ledgers.
+
+**18.09.2026 · T-0326** (Befund 36 an 60, Schritt 5 von 5; letzter Schritt der Ersatzkette für
+T-0293. Schritt L1 aus `.claude/methodik-loop.md`, Autor-Revision — keine Gegenprüfung, kein
+`/risiko-fortsetzen`, kein L4 nach eiserner Regel 4; die Gegenprüfung fährt T-0246 in eigener
+Sitzung. Geändert wird ausschließlich dieses Ledger; der Bericht
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` wird in diesem Paket nur gelesen, nicht
+verändert — der Rechenweg steht bereits im Block **18.09.2026 · T-0322** oben (Punkte (a) bis (e)),
+der Nachzug in den Bericht ist in den Zwischenschritten der Kette bereits vollzogen.)
+
+| Nr | Kat. | Vorgenommene Änderung | Prüfausdruck | Status danach |
+|---|---|---|---|---|
+| 36 | B | **Nachzug des Rechenwegs aus T-0322 im Bericht bestätigt und Statuszeile geschlossen.** Das M₀-Band **0,657–2,643** Mrd. €₂₀₂₆/a steht in **§4.3** (Abschnitt „Modellsumme vor Kalibrierung"). Das aus dem A*-Band 0,297–2,263 (§4.2) und dem M₀-Band 0,657–2,643 (§4.3) vollständig fortgepflanzte λ-Band **0,11–3,44** steht in **§4.4** (Abschnitt „Der Niveau-Skalar", Kopfformel). Die Herleitung der Plausibilitätsschranke aus genau diesem fortgepflanzten Band — statt der bisherigen freihändig gesetzten Abschätzung „Faktor 2 um den Neutralwert 1" — steht ebenfalls in **§4.4** (Absatz „Plausibilitätsschranke", Rundungsregel zwei Nachkommastellen kaufmännisch, Entscheidungsregel unverändert). Die Führung der Schranke **[0,11; 3,44]** in der Parametertabelle steht in **§4.8** (Zeile „Plausibilitätsschranke λ", Wert „0,11 bzw. 3,44", Quellspalte „berechnet aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\)"). Der nachgezogene Produkt-Block `flood_bldg.lambda` steht in **Kap. 7**: `band: [0.11, 3.44]`, `herkunft: herleitung:§4.4`, `herleitung_anker: "#niveau-skalar"`. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('0,657–2,643','0,11–3,44','[0,11; 3,44]','0,11 bzw. 3,44','[0.11, 3.44]','0,297–2,263')) else 1)"` und `python3 backend/scripts/lint_methodik.py 60` | **behoben** — M₀-Band 0,657–2,643 (§4.3), das daraus und aus dem A*-Band fortgepflanzte λ-Band 0,11–3,44 samt hergeleiteter Plausibilitätsschranke (§4.4) und deren Führung in der Parametertabelle [0,11; 3,44] (§4.8) sind im Bericht durchgängig; der Produkt-Block `flood_bldg.lambda` (Kap. 7) trägt `band: [0.11, 3.44]` nach. Damit ist Befund 36 vollständig geschlossen. |
+
+Nicht angefasst (Dateirahmen): `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (nur
+gelesen), `docs/evidenz/register.md`, `backend/scripts/lint_methodik.py`, `backend/`, die
+Stichprobendateien unter `docs/evidenz/60_stichprobe/` und die Kopftabelle „Offene Befunde" am Kopf
+dieses Ledgers (schreibt allein T-0296 fort, Vorgabe aus dem Vorhaben T-0281, Punkt 2). Der alte
+Eintrag zu Befund 36 in der Runde-2-Tabelle (Status „offen — Rest: …") bleibt als Historie stehen.
