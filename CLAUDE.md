@@ -52,8 +52,16 @@ abgenommenen Bericht wird als **bewusste Überstimmung im Befund-Ledger** gefüh
   Bandbreite, Sensitivität) und im Produkt klar als Abschätzung ausgewiesen. Bauform-Grenzen werden
   als Modellgrenze der Abschätzung dokumentiert. (Aufgabe §3.5; betrifft zuerst #96 S158
   Pollen-Frühwarnung.)
+- **P3 — Erklärbarkeit der Methodik.** (Anweisung des Aufsichtsrats A-0034, 13.09.2026.) Die
+  Methodik schafft den Spagat zwischen rechnerisch korrekter Abschätzung und Erklärbarkeit
+  gegenüber einem Berater eines Beratungshauses oder einem Sachbearbeiter einer Kommune —
+  fachkundig, aber ohne Statistikausbildung. Zu komplexe Verteilungsfunktionen und nicht lesbare
+  Formeln sind ein Befund; die Belastbarkeit der Ergebnisse darf dabei nicht sinken. Geraten beide
+  in Konflikt, werden beide Formen im Bericht ausgewiesen und die Wahl begründet — still
+  vereinfacht wird nie. Prüfpunkte E1–E4 und Adressatendefinition: Aufgabe §8; geprüft über
+  Leitfrage 11 (Aufgabe §5, `/review-methodik`).
 
-Prüfer prüfen Produkt-Tickets auch gegen P1 und P2.
+Prüfer prüfen Produkt-Tickets auch gegen P1, P2 und P3.
 
 ## Workflow-Commands
 

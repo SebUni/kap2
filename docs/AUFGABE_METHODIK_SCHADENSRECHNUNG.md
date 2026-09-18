@@ -32,7 +32,16 @@ Risiko-Methodiken.
 > `/risiko-fortsetzen` als bewusste Überstimmung im Ledger fortgeschrieben.
 > (5) §3.6 — die nutzersichtbare Parameterliste trägt je Parameter entweder die Quelle oder den
 > Vermerk „Abschätzung von KAP3“ samt Herleitung; eine Herleitung, die nur als Code-Kommentar
-> existiert, erfüllt die Pflicht nicht. v2 konsolidiert die Aufgabenbeschreibung v1 (22.08.2026) und
+> existiert, erfüllt die Pflicht nicht.
+>
+> **Fortschreibung 13.09.2026 (Anweisung des Aufsichtsrats A-0034; Vorgabe P3 in `CLAUDE.md`):**
+> (6) neuer **§8 Erklärbarkeit** — die Methodik muss den Spagat zwischen rechnerisch korrekter
+> Abschätzung und Nachvollziehbarkeit für Berater und kommunale Sachbearbeiter schaffen. Zu
+> komplexe Verteilungsfunktionen und nicht lesbare Formeln sind ein Befund; die Belastbarkeit der
+> Ergebnisse darf dabei nicht sinken. Geprüft wird über die Prüfpunkte E1–E4 (§8) im Rahmen von
+> Leitfrage 11 (§5).
+>
+> v2 konsolidiert die Aufgabenbeschreibung v1 (22.08.2026) und
 `docs/METHODIK_GRUNDSAETZE.md` (G1–G14) **inklusive der Review-Fortschreibungen aus der
 M0-Gegenprüfung** (Kalibrierfaktor-Regel ex G1/G5, G14-Geltungsbereich, G11-Begründung).
 `METHODIK_GRUNDSAETZE.md` entfällt; die Datei bleibt nur als Ein-Zeilen-Verweis hierher bestehen.
@@ -434,7 +443,11 @@ beantworten (nicht „nichts weiter gefunden", sondern je Frage: bestanden/Befun
    Ist-Ergebnis, out-of-sample?
 9. **Kostensätze:** Preisstand einheitlich, Quellen, VSL/VOLY-Konsistenz, Konto-Zuordnung?
 10. **Quellen:** fehlend, veraltet, falsch zugeordnet, unverifiziert; Zahlen ≠ Primärquelle?
-11. **Form:** Zeichentabellen vollständig; Beispiele rechnen auf (Golden-Tests grün)?
+11. **Form und Erklärbarkeit:** Zeichentabellen vollständig; Beispiele rechnen auf (Golden-Tests
+    grün)? **Prüfpunkte E1–E4 aus §8 einzeln mit ja/nein und Fundstelle** — insbesondere E3:
+    jede Verteilungsfunktion oder Formel, die der Adressat nicht nachvollziehen kann, trägt
+    Näherung mit Fehler, Rechenbeispiel oder Unvermeidbarkeits-Begründung; still vereinfacht
+    (Belastbarkeit gesenkt, ohne beides auszuweisen) = Befund.
 12. **Umsetzbarkeit:** Daten offen/keyless; Parameter-Blöcke vollständig; Architektur-vereinbar;
     benötigte neue Ebenen als solche gekennzeichnet (inkl. Struktur-Ebenen wie u18)?
 13. **Herleitungspflicht:** ein einziges Formelzeichen ohne abgeschlossene Herleitung = Befund.
@@ -516,6 +529,54 @@ Befunde ab):
 Familien-Prototyp „K1-Gesundheit bottom-up" — die Migration erzeugt Lints, Registry-Extraktion
 und die ersten Golden-Tests als Nebenprodukt), (2) Lints + Commands bauen, (3) erst dann das
 nächste Risiko — ab dann kostet ein Familien-Folgerisiko einen Bruchteil des M0-Aufwands.
+
+---
+
+## 8. Erklärbarkeit
+
+**Vorgabe P3 — Erklärbarkeit der Methodik.** Herkunft: **Anweisung des Aufsichtsrats A-0034 vom
+13.09.2026** (Firmen-Repo `firma`, `gedaechtnis/aufsichtsrat/regeln.jsonl`). Sie geht den
+Methodik-Regeln vor; ein Widerspruch zu einer bestehenden Regel oder einem abgenommenen Bericht
+wird als **bewusste Überstimmung im Befund-Ledger** geführt (`/risiko-fortsetzen <nr>`), nie still
+im Code gelöst und nie als Grund, die Vorgabe nicht umzusetzen. (Aufgabe §2.7, §3.6, §3.9; Prüfung
+über Leitfrage 11 in §5.)
+
+**Adressat.** Ein Berater eines Beratungshauses, das Klimaanpassungskonzepte schreibt, oder ein
+Sachbearbeiter einer Kommune: fachkundig in Sache und Verwaltung, aber ohne Statistikausbildung —
+er muss den Rechenweg und jede verwendete Formel ohne Statistiklehrbuch nachvollziehen und
+gegenüber Dritten vertreten können.
+
+**Prüfpunkte (E1–E4).** Jeder ist mit ja oder nein zu beantworten und benennt seine Fundstelle im
+Bericht; ein „nein" ist ein Befund nach §5 (Kategorie B, sofern nicht zugleich ein A-Kriterium
+verletzt ist).
+
+- **E1 — Rechenweg in Worten.** Beschreibt Abschnitt 3 (Modell) den Weg vom Eingang bis zum
+  Euro-Betrag in höchstens fünf Sätzen Fließtext ohne Formelzeichen? *Fundstelle: Bericht
+  Abschnitt 3, einleitender Absatz.*
+- **E2 — Rechenbeispiel mit Zahlen.** Trägt jede Hauptformel ein Beispiel mit eingesetzten Zahlen
+  und allen Zwischenwerten (ausführbarer Beispiel-Block nach §4)? *Fundstelle: Beispiel-Blöcke in
+  Bericht Abschnitt 3.*
+- **E3 — Verteilungsfunktionen und Formelsatz.** Wird eine **Verteilungsfunktion** (z. B.
+  Extremwert-, Log-Normal- oder Poisson-Annahme, Faltung, Integral, Quantilfunktion) oder eine
+  **Formel** verwendet, die der Adressat nach der Definition oben nicht nachvollziehen kann? Wenn
+  ja: steht an derselben Stelle genau eine der drei zulässigen Antworten — (a) eine **geschlossene
+  Näherung mit ausgewiesenem Fehler** gegenüber der exakten Form (Abweichung beziffert, Gültigkeits-
+  bereich genannt), (b) ein **Rechenbeispiel mit Zahlen**, das die Funktion an konkreten Werten
+  vorführt, oder (c) eine **Begründung, warum die komplexere Form unvermeidbar ist**, samt Angabe,
+  was eine Vereinfachung an Belastbarkeit kosten würde? Fehlt alle drei, ist das ein Befund.
+  *Fundstelle: Bericht Abschnitt 3 an der betreffenden Formel, ggf. Abschnitt 6 (Modellgrenzen).*
+- **E4 — Zeichen und Begriffe.** Hat jedes Formelzeichen in der Zeichentabelle eine Bedeutung in
+  Klartext samt Einheit, und ist jeder statistische Fachbegriff bei erster Verwendung in einem Satz
+  erklärt (z. B. Odds Ratio, Zentrierung, out-of-sample)? *Fundstelle: Zeichentabellen in Abschnitt
+  3, Parameter-Blöcke in Abschnitt 7.*
+
+**Belastbarkeit hat Vorrang vor Bequemlichkeit.** Die Erklärbarkeit darf die Belastbarkeit des
+Ergebnisses nicht senken. Erklärbarkeit ist keine Erlaubnis, ungenau zu rechnen: eine
+Verteilungsannahme, ein Modifikator oder eine Kalibrierstufe wird nicht weggelassen, weil sie
+schwer zu erklären ist. **Geraten Erklärbarkeit und Belastbarkeit in Konflikt, wird beides im
+Bericht ausgewiesen** — die einfache und die belastbare Form, mit der Differenz im Ergebnis — und
+die getroffene Wahl wird begründet (Abschnitt 6, Modellgrenzen). **Still zu vereinfachen ist
+unzulässig** und im Review ein Befund, genauso wie eine unerklärt stehengelassene Formel.
 
 ---
 
