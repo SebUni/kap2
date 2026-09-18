@@ -53,6 +53,32 @@ angewendete Regel wird im Entscheidungslog mit ihrer Nummer zitiert.
   9 von 17 als „übernommen" geführten Befunden nicht umgesetzt; das ist über vier Runden
   unbemerkt geblieben, weil zwischen Behauptung und Status keine Maschine stand.
 
+## Rollen im Loop — wer welchen Schritt verantwortet
+
+Die Schrittnummern L1–L7 bleiben unverändert; diese Landkarte sagt nur, **wer** sie ausführt.
+`/risiko-auto` und `/risiko-fortsetzen` erben sie über ihren Verweis auf diese Datei.
+
+| Schritt | Rolle | Sitzung |
+| --- | --- | --- |
+| L1 · Revision | `methodik_consultant` | Autor-Sitzung des Consultant (dieselbe Sitzung wie der Lauf) |
+| L2 · Code-Nachzug | `methodik_consultant` | Autor-Sitzung des Consultant |
+| L3 · Lints und Tests | `methodik_consultant` | Autor-Sitzung des Consultant |
+| L4 · Unabhängiger Review | `methodik_consultant` | beauftragt den Subagenten `methodik-reviewer` in frischem Kontext; dieser führt die §5-Gegenprüfung durch |
+| L5 · Loop-Steuerung | `methodik_consultant` | Autor-Sitzung des Consultant |
+| L6 · Export | `methodik_consultant` | Autor-Sitzung des Consultant |
+| L7 · Statusbericht | `methodik_consultant` | Consultant schreibt ihn; gelesen und bewertet wird er vom `methodik_manager` in einer eigenen Sitzung |
+
+Der Manager-Review ist der Gegenprüfung nach §5 nachgelagert und ersetzt sie nicht.
+Nach L7 läuft `/manager-review <nr>` in einer eigenen Sitzung; ohne dessen Zeile `MANAGER-REVIEW: ABGENOMMEN` gilt ein Bericht der Rollenkette nicht als abgenommen.
+Nacharbeitspunkte des Managers gehen als Anlass in `/risiko-fortsetzen <nr>`, nie direkt ins Ledger.
+
+Der `cmo` zieht keinen Loop-Schritt an sich: Er verantwortet berichtsübergreifend, dass die
+Methodik insgesamt konsistent, widerspruchsfrei und für Beratungshäuser und Kommunen verständlich
+ist, und wird erst nach der Abnahme durch den `methodik_manager` tätig — in einer eigenen,
+berichtsübergreifenden Sitzung.
+
+Für Berichte ohne Auftragsvermerk der Rollenkette — der Altbestand einschließlich Risiko 60 — ändert sich am Ablauf nichts (F-0038).
+
 ## L1 · Revision (Bericht ist die Quelle)
 
 Alle offenen A- und B-Befunde beheben, C-Befunde gleich mit. Betroffene Kopplungen nach W6
