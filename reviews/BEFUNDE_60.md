@@ -3433,3 +3433,117 @@ Tabellen-Nummernspalten und alle „Befund <n>"-Nennungen), neu vergeben sind de
   nur die Faktoren und Bandenden der genannten Rechenschritte.
 - **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
   T-0359).
+
+### Leitfrage 4
+
+Paket T-0375 der Runde 3 (18.09.2026, zweite Hälfte des ersetzten T-0364), eigene frische Sitzung:
+Sie hat den geprüften Stand nicht geschrieben (eiserne Regel 4; geschrieben haben T-0235 bis
+T-0243, T-0256 bis T-0259 und die Revisionspakete aus T-0281, alle im Endstatus). Das Bundle nach
+§1 lag ab dem ersten Turn vor (Abschnitt 0 dieser Runde); die Lint-Ausgabe aus Abschnitt 0.1 wird
+**übernommen, nicht neu erhoben** (§5). Maßstab sind ausschließlich §3 und §5 der Aufgabe, nicht
+der Berichtstext; nach §6 läuft die volle Prüfung erneut, weil Kalibrierung und Modellstruktur seit
+Runde 2 geändert wurden. Dieses Paket trägt davon **Leitfrage 4** („Doppelzählung: Zwei Kanäle?
+Zwei Konten? Maßnahmeneffekt schon im Basiswert? Referenzwerte doppeln Baseline-Anteile
+(HD_ref-Klasse)?", Aufgabe §5, Z. 434–435).
+
+**Prüfumfang.** Vertieft geprüft sind genau **4.7 „Kalibrierjahre und Doppelzählungs-Wächter
+(Bindung von §5.1)"** (Bericht Z. 1387–1456) und **Kapitel 9 „Ansatz-Vergleich"** mit „Die drei
+verglichenen Ansätze" (Z. 2434–2452), „Kriterienraster" (Z. 2454–2464) und „Umsetzungsgrundlage"
+(Z. 2466–2500). Umfang in dieser Sitzung gemessen, ohne HTML-Kommentare:
+
+```
+$ python3 - <<'EOF'
+import re
+s = open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md').read().split('\n')
+strip = lambda t: re.sub(r'<!--.*?-->', '', t, flags=re.S)
+a, b = strip('\n'.join(s[1386:1456])), strip('\n'.join(s[2412:2501]))
+print(len(a), len(b), len(a) + len(b))
+EOF
+5701 9730 15431
+```
+
+Das deckt sich mit der Vorgabe (5.701 + 9.730 = 15.431 Zeichen); ein abweichender eigener Messwert
+war nicht auszuweisen. **4.1 bis 4.6 und 4.8 sind nur als Fundstelle zitiert**, nicht vertieft
+geprüft (v. a. §4.1a Z. 991–1045, §4.2 Z. 1082–1127, §4.3/§4.4 für \(M_0\) und \(\lambda\)); ebenso
+nur zitiert Kap. 1 Z. 122–155 und §5.1 Z. 1586–1667.
+
+**Verdikt Leitfrage 4: Befund** (drei neue Befunde: **79** Kategorie B, **80** und **81**
+Kategorie C). Die vier Teilfragen einzeln:
+
+| Teilfrage (§5 LF 4) | Verdikt | Begründung mit Fundstelle |
+|---|---|---|
+| **Zwei Kanäle?** | **Befund** — 81 | In #60 rechnet genau **ein** Euro-Pfad: Kernformel §3.4 (Z. 646–722) auf Ansatz (a), als alleinige Umsetzungsgrundlage festgelegt in Z. 2467–2469, (c) ausgeschieden (Z. 2494–2500). Gegen andere Module trennt der Bericht sauber: \(\varphi_{\text{fluss}}\) = 0,50 scheidet den Starkregenanteil des Ankers ab (Z. 1091, nur zitiert), Partitionszitate zu #59/#46/#37/#12 in Kap. 1 Z. 120. Offen bleibt, dass (b) in Z. 2490–2492 als „**Ergänzungsmodul** … grober Plausibilitätsrahmen" weiterläuft, ohne Aussage, dass sein Betrag **nie additiv** in K3 eingeht (gemessen in Z. 2413–2500: „additiv" 0 Treffer). → Befund 81. |
+| **Zwei Konten?** | **bestanden** | §5.1 Z. 1596–1598: „**Nur K3**; die Kosten des Objektschutzes sind K8-Maßnahmenkosten und schließen den verhinderten Schaden je Gebäude aus (R7)." Kap. 9 führt keinen zweiten Kontobezug — die drei Ansätze unterscheiden sich allein im Rechenweg zum K3-Betrag (Z. 2436–2452); Kontoausschlüsse K5/K4/K1 in Kap. 1 Z. 120. Kein Befund. |
+| **Maßnahmeneffekt schon im Basiswert?** | **Befund** — 79 | Im Grundsatz richtig beantwortet: \(\Delta q\) zählt ausschließlich Nachrüstungen **nach dem letzten Kalibrierjahr 2024** (Z. 1407–1414; Bindung §5.1.2 Z. 1635–1639). **Falsch beziffert** ist der Anteil, der schon im Basiswert steckt: Der Bericht leitet ihn aus dem **Zählgewicht** \((2024-t+1)/23\) ab (Z. 1400–1405) und beziffert damit die Verzerrung (Z. 1427–1443); der Schätzer ist aber \(\lambda = \text{Mittel}(A_t)/M_0\) (§4.1a Z. 1010–1016), also ein Mittel über **Beträge**. Nachrechnung unten. → Befund 79. |
+| **Referenzwerte doppeln Baseline-Anteile (HD_ref-Klasse)?** | **bestanden (ausdrückliche Feststellung)** | **Die in Kapitel 9 genannten Referenzwerte enthalten keine Anteile, die im Basiswert des kalibrierten Modells bereits stecken.** (1) \(f_{\text{S094}}\) = 1,00 (0,84–1,18), in Z. 2499 genannt, ist geometrisch um 1 zentriert und ausdrücklich „kein eigenes Multiplikativglied im Basiswert" (Z. 188; ebenso \(f_{\text{S093}}\) Z. 187, Zeichentabelle Z. 773) — der Neutralwert kann nichts doppeln, das Band läuft nur als Unsicherheit mit. (2) Die FLEMOps-Achsen in Z. 2438–2440 sind Struktur-, keine Niveauangaben; das Niveau trägt allein \(\lambda\). (3) Die niederländische Flächenschadensrate aus B2 (Z. 2444–2448, 2487–2490) ist der einzige Referenzwert mit eigenem Euro-Niveau; sie rechnet heute nicht mit, und der Bericht benennt selbst, dass sie „vom Sensitivitätsband zum tragenden Basiswert aufsteigen" würde (Z. 2489–2490) — daraus folgt Befund 81, nicht eine heutige Doppelung. (4) Eine HD_ref-Klasse führt Kap. 9 nicht (gemessen Z. 2413–2500: „HD_ref" 0, „Referenzwert" 0 Treffer). Kein eigener Befund. |
+
+#### Nachrechnung statt Lektüre — der Wächter an zwei Kalibrierjahren
+
+Grundlage sind ausschließlich im Bericht ausgewiesene Zahlen: die Ankerreihe
+`docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`, Spalte `wert_mrd_eur` (in §4.1a Z. 1030–1040 und
+§4.5 Z. 1536 als Ankerreihe geführt), und die Kette \(\lambda = \text{Mittel}(A_t)/M_0\)
+(§4.1a Z. 1010–1016) mit \(M_0\) = 1,360 und den Folgefaktoren 0,615865 (Z. 1036–1038).
+§3.4 eingehalten: gerechnet auf 23 Jahreswerten, **kein** Vollraster-Lauf.
+
+**Probe der Kette (Identifizierung der Reihe):** Summe der 23 Werte = 42,28 Mrd. €; Mittel
+42,28 ÷ 23 = **1,8383** (Bericht 1,838, Z. 1040); \(A^{*}\) = 1,8383 · 0,615865 = **1,1321**
+(Bericht 1,132); \(\lambda\) = 1,1321 ÷ 1,360 = **0,8324** (Bericht 0,832, Z. 1040/1380/1467).
+Abweichung je < 0,001, reine Rundung.
+
+**Jahr 2020** (Bericht Z. 1403: „2020 mit 5/23 = **21,7 %**"; Z. 1431–1432: Überschätzung
+„**78,3 Prozentpunkte**"):
+- *Rechenweg des Berichts (Zählgewicht):* (2024 − 2020 + 1) ÷ 23 = 5 ÷ 23 = 0,21739 → **21,74 %**.
+  **Abweichung zum ausgewiesenen Wert 0,0 pp** — der Bericht rechnet sein eigenes Gewicht richtig.
+- *Rechenweg aus dem Schätzer (Wertgewicht):* Eine Nachrüstung aus 2020 senkt die Ankerwerte
+  2020–2024, also \(\sum_{s=2020}^{2024} A_s / \sum A\) = (0,4 + 12,6 + 0,3 + 1,1 + 2,6) ÷ 42,28
+  = 17,0 ÷ 42,28 = 0,40208 → **40,2 %** (Werte: Zeilen 2020…2024 der Ankerreihe, Spalte
+  `wert_mrd_eur`; 2021 = 12,6 trägt allein 29,8 % der Summe). **Abweichung zum im Bericht
+  ausgewiesenen Gewicht +18,5 pp** (Faktor 1,85); die bezifferte Überschätzung fällt von 78,3 pp
+  auf **59,8 pp**, **Abweichung 18,5 pp**.
+
+**Jahr 2014** (Bericht Z. 1403–1404: „11/23 = **47,8 %**"; Z. 1432–1433: „**52,2
+Prozentpunkte**"):
+- *Zählgewicht:* (2024 − 2014 + 1) ÷ 23 = 11 ÷ 23 = 0,47826 → **47,8 %**, **Abweichung 0,0 pp**.
+- *Wertgewicht:* (1,2 + 0,3 + 2,0 + 0,7 + 1,0 + 0,5 + 0,4 + 12,6 + 0,3 + 1,1 + 2,6) ÷ 42,28
+  = 22,7 ÷ 42,28 = 0,53690 → **53,7 %**, **Abweichung +5,9 pp**; die Überschätzung fällt von
+  52,2 pp auf **46,3 pp**, **Abweichung 5,9 pp**.
+
+**Dritte Probe (2010) zur Größenordnungs-Aussage.** Der Bericht beziffert den unterzählten Hebel
+mit „rund der Hälfte bis zu drei Vierteln des Effekts einzelner, in den letzten zehn bis fünfzehn
+Kalibrierjahren realisierter Maßnahmen" (Z. 1438–1441). Unterzählter Rest = 1 − Wertgewicht:
+2010 → 29,6 ÷ 42,28 = 70,0 %, Rest **30,0 %**; 2015 → 21,5 ÷ 42,28 = 50,9 %, Rest **49,1 %**;
+2014 Rest 46,3 %; 2020 Rest 59,8 %. Für das genannte Fenster 2010–2015 liegt der Rest bei
+**30,0 % bis 49,1 %**, nicht bei „der Hälfte bis drei Vierteln".
+
+**Ursache in einem Satz:** Die Ankerreihe ist stark schief (2021 allein 29,8 % der Summe); ein
+Gleichgewicht der Jahre gilt für die **Zahl** der Summanden, nicht für ihren **Beitrag zum Mittel**.
+
+#### Neue Befunde dieses Pakets (79, 80 und 81)
+
+Höchste zu Laufbeginn im Ledger vorhandene Nummer: **78** (gemessen über alle
+Tabellen-Nummernspalten und alle „Befund <n>"-Nennungen); erste neue Nummer deshalb **79**.
+
+| Nr | Kat. | Befund |
+|---|---|---|
+| 79 | **B** | **Stelle:** §4.7 Z. 1400–1405 (Gewicht \((2024-t+1)/23\); „2020 mit 5/23 = 21,7 %", „2014 mit 11/23 = 47,8 %"), Z. 1416–1426 (Verfallsregel „Gewicht 1/24 statt 1/23") und Z. 1427–1443 (Modellgrenze: „78,3 Prozentpunkte", „52,2 Prozentpunkte", „bis zu 95,7 %", „rund der Hälfte bis zu drei Vierteln"). · **Art: Fehler (falsche Gewichtung in einer bezifferten Modellgrenze)** (§5 LF 4 „Maßnahmeneffekt schon im Basiswert"; §3.4 Kleinste-Quadrate-Bestimmung; P1 „samt Herleitung"). · **Begründung:** Der Wächter beziffert den bereits im kalibrierten Niveau steckenden Anteil einer Vor-2025-Maßnahme über ein **Zählgewicht** der Kalibrierjahre (1/23 je Jahr). Der Schätzer, auf den er sich beruft, ist \(\lambda = \text{Mittel}(A_t)/M_0\) (§4.1a Z. 1010–1016): Gleiches Gewicht je Jahr gilt dort für die **Zahl** der Summanden, der Einfluss eines Jahres auf das Mittel ist jedoch proportional zu seinem **Betrag** \(A_t\). Senkt eine Maßnahme aus Jahr \(t\) die Schäden der Jahre \(t\) bis 2024 anteilig, sinkt das Ankermittel um \(\sum_{s=t}^{2024} A_s / \sum_s A_s\), nicht um \((2024-t+1)/23\). In dieser Sitzung aus der Ankerreihe nachgerechnet (Summe 42,28 Mrd. €; Probe: Mittel 1,8383 → \(A^{*}\) 1,1321 → \(\lambda\) 0,8324, deckungsgleich mit Z. 1040): **2020** 17,0 ÷ 42,28 = **40,2 %** statt 21,7 % (**+18,5 pp**; Verzerrung 78,3 → 59,8 pp), **2014** 22,7 ÷ 42,28 = **53,7 %** statt 47,8 % (**+5,9 pp**; 52,2 → 46,3 pp), **2010** 70,0 % statt 65,2 %. Ursache ist die Schiefe der Reihe (2021 allein 29,8 % der Summe) — dieselbe Schiefe, die §4.1a über Tukey-Fence und Fenster-Sensitivität behandelt. Dieselbe Verwechslung trägt die Verfallsregel (Z. 1416–1426: die Verschiebung bei Aufnahme von 2025 ist nicht 1/24 des Abstands, sondern der Betragsanteil \(A_{2025}\) am erweiterten Fenster) und die Größenordnungs-Aussage Z. 1438–1441 (nachgerechnet 30,0–49,1 % statt „Hälfte bis drei Viertel"). Kategorie **B**: Kein ausgewiesener Betrag ändert sich — \(\Delta q\) zählt operativ ohnehin nur Nachrüstungen nach 2024 (Z. 1407–1414), \(r_{\text{S092}}\) = 0,035 (0,0075–0,0992) und \(\lambda\) bleiben unberührt —, aber die **bezifferte** Modellgrenze ist falsch gerechnet und überzeichnet die Konservativität des Wächters um bis zu 18,5 Prozentpunkte. · **Vorschlag:** Gewichte in §4.7 auf \(\sum_{s=t}^{2024} A_s / \sum_s A_s\) umstellen (Formel plus die zwei Rechenbeispiele 2020 und 2014, Verweis auf die Ankerreihen-CSV), die drei bezifferten Stellen (21,7/47,8 · 78,3/52,2 · „Hälfte bis drei Viertel") nachziehen, die Verfallsregel auf denselben Nenner stellen und die Schiefe der Reihe ausdrücklich als Grund nennen — nach P3 mit lesbarem Zweizeiler-Rechenweg statt nur einer Formel. Nicht in diesem Paket umgesetzt (Dateirahmen), hier nur verbucht. |
+| 80 | **C** | **Stelle:** Kap. 9, Kriterienraster **Z. 2462**, Zeile „Maßnahmen-Anschluss", Spalte (a): „der Objektschutz-Hebel S092 **greift als Faktor auf den Schadensgrad** (§5.1, r_S092)", gegen §5.1 „Wirkungsort" **Z. 1596–1598** (\(\text{EAD}_{\text{mit}} = \text{EAD}\cdot(1-r_{\text{S092}})\), kommunenweit) und §5.1 Modellgrenze (1) **Z. 1648–1649** („**Kommunenweiter Pauschalfaktor** statt zellscharfer Wirkung (Bauform-Grenze)"). · **Art: Widerspruch (Bericht gegen Bericht, am entscheidungstragenden Kriterium)** (§5 LF 4 — der Wirkungsort entscheidet, gegen welchen Basiswert auf Doppelzählung zu prüfen ist; P3). · **Begründung:** Kap. 9 wertet Ansatz (b) im selben Feld gerade deshalb ab, weil S092 sich dort „nur als pauschaler Abschlag auf das Gesamtergebnis anhängen" ließe, „ohne Wirkungsort (§3.5)" — genau das ist aber die heute umgesetzte Form in (a): \(r_{\text{S092}}\) multipliziert den fertigen K3-Erwartungsschaden der **Kommune**, nicht den Schadensgrad der Zelle, und §5.1 weist das selbst als Bauform-Grenze aus. Gemessen: „Schadensgrad" kommt in §5.1 (Z. 1586–1667) **null mal** vor. Für Leitfrage 4 ist das nicht folgenlos: Ein Hebel am Schadensgrad wäre gegen den zelligen Basiswert zu prüfen, ein kommunenweiter Pauschalfaktor gegen das kalibrierte Niveau — der Bericht nennt zwei verschiedene Angriffspunkte für dieselbe Größe. Kategorie **C**: Kein Zahlenwert betroffen, und die Wahl von (a) trägt auch ohne dieses Kriterium (fünf weitere Güte-Kriterien „hoch", Z. 2471–2477); betroffen sind Begründungstreue und Leser-Erwartung. · **Vorschlag:** Z. 2462 auf den heutigen Stand ziehen — „(a) bietet als einziger Ansatz den **Angriffspunkt** für einen zellscharfen Objektschutz-Hebel; umgesetzt ist er derzeit als kommunenweiter Pauschalfaktor auf den K3-Erwartungsschaden (§5.1, Modellgrenze (1))" — und die Abwertung von (b) auf den bleibenden Unterschied stützen (dort fehlt der Angriffspunkt dauerhaft, hier ist er vorhanden, aber noch nicht ausgeschöpft). Nicht in diesem Paket umgesetzt (Dateirahmen), hier nur verbucht. |
+| 81 | **C** | **Stelle:** Kap. 9 „Umsetzungsgrundlage" **Z. 2490–2492** („(b) bleibt als **Ergänzungsmodul** vorgesehen: als grober Plausibilitätsrahmen für Kommunen, in denen der Zensus-Bestand je Zelle lückenhaft ist"), ebenso Kopfzeile Z. 33 und Entscheidungslog Z. 2510. · **Art: Lücke (Zwei-Kanäle-Risiko nicht ausgeschlossen)** (§5 LF 4 „Zwei Kanäle?"; R9 „innerhalb eines Kontos zählt jede Einheit genau einmal", zitiert Kap. 1 Z. 120). · **Begründung:** Das Ergänzungsmodul (b) berechnet für dieselbe Kommune, dasselbe Konto K3 und dasselbe Bezugsjahr einen **zweiten** Euro-Betrag aus anderer Datenbasis (Flächenschadensrate B2). Nirgends steht, dass dieser Betrag ausschließlich Vergleichsgröße ist und **nie** — auch nicht anteilig für Zellen mit lückenhaftem Zensus-Bestand — in den ausgewiesenen K3-Betrag eingeht; gemessen in Kap. 9 (Z. 2413–2500): „additiv" **0 Treffer**, „ersetzt" **0 Treffer**. Gerade der genannte Anwendungsfall legt eine Auffüllrechnung nahe; dort entstünde bei unsauberer Abgrenzung entweder eine Doppelzählung (Zelle zählt in beiden Kanälen) oder ein stiller Modellwechsel mit zweitem, unkalibriertem Niveau — die Gefahr benennt Z. 2489–2490 für den Basiswert selbst. Kategorie **C**: Das Modul ist heute nicht umgesetzt, kein ausgewiesener Betrag betroffen; es fehlt die Abgrenzungsregel, bevor es gebaut wird. · **Vorschlag:** In Z. 2490–2492 ergänzen: „Das Ergänzungsmodul liefert ausschließlich einen Vergleichswert; es geht weder additiv noch ersetzend in den ausgewiesenen K3-Betrag ein (R9). Wird es später als Auffüllung für Zellen ohne Zensus-Bestand genutzt, sind die betroffenen Zellen im Hauptpfad auf null zu setzen und die Umstellung als Modellentscheid zu dokumentieren." Nicht in diesem Paket umgesetzt (Dateirahmen), hier nur verbucht. |
+
+#### Abgrenzung und Status dieses Pakets
+
+- **Geändert wurde ausschließlich `reviews/BEFUNDE_60.md`** (angehängt).
+  `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, `docs/evidenz/register.md`,
+  `backend/scripts/lint_methodik.py` und die Arbeitsmappen sind byte-gleich; der Bericht wurde nur
+  gelesen und an den ausgewiesenen Stellen nachgerechnet (eiserne Regeln 2 und 5).
+- **Kein Befund behoben, keiner umnummeriert.** Höchste vorhandene Nummer zu Laufbeginn: **78**;
+  neu vergeben sind **79, 80 und 81**.
+- **Nur Leitfrage 4 beantwortet**, an 4.7 und Kapitel 9 (15.431 Zeichen, oben gemessen);
+  Leitfrage 7 trägt das Schwesterpaket. 4.1–4.6 und 4.8 sind nur als Fundstelle zitiert.
+- **Vorgaben P1/P2 am Prüfgegenstand mitgeprüft:** \(\Delta q\), \(e_{\text{bem}}\),
+  \(s_{\text{bem}}\) und \(r_{\text{S092}}\) führen Wert, Band, Sensitivität und den Vermerk
+  „Abschätzung von KAP3" samt Herleitung (Z. 1607–1613, Z. 1640–1647); die Wächter-Modellgrenze ist
+  vorhanden, aber falsch beziffert (Befund 79) — daraus entsteht kein eigener P1/P2-Befund.
+- **Ressourcen-Regel §3.4 eingehalten:** nachgerechnet auf den 23 ausgewiesenen Jahreswerten der
+  Ankerreihe, kein nationaler 100-m-Vollraster-Lauf.
+- **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
+  T-0359); das Konvergenz-Verdikt der Runde trägt T-0373.
