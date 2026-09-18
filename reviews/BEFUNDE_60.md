@@ -3095,3 +3095,114 @@ Faktoren wie \(M_0\) (§4.3 Z. 1157). Der Test \(\lambda M_0 \le O\) ist damit �
 - **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
   T-0359); der Lint-Lauf der Runde steht im Eröffnungsabschnitt und wurde nicht wiederholt.
 - **Nicht Gegenstand dieses Pakets:** §4.1–§4.4, §4.7, §4.8, Kapitel 9 sowie alle übrigen Leitfragen.
+
+### Leitfrage 5 — Modifikatoren und Wirkungsabschätzung S092
+
+**Prüfumfang dieses Pakets (T-0379, ersetzt T-0365).** Leitfrage 5 aus §5 der Aufgabe
+(„**Modifikatoren:** zentriert, OR-Übersetzung korrekt, richtige Studienart, **richtige Band- und
+Endpunkt-Zuordnung**?", `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` **Z. 436–437**), Maßstab
+zusätzlich §3.5 (**Z. 232–256**: Bandzuordnung, Mittelwertzentrierung, OR-Übersetzung
+\(\beta = (OR-1)/[1+\bar q (OR-1)]\), geschlossene Betrachtungsebene, Fortschreibungs-Regel für den
+Referenzzustand) und §3.9. Vertieft geprüft ist genau **Kapitel 5 „Maßnahmen-Hebel" mit §5.1,
+§5.1.1, §5.1.2 und §5.1.3** (Z. 1574–1773). Umfangsmessung in dieser Sitzung, ausgeführt:
+`python3 -c 'import re; t=open("docs/methodik/60_gebaeudeschaeden_flusshochwasser.md").read().split(chr(10)); m=lambda a,b: len(re.sub(r"<!--.*?-->","",chr(10).join(t[a-1:b]),flags=re.S)); print(m(1574,1773))'`
+→ **14.432** Zeichen ohne HTML-Kommentare, identisch mit dem Planungsstand vom 18.09.2026, keine
+Abweichung auszuweisen. Der Abschnitt „## Ergebnis" sowie Kapitel 7 mit §7.1/§7.2 gehören zu
+Schwesterpaketen (Reihenfolgeplätze 14 und 17) und sind hier nur als Fundstelle zitiert; die
+Leitfragen 11 und 12 werden hier **nicht** beantwortet.
+
+**Verdikt zu Leitfrage 5: Befund** (Befunde 66, 67 und 68). Rechnerisch ist die Kette sauber: Punktwert,
+Band und alle drei Einzelachsen-Sensitivitäten von \(r_{\text{S092}}\) sind aus den in §5.1.2
+genannten Eingangsgrößen exakt reproduzierbar (Nachrechnung unten, Abweichung 0), die
+Endpunkt-Zuordnung ist eindeutig und doppelzählungsfrei begründet (nur Konto K3, Objektschutzkosten
+als K8 über die R7-Weiche ausgeschlossen, §5.1 **Z. 1596–1598**), und eine OR-Übersetzung kommt in
+Kapitel 5 nicht vor, kann also auch nicht falsch sein (grep in dieser Sitzung über Z. 1574–1773:
+keine Fundstelle für „Odds", „OR-" oder „Modifikator" außerhalb des HTML-Kommentars Z. 1576–1582).
+Nicht erfüllt sind drei Punkte: die **Bandzuordnung** der oberen Grenze von \(s_{\text{bem}}\) ruht
+auf einem Ankerwert, den der Bericht selbst im gleichen Absatz als überholt ausweist, ohne die
+abhängigen Zahlen nachzuziehen (Befund 66, Fundstelle §5.1.3 **Z. 1697–1717** gegen §5.1.1 **Z. 1615**
+und §5.1.2 **Z. 1640–1646**); der **Referenzzustand** der Zentrierung — der heutige Ausstattungsgrad
+\(q_0\) — ist als „geparkt" geführt und trägt keinen Zahlenwert, sodass die Marginalität von
+\(\Delta q\) behauptet, aber nicht prüfbar ist (Befund 67, Fundstelle §5.1.2 **Z. 1635–1638** gegen
+§3.5 **Z. 236–239** und §3.9); und der einzige Ort, an dem Kapitel 5 den Knoten **S094** erwähnt, ist
+ein HTML-Kommentar (Befund 68, Fundstelle **Z. 1581**).
+
+#### (b) Die vier Teilaussagen der Leitfrage 5 einzeln
+
+| Teilaussage (§5 LF 5) | ja/nein | Fundstelle und Begründung in einem Satz |
+|---|---|---|
+| **zentriert** (§3.5 Z. 236–239, Fortschreibungs-Regel Z. 254–256) | **nein** (Befund 67) | Eine Mittelwertzentrierung `1 + β·(x − x̄)` ist hier nicht einschlägig — \(r_{\text{S092}}\) ist ein kommunenweiter Pauschalfaktor ohne zellvariable Kovariate (§5.1.1 **Z. 1612–1615**) —, wohl aber die Fortschreibungs-Regel für den Referenzzustand: Er ist zwar auf den **Baseline-Lauf** festgelegt („allein die Nachrüstung nach dem letzten Kalibrierjahr 2024", §5.1.2 **Z. 1635–1637**), der Bezugswert \(q_0\) selbst ist aber unbeziffert und als „geparkt" ausgewiesen (**Z. 1637–1638**, Verweis §4.7). |
+| **OR-Übersetzung korrekt** (§3.5 Z. 237–239) | **ja (leer erfüllt)** | In Z. 1574–1773 kommt kein Odds Ratio und keine Übersetzung \(\beta = (OR-1)/[1+\bar q(OR-1)]\) vor (grep in dieser Sitzung ohne Treffer); die Kette ist rein multiplikativ aus drei Anteilen gebildet (§5.1 **Z. 1600**), eine fehlerhafte OR-Übersetzung ist damit ausgeschlossen. |
+| **richtige Studienart** (§3.5, P2) | **ja** | §5.1 **Z. 1588–1594** weist ausdrücklich zurück, Querschnittsbefragungen Betroffener als Maßnahmen-Effektgröße zu verwenden („Selbstselektion", nicht im Volltext verifiziert), führt den Hebel nach P2 nicht mit Wirkung null, sondern als gekennzeichnete **Abschätzung von KAP3** und benennt den Ersetzungspfad auf Interventions-/quasi-experimentelle Evidenz (§5.1.2 **Z. 1651–1653**). |
+| **richtige Band- und Endpunkt-Zuordnung** | **Endpunkt ja, Band nein** (Befund 66) | Endpunkt eindeutig: multiplikativ auf den K3-Erwartungsschaden von #60, Kosten als K8 ausgeschlossen, Schutzsysteme über die R7-Weiche an #50 (§5.1 **Z. 1596–1598**); Band nicht: die obere Grenze \(s_{\text{bem}} \le 0{,}62\) stützt sich auf den Ankerwert 38,5 % aus dem Einzeljahr 2024 (§5.1.3 **Z. 1700–1705**), den §4.5 seit Befund 33 durch 47,7 % ersetzt hat — mit ihm läge die Grenze bei 0,52 (**Z. 1710–1713**). |
+
+#### (c) Nachrechnung statt Lektüre — Wirkungsabschätzung 60-S092-01
+
+Eingangsgrößen aus §5.1.2: \(\Delta q\) = 0,10 (0,05–0,20), \(s_{\text{bem}}\) = 0,50 (0,30–0,62),
+\(e_{\text{bem}}\) = 0,70 (0,50–0,80), Kette \(r_{\text{S092}} = \Delta q \cdot s_{\text{bem}} \cdot
+e_{\text{bem}}\) (**Z. 1600**, **Z. 1621–1633**, **Z. 1640–1646**). In dieser Sitzung ausgeführt:
+`python3 -c "dq,s,e=0.10,0.50,0.70; print('r',dq*s*e,'lo',0.05*0.30*0.50,'hi',0.20*0.62*0.80); print('achsen',0.05*s*e,0.20*s*e,dq*0.30*e,dq*0.62*e,dq*s*0.50,dq*s*0.80); print('s_bem_o',1-1.0/2.6,'neu',1-0.477,'hi_neu',0.20*0.52*0.80,'achse_neu',dq*0.52*e)"`
+→ `r 0.034999999999999996 lo 0.0075 hi 0.09920000000000001` /
+`achsen 0.0174999... 0.0699999... 0.0209999... 0.043399999999999994 0.025 0.04000000000000001` /
+`s_bem_o 0.6153846153846154 neu 0.523 hi_neu 0.08320000000000001 achse_neu 0.0364`.
+
+| Größe | Wert im Bericht | nachgerechnet | Abweichung |
+|---|---|---|---|
+| \(r_{\text{S092}}\) (Punkt) | 0,035 = −3,5 % (Z. 1640, 1643) | **0,035** | 0 |
+| untere Bandgrenze 0,05·0,30·0,50 | 0,0075 = −0,75 % (Z. 1641, 1643) | **0,0075** | 0 |
+| obere Bandgrenze 0,20·0,62·0,80 | 0,0992 = −9,92 % (Z. 1641, 1643) | **0,0992** | 0 |
+| Einzelachse \(\Delta q\) 0,05–0,20 | 0,0175–0,070 (Z. 1645) | **0,0175–0,0700** | 0 |
+| Einzelachse \(s_{\text{bem}}\) 0,30–0,62 | 0,021–0,043 (Z. 1645–1646) | **0,0210–0,0434** → 0,043 | 0 (auf drei Stellen) |
+| Einzelachse \(e_{\text{bem}}\) 0,50–0,80 | 0,025–0,040 (Z. 1646) | **0,0250–0,0400** | 0 |
+| Herleitung der oberen \(s_{\text{bem}}\)-Grenze 1 − 1,0/2,6 | 0,615 → gesetzt 0,62 (Z. 1702–1705) | **0,6153846** → 0,62 | 0 |
+
+**Ergebnis:** Die Wirkungsabschätzung 60-S092-01 ist aus den in §5.1.2 genannten Eingangsgrößen
+**vollständig und ohne Abweichung reproduzierbar**; der Rechenteil der Leitfrage ist bestanden, und
+der Beispielblock `beispiel_60_s092_abschaetzung` (Z. 1655–1664) deckt dieselben Werte ab. Die
+Abweichung liegt nicht in der Rechnung, sondern in ihrem Eingang: Mit dem heute gültigen Ankerwert
+der Verteilungsprüfung (47,7 % statt 38,5 %, §4.5 über Befund 33) ergibt dieselbe Herleitung
+\(s_{\text{bem}} \le 1 - 0{,}477 = 0{,}523\) → **0,52** statt 0,62, damit obere Bandgrenze
+\(r_{\text{S092}}\) = **0,0832** statt 0,0992 (−16,1 %) und Einzelachse \(s_{\text{bem}}\) oben
+**0,0364** statt 0,0434. Daraus **Befund 66**. Nach §3.4 zellweise und auf der 23-zeiligen
+Ankerreihe gerechnet, kein Vollraster-Lauf; im Code wurde nichts geändert (eiserne Regel 5).
+
+#### (d) Vorgabe P2 für 60-S094-01 in Kapitel 5
+
+**Kapitel 5 führt für 60-S094-01 keine ausgewiesene Abschätzung mit Zahlenwert, Bandbreite und
+Sensitivität** — der Knoten S094 erscheint dort ausschließlich im HTML-Kommentar **Z. 1581**
+(„Offene Hebel-Kandidaten: S096/S097/S098 …, S093/S094"), also in einem Text, der nicht ausgeliefert
+wird und nach Vorgabe P1 („eine Herleitung nur als Code-Kommentar erfüllt die Vorgabe nicht") nicht
+zählt; die P2-konforme Abschätzung \(f_{\text{S094}}\) = 1,00, Band 0,84–1,18, Sensitivität
+−16 %/+18 % samt Bauform-Grenze steht vollständig, aber **außerhalb** von Kapitel 5 in Kap. 2
+Registerzeile 60-S094-01 (**Z. 188**), Langbeleg B6 (**Z. 469**, **Z. 519**) und §3.5 (**Z. 773**).
+Daraus **Befund 68** (Kategorie C).
+
+#### Neue Befunde dieses Pakets (66 bis 68)
+
+| Nr | Kat. | Befund |
+|---|---|---|
+| 66 | **B** | **Stelle:** Bericht §5.1.3, Absatz „Tragende Begründung der oberen Bandgrenze: Ankerwert der Verteilungsprüfung (§4.5)" **Z. 1697–1717** (darin der Nachtrag „… liefert dort jetzt 47,7 % statt der hier verwendeten 38,5 % …; die obere Bandgrenze läge mit dem neuen Wert bei 1 − 0,477 = 0,52 statt 0,62"), gegen die ausgewiesenen Zahlen in §5.1.1 **Z. 1615**, §5.1.2 **Z. 1640–1646**, §5.1.3 **Z. 1719–1721** und den Beispielblöcken **Z. 1662** und **Z. 1766–1771**. · **Art: Widerspruch/veraltete Bandzuordnung** (§5 LF 5 „richtige Band- und Endpunkt-Zuordnung"; §3.9; §6 „ein zu weit gewordenes Band ist ein Befund"). · **Begründung:** Die obere Bandgrenze von \(s_{\text{bem}}\) hat nach der Revision zu Befund 26 genau **eine** tragende Begründung, den zellunabhängigen Ankerwert der Verteilungsprüfung; dieser Anker ist mit Befund 33 auf die Jahresauslassung über 2002–2024 umgestellt und liefert 47,7 % statt 38,5 %. Der Bericht benennt das selbst und verschiebt den Nachzug ausdrücklich („nicht in diesem Paket vollzogen … im Ledger als Restpunkt vermerkt", Z. 1714–1716). Damit stehen in einem abgenommenen Bericht Zahlen, deren einzige tragende Herleitung im selben Absatz als überholt bezeichnet wird: 0,62 statt 0,52, \(r_{\text{S092}}\)-Obergrenze 0,0992 statt 0,0832 (−16,1 %, Ausdruck oben), Einzelachse oben 0,0434 statt 0,0364. Verschärfend: Mit 0,52 läge der Punktwert 0,50 bei 96 % der Obergrenze, das Band wäre faktisch einseitig nach unten — genau die Fehlerrichtung, die §5.1.3 **Z. 1728–1741** („die Näherung überschätzt den Hebel") beschreibt; der heutige Zuschnitt 0,30–0,62 lässt dagegen ein Aufwärtsband von +24 % zu, das die eigene Richtungsaussage nicht mehr deckt. Kategorie B statt A, weil der Punktwert 0,035 unberührt bleibt und die Abweichung nur die obere Bandhälfte betrifft; Abgrenzung zu Befund 26 (dort wurde 0,66 → 0,62 gesetzt, mit dem damals gültigen Anker) und zu Befund 33 (dort die Ankerseite selbst, ohne die S092-Folgestellen). · **Vorschlag:** Den Nachzug in einem eigenen Revisionspaket vollziehen — \(s_{\text{bem}}\)-Band auf 0,30–0,52, \(r_{\text{S092}}\)-Band auf 0,0075–0,0832, Einzelachse \(s_{\text{bem}}\) auf 0,021–0,0364 — und zwar gleichlautend an allen in Z. 1722–1725 genannten Stellen (Kap. 1 Knoten-Bilanz, Kap. 2 Zeile 60-S092-01, §3.5, §5.1.1, §5.1.2, §5.1.3, Kap. 7 `flood_bldg.s_bem`/`flood_bldg.r_s092`, Entscheidungslog Nr. 3, Beispielblöcke) plus `docs/evidenz/register.md` Z. 65 (vgl. Befund 19). Bis dahin im Bericht an der Zahl selbst — nicht nur im Fließtext von §5.1.3 — kenntlich machen, dass 0,62 ein überholter Stand ist; zusätzlich prüfen, ob der Punktwert 0,50 bei einer Obergrenze 0,52 noch als Mitte tragfähig ist oder mitgesenkt werden muss. |
+| 67 | **B** | **Stelle:** Bericht §5.1.2 **Z. 1635–1638** („Gezählt wird allein die Nachrüstung **nach dem letzten Kalibrierjahr 2024** … der heutige Ausstattungsgrad \(q_0\) ist dort als geparkt ausgewiesen") und §5.1.1 **Z. 1612** (\(\Delta q\) = 0,10, Band 0,05–0,20, „zusätzlich nachgerüsteter Anteil exponierter Gebäude (marginal gegenüber heute)"), gegen §3.5 **Z. 236–239** („Zentrierungs-Mittelwerte … sind herleitungspflichtige Parameter (3.9)") und **Z. 254–256** (Referenzzustand im Baseline-Lauf). · **Art: Lücke (Referenzzustand ohne Zahlenwert)** (§5 LF 5 „zentriert"; §3.9 Herleitungspflicht; §3.5 Doppelzählungs-Wächter). · **Begründung:** Der Hebel wirkt als \(\text{EAD}\cdot(1-r)\) auf einen Erwartungsschaden, dessen Niveau-Skalar an Jahren bis 2024 kalibriert ist und in dem der **bereits vorhandene** Objektschutz steckt. Ob \(\Delta q\) = 0,10 tatsächlich marginal ist, hängt deshalb an \(q_0\): Bei hohem Bestandsausstattungsgrad ist ein weiteres Zehntel der exponierten Gebäude ein anderer Eingriff als bei nahe null, und die Wirkung je nachgerüstetem Gebäude \(e_{\text{bem}}\) = 0,70 unterstellt implizit, dass die nachgerüsteten Gebäude vorher **keinen** Schutz hatten. \(q_0\) trägt aber keinen Zahlenwert, keine Bandbreite und keine Quelle, sondern nur den Status „geparkt" (Verweis §4.7). Damit ist der Referenzzustand der Zentrierung — der Punkt, gegen den „marginal" gemessen wird — ein herleitungspflichtiger Parameter ohne Herleitung (§3.9), und der Doppelzählungs-Wächter ist als Regel formuliert, aber nicht als prüfbare Größe. Nutzersichtbar ist die Lücke ebenfalls (P1): Ein Sachbearbeiter, der das Programm auf „jedes zehnte exponierte Gebäude" auslegt, erfährt nicht, wie viele davon schon geschützt sind. Kategorie B: kein ausgewiesener Zahlenwert ist falsch, aber die Marginalitätsaussage, die den Hebel überhaupt rechtfertigt, ist nicht nachprüfbar. · **Vorschlag:** \(q_0\) als eigenen abgeschätzten Parameter nach §3.9 führen — Zahlenwert, Band, Herleitung (etwa aus publizierten Vorsorge-Quoten der Betroffenenbefragungen, ausdrücklich als Abschätzung von KAP3 und nicht als Effektgröße, damit der Studienart-Einwand aus Z. 1588–1592 unberührt bleibt) — und \(\Delta q\) ausdrücklich an ihn binden (\(\Delta q \le 1 - q_0\), Wirkung nur auf den ungeschützten Teil). Alternativ, falls \(q_0\) geparkt bleiben soll: im Bericht und im Produkt als **Modellgrenze** der Abschätzung ausweisen (nach dem Muster der drei Modellgrenzen in Z. 1648–1653), mit dem Satz, dass \(r_{\text{S092}}\) überschätzt, falls der Bestandsschutz hoch ist — die Richtung ist dieselbe wie bei \(s_{\text{bem}}\). |
+| 68 | **C** | **Stelle:** Bericht Kapitel 5, HTML-Kommentar **Z. 1576–1582**, dort Z. 1581 („Offene Hebel-Kandidaten: S096/S097/S098 (über R7-Erwartungswert mit #50), S093/S094"), gegen Vorgabe P1 (`CLAUDE.md`: „Eine Herleitung nur als Code-Kommentar erfüllt die Vorgabe nicht") und gegen die vollständige Abschätzung zu 60-S094-01 in Kap. 2 **Z. 188**, B6 **Z. 469/519** und §3.5 **Z. 773**. · **Art: Lücke (Sichtbarkeit/Verweis)** (§5 LF 5 „richtige Band- und Endpunkt-Zuordnung"; P1/P2). · **Begründung:** Kapitel 5 ist der Ort, an dem ein Leser nach Hebeln und ihren Wirkungen sucht. Für 60-S094-01 steht dort im ausgelieferten Text nichts — weder Zahlenwert 1,00, noch Band 0,84–1,18, noch Sensitivität −16 %/+18 %, noch die Bauform-Grenze —, sondern nur ein nicht ausgeliefertes Autorenmemo, das S094 als „offenen Hebel-Kandidaten" führt. Das ist zugleich eine inhaltliche Unschärfe: S094 ist im heutigen Modell **kein** Maßnahmen-Hebel, sondern eine geometrisch zentrierte Struktur-Achse der Schadensfunktion (§3.5 Z. 773, Ebene GEBAEUDEZUSTAND_BAUSTOFF „geparkt", Z. 564) — der Kommentar legt nahe, dass daraus noch ein Hebel wird, ohne das im Text zu sagen. P2 selbst ist **nicht verletzt**: Die Wirkung ist nirgends null gesetzt, sondern als Abschätzung mit Wert, Band, Sensitivität und Modellgrenzen ausgewiesen — nur eben außerhalb von Kapitel 5. Deshalb Kategorie C. · **Vorschlag:** In Kapitel 5 einen kurzen sichtbaren Absatz „Nicht als Hebel geführt" ergänzen, der S093/S094 mit einem Satz und Verweis auf die Registerzeilen 60-S093-01/60-S094-01 einordnet (Struktur-Achse, Ebene geparkt, Bänder 0,71–1,40 und 0,84–1,18, gemeinsam 0,60–1,66) und benennt, unter welcher Bedingung daraus ein Hebel würde (verfügbare Zell-Merkmale für Zustand und Baustoff). Den Pflichtinhalte-Kommentar dabei nicht als Ersatz für Text stehen lassen (P1). |
+
+#### Abgrenzung und Status dieses Pakets
+
+- **Geändert wurde ausschließlich `reviews/BEFUNDE_60.md`** (angehängt).
+  `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, `docs/evidenz/register.md`,
+  `backend/scripts/lint_methodik.py` und `backend/` sind byte-gleich; der Bericht wurde nur in
+  Z. 1574–1773 sowie punktuell über Grep gelesen, die Arbeitsmappen gar nicht geändert
+  (eiserne Regel 2), die Stichproben-CSV `docs/evidenz/60_stichprobe/hq_*.csv` nicht geöffnet.
+- **Kein Befund behoben, keiner umnummeriert.** Höchste vorhandene Nummer zu Laufbeginn: **65**
+  (ermittelt per Grep über alle „Befund <n>"-Nennungen); neu vergeben sind **66–68**. Die Befunde
+  19, 26 und 33 sind nur als Gegenstelle eingeordnet.
+- **Nur Leitfrage 5.** Die Leitfragen 11 und 12 sind hier nicht beantwortet; der Abschnitt
+  „## Ergebnis" und Kapitel 7 (§7.1, §7.2) sind nur als Fundstelle zitiert und gehören zu den
+  Paketen auf den Reihenfolgeplätzen 14 und 17.
+- **Ressourcen-Regel §3.4 eingehalten:** kein nationaler 100-m-Vollraster-Lauf; nachgerechnet wurde
+  aus den im Bericht ausgewiesenen Zahlen. Divergenzen sind als Befunde verbucht, nicht still im
+  Code behoben (eiserne Regel 5).
+- **Frische Sitzung** (eiserne Regel 4): Diese Gegenprüfung ist nicht die Sitzung, die den geprüften
+  Stand geschrieben hat.
+- **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
+  T-0359); der Lint-Lauf der Runde steht im Eröffnungsabschnitt und wurde nicht wiederholt.
+- **Nicht Gegenstand dieses Pakets:** alle Kapitel außer Kapitel 5 sowie alle übrigen Leitfragen.
