@@ -2194,3 +2194,63 @@ $ sed -n '/^## Offene Befunde/,/^## Review-Runde 1/p' reviews/BEFUNDE_60.md | gr
 Die Überschrift `## Offene Befunde (N)` ist entsprechend auf `## Offene Befunde (19)` gesetzt.
 
 **Damit sind alle A-Befunde des Ledgers (1, 2, 3, 4, 5, 20, 32, 33, 34, 40) auf `behoben`.**
+
+## Review-Runde 3
+
+**Datum: 18.09.2026** · Eröffnungspaket (T-0359) der dritten Gegenprüfungsrunde nach §5 der
+Aufgabe `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md`. Dieses Paket legt den Abschnitt an, hält die
+Vorbedingung fest und zitiert das deterministische Lint-Ergebnis des Tages; die elf Folgepakete
+hängen ihre Verdikte darunter. **In diesem Paket wird keine Leitfrage beantwortet, kein Befund
+geprüft und kein Befund behoben.** Eiserne Regel 4 („Review nur in frischer Session") ist gewahrt:
+Diese Sitzung hat den geprüften Stand nicht geschrieben — geschrieben haben die Autoren-Pakete
+T-0235 bis T-0243, T-0256 bis T-0259 und die Revisionspakete aus T-0281, alle im Endstatus.
+
+**Befundnummern.** Das Ledger trägt heute die Nummern 1 bis 46 (Runde 1: 1–19, Runde 2: 20–46).
+Neue Befunde dieser Runde werden fortlaufend ab der nächsthöheren freien Nummer vergeben; die
+erste neue Nummer ist damit **47**.
+
+### 0 · Vorbedingung nach §5, Schritt 0 — Prüfgrundlagen-Bundle (§1)
+
+§5 der Aufgabe stellt der Gegenprüfung eine Vorbedingung voran: Das vollständige
+Prüfgrundlagen-Bundle nach §1 — Bericht, diese Aufgabe, beide Arbeitsmappen, Anlagen — liegt der
+Review-Session **ab dem ersten Turn** vor; ein Review ohne vollständiges Bundle ist ungültig
+(Lehre aus der M0-Prüfung: nachgereichte Quellen erzeugten zwei Extra-Durchgänge). Die folgenden
+Bestandteile liegen dieser Sitzung unter den genannten Pfaden im Repo vor, ohne Nachreichung; zur
+Identifizierung des geprüften Standes ist je Datei die Größe in Bytes und der Anfang der
+SHA-256-Summe angegeben (gemessen am 18.09.2026 in dieser Sitzung).
+
+| Bestandteil des Bundles (§1) | Pfad | Liegt dieser Sitzung vor |
+|---|---|---|
+| Bericht (Prüfgegenstand) | `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` | ja, ab dem ersten Turn — 229.149 Bytes, SHA-256 `d36326bd5678…` |
+| Aufgabe (einzige Instruktionsquelle, v2) | `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` | ja, ab dem ersten Turn — 38.446 Bytes, SHA-256 `08accbea6688…`; §1 und §5 in dieser Sitzung gelesen |
+| Arbeitsmappe Wirkungsketten | `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` | ja, ab dem ersten Turn — 86.813 Bytes, SHA-256 `2faac648aade…`; Blätter „Klimawirkungsketten", „Schadensbaum-Netzwerkliste" (nur gelesen, eiserne Regel 2) |
+| Arbeitsmappe Monetarisierung | `docs/Schadensbaum/KWRA-Monetarisierung.xlsx` | ja, ab dem ersten Turn — 50.825 Bytes, SHA-256 `4383882d3a93…`; Blätter „Risiken-Monetarisierung", „Schadenskonten-System", „Rechenregeln", „Abgleich-Protokoll" (nur gelesen, eiserne Regel 2) |
+
+Damit ist die Vorbedingung nach §5, Schritt 0 für Runde 3 erfüllt; die Folgepakete arbeiten auf
+demselben Stand und verweisen auf diese Tabelle, statt sie zu wiederholen.
+
+### 0.1 · Deterministisches Lint-Ergebnis vom 18.09.2026
+
+Nach §5 („Zuerst die deterministischen Lint-Ergebnisse übernehmen — nicht manuell nachprüfen, was
+die Maschine prüft") wird das Lint zu Beginn der Runde ausgeführt. Das Skript
+`backend/scripts/lint_methodik.py` gehört T-0234 und wurde hier **nur ausgeführt, nicht geändert**.
+Die folgende Ausgabe ist wörtlich die des Laufs von heute, einschließlich der führenden Leerzeile;
+nichts daran ist vorhergesagt oder zusammengefasst:
+
+```
+$ python3 backend/scripts/lint_methodik.py 60
+
+=== #60 · 60_gebaeudeschaeden_flusshochwasser.md ===
+  162 Checks grün
+  Historie-Marker: 0 markierte Zeilen (Ratchet None), 0 gedeckte Fundstellen abgelöster Werte:
+
+ALLE LINTS GRÜN
+```
+
+**Rückgabewert des Aufrufs: `0`** (gemessen, nicht angenommen). Die Folgepakete übernehmen dieses
+Ergebnis nach §5, statt es erneut zu erheben; Abweichungen späterer Läufe sind im jeweiligen Paket
+mit eigenem Zitat auszuweisen.
+
+Nicht angefasst (Dateirahmen dieses Pakets): `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`,
+`docs/evidenz/register.md`, `backend/scripts/lint_methodik.py`, `backend/` und die Kopftabelle
+„Offene Befunde" am Kopf dieses Ledgers. Geändert wurde ausschließlich diese Datei.
