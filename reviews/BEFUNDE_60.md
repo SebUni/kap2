@@ -1998,14 +1998,15 @@ Preisstand 2026 ist eine **Abschätzung von KAP3**: Über 13 Jahre wird eine dur
 Preissteigerung von 2 %/a angesetzt (Herleitung: \(1{,}02^{13} = 1{,}294\)), also
 \(E_{\min,2026} = 8 \cdot 1{,}294 = 10{,}35\) Mrd. EUR₂₀₂₆.
 
-Der **Wohngebäude- bzw. Wohnanteil** ist eine **Abschätzung von KAP3** mit dem Wert \(w = 0{,}30\):
-Der Gesetzestext selbst weist laut CSV-Anmerkung keinen auf Wohngebäude oder private Haushalte
-entfallenden Euro-Anteil aus („nennt Privathaushalte nur als eine von zwei Fördergruppen ohne
-Bezifferung"); angesetzt wird eine grobe Drittelung der Aufbauhilfe-Mittel auf private
-Wohngebäude/-inhalte, Infrastruktur und Wirtschaft/Landwirtschaft, wovon der schmalere Anteil
-„Wohngebäude" (ohne Hausrat, ohne Infrastruktur) mit rund einem Drittel des Privathaushalts-Anteils
-angesetzt wird — Herleitung: übliche Aufbauhilfe-Mittelverwendung dieser Größenordnung, keine
-Quelle beziffert den Wert exakt.
+Der **Wohngebäude- bzw. Wohnanteil** ist eine **Abschätzung von KAP3**: Der Gesetzestext selbst
+weist laut CSV-Anmerkung keinen auf Wohngebäude oder private Haushalte entfallenden Euro-Anteil aus
+(„nennt Privathaushalte nur als eine von zwei Fördergruppen ohne Bezifferung"); angesetzt wird eine
+grobe Drittelung der Aufbauhilfe-Mittel auf die drei Fördergruppen private Haushalte,
+Infrastruktur und Wirtschaft/Landwirtschaft, also ein Privathaushalts-Anteil von rund einem Drittel
+(≈ 1/3), und davon wiederum rund ein Drittel für die Gebäudesubstanz selbst — „Wohngebäude" ohne
+Hausrat und ohne Fahrzeuge (≈ 1/3 des Privathaushalts-Anteils). Rechenschritt (reproduzierbar, keine
+Quelle beziffert den Wert exakt): \(w = \tfrac{1}{3} \cdot \tfrac{1}{3} = \tfrac{1}{9} \approx
+0{,}11\).
 
 Der **flussseitige Anteil** ist ebenfalls eine **Abschätzung von KAP3** mit dem Wert
 \(f_{\text{fluss}} = 0{,}90\): Beide geförderten Ereignisse — Elbe-/Donau-Hochwasser 2013,
@@ -2021,8 +2022,8 @@ Wiederkehrzeit dieser beiden konkreten Ereignisse).
 
 \[
 U = \frac{E_{\min,2026} \cdot w \cdot f_{\text{fluss}}}{T}
-  = \frac{10{,}35 \cdot 0{,}30 \cdot 0{,}90}{100}
-  = \textbf{0,028 Mrd. EUR}_{2026}\text{/a}.
+  = \frac{10{,}35 \cdot 0{,}11 \cdot 0{,}90}{100}
+  = \textbf{0,010 Mrd. EUR}_{2026}\text{/a}.
 \]
 
 **(b) Welche Ankergrößen gehen in \(U\) ein?** In dieses \(U\) geht **keine** der sechs
@@ -2035,8 +2036,9 @@ Untergrenze \(U = A_{\text{ver}} w_{\text{wg}} \varphi \pi\) für jedes \(u\kapp
 unterhalb von \(A^{*} = U \cdot u\kappa \equiv \lambda M_0\) liegen musste, weil \(U\) ein
 Teilprodukt derselben Faktoren war, aus denen \(\lambda M_0\) gebildet wird; mit der neuen, aus den
 amtlichen Fondsgesetzen und eigenständigen Schätzungen gebildeten \(U\) besteht diese algebraische
-Teilmengen-Beziehung nicht mehr, und die Lage von \(\lambda M_0\) = 0,985 Mrd. EUR₂₀₂₆/a relativ zu
-\(U\) ist eine echte, aus unabhängigen Zahlen folgende Aussage statt einer Tautologie.
+Teilmengen-Beziehung nicht mehr, und die Lage von \(\lambda M_0\) = \(A^{*}\) = 0,832 · 1,360 =
+1,132 Mrd. EUR₂₀₂₆/a (§4.4, Stand nach der Ankerrevision T-0320/T-0321) relativ zu \(U\) ist eine
+echte, aus unabhängigen Zahlen folgende Aussage statt einer Tautologie.
 
 **(c) Obergrenze \(O\) klassengerecht.** Grundlage sind die Register-Mengen 339.000 Adressen der
 Klassen GK3+GK4 mit Jährlichkeit 0,1 a⁻¹, 1.380.000 Adressen der Klasse GK2 mit Jährlichkeit
@@ -2073,10 +2075,13 @@ Für beide Bandenden gilt deshalb dieselbe Ausnahmebegründung: Wo keine amtlich
 gesuchte Aufteilung liefert, tritt eine ausgewiesene, nachvollziehbare Abschätzung von KAP3 an ihre
 Stelle, nicht eine stillschweigende Ersatzquelle.
 
-**(e) Fixierung des Bandes vor der Lagepüfung.** Das Band [\(U\); \(O\)] = [0,028; 6,29] Mrd.
+**(e) Fixierung des Bandes vor der Lagepüfung.** Das Band [\(U\); \(O\)] = [0,010; 6,29] Mrd.
 EUR₂₀₂₆/a wird mit diesem Paket vorab fixiert und im Nachzugsschritt nicht nachträglich geweitet,
-unabhängig davon, wo \(\lambda M_0\) am Ende liegt. Der in Bericht-§4.4 ausgewiesene Wert
-\(\lambda M_0 = A^{*} = 0{,}985\) Mrd. EUR₂₀₂₆/a liegt innerhalb dieses fixierten Bandes.
+unabhängig davon, wo \(\lambda M_0\) am Ende liegt. Der in Bericht-§4.4 seit der Ankerrevision
+(T-0320/T-0321) ausgewiesene Wert \(\lambda M_0 = A^{*} = 0{,}832 \cdot 1{,}360 = 1{,}132\)
+Mrd. EUR₂₀₂₆/a (derselbe Wert steht im Ist-Satz §4.6, Z. 1363) liegt innerhalb dieses fixierten
+Bandes — nicht der abgelöste Stand 0,985 Mrd. EUR₂₀₂₆/a aus dem inzwischen verworfenen
+Stichprobenlauf.
 
 **(f) Nachzugsstellen (Schritt 3/4 der Ersatzkette).** Der hier festgehaltene Rechenweg ist an
 folgenden Fundstellen nachzuziehen: **§4.6** (die Tabelle mit \(U\) = 0,639 und \(O\) = 2,26, der
@@ -2094,7 +2099,7 @@ python3 -c "
 E_nom = 8.0
 faktor_2026 = 1.02 ** 13
 E_min_2026 = E_nom * faktor_2026
-w = 0.30
+w = (1/3) * (1/3)
 f_fluss = 0.90
 T = 100
 U = E_min_2026 * w * f_fluss / T
@@ -2105,13 +2110,13 @@ wert_geb = 527280.0
 q_deckel = 0.250
 O = (n_gk34 + n_gk2) * wert_geb * q_deckel / 1e9
 
-assert abs(U - 0.0279) < 2e-3, U
+assert abs(U - 0.0103) < 2e-3, U
 assert abs(O - 6.288) < 2e-2, O
 print('U =', round(U, 3), 'Mrd. EUR2026/a; O =', round(O, 2), 'Mrd. EUR2026/a')
 "
 ```
 
-Ausgeführt am 18.09.2026: `U = 0.028 Mrd. EUR2026/a; O = 6.29 Mrd. EUR2026/a`, Exit 0.
+Ausgeführt am 18.09.2026: `U = 0.01 Mrd. EUR2026/a; O = 6.29 Mrd. EUR2026/a`, Exit 0.
 
 **Status.** Befund 35 bleibt **offen**. Dieses Paket schreibt bewusst nur ins Ledger: der Bericht
 (§4.6, §4.8, Block `beispiel_60_kalibrierung`, §7.2) wird in den Folgepaketen nachgezogen, der
