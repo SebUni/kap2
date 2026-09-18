@@ -1045,12 +1045,13 @@ Sensitivität mit (Mittelwert \(A_{\text{ver}}\) je Fenster aus
 | 2002–2024 ohne 2021 | 22 | **1,349** | 0,831 | **0,611** |
 | 2014–2024 ohne 2021 | 10 | **1,010** | 0,622 | **0,457** |
 
-Drei der vier \(\lambda\)-Werte liegen innerhalb der Plausibilitätsschranke [0,50; 2,00] aus §4.4;
-nur das kürzeste Fenster (2014–2024 ohne 2021, \(\lambda\) = 0,457) unterschreitet sie. Genau das
-ist der zweite Grund für die Wahl des Hauptfensters: Mit dem kürzesten der vier geprüften Fenster
-fiele \(\lambda\) unter die Plausibilitätsschranke und das Modell gälte nach §4.4 als fehlerhaft
-statt kalibrierbar — ein Modellentscheid, den die Wahl des Hauptfensters nicht nach diesem Ergebnis
-trifft, sondern vorab über die ergebnisunabhängige Auswahlregel oben.
+Gegen die hergeleitete Plausibilitätsschranke [0,11; 3,44] aus §4.4 liegen **alle vier**
+\(\lambda\)-Werte innerhalb — auch das kürzeste Fenster (2014–2024 ohne 2021, \(\lambda\) = 0,457)
+unterschreitet die Schranke nicht mehr, seit sie aus dem vollständig fortgepflanzten Band von
+\(A^{*}\) und \(M_0\) folgt statt freihändig gesetzt zu sein (§4.4). Das Unterschreiten der
+Schranke trägt die Wahl des Hauptfensters damit nicht mehr als zweiten Grund; sie stützt sich
+**allein** auf die ergebnisunabhängige Auswahlregel oben, die unabhängig davon feststeht, welches
+der vier geprüften Fenster das für den Bericht günstigste \(\lambda\) liefert.
 
 **Herleitung des Ausreißerbands (Tukey-Fence).** Statt ein einzelnes Jahr freihändig als „den"
 Ausreißer zu benennen, wird ein benannter, uniform auf die gesamte Hauptfenster-Reihe angewandter
@@ -1218,16 +1219,17 @@ Zentralwert 339.000 · 0,0059796 + 1.380.000 · 0,00067515 = 2.958,79/a (unverä
 \(M_0\)_oben = 0,872 · 596.086,4 € · 5.084,22/a = 2.642.713.194 €₂₀₂₆/a ≈ **2,643 Mrd. €₂₀₂₆/a**
 
 Damit ist \(M_0\) = **1,360 Mrd. €₂₀₂₆/a**, mit einem Band von **0,657–2,643 Mrd. €₂₀₂₆/a** um
-diesen Zentralwert. Der Nachzug dieses Bands in die Plausibilitätsschranke von §4.4, in §4.8 und in
-den Produkt-Block `flood_bldg.lambda` (Kap. 7) folgt in den nächsten Schritten der Ersatzkette für
-Ledger-Befund 36; §4.4 rechnet in diesem Zwischenstand noch mit dem λ-Band bei unverändertem
-\(M_0\) (siehe dort).
+diesen Zentralwert. Dieses Band ist in §4.4 und §4.8 bereits in das λ-Band und die
+Plausibilitätsschranke fortgepflanzt (Ersatzkette für Ledger-Befund 36); der Nachzug in den
+Produkt-Block `flood_bldg.lambda` (Kap. 7) und die Entscheidungslog-Zeile 8 folgt im nächsten
+Schritt der Kette.
 
 <a id="niveau-skalar"></a>
 ### 4.4 Der Niveau-Skalar
 
-\(\lambda = A^{*}/M_0\) = 1,132 / 1,360 = **0,832** (Band aus dem Ankerband 0,297–2,263 bei
-unverändertem \(M_0\): **0,22–1,66**).
+\(\lambda = A^{*}/M_0\) = 1,132 / 1,360 = **0,832** (vollständig fortgepflanztes Band, Zähler und
+Nenner unabhängig an ihren jeweiligen Extremen, aus dem Ankerband von \(A^{*}\), 0,297–2,263
+(§4.2), und dem Band von \(M_0\), 0,657–2,643 (§4.3): **0,11–3,44**).
 
 **Anwendungsregel.** \(\lambda\) ist ein **einziger, bundesweit konstanter** Faktor auf
 \(\text{EAD}_k\) jeder Kommune. Er ist kein Verteilungsschlüssel: Die relative Verteilung zwischen
@@ -1235,17 +1237,28 @@ Kommunen bleibt unverändert, eine Kommune ohne Flussaue bleibt bei 0 (Lackmuste
 keinen zweiten Skalar, keinen bundeslandspezifischen Korrekturfaktor und keine Nachkalibrierung
 einzelner Kommunen.
 
-**Plausibilitätsschranke.** Ergibt eine Neubestimmung \(\lambda < 0{,}50\) oder \(\lambda >
-2{,}00\), wird **nicht** der Skalar gesetzt, sondern das Modell gilt als fehlerhaft: Dann trägt
+**Plausibilitätsschranke.** Ergibt eine Neubestimmung \(\lambda < 0{,}11\) oder \(\lambda >
+3{,}44\), wird **nicht** der Skalar gesetzt, sondern das Modell gilt als fehlerhaft: Dann trägt
 eine Eingangsgröße den Fehler (Exponiertenzahl, Wertdichte, Schadensfunktion), und der Befund geht
-ins Ledger, bevor gerechnet wird. Der Zentralwert \(\lambda\) = 0,832 **liegt innerhalb** der
-Schranke [0,50; 2,00]; der Skalar wird deshalb gesetzt. Die Schranke selbst bleibt unverändert bei
-0,50 bzw. 2,00 — sie wird nicht an das Ergebnis angepasst. Dass das untere **Bandende** 0,22 unter
-0,50 fällt, betrifft nicht den Zentralwert, sondern die noch ausstehende Herleitung der Schranke
-aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\); dieser Punkt ist als Befund 36 im Ledger
-offen und wird hier weder durch Weiten der Schranke noch nebenbei gelöst. Gesetzt heißt nicht
-endgültig: \(\lambda\) ist **weiterhin vorläufig** — die Verteilungsprüfung in 4.5 wird nicht
-bestanden (Modellentscheid), und die Ledger-Befunde 35 und 36 sind offen (Einleitung Kap. 4).
+ins Ledger, bevor gerechnet wird. Die Schranke [0,11; 3,44] ist keine freihändig gesetzte
+Abschätzung von KAP3 mehr (das war der bis hierhin geltende Stand „Faktor 2 um den Neutralwert
+1"), sondern hergeleitet: Sie ist das vollständig fortgepflanzte Band aus dem Ankerband von
+\(A^{*}\), 0,297–2,263 (§4.2), und dem Band von \(M_0\), 0,657–2,643 (§4.3) — Zähler und Nenner
+unabhängig an ihren jeweiligen Extremen, alle Enden gleichgerichtet (multiplikative Bandenden,
+keine Verteilungsannahme, Anweisung A-0034): \(\lambda_{\text{unten}}\) = 0,297 / 2,643 =
+0,112384… → **0,11**, \(\lambda_{\text{oben}}\) = 2,263 / 0,657 = 3,444409… → **3,44** (zwei
+Nachkommastellen, kaufmännisch gerundet). Eine Neubestimmung von \(\lambda\), die außerhalb dieser
+aus den eigenen, in §4.2 und §4.3 benannten Bandenden folgenden Spanne läge, wäre mit dem eigenen
+Modell nicht mehr verträglich — das ist die einzige ergebnisunabhängige Bezugsgröße, die ohne eine
+zusätzliche, nicht durch A-0034 gedeckte Verteilungsannahme zur Verfügung steht. Das untere
+Bandende \(\lambda\) = 0,11 **gilt als zulässig**: Es fällt nicht unter die Schranke, sondern
+bildet ihren unteren Wert, weil die Schranke gerade aus diesem Bandende hergeleitet ist, nicht
+unabhängig davon gesetzt. Das obere Bandende \(\lambda\) = 3,44 **gilt aus demselben Grund als
+zulässig** — auch dieses Bandende bildet den oberen Wert der Schranke selbst. Der Zentralwert
+\(\lambda\) = 0,832 **liegt innerhalb** der Schranke [0,11; 3,44]; der Skalar wird deshalb gesetzt.
+Gesetzt heißt nicht endgültig: \(\lambda\) ist **weiterhin vorläufig** — die Verteilungsprüfung in
+4.5 wird nicht bestanden (Modellentscheid), und die Ledger-Befunde 35 und 36 sind offen (Einleitung
+Kap. 4).
 
 ### 4.5 Unabhängige Verteilungsprüfung: Achse Ereignisregime (Jahresauslassung über die Ankerreihe)
 
@@ -1432,10 +1445,10 @@ die Bezifferung von \(q_0\) bleibt offen und ist als solche gekennzeichnet.
 | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\pi\) | 1,07 (1,04–1,11) | **Abschätzung von KAP3** aus B4 (Baupreisindex), Herleitung §4.2 |
-| \(\lambda\) Niveau-Skalar | 0,832 (0,22–1,66) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\) als Kleinste-Quadrate-Schätzer der Jahres-Auswahlregel-Reihe (§4.1a), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3) mit Wohngebäudeanteil 0,872; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein; Zentralwert innerhalb der Plausibilitätsschranke, Sensitivität je Zeitfenster in §4.1a, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
+| \(\lambda\) Niveau-Skalar | 0,832 (0,11–3,44) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\) als Kleinste-Quadrate-Schätzer der Jahres-Auswahlregel-Reihe (§4.1a), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3) mit Wohngebäudeanteil 0,872; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein; Band vollständig fortgepflanzt aus dem \(A^{*}\)-Band (§4.2) und dem \(M_0\)-Band 0,657–2,643 (§4.3); Zentralwert innerhalb der Plausibilitätsschranke, Sensitivität je Zeitfenster in §4.1a, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
 | Baupreisanstieg 2023 → 2024 | 3 % (2,3–5,0 %) | **Abschätzung von KAP3**: gerundet aus den in B4 zitierten Jahresraten des Baupreisindex (3,2 %/3,3 %), Band wie B4; geht in \(\pi = 1{,}105/1{,}03\) ein (§4.2); Sensitivität: \(\pi\) = 1,080 bei 2,3 %, 1,052 bei 5,0 % |
 | Betroffenheit exponierter Gebäude | 1/100 a | **Abschätzung von KAP3**, Herleitung §4.6 (mittlere Betroffenheit auf Bemessungsniveau HQ100); geht linear in \(O\) ein |
-| Plausibilitätsschranke \(\lambda\) | 0,50 bzw. 2,00 | **Abschätzung von KAP3** (Faktor 2 um den Neutralwert 1), §4.4; gilt für den Zentralwert einer Neubestimmung; die Fenster-Sensitivität in §4.1a prüft die Schranke an vier \(\lambda\)-Werten, drei davon innerhalb; die Herleitung aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) steht aus (Ledger, Befund 36) |
+| Plausibilitätsschranke \(\lambda\) | 0,11 bzw. 3,44 | **berechnet** aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) (§4.4), Rundungsregel und Entscheidungsregel wie dort; gilt für den Zentralwert einer Neubestimmung; die Fenster-Sensitivität in §4.1a prüft die Schranke an vier \(\lambda\)-Werten, alle vier innerhalb |
 | Toleranz Verteilungsprüfung | ±11,5 Prozentpunkte | **berechnet**, Herleitung §4.5: quadratische Zusammensetzung aus Jackknife-Standardfehler der Ankerreihe ±11,2 (gerechnet aus `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), Ableseunschärfe ±1,7 und modellseitigem HQextrem-Band ±2,3; **Abschätzung von KAP3** ist daran nur die Wahl der Kombinationsregel (unabhängige Beiträge, quadratisch), vorab festgelegt. Ist-Ergebnis: Abstand 13,9 Pp, **Prüfung nicht bestanden** (Modellentscheid §4.5) |
 | \(U\) Sanity-Untergrenze | 0,639 Mrd. €₂₀₂₆/a | **berechnet** aus Anker und Bestandsanteilen, Herleitung §4.6; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(\varphi_{\text{fluss}}\) und \(\pi\) ein |
 | \(O\) Sanity-Obergrenze | 2,26 Mrd. €₂₀₂₆/a | **berechnet** aus Bestandswert, Deckelquote und 1/100 a, Herleitung §4.6; es fließen die Abschätzungen von KAP3 Betroffenheit 1/100 a und Deckelquote 0,250 (§3.3) ein |
@@ -1477,10 +1490,17 @@ M0_oben = w_wohn * wert_geb_hi * term_hi / 1e9
 assert abs(M0_unten - 0.657) < 5e-3
 assert abs(M0_oben - 2.643) < 5e-3
 
-# 4.4 Niveau-Skalar samt Band aus dem Ankerband
+# 4.4 Niveau-Skalar: vollstaendig fortgepflanztes Lambda-Band und hergeleitete Plausibilitaetsschranke
 lam = A_stern / M0
-assert abs(lam - 0.832) < 5e-3 and 0.50 <= lam <= 2.00   # Plausibilitaetsschranke 4.4
-assert abs(lo / M0 - 0.218) < 5e-3 and abs(hi / M0 - 1.663) < 5e-3
+assert abs(lam - 0.832) < 5e-3
+lam_lo = lo / M0_oben                       # unteres Lambda-Bandende (Zaehler/Nenner an den Extremen)
+lam_hi = hi / M0_unten                      # oberes Lambda-Bandende
+assert abs(lam_lo - 0.11) < 5e-3
+assert abs(lam_hi - 3.44) < 5e-3
+schranke_lo, schranke_hi = round(lam_lo, 2), round(lam_hi, 2)
+assert abs(schranke_lo - 0.11) < 5e-3       # Plausibilitaetsschranke unten
+assert abs(schranke_hi - 3.44) < 5e-3       # Plausibilitaetsschranke oben
+assert schranke_lo <= lam <= schranke_hi    # Zentralwert liegt innerhalb der Schranke
 
 # 4.5 Verteilungspruefung Ereignisregime: Anteil ab HQ100 gegen Ankerbefund
 A = [15.0, 77.76, 300.0]
