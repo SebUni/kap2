@@ -50,3 +50,15 @@ VERDIKT: <n> NEUE BEFUNDE (A:<a> B:<b> C:<c>)
 
 Null-Runde nur, wenn diese Runde **keine neuen A- oder B-Befunde** ergab, alle Lints grün
 sind und alle 14 Leitfragen ein Verdikt haben.
+
+## Abgrenzung zum Manager-Review
+
+Diese Gegenprüfung nach §5 ist die formale Abnahme; der fachliche Review des Managers (`/manager-review <nr>`) läuft danach in einer eigenen Sitzung und ersetzt sie nicht.
+
+Beim `methodik_manager` liegt und ist hier **nicht** zu prüfen:
+
+- die fachliche Angemessenheit der Wirkungskette gegenüber dem erteilten Auftrag,
+- die Erklärbarkeit für Berater und kommunale Sachbearbeiter,
+- die Abwägung zwischen Genauigkeit und Lesbarkeit.
+
+Ein Verstoß gegen §3 oder §5 wird trotzdem hier gemeldet, auch wenn er die Erklärbarkeit betrifft.
