@@ -2787,3 +2787,201 @@ die Einträge sind reine Gegenprüfung.
 - **Kein Befund behoben, keiner umnummeriert.** Die Befunde 3, 49 (Registerzeilen) und 41 (Zeitwertansatz) werden nur abgegrenzt, nicht neu vergeben.
 - **Kopftabelle „Offene Befunde (19)" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete, festgelegt im Eröffnungspaket T-0359). Mit 47–49 (T-0360), 50–53 (T-0361) und 54–57 aus diesem Paket wären es 30 offene Zeilen; nachgezogen wird die Kopftabelle im Abschlusspaket der Runde 3.
 - **Nicht Gegenstand dieses Pakets:** die Leitfragen 1, 2, 4 bis 12 und 14, der Berichtskopf, die Abschnitte 3.2 und 3.3, die Kapitel 1, 2 und 4 bis 9 sowie die Regression der Befunde 1–53. Formelzeichen, die allein in Kapitel 5 auftreten (\(r_{\text{S092}}\), \(\Delta q\), \(e_{\text{bem}}\)), sind aus der Zählung ausgenommen und nur als vorhanden vermerkt.
+
+### Leitfragen 6 und 8
+
+Paket T-0363 der Runde 3 (18.09.2026), eigene frische Sitzung: Sie hat den geprüften Stand nicht
+geschrieben — Kapitel 4, Kapitel 6 und das Entscheidungslog stammen aus T-0235 bis T-0243, T-0256
+bis T-0259 und den Revisionspaketen aus T-0281, alle im Endstatus (eiserne Regel 4). Das Bundle
+nach §1 lag ab dem ersten Turn vor (Abschnitt 0 dieser Runde, unverändert gültig); die Lint-Ausgabe
+aus Abschnitt 0.1 wird **übernommen, nicht neu erhoben** (§5, Schritt „zuerst die deterministischen
+Lints"). Maßstab sind ausschließlich §3 und §5 der Aufgabe, nicht der Berichtstext. Nach §6 ist die
+volle Prüfung erneut zu fahren, weil die Kalibrierung seit Runde 2 durch die Autor-Revision
+geändert wurde; dieses Paket trägt davon den Kern: die Leitfragen **6** (Struktur) und **8**
+(Kalibrierung).
+
+**Prüfumfang dieses Pakets.** Vertieft geprüft sind **Kapitel 4 Teil A** (Kapitelkopf
+`## 4 Kalibrierung & Validierung (§2.4/§3.4)` samt 4.1, 4.1a, 4.2, 4.3 und 4.4), **Kapitel 6**
+„Szenario-Anwendung & Modellgrenzen" und der Abschnitt `## Entscheidungslog`. Nachgemessen, nicht
+aus dem Ticket übernommen:
+
+```
+$ python3 -c "
+import re
+s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read()
+def body(a,b):
+    t=s.split(chr(10)+a)[1].split(chr(10)+b)[0]
+    return re.sub('<!--.*?-->','',t,flags=re.S).strip(chr(10))
+pairs=[('## 4 Kalibrierung','### 4.1 Nationaler'),('### 4.1 Nationaler','### 4.1a Kleinste'),
+       ('### 4.1a Kleinste','### 4.2 Vom Anker'),('### 4.2 Vom Anker','### 4.3 Modellsumme'),
+       ('### 4.3 Modellsumme','### 4.4 Der Niveau'),('### 4.4 Der Niveau','### 4.5 Unabhängige')]
+t=0
+for a,b in pairs:
+    n=len(body(a,b)); t+=n; print(a,n)
+print('SUMME Kap4 TeilA',t)
+"
+## 4 Kalibrierung 1778
+### 4.1 Nationaler 2797
+### 4.1a Kleinste 6204
+### 4.2 Vom Anker 3717
+### 4.3 Modellsumme 8960
+### 4.4 Der Niveau 2683
+SUMME Kap4 TeilA 26139
+```
+
+Kapitel 6 misst **5.306** Zeichen und das Entscheidungslog **5.011** Zeichen — beide treffen die im
+Ticket genannten Werte exakt. Kapitel 4 Teil A misst **26.139** statt der genannten 25.530 Zeichen
+(mit Schnitt am Zeilenanfang der Überschriften: 26.255), die Summe also **36.456** statt 35.847.
+Der geprüfte Textkörper ist derselbe — die Abschnittsgrenzen sind die im Ticket genannten; die
+Differenz stammt aus 4.1a und 4.3, die seit dem Ticketschnitt um das Ausreißerband und die
+Restfehler-Positionen gewachsen sind. Die Zahl steht hier als Messwert, statt die Ticketzahl zu
+wiederholen.
+
+**Nicht vertieft geprüft** sind 4.5 bis 4.8 (Kapitel 4 Teil B, Geschwisterpaket); sie werden nur
+als Gegenstelle zitiert, etwa für die Verteilungsprüfung, die LF 8 ausdrücklich verlangt. Ein
+nationaler 100-m-Vollraster-Lauf ist nach §3.4 unzulässig und wurde **nicht** gefahren:
+Nachgerechnet wurde ausschließlich aus den im Bericht ausgewiesenen Zahlen (Ressourcen-Regel §3.4).
+Die Arbeitsmappen wurden nur gelesen (eiserne Regel 2); im Code wurde nichts geändert (eiserne
+Regel 5).
+
+**Befundnummern — gemessen statt übernommen.** Das Ticket nennt als erste freie Nummer 47; das
+Ledger trägt inzwischen die Nummern 1 bis **57** (47–49 aus T-0360, 50–53 aus T-0361, 54–57 aus
+T-0371). Nach der Regel „fortlaufend ab der nächsthöheren freien Nummer" vergibt dieses Paket
+deshalb ab **58**; die Ticketzahl 47 ist zwischen Ticketschnitt und Lauf veraltet.
+
+#### LF 6 — Struktur: überall verwendet, wo die Evidenz strukturabhängig ist; Kopplungen zwischen abgeleiteten Parametern neu gerechnet?
+
+**Verdikt: Befund** (Befunde 58, 59 und 60). Beide Hälften der Leitfrage tragen je einen eigenen
+Mangel; erfüllt sind sie dort, wo der Bericht die Strukturabhängigkeit ausdrücklich als Modellgrenze
+führt.
+
+*Erfüllt — Strukturabhängigkeit im Zellmodell und in den Modellgrenzen.* Das Produktionsmodell führt
+die Gebäudestruktur als eigene Achse: \(w_z = k_{\text{BGF}} \sum_t \theta_{z,t} n_t\) (§3.4
+Schritt 3, Z. 681) mit zwei belegten Wertsätzen, \(n_{\text{EFH/ZFH}}\) = 1.950 und
+\(n_{\text{MFH}}\) = 1.533 €₂₀₂₆/m² BGF (Z. 684–685), gespeist aus der Ebene GEBAEUDEWERT (§3.2
+Z. 563: Zensus 2022, Gebäudetyp im 100-m-Gitter, Fallback „Typ-Mix der übrigen Zellen derselben
+Kommune", ersatzweise „der amtlich publizierte Bestandsmix des Bundeslandes"). Kapitel 6 hält die
+strukturabhängigen Stellen als Modellgrenzen fest, statt sie zu verallgemeinern: Modellgrenze 2
+(Z. 1805–1809) weist die Materialachse S094 ausdrücklich als für Mauerwerksbauweise kalibriert und
+für Holz-, Fachwerk- und Leichtbau als Untergrenze aus (Vorgabe P2, Bauform-Grenze dokumentiert);
+Modellgrenze 4 (Z. 1812–1813) beziffert die Regionalstreuung des bundeseinheitlichen NHK-Satzes mit
+±20 %; Stationaritätsannahme (2) (Z. 1788–1790) sagt, die Bänder von \(d(h)\) bildeten „nur den
+heutigen Bestandsmix ab, nicht eine künftige Bauweise". Das ist der Teil der Leitfrage, der sitzt.
+
+*Nicht erfüllt — die Kalibrierung selbst ist strukturlos gerechnet.* §4.3 bildet den Wert je
+exponiertem Wohngebäude als „208 m² Wohnfläche · 1,30 BGF/Wohnfläche · 1.950 €₂₀₂₆/m² BGF =
+527.280 €₂₀₂₆" (Z. 1138–1139) und setzt damit den **EFH/ZFH-Satz für den gesamten nationalen
+Bestand** an; \(\theta_{z,t}\) kommt in ganz Kapitel 4 nicht vor, auch nicht als Zeile der
+M₀-Bandtabelle (Z. 1199–1208). Die Struktur ist also genau dort weggelassen, wo die Evidenz
+strukturabhängig ist und wo der Bericht sie in §3.2 selbst als national verfügbar ausweist. Daraus
+**Befund 58**.
+
+*Nicht erfüllt — Kopplungen zwischen abgeleiteten Parametern nicht neu gerechnet.* Der Anker hat
+sich mit der Revision von \(A^{*}\) = 0,985 auf 1,132 Mrd. €₂₀₂₆/a bewegt (Entscheidungslog Nr. 8,
+Z. 2513: „\(A^{*}\) = 1,132 (statt 0,985 nach dem verworfenen Stichprobenlauf)"). Drei abgeleitete
+Größen im Prüfumfang sind seither nicht nachgerechnet und tragen rechnerisch weiterhin den
+abgelösten Wert — nachgewiesen durch Rückrechnung, nicht vermutet (Befund 59). Zusätzlich ist die
+Kopplung des Preisfaktors \(\pi\) an das Baupreisband aus B4 nur am unteren, nicht am oberen
+Bandende vollzogen (Befund 60).
+
+#### LF 8 — Kalibrierung: ein Skalar; Revisionsstand; unabhängige Verteilungsprüfung mit Ist-Ergebnis, out-of-sample?
+
+**Verdikt: Befund** (Befunde 61 und 62). Die vier Teilforderungen der Leitfrage fallen
+unterschiedlich aus; die Nachrechnung des Skalars selbst besteht.
+
+*Erfüllt — ein einziger Skalar.* §4.4 Z. 1234–1238 bindet \(\lambda\) als „einzigen, bundesweit
+konstanten" Faktor auf \(\text{EAD}_k\) und schließt Verteilungswirkung, zweiten Skalar,
+bundeslandspezifischen Korrekturfaktor und Nachkalibrierung einzelner Kommunen ausdrücklich aus;
+die Einleitung des Kapitels (Z. 934–937) trennt Niveau und Verteilung ebenso. Regionale
+Kalibrierfaktoren, die §3.4 nur als befristete Übergangslösung zuließe, kommen nicht vor.
+
+*Erfüllt — Revisionsstand und vorläufige Jahre.* §4.1 Z. 968–974 benennt den Stand („Datenservice
+zum Naturgefahrenreport 2025") mit den Aktualisierungsvermerken 10.10.2025 und 30.12.2025, weist
+die Reihe als bestands- und preisnormiert aus („bezogen auf Bestand und Preise 2024") und hält das
+Schadenjahr 2025 als nur vorläufig mitgeteilt **aus** der Kalibrierung heraus („geht in die
+Kalibrierung **nicht** ein; es dient ausschließlich als nachlaufende Kontrolle"). Damit ist die
+Forderung von §3.4 („laufende/vorläufige Jahre gesondert, nicht ins Kalibrier-Mittel") erfüllt; eine
+Sensitivität ohne vorläufige Werte erübrigt sich, weil kein vorläufiger Wert in der Reihe steht.
+
+*Erfüllt — unabhängige Verteilungsprüfung mit Ist-Ergebnis, out-of-sample.* §4.5 (Teil B, hier nur
+als Gegenstelle) prüft die Achse Ereignisregime über eine Jahresauslassung (Leave-one-out,
+Z. 1272–1278), begründet die Unabhängigkeit von der Kalibrierung zweifach und nachrechenbar
+(Skaleninvarianz und Jahresauslassung, Z. 1287–1298) und fixiert die Toleranz mit ±11,5
+Prozentpunkten **vorab** (Z. 1300–1302). Prüfdaten und Fit-Daten fallen damit auseinander; das
+Ist-Ergebnis ist ausgewiesen und lautet **nicht bestanden**, was der Bericht nicht glättet, sondern
+als Grund für den Vermerk „vorläufig" führt (Kapitelkopf Z. 949–954, §4.4 Z. 1259–1261). Die
+Vollständigkeit dieser Prüfung liegt beim Geschwisterpaket zu Teil B; für LF 8 ist die Forderung
+formal erfüllt.
+
+*Nachgerechnet statt gelesen — der Niveau-Skalar.* Die Leitfrage wird hier nicht am Text, sondern an
+der Rechnung geprüft. Beide Eingangszahlen stammen aus dem Bericht:
+
+| Eingangszahl | Wert | Fundstelle |
+|---|---|---|
+| Zielwert der Bundessumme \(A^{*}\) | 1,132 Mrd. €₂₀₂₆/a | `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` §4.2 „Zielwert" **Z. 1123** |
+| Modellsumme vor Kalibrierung \(M_0\) | 1,360 Mrd. €₂₀₂₆/a | ebenda §4.3 **Z. 1157–1159** |
+| ausgewiesener Skalar \(\lambda\) (Vergleichswert) | 0,832 | ebenda §4.4 **Z. 1230** |
+
+**Rechenweg.** \(\lambda_{\text{nachgerechnet}} = A^{*}/M_0 = 1{,}132 / 1{,}360 =
+0{,}8323529411\ldots \rightarrow \mathbf{0{,}832}\) (drei Nachkommastellen). Gegen den in 4.4
+ausgewiesenen Wert 0,832: **Abweichung +0,042 %**. Gegenprobe mit ungerundeten Eingängen, damit die
+Übereinstimmung nicht aus der Rundung stammt: \(A^{*}\) aus seinen sechs Faktoren (§4.2 Z. 1123) =
+1,838 · 0,65 · 1,54 · 0,50 · 1,15 · 1,07 = 1,1319603295 (Folgefaktor-Produkt 0,6158652500 —
+identisch mit dem in §4.1a Z. 1037–1038 ausgewiesenen 0,615865); \(M_0\) aus seinen Eingängen
+(§4.3 Z. 1157) = 0,872 · 527.280 € · (339.000 · 0,0059796/a + 1.380.000 · 0,00067515/a) =
+0,872 · 527.280 € · 2.958,7914/a = 1.360.417.254 €₂₀₂₆/a = 1,360417 Mrd.; daraus \(\lambda\) =
+1,1319603295 / 1,360417254 = 0,8320684896 → **0,832**, **Abweichung +0,008 %**. Auch die
+Klassenbeiträge stimmen (GK3+GK4 0,9320 gegen ausgewiesene 0,932 Mrd.; GK2 428,39 gegen
+ausgewiesene 428 Mio.). Der produktive Skalar ist damit korrekt gerechnet; **dieser Teil ist
+bestanden**, und der Befund liegt nicht am Zentralwert.
+
+*Nicht erfüllt — die Schranke, die den Skalar prüfen soll, kann nicht ansprechen.* §4.4
+Z. 1240–1258 stellt \(\lambda\) eine Plausibilitätsschranke [0,11; 3,44] zur Seite, bei deren
+Verletzung „das Modell als fehlerhaft gilt". Sie ist aus denselben Bandenden hergeleitet, aus denen
+\(\lambda\) selbst folgt, und kann deshalb von \(\lambda = A^{*}/M_0\) nie verletzt werden — der
+Bericht zieht diesen Schluss an zwei Stellen selbst („Das untere Bandende \(\lambda\) = 0,11 **gilt
+als zulässig**", „Das obere Bandende … **gilt aus demselben Grund als zulässig**", Z. 1253–1257).
+Daraus **Befund 61**.
+
+*Nicht erfüllt — die Bandrechnung des Skalars ist an drei Stellen nicht nachrechenbar.* Die in 4.4
+und 4.3 ausgewiesenen Zwischenergebnisse der Bandfortpflanzung weichen ab der vierten
+Nachkommastelle von der Division ab, die der Bericht angibt. Daraus **Befund 62** (Kategorie C: die
+gerundeten Endwerte 0,11 / 3,44 / 0,657 ändern sich nicht).
+
+#### Neue Befunde dieses Pakets (58 bis 62)
+
+| Nr | Kat. | Befund |
+|---|---|---|
+| 58 | **B** | **Stelle:** Bericht §4.3 Z. 1138–1139 („208 m² Wohnfläche · 1,30 BGF/Wohnfläche · 1.950 €₂₀₂₆/m² BGF = **527.280 €₂₀₂₆**") und M₀-Bandtabelle Z. 1199–1208, Zeile „Wertsatz" Z. 1203 — gegen §3.4 Schritt 3 Z. 681 (\(w_z = k_{\text{BGF}} \sum_t \theta_{z,t} n_t\)), §3.5 Z. 684–685 (\(n_{\text{EFH/ZFH}}\) = 1.950, \(n_{\text{MFH}}\) = 1.533 €₂₀₂₆/m² BGF) und §3.2 Ebene GEBAEUDEWERT Z. 563 (Gebäudetyp-Mix \(\theta_{z,t}\) aus Zensus 2022, Fallback „amtlich publizierter Bestandsmix des Bundeslandes"). · **Art: Fehler/Lücke** (§3.4 „Kalibriermodell = Produktionsmodell"; §5 LF 6 erste Hälfte). · **Begründung:** Das Produktionsmodell bewertet jede Zelle mit einem **typgewichteten** Wertsatz über \(\theta_{z,t}\); der nationale Kalibrierlauf, aus dem \(M_0\) und damit \(\lambda\) folgen, setzt stattdessen für **den gesamten** exponierten Bestand den EFH/ZFH-Satz 1.950 €₂₀₂₆/m² BGF an. \(\theta\) kommt in Kapitel 4 an keiner Stelle vor, auch nicht als Bandzeile — die Struktur ist weder gerechnet noch als Unsicherheit geführt. Die beiden Sätze liegen 21 % auseinander (1.950 gegen 1.533), die Richtung des Fehlers ist eindeutig: \(M_0\) ist zu hoch und \(\lambda\) zu niedrig angesetzt, soweit MFH-Wohnfläche im exponierten Bestand steckt. Nachgerechnet als Randfall: Trüge der exponierte Bestand durchgehend den MFH-Satz, wäre \(M_0\) = 1,360 · 1.533/1.950 = **1,069** Mrd. €₂₀₂₆/a und \(\lambda\) = 1,132/1,069 = **1,059** statt 0,832 — eine Verschiebung um **+27 %**, also größer als jede der vier Fenster-Sensitivitäten in §4.1a (Z. 1041–1046). Verschärfend: Die Wohnfläche 208 m² ist der Quotient aus 4,1 Mrd. m² und 19,7 Mio. **Wohngebäuden aller Typen** (Z. 1201), also ein Mittel **über** die Typen, während der Wertsatz daneben typ**spezifisch** gewählt ist — die beiden Faktoren desselben Produkts beziehen sich auf verschiedene Grundgesamtheiten. Dass der Fallback nach §3.2 gerade der Bestandsmix des Bundeslandes ist, zeigt, dass die Größe für einen nationalen Ansatz vorliegt und nicht beschafft werden müsste. · **Vorschlag:** In §4.3 den nationalen Typ-Mix \(\bar\theta\) (Zensus 2022, Wohnfläche je Gebäudetyp) einsetzen und den Wert je exponiertem Wohngebäude mit \(k_{\text{BGF}} (\bar\theta_{\text{EFH}} n_{\text{EFH}} + \bar\theta_{\text{MFH}} n_{\text{MFH}})\) bilden, \(M_0\), \(\lambda\) und das M₀-Band daraus neu rechnen; \(\bar\theta\) als eigene Zeile in die Bandtabelle aufnehmen (Bandenden aus der Spannweite der Länder-Mixe). Ist der Mix für die **exponierte** Teilmenge nicht greifbar, den Punktwert als Abschätzung von KAP3 nach §3.9 mit Band 1.533–1.950 ausweisen — aber nicht stillschweigend den oberen Rand als Zentralwert führen. Solange das offen ist, gehört die Richtung des Fehlers in den Vorläufigkeitsvermerk von \(\lambda\) (Z. 949–954). |
+| 59 | **B** | **Stelle:** Drei Stellen im Prüfumfang, die rechnerisch den abgelösten Anker \(A^{*}\) = 0,985 Mrd. €₂₀₂₆/a tragen statt den geltenden 1,132 (Entscheidungslog Nr. 8 Z. 2513 weist den Wechsel selbst aus: „\(A^{*}\) = 1,132 (statt 0,985 nach dem verworfenen Stichprobenlauf)"): **(a)** §4.3 Z. 1153–1155 — die Gegenrechnung mit dem Alternativnenner „ergäbe \(M_0\) = 0,931 Mrd. €₂₀₂₆/a und \(\lambda\) = **1,058**"; **(b)** Kapitel 6 Modellgrenze 9 Z. 1826–1832 und Versionsstempel Z. 1840–1841 — „der Zeitwertansatz … läge um 45 % niedriger (**0,54** statt **0,99** Mrd. €₂₀₂₆/a, Band 0,39–0,74)"; **(c)** Entscheidungslog Nr. 7 Z. 2512 — „höbe \(\lambda\) auf **1,32** (bis **1,81**)" samt dem dort als „nachgezogen 17.09.2026 (T-0313)" bezeichneten Stand „\(\lambda\) = **0,724**" und der Auswirkungsspalte „0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a". · **Art: veraltete Angabe/Widerspruch** (§5 LF 6 zweite Hälfte „Kopplungen zwischen abgeleiteten Parametern neu gerechnet?"; §5 LF 10 „veraltet"). · **Begründung:** Jeder der Zahlenwerte lässt sich exakt auf den alten Anker zurückrechnen, ist also nicht neu gerechnet, sondern stehen geblieben. (a) 0,985 / 0,931 = 1,05800 — genau die ausgewiesenen 1,058; mit dem geltenden Anker ist es 1,132 / 0,931 = **1,216**, die Angabe liegt **13,0 % zu niedrig**. (b) Die kalibrierte Bundessumme ist \(\lambda \cdot M_0\) = 0,832 · 1,360 = **1,132** Mrd. €₂₀₂₆/a — der Bericht rechnet das in §4.6 Z. 1381 selbst vor („derselbe Wert wie in §4.4"); Kapitel 6 nennt daneben 0,99 Mrd., also den alten Anker, **12,5 % zu niedrig**, und die Zeitwert-Sensitivität 0,54 statt 0,55 · 1,132 = **0,62** (Band 0,45–0,85 statt 0,39–0,74). (c) 0,985 / (1,360 · 0,55) = 1,3168 → die ausgewiesenen „1,32", und 0,985 / (1,360 · 0,40) = 1,8107 → die „1,81"; mit dem geltenden Anker sind es 1,132 / (1,360 · 0,55) = **1,51** und 1,132 / (1,360 · 0,40) = **2,08** — dieselben Werte, die §7.2 Z. 2250–2251 bereits korrekt führt. Das Entscheidungslog ist damit intern gegen §7.2 widersprüchlich, und der als Nachzug gekennzeichnete \(\lambda\) = 0,724 ist seit derselben Revision auf 0,832 abgelöst. Die Prozentangabe „−45 %" bleibt richtig, weil sie nur \(f_{\text{AWM}}\) spiegelt; falsch sind die absoluten Beträge — und genau sie stehen im nutzersichtbaren Versionsstempel. · **Vorschlag:** Die Werte aus dem geltenden \(A^{*}\) = 1,132 neu rechnen und einsetzen: (a) 1,058 → 1,216; (b) „0,54 statt 0,99" → „0,62 statt 1,13", Band 0,39–0,74 → 0,45–0,85; (c) 1,32 (1,81) → 1,51 (2,08), \(\lambda\) = 0,724 → 0,832. Zusätzlich die kalibrierte Bundessumme **einmal** an einer Stelle definieren (§4.6 Z. 1381) und in Kapitel 6 und im Entscheidungslog nur noch dorthin verweisen, statt den Betrag zu wiederholen — er ist mehrfach abgeschrieben und mehrfach veraltet. Für den Lint: eine Regel, die \(\lambda \cdot M_0\) gegen jede im Bericht genannte Bundessumme prüft. |
+| 60 | **C** | **Stelle:** Bericht §4.2 Z. 1119–1121 (\(\pi\) = 1,07: „Das Register führt für 2023 → 2026 den Baupreisfaktor 1,105 (B4, Band **1,07–1,16**). Abzüglich rund 3 % Baupreisanstieg 2023 → 2024 ergibt sich \(1{,}105/1{,}03 \approx 1{,}073\); **Band 1,04–1,11**") und Zeile \(\pi\) der Tabelle Z. 1093 — gegen §4.3 M₀-Bandtabelle Z. 1203, die dasselbe B4-Band auf den Wertsatz anwendet (1.889–2.047). · **Art: Fehler** (§5 LF 6 „Kopplungen zwischen abgeleiteten Parametern neu gerechnet?"). · **Begründung:** \(\pi\) ist ein abgeleiteter Parameter: Er entsteht aus dem B4-Faktor durch Division mit 1,03. Der Zentralwert ist so gerechnet (1,105/1,03 = 1,0728 → 1,07), das **untere** Bandende ebenfalls (1,07/1,03 = 1,0388 → 1,04), das **obere** Bandende dagegen nicht: 1,16/1,03 = **1,126**, ausgewiesen ist 1,11. Dass die Nachbarzeile in §4.3 dieselbe Kopplung sauber durchrechnet (1.950/1,105 · 1,07 → 1.889 und 1.950/1,105 · 1,16 → 2.047), zeigt, dass die Abweichung nicht gewollt ist, sondern in 4.2 unterblieben ist. Wirkung: \(A^{*}\)_oben stiege von 2,263 auf 2,296 Mrd. €₂₀₂₆/a, die obere Plausibilitätsschranke von 3,44 auf 3,49 (2,296/0,657). Der Zentralwert von \(A^{*}\) und damit \(\lambda\) ist **nicht** betroffen — deshalb Kategorie C, nicht B. · **Vorschlag:** Das obere Bandende von \(\pi\) auf 1,13 (1,16/1,03, kaufmännisch gerundet) ziehen und das Band von \(A^{*}\) sowie die Schranke in §4.4 und §4.8 nachziehen; oder, falls die Deckelung auf 1,11 beabsichtigt ist, sie als Abschätzung von KAP3 mit Begründung ausweisen (§3.9), statt sie als Ergebnis der Division erscheinen zu lassen. |
+| 61 | **B** | **Stelle:** Bericht §4.4 „Plausibilitätsschranke" Z. 1240–1258, besonders die Herleitung Z. 1243–1250 („Sie ist das vollständig fortgepflanzte Band aus dem Ankerband von \(A^{*}\), 0,297–2,263 (§4.2), und dem Band von \(M_0\), 0,657–2,643 (§4.3)") und der Selbstbefund Z. 1253–1257 („Das untere Bandende \(\lambda\) = 0,11 **gilt als zulässig** … Das obere Bandende \(\lambda\) = 3,44 **gilt aus demselben Grund als zulässig**") — gegen die Funktion, die derselbe Abschnitt ihr zuweist (Z. 1240–1243: „Ergibt eine Neubestimmung \(\lambda < 0{,}11\) oder \(\lambda > 3{,}44\), wird **nicht** der Skalar gesetzt, sondern das Modell gilt als fehlerhaft"). · **Art: Fehler (Zirkelschluss)** (§5 LF 8 „ein Skalar"; §3.4 Kalibrierfaktor-Regel; §8/P3 Erklärbarkeit). · **Begründung:** Die Schranke ist definitionsgemäß das Intervall \([A^{*}_{u}/M_{0,o},\; A^{*}_{o}/M_{0,u}]\). Jedes \(\lambda = A^{*}/M_0\), das aus Werten innerhalb der eigenen Bänder gebildet wird, liegt zwangsläufig darin — die Prüfung kann kein Ergebnis zurückweisen, das mit der Methode des Berichts überhaupt entstehen kann. Der Bericht spricht das selbst aus, zieht daraus aber nicht den Schluss, dass die Schranke ihre Aufgabe („das Modell gilt als fehlerhaft") damit nicht erfüllen kann. Erkennbar wird die Wirkungslosigkeit an der Weite: [0,11; 3,44] überspannt den Faktor **31**, während der Vorgängerstand („Faktor 2 um den Neutralwert 1", Z. 1244) mindestens ansprechen konnte — die Herleitung hat den Prüfstein nicht geschärft, sondern abgeschafft. Dass §4.1a Z. 1048–1054 die vier Fenster-\(\lambda\) (0,457 bis 0,935) gegen sie prüft und die Unterschreitung ausdrücklich als zweites Argument fallen lässt, bestätigt es: Der Test hat in keinem geprüften Fall unterschieden. Ein zweiter, davon unabhängiger Prüfstein für den Skalar existiert im Kapitel nicht; das Sanity-Band in §4.6 prüft die Bundessumme, nicht \(\lambda\). · **Vorschlag:** Die Schranke aus einer Größe herleiten, die **nicht** in \(\lambda\) eingeht — etwa aus einem unabhängigen Vergleichswert der Bundessumme (Wiederaufbaufonds 2002/2013/2021 als Ereignisbilanz, §4.1 Z. 962–964) oder aus einem Modellverständnis-Argument („\(\lambda\) unter 0,5 oder über 2 heißt, dass Exponiertenzahl, Wertdichte oder Schadensfunktion um mehr als den Faktor 2 danebenliegen") und die so gesetzte Schranke als Abschätzung von KAP3 nach §3.9 ausweisen. Die Bandfortpflanzung aus \(A^{*}\) und \(M_0\) bleibt daneben als **Unsicherheitsband** von \(\lambda\) stehen — sie ist als solches richtig gerechnet und soll nur nicht mehr als Prüfstein auftreten. Beides ist im Text zu trennen, damit ein Leser nach P3/§8 nicht ein Prüfkriterium sieht, wo ein Konfidenzband steht. |
+| 62 | **C** | **Stelle:** Drei nachgerechnete Zwischenergebnisse: **(a)** §4.4 Z. 1248–1249 „\(\lambda_{\text{unten}}\) = 0,297 / 2,643 = **0,112384…**"; **(b)** ebenda Z. 1249 „\(\lambda_{\text{oben}}\) = 2,263 / 0,657 = **3,444409…**"; **(c)** §4.3 Z. 1218 „\(M_0\)_unten = 0,872 · 491.140 € · 1.534,08/a = **656.945.337** €₂₀₂₆/a". · **Art: Fehler (Rechenweg)** (§5 LF 8; §8/E3 „Rechenbeispiel", P3). · **Begründung:** Die drei Divisionen bzw. Produkte ergeben nachgerechnet andere Ziffern, als der Bericht ausweist: (a) 0,297/2,643 = **0,1123723…**, nicht 0,112384… (Abweichung ab der fünften Nachkommastelle); (b) 2,263/0,657 = **3,4444444…**, nicht 3,444409… — die ausgewiesene Ziffernfolge lässt sich auch mit den ungerundeten Bandenden nicht erzeugen (2,2626871/0,657 = 3,443968); (c) 0,872 · 491.140 · 1.534,08 = **657.006.700,6**, nicht 656.945.337 (Differenz 61.364 €, 0,009 %). Die gerundeten Endwerte 0,11, 3,44 und 0,657 Mrd. sind in allen drei Fällen unberührt — deshalb Kategorie C und keine Wirkung auf \(\lambda\) oder das Ergebnis. Der Befund gilt trotzdem, weil der Bericht die Ziffern ausdrücklich als nachvollziehbaren Rechenweg anbietet („zwei Nachkommastellen, kaufmännisch gerundet", Z. 1249–1250): Wer nachrechnet — wie es §8/E3 vom Adressaten gerade erwartet —, findet drei Abweichungen und muss zuerst prüfen, ob er selbst falsch liegt. · **Vorschlag:** Die drei Stellen aus der Rechnung neu setzen (0,112372…, 3,444444…, 657.006.701) und Zwischenergebnisse künftig aus dem Ausdruck übernehmen, der sie erzeugt, statt sie zu tippen; ergänzend in den Lint aufnehmen, dass jede im Bericht als „=" ausgewiesene Division der Kalibrierkette nachgerechnet wird (die Eingänge stehen alle im Text). |
+
+#### Abgrenzung und Status dieses Pakets
+
+- **Geändert wurde ausschließlich `reviews/BEFUNDE_60.md`.**
+  `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, `docs/evidenz/register.md`,
+  `backend/scripts/lint_methodik.py` und `backend/` sind unangetastet; die Arbeitsmappen wurden nur
+  gelesen und nicht verändert (eiserne Regel 2).
+- **Kein Befund behoben, keiner umnummeriert.** Die Befunde 33 (Verteilungsprüfung), 34
+  (Kleinste-Quadrate-Anker), 35/36 (Bänder) und 41 (Zeitwertansatz) werden nur als Gegenstelle
+  eingeordnet, nicht neu vergeben. Befund 59 greift Befund 41 **nicht** wieder auf: Dort ging es um
+  die Entscheidung Neuwert/Zeitwert, hier um Beträge, die nach dieser Entscheidung nicht auf den
+  geltenden Anker nachgezogen wurden.
+- **Abgrenzung zu Befund 57** (Paket T-0371, LF 3): Dort geht es um die fehlende Proportionalität
+  zwischen \(\bar A_k\) und \(\text{EAD}_k\) wegen der typabhängigen Wertdichte **innerhalb** des
+  Modells; Befund 58 betrifft dieselbe Größe \(\theta\) an einem anderen Ort — ihr Fehlen in der
+  **nationalen Kalibrierung** in §4.3. Beide sind unabhängig voneinander zu beheben.
+- **Gesehen, aber außerhalb des Dateirahmens dieses Pakets und deshalb nicht als Befund vergeben:**
+  der Vorläufigkeitsvermerk von \(\lambda\) in §4.8 Z. 1467 (nennt die Befunde 33 und 34 statt der
+  in §4.4 Z. 1259–1261 genannten 35 und 36) und der Kopfabschnitt „Offen (Stand 17.09.2026)" Z. 35
+  (führt weiterhin \(\lambda\) = 0,724). Beides ist dieselbe Ursache wie Befund 59; das Paket zu
+  Kapitel 4 Teil B und das Abschlusspaket der Runde entscheiden dort.
+- **Kopftabelle „Offene Befunde (19)" bewusst nicht fortgeschrieben** (Dateirahmen der
+  Runde-3-Pakete, festgelegt im Eröffnungspaket T-0359). Mit 58–62 aus diesem Paket wären es 35
+  offene Zeilen; nachgezogen wird die Kopftabelle im Abschlusspaket der Runde 3.
+- **Ressourcen-Regel §3.4 eingehalten:** kein nationaler 100-m-Vollraster-Lauf; alle Nachrechnungen
+  stammen aus den im Bericht ausgewiesenen Zahlen. Im Code wurde nichts geändert (eiserne Regel 5).
+- **Nicht Gegenstand dieses Pakets:** die Leitfragen 1 bis 5, 7 und 9 bis 14, die Abschnitte 4.5 bis
+  4.8, die Kapitel 1, 2, 3, 5, 7, 8 und 9 sowie die Regression der Befunde 1–57.
