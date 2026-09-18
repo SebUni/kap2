@@ -264,28 +264,29 @@ docs/MODELL_KRITIK.md
 Kein Pfad wurde als `No such file` gemeldet; alle sechs zitierten Belegpfade der Zeilen 21–25
 existieren im Produkt-Repo.
 
-## Zusammenfassung
+### Nachtrag: Abschlusszählung aller 25 Zeilen und Gegenprüfung aller Belegpfade (Teilpaket 6)
 
-Die Tabelle umfasst alle 25 Anforderungszeilen. Ausgezählt nach Status: 6 Zeilen `erfüllt`,
-14 Zeilen `teilweise` und 5 Zeilen `offen`; 6 + 14 + 5 = 25 entspricht der Gesamtzahl der
-Anforderungszeilen.
-
-Zähllauf über die Datei (`grep -c`, wörtliche Ausgabe):
+Zähllauf über die Datei, beschränkt auf Tabellenzeilen (`grep -c` mit Anker auf die Zeilennummer
+und die Status-Spalte, damit die Zählmuster nicht versehentlich die eigenen, unten stehenden
+Befehlszeilen dieses Transkripts miterfassen; wörtliche Ausgabe):
 
 ```
-$ grep -c '| erfüllt |' docs/KONFORMITAET_CHECKLISTE.md
+$ grep -c '^| [0-9].*| erfüllt |' docs/KONFORMITAET_CHECKLISTE.md
 6
-$ grep -c '| teilweise |' docs/KONFORMITAET_CHECKLISTE.md
+$ grep -c '^| [0-9].*| teilweise |' docs/KONFORMITAET_CHECKLISTE.md
 14
-$ grep -c '| offen |' docs/KONFORMITAET_CHECKLISTE.md
+$ grep -c '^| [0-9].*| offen |' docs/KONFORMITAET_CHECKLISTE.md
 5
 $ grep -c '^| [0-9]' docs/KONFORMITAET_CHECKLISTE.md
 25
 ```
 
+6 + 14 + 5 = 25 entspricht der Gesamtzahl der Anforderungszeilen; die Tabelle umfasst damit
+alle 25 Zeilen.
+
 Gegenprüflauf sämtlicher Belegpfade aller Zeilen mit Status `erfüllt` oder `teilweise`
 (12 verschiedene Pfade insgesamt, aus 20 Zeilen mit teils wiederkehrenden Pfaden; `ls -d`
-je Pfad):
+je Pfad, wörtliche Ausgabe):
 
 ```
 $ ls -d docs/methodik/95_hitzebelastung.md
@@ -315,6 +316,16 @@ docs/MODELL_KRITIK.md
 ```
 
 Kein Pfad wurde als `No such file` gemeldet; alle Belegpfade aller Zeilen mit Status `erfüllt`
-oder `teilweise` existieren im Produkt-Repo. Die Checkliste ist damit für alle 25 Zeilen
-vollständig erfasst und die zitierten Belegpfade sind gegengeprüft; keine Lücke wurde behoben,
-kein Produktcode wurde angefasst — das war nicht Aufgabe dieses Pakets.
+oder `teilweise` existieren im Produkt-Repo. Keine Lücke wurde behoben, kein Produktcode wurde
+angefasst — das war nicht Aufgabe dieses Pakets.
+
+## Zusammenfassung
+
+Die Tabelle umfasst alle 25 Anforderungszeilen. Ausgezählt nach Status (Zähllauf und
+Gegenprüfung der Belegpfade siehe Abschnitt Ergebnis, Nachtrag "Abschlusszählung"): 6 Zeilen
+`erfüllt`, 14 Zeilen `teilweise` und 5 Zeilen `offen`; 6 + 14 + 5 = 25 entspricht der
+Gesamtzahl der Anforderungszeilen. Alle 12 im Produkt genannten, unterschiedlichen Belegpfade
+der erfüllt/teilweise-Zeilen wurden mit `ls -d` gegengeprüft; kein Pfad wurde als
+`No such file` gemeldet. Die Checkliste ist damit für alle 25 Zeilen vollständig erfasst und
+die zitierten Belegpfade sind gegengeprüft; keine Lücke wurde behoben, kein Produktcode wurde
+angefasst — das war nicht Aufgabe dieses Pakets.
