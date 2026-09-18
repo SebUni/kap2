@@ -33,13 +33,20 @@ from dataclasses import dataclass
 from datetime import datetime
 
 import pytest
+from fastapi import HTTPException
 from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import load_only, sessionmaker
 from sqlalchemy.pool import StaticPool
+from starlette.requests import Request
 
-from app.api.deps import SESSION_COOKIE, require_kommune_access
+from app.api.deps import (
+    SESSION_COOKIE,
+    assert_measure_access,
+    require_kommune_access,
+    user_kommune_ids,
+)
 from app.db.database import Base, get_db
 from app.main import app
 from app.models.auth_models import (
@@ -49,6 +56,7 @@ from app.models.auth_models import (
     UserSession,
     user_kommunen,
 )
+from app.models.models import AdaptationMeasure
 from app.services import auth_service
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -353,3 +361,269 @@ def test_aufbau_liefert_kommunen_und_prinzipale(aufbau, client_a, client_ohne_ko
         daten = antwort.json()
         assert daten["authenticated"] is True
         assert daten["user"]["id"] == nutzer_id
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# (c) Hilfen für die vier Trennungsprüfungen (T-0341, Teilpaket 2 aus T-0337)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Platzhalter für Pfadparameter neben ``kommune_id``. Die Werte müssen nur
+# syntaktisch passen: alle vier Prüfungen erwarten, dass der Guard vor dem
+# Routenrumpf abweist — ein Rumpf, der anliefe, wäre selbst der Befund.
+_PLATZHALTER_PFAD = {"code": "hitze", "risk_code": "hitze"}
+_PLATZHALTER_ID = "1"
+
+# Status, die als saubere Abweisung gelten (Punkt 1).
+_ABWEISUNG = (403, 404)
+
+
+def _pfad_fuellen(route: KommuneRoute, kommune_id: int) -> str:
+    """Konkrete URL der Route für die genannte Kommune."""
+    pfad = route.pfad
+    ersetzungen = {"kommune_id": str(kommune_id)}
+    for teil in pfad.split("{")[1:]:
+        name = teil.split("}")[0].split(":")[0]
+        if name in ersetzungen:
+            continue
+        ersetzungen[name] = _PLATZHALTER_PFAD.get(
+            name, _PLATZHALTER_ID if name.endswith("_id") else "x"
+        )
+    for name, wert in ersetzungen.items():
+        pfad = pfad.replace("{" + name + "}", wert)
+    return pfad
+
+
+def _abfrage_fuellen(route: KommuneRoute, kommune_id: int) -> dict[str, str]:
+    """Kommune-Abfrageparameter der Route auf die genannte Kommune setzen."""
+    return {name: str(kommune_id) for name in route.abfrage_parameter}
+
+
+def _anfrage(client: TestClient, route: KommuneRoute, methode: str, kommune_id: int):
+    """Eine Route-Methode-Kombination gegen die genannte Kommune aufrufen."""
+    return client.request(
+        methode,
+        _pfad_fuellen(route, kommune_id),
+        params=_abfrage_fuellen(route, kommune_id) or None,
+    )
+
+
+def _kennung_im_json(knoten, kennung: int) -> bool:
+    """Steht die Kommune-Kennung irgendwo unter einem Kommune-Schlüssel?"""
+    if isinstance(knoten, dict):
+        for feldname, wert in knoten.items():
+            if _KOMMUNE_MARKER in str(feldname).lower():
+                if wert == kennung or str(wert) == str(kennung):
+                    return True
+            if _kennung_im_json(wert, kennung):
+                return True
+        return False
+    if isinstance(knoten, (list, tuple)):
+        return any(_kennung_im_json(eintrag, kennung) for eintrag in knoten)
+    return False
+
+
+def _nennt_kommune_b(antwort) -> str | None:
+    """Verrät der Antwortrumpf Name oder Kennung der fremden Kommune B?"""
+    rumpf = antwort.text or ""
+    if KOMMUNE_B_NAME in rumpf:
+        return f"Name {KOMMUNE_B_NAME!r} steht im Rumpf"
+    try:
+        daten = antwort.json()
+    except ValueError:
+        return None
+    if _kennung_im_json(daten, KOMMUNE_B_ID):
+        return f"Kennung {KOMMUNE_B_ID} steht unter einem Kommune-Schlüssel"
+    return None
+
+
+def _hat_inhalt(antwort) -> bool:
+    """200 mit leerem Rumpf ist kein Datenabfluss — alles andere schon."""
+    return bool((antwort.text or "").strip())
+
+
+def _lade_massnahme(db, measure_id: int) -> AdaptationMeasure:
+    """Maßnahme aus der Testdatenbank, ohne die Geometriespalte zu lesen.
+
+    ``AsEWKB(...)`` gibt es auf SQLite nicht; ``assert_measure_access`` braucht
+    ohnehin nur ``kommune_id`` und ``demo_session_id``.
+    """
+    return (
+        db.query(AdaptationMeasure)
+        .options(load_only(
+            AdaptationMeasure.kommune_id,
+            AdaptationMeasure.demo_session_id,
+            AdaptationMeasure.name,
+        ))
+        .filter(AdaptationMeasure.id == measure_id)
+        .one()
+    )
+
+
+def _fake_request(pfad: str, methode: str, pfad_parameter: dict) -> Request:
+    """Minimaler Request für den unmittelbaren Aufruf des Guards.
+
+    Der Guard wird bewusst direkt gerufen statt über HTTP: sonst liefen die
+    Routenrümpfe an (Assessment-Start, Grid-Bau, Netzaufrufe), die mit der
+    Zugriffsfrage nichts zu tun haben.
+    """
+    request = Request({
+        "type": "http",
+        "http_version": "1.1",
+        "method": methode,
+        "scheme": "http",
+        "server": ("testserver", 80),
+        "path": pfad,
+        "raw_path": pfad.encode(),
+        "query_string": b"",
+        "root_path": "",
+        "headers": [],
+        "client": ("testclient", 50000),
+        "app": app,
+    })
+    request.scope["path_params"] = dict(pfad_parameter)
+    return request
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Die vier Trennungsprüfungen auf der Laufzeit-Routenliste
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_nutzer_von_kommune_a_kommt_nirgends_an_kommune_b(client_a):
+    """(1) Nutzer der Kommune A: auf jeder Kombination für B abgewiesen.
+
+    Geprüft wird beides — der Status (403/404, nie 200) und der Rumpf: weder
+    Name noch Kennung der fremden Kommune dürfen darin auftauchen.
+    """
+    kombinationen = route_methode_kombinationen()
+    assert kombinationen, "Prüfliste leer — siehe test_pruefliste_ist_nicht_leer"
+
+    verstoesse: list[str] = []
+    for route, methode in kombinationen:
+        antwort = _anfrage(client_a, route, methode, KOMMUNE_B_ID)
+        if antwort.status_code == 200:
+            verstoesse.append(f"{methode} {route.pfad}: Status 200 für fremde Kommune")
+        elif antwort.status_code not in _ABWEISUNG:
+            verstoesse.append(
+                f"{methode} {route.pfad}: Status {antwort.status_code} statt 403/404"
+            )
+        leck = _nennt_kommune_b(antwort)
+        if leck:
+            verstoesse.append(f"{methode} {route.pfad}: {leck} ({antwort.text[:200]})")
+
+    assert not verstoesse, "Mandantentrennung verletzt:\n" + "\n".join(verstoesse)
+
+
+def test_nutzer_ohne_kommune_sieht_nichts(aufbau, client_ohne_kommune):
+    """(2) Nutzer ohne Zeile in ``user_kommunen``: keine 200-Antwort mit Inhalt.
+
+    Geprüft auf denselben Kombinationen, und zwar für beide Kommunen — für
+    diesen Nutzer ist jede von beiden fremd. Dazu die Gegenprobe an der
+    Quelle: ``user_kommune_ids`` gibt für ihn die leere Menge.
+    """
+    kombinationen = route_methode_kombinationen()
+    assert kombinationen, "Prüfliste leer — siehe test_pruefliste_ist_nicht_leer"
+
+    verstoesse: list[str] = []
+    for kommune_id in (KOMMUNE_A_ID, KOMMUNE_B_ID):
+        for route, methode in kombinationen:
+            antwort = _anfrage(client_ohne_kommune, route, methode, kommune_id)
+            if antwort.status_code == 200 and _hat_inhalt(antwort):
+                verstoesse.append(
+                    f"{methode} {route.pfad} (Kommune {kommune_id}): 200 mit Inhalt "
+                    f"{antwort.text[:200]}"
+                )
+
+    assert not verstoesse, (
+        "Nutzer ohne Kommune-Zuordnung bekommt Daten:\n" + "\n".join(verstoesse)
+    )
+
+    with aufbau.sitzung() as db:
+        nutzer_ohne = db.get(User, aufbau.nutzer_ohne_id)
+        assert user_kommune_ids(db, nutzer_ohne) == set()
+
+
+def test_assert_measure_access_trennt_die_kommunen(aufbau):
+    """(3) Maßnahmen-Guard: fremde Maßnahme abgewiesen, eigene durchgelassen."""
+    with aufbau.sitzung() as db:
+        for measure_id, kommune_id in ((901, KOMMUNE_A_ID), (902, KOMMUNE_B_ID)):
+            db.execute(
+                text(
+                    "INSERT OR REPLACE INTO adaptation_measures "
+                    "(id, kommune_id, name, measure_type, created_at) "
+                    "VALUES (:i, :k, :n, :t, :z)"
+                ),
+                {
+                    "i": measure_id,
+                    "k": kommune_id,
+                    "n": f"Maßnahme Kommune {kommune_id}",
+                    "t": "gruendach",
+                    "z": datetime.utcnow(),
+                },
+            )
+        db.commit()
+
+        nutzer_a = db.get(User, aufbau.nutzer_a_id)
+        massnahme_a = _lade_massnahme(db, 901)
+        massnahme_b = _lade_massnahme(db, 902)
+        assert massnahme_a.kommune_id == KOMMUNE_A_ID
+        assert massnahme_b.kommune_id == KOMMUNE_B_ID
+
+        with pytest.raises(HTTPException) as fehler:
+            assert_measure_access(db, nutzer_a, massnahme_b)
+        assert fehler.value.status_code == 403
+
+        # Gegenprobe: die eigene Maßnahme geht durch (kein Wurf).
+        assert_measure_access(db, nutzer_a, massnahme_a)
+
+
+def test_admin_passiert_beide_kommunen_nutzer_a_nur_seine(aufbau):
+    """(4) ``require_kommune_access`` unmittelbar: Admin überall, Nutzer A nur A.
+
+    Je Route-Methode-Kombination zweimal für den Admin (Kommune A und B) und
+    einmal als Gegenprobe für den Nutzer der Kommune A auf Kommune B.
+    """
+    kombinationen = route_methode_kombinationen()
+    assert kombinationen, "Prüfliste leer — siehe test_pruefliste_ist_nicht_leer"
+
+    verstoesse: list[str] = []
+    with aufbau.sitzung() as db:
+        admin = db.get(User, aufbau.admin_id)
+        nutzer_a = db.get(User, aufbau.nutzer_a_id)
+
+        for route, methode in kombinationen:
+            for kommune_id in (KOMMUNE_A_ID, KOMMUNE_B_ID):
+                request = _fake_request(
+                    _pfad_fuellen(route, kommune_id), methode,
+                    {"kommune_id": str(kommune_id)},
+                )
+                try:
+                    ergebnis = require_kommune_access(request, db=db, actor=admin)
+                except HTTPException as fehler:
+                    verstoesse.append(
+                        f"Admin abgewiesen: {methode} {route.pfad} "
+                        f"(Kommune {kommune_id}) → {fehler.status_code}"
+                    )
+                else:
+                    if ergebnis is not admin:
+                        verstoesse.append(
+                            f"Admin: Guard liefert fremden Actor bei {methode} {route.pfad}"
+                        )
+
+            gegen = _fake_request(
+                _pfad_fuellen(route, KOMMUNE_B_ID), methode,
+                {"kommune_id": str(KOMMUNE_B_ID)},
+            )
+            try:
+                require_kommune_access(gegen, db=db, actor=nutzer_a)
+            except HTTPException as fehler:
+                if fehler.status_code != 403:
+                    verstoesse.append(
+                        f"Nutzer A bei {methode} {route.pfad}: Status "
+                        f"{fehler.status_code} statt 403"
+                    )
+            else:
+                verstoesse.append(
+                    f"Nutzer A passiert den Guard für Kommune B: {methode} {route.pfad}"
+                )
+
+    assert not verstoesse, "Guard trennt nicht:\n" + "\n".join(verstoesse)
