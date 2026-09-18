@@ -3547,3 +3547,122 @@ Tabellen-Nummernspalten und alle „Befund <n>"-Nennungen); erste neue Nummer de
   Ankerreihe, kein nationaler 100-m-Vollraster-Lauf.
 - **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
   T-0359); das Konvergenz-Verdikt der Runde trägt T-0373.
+
+### Leitfrage 9
+
+Paket T-0372 der Runde 3 (18.09.2026, zweite Hälfte des ersetzten T-0362), eigene frische Sitzung:
+Sie hat den geprüften Stand nicht geschrieben (eiserne Regel 4; geschrieben haben T-0235 bis
+T-0243, T-0256 bis T-0259 und die Revisionspakete aus T-0281, alle im Endstatus). Das Bundle nach
+§1 lag ab dem ersten Turn vor (Abschnitt 0 dieser Runde); die Lint-Ausgabe aus Abschnitt 0.1 wird
+**übernommen, nicht neu erhoben** (§5, Schritt „zuerst die deterministischen Lints"; darin liegt
+auch der maschinelle Check „Preisstand-Einheitlichkeit je Bericht", Aufgabe §7). Maßstab sind
+ausschließlich §3 und §5 der Aufgabe, nicht der Berichtstext. Dieses Paket trägt davon
+**Leitfrage 9** („Kostensätze: Preisstand einheitlich, Quellen, VSL/VOLY-Konsistenz,
+Konto-Zuordnung?", Aufgabe §5 Z. 444), gemessen an §3.6 Z. 280–282 („Kostensätze mit **Preisstand**
+und Quelle; alle Kostensätze eines Berichts auf einen gemeinsamen Preisstand indexiert
+(Umrechnungsfaktor je Satz in der Zeichentabelle)"), an §3.9 und an den Vorgaben P1/P2.
+
+**Prüfumfang dieses Pakets.** Vertieft geprüft sind genau der **Berichtskopf vor `## Ergebnis`**
+(Z. 1–29, 2.423 Zeichen), **§3.2 „Datenebenen nach §3.1"** (Z. 553–586, 5.052 Zeichen) und
+**§3.3 „Tiefen-Schadensfunktion \(d(h)\) — Stützstellen und Herleitung (P1)"** (Z. 588–644,
+4.358 Zeichen) — zusammen 11.833 Zeichen ohne HTML-Kommentare und ohne die Überschriftenzeilen
+selbst; in dieser Sitzung nachgemessen und bestätigt (Kopf 2.422 + 1 Zeilenumbruch, §3.2
+einschließlich der Ankerzeile Z. 587, §3.3 einschließlich der Ankerzeile Z. 645). §3.1 und §3.4 bis §3.7 gehören zum Schwesterpaket und sind hier nur als Fundstelle zitiert
+(Z. 536–540 Preisstand-Deklaration, Z. 681–692 Preisschritt der Kernformel, Z. 779
+Zeichentabellenzeile \(n_t\)); ebenso nur zitiert sind Registerzeile 60-R24-01 (Z. 193),
+Langbeleg B4 (Z. 303–390) und die Parameter-Blöcke `flood_bldg.n_efh_zfh` (Z. 1928–1941) und
+`flood_bldg.n_mfh` (Z. 1943–1955).
+
+**Nachgerechnet statt gelesen** (§3.4 Ressourcen-Regel: aus den ausgewiesenen Zahlen und auf
+Stichproben, kein nationaler 100-m-Vollraster-Lauf). Beide Kostensätze der Ebene GEBAEUDEWERT aus
+§3.2 Z. 563 (dort geführt als „Wertsätze aus ImmoWertV Anlage 4 (NHK 2010) und
+Destatis-Baupreisindex, Fortschreibung nach Register 60-R24-01 (B4)", beziffert im Preisschritt
+Z. 683–685) werden vom Preisstand ihrer Quelle auf das in §3.1 Z. 537–540 deklarierte Bezugsjahr
+**2026** umgerechnet.
+
+*Verwendeter Index mit Zahlenwert und Quelle mit Fundstelle:* Destatis, Fachserie 17 Reihe 4
+„Preisindizes für die Bauwirtschaft" (Basis 2015 = 100), Jahresdurchschnitte Neubau konventionell
+gefertigter Wohngebäude — **2010 = 89,1**, **2023 = 149,8**; zitiert in Langbeleg B4, Quelle (4),
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Z. 332–339. *Ausgangswerte:* NHK 2010,
+ImmoWertV Anlage 4, Gebäudeart 1.01 Standardstufe 3 = **1.050 €₂₀₁₀/m² BGF**, Mehrfamilienhäuser
+bis 6 WE Standardstufe 3 = **825 €₂₀₁₀/m² BGF** (B4, Quelle (3), Z. 320–331; Preisstand der Quelle
+dort wörtlich „auf den im Jahresdurchschnitt bestehenden Kostenstand des Jahres 2010"). *Zweiter
+Schritt:* Fortschreibung 2023 → 2026 mit dem als Abschätzung von KAP3 ausgewiesenen Faktor
+**1,105** (drei Jahresschritte à 3,4 %; nachgerechnet: 1,034³ = 1,10551; B4 Rechenschritt 2,
+Z. 357–367).
+
+| Kostensatz | Rechenweg dieser Sitzung | nachgerechnet | Bericht (Z. 684–685) | Abweichung |
+|---|---|---|---|---|
+| \(n_{\text{EFH/ZFH}}\) | 1.050 × (149,8 ÷ 89,1 = 1,681257) = 1.765,32 €₂₀₂₃/m² BGF → × 1,105 = **1.950,68 €₂₀₂₆/m² BGF** | 1.950,68 | 1.950 | **−0,035 %** |
+| \(n_{\text{MFH}}\) | 825 × 1,681257 = 1.387,04 €₂₀₂₃/m² BGF → × 1,105 = **1.532,68 €₂₀₂₆/m² BGF** | 1.532,68 | 1.533 | **+0,021 %** |
+
+Gegenprobe über den in der Zeichentabelle geführten Gesamtfaktor (Z. 779: 1,6813 × 1,105 =
+1,8578): 1.050 × 1,8578 = 1.950,69 und 825 × 1,8578 = 1.532,69 — beide Wege stimmen auf 0,01 €
+überein. Die verbleibende Abweichung zum Berichtswert stammt allein aus der Zwischenrundung auf
+volle Euro in Rechenschritt 1 und liegt weit unter der Rundungsstelle des ausgewiesenen Werts.
+Auch die Bänder sind nachgerechnet und bestätigt: 1.765 × 1,07 = 1.888,6 ⇒ 1.889 und
+1.765 × 1,16 = 2.047,4 ⇒ 2.047 (EFH/ZFH, Z. 684); 1.387 × 1,07 = 1.484,1 ⇒ 1.484 und
+1.387 × 1,16 = 1.608,9 ⇒ 1.609 (MFH, Z. 685). **Rechnerisch ist an beiden Kostensätzen nichts zu
+beanstanden.**
+
+**Die vier Teilfragen der Leitfrage einzeln.**
+
+1. **Preisstand einheitlich — erfüllt.** Der Bericht deklariert genau einen Preisstand (2026,
+   §3.1 Z. 536–540). Im vertieften Prüfumfang trägt jede Geldgröße diesen Preisstand: §3.2 führt
+   Geld ausschließlich in der Zeile GEBAEUDEWERT („Preisstand 2026 einheitlich", Z. 563), §3.3
+   enthält **keinen** Kostensatz, sondern nur dimensionslose Schadensquoten (Tabelle Z. 632–633),
+   und der Berichtskopf (Z. 1–29) nennt keinen abweichenden Preisstand. Der nach §3.6 verlangte
+   **Umrechnungsfaktor je Satz** steht in der Zeichentabelle (Z. 779: 1,8578) und zusätzlich in
+   beiden Parameter-Blöcken (`umrechnungsfaktor: 1.8578`, `preisstand: 2026`, Z. 1936/1937 und
+   Z. 1951/1952) — an dieser Stelle nur festgestellt; die Regression des früheren Befunds 40
+   trägt das dafür zuständige Paket.
+2. **Quellen — erfüllt.** Beide Kostensätze sind auf eine Rechtsverordnung (ImmoWertV Anlage 4)
+   und einen amtlichen Preisindex zurückgeführt, je mit URL, Archiv-Snapshot und Zugriffsdatum
+   (B4 Quellen (3) und (4), Z. 320–339); §3.2 Z. 563 nennt beide Quellen und verweist für die
+   Fortschreibung auf Register 60-R24-01/B4. Die in der Nachrechnung verwendeten Zahlen stammen
+   aus dem dort zitierten Wortlaut, nicht aus einer Zusammenfassung.
+3. **VSL/VOLY-Konsistenz — nicht einschlägig, und die Nichtanwendbarkeit ist belegt.** Der
+   Konsistenz-Check VSL ÷ VOLY (Aufgabe §3.2 Z. 228–231) gilt für Mortalitätsendpunkte. #60
+   bewertet ausschließlich Sachschäden an Gebäuden (Konto K3); im Prüfumfang kommt kein Lebens-
+   oder Lebensjahreswert vor, und die Gesundheitsfolgen desselben Ereignisses sind ausdrücklich
+   ausgegrenzt (Kap. 1 „Nur K3 aktiv" Z. 153, aufgegriffen in §3.1 Z. 549–551: K1 (#101),
+   K4 (#74), K5 und K8 (#50) nicht enthalten). Kein Befund; die Teilfrage läuft ins Leere, statt
+   stillschweigend übergangen zu werden.
+4. **Konto-Zuordnung — erfüllt.** Beide Kostensätze tragen genau ein Konto: `endpunkt:
+   K3-Wiederherstellung` in beiden Blöcken (Z. 1939 und Z. 1954), und die Ebene GEBAEUDEWERT
+   speist über \(w_z\) allein den K3-Euro-Pfad (§3.2 Z. 563 in Verbindung mit §3.4 Z. 681). Ein
+   zweites Konto berührt keiner der beiden Sätze; der Doppelkanal-Ausschluss zu S074/R17 (§3.2
+   Z. 583–586) gehört zu Leitfrage 4 und wird hier nicht vertieft.
+
+**Verdikt: Befund** — ein neuer Befund, Nummer **82**, Kategorie C. Rechnung, Quellenlage,
+Preisstand-Einheitlichkeit und Konto-Zuordnung halten stand; zu beanstanden ist allein, dass
+derselbe Wertsatz an drei Stellen drei verschiedene Kennzeichnungen nach §3.9/P1 trägt — im
+vertieft geprüften §3.2 gar keine, im Kernformel-Text „belegt", im Parameter-Block
+`abschaetzung_kap3`.
+
+| Nr. | Kat. | Befund |
+|---|---|---|
+| 82 | **C** | **Stelle:** Bericht §3.2 „Datenebenen nach §3.1", Zeile **GEBAEUDEWERT** Z. 563 — Spalte „Quelle / Beschaffungsweg": „Wertsätze aus ImmoWertV Anlage 4 (NHK 2010) und Destatis-Baupreisindex, Fortschreibung nach Register 60-R24-01 (B4)", Spalte „Normierung/Zentrierung": „Preisstand 2026 einheitlich"; gegen §3.4 Z. 683 („Die Wertsätze \(n_t\) sind **belegt** und auf den Preisstand 2026 indexiert") und gegen die Parameter-Blöcke `flood_bldg.n_efh_zfh` (Z. 1928–1941) und `flood_bldg.n_mfh` (Z. 1943–1955), die für denselben Wert `kennzeichnung: abschaetzung_kap3` führen (Z. 1933, Z. 1948); Bezug: Berichtskopf Z. 25–28 („Jeder als **Abschätzung von KAP3** geführte Wert ist in seiner Registerzeile als solcher gekennzeichnet (§3.9; Vorgaben P1/P2)"). · **Art: Widerspruch/Lücke in der Kennzeichnung** (§3.9 „Abgeschätzt"; Vorgabe P1 „je Parameter … entweder die Quelle oder der Vermerk, dass es eine begründete Abschätzung von KAP3 ist, samt Herleitung"; §5 LF 9). · **Begründung:** \(n_t\) ist ein **Mischwert**. Der Kern (NHK 2010, Indexierung 2010 → 2023) ist belegt und in dieser Sitzung nachgerechnet; die Fortschreibung 2023 → 2026 mit dem Faktor 1,105 ist dagegen ausdrücklich eine Abschätzung von KAP3, weil „eine Jahresdurchschnitts-Indexreihe bis 2026 in der geprüften Fachserie nicht vorliegt" (B4 Rechenschritt 2, Z. 357–367). Nachgerechnet trägt der abgeschätzte Teil **10,5 %** des Endwerts, und sein Band 1,07–1,16 erzeugt die ausgewiesenen Spannen 1.889–2.047 bzw. 1.484–1.609, also rund −3,1 %/+5,0 % auf den Kostensatz — keine Randgröße. Darüber sagen drei Stellen drei verschiedene Dinge: §3.2, aus dem die Datenebene GEBAEUDEWERT gebaut wird, nennt nur zwei amtliche Quellen und behauptet „Preisstand 2026 einheitlich", ohne erkennbar zu machen, dass dieser Preisstand erst über eine Abschätzung erreicht wird; §3.4 nennt den Satz rundheraus „belegt"; nur der Parameter-Block kennzeichnet ihn als Abschätzung. Wer §3.2 als Spezifikation liest — die vorgesehene Leseart des Kapitels —, hält den Wertsatz für vollständig quellenbelegt. Die Registerzeile 60-R24-01 (Z. 193) kennzeichnet den Faktor korrekt, die Kopfaussage ist insofern nicht falsch, deckt aber den Wertsatz selbst nicht ab. Kategorie C, weil kein Zahlenwert und kein Rechenweg betroffen ist (Nachrechnung oben: −0,035 % und +0,021 %); betroffen ist die Kennzeichnung, an der ein Anwender die Belastbarkeit abliest. · **Vorschlag:** (a) In Z. 563 hinter „Preisstand 2026 einheitlich" ergänzen: „(Indexierung 2010 → 2023 belegt; Fortschreibung 2023 → 2026 mit Faktor 1,105 = Abschätzung von KAP3, §3.9, Band 1,07–1,16, Herleitung B4)". (b) In Z. 683 „belegt" auf „im Kern belegt, mit abgeschätztem Fortschreibungsfaktor (§3.9)" ziehen, damit Text und Blockkennzeichnung dieselbe Aussage machen. (c) In den Lint aufnehmen, dass ein Parameter mit `kennzeichnung: abschaetzung_kap3` im Berichtstext nicht als „belegt" bezeichnet sein darf — sonst altert die Kennzeichnung beim nächsten Nachzug wieder auseinander. |
+
+**Abgrenzung und Status dieses Pakets.**
+
+- **Kein Befund behoben, keiner umnummeriert.** Die zu Laufbeginn höchste im Ledger vergebene
+  Nummer war **81**; die erste neue Nummer dieses Pakets ist deshalb **82**, und vergeben wurde
+  genau diese eine.
+- **Nur Leitfrage 9 beantwortet**, an Berichtskopf, §3.2 und §3.3 (11.833 Zeichen, oben
+  gemessen). §3.1 und §3.4 bis §3.7 trägt das Schwesterpaket; sie sind hier nur als Fundstelle
+  zitiert, nicht vertieft geprüft.
+- **Vorgaben P1/P2 am Prüfgegenstand mitgeprüft:** P1 ist für \(k_{\text{BGF}}\), den
+  Fortschreibungsfaktor 1,105 und die Stützstellen von \(d(h)\) (Z. 623–633, je Zelle
+  „abgeschätzt" mit im Text ausgeschriebener Herleitung) erfüllt, für den Wertsatz \(n_t\) an der
+  Stelle §3.2 nur unvollständig → Befund 82. P2 ist im Prüfumfang nicht einschlägig (kein
+  Maßnahmen-Hebel in §3.2/§3.3; die Bauform-Grenze der Materialachse steht in Register
+  60-S094-01 und gehört zu Leitfrage 5).
+- **Ressourcen-Regel §3.4 eingehalten:** nachgerechnet auf den ausgewiesenen Zahlen
+  (89,1 · 149,8 · 1.050 · 825 · 1,105), kein nationaler 100-m-Vollraster-Lauf.
+- **Eiserne Regel 2 eingehalten:** `KWRA-Monetarisierung.xlsx` wurde nur gelesen, nicht geändert.
+- **Geänderte Dateien:** ausschließlich diese. `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`
+  (SHA-256 `d36326bd5678…`) und `docs/evidenz/register.md` (SHA-256 `29a90539c30b…`) sind
+  byte-gleich geblieben; `backend/scripts/lint_methodik.py` (T-0234) wurde nicht angefasst.
+- **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
+  T-0359); das Konvergenz-Verdikt der Runde trägt T-0373.
