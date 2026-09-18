@@ -1191,6 +1191,38 @@ das **Grimma, Dresden, Deggendorf, Passau, Halle (Saale), Hitzacker, Rosenheim u
 — acht Kommunen mit Hochwassergefahrenkarten-Deckung, auf denen das Produktionsmodell vollständig
 gerechnet wird. Die Auswahlregel steht damit im Bericht und ist nachvollziehbar erweiterbar.
 
+**M₀-Band (Vorgabe P1, Ledger-Befund 36).** Jede der acht Eingangsgrößen aus den Punkten 1–3 oben
+erhält ein unteres und ein oberes Bandende, alle Enden gleichgerichtet (multiplikative Bandenden,
+keine Verteilungsannahme, wie in §4.2 für \(A^{*}\), Anweisung A-0034):
+
+| Eingangsgröße | Zentralwert | Unteres Bandende | Oberes Bandende | Quelle bzw. Abschätzung |
+|---|---|---|---|---|
+| Wohnfläche je Wohngebäude | 208 m² | **208 m²** | **208 m²** | **Quelle:** Register 60-R24-01 (4,1 Mrd. m² ÷ 19,7 Mio. Wohngebäude, amtliche Bestandsstatistik). Kein Band ausgewiesen — die Größe ist der Quotient zweier amtlicher Summen, keine Abschätzung von KAP3; sie geht deshalb unten wie oben mit demselben Punktwert ein, statt ihr ohne Beleg eine Streuung zu unterstellen. |
+| BGF-Faktor | 1,30 | **1,25** | **1,40** | **Quelle:** Register 60-R24-01, §3.9 „Abgeschätzt" (Rechenschritt 3, Band 1,25–1,40). |
+| Wertsatz | 1.950 €₂₀₂₆/m² BGF | **1.889 €₂₀₂₆/m² BGF** | **2.047 €₂₀₂₆/m² BGF** | **Quelle:** Register 60-R24-01 (Fortschreibungsfaktor 2023→2026, Band 1,07–1,16; Band 1.889–2.047). |
+| Wohngebäudeanteil je Adresse | 0,872 | **0,872** | **0,872** | **Quelle:** Register 60-R17-01/60-R24-01 (19,7 Mio. Wohngebäude ÷ 22,6 Mio. Adressen, beides amtliche Bestandsstatistik, Punkt 2 oben). Kein Band ausgewiesen — Quotient zweier amtlicher Summen ohne publizierte Unsicherheit; Punktwert unten wie oben. |
+| Klassenrate GK3+GK4 | 0,0059796/a | **0,0033/a** | **0,0103/a** | **Abschätzung von KAP3**, Herleitung: Streuung der Klassenrate über die acht Anker-Kommunen (Faktor 3,1; `m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Klasse `gk3_gk4`: Minimum Deggendorf 0,0033, Maximum Grimma 0,0103), siehe Restfehler-Position 3 oben. |
+| Klassenrate GK2 | 0,00067515/a | **0,000301/a** | **0,001154/a** | **Abschätzung von KAP3**, hergeleitet analog zur Restfehler-Position 3: `m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Klasse `gk2` — Minimum Reichertshofen 0,000301, Maximum Halle (Saale) 0,001154. Für GK2 beziffert dieses Kapitel die Streuung nicht als eigene Restfehler-Position; das Minimum/Maximum der acht Kommunenwerte wird deshalb hier nach demselben Verfahren als KAP3-Abschätzung übernommen. |
+| Exponierte Adressen GK3+GK4 | 339.000 | **339.000** | **339.000** | **Quelle:** Register 60-R17-01 (ZÜRS Geo 2025, GK3 1,1 % + GK4 0,4 % von 22,6 Mio. Adressen; Punkt 1 oben). Kein Band ausgewiesen — die Zonierungsquote ist eine Bestandsstatistik, keine Abschätzung; Punktwert unten wie oben. |
+| Exponierte Adressen GK2 | 1.380.000 | **1.380.000** | **1.380.000** | **Quelle:** Register 60-R17-01 (ZÜRS Geo 2025, GK2 6,1 % von 22,6 Mio. Adressen; Punkt 1 oben). Kein Band ausgewiesen, aus demselben Grund wie oben. |
+
+Wert je exponiertem Wohngebäude: unten 208 · 1,25 · 1.889 = 491.140 €₂₀₂₆; Zentralwert
+208 · 1,30 · 1.950 = 527.280 €₂₀₂₆ (unverändert, Punkt 2); oben 208 · 1,40 · 2.047 = 596.086,4
+€₂₀₂₆.
+
+Summenterm (Adressen × Klassenrate): unten 339.000 · 0,0033 + 1.380.000 · 0,000301 = 1.534,08/a;
+Zentralwert 339.000 · 0,0059796 + 1.380.000 · 0,00067515 = 2.958,79/a (unverändert, Punkt 3); oben
+339.000 · 0,0103 + 1.380.000 · 0,001154 = 5.084,22/a.
+
+\(M_0\)_unten = 0,872 · 491.140 € · 1.534,08/a = 656.945.337 €₂₀₂₆/a ≈ **0,657 Mrd. €₂₀₂₆/a**
+\(M_0\)_oben = 0,872 · 596.086,4 € · 5.084,22/a = 2.642.713.194 €₂₀₂₆/a ≈ **2,643 Mrd. €₂₀₂₆/a**
+
+Damit ist \(M_0\) = **1,360 Mrd. €₂₀₂₆/a**, mit einem Band von **0,657–2,643 Mrd. €₂₀₂₆/a** um
+diesen Zentralwert. Der Nachzug dieses Bands in die Plausibilitätsschranke von §4.4, in §4.8 und in
+den Produkt-Block `flood_bldg.lambda` (Kap. 7) folgt in den nächsten Schritten der Ersatzkette für
+Ledger-Befund 36; §4.4 rechnet in diesem Zwischenstand noch mit dem λ-Band bei unverändertem
+\(M_0\) (siehe dort).
+
 <a id="niveau-skalar"></a>
 ### 4.4 Der Niveau-Skalar
 
@@ -1430,6 +1462,20 @@ beitrag_gk2 = w_wohn * wert_geb * 1_380_000 * r_gk2 / 1e9
 assert abs(beitrag_gk34 - 0.932) < 5e-3 and abs(beitrag_gk2 - 0.428) < 5e-3
 M0 = beitrag_gk34 + beitrag_gk2
 assert abs(M0 - 1.360) < 5e-3
+
+# 4.3 M0-Band (Vorgabe P1): Bandenden der acht Eingangsgroessen, alle gleichgerichtet
+bgf_lo, bgf_hi = 1.25, 1.40
+ws_lo, ws_hi = 1889.0, 2047.0
+r_gk34_lo, r_gk34_hi = 0.0033, 0.0103
+r_gk2_lo, r_gk2_hi = 0.000301, 0.001154
+wert_geb_lo = 208.0 * bgf_lo * ws_lo
+wert_geb_hi = 208.0 * bgf_hi * ws_hi
+term_lo = 339_000 * r_gk34_lo + 1_380_000 * r_gk2_lo
+term_hi = 339_000 * r_gk34_hi + 1_380_000 * r_gk2_hi
+M0_unten = w_wohn * wert_geb_lo * term_lo / 1e9
+M0_oben = w_wohn * wert_geb_hi * term_hi / 1e9
+assert abs(M0_unten - 0.657) < 5e-3
+assert abs(M0_oben - 2.643) < 5e-3
 
 # 4.4 Niveau-Skalar samt Band aus dem Ankerband
 lam = A_stern / M0
