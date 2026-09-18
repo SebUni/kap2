@@ -1985,7 +1985,7 @@ Gelesen, nicht verändert: `docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv`.)
 
 | Nr | Kat. | Vorgenommene Änderung | Status danach |
 |---|---|---|---|
-| 35 | B | Rechenweg für die ankerunabhängige Untergrenze \(U\) aus den amtlichen Wiederaufbauhilfen und für die klassengerechte Obergrenze \(O\) festgehalten (Zahlen, Quellen/Abschätzungen, Amtlichkeitsgebot-Ausnahme — Details unten). Der Nachzug im Bericht erfolgt in den Folgepaketen. | offen — Rechenweg steht, Nachzug in den Folgepaketen |
+| 35 (Zwischenstand T-0333) | B | Rechenweg für die ankerunabhängige Untergrenze \(U\) aus den amtlichen Wiederaufbauhilfen und für die klassengerechte Obergrenze \(O\) festgehalten (Zahlen, Quellen/Abschätzungen, Amtlichkeitsgebot-Ausnahme — Details unten). Der Nachzug im Bericht erfolgt in den Folgepaketen. | offen — Rechenweg steht, Nachzug in den Folgepaketen (abgelöst durch den Abschlussblock T-0336 unten) |
 
 **(a) Untergrenze \(U\) aus den amtlichen Wiederaufbauhilfen 2013/2021.** Grundlage ist
 `docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv` mit den beiden gesetzlich festgeschriebenen
@@ -2127,3 +2127,23 @@ Nicht angefasst (Dateirahmen): `docs/methodik/60_gebaeudeschaeden_flusshochwasse
 `docs/evidenz/register.md`, `backend/scripts/lint_methodik.py`, `backend/`, die Stichprobendateien
 unter `docs/evidenz/60_stichprobe/` und die Kopftabelle „Offene Befunde" dieses Ledgers (schreibt
 allein T-0296 fort).
+
+**18.09.2026 · T-0336** (Befund 35 an 60, Schritt 5 von 5 zur Auflösung von T-0294; Ersatz für den
+Befundabschluss nach dem Muster T-0321; Schritt L1 aus `.claude/methodik-loop.md`,
+Autor-Revision — keine Gegenprüfung, kein `/risiko-fortsetzen`, kein L4 nach eiserner Regel 4;
+die Gegenprüfung fährt T-0246 in eigener Sitzung). Geändert wird ausschließlich dieses Ledger;
+nichts wurde neu hergeleitet oder neu gerechnet — der Rechenweg steht bereits im Block
+**18.09.2026 · T-0322/T-0333** oben, die Zahlen und der Nachzug stehen bereits im Bericht
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (§4.6 „Neufassung nach Befund 35",
+§4.8-Parameterzeilen \(U\)/\(O\), Block `beispiel_60_kalibrierung`). Dieses Paket fasst nur
+zusammen und belegt, damit die Statuszeile für Befund 35 in diesem Ledger den bereits vollzogenen
+Nachzug wörtlich abbildet.
+
+| Nr | Kat. | Vorgenommene Änderung | Prüfausdruck | Status danach |
+|---|---|---|---|---|
+| 35 | B | **Zusammenfassung und Beleg des bereits im Bericht vollzogenen Nachzugs zu den drei Teilpunkten des Befunds.** (a) **Zirkuläre Untergrenze:** \(U\) ist nicht mehr aus den Ankerfaktoren \(A_{\text{ver}}, w_{\text{wg}}, u, \varphi_{\text{fluss}}, \kappa, \pi\) gebildet, sondern aus den amtlichen Wiederaufbauhilfe-Fondsvolumina (BGBl.) mit den KAP3-Abschätzungen Wohnanteil, Flussanteil und Wiederkehrzeit zu \(U\) = 0,0103 Mrd. €₂₀₂₆/a, unabhängig von der Ankerseite — Fundstelle **§4.6**, Absatz zur Untergrenze. (b) **Obergrenze ohne Klassenbezug:** \(O\) ist jetzt klassengerecht aus den ZÜRS-Jährlichkeiten je Adressklasse gebildet (GK3/GK4 0,1 a⁻¹, GK2 0,01 a⁻¹ statt einer bandweiten Höchstrate) zu \(O\) = 6,29 Mrd. €₂₀₂₆/a — Fundstelle **§4.6**, Absatz zur Obergrenze. (c) **Fehlende Begründung der Ausnahme vom Amtlichkeitsgebot:** Für beide Bandenden steht im Bericht ausdrücklich, welche Eingangsgrößen amtlich sind (die beiden Fondsvolumina) und welche als Abschätzung von KAP3 an die Stelle fehlender amtlicher Aufteilungsstatistik treten (Wohn-/Flussanteil, Wiederkehrzeit bei \(U\); ZÜRS-Klassifikation und GDV-Gebäudewert bei \(O\)) — Fundstelle **§4.6**, Absatz „Ausnahme vom Amtlichkeitsgebot (§3.4)". Nachgezogen sind außerdem die P1-Zeilen „\(U\) Sanity-Untergrenze" und „\(O\) Sanity-Obergrenze" in **§4.8** sowie der Rechenblock zu \(U\) und \(O\) im Block **`beispiel_60_kalibrierung`** (Kommentar „4.6 Sanity-Band und Lage der kalibrierten Bundessumme (Befund 35, ankerunabhaengiges U)", Zusicherungen `U`, `O` und `U <= lam * M0 <= O`). Der in §4.4 ausgewiesene Wert \(\lambda \cdot M_0\) = 0,832 · 1,360 = 1,132 Mrd. €₂₀₂₆/a liegt innerhalb des neu fixierten Bandes [0,0103; 6,29] Mrd. €₂₀₂₆/a, und diese Lage ist jetzt eine echte, aus unabhängigen Zahlen folgende Aussage statt der früheren Tautologie. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.6 ')[1].split(chr(10)+'### 4.7 ')[0];raise SystemExit(0 if all(x in k for x in ('0,0103','6,29','Amtlichkeitsgebot','1,132')) else 1)"` und `python3 backend/scripts/lint_methodik.py 60` | **behoben** — die Untergrenze ist ankerunabhängig aus amtlichen Wiederaufbauhilfe-Fondsvolumina hergeleitet, die Obergrenze ist klassengerecht nach ZÜRS-Jährlichkeit gebildet, und die Ausnahme vom Amtlichkeitsgebot ist für beide Bandenden begründet ausgewiesen; \(\lambda M_0\) = 1,132 liegt innerhalb des neuen Bandes [0,0103; 6,29] |
+
+Nicht angefasst (Dateirahmen): `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`,
+`docs/evidenz/register.md`, `backend/`, `backend/scripts/lint_methodik.py` und die Kopftabelle
+„Offene Befunde" am Kopf dieses Ledgers (schreibt allein T-0296 fort). Die übrigen Befunde sind in
+ihrem Status nicht angerührt.
