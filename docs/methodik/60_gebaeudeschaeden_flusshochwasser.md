@@ -1327,13 +1327,56 @@ Grenzen ist ein roter Test, kein Hinweis.
 abgeschlossene Schadenjahre. **2025 ist ausgeschlossen** (vorläufig, §4.1). Das **letzte
 Kalibrierjahr ist 2024**; auf dieses Jahr sind Bestands- und Preisnormierung des Ankers bezogen.
 
-**Wächter.** Der Objektschutz, der in den Kalibrierjahren 2002–2024 bereits an den Gebäuden
-vorhanden war, steckt in den Schadenzahlen des Ankers und damit in \(\lambda\). \(\Delta q\) aus
-§5.1.2 zählt deshalb **ausschließlich Nachrüstungen nach dem letzten Kalibrierjahr 2024**; jede
-vor 2025 realisierte bauliche Vorsorge ist Teil des Basisschadens und darf nicht erneut als
-Minderung gebucht werden. Operativ: Ein Hebelwert gilt nur für den Zuwachs gegenüber dem
-Ausstattungsstand 31.12.2024, und er verfällt, sobald ein Kalibrierjahr nach 2024 in den Anker
-aufgenommen wird — dann verschiebt sich der Referenzzustand mit.
+**Wächter — Referenzzustand ist das gewichtete Ausstattungsmittel, nicht der Stichtag.** Weil die
+Modellsumme im Kalibrierfenster konstant gesetzt ist (\(M_t \equiv M_0\), §4.3), fällt der
+Kleinste-Quadrate-Schätzer von \(\lambda\) auf das arithmetische, über die 23 Kalibrierjahre
+**gleichgewichtete** Mittel der Ankerreihe zurück (§4.1a, Gewicht 1/23 je Jahr). \(\lambda\)
+bildet damit nicht den Ausstattungsstand eines Stichtags ab, sondern dieses über die
+Kalibrierjahre gewichtete Ausstattungsmittel — der Referenzzustand des Wächters ist entsprechend
+als **das über die Kalibrierjahre 2002–2024 gleichgewichtete Ausstattungsmittel** definiert, nicht
+als Ausstattungsstand zu einem Stichtag. Eine Nachrüstung aus dem Jahr \(t\) ist in den
+Kalibrierjahren \(t\) bis 2024 bereits vorhanden, geht also mit \((2024-t+1)\) von 23 Jahren in
+dieses Mittel ein — Gewicht \((2024-t+1)/23\): 2020 mit 5/23 = **21,7 %**, 2014 mit 11/23 =
+**47,8 %**, das früheste Kalibrierjahr 2002 mit 23/23 = 100 %. Nur mit diesem — für jüngere
+Nachrüstjahre kleinen — Gewicht steckt eine vor 2025 realisierte Maßnahme tatsächlich im
+kalibrierten Niveau, nicht vollständig.
+
+\(\Delta q\) aus §5.1.2 zählt operativ trotzdem **ausschließlich Nachrüstungen nach dem letzten
+Kalibrierjahr 2024**: Eine jahresscharfe Zurechnung des heutigen Ausstattungsstands auf einzelne
+Kalibrierjahre wäre nötig, um die tatsächlichen, jahresabhängigen Gewichte oben je Maßnahme
+anzuwenden, und ist mangels Datenquelle nicht möglich (\(q_0\) bleibt geparkt, siehe unten). Der
+Wächter sperrt Vor-2025-Maßnahmen deshalb **pauschal mit Gewicht 1** statt mit ihrem tatsächlichen,
+jahresabhängigen Gewicht — bewusst konservativ gegen Doppelzählung, aber mit einer bezifferbaren
+Verzerrung (siehe Modellgrenze unten).
+
+**Verfallsregel, umgestellt auf die tatsächliche Gewichtsverschiebung.** Bisher verfiel der
+Hebelwert „sobald ein Kalibrierjahr nach 2024 in den Anker aufgenommen wird — dann verschiebt sich
+der Referenzzustand mit"; das unterstellte eine Verschiebung des Referenzzustands um ein volles
+Jahr je neu aufgenommenem Kalibrierjahr. Tatsächlich verschiebt eine Fenstererweiterung um ein Jahr
+(23 auf 24 Jahre) das gleichgewichtete Mittel nur um den Anteil, den das neue Jahr am neuen
+Fenster trägt: Der neue Mittelwert ist \((23 \cdot \bar A_{23} + A_{2025})/24 = \bar A_{23} +
+(A_{2025} - \bar A_{23})/24\), die Verschiebung des Referenzzustands beträgt also **1/24** des
+Abstands zwischen dem neuen Jahreswert und dem bisherigen Mittel, nicht ein ganzes Jahr. Der
+Hebelwert verfällt entsprechend erst mit dem tatsächlichen Neu-Fit von \(\lambda\) auf das erweiterte
+Fenster (dann trägt jedes Jahr Gewicht 1/24 statt 1/23, einschließlich des neu aufgenommenen
+Jahres), nicht bereits mit der bloßen Aufnahme des Jahres in die Ankerreihe.
+
+**Modellgrenze: Richtung und Größenordnung der Verzerrung bei geparktem \(q_0\).** Weil der
+Wächter Vor-2025-Maßnahmen pauschal mit Gewicht 1 statt mit ihrem tatsächlichen Gewicht
+\((2024-t+1)/23\) sperrt, wird der Anteil einer Maßnahme aus Jahr \(t\), der bereits im kalibrierten
+Niveau steckt, **überschätzt** — um \(1 - (2024-t+1)/23 = (t-2002)/23\). Für 2020 sind das
+78,3 Prozentpunkte (21,7 % tatsächlich gegenüber 100 % angenommen), für 2014 sind es
+52,2 Prozentpunkte (47,8 % gegenüber 100 %); die Überschätzung fällt für das früheste
+Kalibrierjahr 2002 auf 0 (dort ist die Maßnahme tatsächlich vollständig im Mittel enthalten) und
+wächst zum letzten Kalibrierjahr 2024 hin auf bis zu 95,7 % (Gewicht dort nur 1/23 = 4,3 %). In
+dieser Richtung ist der Wächter also **konservativ**: Er bucht keinen vor 2025 realisierten
+Objektschutz doppelt, verzichtet dafür aber darauf, den in \(\Delta q\) zählbaren Hebel um den
+nicht schon eingepreisten Rest jüngerer Vor-2025-Maßnahmen zu erhöhen — der tatsächlich wirksame
+Hebel wird dadurch **unterzählt**, in einer Größenordnung von rund der Hälfte bis zu drei
+Vierteln des Effekts einzelner, in den letzten zehn bis fünfzehn Kalibrierjahren realisierter
+Maßnahmen. Diese Verzerrung ist nicht bezifferbar auf das tatsächliche Portfolio, solange \(q_0\)
+und seine Verteilung über die Nachrüstjahre geparkt sind; sie ist hier als Modellgrenze der
+Wächter-Vereinfachung ausgewiesen, nicht als Fehler behoben.
 
 **Heutiger Objektschutz-Anteil \(q_0\): geparkt (Datenquelle fehlt).** Eine bundesweite Statistik
 des Ausstattungsgrads mit baulicher Objektvorsorge existiert nicht; die verfügbaren Angaben
@@ -1343,9 +1386,9 @@ mit Beschaffungs-Watchlist: (1) Zusatzmodul einer künftigen Zensus-Gebäudeerhe
 Auswertung kommunaler Förderprogramme zur Objektvorsorge, (3) Schadenstatistik der
 Wohngebäudeversicherung nach Vorsorgemerkmal. Die Marginalitätsaussage von §5.1.2 stützt sich
 solange **nicht** auf \(q_0\), sondern allein auf die Jahresbindung oben: Was vor 2025 gebaut
-wurde, ist im kalibrierten Niveau enthalten, unabhängig davon, wie viel es war. Das ist die
-prüfbare Form des Wächters; die Bezifferung von \(q_0\) bleibt offen und ist als solche
-gekennzeichnet.
+wurde, wird im Wächter — mit der oben ausgewiesenen Verzerrung — als im kalibrierten Niveau
+enthalten behandelt, unabhängig davon, wie viel es war. Das ist die prüfbare Form des Wächters;
+die Bezifferung von \(q_0\) bleibt offen und ist als solche gekennzeichnet.
 
 ### 4.8 Parameter dieses Kapitels (Vorgabe P1)
 
