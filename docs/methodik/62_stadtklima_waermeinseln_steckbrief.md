@@ -243,11 +243,29 @@ Wirkung an 95, 65 und 87 weiter (Abschnitt 2.3).
 
 ## 4 Was die Kommune daraus ablesen kann
 
-<!-- Inhalt aus dem Folge-Teilpaket zu T-0405 dieses Vorhabens (T-0357). -->
+Die Zellkarte zeigt, in welchen Quartieren sich die Stadt gegenüber ihrem Umland am stärksten
+aufheizt und wie stark dieser Aufschlag zum Hitze-Risikoindex der Kommune beiträgt. Eine Kommune
+liest daraus ab, wo Verschattung, Entsiegelung und Begrünung zuerst wirken, weil dort die
+Ausgangsbelastung am höchsten ist — etwa in dem Sinn: „Diese vier Ortsteile tragen die höchste
+Wärmelast; Verschattung und Entsiegelung wirken dort am stärksten.“ Die Karte liefert eine
+Rangfolge der Flächen für die Maßnahmenplanung, keinen Schadensbetrag und keine Zahl betroffener
+Personen.
 
 ## 5 Warum hier kein Betrag steht
 
-<!-- Inhalt aus dem Folge-Teilpaket zu T-0405 dieses Vorhabens (T-0357). -->
+Diese Klimawirkung ist ein Screening ohne Euro-Bezifferung — niemals 0 Euro und niemals leer. Der
+Rechenkern zeigt, wo die Wärmeinsel am stärksten wirkt, bucht dafür aber bewusst keinen eigenen
+Betrag: Nach der Monetarisierungs-Arbeitsmappe ist die Klimawirkung 62 rein vorgelagert und gibt
+ihre Wirkung ausschließlich an die nachgelagerten Klimawirkungen Hitzebelastung (95),
+Kühlenergiebedarf (65) und Leistungseinbußen von Beschäftigten (87) weiter; eine eigene Bepreisung
+wäre dort ausdrücklich eine Doppelzählung (Abschnitt 2.3, Quellenblatt Zeile 67, Regel R2).
+
+Fehlende Groesse der Kernformel: Preis
+Diese Datenlage wuerde sie liefern: ein eigener, doppelzählungsfreier Kostensatz für Id 62 in der
+Monetarisierungs-Arbeitsmappe „Risiken-Monetarisierung“ — dort steht dazu heute ausdrücklich „—“
+(kein Kostensatz, da rein vorgelagert ohne eigene Buchung; `docs/evidenz/62_steckbrief_quellen.md`,
+Abschnitt Parameter). Aus dem Screening wird kein Euro-Wert per Analogie zu anderen Klimawirkungen
+hochgerechnet, auch nicht als Spanne.
 
 ## 6 Massnahme
 
