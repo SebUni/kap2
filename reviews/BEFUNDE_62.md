@@ -7,8 +7,7 @@ gegenstandslos. Befunde werden fortlaufend ab 1 nummeriert. Pflege über
 `backend/scripts/ledger.py`. Ein Befund wird nur mit Prüfausdruck geschlossen (W7).
 Zurückgestellte A-Befunde blockieren die Abnahme.
 
-Prüfbefehl Kopfzahl: grep -c "| offen |" reviews/BEFUNDE_62.md muss dieselbe Zahl ergeben wie
-die Klammer in der Überschrift "## Offene Befunde (N)".
+Pruefbefehl Kopfzahl: grep -c "| offen |" reviews/BEFUNDE_62.md muss dieselbe Zahl ergeben wie die Klammer in der Ueberschrift "## Offene Befunde (N)".
 
 ## Offene Befunde (0)
 
