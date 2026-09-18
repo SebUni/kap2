@@ -2603,3 +2603,187 @@ ab ihr wird hier fortlaufend vergeben, damit keine Nummer doppelt belegt wird.
 - **Kein Befund behoben, keiner umnummeriert.** Befund 48 (FS-Exposition in B2) und Befund 42 (Archiv-Snapshots) werden nur eingeordnet, nicht neu vergeben.
 - **Kopftabelle „Offene Befunde (19)" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete, festgelegt im Eröffnungspaket T-0359). Mit 47–49 aus T-0360 und 50–53 aus diesem Paket wären es 26 offene Zeilen; nachgezogen wird die Kopftabelle im Abschlusspaket der Runde 3.
 - **Nicht Gegenstand dieses Pakets:** die Leitfragen 1 bis 9 und 11 bis 13, die Registertabelle in Kapitel 2 Teil A, die Kapitel 1 und 3 bis 7 sowie 9 und die Regression der Befunde 1–46. Sie liegen bei den Geschwisterpaketen der Runde 3.
+
+### Leitfragen 3 und 13
+
+Paket T-0371 der Runde 3 (18.09.2026; ersetzt das an der Laufkappe gescheiterte T-0362), eigene
+frische Sitzung: Sie hat den geprüften Stand nicht geschrieben — Kapitel 3 stammt aus T-0235 bis
+T-0243, T-0256 bis T-0259 und den Revisionspaketen aus T-0281, alle im Endstatus (eiserne
+Regel 4). Das Bundle nach §1 lag ab dem ersten Turn vor (Abschnitt 0 dieser Runde, unverändert
+gültig); die Lint-Ausgabe aus Abschnitt 0.1 wird **übernommen, nicht neu erhoben** (§5, Schritt
+„zuerst die deterministischen Lints"). Maßstab sind ausschließlich §3 und §5 der Aufgabe, nicht
+der Berichtstext. Dieses Paket trägt davon die Leitfragen **3** (physische Zwischengröße) und
+**13** (Herleitungspflicht).
+
+**Prüfumfang dieses Pakets.** Vertieft geprüft ist **Kapitel 3 Teil A**: der Kapitelkopf
+`## 3 Modell (§2.3)` und die Abschnitte 3.1, 3.4, 3.5, 3.6 und 3.7. Nachgemessen, nicht aus dem
+Ticket übernommen:
+
+```
+$ python3 -c "
+import re
+s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read()
+def body(a,b):
+    t=s.split(chr(10)+a)[1].split(chr(10)+b)[0]
+    t=re.sub('<!--.*?-->','',t,flags=re.S)
+    return t.strip(chr(10))
+pairs=[('## 3 Modell','### 3.1 Native'),('### 3.1 Native','### 3.2 Datenebenen'),('### 3.4 Kernformel','### 3.5 Zeichentabelle'),('### 3.5 Zeichentabelle','### 3.6 Aggregation'),('### 3.6 Aggregation','### 3.7 Schicht-A'),('### 3.7 Schicht-A','## 4 Kalibrierung')]
+tot=0
+for a,b in pairs:
+    n=len(body(a,b)); tot+=n; print(a, n)
+print('SUMME', tot)
+"
+## 3 Modell 392
+### 3.1 Native 1580
+### 3.4 Kernformel 7064
+### 3.5 Zeichentabelle 7120
+### 3.6 Aggregation 6314
+### 3.7 Schicht-A 3109
+SUMME 25579
+```
+
+Gemessen sind **25.579** statt der im Ticket genannten 25.329 Zeichen (Kopf 392 statt 386, 3.1
+1.580 statt 1.520, 3.4 7.064 statt 7.028, 3.5 7.120 statt 7.069, 3.6 6.314 statt 6.259, 3.7 3.109
+statt 3.067). Der geprüfte Textkörper ist derselbe; die Differenz von 250 Zeichen stammt aus der
+Schnittkante der Zählung — dieser Ausdruck schneidet am Zeilenanfang der Überschrift und zählt den
+Rest der Überschriftenzeile mit. Die Zahl steht hier als Messwert, statt die Ticketzahl zu
+wiederholen. **Nicht vertieft geprüft** sind der Berichtskopf sowie die Abschnitte 3.2 und 3.3
+(Geschwisterpaket); sie werden nur als Gegenstelle zitiert, etwa für die Herleitung von
+\(d(h)\), \(h_1\) und \(h_5\). Ein nationaler 100-m-Vollraster-Lauf ist nach §3.4 nicht zulässig
+und wurde **nicht** gefahren: Nachgerechnet wurde zellweise am Rechenbeispiel des Berichts und an
+der Zeichentabelle. Die Arbeitsmappen wurden in diesem Paket nicht geändert (eiserne Regel 2); der
+Abgleich gegen sie trägt die Leitfragen 1 und 14 und liegt bei den Geschwisterpaketen. Im Code
+wurde nichts geändert (eiserne Regel 5).
+
+#### LF 3 — Physische Zwischengröße: Euro je Zelle auf eine physische Größe rückführbar; native Ausweise proportional zu den Euro-Pfaden?
+
+**Verdikt: Befund** (Befund 57). Der Kernteil der Leitfrage ist erfüllt, der Klammerzusatz zu den
+nativen Ausweisen nicht.
+
+*Erfüllt — Euro je Zelle rückführbar.* Die Kernformel trennt die drei Schritte sauber und lässt
+den Euro erst im letzten entstehen. Schritt 1 (Z. 648–651) bildet
+\(A_{z,s} = W_z a_{z,s} \cdot d(h_{z,s}) f_{S093} f_{S094}\) in **m²** und benennt das Ergebnis
+ausdrücklich als „schadensäquivalente Wohnfläche … die physische Zwischengröße" (Z. 653–655),
+„existiert unabhängig von jedem Preis". Schritt 2 (Z. 662) hält die Einheit bei m²/a. Erst
+Schritt 3 (Z. 679–681) multipliziert mit der Wertdichte: \(\text{EAD}_z = \bar A_z \cdot w_z\),
+\(w_z = k_{\text{BGF}} \sum_t \theta_{z,t} n_t\). Die Einheitenkette schließt: m² Wohnfläche/a ×
+(m² BGF/m² Wohnfläche × €₂₀₂₆/m² BGF) = €₂₀₂₆/a. Jeder Euro-Betrag der Zelle ist damit durch
+Division durch \(w_z\) wieder in die physische Größe rückführbar; das Rechenbeispiel Z. 713–720
+führt das mit 15,0 / 77,8 / 300,0 m², \(\bar A_z = 6{,}31\) m²/a und ≈ 16.000 €₂₀₂₆/a vor und ist
+als Golden-Test `beispiel_60_kernformel_zelle` (Z. 722–748) hinterlegt. Kein Summand stammt aus
+einer nationalen Größe, die verteilt würde (Lackmustest Z. 708–711, in 3.6 Z. 805–812 wiederholt):
+Eine Kommune ohne Flussaue erhält exakt 0.
+
+*Erfüllt — Ausweis der physischen Größe.* §3.1 Z. 545–548 deklariert \(\bar A\) in m²/a als
+physischen Teil-Ausweis, §3.6 Z. 816–828 führt ihn als Ausweis 1 neben dem Euro-Ausweis 3 und
+ergänzt mit Ausweis 2 die reine Exposition \(\sum_{z\in k} W_z a_{z,s}\) in m² je Szenario.
+Ausweis 2 ist ausdrücklich „ohne Schadensquote und ohne Preis" und behauptet keine
+Proportionalität; er ist die gegen die Gefahrenkarte prüfbare Zahl. Der Schicht-A-Index ist in 3.7
+Z. 918–928 ausdrücklich vom Euro-Pfad getrennt („geht in keine Formel dieses Kapitels ein …
+umgekehrt fließt kein Euro-Betrag in \(I_{60,k}\) ein"), also kein verdeckter zweiter Euro-Pfad.
+
+*Nicht erfüllt — Proportionalität auf der deklarierten Betrachtungsebene.* §3.1 Z. 548 schreibt
+die Beziehung indexfrei als \(\text{EAD} = \bar A \cdot w\), und §3.1 Z. 541–543 deklariert die
+Betrachtungsebene als die **Kommune**. §3.6 Z. 797 rechnet dagegen
+\(\text{EAD}_k = \sum_{z\in k} \bar A_z w_z\). Beide Formen stimmen nur überein, wenn \(w_z\) über
+alle Zellen der Kommune gleich ist; \(w_z\) hängt aber über \(\theta_{z,t}\) am Gebäudetyp-Mix der
+Zelle, und die beiden Wertsätze unterscheiden sich um 21 % (1.950 gegen 1.533 €₂₀₂₆/m² BGF,
+Z. 684–685). Der Golden-Test in 3.6 kennt die Bedingung und nennt sie im Kommentar Z. 879
+(„Linearitaet: … (gleiche Wertdichte)"), prüft die Gleichheit aber nur an einer Kommune mit
+einheitlichem \(\theta_{\text{EFH/ZFH}} = 1{,}0\); im sichtbaren Berichtstext steht die Bedingung
+nirgends. Für einen Leser der Teil-Ausweise heißt das: Zwei Kommunen mit gleichem \(\bar A_k\)
+können sich im \(\text{EAD}_k\) um bis zu 21 % unterscheiden, ohne dass der Bericht das ausweist —
+der native Ausweis ist zum Euro-Pfad **monoton, aber nicht proportional**. Daraus Befund 57
+(Kategorie B: die Rechnung in 3.4/3.6 bleibt richtig, falsch ist nur die Identität in 3.1).
+
+#### LF 13 — Herleitungspflicht: ein einziges Formelzeichen ohne abgeschlossene Herleitung ist ein Befund
+
+**Verdikt: Befund** (Befunde 54 und 55). Nachgerechnet statt gelesen: Die Zeichentabelle 3.5 wurde
+vollständig gegen die in 3.4, 3.6 und 3.7 verwendeten Formelzeichen abgeglichen — und umgekehrt.
+
+**Zählung.** Die Tabelle 3.5 (Z. 762–789) trägt **28 Zeilen** mit zusammen **41 Einzelzeichen**
+(Zeilen fassen Index-Varianten zusammen, etwa \(W_z\), \(W_k\) oder \(p_i\), \(p_1\), \(p_2\),
+\(p_3\)). Davon treten **3 Zeichen allein in Kapitel 5 auf** — \(r_{\text{S092}}\), \(\Delta q\),
+\(e_{\text{bem}}\) — und sind nach dem Zuschnitt dieses Pakets nicht sein Gegenstand; sie stehen in
+der Tabelle und sind hier nur abgezogen. Im Prüfumfang liegen damit **38 Zeichen aus 25 Zeilen**.
+Hinzu kommen **2 Zeichen, die in den Formeln von Teil A verwendet werden und keine Zeile in 3.5
+haben** (siehe unten). **Geprüft wurden also 40 Formelzeichen.** \(\text{EAD}_{\text{mit}}\) und
+\(s_{\text{bem}}\) bleiben im Umfang, weil sie im Text von 3.7 (Z. 922) beziehungsweise 3.6
+(Z. 828) vorkommen; ihre Herleitung liegt an den gesetzten Ankern `#s092-wirkung` (Z. 1584) und
+`#s-bem-naeherung` (Z. 1666) und ist abgeschlossen.
+
+**Ergebnis 1 — Zeichen ohne Eintrag in 3.5 (namentlich).** Zwei:
+
+```
+$ python3 -c "
+s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read()
+g=lambda a,b: s[s.index(a):s.index(b)]
+t35=g('### 3.5 Zeichentabelle','### 3.6 Aggregation'); t34=g('### 3.4 Kernformel','### 3.5 Zeichentabelle'); t31=g('### 3.1 Native','### 3.2 Datenebenen')
+rows=[l for l in t35.split(chr(10)) if l.startswith('| ') and '---' not in l[:6] and 'Bedeutung' not in l]
+awm=chr(92)+'(f_'+chr(123)+chr(92)+'text'+chr(123)+'AWM'+chr(125)+chr(125)+chr(92)+')'
+print('Zeilen 3.5:',len(rows))
+print('f_AWM in 3.4:',awm in t34,'| Zeile in 3.5:',any(awm in r for r in rows))
+wz=chr(92)+'(w_z'+chr(92)+')'; wf=chr(92)+'cdot w'+chr(92)+')'
+print('indexfreies w in 3.1:',wf in t31,'| Zeile fuer w_z:',any(wz in r.split('|')[1] for r in rows),'| Zeile fuer indexfreies w:',any(r.split('|')[1].strip()==chr(92)+'(w'+chr(92)+')' for r in rows))
+"
+Zeilen 3.5: 28
+f_AWM in 3.4: True | Zeile in 3.5: False
+indexfreies w in 3.1: True | Zeile fuer w_z: True | Zeile fuer indexfreies w: False
+```
+
+- \(f_{\text{AWM}}\) — Alterswertminderungsfaktor, in §3.4 Schritt 3 (Z. 689–692) mit Wert 0,55 und
+  Band 0,40–0,75 geführt, ohne Zeile in 3.5, obwohl die Überschrift „alle Formelzeichen der
+  Kapitel 3 und 5" verspricht. → Befund 54.
+- \(w\) **ohne Index** — in §3.1 Z. 548 (\(\text{EAD} = \bar A \cdot w\)) benutzt; die Tabelle führt
+  nur \(w_z\) „Wertdichte der **Zelle**" (Z. 781) und erklärt das indexfreie Gattungszeichen anders
+  als bei \(\bar A\) (Z. 775, „indexfrei \(\bar A\) als Gattungszeichen") nicht. → Befund 54.
+
+**Ergebnis 2 — Zeichen ohne abgeschlossene Herleitung (namentlich).** Kein Zeichen des Prüfumfangs
+ist ohne Herleitung geblieben; die Herkunftsspalte hält für jedes der 38 Zeichen eine Register-ID
+oder eine Berichtsstelle bereit, und alle sechs reinen Laufindizes (\(z\), \(k\), \(s\), \(i\),
+\(t\), \(n\)) sind als **Notation** gekennzeichnet und tragen keinen Wert — §3.9 greift für sie
+nicht. Stichprobenweise gegengelesen und abgeschlossen vorgefunden: \(k_{\text{BGF}}\) = 1,30
+(Herleitung mit Band und Ergebnis-Sensitivität −11 % in Langbeleg B4, Rechenschritt 3, Z. 369–381),
+\(n_t\) (NHK 2010 → Preisstand 2026 mit ausgeschriebenem Umrechnungsfaktor 1,6813 × 1,105 = 1,8578,
+Z. 354–364 und Tabellenzeile Z. 779), \(p_3\) (geometrisches Mittel des WHG-/Länderpraxis-Bandes,
+Z. 664–678), \(d(h)\), \(h_1\), \(h_5\) (§3.3 Z. 588–630 mit Interpolationsregel, Deckelung,
+Richtung und Band), \(T\) (Kehrwert, nur zur Lesbarkeit).
+
+**Ergebnis 3 — Herkunft, die auf eine nicht zugelassene Registerzeile zeigt.** Vier Zeichen des
+Prüfumfangs — \(d_1\), \(d_5\), \(f_{S093}\), \(f_{S094}\) — nennen als Herkunft die
+Registerzeilen 60-S093-01 und 60-S094-01. Beide tragen in der Entscheidungsspalte
+**„Sensitivitätsband, abgeschätzt"**, während die Präambel des Registers (Z. 160) für Formelzeichen
+wörtlich verlangt: „In Formeln (§3) dürfen später nur Zeilen mit Entscheidung **Basiswert**
+stehen." Zusätzlich sagen beide Registerzeilen wörtlich „kein eigenes Multiplikativglied im
+Basiswert", während die Kernformel Z. 651 genau ein solches Glied \(\cdot f_{S093} \cdot f_{S094}\)
+trägt (numerisch neutral, 1,00). → Befund 55. Zum Vergleich: \(W_z\), \(\theta_{z,t}\), \(n_t\)
+(60-R24-01) und \(a_{z,s}\), \(h_{z,s}\), \(p_1\), \(p_2\) (60-W085-01) verweisen auf Zeilen mit
+Entscheidung **Basiswert** und erfüllen die Regel.
+
+**Ergebnis 4 — Form der Tabelle.** §3.2 verlangt „je Formel eine **alphabetisch sortierte**
+Formelzeichen-Tabelle". Die 28 Zeilen stehen in der Reihenfolge ihres Auftretens (z, k, s/i, t, n,
+W, a, h, d, … EAD, r, Δq, s_bem, e_bem, x, I), nicht alphabetisch. → Befund 56, formal eine Frage
+der Leitfrage 11; er wird hier verbucht, weil er beim zeilenweisen Durchgang der Tabelle anfällt
+und sonst still bliebe.
+
+#### Neue Befunde dieses Pakets (54–57)
+
+**Nummernvergabe.** Das Ticket geht vom Ledgerstand 1–46 aus und nennt 47 als erste freie Nummer
+der Runde; tatsächlich haben die Pakete der Reihenfolge 1 bis 3 inzwischen die Nummern **47–49**
+(T-0360) und **50–53** (T-0361) vergeben. Die zu Laufbeginn höchste vorhandene Nummer ist damit
+**53**, die erste neue Nummer dieses Pakets **54**. **Kein Befund wird in diesem Paket behoben** —
+die Einträge sind reine Gegenprüfung.
+
+| Nr | Kat. | Stelle · Art · Begründung · Vorschlag |
+|---|---|---|
+| 54 | **B** | **Stelle:** Bericht §3.5 „Zeichentabelle (alle Formelzeichen der Kapitel 3 und 5, §3.2/§3.9)" Z. 750–789 (28 Zeilen), gegen §3.4 Schritt 3 Z. 689–692 (\(f_{\text{AWM}}\) = 0,55, Band 0,40–0,75) und §3.1 Z. 548 (\(\text{EAD} = \bar A \cdot w\)). · **Art: Lücke** (§3.2 „je Formel eine … Formelzeichen-Tabelle (Zeichen · Name · Einheit · Wert/Herkunft)"; §3.9 Fertig-Regel „Jede Zeile jeder Zeichentabelle referenziert … eine abgeschlossene Herleitung"; §5 LF 13). · **Begründung:** Die Tabelle beansprucht in ihrer Überschrift und im Einleitungssatz Vollständigkeit („führt **jedes** Formelzeichen, das in diesem Kapitel oder in Kapitel 5 vorkommt"). Der Abgleich (Ausdruck oben) findet zwei in Kapitel 3 verwendete Zeichen ohne Zeile: (a) \(f_{\text{AWM}}\), der Alterswertminderungsfaktor, mit Zahlenwert, Band und einer Ergebnis-Sensitivität von −45 % (§7.2) — er ist damit kein Randzeichen, sondern der Parameter der größten benannten Einzelverschiebung des Berichts; seine Herleitung existiert (§4.8 Z. 1474, §7.2 Z. 2262 ff.), sie ist nur nicht von der Zeichentabelle aus erreichbar. (b) Das indexfreie \(w\) in §3.1: Für \(\bar A\) erklärt die Tabelle das indexfreie Gattungszeichen ausdrücklich (Z. 775), für \(w\) nicht, obwohl §3.1 es in einer Formel benutzt; wer die Tabelle als Nachschlagewerk benutzt, findet nur die Zell-Wertdichte \(w_z\). · **Vorschlag:** Zwei Zeilen ergänzen — \(f_{\text{AWM}}\) („Alterswertminderungsfaktor, nur Sensitivität; 0,55, Band 0,40–0,75", Einheit „–", Herkunft `herleitung: §7.2 / #fortschreibung-neuwert-k3`) und \(w\) als Gattungszeichen zu \(w_z\)/\(w_k\) nach dem Muster der \(\bar A\)-Zeile, mit dem Hinweis, dass auf Kommunenebene die flächengewichtete Wertdichte gemeint ist (Befund 57). Den Vollständigkeitsanspruch der Überschrift als Lint prüfen, damit er beim nächsten neuen Zeichen nicht still altert. |
+| 55 | **B** | **Stelle:** Bericht §3.5 Z. 771 (\(d_1\), \(d_5\): „register: 60-S093-01") und Z. 773 (\(f_{S093}\), \(f_{S094}\): „register: 60-S093-01 bzw. 60-S094-01"), gegen Kap. 2 Registerpräambel Z. 160 und die Entscheidungsspalten der Zeilen 60-S093-01 (Z. 187) und 60-S094-01 (Z. 188), beide „**Sensitivitätsband, abgeschätzt** … kein eigenes Multiplikativglied im Basiswert", gegen die Kernformel §3.4 Z. 651 (Faktoren \(\cdot f_{S093} \cdot f_{S094}\)). · **Art: Widerspruch** (§2.3 „ausschließlich aus Register-Zeilen komponiert"; eigene Regel des Berichts Z. 160 „In Formeln (§3) dürfen später nur Zeilen mit Entscheidung **Basiswert** stehen"; §5 LF 13 Herkunftskette). · **Begründung:** Vier Formelzeichen des Basiswert-Pfades holen ihre Herkunft aus Registerzeilen, die der Bericht selbst nicht für Formeln zugelassen hat. Bei \(f_{S093}\)/\(f_{S094}\) sagt die Registerzeile darüber hinaus wörtlich das Gegenteil dessen, was die Formel zeigt: Sie bestreitet ein Multiplikativglied, das in Z. 651 steht. Numerisch ist der Widerspruch heute folgenlos (Neutralwert 1,00), aber er entwertet die Herkunftsangabe: Wer die Herleitung von \(d_1\) und \(d_5\) — den beiden **belegten** Enden der Schadensfunktion, die den Euro-Betrag tragen — über die Register-ID nachschlägt, landet auf einer Zeile, deren Entscheidung „Sensitivitätsband" lautet. Damit ist für die vier Zeichen nicht entscheidbar, ob ihr Wert Basiswert oder Bandende ist. Abgrenzung: **kein** Wiederaufgreifen von Befund 3 (dort fehlten Entscheidungen ganz) und **kein** Teil von Befund 49 (dort geht es um Zeilen mit Entscheidung `offen`); hier tragen die Zeilen eine zulässige Entscheidung, nur die falsche für ihren Verwendungsort. · **Vorschlag:** Entweder 60-S093-01 in zwei Zeilen teilen — eine mit Entscheidung **Basiswert** für die belegten Enden \(d_1\)/\(d_5\) der Wasserstandsachse (Thieken u. a. 2008, B5) und eine mit **Sensitivitätsband** für die Zustandsachse \(f_{S093}\) (analog 60-S094-01) — oder die Präambel Z. 160 um den Fall „neutral gesetztes Bandzeichen (Wert 1,00), das als Platzhalter in der Formel steht" ergänzen und den Satz „kein eigenes Multiplikativglied im Basiswert" in beiden Registerzeilen auf den Ist-Stand der Formel ziehen. |
+| 56 | **C** | **Stelle:** Bericht §3.5 Z. 762–789, Reihenfolge der 28 Tabellenzeilen (z, k, s/i, t, n, \(W\), \(a\), \(h\), \(d(h)\), \(d_1\)/\(d_5\), \(h_1\)/\(h_5\), \(f_{S093}\)/\(f_{S094}\), \(A_{z,s}\), \(\bar A\), \(p_i\), \(T\), \(\theta\), \(n_t\), \(k_{\text{BGF}}\), \(w_z\), EAD, …, \(x_k\), \(I_{60,k}\)). · **Art: Formabweichung** (§3.2 „je Formel eine **alphabetisch sortierte** Formelzeichen-Tabelle"). · **Begründung:** Die Tabelle ist nach dem Auftreten in den Formeln sortiert, nicht alphabetisch. Bei 28 Zeilen und 41 Einzelzeichen ist das der Unterschied zwischen Nachschlagen und Durchlesen — genau die Funktion, für die §3.2 die Sortierung verlangt, und ein Adressat ohne Statistikausbildung (§8/P3) nutzt die Tabelle als Nachschlagewerk. Kategorie C: keine Zahl, keine Rechnung, kein Zusammenhang betroffen. Formal gehört der Punkt zu Leitfrage 11 (Form und Erklärbarkeit); er wird hier verbucht, weil er beim zeilenweisen Abgleich für Leitfrage 13 anfällt und sonst still bliebe — das Paket zu LF 11 findet ihn damit als bereits nummeriert vor. · **Vorschlag:** Die Zeilen alphabetisch nach dem Zeichennamen sortieren (lateinische vor griechischen Zeichen, Index nachgeordnet) und die heutige Auftretensreihenfolge, wenn sie für das Lesen gewollt ist, als eigene Spalte „Schritt" führen; alternativ die Abweichung als bewusste Wahl im Einleitungssatz von §3.5 begründen (§3.2 lässt eine begründete Abweichung nicht ausdrücklich zu — dann wäre eine Fortschreibung der Aufgabe nötig). |
+| 57 | **B** | **Stelle:** Bericht §3.1 Z. 541–548 — Betrachtungsebene „die **Kommune**" (Z. 541) und Formel \(\text{EAD} = \bar A \cdot w\) (Z. 548) —, gegen §3.6 Z. 797 (\(\text{EAD}_k = \sum_{z\in k} \bar A_z w_z\)) und §3.6 Z. 816–828 (Teil-Ausweise 1 und 3), mit dem Wertsatz-Abstand aus §3.4 Z. 684–685 (1.950 gegen 1.533 €₂₀₂₆/m² BGF) und dem Golden-Test-Kommentar §3.6 Z. 879 („Linearitaet: … (gleiche Wertdichte)"). · **Art: Fehler/Lücke** (§5 LF 3 „auch native Ausweise proportional zu den Euro-Pfaden"; §3.6 Ausweis-Disziplin). · **Begründung:** Auf der Zelle ist der Euro-Betrag exakt proportional zur physischen Zwischengröße (\(\text{EAD}_z = \bar A_z w_z\)) — das erfüllt den Kern von LF 3. Auf der **deklarierten** Betrachtungsebene Kommune gilt \(\text{EAD}_k = \bar A_k \cdot w\) aber nur, wenn \(w_z\) über alle Zellen gleich ist; sonst ist der Quotient \(\text{EAD}_k / \bar A_k\) die flächengewichtete Wertdichte der Kommune. Weil \(w_z\) über \(\theta_{z,t}\) am Gebäudetyp-Mix hängt und die beiden Wertsätze 21 % auseinanderliegen, können zwei Kommunen mit identischem physischen Ausweis \(\bar A_k\) bis zu 21 % verschiedene Euro-Ausweise tragen. Die Formel in §3.1 behauptet als Identität, was nur eine Zell-Identität ist; der Test kennt die Bedingung (Z. 879), prüft sie aber an einer Kommune mit einheitlichem \(\theta_{\text{EFH/ZFH}} = 1{,}0\) und trägt sie nicht in den Berichtstext. Kategorie B: Die Rechenwege in §3.4 und §3.6 sind richtig, kein ausgewiesener Zahlenwert ändert sich; falsch ist die zusammenfassende Identität und fehlend der Hinweis am Teil-Ausweis. · **Vorschlag:** (a) §3.1 Z. 548 auf \(\text{EAD}_z = \bar A_z \cdot w_z\) und \(\text{EAD}_k = \sum_{z\in k} \bar A_z w_z\) ziehen (oder \(w\) ausdrücklich als flächengewichtete Wertdichte \(w_k = \text{EAD}_k / \bar A_k\) definieren, dann mit Zeile in §3.5, siehe Befund 54). (b) Bei Teil-Ausweis 1 in §3.6 den Satz ergänzen, dass \(\bar A_k\) und \(\text{EAD}_k\) über Kommunen hinweg nicht proportional sind, weil die Wertdichte am Gebäudetyp-Mix hängt, und die Spannweite 1.533…1.950 €₂₀₂₆/m² BGF nennen. (c) Den Golden-Test um eine Kommune mit gemischtem \(\theta\) erweitern, die den Unterschied zwischen \(\bar A_k \cdot w_{\text{EFH}}\) und \(\sum_z \bar A_z w_z\) festhält. |
+
+#### Abgrenzung und Status dieses Pakets
+
+- **Geändert wurde ausschließlich `reviews/BEFUNDE_60.md`.** `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, `docs/evidenz/register.md`, `backend/scripts/lint_methodik.py` und `backend/` sind unangetastet; die Arbeitsmappen wurden in diesem Paket nicht geöffnet und nicht verändert (eiserne Regel 2), der Abgleich gegen sie liegt bei den Paketen zu den Leitfragen 1 und 14.
+- **Kein Befund behoben, keiner umnummeriert.** Die Befunde 3, 49 (Registerzeilen) und 41 (Zeitwertansatz) werden nur abgegrenzt, nicht neu vergeben.
+- **Kopftabelle „Offene Befunde (19)" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete, festgelegt im Eröffnungspaket T-0359). Mit 47–49 (T-0360), 50–53 (T-0361) und 54–57 aus diesem Paket wären es 30 offene Zeilen; nachgezogen wird die Kopftabelle im Abschlusspaket der Runde 3.
+- **Nicht Gegenstand dieses Pakets:** die Leitfragen 1, 2, 4 bis 12 und 14, der Berichtskopf, die Abschnitte 3.2 und 3.3, die Kapitel 1, 2 und 4 bis 9 sowie die Regression der Befunde 1–53. Formelzeichen, die allein in Kapitel 5 auftreten (\(r_{\text{S092}}\), \(\Delta q\), \(e_{\text{bem}}\)), sind aus der Zählung ausgenommen und nur als vorhanden vermerkt.
