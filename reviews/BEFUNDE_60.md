@@ -1976,3 +1976,149 @@ gelesen), `docs/evidenz/register.md`, `backend/scripts/lint_methodik.py`, `backe
 Stichprobendateien unter `docs/evidenz/60_stichprobe/` und die Kopftabelle „Offene Befunde" am Kopf
 dieses Ledgers (schreibt allein T-0296 fort, Vorgabe aus dem Vorhaben T-0281, Punkt 2). Der alte
 Eintrag zu Befund 36 in der Runde-2-Tabelle (Status „offen — Rest: …") bleibt als Historie stehen.
+
+**18.09.2026 · T-0333** (Befund 35 an 60, Schritt 2 von 5 der Ersatzkette für T-0294; Schritt L1 aus
+`.claude/methodik-loop.md`, Autor-Revision — keine Gegenprüfung, kein `/risiko-fortsetzen`, kein L4
+nach eiserner Regel 4. Geändert wird ausschließlich dieses Ledger; der Bericht
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` bleibt byte-gleich, das zieht Schritt 3 nach.
+Gelesen, nicht verändert: `docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv`.)
+
+| Nr | Kat. | Vorgenommene Änderung | Status danach |
+|---|---|---|---|
+| 35 | B | Rechenweg für die ankerunabhängige Untergrenze \(U\) aus den amtlichen Wiederaufbauhilfen und für die klassengerechte Obergrenze \(O\) festgehalten (Zahlen, Quellen/Abschätzungen, Amtlichkeitsgebot-Ausnahme — Details unten). Der Nachzug im Bericht erfolgt in den Folgepaketen. | offen — Rechenweg steht, Nachzug in den Folgepaketen |
+
+**(a) Untergrenze \(U\) aus den amtlichen Wiederaufbauhilfen 2013/2021.** Grundlage ist
+`docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv` mit den beiden gesetzlich festgeschriebenen
+Fondsvolumina 8 Mrd. EUR (2013, AufbhG, § 4 Abs. 1 Satz 1 — fest zugesagter Betrag) und 30 Mrd. EUR
+(2021, AufbhEG 2021, § 4 Abs. 1 — „bis zu", davon 16 Mrd. EUR im Jahr 2021 selbst zugeführt, der
+Rest erst „nach Maßgabe des Haushaltsgesetzes"). Als **Ereignis-Mindestschaden** wird der kleinere,
+vollständig feststehende Betrag angesetzt, nicht die unsichere Obergrenze von 2021: 8 Mrd. EUR
+nominal 2013 (Quelle: CSV Zeile `wiederaufbauhilfe_fondsvolumen;8;…;2013`). Die Umrechnung auf
+Preisstand 2026 ist eine **Abschätzung von KAP3**: Über 13 Jahre wird eine durchschnittliche
+Preissteigerung von 2 %/a angesetzt (Herleitung: \(1{,}02^{13} = 1{,}294\)), also
+\(E_{\min,2026} = 8 \cdot 1{,}294 = 10{,}35\) Mrd. EUR₂₀₂₆.
+
+Der **Wohngebäude- bzw. Wohnanteil** ist eine **Abschätzung von KAP3** mit dem Wert \(w = 0{,}30\):
+Der Gesetzestext selbst weist laut CSV-Anmerkung keinen auf Wohngebäude oder private Haushalte
+entfallenden Euro-Anteil aus („nennt Privathaushalte nur als eine von zwei Fördergruppen ohne
+Bezifferung"); angesetzt wird eine grobe Drittelung der Aufbauhilfe-Mittel auf private
+Wohngebäude/-inhalte, Infrastruktur und Wirtschaft/Landwirtschaft, wovon der schmalere Anteil
+„Wohngebäude" (ohne Hausrat, ohne Infrastruktur) mit rund einem Drittel des Privathaushalts-Anteils
+angesetzt wird — Herleitung: übliche Aufbauhilfe-Mittelverwendung dieser Größenordnung, keine
+Quelle beziffert den Wert exakt.
+
+Der **flussseitige Anteil** ist ebenfalls eine **Abschätzung von KAP3** mit dem Wert
+\(f_{\text{fluss}} = 0{,}90\): Beide geförderten Ereignisse — Elbe-/Donau-Hochwasser 2013,
+Ahrtal-Flut 2021 — sind dokumentierte Flusshochwasserereignisse; der Abschlag von 10 Prozentpunkten
+trägt Siel- und Sturzflutanteilen innerhalb derselben Schadenssummen Rechnung, die die
+Fondsgesetze nicht getrennt ausweisen (Herleitung: Sachkenntnis der beiden Ereignisse, keine
+Quelle beziffert den Trennanteil).
+
+Die **Umlage auf die Wiederkehrzeit** ist eine **Abschätzung von KAP3**: Beide Ereignisse gelten
+als Jahrhundertereignisse; angesetzt wird eine Wiederkehrzeit \(T = 100\) Jahre (Herleitung: analog
+zur unter (c) verwendeten Jährlichkeit 0,01 a⁻¹ der GK2-Klasse, keine eigene Quelle für die
+Wiederkehrzeit dieser beiden konkreten Ereignisse).
+
+\[
+U = \frac{E_{\min,2026} \cdot w \cdot f_{\text{fluss}}}{T}
+  = \frac{10{,}35 \cdot 0{,}30 \cdot 0{,}90}{100}
+  = \textbf{0,028 Mrd. EUR}_{2026}\text{/a}.
+\]
+
+**(b) Welche Ankergrößen gehen in \(U\) ein?** In dieses \(U\) geht **keine** der sechs
+Ankergrößen \(A_{\text{ver}}\), \(w_{\text{wg}}\), \(u\), \(\varphi\), \(\kappa\) und \(\pi\) ein —
+alle vier Eingangsgrößen unter (a) (Ereignis-Mindestschaden, Wohngebäude-/Wohnanteil, flussseitiger
+Anteil, Umlage auf die Wiederkehrzeit) stammen aus den Wiederaufbauhilfe-Gesetzen und aus eigenen,
+von den Ankerfaktoren unabhängigen Abschätzungen von KAP3. Genau das macht die Prüfung
+\(U \le \lambda M_0\) nicht mehr trivial erfüllt: Befund 35a hatte gezeigt, dass die alte
+Untergrenze \(U = A_{\text{ver}} w_{\text{wg}} \varphi \pi\) für jedes \(u\kappa \ge 1\) automatisch
+unterhalb von \(A^{*} = U \cdot u\kappa \equiv \lambda M_0\) liegen musste, weil \(U\) ein
+Teilprodukt derselben Faktoren war, aus denen \(\lambda M_0\) gebildet wird; mit der neuen, aus den
+amtlichen Fondsgesetzen und eigenständigen Schätzungen gebildeten \(U\) besteht diese algebraische
+Teilmengen-Beziehung nicht mehr, und die Lage von \(\lambda M_0\) = 0,985 Mrd. EUR₂₀₂₆/a relativ zu
+\(U\) ist eine echte, aus unabhängigen Zahlen folgende Aussage statt einer Tautologie.
+
+**(c) Obergrenze \(O\) klassengerecht.** Grundlage sind die Register-Mengen 339.000 Adressen der
+Klassen GK3+GK4 mit Jährlichkeit 0,1 a⁻¹, 1.380.000 Adressen der Klasse GK2 mit Jährlichkeit
+0,01 a⁻¹ (beide unverändert aus Register 60-R17-01, wie unter (b) von Befund 35 in Runde 2
+vorgeschlagen — keine abweichende Klassenrate wird hier angesetzt), dem Gebäudewert 527.280
+EUR₂₀₂₆ je exponiertem Wohngebäude (Register 60-R24-01, unverändert) und der Deckelquote 0,250
+(§3.3, Deckelung der Schadensfunktion):
+
+\[
+O = (339.000 \cdot 0{,}1 + 1.380.000 \cdot 0{,}01) \cdot 527.280 \cdot 0{,}250
+  = 47.700 \cdot 527.280 \cdot 0{,}250
+  = \textbf{6,29 Mrd. EUR}_{2026}\text{/a}.
+\]
+
+Das ist derselbe Wert, der im Befund-Eintrag der Runde 2 als klassengerechte Gegenrechnung bereits
+genannt ist (6,29 Mrd. €₂₀₂₆/a, GK4 allein 1,19 Mrd.); dieses Paket rechnet ihn hier formal aus den
+vier genannten Eingangsgrößen nach, statt ihn nur zu zitieren.
+
+**(d) Ausnahme vom Amtlichkeitsgebot (§3.4) für die verbleibenden nicht-amtlichen
+Eingangsgrößen.** §3.4 verlangt Sanity-Bänder mit Unter- und Obergrenze aus amtlicher Statistik
+oder einer begründeten Ausnahme. Bei \(U\) sind die beiden Fondsvolumina amtlich (Bundesgesetze,
+BGBl.), aber der Wohngebäude-/Wohnanteil, der flussseitige Anteil und die Umlage auf die
+Wiederkehrzeit sind — wie unter (a) gezeigt — Abschätzungen von KAP3, weil die Gesetzestexte selbst
+keine Aufteilung nach Verwendungszweck oder Schadensart ausweisen und keine amtliche Statistik
+existiert, die die Aufbauhilfe-Mittel zweier Einzelereignisse auf Wohngebäude, Flussanteil und
+Jährlichkeit herunterbricht. Bei \(O\) sind die Adresszahlen 339.000/1.380.000 aus der
+ZÜRS-Klassifikation und der Gebäudewert 527.280 EUR₂₀₂₆ Branchenstatistik des GDV bzw. eine
+Registerabschätzung, also ebenfalls keine amtliche Statistik im engeren Sinn; die Ausnahme ist hier
+dieselbe wie an den übrigen Fundstellen des Berichts, an denen ZÜRS- und GDV-Zahlen bereits als
+Abschätzung von KAP3 statt als amtliche Quelle geführt werden (z. B. §4.1 für den GDV-Anker), weil
+für die bundesweite Betroffenheits- und Wertstruktur von Wohngebäuden keine amtliche Vollerhebung
+existiert und ZÜRS/GDV die einzigen verfügbaren, branchenweit einheitlichen Klassifikationen sind.
+Für beide Bandenden gilt deshalb dieselbe Ausnahmebegründung: Wo keine amtliche Statistik die
+gesuchte Aufteilung liefert, tritt eine ausgewiesene, nachvollziehbare Abschätzung von KAP3 an ihre
+Stelle, nicht eine stillschweigende Ersatzquelle.
+
+**(e) Fixierung des Bandes vor der Lagepüfung.** Das Band [\(U\); \(O\)] = [0,028; 6,29] Mrd.
+EUR₂₀₂₆/a wird mit diesem Paket vorab fixiert und im Nachzugsschritt nicht nachträglich geweitet,
+unabhängig davon, wo \(\lambda M_0\) am Ende liegt. Der in Bericht-§4.4 ausgewiesene Wert
+\(\lambda M_0 = A^{*} = 0{,}985\) Mrd. EUR₂₀₂₆/a liegt innerhalb dieses fixierten Bandes.
+
+**(f) Nachzugsstellen (Schritt 3/4 der Ersatzkette).** Der hier festgehaltene Rechenweg ist an
+folgenden Fundstellen nachzuziehen: **§4.6** (die Tabelle mit \(U\) = 0,639 und \(O\) = 2,26, der
+Folgeabsatz mit der Herleitung beider Grenzen, und der Ist-Satz, der \(\lambda M_0\) gegen das Band
+prüft); **§4.8** (die Zeilen „\(U\) Sanity-Untergrenze", „\(O\) Sanity-Obergrenze" und
+„Betroffenheit exponierter Gebäude" der Parametertabelle); der Block `beispiel_60_kalibrierung`
+(die Zeilen, die \(U\) und \(O\) berechnen, samt der zugehörigen Zusicherung/Assertion); und
+**§7.2** (der Satz mit „0,556 · 0,55", der die alte, bundesweit einheitliche Untergrenze 0,556
+fortschreibt und auf die neue \(U\) umzustellen ist).
+
+**(g) Nachrechnung von \(U\) und \(O\).**
+
+```python test: befund_35_u_o
+python3 -c "
+E_nom = 8.0
+faktor_2026 = 1.02 ** 13
+E_min_2026 = E_nom * faktor_2026
+w = 0.30
+f_fluss = 0.90
+T = 100
+U = E_min_2026 * w * f_fluss / T
+
+n_gk34 = 339000 * 0.1
+n_gk2 = 1380000 * 0.01
+wert_geb = 527280.0
+q_deckel = 0.250
+O = (n_gk34 + n_gk2) * wert_geb * q_deckel / 1e9
+
+assert abs(U - 0.0279) < 2e-3, U
+assert abs(O - 6.288) < 2e-2, O
+print('U =', round(U, 3), 'Mrd. EUR2026/a; O =', round(O, 2), 'Mrd. EUR2026/a')
+"
+```
+
+Ausgeführt am 18.09.2026: `U = 0.028 Mrd. EUR2026/a; O = 6.29 Mrd. EUR2026/a`, Exit 0.
+
+**Status.** Befund 35 bleibt **offen**. Dieses Paket schreibt bewusst nur ins Ledger: der Bericht
+(§4.6, §4.8, Block `beispiel_60_kalibrierung`, §7.2) wird in den Folgepaketen nachgezogen, der
+Befundabschluss folgt danach. Die Kopftabelle „Offene Befunde" bleibt unberührt (schreibt allein
+T-0296 fort).
+
+Nicht angefasst (Dateirahmen): `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`,
+`docs/evidenz/register.md`, `backend/scripts/lint_methodik.py`, `backend/`, die Stichprobendateien
+unter `docs/evidenz/60_stichprobe/` und die Kopftabelle „Offene Befunde" dieses Ledgers (schreibt
+allein T-0296 fort).
