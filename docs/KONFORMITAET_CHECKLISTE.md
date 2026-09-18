@@ -27,6 +27,11 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 13 | Die Träger öffentlicher Aufgaben haben bei ihren Planungen und Entscheidungen das Ziel der Klimaanpassung fachübergreifend und integriert zu berücksichtigen. | KAnG, https://www.gesetze-im-internet.de/kang/__8.html | § 8 Abs. 1 | teilweise | frontend/src/components/MeasuresTableTab.tsx, frontend/src/pages/roadmap/roadmapData.ts | Das Produkt stellt Klimarisiken und Maßnahmen je Klimawirkung bereit, prüft aber nicht, ob eine konkrete Planung oder Entscheidung eines Trägers öffentlicher Aufgaben das Klimaanpassungsziel tatsächlich fachübergreifend und integriert berücksichtigt; eine solche Prüf- oder Nachweisfunktion existiert im Produkt nicht. |
 | 14 | Die Länder bestimmen im Rahmen der Grenzen des Art. 28 Abs. 2 Grundgesetz diejenigen öffentlichen Stellen, die für die Gebiete der Gemeinden und Kreise jeweils ein Klimaanpassungskonzept aufzustellen haben, soweit nicht bereits vorhanden. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 1 | offen | — | Diese Zuständigkeitsbestimmung ist eine Aufgabe der Länder; das Produkt trifft keine Aussage dazu, wer zur Konzepterstellung verpflichtet ist, sondern unterstützt die inhaltliche Erstellung, sobald eine Kommune oder ein Berater tätig wird. |
 | 15 | Klimaanpassungskonzepte sollen auf einer Klimarisikoanalyse im Sinne einer Feststellung von potentiellen prioritären Risiken und sehr dringlichen Handlungserfordernissen (Betroffenheitsanalyse) oder vergleichbaren Entscheidungsgrundlagen beruhen. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 3 | teilweise | backend/app/data/catalog.py, frontend/src/pages/roadmap/roadmapData.ts | Wie bereits zu Zeile 6 festgehalten, übernimmt das Produkt die Kategorie "sehr dringend" punktuell in der Roadmap, ohne die zugrunde liegende Klimarisikoanalyse systematisch und vollständig nach dieser gesetzlichen Vorgabe herzuleiten; laut docs/KATALOG_KRITIK.md fehlen im heutigen Katalog Klimawirkungen, die bundesweit als sehr dringend eingestuft sind. |
+| 16 | Vor der eigentlichen Risikobewertung ist der Kontext festzulegen (Bestandsaufnahme): lokale sozioökonomische und geographische Rahmenbedingungen sowie Trends sind zu erfassen, ebenso bereits vorhandene Informationen zu vergangenen und erwarteten Klimarisiken, einschließlich besonders klimasensibler Strukturen (z. B. kritische Infrastruktur) und vulnerabler Personengruppen. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Bestandsaufnahme"/"Festlegung des Kontexts", S. 12) | teilweise | docs/methodik/95_hitzebelastung.md, backend/app/data/catalog.py | Die Methodik-Berichte und der Katalog liefern klimatische und sozioökonomische Kennzahlen je Kommune und Klimawirkung, aber es gibt keine dokumentierte, der Analyse vorgeschaltete Bestandsaufnahme-Phase, die gezielt vulnerable Personengruppen und klimasensible Strukturen je Kommune erhebt; das Produkt setzt direkt bei der quantitativen Risikoberechnung an. |
+| 17 | In der Vorbereitungsphase sind interessierte Parteien mit einschlägiger Fachexpertise zu identifizieren und über partizipative Ansätze frühzeitig in die Entscheidungsfindung einzubeziehen, um ein gemeinsames Verständnis und Verantwortungsgefühl unter den Beteiligten zu fördern. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Interessierte Parteien identifizieren und partizipative Ansätze planen", S. 13) | offen | — | Das Produkt bietet keinen Prozess und keine Funktion, mit der eine Kommune interessierte Parteien identifiziert oder einen partizipativen Beteiligungsprozess plant und begleitet; es ist ein Analysewerkzeug für die inhaltliche Berechnung von Klimarisiken, keine Prozessunterstützung für Beteiligungsverfahren. |
+| 18 | Optional kann die Anpassungskapazität eines betroffenen Systems analysiert und bewertet werden, unterschieden nach mehreren Komponenten (u. a. organisationsbezogene Fähigkeit, technisches Vermögen, finanzielle Fähigkeit, Fähigkeit des Ökosystems) und nach unterschiedlichen Reifegraden, um abzuleiten, wie stark sich das Klimarisiko durch Anpassung verringern lässt. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6, Anhang G und H (Abschnitt 2.2.5 "Optional: Anpassungskapazität analysieren und bewerten", S. 28f.) | teilweise | docs/methodik/95_hitzebelastung.md, docs/methodik/61_vegetation_in_siedlungen.md | Die vorliegenden Methodik-Berichte unterscheiden Klimarisiko ohne und mit Anpassung, aber es fehlt eine systematische, nach mehreren Komponenten (organisatorisch, technisch, finanziell, ökosystemisch) untergliederte Bewertung der Anpassungskapazität, wie sie die Norm für diesen optionalen Analyseschritt vorsieht. |
+| 19 | Bei der Interpretation der Analyseergebnisse sind bestehende Unsicherheiten in den zugrunde liegenden Informationen und Daten explizit zu berücksichtigen, ebenso handlungsfeld- und regionsübergreifende Abhängigkeiten, bevor daraus Handlungsoptionen formuliert werden. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6 (Abschnitt 2.2.6 "Ergebnisse interpretieren", S. 29f.) | teilweise | docs/evidenz/register.md, docs/methodik/95_hitzebelastung.md | Das Evidenz-Register weist Unsicherheiten je Parameter aus, aber es gibt im Produkt keine zusammenfassende Interpretationsschicht, die diese Unsicherheiten handlungsfeld- und regionsübergreifend bei der Formulierung von Handlungsoptionen einbezieht; die Interpretation bleibt je Klimawirkung isoliert. |
+| 20 | Die Ergebnisse der Risikobewertung sind zielgruppenspezifisch zu kommunizieren, etwa durch einen ausführlichen Bericht mit Datengrundlagen und Methodik für die Fachöffentlichkeit sowie durch leicht verständliche, prägnante Kommunikationsprodukte (z. B. Karten, Zusammenfassungen) für politische Entscheidungsträger und die breite Öffentlichkeit. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 7 (Abschnitt 2.3.2 "Ergebnisse zielgruppenspezifisch kommunizieren", S. 31) | teilweise | docs/methodik/95_hitzebelastung.md, frontend/src/components/MeasuresTableTab.tsx | Das Produkt liefert ausführliche Methodik-Berichte für die Fachöffentlichkeit und eine Maßnahmentabelle für Nutzer*innen in der Kommune, aber es fehlen eigenständige, stark vereinfachte Kommunikationsprodukte (z. B. Kartendarstellungen oder Kurzzusammenfassungen) speziell für politische Entscheidungsträger oder die breite Öffentlichkeit. |
 
 ## Ergebnis
 
@@ -150,3 +155,66 @@ frontend/src/pages/roadmap/roadmapData.ts
 Kein Pfad wurde als `No such file` gemeldet; alle vier zitierten Belegpfade der Zeilen 11–15
 existieren im Produkt-Repo (Zeile 11 und 15 verweisen teils auf denselben Pfad wie eine vorherige
 Zeile).
+
+### Nachtrag: Zeilen 16–20 (Teilpaket 4, ISO 14091:2021 — Sekundärquelle)
+
+Die ISO 14091:2021 selbst liegt nicht im Repo und wurde nicht beschafft. Als Sekundärquelle wurde
+das PDF des Umweltbundesamts "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen
+zur Umsetzung der ISO 14091" (Autor*innen: Luise Porst, Maike Voß, Walter Kahlenborn, Inke
+Schauser; Stand Juni 2022) abgerufen, verlinkt unter
+https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene, direkter
+PDF-Pfad https://www.umweltbundesamt.de/system/files/medien/479/publikationen/2022_uba-fachbroschuere_kra_auf_kommunaler_ebene.pdf.
+Diese Broschüre fasst die Kapitelstruktur der ISO 14091:2021 zusammen und ordnet ihre eigenen
+Abschnitte 2.1–2.3 den Kapiteln der Norm explizit über Fußnoten zu; sie gibt den Norminhalt in
+eigenen Worten wieder (keine Wortlautzitate der Norm selbst). Ergänzend wurde eine Websuche zur
+groben Orientierung über den Kapitelaufbau (5 Vorbereitung, 6 Durchführung, 7 Berichterstattung
+und Kommunikation) durchgeführt; für die in der Tabelle genannten Kapitelnummern wurde jedoch
+ausschließlich die tatsächlich abgerufene PDF-Quelle als Beleg verwendet, da nur dort die
+Zuordnung Abschnitt → Kapitel explizit und geprüft vorliegt (Fußnote 5: "Kapitel 5 der ISO
+14091" zu Abschnitt 2.1; Fußnote 27: "Kapitel 6 der ISO 14091" zu Abschnitt 2.2; Fußnote 35:
+"Kapitel 7 der ISO 14091" zu Abschnitt 2.3; Fußnote 33: "Anhang G ... und H ... der ISO 14091"
+zur Anpassungskapazität in Abschnitt 2.2.5).
+
+Herkunft der einzelnen Zeilen aus derselben URL (Kapitelnummer und Inhalt jeweils daraus
+abgeleitet):
+
+- Zeile 16: https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene
+  — PDF-Abschnitt 2.1.2 "Bestandsaufnahme" (S. 12), Fußnote 7 ("In der ISO 14091 wird dieser
+  Abschnitt der KRA als 'Festlegung des Kontexts' bezeichnet") und Fußnote 5 ("Kapitel 5 der ISO
+  14091" für den gesamten Abschnitt 2.1).
+- Zeile 17: dieselbe URL — PDF-Abschnitt 2.1.2 "Interessierte Parteien identifizieren und
+  partizipative Ansätze planen" (S. 13), ebenfalls unter Kapitel 5 (Fußnote 5).
+- Zeile 18: dieselbe URL — PDF-Abschnitt 2.2.5 "Optional: Anpassungskapazität analysieren und
+  bewerten" (S. 28f.), Fußnote 27 ("Kapitel 6 der ISO 14091" für Abschnitt 2.2) sowie Fußnote 33
+  ("Anhang G ... und H ... der ISO 14091") für die vier Komponenten der Anpassungskapazität.
+- Zeile 19: dieselbe URL — PDF-Abschnitt 2.2.6 "Ergebnisse interpretieren" (S. 29f.), unter
+  Kapitel 6 (Fußnote 27).
+- Zeile 20: dieselbe URL — PDF-Abschnitt 2.3.2 "Ergebnisse zielgruppenspezifisch kommunizieren"
+  (S. 31), unter Kapitel 7 (Fußnote 35).
+
+Fünf weitere Anforderungen (Zeilen 16–20) wurden erfasst: keine als `erfüllt`, vier (Zeilen 16,
+18, 19, 20) als `teilweise` und eine (Zeile 17) als `offen`. Grund: Das Produkt liefert
+quantitative Risiko- und Methodik-Inhalte je Klimawirkung, deckt aber die prozessualen
+Vorbereitungs- und Kommunikationsschritte der Norm (Bestandsaufnahme vulnerabler Gruppen,
+Beteiligungsverfahren, komponentenweise Anpassungskapazität, regionsübergreifende
+Unsicherheitsinterpretation, zielgruppendifferenzierte Kommunikationsprodukte) nur ansatzweise
+oder gar nicht ab. Keine Lücke wurde behoben, kein Produktcode wurde angefasst — das war nicht
+Aufgabe dieses Pakets.
+
+Prüflauf der in Zeilen 16–20 genannten Belegpfade (`ls -d` je Pfad):
+
+```
+$ ls -d docs/methodik/95_hitzebelastung.md
+docs/methodik/95_hitzebelastung.md
+$ ls -d backend/app/data/catalog.py
+backend/app/data/catalog.py
+$ ls -d docs/methodik/61_vegetation_in_siedlungen.md
+docs/methodik/61_vegetation_in_siedlungen.md
+$ ls -d docs/evidenz/register.md
+docs/evidenz/register.md
+$ ls -d frontend/src/components/MeasuresTableTab.tsx
+frontend/src/components/MeasuresTableTab.tsx
+```
+
+Kein Pfad wurde als `No such file` gemeldet; alle fünf zitierten Belegpfade der Zeilen 16–20
+existieren im Produkt-Repo.
