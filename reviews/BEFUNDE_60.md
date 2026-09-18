@@ -3777,3 +3777,167 @@ und keine Verteilungsfunktion, nur Skalare mit Band.
   Lint-Lauf der Runde aus Abschnitt 0.1 (T-0359) wurde nicht wiederholt.
 - **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
   T-0359); das Konvergenz-Verdikt der Runde trägt das Abschlusspaket.
+
+### Leitfrage 7 — Teil 2: Parameterblock 4.8 und Gesamtverdikt
+
+**Prüfumfang dieses Pakets (T-0377).** Zweiter Teil der Leitfrage 7 aus §5 der Aufgabe („**Tails/
+Parameter:** Verteilungsannahmen, wo empirische Quantile verfügbar wären; **gesetzte Werte, die
+messbar wären; Kalibriermodell = Produktionsmodell?**", `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md`
+**Z. 440–441**), vertieft geprüft an genau einem Abschnitt des Berichts: §4.8 „Parameter dieses
+Kapitels (Vorgabe P1)", **Z. 1457–1573** (Tabellenkopf Z. 1459, Parameterzeilen Z. 1461–1475,
+Testblock `beispiel_60_kalibrierung` Z. 1477–1573; nächste Überschrift „## 5" in Z. 1574).
+Umfangsmessung in dieser Sitzung, ausgeführt:
+`python3 -c 'import re; t=open("docs/methodik/60_gebaeudeschaeden_flusshochwasser.md").read().split(chr(10)); print(len(re.sub(r"<!--.*?-->","",chr(10).join(t[1456:1573]),flags=re.S)))'`
+→ **9.059** Zeichen — identisch mit dem Planungsstand vom 18.09.2026, keine Abweichung auszuweisen.
+§4.1–§4.7 und Kapitel 9 gehören zu Schwesterpaketen und sind hier nur als Fundstelle zitiert.
+
+#### (a) Zeilenweise P1-Prüfung der Parametertabelle §4.8
+
+Maßstab: Vorgabe P1 — je Parameter entweder die **Quelle** oder der Vermerk, dass es eine
+**begründete Abschätzung von KAP3** ist, **samt Herleitung**; eine Herleitung nur als
+Code-Kommentar erfüllt die Vorgabe nicht (§3.6, §3.9).
+
+| Zeile | Parameter | Kennzeichnung in Spalte 3 | Herleitung auffindbar? | P1 |
+|---|---|---|---|---|
+| Z. 1461 | \(A_{\text{ver}}\) Anker | **Quelle** (GDV-Naturgefahrenstatistik 2024 / Naturgefahrenreport 2025, Stand 10.10./30.12.2025) + Evidenzdatei `60_gdv_jahresreihe_2002_2024.csv` | ja, §4.1/§4.1a | **erfüllt** |
+| Z. 1462 | \(w_{\text{wg}}\) | **Abschätzung von KAP3** | ja, §4.2 | **erfüllt** |
+| Z. 1463 | \(u\) | **Abschätzung von KAP3** auf belegter Versicherungsdichte 57 % | ja, §4.2 | **erfüllt** |
+| Z. 1464 | \(\varphi_{\text{fluss}}\) | **Abschätzung von KAP3** | ja, §4.2 | **erfüllt** |
+| Z. 1465 | \(\kappa\) | **Abschätzung von KAP3** | ja, §4.2 | **erfüllt** |
+| Z. 1466 | \(\pi\) | **Abschätzung von KAP3** aus B4 (Baupreisindex) | ja, §4.2 | **erfüllt** |
+| Z. 1467 | \(\lambda\) Niveau-Skalar | **berechnet** aus \(A^{*}/M_0\), Eingänge und Bandherkunft benannt, „vorläufig" wegen der Befunde 33 und 34 | ja, §4.1a/§4.3/§4.4 | **erfüllt** (abgeleitete Größe; Nachrechnung unten) |
+| Z. 1468 | Baupreisanstieg 2023 → 2024 | **Abschätzung von KAP3**, gerundet aus B4-Jahresraten, mit Sensitivität | ja, §4.2/B4 | **erfüllt** |
+| Z. 1469 | Klassenraten Bestandsschranke (0,1; 0,01 a⁻¹) | **Abschätzung von KAP3**, „Register 60-R17-01 … unverändert übernommen" | ja, §4.6 | **erfüllt**; Anmerkung: Quelle und Abschätzung stehen in derselben Zelle vermischt (übernommener Registerwert **und** KAP3-Abschätzung); formal genügt die Zelle P1, weil Herleitung und Register benannt sind |
+| Z. 1470 | Plausibilitätsschranke \(\lambda\) | **berechnet** aus dem fortgepflanzten Band | ja, §4.4 | **erfüllt** |
+| Z. 1471 | Toleranz Verteilungsprüfung | **berechnet**, Abschätzungsanteil (Kombinationsregel) ausdrücklich abgegrenzt | ja, §4.5 | **erfüllt** |
+| Z. 1472 | \(U\) Sanity-Untergrenze | **teils Quelle** (BGBl.-Fondsvolumina), **teils Abschätzung von KAP3**, Anteile benannt | ja, §4.6 | **erfüllt** |
+| Z. 1473 | \(O\) Sanity-Obergrenze | **berechnet** aus Klassenraten, Register 60-R17-01, Gebäudewert 527.280 € (60-R24-01), Deckel 0,250 (§3.3) | ja, §4.6 | **erfüllt** |
+| Z. 1474 | \(f_{\text{AWM}}\) | **Abschätzung von KAP3** auf § 38 ImmoWertV, mit Sensitivität | ja, §7.2 | **erfüllt** |
+| Z. 1475 | \(q_0\) Objektschutz-Anteil | **„geparkt (Datenquelle fehlt)" — keine Quelle, keine Abschätzung** | Watchlist §4.7 | **nicht erfüllt**, aber **nicht doppelt erfasst**: die Folge (unbezifferter Bezugswert in §5.1.2) ist bereits **Befund 67** |
+
+**Feststellung zu (a).** Alle 15 Tabellenzeilen tragen die nach P1 verlangte Kennzeichnung mit
+auffindbarer Herleitung; die einzige Lücke (\(q_0\)) ist im Bericht ausdrücklich als Lücke
+ausgewiesen und bereits verbucht. **Nicht** erfüllt ist P1 dagegen für die Parameter, die
+ausschließlich im Testblock Z. 1477–1573 stehen und **keine** Zeile in der nutzersichtbaren Liste
+haben, obwohl sie das Ergebnis tragen: Wohngebäudeanteil je Adresse **0,872** (Z. 1487), gemessene
+Klassenraten \(r_{\text{GK3/GK4}}\) = **0,005979599550826** und \(r_{\text{GK2}}\) =
+**0,000675151053693** (Z. 1488–1489), die Bausteine des Gebäudewerts **208 m² · 1,30 ·
+1.950 €/m²** (Z. 1485), die \(M_0\)-Bandenden-Eingänge BGF 1,25/1,40 und Werteinheit
+1.889/2.047 €/m² (Z. 1497–1498) sowie die \(U\)-Herleitungsgrößen \(E_{\text{nom}}\) = 8,0 Mrd. €,
+1,02¹³, \(w_u = 1/9\), \(f_{\text{fluss}}\) = 0,90, \(T_u\) = 100 a (Z. 1564–1566). Für sie steht
+Quelle bzw. Abschätzungscharakter nur als **Code-Kommentar** — genau der Fall, den P1 ausschließt.
+Daraus **Befund 88**.
+
+#### (b) Zwei Nachrechnungen statt Lektüre
+
+**Nachrechnung 1 — Niveau-Skalar \(\lambda\) aus den in §4.8 genannten Eingangsgrößen.** Eingänge
+ausschließlich aus §4.8: \(A_{\text{ver}}\) 1,838 · \(w_{\text{wg}}\) 0,65 · \(u\) 1,54 ·
+\(\varphi\) 0,50 · \(\kappa\) 1,15 · \(\pi\) 1,07 (Z. 1461–1466, Z. 1479–1480); Gebäudewert
+208 · 1,30 · 1.950 (Z. 1485); Wohngebäudeanteil 0,872 (Z. 1487); Klassenraten und Adresszahlen
+(Z. 1488–1491). Ausgeführt in dieser Sitzung:
+`python3 -c 'A=1.838*0.65*1.54*0.50*1.15*1.07; wg=208.0*1.30*1950.0; M0=0.872*wg*(339000*0.005979599550826+1380000*0.000675151053693)/1e9; print(A, wg, M0, A/M0)'`
+→ `1.1319603295 527280.0000000001 1.3604178521941683 0.8320681235359434`. Bandenden, ausgeführt:
+`python3 -c 'print((1.061*0.55*1.33*0.35*1.05*1.04)/2.643, (1.838*0.75*1.75*0.65*1.30*1.11)/0.657)'`
+→ `0.11223368796821794 3.4439682363013704`.
+
+| Größe | Wert im Bericht (§4.8) | nachgerechnet | Abweichung |
+|---|---|---|---|
+| \(A^{*}\) Zielwert | 1,132 Mrd. €₂₀₂₆/a (Z. 1480) | **1,13196** | +0,02 % (Rundung) |
+| Gebäudewert | 527.280 €₂₀₂₆ (Z. 1473, Z. 1486) | **527.280,0** | 0 |
+| \(M_0\) | 1,360 Mrd. €₂₀₂₆/a (Z. 1493) | **1,36042** | +0,03 % (Rundung) |
+| \(\lambda\) Zentralwert | **0,832** (Z. 1467) | **0,83207** | +0,01 % (Rundung) |
+| \(\lambda\)-Band unten | 0,11 (Z. 1467, Z. 1470) | **0,11223** | +2,0 % (Rundung auf zwei Stellen, konservativ nach unten) |
+| \(\lambda\)-Band oben | 3,44 (Z. 1467, Z. 1470) | **3,44397** | +0,12 % (Rundung) |
+
+**Ergebnis:** Der Niveau-Skalar ist aus den in §4.8 selbst genannten Eingangsgrößen vollständig
+reproduzierbar; alle Abweichungen sind reine Rundungen auf die ausgewiesene Stellenzahl. Dieser
+Teil ist rechnerisch **bestanden**.
+
+**Nachrechnung 2 — Klassenraten GK3/GK4 und GK2 gegen die angegebene Quelle.** Quelle laut §4.8
+Z. 1467 und Z. 1488–1489: `docs/evidenz/60_stichprobe/m0_klassenraten.csv` (28 Zeilen, Trennzeichen
+`;`), in dieser Sitzung gelesen.
+
+| Größe | Wert im Bericht | Wert in der Quelle (Fundstelle) | Abweichung |
+|---|---|---|---|
+| \(r_{\text{GK3/GK4}}\) | 0,005979599550826 (Z. 1488, Kommentar „klasse=gk3_gk4/kommune=alle") | **0,005979599550826** — CSV **Z. 10**, Zeile `gk3_gk4;alle`, Spalte `rate_exponiert_hqextrem_1_pro_a` (9. Spalte) | **0** (zeichengleich) |
+| \(r_{\text{GK2}}\) | 0,000675151053693 (Z. 1489, Kommentar „klasse=gk2/kommune=alle") | **0,000675151053693** — CSV **Z. 19**, Zeile `gk2;alle`, Spalte `rate_exponiert_hqextrem_1_pro_a` | **0** (zeichengleich) |
+| Gegenprobe: dieselben Zeilen, Spalte `rate_zellen_1_pro_a` | — | 0,004197318695391 (CSV Z. 10) bzw. 0,000436059863136 (CSV Z. 19) | **−30 % / −35 %** gegenüber den verwendeten Werten |
+
+**Ergebnis:** Beide Klassenraten stimmen zeichengenau mit der angegebenen Quelle überein; inhaltlich
+ist die Quellenangabe **bestanden**. Sie ist aber **nicht eindeutig**: Die CSV führt in denselben
+Zeilen zwei Ratenspalten (`rate_zellen_1_pro_a`, `rate_exponiert_hqextrem_1_pro_a`), die sich um 30
+bzw. 35 % unterscheiden; Bericht und Code-Kommentar benennen nur Klasse und Kommune, nicht die
+Spalte. Ein Nachrechner nach §3.9 kann die Zelle daher nicht eindeutig treffen. Daraus
+**Befund 89**.
+
+#### (c) Kalibriermodell = Produktionsmodell? — Abgleich gegen `backend/scripts/kalibrierung/`
+
+Ausgeführt in dieser Sitzung (gezielter grep, keine Lektüre der Skripte):
+`grep -rnE "0\.832|1\.838|527280|0\.872|0\.0059796|0\.00067515|3\.44" backend/scripts/kalibrierung/ --include=*.py`
+→ **kein Treffer**. Ebenso
+`grep -rn "m0_klassenraten\|339_000\|339000\|1_380_000\|1380000" backend/scripts/kalibrierung/ --include=*.py`
+→ kein Treffer für die Adresszahlen; die einzigen Treffer sind die **erzeugende** Seite in
+`backend/scripts/kalibrierung/stichprobe60_klassenraten.py` **Z. 10, 97 und 185**
+(`AUSGABE = 'm0_klassenraten.csv'`).
+
+**Feststellung.** Die Stichprobe, aus der die Klassenraten stammen, ist reproduzierbar verskriptet;
+die **Kalibrierung selbst** — \(A^{*}\), \(M_0\), \(\lambda\), Band und Plausibilitätsschranke, also
+genau die Werte der Tabelle §4.8 — kommt in `backend/scripts/kalibrierung/` an keiner Stelle vor.
+Die einzige ausführbare Fassung dieser Rechnung ist der Testblock **im Bericht** (Z. 1477–1573); er
+belegt die Konsistenz des Berichts mit sich selbst, nicht die Übereinstimmung mit einem
+Produktionsstand. Zu Leitfrage 7 „Kalibriermodell = Produktionsmodell?" ist damit für §4.8 **keine
+Deckungsgleichheit feststellbar und keine Divergenz belegbar** — es fehlt die Gegenseite. Daraus
+**Befund 87**. Nach eiserner Regel 5 wird im Code nichts geändert. Umfangsgrenze dieser Aussage:
+gesucht wurde ausschließlich in `backend/scripts/kalibrierung/` (Dateirahmen des Pakets).
+
+#### Neue Befunde dieses Pakets (87 bis 89)
+
+| Nr | Kat. | Befund |
+|---|---|---|
+| 87 | **B** | **Stelle:** Bericht §4.8, Parametertabelle Z. 1461–1475 und Testblock `beispiel_60_kalibrierung` Z. 1477–1573, gegen `backend/scripts/kalibrierung/` (gezielter grep dieser Sitzung, oben zitiert: kein Treffer für 0,832 / 1,838 / 527280 / 0,872 / 0,0059796 / 0,00067515 / 3,44 / 339.000 / 1.380.000). · **Art: Lücke** (§5 LF 7 „Kalibriermodell = Produktionsmodell?"; §3.9). · **Begründung:** Die Kalibrierung von #60 — Zielwert \(A^{*}\), Modellsumme \(M_0\), Niveau-Skalar \(\lambda\) samt Band und Plausibilitätsschranke — existiert ausführbar nur als Testblock im Methodikbericht. Unter `backend/scripts/kalibrierung/` liegt für #60 ausschließlich die **Stichprobenseite** (`stichprobe60_*.py`, darunter `stichprobe60_klassenraten.py`, das `m0_klassenraten.csv` erzeugt); ein Skript, das aus diesen Raten \(M_0\) und \(\lambda\) bildet, gibt es nicht — anders als bei #M0, wo `calibrate_heat_mortality*.py` genau diese Rolle trägt. Folge: Der Testblock prüft den Bericht gegen sich selbst; eine Änderung an den sechs Ankerabschätzungen oder an den Klassenraten fiele im Produktionspfad nicht auf, und die Frage der Leitfrage lässt sich weder mit „ja" noch mit „nein" beantworten, weil die Gegenseite fehlt. Kategorie B: kein ausgewiesener Zahlenwert ist falsch — die Nachrechnung oben bestätigt alle —, aber die von §5 LF 7 verlangte Gleichheitsprüfung ist am heutigen Stand nicht durchführbar. Abgrenzung: Befund 64 betrifft die Aussagekraft des Sanity-Bands innerhalb des Berichts, nicht das Verhältnis Bericht ↔ Produktionscode. · **Vorschlag:** Die Kalibrierung als eigenes Skript `backend/scripts/kalibrierung/kalibrierung60_lambda.py` nachziehen, das die Eingänge aus `m0_klassenraten.csv` und `60_gdv_jahresreihe_2002_2024.csv` liest, \(A^{*}\), \(M_0\), \(\lambda\), Band und Schranke ausgibt und die im Bericht ausgewiesenen Werte als Assertions führt; in §4.8 die Fundstelle des Skripts nennen, damit Kalibrier- und Produktionsstand nachweislich dieselbe Rechnung sind. Bis dahin in §4.8 ausdrücklich vermerken, dass der Testblock die einzige ausführbare Fassung ist. |
+| 88 | **B** | **Stelle:** Bericht §4.8, Parametertabelle Z. 1461–1475 (abschließend formuliert: „Parameter dieses Kapitels") gegen den Testblock Z. 1485 (`208.0 * 1.30 * 1950.0`), Z. 1487 (`w_wohn = 0.872   # Wohngebaeudeanteil je Adresse (19,7/22,6)`), Z. 1488–1489 (`r_gk34`, `r_gk2`), Z. 1497–1498 (`bgf_lo, bgf_hi = 1.25, 1.40`; `ws_lo, ws_hi = 1889.0, 2047.0`) und Z. 1564–1566 (`E_nom, faktor_2026 = 8.0, 1.02 ** 13`; `w_u, f_fluss, T_u = (1/3)*(1/3), 0.90, 100`). · **Art: Lücke (Vorgabe P1)** (CLAUDE.md P1; Aufgabe §3.6, §3.9). · **Begründung:** P1 verlangt eine **nutzersichtbare** Parameterliste mit Quelle oder ausgewiesener KAP3-Abschätzung samt Herleitung **für alle Parameter** und stellt ausdrücklich klar, dass eine Herleitung nur als Code-Kommentar die Vorgabe nicht erfüllt. Die genannten elf Größen tragen das Ergebnis unmittelbar: \(M_0\) ist das Produkt aus Wohngebäudeanteil, Gebäudewert und Klassenraten, und über \(\lambda = A^{*}/M_0\) skaliert jede von ihnen den Endbetrag linear; die \(M_0\)-Bandenden und die fünf \(U\)-Größen bestimmen Band und Sanity-Untergrenze. In der Tabelle erscheinen sie entweder gar nicht (0,872; \(r_{\text{GK3/GK4}}\); \(r_{\text{GK2}}\); BGF 1,25/1,40; 1.889/2.047 €/m²; \(E_{\text{nom}}\); \(w_u\); \(f_{\text{fluss}}\); \(T_u\)) oder nur als Zwischenprodukt ohne eigene Bausteine (Gebäudewert 527.280 € in Z. 1473, dessen drei Faktoren 208 m², 1,30 und 1.950 €/m² nirgends in der Liste stehen). Ihre einzige Kennzeichnung ist ein Kommentar im Python-Block. Kategorie B, weil kein Zahlenwert falsch ist, aber eine ausdrückliche Vorgabe des Aufsichtsrats an genau der Stelle nicht erfüllt ist, die sie erfüllen soll. Abgrenzung: Befund 67 betrifft \(q_0\) in §5.1.2, nicht die hier fehlenden Zeilen. · **Vorschlag:** Die elf Größen als eigene Zeilen in §4.8 aufnehmen, je mit Wert, Band und Spalte 3 nach demselben Muster (Wohngebäudeanteil 0,872 → Quelle Zensus-Ableitung 19,7/22,6; Klassenraten → Quelle `m0_klassenraten.csv` mit Zeile und Spalte, siehe Befund 89; 208 m²/1,30/1.950 €/m² → Register 60-R24-01 bzw. Abschätzung; \(E_{\text{nom}}\) → BGBl.; \(w_u\), \(f_{\text{fluss}}\), \(T_u\) → Abschätzung von KAP3 mit Herleitung §4.6). Alternativ die Überschrift von §4.8 wahrheitsgemäß auf „Kernparameter" einschränken und die vollständige Liste an einer benannten Stelle führen — die halbe Liste unter dem Titel „Parameter dieses Kapitels" ist der Fehler. |
+| 89 | **C** | **Stelle:** Bericht §4.8 Z. 1467 (\(\lambda\)-Zeile: „\(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3)") und Z. 1488–1489 (Kommentare „klasse=gk3_gk4/kommune=alle" bzw. „klasse=gk2/kommune=alle") gegen `docs/evidenz/60_stichprobe/m0_klassenraten.csv` Z. 10 und Z. 19. · **Art: Lücke (Nachprüfbarkeit der Fundstelle)** (§3.9; §8/E3, P3). · **Begründung:** Die Werte selbst stimmen zeichengenau (Nachrechnung 2). Die Fundstellenangabe benennt aber nur Klasse und Kommune, während die CSV in derselben Zeile **zwei** Ratenspalten führt: `rate_zellen_1_pro_a` (0,004197318695391 bzw. 0,000436059863136) und `rate_exponiert_hqextrem_1_pro_a` (0,005979599550826 bzw. 0,000675151053693). Verwendet ist die zweite; die erste liegt um 30 bzw. 35 % niedriger und ergäbe ein anderes \(M_0\) und ein anderes \(\lambda\). Ein Prüfer, der der Angabe folgt, trifft die Zelle nicht eindeutig — dieselbe Klasse von Mangel, die für Quelle 2 bereits als Befund 43 (b) und für Quelle 1 als Befund 69 geführt wird, hier an der Evidenzdatei der Kalibrierung. Kategorie C: kein Zahlenwert ändert sich, die Angabe ist nur unterbestimmt. · **Vorschlag:** In Z. 1467 und in den beiden Kommentaren die Spalte mitnennen (`rate_exponiert_hqextrem_1_pro_a`, Zeilen `gk3_gk4;alle` / `gk2;alle`) und in §4.3 einen Satz ergänzen, warum die auf die exponierte Fläche bezogene Rate und nicht die Zellrate die richtige Bezugsgröße ist. Für den Lint: Fundstellenangaben auf CSV-Dateien müssen Zeilen- **und** Spaltenbezeichner tragen. |
+
+#### Gesamtverdikt zu Leitfrage 7
+
+Zusammengeführt, nicht neu erhoben, aus zwei Quellen:
+
+| Teil | Gegenstand | Fundstelle im Ledger | Verdikt |
+|---|---|---|---|
+| Teil 1 | Verteilungsannahmen (§4.5) und Sanity-Band (§4.6) | Unterabschnitt „### Leitfrage 7 — Teil 1: Verteilungsannahmen und Sanity-Band", Überschrift in **Z. 2989** dieses Ledgers (Zwischenverdikt im Absatz ab Z. 3000) | **Befund** (63, 64, 65) |
+| Teil 2 | Parameterblock §4.8, dieses Paket | dieser Unterabschnitt | **Befund** (87, 88, 89) |
+
+**Gesamtverdikt Leitfrage 7: Befund.** Tragend sind sechs Befunde, geordnet nach den drei Fragen
+der Leitfrage. *Verteilungsannahmen, wo empirische Quantile verfügbar wären:* Die Ankerreihe wird
+nur als Mittelwert-Aggregat genutzt, ein Quantilvergleich unterbleibt (Befund 63, Teil 1).
+*Gesetzte Werte, die messbar wären:* Die Sanity-Obergrenze ist kein modellunabhängiger Wert
+(Befund 64), der Regime-Anteil ist widersprüchlich gerundet (Befund 65), elf ergebnistragende
+Größen stehen nur im Code-Kommentar statt in der nutzersichtbaren Parameterliste (Befund 88), und
+eine Quellenangabe ist spaltenunbestimmt (Befund 89). *Kalibriermodell = Produktionsmodell:* Die
+Frage ist am heutigen Stand nicht beantwortbar, weil die Kalibrierung von #60 außerhalb des
+Berichts nicht existiert (Befund 87). Was **bestanden** ist und im Verdikt nicht untergehen soll:
+Sämtliche nachgerechneten Zahlen der Leitfrage stimmen — Toleranz und Prüfgröße in Teil 1,
+Zielwert, Modellsumme, Niveau-Skalar, Band und beide Klassenraten in Teil 2 —, und 14 der
+15 Tabellenzeilen von §4.8 erfüllen P1 vollständig. Das Verdikt „Befund" folgt aus Vollständigkeit
+und Nachweisbarkeit, nicht aus Rechenfehlern. **Damit ist Leitfrage 7 in Runde 3 genau einmal
+verdiktiert, nämlich hier.**
+
+#### Abgrenzung und Status dieses Pakets (T-0377)
+
+- **Geändert wurde ausschließlich `reviews/BEFUNDE_60.md`** (angehängt).
+  `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und `docs/evidenz/register.md` sind
+  byte-gleich; `docs/evidenz/60_stichprobe/m0_klassenraten.csv` und die Skripte unter
+  `backend/scripts/kalibrierung/` wurden nur gelesen bzw. durchsucht, nicht geändert (eiserne
+  Regeln 2 und 5). Die großen Stichprobendateien `60_stichprobe/hq_*.csv` wurden nicht geöffnet.
+- **Kein Befund behoben, keiner umnummeriert.** Höchste vorhandene Nummer zu Laufbeginn: **86**;
+  neu vergeben sind **87–89**. Die Befunde 33, 34, 43 (b), 64, 67 und 69 sind nur als Gegenstelle
+  bzw. zur Abgrenzung eingeordnet.
+- **Ressourcen-Regel §3.4 eingehalten:** kein nationaler 100-m-Vollraster-Lauf; nachgerechnet wurde
+  zellweise aus den in §4.8 ausgewiesenen Zahlen und aus zwei Zeilen der 28-zeiligen
+  Klassenraten-Stichprobe. Der Codeabgleich war ein gezielter grep, keine Lektüre der Skripte.
+- **Frische Sitzung** (eiserne Regel 4): Diese Gegenprüfung ist nicht die Sitzung, die den
+  geprüften Stand geschrieben hat.
+- **Nicht Gegenstand dieses Pakets:** §4.1–§4.7 und Kapitel 9 (Schwesterpakete, hier nur als
+  Fundstelle zitiert), die übrigen Leitfragen, die Regression der Altbefunde.
+- **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
+  T-0359); das Konvergenz-Verdikt der Runde trägt das Abschlusspaket.
