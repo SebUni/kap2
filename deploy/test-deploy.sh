@@ -181,10 +181,30 @@ speicher_zeile "nach frontend-build"
 SCHRITT="datenbank"
 cd "$PRODUKT/backend"
 mkdir -p logs
-if ! "$VENV/bin/alembic" upgrade head; then
-  echo "Warnung: alembic upgrade head fehlgeschlagen — Tabellen werden beim Start per create_all angelegt"
-  echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head), Fortsetzung mit create_all-Fallback"
+# T-0338: Der bisherige Fallback ("Warnung ... Fortsetzung mit create_all") hat den eigentlichen
+# Fehler verschluckt statt ihn zu beheben -- app/main.py legt beim Start ohnehin per create_all
+# alle Tabellen an (Base.metadata.create_all), aber OHNE die Alembic-Versionstabelle zu setzen.
+# Damit beginnt "alembic upgrade head" beim naechsten Deploy wieder bei der Baseline-Revision und
+# scheitert dort dauerhaft an "relation ... already exists" (DuplicateTable/-Column) -- genau die
+# Endlosschleife, die zu diesem Ticket gefuehrt hat. Statt das zu ignorieren: Wenn der Fehler nach
+# "existiert bereits" aussieht UND die Datenbank noch keine Alembic-Version kennt, ist das Schema
+# vermutlich durch einen frueheren create_all-Fallback bereits vorhanden -- dann auf den aktuellen
+# Kopf stempeln (ohne die SQL-Anweisungen erneut auszufuehren) und danach normal hochziehen.
+# Jeder andere Fehler bleibt fatal (ERR-Trap) statt weiter stillschweigend uebersprungen zu werden.
+ALEMBIC_LOG=$(mktemp)
+if ! "$VENV/bin/alembic" upgrade head >"$ALEMBIC_LOG" 2>&1; then
+  cat "$ALEMBIC_LOG"
+  if grep -qiE "DuplicateTable|DuplicateColumn|already exists" "$ALEMBIC_LOG" \
+     && [[ -z "$("$VENV/bin/alembic" current 2>/dev/null)" ]]; then
+    echo "Datenbank enthaelt bereits das Schema ohne Alembic-Tracking (fruehere create_all-Fallback-Anlage) -- stemple auf head statt erneut anzulegen."
+    "$VENV/bin/alembic" stamp head
+    "$VENV/bin/alembic" upgrade head
+  else
+    rm -f "$ALEMBIC_LOG"
+    false
+  fi
 fi
+rm -f "$ALEMBIC_LOG"
 
 SCHRITT="dienst"
 # T-0197: kap2-test.service ist eine System-Unit und wird ohne sudo neu gestartet. "systemctl
