@@ -169,6 +169,22 @@ if git rev-parse -q --verify "origin/$REF" >/dev/null; then git checkout -q -B d
 COMMIT=$(git rev-parse --short HEAD)
 echo "Commit $COMMIT"
 
+# T-0424: Dieser Lauf arbeitet bislang mit der Kopie, die VOR diesem Checkout angelegt wurde
+# (siehe Kommentar oben zum Sinn der Kopie) -- das ist der Stand des Skripts vor Commit $COMMIT,
+# nicht dessen eigener Stand. Aendert Commit $COMMIT selbst deploy/test-deploy.sh (etwa einen
+# Bugfix in genau diesem Skript), liefe der Rest des Laufs mit der VERALTETEN Logik weiter, obwohl
+# der Zielcommit die Korrektur schon enthaelt -- genau das hat den Ausfall bei Commit 6ec55ef6
+# verursacht: Datenbank- und Dienst-Schritt liefen dort noch mit dem Stand vor den Korrekturen
+# aus T-0339/T-0342, obwohl beide zu diesem Zeitpunkt bereits committet waren. Ab hier ist keine
+# weitere Aenderung an $PRODUKT mehr zu erwarten (die einzige Stelle, die es umschreibt, ist der
+# Checkout oben) -- ein Wechsel auf die frisch ausgecheckte Fassung ist deshalb gefahrlos.
+# DEPLOY_AKTUALISIERT verhindert eine zweite Runde, falls die frische Fassung aus irgendeinem
+# Grund erneut abweicht.
+if [[ -z "${DEPLOY_AKTUALISIERT:-}" ]] && ! cmp -s "$PRODUKT/deploy/test-deploy.sh" "$0" 2>/dev/null; then
+  echo "-- deploy/test-deploy.sh hat sich mit Commit $COMMIT geaendert; Lauf wechselt auf die neue Fassung"
+  exec env -u DEPLOY_KOPIE DEPLOY_AKTUALISIERT=1 bash "$PRODUKT/deploy/test-deploy.sh" "$REF"
+fi
+
 SCHRITT="backend-abhaengigkeiten"
 [[ -x "$VENV/bin/pip" ]] || python3.12 -m venv "$VENV"
 "$VENV/bin/pip" install -q --upgrade pip wheel
