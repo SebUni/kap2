@@ -7,8 +7,23 @@
 # Firmen-Repo, der zuletzt gemeldete Status blieb stehen und wurde weiter als aktuell gelesen.
 set -Eeuo pipefail
 # Aus einer Kopie laufen: git reset weiter unten überschreibt sonst das laufende Skript.
+# Eigenes, dauerhaftes Verzeichnis statt /tmp (T-0425): Der Watcher startet dieses Skript aus
+# einem systemd-Oneshot-Dienst mit PrivateTmp=true (Ursache in firma-supervisor gemeldet, hier
+# nicht aenderbar) und beendet seinen eigenen Prozess, sobald Popen() zurueckkehrt -- lange bevor
+# dieses Skript fertig ist. Sobald der Oneshot-Dienst dabei als "inaktiv" gilt, loest systemd die
+# private /tmp-Einhaengung dieses Dienstlaufs, auch fuer laengst abgekoppelte Kindprozesse (siehe
+# https://systemd.io/TEMPORARY_DIRECTORIES/); jeder spaetere Zugriff auf /tmp scheitert dann mit
+# "No such file or directory", obwohl das echte /tmp des Servers unveraendert existiert und Platz
+# hat. Ein Verzeichnis neben PRODUKT/FIRMA/VENV haengt an keiner Dienst-Sitzung und bleibt daher
+# fuer die gesamte Laufzeit dieses Skripts erreichbar.
+DEPLOY_TMP="${DEPLOY_TMP:-/opt/overlord/kap2-deploy-tmp}"
+mkdir -p "$DEPLOY_TMP"
+# TMPDIR fuer den gesamten Lauf setzen, nicht nur fuer die beiden mktemp-Aufrufe unten: sonst
+# griffen pip/npm/alembic weiterhin über die ungesetzte Voreinstellung auf /tmp zu und liefen in
+# dieselbe Falle, sobald ein Schritt lang genug dauert.
+export TMPDIR="$DEPLOY_TMP"
 if [[ -z "${DEPLOY_KOPIE:-}" ]]; then
-  KOPIE=$(mktemp /tmp/test-deploy.XXXXXX.sh); cp "$0" "$KOPIE"; export DEPLOY_KOPIE=1
+  KOPIE=$(mktemp "$DEPLOY_TMP/test-deploy.XXXXXX.sh"); cp "$0" "$KOPIE"; export DEPLOY_KOPIE=1
   # Signale an die Kopie weiterreichen (T-0132): trifft ein TERM/INT/HUP nur diesen
   # Elternprozess, liefe die Kopie sonst weiter und die Signalfallen unten kaemen nie
   # zum Zug -- der Lauf endete wortlos, genau die Luecke aus T-0132.
@@ -45,9 +60,9 @@ PROTOKOLL=/var/log/overlord/deploy.log
 PASSWORT_QUELLE="$ENV_DATEI"
 SCHRITT="start"; COMMIT=""
 set -a; source "$ENV_DATEI"; set +a
-# Rueckfallweg fuer den Dienst-Neustart (T-0342). Der Lauf arbeitet aus einer Kopie in /tmp
-# (siehe oben), deshalb wird die Bibliothek ueber $PRODUKT geladen und nicht ueber $0 -- sonst
-# suchte "source" im Ablageverzeichnis der Kopie.
+# Rueckfallweg fuer den Dienst-Neustart (T-0342). Der Lauf arbeitet aus einer Kopie in
+# $DEPLOY_TMP (siehe oben), deshalb wird die Bibliothek ueber $PRODUKT geladen und nicht ueber
+# $0 -- sonst suchte "source" im Ablageverzeichnis der Kopie.
 source "$PRODUKT/deploy/lib-neustart.sh"
 
 speicher_zeile() {  # $1 = Marke (vorher|nachher|...) -- Beweismittel im Protokoll (T-0132)
@@ -196,7 +211,7 @@ mkdir -p logs
 # Rueckfall schon vorhanden -- einmal auf den Kopf stempeln (ohne die SQL-Anweisungen erneut
 # auszufuehren) und danach regulaer hochziehen. Jeder andere Fehler bricht den Schritt fatal ab;
 # still weiterlaufen tut der Schritt nicht mehr, auch nicht mit create_all als Rueckfall.
-ALEMBIC_LOG=$(mktemp)
+ALEMBIC_LOG=$(mktemp "$DEPLOY_TMP/alembic.XXXXXX.log")
 if "$VENV/bin/alembic" upgrade head >"$ALEMBIC_LOG" 2>&1; then
   cat "$ALEMBIC_LOG"
   rm -f "$ALEMBIC_LOG"
