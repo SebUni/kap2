@@ -17,7 +17,17 @@ set -Eeuo pipefail
 # hat. Ein Verzeichnis neben PRODUKT/FIRMA/VENV haengt an keiner Dienst-Sitzung und bleibt daher
 # fuer die gesamte Laufzeit dieses Skripts erreichbar.
 DEPLOY_TMP="${DEPLOY_TMP:-/opt/overlord/kap2-deploy-tmp}"
-mkdir -p "$DEPLOY_TMP"
+# Fallback statt Abbruch (Nacharbeit T-0425 Punkt 3): An dieser Stelle steht weder die ERR-Falle
+# noch status_schreiben zur Verfuegung (beides braucht Code, der erst weiter unten kommt) -- ein
+# hartes "mkdir ... || exit" wuerde also genau die Luecke aus T-0132 wieder aufreissen: der Lauf
+# stuerbe wortlos, ohne einen Statuseintrag im Firmen-Repo, und der zuletzt gemeldete Status bliebe
+# faelschlich stehen. Schlaegt das Anlegen fehl (z.B. fehlendes Schreibrecht in /opt/overlord),
+# faellt der Lauf deshalb auf das alte Verhalten (Server-/tmp) zurueck, statt zu sterben; das
+# ist im ungünstigsten Fall so anfaellig wie vor diesem Ticket, aber nie stumm.
+if ! mkdir -p "$DEPLOY_TMP" 2>/dev/null; then
+  echo "!! Konnte $DEPLOY_TMP nicht anlegen -- falle auf /tmp zurueck (siehe T-0425)" >&2
+  DEPLOY_TMP=/tmp
+fi
 # TMPDIR fuer den gesamten Lauf setzen, nicht nur fuer die beiden mktemp-Aufrufe unten: sonst
 # griffen pip/npm/alembic weiterhin über die ungesetzte Voreinstellung auf /tmp zu und liefen in
 # dieselbe Falle, sobald ein Schritt lang genug dauert.
