@@ -4,8 +4,10 @@ Skaliert die heutigen aggregierten Schadenskosten (``get_risk_aggregate``) mit
 demselben regionalisierten DWD-Klimasignal wie die Risiko-Index-Projektion
 (``projection_service.scenario_factors``) und preist auf dem Maßnahmenpfad die
 Maßnahmenkosten ein: OPEX jährlich ab Umsetzungsjahr, CAPEX einmalig im
-Umsetzungsjahr. Bewusste, im Response dokumentierte Vereinfachungen — keine
-Diskontierung, Maßnahmenwirkung zeitkonstant.
+Umsetzungsjahr. Die kumulierten Kosten werden zusätzlich als Barwerte mit 0 %
+und 1 % Reiner Zeitpräferenzrate ausgewiesen (UBA Methodenkonvention 4.0,
+Kap. 2.2.3). Bewusste, im Response dokumentierte Vereinfachung —
+Maßnahmenwirkung zeitkonstant.
 """
 
 from __future__ import annotations
@@ -18,6 +20,11 @@ from app.data import catalog
 from app.services.climate.dwd_data import get_climate_projection
 from app.services.measure_service import get_risk_aggregate, kommune_measures_query
 from app.services.projection_service import scenario_factors
+
+# Reine Zeitpräferenzraten (RZPR) der UBA Methodenkonvention 4.0, Kap. 2.2.3:
+# mindestens zwei Werte berichten, um die Sensitivität gegenüber der
+# Zeitpräferenz zu zeigen.
+PURE_TIME_PREFERENCE_RATES: tuple[float, ...] = (0.0, 0.01)
 
 
 def _group_costs(agg: dict) -> dict[str, float]:
@@ -89,6 +96,19 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             out.append(round(running, 2))
         return out
 
+    def _discounted(series: list[float]) -> dict[str, list[float]]:
+        """Kumulierte Kosten als Barwerte je Reiner Zeitpräferenzrate (UBA MK 4.0,
+        Kap. 2.2.3): mindestens 0 % und 1 %, abgezinst auf das Basisjahr
+        ``years[0]`` mit dem Faktor 1/(1+r)^(Jahr − Basisjahr)."""
+        out: dict[str, list[float]] = {}
+        for rate in PURE_TIME_PREFERENCE_RATES:
+            running, row = 0.0, []
+            for year, value in zip(years, series):
+                running += value / ((1.0 + rate) ** (year - years[0]))
+                row.append(round(running, 2))
+            out[str(rate)] = row
+        return out
+
     def _scenario_block(scenario: str) -> dict:
         # Gefahrengruppen-spezifisch fortschreiben statt EINEN Gesamtwert linear zu
         # skalieren: Der Hitzeanteil folgt der konvexen Expositions-Wirkungs-Kurve,
@@ -124,10 +144,12 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             "no_measures": {
                 "annual": damages_no,
                 "cumulative": _cumulative(damages_no),
+                "discounted": _discounted(damages_no),
             },
             "with_measures": {
                 "annual": annual_with,
                 "cumulative": _cumulative(annual_with),
+                "discounted": _discounted(annual_with),
                 "components": {
                     "damages": damages_with,
                     "opex": [round(v, 2) for v in opex_by_year],
@@ -154,8 +176,10 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
         "assumptions": [
             "Skalierung der heutigen Schadenskosten mit dem regionalisierten "
             "DWD-Hitzetage-Trend (gleiches Klimasignal wie die Risiko-Projektion)",
-            "CAPEX einmalig im Umsetzungsjahr (Default: Folgejahr), keine "
-            "Diskontierung/Annualisierung",
+            "CAPEX einmalig im Umsetzungsjahr (Default: Folgejahr); die "
+            "kumulierten Kosten werden zusätzlich als Barwerte mit 0 % und 1 % "
+            "Reiner Zeitpräferenzrate ausgewiesen (Feld „discounted“, abgezinst "
+            f"auf das Basisjahr {years[0]})",
             "Maßnahmenwirkung zeitkonstant über den Horizont; OPEX ab Umsetzungsjahr",
         ],
         "warnings": warnings,
