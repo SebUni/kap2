@@ -3992,3 +3992,78 @@ verdiktiert, nämlich hier.**
   Fundstelle zitiert), die übrigen Leitfragen, die Regression der Altbefunde.
 - **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
   T-0359); das Konvergenz-Verdikt der Runde trägt das Abschlusspaket.
+
+### Leitfrage 11 — Form und Erklärbarkeit
+
+Paket T-0381 der Runde 3 (20.09.2026), eigene frische Sitzung (eiserne Regel 4: Diese Sitzung hat
+den geprüften Stand nicht geschrieben — geschrieben haben T-0235 bis T-0243, T-0256 bis T-0259 und
+die Revisionspakete aus T-0281). **Prüfumfang:** Abschnitt `## Ergebnis` (Z. 30–38), §7.1
+(Z. 2186–2229) und §7.2 (Z. 2230–2325) von `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`.
+**Eigene Messung** (in dieser Sitzung ausgeführt, HTML-Kommentare entfernt):
+`python3 -c "L=open(...).read().split(chr(10)); seg=lambda a,b: len(re.sub(r'<!--.*?-->','',chr(10).join(L[a-1:b])+chr(10),flags=re.S)); print(seg(30,38),seg(2186,2229),seg(2230,2325))"`
+→ **2.377 · 3.181 · 6.660 = 12.218 Zeichen** (Ticketangabe 2.376/3.180/6.659/12.215; Differenz je
+Abschnitt genau 1 Zeichen = abschließendes Zeilenende, Textkörper identisch). Kapitelkopf 7 und die
+Parameter-Blöcke Z. 1843–2185 sowie Kapitel 5 sind Schwesterpakete und hier nur als Fundstelle
+zitiert; Leitfragen 5 und 12 werden hier nicht beantwortet. Lint-Ergebnis der Runde übernommen (§5,
+Eröffnungspaket T-0359), nicht wiederholt.
+
+**Verdikt Leitfrage 11: Befund** (vier neue Befunde, 92–95; Nummernstand zu Laufbeginn: höchste
+vergebene Nummer 91, erste neue Nummer 92).
+
+| Teilfrage der LF 11 | Verdikt | Begründung mit Fundstelle |
+|---|---|---|
+| Zeichentabellen vollständig | **Befund** | Die Zeichentabelle §3.5 deckt laut eigener Überschrift „alle Formelzeichen der **Kapitel 3 und 5**" ab (Z. 750, nur zitiert). \(f_{\text{AWM}}\), das einzige in §7.2 neu eingeführte Zeichen, steht in keiner Zeichentabelle: gemessen in dieser Sitzung `grep -n "AWM" …` → **6 Treffer** (Z. 691, 1474, 2262, 2290, 2323, 2512), keiner davon in §3.5 (Z. 750 ff.) oder §5.1.1 (Z. 1602 ff.), und in Kapitel 7 trägt kein Parameter-Block die id `f_awm`. Klartext („Alterswertminderungsfaktor") steht in §4.8 Z. 1474 und §7.2 Z. 2262, eine **Einheit** (dimensionslos, RND/GND) an keiner der beiden Stellen → **Befund 95** (C). Die in §7.2 verwendeten Zeichen \(A^{*}\), \(M_0\), \(\lambda\), \(U\), \(O\) sind dagegen in §3.5/§4.8 geführt (z. B. \(U\) Z. 1472). |
+| Beispiele rechnen auf (Golden-Test grün) | **grün, aber Befund im Inhalt** | Der Beispielblock `beispiel_60_zeitwert` (Z. 2296–2319) wurde in dieser Sitzung ausgeführt (`python3 -c "…re.search(r'```python test: beispiel_60_zeitwert…').group(1); exec(…)"`) → **alle asserts grün**, kein Fehler. Er ist jedoch mit einem **abgelösten Anker** gerechnet: Z. 2303 `A_stern = 1.6 * 0.65 * 1.54 * 0.50 * 1.15 * 1.07` = **0,98538**, während §4.2 Z. 1123 den Anker mit \(A_{\text{ver}}\) = **1,838** zu \(A^{*}\) = **1,132 Mrd. €₂₀₂₆/a** ausschreibt und §4.5 Z. 1381 den kalibrierten Ist-Betrag mit \(\lambda M_0\) = **1,132** führt → **Befund 92** (B). Der Golden-Test kann das nicht fangen, weil er seine Ausgangszahl selbst mitbringt. |
+| Innere Widerspruchsfreiheit der Beispielzahlen | **Befund** | §7.2 nennt dieselbe Größe (das λ bei allein umgestelltem Basiswert) zweimal verschieden: Prosa Z. 2250–2251 „Zentralwert 1,132 / (1,360 · 0,55) = **1,51**, am unteren Faktor-Ende … = **2,08**" gegen Z. 2293 „nur \(\lambda\) steigt — auf **1,32**" und den Test Z. 2311–2312 (`1.32` / `1.81`) → **Befund 93** (B). |
+| Erklärbarkeit nach P3 (A-0034) im Prüfumfang | **bestanden** | §7.1 und §7.2 kommen ohne Verteilungsfunktion aus; gerechnet wird ausschließlich mit Multiplikation, Division und Prozent (Z. 2285, Z. 2288–2291, Block Z. 2296–2319). Die Abschätzung \(f_{\text{AWM}}\) ist aus Regel (§ 38 ImmoWertV, Z. 2265–2273), Annahme (mittleres Alter, RND 44/80, Z. 2274–2280) und Modellgrenze (Ausbauteile mit kürzerer Nutzungsdauer, Z. 2281–2283) hergeleitet — für einen Sachbearbeiter ohne Statistikausbildung nachvollziehbar. Keine stille Vereinfachung: Die Zeitwert-Lesart wird als beziffertes Band ausgewiesen statt weggelassen (Z. 2241–2243), und §7.1 begründet die Wertebereichs-Abweichung offen, statt sie umzubiegen (Z. 2198–2204). |
+
+**Prüfpunkte E1–E4 (§8 der Aufgabe) — einzeln mit ja/nein und Fundstelle**
+
+| Punkt | Antwort | Fundstelle und Begründung |
+|---|---|---|
+| **E1 — Rechenweg in Worten** | **ja** | Bericht Kap. 3, einleitender Absatz Z. 525–529: zwei Sätze Fließtext ohne Formelzeichen („Umsetzungsgrundlage ist Ansatz **(a)** … Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle"; Kernformel in Worten „Menge × Rate × Preis auf Zellebene", Z. 528). Grenze „höchstens fünf Sätze" eingehalten (2). Nur als Fundstelle zitiert, Kapitel 3 ist Schwesterpaket. |
+| **E2 — Rechenbeispiel mit Zahlen** | **ja im Prüfumfang, mit Einschränkung** | §7.2 Z. 2296–2319: ausführbarer Block nach §4 mit allen Zwischenwerten (Gebäudewert Z. 2301, \(M_0\) Z. 2308, λ-Varianten Z. 2311–2312, K3-Band Z. 2314–2315), in dieser Sitzung grün ausgeführt. §7.1 ist reiner Antragstext ohne Hauptformel und braucht keinen Block. Einschränkung: abgelöste Eingangszahl → Befund 92; Zahlenwiderspruch zur Prosa → Befund 93. |
+| **E3 — Verteilungsfunktionen und Formelsatz** | **ja (keine erklärungsbedürftige Form im Prüfumfang)** | Im Prüfumfang kommt keine Verteilungsfunktion vor — §7.1/§7.2 (Z. 2186–2325) führen weder Quantil-, Log-Normal-, Poisson- noch Faltungsform; die einzigen Formeln sind \(\lambda = A^{*}/(M_0 f_{\text{AWM}})\) (Z. 2249–2251) und die Produktform des Blocks (Z. 2301–2318), beide Grundrechenarten. Zu \(f_{\text{AWM}}\) liegt zusätzlich die zulässige Antwort (b) aus §8 vor (Rechenbeispiel mit Zahlen, Z. 2285 und Block). Der Abschnitt `## Ergebnis` (Z. 30–38) ist bis auf \(M_0\) und \(\lambda\) formelfrei. |
+| **E4 — Zeichen und Begriffe** | **nein** | \(f_{\text{AWM}}\) ohne Zeichentabelleneintrag, ohne Parameter-Block und ohne Einheit (§4.8 Z. 1474, §7.2 Z. 2262) → **Befund 95** (C). Begriffe: „Restnutzungsdauer/Gesamtnutzungsdauer" ist bei erster Verwendung erklärt (Z. 2266–2268), „Sensitivitätsband" im Satzzusammenhang (Z. 2242–2243); „Zentralwert" (Z. 2250) bleibt unerklärt, wird aber nicht hier zuerst verwendet (Kapitel 3/4, Schwesterpakete) — hier nicht doppelt verbucht. |
+
+**Nachrechnung statt Lektüre (§5, in dieser Sitzung ausgeführt).** Ausdruck:
+`python3 -c "A=1.6*0.65*1.54*0.50*1.15*1.07; w=208.0*1.30*1950.0; M0=(0.872*w*339000*0.005979599550826+0.872*w*1380000*0.000675151053693)/1e9; print(A, w, M0, A/(M0*0.55), A/(M0*0.40), 1.132/(1.360*0.55), 1.132/(1.360*0.40), w*0.55, A*0.55, A*0.40, A*0.75, A*(1-0.55), (A*0.55-A)/A*100, 0.0103*0.55)"`
+
+| Größe (Fundstelle) | gedruckt | nachgerechnet (obiger Ausdruck) | Abweichung |
+|---|---|---|---|
+| \(A^{*}\) des Blocks (Z. 2303) | — (als `A_stern` gesetzt) | **0,985384** | gegen §4.2 Z. 1123 (**1,132**): **−12,9 %** → Befund 92 |
+| \(M_0\) (Z. 2308–2309) | 1,360 | **1,360418** | +0,03 % (Rundung) ✓ |
+| Zeitwert je Gebäude (Z. 2285) | 290.004 € | **290.004,00** | **0** ✓ |
+| λ bei nur umgestelltem Basiswert, Zentralwert (Z. 2250 bzw. Z. 2293) | **1,51** bzw. **1,32** | 1,132/(1,360·0,55) = **1,51337**; 0,985384/(1,360418·0,55) = **1,31695** | jede Rechnung für sich **< 0,4 %** korrekt — die beiden gedruckten Werte widersprechen **einander**, weil zwei verschiedene Anker eingesetzt sind → Befund 93 |
+| λ am unteren Faktorende (Z. 2251 bzw. Z. 2312) | **2,08** bzw. **1,81** | **2,08088** bzw. **1,81081** | je < 0,05 %, derselbe Widerspruch → Befund 93 |
+| K3 bei konsistentem Zeitwert (Z. 2288–2289) | 0,54 (0,39–0,74) | **0,541961** (0,394154–0,739038) | < 0,4 % ✓ (bezogen auf den abgelösten Anker) |
+| Rückgang (Z. 2289–2290) | −0,44 Mrd., **−45 %** | **−0,443423**, **−45,00 %** | ✓ |
+| Sanity-Untergrenze (Z. 2291) | 0,0057 | **0,005665** | +0,6 % (Rundung) ✓ |
+
+**Zum Abschnitt `## Ergebnis` (Z. 30–38) — stimmen die genannten Beträge mit den Stellen überein,
+auf die der Abschnitt verweist?** Teilweise: \(M_0\) = 1,360 Mrd. €₂₀₂₆/a stimmt mit §4.4 Z. 1230
+überein, ebenso die Registerzählung „32 Registerzeilen, davon 7 belegt bzw. entschieden, 25 offen"
+(gemessen in dieser Sitzung an `docs/evidenz/register.md`: `grep -c "^| 60-"` → **32**, davon mit
+Statusklammer „(offen…)" **25**, entschieden/belegt **7**) — **aber \(\lambda\) = 0,724 (Z. 35)
+steht gegen §4.4 Z. 1230 („1,132 / 1,360 = **0,832**"), §4.5 Z. 1381 und den Parameter-Block
+`flood_bldg.lambda` Z. 2169 (`wert: 0.832`)** → **Befund 94** (B).
+
+**Neue Befunde dieses Pakets (92–95)**
+
+| Nr. | Kat. | Stelle · Art · Begründung · Vorschlag |
+|---|---|---|
+| 92 | **B** | **Stelle:** Bericht §7.2 Z. 2288 („sinkt die kalibrierte Bundessumme K3 von **0,99 Mrd. €₂₀₂₆/a**") und Z. 2303 (`A_stern = 1.6 * 0.65 * 1.54 * 0.50 * 1.15 * 1.07`), gegen §4.2 Z. 1123 (\(A^{*}\) = 1,838 · 0,65 · 1,54 · 0,50 · 1,15 · 1,07 = **1,132**) und §4.5 Z. 1381 (\(\lambda M_0\) = **1,132**). · **Art: Widerspruch (abgelöster Stand).** · **Begründung:** Der erste Faktor der Ankerkette ist im Beispielblock **1,6** statt des heute geltenden \(A_{\text{ver}}\) = 1,838 aus der Kleinste-Quadrate-Bestimmung (§4.1). Der ganze Sensitivitätsabschnitt hängt daran — Ausgangsbetrag 0,99 Mrd., Zielbetrag 0,54 (0,39–0,74) und die abgeleitete Sanity-Untergrenze; mit dem geltenden Anker lautete der Ausgangsbetrag 1,132 und der Zeitwert-Zentralwert **0,623** Mrd. €₂₀₂₆/a (nachgerechnet in dieser Sitzung: `python3 -c "print(1.132*0.55)"` → 0,6226). Der Prozentsatz −45 % bleibt unberührt, die absoluten Beträge nicht. Nach eiserner Regel 5 wird das nicht still nachgezogen, sondern verbucht. Kategorie B, weil die Rechenlogik stimmt, aber alle Euro-Beträge des Abschnitts auf einem abgelösten Anker stehen und §4.8 Z. 1474 sowie Kap. 6 Z. 1827 dieselbe Zahl „0,99" weitertragen. · **Vorschlag:** \(A^{*}\) im Block aus §4.2 übernehmen (1,838-Kette oder direkt 1,132 mit Quellenzeile), die davon abgeleiteten Beträge neu setzen und die Stellen Z. 1474, Z. 1827 und Z. 2512 im selben Zug nachziehen. |
+| 93 | **B** | **Stelle:** Bericht §7.2, Begründung 1 Z. 2250–2251 (**1,51** / **2,08**) gegen Z. 2293 (**1,32**) und Beispielblock Z. 2311–2312 (`1.32` / `1.81`). · **Art: Widerspruch (innerhalb desselben Abschnitts).** · **Begründung:** Dieselbe Aussage — „wird nur der Basiswert auf den Zeitwert gesetzt, steigt λ auf …" — trägt im selben Abschnitt zwei Zahlenpaare, weil die Prosa mit \(A^{*}\) = 1,132 und der Block mit 0,985 rechnet (beide Rechnungen in dieser Sitzung nachvollzogen, Abweichung je < 0,4 %). Für den Adressaten nach §8 ist an dieser Stelle nicht entscheidbar, welcher Wert gilt; die Entscheidungstabelle Kap. 9 Z. 2512 zitiert zusätzlich „1,32 (bis 1,81)" (nur als Fundstelle, Kapitel 9 ist Schwesterpaket). Kategorie B: kein Rechenfehler, aber eine aus dem Bericht nicht auflösbare Doppelangabe. · **Vorschlag:** Nach Behebung von Befund 92 beide Stellen auf denselben Anker stellen und **eine** Angabe als maßgeblich kennzeichnen; die andere streichen, nicht stehen lassen. |
+| 94 | **B** | **Stelle:** Bericht Abschnitt `## Ergebnis` Z. 35 („\(M_0\) = 1,360 Mrd. €₂₀₂₆/a und \(\lambda\) = **0,724**") gegen §4.4 Z. 1230 (\(\lambda\) = **0,832**), §4.5 Z. 1381 und Parameter-Block `flood_bldg.lambda` Z. 2169 (`wert: 0.832`). · **Art: Widerspruch (abgelöster Stand an der meistgelesenen Stelle).** · **Begründung:** Der Ergebnisabschnitt ist die Kurzfassung des Berichts und verweist selbst auf „Kap. 4"; der dort geführte Skalar ist seit der Kleinste-Quadrate-Ankerbestimmung 0,832. \(M_0\) = 1,360 stimmt, nur λ nicht — die Fortschreibung ist an dieser einen Stelle nicht angekommen. Der Standvermerk „Stand 17.09.2026, nach Review-Runde 2" erklärt den Widerspruch, löst ihn aber nicht auf: Ein Leser entnimmt dem Ergebnisabschnitt einen Wert, den der Bericht an drei anderen Stellen anders führt, und die Produkt-Parameterliste (P1) führt 0,832. Kategorie B. · **Vorschlag:** In Z. 35 λ auf 0,832 setzen und den Standvermerk mitziehen; alternativ den Skalar im Ergebnisabschnitt nicht beziffern und auf §4.4 verweisen, damit er nur an einer Stelle gepflegt wird. |
+| 95 | **C** | **Stelle:** Bericht §7.2 Z. 2262 und §4.8 Z. 1474 (\(f_{\text{AWM}}\)); Zeichentabellen §3.5 Z. 750 und §5.1.1 Z. 1602 (nur zitiert); Kapitel 7, Parameter-Blöcke Z. 1843–2185 (nur zitiert, keine id `f_awm`). · **Art: Lücke (Prüfpunkt E4 aus §8).** · **Begründung:** E4 verlangt für jedes Formelzeichen Bedeutung in Klartext **samt Einheit**, Fundstelle „Zeichentabellen in Abschnitt 3, Parameter-Blöcke in Abschnitt 7". \(f_{\text{AWM}}\) ist an beiden vorgesehenen Orten nicht geführt: §3.5 deckt laut Überschrift nur die Kapitel 3 und 5 ab, ein Block existiert nicht, und die beiden Textstellen nennen Wert und Band, aber keine Einheit (dimensionslos, Verhältnis RND/GND). Kategorie C, weil Herleitung und Kennzeichnung als Abschätzung vollständig sind (P1 erfüllt, §4.8 Z. 1474) und allein die Zeichenführung fehlt. · **Vorschlag:** \(f_{\text{AWM}}\) in die Zeichentabelle §3.5 oder in eine eigene kleine Zeichentabelle in §7.2 aufnehmen, mit Einheit „– (Verhältnis RND/GND)"; ein Parameter-Block ist entbehrlich, solange der Faktor nur als Sensitivität läuft — das dann im Text ausdrücklich vermerken. |
+
+**Abgrenzung und Status dieses Pakets.** Kein Befund wurde behoben (weder 92–95 noch ein
+Altbefund). Geändert wurde ausschließlich diese Datei;
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (MD5 `24972e4404a8e1bc0990e63f1959798d`) und
+`docs/evidenz/register.md` (MD5 `5fb629559a13d835e56831fcedc9b666`) sind byte-gleich geblieben, die
+Arbeitsmappen wurden nur gelesen (eiserne Regel 2), `backend/scripts/lint_methodik.py` nicht
+geändert. Ressourcen-Regel §3.4 eingehalten: nachgerechnet wurde aus den gedruckten Zahlen, kein
+nationaler 100-m-Vollrasterlauf, die Stichproben-Dateien `docs/evidenz/60_stichprobe/hq_*.csv`
+wurden nicht geöffnet. Nicht Gegenstand: Kapitelkopf 7 und Parameter-Blöcke Z. 1843–2185,
+Kapitel 5, Kapitel 9, die Leitfragen 5 und 12, die Regression der Altbefunde sowie die Kopftabelle
+„Offene Befunde" (Abschlusspaket).
