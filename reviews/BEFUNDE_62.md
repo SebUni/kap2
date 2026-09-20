@@ -68,12 +68,19 @@ Schaden.
 3. Verwechslungssperre (Zuschnitt Kap. 4):
 
 ```
-grep -nE '0 ?(€|EUR|Euro)|Screening ohne Euro' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md
+grep -nE '(^|[^0-9])0 ?(€|EUR|Euro)|Screening ohne Euro' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md
 256:Diese Klimawirkung ist ein Screening ohne Euro-Bezifferung — niemals ein Null-Betrag und niemals
 ```
 
-Kein „0 €" und kein leeres Feld für diese Klimawirkung; der vorgeschriebene Vermerk steht
-wörtlich. Bestanden.
+Die Ziffernsperre `(^|[^0-9])` vor der Null ist nötig, damit das Muster einen Null-Betrag trifft
+und nicht jede Zahl, die auf eine Null endet: Ohne sie meldet derselbe Befehl zusätzlich die
+Zeilen 322, 325, 332 und 333 („40 €", „0,50 €", „350.000 €", „5.000 €") — sämtlich
+Maßnahmenkosten aus Abschnitt 6 und damit für die Verwechslungssperre unschädlich. Ausgeführt
+wurden beide Fassungen; die Ausgabe der engen Fassung steht oben, die weite Fassung liefert die
+genannten vier Kostenzeilen zusätzlich.
+
+Ergebnis: Kein „0 €" und kein leeres Feld für diese Klimawirkung; der vorgeschriebene Vermerk
+steht wörtlich in Zeile 256. Bestanden.
 
 4. Ausschlüsse der Klasse B (Zuschnitt Kap. 3, „Nicht enthalten"):
 
