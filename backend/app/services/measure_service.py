@@ -705,7 +705,12 @@ def build_cost_summary(db: Session, kommune_id: int, demo_session_id: str | None
         / max(abs(damage_reduction), 1.0) > 0.25
         if (per_measure_damage_ben or damage_reduction) else False
     )
-    return {
+    # Untergrenzen-Kennzeichnung (UBA MK 4.0, Anforderung 25): dieselben Kategorien
+    # wie in der Basissumme — fehlt dort ein belegter Kostensatz, sind auch die
+    # Schadenssummen dieser Übersicht konservative Untergrenzen.
+    lb = base["cost"].get("lower_bound")
+
+    out = {
         "damages_base_eur": damages_base,
         "damages_with_measures_eur": damages_with,
         "damage_reduction_eur": damage_reduction,
@@ -721,3 +726,6 @@ def build_cost_summary(db: Session, kommune_id: int, demo_session_id: str | None
             "rows": measure_rows,
         },
     }
+    if lb is not None:
+        out["lower_bound"] = lb
+    return out

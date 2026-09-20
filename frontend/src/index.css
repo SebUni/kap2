@@ -2635,6 +2635,13 @@ body {
   color: var(--text-muted);
   margin-top: 2px;
 }
+/* Untergrenzen-Hinweis direkt an der Euro-Summe (UBA MK 4.0, Anforderung 25). */
+.hero-kpi .hero-kpi-lower-bound {
+  font-size: 0.7rem;
+  color: var(--warning, #b26a00);
+  margin-top: 3px;
+  cursor: help;
+}
 
 /* ── Klima-Chips (Kommune vs. Deutschland) ───────────────────────────────── */
 .climate-chips {
