@@ -32,6 +32,26 @@ fi
 # griffen pip/npm/alembic weiterhin über die ungesetzte Voreinstellung auf /tmp zu und liefen in
 # dieselbe Falle, sobald ein Schritt lang genug dauert.
 export TMPDIR="$DEPLOY_TMP"
+# Aufraeumen alter Eintraege (T-0442): Seit T-0425 ist DEPLOY_TMP ein dauerhaftes Verzeichnis
+# statt /tmp, das der Kernel selbst leert. Nach einem harten Abbruch blieben Skriptkopien und
+# pip-/npm-Zwischendateien liegen (Urteil T-0425, Anmerkung a) -- auf einem 8-GB-Server kein
+# theoretisches Problem. Deshalb hier, VOR dem Anlegen der Skriptkopie, alles unterhalb von
+# DEPLOY_TMP entfernen, was aelter als 24 Stunden ist. Die ERR-Falle (trap fehler_abbruch ERR)
+# ist an dieser Stelle noch nicht gesetzt -- jeder Schritt ist deshalb bewusst so gebaut, dass er
+# unter "set -e" nie mit einem Fehlschlag durchschlaegt: ein Fehler wird protokolliert, der Lauf
+# geht weiter, nichts ausserhalb von DEPLOY_TMP wird angefasst.
+aufraeumen_alte_eintraege() {  # $1 = Zielverzeichnis
+  local ziel="$1" pfad n=0 fehler=0
+  while IFS= read -r -d '' pfad; do
+    if rm -rf -- "$pfad" 2>/dev/null; then
+      n=$((n + 1))
+    else
+      fehler=1
+    fi
+  done < <(find "$ziel" -mindepth 1 -maxdepth 1 -mmin +1440 -print0 2>/dev/null)
+  echo "-- aufraeumen $ziel: $n alte(n) Eintrag/Eintraege (>24h) entfernt$( [[ $fehler -eq 1 ]] && echo ', Fehler bei mindestens einem Eintrag -- Lauf geht weiter' )"
+}
+aufraeumen_alte_eintraege "$DEPLOY_TMP"
 if [[ -z "${DEPLOY_KOPIE:-}" ]]; then
   KOPIE=$(mktemp "$DEPLOY_TMP/test-deploy.XXXXXX.sh"); cp "$0" "$KOPIE"; export DEPLOY_KOPIE=1
   # Signale an die Kopie weiterreichen (T-0132): trifft ein TERM/INT/HUP nur diesen
