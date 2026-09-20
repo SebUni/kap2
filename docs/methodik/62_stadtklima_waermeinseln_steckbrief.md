@@ -253,7 +253,8 @@ Personen.
 
 ## 5 Warum hier kein Betrag steht
 
-Diese Klimawirkung ist ein Screening ohne Euro-Bezifferung — niemals 0 Euro und niemals leer. Der
+Diese Klimawirkung ist ein Screening ohne Euro-Bezifferung — niemals ein Null-Betrag und niemals
+leer. Der
 Rechenkern zeigt, wo die Wärmeinsel am stärksten wirkt, bucht dafür aber bewusst keinen eigenen
 Betrag: Nach der Monetarisierungs-Arbeitsmappe ist die Klimawirkung 62 rein vorgelagert und gibt
 ihre Wirkung ausschließlich an die nachgelagerten Klimawirkungen Hitzebelastung (95),
@@ -269,7 +270,85 @@ hochgerechnet, auch nicht als Spanne.
 
 ## 6 Massnahme
 
-<!-- Inhalt aus dem Folge-Teilpaket zu T-0405 dieses Vorhabens (T-0357). -->
+Eingrenzung der Euro-Pruefung: awk '/^## 6 /{f=1} /^## 7 /{f=0} !f' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md | grep -cE '[0-9][ ]?(EUR-Zeichen|EUR|Euro)' - Abschnitt 6 ist ausgenommen, weil dort der CAPEX/OPEX-Rahmen der Massnahme steht.
+
+Ausführbare Fassung derselben Zeile, mit dem tatsächlichen Euro-Zeichen anstelle des Worts
+`EUR-Zeichen` (Sollausgabe `0`; `grep -c` beendet sich dabei mit Rückgabewert 1 — das ist der
+Sollzustand und kein Fehler):
+
+```
+awk '/^## 6 /{f=1} /^## 7 /{f=0} !f' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md | grep -cE '[0-9][ ]?(€|EUR|Euro)'
+```
+
+**Warum in diesem Abschnitt Beträge stehen — und nur hier.** Die Grundregel „kein Risiko ohne
+Maßnahme“ gilt auch für einen Steckbrief ohne Euro-Ausweis. Die Zahlen unten sind
+**Maßnahmenkosten**, also der Aufwand einer Kommune, und niemals ein Schaden. Eine vermiedene
+Schadenssumme wird hier ausdrücklich **nicht** ausgewiesen und ein Kosten-Nutzen-Vergleich **nicht**
+gerechnet: Die Klimawirkung 62 bucht nach der Monetarisierungs-Arbeitsmappe selbst nichts
+(Abschnitte 2.3 und 5), also gibt es auf der Nutzenseite nichts zu gegenzurechnen, ohne eine
+Doppelzählung über die Klimawirkungen 95, 65 und 87 zu erzeugen. Der Nutzenparameter
+`benefit_per_m2_year` des Kostenmodells bleibt deshalb hier unbenutzt.
+
+### 6.1 Das Kostenmodell des Produkts in einem Absatz
+
+Das Produkt rechnet Maßnahmenkosten mit einem festen Satz von Parametern je Maßnahme
+(`backend/app/services/measure_service.py`, `compute_costs`; Registry-Namen und Einheiten in
+`backend/app/services/parameter_registry.py`):
+
+```
+CAPEX (einmalig) = capex_fixed + Anzahl × capex_per_unit + Fläche × capex_per_m2
+OPEX (je Jahr)   = opex_fixed_year + Anzahl × opex_per_unit_year + Fläche × opex_per_m2_year
+```
+
+Jede Komponente, deren Katalogfeld gesetzt ist, erscheint im Produkt als eigene Zeile mit
+Einzelpreis, Menge, Betrag und Quelle. In der Fortschreibung über den Betrachtungszeitraum wird
+CAPEX einmalig im Umsetzungsjahr gebucht, OPEX jährlich ab dem Umsetzungsjahr
+(`backend/app/services/cost_projection_service.py`). Mehr Parameter als die sechs oben gibt es
+nicht; was hier steht, ist nur mit diesen Feldern gerechnet.
+
+### 6.2 Die einschlägige Maßnahme: Entsiegelung
+
+Für die Wärmeinsel ist **Entsiegelung** (`DESEALING_SURFACE`, „Rückbau versiegelter Flächen“) die
+naheliegende Maßnahme, weil sie genau an der Größe ansetzt, die den Aufschlag im Rechenkern
+erzeugt: dem Versiegelungsgrad der Zelle (`SEALING_DEGREE`, Abschnitt 3.3). Der Maßnahmeneintrag
+liegt heute im geparkten Katalog (`backend/app/data/catalog_parked.py`) — passend dazu, dass Id 62
+im Produkt als geplante Klimawirkung der Stufe 1 geführt wird (Abschnitt 1). Seine Kostenparameter
+sind vollständig belegt und werden hier unverändert zitiert:
+
+| Parameter des Kostenmodells | Wert | Bedeutung | Quelle bzw. Abschätzung |
+|---|---|---|---|
+| `capex_fixed` | 0 (keine Pauschale) | mengenunabhängige Grundkosten | entfällt; die Maßnahme ist rein flächenbezogen |
+| `capex_per_unit` | nicht anwendbar (`None`) | Investition je Stück | entfällt; die Maßnahme kennt keine Stück-Logik (`unit_label` = `None`) |
+| `capex_per_m2` | **35 €/m²** | Aufbruch der Versiegelung, Entsorgung, Bodenlockerung, Begrünung | belegt: Sieker / bauindex-online 2026 (25–40 €/m² je Material), kommunale Förderprogramme (Bremen bis 40 €/m², Oberösterreich 30 €/m² pauschal); Punktwert im oberen Bereich der Spanne |
+| `opex_fixed_year` | nicht anwendbar (`None`) | feste Betriebskosten je Jahr | entfällt |
+| `opex_per_unit_year` | nicht anwendbar (`None`) | Betrieb und Unterhalt je Stück und Jahr | entfällt |
+| `opex_per_m2_year` | **0,50 €/m²/a** | Pflege der entsiegelten, begrünten Fläche | **Abschätzung von KAP3** (extensive Grünpflege); im Katalog als Modellannahme ausgewiesen |
+
+**Der Rahmen an einem Beispiel.** Entsiegelt eine Kommune einen Hektar — also eine 100-m-Zelle des
+Screening-Rasters (Abschnitt 3.1), 10.000 m² — ergibt das Kostenmodell:
+
+| Größe | Rechnung | Ergebnis |
+|---|---|---|
+| CAPEX, einmalig | 10.000 m² × 35 €/m² | **350.000 €** |
+| OPEX, je Jahr | 10.000 m² × 0,50 €/m²/a | **5.000 €/a** |
+
+Die beiden Beträge sind die **Kosten der Maßnahme**, keine Schadensgröße. Sie skalieren linear mit
+der tatsächlich entsiegelten Fläche; eine Kommune, die eine Teilfläche angeht, rechnet mit ihrem
+eigenen Quadratmeterwert weiter. Beide Zahlen sind im Produkt übersteuerbar: Liegen einer Kommune
+eigene Ausschreibungspreise vor, treten sie an die Stelle der Katalogwerte, und das Produkt weist
+den Wert dann als kommunale Übersteuerung aus.
+
+**Wo die Maßnahme im Screening ansetzt.** Die Zellkarte des Wärmeinsel-Aufschlags aus Abschnitt 3
+liefert die Rangfolge der Flächen: Dort, wo Versiegelungsgrad und Aufschlag am höchsten sind, ist
+der Quadratmeter Entsiegelung am wirksamsten. Was dieser Steckbrief bewusst **nicht** sagt, ist, wie
+viel Euro Schaden diese Entsiegelung vermeidet — diese Größe entsteht erst bei den nachgelagerten
+Klimawirkungen 95, 65 und 87 und wird dort gebucht, nicht hier.
+
+**Verwandte Maßnahme, nachrichtlich.** Derselbe geparkte Katalog führt mit `URBAN_GREEN`
+(„Stadtgrün“, Ausbau städtischer Grünflächen) eine zweite Maßnahme mit Wärmeinsel-Bezug; ihr Rahmen
+liegt bei 25 €/m² CAPEX und 3 €/m²/a OPEX (Quellen: Modellannahme, plausibilisiert an Institut für
+Stadtgrün (Semmler 2013) und Berliner Stadtbaumkampagne; Unterhalt belegt bei Semmler 2013). Sie
+ist hier nur genannt, nicht ausgearbeitet — der Steckbrief verlangt mindestens eine Maßnahme.
 
 ## 7 Parameter und Quellen
 
