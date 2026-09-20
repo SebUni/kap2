@@ -115,6 +115,39 @@ curl -s -o /dev/null -w "%{http_code}\n" -H "If-None-Match: $ET" \
   "http://localhost:8000/api/kommune/2/risk-summary"   # → 304
 ```
 
+## Tests ausführen
+
+Die Backend-Tests laufen **nicht** mit dem System-Python: `fastapi`, `numpy`,
+`sqlalchemy` und `shapely` sind dort nicht installiert, und jedes Testmodul, das
+eines dieser Pakete braucht, scheitert schon beim Einsammeln. Verbindlich ist
+deshalb für Entwickler und Prüfer `scripts/testlauf.sh`, aufgerufen aus dem
+Wurzelverzeichnis des Repos:
+
+```bash
+bash scripts/testlauf.sh backend/tests/test_kwra_querverbindungen.py -q
+bash scripts/testlauf.sh backend/tests/test_planned_risks.py -q
+bash scripts/testlauf.sh                 # ohne Argument: alle Tests unter backend/tests
+```
+
+Alles nach dem Skriptnamen geht unverändert an `pytest` (`-q`, `-k`, `-x`, …).
+Das Skript
+
+- legt die Python-Umgebung beim ersten Lauf unter `${KAP2_VENV:-$HOME/.venvs/kap2}`
+  an — **außerhalb** des Repos — und installiert dort `backend/requirements.txt`
+  plus `pytest`; danach installiert es nur nach, wenn sich die Prüfsumme von
+  `backend/requirements.txt` geändert hat;
+- legt nichts innerhalb des Arbeitsbaums an: Bytecode-Cache
+  (`PYTHONPYCACHEPREFIX`) und pytest-Cache (`cache_dir`) liegen in der Umgebung,
+  `git status --porcelain` ist nach dem Lauf unverändert;
+- setzt `backend/` auf den Importpfad. Damit ist das Arbeitsverzeichnis des
+  Aufrufs egal: Module, die direkt `app…` importieren, und Module, die den Pfad
+  selbst setzen, laufen beide. Ein blankes `python3 -m pytest` ist nicht
+  gleichwertig — dessen Ergebnis hängt vom Arbeitsverzeichnis ab.
+
+Eine andere Umgebung wählt man über `KAP2_VENV=/pfad/zum/venv bash scripts/testlauf.sh …`.
+Wer „kein Test läuft" meldet, nennt den vollständigen Befehl und das
+Arbeitsverzeichnis mit.
+
 ## Frontend prüfen
 
 Gilt für jede Abnahme eines Frontend-Pakets: Oberflächenänderungen werden nicht
