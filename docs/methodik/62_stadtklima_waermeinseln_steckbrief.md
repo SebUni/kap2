@@ -352,4 +352,37 @@ ist hier nur genannt, nicht ausgearbeitet — der Steckbrief verlangt mindestens
 
 ## 7 Parameter und Quellen
 
-<!-- Inhalt aus dem Folge-Teilpaket zu T-0405 dieses Vorhabens (T-0357). -->
+Diese Tabelle übernimmt die Parameter- und Belegzeilen aus dem Quellenblatt
+`docs/evidenz/62_steckbrief_quellen.md`, Abschnitt „Parameter“, unverändert in den Bericht (Vorgabe
+P1, `CLAUDE.md`). Je Zeile steht in der Spalte **Herkunft** entweder die zitierfähige Quellenangabe
+selbst oder — wo das Quellenblatt noch keine belegte Zahl führt — wörtlich das Wort „Abschaetzung“;
+die Spalte **Quelle** nennt das Dokument bzw. die Fundstelle, aus der die Herkunftsangabe stammt.
+Wo „Abschaetzung“ steht, ist die Herleitung in einer Fußnote direkt unter der Tabelle ausgeführt
+(P1: eine Herleitung nur als Code-Kommentar reicht nicht). Widersprüche zwischen Bericht und
+Quellenblatt gibt es an dieser Stelle nicht; wo das Quellenblatt selbst einen Wert als offen führt,
+wird das hier unverändert als offener Punkt ausgewiesen, nicht durch eine eigene Schätzung ersetzt.
+
+| Parameter | Wert | Einheit | Herkunft | Quelle |
+|---|---|---|---|---|
+| Gefahr Hitze (E02) als Eingangsgröße der Wirkungskette | qualitativ, kein Schwellenwert in der Arbeitsmappe hinterlegt | – | Klimawirkungsketten, Zeile 3 (Id E02, Name „Hitze“, Typ „Einfluss“) | `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt „Klimawirkungsketten“; deckungsgleich mit `hazard_names[0]` in `backend/app/data/catalog.py`, Zeile 319 |
+| Gefahr Sonnenscheindauer (E19) als Eingangsgröße der Wirkungskette | qualitativ, kein Schwellenwert in der Arbeitsmappe hinterlegt | – | Klimawirkungsketten, Zeile 20 (Id E19, Name „Sonnenscheindauer“, Typ „Einfluss“) | `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt „Klimawirkungsketten“; deckungsgleich mit `hazard_names[1]` in `backend/app/data/catalog.py`, Zeile 319 |
+| Sensitivität Grad der Versiegelung (S100) — Wirkstärke auf die Wärmeinsel-Intensität | offen, kein Zahlenwert in der Arbeitsmappe hinterlegt | – | Abschaetzung[^s100] | `docs/evidenz/62_steckbrief_quellen.md`, Abschnitt „Parameter“, Zeile „Sensitivität Grad der Versiegelung (S100)“ |
+| Sensitivität Begrünung von Städten/Siedlungen (S099) — Kühlwirkung | v_neu = 0,60 (Band 0,40–0,90, Stadtgrün); v_geb = 0,30 (Band 0,10–0,60, Dach-/Fassadengrün) | dimensionslos (Wirkfaktor) | Abschaetzung[^s099] | `docs/evidenz/register.md`, Register-ID 61-S099-01 |
+| Kopplung Stadtklima/Wärmeinseln → nachgelagerter Kühlenergiebedarf (Id 65) | offen, kein Zahlenwert recherchiert | – | Abschaetzung[^k65] | `docs/evidenz/62_steckbrief_quellen.md`, Abschnitt „Parameter“, Zeile „Kopplung an nachgelagerten Kühlenergiebedarf“ |
+| Bewertungsansatz / Kostensatz für Id 62 | „—“ (kein Kostensatz, da rein vorgelagert ohne eigene Buchung) | entfällt (kein Kostensatz) | Risiken-Monetarisierung, Zeile 67, Spalte „Bewertungsansatz / Kostensatz“ | `docs/Schadensbaum/KWRA-Monetarisierung.xlsx`, Blatt „Risiken-Monetarisierung“ |
+
+[^s100]: Für S100 liegt in der Arbeitsmappe kein Zahlenwert vor, und im Evidenz-Register
+(`docs/evidenz/register.md`) ist bislang kein Basiswert zu S100 für Id 62 hinterlegt. Der Wert ist
+für ein künftiges Fortsetzungspaket dieses Vorhabens zu erarbeiten, bevor daraus eine Formel
+entsteht (§3.9); dieser Steckbrief weist ihn deshalb als offenen Punkt aus statt eine unbelegte
+Zahl oder eine stille Null einzusetzen.
+
+[^s099]: Der Wert ist die für Klimawirkung 61 hergeleitete Abschätzung (Register-ID 61-S099-01),
+weil S099 laut Netzwerkliste (Zeilen 62–63) von den Risiken 61 und 62 gemeinsam genutzt wird. Er
+dient hier als Ausgangspunkt, ist aber laut Quellenblatt für Id 62 gesondert zu prüfen und nicht
+unbesehen zu übernehmen.
+
+[^k65]: Zur Kopplung zwischen Stadtklima/Wärmeinseln und dem Kühlenergiebedarf (Id 65) liegt
+bislang keine recherchierte Quelle vor; der Zusammenhang ist Voraussetzung für eine spätere
+Wirkungsfunktion Stadtklima → Kühlenergiebedarf und wird als offener Punkt für ein künftiges
+Fortsetzungspaket dieses Vorhabens geführt.
