@@ -99,6 +99,14 @@ def _lauf(tmp_path: Path, modus: str) -> tuple[int, str, list[str]]:
     produkt = tmp_path / "produkt"
     (produkt / "backend").mkdir(parents=True)
 
+    # Seit T-0425 legt der Schritt sein Alembic-Protokoll mit "mktemp $DEPLOY_TMP/..." an
+    # (vorher fest in $DEPLOY_TMP von deploy/test-deploy.sh selbst gesetzt, oberhalb dieses
+    # herausgeschnittenen Blocks). Die Werkbank hier schneidet nur den Block aus, nicht die
+    # Zeile, die DEPLOY_TMP definiert -- ohne eigenen Wert bricht "set -u" mit "unbound
+    # variable" ab, bevor alembic ueberhaupt aufgerufen wird.
+    deploy_tmp = tmp_path / "deploy-tmp"
+    deploy_tmp.mkdir()
+
     skript = tmp_path / "datenbank-schritt.sh"
     skript.write_text(RAHMEN.format(block=_datenbank_block()), encoding="utf-8")
 
@@ -114,6 +122,7 @@ def _lauf(tmp_path: Path, modus: str) -> tuple[int, str, list[str]]:
             "STUB_MODUS": modus,
             "STUB_PROTOKOLL": str(protokoll),
             "HOME": str(tmp_path),
+            "DEPLOY_TMP": str(deploy_tmp),
         },
     )
     aufrufe = [z for z in protokoll.read_text(encoding="utf-8").splitlines() if z.strip()]

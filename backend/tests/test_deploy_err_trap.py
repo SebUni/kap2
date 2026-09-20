@@ -57,7 +57,11 @@ def _funktionsblock() -> str:
     # zusaetzlich aufseher_zeile. Wird weiter unten ausgeschnitten, fehlen diese Helfer
     # in der Werkbank und der Lauf endet in "command not found" statt im Fehlerstatus.
     anfang = text.index("speicher_zeile() {")
-    ende = text.index("trap fehler_abbruch ERR") + len("trap fehler_abbruch ERR")
+    # Ab T-0442 nennt schon ein Kommentar vor dem Funktionsblock (Begruendung der
+    # Aufraeumlogik zu DEPLOY_TMP) die Zeichenkette "trap fehler_abbruch ERR" beilaeufig --
+    # text.index() faende dort die erste, viel zu fruehe Stelle und ende laege vor anfang
+    # (leerer Ausschnitt). Deshalb ab anfang weitersuchen, nicht vom Dateianfang.
+    ende = text.index("trap fehler_abbruch ERR", anfang) + len("trap fehler_abbruch ERR")
     return text[anfang:ende]
 
 
