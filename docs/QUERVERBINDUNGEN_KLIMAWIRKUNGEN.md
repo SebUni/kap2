@@ -1,4 +1,4 @@
-# Querverbindungen zwischen Klimawirkungen (KWRA 2021, Teilbericht 6, Kap. 3.4)
+# Querverbindungen zwischen Klimawirkungen (KWRA 2021, Teilbericht 6, Kap. 3.4 und Kap. 7)
 
 Analysedokument zu Quellenlage, Netzrollen und Modellgrenze der im Backend-Datenmodul
 `backend/app/data/kwra_querverbindungen.py` geführten Querverbindungen. Ergänzt die dortigen
@@ -8,33 +8,35 @@ Teil 2 = Auswertung je Produkt-Klimawirkung und Katalog-Endpunkt).
 ## Quellenlage
 
 Quelle ist ausschließlich UBA/BMU, „Klimawirkungs- und Risikoanalyse 2021 für Deutschland"
-(KWRA 2021), Teilbericht 6 (Integrierte Auswertung), Kapitel 3.4 „Vernetzung der Klimawirkungen",
-Dessau-Roßlau 2021 — abgelegt unter
-`docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`.
+(KWRA 2021), Teilbericht 6 (Integrierte Auswertung), Kapitel 3.4 „Analyse der Querverbindungen"
+(S. 82–88) sowie Kapitel 7 „Querbetrachtung der Systembereiche" (S. 146–154), Dessau-Roßlau 2021
+— abgelegt unter `docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`.
 
-Teilbericht 6 benennt für das KWRA-Wirkungsnetz **257 Querverbindungen** zwischen den 102
-Klimawirkungen insgesamt (im Durchschnitt rund 2,5 ein- oder ausgehende Beziehungen je
-Klimawirkung). Eine vollständige Liste aller 257 Einzelkanten veröffentlicht der Teilbericht
-jedoch in keinem der sechs Teilberichte: Abbildung 8 in Teilbericht 6 zeigt das Netz nur als
-Chord-Diagramm auf Handlungsfeldebene, aus dem sich keine exakten Kanten ablesen lassen. Belegt
-sind deshalb nur zwei Ausschnitte, die dieses Dokument und das zugrunde liegende Datenmodul
-wörtlich übernehmen:
+Teilbericht 6 benennt für das KWRA-Wirkungsnetz in Kapitel 3.4 (Kernaussagen S. 88) **257
+Querverbindungen** zwischen den 102 Klimawirkungen insgesamt (im Durchschnitt rund 2,5 ein- oder
+ausgehende Beziehungen je Klimawirkung). Eine vollständige Liste aller 257 Einzelkanten
+veröffentlicht der Teilbericht jedoch in keinem der sechs Teilberichte: Abbildung 8 (S. 83) zeigt
+das Netz nur als Chord-Diagramm auf Handlungsfeldebene, aus dem sich keine exakten Kanten ablesen
+lassen. Aus Kapitel 3.4 belegt sind deshalb nur zwei Ausschnitte, die dieses Dokument und das
+zugrunde liegende Datenmodul wörtlich übernehmen:
 
-1. die **Netzrollen** — 25 Klimawirkungen, die Kap. 3.4 ausdrücklich als starke Sender oder starke
-   Empfänger im Wirkungsnetz benennt (Abschnitt „Netzrollen");
-2. die im Fließtext von Kap. 3.4 **wörtlich genannten Einzelbeziehungen** (Auszug, 20 Einträge,
-   Abschnitt „Benannte Einzelbeziehungen").
+1. die **Netzrollen** — 25 Klimawirkungen, die Kap. 3.4 (S. 82–88) ausdrücklich als starke Sender
+   oder starke Empfänger im Wirkungsnetz benennt (Abschnitt „Netzrollen");
+2. die im Fließtext von Kap. 3.4 (S. 82–88) **wörtlich genannten Einzelbeziehungen** (Auszug,
+   20 Einträge, Abschnitt „Benannte Einzelbeziehungen").
 
-Zusätzlich belegt Tabelle 28 in Teilbericht 6 die Querverbindungen auf der Ebene der fünf
-Systembereiche (Abschnitt „Querverbindungen zwischen den Systembereichen"). Übertragen wurde die
-kuratierte Arbeitsmappe `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blätter „Klimawirkungen"
+Zusätzlich belegt **Tabelle 28** in **Kapitel 7** „Querbetrachtung der Systembereiche" (S. 153) die
+Querverbindungen auf der Ebene der fünf Systembereiche (Abschnitt „Querverbindungen zwischen den
+Systembereichen") — diese Tabelle steht damit außerhalb von Kap. 3.4, in einem eigenen späteren
+Kapitel des Teilberichts. Übertragen wurde die kuratierte Arbeitsmappe
+`docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blätter „Klimawirkungen"
 (Spalte „Netzrolle (TB 6 Kap. 3.4)") und „Wirkbeziehungen".
 
 ## Netzrollen
 
-Die 25 Klimawirkungen, die Teilbericht 6 Kap. 3.4 ausdrücklich als starke Sender
-(„stark ausgehend") oder starke Empfänger („stark eingehend") im Wirkungsnetz benennt
-(`app.data.kwra_querverbindungen.NETZROLLEN`).
+Die 25 Klimawirkungen, die Teilbericht 6 Kap. 3.4 „Analyse der Querverbindungen" (S. 82–88)
+ausdrücklich als starke Sender („stark ausgehend") oder starke Empfänger („stark eingehend") im
+Wirkungsnetz benennt (`app.data.kwra_querverbindungen.NETZROLLEN`).
 
 | KWRA-ID | Klimawirkung | Handlungsfeld | Rolle |
 |---|---|---|---|
@@ -70,8 +72,8 @@ Einzelbeziehungen, siehe unten) ausschließlich eingehende.
 
 ## Benannte Einzelbeziehungen
 
-Im Fließtext von Teilbericht 6 Kap. 3.4 wörtlich genannte Einzelbeziehungen (Auszug, nicht
-vollständig — `app.data.kwra_querverbindungen.BENANNTE_BEZIEHUNGEN`). Acht Beziehungen liegen auf
+Im Fließtext von Teilbericht 6 Kap. 3.4 „Analyse der Querverbindungen" (S. 82–88) wörtlich genannte
+Einzelbeziehungen (Auszug, nicht vollständig — `app.data.kwra_querverbindungen.BENANNTE_BEZIEHUNGEN`). Acht Beziehungen liegen auf
 Ebene einzelner Klimawirkungen, sieben auf gemischter Ebene (ein oder beide Enden ein
 Handlungsfeld mit mehreren Klimawirkungen) und fünf zwischen ganzen Handlungsfeldern.
 
@@ -100,7 +102,9 @@ Handlungsfeld mit mehreren Klimawirkungen) und fünf zwischen ganzen Handlungsfe
 
 ## Querverbindungen zwischen den Systembereichen
 
-Tabelle 28 aus Teilbericht 6 fasst die Querverbindungen auf Ebene der fünf Systembereiche zusammen
+Tabelle 28 aus Teilbericht 6, Kapitel 7 „Querbetrachtung der Systembereiche" (S. 153) — und damit
+außerhalb von Kap. 3.4, in einem eigenen späteren Kapitel des Teilberichts — fasst die
+Querverbindungen auf Ebene der fünf Systembereiche zusammen
 (`app.data.kwra_querverbindungen.SYSTEMBEREICH_MATRIX`). Rein vorgelagerte Klimawirkungen sind
 darin nicht enthalten; die Diagonale zählt Wirkbeziehungen innerhalb desselben Systembereichs,
 „Summe ausgehend" nur die Beziehungen zu den vier anderen Systembereichen.
@@ -143,9 +147,14 @@ kein vollständiges Kantenverzeichnis ist.
   formuliert; sie lassen sich nicht auf eine einzelne Klimawirkung als Quelle oder Ziel verengen,
   ohne den Wortlaut der KWRA zu überstimmen (`quelle_kwra_id`/`ziel_kwra_id` sind dort bewusst auf
   `None` gesetzt).
-- Die Systembereichs-Matrix (Tabelle 28) zählt Beziehungen zwischen Systembereichen, nicht zwischen
-  einzelnen Klimawirkungen; ein Rückschluss von der Matrix auf einzelne Steckbrief-Paare ist nicht
-  möglich.
-- Alle Angaben stammen ausschließlich aus Teilbericht 6, Kapitel 3.4 der KWRA 2021 (Bezugsjahr
-  2021); eine Aktualisierung des Wirkungsnetzes durch neuere KWRA-Ausgaben ist nicht Teil dieses
-  Dokuments.
+- Die Systembereichs-Matrix (Tabelle 28, Kap. 7, S. 153) zählt Beziehungen zwischen Systembereichen,
+  nicht zwischen einzelnen Klimawirkungen; ein Rückschluss von der Matrix auf einzelne
+  Steckbrief-Paare ist nicht möglich. Sie stammt aus einem eigenen, späteren Kapitel des
+  Teilberichts (Kap. 7 „Querbetrachtung der Systembereiche") und nicht aus Kap. 3.4 — beide
+  Kapitel werden hier bewusst getrennt referenziert, damit die Herkunft jeder Tabelle eindeutig
+  bleibt.
+- Alle Angaben stammen ausschließlich aus Teilbericht 6 der KWRA 2021 (Bezugsjahr 2021):
+  Netzrollen und benannte Einzelbeziehungen aus Kapitel 3.4 „Analyse der Querverbindungen"
+  (S. 82–88, Abbildung 8 auf S. 83, Kernaussagen S. 88), die Systembereichs-Matrix aus Kapitel 7
+  „Querbetrachtung der Systembereiche" (Tabelle 28, S. 153); eine Aktualisierung des
+  Wirkungsnetzes durch neuere KWRA-Ausgaben ist nicht Teil dieses Dokuments.
