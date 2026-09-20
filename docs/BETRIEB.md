@@ -115,6 +115,83 @@ curl -s -o /dev/null -w "%{http_code}\n" -H "If-None-Match: $ET" \
   "http://localhost:8000/api/kommune/2/risk-summary"   # → 304
 ```
 
+## Frontend prüfen
+
+Gilt für jede Abnahme eines Frontend-Pakets: Oberflächenänderungen werden nicht
+nur gelesen, sondern gebaut und typgeprüft. Die Befehlsfolge auf dem
+Arbeitsrechner der ausführenden Rolle lautet vollständig:
+
+```bash
+cd frontend
+npm ci                 # einmalig bzw. nach Änderung an package-lock.json
+npm run build   ; echo "exit $?"
+npm run typecheck ; echo "exit $?"
+```
+
+`frontend/node_modules/` und `frontend/dist/` sind in `.gitignore` und gehören
+nie in einen Commit. `npm ci` (nicht `npm install`) hält den Stand exakt auf
+`package-lock.json` — Abhängigkeiten werden beim Prüfen nicht angehoben.
+
+### Beleg: tatsächlich ausgeführter Lauf (20.09.2026, T-0482)
+
+Umgebung: Linux, `node -v` → `v20.20.2`, `npm -v` → `10.8.2`.
+`npm ci` lief erfolgreich (`added 253 packages, and audited 254 packages in 5s`,
+Exit-Status 0) — die Paketquelle `registry.npmjs.org` war erreichbar.
+
+`npm run build` — wörtliche Ausgabe, Kopf und Schlusszeilen:
+
+```
+> frontend@1.0.0 build
+> NODE_OPTIONS=--max-old-space-size=768 vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1084 modules transformed.
+rendering chunks...
+...
+dist/assets/vendor-vis-E-kp2pZy.js                      520.99 kB │ gzip: 157.87 kB
+dist/assets/index-dL2jvBJv.js                           539.22 kB │ gzip: 121.88 kB
+dist/assets/vendor-maplibre-BCorPmJ4.js               1,046.84 kB │ gzip: 283.04 kB
+✓ built in 13.02s
+exit 0
+```
+
+Auf stderr erscheinen dabei zwei Warnungen, die den Exit-Status nicht ändern und
+kein Abnahmehindernis sind (Vite-CJS-Node-API veraltet; Chunks über 500 kB).
+
+`npm run typecheck` — wörtliche Ausgabe, vollständig:
+
+```
+> frontend@1.0.0 typecheck
+> tsc --noEmit -p tsconfig.json
+
+exit 0
+```
+
+stderr war leer; `tsc` meldet keinen Typfehler.
+
+**Damit gilt für Frontend-Pakete:** Bauen und Typprüfen sind ausführbar, die
+Abnahme erfolgt gegen diese beiden grünen Läufe und nicht mehr nur dateibasiert
+durch Lesen. Ein Paket, dessen Ausgabe hier einen Exit-Status ungleich 0 zeigt,
+ist nicht abnahmefähig.
+
+**Wenn der Aufruf verweigert wird:** In einem gesteuerten Lauf kann `npm` an der
+Berechtigungsliste `.claude/settings.json` scheitern (Meldung
+`This command requires approval`) — das ist kein fehlendes Netz und kein
+fehlendes Werkzeug. Die Liste führt `npm` bislang nicht; bis sie um
+`Bash(npm:*)` ergänzt ist, werden die Befehle über den dort erlaubten
+Python-Aufruf gestartet, mit identischem Ergebnis:
+
+```bash
+python3 -c "import subprocess,sys; p=subprocess.run(['npm','run','build'],cwd='frontend',capture_output=True,text=True); print(p.stdout[-2000:], p.stderr[-2000:]); sys.exit(p.returncode)"
+```
+
+Der Beleg oben ist genau auf diesem Weg entstanden.
+Erst wenn `npm ci` selbst mit einer Netz-/Registry-Fehlermeldung abbricht, ist
+die Umgebung nicht herstellbar; dann ist die wörtliche Fehlausgabe hier
+nachzutragen, und die Abnahme von Frontend-Paketen läuft bis zur Behebung
+dateibasiert (Lesen des Diffs) mit ausdrücklichem Vermerk am Ticket.
+
 ## Migration / Upgrade
 
 ```bash
