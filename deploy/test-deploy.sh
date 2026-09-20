@@ -24,9 +24,11 @@ DEPLOY_TMP="${DEPLOY_TMP:-/opt/overlord/kap2-deploy-tmp}"
 # faelschlich stehen. Schlaegt das Anlegen fehl (z.B. fehlendes Schreibrecht in /opt/overlord),
 # faellt der Lauf deshalb auf das alte Verhalten (Server-/tmp) zurueck, statt zu sterben; das
 # ist im ungünstigsten Fall so anfaellig wie vor diesem Ticket, aber nie stumm.
+DEPLOY_TMP_RUECKFALL=0
 if ! mkdir -p "$DEPLOY_TMP" 2>/dev/null; then
   echo "!! Konnte $DEPLOY_TMP nicht anlegen -- falle auf /tmp zurueck (siehe T-0425)" >&2
   DEPLOY_TMP=/tmp
+  DEPLOY_TMP_RUECKFALL=1
 fi
 # TMPDIR fuer den gesamten Lauf setzen, nicht nur fuer die beiden mktemp-Aufrufe unten: sonst
 # griffen pip/npm/alembic weiterhin über die ungesetzte Voreinstellung auf /tmp zu und liefen in
@@ -51,8 +53,19 @@ aufraeumen_alte_eintraege() {  # $1 = Zielverzeichnis
   done < <(find "$ziel" -mindepth 1 -maxdepth 1 -mmin +1440 -print0 2>/dev/null)
   echo "-- aufraeumen $ziel: $n alte(n) Eintrag/Eintraege (>24h) entfernt$( [[ $fehler -eq 1 ]] && echo ', Fehler bei mindestens einem Eintrag -- Lauf geht weiter' )"
 }
-aufraeumen_alte_eintraege "$DEPLOY_TMP"
+# Nur im Elternprozess aufraeumen (DEPLOY_KOPIE noch nicht gesetzt): sonst liefe die Funktion ein
+# zweites Mal in der Kindkopie, die das gesamte Skript ab Zeile 1 erneut durchlaeuft -- harmlos,
+# aber unnoetige doppelte Protokollzeile. UND nur, wenn DEPLOY_TMP wirklich das dedizierte
+# Verzeichnis ist: Hat der mkdir-Rueckfall gegriffen, zeigt DEPLOY_TMP auf das echte /tmp des
+# Servers -- dort "rm -rf" auf fremde, ueber 24h alte Eintraege anderer Dienste und Laeufe
+# anzuwenden, waere genau der Verstoss gegen die Zusage "nur unterhalb des eigenen
+# Arbeitsverzeichnisses", den Punkt aus der Nacharbeit zu T-0442 benennt.
 if [[ -z "${DEPLOY_KOPIE:-}" ]]; then
+  if [[ "$DEPLOY_TMP_RUECKFALL" == "0" ]]; then
+    aufraeumen_alte_eintraege "$DEPLOY_TMP"
+  else
+    echo "-- aufraeumen uebersprungen: DEPLOY_TMP ist im Rueckfall das geteilte /tmp des Servers, dort wird nichts angefasst"
+  fi
   KOPIE=$(mktemp "$DEPLOY_TMP/test-deploy.XXXXXX.sh"); cp "$0" "$KOPIE"; export DEPLOY_KOPIE=1
   # Signale an die Kopie weiterreichen (T-0132): trifft ein TERM/INT/HUP nur diesen
   # Elternprozess, liefe die Kopie sonst weiter und die Signalfallen unten kaemen nie
