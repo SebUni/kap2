@@ -136,7 +136,12 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             },
         }
 
-    return {
+    # Untergrenzen-Kennzeichnung (UBA MK 4.0, Anforderung 25): Die projizierten
+    # Summen schreiben dieselben Wirkungskategorien fort wie die Basissumme — fehlt
+    # dort ein belegter Kostensatz, sind auch die Projektionswerte Untergrenzen.
+    lb = base["cost"].get("lower_bound")
+
+    out = {
         "years": years,
         "base_year_damages_eur": round(total_base, 2),
         "has_measures": bool(measure_rows),
@@ -156,3 +161,6 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
         "warnings": warnings,
         "source": proj.get("source"),
     }
+    if lb is not None:
+        out["lower_bound"] = lb
+    return out

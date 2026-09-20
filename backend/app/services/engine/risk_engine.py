@@ -24,7 +24,7 @@ wegen ``_PATHWAYS`` wirkungslos). Compound/Cascade sind als Hazards mit
 from __future__ import annotations
 
 from app.data import catalog
-from app.services.engine import override_context, tunables
+from app.services.engine import lower_bound, override_context, tunables
 
 CELL_AREA_KM2 = 0.01  # 100 m × 100 m Rasterzelle
 AGGREGATION_PERCENTILE = 90.0
@@ -344,10 +344,19 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
         2,
     )
 
+    # Untergrenzen-Kennzeichnung (UBA MK 4.0, Anforderung 25): Wirkungskategorien
+    # ohne belegten Kostensatz gehen mit 0 € in die Summe ein — der Betrag ist dann
+    # eine konservative Untergrenze und wird so ausgewiesen.
+    lb = lower_bound.lower_bound(
+        [r["code"] for r in by_risk if r["code"] not in catalog.NON_ADDITIVE_RISK_CODES])
+    cost_block: dict = {"total_eur": total_cost, "by_risk": by_risk}
+    if lb is not None:
+        cost_block["lower_bound"] = lb
+
     return {
         "risks": risk_out,
         "groups": groups,
-        "cost": {"total_eur": total_cost, "by_risk": by_risk},
+        "cost": cost_block,
         # Server-Wahrheit für die Frontend-Chips/Ringe: Grenzen + Labels der
         # Risikoklassen (abgeleitet aus model.risk_threshold, keine Hardcodes im UI).
         "classification": {

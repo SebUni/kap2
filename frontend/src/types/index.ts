@@ -552,11 +552,24 @@ export interface RiskGroupEntry {
   risk_codes: string[]
 }
 
+/**
+ * Untergrenzen-Kennzeichnung einer Euro-Summe (UBA MK 4.0, Anforderung 25):
+ * gesetzt, sobald mindestens eine einfließende Wirkungskategorie einen
+ * Kostensatz ohne Beleg trägt und deshalb mit 0 € in die Summe eingeht.
+ */
+export interface LowerBoundNote {
+  unsourced_categories: number
+  total_categories: number
+  categories: { code: string; name: string }[]
+  note: string
+}
+
 export interface RiskAggregate {
   risks: Record<string, RiskAggregateEntry>
   groups: Record<string, RiskGroupEntry>
   cost: {
     total_eur: number
+    lower_bound?: LowerBoundNote
     by_risk: {
       code: string; name: string; cost_eur: number; outcome: number
       outcome_unit: string; cost_dimension: string; index: number
@@ -576,6 +589,8 @@ export interface CostSummary {
   damages_base_eur: number
   damages_with_measures_eur: number
   damage_reduction_eur: number
+  /** Untergrenzen-Hinweis zu den Schadenssummen (UBA MK 4.0, Anforderung 25). */
+  lower_bound?: LowerBoundNote
   by_risk: RiskAggregate['cost']['by_risk']
   measures: {
     total_capex_eur: number
@@ -678,6 +693,9 @@ export interface CostProjection {
   assumptions: string[]
   warnings: string[]
   source?: string
+  /** Untergrenzen-Hinweis: gesetzt, wenn die fortgeschriebenen Kategorien
+   *  einen Kostensatz ohne Beleg enthalten (UBA MK 4.0, Anforderung 25). */
+  lower_bound?: LowerBoundNote
 }
 
 export const GROUP_ORDER: { key: GroupKey; label: string }[] = [

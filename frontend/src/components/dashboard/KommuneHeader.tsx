@@ -1,6 +1,6 @@
 import { useStore } from '../../store'
 import ChartSkeleton from './ChartSkeleton'
-import type { ClimateMetric } from '../../types'
+import type { ClimateMetric, LowerBoundNote } from '../../types'
 import { fmtEurCompact, fmtNum } from '../../utils/format'
 
 /** Kurzbezeichner je Klimametrik für die Chip-Zeile. */
@@ -52,6 +52,22 @@ function ClimateChip({ m }: { m: ClimateMetric }) {
         </span>
       )}
     </span>
+  )
+}
+
+/**
+ * Untergrenzen-Hinweis direkt unter der Euro-Summe (UBA MK 4.0, Anforderung 25):
+ * Wirkungskategorien ohne belegten Kostensatz gehen mit 0 € in die Summe ein —
+ * der ausgewiesene Betrag ist dann eine konservative Untergrenze. Der volle
+ * Begründungstext des Backends steht im Tooltip.
+ */
+function LowerBoundHint({ lb }: { lb?: LowerBoundNote }) {
+  if (!lb) return null
+  return (
+    <div className="hero-kpi-lower-bound" title={lb.note}>
+      ⚠ Konservative Untergrenze: {lb.unsourced_categories} von {lb.total_categories}{' '}
+      Wirkungskategorien ohne belegten Kostensatz (gehen mit 0 € ein)
+    </div>
   )
 }
 
@@ -155,6 +171,7 @@ export default function KommuneHeader({ className = '' }: { className?: string }
             {riskSummary ? `${fmtEurCompact(riskSummary.cost.total_eur)}/a` : '…'}
           </div>
           <div className="hero-kpi-sub">Summe aller monetarisierten Klimarisiken</div>
+          <LowerBoundHint lb={riskSummary?.cost.lower_bound} />
         </div>
         <div className="hero-kpi">
           <div className="hero-kpi-label">{proj ? proj.years[lastIdx] : 2065} ohne Maßnahmen</div>
@@ -162,6 +179,7 @@ export default function KommuneHeader({ className = '' }: { className?: string }
             {scen ? `${fmtEurCompact(scen.no_measures.annual[lastIdx])}/a` : '…'}
           </div>
           <div className="hero-kpi-sub">Projektion, Szenario RCP 4.5</div>
+          <LowerBoundHint lb={proj?.lower_bound} />
         </div>
         <div className="hero-kpi">
           <div className="hero-kpi-label">{proj ? proj.years[lastIdx] : 2065} mit Maßnahmen</div>
@@ -177,6 +195,7 @@ export default function KommuneHeader({ className = '' }: { className?: string }
               ? 'Noch keine Maßnahmen erfasst'
               : 'inkl. Maßnahmenkosten (CAPEX/OPEX)'}
           </div>
+          <LowerBoundHint lb={proj?.lower_bound} />
         </div>
       </div>
 
