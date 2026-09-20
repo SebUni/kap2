@@ -75,3 +75,55 @@ def lower_bound(risk_codes: Iterable[str]) -> dict | None:
         "categories": missing,
         "note": note,
     }
+
+
+#: Parameter-ID-Muster eines nutzergesetzten Kostensatzes (``parameter_registry``).
+_COST_RATE_PARAM_SUFFIX = ".cost_per_outcome"
+_COST_RATE_PARAM_PREFIX = "risks."
+
+
+def overridden_cost_rate_codes(db, kommune_id: int) -> set[str]:
+    """Wirkungskategorien, deren Kostensatz die Kommune selbst gesetzt hat.
+
+    Ein Override macht einen unbelegten Kostensatz **nicht** belegt: Der Wert ist
+    der Beleg der Kommune, nicht unserer. Er wird im Hinweistext zusätzlich
+    benannt (Entscheidung CEO, 20.09.2026). Fehlt die Datenbank oder schlägt die
+    Abfrage fehl, wird nichts behauptet (leere Menge).
+    """
+    try:
+        from app.services import parameter_registry
+
+        overrides = parameter_registry.load_db_overrides(db, kommune_id)
+    except Exception:  # Export/Kontext dürfen an der Zusatzangabe nicht scheitern
+        return set()
+    out: set[str] = set()
+    for o in overrides or []:
+        pid = str(o.get("parameter_id") or "")
+        if pid.startswith(_COST_RATE_PARAM_PREFIX) and pid.endswith(_COST_RATE_PARAM_SUFFIX):
+            out.add(pid[len(_COST_RATE_PARAM_PREFIX):-len(_COST_RATE_PARAM_SUFFIX)])
+    return out
+
+
+def qualifier_text(lb: dict | None, overridden_codes: Iterable[str] = ()) -> str | None:
+    """Der Qualifizierungstext zu einer Euro-Summe — wörtlich wie im Dashboard/API.
+
+    ``None``, wenn es nichts zu qualifizieren gibt (``lb`` ist ``None``). Sonst der
+    unveränderte ``note``-Text aus :func:`lower_bound`; tragen betroffene
+    Kategorien einen nutzergesetzten Kostensatz, folgt ein zusätzlicher Satz, der
+    das benennt.
+    """
+    if not lb:
+        return None
+    text = lb.get("note") or ""
+    ov = set(overridden_codes or ())
+    if not ov:
+        return text
+    betroffen = [c for c in (lb.get("categories") or []) if c.get("code") in ov]
+    if not betroffen:
+        return text
+    namen = ", ".join(c.get("name", c.get("code", "")) for c in betroffen)
+    return text + (
+        f" Bei {len(betroffen)} dieser Kategorien ({namen}) ist der Kostensatz "
+        f"vom Nutzer gesetzt (Override der Kommune); dieser Wert gilt weiterhin "
+        f"als unbelegt, weil er nicht durch eine Quelle des Modells gedeckt ist."
+    )

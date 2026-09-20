@@ -11,6 +11,24 @@ from sqlalchemy.orm import Session
 from app.data import catalog
 from app.models.models import AdaptationMeasure, MeasureImpact
 from app.services import measure_service
+from app.services.engine import lower_bound
+
+
+def _lower_bound_qualifier(db: Session, kommune_id: int) -> str | None:
+    """Qualifizierungstext zu den Euro-Summen dieser Kommune (T-0440-Zählung).
+
+    ``None``, wenn jede einfließende Wirkungskategorie einen belegten Kostensatz
+    trägt — dann ist nichts zu qualifizieren. Der Export darf an dieser Zusatz-
+    angabe nicht scheitern; bei fehlender Berechnung bleibt die Spalte leer.
+    """
+    try:
+        agg = measure_service.get_risk_aggregate(db, kommune_id, apply_measures=False)
+    except Exception:
+        return None
+    lb = (agg.get("cost") or {}).get("lower_bound")
+    return lower_bound.qualifier_text(
+        lb, lower_bound.overridden_cost_rate_codes(db, kommune_id)
+    )
 
 
 def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
@@ -35,8 +53,16 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
         "CAPEX (€)", "OPEX/Jahr (€)", "Nutzen/Jahr (€)",
         "Ø Risiko-Reduktion (Index-Pkt., Σ)",
         "Anzahl", "Einheit",
+        "Hinweis zur Nutzen-Summe (Untergrenze)",
     ]
     ws.append(headers)
+
+    # Untergrenzen-Kennzeichnung (UBA MK 4.0, Anforderung 25; T-0440): Der
+    # jährliche Nutzen ist eine vermiedene Schadenssumme über dieselben
+    # Wirkungskategorien wie die Basissumme. Fehlt dort ein belegter Kostensatz,
+    # geht die Kategorie mit 0 € ein — der Betrag ist dann eine Untergrenze und
+    # verlässt das Haus nur mit demselben Qualifizierungstext wie im Dashboard.
+    lb_note = _lower_bound_qualifier(db, kommune_id)
 
     for m in measures:
         geom_wkt = ""
@@ -75,6 +101,7 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
             round(total_didx, 2),
             count if count is not None else "",
             unit_label,
+            lb_note or "",
         ])
 
     # ── Sheet 2: Summary ──
@@ -84,6 +111,8 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
     ws2.append(["Gesamt-CAPEX (€)", sum(
         (m.impact_summary or {}).get("capex_eur", 0) for m in measures
     )])
+    if lb_note:
+        ws2.append(["Hinweis zu den ausgewiesenen Schadens-/Nutzensummen", lb_note])
 
     # Auto-width
     for ws_sheet in [ws, ws2]:

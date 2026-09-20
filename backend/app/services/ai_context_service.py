@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.models.models import AdaptationMeasure, Kommune
 from app.services import kommune_profile_service, measure_service
+from app.services.engine import lower_bound
 
 log = logging.getLogger("app")
 
@@ -126,6 +127,15 @@ def _risk_lines(db: Session, kommune_id: int) -> list[str]:
     total = cost.get("total_eur")
     if total is not None:
         lines.append(f"ERWARTETER SCHADEN GESAMT (ohne Maßnahmen): {_euro(total)}/Jahr")
+        # Untergrenzen-Kennzeichnung (UBA MK 4.0, Anforderung 25; T-0440): Der
+        # Assistent formuliert Sätze für den Nutzer — die Summe darf ihm nur mit
+        # demselben Qualifizierungstext vorliegen wie im Dashboard und in der API.
+        note = lower_bound.qualifier_text(
+            cost.get("lower_bound"),
+            lower_bound.overridden_cost_rate_codes(db, kommune_id),
+        )
+        if note:
+            lines.append(note)
 
     by_risk = [r for r in (cost.get("by_risk") or []) if (r.get("cost_eur") or 0) > 0]
     by_risk = by_risk[:8]  # Top-Kostentreiber; Liste ist bereits absteigend sortiert
