@@ -146,8 +146,94 @@ liefern beide Formen dieselbe Zahl; die Kopfzahl 11 stimmt mit der Ausgabe über
 | 9 | Abschnitte 5 und 6 (Z. 264–265, 271) · In einem durchgehend typografisch gesetzten Dokument stehen ASCII-Ersatzschreibungen ohne Umlaut: „Fehlende Groesse der Kernformel", „Diese Datenlage wuerde sie liefern", Überschrift „## 6 Massnahme". Formmangel im Kundenblick (P3, Leitfrage 11). | C | offen | Schreibweisen vereinheitlicht | `grep -n 'Groesse\|wuerde\|Massnahme' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md` | — |
 | 10 | Abschnitt 3.3 (Z. 183–185) · Der Bericht nennt die UHI-Parameterspanne „`uhi.alpha` bis `uhi.tree_cooling`". `parameter_registry.py` (Z. 294–297) führt elf Schlüssel; `tree_cooling` ist der sechste, die Spanne lässt `zeta`, `delta_night`, `night_weight`, `mean_factor` und `vent_ratio` aus — obwohl derselbe Absatz die Durchlüftungsdämpfung (`vent_ratio`) beschreibt (Leitfrage 10). | C | offen | Spannenangabe im Bericht auf den vollständigen Schlüsselsatz gebracht | `grep -n 'uhi_defaults' -A 4 backend/app/services/parameter_registry.py` | — |
 | 11 | Abschnitt 5 (Z. 264) · Als fehlende Kernformel-Größe ist allein der Preis benannt. Nach Abschnitt 2.3 bucht Id 62 überhaupt nichts, es gibt also weder ein Mengengerüst exponierter Einheiten noch eine physische Wirkungsrate für diese Klimawirkung; die Beschränkung auf den Preis ist im Bericht nicht begründet (Zuschnitt Kap. 3 Punkt 5: „Menge, Rate oder Preis"). | C | offen | Abschnitt 5 benennt alle fehlenden Größen oder begründet die Beschränkung auf den Preis | `grep -n 'Fehlende Groesse der Kernformel' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md` | — |
+| 12 | Kopplung der Maßnahme Entsiegelung an die Wärmebelastung · Methodischer Entscheid zu `DESEALING_SURFACE` (`catalog_parked.py`, Z. 944–962) gegenüber der Wirkbeschreibung in `catalog.py` (`_MEASURE_EFFECT_DOCS`, Z. 1943–1956). Verdikt, Doppelzählungsprüfung nach G13 und Berichtsfolge im Abschnitt „Befund 12" unter dieser Tabelle. | B | geschlossen (Entscheid, niedergelegt in diesem Ledger): Verdikt „Kopplung wird nicht ergänzt"; die Berichtsformulierung ist im Wortlaut vorgegeben und wird mit Befund 4 eingesetzt | Abschnitt „Befund 12" unten (vier Punkte: Stand, Verdikt, Doppelzählungsprüfung, Berichtsfolge) | `grep -n 'DESEALING_SURFACE' -A 4 backend/app/data/catalog_parked.py` (Sollzustand: `linked_risk_codes` ohne Wärmekennzahl) | — |
+
+Befund 12 ist mit seiner Niederschrift geschlossen und zählt deshalb nicht in die Kopfzahl der
+elf offenen Befunde; die Ausgabe des Kopf-Prüfbefehls bleibt unverändert 11.
 
 Kein Befund der Kategorie A: Die harten Sperren der Klasse B sind eingehalten — sieben
 Abschnitte in der vorgeschriebenen Reihenfolge, kein Euro-Betrag außerhalb der Maßnahmenkosten,
 kein Null-Betrag und kein leeres Feld, keine Schadensfunktion, keine Kalibrierung, keine
 Schadenskonten und keine Hochrechnung einer Größenordnung.
+
+### Befund 12 — Kopplung der Maßnahme Entsiegelung an die Wärmebelastung
+
+Entschieden am 20.09.2026 aus den offenen Fragen der Läufe zu T-0407 (Entwickler und Prüfer).
+Anlass ist Befund 4: Der Steckbrief führt die Entsiegelung als einschlägige Maßnahme gegen die
+Wärmeinsel, der Katalog kennt für diese Maßnahme keinen Wärme-Pfad. Dieser Befund entscheidet
+die Frage methodisch, bevor ein Feld angefasst wird; der Katalog wird von diesem Paket **nicht**
+geändert.
+
+**1. Der heutige Stand.** `DESEALING_SURFACE` steht in `backend/app/data/catalog_parked.py`
+(Eintrag Z. 944–962) mit
+`linked_risk_codes: ["HYDROLOGICAL_STRESS_RISK_INDEX", "EXPECTED_BUILDING_DAMAGE_EUR"]`
+(Z. 947) — also ohne jede Verknüpfung zu einer Wärme- oder Hitzekennzahl; die Wärmekennzahl
+`EXPECTED_THERMAL_STRESS_HOURS` (`catalog_parked.py`, Z. 486–493) trägt dort nicht. Die
+Wirkbeschreibung derselben Maßnahme in `backend/app/data/catalog.py`
+(`_MEASURE_EFFECT_DOCS["DESEALING_SURFACE"]`, Z. 1943–1956) nennt die Kühlwirkung dagegen
+ausdrücklich („Zusätzlich kühlt die Fläche und speist Grundwasser", Z. 1948–1949) und führt
+„die verknüpften Überflutungs-/Hitzerisiken" als Wirkziel des Reduktionsansatzes von 30 %
+(Z. 1949–1950). Katalogfeld und Wirkbeschreibung widersprechen einander: Das Feld kennt keinen
+Hitzepfad, der Text unterstellt einen. Im Rechenweg wirkt allein das Feld —
+`backend/app/services/measure_service.py` (Z. 578–580) multipliziert den Zellindex jedes in
+`linked_risk_codes` genannten Risikos mit dem Reduktionsfaktor, der Text wird nur angezeigt.
+
+**2. Verdikt: Kopplung wird nicht ergänzt.** Der Reduktionswert `default_reduction: 0.30` ist in
+`_MEASURE_EFFECT_DOCS` allein aus dem Abflussbeiwert hergeleitet (0,9 → 0,1–0,3 nach DWA-A 138);
+für die Wärmebelastung existiert im Produkt keine eigene hergeleitete Reduktionsrate, und der
+Katalog führt je Maßnahme nur **einen** Reduktionswert für alle verknüpften Risiken — eine
+Kopplung übertrüge also stillschweigend eine hydrologisch hergeleitete Zahl auf einen thermischen
+Index und verstieße gegen die Herleitungspflicht (G14, §3.9). Die Roadmap-Grundregel „kein Risiko
+ohne mindestens eine Maßnahme" drängt hier nicht: Auf `EXPECTED_THERMAL_STRESS_HOURS` wirken im
+geparkten Katalog bereits acht Maßnahmen, darunter `URBAN_GREEN` (Z. 1337–1340) und `COOL_ROOFS` (Z. 963–966), das
+Risiko ist also versorgt. Hinzu kommt die Doppelzählung nach Punkt 3, die vor einer Kopplung erst
+aufgelöst werden müsste. Der Entscheid ist revidierbar, sobald eine eigene, belegte
+Kühlwirkungsrate der Entsiegelung hergeleitet und der Nutzenwert bereinigt ist; er hält den
+Zustand nur so lange fest, wie beides fehlt.
+
+**3. Doppelzählungsprüfung nach G13 „Keine Wirkung über zwei Kanäle".** Ja — der Wert
+`benefit_per_m2_year: 5.0` enthält bereits einen Hitzenutzen: Seine Herleitung in
+`_MEASURE_EFFECT_DOCS` (`catalog.py`, Z. 1951–1955; Quellenlage der `source_details`
+Niederschlagswasserentgelt und Ökosystemleistung) setzt sich aus dem entfallenden
+Niederschlagswasserentgelt (1,84 €/m²·a, BWB Berlin) und Ökosystemleistungen nach TEEB DE
+zusammen, und die dort aufgezählten Leistungen sind wörtlich „Versickerung, **Kühlung**, Grün".
+Der Kühlanteil steckt damit heute monetarisiert im direkten Zusatznutzen, den
+`measure_service.py` (Z. 486) als `benefit_per_m2_year · Fläche` additiv zum Schadensnutzen
+führt. Würde die Maßnahme zusätzlich auf `EXPECTED_THERMAL_STRESS_HOURS` gekoppelt, entstünde der
+Hitzenutzen ein zweites Mal als vermiedener Schaden — diese Kennzahl trägt in `catalog.py`
+(Z. 957–964) einen Kostensatz von 400 €/Belastungsstunde und wird in
+`measure_service.py` zu einem Euro-Nutzen verrechnet: dieselbe physikalische Kühlwirkung über zwei
+Kanäle. Eine spätere Kopplung vermeidet die Doppelzählung nur so: Der Nutzenwert wird vorher auf
+den nicht-thermischen Anteil zurückgeschnitten (Niederschlagswasserentgelt plus Versickerungs- und
+Grünleistung, ohne Kühlanteil), die Kürzung wird in `source_details` mit Zahl und Begründung
+ausgewiesen, und der Wärmepfad bekommt eine eigene, aus Kühlwirkungsliteratur hergeleitete
+Reduktionsrate statt der hydrologischen 0,30. Solange diese Trennung nicht belegt ist, bleibt die
+Kopplung aus.
+
+**Was ein Folgepaket ändern müsste (nicht in diesem Paket).** Zwei Stellen, beide außerhalb des
+Dateirahmens dieses Pakets: (a) `backend/app/data/catalog.py`,
+`_MEASURE_EFFECT_DOCS["DESEALING_SURFACE"]["default_reduction"]` — die Formulierung „der
+verknüpften Überflutungs-/Hitzerisiken" behauptet einen Hitzepfad, den das Katalogfeld nicht
+trägt, und ist auf die tatsächlich verknüpften Risiken zurückzuführen; (b) falls der Entscheid
+später gedreht wird, `backend/app/data/catalog_parked.py`, Feld `linked_risk_codes` des Eintrags
+`DESEALING_SURFACE` (Z. 947) sowie die Felder `default_reduction` und `benefit_per_m2_year`
+(Z. 946, 949) nach Punkt 3.
+
+**4. Folge für den Steckbrief #62.** Ja, der Steckbrief muss seinen Verweis anpassen: Abschnitt
+6.2 von `docs/methodik/62_stadtklima_waermeinseln_steckbrief.md` nennt die Entsiegelung als „die
+einschlägige Maßnahme … für die Wärmeinsel", ohne offenzulegen, dass das Produkt für diese
+Maßnahme keine Wirkung auf eine Wärmekennzahl rechnet. Anzupassen ist Abschnitt 6.2 durch einen
+zusätzlichen Absatz am Ende des Abschnitts, mit genau dieser Formulierung:
+
+> **Was das Produkt für diese Maßnahme heute nicht rechnet.** Im Katalog ist die Entsiegelung
+> allein mit dem hydrologischen Belastungsindex und dem erwarteten Gebäudeschaden verknüpft, nicht
+> mit einer Wärme- oder Hitzekennzahl. Dieser Steckbrief nennt die Maßnahme deshalb wegen ihres
+> Ansatzpunkts am Versiegelungsgrad und wegen ihres Kostenrahmens; eine im Produkt gerechnete
+> Wirkung auf die Wärmebelastung behauptet er nicht.
+
+Damit behauptet der Bericht keine Produktkopplung, die im Katalog nicht besteht. Eingesetzt wird
+der Absatz nicht hier, sondern in dem Paket, das Befund 4 abarbeitet: Jede Einfügung in den
+Steckbrief verschiebt dessen Zeilennummern, und die Zeilenverweise samt Euro-Prüfausdrücken der
+Gegenprüfung oben werden dann in einem Zug nachgezogen statt zweimal. Befund 4 bleibt bis dahin
+offen; dieser Befund liefert dafür die Entscheidungsgrundlage, schließt den Zweig „Verknüpfung im
+Katalog ergänzt" aus und gibt den Wortlaut des verbleibenden Zweigs vor.
