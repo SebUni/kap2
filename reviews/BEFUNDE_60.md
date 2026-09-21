@@ -4251,3 +4251,222 @@ Tabellen-Nummernspalten und alle „Befund <n>"-Nennungen), neu vergeben sind de
   wurden nicht geöffnet.
 - **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
   T-0359).
+
+### Konvergenz-Verdikt Runde 3
+
+Abschlusspaket T-0392 der Runde 3 (21.09.2026; ersetzt T-0382 inhaltsgleich, nur wegen der
+Reihenfolge). **Dieses Paket beantwortet keine Leitfrage neu, prüft keinen Befundstatus neu und
+behebt keinen Befund.** Es liest die vier Bedingungen des Konvergenzkriteriums nach §5.4 der Aufgabe
+(`docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` Z. 479–489) aus den in dieser Runde bereits
+geschriebenen Unterabschnitten ab — Eröffnungsabschnitt 0/0.1, die Leitfragen-Pakete und die acht
+Unterabschnitte „Befundregression Teil 1" bis „Teil 8" — und zieht die Zählung aus dem Ledger.
+Alle Zeilenangaben beziehen sich auf diese Datei im Stand zu Laufbeginn. Der Bericht wurde für
+dieses Paket nicht gelesen.
+
+**Befundnummern.** Höchste zu Laufbeginn im Ledger vorhandene Nummer: **104** (über alle
+„Befund <n>"-Nennungen und alle Tabellen-Nummernspalten ermittelt); die erste neue Nummer wäre
+damit **105**. Dieses Paket vergibt **keine** neue Nummer — es erhebt nichts, was ein Befund sein
+könnte. Die im Ticketschnitt genannte Ausgangszahl 47 ist durch die seither freigegebenen Pakete
+dieser Runde überholt.
+
+#### (a) Die vier Aussagen nach §5.4
+
+- **1. Alle deterministischen Lints grün: ja.** Beleg: Unterabschnitt „### 0.1 · Deterministisches
+  Lint-Ergebnis vom 18.09.2026" (Z. 2232–2252). Dort steht die wörtliche Ausgabe von
+  `python3 backend/scripts/lint_methodik.py 60` mit „162 Checks grün" und „ALLE LINTS GRÜN"
+  (Z. 2244/2247) und der gemessene Rückgabewert `0` (Z. 2250). Kein Folgepaket der Runde weist eine
+  abweichende Ausgabe aus; alle übernehmen dieses Ergebnis nach §5. Einschränkung, die zur Aussage
+  gehört, ohne sie zu ändern: Die **Reichweite** des Lints ist als Befund geführt — Befund 17
+  („unvollständig geschlossen", Befundregression Teil 2, Z. 3286) und der neue Befund 71
+  (Befundregression Teil 1, Z. 3295: eine stumm übersprungene Prüfung bei grüner Gesamtmeldung).
+  Grün ist also gemessen, aber nicht gleichbedeutend mit vollständig geprüft.
+- **2. Alle 14 Leitfragen mit explizitem Verdikt beantwortet: ja.** Jede der 14 Leitfragen trägt in
+  dieser Runde genau ein ausdrückliches Verdikt; 13 lauten „Befund", eines „bestanden". Belege
+  einzeln:
+
+  | LF | Verdikt | Unterabschnitt dieser Runde (Überschrift, Zeile) | Verdiktzeile |
+  |---|---|---|---|
+  | 1 | **Befund** (47, 48, 49) | „### Leitfragen 1 und 2" (Z. 2258) | Z. 2293 |
+  | 2 | **bestanden** (Prüfumfang Kap. 1 und Kap. 2 Teil A) | „### Leitfragen 1 und 2" (Z. 2258) | Z. 2384 |
+  | 3 | **Befund** (57) | „### Leitfragen 3 und 13" (Z. 2607) | Z. 2660 |
+  | 4 | **Befund** (79, 80, 81) | „### Leitfrage 4" (Z. 3488) | Z. 3521 |
+  | 5 | **Befund** (66, 67, 68) | „### Leitfrage 5 — Modifikatoren und Wirkungsabschätzung S092" (Z. 3099, Reihenfolgeplatz 7) | Z. 3114 |
+  | 6 | **Befund** (58, 59, 60) | „### Leitfragen 6 und 8" (Z. 2791) | Z. 2854 |
+  | 7 | **Befund** (63, 64, 65, 87, 88, 89) | „### Leitfrage 7 — Teil 2: Parameterblock 4.8 und Gesamtverdikt" (Z. 3832, Reihenfolgeplatz 15) | Gesamtverdikt Z. 3961–3974 |
+  | 8 | **Befund** (61, 62) | „### Leitfragen 6 und 8" (Z. 2791) | Z. 2889 |
+  | 9 | **Befund** (82) | „### Leitfrage 9" (Z. 3602) | Z. 3688 |
+  | 10 | **Befund** (50, 51, 52) | „### Leitfragen 10 und 14" (Z. 2447) | Z. 2483 |
+  | 11 | **Befund** (92, 93, 94, 95) | „### Leitfrage 11 — Form und Erklärbarkeit" (Z. 3996, Reihenfolgeplatz 17) | Z. 4010 |
+  | 12 | **Befund** (83, 84, 85, 86) | „### Leitfrage 12 — Umsetzbarkeit und Parameter-Blöcke" (Z. 3721, Reihenfolgeplatz 14) | Z. 3742 |
+  | 13 | **Befund** (54, 55) | „### Leitfragen 3 und 13" (Z. 2607) | Z. 2701 |
+  | 14 | **Befund** (53) | „### Leitfragen 10 und 14" (Z. 2447) | Z. 2560 |
+
+  Zur **Leitfrage 7** ausdrücklich: Maßgeblich ist das **Gesamtverdikt** im Unterabschnitt vom
+  Reihenfolgeplatz 15 (Z. 3832), das Teil 1 und Teil 2 zusammenführt und selbst feststellt: „Damit
+  ist Leitfrage 7 in Runde 3 genau einmal verdiktiert, nämlich hier" (Z. 3973–3974). Der Zwischeneintrag
+  im Unterabschnitt „### Leitfrage 7 — Teil 1: Verteilungsannahmen und Sanity-Band" (Z. 2989) ist
+  hier **nicht** als zweites Verdikt gezählt. Die acht Unterabschnitte „Befundregression Teil 1" bis
+  „Teil 8" (Z. 3210, 3268, 3325, 3381, 3437, 4071, 4133, 4193) geben erklärtermaßen **kein**
+  Leitfragen-Verdikt ab; 2 + 2 + 2 + 2 + 1 + 1 + 1 + 1 + 1 + 1 = 14 verteilt auf die zehn
+  Leitfragen-Unterabschnitte.
+- **3. Neue A- oder B-Befunde in dieser Runde: ja.** In Runde 3 sind die Nummern **47 bis 104** neu
+  vergeben — 58 Befunde, davon **null A**, **26 B** (47, 49, 53, 54, 55, 57, 58, 59, 61, 63, 64, 66,
+  67, 73, 79, 83, 84, 87, 88, 92, 93, 94, 96, 97, 99, 100) und **32 C** (48, 50, 51, 52, 56, 60, 62,
+  65, 68, 69, 70, 71, 72, 74, 75, 76, 77, 78, 80, 81, 82, 85, 86, 89, 90, 91, 95, 98, 101, 102, 103,
+  104). Belegt sind sie in den Tabellen „Neue Befunde dieses Pakets" der Leitfragen-Pakete
+  (Z. 2436–2438, 2595–2598, 2779–2782, 2955–2959, 3075–3077, 3184–3186, 3579–3581, 3696, 3796–3799,
+  3948–3950, 4055–4058) und der acht Regressionspakete (Z. 3236–3237, 3295–3297, 3351–3352,
+  3410–3412, 3465–3466, 4102–4104, 4164–4165, 4223–4226). Übernommen, nicht neu erhoben.
+- **4. Null-Runde: nein.** Eine Null-Runde verlangt nach §5.4 Ziffer 3 **null** neue A- oder
+  B-Befunde einer frischen Review-Session über das vollständige Bundle. Diese Runde hat 26 neue
+  B-Befunde; damit ist die dritte Bedingung nicht erfüllt. Die Bedingungen 1 und 2 sind erfüllt, die
+  Bedingung 4 („Abnahmekriterien erfüllt", §5.4 Z. 484–489) ist mit 77 verbliebenen B-/C-Befunden
+  ebenfalls nicht erfüllt. **Folge nach §5.4/§6: Die Runde 3 konvergiert nicht.** Das ist das
+  Ergebnis der Vorgängerpakete, nicht eine Feststellung dieses Pakets.
+
+#### (b) Vorbedingung aus Schritt 0 von `/integriere-risiko`
+
+Schritt 0 von `.claude/commands/integriere-risiko.md` bricht ab, wenn **offene A-Befunde** vorhanden
+sind **oder** das **dokumentierte Konvergenz-Verdikt** fehlt. Die beiden Sätze dazu:
+
+**Offene A-Befunde: null.** Alle zehn je vergebenen A-Befunde (1, 2, 3, 4, 5, 20, 32, 33, 34, 40)
+tragen im Ledger den Status „behoben"; die Regression dieser Runde hat diesen Status ausdrücklich
+nicht angetastet („Die Status der Befunde 31 bis 34 selbst bleiben unberührt", Z. 3475; „Die Status
+der Befunde 39 bis 42 selbst bleiben unberührt", Z. 4177), und die Restmängel, die sie bei 34 und 40
+festgestellt hat, sind als **neue Befunde der Kategorien C und B** verbucht (91 in Z. 3466, 99 und
+100 in Z. 4164–4165), nicht als Wiedereröffnung eines A-Befunds; auch in Runde 3 ist kein neuer
+A-Befund entstanden (Aussage 3 oben). **Konvergenz-Verdikt dokumentiert: ja** — es steht in diesem
+Unterabschnitt, abgelesen aus den Unterabschnitten der Runde 3, und es lautet „keine Null-Runde";
+damit ist der Text vorhanden, den Schritt 0 verlangt, sein Inhalt aber negativ. Ob die Integration
+daraus startet oder nicht, entscheidet **T-0248** und nicht dieses Paket; eine Integrationsfreigabe
+wird hier ausdrücklich **nicht** erteilt.
+
+#### (c) Fall „Null-Runde nein bei null offenen A-Befunden": Bewertung der B- und C-Befunde
+
+Weil genau dieser Fall eingetreten ist, folgt die einzelne Bewertung jedes verbliebenen B- und
+C-Befunds. **Verblieben** heißt hier: entweder ein Altbefund, den die Befundregression dieser Runde
+**nicht** als „bestätigt geschlossen" beurteilt hat (Urteile übernommen aus den acht
+Regressionsabschnitten, nicht neu erhoben), oder ein in dieser Runde neu vergebener Befund 47–104.
+Das sind **19 Altbefunde** (11, 12, 17, 21, 22, 24, 25, 27, 29, 30, 31, 35, 37, 38, 41, 43, 44, 45,
+46) und **58 neue**, zusammen **77**. Nicht mehr enthalten sind die acht in dieser Runde als
+„bestätigt geschlossen" beurteilten Altbefunde 6, 13, 23, 26, 28, 36, 39 und 42 sowie die
+A-Befunde. Bewertet wird je Nummer nur, **ob** sie den Modellkern (Knotenmenge, Formelstellen,
+Kalibrier- und Validierungsarchitektur, Konto-Abgrenzung), eine **Modellzahl** (rechnender Wert,
+Band oder Schwelle), eine **Formel** (Ausdruck oder Formelzeichen) oder den **Produktionscode**
+(Dateien unter `backend/`) berührt — mit je einer Fundstelle. Es wird kein Befundstatus und keine
+Kategorie neu geprüft.
+
+| Nr | Kat. | Berührt | Fundstelle (eine je Befund) |
+|---|---|---|---|
+| 11 | B | keines der vier — Quellenführung/Fundstellenangabe | Bericht Kap. 8 „Quellen (§3.8)" ab Z. 2326 (Regression Teil 1, Z. 3228) |
+| 12 | B | Modellzahl, nur in der Kennzeichnung (Preisstandjahr/\(n_t\)), nicht im Wert | Bericht Kap. 1 „Konto-Einbettung" Z. 133–139 (Regression Teil 1, Z. 3229) |
+| 17 | C | Code, aber Prüfskript statt Produktionspfad: `backend/scripts/lint_methodik.py` | Pflichtkapitel-Check Z. 258–292 dieses Skripts (Regression Teil 2, Z. 3286) |
+| 21 | C | Modellkern — Knotennamen der Bilanz ohne sichtbare Modellgrenze | Bericht Kap. 1 Knoten-Bilanz Z. 85/100/101 (Regression Teil 2, Z. 3288) |
+| 22 | B | keines der vier — Kopf-Status- und Prüfstandsangabe des Berichts | Bericht Kopf-Statuszeile Z. 3 (Regression Teil 2, Z. 3289, „zurückgefallen") |
+| 24 | C | Formel — Darstellung \(\text{EAD} = \bar A \cdot w\) und ihre Bezugsebene | Bericht §3.1 Z. 545–548 (Regression Teil 3, Z. 3343) |
+| 25 | C | Formel — Vollständigkeit der Zeichentabelle | Bericht §3.5 Z. 750–789, Anspruchssatz Z. 752 (Regression Teil 3, Z. 3344) |
+| 27 | C | Modellzahl — Fortschreibungsschritte des Kostensatzes 60-R24-01 | Bericht Kap. 2 Z. 193 und Langbeleg B4 Z. 357–367 (Regression Teil 4, Z. 3401) |
+| 29 | C | keines der vier — Studientyp-Einordnung der Evidenz zu S092 | Bericht Kap. 2, Registerzeile 60-S092-01 Z. 186 (Regression Teil 4, Z. 3403) |
+| 30 | C | Modellkern — typunabhängige Stützstellen \(d(h)\) trotz typabhängiger Evidenz | Bericht §3.3 Z. 587–600 gegen 60-S093-01 Z. 187 (Regression Teil 4, Z. 3404) |
+| 31 | C | Modellzahl — Zentralwert \(p_3\) und sein Band | Bericht Kap. 2, Registerzeile 60-W085-01 Z. 164 (Regression Teil 5, Z. 3456) |
+| 35 | B | Modellzahl — Sanity-Grenzen \(U\) = 0,0103 und \(O\) = 6,29 | Bericht §4.6 Z. 1362/1363 (Regression Teil 6, Z. 4093) |
+| 37 | B | Modellzahl — Parameterzeilen des §4.8 (P1-Tabelle) | Bericht §4.8 Z. 1459–1474 (Regression Teil 6, Z. 4095, „zurückgefallen") |
+| 38 | C | Modellzahl — Preisstandfaktor \(\pi\) = 1,07 (1,04–1,11) | Bericht §4.2 Z. 1093 und Z. 1120–1121 (Regression Teil 6, Z. 4096) |
+| 41 | B | Modellzahl — \(f_{\text{AWM}}\) = 0,55 und die Ergebnis-Sensitivität in §7.2 | Bericht §7.2 Z. 2262 (Regression Teil 7, Z. 4157) |
+| 43 | C | keines der vier — Zellgenauigkeit der Quellenangabe | Bericht §7.1 Z. 2195–2204, dort Z. 2197 (Regression Teil 8, Z. 4214) |
+| 44 | C | Modellzahl mittelbar — Bauform-Modellgrenze der P2-Abschätzung S094 | Bericht Kap. 6 Z. 1805–1809 (Regression Teil 8, Z. 4215) |
+| 45 | C | keines der vier — Aufwandskriterium des Kriterienrasters | Bericht Kap. 9 Z. 2464 (Regression Teil 8, Z. 4216) |
+| 46 | B | Modellkern — Kanalzuordnung S074/R17 (Kein-Doppelkanal) | Bericht Kap. 1 Knoten-Bilanz Z. 85/86 (Regression Teil 8, Z. 4217) |
+| 47 | B | Modellkern — Formelstellen-Zuordnung des Knotens S104 | Bericht Kap. 1, Knoten-Bilanz Z. 107 (Z. 2436) |
+| 48 | C | Modellkern — benannte Formelstellen gegen die Bilanzzeilen | Bericht Kap. 1, Präambel Z. 69–74 gegen Z. 85/86 (Z. 2437) |
+| 49 | B | Modellkern — 25 von 32 Registerzeilen ohne Entscheidung | Bericht Kap. 2 Teil A, Registertabelle Z. 165–195 (Z. 2438) |
+| 50 | C | keines der vier — Fundstellenbereiche der Quellen 1 und 2 | Bericht Kap. 8, Quelle 1 Z. 2333–2341 (Z. 2595) |
+| 51 | C | keines der vier — Archiv-Snapshots der Belege in Kap. 2 Teil B | Bericht Kap. 2 Teil B, B1 Z. 222–227 (Z. 2596) |
+| 52 | C | keines der vier — veraltete Prüfstandsangabe in einer Überschrift | Bericht Kap. 2, Überschrift Teil B Z. 197 (Z. 2597) |
+| 53 | B | Modellzahl — Basiswertwahl Neuwert gegen Zeitwert (Mon. J64) | Bericht Kap. 2 Teil B, B4 Z. 383–389 (Z. 2598) |
+| 54 | B | Formel — \(f_{\text{AWM}}\) fehlt in der Zeichentabelle | Bericht §3.5 Z. 750–789 gegen §3.4 Z. 689–692 (Z. 2779) |
+| 55 | B | Formel — Herkunftszuordnung der Zeichen \(d_1/d_5\), \(f_{S093}/f_{S094}\) | Bericht §3.5 Z. 771 und Z. 773 (Z. 2780) |
+| 56 | C | Formel — Reihenfolge der 28 Zeilen der Zeichentabelle | Bericht §3.5 Z. 762–789 (Z. 2781) |
+| 57 | B | Formel — Betrachtungsebene der EAD-Formel gegen §3.6 | Bericht §3.1 Z. 541–548 gegen §3.6 Z. 797 (Z. 2782) |
+| 58 | B | Modellzahl — Wertsatz 527.280 €₂₀₂₆ der \(M_0\)-Bandtabelle | Bericht §4.3 Z. 1138–1139 (Z. 2955) |
+| 59 | B | Modellzahl — abgelöster Anker \(A^{*}\) = 0,985 statt 1,132 | drei Stellen im Prüfumfang, Entscheidungslog Nr. 8 Z. 2513 (Z. 2956) |
+| 60 | C | Modellzahl — \(\pi\) = 1,07 aus 1,105 abzüglich 3 % | Bericht §4.2 Z. 1119–1121 (Z. 2957) |
+| 61 | B | Modellkern und Modellzahl — Plausibilitätsschranke \(\lambda\) (Zirkelschluss) | Bericht §4.4 Z. 1240–1258 (Z. 2958) |
+| 62 | C | Modellzahl — Rechenweg \(\lambda_{\text{unten}}/\lambda_{\text{oben}}\) | Bericht §4.4 Z. 1248–1249 (Z. 2959) |
+| 63 | B | Modellkern — Verteilungsprüfung ohne Quantilvergleich | Bericht §4.5 Z. 1271–1286 und Z. 1341–1349 (Z. 3075) |
+| 64 | B | Modellzahl — Sanity-Obergrenze \(O\) = 6,29 nicht modellunabhängig | Bericht §4.6 Z. 1363 (Z. 3076) |
+| 65 | C | Modellzahl — Regime-Anteile 66,1/23,2/10,6 und Differenz 13,9 Pp | Bericht §4.5 Z. 1319–1325 (Z. 3077) |
+| 66 | B | Modellzahl — Bandzuordnung des Ankerwerts in §5.1.3 | Bericht §5.1.3 Z. 1697–1717 (Z. 3184) |
+| 67 | B | Modellzahl — Referenzzustand \(q_0\) ohne Zahlenwert | Bericht §5.1.2 Z. 1635–1638 (Z. 3185) |
+| 68 | C | keines der vier — Sichtbarkeit der Hebel-Kandidaten (nur HTML-Kommentar) | Bericht Kap. 5, HTML-Kommentar Z. 1576–1582 (Z. 3186) |
+| 69 | C | keines der vier — Zeilenbereich der Quelle 1 deckt Z272 nicht ab | Bericht Kap. 8, Quelle 1 Z. 2339 (Z. 3236) |
+| 70 | C | Modellzahl in der Kennzeichnung — Preisstandjahr, überholte Ersetzungsbedingung | Bericht Kap. 1 Z. 136–138 (Z. 3237) |
+| 71 | C | Code — Prüfskript `backend/scripts/lint_methodik.py`, stumm übersprungene Prüfung | Ausgabeblock Z. 952–959 und `registry_abgleich()` Z. 296–301 (Z. 3295) |
+| 72 | C | Modellkern — Knotennamen weichen von der Arbeitsmappe ab, ohne Modellgrenze | Bericht Kap. 1, Knoten-Bilanz Z. 85/100/101 (Z. 3296) |
+| 73 | B | keines der vier — Kopf-Statuszeile und Offen-Punkt des Berichts | Bericht Z. 3 und Z. 35 (Z. 3297) |
+| 74 | C | Formel — physischer Teil-Ausweis und seine Bezugsebene | Bericht §3.1 Z. 545–548 (Z. 3351) |
+| 75 | C | Formel — Vollständigkeitsanspruch und Zeichenkollision bei \(t\) | Bericht §3.5 Z. 752 (Z. 3352) |
+| 76 | C | Modellzahl — Jahresschritte der Kostensatz-Fortschreibung ohne Modellgrenze | Bericht Kap. 2 Z. 193, Langbeleg B4 Z. 357–367 (Z. 3410) |
+| 77 | C | keines der vier — Studientyp-Widerspruch 60-S092-01 gegen B5 | Bericht Kap. 2, Z. 186 gegen Z. 409–410 (Z. 3411) |
+| 78 | C | Modellkern — strukturabhängige Evidenz nicht in die Stützstellen durchgezogen | Bericht Kap. 2 Z. 187 gegen §3.3 Z. 587–600 (Z. 3412) |
+| 79 | B | Formel und Modellzahl — Gewicht \((2024-t+1)/23\) in einer bezifferten Modellgrenze | Bericht §4.7 Z. 1400–1405 und Z. 1416–1426 (Z. 3579) |
+| 80 | C | Modellkern — Wirkungsort des Hebels S092 (Schadensgrad gegen §5.1) | Bericht Kap. 9, Kriterienraster Z. 2462 (Z. 3580) |
+| 81 | C | Modellkern — Zwei-Kanäle-Risiko des Ergänzungsmoduls nicht ausgeschlossen | Bericht Kap. 9 Z. 2490–2492 (Z. 3581) |
+| 82 | C | Modellzahl in der Kennzeichnung — Wertsatz GEBAEUDEWERT dreifach verschieden gekennzeichnet | Bericht §3.2 Z. 563 (Z. 3696) |
+| 83 | B | Modellzahl — neun der 15 rechnenden §4.8-Parameter ohne Block | Bericht Kap. 7 Kopf Z. 1845 gegen §4.8 Z. 1459–1475 (Z. 3796) |
+| 84 | B | Modellzahl — `band: null` bei `wert: 0.1` im Block `flood_bldg.p_hq_haeufig` | Bericht Kap. 7 Z. 1971–1983 (Z. 3797) |
+| 85 | C | Modellzahl in der Kennzeichnung — Vorläufigkeitsgrund des \(\lambda\)-Blocks | Bericht Kap. 7 Z. 2178 (Z. 3798) |
+| 86 | C | Modellzahl in der Kennzeichnung — Status der Blöcke `f_s093`/`f_s094` | Bericht Kap. 7 Z. 2069–2081 und Z. 2083–2095 (Z. 3799) |
+| 87 | B | Produktionscode — die Kalibrierung von #60 existiert unter `backend/scripts/kalibrierung/` nicht | Bericht §4.8 Z. 1461–1475 gegen den grep jener Sitzung (Z. 3948) |
+| 88 | B | Modellzahl und Code — elf ergebnistragende Größen nur im Testblock/Code-Kommentar | Bericht §4.8, Testblock Z. 1485–1487 (Z. 3949) |
+| 89 | C | Modellzahl — Klassenraten-Fundstelle ohne Spaltenbezeichner | Bericht §4.8 Z. 1467 gegen `docs/evidenz/60_stichprobe/m0_klassenraten.csv` (Z. 3950) |
+| 90 | C | Modellzahl — \(p_3\) = 2,236·10⁻³ a⁻¹ fehlt in der Registerzeile | Bericht Kap. 2, 60-W085-01 Z. 164 (Z. 3465) |
+| 91 | C | Modellzahl — Ledger führt das abgelöste \(\lambda\)-Band 0,22–1,66 | Ledger Z. 59 und Z. 1759 gegen Bericht §4.4 Z. 1230–1232 (Z. 3466) |
+| 92 | B | Modellzahl und Formel — Beispielblock rechnet \(A^{*}\) auf dem Anker 1,6 | Bericht §7.2 Z. 2288 und Z. 2303 (Z. 4055) |
+| 93 | B | Modellzahl — 1,51/2,08 gegen 1,32/1,81 innerhalb desselben §7.2 | Bericht §7.2 Z. 2250–2251 gegen Z. 2293 (Z. 4056) |
+| 94 | B | Modellzahl — \(\lambda\) = 0,724 im Ergebnis-Abschnitt gegen 0,832 in §4.4 | Bericht `## Ergebnis` Z. 35 gegen §4.4 Z. 1230 (Z. 4057) |
+| 95 | C | Formel — \(f_{\text{AWM}}\) fehlt in den Zeichentabellen (Prüfpunkt E4) | Bericht §7.2 Z. 2262, §3.5 Z. 750 (Z. 4058) |
+| 96 | B | Modellzahl — Sanity-Band \(U\)/\(O\) ohne Trennschärfe, Weitung nicht ausgewiesen | Bericht §4.6 Z. 1362/1363 (Z. 4102) |
+| 97 | B | Modellzahl — Herleitung der Untergrenze \(U\) fehlt in der P1-Tabelle | Bericht §4.8 Z. 1472 gegen §4.6 Z. 1362 (Z. 4103) |
+| 98 | C | Modellzahl — fortbestehender Rundungsfehler im \(\pi\)-Band | Bericht §4.2 Z. 1093/1120–1121, §4.8 Z. 1466 (Z. 4104) |
+| 99 | B | Modellzahl — acht rechnende §4.8-Zeilen ohne Parameter-Block | Bericht Kap. 7 Z. 1845, Blockliste Z. 1869–2168 (Z. 4164) |
+| 100 | B | Modellzahl — Sensitivität in §7.2 auf dem überholten Anker 1,6/0,99 | Bericht §7.2 Z. 2287–2294 und Z. 2303 (Z. 4165) |
+| 101 | C | keines der vier — Zellenliste der Quelle 2 unvollständig | Bericht Kap. 8, Quelle 2 Z. 2345–2351 (Z. 4223) |
+| 102 | C | Modellzahl mittelbar — Bauform-Grenze der P2-Abschätzung an S094 statt S092 | Bericht Kap. 6 Z. 1805–1809, Register 60-S094-01 Z. 188 (Z. 4224) |
+| 103 | C | keines der vier — Kriterienraster Datenverfügbarkeit und Aufwand | Bericht Kap. 9 Z. 2461 und Z. 2464 (Z. 4225) |
+| 104 | C | Modellkern — Zuordnung S074 zur Formelstelle FS-Exposition | Bericht Kap. 2, Langbeleg B2 Z. 263–264 (Z. 4226) |
+
+**Verdichtung der Spalte „Berührt" (nur gezählt, nicht neu bewertet).** Von den 77 Befunden berühren
+**13** den Modellkern (21, 30, 46, 47, 48, 49, 61, 63, 72, 78, 80, 81, 104 — 61 zugleich eine
+Modellzahl), **40** eine Modellzahl, **zehn** eine Formel oder ein Formelzeichen (24, 25, 54, 55,
+56, 57, 74, 75, 79, 95 — 79 zugleich eine Modellzahl, 92 zusätzlich über den Beispielblock) und
+**vier** Dateien unter `backend/` (17 und 71 das Prüfskript `lint_methodik.py`, 87 das fehlende
+Kalibrierskript unter `backend/scripts/kalibrierung/`, 88 den Testblock samt Code-Kommentaren);
+**14** berühren keines der vier und betreffen Quellenführung, Kopfangaben oder Kriterienraster (11,
+22, 29, 43, 45, 50, 51, 52, 68, 69, 73, 77, 101, 103). Kein verbliebener B- oder C-Befund verlangt
+eine Änderung am rechnenden Produktionscode unter `backend/app/`; die vier mit Code-Bezug betreffen
+Prüf-, Kalibrier- und Testmechanik. Das entspricht der Lage des Vergleichsfalls #98
+(`reviews/BEFUNDE_98.md`), wo die Runden 20, 22 und 23 ebenfalls ohne Null-Runde schlossen und
+integrationshindernd ausschließlich Befunde an der Prüfmechanik selbst waren. Welche Folgerung
+daraus für die Integration zu ziehen ist, entscheidet **T-0248**; dieses Paket zieht sie nicht.
+
+#### Abgrenzung und Status dieses Pakets (T-0392)
+
+- **Geändert wurde ausschließlich `reviews/BEFUNDE_60.md`** (angehängt).
+  `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` und `docs/evidenz/register.md` sind
+  byte-gleich; `backend/scripts/lint_methodik.py` wurde nicht geändert (T-0234) und nicht
+  ausgeführt — die Lint-Aussage stützt sich auf das im Eröffnungsabschnitt 0.1 zitierte Ergebnis.
+  Der Bericht wurde für dieses Paket **nicht gelesen** (Kostenbremse des Tickets).
+- **Keine Leitfrage neu beantwortet, kein Befundstatus neu geprüft, kein Befund behoben, keiner
+  umnummeriert.** Höchste vorhandene Nummer zu Laufbeginn: **104**; neu vergeben: **keine**.
+- **Alles abgelesen, nichts neu erhoben:** die vier Aussagen und die Zählung stammen aus den
+  Unterabschnitten dieser Runde und aus dem Ledger; die Urteile der acht Regressionsabschnitte sind
+  für die dritte und vierte Aussage sowie für die Liste unter (c) übernommen.
+- **Ressourcen-Regel §3.4 eingehalten:** kein nationaler 100-m-Vollraster-Lauf; gelesen wurde der
+  Abschnitt der Runde 3 ab Z. 2198, die Zählungen liefen über gezielte Greps.
+- **Frische Sitzung** (eiserne Regel 4): Diese Sitzung hat den geprüften Stand nicht geschrieben
+  (T-0235 bis T-0243, T-0256 bis T-0259, Revisionspakete aus T-0281 — alle abgeschlossen).
+- **Kopftabelle „Offene Befunde" bewusst nicht fortgeschrieben** (Dateirahmen der Runde-3-Pakete,
+  T-0359).
+- **Nicht Gegenstand:** die Integration (T-0248), die Revision der 77 verbliebenen Befunde und jede
+  Entscheidung über eine weitere Runde.
