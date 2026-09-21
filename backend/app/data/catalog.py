@@ -22,6 +22,8 @@ Konventionen
 
 from __future__ import annotations
 
+from typing import NamedTuple
+
 # ── KWRA-Risikogruppen (max. 5) – für Spinnendiagramme & Risiko-Gruppierung ────
 
 KWRA_GROUPS: list[dict] = [
@@ -2503,6 +2505,44 @@ INDICATOR_BY_CODE = {
     **VULNERABILITIES_BY_CODE,
     **AUXILIARY_BY_CODE,
 }
+
+
+# ── Verwechslungssperre Klasse A/B (T-0513) ─────────────────────────────────────
+# Klasse A = Risiko mit Euro-Bezifferung (Regelfall, siehe cost_per_outcome_eur).
+# Klasse B = reines Screening ohne Euro-Layer; ein Risiko markiert dies explizit
+# über den Katalogschlüssel "euro_layer": False. Fehlt der Schlüssel, gilt das
+# Risiko als Klasse A (bisheriger Bestand, keine stille Umwidmung).
+
+NO_EURO_LAYER_TEXT = "Screening ohne Euro-Bezifferung"
+
+
+def risk_has_euro_layer(risk: dict) -> bool:
+    """True, wenn das Risiko eine Euro-Bezifferung führt (Klasse A).
+
+    Nur ein expliziter Katalogeintrag ``"euro_layer": False`` markiert ein
+    Risiko als Klasse B (Screening ohne Euro-Bezifferung); ohne diesen
+    Schlüssel gilt Klasse A.
+    """
+    return risk.get("euro_layer", True) is not False
+
+
+class EuroCoverage(NamedTuple):
+    covered: int
+    total: int
+    text: str
+
+
+def euro_coverage(risks: list[dict] | None = None) -> EuroCoverage:
+    """Zählt die Euro-Abdeckung (Klasse A) über eine Risikoliste.
+
+    Ohne Argument wird der vollständige Katalog (``RISKS``) gezählt.
+    """
+    if risks is None:
+        risks = RISKS
+    total = len(risks)
+    covered = sum(1 for r in risks if risk_has_euro_layer(r))
+    text = f"{covered} von {total} Klimawirkungen in Euro beziffert"
+    return EuroCoverage(covered=covered, total=total, text=text)
 
 
 def normalize_value(code: str, value: float) -> float:
