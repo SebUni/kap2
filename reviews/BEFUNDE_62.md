@@ -147,9 +147,11 @@ liefern beide Formen dieselbe Zahl; die Kopfzahl 11 stimmt mit der Ausgabe über
 | 10 | Abschnitt 3.3 (Z. 183–185) · Der Bericht nennt die UHI-Parameterspanne „`uhi.alpha` bis `uhi.tree_cooling`". `parameter_registry.py` (Z. 294–297) führt elf Schlüssel; `tree_cooling` ist der sechste, die Spanne lässt `zeta`, `delta_night`, `night_weight`, `mean_factor` und `vent_ratio` aus — obwohl derselbe Absatz die Durchlüftungsdämpfung (`vent_ratio`) beschreibt (Leitfrage 10). | C | offen | Spannenangabe im Bericht auf den vollständigen Schlüsselsatz gebracht | `grep -n 'uhi_defaults' -A 4 backend/app/services/parameter_registry.py` | — |
 | 11 | Abschnitt 5 (Z. 264) · Als fehlende Kernformel-Größe ist allein der Preis benannt. Nach Abschnitt 2.3 bucht Id 62 überhaupt nichts, es gibt also weder ein Mengengerüst exponierter Einheiten noch eine physische Wirkungsrate für diese Klimawirkung; die Beschränkung auf den Preis ist im Bericht nicht begründet (Zuschnitt Kap. 3 Punkt 5: „Menge, Rate oder Preis"). | C | offen | Abschnitt 5 benennt alle fehlenden Größen oder begründet die Beschränkung auf den Preis | `grep -n 'Fehlende Groesse der Kernformel' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md` | — |
 | 12 | Kopplung der Maßnahme Entsiegelung an die Wärmebelastung · Methodischer Entscheid zu `DESEALING_SURFACE` (`catalog_parked.py`, Z. 944–962) gegenüber der Wirkbeschreibung in `catalog.py` (`_MEASURE_EFFECT_DOCS`, Z. 1943–1956). Verdikt, Doppelzählungsprüfung nach G13 und Berichtsfolge im Abschnitt „Befund 12" unter dieser Tabelle. | B | geschlossen (Entscheid, niedergelegt in diesem Ledger): Verdikt „Kopplung wird nicht ergänzt"; die Berichtsformulierung ist im Wortlaut vorgegeben und wird mit Befund 4 eingesetzt | Abschnitt „Befund 12" unten (vier Punkte: Stand, Verdikt, Doppelzählungsprüfung, Berichtsfolge) | `grep -n 'DESEALING_SURFACE' -A 4 backend/app/data/catalog_parked.py` (Sollzustand: `linked_risk_codes` ohne Wärmekennzahl) | — |
+| 13 | Sensitivitäten S094 bis S098 im Quellenblatt, aber nicht in `catalog.py` · Methodischer Entscheid zu den fünf Sensitivitäten, die die Arbeitsmappe der Klimawirkung #62 zuordnet (`KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt „Klimawirkungsketten", Zeile 279) und die der Katalogeintrag `PLANNED_RISKS`/`kwra_id: 62` (`catalog.py`, Z. 317–322) nicht führt. Fundstellen, Ergebniswirkung je Kennung und Verdikt im Abschnitt „Befund 13" unter dieser Tabelle. | B | geschlossen (Entscheid, niedergelegt in diesem Ledger): Verdikt „wird im Katalog ergänzt"; Datei und Feld des Folgepakets sind benannt, dieses Paket ändert `catalog.py` nicht | Abschnitt „Befund 13" unten (vier Punkte: Fundstellen und Fehlnachweis, Ergebniswirkung, Verdikt, Folgepaket) | `python3 -c "import sys; sys.path.insert(0,'backend'); from app.data import catalog; print([p for p in catalog.PLANNED_RISKS if p['kwra_id']==62][0]['sensitivity_names'])"` (Sollzustand: sieben Namen statt zwei) | — |
 
-Befund 12 ist mit seiner Niederschrift geschlossen und zählt deshalb nicht in die Kopfzahl der
-elf offenen Befunde; die Ausgabe des Kopf-Prüfbefehls bleibt unverändert 11.
+Die Befunde 12 und 13 sind mit ihrer Niederschrift geschlossen und zählen deshalb nicht in die
+Kopfzahl der elf offenen Befunde; die Ausgabe des Kopf-Prüfbefehls bleibt unverändert 11. Befund 2
+bleibt offen: Er wird erst mit dem Nachzug im Katalog geschlossen, den Befund 13 anordnet.
 
 Kein Befund der Kategorie A: Die harten Sperren der Klasse B sind eingehalten — sieben
 Abschnitte in der vorgeschriebenen Reihenfolge, kein Euro-Betrag außerhalb der Maßnahmenkosten,
@@ -237,3 +239,145 @@ Steckbrief verschiebt dessen Zeilennummern, und die Zeilenverweise samt Euro-Pr�
 Gegenprüfung oben werden dann in einem Zug nachgezogen statt zweimal. Befund 4 bleibt bis dahin
 offen; dieser Befund liefert dafür die Entscheidungsgrundlage, schließt den Zweig „Verknüpfung im
 Katalog ergänzt" aus und gibt den Wortlaut des verbleibenden Zweigs vor.
+
+### Befund 13 — Sensitivitäten S094 bis S098 im Quellenblatt, aber nicht in catalog.py
+
+Entschieden am 21.09.2026 aus der offenen Frage
+`Q-20260920T110402Z-pruefer-ab99af-2` der Gegenprüfung zu T-0408. Anlass ist Befund 2: Das
+Quellenblatt ordnet der Klimawirkung #62 sieben Sensitivitäten zu, der Produktkatalog führt zwei.
+Dieser Befund entscheidet die Frage methodisch, bevor ein Feld angefasst wird; der Katalog wird
+von diesem Paket **nicht** geändert.
+
+**1. Fundstellen im Quellenblatt und Fehlnachweis in `catalog.py`.** Quellenblatt ist die
+Arbeitsmappe `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt
+„Klimawirkungsketten". Die Klimawirkung #62 steht dort in Zeile 279 (Id `W124`,
+„Stadtklima/Wärmeinseln") und führt in der Spalte `Input_IDs_Sensitivitäten` die Zeichenkette
+`S094; S095; S096; S097; S098; S099; S100`; jede der fünf hier strittigen Kennungen hat im selben
+Blatt zusätzlich eine eigene Stammzeile vom Typ „Sensitivität". Ausgeführt am 21.09.2026 in der
+Repo-Wurzel:
+
+```
+python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)
+for i,r in enumerate(wb['Klimawirkungsketten'].iter_rows(values_only=True),1):
+    if r[0] in ('S094','S095','S096','S097','S098'): print(i, r[0], r[1], r[2])
+    if i==279: print(i, r[0], r[5])
+"
+258 S094 Verwendete Baumaterialien auf Gebäudeebene Sensitivität
+259 S095 Begrünung von Gebäuden Sensitivität
+260 S096 Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand Sensitivität
+261 S097 Zustand von (Schutz-)Infrastrukturen Sensitivität
+262 S098 Verwendete Baumaterialien von (Schutz-)Infrastrukturen Sensitivität
+279 W124 S094; S095; S096; S097; S098; S099; S100
+```
+
+Der Fehlnachweis in `backend/app/data/catalog.py` hat zwei Teile, weil der Katalog Sensitivitäten
+nicht über die Kennung, sondern über den Klartextnamen führt. Erstens kommt keine der fünf
+Kennungen in der Datei überhaupt vor (Ausgabe je Befehlszeile darunter):
+
+```
+grep -c 'S094' backend/app/data/catalog.py
+0
+grep -c 'S095' backend/app/data/catalog.py
+0
+grep -c 'S096' backend/app/data/catalog.py
+0
+grep -c 'S097' backend/app/data/catalog.py
+0
+grep -c 'S098' backend/app/data/catalog.py
+0
+```
+
+Zweitens führt der Eintrag zu #62 nur die beiden Namen von S099 und S100:
+
+```
+grep -n '"kwra_id": 62' -A 5 backend/app/data/catalog.py | grep 'sensitivity_names'
+321-     "sensitivity_names": ["Begrünung von Städten / Siedlungen", "Grad der Versiegelung"],
+```
+
+```
+python3 -c "
+import sys; sys.path.insert(0,'backend')
+from app.data import catalog
+e=[p for p in catalog.PLANNED_RISKS if p['kwra_id']==62][0]
+for n in ['Verwendete Baumaterialien auf Gebäudeebene','Begrünung von Gebäuden','Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand','Zustand von (Schutz-)Infrastrukturen','Verwendete Baumaterialien von (Schutz-)Infrastrukturen']:
+    print(n in e['sensitivity_names'], n)
+"
+False Verwendete Baumaterialien auf Gebäudeebene
+False Begrünung von Gebäuden
+False Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand
+False Zustand von (Schutz-)Infrastrukturen
+False Verwendete Baumaterialien von (Schutz-)Infrastrukturen
+```
+
+Je Kennung zusammengefasst — Datei des Fehlnachweises ist durchgehend
+`backend/app/data/catalog.py`, Eintrag `PLANNED_RISKS` mit `kwra_id: 62` (Z. 317–322):
+
+| Kennung | Name im Quellenblatt | Stammzeile (Blatt „Klimawirkungsketten") | Zuordnung zu #62 | Fehlnachweis in `catalog.py` |
+|---|---|---|---|---|
+| S094 | Verwendete Baumaterialien auf Gebäudeebene | Zeile 258 | Zeile 279, Spalte `Input_IDs_Sensitivitäten`, erstes Listenglied | `grep -c 'S094' …/catalog.py` → `0`; Name nicht in `sensitivity_names` von #62 (Python-Abgleich → `False`). Der Name steht an anderer Stelle der Datei (`grep -c '…auf Gebäudeebene'` → `3`), aber bei den Einträgen #63, #60 und #59, nicht bei #62. |
+| S095 | Begrünung von Gebäuden | Zeile 259 | Zeile 279, zweites Listenglied | `grep -c 'S095' …/catalog.py` → `0`; Name nicht in `sensitivity_names` von #62 (→ `False`). Der Name kommt einmal in der Datei vor (→ `1`), dort beim Eintrag #63. |
+| S096 | Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand | Zeile 260 | Zeile 279, drittes Listenglied | `grep -c 'S096' …/catalog.py` → `0`; Name nicht in `sensitivity_names` von #62 (→ `False`). Der Name kommt einmal in der Datei vor (→ `1`), dort beim Eintrag #61. |
+| S097 | Zustand von (Schutz-)Infrastrukturen | Zeile 261 | Zeile 279, viertes Listenglied | `grep -c 'S097' …/catalog.py` → `0`; Name nicht in `sensitivity_names` von #62 (→ `False`). Der Name kommt zweimal in der Datei vor (→ `2`), an beiden Stellen bei anderen Einträgen. |
+| S098 | Verwendete Baumaterialien von (Schutz-)Infrastrukturen | Zeile 262 | Zeile 279, fünftes Listenglied | `grep -c 'S098' …/catalog.py` → `0`; Name nicht in `sensitivity_names` von #62 (→ `False`); der Name kommt in der ganzen Datei nicht vor (`grep -c 'Verwendete Baumaterialien von (Schutz-)Infrastrukturen' …/catalog.py` → `0`). |
+
+**2. Verändert das Fehlen ein ausgewiesenes Ergebnis?** Nein — für keine der fünf Kennungen. Die
+betroffene Größe ist in allen fünf Fällen dieselbe: das reine Beschreibungsfeld
+`sensitivity_names` des geplanten (gesperrten) Katalogeintrags `kwra_id: 62`, das über
+`backend/app/api/routes/catalog.py` (Z. 49–52) als `planned_risks[].sensitivity_names` in die
+Antwort von `GET /catalog` geht. Weder der Rechenkern noch die Oberfläche liest es; die Oberfläche
+zeigt von einem geplanten Eintrag nur Name und Stufenlabel
+(`frontend/src/components/LayerPanel.tsx`, Z. 246–251). Prüfausdruck, ausgeführt am 21.09.2026 in
+der Repo-Wurzel — die einzige Fundstelle außerhalb der Katalogdatei ist eine Typdeklaration ohne
+Anzeige:
+
+```
+grep -rn 'sensitivity_names' backend/app/services backend/app/api frontend/src
+frontend/src/types/index.ts:400:  sensitivity_names: string[]
+```
+
+Daraus je Kennung derselbe Satz, mit der Größe, die betroffen wäre:
+
+- **S094:** Das Fehlen verändert kein ausgewiesenes Ergebnis; betroffen wäre allein die Länge und
+  der Inhalt der Liste `planned_risks[].sensitivity_names` des Eintrags #62 in der Antwort von
+  `GET /catalog` — kein Index, kein Euro-Betrag, keine Karte.
+- **S095:** wie S094 — kein ausgewiesenes Ergebnis betroffen, nur dasselbe Listenfeld.
+- **S096:** wie S094 — kein ausgewiesenes Ergebnis betroffen, nur dasselbe Listenfeld.
+- **S097:** wie S094 — kein ausgewiesenes Ergebnis betroffen, nur dasselbe Listenfeld.
+- **S098:** wie S094 — kein ausgewiesenes Ergebnis betroffen, nur dasselbe Listenfeld.
+
+Der Grund gilt für alle fünf gemeinsam: #62 ist eine Klimawirkung der Klasse B ohne
+Schadensbetrag, steht in `PLANNED_RISKS` (gesperrt) und trägt nach Abschnitt 2.3 des Steckbriefs
+ohnehin nichts in ein Schadenskonto. Weil kein Ergebnis betroffen ist, bleibt der Steckbrief
+#62 an der zitierenden Stelle (Abschnitt 2.4) unverändert: Seine Aussage, die Arbeitsmappe nenne
+sieben und der Katalog führe zwei Sensitivitäten, ist durch Punkt 1 in genau diesem Wortlaut
+bestätigt, und sein Satz „Dieser Steckbrief ändert dazu nichts am Code" bleibt richtig.
+
+**3. Verdikt: wird im Katalog ergänzt.** Das Quellenblatt ist nach dem Prüfgrundlagen-Bundle
+(`CLAUDE.md`) die verbindliche Arbeitsmappe, und seine Zuordnung ist für #62 nicht pauschal,
+sondern eigens gesetzt — die zwölf Bauwesen-Klimawirkungen der Zeilen 272 bis 283 tragen sieben
+verschiedene Sensitivitätslisten, #62 als einzige genau diese sieben. Eiserne Regel 2 verbietet,
+die Arbeitsmappe still zu überstimmen; §2.1 lässt keinen Knoten unadressiert, und fünf Knoten
+sind derzeit weder verarbeitet noch begründet inaktiv (Befund 2). Der Nachzug ist risikolos, weil
+er nach Punkt 2 kein ausgewiesenes Ergebnis bewegt und keinen Zahlenwert mit Herleitungspflicht
+einführt — anders als die Kopplungsfrage in Befund 12, wo eine hydrologisch hergeleitete
+Reduktionsrate auf einen thermischen Pfad übertragen worden wäre. Zu klären hat das Folgepaket
+dabei den Ursprung der Abweichung: Der Kommentar über `PLANNED_RISKS` (`catalog.py`, Z. 307–315)
+nennt als Herkunft der Namenslisten das Blatt „Wirkungsmechanismen" der Mappe
+`docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, das für #62 in Zeile 67 nur die beiden Namen von S099
+und S100 führt — der heutige Katalogstand ist also seiner eigenen Quelle treu, und zwei
+Digitalisate derselben UBA-Zeichnung von 2016 widersprechen einander.
+
+**4. Was ein Folgepaket ändern muss (nicht in diesem Paket).** Datei: `backend/app/data/catalog.py`.
+Feld: der Schlüssel `sensitivity_names` im Eintrag der Liste `PLANNED_RISKS` mit `kwra_id: 62`
+(heute Z. 321) — er wird um die fünf Namen aus der Tabelle in Punkt 1 auf sieben Einträge
+erweitert, in der Reihenfolge des Quellenblatts (S094 bis S100). Zweite Stelle in derselben Datei:
+der Quellenkommentar über `PLANNED_RISKS` (Z. 307–315), der die Herkunft der Namenslisten
+heute allein dem Blatt „Wirkungsmechanismen" zuschreibt; für #62 ist dort der abweichende
+Vorrang des Schadensbaum-Quellenblatts samt Zeilenangabe 279 zu vermerken, sonst entstünde eine
+neue stille Abweichung von der genannten Quelle. Der Test
+`backend/tests/test_planned_risks.py` prüft Anzahl, IDs, Stufen und nichtleere Treiberlisten,
+nicht die Länge der Sensitivitätsliste; er bleibt von der Ergänzung unberührt, ist aber nach dem
+Nachzug auszuführen. Mit diesem Nachzug wird Befund 2 schließbar; bis dahin bleibt er offen.
+Dieses Paket ändert `catalog.py` nicht.
