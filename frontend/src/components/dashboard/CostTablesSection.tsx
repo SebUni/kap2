@@ -34,15 +34,23 @@ export default function CostTablesSection() {
                   {r.outcome.toLocaleString('de-DE', { maximumFractionDigits: 1 })} {r.outcome_unit}
                 </td>
                 <td style={{ textAlign: 'right' }}>
-                  {r.cost_dimension === 'monetary' || r.cost_eur > 0 ? fmtEur(r.cost_eur) : '–'}
+                  {/* Verwechslungssperre Klasse A/B (T-0517): Klasse B zeigt den
+                      Screening-Vermerk des Backends, nie einen Strich oder 0 €. */}
+                  {r.has_euro_layer === false ? String(r.cost_display ?? '') : fmtEur(r.cost_eur)}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {riskSummary.cost.euro_coverage && (
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 6 }}>
+            Gesamtschaden {fmtEur(costSummary?.damages_with_measures_eur ?? riskSummary.cost.total_eur)}/Jahr
+            {' · '}{riskSummary.cost.euro_coverage.text}
+          </p>
+        )}
       </div>
 
-      {costSummary && costSummary.measures.rows.length > 0 && (
+      {costSummary &&costSummary.measures.rows.length > 0 && (
         <div className="chart-card" style={{ marginTop: '1rem' }}>
           <h3 className="chart-title">Maßnahmen – CAPEX/OPEX & Nutzen</h3>
           <table className="data-table">

@@ -72,6 +72,15 @@ function LowerBoundHint({ lb }: { lb?: LowerBoundNote }) {
 }
 
 /**
+ * Vollständigkeitsanzeige neben jeder Euro-Summe (T-0517): der Text
+ * (euro_coverage.text) kommt vom Backend, beide Zahlen aus dem Katalog gezählt.
+ */
+function EuroCoverageHint({ text }: { text?: string }) {
+  if (!text) return null
+  return <div className="hero-kpi-sub">{text}</div>
+}
+
+/**
  * Hero-Kopf des Dashboards: Kommunenname, Meta-Zeile (Bundesland · Landkreis ·
  * Höhe · Einwohner · Fläche · BIP Kreisebene · Kommunalhaushalt Ø — die beiden
  * Wirtschafts-/Finanz-Kennzahlen aus der Regionalstatistik mit Quellen-Tooltip),
@@ -171,6 +180,7 @@ export default function KommuneHeader({ className = '' }: { className?: string }
             {riskSummary ? `${fmtEurCompact(riskSummary.cost.total_eur)}/a` : '…'}
           </div>
           <div className="hero-kpi-sub">Summe aller monetarisierten Klimarisiken</div>
+          <EuroCoverageHint text={riskSummary?.cost.euro_coverage?.text} />
           <LowerBoundHint lb={riskSummary?.cost.lower_bound} />
         </div>
         <div className="hero-kpi">
@@ -179,6 +189,7 @@ export default function KommuneHeader({ className = '' }: { className?: string }
             {scen ? `${fmtEurCompact(scen.no_measures.annual[lastIdx])}/a` : '…'}
           </div>
           <div className="hero-kpi-sub">Projektion, Szenario RCP 4.5</div>
+          <EuroCoverageHint text={riskSummary?.cost.euro_coverage?.text} />
           <LowerBoundHint lb={proj?.lower_bound} />
         </div>
         <div className="hero-kpi">
@@ -195,6 +206,7 @@ export default function KommuneHeader({ className = '' }: { className?: string }
               ? 'Noch keine Maßnahmen erfasst'
               : 'inkl. Maßnahmenkosten (CAPEX/OPEX)'}
           </div>
+          <EuroCoverageHint text={riskSummary?.cost.euro_coverage?.text} />
           <LowerBoundHint lb={proj?.lower_bound} />
         </div>
       </div>
