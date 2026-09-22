@@ -80,6 +80,19 @@ def _write_layer(path: str, layer: str, geometries, field_data: list, fields: li
     )
 
 
+def cost_column_values(risk: dict, raw_costs: list) -> list:
+    """Spalte ``<code>_cost_eur`` einer Wirkung für den Layer ``bewertung_100m``.
+
+    Klasse B (Katalogeintrag ``"euro_layer": False``) hat keine Euro-Schicht:
+    Dort steht je Zelle der Vermerk ``catalog.NO_EURO_LAYER_TEXT`` statt einer
+    0, die als „kein Schaden" gelesen würde. Alle anderen Wirkungen behalten
+    ihre Euro-Werte unverändert als float.
+    """
+    if not catalog.risk_has_euro_layer(risk):
+        return [catalog.NO_EURO_LAYER_TEXT for _ in raw_costs]
+    return [float(v) for v in raw_costs]
+
+
 def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
     """Build a multi-layer GeoPackage and return the file path."""
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
@@ -158,7 +171,7 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
             rdata = risks.get(code, {})
             risk_index_cols[code].append(float(rdata.get("index", 0.0)))
             risk_outcome_cols[f"{code}_outcome"].append(float(rdata.get("outcome", 0.0)))
-            risk_cost_cols[f"{code}_cost_eur"].append(float(rdata.get("cost_eur", 0.0)))
+            risk_cost_cols[f"{code}_cost_eur"].append(rdata.get("cost_eur", 0.0))
 
         auxiliary = data.get("auxiliary", {})
         for code in auxiliary_codes:
@@ -167,6 +180,11 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
 
     if not geometries:
         raise ValueError("Keine Bewertungsdaten vorhanden")
+
+    # Klasse B: Screening-Vermerk statt 0 in der Schadensspalte (T-0515).
+    for risk in catalog.RISKS:
+        key = f"{risk['code']}_cost_eur"
+        risk_cost_cols[key] = cost_column_values(risk, risk_cost_cols[key])
 
     # Layer: bewertung_100m
     field_data: list = [gitter_ids, x3035_vals, y3035_vals]
