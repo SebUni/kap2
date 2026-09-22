@@ -327,29 +327,41 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             "aggregation": f"P{int(AGGREGATION_PERCENTILE)}",
         }
 
+    # Verwechslungssperre Klasse A/B (T-0358/T-0514): Jede Wirkung steht in by_risk,
+    # trägt aber, ob sie eine Euro-Schicht hat, und den Anzeigewert — Klasse B zeigt
+    # statt eines Betrags catalog.NO_EURO_LAYER_TEXT (nie 0 €, nie „kein Schaden“).
+    has_euro = {r["code"]: catalog.risk_has_euro_layer(r) for r in catalog.RISKS}
     by_risk = sorted(
         [{"code": c, "name": r["name"], "cost_eur": r["cost_eur"],
           "outcome": r["outcome"], "outcome_unit": r["outcome_unit"],
           "cost_dimension": r["cost_dimension"], "index": r["index"],
           "exposed_p90_index": r["exposed_p90_index"], "risk_class": r["risk_class"],
-          "aggregation": r["aggregation"], "top5_share": r["top5_share"]}
+          "aggregation": r["aggregation"], "top5_share": r["top5_share"],
+          "has_euro_layer": has_euro[c],
+          "cost_display": r["cost_eur"] if has_euro[c] else catalog.NO_EURO_LAYER_TEXT}
          for c, r in risk_out.items()],
         key=lambda x: x["cost_eur"], reverse=True,
     )
-    # Nicht-additive Teilkennzahlen (z. B. Restaurierung = Anteil der Sektorschäden)
-    # werden ausgewiesen, aber NICHT in die Summe addiert (Doppelzählung §3.7).
-    total_cost = round(
-        sum(r["cost_eur"] for r in by_risk
-            if r["code"] not in catalog.NON_ADDITIVE_RISK_CODES),
-        2,
-    )
+    # In die Summe gehen nur Wirkungen mit Euro-Schicht (Klasse A) ein. Nicht-additive
+    # Teilkennzahlen (z. B. Restaurierung = Anteil der Sektorschäden) werden
+    # ausgewiesen, aber NICHT in die Summe addiert (Doppelzählung §3.7).
+    summed = [r for r in by_risk
+              if r["has_euro_layer"] and r["code"] not in catalog.NON_ADDITIVE_RISK_CODES]
+    total_cost = round(sum(r["cost_eur"] for r in summed), 2)
 
     # Untergrenzen-Kennzeichnung (UBA MK 4.0, Anforderung 25): Wirkungskategorien
     # ohne belegten Kostensatz gehen mit 0 € in die Summe ein — der Betrag ist dann
-    # eine konservative Untergrenze und wird so ausgewiesen.
-    lb = lower_bound.lower_bound(
-        [r["code"] for r in by_risk if r["code"] not in catalog.NON_ADDITIVE_RISK_CODES])
-    cost_block: dict = {"total_eur": total_cost, "by_risk": by_risk}
+    # eine konservative Untergrenze und wird so ausgewiesen. Klasse B ist keine
+    # Lücke im Kostensatz, sondern bewusst unbeziffert — sie zählt hier nicht mit.
+    lb = lower_bound.lower_bound([r["code"] for r in summed])
+    cov = catalog.euro_coverage(catalog.RISKS)
+    cost_block: dict = {
+        "total_eur": total_cost,
+        "by_risk": by_risk,
+        # Vollständigkeitsanzeige neben der Summe („x von y Klimawirkungen in Euro
+        # beziffert“), beide Zahlen aus dem Katalog gezählt.
+        "euro_coverage": {"covered": cov.covered, "total": cov.total, "text": cov.text},
+    }
     if lb is not None:
         cost_block["lower_bound"] = lb
 
