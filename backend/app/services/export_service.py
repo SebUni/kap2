@@ -14,21 +14,71 @@ from app.services import measure_service
 from app.services.engine import lower_bound
 
 
-def _lower_bound_qualifier(db: Session, kommune_id: int) -> str | None:
+def _risk_aggregate(db: Session, kommune_id: int) -> dict | None:
+    """Risiko-Aggregat der Kommune ohne Maßnahmen; ``None``, wenn es nicht vorliegt.
+
+    Der Export darf an dieser Zusatzangabe nicht scheitern.
+    """
+    try:
+        return measure_service.get_risk_aggregate(db, kommune_id, apply_measures=False)
+    except Exception:
+        return None
+
+
+def _lower_bound_qualifier(db: Session, kommune_id: int, agg: dict | None) -> str | None:
     """Qualifizierungstext zu den Euro-Summen dieser Kommune (T-0440-Zählung).
 
     ``None``, wenn jede einfließende Wirkungskategorie einen belegten Kostensatz
     trägt — dann ist nichts zu qualifizieren. Der Export darf an dieser Zusatz-
     angabe nicht scheitern; bei fehlender Berechnung bleibt die Spalte leer.
     """
-    try:
-        agg = measure_service.get_risk_aggregate(db, kommune_id, apply_measures=False)
-    except Exception:
+    if agg is None:
         return None
     lb = (agg.get("cost") or {}).get("lower_bound")
     return lower_bound.qualifier_text(
         lb, lower_bound.overridden_cost_rate_codes(db, kommune_id)
     )
+
+
+def _has_euro_layer(row: dict) -> bool:
+    """Klasse A/B einer Aggregatzeile; ohne Kennzeichen entscheidet der Katalog."""
+    if "has_euro_layer" in row:
+        return bool(row["has_euro_layer"])
+    return catalog.risk_has_euro_layer(catalog.RISKS_BY_CODE.get(row.get("code"), {}))
+
+
+def _fill_climate_impacts_sheet(ws, agg: dict | None, lb_note: str | None) -> None:
+    """Blatt „Klimawirkungen“: je Wirkung der Jahresschaden, dazu die Vollständigkeit.
+
+    Verwechslungssperre Klasse A/B (T-0358/T-0516): Eine Wirkung ohne Euro-Schicht
+    zeigt in „Schaden pro Jahr“ den Vermerk ``catalog.NO_EURO_LAYER_TEXT`` — nie 0,
+    denn ein Gutachter läse 0 als „kein Schaden“. Unter der Tabelle steht die
+    Vollständigkeitsanzeige („x von y Klimawirkungen in Euro beziffert“) neben der
+    Summe, die nur die Wirkungen mit Euro-Schicht enthält.
+    """
+    ws.append(["Code", "Klimawirkung", "Schaden pro Jahr", "Einheit", "Euro-Bezifferung"])
+    if agg is None:
+        ws.append(["", "Risikoberechnung für diese Kommune nicht verfügbar"])
+        return
+    cost = agg.get("cost") or {}
+    for row in cost.get("by_risk") or []:
+        if _has_euro_layer(row):
+            value = round(float(row.get("cost_eur") or 0.0), 2)
+            unit, klasse = "€/Jahr", "ja (Klasse A)"
+        else:
+            value = catalog.NO_EURO_LAYER_TEXT
+            unit, klasse = "", "nein (Klasse B, Screening)"
+        ws.append([row.get("code", ""), row.get("name", ""), value, unit, klasse])
+
+    ws.append([])
+    coverage = cost.get("euro_coverage") or {}
+    coverage_text = coverage.get("text") or catalog.euro_coverage(catalog.RISKS).text
+    if "total_eur" in cost:
+        ws.append(["", "Gesamtschaden pro Jahr (nur in Euro bezifferte Wirkungen)",
+                   round(float(cost["total_eur"]), 2), "€/Jahr"])
+    ws.append(["", "Vollständigkeit", coverage_text])
+    if lb_note:
+        ws.append(["", "Hinweis zur Summe (Untergrenze)", lb_note])
 
 
 def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
@@ -62,7 +112,8 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
     # Wirkungskategorien wie die Basissumme. Fehlt dort ein belegter Kostensatz,
     # geht die Kategorie mit 0 € ein — der Betrag ist dann eine Untergrenze und
     # verlässt das Haus nur mit demselben Qualifizierungstext wie im Dashboard.
-    lb_note = _lower_bound_qualifier(db, kommune_id)
+    agg = _risk_aggregate(db, kommune_id)
+    lb_note = _lower_bound_qualifier(db, kommune_id, agg)
 
     for m in measures:
         geom_wkt = ""
@@ -114,8 +165,12 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
     if lb_note:
         ws2.append(["Hinweis zu den ausgewiesenen Schadens-/Nutzensummen", lb_note])
 
+    # ── Sheet 3: Klimawirkungen (Klasse A/B, Vollständigkeit) ──
+    ws3 = wb.create_sheet("Klimawirkungen")
+    _fill_climate_impacts_sheet(ws3, agg, lb_note)
+
     # Auto-width
-    for ws_sheet in [ws, ws2]:
+    for ws_sheet in [ws, ws2, ws3]:
         for col in ws_sheet.columns:
             max_len = max(len(str(cell.value or "")) for cell in col)
             ws_sheet.column_dimensions[col[0].column_letter].width = min(max_len + 2, 50)
