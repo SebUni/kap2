@@ -251,7 +251,10 @@ export function GroupRadarCard({ className = '' }: { className?: string }) {
 export function TopRisksCard({ className = '' }: { className?: string }) {
   const { riskSummary, costSummary } = useStore()
   const byRisk = costSummary?.by_risk || riskSummary?.cost.by_risk || []
-  const top = byRisk.filter(r => r.cost_eur > 0).slice(0, 5)
+  // Verwechslungssperre Klasse A/B (T-0517): Klasse B (ohne Euro-Schicht) fällt nicht
+  // still aus der Liste, sondern steht mit dem Screening-Vermerk unter den Top 5.
+  const top = byRisk.filter(r => r.has_euro_layer !== false && r.cost_eur > 0).slice(0, 5)
+  const screening = byRisk.filter(r => r.has_euro_layer === false)
   const maxCost = top.length ? top[0].cost_eur : 0
   const benefitDirect = costSummary?.measures.total_benefit_direct_eur ?? 0
   const annualBenefit = (costSummary?.damage_reduction_eur ?? 0) + benefitDirect
@@ -286,7 +289,15 @@ export function TopRisksCard({ className = '' }: { className?: string }) {
               </div>
             )
           })}
-          {!top.length && (
+          {screening.map(r => (
+            <div key={r.code} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, fontSize: '0.82rem' }}>
+              <span style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{r.name}</span>
+              <span style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                {r.has_euro_layer === false ? String(r.cost_display ?? '') : fmtEurCompact(r.cost_eur)}
+              </span>
+            </div>
+          ))}
+          {!top.length && !screening.length && (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               Keine monetarisierten Risiken vorhanden.
             </p>

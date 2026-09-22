@@ -575,7 +575,13 @@ export interface RiskAggregate {
       outcome_unit: string; cost_dimension: string; index: number
       exposed_p90_index?: number; risk_class?: RiskClass
       aggregation?: 'sum' | 'p90'; top5_share?: number
+      /** Verwechslungssperre Klasse A/B: false = Screening ohne Euro-Bezifferung. */
+      has_euro_layer?: boolean
+      /** Anzeigewert: Betrag (Klasse A) oder Screening-Vermerk (Klasse B). */
+      cost_display?: number | string
     }[]
+    /** Vollständigkeitsanzeige neben der Summe (Text vom Backend). */
+    euro_coverage?: { covered: number; total: number; text: string }
   }
   /** Server-Wahrheit der Risikoklassen (Grenzen folgen model.risk_threshold). */
   classification?: {
