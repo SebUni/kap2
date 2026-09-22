@@ -4350,7 +4350,8 @@ Regressionsabschnitten, nicht neu erhoben), oder ein in dieser Runde neu vergebe
 Das sind **19 Altbefunde** (11, 12, 17, 21, 22, 24, 25, 27, 29, 30, 31, 35, 37, 38, 41, 43, 44, 45,
 46) und **58 neue**, zusammen **77**. Nicht mehr enthalten sind die acht in dieser Runde als
 „bestätigt geschlossen" beurteilten Altbefunde 6, 13, 23, 26, 28, 36, 39 und 42 sowie die
-A-Befunde. Bewertet wird je Nummer nur, **ob** sie den Modellkern (Knotenmenge, Formelstellen,
+A-Befunde; ebenso zählen die Altbefunde 7, 8, 9, 10, 14, 15, 16, 18 und 19 nicht zu den 77, weil sie
+im Ledgerkopf „behoben" tragen und in dieser Runde nicht regressiert wurden. Bewertet wird je Nummer nur, **ob** sie den Modellkern (Knotenmenge, Formelstellen,
 Kalibrier- und Validierungsarchitektur, Konto-Abgrenzung), eine **Modellzahl** (rechnender Wert,
 Band oder Schwelle), eine **Formel** (Ausdruck oder Formelzeichen) oder den **Produktionscode**
 (Dateien unter `backend/`) berührt — mit je einer Fundstelle. Es wird kein Befundstatus und keine
@@ -4436,14 +4437,20 @@ Kategorie neu geprüft.
 | 103 | C | keines der vier — Kriterienraster Datenverfügbarkeit und Aufwand | Bericht Kap. 9 Z. 2461 und Z. 2464 (Z. 4225) |
 | 104 | C | Modellkern — Zuordnung S074 zur Formelstelle FS-Exposition | Bericht Kap. 2, Langbeleg B2 Z. 263–264 (Z. 4226) |
 
-**Verdichtung der Spalte „Berührt" (nur gezählt, nicht neu bewertet).** Von den 77 Befunden berühren
-**13** den Modellkern (21, 30, 46, 47, 48, 49, 61, 63, 72, 78, 80, 81, 104 — 61 zugleich eine
-Modellzahl), **40** eine Modellzahl, **zehn** eine Formel oder ein Formelzeichen (24, 25, 54, 55,
-56, 57, 74, 75, 79, 95 — 79 zugleich eine Modellzahl, 92 zusätzlich über den Beispielblock) und
-**vier** Dateien unter `backend/` (17 und 71 das Prüfskript `lint_methodik.py`, 87 das fehlende
-Kalibrierskript unter `backend/scripts/kalibrierung/`, 88 den Testblock samt Code-Kommentaren);
-**14** berühren keines der vier und betreffen Quellenführung, Kopfangaben oder Kriterienraster (11,
-22, 29, 43, 45, 50, 51, 52, 68, 69, 73, 77, 101, 103). Kein verbliebener B- oder C-Befund verlangt
+**Verdichtung der Spalte „Berührt" (nur gezählt, nicht neu bewertet).** Jede Liste entspricht genau
+den Zeilen der Tabelle oben, die die Kategorie in ihrer Spalte „Berührt" führen. Von den 77 Befunden
+berühren **13** den **Modellkern** (21, 30, 46, 47, 48, 49, 61, 63, 72, 78, 80, 81, 104); **39**
+eine **Modellzahl** (12, 27, 31, 35, 37, 38, 41, 44, 53, 58, 59, 60, 61, 62, 64, 65, 66, 67, 70,
+76, 79, 82, 83, 84, 85, 86, 88, 89, 90, 91, 92, 93, 94, 96, 97, 98, 99, 100, 102); **11** eine
+**Formel beziehungsweise ein Formelzeichen** (24, 25, 54, 55, 56, 57, 74, 75, 79, 92, 95); **4**
+**Dateien unter `backend/` (Produktionscode)** (17, 71, 87, 88 — 17 und 71 das Prüfskript
+`lint_methodik.py`, 87 das fehlende Kalibrierskript unter `backend/scripts/kalibrierung/`, 88 den
+Testblock samt Code-Kommentaren); **14** berühren **keines der vier** und betreffen Quellenführung,
+Kopfangaben oder Kriterienraster (11, 22, 29, 43, 45, 50, 51, 52, 68, 69, 73, 77, 101, 103).
+**Überschneidungen** — Nummern, die in der Tabelle zwei Kategorien tragen: **61** (Modellkern und
+Modellzahl), **79** (Formel und Modellzahl), **88** (Modellzahl und `backend/`), **92** (Modellzahl
+und Formel); das sind vier. **Rechenzeile:** 13 + 39 + 11 + 4 + 14 = 81; 81 − 4 Überschneidungen
+(61, 79, 88, 92, je einmal abgezogen) = **77**. Kein verbliebener B- oder C-Befund verlangt
 eine Änderung am rechnenden Produktionscode unter `backend/app/`; die vier mit Code-Bezug betreffen
 Prüf-, Kalibrier- und Testmechanik. Das entspricht der Lage des Vergleichsfalls #98
 (`reviews/BEFUNDE_98.md`), wo die Runden 20, 22 und 23 ebenfalls ohne Null-Runde schlossen und
