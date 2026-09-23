@@ -212,7 +212,7 @@ Wasserstandsachse von FLEMOps (Langbeleg B5) sind Basiswert und in §3.3 hergele
 | 60-R23-01 | R23 Bau- und Immobilienunternehmen → Gebäudeschaden | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | **bewusst inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” — Unternehmensschäden (Betriebsausfall der Bauwirtschaft) sind kein K3-Gebäudeschaden |
 | 60-R25-01 | R25 Siedlungsinfrastrukturen → Gebäudeschaden | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | **bewusst inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” — Siedlungsinfrastruktur bucht K4 |
 
-### Belege zu den entschiedenen Registerzeilen (§3.8, Volltext geprüft am 13.09.2026)
+### Belege zu den entschiedenen Registerzeilen (§3.8, Volltext geprüft 13.09.2026, Quellen- und Snapshot-Stand 17.09.2026)
 
 **B1 — 60-W085-01 (Hazard-Szenarien und Überflutungstiefe).**
 Quellen: (1) **LAWA — Bund/Länder-Arbeitsgemeinschaft Wasser (2024):** „Empfehlungen zur
@@ -242,7 +242,7 @@ Hochwassergefahren- und -risikokarten“**, URL
 `https://www.lfu.bayern.de/wasser/hw_risikomanagement_umsetzung/faq_karten/index.htm`,
 Archiv-Snapshot
 `https://web.archive.org/web/20260314134744/https://www.lfu.bayern.de/wasser/hw_risikomanagement_umsetzung/faq_karten/index.htm`
-(Snapshot vom 14.03.2026), Zugriff 13.09.2026; wörtlich: HQhäufig ist „ein Abfluss (Q) verstanden, der statistisch gesehen im
+(Snapshot vom 14.03.2026; Stand laut Snapshot 14.03.2026 — ein eigenes Stand-Feld der Seite ist nicht belegt), Zugriff 13.09.2026; wörtlich: HQhäufig ist „ein Abfluss (Q) verstanden, der statistisch gesehen im
 Mittel alle 5 bis 20 Jahre auftritt“ (die Karten zeigen ein HQ10), HQ100 ist „ein Abfluss (Q), der
 im Mittel alle hundert Jahre erreicht oder überschritten wird“, HQextrem entspricht ungefähr einem
 HQ1000. **Rechenschritt (§3.9 Übernommen):** p = 1/T mit T aus den zitierten Wiederkehrintervallen
@@ -263,7 +263,7 @@ Land zu erheben.
 Quellen: (1) **LAIV MV — Landesamt für innere Verwaltung Mecklenburg-Vorpommern, „Geländemodelle“**,
 URL `https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/`, Archiv-Snapshot
 `https://web.archive.org/web/20260515142234/https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/`
-(Snapshot vom 15.05.2026), Zugriff 13.09.2026;
+(Snapshot vom 15.05.2026; Stand laut Snapshot 15.05.2026 — ein eigenes Stand-Feld der Seite ist nicht belegt), Zugriff 13.09.2026;
 wörtlich zur Höhengenauigkeit des DGM1: „0,15 – 0,2 m“, zur Erfassung: „Dominierende
 Erfassungsmethoden für die Erhebung der Messdaten sind das Airborne Laserscanning und die
 Bildkorrelation auf Basis orientierter Luftbildpaare.“ (2) **de Moel, H.; Aerts, J. C. J. H.
@@ -303,7 +303,7 @@ Umweltrisiken“**, URL
 `https://www.gdv.de/gdv/themen/klima/-zuers-geo-zonierungssystem-fuer-ueberschwemmungsrisiko-und-einschaetzung-von-umweltrisiken-11656`,
 Archiv-Snapshot
 `https://web.archive.org/web/20260902211622/https://www.gdv.de/gdv/themen/klima/-zuers-geo-zonierungssystem-fuer-ueberschwemmungsrisiko-und-einschaetzung-von-umweltrisiken-11656`
-(Snapshot vom 02.09.2026), Zugriff 13.09.2026; wörtlich zur Klasse 2: in ihr sind „auch Objekte enthalten, die durch einen
+(Snapshot vom 02.09.2026; Stand laut Snapshot 02.09.2026 — ein eigenes Stand-Feld der Seite ist nicht belegt), Zugriff 13.09.2026; wörtlich zur Klasse 2: in ihr sind „auch Objekte enthalten, die durch einen
 Deich geschützt sind“, sofern dieser mindestens einem hundertjährlichen Hochwasser standhält;
 Objekte im Umkreis von 100 m zu einem Bach tragen zusätzlich den Vermerk „Bachzone“.
 **Rechenschritt (§3.9 Abgeleitet):** aus den beiden wörtlich belegten Anteilen folgt die
@@ -336,7 +336,7 @@ Stichtag 31.12.2024: 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche,
 (2) **Statistisches Bundesamt, Themenseite „Wohnen“**, URL
 `https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html`, Archiv-Snapshot
 `https://web.archive.org/web/20260831100304/https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html`
-(Snapshot vom 31.08.2026), Zugriff 13.09.2026;
+(Snapshot vom 31.08.2026; Stand laut Snapshot 31.08.2026 — ein eigenes Stand-Feld der Seite ist nicht belegt; der Inhalt nennt den Bestand zum Jahresende 2025), Zugriff 13.09.2026;
 wörtlich: „44,0 Millionen Wohnungen in Deutschland zum Jahresende 2025“, Gesamtwohnfläche
 4,1 Mrd m² (Fortschreibung des Wohngebäude- und Wohnungsbestandes auf Zensus-2022-Basis).
 (3) **ImmoWertV, Anlage 4 (zu § 36 Abs. 1) „Normalherstellungskosten 2010“**, URL
@@ -356,7 +356,7 @@ Bundesamt, Fachserie 17 Reihe 4 „Preisindizes für die Bauwirtschaft“ (Basis
 `https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile`,
 Archiv-Snapshot
 `https://web.archive.org/web/20250416003519/https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile`
-(Snapshot vom 16.04.2025; die PDF-Datei selbst liegt unter derselben Adresse mit dem Zusatz `id_`
+(Snapshot vom 16.04.2025; Stand laut Snapshot 16.04.2025 — Erscheinungsjahr und Ausgabe der Reihe sind im Bericht nicht belegt, weil Titel und Adresse sie nicht nennen und der Snapshot der Prüfung nicht wieder vorlag; Berichtsjahrgang der entnommenen Werte: Jahresdurchschnitte 2010–2023; die PDF-Datei selbst liegt unter derselben Adresse mit dem Zusatz `id_`
 hinter dem Zeitstempel), Zugriff 13.09.2026; Jahresdurchschnitte Neubau konventionell gefertigter Wohngebäude:
 2010 = 89,1 · 2015 = 100,0 · 2020 = 114,0 · 2021 = 121,9 · 2022 = 139,4 · 2023 = 149,8.
 (5) **Statistisches Bundesamt (2026):** Pressemitteilung Nr. 241 vom 10.07.2026, URL
