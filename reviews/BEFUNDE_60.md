@@ -5715,6 +5715,15 @@ Exit 0
 | 89 | 163 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv, reviews/BEFUNDE_60.md | tauglich |
 | 98 | 172 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): prüft nicht die beanstandeten Stellen (π-Band, `* 1.124`), sondern nur Folgezahlen des λ-Bands |
 | 36 | 5788 (Autor-Revision T-0570) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): bindet feste Zahlenwerte, die heute das λ-Unsicherheitsband bezeichnen, nicht die Schranke |
+| 59 | 133 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 91 | 165 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich: matcht mit seinem Lesen von reviews/BEFUNDE_60.md den eigenen Beleg nicht (Zeilenanfang wählt nur die beiden Ledgerzeilen zu Befund 34, nicht die Belegzeilen zu Befund 91) |
+| 94 | 168 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 34 | 1866 (Review-Runde 2, T-0571 hat die Zeile fortgeschrieben) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): bindet feste Zahlenwerte (`0,832`, `0,22`, `1,66`, `wert: 0.832`), die T-0570 abgelöst hat; endet am heutigen Stand mit 1, obwohl der Befund geschlossen ist |
+| 41 | 115 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 53 | 127 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 92 | 166 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 93 | 167 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 100 | 174 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
 
 Befund 24: Der Ausdruck liest §3.1 des Berichts (Physischer Teil-Ausweis) und prüft, ob dort `EAD}_z = ` und `EAD}_k = ` stehen, aber nicht `EAD} = `. Die T-0567-Commits (`f3295ea2`, `081f239d`, `ee82fa5a`) berühren laut `git show --stat` außer dem Bericht auch `reviews/BEFUNDE_60.md` — dort steht jedoch nur die Ledger-Buchung des Befunds selbst, kein zusätzlicher Sachverhalt, den der Ausdruck prüfen müsste. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" trifft damit nicht zu. Lauf am heutigen Stand: Exit 0 (geschlossen, Kopftabellen-Maßstab). Probe am Vergabestand `cedc3e77` (Elterncommit des ersten T-0567-Commits, über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, kein Checkout): Exit 1 (Befund bestand).
 
@@ -5897,6 +5906,53 @@ Exit 0
 ```
 
 Probe am Vergabestand `3dfc2d10` (entpackt wie oben): alter Befehl Exit 1 (die T-0570-Zahlen fehlen dort noch), Ersatz Exit 0 (die Schranke war dort schon in §4.8 geführt, Befund geschlossen; der Ersatz prüft die Führung, nicht die Zahlen). Am Vergabestand des Befunds `d64231f1` (T-0569, entpackt wie oben): Ersatz Exit 0 (Schranke dort als berechnet aus dem fortgepflanzten Band in §4.8 geführt). Gegenprobe: heutiger Bericht ohne die §4.8-Zeile „Plausibilitätsschranke" (Kopie): alter Befehl Exit 0 (falsch), Ersatz Exit 1 (besteht).
+
+**T-0571 (Befunde 59, 91, 94; Befund 34 Z. 1866).** Die beiden T-0571-Commits (`10b4a17d`, `daa8bcb7`) berühren laut `git show --stat` den Bericht und `reviews/BEFUNDE_60.md`. Kontrolle statt Unterstellung: Der Ledger trägt bei Befund 59 und 94 nur die Buchung des Befunds; bei Befund 91 ist der Ledger selbst der Gegenstand (Ablösungsvermerk in den Ledgerzeilen zu Befund 34) — deshalb liest der Ausdruck zu 91 beide Dateien, die zu 59 und 94 brauchen nur den Bericht. Vergabestand aller T-0571-Läufe: `1624f94a` (Elterncommit von `10b4a17d`, über `git archive 1624f94a docs/methodik docs/evidenz reviews` in ein leeres Verzeichnis entpackt, kein Checkout). Lauf am heutigen Stand: Exit 0 (geschlossen); Probe am Vergabestand: Exit 1 (Befund bestand) — bei 59, 91 und 94; Lauf am Stand M: Exit 0. Zusätzlich steht in M Z. 1866 (Ledgerzeile zu Befund 34, Runde 2, Spalte „Prüfausdruck") ein Ausdruck, dessen Zeile laut `git blame` aus `10b4a17d` stammt, weil T-0571 dort den Ablösungsvermerk angehängt hat; er ist hier mitbeurteilt.
+
+Befund 59: Der Ausdruck liest §4.3, die Modellgrenze 9 (Kap. 6) und die Entscheidungslog-Zeile Nr. 7 und prüft, dass die Gegenrechnung `1,058` nicht mehr steht, Zeitwert-Betrag und -Band (0,62 statt 1,13; 0,45–0,85) und \(\lambda\) 1,66 (bis 2,28) an allen drei Stellen gelten, die alten Werte fehlen und die Rechnungen stimmen. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft nicht zu (siehe Absatz oben). Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `1624f94a`: Exit 1 (Befund bestand).
+
+Befund 91: Der Ausdruck liest `reviews/BEFUNDE_60.md` und den Bericht. Er **matcht mit diesem Lesen den eigenen Beleg nicht**: Er wählt aus dem Ledger nur die Zeilen, die mit `| 34 | Bericht §4.1` (heute Z. 123) oder `| 34 | A | **Zusammenfassung` (heute Z. 1881) beginnen, verlangt genau zwei davon und prüft in ihnen den Vermerk `**abgelöst:** das Band 0,22–1,66` samt `0,12–3,93`. Die Belegzeilen zu Befund 91 selbst — die Kopftabellenzeile (heute Z. 180), die den Vermerk-Wortlaut ebenfalls trägt, die Zeile im Abschnitt Autor-Revision T-0571 und diese Durchsicht — beginnen anders und werden nicht gewählt. Gegenproben an Kopien des heutigen Stands (Bericht und Ledger, entpackt in ein leeres Verzeichnis): Ledger ohne alle Zeilen `| 91 |` Exit 0 (der eigene Beleg trägt nicht); Vermerk `**abgelöst:**` aus den beiden 34-Zeilen entfernt Exit 1 (er liest also wirklich das Ledger); eine dritte Zeile mit Anfang `| 34 | Bericht §4.1` angehängt Exit 1 (deshalb darf keine neue Zeile so beginnen; diese Durchsicht beginnt ihre Zeilen zu Befund 34 mit `| 34 | 1866`). Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft nicht zu. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `1624f94a`: Exit 1 (Befund bestand: dort trägt der Ledger den Vermerk noch nicht).
+
+Befund 94: Der Ausdruck liest den Abschnitt `## Ergebnis` und den Bericht und prüft, dass `0,724` und `1,360` dort fehlen, \(M_0\) = 1,243 und \(\lambda\) = 0,911 mit Nachzugsvermerk stehen und der Parameterblock `wert: 0.911` trägt. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft nicht zu (siehe Absatz oben). Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `1624f94a`: Exit 1 (Befund bestand).
+
+**T-0573 (Befunde 41, 53, 92, 93, 100).** Die beiden T-0573-Commits (`523c59d6`, `6e87f7f1`) berühren laut `git show --stat` den Bericht und `reviews/BEFUNDE_60.md`; der Ledger trägt bei allen fünf Befunden nur die Buchung des Befunds, keinen Sachverhalt, den ein Ausdruck prüfen müsste. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft bei keinem der fünf zu. Vergabestand: `4d9bdb41` (Elterncommit von `523c59d6`, entpackt wie oben). Bei allen fünf: Lauf am heutigen Stand Exit 0 (geschlossen), am Stand M Exit 0, Probe am Vergabestand `4d9bdb41` Exit 1 (Befund bestand).
+
+Befund 41: Der Ausdruck liest §4.8 und prüft die Zeile des Alterswertminderungsfaktors (0,55 (0,40–0,75); „0,62 (0,45–0,85) statt 1,13 Mrd.“, kein `0,54`) und, dass `0,99` im Bericht fehlt.
+
+Befund 53: Der Ausdruck liest Kopf, Kap. 8 und §7.2 und prüft Antragsstatus, „Anhängige Abweichung“, den Quellenanker, „Stand an der Quelle (Befund 53)“, Entscheider, Frist und die Aussage „noch keine Zeile“.
+
+Befund 92: Der Ausdruck liest §7.2 und prüft die Kette `A_stern = 1.838 * …` samt Zusicherung `assert abs(M0 - 1.243)`, dass die abgelösten Literale `1.6` fehlen und `1,132` mit der Rechnung übereinstimmt.
+
+Befund 93: Der Ausdruck liest §7.2 und prüft die \(\lambda\)-Angaben 1,66 und 2,28 mit den Zusicherungen im Block, das Fehlen von `1,51`, `2,08`, `1,32`, `1,81`, `1,360` und die Kennzeichnung „maßgebliche“.
+
+Befund 100: Der Ausdruck liest §7.2 und Modellgrenze 9 und prüft Sensitivität 0,62 (0,45–0,85), −0,51, den Zeitwert je Gebäude, die Zusicherung im Block, das Fehlen von `0,54`, `0,39–0,74`, `290.004`, `527.280` und rechnet die Werte nach.
+
+Nicht als Prüfausdrücke behandelt sind die beiden Prosasätze in M Z. 5850 und Z. 5899 (Abschnitte Autor-Revision T-0571 und T-0573): Sie nennen `python3 backend/scripts/lint_methodik.py 60` und `grep -c` als gelaufene Läufe, stehen aber in keiner Spalte „Prüfausdruck“ und sind keine Befehle zu einem Befund.
+
+**Befund 34 (Z. 1866)** — untauglich: anderer Grund (benannt): bindet feste Zahlenwerte, die T-0570 abgelöst hat. Der Ausdruck prüft nur, dass sieben Zeichenketten irgendwo im Bericht stehen (`1,838`, `1,132`, `0,832`, `0,22`, `1,66`, `w_wg`, `wert: 0.832`). Der Befund (Anker- und \(\lambda\)-Herleitung) ist geschlossen; der Bericht führt \(\lambda\) heute als 0,911 (Band 0,12–3,93), `0,832` und `wert: 0.832` stehen nicht mehr. Der Ausdruck endet deshalb am heutigen Stand mit 1 — das falsche Ergebnis. Die zweite Angabe der Zelle, `python3 backend/scripts/lint_methodik.py 60`, ist hier nicht neu beurteilt.
+
+Ersatz:
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if (all(x in s for x in ('1,838','1,132','0,911','0,12–3,93','w_wg','wert: 0.911')) and 'wert: 0.832' not in s) else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('1,838','1,132','0,832','0,22','1,66','w_wg','wert: 0.832')) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('1,838','1,132','0,832','0,22','1,66','w_wg','wert: 0.832')) else 1)"; echo "Exit $?"
+Exit 1
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if (all(x in s for x in ('1,838','1,132','0,911','0,12–3,93','w_wg','wert: 0.911')) and 'wert: 0.832' not in s) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe am Vergabestand `1624f94a` (Elterncommit von `10b4a17d`, T-0571; entpackt wie oben): alter Befehl Exit 1, Ersatz Exit 0 — der Stand nach T-0570 führt \(\lambda\) = 0,911 schon; `1624f94a` ist der Vergabestand von T-0571, nicht der Stand, an dem Befund 34 bestand. Der Ersatz prüft die Führung der aktuellen Werte, nicht die Beanstandung. Gegenprobe an einer Kopie des heutigen Berichts mit `wert: 0.832` statt `wert: 0.911`: Ersatz Exit 1.
 
 ## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)
 
