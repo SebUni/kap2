@@ -227,6 +227,24 @@ if git rev-parse -q --verify "origin/$REF" >/dev/null; then git checkout -q -B d
 COMMIT=$(git rev-parse --short HEAD)
 echo "Commit $COMMIT"
 
+SCHRITT="deploy-tests"
+# T-0530: Die Deploy-Tests (backend/tests/test_deploy_*.py) laufen vor jedem Deploy, gegen genau
+# den Stand, der gleich ausgeliefert wird -- und VOR Abhaengigkeiten, Bau, Migration und Neustart.
+# Sonst faellt Drift zwischen Skript und Tests erst beim Ausliefern auf, und dann steht die
+# Testumgebung. Rot bricht hier ab (ERR-Falle -> Status "fehler" im Firmen-Repo); gebaut oder
+# ausgeliefert wird dann nichts. Die Tests brauchen nur pytest und die Standardbibliothek; fehlt
+# pytest im venv, wird es nachinstalliert, statt die Tests stillschweigend auszulassen.
+# --tb=line: je rotem Test eine Zeile mit dem Grund (bei Ankern: "ANKER ROT: '<anker>' ..."),
+# damit der Grund in den letzten Protokollzeilen des Fehlerstatus steht.
+cd "$PRODUKT/backend"
+[[ -x "$VENV/bin/pip" ]] || python3.12 -m venv "$VENV"
+"$VENV/bin/python" -m pytest --version >/dev/null 2>&1 || "$VENV/bin/pip" install -q pytest
+if ! env -u KAP2_DEPLOY_SKRIPT "$VENV/bin/python" -m pytest -q -p no:cacheprovider --tb=line tests/test_deploy_*.py; then
+  echo "!! Deploy-Tests rot -- Abbruch vor Bau und Auslieferung (nichts gebaut, nichts neu gestartet)"
+  false
+fi
+echo "Deploy-Tests gruen"
+
 SCHRITT="backend-abhaengigkeiten"
 [[ -x "$VENV/bin/pip" ]] || python3.12 -m venv "$VENV"
 "$VENV/bin/pip" install -q --upgrade pip wheel

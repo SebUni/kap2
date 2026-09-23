@@ -7,6 +7,12 @@
   Installiert das Backend in
   `/opt/overlord/kap2-venv`, migriert die Datenbank, startet `kap2-test.service` neu, prüft `/api/health` und
   schreibt `betrieb/deploy-status.json` ins Firmen-Repo (das ist das Signal für den CEO).
+- Vor Abhängigkeiten, Bau, Migration und Neustart läuft der Schritt `deploy-tests`
+  (`backend/tests/test_deploy_*.py` gegen den auszuliefernden Stand, T-0530). Ist ein Test rot,
+  bricht der Lauf dort ab und meldet `fehler` — gebaut oder ausgeliefert wird nichts. Die Tests
+  suchen Textanker in `test-deploy.sh` nur in Befehlszeilen (`backend/tests/_deploy_anker.py`):
+  ein fehlender oder nur noch in einem Kommentar stehender Anker macht den Test rot, mit dem
+  Namen des Ankers in der Meldung.
 - `kap2-test.service`: uvicorn auf 127.0.0.1:8010, Konfiguration in `/etc/overlord/kap2-test.env`,
   läuft als `User=overlord`. Installation als **System-Unit**: `cp deploy/kap2-test.service
   /etc/systemd/system/kap2-test.service && systemctl daemon-reload && systemctl enable --now kap2-test`

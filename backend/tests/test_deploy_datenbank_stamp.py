@@ -22,8 +22,8 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-WURZEL = Path(__file__).resolve().parents[2]
-SKRIPT = WURZEL / "deploy" / "test-deploy.sh"
+# Strenge Anker (T-0530): Treffer nur in Befehlszeilen, fehlender Anker macht den Test rot.
+from _deploy_anker import SKRIPT, ausschnitt
 
 # Stub-alembic: verhält sich je nach STUB_MODUS wie ein echter Aufruf und schreibt jeden
 # Aufruf mit seinen Argumenten in STUB_PROTOKOLL, damit der Test zählen kann, was passiert ist.
@@ -78,10 +78,7 @@ echo "== schritt datenbank beendet"
 
 
 def _datenbank_block() -> str:
-    text = SKRIPT.read_text(encoding="utf-8")
-    anfang = text.index('SCHRITT="datenbank"')
-    ende = text.index('SCHRITT="dienst"')
-    return text[anfang:ende]
+    return ausschnitt('SCHRITT="datenbank"', 'SCHRITT="dienst"')
 
 
 def _lauf(tmp_path: Path, modus: str) -> tuple[int, str, list[str]]:

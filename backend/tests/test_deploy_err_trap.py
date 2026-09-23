@@ -27,7 +27,8 @@ from pathlib import Path
 
 import pytest
 
-SKRIPT = Path(__file__).resolve().parents[2] / "deploy" / "test-deploy.sh"
+# Strenge Anker (T-0530): Treffer nur in Befehlszeilen, fehlender Anker macht den Test rot.
+from _deploy_anker import SKRIPT, anker_index, skript_text
 
 PYTHON3_ATTRAPPE = """#!/usr/bin/env bash
 # Scheitert beim ersten Aufruf (status_schreiben fertig), danach echtes python3.
@@ -50,18 +51,19 @@ def _set_zeile() -> str:
 
 
 def _funktionsblock() -> str:
-    text = SKRIPT.read_text(encoding="utf-8")
+    text = skript_text()
     # Anker ist die *erste* Funktion des Blocks, nicht status_schreiben: seit T-0132 ist
     # status_schreiben in status_lokal_schreiben (JSON + lokal festschreiben) und
     # status_veroeffentlichen (Push-Schleife) aufgeteilt, und fehler_abbruch ruft
     # zusaetzlich aufseher_zeile. Wird weiter unten ausgeschnitten, fehlen diese Helfer
     # in der Werkbank und der Lauf endet in "command not found" statt im Fehlerstatus.
-    anfang = text.index("speicher_zeile() {")
+    anfang = anker_index(text, "speicher_zeile() {")
     # Ab T-0442 nennt schon ein Kommentar vor dem Funktionsblock (Begruendung der
     # Aufraeumlogik zu DEPLOY_TMP) die Zeichenkette "trap fehler_abbruch ERR" beilaeufig --
     # text.index() faende dort die erste, viel zu fruehe Stelle und ende laege vor anfang
-    # (leerer Ausschnitt). Deshalb ab anfang weitersuchen, nicht vom Dateianfang.
-    ende = text.index("trap fehler_abbruch ERR", anfang) + len("trap fehler_abbruch ERR")
+    # (leerer Ausschnitt). Deshalb ab anfang weitersuchen, nicht vom Dateianfang. Seit T-0530
+    # zaehlen Kommentarzeilen bei der Suche ohnehin nicht mit (anker_index).
+    ende = anker_index(text, "trap fehler_abbruch ERR", anfang) + len("trap fehler_abbruch ERR")
     return text[anfang:ende]
 
 
