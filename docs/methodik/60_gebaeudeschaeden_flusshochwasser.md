@@ -374,11 +374,11 @@ unteres Ende drei Schritte à 2,3 % (1,023³ = 1,0706), oberes Ende drei Schritt
 **Woher die Jahresraten kommen (§3.9 Abgeschätzt, Vorgabe P1).** Nur das obere Bandende ist
 belegt: 5,0 % ist der höchste der drei zitierten amtlichen Werte (Mai 2026). Die beiden anderen
 Raten sind **gerundete Setzungen von KAP3**, nicht aus den Monatswerten errechnet: Der Zentralwert
-3,4 % liegt zwischen dem Median (3,3 %) und dem arithmetischen Mittel (3,8 %) der drei zitierten
+3,4 % liegt zwischen dem Median (3,3 %) und dem arithmetischen Mittel (3,83 %) der drei zitierten
 Werte, näher am Median, weil der Mai-Wert ein einzelner Monat am aktuellen Rand ist und die beiden
 älteren Werte (3,2 %/3,3 %) zwei der drei Fortschreibungsjahre abbilden. Richtung und Größe der
-Setzung: mit dem Median ergäbe sich 1,033³ = 1,102 (−0,3 % gegenüber 1,105), mit dem Mittel
-1,038³ = 1,119 (+1,3 %) — beide innerhalb des Bandes. Das untere Bandende 2,3 % liegt rund einen
+Setzung: mit dem Median ergäbe sich 1,033³ = 1,102 (−0,2 % gegenüber 1,105), mit dem Mittel
+1,0383³ = 1,119 (+1,3 %) — beide innerhalb des Bandes. Das untere Bandende 2,3 % liegt rund einen
 Prozentpunkt unter dem niedrigsten zitierten Wert (3,2 %), weil für das Jahr 2024 keine Rate
 zitiert ist und ein Jahresdurchschnitt unter den Monatswerten vom Jahresende 2025 liegen kann.
 Ergebnis: 1.765 × 1,105 = 1.950,3 ⇒ **1.950 €₂₀₂₆/m² BGF** (Band 1.765 × 1,0706 = 1.889,6 bis
@@ -386,7 +386,7 @@ Ergebnis: 1.765 × 1,105 = 1.950,3 ⇒ **1.950 €₂₀₂₆/m² BGF** (Band 1
 (Band 1.387 × 1,0706 = 1.484,9 bis 1.387 × 1,1576 = 1.605,6 ⇒ **1.485–1.606**). **Modellgrenze:**
 Die Jahresraten sind gesetzt, nicht aus einer amtlichen Jahresdurchschnittsreihe gemessen; der
 Zentralwert 1.950 / 1.533 hängt an der Setzung 3,4 % (Wirkung der Alternativen Median/Mittel:
-−0,3 % bzw. +1,3 % auf \(n_t\)); erscheint die Jahresdurchschnittsreihe bis 2026, wird der Schritt
+−0,2 % bzw. +1,3 % auf \(n_t\)); erscheint die Jahresdurchschnittsreihe bis 2026, wird der Schritt
 durch den gemessenen Indexstand ersetzt (Rechenschritt 4, „Kopplung“). **Produkt-Kennzeichnung
 (Vorgabe P1/P2):** der Fortschreibungsfaktor ist eine begründete Abschätzung von KAP3, keine
 Quellenangabe, und wird in der nutzersichtbaren Parameterliste als solche geführt.
