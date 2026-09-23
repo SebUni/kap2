@@ -1231,8 +1231,9 @@ Stichprobenlauf auf den acht Anker-Kommunen.
    (Wertsätze und BGF-Faktor: Register 60-R24-01). Wohnfläche 208 m² und Typ-Mix beziehen sich
    damit auf **dieselbe** Grundgesamtheit (alle Wohngebäude): \(\sum_t W_t n_t = W \sum_t
    \bar\theta_t n_t\). **Modellgrenze:** \(\bar\theta\) ist der Bestandsmix des Bundes, nicht der
-   der exponierten Teilmenge (nicht gemessen; Fortschreibung auf Basis der GWZ 2011, der Zensus
-   2022 führt den Typ nur im Gitter); Randfälle reiner MFH- bzw. EFH/ZFH-Satz: \(M_0\) = 1,069
+   der exponierten Teilmenge (nicht gemessen). Die Quelle ist die Bestandsfortschreibung auf Basis
+   der GWZ 2011; ob der Zensus 2022 eine Bundessumme der Wohnfläche je Gebäudetyp veröffentlicht,
+   ist **nicht geprüft**. Randfälle reiner MFH- bzw. EFH/ZFH-Satz: \(M_0\) = 1,069
    bzw. 1,360 Mrd. €₂₀₂₆/a. Der Wert wird
    multipliziert mit dem **Wohngebäudeanteil je Adresse 0,872** (= 19,7 Mio. Wohngebäude /
    22,6 Mio. Adressen, Register 60-R17-01, **Quelle**) — nicht jede exponierte Adresse trägt ein
@@ -1300,7 +1301,7 @@ keine Verteilungsannahme, wie in §4.2 für \(A^{*}\), Anweisung A-0034):
 | BGF-Faktor | 1,30 | **1,25** | **1,40** | **Quelle:** Register 60-R24-01, §3.9 „Abgeschätzt" (Rechenschritt 3, Band 1,25–1,40). |
 | Wertsatz \(n_{\text{EFH/ZFH}}\) | 1.950 €₂₀₂₆/m² BGF | **1.890 €₂₀₂₆/m² BGF** | **2.043 €₂₀₂₆/m² BGF** | **Quelle:** Register 60-R24-01 (Fortschreibungsfaktor 2023→2026, Band 1,0706–1,1576, gerundet 1,07–1,16; Band 1.890–2.043, B4 Rechenschritt 2). |
 | Wertsatz \(n_{\text{MFH}}\) | 1.533 €₂₀₂₆/m² BGF | **1.485 €₂₀₂₆/m² BGF** | **1.606 €₂₀₂₆/m² BGF** | **Quelle:** Register 60-R24-01 (derselbe Fortschreibungsfaktor; Band 1.485–1.606, B4 Rechenschritt 2). |
-| Typ-Mix \(\bar\theta_{\text{EFH/ZFH}}\) (Wohnflächenanteil; \(\bar\theta_{\text{MFH}} = 1 - \bar\theta_{\text{EFH/ZFH}}\)) | 0,596 | **0,471** | **0,624** | **Quelle:** Destatis, Bestand und Bauabgang von Wohnungen und Wohngebäuden 2021, Tabelle 2.1.3, 31.12.2021 (`docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv`): Deutschland 2.289.188/3.841.438 = 0,596. Bandenden aus der Spannweite der regionalen Mixe derselben Tabelle — eine Aufgliederung nach Bundesländern führt die Quelle nicht: Neue Länder und Berlin (259.344 + 72.212)/703.982 = 0,471, Früheres Bundesgebiet (1.417.059 + 540.574)/3.137.456 = 0,624. Dass der Mix der **exponierten** Teilmenge in diesem Band liegt, ist eine **Abschätzung von KAP3** (§3.9; Herleitung: die Anker-Kommunen liegen in beiden Gebietsteilen); die Randfälle 0 und 1 stehen als Modellgrenze in Punkt 2 oben. |
+| Typ-Mix \(\bar\theta_{\text{EFH/ZFH}}\) (Wohnflächenanteil; \(\bar\theta_{\text{MFH}} = 1 - \bar\theta_{\text{EFH/ZFH}}\)) | 0,596 | **0,471** | **0,624** | **Quelle:** Destatis, Bestand und Bauabgang von Wohnungen und Wohngebäuden 2021, Tabelle 2.1.3, 31.12.2021 (`docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv`): Deutschland 2.289.188/3.841.438 = 0,596. Bandenden aus den beiden Gebietsteilen, die Tabelle 2.1.3 ausweist: Neue Länder und Berlin (259.344 + 72.212)/703.982 = 0,471, Früheres Bundesgebiet (1.417.059 + 540.574)/3.137.456 = 0,624. In dieser Publikation ist die Wohnfläche nach Gebäudetyp nur in Tabelle 2.1 (Deutschland und die zwei Gebietsteile) aufgegliedert; die Länder-Tabellen 1.3 (Wohnfläche, PDF-S. 11–13) und 2.2 (Wohngebäude, PDF-S. 17–19) führen keinen Gebäudetyp (gelesen: Tabellenverzeichnis PDF-S. 4, Tabellen 1.3.3, 2.1.3 und 2.2.3 vollständig). Ob Länderwerte aus einer anderen amtlichen Quelle (etwa GENESIS-Tabelle 31231) das Band weiten würden, ist **nicht geprüft**; die Wahl der Gebietsteile als Bandenden ist deshalb eine **Abschätzung von KAP3** (§3.9). Ebenso ist es eine Abschätzung von KAP3, dass der Mix der **exponierten** Teilmenge in diesem Band liegt (Herleitung: die Anker-Kommunen liegen in beiden Gebietsteilen). Die Randfälle 0 und 1 stehen als Modellgrenze in Punkt 2 oben. |
 | Wohngebäudeanteil je Adresse | 0,872 | **0,872** | **0,872** | **Quelle:** Register 60-R17-01/60-R24-01 (19,7 Mio. Wohngebäude ÷ 22,6 Mio. Adressen, beides amtliche Bestandsstatistik, Punkt 2 oben). Kein Band ausgewiesen — Quotient zweier amtlicher Summen ohne publizierte Unsicherheit; Punktwert unten wie oben. |
 | Klassenrate GK3+GK4 | 0,0059796/a | **0,0033/a** | **0,0103/a** | **Abschätzung von KAP3**, Herleitung: Streuung der Klassenrate über die acht Anker-Kommunen (Faktor 3,1; `m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Klasse `gk3_gk4`: Minimum Deggendorf 0,0033, Maximum Grimma 0,0103), siehe Restfehler-Position 3 oben. |
 | Klassenrate GK2 | 0,00067515/a | **0,000301/a** | **0,001154/a** | **Abschätzung von KAP3**, hergeleitet analog zur Restfehler-Position 3: `m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Klasse `gk2` — Minimum Reichertshofen 0,000301, Maximum Halle (Saale) 0,001154. Für GK2 beziffert dieses Kapitel die Streuung nicht als eigene Restfehler-Position; das Minimum/Maximum der acht Kommunenwerte wird deshalb hier nach demselben Verfahren als KAP3-Abschätzung übernommen. |
@@ -1324,9 +1325,8 @@ Zentralwert 339.000 · 0,0059796 + 1.380.000 · 0,00067515 = 2.958,79/a (unverä
 
 Damit ist \(M_0\) = **1,243 Mrd. €₂₀₂₆/a**, mit einem Band von **0,583–2,425 Mrd. €₂₀₂₆/a** um
 diesen Zentralwert. Dieses Band ist in §4.4 und §4.8 bereits in das λ-Band und die
-Plausibilitätsschranke fortgepflanzt (Ersatzkette für Ledger-Befund 36); der Nachzug in den
-Produkt-Block `flood_bldg.lambda` (Kap. 7) und die Entscheidungslog-Zeile 8 folgt im nächsten
-Schritt der Kette.
+Plausibilitätsschranke fortgepflanzt (Ersatzkette für Ledger-Befund 36) und ebenso in den
+Produkt-Block `flood_bldg.lambda` (Kap. 7) und die Entscheidungslog-Zeile 8 nachgezogen.
 
 <a id="niveau-skalar"></a>
 ### 4.4 Der Niveau-Skalar

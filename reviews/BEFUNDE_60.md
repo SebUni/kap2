@@ -4671,6 +4671,24 @@ und sind nicht nachgezogen.
 | 98 | C | **Fortschreibung des Prüfausdrucks, kein neuer Eingriff.** Der bisherige Ausdruck bindet `[0,11; 3,49]`, `band: [0.11, 3.49]`, `assert abs(schranke_hi - 3.49)` und `0,657–2,638`, die dieses Paket nach Befund 58 bewusst ändert; er endete auf dem Branch deshalb mit 1, ohne dass Befund 98 (Schranke aus dem ungerundeten \(\pi\)-Band) wieder aufgeht. In der Kopftabelle fortgeschrieben auf `[0,12; 3,93]`, `band: [0.12, 3.93]`, `assert abs(schranke_hi - 3.93)` und `0,583–2,425`, gleiche Prüflogik. | in der Kopftabelle ersetzt | behoben (unverändert) |
 | 36 | B | **Fortschreibung des Prüfausdrucks aus der Autor-Revision T-0569** (kein Prüfausdruck der Kopftabelle), gleiche Begründung wie 98; neue Werte `0,583–2,425`, `0,12–3,93`, `[0,12; 3,93]`, `0,12 bzw. 3,93`, `[0.12, 3.93]`, `0,296–2,291`. | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('0,583–2,425','0,12–3,93','[0,12; 3,93]','0,12 bzw. 3,93','[0.12, 3.93]','0,296–2,291')) else 1)"` | behoben (unverändert) |
 
+**Nacharbeit Runde 1 — gelesene Abschnitte der Quelle.** Die Destatis-Publikation „Bestand und
+Bauabgang von Wohnungen und Wohngebäuden 2021“ (23 PDF-Seiten, URL in
+`docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv`) ist so gelesen worden: das
+Tabellenverzeichnis auf PDF-S. 4 ganz (Tabellen 1.1 Wohnungen, 1.2 Wohnungen nach Ländern,
+1.3 Wohnfläche nach Ländern, 2.1 Wohngebäude, 2.2 Wohngebäude nach Ländern, 3–5 Abgänge) sowie die
+Tabellen 1.3.3 (PDF-S. 13), 2.1.3 (PDF-S. 16) und 2.2.3 (PDF-S. 19) vollständig. Nach Gebäudetyp
+(1 / 2 / 3+ Wohnungen, Wohnheime) mit Wohnfläche gliedert allein Tabelle 2.1, und zwar nur für
+Deutschland, das Frühere Bundesgebiet und die Neuen Länder mit Berlin. 1.3.3 führt die Wohnfläche
+je Land ohne Typ, 2.2.3 die Zahl der Wohngebäude je Land ohne Typ und ohne Wohnfläche. Die älteren
+Jahrgangstabellen (1.3.1/1.3.2, 2.1.1/2.1.2, 2.2.1/2.2.2) haben laut Verzeichnis denselben Aufbau
+und sind nicht einzeln gelesen. Der Bericht sagt deshalb nicht mehr „die Quelle führt keine
+Länderaufgliederung“, sondern „Bandenden aus den beiden Gebietsteilen, die Tabelle 2.1.3
+ausweist“. Er nennt offen, dass Länderwerte aus einer anderen amtlichen Quelle (GENESIS 31231)
+**nicht geprüft** sind, und führt die Wahl der Bandenden als Abschätzung von KAP3. Die Aussage
+zum Zensus 2022 ist auf „nicht geprüft“ zurückgenommen. Der überholte Satz am Ende von §4.3
+(Nachzug in `flood_bldg.lambda` und Entscheidungslog-Zeile 8 „im nächsten Schritt“) ist
+berichtigt. Kein Zahlenwert ändert sich.
+
 **Prüfausdrücke der Kopftabelle.** Die drei neuen Prüfausdrücke (58, 62, 89) enden auf dem Branch
 mit 0 und auf dem Stand von main vor dem Paket mit 1. Von den übrigen Prüfausdrücken der
 Kopftabelle, die auf main mit 0 endeten, kippte allein der zu 98; er ist oben fortgeschrieben und
