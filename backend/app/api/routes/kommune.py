@@ -17,6 +17,7 @@ from app.models.models import (
     CellAssessment, GridCell, AdaptationMeasure,
     MeasureImpact, ProjectStatus, RiskZone, GeoExportJob,
 )
+from app.data.kang_zustaendigkeit import zustaendigkeit_fuer
 from app.services.bestandsaufnahme_markdown import bestandsaufnahme_markdown
 from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
@@ -149,6 +150,20 @@ async def get_kommune_bestandsaufnahme(kommune_id: int, db: Session = Depends(ge
         content=bestandsaufnahme_markdown(ergebnis),
         media_type="text/markdown; charset=utf-8",
     )
+
+
+@router.get("/{kommune_id}/kang-zustaendigkeit")
+def get_kommune_kang_zustaendigkeit(kommune_id: int, db: Session = Depends(get_db)):
+    """Zuständige Stelle für das Klimaanpassungskonzept nach § 12 Abs. 1 KAnG (T-0751)."""
+    kommune = (
+        db.query(Kommune)
+        .options(load_only(Kommune.id, Kommune.bundesland))
+        .filter(Kommune.id == kommune_id)
+        .first()
+    )
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    return zustaendigkeit_fuer(kommune.bundesland)
 
 
 @router.get("")
