@@ -76,6 +76,30 @@ async function requestWithProgress<T>(path: string, onProgress?: ProgressCallbac
   return JSON.parse(new TextDecoder().decode(bytes)) as T
 }
 
+/** Antwort von GET /catalog/querverbindungen (backend/app/services/querverbindungen.py). */
+export interface QuerverbindungKlimawirkung {
+  kwra_id: number
+  name: string
+  netzrolle: 'stark ausgehend' | 'stark eingehend' | null
+  ausgehende_benannte: number
+  eingehende_benannte: number
+}
+
+export interface QuerverbindungsAuswertung {
+  klimawirkungen: QuerverbindungKlimawirkung[]
+  kennzahlen: Record<string, string | number>
+  systembereich_matrix: Record<string, Record<string, number>>
+  abdeckung: {
+    klimawirkungen_im_katalog: number
+    klimawirkungen_kwra_gesamt: number
+    mit_ausgewiesener_netzrolle: number
+    mit_benannter_einzelbeziehung: number
+    hinweis: string
+  }
+  quelle: string
+  modellgrenze: string
+}
+
 export interface AuthUser {
   id: number
   email: string
@@ -331,6 +355,8 @@ export const api = {
     request<Record<string, unknown>>(
       `/catalog/layer/${code}/recipe${category ? `?category=${category}` : ''}`,
     ),
+  /** KWRA-Querverbindungen je Klimawirkung (Netzrolle, benannte Beziehungen, Kennzahlen). */
+  getQuerverbindungen: () => request<QuerverbindungsAuswertung>('/catalog/querverbindungen'),
 
   // ── Parameter ───────────────────────────────────────────────────────
   getParameters: (kommuneId: number, layer?: string, category?: string) => {
