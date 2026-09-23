@@ -121,6 +121,10 @@ export interface MeasureImpactSummary {
   annual_benefit_direct_eur?: number
   /** true, wenn der Schadens-Nutzen am Gesamtschaden der verknüpften Risiken gekappt wurde. */
   benefit_capped?: boolean
+  /** Vermerk statt Betrag bei reiner Screening-Maßnahme (Klasse B, T-0838); sonst null. */
+  benefit_display?: string | null
+  /** Zusatz „ohne x Wirkungen im Screening“ zum Euro-Nutzen einer gemischten Maßnahme. */
+  benefit_note?: string | null
   count?: number
   count_is_default?: boolean
   recommended_count?: number
@@ -616,6 +620,7 @@ export interface CostSummary {
       capex_eur: number; opex_annual_eur: number; annual_benefit_eur: number
       annual_benefit_damage_eur?: number; annual_benefit_flat_eur?: number
       annual_benefit_direct_eur?: number; benefit_capped?: boolean
+      benefit_display?: string | null; benefit_note?: string | null
     }[]
   }
 }
