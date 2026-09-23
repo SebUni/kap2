@@ -343,10 +343,10 @@ function buildTooltipHtml(
         h += `<div style="margin-top:6px;font-weight:700;font-size:10px;color:#334155">OSM-Gewässer-Objekte (Debug)</div>`
         h += `<div style="font-size:10px;color:#475569">`
         for (const s of waterSrc) {
-          const url = `https://www.openstreetmap.org/${s.osm_type}/${s.osm_id}`
+          const url = `https://www.openstreetmap.org/${escHtml(String(s.osm_type))}/${s.osm_id}`
           const nm = s.name ? ` „${escHtml(String(s.name))}“` : ''
           const flag = s.minor ? ' · <span style="color:#94a3b8">Graben (schwach)</span>' : ''
-          h += `<div style="margin:1px 0">• <a href="${url}" target="_blank" rel="noopener" style="color:#2563eb">${s.osm_type}/${s.osm_id}</a>` +
+          h += `<div style="margin:1px 0">• <a href="${url}" target="_blank" rel="noopener" style="color:#2563eb">${escHtml(String(s.osm_type))}/${s.osm_id}</a>` +
             ` — ${escHtml(String(s.tag))}${nm} · ${fmtNum(s.dist_m)} m${flag}</div>`
         }
         h += `</div>`
