@@ -6213,6 +6213,345 @@ Alter Befehl: Exit 0, obwohl der Prosasatz zu §3.6 fehlt (der Kommentar im Gold
 
 Probe am Vergabestand `cedc3e77` (Elterncommit von `f3295ea2`, Kopie über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` nach `.t0748/va`, kein Checkout): alter Befehl Exit 1, neuer Befehl Exit 1 (Befund bestand, beide richtig).
 
+#### Fundstellenverzeichnis
+
+**T-0622 (übernimmt T-0597), 23.09.2026.** Das Verzeichnis führt jede Fundstelle genau einmal, mit Bezugscommit, Zeilenbereich, Klasse und Zuordnung: entweder ein Verweis auf die Tabelle dieses Abschnitts („Tabelle:“ mit Befund und Buchstabe der Tabelle oben, „Tabelle (Schritt 3a1):“ mit Befund und M-Zeile der Tabelle in Schritt 3a1, die keine Buchstaben führt) oder eine sachliche Ausschlussbegründung („ausgeschlossen:“). Fundstellen sind (a) jeder mit drei Backticks umzäunte Codeblock, angegeben mit Öffnungs- und Schlusszeile, auch mit Sprachkennung; (b) jede Zeile, die „Prüfausdruck“ enthält; (c) jede Zeile einer Tabelle, deren Kopf eine Spalte „Prüfausdruck“ hat und die dort einen Befehl in Backticks trägt. Erhoben sind sie im ganzen Stand `e3f5d6dd` und in den seither hinzugekommenen Zeilen von M = `8c3c4075359245730ebda58065652885522e0ddf` (der Commit, den Schritt 3a1 benennt; im Verzeichnis kurz `8c3c4075`), jeweils ohne diesen Abschnitt, also ohne die Zeilen von seiner Überschrift bis vor `## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)`. Im Stand `e3f5d6dd` gibt es den Abschnitt noch nicht; in M umfasst er Z. 4588–5677. „Hinzugekommen“ heißt: Die Zeile liegt in M in einem eingefügten oder ersetzten Stück des zeilenweisen Vergleichs `e3f5d6dd` → M (`difflib.SequenceMatcher`, ohne Autojunk); ein Codeblock zählt als hinzugekommen, wenn eine seiner Zeilen hinzugekommen ist. Ein Codeblock beginnt wie in CommonMark an einer Zeile mit mindestens drei Backticks, deren Rest keinen Backtick enthält; eine Zeile, die mit vier Backticks einen Inline-Code eröffnet (`e3f5d6dd` Z. 268), ist deshalb kein Zaun. Liegt eine Zeile in mehreren Klassen, steht sie einmal da, mit beiden Klassen.
+
+Das Verzeichnis legt keine Fundstelle offen, die noch nicht beurteilt war. Jeder Befehl, der als Prüfausdruck eines Befunds dasteht, hat seine Zeile in einer der beiden Tabellen; die übrigen Fundstellen sind Tabellenköpfe, Prosa, Lint-Ausgaben, gleichlautende Wiederholungen oder Belege der Runde 3, die nach „Umfang“ nicht zu den Prüfausdrücken zählen. Neu gegenüber „Umfang“ benannt sind nur Stellen, die dort nicht einzeln aufgezählt waren. Sie sind ausdrücklich ausgeschlossen, und zwar mit derselben Begründung, die „Umfang“ für ihre Gruppe gibt: die Messblöcke im Nachtrag zu Befund 2 (Z. 2170–2173 ist der Lauf von 2 (a), Z. 2175–2178 eine Zeilenzählung) und die Mess- und Rechenblöcke der Leitfragen der Runde 3. Deshalb sind keine Zeile der Tabellen, kein Urteil und kein Zählsatz geändert. Auf `main` hat sich die Datei seit M auch außerhalb dieses Abschnitts geändert, durch die Autor-Revisionen ab T-0580. Diese Zeilen erhebt das Verzeichnis nicht, weil es nur `e3f5d6dd` und M liest (siehe Ergebnis von T-0622).
+
+| Nr | Commit | Zeilen | Klasse | Zuordnung |
+|---|---|---|---|---|
+| F001 | e3f5d6dd | 6 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regelsatz im Ledgerkopf (W7), trägt keinen Befehl |
+| F002 | e3f5d6dd | 34 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F003 | e3f5d6dd | 36 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 1 (a) |
+| F004 | e3f5d6dd | 37 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 2 (a) |
+| F005 | e3f5d6dd | 39 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 4 |
+| F006 | e3f5d6dd | 40 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 5 |
+| F007 | e3f5d6dd | 42 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 7 (a) |
+| F008 | e3f5d6dd | 43 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 8 (a) |
+| F009 | e3f5d6dd | 44 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 9 (a) |
+| F010 | e3f5d6dd | 45 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 10 |
+| F011 | e3f5d6dd | 49 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 14 |
+| F012 | e3f5d6dd | 50 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 15 |
+| F013 | e3f5d6dd | 54 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 19 |
+| F014 | e3f5d6dd | 102–108 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Ausgabe des Lint-Laufs python3 backend/scripts/lint_methodik.py 60, kein Befehl zu einem Befund; der Lint-Lauf ist als Prüfausdruck unter 32 (d), 33 (c), 34 (c), 35 (c), 36 (c) und 39 (c) beurteilt |
+| F015 | e3f5d6dd | 116 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Prosa zur Gliederung der Leitfragen, trägt keinen Befehl |
+| F016 | e3f5d6dd | 123 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Einleitungszeile; der Befehl steht im Block Z. 125–134 und ist dort verzeichnet (1 (b), 2 (b)) |
+| F017 | e3f5d6dd | 125–134 | Codeblock (Sprachkennung: bash) | Tabelle: 1 (b), 2 (b) |
+| F018 | e3f5d6dd | 163 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Einleitungszeile; der Befehl steht im Block Z. 165–174 und ist dort verzeichnet (6, 7 (b)) |
+| F019 | e3f5d6dd | 165–174 | Codeblock (Sprachkennung: bash) | Tabelle: 6, 7 (b) |
+| F020 | e3f5d6dd | 242 | Zeile mit „Prüfausdruck“ | Tabelle: 11 (a), 11 (b) — Einleitungszeile der beiden Ausdrücke in Z. 243 und Z. 244 |
+| F021 | e3f5d6dd | 256–264 | Codeblock (Sprachkennung: bash) | Tabelle: 8 (b), 9 (b), 8 (c), 9 (c) |
+| F022 | e3f5d6dd | 300 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Einleitungszeile; der Befehl steht im Block Z. 302–309 und ist dort verzeichnet (13 (b)) |
+| F023 | e3f5d6dd | 302–309 | Codeblock (Sprachkennung: bash) | Tabelle: 13 (b) |
+| F024 | e3f5d6dd | 332 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F025 | e3f5d6dd | 334 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 1 (a) — gleichlautend mit Z. 36, dort einmal gezählt |
+| F026 | e3f5d6dd | 335 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 2 (a) — gleichlautend mit Z. 37, dort einmal gezählt |
+| F027 | e3f5d6dd | 337 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 4 — gleichlautend mit Z. 39, dort einmal gezählt |
+| F028 | e3f5d6dd | 338 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 5 — gleichlautend mit Z. 40, dort einmal gezählt |
+| F029 | e3f5d6dd | 340 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 7 (a) — gleichlautend mit Z. 42, dort einmal gezählt |
+| F030 | e3f5d6dd | 341 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 8 (a) — gleichlautend mit Z. 43, dort einmal gezählt |
+| F031 | e3f5d6dd | 342 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle: 9 (a) — gleichlautend mit Z. 44, dort einmal gezählt |
+| F032 | e3f5d6dd | 343 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 10 — gleichlautend mit Z. 45, dort einmal gezählt |
+| F033 | e3f5d6dd | 346 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 13 (a) |
+| F034 | e3f5d6dd | 347 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 14 — gleichlautend mit Z. 49, dort einmal gezählt |
+| F035 | e3f5d6dd | 348 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 15 — gleichlautend mit Z. 50, dort einmal gezählt |
+| F036 | e3f5d6dd | 350 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 17 |
+| F037 | e3f5d6dd | 426–432 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Ausgabe des Lint-Laufs python3 backend/scripts/lint_methodik.py 60, kein Befehl zu einem Befund; der Lint-Lauf ist als Prüfausdruck unter 32 (d), 33 (c), 34 (c), 35 (c), 36 (c) und 39 (c) beurteilt |
+| F038 | e3f5d6dd | 451 | Zeile mit „Prüfausdruck“ | ausgeschlossen: „Prüfausdruck über Mengengleichheit“ ohne Wortlaut, nur das Ergebnis steht da (vgl. „Umfang“; Befund 21 trägt mit Z. 518 einen eigenen Ausdruck) |
+| F039 | e3f5d6dd | 515 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F040 | e3f5d6dd | 517 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 20 |
+| F041 | e3f5d6dd | 518 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 21 |
+| F042 | e3f5d6dd | 676 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F043 | e3f5d6dd | 678 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 23 |
+| F044 | e3f5d6dd | 679 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 24 |
+| F045 | e3f5d6dd | 680 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 25 |
+| F046 | e3f5d6dd | 681 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 26 (a) |
+| F047 | e3f5d6dd | 795 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Prosa zur Exit-Bedeutung der folgenden Befundtabelle, trägt keinen Befehl |
+| F048 | e3f5d6dd | 798 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F049 | e3f5d6dd | 800 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 27 |
+| F050 | e3f5d6dd | 801 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 28 (a) |
+| F051 | e3f5d6dd | 802 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 29 |
+| F052 | e3f5d6dd | 803 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 30 |
+| F053 | e3f5d6dd | 804 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 31 |
+| F054 | e3f5d6dd | 992 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Prosa zur Exit-Bedeutung der folgenden Befundtabelle, trägt keinen Befehl |
+| F055 | e3f5d6dd | 995 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F056 | e3f5d6dd | 997 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 32 (a) |
+| F057 | e3f5d6dd | 998 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 33 (a) |
+| F058 | e3f5d6dd | 999 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 34 (a) |
+| F059 | e3f5d6dd | 1000 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 35 (a) |
+| F060 | e3f5d6dd | 1001 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 36 (a) |
+| F061 | e3f5d6dd | 1002 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 37 |
+| F062 | e3f5d6dd | 1003 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 38 |
+| F063 | e3f5d6dd | 1004 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 39 (a) |
+| F064 | e3f5d6dd | 1196 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Prosa zur Exit-Bedeutung der folgenden Befundtabelle, trägt keinen Befehl |
+| F065 | e3f5d6dd | 1199 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F066 | e3f5d6dd | 1201 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 40 |
+| F067 | e3f5d6dd | 1202 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 41 (a) |
+| F068 | e3f5d6dd | 1203 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 42 (a); das Bruchstück zu Teil (a) im Klammersatz derselben Zeile ist nach „Umfang“ ausgeschlossen (nur Zitat, nicht ausführbar) |
+| F069 | e3f5d6dd | 1204 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 43 |
+| F070 | e3f5d6dd | 1205 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 44 |
+| F071 | e3f5d6dd | 1206 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 45 |
+| F072 | e3f5d6dd | 1234 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Prosa der Befundregression Runde 2 (Befunde 1–10), nennt Ausdrücke ohne Befehl |
+| F073 | e3f5d6dd | 1236 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Prosa der Befundregression Runde 2 (Befunde 1–10), nennt Befunde ohne Ausdruck, trägt keinen Befehl |
+| F074 | e3f5d6dd | 1247 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 1, trägt keinen Befehl |
+| F075 | e3f5d6dd | 1250 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 4, trägt keinen Befehl |
+| F076 | e3f5d6dd | 1251 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 5, trägt keinen Befehl |
+| F077 | e3f5d6dd | 1253 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 7, trägt keinen Befehl |
+| F078 | e3f5d6dd | 1254 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 8, trägt keinen Befehl |
+| F079 | e3f5d6dd | 1255 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 9, trägt keinen Befehl |
+| F080 | e3f5d6dd | 1256 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 10, trägt keinen Befehl |
+| F081 | e3f5d6dd | 1269 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Prosa zur Exit-Bedeutung der folgenden Befundtabelle, trägt keinen Befehl |
+| F082 | e3f5d6dd | 1272 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F083 | e3f5d6dd | 1274 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 46 |
+| F084 | e3f5d6dd | 1301 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Prosa der Befundregression Runde 2 (Befunde 11–19), nennt Ausdrücke ohne Befehl |
+| F085 | e3f5d6dd | 1306 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Prosa der Befundregression Runde 2 (Befunde 11–19), nennt Befunde ohne Ausdruck, trägt keinen Befehl |
+| F086 | e3f5d6dd | 1316–1322 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Ausgabe des Lint-Laufs python3 backend/scripts/lint_methodik.py 60, kein Befehl zu einem Befund; der Lint-Lauf ist als Prüfausdruck unter 32 (d), 33 (c), 34 (c), 35 (c), 36 (c) und 39 (c) beurteilt |
+| F087 | e3f5d6dd | 1330 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 13, trägt keinen Befehl |
+| F088 | e3f5d6dd | 1331 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 14, trägt keinen Befehl |
+| F089 | e3f5d6dd | 1332 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 15, trägt keinen Befehl |
+| F090 | e3f5d6dd | 1334 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 17, trägt keinen Befehl |
+| F091 | e3f5d6dd | 1545 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F092 | e3f5d6dd | 1547 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 41 (b) |
+| F093 | e3f5d6dd | 1558 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F094 | e3f5d6dd | 1560 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 28 (b) |
+| F095 | e3f5d6dd | 1570 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F096 | e3f5d6dd | 1572 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 26 (b) |
+| F097 | e3f5d6dd | 1585 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F098 | e3f5d6dd | 1587 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 19 — gleichlautend mit Z. 54, dort einmal gezählt |
+| F099 | e3f5d6dd | 1600 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F100 | e3f5d6dd | 1602 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 42 (b) |
+| F101 | e3f5d6dd | 1619 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F102 | e3f5d6dd | 1621 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 42 (c) |
+| F103 | e3f5d6dd | 1637 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F104 | e3f5d6dd | 1639 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 42 (d) |
+| F105 | e3f5d6dd | 1729 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F106 | e3f5d6dd | 1731 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle: 32 (b) |
+| F107 | e3f5d6dd | 1747 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F108 | e3f5d6dd | 1749 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 32 (c) |
+| F109 | e3f5d6dd | 1767 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F110 | e3f5d6dd | 1769 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 34 (b) |
+| F111 | e3f5d6dd | 1792 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F112 | e3f5d6dd | 1794 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle: 33 (b) |
+| F113 | e3f5d6dd | 1811 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F114 | e3f5d6dd | 1813 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle: 39 (b) |
+| F115 | e3f5d6dd | 1938 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Überschrift des Ausdrucks (f); der Befehl steht im Block Z. 1940–1959 und ist dort verzeichnet (36 (d)) |
+| F116 | e3f5d6dd | 1940–1959 | Codeblock (Sprachkennung: bash) | Tabelle: 36 (d) |
+| F117 | e3f5d6dd | 1981 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F118 | e3f5d6dd | 1983 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 36 (b) |
+| F119 | e3f5d6dd | 2108–2128 | Codeblock (Sprachkennung: python test: befund_35_u_o) | Tabelle: 35 (d) |
+| F120 | e3f5d6dd | 2153 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F121 | e3f5d6dd | 2155 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle: 35 (b) |
+| F122 | e3f5d6dd | 2170–2173 | Codeblock (ohne Sprachkennung) | Tabelle: 2 (a) — Lauf des gleichlautenden Ausdrucks aus Z. 37 im Nachtrag zu Befund 2 |
+| F123 | e3f5d6dd | 2175–2178 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Messung der Datenzeilen der Knoten-Bilanz im Nachtrag zu Befund 2, dort nicht als Prüfausdruck geführt (Ausdruck des Nachtrags ist 2 (a), Z. 2188–2189) |
+| F124 | e3f5d6dd | 2188 | Zeile mit „Prüfausdruck“ | Tabelle: 2 (a) — die Prosa des Nachtrags zu Befund 2 nennt in Z. 2189 den Ausdruck aus Z. 37 wörtlich |
+| F125 | e3f5d6dd | 2196 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Einleitung des Kopfzähler-Ausdrucks; der Befehl steht im Block Z. 2199–2202 und ist dort verzeichnet |
+| F126 | e3f5d6dd | 2199–2202 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Kopfzähler-Ausdruck im Nachtrag zu Befund 2 — zählt Ledger-Zeilen, keinen Befund (vgl. „Umfang“, dort als Z. 2197 genannt) |
+| F127 | e3f5d6dd | 2250–2258 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Befehl und Ausgabe des Lint-Laufs der Runde 3 (0.1), kein Befehl zu einem Befund; der Lint-Lauf ist als Prüfausdruck unter 32 (d), 33 (c), 34 (c), 35 (c), 36 (c) und 39 (c) beurteilt |
+| F128 | e3f5d6dd | 2284–2287 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Zeichenzählung Kapitel 1 und 2 zu den Leitfragen 1 und 2 — Beleg einer Leitfrage der Runde 3, nicht als Prüfausdruck eines Befunds geführt; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck“ (vgl. „Umfang“) |
+| F129 | e3f5d6dd | 2318–2334 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Mengenabgleich Mappen-Knoten gegen Knoten-Bilanz zu Leitfrage 1 — Beleg einer Leitfrage der Runde 3, nicht als Prüfausdruck eines Befunds geführt; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck“ (vgl. „Umfang“) |
+| F130 | e3f5d6dd | 2474–2477 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Zeichenzählung zu den Leitfragen 10 und 14 — Beleg einer Leitfrage der Runde 3, nicht als Prüfausdruck eines Befunds geführt; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck“ (vgl. „Umfang“) |
+| F131 | e3f5d6dd | 2524–2537 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Rechenkontrolle ohne Kommandozeile (nur Zahlen) zu Leitfrage 10 — Beleg einer Leitfrage der Runde 3, nicht als Prüfausdruck eines Befunds geführt; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck“ (vgl. „Umfang“) |
+| F132 | e3f5d6dd | 2632–2653 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Zeichenzählung zu den Leitfragen 3 und 13 — Beleg einer Leitfrage der Runde 3, nicht als Prüfausdruck eines Befunds geführt; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck“ (vgl. „Umfang“) |
+| F133 | e3f5d6dd | 2727–2742 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Fundbeleg „Zeichen ohne Eintrag in 3.5“ zu Leitfrage 13 — Beleg einer Leitfrage der Runde 3, nicht als Prüfausdruck eines Befunds geführt; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck“ (vgl. „Umfang“) |
+| F134 | e3f5d6dd | 2818–2840 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Zeichenzählung Kapitel 4 zu den Leitfragen 6 und 8 — Beleg einer Leitfrage der Runde 3, nicht als Prüfausdruck eines Befunds geführt; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck“ (vgl. „Umfang“) |
+| F135 | e3f5d6dd | 3297 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 20, trägt keinen Befehl (Runde 3) |
+| F136 | e3f5d6dd | 3515–3524 | Codeblock (ohne Sprachkennung) | ausgeschlossen: Zeichenzählung zu Leitfrage 4 — Beleg einer Leitfrage der Runde 3, nicht als Prüfausdruck eines Befunds geführt; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck“ (vgl. „Umfang“) |
+| F137 | e3f5d6dd | 4165 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile der Runde 3 (Tabelle ohne Spalte „Prüfausdruck“), zitiert eine Bedingung des Ausdrucks zu Befund 39 (a) als Bruchstück, nicht ausführbar |
+| F138 | e3f5d6dd | 4166 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 40, trägt keinen Befehl (Runde 3) |
+| F139 | e3f5d6dd | 4224 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 43, trägt keinen Befehl (Runde 3) |
+| F140 | e3f5d6dd | 4225 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 44, trägt keinen Befehl (Runde 3) |
+| F141 | e3f5d6dd | 4226 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile der Runde 3 (Tabelle ohne Spalte „Prüfausdruck“), zitiert eine Bedingung des Ausdrucks zu Befund 45 als Bruchstück, nicht ausführbar |
+| F142 | e3f5d6dd | 4227 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Regressionszeile (Tabelle ohne Spalte „Prüfausdruck“), nennt nur den Ausgang des Ausdrucks zu Befund 46, trägt keinen Befehl (Runde 3) |
+| F143 | e3f5d6dd | 4235 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Zeile zu Befund 103 in „Neue Befunde dieses Pakets“ (Runde 3, Tabelle ohne Spalte „Prüfausdruck“), zitiert eine Bedingung des Ausdrucks zu Befund 45 als Bruchstück, nicht ausführbar |
+| F144 | 8c3c4075 | 17 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Nachtragsprosa im Ledgerkopf, trägt keinen Befehl |
+| F145 | 8c3c4075 | 26 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Nachtragsprosa im Ledgerkopf, trägt keinen Befehl; der genannte Ausdruck zu 98 ist in Schritt 3a1 unter Befund 98 (M Z. 172) beurteilt |
+| F146 | 8c3c4075 | 31 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Nachtragsprosa im Ledgerkopf, trägt keinen Befehl; der genannte Ausdruck zu 41 ist in Schritt 3a1 unter Befund 41 (M Z. 115) beurteilt |
+| F147 | 8c3c4075 | 42 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Nachtragsprosa im Ledgerkopf, trägt keinen Befehl; der genannte Ausdruck zu 37 ist in Schritt 3a1 unter Befund 37 (M Z. 111) beurteilt |
+| F148 | 8c3c4075 | 45 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Nachtragsprosa im Ledgerkopf, trägt keinen Befehl; der genannte Ausdruck zu 19 ist in Schritt 3a1 unter Befund 19 (M Z. 93) beurteilt |
+| F149 | 8c3c4075 | 48 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Nachtragsprosa im Ledgerkopf, trägt keinen Befehl; der genannte Ausdruck zu 15 ist in Schritt 3a1 unter Befund 15 (M Z. 89) beurteilt |
+| F150 | 8c3c4075 | 50 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Nachtragsprosa im Ledgerkopf, trägt keinen Befehl; der genannte Ausdruck zu 46 ist in Schritt 3a1 unter Befund 46 (M Z. 120) beurteilt |
+| F151 | 8c3c4075 | 86 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 12, M Z. 86 |
+| F152 | 8c3c4075 | 89 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 15, M Z. 89 |
+| F153 | 8c3c4075 | 93 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 19, M Z. 93 |
+| F154 | 8c3c4075 | 95 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 21, M Z. 95 |
+| F155 | 8c3c4075 | 98 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 24, M Z. 98 |
+| F156 | 8c3c4075 | 99 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 25, M Z. 99 |
+| F157 | 8c3c4075 | 101 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 27, M Z. 101 |
+| F158 | 8c3c4075 | 109 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 35, M Z. 109 |
+| F159 | 8c3c4075 | 111 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 37, M Z. 111 |
+| F160 | 8c3c4075 | 112 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 38, M Z. 112 |
+| F161 | 8c3c4075 | 115 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 41, M Z. 115 |
+| F162 | 8c3c4075 | 120 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 46, M Z. 120 |
+| F163 | 8c3c4075 | 121 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 47, M Z. 121 |
+| F164 | 8c3c4075 | 122 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 48, M Z. 122 |
+| F165 | 8c3c4075 | 127 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 53, M Z. 127 |
+| F166 | 8c3c4075 | 128 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 54, M Z. 128 |
+| F167 | 8c3c4075 | 129 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 55, M Z. 129 |
+| F168 | 8c3c4075 | 130 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 56, M Z. 130 |
+| F169 | 8c3c4075 | 131 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 57, M Z. 131 |
+| F170 | 8c3c4075 | 132 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 58, M Z. 132 |
+| F171 | 8c3c4075 | 133 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 59, M Z. 133 |
+| F172 | 8c3c4075 | 134 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 60, M Z. 134 |
+| F173 | 8c3c4075 | 135 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 61, M Z. 135 |
+| F174 | 8c3c4075 | 136 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 62, M Z. 136 |
+| F175 | 8c3c4075 | 137 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 63, M Z. 137 |
+| F176 | 8c3c4075 | 138 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 64, M Z. 138 |
+| F177 | 8c3c4075 | 139 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 65, M Z. 139 |
+| F178 | 8c3c4075 | 140 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 66, M Z. 140 |
+| F179 | 8c3c4075 | 141 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 67, M Z. 141 |
+| F180 | 8c3c4075 | 142 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 68, M Z. 142 |
+| F181 | 8c3c4075 | 144 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 70, M Z. 144 |
+| F182 | 8c3c4075 | 146 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 72, M Z. 146 |
+| F183 | 8c3c4075 | 148 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 74, M Z. 148 |
+| F184 | 8c3c4075 | 149 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 75, M Z. 149 |
+| F185 | 8c3c4075 | 150 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 76, M Z. 150 |
+| F186 | 8c3c4075 | 153 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 79, M Z. 153 |
+| F187 | 8c3c4075 | 156 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 82, M Z. 156 |
+| F188 | 8c3c4075 | 157 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 83, M Z. 157 |
+| F189 | 8c3c4075 | 158 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 84, M Z. 158 |
+| F190 | 8c3c4075 | 159 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 85, M Z. 159 |
+| F191 | 8c3c4075 | 160 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 86, M Z. 160 |
+| F192 | 8c3c4075 | 162 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 88, M Z. 162 |
+| F193 | 8c3c4075 | 163 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 89, M Z. 163 |
+| F194 | 8c3c4075 | 165 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 91, M Z. 165 |
+| F195 | 8c3c4075 | 166 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 92, M Z. 166 |
+| F196 | 8c3c4075 | 167 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 93, M Z. 167 |
+| F197 | 8c3c4075 | 168 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 94, M Z. 168 |
+| F198 | 8c3c4075 | 169 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 95, M Z. 169 |
+| F199 | 8c3c4075 | 170 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 96, M Z. 170 |
+| F200 | 8c3c4075 | 171 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 97, M Z. 171 |
+| F201 | 8c3c4075 | 172 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 98, M Z. 172 |
+| F202 | 8c3c4075 | 173 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 99, M Z. 173 |
+| F203 | 8c3c4075 | 174 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 100, M Z. 174 |
+| F204 | 8c3c4075 | 177 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Kopftabelle, Befund 103 — die Spalte „Prüfausdruck“ trägt „—“, das Wort steht nur im Befundtext; kein Befehl |
+| F205 | 8c3c4075 | 178 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 104, M Z. 178 |
+| F206 | 8c3c4075 | 1866 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 34, M Z. 1866 |
+| F207 | 8c3c4075 | 5684 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F208 | 8c3c4075 | 5686 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 24, M Z. 5686 |
+| F209 | 8c3c4075 | 5687 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 57, M Z. 5687 |
+| F210 | 8c3c4075 | 5688 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 74, M Z. 5688 |
+| F211 | 8c3c4075 | 5689 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a1): Befund 82, M Z. 5689 |
+| F212 | 8c3c4075 | 5692 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F213 | 8c3c4075 | 5703 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F214 | 8c3c4075 | 5705 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 25, M Z. 99 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F215 | 8c3c4075 | 5707 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 55, M Z. 129 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F216 | 8c3c4075 | 5708 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 56, M Z. 130 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F217 | 8c3c4075 | 5713 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F218 | 8c3c4075 | 5740 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F219 | 8c3c4075 | 5743 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 27, M Z. 101 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F220 | 8c3c4075 | 5744 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 38, M Z. 112 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F221 | 8c3c4075 | 5749 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 36, M Z. 5749 |
+| F222 | 8c3c4075 | 5752 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F223 | 8c3c4075 | 5782 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F224 | 8c3c4075 | 5787 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 98, M Z. 172 — die Spalte trägt „in der Kopftabelle ersetzt“, keinen eigenen Befehl |
+| F225 | 8c3c4075 | 5788 | Tabellenzeile mit Befehl in der Spalte, Zeile enthält „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 36, M Z. 5788 |
+| F226 | 8c3c4075 | 5841 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F227 | 8c3c4075 | 5843 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 59, M Z. 133 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F228 | 8c3c4075 | 5849 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F229 | 8c3c4075 | 5881 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F230 | 8c3c4075 | 5897 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F231 | 8c3c4075 | 5923 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F232 | 8c3c4075 | 5926 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 61, M Z. 135 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F233 | 8c3c4075 | 5956 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F234 | 8c3c4075 | 5980 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F235 | 8c3c4075 | 5994 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F236 | 8c3c4075 | 6021 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F237 | 8c3c4075 | 6023 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 37, M Z. 111 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F238 | 8c3c4075 | 6036 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F239 | 8c3c4075 | 6065 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F240 | 8c3c4075 | 6070 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 79, M Z. 153 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F241 | 8c3c4075 | 6072 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 19, M Z. 93 — Prosa zum fortgeschriebenen Ausdruck, der Befehl steht in der Kopftabelle |
+| F242 | 8c3c4075 | 6080 | Zeile mit „Prüfausdruck“ | Tabelle: 10 — Prosa über den unveränderten Ausdruck zu 10 (e3f5d6dd Z. 45), trägt keinen Befehl |
+| F243 | 8c3c4075 | 6089 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F244 | 8c3c4075 | 6106 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F245 | 8c3c4075 | 6108 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 83, M Z. 157 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F246 | 8c3c4075 | 6119 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 15, M Z. 89 — Prosa zum fortgeschriebenen Ausdruck, der Befehl steht in der Kopftabelle |
+| F247 | 8c3c4075 | 6138 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
+| F248 | 8c3c4075 | 6151 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
+| F249 | 8c3c4075 | 6153 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 21, M Z. 95 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+
+**Vollständigkeitsprobe.** Sie erhebt die Fundstellen nur über `git show <commit>:reviews/BEFUNDE_60.md` aus `e3f5d6dd` und M, jeweils ohne diesen Abschnitt. Das Verzeichnis liest sie nur aus diesem Abschnitt der Arbeitsdatei (erstes Argument, Vorgabe `reviews/BEFUNDE_60.md`), und zwar nur die Zeilen zwischen `#### Fundstellenverzeichnis` und der nächsten Überschrift. Sich selbst kann sie nicht zählen, weil sie im Abschnitt steht und der Abschnitt aus beiden Commits herausgeschnitten ist. Ein Eintrag zählt nur mit einer Zuordnung („Tabelle:“ mit Befundnummer oder „ausgeschlossen:“ mit Begründung). Eine Zeile `| F…`, die das Muster verfehlt, bricht die Probe ab, ebenso ein Eintrag, der keine Fundstelle ist. Aufruf aus dem Repo-Wurzelverzeichnis; der Block wird mit `python3 -c` aus dieser Datei gelesen und ausgeführt:
+
+```python probe: fundstellenverzeichnis
+import re, sys, difflib, subprocess
+from collections import Counter
+D = 'reviews/BEFUNDE_60.md'
+H = '### Durchsicht der Prüfausdrücke (Selbstbeleg-Fehlertyp)'
+E = '## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)'
+C = {'e3f5d6dd': 'e3f5d6dd', '8c3c4075': '8c3c4075359245730ebda58065652885522e0ddf'}
+B = chr(96)
+BEF = re.compile(B + r'\s*(python3?|grep|git|sed|awk|wc|diff|pdftotext|sha256sum|cat|ls|find|test|bash|sh|cd|curl|head|tail|rg)\b')
+def show(c):
+    return subprocess.run(['git', 'show', c + ':' + D], capture_output=True, text=True, check=True).stdout.split('\n')
+def ohne(L):
+    return set(range(L.index(H), L.index(E))) if H in L else set()
+def zellen(z):
+    return [c.strip() for c in z.strip().strip('|').split('|')]
+def fund(L):
+    s = ohne(L); f = set(); auf = None; n = 0
+    for i, l in enumerate(L):
+        if i in s:
+            continue
+        m = re.match(r'^ {0,3}(' + B + '{3,})(.*)$', l)
+        if m and auf is None and B not in m.group(2):
+            auf, n = i, len(m.group(1))
+        elif m and auf is not None and len(m.group(1)) >= n and not m.group(2).strip():
+            f.add((auf + 1, i + 1)); auf = None
+        if 'Prüfausdruck' in l:
+            f.add((i + 1, i + 1))
+    i = 0
+    while i < len(L):
+        if i not in s and L[i].strip().startswith('|') and i + 1 < len(L) and re.match(r'^\s*\|[\s:|-]+\|\s*$', L[i + 1]):
+            sp = [k for k, c in enumerate(zellen(L[i])) if 'Prüfausdruck' in c]
+            j = i + 2
+            while j < len(L) and L[j].strip().startswith('|'):
+                c = zellen(L[j].replace('\\|', '\x00'))
+                if j not in s and any(k < len(c) and BEF.search(c[k].replace('\x00', '|')) for k in sp):
+                    f.add((j + 1, j + 1))
+                j += 1
+            i = j
+        else:
+            i += 1
+    return f
+e3 = show(C['e3f5d6dd']); mm = show(C['8c3c4075'])
+neu = set()
+for t, a1, a2, b1, b2 in difflib.SequenceMatcher(None, e3, mm, autojunk=False).get_opcodes():
+    if t in ('replace', 'insert'):
+        neu.update(range(b1 + 1, b2 + 1))
+soll = {('e3f5d6dd',) + k for k in fund(e3)}
+soll |= {('8c3c4075',) + k for k in fund(mm) if any(x in neu for x in range(k[0], k[1] + 1))}
+W = open(sys.argv[1] if len(sys.argv) > 1 else D, encoding='utf-8').read().split('\n')
+A = W[W.index(H):W.index(E)]
+k = A.index('#### Fundstellenverzeichnis')
+ende = next((j for j in range(k + 1, len(A)) if A[j].startswith('#')), len(A))
+ist = []
+for l in A[k:ende]:
+    m = re.match(r'^\| F\d{3} \| (e3f5d6dd|8c3c4075) \| (\d+)(?:–(\d+))? \| [^|]+ \| (Tabelle: [^|]*\d[^|]*|Tabelle \(Schritt 3a1\): Befund \d+[^|]*|ausgeschlossen: [^|]{12,}) \|$', l)
+    if m:
+        ist.append((m.group(1), int(m.group(2)), int(m.group(3) or m.group(2))))
+    else:
+        assert not l.startswith('| F'), l
+z = Counter(ist)
+print('fehlend: %d · doppelt: %d · fundstellen: %d' % (len(soll - set(ist)), sum(v - 1 for v in z.values()), len(soll)))
+assert set(ist) <= soll, sorted(set(ist) - soll)
+```
+
+Lauf am Branch `ticket/T-0622-ceo`, wörtlich:
+
+```
+$ python3 -c "import sys;L=open('reviews/BEFUNDE_60.md',encoding='utf-8').read().split(chr(10));a=L.index(chr(96)*3+'python probe: fundstellenverzeichnis');b=L.index(chr(96)*3,a+1);sys.argv=['probe']+sys.argv[1:];exec(chr(10).join(L[a+1:b]))"
+fehlend: 0 · doppelt: 0 · fundstellen: 249
+```
+
+Gegenprobe an einer Kopie außerhalb des Repos, aus der der Verzeichniseintrag F001 (`e3f5d6dd` Z. 6) entfernt ist, wörtlich:
+
+```
+$ grep -v '^| F001 |' reviews/BEFUNDE_60.md > /opt/overlord/overlord-arbeit/.t0622/kopie.md
+$ python3 -c "import sys;L=open('reviews/BEFUNDE_60.md',encoding='utf-8').read().split(chr(10));a=L.index(chr(96)*3+'python probe: fundstellenverzeichnis');b=L.index(chr(96)*3,a+1);sys.argv=['probe']+sys.argv[1:];exec(chr(10).join(L[a+1:b]))" /opt/overlord/overlord-arbeit/.t0622/kopie.md
+fehlend: 1 · doppelt: 0 · fundstellen: 249
+```
+
 ## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)
 
 Autor-Paket vom 23.09.2026 (Vorhaben T-0401): Bericht §3.1/§3.2 — Euro-Ausweis gegen physischen
