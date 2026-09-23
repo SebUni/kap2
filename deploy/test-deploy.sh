@@ -246,9 +246,14 @@ fi
 echo "Deploy-Tests gruen"
 
 SCHRITT="backend-abhaengigkeiten"
+# Explizit ins Backend-Verzeichnis wechseln statt sich auf das cwd des vorherigen Schritts
+# (deploy-tests) zu verlassen: Dort steht bereits "$PRODUKT/backend", weshalb der bisherige
+# relative Pfad "backend/requirements.txt" ins Leere lief ("Could not open requirements file"),
+# und die Datei nur bei zufaellig anderem cwd gefunden wurde.
+cd "$PRODUKT/backend"
 [[ -x "$VENV/bin/pip" ]] || python3.12 -m venv "$VENV"
 "$VENV/bin/pip" install -q --upgrade pip wheel
-"$VENV/bin/pip" install -q -r backend/requirements.txt
+"$VENV/bin/pip" install -q -r requirements.txt
 
 SCHRITT="frontend-build"
 cd "$PRODUKT/frontend"
