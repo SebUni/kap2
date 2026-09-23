@@ -18,8 +18,7 @@ durchsucht, weil sie ohne JavaScript keinen Inhalt ausliefern; der Suchweg je La
 Landesbehörde für das Gemeindegebiet) zur Konzeptaufstellung. `keine Bestimmung getroffen` heißt:
 In der Erhebung wurde keine geltende Landesnorm gefunden, die die Stellen nach § 12 Abs. 1 KAnG
 bestimmt; `Fundstelle` nennt dann das amtliche Landesrecht-Portal des Landes als Ort der
-geltenden Fassung, nicht als durchsuchte Quelle. Nach § 13 KAnG haben die
-Länder dafür bis zum 31.01.2027 Zeit.
+geltenden Fassung, nicht als durchsuchte Quelle.
 
 | Land | Rechtsgrundlage | Fundstelle | Zuständige Stelle | Pflicht | Stand |
 |---|---|---|---|---|---|
@@ -61,18 +60,34 @@ Länder dafür bis zum 31.01.2027 Zeit.
   KlimaChancen Bayern (https://klimachancen.bayern/erstes-klimaanpassungsgesetz-in-deutschland;
   Seite selbst nicht abgerufen): „Ob Gemeinden oder Landkreise für die Erstellung eines
   Klimaanpassungskonzepts zuständig sind, ist bisher in Bayern noch nicht geregelt.“
-- **Berlin (Stadtstaat, Einheitsgemeinde):** GVBl. Berlin Nr. 33 vom 20.11.2025, S. 541 ff.,
-  Gesetz für ein Klimaanpassungsgesetz Berlin vom 07.11.2025, Art. 1 § 10 Abs. 1: „Die zuständige
-  Senatsverwaltung beschließt spätestens ein Jahr nach Inkrafttreten dieses Gesetzes ein
-  Klimaanpassungsprogramm …“; nach § 10 Abs. 2 Nr. 1 auf Grundlage der Klimarisikoanalyse des
-  Bundes nach § 4 KAnG. Weder das Gesetz noch seine Begründung (Drs. 19/2573 vom 03.07.2025,
-  https://www.parlament-berlin.de/ados/19/IIIPlen/vorgang/d19-2573.pdf; durchsucht nach
-  „§ 12 KAnG“, „12 KAnG“ und „Klimaanpassungskonzept“, Treffer nur zu § 12 KAnGBln und § 10
-  Abs. 4 KAnG) nennen § 12 Abs. 1 KAnG. Ob das gesamtstädtische Klimaanpassungsprogramm als
-  Konzept nach § 12 KAnG für das Gemeindegebiet Berlins gilt, ist deshalb nicht belegt und
-  wird hier nur als mögliche Lesart vermerkt; die Tabelle führt Berlin als nicht bestimmt.
-  Die Bezirke haben nach § 8 Abs. 2 Bezirkshitzeaktionspläne aufzustellen, aber kein
-  Klimaanpassungskonzept.
+- **Berlin (Stadtstaat, Einheitsgemeinde):** Keine Bestimmung nach § 12 Abs. 1 KAnG gefunden.
+  Quellen: Gesetz für ein Klimaanpassungsgesetz Berlin vom 07.11.2025, GVBl. Berlin Nr. 33 vom
+  20.11.2025, S. 542–550
+  (https://www.berlin.de/sen/justiz/service/gesetze-und-verordnungen/2025/ausgabe-nr-33-vom-20112025-s-541-568.pdf),
+  und die Begründung, Drs. 19/2573 vom 03.07.2025
+  (https://www.parlament-berlin.de/ados/19/IIIPlen/vorgang/d19-2573.pdf).
+  Gelesen: im Gesetz Inhaltsübersicht und § 1 (S. 542), § 8 und § 10 (S. 545–546), § 12
+  (S. 546), §§ 14–16 (S. 547); in der Drucksache Allgemeiner Teil zum Verhältnis zum KAnG
+  (S. 42), Begründung zu § 10 (S. 62) und zu § 12 (S. 64). Den gesamten extrahierten Text
+  beider Dokumente habe ich außerdem nach „§ 12 KAnG“, „12 KAnG“, „Bundes-Klima“ (auch
+  getrennt am Zeilenende), „Bundes-Klimaanpassungsgesetz“, „Absatz 1 des“,
+  „12 Abs. 1“/„12 Absatz 1“ und „Klimaanpassungskonzept“ durchsucht.
+  Ergebnis: Das Gesetz nennt das KAnG nur in § 10 Abs. 2 Nr. 1 und § 12 Abs. 2 Nr. 1
+  (Klimarisikoanalyse des Bundes nach § 4 KAnG) und in § 12 Abs. 1 (Frist nach § 10 Abs. 6
+  Satz 1 KAnG). § 12 KAnGBln („Vorsorgende Klimaanpassungsstrategie“) lautet in Abs. 1: „Die
+  zuständige Senatsverwaltung beschließt spätestens innerhalb der Frist nach § 10 Absatz 6
+  Satz 1 des Bundes-Klimaanpassungsgesetzes eine Klimaanpassungsstrategie …“. Nach der
+  Begründung (S. 64) setzt er die Landesstrategie nach § 10 Abs. 1 KAnG um, nicht § 12 KAnG.
+  Die Begründung zu § 10 KAnGBln (Klimaanpassungsprogramm, S. 62) stützt sich auf § 15 Abs. 1
+  des Berliner Energiewende- und Klimaschutzgesetzes und nennt das KAnG nicht. Die Drucksache
+  zitiert das KAnG ausgeschrieben nur zu §§ 2, 3, 4, 8 und 10, nie zu § 12 (ein Treffer zu
+§ 11 betrifft das Bundes-Klimaschutzgesetz). Auf S. 42 heißt
+  es allgemein, das Gesetz diene „auch der Umsetzung der Pflichten des Landes Berlin aus dem
+  Bundes-Klimaanpassungsgesetz (KAnG)“, ohne eine Stelle nach § 12 KAnG zu bestimmen.
+  Ob das gesamtstädtische Klimaanpassungsprogramm nach § 10 Abs. 1 KAnGBln als Konzept nach
+  § 12 KAnG gilt, ist damit nicht belegt und bleibt nur eine mögliche Lesart; die Tabelle
+  bestätigt Berlin als nicht bestimmt. Die Bezirke haben nach § 8 Abs. 2 KAnGBln
+  Bezirkshitzeaktionspläne aufzustellen, aber kein Klimaanpassungskonzept.
 - **Brandenburg:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche „Brandenburg
   Klimaanpassungskonzept Landkreise Pflicht Landesgesetz § 12 KAnG Klimagesetz Brandenburg
   2026“; Treffer u. a. Ministeriumsseite zur kommunalen Klimaanpassung
@@ -110,9 +125,15 @@ Länder dafür bis zum 31.01.2027 Zeit.
 - **Niedersachsen:** NI-VORIS, § 26 NKlimaG, Fassung gültig ab 01.01.2026: Landkreise,
   kreisfreie Städte, Landeshauptstadt Hannover, Stadt Göttingen und Region Hannover sind
   öffentliche Stellen nach § 12 KAnG und stellen bis 31.12.2028 Klimaanpassungskonzepte auf.
-- **Nordrhein-Westfalen:** Das Klimaanpassungsgesetz NRW von 2021 bestimmt keine Stellen nach
-  § 12 KAnG; die Novelle ist nicht verabschiedet (Kreis Gütersloh, 14.09.2026: Landesgesetz
-  „vermutlich noch im Herbst 2026“ erwartet). Siehe Anhängige Entwürfe.
+- **Nordrhein-Westfalen:** Keine geltende Landesnorm gefunden, die Stellen nach § 12 KAnG
+  bestimmt; die Novelle des Klimaanpassungsgesetzes NRW ist nicht verabschiedet. Beleg: Bericht
+  über den Kreis Gütersloh vom 14.09.2026
+  (https://www.marktplatz-hsw.de/index.php/2026/09/14/kreis-buendelt-aufgabe-fuer-die-kommunen-klimaanpassungskonzept-wird-pflicht/,
+  abgerufen am 23.09.2026): Landesgesetz „vermutlich noch im Herbst 2026“ erwartet, „2027 …
+  werde die Aufstellung von Klimaanpassungskonzepten vermutlich Pflicht“; gleichlautende
+  Pressemitteilung des Kreises vom 11.09.2026
+  (https://www.kreis-guetersloh.de/aktuelles/presse-und-oeffentlichkeitsarbeit/pressemitteilungen/11-09-2026-klimaanpassungskonzept-wird-pflicht/,
+  Überschrift gelesen). Siehe Anhängige Entwürfe.
 - **Rheinland-Pfalz:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche
   „Rheinland-Pfalz Landesklimaschutzgesetz Novelle 2026 Klimaanpassungskonzept Landkreise
   kreisfreie Städte verpflichtend KAnG“. Laut Suchergebnis (Kompetenzzentrum für
@@ -184,8 +205,11 @@ Länder dafür bis zum 31.01.2027 Zeit.
   und LEKA MV (https://www.leka-mv.de/klimavertaeglichkeitsgesetz-beschlossen/) nennt die
   beschlossene Fassung zusätzlich die großen kreisangehörigen Städte; Paragraf der Endfassung
   nicht gelesen. Wandert in die Tabelle, sobald Verkündung und Norm belegt sind.
-- **Sachsen:** Landesgesetz im Lauf der Legislaturperiode angekündigt, noch kein Entwurf
-  veröffentlicht; Konzeptpflicht nicht vor 2027.
+- **Sachsen:** Laut Klima-Portal Sachsen
+  (https://www.klima.sachsen.de/umsetzung-des-klimaanpassungsgesetzes-im-freistaat-sachsen-29962.html,
+  abgerufen am 23.09.2026) ist das Landesgesetz „im weiteren Lauf der aktuellen
+  Legislaturperiode vorzulegen“; mit einer Verpflichtung „ist nicht vor 2027 zu rechnen“. Ein
+  veröffentlichter Entwurf wurde in der Erhebung nicht gefunden.
 
 ## Pflege
 
