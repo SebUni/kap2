@@ -6,15 +6,19 @@ Stellen bestimmt sind, die nach § 12 Abs. 1 KAnG
 ein Klimaanpassungskonzept aufstellen; das Produkt bildet daraus je Kommune die zuständige
 Stelle ab.
 
-Erhebungsdatum: 2026-09-23 (Web-Recherche in Landesrecht-Portalen, Gesetz- und
-Verordnungsblättern, Landtagsdrucksachen und amtlichen Seiten der Landesministerien).
+Erhebungsdatum: 2026-09-23. Erhebungsweg: Websuche (Suchmaschine) je Land sowie Abruf und
+Lektüre der dabei gefundenen Gesetz- und Verordnungsblätter, Landtagsdrucksachen und amtlichen
+Seiten der Landesministerien. Die Landesrecht-Portale selbst (juris-Oberflächen) wurden nicht
+durchsucht, weil sie ohne JavaScript keinen Inhalt ausliefern; der Suchweg je Land steht unter
+„Belege je Land“.
 
 **Abbildung der Rechtslage, keine Rechtsauskunft.**
 
 `Pflicht` meint die Pflicht der bestimmten Stelle (Gemeinde, Kreis oder beim Stadtstaat die
 Landesbehörde für das Gemeindegebiet) zur Konzeptaufstellung. `keine Bestimmung getroffen` heißt:
 In der Erhebung wurde keine geltende Landesnorm gefunden, die die Stellen nach § 12 Abs. 1 KAnG
-bestimmt; `Fundstelle` nennt dann das Landesrecht-Portal des Landes. Nach § 13 KAnG haben die
+bestimmt; `Fundstelle` nennt dann das amtliche Landesrecht-Portal des Landes als Ort der
+geltenden Fassung, nicht als durchsuchte Quelle. Nach § 13 KAnG haben die
 Länder dafür bis zum 31.01.2027 Zeit.
 
 | Land | Rechtsgrundlage | Fundstelle | Zuständige Stelle | Pflicht | Stand |
@@ -32,8 +36,8 @@ Länder dafür bis zum 31.01.2027 Zeit.
 | Rheinland-Pfalz | keine Bestimmung getroffen, Stand 2026-09-23 | https://landesrecht.rlp.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
 | Saarland | keine Bestimmung getroffen, Stand 2026-09-23 | https://recht.saarland.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
 | Sachsen | keine Bestimmung getroffen, Stand 2026-09-23 | https://www.revosax.sachsen.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
-| Sachsen-Anhalt | § 1 Abs. 1 KAnG-AG LSA (Ausführungsgesetz des Landes Sachsen-Anhalt zum Bundes-Klimaanpassungsgesetz vom 15.07.2026, GVBl. LSA 2026 Nr. 15 vom 27.07.2026, S. 347) | https://www.landesrecht-sachsen-anhalt.info/down/aletztg.pdf | Landkreise und kreisfreie Städte; Gemeinden von eigener Konzeptpflicht befreit | ja | 2026-09-23 |
-| Schleswig-Holstein | § 33 EWKG (Energiewende- und Klimaschutzgesetz Schleswig-Holstein, i. d. F. der vom Landtag im Januar 2025 beschlossenen Novelle) | https://www.gesetze-rechtsprechung.sh.juris.de/jportal/?quelle=jlink&query=EWKSG+SH+%C2%A7+33&psml=bsshoprod.psml&max=true | Kreise und kreisfreie Städte (Frist 30.06.2029); Gemeinden können freiwillig eigene Konzepte aufstellen | ja | 2026-09-23 |
+| Sachsen-Anhalt | § 1 Abs. 1 KAnG-AG LSA (Ausführungsgesetz des Landes Sachsen-Anhalt zum Bundes-Klimaanpassungsgesetz vom 15.07.2026, GVBl. LSA 2026 Nr. 15 vom 27.07.2026, S. 347; Wortlaut nach der vom Landtag angenommenen Beschlussempfehlung Drs. 8/7116, S. 3, verkündete Ausgabe selbst nicht gelesen) | https://padoka.landtag.sachsen-anhalt.de/files/drs/wp8/drs/d7116vbe.pdf | Landkreise und kreisfreie Städte (Vorlage des Konzepts bis 30.06.2031, § 3 Abs. 3) | ja | 2026-09-23 |
+| Schleswig-Holstein | § 33 Abs. 1 EWKG (Energiewende- und Klimaschutzgesetz Schleswig-Holstein, eingefügt durch Art. 1 Nr. 39 des Gesetzes vom 25.03.2025, GVOBl. Schl.-H. 2025/26 vom 28.03.2025, S. 39) | https://verkuendungsportal.schleswig-holstein.de/home/gvobl/veroeffentlichungen/2025/2025_maerz/2025-26_maerz28 | Kreise und kreisfreie Städte (erstmals bis 30.06.2029); Gemeinden unter 100.000 Einwohnern ohne eigene Pflicht, wenn ein Kreiskonzept erstellt wird | ja | 2026-09-23 |
 | Thüringen | keine Bestimmung getroffen, Stand 2026-09-23 | https://landesrecht.thueringen.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
 
 ## Belege je Land
@@ -50,9 +54,13 @@ Länder dafür bis zum 31.01.2027 Zeit.
   (§§ 29b Absatz 1 Satz 1 Nummer 2 …)“; der Landkreis „erstellt die Anpassungskonzepte gemäß
   § 29b Absatz 1 Satz 1 Nummer 3 KlimaG BW für die kreisangehörigen Gemeinden (ohne Große
   Kreisstädte)“. Die Fundstelle verweist auf die Gesamtausgabe im Portal.
-- **Bayern:** Keine Landesnorm gefunden. KlimaChancen Bayern (https://klimachancen.bayern/erstes-klimaanpassungsgesetz-in-deutschland):
-  „Ob Gemeinden oder Landkreise für die Erstellung eines Klimaanpassungskonzepts zuständig sind,
-  ist bisher in Bayern noch nicht geregelt.“
+- **Bayern:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche „Umsetzung
+  Bundes-Klimaanpassungsgesetz Länder Landesrecht Klimaanpassungskonzept Pflicht Gemeinden Stand
+  2026 Übersicht“ und „Hamburg Bremen Brandenburg Saarland Hessen Bayern Klimaanpassungskonzept
+  § 12 KAnG landesrechtliche Umsetzung noch nicht geregelt 2026“. Aussage laut Suchergebnis
+  KlimaChancen Bayern (https://klimachancen.bayern/erstes-klimaanpassungsgesetz-in-deutschland;
+  Seite selbst nicht abgerufen): „Ob Gemeinden oder Landkreise für die Erstellung eines
+  Klimaanpassungskonzepts zuständig sind, ist bisher in Bayern noch nicht geregelt.“
 - **Berlin (Stadtstaat, Einheitsgemeinde):** GVBl. Berlin Nr. 33 vom 20.11.2025, S. 541 ff.,
   Gesetz für ein Klimaanpassungsgesetz Berlin vom 07.11.2025, Art. 1 § 10 Abs. 1: „Die zuständige
   Senatsverwaltung beschließt spätestens ein Jahr nach Inkrafttreten dieses Gesetzes ein
@@ -65,13 +73,35 @@ Länder dafür bis zum 31.01.2027 Zeit.
   wird hier nur als mögliche Lesart vermerkt; die Tabelle führt Berlin als nicht bestimmt.
   Die Bezirke haben nach § 8 Abs. 2 Bezirkshitzeaktionspläne aufzustellen, aber kein
   Klimaanpassungskonzept.
-- **Brandenburg:** Keine Landesnorm gefunden.
+- **Brandenburg:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche „Brandenburg
+  Klimaanpassungskonzept Landkreise Pflicht Landesgesetz § 12 KAnG Klimagesetz Brandenburg
+  2026“; Treffer u. a. Ministeriumsseite zur kommunalen Klimaanpassung
+  (https://mweke.brandenburg.de/de/klimafolgenanpassung-in-kommunen-checkliste-zum-einstieg-in-die-kommunale-klimaanpassung/brandenburg_06.c.883852.de)
+  und Landkreistag Brandenburg (https://www.landkreistag-brandenburg.de/de/klimaschutz.html);
+  kein Treffer auf ein Landesgesetz oder eine Verordnung, die Stellen nach § 12 KAnG bestimmt.
+  Die Treffer wurden nicht einzeln abgerufen.
 - **Bremen (Stadtstaat, zwei Stadtgemeinden Bremen und Bremerhaven):** Keine Landesnorm
-  gefunden, weder für die Stadtgemeinde Bremen noch für Bremerhaven.
-- **Hamburg (Stadtstaat, Einheitsgemeinde):** Keine Landesnorm gefunden; auch die Bezirke sind
-  nicht bestimmt.
-- **Hessen:** Keine Landesnorm gefunden; Klimaanpassungskonzepte bestehen dort bisher
-  freiwillig über das Bündnis „Hessen aktiv: Die Klima-Kommunen“.
+  gefunden, weder für die Stadtgemeinde Bremen noch für Bremerhaven. Suchweg (23.09.2026):
+  Websuche „Bremen Bremerhaven Klimaanpassungskonzept Klimaschutz- und Energiegesetz BremKEG
+  Klimaanpassung § 12 KAnG Umsetzung 2026“. Laut Suchergebnis regelt § 3 BremKEG (Änderung
+  02/2023) die Fortschreibung der Landes-Klimaanpassungsstrategie, keine Stellen nach § 12 KAnG;
+  Strategie 2025 für Land und beide Stadtgemeinden
+  (https://www.klimaanpassung.bremen.de/klimaanpassung/die-klimaanpassungsstrategie-23656).
+  Die Treffer wurden nicht einzeln abgerufen.
+- **Hamburg (Stadtstaat, Einheitsgemeinde):** Keine Landesnorm gefunden. Suchweg (23.09.2026):
+  Websuche „Hamburg Klimaschutzgesetz Klimaanpassung Bezirke Klimaanpassungskonzept § 12 KAnG
+  Umsetzung Hamburg 2026“. Laut Suchergebnissen erstellen die sieben Bezirksämter eigene
+  Klimaanpassungskonzepte (z. B. Hamburg-Mitte,
+  https://www.hamburg.de/politik-und-verwaltung/bezirke/mitte/themen/umwelt-natur-klimaschutz/klima/klimaanpassungskonzept-hamburg-mitte-265806);
+  eine Norm, die sie oder eine andere Stelle nach § 12 KAnG bestimmt, fand sich nicht. Die
+  Treffer wurden nicht einzeln abgerufen.
+- **Hessen:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche „Hessen
+  Klimaanpassungskonzept Pflicht Landkreise Gesetz Umsetzung Bundes-Klimaanpassungsgesetz
+  Hessisches Klimagesetz Änderung 2026“. Laut Suchergebnis (Umweltbundesamt, Regionale Anpassung
+  in Hessen,
+  https://www.umweltbundesamt.de/themen/klima-energie/klimafolgen-anpassung/anpassung-an-den-klimawandel/anpassung-auf-laenderebene/bundesland-hessen)
+  laufen kommunale Konzepte bisher freiwillig über das Bündnis „Hessen aktiv: Die
+  Klima-Kommunen“. Die Treffer wurden nicht einzeln abgerufen.
 - **Mecklenburg-Vorpommern:** Das Klimaverträglichkeitsgesetz ist vom Landtag beschlossen
   (03.06.2026), seine Verkündung im GVOBl. M-V ist in dieser Erhebung nicht nachgewiesen:
   GVOBl. M-V 2026 Nr. 16 vom 11.06.2026 enthält es nicht (Inhaltsverzeichnis gelesen), eine
@@ -83,32 +113,58 @@ Länder dafür bis zum 31.01.2027 Zeit.
 - **Nordrhein-Westfalen:** Das Klimaanpassungsgesetz NRW von 2021 bestimmt keine Stellen nach
   § 12 KAnG; die Novelle ist nicht verabschiedet (Kreis Gütersloh, 14.09.2026: Landesgesetz
   „vermutlich noch im Herbst 2026“ erwartet). Siehe Anhängige Entwürfe.
-- **Rheinland-Pfalz:** Keine Landesnorm gefunden; das Land konkretisiert die Vorgaben laut
-  Klimawandel-RLP noch (https://www.klimawandel.rlp.de/).
-- **Saarland:** Keine Landesnorm gefunden.
+- **Rheinland-Pfalz:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche
+  „Rheinland-Pfalz Landesklimaschutzgesetz Novelle 2026 Klimaanpassungskonzept Landkreise
+  kreisfreie Städte verpflichtend KAnG“. Laut Suchergebnis (Kompetenzzentrum für
+  Klimawandelfolgen, https://www.klimawandel.rlp.de/, und Ministeriumsseite
+  https://mlwuf.rlp.de/themen/energie-und-klimaschutz/anpassung-an-klimawandelfolgen/verpflichtungen-fuer-kommunen)
+  konkretisiert das Land die Vorgaben von § 12 KAnG noch. Die Treffer wurden nicht einzeln
+  abgerufen.
+- **Saarland:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche „Saarland
+  Klimaanpassungskonzept Landkreise Gemeinden Pflicht Saarländisches Klimaschutzgesetz
+  Klimaanpassung § 12 KAnG 2026“. Treffer: Saarländisches Klimaschutzgesetz ohne Bestimmung nach
+  § 12 KAnG; Forderung der Saar-Grünen vom 08/2026, Klimaanpassung als kommunale Pflichtaufgabe
+  erst zu verankern
+  (https://gruene-saar.de/2026/08/saar-gruene-klimaschutz-und-klimaanpassung-als-kommunale-pflichtaufgabe-im-saarland-verankern/).
+  Die Treffer wurden nicht einzeln abgerufen.
 - **Sachsen:** Klima-Portal Sachsen
   (https://www.klima.sachsen.de/umsetzung-des-klimaanpassungsgesetzes-im-freistaat-sachsen-29962.html):
   „Eine Entscheidung ist hierzu noch nicht getroffen“; erwogen werden alle Gemeinden oder nur
   Landkreise und kreisfreie Städte.
-- **Sachsen-Anhalt:** Verkündet: Das Inhaltsverzeichnis des GVBl. LSA 2026 Nr. 15, ausgegeben
-  am 27.07.2026 (Fundstelle, Sammel-PDF der Gesetzblatt-Inhaltsverzeichnisse im amtlichen
-  Landesrecht-Informationsangebot), führt „15. 7. 2026 Ausführungsgesetz des Landes
-  Sachsen-Anhalt zum Bundes-Klimaanpassungsgesetz (KAnG-AG LSA) … 347“. Inhalt:
-  Gesetzentwurf Drs. 8/6630
-  (https://padoka.landtag.sachsen-anhalt.de/files/drs/wp8/drs/d6630lge.pdf), § 1 Abs. 1: „Die
-  Landkreise und kreisfreien Städte sind die zuständigen öffentlichen Stellen nach § 12 …“;
-  Beschluss am 24.06.2026 (Beschlussempfehlung Drs. 8/7116,
-  https://www.landtag.sachsen-anhalt.de/52-sitzungsperiode). Der Wortlaut der verkündeten
-  Fassung und die Norm-URL im Portal landesrecht.sachsen-anhalt.de konnten nicht abgerufen
-  werden; die Paragrafenzählung folgt dem Entwurf.
-- **Schleswig-Holstein:** Fundstelle ist der Direktlink (jlink) auf § 33 EWKG im Portal
-  gesetze-rechtsprechung.sh.juris.de. Inhalt laut Landesregierung SH, FAQ zum EWKG
-  (https://www.schleswig-holstein.de/DE/fachinhalte/E/energiewende/_faqs_ewkg/faq_ewkg_klimaanpassung/akkordeon_faq_ewkg_klimaanpassung):
-  „Die Kreise und kreisfreien Städte werden nach § 33 EWKG verpflichtet,
-  Klimaanpassungskonzepte zu entwickeln“, Frist 30.06.2029; Landtagsbeschluss der Novelle laut
-  Pressemitteilung vom 30.01.2025.
-- **Thüringen:** Keine Landesnorm gefunden; das ThürKlimaG verpflichtet Landkreise und Städte
-  über 30.000 Einwohner zu Klimaschutzstrategien, Klimaanpassungskonzepte sind freiwillig.
+- **Sachsen-Anhalt:** Wortlaut: Beschlussempfehlung des Ausschusses für Wissenschaft, Energie,
+  Klimaschutz und Umwelt, Drs. 8/7116 vom 16.06.2026 (Fundstelle), S. 3, rechte Spalte
+  (angenommene Fassung), § 1 „Zuständige öffentliche Stellen“ Abs. 1: „Die Landkreise und
+  kreisfreien Städte sind die zuständigen öffentlichen Stellen nach § 12 Abs. 1 Satz 1 des
+  Bundes-Klimaanpassungsgesetzes …“; S. 3 ff., § 3 Abs. 1: „Die zuständigen öffentlichen Stellen
+  erstellen … für ihr jeweiliges Gebiet ein Klimaanpassungskonzept“; S. 5, § 3 Abs. 3: Vorlage
+  „bis spätestens 30. Juni 2031“. Landtagsbeschluss nach dieser Empfehlung am 24.06.2026
+  (https://www.landtag.sachsen-anhalt.de/52-sitzungsperiode). Verkündung: Inhaltsverzeichnis
+  GVBl. LSA 2026 Nr. 15, ausgegeben am 27.07.2026: „15. 7. 2026 Ausführungsgesetz des Landes
+  Sachsen-Anhalt zum Bundes-Klimaanpassungsgesetz (KAnG-AG LSA) … 347“ (abgerufen am 23.09.2026
+  aus der fortlaufend aktualisierten Sammeldatei
+  https://www.landesrecht-sachsen-anhalt.info/down/aletztg.pdf). Die Gesetzblattseite S. 347
+  selbst und die Norm im Portal landesrecht.sachsen-anhalt.de wurden nicht gelesen. Die frühere
+  Angabe „Gemeinden von eigener Konzeptpflicht befreit“ stammt aus der Begründung des Entwurfs,
+  nicht aus dem Normtext, und steht deshalb nicht mehr in der Tabelle.
+- **Schleswig-Holstein:** GVOBl. Schl.-H. 2025/26 vom 28.03.2025 (Fundstelle, amtliches
+  Verkündungsportal), Gesetz zur Änderung des Energiewende- und Klimaschutzgesetzes
+  Schleswig-Holstein … vom 25.03.2025, Art. 1 Nr. 39 (S. 39), neuer § 33 Abs. 1: „Die Kreise und
+  kreisfreien Städte sind die zuständigen öffentlichen Stellen im Sinne des § 12 Absatz 1 des
+  Bundes-Klimaanpassungsgesetzes. Für Gebiete einer Gemeinde mit weniger als 100.000 Einwohnern
+  besteht keine Pflicht, ein Klimaanpassungskonzept zu erstellen, wenn für das Gebiet eines
+  Kreises, in dem die Gemeinde gelegen ist, ein Klimaanpassungskonzept erstellt wird. Ein
+  Klimaanpassungskonzept ist erstmals zu erstellen bis zum Ablauf des 30. Juni 2029.“ Ein
+  Direktlink auf § 33 im Portal gesetze-rechtsprechung.sh.juris.de wäre
+  https://www.gesetze-rechtsprechung.sh.juris.de/jportal/?quelle=jlink&query=EWKSG+SH+%C2%A7+33&psml=bsshoprod.psml&max=true;
+  er ist selbst gebildet (nach dem Muster des verzeichneten Direktlinks auf § 1 EWKG) und nicht
+  abgerufen, deshalb nicht als Fundstelle eingetragen.
+- **Thüringen:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche „Thüringen
+  Klimaanpassungskonzept Landkreise Pflicht Gesetz Bundes-Klimaanpassungsgesetz Umsetzung
+  ThürKlimaG Änderung“. Laut Suchergebnis (Umweltbundesamt, Regionale Anpassung in Thüringen,
+  https://www.umweltbundesamt.de/themen/klima-energie/klimafolgen-anpassung/anpassung-an-den-klimawandel/anpassung-auf-laenderebene/regionale-anpassung-in-thueringen,
+  und Thüringer Umweltministerium, https://umwelt.thueringen.de/themen/klima/klimagesetz)
+  können Landkreise und Gemeinden Anpassungskonzepte freiwillig erstellen; das ThürKlimaG
+  verpflichtet nur zu Klimaschutzstrategien. Die Treffer wurden nicht einzeln abgerufen.
 
 ## Anhängige Entwürfe
 
