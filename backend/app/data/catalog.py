@@ -315,6 +315,10 @@ STAGE_LABELS: dict[int, str] = {
 # in RISKS. #96 ist seit der Integration (31.08.2026) aktiv; zusammen mit
 # kwra_id 95/96 (aktiv) sind alle 52 Roadmap-Klimawirkungen genau einmal
 # vertreten (Test: tests/test_planned_risks.py).
+# Abweichung kwra_id 62: sensitivity_names folgt hier NICHT der Wirkungsmechanismen-Mappe,
+# sondern vorrangig docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx,
+# Blatt „Klimawirkungsketten", Zeile 279 (S094–S100) — Entscheid und Herleitung in
+# reviews/BEFUNDE_62.md, Befund 13.
 PLANNED_RISKS: list[dict] = [
     {"kwra_id": 62, "name": "Stadtklima / Wärmeinseln",
      "cluster": "infrastruktur", "kwra_field": "Bauwesen", "stage": 1,
