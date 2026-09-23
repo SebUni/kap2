@@ -5707,6 +5707,11 @@ Exit 0
 | 70 | 144 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
 | 76 | 150 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | untauglich: liest nur eine von mehreren betroffenen Dateien |
 | 36 | 5749 (Autor-Revision T-0569) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): bindet feste Zahlenwerte, die eine spätere Fortschreibung des Berichts überholt hat |
+| 58 | 132 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv, reviews/BEFUNDE_60.md | untauglich: liest nur eine von mehreren betroffenen Dateien |
+| 62 | 136 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv, reviews/BEFUNDE_60.md | tauglich |
+| 89 | 163 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv, reviews/BEFUNDE_60.md | tauglich |
+| 98 | 172 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): prüft nicht die beanstandeten Stellen (π-Band, `* 1.124`), sondern nur Folgezahlen des λ-Bands |
+| 36 | 5788 (Autor-Revision T-0570) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): bindet feste Zahlenwerte, die heute das λ-Unsicherheitsband bezeichnen, nicht die Schranke |
 
 Befund 24: Der Ausdruck liest §3.1 des Berichts (Physischer Teil-Ausweis) und prüft, ob dort `EAD}_z = ` und `EAD}_k = ` stehen, aber nicht `EAD} = `. Die T-0567-Commits (`f3295ea2`, `081f239d`, `ee82fa5a`) berühren laut `git show --stat` außer dem Bericht auch `reviews/BEFUNDE_60.md` — dort steht jedoch nur die Ledger-Buchung des Befunds selbst, kein zusätzlicher Sachverhalt, den der Ausdruck prüfen müsste. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" trifft damit nicht zu. Lauf am heutigen Stand: Exit 0 (geschlossen, Kopftabellen-Maßstab). Probe am Vergabestand `cedc3e77` (Elterncommit des ersten T-0567-Commits, über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, kein Checkout): Exit 1 (Befund bestand).
 
@@ -5808,6 +5813,87 @@ Exit 0
 ```
 
 Probe am Vergabestand `d64231f1` (Elterncommit von `50378c8b`, entpackt über `git archive d64231f1 docs/methodik docs/evidenz/register.md`, kein Checkout): alter Befehl Exit 1 (Bericht dort noch mit den Werten `0,657–2,643` und `0,11–3,44`), Ersatz Exit 0 (Schranke dort als berechnet aus dem fortgepflanzten Band in §4.8 geführt, Befund geschlossen). Gegenprobe: heutiger Bericht ohne die §4.8-Zeile „Plausibilitätsschranke“ (Kopie): Ersatz Exit 1 (besteht).
+
+**T-0570 (Befunde 58, 62, 89, 98, 36).** Die drei T-0570-Commits (`661bd713`, `a5a10967`, `0325f558`) berühren laut `git show --stat` neben dem Bericht die neue Evidenzdatei `docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv` (Destatis, Tabelle 2.1.3; drei Gebietszeilen mit Wohnflächen je Gebäudetyp und Spalte `theta_efh_zfh`) und `reviews/BEFUNDE_60.md`. Vergabestand ist `3dfc2d10` (`git rev-parse 661bd713^`). Alle fünf Ausdrücke lesen nur den Bericht; keiner liest die CSV. Ob das der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" ist, hängt davon ab, ob die CSV für den Sachverhalt des Befunds einschlägig ist. Kontrolle statt Unterstellung: Die CSV trägt die Quellwerte des Typ-Mix \(\bar\theta_{\text{EFH/ZFH}}\) = 0,596 (0,471–0,624), den §4.3 und §4.8 des Berichts führen (Deutschland (1.676.403 + 612.785)/3.841.438 = 0,596; Früheres Bundesgebiet 0,624; Neue Länder und Berlin 0,471). Das ist der Sachverhalt von Befund 58. Die Befunde 62 (Ziffern von Divisionen und Produkten aus den ausgewiesenen Eingängen), 89 (Fundstelle in `docs/evidenz/60_stichprobe/m0_klassenraten.csv`, von T-0570 nicht berührt), 98 (π-Band) und 36 (Schranke) stehen nicht auf dieser CSV. `reviews/BEFUNDE_60.md` trägt bei allen fünf nur die Ledger-Buchung. Alle fünf Ausdrücke sind verbatim aus dem Repo-Wurzelverzeichnis gelaufen, heute am Stand `43e23326` (= `origin/main`), und als Probe am Vergabestand `3dfc2d10` (entpackt über `git archive 3dfc2d10 docs/methodik docs/evidenz` in ein leeres Verzeichnis, kein Checkout). Alle fünf alten Befehle enden heute mit Exit 0 (geschlossen) und am Vergabestand mit Exit 1 (T-0570-Werte noch nicht nachgezogen). Zusätzlich sind sie gegen Kopien des heutigen Standes mit je einer gezielten Störung gelaufen (siehe je Befund).
+
+Befund 62: Der Ausdruck prüft, dass der Bericht die nachgerechneten Ziffernfolgen `0,122061…`, `3,929674…`, `1.534,08/a = 582.838.678` und `5.084,22/a = 2.425.419.445` führt, und rechnet Divisionen und Produkte aus den ausgewiesenen Eingängen nach. Die CSV ist nicht einschlägig: der Befund betrifft den Rechenweg der Ziffern, nicht die Quelle der Eingänge. Gegenproben an Kopien des heutigen Berichts: `0,122061…` → `0,122062…` Exit 1, `582.838.678` → `582.838.679` Exit 1. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `3dfc2d10`: Exit 1 (Ziffernfolgen dort noch die früheren). Tauglich.
+
+Befund 89: Der Ausdruck liest §4.8 und prüft, dass `rate_exponiert_hqextrem_1_pro_a` mindestens dreimal, die Zeilenschlüssel `gk3_gk4;alle` und `gk2;alle` und die Begründung „Wahl des Nenners" genannt sind. Die Fundstelle liegt in `docs/evidenz/60_stichprobe/m0_klassenraten.csv`; diese Datei berührt kein T-0570-Commit, beide Zeilenschlüssel und die Spalte stehen dort (Zeilen 10 und 19, Kopfzeile). Die Destatis-CSV ist für diese Fundstelle nicht einschlägig. Gegenproben an Kopien des heutigen Berichts: Spaltenname ersetzt Exit 1, `gk2;alle` → `gk2;xx` Exit 1. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `3dfc2d10`: Exit 1 (Befund bestand). Tauglich.
+
+**Befund 58 (Z. 132)** — untauglich: liest nur eine von mehreren betroffenen Dateien. Der Ausdruck liest §4.3 des Berichts und prüft die Rechnung `0,596 · 1.950 + 0,404 · 1.533 = 1.781,532`, `0,872 · 481.726,25 €`, `1,243 Mrd.` und das Fehlen der alten 527.280 €. Den Typ-Mix 0,596 (und die Bandenden 0,471 und 0,624) hat T-0570 aus der neuen CSV abgeleitet; der Ausdruck liest sie nicht. Wird die CSV verändert, während der Bericht stimmt, endet der alte Ausdruck weiter mit 0 (geschlossen), obwohl die Quelle des Typ-Mix nicht mehr zum Bericht passt. Ersatz: dieselben Prüfungen, zusätzlich die drei Anteile aus den Wohnflächenspalten der CSV nachgerechnet und gegen die Berichtszahlen gehalten. Soll: Exit 0 (geschlossen) am heutigen Stand, Exit 1 am Vergabestand und bei abweichender CSV.
+
+Ersatz:
+
+```bash
+python3 -c "import csv;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.3 ')[1].split(chr(10)+'### 4.4 ')[0];d=dict((r['gebiet'],r) for r in csv.DictReader(open('docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv',encoding='utf-8'),delimiter=chr(59)));th=lambda g:(int(d[g]['wohnflaeche_1_wohnung_1000m2'])+int(d[g]['wohnflaeche_2_wohnungen_1000m2']))/int(d[g]['wohnflaeche_wohngebaeude_1000m2']);raise SystemExit(0 if ('= 0,596 · 1.950 + 0,404 · 1.533 = **1.781,532' in k and '0,872 · 481.726,25 €' in k and '**1,243 Mrd.' in k and '1.950 €₂₀₂₆/m² BGF = **527.280' not in k and round(th('Deutschland'),3)==0.596 and round(th('Früheres Bundesgebiet'),3)==0.624 and round(th('Neue Länder und Berlin'),3)==0.471 and all(x in k for x in ('0,596','0,471','0,624')) and round(0.596*1950+0.404*1533,3)==1781.532) else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n### 4.3 ')[1].split('\n### 4.4 ')[0];raise SystemExit(0 if '= 0,596 · 1.950 + 0,404 · 1.533 = **1.781,532' in k and '0,872 · 481.726,25 €' in k and '**1,243 Mrd.' in k and '1.950 €₂₀₂₆/m² BGF = **527.280' not in k else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n### 4.3 ')[1].split('\n### 4.4 ')[0];raise SystemExit(0 if '= 0,596 · 1.950 + 0,404 · 1.533 = **1.781,532' in k and '0,872 · 481.726,25 €' in k and '**1,243 Mrd.' in k and '1.950 €₂₀₂₆/m² BGF = **527.280' not in k else 1)"; echo "Exit $?"
+Exit 0
+$ python3 -c "import csv;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.3 ')[1].split(chr(10)+'### 4.4 ')[0];d=dict((r['gebiet'],r) for r in csv.DictReader(open('docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv',encoding='utf-8'),delimiter=chr(59)));th=lambda g:(int(d[g]['wohnflaeche_1_wohnung_1000m2'])+int(d[g]['wohnflaeche_2_wohnungen_1000m2']))/int(d[g]['wohnflaeche_wohngebaeude_1000m2']);raise SystemExit(0 if ('= 0,596 · 1.950 + 0,404 · 1.533 = **1.781,532' in k and '0,872 · 481.726,25 €' in k and '**1,243 Mrd.' in k and '1.950 €₂₀₂₆/m² BGF = **527.280' not in k and round(th('Deutschland'),3)==0.596 and round(th('Früheres Bundesgebiet'),3)==0.624 and round(th('Neue Länder und Berlin'),3)==0.471 and all(x in k for x in ('0,596','0,471','0,624')) and round(0.596*1950+0.404*1533,3)==1781.532) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe am Vergabestand `3dfc2d10`: alter Befehl Exit 1, Ersatz Exit 1 (die CSV gibt es dort noch nicht, `FileNotFoundError`; Befund bestand, beide richtig). Gegenprobe, die nur der Ersatz besteht: heutiger Bericht mit einer Kopie der CSV, in der die Wohnfläche der 1-Wohnungs-Gebäude Deutschland von `1676403` auf `1976403` gesetzt ist: alter Befehl Exit 0 (falsch, meldet geschlossen), Ersatz Exit 1 (besteht). Gegenprobe im Bericht: `0,596 · 1.950` → `0,650 · 1.950` beim alten Befehl Exit 1.
+
+**Befund 98 (Z. 172)** — untauglich: anderer Grund (benannt): prüft nicht die beanstandeten Stellen. Befund 98 beanstandet das gerundete π-Band „1,07 (1,04–1,11)" in §4.2 und §4.8 und `* 1.11` im Beispielblock. Der Ausdruck prüft stattdessen nur Folgezahlen (`3,44` fehlt, `[0,12; 3,93]` mindestens dreimal, `band: [0.12, 3.93]`, `assert abs(schranke_hi - 3.93)`, `0,583–2,425`). Wird die Beanstandung in eine Kopie des heutigen Berichts zurückgesetzt, bleibt der alte Ausdruck bei Exit 0 (geschlossen): `1,07 (1,039–1,124)` → `1,07 (1,04–1,11)` Exit 0, `* 1.124 ` → `* 1.11 ` Exit 0. Die Zahlen stehen als Text da und folgen den Eingängen nicht. Die Destatis-CSV ist für diesen Befund nicht einschlägig (er betrifft \(\pi\), nicht \(\bar\theta\)); der Mangel liegt im Ausdruck selbst. Ersatz: prüft die beanstandeten Stellen (kein `1,04–1,11`, kein `* 1.11 `, `1,07 (1,039–1,124)` genau zweimal, `* 1.124 ` im Block, `band: [1.039, 1.124]`) und rechnet die Bandenden aus dem ungerundeten π-Band nach (1,0706/1,03; 1,1576/1,03). Soll: Exit 0 (geschlossen) am heutigen Stand, Exit 1 bei zurückgesetzter Beanstandung.
+
+Ersatz:
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if ('1,04–1,11' not in s and '* 1.11 ' not in s and s.count('1,07 (1,039–1,124)')==2 and '* 1.124 ' in s and 'band: [1.039, 1.124]' in s and round(1.0706/1.03,3)==1.039 and round(1.1576/1.03,3)==1.124) else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if ('3,44' not in s and '3.44' not in s and s.count('[0,12; 3,93]')>=3 and 'band: [0.12, 3.93]' in s and 'assert abs(schranke_hi - 3.93)' in s and '0,583–2,425' in s) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if ('3,44' not in s and '3.44' not in s and s.count('[0,12; 3,93]')>=3 and 'band: [0.12, 3.93]' in s and 'assert abs(schranke_hi - 3.93)' in s and '0,583–2,425' in s) else 1)"; echo "Exit $?"
+Exit 0
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if ('1,04–1,11' not in s and '* 1.11 ' not in s and s.count('1,07 (1,039–1,124)')==2 and '* 1.124 ' in s and 'band: [1.039, 1.124]' in s and round(1.0706/1.03,3)==1.039 and round(1.1576/1.03,3)==1.124) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe am Vergabestand `3dfc2d10`: alter Befehl Exit 1 (die neuen λ-Zahlen fehlen dort noch), Ersatz Exit 0 — das π-Band steht dort schon ungerundet, weil T-0569 es vor T-0570 behoben hat; der Ersatz prüft die Beanstandung, nicht die T-0570-Zahlen, und meldet dort zu Recht „geschlossen". Der Vergabestand des Befunds selbst ist `d64231f1` (Elterncommit von `50378c8b`, T-0569; entpackt wie oben): Ersatz Exit 1 (Beanstandung dort noch im Bericht, Befund bestand). Gegenproben an Kopien des heutigen Berichts: `1,07 (1,039–1,124)` → `1,07 (1,04–1,11)`: alter Befehl Exit 0 (falsch), Ersatz Exit 1; `* 1.124 ` → `* 1.11 `: alter Befehl Exit 0 (falsch), Ersatz Exit 1. Eine veränderte CSV ändert an keinem der beiden Befehle etwas (Exit 0), wie erwartet.
+
+**Befund 36 (Z. 5788)** — untauglich: anderer Grund (benannt): bindet feste Zahlenwerte, die heute das λ-Unsicherheitsband bezeichnen, nicht die Schranke. Der Ausdruck ist die Fortschreibung des T-0569-Ausdrucks zu Befund 36 und trägt dessen Mangel weiter: Er prüft nur, dass sechs Zeichenketten irgendwo im Bericht stehen (`0,583–2,425`, `0,12–3,93`, `[0,12; 3,93]`, `0,12 bzw. 3,93`, `[0.12, 3.93]`, `0,296–2,291`). Befund 36 (Schranke ohne Herleitung und nicht in der P1-Tabelle) verlangt eine hergeleitete, in §4.8 geführte Schranke. Seit T-0574 ist die Plausibilitätsschranke [0,5; 2,0] (Abschätzung von KAP3, §4.4, §4.8); die Ziffern 0,12 und 3,93 bezeichnen heute das λ-Unsicherheitsband (§4.8, Zeile „Unsicherheitsband λ", „kein Prüfstein"). Der Ausdruck endet heute nur mit 0, weil dieselben Ziffern dort stehen. Gegenprobe an einer Kopie des heutigen Berichts ohne die §4.8-Zeile „Plausibilitätsschranke": alter Befehl Exit 0 (falsch, meldet geschlossen), obwohl die Schranke dann nicht geführt ist. Die Destatis-CSV ist für die Schranke nicht einschlägig. Ersatz: derselbe Befehl wie der Ersatz zu Befund 36 (Z. 5749) — prüft die §4.8-Zeile, ihren Verweis auf §4.4, ihre Kennzeichnung und dass beide Werte als „Plausibilitätsschranke [a; b]" in Kapitel 4 stehen, ohne feste Zahlenwerte. Soll: Exit 0 (geschlossen) am heutigen Stand, Exit 1 ohne die §4.8-Zeile.
+
+Ersatz:
+
+```bash
+python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];t=k.split(chr(10)+'### 4.8 ')[1];z=[l for l in t.split(chr(10)) if l.startswith(chr(124)+' Plausibilit')];v=re.findall(r'(\d+,\d+) bzw\. (\d+,\d+)',z[0]) if len(z)==1 else [];raise SystemExit(0 if (len(z)==1 and len(v)==1 and '§4.4' in z[0] and ('Abschätzung von KAP3' in z[0] or '**berechnet**' in z[0]) and 'Plausibilitätsschranke ['+v[0][0]+'; '+v[0][1]+']' in k) else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('0,583–2,425','0,12–3,93','[0,12; 3,93]','0,12 bzw. 3,93','[0.12, 3.93]','0,296–2,291')) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('0,583–2,425','0,12–3,93','[0,12; 3,93]','0,12 bzw. 3,93','[0.12, 3.93]','0,296–2,291')) else 1)"; echo "Exit $?"
+Exit 0
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];t=k.split(chr(10)+'### 4.8 ')[1];z=[l for l in t.split(chr(10)) if l.startswith(chr(124)+' Plausibilit')];v=re.findall(r'(\d+,\d+) bzw\. (\d+,\d+)',z[0]) if len(z)==1 else [];raise SystemExit(0 if (len(z)==1 and len(v)==1 and '§4.4' in z[0] and ('Abschätzung von KAP3' in z[0] or '**berechnet**' in z[0]) and 'Plausibilitätsschranke ['+v[0][0]+'; '+v[0][1]+']' in k) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe am Vergabestand `3dfc2d10` (entpackt wie oben): alter Befehl Exit 1 (die T-0570-Zahlen fehlen dort noch), Ersatz Exit 0 (die Schranke war dort schon in §4.8 geführt, Befund geschlossen; der Ersatz prüft die Führung, nicht die Zahlen). Am Vergabestand des Befunds `d64231f1` (T-0569, entpackt wie oben): Ersatz Exit 0 (Schranke dort als berechnet aus dem fortgepflanzten Band in §4.8 geführt). Gegenprobe: heutiger Bericht ohne die §4.8-Zeile „Plausibilitätsschranke" (Kopie): alter Befehl Exit 0 (falsch), Ersatz Exit 1 (besteht).
 
 ## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)
 
