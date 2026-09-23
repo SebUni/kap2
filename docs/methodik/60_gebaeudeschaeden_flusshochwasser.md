@@ -3381,8 +3381,8 @@ dieses Berichts ein — vgl. B6, „Hochwasserschutzfibel … hier nicht im Voll
 
 1. **KWRA-Schadensbaum × UBA-Klimawirkungsketten**, Arbeitsmappe
    `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` — Sheets
-   „Klimawirkungsketten“ (Z3–Z271 wie in Kap. 1 zitiert) und „Schadensbaum-Netzwerkliste“ (Z13, Z50,
-   Z51, Z53, Z60, Z61). **Dateistand:** Git-Commit `1a89a2e8a69539eb15aa48aec214a44a05567137`
+   „Klimawirkungsketten“ (Z3–Z272, u. a. wie in Kap. 1 zitiert) und „Schadensbaum-Netzwerkliste“
+   (Z13, Z50, Z53, Z61). **Dateistand:** Git-Commit `1a89a2e8a69539eb15aa48aec214a44a05567137`
    (2026-08-17). **Prüfsumme (SHA-256):**
    `2faac648aade047f274f6b305a73c44ef3727f16a379124bf35eb590c0735a28`. **Zugriffsdatum:**
    13.09.2026 (Repository-Arbeitskopie, Volltext im Original geprüft — Sheet-/Zeilenbezüge oben
