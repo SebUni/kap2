@@ -36,7 +36,7 @@ export default function CostTablesSection() {
                 <td style={{ textAlign: 'right' }}>
                   {/* Verwechslungssperre Klasse A/B (T-0517): Klasse B zeigt den
                       Screening-Vermerk des Backends, nie einen Strich oder 0 €. */}
-                  {r.has_euro_layer === false ? String(r.cost_display ?? '') : fmtEur(r.cost_eur)}
+                  {r.has_euro_layer === false || r.cost_eur == null ? String(r.cost_display ?? '') : fmtEur(r.cost_eur)}
                 </td>
               </tr>
             ))}
