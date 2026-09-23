@@ -11,7 +11,7 @@ export const fmtEurCompact = (v: number): string => {
   // Erst runden, dann die Größenklasse wählen: sonst erscheint 9.960 als „10.000 €“
   // neben „10 Tsd. €“ und 999.600 als „1.000 Tsd. €“.
   const magnitude = Math.pow(10, 1 - Math.floor(Math.log10(abs)))
-  const small = Math.round(abs * magnitude) / magnitude
+  const small = Math.abs(Math.round(v * magnitude) / magnitude)
   const tsd = Math.round(abs / 1e3)
   const mio = Math.round((abs / 1e6) * 100) / 100
   const de = (x: number, d: number) => (sign * x).toLocaleString('de-DE', { maximumFractionDigits: d })
