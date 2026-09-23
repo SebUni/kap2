@@ -5684,6 +5684,16 @@ $ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',enco
 Exit 0
 ```
 
+#### Schritt 3a1: Ausdrücke seit 8c3c4075359245730ebda58065652885522e0ddf (Bezugscommit M)
+
+**Maßstab.** Wie oben im Abschnitt: Jeder Ausdruck wurde verbatim ausgeführt; untauglich ist ein Ausdruck, der am heutigen Stand das falsche Ergebnis liefert, dessen richtiges Ergebnis nur zufällig zustande kommt, oder der von den Dateien, die der zugehörige Commit seit M (`8c3c4075359245730ebda58065652885522e0ddf`) laut `git show --stat` berührt, nicht alle liest, sofern die ungelesene Datei selbst einen zu prüfenden Sachverhalt trägt (kein bloßer Ledger-Eintrag über den Fund).
+
+| Befund | M Z. … | Stand | liest | berührt (Paket) | Urteil |
+|---|---|---|---|---|---|
+| 24 | 98 (Kopftabelle), 5686 (Autor-Revision T-0567) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+
+Befund 24: Der Ausdruck liest §3.1 des Berichts (Physischer Teil-Ausweis) und prüft, ob dort `EAD}_z = ` und `EAD}_k = ` stehen, aber nicht `EAD} = `. Die T-0567-Commits (`f3295ea2`, `081f239d`, `ee82fa5a`) berühren laut `git show --stat` außer dem Bericht auch `reviews/BEFUNDE_60.md` — dort steht jedoch nur die Ledger-Buchung des Befunds selbst, kein zusätzlicher Sachverhalt, den der Ausdruck prüfen müsste. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" trifft damit nicht zu. Lauf am heutigen Stand: Exit 0 (geschlossen, Kopftabellen-Maßstab). Probe am Vergabestand `cedc3e77` (Elterncommit des ersten T-0567-Commits, über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, kein Checkout): Exit 1 (Befund bestand).
+
 ## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)
 
 Autor-Paket vom 23.09.2026 (Vorhaben T-0401): Bericht §3.1/§3.2 — Euro-Ausweis gegen physischen
