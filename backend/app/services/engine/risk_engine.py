@@ -292,7 +292,9 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             "outcome": outcome,
             "outcome_sum": outcome,
             "outcome_unit": risk["outcome_unit"],
-            "cost_eur": cost,
+            # Verwechslungssperre Klasse A/B (T-0842): Der Betrag einer Klasse-B-Wirkung
+            # verschwindet an der Quelle. Die physische Menge steht in ``outcome``.
+            "cost_eur": cost if catalog.risk_has_euro_layer(risk) else None,
             "cost_dimension": risk["cost_dimension"],
             "group": risk["group"],
             "name": risk["name"],
@@ -332,7 +334,7 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
     # statt eines Betrags catalog.NO_EURO_LAYER_TEXT (nie 0 €, nie „kein Schaden“).
     has_euro = {r["code"]: catalog.risk_has_euro_layer(r) for r in catalog.RISKS}
     # Der Betrag einer Klasse-B-Wirkung verschwindet an der Quelle: cost_eur ist dort
-    # None (risks[code] bleibt unverändert). Die Rangfolge nach Betrag gilt nur für
+    # None, auch in risks[code]. Die Rangfolge nach Betrag gilt nur für
     # Klasse A; Klasse B folgt danach alphabetisch nach Name — eine Rangfolge nach dem
     # unterdrückten Betrag würde ihn verraten.
     eintraege = [
