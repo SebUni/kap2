@@ -169,8 +169,11 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
         risks = data.get("risks", {})
         for code in risk_codes:
             rdata = risks.get(code, {})
-            risk_index_cols[code].append(float(rdata.get("index", 0.0)))
-            risk_outcome_cols[f"{code}_outcome"].append(float(rdata.get("outcome", 0.0)))
+            # Fehlender Wert → None (NULL), nie 0.0: eine 0 wäre eine Nullwirkung (A-0010/P2).
+            idx = rdata.get("index")
+            out = rdata.get("outcome")
+            risk_index_cols[code].append(float(idx) if idx is not None else None)
+            risk_outcome_cols[f"{code}_outcome"].append(float(out) if out is not None else None)
             risk_cost_cols[f"{code}_cost_eur"].append(rdata.get("cost_eur", 0.0))
 
         auxiliary = data.get("auxiliary", {})
