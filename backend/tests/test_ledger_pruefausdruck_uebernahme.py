@@ -58,3 +58,33 @@ def test_pruefausdruck_aus_frueherem_vorkommen_wird_uebernommen(tmp_path: Path) 
     unbelegt = [b.nr for b in befunde.values()
                 if b.lage == "geschlossen" and not b.pruefausdruck]
     assert unbelegt == ["2"]
+
+
+# T-0785-ceo: Die Kopftabelle hat für den Prüfausdruck Vorrang vor späteren Vorkommen.
+MINI_LEDGER_KOPF = """# Befunde 98 (Test)
+
+## Kopftabelle
+
+| Nr | Befund (Ort · Art) | Kat | Status | Nachweis | Prüfausdruck |
+|---|---|---|---|---|---|
+| 1 | Bericht Kap. 1 · Lücke — Ausdruck in Kopftabelle | B | offen | – | `python3 -c "raise SystemExit(0)"` |
+| 2 | Bericht Kap. 2 · Lücke — Kopftabelle ohne Ausdruck | B | offen | – | – |
+
+## Runde 2
+
+| Nr | Kat | Status | Nachweis | Prüfausdruck |
+|---|---|---|---|---|
+| 1 | B | geschlossen | Rev. 2 | `python3 -c "raise SystemExit(1)"` |
+| 2 | B | geschlossen | Rev. 2 | `python3 -c "raise SystemExit(0)"` |
+"""
+
+
+def test_kopftabelle_hat_vorrang_beim_pruefausdruck(tmp_path: Path) -> None:
+    pfad = tmp_path / "BEFUNDE_98.md"
+    pfad.write_text(MINI_LEDGER_KOPF, encoding="utf-8")
+
+    befunde = {b.nr: b for b in ledger.parse(pfad)}
+
+    assert befunde["1"].pruefausdruck == 'python3 -c "raise SystemExit(0)"'
+    assert befunde["2"].pruefausdruck == 'python3 -c "raise SystemExit(0)"'
+    assert befunde["1"].lage == "geschlossen"
