@@ -17,18 +17,23 @@ import subprocess
 import time
 from pathlib import Path
 
-WURZEL = Path(__file__).resolve().parents[2]
-SKRIPT = WURZEL / "deploy" / "test-deploy.sh"
+# Strenge Anker (T-0530): Treffer nur in Befehlszeilen, fehlender Anker macht den Test rot.
+from _deploy_anker import SKRIPT, WURZEL, anker_index, ausschnitt, hat_anker, skript_text
 UNIT = WURZEL / "deploy" / "kap2-test.service"
 MAIN = WURZEL / "backend" / "app" / "main.py"
 LIB = WURZEL / "deploy" / "lib-neustart.sh"
 
 
 def _dienst_block() -> str:
-    text = SKRIPT.read_text(encoding="utf-8")
-    anfang = text.index('SCHRITT="dienst"')
-    ende = text.index('SCHRITT="status"')
-    return text[anfang:ende]
+    return ausschnitt('SCHRITT="dienst"', 'SCHRITT="status"')
+
+
+def _restart_zweig(block: str) -> str:
+    """Fehlerzweig von `if ! /bin/systemctl restart kap2-test; then` bis zu seinem `fi`."""
+    kopf = "if ! /bin/systemctl restart kap2-test; then"
+    anfang = anker_index(block, kopf)
+    ende = anker_index(block, "\nfi", anfang)
+    return block[anfang:ende]
 
 
 def test_skript_ist_syntaktisch_fehlerfrei():
@@ -42,14 +47,14 @@ def test_dienst_startet_ohne_sudo_neu():
     # Kommentarzeilen ausnehmen: dort wird der Verzicht auf sudo gerade begründet.
     befehle = "\n".join(z for z in block.splitlines() if not z.lstrip().startswith("#"))
     assert not re.search(r"(^|\s)sudo\s", befehle), befehle
-    assert "systemctl restart kap2-test" in block
+    assert hat_anker(block, "systemctl restart kap2-test")
 
 
 def test_dienst_prueft_vorbedingung_unit_vorhanden():
     """(b) Fehlt die Unit, gibt es eine verständliche Anweisung statt einer nackten Fehlermeldung."""
     block = _dienst_block()
-    assert "systemctl list-unit-files kap2-test.service" in block
-    assert "/etc/systemd/system/kap2-test.service" in block
+    assert hat_anker(block, "systemctl list-unit-files kap2-test.service")
+    assert hat_anker(block, "/etc/systemd/system/kap2-test.service")
 
 
 def test_dienst_prueft_polkit_regel_nicht_als_rules_datei_vorab():
@@ -60,30 +65,28 @@ def test_dienst_prueft_polkit_regel_nicht_als_rules_datei_vorab():
     """
     block = _dienst_block()
     assert "/etc/polkit-1/rules.d/" not in block
-    assert "/etc/polkit-1/localauthority/50-local.d/50-kap2-test.pkla" in block
+    assert hat_anker(block, "/etc/polkit-1/localauthority/50-local.d/50-kap2-test.pkla")
 
 
 def test_dienst_schritt_wird_nicht_uebersprungen():
     """(c) Scheitert der Neustart mangels Berechtigung, bricht der Lauf ab — kein Überspringen."""
     block = _dienst_block()
-    assert "if ! /bin/systemctl restart kap2-test; then" in block
-    fehlerzweig = block[block.index("if ! /bin/systemctl restart kap2-test; then"):]
-    fehlerzweig = fehlerzweig.split("\nfi", 1)[0]
+    fehlerzweig = _restart_zweig(block)
     # Im Fehlerzweig steht ein `false`, das den ERR-Trap auslöst (Abbruch mit Fehlerstatus).
     assert re.search(r"^\s*false\s*$", fehlerzweig, re.M), fehlerzweig
-    assert "NICHT uebersprungen" in fehlerzweig
+    assert hat_anker(fehlerzweig, "NICHT uebersprungen")
     # Der nötige Handgriff steht wörtlich im Abbruchtext.
-    assert "/etc/polkit-1/localauthority/50-local.d/50-kap2-test.pkla" in fehlerzweig
-    assert "/etc/systemd/system/kap2-test.service" in fehlerzweig
+    assert hat_anker(fehlerzweig, "/etc/polkit-1/localauthority/50-local.d/50-kap2-test.pkla")
+    assert hat_anker(fehlerzweig, "/etc/systemd/system/kap2-test.service")
 
 
 def test_dienst_prueft_identitaet_des_neuen_prozesses():
     """(d) MainPID muss sich ändern und ≠ 0 sein, und /api/health den ausgerollten Commit melden."""
     block = _dienst_block()
-    assert "MainPID" in block
-    assert '"$NEU_PID" != "0"' in block
-    assert '"$NEU_PID" != "$ALT_PID"' in block
-    assert '"$GEMELDET" == "$COMMIT"' in block
+    assert hat_anker(block, "MainPID")
+    assert hat_anker(block, '"$NEU_PID" != "0"')
+    assert hat_anker(block, '"$NEU_PID" != "$ALT_PID"')
+    assert hat_anker(block, '"$GEMELDET" == "$COMMIT"')
 
 
 def test_unit_laeuft_nicht_als_root():
@@ -181,15 +184,16 @@ def test_eigenprozess_neustart_bricht_bei_fremder_pid_ab(tmp_path):
 
 def test_dienst_faellt_auf_eigenen_prozess_zurueck():
     """(T-0342) Der Dienst-Schritt bricht nach abgelehntem `restart` nicht mehr sofort ab."""
-    text = SKRIPT.read_text(encoding="utf-8")
-    assert 'source "$PRODUKT/deploy/lib-neustart.sh"' in text
+    text = skript_text()
+    assert hat_anker(text, 'source "$PRODUKT/deploy/lib-neustart.sh"')
     block = _dienst_block()
-    zweig = block[block.index("if ! /bin/systemctl restart kap2-test; then"):]
-    zweig = zweig.split("\nfi", 1)[0]
-    assert "neustart_ueber_eigenen_prozess kap2-test" in zweig
+    zweig = _restart_zweig(block)
+    assert hat_anker(zweig, "neustart_ueber_eigenen_prozess kap2-test")
     # Das `false` liegt hinter der Prüfung des Rückgabewerts, nicht davor.
-    assert zweig.index("neustart_ueber_eigenen_prozess kap2-test") < zweig.index("NEUSTART_RC -ne 0")
-    assert zweig.index("NEUSTART_RC -ne 0") < zweig.rindex("false")
+    assert anker_index(zweig, "neustart_ueber_eigenen_prozess kap2-test") < anker_index(
+        zweig, "NEUSTART_RC -ne 0"
+    )
+    assert anker_index(zweig, "NEUSTART_RC -ne 0") < zweig.rindex("false")
 
 
 def test_commit_ermittlung_liefert_kurz_hash():
