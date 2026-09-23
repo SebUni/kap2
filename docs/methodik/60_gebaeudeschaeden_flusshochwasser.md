@@ -1448,13 +1448,19 @@ Budget ein, weil sie nicht als Streuung beziffert werden können: die gepoolten 
 pluvialen Ereignisse der GDV-Position und der Unterschied zwischen versicherten und gesamten
 Schäden. Beide stehen unten als Modellgrenze.
 
-**Ist-Ergebnis.** Modellseite: aus den Stützstellen von §3.6 entfallen auf HQhäufig 66,1 %, auf
-HQ100 23,2 % und auf das Extremregime 10,6 % des Erwartungswerts, also **33,9 %** auf das seltene
-Regime ab HQ100. Ankerseite: Von der Summe 42,28 Mrd. € der 23 Jahre liegen 20,19 Mrd. € über dem
-jeweils ohne das Jahr gebildeten Normaljahr; dieser Überschuss verteilt sich auf fünf Jahre —
-2021 (11,25), 2002 (5,82), 2013 (2,16), 2024 (0,80) und 2016 (0,17). Daraus
-\(R_{\text{anker}}\) = 20,19/42,28 = **47,7 %**. **Differenz 13,9 Prozentpunkte > 11,5
-Prozentpunkte — Prüfung nicht bestanden.**
+**Ist-Ergebnis.** Modellseite: aus den Stützstellen von §3.6 entfallen auf HQhäufig 66,14 %, auf
+HQ100 23,23 % und auf das Extremregime 10,63 % des Erwartungswerts (die drei Summanden
+4,174 / 1,466 / 0,671 m²/a der Trapezsumme aus §3.4 Schritt 2, geteilt durch ihre Summe
+6,311 m²/a; die drei Anteile summieren sich zu 100,00 %), also
+23,23 + 10,63 = **33,86 %** auf das seltene Regime ab HQ100. Ankerseite: Von der Summe
+42,28 Mrd. € der 23 Jahre liegen 20,186 Mrd. € über dem jeweils ohne das Jahr gebildeten
+Normaljahr; dieser Überschuss verteilt sich auf fünf Jahre — 2021 (11,25), 2002 (5,82), 2013
+(2,16), 2024 (0,80) und 2016 (0,17). Daraus \(R_{\text{anker}}\) = 20,186/42,28 = **47,74 %**.
+**Differenz 47,74 − 33,86 = 13,88 Prozentpunkte > 11,5 Prozentpunkte — Prüfung nicht bestanden.**
+Alle Anteile stehen mit zwei Nachkommastellen, damit sich die Einzelanteile zu 100 und die beiden
+seltenen Anteile zu ihrer Summe addieren; auf eine Stelle gerundet ergäben 66,1 + 23,2 + 10,6 nur
+99,9 und 23,2 + 10,6 = 33,8 statt 33,9 (Ledger-Befund 65). Gerundet auf eine Stelle bleibt es bei
+rund 13,9 Prozentpunkten Abstand.
 
 **Modellentscheid (§3.8, nicht geglättet).** Das Ergebnis wird weder durch Weiten der Toleranz noch
 durch Nachziehen des Modells an den Anker geheilt. Es wird als Entscheid ausgewiesen und im Ledger
@@ -1477,8 +1483,75 @@ bestünde eine Verdopplung des HQextrem-Schadens (\(A_3\) = 600 m², Regime-Ante
 Folge des großen ankerseitigen Stichprobenfehlers, nicht der Toleranzwahl. Weiter offen bleiben:
 die GDV-Position poolt fluviale und pluviale Ereignisse (2021 ist pluvial dominiert und trägt
 allein 56 % des Überschusses), sie misst versicherte statt gesamter Schäden, und das Normaljahr
-\(\bar{A}_{-t}\) ist ein Mittel, keine gemessene Trennung nach Jährlichkeit. Eine engere Prüfung
-verlangt Ereignis- statt Jahreswerte; sie ist nicht publiziert (§4.1).
+\(\bar{A}_{-t}\) ist ein Mittel, keine gemessene Trennung nach Jährlichkeit. Was fehlt, sind
+**Ereignis**werte; sie sind nicht publiziert (§4.1). Die **Jahres**werte selbst sind dagegen
+vorhanden, und ihre Quantile gehen in die zweite Prüfgröße unten ein (Ledger-Befund 63).
+
+**Zweite Prüfgröße: Quantilvergleich der höchsten Jahre (Ledger-Befund 63).**
+\(R_{\text{anker}}\) vergleicht Mittelwerte. Daneben steht ein Vergleich der **Jahresquantile**, der
+keine Ereignisdaten braucht: Die 23 Jahreswerte werden der Größe nach geordnet; das Jahr auf Rang
+\(i\) (\(i = 1\) ist das schadensreichste) erhält die Überschreitungswahrscheinlichkeit nach Weibull
+\(p_i = i/(n+1) = i/24\) a⁻¹ — Rang 1 steht also für ein „rund 24-jährliches Jahr". Verglichen wird
+auf beiden Seiten, das Wievielfache eines Normaljahrs dieses Jahr ist:
+
+\[
+Q_i^{\text{anker}} = \frac{A_{(i)}}{\bar{A}_{-(i)}},
+\qquad
+Q_i^{\text{modell}} = \frac{D(p_i)}{\bar A_z} .
+\]
+
+Dabei ist \(A_{(i)}\) der Jahreswert auf Rang \(i\), \(\bar{A}_{-(i)}\) das ohne dieses Jahr gebildete
+Normaljahr (wie oben), und \(D(p)\) die Schaden-Wahrscheinlichkeits-Kurve aus §3.4 Schritt 2 —
+dieselbe Kurve, deren Fläche \(\bar A_z\) ist: zwischen den drei Stützstellen (15,0 / 77,76 /
+300,0 m² bei \(p\) = 0,1 / 0,01 / 0,002236 a⁻¹) geradlinig in \(p\), seltener als HQextrem konstant,
+häufiger als HQhäufig null. Beide Seiten sind Verhältnisse und damit **skaleninvariant**; sie
+tragen wie \(R_{\text{anker}}\) keine Niveauinformation und sind von \(\lambda\) unabhängig. Die
+Modellseite unterstellt, dass die Kurve der Beispielzelle die **Form** der Bundesjahressumme
+wiedergibt, also alle betroffenen Flussabschnitte eines Jahres dasselbe Ereignisregime erleben —
+eine Modellgrenze; eine räumlich weniger gleichläufige Bundessumme hätte flachere obere Quantile.
+Gelesen wird eine Rangtabelle, keine angepasste Extremwertverteilung (P3).
+
+**Toleranz — vorab fixiert: 90-%-Rangband** (Abschätzung von KAP3 beim Niveau 90 %, §3.9; die
+Bandgrenzen selbst sind gerechnet). Wie selten das Jahr auf Rang \(i\) in Wahrheit ist, ist bei
+23 Jahren selbst unsicher. Die Grenzen \(p_{i,u}\) und \(p_{i,o}\) sind die
+Überschreitungswahrscheinlichkeiten, bei denen in 23 unabhängigen Jahren mit 5 % bzw. 95 %
+Wahrscheinlichkeit mindestens \(i\) Jahre darüber lägen (Binomialverteilung; über die Form der
+Schäden wird dabei nichts angenommen). Die Prüfung gilt je Rang als bestanden, wenn
+\(Q_i^{\text{anker}}\) zwischen \(D(p_{i,o})/\bar A_z\) und \(D(p_{i,u})/\bar A_z\) liegt. Geprüft
+werden die vier höchsten Ränge. Die Ableseunschärfe (±0,05 Mrd. € je Balken, ungünstigstes Muster)
+verschiebt \(Q_1^{\text{anker}}\) nur zwischen 8,97 und 9,74 und geht deshalb nicht eigens ins Band
+ein. Sensitivität des Niveaus: Mit 80 % statt 90 % wird das Band enger (Rang 1: 2,90 bis 36,9),
+das Ergebnis unten ändert sich nicht.
+
+| Rang \(i\) | Jahr | \(A_{(i)}\) (Mrd. €) | \(\bar{A}_{-(i)}\) | \(Q_i^{\text{anker}}\) | \(p_i\) (a⁻¹) | \(Q_i^{\text{modell}}\) bei \(p_i\) | Rangband \(p_{i,u}\)–\(p_{i,o}\) (a⁻¹) | Band für \(Q_i^{\text{anker}}\) | Ergebnis |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 2021 | 12,6 | 1,349 | **9,34** | 0,042 | 8,82 | 0,0022–0,122 | 0 bis 47,5 | im Band |
+| 2 | 2002 | 7,4 | 1,585 | **4,67** | 0,083 | 4,22 | 0,016–0,190 | 0 bis 11,7 | im Band |
+| 3 | 2013 | 3,9 | 1,745 | **2,24** | 0,125 | 0 (häufiger als HQhäufig) | 0,037–0,249 | 0 bis 9,39 | im Band |
+| 4 | 2024 | 2,6 | 1,804 | **1,44** | 0,167 | 0 (häufiger als HQhäufig) | 0,062–0,304 | 0 bis 6,61 | im Band |
+
+**Ist-Ergebnis des Quantilvergleichs: bestanden auf allen vier Rängen.** Im Punktvergleich bei
+\(p_i\) liegen die beiden höchsten Jahre um 6 % (9,34 gegen 8,82) und 11 % (4,67 gegen 4,22) über
+dem Modell — dieselbe Richtung wie bei \(R_{\text{anker}}\) (seltene Jahre im Anker schwerer als im
+Modell), aber klein. Auf den Rängen 3 und 4 liegt \(p_i\) über der HQhäufig-Rate von 0,1 a⁻¹: Dort
+rechnet das Modell nicht (ausgewiesene Untergrenze, §3.4 Schritt 2), und die GDV-Werte enthalten
+zudem pluviale Schäden; die Modellseite 0 ist dort keine Aussage über die Form.
+
+**Trennschärfe des Quantilvergleichs** (gemessen, nicht geglättet, §3.8): Er kann bei 23 Jahren
+praktisch nicht scheitern. Das untere Bandende ist auf allen vier Rängen 0, weil das Rangband über
+die HQhäufig-Rate hinausreicht; das obere liegt beim 6,6- bis 47,5-Fachen des Normaljahrs. Eine
+Verdopplung (\(A_3\) = 600 m²), eine Verdreifachung (900 m²) und eine Halbierung (150 m²) des
+HQextrem-Schadens bestehen ebenso. Die erhoffte Schärfung nach oben tritt damit **nicht** ein: Die
+Schwäche von \(R_{\text{anker}}\) nach oben kommt aus der Kürze der Reihe, und ein Quantilvergleich
+über dieselben 23 Jahre erbt sie. Informativ, aber ohne Toleranz und deshalb **kein Prüfurteil**,
+ist der Punktvergleich unter den Varianten: Bei doppeltem HQextrem-Schaden sänke
+\(Q_1^{\text{modell}}\) auf 6,83 und \(Q_2^{\text{modell}}\) auf 3,27, bei dreifachem auf 5,58 und
+2,67 — weiter weg von 9,34 und 4,67, weil \(D(p)\) zwischen HQhäufig und HQ100 nicht von \(A_3\)
+abhängt, das Normaljahr \(\bar A_z\) aber steigt. Die im Modellentscheid oben benannte Richtung
+„mehr Gewicht auf HQextrem" wird von den oberen Jahresquantilen also nicht gestützt; das spricht
+eher für mehr Gewicht zwischen HQhäufig und HQ100. Entschieden wird daraus nichts — die Stützstellen
+bleiben unverändert (§2.4), der Befund steht als Hinweis für die nächste Revision der
+Schadensfunktion.
 
 ### 4.6 Sanity-Band der Bundessumme
 
@@ -1627,6 +1700,7 @@ die Bezifferung von \(q_0\) bleibt offen und ist als solche gekennzeichnet.
 | Unsicherheitsband \(\lambda\) | 0,12 bzw. 3,93 | **berechnet** aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) (§4.4), Rundungsregel wie dort; Band des Skalars, **kein Prüfstein** (bis T-0574 als Plausibilitätsschranke geführt, Ledger-Befund 61) |
 | Plausibilitätsschranke \(\lambda\) | 0,5 bzw. 2,0 | **Abschätzung von KAP3**, Herleitung §4.4: Faktor 2 um den Neutralwert 1 aus dem Modellverständnis-Argument (die Eingangsgrößen von \(M_0\) zusammen um mehr als den Faktor 2 daneben, mehr als ihre belegten Bänder gemeinsam erklären), ohne eine Größe, die in \(\lambda\) eingeht; Sensitivität Faktor 1,5 / 3 dort; gilt für den Zentralwert einer Neubestimmung, die Fenster-Sensitivität in §4.1a prüft sie an vier \(\lambda\)-Werten, alle vier innerhalb (0,500 knapp) |
 | Toleranz Verteilungsprüfung | ±11,5 Prozentpunkte | **berechnet**, Herleitung §4.5: quadratische Zusammensetzung aus Jackknife-Standardfehler der Ankerreihe ±11,2 (gerechnet aus `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), Ableseunschärfe ±1,7 und modellseitigem HQextrem-Band ±2,3; **Abschätzung von KAP3** ist daran nur die Wahl der Kombinationsregel (unabhängige Beiträge, quadratisch), vorab festgelegt. Ist-Ergebnis: Abstand 13,9 Pp, **Prüfung nicht bestanden** (Modellentscheid §4.5) |
+| Toleranz Quantilvergleich | 90-%-Rangband je Rang (Rang 1: \(p\) = 0,0022–0,122 a⁻¹) | **Abschätzung von KAP3** beim Niveau 90 %, Bandgrenzen **berechnet** aus der Binomialverteilung der Rangplätze in 23 Jahren (Reihe `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), Herleitung §4.5 „Zweite Prüfgröße"; Sensitivität: mit 80 % bleibt das Ergebnis (alle vier Ränge im Band) unverändert |
 | \(U\) Sanity-Untergrenze (unabhängig) | 0,189 Mrd. €₂₀₂₆/a (0,095–0,315) | **berechnet**, Herleitung §4.6: \(E_{\text{fonds}} \cdot w \cdot f_{\text{fluss}} / N\) aus den drei Zeilen darunter; Band aus den Bandenden von \(w\) und \(f_{\text{fluss}}\), fixiert ist der Zentralwert |
 | \(E_{\text{fonds}}\) Fondsvolumina der Wiederaufbauhilfe 2013 und 2021 | 8 und 30 Mrd. €, fortgeschrieben 10,35 + 33,12 = 43,47 Mrd. €₂₀₂₆ | **Quelle:** AufbhG 2013 § 4 Abs. 1 Satz 1 und Aufbauhilfegesetz 2021 (BGBl.), `docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv`; Fortschreibung 2 %/a wie im Bericht, Herleitung §4.6 |
 | \(w\) Wohngebäudeanteil der Aufbauhilfe-Mittel | 0,11 (0,06–0,17) | **Abschätzung von KAP3, Herleitung §4.6**: 1/3 private Haushalte · 1/3 Gebäudesubstanz; Band aus Haushaltsanteil 1/4–1/2 und Gebäudeanteil 1/4–1/3 |
@@ -1736,6 +1810,70 @@ assert abs(toleranz - 11.5) < 5e-2
 # Ergebnis: Abstand groesser als die Toleranz -> Pruefung nicht bestanden (Modellentscheid 4.5)
 abstand = abs(anker - anteil) * 100
 assert abs(abstand - 13.88) < 5e-2 and abstand > toleranz
+# Ausgewiesene Anteile auf zwei Stellen: Summe 100, seltenes Regime = Summe seiner Teile (Befund 65)
+p3 = (5.0e-3 * 1.0e-3) ** 0.5
+tau = [(1.0e-1 - 1.0e-2) * (A[0] + A[1]) / 2, (1.0e-2 - p3) * (A[1] + A[2]) / 2, p3 * A[2]]
+proz = [round(100 * x / sum(tau), 2) for x in tau]
+assert proz == [66.14, 23.23, 10.63] and abs(sum(proz) - 100.0) < 1e-9
+assert round(proz[1] + proz[2], 2) == round(100 * anteil, 2) == 33.86
+assert round(100 * anker, 2) == 47.74 and round(47.74 - 33.86, 2) == 13.88
+assert abs(sum(max(0.0, x - (sum(reihe) - x) / 22) for x in reihe) - 20.186) < 5e-4
+
+# 4.5 zweite Pruefgroesse: Quantilvergleich der hoechsten Jahre (Befund 63)
+def kurve(q, a3=300.0):                                  # D(p) aus 3.4 Schritt 2
+    s = [15.0, 77.76, a3]
+    if q > 1.0e-1:
+        return 0.0                                       # haeufiger als HQhaeufig: nicht kartiert
+    if q >= 1.0e-2:
+        return s[0] + (1.0e-1 - q) / (1.0e-1 - 1.0e-2) * (s[1] - s[0])
+    if q >= p3:
+        return s[1] + (1.0e-2 - q) / (1.0e-2 - p3) * (s[2] - s[1])
+    return s[2]
+def flaeche(a3=300.0):
+    return ((1.0e-1 - 1.0e-2) * (15.0 + 77.76) / 2 + (1.0e-2 - p3) * (77.76 + a3) / 2 + p3 * a3)
+assert abs(flaeche() - sum(tau)) < 1e-12
+def rangband(i, n=23, niveau=0.90):                     # Binomialverteilung der Rangplaetze
+    from math import comb
+    def ueber(x):
+        return sum(comb(n, k) * x ** k * (1 - x) ** (n - k) for k in range(i, n + 1))
+    grenzen = []
+    for ziel in ((1 - niveau) / 2, (1 + niveau) / 2):
+        lo_, hi_ = 0.0, 1.0
+        for _ in range(200):
+            mid = (lo_ + hi_) / 2
+            lo_, hi_ = (mid, hi_) if ueber(mid) < ziel else (lo_, mid)
+        grenzen.append((lo_ + hi_) / 2)
+    return grenzen
+sortiert = sorted(reihe, reverse=True)
+def quantilvergleich(a3=300.0, niveau=0.90):
+    zeilen = []
+    for i in range(1, 5):
+        x = sortiert[i - 1]
+        q_anker = x / ((sum(reihe) - x) / 22)
+        p_u, p_o = rangband(i, niveau=niveau)
+        band = (kurve(p_o, a3) / flaeche(a3), kurve(p_u, a3) / flaeche(a3))
+        zeilen.append((q_anker, kurve(i / 24, a3) / flaeche(a3), p_u, p_o, band))
+    return zeilen
+qv = quantilvergleich()
+soll = [(9.34, 8.82, 0.0022, 0.122, 47.5), (4.67, 4.22, 0.016, 0.190, 11.7),
+        (2.24, 0.0, 0.037, 0.249, 9.39), (1.44, 0.0, 0.062, 0.304, 6.61)]
+for (q_a, q_m, p_u, p_o, band), (s_a, s_m, s_u, s_o, s_hi) in zip(qv, soll):
+    assert abs(q_a - s_a) < 5e-3 and abs(q_m - s_m) < 5e-3
+    assert abs(p_u - s_u) < 5e-4 and abs(p_o - s_o) < 5e-3
+    assert band[0] == 0.0 and abs(band[1] - s_hi) < 5e-2 * max(1.0, s_hi / 10)
+    assert band[0] <= q_a <= band[1]                     # bestanden auf allen vier Raengen
+# Trennschaerfe: Verdopplung, Verdreifachung, Halbierung von A_3 und Niveau 80 % bestehen ebenso
+for a3 in (600.0, 900.0, 150.0):
+    assert all(b[0] <= q <= b[1] for q, _, _, _, b in quantilvergleich(a3))
+# Ableseunschaerfe Rang 1 (+-0,05 je Balken, unguenstigstes Muster): 8,97 bis 9,74
+rest1 = sum(reihe) - sortiert[0]
+assert abs((sortiert[0] - 0.05) / ((rest1 + 22 * 0.05) / 22) - 8.97) < 5e-3
+assert abs((sortiert[0] + 0.05) / ((rest1 - 22 * 0.05) / 22) - 9.74) < 5e-3
+assert all(b[0] <= q <= b[1] for q, _, _, _, b in quantilvergleich(niveau=0.80))
+assert abs(quantilvergleich(niveau=0.80)[0][4][0] - 2.90) < 5e-3
+assert abs(quantilvergleich(niveau=0.80)[0][4][1] - 36.9) < 5e-2
+assert [round(z[1], 2) for z in quantilvergleich(600.0)[:2]] == [6.83, 3.27]
+assert [round(z[1], 2) for z in quantilvergleich(900.0)[:2]] == [5.58, 2.67]
 
 # 4.6 Sanity-Band und Lage der kalibrierten Bundessumme (Befunde 35, 64, 96, 97)
 E_2013 = 8.0 * 1.02 ** 13                    # Fondsvolumen 2013, fortgeschrieben
