@@ -545,7 +545,18 @@ Erwartungsschaden des Kontos K3 aus flussseitiger Überflutung**, Zeichen \(\tex
 - **Physischer Teil-Ausweis (Zwischengröße vor dem Euro):** die **schadensäquivalente Wohnfläche**
   \(\bar A\) in **m²/a** — diejenige Wohnfläche, deren vollständige Wiederherstellung dem
   erwarteten Schaden der Zelle beziehungsweise der Kommune entspricht. Sie entsteht in der Formel
-  vor jedem Euro-Betrag und trägt ihn: \(\text{EAD} = \bar A \cdot w\).
+  vor jedem Euro-Betrag und trägt ihn auf der **Zelle**: \(\text{EAD}_z = \bar A_z \cdot w_z\).
+  Auf der deklarierten Betrachtungsebene **Kommune** ist der Euro-Ausweis die Summe über die Zellen,
+  \(\text{EAD}_k = \sum_{z \in k} \bar A_z \cdot w_z\) (§3.6), und keine Multiplikation von
+  \(\bar A_k\) mit einer einzigen Wertdichte. **Modellgrenze:** \(\bar A_k\) und
+  \(\text{EAD}_k\) sind über Kommunen hinweg **nicht proportional**, sobald der Gebäudetyp-Mix
+  \(\theta_{z,t}\) zwischen den Zellen wechselt, weil die Wertdichte \(w_z\) zwischen
+  \(1{,}30 \cdot 1.533\) und \(1{,}30 \cdot 1.950\) €₂₀₂₆/m² Wohnfläche liegt; der Quotient
+  \(\text{EAD}_k / \bar A_k\) ist die mit \(\bar A_z\) gewichtete Wertdichte der Kommune.
+  Gerechnetes Beispiel (Golden-Test in §3.6): eine Ein-/Zweifamilienhaus-Zelle und eine
+  Mehrfamilienhaus-Zelle ergeben \(\text{EAD}_k = 20.195{,}7\) €₂₀₂₆/a gegen
+  \(\bar A_k \cdot w_{\text{Kommune}} = 18.077{,}9\) €₂₀₂₆/a mit der wohnflächengewichteten
+  Wertdichte der Kommune — 10,5 % Abweichung bezogen auf \(\text{EAD}_k\).
 - **Begrenzung des Ausweises (§3.6):** \(\text{EAD}\) ist der bewertete Schaden des Kontos K3 und
   damit eine Untergrenze des Gesamtschadens desselben Ereignisses; K1 (#101), K4 (#74), K5 und K8
   (#50) sind nicht enthalten (Kap. 1, „Nur K3 aktiv“).
@@ -560,7 +571,7 @@ keyless Beschaffungsweg, Zell-Ableitungsregel, Fallback, Normierung/Zentrierung 
 |---|---|---|---|---|---|
 | **HQ_FLAECHE** — überfluteter Flächenanteil \(a_{z,s}\) je Zelle und Szenario | **neu anzulegen** | Hochwassergefahrenkarten der Länder nach § 74 WHG / HWRM-RL; Kartendienste und Downloads der Landesämter sowie der Bund/Länder-Zusammenführung WasserBLIcK (BfG), ohne Schlüssel oder Nutzerkonto abrufbar; Szenariendefinition LAWA 2024 (Register 60-W085-01, Langbeleg B1) | Verschnitt der Überflutungsfläche des Szenarios \(s\) mit der 100-m-Zelle; \(a_{z,s}\) = überflutete Teilfläche / Zellfläche, Werte in [0, 1] | Zelle ohne Kartenabdeckung (Gewässer ohne signifikantes Risiko nach § 73 WHG): \(a_{z,s} = 0\), nachrichtlich als „nicht kartiert“ geführt — kein Neutralwert, sondern der Lackmustest-Fall (§3.1) | keine Zentrierung: \(a_{z,s}\) ist ein Anteil mit physischer Bedeutung, kein Modifikator |
 | **HQ_TIEFE** — Wassertiefe \(h_{z,s}\) je Zelle und Szenario | **neu anzulegen** | dieselbe Quelle; die Tiefenklassen 0–0,5 / >0,5–1 / >1–2 / >2–4 / >4 m sind nach LAWA 2024, S. 16 Pflichtbestandteil jeder Karte (B1) | flächengewichtetes Mittel der Tiefenklassen-Mittelwerte über den überfluteten Teil der Zelle; offene oberste Klasse mit ihrer Untergrenze angesetzt (Untergrenze, §3.6) | Zelle mit \(a_{z,s} > 0\), aber ohne Tiefenangabe: Median der Tiefenklasse **derselben Kommune im selben Szenario** (Betrachtungsebene selbst, §3.2); fehlt auch der, die amtlich publizierte Klassenverteilung des Bundeslandes | keine Zentrierung; die Tiefe geht über die Schadensfunktion aus Abschnitt 3.3 dieses Berichts ein |
-| **GEBAEUDEWERT** — Wohnfläche \(W_z\), Gebäudetyp-Mix \(\theta_{z,t}\), Wertdichte \(w_z\) | **neu anzulegen** | Zensus 2022, Gebäude- und Wohnungszählung, 100-m-Gitter (offener Download ohne Schlüssel) für Wohnfläche und Gebäudetyp; Wertsätze aus ImmoWertV Anlage 4 (NHK 2010) und Destatis-Baupreisindex, Fortschreibung nach Register 60-R24-01 (B4) | \(W_z\) = Summe der Wohnfläche der Gitterzelle; \(\theta_{z,t}\) = Anteil der Wohnfläche je Gebäudetyp \(t\) (Ein-/Zweifamilien- gegen Mehrfamilienhaus); \(w_z = k_{\text{BGF}} \sum_t \theta_{z,t} n_t\) | Zelle mit Gebäudebestand, aber ohne Typaufteilung: Typ-Mix **der übrigen Zellen derselben Kommune** (§3.2); fehlt auch der, der amtlich publizierte Bestandsmix des Bundeslandes | \(w_z\) ist ein Preis, kein Modifikator — keine Zentrierung; Preisstand 2026 einheitlich |
+| **GEBAEUDEWERT** — Wohnfläche \(W_z\), Gebäudetyp-Mix \(\theta_{z,t}\), Wertdichte \(w_z\) | **neu anzulegen** | Zensus 2022, Gebäude- und Wohnungszählung, 100-m-Gitter (offener Download ohne Schlüssel) für Wohnfläche und Gebäudetyp; Wertsätze aus ImmoWertV Anlage 4 (NHK 2010) und Destatis-Baupreisindex, Fortschreibung nach Register 60-R24-01 (B4) | \(W_z\) = Summe der Wohnfläche der Gitterzelle; \(\theta_{z,t}\) = Anteil der Wohnfläche je Gebäudetyp \(t\) (Ein-/Zweifamilien- gegen Mehrfamilienhaus); \(w_z = k_{\text{BGF}} \sum_t \theta_{z,t} n_t\) | Zelle mit Gebäudebestand, aber ohne Typaufteilung: Typ-Mix **der übrigen Zellen derselben Kommune** (§3.2); fehlt auch der, der amtlich publizierte Bestandsmix des Bundeslandes | \(w_z\) ist ein Preis, kein Modifikator — keine Zentrierung; Preisstand 2026 einheitlich (Indexierung 2010 → 2023 belegt; Fortschreibung 2023 → 2026 mit Faktor 1,105 = Abschätzung von KAP3, §3.9, Band 1,07–1,16, Herleitung B4) |
 | **GEBAEUDEZUSTAND_BAUSTOFF** — Zustands- und Materialachse \(f_{S093}\), \(f_{S094}\) | **geparkt (Datenquelle fehlt)** — Beschaffungs-Watchlist | keine bundesweite offene Erhebung von Bauzustand oder Baumaterial je Zelle; Zensus 2022 führt Baujahrsklasse und Gebäudetyp, nicht den Bauzustand und nicht den Baustoff (Register 60-S093-01, 60-S094-01) | entfällt, solange die Ebene geparkt ist | \(f_{S093} = f_{S094} = 1{,}00\) — der Zentrierungs-Neutralwert, dokumentiert und nicht still (§3.1) | geometrisch zentriert um 1 (§3.2; Klassenanteile nicht belegt, B5/B6); die Bänder 0,71–1,40 und 0,84–1,18 laufen als Struktur-Unsicherheit mit (multiplikativ 0,60–1,66) |
 
 **Beschaffungs-Watchlist zu GEBAEUDEZUSTAND_BAUSTOFF (§3.1).** Beobachtet werden drei Wege, jeder
@@ -680,7 +691,7 @@ KAP3, Richtung: unterschätzt den Tail, weil dort die Schadensquote noch steigt.
 
 $$ \text{EAD}_z \;=\; \bar A_z \cdot w_z, \qquad w_z \;=\; k_{\text{BGF}} \cdot \sum_t \theta_{z,t}\, n_t \qquad [\text{€}_{2026}/\text{a}] $$
 
-Die Wertsätze \(n_t\) sind belegt und auf den Preisstand 2026 indexiert (Register 60-R24-01, B4):
+Die Wertsätze \(n_t\) sind im Kern belegt, mit abgeschätztem Fortschreibungsfaktor (§3.9), und auf den Preisstand 2026 indexiert (Register 60-R24-01, B4):
 \(n_{\text{EFH/ZFH}} = 1.950\) €₂₀₂₆/m² BGF (Band 1.889–2.047),
 \(n_{\text{MFH}} = 1.533\) €₂₀₂₆/m² BGF (Band 1.484–1.609). Der Umrechnungsfaktor
 \(k_{\text{BGF}} = 1{,}30\) m² BGF je m² Wohnfläche (Band 1,25–1,40) ist eine **Abschätzung von
@@ -772,7 +783,7 @@ tragen sie maschinenlesbar.
 | \(h_1\), \(h_5\) | Grenzen des belegten Tiefenintervalls: 0,10 m und 1,75 m | m | herleitung: §3.3 — \(h_1\) Klassenmitte der untersten, \(h_5\) gesetzte Repräsentanz der offenen obersten FLEMOps-Klasse (Abschätzung von KAP3, §3.9) |
 | \(f_{S093}\), \(f_{S094}\) | geometrisch zentrierte Zustands- und Baustoffachse des Gebäudebestands | – | register: 60-S093-01 bzw. 60-S094-01 — Ebene geparkt, Neutralwert 1,00, Bänder 0,71–1,40 bzw. 0,84–1,18, gemeinsam 0,60–1,66 als Unsicherheitsbeitrag (§3.2) |
 | \(A_{z,s}\) | schadensäquivalente Wohnfläche der Zelle im Ereignis \(s\) — die physische Zwischengröße vor jedem Euro-Betrag | m² | herleitung: §3.4 Schritt 1 — Menge \(W_z a_{z,s}\) × Rate \(d(h_{z,s}) f_{S093} f_{S094}\) |
-| \(\bar A\) (\(\bar A_z\), \(\bar A_k\)) | jährlich erwartete schadensäquivalente Wohnfläche — indexfrei \(\bar A\) als Gattungszeichen (§3.1), mit Index für die Zelle bzw. die Kommune — physischer Teil-Ausweis | m²/a | herleitung: §3.4 Schritt 2 (Trapezsumme über die Szenarien) und §3.6 (Summe über die Zellen der Kommune) |
+| \(\bar A\) (\(\bar A_z\), \(\bar A_k\)) | jährlich erwartete schadensäquivalente Wohnfläche — indexfrei \(\bar A\) als Gattungszeichen (§3.1), mit Index für die Zelle bzw. die Kommune — physischer Teil-Ausweis; \(\text{EAD}_z = \bar A_z w_z\) gilt auf der Zelle, auf der Kommune ist \(\text{EAD}_k = \sum_{z \in k} \bar A_z w_z\) (§3.6), \(\bar A_k\) und \(\text{EAD}_k\) sind bei gemischtem Gebäudetyp nicht proportional (§3.1) | m²/a | herleitung: §3.4 Schritt 2 (Trapezsumme über die Szenarien) und §3.6 (Summe über die Zellen der Kommune) |
 | \(p_i\) (\(p_1\), \(p_2\), \(p_3\)) | jährliche Überschreitungswahrscheinlichkeit des Szenarios \(i\) | a⁻¹ | register: 60-W085-01 — \(p_1\), \(p_2\) belegt (Langbeleg B1); \(p_3\) herleitung: §3.4 Schritt 2, geometrisches Mittel der beiden Enden (Abschätzung von KAP3, §3.9) |
 | \(T\) | Wiederkehrintervall eines Szenarios, \(T = 1/p\); für \(p_3\) rund 447 a | a | herleitung: §3.4 Schritt 2 — Kehrwert der Jährlichkeit, nur zur Lesbarkeit ausgewiesen |
 | \(\theta_{z,t}\) | Anteil der Wohnfläche der Zelle, der auf den Gebäudetyp \(t\) entfällt; \(\sum_t \theta_{z,t} = 1\) | – | register: 60-R24-01 — Gebäudetyp des Zensus 2022 im 100-m-Gitter (§3.2) |
@@ -817,7 +828,11 @@ exakt erfüllt: Eine Kommune ohne Flussaue erhält 0, nicht einen kleinen Rest.
 der physische Teil nicht im Euro-Betrag verschwindet (§3.6):
 
 1. **Physischer Teil-Ausweis:** \(\bar A_k\) in m²/a — die jährlich erwartete
-   schadensäquivalente Wohnfläche der Kommune.
+   schadensäquivalente Wohnfläche der Kommune. \(\bar A_k\) und \(\text{EAD}_k\) sind über
+   Kommunen hinweg **nicht proportional**, weil die Wertdichte am Gebäudetyp-Mix hängt: Die
+   Wertsätze spannen 1.533…1.950 €₂₀₂₆/m² BGF, zwei Kommunen mit gleichem \(\bar A_k\) können
+   deshalb bis zu rund 21 % verschiedene Euro-Ausweise tragen (Beispiel mit gemischtem Typ-Mix im
+   Golden-Test unten: 10,5 % bezogen auf \(\text{EAD}_k\); §3.1, Modellgrenze).
 2. **Exponierte Wohnfläche je Szenario:** \(\sum_{z \in k} W_z\,a_{z,s}\) in m², getrennt für
    HQhäufig, HQ100 und HQextrem. Diese Größe ist reine Exposition, ohne Schadensquote und ohne
    Preis, und damit die Zahl, die sich unmittelbar gegen die Hochwassergefahrenkarte prüfen lässt.
@@ -884,6 +899,17 @@ W_k = 1200.0 + 800.0
 x_k = (1200.0 * 0.80 + 800.0 * 0.0) / W_k
 assert abs(x_k - 0.48) < 1e-12 and 0.0 <= x_k <= 1.0
 assert abs(ead_k - A_bar_k * k_bgf * n_efh) < 1e-9         # unveraendert ohne x_k
+
+# Gemischter Gebaeudetyp (3.1 Modellgrenze): EFH-Zelle und MFH-Zelle in einer Kommune.
+# Auf der Zelle gilt EAD_z = A_bar_z * w_z, auf der Kommune nur die Summe -> nicht proportional.
+n_mfh = 1533.0
+B1, B1_bar, _ = zelle(1200.0, 1.0, ((0.25, 0.050), (0.80, 0.081), (1.00, 0.250)))
+B2, B2_bar, _ = zelle(3000.0, 1.0, ((0.00, 0.050), (0.10, 0.081), (0.20, 0.250)))
+ead_mix = B1_bar * k_bgf * n_efh + B2_bar * k_bgf * n_mfh    # Summe ueber die Zellen
+w_mix = k_bgf * (1200.0 * n_efh + 3000.0 * n_mfh) / 4200.0   # wohnflaechengewichtete Wertdichte
+assert abs(ead_mix - 20195.7) < 0.1
+assert abs((B1_bar + B2_bar) * w_mix - 18077.9) < 0.1
+assert abs(ead_mix - (B1_bar + B2_bar) * w_mix) / ead_mix > 0.10   # 10,5 % bezogen auf EAD_k
 ```
 
 ### 3.7 Schicht-A-Index — getrennt vom Euro-Pfad (§3.2/§3.6)
