@@ -1031,6 +1031,8 @@ seit dieser Revision außerhalb der Anpassungsdaten liegt und dort **nicht besta
 (Modellentscheid, Ledger-Befund 33); der Produkt-Block in Kap. 7 trägt zum Stand dieser Revision denselben
 Wert.
 
+<a id="anker-gdv"></a>
+
 ### 4.1 Nationaler Anker: GDV-Naturgefahrenstatistik, Teilreihe Überschwemmung/Starkregen
 
 **Anker \(A_{\text{ver}}\) (namentlich).** Die jährlich veröffentlichte
@@ -1208,6 +1210,8 @@ Primärquelle; sie werden im Produkt nach Vorgabe P1 mit genau dieser Herleitung
 (Band, alle Enden gleichgerichtet: **0,30–2,29 Mrd. €₂₀₂₆/a**). Das ist der bundesweite
 Erwartungsschaden des Kontos K3 an Wohngebäuden aus flussseitiger Überflutung, den der Anker nahe
 legt — die Größe, gegen die die Modellsumme gestellt wird.
+
+<a id="modellsumme-m0"></a>
 
 ### 4.3 Modellsumme vor Kalibrierung — und die verwendete Auflösung (§3.4)
 
@@ -1392,6 +1396,8 @@ Untergrenze Faktor 1,82, zur Obergrenze Faktor 2,20); der Skalar wird deshalb ge
 nicht endgültig: \(\lambda\) ist **weiterhin vorläufig**, weil die Verteilungsprüfung in 4.5 nicht
 bestanden wird (Modellentscheid, Einleitung Kap. 4).
 
+<a id="verteilungspruefung"></a>
+
 ### 4.5 Unabhängige Verteilungsprüfung: Achse Ereignisregime (Jahresauslassung über die Ankerreihe)
 
 **Prüfgröße.** Anteil des **Erwartungswerts** der Jahresschadensumme, der aus dem **seltenen
@@ -1552,6 +1558,8 @@ abhängt, das Normaljahr \(\bar A_z\) aber steigt. Die im Modellentscheid oben b
 eher für mehr Gewicht zwischen HQhäufig und HQ100. Entschieden wird daraus nichts — die Stützstellen
 bleiben unverändert (§2.4), der Befund steht als Hinweis für die nächste Revision der
 Schadensfunktion.
+
+<a id="sanity-band"></a>
 
 ### 4.6 Sanity-Band der Bundessumme
 
@@ -1734,7 +1742,7 @@ wird deshalb **nicht gemessen, sondern abgeschätzt**:
 | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\pi\) | 1,07 (1,039–1,124) | **Abschätzung von KAP3** aus B4 (Baupreisindex), Herleitung §4.2 |
-| \(\lambda\) Niveau-Skalar | 0,911 (0,12–3,93) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\) als Kleinste-Quadrate-Schätzer der Jahres-Auswahlregel-Reihe (§4.1a), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Zeilen `gk3_gk4;alle` bzw. `gk2;alle`; Wahl dieser Spalte statt `rate_zellen_1_pro_a` begründet in §4.3 Punkt 3) mit Wohngebäudeanteil 0,872 und typgewichtetem Wertsatz (\(\bar\theta_{\text{EFH/ZFH}}\) = 0,596, §4.3 Punkt 2); es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein, über \(M_0\) zusätzlich der BGF-Faktor \(k_{\text{BGF}}\) und der Fortschreibungsfaktor der Wertsätze (eigene Zeilen); Band vollständig fortgepflanzt aus dem \(A^{*}\)-Band (§4.2) und dem \(M_0\)-Band 0,583–2,425 (§4.3); Zentralwert innerhalb der Plausibilitätsschranke, Sensitivität je Zeitfenster in §4.1a, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
+| \(\lambda\) Niveau-Skalar | 0,911 (0,12–3,93) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\) als Kleinste-Quadrate-Schätzer der Jahres-Auswahlregel-Reihe (§4.1a), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Zeilen `gk3_gk4;alle` bzw. `gk2;alle`; Wahl dieser Spalte statt `rate_zellen_1_pro_a` begründet in §4.3 Punkt 3) mit Wohngebäudeanteil 0,872 und typgewichtetem Wertsatz (\(\bar\theta_{\text{EFH/ZFH}}\) = 0,596, §4.3 Punkt 2); es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein, über \(M_0\) zusätzlich der BGF-Faktor \(k_{\text{BGF}}\) und der Fortschreibungsfaktor der Wertsätze (eigene Zeilen); Band vollständig fortgepflanzt aus dem \(A^{*}\)-Band (§4.2) und dem \(M_0\)-Band 0,583–2,425 (§4.3); Zentralwert innerhalb der Plausibilitätsschranke, Sensitivität je Zeitfenster in §4.1a, **vorläufig**, weil die unabhängige Verteilungsprüfung in §4.5 nicht bestanden ist (Abstand 13,9 Pp gegen Toleranz ±11,5 Pp, Modellentscheid §4.5; derselbe Grund in §4.4 und im Block `flood_bldg.lambda`) |
 | Baupreisanstieg 2023 → 2024 | 3 % (2,3–5,0 %) | **Abschätzung von KAP3**: gerundet aus den in B4 zitierten Jahresraten des Baupreisindex (3,2 %/3,3 %), Band wie B4; geht in \(\pi = 1{,}105/1{,}03\) ein (§4.2); Sensitivität: \(\pi\) = 1,080 bei 2,3 %, 1,052 bei 5,0 % |
 | Klassenraten Bestandsschranke (GK3/GK4; GK2) | 0,1 a⁻¹; 0,01 a⁻¹ | **Abschätzung von KAP3**, Herleitung §4.6 (Register 60-R17-01: Jährlichkeit je ZÜRS-Adressklasse, unverändert übernommen); geht linear in \(O\) ein |
 | \(\bar\theta_{\text{EFH/ZFH}}\) nationaler Typ-Mix (Wohnflächenanteil EFH/ZFH; MFH = 1 − \(\bar\theta_{\text{EFH/ZFH}}\)) | 0,596 (0,471–0,624) | **Quelle:** Destatis, Bestand und Bauabgang von Wohnungen und Wohngebäuden 2021, Tabelle 2.1.3, 31.12.2021 (`docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv`); Band aus den Gebietsteilen derselben Tabelle; dass die exponierte Teilmenge im Band liegt, ist eine **Abschätzung von KAP3**, Herleitung §4.3 (Punkt 2 und Bandtabelle) |
@@ -2274,6 +2282,44 @@ Faktor in die Aggregation nach Abschnitt 3.6 ein, ohne die Kernformel aus Abschn
 
 Kap. 7 führt je rechnendem Parameter aus §3.5 und §4.8 einen Block: die Kostensätze mit Pflichtfeld `preisstand: 2026` und Umrechnungsfaktor, die Parameter der Kernformel und der Kalibrierung sowie die vier Blöcke des Hebels S092.
 
+**Zuordnung der Zeilen aus §4.8 (Befunde 83, 99).** Jede Zeile der Tabelle §4.8 hat einen eigenen
+Block, mit zwei Ausnahmen, die auf einen vorhandenen Block zeigen statt ihn zu doppeln: die Zeile
+„Unsicherheitsband \(\lambda\)" ist das Feld `band` des Blocks `flood_bldg.lambda`, die Zeile
+„Gedeckelte Schadensquote (nur \(O_M\))" ist der Block `flood_bldg.d_5`. Die Blöcke der Kalibrier-
+und Prüfgrößen (Anker \(A_{\text{ver}}\), Baupreisanstieg, Klassenraten der Bestandsschranke,
+Typ-Mix, \(M_0\) und seine Eingänge, Plausibilitätsschranke, beide Prüftoleranzen, Sanity-Grenzen
+\(U\), \(O_u\), \(O_M\) mit ihren Eingängen, \(f_{\text{AWM}}\), \(q_0\)) stehen hinter den Blöcken der
+Kernformel. Jeder dieser Blöcke sagt im Feld `rolle:`, wie er rechnet: `kalibrierung` — geht
+über \(\lambda\) in den Betrag ein; `pruefgroesse` — entscheidet eine Prüfung (Plausibilitätsschranke,
+Verteilungsprüfung, Sanity-Band), geht aber nicht in den Betrag ein; `sensitivitaet` — läuft nur
+als Sensitivität; `waechter` — bindet den Doppelzählungs-Wächter (§4.7). Blöcke ohne `rolle:`
+gehen unmittelbar in die Kernformel oder den Hebel ein. Der Anker \(A_{\text{ver}}\) ist kein Kostensatz, sondern die Kalibriergröße im
+Bestands- und Preisstand 2024 der GDV-Reihe (§4.1); er trägt deshalb `preisstand: null` und das
+Feld `preisstand_hinweis`, auf den Preisstand 2026 hebt ihn \(\pi\) (Block `flood_bldg.pi`).
+
+**Datenebene und Ebenen-Status (Befund 86).** Jeder Block trägt `datenebene:` — die Ebene aus §3.2,
+auf der der Parameter im Produkt wirkt (`HQ_FLAECHE`, `HQ_TIEFE`, `GEBAEUDEWERT`,
+`GEBAEUDEZUSTAND_BAUSTOFF`), oder `null`, wenn er an keiner Zellebene hängt (Kalibrier- und
+Prüfgrößen, Hebel). Wo eine Ebene genannt ist, steht `ebene_status:` mit genau einem der Werte
+`vorhanden`, `neu_anzulegen` oder `geparkt` nach §3.2. Bei `geparkt` setzt der Block zusätzlich
+`platzhalter: true` und `platzhalter_text:`: Der Wert 1,00 der Faktoren \(f_{S093}\), \(f_{S094}\) ist
+keine abgeschätzte Wirkung, sondern der Neutralwert einer fehlenden Datenebene; im Produkt steht
+neben ihm deshalb „neutral gesetzt, Datenebene fehlt (§3.2)", nicht „Abschätzung von KAP3".
+\(q_0\) hängt an keiner Zellebene aus §3.2, seine Datenquelle ist aber ebenfalls geparkt (§4.7);
+sein Block führt `ebene_status: geparkt` ohne das Feld `platzhalter`, weil 0,15 eine Abschätzung und kein
+Neutralwert ist.
+
+**Band der Szenario-Wahrscheinlichkeit HQhäufig (Befund 84).** Der Block `flood_bldg.p_hq_haeufig`
+führt das Band der Registerzeile 60-W085-01 mit: Die Länder kartieren „häufig" zwischen HQ20 und
+HQ5, also 0,05 bis 0,2 a⁻¹ um den Kartenfall HQ10. Wirkung auf den K3-Betrag, einmal beziffert:
+Die Trapezsumme je Zelle vor dem Niveau-Skalar (§3.4, Stützstellen 15,0 / 77,76 / 300,0 m² je Ereignis bei
+p = 0,1 / 0,01 / 0,002236 a⁻¹) sinkt am unteren Bandende auf das 0,63-Fache und steigt am oberen auf das 1,73-Fache; der
+Anteil des häufigen Szenarios liegt dabei bei 46 % bzw. 80 % statt 66 %. Die kalibrierte
+Bundessumme bleibt davon unberührt, weil \(\lambda\) sie auf \(A^{*}\) setzt; das Band verschiebt die
+Verteilung zwischen Kommunen mit viel und wenig häufig überfluteter Fläche. `flood_bldg.p_hq100`
+bleibt ohne Band, weil HQ100 definitorisch ist (§ 74 WHG); das steht als `band_grund` im Block,
+damit `band: null` nicht wie eine Auslassung aussieht.
+
 **Kennzeichnung nach Vorgabe P1 — im Block, nicht im Kommentar.** Jeder Block dieses Kapitels trägt
 drei zusätzliche, maschinenlesbare Felder. Eine Kennzeichnung als YAML-Kommentar hinter `herkunft`
 erfüllt P1 ausdrücklich nicht („eine Herleitung nur als Code-Kommentar erfüllt die Vorgabe nicht"),
@@ -2305,6 +2351,7 @@ parameter:
   herleitung_anker: "#s092-wirkung"
   quelle: null
   preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2321,6 +2368,7 @@ parameter:
   naeherung_richtung: ueberschaetzt_hebel
   quelle: null
   preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2335,6 +2383,7 @@ parameter:
   herleitung_anker: "#s092-wirkung"
   quelle: null
   preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2350,6 +2399,7 @@ parameter:
   herleitung_anker: "#s092-wirkung"
   quelle: null
   preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2365,6 +2415,8 @@ parameter:
   quelle: "NHK 2010, ImmoWertV Anlage 4; Fortschreibung mit Baupreisindex (Langbeleg B4)"
   preisstand: 2026
   umrechnungsfaktor: 1.8578
+  datenebene: GEBAEUDEWERT
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2380,6 +2432,8 @@ parameter:
   quelle: "NHK 2010, ImmoWertV Anlage 4; Fortschreibung mit Baupreisindex (Langbeleg B4)"
   preisstand: 2026
   umrechnungsfaktor: 1.8578
+  datenebene: GEBAEUDEWERT
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2394,6 +2448,8 @@ parameter:
   herleitung_anker: "#kernformel-zelle"
   quelle: null
   preisstand: null
+  datenebene: GEBAEUDEWERT
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2402,12 +2458,14 @@ parameter:
   id: flood_bldg.p_hq_haeufig
   wert: 0.1
   einheit: "1/a"
-  band: null
+  band: [0.05, 0.2]
   herkunft: register:60-W085-01
   kennzeichnung: quelle
   herleitung_anker: null
-  quelle: "Langbeleg B1"
+  quelle: "Langbeleg B1; Spanne HQ20 bis HQ5 nach Register 60-W085-01"
   preisstand: null
+  datenebene: HQ_FLAECHE
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2417,11 +2475,14 @@ parameter:
   wert: 0.01
   einheit: "1/a"
   band: null
+  band_grund: "definitorisch (HQ100, § 74 WHG)"
   herkunft: register:60-W085-01
   kennzeichnung: quelle
   herleitung_anker: null
   quelle: "Langbeleg B1"
   preisstand: null
+  datenebene: HQ_FLAECHE
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2436,6 +2497,8 @@ parameter:
   herleitung_anker: "#kernformel-zelle"
   quelle: null
   preisstand: null
+  datenebene: HQ_FLAECHE
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2450,6 +2513,8 @@ parameter:
   herleitung_anker: null
   quelle: "Thieken u. a. 2008, FLEMOps (Langbeleg B5)"
   preisstand: null
+  datenebene: HQ_TIEFE
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2464,6 +2529,8 @@ parameter:
   herleitung_anker: null
   quelle: "Thieken u. a. 2008, FLEMOps (Langbeleg B5)"
   preisstand: null
+  datenebene: HQ_TIEFE
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2478,6 +2545,8 @@ parameter:
   herleitung_anker: "#tiefen-schadensfunktion"
   quelle: null
   preisstand: null
+  datenebene: HQ_TIEFE
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2492,6 +2561,8 @@ parameter:
   herleitung_anker: "#tiefen-schadensfunktion"
   quelle: null
   preisstand: null
+  datenebene: HQ_TIEFE
+  ebene_status: neu_anzulegen
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2506,6 +2577,10 @@ parameter:
   herleitung_anker: "#tiefen-schadensfunktion"
   quelle: null
   preisstand: null
+  datenebene: GEBAEUDEZUSTAND_BAUSTOFF
+  ebene_status: geparkt
+  platzhalter: true
+  platzhalter_text: "neutral gesetzt, Datenebene fehlt (§3.2)"
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2520,6 +2595,10 @@ parameter:
   herleitung_anker: "#tiefen-schadensfunktion"
   quelle: null
   preisstand: null
+  datenebene: GEBAEUDEZUSTAND_BAUSTOFF
+  ebene_status: geparkt
+  platzhalter: true
+  platzhalter_text: "neutral gesetzt, Datenebene fehlt (§3.2)"
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2534,6 +2613,7 @@ parameter:
   herleitung_anker: "#kalibrierung-zielwert"
   quelle: null
   preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2548,6 +2628,7 @@ parameter:
   herleitung_anker: "#kalibrierung-zielwert"
   quelle: null
   preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2562,6 +2643,7 @@ parameter:
   herleitung_anker: "#kalibrierung-zielwert"
   quelle: null
   preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2576,6 +2658,7 @@ parameter:
   herleitung_anker: "#kalibrierung-zielwert"
   quelle: null
   preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2590,6 +2673,7 @@ parameter:
   herleitung_anker: "#kalibrierung-zielwert"
   quelle: null
   preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
@@ -2605,7 +2689,482 @@ parameter:
   quelle: null
   preisstand: null
   vorlaeufig: true
-  vorlaeufig_grund: "Stand nach der Kleinste-Quadrate-Ankerbestimmung (17.09.2026): berechnet als A*/M0 = 1,132 / 1,243 aus der GDV-Jahresreihe 2002–2024 (§4.1/§4.4); M0 seit T-0570 mit typgewichtetem Wertsatz (Typ-Mix EFH/ZFH 0,596, §4.3). Weiterhin vorlaeufig, weil der Ledger-Befund 33 (Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion) offen ist und den Wert verschieben kann."
+  vorlaeufig_grund: "Vorlaeufig, weil die unabhaengige Verteilungspruefung (§4.5) nicht bestanden ist: Abstand 13,9 Prozentpunkte gegen die vorab fixierte Toleranz von 11,5 Prozentpunkten (Modellentscheid §4.5). Massgeblich ist der Text in §4.4 (#niveau-skalar); Stand 23.09.2026."
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.a_ver
+  wert: 1.838
+  einheit: "Mrd. €2024/a"
+  band: [1.061, 1.838]
+  herkunft: herleitung:§4.1
+  kennzeichnung: quelle
+  herleitung_anker: "#anker-gdv"
+  preisstand_hinweis: "Bestands- und Preisstand 2024 der GDV-Reihe (§4.1); auf 2026 ueber flood_bldg.pi"
+  rolle: kalibrierung
+  quelle: "GDV-Naturgefahrenstatistik 2024, Datenservice Naturgefahrenreport 2025; docs/evidenz/60_gdv_jahresreihe_2002_2024.csv"
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.baupreisanstieg_2023_2024
+  wert: 0.03
+  einheit: "1/a"
+  band: [0.023, 0.050]
+  herkunft: herleitung:§4.2
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#kalibrierung-zielwert"
+  sensitivitaet: "pi = 1,080 bei 2,3 %, 1,052 bei 5,0 %"
+  rolle: kalibrierung
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.rate_bestand_gk3_gk4
+  wert: 0.1
+  einheit: "1/a"
+  band: null
+  herkunft: register:60-R17-01
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#sanity-band"
+  band_grund: "Jaehrlichkeit der ZUeRS-Adressklasse, unveraendert uebernommen (§4.6)"
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.rate_bestand_gk2
+  wert: 0.01
+  einheit: "1/a"
+  band: null
+  herkunft: register:60-R17-01
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#sanity-band"
+  band_grund: "Jaehrlichkeit der ZUeRS-Adressklasse, unveraendert uebernommen (§4.6)"
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.theta_efh_zfh
+  wert: 0.596
+  einheit: "-"
+  band: [0.471, 0.624]
+  herkunft: herleitung:§4.3
+  kennzeichnung: quelle
+  herleitung_anker: "#modellsumme-m0"
+  band_kennzeichnung: abschaetzung_kap3
+  rolle: kalibrierung
+  quelle: "Destatis, Bestand und Bauabgang von Wohnungen und Wohngebaeuden 2021, Tabelle 2.1.3; docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv"
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.m0
+  wert: 1.243
+  einheit: "Mrd. EUR2026/a"
+  band: [0.583, 2.425]
+  herkunft: herleitung:§4.3
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#modellsumme-m0"
+  abgeleitet_aus: [flood_bldg.w_wohn, flood_bldg.wert_je_wohngebaeude, flood_bldg.adressen_gk3_gk4, flood_bldg.adressen_gk2, flood_bldg.r_gk3_gk4, flood_bldg.r_gk2]
+  rolle: kalibrierung
+  quelle: null
+  preisstand: 2026
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.wohnflaeche_je_wohngebaeude
+  wert: 208
+  einheit: "m2"
+  band: null
+  herkunft: register:60-R24-01
+  kennzeichnung: quelle
+  herleitung_anker: null
+  band_grund: "Quotient zweier amtlicher Summen (§4.3 Bandtabelle)"
+  rolle: kalibrierung
+  quelle: "amtliche Bestandsstatistik 31.12.2024 (4,1 Mrd. m2 / 19,7 Mio. Wohngebaeude)"
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.wert_je_wohngebaeude
+  wert: 481726.25
+  einheit: "EUR2026"
+  band: [435696.30, 547073.95]
+  herkunft: herleitung:§4.3
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#modellsumme-m0"
+  abgeleitet_aus: [flood_bldg.wohnflaeche_je_wohngebaeude, flood_bldg.k_bgf, flood_bldg.theta_efh_zfh, flood_bldg.n_efh_zfh, flood_bldg.n_mfh]
+  rolle: kalibrierung
+  quelle: null
+  preisstand: 2026
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.w_wohn
+  wert: 0.872
+  einheit: "-"
+  band: null
+  herkunft: register:60-R17-01
+  kennzeichnung: quelle
+  herleitung_anker: null
+  band_grund: "Quotient zweier amtlicher Summen ohne publizierte Unsicherheit (§4.3)"
+  rolle: kalibrierung
+  quelle: "Register 60-R17-01/60-R24-01 (19,7 Mio. Wohngebaeude / 22,6 Mio. bewertete Adressen)"
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.adressen_gk3_gk4
+  wert: 339000
+  einheit: "Adressen"
+  band: null
+  herkunft: register:60-R17-01
+  kennzeichnung: quelle
+  herleitung_anker: null
+  rolle: kalibrierung
+  quelle: "ZUeRS Geo 2025: GK3 1,1 % + GK4 0,4 % von 22,6 Mio. Adressen"
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.adressen_gk2
+  wert: 1380000
+  einheit: "Adressen"
+  band: null
+  herkunft: register:60-R17-01
+  kennzeichnung: quelle
+  herleitung_anker: null
+  rolle: kalibrierung
+  quelle: "ZUeRS Geo 2025: GK2 6,1 % von 22,6 Mio. Adressen"
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.r_gk3_gk4
+  wert: 0.0059796
+  einheit: "1/a"
+  band: [0.0033, 0.0103]
+  herkunft: herleitung:§4.3
+  kennzeichnung: quelle
+  herleitung_anker: "#modellsumme-m0"
+  band_kennzeichnung: abschaetzung_kap3
+  rolle: kalibrierung
+  quelle: "docs/evidenz/60_stichprobe/m0_klassenraten.csv, Zeile gk3_gk4;alle, Spalte rate_exponiert_hqextrem_1_pro_a"
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.r_gk2
+  wert: 0.00067515
+  einheit: "1/a"
+  band: [0.000301, 0.001154]
+  herkunft: herleitung:§4.3
+  kennzeichnung: quelle
+  herleitung_anker: "#modellsumme-m0"
+  band_kennzeichnung: abschaetzung_kap3
+  rolle: kalibrierung
+  quelle: "docs/evidenz/60_stichprobe/m0_klassenraten.csv, Zeile gk2;alle, Spalte rate_exponiert_hqextrem_1_pro_a"
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.lambda_schranke_min
+  wert: 0.5
+  einheit: "-"
+  band: null
+  herkunft: herleitung:§4.4
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#niveau-skalar"
+  sensitivitaet: "Faktor 1,5 bzw. 3 um 1 (§4.4)"
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.lambda_schranke_max
+  wert: 2.0
+  einheit: "-"
+  band: null
+  herkunft: herleitung:§4.4
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#niveau-skalar"
+  sensitivitaet: "Faktor 1,5 bzw. 3 um 1 (§4.4)"
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.toleranz_verteilungspruefung
+  wert: 11.5
+  einheit: "Prozentpunkte"
+  band: null
+  herkunft: herleitung:§4.5
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#verteilungspruefung"
+  band_grund: "Toleranz selbst; berechnet aus Jackknife 11,2, Ablese 1,7, Modellband 2,3 (quadratisch); abgeschaetzt ist die Kombinationsregel"
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.niveau_quantilvergleich
+  wert: 0.90
+  einheit: "-"
+  band: null
+  herkunft: herleitung:§4.5
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#verteilungspruefung"
+  sensitivitaet: "Niveau 0,80: Ergebnis unveraendert (§4.5)"
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.sanity_u
+  wert: 0.189
+  einheit: "Mrd. EUR2026/a"
+  band: [0.095, 0.315]
+  herkunft: herleitung:§4.6
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#sanity-band"
+  abgeleitet_aus: [flood_bldg.e_fonds, flood_bldg.w_aufbauhilfe, flood_bldg.f_fluss, flood_bldg.n_ankerfenster]
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: 2026
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.e_fonds
+  wert: 43.47
+  einheit: "Mrd. EUR2026"
+  band: null
+  herkunft: herleitung:§4.6
+  kennzeichnung: quelle
+  herleitung_anker: "#sanity-band"
+  abgeleitet_aus: [flood_bldg.fondsrate]
+  band_grund: "Fondsvolumina gesetzlich fixiert; Fortschreibung als eigener Block"
+  rolle: pruefgroesse
+  quelle: "AufbhG 2013 § 4 Abs. 1 Satz 1; Aufbauhilfegesetz 2021; docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv"
+  preisstand: 2026
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.fondsrate
+  wert: 0.02
+  einheit: "1/a"
+  band: null
+  herkunft: herleitung:§4.6
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#sanity-band"
+  sensitivitaet: "0 %/a: U 0,165, O_u 10,0; 3 %/a: U 0,202, O_u 11,59 Mrd. EUR2026/a"
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.w_aufbauhilfe
+  wert: 0.11
+  einheit: "-"
+  band: [0.06, 0.17]
+  herkunft: herleitung:§4.6
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#sanity-band"
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.f_fluss
+  wert: 0.90
+  einheit: "-"
+  band: [0.80, 1.00]
+  herkunft: herleitung:§4.6
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#sanity-band"
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.n_ankerfenster
+  wert: 23
+  einheit: "a"
+  band: null
+  herkunft: herleitung:§4.6
+  kennzeichnung: quelle
+  herleitung_anker: "#sanity-band"
+  rolle: pruefgroesse
+  quelle: "gezaehlt: Kalibrierjahre 2002-2024 (§4.1/§4.7)"
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.sanity_o_u
+  wert: 11.04
+  einheit: "Mrd. EUR2026/a"
+  band: null
+  herkunft: herleitung:§4.6
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#sanity-band"
+  abgeleitet_aus: [flood_bldg.e_fonds, flood_bldg.f_fluss]
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: 2026
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.sanity_o_m
+  wert: 6.29
+  einheit: "Mrd. EUR2026/a"
+  band: null
+  herkunft: herleitung:§4.6
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#sanity-band"
+  abgeleitet_aus: [flood_bldg.rate_bestand_gk3_gk4, flood_bldg.rate_bestand_gk2, flood_bldg.adressen_gk3_gk4, flood_bldg.adressen_gk2, flood_bldg.gebaeudewert_efh_om, flood_bldg.d_5]
+  pruefstein: false
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: 2026
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.gebaeudewert_efh_om
+  wert: 527280
+  einheit: "EUR2026"
+  band: null
+  herkunft: herleitung:§4.6
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#sanity-band"
+  abgeleitet_aus: [flood_bldg.wohnflaeche_je_wohngebaeude, flood_bldg.k_bgf, flood_bldg.n_efh_zfh]
+  rolle: pruefgroesse
+  quelle: null
+  preisstand: 2026
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.f_awm
+  wert: 0.55
+  einheit: "-"
+  band: [0.40, 0.75]
+  herkunft: herleitung:§7.2
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#fortschreibung-neuwert-k3"
+  sensitivitaet: "K3-Betrag 0,62 (0,45-0,85) statt 1,13 Mrd. EUR2026/a"
+  rolle: sensitivitaet
+  quelle: null
+  preisstand: null
+  datenebene: null
+  bandzuordnung: [alle]
+  endpunkt: K3-Wiederherstellung
+  wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
+---
+parameter:
+  id: flood_bldg.q0
+  wert: 0.15
+  einheit: "-"
+  band: [0.05, 0.30]
+  herkunft: herleitung:§4.7
+  kennzeichnung: abschaetzung_kap3
+  herleitung_anker: "#q0-abschaetzung"
+  ebene_status: geparkt
+  ebene_hinweis: "Ausstattungsgrad Objektvorsorge, Datenquelle fehlt, Watchlist §4.7"
+  rolle: waechter
+  quelle: null
+  preisstand: null
+  datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
