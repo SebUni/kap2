@@ -4586,6 +4586,8 @@ Anlass: Frage des Prüfers Q-20260921T153316Z-pruefer-2f6a91-1 bei der Abnahme v
 
 **Umfang.** Gezählt ist jeder Befund, der in einer Tabellenspalte „Prüfausdruck" einen ausführbaren Befehl trägt: die Übersichtstabelle, die Befundtabellen der Runden 1 und 2 und die Tabellen der Autor-Revision nach Runde 2. Gleichlautende Ausdrücke an mehreren Stellen (Übersicht und Runde 1; Befund 19 in Z. 54 und Z. 1587) zählen einmal. Mitgezählt sind außerdem die Prüfausdrücke, mit denen die Leitfragen der Runde 1 ihre Befunde zuerst belegt haben — LF 1 (Z. 126–133 → Befunde 1 und 2), LF 4 (Z. 166–173 → Befunde 6 und 7), LF 10 (Z. 243 und Z. 244 → Befund 11), LF 14 (Z. 303–308 → Befund 13) —, und Ausdruck (f) der Autor-Revision zu Befund 36 (Z. 1941–1958). Ein Leitfragen-Ausdruck, der auf zwei Befunde verweist, steht in beiden Zeilen, ist für jeden Befund getrennt beurteilt und zählt bei jedem. Mitgezählt ist der Lint-Lauf `python3 backend/scripts/lint_methodik.py 60`, wo er in der Spalte steht. Nicht gezählt sind: der nicht ausführbare Bruchstück-Ausdruck zu Teil (a) von Befund 42 in Z. 1203 (nur als Zitat im Klammersatz); die Befehle im Befundtext der Befunde 71, 83, 85 und 92 (Rechen- und Fundbelege; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck"); der „Prüfausdruck über Mengengleichheit" in Leitfrage 1 der Runde 2 (Z. 451, → Befunde 20 und 21) — der Ledger nennt dort nur sein Ergebnis (`nur Bericht: set() | nur Mappe: set()`), nicht den Befehl; ohne Wortlaut ist er weder ausführbar noch beurteilbar (Befund 21 trägt mit Z. 518 einen eigenen Ausdruck zum selben Abgleich) — und der Kopfzähler-Ausdruck im Nachtrag zu Befund 2 (Z. 2197, er zählt Ledger-Zeilen, keinen Befund).
 
+**Nachtrag zum Umfang (T-0620, 23.09.2026).** Mitgezählt sind außerdem die beiden Prüfausdrücke der Leitfrage 11 der Runde 1 (Z. 257–262 und Z. 263 → Befunde 8 und 9) und Block (g) „Nachrechnung von \(U\) und \(O\)" der Autor-Revision nach Runde 2 zu Befund 35 (Z. 2108–2127; Z. 2108 ist die Zaunzeile mit der Kennung `python test: befund_35_u_o`, der Befehl steht in Z. 2109–2127). Beide Leitfragen-Ausdrücke stehen in beiden Zeilen und sind je Befund getrennt beurteilt. Block (g) zählt wie Ausdruck (f) zu Befund 36: ein ausführbarer Befehl der Autor-Revision, als Test gekennzeichnet und damit als Beleg lesbar, auch wenn er nicht „Prüfausdruck" heißt. Die Läufe dieser fünf Einträge liefen am Bericht mit SHA-256 `b91e8bc32e86…` (letzter Commit des Berichts `f834d53a`); am Berichtsstand `88d27a04` der übrigen Läufe enden alle zehn Befehle der fünf Blöcke (alt und neu) mit demselben Exit-Code und derselben Ausgabe der Zählung (Kontrolllauf, hier nicht abgedruckt). Ihre Proben am Vergabestand `357980fc` nehmen `backend/` aus demselben Commit (`git archive`), weil der Ausdruck aus Z. 263 und der Ersatz zu Befund 9 `backend/` lesen. Für Befund 35 ist `357980fc` nicht der Vergabestand (vergeben in Runde 2, T-0273); dort führt der Bericht noch kein Sanity-Band mit \(U\) und \(O\), der Befund ist an diesem Stand also nicht geschlossen. Kein Urteil aus T-0540/T-0599 ist geändert: In den Zeilen 8, 9 und 35 sind nur Einträge angehängt (die bisherigen Einträge der Zeilen 8 und 9 tragen dafür jetzt die Marke (a)), dazu der Zählsatz und dieser Absatz.
+
 **Maßstab.** Jeder Ausdruck wurde verbatim ausgeführt. Welcher Exit-Code „besteht" heißt, legt sein Paket fest: In den Befundtabellen der Runde 2 (Befunde 23–46, Z. 678–1274) heißt Exit 0 „besteht", überall sonst (Übersicht, Runde 1, Paket 0.3 mit Befund 20/21, Autor-Revision) Exit 0 „geschlossen". Maßstab für das richtige Ergebnis ist das letzte Urteil dieses Ledgers zum Befund (Befundregression Runde 3, wo vorhanden, sonst Runde 2; bei Befund 2 der Nachtrag, bei Befund 19 die spätere Autor-Revision T-0288). Hat eine Regression einen Rest unter **eigener neuer Nummer** verbucht (z. B. 40 → 99, 41 → 100, 46 → 104, 35 → 96), gehört er nicht zur Frage des alten Ausdrucks. Untauglich ist ein Ausdruck, der am heutigen Stand das falsche Ergebnis liefert, oder dessen richtiges Ergebnis nur zufällig zustande kommt (Probe weiter unten). Die Leitfragen-Ausdrücke der Runde 1 drucken ein Ergebnis statt eines Exit-Codes mit Bedeutung; richtig ist ihr Ergebnis, wenn es den Stand der Vergabe (Befund besteht) vom heutigen Stand so unterscheidet, wie das letzte Urteil es verlangt. Zur Gegenprobe lief jeder als tauglich beurteilte Ausdruck außerdem am Berichtsstand seiner Vergabe (T-0232, T-0270 bis T-0274; ausgenommen der Lint-Lauf und Befund 46, dessen Vergabe-Commit nicht eindeutig ist); jeder meldete dort „besteht“. Dabei fiel der Zählausdruck zu Befund 2 auf (siehe unten). Die Sachverhalte selbst sind hier nicht neu begutachtet.
 
 | Befund | Prüfausdruck (wörtlich) | gelesene Datei(en) | Urteil |
@@ -4596,8 +4598,8 @@ Anlass: Frage des Prüfers Q-20260921T153316Z-pruefer-2f6a91-1 bei der Abnahme v
 | 5 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 3 ')[1].split('\n## 4 ')[0];raise SystemExit(0 if all(t in k for t in ('HQ_FLAECHE','HQ_TIEFE','GEBAEUDEWERT','neu anzulegen','geparkt (Datenquelle fehlt)','Beschaffungs-Watchlist')) else 1)"` (Z. 40) | Bericht | tauglich |
 | 6 | <code>python3 -c "<br>import openpyxl<br>wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True)<br>k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))<br>print('K3-Buchungsobjekte:',k[28][2])<br>ap=list(wb['Abgleich-Protokoll'].iter_rows(values_only=True))<br>print([ (r[0],r[1],r[3]) for r in ap if str(r[1])=='49' ])<br>"</code> (Z. 166–173) | `KWRA-Monetarisierung.xlsx` | untauglich: liest nur eine von mehreren betroffenen Dateien |
 | 7 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 4 ')[1].split('\n## 5 ')[0];raise SystemExit(0 if all(t in k for t in ('2002','2024','geparkt (Datenquelle fehlt)','Doppelzählungs-Wächter')) else 1)"` (Z. 42)<br>(b) <code>python3 -c "<br>import openpyxl<br>wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True)<br>k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))<br>print('K3-Buchungsobjekte:',k[28][2])<br>ap=list(wb['Abgleich-Protokoll'].iter_rows(values_only=True))<br>print([ (r[0],r[1],r[3]) for r in ap if str(r[1])=='49' ])<br>"</code> (Z. 166–173) | (a) Bericht<br>(b) `KWRA-Monetarisierung.xlsx` | (a) tauglich<br>(b) untauglich: anderer Grund (benannt): misst einen anderen Sachverhalt (K3-Buchungsobjekte und Abgleich-Protokoll), nicht Kalibrierjahre und Wächter |
-| 8 | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 3.5 ')[1].split(chr(10)+'### ')[0];r=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][2:];ok=all(len(c)==4 and (any(a in c[3] for a in ('register:','herleitung:')) or (c[3]=='Notation' and c[2]=='—')) for c in r);ead=[c for c in r if 'EAD' in c[0]];raise SystemExit(0 if ok and len(r)>=20 and any('2026' in c[1] and 'Kommune' in c[1] for c in ead) and any('mit' in c[0] for c in ead) else 1)"` (Z. 43) | Bericht | tauglich |
-| 9 | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) else 1)"` (Z. 44) | Bericht | untauglich: liest nur eine von mehreren betroffenen Dateien |
+| 8 | (a) `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 3.5 ')[1].split(chr(10)+'### ')[0];r=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][2:];ok=all(len(c)==4 and (any(a in c[3] for a in ('register:','herleitung:')) or (c[3]=='Notation' and c[2]=='—')) for c in r);ead=[c for c in r if 'EAD' in c[0]];raise SystemExit(0 if ok and len(r)>=20 and any('2026' in c[1] and 'Kommune' in c[1] for c in ead) and any('mit' in c[0] for c in ead) else 1)"` (Z. 43)<br>(b) <code>python3 -c "<br>dq,s,e=0.10,0.50,0.70<br>assert abs(dq*s*e-0.035)&lt;1e-12<br>assert abs(0.05*0.30*0.50-0.0075)&lt;1e-12 and abs(0.20*0.70*0.80-0.112)&lt;1e-12<br>print('Beispielblock rechnet auf')<br>"</code> (Z. 257–262)<br>(c) <code>grep -rn "beispiel_60" --include=*.py backend &#124; wc -l</code> (Z. 263) | (a) Bericht<br>(b) keine (reine Rechnung)<br>(c) alle `*.py` unter `backend/` | (a) tauglich<br>(b) untauglich: anderer Grund (benannt): liest keine Datei und misst einen anderen Sachverhalt — die Arithmetik des Beispielblocks, nicht die Zeichentabelle<br>(c) untauglich: anderer Grund (benannt): misst einen anderen Sachverhalt — Fundstellen von „beispiel_60" im Code, nicht die Zeichentabelle des Berichts |
+| 9 | (a) `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) else 1)"` (Z. 44)<br>(b) <code>python3 -c "<br>dq,s,e=0.10,0.50,0.70<br>assert abs(dq*s*e-0.035)&lt;1e-12<br>assert abs(0.05*0.30*0.50-0.0075)&lt;1e-12 and abs(0.20*0.70*0.80-0.112)&lt;1e-12<br>print('Beispielblock rechnet auf')<br>"</code> (Z. 257–262)<br>(c) <code>grep -rn "beispiel_60" --include=*.py backend &#124; wc -l</code> (Z. 263) | (a) Bericht<br>(b) keine (reine Rechnung)<br>(c) alle `*.py` unter `backend/` | (a) untauglich: liest nur eine von mehreren betroffenen Dateien<br>(b) untauglich: anderer Grund (benannt): liest keine Datei — rechnet nur die Zahlen des Beispielblocks nach<br>(c) untauglich: anderer Grund (benannt): das Suchwort „beispiel_60" trifft eine fremde Fundstelle (Docstring in `backend/scripts/kalibrierung/stichprobe60_kernformel.py` Z. 26) |
 | 10 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('### 5.1.3 ')[1].split(chr(10)+'## 6 ')[0];b=s.split('id: flood_bldg.s_bem')[1].split('---')[0];raise SystemExit(0 if all(t in k for t in ('Näherung','überschätzt','0,661','Stichproben')) and all(t in b for t in ('naeherung: true','naeherung_richtung: ueberschaetzt_hebel','herleitung_anker: \"#s-bem-naeherung\"')) else 1)"` (Z. 45) | Bericht | tauglich |
 | 11 | (a) `grep -c "http" docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (Z. 243)<br>(b) <code>grep -n "Zugriff\&#124;Snapshot\&#124;DOI" …</code> (Z. 244) | (a) Bericht<br>(b) keine (Dateiargument ausgelassen) | (a) untauglich: anderer Grund (benannt): zählt „http" im ganzen Bericht statt in Kapitel 8<br>(b) untauglich: anderer Grund (benannt): das Dateiargument ist mit „…" ausgelassen, der Ausdruck ist nicht ausführbar |
 | 13 | (a) `python3 -c "import re;s=open('backend/app/data/catalog.py',encoding='utf-8').read();b=s.split('\"kwra_id\": 60')[1].split('kwra_id')[0];raise SystemExit(0 if b.count('\"')//2>=0 else 1)"` (Z. 346)<br>(b) <code>python3 -c "<br>import openpyxl<br>wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)<br>w=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))[271]<br>print('Mappe: sens',len(w[9].split(';')),'&#124; wirkung',len(w[11].split(';')))<br>"</code> (Z. 303–308) | (a) `backend/app/data/catalog.py`<br>(b) `KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` | (a) untauglich: anderer Grund (benannt): die Bedingung `b.count('"')//2>=0` ist immer wahr, und der Ausdruck liest nur `catalog.py`, nicht die beanstandete Behauptung im Bericht<br>(b) untauglich: liest nur eine von mehreren betroffenen Dateien |
@@ -4619,7 +4621,7 @@ Anlass: Frage des Prüfers Q-20260921T153316Z-pruefer-2f6a91-1 bei der Abnahme v
 | 32 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('Vorab-Wert aus der Beispielzelle' in k and 'ZÜRS-GK3+GK4' in k and 'Das Kalibriermodell ist das' in k) else 1)"` (Z. 997)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if all(x in k for x in ('m0_klassenraten.csv','0,872','GK2','1,360','0,724','0,29','1,63')) and not any(x in k for x in ('Vorab-Wert aus der Beispielzelle','0,42','2,36','**1,05**','0,00526')) else 1)"` (Z. 1731)<br>(c) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=s.split('id: flood_bldg.lambda')[1].split('---')[0];z=s.split('beispiel_60_zeitwert')[1].split(chr(96)*3)[0];raise SystemExit(0 if 'wert: 0.724' in b and 'band: [0.29, 1.63]' in b and 'vorlaeufig: true' in b and '1,32 (bis 1,81)' in s and '1,91' not in s and '2,62' not in s and '2.00' not in z else 1)"` (Z. 1749)<br>(d) `python3 backend/scripts/lint_methodik.py 60` | (a) Bericht<br>(b) Bericht<br>(c) Bericht<br>(d) Bericht (über `backend/scripts/lint_methodik.py`) | (a) tauglich<br>(b) untauglich: anderer Grund (benannt): fragt den Zwischenstand \(\lambda\) = 0,724 (Band 0,29–1,63) ab, den Befund 34 inzwischen abgelöst hat<br>(c) untauglich: anderer Grund (benannt): fragt den Zwischenstand `wert: 0.724`, `band: [0.29, 1.63]` und „1,32 (bis 1,81)" ab<br>(d) tauglich |
 | 33 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('1,0/2,6' in k and '1 von 23 Kalibrierjahren' in k and 'dafür ±12,5 Prozentpunkte' in k) else 1)"` (Z. 998)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.5 ')[1].split(chr(10)+'### 4.6 ')[0];raise SystemExit(0 if ('1,0/2,6' not in k and '1 von 23 Kalibrierjahren' not in k and 'dafür ±12,5 Prozentpunkte' not in k and 'Erwartungswertanteil' in k and 'Leave-one-out' in k and '60_gdv_jahresreihe_2002_2024.csv' in k and k.index('Toleranz — vorab fixiert') < k.index('**Ist-Ergebnis.**')) else 1)"` (Z. 1794)<br>(c) `python3 backend/scripts/lint_methodik.py 60` | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`) | (a) tauglich<br>(b) tauglich<br>(c) tauglich |
 | 34 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('Kleinste Quadrate' not in k and 'Zeitfenster' not in k and 'an Wohngebäuden' in k and 'nicht publiziert' in k) else 1)"` (Z. 999)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('1,838','1,132','0,832','0,22','1,66','w_wg','wert: 0.832')) else 1)"` (Z. 1769)<br>(c) `python3 backend/scripts/lint_methodik.py 60` | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`) | (a) tauglich<br>(b) untauglich: anderer Grund (benannt): fragt das abgelöste \(\lambda\)-Band 0,22–1,66 ab<br>(c) tauglich |
-| 35 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('mittleren Betroffenheit von 1/100 Jahren' in k and 'Hochrechnung \\\\(u\\\\) entfällt hier bewusst' in k and 6.311/1200>0.25*0.01) else 1)"` (Z. 1000)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.6 ')[1].split(chr(10)+'### 4.7 ')[0];raise SystemExit(0 if all(x in k for x in ('0,0103','6,29','Amtlichkeitsgebot','1,132')) else 1)"` (Z. 2155)<br>(c) `python3 backend/scripts/lint_methodik.py 60` | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`) | (a) tauglich<br>(b) tauglich<br>(c) tauglich |
+| 35 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('mittleren Betroffenheit von 1/100 Jahren' in k and 'Hochrechnung \\\\(u\\\\) entfällt hier bewusst' in k and 6.311/1200>0.25*0.01) else 1)"` (Z. 1000)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.6 ')[1].split(chr(10)+'### 4.7 ')[0];raise SystemExit(0 if all(x in k for x in ('0,0103','6,29','Amtlichkeitsgebot','1,132')) else 1)"` (Z. 2155)<br>(c) `python3 backend/scripts/lint_methodik.py 60`<br>(d) <code>python3 -c "<br>E_nom = 8.0<br>faktor_2026 = 1.02 ** 13<br>E_min_2026 = E_nom * faktor_2026<br>w = (1/3) * (1/3)<br>f_fluss = 0.90<br>T = 100<br>U = E_min_2026 * w * f_fluss / T<br><br>n_gk34 = 339000 * 0.1<br>n_gk2 = 1380000 * 0.01<br>wert_geb = 527280.0<br>q_deckel = 0.250<br>O = (n_gk34 + n_gk2) * wert_geb * q_deckel / 1e9<br><br>assert abs(U - 0.0103) &lt; 2e-3, U<br>assert abs(O - 6.288) &lt; 2e-2, O<br>print('U =', round(U, 3), 'Mrd. EUR2026/a; O =', round(O, 2), 'Mrd. EUR2026/a')<br>"</code> (Z. 2108–2127) | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`)<br>(d) keine (reine Rechnung) | (a) tauglich<br>(b) tauglich<br>(c) tauglich<br>(d) untauglich: anderer Grund (benannt): liest keine Datei — rechnet nur fest eingetragene Zahlen nach |
 | 36 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];t=k.split('### 4.8 ')[1];raise SystemExit(0 if ('0,42–2,36' in k and '2{,}00' in k and '2,00' not in t and '2{,}00' not in t) else 1)"` (Z. 1001)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('0,657–2,643','0,11–3,44','[0,11; 3,44]','0,11 bzw. 3,44','[0.11, 3.44]','0,297–2,263')) else 1)"` (Z. 1983)<br>(c) `python3 backend/scripts/lint_methodik.py 60`<br>(d) <code>python3 -c "wf=208.0<br>bgf_lo,bgf_c,bgf_hi=1.25,1.30,1.40<br>ws_lo,ws_c,ws_hi=1889.0,1950.0,2047.0<br>w_wohn=0.872<br>n34,n2=339000,1380000<br>r34_lo,r34_c,r34_hi=0.0033,0.005979599550826,0.0103<br>r2_lo,r2_c,r2_hi=0.000301,0.000675151053693,0.001154<br>wg_lo=wf*bgf_lo*ws_lo; wg_c=wf*bgf_c*ws_c; wg_hi=wf*bgf_hi*ws_hi<br>term_lo=n34*r34_lo+n2*r2_lo; term_c=n34*r34_c+n2*r2_c; term_hi=n34*r34_hi+n2*r2_hi<br>M0_lo=w_wohn*wg_lo*term_lo/1e9; M0_c=w_wohn*wg_c*term_c/1e9; M0_hi=w_wohn*wg_hi*term_hi/1e9<br>assert abs(M0_c-1.360)&lt;5e-3 and abs(M0_lo-0.657)&lt;5e-3 and abs(M0_hi-2.643)&lt;5e-3<br>A_lo,A_hi=0.297,2.263<br>lam_lo=A_lo/M0_hi; lam_hi=A_hi/M0_lo<br>schranke=(round(lam_lo,2),round(lam_hi,2))<br>assert schranke==(0.11,3.44)<br>lam_band=(0.22,1.66)<br>assert schranke[0]&lt;=lam_band[0]&lt;=schranke[1] and schranke[0]&lt;=lam_band[1]&lt;=schranke[1]<br>print('OK M0', round(M0_lo,3), round(M0_c,3), round(M0_hi,3), 'schranke', schranke)"</code> (Z. 1941–1958) | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`)<br>(d) keine (reine Rechnung) | (a) tauglich<br>(b) tauglich<br>(c) tauglich<br>(d) untauglich: anderer Grund (benannt): liest keine Datei — rechnet nur fest eingetragene Zahlen nach |
 | 37 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 4.8 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('Betroffenheit' not in t and '2,00' not in t and 'rund 3' not in t and 'Baupreisanstieg' not in t) else 1)"` (Z. 1002) | Bericht | untauglich: anderer Grund (benannt): fragt die Namen der drei damals fehlenden Zeilen ab, nicht, ob jeder rechnende Wert eine eigene Zeile hat |
 | 38 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('1,07 (1,04–1,11)' in k and round(1.16/1.03,2)>1.11) else 1)"` (Z. 1003) | Bericht | tauglich |
@@ -4632,9 +4634,9 @@ Anlass: Frage des Prüfers Q-20260921T153316Z-pruefer-2f6a91-1 bei der Abnahme v
 | 45 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 9 ')[1].split(chr(10)+'## Entscheidungslog')[0];raise SystemExit(0 if ('davon zwei neu anzulegen' in k and 'geparkt' not in k) else 1)"` (Z. 1206) | Bericht | untauglich: anderer Grund (benannt): das Suchwort „geparkt" trifft eine fremde Fundstelle (Kap. 9 Z. 2462, FS-Schutzsystem-Weiche) |
 | 46 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k1=s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0];k3=s.split(chr(10)+'## 3 ')[1].split(chr(10)+'## Entscheidungslog')[0];z=[l for l in k1.split(chr(10)) if l.startswith(chr(124)+' S074 ') or l.startswith(chr(124)+' R17 ')];raise SystemExit(0 if (len(z)==2 and all('**FS-Exposition**' in l for l in z) and 'FS-Exposition' not in k3 and 'nicht** als' in k3) else 1)"` (Z. 1274) | Bericht | tauglich |
 
-Geprüft wurden **66 Prüfausdrücke** (Tabelleneinträge) zu 41 Befunden; davon sind **29 untauglich** und 37 tauglich.
+Geprüft wurden **71 Prüfausdrücke** (Tabelleneinträge) zu 41 Befunden; davon sind **34 untauglich** und 37 tauglich.
 
-Nach Fehlertyp: 1 „matcht den eigenen Beleg", 5 „liest nur eine von mehreren betroffenen Dateien", 23 „anderer Grund" (davon 7 feste Zeilennummern). Der Fehlertyp des Hauses (Selbstbeleg und halbe Dateimenge) erklärt damit 6 der 29; die größte Gruppe sind Ausdrücke, die an Zeilennummern oder an einem überholten Zwischenstand hängen und deshalb nach jeder Revision kippen.
+Nach Fehlertyp: 1 „matcht den eigenen Beleg", 5 „liest nur eine von mehreren betroffenen Dateien", 28 „anderer Grund" (davon 7 feste Zeilennummern). Der Fehlertyp des Hauses (Selbstbeleg und halbe Dateimenge) erklärt damit 6 der 34; die größte Gruppe sind Ausdrücke, die an Zeilennummern oder an einem überholten Zwischenstand hängen und deshalb nach jeder Revision kippen. Die fünf Einträge aus T-0620 kommen alle als „anderer Grund" hinzu: drei lesen keine Datei (8 (b), 9 (b), 35 (d)), einer misst einen anderen Sachverhalt (8 (c)), einer trifft eine fremde Fundstelle (9 (c)).
 
 #### Ersatzausdrücke mit Lauf alt und neu
 
@@ -4851,6 +4853,80 @@ $ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',enco
 Exit 1
 ```
 
+**Befund 8 (b) (Z. 257–262)** — untauglich: anderer Grund (benannt): liest keine Datei und misst einen anderen Sachverhalt — die Arithmetik des Beispielblocks, nicht die Zeichentabelle. Leitfrage 11 verweist auf die Befunde 8 und 9; der Ausdruck rechnet nur die Zahlen des Blocks `beispiel_60_s092_abschaetzung` nach und druckt am Stand der Vergabe wie heute „Beispielblock rechnet auf". Ob EAD und EAD_mit in einer Zeichentabelle stehen, kommt darin nicht vor. Ersatz ist der Schließungsausdruck der Übersicht (Z. 43), hier als tauglich beurteilt; am Stand der Vergabe endet er mit Exit 1, weil es §3.5 dort noch nicht gibt (IndexError). Soll: Stand der Vergabe Exit 1 (besteht), heute Exit 0 (bestätigt geschlossen, Regression Runde 2, Z. 1254).
+
+Ersatz:
+
+```bash
+python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 3.5 ')[1].split(chr(10)+'### ')[0];r=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][2:];ok=all(len(c)==4 and (any(a in c[3] for a in ('register:','herleitung:')) or (c[3]=='Notation' and c[2]=='—')) for c in r);ead=[c for c in r if 'EAD' in c[0]];raise SystemExit(0 if ok and len(r)>=20 and any('2026' in c[1] and 'Kommune' in c[1] for c in ead) and any('mit' in c[0] for c in ead) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "
+dq,s,e=0.10,0.50,0.70
+assert abs(dq*s*e-0.035)<1e-12
+assert abs(0.05*0.30*0.50-0.0075)<1e-12 and abs(0.20*0.70*0.80-0.112)<1e-12
+print('Beispielblock rechnet auf')
+"; echo "Exit $?"
+Beispielblock rechnet auf
+Exit 0
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 3.5 ')[1].split(chr(10)+'### ')[0];r=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][2:];ok=all(len(c)==4 and (any(a in c[3] for a in ('register:','herleitung:')) or (c[3]=='Notation' and c[2]=='—')) for c in r);ead=[c for c in r if 'EAD' in c[0]];raise SystemExit(0 if ok and len(r)>=20 and any('2026' in c[1] and 'Kommune' in c[1] for c in ead) and any('mit' in c[0] for c in ead) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1, `357980fc`), an dem der Befund bestand; `backend/` aus demselben Commit:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && git archive 357980fc backend | tar -x -C $T && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ python3 -c "
+dq,s,e=0.10,0.50,0.70
+assert abs(dq*s*e-0.035)<1e-12
+assert abs(0.05*0.30*0.50-0.0075)<1e-12 and abs(0.20*0.70*0.80-0.112)<1e-12
+print('Beispielblock rechnet auf')
+"; echo "Exit $?"
+Beispielblock rechnet auf
+Exit 0
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 3.5 ')[1].split(chr(10)+'### ')[0];r=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][2:];ok=all(len(c)==4 and (any(a in c[3] for a in ('register:','herleitung:')) or (c[3]=='Notation' and c[2]=='—')) for c in r);ead=[c for c in r if 'EAD' in c[0]];raise SystemExit(0 if ok and len(r)>=20 and any('2026' in c[1] and 'Kommune' in c[1] for c in ead) and any('mit' in c[0] for c in ead) else 1)"; echo "Exit $?"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+IndexError: list index out of range
+Exit 1
+```
+
+**Befund 8 (c) (Z. 263)** — untauglich: anderer Grund (benannt): misst einen anderen Sachverhalt — Fundstellen von „beispiel_60" im Code, nicht die Zeichentabelle des Berichts. Der Ausdruck liest nur die `*.py`-Dateien unter `backend/`. Seine Ausgabe wechselt zwar von 0 (Vergabe) auf 1 (heute), aber nur wegen eines Docstrings in `backend/scripts/kalibrierung/stichprobe60_kernformel.py` Z. 26 (seit T-0305, Commit `e3b88d8c`); mit der Zeichentabelle hat das nichts zu tun, das richtige Ergebnis kommt zufällig zustande. Ersatz wie (b). Soll: Stand der Vergabe Exit 1 (besteht), heute Exit 0 (bestätigt geschlossen, Regression Runde 2, Z. 1254).
+
+Ersatz:
+
+```bash
+python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 3.5 ')[1].split(chr(10)+'### ')[0];r=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][2:];ok=all(len(c)==4 and (any(a in c[3] for a in ('register:','herleitung:')) or (c[3]=='Notation' and c[2]=='—')) for c in r);ead=[c for c in r if 'EAD' in c[0]];raise SystemExit(0 if ok and len(r)>=20 and any('2026' in c[1] and 'Kommune' in c[1] for c in ead) and any('mit' in c[0] for c in ead) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ grep -rn "beispiel_60" --include=*.py backend | wc -l; echo "Exit $?"
+1
+Exit 0
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 3.5 ')[1].split(chr(10)+'### ')[0];r=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][2:];ok=all(len(c)==4 and (any(a in c[3] for a in ('register:','herleitung:')) or (c[3]=='Notation' and c[2]=='—')) for c in r);ead=[c for c in r if 'EAD' in c[0]];raise SystemExit(0 if ok and len(r)>=20 and any('2026' in c[1] and 'Kommune' in c[1] for c in ead) and any('mit' in c[0] for c in ead) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1, `357980fc`), an dem der Befund bestand; `backend/` aus demselben Commit:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && git archive 357980fc backend | tar -x -C $T && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ grep -rn "beispiel_60" --include=*.py backend | wc -l; echo "Exit $?"
+0
+Exit 0
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 3.5 ')[1].split(chr(10)+'### ')[0];r=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][2:];ok=all(len(c)==4 and (any(a in c[3] for a in ('register:','herleitung:')) or (c[3]=='Notation' and c[2]=='—')) for c in r);ead=[c for c in r if 'EAD' in c[0]];raise SystemExit(0 if ok and len(r)>=20 and any('2026' in c[1] and 'Kommune' in c[1] for c in ead) and any('mit' in c[0] for c in ead) else 1)"; echo "Exit $?"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+IndexError: list index out of range
+Exit 1
+```
+
 **Befund 9 (Z. 44)** — untauglich: liest nur eine von mehreren betroffenen Dateien. Befund 9 steht gegen `backend/` (Golden-Test); der Ausdruck liest nur den Bericht und meldet deshalb Exit 0 = behoben, obwohl die Regression Runde 2 (Z. 1255) die Fundstelle `backend/` als nicht erfüllt beurteilt. Soll: Exit 1 (nicht geschlossen): in `backend/tests/` gibt es keinen Test, der `beispiel_60` enthält.
 
 Ersatz:
@@ -4863,6 +4939,74 @@ Lauf am heutigen Stand:
 
 ```
 $ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) else 1)"; echo "Exit $?"
+Exit 0
+$ python3 -c "import re,glob;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];g=[p for p in glob.glob('backend/tests/**/*.py',recursive=True) if 'beispiel_60' in open(p,encoding='utf-8').read()];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) and g else 1)"; echo "Exit $?"
+Exit 1
+```
+
+**Befund 9 (b) (Z. 257–262)** — untauglich: anderer Grund (benannt): liest keine Datei — rechnet nur die Zahlen des Beispielblocks nach. Befund 9 steht zwischen dem Beispielblock im Bericht und `backend/`; der Ausdruck liest keins von beiden und druckt am Stand der Vergabe wie heute „Beispielblock rechnet auf". Er kann weder das Bestehen noch das Schließen des Befunds zeigen. Ersatz ist der Ersatz zu Befund 9 (Z. 44) weiter oben, der den Bericht und `backend/tests/` liest. Soll: heute Exit 1 (nicht geschlossen — die Regression Runde 2, Z. 1255, beurteilt die Fundstelle `backend/` als nicht erfüllt), am Stand der Vergabe Exit 1.
+
+Ersatz:
+
+```bash
+python3 -c "import re,glob;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];g=[p for p in glob.glob('backend/tests/**/*.py',recursive=True) if 'beispiel_60' in open(p,encoding='utf-8').read()];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) and g else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "
+dq,s,e=0.10,0.50,0.70
+assert abs(dq*s*e-0.035)<1e-12
+assert abs(0.05*0.30*0.50-0.0075)<1e-12 and abs(0.20*0.70*0.80-0.112)<1e-12
+print('Beispielblock rechnet auf')
+"; echo "Exit $?"
+Beispielblock rechnet auf
+Exit 0
+$ python3 -c "import re,glob;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];g=[p for p in glob.glob('backend/tests/**/*.py',recursive=True) if 'beispiel_60' in open(p,encoding='utf-8').read()];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) and g else 1)"; echo "Exit $?"
+Exit 1
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1, `357980fc`), an dem der Befund bestand; `backend/` aus demselben Commit:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && git archive 357980fc backend | tar -x -C $T && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ python3 -c "
+dq,s,e=0.10,0.50,0.70
+assert abs(dq*s*e-0.035)<1e-12
+assert abs(0.05*0.30*0.50-0.0075)<1e-12 and abs(0.20*0.70*0.80-0.112)<1e-12
+print('Beispielblock rechnet auf')
+"; echo "Exit $?"
+Beispielblock rechnet auf
+Exit 0
+$ python3 -c "import re,glob;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];g=[p for p in glob.glob('backend/tests/**/*.py',recursive=True) if 'beispiel_60' in open(p,encoding='utf-8').read()];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) and g else 1)"; echo "Exit $?"
+Exit 1
+```
+
+**Befund 9 (c) (Z. 263)** — untauglich: anderer Grund (benannt): das Suchwort „beispiel_60" trifft eine fremde Fundstelle (Docstring in `backend/scripts/kalibrierung/stichprobe60_kernformel.py` Z. 26). Am Stand der Vergabe zählt der Ausdruck richtig 0 Treffer. Heute zählt er 1; der einzige Treffer ist der Satz „Block beispiel_60_kernformel_zelle im Bericht ist die Referenz" im Kopf eines Kalibrierskripts (T-0305, Commit `e3b88d8c`), kein Golden-Test. Wer die 1 als „hinterlegt" liest, hält Befund 9 für geschlossen, obwohl die Regression Runde 2 (Z. 1255) die Fundstelle `backend/` als nicht erfüllt beurteilt und `backend/tests/` bis heute keinen solchen Test enthält. Ersatz wie (b). Soll: heute Exit 1 (nicht geschlossen), am Stand der Vergabe Exit 1.
+
+Ersatz:
+
+```bash
+python3 -c "import re,glob;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];g=[p for p in glob.glob('backend/tests/**/*.py',recursive=True) if 'beispiel_60' in open(p,encoding='utf-8').read()];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) and g else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ grep -rn "beispiel_60" --include=*.py backend | wc -l; echo "Exit $?"
+1
+Exit 0
+$ python3 -c "import re,glob;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];g=[p for p in glob.glob('backend/tests/**/*.py',recursive=True) if 'beispiel_60' in open(p,encoding='utf-8').read()];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) and g else 1)"; echo "Exit $?"
+Exit 1
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1, `357980fc`), an dem der Befund bestand; `backend/` aus demselben Commit:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && git archive 357980fc backend | tar -x -C $T && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ grep -rn "beispiel_60" --include=*.py backend | wc -l; echo "Exit $?"
+0
 Exit 0
 $ python3 -c "import re,glob;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];g=[p for p in glob.glob('backend/tests/**/*.py',recursive=True) if 'beispiel_60' in open(p,encoding='utf-8').read()];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) and g else 1)"; echo "Exit $?"
 Exit 1
@@ -5279,6 +5423,74 @@ $ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',enco
 Exit 1
 $ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('1,838','1,132','0,832','w_wg','wert: 0.832')) else 1)"; echo "Exit $?"
 Exit 0
+```
+
+**Befund 35 (d) (Z. 2108–2127)** — untauglich: anderer Grund (benannt): liest keine Datei — rechnet nur fest eingetragene Zahlen nach. Die Zaunzeile weist den Block als `python test: befund_35_u_o` aus; wörtlich ist er ein Shell-Befehl (`python3 -c "…"`) und läuft wie alle Ausdrücke dieses Abschnitts in der Shell. Er rechnet \(U\) und \(O\) aus eingetragenen Zahlen nach und endet an jedem Berichtsstand mit Exit 0, auch an `357980fc`, wo der Bericht noch kein Sanity-Band mit \(U\) und \(O\) führt. Heute stimmt Exit 0 nur zufällig: Die Teilpunkte (a)–(c) sind belegt (Regression Runde 3 Teil 6, Z. 4103), der Rest steht unter Befund 96 und gehört nicht zur Frage dieses Ausdrucks. Die nachgerechnete Untergrenze 0,0103 ist nicht mehr die des Berichts (T-0574: 0,189). Der Ersatz bindet deshalb nur die klassengerechte Schranke 6,29, heute die Modellschranke. Er rechnet sie nach und verlangt, dass §4.6 sie führt, zusammen mit der Fondsherleitung (AufbhG), dem Klassenbezug, der Ausnahme vom Amtlichkeitsgebot und dem Ist-Wert 1,132. Soll: heute Exit 0 (geschlossen), an `357980fc` Exit 1.
+
+Ersatz:
+
+```bash
+python3 -c "O=(339000*0.1+1380000*0.01)*527280.0*0.250/1e9;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.6 ')[1].split(chr(10)+'### 4.7 ')[0];raise SystemExit(0 if (abs(O-6.288)<2e-2 and ('%.2f' % O).replace('.',',') in k and all(x in k for x in ('Fondsvolum','AufbhG','klassengerecht','Amtlichkeitsgebot','1,132'))) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "
+E_nom = 8.0
+faktor_2026 = 1.02 ** 13
+E_min_2026 = E_nom * faktor_2026
+w = (1/3) * (1/3)
+f_fluss = 0.90
+T = 100
+U = E_min_2026 * w * f_fluss / T
+
+n_gk34 = 339000 * 0.1
+n_gk2 = 1380000 * 0.01
+wert_geb = 527280.0
+q_deckel = 0.250
+O = (n_gk34 + n_gk2) * wert_geb * q_deckel / 1e9
+
+assert abs(U - 0.0103) < 2e-3, U
+assert abs(O - 6.288) < 2e-2, O
+print('U =', round(U, 3), 'Mrd. EUR2026/a; O =', round(O, 2), 'Mrd. EUR2026/a')
+"; echo "Exit $?"
+U = 0.01 Mrd. EUR2026/a; O = 6.29 Mrd. EUR2026/a
+Exit 0
+$ python3 -c "O=(339000*0.1+1380000*0.01)*527280.0*0.250/1e9;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.6 ')[1].split(chr(10)+'### 4.7 ')[0];raise SystemExit(0 if (abs(O-6.288)<2e-2 and ('%.2f' % O).replace('.',',') in k and all(x in k for x in ('Fondsvolum','AufbhG','klassengerecht','Amtlichkeitsgebot','1,132'))) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe — Berichtsstand `357980fc` (T-0232, Review-Runde 1; Befund 35 ist erst in Runde 2 vergeben, an diesem Stand führt der Bericht weder \(U\) noch \(O\)); `backend/` aus demselben Commit:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && git archive 357980fc backend | tar -x -C $T && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ python3 -c "
+E_nom = 8.0
+faktor_2026 = 1.02 ** 13
+E_min_2026 = E_nom * faktor_2026
+w = (1/3) * (1/3)
+f_fluss = 0.90
+T = 100
+U = E_min_2026 * w * f_fluss / T
+
+n_gk34 = 339000 * 0.1
+n_gk2 = 1380000 * 0.01
+wert_geb = 527280.0
+q_deckel = 0.250
+O = (n_gk34 + n_gk2) * wert_geb * q_deckel / 1e9
+
+assert abs(U - 0.0103) < 2e-3, U
+assert abs(O - 6.288) < 2e-2, O
+print('U =', round(U, 3), 'Mrd. EUR2026/a; O =', round(O, 2), 'Mrd. EUR2026/a')
+"; echo "Exit $?"
+U = 0.01 Mrd. EUR2026/a; O = 6.29 Mrd. EUR2026/a
+Exit 0
+$ python3 -c "O=(339000*0.1+1380000*0.01)*527280.0*0.250/1e9;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.6 ')[1].split(chr(10)+'### 4.7 ')[0];raise SystemExit(0 if (abs(O-6.288)<2e-2 and ('%.2f' % O).replace('.',',') in k and all(x in k for x in ('Fondsvolum','AufbhG','klassengerecht','Amtlichkeitsgebot','1,132'))) else 1)"; echo "Exit $?"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+IndexError: list index out of range
+Exit 1
 ```
 
 **Befund 36 (d) (Z. 1941–1958)** — untauglich: anderer Grund (benannt): liest keine Datei — rechnet nur fest eingetragene Zahlen nach. Der Ausdruck prüft, ob die Rechnung mit den eingetragenen Zahlen aufgeht, nicht, ob der Bericht diese Schranke führt. Er meldet OK auch an einem Bericht, in dem wieder die alte, gesetzte Schranke 0,50/2,00 steht. Der Ersatz rechnet gleich und verlangt zusätzlich, dass der Bericht die gerechnete Schranke und beide Bänder enthält. Soll: heute Exit 0 (bestätigt geschlossen, Regression Runde 3 Teil 6); an der Probe Exit 1.
