@@ -1957,8 +1957,11 @@ _MEASURE_EFFECT_DOCS: dict[str, dict[str, tuple[str, list[str], str]]] = {
             "Abflussbeiwert sinkt von ~0,9 (Asphalt/Beton) auf ~0,1-0,3 (begrünte Fläche), d. h. "
             "60-80 % des Oberflächenabflusses der entsiegelten Fläche entfallen (DWA-A-138-"
             "Kennwerte; Bremer Entsiegelungsprogramm). Zusätzlich kühlt die Fläche und speist "
-            "Grundwasser. Angesetzt: 30 % Reduktion der verknüpften Überflutungs-/Hitzerisiken "
-            "in den entsiegelten Zellen. Editierbare Modellannahme im belegten Wirkprinzip."),
+            "Grundwasser. Angesetzt: 30 % Reduktion des hydrologischen Belastungsindex und des "
+            "erwarteten Gebäudeschadens in den entsiegelten Zellen. Die kühlende Wirkung "
+            "entsiegelter Flächen ist beschrieben, wird im Produkt aber keinem Hitze-Wirkpfad "
+            "zugerechnet (Befund 12 in reviews/BEFUNDE_62.md). Editierbare Modellannahme im "
+            "belegten Wirkprinzip."),
         "benefit_per_m2_year": ("Gesplittete Abwassergebühr + Ökosystemleistung", ["BWB_Niederschlagswasserentgelt", "TEEB_DE_Naturkapital"],
             "Direkter Zusatznutzen: Entsiegelte Flächen entfallen aus dem Niederschlagswasser"
             "entgelt (z. B. 1,84 €/m²·a in Berlin, BWB) und erbringen Ökosystemleistungen "
