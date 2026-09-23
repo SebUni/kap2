@@ -92,8 +92,10 @@ export default function LitePanel() {
               </div>
               <div className="lite-outcome">
                 ≈ {fmtNum(detailRisk.outcome * (adjIndex / (baseIndex || 1)), detailRisk.unit)}
-                {detailRisk.cost_eur > 0 && !detailRisk.unit.includes('€') &&
-                  <> · ≈ {fmtNum(detailRisk.cost_eur * (adjIndex / (baseIndex || 1)), '€')}</>}
+                {detailRisk.has_euro_layer === false
+                  ? <> · {String(detailRisk.cost_display ?? '')}</>
+                  : detailRisk.cost_eur > 0 && !detailRisk.unit.includes('€') &&
+                    <> · ≈ {fmtNum(detailRisk.cost_eur * (adjIndex / (baseIndex || 1)), '€')}</>}
               </div>
               {anyMeasure && (
                 <div className="lite-adjusted-note">

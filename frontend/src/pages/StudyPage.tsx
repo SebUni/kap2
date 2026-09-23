@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-interface RankRow { ags: string; name: string; bundesland: string | null; index: number; outcome: number; unit: string; cost_eur: number }
+interface RankRow { ags: string; name: string; bundesland: string | null; index: number; outcome: number; unit: string; cost_eur: number
+  /** Verwechslungssperre Klasse A/B: false = Screening ohne Euro-Bezifferung. */
+  has_euro_layer?: boolean
+  /** Anzeigewert: Betrag (Klasse A) oder Screening-Vermerk (Klasse B). */
+  cost_display?: number | string
+}
 interface Study {
   stand: string | null
   gemeinde_count: number
@@ -39,6 +44,8 @@ export default function StudyPage() {
   const ranking = study.rankings[risk] ?? []
   const blMeans = study.bundesland_means[risk] ?? {}
   const sortedBl = Object.entries(blMeans).sort((a, b) => b[1] - a[1])
+  // Spalte Schaden/Jahr: Klasse B zeigt den Screening-Vermerk, Klasse A den Betrag.
+  const showDamage = ranking.some((r) => r.has_euro_layer === false || r.cost_eur > 0)
 
   return (
     <div className="landing">
@@ -79,7 +86,7 @@ export default function StudyPage() {
             <h3>Top 20 Gemeinden</h3>
             <div style={{ overflowX: 'auto' }}>
               <table className="admin-table">
-                <thead><tr><th>#</th><th>Gemeinde</th><th>Land</th><th>Index</th></tr></thead>
+                <thead><tr><th>#</th><th>Gemeinde</th><th>Land</th><th>Index</th>{showDamage && <th>Schaden/Jahr</th>}</tr></thead>
                 <tbody>
                   {ranking.map((r, i) => (
                     <tr key={r.ags}>
@@ -87,6 +94,13 @@ export default function StudyPage() {
                       <td><Link to={`/deutschland?ags=${r.ags}`}>{r.name}</Link></td>
                       <td>{r.bundesland}</td>
                       <td><b>{r.index.toFixed(0)}</b></td>
+                      {showDamage && (
+                        <td>
+                          {r.has_euro_layer === false
+                            ? String(r.cost_display ?? '')
+                            : r.cost_eur > 0 && `${Math.round(r.cost_eur).toLocaleString('de-DE')} €`}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
