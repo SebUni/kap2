@@ -5763,6 +5763,10 @@ Exit 0
 | 72 | 146 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
 | 104 | 178 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
 | 57 | 131 (Kopftabelle), 5687 (Autor-Revision T-0567) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md (`f3295ea2`: Bericht und Ledger; `081f239d`: nur Ledger; `ee82fa5a`: Bericht und Ledger) | untauglich: liest nur eine von mehreren betroffenen Dateien — hier auf den `python test`-Block bezogen: der Golden-Test ist keine eigene Datei, sondern ein Block im Bericht; der Ausdruck prüft den Block `python test: beispiel_60_kernformel` samt seinen `assert`-Zeilen nicht, sondern nur drei Teilzeichenfolgen in §3.6; Ersatzblock unten |
+| 74 | 148 (Kopftabelle), 5688 (Autor-Revision T-0567) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md (`f3295ea2`: Bericht und Ledger; `081f239d`: nur Ledger; `ee82fa5a`: Bericht und Ledger) | untauglich: anderer Grund (benannt): der Treffer für §3.6 kann aus dem Kommentar in Z. 985 des Berichts stammen (Block `python test: beispiel_60_kernformel`, innerhalb der Codezaun-Zeilen) statt aus dem Prosasatz Z. 913 (Teil-Ausweis 1) — wird das Wort in der Prosa gestrichen, bleibt der Ausdruck bei Exit 0; Ersatzblock unten |
+| 82 | 156 (Kopftabelle), 5689 (Autor-Revision T-0567) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md (`f3295ea2`: Bericht und Ledger; `081f239d`: nur Ledger; `ee82fa5a`: Bericht und Ledger) | tauglich |
+
+**Zählsatz (T-0834, Vollständigkeitsprobe gegen M).** Die Tabelle hat 57 Zeilen zu 56 verschiedenen Befunden (nur Befund 36 hat zwei Zeilen, M Z. 5749 und Z. 5788); davon sind 46 Zeilen tauglich und 11 untauglich, keine ohne Urteil. Eine Vollständigkeitsprobe mit `difflib` zwischen `e3f5d6dd` und M (`8c3c4075359245730ebda58065652885522e0ddf`) fand außerhalb des Abschnitts „Durchsicht der Prüfausdrücke (Selbstbeleg-Fehlertyp)" (M Z. 4588–5677) keine hinzugekommene Zeile mit einem Prüfausdruck aus einer Spalte „Prüfausdruck", zu der die Tabelle keine Zeile mit diesem Zeilenbereich hätte; nachgetragen wurde deshalb keine Zeile. M Z. 108 (Kopftabelle, Befund 34) trägt keinen ausführbaren Ausdruck und ist vermerkt, nicht beurteilt. Die Zeilen der Paketberichte, die `python3 backend/scripts/lint_methodik.py 60` als gelaufenen Lauf nennen, sind wie in M Z. 5850 und Z. 5899 keine Prüfausdrücke zu einem Befund; das gilt namentlich auch für M Z. 5693, 5714, 5754 und 5812 (Prosa der Autor-Revisionen T-0567, T-0568, T-0569 und T-0570, die den Lint-Lauf nennen).
 
 Befund 24: Der Ausdruck liest §3.1 des Berichts (Physischer Teil-Ausweis) und prüft, ob dort `EAD}_z = ` und `EAD}_k = ` stehen, aber nicht `EAD} = `. Die T-0567-Commits (`f3295ea2`, `081f239d`, `ee82fa5a`) berühren laut `git show --stat` außer dem Bericht auch `reviews/BEFUNDE_60.md` — dort steht jedoch nur die Ledger-Buchung des Befunds selbst, kein zusätzlicher Sachverhalt, den der Ausdruck prüfen müsste. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" trifft damit nicht zu. Lauf am heutigen Stand: Exit 0 (geschlossen, Kopftabellen-Maßstab). Probe am Vergabestand `cedc3e77` (Elterncommit des ersten T-0567-Commits, über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, kein Checkout): Exit 1 (Befund bestand).
 
@@ -6163,6 +6167,51 @@ Vergabestand cedc3e77 (git show cedc3e77:<Bericht>), .t0747/va:           alt Ex
 ```
 
 Probe am Vergabestand `cedc3e77` (Elterncommit von `f3295ea2`, entpackt über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, kein Checkout): alter Befehl Exit 1, neuer Befehl Exit 1 (Befund bestand, beide richtig).
+
+**Befunde 74 und 82 (T-0748, T-0833).** Beide Ausdrücke stehen in M zeichengleich in der Kopftabelle (Z. 148, Z. 156) und in der Autor-Revision (Z. 5688, Z. 5689); Abgleich mit dem Feld `befehl` zu nr 74 und 82 in `/opt/overlord/overlord-arbeit/.t0621/E.json`. Die Zuordnung zum Paket folgt `git log -S`: der Befehlstext kommt jeweils mit `f3295ea2` (T-0567), Vergabestand ist `cedc3e77`, der Elterncommit des ersten T-0567-Commits. Die drei T-0567-Commits berühren laut `git show --stat`: `f3295ea2` Bericht und Ledger, `081f239d` nur Ledger, `ee82fa5a` Bericht und Ledger. Beide Ausdrücke lesen nur den Bericht; die Ledger-Änderung ist die Buchung der Befunde und trägt keinen Sachverhalt, den ein Ausdruck prüfen müsste. `git blame` an M liefert für keine Zeile mit einem Prüfausdruck einen Commit, der T-0566 nennt (die T-0566-Zeilen der Kopftabelle, etwa Befund 49, 71, 87, tragen keinen Ausdruck): T-0566 trägt keinen Ausdruck bei.
+
+Befund 82 (Z. 156, Z. 5689) — tauglich: Der Ausdruck verlangt in §3.2 den Wortlaut „Fortschreibung 2023 → 2026 mit Faktor 1,105 = Abschätzung von KAP3" und in §3.4 das Fehlen von „sind belegt und auf den Preisstand". Probe im Kopierverzeichnis `/opt/overlord/overlord-arbeit/.t0748/`: heute Exit 0, Vergabestand `cedc3e77` Exit 1 (Befund bestand: alter Satz in §3.4, neuer Wortlaut fehlt in §3.2), Veränderung (a) alter Satz in §3.4 wieder eingesetzt Exit 1, Veränderung (b) Wortlaut in §3.2 verkürzt Exit 1. Der alte Satz steht im Bericht nur einmal (Vergabestand), der neue Wortlaut heute nur einmal.
+
+Ersatz zu Befund 74:
+
+```bash
+python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=lambda a,b: re.sub(chr(96)*3+'.*?'+chr(96)*3,'',s.split(chr(10)+'### '+a+' ')[1].split(chr(10)+'### '+b+' ')[0],flags=re.S);raise SystemExit(0 if all('nicht proportional' in t(a,b) for a,b in (('3.1','3.2'),('3.5','3.6'),('3.6','3.7'))) else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M Z. 148 und Z. 5688):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=lambda a,b: s.split('\n### '+a+' ')[1].split('\n### '+b+' ')[0];raise SystemExit(0 if all('nicht proportional' in t(a,b) for a,b in (('3.1','3.2'),('3.5','3.6'),('3.6','3.7'))) else 1)"
+```
+
+Der neue Befehl entfernt vor der Suche alle Codezaun-Blöcke (Zeilen von drei Backticks bis drei Backticks) aus dem jeweiligen Abschnitt, sodass nur die Prosa zählt; er enthält kein `|`.
+
+Läufe am heutigen Stand (Kopie des Berichts aus `HEAD` = `origin/main` `1e098e95`, byte-gleich mit dem Arbeitsverzeichnis, Kopierverzeichnis `/opt/overlord/overlord-arbeit/.t0748/he`, gleicher relativer Pfad, Ausführung dort mit `bash -c`, Skript `.t0748/p2.py`):
+
+```
+$ (alter Befehl); echo "Exit $?"
+Exit 0
+$ (neuer Befehl); echo "Exit $?"
+Exit 0
+```
+
+Veränderungsprobe `.t0748/v74` (Kopie des heutigen Berichts, nur die Prosastelle Z. 913 geändert, der Kommentar in Z. 985 bleibt):
+
+```
+--- Original
++++ v74
+@@ -913 +913 @@
+-   Kommunen hinweg **nicht proportional**, weil die Wertdichte am Gebäudetyp-Mix hängt: Die
++   Kommunen hinweg **abweichend**, weil die Wertdichte am Gebäudetyp-Mix hängt: Die
+```
+
+```
+v74 (Prosa in §3.6 geändert):   alter Befehl Exit 0, neuer Befehl Exit 1
+```
+
+Alter Befehl: Exit 0, obwohl der Prosasatz zu §3.6 fehlt (der Kommentar im Golden-Test-Block genügt ihm). Neuer Befehl: Exit 1.
+
+Probe am Vergabestand `cedc3e77` (Elterncommit von `f3295ea2`, Kopie über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` nach `.t0748/va`, kein Checkout): alter Befehl Exit 1, neuer Befehl Exit 1 (Befund bestand, beide richtig).
 
 ## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)
 
