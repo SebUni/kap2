@@ -51,8 +51,11 @@ def lauf(monkeypatch):
     """(Aggregat mit A und B, Aggregat nur mit A) über denselben Katalog."""
     basis = list(catalog.RISKS)
     a, b = _eintraege()
+    for r in a:
+        monkeypatch.setitem(catalog.RISKS_BY_CODE, r["code"], r)
+    monkeypatch.setattr(catalog, "RISKS", basis + a)
     ohne_b = _aggregate(basis + a)
-    for r in a + b:
+    for r in b:
         monkeypatch.setitem(catalog.RISKS_BY_CODE, r["code"], r)
     monkeypatch.setattr(catalog, "RISKS", basis + a + b)
     return _aggregate(basis + a + b), ohne_b
