@@ -237,7 +237,9 @@ export default function MeasureSidebar() {
             <h3>Nutzen (jährlich)</h3>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
               <span style={{ color: 'var(--text-muted)' }}>Vermiedene Schäden / Nutzen</span>
-              <span style={{ color: 'var(--success)' }}>{fmtEur(impact.annual_benefit_eur)}</span>
+              <span style={{ color: 'var(--success)' }}>{impact.benefit_display
+                ? impact.benefit_display
+                : <>{fmtEur(impact.annual_benefit_eur)}{impact.benefit_note && <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{impact.benefit_note}</span>}</>}</span>
             </div>
           </div>
         </>
