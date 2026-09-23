@@ -9,7 +9,9 @@ export const fmtEurCompact = (v: number): string => {
   if (abs >= 1e9) return `${(v / 1e9).toLocaleString('de-DE', { maximumFractionDigits: 2 })} Mrd. €`
   if (abs >= 1e6) return `${(v / 1e6).toLocaleString('de-DE', { maximumFractionDigits: 2 })} Mio. €`
   if (abs >= 1e4) return `${(v / 1e3).toLocaleString('de-DE', { maximumFractionDigits: 0 })} Tsd. €`
-  return fmtEur(v)
+  if (v === 0) return fmtEur(0)
+  const magnitude = Math.pow(10, 1 - Math.floor(Math.log10(abs)))
+  return fmtEur(Math.round(v * magnitude) / magnitude)
 }
 
 export const fmtNum = (v: number, digits = 1): string =>
