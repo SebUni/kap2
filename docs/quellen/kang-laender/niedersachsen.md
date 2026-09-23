@@ -1,6 +1,6 @@
 Quelle: https://voris.wolterskluwer-online.de/browse/document/025ca7c9-36f3-3682-86f4-54cbfbdbca79
 Abgerufen: 2026-09-23
-Grundlage: verkündeter Text
+Grundlage: amtliche konsolidierte Fassung
 
 # Niedersachsen — § 26 NKlimaG (Textabbild)
 

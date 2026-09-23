@@ -1,66 +1,173 @@
-Quelle: https://www.dokumentation.landtag-mv.de/parldok/dokument/67755/8_5418_gesetz_zur_gestaltung_einer_klimavertraeglichen_gesellschaft_umwelt_und_wirtschaft_in_mecklenburg_vorpommern_und_zur_aenderung_anderer_gesetze
+Quelle: https://www.regierung-mv.de/static/Regierungsportal/Justizministerium/Inhalte/Rechtliches/GVOBI.M-V/GVOBl.%20Nr.%2020%20v.%2017.7.2026.pdf
 Abgerufen: 2026-09-23
-Grundlage: Entwurf
+Grundlage: verkündeter Text
 
-# Mecklenburg-Vorpommern — Klimaverträglichkeitsgesetz, § 24 des Entwurfs (Textabbild)
+# Mecklenburg-Vorpommern — § 24 KlVG M-V (Textabbild)
 
-Die Übersicht führt Mecklenburg-Vorpommern als „keine Bestimmung getroffen“ (beschlossen,
-Verkündung nicht nachgewiesen). Abgelegt ist der Regierungsentwurf Drs. 8/5418 vom
-29.10.2025: Deckblatt, Abschnitt 8 mit §§ 23 und 24 (PDF-Seiten 29 und 30) und die
-Begründung zu § 24 (PDF-Seiten 83 und 84). Text mit `pdftotext` ausgezogen. Amtliches Werk
-nach § 5 UrhG.
+Amtliche Fassung: Gesetz zur Gestaltung einer klimaverträglichen Gesellschaft, Umwelt und
+Wirtschaft in Mecklenburg-Vorpommern und zur Änderung anderer Gesetze vom 08.07.2026,
+Gesetz- und Verordnungsblatt für Mecklenburg-Vorpommern 2026 Nr. 20, ausgegeben am
+17.07.2026, S. 659 ff.; Artikel 1 ist das Klimaverträglichkeitsgesetz (KlVG M-V). Die PDF der
+Ausgabe liegt auf dem Regierungsportal M-V (Seite „Gesetz- und Verordnungsblätter“ des
+Justizministeriums,
+https://www.regierung-mv.de/Landesregierung/jm/service_justizministerium/verkuendungsblaetter/gesetz-verordnungsblaetter/).
+Abgelegt: Inhaltsverzeichnis der Ausgabe (S. 657, Auszug), Kopf des Gesetzes (S. 659), § 24
+(S. 666, PDF-Seite 10) und Artikel 21 Inkrafttreten (S. 671, PDF-Seite 15). Text mit
+`pdftotext` ausgezogen. Das Blatt ist zweispaltig; im Auszug stehen Zeilen von § 25 (rechte
+Spalte) zwischen den Absätzen von § 24 — sie sind unten weggelassen, der Text von § 24 ist sonst
+unverändert. Amtliches Werk nach § 5 UrhG.
 
-**Warum nicht der beschlossene Wortlaut:** Die vom Landtag am 03.06.2026 beschlossene Fassung
-(Beschlussempfehlung des federführenden Ausschusses oder Gesetzesbeschluss) wurde in diesem
-Lauf nicht gefunden. Der Entwurf ist deshalb der einzige frei abrufbare Normtext. Nach
-Pressemitteilung der Landesregierung und LEKA MV nennt die beschlossene Fassung zusätzlich
-größere bzw. große kreisangehörige Städte; der Entwurfswortlaut unten ist insoweit nicht die
-beschlossene Fassung.
+**Ergebnis für die Übersicht:** § 24 Abs. 1 KlVG M-V verpflichtet die Landkreise, die
+kreisfreien und die großen kreisangehörigen Städte, ab dem 01.01.2030 innerhalb von drei
+Jahren Klimaanpassungskonzepte zu erstellen (oder bestehende innerhalb von zehn Jahren
+fortzuschreiben), die den Anforderungen des § 12 Abs. 2, 3, 5 und 6 KAnG entsprechen; den
+übrigen Gemeinden wird ein vereinfachtes Konzept nur empfohlen (Abs. 2). Die Norm nennt § 12
+Abs. 1 KAnG nicht ausdrücklich; dass sie die Stellen nach § 12 Abs. 1 Satz 1 KAnG bestimmt,
+sagt die Begründung des Regierungsentwurfs zu § 24 (unten, Drs. 8/5418, PDF-Seite 84). Der
+Wortlaut von Abs. 1 ist gleich dem der Beschlussempfehlung Drs. 8/6609, Ziffer I Nr. 7 (unten).
+Nach Artikel 21 tritt das Gesetz am Tag nach der Verkündung in Kraft, also am 18.07.2026.
 
-## Nachweis der Suche nach beschlossener Fassung und Verkündung (23.09.2026)
-
-- Websuche „Klimaverträglichkeitsgesetz Mecklenburg-Vorpommern Beschlussempfehlung Drucksache
-  8/ Agrarausschuss 2026 Klimaanpassungskonzepte“: Treffer Drs. 8/5418 (Entwurf, oben),
-  Drs. 8/6599 und Drs. 8/6349 sowie Presseberichte. Abgerufen und Deckblatt gelesen:
-  Drs. 8/6599 vom 22.05.2026 (https://www.dokumentation.landtag-mv.de/parldok/dokument/71495)
-  ist die Beschlussempfehlung des 6. Ausschusses zum Antrag Drs. 8/253 „Erstellung eines
-  jährlichen Klima- und Treibhausgasberichtes“; Drs. 8/6349 vom 09.03.2026
-  (https://www.dokumentation.landtag-mv.de/parldok/dokument/70688) betrifft die
-  Bürgerbeteiligung an Wind- und Solarerlösen (Drs. 8/5436). Beide sind nicht die
-  beschlossene Fassung des Klimaverträglichkeitsgesetzes.
-- Websuche „"Drucksache 8/5418" Beschlussempfehlung und Bericht Klimaverträglichkeitsgesetz
-  landtag-mv parldok“: kein Treffer auf eine Beschlussempfehlung zu Drs. 8/5418.
-- Websuche „Klimaverträglichkeitsgesetz M-V KlVG GVOBl. M-V 2026 verkündet
-  "Klimaverträglichkeitsgesetz" Gesetz- und Verordnungsblatt“: kein Treffer auf eine
-  Verkündung im GVOBl. M-V; nur Stellungnahmen der Anhörung und Presseberichte.
-- Pressemitteilung der Landesregierung
-  (https://www.regierung-mv.de/Landesregierung/lm/Aktuell/?id=220619&processor=processor.sa.pressemitteilung)
-  abgerufen und gelesen: bestätigt den Landtagsbeschluss, nennt weder Drucksache noch
-  Gesetzblatt. Wortlaut der einschlägigen Sätze:
-
-### Pressemitteilung der Landesregierung, Auszug
+### GVOBl. M-V 2026 Nr. 20, Inhaltsverzeichnis (S. 657, Auszug)
 
 ```text
-Der Landtag Mecklenburg-Vorpommern hat heute das Klimaverträglichkeitsgesetz beschlossen. Damit erhält das Land erstmals einen verbindlichen gesetzlichen Rahmen für Klimaschutz und Klimaanpassung. Ziel ist es, Mecklenburg-Vorpommern bis zum Jahr 2045 klimaneutral aufzustellen und die Folgen des Klimawandels wirksam zu begrenzen.
-„Der Klimawandel ist längst keine abstrakte Zukunftsfrage mehr. Er verändert bereits heute unsere Küsten, unsere Wälder, unsere Landwirtschaft und unsere Lebensbedingungen. Mit dem Klimaverträglichkeitsgesetz schaffen wir einen verlässlichen Rahmen, um unser Land zukunftssicher aufzustellen und die Lebensqualität auch für kommende Generationen zu erhalten“, erklärte Klimaschutzminister Dr. Till Backhaus.
-Deutschland stößt derzeit noch rund 650 Millionen Tonnen Treibhausgase pro Jahr aus. Auf Mecklenburg-Vorpommern entfallen davon rund 18 Millionen Tonnen CO₂-Äquivalente. Das Gesetz schafft erstmals einen verbindlichen Rahmen, um diese Emissionen schrittweise zu senken und gleichzeitig die Folgen des Klimawandels wirksam zu begrenzen.
-Das Gesetz verankert die Klimaneutralität bis 2045 erstmals gesetzlich und legt verbindliche Zwischenziele fest: Bis 2030 sollen die Treibhausgasemissionen um 26 Prozent, bis 2035 um 53 Prozent und bis 2040 um 78 Prozent reduziert werden. Grundlage dafür sind wissenschaftlich erarbeitete Zielpfade für alle relevanten Emissionssektoren.
-Zugleich verpflichtet das Gesetz die Landesregierung zur Erarbeitung eines Klimaschutzplans mit konkreten Maßnahmen und Meilensteinen. Darüber hinaus werden die Klimaanpassungsstrategie des Landes, die Fachstelle für Klimawandel und Klimaanpassung sowie Klimaschutz- und Klimaanpassungskonzepte für Landkreise und größere Städte gesetzlich verankert.
-„Klimaschutz und Klimaanpassung gehören zusammen. Wir müssen Emissionen senken, aber wir müssen uns gleichzeitig auf häufigere Hitzewellen, längere Trockenperioden, Starkregenereignisse und den steigenden Meeresspiegel einstellen. Beides ist eine zentrale Zukunftsaufgabe für unser Land“, sagte Backhaus.
-Eine besondere Rolle kommt dabei den Mooren zu. Entwässerte Moorböden verursachen rund ein Drittel der Treibhausgasemissionen Mecklenburg-Vorpommerns und stellen damit die größte Einzelquelle klimaschädlicher Emissionen im Land dar. Das Gesetz stellt deshalb klar, dass dem Moorschutz ein überragendes öffentliches Interesse zukommt und das Land auf eine Beendigung der Moorentwässerung bis 2045 hinwirkt.
-Backhaus betonte, dass der Gesetzentwurf im Zuge eines umfassenden Beteiligungsverfahrens weiterentwickelt wurde. Hinweise aus Landwirtschaft, Kommunen, Eigentümerschaft und Umweltverbänden seien in die aktuelle Fassung eingeflossen.
-„Wir machen Klimaschutz mit klaren Aussagen und verbindlichen Zielen. Aber wir machen ihn mit Augenmaß. Klimaschutz darf nicht gegen die Menschen organisiert werden, sondern nur gemeinsam mit ihnen. Deshalb setzen wir auf Freiwilligkeit, auf Augenhöhe mit den Bodeneigentümern, den Landwirten und den Kommunen. Das zeigt: Wir machen Politik nicht mit der Brechstange, sondern mit den Menschen. Das ist ökonomisch, ökologisch und sozial das Prinzip der Vernunft.“
-Der Minister verwies darauf, dass Mecklenburg-Vorpommern bereits heute eine Vorreiterrolle beim Klimaschutz einnimmt. So stammen 87,7 Prozent der Bruttostromerzeugung aus erneuerbaren Energien. Das Land produziert inzwischen nahezu dreimal so viel erneuerbaren Strom, wie es selbst verbraucht.
-Auch beim Moorschutz gehört Mecklenburg-Vorpommern bundesweit zu den Vorreitern. Seit 1991 wurden rund 400 Moorschutzprojekte umgesetzt und etwa 34.000 Hektar Moorflächen wiedervernässt oder in ihrer hydrologischen Funktion verbessert. Allein über das Aktionsprogramm Natürlicher Klimaschutz konnten rund 150 Millionen Euro zusätzliche Bundesmittel für Moor-, Küsten- und Naturschutzprojekte nach Mecklenburg-Vorpommern geholt werden.
-Zur Unterstützung der Landnutzer wurden umfangreiche Beratungs- und Förderstrukturen aufgebaut. Mit der bundesweiten Paludi-Richtlinie stehen erstmals 1,75 Milliarden Euro für die Umstellung auf eine nasse Moorbewirtschaftung zur Verfügung. Mecklenburg-Vorpommern hat darüber hinaus als erstes Bundesland eine eigene Mooragentur eingerichtet.
-Auch die Kommunen werden mit den Herausforderungen der Klimaanpassung nicht allein gelassen. Das Gesetz schafft die Grundlage für kommunale Klimaschutz- und Klimaanpassungskonzepte und stärkt die Unterstützung bei den Themen Hitzevorsorge, Starkregen, Dürre und Küstenschutz.
+Gesetz- und Verordnungsblatt
+für Mecklenburg-Vorpommern
+Herausgeber: Ministerium für Justiz, Gleichstellung und Verbraucherschutz
+
+2026                Ausgegeben in Schwerin am 17. Juli                Nr. 20
+
+Tag          INHALT                                                         Seite
+
+8.7.2026     Gesetz zur Gestaltung einer klimaverträglichen Gesellschaft, Umwelt und Wirtschaft in
+             Mecklenburg-Vorpommern und zur Änderung anderer Gesetze
+             GS Meckl.-Vorp. Gl. Nr. 8053 - 11 ...................................... 659
 ```
 
-- Das Portal https://www.landesrecht-mv.de/ liefert ohne JavaScript keinen Inhalt und wurde
-  deshalb nicht durchsucht. Aus dem Vorlauf (T-0750-cto) stammt: GVOBl. M-V 2026 Nr. 16 vom
-  11.06.2026 enthält das Gesetz nicht; diese Ausgabe wurde in diesem Lauf nicht erneut gelesen.
+### Kopf des Gesetzes (S. 659)
 
-### Drs. 8/5418, Deckblatt
+```text
+Nr. 20            Tag der Ausgabe: Schwerin, den 17. Juli 2026            659
+
+Gesetz zur Gestaltung einer klimaverträglichen Gesellschaft, Umwelt und Wirtschaft in
+Mecklenburg- Vorpommern und zur Änderung anderer Gesetze
+Vom 8. Juli 2026
+
+GS Meckl.-Vorp. Gl. Nr. 8053 - 11
+
+Der Landtag hat das folgende Gesetz beschlossen:
+
+Artikel 1
+Gesetz zur Gestaltung einer klimaverträglichen Gesellschaft,
+Umwelt und Wirtschaft in Mecklenburg-Vorpommern
+(Klimaverträglichkeitsgesetz – KlVG M-V)
+```
+
+### § 24 KlVG M-V (S. 666)
+
+```text
+§ 24
+Pflicht zur Aufstellung kommunaler
+Klimaanpassungskonzepte; Verordnungsermächtigung
+(1) Die Landkreise, die kreisfreien und die großen kreisangehörigen Städte sind verpflichtet, ab dem 1. Januar 2030 innerhalb von
+drei Jahren Klimaanpassungskonzepte zu erstellen oder innerhalb
+von zehn Jahren fortzuschreiben, die den Anforderungen des § 12
+Absatz 2, 3, 5 und 6 des Bundes-Klimaanpassungsgesetzes entsprechen. Konzepte benachbarter Planungsräume sind aufeinander abzustimmen. Das Land unterstützt, indem die Landkreise
+und diese Städte ab dem Jahr 2030 auf Antrag einmalig eine pauschale Zuweisung in Höhe von je 50 000 Euro erhalten.
+(2) Den übrigen Gemeinden wird empfohlen, vereinfachte Klimaanpassungskonzepte zu erstellen. Das Klimaanpassungskonzept des
+Landkreises ist zu berücksichtigen. Absatz 1 Satz 2 gilt sinngemäß.
+(3) Die Fachstelle Klimawandel und Klimaanpassung unterstützt
+die Landkreise und Gemeinden bei der Ermittlung und Nutzung
+der erforderlichen Daten und Informationen für die Erstellung der
+Konzepte.
+(4) Die Landesregierung wird ermächtigt, durch Rechtsverordnung die wesentlichen Inhalte der Klimaanpassungskonzepte
+und das Verfahren zur Abwicklung der Förderung nach Absatz 1
+sowie Berichtspflichten der Kommunen zu bestimmen. Dabei ist
+zu regeln, in welcher Form Klimaanpassungskonzepte einer Beteiligung der Öffentlichkeit, einer Berichterstattung über die Umsetzung ihres Maßnahmenkatalogs und in welchen Zeiträumen sie
+einer Fortschreibung bedürfen. Es sind Regelungen zur Weitergeltung bestehender Klimaanpassungskonzepte zu treffen.
+(5) Das Klimaanpassungskonzept des jeweiligen Landkreises und
+der jeweiligen Gemeinde ist dem für Klimaanpassung zuständigen Ministerium spätestens drei Monate nach Beschlussfassung
+elektronisch zu übermitteln.
+```
+
+### Artikel 21 (S. 671)
+
+```text
+Artikel 21
+Inkrafttreten
+Dieses Gesetz tritt am Tag nach der Verkündung in Kraft.
+Das vorstehende Gesetz wird hiermit ausgefertigt. Es ist im Gesetz- und
+Verordnungsblatt für Mecklenburg-Vorpommern zu verkünden.
+Schwerin, den 8. Juli 2026
+```
+
+### Berichtigung, GVOBl. M-V 2026 Nr. 23 vom 31.07.2026, S. 897
+
+https://www.regierung-mv.de/static/Regierungsportal/Justizministerium/Inhalte/Rechtliches/GVOBI.M-V/GVOBl.%20Nr.%2023%20v.%2031.7.2026.pdf — berichtigt nur die
+Inhaltsübersicht (Abschnitt 8 war im Druck verschoben), nicht den Text von § 24:
+
+```text
+Klimaverträglichkeitsgesetz
+GVOBl. M-V 2026 S. 659
+– Berichtigung –
+In der Inhaltsübersicht wird der Abschnitt 8 wie folgt gefasst:
+„Abschnitt 8
+Klimaanpassung
+§ 23 Klimaanpassungsstrategie des Landes
+§ 24 Pflicht zur Aufstellung kommunaler Klimaanpassungskonzepte; Verordnungsermächtigung
+§ 25 Fachstelle Klimawandel und Klimaanpassung“.
+Schwerin, den 17. Juli 2026
+```
+
+(Die Paragrafenzeilen stehen im Blatt in einer Tabelle; hier sind Nummer und Überschrift je
+Zeile zusammengeführt.)
+
+## Gesetzgebungsgang und Suchweg (gelesen am 23.09.2026)
+
+- Beschlussempfehlung und Bericht des Ausschusses für Klimaschutz, Landwirtschaft und Umwelt
+  (6. Ausschuss), Drs. 8/6609 vom 27.05.2026
+  (https://www.dokumentation.landtag-mv.de/parldok/dokument/71587). Ziffer I Nr. 7 (PDF-Seite 12)
+  ersetzt § 24 Abs. 1 des Entwurfs; der Bericht (PDF-Seite 47) begründet: die Änderungen der
+  §§ 7 und 24 sollten „auch die großen kreisangehörigen Städte Wismar, Greifswald, Stralsund und
+  Neubrandenburg mit der Erarbeitung von Klimaschutzplänen und Klimaanpassungskonzepten“
+  beauftragen.
+- Plenarprotokoll 8/133 vom 03.06.2026
+  (https://www.dokumentation.landtag-mv.de/parldok/dokument/71633), Zweite Lesung und
+  Schlussabstimmung: Der Gesetzentwurf wurde „entsprechend der Beschlussempfehlung auf
+  Drucksache 8/6609 mit den soeben beschlossenen Änderungen“ angenommen. Angenommen wurde dabei
+  der Änderungsantrag Drs. 8/6637 der Fraktionen SPD und Die Linke
+  (https://www.dokumentation.landtag-mv.de/parldok/dokument/71626); er ändert allein Ziffer I
+  Nr. 1 der Beschlussempfehlung (§ 2 KlVG M-V), nicht § 24.
+- Verkündung: Die Ausgaben Nr. 16 (11.06.2026) bis Nr. 26 (14.09.2026) des GVOBl. M-V sind vom
+  Regierungsportal abgerufen und nach „klimaverträglich“ durchsucht: Nr. 20 enthält das Gesetz,
+  Nr. 23 die Berichtigung, die übrigen Ausgaben nichts dazu.
+- Die Drucksachennummern 8/6609 und 8/6637 fanden sich im Plenarprotokoll; die Dokumentnummern
+  der Parlamentsdokumentation sind durch Abruf der Nummern 71496 bis 71639 und Lesen des
+  Deckblatts ermittelt.
+
+### Drs. 8/6609, Beschlussempfehlung Ziffer I Nr. 7 (PDF-Seite 12)
+
+```text
+7. § 24 Absatz 1 wird durch den folgenden Absatz 1 ersetzt:
+
+   „(1) Die Landkreise, die kreisfreien und die großen kreisangehörigen Städte sind
+   verpflichtet, ab dem 1. Januar 2030 innerhalb von drei Jahren Klimaanpassungs-
+   konzepte zu erstellen oder innerhalb von zehn Jahren fortzuschreiben, die den
+   Anforderungen des § 12 Absatz 2, 3, 5 und 6 des Bundes-Klimaanpassungsgesetzes
+   entsprechen. Konzepte benachbarter Planungsräume sind aufeinander abzustimmen.
+   Das Land unterstützt, indem die Landkreise und diese Städte ab dem Jahr 2030 auf
+   Antrag einmalig eine pauschale Zuweisung in Höhe von je 50 000 Euro erhalten.“
+```
+
+## Vorlauf: Regierungsentwurf Drs. 8/5418 (abgelegt mit T-0800)
+
+Regierungsentwurf vom 29.10.2025
+(https://www.dokumentation.landtag-mv.de/parldok/dokument/67755/8_5418_gesetz_zur_gestaltung_einer_klimavertraeglichen_gesellschaft_umwelt_und_wirtschaft_in_mecklenburg_vorpommern_und_zur_aenderung_anderer_gesetze):
+Deckblatt, Abschnitt 8 mit §§ 23 und 24 (PDF-Seiten 29 und 30) und die Begründung zu § 24
+(PDF-Seiten 83 und 84). Abs. 1 des Entwurfs nannte nur Landkreise und kreisfreie Städte; die
+Absätze 2 bis 5 stehen in der verkündeten Fassung wortgleich. Die Begründung zu § 24 ist der
+Beleg dafür, dass § 24 die Stellen nach § 12 Abs. 1 Satz 1 KAnG bestimmt.
+
+#### Drs. 8/5418, Deckblatt
 
 ```text
 LANDTAG MECKLENBURG-VORPOMMERN
@@ -77,7 +184,7 @@ Umwelt und Wirtschaft in Mecklenburg-Vorpommern und zur Änderung anderer
 Gesetze
 ```
 
-### Drs. 8/5418, Abschnitt 8, §§ 23 und 24 (PDF-Seiten 29 und 30)
+#### Drs. 8/5418, Abschnitt 8, §§ 23 und 24 (PDF-Seiten 29 und 30)
 
 ```text
 Abschnitt 8
@@ -132,7 +239,7 @@ treffen.
 dem für Klimaanpassung zuständigen Ministerium spätestens drei Monate nach Beschlussfassung elektronisch zu übermitteln.
 ```
 
-### Drs. 8/5418, Begründung zu § 24 (PDF-Seiten 83 und 84)
+#### Drs. 8/5418, Begründung zu § 24 (PDF-Seiten 83 und 84)
 
 ```text
 Zu § 24 (Pflicht zur Aufstellung kommunaler Klimaanpassungskonzepte; Verordnungsermächtigung)
