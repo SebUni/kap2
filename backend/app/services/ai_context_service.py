@@ -15,6 +15,7 @@ import logging
 
 from sqlalchemy.orm import Session
 
+from app.data import catalog
 from app.models.models import AdaptationMeasure, Kommune
 from app.services import kommune_profile_service, measure_service
 from app.services.engine import lower_bound
@@ -137,13 +138,28 @@ def _risk_lines(db: Session, kommune_id: int) -> list[str]:
         if note:
             lines.append(note)
 
-    by_risk = [r for r in (cost.get("by_risk") or []) if (r.get("cost_eur") or 0) > 0]
+    all_risks = cost.get("by_risk") or []
+    # Klasse B (Screening ohne Euro-Bezifferung, T-0839): kein Betrag, kein Rang
+    # in der Top-Liste — aber auch nicht still weglassen, sondern mit Vermerk.
+    klasse_b = [r for r in all_risks if r.get("has_euro_layer") is False]
+    by_risk = [r for r in all_risks
+               if r.get("has_euro_layer") is not False and (r.get("cost_eur") or 0) > 0]
     by_risk = by_risk[:8]  # Top-Kostentreiber; Liste ist bereits absteigend sortiert
     if by_risk:
         lines.append("TOP-EINZELRISIKEN (Schaden/Jahr, Index, Klasse):")
         for r in by_risk:
             lines.append(
                 f"- {r.get('name')}: {_euro(r.get('cost_eur'))}, "
+                f"Index {_num(r.get('index'), 0)}, {r.get('risk_class')}"
+            )
+    if klasse_b:
+        lines.append(
+            f"WEITERE WIRKUNGEN ({catalog.NO_EURO_LAYER_TEXT}; nicht in der Gesamtsumme, "
+            "keinen Euro-Betrag nennen):"
+        )
+        for r in klasse_b:
+            lines.append(
+                f"- {r.get('name')}: {catalog.NO_EURO_LAYER_TEXT}, "
                 f"Index {_num(r.get('index'), 0)}, {r.get('risk_class')}"
             )
 
