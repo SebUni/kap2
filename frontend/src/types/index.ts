@@ -482,7 +482,7 @@ export interface RiskHistogramEntry {
   outcome: number
   /** Aggregierter Outcome (= outcome; Σ über Zellen für pop/area, sonst P90-basiert). */
   outcome_sum?: number
-  cost_eur: number
+  cost_eur: number | null
   /** "sum" (Σ über Zellen, pop/area) | "p90" (kommunenweiter Einzelwert, flat). */
   aggregation?: 'sum' | 'p90'
   /** Anteil der Summe aus den stärksten 5 % Zellen (Konzentration/Hotspot-Signal). */
@@ -524,7 +524,7 @@ export interface RiskAggregateEntry {
   /** Aggregierter Outcome (Summe der Zell-Outcomes für pop/area, sonst P90-basiert). */
   outcome_sum?: number
   outcome_unit: string
-  cost_eur: number
+  cost_eur: number | null
   cost_dimension: string
   group: string
   name: string
