@@ -1,12 +1,17 @@
-"""T-0460: Zeile 9 der Konformitäts-Checkliste ist auf 'erfüllt' gesetzt und gegen
+"""T-0460, fortgeschrieben mit T-0741: Zeile 9 der Konformitäts-Checkliste ist gegen
 die genannten Belege abgesichert.
+
+T-0460 hatte Zeile 9 auf 'erfüllt' gesetzt. Die Gegenprobe gegen KWRA 2021,
+Teilbericht 6, Kap. 3.4 (T-0741, Abschnitt „Gegenprobe Zeile 9“ in der Checkliste)
+hat ergeben, dass die vier Belege die Anforderung nur teilweise tragen; Status und
+Lücke wurden deshalb auf 'teilweise' bzw. eine ausformulierte Lücke umgestellt.
 
 Prüft wörtlich gegen docs/KONFORMITAET_CHECKLISTE.md:
 - es gibt genau eine Zeile, die mit '| 9 |' beginnt,
 - diese Zeile hat sieben Spalten,
-- fünfte Spalte (Status) ist genau 'erfüllt',
+- fünfte Spalte (Status) ist genau 'teilweise',
 - sechste Spalte (Fundstelle/Beleg) ist genau die vier erwarteten Pfade,
-- siebte Spalte (Lücke) ist genau '—',
+- siebte Spalte (Lücke) ist nicht leer und nicht '—',
 - jeder der vier genannten Pfade existiert als Datei im Repo.
 """
 
@@ -49,9 +54,9 @@ def test_zeile_9_hat_sieben_spalten():
     assert len(spalten) == 7, f"Erwartet 7 Spalten, gefunden: {len(spalten)} -> {spalten}"
 
 
-def test_zeile_9_status_ist_erfuellt():
+def test_zeile_9_status_ist_teilweise():
     spalten = _spalten(_zeile_9())
-    assert spalten[4].strip() == "erfüllt"
+    assert spalten[4].strip() == "teilweise"
 
 
 def test_zeile_9_beleg_ist_exakt():
@@ -59,9 +64,9 @@ def test_zeile_9_beleg_ist_exakt():
     assert spalten[5].strip() == ERWARTETE_BELEGE
 
 
-def test_zeile_9_luecke_ist_leer():
-    spalten = _spalten(_zeile_9())
-    assert spalten[6].strip() == "—"
+def test_zeile_9_luecke_ist_benannt():
+    luecke = _spalten(_zeile_9())[6].strip()
+    assert luecke not in ("", "—"), "Status 'teilweise' verlangt eine benannte Lücke"
 
 
 def test_zeile_9_belegte_pfade_existieren():

@@ -88,13 +88,13 @@ export default function RiskDistributionSection() {
                               <span className="kpi-unit"> {r.outcome_unit}</span>
                             </div>
                           </div>
-                          {(euro?.has_euro_layer === false || r.cost_dimension === 'monetary' || r.cost_eur > 0) && (
+                          {(euro?.has_euro_layer === false || r.cost_dimension === 'monetary' || (r.cost_eur ?? 0) > 0) && (
                             <div className="kpi-card" style={{ flex: '1 1 110px' }}>
                               <div className="kpi-label">Schaden/Jahr</div>
                               {/* Verwechslungssperre Klasse A/B (T-0517): Klasse B zeigt den
                                   Screening-Vermerk des Backends statt eines Betrags. */}
                               <div className="kpi-value accent" style={{ fontSize: '0.95rem' }}>
-                                {euro?.has_euro_layer === false ? String(euro.cost_display ?? '') : fmtEur(r.cost_eur)}
+                                {euro?.has_euro_layer === false || r.cost_eur == null ? String(euro?.cost_display ?? '') : fmtEur(r.cost_eur)}
                               </div>
                             </div>
                           )}

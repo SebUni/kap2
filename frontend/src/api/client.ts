@@ -100,6 +100,17 @@ export interface QuerverbindungsAuswertung {
   modellgrenze: string
 }
 
+/** Antwort von GET /kommune/{id}/kang-zustaendigkeit (§ 12 Abs. 1 KAnG, Landesrecht). */
+export interface KangZustaendigkeit {
+  bundesland: string
+  rechtsgrundlage: string
+  fundstelle: string
+  zustaendige_stelle: string
+  pflicht: 'ja' | 'nein' | 'keine Bestimmung getroffen' | 'unbekannt'
+  /** Datum JJJJ-MM-TT */
+  stand: string
+}
+
 export interface AuthUser {
   id: number
   email: string
@@ -399,6 +410,8 @@ export const api = {
     request<Record<string, unknown>>(`/kommune/${kommuneId}/cost-projection`),
   getKommuneProfile: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/profile`),
+  getKangZustaendigkeit: (kommuneId: number) =>
+    request<KangZustaendigkeit>(`/kommune/${kommuneId}/kang-zustaendigkeit`),
 
   // ── Config ──────────────────────────────────────────────────────────
   getConfig: (kommuneId: number) =>

@@ -292,7 +292,9 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             "outcome": outcome,
             "outcome_sum": outcome,
             "outcome_unit": risk["outcome_unit"],
-            "cost_eur": cost,
+            # Verwechslungssperre Klasse A/B (T-0842): Der Betrag einer Klasse-B-Wirkung
+            # verschwindet an der Quelle. Die physische Menge steht in ``outcome``.
+            "cost_eur": cost if catalog.risk_has_euro_layer(risk) else None,
             "cost_dimension": risk["cost_dimension"],
             "group": risk["group"],
             "name": risk["name"],
@@ -331,17 +333,26 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
     # trägt aber, ob sie eine Euro-Schicht hat, und den Anzeigewert — Klasse B zeigt
     # statt eines Betrags catalog.NO_EURO_LAYER_TEXT (nie 0 €, nie „kein Schaden“).
     has_euro = {r["code"]: catalog.risk_has_euro_layer(r) for r in catalog.RISKS}
-    by_risk = sorted(
-        [{"code": c, "name": r["name"], "cost_eur": r["cost_eur"],
-          "outcome": r["outcome"], "outcome_unit": r["outcome_unit"],
-          "cost_dimension": r["cost_dimension"], "index": r["index"],
-          "exposed_p90_index": r["exposed_p90_index"], "risk_class": r["risk_class"],
-          "aggregation": r["aggregation"], "top5_share": r["top5_share"],
-          "has_euro_layer": has_euro[c],
-          "cost_display": r["cost_eur"] if has_euro[c] else catalog.NO_EURO_LAYER_TEXT}
-         for c, r in risk_out.items()],
-        key=lambda x: x["cost_eur"], reverse=True,
-    )
+    # Der Betrag einer Klasse-B-Wirkung verschwindet an der Quelle: cost_eur ist dort
+    # None, auch in risks[code]. Die Rangfolge nach Betrag gilt nur für
+    # Klasse A; Klasse B folgt danach alphabetisch nach Name — eine Rangfolge nach dem
+    # unterdrückten Betrag würde ihn verraten.
+    eintraege = [
+        {"code": c, "name": r["name"],
+         "cost_eur": r["cost_eur"] if has_euro[c] else None,
+         "outcome": r["outcome"], "outcome_unit": r["outcome_unit"],
+         "cost_dimension": r["cost_dimension"], "index": r["index"],
+         "exposed_p90_index": r["exposed_p90_index"], "risk_class": r["risk_class"],
+         "aggregation": r["aggregation"], "top5_share": r["top5_share"],
+         "has_euro_layer": has_euro[c],
+         "cost_display": r["cost_eur"] if has_euro[c] else catalog.NO_EURO_LAYER_TEXT}
+        for c, r in risk_out.items()
+    ]
+    klasse_a = sorted((e for e in eintraege if e["has_euro_layer"]),
+                      key=lambda x: x["cost_eur"], reverse=True)
+    klasse_b = sorted((e for e in eintraege if not e["has_euro_layer"]),
+                      key=lambda x: x["name"])
+    by_risk = klasse_a + klasse_b
     # In die Summe gehen nur Wirkungen mit Euro-Schicht (Klasse A) ein. Nicht-additive
     # Teilkennzahlen (z. B. Restaurierung = Anteil der Sektorschäden) werden
     # ausgewiesen, aber NICHT in die Summe addiert (Doppelzählung §3.7).
