@@ -5,13 +5,20 @@ export const fmtEur = (v: number): string =>
 
 /** Kompakte €-Angabe für Hero-KPIs (1,2 Mio. €, 340 Tsd. €). */
 export const fmtEurCompact = (v: number): string => {
-  const abs = Math.abs(v)
-  if (abs >= 1e9) return `${(v / 1e9).toLocaleString('de-DE', { maximumFractionDigits: 2 })} Mrd. €`
-  if (abs >= 1e6) return `${(v / 1e6).toLocaleString('de-DE', { maximumFractionDigits: 2 })} Mio. €`
-  if (abs >= 1e4) return `${(v / 1e3).toLocaleString('de-DE', { maximumFractionDigits: 0 })} Tsd. €`
   if (v === 0) return fmtEur(0)
+  const sign = v < 0 ? -1 : 1
+  const abs = Math.abs(v)
+  // Erst runden, dann die Größenklasse wählen: sonst erscheint 9.960 als „10.000 €“
+  // neben „10 Tsd. €“ und 999.600 als „1.000 Tsd. €“.
   const magnitude = Math.pow(10, 1 - Math.floor(Math.log10(abs)))
-  return fmtEur(Math.round(v * magnitude) / magnitude)
+  const small = Math.abs(Math.round(v * magnitude) / magnitude)
+  const tsd = Math.round(abs / 1e3)
+  const mio = Math.round((abs / 1e6) * 100) / 100
+  const de = (x: number, d: number) => (sign * x).toLocaleString('de-DE', { maximumFractionDigits: d })
+  if (abs >= 1e9 || mio >= 1000) return `${de(abs / 1e9, 2)} Mrd. €`
+  if (abs >= 1e6 || tsd >= 1000) return `${de(abs / 1e6, 2)} Mio. €`
+  if (abs >= 1e4 || small >= 1e4) return `${de(tsd, 0)} Tsd. €`
+  return fmtEur(sign * small)
 }
 
 export const fmtNum = (v: number, digits = 1): string =>
