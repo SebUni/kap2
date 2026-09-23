@@ -12,12 +12,11 @@ Geprüft wird:
     ``_write_layer``: die an ``bewertung_100m`` übergebene Klasse-B-Spalte
     enthält ausschließlich den Vermerk, keinen Wert 0, 0.0, '-' oder None.
 
-Ohne Datenbank und ohne pyogrio (fehlt in der Prüfumgebung).
+Ohne Datenbank; das Schreiben über pyogrio wird mit ``_write_layer`` abgefangen.
 """
 
 from __future__ import annotations
 
-import sys
 import types
 
 import pytest
@@ -25,16 +24,9 @@ import pytest
 import _stub_heavy_deps
 
 # Muss vor dem Import der App-Module laufen (nur wirksam, wo die echten Pakete
-# fehlen — im Deploy-Venv passiert nichts).
+# fehlen — im Deploy-Venv passiert nichts; die conftest hängt das Ersatzmodul
+# ohnehin schon vor dem Einsammeln ein, dieser Aufruf ist nur idempotent).
 _stub_heavy_deps.install()
-
-# Der Export importiert ``from shapely import wkb``; das Ersatzmodul für shapely
-# bildet ``wkb`` nicht ab. Nur ergänzen, wenn shapely selbst ersetzt ist.
-if "shapely.wkb" not in sys.modules and not hasattr(sys.modules.get("shapely"), "wkb"):
-    _wkb = types.ModuleType("shapely.wkb")
-    _wkb.dumps = lambda g: b""
-    sys.modules["shapely.wkb"] = _wkb
-    sys.modules["shapely"].wkb = _wkb
 
 from app.data import catalog  # noqa: E402
 from app.models.models import CellAssessment, GridCell, Kommune  # noqa: E402

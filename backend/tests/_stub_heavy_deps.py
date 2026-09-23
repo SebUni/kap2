@@ -212,21 +212,41 @@ class _FallbackFinder:
 
     Greift nur, wenn kein echter Finder das Modul liefert, und nie für ``app``
     oder die Tests selbst — ein echter Importfehler im Produktivcode bleibt
-    damit sichtbar.
+    damit sichtbar. numpy, pandas und pyogrio stehen bewusst **nicht** in
+    ``ERSETZBAR``: numpy und pyogrio kommen über ``backend/requirements.txt``
+    und sind in der Prüfumgebung inzwischen echt installiert; pandas ist eine
+    von pyogrio selbst über ``try/except ImportError`` weich geprüfte
+    Abhängigkeit — ein pauschales Ersatzmodul würde dort ``pandas is not
+    None`` liefern und den anschließenden Zugriff auf ``pandas.__version__``
+    mit ``AttributeError`` statt der von pyogrio erwarteten Fallback-Antwort
+    scheitern lassen.
     """
 
     #: Fremdpakete, die die Importkette von Export und KI-Kontext berührt und
     #: die für diesen Test keine echte Funktion beisteuern.
     ERSETZBAR = {
-        "httpx", "requests", "numpy", "pandas", "rasterio", "pyproj", "fiona",
+        "httpx", "requests", "rasterio", "pyproj", "fiona",
         "fastapi", "starlette", "jinja2", "anthropic", "psycopg2", "redis",
-        "scipy", "netCDF4", "xarray", "dateutil", "pyogrio", "affine",
+        "scipy", "netCDF4", "xarray", "dateutil", "affine",
     }
 
+    def __init__(self, fehlend=frozenset()):
+        #: Wurzeln aus ``ERSETZBAR``, die beim Einhängen nicht installiert waren.
+        #: Festgestellt **vor** dem Einhängen (siehe ``install``); ``find_spec``
+        #: fragt selbst nie über ``importlib.util.find_spec`` nach — das liefe
+        #: wieder durch ``sys.meta_path`` in diesen Finder und endete in einer
+        #: Endlosrekursion.
+        self.fehlend = frozenset(fehlend)
+
     def find_spec(self, fullname, path=None, target=None):
-        if fullname.split(".")[0] not in self.ERSETZBAR:
-            return None
+        if fullname.split(".")[0] not in self.fehlend:
+            return None  # installiertes echtes Paket bleibt unangetastet
         return importlib.util.spec_from_loader(fullname, _FallbackLoader())
+
+
+def _fehlende_ersetzbare() -> frozenset:
+    """Wurzeln aus ``ERSETZBAR``, die nicht installiert sind (vor dem Einhängen)."""
+    return frozenset(w for w in _FallbackFinder.ERSETZBAR if _missing(w))
 
 
 def install() -> None:
@@ -240,5 +260,8 @@ def install() -> None:
     if _missing("openpyxl"):
         _install_openpyxl()
     _install_pydantic()
-    if not any(isinstance(f, _FallbackFinder) for f in sys.meta_path):
-        sys.meta_path.append(_FallbackFinder())
+    if any(isinstance(f, _FallbackFinder) for f in sys.meta_path):
+        return
+    fehlend = _fehlende_ersetzbare()
+    if fehlend:
+        sys.meta_path.append(_FallbackFinder(fehlend))
