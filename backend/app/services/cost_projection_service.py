@@ -29,11 +29,19 @@ PURE_TIME_PREFERENCE_RATES: tuple[float, ...] = (0.0, 0.01)
 
 def _group_costs(agg: dict) -> dict[str, float]:
     """Schadenskosten je KWRA-Gruppe (nicht-additive Sammelrisiken ausgeschlossen,
-    damit die Gruppensumme der ausgewiesenen Gesamtsumme entspricht)."""
+    damit die Gruppensumme der ausgewiesenen Gesamtsumme entspricht).
+
+    Klasse-B-Wirkungen (Screening ohne Euro-Bezifferung, ``euro_layer: False``)
+    werden ausgelassen, nicht als 0 gezählt: Sie tragen keinen Euro-Betrag, und
+    eine Gruppe, die nur aus Klasse B besteht, erscheint nicht mit 0 €."""
     out: dict[str, float] = {}
     for r in agg["cost"]["by_risk"]:
         code = r["code"]
         if code in catalog.NON_ADDITIVE_RISK_CODES:
+            continue
+        spec = catalog.RISKS_BY_CODE.get(code)
+        if (r.get("has_euro_layer") is False
+                or (spec is not None and not catalog.risk_has_euro_layer(spec))):
             continue
         grp = catalog.RISKS_BY_CODE.get(code, {}).get("group", "other")
         out[grp] = out.get(grp, 0.0) + float(r["cost_eur"] or 0.0)
