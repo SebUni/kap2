@@ -212,19 +212,29 @@ class _FallbackFinder:
 
     Greift nur, wenn kein echter Finder das Modul liefert, und nie für ``app``
     oder die Tests selbst — ein echter Importfehler im Produktivcode bleibt
-    damit sichtbar.
+    damit sichtbar. numpy, pandas und pyogrio stehen bewusst **nicht** in
+    ``ERSETZBAR``: numpy und pyogrio kommen über ``backend/requirements.txt``
+    und sind in der Prüfumgebung inzwischen echt installiert; pandas ist eine
+    von pyogrio selbst über ``try/except ImportError`` weich geprüfte
+    Abhängigkeit — ein pauschales Ersatzmodul würde dort ``pandas is not
+    None`` liefern und den anschließenden Zugriff auf ``pandas.__version__``
+    mit ``AttributeError`` statt der von pyogrio erwarteten Fallback-Antwort
+    scheitern lassen.
     """
 
     #: Fremdpakete, die die Importkette von Export und KI-Kontext berührt und
     #: die für diesen Test keine echte Funktion beisteuern.
     ERSETZBAR = {
-        "httpx", "requests", "numpy", "pandas", "rasterio", "pyproj", "fiona",
+        "httpx", "requests", "rasterio", "pyproj", "fiona",
         "fastapi", "starlette", "jinja2", "anthropic", "psycopg2", "redis",
-        "scipy", "netCDF4", "xarray", "dateutil", "pyogrio", "affine",
+        "scipy", "netCDF4", "xarray", "dateutil", "affine",
     }
 
     def find_spec(self, fullname, path=None, target=None):
-        if fullname.split(".")[0] not in self.ERSETZBAR:
+        wurzel = fullname.split(".")[0]
+        if wurzel not in self.ERSETZBAR:
+            return None
+        if not _missing(wurzel):  # echtes Paket bleibt unangetastet
             return None
         return importlib.util.spec_from_loader(fullname, _FallbackLoader())
 

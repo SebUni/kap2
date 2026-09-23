@@ -14,36 +14,20 @@ zurückgelesen. Ohne Datenbank: Session-Doppel, Aggregat über
 from __future__ import annotations
 
 import io
-import sys
 
 import pytest
 
 import _stub_heavy_deps
 
 # Muss vor dem Import der App-Module laufen (nur wirksam, wo die echten Pakete
-# fehlen — im Deploy-Venv passiert nichts).
+# fehlen — im Deploy-Venv passiert nichts; die conftest hängt das Ersatzmodul
+# ohnehin schon vor dem Einsammeln ein, dieser Aufruf ist nur idempotent).
 _stub_heavy_deps.install()
 
 openpyxl = pytest.importorskip("openpyxl")
 if not hasattr(openpyxl, "__version__"):  # Ersatzmodul statt echtem openpyxl
     pytest.skip("echtes openpyxl nötig, um die xlsx-Bytes zurückzulesen",
                 allow_module_level=True)
-
-
-def _nur_echte_typen(monkeypatch) -> None:
-    """Hält openpyxl lauffähig, obwohl numpy durch ein Ersatzmodul abgedeckt ist.
-
-    ``_stub_heavy_deps`` beantwortet ``import numpy`` mit einem Ersatzmodul; openpyxl
-    nimmt dann dessen Platzhalter in ``NUMERIC_TYPES`` auf, und ``isinstance``
-    scheitert beim Schreiben. Für die Dauer des Tests bleiben dort nur echte Typen.
-    """
-    for name, mod in list(sys.modules.items()):
-        if name.split(".")[0] != "openpyxl" or mod is None:
-            continue
-        typen = getattr(mod, "NUMERIC_TYPES", None)
-        if isinstance(typen, tuple) and not all(isinstance(t, type) for t in typen):
-            monkeypatch.setattr(mod, "NUMERIC_TYPES",
-                                tuple(t for t in typen if isinstance(t, type)))
 
 
 from app.data import catalog  # noqa: E402
@@ -151,7 +135,6 @@ def db():
 @pytest.fixture
 def export(db, klasse_b, monkeypatch):
     """Exportiert und liest die xlsx-Bytes mit openpyxl zurück; liefert (Mappe, Aggregat)."""
-    _nur_echte_typen(monkeypatch)
     agg = _aggregate()
     monkeypatch.setattr(measure_service, "get_risk_aggregate", lambda *a, **k: agg)
     monkeypatch.setattr(
