@@ -10,11 +10,13 @@ Amtliches Niedersächsisches Vorschrifteninformationssystem (NI-VORIS), § 26 NK
 wieder, nicht die Seite des Gesetzblatts selbst. Text aus dem HTML der Seite ausgezogen;
 die hochgestellten Satznummern stehen als eigene Zeilen, Verweise („§ 12 Abs. 1 Satz 1 KAnG“)
 sind im Original Links und stehen deshalb ebenfalls auf eigener Zeile. Amtliches Werk nach
-§ 5 UrhG.
+§ 5 UrhG. Die Kopfzeile des Textblocks (Paragraf und Überschrift) steht auf der Seite mit
+geschützten Leerzeichen; sie ist hier mit normalen Leerzeichen wiedergegeben.
 
 ### § 26 NKlimaG, vollständig
 
 ```text
+§ 26 NKlimaG - Klimaanpassungskonzepte
 Bibliographie
 Titel
 Niedersächsisches Gesetz zur Förderung des Klimaschutzes und zur Minderung der Folgen des Klimawandels (Niedersächsisches Klimagesetz - NKlimaG)

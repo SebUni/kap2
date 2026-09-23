@@ -9,8 +9,8 @@ Abschnitte ab, auf die sich die Negativaussage stützt.
 
 1. Verkündeter Text: Gesetz für ein Klimaanpassungsgesetz Berlin und zur Änderung weiterer
    Vorschriften vom 07.11.2025, GVBl. Berlin 81. Jahrgang Nr. 33 vom 20.11.2025 (Quelle oben).
-   Abgelegt: Inhaltsübersicht und § 1 (S. 542), § 8 bis § 12 (S. 545 bis 546, Seitenwechsel
-   nach § 12 Abs. 3 auf S. 547). Text mit `pdftotext` in Lesereihenfolge ausgezogen; die
+   Abgelegt: Inhaltsübersicht und § 1 (S. 542), § 8 bis § 12 (S. 545 bis 546) und § 14 bis
+   § 16 (S. 547). Text mit `pdftotext` in Lesereihenfolge ausgezogen; die
    Kopfzeilen des Blatts („Gesetz- und Verordnungsblatt für Berlin“, Jahrgang, Seitenzahl)
    stehen, wo sie im Umbruch liegen.
 2. Begründung: Drs. 19/2573 des Abgeordnetenhauses vom 03.07.2025
@@ -19,11 +19,18 @@ Abschnitte ab, auf die sich die Negativaussage stützt.
    Begründung zu § 10 (PDF-Seite 62) und zu § 12 (PDF-Seite 64); die im Text gedruckten
    Seitenzahlen der Begründung (6/7, 27, 29) weichen von den PDF-Seiten ab.
 
-Befund aus diesen Stellen (unverändert gegenüber der Übersicht): Das Gesetz nennt das KAnG in
-§ 10 Abs. 2 Nr. 1 und § 12 Abs. 2 Nr. 1 (Klimarisikoanalyse des Bundes nach § 4 KAnG), in
-§ 12 Abs. 1 (Frist nach § 10 Abs. 6 Satz 1 KAnG) und in § 12 Abs. 2 Nr. 3 (Cluster nach
-§ 3 Abs. 2 KAnG); eine Bestimmung von Stellen nach § 12 Abs. 1 KAnG enthält keiner der
-abgelegten Paragrafen. Die Begründung zu § 12 ordnet ihn § 10 KAnG (Landesstrategie) zu.
+Befund aus diesen Stellen: Das Gesetz nennt das KAnG in § 10 Abs. 2 Nr. 1 und § 12 Abs. 2
+Nr. 1 (Klimarisikoanalyse des Bundes nach § 4 KAnG), in § 12 Abs. 1 (Frist nach § 10 Abs. 6
+Satz 1 KAnG) und in § 12 Abs. 2 Nr. 3 (Cluster und Handlungsfelder nach § 3 Abs. 2 KAnG).
+Eine Bestimmung von Stellen nach § 12 Abs. 1 KAnG enthält keiner der abgelegten Paragrafen;
+§§ 14 bis 16 nennen das KAnG nicht. Die Begründung zu § 12 ordnet ihn § 10 KAnG
+(Landesstrategie) zu.
+
+**Abweichung von der Übersicht:** Die Übersicht (docs/KANG_ZUSTAENDIGKEIT_LAENDER.md,
+„Belege je Land“, Berlin) sagt, das Gesetz nenne das KAnG „nur“ in § 10 Abs. 2 Nr. 1,
+§ 12 Abs. 2 Nr. 1 und § 12 Abs. 1. Der verkündete Text nennt es zusätzlich in § 12 Abs. 2
+Nr. 3 (Verweis auf § 3 Abs. 2 KAnG). Am Ergebnis „keine Bestimmung getroffen“ ändert das
+nichts; die Übersicht bleibt in diesem Paket unverändert.
 Amtliche Werke nach § 5 UrhG.
 
 ### GVBl. Berlin Nr. 33, S. 542: Gesetzeskopf, Inhaltsübersicht, § 1 KAnGBln
@@ -115,7 +122,7 @@ gegenüber den Auswirkungen des Klimawandels soll gesteigert
 werden, und so Beiträge zu den nationalen und internationalen Anstrengungen bei der Klimaanpassung geleistet werden.
 ```
 
-### GVBl. Berlin Nr. 33, S. 545 bis 547: §§ 8 bis 12 KAnGBln
+### GVBl. Berlin Nr. 33, S. 545 bis 546: §§ 8 bis 12 KAnGBln
 
 ```text
 §8
@@ -246,6 +253,33 @@ nach Inkrafttreten dieses Gesetzes im Internet zu veröffentlichen.
 Mischwasserkanalisation befindliche private Oberflächen durch die
 Schaffung geeigneter Anreizsysteme vom Kanalnetz abgekoppelt
 werden können.
+```
+
+### GVBl. Berlin Nr. 33, S. 547: §§ 14 bis 16 KAnGBln
+
+```text
+Gesetz- und Verordnungsblatt für Berlin
+§ 14
+Open Data für Innovationen
+Die für Klimaanpassung zuständige Senatsverwaltung schafft
+eine öffentliche digitale Plattform für die nach § 13 erhobenen Daten
+und Indikatoren. Für die digitale Plattform findet § 67 Absatz 1 und
+2, sowie Absatz 5 bis 9 des Berliner Mobilitätsgesetzes vom 5. Juli
+2018 (GVBl. S. 464), das zuletzt durch Artikel 27 des Gesetzes vom
+10. Juli 2025 (GVBl. S. 270) geändert worden ist, entsprechende
+Anwendung unter der Maßgabe, dass die für Klimaanpassung zuständige Senatsverwaltung ermächtigt wird, das Nähere zu der digitalen Plattform durch Rechtsverordnung zu regeln.
+§ 15
+Klimaanpassungsberichte
+Der Senat erarbeitet zum 31. März jedes zweiten Jahres einen
+Klimaanpassungsbericht, welcher auf Grundlage der Monitoringdaten nach § 13 Absatz 1 Nummer 1 bis 3 den Umsetzungsstand zu
+den Maßnahmen aus dem Klimaanpassungsprogramm beinhaltet.
+Der Jahresbericht ist im Internet zu veröffentlichen.
+§ 16
+Verpflichtende öffentliche Vorstellung
+Der Senat leitet die Klimarisikoanalyse, die Klimaanpassungsstrategie, das Klimaanpassungsprogramm, die Bedarfsanalyse für
+Einsatzkräfte, die Sofortprogramme und den Klimaanpassungsbericht jeweils innerhalb eines Monats nach Veröffentlichung dem
+Abgeordnetenhaus zu, sowie dem Rat der Bürgermeisterinnen und
+Bürgermeister zur Stellungnahme zu.
 ```
 
 ### Drs. 19/2573, PDF-Seite 42: Allgemeiner Teil, Verhältnis zum KAnG
