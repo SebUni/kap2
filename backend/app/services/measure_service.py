@@ -237,6 +237,74 @@ def compute_costs(mdef: dict, count: int, area_m2: float) -> dict:
     }
 
 
+# ── Verwechslungssperre Klasse A/B im Maßnahmen-Nutzen (T-0838) ──────────────────
+# Klasse-B-Wirkungen (``"euro_layer": False``, reines Screening) tragen keinen
+# Euro-Betrag — auch dann nicht, wenn ihr Katalogeintrag einen Kostensatz > 0 führt.
+# ``catalog.risk_contributes_to_total`` prüft die Euro-Schicht nicht (sie trägt Summe
+# und Untergrenze, T-0515) und bleibt unverändert; der Maßnahmen-Nutzen und sein
+# Deckel sind deshalb zusätzlich an ``catalog.risk_has_euro_layer`` gebunden.
+
+
+def _risk_counts_for_euro_benefit(risk: dict | None) -> bool:
+    """True, wenn eine verknüpfte Wirkung einen Euro-Nutzen tragen darf.
+
+    Bedingung: sie trägt zur Gesamtschadenssumme bei **und** führt eine
+    Euro-Schicht (Klasse A). Klasse B liefert weder Zell-/flat-Nutzen noch
+    einen Beitrag zum Deckel.
+    """
+    return bool(risk) and catalog.risk_contributes_to_total(risk) \
+        and catalog.risk_has_euro_layer(risk)
+
+
+def _benefit_cap(linked: list[str], base_risks: dict, k_indirect: float) -> float:
+    """Deckel des Schadens-Nutzens: Basisschaden der verknüpften pop-/area-Wirkungen
+    mit Euro-Schicht (inkl. gekoppelter Folgekosten direkter Sektorschäden).
+
+    Liest ``cost_eur`` des Basis-Aggregats nur für Klasse A — ein Klasse-B-Betrag
+    geht nie in den Deckel ein, auch wenn das Aggregat dort (noch) eine Zahl führt.
+    """
+    cap = 0.0
+    for code in linked:
+        risk = catalog.RISKS_BY_CODE.get(code)
+        entry = (base_risks or {}).get(code)
+        if not entry or not _risk_counts_for_euro_benefit(risk):
+            continue
+        if risk.get("scale", "pop") in ("pop", "area"):
+            cost = float(entry.get("cost_eur") or 0.0)
+            cap += cost
+            if code in catalog.DIRECT_SECTOR_RISK_CODES:
+                cap += k_indirect * cost  # gekoppelte Folgekosten zählen zum Nutzen dazu
+    return cap
+
+
+def _benefit_euro_layer_fields(linked: list[str]) -> dict:
+    """Vermerkfelder zur Euro-Schicht des Maßnahmen-Nutzens (Entscheidung CEO, T-0563).
+
+    - ``benefit_has_euro_layer``: False, wenn alle verknüpften (im Katalog bekannten)
+      Wirkungen Klasse B sind. Dann gibt es keinen Euro-Nutzen aus vermiedenen Schäden
+      — auch keine 0 (P2) —, kein Nutzen-Kosten-Verhältnis und keinen Rangplatz nach Euro.
+    - ``benefit_display``: bei einer reinen Klasse-B-Maßnahme
+      ``catalog.NO_EURO_LAYER_TEXT`` statt eines Betrags, sonst None (Betrag gilt).
+    - ``benefit_note``: bei einer gemischten Maßnahme der Zusatz
+      „ohne x Wirkungen im Screening“ zum Euro-Nutzen aus den Klasse-A-Wirkungen.
+    - ``benefit_screening_risk_codes``: die verknüpften Klasse-B-Wirkungen.
+    """
+    known = [c for c in linked if c in catalog.RISKS_BY_CODE]
+    screening = [c for c in known
+                 if not catalog.risk_has_euro_layer(catalog.RISKS_BY_CODE[c])]
+    pure_screening = bool(known) and len(screening) == len(known)
+    note = None
+    if screening and not pure_screening:
+        n = len(screening)
+        note = f"ohne {n} {'Wirkung' if n == 1 else 'Wirkungen'} im Screening"
+    return {
+        "benefit_has_euro_layer": not pure_screening,
+        "benefit_display": catalog.NO_EURO_LAYER_TEXT if pure_screening else None,
+        "benefit_note": note,
+        "benefit_screening_risk_codes": screening,
+    }
+
+
 # Kosten-/nutzenrelevante Felder der (aufgelösten) Maßnahmendefinition: ändert sich
 # eines davon (Katalog-Rekalibrierung oder Override), ist ein gespeichertes
 # impact_summary veraltet und muss neu gerechnet werden.
@@ -266,6 +334,13 @@ def _params_fingerprint(db: Session, measure: AdaptationMeasure, mdef: dict,
         "config": measure.config or {},
         "model_version": catalog.MODEL_VERSION,
         "cells": str(cells_marker),
+        # Euro-Schicht der verknüpften Wirkungen (T-0838): wird eine Wirkung im
+        # Katalog zu Klasse B, ist ein gespeicherter Euro-Nutzen veraltet.
+        "euro_layer": {
+            c: catalog.risk_has_euro_layer(catalog.RISKS_BY_CODE[c])
+            for c in (mdef.get("linked_risk_codes") or [])
+            if c in catalog.RISKS_BY_CODE
+        },
     }
     return hashlib.sha1(
         json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
@@ -402,7 +477,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
             covered_base_index[code] = covered_base_index.get(code, 0.0) + base_idx
             covered_new_index[code] = covered_new_index.get(code, 0.0) + new_idx
             risk = catalog.RISKS_BY_CODE.get(code)
-            if (risk and catalog.risk_contributes_to_total(risk)
+            if (_risk_counts_for_euro_benefit(risk)
                     and risk.get("scale", "pop") in ("pop", "area")):
                 reduced = _cell_cost(risk, r, cell_pop) * (1.0 - factor)
                 annual_benefit_damage += reduced
@@ -423,7 +498,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         catalog.RISKS_BY_CODE[c] for c in linked
         if c in catalog.RISKS_BY_CODE
         and catalog.RISKS_BY_CODE[c].get("scale", "pop") not in ("pop", "area")
-        and catalog.risk_contributes_to_total(catalog.RISKS_BY_CODE[c])
+        and _risk_counts_for_euro_benefit(catalog.RISKS_BY_CODE[c])
     ]
     if flat_linked:
         kommune = db.query(Kommune).filter(Kommune.id == measure.kommune_id).first()
@@ -460,17 +535,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     if annual_benefit_damage > 0.0:
         base_agg = get_risk_aggregate(db, measure.kommune_id, apply_measures=False)
         k = float(override_context.get_override("impact.k_indirect", _K_INDIRECT_DEFAULT))
-        cap = 0.0
-        for code in linked:
-            risk = catalog.RISKS_BY_CODE.get(code)
-            entry = base_agg.get("risks", {}).get(code)
-            if not risk or not entry or not catalog.risk_contributes_to_total(risk):
-                continue
-            if risk.get("scale", "pop") in ("pop", "area"):
-                cost = float(entry.get("cost_eur") or 0.0)
-                cap += cost
-                if code in catalog.DIRECT_SECTOR_RISK_CODES:
-                    cap += k * cost  # gekoppelte Folgekosten zählen zum Nutzen dazu
+        cap = _benefit_cap(linked, base_agg.get("risks", {}), k)
         if cap > 0.0 and annual_benefit_damage > cap:
             log.warning(
                 "Maßnahme %s: Schadens-Nutzen %.0f € über Gesamtschaden der verknüpften "
@@ -511,6 +576,11 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         "annual_benefit_flat_eur": round(annual_benefit_flat, 2),
         "annual_benefit_direct_eur": round(annual_benefit_direct, 2),
         "benefit_capped": benefit_capped,
+        # Verwechslungssperre Klasse A/B (T-0838): Vermerk statt Betrag für reine
+        # Screening-Maßnahmen, Zusatz „ohne x Wirkungen im Screening“ für gemischte.
+        # ``annual_benefit_eur`` bleibt eine Zahl (Klasse-A-Anteil + direkter Nutzen),
+        # weil Export und Maßnahmentabelle sie als Zahl lesen.
+        **_benefit_euro_layer_fields(linked),
         "params_fingerprint": fingerprint,
         "count": count,
         "count_is_default": count_is_default,
@@ -694,7 +764,13 @@ def build_cost_summary(db: Session, kommune_id: int, demo_session_id: str | None
                              "annual_benefit_damage_eur": round(ben_damage, 2),
                              "annual_benefit_flat_eur": round(ben_flat, 2),
                              "annual_benefit_direct_eur": round(ben_direct, 2),
-                             "benefit_capped": bool(summary.get("benefit_capped", False))})
+                             "benefit_capped": bool(summary.get("benefit_capped", False)),
+                             # Verwechslungssperre (T-0838); ältere Summaries ohne die
+                             # Felder gelten als Klasse A (bisheriger Bestand).
+                             "benefit_has_euro_layer": bool(
+                                 summary.get("benefit_has_euro_layer", True)),
+                             "benefit_display": summary.get("benefit_display"),
+                             "benefit_note": summary.get("benefit_note")})
 
     damages_base = base["cost"]["total_eur"]
     damages_with = withm["cost"]["total_eur"]
