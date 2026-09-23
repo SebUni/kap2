@@ -130,13 +130,17 @@ KWK = Sheet „Klimawirkungsketten“, NW = „Schadensbaum-Netzwerkliste“, Mo
 - **Bewertungsbaustein:** K3-Wiederherstellung (NW Z61). Bewertungsansatz (Mon. Z65): „Wie ID 59,
   ereignisbezogen flussseitig; HQ-Szenarien × Schadensfunktionen (Wassertiefe-Schaden) ×
   Gebäudewerte.” Gegenstand: „Sachschäden flussseitiger Überflutung.”
-- **Preisstandjahr (Abschätzung von KAP3, §3.9 ABGESCHÄTZT):** 2026. Herleitung: Keine der beiden
+- **Preisstandjahr (abgeleitet aus Register 60-R24-01):** 2026. Herleitung: Keine der beiden
   Arbeitsmappen beziffert für K3-Wiederherstellungskosten ein Preisstandjahr (anders als K1/VOLY,
   Konten Z11: „Preisstand 2024”); Rechenregeln Z19 (A4) verlangt: „Konkrete Zahlen sind vor
-  Produktivsetzung zu belegen.” Bis ein K3-eigener Kostensatz mit Quelle vorliegt (Kap. 3/7), wird
-  das Erstellungsjahr dieses Berichtsteils als Preisstandjahr gesetzt und bei Bezifferung ersetzt
-  (Ersetzungspfad, W1) — kein dauerhafter unspezifizierter Wert ohne Kennzeichnung als Abschätzung
-  (Eiserne Regel 3, P1).
+  Produktivsetzung zu belegen.” Der K3-eigene Kostensatz mit Quelle liegt vor: Register 60-R24-01
+  (NHK 2010 nach ImmoWertV Anlage 4, mit dem amtlichen Baupreisindex fortgeschrieben, Langbeleg B4)
+  trägt die Wertsätze \(n_t\) = 1.950 / 1.533 €₂₀₂₆/m² BGF (§3.5) und damit den Basiswert
+  527.280 €₂₀₂₆ je Wohngebäude (§4.3). Das Preisstandjahr 2026 ist deshalb der Preisstand dieser
+  belegten und indexierten Wertsätze, kein frei gesetztes Erstellungsjahr mehr; der frühere
+  Ersetzungspfad (W1) ist mit dem Register eingelöst. **Abschätzung von KAP3 (§3.9 ABGESCHÄTZT)**
+  ist daran allein der Fortschreibungsfaktor 2023 → 2026 (1,105; Band 1,07–1,16; Langbeleg B4,
+  Rechenschritt 2) — nur er wird im Produkt als Abschätzung ausgewiesen (Eiserne Regel 3, P1).
 - **Rechenregeln:** R5 (übernommen), R7, R9 (Mon. Z65, Spalte „Regeln”: „R7, R9”); dazu Annahme A5
   Ereignislogik (Rechenregeln Z20): „Eintrittswahrscheinlichkeit × Schadensfunktion × Bestand;
   Schutzsysteme über die R7-Erwartungswert-Weiche”. **R5-Entscheidung (schließt offenen Punkt 4 des
@@ -196,7 +200,7 @@ Wasserstandsachse von FLEMOps (Langbeleg B5) sind Basiswert und in §3.3 hergele
 | 60-S097-01 | S097 Zustand Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
 | 60-S098-01 | S098 Baumaterialien Schutzinfrastruktur → Versagenswahrscheinlichkeit | offen | offen | offen | offen | offen | offen (Vorschlag: R7-Weiche mit #50) |
 | 60-S104-01 | S104 Investitionen in exponierten Gebieten → Bestandsentwicklung | offen | offen | offen | offen | offen | offen |
-| 60-R24-01 | R24 Gebäude → Mengengerüst (Gebäudewerte) | **Menge:** 19,7 Mio Wohngebäude (13,5 Mio Einfamilien-, 2,7 Mio Zweifamilien-, 3,5 Mio Mehrfamilienhäuser), 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche (31.12.2024) ⇒ 208 m² Wohnfläche je Wohngebäude; Fortschreibung 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m². **Wertsatz (Wiederherstellung/Neubauwert):** NHK 2010 Standardstufe 3 (mittlerer Standard) = 1.050 €₂₀₁₀/m² BGF (freistehende Ein-/Zweifamilienhäuser, Geb.-Art 1.01) bzw. 825 €₂₀₁₀/m² BGF (Mehrfamilienhäuser ≤ 6 WE), je inkl. Umsatzsteuer und Baunebenkosten; Indexierung mit dem Baupreisindex Wohngebäude (2015 = 100: 2010 = 89,1 → 2023 = 149,8, Faktor 1,681) ⇒ 1.765 bzw. 1.387 €₂₀₂₃/m² BGF; Fortschreibung 2023 → Preisstand 2026 mit Faktor 1,105 (Band 1,07–1,16; §3.9 **abgeschätzt**, Kette in B4) ⇒ **1.950 €₂₀₂₆/m² BGF (Band 1.889–2.047)** bzw. **1.533 €₂₀₂₆/m² BGF (Band 1.484–1.609)**; BGF je m² Wohnfläche = 1,30 (Band 1,25–1,40; §3.9 **abgeschätzt**) ⇒ Wertdichte 1.993–2.535 €₂₀₂₆/m² Wohnfläche ⇒ Wiederherstellungswert des Wohngebäudebestands 8,2–10,4 Bio. €₂₀₂₆ (Sensitivität: ±10 % auf den Indexfaktor verschieben den Bestandswert um ±0,8–1,0 Bio. €) | amtliche Statistik (Fortschreibung des Wohngebäude- und Wohnungsbestands auf Zensus-2022-Basis) + normierter Kostenkennwert aus Rechtsverordnung (ImmoWertV Anlage 4), fortgeschrieben mit amtlichem Preisindex | Destatis 2025, Pressemitteilung Nr. 336 vom 17.09.2025, „43,8 Millionen Wohnungen in Deutschland zum Jahresende 2024“, https://www.destatis.de/DE/Presse/Pressemitteilungen/2025/09/PD25_336_31231.html, Zugriff 13.09.2026; Destatis, Themenseite „Wohnen“ (Fortschreibung zum 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m²), https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html, Zugriff 13.09.2026; ImmoWertV, Anlage 4 (zu § 36 Abs. 1) „Normalherstellungskosten 2010 (NHK 2010)“, https://www.gesetze-im-internet.de/immowertv_2022/anlage_4.html, Zugriff 13.09.2026; Destatis, Fachserie 17 Reihe 4 „Preisindizes für die Bauwirtschaft“ (Basis 2015 = 100), https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile, Zugriff 13.09.2026; Destatis 2026, PM Nr. 241 vom 10.07.2026 (Baupreise Wohngebäude Mai 2026: +5,0 % gg. Vj.), https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/07/PD26_241_61261.html, Zugriff 13.09.2026 — Volltext geprüft; Langbeleg **B4** unter der Tabelle (Mon. Z65: „Gebäudewerte“) | DE-weit. **Modellgrenzen:** (a) NHK-Standardstufe 3 als bundesweiter Einheitssatz — ohne Regionalfaktor der Gutachterausschüsse streut der Wertsatz zwischen Hoch- und Niedrigpreisregionen um schätzungsweise ±20 %; (b) **Nichtwohngebäude** (Gewerbe, öffentliche Gebäude) sind im Mengengerüst nicht enthalten — die Mengenbasis ist insoweit eine Untergrenze (§3.6); (c) NHK sind **Neubau-/Wiederherstellungswerte**; der Zeitwertansatz der Arbeitsmappe (Mon. J64; Alterswertminderung nach § 38 ImmoWertV) liegt darunter — entschieden: Neuwert bleibt Basiswert, Antrag auf Fortschreibung in §7.2, Zeitwertansatz als Band mit Alterswertminderungsfaktor 0,55 (0,40–0,75; Abschätzung von KAP3), nicht geglättet (§3.8) | Gebäudezahl und Wohnfläche je Zelle aus dem Zensus-2022-Gitter (100 m) bzw. den amtlichen Hausumringen; Datenebene GEBAEUDEWERT **neu anzulegen** (§3.1, Spezifikation in Kap. 3), Fortschreibung über die Destatis-Bestandsfortschreibung; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Basiswert** — FS-Mengengerüst: Wohnfläche je Zelle × Wertdichte €₂₀₂₆/m²; der Zeitwertansatz (§7.2) sowie die abgeschätzten Faktoren (Indexierung 2023→2026, BGF/Wohnfläche) laufen als Sensitivitätsband mit und werden im Produkt nach Vorgabe P1/P2 als Abschätzung von KAP3 ausgewiesen |
+| 60-R24-01 | R24 Gebäude → Mengengerüst (Gebäudewerte) | **Menge:** 19,7 Mio Wohngebäude (13,5 Mio Einfamilien-, 2,7 Mio Zweifamilien-, 3,5 Mio Mehrfamilienhäuser), 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche (31.12.2024) ⇒ 208 m² Wohnfläche je Wohngebäude; Fortschreibung 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m². **Wertsatz (Wiederherstellung/Neubauwert):** NHK 2010 Standardstufe 3 (mittlerer Standard) = 1.050 €₂₀₁₀/m² BGF (freistehende Ein-/Zweifamilienhäuser, Geb.-Art 1.01) bzw. 825 €₂₀₁₀/m² BGF (Mehrfamilienhäuser ≤ 6 WE), je inkl. Umsatzsteuer und Baunebenkosten; Indexierung mit dem Baupreisindex Wohngebäude (2015 = 100: 2010 = 89,1 → 2023 = 149,8, Faktor 1,681) ⇒ 1.765 bzw. 1.387 €₂₀₂₃/m² BGF; Fortschreibung 2023 → Preisstand 2026 mit Faktor 1,105 (Band 1,07–1,16; §3.9 **abgeschätzt**, Kette in B4) ⇒ **1.950 €₂₀₂₆/m² BGF (Band 1.890–2.043)** bzw. **1.533 €₂₀₂₆/m² BGF (Band 1.485–1.606)** (Bandenden mit den ungerundeten Faktoren 1,023³ = 1,0706 und 1,050³ = 1,1576 gerechnet, B4 Rechenschritt 2); BGF je m² Wohnfläche = 1,30 (Band 1,25–1,40; §3.9 **abgeschätzt**) ⇒ Wertdichte als **Typ-Spanne** 1.993 (MFH) bis 2.535 (EFH/ZFH) €₂₀₂₆/m² Wohnfläche, als **Unsicherheitsband** mit beiden Faktorbändern 1.856–2.860 €₂₀₂₆/m² Wohnfläche ⇒ Wiederherstellungswert des Wohngebäudebestands als Typ-Spanne 8,2 (MFH) bis 10,4 (EFH/ZFH) Bio. €₂₀₂₆, als Unsicherheitsband 7,6–11,7 Bio. €₂₀₂₆ (B4 Rechenschritte 3 und 4; Sensitivität: ±10 % auf den Indexfaktor verschieben den Bestandswert um ±0,8–1,0 Bio. €) | amtliche Statistik (Fortschreibung des Wohngebäude- und Wohnungsbestands auf Zensus-2022-Basis) + normierter Kostenkennwert aus Rechtsverordnung (ImmoWertV Anlage 4), fortgeschrieben mit amtlichem Preisindex | Destatis 2025, Pressemitteilung Nr. 336 vom 17.09.2025, „43,8 Millionen Wohnungen in Deutschland zum Jahresende 2024“, https://www.destatis.de/DE/Presse/Pressemitteilungen/2025/09/PD25_336_31231.html, Zugriff 13.09.2026; Destatis, Themenseite „Wohnen“ (Fortschreibung zum 31.12.2025: 44,0 Mio Wohnungen, 4,1 Mrd m²), https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html, Zugriff 13.09.2026; ImmoWertV, Anlage 4 (zu § 36 Abs. 1) „Normalherstellungskosten 2010 (NHK 2010)“, https://www.gesetze-im-internet.de/immowertv_2022/anlage_4.html, Zugriff 13.09.2026; Destatis, Fachserie 17 Reihe 4 „Preisindizes für die Bauwirtschaft“ (Basis 2015 = 100), https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile, Zugriff 13.09.2026; Destatis 2026, PM Nr. 241 vom 10.07.2026 (Baupreise Wohngebäude Mai 2026: +5,0 % gg. Vj.), https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/07/PD26_241_61261.html, Zugriff 13.09.2026 — Volltext geprüft; Langbeleg **B4** unter der Tabelle (Mon. Z65: „Gebäudewerte“) | DE-weit. **Modellgrenzen:** (a) NHK-Standardstufe 3 als bundesweiter Einheitssatz — ohne Regionalfaktor der Gutachterausschüsse streut der Wertsatz zwischen Hoch- und Niedrigpreisregionen um schätzungsweise ±20 %; (b) **Nichtwohngebäude** (Gewerbe, öffentliche Gebäude) sind im Mengengerüst nicht enthalten — die Mengenbasis ist insoweit eine Untergrenze (§3.6); (c) NHK sind **Neubau-/Wiederherstellungswerte**; der Zeitwertansatz der Arbeitsmappe (Mon. J64; Alterswertminderung nach § 38 ImmoWertV) liegt darunter — entschieden: Neuwert bleibt Basiswert, Antrag auf Fortschreibung in §7.2, Zeitwertansatz als Band mit Alterswertminderungsfaktor 0,55 (0,40–0,75; Abschätzung von KAP3), nicht geglättet (§3.8) | Gebäudezahl und Wohnfläche je Zelle aus dem Zensus-2022-Gitter (100 m) bzw. den amtlichen Hausumringen; Datenebene GEBAEUDEWERT **neu anzulegen** (§3.1, Spezifikation in Kap. 3), Fortschreibung über die Destatis-Bestandsfortschreibung; Abgleich nach §3.4 auf Bundesland- und Gemeindepunkt-Stichproben, kein Vollraster-Lauf | **Basiswert** — FS-Mengengerüst: Wohnfläche je Zelle × Wertdichte €₂₀₂₆/m²; der Zeitwertansatz (§7.2) sowie die abgeschätzten Faktoren (Indexierung 2023→2026, BGF/Wohnfläche) laufen als Sensitivitätsband mit und werden im Produkt nach Vorgabe P1/P2 als Abschätzung von KAP3 ausgewiesen |
 | 60-R23-01 | R23 Bau- und Immobilienunternehmen → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
 | 60-R25-01 | R25 Siedlungsinfrastrukturen → Gebäudeschaden | offen | offen | offen | offen | offen | offen |
 
@@ -365,12 +369,27 @@ Eine Jahresdurchschnitts-Indexreihe bis 2026 liegt in der geprüften Fachserie n
 amtlichen Veränderungsraten sind punktuell veröffentlicht (November 2025 +3,2 %, Februar 2026
 +3,3 %, Mai 2026 +5,0 % gegenüber dem jeweiligen Vorjahresmonat). Angesetzt werden drei
 Jahresschritte (2024, 2025, 2026) mit je 3,4 % ⇒ 1,034³ = 1,1055 ⇒ **Faktor 1,105**. Bandbreite:
-unteres Ende drei Schritte à 2,3 % (1,023³ = 1,071), oberes Ende drei Schritte à 5,0 %
-(1,050³ = 1,158) ⇒ **Band 1,07–1,16**. Ergebnis: 1.765 × 1,105 = 1.950,3 ⇒
-**1.950 €₂₀₂₆/m² BGF** (Band 1.889–2.047); 1.387 × 1,105 = 1.532,6 ⇒ **1.533 €₂₀₂₆/m² BGF**
-(Band 1.484–1.609). **Produkt-Kennzeichnung (Vorgabe P1/P2):** der Fortschreibungsfaktor ist eine
-begründete Abschätzung von KAP3, keine Quellenangabe, und wird in der nutzersichtbaren
-Parameterliste als solche geführt.
+unteres Ende drei Schritte à 2,3 % (1,023³ = 1,0706), oberes Ende drei Schritte à 5,0 %
+(1,050³ = 1,1576) ⇒ **Band 1,07–1,16** (gerundete Anzeige; gerechnet wird mit 1,0706 und 1,1576).
+**Woher die Jahresraten kommen (§3.9 Abgeschätzt, Vorgabe P1).** Nur das obere Bandende ist
+belegt: 5,0 % ist der höchste der drei zitierten amtlichen Werte (Mai 2026). Die beiden anderen
+Raten sind **gerundete Setzungen von KAP3**, nicht aus den Monatswerten errechnet: Der Zentralwert
+3,4 % liegt zwischen dem Median (3,3 %) und dem arithmetischen Mittel (3,8 %) der drei zitierten
+Werte, näher am Median, weil der Mai-Wert ein einzelner Monat am aktuellen Rand ist und die beiden
+älteren Werte (3,2 %/3,3 %) zwei der drei Fortschreibungsjahre abbilden. Richtung und Größe der
+Setzung: mit dem Median ergäbe sich 1,033³ = 1,102 (−0,3 % gegenüber 1,105), mit dem Mittel
+1,038³ = 1,119 (+1,3 %) — beide innerhalb des Bandes. Das untere Bandende 2,3 % liegt rund einen
+Prozentpunkt unter dem niedrigsten zitierten Wert (3,2 %), weil für das Jahr 2024 keine Rate
+zitiert ist und ein Jahresdurchschnitt unter den Monatswerten vom Jahresende 2025 liegen kann.
+Ergebnis: 1.765 × 1,105 = 1.950,3 ⇒ **1.950 €₂₀₂₆/m² BGF** (Band 1.765 × 1,0706 = 1.889,6 bis
+1.765 × 1,1576 = 2.043,2 ⇒ **1.890–2.043**); 1.387 × 1,105 = 1.532,6 ⇒ **1.533 €₂₀₂₆/m² BGF**
+(Band 1.387 × 1,0706 = 1.484,9 bis 1.387 × 1,1576 = 1.605,6 ⇒ **1.485–1.606**). **Modellgrenze:**
+Die Jahresraten sind gesetzt, nicht aus einer amtlichen Jahresdurchschnittsreihe gemessen; der
+Zentralwert 1.950 / 1.533 hängt an der Setzung 3,4 % (Wirkung der Alternativen Median/Mittel:
+−0,3 % bzw. +1,3 % auf \(n_t\)); erscheint die Jahresdurchschnittsreihe bis 2026, wird der Schritt
+durch den gemessenen Indexstand ersetzt (Rechenschritt 4, „Kopplung“). **Produkt-Kennzeichnung
+(Vorgabe P1/P2):** der Fortschreibungsfaktor ist eine begründete Abschätzung von KAP3, keine
+Quellenangabe, und wird in der nutzersichtbaren Parameterliste als solche geführt.
 
 **Rechenschritt 3 (§3.9 Abgeschätzt) — BGF je m² Wohnfläche.** Die amtliche Bestandsstatistik
 führt Wohnfläche, die NHK je m² Brutto-Grundfläche; eine bundesweite amtliche BGF-Statistik des
@@ -378,11 +397,16 @@ Bestands existiert nicht (**Datenlücke §3.8**). Angesetzt wird BGF/Wohnfläche
 (Band 1,25–1,40) — begründet damit, dass Wohnfläche weder Konstruktionsflächen (Außen- und
 Innenwände) noch Erschließungs-, Keller- und Nebenflächen enthält, die in der BGF mitzählen.
 Ergebnis: 1.533 × 1,30 = 1.992,9 ⇒ **1.993 €₂₀₂₆/m² Wohnfläche** (Mehrfamilienhaus) und
-1.950 × 1,30 = 2.535 ⇒ **2.535 €₂₀₂₆/m² Wohnfläche** (Ein-/Zweifamilienhaus).
+1.950 × 1,30 = 2.535 ⇒ **2.535 €₂₀₂₆/m² Wohnfläche** (Ein-/Zweifamilienhaus). Die Spanne
+1.993–2.535 ist eine **Typ-Spanne** (reiner MFH- gegen reinen EFH/ZFH-Satz), kein
+Unsicherheitsband. Das **Unsicherheitsband** entsteht erst, wenn die Bänder der beiden
+abgeschätzten Faktoren fortgepflanzt werden (alle Enden gleichgerichtet): unten 1.484,9 × 1,25 =
+1.856 (MFH), oben 2.043,2 × 1,40 = 2.860 (EFH/ZFH) ⇒ **1.856–2.860 €₂₀₂₆/m² Wohnfläche**.
 
 **Rechenschritt 4 (§3.9 Abgeleitet) — Bestandsprobe und Sensitivität.** 4,1 Mrd m² Wohnfläche ×
-1.993 bis 2.535 €₂₀₂₆/m² = 8,17 bis 10,39 ⇒ **8,2 bis 10,4 Bio. €₂₀₂₆** Wiederherstellungswert des
-Wohngebäudebestands; je Wohngebäude 4,1 Mrd m² ÷ 19,7 Mio = **208 m² Wohnfläche**. Sensitivität:
+1.993 bis 2.535 €₂₀₂₆/m² = 8,17 bis 10,39 ⇒ **8,2 (MFH) bis 10,4 (EFH/ZFH) Bio. €₂₀₂₆**
+Wiederherstellungswert des Wohngebäudebestands als Typ-Spanne; mit dem Unsicherheitsband der
+Wertdichte 4,1 Mrd m² × 1.856 bis 2.860 €₂₀₂₆/m² = 7,61 bis 11,73 ⇒ **7,6–11,7 Bio. €₂₀₂₆**; je Wohngebäude 4,1 Mrd m² ÷ 19,7 Mio = **208 m² Wohnfläche**. Sensitivität:
 ±10 % auf den Fortschreibungsfaktor verschieben den Bestandswert um ±0,8 bis 1,0 Bio. €; der
 BGF-Faktor 1,25 statt 1,40 verschiebt ihn um −11 %. **Kopplung (§3.9):** die Wertdichte hängt am
 Baupreisindex; erscheint die Jahresdurchschnittsreihe bis 2026, wird Rechenschritt 2 durch den
@@ -541,7 +565,8 @@ Erwartungsschaden des Kontos K3 aus flussseitiger Überflutung**, Zeichen \(\tex
 
 - **Einheit:** Euro je Jahr, im Preisstand des Berichts — **€₂₀₂₆/a**.
 - **Bezugsjahr (Preisstand):** **2026**, einheitlich für alle Kostensätze dieses Berichts
-  (Kap. 1, „Konto-Einbettung“: Preisstandjahr 2026, §3.9 abgeschätzt, mit Ersetzungspfad). Die
+  (Kap. 1, „Konto-Einbettung“: Preisstandjahr 2026, abgeleitet aus Register 60-R24-01; §3.9
+  abgeschätzt ist allein der Fortschreibungsfaktor 2023 → 2026). Die
   Wertsätze der Ebene GEBAEUDEWERT sind auf genau diesen Preisstand indexiert (Register
   60-R24-01, Langbeleg B4).
 - **Betrachtungsebene:** die **Kommune**; gerechnet wird auf 100-m-Zellen innerhalb der Kommune,
@@ -698,8 +723,8 @@ KAP3, Richtung: unterschätzt den Tail, weil dort die Schadensquote noch steigt.
 $$ \text{EAD}_z \;=\; \bar A_z \cdot w_z, \qquad w_z \;=\; k_{\text{BGF}} \cdot \sum_t \theta_{z,t}\, n_t \qquad [\text{€}_{2026}/\text{a}] $$
 
 Die Wertsätze \(n_t\) sind im Kern belegt, mit abgeschätztem Fortschreibungsfaktor (§3.9), und auf den Preisstand 2026 indexiert (Register 60-R24-01, B4):
-\(n_{\text{EFH/ZFH}} = 1.950\) €₂₀₂₆/m² BGF (Band 1.889–2.047),
-\(n_{\text{MFH}} = 1.533\) €₂₀₂₆/m² BGF (Band 1.484–1.609). Der Umrechnungsfaktor
+\(n_{\text{EFH/ZFH}} = 1.950\) €₂₀₂₆/m² BGF (Band 1.890–2.043),
+\(n_{\text{MFH}} = 1.533\) €₂₀₂₆/m² BGF (Band 1.485–1.606). Der Umrechnungsfaktor
 \(k_{\text{BGF}} = 1{,}30\) m² BGF je m² Wohnfläche (Band 1,25–1,40) ist eine **Abschätzung von
 KAP3** (§3.9, Herleitung in Register 60-R24-01: Verhältnis von Brutto-Grundfläche zu Wohnfläche
 im Wohnungsbau, Band aus der Spannweite zwischen kompakten Mehrfamilien- und gegliederten
@@ -1089,7 +1114,7 @@ Sensitivität mit (Mittelwert \(A_{\text{ver}}\) je Fenster aus
 | 2002–2024 ohne 2021 | 22 | **1,349** | 0,831 | **0,611** |
 | 2014–2024 ohne 2021 | 10 | **1,010** | 0,622 | **0,457** |
 
-Gegen die hergeleitete Plausibilitätsschranke [0,11; 3,44] aus §4.4 liegen **alle vier**
+Gegen die hergeleitete Plausibilitätsschranke [0,11; 3,49] aus §4.4 liegen **alle vier**
 \(\lambda\)-Werte innerhalb — auch das kürzeste Fenster (2014–2024 ohne 2021, \(\lambda\) = 0,457)
 unterschreitet die Schranke nicht mehr, seit sie aus dem vollständig fortgepflanzten Band von
 \(A^{*}\) und \(M_0\) folgt statt freihändig gesetzt zu sein (§4.4). Das Unterschreiten der
@@ -1134,7 +1159,7 @@ durch eine Messung ersetzen kann, und ändert keinen der fünf Faktoren aus 4.2.
 | Hochrechnung auf den unversicherten Bestand | \(u\) | 1,54 (1,33–1,75) | **Abschätzung von KAP3** aus der belegten Versicherungsdichte 57 % |
 | Anteil flussseitig an Starkregen + Überschwemmung | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3** (§3.9), Herleitung unten |
 | Leistung → Wiederherstellungskosten | \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3** (§3.9), Herleitung unten |
-| Preisstand 2024 → 2026 | \(\pi\) | 1,07 (1,04–1,11) | **Abschätzung von KAP3**, abgeleitet aus B4 (Register 60-R24-01) |
+| Preisstand 2024 → 2026 | \(\pi\) | 1,07 (1,039–1,124) | **Abschätzung von KAP3**, abgeleitet aus B4 (Register 60-R24-01) |
 
 **Herleitung der vier abgeschätzten Faktoren** (alle vier sind Abschätzungen von KAP3, keine
 Primärquelle; sie werden im Produkt nach Vorgabe P1 mit genau dieser Herleitung ausgewiesen):
@@ -1162,10 +1187,14 @@ Primärquelle; sie werden im Produkt nach Vorgabe P1 mit genau dieser Herleitung
   benannt: Regulierungskosten und Kulanz wirken umgekehrt, deshalb kein höherer Zentralwert.
 - \(\pi\) = 1,07. Das Register führt für 2023 → 2026 den Baupreisfaktor 1,105 (B4, Band
   1,07–1,16). Abzüglich rund 3 % Baupreisanstieg 2023 → 2024 ergibt sich \(1{,}105/1{,}03 \approx
-  1{,}073\); Band 1,04–1,11.
+  1{,}073\). Das Band ist aus dem ungerundeten B4-Band (1,023³ = 1,0706 bis 1,050³ = 1,1576,
+  Langbeleg B4, Rechenschritt 2) mit derselben Division gerechnet: \(1{,}0706/1{,}03 = 1{,}039\)
+  bis \(1{,}1576/1{,}03 = 1{,}124\) ⇒ **Band 1,039–1,124**. \(\pi\) ist damit ein abgeleiteter
+  Parameter: Zentralwert und beide Bandenden folgen aus B4, abgeschätzt sind allein die
+  B4-Jahresraten und der 3-%-Schritt 2023 → 2024 (Parameterliste §4.8).
 
 **Zielwert.** \(A^{*}\) = 1,838 · 0,65 · 1,54 · 0,50 · 1,15 · 1,07 = **1,132 Mrd. €₂₀₂₆/a**
-(Band, alle Enden gleichgerichtet: **0,30–2,26 Mrd. €₂₀₂₆/a**). Das ist der bundesweite
+(Band, alle Enden gleichgerichtet: **0,30–2,29 Mrd. €₂₀₂₆/a**). Das ist der bundesweite
 Erwartungsschaden des Kontos K3 an Wohngebäuden aus flussseitiger Überflutung, den der Anker nahe
 legt — die Größe, gegen die die Modellsumme gestellt wird.
 
@@ -1244,25 +1273,25 @@ keine Verteilungsannahme, wie in §4.2 für \(A^{*}\), Anweisung A-0034):
 |---|---|---|---|---|
 | Wohnfläche je Wohngebäude | 208 m² | **208 m²** | **208 m²** | **Quelle:** Register 60-R24-01 (4,1 Mrd. m² ÷ 19,7 Mio. Wohngebäude, amtliche Bestandsstatistik). Kein Band ausgewiesen — die Größe ist der Quotient zweier amtlicher Summen, keine Abschätzung von KAP3; sie geht deshalb unten wie oben mit demselben Punktwert ein, statt ihr ohne Beleg eine Streuung zu unterstellen. |
 | BGF-Faktor | 1,30 | **1,25** | **1,40** | **Quelle:** Register 60-R24-01, §3.9 „Abgeschätzt" (Rechenschritt 3, Band 1,25–1,40). |
-| Wertsatz | 1.950 €₂₀₂₆/m² BGF | **1.889 €₂₀₂₆/m² BGF** | **2.047 €₂₀₂₆/m² BGF** | **Quelle:** Register 60-R24-01 (Fortschreibungsfaktor 2023→2026, Band 1,07–1,16; Band 1.889–2.047). |
+| Wertsatz | 1.950 €₂₀₂₆/m² BGF | **1.890 €₂₀₂₆/m² BGF** | **2.043 €₂₀₂₆/m² BGF** | **Quelle:** Register 60-R24-01 (Fortschreibungsfaktor 2023→2026, Band 1,0706–1,1576, gerundet 1,07–1,16; Band 1.890–2.043, B4 Rechenschritt 2). |
 | Wohngebäudeanteil je Adresse | 0,872 | **0,872** | **0,872** | **Quelle:** Register 60-R17-01/60-R24-01 (19,7 Mio. Wohngebäude ÷ 22,6 Mio. Adressen, beides amtliche Bestandsstatistik, Punkt 2 oben). Kein Band ausgewiesen — Quotient zweier amtlicher Summen ohne publizierte Unsicherheit; Punktwert unten wie oben. |
 | Klassenrate GK3+GK4 | 0,0059796/a | **0,0033/a** | **0,0103/a** | **Abschätzung von KAP3**, Herleitung: Streuung der Klassenrate über die acht Anker-Kommunen (Faktor 3,1; `m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Klasse `gk3_gk4`: Minimum Deggendorf 0,0033, Maximum Grimma 0,0103), siehe Restfehler-Position 3 oben. |
 | Klassenrate GK2 | 0,00067515/a | **0,000301/a** | **0,001154/a** | **Abschätzung von KAP3**, hergeleitet analog zur Restfehler-Position 3: `m0_klassenraten.csv`, Spalte `rate_exponiert_hqextrem_1_pro_a`, Klasse `gk2` — Minimum Reichertshofen 0,000301, Maximum Halle (Saale) 0,001154. Für GK2 beziffert dieses Kapitel die Streuung nicht als eigene Restfehler-Position; das Minimum/Maximum der acht Kommunenwerte wird deshalb hier nach demselben Verfahren als KAP3-Abschätzung übernommen. |
 | Exponierte Adressen GK3+GK4 | 339.000 | **339.000** | **339.000** | **Quelle:** Register 60-R17-01 (ZÜRS Geo 2025, GK3 1,1 % + GK4 0,4 % von 22,6 Mio. Adressen; Punkt 1 oben). Kein Band ausgewiesen — die Zonierungsquote ist eine Bestandsstatistik, keine Abschätzung; Punktwert unten wie oben. |
 | Exponierte Adressen GK2 | 1.380.000 | **1.380.000** | **1.380.000** | **Quelle:** Register 60-R17-01 (ZÜRS Geo 2025, GK2 6,1 % von 22,6 Mio. Adressen; Punkt 1 oben). Kein Band ausgewiesen, aus demselben Grund wie oben. |
 
-Wert je exponiertem Wohngebäude: unten 208 · 1,25 · 1.889 = 491.140 €₂₀₂₆; Zentralwert
-208 · 1,30 · 1.950 = 527.280 €₂₀₂₆ (unverändert, Punkt 2); oben 208 · 1,40 · 2.047 = 596.086,4
+Wert je exponiertem Wohngebäude: unten 208 · 1,25 · 1.890 = 491.400 €₂₀₂₆; Zentralwert
+208 · 1,30 · 1.950 = 527.280 €₂₀₂₆ (unverändert, Punkt 2); oben 208 · 1,40 · 2.043 = 594.921,6
 €₂₀₂₆.
 
 Summenterm (Adressen × Klassenrate): unten 339.000 · 0,0033 + 1.380.000 · 0,000301 = 1.534,08/a;
 Zentralwert 339.000 · 0,0059796 + 1.380.000 · 0,00067515 = 2.958,79/a (unverändert, Punkt 3); oben
 339.000 · 0,0103 + 1.380.000 · 0,001154 = 5.084,22/a.
 
-\(M_0\)_unten = 0,872 · 491.140 € · 1.534,08/a = 656.945.337 €₂₀₂₆/a ≈ **0,657 Mrd. €₂₀₂₆/a**
-\(M_0\)_oben = 0,872 · 596.086,4 € · 5.084,22/a = 2.642.713.194 €₂₀₂₆/a ≈ **2,643 Mrd. €₂₀₂₆/a**
+\(M_0\)_unten = 0,872 · 491.400 € · 1.534,08/a = 657.354.507 €₂₀₂₆/a ≈ **0,657 Mrd. €₂₀₂₆/a**
+\(M_0\)_oben = 0,872 · 594.921,6 € · 5.084,22/a = 2.637.549.123 €₂₀₂₆/a ≈ **2,638 Mrd. €₂₀₂₆/a**
 
-Damit ist \(M_0\) = **1,360 Mrd. €₂₀₂₆/a**, mit einem Band von **0,657–2,643 Mrd. €₂₀₂₆/a** um
+Damit ist \(M_0\) = **1,360 Mrd. €₂₀₂₆/a**, mit einem Band von **0,657–2,638 Mrd. €₂₀₂₆/a** um
 diesen Zentralwert. Dieses Band ist in §4.4 und §4.8 bereits in das λ-Band und die
 Plausibilitätsschranke fortgepflanzt (Ersatzkette für Ledger-Befund 36); der Nachzug in den
 Produkt-Block `flood_bldg.lambda` (Kap. 7) und die Entscheidungslog-Zeile 8 folgt im nächsten
@@ -1272,8 +1301,8 @@ Schritt der Kette.
 ### 4.4 Der Niveau-Skalar
 
 \(\lambda = A^{*}/M_0\) = 1,132 / 1,360 = **0,832** (vollständig fortgepflanztes Band, Zähler und
-Nenner unabhängig an ihren jeweiligen Extremen, aus dem Ankerband von \(A^{*}\), 0,297–2,263
-(§4.2), und dem Band von \(M_0\), 0,657–2,643 (§4.3): **0,11–3,44**).
+Nenner unabhängig an ihren jeweiligen Extremen, aus dem Ankerband von \(A^{*}\), 0,296–2,291
+(§4.2), und dem Band von \(M_0\), 0,657–2,638 (§4.3): **0,11–3,49**).
 
 **Anwendungsregel.** \(\lambda\) ist ein **einziger, bundesweit konstanter** Faktor auf
 \(\text{EAD}_k\) jeder Kommune. Er ist kein Verteilungsschlüssel: Die relative Verteilung zwischen
@@ -1282,24 +1311,24 @@ keinen zweiten Skalar, keinen bundeslandspezifischen Korrekturfaktor und keine N
 einzelner Kommunen.
 
 **Plausibilitätsschranke.** Ergibt eine Neubestimmung \(\lambda < 0{,}11\) oder \(\lambda >
-3{,}44\), wird **nicht** der Skalar gesetzt, sondern das Modell gilt als fehlerhaft: Dann trägt
+3{,}49\), wird **nicht** der Skalar gesetzt, sondern das Modell gilt als fehlerhaft: Dann trägt
 eine Eingangsgröße den Fehler (Exponiertenzahl, Wertdichte, Schadensfunktion), und der Befund geht
-ins Ledger, bevor gerechnet wird. Die Schranke [0,11; 3,44] ist keine freihändig gesetzte
+ins Ledger, bevor gerechnet wird. Die Schranke [0,11; 3,49] ist keine freihändig gesetzte
 Abschätzung von KAP3 mehr (das war der bis hierhin geltende Stand „Faktor 2 um den Neutralwert
 1"), sondern hergeleitet: Sie ist das vollständig fortgepflanzte Band aus dem Ankerband von
-\(A^{*}\), 0,297–2,263 (§4.2), und dem Band von \(M_0\), 0,657–2,643 (§4.3) — Zähler und Nenner
+\(A^{*}\), 0,296–2,291 (§4.2), und dem Band von \(M_0\), 0,657–2,638 (§4.3) — Zähler und Nenner
 unabhängig an ihren jeweiligen Extremen, alle Enden gleichgerichtet (multiplikative Bandenden,
-keine Verteilungsannahme, Anweisung A-0034): \(\lambda_{\text{unten}}\) = 0,297 / 2,643 =
-0,112384… → **0,11**, \(\lambda_{\text{oben}}\) = 2,263 / 0,657 = 3,444409… → **3,44** (zwei
+keine Verteilungsannahme, Anweisung A-0034): \(\lambda_{\text{unten}}\) = 0,296 / 2,638 =
+0,112206… → **0,11**, \(\lambda_{\text{oben}}\) = 2,291 / 0,657 = 3,487062… → **3,49** (zwei
 Nachkommastellen, kaufmännisch gerundet). Eine Neubestimmung von \(\lambda\), die außerhalb dieser
 aus den eigenen, in §4.2 und §4.3 benannten Bandenden folgenden Spanne läge, wäre mit dem eigenen
 Modell nicht mehr verträglich — das ist die einzige ergebnisunabhängige Bezugsgröße, die ohne eine
 zusätzliche, nicht durch A-0034 gedeckte Verteilungsannahme zur Verfügung steht. Das untere
 Bandende \(\lambda\) = 0,11 **gilt als zulässig**: Es fällt nicht unter die Schranke, sondern
 bildet ihren unteren Wert, weil die Schranke gerade aus diesem Bandende hergeleitet ist, nicht
-unabhängig davon gesetzt. Das obere Bandende \(\lambda\) = 3,44 **gilt aus demselben Grund als
+unabhängig davon gesetzt. Das obere Bandende \(\lambda\) = 3,49 **gilt aus demselben Grund als
 zulässig** — auch dieses Bandende bildet den oberen Wert der Schranke selbst. Der Zentralwert
-\(\lambda\) = 0,832 **liegt innerhalb** der Schranke [0,11; 3,44]; der Skalar wird deshalb gesetzt.
+\(\lambda\) = 0,832 **liegt innerhalb** der Schranke [0,11; 3,49]; der Skalar wird deshalb gesetzt.
 Gesetzt heißt nicht endgültig: \(\lambda\) ist **weiterhin vorläufig** — die Verteilungsprüfung in
 4.5 wird nicht bestanden (Modellentscheid), und die Ledger-Befunde 35 und 36 sind offen (Einleitung
 Kap. 4).
@@ -1507,11 +1536,11 @@ die Bezifferung von \(q_0\) bleibt offen und ist als solche gekennzeichnet.
 | \(u\) | 1,54 (1,33–1,75) | **Abschätzung von KAP3** auf belegter Versicherungsdichte 57 %, Herleitung §4.2 |
 | \(\varphi_{\text{fluss}}\) | 0,50 (0,35–0,65) | **Abschätzung von KAP3**, Herleitung §4.2 |
 | \(\kappa\) | 1,15 (1,05–1,30) | **Abschätzung von KAP3**, Herleitung §4.2 |
-| \(\pi\) | 1,07 (1,04–1,11) | **Abschätzung von KAP3** aus B4 (Baupreisindex), Herleitung §4.2 |
-| \(\lambda\) Niveau-Skalar | 0,832 (0,11–3,44) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\) als Kleinste-Quadrate-Schätzer der Jahres-Auswahlregel-Reihe (§4.1a), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3) mit Wohngebäudeanteil 0,872; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein; Band vollständig fortgepflanzt aus dem \(A^{*}\)-Band (§4.2) und dem \(M_0\)-Band 0,657–2,643 (§4.3); Zentralwert innerhalb der Plausibilitätsschranke, Sensitivität je Zeitfenster in §4.1a, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
+| \(\pi\) | 1,07 (1,039–1,124) | **Abschätzung von KAP3** aus B4 (Baupreisindex), Herleitung §4.2 |
+| \(\lambda\) Niveau-Skalar | 0,832 (0,11–3,49) — **vorläufig** | **berechnet** aus \(A^{*}/M_0\) als Kleinste-Quadrate-Schätzer der Jahres-Auswahlregel-Reihe (§4.1a), §4.4, Stand nach dem Stichprobenlauf: \(M_0\) aus den gemessenen Klassenraten GK3+GK4 und GK2 (`docs/evidenz/60_stichprobe/m0_klassenraten.csv`, §4.3) mit Wohngebäudeanteil 0,872; es fließen die Abschätzungen von KAP3 \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\), \(\pi\) sowie die Restfehler der Stichprobe (§4.3) ein; Band vollständig fortgepflanzt aus dem \(A^{*}\)-Band (§4.2) und dem \(M_0\)-Band 0,657–2,638 (§4.3); Zentralwert innerhalb der Plausibilitätsschranke, Sensitivität je Zeitfenster in §4.1a, **vorläufig** wegen der offenen Ledger-Befunde 33 und 34 |
 | Baupreisanstieg 2023 → 2024 | 3 % (2,3–5,0 %) | **Abschätzung von KAP3**: gerundet aus den in B4 zitierten Jahresraten des Baupreisindex (3,2 %/3,3 %), Band wie B4; geht in \(\pi = 1{,}105/1{,}03\) ein (§4.2); Sensitivität: \(\pi\) = 1,080 bei 2,3 %, 1,052 bei 5,0 % |
 | Klassenraten Bestandsschranke (GK3/GK4; GK2) | 0,1 a⁻¹; 0,01 a⁻¹ | **Abschätzung von KAP3**, Herleitung §4.6 (Register 60-R17-01: Jährlichkeit je ZÜRS-Adressklasse, unverändert übernommen); geht linear in \(O\) ein |
-| Plausibilitätsschranke \(\lambda\) | 0,11 bzw. 3,44 | **berechnet** aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) (§4.4), Rundungsregel und Entscheidungsregel wie dort; gilt für den Zentralwert einer Neubestimmung; die Fenster-Sensitivität in §4.1a prüft die Schranke an vier \(\lambda\)-Werten, alle vier innerhalb |
+| Plausibilitätsschranke \(\lambda\) | 0,11 bzw. 3,49 | **berechnet** aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) (§4.4), Rundungsregel und Entscheidungsregel wie dort; gilt für den Zentralwert einer Neubestimmung; die Fenster-Sensitivität in §4.1a prüft die Schranke an vier \(\lambda\)-Werten, alle vier innerhalb |
 | Toleranz Verteilungsprüfung | ±11,5 Prozentpunkte | **berechnet**, Herleitung §4.5: quadratische Zusammensetzung aus Jackknife-Standardfehler der Ankerreihe ±11,2 (gerechnet aus `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), Ableseunschärfe ±1,7 und modellseitigem HQextrem-Band ±2,3; **Abschätzung von KAP3** ist daran nur die Wahl der Kombinationsregel (unabhängige Beiträge, quadratisch), vorab festgelegt. Ist-Ergebnis: Abstand 13,9 Pp, **Prüfung nicht bestanden** (Modellentscheid §4.5) |
 | \(U\) Sanity-Untergrenze | 0,0103 Mrd. €₂₀₂₆/a | teils **Quelle**, teils **Abschätzung von KAP3**, Herleitung §4.6: die beiden Fondsvolumina der Wiederaufbauhilfe-Gesetze (amtliche Quelle, BGBl.) sind belegt; Wohngebäude-/Wohnanteil, flussseitiger Anteil und die Umlage auf die Wiederkehrzeit sind Abschätzungen von KAP3 |
 | \(O\) Sanity-Obergrenze | 6,29 Mrd. €₂₀₂₆/a | **berechnet** aus den ZÜRS-Klassenraten (GK3/GK4 0,1 a⁻¹, GK2 0,01 a⁻¹), den Adresszahlen (Register 60-R17-01) und dem Gebäudewert 527.280 €₂₀₂₆ (Register 60-R24-01), gedeckelt mit der Schadensquote 0,250 (§3.3), Herleitung §4.6; es fließen die Abschätzungen von KAP3 der ZÜRS-/GDV-Registerabschätzungen ein |
@@ -1523,9 +1552,9 @@ die Bezifferung von \(q_0\) bleibt offen und ist als solche gekennzeichnet.
 A_ver, w_wg, u, phi, kappa, pi = 1.838, 0.65, 1.54, 0.50, 1.15, 1.07
 A_stern = A_ver * w_wg * u * phi * kappa * pi
 assert abs(A_stern - 1.132) < 5e-3
-lo = 1.061 * 0.55 * 1.33 * 0.35 * 1.05 * 1.04
-hi = 1.838 * 0.75 * 1.75 * 0.65 * 1.30 * 1.11
-assert abs(lo - 0.297) < 5e-3 and abs(hi - 2.263) < 5e-3
+lo = 1.061 * 0.55 * 1.33 * 0.35 * 1.05 * 1.039
+hi = 1.838 * 0.75 * 1.75 * 0.65 * 1.30 * 1.124   # pi-Band 1.0706/1.03 bis 1.1576/1.03 (B4 ungerundet)
+assert abs(lo - 0.296) < 5e-3 and abs(hi - 2.291) < 5e-3
 
 # 4.3 Modellsumme aus den gemessenen Klassenraten (docs/evidenz/60_stichprobe/m0_klassenraten.csv)
 wert_geb = 208.0 * 1.30 * 1950.0                 # EUR2026 je exponiertem Wohngebaeude
@@ -1541,7 +1570,7 @@ assert abs(M0 - 1.360) < 5e-3
 
 # 4.3 M0-Band (Vorgabe P1): Bandenden der acht Eingangsgroessen, alle gleichgerichtet
 bgf_lo, bgf_hi = 1.25, 1.40
-ws_lo, ws_hi = 1889.0, 2047.0
+ws_lo, ws_hi = 1890.0, 2043.0
 r_gk34_lo, r_gk34_hi = 0.0033, 0.0103
 r_gk2_lo, r_gk2_hi = 0.000301, 0.001154
 wert_geb_lo = 208.0 * bgf_lo * ws_lo
@@ -1551,7 +1580,7 @@ term_hi = 339_000 * r_gk34_hi + 1_380_000 * r_gk2_hi
 M0_unten = w_wohn * wert_geb_lo * term_lo / 1e9
 M0_oben = w_wohn * wert_geb_hi * term_hi / 1e9
 assert abs(M0_unten - 0.657) < 5e-3
-assert abs(M0_oben - 2.643) < 5e-3
+assert abs(M0_oben - 2.638) < 5e-3
 
 # 4.4 Niveau-Skalar: vollstaendig fortgepflanztes Lambda-Band und hergeleitete Plausibilitaetsschranke
 lam = A_stern / M0
@@ -1559,10 +1588,10 @@ assert abs(lam - 0.832) < 5e-3
 lam_lo = lo / M0_oben                       # unteres Lambda-Bandende (Zaehler/Nenner an den Extremen)
 lam_hi = hi / M0_unten                      # oberes Lambda-Bandende
 assert abs(lam_lo - 0.11) < 5e-3
-assert abs(lam_hi - 3.44) < 5e-3
+assert abs(lam_hi - 3.49) < 5e-3
 schranke_lo, schranke_hi = round(lam_lo, 2), round(lam_hi, 2)
 assert abs(schranke_lo - 0.11) < 5e-3       # Plausibilitaetsschranke unten
-assert abs(schranke_hi - 3.44) < 5e-3       # Plausibilitaetsschranke oben
+assert abs(schranke_hi - 3.49) < 5e-3       # Plausibilitaetsschranke oben
 assert schranke_lo <= lam <= schranke_hi    # Zentralwert liegt innerhalb der Schranke
 
 # 4.5 Verteilungspruefung Ereignisregime: Anteil ab HQ100 gegen Ankerbefund
@@ -1972,7 +2001,7 @@ parameter:
   id: flood_bldg.n_efh_zfh
   wert: 1950
   einheit: "EUR2026/m2 BGF"
-  band: [1889, 2047]
+  band: [1890, 2043]
   herkunft: register:60-R24-01
   kennzeichnung: abschaetzung_kap3
   herleitung_anker: "#kernformel-zelle"
@@ -1987,7 +2016,7 @@ parameter:
   id: flood_bldg.n_mfh
   wert: 1533
   einheit: "EUR2026/m2 BGF"
-  band: [1484, 1609]
+  band: [1485, 1606]
   herkunft: register:60-R24-01
   kennzeichnung: abschaetzung_kap3
   herleitung_anker: "#kernformel-zelle"
@@ -2198,7 +2227,7 @@ parameter:
   id: flood_bldg.pi
   wert: 1.07
   einheit: "-"
-  band: [1.04, 1.11]
+  band: [1.039, 1.124]
   herkunft: herleitung:§4.2
   kennzeichnung: abschaetzung_kap3
   herleitung_anker: "#kalibrierung-zielwert"
@@ -2212,7 +2241,7 @@ parameter:
   id: flood_bldg.lambda
   wert: 0.832
   einheit: "-"
-  band: [0.11, 3.44]
+  band: [0.11, 3.49]
   herkunft: herleitung:§4.4
   kennzeichnung: abschaetzung_kap3
   herleitung_anker: "#niveau-skalar"
@@ -2554,4 +2583,4 @@ Materialband \(f_{\text{S094}}\) = 1,00 (0,84–1,18) in Ansatz (a).
 | 5 | Welcher Ansatz wird umgesetzt? (Ansatz-Vergleich §2.6/§3.7) | **13.09.2026 (T-0237):** Ansatz **(a)** Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle — p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp · Gebäudequalität) × Gebäudewert | einziger Ansatz, der in den sechs Güte-Kriterien durchgehend „hoch“ trägt (das siebte Kriterium Aufwand läuft umgekehrt: dort ist „gering“ günstig, (a) liegt mit „mittel“ über (b) und weit unter (c) und ist nach §3.4 ressourcenverträglich): vollständig aus frei zugänglichen, im Register belegten Datenebenen speisbar, Wirkungsort für S092 und die R7-Weiche vorhanden, Schicht-B-Form mit physischer Zwischengröße vor dem Euro, Kalibrierung und Abgleich auf Stichprobenebene ohne nationalen Vollraster-Lauf (§3.4) | (b) aggregierte Flächenschadensrate — kein Wirkungsort für den Maßnahmen-Hebel, tragender Wert nur aus niederländischer Fallstudie (B2); als Ergänzungsmodul vorgesehen. (c) Schadensgradmodell D0–D6 am Einzelgebäude — Bauweise/Bauzustand bundesweit nicht erhoben, Umrechnung Grad → Euro nicht belegt | Umsetzungsgrundlage für Kap. 3 und Prototyp der Familie K3/K4-Ereignisschäden (bindet später #50 und #47); Kopfzeile und Kap. 9 nachgezogen |
 | 6 | Divergenz Bericht ↔ Code bei den Namenslisten von #60 (Befund 13) | **13.09.2026 (T-0243):** Bericht auf den belegbaren Stand korrigiert (Kap. 1: Teilmenge mit abweichender Namensquelle statt „genau"); Code (`backend/app/data/catalog.py`, `kwra_id: 60`) bleibt unverändert | eiserne Regel 5 — Divergenz Bericht ↔ Code wird nie still im Code gefixt; Angleichen des Codes ist Aufgabe der Integration, nicht dieses Berichtsschritts | Code stillschweigend an W117 nachziehen (verstieße gegen eiserne Regel 4/5, kein Prüfmittel im Rahmen dieses Pakets) | Divergenz als Integrationspunkt für `/integriere-risiko 60` geführt: `sensitivity_names` und `upstream_names` in `catalog.py` müssen dort gegen die 7 Sensitivitäten und 8 Wirkungs-Eingänge von W117 abgeglichen werden |
 | 7 | Neuwert oder Zeitwertansatz der Arbeitsmappe (Mon. J65 → J64) als Basiswert K3? (Befund 41) | **17.09.2026 (T-0285):** Neuwert (NHK, indexiert, 527.280 €₂₀₂₆ je Wohngebäude) bleibt Basiswert; Zeitwertansatz als Sensitivitätsband mit \(f_{\text{AWM}}\) = 0,55 (0,40–0,75, Abschätzung von KAP3); Abweichung von J64 als Antrag auf Fortschreibung in §7.2 | W1/W6: der Anker \(A^{*}\) ist neuwertbasiert (gleitender Neuwert, §4.2); eine Umstellung nur des Basiswerts ließe den kalibrierten Betrag unverändert und höbe \(\lambda\) auf 1,32 (bis 1,81) (**nachgezogen 17.09.2026 (T-0313)** auf die M0-Revision aus Befund 32: \(M_0\) = 1,360 statt 0,940 Mrd. €₂₀₂₆/a, \(\lambda\) = 0,724; die Entscheidung selbst bleibt unberührt); ein konsistenter Zeitwertansatz braucht eine quellenlose Anker-Umrechnung | Zeitwertansatz übernehmen und \(A^{*}\), \(U\), \(O\) mit \(f_{\text{AWM}}\) umrechnen | Basiswert, \(M_0\) und \(\lambda\) unverändert; Sensitivität K3-Betrag 0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a (−45 %); Kap. 6 Modellgrenze 9 und Versionsstempel präzisiert |
-| 8 | Anker \(A^{*}\) aus dem Einzeljahr 2024 oder aus dem Mehrjahresmittel 2002–2024 der GDV-Reihe? (Befund 34) | **17.09.2026 (T-0320):** Mehrjahresmittel per Kleinste-Quadrate-Ankerbestimmung (§4.1/§4.4): \(A^{*}\) = 1,132 Mrd. €₂₀₂₆/a | ein Einzeljahr trägt die volle Jahreswitterung (Hochwasserereignisse streuen stark zwischen den Jahren) und wäre kein robuster Anker für einen langfristigen Skalar; die Kleinste-Quadrate-Bestimmung über die gesamte Reihe 2002–2024 glättet diese Streuung und ist reproduzierbar aus den veröffentlichten Jahreswerten | Anker aus dem letzten verfügbaren Einzeljahr (2024) | \(A^{*}\) = 1,132 (statt 0,985 nach dem verworfenen Stichprobenlauf), \(\lambda\) = 0,832, Band 0,11–3,44; §7.2 Zeitwert-Sensitivität 1,51 (2,08) |
+| 8 | Anker \(A^{*}\) aus dem Einzeljahr 2024 oder aus dem Mehrjahresmittel 2002–2024 der GDV-Reihe? (Befund 34) | **17.09.2026 (T-0320):** Mehrjahresmittel per Kleinste-Quadrate-Ankerbestimmung (§4.1/§4.4): \(A^{*}\) = 1,132 Mrd. €₂₀₂₆/a | ein Einzeljahr trägt die volle Jahreswitterung (Hochwasserereignisse streuen stark zwischen den Jahren) und wäre kein robuster Anker für einen langfristigen Skalar; die Kleinste-Quadrate-Bestimmung über die gesamte Reihe 2002–2024 glättet diese Streuung und ist reproduzierbar aus den veröffentlichten Jahreswerten | Anker aus dem letzten verfügbaren Einzeljahr (2024) | \(A^{*}\) = 1,132 (statt 0,985 nach dem verworfenen Stichprobenlauf), \(\lambda\) = 0,832, Band 0,11–3,49; §7.2 Zeitwert-Sensitivität 1,51 (2,08) |
