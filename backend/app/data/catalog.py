@@ -320,7 +320,7 @@ PLANNED_RISKS: list[dict] = [
      "cluster": "infrastruktur", "kwra_field": "Bauwesen", "stage": 1,
      "hazard_names": ["Hitze", "Sonnenscheindauer"],
      "upstream_names": ["Vegetation in Siedlungen"],
-     "sensitivity_names": ["Begrünung von Städten / Siedlungen", "Grad der Versiegelung"],
+     "sensitivity_names": ["Verwendete Baumaterialien auf Gebäudeebene", "Begrünung von Gebäuden", "Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand", "Zustand von (Schutz-)Infrastrukturen", "Verwendete Baumaterialien von (Schutz-)Infrastrukturen", "Begrünung von Städten / Siedlungen", "Grad der Versiegelung"],
      "exposure_names": ["Vorkommen von Bau- und Immobilienunternehmen", "Vorkommen von Gebäuden", "Vorkommen von Siedlungsinfrastrukturen"]},
     {"kwra_id": 63, "name": "Innenraumklima",
      "cluster": "infrastruktur", "kwra_field": "Bauwesen", "stage": 1,
