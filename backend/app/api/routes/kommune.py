@@ -3,9 +3,10 @@ import os
 import shutil
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import Response
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import shape as shapely_shape, mapping
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 
 from app.api.deps import require_admin, require_user, user_kommune_ids
 from app.api.gzip_files import file_etag, gzip_json_file_response
@@ -16,10 +17,12 @@ from app.models.models import (
     CellAssessment, GridCell, AdaptationMeasure,
     MeasureImpact, ProjectStatus, RiskZone, GeoExportJob,
 )
+from app.services.bestandsaufnahme_markdown import bestandsaufnahme_markdown
 from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
 from app.services import (
-    aggregate_cache, artifact_rebuild, dashboard_cache, kommune_profile_service,
+    aggregate_cache, artifact_rebuild, bestandsaufnahme_service, dashboard_cache,
+    kommune_profile_service,
     osm_service, grid_service, layer_cache,
 )
 
@@ -120,6 +123,31 @@ async def get_kommune_profile(kommune_id: int, request: Request, db: Session = D
     path, etag = art
     return gzip_json_file_response(
         request, path, etag=etag, download_name=f"profile-{kommune_id}.json",
+    )
+
+
+@router.get("/{kommune_id}/bestandsaufnahme")
+async def get_kommune_bestandsaufnahme(kommune_id: int, db: Session = Depends(get_db)):
+    """Bestandsaufnahme der Kommune als Markdown-Bericht (Zeile 16, T-0447).
+
+    Mandantenschutz über die Router-Dependency ``require_kommune_access``.
+    Geladen werden nur die Spalten, die der Dienst braucht (keine Geometrie);
+    der blockierende Datenzugriff läuft wie beim Profil in einem Thread.
+    """
+    kommune = (
+        db.query(Kommune)
+        .options(load_only(Kommune.id, Kommune.name, Kommune.osm_id))
+        .filter(Kommune.id == kommune_id)
+        .first()
+    )
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    ergebnis = await asyncio.to_thread(
+        bestandsaufnahme_service.bestandsaufnahme_fuer_kommune, db, kommune,
+    )
+    return Response(
+        content=bestandsaufnahme_markdown(ergebnis),
+        media_type="text/markdown; charset=utf-8",
     )
 
 
