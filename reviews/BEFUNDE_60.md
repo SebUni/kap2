@@ -5700,6 +5700,24 @@ an den Prüfsteinen, gegen die sie stehen.
 | 96 | B | §4.6: Weitung beziffert und begründet, Band fixiert; \(U\) aus beiden Fondsvolumina auf das Ankerfenster; Empfindlichkeit von \(U\) aus den Bändern von \(w\) und \(f_{\text{fluss}}\); Abstände als Kennzahl. | wortgleich in der Kopftabelle | behoben |
 | 97 | B | §4.8: Zeilen \(E_{\text{fonds}}\), \(w\), \(f_{\text{fluss}}\), \(N\), \(O_u\); \(U\) mit Band und Verweis; \(T\) entfällt. Kopfzeile 37 trägt den Ablösungsvermerk („Klassenraten Bestandsschranke“); die Einträge zu 37 in Runde 2 und in der Autor-Revision nach Runde 2 bleiben wortgleich. | wortgleich in der Kopftabelle | behoben |
 
+**Nacharbeit Runde 1 (Urteil des Prüfers vom 23.09.2026).** (i) Kap. 7, Block `flood_bldg.lambda`,
+`vorlaeufig_grund`: nennt nur noch Befund 33 als offen (35 behoben, 36 bestätigt geschlossen), wie die
+Einleitung von Kap. 4. (ii) §4.4 und §4.8: Die Begründung der Schranke sagt jetzt, dass die
+Eingangsgrößen von \(M_0\) **zusammen** um mehr als den Faktor 2 danebenliegen (bei drei
+multiplikativen Größen genügen je rund 26 %, \(2^{1/3}\) = 1,26), und begründet, warum das ein
+Modellfehler ist und kein Kalibrierrest: Auch alle Eingangsgrößen gleichzeitig an ihren ungünstigen
+Bandenden verschieben \(M_0\) nur auf das 0,47- bzw. 1,95-Fache (§4.3). Der frühere Satz „mindestens
+eine dieser Größen um mehr als das Doppelte“ war ein Fehlschluss. (iii) §4.6: Der Rechenweg ist mit
+den exakten Brüchen angeschrieben — 43,47 · (1/9) · 0,90 / 23 = 0,189 und 43,47 · (1/6) · 1,00 / 23 =
+0,315 statt der gerundeten 0,11 bzw. 0,167, die nachgerechnet 0,187 bzw. 0,316 ergaben (Fehlerart
+wie Befund 62). (iv) §4.3 und der Blockkommentar zu §4.4: Das \(M_0\)-Band geht nur noch in das
+Unsicherheitsband von \(\lambda\) ein, nicht mehr in die Plausibilitätsschranke.
+(v) **Widerspruch zur Kopfzeile 36:** Deren Nachweisspalte sagt „Die gesetzte Schranke 0,50/2,00
+existiert nicht mehr“. Mit T-0574 gilt eine Schranke [0,5; 2,0] wieder — jetzt als ausgewiesene
+Abschätzung von KAP3 mit Begründung und getrennt vom fortgepflanzten Band, das Befund 36 verlangt
+hatte und das als Unsicherheitsband bestehen bleibt. Die Kopfzeile 36 bleibt als Nachweis ihres
+Pakets wortgleich; sie ist in diesem Punkt durch T-0574 überholt.
+
 **Bewusst nicht angefasst.** Die Nachweisspalte der Kopfzeile 92 nennt noch „\(U\) = 0,0103 (§4.6)"
 als Stand von T-0573; sie ist ein Nachweis jenes Pakets und bleibt wortgleich — §7.2 selbst ist auf
 0,189 nachgezogen. `backend/scripts/lint_methodik.py` prüft das Sanity-Band nicht eigens; ein

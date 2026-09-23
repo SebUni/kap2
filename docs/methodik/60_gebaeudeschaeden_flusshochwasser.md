@@ -1327,8 +1327,8 @@ Zentralwert 339.000 · 0,0059796 + 1.380.000 · 0,00067515 = 2.958,79/a (unverä
 \(M_0\)_oben = 0,872 · 547.073,95 € · 5.084,22/a = 2.425.419.445 €₂₀₂₆/a ≈ **2,425 Mrd. €₂₀₂₆/a**
 
 Damit ist \(M_0\) = **1,243 Mrd. €₂₀₂₆/a**, mit einem Band von **0,583–2,425 Mrd. €₂₀₂₆/a** um
-diesen Zentralwert. Dieses Band ist in §4.4 und §4.8 bereits in das λ-Band und die
-Plausibilitätsschranke fortgepflanzt (Ersatzkette für Ledger-Befund 36) und ebenso in den
+diesen Zentralwert. Dieses Band ist in §4.4 und §4.8 in das Unsicherheitsband von λ fortgepflanzt (Ersatzkette
+für Ledger-Befund 36; die Plausibilitätsschranke ist seit T-0574 davon getrennt, §4.4) und ebenso in den
 Produkt-Block `flood_bldg.lambda` (Kap. 7) und die Entscheidungslog-Zeile 8 nachgezogen.
 
 <a id="niveau-skalar"></a>
@@ -1368,8 +1368,17 @@ gleicht nur den gemeinsamen Niveaufehler von \(M_0\) aus. Jede der tragenden Ein
 \(M_0\) — exponierte Adressen je Klasse, Wertsatz je Gebäude, Schadensquote aus der
 Schadensfunktion — ist aus einer eigenen Quelle belegt (§4.3, Register 60-R17-01, 60-R24-01, §3.3).
 Muss der Skalar das Modellniveau um mehr als den **Faktor 2** nach oben oder unten verschieben,
-liegt mindestens eine dieser Größen um mehr als das Doppelte daneben; das ist kein
-Kalibrierrest mehr, sondern ein Fehler im Modell. Der Faktor 2 ist eine **Abschätzung von KAP3**
+liegen diese Eingangsgrößen **zusammen** um mehr als den Faktor 2 daneben — weil sie sich
+multiplizieren, genügt dafür schon, dass jede der drei um rund 26 % in dieselbe Richtung abweicht
+(\(2^{1/3}\) = 1,26). Warum das als Modellfehler gilt und nicht als Kalibrierrest: Ein
+Kalibrierrest ist die Niveauabweichung, die sich aus der belegten Unsicherheit der Eingangsgrößen
+erklären lässt. Selbst wenn alle Eingangsgrößen von \(M_0\) gleichzeitig an ihren ungünstigen
+Bandenden liegen, verschiebt sich \(M_0\) nur auf das 0,47- bzw. 1,95-Fache seines Zentralwerts
+(0,583 / 1,243 bzw. 2,425 / 1,243, §4.3), also knapp innerhalb des Faktors 2. Ein darüber hinaus
+nötiger Ausgleich lässt sich mit den belegten Bändern nicht mehr erklären und deutet auf eine
+Eingangsgröße außerhalb ihres Bandes (falsche Quelle, falsche Einheit, fehlende Klasse). Das
+\(M_0\)-Band dient dabei nur als Stütze der Plausibilität, nicht als Herleitung: Die Schranke
+bewegt sich nicht mit ihm. Der Faktor 2 ist eine **Abschätzung von KAP3**
 (§3.9), keine Messung; er ist der frühere, vor der Herleitung aus den Bändern (Ledger-Befund 36) geltende Stand
 („Faktor 2 um den Neutralwert 1"), jetzt mit dieser Begründung und getrennt vom Unsicherheitsband ausgewiesen. **Sensitivität der Wahl:**
 Mit Faktor 2 liegt das kürzeste Fenster aus §4.1a (\(\lambda\) = 0,500, genau 0,5004) knapp
@@ -1487,7 +1496,7 @@ den Prüfstein bilden, von der **Modellschranke**, die nur mitgeführt wird.
 
 | Grenze | Wert | Herleitung |
 |---|---|---|
-| Untergrenze \(U\) (unabhängig) | **0,189 Mrd. €₂₀₂₆/a** | amtliche Ereignisbilanz der beiden Wiederaufbauhilfe-Gesetze (`docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv`), beide im Ankerfenster 2002–2024: Fondsvolumen 8 Mrd. € (2013, AufbhG § 4 Abs. 1 Satz 1), fortgeschrieben mit 2 %/a über 13 Jahre (\(1{,}02^{13} = 1{,}294\)) zu 10,35 Mrd. €₂₀₂₆, und 30 Mrd. € (2021), fortgeschrieben über 5 Jahre (\(1{,}02^{5} = 1{,}104\)) zu 33,12 Mrd. €₂₀₂₆; zusammen \(E_{\text{fonds}}\) = **43,47 Mrd. €₂₀₂₆**. Davon der Wohngebäudeanteil \(w\) = 1/3 · 1/3 ≈ 0,11 (**Abschätzung von KAP3**, Band 0,06–0,17: ein Drittel der Mittel für private Haushalte neben Infrastruktur und Wirtschaft/Landwirtschaft, davon ein Drittel für die Gebäudesubstanz ohne Hausrat und Fahrzeuge; Band aus einem Haushaltsanteil von 1/4 bis 1/2 und einem Gebäudeanteil von 1/4 bis 1/3) und der flussseitige Anteil \(f_{\text{fluss}}\) = 0,90 (**Abschätzung von KAP3**, Band 0,80–1,00: beide Ereignisse sind dokumentierte Flusshochwasser; der Abschlag trägt nicht getrennt ausgewiesenen Siel- und Sturzflutanteilen Rechnung), verteilt auf die Länge des Ankerfensters \(N\) = 23 Jahre (2002–2024, dieselben Kalibrierjahre wie §4.1 und §4.7; gezählt, keine Abschätzung): \(U = \dfrac{E_{\text{fonds}} \cdot w \cdot f_{\text{fluss}}}{N} = \dfrac{43{,}47 \cdot 0{,}11 \cdot 0{,}90}{23}\) = **0,189 Mrd. €₂₀₂₆/a**. Es ist ein Mindestwert, weil alle übrigen Hochwasserschäden des Fensters (2002 und alle Jahre ohne Aufbauhilfegesetz) hinzukommen. Keine der sechs Ankergrößen \(A_{\text{ver}}\), \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\) und \(\pi\) und keine Registergröße von \(M_0\) geht als Faktor ein. Die frühere Wiederkehrzeit \(T\) = 100 a entfällt; an ihre Stelle tritt die gezählte Fensterlänge. |
+| Untergrenze \(U\) (unabhängig) | **0,189 Mrd. €₂₀₂₆/a** | amtliche Ereignisbilanz der beiden Wiederaufbauhilfe-Gesetze (`docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv`), beide im Ankerfenster 2002–2024: Fondsvolumen 8 Mrd. € (2013, AufbhG § 4 Abs. 1 Satz 1), fortgeschrieben mit 2 %/a über 13 Jahre (\(1{,}02^{13} = 1{,}294\)) zu 10,35 Mrd. €₂₀₂₆, und 30 Mrd. € (2021), fortgeschrieben über 5 Jahre (\(1{,}02^{5} = 1{,}104\)) zu 33,12 Mrd. €₂₀₂₆; zusammen \(E_{\text{fonds}}\) = **43,47 Mrd. €₂₀₂₆**. Davon der Wohngebäudeanteil \(w\) = 1/3 · 1/3 ≈ 0,11 (**Abschätzung von KAP3**, Band 0,06–0,17: ein Drittel der Mittel für private Haushalte neben Infrastruktur und Wirtschaft/Landwirtschaft, davon ein Drittel für die Gebäudesubstanz ohne Hausrat und Fahrzeuge; Band aus einem Haushaltsanteil von 1/4 bis 1/2 und einem Gebäudeanteil von 1/4 bis 1/3) und der flussseitige Anteil \(f_{\text{fluss}}\) = 0,90 (**Abschätzung von KAP3**, Band 0,80–1,00: beide Ereignisse sind dokumentierte Flusshochwasser; der Abschlag trägt nicht getrennt ausgewiesenen Siel- und Sturzflutanteilen Rechnung), verteilt auf die Länge des Ankerfensters \(N\) = 23 Jahre (2002–2024, dieselben Kalibrierjahre wie §4.1 und §4.7; gezählt, keine Abschätzung): \(U = \dfrac{E_{\text{fonds}} \cdot w \cdot f_{\text{fluss}}}{N} = \dfrac{43{,}47 \cdot (1/9) \cdot 0{,}90}{23}\) = **0,189 Mrd. €₂₀₂₆/a**. Es ist ein Mindestwert, weil alle übrigen Hochwasserschäden des Fensters (2002 und alle Jahre ohne Aufbauhilfegesetz) hinzukommen. Keine der sechs Ankergrößen \(A_{\text{ver}}\), \(w_{\text{wg}}\), \(u\), \(\varphi_{\text{fluss}}\), \(\kappa\) und \(\pi\) und keine Registergröße von \(M_0\) geht als Faktor ein. Die frühere Wiederkehrzeit \(T\) = 100 a entfällt; an ihre Stelle tritt die gezählte Fensterlänge. |
 | Obergrenze \(O_u\) (unabhängig) | **11,04 Mrd. €₂₀₂₆/a** | aus derselben amtlichen Quelle: das größere Fondsvolumen 2021, fortgeschrieben 33,12 Mrd. €₂₀₂₆, mit den **oberen** Enden der beiden Anteile — der volle Drittelanteil der privaten Haushalte (1/3, einschließlich Hausrat, als Ersatz für den nicht im Fonds enthaltenen versicherten Teil) und \(f_{\text{fluss}}\) = 1,00 — **in jedem Jahr**: \(O_u = 33{,}12 \cdot 1/3 \cdot 1{,}00\) = **11,04 Mrd. €₂₀₂₆/a**. Begründung (**Abschätzung von KAP3**): Das langjährige Jahresmittel kann den Schaden des schwersten Jahres im Ankerfenster nicht übersteigen. Weder Registerzahlen noch Gebäudewert von \(M_0\) noch Ankergrößen gehen ein. |
 | Modellschranke \(O_M\) (modellabhängig, kein Prüfstein) | 6,29 Mrd. €₂₀₂₆/a | klassengerechte Bestandsschranke aus Register 60-R17-01: 339.000 exponierte Adressen GK3/GK4 mit Jährlichkeit 0,1 a⁻¹ und 1.380.000 Adressen GK2 mit 0,01 a⁻¹, Gebäudewert 527.280 €₂₀₂₆ (Register 60-R24-01), gedeckelte Schadensquote 0,250 (§3.3): \(O_M = (339.000 \cdot 0{,}1 + 1.380.000 \cdot 0{,}01) \cdot 527.280 \cdot 0{,}250\) = 6,29 Mrd. €₂₀₂₆/a — das physikalische Maximum der Registerstruktur. Weil \(O_M\) dieselben Adresszahlen und fast denselben Wertsatz wie \(M_0\) trägt, ist sie ein festes Vielfaches der Modellsumme (\(O_M / M_0\) = 6,29 / 1,243 = 5,06). \(\lambda M_0 \le O_M\) ist deshalb gleichbedeutend mit \(\lambda \le 5{,}06\) und kann nach bestandener Plausibilitätsschranke \(\lambda \le 2{,}0\) (§4.4) nicht mehr auslösen (\(2{,}0 \cdot 1{,}243\) = 2,49 < 6,29). Sie wird nur mitgeführt, damit ein Leser sieht, wie weit das Ergebnis vom Maximum der eigenen Registerstruktur entfernt ist. |
 
@@ -1502,7 +1511,7 @@ unabhängiges Band kann nicht so eng sein wie eines, das aus dem Ergebnis abgele
 Nachführen.
 
 **Empfindlichkeit von \(U\).** Mit den Bandenden von \(w\) und \(f_{\text{fluss}}\) liegt \(U\)
-zwischen 43,47 · 0,0625 · 0,80 / 23 = 0,095 und 43,47 · 0,167 · 1,00 / 23 = 0,315 Mrd. €₂₀₂₆/a. Die
+zwischen 43,47 · (1/16) · 0,80 / 23 = 0,095 und 43,47 · (1/6) · 1,00 / 23 = 0,315 Mrd. €₂₀₂₆/a. Die
 kalibrierte Bundessumme 1,132 liegt auch über dem oberen Ende (Faktor 3,6) und beim unteren Ende beim
 Faktor 12. Fixiert ist der Zentralwert 0,189.
 
@@ -1616,7 +1625,7 @@ die Bezifferung von \(q_0\) bleibt offen und ist als solche gekennzeichnet.
 | Klassenraten Bestandsschranke (GK3/GK4; GK2) | 0,1 a⁻¹; 0,01 a⁻¹ | **Abschätzung von KAP3**, Herleitung §4.6 (Register 60-R17-01: Jährlichkeit je ZÜRS-Adressklasse, unverändert übernommen); geht linear in \(O\) ein |
 | \(\bar\theta_{\text{EFH/ZFH}}\) nationaler Typ-Mix (Wohnflächenanteil EFH/ZFH; MFH = 1 − \(\bar\theta_{\text{EFH/ZFH}}\)) | 0,596 (0,471–0,624) | **Quelle:** Destatis, Bestand und Bauabgang von Wohnungen und Wohngebäuden 2021, Tabelle 2.1.3, 31.12.2021 (`docs/evidenz/60_destatis_wohnflaeche_gebaeudetyp_2021.csv`); Band aus den Gebietsteilen derselben Tabelle; dass die exponierte Teilmenge im Band liegt, ist eine **Abschätzung von KAP3**, Herleitung §4.3 (Punkt 2 und Bandtabelle) |
 | Unsicherheitsband \(\lambda\) | 0,12 bzw. 3,93 | **berechnet** aus dem fortgepflanzten Band von \(A^{*}\) und \(M_0\) (§4.4), Rundungsregel wie dort; Band des Skalars, **kein Prüfstein** (bis T-0574 als Plausibilitätsschranke geführt, Ledger-Befund 61) |
-| Plausibilitätsschranke \(\lambda\) | 0,5 bzw. 2,0 | **Abschätzung von KAP3**, Herleitung §4.4: Faktor 2 um den Neutralwert 1 aus dem Modellverständnis-Argument (eine Eingangsgröße von \(M_0\) um mehr als das Doppelte daneben), ohne eine Größe, die in \(\lambda\) eingeht; Sensitivität Faktor 1,5 / 3 dort; gilt für den Zentralwert einer Neubestimmung, die Fenster-Sensitivität in §4.1a prüft sie an vier \(\lambda\)-Werten, alle vier innerhalb (0,500 knapp) |
+| Plausibilitätsschranke \(\lambda\) | 0,5 bzw. 2,0 | **Abschätzung von KAP3**, Herleitung §4.4: Faktor 2 um den Neutralwert 1 aus dem Modellverständnis-Argument (die Eingangsgrößen von \(M_0\) zusammen um mehr als den Faktor 2 daneben, mehr als ihre belegten Bänder gemeinsam erklären), ohne eine Größe, die in \(\lambda\) eingeht; Sensitivität Faktor 1,5 / 3 dort; gilt für den Zentralwert einer Neubestimmung, die Fenster-Sensitivität in §4.1a prüft sie an vier \(\lambda\)-Werten, alle vier innerhalb (0,500 knapp) |
 | Toleranz Verteilungsprüfung | ±11,5 Prozentpunkte | **berechnet**, Herleitung §4.5: quadratische Zusammensetzung aus Jackknife-Standardfehler der Ankerreihe ±11,2 (gerechnet aus `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), Ableseunschärfe ±1,7 und modellseitigem HQextrem-Band ±2,3; **Abschätzung von KAP3** ist daran nur die Wahl der Kombinationsregel (unabhängige Beiträge, quadratisch), vorab festgelegt. Ist-Ergebnis: Abstand 13,9 Pp, **Prüfung nicht bestanden** (Modellentscheid §4.5) |
 | \(U\) Sanity-Untergrenze (unabhängig) | 0,189 Mrd. €₂₀₂₆/a (0,095–0,315) | **berechnet**, Herleitung §4.6: \(E_{\text{fonds}} \cdot w \cdot f_{\text{fluss}} / N\) aus den drei Zeilen darunter; Band aus den Bandenden von \(w\) und \(f_{\text{fluss}}\), fixiert ist der Zentralwert |
 | \(E_{\text{fonds}}\) Fondsvolumina der Wiederaufbauhilfe 2013 und 2021 | 8 und 30 Mrd. €, fortgeschrieben 10,35 + 33,12 = 43,47 Mrd. €₂₀₂₆ | **Quelle:** AufbhG 2013 § 4 Abs. 1 Satz 1 und Aufbauhilfegesetz 2021 (BGBl.), `docs/evidenz/60_wiederaufbauhilfen_2013_2021.csv`; Fortschreibung 2 %/a wie im Bericht, Herleitung §4.6 |
@@ -1671,7 +1680,7 @@ M0_oben = w_wohn * wert_geb_hi * term_hi / 1e9
 assert abs(M0_unten - 0.583) < 5e-3
 assert abs(M0_oben - 2.425) < 5e-3
 
-# 4.4 Niveau-Skalar: vollstaendig fortgepflanztes Lambda-Band und hergeleitete Plausibilitaetsschranke
+# 4.4 Niveau-Skalar: vollstaendig fortgepflanztes Lambda-Band (Unsicherheitsband) und Plausibilitaetsschranke
 lam = A_stern / M0
 assert abs(lam - 0.911) < 5e-3
 lam_lo = lo / M0_oben                       # unteres Lambda-Bandende (Zaehler/Nenner an den Extremen)
@@ -2353,7 +2362,7 @@ parameter:
   quelle: null
   preisstand: null
   vorlaeufig: true
-  vorlaeufig_grund: "Stand nach der Kleinste-Quadrate-Ankerbestimmung (17.09.2026): berechnet als A*/M0 = 1,132 / 1,243 aus der GDV-Jahresreihe 2002–2024 (§4.1/§4.4); M0 seit T-0570 mit typgewichtetem Wertsatz (Typ-Mix EFH/ZFH 0,596, §4.3). Weiterhin vorlaeufig, weil die Ledger-Befunde 33 (Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion), 35 und 36 offen sind und den Wert verschieben koennen."
+  vorlaeufig_grund: "Stand nach der Kleinste-Quadrate-Ankerbestimmung (17.09.2026): berechnet als A*/M0 = 1,132 / 1,243 aus der GDV-Jahresreihe 2002–2024 (§4.1/§4.4); M0 seit T-0570 mit typgewichtetem Wertsatz (Typ-Mix EFH/ZFH 0,596, §4.3). Weiterhin vorlaeufig, weil der Ledger-Befund 33 (Jahreswerte der Ankerreihe statt Mittelwert-Rekonstruktion) offen ist und den Wert verschieben kann."
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
   wertebereich_abweichung: "#fortschreibung-endpunkt-k3"
