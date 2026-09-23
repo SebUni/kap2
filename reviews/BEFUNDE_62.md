@@ -409,6 +409,18 @@ seinen eigenen Status auf geschlossen zu setzen und die Kopfzahl der offenen Bef
 nachzuziehen ist nach Punkt „Wahlweise" der Nacharbeit nicht Pflicht dieses Tickets und bleibt
 für ein Folgepaket offen.
 
+**Vorrang-Vermerk (T-0592, 23.09.2026, Vermerkpflicht nach
+`docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md`, Abschnitt „Vorrang zwischen den UBA-Digitalisaten").**
+Befund 13 wendet die Vorrangregel dieses Abschnitts an; die Anwendung wird hier mit beiden
+Fundstellen festgehalten. Beide Fundstellen sind zeichengleich aus der Spalte „Fundstelle" der
+Tabelle des Beispielfalls #62 übernommen:
+Schadensbaum-Mappe: `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt `Klimawirkungsketten`, Zeile 279 (Knoten `W124`), Spalte J (Kopfzelle J1: `Input_Namen_Sensitivitäten`) —
+Wortlaut: sieben Sensitivitätsfaktoren (S094 bis S100, Spalte F derselben Zeile).
+KWRA-2021-Mappe: `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt `Wirkungsmechanismen`, Zeile 67 (ID `62`), Spalte G (Kopfzelle G5: `Vulnerabilität – Sensitivitätsfaktoren`) —
+Wortlaut: `Begrünung von Städten / Siedlungen · Grad der Versiegelung` (zwei Faktoren).
+Beide Zellen wurden am 23.09.2026 in den Arbeitsmappen nachgelesen; ihr Wortlaut stimmt mit der
+Tabelle überein. Ergebnis: Es gilt die Arbeitsmappe `KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`; das Verdikt von Befund 13 bleibt unverändert.
+
 ### Befund 14 — Derselbe Nutzenwert 5 €/(m²·a) bei URBAN_GREEN und DESEALING_SURFACE
 
 Aufgenommen am 23.09.2026 aus den offenen Fragen der Läufe zu T-0480
