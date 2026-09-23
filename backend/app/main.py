@@ -18,6 +18,7 @@ from app.api.routes import (
     kommune, assessment, measures, config, export,
     catalog as catalog_route, admin, parameters,
     ai as ai_route,
+    anpassungskapazitaet as anpassungskapazitaet_route,
 )
 from app.log_config import setup_logging
 
@@ -64,6 +65,7 @@ app.include_router(config.router, prefix="/api", tags=["Konfiguration"], depende
 app.include_router(export.router, prefix="/api", tags=["Export/Import"], dependencies=_PROTECTED)
 app.include_router(catalog_route.router, prefix="/api", tags=["Katalog"], dependencies=_PROTECTED)
 app.include_router(parameters.router, prefix="/api", tags=["Parameter"], dependencies=_PROTECTED)
+app.include_router(anpassungskapazitaet_route.router, prefix="/api", tags=["Anpassungskapazität"], dependencies=_PROTECTED)
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"], dependencies=[Depends(require_admin)])
 app.include_router(admin_demo_route.router, prefix="/api/admin", tags=["Admin"], dependencies=[Depends(require_admin)])
 app.include_router(admin_lite_route.router, prefix="/api/admin", tags=["Admin"], dependencies=[Depends(require_admin)])
