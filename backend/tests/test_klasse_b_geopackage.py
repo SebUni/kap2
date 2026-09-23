@@ -12,7 +12,7 @@ Geprüft wird:
     ``_write_layer``: die an ``bewertung_100m`` übergebene Klasse-B-Spalte
     enthält ausschließlich den Vermerk, keinen Wert 0, 0.0, '-' oder None.
 
-Ohne Datenbank und ohne pyogrio (fehlt in der Prüfumgebung).
+Ohne Datenbank; das Schreiben über pyogrio wird mit ``_write_layer`` abgefangen.
 """
 
 from __future__ import annotations
