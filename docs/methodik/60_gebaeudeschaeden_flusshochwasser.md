@@ -2312,8 +2312,8 @@ Neutralwert ist.
 **Band der Szenario-Wahrscheinlichkeit HQhäufig (Befund 84).** Der Block `flood_bldg.p_hq_haeufig`
 führt das Band der Registerzeile 60-W085-01 mit: Die Länder kartieren „häufig" zwischen HQ20 und
 HQ5, also 0,05 bis 0,2 a⁻¹ um den Kartenfall HQ10. Wirkung auf den K3-Betrag, einmal beziffert:
-Die Trapezsumme je Zelle vor dem Niveau-Skalar (§3.4, Szenariobeiträge 15 / 77,76 / 300 € je m²
-BGF) sinkt am unteren Bandende auf das 0,63-Fache und steigt am oberen auf das 1,73-Fache; der
+Die Trapezsumme je Zelle vor dem Niveau-Skalar (§3.4, Stützstellen 15,0 / 77,76 / 300,0 m² je Ereignis bei
+p = 0,1 / 0,01 / 0,002236 a⁻¹) sinkt am unteren Bandende auf das 0,63-Fache und steigt am oberen auf das 1,73-Fache; der
 Anteil des häufigen Szenarios liegt dabei bei 46 % bzw. 80 % statt 66 %. Die kalibrierte
 Bundessumme bleibt davon unberührt, weil \(\lambda\) sie auf \(A^{*}\) setzt; das Band verschiebt die
 Verteilung zwischen Kommunen mit viel und wenig häufig überfluteter Fläche. `flood_bldg.p_hq100`

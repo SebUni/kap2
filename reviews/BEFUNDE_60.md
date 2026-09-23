@@ -5895,8 +5895,8 @@ des Berichts ist geändert; \(\lambda\) = 0,911, \(M_0\) = 1,243 und die Bundess
 | 86 | C | Vorschlag (a), (b) und (c): Felder an jedem Block, Platzhalterkennzeichnung für die geparkte Ebene, Kopf beschreibt die Felder. | wortgleich in der Kopftabelle | behoben |
 | 99 | B | Erste Alternative des Vorschlags: für die acht Zeilen Blöcke angelegt, keine Ausnahme im Einleitungssatz nötig. `preisstand: 2026` an \(U\), \(O_u\), \(O_M\); \(A_{\text{ver}}\) steht im Preisstand 2024 der GDV-Reihe und trägt deshalb `preisstand: null` mit `preisstand_hinweis` (Umrechnung über \(\pi\)) — `preisstand: 2024` hätte die Lint-Prüfung „Preisstand einheitlich“ rot gemacht und `2026` wäre falsch. | wortgleich in der Kopftabelle | behoben |
 
-**Rechnung zu 84.** Trapezsumme je Zelle aus §3.4 (Szenariobeiträge 15 / 77,76 / 300, \(p\) = 0,1 /
-0,01 / 0,002236): 0,09 · 46,38 + 0,007764 · 188,88 + 0,002236 · 300 = 4,174 + 1,466 + 0,671 = 6,311
+**Rechnung zu 84.** Trapezsumme je Zelle aus §3.4 (Stützstellen 15,0 / 77,76 / 300,0 m² je Ereignis bei \(p\) = 0,1 /
+0,01 / 0,002236 a⁻¹): 0,09 · 46,38 + 0,007764 · 188,88 + 0,002236 · 300 = 4,174 + 1,466 + 0,671 = 6,311
 (Anteil häufig 66,1 %). Mit \(p_1\) = 0,05: 1,855 + 1,466 + 0,671 = 3,993 (Faktor 0,633; Anteil 46,5 %).
 Mit \(p_1\) = 0,2: 8,812 + 1,466 + 0,671 = 10,950 (Faktor 1,735; Anteil 80,5 %).
 
