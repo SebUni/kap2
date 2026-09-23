@@ -5762,7 +5762,7 @@ Exit 0
 | 48 | 122 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): bindet einen festen Wortlaut (`Registerzeile 60-S104-01 ist offen`), den T-0580 abgelöst hat („ist bewusst inaktiv (geparkt)“); endet am heutigen Stand mit 1, obwohl der Befund geschlossen ist |
 | 72 | 146 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
 | 104 | 178 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
-| 57 | 131 (Kopftabelle), 5687 (Autor-Revision T-0567) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md (`f3295ea2`: Bericht und Ledger; `081f239d`: nur Ledger; `ee82fa5a`: Bericht und Ledger) | untauglich: liest nicht den ganzen betroffenen Bestand — der Ausdruck prüft den Block `python test: beispiel_60_kernformel` samt seinen `assert`-Zeilen nicht, sondern nur drei Teilzeichenfolgen in §3.6; Ersatzblock unten |
+| 57 | 131 (Kopftabelle), 5687 (Autor-Revision T-0567) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md (`f3295ea2`: Bericht und Ledger; `081f239d`: nur Ledger; `ee82fa5a`: Bericht und Ledger) | untauglich: liest nur eine von mehreren betroffenen Dateien — hier auf den `python test`-Block bezogen: der Golden-Test ist keine eigene Datei, sondern ein Block im Bericht; der Ausdruck prüft den Block `python test: beispiel_60_kernformel` samt seinen `assert`-Zeilen nicht, sondern nur drei Teilzeichenfolgen in §3.6; Ersatzblock unten |
 
 Befund 24: Der Ausdruck liest §3.1 des Berichts (Physischer Teil-Ausweis) und prüft, ob dort `EAD}_z = ` und `EAD}_k = ` stehen, aber nicht `EAD} = `. Die T-0567-Commits (`f3295ea2`, `081f239d`, `ee82fa5a`) berühren laut `git show --stat` außer dem Bericht auch `reviews/BEFUNDE_60.md` — dort steht jedoch nur die Ledger-Buchung des Befunds selbst, kein zusätzlicher Sachverhalt, den der Ausdruck prüfen müsste. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" trifft damit nicht zu. Lauf am heutigen Stand: Exit 0 (geschlossen, Kopftabellen-Maßstab). Probe am Vergabestand `cedc3e77` (Elterncommit des ersten T-0567-Commits, über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, kein Checkout): Exit 1 (Befund bestand).
 
@@ -6115,7 +6115,7 @@ Probe am Vergabestand `34fc6509` (Elterncommit von `05f40760`, entpackt über `g
 
 Urteil: Untauglich sind die Ausdrücke zu 47 und 48 aus T-0579, beide mit benanntem anderem Grund und je einem Ersatzblock; die übrigen Ausdrücke aus T-0579 sind tauglich. Nicht als Prüfausdrücke behandelt sind die Prosasätze in M Z. 6171–6172 (Abschnitt Autor-Revision T-0579): Sie nennen `python3 backend/scripts/lint_methodik.py 60` als gelaufenen Lauf, stehen aber in keiner Spalte „Prüfausdruck“ und sind kein Befehl zu einem Befund.
 
-**Ersatz zu Befund 57 (T-0832).** Der Ausdruck aus Z. 131 und Z. 5687 in M (dort wörtlich gleich, auch in `/opt/overlord/overlord-arbeit/.t0621/E.json`, Feld `befehl`, nr 57) liest nur den Bericht und prüft, ob `ead_mix`, `1.533…1.950` und `nicht proportional` als Text in §3.6 stehen. Der Block `python test: beispiel_60_kernformel` (Bericht Z. 943–994, 13 `assert`-Zeilen, darunter die drei zu T-0567: `ead_mix`, `w_mix`, 10-%-Abstand) wird weder ausgeführt noch auf seine `assert`-Zeilen gelesen. Veränderungsprobe an Kopien unter `/opt/overlord/overlord-arbeit/.t0747/` (gleicher relativer Pfad `docs/methodik/…`, Ausführung im Kopierverzeichnis): (v1) alle 13 `assert`-Zeilen des Blocks entfernt, (v2) nur die Zeile `assert abs(ead_mix - 20195.7) < 0.1` zu `assert abs(ead_mix - 1.0) < 0.1` verfälscht. Alter Ausdruck: v1 Exit 0, v2 Exit 0 — er prüft die `assert`-Zeilen nicht (Fehlertyp „liest nicht den ganzen betroffenen Bestand“, hier auf den `python test`-Block bezogen; die Gegenansicht, der Golden-Test sei eine eigene Datei, trifft nicht zu, er steht im Bericht). Zur Ledger-Datei: `081f239d` berührt nur sie, `f3295ea2` und `ee82fa5a` berühren Bericht und Ledger; die Ledger-Änderung ist hier nur die Buchung des Befunds und trägt keinen Sachverhalt, den der Ausdruck prüfen müsste.
+**Ersatz zu Befund 57 (T-0832).** Der Ausdruck aus Z. 131 und Z. 5687 in M (dort wörtlich gleich; abgeglichen in T-0832 mit `/opt/overlord/overlord-arbeit/.t0747/pruef.py`: Feld `befehl` zu nr 57 in `/opt/overlord/overlord-arbeit/.t0621/E.json`, dort `z` = [131, 5687], ist zeichengleich mit dem Befehl in Z. 131 und in Z. 5687 von M, Länge je 247 Zeichen) liest nur den Bericht und prüft, ob `ead_mix`, `1.533…1.950` und `nicht proportional` als Text in §3.6 stehen. Der Block `python test: beispiel_60_kernformel` (Bericht Z. 943–994, 13 `assert`-Zeilen, darunter die drei zu T-0567: `ead_mix`, `w_mix`, 10-%-Abstand) wird weder ausgeführt noch auf seine `assert`-Zeilen gelesen. Veränderungsprobe an Kopien unter `/opt/overlord/overlord-arbeit/.t0747/` (gleicher relativer Pfad `docs/methodik/…`, Ausführung im Kopierverzeichnis; die Kopien erzeugt `.t0747/prep.py`, Ersetzung `l.replace('20195.7', '1.0')` nur auf der Zeile, die mit `assert abs(ead_mix - 20195.7)` beginnt): (v1) alle 13 `assert`-Zeilen des Blocks entfernt, (v2) nur diese eine Zeile verfälscht. Alter Ausdruck: v1 Exit 0, v2 Exit 0 — er prüft die `assert`-Zeilen nicht (Fehlertyp „liest nur eine von mehreren betroffenen Dateien“, hier auf den `python test`-Block bezogen; die Gegenansicht, der Golden-Test sei eine eigene Datei, trifft nicht zu, er steht im Bericht). Zur Ledger-Datei: `081f239d` berührt nur sie, `f3295ea2` und `ee82fa5a` berühren Bericht und Ledger; die Ledger-Änderung ist hier nur die Buchung des Befunds und trägt keinen Sachverhalt, den der Ausdruck prüfen müsste.
 
 Alter Befehl (wörtlich):
 
@@ -6129,22 +6129,37 @@ Neuer Befehl (wörtlich, einzeilig, ohne das Zeichen `|`; führt den Block aus u
 python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: beispiel_60_kernformel'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);exec(compile(b[0],'t','exec'),{});raise SystemExit(0 if len(b)==1 and b[0].count(chr(10)+'assert ')>=3 and 'assert abs(ead_mix - 20195.7)' in b[0] else 1)"
 ```
 
-Läufe (jeweils mit `echo "Exit $?"`):
+Veränderung v2, wörtlich als Diff der Kopie gegen das Original (`difflib.unified_diff`, `.t0747/probe.py`):
 
 ```
-$ (heute, unveränderter Bericht) alter Befehl
+--- Original
++++ v2-Kopie
+@@ -991 +991 @@
+-assert abs(ead_mix - 20195.7) < 0.1
++assert abs(ead_mix - 1.0) < 0.1
+```
+
+Läufe in `/opt/overlord/overlord-arbeit/.t0747/v2` (Arbeitsverzeichnis; ausgeführt als `bash /opt/overlord/overlord-arbeit/.t0747/alt.sh` und `bash /opt/overlord/overlord-arbeit/.t0747/neu.sh`, die Dateien enthalten genau die oben stehenden Befehle plus `; echo "Exit $?"`), Ausgabe ungekürzt:
+
+```
+$ cd /opt/overlord/overlord-arbeit/.t0747/v2 && bash /opt/overlord/overlord-arbeit/.t0747/alt.sh
 Exit 0
-$ (heute, unveränderter Bericht) neuer Befehl
-Exit 0
-$ (v1: alle assert-Zeilen entfernt) alter Befehl
-Exit 0
-$ (v1: alle assert-Zeilen entfernt) neuer Befehl
+$ cd /opt/overlord/overlord-arbeit/.t0747/v2 && bash /opt/overlord/overlord-arbeit/.t0747/neu.sh
 Exit 1
-$ (v2: ead_mix-assert verfälscht) alter Befehl
-Exit 0
-$ (v2: ead_mix-assert verfälscht) neuer Befehl
-Traceback … File "t", line 48 … AssertionError
-Exit 1
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "t", line 48, in <module>
+AssertionError
+```
+
+Alter Befehl: Exit 0 trotz verfälschter `assert`-Zeile. Neuer Befehl: `AssertionError` in Blockzeile 48 (Bericht Z. 991), Exit 1 (Python-Exitcode 1, in der Ausgabe als `Exit 1` gedruckt).
+
+Weitere Läufe im selben Verfahren (Exitcodes, gedruckt als `Exit n`):
+
+```
+heute, unveränderter Bericht, /opt/overlord/overlord-arbeit/.t0747:      alt Exit 0, neu Exit 0
+v1 (alle assert-Zeilen entfernt), .t0747/v1:                              alt Exit 0, neu Exit 1
+Vergabestand cedc3e77 (git show cedc3e77:<Bericht>), .t0747/va:           alt Exit 1, neu Exit 1
 ```
 
 Probe am Vergabestand `cedc3e77` (Elterncommit von `f3295ea2`, entpackt über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, kein Checkout): alter Befehl Exit 1, neuer Befehl Exit 1 (Befund bestand, beide richtig).
