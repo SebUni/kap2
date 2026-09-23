@@ -62,17 +62,25 @@ als Integrationspunkt für `/integriere-risiko 60` geführt (Entscheidungslog Nr
 ### Knoten-Bilanz
 
 **Entscheidungsstand (T-0235).** Spalte „rechnet in” trägt ab dieser Fassung je Zeile entweder eine
-der sieben benannten **Formelstellen**, an die Kapitel 3 die Größe künftig bindet, oder den Wert
+der sechs benannten **Formelstellen**, an die Kapitel 3 die Größe künftig bindet, oder den Wert
 `inaktiv` mit einem wörtlichen Zitat aus `KWRA-Monetarisierung.xlsx` (Blatt und Zelle). Die
 Formelstellen sind **Namen, keine Formeln**: Kapitel 3 ist inzwischen ausgeschrieben (§3.1–§3.7);
 jede Zeile unten rechnet dort an einer Formelstelle, wirkt als Sensitivitätsband über eine andere
 Formelstelle oder ist ausdrücklich inaktiv geführt. Benannte Formelstellen: **FS-Hazard**
-(Eintrittswahrscheinlichkeit p(HQ) inkl. der Kein-Doppelkanal-Zuflüsse), **FS-Exposition**
-(Wassertiefe am Gebäude), **FS-Schadensgrad** (Wassertiefe-Schadensfunktion nach Bauart/Zustand),
-**FS-Mengengerüst** (Gebäudewerte/Bestand), **FS-Schutzsystem** (R7-Erwartungswert-Weiche mit #50 — **in dieser Fassung inaktiv, geparkt**: die Kernformel trägt den Term noch nicht, §3.4),
-**FS-Bestandsdynamik** (Kap. 6, Szenario-Dynamik des Bestands) und **FS-Vorsorge** (Maßnahmen-Hebel
-S092, bereits in §5.1 beziffert). Die Spalte „Vorschlag” bleibt unverändert als Beleg aus der
-Arbeitsmappe stehen; sie ist weiterhin keine eigene Entscheidung.
+(Eintrittswahrscheinlichkeit p(HQ) inkl. der Kein-Doppelkanal-Zuflüsse; die Wassertiefe am Gebäude
+kommt allein aus der HWGK-Tiefe, 60-W085-01), **FS-Schadensgrad** (Wassertiefe-Schadensfunktion nach
+Bauart/Zustand), **FS-Mengengerüst** (Gebäudewerte/Bestand), **FS-Schutzsystem** (R7-Erwartungswert-Weiche mit #50 — **in dieser Fassung inaktiv, geparkt**: die Kernformel trägt den Term noch nicht, §3.4),
+**FS-Bestandsdynamik** (Kap. 6, Szenario-Dynamik des Bestands — **in dieser Fassung inaktiv,
+geparkt**: Registerzeile 60-S104-01 ist offen, der Bestand R24 wird für das Szenariojahr konstant
+gehalten, Kap. 6 Modellgrenzen) und **FS-Vorsorge** (Maßnahmen-Hebel S092, bereits in §5.1
+beziffert). Die frühere siebte Formelstelle FS-Exposition (Wassertiefe am Gebäude) ist
+**aufgehoben**: Kapitel 3 kennt sie nicht, und Geländehöhe (S074) und Gewässernähe (R17) wirken nach
+dem Kein-Doppelkanal-Grundsatz (§3.2) nur als Sensitivitätsband über FS-Hazard, nicht als eigener
+Faktor; keine Zeile der Bilanz bindet mehr an sie. Die Spalte „Name” führt den Wortlaut der
+Arbeitsmappe (Blatt „Klimawirkungsketten”, Spalte B der genannten Zeile) **ungekürzt**; nur der
+Klammerzusatz am Ende („über W085”, „= Id …”, „direkt …”) ist ein Zusatz dieses Berichts. Die
+Spalte „Vorschlag” bleibt unverändert als Beleg aus der Arbeitsmappe stehen; sie ist weiterhin keine
+eigene Entscheidung.
 
 | Knoten | Name | Blatt/Zeile | rechnet in | Vorschlag laut Arbeitsmappe |
 |---|---|---|---|---|
@@ -82,7 +90,7 @@ Arbeitsmappe stehen; sie ist weiterhin keine eigene Entscheidung.
 | E08 | Starkregen (direkt auf W117 und über W085) | KWK Z9 | **FS-Hazard** (Anteil über W085, kein eigener Faktor); direkter Kanal **inaktiv** — R9 (Rechenregeln Z11): „Innerhalb eines Kontos zählt jede Einheit (…Gebäude) genau einmal; verschiedene Konten desselben Ereignisses sind additiv.” i. V. m. Mon. Z64 (Nicht enthalten): „Flusshochwasserschäden (ID 60)” (#59 bucht den direkten Starkregen-Gebäudeschaden) | über W085 wie E12; direkter Gebäudeschaden durch Starkregen gehört zu #59 (Mon. Z64 „Sachschäden durch Starkregen/Rückstau”) — R9 |
 | S072 | Boden-/Vegetationsbedeckung (über W085) | KWK Z197 | **FS-Hazard** (enthalten im Hazard-Datensatz, kein eigener Faktor — Kein-Doppelkanal §3.2) | wirkt auf Abflussbildung in W085; bewusst inaktiv, falls der Hazard-Datensatz den Abfluss schon enthält (Kein-Doppelkanal) |
 | S073 | Flächenversiegelung (über W085) | KWK Z198 | **FS-Hazard** (enthalten im Hazard-Datensatz, kein eigener Faktor — Kein-Doppelkanal §3.2) | wie S072 |
-| S074 | Topographie (Geländeform, Höhe) (über W085) | KWK Z199 | **Sensitivitätsband** (Kein-Doppelkanal §3.2; Register 60-S074-01/60-R17-01) — wirkt über FS-Hazard (Wassertiefe der Gefahrenkarte), keine eigene Formelstelle; früher: FS-Exposition — Geländehöhe → Wassertiefe am Gebäude | Kandidat für die Zell-Exposition (Geländehöhe → Wassertiefe); Doppelkanal prüfen, falls HQ-Karten Wassertiefen bereits führen |
+| S074 | Topographie (Geländeform, Höhe, etc.) (über W085) | KWK Z199 | **Sensitivitätsband** (Kein-Doppelkanal §3.2; Register 60-S074-01/60-R17-01) — wirkt über FS-Hazard (Wassertiefe der Gefahrenkarte), keine eigene Formelstelle; früher: FS-Exposition — Geländehöhe → Wassertiefe am Gebäude | Kandidat für die Zell-Exposition (Geländehöhe → Wassertiefe); Doppelkanal prüfen, falls HQ-Karten Wassertiefen bereits führen |
 | R17 | Vorkommen von Oberflächengewässer und Grundwasser (über W085) | KWK Z204 | **Sensitivitätsband** (Kein-Doppelkanal §3.2; Register 60-S074-01/60-R17-01) — wirkt über FS-Hazard (Wassertiefe der Gefahrenkarte), keine eigene Formelstelle; früher: FS-Exposition — Lackmustest §3.1: keine Flussaue → ~0 | Kandidat Exposition; Lackmustest §3.1: keine Flussaue → ~0 |
 | R18 | Vorkommen von Abwasser- und Entwässerungssystemen (über W085) | KWK Z205 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)”; Mon. Z57 (Id 52, Spalte „Nicht enthalten”): „Gebäudeschäden durch Rückstau (ID 59).” | Rückstau gehört zu #59 (Mon. Z64), Kanalnetz zu #52 (K4) — voraussichtlich bewusst inaktiv |
 | R19 | Vorkommen von Infrastruktur an Binnengewässern (über W085) | KWK Z206 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” | Infrastruktur → K4 (K3-Definition, Konten Z28) — voraussichtlich bewusst inaktiv |
@@ -97,14 +105,14 @@ Arbeitsmappe stehen; sie ist weiterhin keine eigene Entscheidung.
 | W008 | Bergsturz, Felssturz, Steinschlag | KWK Z45 | **inaktiv** — R9 (Rechenregeln Z11): „Innerhalb eines Kontos zählt jede Einheit (…Gebäude) genau einmal”; Schadenskonten-System Z29 führt „12 Rutschungen und Muren” als eigenständiges K3-Buchungsobjekt | Massenbewegungen → #12 (NW Z13, K3) — R9 |
 | W006 | Rutschungen und Muren (= Id 12) | KWK Z43 | **inaktiv** — wie W008; zusätzlich Mon. Z17 (Id 12, Spalte „Regeln”): „R7, R9” und Spalte „Bewertungsansatz”: „Wiederherstellungskosten beschädigter Gebäude (K3) …” (eigener Bewertungsansatz von #12, nicht #60) | wie W008 |
 | W091 | Grundwasserstand (= Id 55) | KWK Z214 | **inaktiv** — Abgleich-Protokoll Punkt 5 (Zeile 10): Ziel-Name/Konto „Direktbuchung Konto K3” — Id 55 bucht eigenständig direkt in K3, außerhalb der #60-Formel (R9, Rechenregeln Z11) | Id 55 bucht direkt in K3 (Abgleich-Protokoll P5) — Partition gegenüber #60 offen (R9) |
-| W100 | Einschränkungen Kanalnetze und Vorfluter (= Id 52) | KWK Z223 | **inaktiv** — Mon. Z57 (Id 52, Spalte „Schadenskonto”): „K4”; Spalte „Nicht enthalten”: „Gebäudeschäden durch Rückstau (ID 59).” | Id 52 bucht K4 (NW Z53) — voraussichtlich bewusst inaktiv |
-| S092 | Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer | KWK Z256 | **FS-Vorsorge** — Maßnahmen-Hebel, bereits beziffert (§5.1: r_S092 = 0,035, Band 0,0075–0,0832, §3.9 Abgeschätzt) | Kandidat **Maßnahmen-Hebel** (Objektschutz); P2-Abschätzung §5.1 |
+| W100 | Einschränkungen der Funktionsfähigkeit von Kanalnetzen und Vorflutern (= Id 52) | KWK Z223 | **inaktiv** — Mon. Z57 (Id 52, Spalte „Schadenskonto”): „K4”; Spalte „Nicht enthalten”: „Gebäudeschäden durch Rückstau (ID 59).” | Id 52 bucht K4 (NW Z53) — voraussichtlich bewusst inaktiv |
+| S092 | Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer von Gebäuden und Infrastrukturen | KWK Z256 | **FS-Vorsorge** — Maßnahmen-Hebel, bereits beziffert (§5.1: r_S092 = 0,035, Band 0,0075–0,0832, §3.9 Abgeschätzt) | Kandidat **Maßnahmen-Hebel** (Objektschutz); P2-Abschätzung §5.1 |
 | S093 | Zustand von Gebäuden und Infrastrukturen | KWK Z257 | **FS-Schadensgrad** — Vulnerabilität der Wassertiefe-Schadensfunktion (Mon. Z65) | Kandidat Vulnerabilität der Schadensfunktion; Evidenz und Zellgröße offen |
 | S094 | Verwendete Baumaterialien auf Gebäudeebene | KWK Z258 | **FS-Schadensgrad** — wie S093 | wie S093 |
 | S096 | Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand | KWK Z260 | **inaktiv (geparkt: Formelstelle FS-Schutzsystem ohne Term in §3.4, Modul #50 fehlt)** — Ziel: R7-Erwartungswert-Weiche mit #50 (Mon. Z65 Spalte „Regeln”: „R7, R9”; Rechenregeln Z9 R7) | Schutzsysteme über R7-Weiche mit #50 (Mon. Z65 „Schutzkosten (ID 50, R7)”; Z55) |
 | S097 | Zustand von (Schutz-)Infrastrukturen | KWK Z261 | **inaktiv (geparkt: Formelstelle FS-Schutzsystem ohne Term in §3.4, Modul #50 fehlt)** — Ziel: wie S096 (Versagensfall, Erwartungswert R7) | wie S096 (Versagensfall, Erwartungswert R7) |
 | S098 | Verwendete Baumaterialien von (Schutz-)Infrastrukturen | KWK Z262 | **inaktiv (geparkt: Formelstelle FS-Schutzsystem ohne Term in §3.4, Modul #50 fehlt)** — Ziel: wie S096 | wie S096 |
-| S104 | Investitionen der Bau- und Immobilienwirtschaft in exponierten Gebieten | KWK Z268 | **FS-Bestandsdynamik** — Szenario-Dynamik des Gebäudebestands (Kap. 6) | Kandidat Szenario-Dynamik des Gebäudebestands (Kap. 6) |
+| S104 | Investitionen der Bau- und Immobilienwirtschaft in exponierten Gebieten | KWK Z268 | **inaktiv (geparkt: Formelstelle FS-Bestandsdynamik ohne Term, Registerzeile 60-S104-01 offen)** — Kap. 6 (Modellgrenzen, „Bestandsdynamik S104”): Investitionen in exponierten Gebieten fließen „im heutigen Modellstand **nicht** als eigener Pfad ein”, der Gebäudebestand R24 wird für das Szenariojahr konstant gehalten; Ziel: Szenario-Dynamik des Gebäudebestands, sobald 60-S104-01 eine Entscheidung trägt | Kandidat Szenario-Dynamik des Gebäudebestands (Kap. 6) |
 | R24 | Vorkommen von Gebäuden | KWK Z270 | **FS-Mengengerüst** — Gebäudewerte (Mon. Z65: „HQ-Szenarien × Schadensfunktionen × Gebäudewerte”) | **Mengengerüst** (Gebäudewerte, Mon. Z65) |
 | R23 | Vorkommen von Bau- und Immobilienunternehmen | KWK Z269 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” — Unternehmensschäden (Betriebsausfall der Bauwirtschaft) sind kein K3-Gebäudeschaden | laut W117-Anmerkung pauschal nach Regel 4 eingetragen; kein Bezug zu Gebäudeschäden — voraussichtlich bewusst inaktiv |
 | R25 | Vorkommen von Siedlungsinfrastrukturen | KWK Z271 | **inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” | Infrastruktur → K4 (Konten Z28) — voraussichtlich bewusst inaktiv |
@@ -270,9 +278,10 @@ DGM1-Höhenfehler geht als Tiefenfehler ein (h = Wasserspiegellage − Geländeh
 2,0 × 6,2 % = 12,4 % Schadensänderung, gerundet ±12 % als Bandmitte-nahe Obergrenze. Die Linearität
 ist nur im geprüften Bereich der Quelle (−0,5 m bis 0 m) belegt und wird nicht extrapoliert.
 **Kopplung (§3.9):** das Band hängt an der Wassertiefe aus 60-W085-01; ändert sich dort die
-Tiefenquelle, wird es neu gerechnet. **Abgrenzung zur Knoten-Bilanz:** S074 bleibt der
-Formelstelle FS-Exposition zugeordnet, wirkt dort aber über die bereits topographiebasierte
-HWGK-Wassertiefe; ein zweiter Topographie-Faktor wäre ein Doppelkanal (§3.2). **Datenlücke
+Tiefenquelle, wird es neu gerechnet. **Abgrenzung zur Knoten-Bilanz:** S074 ist
+**keiner eigenen Formelstelle** zugeordnet (Kap. 1, Knoten-Bilanz), sondern wirkt als
+Sensitivitätsband über FS-Hazard, also über die bereits topographiebasierte HWGK-Wassertiefe
+(60-W085-01); ein zweiter Topographie-Faktor wäre ein Doppelkanal (§3.2). **Datenlücke
 (§3.8):** eine deutsche Sensitivitätsrechnung derselben Bauart (Schaden je 10 cm Tiefe) wurde nicht
 gefunden; die niederländische Fallstudie wird als dokumentierte Übertragung geführt.
 
