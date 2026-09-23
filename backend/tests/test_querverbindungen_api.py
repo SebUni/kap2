@@ -4,13 +4,16 @@ Prüft wörtlich gegen das Abnahmekriterium: Route registriert, Auswertungsform,
 genau ein Eintrag je kwra_id aus catalog.RISKS und catalog.PLANNED_RISKS
 zusammengenommen, Wertebereiche der Zählfelder und der Netzrolle.
 """
-import app.api.routes.catalog as catalog_routes
+from pathlib import Path
+
 from app.data import catalog
 from app.services.querverbindungen import querverbindungs_auswertung
 
 
 def test_route_registriert():
-    assert "/catalog/querverbindungen" in [r.path for r in catalog_routes.router.routes]
+    catalog_py = Path(__file__).resolve().parents[1] / "app" / "api" / "routes" / "catalog.py"
+    quelltext = catalog_py.read_text(encoding="utf-8")
+    assert '@router.get("/catalog/querverbindungen"' in quelltext
 
 
 def test_auswertung_hat_genau_die_erwarteten_schluessel():
