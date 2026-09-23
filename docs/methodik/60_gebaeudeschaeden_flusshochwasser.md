@@ -3226,8 +3226,10 @@ und `bandzuordnung: [alle]` und liegen damit **außerhalb** dieses Wertebereichs
 
 **Begründung.** #60 ist der erste Vertreter der Familie **K3/K4-Ereignisschäden** (§2.6). Sein
 Endpunkt ist kein Gesundheitsendpunkt, sondern der Baustein eines Schadenskontos —
-`K3-Wiederherstellung` aus `KWRA-Monetarisierung.xlsx`, Blatt „Schadenskonten-System" Z28, wie in
-Kap. 1 („Konto-Einbettung") gebucht. Keiner der drei zugelassenen Werte träfe zu: `mortalitaet` und
+`K3-Wiederherstellung`, der Baustein-Name des Buchungsobjekts #60 in der Netzwerkliste
+(`KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt „Schadensbaum-Netzwerkliste“ J61), gebucht
+auf das Konto K3 (`KWRA-Monetarisierung.xlsx`, Blatt „Schadenskonten-System“ C26 Definition, C27
+Kostensatz-Typ) wie in Kap. 1 („Konto-Einbettung“). Keiner der drei zugelassenen Werte träfe zu: `mortalitaet` und
 `morbiditaet` sind für einen Sachschaden sachlich falsch, `beide` wäre irreführend, weil die
 Personenfolgen desselben Ereignisses ausdrücklich **nicht** in #60, sondern in #101 (K1) gebucht
 werden (Kap. 6, Modellgrenze 1). Ebenso hat der Hebel S092 keine Bandachse: Er wirkt als
@@ -3239,8 +3241,8 @@ einen der zugelassenen Werte wäre eine falsche Angabe, keine Einhaltung des Wer
 Fortschreibung geändert, §1/§5.4; dieser Abschnitt ist der Antrag, nicht die Änderung):
 
 1. `endpunkt` erhält für Berichte der Familie K3/K4-Ereignisschäden zusätzlich den Wertebereich
-   „Baustein-Name des Schadenskontos nach Blatt „Schadenskonten-System"" (hier
-   `K3-Wiederherstellung`).
+   „Baustein-Name des Buchungsobjekts nach Blatt „Schadensbaum-Netzwerkliste" (Spalte J), gebucht auf
+   ein Konto des Blatts „Schadenskonten-System"" (hier `K3-Wiederherstellung`).
 2. `bandzuordnung` erhält zusätzlich den Wert `[alle]` für Parameter ohne differenzierende
    Bandachse.
 3. Das Block-Format wird um die fünf Felder erweitert, mit denen dieses Kapitel die Vorgabe P1
@@ -3395,8 +3397,9 @@ dieses Berichts ein — vgl. B6, „Hochwasserschutzfibel … hier nicht im Voll
    13.09.2026 (Repository-Arbeitskopie, Volltext im Original geprüft — Sheet-/Zeilenbezüge oben
    und in Kap. 1/2 einzeln verifiziert).
 2. **KWRA-Monetarisierung**, Arbeitsmappe `docs/Schadensbaum/KWRA-Monetarisierung.xlsx` — Sheets
-   „Risiken-Monetarisierung“ (Z51, Z54–Z56, Z64, Z65, Z106), „Schadenskonten-System“ (Z26–Z30),
-   „Rechenregeln“ (Z9, Z11, Z20), „Abgleich-Protokoll“ (P5, P15, P16). **Dateistand:** Git-Commit
+   „Risiken-Monetarisierung“ (Z17, Z42, Z51, Z54–Z57, Z64, Z65, Z106), „Schadenskonten-System“
+   (Z26–Z30), „Rechenregeln“ (Z7, Z9, Z11, Z19, Z20), „Abgleich-Protokoll“ (Punkt 3, P5, P15, P16);
+   die Einzelnachweise stehen bei den Zitaten in Kap. 1/2. **Dateistand:** Git-Commit
    `68442ca12689045730c349c4160abe963096f733` (2026-08-30). **Prüfsumme (SHA-256):**
    `4383882d3a935f09abe891b6f60ec6f8843e28da627813eaaed31fe15308ce2d`. **Zugriffsdatum:**
    13.09.2026 (Repository-Arbeitskopie, Volltext im Original geprüft — Sheet-/Zeilenbezüge oben
