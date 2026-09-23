@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { fmtEurCompact } from '../utils/format'
 
 interface RankRow { ags: string; name: string; bundesland: string | null; index: number; outcome: number; unit: string; cost_eur: number
   /** Verwechslungssperre Klasse A/B: false = Screening ohne Euro-Bezifferung. */
@@ -98,7 +99,7 @@ export default function StudyPage() {
                         <td>
                           {r.has_euro_layer === false
                             ? String(r.cost_display ?? '')
-                            : r.cost_eur > 0 && `${Math.round(r.cost_eur).toLocaleString('de-DE')} €`}
+                            : r.cost_eur > 0 && fmtEurCompact(r.cost_eur)}
                         </td>
                       )}
                     </tr>
