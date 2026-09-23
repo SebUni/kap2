@@ -319,6 +319,11 @@ STAGE_LABELS: dict[int, str] = {
 # sondern vorrangig docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx,
 # Blatt „Klimawirkungsketten", Zeile 279 (S094–S100) — Entscheid und Herleitung in
 # reviews/BEFUNDE_62.md, Befund 13.
+# Abweichung kwra_id 63: sensitivity_names folgt hier NICHT der Wirkungsmechanismen-Mappe,
+# sondern vorrangig docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx,
+# Blatt „Klimawirkungsketten", Zeile 278 (S092–S094) — Vorrangregel nach
+# docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md, Abschnitt „Vorrang zwischen den UBA-Digitalisaten",
+# Beispielfall #63 (T-0564-ceo); Vermerk im Ledger folgt mit dem ersten Steckbrief zu #63.
 PLANNED_RISKS: list[dict] = [
     {"kwra_id": 62, "name": "Stadtklima / Wärmeinseln",
      "cluster": "infrastruktur", "kwra_field": "Bauwesen", "stage": 1,
@@ -330,7 +335,7 @@ PLANNED_RISKS: list[dict] = [
      "cluster": "infrastruktur", "kwra_field": "Bauwesen", "stage": 1,
      "hazard_names": ["Hitze", "Kälte / Frost", "Luftfeuchtigkeit", "Sonnenscheindauer", "Nässe"],
      "upstream_names": [],
-     "sensitivity_names": ["Verwendete Baumaterialien auf Gebäudeebene", "Begrünung von Gebäuden"],
+     "sensitivity_names": ["Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer von Gebäuden und Infrastrukturen", "Zustand von Gebäuden und Infrastrukturen", "Verwendete Baumaterialien auf Gebäudeebene"],
      "exposure_names": ["Vorkommen von Bau- und Immobilienunternehmen", "Vorkommen von Gebäuden", "Vorkommen von Siedlungsinfrastrukturen"]},
     {"kwra_id": 61, "name": "Vegetation in Siedlungen",
      "cluster": "infrastruktur", "kwra_field": "Bauwesen", "stage": 1,
