@@ -257,16 +257,25 @@ def parse(pfad: Path, verlauf: bool = False) -> list[Befund]:
     # Runden). Der Befund**text** dagegen ist stabil und steht oft nur im ersten
     # Vorkommen — Zwischenstands-Tabellen führen die Nummer ohne Textspalte. Er
     # wird deshalb aus dem ersten aussagekräftigen Vorkommen übernommen.
+    # Gleiches gilt für den Prüfausdruck (T-0692-cto): Führt eine spätere
+    # Rundentabelle den Befund ohne Prüfausdruck-Spalte, verdeckte sie bisher den
+    # Ausdruck der Kopftabelle, und `--pruefe` zählte den Befund als unbelegt.
+    # Trägt das letzte Vorkommen keinen Ausdruck, gilt der jüngste vorhandene.
     endstand: dict[str, Befund] = {}
     texte: dict[str, str] = {}
+    ausdruecke: dict[str, str] = {}
     for b in roh_liste:
         key = b.nr.split(" (")[0]
         endstand[key] = b
         if key not in texte and len(b.text) > 8:
             texte[key] = b.text
+        if b.pruefausdruck:
+            ausdruecke[key] = b.pruefausdruck
     for key, b in endstand.items():
         if len(b.text) <= 8 and key in texte:
             b.text = texte[key]
+        if not b.pruefausdruck and key in ausdruecke:
+            b.pruefausdruck = ausdruecke[key]
     return sorted(endstand.values(), key=lambda b: b.sortkey)
 
 
