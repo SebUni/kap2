@@ -261,9 +261,19 @@ def parse(pfad: Path, verlauf: bool = False) -> list[Befund]:
     # Rundentabelle den Befund ohne Prüfausdruck-Spalte, verdeckte sie bisher den
     # Ausdruck der Kopftabelle, und `--pruefe` zählte den Befund als unbelegt.
     # Trägt das letzte Vorkommen keinen Ausdruck, gilt der jüngste vorhandene.
+    # Vorrang der Kopftabelle (T-0785-ceo): Trägt die erste Befundtabelle der Datei
+    # für eine Nummer einen Ausdruck, ist dieser der Ausdruck des Endstands — dort
+    # werden Ersatzausdrücke gepflegt (T-0610-ceo, T-0620-ceo); ein späteres,
+    # älteres Vorkommen darf ihn nicht verdecken. Trägt sie keinen, gilt wie
+    # bisher der jüngste vorhandene. Status und Befundtext bleiben unberührt.
     endstand: dict[str, Befund] = {}
     texte: dict[str, str] = {}
     ausdruecke: dict[str, str] = {}
+    kopf_ausdruecke: dict[str, str] = {}
+    kopf_tabelle = roh_liste[0].tabelle if roh_liste else None
+    for b in roh_liste:
+        if b.tabelle == kopf_tabelle and b.pruefausdruck:
+            kopf_ausdruecke.setdefault(b.nr.split(" (")[0], b.pruefausdruck)
     for b in roh_liste:
         key = b.nr.split(" (")[0]
         endstand[key] = b
@@ -274,7 +284,9 @@ def parse(pfad: Path, verlauf: bool = False) -> list[Befund]:
     for key, b in endstand.items():
         if len(b.text) <= 8 and key in texte:
             b.text = texte[key]
-        if not b.pruefausdruck and key in ausdruecke:
+        if key in kopf_ausdruecke:
+            b.pruefausdruck = kopf_ausdruecke[key]
+        elif not b.pruefausdruck and key in ausdruecke:
             b.pruefausdruck = ausdruecke[key]
     return sorted(endstand.values(), key=lambda b: b.sortkey)
 
