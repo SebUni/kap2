@@ -578,6 +578,78 @@ Bericht ausgewiesen** — die einfache und die belastbare Form, mit der Differen
 die getroffene Wahl wird begründet (Abschnitt 6, Modellgrenzen). **Still zu vereinfachen ist
 unzulässig** und im Review ein Befund, genauso wie eine unerklärt stehengelassene Formel.
 
+## Vorrang zwischen den UBA-Digitalisaten
+
+Widersprechen sich die Arbeitsmappen `KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` und `KWRA-2021_Klimawirkungen.xlsx`, gilt für jedes Risiko die Schadensbaum-Mappe. Risikostufen ohne Anpassung, Gewissheit, Anpassungsdauer, Wirksamkeit der Anpassung und Restrisiko stehen nur in der KWRA-2021-Mappe und werden von dort übernommen.
+
+**Begründung aus dem Charakter der beiden Dokumente.** Die Knoten der Wirkungskette stammen in
+beiden Mappen aus denselben UBA-Zeichnungen von 2016 (Klimawirkungsketten). Die beiden Mappen sind
+aber für verschiedene Zwecke gebaut:
+
+- *Schadensbaum-Mappe — die Knotenliste des Bundles.* Sie ist Quelle 1 des
+  Prüfgrundlagen-Bundles (diese Aufgabe, §1, Zeilen 66–68: „Diese Knoten sind die einzig
+  zulässigen Eingangsgrößen — nicht mehr, nicht weniger."). Jeder Pfeil der Zeichnung ist dort
+  eine eigene Kennung: Blatt `Klimawirkungsketten`, Zeile 1, Spalten E bis H tragen die
+  Kopfzellen `Input_IDs_Einflüsse`, `Input_IDs_Sensitivitäten`, `Input_IDs_Räumlich` und
+  `Input_IDs_Wirkung`; Spalte Q (Kopf `Anmerkung`) hält je Zeile fest, von welchem Pfeil der
+  Zeichnung der Eintrag abgelesen ist.
+- *KWRA-2021-Mappe — die Bewertungstabelle.* Sie liegt nicht im Bundle, sondern unter
+  `docs/KWAR/`, und ist nach eigener Angabe eine Aufbereitung der Teilberichte der KWRA 2021:
+  Blatt `Lesehinweise`, Zelle A2:
+
+  `Vollständig aufbereitet aus allen sechs Teilberichten der Klimawirkungs- und Risikoanalyse 2021 (Umweltbundesamt).`
+
+  Belastbar ist sie für die Bewertungen
+  im Blatt `Klimawirkungen` (Zeile 2, Kopfzellen der Spalten N bis AF: Risiko ohne Anpassung,
+  Gewissheit, Anpassungsdauer, Wirksamkeit, Restrisiko). Ihr Blatt `Wirkungsmechanismen` dagegen
+  ist nach seiner Zeile 2 selbst nur eine zweite Abschrift der Zeichnung und nicht Teil der
+  KWRA-Bewertung. Zelle A2 dieses Blatts lautet vollständig:
+
+  `Quelle: UBA (2016), Klimawirkungsketten — visuell aus den Diagrammen abgelesen. NICHT Teil der KWRA-2021-Bewertung. Namensstand der Vulnerabilitätsanalyse 2015, auf die KWRA-2021-Klimawirkungen abgebildet. Die Exposition ist in der Quelle nur je Handlungsfeld definiert, nicht je Klimawirkung. Zuordnungsebene „Container" heißt: Der Pfeil zeigt auf das Themenfeld und gilt für alle Klimawirkungen darin.`
+
+Ein Widerspruch entsteht deshalb praktisch nur bei den Knoten der Wirkungskette (Einflüsse,
+Sensitivitäten, räumliches Vorkommen, vorgelagerte Wirkungen). Dort ist die Schadensbaum-Mappe die
+genauere und die verbindliche Abschrift. Die Bewertungen gibt es nur in der KWRA-2021-Mappe, dort
+kann nichts widersprechen. Was außerhalb der Wirkungskette in beiden Mappen steht, stimmt überein
+(Abgleich vom 22.09.2026).
+Die Namen der 102 Klimawirkungen sind gleich (Schadensbaum-Mappe: Blatt
+`Schadensbaum-Netzwerkliste`, Spalte B; KWRA-2021-Mappe: Blatt `Klimawirkungen`, Spalte D). Auch
+das Handlungserfordernis ist gleich (Schadensbaum-Mappe: dasselbe Blatt, Spalte E, Kopf
+`Handlungserfordernis (KWRA)`; KWRA-2021-Mappe: Blatt `Klimawirkungen`, Spalte AG).
+
+**Vermerkpflicht.** Jede Anwendung dieser Regel wird im Befund-Ledger `reviews/BEFUNDE_<nr>.md` des
+betroffenen Risikos mit beiden Fundstellen (Datei, Blatt, Zeile, Spalte) und dem Ergebnis
+festgehalten.
+
+**Beispielfall #62 — Stadtklima / Wärmeinseln.** Der Widerspruch betrifft die
+Sensitivitätsfaktoren.
+
+| | Fundstelle | Wortlaut der Zelle |
+|---|---|---|
+| Schadensbaum-Mappe | `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt `Klimawirkungsketten`, Zeile 279 (Knoten `W124`), Spalte J (Kopfzelle J1: `Input_Namen_Sensitivitäten`) | `Verwendete Baumaterialien auf Gebäudeebene; Begrünung von Gebäuden; Bauliche, organisatorische und finanzielle Vorsorge der öffentlichen Hand; Zustand von (Schutz-)Infrastrukturen; Verwendete Baumaterialien von (Schutz-)Infrastrukturen; Begrünung von Städten/Siedlungen; Grad der Versiegelung` |
+| KWRA-2021-Mappe | `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt `Wirkungsmechanismen`, Zeile 67 (ID `62`), Spalte G (Kopfzelle G5: `Vulnerabilität – Sensitivitätsfaktoren`) | `Begrünung von Städten / Siedlungen · Grad der Versiegelung` |
+
+Die Schadensbaum-Mappe nennt sieben Faktoren (S094 bis S100, Spalte F derselben Zeile), die
+KWRA-2021-Mappe zwei. *Ergebnis der Regel:* Es gelten die sieben Sensitivitäten der
+Schadensbaum-Mappe. Die fünf nur dort genannten Faktoren muss der Bericht zu #62 adressieren
+(§2.1). So hat Befund 13 in `reviews/BEFUNDE_62.md` schon entschieden.
+
+**Beispielfall #63 — Innenraumklima.** Auch hier betrifft der Widerspruch die
+Sensitivitätsfaktoren, und zwar in beide Richtungen.
+
+| | Fundstelle | Wortlaut der Zelle |
+|---|---|---|
+| Schadensbaum-Mappe | `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt `Klimawirkungsketten`, Zeile 278 (Knoten `W123`), Spalte J (Kopfzelle J1: `Input_Namen_Sensitivitäten`) | `Bauliche, organisatorische und finanzielle Vorsorge der Eigentümer und Nutzer von Gebäuden und Infrastrukturen; Zustand von Gebäuden und Infrastrukturen; Verwendete Baumaterialien auf Gebäudeebene` |
+| KWRA-2021-Mappe | `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt `Wirkungsmechanismen`, Zeile 68 (ID `63`), Spalte G (Kopfzelle G5: `Vulnerabilität – Sensitivitätsfaktoren`) | `Verwendete Baumaterialien auf Gebäudeebene · Begrünung von Gebäuden` |
+
+Gemeinsam ist beiden nur der Faktor Verwendete Baumaterialien auf Gebäudeebene (S094). Die Schadensbaum-Mappe führt
+zusätzlich die Vorsorge der Eigentümer und Nutzer und den Zustand von Gebäuden (S092, S093,
+Spalte F derselben Zeile). Die KWRA-2021-Mappe führt zusätzlich die Begrünung von Gebäuden, die
+die Schadensbaum-Mappe bei #63 nicht nennt, sondern nur bei #62 (S095). *Ergebnis der Regel:* Es
+gelten die drei Sensitivitäten S092, S093 und S094 der Schadensbaum-Mappe. Die Begrünung von
+Gebäuden ist für #63 kein Eingangsknoten. Für #63 gibt es noch keinen Bericht und kein Ledger.
+Den Vermerk trägt der erste `/neu-risiko 63` in `reviews/BEFUNDE_63.md` ein.
+
 ---
 
 *Dieses Dokument ersetzt: Aufgabenbeschreibung v1 (22.08.2026) und `docs/METHODIK_GRUNDSAETZE.md`.*
