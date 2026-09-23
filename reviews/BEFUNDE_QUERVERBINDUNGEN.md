@@ -28,15 +28,25 @@ Nachzählung: **157 zwischen Systembereichen + 105 innerhalb eines Systembereich
 
 **2. Kennzahl der Arbeitsmappe:** **257** Querverbindungen insgesamt — Arbeitsmappe, Blatt
 „Wirkbeziehungen", Zelle B6 (Zeile 6, Abschnitt „1. Kennzahlen (Teilbericht 6, Kapitel 3.4)"). Die Quelle nennt sie
-an drei Stellen gleichlautend: Teilbericht 6, Kap. 3.4, S. 83 („Im Rahmen der Analyse wurden 257
-Querverbindungen identifiziert"), Kernaussagen S. 88 und Zusammenfassung des Teilberichts (Kap. „Auswertung der
-Querverbindungen", „Insgesamt wurden 257 Querverbindungen zwischen den 102 Klimawirkungen der 13 Handlungsfelder
-identifiziert").
+an vier Stellen gleichlautend: Teilbericht 6, Kap. 3.4, S. 83 („Im Rahmen der Analyse wurden 257 Querverbindungen
+identifiziert“); Teilbericht 6, Kernaussagen der Analyse der Querverbindungen, S. 88 („Insgesamt bestehen 257
+Querverbindungen …“; Überschrift dort wörtlich „Kernaussagen der Analyse der Querverbindungen“); Teilbericht 6,
+Zusammenfassung, S. 20 („Insgesamt wurden 257 Querverbindungen zwischen den 102 Klimawirkungen der 13
+Handlungsfelder identifiziert“); Zusammenfassungsbericht der KWRA (`kwra2021_teilbericht_zusammenfassung_…pdf`),
+S. 106, gleicher Wortlaut. Seitenzahlen nach der Seitenmarke des Textauszugs.
 
 **3. Worin die Differenz von fünf besteht:** aus der Quelle nicht entscheidbar. Es fehlt die Kantenliste der 257
 Querverbindungen (Einzelbeziehungen je Klimawirkung, von der KWRA in keinem der sechs Teilberichte veröffentlicht;
 Abbildung 8, S. 83, zeigt nur das Chord-Diagramm auf Handlungsfeldebene) sowie eine Angabe des Teilberichts,
-ob Tabelle 28 gleich abgegrenzt zählt wie Kap. 3.4. Belegt ist nur das Gegenteil einer naheliegenden Erklärung:
+ob Tabelle 28 gleich abgegrenzt zählt wie Kap. 3.4. Durchgesehen für diese Aussage (Stand 23.09.2026): Teilbericht 6, Kap. 3.4 (S. 82–88), auf die
+Stichworte „Liste“, „Anhang“ und „Tabelle“ durchsucht (keine Treffer, Text zu den 257 in Auszügen gelesen); Tabelle 28 (S. 153) und das Tabellenverzeichnis (S. 10) von
+Teilbericht 6; über alle Teilberichte 1–6, den Zusammenfassungsbericht und den Anhang (`cc_20-2021_kwra2021_anhang.pdf`)
+eine Volltextsuche nach „257“, „Querverbindung“ und „Wirkbeziehung“ (im Anhang keine Treffer; sein Inhaltsverzeichnis
+nennt Anhänge A bis E — Expertenlisten, Szenarien, Indikator-Kennblätter —, keinen zu Wirkbeziehungen; die
+Teilberichte 1–5 enthalten keinen Treffer für 257 in diesem Zusammenhang). Die Stichwortsuche ist Ergänzung; die
+Aussage „keine Kantenliste veröffentlicht“ deckt sich mit dem Vermerk der Arbeitsmappe (Blatt „Wirkbeziehungen“,
+Zeile 2; Blatt „Lesehinweise“, Zeile 40) und wird von dort **als übernommene Angabe** geführt, nicht als eigene
+vollständige Durchsicht der Teilberichte 2–5 Seite für Seite. Belegt ist nur das Gegenteil einer naheliegenden Erklärung:
 Kap. 3.4 nimmt die rein vorgelagerten Klimawirkungen in die 257 hinein (Fußnote 20, S. 82), Tabelle 28
 schließt sie aus (Tabellenvermerk, S. 153). Das würde Tabelle 28 kleiner machen als 257, nicht größer — die
 Abgrenzung erklärt die Differenz also nicht. Ob doppelt geführte Paare, gegenseitige Wechselwirkungen (S. 88:
