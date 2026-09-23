@@ -10,6 +10,8 @@
       "Bash(pip:*)",
       "Bash(pip3:*)",
       "Bash(pytest:*)",
+      "Bash(bash:*)",
+      "Bash(npm:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(mkdir:*)",
