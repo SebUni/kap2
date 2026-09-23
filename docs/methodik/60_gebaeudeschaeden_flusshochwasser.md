@@ -416,7 +416,9 @@ Regulierungspraxis auch Zeitwerte ansetzen (Alterswertminderung nach ImmoWertV);
 schreibt über Mon. J65 → J64 den Zeitwertansatz vor. **Entschieden:** Der Neuwert bleibt Basiswert,
 die Abweichung von J64 steht als Antrag auf Fortschreibung in §7.2 (Anker `#fortschreibung-neuwert-k3`);
 der Zeitwertansatz läuft dort als beziffertes Band mit (Alterswertminderungsfaktor 0,55, Band
-0,40–0,75, Abschätzung von KAP3; K3-Betrag −45 %). **Modellgrenze:**
+0,40–0,75, Abschätzung von KAP3; K3-Betrag −45 %). **Status des Antrags:** beantragt 17.09.2026,
+noch nicht entschieden, im Abgleich-Protokoll der Mappe noch ohne Zeile; Entscheider, Frist und die
+Folge für die Abnahme (Quellen-Synchronität, LF 14) stehen in §7.2 unter „Status". **Modellgrenze:**
 Nichtwohngebäude sind im Mengengerüst nicht enthalten — die Mengenbasis ist insoweit eine
 Untergrenze (§3.6).
 
@@ -1583,7 +1585,7 @@ die Bezifferung von \(q_0\) bleibt offen und ist als solche gekennzeichnet.
 | Toleranz Verteilungsprüfung | ±11,5 Prozentpunkte | **berechnet**, Herleitung §4.5: quadratische Zusammensetzung aus Jackknife-Standardfehler der Ankerreihe ±11,2 (gerechnet aus `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`), Ableseunschärfe ±1,7 und modellseitigem HQextrem-Band ±2,3; **Abschätzung von KAP3** ist daran nur die Wahl der Kombinationsregel (unabhängige Beiträge, quadratisch), vorab festgelegt. Ist-Ergebnis: Abstand 13,9 Pp, **Prüfung nicht bestanden** (Modellentscheid §4.5) |
 | \(U\) Sanity-Untergrenze | 0,0103 Mrd. €₂₀₂₆/a | teils **Quelle**, teils **Abschätzung von KAP3**, Herleitung §4.6: die beiden Fondsvolumina der Wiederaufbauhilfe-Gesetze (amtliche Quelle, BGBl.) sind belegt; Wohngebäude-/Wohnanteil, flussseitiger Anteil und die Umlage auf die Wiederkehrzeit sind Abschätzungen von KAP3 |
 | \(O\) Sanity-Obergrenze | 6,29 Mrd. €₂₀₂₆/a | **berechnet** aus den ZÜRS-Klassenraten (GK3/GK4 0,1 a⁻¹, GK2 0,01 a⁻¹), den Adresszahlen (Register 60-R17-01) und dem Gebäudewert 527.280 €₂₀₂₆ (Register 60-R24-01), gedeckelt mit der Schadensquote 0,250 (§3.3), Herleitung §4.6; es fließen die Abschätzungen von KAP3 der ZÜRS-/GDV-Registerabschätzungen ein |
-| \(f_{\text{AWM}}\) Alterswertminderungsfaktor (Zeitwertansatz, nur Sensitivität) | 0,55 (0,40–0,75) | **Abschätzung von KAP3** auf der Regel § 38 ImmoWertV (RND/GND, GND 80 a nach Anlage 1), Herleitung §7.2; geht nicht in den Basiswert ein; Sensitivität: K3-Betrag 0,54 (0,39–0,74) statt 0,99 Mrd. €₂₀₂₆/a |
+| \(f_{\text{AWM}}\) Alterswertminderungsfaktor (Zeitwertansatz, nur Sensitivität) | 0,55 (0,40–0,75) | **Abschätzung von KAP3** auf der Regel § 38 ImmoWertV (RND/GND, GND 80 a nach Anlage 1), Herleitung §7.2; geht nicht in den Basiswert ein; Sensitivität: K3-Betrag 0,62 (0,45–0,85) statt 1,13 Mrd. €₂₀₂₆/a (kalibrierte Bundessumme §4.6) |
 | \(q_0\) Objektschutz-Anteil heute | **geparkt (Datenquelle fehlt)** | keine Quelle; Watchlist §4.7 — nicht gesetzt, nicht geschätzt |
 
 ```python test: beispiel_60_kalibrierung
@@ -2356,7 +2358,8 @@ J65 („Wie ID 59, …") → J64 („Wiederherstellungskosten (Gebäude, Hausrat
 **Zeitwertansatz**; …") den **Zeitwertansatz** vor. Das Blatt „Schadenskonten-System" C27 lässt für K3
 beide Lesarten zu („Wiederherstellungs-/Zeitwertkosten"), die Kontodefinition Z26 spricht von
 „Wiederherstellungskosten". Dieser Bericht bewertet mit **NHK-Neuwerten**: Wiederherstellungswert
-**527.280 €₂₀₂₆** je exponiertem Wohngebäude (§4.3, Register 60-R24-01). Die Arbeitsmappe wird nicht
+**481.726,25 €₂₀₂₆** je exponiertem Wohngebäude (typgewichteter Wertsatz 1.781,532 €₂₀₂₆/m² BGF,
+§4.3 Punkt 2; Mengengerüst Register 60-R24-01). Die Arbeitsmappe wird nicht
 verändert (eiserne Regel 2); dieser Abschnitt ist der Antrag, nicht die Änderung (Befund 41 in
 `reviews/BEFUNDE_60.md`).
 
@@ -2369,8 +2372,10 @@ fortzuschreiben. Begründung:
    gezahlte Wohngebäude-Leistungen, und Wohngebäudeverträge decken zum gleitenden Neuwert (§4.2,
    Herleitung von \(\kappa\)). Würde nur der Basiswert je Gebäude auf den Zeitwert gesetzt, bliebe der
    kalibrierte K3-Betrag \(\lambda M_0 \equiv A^{*}\) **unverändert** — \(\lambda\) nähme allein die
-   Alterswertminderung auf (Zentralwert 1,132 / (1,360 · 0,55) = **1,51**, am unteren Faktor-Ende
-   1,132 / (1,360 · 0,40) = **2,08**). Die Umstellung hätte dann keine Wirkung auf das Ergebnis,
+   Alterswertminderung auf (Zentralwert \(A^{*}/(M_0 f_{\text{AWM}})\) = 1,132 / (1,243 · 0,55) =
+   **1,66**, am unteren Faktor-Ende 1,132 / (1,243 · 0,40) = **2,28**; \(A^{*}\) aus §4.2,
+   \(M_0\) aus §4.3). Diese beiden Werte sind die maßgebliche \(\lambda\)-Angabe dieses Abschnitts;
+   der Beispielblock unten rechnet sie nach. Die Umstellung hätte dann keine Wirkung auf das Ergebnis,
    sondern verzerrte nur den Skalar: Derselbe Anker würde durch einen kleineren Nenner geteilt, ohne
    dass sich an der bewerteten Sache etwas ändert.
 2. **Ein konsistenter Zeitwertansatz braucht eine Anker-Umrechnung ohne Quelle.** Erst wenn auch
@@ -2404,44 +2409,61 @@ fortzuschreiben. Begründung:
   allem Ausbauteile mit kürzerer Nutzungsdauer (Estrich, Putz, Bodenbeläge, Haustechnik); auf sie
   bezogen läge der Faktor eher am unteren Bandende.
 
-**Zeitwert je Gebäude:** 527.280 € · 0,55 = **290.004 €₂₀₂₆** (Band 210.912–395.460 €₂₀₂₆).
+**Zeitwert je Gebäude:** 481.726,25 € · 0,55 = **264.949 €₂₀₂₆** (Band 192.691–361.295 €₂₀₂₆).
 
-**Ergebnis-Sensitivität auf den K3-Betrag.** Bei konsistentem Zeitwertansatz (Basiswert, Anker und
-Sanity-Grenzen mit demselben Faktor) sinkt die kalibrierte Bundessumme K3 von **0,99 Mrd. €₂₀₂₆/a**
-auf **0,54 Mrd. €₂₀₂₆/a** (Band **0,39–0,74 Mrd. €₂₀₂₆/a**), also um **−0,44 Mrd. €₂₀₂₆/a bzw.
-−45 %** (Band −25 % bis −60 %). Dieselbe Verschiebung gilt je Kommune, weil \(f_{\text{AWM}}\)
-bundesweit einheitlich wirkt. Die Sanity-Untergrenze fiele mit auf 0,0103 · 0,55 = **0,0057 Mrd. €₂₀₂₆/a**.
-Werden nur die Gebäudewerte umgestellt, der Anker aber nicht, bleibt der Betrag bei 0,99 Mrd. €₂₀₂₆/a
-und nur \(\lambda\) steigt — auf 1,32 (Begründung 1). Im Produkt wird der Faktor nach Vorgabe P1 als
-„Abschätzung von KAP3" mit dieser Herleitung in der Parameterliste geführt (§4.8).
+**Ergebnis-Sensitivität auf den K3-Betrag.** Ausgangspunkt ist die kalibrierte Bundessumme
+\(\lambda M_0 = A^{*}\) = **1,132 Mrd. €₂₀₂₆/a** (§4.2, §4.6). Bei konsistentem Zeitwertansatz
+(Basiswert, Anker und Sanity-Grenzen mit demselben Faktor) sinkt sie auf 1,132 · 0,55 =
+**0,62 Mrd. €₂₀₂₆/a** (Band 1,132 · 0,40 bis 1,132 · 0,75 = **0,45–0,85 Mrd. €₂₀₂₆/a**), also um
+**−0,51 Mrd. €₂₀₂₆/a bzw. −45 %** (Band −25 % bis −60 %). Dieselbe Verschiebung gilt je Kommune, weil
+\(f_{\text{AWM}}\) bundesweit einheitlich wirkt. Die Sanity-Untergrenze fiele mit auf 0,0103 · 0,55 =
+**0,0057 Mrd. €₂₀₂₆/a**. Werden nur die Gebäudewerte umgestellt, der Anker aber nicht, bleibt der
+Betrag bei 1,132 Mrd. €₂₀₂₆/a und nur \(\lambda\) steigt (Werte in Begründung 1). Im Produkt wird der
+Faktor nach Vorgabe P1 als „Abschätzung von KAP3" mit dieser Herleitung in der Parameterliste geführt
+(§4.8).
 
 ```python test: beispiel_60_zeitwert
 # 7.2 Zeitwertansatz als Sensitivitaetsband (Abschaetzung von KAP3)
 GND = 80.0
 f_mid, f_lo, f_hi = 44.0 / GND, 32.0 / GND, 60.0 / GND
 assert (f_mid, f_lo, f_hi) == (0.55, 0.40, 0.75)
-wert_geb = 208.0 * 1.30 * 1950.0
-assert abs(wert_geb * f_mid - 290004.0) < 1.0
-A_stern = 1.6 * 0.65 * 1.54 * 0.50 * 1.15 * 1.07
+theta = 0.596                                    # Typ-Mix EFH/ZFH wie in 4.3 Punkt 2
+n_mix = theta * 1950.0 + (1 - theta) * 1533.0    # typgewichteter Wertsatz EUR2026/m2 BGF
+wert_geb = 208.0 * 1.30 * n_mix                  # Neuwert je exponiertem Wohngebaeude (4.3)
+assert abs(wert_geb - 481726.25) < 1.0
+assert abs(wert_geb * f_mid - 264949.0) < 1.0
+assert abs(wert_geb * f_lo - 192691.0) < 1.0 and abs(wert_geb * f_hi - 361295.0) < 1.0
+A_stern = 1.838 * 0.65 * 1.54 * 0.50 * 1.15 * 1.07   # Anker wie in 4.2 (A_ver = 1,838)
+assert abs(A_stern - 1.132) < 5e-3
 # M0 wie in 4.3: gemessene Klassenraten, Wohngebaeudeanteil, nationales Mengengeruest
 w_wohn = 0.872
 r_gk34 = 0.005979599550826
 r_gk2 = 0.000675151053693
 M0 = (w_wohn * wert_geb * 339_000 * r_gk34 + w_wohn * wert_geb * 1_380_000 * r_gk2) / 1e9
-assert abs(M0 - 1.360) < 5e-3
-# nur Basiswert umgestellt: Betrag unveraendert, lambda steigt
-assert abs(A_stern / (M0 * f_mid) - 1.32) < 5e-3
-assert abs(A_stern / (M0 * f_lo) - 1.81) < 5e-3
+assert abs(M0 - 1.243) < 5e-3
+# nur Basiswert umgestellt: Betrag unveraendert, lambda steigt (Begruendung 1)
+assert abs(A_stern / (M0 * f_mid) - 1.66) < 5e-3
+assert abs(A_stern / (M0 * f_lo) - 2.28) < 5e-3
 # konsistent umgestellt: K3-Betrag und Band
-assert abs(A_stern * f_mid - 0.542) < 5e-3
-assert abs(A_stern * f_lo - 0.394) < 5e-3 and abs(A_stern * f_hi - 0.739) < 5e-3
-assert abs(A_stern * (1 - f_mid) - 0.443) < 5e-3
-U = 1.6 * 0.65 * 0.50 * 1.07
-assert abs(U * f_mid - 0.306) < 5e-3
+assert abs(A_stern * f_mid - 0.62) < 5e-3
+assert abs(A_stern * f_lo - 0.45) < 5e-3 and abs(A_stern * f_hi - 0.85) < 5e-3
+assert abs(A_stern * (1 - f_mid) - 0.51) < 5e-3
+U = 0.0103                                       # Sanity-Untergrenze aus 4.6, Mrd. EUR2026/a
+assert abs(U * f_mid - 0.0057) < 5e-5
 ```
 
 **Status.** Beantragt am **17.09.2026**, noch nicht entschieden. Bis zur Entscheidung rechnet #60 mit
 dem Neuwert und weist den Zeitwertansatz als Band aus (hier, §3.4, §4.8, Kap. 6 Modellgrenze 9).
+**Stand an der Quelle (Befund 53):** Das Blatt „Abgleich-Protokoll" der Arbeitsmappe führt zu #60
+**noch keine Zeile**; vorgesehen ist eine Zeile nach dem Muster Z151 (Quelle-ID 60, Ziel J64/J65, Art
+„Fortschreibung Bewertungslogik (keine Kante)", Inhalt „Neuwert (NHK, indexiert) statt
+Zeitwertansatz für #60; Zeitwert als Sensitivitätsband \(f_{\text{AWM}}\) = 0,55 (0,40–0,75);
+beantragt 17.09.2026"). **Entscheider:** der Eigner der Arbeitsmappe (Nutzer bzw. Aufsichtsrat, wie
+bei den bisherigen Fortschreibungen der Aufgabe); dieser Bericht ändert die Mappe nicht (eiserne
+Regel 2). **Frist:** vor der Abnahme und Integration von #60 (`/integriere-risiko 60`). Bis die
+Zeile im Abgleich-Protokoll steht oder der Antrag abgelehnt ist, ist die Abnahme von #60 im Punkt
+Quellen-Synchronität (Aufgabe §5 LF 14, §6) blockiert; Kap. 8 (Quelle 2) und B4 verweisen auf diesen
+Status.
 Wird der Antrag abgelehnt, sind Basiswert, \(A^{*}\), \(U\) und \(O\) mit \(f_{\text{AWM}}\)
 umzurechnen; das läuft über den Befund-Ledger, nicht still im Code.
 
@@ -2470,7 +2492,11 @@ dieses Berichts ein — vgl. B6, „Hochwasserschutzfibel … hier nicht im Voll
    `68442ca12689045730c349c4160abe963096f733` (2026-08-30). **Prüfsumme (SHA-256):**
    `4383882d3a935f09abe891b6f60ec6f8843e28da627813eaaed31fe15308ce2d`. **Zugriffsdatum:**
    13.09.2026 (Repository-Arbeitskopie, Volltext im Original geprüft — Sheet-/Zeilenbezüge oben
-   und in Kap. 1/2 einzeln verifiziert).
+   und in Kap. 1/2 einzeln verifiziert). **Anhängige Abweichung:** In einem verbindlichen Punkt
+   weicht dieser Bericht von der Mappe ab — Neuwert statt des in Mon. J65 → J64 vorgeschriebenen
+   Zeitwertansatzes. Antrag auf Fortschreibung vom 17.09.2026, noch nicht entschieden, im
+   Abgleich-Protokoll noch ohne Zeile; Entscheider, Frist und Folge für die Abnahme in §7.2
+   („Status", Anker `#fortschreibung-neuwert-k3`).
 3. **Bundesministerium für Wohnen, Stadtentwicklung und Bauwesen (BMWSB) (2022):**
    „Hochwasserschutzfibel – Objektschutz und bauliche Vorsorge“, Berlin, Deutschland. URL
    `https://www.bmwsb.bund.de/SharedDocs/downloads/DE/publikationen/raumordnung/hochwasserschutzfibel.html`,
