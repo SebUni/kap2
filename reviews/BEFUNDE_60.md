@@ -5744,6 +5744,18 @@ Exit 0
 | 67 | 141 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
 | 68 | 142 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
 | 79 | 153 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/60_gdv_jahresreihe_2002_2024.csv | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
+| 15 | 89 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 83 | 157 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 84 | 158 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 85 | 159 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 86 | 160 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 99 | 173 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 21 | 95 (Kopftabelle) | M | docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 46 | 120 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 47 | 121 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): bindet einen festen Wortlaut (`Registerzeile 60-S104-01 offen)**`, `ist offen`), den T-0580 abgelöst hat („bewusst inaktiv“); endet am heutigen Stand mit 1, obwohl der Befund geschlossen ist |
+| 48 | 122 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): bindet einen festen Wortlaut (`Registerzeile 60-S104-01 ist offen`), den T-0580 abgelöst hat („ist bewusst inaktiv (geparkt)“); endet am heutigen Stand mit 1, obwohl der Befund geschlossen ist |
+| 72 | 146 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
+| 104 | 178 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, reviews/BEFUNDE_60.md | tauglich |
 
 Befund 24: Der Ausdruck liest §3.1 des Berichts (Physischer Teil-Ausweis) und prüft, ob dort `EAD}_z = ` und `EAD}_k = ` stehen, aber nicht `EAD} = `. Die T-0567-Commits (`f3295ea2`, `081f239d`, `ee82fa5a`) berühren laut `git show --stat` außer dem Bericht auch `reviews/BEFUNDE_60.md` — dort steht jedoch nur die Ledger-Buchung des Befunds selbst, kein zusätzlicher Sachverhalt, den der Ausdruck prüfen müsste. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" trifft damit nicht zu. Lauf am heutigen Stand: Exit 0 (geschlossen, Kopftabellen-Maßstab). Probe am Vergabestand `cedc3e77` (Elterncommit des ersten T-0567-Commits, über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, kein Checkout): Exit 1 (Befund bestand).
 
@@ -6013,6 +6025,88 @@ Befund 68: Der Ausdruck liest Kapitel 5 des Berichts vor §5.1 ohne HTML-Komment
 Befund 79: Der Ausdruck liest §4.7 des Berichts und die Ankerreihen-CSV `docs/evidenz/60_gdv_jahresreihe_2002_2024.csv`, rechnet die Betragsanteile aus der CSV selbst nach und prüft, dass §4.7 sie (2020, 2014, Prozentpunkte, 2024, Nachrüstjahre 2010–2015) ausweist, „Betragsanteil" führt und `78,3 Prozentpunkte` sowie „rund der Hälfte bis zu drei" nicht mehr enthält. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `36e4a97b`: Exit 1 (Befund bestand).
 
 Urteil: Keiner der Ausdrücke aus T-0576 und T-0577 ist untauglich; deshalb gibt es hier keinen Ersatzblock. Nicht als Prüfausdrücke behandelt sind die Prosasätze in M Z. 6035–6039 und Z. 6089–6091 (Abschnitte Autor-Revision T-0576 und T-0577): Sie nennen `grep -c` und `python3 backend/scripts/lint_methodik.py 60` als gelaufene Läufe, stehen aber in keiner Spalte „Prüfausdruck" und sind keine Befehle zu einem Befund.
+
+**T-0578 (Befunde 15, 83, 84, 85, 86, 99).** Die drei T-0578-Commits (`22f18ae1`, `1995e22a`, `34fc6509`) berühren laut `git show --stat` den Bericht und `reviews/BEFUNDE_60.md`. Kontrolle statt Unterstellung: `docs/evidenz/register.md` und die Arbeitsmappen sind nicht berührt; der Ledger trägt bei den sechs Befunden nur die Buchung (Kopfzeile, Abschnitt Autor-Revision T-0578, Zeilen M Z. 6106–6112 mit „wortgleich in der Kopftabelle“ in der Spalte Prüfausdruck). Die geänderten Sachverhalte (Kapitel 7, Parameter-Blöcke, §4.8 Zeile λ) stehen im Bericht, den jeder der sechs Ausdrücke liest. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft deshalb nicht zu. Vergabestand ist `da8a57ae` (Elterncommit von `22f18ae1`), entpackt über `git archive da8a57ae docs reviews` in ein leeres Verzeichnis, kein Checkout.
+
+Befund 15: Der Ausdruck liest Kapitel 7 des Berichts bis §7.1 und prüft für jeden Parameter-Block, dass `kennzeichnung` genau einen der zwei zugelassenen Werte trägt und `wertebereich_abweichung: "#fortschreibung-endpunkt-k3"` steht, dass jeder als `abschaetzung_kap3` gekennzeichnete Block mit `herleitung_anker` auf einen im Text gesetzten `<a id=…>` zeigt, dass die drei Anker `s092-wirkung`, `s-bem-naeherung`, `fortschreibung-endpunkt-k3` stehen und dass die Überschrift von §7.1 „13.09.2026“ trägt. Er ist die in T-0578 fortgeschriebene Fassung (der alte verlangte genau vier Blöcke). Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `da8a57ae`: Exit 0. Das ist kein Mangel des Ausdrucks: Befund 15 war vor T-0578 erfüllt (der Vergabestand trägt vier Blöcke, die alle Bedingungen erfüllen); der Ausdruck prüft heute dieselben Bedingungen an allen Blöcken und ist die Fortschreibung des in T-0578 abgelösten alten Ausdrucks.
+
+Befund 83: Der Ausdruck liest Kapitel 7 und §4.8 des Berichts, zählt die Tabellenzeilen von §4.8, verlangt für alle im Ausdruck genannten Kennungen (`flood_bldg.…`) einen Parameter-Block sowie den Absatz „Zuordnung der Zeilen aus §4.8“ und den Verweis auf das Feld `band` des Blocks `flood_bldg.lambda`. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `da8a57ae`: Exit 1 (Befund bestand).
+
+Befund 84: Der Ausdruck liest Kapitel 7 des Berichts und prüft bei `flood_bldg.p_hq_haeufig` das Band `[0.05, 0.2]` ohne `band: null`, bei `flood_bldg.p_hq100` das Feld `band_grund` sowie die Wirkungsangaben „0,63-Fache“ und „1,73-Fache“. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `da8a57ae`: Exit 1 (Befund bestand).
+
+Befund 85: Der Ausdruck liest Kapitel 7 und §4.8 des Berichts und prüft, dass `vorlaeufig_grund` von `flood_bldg.lambda` keine „33“ trägt, „Verteilungspruefung (§4.5) nicht bestanden“ und `#niveau-skalar` nennt und §4.8 „Ledger-Befunde 33 und 34“ nicht mehr führt. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `da8a57ae`: Exit 1 (Befund bestand).
+
+Befund 86: Der Ausdruck liest Kapitel 7 des Berichts und prüft an jedem Block das Feld `datenebene`, an jedem Block mit Datenebene genau einen `ebene_status` aus `vorhanden`/`neu_anzulegen`/`geparkt`, die Platzhalterkennzeichnung der beiden geparkten Blöcke `f_s093`/`f_s094`, `neu_anzulegen` an sechs benannten Blöcken und die Feldbeschreibung `ebene_status:` im Kopf. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `da8a57ae`: Exit 1 (Befund bestand).
+
+Befund 99: Der Ausdruck liest Kapitel 7 des Berichts und prüft an elf benannten Blöcken `kennzeichnung` (`quelle` oder `abschaetzung_kap3`), `herleitung_anker` und `rolle`, an drei Blöcken `preisstand: 2026` und am Block `a_ver` das Feld `preisstand_hinweis`. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `da8a57ae`: Exit 1 (Befund bestand).
+
+Urteil: Keiner der Ausdrücke aus T-0578 ist untauglich; deshalb gibt es hier keinen Ersatzblock. Nicht als Prüfausdrücke behandelt sind die Prosasätze in M Z. 6139–6140 (Abschnitt Autor-Revision T-0578): Sie nennen `python3 backend/scripts/lint_methodik.py 60` als gelaufenen Lauf, stehen aber in keiner Spalte „Prüfausdruck“ und sind kein Befehl zu einem Befund.
+
+**T-0579 (Befunde 21, 46, 47, 48, 72, 104).** Die beiden T-0579-Commits (`05f40760`, `8c3c4075`) berühren laut `git show --stat` den Bericht und `reviews/BEFUNDE_60.md`. Kontrolle statt Unterstellung: `docs/evidenz/register.md` ist nicht berührt (die Registerzeile 60-S074-01 bleibt laut Abschnitt Autor-Revision T-0579 ausdrücklich unverändert); der Ledger trägt bei den sechs Befunden nur die Buchung (Zeilen M Z. 6153–6158 mit „wortgleich in der Kopftabelle“). Die geänderten Sachverhalte (Knoten-Bilanz in Kapitel 1, Langbeleg B2 in Kapitel 2) stehen im Bericht, den jeder der sechs Ausdrücke liest; der Ausdruck zu 21 liest zusätzlich die Arbeitsmappe. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft deshalb nicht zu. Vergabestand ist `34fc6509` (Elterncommit von `05f40760`), entpackt über `git archive 34fc6509 docs reviews` in ein leeres Verzeichnis, kein Checkout.
+
+Befund 21: Der Ausdruck liest die Knoten-Bilanz des Berichts und das Blatt „Klimawirkungsketten“ der Arbeitsmappe `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, entfernt den Klammerzusatz („über W085“, „= Id …“, „direkt …“) vom Namen jeder Bilanzzeile und vergleicht ihn mit Spalte B der genannten KWK-Zeile; verlangt genau 32 Bilanzzeilen und keine Abweichung. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `34fc6509`: Exit 1 (Befund bestand).
+
+Befund 46: Der Ausdruck liest Kapitel 1 des Berichts und prüft, dass die Zeilen S074 und R17 „**Sensitivitätsband**“ und „keine eigene Formelstelle“ führen, `**FS-Exposition**` und „Formelstelle FS-Exposition zugeordnet“ im ganzen Bericht fehlen und die Präambel die Formelstelle als „aufgehoben“ führt. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `34fc6509`: Exit 1 (Befund bestand).
+
+Befund 47: Der Ausdruck liest Kapitel 1 und Kapitel 6 des Berichts und prüft, dass die Zeile S104 in „rechnet in“ mit `**inaktiv (geparkt: Formelstelle FS-Bestandsdynamik ohne Term, Registerzeile 60-S104-01 offen)**` beginnt, das Kap.-6-Zitat („im heutigen Modellstand **nicht** als eigener Pfad ein“) in Bilanz und Kapitel 6 steht und Kapitel 6 `60-S104-01` nennt. Lauf am heutigen Stand: Exit 1 (besteht) — falsch, der Befund ist geschlossen; Grund ist der Wortlaut, den T-0580 (`c737e3c7`) von „offen“ auf „bewusst inaktiv“ gezogen hat. Probe am Vergabestand `34fc6509`: Exit 1 (Befund bestand). Beurteilung: untauglich, Ersatz unten.
+
+Befund 48: Der Ausdruck liest die Knoten-Bilanz des Berichts und prüft „sechs benannten“ statt „sieben benannten“, die sechs Formelstellen fett, das Fehlen von `**FS-Exposition**`, „siebte Formelstelle FS-Exposition“, zwei Vermerke „**in dieser Fassung inaktiv“ und den Satz „Registerzeile 60-S104-01 ist offen“. Lauf am heutigen Stand: Exit 1 (besteht) — falsch, der Befund ist geschlossen; Grund ist der Wortlaut, den T-0580 (`c737e3c7`) von „offen“ auf „bewusst inaktiv“ gezogen hat. Probe am Vergabestand `34fc6509`: Exit 1 (Befund bestand). Beurteilung: untauglich, Ersatz unten.
+
+Befund 72: Der Ausdruck liest Kapitel 1 des Berichts und vergleicht die Spalte „Name“ der Bilanzzeilen S074, W100 und S092 wörtlich mit den Arbeitsmappen-Namen und prüft den Satz, dass die Spalte „Name“ ungekürzt ist. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `34fc6509`: Exit 1 (Befund bestand).
+
+Befund 104: Der Ausdruck liest den Langbeleg B2 des Berichts und prüft, dass `FS-Exposition` dort fehlt und der Absatz „Abgrenzung zur Knoten-Bilanz“ „**keiner eigenen Formelstelle** zugeordnet“, „Sensitivitätsband über FS-Hazard“ und „Doppelkanal (§3.2)“ nennt. Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `34fc6509`: Exit 1 (Befund bestand).
+
+**Befund 47 (Z. 121)** — untauglich: anderer Grund (benannt): bindet einen festen Wortlaut (`Registerzeile 60-S104-01 offen)**`, `ist offen`), den T-0580 abgelöst hat („bewusst inaktiv“); endet am heutigen Stand mit 1, obwohl der Befund geschlossen ist. Ersatz: dieselben Prüfungen, aber der Teil, der den Registerstand des Knotens S104 als Wortlaut bindet, endet vor dem Stand-Wort („offen“ bzw. „bewusst inaktiv“) und hält so den Sachverhalt fest (S104 als inaktiv/geparkt mit Bezug auf `60-S104-01`), nicht den späteren Registerstand. Soll: Exit 0 (geschlossen) am heutigen Stand, Exit 1 (besteht) am Vergabestand `34fc6509`.
+
+Ersatz:
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();P=chr(124);k1=s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0];z=[l for l in k1.split(chr(10)) if l.startswith(P+' S104 ')];c=[x.strip() for x in z[0].split(P)] if len(z)==1 else ['']*6;k6=s.split(chr(10)+'## 6 ')[1].split(chr(10)+'## 7 ')[0];raise SystemExit(0 if c[4].startswith('**inaktiv (geparkt: Formelstelle FS-Bestandsdynamik ohne Term, Registerzeile 60-S104-01 ') and 'im heutigen Modellstand **nicht** als eigener Pfad ein' in c[4] and 'Modellstand **nicht** als eigener Pfad ein' in k6 and '60-S104-01' in k6 else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();P=chr(124);k1=s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0];z=[l for l in k1.split(chr(10)) if l.startswith(P+' S104 ')];c=[x.strip() for x in z[0].split(P)] if len(z)==1 else ['']*6;k6=s.split(chr(10)+'## 6 ')[1].split(chr(10)+'## 7 ')[0];raise SystemExit(0 if c[4].startswith('**inaktiv (geparkt: Formelstelle FS-Bestandsdynamik ohne Term, Registerzeile 60-S104-01 offen)**') and 'im heutigen Modellstand **nicht** als eigener Pfad ein' in c[4] and 'Modellstand **nicht** als eigener Pfad ein' in k6 and '60-S104-01' in k6 else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();P=chr(124);k1=s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0];z=[l for l in k1.split(chr(10)) if l.startswith(P+' S104 ')];c=[x.strip() for x in z[0].split(P)] if len(z)==1 else ['']*6;k6=s.split(chr(10)+'## 6 ')[1].split(chr(10)+'## 7 ')[0];raise SystemExit(0 if c[4].startswith('**inaktiv (geparkt: Formelstelle FS-Bestandsdynamik ohne Term, Registerzeile 60-S104-01 offen)**') and 'im heutigen Modellstand **nicht** als eigener Pfad ein' in c[4] and 'Modellstand **nicht** als eigener Pfad ein' in k6 and '60-S104-01' in k6 else 1)"; echo "Exit $?"
+Exit 1
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();P=chr(124);k1=s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0];z=[l for l in k1.split(chr(10)) if l.startswith(P+' S104 ')];c=[x.strip() for x in z[0].split(P)] if len(z)==1 else ['']*6;k6=s.split(chr(10)+'## 6 ')[1].split(chr(10)+'## 7 ')[0];raise SystemExit(0 if c[4].startswith('**inaktiv (geparkt: Formelstelle FS-Bestandsdynamik ohne Term, Registerzeile 60-S104-01 ') and 'im heutigen Modellstand **nicht** als eigener Pfad ein' in c[4] and 'Modellstand **nicht** als eigener Pfad ein' in k6 and '60-S104-01' in k6 else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe am Vergabestand `34fc6509` (Elterncommit von `05f40760`, entpackt über `git archive 34fc6509 docs reviews`, kein Checkout): alter Befehl Exit 1, Ersatz Exit 1 (Befund bestand, beide richtig).
+
+**Befund 48 (Z. 122)** — untauglich: anderer Grund (benannt): bindet einen festen Wortlaut (`Registerzeile 60-S104-01 ist offen`), den T-0580 abgelöst hat („ist bewusst inaktiv (geparkt)“); endet am heutigen Stand mit 1, obwohl der Befund geschlossen ist. Ersatz: dieselben Prüfungen, aber der Teil, der den Registerstand des Knotens S104 als Wortlaut bindet, endet vor dem Stand-Wort („offen“ bzw. „bewusst inaktiv“) und hält so den Sachverhalt fest (S104 als inaktiv/geparkt mit Bezug auf `60-S104-01`), nicht den späteren Registerstand. Soll: Exit 0 (geschlossen) am heutigen Stand, Exit 1 (besteht) am Vergabestand `34fc6509`.
+
+Ersatz:
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();P=chr(124);v=s.split('### Knoten-Bilanz')[1].split(chr(10)+P)[0];b=s.split('### Knoten-Bilanz')[1].split(chr(10)+chr(10)+'KWK = ')[0];fs=[x for x in ('FS-Hazard','FS-Schadensgrad','FS-Mengengerüst','FS-Schutzsystem','FS-Bestandsdynamik','FS-Vorsorge') if '**'+x+'**' in v];raise SystemExit(0 if 'sechs benannten' in v and 'sieben benannten' not in v and len(fs)==6 and '**FS-Exposition**' not in v and 'siebte Formelstelle FS-Exposition' in v and v.count('**in dieser Fassung inaktiv')==2 and'inaktiv,'+chr(10)+'geparkt**: Registerzeile 60-S104-01 ist ' in v and all(x in b.split(chr(10)+P,1)[1] for x in fs) else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();P=chr(124);v=s.split('### Knoten-Bilanz')[1].split(chr(10)+P)[0];b=s.split('### Knoten-Bilanz')[1].split(chr(10)+chr(10)+'KWK = ')[0];fs=[x for x in ('FS-Hazard','FS-Schadensgrad','FS-Mengengerüst','FS-Schutzsystem','FS-Bestandsdynamik','FS-Vorsorge') if '**'+x+'**' in v];raise SystemExit(0 if 'sechs benannten' in v and 'sieben benannten' not in v and len(fs)==6 and '**FS-Exposition**' not in v and 'siebte Formelstelle FS-Exposition' in v and v.count('**in dieser Fassung inaktiv')==2 and'inaktiv,'+chr(10)+'geparkt**: Registerzeile 60-S104-01 ist offen' in v and all(x in b.split(chr(10)+P,1)[1] for x in fs) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();P=chr(124);v=s.split('### Knoten-Bilanz')[1].split(chr(10)+P)[0];b=s.split('### Knoten-Bilanz')[1].split(chr(10)+chr(10)+'KWK = ')[0];fs=[x for x in ('FS-Hazard','FS-Schadensgrad','FS-Mengengerüst','FS-Schutzsystem','FS-Bestandsdynamik','FS-Vorsorge') if '**'+x+'**' in v];raise SystemExit(0 if 'sechs benannten' in v and 'sieben benannten' not in v and len(fs)==6 and '**FS-Exposition**' not in v and 'siebte Formelstelle FS-Exposition' in v and v.count('**in dieser Fassung inaktiv')==2 and'inaktiv,'+chr(10)+'geparkt**: Registerzeile 60-S104-01 ist offen' in v and all(x in b.split(chr(10)+P,1)[1] for x in fs) else 1)"; echo "Exit $?"
+Exit 1
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();P=chr(124);v=s.split('### Knoten-Bilanz')[1].split(chr(10)+P)[0];b=s.split('### Knoten-Bilanz')[1].split(chr(10)+chr(10)+'KWK = ')[0];fs=[x for x in ('FS-Hazard','FS-Schadensgrad','FS-Mengengerüst','FS-Schutzsystem','FS-Bestandsdynamik','FS-Vorsorge') if '**'+x+'**' in v];raise SystemExit(0 if 'sechs benannten' in v and 'sieben benannten' not in v and len(fs)==6 and '**FS-Exposition**' not in v and 'siebte Formelstelle FS-Exposition' in v and v.count('**in dieser Fassung inaktiv')==2 and'inaktiv,'+chr(10)+'geparkt**: Registerzeile 60-S104-01 ist ' in v and all(x in b.split(chr(10)+P,1)[1] for x in fs) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe am Vergabestand `34fc6509` (Elterncommit von `05f40760`, entpackt über `git archive 34fc6509 docs reviews`, kein Checkout): alter Befehl Exit 1, Ersatz Exit 1 (Befund bestand, beide richtig).
+
+Urteil: Untauglich sind die Ausdrücke zu 47 und 48 aus T-0579, beide mit benanntem anderem Grund und je einem Ersatzblock; die übrigen Ausdrücke aus T-0579 sind tauglich. Nicht als Prüfausdrücke behandelt sind die Prosasätze in M Z. 6171–6172 (Abschnitt Autor-Revision T-0579): Sie nennen `python3 backend/scripts/lint_methodik.py 60` als gelaufenen Lauf, stehen aber in keiner Spalte „Prüfausdruck“ und sind kein Befehl zu einem Befund.
 
 ## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)
 
