@@ -11,6 +11,7 @@ from app.api.deps import demo_session_id_of
 from app.data import catalog
 from app.services.engine import formulas
 from app.services import lineage_graph
+from app.services import querverbindungen
 
 router = APIRouter()
 
@@ -58,6 +59,14 @@ def get_catalog(request: Request):
         risk_codes = getattr(request.state, "demo_risk_codes", [])
         return demo_service.filter_catalog(payload, enabled, risk_codes)
     return payload
+
+
+@router.get("/catalog/querverbindungen")
+def get_querverbindungen():
+    """Auswertung der KWRA-Querverbindungen je katalogisierter Klimawirkung
+    (Netzrolle, benannte Beziehungen, Kennzahlen, Systembereichs-Matrix,
+    Quelle, Modellgrenze). Siehe ``app/services/querverbindungen.py``."""
+    return querverbindungen.querverbindungs_auswertung()
 
 
 @router.get("/catalog/layer/{code}/recipe")
