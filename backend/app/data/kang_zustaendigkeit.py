@@ -11,7 +11,7 @@ from __future__ import annotations
 ZUSTAENDIGKEIT: dict[str, dict[str, str]] = {
     'Baden-Württemberg': {
         'rechtsgrundlage': '§ 29b Abs. 1 Satz 1 Nr. 1 bis 3 KlimaG BW (Klimaschutz- und Klimawandelanpassungsgesetz Baden-Württemberg, i. d. F. des Änderungsgesetzes vom 29.07.2025; Umsetzung von § 12 KAnG in §§ 29a ff.)',
-        'fundstelle': 'https://www.landesrecht-bw.de/bsbw/document/jlr-KlimaSchGBW2023rahmen',
+        'fundstelle': 'https://www.landtag-bw.de/resource/blob/585982/1d33d268d2fd1a37b26f5e178ab62342/GBl2025077.pdf',
         'zustaendige_stelle': 'Stadtkreise und Große Kreisstädte für ihr Gemeindegebiet (Nr. 1); Landkreise für das Kreisgebiet (Nr. 2) und für die übrigen kreisangehörigen Gemeinden (Nr. 3); Beschluss möglichst bis 30.06.2031 (§ 29c Abs. 2 Nr. 1)',
         'pflicht': 'ja',
         'stand': '2026-09-23',
@@ -59,10 +59,10 @@ ZUSTAENDIGKEIT: dict[str, dict[str, str]] = {
         'stand': '2026-09-23',
     },
     'Mecklenburg-Vorpommern': {
-        'rechtsgrundlage': 'keine Bestimmung getroffen, Stand 2026-09-23',
-        'fundstelle': 'https://www.landesrecht-mv.de/',
-        'zustaendige_stelle': 'keine',
-        'pflicht': 'keine Bestimmung getroffen',
+        'rechtsgrundlage': '§ 24 Abs. 1 KlVG M-V (Klimaverträglichkeitsgesetz Mecklenburg-Vorpommern, Art. 1 des Gesetzes vom 08.07.2026, GVOBl. M-V 2026 Nr. 20 vom 17.07.2026, S. 659, § 24 auf S. 666; in Kraft seit 18.07.2026)',
+        'fundstelle': 'https://www.regierung-mv.de/static/Regierungsportal/Justizministerium/Inhalte/Rechtliches/GVOBI.M-V/GVOBl.%20Nr.%2020%20v.%2017.7.2026.pdf',
+        'zustaendige_stelle': 'Landkreise, kreisfreie Städte und große kreisangehörige Städte (ab 01.01.2030 innerhalb von drei Jahren; übrigen Gemeinden vereinfachte Konzepte nur empfohlen, § 24 Abs. 2)',
+        'pflicht': 'ja',
         'stand': '2026-09-23',
     },
     'Niedersachsen': {

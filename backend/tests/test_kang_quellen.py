@@ -24,7 +24,14 @@ DOKU = os.path.join(WURZEL, "docs", "KANG_ZUSTAENDIGKEIT_LAENDER.md")
 QUELLEN = os.path.join(WURZEL, "docs", "quellen", "kang-laender")
 KOPF = "| Land | Rechtsgrundlage | Fundstelle | Zuständige Stelle | Pflicht | Stand |"
 ZUSATZ = ("Berlin", "Mecklenburg-Vorpommern")
-GRUNDLAGEN = ("verkündeter Text", "Beschlussempfehlung", "Entwurf", "Gesetzesbegründung")
+GRUNDLAGEN = (
+    "verkündeter Text",
+    "Beschlussempfehlung",
+    "Entwurf",
+    "Gesetzesbegründung",
+    "Gesetzesbeschluss",
+    "amtliche konsolidierte Fassung",
+)
 
 
 def _slug(land: str) -> str:

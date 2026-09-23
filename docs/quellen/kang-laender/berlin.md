@@ -282,6 +282,56 @@ Abgeordnetenhaus zu, sowie dem Rat der Bürgermeisterinnen und
 Bürgermeister zur Stellungnahme zu.
 ```
 
+### Nachtrag T-0820: Artikel 3 und § 12 Abs. 2 Nr. 3 KAnGBln
+
+Abgerufen am 2026-09-23 aus derselben Ausgabe (Quelle oben), Text mit `pdftotext` in
+Lesereihenfolge ausgezogen; bei Artikel 3 sind die Kopfzeilen des Blatts zwischen S. 549 und
+S. 550 weggelassen.
+
+#### Artikel 3 — Änderung des Allgemeinen Zuständigkeitsgesetzes (S. 549 bis 550)
+
+```text
+Artikel 3
+Änderung des Allgemeinen Zuständigkeitsgesetzes
+Die Anlage Allgemeiner Zuständigkeitskatalog zu § 4 Absatz 1
+Satz 1 des Allgemeinen Zuständigkeitsgesetzes in der Fassung der
+Bekanntmachung vom 22. Juli 1996, das zuletzt durch Artikel 1 des
+Gesetzes vom 22. September 2025 (GVBl. S. 494) geändert worden
+ist, wird wie folgt geändert:
+Nach Absatz 14 der Nummer 11 Umweltschutz und Naturschutz,
+Grünanlagen, Forsten, Kleingärten, Denkmalschutz und Denkmalpflege, Bodenschutz, Krematorien, Tierschutz wird folgender Absatz 15 angefügt:
+„Durchführung des Berliner Klimaanpassungsgesetzes vom 7. November 2025 (GVBl. S. 542) Ausweisung von Hitzevierteln, Beschluss, Prüfung und Aktualisierung des Klimaanpassungsprogramms, Erstellung und Veröffentlichung der Klimarisikoanalyse,
+Beschluss und Aktualisierung der vorsorgenden Klimaanpassungsstrategie, Einsetzung des Beirates Klimaanpassung und Benennung
+der Mitglieder, Einsetzung der Geschäftsstelle des Beirates Klimaanpassung, Vorlegen der Sofortprogramme.“
+Nach Absatz 13 der Nummer 13 Gesundheitswesen wird folgender
+Absatz 14 eingefügt:
+„Aufstellung eines Landeshitzeaktionsplans.“
+```
+
+**Bestimmt Artikel 3 eine Stelle nach § 12 Abs. 1 KAnG?** Nein: Artikel 3 ergänzt nur den
+Allgemeinen Zuständigkeitskatalog um die Durchführung des KAnGBln (Hitzeviertel,
+Klimaanpassungsprogramm, Klimarisikoanalyse, vorsorgende Klimaanpassungsstrategie, Beirat und
+Geschäftsstelle, Sofortprogramme) und den Landeshitzeaktionsplan als Aufgaben der
+Hauptverwaltung; ein Klimaanpassungskonzept nach § 12 KAnG und das KAnG selbst kommen darin nicht
+vor.
+
+#### § 12 Abs. 2 Nr. 3 KAnGBln (S. 546)
+
+```text
+(2) Die Klimaanpassungsstrategie
+3. enthält angemessene, messbare Ziele, die die übergeordneten
+Zwecke nach § 1 im Zeitraum der jeweils nächsten 30 Jahre
+konkretisieren und die jeweils innerhalb eines bestimmten, in
+der Strategie festzulegenden zeitlichen Rahmens erreicht werden sollen; dabei sind mindestens die Cluster und die ihnen zugeordneten Handlungsfelder des § 3 Absatz 2 des Bundes-Klimaanpassungsgesetzes zu adressieren, soweit das Land Berlin
+für den entsprechenden Regelungsbereich zuständig ist; ausgenommen sind die Handlungsfelder des Küsten- und Meeresschutzes; dabei sind die in den §§ 3 bis 6 festgelegten Ziele zu
+beachten;
+```
+
+**Bestimmt § 12 Abs. 2 Nr. 3 KAnGBln eine Stelle nach § 12 Abs. 1 KAnG?** Nein: Die Nummer
+regelt den Inhalt der Landesstrategie (Ziele, die mindestens die Cluster und Handlungsfelder
+nach § 3 Abs. 2 KAnG adressieren) und verweist auf § 3 KAnG, nicht auf § 12 KAnG; sie bestimmt
+keine Stelle, die für Gemeinde- oder Kreisgebiete ein Klimaanpassungskonzept aufstellt.
+
 ### Drs. 19/2573, PDF-Seite 42: Allgemeiner Teil, Verhältnis zum KAnG
 
 ```text
