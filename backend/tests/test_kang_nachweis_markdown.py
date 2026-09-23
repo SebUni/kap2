@@ -107,6 +107,16 @@ def test_abschnitt_abgrenzung_enthaelt_abgrenzungstext():
     assert nachweis["abgrenzung"] in abschnitt
 
 
+# ── (e) Deutsche Zahlenschreibweise und Verweis auf die Methodenbeschreibung ───
+
+def test_deutsche_zahlenschreibweise_und_methodenverweis():
+    nachweis = nachweis_fachuebergreifend({"EXPECTED_ANNUAL_MORTALITY": 1000.0}, [])
+    text = nachweis_markdown(nachweis)
+    assert "1.000,00" in text
+    assert "1,000.00" not in text
+    assert "NACHWEIS_FACHUEBERGREIFEND_KANG.md" in text
+
+
 if __name__ == "__main__":
     import pytest
 

@@ -15,6 +15,22 @@ from __future__ import annotations
 
 TITEL = "# Nachweis der fachübergreifenden und integrierten Berücksichtigung (§ 8 Abs. 1 KAnG)"
 
+METHODENVERWEIS = (
+    "Feld-für-Feld-Erläuterung dieses Nachweises: siehe "
+    "`docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md`."
+)
+
+
+def _de_betrag(wert: float) -> str:
+    """Formatiert einen Geldbetrag in deutscher Schreibweise (Punkt als
+    Tausender-, Komma als Dezimaltrennzeichen, zwei Nachkommastellen).
+
+    Entscheidung des CEO vom 20.09.2026: Jedes Dokument, das das Haus
+    verlässt oder einer Kommune vorgelegt wird, nutzt deutsche
+    Zahlenschreibweise.
+    """
+    return f"{wert:,.2f}".replace(",", "⁣").replace(".", ",").replace("⁣", ".")
+
 
 def _tabelle_betroffene_handlungsfelder(handlungsfelder: list[dict]) -> str:
     zeilen = [
@@ -27,12 +43,12 @@ def _tabelle_betroffene_handlungsfelder(handlungsfelder: list[dict]) -> str:
         risiken = ", ".join(eintrag["risiken"]) or "—"
         massnahmen = ", ".join(eintrag["massnahmen"]) or "—"
         zeilen.append(
-            "| {cluster} | {feld} | {status} | {risiken} | {schaden:,.2f} | {massnahmen} |".format(
+            "| {cluster} | {feld} | {status} | {risiken} | {schaden} | {massnahmen} |".format(
                 cluster=eintrag["cluster"],
                 feld=eintrag["feld"],
                 status=eintrag["status"],
                 risiken=risiken,
-                schaden=eintrag["schaden_eur"],
+                schaden=_de_betrag(eintrag["schaden_eur"]),
                 massnahmen=massnahmen,
             )
         )
@@ -69,6 +85,9 @@ def nachweis_markdown(nachweis: dict) -> str:
     'nicht betroffen'), 'Offene Handlungsfelder' (eine Tabellenzeile je Eintrag
     aus ``zusammenfassung['offene_handlungsfelder']``), 'Integrierende
     Maßnahmen' und 'Abgrenzung' (Volltext von ``nachweis['abgrenzung']``).
+    Geldbeträge stehen in deutscher Zahlenschreibweise (Punkt als Tausender-,
+    Komma als Dezimaltrennzeichen); das Dokument verweist auf die
+    Methodenbeschreibung ``docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md``.
     """
     handlungsfelder = nachweis["handlungsfelder"]
     zusammenfassung = nachweis["zusammenfassung"]
@@ -81,6 +100,8 @@ def nachweis_markdown(nachweis: dict) -> str:
             "Betroffene Handlungsfelder: {betroffen_n}, davon berücksichtigt: "
             "{beruecksichtigt_n}, offen: {offen_n}."
         ).format(**zusammenfassung),
+        "",
+        METHODENVERWEIS,
         "",
         "## Betroffene Handlungsfelder",
         "",
