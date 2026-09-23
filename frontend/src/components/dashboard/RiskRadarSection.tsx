@@ -251,11 +251,12 @@ export function GroupRadarCard({ className = '' }: { className?: string }) {
 export function TopRisksCard({ className = '' }: { className?: string }) {
   const { riskSummary, costSummary } = useStore()
   const byRisk = costSummary?.by_risk || riskSummary?.cost.by_risk || []
-  // Verwechslungssperre Klasse A/B (T-0517): Klasse B (ohne Euro-Schicht) fällt nicht
-  // still aus der Liste, sondern steht mit dem Screening-Vermerk unter den Top 5.
-  const top = byRisk.filter(r => r.has_euro_layer !== false && r.cost_eur > 0).slice(0, 5)
+  // Verwechslungssperre Klasse A/B (T-0517, T-0823): Die Rangliste enthält nur Klasse A
+  // (mit Euro-Bezifferung). Klasse B fällt nicht still weg, sondern steht in einem
+  // eigenen Block „Ohne Euro-Bezifferung (Screening)“ — ohne Rang, ohne Betrag.
+  const top = byRisk.filter(r => r.has_euro_layer !== false && (r.cost_eur ?? 0) > 0).slice(0, 5)
   const screening = byRisk.filter(r => r.has_euro_layer === false)
-  const maxCost = top.length ? top[0].cost_eur : 0
+  const maxCost = top.length ? (top[0].cost_eur ?? 0) : 0
   const benefitDirect = costSummary?.measures.total_benefit_direct_eur ?? 0
   const annualBenefit = (costSummary?.damage_reduction_eur ?? 0) + benefitDirect
 
@@ -277,26 +278,33 @@ export function TopRisksCard({ className = '' }: { className?: string }) {
                   <span style={{ fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</span>
                   </span>
-                  <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtEurCompact(r.cost_eur)}/a</span>
+                  <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtEurCompact(r.cost_eur ?? 0)}/a</span>
                 </div>
                 <div style={{ height: 6, background: 'var(--bg)', borderRadius: 4, overflow: 'hidden' }}>
                   <div style={{
                     height: '100%', borderRadius: 4, background: 'var(--danger)',
-                    width: `${maxCost > 0 ? Math.max(4, (r.cost_eur / maxCost) * 100) : 0}%`,
+                    width: `${maxCost > 0 ? Math.max(4, ((r.cost_eur ?? 0) / maxCost) * 100) : 0}%`,
                     opacity: 0.75,
                   }} />
                 </div>
               </div>
             )
           })}
-          {screening.map(r => (
-            <div key={r.code} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, fontSize: '0.82rem' }}>
-              <span style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{r.name}</span>
-              <span style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                {r.has_euro_layer === false ? String(r.cost_display ?? '') : fmtEurCompact(r.cost_eur)}
-              </span>
+          {screening.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4, paddingTop: 6, borderTop: '1px solid var(--border)' }}>
+              <h3 style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
+                Ohne Euro-Bezifferung (Screening)
+              </h3>
+              {screening.map(r => (
+                <div key={r.code} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, fontSize: '0.82rem' }}>
+                  <span style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{r.name}</span>
+                  <span style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                    {String(r.cost_display ?? '')}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
           {!top.length && !screening.length && (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               Keine monetarisierten Risiken vorhanden.
