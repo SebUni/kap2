@@ -5697,6 +5697,13 @@ Exit 0
 | 56 | 130 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
 | 75 | 149 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
 | 95 | 169 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
+| 12 | 86 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
+| 27 | 101 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | untauglich: liest nur eine von mehreren betroffenen Dateien |
+| 38 | 112 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
+| 60 | 134 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
+| 70 | 144 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | tauglich |
+| 76 | 150 (Kopftabelle) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | untauglich: liest nur eine von mehreren betroffenen Dateien |
+| 36 | 5749 (Autor-Revision T-0569) | M | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, docs/evidenz/register.md, reviews/BEFUNDE_60.md | untauglich: anderer Grund (benannt): bindet feste Zahlenwerte, die eine spätere Fortschreibung des Berichts überholt hat |
 
 Befund 24: Der Ausdruck liest §3.1 des Berichts (Physischer Teil-Ausweis) und prüft, ob dort `EAD}_z = ` und `EAD}_k = ` stehen, aber nicht `EAD} = `. Die T-0567-Commits (`f3295ea2`, `081f239d`, `ee82fa5a`) berühren laut `git show --stat` außer dem Bericht auch `reviews/BEFUNDE_60.md` — dort steht jedoch nur die Ledger-Buchung des Befunds selbst, kein zusätzlicher Sachverhalt, den der Ausdruck prüfen müsste. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" trifft damit nicht zu. Lauf am heutigen Stand: Exit 0 (geschlossen, Kopftabellen-Maßstab). Probe am Vergabestand `cedc3e77` (Elterncommit des ersten T-0567-Commits, über `git show cedc3e77:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md`, kein Checkout): Exit 1 (Befund bestand).
 
@@ -5713,6 +5720,91 @@ Befund 56: Der Ausdruck liest §3.5, zerlegt die 31 Zeichentabellenzeilen in ein
 Befund 75: Der Ausdruck liest §3.5 und prüft, ob die \(\tau\)-Zeile die Einheit „m²/a" und eine `herleitung:`-Herkunft trägt, der Einleitungssatz „tau" und „q_0" nennt und die \(t\)-Zeile mit der Herkunft „Notation" geführt wird. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" trifft nicht zu (siehe Absatz oben). Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `3001e90a`: Exit 1 (Befund bestand).
 
 Befund 95: Der Ausdruck liest §3.5 und prüft, ob die AWM-Zeile die Einheit „RND/GND", den Hinweis „Parameter-Block" und eine `herleitung:`-Herkunft trägt. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien" trifft nicht zu (siehe Absatz oben). Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `3001e90a`: Exit 1 (Befund bestand).
+
+**T-0569 (Befunde 12, 27, 36, 38, 60, 70, 76).** Die drei T-0569-Commits (`50378c8b`, `5b8499c6`, `b399f99f`) berühren laut `git show --stat` neben dem Bericht auch `docs/evidenz/register.md` und `reviews/BEFUNDE_60.md`. Kontrolle statt Unterstellung: `git diff d64231f1 b399f99f -- docs/evidenz/register.md` ändert genau eine Zeile, die Registerzeile `60-R24-01` (Gebäudewerte), und zwar die Bandenden des Wertsatzes (1.889–2.047 → 1.890–2.043; 1.484–1.609 → 1.485–1.606), die Typ-Spanne (1.993 (MFH) bis 2.535 (EFH/ZFH)) neben dem Unsicherheitsband (1.856–2.860) und die Spanne des Gesamtwerts (8,2–10,4 → Typ-Spanne 8,2 bis 10,4, Unsicherheitsband 7,6–11,7 Bio. €₂₀₂₆). Das ist der Spiegel derselben Sachverhalte, die die Befunde 27 und 76 im Bericht verlangen; bei den Befunden 12, 38, 60 und 70 (Preisstandjahr in der Konto-Einbettung, Band von \(\pi\)) trägt die Registerzeile keinen zu prüfenden Sachverhalt. `d64231f1` ist der Elterncommit des ersten T-0569-Commits (`git rev-parse 50378c8b^`).
+
+Befund 12: Der Ausdruck liest die Konto-Einbettung des Berichts und prüft, ob dort „Preisstandjahr (abgeleitet aus Register 60-R24-01)“ und „Rechenregeln:** R5 (übernommen)“ stehen und „Bis ein K3-eigener Kostensatz“ fehlt. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft nicht zu (siehe Absatz oben: die Registerzeile trägt den Preisstand-Sachverhalt der Konto-Einbettung nicht). Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `d64231f1` (über `git archive d64231f1 docs/methodik docs/evidenz/register.md` in ein leeres Verzeichnis entpackt, kein Checkout): Exit 1 (Befund bestand).
+
+Befund 38: Der Ausdruck liest Kapitel 4 des Berichts und prüft, ob dort „1,07 (1,039–1,124)“ zweimal steht, „1,04–1,11“ fehlt und die Rechnung 1,05³/1,03 = 1,124 stimmt. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft nicht zu (siehe Absatz oben: der Spiegel führt den Faktor 1,105 mit Band 1,07–1,16 unverändert). Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `d64231f1` (über `git archive d64231f1 docs/methodik docs/evidenz/register.md` in ein leeres Verzeichnis entpackt, kein Checkout): Exit 1 (Befund bestand).
+
+Befund 60: Der Ausdruck liest Kapitel 4 und den Bericht und prüft, ob dort „1{,}1576/1{,}03 = 1{,}124“, „Band 1,039–1,124“, „0,296–2,291“ und im Parameterblock „band: [1.039, 1.124]“ stehen. Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft nicht zu (siehe Absatz oben). Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `d64231f1` (über `git archive d64231f1 docs/methodik docs/evidenz/register.md` in ein leeres Verzeichnis entpackt, kein Checkout): Exit 1 (Befund bestand).
+
+Befund 70: Der Ausdruck liest die Konto-Einbettung und den Bericht und prüft die Formulierung zum Preisstandjahr („abgeleitet aus Register 60-R24-01; §3.9“) und den Ersetzungspfad (W1). Der Fehlertyp „liest nur eine von mehreren betroffenen Dateien“ trifft nicht zu (siehe Absatz oben). Lauf am heutigen Stand: Exit 0 (geschlossen). Probe am Vergabestand `d64231f1` (über `git archive d64231f1 docs/methodik docs/evidenz/register.md` in ein leeres Verzeichnis entpackt, kein Checkout): Exit 1 (Befund bestand).
+
+**Befund 27 (Z. 101)** — untauglich: liest nur eine von mehreren betroffenen Dateien. Der Ausdruck liest die Registerzeile `60-R24-01` im Bericht (Kap. 2) und den Langbeleg B4 und prüft, ob dort die Bandenden `1.890–2.043` und `1.485–1.606`, die Typ-Spanne, das Unsicherheitsband `1.856–2.860` stehen und `1.889–2.047` fehlt. Genau diese Zeichenketten hat der T-0569-Commit auch in der Spiegelzeile `60-R24-01` von `docs/evidenz/register.md` geändert; der Ausdruck liest diese Datei nicht. Wird der Spiegel auf den alten Stand gesetzt, während der Bericht stimmt, endet der alte Ausdruck weiter mit 0 (geschlossen), obwohl der Befund (Bandenden im Register falsch) in einer der beiden Dateien besteht. Ersatz: dieselben Prüfungen, zusätzlich gegen die Spiegelzeile. Soll: Exit 0 (geschlossen) am heutigen Stand, Exit 1 (besteht) am Vergabestand und bei einem Spiegel im alten Stand.
+
+Ersatz:
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();g=open('docs/evidenz/register.md',encoding='utf-8').read();r=[l for l in s.split(chr(10)) if l.startswith(chr(124)+' 60-R24-01 ')][0];q=[l for l in g.split(chr(10)) if l.startswith(chr(124)+' 60-R24-01 ')][0];b=s.split('**Rechenschritt 2 ')[1].split('**B5 ')[0];w=('1.890–2.043','1.485–1.606','1.993 (MFH) bis 2.535 (EFH/ZFH)','1.856–2.860');raise SystemExit(0 if (all(x in r and x in q for x in w) and 'gerundete Setzungen von KAP3' in b and '1.889–2.047' not in s and '1.889–2.047' not in g and round(1765*1.05**3)==2043) else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();r=[l for l in s.split(chr(10)) if l.startswith(chr(124)+' 60-R24-01 ')][0];b=s.split('**Rechenschritt 2 ')[1].split('**B5 ')[0];raise SystemExit(0 if ('1.890–2.043' in r and '1.485–1.606' in r and '1.993 (MFH) bis 2.535 (EFH/ZFH)' in r and '1.856–2.860' in r and 'gerundete Setzungen von KAP3' in b and '1.889–2.047' not in s and round(1765*1.05**3)==2043) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();r=[l for l in s.split(chr(10)) if l.startswith(chr(124)+' 60-R24-01 ')][0];b=s.split('**Rechenschritt 2 ')[1].split('**B5 ')[0];raise SystemExit(0 if ('1.890–2.043' in r and '1.485–1.606' in r and '1.993 (MFH) bis 2.535 (EFH/ZFH)' in r and '1.856–2.860' in r and 'gerundete Setzungen von KAP3' in b and '1.889–2.047' not in s and round(1765*1.05**3)==2043) else 1)"; echo "Exit $?"
+Exit 0
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();g=open('docs/evidenz/register.md',encoding='utf-8').read();r=[l for l in s.split(chr(10)) if l.startswith(chr(124)+' 60-R24-01 ')][0];q=[l for l in g.split(chr(10)) if l.startswith(chr(124)+' 60-R24-01 ')][0];b=s.split('**Rechenschritt 2 ')[1].split('**B5 ')[0];w=('1.890–2.043','1.485–1.606','1.993 (MFH) bis 2.535 (EFH/ZFH)','1.856–2.860');raise SystemExit(0 if (all(x in r and x in q for x in w) and 'gerundete Setzungen von KAP3' in b and '1.889–2.047' not in s and '1.889–2.047' not in g and round(1765*1.05**3)==2043) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe am Vergabestand `d64231f1` (Elterncommit von `50378c8b`, entpackt über `git archive d64231f1 docs/methodik docs/evidenz/register.md`, kein Checkout): alter Befehl Exit 1, Ersatz Exit 1 (Befund bestand, beide richtig). Gegenprobe, die nur der Ersatz besteht: heutiger Bericht mit der Datei `docs/evidenz/register.md` des Vergabestands `d64231f1` (Spiegel im alten Stand): alter Befehl Exit 0 (falsch, meldet geschlossen), Ersatz Exit 1 (besteht).
+
+**Befund 76 (Z. 150)** — untauglich: liest nur eine von mehreren betroffenen Dateien. Der Ausdruck liest Rechenschritte 2 und 3 des Langbelegs B4 im Bericht und prüft „**Modellgrenze:**“, „Median (3,3 %)“, „Typ-Spanne“ und „7,6–11,7 Bio.“. Die beiden zuletzt genannten Angaben hat der T-0569-Commit auch in der Spiegelzeile `60-R24-01` von `docs/evidenz/register.md` geändert; der Ausdruck liest diese Datei nicht. Wird der Spiegel auf den alten Stand gesetzt, endet der alte Ausdruck weiter mit 0. Ersatz: dieselben Prüfungen, zusätzlich „Typ-Spanne“ und „7,6–11,7 Bio.“ in der Spiegelzeile. Soll: Exit 0 (geschlossen) am heutigen Stand, Exit 1 (besteht) am Vergabestand und bei einem Spiegel im alten Stand.
+
+Ersatz:
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();g=open('docs/evidenz/register.md',encoding='utf-8').read();q=[l for l in g.split(chr(10)) if l.startswith(chr(124)+' 60-R24-01 ')][0];b=s.split('**Rechenschritt 2 ')[1].split('**Rechenschritt 3 ')[0];c=s.split('**Rechenschritt 3 ')[1].split('**B5 ')[0];raise SystemExit(0 if ('**Modellgrenze:**' in b and 'Median (3,3 %)' in b and all(x in c and x in q for x in ('Typ-Spanne','7,6–11,7 Bio.'))) else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=s.split('**Rechenschritt 2 ')[1].split('**Rechenschritt 3 ')[0];c=s.split('**Rechenschritt 3 ')[1].split('**B5 ')[0];raise SystemExit(0 if ('**Modellgrenze:**' in b and 'Median (3,3 %)' in b and 'Typ-Spanne' in c and '7,6–11,7 Bio.' in c) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=s.split('**Rechenschritt 2 ')[1].split('**Rechenschritt 3 ')[0];c=s.split('**Rechenschritt 3 ')[1].split('**B5 ')[0];raise SystemExit(0 if ('**Modellgrenze:**' in b and 'Median (3,3 %)' in b and 'Typ-Spanne' in c and '7,6–11,7 Bio.' in c) else 1)"; echo "Exit $?"
+Exit 0
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();g=open('docs/evidenz/register.md',encoding='utf-8').read();q=[l for l in g.split(chr(10)) if l.startswith(chr(124)+' 60-R24-01 ')][0];b=s.split('**Rechenschritt 2 ')[1].split('**Rechenschritt 3 ')[0];c=s.split('**Rechenschritt 3 ')[1].split('**B5 ')[0];raise SystemExit(0 if ('**Modellgrenze:**' in b and 'Median (3,3 %)' in b and all(x in c and x in q for x in ('Typ-Spanne','7,6–11,7 Bio.'))) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe am Vergabestand `d64231f1` (Elterncommit von `50378c8b`, entpackt über `git archive d64231f1 docs/methodik docs/evidenz/register.md`, kein Checkout): alter Befehl Exit 1, Ersatz Exit 1 (Befund bestand, beide richtig). Gegenprobe, die nur der Ersatz besteht: heutiger Bericht mit der Datei `docs/evidenz/register.md` des Vergabestands `d64231f1` (Spiegel im alten Stand): alter Befehl Exit 0 (falsch, meldet geschlossen), Ersatz Exit 1 (besteht).
+
+**Befund 36 (Z. 5749)** — untauglich: anderer Grund (benannt): bindet die sechs Zahlenwerte `0,657–2,638`, `0,11–3,49`, `[0,11; 3,49]`, `0,11 bzw. 3,49`, `[0.11, 3.49]` und `0,296–2,291`, die eine spätere Fortschreibung des Berichts überholt hat: Kapitel 4 führt heute das Band \(\lambda\) 0,12–3,93 und die Plausibilitätsschranke [0,5; 2,0] (§4.4, §4.8). Der Ausdruck endet heute mit 1 (besteht), obwohl der Befund 36 (Schranke ohne Herleitung und nicht in der P1-Tabelle) am heutigen Stand geschlossen ist: Die Schranke hat eine Herleitung in §4.4 und eine eigene Zeile in §4.8. Er hängt damit an Zahlen statt an dem, was der Befund verlangt. Ersatz: prüft, dass §4.8 genau eine Zeile „Plausibilitätsschranke“ mit Verweis auf §4.4 und Kennzeichnung (Abschätzung von KAP3 oder berechnet) trägt und dass die beiden Werte dieser Zeile als „Plausibilitätsschranke [a; b]“ in Kapitel 4 stehen — ohne feste Zahlenwerte. Soll: Exit 0 (geschlossen) am heutigen Stand und am Vergabestand, Exit 1 ohne die §4.8-Zeile.
+
+Ersatz:
+
+```bash
+python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];t=k.split(chr(10)+'### 4.8 ')[1];z=[l for l in t.split(chr(10)) if l.startswith(chr(124)+' Plausibilit')];v=re.findall(r'(\d+,\d+) bzw\. (\d+,\d+)',z[0]) if len(z)==1 else [];raise SystemExit(0 if (len(z)==1 and len(v)==1 and '§4.4' in z[0] and ('Abschätzung von KAP3' in z[0] or '**berechnet**' in z[0]) and 'Plausibilitätsschranke ['+v[0][0]+'; '+v[0][1]+']' in k) else 1)"
+```
+
+Alter Befehl (wörtlich, wie in M):
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('0,657–2,638','0,11–3,49','[0,11; 3,49]','0,11 bzw. 3,49','[0.11, 3.49]','0,296–2,291')) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('0,657–2,638','0,11–3,49','[0,11; 3,49]','0,11 bzw. 3,49','[0.11, 3.49]','0,296–2,291')) else 1)"; echo "Exit $?"
+Exit 1
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];t=k.split(chr(10)+'### 4.8 ')[1];z=[l for l in t.split(chr(10)) if l.startswith(chr(124)+' Plausibilit')];v=re.findall(r'(\d+,\d+) bzw\. (\d+,\d+)',z[0]) if len(z)==1 else [];raise SystemExit(0 if (len(z)==1 and len(v)==1 and '§4.4' in z[0] and ('Abschätzung von KAP3' in z[0] or '**berechnet**' in z[0]) and 'Plausibilitätsschranke ['+v[0][0]+'; '+v[0][1]+']' in k) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe am Vergabestand `d64231f1` (Elterncommit von `50378c8b`, entpackt über `git archive d64231f1 docs/methodik docs/evidenz/register.md`, kein Checkout): alter Befehl Exit 1 (Bericht dort noch mit den Werten `0,657–2,643` und `0,11–3,44`), Ersatz Exit 0 (Schranke dort als berechnet aus dem fortgepflanzten Band in §4.8 geführt, Befund geschlossen). Gegenprobe: heutiger Bericht ohne die §4.8-Zeile „Plausibilitätsschranke“ (Kopie): Ersatz Exit 1 (besteht).
 
 ## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)
 
