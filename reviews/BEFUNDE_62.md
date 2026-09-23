@@ -119,7 +119,7 @@ Formal erfüllt; siehe Befunde 9 und 11.
 7. Abschnitt 7 führt je Parameter eine Spalte Herkunft und eine Spalte Quelle mit drei Fußnoten
 für die als Abschätzung geführten Zeilen (A-0010, P1). Formal erfüllt; siehe Befunde 5 und 6.
 
-## Offene Befunde (12)
+## Offene Befunde (11)
 
 Prüfbefehl der Kopfzahl, ausgeführt am 20.09.2026 in der Repo-Wurzel:
 
@@ -141,12 +141,22 @@ grep -c '| offen[ ]|' reviews/BEFUNDE_62.md
 12
 ```
 
-Die Kopfzahl ist entsprechend auf 12 nachgezogen.
+Die Kopfzahl war entsprechend auf 12 nachgezogen.
+
+Nachgezählt am 23.09.2026 in der Repo-Wurzel nach Schließung von Befund 2 (T-0604, Verweis auf den
+Absatz „Nachzug erledigt" unter Befund 13), derselbe Befehl: vorher `12`, nachher
+
+```
+grep -c '| offen[ ]|' reviews/BEFUNDE_62.md
+11
+```
+
+Die Kopfzahl ist entsprechend wieder auf 11 nachgezogen.
 
 | Nr | Befund (Stelle · Kurzfassung) | Kat. | Status | Umsetzungsnachweis | Prüfausdruck | Begründung bei Abweichung |
 |---|---|---|---|---|---|---|
 | 1 | Abschnitt 4 (Z. 249–250) · Der Bericht stellt der Kommune eine Ortsteil-Aussage in Aussicht („Diese vier Ortsteile tragen die höchste Wärmelast"), während Abschnitt 3.4 (Z. 200–205) feststellt, dass es die Ortsteil-Ebene im Rechenkern nicht gibt — aggregiert wird von der Zelle auf die Kommune. Der Adressat liest in Abschnitt 4 eine Aussage, die das Produkt heute nicht liefert; Widerspruch im Dokument (Leitfrage 14, P3). | B | offen | Abschnitt 4 nennt die tatsächliche Ausgabeebene oder verweist an Ort und Stelle auf die Einschränkung aus 3.4 | `grep -n 'Ortsteile' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md` | — |
-| 2 | Abschnitt 2.4 (Z. 97–106) · Die Arbeitsmappe führt zu Id 62 sieben Sensitivitäten (S094–S100), `backend/app/data/catalog.py` (`PLANNED_RISKS`, Z. 317–322) nur zwei (S099, S100). Der Bericht benennt die Lücke, löst sie aber nicht auf; nach §2.1 bleibt kein Knoten unadressiert — fünf Knoten sind weder verarbeitet noch begründet inaktiv (Leitfrage 1). | B | offen | Knoten-Bilanz für S094–S098 im Bericht oder Nachzug im Katalog, jeweils mit Begründung | `grep -n 'sensitivity_names' backend/app/data/catalog.py` | — |
+| 2 | Abschnitt 2.4 (Z. 97–106) · Die Arbeitsmappe führt zu Id 62 sieben Sensitivitäten (S094–S100), `backend/app/data/catalog.py` (`PLANNED_RISKS`, Z. 317–322) nur zwei (S099, S100). Der Bericht benennt die Lücke, löst sie aber nicht auf; nach §2.1 bleibt kein Knoten unadressiert — fünf Knoten sind weder verarbeitet noch begründet inaktiv (Leitfrage 1). | B | behoben (T-0541, 23.09.2026) | Nachzug im Katalog umgesetzt, siehe Absatz „Nachzug erledigt" unter Befund 13 | `grep -n 'sensitivity_names' backend/app/data/catalog.py` | — |
 | 3 | Abschnitt 3.4 (Z. 200–205) · Zuschnitt Kap. 3 Punkt 3 schreibt die „Aggregation auf Ortsteile" vor; der Rechenkern kennt diese Ebene nicht. Die Abweichung ist im Bericht vermerkt, war aber bis zu dieser Prüfung in keinem Befund-Ledger geführt, obwohl Kap. 3 jede Abweichung von der Gliederung dort verlangt (Leitfrage 14). | B | offen | Ortsteil-Ebene im Rechenkern angelegt oder Kap. 3 des Zuschnitts fortgeschrieben, Entscheid hier vermerkt | `grep -rn 'district\|ortsteil' backend/app/services/` | — |
 | 4 | Abschnitt 6.2 (Z. 311–316) · Der Bericht führt `DESEALING_SURFACE` als einschlägige Maßnahme gegen die Wärmeinsel. Im geparkten Katalog (`catalog_parked.py`, Z. 944–947) trägt der Eintrag als `linked_risk_codes` nur `HYDROLOGICAL_STRESS_RISK_INDEX` und `EXPECTED_BUILDING_DAMAGE_EUR` — keinen Hitze-Pfad; auf `EXPECTED_THERMAL_STRESS_HOURS` wirkt im Katalog `URBAN_GREEN`. Die behauptete Wirkung auf den Wärmeinsel-Pfad ist im Produkt heute nicht hinterlegt (Leitfrage 12). | B | offen | Verknüpfung im Katalog ergänzt oder die Maßnahmenwahl im Bericht an die vorhandene Verknüpfung angepasst | `grep -n 'DESEALING_SURFACE' -A 4 backend/app/data/catalog_parked.py` | — |
 | 5 | Abschnitt 7, Zeilen S100 und Kopplung Id 65 (Z. 369, 371) · Die Spalte Herkunft trägt das Wort „Abschaetzung", während Wert und Fußnote ausdrücklich festhalten, dass kein Zahlenwert vorliegt und die Größe offen bleibt. Damit steht weder eine Quelle noch eine ausgewiesene Abschätzung samt Herleitung — P1 und §3.9 verlangen eines von beidem; die Spaltenangabe widerspricht zudem dem Zelleninhalt (Leitfrage 13). | B | offen | Herkunft auf „offen" gestellt oder eine belegte Abschätzung mit Herleitung nachgetragen | `grep -n 'Abschaetzung' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md` | — |
@@ -161,9 +171,10 @@ Die Kopfzahl ist entsprechend auf 12 nachgezogen.
 | 14 | Derselbe Nutzenwert 5 €/(m²·a) bei URBAN_GREEN und DESEALING_SURFACE · `benefit_per_m2_year: 5.0` aus derselben Quelle TEEB DE steht an zwei Maßnahmen mit zwei einander widersprechenden Herleitungen: bei `URBAN_GREEN` (`catalog_parked.py`, Z. 1371–1375) ausdrücklich ohne Kühlanteil („über die vermiedenen Hitzeschäden hinaus"), bei `DESEALING_SURFACE` (`catalog.py`, `_MEASURE_EFFECT_DOCS`, Z. 1957–1961) ausdrücklich mit Kühlanteil („Versickerung, Kühlung, Grün"). Verdikt: keine Doppelzählung bei URBAN_GREEN, aber ungeklärte Zusammensetzung des Punktwerts (G13, G14/§3.9, P1). Einzelheiten im Abschnitt „Befund 14" unter dieser Tabelle. | B | offen | Beide Herleitungen auf eine belegte Zusammensetzung des Punktwerts gebracht (mit oder ohne Kühlanteil, je Maßnahme begründet), oder abweichende Werte mit eigener Quelle | `grep -n 'Direkter Zusatznutzen über die vermiedenen Hitzeschäden\|Versickerung, Kühlung, Grün' backend/app/data/catalog_parked.py backend/app/data/catalog.py` | — |
 
 Die Befunde 12 und 13 sind mit ihrer Niederschrift geschlossen und zählen deshalb nicht in die
-Kopfzahl der elf offenen Befunde; die Ausgabe des Kopf-Prüfbefehls bleibt unverändert 11. Befund 2
-bleibt offen: Er wird erst mit dem Nachzug im Katalog geschlossen, den Befund 13 anordnet.
-Befund 14 (23.09.2026) ist offen und hebt die Kopfzahl auf 12.
+Kopfzahl der offenen Befunde. Befund 2 ist mit dem Nachzug im Katalog, den Befund 13 anordnet,
+inhaltlich miterledigt und förmlich geschlossen (siehe Absatz „Nachzug erledigt" unter Befund 13);
+er zählt deshalb nicht mehr mit. Befund 14 (23.09.2026) ist offen. Die Kopfzahl der offenen
+Befunde steht damit bei elf.
 
 Kein Befund der Kategorie A: Die harten Sperren der Klasse B sind eingehalten — sieben
 Abschnitte in der vorgeschriebenen Reihenfolge, kein Euro-Betrag außerhalb der Maßnahmenkosten,
