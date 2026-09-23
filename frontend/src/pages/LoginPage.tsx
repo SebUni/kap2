@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import InlineSpinner from '../components/InlineSpinner'
+import { sicheresRuecksprungziel } from '../lib/ruecksprung'
 
 export default function LoginPage() {
   const login = useAuthStore((s) => s.login)
@@ -20,7 +21,8 @@ export default function LoginPage() {
     setBusy(true)
     try {
       const user = await login(email.trim(), password)
-      navigate(from || (user.role === 'admin' ? '/admin' : '/app'), { replace: true })
+      const ziel = sicheresRuecksprungziel(from) ?? (user.role === 'admin' ? '/admin' : '/app')
+      navigate(ziel, { replace: true })
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       setError(msg.includes('401') ? 'E-Mail oder Passwort falsch.' : msg)
