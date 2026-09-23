@@ -4,6 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { useStore } from '../store'
 import { kangClusterColor, KANG_CLUSTER_COLORS } from '../utils/kangColors'
 import { gridAlignBearing, firstPolygonRing } from '../utils/gridBearing'
+import { escHtml } from '../utils/escapeHtml'
 import type {
   CellOutcomeBreakdown, CellPathwayBreakdown, HevRecipeMeta, IndicatorRecipe,
   LayerMeta, LayerRecipe, OutcomeFactorMeta, ResolvedInput, RiskRecipe,
@@ -343,10 +344,10 @@ function buildTooltipHtml(
         h += `<div style="font-size:10px;color:#475569">`
         for (const s of waterSrc) {
           const url = `https://www.openstreetmap.org/${s.osm_type}/${s.osm_id}`
-          const nm = s.name ? ` „${s.name}“` : ''
+          const nm = s.name ? ` „${escHtml(String(s.name))}“` : ''
           const flag = s.minor ? ' · <span style="color:#94a3b8">Graben (schwach)</span>' : ''
           h += `<div style="margin:1px 0">• <a href="${url}" target="_blank" rel="noopener" style="color:#2563eb">${s.osm_type}/${s.osm_id}</a>` +
-            ` — ${s.tag}${nm} · ${fmtNum(s.dist_m)} m${flag}</div>`
+            ` — ${escHtml(String(s.tag))}${nm} · ${fmtNum(s.dist_m)} m${flag}</div>`
         }
         h += `</div>`
       }

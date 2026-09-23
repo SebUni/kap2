@@ -1,13 +1,6 @@
 import type { LineageNodeData } from '../types'
 import { renderFormulaHtml, renderLatexHtml } from './formulaLatex'
-
-function esc(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-}
+import { escHtml } from './escapeHtml'
 
 // Tooltip-Schlüssel, deren Wert eine Formel ist → als LaTeX rendern
 const FORMULA_KEYS = new Set(['Berechnung', 'Formel'])
@@ -31,7 +24,7 @@ export function formatLineageTooltip(text: string): string {
   const body = firstIsFormula ? lines : lines.slice(1)
   const parts = firstIsFormula
     ? []
-    : [`<div class="kap-lineage-tip-title">${esc(lines[0])}</div>`]
+    : [`<div class="kap-lineage-tip-title">${escHtml(lines[0])}</div>`]
 
   for (const line of body) {
     // Fertige LaTeX-Zeilen des Backends: $$…$$
@@ -52,17 +45,17 @@ export function formatLineageTooltip(text: string): string {
         const mathHtml = renderFormulaHtml(val)
         parts.push(mathHtml
           ? `<div class="kap-lineage-tip-math">${mathHtml}</div>`
-          : `<div class="kap-lineage-tip-text">${esc(val)}</div>`)
+          : `<div class="kap-lineage-tip-text">${escHtml(val)}</div>`)
         continue
       }
       parts.push(
         `<div class="kap-lineage-tip-row">`
-        + `<span class="kap-lineage-tip-key">${esc(key)}:</span> `
-        + `<span>${esc(val)}</span>`
+        + `<span class="kap-lineage-tip-key">${escHtml(key)}:</span> `
+        + `<span>${escHtml(val)}</span>`
         + `</div>`,
       )
     } else {
-      parts.push(`<div class="kap-lineage-tip-text">${esc(line)}</div>`)
+      parts.push(`<div class="kap-lineage-tip-text">${escHtml(line)}</div>`)
     }
   }
   return parts.join('')
