@@ -329,3 +329,13 @@ der erfüllt/teilweise-Zeilen wurden mit `ls -d` gegengeprüft; kein Pfad wurde 
 `No such file` gemeldet. Die Checkliste ist damit für alle 25 Zeilen vollständig erfasst und
 die zitierten Belegpfade sind gegengeprüft; keine Lücke wurde behoben, kein Produktcode wurde
 angefasst — das war nicht Aufgabe dieses Pakets.
+
+## Nenner der Konformitätsaussage
+
+Entscheid des Aufsichtsrats vom 23.09.2026: Die Zeilen 11 und 12 richten sich ausschließlich an
+die Bundesregierung (Klimarisikoanalyse nach § 4 KAnG bzw. Klimaanpassungsstrategie nach § 3
+KAnG) und zählen deshalb nicht im Nenner einer Konformitätsaussage dieses Produkts — ein
+Werkzeug für Kommunen und Beratungsbüros kann diese Pflichten von vornherein nicht erfüllen.
+Zeile 14 richtet sich dagegen an die Länder, die zur Zielgruppe der Konformitätsaussage
+gehören; ihre Anforderung zählt im Nenner mit. Der Nenner jeder Konformitätsaussage ist damit
+23 von 25 Zeilen (25 Zeilen insgesamt minus die beiden Bundeszeilen 11 und 12).
