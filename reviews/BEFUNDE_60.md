@@ -4492,27 +4492,29 @@ daraus für die Integration zu ziehen ist, entscheidet **T-0248**; dieses Paket 
 
 Anlass: Frage des Prüfers Q-20260921T153316Z-pruefer-2f6a91-1 bei der Abnahme von T-0391 — der Prüfausdruck zu Befund 45 ist untauglich; sind die übrigen Ausdrücke dieses Ledgers vom selben Fehlertyp? (T-0540, 23.09.2026). **Kein Befund wird hier behoben, umnummeriert oder im Status geändert; keine Zeile oberhalb dieses Abschnitts ist geändert.** Die Übersichtstabelle bleibt unberührt (T-0392). Gelaufen am Bericht mit SHA-256 `d36326bd5678…` (letzter Commit des Berichts `88d27a04`), aus dem Repo-Wurzelverzeichnis.
 
-**Umfang.** Gezählt ist jeder Befund, der in einer Tabellenspalte „Prüfausdruck" einen ausführbaren Befehl trägt: die Übersichtstabelle, die Befundtabellen der Runden 1 und 2 und die Tabellen der Autor-Revision nach Runde 2. Gleichlautende Ausdrücke an mehreren Stellen (Übersicht und Runde 1; Befund 19 in Z. 54 und Z. 1587) zählen einmal. Mitgezählt ist der Lint-Lauf `python3 backend/scripts/lint_methodik.py 60`, wo er in der Spalte steht. Nicht gezählt sind: der nicht ausführbare Bruchstück-Ausdruck zu Teil (a) von Befund 42 in Z. 1203 (nur als Zitat im Klammersatz); die Befehle im Befundtext der Befunde 71, 83, 85 und 92 (Rechen- und Fundbelege; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck"); die Prüfausdrücke der Leitfragen-Abschnitte (Z. 123, 163, 242, 300, 451 — sie gehören zu keiner Befundnummer) und der Kopfzähler-Ausdruck im Nachtrag zu Befund 2 (Z. 2197, er zählt Ledger-Zeilen, keinen Befund).
+**Umfang.** Gezählt ist jeder Befund, der in einer Tabellenspalte „Prüfausdruck" einen ausführbaren Befehl trägt: die Übersichtstabelle, die Befundtabellen der Runden 1 und 2 und die Tabellen der Autor-Revision nach Runde 2. Gleichlautende Ausdrücke an mehreren Stellen (Übersicht und Runde 1; Befund 19 in Z. 54 und Z. 1587) zählen einmal. Mitgezählt sind außerdem die Prüfausdrücke, mit denen die Leitfragen der Runde 1 ihre Befunde zuerst belegt haben — LF 1 (Z. 126–133 → Befunde 1 und 2), LF 4 (Z. 166–173 → Befunde 6 und 7), LF 10 (Z. 243 und Z. 244 → Befund 11), LF 14 (Z. 303–308 → Befund 13) —, und Ausdruck (f) der Autor-Revision zu Befund 36 (Z. 1941–1958). Ein Leitfragen-Ausdruck, der auf zwei Befunde verweist, steht in beiden Zeilen, ist für jeden Befund getrennt beurteilt und zählt bei jedem. Mitgezählt ist der Lint-Lauf `python3 backend/scripts/lint_methodik.py 60`, wo er in der Spalte steht. Nicht gezählt sind: der nicht ausführbare Bruchstück-Ausdruck zu Teil (a) von Befund 42 in Z. 1203 (nur als Zitat im Klammersatz); die Befehle im Befundtext der Befunde 71, 83, 85 und 92 (Rechen- und Fundbelege; die Befundtabellen der Runde 3 haben keine Spalte „Prüfausdruck"); der „Prüfausdruck über Mengengleichheit" in Leitfrage 1 der Runde 2 (Z. 451, → Befunde 20 und 21) — der Ledger nennt dort nur sein Ergebnis (`nur Bericht: set() | nur Mappe: set()`), nicht den Befehl; ohne Wortlaut ist er weder ausführbar noch beurteilbar (Befund 21 trägt mit Z. 518 einen eigenen Ausdruck zum selben Abgleich) — und der Kopfzähler-Ausdruck im Nachtrag zu Befund 2 (Z. 2197, er zählt Ledger-Zeilen, keinen Befund).
 
-**Maßstab.** Jeder Ausdruck wurde verbatim ausgeführt. Welcher Exit-Code „besteht" heißt, legt sein Paket fest: In den Befundtabellen der Runde 2 (Befunde 23–46, Z. 678–1274) heißt Exit 0 „besteht", überall sonst (Übersicht, Runde 1, Paket 0.3 mit Befund 20/21, Autor-Revision) Exit 0 „geschlossen". Maßstab für das richtige Ergebnis ist das letzte Urteil dieses Ledgers zum Befund (Befundregression Runde 3, wo vorhanden, sonst Runde 2; bei Befund 2 der Nachtrag, bei Befund 19 die spätere Autor-Revision T-0288). Hat eine Regression einen Rest unter **eigener neuer Nummer** verbucht (z. B. 40 → 99, 41 → 100, 46 → 104, 35 → 96), gehört er nicht zur Frage des alten Ausdrucks. Untauglich ist ein Ausdruck, der am heutigen Stand das falsche Ergebnis liefert, oder dessen richtiges Ergebnis nur zufällig zustande kommt (Probe weiter unten). Die Sachverhalte selbst sind hier nicht neu begutachtet.
+**Maßstab.** Jeder Ausdruck wurde verbatim ausgeführt. Welcher Exit-Code „besteht" heißt, legt sein Paket fest: In den Befundtabellen der Runde 2 (Befunde 23–46, Z. 678–1274) heißt Exit 0 „besteht", überall sonst (Übersicht, Runde 1, Paket 0.3 mit Befund 20/21, Autor-Revision) Exit 0 „geschlossen". Maßstab für das richtige Ergebnis ist das letzte Urteil dieses Ledgers zum Befund (Befundregression Runde 3, wo vorhanden, sonst Runde 2; bei Befund 2 der Nachtrag, bei Befund 19 die spätere Autor-Revision T-0288). Hat eine Regression einen Rest unter **eigener neuer Nummer** verbucht (z. B. 40 → 99, 41 → 100, 46 → 104, 35 → 96), gehört er nicht zur Frage des alten Ausdrucks. Untauglich ist ein Ausdruck, der am heutigen Stand das falsche Ergebnis liefert, oder dessen richtiges Ergebnis nur zufällig zustande kommt (Probe weiter unten). Die Leitfragen-Ausdrücke der Runde 1 drucken ein Ergebnis statt eines Exit-Codes mit Bedeutung; richtig ist ihr Ergebnis, wenn es den Stand der Vergabe (Befund besteht) vom heutigen Stand so unterscheidet, wie das letzte Urteil es verlangt. Zur Gegenprobe lief jeder als tauglich beurteilte Ausdruck außerdem am Berichtsstand seiner Vergabe (T-0232, T-0270 bis T-0274; ausgenommen der Lint-Lauf und Befund 46, dessen Vergabe-Commit nicht eindeutig ist); jeder meldete dort „besteht“. Dabei fiel der Zählausdruck zu Befund 2 auf (siehe unten). Die Sachverhalte selbst sind hier nicht neu begutachtet.
 
 | Befund | Prüfausdruck (wörtlich) | gelesene Datei(en) | Urteil |
 |---|---|---|---|
-| 1 | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 3 ')[1].split('\n## 4 ')[0];raise SystemExit(0 if len(re.sub(r'<!--.*?-->','',k,flags=re.S).strip())>=8000 else 1)"` (Z. 36) | Bericht | tauglich |
-| 2 | `grep -c "rechnet in: offen" docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (Z. 37) | Bericht | tauglich |
+| 1 | (a) `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 3 ')[1].split('\n## 4 ')[0];raise SystemExit(0 if len(re.sub(r'<!--.*?-->','',k,flags=re.S).strip())>=8000 else 1)"` (Z. 36)<br>(b) <code>python3 -c "<br>import openpyxl<br>wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)<br>rows=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))<br>cite={13:'E12',8:'E07',9:'E08',197:'S072',198:'S073',199:'S074',204:'R17',205:'R18',206:'R19',11:'E10',18:'E17',15:'E14',3:'E02',4:'E03',181:'W074',184:'W077',210:'W087',45:'W008',43:'W006',214:'W091',223:'W100',256:'S092',257:'S093',258:'S094',260:'S096',261:'S097',262:'S098',268:'S104',270:'R24',269:'R23',271:'R25',226:'W103',272:'W117',208:'W085'}<br>bad=[(r,k,rows[r-1][0]) for r,k in sorted(cite.items()) if rows[r-1][0]!=k]<br>print('Zeilen-Abweichungen:',bad)<br>"</code> (Z. 126–133) | (a) Bericht<br>(b) `KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` | (a) tauglich<br>(b) untauglich: anderer Grund (benannt): misst einen anderen Sachverhalt — ob die von Hand in den Ausdruck eingetragenen Blattzeilen die genannten Knoten treffen; Kapitel 3 und der Bericht kommen darin nicht vor |
+| 2 | (a) `grep -c "rechnet in: offen" docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (Z. 37)<br>(b) <code>python3 -c "<br>import openpyxl<br>wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)<br>rows=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))<br>cite={13:'E12',8:'E07',9:'E08',197:'S072',198:'S073',199:'S074',204:'R17',205:'R18',206:'R19',11:'E10',18:'E17',15:'E14',3:'E02',4:'E03',181:'W074',184:'W077',210:'W087',45:'W008',43:'W006',214:'W091',223:'W100',256:'S092',257:'S093',258:'S094',260:'S096',261:'S097',262:'S098',268:'S104',270:'R24',269:'R23',271:'R25',226:'W103',272:'W117',208:'W085'}<br>bad=[(r,k,rows[r-1][0]) for r,k in sorted(cite.items()) if rows[r-1][0]!=k]<br>print('Zeilen-Abweichungen:',bad)<br>"</code> (Z. 126–133) | (a) Bericht<br>(b) `KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` | (a) untauglich: anderer Grund (benannt): sucht die Zeichenfolge „rechnet in: offen", die im Bericht nie stand — die Knoten-Bilanz führt „offen" als Zelle der Spalte „rechnet in"<br>(b) untauglich: liest nur eine von mehreren betroffenen Dateien |
 | 4 | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 4 ')[1].split('\n## 5 ')[0];raise SystemExit(0 if len(re.sub(r'<!--.*?-->','',k,flags=re.S).strip())>=6000 else 1)"` (Z. 39) | Bericht | tauglich |
 | 5 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 3 ')[1].split('\n## 4 ')[0];raise SystemExit(0 if all(t in k for t in ('HQ_FLAECHE','HQ_TIEFE','GEBAEUDEWERT','neu anzulegen','geparkt (Datenquelle fehlt)','Beschaffungs-Watchlist')) else 1)"` (Z. 40) | Bericht | tauglich |
-| 7 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 4 ')[1].split('\n## 5 ')[0];raise SystemExit(0 if all(t in k for t in ('2002','2024','geparkt (Datenquelle fehlt)','Doppelzählungs-Wächter')) else 1)"` (Z. 42) | Bericht | tauglich |
+| 6 | <code>python3 -c "<br>import openpyxl<br>wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True)<br>k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))<br>print('K3-Buchungsobjekte:',k[28][2])<br>ap=list(wb['Abgleich-Protokoll'].iter_rows(values_only=True))<br>print([ (r[0],r[1],r[3]) for r in ap if str(r[1])=='49' ])<br>"</code> (Z. 166–173) | `KWRA-Monetarisierung.xlsx` | untauglich: liest nur eine von mehreren betroffenen Dateien |
+| 7 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 4 ')[1].split('\n## 5 ')[0];raise SystemExit(0 if all(t in k for t in ('2002','2024','geparkt (Datenquelle fehlt)','Doppelzählungs-Wächter')) else 1)"` (Z. 42)<br>(b) <code>python3 -c "<br>import openpyxl<br>wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True)<br>k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))<br>print('K3-Buchungsobjekte:',k[28][2])<br>ap=list(wb['Abgleich-Protokoll'].iter_rows(values_only=True))<br>print([ (r[0],r[1],r[3]) for r in ap if str(r[1])=='49' ])<br>"</code> (Z. 166–173) | (a) Bericht<br>(b) `KWRA-Monetarisierung.xlsx` | (a) tauglich<br>(b) untauglich: anderer Grund (benannt): misst einen anderen Sachverhalt (K3-Buchungsobjekte und Abgleich-Protokoll), nicht Kalibrierjahre und Wächter |
 | 8 | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 3.5 ')[1].split(chr(10)+'### ')[0];r=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][2:];ok=all(len(c)==4 and (any(a in c[3] for a in ('register:','herleitung:')) or (c[3]=='Notation' and c[2]=='—')) for c in r);ead=[c for c in r if 'EAD' in c[0]];raise SystemExit(0 if ok and len(r)>=20 and any('2026' in c[1] and 'Kommune' in c[1] for c in ead) and any('mit' in c[0] for c in ead) else 1)"` (Z. 43) | Bericht | tauglich |
 | 9 | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();b=re.findall('python test: ([a-z0-9_]+)'+chr(10)+'(.*?)'+chr(10)+chr(96)*3,s,re.S);[exec(compile(c,n,'exec'),{}) for n,c in b];raise SystemExit(0 if b and all('assert' in c for n,c in b) and any(n=='beispiel_60_kernformel' for n,c in b) else 1)"` (Z. 44) | Bericht | untauglich: liest nur eine von mehreren betroffenen Dateien |
 | 10 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('### 5.1.3 ')[1].split(chr(10)+'## 6 ')[0];b=s.split('id: flood_bldg.s_bem')[1].split('---')[0];raise SystemExit(0 if all(t in k for t in ('Näherung','überschätzt','0,661','Stichproben')) and all(t in b for t in ('naeherung: true','naeherung_richtung: ueberschaetzt_hebel','herleitung_anker: \"#s-bem-naeherung\"')) else 1)"` (Z. 45) | Bericht | tauglich |
-| 13 | `python3 -c "import re;s=open('backend/app/data/catalog.py',encoding='utf-8').read();b=s.split('\"kwra_id\": 60')[1].split('kwra_id')[0];raise SystemExit(0 if b.count('\"')//2>=0 else 1)"` (Z. 346) | `backend/app/data/catalog.py` | untauglich: anderer Grund (benannt): die Bedingung `b.count('"')//2>=0` ist immer wahr, und der Ausdruck liest nur `catalog.py`, nicht die beanstandete Behauptung im Bericht |
+| 11 | (a) `grep -c "http" docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (Z. 243)<br>(b) <code>grep -n "Zugriff\&#124;Snapshot\&#124;DOI" …</code> (Z. 244) | (a) Bericht<br>(b) keine (Dateiargument ausgelassen) | (a) untauglich: anderer Grund (benannt): zählt „http" im ganzen Bericht statt in Kapitel 8<br>(b) untauglich: anderer Grund (benannt): das Dateiargument ist mit „…" ausgelassen, der Ausdruck ist nicht ausführbar |
+| 13 | (a) `python3 -c "import re;s=open('backend/app/data/catalog.py',encoding='utf-8').read();b=s.split('\"kwra_id\": 60')[1].split('kwra_id')[0];raise SystemExit(0 if b.count('\"')//2>=0 else 1)"` (Z. 346)<br>(b) <code>python3 -c "<br>import openpyxl<br>wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)<br>w=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))[271]<br>print('Mappe: sens',len(w[9].split(';')),'&#124; wirkung',len(w[11].split(';')))<br>"</code> (Z. 303–308) | (a) `backend/app/data/catalog.py`<br>(b) `KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` | (a) untauglich: anderer Grund (benannt): die Bedingung `b.count('"')//2>=0` ist immer wahr, und der Ausdruck liest nur `catalog.py`, nicht die beanstandete Behauptung im Bericht<br>(b) untauglich: liest nur eine von mehreren betroffenen Dateien |
 | 14 | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 6 ')[1].split('\n## 7 ')[0];raise SystemExit(0 if len(re.sub(r'<!--.*?-->','',k,flags=re.S).strip())>=2500 else 1)"` (Z. 49) | Bericht | tauglich |
 | 15 | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 7 ')[1].split(chr(10)+'## 8 ')[0];bl=re.split(r'^parameter:$',k,flags=re.M)[1:];kz=[re.search(r'^  kennzeichnung: (\S+)$',b,re.M) for b in bl];ok=all(m and m.group(1) in ('quelle','abschaetzung_kap3') for m in kz) and all(re.search(r'^  herleitung_anker: \"#\S+\"$',b,re.M) and re.search(r'^  wertebereich_abweichung: \"#fortschreibung-endpunkt-k3\"$',b,re.M) for b in bl);ank=all(('<a id=\"'+a+'\">') in s for a in ('s092-wirkung','s-bem-naeherung','fortschreibung-endpunkt-k3'));raise SystemExit(0 if len(bl)==4 and ok and ank and '13.09.2026' in k.split('### 7.1 ')[1] else 1)"` (Z. 50) | Bericht | untauglich: anderer Grund (benannt): fest verdrahtete Blockzahl `len(bl)==4` und Anker-Pflicht auch für Blöcke mit `kennzeichnung: quelle` |
 | 17 | `python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=[len(re.sub(r'<!--.*?-->','',t,flags=re.S).strip()) for t in re.split(r'\n## ',s)];raise SystemExit(0 if min(k)>200 else 1)"` (Z. 350) | Bericht | untauglich: liest nur eine von mehreren betroffenen Dateien |
 | 19 | `python3 -c "r=open('docs/evidenz/register.md',encoding='utf-8').read();z=[l for l in r.split(chr(10)) if l.startswith(chr(124)+' 60-S092-01 ')];b=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if (len(z)==1 and 'Band 0,0075–0,0992' in z[0] and '0,0075–0,112' not in r and '(Band 0,0075–**0,0992**' in b) else 1)"` (Z. 54) | Bericht, `docs/evidenz/register.md` | tauglich |
 | 20 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k1=s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0];rest=s.split(chr(10)+'## 2 ')[1];raise SystemExit(0 if rest.count('FS-Schutzsystem')>0 else 1)"` (Z. 517) | Bericht | untauglich: matcht den eigenen Beleg |
-| 21 | `python3 -c "import openpyxl,re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('| Knoten | Name | Blatt/Zeile | rechnet in |')[1].split(chr(10)+chr(10))[0];rows=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][1:];wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True);k=list(wb['Klimawirkungsketten'].iter_rows(values_only=True));bad=[r[0] for r in rows if re.sub(r'\s*\((über W085|= Id \d+|direkt[^)]*)\)\s*$','',r[1]).strip()!=k[int(re.search(r'KWK Z(\d+)',r[2]).group(1))-1][1]];raise SystemExit(0 if not bad else 1)"` (Z. 518) | Bericht, `KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` | tauglich |
+| 21 | <code>python3 -c "import openpyxl,re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('&#124; Knoten &#124; Name &#124; Blatt/Zeile &#124; rechnet in &#124;')[1].split(chr(10)+chr(10))[0];rows=[[c.strip() for c in z.strip().strip(chr(124)).split(chr(124))] for z in t.split(chr(10)) if z.strip().startswith(chr(124))][1:];wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True);k=list(wb['Klimawirkungsketten'].iter_rows(values_only=True));bad=[r[0] for r in rows if re.sub(r'\s*\((über W085&#124;= Id \d+&#124;direkt[^)]*)\)\s*$','',r[1]).strip()!=k[int(re.search(r'KWK Z(\d+)',r[2]).group(1))-1][1]];raise SystemExit(0 if not bad else 1)"</code> (Z. 518) | Bericht, `KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx` | tauglich |
 | 23 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();L=s.split(chr(10));k=chr(10).join(L[798:833]);raise SystemExit(0 if ('Perzentilrang' in k and 'Bindung' not in k and 'x_k = 0' not in k) else 1)"` (Z. 678) | Bericht | untauglich: anderer Grund (benannt): feste Zeilennummern — der Ausschnitt `L[…]` liest am heutigen Bericht einen anderen Abschnitt als bei der Vergabe |
 | 24 | `python3 -c "p=[1e-1,1e-2,(5e-3*1e-3)**0.5];ab=lambda A: sum((p[i]-p[i+1])*(A[i]+A[i+1])/2 for i in range(2))+p[2]*A[2];A1=ab([1200*0.25*0.050,1200*0.80*0.081,1200*1.00*0.250]);A2=ab([0.0,3000*0.10*0.081,3000*0.20*0.250]);E=A1*1.30*1950+A2*1.30*1533;wk=1.30*(1200*1950+3000*1533)/4200;raise SystemExit(0 if abs(E-(A1+A2)*wk)/E > 0.05 else 1)"` (Z. 679) | keine (reine Rechnung) | untauglich: anderer Grund (benannt): liest keine Datei — das Ergebnis hängt nicht vom Bericht ab |
 | 25 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();L=s.split(chr(10));t35=chr(10).join(L[669:700]);t511=chr(10).join(L[1131:1140]);k5=chr(10).join(L[1097:1261]);fehlt=[z for z in ('q_0','t_1','t_2','t_3') if z in k5 and z not in t35 and z not in t511];raise SystemExit(0 if fehlt else 1)"` (Z. 680) | Bericht | untauglich: anderer Grund (benannt): feste Zeilennummern — der Ausschnitt `L[…]` liest am heutigen Bericht einen anderen Abschnitt als bei der Vergabe |
@@ -4526,7 +4528,7 @@ Anlass: Frage des Prüfers Q-20260921T153316Z-pruefer-2f6a91-1 bei der Abnahme v
 | 33 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('1,0/2,6' in k and '1 von 23 Kalibrierjahren' in k and 'dafür ±12,5 Prozentpunkte' in k) else 1)"` (Z. 998)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.5 ')[1].split(chr(10)+'### 4.6 ')[0];raise SystemExit(0 if ('1,0/2,6' not in k and '1 von 23 Kalibrierjahren' not in k and 'dafür ±12,5 Prozentpunkte' not in k and 'Erwartungswertanteil' in k and 'Leave-one-out' in k and '60_gdv_jahresreihe_2002_2024.csv' in k and k.index('Toleranz — vorab fixiert') < k.index('**Ist-Ergebnis.**')) else 1)"` (Z. 1794)<br>(c) `python3 backend/scripts/lint_methodik.py 60` | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`) | (a) tauglich<br>(b) tauglich<br>(c) tauglich |
 | 34 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('Kleinste Quadrate' not in k and 'Zeitfenster' not in k and 'an Wohngebäuden' in k and 'nicht publiziert' in k) else 1)"` (Z. 999)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('1,838','1,132','0,832','0,22','1,66','w_wg','wert: 0.832')) else 1)"` (Z. 1769)<br>(c) `python3 backend/scripts/lint_methodik.py 60` | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`) | (a) tauglich<br>(b) untauglich: anderer Grund (benannt): fragt das abgelöste \(\lambda\)-Band 0,22–1,66 ab<br>(c) tauglich |
 | 35 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('mittleren Betroffenheit von 1/100 Jahren' in k and 'Hochrechnung \\\\(u\\\\) entfällt hier bewusst' in k and 6.311/1200>0.25*0.01) else 1)"` (Z. 1000)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'### 4.6 ')[1].split(chr(10)+'### 4.7 ')[0];raise SystemExit(0 if all(x in k for x in ('0,0103','6,29','Amtlichkeitsgebot','1,132')) else 1)"` (Z. 2155)<br>(c) `python3 backend/scripts/lint_methodik.py 60` | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`) | (a) tauglich<br>(b) tauglich<br>(c) tauglich |
-| 36 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];t=k.split('### 4.8 ')[1];raise SystemExit(0 if ('0,42–2,36' in k and '2{,}00' in k and '2,00' not in t and '2{,}00' not in t) else 1)"` (Z. 1001)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('0,657–2,643','0,11–3,44','[0,11; 3,44]','0,11 bzw. 3,44','[0.11, 3.44]','0,297–2,263')) else 1)"` (Z. 1983)<br>(c) `python3 backend/scripts/lint_methodik.py 60` | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`) | (a) tauglich<br>(b) tauglich<br>(c) tauglich |
+| 36 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];t=k.split('### 4.8 ')[1];raise SystemExit(0 if ('0,42–2,36' in k and '2{,}00' in k and '2,00' not in t and '2{,}00' not in t) else 1)"` (Z. 1001)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('0,657–2,643','0,11–3,44','[0,11; 3,44]','0,11 bzw. 3,44','[0.11, 3.44]','0,297–2,263')) else 1)"` (Z. 1983)<br>(c) `python3 backend/scripts/lint_methodik.py 60`<br>(d) <code>python3 -c "wf=208.0<br>bgf_lo,bgf_c,bgf_hi=1.25,1.30,1.40<br>ws_lo,ws_c,ws_hi=1889.0,1950.0,2047.0<br>w_wohn=0.872<br>n34,n2=339000,1380000<br>r34_lo,r34_c,r34_hi=0.0033,0.005979599550826,0.0103<br>r2_lo,r2_c,r2_hi=0.000301,0.000675151053693,0.001154<br>wg_lo=wf*bgf_lo*ws_lo; wg_c=wf*bgf_c*ws_c; wg_hi=wf*bgf_hi*ws_hi<br>term_lo=n34*r34_lo+n2*r2_lo; term_c=n34*r34_c+n2*r2_c; term_hi=n34*r34_hi+n2*r2_hi<br>M0_lo=w_wohn*wg_lo*term_lo/1e9; M0_c=w_wohn*wg_c*term_c/1e9; M0_hi=w_wohn*wg_hi*term_hi/1e9<br>assert abs(M0_c-1.360)&lt;5e-3 and abs(M0_lo-0.657)&lt;5e-3 and abs(M0_hi-2.643)&lt;5e-3<br>A_lo,A_hi=0.297,2.263<br>lam_lo=A_lo/M0_hi; lam_hi=A_hi/M0_lo<br>schranke=(round(lam_lo,2),round(lam_hi,2))<br>assert schranke==(0.11,3.44)<br>lam_band=(0.22,1.66)<br>assert schranke[0]&lt;=lam_band[0]&lt;=schranke[1] and schranke[0]&lt;=lam_band[1]&lt;=schranke[1]<br>print('OK M0', round(M0_lo,3), round(M0_c,3), round(M0_hi,3), 'schranke', schranke)"</code> (Z. 1941–1958) | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`)<br>(d) keine (reine Rechnung) | (a) tauglich<br>(b) tauglich<br>(c) tauglich<br>(d) untauglich: anderer Grund (benannt): liest keine Datei — rechnet nur fest eingetragene Zahlen nach |
 | 37 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 4.8 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('Betroffenheit' not in t and '2,00' not in t and 'rund 3' not in t and 'Baupreisanstieg' not in t) else 1)"` (Z. 1002) | Bericht | untauglich: anderer Grund (benannt): fragt die Namen der drei damals fehlenden Zeilen ab, nicht, ob jeder rechnende Wert eine eigene Zeile hat |
 | 38 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 4 ')[1].split(chr(10)+'## 5 ')[0];raise SystemExit(0 if ('1,07 (1,04–1,11)' in k and round(1.16/1.03,2)>1.11) else 1)"` (Z. 1003) | Bericht | tauglich |
 | 39 | (a) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split('### 4.7 ')[1].split('### 4.8 ')[0];raise SystemExit(0 if ('Ausstattungsstand 31.12.2024' in t and 'gewicht' not in t.lower()) else 1)"` (Z. 1004)<br>(b) `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();t=s.split(chr(10)+'### 4.7 ')[1].split(chr(10)+'### 4.8 ')[0];k=s.split(chr(10)+'### 5.1.2 ')[1].split(chr(10)+'### 5.1.3 ')[0];raise SystemExit(0 if ('Ausstattungsstand 31.12.2024' not in t and 'gleichgewichtete' in t and '21,7' in t and '47,8' in t and '1/24' in t and '78,3' in t and '52,2' in t and 'unterzählt' in t and '§4.7' in k) else 1)"` (Z. 1813)<br>(c) `python3 backend/scripts/lint_methodik.py 60` | (a) Bericht<br>(b) Bericht<br>(c) Bericht (über `backend/scripts/lint_methodik.py`) | (a) tauglich<br>(b) tauglich<br>(c) tauglich |
@@ -4538,13 +4540,224 @@ Anlass: Frage des Prüfers Q-20260921T153316Z-pruefer-2f6a91-1 bei der Abnahme v
 | 45 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 9 ')[1].split(chr(10)+'## Entscheidungslog')[0];raise SystemExit(0 if ('davon zwei neu anzulegen' in k and 'geparkt' not in k) else 1)"` (Z. 1206) | Bericht | untauglich: anderer Grund (benannt): das Suchwort „geparkt" trifft eine fremde Fundstelle (Kap. 9 Z. 2462, FS-Schutzsystem-Weiche) |
 | 46 | `python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k1=s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0];k3=s.split(chr(10)+'## 3 ')[1].split(chr(10)+'## Entscheidungslog')[0];z=[l for l in k1.split(chr(10)) if l.startswith(chr(124)+' S074 ') or l.startswith(chr(124)+' R17 ')];raise SystemExit(0 if (len(z)==2 and all('**FS-Exposition**' in l for l in z) and 'FS-Exposition' not in k3 and 'nicht** als' in k3) else 1)"` (Z. 1274) | Bericht | tauglich |
 
-Geprüft wurden **58 Prüfausdrücke** zu 39 Befunden; davon sind **20 untauglich** und 38 tauglich.
+Geprüft wurden **66 Prüfausdrücke** (Tabelleneinträge) zu 41 Befunden; davon sind **29 untauglich** und 37 tauglich.
 
-Nach Fehlertyp: 1 „matcht den eigenen Beleg", 2 „liest nur eine von mehreren betroffenen Dateien", 17 „anderer Grund" (davon 7 feste Zeilennummern). Der Fehlertyp des Hauses (Selbstbeleg und halbe Dateimenge) erklärt damit drei der 20; die größte Gruppe sind Ausdrücke, die an Zeilennummern oder an einem überholten Zwischenstand hängen und deshalb nach jeder Revision kippen.
+Nach Fehlertyp: 1 „matcht den eigenen Beleg", 5 „liest nur eine von mehreren betroffenen Dateien", 23 „anderer Grund" (davon 7 feste Zeilennummern). Der Fehlertyp des Hauses (Selbstbeleg und halbe Dateimenge) erklärt damit 6 der 29; die größte Gruppe sind Ausdrücke, die an Zeilennummern oder an einem überholten Zwischenstand hängen und deshalb nach jeder Revision kippen.
 
 #### Ersatzausdrücke mit Lauf alt und neu
 
-Jeder Block zeigt zuerst den alten, dann den neuen Ausdruck, wörtlich ausgeführt am heutigen Stand. Wo der alte heute zufällig richtig liegt, folgt eine Probe an einem Berichtsstand, dessen Sachlage bekannt ist; der Aufbau der Probe steht als erste Zeile im Block. Die Ersatzausdrücke haben dieselbe Exit-Bedeutung wie der Ausdruck, den sie ersetzen. Sie stehen nur hier; eingesetzt werden sie mit der nächsten Regression, die den jeweiligen Befund anfasst.
+Jeder Block zeigt zuerst den alten, dann den neuen Ausdruck, wörtlich ausgeführt am heutigen Stand. Wo der alte heute zufällig richtig liegt, folgt eine Probe an einem Berichtsstand, dessen Sachlage bekannt ist; der Aufbau der Probe steht als erste Zeile im Block. Die Ersatzausdrücke haben dieselbe Exit-Bedeutung wie der Ausdruck, den sie ersetzen; Ersatz für einen Leitfragen-Ausdruck endet mit Exit 0 = geschlossen (bei LF 10 (b) zählt die gedruckte Zahl). Sie stehen nur hier; eingesetzt werden sie mit der nächsten Regression, die den jeweiligen Befund anfasst.
+
+**Befund 1 (b) (Z. 126–133)** — untauglich: anderer Grund (benannt): misst einen anderen Sachverhalt — ob die von Hand in den Ausdruck eingetragenen Blattzeilen die genannten Knoten treffen; Kapitel 3 und der Bericht kommen darin nicht vor. Befund 1 (Kapitel 3 leer) hängt nicht an den Blattzeilen der Mappe. Der Ausdruck gibt am Stand der Vergabe und heute dieselbe Ausgabe, obwohl der Befund damals bestand und heute bestätigt geschlossen ist (Regression Runde 2, Z. 1247). Ersatz ist der Schließungsausdruck der Übersicht (Z. 36), hier als tauglich beurteilt. Soll: Stand der Vergabe Exit 1 (besteht), heute Exit 0 (geschlossen).
+
+Ersatz:
+
+```bash
+python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 3 ')[1].split('\n## 4 ')[0];raise SystemExit(0 if len(re.sub(r'<!--.*?-->','',k,flags=re.S).strip())>=8000 else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)
+rows=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))
+cite={13:'E12',8:'E07',9:'E08',197:'S072',198:'S073',199:'S074',204:'R17',205:'R18',206:'R19',11:'E10',18:'E17',15:'E14',3:'E02',4:'E03',181:'W074',184:'W077',210:'W087',45:'W008',43:'W006',214:'W091',223:'W100',256:'S092',257:'S093',258:'S094',260:'S096',261:'S097',262:'S098',268:'S104',270:'R24',269:'R23',271:'R25',226:'W103',272:'W117',208:'W085'}
+bad=[(r,k,rows[r-1][0]) for r,k in sorted(cite.items()) if rows[r-1][0]!=k]
+print('Zeilen-Abweichungen:',bad)
+"; echo "Exit $?"
+Zeilen-Abweichungen: []
+Exit 0
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 3 ')[1].split('\n## 4 ')[0];raise SystemExit(0 if len(re.sub(r'<!--.*?-->','',k,flags=re.S).strip())>=8000 else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1), an dem der Befund bestand:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && ln -s $PWD/backend $T/backend && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)
+rows=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))
+cite={13:'E12',8:'E07',9:'E08',197:'S072',198:'S073',199:'S074',204:'R17',205:'R18',206:'R19',11:'E10',18:'E17',15:'E14',3:'E02',4:'E03',181:'W074',184:'W077',210:'W087',45:'W008',43:'W006',214:'W091',223:'W100',256:'S092',257:'S093',258:'S094',260:'S096',261:'S097',262:'S098',268:'S104',270:'R24',269:'R23',271:'R25',226:'W103',272:'W117',208:'W085'}
+bad=[(r,k,rows[r-1][0]) for r,k in sorted(cite.items()) if rows[r-1][0]!=k]
+print('Zeilen-Abweichungen:',bad)
+"; echo "Exit $?"
+Zeilen-Abweichungen: []
+Exit 0
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 3 ')[1].split('\n## 4 ')[0];raise SystemExit(0 if len(re.sub(r'<!--.*?-->','',k,flags=re.S).strip())>=8000 else 1)"; echo "Exit $?"
+Exit 1
+```
+
+**Befund 2 (a) (Z. 37)** — untauglich: anderer Grund (benannt): sucht die Zeichenfolge „rechnet in: offen", die im Bericht nie stand — die Knoten-Bilanz führt „offen" als Zelle der Spalte „rechnet in". Am Berichtsstand der Vergabe (T-0232), als alle 32 Zeilen der Knoten-Bilanz in der Spalte „rechnet in" `offen` trugen, gibt der Ausdruck bereits 0 aus, also „geschlossen". Das heutige Ergebnis 0 stimmt deshalb nur zufällig. Der Ersatz liest die Spalte „rechnet in" der Tabelle selbst. Soll: heute 0 von 32 (geschlossen, Nachtrag zu Befund 2); am Stand der Vergabe 32 von 32.
+
+Ersatz:
+
+```bash
+python3 -c "import itertools;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();L=s.split(chr(10));i=[j for j,l in enumerate(L) if l.startswith(chr(124)+' Knoten '+chr(124)+' Name ') and 'rechnet in' in l][0];h=[c.strip() for c in L[i].strip().strip(chr(124)).split(chr(124))].index('rechnet in');z=list(itertools.takewhile(lambda l:l.startswith(chr(124)),L[i+2:]));n=sum(1 for l in z if l.strip().strip(chr(124)).split(chr(124))[h].strip().strip(chr(96))=='offen');print('Zeilen der Knoten-Bilanz mit rechnet in = offen:',n,'von',len(z));raise SystemExit(1 if n else 0)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ grep -c "rechnet in: offen" docs/methodik/60_gebaeudeschaeden_flusshochwasser.md; echo "Exit $?"
+0
+Exit 1
+$ python3 -c "import itertools;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();L=s.split(chr(10));i=[j for j,l in enumerate(L) if l.startswith(chr(124)+' Knoten '+chr(124)+' Name ') and 'rechnet in' in l][0];h=[c.strip() for c in L[i].strip().strip(chr(124)).split(chr(124))].index('rechnet in');z=list(itertools.takewhile(lambda l:l.startswith(chr(124)),L[i+2:]));n=sum(1 for l in z if l.strip().strip(chr(124)).split(chr(124))[h].strip().strip(chr(96))=='offen');print('Zeilen der Knoten-Bilanz mit rechnet in = offen:',n,'von',len(z));raise SystemExit(1 if n else 0)"; echo "Exit $?"
+Zeilen der Knoten-Bilanz mit rechnet in = offen: 0 von 32
+Exit 0
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1), an dem der Befund bestand:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && ln -s $PWD/backend $T/backend && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ grep -c "rechnet in: offen" docs/methodik/60_gebaeudeschaeden_flusshochwasser.md; echo "Exit $?"
+0
+Exit 1
+$ python3 -c "import itertools;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();L=s.split(chr(10));i=[j for j,l in enumerate(L) if l.startswith(chr(124)+' Knoten '+chr(124)+' Name ') and 'rechnet in' in l][0];h=[c.strip() for c in L[i].strip().strip(chr(124)).split(chr(124))].index('rechnet in');z=list(itertools.takewhile(lambda l:l.startswith(chr(124)),L[i+2:]));n=sum(1 for l in z if l.strip().strip(chr(124)).split(chr(124))[h].strip().strip(chr(96))=='offen');print('Zeilen der Knoten-Bilanz mit rechnet in = offen:',n,'von',len(z));raise SystemExit(1 if n else 0)"; echo "Exit $?"
+Zeilen der Knoten-Bilanz mit rechnet in = offen: 32 von 32
+Exit 1
+```
+
+**Befund 2 (b) (Z. 126–133)** — untauglich: liest nur eine von mehreren betroffenen Dateien. Befund 2 steht zwischen der Knoten-Bilanz des Berichts und der Mappe. Der Ausdruck liest nur die Mappe; die Zuordnung Blattzeile → Knoten ist von Hand in `cite` eingetragen, nicht aus dem Bericht gelesen. Er gibt deshalb am Stand der Vergabe (alle 32 Zeilen „rechnet in: offen") und heute dieselbe Ausgabe. Ersatz ist derselbe Zählausdruck wie für den Ausdruck (a) dieses Befunds, der die Spalte „rechnet in" der Knoten-Bilanz liest. Soll: Stand der Vergabe 32 von 32 (besteht), heute 0 von 32 (geschlossen; Nachtrag zu Befund 2).
+
+Ersatz:
+
+```bash
+python3 -c "import itertools;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();L=s.split(chr(10));i=[j for j,l in enumerate(L) if l.startswith(chr(124)+' Knoten '+chr(124)+' Name ') and 'rechnet in' in l][0];h=[c.strip() for c in L[i].strip().strip(chr(124)).split(chr(124))].index('rechnet in');z=list(itertools.takewhile(lambda l:l.startswith(chr(124)),L[i+2:]));n=sum(1 for l in z if l.strip().strip(chr(124)).split(chr(124))[h].strip().strip(chr(96))=='offen');print('Zeilen der Knoten-Bilanz mit rechnet in = offen:',n,'von',len(z));raise SystemExit(1 if n else 0)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)
+rows=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))
+cite={13:'E12',8:'E07',9:'E08',197:'S072',198:'S073',199:'S074',204:'R17',205:'R18',206:'R19',11:'E10',18:'E17',15:'E14',3:'E02',4:'E03',181:'W074',184:'W077',210:'W087',45:'W008',43:'W006',214:'W091',223:'W100',256:'S092',257:'S093',258:'S094',260:'S096',261:'S097',262:'S098',268:'S104',270:'R24',269:'R23',271:'R25',226:'W103',272:'W117',208:'W085'}
+bad=[(r,k,rows[r-1][0]) for r,k in sorted(cite.items()) if rows[r-1][0]!=k]
+print('Zeilen-Abweichungen:',bad)
+"; echo "Exit $?"
+Zeilen-Abweichungen: []
+Exit 0
+$ python3 -c "import itertools;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();L=s.split(chr(10));i=[j for j,l in enumerate(L) if l.startswith(chr(124)+' Knoten '+chr(124)+' Name ') and 'rechnet in' in l][0];h=[c.strip() for c in L[i].strip().strip(chr(124)).split(chr(124))].index('rechnet in');z=list(itertools.takewhile(lambda l:l.startswith(chr(124)),L[i+2:]));n=sum(1 for l in z if l.strip().strip(chr(124)).split(chr(124))[h].strip().strip(chr(96))=='offen');print('Zeilen der Knoten-Bilanz mit rechnet in = offen:',n,'von',len(z));raise SystemExit(1 if n else 0)"; echo "Exit $?"
+Zeilen der Knoten-Bilanz mit rechnet in = offen: 0 von 32
+Exit 0
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1), an dem der Befund bestand:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && ln -s $PWD/backend $T/backend && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)
+rows=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))
+cite={13:'E12',8:'E07',9:'E08',197:'S072',198:'S073',199:'S074',204:'R17',205:'R18',206:'R19',11:'E10',18:'E17',15:'E14',3:'E02',4:'E03',181:'W074',184:'W077',210:'W087',45:'W008',43:'W006',214:'W091',223:'W100',256:'S092',257:'S093',258:'S094',260:'S096',261:'S097',262:'S098',268:'S104',270:'R24',269:'R23',271:'R25',226:'W103',272:'W117',208:'W085'}
+bad=[(r,k,rows[r-1][0]) for r,k in sorted(cite.items()) if rows[r-1][0]!=k]
+print('Zeilen-Abweichungen:',bad)
+"; echo "Exit $?"
+Zeilen-Abweichungen: []
+Exit 0
+$ python3 -c "import itertools;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();L=s.split(chr(10));i=[j for j,l in enumerate(L) if l.startswith(chr(124)+' Knoten '+chr(124)+' Name ') and 'rechnet in' in l][0];h=[c.strip() for c in L[i].strip().strip(chr(124)).split(chr(124))].index('rechnet in');z=list(itertools.takewhile(lambda l:l.startswith(chr(124)),L[i+2:]));n=sum(1 for l in z if l.strip().strip(chr(124)).split(chr(124))[h].strip().strip(chr(96))=='offen');print('Zeilen der Knoten-Bilanz mit rechnet in = offen:',n,'von',len(z));raise SystemExit(1 if n else 0)"; echo "Exit $?"
+Zeilen der Knoten-Bilanz mit rechnet in = offen: 32 von 32
+Exit 1
+```
+
+**Befund 6 (Z. 166–173)** — untauglich: liest nur eine von mehreren betroffenen Dateien. Befund 6 steht zwischen den Weitergaben im Bericht und `KWRA-Monetarisierung.xlsx`. Der Ausdruck liest nur die Mappe und druckt deren K3-Buchungsobjekte; ob #37 im Bericht fehlt, hat der Prüfer von Hand verglichen. Die Ausgabe ist am Stand der Vergabe und heute gleich, obwohl der Befund heute bestätigt geschlossen ist (Regression Runde 3 Teil 1). Soll: Stand der Vergabe Exit 1 mit #37 in der Fehlliste, heute Exit 0.
+
+Ersatz:
+
+```bash
+python3 -c "import openpyxl,re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();w=s.split('### Weitergaben')[1].split(chr(10)+'### ')[0].split(chr(10)+'## ')[0];wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True);k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))[28][2];ids=[x.strip().split(' ')[0] for x in k.split(chr(183))];f=[i for i in ids if i!='60' and not re.search('#'+i+'(?![0-9])',w)];print('K3-Objekte ohne Eintrag in den Weitergaben:',f);raise SystemExit(1 if f else 0)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True)
+k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))
+print('K3-Buchungsobjekte:',k[28][2])
+ap=list(wb['Abgleich-Protokoll'].iter_rows(values_only=True))
+print([ (r[0],r[1],r[3]) for r in ap if str(r[1])=='49' ])
+"; echo "Exit $?"
+K3-Buchungsobjekte: 12 Rutschungen und Muren · 37 Schäden an Aquakulturen · 46 Beschädigung oder Zerstörung von Siedlung und Infrastruktur an der Küste · 59 Schäden an Gebäuden aufgrund von Starkregen · 60 Schäden an Gebäuden aufgrund von Flusshochwasser · 92 Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen · 102 Auswirkungen auf das Gesundheitssystem
+[(1, 49, '10'), (3, 49, '37'), (11, 49, 'Fang-DB'), (15, 49, '92'), (16, 49, '102'), (18, 49, '52'), (30, 49, '57'), (30, 49, '68'), (34, 49, '71'), (35, 49, '76'), (35, 49, '77'), (37, 49, '36'), (40, 49, '7'), (51, 49, 'K5')]
+Exit 0
+$ python3 -c "import openpyxl,re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();w=s.split('### Weitergaben')[1].split(chr(10)+'### ')[0].split(chr(10)+'## ')[0];wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True);k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))[28][2];ids=[x.strip().split(' ')[0] for x in k.split(chr(183))];f=[i for i in ids if i!='60' and not re.search('#'+i+'(?![0-9])',w)];print('K3-Objekte ohne Eintrag in den Weitergaben:',f);raise SystemExit(1 if f else 0)"; echo "Exit $?"
+K3-Objekte ohne Eintrag in den Weitergaben: []
+Exit 0
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1), an dem der Befund bestand:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && ln -s $PWD/backend $T/backend && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True)
+k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))
+print('K3-Buchungsobjekte:',k[28][2])
+ap=list(wb['Abgleich-Protokoll'].iter_rows(values_only=True))
+print([ (r[0],r[1],r[3]) for r in ap if str(r[1])=='49' ])
+"; echo "Exit $?"
+K3-Buchungsobjekte: 12 Rutschungen und Muren · 37 Schäden an Aquakulturen · 46 Beschädigung oder Zerstörung von Siedlung und Infrastruktur an der Küste · 59 Schäden an Gebäuden aufgrund von Starkregen · 60 Schäden an Gebäuden aufgrund von Flusshochwasser · 92 Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen · 102 Auswirkungen auf das Gesundheitssystem
+[(1, 49, '10'), (3, 49, '37'), (11, 49, 'Fang-DB'), (15, 49, '92'), (16, 49, '102'), (18, 49, '52'), (30, 49, '57'), (30, 49, '68'), (34, 49, '71'), (35, 49, '76'), (35, 49, '77'), (37, 49, '36'), (40, 49, '7'), (51, 49, 'K5')]
+Exit 0
+$ python3 -c "import openpyxl,re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();w=s.split('### Weitergaben')[1].split(chr(10)+'### ')[0].split(chr(10)+'## ')[0];wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True);k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))[28][2];ids=[x.strip().split(' ')[0] for x in k.split(chr(183))];f=[i for i in ids if i!='60' and not re.search('#'+i+'(?![0-9])',w)];print('K3-Objekte ohne Eintrag in den Weitergaben:',f);raise SystemExit(1 if f else 0)"; echo "Exit $?"
+K3-Objekte ohne Eintrag in den Weitergaben: ['12', '37']
+Exit 1
+```
+
+**Befund 7 (b) (Z. 166–173)** — untauglich: anderer Grund (benannt): misst einen anderen Sachverhalt (K3-Buchungsobjekte und Abgleich-Protokoll), nicht Kalibrierjahre und Wächter. Die Leitfrage 4 verweist auf die Befunde 6 und 7, der Ausdruck belegt nur Befund 6. Für Befund 7 liefert er an jedem Berichtsstand dieselbe Ausgabe. Ersatz ist der Schließungsausdruck der Übersicht (Z. 42), hier als tauglich beurteilt; der Rest von Befund 7 ist Befund 39. Soll: Stand der Vergabe Exit 1, heute Exit 0.
+
+Ersatz:
+
+```bash
+python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 4 ')[1].split('\n## 5 ')[0];raise SystemExit(0 if all(t in k for t in ('2002','2024','geparkt (Datenquelle fehlt)','Doppelzählungs-Wächter')) else 1)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True)
+k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))
+print('K3-Buchungsobjekte:',k[28][2])
+ap=list(wb['Abgleich-Protokoll'].iter_rows(values_only=True))
+print([ (r[0],r[1],r[3]) for r in ap if str(r[1])=='49' ])
+"; echo "Exit $?"
+K3-Buchungsobjekte: 12 Rutschungen und Muren · 37 Schäden an Aquakulturen · 46 Beschädigung oder Zerstörung von Siedlung und Infrastruktur an der Küste · 59 Schäden an Gebäuden aufgrund von Starkregen · 60 Schäden an Gebäuden aufgrund von Flusshochwasser · 92 Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen · 102 Auswirkungen auf das Gesundheitssystem
+[(1, 49, '10'), (3, 49, '37'), (11, 49, 'Fang-DB'), (15, 49, '92'), (16, 49, '102'), (18, 49, '52'), (30, 49, '57'), (30, 49, '68'), (34, 49, '71'), (35, 49, '76'), (35, 49, '77'), (37, 49, '36'), (40, 49, '7'), (51, 49, 'K5')]
+Exit 0
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 4 ')[1].split('\n## 5 ')[0];raise SystemExit(0 if all(t in k for t in ('2002','2024','geparkt (Datenquelle fehlt)','Doppelzählungs-Wächter')) else 1)"; echo "Exit $?"
+Exit 0
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1), an dem der Befund bestand:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && ln -s $PWD/backend $T/backend && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Monetarisierung.xlsx',read_only=True,data_only=True)
+k=list(wb['Schadenskonten-System'].iter_rows(values_only=True))
+print('K3-Buchungsobjekte:',k[28][2])
+ap=list(wb['Abgleich-Protokoll'].iter_rows(values_only=True))
+print([ (r[0],r[1],r[3]) for r in ap if str(r[1])=='49' ])
+"; echo "Exit $?"
+K3-Buchungsobjekte: 12 Rutschungen und Muren · 37 Schäden an Aquakulturen · 46 Beschädigung oder Zerstörung von Siedlung und Infrastruktur an der Küste · 59 Schäden an Gebäuden aufgrund von Starkregen · 60 Schäden an Gebäuden aufgrund von Flusshochwasser · 92 Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen · 102 Auswirkungen auf das Gesundheitssystem
+[(1, 49, '10'), (3, 49, '37'), (11, 49, 'Fang-DB'), (15, 49, '92'), (16, 49, '102'), (18, 49, '52'), (30, 49, '57'), (30, 49, '68'), (34, 49, '71'), (35, 49, '76'), (35, 49, '77'), (37, 49, '36'), (40, 49, '7'), (51, 49, 'K5')]
+Exit 0
+$ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split('\n## 4 ')[1].split('\n## 5 ')[0];raise SystemExit(0 if all(t in k for t in ('2002','2024','geparkt (Datenquelle fehlt)','Doppelzählungs-Wächter')) else 1)"; echo "Exit $?"
+Exit 1
+```
 
 **Befund 9 (Z. 44)** — untauglich: liest nur eine von mehreren betroffenen Dateien. Befund 9 steht gegen `backend/` (Golden-Test); der Ausdruck liest nur den Bericht und meldet deshalb Exit 0 = behoben, obwohl die Regression Runde 2 (Z. 1255) die Fundstelle `backend/` als nicht erfüllt beurteilt. Soll: Exit 1 (nicht geschlossen): in `backend/tests/` gibt es keinen Test, der `beispiel_60` enthält.
 
@@ -4563,7 +4776,57 @@ $ python3 -c "import re,glob;s=open('docs/methodik/60_gebaeudeschaeden_flusshoch
 Exit 1
 ```
 
-**Befund 13 (Z. 346)** — untauglich: anderer Grund (benannt): die Bedingung `b.count('"')//2>=0` ist immer wahr, und der Ausdruck liest nur `catalog.py`, nicht die beanstandete Behauptung im Bericht. Die Regression Runde 2 (Z. 1302–1303) hat die Tautologie schon benannt, den Ausdruck aber stehen lassen. Er endet in jedem Zustand mit Exit 0 — auch am Berichtsstand der Vergabe (T-0232, Commit `357980fc`), als die falsche Behauptung „genau die Namenslisten" noch im Bericht stand. Soll: am heutigen Stand Exit 0 (bestätigt geschlossen, Regression Runde 3 Teil 1); am Stand der Vergabe Exit 1.
+**Befund 11 (a) (Z. 243)** — untauglich: anderer Grund (benannt): zählt „http" im ganzen Bericht statt in Kapitel 8. Der Ausdruck belegte Befund 11 mit dem Ergebnis 0. Heute tragen die Langbelege B1–B6 URLs, der Zähler ist deshalb unabhängig von Kapitel 8 größer als 0. Die Probe setzt in den heutigen Bericht das Kapitel 8 vom Stand der Vergabe ein (ohne jede URL): Der alte Ausdruck meldet trotzdem Treffer, also „Quellen tragen URLs". Soll: heute Exit 0 mit leerer Liste (Kern geschlossen, Rest ist Befund 69); an der Probe Exit 1.
+
+Ersatz:
+
+```bash
+python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 8 ')[1].split(chr(10)+'## 9 ')[0];e=re.split(chr(10)+'(?=[0-9]+[.] )',k)[1:];f=[x.split('.')[0] for x in e if not x.split('. ',1)[1].startswith('Evidenz-Quellen') and not (('http' in x or 'SHA-256' in x) and 'Zugriff' in x)];print('Quellen in Kap. 8 ohne URL bzw. Prüfsumme und Zugriffsdatum:',f);raise SystemExit(1 if f else 0)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ grep -c "http" docs/methodik/60_gebaeudeschaeden_flusshochwasser.md; echo "Exit $?"
+44
+Exit 0
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 8 ')[1].split(chr(10)+'## 9 ')[0];e=re.split(chr(10)+'(?=[0-9]+[.] )',k)[1:];f=[x.split('.')[0] for x in e if not x.split('. ',1)[1].startswith('Evidenz-Quellen') and not (('http' in x or 'SHA-256' in x) and 'Zugriff' in x)];print('Quellen in Kap. 8 ohne URL bzw. Prüfsumme und Zugriffsdatum:',f);raise SystemExit(1 if f else 0)"; echo "Exit $?"
+Quellen in Kap. 8 ohne URL bzw. Prüfsumme und Zugriffsdatum: []
+Exit 0
+```
+
+Probe — heutiger Bericht mit dem Kapitel 8 vom Stand der Vergabe (T-0232), das keine einzige URL trägt:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && ln -s $PWD/backend $T/backend && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/alt.md && git show 88d27a04:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | python3 -c "import sys;t=sys.stdin.read();a=open(sys.argv[1],encoding='utf-8').read();n=chr(10);k=a.split(n+'## 8 ')[1].split(n+'## 9 ')[0];v,r=t.split(n+'## 8 ',1);z=r.split(n+'## 9 ',1)[1];sys.stdout.write(v+n+'## 8 '+k+n+'## 9 '+z)" $T/alt.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ grep -c "http" docs/methodik/60_gebaeudeschaeden_flusshochwasser.md; echo "Exit $?"
+36
+Exit 0
+$ python3 -c "import re;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 8 ')[1].split(chr(10)+'## 9 ')[0];e=re.split(chr(10)+'(?=[0-9]+[.] )',k)[1:];f=[x.split('.')[0] for x in e if not x.split('. ',1)[1].startswith('Evidenz-Quellen') and not (('http' in x or 'SHA-256' in x) and 'Zugriff' in x)];print('Quellen in Kap. 8 ohne URL bzw. Prüfsumme und Zugriffsdatum:',f);raise SystemExit(1 if f else 0)"; echo "Exit $?"
+Quellen in Kap. 8 ohne URL bzw. Prüfsumme und Zugriffsdatum: ['1', '2']
+Exit 1
+```
+
+**Befund 11 (b) (Z. 244)** — untauglich: anderer Grund (benannt): das Dateiargument ist mit „…" ausgelassen, der Ausdruck ist nicht ausführbar. Wörtlich ausgeführt sucht grep in einer Datei namens „…" und bricht ab. Der Ersatz schränkt die Suche auf Kapitel 8 ein, wie die Leitfrage es meint. Soll: Zahl der Treffer in Kapitel 8 (heute 25; am Stand der Vergabe 1, und der stand im HTML-Kommentar).
+
+Ersatz:
+
+```bash
+sed -n '/^## 8 /,/^## 9 /p' docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | grep -c "Zugriff\|Snapshot\|DOI"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ grep -n "Zugriff\|Snapshot\|DOI" …; echo "Exit $?"
+grep: …: No such file or directory
+Exit 2
+$ sed -n '/^## 8 /,/^## 9 /p' docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | grep -c "Zugriff\|Snapshot\|DOI"; echo "Exit $?"
+25
+Exit 0
+```
+
+**Befund 13 (a) (Z. 346)** — untauglich: anderer Grund (benannt): die Bedingung `b.count('"')//2>=0` ist immer wahr, und der Ausdruck liest nur `catalog.py`, nicht die beanstandete Behauptung im Bericht. Die Regression Runde 2 (Z. 1302–1303) hat die Tautologie schon benannt, den Ausdruck aber stehen lassen. Er endet in jedem Zustand mit Exit 0 — auch am Berichtsstand der Vergabe (T-0232, Commit `357980fc`), als die falsche Behauptung „genau die Namenslisten" noch im Bericht stand. Soll: am heutigen Stand Exit 0 (bestätigt geschlossen, Regression Runde 3 Teil 1); am Stand der Vergabe Exit 1.
 
 Ersatz:
 
@@ -4587,6 +4850,47 @@ $ T=$(mktemp -d) && mkdir -p $T/docs/methodik && ln -s $PWD/backend $T/backend &
 $ python3 -c "import re;s=open('backend/app/data/catalog.py',encoding='utf-8').read();b=s.split('\"kwra_id\": 60')[1].split('kwra_id')[0];raise SystemExit(0 if b.count('\"')//2>=0 else 1)"; echo "Exit $?"
 Exit 0
 $ python3 -c "import ast;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k=s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0];c=open('backend/app/data/catalog.py',encoding='utf-8').read();e=c.split('\"kwra_id\": 60')[1];n=len(ast.literal_eval(e.split('\"sensitivity_names\":')[1].split(']')[0].strip()+']'));raise SystemExit(0 if n==5 and 'Teilmenge' in k and 'trägt genau die Namenslisten' not in k else 1)"; echo "Exit $?"
+Exit 1
+```
+
+**Befund 13 (b) (Z. 303–308)** — untauglich: liest nur eine von mehreren betroffenen Dateien. Befund 13 steht zwischen der Behauptung im Bericht, `catalog.py` und der Mappe. Der Ausdruck liest nur die Mappe (7 und 8), die Zählung in `catalog.py` und die Behauptung im Bericht sind von Hand ergänzt. Seine Ausgabe ist am Stand der Vergabe und heute gleich. Soll: Stand der Vergabe Exit 1 („behauptet Gleichheit: True"), heute Exit 0.
+
+Ersatz:
+
+```bash
+python3 -c "import openpyxl,ast;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k1=' '.join(s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0].split());wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True);w=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))[271];c=open('backend/app/data/catalog.py',encoding='utf-8').read().split('\"kwra_id\": 60')[1];n=lambda f: len(ast.literal_eval(c.split('\"'+f+'\":')[1].split(']')[0].strip()+']'));g='genau die Namenslisten' in k1 and 'nicht** genau die Namenslisten' not in k1;print('Mappe sens',len(w[9].split(';')),'wirkung',len(w[11].split(';')),'| catalog sens',n('sensitivity_names'),'upstream',n('upstream_names'),'| Bericht behauptet Gleichheit:',g);raise SystemExit(1 if g else 0)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)
+w=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))[271]
+print('Mappe: sens',len(w[9].split(';')),'| wirkung',len(w[11].split(';')))
+"; echo "Exit $?"
+Mappe: sens 7 | wirkung 8
+Exit 0
+$ python3 -c "import openpyxl,ast;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k1=' '.join(s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0].split());wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True);w=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))[271];c=open('backend/app/data/catalog.py',encoding='utf-8').read().split('\"kwra_id\": 60')[1];n=lambda f: len(ast.literal_eval(c.split('\"'+f+'\":')[1].split(']')[0].strip()+']'));g='genau die Namenslisten' in k1 and 'nicht** genau die Namenslisten' not in k1;print('Mappe sens',len(w[9].split(';')),'wirkung',len(w[11].split(';')),'| catalog sens',n('sensitivity_names'),'upstream',n('upstream_names'),'| Bericht behauptet Gleichheit:',g);raise SystemExit(1 if g else 0)"; echo "Exit $?"
+Mappe sens 7 wirkung 8 | catalog sens 5 upstream 5 | Bericht behauptet Gleichheit: False
+Exit 0
+```
+
+Probe — Berichtsstand der Vergabe (T-0232, Review-Runde 1), an dem der Befund bestand:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && ln -s $PWD/backend $T/backend && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 357980fc:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ python3 -c "
+import openpyxl
+wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True)
+w=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))[271]
+print('Mappe: sens',len(w[9].split(';')),'| wirkung',len(w[11].split(';')))
+"; echo "Exit $?"
+Mappe: sens 7 | wirkung 8
+Exit 0
+$ python3 -c "import openpyxl,ast;s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();k1=' '.join(s.split(chr(10)+'## 1 ')[1].split(chr(10)+'## 2 ')[0].split());wb=openpyxl.load_workbook('docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx',read_only=True,data_only=True);w=list(wb['Klimawirkungsketten'].iter_rows(values_only=True))[271];c=open('backend/app/data/catalog.py',encoding='utf-8').read().split('\"kwra_id\": 60')[1];n=lambda f: len(ast.literal_eval(c.split('\"'+f+'\":')[1].split(']')[0].strip()+']'));g='genau die Namenslisten' in k1 and 'nicht** genau die Namenslisten' not in k1;print('Mappe sens',len(w[9].split(';')),'wirkung',len(w[11].split(';')),'| catalog sens',n('sensitivity_names'),'upstream',n('upstream_names'),'| Bericht behauptet Gleichheit:',g);raise SystemExit(1 if g else 0)"; echo "Exit $?"
+Mappe sens 7 wirkung 8 | catalog sens 5 upstream 5 | Bericht behauptet Gleichheit: True
 Exit 1
 ```
 
@@ -4883,6 +5187,130 @@ $ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',enco
 Exit 1
 $ python3 -c "s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read();raise SystemExit(0 if all(x in s for x in ('1,838','1,132','0,832','w_wg','wert: 0.832')) else 1)"; echo "Exit $?"
 Exit 0
+```
+
+**Befund 36 (d) (Z. 1941–1958)** — untauglich: anderer Grund (benannt): liest keine Datei — rechnet nur fest eingetragene Zahlen nach. Der Ausdruck prüft, ob die Rechnung mit den eingetragenen Zahlen aufgeht, nicht, ob der Bericht diese Schranke führt. Er meldet OK auch an einem Bericht, in dem wieder die alte, gesetzte Schranke 0,50/2,00 steht. Der Ersatz rechnet gleich und verlangt zusätzlich, dass der Bericht die gerechnete Schranke und beide Bänder enthält. Soll: heute Exit 0 (bestätigt geschlossen, Regression Runde 3 Teil 6); an der Probe Exit 1.
+
+Ersatz:
+
+```bash
+python3 -c "wf=208.0
+bgf_lo,bgf_c,bgf_hi=1.25,1.30,1.40
+ws_lo,ws_c,ws_hi=1889.0,1950.0,2047.0
+w_wohn=0.872
+n34,n2=339000,1380000
+r34_lo,r34_c,r34_hi=0.0033,0.005979599550826,0.0103
+r2_lo,r2_c,r2_hi=0.000301,0.000675151053693,0.001154
+wg_lo=wf*bgf_lo*ws_lo; wg_c=wf*bgf_c*ws_c; wg_hi=wf*bgf_hi*ws_hi
+term_lo=n34*r34_lo+n2*r2_lo; term_c=n34*r34_c+n2*r2_c; term_hi=n34*r34_hi+n2*r2_hi
+M0_lo=w_wohn*wg_lo*term_lo/1e9; M0_c=w_wohn*wg_c*term_c/1e9; M0_hi=w_wohn*wg_hi*term_hi/1e9
+assert abs(M0_c-1.360)<5e-3 and abs(M0_lo-0.657)<5e-3 and abs(M0_hi-2.643)<5e-3
+A_lo,A_hi=0.297,2.263
+lam_lo=A_lo/M0_hi; lam_hi=A_hi/M0_lo
+schranke=(round(lam_lo,2),round(lam_hi,2))
+assert schranke==(0.11,3.44)
+lam_band=(0.22,1.66)
+assert schranke[0]<=lam_band[0]<=schranke[1] and schranke[0]<=lam_band[1]<=schranke[1]
+s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read()
+assert ('[%.2f; %.2f]' % schranke).replace('.',',') in s and '0,657–2,643' in s and '0,297–2,263' in s
+print('OK M0', round(M0_lo,3), round(M0_c,3), round(M0_hi,3), 'schranke', schranke)"
+```
+
+Lauf am heutigen Stand:
+
+```
+$ python3 -c "wf=208.0
+bgf_lo,bgf_c,bgf_hi=1.25,1.30,1.40
+ws_lo,ws_c,ws_hi=1889.0,1950.0,2047.0
+w_wohn=0.872
+n34,n2=339000,1380000
+r34_lo,r34_c,r34_hi=0.0033,0.005979599550826,0.0103
+r2_lo,r2_c,r2_hi=0.000301,0.000675151053693,0.001154
+wg_lo=wf*bgf_lo*ws_lo; wg_c=wf*bgf_c*ws_c; wg_hi=wf*bgf_hi*ws_hi
+term_lo=n34*r34_lo+n2*r2_lo; term_c=n34*r34_c+n2*r2_c; term_hi=n34*r34_hi+n2*r2_hi
+M0_lo=w_wohn*wg_lo*term_lo/1e9; M0_c=w_wohn*wg_c*term_c/1e9; M0_hi=w_wohn*wg_hi*term_hi/1e9
+assert abs(M0_c-1.360)<5e-3 and abs(M0_lo-0.657)<5e-3 and abs(M0_hi-2.643)<5e-3
+A_lo,A_hi=0.297,2.263
+lam_lo=A_lo/M0_hi; lam_hi=A_hi/M0_lo
+schranke=(round(lam_lo,2),round(lam_hi,2))
+assert schranke==(0.11,3.44)
+lam_band=(0.22,1.66)
+assert schranke[0]<=lam_band[0]<=schranke[1] and schranke[0]<=lam_band[1]<=schranke[1]
+print('OK M0', round(M0_lo,3), round(M0_c,3), round(M0_hi,3), 'schranke', schranke)"; echo "Exit $?"
+OK M0 0.657 1.36 2.643 schranke (0.11, 3.44)
+Exit 0
+$ python3 -c "wf=208.0
+bgf_lo,bgf_c,bgf_hi=1.25,1.30,1.40
+ws_lo,ws_c,ws_hi=1889.0,1950.0,2047.0
+w_wohn=0.872
+n34,n2=339000,1380000
+r34_lo,r34_c,r34_hi=0.0033,0.005979599550826,0.0103
+r2_lo,r2_c,r2_hi=0.000301,0.000675151053693,0.001154
+wg_lo=wf*bgf_lo*ws_lo; wg_c=wf*bgf_c*ws_c; wg_hi=wf*bgf_hi*ws_hi
+term_lo=n34*r34_lo+n2*r2_lo; term_c=n34*r34_c+n2*r2_c; term_hi=n34*r34_hi+n2*r2_hi
+M0_lo=w_wohn*wg_lo*term_lo/1e9; M0_c=w_wohn*wg_c*term_c/1e9; M0_hi=w_wohn*wg_hi*term_hi/1e9
+assert abs(M0_c-1.360)<5e-3 and abs(M0_lo-0.657)<5e-3 and abs(M0_hi-2.643)<5e-3
+A_lo,A_hi=0.297,2.263
+lam_lo=A_lo/M0_hi; lam_hi=A_hi/M0_lo
+schranke=(round(lam_lo,2),round(lam_hi,2))
+assert schranke==(0.11,3.44)
+lam_band=(0.22,1.66)
+assert schranke[0]<=lam_band[0]<=schranke[1] and schranke[0]<=lam_band[1]<=schranke[1]
+s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read()
+assert ('[%.2f; %.2f]' % schranke).replace('.',',') in s and '0,657–2,643' in s and '0,297–2,263' in s
+print('OK M0', round(M0_lo,3), round(M0_c,3), round(M0_hi,3), 'schranke', schranke)"; echo "Exit $?"
+OK M0 0.657 1.36 2.643 schranke (0.11, 3.44)
+Exit 0
+```
+
+Probe — heutiger Bericht, in dem die hergeleitete Schranke wieder durch die gesetzte 0,50/2,00 ersetzt ist:
+
+```
+$ T=$(mktemp -d) && mkdir -p $T/docs/methodik && ln -s $PWD/backend $T/backend && ln -s $PWD/docs/evidenz $T/docs/evidenz && ln -s $PWD/docs/Schadensbaum $T/docs/Schadensbaum && git show 88d27a04:docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | python3 -c "import sys;t=sys.stdin.read();sys.stdout.write(t.replace('[0,11; 3,44]','[0,50; 2,00]').replace('0,11–3,44','0,50–2,00'))" > $T/docs/methodik/60_gebaeudeschaeden_flusshochwasser.md && cd $T
+$ python3 -c "wf=208.0
+bgf_lo,bgf_c,bgf_hi=1.25,1.30,1.40
+ws_lo,ws_c,ws_hi=1889.0,1950.0,2047.0
+w_wohn=0.872
+n34,n2=339000,1380000
+r34_lo,r34_c,r34_hi=0.0033,0.005979599550826,0.0103
+r2_lo,r2_c,r2_hi=0.000301,0.000675151053693,0.001154
+wg_lo=wf*bgf_lo*ws_lo; wg_c=wf*bgf_c*ws_c; wg_hi=wf*bgf_hi*ws_hi
+term_lo=n34*r34_lo+n2*r2_lo; term_c=n34*r34_c+n2*r2_c; term_hi=n34*r34_hi+n2*r2_hi
+M0_lo=w_wohn*wg_lo*term_lo/1e9; M0_c=w_wohn*wg_c*term_c/1e9; M0_hi=w_wohn*wg_hi*term_hi/1e9
+assert abs(M0_c-1.360)<5e-3 and abs(M0_lo-0.657)<5e-3 and abs(M0_hi-2.643)<5e-3
+A_lo,A_hi=0.297,2.263
+lam_lo=A_lo/M0_hi; lam_hi=A_hi/M0_lo
+schranke=(round(lam_lo,2),round(lam_hi,2))
+assert schranke==(0.11,3.44)
+lam_band=(0.22,1.66)
+assert schranke[0]<=lam_band[0]<=schranke[1] and schranke[0]<=lam_band[1]<=schranke[1]
+print('OK M0', round(M0_lo,3), round(M0_c,3), round(M0_hi,3), 'schranke', schranke)"; echo "Exit $?"
+OK M0 0.657 1.36 2.643 schranke (0.11, 3.44)
+Exit 0
+$ python3 -c "wf=208.0
+bgf_lo,bgf_c,bgf_hi=1.25,1.30,1.40
+ws_lo,ws_c,ws_hi=1889.0,1950.0,2047.0
+w_wohn=0.872
+n34,n2=339000,1380000
+r34_lo,r34_c,r34_hi=0.0033,0.005979599550826,0.0103
+r2_lo,r2_c,r2_hi=0.000301,0.000675151053693,0.001154
+wg_lo=wf*bgf_lo*ws_lo; wg_c=wf*bgf_c*ws_c; wg_hi=wf*bgf_hi*ws_hi
+term_lo=n34*r34_lo+n2*r2_lo; term_c=n34*r34_c+n2*r2_c; term_hi=n34*r34_hi+n2*r2_hi
+M0_lo=w_wohn*wg_lo*term_lo/1e9; M0_c=w_wohn*wg_c*term_c/1e9; M0_hi=w_wohn*wg_hi*term_hi/1e9
+assert abs(M0_c-1.360)<5e-3 and abs(M0_lo-0.657)<5e-3 and abs(M0_hi-2.643)<5e-3
+A_lo,A_hi=0.297,2.263
+lam_lo=A_lo/M0_hi; lam_hi=A_hi/M0_lo
+schranke=(round(lam_lo,2),round(lam_hi,2))
+assert schranke==(0.11,3.44)
+lam_band=(0.22,1.66)
+assert schranke[0]<=lam_band[0]<=schranke[1] and schranke[0]<=lam_band[1]<=schranke[1]
+s=open('docs/methodik/60_gebaeudeschaeden_flusshochwasser.md',encoding='utf-8').read()
+assert ('[%.2f; %.2f]' % schranke).replace('.',',') in s and '0,657–2,643' in s and '0,297–2,263' in s
+print('OK M0', round(M0_lo,3), round(M0_c,3), round(M0_hi,3), 'schranke', schranke)"; echo "Exit $?"
+Traceback (most recent call last):
+  File "<string>", line 19, in <module>
+AssertionError
+Exit 1
 ```
 
 **Befund 37 (Z. 1002)** — untauglich: anderer Grund (benannt): fragt die Namen der drei damals fehlenden Zeilen ab, nicht, ob jeder rechnende Wert eine eigene Zeile hat. Die drei damals fehlenden Zeilen stehen inzwischen in §4.8, der Ausdruck meldet Exit 1 = behoben. Die Regression Runde 3 Teil 6 (Z. 4105) hat den Befund aber als **zurückgefallen** beurteilt: Wohngebäudeanteil, flussseitiger Anteil und Wiederkehrzeit rechnen in \(U\) und haben keine eigene Zeile. Soll: Exit 0 (besteht).
