@@ -22,10 +22,6 @@ import pytest
 
 import _stub_heavy_deps
 
-# Muss vor dem Import der App-Module laufen (nur wirksam, wo die echten Pakete
-# fehlen — im Deploy-Venv passiert nichts).
-_stub_heavy_deps.install()
-
 from app.data import catalog  # noqa: E402
 from app.models.models import (  # noqa: E402
     AdaptationMeasure, ConfigParameter, Kommune, MeasureImpact,

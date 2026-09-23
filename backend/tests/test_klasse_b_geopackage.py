@@ -21,13 +21,6 @@ import types
 
 import pytest
 
-import _stub_heavy_deps
-
-# Muss vor dem Import der App-Module laufen (nur wirksam, wo die echten Pakete
-# fehlen — im Deploy-Venv passiert nichts; die conftest hängt das Ersatzmodul
-# ohnehin schon vor dem Einsammeln ein, dieser Aufruf ist nur idempotent).
-_stub_heavy_deps.install()
-
 from app.data import catalog  # noqa: E402
 from app.models.models import CellAssessment, GridCell, Kommune  # noqa: E402
 from app.services import geodata_export_service as gx  # noqa: E402

@@ -17,13 +17,6 @@ import io
 
 import pytest
 
-import _stub_heavy_deps
-
-# Muss vor dem Import der App-Module laufen (nur wirksam, wo die echten Pakete
-# fehlen — im Deploy-Venv passiert nichts; die conftest hängt das Ersatzmodul
-# ohnehin schon vor dem Einsammeln ein, dieser Aufruf ist nur idempotent).
-_stub_heavy_deps.install()
-
 openpyxl = pytest.importorskip("openpyxl")
 if not hasattr(openpyxl, "__version__"):  # Ersatzmodul statt echtem openpyxl
     pytest.skip("echtes openpyxl nötig, um die xlsx-Bytes zurückzulesen",
