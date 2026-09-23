@@ -12,6 +12,7 @@ from app.data import catalog
 from app.services.engine import formulas
 from app.services import lineage_graph
 from app.services import querverbindungen
+from app.services import gewissheit
 
 router = APIRouter()
 
@@ -32,12 +33,15 @@ def _layer_category(code: str) -> str | None:
 
 @router.get("/catalog")
 def get_catalog(request: Request):
+    stufen = gewissheit.gewissheitsstufen()
     payload = {
         "groups": catalog.KWRA_GROUPS,
         "hazards": catalog.HAZARDS,
         "exposures": catalog.EXPOSURES,
         "vulnerabilities": catalog.VULNERABILITIES,
-        "risks": catalog.RISKS,
+        # Je Risiko zusätzlich die kategoriale Gewissheitsstufe (KWRA-Skala sehr
+        # gering … hoch, abgeleitet aus den Evidenzklassen, Checkliste Zeile 8).
+        "risks": [{**r, "certainty": stufen[r["code"]]} for r in catalog.RISKS],
         "measures": catalog.MEASURES,
         "hazard_categories": catalog.HAZARD_CATEGORIES,
         "exposure_categories": catalog.EXPOSURE_CATEGORIES,
