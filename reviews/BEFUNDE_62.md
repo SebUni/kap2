@@ -119,7 +119,7 @@ Formal erfüllt; siehe Befunde 9 und 11.
 7. Abschnitt 7 führt je Parameter eine Spalte Herkunft und eine Spalte Quelle mit drei Fußnoten
 für die als Abschätzung geführten Zeilen (A-0010, P1). Formal erfüllt; siehe Befunde 5 und 6.
 
-## Offene Befunde (11)
+## Offene Befunde (12)
 
 Prüfbefehl der Kopfzahl, ausgeführt am 20.09.2026 in der Repo-Wurzel:
 
@@ -132,6 +132,16 @@ Das Muster `[ ]` trifft genau das eine Leerzeichen des Abnahmekriteriums und ist
 selbstzählfreie Schreibweise desselben Ausdrucks: Stünde das Muster wörtlich in dieser Datei,
 zählte die Befehlszeile sich selbst mit und verfälschte die Kopfzahl um 1. Auf dieser Datei
 liefern beide Formen dieselbe Zahl; die Kopfzahl 11 stimmt mit der Ausgabe überein.
+
+Nachgezählt am 23.09.2026 in der Repo-Wurzel nach Aufnahme des offenen Befunds 14 (T-0510),
+derselbe Befehl: vorher `11`, nachher
+
+```
+grep -c '| offen[ ]|' reviews/BEFUNDE_62.md
+12
+```
+
+Die Kopfzahl ist entsprechend auf 12 nachgezogen.
 
 | Nr | Befund (Stelle · Kurzfassung) | Kat. | Status | Umsetzungsnachweis | Prüfausdruck | Begründung bei Abweichung |
 |---|---|---|---|---|---|---|
@@ -148,10 +158,12 @@ liefern beide Formen dieselbe Zahl; die Kopfzahl 11 stimmt mit der Ausgabe über
 | 11 | Abschnitt 5 (Z. 264) · Als fehlende Kernformel-Größe ist allein der Preis benannt. Nach Abschnitt 2.3 bucht Id 62 überhaupt nichts, es gibt also weder ein Mengengerüst exponierter Einheiten noch eine physische Wirkungsrate für diese Klimawirkung; die Beschränkung auf den Preis ist im Bericht nicht begründet (Zuschnitt Kap. 3 Punkt 5: „Menge, Rate oder Preis"). | C | offen | Abschnitt 5 benennt alle fehlenden Größen oder begründet die Beschränkung auf den Preis | `grep -n 'Fehlende Groesse der Kernformel' docs/methodik/62_stadtklima_waermeinseln_steckbrief.md` | — |
 | 12 | Kopplung der Maßnahme Entsiegelung an die Wärmebelastung · Methodischer Entscheid zu `DESEALING_SURFACE` (`catalog_parked.py`, Z. 944–962) gegenüber der Wirkbeschreibung in `catalog.py` (`_MEASURE_EFFECT_DOCS`, Z. 1943–1956). Verdikt, Doppelzählungsprüfung nach G13 und Berichtsfolge im Abschnitt „Befund 12" unter dieser Tabelle. | B | geschlossen (Entscheid, niedergelegt in diesem Ledger): Verdikt „Kopplung wird nicht ergänzt"; die Berichtsformulierung ist im Wortlaut vorgegeben und wird mit Befund 4 eingesetzt | Abschnitt „Befund 12" unten (vier Punkte: Stand, Verdikt, Doppelzählungsprüfung, Berichtsfolge) | `grep -n 'DESEALING_SURFACE' -A 4 backend/app/data/catalog_parked.py` (Sollzustand: `linked_risk_codes` ohne Wärmekennzahl) | — |
 | 13 | Sensitivitäten S094 bis S098 im Quellenblatt, aber nicht in `catalog.py` · Methodischer Entscheid zu den fünf Sensitivitäten, die die Arbeitsmappe der Klimawirkung #62 zuordnet (`KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt „Klimawirkungsketten", Zeile 279) und die der Katalogeintrag `PLANNED_RISKS`/`kwra_id: 62` (`catalog.py`, Z. 317–322) nicht führt. Fundstellen, Ergebniswirkung je Kennung und Verdikt im Abschnitt „Befund 13" unter dieser Tabelle. | B | behoben (T-0541, 23.09.2026, Nacharbeitsrunde 1): Nachzug umgesetzt in `backend/app/data/catalog.py` an beiden von Punkt 4 genannten Stellen — Feld `sensitivity_names` des Eintrags `kwra_id: 62`, Z. 327, trägt jetzt sieben Namen (S094–S100) in Reihenfolge des Quellenblatts; der Quellenkommentar über `PLANNED_RISKS`, Z. 318–321, vermerkt den abweichenden Vorrang des Schadensbaum-Quellenblatts für #62. Test `backend/tests/test_katalog_sensitivitaeten_62.py` | Abschnitt „Befund 13" unten (vier Punkte: Fundstellen und Fehlnachweis, Ergebniswirkung, Verdikt, Folgepaket) | `python3 -c "import sys; sys.path.insert(0,'backend'); from app.data import catalog; print([p for p in catalog.PLANNED_RISKS if p['kwra_id']==62][0]['sensitivity_names'])"` (Sollzustand: sieben Namen statt zwei) | — |
+| 14 | Derselbe Nutzenwert 5 €/(m²·a) bei URBAN_GREEN und DESEALING_SURFACE · `benefit_per_m2_year: 5.0` aus derselben Quelle TEEB DE steht an zwei Maßnahmen mit zwei einander widersprechenden Herleitungen: bei `URBAN_GREEN` (`catalog_parked.py`, Z. 1371–1375) ausdrücklich ohne Kühlanteil („über die vermiedenen Hitzeschäden hinaus"), bei `DESEALING_SURFACE` (`catalog.py`, `_MEASURE_EFFECT_DOCS`, Z. 1957–1961) ausdrücklich mit Kühlanteil („Versickerung, Kühlung, Grün"). Verdikt: keine Doppelzählung bei URBAN_GREEN, aber ungeklärte Zusammensetzung des Punktwerts (G13, G14/§3.9, P1). Einzelheiten im Abschnitt „Befund 14" unter dieser Tabelle. | B | offen | Beide Herleitungen auf eine belegte Zusammensetzung des Punktwerts gebracht (mit oder ohne Kühlanteil, je Maßnahme begründet), oder abweichende Werte mit eigener Quelle | `grep -n 'Direkter Zusatznutzen über die vermiedenen Hitzeschäden\|Versickerung, Kühlung, Grün' backend/app/data/catalog_parked.py backend/app/data/catalog.py` | — |
 
 Die Befunde 12 und 13 sind mit ihrer Niederschrift geschlossen und zählen deshalb nicht in die
 Kopfzahl der elf offenen Befunde; die Ausgabe des Kopf-Prüfbefehls bleibt unverändert 11. Befund 2
 bleibt offen: Er wird erst mit dem Nachzug im Katalog geschlossen, den Befund 13 anordnet.
+Befund 14 (23.09.2026) ist offen und hebt die Kopfzahl auf 12.
 
 Kein Befund der Kategorie A: Die harten Sperren der Klasse B sind eingehalten — sieben
 Abschnitte in der vorgeschriebenen Reihenfolge, kein Euro-Betrag außerhalb der Maßnahmenkosten,
@@ -396,3 +408,101 @@ inhaltlich miterledigt (die Knoten-Bilanz für S094–S098 ist über den Katalog
 seinen eigenen Status auf geschlossen zu setzen und die Kopfzahl der offenen Befunde
 nachzuziehen ist nach Punkt „Wahlweise" der Nacharbeit nicht Pflicht dieses Tickets und bleibt
 für ein Folgepaket offen.
+
+### Befund 14 — Derselbe Nutzenwert 5 €/(m²·a) bei URBAN_GREEN und DESEALING_SURFACE
+
+Aufgenommen am 23.09.2026 aus den offenen Fragen der Läufe zu T-0480
+(`Q-20260920T133924Z-entwickler-1e9861-2`, `Q-20260920T134212Z-pruefer-8c14f9-2`). Anlass ist
+Befund 12, Punkt 3: Dort ist für die Entsiegelung festgestellt, dass der Nutzenwert
+`benefit_per_m2_year: 5.0` einen Kühlanteil enthält. `URBAN_GREEN` trägt denselben Wert aus
+derselben Quelle (TEEB DE) und ist zugleich auf eine Wärmekennzahl gekoppelt. Dieser Befund stellt
+nur die Aktenlage fest; Katalog und Dienst werden von diesem Paket **nicht** geändert, und es
+entsteht keine neue Zahl. Zeilenangaben nach dem Stand des Branches `ticket/T-0510` am 23.09.2026.
+
+**1. Die beiden Herleitungstexte zu `benefit_per_m2_year`.**
+
+*URBAN_GREEN* — `backend/app/data/catalog_parked.py`, Eintrag Z. 1337–1375; Wert
+`"benefit_per_m2_year": 5.0` in Z. 1342, Quellenangabe `"TEEB DE (Ökosystemleistungen Stadtgrün)"`
+in Z. 1348, Quellenschlüssel `["TEEB_DE_Naturkapital"]` in Z. 1351, Herleitungstext Z. 1371–1375:
+
+> „Direkter Zusatznutzen über die vermiedenen Hitzeschäden hinaus: Stadtgrün liefert
+> quantifizierbare Ökosystemleistungen (Regenwasserrückhalt → geringeres
+> Niederschlagswasserentgelt, Luftreinhaltung, Erholungs-/Gesundheitswert; TEEB DE beziffert
+> städtische Ökosystemleistungen auf einige €/m²·a). Punktwert 5 €/(m²·a) als konservative Summe
+> von Rückhalte- und Erholungsnutzen; editierbar."
+
+Feststellung: Dieser Text rechnet **keinen** Kühl- oder Hitzenutzen in die 5,0 € ein. Er nimmt ihn
+dem Wortlaut nach ausdrücklich aus („über die vermiedenen Hitzeschäden hinaus") und benennt als
+Bestandteile des Punktwerts allein Rückhalte- und Erholungsnutzen.
+
+*DESEALING_SURFACE* — `backend/app/data/catalog_parked.py`, Eintrag Z. 944–962; Wert
+`"benefit_per_m2_year": 5.0` in Z. 949. **In `catalog_parked.py` steht zu diesem Feld kein
+Herleitungstext:** `sources` (Z. 952–953) und `source_details` (Z. 955–962) führen nur
+`capex_per_m2` und `opex_per_m2_year`, `source_refs` (Z. 954) nur `capex_per_m2`. Die einzige
+Herleitung des Werts steht in `backend/app/data/catalog.py`,
+`_MEASURE_EFFECT_DOCS["DESEALING_SURFACE"]["benefit_per_m2_year"]`, Z. 1957–1961 (Quellenangabe
+„Gesplittete Abwassergebühr + Ökosystemleistung", Schlüssel `BWB_Niederschlagswasserentgelt`,
+`TEEB_DE_Naturkapital`):
+
+> „Direkter Zusatznutzen: Entsiegelte Flächen entfallen aus dem Niederschlagswasserentgelt
+> (z. B. 1,84 €/m²·a in Berlin, BWB) und erbringen Ökosystemleistungen (Versickerung, Kühlung,
+> Grün; TEEB DE einige €/m²·a) → Punktwert 5 €/(m²·a). Kommunal unterschiedlich, editierbar."
+
+Feststellung: Dieser Text rechnet einen **Kühlnutzen** in die 5,0 € ein („Versickerung, Kühlung,
+Grün"). Er wird nach `_enrich_measure_effect_docs` (`catalog.py`, Z. 2289–2309) nur an Einträge der
+aktiven Liste `MEASURES` gehängt; der geparkte Eintrag bekommt ihn heute nicht, der Text ist dem
+Wert also nur über den Code-Schlüssel zugeordnet (Beobachtung, kein eigener Befund hier).
+
+Ergebnis: Derselbe Punktwert 5,0 aus derselben Quelle TEEB DE ist einmal ohne, einmal mit
+Kühlanteil hergeleitet. Beide Lesarten können nicht zugleich stimmen: Enthält der TEEB-Wert einen
+Kühlanteil, ist die Herleitung bei `URBAN_GREEN` falsch; enthält er keinen, ist die Herleitung bei
+`DESEALING_SURFACE` falsch und die Begründung der Doppelzählungsprüfung in Befund 12, Punkt 3,
+trägt nur über ihren Wortlaut, nicht über die Quelle. Welche Lesart stimmt, lässt sich aus dem
+Katalog nicht entscheiden — keiner der beiden Texte zerlegt den Punktwert in Zahlen je Leistung.
+
+**2. Kopplung an eine Wärme- oder Hitzekennzahl über `linked_risk_codes`.**
+
+- `URBAN_GREEN`: `"linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS"]`,
+  `catalog_parked.py` Z. 1340 — gekoppelt an die Wärmekennzahl „Stunden thermischer Belastung"
+  (`EXPECTED_THERMAL_STRESS_HOURS`, `catalog_parked.py` Z. 486; Kostensatz 400 € je
+  Belastungsstunde in `catalog.py` Z. 963–969).
+- `DESEALING_SURFACE`: `"linked_risk_codes": ["HYDROLOGICAL_STRESS_RISK_INDEX",
+  "EXPECTED_BUILDING_DAMAGE_EUR"]`, `catalog_parked.py` Z. 947 — an **keine** Wärme- oder
+  Hitzekennzahl gekoppelt (Stand nach Befund 12, Verdikt „Kopplung wird nicht ergänzt").
+
+**3. Die Addition in `measure_service.py`.** `backend/app/services/measure_service.py`, Z. 486,
+bildet den direkten Zusatznutzen `annual_benefit_direct = benefit_per_m2_year · covered_area_m2`;
+Z. 503–504 addiert ihn zum vermiedenen Schaden der gekoppelten Risiken:
+`"annual_benefit_eur": round(annual_benefit_direct + annual_benefit_damage + annual_benefit_flat, 2)`.
+Der Schadensanteil `annual_benefit_damage` entsteht aus der Minderung der Zellindizes jedes Risikos
+in `linked_risk_codes` (Z. 363 und Schleife ab Z. 578), bei `URBAN_GREEN` also allein aus der
+Minderung der Stunden thermischer Belastung. Diese Addition zählt bei URBAN_GREEN denselben Effekt
+nicht zweimal, solange der Herleitungstext gilt: Der Schadensanteil trägt den Kühleffekt, der
+direkte Zusatznutzen nach Z. 1371–1375 nur Rückhalte- und Erholungsnutzen. Sie zählte ihn zweimal,
+wenn der Punktwert 5,0 — wie die Entsiegelungs-Herleitung für dieselbe Quelle behauptet — einen
+Kühlanteil enthielte. Beide Maßnahmen stehen heute in `_PARKED_MEASURES` und nicht in
+`catalog.MEASURES`; die Addition wird für sie derzeit nicht ausgeführt und wird es erst mit ihrer
+Rückkehr in den aktiven Katalog.
+
+**4. Verdikt: Doppelzählung besteht bei URBAN_GREEN nicht.** Grundsatz G13 („keine Wirkung über
+zwei Kanäle", Aufgabe §3.2 „Kein-Doppelkanal", Z. 256–258) verlangt, dass jede physikalische
+Wirkung genau einmal zählt und vor Aufnahme eines Faktors geprüft wird, ob er implizit schon in
+einem Eingang steckt. Bei `URBAN_GREEN` läuft die Kühlwirkung nur über einen Kanal, die Kopplung
+an `EXPECTED_THERMAL_STRESS_HOURS`, denn der Herleitungstext des Nutzenwerts nimmt Hitzeschäden
+ausdrücklich aus und benennt allein Rückhalte- und Erholungsnutzen. Nach der Aktenlage ist G13 damit
+eingehalten. Offen bleibt der Befund dennoch, weil dieselbe TEEB-Zahl bei der Entsiegelung mit
+Kühlanteil hergeleitet ist und G13 nur so sicher erfüllt ist, wie diese Widersprüchlichkeit
+aufgelöst wird. Neue Zahlen, die eine Aufteilung des Punktwerts bräuchten, setzt dieser Befund
+nicht (P1).
+
+**5. Folgepaket bei Verdikt „besteht".** Entfällt nach dem Verdikt in Punkt 4.
+
+**Was ein Folgepaket für den offenen Widerspruch klären müsste (nicht in diesem Paket).** Die
+Zusammensetzung des TEEB-DE-Werts aus der Quelle selbst belegen und danach genau eine der beiden
+Herleitungen richtigstellen: `backend/app/data/catalog_parked.py`, Eintrag `URBAN_GREEN`,
+`source_details["benefit_per_m2_year"]` (Z. 1371–1375), oder `backend/app/data/catalog.py`,
+`_MEASURE_EFFECT_DOCS["DESEALING_SURFACE"]["benefit_per_m2_year"]` (Z. 1957–1961). Ergäbe die
+Quelle einen Kühlanteil im Wert von `URBAN_GREEN`, wäre dessen Feld `benefit_per_m2_year`
+(Z. 1342) um diesen Anteil zu kürzen; betroffen wäre dann im Produkt der Jahresnutzen der Maßnahme
+(`annual_benefit_eur`), in der Oberfläche „Nutzen/Jahr" (Maßnahmentabelle) und „Vermiedene
+Schäden / Nutzen" (Maßnahmen-Seitenleiste).
