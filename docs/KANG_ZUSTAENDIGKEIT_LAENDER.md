@@ -22,14 +22,14 @@ geltenden Fassung, nicht als durchsuchte Quelle.
 
 | Land | Rechtsgrundlage | Fundstelle | Zuständige Stelle | Pflicht | Stand |
 |---|---|---|---|---|---|
-| Baden-Württemberg | § 29b Abs. 1 Satz 1 Nr. 1 bis 3 KlimaG BW (Klimaschutz- und Klimawandelanpassungsgesetz Baden-Württemberg, i. d. F. des Änderungsgesetzes vom 29.07.2025; Umsetzung von § 12 KAnG in §§ 29a ff.) | https://www.landesrecht-bw.de/bsbw/document/jlr-KlimaSchGBW2023rahmen | Stadtkreise und Große Kreisstädte für ihr Gemeindegebiet (Nr. 1); Landkreise für das Kreisgebiet (Nr. 2) und für die übrigen kreisangehörigen Gemeinden (Nr. 3); Beschluss möglichst bis 30.06.2031 (§ 29c Abs. 2 Nr. 1) | ja | 2026-09-23 |
+| Baden-Württemberg | § 29b Abs. 1 Satz 1 Nr. 1 bis 3 KlimaG BW (Klimaschutz- und Klimawandelanpassungsgesetz Baden-Württemberg, i. d. F. des Änderungsgesetzes vom 29.07.2025; Umsetzung von § 12 KAnG in §§ 29a ff.) | https://www.landtag-bw.de/resource/blob/585982/1d33d268d2fd1a37b26f5e178ab62342/GBl2025077.pdf | Stadtkreise und Große Kreisstädte für ihr Gemeindegebiet (Nr. 1); Landkreise für das Kreisgebiet (Nr. 2) und für die übrigen kreisangehörigen Gemeinden (Nr. 3); Beschluss möglichst bis 30.06.2031 (§ 29c Abs. 2 Nr. 1) | ja | 2026-09-23 |
 | Bayern | keine Bestimmung getroffen, Stand 2026-09-23 | https://www.gesetze-bayern.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
 | Berlin | keine Bestimmung getroffen, Stand 2026-09-23 | https://gesetze.berlin.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
 | Brandenburg | keine Bestimmung getroffen, Stand 2026-09-23 | https://bravors.brandenburg.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
 | Bremen | keine Bestimmung getroffen, Stand 2026-09-23 | https://www.transparenz.bremen.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
 | Hamburg | keine Bestimmung getroffen, Stand 2026-09-23 | https://www.landesrecht-hamburg.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
 | Hessen | keine Bestimmung getroffen, Stand 2026-09-23 | https://www.rv.hessenrecht.hessen.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
-| Mecklenburg-Vorpommern | keine Bestimmung getroffen, Stand 2026-09-23 | https://www.landesrecht-mv.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
+| Mecklenburg-Vorpommern | § 24 Abs. 1 KlVG M-V (Klimaverträglichkeitsgesetz Mecklenburg-Vorpommern, Art. 1 des Gesetzes vom 08.07.2026, GVOBl. M-V 2026 Nr. 20 vom 17.07.2026, S. 659, § 24 auf S. 666; in Kraft seit 18.07.2026) | https://www.regierung-mv.de/static/Regierungsportal/Justizministerium/Inhalte/Rechtliches/GVOBI.M-V/GVOBl.%20Nr.%2020%20v.%2017.7.2026.pdf | Landkreise, kreisfreie Städte und große kreisangehörige Städte (ab 01.01.2030 innerhalb von drei Jahren; übrigen Gemeinden vereinfachte Konzepte nur empfohlen, § 24 Abs. 2) | ja | 2026-09-23 |
 | Niedersachsen | § 26 Abs. 1 NKlimaG (Niedersächsisches Klimagesetz, Fassung gültig ab 01.01.2026) | https://voris.wolterskluwer-online.de/browse/document/025ca7c9-36f3-3682-86f4-54cbfbdbca79 | Landkreise, kreisfreie Städte, Landeshauptstadt Hannover, Stadt Göttingen und Region Hannover (Frist 31.12.2028; Landkreise und Region je ein Konzept für ihr ganzes Gebiet) | ja | 2026-09-23 |
 | Nordrhein-Westfalen | keine Bestimmung getroffen, Stand 2026-09-23 | https://recht.nrw.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
 | Rheinland-Pfalz | keine Bestimmung getroffen, Stand 2026-09-23 | https://landesrecht.rlp.de/ | keine | keine Bestimmung getroffen | 2026-09-23 |
@@ -52,7 +52,9 @@ geltenden Fassung, nicht als durchsuchte Quelle.
   „Jeder Landkreis muss ein Klimaanpassungskonzept für das Gebiet des Landkreises erstellen …
   (§§ 29b Absatz 1 Satz 1 Nummer 2 …)“; der Landkreis „erstellt die Anpassungskonzepte gemäß
   § 29b Absatz 1 Satz 1 Nummer 3 KlimaG BW für die kreisangehörigen Gemeinden (ohne Große
-  Kreisstädte)“. Die Fundstelle verweist auf die Gesamtausgabe im Portal.
+  Kreisstädte)“. Die Fundstelle verweist auf das verkündete Änderungsgesetz im Gesetzblatt für
+  Baden-Württemberg 2025 Nr. 77 vom 05.08.2025 (Art. 1 Nr. 16, § 29b; Textabbild in
+  `docs/quellen/kang-laender/baden-wuerttemberg.md`).
 - **Bayern:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche „Umsetzung
   Bundes-Klimaanpassungsgesetz Länder Landesrecht Klimaanpassungskonzept Pflicht Gemeinden Stand
   2026 Übersicht“ und „Hamburg Bremen Brandenburg Saarland Hessen Bayern Klimaanpassungskonzept
@@ -88,6 +90,13 @@ geltenden Fassung, nicht als durchsuchte Quelle.
   § 12 KAnG gilt, ist damit nicht belegt und bleibt nur eine mögliche Lesart; die Tabelle
   bestätigt Berlin als nicht bestimmt. Die Bezirke haben nach § 8 Abs. 2 KAnGBln
   Bezirkshitzeaktionspläne aufzustellen, aber kein Klimaanpassungskonzept.
+  Nachgeprüft (T-0820): Artikel 3 des Gesetzes (Änderung des Allgemeinen Zuständigkeitsgesetzes,
+  S. 549–550) weist der Hauptverwaltung nur die Durchführung des KAnGBln zu (Hitzeviertel,
+  Klimaanpassungsprogramm, Klimarisikoanalyse, vorsorgende Klimaanpassungsstrategie, Beirat,
+  Sofortprogramme) und die Aufstellung eines Landeshitzeaktionsplans; eine Stelle nach § 12
+  Abs. 1 KAnG bestimmt er nicht. § 12 Abs. 2 Nr. 3 KAnGBln verweist auf die Cluster und
+  Handlungsfelder des § 3 Abs. 2 KAnG als Inhalt der Landesstrategie, nicht auf § 12 KAnG.
+  Wortlaut beider Stellen in `docs/quellen/kang-laender/berlin.md`.
 - **Brandenburg:** Keine Landesnorm gefunden. Suchweg (23.09.2026): Websuche „Brandenburg
   Klimaanpassungskonzept Landkreise Pflicht Landesgesetz § 12 KAnG Klimagesetz Brandenburg
   2026“; Treffer u. a. Ministeriumsseite zur kommunalen Klimaanpassung
@@ -117,11 +126,22 @@ geltenden Fassung, nicht als durchsuchte Quelle.
   https://www.umweltbundesamt.de/themen/klima-energie/klimafolgen-anpassung/anpassung-an-den-klimawandel/anpassung-auf-laenderebene/bundesland-hessen)
   laufen kommunale Konzepte bisher freiwillig über das Bündnis „Hessen aktiv: Die
   Klima-Kommunen“. Die Treffer wurden nicht einzeln abgerufen.
-- **Mecklenburg-Vorpommern:** Das Klimaverträglichkeitsgesetz ist vom Landtag beschlossen
-  (03.06.2026), seine Verkündung im GVOBl. M-V ist in dieser Erhebung nicht nachgewiesen:
-  GVOBl. M-V 2026 Nr. 16 vom 11.06.2026 enthält es nicht (Inhaltsverzeichnis gelesen), eine
-  spätere Ausgabe oder die Norm im Portal wurde nicht gefunden. Deshalb nicht in der Tabelle;
-  siehe Anhängige Entwürfe.
+- **Mecklenburg-Vorpommern:** GVOBl. M-V 2026 Nr. 20 vom 17.07.2026 (Fundstelle), Gesetz zur
+  Gestaltung einer klimaverträglichen Gesellschaft, Umwelt und Wirtschaft in
+  Mecklenburg-Vorpommern und zur Änderung anderer Gesetze vom 08.07.2026, Art. 1
+  (Klimaverträglichkeitsgesetz – KlVG M-V), § 24 Abs. 1 (S. 666): „Die Landkreise, die
+  kreisfreien und die großen kreisangehörigen Städte sind verpflichtet, ab dem 1. Januar 2030
+  innerhalb von drei Jahren Klimaanpassungskonzepte zu erstellen oder innerhalb von zehn Jahren
+  fortzuschreiben, die den Anforderungen des § 12 Absatz 2, 3, 5 und 6 des
+  Bundes-Klimaanpassungsgesetzes entsprechen.“ Den übrigen Gemeinden wird ein vereinfachtes
+  Konzept nur empfohlen (Abs. 2). Inkrafttreten am Tag nach der Verkündung (Art. 21), also am
+  18.07.2026; die Berichtigung in GVOBl. M-V 2026 Nr. 23, S. 897, betrifft nur die
+  Inhaltsübersicht. Dass § 24 die Stellen nach § 12 Abs. 1 Satz 1 KAnG bestimmt, sagt die
+  Begründung des Regierungsentwurfs Drs. 8/5418 zu § 24. Die großen kreisangehörigen Städte hat
+  der Agrarausschuss mit der Beschlussempfehlung Drs. 8/6609 vom 27.05.2026 eingefügt (Bericht:
+  Wismar, Greifswald, Stralsund und Neubrandenburg); der Landtag hat das Gesetz am 03.06.2026
+  nach dieser Empfehlung beschlossen (Plenarprotokoll 8/133). Wortlaut, Gesetzgebungsgang und
+  Suchweg in `docs/quellen/kang-laender/mecklenburg-vorpommern.md`.
 - **Niedersachsen:** NI-VORIS, § 26 NKlimaG, Fassung gültig ab 01.01.2026: Landkreise,
   kreisfreie Städte, Landeshauptstadt Hannover, Stadt Göttingen und Region Hannover sind
   öffentliche Stellen nach § 12 KAnG und stellen bis 31.12.2028 Klimaanpassungskonzepte auf.
@@ -193,18 +213,6 @@ geltenden Fassung, nicht als durchsuchte Quelle.
   Verabschiedung laut Landesregierung für Herbst 2026 vorgesehen
   (https://www.umwelt.nrw.de/nordrhein-westfalen-staerkt-die-kommunen-beim-schutz-vor-klimarisiken-wie-hitze-und-starkregen,
   Meldung vom 24.04.2026). Welche Stellen bestimmt werden, war in der Erhebung nicht belegt.
-- **Mecklenburg-Vorpommern:** Gesetz zur Gestaltung einer klimaverträglichen Gesellschaft,
-  Umwelt und Wirtschaft in Mecklenburg-Vorpommern (Klimaverträglichkeitsgesetz), vom Landtag am
-  03.06.2026 beschlossen, Verkündung nicht nachgewiesen. Regierungsentwurf Drs. 8/5418 vom
-  29.10.2025
-  (https://www.dokumentation.landtag-mv.de/parldok/dokument/67755/8_5418_gesetz_zur_gestaltung_einer_klimavertraeglichen_gesellschaft_umwelt_und_wirtschaft_in_mecklenburg_vorpommern_und_zur_aenderung_anderer_gesetze),
-  § 24 Abs. 1: „Die Landkreise und die kreisfreien Städte sind verpflichtet, ab dem 1. Januar
-  2030 innerhalb von drei Jahren Klimaanpassungskonzepte zu erstellen …“; übrigen Gemeinden
-  empfohlen (Abs. 2). Laut Landesregierung
-  (https://www.regierung-mv.de/Landesregierung/lm/Aktuell/?id=220619&processor=processor.sa.pressemitteilung)
-  und LEKA MV (https://www.leka-mv.de/klimavertaeglichkeitsgesetz-beschlossen/) nennt die
-  beschlossene Fassung zusätzlich die großen kreisangehörigen Städte; Paragraf der Endfassung
-  nicht gelesen. Wandert in die Tabelle, sobald Verkündung und Norm belegt sind.
 - **Sachsen:** Laut Klima-Portal Sachsen
   (https://www.klima.sachsen.de/umsetzung-des-klimaanpassungsgesetzes-im-freistaat-sachsen-29962.html,
   abgerufen am 23.09.2026) ist das Landesgesetz „im weiteren Lauf der aktuellen

@@ -1,6 +1,6 @@
 # Methodik-Bericht #60 — Schäden an Gebäuden aufgrund von Flusshochwasser
 
-Status: **in Revision nach Review-Runde 2** (Erstaufschlag 11.09.2026; Review-Runde 1 13.09.2026, Review-Runde 2 17.09.2026; Autor-Revision nach Runde 2 am 17.09.2026, Ledger `reviews/BEFUNDE_60.md`) · Stand 17.09.2026 ·
+Status: **Revision nach Review-Runde 3 abgeschlossen** (Erstaufschlag 11.09.2026; Review-Runde 1 13.09.2026, Review-Runde 2 17.09.2026, Review-Runde 3 ab 18.09.2026; Autor-Revision nach Runde 3 bis 23.09.2026, Ledger `reviews/BEFUNDE_60.md`; ob eine weitere Prüfrunde folgt, ist nicht entschieden, eine Abnahme liegt nicht vor) · Stand 23.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz (a) — Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle**
 (entschieden im Ansatz-Vergleich Kap. 9; Entscheidungslog Nr. 5) · Familie: **K3/K4-Ereignisschäden — noch kein Prototyp, dieser Bericht ist
@@ -30,11 +30,12 @@ der erste Vertreter** (§2.6; Entscheidungslog Nr. 2)
 ## Ergebnis
 
 - **Slug:** `60_gebaeudeschaeden_flusshochwasser`. **Registerzeilen:** 32 (`60-<Knoten>-01`), gespiegelt in `docs/evidenz/register.md`. Davon **7 belegt bzw. entschieden** — 60-W085-01, 60-R24-01, 60-S074-01, 60-R17-01, 60-S093-01, 60-S094-01 und 60-S092-01 (Maßnahmen-Hebel, abgeschätzt) —, die **übrigen 25 sind „bewusst inaktiv“** mit Begründung und Zitat aus der Knoten-Bilanz (Befund 49, T-0580; S096–S098 und S104 geparkt).
-- **Entschieden (T-0237):** Ansatz-Vergleich Kap. 9 — Umsetzungsgrundlage ist Ansatz **(a)** (Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle); (b) aggregierte Flächenschadensrate bleibt als Ergänzungsmodul, (c) Schadensgradmodell am Einzelgebäude ist ausgeschieden.
+- **Entschieden (T-0237):** Ansatz-Vergleich Kap. 9 — Umsetzungsgrundlage ist Ansatz **(a)** (Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle); (b) aggregierte Flächenschadensrate bleibt als Ergänzungsmodul (ausschließlich Vergleichswert, geht weder additiv noch ersetzend in den K3-Betrag ein, R9; Abgrenzung in Kap. 9), (c) Schadensgradmodell am Einzelgebäude ist ausgeschieden.
 - **Entschieden (T-0238):** Kap. 3 bis zur Kernformel — native Ergebnisgröße (EAD in €₂₀₂₆/a, Ebene Kommune), vier Datenebenen nach §3.1 (drei „neu anzulegen", eine „geparkt"), Tiefen-Schadensfunktion und Schicht-B-Kernformel Menge × Rate × Preis je 100-m-Zelle.
-- **Offen (Stand 17.09.2026, nach Review-Runde 2):** (1) \(M_0\) = 1,243 Mrd. €₂₀₂₆/a und \(\lambda\) = 0,911 (Werte nachgezogen 23.09.2026 auf §4.3/§4.4, die dort allein gepflegt werden) sind aus dem Stichprobenlauf des Produktionsmodells auf den acht Anker-Kommunen gerechnet (Kap. 4); die out-of-sample-Verteilungsprüfung (Jahresauslassung, §4.5) und der Fit über die Jahresreihe (§4.1a) sind seither nachgezogen (Ledger-Befunde 33 und 34); \(\lambda\) bleibt vorläufig, weil die Verteilungsprüfung als Modellentscheid **nicht bestanden** ausgewiesen ist (§4.5) und die Befunde 35 und 36 offen sind; (2) R7-Weiche mit #50 (FS-Schutzsystem, geparkt); (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
+- **Offen (Stand 23.09.2026, Revision nach Review-Runde 3 abgeschlossen):** (1) \(M_0\) = 1,243 Mrd. €₂₀₂₆/a und \(\lambda\) = 0,911 (Werte nachgezogen 23.09.2026 auf §4.3/§4.4, die dort allein gepflegt werden) sind aus dem Stichprobenlauf des Produktionsmodells auf den acht Anker-Kommunen gerechnet (Kap. 4); die out-of-sample-Verteilungsprüfung (Jahresauslassung, §4.5) und der Fit über die Jahresreihe (§4.1a) sind seither nachgezogen (Ledger-Befunde 33 und 34); \(\lambda\) bleibt vorläufig, weil die Verteilungsprüfung als Modellentscheid **nicht bestanden** ausgewiesen ist (§4.5); die Befunde 35 und 36 sind nachgezogen; (2) R7-Weiche mit #50 (FS-Schutzsystem, geparkt); (3) R9-Partitionen zum verbliebenen Rest #92/#102/Id 55 (W091) — #37 und #12 sind entschieden, vgl. Kap. 1 Weitergaben; (4) die 25 noch nicht belegten Registerzeilen aus Kap. 2.
 - **Aufwand Erstaufschlag:** 2 Nacharbeitsrunden (R1: Planungszahl korrigiert, Beispiel-Code-Zaun im Kommentar entfernt; R2: Lint-Funde behoben, Zeichentabelle S092 als eigener Abschnitt, Verweis korrigiert). Erstaufschlag: eine Session, 26 Werkzeugaufrufe, rund 3,2 USD. Nacharbeit: je rund 0,3 USD. Die Evidenz der sieben belegten Registerzeilen ist in eigenen Runden recherchiert und im Volltext geprüft (Quellen und Langbelege B1–B6 in Kap. 2).
-- **Planung:** Gegenprüfung ist nicht Teil des Tickets und noch nicht gemessen. Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
+- **Prüfstand:** Drei Review-Runden sind gefahren (Ledger `reviews/BEFUNDE_60.md`); die Autor-Revision nach Runde 3 ist abgeschlossen. Nach dem Ledger-Kopf sind noch 3 Befunde offen (17, 71, 87 — sämtlich Werkzeug- beziehungsweise Prüfskript-Befunde, nicht der Bericht selbst). Ob eine vierte Prüfrunde folgt, ist nicht entschieden; der Bericht ist nicht abgenommen.
+- **Planung:** Vergleich laut `reviews/BEFUNDE_98.md`: #98 hatte nach 23 Review-Runden keine Null-Runde und wurde dennoch integriert. #60 gründet eine neue Familie, also ist mit vielen Runden zu rechnen.
 
 ## 1 Wirkungskette & Knoten-Bilanz (§2.1)
 
@@ -212,7 +213,7 @@ Wasserstandsachse von FLEMOps (Langbeleg B5) sind Basiswert und in §3.3 hergele
 | 60-R23-01 | R23 Bau- und Immobilienunternehmen → Gebäudeschaden | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | **bewusst inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” — Unternehmensschäden (Betriebsausfall der Bauwirtschaft) sind kein K3-Gebäudeschaden |
 | 60-R25-01 | R25 Siedlungsinfrastrukturen → Gebäudeschaden | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | entfällt — kein Rechenpfad | **bewusst inaktiv** — Schadenskonten-System Z28 (Spalte „Ausgeschlossen”): „Betriebsunterbrechung (→K5), Infrastruktur (→K4), Personen (→K1)” — Siedlungsinfrastruktur bucht K4 |
 
-### Belege zu den entschiedenen Registerzeilen (§3.8, Volltext geprüft am 13.09.2026)
+### Belege zu den entschiedenen Registerzeilen (§3.8, Volltext geprüft 13.09.2026, Quellen- und Snapshot-Stand 17.09.2026)
 
 **B1 — 60-W085-01 (Hazard-Szenarien und Überflutungstiefe).**
 Quellen: (1) **LAWA — Bund/Länder-Arbeitsgemeinschaft Wasser (2024):** „Empfehlungen zur
@@ -242,7 +243,7 @@ Hochwassergefahren- und -risikokarten“**, URL
 `https://www.lfu.bayern.de/wasser/hw_risikomanagement_umsetzung/faq_karten/index.htm`,
 Archiv-Snapshot
 `https://web.archive.org/web/20260314134744/https://www.lfu.bayern.de/wasser/hw_risikomanagement_umsetzung/faq_karten/index.htm`
-(Snapshot vom 14.03.2026), Zugriff 13.09.2026; wörtlich: HQhäufig ist „ein Abfluss (Q) verstanden, der statistisch gesehen im
+(Snapshot vom 14.03.2026; Stand laut Snapshot 14.03.2026 — ein eigenes Stand-Feld der Seite ist nicht belegt), Zugriff 13.09.2026; wörtlich: HQhäufig ist „ein Abfluss (Q) verstanden, der statistisch gesehen im
 Mittel alle 5 bis 20 Jahre auftritt“ (die Karten zeigen ein HQ10), HQ100 ist „ein Abfluss (Q), der
 im Mittel alle hundert Jahre erreicht oder überschritten wird“, HQextrem entspricht ungefähr einem
 HQ1000. **Rechenschritt (§3.9 Übernommen):** p = 1/T mit T aus den zitierten Wiederkehrintervallen
@@ -263,7 +264,7 @@ Land zu erheben.
 Quellen: (1) **LAIV MV — Landesamt für innere Verwaltung Mecklenburg-Vorpommern, „Geländemodelle“**,
 URL `https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/`, Archiv-Snapshot
 `https://web.archive.org/web/20260515142234/https://www.laiv-mv.de/Geoinformation/Geobasisdaten/Gelaendemodelle/`
-(Snapshot vom 15.05.2026), Zugriff 13.09.2026;
+(Snapshot vom 15.05.2026; Stand laut Snapshot 15.05.2026 — ein eigenes Stand-Feld der Seite ist nicht belegt), Zugriff 13.09.2026;
 wörtlich zur Höhengenauigkeit des DGM1: „0,15 – 0,2 m“, zur Erfassung: „Dominierende
 Erfassungsmethoden für die Erhebung der Messdaten sind das Airborne Laserscanning und die
 Bildkorrelation auf Basis orientierter Luftbildpaare.“ (2) **de Moel, H.; Aerts, J. C. J. H.
@@ -303,7 +304,7 @@ Umweltrisiken“**, URL
 `https://www.gdv.de/gdv/themen/klima/-zuers-geo-zonierungssystem-fuer-ueberschwemmungsrisiko-und-einschaetzung-von-umweltrisiken-11656`,
 Archiv-Snapshot
 `https://web.archive.org/web/20260902211622/https://www.gdv.de/gdv/themen/klima/-zuers-geo-zonierungssystem-fuer-ueberschwemmungsrisiko-und-einschaetzung-von-umweltrisiken-11656`
-(Snapshot vom 02.09.2026), Zugriff 13.09.2026; wörtlich zur Klasse 2: in ihr sind „auch Objekte enthalten, die durch einen
+(Snapshot vom 02.09.2026; Stand laut Snapshot 02.09.2026 — ein eigenes Stand-Feld der Seite ist nicht belegt), Zugriff 13.09.2026; wörtlich zur Klasse 2: in ihr sind „auch Objekte enthalten, die durch einen
 Deich geschützt sind“, sofern dieser mindestens einem hundertjährlichen Hochwasser standhält;
 Objekte im Umkreis von 100 m zu einem Bach tragen zusätzlich den Vermerk „Bachzone“.
 **Rechenschritt (§3.9 Abgeleitet):** aus den beiden wörtlich belegten Anteilen folgt die
@@ -336,7 +337,7 @@ Stichtag 31.12.2024: 43,8 Mio Wohnungen, 4,1 Mrd m² Wohnfläche,
 (2) **Statistisches Bundesamt, Themenseite „Wohnen“**, URL
 `https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html`, Archiv-Snapshot
 `https://web.archive.org/web/20260831100304/https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Wohnen/_inhalt.html`
-(Snapshot vom 31.08.2026), Zugriff 13.09.2026;
+(Snapshot vom 31.08.2026; Stand laut Snapshot 31.08.2026 — ein eigenes Stand-Feld der Seite ist nicht belegt; der Inhalt nennt den Bestand zum Jahresende 2025), Zugriff 13.09.2026;
 wörtlich: „44,0 Millionen Wohnungen in Deutschland zum Jahresende 2025“, Gesamtwohnfläche
 4,1 Mrd m² (Fortschreibung des Wohngebäude- und Wohnungsbestandes auf Zensus-2022-Basis).
 (3) **ImmoWertV, Anlage 4 (zu § 36 Abs. 1) „Normalherstellungskosten 2010“**, URL
@@ -356,7 +357,7 @@ Bundesamt, Fachserie 17 Reihe 4 „Preisindizes für die Bauwirtschaft“ (Basis
 `https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile`,
 Archiv-Snapshot
 `https://web.archive.org/web/20250416003519/https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Baupreise-Immobilienpreisindex/Publikationen/Downloads-Bau-und-Immobilienpreisindex/bauwirtschaft-preise-2170400223244.pdf?__blob=publicationFile`
-(Snapshot vom 16.04.2025; die PDF-Datei selbst liegt unter derselben Adresse mit dem Zusatz `id_`
+(Snapshot vom 16.04.2025; Stand laut Snapshot 16.04.2025 — Erscheinungsjahr und Ausgabe der Reihe sind im Bericht nicht belegt, weil Titel und Adresse sie nicht nennen und der Snapshot der Prüfung nicht wieder vorlag; Berichtsjahrgang der entnommenen Werte: Jahresdurchschnitte 2010–2023; die PDF-Datei selbst liegt unter derselben Adresse mit dem Zusatz `id_`
 hinter dem Zeitstempel), Zugriff 13.09.2026; Jahresdurchschnitte Neubau konventionell gefertigter Wohngebäude:
 2010 = 89,1 · 2015 = 100,0 · 2020 = 114,0 · 2021 = 121,9 · 2022 = 139,4 · 2023 = 149,8.
 (5) **Statistisches Bundesamt (2026):** Pressemitteilung Nr. 241 vom 10.07.2026, URL
@@ -3552,6 +3553,10 @@ belegte Flächenschadensrate stammt aus einer niederländischen Fallstudie (B2),
 zum tragenden Basiswert aufsteigen. (b) bleibt als **Ergänzungsmodul** vorgesehen: als grober
 Plausibilitätsrahmen für Kommunen, in denen der Zensus-Bestand je Zelle lückenhaft ist.
 
+**Abgrenzung des Ergänzungsmoduls (b) gegen den K3-Betrag (R9).** Das Ergänzungsmodul liefert ausschließlich einen Vergleichswert.
+Es geht weder additiv noch ersetzend in den ausgewiesenen K3-Betrag ein (R9).
+Wird es später als Auffüllung für Zellen ohne Zensus-Bestand genutzt, sind diese Zellen im Hauptpfad auf null zu setzen, und die Umstellung ist als Modellentscheid zu dokumentieren.
+
 Gegen **(c)** spricht die Datenlage, nicht die Modellidee: Bauweise und Bauzustand je Gebäude sind
 bundesweit nicht erhoben (Datenlücken in 60-S093-01 und 60-S094-01), die Skala ist laut B6
 mauerwerksbasiert und an Extremereignissen einschließlich einer Sturzflut kalibriert, und die
@@ -3568,7 +3573,7 @@ Materialband \(f_{\text{S094}}\) = 1,00 (0,84–1,18) in Ansatz (a).
 | 2 | Familie? | neue Familie K3/K4-Ereignisschäden, Kap. 9 angelegt | kein K3-Bericht in `docs/methodik/` | Übernahme der K1-Struktur (#95) — passt nicht zu Ereignislogik A5 | Drei-Ansätze-Vergleich Pflicht |
 | 3 | S092 ohne zulässige Effektgröße | P2-Abschätzung r = 0,035 (0,0075–0,0832) | Vorgabe P2, §3.5; Querschnittsbefragungen sind keine Maßnahmen-Effektgröße | Wirkung null (unzulässig nach P2) | Maßnahmen-Modul, kein Basiswert |
 | 4 | Slug | `gebaeudeschaeden_flusshochwasser` | kurz, eindeutig gegen #59 (Starkregen) und #46 (Küste) | `flusshochwasser` (verwechselbar mit Id 49) | Dateinamen Bericht/Ledger |
-| 5 | Welcher Ansatz wird umgesetzt? (Ansatz-Vergleich §2.6/§3.7) | **13.09.2026 (T-0237):** Ansatz **(a)** Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle — p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp · Gebäudequalität) × Gebäudewert | einziger Ansatz, der in den sechs Güte-Kriterien durchgehend „hoch“ trägt (das siebte Kriterium Aufwand läuft umgekehrt: dort ist „gering“ günstig, (a) liegt mit „mittel“ über (b) und weit unter (c) und ist nach §3.4 ressourcenverträglich): vollständig aus frei zugänglichen, im Register belegten Datenebenen speisbar, Wirkungsort für S092 und die R7-Weiche vorhanden, Schicht-B-Form mit physischer Zwischengröße vor dem Euro, Kalibrierung und Abgleich auf Stichprobenebene ohne nationalen Vollraster-Lauf (§3.4) | (b) aggregierte Flächenschadensrate — kein Wirkungsort für den Maßnahmen-Hebel, tragender Wert nur aus niederländischer Fallstudie (B2); als Ergänzungsmodul vorgesehen. (c) Schadensgradmodell D0–D6 am Einzelgebäude — Bauweise/Bauzustand bundesweit nicht erhoben, Umrechnung Grad → Euro nicht belegt | Umsetzungsgrundlage für Kap. 3 und Prototyp der Familie K3/K4-Ereignisschäden (bindet später #50 und #47); Kopfzeile und Kap. 9 nachgezogen |
+| 5 | Welcher Ansatz wird umgesetzt? (Ansatz-Vergleich §2.6/§3.7) | **13.09.2026 (T-0237):** Ansatz **(a)** Szenario-Erwartungswert mit typisierter Tiefen-Schadensfunktion je 100-m-Zelle — p(HQ) × Schadensgrad(Wassertiefe · Gebäudetyp · Gebäudequalität) × Gebäudewert | einziger Ansatz, der in den sechs Güte-Kriterien durchgehend „hoch“ trägt (das siebte Kriterium Aufwand läuft umgekehrt: dort ist „gering“ günstig, (a) liegt mit „mittel“ über (b) und weit unter (c) und ist nach §3.4 ressourcenverträglich): vollständig aus frei zugänglichen, im Register belegten Datenebenen speisbar, Wirkungsort für S092 und die R7-Weiche vorhanden, Schicht-B-Form mit physischer Zwischengröße vor dem Euro, Kalibrierung und Abgleich auf Stichprobenebene ohne nationalen Vollraster-Lauf (§3.4) | (b) aggregierte Flächenschadensrate — kein Wirkungsort für den Maßnahmen-Hebel, tragender Wert nur aus niederländischer Fallstudie (B2); als Ergänzungsmodul vorgesehen, ausschließlich als Vergleichswert ohne Eingang in den K3-Betrag (Abgrenzung R9, siehe Kap. 9). (c) Schadensgradmodell D0–D6 am Einzelgebäude — Bauweise/Bauzustand bundesweit nicht erhoben, Umrechnung Grad → Euro nicht belegt | Umsetzungsgrundlage für Kap. 3 und Prototyp der Familie K3/K4-Ereignisschäden (bindet später #50 und #47); Kopfzeile und Kap. 9 nachgezogen |
 | 6 | Divergenz Bericht ↔ Code bei den Namenslisten von #60 (Befund 13) | **13.09.2026 (T-0243):** Bericht auf den belegbaren Stand korrigiert (Kap. 1: Teilmenge mit abweichender Namensquelle statt „genau"); Code (`backend/app/data/catalog.py`, `kwra_id: 60`) bleibt unverändert | eiserne Regel 5 — Divergenz Bericht ↔ Code wird nie still im Code gefixt; Angleichen des Codes ist Aufgabe der Integration, nicht dieses Berichtsschritts | Code stillschweigend an W117 nachziehen (verstieße gegen eiserne Regel 4/5, kein Prüfmittel im Rahmen dieses Pakets) | Divergenz als Integrationspunkt für `/integriere-risiko 60` geführt: `sensitivity_names` und `upstream_names` in `catalog.py` müssen dort gegen die 7 Sensitivitäten und 8 Wirkungs-Eingänge von W117 abgeglichen werden |
 | 7 | Neuwert oder Zeitwertansatz der Arbeitsmappe (Mon. J65 → J64) als Basiswert K3? (Befund 41) | **17.09.2026 (T-0285):** Neuwert (NHK, indexiert, 527.280 €₂₀₂₆ je Wohngebäude) bleibt Basiswert; Zeitwertansatz als Sensitivitätsband mit \(f_{\text{AWM}}\) = 0,55 (0,40–0,75, Abschätzung von KAP3); Abweichung von J64 als Antrag auf Fortschreibung in §7.2 | W1/W6: der Anker \(A^{*}\) ist neuwertbasiert (gleitender Neuwert, §4.2); eine Umstellung nur des Basiswerts ließe den kalibrierten Betrag unverändert und höbe \(\lambda\) auf 1,66 (bis 2,28) (**nachgezogen 23.09.2026 (T-0571)** auf den geltenden Stand \(A^{*}\) = 1,132 (§4.2), \(M_0\) = 1,243 Mrd. €₂₀₂₆/a und \(\lambda\) = 0,911 (§4.3/§4.4): 1,132 / (1,243 · 0,55) = 1,66, am unteren Faktor-Ende 1,132 / (1,243 · 0,40) = 2,28; frühere Nachzüge T-0313 und T-0320; die Entscheidung selbst bleibt unberührt); ein konsistenter Zeitwertansatz braucht eine quellenlose Anker-Umrechnung | Zeitwertansatz übernehmen und \(A^{*}\), \(U\), \(O\) mit \(f_{\text{AWM}}\) umrechnen | Basiswert, \(M_0\) und \(\lambda\) unverändert; Sensitivität K3-Betrag 0,62 (0,45–0,85) statt der kalibrierten Bundessumme aus §4.6 (−45 %); Kap. 6 Modellgrenze 9 und Versionsstempel präzisiert |
 | 8 | Anker \(A^{*}\) aus dem Einzeljahr 2024 oder aus dem Mehrjahresmittel 2002–2024 der GDV-Reihe? (Befund 34) | **17.09.2026 (T-0320):** Mehrjahresmittel per Kleinste-Quadrate-Ankerbestimmung (§4.1/§4.4): \(A^{*}\) = 1,132 Mrd. €₂₀₂₆/a | ein Einzeljahr trägt die volle Jahreswitterung (Hochwasserereignisse streuen stark zwischen den Jahren) und wäre kein robuster Anker für einen langfristigen Skalar; die Kleinste-Quadrate-Bestimmung über die gesamte Reihe 2002–2024 glättet diese Streuung und ist reproduzierbar aus den veröffentlichten Jahreswerten | Anker aus dem letzten verfügbaren Einzeljahr (2024) | \(A^{*}\) = 1,132 (statt 0,985 nach dem verworfenen Stichprobenlauf), \(\lambda\) = 0,832, Band 0,11–3,49; §7.2 Zeitwert-Sensitivität 1,51 (2,08). **Nachtrag 23.09.2026 (T-0570, Ledger-Befund 58):** mit typgewichtetem Wertsatz in \(M_0\) (1,243 statt 1,360) \(\lambda\) = 0,911, Band 0,12–3,93 (§4.3/§4.4) |

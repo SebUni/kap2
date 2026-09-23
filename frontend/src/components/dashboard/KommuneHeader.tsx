@@ -1,5 +1,6 @@
 import { useStore } from '../../store'
 import ChartSkeleton from './ChartSkeleton'
+import KangZustaendigkeit from './KangZustaendigkeit'
 import type { ClimateMetric, LowerBoundNote } from '../../types'
 import { fmtEurCompact, fmtNum } from '../../utils/format'
 
@@ -172,6 +173,9 @@ export default function KommuneHeader({ className = '' }: { className?: string }
             : p ? '' : 'Profil wird geladen …'}
         </div>
       </div>
+      {/* § 12 Abs. 1 KAnG: landesrechtliche Pflicht zum Klimaanpassungskonzept,
+          direkt unter der Meta-Zeile mit Bundesland und Landkreis. */}
+      <KangZustaendigkeit kommuneId={kommune.id} />
 
       <div className="hero-kpis">
         <div className="hero-kpi">

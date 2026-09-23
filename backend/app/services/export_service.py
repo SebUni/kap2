@@ -14,6 +14,10 @@ from app.services import measure_service
 from app.services.engine import lower_bound
 
 
+# Vermerk an nicht-additiven Wirkungen (Teilmenge bereits gezählter Schäden).
+NICHT_IN_SUMME_TEXT = "nicht in der Gesamtsumme"
+
+
 def _risk_aggregate(db: Session, kommune_id: int) -> dict | None:
     """Risiko-Aggregat der Kommune ohne Maßnahmen; ``None``, wenn es nicht vorliegt.
 
@@ -68,6 +72,8 @@ def _fill_climate_impacts_sheet(ws, agg: dict | None, lb_note: str | None) -> No
         else:
             value = catalog.NO_EURO_LAYER_TEXT
             unit, klasse = "", "nein (Klasse B, Screening)"
+        if row.get("code") in catalog.NON_ADDITIVE_RISK_CODES:
+            klasse = f"{klasse}; {NICHT_IN_SUMME_TEXT}"
         ws.append([row.get("code", ""), row.get("name", ""), value, unit, klasse])
 
     ws.append([])
@@ -162,6 +168,9 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
     ws2.append(["Gesamt-CAPEX (€)", sum(
         (m.impact_summary or {}).get("capex_eur", 0) for m in measures
     )])
+    zusammen_cov = ((agg or {}).get("cost") or {}).get("euro_coverage") or {}
+    ws2.append(["Vollständigkeit",
+                zusammen_cov.get("text") or catalog.euro_coverage(catalog.RISKS).text])
     if lb_note:
         ws2.append(["Hinweis zu den ausgewiesenen Schadens-/Nutzensummen", lb_note])
 
