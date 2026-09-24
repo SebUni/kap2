@@ -1,5 +1,6 @@
 ---
-description: Voller Erstdurchlauf ohne Nutzer-Input — Erstaufschlag inkl. Recherche, automatische Entscheidungen (Entscheidungslog), unabhängiger Review durch frischen Subagenten, Revision, Loop bis Null-Runde, PDF-/HTML-Export. Wartet nirgends auf Eingaben; endet mit einem Statusbericht.
+name: aufsichtsrat-risiko-auto
+description: Einzelsitzungs-Weg des Aufsichtsrats — voller Erstdurchlauf ohne Nutzer-Input — Erstaufschlag inkl. Recherche, automatische Entscheidungen (Entscheidungslog), unabhängiger Review durch frischen Subagenten, Revision, Loop bis Null-Runde, PDF-/HTML-Export. Wartet nirgends auf Eingaben; endet mit einem Statusbericht.
 argument-hint: <risiko-nr>
 ---
 
@@ -7,7 +8,9 @@ Risiko-Nummer: $ARGUMENTS
 
 Dieser Command ist der **Erstdurchlauf**: aus den Arbeitsmappen entsteht ein neuer
 Methodik-Bericht, der bis zur Null-Runde gebracht wird. Der Wiedereinstieg in einen bereits
-bestehenden Bericht läuft über `/risiko-fortsetzen`.
+bestehenden Bericht läuft über `/aufsichtsrat-risiko-fortsetzen`. In der Firma läuft derselbe Weg verteilt über die
+Rollenkette (siehe „Rollen im Loop“ in `.claude/methodik-loop.md`); dieser Skill ist der Weg des Aufsichtsrats in einer
+einzigen Sitzung (früher `/risiko-auto`).
 
 **Grundregel, Entscheidungsregeln W1–W6 und der gesamte Ablauf ab der Revision stehen in
 @.claude/methodik-loop.md** — diese Datei ist verbindlich und wird hier nicht wiederholt.
@@ -16,7 +19,8 @@ Entscheidungslog dokumentieren.
 
 ## Schritt A — Entwurf (nur in diesem Command)
 
-Führe die vollständige Pipeline aus @.claude/commands/neu-risiko.md aus, mit **einer**
+Führe die vollständige Pipeline aus dem Skill `methodik_consultant-erstaufschlag` aus
+(@.claude/skills/methodik_consultant-erstaufschlag/SKILL.md), mit **einer**
 Änderung: Phase 6 ist kein Wartepunkt. Jede ⚠️-Entscheidung wird sofort mit deiner Empfehlung
 angewendet und im Bericht unter `## Entscheidungslog` dokumentiert
 (Nr · Frage · angewendete Entscheidung · Begründung · Alternative · Auswirkung aufs Ergebnis).

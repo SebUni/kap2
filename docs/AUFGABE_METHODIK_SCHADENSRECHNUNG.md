@@ -1,7 +1,7 @@
 # Aufgabenbeschreibung: Methodik zur Schadensrechnung von Klimarisiken — v2 (konsolidiert)
 
-Stand: 25.08.2026 · **Einzige Instruktionsquelle** für Herleitung, Review und Integration von
-Risiko-Methodiken.
+Stand: 25.08.2026, fortgeschrieben bis 24.09.2026 · **Einzige Instruktionsquelle** für Herleitung, Review und
+Integration von Risiko-Methodiken.
 
 > **Fortschreibung 30.08.2026 (Nutzer-Entscheid, aus der #95-Integration):**
 > (1) §3.4 **Ressourcen-Regel** — nationale 100-m-Vollraster-Läufe („Zell-Läufe")
@@ -40,6 +40,19 @@ Risiko-Methodiken.
 > komplexe Verteilungsfunktionen und nicht lesbare Formeln sind ein Befund; die Belastbarkeit der
 > Ergebnisse darf dabei nicht sinken. Geprüft wird über die Prüfpunkte E1–E4 (§8) im Rahmen von
 > Leitfrage 11 (§5).
+>
+> **Fortschreibung 24.09.2026 (Aufsichtsrat; Vorgabe P3 in `CLAUDE.md` neu gefasst):** (7) **Eine Methodik je
+> Risiko.** Am Ende steht genau eine Methodik — kein Nebeneinander einer einfachen und einer komplexen Fassung, kein
+> Ansatz-Kapitel; verworfene Ansätze stehen mit je einem Satz im Entscheidungslog (§2.6, §3.7, §4). **So einfach wie
+> möglich, so komplex wie nötig:** nie so einfach, dass das Ergebnis die Lage falsch darstellt; wo es nicht einfach geht,
+> wird die Methodik komplexer und begründet an der Stelle, was die einfachere Rechnung verfälschen würde (§8 E3). Die
+> bisherige Regel „beide Formen ausweisen“ entfällt. **Rechenkette:** Kapitel 3 jedes Berichts beginnt mit der
+> durchgehenden Rechenkette von der amtlichen Quelle (etwa Zensus) bis zum Euro-Betrag — „Zahl aus Quelle × Faktor =
+> Ergebnis“, möglichst in höchstens zehn Rechenebenen, je Ebene Quelle und Zahl für eine Beispielkommune, nachgerechnet
+> von einem Beispiel-Block (§4, §8 E1). **Einheitliche Schreibweise** nach dem Stil-Skill `kap3-stil`, vom Lint geprüft
+> (§7, §8 E5). **Rollen:** Die Methodik entsteht in der Rollenkette (CMO, Methodik-Manager plant und prüft,
+> Methodik-Consultant arbeitet aus), integriert wird beim CTO; die Befehle heißen nach Rolle und Zweck (§6, §7). Alle
+> Methodiken werden ab M0 (#95, #96, #98) neu angefasst; M1 beginnt erst nach der Abnahme von M0 durch den Aufsichtsrat.
 >
 > v2 konsolidiert die Aufgabenbeschreibung v1 (22.08.2026) und
 `docs/METHODIK_GRUNDSAETZE.md` (G1–G14) **inklusive der Review-Fortschreibungen aus der
@@ -151,14 +164,15 @@ Hebel nur an Ketten-Sensitivitäten; Effektgrößen aus dem Register (Interventi
 Wirkungsort im Modell definieren (auf welche Größe, multiplikativ auf was); Doppelzählungs-Wächter
 und R7-Weiche (§3.5).
 
-### 2.6 Methodik-Familien statt Drei-Ansätze-Ritual
+### 2.6 Methodik-Familien — eine Methodik je Risiko
 
 Risiken werden **Familien** zugeordnet (z. B. „K1-Gesundheit bottom-up" = #95/#96/#98-Muster;
 „K3/K4-Ereignisschäden" = Eintrittswahrscheinlichkeit × Schadensfunktion × Bestand;
-„K6-Ertragsmodelle"; „K8-Vorsorge-Weichen"). Der vollständige **Drei-Ansätze-Vergleich (a–d,
-Kriterienraster, Empfehlung) ist nur Pflicht beim ersten Risiko einer Familie** oder wenn die
-Methodenwahl fachlich strittig ist. Folge-Risiken derselben Familie übernehmen das
-Familien-Template und dokumentieren Alternativen als kurze Verworfen-Liste (je ein Satz Grund).
+„K6-Ertragsmodelle"; „K8-Vorsorge-Weichen"). **Am Ende steht je Risiko genau eine Methodik**
+(Fortschreibung 7, 24.09.2026). Die Methodenwahl wird im Entscheidungslog begründet — beim ersten
+Risiko einer Familie oder bei fachlich strittiger Wahl anhand des Kriterienrasters aus §3.7 —, verworfene
+Ansätze stehen dort mit je einem Satz Grund. Ein eigenes Ansatz-Kapitel und ein Nebeneinander mehrerer
+Fassungen gibt es nicht. Folge-Risiken derselben Familie übernehmen das Familien-Template.
 Verteilschlüssel-Ansätze („nationaler Topf × Anteil") sind per §3.1 generell ausgeschieden und
 nur als Negativ-Beispiel zitierfähig. Zur Einordnung des Umfangs: Von den 102 Klimawirkungen sind
 laut Netzwerkliste ~50 Treiber (0 €), ~10 rein vorgelagert/Zustandsgrößen — **Schicht-B-Methodiken
@@ -206,7 +220,7 @@ G12 → 3.4 (Verteilungsprüfung) · G13 → 3.2 (Kein-Doppelkanal) · G14 → 3
 - **Datenebenen-Anlagepflicht (Fortschreibung 30.08.2026):** Braucht eine Formel eine
   Zellgröße, die das Produkt nicht führt, spezifiziert der Bericht die neue Datenebene
   **vollständig** (Quelle, Beschaffungsweg keyless, Zell-Ableitungsregel, Fallback,
-  Normierung/Zentrierung) und kennzeichnet sie „neu anzulegen" — `/integriere-risiko`
+  Normierung/Zentrierung) und kennzeichnet sie „neu anzulegen" — die Integration (Skill `cto-integration`)
   **legt sie an**; ein dauerhafter Neutral-Fallback ohne spezifizierte Ebene ist
   unzulässig. Existiert nachweislich keine offene Quelle, wird die Ebene als
   „**geparkt** (Datenquelle fehlt)" mit Beschaffungs-Watchlist geführt und der
@@ -267,9 +281,8 @@ G12 → 3.4 (Verteilungsprüfung) · G13 → 3.2 (Kein-Doppelkanal) · G14 → 3
 - Parameter messen statt setzen; **regional variieren dürfen nur physikalische/gemessene
   Modellparameter** (Streuungen, Schwellen, Steigungen, Übersetzungsfaktoren) — Kalibrierfaktoren
   nicht (3.4).
-- Zeitbezug sauber: Jahreswerte, Szenariojahre (je empfohlenem Ansatz ein Absatz
-  „Szenario-Anwendung": verschobene Größe, konstante Größen, Stationaritätsannahmen), Latenzen
-  explizit.
+- Zeitbezug sauber: Jahreswerte, Szenariojahre (ein Absatz „Szenario-Anwendung": verschobene Größe,
+  konstante Größen, Stationaritätsannahmen), Latenzen explizit.
 
 ### 3.3 Konten-Disziplin
 
@@ -340,11 +353,12 @@ G12 → 3.4 (Verteilungsprüfung) · G13 → 3.2 (Kein-Doppelkanal) · G14 → 3
   Gilt für alle Parameter, auch Defaults, Kostensätze und Wirkungsfaktoren; eine Herleitung nur
   als Code-Kommentar genügt nicht.
 
-### 3.7 Ansatz-Vergleich (nur wo nach §2.6 gefordert)
+### 3.7 Methodenwahl (Entscheidungslog, nach §2.6)
 
-Festes Kriterienraster: kausale Treue · Kalibrierbarkeit · lokale Differenzierung ·
-Datenverfügbarkeit · Maßnahmen-Anschluss · Architektur-Konformität · Aufwand. Empfehlung begründet;
-Verworfenes ggf. als Ergänzungsmodul benannt.
+Festes Kriterienraster für die Wahl: kausale Treue · Kalibrierbarkeit · lokale Differenzierung ·
+Datenverfügbarkeit · Maßnahmen-Anschluss · Architektur-Konformität · Erklärbarkeit (§8) · Aufwand. Die Wahl
+steht mit Begründung im Entscheidungslog; jeder verworfene Ansatz mit einem Satz Grund. Kein Ansatz-Kapitel,
+keine zweite Fassung im Bericht.
 
 ### 3.8 Quellen
 
@@ -369,9 +383,9 @@ Jeder Parameter einer Formel ist im Bericht vollständig hergeleitet:
 - **Unzulässig:** Platzhalter, „wird bei Implementierung hergeleitet", Werte nur in der
   Zeichentabelle ohne Weg im Text. Gilt auch für Defaults, Bandgrenzen, Referenzwerte,
   Zentrierungs-Mittelwerte und Kostensätze.
-- **Geltungsbereich:** vollständig für jeden Ansatz, der **Umsetzungsgrundlage** ist; dokumentierte
-  Alternativen/Negativ-Beispiele bis zur Quelle. Wird eine Alternative später Umsetzungsgrundlage,
-  gilt die Pflicht vor der Implementierung vollständig.
+- **Geltungsbereich:** vollständig für die eine Methodik des Berichts. Verworfene Ansätze im
+  Entscheidungslog brauchen keine Herleitung; wird einer später doch gewählt, gilt die Pflicht vor der
+  Implementierung vollständig.
 
 Fertig-Regel: Jede Zeile jeder Zeichentabelle referenziert in „Wert/Herkunft" eine abgeschlossene
 Herleitung (Register-ID oder Herleitungs-Anker) — kein Verweis auf später.
@@ -384,14 +398,32 @@ Herleitung (Register-ID oder Herleitungs-Anker) — kein Verweis auf später.
 docs/methodik/<nn>_<risiko>.md
 1  Wirkungskette & Knoten-Bilanz          (§2.1; Weitergaben zweispaltig)
 2  Evidenz-Register                        (§2.2; Register-IDs, Entscheidungsspalte)
-3  Modell                                  (§2.3; Formeln + Zeichentabellen + Beispiele)
+3  Modell                                  (§2.3; beginnt mit 3.0 Rechenkette, dann Formeln + Zeichentabellen + Beispiele)
 4  Kalibrierung & Validierung              (§2.4/§3.4; Skripte/CSVs als Anlage verlinkt)
 5  Maßnahmen-Hebel                         (§2.5/§3.5)
 6  Szenario-Anwendung & Modellgrenzen      (§3.2; inkl. Infokasten-Texte §3.6)
 7  Parameter-Blöcke                        (maschinenlesbar, s. u.)
 8  Quellen                                 (§3.8)
-[nur erster Familien-Vertreter: 9 Ansatz-Vergleich (§3.7)]
+Entscheidungslog                           (Methodenwahl §3.7, verworfene Ansätze je ein Satz; kein Kapitel 9)
 ```
+
+**Rechenkette (Abschnitt 3.0, Pflicht; §8 E1).** Kapitel 3 beginnt mit `### 3.0 Rechenkette` — dem durchgehenden
+Rechenweg von der amtlichen Quelle bis zum Euro-Betrag, so, dass ein Sachbearbeiter ihn in einem Meeting erzählen kann:
+
+```
+| Ebene | Rechenschritt | Wert (Beispielkommune <Name>) | Quelle |
+|---|---|---|---|
+| 1 | Einwohner ab 75 Jahren | 12.400 | Zensus 2022, Tabelle … |
+| 2 | × zusätzliche Sterbefälle je 1.000 Einwohner und Hitzewoche | × 0,21 | Evidenz-Register 95-S152-01 |
+| … | … | … | … |
+| n | = bewerteter Schaden (Konto K1) je Jahr | = 1,2 Mio. € | Rechnung |
+```
+
+Je Ebene ein Rechenschritt in Worten („Zahl aus Quelle × Faktor = Ergebnis“), die Zahl für die Beispielkommune und die
+Quelle (Datensatz, Register-ID oder „Rechnung“ für abgeleitete Ebenen). Höchstens zehn Ebenen; mehr nur mit einer Zeile
+`**Mehr als zehn Ebenen:** <Begründung, was eine kürzere Kette an der Lage verfälschen würde>`. Die letzte Ebene ist der
+Euro-Betrag. Darunter rechnet ein Beispiel-Block (`python test: rechenkette_<nr>`) die Kette nach. Die Formeln danach sind
+die genaue Fassung derselben Kette, keine zweite Methodik.
 
 **Parameter-Block-Format** (wird per Skript in die Produkt-Registry extrahiert; der Ratchet-Test
 prüft Herkunft maschinell):
@@ -444,10 +476,10 @@ beantworten (nicht „nichts weiter gefunden", sondern je Frage: bestanden/Befun
 9. **Kostensätze:** Preisstand einheitlich, Quellen, VSL/VOLY-Konsistenz, Konto-Zuordnung?
 10. **Quellen:** fehlend, veraltet, falsch zugeordnet, unverifiziert; Zahlen ≠ Primärquelle?
 11. **Form und Erklärbarkeit:** Zeichentabellen vollständig; Beispiele rechnen auf (Golden-Tests
-    grün)? **Prüfpunkte E1–E4 aus §8 einzeln mit ja/nein und Fundstelle** — insbesondere E3:
-    jede Verteilungsfunktion oder Formel, die der Adressat nicht nachvollziehen kann, trägt
-    Näherung mit Fehler, Rechenbeispiel oder Unvermeidbarkeits-Begründung; still vereinfacht
-    (Belastbarkeit gesenkt, ohne beides auszuweisen) = Befund.
+    grün)? **Prüfpunkte E1–E5 aus §8 einzeln mit ja/nein und Fundstelle** — insbesondere E1 (Rechenkette
+    vollständig, je Ebene Quelle und Zahl, höchstens zehn Ebenen oder begründet) und E3: eine Vereinfachung,
+    die die Lage falsch darstellt, ist ein Befund; ebenso Komplexität ohne Begründung der Fehldarstellung und
+    ein Nebeneinander zweier Fassungen.
 12. **Umsetzbarkeit:** Daten offen/keyless; Parameter-Blöcke vollständig; Architektur-vereinbar;
     benötigte neue Ebenen als solche gekennzeichnet (inkl. Struktur-Ebenen wie u18)?
 13. **Herleitungspflicht:** ein einziges Formelzeichen ohne abgeschlossene Herleitung = Befund.
@@ -470,11 +502,11 @@ ist blind für die eigenen Annahmen):
 
 | Schritt | Werkzeug | Input | Output |
 |---|---|---|---|
-| **Erstaufschlag** | Claude Code (Repo) | Template §4, Bundle §1, Familien-Template | `docs/methodik/<risiko>.md` + Skripte/CSVs; Lints lokal grün |
-| **Review** | frische Session: Claude Code `/review-methodik` (bevorzugt — Bundle liegt im Repo) oder claude.ai mit komplettem Bundle | Bundle + Bericht + Ledger | Befunde ins Ledger (Format §5) |
-| **Revision** | Claude Code | Ledger | aktualisierter Bericht + Statusspalte je Befund; Rechenläufe neu, wo Kopplungen betroffen |
+| **Erstaufschlag** | `methodik_consultant` (Skill `methodik_consultant-erstaufschlag`) | Template §4, Bundle §1, Familien-Template | `docs/methodik/<risiko>.md` + Skripte/CSVs; Lints lokal grün |
+| **Review** | `methodik_manager`, Prüflauf in frischer Sitzung (Skill `methodik_manager-gegenpruefung`) | Bundle + Bericht + Ledger | Befunde (Format §5) — im Urteil des Prüflaufs, der Consultant trägt sie ins Ledger ein |
+| **Revision** | `methodik_consultant`, eine Runde je Lauf | Ledger | aktualisierter Bericht + Statusspalte je Befund; Rechenläufe neu, wo Kopplungen betroffen |
 | **Re-Review** | frische Session | Diff + Ledger | nur: geänderte Abschnitte, Regression geschlossener Befunde, offene Befunde; **volle Prüfung erneut**, wenn Kalibrierung oder Modellstruktur geändert wurde |
-| **Abnahme** | — | Abnahmekriterien | Freigabe zur Integration |
+| **Abnahme** | `methodik_manager` (Skill `methodik_manager-abnahme`), Übergabe durch den `cmo` | Abnahmekriterien | Freigabe zur Integration beim `cto` (Skill `cto-integration`); die Abnahme einer Stufe (M0, M1 …) legt der `cmo` dem Aufsichtsrat vor |
 
 **Konvergenzkriterium („Review tatsächlich abgeschlossen"):** nicht Gefühl, sondern vier Bedingungen —
 1. alle deterministischen Lints grün (§7);
@@ -507,6 +539,10 @@ Befunde ab):
   maschinell).
 - Beispiel-Blöcke ausführbar und grün (Golden-Tests).
 - Preisstand-Einheitlichkeit je Bericht.
+- **Rechenkette** (Fortschreibung 7): `### 3.0 Rechenkette` am Anfang von Kapitel 3, Tabelle mit Wert und Quelle je
+  Ebene, fortlaufende Ebenen, letzte Ebene in €, höchstens zehn Ebenen oder die Begründungszeile, Beispiel-Block darunter.
+- **Zahlenformat** nach `kap3-stil`: Beträge ab einer Million als „Mio. €“/„Mrd. €“, Währung als `€`, Leerzeichen vor `%`.
+- **Kein Kapitel 9** (Ansatz-Vergleich): verworfene Ansätze stehen im Entscheidungslog.
 
 **CI-Tests aus dem Bericht:**
 - Mini-Rechenbeispiele → pytest (Bericht ⇄ Code können nicht divergieren).
@@ -514,14 +550,18 @@ Befunde ab):
 - Verteilungs-/Struktur-Validierung → Test mit vorab fixierter Toleranz.
 - Kalibrier-Pipeline als reproduzierbares Skript (Daten-Pins), nicht als Einmal-Lauf.
 
-**Claude-Code-Bausteine** (einmal bauen, dann je Risiko wiederverwenden):
-- `/neu-risiko <nn>`: instanziiert Template §4, zieht Knoten + Kanten + Konto automatisch aus den
-  Arbeitsmappen in Abschnitt 1, legt Register-Skelett mit einer Zeile je Knoten an
-  (Entscheidung „offen").
-- `/review-methodik <nn>`: führt Lints aus, arbeitet dann §5 ab, schreibt Befunde ins Ledger.
-- `/integriere-risiko <nn>`: extrahiert Parameter-Blöcke in die Registry, implementiert die
-  Schicht-B-Funktion gegen die Registry, generiert die Tests aus Beispielen und Sanity-Ankern,
-  legt Kartenebenen an.
+**Claude-Code-Bausteine** (Skills unter `.claude/skills/`, benannt nach der Rolle, die sie einsetzt, und dem Zweck):
+- `methodik_consultant-erstaufschlag <nn>` (früher `/neu-risiko`): instanziiert Template §4 mit der Rechenkette, zieht
+  Knoten + Kanten + Konto automatisch aus den Arbeitsmappen in Abschnitt 1, legt Register-Skelett mit einer Zeile je Knoten
+  an (Entscheidung „offen").
+- `methodik_manager-gegenpruefung <nn>` (früher `/review-methodik`): führt Lints aus, arbeitet dann §5 ab.
+- `methodik_manager-abnahme <nn>` (früher `/manager-review`): fachliche Abnahme nach der Null-Runde.
+- `methodik_consultant-export <nn>` (früher `/export-pdf`): PDF, Wirkungsmechanismus-HTML, Übersicht
+  `docs/methodik/README.md`.
+- `cto-integration <nn>` (früher `/integriere-risiko`): extrahiert Parameter-Blöcke in die Registry, implementiert die
+  Schicht-B-Funktion gegen die Registry, generiert die Tests aus Beispielen und Sanity-Ankern, legt Kartenebenen an.
+- `kap3-stil`: Schreibweise für alle Rollen.
+- Einzelsitzungs-Weg des Aufsichtsrats: `aufsichtsrat-risiko-auto`, `aufsichtsrat-risiko-fortsetzen`.
 - Wiederverwendbares **Evidenz-Register-Repository** (`docs/evidenz/register.md` oder CSV):
   risikoübergreifende Zeilen einmal pflegen, je Risiko referenzieren.
 
@@ -537,7 +577,8 @@ nächste Risiko — ab dann kostet ein Familien-Folgerisiko einen Bruchteil des 
 **Vorgabe P3 — Erklärbarkeit der Methodik.** Herkunft: **Anweisung des Aufsichtsrats A-0034 vom
 13.09.2026** (Firmen-Repo `firma`, `gedaechtnis/aufsichtsrat/regeln.jsonl`). Sie geht den
 Methodik-Regeln vor; ein Widerspruch zu einer bestehenden Regel oder einem abgenommenen Bericht
-wird als **bewusste Überstimmung im Befund-Ledger** geführt (`/risiko-fortsetzen <nr>`), nie still
+wird als **bewusste Überstimmung im Befund-Ledger** geführt (in der Rollenkette als neue Runde, im Einzelsitzungs-Weg
+`/aufsichtsrat-risiko-fortsetzen <nr>`), nie still
 im Code gelöst und nie als Grund, die Vorgabe nicht umzusetzen. (Aufgabe §2.7, §3.6, §3.9; Prüfung
 über Leitfrage 11 in §5.)
 
@@ -546,37 +587,40 @@ Sachbearbeiter einer Kommune: fachkundig in Sache und Verwaltung, aber ohne Stat
 er muss den Rechenweg und jede verwendete Formel ohne Statistiklehrbuch nachvollziehen und
 gegenüber Dritten vertreten können.
 
-**Prüfpunkte (E1–E4).** Jeder ist mit ja oder nein zu beantworten und benennt seine Fundstelle im
+**Prüfpunkte (E1–E5).** Jeder ist mit ja oder nein zu beantworten und benennt seine Fundstelle im
 Bericht; ein „nein" ist ein Befund nach §5 (Kategorie B, sofern nicht zugleich ein A-Kriterium
 verletzt ist).
 
-- **E1 — Rechenweg in Worten.** Beschreibt Abschnitt 3 (Modell) den Weg vom Eingang bis zum
-  Euro-Betrag in höchstens fünf Sätzen Fließtext ohne Formelzeichen? *Fundstelle: Bericht
-  Abschnitt 3, einleitender Absatz.*
+- **E1 — Rechenkette.** Beginnt Abschnitt 3 mit der durchgehenden Rechenkette von der amtlichen Quelle bis zum
+  Euro-Betrag (Format §4): je Ebene ein Rechenschritt in Worten, die Zahl für die Beispielkommune und die Quelle,
+  höchstens zehn Ebenen (mehr nur begründet), vom Beispiel-Block nachgerechnet — so, dass ein Sachbearbeiter sie in
+  einem Meeting erzählen kann, ohne dass ein Schritt fehlt? *Fundstelle: Bericht Abschnitt 3.0.*
 - **E2 — Rechenbeispiel mit Zahlen.** Trägt jede Hauptformel ein Beispiel mit eingesetzten Zahlen
   und allen Zwischenwerten (ausführbarer Beispiel-Block nach §4)? *Fundstelle: Beispiel-Blöcke in
   Bericht Abschnitt 3.*
-- **E3 — Verteilungsfunktionen und Formelsatz.** Wird eine **Verteilungsfunktion** (z. B.
-  Extremwert-, Log-Normal- oder Poisson-Annahme, Faltung, Integral, Quantilfunktion) oder eine
-  **Formel** verwendet, die der Adressat nach der Definition oben nicht nachvollziehen kann? Wenn
-  ja: steht an derselben Stelle genau eine der drei zulässigen Antworten — (a) eine **geschlossene
-  Näherung mit ausgewiesenem Fehler** gegenüber der exakten Form (Abweichung beziffert, Gültigkeits-
-  bereich genannt), (b) ein **Rechenbeispiel mit Zahlen**, das die Funktion an konkreten Werten
-  vorführt, oder (c) eine **Begründung, warum die komplexere Form unvermeidbar ist**, samt Angabe,
-  was eine Vereinfachung an Belastbarkeit kosten würde? Fehlt alle drei, ist das ein Befund.
-  *Fundstelle: Bericht Abschnitt 3 an der betreffenden Formel, ggf. Abschnitt 6 (Modellgrenzen).*
+- **E3 — So einfach wie möglich, so komplex wie nötig.** Wird eine **Verteilungsfunktion** (z. B.
+  Extremwert-, Log-Normal- oder Poisson-Annahme, Faltung, Integral, Quantilfunktion) oder eine **Formel**
+  verwendet, die der Adressat nach der Definition oben nicht nachvollziehen kann: steht an derselben Stelle,
+  **was die einfachere Rechnung an der Lage verfälschen würde** (Richtung und Größe der Verzerrung, beziffert),
+  und ein **Rechenbeispiel mit Zahlen**? Fehlt die Begründung, ist das ein Befund. Umgekehrt ist eine Vereinfachung
+  ein Befund, wenn sie die Lage falsch darstellt — die Richtung eines Effekts, die Rangfolge der Kommunen oder die
+  Größenordnung des Ergebnisses. Ein Nebeneinander einer einfachen und einer belastbaren Fassung ist ebenfalls ein
+  Befund. *Fundstelle: Bericht Abschnitt 3 an der betreffenden Formel, ggf. Abschnitt 6 (Modellgrenzen) und
+  Entscheidungslog.*
 - **E4 — Zeichen und Begriffe.** Hat jedes Formelzeichen in der Zeichentabelle eine Bedeutung in
   Klartext samt Einheit, und ist jeder statistische Fachbegriff bei erster Verwendung in einem Satz
   erklärt (z. B. Odds Ratio, Zentrierung, out-of-sample)? *Fundstelle: Zeichentabellen in Abschnitt
   3, Parameter-Blöcke in Abschnitt 7.*
+- **E5 — Einheitliche Schreibweise.** Folgen Zahlen, Beträge und Einheiten dem Stil-Skill `kap3-stil` (etwa
+  „1,2 Mio. €“, Leerzeichen vor `%`)? Maschinell geprüft (§7); im Review nur übernehmen. *Fundstelle: Lint-Ausgabe.*
 
-**Belastbarkeit hat Vorrang vor Bequemlichkeit.** Die Erklärbarkeit darf die Belastbarkeit des
-Ergebnisses nicht senken. Erklärbarkeit ist keine Erlaubnis, ungenau zu rechnen: eine
-Verteilungsannahme, ein Modifikator oder eine Kalibrierstufe wird nicht weggelassen, weil sie
-schwer zu erklären ist. **Geraten Erklärbarkeit und Belastbarkeit in Konflikt, wird beides im
-Bericht ausgewiesen** — die einfache und die belastbare Form, mit der Differenz im Ergebnis — und
-die getroffene Wahl wird begründet (Abschnitt 6, Modellgrenzen). **Still zu vereinfachen ist
-unzulässig** und im Review ein Befund, genauso wie eine unerklärt stehengelassene Formel.
+**Eine Methodik — so einfach wie möglich, so komplex wie nötig** (Fortschreibung 7, 24.09.2026). Am Ende steht je
+Risiko genau eine Methodik; ein Nebeneinander einer einfachen und einer belastbaren Fassung gibt es nicht, verworfene
+Varianten stehen mit je einem Satz im Entscheidungslog. Die Methodik darf nie so einfach werden, dass das Ergebnis die
+Lage falsch darstellt: Eine Verteilungsannahme, ein Modifikator oder eine Kalibrierstufe wird nicht weggelassen, weil sie
+schwer zu erklären ist. Wo es wirklich nicht einfach geht, wird die Methodik komplexer — und sagt an der Stelle, was die
+einfachere Rechnung verfälschen würde (E3). Die Rechenkette (E1) hält auch eine komplexe Methodik erzählbar. **Still zu
+vereinfachen ist unzulässig** und im Review ein Befund, genauso wie eine unerklärt stehengelassene Formel.
 
 ## Vorrang zwischen den UBA-Digitalisaten
 
@@ -648,7 +692,7 @@ Spalte F derselben Zeile). Die KWRA-2021-Mappe führt zusätzlich die Begrünung
 die Schadensbaum-Mappe bei #63 nicht nennt, sondern nur bei #62 (S095). *Ergebnis der Regel:* Es
 gelten die drei Sensitivitäten S092, S093 und S094 der Schadensbaum-Mappe. Die Begrünung von
 Gebäuden ist für #63 kein Eingangsknoten. Für #63 gibt es noch keinen Bericht und kein Ledger.
-Den Vermerk trägt der erste `/neu-risiko 63` in `reviews/BEFUNDE_63.md` ein.
+Den Vermerk trägt der erste Erstaufschlag zu #63 (Skill `methodik_consultant-erstaufschlag`) in `reviews/BEFUNDE_63.md` ein.
 
 ---
 

@@ -1,5 +1,6 @@
 ---
-description: Instanziiert das Methodik-Template für eine KWRA-Klimawirkung (§2/§4 der Aufgabe) — Knoten, Kanten und Konto automatisch aus den Arbeitsmappen
+name: methodik_consultant-erstaufschlag
+description: Erstaufschlag eines Methodik-Berichts durch den methodik_consultant — instanziiert das Template (§2/§4 der Aufgabe) mit Rechenkette, Knoten, Kanten und Konto automatisch aus den Arbeitsmappen (früher /neu-risiko)
 argument-hint: <risiko-nr>
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
@@ -12,8 +13,9 @@ Du legst den Erstaufschlag eines Methodik-Berichts an. Verbindliche Instruktions
 
 ## Rolle und Auftrag
 
-Ausführende Rolle ist der `methodik_consultant`; Auftraggeber ist der `methodik_manager`,
-der das Risiko zugeteilt hat. Die Liste der offenen menschlichen Entscheidungen aus dem Ergebnis geht an den `methodik_manager`, nicht an einen Nutzer.
+Ausführende Rolle ist der `methodik_consultant` (der Name dieses Skills sagt es: Rolle und Zweck); Auftraggeber ist der
+`methodik_manager`, der das Risiko zugeteilt hat. Die Liste der offenen Entscheidungen aus dem Ergebnis geht an den
+`methodik_manager`, nicht an einen Nutzer. Geschrieben wird nach dem Stil-Skill `kap3-stil` (Zahlen, Einheiten, Begriffe).
 Wer welchen Schritt verantwortet, steht im Abschnitt „Rollen im Loop“ in
 `.claude/methodik-loop.md`.
 
@@ -39,12 +41,12 @@ Wer welchen Schritt verantwortet, steht im Abschnitt „Rollen im Loop“ in
 
 4. **Familie bestimmen:** Prüfe `docs/methodik/` auf bestehende Berichte desselben Kontos /
    Mustertyps (z. B. K1-Gesundheit bottom-up; K3/K4-Ereignisschäden; K6-Ertrag; K8-Vorsorge).
-   Das Verzeichnis existiert ggf. noch nicht; der bestehende K1-Gesundheit-Prototyp M0
-   (#95/#96/#98) liegt als HTML unter `docs/render/METHODIK_M0_GESUNDHEIT.html`
-   (Gegenprüfung: `docs/METHODIK_M0_GESUNDHEIT_Gegenpruefung_Rev5.md`).
-   Gibt es einen abgenommenen Familien-Prototyp → dieses Risiko erbt dessen Struktur, der
-   Drei-Ansätze-Vergleich entfällt (§2.6). Gibt es keinen → Abschnitt 9 (Ansatz-Vergleich)
-   mit anlegen und das im Ergebnis deutlich sagen.
+   Der K1-Gesundheit-Prototyp M0 liegt als Markdown unter `docs/methodik/95_…`, `96_…`, `98_…`.
+   Gibt es einen abgenommenen Familien-Prototyp → dieses Risiko erbt dessen Struktur. Ein
+   Ansatz-Kapitel gibt es nicht (Aufgabe §2.6, Fortschreibung 7): Am Ende steht **eine** Methodik;
+   die Methodenwahl steht im Entscheidungslog, verworfene Ansätze mit je einem Satz Grund.
+   Gibt es keinen Prototyp, sagt das Ergebnis es deutlich — die Wahl wird dann ausführlicher
+   im Entscheidungslog begründet, nicht in einem eigenen Kapitel.
 
 5. **Bericht anlegen:** `docs/methodik/<nr>_<slug>.md` nach dem §4-Template, vorbefüllt:
    - **Kap. 1 Wirkungskette & Knoten-Bilanz:** eine Bilanz-Zeile je Knoten
@@ -56,8 +58,14 @@ Wer welchen Schritt verantwortet, steht im Abschnitt „Rollen im Loop“ in
      `<nr>-<Knoten>-01`, Entscheidung `offen`). Prüfe `docs/evidenz/register.md` auf
      wiederverwendbare Zeilen (Alter, Pflege, Isolation, Außenberufe …) und referenziere sie;
      existiert die Datei noch nicht, lege sie mit diesem Bericht an.
+   - **Kap. 3 beginnt mit `### 3.0 Rechenkette`** (Aufgabe §4, §8 E1): Tabelle
+     `| Ebene | Rechenschritt | Wert (Beispielkommune <Name>) | Quelle |` von der amtlichen Quelle
+     (etwa Zensus-Einwohner) bis zum Euro-Betrag, je Ebene „Zahl aus Quelle × Faktor = Ergebnis“,
+     höchstens zehn Ebenen (mehr nur mit `**Mehr als zehn Ebenen:** <Begründung>`), letzte Ebene der
+     Euro-Betrag; darunter ein Beispiel-Block ```` ```python test: rechenkette_<nr> ```` , der die Kette
+     nachrechnet. Solange Werte fehlen, steht die Kette mit `offen` in der Wertspalte da.
    - **Kap. 3–8:** leere Abschnitte mit den Pflichtinhalten als Kommentar
-     (inkl. Parameter-Block-Beispiel und Beispiel-Test-Block aus §4). Zwei
+     (inkl. Parameter-Block-Beispiel und Beispiel-Test-Block aus §4). Ein Kapitel 9 gibt es nicht. Zwei
      Pflichtregeln als Kommentar in Kap. 3 bzw. Kap. 4 vermerken:
      (a) **Datenebenen-Anlagepflicht (§3.1):** jede benötigte Zellgröße, die das
      Produkt nicht führt, wird als Ebene vollständig spezifiziert („neu anzulegen";
@@ -75,6 +83,6 @@ Wer welchen Schritt verantwortet, steht im Abschnitt „Rollen im Loop“ in
 ## Ergebnis
 
 Kurzer Abschlussbericht: angelegte Dateien, gefundene Knoten/Kanten/Konto (mit Quelle Sheet+Zeile),
-gewählte bzw. fehlende Familie — und eine Liste der **offenen menschlichen Entscheidungen**
-(Register-Entscheidungen, native Ergebnisgröße, ggf. Familien-Neugründung). Erfinde nichts:
-Was die Arbeitsmappen nicht hergeben, bleibt als `offen` markiert.
+gewählte bzw. fehlende Familie — und eine Liste der **offenen Entscheidungen** für den `methodik_manager`
+(Register-Entscheidungen, native Ergebnisgröße, Beispielkommune der Rechenkette, ggf. Familien-Neugründung).
+Erfinde nichts: Was die Arbeitsmappen nicht hergeben, bleibt als `offen` markiert.

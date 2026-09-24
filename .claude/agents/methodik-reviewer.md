@@ -1,6 +1,6 @@
 ---
 name: methodik-reviewer
-description: Unabhängige Gegenprüfung von Methodik-Berichten nach §5 der Aufgabe. Wird von /risiko-auto je Runde aufgerufen; auch direkt nutzbar („reviewe die Methodik von Risiko 96"). Erhält Risikonummer, Berichts- und Ledgerpfad vom Aufrufer.
+description: Unabhängige Gegenprüfung von Methodik-Berichten nach §5 der Aufgabe. Wird im Einzelsitzungs-Weg des Aufsichtsrats (/aufsichtsrat-risiko-auto, /aufsichtsrat-risiko-fortsetzen) je Runde aufgerufen — in der Rollenkette prüft stattdessen der methodik_manager in seinem Prüflauf; auch direkt nutzbar („reviewe die Methodik von Risiko 96"). Erhält Risikonummer, Berichts- und Ledgerpfad vom Aufrufer.
 tools: Read, Grep, Glob, Bash, Write, Edit, WebSearch, WebFetch
 ---
 
@@ -22,7 +22,8 @@ Berichts.
    Herleitungen stichprobenhaft nachrechnen (Python). Bekannte Fehlerklassen besonders:
    Kalibriermodell ≠ Produktionsmodell, Band-/Endpunkt-Zuordnung, unzentrierte Modifikatoren,
    Fall-Kontroll-OR als Maßnahmeneffekt, Kategorienfehler, Referenzwert-Doppelzählung,
-   Quellen-Synchronität, **Ressourcen-Regel-Verstoß** (§3.4: ein geplanter nationaler
+   Quellen-Synchronität, Erklärbarkeit nach §8 E1–E5 (Rechenkette am Anfang von Kapitel 3, genau eine Methodik,
+   Komplexität nur mit Begründung der Fehldarstellung), **Ressourcen-Regel-Verstoß** (§3.4: ein geplanter nationaler
    100-m-Vollraster-Lauf als Prüfstein/Abgleich = Befund), **fehlende
    Datenebenen-Spezifikation** (§3.1: benötigte Zellgröße ohne vollständige
    „neu anzulegen"-Ebene bzw. ohne „geparkt"-Kennzeichnung mit Watchlist = Befund)
@@ -53,7 +54,7 @@ sind und alle 14 Leitfragen ein Verdikt haben.
 
 ## Abgrenzung zum Manager-Review
 
-Diese Gegenprüfung nach §5 ist die formale Abnahme; der fachliche Review des Managers (`/manager-review <nr>`) läuft danach in einer eigenen Sitzung und ersetzt sie nicht.
+Diese Gegenprüfung nach §5 ist die formale Abnahme; die fachliche Abnahme des Managers (Skill `methodik_manager-abnahme`) läuft danach in einer eigenen Sitzung und ersetzt sie nicht.
 
 Beim `methodik_manager` liegt und ist hier **nicht** zu prüfen:
 

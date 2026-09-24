@@ -1,7 +1,8 @@
 # Gemeinsamer Methodik-Loop (L1–L7)
 
-Verbindlich für `/risiko-auto` (Erstdurchlauf) und `/risiko-fortsetzen` (Wiedereinstieg).
-Beide Commands unterscheiden sich **nur** im Einstieg; ab L1 laufen sie identisch.
+Verbindlich für die Rollenkette der Firma (Methodik-Manager und Methodik-Consultant, siehe „Rollen im Loop") und für den
+Einzelsitzungs-Weg des Aufsichtsrats: `/aufsichtsrat-risiko-auto` (Erstdurchlauf) und `/aufsichtsrat-risiko-fortsetzen`
+(Wiedereinstieg). Die beiden Skills unterscheiden sich **nur** im Einstieg; ab L1 laufen sie identisch.
 Maßstab bleibt `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md`.
 
 ## Grundregel — keine Fragen
@@ -11,7 +12,8 @@ Eingabe** — auch nicht bei Weggabelungen, die Modellstruktur, Kalibrierung ode
 Datenbeschaffung betreffen. Jede Weggabelung wird nach W1–W6 entschieden, angewendet und im
 **Entscheidungslog** des Berichts dokumentiert (Nr · Frage · angewendete Entscheidung ·
 Begründung · Alternative · Auswirkung aufs Ergebnis). Der Nutzer überstimmt nachträglich —
-das löst einen Delta-Lauf über `/risiko-fortsetzen` aus (§2.8 Gate 1). Fehlende Daten oder
+das löst einen Delta-Lauf aus (in der Rollenkette eine neue Runde beim Consultant, im
+Einzelsitzungs-Weg `/aufsichtsrat-risiko-fortsetzen`; §2.8 Gate 1). Fehlende Daten oder
 Zugriffe sind kein Haltegrund: nach §3.1/§3.9 als Ebene „geparkt", als Annahme oder als
 bezifferte Näherung dokumentieren und weiterarbeiten — nichts stumm überspringen, nichts
 blockieren.
@@ -55,29 +57,29 @@ angewendete Regel wird im Entscheidungslog mit ihrer Nummer zitiert.
 
 ## Rollen im Loop — wer welchen Schritt verantwortet
 
-Die Schrittnummern L1–L7 bleiben unverändert; diese Landkarte sagt nur, **wer** sie ausführt.
-`/risiko-auto` und `/risiko-fortsetzen` erben sie über ihren Verweis auf diese Datei.
+Aufsichtsrat, 24.09.2026: Die Methodik entsteht in der Rollenkette — der **CEO** gibt sie an den **`cmo`**, der sie über
+alle Berichte führt; je Risiko plant der **`methodik_manager`** und prüft, der **`methodik_consultant`** arbeitet aus;
+integriert wird beim **`cto`**. Die Schrittnummern L1–L7 bleiben; diese Landkarte sagt, **wer** sie ausführt.
 
 | Schritt | Rolle | Sitzung |
 | --- | --- | --- |
-| L1 · Revision | `methodik_consultant` | Autor-Sitzung des Consultant (dieselbe Sitzung wie der Lauf) |
-| L2 · Code-Nachzug | `methodik_consultant` | Autor-Sitzung des Consultant |
-| L3 · Lints und Tests | `methodik_consultant` | Autor-Sitzung des Consultant |
-| L4 · Unabhängiger Review | `methodik_consultant` | beauftragt den Subagenten `methodik-reviewer` in frischem Kontext; dieser führt die §5-Gegenprüfung durch |
-| L5 · Loop-Steuerung | `methodik_consultant` | Autor-Sitzung des Consultant |
-| L6 · Export | `methodik_consultant` | Autor-Sitzung des Consultant |
-| L7 · Statusbericht | `methodik_consultant` | Consultant schreibt ihn; gelesen und bewertet wird er vom `methodik_manager` in einer eigenen Sitzung |
+| Erstaufschlag | `methodik_consultant` | ein Lauf (Skill `methodik_consultant-erstaufschlag`), Paket des Managers |
+| L1 · Revision | `methodik_consultant` | **eine Runde = ein Lauf** des Consultant; er trägt zuerst die Befunde aus dem Urteil des Managers unverändert ins Ledger ein und arbeitet sie dann ab |
+| L2 · Code-Nachzug | `cto` | kein Schritt des Loops mehr: ist das Risiko integriert, geht der Nachzug nach der Abnahme als Integrationsauftrag an den CTO (Skill `cto-integration`) |
+| L3 · Lints und Tests | `methodik_consultant` | im selben Lauf wie L1 |
+| L4 · Unabhängiger Review | `methodik_manager` | **Prüflauf des Managers in frischer Sitzung** (der Motor startet ihn, wenn das Paket fertig ist; Skill `methodik_manager-gegenpruefung`). Der Prüflauf schreibt nicht: die Befunde stehen nummeriert in seinem Urteil, `nacharbeit` bei neuen A-/B-Befunden, `freigabe` bei einer Null-Runde |
+| L5 · Loop-Steuerung | `methodik_manager` | plant die nächste Runde als Nachtrag an das Paket, bis eine Runde ohne Befund durchgeht; nach zehn Runden ohne Null-Runde meldet er es dem `cmo` |
+| L6 · Export | `methodik_consultant` | ein Lauf nach der Null-Runde (Skill `methodik_consultant-export`) |
+| L7 · Statusbericht und Abnahme | `methodik_manager` | fachliche Abnahme in eigener Sitzung (Skill `methodik_manager-abnahme`, Zeile `MANAGER-REVIEW: ABGENOMMEN`); dann übergibt der `cmo` an den `cto` |
 
-Der Manager-Review ist der Gegenprüfung nach §5 nachgelagert und ersetzt sie nicht.
-Nach L7 läuft `/manager-review <nr>` in einer eigenen Sitzung; ohne dessen Zeile `MANAGER-REVIEW: ABGENOMMEN` gilt ein Bericht der Rollenkette nicht als abgenommen.
-Nacharbeitspunkte des Managers gehen als Anlass in `/risiko-fortsetzen <nr>`, nie direkt ins Ledger.
+Der `cmo` führt die Methodik über alle Berichte: Er sorgt dafür, dass seine Rollen die Methodik vollständig erstellen,
+hält sie berichtsübergreifend konsistent und für Beratungshäuser und Kommunen verständlich (Rechenkette, eine Methodik je
+Risiko, Aufgabe §8) und legt dem Aufsichtsrat die Abnahme einer Stufe (M0, M1 …) vor. Es gibt keinen Altbestand mehr,
+für den dieser Ablauf nicht gilt: Alle Methodiken werden ab M0 neu angefasst.
 
-Der `cmo` zieht keinen Loop-Schritt an sich: Er verantwortet berichtsübergreifend, dass die
-Methodik insgesamt konsistent, widerspruchsfrei und für Beratungshäuser und Kommunen verständlich
-ist, und wird erst nach der Abnahme durch den `methodik_manager` tätig — in einer eigenen,
-berichtsübergreifenden Sitzung.
-
-Für Berichte ohne Auftragsvermerk der Rollenkette — der Altbestand einschließlich Risiko 60 — ändert sich am Ablauf nichts (F-0038).
+**Einzelsitzungs-Weg des Aufsichtsrats** (`/aufsichtsrat-risiko-auto`, `/aufsichtsrat-risiko-fortsetzen`): dieselben
+Schritte in einer Sitzung; L4 beauftragt den Subagenten `methodik-reviewer` in frischem Kontext, L2 läuft in derselben
+Sitzung, wenn das Risiko integriert ist.
 
 ## L1 · Revision (Bericht ist die Quelle)
 
@@ -90,13 +92,14 @@ läuft über die Befundnummer, nie über die Zeilenposition. Ändert sich ein Mo
 ziehen Zeichentabelle, Parameter-Blöcke (Kap. 7), Beispiel-Blöcke, Kap.-4-Sanity-Bänder und
 das Entscheidungslog **in derselben Revision** mit.
 
-*Im Erstdurchlauf ist L1 in der ersten Iteration leer — es gibt noch keine Befunde.*
+*Im Erstdurchlauf ist L1 in der ersten Iteration leer — es gibt noch keine Befunde.* Geschrieben wird nach dem
+Stil-Skill `kap3-stil` (Zahlen, Einheiten, Begriffe); Kapitel 3 beginnt mit der Rechenkette (Aufgabe §4, §8 E1).
 
 ## L2 · Code-Nachzug (Eiserne Regel 5)
 
 **Nur wenn das Risiko bereits ganz oder teilweise integriert ist** — im Erstdurchlauf vor der
-Integration entfällt der Schritt, in jedem Delta-/Wiedereinstiegslauf greift er. Der Bericht
-führt, der Code folgt, nie umgekehrt:
+Integration entfällt der Schritt. In der Rollenkette ist er Sache des `cto` (Integrationsauftrag nach der Abnahme),
+im Einzelsitzungs-Weg des Aufsichtsrats läuft er in derselben Sitzung. Der Bericht führt, der Code folgt, nie umgekehrt:
 
 - Registry-Parameter auf die neuen Werte (Herleitungswerte, nicht gerundete Anzeigen).
 - Schicht-B-Funktion an geänderte Formeln, Wirkungsorte und Bandzuordnungen anpassen.
@@ -124,7 +127,8 @@ selbst mit.
 
 ## L4 · Unabhängiger Review
 
-Delegiere an den Subagenten **methodik-reviewer** (frischer Kontext = unabhängige Prüfung).
+**Rollenkette:** der Prüflauf des `methodik_manager` (siehe oben). **Einzelsitzungs-Weg:** delegiere an den Subagenten
+**methodik-reviewer** (frischer Kontext = unabhängige Prüfung).
 Übergib: Risikonummer, Berichtspfad, Ledgerpfad, Rundennummer, höchste bereits vergebene
 Befundnummer — und ausdrücklich den **Prüfumfang**:
 
@@ -141,20 +145,22 @@ Warte auf die Verdikt-Zeile.
 
 ## L5 · Loop
 
-Zurück zu L1. **Maximal 4 Review-Runden.** Meldet der Reviewer eine Null-Runde (keine neuen
-A-/B-Befunde) → L6. Nach 4 Runden ohne Null-Runde → L6 trotzdem ausführen (der Nutzer soll
-auch einen unfertigen Stand lesen können), Restpunkte in den Statusbericht.
+Zurück zu L1. Meldet der Review eine Null-Runde (keine neuen A-/B-Befunde) → L6. **Rollenkette:** Runden bis zur
+Null-Runde; nach zehn Runden ohne Null-Runde meldet der Manager es dem `cmo`. **Einzelsitzungs-Weg:** maximal 4
+Review-Runden, danach L6 trotzdem ausführen (der Aufsichtsrat soll auch einen unfertigen Stand lesen können), Restpunkte
+in den Statusbericht.
 
 ## L6 · Export (PDF **und** HTML)
 
 `scripts/export_methodik_pdf.sh <nr>` erzeugt beides: das Lese-PDF neben der Markdown-Quelle
 **und** die Wirkungsmechanismus-Vorschau `docs/methodik/<slug>_wirkungsmechanismus.html`.
-Fehlerbehandlung und Layout-Regeln wie in `.claude/commands/export-pdf.md` — die
+Fehlerbehandlung und Layout-Regeln wie im Skill `methodik_consultant-export` — die
 Markdown-Quelle bleibt unangetastet, Darstellungs-Fixes nur in `scripts/methodik_report.css`
 oder einer Scratchpad-Kopie. **Hat der Lauf das Modell geändert, den Graph-Builder in
 `scripts/wirkungsmechanismus_preview.py` mitziehen**, sonst zeigt die Vorschau ein veraltetes
 Ziel-Modell. Nach dem Export eine Stichprobe rendern (`pdftoppm -png -r 60`) und auf Überläufe
-sichten, bevor Vollzug gemeldet wird. Beide Pfade melden.
+sichten, bevor Vollzug gemeldet wird. Beide Pfade melden. Danach die Übersicht erneuern:
+`python3 backend/scripts/methodik_uebersicht.py` (schreibt `docs/methodik/README.md`).
 
 ## L7 · Statusbericht (das Einzige, was der Nutzer liest — kompakt halten)
 
@@ -167,8 +173,8 @@ sichten, bevor Vollzug gemeldet wird. Beide Pfade melden.
    Zeile: was entschieden, warum, was die Alternative gewesen wäre.
 5. **Kernzahlen:** Bundessumme vs. Sanity-Band, Validierungsergebnis, Testlage (n grün / n rot),
    Review-Runden und Befundzahlen, Code-Nachzug ja/nein.
-6. **Nächste Schritte:** „Integrieren bzw. Integration fortsetzen: `/integriere-risiko <nr>`.
+6. **Nächste Schritte:** „Integrieren bzw. Integration fortsetzen: Auftrag an den `cto` (Skill `cto-integration`).
    Überstimmen: ‚Entscheidung Nr. X ändern auf …' — dann rechne ich die betroffenen Teile neu,
-   lasse erneut reviewen und exportiere PDF und HTML neu (`/risiko-fortsetzen <nr>`)."
+   lasse erneut reviewen und exportiere PDF und HTML neu (`/aufsichtsrat-risiko-fortsetzen <nr>`)."
 
 Keine Frage am Ende, kein offener Punkt ohne Empfehlung.

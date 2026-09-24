@@ -532,7 +532,7 @@ def build_payload(nr: str) -> dict:
         g, p = _graph_95_plan()
         tabs = [{
             "label": "Ziel-Modell (Bericht Rev. 7): YLL & €",
-            "note": "So wird #95 nach /integriere-risiko 95 im Produkt gerechnet und "
+            "note": "So wird #95 nach der Integration (cto-integration 95) im Produkt gerechnet und "
                     "dargestellt (YLL × VOLY, empirische Wochenquantile, ein nationaler "
                     "Skalar c_kal 0,581 auf bevölkerungsgewichteter Kalibrierbasis, "
                     "β_Süd nachgeschätzt 0,0876, neue Altersketten).",
@@ -603,7 +603,7 @@ def build_payload(nr: str) -> dict:
             "subtitle": "Geplantes Schicht-B-Modell laut Methodik-Bericht "
                         "(docs/methodik/98_uv_schaedigungen.md).",
             "banner": "Vorschau des geplanten Modells — noch nicht integriert. "
-                      "Nach /integriere-risiko 98 erzeugt das Produkt dieses Diagramm "
+                      "Nach der Integration (cto-integration 98) erzeugt das Produkt dieses Diagramm "
                       "aus der Registry; Abweichungen wären ein Befund.",
             "generated": today,
             "tabs": [{"label": "YLL, Zusatzfälle & € (K1 UV)", "lineage": g,

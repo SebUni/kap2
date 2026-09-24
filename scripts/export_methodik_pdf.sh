@@ -59,3 +59,7 @@ PREVIEW_PY="$ROOT/.venv/bin/python"
 [[ -x "$PREVIEW_PY" ]] || PREVIEW_PY="python3"
 "$PREVIEW_PY" "$ROOT/scripts/wirkungsmechanismus_preview.py" "$NR" || \
   echo "WARNUNG: Wirkungsmechanismus-Vorschau fehlgeschlagen (PDF ist unabhängig davon erzeugt)." >&2
+
+# Übersicht aller Berichte (Stand, offene Befunde, PDF/HTML) neu erzeugen — docs/methodik/README.md
+python3 "$ROOT/backend/scripts/methodik_uebersicht.py" || \
+  echo "WARNUNG: Übersicht docs/methodik/README.md nicht erneuert." >&2

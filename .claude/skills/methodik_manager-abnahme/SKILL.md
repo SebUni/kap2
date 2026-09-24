@@ -1,5 +1,6 @@
 ---
-description: Manager-Review eines abgenommenen Methodik-Berichts (Rolle methodik_manager) — nachgelagerte Abnahme nach der Null-Runde des Loops. Liest nur, schreibt nichts; Nacharbeit geht über /risiko-fortsetzen an den Consultant.
+name: methodik_manager-abnahme
+description: Fachliche Abnahme eines Methodik-Berichts durch den methodik_manager nach der Null-Runde. Liest nur, schreibt nichts; Nacharbeit geht als neue Runde an den methodik_consultant (früher /manager-review).
 argument-hint: <risiko-nr>
 allowed-tools: Read, Grep, Glob, Bash
 ---
@@ -8,8 +9,8 @@ Risiko-Nummer: $ARGUMENTS
 
 Du bist der **`methodik_manager`** für dieses Risiko. Du hast die Wirkungskette vorab festgelegt
 und die Ausarbeitung an den **`methodik_consultant`** delegiert; jetzt prüfst du dessen Ergebnis
-ab (A-0032). Maßstab sind @docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md (§3, §5, §6), die Vorgaben
-des Aufsichtsrats aus @CLAUDE.md (P1, P2) und die Anweisung A-0034 zur Erklärbarkeit.
+ab (A-0032). Maßstab sind @docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md (§3, §5, §6, §8), die Vorgaben
+des Aufsichtsrats aus @CLAUDE.md (P1, P2, P3).
 
 Dieser Lauf ist **lesend**: keine schreibenden Werkzeuge, keine Änderung an Bericht, Ledger
 oder Code.
@@ -19,10 +20,8 @@ oder Code.
 Der Manager-Review läuft in einer eigenen Sitzung, nachdem der Loop aus `.claude/methodik-loop.md` mit einer Null-Runde geendet hat; er ersetzt die Gegenprüfung nach §5 nicht.
 
 Der Loop selbst wird hier nicht wiederholt — Ablauf, Grundregel und die Entscheidungsregeln
-W1–W6 stehen in @.claude/methodik-loop.md, die Gegenprüfung in
-@.claude/commands/review-methodik.md.
-
-Für Berichte ohne Auftragsvermerk der Rollenkette — der Altbestand einschließlich Risiko 60 — wird dieser Review nicht verlangt (F-0038).
+W1–W7 stehen in @.claude/methodik-loop.md, die Gegenprüfung im Skill `methodik_manager-gegenpruefung`.
+Die Abnahme gilt für jeden Bericht — alle Methodiken werden ab M0 neu angefasst, einen Altbestand ohne Abnahme gibt es nicht.
 
 ## Prüfgrundlagen
 
@@ -41,10 +40,11 @@ Zeile der Arbeitsmappe, Parameter-ID). Ein „nein“ ist ein Nacharbeitspunkt.
    Knoten-Bilanz mit den beiden Arbeitsmappen unter `docs/Schadensbaum/` überein — jeder Knoten
    des Risikos vorhanden, jede behauptete Kante in der Netzwerkliste, Konto/Ebene/Bausteine wie
    in der Monetarisierungs-Zeile — und entspricht sie der vorab festgelegten Kette? (ja/nein)
-2. **Erklärbarkeit (A-0034):** Kann ein Berater eines Beratungshauses oder ein Sachbearbeiter
-   einer Kommune Rechenweg und Ergebnis ohne Spezialwissen nachvollziehen — lesbare Formeln,
-   keine unnötig komplexen Verteilungsfunktionen, benannte Größen — ohne dass die Abschätzung
-   ihre Belastbarkeit verliert? (ja/nein)
+2. **Erklärbarkeit (P3):** Beginnt Kapitel 3 mit der Rechenkette von der amtlichen Quelle bis zum Euro-Betrag —
+   höchstens zehn Ebenen, je Ebene Zahl für die Beispielkommune und Quelle —, und kann ein Berater eines
+   Beratungshauses oder ein Sachbearbeiter einer Kommune sie in einem Meeting erzählen? Gibt es **genau eine**
+   Methodik, nie so einfach, dass sie die Lage falsch darstellt, und steht an jeder komplexeren Stelle, was die
+   einfachere Rechnung verfälschen würde? (ja/nein)
 3. **Parameterliste (P1):** Trägt **jeder** Parameter — Default, Kostensatz, Wirkungsfaktor —
    nutzersichtbar entweder eine Quelle oder den ausgewiesenen Vermerk, dass es eine begründete
    Abschätzung von KAP3 ist, samt Herleitung (ein Code-Kommentar genügt nicht)? (ja/nein)
@@ -65,7 +65,10 @@ jeweils in der Form:
 Stelle · Art · Begründung · Vorschlag
 ```
 
-Nacharbeitspunkte gehen als Anlass in `/risiko-fortsetzen <nr> <Anlass>` an den Consultant, nie direkt ins Ledger. Dort trägt Schritt B den Anlass als Befund ein (W5); Adressat der Nacharbeit ist der **`methodik_consultant`**.
+Nacharbeitspunkte gehen als **neue Runde an den `methodik_consultant`** (Nachtrag des Managers an das Paket), nie direkt
+ins Ledger; der Consultant trägt sie als Befunde ein (W5). Im Einzelsitzungs-Weg des Aufsichtsrats:
+`/aufsichtsrat-risiko-fortsetzen <nr> <Anlass>`. Nach `ABGENOMMEN` meldet der Manager es dem `cmo`, der an den `cto`
+übergibt (Skill `cto-integration`).
 
 Die Antwort endet mit **genau einer** dieser beiden Zeilen:
 

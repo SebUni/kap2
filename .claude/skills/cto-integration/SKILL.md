@@ -1,5 +1,6 @@
 ---
-description: Überführt eine abgenommene Methodik in die Plattform — Registry-Parameter, Schicht-B-Funktion, Tests aus Beispielen und Sanity-Ankern, Kartenebenen
+name: cto-integration
+description: Der cto überführt eine abgenommene Methodik in die Plattform — Registry-Parameter, Schicht-B-Funktion, Tests aus Beispielen und Sanity-Ankern, Kartenebenen (früher /integriere-risiko)
 argument-hint: <risiko-nr>
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
@@ -8,23 +9,21 @@ Risiko-Nummer: $ARGUMENTS
 
 Du integrierst eine **abgenommene** Methodik in die Plattform. Grundlage:
 `docs/methodik/<nr>_*.md` + @docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md (§4, §7).
-Sonderfall M0 (Altbestand): Bericht ist `docs/render/METHODIK_M0_GESUNDHEIT.html`.
 
 ## Rolle und Auftrag
 
-Ausführende Rolle ist der `methodik_consultant`, der den Bericht in die Plattform überführt.
-Wer welchen Schritt verantwortet, steht im Abschnitt „Rollen im Loop“ in
-`.claude/methodik-loop.md`.
+Ausführende Rolle ist der **`cto`** (Aufsichtsrat, 24.09.2026: die Methodik entsteht beim CMO und seinen Rollen, die
+Integration übernimmt der CTO). Den Auftrag gibt der `cmo` nach der Abnahme des Managers weiter. Wer welchen Schritt
+verantwortet, steht im Abschnitt „Rollen im Loop“ in `.claude/methodik-loop.md`.
 
 ## 0 · Vorbedingung: Abnahme
 
-Lies `reviews/BEFUNDE_<nr>.md` (für M0: `docs/METHODIK_M0_GESUNDHEIT_Gegenpruefung_Rev5.md`).
-Sind offene A-Befunde vorhanden oder fehlt das dokumentierte
-Konvergenz-Verdikt (Null-Runde): **abbrechen** und die Blocker auflisten. Keine Integration
-vor der Abnahme. Wiedereinstieg in den Loop: `/risiko-fortsetzen <nr> <Blocker in einem Satz>`
-— arbeitet die Blocker ohne Rückfragen ab und exportiert PDF und HTML neu.
-Stammt der Bericht aus einem Auftrag der Rollenkette, muss zusätzlich der Manager-Review vorliegen (Zeile `MANAGER-REVIEW: ABGENOMMEN` aus `/manager-review <nr>`); fehlt er, abbrechen und ihn anfordern.
-Für Berichte ohne Auftragsvermerk der Rollenkette — der Altbestand einschließlich Risiko 60 — gilt diese Zusatzbedingung nicht (F-0038).
+Lies `reviews/BEFUNDE_<nr>.md`. Sind offene A-Befunde vorhanden, fehlt das dokumentierte
+Konvergenz-Verdikt (Null-Runde) oder fehlt die fachliche Abnahme des Managers (Zeile
+`MANAGER-REVIEW: ABGENOMMEN`, Skill `methodik_manager-abnahme`): **abbrechen** und die Blocker auflisten —
+in der Rollenkette als `blockiert` an den Auftraggeber (`cmo`), im Einzelsitzungs-Weg des Aufsichtsrats über
+`/aufsichtsrat-risiko-fortsetzen <nr> <Blocker in einem Satz>`. Keine Integration vor der Abnahme; das gilt für jeden
+Bericht, einen Altbestand ohne Abnahme gibt es nicht.
 
 ## 1 · Muster der Codebasis lernen (nichts neu erfinden)
 
@@ -73,7 +72,6 @@ Befund ins Ledger (Kategorie A, „Integration blockiert durch …") und melden;
 die Wahrheit, bis ein Review sie ändert. Abschlussbericht: angelegte Parameter, Funktionen,
 Ebenen, Tests (grün/rot), offene Punkte.
 
-Bleibt dabei ein methodischer Punkt offen — Divergenz, Unklarheit, Fehler im Bericht —, ist der
-nächste Schritt `/risiko-fortsetzen <nr> <Anlass in einem Satz>`: derselbe Review-/Revisions-Loop
-ab dem Ist-Stand, ohne Nutzer-Input, mit Code-Nachzug und neuem PDF-/HTML-Export. Danach
-`/integriere-risiko <nr>` erneut.
+Bleibt dabei ein methodischer Punkt offen — Divergenz, Unklarheit, Fehler im Bericht —, geht er als Befund an den
+`cmo` zurück (neue Runde bei Manager und Consultant; im Einzelsitzungs-Weg `/aufsichtsrat-risiko-fortsetzen <nr>
+<Anlass>`). Danach wird erneut integriert.

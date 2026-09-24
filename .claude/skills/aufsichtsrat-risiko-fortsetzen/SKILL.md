@@ -1,13 +1,15 @@
 ---
-description: Wiedereinstieg in den Methodik-Loop ohne Nutzer-Input — wenn bei der Integration, im Betrieb oder durch eine Überstimmung methodische Unklarheiten, offene Punkte oder Fehler auftauchen. Triage, Revision, Code-Nachzug, Review-Loop bis Null-Runde, PDF-/HTML-Export, Statusbericht.
+name: aufsichtsrat-risiko-fortsetzen
+description: Einzelsitzungs-Weg des Aufsichtsrats — Wiedereinstieg in den Methodik-Loop ohne Nutzer-Input — wenn bei der Integration, im Betrieb oder durch eine Überstimmung methodische Unklarheiten, offene Punkte oder Fehler auftauchen. Triage, Revision, Code-Nachzug, Review-Loop bis Null-Runde, PDF-/HTML-Export, Statusbericht.
 argument-hint: <risiko-nr> [Anlass in einem Satz]
 ---
 
 Risiko-Nummer und Anlass: $ARGUMENTS
 
 Dieser Command ist der **Wiedereinstieg**: Bericht, Ledger und in der Regel schon Code
-existieren. Er unterscheidet sich von `/risiko-auto` nur darin, dass der Einstiegspunkt aus
-dem Ist-Stand bestimmt wird statt aus einem Erstaufschlag.
+existieren. Er unterscheidet sich von `/aufsichtsrat-risiko-auto` nur darin, dass der Einstiegspunkt aus
+dem Ist-Stand bestimmt wird statt aus einem Erstaufschlag (früher `/risiko-fortsetzen`). In der Firma läuft derselbe
+Weg verteilt über die Rollenkette (`.claude/methodik-loop.md`, „Rollen im Loop“).
 
 **Grundregel, Entscheidungsregeln W1–W6 und der gesamte Ablauf ab der Revision stehen in
 @.claude/methodik-loop.md** — diese Datei ist verbindlich und wird hier nicht wiederholt.

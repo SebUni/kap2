@@ -19,6 +19,11 @@ Geprüft wird (Aufgabe §7):
 7. **Revisionsrückstände**: Werte, die der Bericht selbst als abgelöst ausweist
    („bis Rev. N", „statt", Korrekturhistorie), dürfen außerhalb von Historie- und
    Log-Abschnitten nicht mehr als *geltende* Werte vorkommen.
+8. **Rechenkette** (Aufgabe §4, §8 E1; Fortschreibung 7 vom 24.09.2026): `### 3.0 Rechenkette`
+   am Anfang von Kapitel 3, Tabelle mit Wert und Quelle je Ebene, letzte Ebene in €,
+   höchstens zehn Ebenen oder die Begründungszeile, Beispiel-Block darunter.
+9. **Zahlenformat** nach dem Stil-Skill `kap3-stil` (§8 E5) und **kein Kapitel 9**
+   (Ansatz-Vergleich entfällt — eine Methodik je Risiko).
 
 Aufruf:
     python backend/scripts/lint_methodik.py 98          # ein Risiko
@@ -264,21 +269,18 @@ PFLICHTKAPITEL_MIN_ZEICHEN = 500
 
 
 def pflichtkapitel_gefuellt(src: str, lint: Lint) -> None:
-    """Kapitel 1–9 des §4-Templates auf tatsaechliche Substanz pruefen.
+    """Kapitel 1–8 des §4-Templates auf tatsaechliche Substanz pruefen.
 
     Gezaehlt wird je Kapitel die Zahl der Zeichen AUSSERHALB von HTML-Kommentaren
     (`<!-- ... -->`) und ausserhalb der Kapitelueberschrift selbst — reiner
     Kommentartext (etwa ein abgeloester Entwurf) traegt damit kein Kapitel.
     Kapitel unter der Schwelle gelten als leer und erzeugen einen roten Check mit
-    Kapitelnummer, Kapitelname und gezaehlter Zeichenzahl; Kapitel 9 ist nach §4
-    nur beim ersten Vertreter einer Methodik-Familie Pflicht und wird uebersprungen,
-    wenn es im Bericht fehlt.
+    Kapitelnummer, Kapitelname und gezaehlter Zeichenzahl. Kapitel 9 (Ansatz-Vergleich)
+    gibt es seit der Fortschreibung 7 nicht mehr — das prueft `ansatzkapitel_entfaellt()`.
     """
-    for n in range(1, 10):
+    for n in range(1, 9):
         m = re.search(rf"^## {n} (.+?)\n(.*?)(?=^## \d+ |\Z)", src, re.S | re.M)
         if not m:
-            if n == 9:
-                continue  # §4: Kapitel 9 nur beim ersten Familien-Vertreter Pflicht.
             lint.fehler.append(f"Pflichtkapitel {n}: Überschrift nicht gefunden")
             continue
         name = m.group(1).strip()
@@ -289,6 +291,104 @@ def pflichtkapitel_gefuellt(src: str, lint: Lint) -> None:
             f"Pflichtkapitel {n} ({name}) gefüllt",
             f"{substanz} Zeichen Substanz außerhalb von HTML-Kommentaren — "
             f"unter der Schwelle von {PFLICHTKAPITEL_MIN_ZEICHEN}")
+
+
+# Rechenkette (Aufsichtsrat, 24.09.2026): der erzählbare Weg von der amtlichen Quelle bis zum Euro-Betrag.
+RECHENKETTE_MAX_EBENEN = 10
+RECHENKETTE_SPALTEN = ("ebene", "rechenschritt", "wert", "quelle")
+_LEER = {"", "-", "—", "–", "?", "offen"}
+
+
+def rechenkette(src: str, lint: Lint) -> None:
+    """Abschnitt `### 3.0 Rechenkette` am Anfang von Kapitel 3 (Aufgabe §4, §8 E1)."""
+    kap3 = re.search(r"^## 3 .*?\n(.*?)(?=^## \d+ |^## Entscheidungslog|\Z)", src, re.S | re.M)
+    if not kap3:
+        lint.fehler.append("Rechenkette: Kapitel 3 nicht gefunden")
+        return
+    rumpf = kap3.group(1)
+    m = re.search(r"^### [^\n]*Rechenkette[^\n]*\n(.*?)(?=^### |\Z)", rumpf, re.S | re.M)
+    if not m:
+        lint.fehler.append("Rechenkette: Abschnitt „### 3.0 Rechenkette“ fehlt in Kapitel 3 (Aufgabe §4, §8 E1)")
+        return
+    erster = re.search(r"^### ", rumpf, re.M)
+    lint.pruefe(erster is not None and erster.start() == m.start(), "Rechenkette steht am Anfang von Kapitel 3",
+                "vor der Rechenkette steht schon ein anderer Abschnitt — sie gehört vor alle Formeln")
+    teil = m.group(1)
+    zeilen = [z for z in teil.split("\n") if z.strip().startswith("|")]
+    if len(zeilen) < 3:
+        lint.fehler.append("Rechenkette: keine Tabelle (| Ebene | Rechenschritt | Wert (Beispielkommune …) | Quelle |)")
+        return
+    kopf = [c.strip().lower() for c in zeilen[0].strip().strip("|").split("|")]
+    lint.pruefe(len(kopf) == 4 and all(k.startswith(s_) for k, s_ in zip(kopf, RECHENKETTE_SPALTEN)),
+                "Rechenkette: Spalten Ebene · Rechenschritt · Wert · Quelle", f"Kopf ist {kopf}")
+    lint.pruefe(len(kopf) > 2 and "(" in kopf[2], "Rechenkette nennt die Beispielkommune",
+                "Kopf der Wertspalte ohne „(Beispielkommune …)“")
+    ebenen = []
+    letzter_wert = ""
+    for z in zeilen[2:]:
+        zellen = [c.strip() for c in z.strip().strip("|").split("|")]
+        if len(zellen) != 4:
+            lint.fehler.append(f"Rechenkette: Zeile nicht vierspaltig: {z.strip()[:60]}")
+            continue
+        nr, schritt, wert, quelle = zellen
+        ebenen.append(nr)
+        lint.pruefe(bool(schritt) and schritt not in _LEER, f"Rechenkette Ebene {nr}: Rechenschritt", "leer")
+        lint.pruefe(wert not in _LEER, f"Rechenkette Ebene {nr}: Wert", "ohne Zahl für die Beispielkommune")
+        lint.pruefe(quelle not in _LEER, f"Rechenkette Ebene {nr}: Quelle", "ohne Quelle")
+        letzter_wert = wert
+    lint.pruefe(ebenen == [str(i) for i in range(1, len(ebenen) + 1)], "Rechenkette: Ebenen fortlaufend ab 1",
+                f"Ebenen {ebenen}")
+    lint.pruefe("€" in letzter_wert, "Rechenkette endet beim Euro-Betrag", f"letzte Ebene: {letzter_wert[:40]}")
+    if len(ebenen) > RECHENKETTE_MAX_EBENEN:
+        lint.pruefe(bool(re.search(r"\*\*Mehr als zehn Ebenen:\*\*\s*\S.{39,}", teil)),
+                    f"Rechenkette: {len(ebenen)} Ebenen begründet",
+                    f"mehr als {RECHENKETTE_MAX_EBENEN} Ebenen ohne Zeile „**Mehr als zehn Ebenen:** <Begründung>“")
+    lint.pruefe(bool(re.search(r"```python test: \S+", teil)), "Rechenkette: Beispiel-Block rechnet sie nach",
+                "kein ```python test: …``` im Abschnitt")
+
+
+# Zahlenformat nach dem Stil-Skill `kap3-stil` (§8 E5) — nur im Fließtext, nie in Code, Formeln oder Parameter-Blöcken.
+ZAHLENFORMAT_REGELN = (
+    (re.compile(r"(?<![\d.,])\d{1,3}(?:\.\d{3}){2,}(?:,\d+)?\s?(?:€|Euro\b|EUR\b)"),
+     "Beträge ab einer Million als „1,2 Mio. €“"),
+    (re.compile(r"(?<![\d.,])\d{7,}(?:,\d+)?\s?(?:€|Euro\b|EUR\b)"), "Beträge ab einer Million als „1,2 Mio. €“"),
+    (re.compile(r"\b(?:Millionen|Milliarden|Mio\.|Mrd\.)\s+(?:Euro|EUR)\b"), "„Mio. €“ statt ausgeschriebener Währung"),
+    (re.compile(r"\d\s?EUR\b"), "„€“ statt „EUR“"),
+    (re.compile(r"\d(?:,\d+)?%"), "Leerzeichen vor „%“"),
+)
+
+
+def _prosa(src: str) -> list[tuple[int, str]]:
+    """Fließtextzeilen mit Zeilennummer: ohne Code-Blöcke, Formeln, Inline-Code, Links und HTML-Kommentare."""
+    ohne = re.sub(r"```.*?```", lambda m_: "\n" * m_.group(0).count("\n"), src, flags=re.S)
+    ohne = re.sub(r"<!--.*?-->", lambda m_: "\n" * m_.group(0).count("\n"), ohne, flags=re.S)
+    ohne = re.sub(r"\$\$.*?\$\$", lambda m_: "\n" * m_.group(0).count("\n"), ohne, flags=re.S)
+    out = []
+    for i, z in enumerate(ohne.split("\n"), start=1):
+        z = re.sub(r"`[^`]*`", " ", z)
+        z = re.sub(r"\$[^$]*\$|\\\(.*?\\\)|\\\[.*?\\\]", " ", z)
+        z = re.sub(r"https?://\S+", " ", z)
+        out.append((i, z))
+    return out
+
+
+def zahlenformat(src: str, lint: Lint) -> None:
+    funde: dict[str, list[str]] = {}
+    for nr, zeile in _prosa(src):
+        for muster, regel in ZAHLENFORMAT_REGELN:
+            for m_ in muster.finditer(zeile):
+                funde.setdefault(regel, []).append(f"Z. {nr}: {m_.group(0)}")
+    for regel, liste in funde.items():
+        lint.fehler.append(f"Zahlenformat (kap3-stil): {regel} — {len(liste)}× ({'; '.join(liste[:3])}"
+                           + (" …" if len(liste) > 3 else "") + ")")
+    if not funde:
+        lint.ok.append("Zahlenformat nach kap3-stil")
+
+
+def ansatzkapitel_entfaellt(src: str, lint: Lint) -> None:
+    """Fortschreibung 7 (24.09.2026): eine Methodik je Risiko — kein Kapitel 9 (Ansatz-Vergleich)."""
+    lint.pruefe(not re.search(r"^## 9 ", src, re.M), "Kein Kapitel 9 (eine Methodik je Risiko)",
+                "Kapitel 9 (Ansatz-Vergleich) entfällt — verworfene Ansätze mit je einem Satz ins Entscheidungslog")
 
 
 def registry_abgleich(nr: str, werte: dict[str, str], lint: Lint) -> None:
@@ -884,6 +984,9 @@ def pruefe_bericht(pfad: str) -> bool:
     MARKER_ZAEHLER.clear()
     beispiel_bloecke(src, lint)
     pflichtkapitel_gefuellt(src, lint)
+    ansatzkapitel_entfaellt(src, lint)
+    rechenkette(src, lint)
+    zahlenformat(src, lint)
     zeichentabelle(src, lint)
     verbotene_formulierungen(src, lint)
     werte, baender = parameter_bloecke(src, lint)

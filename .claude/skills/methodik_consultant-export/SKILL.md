@@ -1,5 +1,6 @@
 ---
-description: Erzeugt das Lese-PDF eines Methodik-Berichts (KaTeX-Formelsatz, M0-Optik) aus der Markdown-Quelle
+name: methodik_consultant-export
+description: Der methodik_consultant erzeugt Lese-PDF und Wirkungsmechanismus-HTML eines Methodik-Berichts aus der Markdown-Quelle und erneuert die Übersicht (früher /export-pdf)
 argument-hint: <risiko-nr>
 ---
 
@@ -18,7 +19,7 @@ eine eigenständige HTML-Datei, die das echte Produkt-Wirkungsdiagramm (KAP3,
 Methodik-Bericht** — die Vorschau zeigt, was künftig implementiert wird. Ist das Risiko
 bereits (teilweise) im Produkt, kommen Vergleichstabs mit dem Ist-Stand aus
 Backend/Registry hinzu; Abweichungen Ziel ↔ Ist sind Ledger-Befunde (Eiserne Regel 5,
-z. B. #95-Befund 76) und werden bei `/integriere-risiko` geschlossen. Nach einer
+z. B. #95-Befund 76) und werden bei der Integration (Skill `cto-integration`) geschlossen. Nach einer
 Berichts-Revision, die das Modell ändert, den Graph-Builder im Generator mitziehen.
 Melde auch diesen Pfad. Für ein neues Risiko ohne Vorschau-Definition erscheint nur ein
 Hinweis — dann im Generator einen Graph-Builder ergänzen. Frontend-Bundle:
@@ -40,5 +41,9 @@ Fehlerbehandlung:
   KaTeX-kompatibles TeX ist; Delimiter sind `$…$`, `$$…$$`, `\(…\)`.
 - **Nach jedem Export:** Stichprobe rendern (`pdftoppm -png -r 60`) und auf Überläufe/
   Layoutbrüche sichten, bevor Vollzug gemeldet wird.
+
+Danach die Übersicht aller Berichte erneuern: `python3 backend/scripts/methodik_uebersicht.py` schreibt
+`docs/methodik/README.md` (Stand, offene Befunde, PDF und HTML je Bericht; die Prüfakte unter `reviews/` bleibt von
+der Kundenfassung getrennt).
 
 Das PDF ist reiner Export für Menschen — die Quelle ist und bleibt die Markdown-Datei.

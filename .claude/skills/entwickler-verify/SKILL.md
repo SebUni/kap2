@@ -1,5 +1,5 @@
 ---
-name: verify
+name: entwickler-verify
 description: KAP2 end-to-end im Browser verifizieren (Vite + FastAPI + Playwright headless)
 ---
 
