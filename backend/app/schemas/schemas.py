@@ -256,6 +256,11 @@ class MeasureImpactSummary(BaseModel):
     annual_benefit_flat_eur: Optional[float] = None
     annual_benefit_direct_eur: Optional[float] = None
     benefit_capped: Optional[bool] = None
+    # Verwechslungssperre Klasse A/B: Vermerkfelder zur Euro-Schicht des Nutzens.
+    benefit_has_euro_layer: Optional[bool] = None
+    benefit_display: Optional[str] = None
+    benefit_note: Optional[str] = None
+    benefit_screening_risk_codes: Optional[list[str]] = None
     params_fingerprint: Optional[str] = None
     count: Optional[int] = None
     count_is_default: Optional[bool] = None
