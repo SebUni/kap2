@@ -80,6 +80,11 @@ def _write_layer(path: str, layer: str, geometries, field_data: list, fields: li
     )
 
 
+def _float_oder_none(wert):
+    """Fehlender Wert → None (NULL); ein vorhandener 0.0 bleibt 0.0 (A-0010/P2)."""
+    return float(wert) if wert is not None else None
+
+
 def cost_column_values(risk: dict, raw_costs: list) -> list:
     """Spalte ``<code>_cost_eur`` einer Wirkung für den Layer ``bewertung_100m``.
 
@@ -114,8 +119,9 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
         [
             [kommune.name or ""],
             [kommune.bundesland or ""],
-            [kommune.area_km2 if kommune.area_km2 is not None else 0.0],
-            [kommune.population if kommune.population is not None else 0],
+            # Fehlender Wert → None (NULL), nie 0: eine 0 wäre eine Nullwirkung (A-0010/P2).
+            [float(kommune.area_km2) if kommune.area_km2 is not None else None],
+            [kommune.population if kommune.population is not None else None],
         ],
         ["name", "bundesland", "area_km2", "population"],
         geometry_type=boundary_type,
@@ -156,15 +162,15 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
 
         hazards = data.get("hazards", {})
         for code in hazard_codes:
-            hazard_cols[code].append(float(hazards.get(code, 0.0)))
+            hazard_cols[code].append(_float_oder_none(hazards.get(code)))
 
         exposures = data.get("exposures", {})
         for code in exposure_codes:
-            exposure_cols[code].append(float(exposures.get(code, 0.0)))
+            exposure_cols[code].append(_float_oder_none(exposures.get(code)))
 
         vulnerabilities = data.get("vulnerabilities", {})
         for code in vulnerability_codes:
-            vulnerability_cols[code].append(float(vulnerabilities.get(code, 0.0)))
+            vulnerability_cols[code].append(_float_oder_none(vulnerabilities.get(code)))
 
         risks = data.get("risks", {})
         for code in risk_codes:
