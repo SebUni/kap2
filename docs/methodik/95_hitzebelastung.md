@@ -85,6 +85,23 @@ GE-SO-06 (Einpersonenhaushalte).
 - **Nur K1 aktiv (M0):** bewusst als Untergrenze (Begriff definiert in §4); K2 (#87) ab M3,
   K8 (#102, #65) ab Stufe M5 — nichts geht verloren, nichts wird doppelt gezählt.
 
+### Risiko ohne (weitere) Anpassung
+
+**(a) Zuordnung der Zahlen.** Alle in diesem Bericht ausgewiesenen Zahlen des Basiswerts —
+zusätzliche Sterbefälle, YLL, Morbiditätsfälle und die daraus bewerteten Euro-Beträge in K1 — gehören
+zum KWRA-Zustand **„Risiko ohne (weitere) Anpassung"**. Gemeint ist der heutige Anpassungsstand ohne
+zusätzliche Maßnahmen: Er steckt im Basiswert über die Kalibrierung, weil \(c_{\text{kal}}\) auf Jahre mit
+laufendem DWD-Hitzewarnsystem und dem vorhandenen Bestand an Klimaanlagen und Hitzeaktionsplänen
+kalibriert ist (Doppelzählungs-Wächter, §5). Weitere Maßnahmen sind im Basiswert nicht enthalten.
+
+**(b) Zustand „mit Anpassung".** Dargestellt wird er nur als Wirkung einzelner Maßnahmen-Hebel auf den
+Basiswert (§5): Hitzeaktionsplan und Frühwarnkette über \(\delta_{\text{HAP}}\), gekühlte Räume in
+Pflegeheimen am \(\beta_{\text{pfl}}\)-Term und Schutzprogramme für vulnerable Gruppen über
+\(v_{\text{vers},a}\). Im Produkt entsteht daraus der Wert „mit Anpassung" erst, wenn eine Kommune
+Maßnahmen wählt. Ein KWRA-Restrisiko „mit Anpassung" als eigene Zahl weist der Bericht nicht aus; auch
+die spontane Anpassung der Bevölkerung (abflachende Expositions-Wirkung über die Dekaden) ist nicht
+modelliert, sondern als Modellgrenze in §6 geführt.
+
 ## 2 Evidenz-Register (§2.2)
 
 Risikoübergreifend wiederverwendbare Zeilen zusätzlich in `docs/evidenz/register.md`.

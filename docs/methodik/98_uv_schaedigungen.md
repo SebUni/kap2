@@ -188,6 +188,21 @@ in längeren, sonnigeren Warmphasen" — Monetarisierung ID 98, Blattzeile 103).
   #95/#96); Augenschäden (Katarakt — im Monetarisierungs-Gegenstand genannt) und
   Produktivität (K2, ab M3) nicht enthalten — dokumentierte Untererfassung (§6).
 
+### Risiko ohne (weitere) Anpassung
+
+**(a) Zuordnung der Zahlen.** Alle in diesem Bericht ausgewiesenen Zahlen des Basiswerts — zusätzliche
+Hautkrebsfälle, YLL und die daraus bewerteten Euro-Beträge in K1 — gehören zum KWRA-Zustand
+**„Risiko ohne (weitere) Anpassung"**. Gemeint ist der heutige Anpassungsstand ohne zusätzliche
+Maßnahmen: das heutige Schutz- und Expositionsverhalten steckt in den beobachteten
+Inzidenzraten (ZfKD), das bestehende Hautkrebs-Screening in den SCS-Kostensätzen, die der Basiswert bereits
+für alle Fälle ansetzt (§5). Weitere Maßnahmen sind im Basiswert nicht enthalten.
+
+**(b) Zustand „mit Anpassung".** Er wird in diesem Bericht **nicht als Zahl dargestellt**: Beide
+Maßnahmen-Hebel (§5) — Förderung der Früherkennung (S158) und UV-Schutz im öffentlichen Raum mit
+Kommunikation (S155) — laufen qualitativ, weil es keine Effektgröße auf Dosis oder Inzidenz gibt
+beziehungsweise der Screening-Effekt schon im Basiswert steht. Einen KWRA-Wert „mit Anpassung" oder ein
+Restrisiko weist der Bericht deshalb nicht aus; der Ersetzungspfad (Detektionsmix-Parameter) steht in §5.
+
 ## 2 Evidenz-Register (§2.2)
 
 Risikoübergreifend wiederverwendbare Zeilen zusätzlich in `docs/evidenz/register.md`.

@@ -99,6 +99,22 @@ Stadtbaum-Generationen) [15].
   Allergie-Last (Produktivität, Präsentismus [8,65]) folgt per R9 in K2/#87 ab M3 — nichts
   geht verloren, nichts wird doppelt gezählt.
 
+### Risiko ohne (weitere) Anpassung
+
+**(a) Zuordnung der Zahlen.** Alle in diesem Bericht ausgewiesenen Zahlen des Basiswerts — zusätzliche
+Symptom- und Behandlungstage und die daraus bewerteten Euro-Beträge in K1-Morbidität — gehören zum
+KWRA-Zustand **„Risiko ohne (weitere) Anpassung"**; auch die oben zitierte KWRA-Einstufung („gering" in
+der Gegenwart, „mittel" zur Mitte des Jahrhunderts) bezieht sich auf diesen Zustand. Gemeint ist der
+heutige Anpassungsstand ohne zusätzliche Maßnahmen: die heutige Stadtbaum- und Vegetationsausstattung
+steckt über \(\hat G\) in \(\hat P_{\text{Zelle}}\), die bestehende Pollenflug-Vorhersage wirkt im Basiswert
+nicht (Default 1, S158 in der Knoten-Bilanz).
+
+**(b) Zustand „mit Anpassung".** Dargestellt wird er nur als Wirkung der Maßnahmen-Hebel auf den
+Basiswert (§5): allergenarme Stadtbaumwahl über \(\hat G\) — buchbar nur als Umverteilung zwischen Zellen,
+nicht als Niveaueffekt — und die abgeschätzte Pollen-Frühwarnung über \(r_{\text{S158}}\) (Vorgabe P2).
+Im Produkt entsteht der Wert „mit Anpassung" erst, wenn eine Kommune Maßnahmen wählt. Ein KWRA-Restrisiko
+„mit Anpassung" als eigene Zahl weist der Bericht nicht aus.
+
 ## 2 Evidenz-Register (§2.2)
 
 Risikoübergreifend wiederverwendbare Zeilen zusätzlich in `docs/evidenz/register.md`.
