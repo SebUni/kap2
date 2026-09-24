@@ -77,6 +77,9 @@ def lite_gemeinde(ags: str, db: Session = Depends(get_db)):
         cat = catalog.RISKS_BY_CODE.get(r.risk_code, {})
         drivers = dict(r.drivers or {})
         src_keys = drivers.pop("source_refs", None)
+        # Verwechslungssperre Klasse A/B (T-0836): Betrag einer Klasse-B-Wirkung
+        # nicht ausliefern, stattdessen den Screening-Vermerk (LitePanel.tsx).
+        has_euro = catalog.risk_has_euro_layer(cat)
         risks.append({
             "code": r.risk_code,
             "name": cat.get("name", r.risk_code),
@@ -84,7 +87,9 @@ def lite_gemeinde(ags: str, db: Session = Depends(get_db)):
             "index": r.index_value,
             "outcome": r.outcome_value,
             "unit": r.outcome_unit,
-            "cost_eur": r.cost_eur,
+            "cost_eur": r.cost_eur if has_euro else None,
+            "has_euro_layer": has_euro,
+            "cost_display": r.cost_eur if has_euro else catalog.NO_EURO_LAYER_TEXT,
             "drivers": drivers,
             "sources": sources.resolve(src_keys),
         })
