@@ -1,7 +1,7 @@
 """KWRA-Querverbindungen (Wirkbeziehungen zwischen Klimawirkungen) — Teil 1.
 
 Quelle: UBA/BMU „Klimawirkungs- und Risikoanalyse 2021 für Deutschland" (KWRA 2021),
-Teilbericht 6 (Integrierte Auswertung), Kapitel 3.4 „Vernetzung der Klimawirkungen".
+Teilbericht 6 (Integrierte Auswertung), Kapitel 3.4 „Analyse der Querverbindungen".
 Arbeitsmappe: ``docs/KWAR/KWRA-2021_Klimawirkungen.xlsx``, Blatt ``Wirkbeziehungen``
 (kuratierte Übertragung aus Teilbericht 6) und Blatt ``Klimawirkungen``, Spalte
 „Netzrolle (TB 6 Kap. 3.4)".
@@ -37,7 +37,7 @@ from __future__ import annotations
 
 QUELLE = (
     "UBA/BMU, ›Klimawirkungs- und Risikoanalyse 2021 für Deutschland‹, Teilbericht 6 "
-    "(Integrierte Auswertung), Kapitel 3.4 ›Vernetzung der Klimawirkungen‹, Dessau-Roßlau, "
+    "(Integrierte Auswertung), Kapitel 3.4 ›Analyse der Querverbindungen‹, Dessau-Roßlau, "
     "2021. Arbeitsmappe docs/KWAR/KWRA-2021_Klimawirkungen.xlsx, Blätter "
     "›Klimawirkungen‹ (Spalte Netzrolle) und ›Wirkbeziehungen‹."
 )
