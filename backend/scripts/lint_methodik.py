@@ -247,14 +247,24 @@ def parameter_bloecke(src: str, lint: Lint) -> tuple[dict[str, str], set[float]]
         BLOCK_META[name] = {"herkunft": hk.group(1) if hk else "",
                             "band": eigenes_band}
         ps = re.search(r"^\s*preisstand:\s*\"?([^\s\"#]+)", blk, re.M)
-        einheit = re.search(r"^\s*einheit:\s*\"?([^\s\"#]+)", blk, re.M)
-        ist_kostensatz = bool(einheit and "EUR" in einheit.group(1).upper())
-        if ps and ps.group(1) != "null":
+        # Euro-Erkennung ueber die GANZE Einheit (T-0902): Bis dahin wurde nur
+        # das erste Wort auf "EUR" geprueft — "Mrd. €/a" und "Mrd. EUR/a" fielen
+        # durch, und ein Block konnte mit preisstand: null die Regel umgehen.
+        einheit = re.search(r"^\s*einheit:\s*(\"[^\"]*\"|[^#\n]*)", blk, re.M)
+        einheit_text = einheit.group(1).strip().strip('"') if einheit else ""
+        ist_kostensatz = ("EUR" in einheit_text.upper() or "€" in einheit_text)
+        # Kalibrieranker (rolle: kalibrierung) duerfen einen eigenen Preisstand
+        # tragen, etwa die GDV-Reihe in Preisstand 2024; sie zaehlen nicht zur
+        # Einheitlichkeit der Kostensaetze. Ohne diese Rolle bleibt ein
+        # abweichender Preisstand rot.
+        ist_kalibrierung = bool(re.search(r"^\s*rolle:\s*\"?kalibrierung\b",
+                                          blk, re.M))
+        if ps and ps.group(1) != "null" and not ist_kalibrierung:
             preisstaende.add(ps.group(1))
         # §3.3: Kostensaetze MUESSEN einen Preisstand tragen (Befund 298f).
-        lint.pruefe(not ist_kostensatz or (ps and ps.group(1) != "null"),
+        lint.pruefe(not ist_kostensatz or bool(ps and ps.group(1) != "null"),
                     f"Preisstand bei Kostensatz {name}",
-                    "einheit nennt EUR, preisstand ist null")
+                    "einheit nennt EUR oder €, preisstand ist null")
     lint.pruefe(len(preisstaende) <= 1, "Preisstand einheitlich",
                 f"mehrere Preisstände: {sorted(preisstaende)}")
     return werte, baender
