@@ -277,7 +277,7 @@ def _benefit_cap(linked: list[str], base_risks: dict, k_indirect: float) -> floa
     return cap
 
 
-def _benefit_euro_layer_fields(linked: list[str]) -> dict:
+def _benefit_euro_layer_fields(linked: list[str], direct_benefit_eur: float = 0.0) -> dict:
     """Vermerkfelder zur Euro-Schicht des Maßnahmen-Nutzens (Entscheidung CEO, T-0563).
 
     - ``benefit_has_euro_layer``: False, wenn alle verknüpften (im Katalog bekannten)
@@ -285,6 +285,10 @@ def _benefit_euro_layer_fields(linked: list[str]) -> dict:
       — auch keine 0 (P2) —, kein Nutzen-Kosten-Verhältnis und keinen Rangplatz nach Euro.
     - ``benefit_display``: bei einer reinen Klasse-B-Maßnahme
       ``catalog.NO_EURO_LAYER_TEXT`` statt eines Betrags, sonst None (Betrag gilt).
+      Hat die reine Screening-Maßnahme einen direkten Zusatznutzen > 0
+      (``direct_benefit_eur``; eigener, mit Quelle geführter Parameter), gilt der Betrag:
+      ``benefit_display`` None, dazu der Zusatz in ``benefit_note``.
+      ``benefit_has_euro_layer`` bleibt False (kein Nutzen aus vermiedenen Schäden).
     - ``benefit_note``: bei einer gemischten Maßnahme der Zusatz
       „ohne x Wirkungen im Screening“ zum Euro-Nutzen aus den Klasse-A-Wirkungen.
     - ``benefit_screening_risk_codes``: die verknüpften Klasse-B-Wirkungen.
@@ -294,12 +298,14 @@ def _benefit_euro_layer_fields(linked: list[str]) -> dict:
                  if not catalog.risk_has_euro_layer(catalog.RISKS_BY_CODE[c])]
     pure_screening = bool(known) and len(screening) == len(known)
     note = None
-    if screening and not pure_screening:
+    show_direct = pure_screening and float(direct_benefit_eur or 0.0) > 0.0
+    if screening and (not pure_screening or show_direct):
         n = len(screening)
         note = f"ohne {n} {'Wirkung' if n == 1 else 'Wirkungen'} im Screening"
     return {
         "benefit_has_euro_layer": not pure_screening,
-        "benefit_display": catalog.NO_EURO_LAYER_TEXT if pure_screening else None,
+        "benefit_display": (catalog.NO_EURO_LAYER_TEXT
+                            if pure_screening and not show_direct else None),
         "benefit_note": note,
         "benefit_screening_risk_codes": screening,
     }
@@ -580,7 +586,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # Screening-Maßnahmen, Zusatz „ohne x Wirkungen im Screening“ für gemischte.
         # ``annual_benefit_eur`` bleibt eine Zahl (Klasse-A-Anteil + direkter Nutzen),
         # weil Export und Maßnahmentabelle sie als Zahl lesen.
-        **_benefit_euro_layer_fields(linked),
+        **_benefit_euro_layer_fields(linked, annual_benefit_direct),
         "params_fingerprint": fingerprint,
         "count": count,
         "count_is_default": count_is_default,
