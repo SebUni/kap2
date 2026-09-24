@@ -39,11 +39,18 @@ def build_study(db: Session) -> dict:
     for code in LITE_RISK_CODES:
         rows = by_risk.get(code, [])
         rows.sort(key=lambda r: r.index_value or 0, reverse=True)
+        # Verwechslungssperre Klasse A/B (T-0836): Der gespeicherte Betrag einer
+        # Klasse-B-Wirkung wird bei der Ausgabe unterdrückt; an seiner Stelle steht
+        # der Screening-Vermerk (StudyPage.tsx verzweigt auf has_euro_layer).
+        has_euro = catalog.risk_has_euro_layer(catalog.RISKS_BY_CODE.get(code, {}))
         rankings[code] = [{
             "ags": r.ags, "name": gem[r.ags].name if r.ags in gem else r.ags,
             "bundesland": gem[r.ags].bundesland if r.ags in gem else None,
             "index": r.index_value, "outcome": r.outcome_value,
-            "unit": r.outcome_unit, "cost_eur": r.cost_eur,
+            "unit": r.outcome_unit,
+            "cost_eur": r.cost_eur if has_euro else None,
+            "has_euro_layer": has_euro,
+            "cost_display": r.cost_eur if has_euro else catalog.NO_EURO_LAYER_TEXT,
         } for r in rows[:20]]
         # Bundesland-Mittel
         acc: dict[str, list[float]] = defaultdict(list)
