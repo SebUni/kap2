@@ -134,6 +134,12 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
         total_capex = summary.get("capex_eur", 0)
         total_opex = summary.get("opex_annual_eur", 0)
         total_savings = summary.get("annual_benefit_eur", 0)
+        # Verwechslungssperre Klasse A/B (T-0838): reine Screening-Maßnahme zeigt den
+        # Vermerk statt 0 €; bei gemischter Maßnahme bleibt der Betrag, der Zusatz
+        # steht in derselben Zeile (Hinweisspalte).
+        benefit_display = summary.get("benefit_display")
+        benefit_note = summary.get("benefit_note")
+        row_note = " ".join(x for x in (lb_note, benefit_note) if x)
         total_didx = sum(
             sum(v for v in (imp.indicator_deltas or {}).values()) for imp in impacts
         )
@@ -154,11 +160,11 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
             geom_wkt,
             round(total_capex, 2),
             round(total_opex, 2),
-            round(total_savings, 2),
+            benefit_display if benefit_display else round(total_savings, 2),
             round(total_didx, 2),
             count if count is not None else "",
             unit_label,
-            lb_note or "",
+            row_note,
         ])
 
     # ── Sheet 2: Summary ──

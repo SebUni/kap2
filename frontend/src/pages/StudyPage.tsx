@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fmtEurCompact } from '../utils/format'
 
-interface RankRow { ags: string; name: string; bundesland: string | null; index: number; outcome: number; unit: string; cost_eur: number
+interface RankRow { ags: string; name: string; bundesland: string | null; index: number; outcome: number; unit: string; cost_eur: number | null
   /** Verwechslungssperre Klasse A/B: false = Screening ohne Euro-Bezifferung. */
   has_euro_layer?: boolean
   /** Anzeigewert: Betrag (Klasse A) oder Screening-Vermerk (Klasse B). */
@@ -46,7 +46,7 @@ export default function StudyPage() {
   const blMeans = study.bundesland_means[risk] ?? {}
   const sortedBl = Object.entries(blMeans).sort((a, b) => b[1] - a[1])
   // Spalte Schaden/Jahr: Klasse B zeigt den Screening-Vermerk, Klasse A den Betrag.
-  const showDamage = ranking.some((r) => r.has_euro_layer === false || r.cost_eur > 0)
+  const showDamage = ranking.some((r) => r.has_euro_layer === false || (r.cost_eur != null && r.cost_eur > 0))
 
   return (
     <div className="landing">
@@ -99,7 +99,7 @@ export default function StudyPage() {
                         <td>
                           {r.has_euro_layer === false
                             ? String(r.cost_display ?? '')
-                            : r.cost_eur > 0 && fmtEurCompact(r.cost_eur)}
+                            : r.cost_eur != null && r.cost_eur > 0 && fmtEurCompact(r.cost_eur)}
                         </td>
                       )}
                     </tr>

@@ -19,12 +19,13 @@ from app.models.models import (
 )
 from app.data.kang_zustaendigkeit import zustaendigkeit_fuer
 from app.services.bestandsaufnahme_markdown import bestandsaufnahme_markdown
+from app.services.kurzfassung_markdown import kurzfassung_fuer_kommune
 from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
 from app.services import (
     aggregate_cache, artifact_rebuild, bestandsaufnahme_service, dashboard_cache,
     kommune_profile_service,
-    osm_service, grid_service, layer_cache,
+    osm_service, grid_service, layer_cache, unsicherheits_zusammenschau,
 )
 
 router = APIRouter()
@@ -152,6 +153,26 @@ async def get_kommune_bestandsaufnahme(kommune_id: int, db: Session = Depends(ge
     )
 
 
+@router.get("/{kommune_id}/kurzfassung")
+async def get_kommune_kurzfassung(kommune_id: int, db: Session = Depends(get_db)):
+    """Kurzfassung für politische Entscheidungsträger als Markdown (Zeile 20, T-0452).
+
+    Fünf feste Abschnitte; alle Zahlen unverändert aus ``get_risk_aggregate``,
+    ``project_costs`` und ``build_cost_summary``. Mandantenschutz über die
+    Router-Dependency ``require_kommune_access``.
+    """
+    kommune = (
+        db.query(Kommune)
+        .options(load_only(Kommune.id, Kommune.name, Kommune.bundesland))
+        .filter(Kommune.id == kommune_id)
+        .first()
+    )
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    inhalt = await asyncio.to_thread(kurzfassung_fuer_kommune, db, kommune)
+    return Response(content=inhalt, media_type="text/markdown; charset=utf-8")
+
+
 @router.get("/{kommune_id}/kang-zustaendigkeit")
 def get_kommune_kang_zustaendigkeit(kommune_id: int, db: Session = Depends(get_db)):
     """Zuständige Stelle für das Klimaanpassungskonzept nach § 12 Abs. 1 KAnG (T-0751)."""
@@ -164,6 +185,21 @@ def get_kommune_kang_zustaendigkeit(kommune_id: int, db: Session = Depends(get_d
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
     return zustaendigkeit_fuer(kommune.bundesland)
+
+
+@router.get("/{kommune_id}/unsicherheits-zusammenschau")
+def get_kommune_unsicherheits_zusammenschau(kommune_id: int, db: Session = Depends(get_db)):
+    """Handlungsfeldübergreifende Unsicherheits-Zusammenschau vor der Ableitung von
+    Handlungsoptionen (Checkliste Zeile 19, T-0451)."""
+    kommune = (
+        db.query(Kommune)
+        .options(load_only(Kommune.id))
+        .filter(Kommune.id == kommune_id)
+        .first()
+    )
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    return unsicherheits_zusammenschau.unsicherheits_zusammenschau(kommune.id)
 
 
 @router.get("")

@@ -2519,6 +2519,38 @@ INDICATOR_BY_CODE = {
 }
 
 
+# ── KWRA-Systembereiche (Konformitäts-Checkliste Zeile 10, T-0449) ──────────────
+# Quelle: UBA/BMU, KWRA 2021, Teilbericht 6 (Integrierte Auswertung), Kap. 7
+# „Querbetrachtung der Systembereiche“ (S. 146–155). Die KWRA teilt jede
+# Klimawirkung genau einem von fünf übergeordneten Systembereichen zu. Der
+# Bereich „Menschen und soziale Systeme“ umfasst laut S. 151 neun
+# Klimawirkungen, „fast alle“ aus dem Handlungsfeld „Menschliche Gesundheit“
+# (namentlich „Hitzebelastung“ und „Allergische Reaktionen durch Aeroallergene
+# pflanzlicher Herkunft“; UV-Strahlung ebd. als Einflussfaktor für die
+# Gesundheit). Die Zuordnung steht hier als eigene Konstante neben der
+# produktspezifischen Gruppierung (``group``, KAnG-Handlungsfelder) und ersetzt
+# diese nicht. Jede neue Klimawirkung im Katalog braucht hier einen Eintrag
+# (Test ``tests/test_systembereiche.py``).
+
+KWRA_SYSTEMBEREICHE: tuple[str, ...] = (
+    "Natürliche Systeme und Ressourcen",
+    "Naturnutzende Wirtschaftssysteme",
+    "Infrastrukturen und Gebäude",
+    "Naturferne Wirtschaftssysteme",
+    "Menschen und soziale Systeme",
+)
+
+RISK_SYSTEMBEREICH: dict[str, str] = {
+    # KWRA #95 Hitzebelastung (Handlungsfeld Menschliche Gesundheit)
+    "EXPECTED_ANNUAL_MORTALITY": "Menschen und soziale Systeme",
+    "EXPECTED_ANNUAL_MORBIDITY": "Menschen und soziale Systeme",
+    # KWRA #96 Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft
+    "EXPECTED_ANNUAL_ALLERGY_DAYS": "Menschen und soziale Systeme",
+    # KWRA #98 Schädigungen durch UV-Strahlung (Handlungsfeld Menschliche Gesundheit)
+    "EXPECTED_ANNUAL_UV_YLL": "Menschen und soziale Systeme",
+}
+
+
 # ── Verwechslungssperre Klasse A/B (T-0513) ─────────────────────────────────────
 # Klasse A = Risiko mit Euro-Bezifferung (Regelfall, siehe cost_per_outcome_eur).
 # Klasse B = reines Screening ohne Euro-Layer; ein Risiko markiert dies explizit

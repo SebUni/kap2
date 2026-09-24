@@ -68,7 +68,9 @@ export default function CostTablesSection() {
                   <td style={{ fontWeight: 500 }}>{m.name}</td>
                   <td style={{ textAlign: 'right' }}>{fmtEur(m.capex_eur)}</td>
                   <td style={{ textAlign: 'right' }}>{fmtEur(m.opex_annual_eur)}</td>
-                  <td style={{ textAlign: 'right', color: 'var(--success)' }}>{fmtEur(m.annual_benefit_eur)}</td>
+                  <td style={{ textAlign: 'right', color: 'var(--success)' }}>{m.benefit_display
+                    ? m.benefit_display
+                    : <>{fmtEur(m.annual_benefit_eur)}{m.benefit_note && <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{m.benefit_note}</span>}</>}</td>
                 </tr>
               ))}
             </tbody>

@@ -182,7 +182,7 @@ export interface LiteGemeindeRisk {
   index: number
   outcome: number
   unit: string
-  cost_eur: number
+  cost_eur: number | null
   /** Verwechslungssperre Klasse A/B: false = Screening ohne Euro-Bezifferung. */
   has_euro_layer?: boolean
   /** Anzeigewert: Betrag (Klasse A) oder Screening-Vermerk (Klasse B). */
