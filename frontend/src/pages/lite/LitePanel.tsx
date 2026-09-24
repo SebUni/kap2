@@ -94,7 +94,7 @@ export default function LitePanel() {
                 ≈ {fmtNum(detailRisk.outcome * (adjIndex / (baseIndex || 1)), detailRisk.unit)}
                 {detailRisk.has_euro_layer === false
                   ? <> · {String(detailRisk.cost_display ?? '')}</>
-                  : detailRisk.cost_eur > 0 && !detailRisk.unit.includes('€') &&
+                  : detailRisk.cost_eur != null && detailRisk.cost_eur > 0 && !detailRisk.unit.includes('€') &&
                     <> · ≈ {fmtNum(detailRisk.cost_eur * (adjIndex / (baseIndex || 1)), '€')}</>}
               </div>
               {anyMeasure && (
