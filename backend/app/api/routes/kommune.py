@@ -24,7 +24,7 @@ from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGe
 from app.services import (
     aggregate_cache, artifact_rebuild, bestandsaufnahme_service, dashboard_cache,
     kommune_profile_service,
-    osm_service, grid_service, layer_cache,
+    osm_service, grid_service, layer_cache, unsicherheits_zusammenschau,
 )
 
 router = APIRouter()
@@ -164,6 +164,21 @@ def get_kommune_kang_zustaendigkeit(kommune_id: int, db: Session = Depends(get_d
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
     return zustaendigkeit_fuer(kommune.bundesland)
+
+
+@router.get("/{kommune_id}/unsicherheits-zusammenschau")
+def get_kommune_unsicherheits_zusammenschau(kommune_id: int, db: Session = Depends(get_db)):
+    """Handlungsfeldübergreifende Unsicherheits-Zusammenschau vor der Ableitung von
+    Handlungsoptionen (Checkliste Zeile 19, T-0451)."""
+    kommune = (
+        db.query(Kommune)
+        .options(load_only(Kommune.id))
+        .filter(Kommune.id == kommune_id)
+        .first()
+    )
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    return unsicherheits_zusammenschau.unsicherheits_zusammenschau(kommune.id)
 
 
 @router.get("")
