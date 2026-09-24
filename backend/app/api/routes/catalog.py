@@ -13,6 +13,7 @@ from app.services.engine import formulas
 from app.services import lineage_graph
 from app.services import querverbindungen
 from app.services import gewissheit
+from app.services import charakterisierung
 
 router = APIRouter()
 
@@ -34,6 +35,7 @@ def _layer_category(code: str) -> str | None:
 @router.get("/catalog")
 def get_catalog(request: Request):
     stufen = gewissheit.gewissheitsstufen()
+    gruppen = charakterisierung.charakterisierungen()
     payload = {
         "groups": catalog.KWRA_GROUPS,
         "hazards": catalog.HAZARDS,
@@ -41,7 +43,12 @@ def get_catalog(request: Request):
         "vulnerabilities": catalog.VULNERABILITIES,
         # Je Risiko zusätzlich die kategoriale Gewissheitsstufe (KWRA-Skala sehr
         # gering … hoch, abgeleitet aus den Evidenzklassen, Checkliste Zeile 8).
-        "risks": [{**r, "certainty": stufen[r["code"]]} for r in catalog.RISKS],
+        # Dazu die KWRA-Charakterisierungsgruppe aus Anpassungspotenzial und
+        # Gewissheitsstufe (Checkliste Zeile 7, app/services/charakterisierung.py).
+        "risks": [{**r, "certainty": stufen[r["code"]],
+                   "adaptation_potential": gruppen[r["code"]]["anpassungspotenzial"],
+                   "characterization_group": gruppen[r["code"]]["gruppe"]}
+                  for r in catalog.RISKS],
         "measures": catalog.MEASURES,
         "hazard_categories": catalog.HAZARD_CATEGORIES,
         "exposure_categories": catalog.EXPOSURE_CATEGORIES,
@@ -63,6 +70,16 @@ def get_catalog(request: Request):
         risk_codes = getattr(request.state, "demo_risk_codes", [])
         return demo_service.filter_catalog(payload, enabled, risk_codes)
     return payload
+
+
+@router.get("/catalog/charakterisierungsgruppen")
+def get_charakterisierungsgruppen():
+    """KWRA-Charakterisierungsgruppe je Klimawirkung mit ihren beiden Eingaben
+    (Anpassungspotenzial, Gewissheitsstufe) und der Ableitungsregel
+    (Entscheidungstabelle, Schwellen mit Herleitung, Quelle, Modellgrenze).
+    Siehe ``app/services/charakterisierung.py``."""
+    return {"regel": charakterisierung.regel(),
+            "klimawirkungen": charakterisierung.charakterisierungen()}
 
 
 @router.get("/catalog/querverbindungen")
