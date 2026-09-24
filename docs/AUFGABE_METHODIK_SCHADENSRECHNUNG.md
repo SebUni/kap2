@@ -439,7 +439,19 @@ parameter:
   preisstand: null                     # Pflichtfeld bei Kostensätzen
   bandzuordnung: [65-74, 75-84, 85+]
   endpunkt: mortalitaet                # mortalitaet | morbiditaet | beide
+  kennzeichnung: quelle                # quelle | abschaetzung_kap3 | berechnet
+  abgeleitet_aus: []                   # bei kennzeichnung: berechnet Pflicht — Liste der Parameter-IDs, aus denen der Wert folgt
+  rolle: kalibrierung                  # optional: kalibrierung | pruefgroesse | sensitivitaet | waechter
 ```
+
+Felder `kennzeichnung`, `abgeleitet_aus`, `rolle`:
+
+- `kennzeichnung` (Pflicht) hat genau drei Werte: `quelle | abschaetzung_kap3 | berechnet`. `quelle`: der Wert steht
+  in einer benannten Quelle. `abschaetzung_kap3`: begründete Abschätzung von KAP3 mit Herleitung (P1). `berechnet`:
+  der Wert folgt rechnerisch aus anderen Parametern.
+- `abgeleitet_aus` nennt bei `berechnet` die Parameter-IDs, aus denen der Wert entsteht; sonst leer.
+- `rolle` ist optional und sagt, wozu ein Parameter dient: `kalibrierung | pruefgroesse | sensitivitaet | waechter`.
+  Fehlt das Feld, ist es ein gewöhnlicher Rechenparameter.
 
 **Beispiel-Blöcke** sind ausführbar markiert (```python test: …```) und werden als Golden-Tests
 in die CI übernommen — Bericht und Code können nicht auseinanderlaufen.
