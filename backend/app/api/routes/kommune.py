@@ -19,6 +19,7 @@ from app.models.models import (
 )
 from app.data.kang_zustaendigkeit import zustaendigkeit_fuer
 from app.services.bestandsaufnahme_markdown import bestandsaufnahme_markdown
+from app.services.kurzfassung_markdown import kurzfassung_fuer_kommune
 from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
 from app.services import (
@@ -150,6 +151,26 @@ async def get_kommune_bestandsaufnahme(kommune_id: int, db: Session = Depends(ge
         content=bestandsaufnahme_markdown(ergebnis),
         media_type="text/markdown; charset=utf-8",
     )
+
+
+@router.get("/{kommune_id}/kurzfassung")
+async def get_kommune_kurzfassung(kommune_id: int, db: Session = Depends(get_db)):
+    """Kurzfassung für politische Entscheidungsträger als Markdown (Zeile 20, T-0452).
+
+    Fünf feste Abschnitte; alle Zahlen unverändert aus ``get_risk_aggregate``,
+    ``project_costs`` und ``build_cost_summary``. Mandantenschutz über die
+    Router-Dependency ``require_kommune_access``.
+    """
+    kommune = (
+        db.query(Kommune)
+        .options(load_only(Kommune.id, Kommune.name, Kommune.bundesland))
+        .filter(Kommune.id == kommune_id)
+        .first()
+    )
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    inhalt = await asyncio.to_thread(kurzfassung_fuer_kommune, db, kommune)
+    return Response(content=inhalt, media_type="text/markdown; charset=utf-8")
 
 
 @router.get("/{kommune_id}/kang-zustaendigkeit")
