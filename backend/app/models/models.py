@@ -3,7 +3,7 @@ from datetime import datetime
 
 from geoalchemy2 import Geometry
 from sqlalchemy import (
-    BigInteger, Boolean, Column, Integer, String, Float, DateTime, Enum,
+    BigInteger, Boolean, Column, Date, Integer, String, Float, DateTime, Enum,
     ForeignKey, JSON, Text, UniqueConstraint
 )
 from sqlalchemy.orm import relationship
@@ -277,3 +277,24 @@ class AiUsage(Base):
     prompt_tokens = Column(Integer, nullable=False, default=0)
     completion_tokens = Column(Integer, nullable=False, default=0)
     total_tokens = Column(Integer, nullable=False, default=0, index=True)
+
+
+# ── Nachweise zur Einbeziehung (ISO 14091 A6/A10) ──────────────────────────────
+
+class ErgebnisNachweis(Base):
+    """Nachweis, dass eine Stelle die Ergebnisse gelesen hat (mit Datum).
+
+    Nur von Menschen erfasst; die Software erzeugt keinen Nachweis selbst.
+    ``stelle`` ist eine Stelle oder Organisation, kein Personenname
+    (Datenschutz: es gibt bewusst kein Feld für Personen).
+    Gültige Werte für ``art``: app/services/ergebnis_nachweise.py.
+    """
+    __tablename__ = "ergebnis_nachweise"
+
+    id = Column(Integer, primary_key=True, index=True)
+    kommune_id = Column(Integer, ForeignKey("kommunen.id", ondelete="CASCADE"), nullable=False, index=True)
+    art = Column(String(40), nullable=False)
+    stelle = Column(String(255), nullable=False)
+    datum = Column(Date, nullable=False)
+    vermerk = Column(Text, nullable=True)
+    erfasst_am = Column(DateTime, default=datetime.utcnow)
