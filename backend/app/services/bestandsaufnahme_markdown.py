@@ -10,6 +10,7 @@ Größe ohne Wert steht mit ihrem ``luecke_satz`` unter „Datenlücken“.
 from __future__ import annotations
 
 from app.data import sources
+from app.data.bevoelkerungsentwicklung import MODELLGRENZE
 from app.services.kang_nachweis_markdown import _de_betrag
 
 TITEL = "# Bestandsaufnahme"
@@ -26,7 +27,11 @@ GRUPPEN = [
     ("natuerliche_systeme", "## Natürliche Systeme"),
     ("klimasensible_strukturen", "## Klimasensible Strukturen"),
     ("vergangene_ereignisse", "## Vergangene Klimarisiken"),
+    ("trends", "## Trends"),
 ]
+
+# Modellgrenzen je Gruppe, wörtlich unter der Tabelle der Gruppe.
+GRUPPEN_MODELLGRENZEN = {"trends": MODELLGRENZE}
 
 UEBERSCHRIFT_LUECKEN = "## Datenlücken"
 
@@ -64,6 +69,16 @@ def _tabelle(groessen: list[dict]) -> str:
     return "\n".join(zeilen)
 
 
+def _zusatz_zeile(g: dict) -> str:
+    """Beide Stichtage mit Einwohnerzahl und die Veränderung (Größe „Bevölkerungsentwicklung“)."""
+    z = g["zusatz"]
+    return (
+        f"Einwohner am 31.12.{z['jahr_alt']}: {_de_wert(z['einwohner_alt'])}; "
+        f"am 31.12.{z['jahr_neu']}: {_de_wert(z['einwohner_neu'])}; "
+        f"Veränderung: {_de_wert(g['wert'])} {g.get('einheit') or ''}".rstrip()
+    )
+
+
 def bestandsaufnahme_markdown(ergebnis: dict) -> str:
     """Formatiert das Ergebnis von ``bestandsaufnahme_fuer_kommune`` als Markdown."""
     groessen = ergebnis["groessen"]
@@ -80,6 +95,11 @@ def bestandsaufnahme_markdown(ergebnis: dict) -> str:
         ]
         if hinweise:
             teile += ["\n".join(hinweise), ""]
+        for g in mit_wert:
+            if g.get("zusatz"):
+                teile += [_zusatz_zeile(g), ""]
+        if gruppe in GRUPPEN_MODELLGRENZEN:
+            teile += [GRUPPEN_MODELLGRENZEN[gruppe], ""]
 
     saetze: list[str] = []
     for g in groessen:

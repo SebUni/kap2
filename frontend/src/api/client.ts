@@ -210,6 +210,35 @@ export interface SystembereicheAuswertung {
   bereiche: Systembereich[]
 }
 
+/** Ein KAnG-Handlungsfeld in der Antwort von GET /kommune/{id}/kang-nachweis. */
+export interface KangNachweisHandlungsfeld {
+  cluster: string
+  feld: string
+  status: 'berücksichtigt' | 'offen' | 'nicht betroffen'
+  risiken: string[]
+  /** Jährliche Schadenssumme des Feldes in Euro. */
+  schaden_eur: number
+  massnahmen: string[]
+}
+
+/** Antwort von GET /kommune/{id}/kang-nachweis (§ 8 Abs. 1 KAnG, fachübergreifende Berücksichtigung). */
+export interface KangNachweis {
+  handlungsfelder: KangNachweisHandlungsfeld[]
+  zusammenfassung: {
+    betroffen_n: number
+    beruecksichtigt_n: number
+    offen_n: number
+    offene_handlungsfelder: { cluster: string; feld: string }[]
+    integrierende_massnahmen: string[]
+  }
+  /** Abgrenzungstext: keine Rechtskonformität bescheinigt; wörtlich anzuzeigen. */
+  abgrenzung: string
+  nicht_zugeordnet: {
+    risiken: { code: string; schaden_eur: number | null }[]
+    massnahmen: string[]
+  }
+}
+
 /** Antwort von GET /kommune/{id}/kang-zustaendigkeit (§ 12 Abs. 1 KAnG, Landesrecht). */
 export interface KangZustaendigkeit {
   bundesland: string
@@ -550,6 +579,8 @@ export const api = {
     request<Record<string, unknown>>(`/measures/${measureId}/calculate-impact`, { method: 'POST' }),
   getSystembereiche: (kommuneId: number) =>
     request<SystembereicheAuswertung>(`/kommune/${kommuneId}/systembereiche`),
+  getKangNachweis: (kommuneId: number) =>
+    request<KangNachweis>(`/kommune/${kommuneId}/kang-nachweis`),
   getCostSummary: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/cost-summary`),
 

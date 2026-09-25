@@ -1314,6 +1314,34 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "https://doi.org/10.1016/j.envint.2025.109746",
         "accessed": "2026-08-30",
     },
+    "Destatis_GVISys_Bevoelkerung": {
+        "ieee": "Statistisches Bundesamt (Destatis), „Gemeindeverzeichnis-Informationssystem "
+                "GV-ISys: Gemeinden nach Fläche, Bevölkerung und Postleitzahl, Stichtage "
+                "31.12.2017 und 31.12.2023 (Fortschreibung auf Basis des Zensus 2011),“ "
+                "Wiesbaden, Deutschland. [Online]. Verfügbar: "
+                "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/"
+                "Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122023_Auszug_GV.xlsx. "
+                "[Zugriff: 25. September 2026].",
+        "url": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/"
+               "Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122023_Auszug_GV.xlsx",
+        "archive_url": "https://web.archive.org/web/2026/"
+                       "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/"
+                       "Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122023_Auszug_GV.xlsx",
+        "accessed": "2026-09-25",
+    },
+    "UBA_MK40_Diskontierung": {
+        "ieee": "Umweltbundesamt (UBA), „Methodenkonvention 4.0 zur Ermittlung von "
+                "Umweltkosten,“ Kap. 2.2.3 „Diskontierung“, S. 14–15 (Reine "
+                "Zeitpräferenzrate von 0 % und 1 %), Dessau-Roßlau, Deutschland. [Online]. "
+                "Verfügbar: https://www.umweltbundesamt.de/publikationen/methodenkonvention-"
+                "umweltkosten. [Zugriff: 25. September 2026].",
+        "url": "https://www.umweltbundesamt.de/publikationen/methodenkonvention-"
+               "umweltkosten",
+        "archive_url": "https://web.archive.org/web/20260415021252/"
+                       "https://www.umweltbundesamt.de/publikationen/"
+                       "methodenkonvention-umweltkosten",
+        "accessed": "2026-09-25",
+    },
 }
 
 
