@@ -418,6 +418,42 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 evidence_derivation=spec.get("evidence_derivation"),
             ))
 
+    # Einordnungsschwellen (Charakterisierungsgruppe, Gewissheitsstufe): Wert und
+    # Herleitung stammen aus den SCHWELLEN der Module (Single Source), nicht editierbar.
+    # Lazy-Import: gewissheit importiert diese Registry (Zirkel).
+    if emit_globals("charakterisierung") or emit_globals("gewissheit"):
+        from app.services import charakterisierung, gewissheit
+
+        schwellen = (
+            ("charakterisierung", charakterisierung, "SCHWELLE_UMSETZUNG",
+             "Einordnungsschwelle Umsetzung (Charakterisierungsgruppe)"),
+            ("charakterisierung", charakterisierung, "SCHWELLE_ENTWICKLUNG",
+             "Einordnungsschwelle Entwicklung (Charakterisierungsgruppe)"),
+            ("gewissheit", gewissheit, "SCHWELLE_MITTEL",
+             "Schwelle Gewissheitsstufe „mittel“ (Anteil belegter Parameter)"),
+        )
+        for cat, modul, name, label in schwellen:
+            if not emit_globals(cat):
+                continue
+            spec = modul.SCHWELLEN[name]
+            unit = "Anteil" if cat == "gewissheit" else "relative Minderung"
+            params.append(_base_param(
+                f"{cat}.{name.lower()}",
+                layer_code="", layer_category=cat,
+                label=label,
+                value=getattr(modul, name),
+                unit=unit,
+                source=spec["art"],
+                source_detail=spec["herleitung"],
+                editable=False,
+                evidence_class=None,
+                evidence_derivation={
+                    "wert": spec["herleitung"],
+                    "band": spec["band"],
+                    "sensitivitaet": spec["sensitivitaet"],
+                },
+            ))
+
     return params
 
 
