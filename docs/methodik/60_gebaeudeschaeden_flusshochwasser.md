@@ -2369,9 +2369,11 @@ drei zusätzliche, maschinenlesbare Felder. Eine Kennzeichnung als YAML-Kommenta
 erfüllt P1 ausdrücklich nicht („eine Herleitung nur als Code-Kommentar erfüllt die Vorgabe nicht"),
 deshalb sind die früheren Kommentare durch echte Felder ersetzt:
 
-- **`kennzeichnung:`** — genau einer von zwei Werten: `quelle` (der Wert stammt aus einer belegten
-  Quelle; das Feld `quelle:` nennt sie) oder `abschaetzung_kap3` (begründete Abschätzung von KAP3
-  nach §3.9, Vorgaben P1/P2). Die vier Blöcke des Hebels S092 stehen auf `abschaetzung_kap3`;
+- **`kennzeichnung:`** — einer von drei Werten: `quelle` (der Wert stammt aus einer belegten
+  Quelle; das Feld `quelle:` nennt sie), `abschaetzung_kap3` (begründete Abschätzung von KAP3
+  nach §3.9, Vorgaben P1/P2) oder `berechnet` (der Wert folgt rechnerisch aus anderen Blöcken,
+  die das Feld `abgeleitet_aus:` nennt; so geführt sind die in §4.8 als „berechnet“ ausgewiesenen
+  Größen). Die vier Blöcke des Hebels S092 stehen auf `abschaetzung_kap3`;
   `flood_bldg.r_s092` ist aus den drei übrigen berechnet, und weil alle drei Faktoren Abschätzungen
   sind, ist das Produkt als Ganzes ebenfalls eine Abschätzung (Feld `abgeleitet_aus:` nennt die
   Faktoren).
@@ -2730,7 +2732,8 @@ parameter:
   einheit: "-"
   band: [0.12, 3.93]
   herkunft: herleitung:§4.4
-  kennzeichnung: abschaetzung_kap3
+  kennzeichnung: berechnet
+  abgeleitet_aus: [flood_bldg.a_ver, flood_bldg.pi, flood_bldg.m0]
   herleitung_anker: "#niveau-skalar"
   quelle: null
   preisstand: null
@@ -2832,7 +2835,7 @@ parameter:
   einheit: "Mrd. EUR2026/a"
   band: [0.583, 2.425]
   herkunft: herleitung:§4.3
-  kennzeichnung: abschaetzung_kap3
+  kennzeichnung: berechnet
   herleitung_anker: "#modellsumme-m0"
   abgeleitet_aus: [flood_bldg.w_wohn, flood_bldg.wert_je_wohngebaeude, flood_bldg.adressen_gk3_gk4, flood_bldg.adressen_gk2, flood_bldg.r_gk3_gk4, flood_bldg.r_gk2]
   rolle: kalibrierung
@@ -2866,7 +2869,7 @@ parameter:
   einheit: "EUR2026"
   band: [435696.30, 547073.95]
   herkunft: herleitung:§4.3
-  kennzeichnung: abschaetzung_kap3
+  kennzeichnung: berechnet
   herleitung_anker: "#modellsumme-m0"
   abgeleitet_aus: [flood_bldg.wohnflaeche_je_wohngebaeude, flood_bldg.k_bgf, flood_bldg.theta_efh_zfh, flood_bldg.n_efh_zfh, flood_bldg.n_mfh]
   rolle: kalibrierung
@@ -3000,7 +3003,8 @@ parameter:
   einheit: "Prozentpunkte"
   band: null
   herkunft: herleitung:§4.5
-  kennzeichnung: abschaetzung_kap3
+  kennzeichnung: berechnet
+  abgeleitet_aus: [flood_bldg.a_ver, flood_bldg.p_hq_extrem]
   herleitung_anker: "#verteilungspruefung"
   band_grund: "Toleranz selbst; berechnet aus Jackknife 11,2, Ablese 1,7, Modellband 2,3 (quadratisch); abgeschaetzt ist die Kombinationsregel"
   rolle: pruefgroesse
@@ -3034,7 +3038,7 @@ parameter:
   einheit: "Mrd. EUR2026/a"
   band: [0.095, 0.315]
   herkunft: herleitung:§4.6
-  kennzeichnung: abschaetzung_kap3
+  kennzeichnung: berechnet
   herleitung_anker: "#sanity-band"
   abgeleitet_aus: [flood_bldg.e_fonds, flood_bldg.w_aufbauhilfe, flood_bldg.f_fluss, flood_bldg.n_ankerfenster]
   rolle: pruefgroesse
@@ -3134,7 +3138,7 @@ parameter:
   einheit: "Mrd. EUR2026/a"
   band: null
   herkunft: herleitung:§4.6
-  kennzeichnung: abschaetzung_kap3
+  kennzeichnung: berechnet
   herleitung_anker: "#sanity-band"
   abgeleitet_aus: [flood_bldg.e_fonds, flood_bldg.f_fluss]
   rolle: pruefgroesse
@@ -3151,7 +3155,7 @@ parameter:
   einheit: "Mrd. EUR2026/a"
   band: null
   herkunft: herleitung:§4.6
-  kennzeichnung: abschaetzung_kap3
+  kennzeichnung: berechnet
   herleitung_anker: "#sanity-band"
   abgeleitet_aus: [flood_bldg.rate_bestand_gk3_gk4, flood_bldg.rate_bestand_gk2, flood_bldg.adressen_gk3_gk4, flood_bldg.adressen_gk2, flood_bldg.gebaeudewert_efh_om, flood_bldg.d_5]
   pruefstein: false
@@ -3169,7 +3173,7 @@ parameter:
   einheit: "EUR2026"
   band: null
   herkunft: herleitung:§4.6
-  kennzeichnung: abschaetzung_kap3
+  kennzeichnung: berechnet
   herleitung_anker: "#sanity-band"
   abgeleitet_aus: [flood_bldg.wohnflaeche_je_wohngebaeude, flood_bldg.k_bgf, flood_bldg.n_efh_zfh]
   rolle: pruefgroesse
@@ -3249,7 +3253,7 @@ Fortschreibung geändert, §1/§5.4; dieser Abschnitt ist der Antrag, nicht die 
 2. `bandzuordnung` erhält zusätzlich den Wert `[alle]` für Parameter ohne differenzierende
    Bandachse.
 3. Das Block-Format wird um die fünf Felder erweitert, mit denen dieses Kapitel die Vorgabe P1
-   maschinenlesbar erfüllt: `kennzeichnung:` (`quelle | abschaetzung_kap3`), `herleitung_anker:`
+   maschinenlesbar erfüllt: `kennzeichnung:` (`quelle | abschaetzung_kap3 | berechnet`), `herleitung_anker:`
    (Pflicht bei `abschaetzung_kap3`), `wertebereich_abweichung:`, `abgeleitet_aus:` (bei berechneten
    Parametern) sowie `naeherung:`/`naeherung_richtung:` (bei ausgewiesenen Näherungen, hier
    \(s_{\text{bem}}\), §5.1.3). Auch diese Felder gehen über das §4-Template hinaus; sie sind
