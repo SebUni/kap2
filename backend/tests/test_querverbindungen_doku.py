@@ -74,10 +74,11 @@ def test_ueberschriften_vorhanden():
 
 # ── Netzrollen ────────────────────────────────────────────────────────────────
 
-def test_netzrollen_tabelle_25_datenzeilen():
+def test_netzrollen_tabelle_27_datenzeilen():
     abschnitt = _abschnitt(_text(), "## Netzrollen")
     zeilen = _tabellenzeilen(abschnitt)
-    assert len(zeilen) == 25
+    assert len(zeilen) == 27
+    assert len(zeilen) == len(k.NETZROLLEN)
 
 
 def test_netzrollen_ids_identisch_mit_datenmodul():
@@ -103,6 +104,18 @@ def test_systembereiche_tabelle_5_datenzeilen():
     abschnitt = _abschnitt(_text(), "## Querverbindungen zwischen den Systembereichen")
     zeilen = _tabellenzeilen(abschnitt)
     assert len(zeilen) == 5
+
+
+# ── Annahme der Auswertung und Einordnung ─────────────────────────────────────
+
+def test_abschnitt_annahme_und_einordnung_nennt_aussagen():
+    """T-0939 (A4, A10): Annahme (S. 82), Cluster-Einordnung und Kaskadeneffekte stehen in der Doku."""
+    abschnitt = _abschnitt(_text(), "## Annahme der Auswertung und Einordnung")
+    assert "Annahme der Auswertung (S. 82)" in abschnitt
+    assert "nachgelagerten" in abschnitt
+    assert "Cluster Wasser und Land" in abschnitt
+    assert "Kaskadeneffekte" in abschnitt
+    assert "AUSSAGEN" in abschnitt
 
 
 # ── Quellenlage ───────────────────────────────────────────────────────────────

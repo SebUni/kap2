@@ -65,10 +65,30 @@ def querverbindungs_auswertung() -> dict:
             "netzrolle": netzrolle_je_id[kid]["rolle"] if kid in netzrolle_je_id else None,
             "netzrollen": list(netzrolle_je_id[kid]["rollen"]) if kid in netzrolle_je_id else [],
             "zentral": netzrolle_je_id[kid]["zentral"] if kid in netzrolle_je_id else False,
+            # „gesamt“ und/oder „hochrisiko“ (Auswertung der hoch bewerteten
+            # Klimawirkungen, TB 6 S. 86–87); leer ohne Netzrolle.
+            "netzrolle_auswertungen": (
+                list(netzrolle_je_id[kid]["auswertungen"]) if kid in netzrolle_je_id else []
+            ),
             "ausgehende_benannte": ausgehend_je_id.get(kid, 0),
             "eingehende_benannte": eingehend_je_id.get(kid, 0),
         }
         for kid, eintrag in sorted(klimawirkungen_je_id.items())
+    ]
+
+    # Netzknoten der Gesamtbetrachtung (TB 6 Kap. 3.4), die nicht im Katalog stehen
+    # (weder RISKS noch PLANNED_RISKS) — z. B. #49 Hochwasser, der zentrale Knoten.
+    netzknoten_ausserhalb_katalog = [
+        {
+            "kwra_id": e["kwra_id"],
+            "name": e["name"],
+            "handlungsfeld": e["handlungsfeld"],
+            "netzrollen": list(e["rollen"]),
+            "zentral": e["zentral"],
+            "hinweis": "nicht im Katalog",
+        }
+        for e in sorted(kq.NETZROLLEN, key=lambda x: x["kwra_id"])
+        if "gesamt" in e["auswertungen"] and e["kwra_id"] not in klimawirkungen_je_id
     ]
 
     mit_netzrolle = sum(1 for e in klimawirkungen if e["netzrolle"] is not None)
@@ -95,7 +115,8 @@ def querverbindungs_auswertung() -> dict:
         "vollständige Liste (Abbildung 8 in Teilbericht 6 ist ein Chord-Diagramm auf "
         "Handlungsfeldebene, aus dem sich keine exakten Kanten ablesen lassen). "
         "Ausgewiesen werden deshalb nur die von Teilbericht 6 Kapitel 3.4 ausdrücklich "
-        "belegten Angaben: 25 Klimawirkungen mit benannter Netzrolle, "
+        f"belegten Angaben: {len(kq.NETZROLLEN)} Klimawirkungen mit benannter Netzrolle "
+        "(aus der Gesamtbetrachtung und der Auswertung der hoch bewerteten Klimawirkungen), "
         f"{len(kq.BENANNTE_BEZIEHUNGEN)} im Fließtext "
         "genannte Einzelbeziehungen (Auszug, nicht vollständig) sowie Kennzahlen und "
         "die 5x5-Systembereichs-Matrix. Eine vollständige, selbst modellierte "
@@ -105,6 +126,7 @@ def querverbindungs_auswertung() -> dict:
 
     return {
         "klimawirkungen": klimawirkungen,
+        "netzknoten_ausserhalb_katalog": netzknoten_ausserhalb_katalog,
         "kennzahlen": kq.KENNZAHLEN,
         "systembereich_matrix": kq.SYSTEMBEREICH_MATRIX,
         "abdeckung": abdeckung,
