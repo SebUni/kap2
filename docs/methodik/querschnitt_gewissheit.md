@@ -125,13 +125,17 @@ Tabelle 1). Herleitung damit: übernommen, Fundstelle TB6 Tabelle 1, S. 36–41.
 
 Schritt 2, Ticket T-1173-methodik_manager. Gelesen am 25.09.2026, jeweils vollständig: TB6 Kap. 6 mit 6.1 und 6.2
 (S. 136–145), dazu Kap. 5.1 (S. 112–123) und Kap. 5.2 (S. 123–129), weil Kap. 6.2 auf Kap. 5 aufbaut. Als Bild gelesen:
-Tabelle 24 (S. 128–129) und Tabelle 27 (S. 142). PDF-Seite und gedruckte Seite stimmen auf S. 112–145 überein.
+Tabelle 24 (S. 128–129) und Tabelle 27 (S. 142). PDF-Seite und gedruckte Seite stimmen auf S. 112–145 überein. In
+Runde 1 kam TB1 Kap. 2.5 dazu (S. 91–94, PDF-Seiten 92–95, vollständig gelesen), auf das TB6 Fußnote 28 verweist.
 
 **Kurzfassung.** Die KWRA bildet die Charakterisierung für die Zeitscheibe Mitte des Jahrhunderts (2031–2060). Als
 Gewissheit nimmt sie nicht die Gewissheit nach Regel G allein. Sie nimmt eine *Gesamtgewissheit*: den Mittelwert aus
 der Gewissheit ohne Anpassung und der Gewissheit mit Anpassung, und „mittel“ gilt erst ab einem Mittelwert über 1,5.
-Die beiden Schwellen des Produkts nennt die KWRA nicht als Zahl. Sie bleiben Abschätzungen von KAP3. Der Wert 0,5
-bleibt, sein Band wird 0,33–0,5 statt 0,4–0,6. Der Wert 0,1 und sein Band 0,05–0,2 bleiben, mit einer Modellgrenze.
+Wörtlich steht beides in der Methodik der KWRA (TB1 Kap. 2.5, S. 93). Die beiden Schwellen des Produkts nennt die KWRA
+nicht als Zahl. Sie bleiben Abschätzungen von KAP3 und gelten nur, wenn der Eingang des Produkts die beschlossenen
+Maßnahmen misst. Der Wert 0,5 bleibt, sein Band wird 0,33–0,5 statt 0,4–0,6. Der Wert 0,1 und sein Band 0,05–0,2
+bleiben, gestützt von Kap. 6.2 sind sie nicht. Die Regel der KWRA für Entwicklung (0,5 an der weiterreichenden
+Anpassung) geht als Übergabe an T-1111-ceo.
 
 ### Zeitscheibe der Charakterisierung
 
@@ -151,6 +155,16 @@ Zeitscheibe folgt aus drei Stellen, auf die Kap. 6.2 selbst verweist:
 3. Die Gewissheit mit Anpassung steht in Tabelle 24 für „2020–2031“ und „Mitte des Jahrhunderts“. Mitte ist damit die
    einzige Zeitscheibe, für die es beide Teile der Gesamtgewissheit gibt: Tabelle 1 hat Mitte und Ende, Tabelle 24
    hat 2020–2031 und Mitte.
+
+**Wörtlich belegt in Teilbericht 1.** Für die Gesamtgewissheit verweist Kap. 6.2 auf „Teilbericht 1, ‚Konzept und
+Methodik‘“ (TB6 S. 141, Fußnote 28). Dort steht die Zeitscheibe ausdrücklich: „Die mittlere Gesamtgewissheit wurde
+berechnet als Mittelwert der beiden Angaben für a) die Gewissheit der Bewertung der Bedeutung des Klimarisikos (also
+ohne Einbeziehung von Anpassungskapazität) für die Mitte des Jahrhunderts und b) die Gewissheit der Einschätzung der
+Anpassungskapazität für die Mitte des Jahrhunderts.“ (TB1 Kap. 2.5, S. 93, PDF-Seite 94). Dass es keine andere
+Zeitscheibe gab, steht ebenfalls dort: Das Verfahren hat die Unsicherheit dadurch verringert, „dass die Einschätzung
+der Anpassungskapazität nur für die Mitte des Jahrhunderts vorgenommen wurde und nicht für das Ende des Jahrhunderts“
+(TB1 S. 91, PDF-Seite 92, Aufzählung unmittelbar vor Kap. 2.5). Der Satz oben bleibt richtig: Kap. 6.2 selbst nennt
+die Zeitscheibe nicht.
 
 **Nachgerechnet:** Mit der Gewissheit zur Mitte aus beiden Tabellen trifft die Gesamtgewissheit bei allen 26
 Klimawirkungen außerhalb von „Umsetzung“ die Gruppe von Tabelle 27. Das heißt: 13 Klimawirkungen „unter
@@ -189,15 +203,27 @@ hoch 1,0.
 
 | Schwelle | Wert | Band | Urteil | Art |
 |---|---|---|---|---|
-| Umsetzung (`SCHWELLE_UMSETZUNG`) | 0,5 | 0,33–0,5 (bisher 0,4–0,6) | Wert bestätigt, Band ersetzt | Abschätzung von KAP3 |
-| Entwicklung (`SCHWELLE_ENTWICKLUNG`) | 0,1 | 0,05–0,2 | bestätigt, mit Modellgrenze | Abschätzung von KAP3 |
+| Umsetzung (`SCHWELLE_UMSETZUNG`) | 0,5 | 0,33–0,5 (bisher 0,4–0,6) | Wert beibehalten, Band ersetzt | Abschätzung von KAP3; gilt nur, wenn der Eingang die beschlossenen Maßnahmen misst |
+| Entwicklung (`SCHWELLE_ENTWICKLUNG`) | 0,1 | 0,05–0,2 | beibehalten, von Kap. 6.2 nicht gestützt | Abschätzung von KAP3; gilt nur, wenn der Eingang die beschlossenen Maßnahmen misst |
 
-**Umsetzung 0,5: bestätigt.** Im pessimistischen Fall liegt das Risiko ohne Anpassung bei den sehr dringenden
-Klimawirkungen meist auf „hoch“ (Tabelle 25, S. 138). Das Ziel „mittel“ (S. 141) verlangt dann eine Stufe Minderung,
-also die Wirksamkeit „mittel“ = 0,5. Nachgerechnet an der Wirksamkeit der beschlossenen Maßnahmen, Mitte,
-pessimistischer Fall (Mappe Spalte Y): Mit 0,5 trifft die Einordnung „Umsetzung“ bei allen 29 charakterisierten
-Klimawirkungen Tabelle 27. Das sind drei Klimawirkungen in „Umsetzung“ (#96, Hochwasserschutzsysteme, Schiffbarkeit)
-und 26 außerhalb.
+**Welchen Maßnahmenraum die Schwellen voraussetzen.** Die KWRA stellt ihre zwei Fragen an zwei verschiedene
+Maßnahmenräume. „Umsetzung“ fragt, ob die *beschlossenen* Maßnahmen das Ziel erreichen. „Entwicklung“ gegen
+„Innovation“ fragt, ob die *weiterreichende* Anpassung es erreicht (S. 140–141, S. 143; TB1 S. 93). Die Mappe führt
+beide Räume getrennt: Spalte Y „Wirksamkeit APA III – Mitte pessim.“ und Spalte AA „Wirksamkeit weiterr. – Mitte
+pessim.“. Das Produkt hat einen Eingang, das Anpassungspotenzial aus dem Katalog. Welchem Raum er entspricht, legt
+T-1111-ceo fest, nicht diese Datei. Hinweis dafür: Die beschlossenen Maßnahmen „liegen fast nur in der Zuständigkeit des
+Bundes“, bei der weiterreichenden Anpassung „werden auch andere Akteure als diejenigen auf Bundesebene berücksichtigt“
+(S. 112). Beide Schwellen dieser Datei gelten deshalb nur unter einer Bedingung: **Der Eingang des Produkts misst
+dieselbe Frage wie die beschlossenen Maßnahmen.**
+
+**Umsetzung 0,5: beibehalten, gemessen an den beschlossenen Maßnahmen.** Im pessimistischen Fall liegt das Risiko ohne
+Anpassung bei den sehr dringenden Klimawirkungen meist auf „hoch“ (Tabelle 25, S. 138). Das Ziel „mittel“ (S. 141)
+verlangt dann eine Stufe Minderung, also die Wirksamkeit „mittel“ = 0,5. Nachgerechnet an der Wirksamkeit der
+**beschlossenen** Maßnahmen, Mitte, pessimistischer Fall (Mappe Spalte Y): Mit 0,5 trifft die Einordnung „Umsetzung“
+bei allen 29 charakterisierten Klimawirkungen Tabelle 27. Das sind drei Klimawirkungen in „Umsetzung“ (#96,
+Hochwasserschutzsysteme, Schiffbarkeit) und 26 außerhalb. An der weiterreichenden Anpassung (Spalte AA) gemessen
+trifft dieselbe Schwelle nur 14 von 29. #95 und #98 haben dort „mittel“ (0,5) und stünden in „Umsetzung“, gegen
+Tabelle 27. Die Gruppe „Umsetzung“ trägt im Produkt also nur, wenn sein Eingang die beschlossenen Maßnahmen misst.
 
 **Band 0,33–0,5: ersetzt.** Das bisherige Band 0,4–0,6 reichte über 0,5 hinaus. Eine Schwelle über 0,5 verlangt mehr
 als die eine Stufe, die Kap. 6.2 als Ziel setzt. Bei 0,6 fallen #96 und Schiffbarkeit aus „Umsetzung“ heraus (27
@@ -206,17 +232,23 @@ Risikostufen gering, mittel, hoch als 1, 2, 3, ist „hoch“ auf „mittel“ e
 Rangskala wie Messwerte. Deshalb ist sie nur Bandgrenze und nicht Wert. Im ganzen Band 0,33–0,5 bleibt die Zuordnung
 „Umsetzung“ gleich (29 von 29).
 
-**Entwicklung 0,1: bestätigt, mit Modellgrenze.** Die Schwelle trennt im Produkt „kein nennenswerter Hebel“ von „ein
-Hebel, der sich ausbauen lässt“. Auf der Wirksamkeitsskala liegt sie zwischen „gering“ (0, „würde … nicht
-reduzieren“, S. 112) und „gering-mittel“ (0,25). Das ganze Band 0,05–0,2 liegt in dieser Lücke und ordnet
-KWRA-Werte gleich ein. **Modellgrenze:** Die KWRA trennt „Entwicklung“ von „Innovation“ an einer anderen Frage. Sie
-fragt, ob die *weiterreichenden* Maßnahmen das Ziel erreichen (S. 140–141, S. 143). Das Produkt kennt nur einen
-Maßnahmenraum, den Katalog. An den beschlossenen Maßnahmen gemessen trifft 0,1 bei 15 von 26 Klimawirkungen die Gruppe
-von Tabelle 27. Genauer geht es mit einer Zahl nicht: Jede Schwelle von 0,05 bis 0,2 gibt 15 Treffer. Jede Schwelle
-über 0,25 gibt 12 Treffer, weil dann alle 26 Klimawirkungen in „Innovation“ fallen, auch #95 und #98, die Tabelle 27
-unter „Entwicklung“ führt. Für M0 stimmt die Einordnung: #95 und #98 haben „gering-mittel“ (0,25), also „Entwicklung“;
-#96 hat „mittel“ (0,5), also „Umsetzung“, wie Tabelle 27. Wie das Produkt „weiterreichend“ abbildet, gehört zur
-Definition des Anpassungspotenzials (T-1111-ceo) und nicht hierher.
+**Entwicklung 0,1: beibehalten als Abschätzung von KAP3, von Kap. 6.2 nicht gestützt.** Die Schwelle trennt im
+Produkt „kein nennenswerter Hebel“ von „ein Hebel, der sich ausbauen lässt“. Auf der Wirksamkeitsskala liegt sie
+zwischen „gering“ (0, „würde … nicht reduzieren“, S. 112) und „gering-mittel“ (0,25). Das ganze Band 0,05–0,2 liegt
+in dieser Lücke und ordnet KWRA-Werte gleich ein. Das ist eine Setzung von KAP3. Die Frage der KWRA ist eine andere,
+und an den beschlossenen Maßnahmen gemessen erklärt die Schwelle wenig: 0,1 an Spalte Y trifft 15 von 26
+Klimawirkungen, und schon „alles ist Entwicklung“ träfe 14 von 26. Jede Schwelle über 0,25 an Spalte Y gibt 12
+Treffer, weil dann alle 26 in „Innovation“ fallen, auch #95 und #98. Für M0 trifft 0,1 die Tabelle 27: #95 und #98
+haben an Spalte Y „gering-mittel“ (0,25), also „Entwicklung“. #96 hat „mittel“ (0,5), also „Umsetzung“.
+
+**Die Regel der KWRA für Entwicklung (Übergabe an T-1111-ceo).** Kap. 6.2 trennt „Entwicklung“ von „Innovation“
+daran, ob die weiterreichende Anpassung das Ziel erreicht, also an der Wirksamkeit „mittel“ = 0,5 im weiterreichenden
+Raum. Nachgerechnet an Spalte AA trifft diese Regel 25 von 26 Klimawirkungen der Tabelle 27. Der einzige Fehltreffer
+ist ID 10 „Bodenerosion durch Wasser“. Dort steht in Spalte AA „mittel“, das Restrisiko nach weiterreichender
+Anpassung bleibt aber „mittel-hoch“ (Tabelle 24, S. 128), und Tabelle 27 führt die Klimawirkung unter „Innovation
+unter Unsicherheit“. Diese Regel ist nicht verworfen. Das Produkt kann sie erst anwenden, wenn sein Eingang einen
+weiterreichenden Raum abbildet. Dann gilt auf diesem Raum 0,5 als Entwicklungsschwelle. Das entscheidet T-1111-ceo mit
+der Definition des Anpassungspotenzials.
 
 **Befund an der Quelle.** Der Text auf S. 142 nennt für „Umsetzung“ „vier Klimawirkungen aus unterschiedlichen
 Handlungsfeldern“. Tabelle 27 auf derselben Seite zeigt drei. „Abiotischer Stress (Pflanzen)“ steht dort in
@@ -244,14 +276,22 @@ S. 128). Diese Datei rechnet mit der Tabelle.
 6. **Ausnahme (S. 141, Fußnote 28; S. 143, Fußnote 29):** „Ausnahmen in der Berechnung erfolgten bei Klimawirkungen,
    bei denen die beschlossenen Maßnahmen (APA III) ausschlaggebend für die Zuordnung waren“. Genannt sind #96 und
    „Belastung oder Versagen von Hochwasserschutzsystemen“. Beide stehen in „Umsetzung“, und „Umsetzung“ hat keine
-   Variante „unter Unsicherheit“ (S. 140). Deshalb ändert die Ausnahme keine Gruppe.
+   Variante „unter Unsicherheit“ (S. 140). Deshalb ändert die Ausnahme keine Gruppe. Worin die Ausnahme besteht, sagt
+   die Methodik wörtlich. Die Gewissheit der Anpassungskapazität wurde „nur für die beschlossenen Maßnahmen und die
+   weiterreichende Anpassung zusammen durchgeführt“. Deshalb wurden „alle Klimawirkungen, bei denen die beschlossenen
+   Maßnahmen alleine ausreichten, die Zielwerte einzuhalten, nicht einer der Gruppen mit Unsicherheit zugeordnet“
+   (TB1 Kap. 2.5, S. 93–94, PDF-Seiten 94–95). Das Produkt übernimmt diese Korrektur: „Umsetzung“ bekommt nie den
+   Zusatz „unter Unsicherheit“, wie heute in `charakterisierung.py`.
 
-**Die Regel für das Produkt (übernommen, TB6 S. 141):** Die Charakterisierung zählt die Gewissheit als ausreichend,
-wenn die Gesamtgewissheit zur Mitte über 1,5 liegt. Die Gesamtgewissheit ist der Mittelwert der Punkte (sehr gering 0,
-gering 1, mittel 2, hoch 3) aus der Gewissheit nach Regel G, Wert Mitte (TB6 Tabelle 1, Mappe Spalte S), und der
-Gewissheit der Bewertung der Klimarisiken mit Anpassung, Spalte „Mitte des Jahrhunderts“ (TB6 Tabelle 24, S. 128–129).
-Die Mappe führt diese zweite Spalte nicht. Der Mittelwert ist die Regel der KWRA für eine Ja-Nein-Frage. Das Produkt
-zeigt ihn nicht als Stufe.
+**Die Regel für das Produkt (übernommen, TB6 S. 141; TB1 Kap. 2.5, S. 93–94):** Die Charakterisierung zählt die
+Gewissheit als ausreichend, wenn die Gesamtgewissheit zur Mitte über 1,5 liegt („eine Gesamtgewissheit von > 1,5 als
+‚mittel‘ eingestuft“, TB1 S. 93). Die Gesamtgewissheit ist der Mittelwert der Punkte (sehr gering 0, gering 1, mittel
+2, hoch 3) aus zwei Teilen. Teil a) ist die Gewissheit nach Regel G, Wert Mitte (TB6 Tabelle 1, Mappe Spalte S). Teil
+b) ist die Gewissheit der Einschätzung der Anpassungskapazität für die Mitte (TB1 S. 93). Ihr Wert je Klimawirkung
+steht in TB6 Tabelle 24, S. 128–129, Spalte „Gewissheit der Bewertung (Klimarisiken mit Anpassung)“, „Mitte des
+Jahrhunderts“. Dass diese Spalte Teil b) ist, bestätigt die Nachrechnung mit 26 von 26 Treffern. „Umsetzung“ bleibt
+ohne Unsicherheitsvariante (Punkt 6). Die Mappe führt Teil b) nicht. Der Mittelwert ist die Regel der KWRA für eine
+Ja-Nein-Frage, das Produkt zeigt ihn nicht als Stufe.
 
 **Was die einfachere Rechnung verfälschen würde (§8 E3).** Die Gewissheit nach Regel G allein („mittel“ und „hoch“
 reichen), wie `AUSREICHENDE_GEWISSHEIT` sie heute anwendet, trifft Tabelle 27 nur bei 18 von 26 Klimawirkungen. Acht
@@ -339,24 +379,39 @@ assert m0 == {95: 2.5, 96: 1.5, 98: 2.0}
 print("M0 Gesamtgewissheit Mitte:", m0, "| ausreichend:", {i: v > 1.5 for i, v in m0.items()})
 
 
-# (2) Umsetzungsschwelle an der Wirksamkeit der beschlossenen Maßnahmen, Mitte pessimistisch (Mappe Spalte Y)
-def umsetzung_treffer(schwelle):
-    return sum((WIRKSAMKEIT[ws[f"Y{zeile[i]}"].value] >= schwelle) == (gr == "Umsetzung") for i, gr in gruppe.items())
+# (2) Schwellen an der Wirksamkeit zur Mitte, pessimistischer Fall: Mappe Spalte Y = beschlossene Maßnahmen,
+#     Spalte AA = weiterreichende Anpassung (die Frage, an der die KWRA Entwicklung von Innovation trennt)
+assert ws["AA2"].value == "Wirksamkeit weiterr. – Mitte pessim."
 
 
-print("Umsetzung, Treffer von 29 — 0,33:", umsetzung_treffer(0.33), "| 0,4:", umsetzung_treffer(0.4),
-      "| 0,5:", umsetzung_treffer(0.5), "| 0,6:", umsetzung_treffer(0.6))
-assert umsetzung_treffer(0.5) == 29 and umsetzung_treffer(0.6) == 27
+def w(spalte, i):
+    return WIRKSAMKEIT[ws[f"{spalte}{zeile[i]}"].value]
 
 
-# (2) Entwicklungsschwelle an derselben Spalte: trennt „Entwicklung“ von „Innovation“ nur zum Teil
-def entwicklung_treffer(schwelle):
-    return sum((WIRKSAMKEIT[ws[f"Y{zeile[i]}"].value] >= schwelle) == gr.startswith("Entwicklung")
+def umsetzung_treffer(schwelle, spalte="Y"):
+    return sum((w(spalte, i) >= schwelle) == (gr == "Umsetzung") for i, gr in gruppe.items())
+
+
+print("Umsetzung, Treffer von 29, an Y — 0,33:", umsetzung_treffer(0.33), "| 0,4:", umsetzung_treffer(0.4),
+      "| 0,5:", umsetzung_treffer(0.5), "| 0,6:", umsetzung_treffer(0.6), "|| an AA — 0,5:", umsetzung_treffer(0.5, "AA"))
+assert umsetzung_treffer(0.5) == 29 and umsetzung_treffer(0.6) == 27 and umsetzung_treffer(0.5, "AA") == 14
+assert w("AA", 95) == w("AA", 98) == 0.5          # an AA gemessen stünden #95 und #98 in „Umsetzung“
+
+
+def entwicklung_treffer(schwelle, spalte="Y"):
+    return sum((w(spalte, i) >= schwelle) == gr.startswith("Entwicklung")
                for i, gr in gruppe.items() if gr != "Umsetzung")
 
 
-print("Entwicklung/Innovation, Treffer von 26 — 0,05:", entwicklung_treffer(0.05), "| 0,1:", entwicklung_treffer(0.1),
-      "| 0,2:", entwicklung_treffer(0.2), "| 0,3:", entwicklung_treffer(0.3))
+alles_entwicklung = sum(gr.startswith("Entwicklung") for gr in gruppe.values())
+fehl_aa = [i for i, gr in gruppe.items()
+           if gr != "Umsetzung" and (w("AA", i) >= 0.5) != gr.startswith("Entwicklung")]
+print("Entwicklung/Innovation, Treffer von 26, an Y — 0,05:", entwicklung_treffer(0.05), "| 0,1:",
+      entwicklung_treffer(0.1), "| 0,2:", entwicklung_treffer(0.2), "| 0,3:", entwicklung_treffer(0.3),
+      "| alles Entwicklung:", alles_entwicklung)
+print("Entwicklung/Innovation, Treffer von 26, an AA — 0,5:", entwicklung_treffer(0.5, "AA"), "| Fehltreffer:", fehl_aa)
+assert entwicklung_treffer(0.1) == 15 and alles_entwicklung == 14
+assert entwicklung_treffer(0.5, "AA") == 25 and fehl_aa == [10]
 ```
 
 Ausgabe:
@@ -366,8 +421,9 @@ Treffer von 26 — Mitte/Mitte: 26 | Ende/Mitte: 19 | Mitte/2020–2031: 18
 Treffer von 26 — Regel G allein: 18
 Robust unter Unsicherheit (Mittelwert höchstens 1): [13, 19, 51, 55]
 M0 Gesamtgewissheit Mitte: {95: 2.5, 96: 1.5, 98: 2.0} | ausreichend: {95: True, 96: False, 98: True}
-Umsetzung, Treffer von 29 — 0,33: 29 | 0,4: 29 | 0,5: 29 | 0,6: 27
-Entwicklung/Innovation, Treffer von 26 — 0,05: 15 | 0,1: 15 | 0,2: 15 | 0,3: 12
+Umsetzung, Treffer von 29, an Y — 0,33: 29 | 0,4: 29 | 0,5: 29 | 0,6: 27 || an AA — 0,5: 14
+Entwicklung/Innovation, Treffer von 26, an Y — 0,05: 15 | 0,1: 15 | 0,2: 15 | 0,3: 12 | alles Entwicklung: 14
+Entwicklung/Innovation, Treffer von 26, an AA — 0,5: 25 | Fehltreffer: [10]
 ```
 
 ## Folgegrößen
@@ -379,9 +435,10 @@ Entwicklung/Innovation, Treffer von 26 — 0,05: 15 | 0,1: 15 | 0,2: 15 | 0,3: 1
   wie sicher die Aussage über Risiko und Anpassung ist, und nicht, ob die Rechnung von KAP3 Quellen hat. Nach Schritt 2
   gilt: Die Gruppen setzen auf der Gesamtgewissheit zur Mitte des Jahrhunderts auf, dem Mittelwert aus Regel G (Wert
   Mitte) und TB6 Tabelle 24 (Spalte Mitte). Ausreichend ist ein Mittelwert über 1,5. Ohne Wert in Tabelle 24 zählt die
-  Gewissheit als nicht ausreichend. Einzelheiten und Schwellen stehen unter „Einordnung der Charakterisierung“. Grund:
-  Kap. 6.2 bildet die Gesamtgewissheit so (TB6 S. 141). Die Gewissheit nach Regel G allein trifft Tabelle 27 nur
-  18-mal von 26.
+  Gewissheit als nicht ausreichend. Die Schwellen 0,5 und 0,1 gelten nur, wenn der Eingang des Produkts die
+  beschlossenen Maßnahmen misst; das klärt T-1111-ceo. Einzelheiten stehen unter „Einordnung der Charakterisierung“.
+  Grund: Kap. 6.2 und TB1 Kap. 2.5 bilden die Gesamtgewissheit so (TB6 S. 141; TB1 S. 93). Die Gewissheit nach Regel G
+  allein trifft Tabelle 27 nur 18-mal von 26.
 - **Hinweis zur vorsichtigen Interpretation (Zeile 19, `backend/app/services/unsicherheits_zusammenschau.py`):** Er
   setzt auf der Gewissheit nach Regel G auf, je Zeitscheibe, weil Kap. 3.3 genau diesen Zweck nennt, nämlich
   Klimawirkungen zu zeigen, „bei denen die ermittelten Klimarisiken noch hohen Unsicherheiten unterliegen und daher
@@ -514,7 +571,8 @@ Gewählt ist Regel G. Verworfen, je mit einem Satz:
    zwei Stufen trüge, wie #95 heute mit „mittel“ und „hoch“.
 
 Schritt 2 (T-1173-methodik_manager, TB6 Kap. 6.2). Gewählt: Zeitscheibe Mitte, Gesamtgewissheit nach TB6 S. 141,
-Umsetzung 0,5 mit Band 0,33–0,5, Entwicklung 0,1 mit Band 0,05–0,2. Verworfen, je mit einem Satz:
+Umsetzung 0,5 mit Band 0,33–0,5, Entwicklung 0,1 mit Band 0,05–0,2, beide nur gültig, wenn der Eingang des Produkts die
+beschlossenen Maßnahmen misst. Verworfen, je mit einem Satz:
 
 10. **Die Zeitscheibe Ende für die Charakterisierung** ist verworfen, weil die KWRA das Klimarisiko mit Anpassung nur
     bis 2060 bewertet hat (S. 112) und Tabelle 1 Ende mit Tabelle 24 Mitte nur 19 von 26 Gruppen trifft.
@@ -532,14 +590,21 @@ Umsetzung 0,5 mit Band 0,33–0,5, Entwicklung 0,1 mit Band 0,05–0,2. Verworfe
     Kap. 6.2 als Ziel setzt (S. 141), und bei 0,6 #96 und Schiffbarkeit gegen Tabelle 27 aus „Umsetzung“ fielen.
 16. **Die Umsetzungsschwelle 0,33 als Wert** ist verworfen, weil sie die Rangskala gering, mittel, hoch wie Messwerte
     liest, während die KWRA Minderung auf der Wirksamkeitsskala beschreibt (S. 112); sie bleibt untere Bandgrenze.
-17. **Eine Entwicklungsschwelle über 0,25** (bis 0,5, „weiterreichend erreicht das Ziel“) ist verworfen, weil das
-    Produkt nur einen Maßnahmenraum kennt und dann alle 26 Klimawirkungen, auch #95 und #98, in „Innovation“ fielen
-    (12 statt 15 Treffer).
+17. **Eine Entwicklungsschwelle über 0,25 auf dem Eingang, der die beschlossenen Maßnahmen misst,** ist verworfen,
+    weil dort alle 26 Klimawirkungen, auch #95 und #98, in „Innovation“ fielen (12 statt 15 Treffer an Spalte Y). Die
+    Regel der KWRA, 0,5 an der weiterreichenden Anpassung (25 von 26 an Spalte AA), ist damit nicht verworfen, sondern
+    als Übergabe an T-1111-ceo vermerkt, weil nur dort feststeht, ob der Eingang einen weiterreichenden Raum abbildet.
+    (Runde 1: Die erste Fassung verwarf diese Regel an Spalte Y, also am falschen Maßnahmenraum.)
 18. **Regel G allein, wo Tabelle 24 keinen Wert hat**, ist verworfen, weil die Bedingung der KWRA beide Teile verlangt
     und Regel G allein die Gewissheit, wie gerechnet, zu oft als ausreichend zeigt.
 19. **Den Mittelwert als Widerspruch zu Regel G** zu werten ist verworfen: Die Zeile „kein Mittelwert“ unter „Verhältnis
     zur KWRA-Einstufung“ und Punkt 5 gelten für die angezeigte Gewissheit einer Klimawirkung, und der Mittelwert hier
     ist die Regel der KWRA selbst (S. 141) für eine Ja-Nein-Frage, die das Produkt nicht als Stufe zeigt.
+20. **Die Schwellen ohne Bedingung an den Maßnahmenraum** zu übergeben ist verworfen (Runde 1), weil dieselbe Schwelle
+    0,5 an der weiterreichenden Anpassung nur 14 von 29 Gruppen „Umsetzung“ trifft und #95 und #98 gegen Tabelle 27
+    in „Umsetzung“ legte.
+21. **Die Zeitscheibe nur aus Kap. 5 und Kap. 6.2 zu erschließen** ist ersetzt (Runde 1), weil TB1 Kap. 2.5, S. 93,
+    auf das TB6 Fußnote 28 verweist, die Mitte des Jahrhunderts für beide Teile der Gesamtgewissheit wörtlich nennt.
 
 Änderungen an Abschnitten aus Schritt 1: Unter „Folgegrößen“ ist die Klammer „zweiter Teil, Zeitscheibe und Schwellen
 folgen in Schritt 2“ durch das Ergebnis ersetzt, weil Schritt 2 sie beantwortet. Unter „Quellen“ sind die in Schritt 2
@@ -565,8 +630,14 @@ stimmt mit TB6 S. 78–79.
   Tabelle 17, S. 80; Kap. 6.2, S. 141. Schritt 2: Kap. 5.1, S. 112–123; Kap. 5.2 mit Tabelle 24, S. 123–129
   (Tabelle 24 als Bild gelesen); Kap. 6.1 mit Tabelle 25, S. 136–140; Kap. 6.2, S. 140–145 mit Fußnoten 28 und 29 und
   Tabelle 27, S. 142 (als Bild gelesen).
-- **[Mappe, Schritt 2]** Blatt „Klimawirkungen“, Spalten S, T, V und Y (Kopf Y2 „Wirksamkeit APA III – Mitte
-  pessim.“) für die 29 Klimawirkungen aus Tabelle 27.
+- **[TB1]** Umweltbundesamt (Hrsg.): Klimawirkungs- und Risikoanalyse 2021 für Deutschland, Teilbericht 1: Grundlagen.
+  Reihe Climate Change, Dessau-Roßlau, Oktober 2021. Lokale Kopie
+  `docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf` (gedruckte Seite = PDF-Seite − 1). Verwendet
+  (Schritt 2, Runde 1): Kap. 2.5 „Methodik zur Untersuchung von Handlungserfordernissen“, S. 91–94 (PDF-Seiten 92–95),
+  vollständig gelesen, darin Gesamtgewissheit und Zeitscheibe S. 93, Korrektur für die beschlossenen Maßnahmen
+  S. 93–94; Aufzählung unmittelbar vor Kap. 2.5, S. 91 (Anpassungskapazität nur für die Mitte).
+- **[Mappe, Schritt 2]** Blatt „Klimawirkungen“, Spalten S, T, V, Y (Kopf Y2 „Wirksamkeit APA III – Mitte pessim.“)
+  und AA (Kopf AA2 „Wirksamkeit weiterr. – Mitte pessim.“) für die 29 Klimawirkungen aus Tabelle 27.
 - **[Mappe]** `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt „Klimawirkungen“, Zeile 97, Zellen A97, D97, S97, T97,
   AJ97; Kopfzellen S2, T2.
 - **[Bericht 95]** `docs/methodik/95_hitzebelastung.md`, Abschnitt „Risiko ohne (weitere) Anpassung“, Absatz
