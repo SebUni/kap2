@@ -26,6 +26,22 @@ def test_netzrollen_kwra_id_eindeutig_und_im_bereich():
     assert all(1 <= i <= 102 for i in ids)
 
 
+def test_netzrollen_mehrwertig_und_zentral_mit_seitenbeleg():
+    """T-0937 (C3/A8/A6): eine Klimawirkung kann Sender und Empfänger zugleich sein
+    (TB 6 Kap. 3.4, Fn. 21, S. 84); #4 ist beides (S. 87, 88), #49 Hochwasser ist die
+    zentrale Klimawirkung der Gesamtbetrachtung (S. 84, 88)."""
+    je_id = {e["kwra_id"]: e for e in k.NETZROLLEN}
+    assert je_id[4]["rollen"] == ["stark ausgehend", "stark eingehend"]
+    assert je_id[49]["zentral"] is True
+    for e in k.NETZROLLEN:
+        assert e["rollen"], e
+        assert set(e["rollen"]) <= {"stark ausgehend", "stark eingehend"}, e
+        assert e["rolle"] == e["rollen"][0], e
+        assert isinstance(e["zentral"], bool), e
+        if len(e["rollen"]) == 2 or e["zentral"] is True:
+            assert "S. " in e["beleg_rolle"], e
+
+
 # ── BENANNTE_BEZIEHUNGEN ─────────────────────────────────────────────────────
 
 def test_benannte_beziehungen_gesamtzahl():

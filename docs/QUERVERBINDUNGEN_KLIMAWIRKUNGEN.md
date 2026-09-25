@@ -41,7 +41,7 @@ Wirkungsnetz benennt (`app.data.kwra_querverbindungen.NETZROLLEN`).
 | KWRA-ID | Klimawirkung | Handlungsfeld | Rolle |
 |---|---|---|---|
 | 1 | Veränderung der Länge der Vegetationsperiode und Phänologie | Biologische Vielfalt | stark ausgehend |
-| 4 | Verschiebung von Arealen und Rückgang der Bestände | Biologische Vielfalt | stark ausgehend |
+| 4 | Verschiebung von Arealen und Rückgang der Bestände | Biologische Vielfalt | stark ausgehend und stark eingehend; zentral unter den hoch bewerteten Klimawirkungen (S. 87, 88) |
 | 5 | Schäden an Küstenökosystemen | Biologische Vielfalt | stark eingehend |
 | 12 | Rutschungen und Muren | Boden | stark ausgehend |
 | 13 | Wassermangel im Boden | Boden | stark ausgehend |
@@ -55,7 +55,7 @@ Wirkungsnetz benennt (`app.data.kwra_querverbindungen.NETZROLLEN`).
 | 40 | Meeresspiegelhöhe | Küsten- und Meeresschutz | stark ausgehend |
 | 43 | Sturmfluten | Küsten- und Meeresschutz | stark ausgehend |
 | 48 | Niedrigwasser | Wasserhaushalt, Wasserwirtschaft | stark ausgehend |
-| 49 | Hochwasser | Wasserhaushalt, Wasserwirtschaft | stark ausgehend |
+| 49 | Hochwasser | Wasserhaushalt, Wasserwirtschaft | stark ausgehend; zentral in der Gesamtbetrachtung (S. 84, 88) |
 | 53 | Gewässertemperatur und Eisbedeckung und biologische Wasserqualität | Wasserhaushalt, Wasserwirtschaft | stark ausgehend |
 | 55 | Grundwasserstand und Grundwasserqualität | Wasserhaushalt, Wasserwirtschaft | stark eingehend |
 | 73 | Schiffbarkeit der Seeschifffahrtsstraßen | Verkehr, Verkehrsinfrastruktur | stark eingehend |
@@ -66,9 +66,20 @@ Wirkungsnetz benennt (`app.data.kwra_querverbindungen.NETZROLLEN`).
 | 97 | Potenziell schädliche Mikroorganismen und Algen | Menschliche Gesundheit | stark eingehend |
 | 101 | Verletzungen und Todesfälle infolge von Extremereignissen | Menschliche Gesundheit | stark eingehend |
 
-13 Klimawirkungen sind stark ausgehend (Sender), 12 stark eingehend (Empfänger). Küsten- und
-Meeresschutz hat ausschließlich ausgehende Netzrollen, Tourismuswirtschaft (über die benannten
-Einzelbeziehungen, siehe unten) ausschließlich eingehende.
+13 Klimawirkungen sind nach der Arbeitsmappe stark ausgehend (Sender), 12 stark eingehend
+(Empfänger). Küsten- und Meeresschutz hat ausschließlich ausgehende Netzrollen, Tourismuswirtschaft
+(über die benannten Einzelbeziehungen, siehe unten) ausschließlich eingehende.
+
+Eine Klimawirkung kann Sender und Empfänger zugleich sein (Kap. 3.4, Fußnote 21, S. 84). Der
+Fließtext belegt das ausdrücklich für „Verschiebung von Arealen und Rückgang der Bestände“ (#4):
+Sie hat viele ausgehende Wirkbeziehungen (S. 84) und wird unter den hoch bewerteten Klimawirkungen
+zugleich von vielen anderen beeinflusst (S. 87, Kernaussage S. 88). Die zweite Rolle stammt aus dem
+Fließtext, nicht aus der Arbeitsmappe. Als zentral kennzeichnet Kap. 3.4 zwei Klimawirkungen:
+Hochwasser (#49) in der Gesamtbetrachtung, weil es sich auf die meisten anderen Klimawirkungen
+auswirkt (S. 84, 88), und #4 innerhalb der hoch bewerteten Klimawirkungen (S. 87, 88). Das
+Datenmodul führt beides in den Feldern `rollen`, `zentral` und `beleg_rolle`; die Auswertung je
+Klimawirkung liefert `netzrollen` und `zentral` mit aus. Eine gegenseitige Einzelbeziehung zählt
+dort bei beiden Klimawirkungen als aus- und eingehend.
 
 ## Benannte Einzelbeziehungen
 
