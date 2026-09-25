@@ -290,6 +290,12 @@ def get_kommune_kang_nachweis(kommune_id: int, db: Session = Depends(get_db)):
         agg = get_risk_aggregate(db, kommune.id, apply_measures=False)
         for eintrag in agg["cost"]["by_risk"]:
             code = eintrag["code"]
+            # Verwechslungssperre Klasse A/B (T-0879): Eine Wirkung ohne Euro-Schicht
+            # trägt keinen Betrag — None statt 0 €, auch unter ``nicht_zugeordnet``.
+            # Der Nachweis lässt None aus der Feldsumme heraus (wie risk_engine.aggregate).
+            if eintrag.get("has_euro_layer") is False:
+                schaeden[code] = None
+                continue
             schaeden[code] = schaeden.get(code, 0.0) + float(eintrag.get("cost_eur") or 0.0)
 
     massnahmen = [
