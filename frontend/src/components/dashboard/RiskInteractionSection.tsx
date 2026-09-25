@@ -3,6 +3,7 @@ import { api } from '../../api/client'
 import type { Netzrolle, QuerverbindungsAuswertung } from '../../api/client'
 import InfoTooltip from '../InfoTooltip'
 import QuerverbindungenHandlungsfelder from './QuerverbindungenHandlungsfelder'
+import RueckkopplungKreislauf from './RueckkopplungKreislauf'
 
 /**
  * Querverbindungen zwischen Klimawirkungen (KWRA 2021, Teilbericht 6, Kap. 3.4).
@@ -123,6 +124,7 @@ export default function RiskInteractionSection({ className = '' }: { className?:
                 )}
               </tbody>
             </table>
+            <RueckkopplungKreislauf daten={daten} />
             <QuerverbindungenHandlungsfelder daten={daten} />
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 6 }}>
               Modellgrenze: {daten.modellgrenze}
