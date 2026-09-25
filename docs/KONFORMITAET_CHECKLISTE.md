@@ -30,7 +30,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 16 | Vor der eigentlichen Risikobewertung ist der Kontext festzulegen (Bestandsaufnahme): lokale sozioökonomische und geographische Rahmenbedingungen sowie Trends sind zu erfassen, ebenso bereits vorhandene Informationen zu vergangenen und erwarteten Klimarisiken, einschließlich besonders klimasensibler Strukturen (z. B. kritische Infrastruktur) und vulnerabler Personengruppen. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Bestandsaufnahme"/"Festlegung des Kontexts", S. 12) | erfüllt | backend/app/data/bestandsaufnahme.py, backend/app/services/bestandsaufnahme_service.py, backend/app/services/bestandsaufnahme_markdown.py, docs/BESTANDSAUFNAHME.md | Keine Lücke im Produkt; Größen ohne Datenquelle je Kommune weist die Bestandsaufnahme ausdrücklich als vor Ort zu erheben aus. |
 | 17 | In der Vorbereitungsphase sind interessierte Parteien mit einschlägiger Fachexpertise zu identifizieren und über partizipative Ansätze frühzeitig in die Entscheidungsfindung einzubeziehen, um ein gemeinsames Verständnis und Verantwortungsgefühl unter den Beteiligten zu fördern. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Interessierte Parteien identifizieren und partizipative Ansätze planen", S. 13) | offen | — | Das Produkt bietet keinen Prozess und keine Funktion, mit der eine Kommune interessierte Parteien identifiziert oder einen partizipativen Beteiligungsprozess plant und begleitet; es ist ein Analysewerkzeug für die inhaltliche Berechnung von Klimarisiken, keine Prozessunterstützung für Beteiligungsverfahren. |
 | 18 | Optional kann die Anpassungskapazität eines betroffenen Systems analysiert und bewertet werden, unterschieden nach mehreren Komponenten (u. a. organisationsbezogene Fähigkeit, technisches Vermögen, finanzielle Fähigkeit, Fähigkeit des Ökosystems) und nach unterschiedlichen Reifegraden, um abzuleiten, wie stark sich das Klimarisiko durch Anpassung verringern lässt. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6, Anhang G und H (Abschnitt 2.2.5 "Optional: Anpassungskapazität analysieren und bewerten", S. 28f.) | erfüllt | backend/app/data/anpassungskapazitaet.py, backend/app/services/anpassungskapazitaet.py, backend/app/services/anpassungskapazitaet_markdown.py, backend/app/api/routes/anpassungskapazitaet.py, docs/ANPASSUNGSKAPAZITAET.md | Keine Lücke im Produkt; der nach ISO 14091 optionale Schritt ist als Selbsteinschätzung der Kommune je Komponente und Reifegrad umgesetzt und im Bericht als optionaler Analyseschritt ausgewiesen. |
-| 19 | Bei der Interpretation der Analyseergebnisse sind bestehende Unsicherheiten in den zugrunde liegenden Informationen und Daten explizit zu berücksichtigen, ebenso handlungsfeld- und regionsübergreifende Abhängigkeiten, bevor daraus Handlungsoptionen formuliert werden. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6 (Abschnitt 2.2.6 "Ergebnisse interpretieren", S. 29f.) | erfüllt | backend/app/services/unsicherheits_zusammenschau.py, backend/app/api/routes/kommune.py, backend/tests/test_unsicherheits_zusammenschau.py, backend/app/services/gewissheit.py, docs/evidenz/register.md | Vor der Ableitung von Handlungsoptionen liefert das Produkt eine handlungsfeldübergreifende Zusammenschau der Unsicherheiten: je Handlungsfeld die niedrigste Gewissheitsstufe und die Zahl der nicht belegten Parameter, mit ausdrücklichem Hinweis auf vorsichtige Interpretation. |
+| 19 | Bei der Interpretation der Analyseergebnisse sind bestehende Unsicherheiten in den zugrunde liegenden Informationen und Daten explizit zu berücksichtigen, ebenso handlungsfeld- und regionsübergreifende Abhängigkeiten, bevor daraus Handlungsoptionen formuliert werden. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6 (Abschnitt 2.2.6 "Ergebnisse interpretieren", S. 29f.) | teilweise | backend/app/services/unsicherheits_zusammenschau.py, backend/app/api/routes/kommune.py, backend/tests/test_unsicherheits_zusammenschau.py, backend/app/services/gewissheit.py, docs/evidenz/register.md | Die Unsicherheit der Daten trägt das Produkt: Die Zusammenschau nennt je Handlungsfeld die niedrigste Gewissheitsstufe und die Zahl der nicht belegten Parameter und verlangt ab „gering“ vorsichtige Interpretation. Es fehlt aber, was Abschnitt 2.2.6 darüber hinaus verlangt. Handlungsfeldübergreifend ist die Zusammenschau nicht: Der aktive Katalog hat nur das Handlungsfeld „Menschliche Gesundheit“, und auch mit mehreren Feldern stellte sie diese nur nebeneinander, statt wechselseitige Abhängigkeiten zu ermitteln. Nur die übernommenen KWRA-Querverbindungen (Zeile 9) zeigen bundesweite Beziehungen. Regionsübergreifende Abhängigkeiten, etwa zu Nachbarkommunen, werden nicht betrachtet. Die Unsicherheit ist nicht mit den einzelnen Handlungsoptionen verbunden. Leitfragen der Kommune, die Einbeziehung von Fachabteilungen, externer Expertise und angrenzenden Kommunen sowie die Trennung der Maßnahmen danach, ob die Kommune sie allein umsetzen kann, fehlen. Gender- und Diversitätsaspekte gehen nur über das Alter ein. Primärtext ISO 14091 nicht gelesen (T-0531-ceo). Einzelnachweis: Abschnitt „Gegenprobe Zeile 19“. |
 | 20 | Die Ergebnisse der Risikobewertung sind zielgruppenspezifisch zu kommunizieren, etwa durch einen ausführlichen Bericht mit Datengrundlagen und Methodik für die Fachöffentlichkeit sowie durch leicht verständliche, prägnante Kommunikationsprodukte (z. B. Karten, Zusammenfassungen) für politische Entscheidungsträger und die breite Öffentlichkeit. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 7 (Abschnitt 2.3.2 "Ergebnisse zielgruppenspezifisch kommunizieren", S. 31) | erfüllt | docs/methodik/95_hitzebelastung.md, backend/app/services/kurzfassung_markdown.py, backend/app/api/routes/kommune.py, backend/tests/test_kurzfassung_export.py | Neben dem ausführlichen Methodik-Bericht für die Fachöffentlichkeit erzeugt das Produkt eine Kurzfassung mit fünf festen Abschnitten für politische Entscheidungsträger. |
 | 21 | Die Monetarisierung von Umweltauswirkungen soll durchgängig auf dem Schadenskostenansatz beruhen; Vermeidungs- oder Wiederherstellungskosten sollen nicht als Ersatz für Schadenskosten verwendet werden, um Datenlücken zu schließen, da sie vom Minderungsziel abhängen bzw. real oder virtuell sein können und daher kein aussagekräftiger Ersatzwert sind. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 1 (S. 8f.) und Kap. 2.2.1 (S. 12) | teilweise | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, backend/app/data/catalog.py | Für Gesundheitswirkungen (z. B. hitzebedingte Mortalität) folgt das Produkt dem Schadenskostenansatz (VSL/VOLY-artige Kostensätze), für Gebäudeschäden bei Flusshochwasser (#60) wird jedoch ausdrücklich mit Wiederherstellungskosten zum Neuwert (NHK, indexiert) bewertet (docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, Konto K3); das Produkt wendet damit je nach Schadenskategorie unterschiedliche, nicht vereinheitlichte Kostenkonzepte an, statt durchgängig den von der Methodenkonvention empfohlenen Schadenskostenansatz zu verwenden, und dokumentiert diesen Methodenwechsel nicht als bewusste Abweichung von der Konvention. |
 | 22 | Zukünftige Kosten und Nutzen sind unter Verwendung einer Diskontrate (u. a. der Reinen Zeitpräferenzrate) auf den heutigen Tag abzuzinsen; es werden mindestens zwei Werte (0 % und 1 % RZPR) berichtet, um die Sensitivität der Ergebnisse gegenüber der Zeitpräferenz zu zeigen. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 2.2.3 (S. 14f.) | erfüllt | backend/app/services/cost_projection_service.py, backend/tests/test_kostenprojektion_diskontierung.py | Die Kostenprojektion 2025–2065 weist die kumulierten Kosten zusätzlich als Barwerte mit 0 % und 1 % Reiner Zeitpräferenzrate aus; die Sensitivität gegenüber der Zeitpräferenz ist damit berichtet. |
@@ -293,6 +293,102 @@ des Katalogs (#95) landet in der Gruppe der KWRA. Der Status der Zeile 7 ist in 
 auf `teilweise` gesetzt, die Spalte „Lücke“ nennt, was fehlt. Die Zählungen in den Abschnitten
 „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt; sie nachzuziehen ist
 Sache der Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 19 gegen UBA-Handlungsempfehlungen zur ISO 14091, Abschnitt 2.2.6
+
+Frage: Tragen die Belege der Zeile 19 das, was Abschnitt 2.2.6 „Ergebnisse interpretieren“ verlangt — und
+darf „handlungsfeldübergreifend“ gelten, solange der aktive Katalog nur ein Handlungsfeld hat? Gelesen wurde
+gegen die Sekundärquelle Umweltbundesamt (Porst, Voß, Kahlenborn, Schauser), „Klimarisikoanalysen auf
+kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091“, Juni 2022, 40 Seiten, abgerufen am
+25.09.2026 von
+https://www.umweltbundesamt.de/system/files/medien/479/publikationen/2022_uba-fachbroschuere_kra_auf_kommunaler_ebene.pdf
+(Verweis von der Publikationsseite in der Spalte „Quelle“). Die Datei liegt nicht im Repo. PDF-Seitenzahl und
+gedruckte Seitenzahl stimmen überein. Abschnitt 2.2.6 beginnt auf S. 29 in der rechten Spalte und endet auf
+S. 30 in der linken Spalte, rechts beginnt dort 2.3; die Fundstelle „S. 29f.“ stimmt. Fußnote 27 (S. 20) ordnet
+Abschnitt 2.2 dem Kapitel 6 der ISO 14091 zu; auch die Angabe „Kap. 6“ stimmt.
+
+**Befund Primärquelle:** Der Normtext ISO 14091:2021 wurde nicht gelesen. Er wird nicht gekauft; das
+Menschenticket T-0531-ceo ist offen. Die Tabelle stützt sich allein auf die Wiedergabe durch das UBA. Die
+Broschüre spricht in „sollte“ und „empfehlenswert“, nicht in „ist zu“; die Zeile 19 verschärft das zu einer
+Pflicht.
+
+Im Produkt wurden `backend/app/services/unsicherheits_zusammenschau.py` und
+`backend/tests/test_unsicherheits_zusammenschau.py` vollständig gelesen, die Route
+`GET /api/kommune/{kommune_id}/unsicherheits-zusammenschau` in `backend/app/api/routes/kommune.py` im Kopf.
+`unsicherheits_zusammenschau(1)` wurde einmal ausgeführt, ohne etwas zu ändern. Ergebnis: genau ein
+Handlungsfeld, „Menschliche Gesundheit“, niedrigste Gewissheit „mittel“ (EXPECTED_ANNUAL_MORTALITY,
+EXPECTED_ANNUAL_ALLERGY_DAYS), 2 nicht belegte Parameter, Vorsichtsliste leer, `hinweis` = `None`. Alle vier
+Codes des Katalogs (#95 zweimal, #96, #98) tragen `kwra_field` „Menschliche Gesundheit“.
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | „Im letzten Schritt der Durchführung einer KRA geht es darum, die identifizierten Risiken zu interpretieren und einzuordnen, um Antworten auf die zu Beginn formulierten Leitfragen zu liefern.“ | 29 | keiner. Das Produkt kennt keine Leitfragen der Kommune (Abschnitt 2.1.1 „Ziele und Ergebnisse definieren“). | trägt nicht |
+| A2 | „Bestehende Unsicherheiten in den zugrundeliegenden Informationen und Daten sollten in der Interpretation der Ergebnisse … berücksichtigt werden.“ | 29 | `unsicherheits_zusammenschau.py`, `unsicherheits_zusammenschau()` (niedrigste Gewissheitsstufe und Zahl nicht belegter Parameter je Handlungsfeld, Hinweis ab „gering“); `gewissheit.py`, `gewissheitsstufe()`; `docs/evidenz/register.md` (Evidenzklasse je Parameter) | trägt |
+| A3 | Die Unsicherheiten sollten „wie auch in der Formulierung von Handlungsoptionen berücksichtigt werden“. | 29 | `charakterisierung.py`, Gruppen „… unter Unsicherheit“ (Gewissheit geht in den Handlungstyp ein); Hinweistext `HINWEIS_VORSICHT` | trägt teilweise |
+| A4 | „Eine handlungsfeld- und regionsübergreifende Betrachtung der Ergebnisse hilft, wechselseitige Abhängigkeiten zu identifizieren und die geeignetsten Maßnahmen zu identifizieren.“ Hier: der handlungsfeldübergreifende Teil. | 30 | `querverbindungen.py`, `querverbindungs_auswertung()` (KWRA-Querverbindungen zwischen Klimawirkungen, Zeile 9); nicht `unsicherheits_zusammenschau()` | trägt teilweise |
+| A5 | Derselbe Satz, regionsübergreifender Teil: wechselseitige Abhängigkeiten über die Grenze der Kommune hinweg. | 30 | keiner. Der Kopf von `unsicherheits_zusammenschau.py` schließt einen Vergleich zwischen Kommunen ausdrücklich aus. | trägt nicht |
+| A6 | „Da Klimaanpassung auch in Kommunen ein Querschnittsthema darstellt, sollten für die Interpretation der Ergebnisse der KRA verschiedene kommunale Fachabteilungen sowie externe Expertise einbezogen werden.“ | 30 | keiner. `kang_beruecksichtigung.py` zeigt je KAnG-Handlungsfeld Risiken und Maßnahmen einer Planung, bezieht aber niemanden ein. | trägt nicht |
+| A7 | „Zudem ist empfehlenswert, Gender- und Diversitätsaspekte zu berücksichtigen.“ | 30 | `backend/app/data/bestandsaufnahme.py` (vulnerable Personen: Ältere ab 65 Jahren, alleinlebende Ältere); `docs/methodik/95_hitzebelastung.md` (Alters- und Geschlechtsschichtung in der Rechnung) | trägt teilweise |
+| A8 | „Der priorisierte Handlungsbedarf, als zentrales Ergebnis einer KRA, ist die Grundlage für eine Maßnahmenplanung.“ | 30 | `charakterisierung.py`, `charakterisierungen()` (Zeile 7); `frontend/src/pages/roadmap/roadmapData.ts` (Zeile 6) | trägt teilweise |
+| A9 | Es „sollte erörtert werden, welche Handlungsoptionen auf kommunaler Ebene bestehen und ggf. welche Optionen der Zusammenarbeit mit Akteur*innen außerhalb der Kommune bedürfen. Dabei ist auch die Aufteilung der Verwaltungsverantwortung … auf mehrere Ebenen (Stadt/Gemeinde, Landkreis, Bundesland) zu berücksichtigen.“ | 30 | `backend/app/data/kang_zustaendigkeit.py` (zuständige Stelle je Land, Zeile 14); `catalog.MEASURES` (drei Maßnahmen) | trägt teilweise |
+| A10 | „Relevante lokale Akteur*innen, ggf. auch von angrenzenden Kommunen oder Ländervertreter*innen, sollten dabei frühzeitig mit einbezogen werden.“ | 30 | keiner (vgl. Zeile 17, `offen`) | trägt nicht |
+
+**Begründung je Urteil:**
+
+- A1: Leitfragen legt die Kommune in der Vorbereitung fest. Das Produkt fragt sie nicht ab und ordnet die
+  Ergebnisse keiner Leitfrage zu.
+- A2: Das trägt der Kern der Zeile 19. Die Zusammenschau fasst die Unsicherheit der Daten (Evidenzklassen
+  der Parameter) über die Klimawirkungen eines Handlungsfelds zusammen und benennt den Fall, der vorsichtige
+  Interpretation verlangt. Ob sie im Frontend angezeigt wird, ist nicht Gegenstand dieser Gegenprobe
+  (Sichtbarkeit, T-0483); im Frontend ruft heute nichts den Endpunkt auf.
+- A3: Die Gewissheit fließt über die Charakterisierungsgruppen in den Handlungstyp ein, und der Hinweistext
+  nennt die Handlungsoptionen. Eine Verbindung von Unsicherheit und einzelner Maßnahme gibt es nicht: Die
+  Zusammenschau ist ein eigener Endpunkt, nichts stellt sie vor die Maßnahmenwahl. Der Hinweis erscheint
+  heute gar nicht, weil die niedrigste Stufe „mittel“ ist.
+- A4: Die Zusammenschau stellt Handlungsfelder nur nebeneinander. Wechselseitige Abhängigkeiten ermittelt sie
+  nicht, auch nicht bei mehreren Handlungsfeldern. Mit einem einzigen Handlungsfeld gibt es nichts, das
+  übergreifend betrachtet werden könnte. Teilweise trägt nur die Übernahme der KWRA-Querverbindungen
+  (Zeile 9): Sie zeigt bundesweite Beziehungen zwischen Klimawirkungen verschiedener Handlungsfelder, aber
+  keine Abhängigkeiten zwischen den gerechneten Ergebnissen der Kommune.
+- A5: Das Produkt rechnet je Kommune. Abhängigkeiten zu Nachbarkommunen oder zur Region (etwa
+  Oberlieger und Unterlieger beim Hochwasser) werden weder ermittelt noch angezeigt.
+- A6: Einbeziehen ist ein Schritt im Verfahren. Das Produkt bietet dafür nichts, wie schon bei Zeile 17.
+  Die Nachweisrechnung nach § 8 KAnG liefert höchstens eine Vorarbeit: welche Felder betroffen sind.
+- A7: Diversität steckt über Alter und Alleinleben in der Bestandsaufnahme und in der Rechnung zu #95. In der
+  Interpretation, also in der Zusammenschau, spielt sie keine Rolle; Geschlecht geht nur in die
+  Lebenserwartung der Rechnung ein, nicht als Aspekt der Betroffenheit.
+- A8: Wie zu Zeile 6 und 7: Eine Einordnung in Charakterisierungsgruppen gibt es, eine aus Klimarisiko und
+  Anpassungsdauer hergeleitete Priorisierung je Klimawirkung nicht.
+- A9: Die Zuständigkeitstabelle klärt, ob Gemeinde oder Landkreis ein Klimaanpassungskonzept aufstellt. Eine
+  Unterscheidung der Maßnahmen danach, ob die Kommune sie allein umsetzen kann oder Partner außerhalb braucht,
+  gibt es nicht.
+- A10: Wie A6, ein Verfahrensschritt ohne Gegenstück im Produkt.
+
+Nicht als eigene Anforderung gewertet: die Hinweisbox „Empfehlung für eher kleine Kommunen und/oder Kommunen
+mit begrenzten Ressourcen“ (S. 30, unter den Punkten von 2.2.6). Sie beschreibt eine vereinfachte
+Ersatzbewertung (dreistufig gering, mittel, hoch, dazu die Dringlichkeit) und fügt der Interpretation nichts
+hinzu. Ebenso nicht: die Bewertung der Dringlichkeit am Ende von 2.2.4 (S. 28), auf die A8 aufbaut; sie ist
+Gegenstand von Zeile 6.
+
+**Gelesene Seiten und Abschnitte:** Inventar mit `python3 /opt/overlord/overlord/skripte/dokumente.py
+inventar` (40 Seiten). Inhaltsverzeichnis S. 5 ganz. Einführung S. 7–9 ganz, einschließlich des Hinweises auf
+S. 8, dass jedem Teilkapitel eine Kurzfassung des ISO-Abschnitts vorangestellt ist, und der Infobox
+„Klimarisikoanalysen (KRA)“ mit Abbildung 1 auf S. 9 (im Text). S. 20 mit dem Beginn von 2.2, Fußnote 27
+und Abbildung 4 (im Text). S. 28–29 mit dem Ende von 2.2.4, Tabelle 4 und Abschnitt 2.2.5 samt Tabelle 5
+(Kapitelgrenze geprüft). Abschnitt 2.2.6 S. 29–30 vollständig im Text gelesen; S. 30 zusätzlich als Bild
+angesehen, um die Zuordnung der Hinweisbox und die Grenze zu 2.3 zu klären. S. 31 mit 2.3.2 (Ende der
+Nachbarabschnitte). Abschnitt 2.2.6 enthält keine Tabelle und keine Abbildung. Nicht gelesen: 2.1.1 (Leitfragen,
+auf die A1 verweist), 2.2.1–2.2.3, Kapitel 3 und 4 der Broschüre; der Primärtext der ISO 14091.
+
+**Schluss:** Zeile 19 bleibt nicht `erfüllt`. Von 10 Anforderungen trägt der Bestand eine voll (A2), fünf
+teilweise (A3, A4, A7, A8, A9) und vier nicht (A1, A5, A6, A10). Der Status der Zeile 19 ist in derselben
+Änderung auf `teilweise` gesetzt; die Spalte „Lücke“ nennt, was fehlt. Zum angemeldeten Zweifel: Nein, die
+Zeile darf nicht als `erfüllt` gelten, solange der aktive Katalog nur ein Handlungsfeld hat. Eine
+Zusammenschau über ein Handlungsfeld ist nicht handlungsfeldübergreifend. Auch mit mehreren Handlungsfeldern
+reichte sie nicht, denn sie stellt die Felder nur nebeneinander und ermittelt keine wechselseitigen
+Abhängigkeiten. Die regionsübergreifende Betrachtung fehlt ganz. Die Zählungen in den Abschnitten „Nachtrag:
+Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt; sie nachzuziehen ist Sache der
+Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
 
 ## Ergebnis
 
