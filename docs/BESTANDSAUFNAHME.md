@@ -8,7 +8,7 @@ Die Bestandsaufnahme rechnet nichts. Sie führt Größen auf und weist je Größ
 
 ## Erhobene Größen
 
-Das Produkt führt 20 Größen in vier Gruppen. Je Größe steht entweder die Datenquelle (Quellschlüssel und Klartext) oder der Hinweis, dass keine Quelle je Kommune vorliegt.
+Das Produkt führt 21 Größen in fünf Gruppen. Je Größe steht entweder die Datenquelle (Quellschlüssel und Klartext) oder der Hinweis, dass keine Quelle je Kommune vorliegt.
 
 | Code | Größe | Gruppe | Einheit | Quelle oder Lücke |
 |---|---|---|---|---|
@@ -32,6 +32,7 @@ Das Produkt führt 20 Größen in vier Gruppen. Je Größe steht entweder die Da
 | kitas_schulen | Kindertagesstätten und Schulen | Klimasensible Strukturen | – | Für die Größe Kindertagesstätten und Schulen liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. |
 | lieferketten | Lieferketten | Klimasensible Strukturen | – | Für die Größe Lieferketten liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. Hinweis: nicht im Katalog. |
 | schadensereignisse | Vergangene Schadensereignisse durch Wetterextreme | Vergangene Ereignisse | – | Für die Größe Vergangene Schadensereignisse durch Wetterextreme liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. |
+| bevoelkerungsentwicklung | Bevölkerungsentwicklung | Trends | % | Destatis_GVISys_Bevoelkerung (Gemeindeverzeichnis GV-ISys, Destatis, Stichtage 31.12.2017 und 31.12.2023) |
 
 ## Lücken und Abgrenzung
 
