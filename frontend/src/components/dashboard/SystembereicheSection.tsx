@@ -59,7 +59,12 @@ export default function SystembereicheSection({ className = '' }: { className?: 
               <tbody>
                 {daten.bereiche.map(b => (
                   <tr key={b.systembereich}>
-                    <td style={{ fontWeight: 500 }}>{b.systembereich}</td>
+                    <td style={{ fontWeight: 500 }}>
+                      {b.systembereich}
+                      <div style={{ fontWeight: 400, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {b.klimawirkungen_im_katalog} Klimawirkungen im Katalog · {b.euro_beziffert}
+                      </div>
+                    </td>
                     {b.leer_grund ? (
                       <td colSpan={3} style={{ color: 'var(--text-muted)' }}>
                         leer: {b.leer_grund}
