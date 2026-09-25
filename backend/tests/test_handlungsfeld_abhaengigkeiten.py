@@ -63,6 +63,14 @@ def test_andere_handlungsfelder_aus_beziehungen():
         assert eintrag["handlungsfeld"] not in eintrag["andere_handlungsfelder"]
 
 
+def test_hitzebelastung_erreicht_bauwesen_und_energiewirtschaft():
+    eintrag = next(e for e in abhaengigkeiten_der_kommune() if e["kwra_id"] == 95)
+    assert eintrag["andere_handlungsfelder"] == ["Bauwesen", "Energiewirtschaft"]
+    nr_25 = next(b for b in eintrag["beziehungen"] if b["beziehung_nr"] == 25)
+    assert nr_25["partner_kwra_id"] == 65
+    assert nr_25["partner_handlungsfeld"] == "Energiewirtschaft"
+
+
 def test_keine_gewichtung():
     for eintrag in abhaengigkeiten_der_kommune():
         for b in eintrag["beziehungen"]:

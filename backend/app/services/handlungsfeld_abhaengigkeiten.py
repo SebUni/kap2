@@ -13,14 +13,16 @@ wie in ``querverbindungen.querverbindungs_auswertung``.
 Es gibt keine Gewichtung und keine Stärke: Wie stark eine Abhängigkeit wirkt, legt
 der CMO fest (Anmerkung M-0005). Das Handlungsfeld eines Partners stammt aus
 ``catalog.RISKS``/``catalog.PLANNED_RISKS`` (``kwra_field``), ersatzweise aus
-``kwra_querverbindungen.NETZROLLEN`` (``handlungsfeld``); ist es dort nicht geführt,
-bleibt es ``None`` — es wird nicht ergänzt.
+``kwra_querverbindungen.NETZROLLEN`` (``handlungsfeld``), danach aus den Knoten von
+``kwra_rueckkopplungen.RUECKKOPPLUNGEN``; ist es dort nirgends geführt, bleibt es
+``None`` — es wird nicht ergänzt.
 """
 
 from __future__ import annotations
 
 from app.data import catalog
 from app.data import kwra_querverbindungen as kq
+from app.data import kwra_rueckkopplungen as rk
 
 
 def _handlungsfeld_je_kwra_id() -> dict[int, str]:
@@ -32,6 +34,12 @@ def _handlungsfeld_je_kwra_id() -> dict[int, str]:
     for eintrag in kq.NETZROLLEN:
         if eintrag.get("handlungsfeld"):
             felder.setdefault(eintrag["kwra_id"], eintrag["handlungsfeld"])
+    # Weiterer Rückfall: Knoten der Rückkopplungen (TB 6 Kap. 3.4, S. 82, 85–86, Abb. 9),
+    # z. B. #65 Bedarf an Kühlenergie → Energiewirtschaft.
+    for rueckkopplung in rk.RUECKKOPPLUNGEN:
+        for knoten in rueckkopplung["knoten"]:
+            if knoten.get("handlungsfeld"):
+                felder.setdefault(knoten["kwra_id"], knoten["handlungsfeld"])
     return felder
 
 
