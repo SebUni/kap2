@@ -19,7 +19,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 5 | Die Analyse muss ihre methodischen Grenzen und ihren Anwendungsbereich explizit benennen, insbesondere dass sie keine detailliertere lokale oder sektorale Risikoanalyse ersetzt. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 1.4 (S. 35) | erfüllt | docs/methodik/95_hitzebelastung.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | — |
 | 6 | Klimawirkungen sind anhand des Klimarisikos (ohne Anpassung, pessimistischer Fall) und der Anpassungsdauer in Prioritätsstufen "sehr dringende" und "dringende" Handlungserfordernisse einzustufen, damit erkennbar ist, wo Anpassung schon jetzt beginnen muss. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.1 (S. 136–140) | teilweise | frontend/src/pages/roadmap/roadmapData.ts, docs/KATALOG_KRITIK.md | Die Produkt-Roadmap übernimmt die KWRA-Kategorie "sehr dringende Klimawirkungen" wörtlich, um die Ausbaureihenfolge zu begründen (zuerst die drei sehr dringenden Gesundheits-Klimawirkungen, danach 15 weitere). Es gibt aber keine im Produkt selbst nachvollziehbare, aus Klimarisiko und Anpassungsdauer hergeleitete Einstufung je Klimawirkung, und laut docs/KATALOG_KRITIK.md sind 10 der bundesweit 31 "sehr dringenden" Klimawirkungen im heutigen Katalog nicht abgebildet, weil sie ausgewählt statt systematisch aus der KWRA-Einstufung hergeleitet wurden. |
 | 7 | Klimawirkungen mit sehr dringenden Handlungserfordernissen sind anhand von Anpassungspotenzial und Bewertungsgewissheit in Charakterisierungsgruppen (Umsetzung, Entwicklung, Entwicklung unter Unsicherheit, Innovation, Innovation unter Unsicherheit) einzuordnen, um den Handlungstyp zu benennen. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.2 (S. 140–142) | teilweise | backend/app/services/charakterisierung.py, backend/app/services/gewissheit.py, backend/app/api/routes/catalog.py, backend/tests/test_charakterisierungsgruppen.py | Die fünf Gruppen und eine dokumentierte Entscheidungstabelle sind vorhanden, die Schwellen sind nach P1 als Abschätzung von KAP3 ausgewiesen. Es fehlt aber, was die Einordnung nach Kap. 6.2 trägt: Beschlossene und weiterreichende Maßnahmen werden nicht getrennt, und es gibt keinen optimistischen und pessimistischen Fall. „Innovation“ heißt im Produkt nur, dass der Katalog keinen verknüpften Hebel ab 10 % hat, nicht, dass auch alle Maßnahmen das Ziel verfehlen. Die Gewissheit enthält nicht die Gewissheit der Anpassungskapazität. Die Ausnahme der KWRA für die Allergien (Bewertung auf Basis der beschlossenen Maßnahmen, Fn. 28/29) fehlt, ebenso eine gerechnete Sensitivität der Zuordnung und das Handlungserfordernis je Gruppe. Eingeordnet wird jeder Katalogcode, nicht nur die sehr dringenden. Ergebnis: Nur #95 Hitzebelastung liegt wie in Tabelle 27 in „Entwicklung“. #96 Aeroallergene (KWRA „Umsetzung“) und #98 UV-Schädigungen (KWRA „Entwicklung“) landen mit Anpassungspotenzial 0 in „Innovation“, weil keine Maßnahme im Rechenweg wirkt: Die Pollen-Frühwarnung ist nur qualitativ verknüpft, für UV gibt es keine Maßnahme. Die Modellgrenze der API nennt diese Ursache nicht. Einzelnachweis: Abschnitt „Gegenprobe Zeile 7“. |
-| 8 | Die Bewertungsgewissheit ist für jede Klimawirkung auf einer einheitlichen, mehrstufigen Skala (sehr gering bis hoch) auszuweisen und handlungsfeldübergreifend vergleichbar zu machen, damit erkennbar ist, wo hohe Unsicherheiten vorsichtige Interpretation erfordern. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 3.3 (S. 78–82) | erfüllt | backend/app/services/gewissheit.py, backend/app/api/routes/catalog.py, backend/tests/test_gewissheitsstufe.py | Jede Klimawirkung trägt eine kategoriale Gewissheitsstufe auf der vierstufigen Skala sehr gering/gering/mittel/hoch, abgeleitet nach einer dokumentierten Regel aus den Evidenzklassen ihrer Parameter und damit handlungsfeldübergreifend vergleichbar. |
+| 8 | Die Bewertungsgewissheit ist für jede Klimawirkung auf einer einheitlichen, mehrstufigen Skala (sehr gering bis hoch) auszuweisen und handlungsfeldübergreifend vergleichbar zu machen, damit erkennbar ist, wo hohe Unsicherheiten vorsichtige Interpretation erfordern. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 3.3 (S. 78–82) | teilweise | backend/app/services/gewissheit.py, backend/app/api/routes/catalog.py, backend/tests/test_gewissheitsstufe.py | Die Skala stimmt: Jede Klimawirkung des Katalogs trägt eine Stufe auf der vierstufigen Skala der KWRA (sehr gering, gering, mittel, hoch), gebildet nach derselben dokumentierten Regel. Die Herleitung passt aber nicht. Die KWRA bewertet die Gewissheit je Zeitscheibe (Mitte und Ende des Jahrhunderts) aus fünf Teilaspekten: Vorhandensein und Zuverlässigkeit der Daten, Kenntnis der Wirkzusammenhänge, Genauigkeit und Plausibilität der Modellannahmen, Eindeutigkeit der Trends. Das Produkt misst nur den Anteil der Rechenparameter mit Evidenzklasse „belegt“, ohne Zeitscheibe. Damit misst es die Quellenlage der Rechnung, nicht die Gewissheit des Klimarisikos, und widerspricht der KWRA bei den eigenen Klimawirkungen: #98 UV-Schädigungen steht im Produkt auf „hoch“, bei der KWRA zum Ende des Jahrhunderts auf „sehr gering“; ein einziger abgeschätzter Parameter senkt #95 Hitzebelastung (Mortalität) auf „mittel“. Es fehlen zudem die Mittelung je Handlungsfeld und Cluster mit Grad (Tabelle 17), die Änderung zwischen den Zeitscheiben, der Bezug zur Höhe des Klimarisikos (Abbildung 7) und ein handlungsfeldübergreifender Vergleich: Der aktive Katalog hat nur das Handlungsfeld „Menschliche Gesundheit“. Einzelnachweis: Abschnitt „Gegenprobe Zeile 8“. |
 | 9 | Wechselwirkungen (Querverbindungen) zwischen einzelnen Klimawirkungen sind zu identifizieren und auszuwerten, damit erkennbar ist, welche Klimawirkungen besonders viele andere beeinflussen oder von ihnen beeinflusst werden. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 3.4 (S. 82–89) | teilweise | backend/app/data/kwra_querverbindungen.py, backend/app/services/querverbindungen.py, docs/QUERVERBINDUNGEN_KLIMAWIRKUNGEN.md, frontend/src/components/dashboard/RiskInteractionSection.tsx | Das Produkt übernimmt Ergebnisse der KWRA-Querverbindungsanalyse (Kennzahlen, 25 Netzrollen, 20 im Fließtext genannte Beziehungen, Systembereichs-Matrix aus Kap. 7), führt die Analyse aber nicht selbst: keine eigene Identifikation der Querbezüge und kein Abgleich mit den Klimawirkungsketten (UBA 2016); keine Darstellung der Querverbindungen zwischen den 13 Handlungsfeldern (Abb. 8); keine gegenseitigen Wechselwirkungen und kein Rückkopplungskreislauf Hitzebelastung – Bedarf an Kühlenergie – Stadtklima/Wärmeinseln (Abb. 9), obwohl Hitzebelastung und Stadtklima im Katalog stehen; keine gesonderte Auswertung der hoch bewerteten Klimawirkungen; die Netzrolle ist einwertig, obwohl eine Klimawirkung Sender und Empfänger zugleich sein kann. Die Dashboard-Tabelle zeigt nur Klimawirkungen des Katalogs, 13 der 25 Netzrollen – darunter Hochwasser, die zentrale Klimawirkung – erscheinen dort nicht. Einzelnachweis: Abschnitt „Gegenprobe Zeile 9“. |
 | 10 | Die Klimarisiken sind über die fünf übergeordneten Systembereiche (Natürliche Systeme und Ressourcen, Naturnutzende Wirtschaftssysteme, Infrastrukturen und Gebäude, Naturferne Wirtschaftssysteme, Menschen und soziale Systeme) hinweg vergleichbar auszuwerten, um Unterschiede in Risikohöhe und Anpassungsfähigkeit zwischen diesen Bereichen sichtbar zu machen. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 7 (S. 146–155) | teilweise | backend/app/data/catalog.py, backend/app/services/systembereiche.py, backend/tests/test_systembereiche.py, backend/app/data/kwra_querverbindungen.py | Die fünf KWRA-Systembereiche und die Querverbindungen zwischen ihnen (Tabelle 28) sind quellenfest vorhanden, der Vergleich selbst nicht: Alle drei gerechneten Klimawirkungen (#95, #96, #98) liegen in „Menschen und soziale Systeme“, die vier übrigen Bereiche bleiben leer, und die 49 Klimawirkungen der Roadmap tragen keinen Systembereich. Die Risikohöhe wird als Mittel des Produkt-Risikoindex verglichen, nicht wie in Kap. 7 als Anteil der hoch bewerteten Klimawirkungen je Zeitscheibe und Fall. Die Anpassungsfähigkeit — Wirksamkeit beschlossener und weiterreichender Anpassung, Klimarisiko mit Anpassung, Anpassungsdauer, Grenzen der Anpassung — wird je Bereich weder ermittelt noch verglichen, ebenso wenig Gewissheit, maßgebliche klimatische Einflüsse und Zahl der sehr dringenden und dringenden Handlungserfordernisse; die Schlüsse für die Anpassungsplanung (S. 153–154) fehlen. `systembereich_auswertung()` wird außer im Test nirgends aufgerufen. Einzelnachweis: Abschnitt „Gegenprobe Zeile 10“. |
 | 11 | Die Bundesregierung erstellt eine Klimarisikoanalyse nach dem aktuellen Stand der Wissenschaft, veröffentlicht sie und aktualisiert sie mindestens alle acht Jahre, um Handlungsfelder, Klimawirkungen und Regionen mit besonders hohen Klimarisiken aufzuzeigen. | KAnG, https://www.gesetze-im-internet.de/kang/__4.html | § 4 Abs. 1 | teilweise | docs/methodik/95_hitzebelastung.md, backend/app/data/catalog.py | Das Produkt liefert eine quantitative Risikobewertung je Kommune und Klimawirkung (Methodik-Berichte, Katalog), das ist aber keine Klimarisikoanalyse der Bundesregierung im Sinne des § 4 KAnG und enthält keinen eingebauten Mechanismus, der eine Aktualisierung im gesetzlich vorgesehenen Achtjahresturnus sicherstellt oder dokumentiert. |
@@ -389,6 +389,113 @@ reichte sie nicht, denn sie stellt die Felder nur nebeneinander und ermittelt ke
 Abhängigkeiten. Die regionsübergreifende Betrachtung fehlt ganz. Die Zählungen in den Abschnitten „Nachtrag:
 Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt; sie nachzuziehen ist Sache der
 Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 8 gegen KWRA 2021, Teilbericht 6, Kap. 3.3
+
+Frage: Tragen die drei in Zeile 8 genannten Belege, was Kap. 3.3 „Handlungsfeldübergreifende Auswertung der
+Gewissheit“ an die Bewertungsgewissheit stellt? Und passen Skala und Herleitung der KWRA zur Ableitung im Produkt aus
+den Evidenzklassen der Parameter? Zeile 8 steht seit T-0446 auf `erfüllt`, weil die Belegdateien existieren; der
+Normtext war dafür nicht gelesen worden. Gelesen wurde gegen
+`docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`. Im Kap. 3.3 stimmen PDF-Seitenzahl und
+gedruckte Seitenzahl überein. Das Kapitel beginnt auf S. 78 und endet auf S. 82 mit dem letzten Punkt der Kernaussagen;
+danach beginnt auf derselben Seite Kap. 3.4. Die Fundstelle „S. 78–82“ stimmt.
+
+Im Produkt wurden `backend/app/services/gewissheit.py` und `backend/tests/test_gewissheitsstufe.py` vollständig
+gelesen, in `backend/app/api/routes/catalog.py` die Route `GET /catalog` (Feld `certainty` je Risiko). Dazu die
+Stellen, die die Stufe weiterverwenden: `unsicherheits_zusammenschau.py` (`VORSICHT_STUFEN`, `HINWEIS_VORSICHT`) und
+`charakterisierung.py` (`AUSREICHENDE_GEWISSHEIT`). `gewissheit.gewissheitsstufen()` wurde einmal ausgeführt, ohne
+etwas zu ändern. Ergebnis mit Zahl belegter Parameter je Risiko:
+
+| Risikocode | Klimawirkung | belegt / alle Parameter | Stufe im Produkt |
+|---|---|---|---|
+| EXPECTED_ANNUAL_MORTALITY | #95 Hitzebelastung | 25 / 26 (abgeschätzt: `beta_dist_km`) | mittel |
+| EXPECTED_ANNUAL_MORBIDITY | #95 Hitzebelastung | 8 / 8 | hoch |
+| EXPECTED_ANNUAL_ALLERGY_DAYS | #96 Aeroallergene | 20 / 21 (abgeschätzt: `birch_group_share_default`) | mittel |
+| EXPECTED_ANNUAL_UV_YLL | #98 UV-Schädigungen | 30 / 30 | hoch |
+
+Alle vier Codes gehören zum Handlungsfeld „Menschliche Gesundheit“. Im Frontend liest heute nichts das Feld
+`certainty`. Ob die Stufe angezeigt wird, ist nicht Gegenstand dieser Gegenprobe (Sichtbarkeit, T-0483).
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | „Die Gewissheit wurde für alle Klimawirkungen … bestimmt. Der Wertebereich umfasste eine vierstufige Skala von ‚sehr gering‘, ‚gering‘, ‚mittel‘ und ‚hoch‘.“ | 78 | `gewissheit.py`, `GEWISSHEITSSTUFEN` und `gewissheitsstufen()` (eine Stufe für jeden Code aus `catalog.RISKS_BY_CODE`); `catalog.py`, `get_catalog()`, Feld `certainty`; `test_gewissheitsstufe.py`, `test_jeder_risikocode_hat_eine_stufe_der_skala` | trägt |
+| A2 | Die Gewissheit wird je Zeitscheibe bestimmt: „für die beiden Zeitscheiben Mitte des Jahrhunderts (2031 bis 2060) und Ende des Jahrhunderts (2071 bis 2100)“. | 78 | keiner. `gewissheitsstufe()` liefert je Risikocode genau einen Wert ohne Zeitbezug. | trägt nicht |
+| A3 | Die Bewertung der Gewissheit stützt sich auf fünf Teilaspekte: „Vorhandensein von Daten, die Zuverlässigkeit der verwendeten Daten, Kenntnisse über Wirkzusammenhänge, Genauigkeit und Plausibilität von Modellannahmen, die Eindeutigkeit von Trends“ (gleichlautend im Glossar, S. 13). | 78 | `gewissheit.py`, `gewissheitsstufe()`: Anteil der Parameter mit `evidence_class == "belegt"`, Schnitt `SCHWELLE_MITTEL` = 0,5 (Abschätzung von KAP3) | trägt teilweise |
+| A4 | Die Gewissheiten werden gemittelt, über alle Klimawirkungen und je Handlungsfeld, getrennt nach Zeitscheibe und nach aufsteigender Gewissheit geordnet (Tabelle 17), dazu je Cluster (Wasser, Land und Wirtschaft niedriger als die übrigen). Für die Mittelung wird die Skala als Zahl dargestellt (1 = sehr gering bis 4 = hoch); weil das eine „künstliche Spezifizierung“ ist, wird „der eigentliche Grad der Gewissheit … zusätzlich aufgeführt“ (Fn. 18). | 78, 79, 80 | `unsicherheits_zusammenschau.py`, `unsicherheits_zusammenschau()`: niedrigste Stufe je Handlungsfeld, kein Mittelwert, keine Cluster, keine Zeitscheibe | trägt teilweise |
+| A5 | Klimawirkungen und Handlungsfelder „mit besonders hoher oder geringer Gewissheit herausstellen“ (im Text benannt: sehr geringe Gewissheit etwa bei „UV-bedingte Gesundheitsschädigungen“ zum Ende des Jahrhunderts; vergleichsweise hohe, gemittelt 3,5, etwa bei „Hitzebelastung“). | 78, 79 | `catalog.py`, Feld `certainty` je Risiko; `unsicherheits_zusammenschau.py`, Liste der Handlungsfelder ab „gering“ | trägt teilweise |
+| A6 | „Änderungen der Gewissheiten zwischen den betrachteten Zeitscheiben hervorheben“ (etwa „Menschliche Gesundheit“: „nimmt … die Sicherheit bei der Bewertung zum Ende des Jahrhunderts … stark ab“, Tabelle 17: 3,4 mittel zu 2,1 gering). | 78, 79, 80 | keiner (ohne Zeitscheibe, A2) | trägt nicht |
+| A7 | Aufzeigen, wo „die ermittelten Klimarisiken noch hohen Unsicherheiten unterliegen und daher vorsichtig interpretiert werden sollten“. | 78 | `unsicherheits_zusammenschau.py`, `VORSICHT_STUFEN` und `HINWEIS_VORSICHT` (Hinweis ab Stufe „gering“) | trägt teilweise |
+| A8 | Aufzeigen, wo „aufgrund von geringen Gewissheiten noch weiterführender Forschungsbedarf besteht“ (Kernaussage: „Hier besteht insbesondere weiterer Forschungsbedarf“). | 78, 79, 81 | keiner | trägt nicht |
+| A9 | „Gleichzeitig können auf diese Weise auch verbesserte Aussagen zu möglichen Handlungserfordernissen getroffen werden (siehe Kapitel 6).“ | 78 | `charakterisierung.py`, `charakterisierungsgruppe()` mit `AUSREICHENDE_GEWISSHEIT` (Gruppen „… unter Unsicherheit“, Zeile 7) | trägt teilweise |
+| A10 | Die Gewissheit wird der Höhe des Klimarisikos gegenübergestellt: gemittelte Gewissheit der hoch, mittel und gering bewerteten Klimarisiken je Zeitscheibe und für den optimistischen und pessimistischen Fall, mit der Zahl der Klimawirkungen je Gruppe (Abbildung 7; Fn. 19 zur Stichprobengröße). | 80, 81 | keiner | trägt nicht |
+| A11 | Empfehlung für künftige Analysen: „eine detailliertere Aufschlüsselung der Gewissheit, beziehungsweise eine direkte Bewertung der Teilaspekte der Gewissheit“, um „passgenauer Hinweise auf mögliche Wissenslücken geben zu können“. | 81 | `gewissheit.py` über `evidence_class` je Parameter; `docs/evidenz/register.md` (Evidenzklasse je Parameter) | trägt teilweise |
+
+**Begründung je Urteil:**
+
+- A1: Skala und Stufennamen stimmen wörtlich mit S. 78 überein, und jede Klimawirkung des Katalogs trägt genau eine
+  Stufe. Der Test sichert das für jeden Code ab.
+- A2: Die KWRA kennt keine Gewissheit ohne Zeitscheibe. Das Produkt kennt keine Zeitscheibe der Gewissheit. Welcher
+  Zeitscheibe die Stufe des Produkts entsprechen soll, ist nirgends gesagt.
+- A3: Das ist der Kern der Frage nach der Herleitung. Die Skala passt, die Herleitung nicht. Die Regel des Produkts
+  misst nur, ob ein Rechenparameter eine Quelle hat. Das berührt die ersten beiden Teilaspekte (Vorhandensein und
+  Zuverlässigkeit der Daten) und nur für die Parameter, nicht für die Daten des Klimasignals. Kenntnis der
+  Wirkzusammenhänge, Plausibilität der Modellannahmen und Eindeutigkeit der Trends gehen nicht ein. Eine Quelle für
+  einen Parameter sagt nichts darüber, wie sicher die Zukunftsaussage ist. Das Ergebnis weicht deshalb bei den
+  Klimawirkungen des Katalogs von der KWRA ab: #98 UV-Schädigungen hat 30 von 30 Parametern belegt und steht auf
+  „hoch“. Die KWRA nennt „UV-bedingte Gesundheitsschädigungen“ zum Ende des Jahrhunderts unter den sieben
+  Klimawirkungen mit „sehr gering“ (S. 78). Umgekehrt senkt bei #95 Hitzebelastung (Mortalität) ein einziger
+  abgeschätzter Parameter von 26 die Stufe auf „mittel“, während die KWRA „Hitzebelastung“ mit gemittelt 3,5 über
+  beide Zeitscheiben zu den Klimawirkungen mit vergleichsweise hoher Gewissheit zählt (S. 78–79). Die Stufe
+  „hoch“ verlangt im Produkt, dass alle Parameter belegt sind. Sie ist also ein Randfall der Regel, keine Einstufung
+  der Aussagesicherheit. Zudem nennt der Kopf von `gewissheit.py` Tabelle 17 als Ausweis „je Klimawirkung“; Tabelle 17
+  zeigt aber Mittelwerte je Handlungsfeld (S. 80).
+- A4: Die Zusammenschau fasst je Handlungsfeld zusammen, aber mit dem Minimum statt dem Mittel. Das ist eine
+  vertretbare, vorsichtigere Wahl, aber nicht die Auswertung der Tabelle 17. Cluster und Zeitscheiben fehlen. Mit nur
+  einem Handlungsfeld im Katalog gibt es nichts handlungsfeldübergreifend zu vergleichen (wie bei Zeile 19, A4).
+  Tabelle 17 ordnet die Mittelwerte dem Grad durch Runden zu (2,4 gering, 2,6 mittel); das Produkt rechnet keine
+  Mittelwerte und braucht diese Zuordnung heute nicht.
+- A5: Die Stufe je Klimawirkung steht in der API. Herausgestellt wird nichts: keine Rangfolge, keine Hervorhebung
+  der Klimawirkungen mit besonders hoher oder geringer Gewissheit. Die Zusammenschau hebt nur Handlungsfelder ab
+  „gering“ hervor. Wegen A3 würde sie #98 nicht hervorheben, obwohl die KWRA es tut.
+- A6: Ohne Zeitscheibe gibt es keine Änderung zwischen Zeitscheiben. Für das einzige Handlungsfeld des Katalogs ist
+  genau dieser Wechsel der auffälligste Befund der KWRA (Tabelle 17, Text S. 79).
+- A7: Der Hinweis zur vorsichtigen Interpretation ist vorhanden und hängt an der richtigen Grenze („gering“). Er
+  greift heute aber nie, weil die niedrigste Stufe im Katalog „mittel“ ist. Nach der KWRA stünde das Handlungsfeld
+  „Menschliche Gesundheit“ zum Ende des Jahrhunderts auf „gering“ (Tabelle 17) und verlangte diesen Hinweis.
+- A8: Forschungsbedarf leitet die Bundesanalyse für die Forschung ab (Kap. 8). Für ein Werkzeug der Kommune ist das
+  nicht einschlägig. Die Anforderung geht deshalb nicht in die Lücke der Zeile 8 ein; A11 deckt den Teil ab, der für
+  die Kommune zählt, nämlich die Wissenslücken der eigenen Rechnung.
+- A9: Die Stufe geht in die Charakterisierungsgruppe ein. Sie trägt aber die Schwächen aus A2 und A3 mit, und die
+  Gewissheit der Anpassungskapazität fehlt (siehe Zeile 7, Abschnitt „Gegenprobe Zeile 7“).
+- A10: Einen Bezug zwischen Gewissheit und Höhe des Klimarisikos gibt es im Produkt nicht, auch keinen optimistischen
+  und pessimistischen Fall.
+- A11: Das Produkt schlüsselt nach Parametern auf: Das Evidenz-Register zeigt, welcher Parameter abgeschätzt ist. Das
+  ist eine feinere Aufschlüsselung als die der KWRA, aber nicht nach den fünf Teilaspekten.
+
+Nicht als eigene Anforderung gewertet: die Befunde der Bundesanalyse selbst, also die Mittelwerte 2,718 und 2,2
+(S. 78), die Aussagen zu einzelnen Handlungsfeldern (S. 79) und die Kernaussagen (S. 81–82). Sie sind Ergebnisse,
+keine Anforderungen, und dienen oben nur als Vergleich (A3, A5, A6, A7).
+
+**Gelesene Seiten und Abschnitte:** Inventar mit `python3 /opt/overlord/overlord/skripte/dokumente.py inventar`
+(172 Seiten). Inhaltsverzeichnis S. 6–7 ganz. Glossar S. 13, Eintrag „Gewissheit“ (über die Stichwortsuche auf
+S. 12–17 gefunden, dann im Zusammenhang gelesen). S. 77 mit dem Ende von Kap. 3.2 (Kapitelgrenze geprüft). Kap. 3.3
+S. 78–82 vollständig im Text gelesen, einschließlich Fußnote 18 (S. 78), Fußnote 19 (S. 80) und des Kastens
+„Kernaussagen der handlungsfeldübergreifenden Auswertung der Gewissheit“ (S. 81–82); S. 82 bis zum Beginn von
+Kap. 3.4 (Kapitelgrenze geprüft). Als Bild angesehen: S. 80 (Tabelle 17 „Durchschnittliche Gewissheiten und Grad der
+Gewissheit der Bewertungen …“, alle 28 Werte samt Grad) und S. 81 (Abbildung 7 „Gemittelte Gewissheiten der
+Bewertungen der Klimawirkungen mit hohem, mittleren und geringen Klimarisiko …“ mit den Fallzahlen je Zeitscheibe und
+Fall). Kap. 3.3 enthält keine weitere Tabelle und keine weitere Abbildung. Nicht gelesen: die Zusammenfassung
+(S. 18–29) und Kap. 1.3 „Methodisches Vorgehen“ dieses Teilberichts, Kap. 6 und 7, auf die Kap. 3.3 verweist, sowie
+Teilbericht 1 („Methodik und Konzept“), der das Bewertungsverfahren der Gewissheit festlegt, und die
+Handlungsfeldkapitel mit den Einzelwerten je Klimawirkung, darunter die Werte für #96 Aeroallergene.
+
+**Schluss:** Zeile 8 bleibt nicht `erfüllt`. Von 11 Anforderungen trägt der Bestand eine voll (A1), sechs teilweise
+(A3, A4, A5, A7, A9, A11) und vier nicht (A2, A6, A8, A10). Zur Frage nach Skala und Herleitung: Die Skala
+passt wörtlich, die Herleitung nicht. Die Stufe im Produkt misst die Quellenlage der Rechenparameter, nicht die
+Gewissheit des Klimarisikos, und kehrt bei #98 die Einstufung der KWRA um. Der Status der Zeile 8 ist in derselben
+Änderung auf `teilweise` gesetzt; die Spalte „Lücke“ nennt, was fehlt. Die Zählungen in den Abschnitten „Nachtrag:
+Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt; sie nachzuziehen ist Sache der Gesamtzählung
+(T-0821-ceo, T-0487), nicht dieser Gegenprobe.
 
 ## Ergebnis
 
