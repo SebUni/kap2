@@ -7,6 +7,7 @@ zusammengenommen, Wertebereiche der Zählfelder und der Netzrolle.
 from pathlib import Path
 
 from app.data import catalog
+from app.data import kwra_querverbindungen as kq
 from app.services.querverbindungen import querverbindungs_auswertung
 
 
@@ -45,7 +46,8 @@ def test_klimawirkungen_eintraege_haben_erwartete_form():
         assert eintrag["eingehende_benannte"] >= 0
 
 
-def test_summe_ausgehende_benannte_maximal_20():
+def test_summe_ausgehende_benannte_hoechstens_zahl_der_beziehungen():
+    # Obergrenze = Zahl der benannten Beziehungen im Datenmodul (27 seit T-0936).
     ergebnis = querverbindungs_auswertung()
     summe = sum(e["ausgehende_benannte"] for e in ergebnis["klimawirkungen"])
-    assert summe <= 20
+    assert summe <= len(kq.BENANNTE_BEZIEHUNGEN)

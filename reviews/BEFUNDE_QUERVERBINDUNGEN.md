@@ -61,3 +61,34 @@ amtlichen Vorlage, die Matrix ist eine Wiedergabe von Tabelle 28. Nachzählt ein
 262 und die Erklärung, dass die Quelle selbst zwei verschieden abgegrenzte Zahlen enthält. Im Produkt wurde in diesem
 Paket nichts geändert. Vorschlag für ein Folgepaket (nicht Teil von T-0486): Nachfrage beim UBA/adelphi nach der
 Kantenliste bzw. ein Hinweis in der Produktanzeige, dass die Systembereichs-Matrix 262 Beziehungen summiert.
+
+## Befund 2 — Arbeitsmappe führt nicht alle im Fließtext genannten Einzelbeziehungen
+
+Status: im Produkt behoben, Arbeitsmappe unverändert (amtliche Quelldatei, Vorgabe des CEO im Vorhaben T-0870-ceo,
+Nachtrag 24.09.2026). Herkunft: Gegenprobe Zeile 9 (T-0741-ceo), Anforderungen A1 und A3, Codebefund C2; umgesetzt
+in T-0936-cto.
+
+**Abweichung:** Das Blatt „Wirkbeziehungen“ der Arbeitsmappe, Abschnitt „3. Im Fließtext ausdrücklich benannte
+Einzelbeziehungen“, führt 20 Beziehungen, alle in eine Richtung und mit dem Beleg „TB6 Kap. 3.4“ ohne Seite.
+Teilbericht 6, Kap. 3.4 nennt im Fließtext weitere Beziehungen (S. 82–88 vollständig gelesen, Seitenzahl = gedruckte
+Seite = PDF-Seite):
+
+| Beziehung | Richtung | Seite |
+|---|---|---|
+| Wassermangel im Boden (#13) → Schäden in Wäldern (#8) | gerichtet | 82 |
+| Schäden in Wäldern (#8) → Nutzfunktion: Holzertrag (#31) | gerichtet | 82 |
+| Schäden in Wäldern (#8) → Nutzfunktion: Erholung (#32) | gerichtet | 82 |
+| Gewässertemperatur und Eisbedeckung und biologische Wasserqualität (#53) ↔ Mangelndes Kühlwasser für thermische Kraftwerke (#68) | gegenseitig | 82, 85 |
+| Bedarf an Kühlenergie (#65) ↔ Stadtklima/Wärmeinseln (#62) | gegenseitig | 85 |
+| Hitzebelastung (#95) → Bedarf an Kühlenergie (#65) | gerichtet | 85–86 (Abb. 9) |
+| Verschiebung von Arealen und Rückgang der Bestände (#4) ↔ Vegetation in Siedlungen (#61) | gegenseitig | 86 |
+
+Die Unterscheidung „in eine Richtung führend“ gegen „gegenseitige Wechselwirkung“ trifft die Quelle selbst (S. 82,
+S. 85: „Neben den bisher aufgeführten einseitigen Querverbindungen …“). Die IDs stammen aus dem Blatt
+„Klimawirkungen“ der Arbeitsmappe.
+
+**Produkt:** `BENANNTE_BEZIEHUNGEN` in `backend/app/data/kwra_querverbindungen.py` führt die sieben Beziehungen
+zusätzlich (jetzt 27), jede mit dem Vermerk „nicht aus der Arbeitsmappe“ im Beleg. Alle 27 Einträge tragen das
+Feld `richtung` („gerichtet“ oder „gegenseitig“) und die Seite im Beleg; bei den 20 übernommenen Einträgen ist nur
+die Seite ergänzt, Wortlaut und Richtung sind die der Arbeitsmappe. Dieselbe Tabelle steht in
+`docs/QUERVERBINDUNGEN_KLIMAWIRKUNGEN.md`, Abschnitt „Benannte Einzelbeziehungen“.
