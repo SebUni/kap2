@@ -37,7 +37,11 @@ trap 'rm -rf "$TMP"' EXIT
 
 # H1 der Quelle wird per --shift-heading-level-by=-1 zum Dokumenttitel (Hero);
 # keine Auto-Nummerierung, da die Berichte manuell nummerierte Abschnitte tragen.
-pandoc "$MD" -o "$TMP/report.html" \
+# pandoc erkennt den Zaun „python test: <name>“ nicht als Code-Block: nur die Exportkopie
+# wird auf gewöhnliche Python-Zäune umgeschrieben, die Quelle bleibt unverändert.
+python3 "$ROOT/scripts/methodik_zaeune.py" "$MD" "$TMP/quelle.md"
+
+pandoc "$TMP/quelle.md" -o "$TMP/report.html" \
   --standalone --to html5 \
   --from markdown+pipe_tables+tex_math_dollars+tex_math_single_backslash \
   --shift-heading-level-by=-1 \
