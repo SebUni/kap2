@@ -6,6 +6,7 @@ import { GroupRadarCard, TopRisksCard, GroupRadarGrid } from './dashboard/RiskRa
 import RiskDistributionSection from './dashboard/RiskDistributionSection'
 import CostTablesSection from './dashboard/CostTablesSection'
 import RiskInteractionSection from './dashboard/RiskInteractionSection'
+import SystembereicheSection from './dashboard/SystembereicheSection'
 
 /**
  * Dashboard „Executive Story" (Variante C): Hero-Kopf mit Euro-Kernzahlen und
@@ -43,6 +44,7 @@ export default function Dashboard() {
       <GroupRadarCard className="col-span-6" />
       <TopRisksCard className="col-span-6" />
       <GroupRadarGrid className="col-span-12" />
+      <SystembereicheSection className="col-span-12" />
       <RiskInteractionSection className="col-span-12" />
 
       {riskSummary && (
