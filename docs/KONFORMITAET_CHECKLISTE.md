@@ -102,7 +102,7 @@ aus der Auswertung der hoch bewerteten Klimawirkungen. `BENANNTE_BEZIEHUNGEN` f�
   ist nicht abgelesen, sondern nach Entscheidung des CEO (Nachtrag 25.09.2026, 00:50 UTC, zu T-0870-ceo) als
   Modellgrenze ausgewiesen. Dieser Teil der Anforderung fehlt. `ABLESUNG` erklärt zudem die Lücke zwischen
   der Summe der Ablesung (251) und den 257 Querverbindungen mit Ursachen, die die Quelle nicht belegt, und
-  trägt dort noch nicht den Zusatz „Ursache in der Quelle nicht belegt“.
+  trägt dort jetzt den Zusatz „Ursache in der Quelle nicht belegt“.
 - A10: Einordnung nach Clustern und Systembereichen und die Aussage zu Kaskadeneffekten stehen wörtlich mit
   Seite im Datenmodul und in der Doku; das Dashboard zeigt Einordnung und Systembereiche. Die Kaskadeneffekte
   stehen in Doku und Dienstantwort, nicht im Dashboard; die Quelle beziffert sie nicht.
