@@ -20,7 +20,7 @@ das Netz nur als Chord-Diagramm auf Handlungsfeldebene, aus dem sich keine exakt
 lassen. Aus Kapitel 3.4 belegt sind deshalb nur zwei Ausschnitte, die dieses Dokument und das
 zugrunde liegende Datenmodul wörtlich übernehmen:
 
-1. die **Netzrollen** — 25 Klimawirkungen, die Kap. 3.4 (S. 82–88) ausdrücklich als starke Sender
+1. die **Netzrollen** — 27 Klimawirkungen, die Kap. 3.4 (S. 82–88) ausdrücklich als starke Sender
    oder starke Empfänger im Wirkungsnetz benennt (Abschnitt „Netzrollen");
 2. die im Fließtext von Kap. 3.4 (S. 82–88) **wörtlich genannten Einzelbeziehungen** (Auszug,
    27 Einträge, Abschnitt „Benannte Einzelbeziehungen").
@@ -34,41 +34,43 @@ Kapitel des Teilberichts. Übertragen wurde die kuratierte Arbeitsmappe
 
 ## Netzrollen
 
-Die 25 Klimawirkungen, die Teilbericht 6 Kap. 3.4 „Analyse der Querverbindungen" (S. 82–88)
+Die 27 Klimawirkungen, die Teilbericht 6 Kap. 3.4 „Analyse der Querverbindungen" (S. 82–88)
 ausdrücklich als starke Sender („stark ausgehend") oder starke Empfänger („stark eingehend") im
 Wirkungsnetz benennt (`app.data.kwra_querverbindungen.NETZROLLEN`).
 
-| KWRA-ID | Klimawirkung | Handlungsfeld | Rolle |
-|---|---|---|---|
-| 1 | Veränderung der Länge der Vegetationsperiode und Phänologie | Biologische Vielfalt | stark ausgehend |
-| 4 | Verschiebung von Arealen und Rückgang der Bestände | Biologische Vielfalt | stark ausgehend und stark eingehend; zentral unter den hoch bewerteten Klimawirkungen (S. 87, 88) |
-| 5 | Schäden an Küstenökosystemen | Biologische Vielfalt | stark eingehend |
-| 12 | Rutschungen und Muren | Boden | stark ausgehend |
-| 13 | Wassermangel im Boden | Boden | stark ausgehend |
-| 14 | Sickerwasser | Boden | stark ausgehend |
-| 15 | Vernässung | Boden | stark ausgehend |
-| 25 | Ertragsausfälle | Landwirtschaft | stark eingehend |
-| 26 | Qualität der Ernteprodukte | Landwirtschaft | stark eingehend |
-| 31 | Nutzfunktion: Holzertrag | Wald- und Forstwirtschaft | stark eingehend |
-| 38 | Meerestemperatur und Eisbedeckung | Küsten- und Meeresschutz | stark ausgehend |
-| 39 | Wasserqualität und Grundwasserversalzung | Küsten- und Meeresschutz | stark ausgehend |
-| 40 | Meeresspiegelhöhe | Küsten- und Meeresschutz | stark ausgehend |
-| 43 | Sturmfluten | Küsten- und Meeresschutz | stark ausgehend |
-| 48 | Niedrigwasser | Wasserhaushalt, Wasserwirtschaft | stark ausgehend |
-| 49 | Hochwasser | Wasserhaushalt, Wasserwirtschaft | stark ausgehend; zentral in der Gesamtbetrachtung (S. 84, 88) |
-| 53 | Gewässertemperatur und Eisbedeckung und biologische Wasserqualität | Wasserhaushalt, Wasserwirtschaft | stark ausgehend |
-| 55 | Grundwasserstand und Grundwasserqualität | Wasserhaushalt, Wasserwirtschaft | stark eingehend |
-| 73 | Schiffbarkeit der Seeschifffahrtsstraßen | Verkehr, Verkehrsinfrastruktur | stark eingehend |
-| 82 | Beeinträchtigung des Warenverkehrs über Wasserstraßen (Inland) | Industrie und Gewerbe | stark eingehend |
-| 92 | Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen | Tourismuswirtschaft | stark eingehend |
-| 95 | Hitzebelastung | Menschliche Gesundheit | stark eingehend |
-| 96 | Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft | Menschliche Gesundheit | stark eingehend |
-| 97 | Potenziell schädliche Mikroorganismen und Algen | Menschliche Gesundheit | stark eingehend |
-| 101 | Verletzungen und Todesfälle infolge von Extremereignissen | Menschliche Gesundheit | stark eingehend |
+| KWRA-ID | Klimawirkung | Handlungsfeld | Rolle | Auswertung |
+|---|---|---|---|---|
+| 1 | Veränderung der Länge der Vegetationsperiode und Phänologie | Biologische Vielfalt | stark ausgehend | Gesamt |
+| 4 | Verschiebung von Arealen und Rückgang der Bestände | Biologische Vielfalt | stark ausgehend und stark eingehend; zentral unter den hoch bewerteten Klimawirkungen (S. 87, 88) | Gesamt (ausgehend, S. 84) und hoch bewertete (eingehend, zentral, S. 87) |
+| 5 | Schäden an Küstenökosystemen | Biologische Vielfalt | stark eingehend | Gesamt (S. 84) und hoch bewertete (S. 87) |
+| 7 | Schäden an Feuchtgebieten und wassergebundenen Habitaten | Biologische Vielfalt | stark eingehend | nur hoch bewertete (S. 87, nicht aus der Arbeitsmappe) |
+| 8 | Schäden an Wäldern | Biologische Vielfalt | stark eingehend | nur hoch bewertete (S. 87, nicht aus der Arbeitsmappe) |
+| 12 | Rutschungen und Muren | Boden | stark ausgehend | Gesamt |
+| 13 | Wassermangel im Boden | Boden | stark ausgehend | Gesamt |
+| 14 | Sickerwasser | Boden | stark ausgehend | Gesamt |
+| 15 | Vernässung | Boden | stark ausgehend | Gesamt |
+| 25 | Ertragsausfälle | Landwirtschaft | stark eingehend | Gesamt |
+| 26 | Qualität der Ernteprodukte | Landwirtschaft | stark eingehend | Gesamt |
+| 31 | Nutzfunktion: Holzertrag | Wald- und Forstwirtschaft | stark eingehend | Gesamt |
+| 38 | Meerestemperatur und Eisbedeckung | Küsten- und Meeresschutz | stark ausgehend | Gesamt |
+| 39 | Wasserqualität und Grundwasserversalzung | Küsten- und Meeresschutz | stark ausgehend | Gesamt |
+| 40 | Meeresspiegelhöhe | Küsten- und Meeresschutz | stark ausgehend | Gesamt |
+| 43 | Sturmfluten | Küsten- und Meeresschutz | stark ausgehend | Gesamt |
+| 48 | Niedrigwasser | Wasserhaushalt, Wasserwirtschaft | stark ausgehend | Gesamt |
+| 49 | Hochwasser | Wasserhaushalt, Wasserwirtschaft | stark ausgehend; zentral in der Gesamtbetrachtung (S. 84, 88) | Gesamt |
+| 53 | Gewässertemperatur und Eisbedeckung und biologische Wasserqualität | Wasserhaushalt, Wasserwirtschaft | stark ausgehend | Gesamt |
+| 55 | Grundwasserstand und Grundwasserqualität | Wasserhaushalt, Wasserwirtschaft | stark eingehend | Gesamt |
+| 73 | Schiffbarkeit der Seeschifffahrtsstraßen | Verkehr, Verkehrsinfrastruktur | stark eingehend | Gesamt |
+| 82 | Beeinträchtigung des Warenverkehrs über Wasserstraßen (Inland) | Industrie und Gewerbe | stark eingehend | Gesamt |
+| 92 | Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen | Tourismuswirtschaft | stark eingehend | Gesamt |
+| 95 | Hitzebelastung | Menschliche Gesundheit | stark eingehend | Gesamt |
+| 96 | Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft | Menschliche Gesundheit | stark eingehend | Gesamt |
+| 97 | Potenziell schädliche Mikroorganismen und Algen | Menschliche Gesundheit | stark eingehend | Gesamt |
+| 101 | Verletzungen und Todesfälle infolge von Extremereignissen | Menschliche Gesundheit | stark eingehend | Gesamt |
 
-13 Klimawirkungen sind nach der Arbeitsmappe stark ausgehend (Sender), 12 stark eingehend
-(Empfänger). Küsten- und Meeresschutz hat ausschließlich ausgehende Netzrollen, Tourismuswirtschaft
-(über die benannten Einzelbeziehungen, siehe unten) ausschließlich eingehende.
+13 Klimawirkungen sind stark ausgehend (Sender), 14 stark eingehend (Empfänger); 12 der
+Empfänger stammen aus der Arbeitsmappe, #7 und #8 aus dem Fließtext S. 87. Küsten- und
+Meeresschutz hat ausschließlich ausgehende Netzrollen, Tourismuswirtschaft (über die benannten Einzelbeziehungen, siehe unten) ausschließlich eingehende.
 
 Eine Klimawirkung kann Sender und Empfänger zugleich sein (Kap. 3.4, Fußnote 21, S. 84). Der
 Fließtext belegt das ausdrücklich für „Verschiebung von Arealen und Rückgang der Bestände“ (#4):
@@ -80,6 +82,37 @@ auswirkt (S. 84, 88), und #4 innerhalb der hoch bewerteten Klimawirkungen (S. 87
 Datenmodul führt beides in den Feldern `rollen`, `zentral` und `beleg_rolle`; die Auswertung je
 Klimawirkung liefert `netzrollen` und `zentral` mit aus. Eine gegenseitige Einzelbeziehung zählt
 dort bei beiden Klimawirkungen als aus- und eingehend.
+
+Die Spalte „Auswertung“ trennt die beiden Auswertungen von Kap. 3.4: „Gesamt“ ist die
+Gesamtbetrachtung aller 102 Klimawirkungen (S. 82–86), „hoch bewertete“ die gesonderte Auswertung
+der als hoch bewerteten Klimawirkungen (S. 86–87, siehe nächster Abschnitt). Im Datenmodul steht
+das im Feld `auswertungen` („gesamt“, „hochrisiko“); die Auswertung je Klimawirkung liefert es als
+`netzrolle_auswertungen` aus.
+
+## Hoch bewertete Klimawirkungen
+
+„In einem weiteren Analyseschritt“ betrachtet Kap. 3.4 nur die Querverbindungen der Klimawirkungen,
+deren Klimarisiko in den Zeitscheiben Gegenwart, Mitte oder Ende des Jahrhunderts als hoch bewertet
+ist (S. 86). Diese Befunde stehen gesondert von der Gesamtbetrachtung
+(`app.data.kwra_querverbindungen.HOCHRISIKO_BEFUNDE`):
+
+- Unterschiede zur Gesamtbetrachtung ergeben sich vor allem bei den eingehenden Wirkbeziehungen
+  (S. 86).
+- Das Handlungsfeld „Biologische Vielfalt“ hat in dieser Auswertung die höchste Gesamtzahl an
+  Querverbindungen (ein- und ausgehend zusammen) und wird am häufigsten von anderen hoch bewerteten
+  Klimawirkungen beeinflusst (S. 86–87, Kernaussage S. 88).
+- Besonders viele eingehende Wirkbeziehungen haben „Schäden an Küstenökosystemen“ (#5), „Schäden an
+  Feuchtgebieten und wassergebundenen Habitaten“ (#7), „Schäden an Wäldern“ (#8) und „Verschiebung
+  von Arealen und Rückgang der Bestände“ (#4) (S. 87).
+- „Verschiebung von Arealen und Rückgang der Bestände“ (#4) wirkt zugleich auf Landwirtschaft, Wald-
+  und Forstwirtschaft, Fischerei, Bauwesen und Menschliche Gesundheit und nimmt eine zentrale
+  Position unter den hoch bewerteten Klimawirkungen ein (S. 87, 88).
+- Wichtige Einflussfaktoren kommen aus den vorgelagerten Klimawirkungen der Handlungsfelder
+  „Küsten- und Meeresschutz“ und „Wasserhaushalt, Wasserwirtschaft“; die Cluster Land und Wasser
+  sind bei den hohen Klimarisiken enger verflochten (S. 87).
+
+Die Zahl der Querverbindungen in dieser Auswertung nennt Teilbericht 6 nicht; übernommen ist nur,
+was der Fließtext sagt.
 
 ## Benannte Einzelbeziehungen
 
@@ -165,7 +198,7 @@ kein vollständiges Kantenverzeichnis ist.
 
 ## Modellgrenze
 
-- Die 257 Querverbindungen aus Teilbericht 6 sind eine **Gesamtzahl**, keine Kantenliste. Nur 25
+- Die 257 Querverbindungen aus Teilbericht 6 sind eine **Gesamtzahl**, keine Kantenliste. Nur 27
   Netzrollen und 27 im Fließtext benannte Einzelbeziehungen sind wörtlich belegt; die übrigen
   Kanten des Netzes sind aus dem Teilbericht nicht rekonstruierbar (Chord-Diagramm ohne
   Achsenbeschriftung auf Klimawirkungsebene).

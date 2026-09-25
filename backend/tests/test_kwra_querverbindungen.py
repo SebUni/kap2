@@ -10,14 +10,15 @@ from app.data import kwra_querverbindungen as k
 # ── NETZROLLEN ────────────────────────────────────────────────────────────────
 
 def test_netzrollen_gesamtzahl():
-    assert len(k.NETZROLLEN) == 25
+    # 25 aus der Arbeitsmappe + #7 und #8 aus der Hochrisiko-Auswertung (S. 87, T-0938)
+    assert len(k.NETZROLLEN) == 27
 
 
 def test_netzrollen_rollenverteilung():
     ausgehend = [e for e in k.NETZROLLEN if e["rolle"] == "stark ausgehend"]
     eingehend = [e for e in k.NETZROLLEN if e["rolle"] == "stark eingehend"]
     assert len(ausgehend) == 13
-    assert len(eingehend) == 12
+    assert len(eingehend) == 14
 
 
 def test_netzrollen_kwra_id_eindeutig_und_im_bereich():
@@ -40,6 +41,31 @@ def test_netzrollen_mehrwertig_und_zentral_mit_seitenbeleg():
         assert isinstance(e["zentral"], bool), e
         if len(e["rollen"]) == 2 or e["zentral"] is True:
             assert "S. " in e["beleg_rolle"], e
+
+
+def test_netzrollen_auswertungen_gesamt_und_hochrisiko_getrennt():
+    """T-0938 (A12): TB 6 Kap. 3.4 betrachtet die Querverbindungen der hoch bewerteten
+    Klimawirkungen gesondert (S. 86–87); jede Netzrolle sagt, aus welcher Auswertung sie
+    stammt, und die Befunde der Hochrisiko-Auswertung stehen in HOCHRISIKO_BEFUNDE."""
+    for e in k.NETZROLLEN:
+        assert e["auswertungen"], e
+        assert set(e["auswertungen"]) <= {"gesamt", "hochrisiko"}, e
+        if "hochrisiko" in e["auswertungen"]:
+            assert "S. 87" in e["beleg_auswertung"], e
+    je_id = {e["kwra_id"]: e for e in k.NETZROLLEN}
+    assert "hochrisiko" in je_id[5]["auswertungen"]
+    je_name = {e["name"]: e for e in k.NETZROLLEN}
+    for name in (
+        "Schäden an Feuchtgebieten und wassergebundenen Habitaten",
+        "Schäden an Wäldern",
+    ):
+        assert name in je_name, name
+        assert "hochrisiko" in je_name[name]["auswertungen"], name
+    biodiv = [
+        b for b in k.HOCHRISIKO_BEFUNDE
+        if b["name"] == "Biologische Vielfalt" and ({86, 87} & set(b["seiten"]))
+    ]
+    assert len(biodiv) == 1
 
 
 # ── BENANNTE_BEZIEHUNGEN ─────────────────────────────────────────────────────

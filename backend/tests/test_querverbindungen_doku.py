@@ -74,10 +74,11 @@ def test_ueberschriften_vorhanden():
 
 # ── Netzrollen ────────────────────────────────────────────────────────────────
 
-def test_netzrollen_tabelle_25_datenzeilen():
+def test_netzrollen_tabelle_27_datenzeilen():
     abschnitt = _abschnitt(_text(), "## Netzrollen")
     zeilen = _tabellenzeilen(abschnitt)
-    assert len(zeilen) == 25
+    assert len(zeilen) == 27
+    assert len(zeilen) == len(k.NETZROLLEN)
 
 
 def test_netzrollen_ids_identisch_mit_datenmodul():

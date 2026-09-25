@@ -65,6 +65,11 @@ def querverbindungs_auswertung() -> dict:
             "netzrolle": netzrolle_je_id[kid]["rolle"] if kid in netzrolle_je_id else None,
             "netzrollen": list(netzrolle_je_id[kid]["rollen"]) if kid in netzrolle_je_id else [],
             "zentral": netzrolle_je_id[kid]["zentral"] if kid in netzrolle_je_id else False,
+            # „gesamt“ und/oder „hochrisiko“ (Auswertung der hoch bewerteten
+            # Klimawirkungen, TB 6 S. 86–87); leer ohne Netzrolle.
+            "netzrolle_auswertungen": (
+                list(netzrolle_je_id[kid]["auswertungen"]) if kid in netzrolle_je_id else []
+            ),
             "ausgehende_benannte": ausgehend_je_id.get(kid, 0),
             "eingehende_benannte": eingehend_je_id.get(kid, 0),
         }
@@ -95,7 +100,8 @@ def querverbindungs_auswertung() -> dict:
         "vollständige Liste (Abbildung 8 in Teilbericht 6 ist ein Chord-Diagramm auf "
         "Handlungsfeldebene, aus dem sich keine exakten Kanten ablesen lassen). "
         "Ausgewiesen werden deshalb nur die von Teilbericht 6 Kapitel 3.4 ausdrücklich "
-        "belegten Angaben: 25 Klimawirkungen mit benannter Netzrolle, "
+        f"belegten Angaben: {len(kq.NETZROLLEN)} Klimawirkungen mit benannter Netzrolle "
+        "(aus der Gesamtbetrachtung und der Auswertung der hoch bewerteten Klimawirkungen), "
         f"{len(kq.BENANNTE_BEZIEHUNGEN)} im Fließtext "
         "genannte Einzelbeziehungen (Auszug, nicht vollständig) sowie Kennzahlen und "
         "die 5x5-Systembereichs-Matrix. Eine vollständige, selbst modellierte "
