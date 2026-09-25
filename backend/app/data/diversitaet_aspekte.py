@@ -36,9 +36,8 @@ QUELLE: dict = {
 _BROSCHUERE = "UBA, Klimarisikoanalysen auf kommunaler Ebene (2022), Abschnitt 2.2.6"
 
 _DIVERSITAET_ALLGEMEIN = {
-    "aspekt": "Diversitätsaspekte über Alter und Lebenslage hinaus (etwa Herkunft, "
-              "Einkommen, Behinderung): S. 30 nennt keine einzelnen Merkmale, im Code "
-              "geht keines davon ein.",
+    "aspekt": "Diversitätsaspekte über Alter und Lebenslage hinaus: S. 30 nennt keine "
+              "einzelnen Merkmale, im Code geht kein weiteres ein.",
     "quelle": _BROSCHUERE,
     "seite": 30,
 }
@@ -57,8 +56,8 @@ DIVERSITAET_JE_KLIMAWIRKUNG: dict[str, dict] = {
              "fundstelle": f"{_H}:AGE_BETA_FACTOR"},
             {"aspekt": "Geschlecht",
              "wie": "Geschlecht geht nur in die verlorenen Lebensjahre je Sterbefall "
-                    "ein, deren Restlebenserwartung je Altersband für Frauen und Männer "
-                    "mit dem bundesweiten Bevölkerungsanteil gemittelt ist.",
+                    "ein; Frauen und Männer sind bis 84 Jahre mit dem Bevölkerungsanteil, "
+                    "ab 85 Jahren mit den Sterbefällen 2023 gemittelt.",
              "fundstelle": f"{_H}:AGE_LIFE_YEARS"},
             {"aspekt": "Leben im Pflegeheim (85 und älter)",
              "wie": "Der Anteil der Heimbewohner ab 85 Jahren je Zelle (OSM-"
@@ -116,11 +115,15 @@ DIVERSITAET_JE_KLIMAWIRKUNG: dict[str, dict] = {
              "wie": "Die Hautkrebsfälle werden je Altersband der Zelle mit eigener "
                     "Neuerkrankungsrate für Melanom und hellen Hautkrebs gerechnet.",
              "fundstelle": f"{_H}:UV_INCIDENCE_C44"},
-            {"aspekt": "Geschlecht",
-             "wie": "Geschlecht geht nur als bundesweites Gewicht ein: Die "
-                    "Neuerkrankungsraten je Altersband sind aus den Raten für Frauen und "
-                    "Männer mit dem Bevölkerungsanteil zusammengesetzt.",
+            {"aspekt": "Geschlecht (Neuerkrankungen)",
+             "wie": "Die Neuerkrankungsraten je Altersband sind aus den Raten für Frauen "
+                    "und Männer mit dem bundesweiten Bevölkerungsanteil zusammengesetzt.",
              "fundstelle": f"{_H}:UV_INCIDENCE_MM"},
+            {"aspekt": "Geschlecht (verlorene Lebensjahre)",
+             "wie": "Die Restlebenserwartung je Sterbefall an Melanom und hellem "
+                    "Hautkrebs (l_rest_mm, l_rest_c44) ist über Frauen und Männer mit den "
+                    "Sterbefällen 2021–2023 gemittelt.",
+             "fundstelle": "app.services.engine.impact.params:IMPACT_PARAM_SPECS"},
         ],
         "nicht_beruecksichtigt": [
             {"aspekt": "Gender: Der Geschlechteranteil der Kommune geht nicht ein; "
