@@ -106,6 +106,18 @@ def test_systembereiche_tabelle_5_datenzeilen():
     assert len(zeilen) == 5
 
 
+# ── Annahme der Auswertung und Einordnung ─────────────────────────────────────
+
+def test_abschnitt_annahme_und_einordnung_nennt_aussagen():
+    """T-0939 (A4, A10): Annahme (S. 82), Cluster-Einordnung und Kaskadeneffekte stehen in der Doku."""
+    abschnitt = _abschnitt(_text(), "## Annahme der Auswertung und Einordnung")
+    assert "Annahme der Auswertung (S. 82)" in abschnitt
+    assert "nachgelagerten" in abschnitt
+    assert "Cluster Wasser und Land" in abschnitt
+    assert "Kaskadeneffekte" in abschnitt
+    assert "AUSSAGEN" in abschnitt
+
+
 # ── Quellenlage ───────────────────────────────────────────────────────────────
 
 def test_quellenlage_enthaelt_gesamtzahl_und_pdf():

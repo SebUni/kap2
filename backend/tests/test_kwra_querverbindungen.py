@@ -68,6 +68,27 @@ def test_netzrollen_auswertungen_gesamt_und_hochrisiko_getrennt():
     assert len(biodiv) == 1
 
 
+# ── AUSSAGEN ─────────────────────────────────────────────────────────────────
+
+def test_aussagen_annahme_einordnung_kaskaden_mit_wortlaut_und_seite():
+    """T-0939 (A4, A10): Annahme der Auswertung (S. 82), Einordnung nach Clustern und
+    Systembereichen und mögliche Kaskadeneffekte (S. 84–88) stehen im Wortlaut mit Seite."""
+    for schluessel in ("annahme", "einordnung_cluster", "kaskadeneffekte"):
+        assert schluessel in k.AUSSAGEN, schluessel
+        eintrag = k.AUSSAGEN[schluessel]
+        assert isinstance(eintrag["wortlaut"], str), schluessel
+        assert eintrag["wortlaut"].strip(), schluessel
+        assert isinstance(eintrag["seite"], int), schluessel
+        assert 82 <= eintrag["seite"] <= 88, schluessel
+        assert all(82 <= s <= 88 for s in eintrag["seiten"]), schluessel
+        assert eintrag["seite"] in eintrag["seiten"], schluessel
+    assert k.AUSSAGEN["annahme"]["seite"] == 82
+    assert "nachgelagerten" in k.AUSSAGEN["annahme"]["wortlaut"]
+    assert "Cluster Wasser und Land" in k.AUSSAGEN["einordnung_cluster"]["wortlaut"]
+    assert "natürliche Systeme und Ressourcen" in k.AUSSAGEN["einordnung_cluster"]["wortlaut"]
+    assert "Kaskadeneffekte" in k.AUSSAGEN["kaskadeneffekte"]["wortlaut"]
+
+
 # ── BENANNTE_BEZIEHUNGEN ─────────────────────────────────────────────────────
 
 def test_benannte_beziehungen_gesamtzahl():

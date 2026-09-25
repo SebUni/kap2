@@ -32,6 +32,35 @@ Kapitel des Teilberichts. Übertragen wurde die kuratierte Arbeitsmappe
 `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blätter „Klimawirkungen"
 (Spalte „Netzrolle (TB 6 Kap. 3.4)") und „Wirkbeziehungen".
 
+## Annahme der Auswertung und Einordnung
+
+Drei Aussagen von Kap. 3.4 sagen, wie die Auswertung zu lesen ist. Das Datenmodul führt sie im
+Wortlaut mit Seite (`app.data.kwra_querverbindungen.AUSSAGEN`, Schlüssel `annahme`,
+`einordnung_cluster` und `kaskadeneffekte`).
+
+**Annahme der Auswertung (S. 82).** „Die Auswertung basiert auf der Annahme, dass negative
+Auswirkungen des Klimawandels auf eine Klimawirkung auch negative Folgen für die ihr nachgelagerten
+Wirkungen haben.“ Jede Querverbindung in diesem Dokument ist so zu lesen: Wird die vorgelagerte
+Klimawirkung schlimmer, wird es die nachgelagerte auch. Um wie viel, sagt die Querverbindung nicht.
+
+**Einordnung nach Clustern und Systembereichen (S. 84–85, Kernaussagen S. 88).** Alle
+Handlungsfelder mit vielen ausgehenden Wirkbeziehungen gehören zu den Clustern Wasser und Land.
+Fast alle Klimawirkungen mit den meisten ausgehenden Wirkbeziehungen zählen zu den natürlichen
+Systemen und Ressourcen. Die Handlungsfelder mit vielen eingehenden Wirkungen gehören bis auf die
+Landwirtschaft zu den Clustern Wirtschaft und Gesundheit. Nach Systembereichen: „Ausgehende
+Wirkungen finden sich also vor allem in Bezug auf natürliche Systeme und Ressourcen, während
+eingehende Wirkungen naturnutzende Wirtschaftssysteme, Infrastrukturen und Gebäude sowie Menschen
+und soziale Systeme betreffen“ (S. 85). Die Zahlen dazu stehen im Abschnitt „Querverbindungen
+zwischen den Systembereichen“ (Tabelle 28, Kap. 7).
+
+**Mögliche Kaskadeneffekte (S. 84, 87, Kernaussage S. 88).** Die Cluster Wasser und Land werden
+künftig besonders stark vom Klimawandel betroffen sein. „Dies kann unter Umständen Kaskadeneffekte
+bei einer Vielzahl der mit ihnen verknüpften Klimawirkungen und Handlungsfelder in den Clustern
+Wirtschaft, Infrastruktur und Gesundheit auslösen“ (S. 88). Viele Wirkbeziehungen innerhalb des
+Clusters Land (Boden, Biologische Vielfalt, Landwirtschaft) könnten den Effekt noch verstärken
+(S. 84). Schon die Vulnerabilitätsanalyse 2015 fand einen solchen kaskadenartigen Effekt (S. 87).
+Teilbericht 6 beziffert die Kaskadeneffekte nicht; das Produkt übernimmt deshalb nur die Aussage.
+
 ## Netzrollen
 
 Die 27 Klimawirkungen, die Teilbericht 6 Kap. 3.4 „Analyse der Querverbindungen" (S. 82–88)
