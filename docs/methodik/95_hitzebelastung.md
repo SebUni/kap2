@@ -79,8 +79,11 @@ GE-SO-06 (Einpersonenhaushalte).
 ### Konto-Einbettung
 
 - **Konto:** K1 Gesundheit, **Ursache: Hitze** (R9-Partition); Bausteine K1-Mortalität +
-  K1-Morbidität (Risiken-Monetarisierung, ID 95 = Blattzeile 100). Mortalitäts-Bewertung: **YLL × VOLY**
-  (MK 4.0; Log Nr. 2). Die Monetarisierungs-Arbeitsmappe wurde entsprechend fortgeschrieben
+  K1-Morbidität (Risiken-Monetarisierung, ID 95 = Blattzeile 100). Mortalitäts-Bewertung: **YLL × VOLY**,
+  also verlorene Lebensjahre × Wert eines verlorenen Lebensjahres (MK 4.0; Log Nr. 2). YLL (englisch „years
+  of life lost“) zählt je Hitzetoten die Jahre, die er nach der Sterbetafel im Mittel noch gelebt hätte
+  (§3.3). VOLY (englisch „value of a life year“) ist der Eurobetrag für ein solches Jahr, hier 160.800 €
+  (Preisstand 2024, §3.5). Die Monetarisierungs-Arbeitsmappe wurde entsprechend fortgeschrieben
   und die Änderung im Abgleich-Protokoll dokumentiert (Befund 50; Punkt P-neu s. Ledger).
 - **Anzuwendende Rechenregeln:** R7 (Weiche gekühlte Räume, §5), R9 (Ursachenpartition).
 - **Nur K1 aktiv (M0):** bewusst als Untergrenze (Begriff definiert in §4); K2 (#87) ab M3,
@@ -225,8 +228,8 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   338 Mio. € je Jahr (Preisstand 2024), 7 % weniger als die Kette; ohne die Eigenheit aus (c)
   wären es rund 345 Mio. €. Die Kette zeigt den Rechenweg, der Betrag für Berlin ist der
   Zelllauf des Produkts. Die Wirkungen (a) und (d) zusammen (× 0,967, aus den ungerundeten
-  Faktoren) widersprechen der Erklärung des Berlin-Ankers in §4, wonach das Zellmodell über dem
-  Gemeindepunkt liegt (Befund 101).
+  Faktoren) zeigen, dass das Zellmodell für Berlin unter dem Gemeindepunkt liegt; der Berlin-Anker
+  in §4 rechnet damit (Befund 101).
 - **Ebene 6, \(v_{\text{vers},a}\) = 1.** Auf Ebene der Kommune ist der Modifikator genau 1:
   \(\beta_{\text{iso}}\) wirkt heute nicht, weil \(q_{\text{1P}}\) mangels Zellquelle gleich dem
   Bundesmittel gesetzt ist (§3.6), und die Ebene \(q_{\text{pfl}}\) verteilt die Heimbewohner
@@ -864,11 +867,20 @@ assert abs(0.0634 * 1.0 - 0.0634) < 1e-9 and abs(0.0625 * 1.0 - 0.0625) < 1e-9
   Einschränkung unverändert: teilzirkulär (\(f_a\)-Rückrechnung), daher zusätzlich:
 
 - **Zusatz-Anker** Berlin 2018, Band 85+ (nationaler Skalar 0,581): Modell =
-  **221 je 100.000** gegen die RKI-Referenz 260–320 [14] — **unterschätzend (−15 %)**,
-  etwas stärker als in Rev. 6 (−11 %). Richtung erklärt und ehrlich ausgewiesen: der
-  Berlin-Gemeindepunkt trägt keine UHI-Feinstruktur; das Zellmodell wird für Berlin
-  (starke Wärmeinsel) über dem Gemeindepunkt-Wert liegen. Konsistent mit
-  „konservativ = unterschätzend".
+  **221 je 100.000** gegen die RKI-Referenz 260–320 [14] — **unterschätzend (−15 %)**
+  gegen die Untergrenze 260, etwas stärker als in Rev. 6 (−11 %). **Richtung gemessen**
+  (Zellvergleich §3.0, Skript `docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000`,
+  Ledger Runde 16): Der Berlin-Gemeindepunkt (20,06 °C im Mittel 2016–2025) liegt 0,1 K
+  über dem Bevölkerungsmittel der Zellen (19,96 °C). Für den Anker zählen nur die zwei
+  Wirkungen, die den Gemeindepunkt betreffen: Temperatur je Zelle × 0,948 und Feinstruktur
+  σ = 0,5 K × 1,021, zusammen × 0,967. Das Zellmodell liegt damit nicht über, sondern
+  **unter** dem Gemeindepunkt-Wert: 221 × 0,967 ≈ **214 je 100.000**, also rund **−18 %**
+  gegen die Untergrenze 260 (214 / 260 = 0,82). Die übrigen Wirkungen aus §3.0 (Einwohnersumme,
+  Bänder je Zelle) betreffen die Bevölkerungsgrundlage, nicht den Gemeindepunkt. **Die Lücke
+  bleibt unerklärt:** Die Wärmeinsel erklärt sie nicht, und der Bericht hat dafür keine
+  gemessene Ursache; sie steht als offene Abweichung, nicht als Korrektur. Der Anker bleibt ein
+  Anker, kein Wert aus Kapitel 7 ändert sich. Die Aussage bleibt „konservativ =
+  unterschätzend": Das Modell liegt für Berlin unter der RKI-Referenz, nicht darüber.
 
 - **Anker Morbidität / Sanity-Band:** Untergrenze Destatis T67 (Ø 1.400–1.500/Jahr, 2003:
   2.600); Obergrenze K&Z ≈ +2.500 Einweisungen/Hitzetag (Größenordnung 20.000±/Jahr).
@@ -967,7 +979,9 @@ noch auf einen Barwert abgezinst.
 > Das bewertet altersgerecht — ein Sterbefall mit 6 verbleibenden Lebensjahren zählt anders
 > als einer mit 40 — und fällt deutlich vorsichtiger aus als der pauschale ‚Wert eines
 > statistischen Lebens' (Faktor ≈ 5 bei Hitze). Die Vergleichsrechnung mit dem Pauschalwert
-> weisen wir als Sensitivität aus."
+> weisen wir als Sensitivität aus. Die 160.800 € gehen vom Wert der Methodenkonvention für den
+> EU-Durchschnitt aus; die Übertragung auf deutsche Einkommen hat KAP3 selbst abgeschätzt, der Betrag
+> ist deshalb eine Abschätzung von KAP3 (Spanne 136.400–165.600 €)."
 >
 > **Pflicht-Elemente:** Benennung „bewerteter Schaden — Konto K1" (nie „Gesamtschaden");
 > Vollständigkeitsanzeige „Stufe M0: 1 von 8 Konten aktiv" mit Roadmap-Aufklappliste;
