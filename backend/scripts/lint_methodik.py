@@ -43,6 +43,8 @@ DOCS = os.path.abspath(os.path.join(ROOT, "..", "docs", "methodik"))
 
 PFLICHTFELDER = ("id", "wert", "einheit", "band", "herkunft", "quelle",
                  "preisstand", "bandzuordnung", "endpunkt")
+# Zulaessige Werte des Feldes `kennzeichnung` (§4-Template, T-0904/T-0952).
+KENNZEICHNUNGEN = ("quelle", "abschaetzung_kap3", "berechnet")
 # Herkunft und Band je Parameter-Block (Befund 395): `registry_abgleich()` braucht
 # sie, um Bloecke OHNE Registry-Spec einzuordnen — Pfad, abgeleitete Groesse
 # oder ungekennzeichnet. Gefuellt von `parameter_bloecke()`.
@@ -246,6 +248,20 @@ def parameter_bloecke(src: str, lint: Lint) -> tuple[dict[str, str], set[float]]
         hk = re.search(r"^\s*herkunft:\s*(\S+)", blk, re.M)
         BLOCK_META[name] = {"herkunft": hk.group(1) if hk else "",
                             "band": eigenes_band}
+        # Kennzeichnung (§4-Template, T-0952): genau drei Werte. Ein Block mit
+        # `berechnet` muss nennen, aus welchen Parametern sein Wert folgt —
+        # sonst ist die Rechnung nicht nachvollziehbar (P1).
+        kz = re.search(r"^\s*kennzeichnung:\s*\"?([^\s\"#]*)", blk, re.M)
+        if kz:
+            kz_wert = kz.group(1)
+            lint.pruefe(kz_wert in KENNZEICHNUNGEN,
+                        f"Kennzeichnung {name}",
+                        f"'{kz_wert}' ist keiner von {list(KENNZEICHNUNGEN)}")
+            if kz_wert == "berechnet":
+                ab = re.search(r"^\s*abgeleitet_aus:\s*\[([^\]]*)\]", blk, re.M)
+                lint.pruefe(bool(ab and ab.group(1).strip()),
+                            f"abgeleitet_aus bei berechnet {name}",
+                            "kennzeichnung: berechnet ohne oder mit leerem abgeleitet_aus")
         ps = re.search(r"^\s*preisstand:\s*\"?([^\s\"#]+)", blk, re.M)
         # Euro-Erkennung ueber die GANZE Einheit (T-0902): Bis dahin wurde nur
         # das erste Wort auf "EUR" geprueft — "Mrd. €/a" und "Mrd. EUR/a" fielen
