@@ -16,6 +16,35 @@ from app.services import parameter_registry
 #: Vierstufige Skala, aufsteigend nach Gewissheit.
 GEWISSHEITSSTUFEN = ("sehr gering", "gering", "mittel", "hoch")
 
+#: Ab diesem Anteil belegter Parameter gilt die Gewissheit mindestens als „mittel".
+SCHWELLE_MITTEL = 0.5
+
+#: Zahlenschwellen der Ableitungsregel mit Herleitung (Vorgabe P1: Abschätzung als
+#: solche ausgewiesen). Die Grenzen 0 („kein Parameter belegt") und 1 („alle belegt")
+#: sind Wesen der Stufen „sehr gering" und „hoch", keine wählbaren Schwellen.
+SCHWELLEN = {
+    "SCHWELLE_MITTEL": {
+        "wert": SCHWELLE_MITTEL,
+        "art": "Abschätzung von KAP3",
+        "herleitung": (
+            "Die KWRA weist die Bewertungsgewissheit auf einer Skala aus (TB6 Kap. 3.3, "
+            "Tabelle 17), nennt aber keinen Zahlenschnitt für einen Anteil belegter "
+            "Parameter. KAP3 setzt die Grenze zwischen „gering“ und „mittel“ bei der Hälfte: "
+            "Ist mindestens die Hälfte der Parameter eines Risikos belegt, stützt sich die "
+            "Aussage überwiegend auf Quellen, sonst überwiegend auf Abschätzungen."
+        ),
+        "band": (
+            "0,4-0,6 (0,5 als natürlicher Schnitt „überwiegend belegt“; die Bandbreite ist "
+            "eine Setzung von KAP3, nicht aus einer Quelle abgeleitet)."
+        ),
+        "sensitivitaet": (
+            "Wirkt nur auf die Stufe „gering“ gegenüber „mittel“ und über die "
+            "Charakterisierungsgruppe (Zeile 7) darauf, ob eine Klimawirkung „unter "
+            "Unsicherheit“ geführt wird. Keine Rückwirkung auf Euro-Beträge."
+        ),
+    },
+}
+
 
 def _risiko_parameter(risk_code: str) -> list[dict]:
     """Parameter, die die Registry diesem Risiko selbst zuordnet (``layer_code``)."""
@@ -57,7 +86,7 @@ def gewissheitsstufe(risk_code: str, *, _parameter: list[dict] | None = None) ->
     anteil = belegt / n if n else 0.0
     if anteil == 0:
         return "sehr gering"
-    if anteil < 0.5:
+    if anteil < SCHWELLE_MITTEL:
         return "gering"
     if anteil < 1:
         return "mittel"
