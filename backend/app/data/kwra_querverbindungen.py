@@ -22,6 +22,9 @@ Teilbericht 6 ausdrücklich belegt**:
                            S. 86–87).
   HOCHRISIKO_BEFUNDE    — die Aussagen der gesonderten Auswertung der hoch bewerteten
                            Klimawirkungen (S. 86–88), je mit Seitenangabe.
+  AUSSAGEN              — Annahme der Auswertung (S. 82), Einordnung nach Clustern und
+                           Systembereichen (S. 84–85, 88) und mögliche Kaskadeneffekte
+                           (S. 84, 87, 88), je im Wortlaut mit Seite.
   BENANNTE_BEZIEHUNGEN   — die im Fließtext von TB 6 Kap. 3.4 wörtlich genannten
                            Einzelbeziehungen (Auszug, nicht vollständig; 27 Einträge,
                            je mit ``richtung`` „gerichtet“ oder „gegenseitig“ und
@@ -256,6 +259,60 @@ HOCHRISIKO_BEFUNDE: list[dict] = [
                 "eingehenden Wirkbeziehungen.",
      "seiten": [86]},
 ]
+
+# ── Übernommene Aussagen der Auswertung (TB 6 Kap. 3.4, S. 82–88) ────────────────
+#
+# Aussagen von Kap. 3.4, die keine Netzrolle und keine Einzelbeziehung sind, aber sagen, wie die
+# Auswertung zu lesen ist: die Annahme, auf der sie beruht (S. 82), die Einordnung der Ergebnisse
+# nach Clustern und Systembereichen (S. 84–85, Kernaussagen S. 88) und die möglichen
+# Kaskadeneffekte (S. 84, 87, Kernaussage S. 88).
+# Jeder Eintrag: titel, wortlaut (wörtlich aus TB 6, Auslassungen mit „…“), seite (gedruckte
+# Seite der Hauptstelle, = PDF-Seite), seiten (alle Stellen, an denen die Aussage steht), beleg.
+AUSSAGEN: dict[str, dict] = {
+    "annahme": {
+        "titel": "Annahme der Auswertung",
+        "wortlaut": "Die Auswertung basiert auf der Annahme, dass negative Auswirkungen des "
+                    "Klimawandels auf eine Klimawirkung auch negative Folgen für die ihr "
+                    "nachgelagerten Wirkungen haben.",
+        "seite": 82,
+        "seiten": [82],
+        "beleg": "TB6 Kap. 3.4, S. 82, letzter Satz vor Fußnote 20.",
+    },
+    "einordnung_cluster": {
+        "titel": "Einordnung nach Clustern und Systembereichen",
+        "wortlaut": "Alle Handlungsfelder mit verhältnismäßig vielen ausgehenden "
+                    "Wirkbeziehungen sind Teil der Cluster Wasser und Land … fast alle "
+                    "Klimawirkungen mit den meisten ausgehenden Wirkbeziehungen zählen zu den "
+                    "natürlichen Systemen und Ressourcen. … Alle genannten Handlungsfelder mit "
+                    "einer hohen Anzahl an eingehenden Wirkungen gehören bis auf die "
+                    "Landwirtschaft zu den Clustern Wirtschaft und Gesundheit. Ausgehende "
+                    "Wirkungen finden sich also vor allem in Bezug auf natürliche Systeme und "
+                    "Ressourcen, während eingehende Wirkungen naturnutzende "
+                    "Wirtschaftssysteme, Infrastrukturen und Gebäude sowie Menschen und soziale "
+                    "Systeme betreffen.",
+        "seite": 85,
+        "seiten": [84, 85, 88],
+        "beleg": "TB6 Kap. 3.4, S. 84 (Cluster Wasser und Land), S. 85 (natürliche Systeme und "
+                 "Ressourcen; Cluster Wirtschaft und Gesundheit; Systembereiche), Kernaussagen "
+                 "S. 88 (zweiter und dritter Punkt).",
+    },
+    "kaskadeneffekte": {
+        "titel": "Mögliche Kaskadeneffekte",
+        "wortlaut": "Die Handlungsfelder mit verhältnismäßig vielen ausgehenden "
+                    "Wirkbeziehungen sind Teil der Cluster Wasser und Land, welche zukünftig "
+                    "besonders stark vom Klimawandel betroffen sein werden. Dies kann unter "
+                    "Umständen Kaskadeneffekte bei einer Vielzahl der mit ihnen verknüpften "
+                    "Klimawirkungen und Handlungsfelder in den Clustern Wirtschaft, "
+                    "Infrastruktur und Gesundheit auslösen.",
+        "seite": 88,
+        "seiten": [84, 87, 88],
+        "beleg": "TB6 Kap. 3.4, Kernaussagen S. 88 (vierter Punkt); gleichlautend S. 84, dort "
+                 "ergänzt: viele Wirkbeziehungen innerhalb des Clusters Land (Boden, Biologische "
+                 "Vielfalt, Landwirtschaft) „könnte“ den Effekt verstärken; S. 87: schon die "
+                 "VA 2015 stellte einen „kaskadenartigen Effekt“ der Cluster Land und Wasser auf "
+                 "die Cluster Wirtschaft, Gesundheit und Infrastruktur fest.",
+    },
+}
 
 # ── Im Fließtext ausdrücklich benannte Einzelbeziehungen (Auszug) ───────────────
 #
