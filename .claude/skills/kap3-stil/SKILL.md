@@ -11,7 +11,7 @@ prüfbar ist, prüft `backend/scripts/lint_methodik.py` (Zahlenformat); der Rest
 
 ## Zahlen und Beträge
 
-- Dezimalkomma, Tausenderpunkt ab 10.000: `2,5`, `12.400`, `1.250,50 €`.
+- Dezimalkomma, Tausenderpunkt ab 1.000 (nicht in Jahreszahlen, Postleitzahlen und Kennungen): `2,5`, `1.250,50 €`, `12.400`.
 - Beträge ab einer Million in Millionen oder Milliarden mit einer oder zwei Nachkommastellen: `1,2 Mio. €`,
   `3,45 Mrd. €` — nie `1.200.000 €`, nie `1200000 €`, nie „1,2 Millionen Euro“. Darunter ausgeschrieben: `350.000 €`.
 - Euro immer als `€` nach der Zahl mit Leerzeichen (`12 €`), nie `EUR` im Fließtext.
