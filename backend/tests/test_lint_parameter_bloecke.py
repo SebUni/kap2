@@ -17,7 +17,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 from lint_methodik import Lint, parameter_bloecke  # noqa: E402
 
 
-def _block(pid: str, einheit: str, preisstand: str, rolle: str | None = None) -> str:
+def _block(pid: str, einheit: str, preisstand: str, rolle: str | None = None,
+           kennzeichnung: str = "quelle",
+           abgeleitet_aus: str | None = None) -> str:
     zeilen = [
         "parameter:",
         f"  id: {pid}",
@@ -25,8 +27,10 @@ def _block(pid: str, einheit: str, preisstand: str, rolle: str | None = None) ->
         f'  einheit: "{einheit}"',
         "  band: [1.0, 1.0]",
         "  herkunft: herleitung:§4.1",
-        "  kennzeichnung: quelle",
+        f"  kennzeichnung: {kennzeichnung}",
     ]
+    if abgeleitet_aus is not None:
+        zeilen.append(f"  abgeleitet_aus: {abgeleitet_aus}")
     if rolle:
         zeilen.append(f"  rolle: {rolle}")
     zeilen += [
@@ -81,6 +85,45 @@ def test_d_abweichender_preisstand_ohne_kalibrierrolle_bleibt_rot():
 
 def test_einheit_ohne_euro_braucht_keinen_preisstand():
     assert _preisstand_fehler(_bericht(_block("t.y", "1/a", "null"))) == []
+
+
+# T-0952: kennzeichnung kennt drei Werte, berechnet verlangt abgeleitet_aus.
+
+def _kennzeichnung_fehler(src: str) -> list[str]:
+    lint = Lint()
+    parameter_bloecke(src, lint)
+    return [f for f in lint.fehler
+            if f.startswith(("Kennzeichnung", "abgeleitet_aus"))]
+
+
+def test_e_berechnet_mit_abgeleitet_aus_ist_gruen():
+    src = _bericht(
+        _block("t.a", "1/a", "null"),
+        _block("t.b", "1/a", "null", kennzeichnung="abschaetzung_kap3"),
+        _block("t.c", "1/a", "null", kennzeichnung="berechnet",
+               abgeleitet_aus="[t.a, t.b]"),
+    )
+    assert _kennzeichnung_fehler(src) == []
+
+
+def test_f_berechnet_ohne_oder_mit_leerem_abgeleitet_aus_ist_rot():
+    ohne = _kennzeichnung_fehler(_bericht(
+        _block("t.c", "1/a", "null", kennzeichnung="berechnet")))
+    assert len(ohne) == 1
+    assert ohne[0].startswith("abgeleitet_aus bei berechnet t.c")
+    for leer in ("[]", "[ ]"):
+        fehler = _kennzeichnung_fehler(_bericht(
+            _block("t.c", "1/a", "null", kennzeichnung="berechnet",
+                   abgeleitet_aus=leer)))
+        assert len(fehler) == 1
+        assert fehler[0].startswith("abgeleitet_aus bei berechnet t.c")
+
+
+def test_g_fremder_kennzeichnungswert_ist_rot():
+    fehler = _kennzeichnung_fehler(_bericht(
+        _block("t.d", "1/a", "null", kennzeichnung="schaetzung")))
+    assert len(fehler) == 1
+    assert fehler[0].startswith("Kennzeichnung t.d")
 
 
 if __name__ == "__main__":
