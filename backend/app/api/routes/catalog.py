@@ -12,6 +12,7 @@ from app.data import catalog
 from app.services.engine import formulas
 from app.services import lineage_graph
 from app.services import querverbindungen
+from app.services import systembereiche_bundesanalyse
 from app.services import gewissheit
 from app.services import charakterisierung
 
@@ -88,6 +89,14 @@ def get_querverbindungen():
     (Netzrolle, benannte Beziehungen, Kennzahlen, Systembereichs-Matrix,
     Quelle, Modellgrenze). Siehe ``app/services/querverbindungen.py``."""
     return querverbindungen.querverbindungs_auswertung()
+
+
+@router.get("/catalog/systembereiche/bundesanalyse")
+def get_systembereiche_bundesanalyse():
+    """Bundesvergleich der fünf KWRA-Systembereiche (Checkliste Zeile 10, KWRA TB 6 Kap. 7):
+    Risiko, Anpassung, Schlüsse für die Anpassungsplanung, methodische Grenze.
+    Siehe ``app/services/systembereiche_bundesanalyse.py``."""
+    return systembereiche_bundesanalyse.bundesanalyse_vergleich()
 
 
 @router.get("/catalog/layer/{code}/recipe")
