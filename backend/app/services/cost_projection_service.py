@@ -4,10 +4,11 @@ Skaliert die heutigen aggregierten Schadenskosten (``get_risk_aggregate``) mit
 demselben regionalisierten DWD-Klimasignal wie die Risiko-Index-Projektion
 (``projection_service.scenario_factors``) und preist auf dem Maßnahmenpfad die
 Maßnahmenkosten ein: OPEX jährlich ab Umsetzungsjahr, CAPEX einmalig im
-Umsetzungsjahr. Die kumulierten Kosten werden zusätzlich als Barwerte mit 0 %
-und 1 % Reiner Zeitpräferenzrate ausgewiesen (UBA Methodenkonvention 4.0,
-Kap. 2.2.3). Bewusste, im Response dokumentierte Vereinfachung —
-Maßnahmenwirkung zeitkonstant.
+Umsetzungsjahr. Die kumulierten Kosten werden zusätzlich als Barwerte
+ausgewiesen, abgezinst mit einer Diskontrate von 0 % und 1 %. Diese ist hier
+gleich der Reinen Zeitpräferenzrate gesetzt (UBA Methodenkonvention 4.0,
+Kap. 2.2.3); die Komponente der relativen Preise ist nicht angesetzt. Bewusste,
+im Response dokumentierte Vereinfachung — Maßnahmenwirkung zeitkonstant.
 """
 
 from __future__ import annotations
@@ -21,9 +22,10 @@ from app.services.climate.dwd_data import get_climate_projection
 from app.services.measure_service import get_risk_aggregate, kommune_measures_query
 from app.services.projection_service import scenario_factors
 
-# Reine Zeitpräferenzraten (RZPR) der UBA Methodenkonvention 4.0, Kap. 2.2.3:
-# mindestens zwei Werte berichten, um die Sensitivität gegenüber der
-# Zeitpräferenz zu zeigen.
+# Diskontraten von 0 % und 1 %, hier gleich der Reinen Zeitpräferenzrate (RZPR)
+# der UBA Methodenkonvention 4.0, Kap. 2.2.3 gesetzt; die Komponente der
+# relativen Preise ist nicht angesetzt. Mindestens zwei Werte berichten, um die
+# Sensitivität gegenüber der Zeitpräferenz zu zeigen.
 PURE_TIME_PREFERENCE_RATES: tuple[float, ...] = (0.0, 0.01)
 
 
@@ -105,9 +107,11 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
         return out
 
     def _discounted(series: list[float]) -> dict[str, list[float]]:
-        """Kumulierte Kosten als Barwerte je Reiner Zeitpräferenzrate (UBA MK 4.0,
-        Kap. 2.2.3): mindestens 0 % und 1 %, abgezinst auf das Basisjahr
-        ``years[0]`` mit dem Faktor 1/(1+r)^(Jahr − Basisjahr)."""
+        """Kumulierte Kosten als Barwerte je Diskontrate (UBA MK 4.0, Kap. 2.2.3):
+        mindestens 0 % und 1 %, abgezinst auf das Basisjahr ``years[0]`` mit dem
+        Faktor 1/(1+r)^(Jahr − Basisjahr). Die Diskontrate ist hier gleich der
+        Reinen Zeitpräferenzrate gesetzt; die Komponente der relativen Preise
+        ist nicht angesetzt."""
         out: dict[str, list[float]] = {}
         for rate in PURE_TIME_PREFERENCE_RATES:
             running, row = 0.0, []
@@ -185,8 +189,10 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             "Skalierung der heutigen Schadenskosten mit dem regionalisierten "
             "DWD-Hitzetage-Trend (gleiches Klimasignal wie die Risiko-Projektion)",
             "CAPEX einmalig im Umsetzungsjahr (Default: Folgejahr); die "
-            "kumulierten Kosten werden zusätzlich als Barwerte mit 0 % und 1 % "
-            "Reiner Zeitpräferenzrate ausgewiesen (Feld „discounted“, abgezinst "
+            "kumulierten Kosten werden zusätzlich als Barwerte ausgewiesen, "
+            "abgezinst mit einer Diskontrate von 0 % und 1 %, die hier gleich der "
+            "Reinen Zeitpräferenzrate gesetzt ist; die Komponente der relativen "
+            "Preise ist nicht angesetzt (Feld „discounted“, abgezinst "
             f"auf das Basisjahr {years[0]})",
             "Maßnahmenwirkung zeitkonstant über den Horizont; OPEX ab Umsetzungsjahr",
         ],
