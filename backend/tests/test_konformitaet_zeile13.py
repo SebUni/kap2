@@ -1,12 +1,13 @@
-"""T-0465: Zeile 13 der Konformitäts-Checkliste ist auf 'erfüllt' gesetzt und gegen
-die genannten Belege abgesichert.
+"""T-0465: Zeile 13 der Konformitäts-Checkliste ist gegen die genannten Belege
+abgesichert. T-0927-cto: Nach der Gegenprobe am Text von § 8 Abs. 1 KAnG steht der
+Status auf 'teilweise', und die Lücke ist benannt.
 
 Prüft wörtlich gegen docs/KONFORMITAET_CHECKLISTE.md:
 - es gibt genau eine Zeile, die mit '| 13 |' beginnt,
 - diese Zeile hat sieben Spalten,
-- fünfte Spalte (Status) ist genau 'erfüllt',
+- fünfte Spalte (Status) ist genau 'teilweise',
 - sechste Spalte (Fundstelle/Beleg) ist genau die vier erwarteten Pfade,
-- siebte Spalte (Lücke) ist genau '—',
+- siebte Spalte (Lücke) ist weder leer noch '—',
 - jeder der vier genannten Pfade existiert als Datei im Repo.
 """
 
@@ -49,9 +50,10 @@ def test_zeile_13_hat_sieben_spalten():
     assert len(spalten) == 7, f"Erwartet 7 Spalten, gefunden: {len(spalten)} -> {spalten}"
 
 
-def test_zeile_13_status_ist_erfuellt():
+def test_zeile_13_status_ist_teilweise():
+    # T-0927-cto: Gegenprobe am Text von § 8 Abs. 1 KAnG, Status auf 'teilweise'.
     spalten = _spalten(_zeile_13())
-    assert spalten[4].strip() == "erfüllt"
+    assert spalten[4].strip() == "teilweise"
 
 
 def test_zeile_13_beleg_ist_exakt():
@@ -59,9 +61,9 @@ def test_zeile_13_beleg_ist_exakt():
     assert spalten[5].strip() == ERWARTETE_BELEGE
 
 
-def test_zeile_13_luecke_ist_leer():
-    spalten = _spalten(_zeile_13())
-    assert spalten[6].strip() == "—"
+def test_zeile_13_luecke_ist_benannt():
+    luecke = _spalten(_zeile_13())[6].strip()
+    assert luecke not in ("", "—"), "Status 'teilweise' verlangt eine benannte Lücke"
 
 
 def test_zeile_13_belegte_pfade_existieren():
