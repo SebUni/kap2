@@ -92,7 +92,7 @@ NETZROLLEN: list[dict] = [
     {"kwra_id": 4, "name": "Verschiebung von Arealen und Rückgang der Bestände",
      "handlungsfeld": "Biologische Vielfalt", "rolle": "stark ausgehend",
      "rollen": ["stark ausgehend", "stark eingehend"], "zentral": True,
-     "seiten": [84, 87, 88],
+     "seiten": [84, 86, 87, 88],
      "auswertungen": ["gesamt", "hochrisiko"],
      "beleg_auswertung": "TB6 Kap. 3.4: stark ausgehend in der Gesamtauswertung (S. 84); stark "
                          "eingehend und zentral in der Auswertung der hoch bewerteten "
@@ -124,7 +124,7 @@ NETZROLLEN: list[dict] = [
     {"kwra_id": 8, "name": "Schäden an Wäldern",
      "handlungsfeld": "Biologische Vielfalt", "rolle": "stark eingehend",
      "rollen": ["stark eingehend"], "zentral": False,
-     "seiten": [87],
+     "seiten": [82, 87],
      "auswertungen": ["hochrisiko"],
      "beleg_auswertung": "TB6 Kap. 3.4, S. 87 (nicht aus der Arbeitsmappe): unter den hoch "
                          "bewerteten Klimawirkungen „besonders viele eingehende "
@@ -192,7 +192,7 @@ NETZROLLEN: list[dict] = [
     {"kwra_id": 49, "name": "Hochwasser",
      "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark ausgehend",
      "rollen": ["stark ausgehend"], "zentral": True,
-     "seiten": [84, 88],
+     "seiten": [84, 85, 88],
      "auswertungen": ["gesamt"],
      "beleg_rolle": "TB6 Kap. 3.4, S. 84, 88: „Eine zentrale Bedeutung in der Gesamtbetrachtung "
                     "aller Handlungsfelder hat die vorgelagerte Klimawirkung ›Hochwasser‹, die "
@@ -201,7 +201,7 @@ NETZROLLEN: list[dict] = [
     {"kwra_id": 53, "name": "Gewässertemperatur und Eisbedeckung und biologische Wasserqualität",
      "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark ausgehend",
      "rollen": ["stark ausgehend"], "zentral": False,
-     "seiten": [82, 84],
+     "seiten": [82, 84, 85],
      "auswertungen": ["gesamt"]},
     {"kwra_id": 55, "name": "Grundwasserstand und Grundwasserqualität",
      "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark eingehend",
@@ -226,7 +226,7 @@ NETZROLLEN: list[dict] = [
     {"kwra_id": 95, "name": "Hitzebelastung",
      "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend",
      "rollen": ["stark eingehend"], "zentral": False,
-     "seiten": [85, 86],
+     "seiten": [85, 86, 88],
      "auswertungen": ["gesamt"]},
     {"kwra_id": 96, "name": "Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft",
      "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend",
