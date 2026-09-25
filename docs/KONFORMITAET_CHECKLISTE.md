@@ -27,7 +27,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 13 | Die Träger öffentlicher Aufgaben haben bei ihren Planungen und Entscheidungen das Ziel der Klimaanpassung fachübergreifend und integriert zu berücksichtigen. | KAnG, https://www.gesetze-im-internet.de/kang/__8.html | § 8 Abs. 1 | teilweise | backend/app/data/kang_handlungsfelder.py, backend/app/services/kang_beruecksichtigung.py, backend/app/services/kang_nachweis_markdown.py, docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md | Fachübergreifend nur dem Raster nach: Alle aktiven Klimawirkungen liegen im Handlungsfeld Gesundheit, die übrigen 16 Felder stehen immer auf „nicht betroffen“; keine Maßnahme des Katalogs wirkt über mehr als ein Handlungsfeld („integriert“ bleibt leer); die in § 8 Abs. 1 Satz 2 Nr. 1–3 genannten Auswirkungen (Überflutung, Grundwasser und Trockenheit, Bodenerosion) sind nur geplant, nicht gerechnet; die Erzeugung oder Verstärkung einer Wärmeinsel durch eine Planung wird nicht verglichen; eingetretene und zu erwartende Auswirkungen trennt der Nachweis nicht; der Erhalt von Versickerungs-, Speicher- und Verdunstungsflächen (Satz 3) wird nicht erfasst. Einzelnachweis: Abschnitt „Gegenprobe Zeile 13“ |
 | 14 | Die Länder bestimmen im Rahmen der Grenzen des Art. 28 Abs. 2 Grundgesetz diejenigen öffentlichen Stellen, die für die Gebiete der Gemeinden und Kreise jeweils ein Klimaanpassungskonzept aufzustellen haben, soweit nicht bereits vorhanden. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 1 | erfüllt | docs/KANG_ZUSTAENDIGKEIT_LAENDER.md, backend/app/data/kang_zustaendigkeit.py, backend/app/api/routes/kommune.py, frontend/src/components/dashboard/KangZustaendigkeit.tsx | — |
 | 15 | Klimaanpassungskonzepte sollen auf einer Klimarisikoanalyse im Sinne einer Feststellung von potentiellen prioritären Risiken und sehr dringlichen Handlungserfordernissen (Betroffenheitsanalyse) oder vergleichbaren Entscheidungsgrundlagen beruhen. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 3 | teilweise | backend/app/data/catalog.py, frontend/src/pages/roadmap/roadmapData.ts | Wie bereits zu Zeile 6 festgehalten, übernimmt das Produkt die Kategorie "sehr dringend" punktuell in der Roadmap, ohne die zugrunde liegende Klimarisikoanalyse systematisch und vollständig nach dieser gesetzlichen Vorgabe herzuleiten; laut docs/KATALOG_KRITIK.md fehlen im heutigen Katalog Klimawirkungen, die bundesweit als sehr dringend eingestuft sind. |
-| 16 | Vor der eigentlichen Risikobewertung ist der Kontext festzulegen (Bestandsaufnahme): lokale sozioökonomische und geographische Rahmenbedingungen sowie Trends sind zu erfassen, ebenso bereits vorhandene Informationen zu vergangenen und erwarteten Klimarisiken, einschließlich besonders klimasensibler Strukturen (z. B. kritische Infrastruktur) und vulnerabler Personengruppen. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Bestandsaufnahme"/"Festlegung des Kontexts", S. 12) | erfüllt | backend/app/data/bestandsaufnahme.py, backend/app/services/bestandsaufnahme_service.py, backend/app/services/bestandsaufnahme_markdown.py, docs/BESTANDSAUFNAHME.md | Keine Lücke im Produkt; Größen ohne Datenquelle je Kommune weist die Bestandsaufnahme ausdrücklich als vor Ort zu erheben aus. |
+| 16 | Vor der eigentlichen Risikobewertung ist der Kontext festzulegen (Bestandsaufnahme): lokale sozioökonomische und geographische Rahmenbedingungen sowie Trends sind zu erfassen, ebenso bereits vorhandene Informationen zu vergangenen und erwarteten Klimarisiken, einschließlich besonders klimasensibler Strukturen (z. B. kritische Infrastruktur) und vulnerabler Personengruppen. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Bestandsaufnahme"/"Festlegung des Kontexts", S. 12) | teilweise | backend/app/data/bestandsaufnahme.py, backend/app/services/bestandsaufnahme_service.py, backend/app/services/bestandsaufnahme_markdown.py, docs/BESTANDSAUFNAHME.md | Die Bestandsaufnahme erfasst vulnerable Personengruppen und klimasensible Strukturen nur zum Teil: vier von sieben Personengruppen und Kindertagesstätten und Schulen stehen ohne Wert mit Lückensatz, Naturschutzgebiete und Lieferketten fehlen. Trends wie demographischer Wandel und Urbanisierung, natürliche Systeme, vergangene Extremereignisse und ihre Schäden sowie vorhandene Untersuchungen der Kommune (etwa Hochwasser- und Starkregengefahrenkarten, Klimaanalysekarten) erhebt sie nicht, und sie identifiziert keine betroffenen Handlungsfelder. Sozioökonomische und geographische Rahmenbedingungen und den Temperaturverlauf zeigt nur das Kommunenprofil, dieser nur je Bundesland. Einzelnachweis: Abschnitt „Gegenprobe Zeile 16“. |
 | 17 | In der Vorbereitungsphase sind interessierte Parteien mit einschlägiger Fachexpertise zu identifizieren und über partizipative Ansätze frühzeitig in die Entscheidungsfindung einzubeziehen, um ein gemeinsames Verständnis und Verantwortungsgefühl unter den Beteiligten zu fördern. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Interessierte Parteien identifizieren und partizipative Ansätze planen", S. 13) | offen | — | Das Produkt bietet keinen Prozess und keine Funktion, mit der eine Kommune interessierte Parteien identifiziert oder einen partizipativen Beteiligungsprozess plant und begleitet; es ist ein Analysewerkzeug für die inhaltliche Berechnung von Klimarisiken, keine Prozessunterstützung für Beteiligungsverfahren. |
 | 18 | Optional kann die Anpassungskapazität eines betroffenen Systems analysiert und bewertet werden, unterschieden nach mehreren Komponenten (u. a. organisationsbezogene Fähigkeit, technisches Vermögen, finanzielle Fähigkeit, Fähigkeit des Ökosystems) und nach unterschiedlichen Reifegraden, um abzuleiten, wie stark sich das Klimarisiko durch Anpassung verringern lässt. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6, Anhang G und H (Abschnitt 2.2.5 "Optional: Anpassungskapazität analysieren und bewerten", S. 28f.) | erfüllt | backend/app/data/anpassungskapazitaet.py, backend/app/services/anpassungskapazitaet.py, backend/app/services/anpassungskapazitaet_markdown.py, backend/app/api/routes/anpassungskapazitaet.py, docs/ANPASSUNGSKAPAZITAET.md | Keine Lücke im Produkt; der nach ISO 14091 optionale Schritt ist als Selbsteinschätzung der Kommune je Komponente und Reifegrad umgesetzt und im Bericht als optionaler Analyseschritt ausgewiesen. |
 | 19 | Bei der Interpretation der Analyseergebnisse sind bestehende Unsicherheiten in den zugrunde liegenden Informationen und Daten explizit zu berücksichtigen, ebenso handlungsfeld- und regionsübergreifende Abhängigkeiten, bevor daraus Handlungsoptionen formuliert werden. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6 (Abschnitt 2.2.6 "Ergebnisse interpretieren", S. 29f.) | teilweise | backend/app/services/unsicherheits_zusammenschau.py, backend/app/api/routes/kommune.py, backend/tests/test_unsicherheits_zusammenschau.py, backend/app/services/gewissheit.py, docs/evidenz/register.md | Die Unsicherheit der Daten trägt das Produkt: Die Zusammenschau nennt je Handlungsfeld die niedrigste Gewissheitsstufe und die Zahl der nicht belegten Parameter und verlangt ab „gering“ vorsichtige Interpretation. Es fehlt aber, was Abschnitt 2.2.6 darüber hinaus verlangt. Handlungsfeldübergreifend ist die Zusammenschau nicht: Der aktive Katalog hat nur das Handlungsfeld „Menschliche Gesundheit“, und auch mit mehreren Feldern stellte sie diese nur nebeneinander, statt wechselseitige Abhängigkeiten zu ermitteln. Nur die übernommenen KWRA-Querverbindungen (Zeile 9) zeigen bundesweite Beziehungen. Regionsübergreifende Abhängigkeiten, etwa zu Nachbarkommunen, werden nicht betrachtet. Die Unsicherheit ist nicht mit den einzelnen Handlungsoptionen verbunden. Leitfragen der Kommune, die Einbeziehung von Fachabteilungen, externer Expertise und angrenzenden Kommunen sowie die Trennung der Maßnahmen danach, ob die Kommune sie allein umsetzen kann, fehlen. Gender- und Diversitätsaspekte gehen nur über das Alter ein. Primärtext ISO 14091 nicht gelesen (T-0531-ceo). Einzelnachweis: Abschnitt „Gegenprobe Zeile 19“. |
@@ -794,6 +794,135 @@ integrierend erscheint und die in Satz 2 Nr. 1–3 und Satz 3 ausdrücklich gena
 Zeile 13 ist in derselben Änderung auf `teilweise` gesetzt; die Spalte „Lücke“ nennt, was fehlt. Die Zählungen in den
 Abschnitten „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist Sache der
 Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 16 gegen UBA-Handlungsempfehlungen zur ISO 14091, Abschnitt 2.1.2
+
+Frage: Tragen die vier Belege der Zeile 16 das, was Abschnitt 2.1.2 „Bestandsaufnahme“ („Festlegung des Kontexts“)
+verlangt — und genügt es, Größen ohne Datenquelle je Kommune als vor Ort zu erheben auszuweisen, wie die Spalte „Lücke“
+behauptet? Gelesen wurde gegen die Sekundärquelle Umweltbundesamt (Porst, Voß, Kahlenborn, Schauser),
+„Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091“, Juni 2022, 40 Seiten,
+abgerufen am 25.09.2026 um 06:28:35 GMT (`Date`-Kopf des Servers, HTTP 200, 5.321.922 Byte) von
+https://www.umweltbundesamt.de/system/files/medien/479/publikationen/2022_uba-fachbroschuere_kra_auf_kommunaler_ebene.pdf
+(Verweis von der Publikationsseite in der Spalte „Quelle“). Die Datei liegt nicht im Repo. PDF-Seitenzahl und gedruckte
+Seitenzahl stimmen überein (S. 12 trägt die gedruckte Zahl 12); die Spalte „Seite“ nennt beide zugleich.
+
+Abgrenzung: Abschnitt 2.1.2 beginnt auf S. 12 und endet auf S. 15 vor 2.1.3. Er hat drei Unterabschnitte: „Lokal relevante
+Informationen recherchieren“ (S. 12 mit der Infobox „Datenquellen“, die auf S. 13 oben endet), „Interessierte Parteien
+identifizieren und partizipative Ansätze planen“ (S. 13–14) und „Verfügbares Budget kalkulieren und Finanzierung
+sicherstellen“ (S. 14 mit Tabelle 1), dazu die Hinweisbox für kleine Kommunen (S. 15). Fußnote 7 (S. 12): „In der ISO 14091
+wird dieser Abschnitt der KRA als „Festlegung des Kontexts“ bezeichnet.“ Den Kontext im engeren Sinn fasst der kursive
+Vorspann auf S. 12 zusammen, den die Broschüre nach S. 8 jedem Teilkapitel als Kurzfassung des ISO-Abschnitts voranstellt.
+Die Tabelle zerlegt den ersten Unterabschnitt samt Infobox; er ist der Gegenstand der Zeile 16 und ihrer Fundstelle
+„S. 12“. Der zweite Unterabschnitt ist Gegenstand der Zeile 17 (Fundstelle „S. 13“, Status `offen`), der dritte keiner
+Zeile (siehe „Nicht als eigene Anforderung gewertet“).
+
+**Befund Primärquelle:** Der Normtext ISO 14091:2021 wurde nicht gelesen. Er wird nicht gekauft; das Menschenticket
+T-0531-ceo ist offen. Die Tabelle stützt sich allein auf die Wiedergabe durch das UBA. Der Unterabschnitt spricht in
+„sollte“, „bedarf es“ und „können“; die Zeile 16 verschärft das zu „ist … festzulegen“ und „sind zu erfassen“. Fußnote 6
+(S. 11) vermerkt, dass die ISO 14091 mit der Festlegung des Kontexts beginnt und die Broschüre ihn als zweiten Schritt
+nach der Zielfestlegung führt.
+
+Im Produkt wurden `backend/app/data/bestandsaufnahme.py`, `backend/app/services/bestandsaufnahme_service.py`,
+`backend/app/services/bestandsaufnahme_markdown.py` und `docs/BESTANDSAUFNAHME.md` vollständig gelesen, dazu die Route
+`GET /api/kommune/{kommune_id}/bestandsaufnahme` in `backend/app/api/routes/kommune.py` ganz. Weil
+`docs/BESTANDSAUFNAHME.md` (Abschnitt „Lücken und Abgrenzung“) sozioökonomische und geographische Rahmenbedingungen sowie
+Klimatrends ausdrücklich an das Kommunenprofil verweist, wurden auch gelesen: die Route `GET /api/kommune/{kommune_id}/profile`,
+in `backend/app/services/kommune_profile_service.py` die Funktionen `build_profile()` (Kopf und Rückgabe) und
+`_climate_metrics()`, in `backend/app/services/climate/dwd_data.py` die Funktionen `get_climate_history()` und
+`get_climate_projection()` und der Kopf von `backend/app/services/projection_service.py`. Ausgeführt wurde nichts; der
+Stand der gespeicherten Zellen stammt aus dem Vermerk „Gemessen (T-0755)“ im Kopf von `_ZAEHL_FELDER` in
+`bestandsaufnahme_service.py`. Ob die Bestandsaufnahme im Frontend sichtbar ist, ist nicht Gegenstand dieser Gegenprobe
+(Sichtbarkeit, T-0483).
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | „Bereits in der Vorbereitungsphase sollte die Situation der Kommune, also etwa die sozioökonomischen und geographischen Bedingungen … berücksichtigt werden (Festlegung des Kontextes).“ | 12 | `bestandsaufnahme.py`, Größe `arbeitslosenquote` (Regionalstatistik); außerhalb der Belege der Zeile: `kommune_profile_service.py`, `build_profile()` (Einwohnerzahl, Höhenlage aus dem Höhenmodell, Bruttoinlandsprodukt des Kreises, Ausgaben des Kommunalhaushalts, Bundesland und Landkreis) | trägt teilweise |
+| A2 | Ebenso „typische Trends (z. B. demographischer Wandel, Urbanisierungstendenzen)“. | 12 | keiner. Bestandsaufnahme und Kommunenprofil zeigen Bevölkerungsanteile und Einwohnerzahl nur für einen Stand, ohne Verlauf und ohne Vorausberechnung. | trägt nicht |
+| A3 | „Zudem bedarf es eines ersten Überblicks über bereits vorhandene lokale Informationen zu vergangenen und zukünftigen Klimarisiken.“ | 12 | keiner. `bestandsaufnahme.py` führt für vergangene Klimarisiken nur die Größe `schadensereignisse`, und die trägt den Lückensatz; vorhandene Informationen zu zukünftigen Klimarisiken erfasst die Bestandsaufnahme gar nicht. | trägt nicht |
+| A4 | Natürliche Systeme sind „vom Klimawandel besonders bedroht … Dies sollte auch auf kommunaler Ebene einer der zentralen Ausgangspunkte für die Analyse von Klimarisiken, Wirkungsbeziehungen zwischen Handlungsfeldern und die Einschätzung von Anpassungsprioritäten sein.“ | 12 | keiner. `BESTANDSAUFNAHME_GROESSEN` hat keine Gruppe und keine Größe für natürliche Systeme (Gewässer, Wald, Böden, Schutzgebiete). | trägt nicht |
+| A5 | „Um die Situation der Kommune zu erfassen, sollten die besonders für den Klimawandel empfindlichen Strukturen, wie beispielweise Naturschutzgebiete, Krankenhäuser, kritische Infrastrukturen oder Lieferketten, … identifiziert werden.“ | 12 | `bestandsaufnahme.py`, Gruppe `klimasensible_strukturen` (sieben Größen: vier KRITIS-Sektoren aus OSM und BBK, Krankenhäuser, Pflegeeinrichtungen, Kindertagesstätten und Schulen mit Lückensatz); `bestandsaufnahme_service.py`, `_klassen_summe()` und `_zaehl_summe()` | trägt teilweise |
+| A6 | Derselbe Satz: „… sowie vulnerable Personengruppen identifiziert werden.“ | 12 | `bestandsaufnahme.py`, Gruppe `vulnerable_personen` (sieben Größen, drei mit Quelle: Ältere ab 65 Jahren und unter 18-Jährige aus dem Zensus 2022, Arbeitslosenquote; vier mit Lückensatz); `bestandsaufnahme_service.py`, `_anteil_gewichtet()` | trägt teilweise |
+| A7 | „In der Vorbereitungsphase sollten Informationen zu vergangenen lokalen klimatischen Extremereignissen, wie Hochwasser, Trockenheit oder Hitzewellen, und den damit verbundenen Schäden zusammengestellt werden, um bisher betroffene Handlungsfelder zu identifizieren.“ | 12 | keiner. Die Größe `schadensereignisse` trägt nur den Lückensatz „… ist im Rahmen der Konzepterstellung vor Ort zu erheben“. | trägt nicht |
+| A8 | „Auch Informationen zu den Folgen schleichender Veränderungen, wie dem graduellen Temperaturanstieg oder dem Anstieg des Meeresspiegels sollten zusammengetragen werden.“ | 12 | außerhalb der Belege der Zeile: `dwd_data.py`, `get_climate_history()` (heiße Tage, Mitteltemperatur, Sommerhöchsttemperatur seit 1990) und `get_climate_projection()` (2025–2065, RCP 4.5 und RCP 8.5), beide je Bundesland; `projection_service.py` | trägt teilweise |
+| A9 | „Im Ergebnis sollten alle potentiell vom Klimawandel betroffenen Handlungsfelder und Systeme grob identifiziert werden.“ | 12 | keiner. Die Bestandsaufnahme ordnet keine Größe einem Handlungsfeld zu und nennt keine betroffenen Handlungsfelder. | trägt nicht |
+| A10 | Infobox „Datenquellen“: „Eine Recherche zu bereits vorhandenen lokalen und regionalen Untersuchungen in Bezug auf Klimarisiken wie etwa Hochwassergefahren- oder Hochwasserrisikokarten, Starkregengefahrenkarten, Analysen zu städtischen Hitzeinseln oder Feinstaubbelastung sollte Teil der Bestandsaufnahme sein.“ Dazu: wetterbedingte Einsätze der Feuerwehr, Klimafunktions- und Klimaanalysekarten der GIS-Fachabteilungen. | 12 | keiner. Die Bestandsaufnahme fragt keine vorhandene Untersuchung ab und nennt keine; die Wärmeinsel rechnet das Produkt selbst (`engine/inputs.py`, `compute_uhi_delta()`), das ersetzt keine Analyse der Kommune. | trägt nicht |
+| A11 | Infobox: „Falls für die eigene Kommune keine relevanten Informationen zur Verfügung stehen, können auch Informationen benachbarter Kommunen oder von Kommunen mit vergleichbaren Kontexten herangezogen werden.“ | 12 | keiner. Die Bestandsaufnahme rechnet je Kommune; für Größen ohne Wert steht der Lückensatz, kein Verweis auf Nachbarkommunen. | trägt nicht |
+| A12 | Infobox: „Daten zur Darstellung aktueller und künftiger klimatischer Verhältnisse werden vom DAS-Basisdienst Klima und Wasser sowie vom Climate-Data-Center des Deutschen Wetterdienstes zur Verfügung gestellt und sind über den Regionalen Klimaatlas Deutschland zugänglich.“ | 12 | außerhalb der Belege der Zeile: `kommune_profile_service.py`, `_climate_metrics()` (acht Klimakennzahlen aus dem DWD-CDC-Raster am Mittelpunkt der Kommune, sonst Mittel des Bundeslands, mit Deutschland-Vergleich); `dwd_data.py`, `get_climate_projection()` | trägt teilweise |
+| A13 | Infobox: „Auch andere Informationsquellen über – vergangene oder erwartbare – extreme Wetterereignisse, wie etwa Naturgefahrenreporte, Nationale Klimareporte oder der Starkregenkatalog (CatRaRe) können verwendet werden. Ebenso können überregionale Untersuchungen, wie die KRA der Länder oder die Klimawirkungs- und Risikoanalyse des Bundes (KWRA) nützliche Hinweise auf potentielle Klimarisiken geben.“ | 13 | außerhalb der Belege der Zeile: `catalog.py` (Klimawirkungen nach der KWRA 2021; Quelle `DWD_Klimareport` für die Normierung heißer Tage in `HEAT_WAVE`); `querverbindungen.py` (Zeile 9) | trägt teilweise |
+
+**Begründung je Urteil:**
+
+- A1: Die Bestandsaufnahme selbst führt mit der Arbeitslosenquote genau eine sozioökonomische Größe und keine
+  geographische. Den Rest verweist `docs/BESTANDSAUFNAHME.md` an das Kommunenprofil. Das Profil liefert Einwohnerzahl,
+  Höhenlage, Wirtschaftskraft des Kreises und Kommunalhaushalt, also einen Teil der Rahmenbedingungen; Lage an Gewässern,
+  Landnutzung oder Siedlungsstruktur fehlen in `build_profile()`. Das Profil steht nicht unter den Belegen der Zeile 16, und keine der
+  beiden Ausgaben führt beides zu einem Kontext der Kommune zusammen.
+- A2: Ein Trend verlangt einen Verlauf oder eine Vorausberechnung. Das Produkt zeigt Anteile und Einwohnerzahl zu einem
+  Zeitpunkt; demographischer Wandel und Urbanisierung kommen nicht vor.
+- A3: Der Überblick über vorhandene Informationen ist der Kern der Festlegung des Kontexts. Für vergangene Klimarisiken
+  gibt es eine Größe ohne Datenquelle, für zukünftige keine Größe. Das Produkt rechnet zukünftige Klimarisiken selbst, das
+  ist aber die spätere Risikobewertung, nicht der Überblick über das, was die Kommune schon weiß.
+- A4: Die UBA nennt natürliche Systeme als zentralen Ausgangspunkt. Die Bestandsaufnahme beschränkt sich auf Menschen und
+  bauliche Strukturen.
+- A5: Krankenhäuser und kritische Infrastrukturen sind erfasst, Naturschutzgebiete und Lieferketten nicht. Dazu kommt:
+  Nach dem Vermerk „Gemessen (T-0755)“ in `bestandsaufnahme_service.py` tragen die gespeicherten Zellen die Zählfelder für
+  Krankenhäuser und Pflegeeinrichtungen heute nicht; beide Größen stehen dann ohne Wert mit dem Laufzeitsatz. Mit Wert
+  erscheinen in dieser Gruppe heute nur die vier KRITIS-Sektoren, sofern die Zellen die Klassenzählungen tragen.
+- A6: Die Gruppe ist angelegt und benennt die wichtigen Gruppen. Für vier der sieben Größen (Pflegebedürftige,
+  alleinlebende Ältere, Vorerkrankte, Wohnungslose) liefert das Produkt aber keinen Wert, nur den Lückensatz.
+- A7: Vergangene Extremereignisse und Schäden erhebt das Produkt nicht. Der Lückensatz weist die Aufgabe der Kommune zu;
+  damit sind die bisher betroffenen Handlungsfelder nicht identifiziert. Der Lückensatz ist ehrlich, er trägt die
+  Anforderung aber nicht.
+- A8: Den graduellen Temperaturanstieg zeigt das Produkt als Zeitreihe seit 1990 und als Projektion bis 2065, aber nur
+  je Bundesland (Deutschland-Werte, regional skaliert), nicht für die Kommune, und nicht in der Bestandsaufnahme. Den
+  Anstieg des Meeresspiegels und andere schleichende Veränderungen trägt es nicht zusammen.
+- A9: Die Bestandsaufnahme endet mit Tabellen und Datenlücken, ohne Ergebnis über betroffene Handlungsfelder und Systeme.
+  Das Raster der 17 KAnG-Handlungsfelder (`kang_beruecksichtigung.py`, Zeile 13) setzt gerechnete Schäden voraus und kann
+  mit dem aktiven Katalog nur das Feld Gesundheit als betroffen zeigen.
+- A10: Hochwasser- und Starkregengefahrenkarten, Klimaanalysekarten oder Feuerwehreinsätze fragt das Produkt nicht ab,
+  auch nicht als Lückensatz. Die eigene Wärmeinsel-Rechnung ist ein Ergebnis des Produkts, keine vorhandene Untersuchung
+  der Kommune.
+- A11: Eine Kann-Empfehlung. Das Produkt greift bei Klimakennzahlen auf das Mittel des Bundeslands zurück, wenn das Raster
+  keinen Wert liefert; für Klimarisiken nutzt es keine Informationen benachbarter oder vergleichbarer Kommunen.
+- A12: Aktuelle klimatische Verhältnisse kommen aus dem Climate-Data-Center des DWD, zukünftige aus einer eigenen, je
+  Bundesland skalierten Projektion (Quelle nach `get_climate_projection()`: IPCC AR6, DWD KlimaFolgenOnline,
+  ReKliEs-DE). DAS-Basisdienst und Regionaler Klimaatlas nutzt das Produkt nicht, und die Daten stehen im Kommunenprofil,
+  nicht in der Bestandsaufnahme.
+- A13: Die KWRA des Bundes ist die Grundlage des Katalogs, der Nationale Klimareport eine Quelle der Normierung heißer
+  Tage. Naturgefahrenreport, Starkregenkatalog CatRaRe und die KRA der Länder nutzt das Produkt nicht.
+
+Nicht als eigene Anforderung gewertet: der Unterabschnitt „Interessierte Parteien identifizieren und partizipative
+Ansätze planen“ (S. 13–14); er ist Gegenstand der Zeile 17. Der Unterabschnitt „Verfügbares Budget kalkulieren und
+Finanzierung sicherstellen“ (S. 14) mit der Infobox „Finanzierung von Klimarisikoanalysen“ und Tabelle 1 (Kosten von
+Klimaanpassungskonzepten: Pforzheim 100.000 €, Hagen 500.000 €, Speyer 300.000 €, Kaiserslautern 120.000 €,
+Herten 55.000 €); er betrifft die Ressourcen der Kommune, und keine Zeile der Checkliste nimmt ihn auf. Die Hinweisbox
+„Empfehlungen für eher kleine Kommunen und/oder Kommunen mit begrenzten Ressourcen“ (S. 15); ihr zweiter Punkt
+(qualitative Erhebung bei wenig Daten, übergreifende Datensätze von Landesämtern, Regierungsbezirken oder Landkreisen)
+ergänzt A10 und A11 für kleine Kommunen und fügt keine eigene Anforderung hinzu. Ebenso nicht: die Linkfußnoten 8–14
+(S. 12–13), die nur Fundorte der Datenquellen nennen.
+
+**Gelesene Seiten und Abschnitte:** Inventar mit `python3 /opt/overlord/overlord/skripte/dokumente.py inventar`
+(40 Seiten). Inhaltsverzeichnis S. 5 ganz. Einführung S. 7–9 ganz, einschließlich des Hinweises auf S. 8, dass jedem
+Teilkapitel eine Kurzfassung des ISO-Abschnitts in kursiver Schrift vorangestellt ist, und der Infobox „Klimarisikoanalysen
+(KRA)“ mit Abbildung 1 auf S. 9 (im Text). S. 10 (Kapiteltitel). S. 11 ganz: Beginn von 2.1 mit Fußnote 5 (Kapitel 5 der
+ISO 14091), Abschnitt 2.1.1 mit Fußnote 6 und Abbildung 2 (im Text; Kapitelgrenze geprüft). Abschnitt 2.1.2 auf S. 12–15
+vollständig im Text gelesen, samt Fußnoten 7–19, Infobox „Datenquellen“ (S. 12–13), Infobox „Finanzierung von
+Klimarisikoanalysen“ und Tabelle 1 (S. 14) und Hinweisbox für kleine Kommunen (S. 15). S. 12 zusätzlich als Bild
+angesehen, um den kursiven ISO-Vorspann, die Reihenfolge der Punkte in den beiden Spalten und die Zugehörigkeit der
+Infobox zu prüfen. S. 15 unten mit dem Beginn von 2.1.3 (Kapitelgrenze geprüft). **Nicht gelesen:** 2.1.3 ab S. 15 unten,
+2.1.4, 2.1.5, 2.2, 2.3, Kapitel 3 und 4 der Broschüre; die in den Fußnoten 8–19 verlinkten Quellen; der Primärtext der
+ISO 14091.
+
+**Schluss:** Zeile 16 bleibt nicht `erfüllt`. Von 13 Anforderungen trägt der Bestand keine voll, sechs teilweise (A1, A5,
+A6, A8, A12, A13) und sieben nicht (A2, A3, A4, A7, A9, A10, A11). Zur Frage der Gegenprobe: Nein, den Lückensatz „vor
+Ort zu erheben“ als erfüllt zu werten genügt nicht. Er ist ehrlich und erfüllt Vorgabe P1, er trägt aber nur die Größen,
+die die Bestandsaufnahme überhaupt führt. Was der Abschnitt darüber hinaus verlangt, führt sie gar nicht: Trends,
+vergangene Extremereignisse und Schäden, vorhandene Untersuchungen der Kommune, natürliche Systeme und das Ergebnis, welche
+Handlungsfelder betroffen sind. Rahmenbedingungen und Klimaverlauf stehen teilweise im Kommunenprofil, das nicht zu den
+Belegen gehört und nur Werte je Bundesland zeigt. Der Status der Zeile 16 ist in derselben Änderung auf `teilweise`
+gesetzt; die Spalte „Lücke“ nennt, was fehlt. Die Zählungen in den Abschnitten „Nachtrag: Abschlusszählung“ und
+„Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist Sache der Gesamtzählung (T-0821-ceo, T-0487), nicht
+dieser Gegenprobe.
 
 ## Ergebnis
 
