@@ -123,6 +123,19 @@ dastehen. Konten-Einbettung und R9-Abgrenzung in **zwei getrennten Spalten**:
 *Output-Kanten* (laut Netzwerkliste/Abgleich-Protokoll, mit Punkt-Nr. und ggf. Partitionsregel-Zitat)
 und *Konto-Ausschlüsse / verwandte Buchungen* (laut Konten-Definition) — die beiden nicht mischen.
 
+**Pflichtabsatz „Risiko ohne (weitere) Anpassung“ (KWRA 2021)** (Entscheidung des Aufsichtsrats vom 25.09.2026,
+T-1121-cmo). Jeder Methodik-Bericht trägt in Kapitel 1 einen Unterabschnitt mit der Überschrift
+`Risiko ohne (weitere) Anpassung` (Ebene `###`, kein eigenes Kapitel; Kapitelüberschriften bleiben unverändert). Die
+KWRA 2021 unterscheidet das Klimarisiko **ohne (weitere) Anpassung** (heutiger Anpassungsstand, keine zusätzlichen
+Maßnahmen) vom Risiko **mit Anpassung** (Restrisiko nach Umsetzung von Maßnahmen). Der Unterabschnitt enthält drei
+Aussagen: (a) dass die im Bericht ausgewiesenen Zahlen (Fälle, Tage, Euro-Beträge des Basiswerts) ausdrücklich dem
+KWRA-Zustand „ohne (weitere) Anpassung“ zugeordnet sind, und woran der heute schon umgesetzte Anpassungsstand im
+Basiswert steckt (etwa über die Kalibrierjahre); (b) welcher Zustand „mit Anpassung“ im Bericht dargestellt wird, zum
+Beispiel als Wirkung der Maßnahmen-Hebel aus Kapitel 5 auf den Basiswert, oder ausdrücklich, dass er nicht dargestellt
+wird, mit Begründung; (c) welche Risikostufe die KWRA 2021 der Klimawirkung im Zustand „ohne Anpassung“ zuweist, je
+Zeitscheibe, mit Fundstelle in `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx` (Blatt und Zeile). Vorlage für die
+Unterscheidung: `docs/methodik/61_vegetation_in_siedlungen.md`, Kapitel 5.
+
 ### 2.2 Evidenz-Register (Herzstück des Berichts)
 
 **Vor** jeder Modellgleichung wird die Evidenzlage ausgearbeitet: je Zeile ein belegter
