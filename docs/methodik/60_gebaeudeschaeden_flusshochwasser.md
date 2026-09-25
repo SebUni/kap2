@@ -2372,7 +2372,8 @@ deshalb sind die früheren Kommentare durch echte Felder ersetzt:
 - **`kennzeichnung:`** — einer von drei Werten: `quelle` (der Wert stammt aus einer belegten
   Quelle; das Feld `quelle:` nennt sie), `abschaetzung_kap3` (begründete Abschätzung von KAP3
   nach §3.9, Vorgaben P1/P2) oder `berechnet` (der Wert folgt rechnerisch aus anderen Blöcken,
-  die das Feld `abgeleitet_aus:` nennt; so geführt sind die in §4.8 als „berechnet“ ausgewiesenen Größen). Die vier Blöcke des Hebels S092 stehen auf `abschaetzung_kap3`;
+  die das Feld `abgeleitet_aus:` nennt; so geführt sind die in §4.8 als „berechnet“ ausgewiesenen
+  Größen). Die vier Blöcke des Hebels S092 stehen auf `abschaetzung_kap3`;
   `flood_bldg.r_s092` ist aus den drei übrigen berechnet, und weil alle drei Faktoren Abschätzungen
   sind, ist das Produkt als Ganzes ebenfalls eine Abschätzung (Feld `abgeleitet_aus:` nennt die
   Faktoren).
@@ -3252,7 +3253,7 @@ Fortschreibung geändert, §1/§5.4; dieser Abschnitt ist der Antrag, nicht die 
 2. `bandzuordnung` erhält zusätzlich den Wert `[alle]` für Parameter ohne differenzierende
    Bandachse.
 3. Das Block-Format wird um die fünf Felder erweitert, mit denen dieses Kapitel die Vorgabe P1
-   maschinenlesbar erfüllt: `kennzeichnung:` (`quelle | abschaetzung_kap3`), `herleitung_anker:`
+   maschinenlesbar erfüllt: `kennzeichnung:` (`quelle | abschaetzung_kap3 | berechnet`), `herleitung_anker:`
    (Pflicht bei `abschaetzung_kap3`), `wertebereich_abweichung:`, `abgeleitet_aus:` (bei berechneten
    Parametern) sowie `naeherung:`/`naeherung_richtung:` (bei ausgewiesenen Näherungen, hier
    \(s_{\text{bem}}\), §5.1.3). Auch diese Felder gehen über das §4-Template hinaus; sie sind
