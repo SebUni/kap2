@@ -40,6 +40,7 @@ _VP = "vulnerable_personen"
 _NS = "natuerliche_systeme"
 _KS = "klimasensible_strukturen"
 _VE = "vergangene_ereignisse"
+_TR = "trends"
 
 BESTANDSAUFNAHME_GROESSEN: list[dict] = [
     _g("aeltere_ab_65", _VP, "Ältere Menschen ab 65 Jahren", "%", ["Zensus_2022"]),
@@ -62,4 +63,5 @@ BESTANDSAUFNAHME_GROESSEN: list[dict] = [
     _g("kitas_schulen", _KS, "Kindertagesstätten und Schulen", ""),
     _g("lieferketten", _KS, "Lieferketten", "", hinweis=HINWEIS_NICHT_IM_KATALOG),
     _g("schadensereignisse", _VE, "Vergangene Schadensereignisse durch Wetterextreme", ""),
+    _g("bevoelkerungsentwicklung", _TR, "Bevölkerungsentwicklung", "%", ["Destatis_GVISys_Bevoelkerung"]),
 ]
