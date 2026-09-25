@@ -24,7 +24,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 10 | Die Klimarisiken sind über die fünf übergeordneten Systembereiche (Natürliche Systeme und Ressourcen, Naturnutzende Wirtschaftssysteme, Infrastrukturen und Gebäude, Naturferne Wirtschaftssysteme, Menschen und soziale Systeme) hinweg vergleichbar auszuwerten, um Unterschiede in Risikohöhe und Anpassungsfähigkeit zwischen diesen Bereichen sichtbar zu machen. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 7 (S. 146–155) | teilweise | backend/app/data/catalog.py, backend/app/services/systembereiche.py, backend/tests/test_systembereiche.py, backend/app/data/kwra_querverbindungen.py | Die fünf KWRA-Systembereiche und die Querverbindungen zwischen ihnen (Tabelle 28) sind quellenfest vorhanden, der Vergleich selbst nicht: Alle drei gerechneten Klimawirkungen (#95, #96, #98) liegen in „Menschen und soziale Systeme“, die vier übrigen Bereiche bleiben leer, und die 49 Klimawirkungen der Roadmap tragen keinen Systembereich. Die Risikohöhe wird als Mittel des Produkt-Risikoindex verglichen, nicht wie in Kap. 7 als Anteil der hoch bewerteten Klimawirkungen je Zeitscheibe und Fall. Die Anpassungsfähigkeit — Wirksamkeit beschlossener und weiterreichender Anpassung, Klimarisiko mit Anpassung, Anpassungsdauer, Grenzen der Anpassung — wird je Bereich weder ermittelt noch verglichen, ebenso wenig Gewissheit, maßgebliche klimatische Einflüsse und Zahl der sehr dringenden und dringenden Handlungserfordernisse; die Schlüsse für die Anpassungsplanung (S. 153–154) fehlen. `systembereich_auswertung()` wird außer im Test nirgends aufgerufen. Einzelnachweis: Abschnitt „Gegenprobe Zeile 10“. |
 | 11 | Die Bundesregierung erstellt eine Klimarisikoanalyse nach dem aktuellen Stand der Wissenschaft, veröffentlicht sie und aktualisiert sie mindestens alle acht Jahre, um Handlungsfelder, Klimawirkungen und Regionen mit besonders hohen Klimarisiken aufzuzeigen. | KAnG, https://www.gesetze-im-internet.de/kang/__4.html | § 4 Abs. 1 | teilweise | docs/methodik/95_hitzebelastung.md, backend/app/data/catalog.py | Das Produkt liefert eine quantitative Risikobewertung je Kommune und Klimawirkung (Methodik-Berichte, Katalog), das ist aber keine Klimarisikoanalyse der Bundesregierung im Sinne des § 4 KAnG und enthält keinen eingebauten Mechanismus, der eine Aktualisierung im gesetzlich vorgesehenen Achtjahresturnus sicherstellt oder dokumentiert. |
 | 12 | Die Bundesregierung legt eine vorsorgende Klimaanpassungsstrategie mit messbaren Zielen vor, setzt sie um und schreibt sie unter Berücksichtigung aktueller wissenschaftlicher Erkenntnisse alle vier Jahre fort. | KAnG, https://www.gesetze-im-internet.de/kang/__3.html | § 3 Abs. 1 | offen | — | Das Produkt ist ein Werkzeug für Kommunen und Berater und bildet weder eine Bundesstrategie noch einen Fortschreibungszyklus ab; die Pflicht richtet sich an die Bundesregierung und wird vom Produkt nicht adressiert. |
-| 13 | Die Träger öffentlicher Aufgaben haben bei ihren Planungen und Entscheidungen das Ziel der Klimaanpassung fachübergreifend und integriert zu berücksichtigen. | KAnG, https://www.gesetze-im-internet.de/kang/__8.html | § 8 Abs. 1 | erfüllt | backend/app/data/kang_handlungsfelder.py, backend/app/services/kang_beruecksichtigung.py, backend/app/services/kang_nachweis_markdown.py, docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md | — |
+| 13 | Die Träger öffentlicher Aufgaben haben bei ihren Planungen und Entscheidungen das Ziel der Klimaanpassung fachübergreifend und integriert zu berücksichtigen. | KAnG, https://www.gesetze-im-internet.de/kang/__8.html | § 8 Abs. 1 | teilweise | backend/app/data/kang_handlungsfelder.py, backend/app/services/kang_beruecksichtigung.py, backend/app/services/kang_nachweis_markdown.py, docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md | Fachübergreifend nur dem Raster nach: Alle aktiven Klimawirkungen liegen im Handlungsfeld Gesundheit, die übrigen 16 Felder stehen immer auf „nicht betroffen“; keine Maßnahme des Katalogs wirkt über mehr als ein Handlungsfeld („integriert“ bleibt leer); die in § 8 Abs. 1 Satz 2 Nr. 1–3 genannten Auswirkungen (Überflutung, Grundwasser und Trockenheit, Bodenerosion) sind nur geplant, nicht gerechnet; die Erzeugung oder Verstärkung einer Wärmeinsel durch eine Planung wird nicht verglichen; eingetretene und zu erwartende Auswirkungen trennt der Nachweis nicht; der Erhalt von Versickerungs-, Speicher- und Verdunstungsflächen (Satz 3) wird nicht erfasst. Einzelnachweis: Abschnitt „Gegenprobe Zeile 13“ |
 | 14 | Die Länder bestimmen im Rahmen der Grenzen des Art. 28 Abs. 2 Grundgesetz diejenigen öffentlichen Stellen, die für die Gebiete der Gemeinden und Kreise jeweils ein Klimaanpassungskonzept aufzustellen haben, soweit nicht bereits vorhanden. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 1 | erfüllt | docs/KANG_ZUSTAENDIGKEIT_LAENDER.md, backend/app/data/kang_zustaendigkeit.py, backend/app/api/routes/kommune.py, frontend/src/components/dashboard/KangZustaendigkeit.tsx | — |
 | 15 | Klimaanpassungskonzepte sollen auf einer Klimarisikoanalyse im Sinne einer Feststellung von potentiellen prioritären Risiken und sehr dringlichen Handlungserfordernissen (Betroffenheitsanalyse) oder vergleichbaren Entscheidungsgrundlagen beruhen. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 3 | teilweise | backend/app/data/catalog.py, frontend/src/pages/roadmap/roadmapData.ts | Wie bereits zu Zeile 6 festgehalten, übernimmt das Produkt die Kategorie "sehr dringend" punktuell in der Roadmap, ohne die zugrunde liegende Klimarisikoanalyse systematisch und vollständig nach dieser gesetzlichen Vorgabe herzuleiten; laut docs/KATALOG_KRITIK.md fehlen im heutigen Katalog Klimawirkungen, die bundesweit als sehr dringend eingestuft sind. |
 | 16 | Vor der eigentlichen Risikobewertung ist der Kontext festzulegen (Bestandsaufnahme): lokale sozioökonomische und geographische Rahmenbedingungen sowie Trends sind zu erfassen, ebenso bereits vorhandene Informationen zu vergangenen und erwarteten Klimarisiken, einschließlich besonders klimasensibler Strukturen (z. B. kritische Infrastruktur) und vulnerabler Personengruppen. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Bestandsaufnahme"/"Festlegung des Kontexts", S. 12) | erfüllt | backend/app/data/bestandsaufnahme.py, backend/app/services/bestandsaufnahme_service.py, backend/app/services/bestandsaufnahme_markdown.py, docs/BESTANDSAUFNAHME.md | Keine Lücke im Produkt; Größen ohne Datenquelle je Kommune weist die Bestandsaufnahme ausdrücklich als vor Ort zu erheben aus. |
@@ -689,6 +689,111 @@ Zielgruppe; an ihr gemessen fehlt ein Produkt für diese Zielgruppe ganz, und di
 Handlungserfordernisse hin. Der Status der Zeile 20 ist in derselben Änderung auf `teilweise` gesetzt; die Spalte
 „Lücke“ nennt, was fehlt. Die Zählungen in den Abschnitten „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit
 weiter überholt. Sie nachzuziehen ist Sache der Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 13 gegen KAnG, § 8 Abs. 1
+
+Frage: Kann ein Werkzeug für Kommunen und Berater die Pflicht „Die Träger öffentlicher Aufgaben haben … fachübergreifend
+und integriert zu berücksichtigen“ tragen, und was leistet der Nachweis unter `docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md`
+wirklich? Gelesen wurde der Gesetzestext des Bundes-Klimaanpassungsgesetzes (KAnG) in der nichtamtlichen Fassung von
+gesetze-im-internet.de, abgerufen am 25.09.2026 (Adressen und Zeitpunkte unten). Der Text liegt nicht im Repo. Die
+Webseite hat keine Seitenzahlen; die Spalte „Seite“ nennt Paragraf, Absatz, Satz und Nummer.
+
+Wortlaut von § 8 Abs. 1: „Die Träger öffentlicher Aufgaben haben bei ihren Planungen und Entscheidungen das Ziel der
+Klimaanpassung nach § 1 fachübergreifend und integriert zu berücksichtigen. Dabei sind sowohl die bereits eingetretenen
+als auch die zukünftig zu erwartenden Auswirkungen des Klimawandels zu berücksichtigen, insbesondere 1. Überflutung oder
+Überschwemmung bei Starkregen, Sturzfluten oder Hochwasser, 2. Absinken des Grundwasserspiegels oder Verstärkung von
+Trockenheit oder Niedrigwasser, 3. Bodenerosion oder 4. Erzeugung oder Verstärkung eines lokalen Wärmeinsel-Effekts.
+Dabei ist zu berücksichtigen, dass Versickerungs-, Speicher- und Verdunstungsflächen im Rahmen einer wassersensiblen
+Entwicklung so weit wie möglich erhalten werden.“ § 2 Nr. 3 bestimmt „Träger öffentlicher Aufgaben: alle Stellen, die
+öffentliche Aufgaben wahrnehmen, unabhängig davon, ob sie öffentlich-rechtlich oder privatrechtlich organisiert sind.“
+
+Im Produkt wurden `backend/app/data/kang_handlungsfelder.py`, `backend/app/services/kang_beruecksichtigung.py`,
+`backend/app/services/kang_nachweis_markdown.py` und `docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md` vollständig gelesen.
+Dazu, um die Eingänge des Nachweises zu beurteilen: in `backend/app/data/catalog.py` die Listen `RISKS`,
+`PLANNED_RISKS`, `MEASURES` und `KANG_CLUSTERS` (ausgewertet über den Import des Moduls, ohne Schreibzugriff), die
+Liste `_PARKED_MEASURES` in `backend/app/data/catalog_parked.py` (Einträge `SPONGE_CITY` und `INFILTRATION_AREAS`) und in
+`backend/app/services/engine/inputs.py` die Wärmeinsel-Rechnung (`compute_uhi_delta`, `compute_uhi_components`,
+Zellentemperatur `summer_temp_cell`). Der Stand beim Lesen: 4 aktive Klimawirkungen, alle im KWRA-Handlungsfeld
+„Menschliche Gesundheit“ (Mortalität und Erkrankungen durch Hitze, Aeroallergene, UV); 49 geplante Klimawirkungen ohne
+Rechnung; 3 aktive Maßnahmen, zwei im KAnG-Feld „Gesundheit und Pflege“, eine im Querschnittsfeld; 7 Cluster mit
+17 Handlungsfeldern. Außerhalb der vier Belegdateien ruft nichts `nachweis_fachuebergreifend` oder `nachweis_markdown`
+auf (Grep über `backend/app` und `frontend/src`); ob der Nachweis im Produkt sichtbar ist, ist nicht Gegenstand dieser
+Gegenprobe (Sichtbarkeit, T-0483).
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | „Die Träger öffentlicher Aufgaben haben bei ihren Planungen und Entscheidungen das Ziel der Klimaanpassung nach § 1 fachübergreifend … zu berücksichtigen.“ | § 8 Abs. 1 Satz 1 | `kang_beruecksichtigung.py`, `nachweis_fachuebergreifend()` (Gegenüberstellung je KAnG-Handlungsfeld, 17 Felder); `kang_handlungsfelder.py`, `KWRA_FELD_ZU_KANG` und `handlungsfeld_fuer_risiko()`; `NACHWEIS_FACHUEBERGREIFEND_KANG.md`, Abschnitte „Rechtsgrundlage und Adressat“ und „Was das Produkt prüft“ | trägt teilweise |
+| A2 | „… und integriert zu berücksichtigen.“ | § 8 Abs. 1 Satz 1 | keiner, der mit dem Katalog ein Ergebnis liefert. `nachweis_fachuebergreifend()`, Liste `integrierende_massnahmen` (Maßnahmen, deren `linked_risk_codes` auf mehr als ein Handlungsfeld führen); mit dem Katalog ist sie immer leer. | trägt nicht |
+| A3 | „Dabei sind sowohl die bereits eingetretenen als auch die zukünftig zu erwartenden Auswirkungen des Klimawandels zu berücksichtigen …“ | § 8 Abs. 1 Satz 2 | `nachweis_fachuebergreifend()`, Eingang `schaeden` (eine jährliche Schadenssumme je Klimawirkung, ohne Zeitbezug) | trägt teilweise |
+| A4 | „insbesondere 1. Überflutung oder Überschwemmung bei Starkregen, Sturzfluten oder Hochwasser“ | § 8 Abs. 1 Satz 2 Nr. 1 | keiner. Die zugehörigen Klimawirkungen (#50, #51, #59, #60, #74) stehen nur in `catalog.PLANNED_RISKS`, ohne Rechnung. | trägt nicht |
+| A5 | „2. Absinken des Grundwasserspiegels oder Verstärkung von Trockenheit oder Niedrigwasser“ | § 8 Abs. 1 Satz 2 Nr. 2 | keiner. Die zugehörigen Klimawirkungen (#13, #55, #56, #71) stehen nur in `catalog.PLANNED_RISKS`, ohne Rechnung. | trägt nicht |
+| A6 | „3. Bodenerosion“ | § 8 Abs. 1 Satz 2 Nr. 3 | keiner. Bodenerosion durch Wasser (#10) und durch Wind (#11) stehen nur in `catalog.PLANNED_RISKS`, ohne Rechnung. | trägt nicht |
+| A7 | „4. Erzeugung oder Verstärkung eines lokalen Wärmeinsel-Effekts“ | § 8 Abs. 1 Satz 2 Nr. 4 | `engine/inputs.py`, `compute_uhi_delta()` und `compute_uhi_components()` (Wärmeinsel-ΔT je Zelle aus OSM-Landnutzung), eingerechnet in die Zellentemperatur `summer_temp_cell` und damit in Hitzebelastung (#95) | trägt teilweise |
+| A8 | „Dabei ist zu berücksichtigen, dass Versickerungs-, Speicher- und Verdunstungsflächen im Rahmen einer wassersensiblen Entwicklung so weit wie möglich erhalten werden.“ | § 8 Abs. 1 Satz 3 | keiner. Die Maßnahmen „Entsiegelung / Schwammstadt“ (`SPONGE_CITY`) und „Versickerungsflächen“ (`INFILTRATION_AREAS`) sind in `catalog_parked.py` geparkt; kein Nachweisfeld fragt nach dem Erhalt solcher Flächen. | trägt nicht |
+| A9 | „Träger öffentlicher Aufgaben sollen darauf hinwirken, dass bereits versiegelte Böden, deren Versiegelung dauerhaft nicht mehr für die Nutzung der Böden notwendig ist, … soweit dies erforderlich und zumutbar ist, wiederhergestellt und entsiegelt werden.“ | § 8 Abs. 3 Satz 1 | keiner. `SPONGE_CITY` ist geparkt (A8). | trägt nicht |
+
+**Begründung je Urteil:**
+
+- A1: Adressat der Pflicht ist nach § 2 Nr. 3 der Träger öffentlicher Aufgaben, nicht das Werkzeug. Ein Werkzeug kann die
+  Berücksichtigung nicht leisten, es kann sie nur vorbereiten. Das sagt der Nachweis selbst richtig (`ABGRENZUNG`,
+  Abschnitt „Was dem Träger öffentlicher Aufgaben überlassen bleibt“). Das Gerüst dafür ist da: Jede Klimawirkung wird
+  einem der 17 KAnG-Handlungsfelder zugeordnet, jede Maßnahme ebenso, und je Feld steht „berücksichtigt“, „offen“ oder
+  „nicht betroffen“. Fachübergreifend wird der Blick damit aber nicht: Alle 4 aktiven Klimawirkungen liegen im Feld
+  „Gesundheit und Pflege“. Mit dem Katalog kann höchstens dieses eine Feld betroffen sein; die übrigen 16 stehen immer
+  auf „nicht betroffen“, auch dort, wo die Kommune in der Sache betroffen ist. Vom Ziel nach § 1 (Schutz von Leben und
+  Gesundheit, Gesellschaft, Wirtschaft, Infrastruktur, Natur und Ökosystemen) deckt die Rechnung nur Leben und
+  Gesundheit ab.
+- A2: Der Nachweis liest „integriert“ als Maßnahme, die über mehr als ein Handlungsfeld wirkt. Keine der 3 aktiven
+  Maßnahmen tut das: Zwei verweisen nur auf Klimawirkungen im Feld Gesundheit, die dritte auf keine. Die Ausgabe lautet
+  deshalb bei jeder Planung „Keine Maßnahme der Planung setzt an mehr als einem Handlungsfeld an.“ Ob die Lesart des
+  Wortes „integriert“ trägt (Einbeziehung in die eigenen Planungs- und Entscheidungsverfahren), prüft der Nachweis nicht.
+- A3: Der Nachweis nimmt je Klimawirkung eine Zahl entgegen und trennt nicht zwischen eingetretenen und zu erwartenden
+  Auswirkungen. Welche Zahl eingeht (heutiges Klima oder ein Szenario), legt der Aufrufer fest; einen Aufrufer gibt es
+  nicht. Der Nachweis kann also einen der beiden Blicke tragen, beide zusammen nicht.
+- A4: Keine Rechnung zu Überflutung, Sturzflut oder Hochwasser; die geplanten Einträge lassen sich dem Nachweis zwar
+  übergeben, aber ohne Betrag. Das Handlungsfeld Wasserhaushalt bleibt „nicht betroffen“.
+- A5: Wie A4: Grundwasser, Trockenheit im Boden, Bewässerungswasser und Niedrigwasser sind geplant, nicht gerechnet.
+- A6: Wie A4: Bodenerosion ist geplant, nicht gerechnet; das Feld „Boden“ bleibt „nicht betroffen“.
+- A7: Die bestehende Wärmeinsel geht je Zelle in die Temperatur und damit in den Hitzeschaden ein. „Erzeugung oder
+  Verstärkung“ durch eine Planung, also ein Vergleich vor und nach einer Bebauung oder Versiegelung, rechnet das Produkt
+  nicht. Die eigene Klimawirkung „Stadtklima / Wärmeinseln“ (#62) ist nur geplant; im Nachweis erscheint Hitze allein im
+  Feld Gesundheit, nicht im Feld „Gebäude“, dem `KWRA_FELD_ZU_KANG` das Stadtklima zuordnet.
+- A8: Das Produkt erfasst weder Versickerungs-, Speicher- und Verdunstungsflächen noch ihren Verlust durch eine Planung.
+  Die Maßnahmen, die solche Flächen schaffen, sind geparkt.
+- A9: Liegt außerhalb der Fundstelle der Zeile 13 (§ 8 Abs. 1) und geht nicht in ihren Status ein. Auch hier gibt es
+  keinen Beleg: Die Entsiegelung ist geparkt.
+
+Nicht als eigene Anforderung gewertet: § 8 Abs. 2 (gilt als erfüllt, soweit nach Fachgesetzen oder anerkannten Regeln der
+Technik geplant wird, die der Zielsetzung von Abs. 1 entsprechen; eine Rechtsfolge, keine Pflicht), § 8 Abs. 3 Satz 2
+(andere Gesetze „bleiben unberührt“), § 8 Abs. 4 (Kompetenzen der Länder, Gemeinden und Kreise, die Regelungen
+auszugestalten) und § 8 Abs. 5 (keine Anwendung auf Verfahren, die vor dem 01.01.2025 beantragt oder angezeigt wurden
+oder mit deren Ausführung vorher begonnen wurde). Das Wort „insbesondere“ in Satz 2 macht die Liste Nr. 1–4 nicht
+abschließend; die vier Punkte sind trotzdem je eine Anforderung, weil das Gesetz sie ausdrücklich nennt.
+
+**Gelesene Stellen:** alle abgerufen am 25.09.2026 über `urllib` (HTTP 200), Zeitpunkt nach dem `Date`-Kopf des
+Servers:
+
+- https://www.gesetze-im-internet.de/kang/index.html (06:12:07 GMT): Inhaltsverzeichnis ganz (Abschnitte 1–5, §§ 1–14;
+  § 8 bildet allein Abschnitt 3 „Berücksichtigungsgebot“, damit sind die Grenzen des Abschnitts geprüft).
+- https://www.gesetze-im-internet.de/kang/__8.html (06:11:59 GMT): § 8 Abs. 1–5 ganz im Wortlaut.
+- https://www.gesetze-im-internet.de/kang/__1.html (06:12:03 GMT): § 1 „Ziel des Gesetzes“ ganz (drei Sätze), auf den
+  § 8 Abs. 1 Satz 1 verweist.
+- https://www.gesetze-im-internet.de/kang/__2.html (06:12:03 GMT): § 2 „Begriffsbestimmungen“ ganz (Nr. 1–3).
+
+Eine erste Abfrage von § 8 und § 1 über ein zusammenfassendes Abrufwerkzeug gab den Text nur umschrieben wieder; der
+Wortlaut oben stammt allein aus dem direkten Abruf. **Nicht gelesen:** §§ 3–7 und 9–14 KAnG, die Gesetzesbegründung
+(Bundestags-Drucksache), die amtliche Fassung im Bundesgesetzblatt und Kommentarliteratur zu „fachübergreifend und
+integriert“.
+
+**Schluss:** Zeile 13 bleibt nicht `erfüllt`. Von 9 Anforderungen trägt der Bestand keine voll, 3 teilweise (A1, A3, A7)
+und 6 nicht (A2, A4, A5, A6, A8, A9); A9 liegt außerhalb der Fundstelle und zählt für den Status nicht. Zur Frage der
+Gegenprobe: Ein Werkzeug kann die Pflicht nicht tragen, denn sie trifft den Träger öffentlicher Aufgaben; es kann ihm die
+Berücksichtigung vorbereiten, und der Nachweis sagt das richtig. Was er heute leistet, ist ein Raster über 17
+Handlungsfelder, in dem mit dem aktiven Katalog nur das Feld Gesundheit betroffen sein kann, keine Maßnahme als
+integrierend erscheint und die in Satz 2 Nr. 1–3 und Satz 3 ausdrücklich genannten Auswirkungen fehlen. Der Status der
+Zeile 13 ist in derselben Änderung auf `teilweise` gesetzt; die Spalte „Lücke“ nennt, was fehlt. Die Zählungen in den
+Abschnitten „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist Sache der
+Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
 
 ## Ergebnis
 
