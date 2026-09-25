@@ -23,6 +23,7 @@ EINLEITUNG = (
 # (Gruppenschlüssel, Überschrift) in Ausgabereihenfolge.
 GRUPPEN = [
     ("vulnerable_personen", "## Vulnerable Personengruppen"),
+    ("natuerliche_systeme", "## Natürliche Systeme"),
     ("klimasensible_strukturen", "## Klimasensible Strukturen"),
     ("vergangene_ereignisse", "## Vergangene Klimarisiken"),
 ]
@@ -72,6 +73,13 @@ def bestandsaufnahme_markdown(ergebnis: dict) -> str:
         mit_wert = [g for g in groessen if g["gruppe"] == gruppe and g["wert"] is not None]
         teile += [ueberschrift, ""]
         teile += [_tabelle(mit_wert) if mit_wert else "Für diese Gruppe liegt kein Wert vor.", ""]
+        hinweise = [
+            f"- {g['label']}: {g['hinweis']}"
+            for g in groessen
+            if g["gruppe"] == gruppe and g["wert"] is None and g.get("hinweis")
+        ]
+        if hinweise:
+            teile += ["\n".join(hinweise), ""]
 
     saetze: list[str] = []
     for g in groessen:
