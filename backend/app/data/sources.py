@@ -1314,6 +1314,21 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "https://doi.org/10.1016/j.envint.2025.109746",
         "accessed": "2026-08-30",
     },
+    "Destatis_GVISys_Bevoelkerung": {
+        "ieee": "Statistisches Bundesamt (Destatis), „Gemeindeverzeichnis-Informationssystem "
+                "GV-ISys: Gemeinden nach Fläche, Bevölkerung und Postleitzahl, Stichtage "
+                "31.12.2017 und 31.12.2023 (Fortschreibung auf Basis des Zensus 2011),“ "
+                "Wiesbaden, Deutschland. [Online]. Verfügbar: "
+                "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/"
+                "Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122023_Auszug_GV.xlsx. "
+                "[Zugriff: 25. September 2026].",
+        "url": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/"
+               "Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122023_Auszug_GV.xlsx",
+        "archive_url": "https://web.archive.org/web/2026/"
+                       "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/"
+                       "Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122023_Auszug_GV.xlsx",
+        "accessed": "2026-09-25",
+    },
 }
 
 

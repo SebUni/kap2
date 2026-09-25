@@ -1,6 +1,6 @@
 """Test des Bestandsaufnahme-Dienstes (Ticket T-0755, Vorhaben T-0447).
 
-Deckt ab: (a) 20 Einträge in Katalogreihenfolge mit allen Feldern,
+Deckt ab: (a) 21 Einträge in Katalogreihenfolge mit allen Feldern,
 (b) bevölkerungsgewichteter 65+-Anteil, (c) Katalog-Lücken, (d) fehlende
 Arbeitslosenquote → Laufzeitsatz, (e) Kommunen-Einstieg ohne Netzdienst.
 Feste Eingaben, kein Netz, keine Datenbank.
@@ -36,9 +36,9 @@ def _nach_code(eintraege):
     return {e["code"]: e for e in eintraege}
 
 
-def test_a_zwanzig_eintraege_in_katalogreihenfolge():
+def test_a_einundzwanzig_eintraege_in_katalogreihenfolge():
     eintraege = dienst.bestandsaufnahme_aus_daten(ZELLEN, SOZIO)
-    assert len(eintraege) == 20
+    assert len(eintraege) == 21
     assert [e["code"] for e in eintraege] == [g["code"] for g in katalog.BESTANDSAUFNAHME_GROESSEN]
     for e, g in zip(eintraege, katalog.BESTANDSAUFNAHME_GROESSEN):
         assert list(e.keys()) == FELDER + (["hinweis"] if "hinweis" in g else [])
@@ -100,6 +100,10 @@ def test_e_kommune_ohne_netzdienst(monkeypatch):
 
     aufrufe = []
 
+    def _entw(kommune):
+        aufrufe.append(("entwicklung", kommune.id))
+        return None
+
     def _zellen(db, kommune_id):
         aufrufe.append(("zellen", kommune_id))
         return ZELLEN
@@ -110,6 +114,7 @@ def test_e_kommune_ohne_netzdienst(monkeypatch):
 
     monkeypatch.setattr(dienst, "_zellen_der_kommune", _zellen)
     monkeypatch.setattr(dienst, "_sozialdaten", _sozio)
+    monkeypatch.setattr(dienst, "_entwicklung", _entw)
 
     kommune = SimpleNamespace(id=7, name="Musterstadt", osm_id="R123", bundesland="Sachsen")
     ergebnis = dienst.bestandsaufnahme_fuer_kommune(object(), kommune)
@@ -117,8 +122,51 @@ def test_e_kommune_ohne_netzdienst(monkeypatch):
     assert list(ergebnis.keys()) == ["kommune_id", "name", "groessen"]
     assert ergebnis["kommune_id"] == 7
     assert ergebnis["name"] == "Musterstadt"
-    assert ergebnis["groessen"] == dienst.bestandsaufnahme_aus_daten(ZELLEN, SOZIO)
-    assert aufrufe == [("zellen", 7), ("sozio", 7)]
+    assert ergebnis["groessen"] == dienst.bestandsaufnahme_aus_daten(ZELLEN, SOZIO, None)
+    assert aufrufe == [("zellen", 7), ("sozio", 7), ("entwicklung", 7)]
+
+
+ENTWICKLUNG = {"jahr_alt": 2017, "jahr_neu": 2023, "einwohner_alt": 1000,
+               "einwohner_neu": 1050, "veraenderung_prozent": 5.0, "quelle": "Q"}
+
+
+def _ohne_db(monkeypatch, ags):
+    from app.data import bevoelkerungsentwicklung
+    from app.services import inkar_loader
+
+    monkeypatch.setattr(dienst, "_zellen_der_kommune", lambda db, kid: ZELLEN)
+    monkeypatch.setattr(dienst, "_sozialdaten", lambda k: SOZIO)
+    monkeypatch.setattr(inkar_loader, "resolve_ags", lambda osm_id: ags)
+    gefragt = []
+
+    def _entwicklung(a):
+        gefragt.append(a)
+        return ENTWICKLUNG
+
+    monkeypatch.setattr(bevoelkerungsentwicklung, "entwicklung", _entwicklung)
+    return gefragt
+
+
+def test_bevoelkerungsentwicklung_wert_und_jahre_per_stub(monkeypatch):
+    gefragt = _ohne_db(monkeypatch, "14612000")
+    kommune = SimpleNamespace(id=3, name="Dresden", osm_id="R191645")
+    e = _nach_code(dienst.bestandsaufnahme_fuer_kommune(object(), kommune)["groessen"])
+    g = e["bevoelkerungsentwicklung"]
+    assert gefragt == ["14612000"]
+    assert g["wert"] == 5.0
+    assert g["luecke_satz"] == ""
+    assert (g["zusatz"]["jahr_alt"], g["zusatz"]["jahr_neu"]) == (2017, 2023)
+    assert (g["zusatz"]["einwohner_alt"], g["zusatz"]["einwohner_neu"]) == (1000, 1050)
+
+
+def test_bevoelkerungsentwicklung_ohne_gemeinde_ags_ist_laufzeitsatz(monkeypatch):
+    gefragt = _ohne_db(monkeypatch, "09")  # Land/Kreis, kein Gemeinde-AGS
+    kommune = SimpleNamespace(id=3, name="Bayern", osm_id="R2145268")
+    e = _nach_code(dienst.bestandsaufnahme_fuer_kommune(object(), kommune)["groessen"])
+    g = e["bevoelkerungsentwicklung"]
+    assert gefragt == []
+    assert g["wert"] is None and "zusatz" not in g
+    assert g["luecke_satz"] == katalog.LAUFZEITSATZ_VORLAGE.format(label="Bevölkerungsentwicklung")
 
 
 def test_sozialdaten_fehler_ergibt_leeres_dict(monkeypatch):
