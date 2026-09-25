@@ -1,12 +1,17 @@
 """Diskontierung der Kostenprojektion (UBA Methodenkonvention 4.0, Kap. 2.2.3).
 
 Deckt ab:
-  (a) Die Reihe zur Reinen Zeitpräferenzrate 0,0 ist elementweise gleich der
+  (a) Die Reihe zur Diskontrate 0,0 ist elementweise gleich der
       undiskontierten ``cumulative``-Reihe — Abzinsen mit 0 % ändert nichts.
-  (b) Der Endwert der Reihe zur Rate 0,01 liegt unter dem Endwert von
-      ``cumulative`` — mit 1 % RZPR ist der Barwert kleiner.
+  (b) Der Endwert der Reihe zur Diskontrate 0,01 liegt unter dem Endwert von
+      ``cumulative`` — mit 1 % Diskontrate ist der Barwert kleiner.
   (c) Die Zeichenfolge „keine Diskontierung" kommt in ``assumptions`` nicht
       mehr vor; die frühere Einschränkung ist aufgehoben.
+  (d) ``assumptions`` benennt die Diskontrate von 0 % und 1 % und behauptet
+      nicht, die Reine Zeitpräferenzrate sei der ausgewiesene Zinssatz.
+
+Die Diskontrate ist hier gleich der Reinen Zeitpräferenzrate gesetzt; die
+Komponente der relativen Preise ist nicht angesetzt.
 
 Läuft ohne Datenbank: Aggregat, Klimaprojektion, Szenariofaktoren und
 Maßnahmenabfrage werden ersetzt, ``db`` bleibt ungenutzt.
@@ -72,14 +77,14 @@ def _pfade(projection):
 
 
 def test_rate_null_ist_die_undiskontierte_reihe(projection):
-    """(a) 0 % RZPR reproduziert die kumulierte Reihe elementweise."""
+    """(a) Diskontrate 0 % reproduziert die kumulierte Reihe elementweise."""
     for scenario, pfad, block in _pfade(projection):
         assert set(block["discounted"]) == {"0.0", "0.01"}, (scenario, pfad)
         assert block["discounted"]["0.0"] == block["cumulative"], (scenario, pfad)
 
 
 def test_rate_ein_prozent_senkt_den_endwert(projection):
-    """(b) 1 % RZPR ergibt einen kleineren Barwert am Ende des Horizonts."""
+    """(b) Diskontrate 1 % ergibt einen kleineren Barwert am Ende des Horizonts."""
     for scenario, pfad, block in _pfade(projection):
         assert block["discounted"]["0.01"][-1] < block["cumulative"][-1], (scenario, pfad)
 
@@ -88,3 +93,12 @@ def test_assumptions_ohne_keine_diskontierung(projection):
     """(c) Der Vorbehalt „keine Diskontierung" steht nicht mehr in den Annahmen."""
     for eintrag in projection["assumptions"]:
         assert "keine Diskontierung" not in eintrag, eintrag
+
+
+def test_assumptions_nennen_die_diskontrate(projection):
+    """(d) Die Annahmen sprechen von der Diskontrate, nicht von ausgewiesener RZPR."""
+    assert any("Diskontrate von 0 % und 1 %" in e for e in projection["assumptions"])
+    # Zeichenfolge geteilt, damit die Testdatei die alte Formulierung nicht selbst trägt.
+    alt = "Reiner Zeitpräferenzrate" + " ausgewiesen"
+    for eintrag in projection["assumptions"]:
+        assert alt not in eintrag, eintrag
