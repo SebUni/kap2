@@ -682,6 +682,8 @@ export interface KommuneProfile {
 export interface CostProjectionSeries {
   annual: number[]
   cumulative: number[]
+  /** Kumulierte Barwerte je Reiner Zeitpräferenzrate; Schlüssel '0.0' und '0.01'. */
+  discounted?: Record<string, number[]>
 }
 
 export interface CostProjectionScenario {

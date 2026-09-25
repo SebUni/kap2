@@ -36,6 +36,8 @@ MAX_ZEILEN = 5
 # Szenario der Schadenssumme: der pessimistische Fall (KWRA 2021 bewertet das
 # Klimarisiko im pessimistischen Fall), ohne Maßnahmen, unabgezinst (0 % RZPR).
 SZENARIO = "rcp85"
+# Zweites Szenario im selben Absatz (Transparenz): moderater Klimaschutz.
+SZENARIO_OPTIMISTISCH = "rcp45"
 
 UEBERSCHRIFT_GESAMTRISIKO = "Gesamtrisiko"
 UEBERSCHRIFT_KLIMAWIRKUNGEN = "Die fünf teuersten Klimawirkungen"
@@ -79,15 +81,24 @@ def _teuerste_klimawirkungen(aggregat: dict) -> list[dict]:
     return zeilen[:MAX_ZEILEN]
 
 
+def _vermiedener_schaden(m: dict) -> float:
+    """Vermiedener Schaden pro Jahr: ``annual_benefit_damage_eur`` plus
+    ``annual_benefit_flat_eur`` aus dem Maßnahmendienst (ohne direkten Zusatznutzen)."""
+    return (m.get("annual_benefit_damage_eur") or 0.0) + (m.get("annual_benefit_flat_eur") or 0.0)
+
+
 def _wirksamste_massnahmen(kostenuebersicht: dict) -> list[dict]:
-    """Die höchstens fünf Maßnahmen mit dem höchsten jährlichen Nutzen in Euro
-    (``annual_benefit_eur`` aus dem Maßnahmendienst); Maßnahmen ohne bezifferten
-    Nutzen in Euro (Klasse B) oder ohne Nutzen bleiben außen vor."""
+    """Die höchstens fünf Maßnahmen mit dem höchsten vermiedenen Schaden.
+
+    „Wirksam“ heißt: senkt das Klimarisiko. Der direkte Zusatznutzen
+    (``annual_benefit_direct_eur``, etwa Mehrertrag) steht in einer eigenen Spalte
+    und entscheidet die Reihenfolge nicht. Maßnahmen ohne bezifferten Nutzen in
+    Euro (Klasse B) oder ohne vermiedenen Schaden bleiben außen vor."""
     zeilen = [
         m for m in kostenuebersicht["measures"]["rows"]
-        if m.get("benefit_has_euro_layer", True) and (m.get("annual_benefit_eur") or 0) > 0
+        if m.get("benefit_has_euro_layer", True) and _vermiedener_schaden(m) > 0
     ]
-    zeilen.sort(key=lambda m: m["annual_benefit_eur"], reverse=True)
+    zeilen.sort(key=_vermiedener_schaden, reverse=True)
     return zeilen[:MAX_ZEILEN]
 
 
@@ -119,24 +130,31 @@ def _abschnitt_klimawirkungen(aggregat: dict) -> str:
 
 def _abschnitt_schadenssumme(projektion: dict) -> str:
     jahre = projektion["years"]
-    block = projektion["scenarios"][SZENARIO]
-    summe = block["no_measures"]["cumulative"][-1]
-    return (
-        f"Im Szenario {block['label']} summieren sich die erwarteten Klimaschäden "
-        f"ohne Maßnahmen von {jahre[0]} bis {jahre[-1]} auf {_de_euro(summe)} "
-        f"(nicht abgezinst)."
-    )
+    saetze = []
+    for szenario in (SZENARIO, SZENARIO_OPTIMISTISCH):
+        block = projektion["scenarios"][szenario]
+        summe = block["no_measures"]["cumulative"][-1]
+        saetze.append(
+            f"Im Szenario {block['label']} summieren sich die erwarteten Klimaschäden "
+            f"ohne Maßnahmen von {jahre[0]} bis {jahre[-1]} auf {_de_euro(summe)} "
+            f"(nicht abgezinst)."
+        )
+    # Zähler „x von y Klimawirkungen in Euro beziffert“ (M1-Zuschnitt, F-0030):
+    # Text unverändert aus der Katalogfunktion.
+    return " ".join(saetze) + "\n\n" + catalog.euro_coverage().text
 
 
 def _abschnitt_massnahmen(kostenuebersicht: dict) -> str:
     zeilen = [
-        "| Maßnahme | Nutzen pro Jahr | Investition | Betrieb pro Jahr |",
-        "| --- | --- | --- | --- |",
+        "| Maßnahme | Vermiedener Schaden €/Jahr | Zusatznutzen €/Jahr | "
+        "Investition | Betrieb pro Jahr |",
+        "| --- | --- | --- | --- | --- |",
     ]
     auswahl = _wirksamste_massnahmen(kostenuebersicht)
     for m in auswahl:
         zeilen.append(
-            f"| {m['name']} | {_de_euro(m['annual_benefit_eur'])} | "
+            f"| {m['name']} | {_de_euro(_vermiedener_schaden(m))} | "
+            f"{_de_euro(m.get('annual_benefit_direct_eur') or 0.0)} | "
             f"{_de_euro(m['capex_eur'])} | {_de_euro(m['opex_annual_eur'])} |"
         )
     tabelle = "\n".join(zeilen)
