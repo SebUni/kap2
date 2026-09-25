@@ -12,6 +12,9 @@ Rechenregeln (keine neuen Zahlenparameter):
 - KRITIS-Sektoren: Summe der rohen Klassenzählungen (``*_classes``) über alle Zellen.
 - Krankenhäuser/Pflegeeinrichtungen: Summe der Zählungen über die Zellen.
 - Arbeitslosenquote: Rohwert ``unemployment_rate_pct``.
+- Bevölkerungsentwicklung: Veränderung in Prozent zwischen zwei Stichtagen aus
+  ``app.data.bevoelkerungsentwicklung`` (Datei im Repo, je 8-stelligem Gemeinde-AGS);
+  Einwohnerzahlen und Jahre stehen im Eintragsfeld ``zusatz``.
 - Trägt keine Zelle das Feld (bzw. fehlt der Sozialwert), ist der Wert ``None``
   mit Laufzeitsatz, nie 0.
 """
@@ -21,6 +24,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
+from app.data import bevoelkerungsentwicklung
 from app.data.bestandsaufnahme import BESTANDSAUFNAHME_GROESSEN, LAUFZEITSATZ_VORLAGE
 
 log = logging.getLogger(__name__)
@@ -112,7 +116,9 @@ def _zaehl_summe(zellen: list[dict], feld: str) -> Optional[int]:
     return summe if gesehen else None
 
 
-def _wert(code: str, zellen: list[dict], sozio: dict) -> Optional[float | int]:
+def _wert(code: str, zellen: list[dict], sozio: dict, entwicklung: Optional[dict] = None) -> Optional[float | int]:
+    if code == "bevoelkerungsentwicklung":
+        return _zahl((entwicklung or {}).get("veraenderung_prozent"))
     if code in _ANTEIL_FELDER:
         return _anteil_gewichtet(zellen, _ANTEIL_FELDER[code])
     if code in _KRITIS_FELDER:
@@ -124,11 +130,14 @@ def _wert(code: str, zellen: list[dict], sozio: dict) -> Optional[float | int]:
     return None
 
 
-def bestandsaufnahme_aus_daten(zellen: list[dict], sozio: dict) -> list[dict]:
-    """Reine Funktion: 20 Einträge in Katalogreihenfolge aus Zell- und Sozialdaten.
+def bestandsaufnahme_aus_daten(
+    zellen: list[dict], sozio: dict, entwicklung: Optional[dict] = None
+) -> list[dict]:
+    """Reine Funktion: 21 Einträge in Katalogreihenfolge aus Zell- und Sozialdaten.
 
     ``zellen`` sind die ``inputs``-Dicts der gespeicherten Zellen, ``sozio`` die
-    Rohgrößen der Regionalstatistik (``unemployment_rate_pct``).
+    Rohgrößen der Regionalstatistik (``unemployment_rate_pct``), ``entwicklung`` das
+    Ergebnis von ``bevoelkerungsentwicklung.entwicklung`` (oder ``None``).
     """
     eintraege: list[dict] = []
     for g in BESTANDSAUFNAHME_GROESSEN:
@@ -136,7 +145,7 @@ def bestandsaufnahme_aus_daten(zellen: list[dict], sozio: dict) -> list[dict]:
             wert = None
             satz = g["luecke"]
         else:
-            wert = _wert(g["code"], zellen or [], sozio or {})
+            wert = _wert(g["code"], zellen or [], sozio or {}, entwicklung)
             satz = LAUFZEITSATZ_VORLAGE.format(label=g["label"]) if wert is None else ""
         eintrag = {
             "code": g["code"],
@@ -149,6 +158,11 @@ def bestandsaufnahme_aus_daten(zellen: list[dict], sozio: dict) -> list[dict]:
         }
         if g.get("hinweis"):
             eintrag["hinweis"] = g["hinweis"]
+        if g["code"] == "bevoelkerungsentwicklung" and wert is not None:
+            eintrag["zusatz"] = {
+                k: entwicklung[k]
+                for k in ("jahr_alt", "jahr_neu", "einwohner_alt", "einwohner_neu")
+            }
         eintraege.append(eintrag)
     return eintraege
 
@@ -186,12 +200,32 @@ def _sozialdaten(kommune) -> dict:
         return {}
 
 
+def _entwicklung(kommune) -> Optional[dict]:
+    """Bevölkerungsentwicklung der Gemeinde; ``None`` bei jedem Fehlschlag.
+
+    Der AGS wird wie in ``_sozialdaten`` über ``inkar_loader.resolve_ags`` aufgelöst.
+    Nur ein 8-stelliger Schlüssel (Gemeinde) wird nachgeschlagen; kürzere
+    (Land, Kreis) haben keinen Gemeindewert.
+    """
+    from app.services import inkar_loader
+
+    try:
+        ags = inkar_loader.resolve_ags(getattr(kommune, "osm_id", None))
+        if not ags or len(str(ags)) != 8:
+            return None
+        return bevoelkerungsentwicklung.entwicklung(str(ags))
+    except Exception as exc:  # niemals die Bestandsaufnahme abbrechen
+        log.warning("Bevölkerungsentwicklung fehlgeschlagen (kommune=%s): %s", getattr(kommune, "id", None), exc)
+        return None
+
+
 def bestandsaufnahme_fuer_kommune(db, kommune) -> dict:
     """Bestandsaufnahme einer Kommune aus gespeicherten Zell- und Sozialdaten."""
     zellen = _zellen_der_kommune(db, kommune.id)
     sozio = _sozialdaten(kommune)
+    entwicklung = _entwicklung(kommune)
     return {
         "kommune_id": kommune.id,
         "name": kommune.name,
-        "groessen": bestandsaufnahme_aus_daten(zellen, sozio),
+        "groessen": bestandsaufnahme_aus_daten(zellen, sozio, entwicklung),
     }

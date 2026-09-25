@@ -83,3 +83,7 @@ def test_mit_aggregat_vier_leer_einer_belegt(client, monkeypatch):
     assert belegt[0]["leer_grund"] is None
     _pruefe_leer_grund(bereiche)
     assert sum(1 for b in bereiche if b["leer_grund"]) == 4
+    # Der Katalogvergleich zählt alle Klimawirkungen, nicht nur die gerechneten.
+    assert [b["klimawirkungen_im_katalog"] for b in bereiche] == [16, 15, 13, 2, 6]
+    assert bereiche[4]["euro_beziffert"] == "1 von 6 Klimawirkungen in Euro beziffert"
+    assert bereiche[0]["euro_beziffert"] == "0 von 16 Klimawirkungen in Euro beziffert"

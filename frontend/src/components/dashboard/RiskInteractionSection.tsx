@@ -124,11 +124,11 @@ export default function RiskInteractionSection({ className = '' }: { className?:
                 )}
               </tbody>
             </table>
-            <RueckkopplungKreislauf daten={daten} />
-            <QuerverbindungenHandlungsfelder daten={daten} />
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 6 }}>
               Modellgrenze: {daten.modellgrenze}
             </p>
+            <RueckkopplungKreislauf daten={daten} />
+            <QuerverbindungenHandlungsfelder daten={daten} />
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>
               Quelle: {daten.quelle}
             </p>
