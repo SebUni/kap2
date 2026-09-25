@@ -2752,7 +2752,7 @@ parameter:
   preisstand_hinweis: "Bestands- und Preisstand 2024 der GDV-Reihe (§4.1); auf 2026 ueber flood_bldg.pi"
   rolle: kalibrierung
   quelle: "GDV-Naturgefahrenstatistik 2024, Datenservice Naturgefahrenreport 2025; docs/evidenz/60_gdv_jahresreihe_2002_2024.csv"
-  preisstand: null
+  preisstand: 2024
   datenebene: null
   bandzuordnung: [alle]
   endpunkt: K3-Wiederherstellung
