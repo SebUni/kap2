@@ -6634,9 +6634,9 @@ Probe am Vergabestand `19b50d88` (Elterncommit von `0a9a1ffb`, über `git archiv
 
 #### Fundstellenverzeichnis
 
-**T-0622 (übernimmt T-0597), 23.09.2026.** Das Verzeichnis führt jede Fundstelle genau einmal, mit Bezugscommit, Zeilenbereich, Klasse und Zuordnung: entweder ein Verweis auf die Tabelle dieses Abschnitts („Tabelle:“ mit Befund und Buchstabe der Tabelle oben, „Tabelle (Schritt 3a1):“ mit Befund und M-Zeile der Tabelle in Schritt 3a1, die keine Buchstaben führt) oder eine sachliche Ausschlussbegründung („ausgeschlossen:“). Fundstellen sind (a) jeder mit drei Backticks umzäunte Codeblock, angegeben mit Öffnungs- und Schlusszeile, auch mit Sprachkennung; (b) jede Zeile, die „Prüfausdruck“ enthält; (c) jede Zeile einer Tabelle, deren Kopf eine Spalte „Prüfausdruck“ hat und die dort einen Befehl in Backticks trägt. Erhoben sind sie im ganzen Stand `e3f5d6dd` und in den seither hinzugekommenen Zeilen von M = `8c3c4075359245730ebda58065652885522e0ddf` (der Commit, den Schritt 3a1 benennt; im Verzeichnis kurz `8c3c4075`), jeweils ohne diesen Abschnitt, also ohne die Zeilen von seiner Überschrift bis vor `## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)`. Im Stand `e3f5d6dd` gibt es den Abschnitt noch nicht; in M umfasst er Z. 4588–5677. „Hinzugekommen“ heißt: Die Zeile liegt in M in einem eingefügten oder ersetzten Stück des zeilenweisen Vergleichs `e3f5d6dd` → M (`difflib.SequenceMatcher`, ohne Autojunk); ein Codeblock zählt als hinzugekommen, wenn eine seiner Zeilen hinzugekommen ist. Ein Codeblock beginnt wie in CommonMark an einer Zeile mit mindestens drei Backticks, deren Rest keinen Backtick enthält; eine Zeile, die mit vier Backticks einen Inline-Code eröffnet (`e3f5d6dd` Z. 268), ist deshalb kein Zaun. Liegt eine Zeile in mehreren Klassen, steht sie einmal da, mit beiden Klassen.
+**T-0622 (übernimmt T-0597), 23.09.2026.** Das Verzeichnis führt jede Fundstelle genau einmal, mit Bezugscommit, Zeilenbereich, Klasse und Zuordnung: entweder ein Verweis auf die Tabelle dieses Abschnitts („Tabelle:“ mit Befund und Buchstabe der Tabelle oben, „Tabelle (Schritt 3a1):“ mit Befund und M-Zeile der Tabelle in Schritt 3a1, die keine Buchstaben führt, „Tabelle (Schritt 3a2):“ mit der N-Zeile der Tabelle in Schritt 3a2, deren erste Spalte die Befundnummer oder „—“ führt) oder eine sachliche Ausschlussbegründung („ausgeschlossen:“). Fundstellen sind (a) jeder mit drei Backticks umzäunte Codeblock, angegeben mit Öffnungs- und Schlusszeile, auch mit Sprachkennung; (b) jede Zeile, die „Prüfausdruck“ enthält; (c) jede Zeile einer Tabelle, deren Kopf eine Spalte „Prüfausdruck“ hat und die dort einen Befehl in Backticks trägt. Erhoben sind sie im ganzen Stand `e3f5d6dd`, in den seither hinzugekommenen Zeilen von M = `8c3c4075359245730ebda58065652885522e0ddf` (der Commit, den Schritt 3a1 benennt; im Verzeichnis kurz `8c3c4075`) und in den seit M hinzugekommenen Zeilen von N = `7213a0783591250d4c6c03d97c12f673981e3e64` (der Bezugsstand von `main`, den Schritt 3a2 benennt; im Verzeichnis kurz `7213a078`), jeweils ohne diesen Abschnitt, also ohne die Zeilen von seiner Überschrift bis vor `## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)`. Im Stand `e3f5d6dd` gibt es den Abschnitt noch nicht; in M umfasst er Z. 4588–5677, in N Z. 4615–6215. „Hinzugekommen“ heißt: Die Zeile liegt in M (in N) in einem eingefügten oder ersetzten Stück des zeilenweisen Vergleichs `e3f5d6dd` → M (M → N; `difflib.SequenceMatcher`, ohne Autojunk); ein Codeblock zählt als hinzugekommen, wenn eine seiner Zeilen hinzugekommen ist. Ein Codeblock beginnt wie in CommonMark an einer Zeile mit mindestens drei Backticks, deren Rest keinen Backtick enthält; eine Zeile, die mit vier Backticks einen Inline-Code eröffnet (`e3f5d6dd` Z. 268), ist deshalb kein Zaun. Liegt eine Zeile in mehreren Klassen, steht sie einmal da, mit beiden Klassen.
 
-Das Verzeichnis legt keine Fundstelle offen, die noch nicht beurteilt war. Jeder Befehl, der als Prüfausdruck eines Befunds dasteht, hat seine Zeile in einer der beiden Tabellen; die übrigen Fundstellen sind Tabellenköpfe, Prosa, Lint-Ausgaben, gleichlautende Wiederholungen oder Belege der Runde 3, die nach „Umfang“ nicht zu den Prüfausdrücken zählen. Neu gegenüber „Umfang“ benannt sind nur Stellen, die dort nicht einzeln aufgezählt waren. Sie sind ausdrücklich ausgeschlossen, und zwar mit derselben Begründung, die „Umfang“ für ihre Gruppe gibt: der Messblock Z. 2175–2178 im Nachtrag zu Befund 2 (eine Zeilenzählung; Z. 2170–2173 ist der Lauf von 2 (a), zugeordnet wie Eintrag F122, und nicht ausgeschlossen) und die Mess- und Rechenblöcke der Leitfragen der Runde 3. Deshalb sind keine Zeile der Tabellen, kein Urteil und kein Zählsatz geändert. Auf `main` hat sich die Datei seit M auch außerhalb dieses Abschnitts geändert, durch die Autor-Revisionen ab T-0580. Diese Zeilen erhebt das Verzeichnis nicht, weil es nur `e3f5d6dd` und M liest (siehe Ergebnis von T-0622).
+Das Verzeichnis legt keine Fundstelle offen, die noch nicht beurteilt war. Jeder Befehl, der als Prüfausdruck eines Befunds dasteht, hat seine Zeile in einer der Tabellen (oben, Schritt 3a1, Schritt 3a2); die übrigen Fundstellen sind Tabellenköpfe, Prosa, Lint-Ausgaben, gleichlautende Wiederholungen oder Belege der Runde 3, die nach „Umfang“ nicht zu den Prüfausdrücken zählen. Neu gegenüber „Umfang“ benannt sind nur Stellen, die dort nicht einzeln aufgezählt waren. Sie sind ausdrücklich ausgeschlossen, und zwar mit derselben Begründung, die „Umfang“ für ihre Gruppe gibt: der Messblock Z. 2175–2178 im Nachtrag zu Befund 2 (eine Zeilenzählung; Z. 2170–2173 ist der Lauf von 2 (a), zugeordnet wie Eintrag F122, und nicht ausgeschlossen) und die Mess- und Rechenblöcke der Leitfragen der Runde 3. Deshalb sind keine Zeile der Tabellen, kein Urteil und kein Zählsatz geändert. Die 52 Fundstellen aus N (F250–F301) haben je genau eine Zeile in der Tabelle von Schritt 3a2; auch dort legt das Verzeichnis keine unbeurteilte Fundstelle offen, die Probe prüft das mit (Gleichheit der N-Zeilen des Verzeichnisses mit denen der Tabelle). Was nach N auf `main` hinzukommt, erhebt das Verzeichnis nicht.
 
 | Nr | Commit | Zeilen | Klasse | Zuordnung |
 |---|---|---|---|---|
@@ -6889,8 +6889,60 @@ Das Verzeichnis legt keine Fundstelle offen, die noch nicht beurteilt war. Jeder
 | F247 | 8c3c4075 | 6138 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Abschlussprosa der Autor-Revision über die Ausgänge der Kopftabellen-Ausdrücke, trägt keinen Befehl |
 | F248 | 8c3c4075 | 6151 | Zeile mit „Prüfausdruck“ | ausgeschlossen: Tabellenkopf mit der Spalte „Prüfausdruck“, trägt keinen Befehl |
 | F249 | 8c3c4075 | 6153 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a1): Befund 21, M Z. 95 — die Spalte trägt „wortgleich in der Kopftabelle“, keinen eigenen Befehl |
+| F250 | 7213a078 | 64 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 64 — ausgeschlossen, Befund 44 |
+| F251 | 7213a078 | 67 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 67 — ausgeschlossen, Befund 45 |
+| F252 | 7213a078 | 70 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 70 — ausgeschlossen, Befund 43 |
+| F253 | 7213a078 | 112 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 112 — tauglich, Befund 11 |
+| F254 | 7213a078 | 123 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 123 — tauglich, Befund 22 |
+| F255 | 7213a078 | 130 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 130 — untauglich, Befund 29 |
+| F256 | 7213a078 | 131 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 131 — tauglich, Befund 30 |
+| F257 | 7213a078 | 132 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 132 — tauglich, Befund 31 |
+| F258 | 7213a078 | 144 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 144 — untauglich, Befund 43 |
+| F259 | 7213a078 | 145 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 145 — untauglich, Befund 44 |
+| F260 | 7213a078 | 146 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 146 — untauglich, Befund 45 |
+| F261 | 7213a078 | 148 | Zeile mit „Prüfausdruck“ und Tabellenzeile mit Befehl | Tabelle (Schritt 3a2): N Z. 148 — tauglich, Befund 47 |
+| F262 | 7213a078 | 149 | Zeile mit „Prüfausdruck“ und Tabellenzeile mit Befehl | Tabelle (Schritt 3a2): N Z. 149 — tauglich, Befund 48 |
+| F263 | 7213a078 | 150 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 150 — untauglich, Befund 49 |
+| F264 | 7213a078 | 151 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 151 — tauglich, Befund 50 |
+| F265 | 7213a078 | 152 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 152 — tauglich, Befund 51 |
+| F266 | 7213a078 | 153 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 153 — tauglich, Befund 52 |
+| F267 | 7213a078 | 170 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 170 — tauglich, Befund 69 |
+| F268 | 7213a078 | 174 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 174 — untauglich, Befund 73 |
+| F269 | 7213a078 | 178 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 178 — untauglich, Befund 77 |
+| F270 | 7213a078 | 179 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 179 — untauglich, Befund 78 |
+| F271 | 7213a078 | 181 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 181 — tauglich, Befund 80 |
+| F272 | 7213a078 | 182 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 182 — tauglich, Befund 81 |
+| F273 | 7213a078 | 191 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 191 — untauglich, Befund 90 |
+| F274 | 7213a078 | 202 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 202 — tauglich, Befund 101 |
+| F275 | 7213a078 | 203 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 203 — tauglich, Befund 102 |
+| F276 | 7213a078 | 204 | Zeile mit „Prüfausdruck“ und Tabellenzeile mit Befehl | Tabelle (Schritt 3a2): N Z. 204 — untauglich, Befund 103 |
+| F277 | 7213a078 | 6723 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6723 — ausgeschlossen, ohne einzelnen Befund |
+| F278 | 7213a078 | 6726 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6726 — ausgeschlossen, Befund 47 |
+| F279 | 7213a078 | 6727 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6727 — ausgeschlossen, Befund 48 |
+| F280 | 7213a078 | 6741 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6741 — ausgeschlossen, Befund 49 |
+| F281 | 7213a078 | 6765 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6765 — ausgeschlossen, ohne einzelnen Befund |
+| F282 | 7213a078 | 6767 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 6767 — untauglich, Befund 29 |
+| F283 | 7213a078 | 6768 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 6768 — untauglich, Befund 77 |
+| F284 | 7213a078 | 6769 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 6769 — tauglich, Befund 30 |
+| F285 | 7213a078 | 6770 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 6770 — untauglich, Befund 78 |
+| F286 | 7213a078 | 6771 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 6771 — tauglich, Befund 31 |
+| F287 | 7213a078 | 6772 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 6772 — untauglich, Befund 90 |
+| F288 | 7213a078 | 6776 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6776 — ausgeschlossen, Befund 19 |
+| F289 | 7213a078 | 6798 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6798 — ausgeschlossen, ohne einzelnen Befund |
+| F290 | 7213a078 | 6800 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 6800 — tauglich, Befund 69 |
+| F291 | 7213a078 | 6801 | Tabellenzeile, Spalte „Prüfausdruck“ mit Befehl | Tabelle (Schritt 3a2): N Z. 6801 — tauglich, Befund 11 |
+| F292 | 7213a078 | 6817 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6817 — ausgeschlossen, ohne einzelnen Befund |
+| F293 | 7213a078 | 6830 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6830 — ausgeschlossen, ohne einzelnen Befund |
+| F294 | 7213a078 | 6835 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6835 — ausgeschlossen, Befund 44 |
+| F295 | 7213a078 | 6848 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6848 — ausgeschlossen, ohne einzelnen Befund |
+| F296 | 7213a078 | 6854 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6854 — ausgeschlossen, Befund 45 |
+| F297 | 7213a078 | 6869 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6869 — ausgeschlossen, ohne einzelnen Befund |
+| F298 | 7213a078 | 6875 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6875 — ausgeschlossen, Befund 43 |
+| F299 | 7213a078 | 6895 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6895 — ausgeschlossen, ohne einzelnen Befund |
+| F300 | 7213a078 | 6917 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6917 — ausgeschlossen, ohne einzelnen Befund |
+| F301 | 7213a078 | 6935 | Zeile mit „Prüfausdruck“ | Tabelle (Schritt 3a2): N Z. 6935 — ausgeschlossen, ohne einzelnen Befund |
 
-**Vollständigkeitsprobe.** Sie erhebt die Fundstellen nur über `git show <commit>:reviews/BEFUNDE_60.md` aus `e3f5d6dd` und M, jeweils ohne diesen Abschnitt. Das Verzeichnis liest sie nur aus diesem Abschnitt der Arbeitsdatei (erstes Argument, Vorgabe `reviews/BEFUNDE_60.md`), und zwar nur die Zeilen zwischen `#### Fundstellenverzeichnis` und der nächsten Überschrift. Sich selbst kann sie nicht zählen, weil sie im Abschnitt steht und der Abschnitt aus beiden Commits herausgeschnitten ist. Ein Eintrag zählt nur mit einer Zuordnung („Tabelle:“ mit Befundnummer oder „ausgeschlossen:“ mit Begründung). Eine Zeile `| F…`, die das Muster verfehlt, bricht die Probe ab, ebenso ein Eintrag, der keine Fundstelle ist. Aufruf aus dem Repo-Wurzelverzeichnis; der Block wird mit `python3 -c` aus dieser Datei gelesen und ausgeführt:
+**Vollständigkeitsprobe.** Sie erhebt die Fundstellen nur über `git show <commit>:reviews/BEFUNDE_60.md` aus `e3f5d6dd`, den seither hinzugekommenen Zeilen von M und den seit M hinzugekommenen Zeilen von N, jeweils ohne diesen Abschnitt. Das Verzeichnis liest sie nur aus diesem Abschnitt der Arbeitsdatei (erstes Argument, Vorgabe `reviews/BEFUNDE_60.md`), und zwar nur die Zeilen zwischen `#### Fundstellenverzeichnis` und der nächsten Überschrift. Sich selbst kann sie nicht zählen, weil sie im Abschnitt steht und der Abschnitt aus allen drei Commits herausgeschnitten ist. Ein Eintrag zählt nur mit einer Zuordnung („Tabelle:“ mit Befundnummer oder „ausgeschlossen:“ mit Begründung). Eine Zeile `| F…`, die das Muster verfehlt, bricht die Probe ab, ebenso ein Eintrag, der keine Fundstelle ist. Ein Eintrag aus N muss auf die N-Zeile seiner eigenen Fundstelle verweisen, und diese Zeile muss in der Tabelle von Schritt 3a2 stehen; die N-Zeilen dieser Tabelle und die des Verzeichnisses müssen dieselbe Menge sein. Aufruf aus dem Repo-Wurzelverzeichnis; der Block wird mit `python3 -c` aus dieser Datei gelesen und ausgeführt:
 
 ```python probe: fundstellenverzeichnis
 import re, sys, difflib, subprocess
@@ -6898,7 +6950,7 @@ from collections import Counter
 D = 'reviews/BEFUNDE_60.md'
 H = '### Durchsicht der Prüfausdrücke (Selbstbeleg-Fehlertyp)'
 E = '## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)'
-C = {'e3f5d6dd': 'e3f5d6dd', '8c3c4075': '8c3c4075359245730ebda58065652885522e0ddf'}
+C = {'e3f5d6dd': 'e3f5d6dd', '8c3c4075': '8c3c4075359245730ebda58065652885522e0ddf', '7213a078': '7213a0783591250d4c6c03d97c12f673981e3e64'}
 B = chr(96)
 BEF = re.compile(B + r'\s*(python3?|grep|git|sed|awk|wc|diff|pdftotext|sha256sum|cat|ls|find|test|bash|sh|cd|curl|head|tail|rg)\b')
 def show(c):
@@ -6933,42 +6985,53 @@ def fund(L):
         else:
             i += 1
     return f
-e3 = show(C['e3f5d6dd']); mm = show(C['8c3c4075'])
-neu = set()
-for t, a1, a2, b1, b2 in difflib.SequenceMatcher(None, e3, mm, autojunk=False).get_opcodes():
-    if t in ('replace', 'insert'):
-        neu.update(range(b1 + 1, b2 + 1))
+def neu_zeilen(alt, neu):
+    r = set()
+    for t, a1, a2, b1, b2 in difflib.SequenceMatcher(None, alt, neu, autojunk=False).get_opcodes():
+        if t in ('replace', 'insert'):
+            r.update(range(b1 + 1, b2 + 1))
+    return r
+e3 = show(C['e3f5d6dd']); mm = show(C['8c3c4075']); nn = show(C['7213a078'])
+neuM = neu_zeilen(e3, mm); neuN = neu_zeilen(mm, nn)
 soll = {('e3f5d6dd',) + k for k in fund(e3)}
-soll |= {('8c3c4075',) + k for k in fund(mm) if any(x in neu for x in range(k[0], k[1] + 1))}
+soll |= {('8c3c4075',) + k for k in fund(mm) if any(x in neuM for x in range(k[0], k[1] + 1))}
+soll |= {('7213a078',) + k for k in fund(nn) if any(x in neuN for x in range(k[0], k[1] + 1))}
 W = open(sys.argv[1] if len(sys.argv) > 1 else D, encoding='utf-8').read().split('\n')
 A = W[W.index(H):W.index(E)]
 k = A.index('#### Fundstellenverzeichnis')
 ende = next((j for j in range(k + 1, len(A)) if A[j].startswith('#')), len(A))
 ist = []
 for l in A[k:ende]:
-    m = re.match(r'^\| F\d{3} \| (e3f5d6dd|8c3c4075) \| (\d+)(?:–(\d+))? \| [^|]+ \| (Tabelle: [^|]*\d[^|]*|Tabelle \(Schritt 3a1\): Befund \d+[^|]*|ausgeschlossen: [^|]{12,}) \|$', l)
+    m = re.match(r'^\| F\d{3} \| (e3f5d6dd|8c3c4075|7213a078) \| (\d+)(?:–(\d+))? \| [^|]+ \| (Tabelle: [^|]*\d[^|]*|Tabelle \(Schritt 3a1\): Befund \d+[^|]*|Tabelle \(Schritt 3a2\): N Z\. \d+[^|]*|ausgeschlossen: [^|]{12,}) \|$', l)
     if m:
         ist.append((m.group(1), int(m.group(2)), int(m.group(3) or m.group(2))))
+        r = re.match(r'Tabelle \(Schritt 3a2\): N Z\. (\d+)', m.group(4))
+        if r:
+            assert m.group(1) == '7213a078' and int(r.group(1)) == int(m.group(2)), l
     else:
         assert not l.startswith('| F'), l
 z = Counter(ist)
+t = next(j for j, l in enumerate(A) if l.startswith('#### Schritt 3a2: '))
+te = next((j for j in range(t + 1, len(A)) if A[j].startswith('#')), len(A))
+tab = {int(m.group(1)) for m in (re.match(r'^\| (?:\d+|—) \| (\d+) \| N ', l) for l in A[t:te]) if m}
+assert tab == {k[1] for k in soll if k[0] == '7213a078'}, sorted(tab ^ {k[1] for k in soll if k[0] == '7213a078'})
 print('fehlend: %d · doppelt: %d · fundstellen: %d' % (len(soll - set(ist)), sum(v - 1 for v in z.values()), len(soll)))
 assert set(ist) <= soll, sorted(set(ist) - soll)
 ```
 
-Lauf am Branch `ticket/T-0622-ceo`, wörtlich:
+Lauf am Branch `ticket/T-0878-cto`, wörtlich:
 
 ```
 $ python3 -c "import sys;L=open('reviews/BEFUNDE_60.md',encoding='utf-8').read().split(chr(10));a=L.index(chr(96)*3+'python probe: fundstellenverzeichnis');b=L.index(chr(96)*3,a+1);sys.argv=['probe']+sys.argv[1:];exec(chr(10).join(L[a+1:b]))"
-fehlend: 0 · doppelt: 0 · fundstellen: 249
+fehlend: 0 · doppelt: 0 · fundstellen: 301
 ```
 
-Gegenprobe an einer Kopie außerhalb des Repos, aus der der Verzeichniseintrag F001 (`e3f5d6dd` Z. 6) entfernt ist, wörtlich:
+Gegenprobe an einer Kopie außerhalb des Repos, aus der der Verzeichniseintrag F250 (`7213a078` Z. 64, ein Eintrag aus N) entfernt ist, wörtlich:
 
 ```
-$ grep -v '^| F001 |' reviews/BEFUNDE_60.md > /opt/overlord/overlord-arbeit/.t0622/kopie.md
-$ python3 -c "import sys;L=open('reviews/BEFUNDE_60.md',encoding='utf-8').read().split(chr(10));a=L.index(chr(96)*3+'python probe: fundstellenverzeichnis');b=L.index(chr(96)*3,a+1);sys.argv=['probe']+sys.argv[1:];exec(chr(10).join(L[a+1:b]))" /opt/overlord/overlord-arbeit/.t0622/kopie.md
-fehlend: 1 · doppelt: 0 · fundstellen: 249
+$ grep -v '^| F250 |' reviews/BEFUNDE_60.md > /var/lib/overlord/supervisor/probe/T-0878-cto-entwicklerlauf-tnuocwo0/kopie.md
+$ python3 -c "import sys;L=open('reviews/BEFUNDE_60.md',encoding='utf-8').read().split(chr(10));a=L.index(chr(96)*3+'python probe: fundstellenverzeichnis');b=L.index(chr(96)*3,a+1);sys.argv=['probe']+sys.argv[1:];exec(chr(10).join(L[a+1:b]))" /var/lib/overlord/supervisor/probe/T-0878-cto-entwicklerlauf-tnuocwo0/kopie.md
+fehlend: 1 · doppelt: 0 · fundstellen: 301
 ```
 
 ## Autor-Revision T-0567 (Befunde 24, 57, 74, 82)
