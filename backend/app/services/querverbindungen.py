@@ -15,7 +15,9 @@ siehe Kommentar in catalog.py).
 from __future__ import annotations
 
 from app.data import catalog
+from app.data import kwra_handlungsfeld_querbezuege as hf
 from app.data import kwra_querverbindungen as kq
+from app.data import kwra_rueckkopplungen as rk
 
 
 def _klimawirkung_name(eintrag: dict) -> str:
@@ -124,12 +126,39 @@ def querverbindungs_auswertung() -> dict:
         "und wird deshalb bewusst nicht erzeugt."
     )
 
+    katalog_ids = set(klimawirkungen_je_id)
+    rueckkopplungen = [
+        {
+            **{k: v for k, v in e.items() if k not in ("knoten", "kanten", "seiten", "quellen")},
+            "knoten": [{**k, "im_katalog": k["kwra_id"] in katalog_ids} for k in e["knoten"]],
+            "kanten": [dict(k) for k in e["kanten"]],
+            "seiten": list(e["seiten"]),
+            "quellen": list(e["quellen"]),
+        }
+        for e in rk.RUECKKOPPLUNGEN
+    ]
+
+    # Handlungsfeld-Ablesung aus Abbildung 8 (TB 6 S. 83): ausgewiesene Ablesung, keine Tabelle.
+    handlungsfelder = {
+        "felder": [{**e, "summe": hf.summe(e)} for e in hf.HANDLUNGSFELDER],
+        "ablesung": hf.ABLESUNG,
+        "genauigkeit_summe": hf.GENAUIGKEIT_SUMME,
+        "genauigkeit_aufteilung": hf.GENAUIGKEIT_AUFTEILUNG,
+        "quelle": hf.QUELLE,
+    }
+
     return {
         "klimawirkungen": klimawirkungen,
         "netzknoten_ausserhalb_katalog": netzknoten_ausserhalb_katalog,
         "kennzahlen": kq.KENNZAHLEN,
         "systembereich_matrix": kq.SYSTEMBEREICH_MATRIX,
         "abdeckung": abdeckung,
+        "handlungsfelder": handlungsfelder,
+        "rueckkopplungen": rueckkopplungen,
+        "rueckkopplungen_quelle": rk.QUELLE,
+        "hochrisiko": kq.HOCHRISIKO_BEFUNDE,
+        # unverändert: je Eintrag „seite“ (Hauptstelle) und „seiten“ (alle Stellen)
+        "aussagen": kq.AUSSAGEN,
         "quelle": kq.QUELLE,
         "modellgrenze": modellgrenze,
     }
