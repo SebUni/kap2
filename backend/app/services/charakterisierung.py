@@ -63,6 +63,16 @@ SCHWELLEN = {
             "relative Minderung gilt: Senken die im Katalog hinterlegten Maßnahmen das Risiko "
             "mindestens um die Hälfte, reichen sie aus, und es geht um die Umsetzung."
         ),
+        "band": (
+            "0,4-0,6 (0,5 als Übertragung von „eine von drei Stufen“ auf eine relative "
+            "Minderung; die Bandbreite ist eine Setzung von KAP3, nicht aus einer Quelle "
+            "abgeleitet)."
+        ),
+        "sensitivitaet": (
+            "Bestimmt, ab welcher Minderung eine Klimawirkung als „Umsetzung“ gilt statt "
+            "als „Entwicklung“. Wirkt nur auf die Einordnung (Konformitätszeile 7), nicht "
+            "auf Risikoindizes oder Euro-Beträge."
+        ),
     },
     "SCHWELLE_ENTWICKLUNG": {
         "wert": SCHWELLE_ENTWICKLUNG,
@@ -73,6 +83,15 @@ SCHWELLEN = {
             "tiefgreifender Anpassung erreichbar (KWRA-Gruppe Innovation). Ab zehn Prozent "
             "gibt es einen Hebel, den weiterreichende Maßnahmen ausbauen können "
             "(KWRA-Gruppe Entwicklung)."
+        ),
+        "band": (
+            "0,05-0,2 (0,1 als runde Grenze für „nennenswerte Wirkung“; die Bandbreite ist "
+            "eine Setzung von KAP3, nicht aus einer Quelle abgeleitet)."
+        ),
+        "sensitivitaet": (
+            "Bestimmt, ab welcher Minderung eine Klimawirkung als „Entwicklung“ statt "
+            "als „Innovation“ gilt. Wirkt nur auf die Einordnung (Konformitätszeile 7), "
+            "nicht auf Risikoindizes oder Euro-Beträge."
         ),
     },
 }
