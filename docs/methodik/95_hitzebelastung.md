@@ -1,10 +1,11 @@
 # Methodik-Bericht #95 — Hitzebelastung
 
-Status: **Rev. 8 (Fortschreibungs-Revision: §3.4-Ressourcen-Regel — kein
-nationaler Zell-Lauf; §3.1-Datenebenen-Anlagepflicht — q_pfl-Ebene angelegt,
-q_1P geparkt; L̄_85+ exakt sterbefallgewichtet 4,16 J) — ABNAHMEREIF & INTEGRIERT
-(Review Runden 6–9: Befunde 86–94 behoben, Runde 9 ohne neue A/B-Befunde)** ·
-30.08.2026 · Rev. 7 war abnahmereif (Null-Runde Runde 5) und ist integriert ·
+Status: **Rev. 8, Fortschreibung 7 in Revision — nicht abnahmereif** (A-0048; Ledger-Runden
+10–14: Rechenkette 3.0, Pflichtabschnitt „Risiko ohne (weitere) Anpassung“, Kennzeichnung der
+Parameter; Abnahme durch den methodik_manager steht aus) · 25.09.2026 · Ausgangsstand ist Rev. 8
+vom 30.08.2026 (§3.4-Ressourcen-Regel — kein nationaler Zell-Lauf; §3.1-Datenebenen-Anlagepflicht —
+q_pfl-Ebene angelegt, q_1P geparkt; L̄_85+ exakt sterbefallgewichtet 4,16 J; Review-Runden 6–9,
+Befunde 86–94 behoben), im Produkt integriert · Rev. 7 war abnahmereif (Null-Runde Runde 5) und ist integriert ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 95-A** (RKI-Expositions-Wirkungs-Funktion, bottom-up; Entscheidungslog Nr. 1)
 
@@ -987,7 +988,7 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
-  kennzeichnung: quelle   # Sterbetafel 2022/2024 [48]; 85+ sterbefallgewichtet aus amtlichen Zahlen (§3.5 #l-a)
+  kennzeichnung: abschaetzung_kap3   # Sterbetafel 2022/2024 [48]; u65/65-74/75-84 Stuetzstellen e(60)/e(70)/e(80) als Setzung von KAP3, 85+ exakt sterbefallgewichtet (§3.5 #l-a)
   abgeleitet_aus: []
 parameter:
   id: heat.voly
@@ -1011,7 +1012,7 @@ parameter:
   preisstand: "2024"
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
-  kennzeichnung: quelle   # Kostennachweis 2023 [17], mit VPI auf 2024 indexiert; als Proxy gekennzeichnet (§3.5, Log 17)
+  kennzeichnung: abschaetzung_kap3   # Proxy von KAP3: Durchschnitt aller KH-Faelle aus Kostennachweis 2023 [17], mit VPI auf 2024 indexiert (§3.5, Log 17)
   abgeleitet_aus: []
 parameter:
   id: heat.c_kal
@@ -1269,7 +1270,9 @@ DOI-Links die persistenten Referenzen.
   A. Crespi, K. Renner, M. Zebisch, U. Fritsch, I. Schauser, „Klimawirkungs- und Risikoanalyse 2021
   für Deutschland — Teilbericht 6: Integrierte Auswertung – Klimarisiken, Handlungserfordernisse und
   Forschungsbedarfe“, Umweltbundesamt, Climate Change 25/2021, Dessau-Roßlau, Juni 2021
-  (http://www.umweltbundesamt.de/publikationen; im Repo `docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`).
+  (Publikationsseite https://www.umweltbundesamt.de/publikationen/KWRA-Teil-6-Integrierte-Auswertung;
+  PDF https://www.umweltbundesamt.de/sites/default/files/medien/479/publikationen/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf,
+  abgerufen 25.09.2026; im Repo `docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`).
   Verwendet: Tabelle 1, S. 41 (Stufen und Gewissheit „Hitzebelastung“), Kapitel 3.3, S. 78–79 mit
   Fußnote 18 (Zahlenskala der Gewissheit). Aufbereitet in `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`.
 
@@ -1326,4 +1329,4 @@ Befund 95); der gewählte Ansatz 95-A ist Nr. 1. Einträge 39–40: Fortschreibu
 | 37 | Ansatz 95-B (nationaler Anker, top-down)? | **verworfen** | 95-B verteilt eine feste nationale Zahl von Hitzetoten über einen Schlüssel und scheidet nach §3.1 aus, weil damit auch eine Kommune ohne Hitze Todesfälle erhielte. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
 | 38 | Ansatz 95-C (Personen-Hitzegradtage-Regression)? | **verworfen** | 95-C ersetzt die publizierte und kalibrierte RKI-Kurve durch eine lineare Regression mit aufgesetzter Krümmung (κ ≈ 1,2–1,5) und wäre gegenüber 95-A ein Rückschritt. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
 | 39 ⚠ | Satz „Bestand an Klimaanlagen und Hitzeaktionsplänen im Basiswert“ (Kapitel 1, Absatz (a))? | **gestrichen** — Absatz (a) sagt nur noch, was aus der Kalibrierung folgt: \(c_{\text{kal}}\) ist an die RKI-Reihe 2012–2024 angepasst, der Anpassungsstand dieser Jahre steckt damit im Niveau; genannt bleibt nur das DWD-Hitzewarnsystem mit Beleg [45] | Der Bericht hat keine Quelle für die Klimaanlagen-Quote und keine für die Verbreitung kommunaler Hitzeaktionspläne in den Kalibrierjahren; eine Behauptung ohne Beleg bleibt nicht stehen (P1) | Satz belegen: Klimaanlagen-Quote der Haushalte und Pflegeheime sowie Einführungsjahre der Hitzeaktionspläne gegen das Fenster 2012–2024 (Fortschreibung) | keine Zahl betroffen; Aussage (a) schmaler, aber belegt |
-| 40 ⚠ | Kennzeichnung der Grenzfälle in Kapitel 7? | **`abschaetzung_kap3`**, sobald eine Setzung von KAP3 im Wert steckt (\(\beta_{85+}\) Süd-Nachschätzung, \(f_a\) lineare Näherung, VOLY-Elastizität beim Raumtransfer, \(r_{0,a}\)-Altersprofil, \(\delta_{\text{HAP}}\), Distanzterm); **`quelle`** für reine Rechnungen aus amtlichen oder gemessenen Zahlen ohne Setzung (Quotienten, Indexierung, ausgezählte Quantile); **`berechnet`** nur, wo der Wert aus anderen Blöcken folgt (\(c_{\text{kal}}\), \(\beta_{\text{iso}}\), \(\beta_{\text{pfl}}\)) | Die Parameterliste im Produkt (P1) soll eine Setzung nie als Quellenwert zeigen; gleiche Lesart wie die Blöcke in `60_*.md` („Quotient zweier amtlicher Summen“ = `quelle`) | alle aus Quellen abgeleiteten Werte als `abschaetzung_kap3` (überzeichnet die Unsicherheit amtlicher Quotienten) | keine Zahl betroffen; Anzeige „Quelle“ oder „Abschätzung von KAP3“ im Produkt |
+| 40 ⚠ | Kennzeichnung der Grenzfälle in Kapitel 7? | **`abschaetzung_kap3`**, sobald eine Setzung von KAP3 im Wert steckt (\(\beta_{85+}\) Süd-Nachschätzung, \(f_a\) lineare Näherung, VOLY-Elastizität beim Raumtransfer, \(c_{\text{Fall}}\) als Proxy aus dem Durchschnitt aller Krankenhausfälle, Stützstellen e(60)/e(70)/e(80) für die Bänder u65, 65–74 und 75–84 in \(\bar L_a\), \(r_{0,a}\)-Altersprofil, \(\delta_{\text{HAP}}\), Distanzterm); **`quelle`** für reine Rechnungen aus amtlichen oder gemessenen Zahlen ohne Setzung (Quotienten, ausgezählte Quantile); Prüfstein: Misst der Wert die Zielgröße selbst, ist die bloße Wahl zwischen Quellenwerten keine Setzung (\(e_{\text{HD}}\) konditional statt unkonditional, Log 19; Stationsauswahl für \(q_w\), Log 5) — steht er für eine andere Größe (Proxy) oder nähert er ein Bandmittel durch einen Punkt an, ist es eine; **`berechnet`** nur, wo der Wert aus anderen Blöcken folgt (\(c_{\text{kal}}\), \(\beta_{\text{iso}}\), \(\beta_{\text{pfl}}\)) | Die Parameterliste im Produkt (P1) soll eine Setzung nie als Quellenwert zeigen; gleiche Lesart wie die Blöcke in `60_*.md` („Quotient zweier amtlicher Summen“ = `quelle`) | alle aus Quellen abgeleiteten Werte als `abschaetzung_kap3` (überzeichnet die Unsicherheit amtlicher Quotienten) | keine Zahl betroffen; Anzeige „Quelle“ oder „Abschätzung von KAP3“ im Produkt |
