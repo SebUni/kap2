@@ -40,6 +40,7 @@ Teilbericht 6 ausdrücklich belegt**:
                            darin nicht enthalten; die Diagonale zählt Wirkbeziehungen
                            innerhalb desselben Systembereichs, ``summe_ausgehend`` nur
                            die Beziehungen zu den vier anderen Systembereichen.
+  SYSTEMBEREICH_MATRIX_QUELLE — Fundstelle der Matrix (Tabelle 28, Kap. 7, S. 153).
 
 Eine vollständige Kantenliste aller 257 Querverbindungen ist keine KWRA-Angabe und
 müsste eigenständig modelliert und als solche gekennzeichnet werden (siehe Vermerk am
@@ -550,4 +551,18 @@ SYSTEMBEREICH_MATRIX: dict[str, dict[str, int]] = {
         "Menschen und soziale Systeme": 6,
         "summe_ausgehend": 12,
     },
+}
+
+# Fundstelle der Matrix: Tabelle 28 steht in TB 6, Kapitel 7, auf S. 153 (gedruckte
+# Seitenzahl = PDF-Seite, gegengeprüft am PDF-Text, T-1127).
+SYSTEMBEREICH_MATRIX_QUELLE: dict[str, object] = {
+    "tabelle": 28,
+    "seite": 153,
+    "titel": "Ausgehende und eingehende Querverbindungen der fünf Systembereiche",
+    "kapitel": 7,
+    "kapitel_titel": "Querbetrachtung der Systembereiche",
+    "bericht": (
+        "UBA/BMU, ›Klimawirkungs- und Risikoanalyse 2021 für Deutschland‹, Teilbericht 6 "
+        "(Integrierte Auswertung), Dessau-Roßlau, 2021"
+    ),
 }

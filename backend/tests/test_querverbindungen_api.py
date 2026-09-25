@@ -21,7 +21,7 @@ def test_auswertung_hat_genau_die_erwarteten_schluessel():
     ergebnis = querverbindungs_auswertung()
     assert set(ergebnis.keys()) == {
         "klimawirkungen", "netzknoten_ausserhalb_katalog", "kennzahlen", "systembereich_matrix",
-        "abdeckung", "quelle", "modellgrenze",
+        "systembereich_matrix_quelle", "abdeckung", "quelle", "modellgrenze",
         "handlungsfelder", "rueckkopplungen", "rueckkopplungen_quelle", "hochrisiko", "aussagen",
     }
 
@@ -42,6 +42,15 @@ def test_auswertung_liefert_handlungsfelder_rueckkopplungen_hochrisiko_aussagen(
     assert ergebnis["aussagen"] == kq.AUSSAGEN
     for a in ergebnis["aussagen"].values():
         assert isinstance(a["seite"], int) and isinstance(a["seiten"], list)
+
+
+def test_systembereich_matrix_quelle_nennt_tabelle_28_seite_153():
+    # TB 6, Kap. 7: „Tabelle 28: Ausgehende und eingehende Querverbindungen der fünf
+    # Systembereiche“ steht auf S. 153 (T-1127).
+    quelle = querverbindungs_auswertung()["systembereich_matrix_quelle"]
+    assert quelle["tabelle"] == 28
+    assert quelle["seite"] == 153
+    assert quelle == kq.SYSTEMBEREICH_MATRIX_QUELLE
 
 
 def test_klimawirkungen_genau_ein_eintrag_je_kwra_id():
