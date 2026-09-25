@@ -136,7 +136,7 @@ zehn jüngsten verfügbaren Jahre, Abruf 25.09.2026).
 | 1 | Einwohner je Altersband \(\text{pop}_a\) (u65 · 65–74 · 75–84 · 85+) | 2.961.430 · 339.490 · 253.528 · 107.933 | Fortschreibung des Bevölkerungsstandes, Stichtag 31.12.2023, Basis Zensus 2022, Tab. 12411-09-01-4-B [48]; Anlage `bevoelkerung_bundesland_altersband.csv` (Befund 99) |
 | 2 | Sommermittel der Temperatur \(\bar T\) (Juni–August, 24-h-Mittel) | 20,07 °C | DWD-CDC-Raster air_temperature_mean, 1 km [33] |
 | 3 | Schwelle und Steigung der Region Mitte: \(T_0\); \(\beta_a = \beta_{85+} \times f_a\) | \(T_0\) = 20,2 °C; \(\beta_{85+}\) = 0,0625 K⁻¹ × \(f_a\) 0,357 · 0,588 · 0,631 · 1,0 = 0,0223 · 0,0368 · 0,0394 · 0,0625 K⁻¹ | Winklmayr 2022 [11] (§3.3); \(f_a\) Rückrechnung §3.3a [12,49] |
-| 4 | Wochenexzess: 13 Sommerwochen \(T_w = \bar T + q_w\), je Woche Übersterblichkeit \(e^{\beta_a (T_w - T_0)_+} - 1\), summiert | 6 von 13 Wochen über 20,2 °C (20,58 bis 24,67 °C); Summe 0,289 · 0,486 · 0,524 · 0,860 | Wochenquantile Mitte, Tabelle §3.2 [33,50] |
+| 4 | Wochenexzess: 13 Sommerwochen \(T_w = \bar T + q_w\), je Woche Übersterblichkeit \(e^{\beta_a (T_w - T_0)_+} - 1\), summiert | 6 von 13 Wochen über 20,2 °C (20,58–24,67 °C); Summe 0,289 · 0,486 · 0,524 · 0,860 | Wochenquantile Mitte, Tabelle §3.2 [33,50] |
 | 5 | Basissterbefälle je Woche: \(\text{pop}_a \times m_a / 100.000 / 52\) | \(m_a\) 213,2 · 1.737,9 · 4.812,3 · 14.800,2 je 100.000 ⇒ 121,4 · 113,5 · 234,6 · 307,2 Sterbefälle je Woche | Sterbefälle 2023 [49] (§3.5) |
 | 6 | Zusätzliche Sterbefälle \(D_a\) = \(c_{\text{kal}}\) × \(v_{\text{vers},a}\) × Ebene 5 × Ebene 4 | 0,581 × 1 × … = 20,4 · 32,0 · 71,4 · 153,6 = **277,4 Todesfälle je Jahr** | \(c_{\text{kal}}\) Kalibrierung §4 [50]; \(v_{\text{vers}}\) §3.3 |
 | 7 | Verlorene Lebensjahre: \(\text{YLL} = \sum_a D_a \times \bar L_a\) | \(\bar L_a\) 23,39 · 15,59 · 8,90 · 4,16 J ⇒ 476,3 + 499,5 + 635,4 + 638,8 = **2.250 YLL je Jahr** (native Ergebnisgröße) | Sterbetafel 2022/2024 [48], Sterbefälle 2023 [49] (§3.5) |
@@ -154,33 +154,42 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   Schwelle 20,2 °C) käme für Berlin null heraus, also −100 %. Die Hitzetoten entstehen in den
   sechs heißen Wochen; deshalb rechnet die Kette jede der 13 Sommerwochen einzeln. Der Teiler 52
   ist keine Vereinfachung: Die 39 Wochen außerhalb des Sommers tragen nach dem Modell nichts bei.
-- **Ebenen 2 und 6, eine Zelle statt aller Zellen: die Kette überschätzt Berlin um rund
-  4,5 %.** Das Produkt rechnet jede Zelle mit ihrer eigenen Temperatur (§3.1) und summiert; die
-  Kette setzt für ganz Berlin die Zelle Berlin-Mitte an. Sie ist praktisch der Gemeindepunkt
-  der Kalibrierung (§4): Dessen Reihe in `sommermittel_bundesland_povw.csv` [50] ergibt für die
-  Sommer 2016–2025 im Mittel 20,06 °C. Nachgerechnet mit allen 40.663 bewohnten 100-m-Zellen
-  Berlins (Zensus 2022, Gitterdaten Bevölkerungszahl und Alter in 5er-Jahresgruppen [67]), jede
-  Zelle mit ihrem Wert aus dem 1-km-Raster [33], ergeben sich drei Wirkungen:
-  (a) **Temperatur je Zelle: −5,3 %.** Das Bevölkerungsmittel liegt bei 19,96 °C, also 0,11 K
-  unter Berlin-Mitte (Zellen von 19,38 bis 20,38 °C); drei Viertel der Einwohner wohnen kühler
-  als Berlin-Mitte. Gemessen mit der Berliner Altersstruktur in jeder Zelle.
-  (b) **Wärmeinsel-Feinstruktur unter 1 km: +2,0 %.** Modellrechnung mit derselben gesetzten
+- **Ebenen 1, 2 und 6, eine Zelle statt aller Zellen: Die Kette überschätzt Berlin um rund
+  7 %.** Das Produkt rechnet jede 100-m-Zelle mit ihrer eigenen Temperatur (§3.1) und ihrer
+  eigenen Bevölkerung aus dem Zensus-Gitter und summiert. Die Kette setzt für die ganze Kommune
+  die Zelle Berlin-Mitte und die Fortschreibung aus Ebene 1 an. Die Zelle Berlin-Mitte ist
+  praktisch der Gemeindepunkt der Kalibrierung (§4): Dessen Reihe in
+  `sommermittel_bundesland_povw.csv` [50] ergibt für die Sommer 2016–2025 im Mittel 20,06 °C.
+  Nachgerechnet mit allen 40.663 bewohnten 100-m-Zellen Berlins (Zensus 2022, Gitterdaten [67]),
+  jede mit ihrem Wert aus dem 1-km-Raster [33] und ihrer Bevölkerung nach der Logik des Produkts
+  (`zensus_loader.apply_zensus_to_cell_inputs`: Einwohner × Anteil 65+, Aufteilung der 65+ aus
+  den 5er-Jahresgruppen), ergeben sich vier Wirkungen, jede auf die vorige gerechnet:
+  (a) **Temperatur je Zelle: × 0,948.** Das Bevölkerungsmittel liegt bei 19,96 °C, also 0,11 K
+  unter Berlin-Mitte (Zellen 19,38–20,38 °C); drei Viertel der Einwohner wohnen kühler als
+  Berlin-Mitte.
+  (b) **Einwohnersumme: × 0,982.** Das Zensus-Gitter (Stichtag 15.05.2022) zählt in Berlin
+  3.595.270 Einwohner, die Fortschreibung aus Ebene 1 (Stichtag 31.12.2023) 3.662.381
+  (Befund 99).
+  (c) **Altersbänder je Zelle wie im Produkt: × 0,981.** Davon × 0,980 durch eine Eigenheit des
+  Produkts: In 4770 Zellen mit 99.026 Einwohnern ist der Anteil 65+ im Gitter geheimgehalten
+  („–“), und das Produkt setzt dort 65+ = 0 (Befund 104). Der Rest, × 1,001, sind
+  Altersstruktur und Wohnlage der Älteren.
+  (d) **Wärmeinsel-Feinstruktur unter 1 km: × 1,020.** Modellrechnung mit derselben gesetzten
   Streuung σ = 0,5 K wie in §4, keine Messung; die gekrümmte Kurve hebt die Summe.
-  (c) **Altersverteilung in der Stadt: −1,2 %.** Ältere wohnen etwas kühler (85+ im Mittel
-  0,04 K unter allen Einwohnern), gemessen an den 2.815 Zellen mit vollständigen
-  Altersangaben (241.174 Einwohner); in den übrigen Zellen sind die Altersgruppen geheimgehalten.
-  Zusammen 0,947 × 1,020 × 0,988 = 0,955: Für ganz Berlin ergibt die Methodik rund 347 Mio. €
-  statt 362,9 Mio. € je Jahr. Die Kette zeigt den Rechenweg; der Betrag für Berlin ist der
-  Zelllauf des Produkts. Dieses Ergebnis widerspricht der Erklärung des Berlin-Ankers in §4,
-  wonach das Zellmodell über dem Gemeindepunkt liegt (Befund 101).
+  Zusammen 0,948 × 0,982 × 0,981 × 1,020 = 0,932: Der Zelllauf ergibt für Berlin rund
+  338 Mio. € je Jahr (Preisstand 2024), 7 % weniger als die Kette; ohne die Eigenheit aus (c)
+  wären es rund 345 Mio. €. Die Kette zeigt den Rechenweg, der Betrag für Berlin ist der
+  Zelllauf des Produkts. Die Wirkungen (a) und (d) zusammen (× 0,967) widersprechen der
+  Erklärung des Berlin-Ankers in §4, wonach das Zellmodell über dem Gemeindepunkt liegt
+  (Befund 101).
 - **Ebene 6, \(v_{\text{vers},a}\) = 1.** Auf Ebene der Kommune ist der Modifikator genau 1:
   \(\beta_{\text{iso}}\) wirkt heute nicht, weil \(q_{\text{1P}}\) mangels Zellquelle gleich dem
   Bundesmittel gesetzt ist (§3.6), und die Ebene \(q_{\text{pfl}}\) verteilt die Heimbewohner
   erwartungstreu auf die Zellen der Kommune. Innerhalb der Kommune verschiebt \(\beta_{\text{pfl}}\)
   nur, *wo* die Todesfälle anfallen. Abweichen kann die Zellsumme nur, wenn Heime systematisch in
   wärmeren oder kühleren Zellen liegen, und durch die Kappung bei 1 (nur abwärts). **Abschätzung
-  von KAP3** für den Extremfall, dass alle Heimbewohner in Zellen 1 K über dem Stadtmittel wohnen
-  und alle übrigen 85-Jährigen am Stadtmittel: Heimzellen haben \(q_{\text{pfl}} = 1\) und damit
+  von KAP3** für den Extremfall, dass alle Heimbewohner in Zellen 1 K über dem Mittel der Kommune
+  wohnen und alle übrigen Menschen ab 85 am Mittel der Kommune: Heimzellen haben \(q_{\text{pfl}} = 1\) und damit
   \(v = 1 + 1{,}54 \times (1 - 0{,}149) = 2{,}31\), die übrigen \(q_{\text{pfl}} = 0\) und
   \(v = 1 - 1{,}54 \times 0{,}149 = 0{,}77\). Die Heimbewohner tragen also
   0,149 × 2,31 = 0,344 der Todesfälle 85+, die übrigen 0,851 × 0,77 = 0,656. Um 1 K wärmer steigt
@@ -232,15 +241,20 @@ assert abs(yll(t_mittel + 0.5)[1] / y - 1.27) < 0.005
 assert abs(d[3] / sum(d) - 0.55) < 0.01
 assert sum(c_kal * p * mm / 100_000 * (math.exp(b85 * f * max(0.0, t_mittel - t0)) - 1)
            for p, mm, f in zip(pop, m, fa)) == 0.0    # nur Sommermittel => null
-# Eine Zelle statt aller Zellen (Zelllauf Berlin, Werte aus dem Text): (a) x (b) x (c)
-assert abs(0.947 * 1.020 * 0.988 - 0.955) < 0.001
-assert abs((eur_mort + eur_morb) / 1e6 * 0.955 - 347) < 1
-# (b) nachgerechnet am Punkt: sigma 0,5 K, mittelwerttreu, Gauss-Hermite-Mittel
+# Eine Zelle statt aller Zellen (Zelllauf Berlin, Messwerte aus dem Text): (a) x (b) x (c) x (d)
+assert abs(3_595_270 / sum(pop) - 0.982) < 0.0005        # (b) Einwohnersumme Gitter / Fortschreibung
+assert abs(0.980 * 1.001 - 0.981) < 0.001                # (c) = Produkt-Eigenheit x Rest
+gesamt = 0.948 * 0.982 * 0.981 * 1.020
+assert abs(gesamt - 0.932) < 0.001
+assert abs((eur_mort + eur_morb) / 1e6 * gesamt - 338) < 1
+assert abs((eur_mort + eur_morb) / 1e6 * gesamt / 0.980 - 345) < 1
+assert abs(0.948 * 1.020 - 0.967) < 0.001                # (a) x (d), Befund 101
+# (d) nachgerechnet am Punkt: sigma 0,5 K, mittelwerttreu, Gauss-Hermite-Mittel
 zs = [-2.0201828705, -0.9585724646, 0.0, 0.9585724646, 2.0201828705]
 ws = [0.0199532421, 0.3936193232, 0.9453087205, 0.3936193232, 0.0199532421]
 uhi = sum(w * yll(t_mittel + 0.5 * math.sqrt(2) * z)[1] for z, w in zip(zs, ws)) / sum(ws)
 assert abs(uhi / y - 1.02) < 0.003
-# Heim-Extremfall (Abschaetzung von KAP3): alle Heimbewohner 1 K ueber dem Stadtmittel
+# Heim-Extremfall (Abschaetzung von KAP3): alle Heimbewohner 1 K ueber dem Mittel der Kommune
 v_heim, v_rest = 1 + 1.54 * (1 - 0.149), 1 + 1.54 * (0 - 0.149)
 g_heim, g_rest = 0.149 * v_heim, 0.851 * v_rest
 assert abs(v_heim - 2.31) < 0.005 and abs(v_rest - 0.77) < 0.005
