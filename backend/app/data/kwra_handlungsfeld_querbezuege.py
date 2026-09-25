@@ -34,9 +34,9 @@ ABLESUNG = (
     "ausgehende Wirkungen „Wasserhaushalt, Wasserwirtschaft“ (S. 84), am meisten beeinflusst "
     "„Tourismuswirtschaft“ (S. 85), nur ausgehend „Küsten- und Meeresschutz“ und nur eingehend "
     "„Tourismuswirtschaft“ (Hinweistext zu Abbildung 8, S. 83). "
-    "Modellgrenze: Die Summe der Ablesung (251) liegt unter den 257 Querverbindungen der Quelle; "
-    "die Abbildung zeigt nur Beziehungen zwischen Handlungsfeldern, die Differenz liegt innerhalb "
-    "der Ablesegenauigkeit oder in Beziehungen innerhalb desselben Handlungsfelds. Die "
+    "Modellgrenze: Die Summe der Ablesung (251) liegt unter den 257 Querverbindungen der Quelle. "
+    "Mögliche Ursachen sind die Ablesegenauigkeit oder Beziehungen innerhalb desselben "
+    "Handlungsfelds, die die Abbildung nicht zeigt (Ursache in der Quelle nicht belegt). Die "
     "Verbindungen von Handlungsfeld zu Handlungsfeld (Dicke der Bänder) sind nicht als Zahl "
     "abgelesen."
 )
