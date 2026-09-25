@@ -1,10 +1,10 @@
-"""T-0759: Zeile 16 der Konformitäts-Checkliste ist auf 'erfüllt' gesetzt und gegen
-die genannten Belege abgesichert.
+"""T-0759: Zeile 16 der Konformitäts-Checkliste gegen die genannten Belege
+abgesichert; seit der Gegenprobe T-0928-cto steht sie auf 'teilweise'.
 
 Prüft wörtlich gegen docs/KONFORMITAET_CHECKLISTE.md:
 - es gibt genau eine Zeile, die mit '| 16 |' beginnt,
 - diese Zeile hat sieben Spalten,
-- fünfte Spalte (Status) ist genau 'erfüllt',
+- fünfte Spalte (Status) ist genau 'teilweise',
 - sechste Spalte (Fundstelle/Beleg) ist genau die vier erwarteten Pfade,
 - siebte Spalte (Lücke) ist genau der erwartete Satz,
 - jeder der vier genannten Pfade existiert als Datei im Repo.
@@ -22,8 +22,17 @@ ERWARTETE_BELEGE = (
     "docs/BESTANDSAUFNAHME.md"
 )
 ERWARTETE_LUECKE = (
-    "Keine Lücke im Produkt; Größen ohne Datenquelle je Kommune weist die "
-    "Bestandsaufnahme ausdrücklich als vor Ort zu erheben aus."
+    "Die Bestandsaufnahme erfasst vulnerable Personengruppen und klimasensible "
+    "Strukturen nur zum Teil: vier von sieben Personengruppen und "
+    "Kindertagesstätten und Schulen stehen ohne Wert mit Lückensatz, "
+    "Naturschutzgebiete und Lieferketten fehlen. Trends wie demographischer "
+    "Wandel und Urbanisierung, natürliche Systeme, vergangene Extremereignisse "
+    "und ihre Schäden sowie vorhandene Untersuchungen der Kommune (etwa "
+    "Hochwasser- und Starkregengefahrenkarten, Klimaanalysekarten) erhebt sie "
+    "nicht, und sie identifiziert keine betroffenen Handlungsfelder. "
+    "Sozioökonomische und geographische Rahmenbedingungen und den "
+    "Temperaturverlauf zeigt nur das Kommunenprofil, dieser nur je Bundesland. "
+    "Einzelnachweis: Abschnitt „Gegenprobe Zeile 16“."
 )
 
 
@@ -53,9 +62,10 @@ def test_zeile_16_hat_sieben_spalten():
     assert len(spalten) == 7, f"Erwartet 7 Spalten, gefunden: {len(spalten)} -> {spalten}"
 
 
-def test_zeile_16_status_ist_erfuellt():
+def test_zeile_16_status_ist_teilweise():
+    # T-0928-cto: Gegenprobe am UBA-Abschnitt 2.1.2 stuft Zeile 16 auf 'teilweise'.
     spalten = _spalten(_zeile_16())
-    assert spalten[4].strip() == "erfüllt"
+    assert spalten[4].strip() == "teilweise"
 
 
 def test_zeile_16_beleg_ist_exakt():
