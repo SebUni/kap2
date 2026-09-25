@@ -43,6 +43,25 @@ def test_netzrollen_mehrwertig_und_zentral_mit_seitenbeleg():
             assert "S. " in e["beleg_rolle"], e
 
 
+def test_netzrollen_seiten_je_eintrag():
+    """Feld ``seiten``: gedruckte Seiten von TB 6 Kap. 3.4 (S. 82–88), auf denen die
+    Klimawirkung genannt ist; enthält jede Seite aus beleg_rolle und beleg_auswertung."""
+    import re
+    for e in k.NETZROLLEN:
+        s = e["seiten"]
+        assert isinstance(s, list) and s, e
+        assert all(type(x) is int and 82 <= x <= 88 for x in s), e
+        assert s == sorted(set(s)), e
+        belegt = set()
+        for feld in ("beleg_rolle", "beleg_auswertung"):
+            for teil in re.findall(r"S\. ?(\d+(?:(?:, ?| und )\d+)*)", e.get(feld, "")):
+                belegt |= {int(z) for z in re.findall(r"\d+", teil)}
+        assert belegt <= set(s), e
+    je_id = {e["kwra_id"]: e for e in k.NETZROLLEN}
+    assert {84, 87, 88} <= set(je_id[4]["seiten"])
+    assert {84, 88} <= set(je_id[49]["seiten"])
+
+
 def test_netzrollen_auswertungen_gesamt_und_hochrisiko_getrennt():
     """T-0938 (A12): TB 6 Kap. 3.4 betrachtet die Querverbindungen der hoch bewerteten
     Klimawirkungen gesondert (S. 86–87); jede Netzrolle sagt, aus welcher Auswertung sie
