@@ -10,7 +10,12 @@ import {
 
 const CHART_HEIGHT = 'min(300px, 34vh)'
 
-type Scenario = 'rcp45' | 'rcp85'
+const DISCOUNT_RATES = [
+  { key: '0.0', label: '0 %' },
+  { key: '0.01', label: '1 %' },
+]
+
+type Scenario ='rcp45' | 'rcp85'
 type Mode = 'annual' | 'cumulative'
 
 function ToggleGroup<T extends string>({ value, onChange, options }: {
@@ -137,6 +142,38 @@ export default function CostTimelineSection({ className = '' }: { className?: st
                 )}
               </ComposedChart>
             </ResponsiveContainer>
+          </div>
+          <div style={{ fontSize: '0.78rem', marginTop: 6 }} data-testid="cost-discounted">
+            <div style={{ fontWeight: 600 }}>
+              Barwert der kumulierten Kosten {proj.years[proj.years.length - 1]} (Basisjahr {proj.years[0]})
+            </div>
+            <table style={{ borderCollapse: 'collapse', marginTop: 2 }}>
+              <thead>
+                <tr style={{ color: 'var(--text-muted)', textAlign: 'right' }}>
+                  <th style={{ textAlign: 'left', paddingRight: 12, fontWeight: 400 }}>Reine Zeitpräferenzrate</th>
+                  <th style={{ paddingRight: 12, fontWeight: 400 }}>Ohne Maßnahmen</th>
+                  {proj.has_measures && <th style={{ fontWeight: 400 }}>Mit Maßnahmen</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {DISCOUNT_RATES.map(r => {
+                  const ohne = scen?.no_measures.discounted?.[r.key]
+                  const mit = scen?.with_measures.discounted?.[r.key]
+                  return (
+                    <tr key={r.key} style={{ textAlign: 'right' }}>
+                      <td style={{ textAlign: 'left', paddingRight: 12 }}>{r.label}</td>
+                      <td style={{ paddingRight: 12 }}>{ohne?.length ? fmtEurCompact(ohne[ohne.length - 1]) : '–'}</td>
+                      {proj.has_measures && (
+                        <td>{mit?.length ? fmtEurCompact(mit[mit.length - 1]) : '–'}</td>
+                      )}
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
+              Abgezinst wird nur die Zeitpräferenz (Reine Zeitpräferenzrate); die Komponente der relativen Preise (Ramsey) fehlt.
+            </div>
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 4 }}>
             {!proj.has_measures && (
