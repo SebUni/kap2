@@ -29,8 +29,10 @@ def test_pflichtfelder_und_ebene():
 
 def test_ueberregionale_mit_url():
     for u in v.UNTERSUCHUNGEN:
-        if u["ebene"] != "kommunal":
+        if u["ebene"] == "bund":
             assert re.search(r"https://\S+", u["wo_erhaeltlich"]), u["code"]
+        if u["ebene"] == "land":
+            assert "LANDESPORTALE" in u["wo_erhaeltlich"], u["code"]
 
 
 def test_landesportale_schluessel_gleich_bundeslaender():

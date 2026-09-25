@@ -79,9 +79,7 @@ UNTERSUCHUNGEN: list[dict[str, str]] = [
         "code": "kra_land",
         "bezeichnung": "Klimarisikoanalyse (KRA) des Landes",
         "ebene": "land",
-        "wo_erhaeltlich": "Landesregierung des Bundeslands, URL je Land unter LANDESPORTALE[Land]['kra_land']; "
-                          "Überblick der Länder: "
-                          "https://www.umweltbundesamt.de/themen/klima-energie/klimafolgen-anpassung/anpassung-an-den-klimawandel/anpassung-auf-laenderebene",
+        "wo_erhaeltlich": "Landesregierung des Bundeslands, URL je Land unter LANDESPORTALE[Land]['kra_land']",
     },
     {
         "code": "kwra",
@@ -124,19 +122,19 @@ LANDESPORTALE: dict[str, dict[str, str]] = {
         "kra_land": "Klimarisikoanalyse des Landes in Erarbeitung, Teil der Klimaanpassungsstrategie bis Anfang 2027 (Stand 25.09.2026)",
     },
     "Mecklenburg-Vorpommern": {
-        "hochwasser": "https://www.lung.mv-regierung.de/",
+        "hochwasser": "https://www.lung.mv-regierung.de/fachinformationen/wasser/hochwasserrisikomanagementrichtlinie/hochwassergefahren-und-hochwasserrisikokarten/",
         "kra_land": "Klimarisikoanalyse des Landes in Erarbeitung, Grundlage der Klimaanpassungsstrategie (Stand 25.09.2026)",
     },
     "Niedersachsen": {
-        "hochwasser": "https://www.umweltkarten-niedersachsen.de/",
+        "hochwasser": "https://www.umwelt.niedersachsen.de/startseite/themen/wasser/hochwasser_amp_kustenschutz/hochwasserrisikomanagement_richtlinie/hochwassergefahren_und_hochwasserrisikokarten/hochwasserkarten-121920.html",
         "kra_land": "https://zkfn.de/klimarisikoanalyse-fuer-niedersachsen-2025/",
     },
     "Nordrhein-Westfalen": {
-        "hochwasser": "https://www.flussgebiete.nrw.de/",
+        "hochwasser": "https://www.flussgebiete.nrw.de/hochwassergefahrenkarten-und-hochwasserrisikokarten",
         "kra_land": _KEINE_KRA,
     },
     "Rheinland-Pfalz": {
-        "hochwasser": "https://hochwassermanagement.rlp-umwelt.de/",
+        "hochwasser": "https://hochwassermanagement.rlp.de/",
         "kra_land": _KEINE_KRA,
     },
     "Saarland": {
@@ -144,19 +142,19 @@ LANDESPORTALE: dict[str, dict[str, str]] = {
         "kra_land": _KEINE_KRA,
     },
     "Sachsen": {
-        "hochwasser": "https://www.umwelt.sachsen.de/hochwasser-4101.html",
+        "hochwasser": "https://www.wasser.sachsen.de/gefahren-und-risikokarten-10985.html",
         "kra_land": _KEINE_KRA,
     },
     "Sachsen-Anhalt": {
-        "hochwasser": "https://lhw.sachsen-anhalt.de/",
+        "hochwasser": "https://lhw.sachsen-anhalt.de/planen-bauen/eu-risikomanagement/hochwassergefahren-und-risikokarten-stufe-2",
         "kra_land": _KEINE_KRA,
     },
     "Schleswig-Holstein": {
-        "hochwasser": "https://www.schleswig-holstein.de/DE/fachinhalte/H/hochwasserschutz",
+        "hochwasser": "https://www.schleswig-holstein.de/DE/fachinhalte/H/hochwasserschutz/hwgefahrenRisikokarten",
         "kra_land": "https://www.schleswig-holstein.de/DE/fachinhalte/K/klimaschutz/Downloads/klimarisikoanalyse.pdf?__blob=publicationFile&v=1",
     },
     "Thüringen": {
-        "hochwasser": "https://tlubn.thueringen.de/wasser/hochwasserschutz",
+        "hochwasser": "https://hnz.thueringen.de/hochwasservorsorge/gefahrenkarten.html",
         "kra_land": _KEINE_KRA,
     },
 }
