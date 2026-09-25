@@ -58,9 +58,9 @@ def test_ueberschriften_je_einmal_in_reihenfolge():
     assert positionen == sorted(positionen)
 
 
-def test_tabelle_20_zeilen_codes_in_katalogreihenfolge():
+def test_tabelle_21_zeilen_codes_in_katalogreihenfolge():
     zeilen = _tabellenzeilen(_abschnitt(_text(), "## Erhobene Größen"))
-    assert len(zeilen) == 20
+    assert len(zeilen) == 21
     assert [z[0] for z in zeilen] == [g["code"] for g in GROESSEN]
 
 

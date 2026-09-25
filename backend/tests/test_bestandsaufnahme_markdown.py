@@ -97,6 +97,21 @@ def test_datenluecken_saetze_wortlich_einmal():
         assert md.count(satz) == 1, satz
 
 
+def test_trends_zeigt_beide_jahre_veraenderung_und_modellgrenze():
+    from app.data.bevoelkerungsentwicklung import MODELLGRENZE
+
+    g = {"code": "bevoelkerungsentwicklung", "gruppe": "trends", "label": "Bevölkerungsentwicklung",
+         "einheit": "%", "wert": 5.0, "quellen": ["Destatis_GVISys_Bevoelkerung"], "luecke_satz": "",
+         "zusatz": {"jahr_alt": 2017, "jahr_neu": 2023, "einwohner_alt": 1000, "einwohner_neu": 1050}}
+    md = bestandsaufnahme_markdown({"kommune_id": 1, "name": "X", "groessen": [g]})
+    assert md.splitlines().count("## Trends") == 1
+    abschnitt = _abschnitt(md, "## Trends")
+    assert "Bevölkerungsentwicklung" in abschnitt
+    assert "31.12.2017: 1.000" in abschnitt and "31.12.2023: 1.050" in abschnitt
+    assert "Veränderung: 5,00 %" in abschnitt
+    assert abschnitt.index("Veränderung") < abschnitt.index(MODELLGRENZE)
+
+
 if __name__ == "__main__":
     import pytest
     sys.exit(pytest.main([__file__, "-q"]))
