@@ -18,7 +18,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 4 | Sensitivität (Anfälligkeit eines Systems gegenüber einem klimatischen Einfluss) und räumliche Exposition (Vorhandensein potenziell betroffener Systemelemente) sind begrifflich und methodisch getrennt zu führen, nicht zu vermischen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 (S. 44) | erfüllt | docs/methodik/95_hitzebelastung.md | — |
 | 5 | Die Analyse muss ihre methodischen Grenzen und ihren Anwendungsbereich explizit benennen, insbesondere dass sie keine detailliertere lokale oder sektorale Risikoanalyse ersetzt. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 1.4 (S. 35) | erfüllt | docs/methodik/95_hitzebelastung.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | — |
 | 6 | Klimawirkungen sind anhand des Klimarisikos (ohne Anpassung, pessimistischer Fall) und der Anpassungsdauer in Prioritätsstufen "sehr dringende" und "dringende" Handlungserfordernisse einzustufen, damit erkennbar ist, wo Anpassung schon jetzt beginnen muss. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.1 (S. 136–140) | teilweise | frontend/src/pages/roadmap/roadmapData.ts, docs/KATALOG_KRITIK.md | Die Produkt-Roadmap übernimmt die KWRA-Kategorie "sehr dringende Klimawirkungen" wörtlich, um die Ausbaureihenfolge zu begründen (zuerst die drei sehr dringenden Gesundheits-Klimawirkungen, danach 15 weitere). Es gibt aber keine im Produkt selbst nachvollziehbare, aus Klimarisiko und Anpassungsdauer hergeleitete Einstufung je Klimawirkung, und laut docs/KATALOG_KRITIK.md sind 10 der bundesweit 31 "sehr dringenden" Klimawirkungen im heutigen Katalog nicht abgebildet, weil sie ausgewählt statt systematisch aus der KWRA-Einstufung hergeleitet wurden. |
-| 7 | Klimawirkungen mit sehr dringenden Handlungserfordernissen sind anhand von Anpassungspotenzial und Bewertungsgewissheit in Charakterisierungsgruppen (Umsetzung, Entwicklung, Entwicklung unter Unsicherheit, Innovation, Innovation unter Unsicherheit) einzuordnen, um den Handlungstyp zu benennen. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.2 (S. 140–142) | erfüllt | backend/app/services/charakterisierung.py, backend/app/services/gewissheit.py, backend/app/api/routes/catalog.py, backend/tests/test_charakterisierungsgruppen.py | Jede Klimawirkung, die eine Dringlichkeitseinstufung trägt, wird nach einer dokumentierten Entscheidungstabelle aus Anpassungspotenzial und Gewissheitsstufe einer der fünf KWRA-Charakterisierungsgruppen zugeordnet und über die API ausgewiesen. |
+| 7 | Klimawirkungen mit sehr dringenden Handlungserfordernissen sind anhand von Anpassungspotenzial und Bewertungsgewissheit in Charakterisierungsgruppen (Umsetzung, Entwicklung, Entwicklung unter Unsicherheit, Innovation, Innovation unter Unsicherheit) einzuordnen, um den Handlungstyp zu benennen. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.2 (S. 140–142) | teilweise | backend/app/services/charakterisierung.py, backend/app/services/gewissheit.py, backend/app/api/routes/catalog.py, backend/tests/test_charakterisierungsgruppen.py | Die fünf Gruppen und eine dokumentierte Entscheidungstabelle sind vorhanden, die Schwellen sind nach P1 als Abschätzung von KAP3 ausgewiesen. Es fehlt aber, was die Einordnung nach Kap. 6.2 trägt: Beschlossene und weiterreichende Maßnahmen werden nicht getrennt, und es gibt keinen optimistischen und pessimistischen Fall. „Innovation“ heißt im Produkt nur, dass der Katalog keinen verknüpften Hebel ab 10 % hat, nicht, dass auch alle Maßnahmen das Ziel verfehlen. Die Gewissheit enthält nicht die Gewissheit der Anpassungskapazität. Die Ausnahme der KWRA für die Allergien (Bewertung auf Basis der beschlossenen Maßnahmen, Fn. 28/29) fehlt, ebenso eine gerechnete Sensitivität der Zuordnung und das Handlungserfordernis je Gruppe. Eingeordnet wird jeder Katalogcode, nicht nur die sehr dringenden. Ergebnis: Nur #95 Hitzebelastung liegt wie in Tabelle 27 in „Entwicklung“. #96 Aeroallergene (KWRA „Umsetzung“) und #98 UV-Schädigungen (KWRA „Entwicklung“) landen mit Anpassungspotenzial 0 in „Innovation“, weil keine Maßnahme im Rechenweg wirkt: Die Pollen-Frühwarnung ist nur qualitativ verknüpft, für UV gibt es keine Maßnahme. Die Modellgrenze der API nennt diese Ursache nicht. Einzelnachweis: Abschnitt „Gegenprobe Zeile 7“. |
 | 8 | Die Bewertungsgewissheit ist für jede Klimawirkung auf einer einheitlichen, mehrstufigen Skala (sehr gering bis hoch) auszuweisen und handlungsfeldübergreifend vergleichbar zu machen, damit erkennbar ist, wo hohe Unsicherheiten vorsichtige Interpretation erfordern. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 3.3 (S. 78–82) | erfüllt | backend/app/services/gewissheit.py, backend/app/api/routes/catalog.py, backend/tests/test_gewissheitsstufe.py | Jede Klimawirkung trägt eine kategoriale Gewissheitsstufe auf der vierstufigen Skala sehr gering/gering/mittel/hoch, abgeleitet nach einer dokumentierten Regel aus den Evidenzklassen ihrer Parameter und damit handlungsfeldübergreifend vergleichbar. |
 | 9 | Wechselwirkungen (Querverbindungen) zwischen einzelnen Klimawirkungen sind zu identifizieren und auszuwerten, damit erkennbar ist, welche Klimawirkungen besonders viele andere beeinflussen oder von ihnen beeinflusst werden. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 3.4 (S. 82–89) | teilweise | backend/app/data/kwra_querverbindungen.py, backend/app/services/querverbindungen.py, docs/QUERVERBINDUNGEN_KLIMAWIRKUNGEN.md, frontend/src/components/dashboard/RiskInteractionSection.tsx | Das Produkt übernimmt Ergebnisse der KWRA-Querverbindungsanalyse (Kennzahlen, 25 Netzrollen, 20 im Fließtext genannte Beziehungen, Systembereichs-Matrix aus Kap. 7), führt die Analyse aber nicht selbst: keine eigene Identifikation der Querbezüge und kein Abgleich mit den Klimawirkungsketten (UBA 2016); keine Darstellung der Querverbindungen zwischen den 13 Handlungsfeldern (Abb. 8); keine gegenseitigen Wechselwirkungen und kein Rückkopplungskreislauf Hitzebelastung – Bedarf an Kühlenergie – Stadtklima/Wärmeinseln (Abb. 9), obwohl Hitzebelastung und Stadtklima im Katalog stehen; keine gesonderte Auswertung der hoch bewerteten Klimawirkungen; die Netzrolle ist einwertig, obwohl eine Klimawirkung Sender und Empfänger zugleich sein kann. Die Dashboard-Tabelle zeigt nur Klimawirkungen des Katalogs, 13 der 25 Netzrollen – darunter Hochwasser, die zentrale Klimawirkung – erscheinen dort nicht. Einzelnachweis: Abschnitt „Gegenprobe Zeile 9“. |
 | 10 | Die Klimarisiken sind über die fünf übergeordneten Systembereiche (Natürliche Systeme und Ressourcen, Naturnutzende Wirtschaftssysteme, Infrastrukturen und Gebäude, Naturferne Wirtschaftssysteme, Menschen und soziale Systeme) hinweg vergleichbar auszuwerten, um Unterschiede in Risikohöhe und Anpassungsfähigkeit zwischen diesen Bereichen sichtbar zu machen. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 7 (S. 146–155) | teilweise | backend/app/data/catalog.py, backend/app/services/systembereiche.py, backend/tests/test_systembereiche.py, backend/app/data/kwra_querverbindungen.py | Die fünf KWRA-Systembereiche und die Querverbindungen zwischen ihnen (Tabelle 28) sind quellenfest vorhanden, der Vergleich selbst nicht: Alle drei gerechneten Klimawirkungen (#95, #96, #98) liegen in „Menschen und soziale Systeme“, die vier übrigen Bereiche bleiben leer, und die 49 Klimawirkungen der Roadmap tragen keinen Systembereich. Die Risikohöhe wird als Mittel des Produkt-Risikoindex verglichen, nicht wie in Kap. 7 als Anteil der hoch bewerteten Klimawirkungen je Zeitscheibe und Fall. Die Anpassungsfähigkeit — Wirksamkeit beschlossener und weiterreichender Anpassung, Klimarisiko mit Anpassung, Anpassungsdauer, Grenzen der Anpassung — wird je Bereich weder ermittelt noch verglichen, ebenso wenig Gewissheit, maßgebliche klimatische Einflüsse und Zahl der sehr dringenden und dringenden Handlungserfordernisse; die Schlüsse für die Anpassungsplanung (S. 153–154) fehlen. `systembereich_auswertung()` wird außer im Test nirgends aufgerufen. Einzelnachweis: Abschnitt „Gegenprobe Zeile 10“. |
@@ -179,6 +179,120 @@ zwei teilweise (A1, A2) und acht nicht (A3–A7, A9–A11); der Status der Zeile
 derselben Änderung auf `teilweise` gesetzt, die Spalte „Lücke“ nennt, was fehlt. Die Zählungen in den
 Abschnitten „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt; sie
 nachzuziehen ist Sache der Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 7 gegen KWRA 2021, Teilbericht 6, Kap. 6.2
+
+Frage: Tragen die vier in Zeile 7 genannten Belege die Einordnung in Charakterisierungsgruppen, die
+Kap. 6.2 „Charakterisierung der Handlungserfordernisse“ verlangt — und stimmen die Gruppen, die das
+Produkt ausweist, mit denen der KWRA überein? Gelesen wurde gegen
+`docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`; in Kap. 6.2 stimmen
+PDF-Seitenzahl und gedruckte Seitenzahl überein. Kap. 6.2 reicht von S. 140 bis S. 145, nicht nur bis
+S. 142, wie die Fundstelle der Zeile 7 angibt. `backend/app/services/charakterisierung.py` und die
+Route `GET /catalog/charakterisierungsgruppen` in `backend/app/api/routes/catalog.py` wurden vollständig
+gelesen, `backend/app/services/gewissheit.py` und `backend/tests/test_charakterisierungsgruppen.py` im
+Aufbau. `charakterisierungen()` wurde einmal ausgeführt, ohne etwas zu ändern:
+
+| Risikocode | Klimawirkung | Anpassungspotenzial p | Gewissheit | Gruppe im Produkt |
+|---|---|---|---|---|
+| EXPECTED_ANNUAL_MORTALITY | #95 Hitzebelastung | 0,259 | mittel | Entwicklung |
+| EXPECTED_ANNUAL_MORBIDITY | #95 Hitzebelastung | 0,259 | hoch | Entwicklung |
+| EXPECTED_ANNUAL_ALLERGY_DAYS | #96 Aeroallergene | 0,0 | mittel | Innovation |
+| EXPECTED_ANNUAL_UV_YLL | #98 UV-Schädigungen | 0,0 | hoch | Innovation |
+
+Der Katalog führt drei Maßnahmen (`catalog.MEASURES`). Nur `HEAT_ACTION_PLANS` (r = 0,05) und
+`VULNERABLE_GROUP_PROGRAMS` (r = 0,22) sind über `linked_risk_codes` mit einer Klimawirkung verknüpft,
+beide mit #95. `POLLEN_EARLY_WARNING` (r = 0,03) steht für #96 nur in `qualitative_risk_codes` und zählt
+in `anpassungspotenzial()` nicht. Für #98 gibt es keine Maßnahme.
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | Eingeordnet werden die „identifizierten Klimawirkungen mit sehr dringenden Handlungserfordernissen“, also die 31 aus Tabelle 25; Tabelle 27 führt davon 29, weil für die beiden mit Stern markierten („Beschädigung oder Zerstörung von Siedlung und Infrastruktur an der Küste“, „Innenraumklima“) keine Anpassungskapazität bewertet wurde. | 140, 138 (Tab. 25), 142 (Tab. 27) | `charakterisierung.py`, `charakterisierungen()` (läuft über alle Codes aus `catalog.RISKS_BY_CODE`) | trägt teilweise |
+| A2 | Erste Frage: „Reichen die beschlossenen Maßnahmen im optimistischen und im pessimistischen Fall aus, um das Restrisiko auf ein bestimmtes, gesetztes Niveau zu reduzieren?“ Gruppe I „Umsetzung“: Die beschlossenen Maßnahmen reichen aus. | 140 | `charakterisierung.py`, `anpassungspotenzial()` und `SCHWELLE_UMSETZUNG` (0,5) | trägt teilweise |
+| A3 | Zweite Frage: „Reichen die weiterreichenden Maßnahmen … aus …?“ Gruppe II „Entwicklung“: Die beschlossenen reichen nicht, weiterreichende schon. Gruppe IV „Innovation“: Es ist „relativ sicher, dass das Ziel … selbst bei der Umsetzung aller beschlossenen und weiterreichenden Maßnahmen nicht erreicht wird“. | 140–141, 143 | keiner. `SCHWELLE_ENTWICKLUNG` (0,1) fragt, ob der Katalog einen Hebel ab 10 % enthält, nicht, ob alle beschlossenen und weiterreichenden Maßnahmen das Ziel erreichen. | trägt nicht |
+| A4 | Dritte Frage: „Wie sicher sind die getroffenen Aussagen?“ Die Gesamtgewissheit kombiniert die Gewissheit der Bewertung des Klimarisikos ohne Anpassung mit der Gewissheit der Bewertung der Anpassungskapazität (Skalenwerte 0–3); „mittel“ gilt erst ab einem Mittelwert über 1,5. | 140, 141 | `gewissheit.py`, `gewissheitsstufe()` (Evidenzklassen der Parameter der Schadensrechnung); `AUSREICHENDE_GEWISSHEIT` in `charakterisierung.py` | trägt teilweise |
+| A5 | Fünf Gruppen: I Umsetzung, II Entwicklung, III Entwicklung unter Unsicherheit, IV Innovation, V Innovation unter Unsicherheit. Die beiden Varianten „unter Unsicherheit“ gibt es nur zu Entwicklung und Innovation. | 140–141 | `charakterisierung.py`, `CHARAKTERISIERUNGSGRUPPEN` und `ENTSCHEIDUNGSTABELLE`; `test_charakterisierungsgruppen.py`, `test_konstanten_fuenf_gruppen` und `test_tabelle_ueberdeckt_alle_eingaben_eindeutig` | trägt |
+| A6 | Jede Gruppe benennt ein Handlungserfordernis: die Umsetzung sicherstellen (Finanzierung, Monitoring, Einbindung der Akteure); weiterreichende Maßnahmen entwickeln und in die Planung aufnehmen, auch „high-regret“; Forschung, bevor weiterreichende Maßnahmen aufgegriffen werden; tiefgreifende Anpassung und ein fachlicher und gesellschaftlicher Diskurs; intensive Forschung zu weiterreichender und tiefgreifender Anpassung. | 140–141 | `catalog.py`, `get_charakterisierungsgruppen()`: liefert den Gruppennamen, aber keinen Text zum Handlungserfordernis | trägt teilweise |
+| A7 | Normative Vorgabe der beispielhaften Zuordnung: Im optimistischen Fall soll ein gering-mittleres Restrisiko nicht überschritten werden, im pessimistischen Fall wird ein mittleres angestrebt; „eine mittlere Gesamtgewissheit reicht aus“, um nicht in eine Gruppe „unter Unsicherheit“ zu fallen. | 141 | `charakterisierung.py`, `SCHWELLEN` (Wert, „Abschätzung von KAP3“, Herleitung, Band, Sensitivität) und `AUSREICHENDE_GEWISSHEIT` | trägt teilweise |
+| A8 | Die Zuordnung „reagiert in hohem Maße sensitiv“ auf das akzeptierte Restrisiko und die gewünschte Gewissheit. Eine Sensitivitätsanalyse weist robuste Zuordnungen aus: Bei einer Gewissheitsschwelle über 1 bleiben vier Klimawirkungen auf Forschung angewiesen, bei über 1,5 kommen neun hinzu. Beim Zielwert „gering-mittel“ auch im pessimistischen Fall reichen die beschlossenen Maßnahmen nur noch für eine Klimawirkung aus, bei „gering“ erreicht nur die Schiffbarkeit das Ziel. | 141, 143–144 | `SCHWELLEN`, Felder `band` und `sensitivitaet` (nur als Text, ohne Rechnung) | trägt teilweise |
+| A9 | Ausnahme: Bei „Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft (z. B. Pollen)“ und „Belastung oder Versagen von Hochwasserschutzsystemen“ erfolgt die Bewertung auf Basis der beschlossenen Maßnahmen (APA III); diese sind ausschlaggebend für die Zuordnung (Fn. 28, Fn. 29). | 141, 143 | keiner | trägt nicht |
+| A10 | Tabelle 27 weist die Gruppen beispielhaft zu. Für die Klimawirkungen des Katalogs: Hitzebelastung „Entwicklung“, Allergische Reaktionen durch Aeroallergene „Umsetzung“, UV-bedingte Gesundheitsschädigungen „Entwicklung“ (alle Handlungsfeld „Menschliche Gesundheit“). Im Produkt stimmt nur #95 (Entwicklung, beide Codes). Abweichungen: #96 KWRA „Umsetzung“ (S. 142, Tab. 27; Ausnahme S. 143, Fn. 29), Produkt „Innovation“; #98 KWRA „Entwicklung“ (S. 142, Tab. 27), Produkt „Innovation“. | 142 (Tab. 27), 143 | `charakterisierungen()`, ausgeliefert über `GET /catalog/charakterisierungsgruppen`; `regel()`, Feld `modellgrenze` | trägt teilweise |
+
+**Begründung je Urteil:**
+
+- A1: Das Produkt filtert nicht nach Dringlichkeit, sondern ordnet jeden Katalogcode ein. Im heutigen
+  Katalog fällt das nicht auf, weil alle drei gerechneten Klimawirkungen in Tabelle 25 stehen (S. 138).
+  Eine vierte Klimawirkung ohne sehr dringende Handlungserfordernisse bekäme trotzdem eine Gruppe. Eine
+  Einstufung nach Dringlichkeit führt das Produkt nicht (Zeile 6). Die übrigen 26 Klimawirkungen aus
+  Tabelle 27 stehen nicht im Katalog; sie zu zählen, ist Sache von T-0821-ceo und T-0830-ceo.
+- A2: Die Schwelle 0,5 ist eine ausgewiesene Übertragung des Restrisikoziels auf eine relative
+  Minderung. Das Produkt trennt aber weder beschlossene von weiterreichenden Maßnahmen, noch kennt es
+  einen optimistischen und einen pessimistischen Fall. Es misst nur, was der Katalog an verknüpften
+  Maßnahmen hinterlegt.
+- A3: Kern der Abweichung. In der KWRA sagt „Innovation“, dass selbst alle Maßnahmen nicht reichen. Im
+  Produkt heißt „Innovation“ nur, dass der Katalog keinen verknüpften Hebel ab 10 % enthält; bei p = 0
+  heißt es, dass gar keine Maßnahme verknüpft ist. Damit benennt das Produkt für #96 und #98 einen
+  Handlungstyp (tiefgreifende Anpassung), den die KWRA für diese beiden Klimawirkungen gerade nicht
+  benennt.
+- A4: Die Skala stimmt, und „mittel“ reicht wie in der KWRA. Die Stufe des Produkts beruht aber nur auf
+  den Belegen der Schadensparameter. Eine Gewissheit der Anpassungskapazität geht nicht ein, obwohl sie
+  in der KWRA die Hälfte der Gesamtgewissheit ausmacht.
+- A5: Namen und Aufbau stimmen wörtlich. „Umsetzung“ hat wie in der KWRA keine Unsicherheitsvariante.
+- A6: Der Gruppenname trägt den Handlungstyp nur als Schlagwort. Was die KWRA je Gruppe als
+  Handlungserfordernis beschreibt, gibt die API nicht aus. Ob es im Frontend angezeigt wird, ist nicht
+  Gegenstand dieser Gegenprobe (Sichtbarkeit, T-0483).
+- A7: Die Gewissheitsvorgabe ist wörtlich übernommen. Das Restrisikoziel ist durch eine Abschätzung von
+  KAP3 ersetzt, mit Herleitung, Band und Sensitivität; das erfüllt Vorgabe P1. Das Ziel für den
+  optimistischen Fall (gering-mittel) hat keine Entsprechung.
+- A8: Band und Sensitivität stehen als Text in `SCHWELLEN`. Eine Rechnung, welche Zuordnung an den
+  Bandenden stabil bleibt, gibt es nicht. Nachgerechnet mit den Werten oben: Über beide Bänder
+  (0,4–0,6 und 0,05–0,2) bleibt #95 bei 0,259 in „Entwicklung“, #96 und #98 bei 0 in „Innovation“.
+  Die Gewissheitsschwelle ist im Produkt fest.
+- A9: Genau diese Ausnahme betrifft #96. Die KWRA stützt „Umsetzung“ für die Allergien auf die
+  beschlossenen Maßnahmen des Bundes (APA III). Das Produkt kennt keine beschlossenen Maßnahmen als
+  eigene Größe, daher fehlt die Ausnahme.
+- A10: Die Abweichung ist zum Teil ausgewiesen: `regel()["modellgrenze"]` sagt allgemein, die Gruppe
+  „kann … abweichen“, und die Schwellen sind nach P1 als Abschätzung gekennzeichnet. Nicht ausgewiesen
+  ist die Ursache je Klimawirkung, und die liegt nicht bei den Schwellen. Sie liegt bei fehlenden
+  Maßnahmen im Rechenweg:
+  - #96: Der Methodik-Bericht `docs/methodik/96_aeroallergene.md` hat zwei Hebel mit Wirkung. Der erste
+    ist die Pollen-Frühwarnung S158 mit r = 0,03 (Band 0,005–0,10) als Abschätzung nach Vorgabe P2
+    (§5.1). Sie bleibt nach Integrationsauflage aus Befund 124 absichtlich ohne `linked_risk_codes`;
+    selbst verknüpft läge sie mit 0,03 unter 0,1. Der zweite ist die allergenarme Stadtbaumwahl mit 14 %
+    je Zelle; sie wirkt nur als Umverteilung und ist keine Katalogmaßnahme (§5).
+  - #98: `docs/methodik/98_uv_schaedigungen.md` führt beide Hebel nur qualitativ (§5, Entscheidungslog 12).
+    Die UV-Schutzprogramme S155 haben keine Effektgröße, die Früherkennung S158 steckt schon im Basiswert
+    (Befund 203).
+
+  Zum angemeldeten Zweifel heißt das: Es ist keine reine Modellgrenze der Schwellen. Das Anpassungspotenzial
+  0 für #96 und #98 heißt „keine wirkende Maßnahme im Rechenweg“, nicht „Anpassung reicht nicht“. Das
+  Produkt liest es aber als Gruppe „Innovation“ und stellt damit die Lage anders dar als die KWRA.
+  Bei den Zahlen bemerkt: Der Text auf S. 142 nennt vier Klimawirkungen in „Umsetzung“, Tabelle 27
+  (als Bild angesehen) führt drei. „Abiotischer Stress (Pflanzen)“ steht dort in „Entwicklung“.
+
+Nicht als Anforderung an die Einordnung gewertet: der zweite Teil von Kap. 6.2, „Charakterisierung
+aufgrund der Anpassungsdimensionen“ (S. 144–145). Er beschreibt eine eigene Auswertung der sechs
+Anpassungsdimensionen und ordnet nicht in Gruppen ein.
+
+**Gelesene Seiten und Abschnitte:** Inventar mit `python3 /opt/overlord/overlord/skripte/dokumente.py
+inventar` (172 Seiten). Inhaltsverzeichnis S. 6–7 ganz überflogen. Kap. 6.2 „Charakterisierung der
+Handlungserfordernisse“ S. 140–145 vollständig im Text gelesen, einschließlich Fußnote 28 (S. 141) und
+Fußnote 29 (S. 143). Dazu das Ende von Kap. 6.1 oben auf S. 140 und S. 146 mit dem Beginn von Kap. 7
+(Kapitelgrenze geprüft). Tabelle 25 „31 Klimawirkungen mit sehr dringenden Handlungserfordernissen“
+(S. 138, Kap. 6.1) im Text gelesen, weil A1 sich auf sie stützt. Als Bild angesehen: S. 142 mit
+Tabelle 27 „Kategorien von sehr dringenden Handlungserfordernissen“, ganz übernommen: 3 in Umsetzung,
+10 in Entwicklung, 4 in Entwicklung mit Unsicherheit, 3 in Innovation, 9 in Innovation unter
+Unsicherheit, zusammen 29. Kap. 6.2 enthält keine weitere Tabelle oder Abbildung. Nicht gelesen:
+Kap. 5 (Anpassungskapazität, Tabellen 21–24), auf dem Kap. 6.2 aufbaut; Tabelle 26; Teilbericht 1,
+auf den Fn. 28 für die Gesamtgewissheit verweist. Im Produkt gelesen: `docs/methodik/96_aeroallergene.md`
+§5 und §5.1 (Kopf) sowie Entscheidungslog 15, 19 und 20; `docs/methodik/98_uv_schaedigungen.md` die
+Hebelzeilen S155 und S158, Register 98-S155-01 und 98-S158-01, §5 und Entscheidungslog 12.
+
+**Schluss:** Zeile 7 bleibt nicht `erfüllt`. Von 10 Anforderungen trägt der Bestand eine voll (A5),
+sieben teilweise (A1, A2, A4, A6, A7, A8, A10) und zwei nicht (A3, A9). Nur eine der drei Klimawirkungen
+des Katalogs (#95) landet in der Gruppe der KWRA. Der Status der Zeile 7 ist in derselben Änderung
+auf `teilweise` gesetzt, die Spalte „Lücke“ nennt, was fehlt. Die Zählungen in den Abschnitten
+„Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt; sie nachzuziehen ist
+Sache der Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
 
 ## Ergebnis
 
