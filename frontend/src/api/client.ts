@@ -198,6 +198,9 @@ export interface Systembereich {
   risk_codes: string[]
   mittlerer_index: number | null
   schadenskosten_eur: number | null
+  klimawirkungen_im_katalog: number
+  /** Text „x von y Klimawirkungen in Euro beziffert“. */
+  euro_beziffert: string
   /** Gesetzt, wenn der Bereich leer ist: Begründung, die in der Zeile steht (nie ausgeblendet). */
   leer_grund: string | null
 }
