@@ -46,8 +46,29 @@ def test_klimawirkungen_eintraege_haben_erwartete_form():
         assert eintrag["eingehende_benannte"] >= 0
 
 
-def test_summe_ausgehende_benannte_hoechstens_zahl_der_beziehungen():
-    # Obergrenze = Zahl der benannten Beziehungen im Datenmodul (27 seit T-0936).
+def test_summe_ausgehende_benannte_hoechstens_zahl_der_gezaehlten_richtungen():
+    # Obergrenze = gezählte Richtungen: jede Beziehung einmal, eine „gegenseitige“
+    # zweimal, weil sie bei beiden Klimawirkungen aus- und eingehend zählt (T-0937).
     ergebnis = querverbindungs_auswertung()
-    summe = sum(e["ausgehende_benannte"] for e in ergebnis["klimawirkungen"])
-    assert summe <= len(kq.BENANNTE_BEZIEHUNGEN)
+    obergrenze = sum(
+        2 if b["richtung"] == "gegenseitig" else 1 for b in kq.BENANNTE_BEZIEHUNGEN
+    )
+    summe_aus = sum(e["ausgehende_benannte"] for e in ergebnis["klimawirkungen"])
+    summe_ein = sum(e["eingehende_benannte"] for e in ergebnis["klimawirkungen"])
+    assert summe_aus <= obergrenze
+    assert summe_ein <= obergrenze
+
+
+def test_gegenseitige_beziehung_zaehlt_bei_beiden_aus_und_eingehend():
+    # Bedarf an Kühlenergie (#65) ↔ Stadtklima/Wärmeinseln (#62), TB 6 S. 85: #62 ist
+    # im Katalog und zählt die Beziehung deshalb als ausgehend und als eingehend.
+    je_id = {e["kwra_id"]: e for e in querverbindungs_auswertung()["klimawirkungen"]}
+    assert je_id[62]["ausgehende_benannte"] == 2  # → #95 und ↔ #65
+    assert je_id[62]["eingehende_benannte"] == 1  # ↔ #65
+
+
+def test_netzrollen_mehrwertig_und_zentral_im_dienst():
+    for e in querverbindungs_auswertung()["klimawirkungen"]:
+        assert set(e["netzrollen"]) <= {"stark ausgehend", "stark eingehend"}
+        assert (e["netzrolle"] is None) == (e["netzrollen"] == [])
+        assert isinstance(e["zentral"], bool)

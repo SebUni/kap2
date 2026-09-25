@@ -40,23 +40,31 @@ def querverbindungs_auswertung() -> dict:
         kid = p["kwra_id"]
         klimawirkungen_je_id.setdefault(kid, {"kwra_id": kid, "name": _klimawirkung_name(p)})
 
-    netzrolle_je_id = {e["kwra_id"]: e["rolle"] for e in kq.NETZROLLEN}
+    netzrolle_je_id = {e["kwra_id"]: e for e in kq.NETZROLLEN}
 
+    # Eine Beziehung mit richtung „gegenseitig“ wirkt in beide Richtungen (TB 6 Kap. 3.4,
+    # S. 82, 85–86) und zählt deshalb bei beiden Klimawirkungen als aus- und eingehend.
     ausgehend_je_id: dict[int, int] = {}
     eingehend_je_id: dict[int, int] = {}
     for beziehung in kq.BENANNTE_BEZIEHUNGEN:
         quelle_id = beziehung.get("quelle_kwra_id")
         ziel_id = beziehung.get("ziel_kwra_id")
-        if quelle_id is not None:
-            ausgehend_je_id[quelle_id] = ausgehend_je_id.get(quelle_id, 0) + 1
-        if ziel_id is not None:
-            eingehend_je_id[ziel_id] = eingehend_je_id.get(ziel_id, 0) + 1
+        kanten = [(quelle_id, ziel_id)]
+        if beziehung.get("richtung") == "gegenseitig":
+            kanten.append((ziel_id, quelle_id))
+        for von_id, nach_id in kanten:
+            if von_id is not None:
+                ausgehend_je_id[von_id] = ausgehend_je_id.get(von_id, 0) + 1
+            if nach_id is not None:
+                eingehend_je_id[nach_id] = eingehend_je_id.get(nach_id, 0) + 1
 
     klimawirkungen = [
         {
             "kwra_id": kid,
             "name": eintrag["name"],
-            "netzrolle": netzrolle_je_id.get(kid),
+            "netzrolle": netzrolle_je_id[kid]["rolle"] if kid in netzrolle_je_id else None,
+            "netzrollen": list(netzrolle_je_id[kid]["rollen"]) if kid in netzrolle_je_id else [],
+            "zentral": netzrolle_je_id[kid]["zentral"] if kid in netzrolle_je_id else False,
             "ausgehende_benannte": ausgehend_je_id.get(kid, 0),
             "eingehende_benannte": eingehend_je_id.get(kid, 0),
         }
