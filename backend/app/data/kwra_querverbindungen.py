@@ -87,7 +87,7 @@ NETZROLLEN: list[dict] = [
     {"kwra_id": 1, "name": "Veränderung der Länge der Vegetationsperiode und Phänologie",
      "handlungsfeld": "Biologische Vielfalt", "rolle": "stark ausgehend",
      "rollen": ["stark ausgehend"], "zentral": False,
-     "seiten": [84],
+     "seiten": [84, 85],
      "auswertungen": ["gesamt"]},
     {"kwra_id": 4, "name": "Verschiebung von Arealen und Rückgang der Bestände",
      "handlungsfeld": "Biologische Vielfalt", "rolle": "stark ausgehend",
