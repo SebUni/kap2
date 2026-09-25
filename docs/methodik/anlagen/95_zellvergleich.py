@@ -26,7 +26,8 @@ ist („–“; das Produkt setzt dort heute 65+ = 0, Befund 104):
            Rest R = Z − Einwohner ab 65 der Zellen mit veröffentlichtem Anteil − Einwohner ab 65 aus Stufe 1;
            jede übrige geheimgehaltene Zelle bekommt R / Einwohner dieser Zellen, begrenzt auf 0–100 %
            (R < 0 gibt 0). Das gilt auch für Gemeinden ohne Zelle mit veröffentlichtem Anteil.
-  Ohne Zeile in [69] (Gebietsstand) oder mit „.“ dort bleibt Stufe 2 aus (Ausgabe „ohne Ersatzwert“).
+  Fehlt die Gemeindezeile in [69] (Gebietsstand) oder steht dort „.“, gilt A_G der Kreiszeile (erste fünf
+  Stellen des AGS); fehlt auch sie, bleibt Stufe 2 aus (Ausgabe „ohne Ersatzwert“).
 Ausgegeben werden die Einwohner ab 65 heute und mit Regel, der Jahresbetrag nach heutiger Produktlogik
 (Zellen wie (c), dazu (d)), der Jahresbetrag mit Ersatzregel (ebenso mit (d)), der Faktor heute gegen
 Ersatzregel und die Spanne des Faktors, wenn die Gruppe 60–66 gar nicht (0/7) oder ganz (7/7) zählt.
@@ -36,7 +37,8 @@ Mit --rangliste (ohne --gemeinde) zählt das Skript für alle Gemeinden aus VG25
 Zellen mit geheimgehaltenem Anteil 65+ aus und nennt die Gemeinden mit dem höchsten Anteil unter denen mit
 2000 bis unter 10.000 Einwohnern im Gitter (Wahl der ländlichen Beispielkommune in §3.3; einige Minuten).
 Dazu zählt es, in wie vielen Gemeinden der Rest R der Stufe 2 unter null liegt (Modellgrenze §3.3), in
-wie vielen der Anteil der Stufe 2 auf 100 % begrenzt wird und wie viele keine Zeile in [69] haben.
+wie vielen der Anteil der Stufe 2 auf 100 % begrenzt wird, wie viele A_G aus der Kreiszeile nehmen und wie
+viele weder eine Gemeinde- noch eine Kreiszeile in [69] haben.
 
 Parameter: Kapitel 7 des Berichts (Zeilen „wert:“), Wochenquantile aus der Tabelle §3.2 wie die
 Rechenkette (mit --wochenquantile produkt aus backend/data/kalibrierung/wochenquantile_region.csv
@@ -339,11 +341,15 @@ DEMOGRAFIE_URL = "https://www.destatis.de/static/DE/zensus/gitterdaten/Regionalt
 ANTEIL_60_66 = 2 / 7
 
 
+KREISEBENE = "Stadtkreis/kreisfreie Stadt/Landkreis"
+
+
 def zensus_demografie(cache: Path) -> dict:
-    """AGS (8 Stellen) -> (Insgesamt, 60–66, ab 67) je Gemeinde aus dem Blatt „CSV-Demografie“ von [69].
+    """(Insgesamt, 60–66, ab 67) aus dem Blatt „CSV-Demografie“ von [69]: je Gemeinde unter dem AGS
+    (8 Stellen), je Kreis unter dem Kreisschlüssel (5 Stellen; Rückfall der Stufe 2, Befund 119).
 
     Zeichen nach der Zeichenerklärung von [69]: „–“ = genau null oder auf null geändert (zählt als 0),
-    „.“ = Zahlenwert unbekannt oder geheim (die Gemeinde bekommt keinen Wert, None)."""
+    „.“ = Zahlenwert unbekannt oder geheim (die Zeile bekommt keinen Wert, None)."""
     import xml.etree.ElementTree as ET
     import re
     ns = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
@@ -368,7 +374,8 @@ def zensus_demografie(cache: Path) -> dict:
         if kopf is None:
             kopf = {name: sp for sp, name in zeile.items()}
             continue
-        if zeile.get(kopf["Regionalebene"]) != "Gemeinde":
+        ebene = zeile.get(kopf["Regionalebene"])
+        if ebene not in ("Gemeinde", KREISEBENE):
             continue
 
         def zahl(name):
@@ -378,8 +385,18 @@ def zensus_demografie(cache: Path) -> dict:
                                                  "Alter_infr__11"))
         ars = zeile[kopf["_RS"]]
         ok = None not in (ges, g60, g67, g75) and ges > 0
-        daten[ars[:5] + ars[9:]] = (ges, g60, g67 + g75) if ok else None
+        daten[ars[:5] + ars[9:] if ebene == "Gemeinde" else ars[:5]] = (ges, g60, g67 + g75) if ok else None
     return daten
+
+
+def demografie_fuer(demografie: dict, ags: str):
+    """Zeile aus [69] für eine Gemeinde: die Gemeindezeile; fehlt sie (anderer Gebietsstand) oder steht dort
+    „.“, die Kreiszeile (erste fünf Stellen des AGS); sonst keine. Gibt (Zeile, "Gemeinde"|"Kreis"|None)."""
+    if demografie.get(ags) is not None:
+        return demografie[ags], "Gemeinde"
+    if demografie.get(ags[:5]) is not None:
+        return demografie[ags[:5]], "Kreis"
+    return None, None
 
 
 def zielanteil_ab65(zeile, teil: float = ANTEIL_60_66) -> float:
@@ -743,14 +760,15 @@ def rangliste(cache: Path, vg250_url: str, von: int = 2_000, bis: int = 10_000, 
                         ew_fest += fest
                         ew_s2 += e if s2 else 0.0
         if ew > 0:
-            zeile = demografie.get(ags)
+            zeile, ebene = demografie_fuer(demografie, ags)
             r = zielanteil_ab65(zeile) * ew - ew_fest if zeile is not None else None
-            liste.append((ags, name, ew, ew_g, offen, ew_s2, r))
+            liste.append((ags, name, ew, ew_g, offen, ew_s2, r, ebene))
     klein = [z for z in liste if z[2] < bis]
     quoten = sorted(z[3] / z[2] for z in klein)
     ohne = [z for z in liste if z[4] == 0]
     mit_s2 = [z for z in liste if z[5] > 0]
     ohne_zeile = [z for z in mit_s2 if z[6] is None]
+    kreis = [z for z in mit_s2 if z[7] == "Kreis"]
     negativ = [z for z in mit_s2 if z[6] is not None and z[6] < 0]
     voll = [z for z in mit_s2 if z[6] is not None and z[6] > z[5]]
     print(f"Rangliste #95 — {de_int(len(liste))} Gemeinden mit Einwohnern im Zensus-Gitter, "
@@ -763,19 +781,22 @@ def rangliste(cache: Path, vg250_url: str, von: int = 2_000, bis: int = 10_000, 
     print(f"Gemeinden ohne Zelle mit veröffentlichtem Anteil 65+: {de_int(len(ohne))} mit zusammen "
           f"{de_int(sum(z[2] for z in ohne))} Einwohnern (Stufe 2 gilt auch für sie)")
     ew_s2 = sum(z[5] for z in mit_s2)
-    print(f"Stufe 2 der Ersatzregel (Rest aus der Gemeindesumme [69], 2/7 der Gruppe 60–66): "
+    print(f"Stufe 2 der Ersatzregel (Rest aus der Gemeindesumme [69], 2/7 der Gruppe 60–66, ohne Gemeindezeile "
+          f"die Kreiszeile): "
           f"{de_int(len(mit_s2))} Gemeinden mit Zellen der Stufe 2, darin {de_int(ew_s2)} Einwohner")
     for text, gruppe in (("Rest R < 0 (Stufe 2 gibt 0 %, Modellgrenze)", negativ),
                          ("Rest R über den Einwohnern der Stufe 2 (auf 100 % begrenzt)", voll),
-                         ("keine Zeile in [69] oder „.“ dort (ohne Ersatzwert)", ohne_zeile)):
+                         ("A_G aus der Kreiszeile (keine Gemeindezeile in [69] oder „.“ dort)", kreis),
+                         ("weder Gemeinde- noch Kreiszeile in [69] (ohne Ersatzwert, Modellgrenze)", ohne_zeile)):
         e2 = sum(z[5] for z in gruppe)
         print(f"  {text}: {de_int(len(gruppe))} Gemeinden, {de_int(e2)} Einwohner in Zellen der Stufe 2 "
               f"({de(100 * e2 / ew_s2, 1) if ew_s2 else '–'} %)")
     if negativ:
-        print(f"    R < 0 im Median {de_int(sorted(z[6] for z in negativ)[len(negativ) // 2])} Einwohner ab 65; "
-              f"größter Überhang {de_int(min(z[6] for z in negativ))}")
+        ueberhang = sorted(-z[6] for z in negativ)
+        print(f"    Überhang bei R < 0 (Einwohner ab 65 über der Zielzahl): Median {de_int(ueberhang[len(ueberhang) // 2])}, "
+              f"größter {de_int(ueberhang[-1])}")
     print(f"Höchster Anteil unter den Gemeinden mit {de_int(von)} bis unter {de_int(bis)} Einwohnern:")
-    for ags, name, ew, ew_g, offen, _s2, _r in sorted((z for z in klein if z[2] >= von),
+    for ags, name, ew, ew_g, offen, _s2, _r, _eb in sorted((z for z in klein if z[2] >= von),
                                                      key=lambda z: -z[3] / z[2])[:n]:
         print(f"  {ags} {name}: {de_int(ew)} Einwohner, davon {de_int(ew_g)} ({de(100 * ew_g / ew, 1)} %) "
               f"in geheimgehaltenen Zellen; {de_int(offen)} Zellen mit veröffentlichtem Anteil")
@@ -928,7 +949,7 @@ def main():
     ew_stufe2 = sum(ew[i] for i in stufe2_idx)
     ew65_mit = sum(cell_inputs[i]["pop_over_65"] for i in mit)
     ew65_stufe1 = sum(ew[i] * stufe[i][1] for i in stufe)
-    demo = zensus_demografie(cache).get(ags) if args.ersatz else None
+    demo, demo_ebene = demografie_fuer(zensus_demografie(cache), ags) if args.ersatz else (None, None)
 
     def regel_zellen(teil):
         """Zellen mit Ersatzregel; teil = gezählter Anteil der Gruppe 60–66 (Vorgabe 2/7)."""
@@ -1002,7 +1023,7 @@ def main():
                       f"{sum(1 for i in idx1 if stufe[i][1] > 1)} Zellen")
         print(zeile)
         if demo is None:
-            print(f"  Stufe 2: keine Zeile für {ags} in der Regionaltabelle Demografie [69] (oder „.“ dort); "
+            print(f"  Stufe 2: weder Gemeinde- noch Kreiszeile für {ags} in der Regionaltabelle Demografie [69]; "
                   f"{de_int(len(stufe2_idx))} Zellen mit {de_int(ew_stufe2)} Einwohnern ohne Ersatzwert, "
                   f"rechnen wie heute")
         else:
@@ -1010,7 +1031,7 @@ def main():
             a_g = zielanteil_ab65(demo)
             print(f"  Stufe 2, Rest aus der Gemeindesumme: {de_int(len(stufe2_idx))} Zellen, "
                   f"{de_int(ew_stufe2)} Einwohner")
-            print(f"    Zensus 2022 [69]: {de_int(ges)} Einwohner, 60–66: {de_int(g60)}, ab 67: {de_int(ab67)}; "
+            print(f"    Zensus 2022 [69], {'Gemeindezeile' if demo_ebene == 'Gemeinde' else 'Kreiszeile'}: {de_int(ges)} Einwohner, 60–66: {de_int(g60)}, ab 67: {de_int(ab67)}; "
                   f"A_G = ({de_int(ab67)} + 2/7 × {de_int(g60)}) / {de_int(ges)} = {de(100 * a_g, 2)} %")
             print(f"    Zielzahl Z = {de(100 * a_g, 2)} % × {de_int(sum_ew)} = {de_int(st2[1])}; "
                   f"fest: {de_int(ew65_mit)} (Zellen mit veröffentlichtem Anteil) + {de_int(ew65_stufe1)} "
