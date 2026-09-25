@@ -221,15 +221,13 @@ def get_kommune_systembereiche(kommune_id: int, db: Session = Depends(get_db)):
     )
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
-    try:
+    # Ein Aggregat gibt es erst nach der Berechnung. Ohne sie legt die Engine für jedes
+    # Katalogrisiko einen Nulleintrag an; das wäre keine leere, sondern eine falsche Auswertung.
+    liegt_aggregat_vor = assessment_is_done(db, kommune.id)
+    if liegt_aggregat_vor:
         agg = get_risk_aggregate(db, kommune.id, apply_measures=False)
-    except Exception:  # noqa: BLE001 - kein Aggregat ⇒ leere Bereiche mit Grund, nie 500
-        agg = None
-    if not isinstance(agg, dict) or not (agg.get("cost") or {}).get("by_risk"):
-        agg = {"cost": {"by_risk": []}}
-        liegt_aggregat_vor = False
     else:
-        liegt_aggregat_vor = True
+        agg = {"cost": {"by_risk": []}}
     auswertung = systembereich_auswertung(agg)
     bereiche = []
     for name in catalog.KWRA_SYSTEMBEREICHE:
