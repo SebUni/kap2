@@ -76,3 +76,22 @@ def test_unsicherheits_zusammenschau_unbekannte_kommune_404(client):
     antwort = client.get(f"/api/kommune/{UNBEKANNTE_KOMMUNE_ID}/unsicherheits-zusammenschau")
     assert antwort.status_code == 404
     assert antwort.json()["detail"] == "Kommune nicht gefunden"
+
+
+def test_kurzfassung_vorhandene_kommune(client, monkeypatch):
+    """Dienste ersetzt (keine Rechendaten in der Testdatenbank); geprüft wird die Route."""
+    from app.services import cost_projection_service, measure_service
+
+    monkeypatch.setattr(measure_service, "get_risk_aggregate",
+                        lambda *a, **k: {"cost": {"total_eur": 1000.0, "by_risk": []}})
+    monkeypatch.setattr(cost_projection_service, "project_costs", lambda *a, **k: {
+        "years": [2025, 2065],
+        "scenarios": {
+            "rcp45": {"label": "RCP 4.5", "no_measures": {"cumulative": [1.0, 2.0]}},
+            "rcp85": {"label": "RCP 8.5", "no_measures": {"cumulative": [1.0, 3.0]}},
+        }})
+    monkeypatch.setattr(measure_service, "build_cost_summary",
+                        lambda *a, **k: {"measures": {"rows": []}})
+    antwort = client.get(f"/api/kommune/{KOMMUNE_A_ID}/kurzfassung")
+    assert antwort.status_code == 200, antwort.text
+    assert "## Erwartete Schadenssumme" in antwort.text

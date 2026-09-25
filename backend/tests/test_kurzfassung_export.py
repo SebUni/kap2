@@ -17,6 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from app.data import catalog  # noqa: E402
 from app.services.kurzfassung_markdown import kurzfassung_markdown  # noqa: E402
 
 UEBERSCHRIFTEN = [
@@ -54,6 +55,8 @@ def _projektion() -> dict:
 def _kostenuebersicht() -> dict:
     zeilen = [
         {"name": f"Maßnahme {i}", "annual_benefit_eur": 10_000.0 * (i + 1),
+         "annual_benefit_damage_eur": 10_000.0 * (i + 1),
+         "annual_benefit_flat_eur": 0.0, "annual_benefit_direct_eur": 0.0,
          "capex_eur": 50_000.0, "opex_annual_eur": 1_000.0,
          "benefit_has_euro_layer": True}
         for i in range(7)
@@ -110,3 +113,32 @@ def test_zahlen_unveraendert_aus_den_diensten():
     # wirksamste Maßnahme (höchster Nutzen) zuerst
     massnahmen = _datenzeilen(abschnitte[UEBERSCHRIFTEN[3]])
     assert massnahmen[0].startswith("| Maßnahme 6 | 70.000 € |")
+
+
+def test_d_abschnitt_3_enthaelt_zaehler_aus_catalog():
+    summe = _abschnitte(_dokument())[UEBERSCHRIFTEN[2]]
+    assert catalog.euro_coverage().text in summe
+
+
+def test_e_abschnitt_3_nennt_beide_szenarien():
+    summe = _abschnitte(_dokument())[UEBERSCHRIFTEN[2]]
+    assert "RCP 8.5" in summe and "RCP 4.5" in summe
+    assert "3 €" in summe  # letzter kumulierter Wert RCP 4.5 (3,0) unverändert
+
+
+def test_f_reihenfolge_nach_vermiedenem_schaden_nicht_nach_zusatznutzen():
+    a = {"name": "Maßnahme A", "annual_benefit_eur": 900_000.0,
+         "annual_benefit_damage_eur": 10_000.0, "annual_benefit_flat_eur": 0.0,
+         "annual_benefit_direct_eur": 890_000.0,
+         "capex_eur": 1.0, "opex_annual_eur": 1.0, "benefit_has_euro_layer": True}
+    b = {"name": "Maßnahme B", "annual_benefit_eur": 200_000.0,
+         "annual_benefit_damage_eur": 150_000.0, "annual_benefit_flat_eur": 50_000.0,
+         "annual_benefit_direct_eur": 0.0,
+         "capex_eur": 1.0, "opex_annual_eur": 1.0, "benefit_has_euro_layer": True}
+    text = kurzfassung_markdown("Musterstadt", _aggregat(), _projektion(),
+                                {"measures": {"rows": [a, b]}})
+    abschnitt = _abschnitte(text)[UEBERSCHRIFTEN[3]]
+    assert "Vermiedener Schaden €/Jahr" in abschnitt and "Zusatznutzen €/Jahr" in abschnitt
+    daten = _datenzeilen(abschnitt)
+    assert daten[0].startswith("| Maßnahme B | 200.000 € | 0 € |"), daten
+    assert daten[1].startswith("| Maßnahme A | 10.000 € | 890.000 € |"), daten
