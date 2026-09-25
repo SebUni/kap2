@@ -5,10 +5,11 @@ demselben regionalisierten DWD-Klimasignal wie die Risiko-Index-Projektion
 (``projection_service.scenario_factors``) und preist auf dem Maßnahmenpfad die
 Maßnahmenkosten ein: OPEX jährlich ab Umsetzungsjahr, CAPEX einmalig im
 Umsetzungsjahr. Die kumulierten Kosten werden zusätzlich als Barwerte
-ausgewiesen, abgezinst mit einer Diskontrate von 0 % und 1 %. Diese ist hier
-gleich der Reinen Zeitpräferenzrate gesetzt (UBA Methodenkonvention 4.0,
-Kap. 2.2.3); die Komponente der relativen Preise ist nicht angesetzt. Bewusste,
-im Response dokumentierte Vereinfachung — Maßnahmenwirkung zeitkonstant.
+ausgewiesen. Die Diskontrate ist nach UBA Methodenkonvention 4.0, Kap. 2.2.3,
+die Summe aus Reiner Zeitpräferenzrate (RZPR, 0 % und 1 %) und der Komponente
+der relativen Preise (``app.data.diskontierung``, vorläufig 0 Pp. als
+Abschätzung von KAP3). Bewusste, im Response dokumentierte Vereinfachung —
+Maßnahmenwirkung zeitkonstant.
 """
 
 from __future__ import annotations
@@ -18,15 +19,30 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.data import catalog
+from app.data import diskontierung
+# Weiter aus diesem Modul importierbar; Quelle ist app.data.diskontierung.
+from app.data.diskontierung import PURE_TIME_PREFERENCE_RATES  # noqa: F401
 from app.services.climate.dwd_data import get_climate_projection
 from app.services.measure_service import get_risk_aggregate, kommune_measures_query
 from app.services.projection_service import scenario_factors
 
-# Diskontraten von 0 % und 1 %, hier gleich der Reinen Zeitpräferenzrate (RZPR)
-# der UBA Methodenkonvention 4.0, Kap. 2.2.3 gesetzt; die Komponente der
-# relativen Preise ist nicht angesetzt. Mindestens zwei Werte berichten, um die
-# Sensitivität gegenüber der Zeitpräferenz zu zeigen.
-PURE_TIME_PREFERENCE_RATES: tuple[float, ...] = (0.0, 0.01)
+
+def _diskontraten() -> dict[str, float]:
+    """Diskontrate je RZPR: RZPR + Komponente der relativen Preise.
+
+    Schlüssel ist die RZPR als Zeichenfolge (wie im Feld ``discounted``). Die
+    Komponente wird zur Laufzeit aus ``app.data.diskontierung`` gelesen."""
+    komponente = diskontierung.RELATIVE_PRICE_COMPONENT
+    return {str(r): r + komponente for r in diskontierung.PURE_TIME_PREFERENCE_RATES}
+
+
+def _prozent(anteil: float) -> str:
+    """Dezimalanteil als Prozentzahl mit Dezimalkomma, ohne überflüssige Stellen
+    (0.01 → „1“, 0.005 → „0,5“, 0.0 → „0“)."""
+    wert = round(anteil * 100, 4)
+    if wert == 0:
+        wert = 0.0  # kein „-0“
+    return f"{wert:g}".replace(".", ",")
 
 
 def _group_costs(agg: dict) -> dict[str, float]:
@@ -109,16 +125,15 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
     def _discounted(series: list[float]) -> dict[str, list[float]]:
         """Kumulierte Kosten als Barwerte je Diskontrate (UBA MK 4.0, Kap. 2.2.3):
         mindestens 0 % und 1 %, abgezinst auf das Basisjahr ``years[0]`` mit dem
-        Faktor 1/(1+r)^(Jahr − Basisjahr). Die Diskontrate ist hier gleich der
-        Reinen Zeitpräferenzrate gesetzt; die Komponente der relativen Preise
-        ist nicht angesetzt."""
+        Faktor 1/(1+d)^(Jahr − Basisjahr). Die Diskontrate d ist je RZPR r gleich
+        r + Komponente der relativen Preise; Schlüssel bleibt die RZPR."""
         out: dict[str, list[float]] = {}
-        for rate in PURE_TIME_PREFERENCE_RATES:
+        for key, rate in _diskontraten().items():
             running, row = 0.0, []
             for year, value in zip(years, series):
                 running += value / ((1.0 + rate) ** (year - years[0]))
                 row.append(round(running, 2))
-            out[str(rate)] = row
+            out[key] = row
         return out
 
     def _scenario_block(scenario: str) -> dict:
@@ -175,6 +190,12 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
     # dort ein belegter Kostensatz, sind auch die Projektionswerte Untergrenzen.
     lb = base["cost"].get("lower_bound")
 
+    diskontraten = _diskontraten()
+    komponente = diskontierung.RELATIVE_PRICE_COMPONENT
+    rzpr = list(diskontierung.PURE_TIME_PREFERENCE_RATES)
+    raten_text = " und ".join(f"{_prozent(v)} %" for v in diskontraten.values())
+    rzpr_text = " und ".join(f"{_prozent(v)} %" for v in rzpr)
+
     out = {
         "years": years,
         "base_year_damages_eur": round(total_base, 2),
@@ -190,12 +211,27 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             "DWD-Hitzetage-Trend (gleiches Klimasignal wie die Risiko-Projektion)",
             "CAPEX einmalig im Umsetzungsjahr (Default: Folgejahr); die "
             "kumulierten Kosten werden zusätzlich als Barwerte ausgewiesen, "
-            "abgezinst mit einer Diskontrate von 0 % und 1 %, die hier gleich der "
-            "Reinen Zeitpräferenzrate gesetzt ist; die Komponente der relativen "
-            "Preise ist nicht angesetzt (Feld „discounted“, abgezinst "
-            f"auf das Basisjahr {years[0]})",
+            f"abgezinst mit einer Diskontrate von {raten_text} (Feld „discounted“, "
+            f"abgezinst auf das Basisjahr {years[0]})",
+            "Zusammensetzung der Diskontrate nach UBA Methodenkonvention 4.0, "
+            "Kap. 2.2.3: Diskontrate = Reine Zeitpräferenzrate (RZPR) + Komponente "
+            f"der relativen Preise. Die RZPR beträgt {rzpr_text}. Die Komponente der "
+            f"relativen Preise ist mit {_prozent(komponente)} Pp. angesetzt, eine "
+            "Abschätzung von KAP3, bis die Methodik sie festlegt; ihre Richtung "
+            "für Gesundheitsschäden ist offen (Feld „diskontierung“)",
             "Maßnahmenwirkung zeitkonstant über den Horizont; OPEX ab Umsetzungsjahr",
         ],
+        "diskontierung": {
+            "rzpr": rzpr,
+            "relative_preise": {
+                "wert": komponente,
+                "evidence_class": diskontierung.RELATIVE_PRICE_COMPONENT_SPEC["evidence_class"],
+                "begruendung": diskontierung.RELATIVE_PRICE_COMPONENT_SPEC[
+                    "evidence_derivation"]["wert"],
+            },
+            "diskontraten": diskontraten,
+            "modellgrenzen": list(diskontierung.MODELLGRENZEN),
+        },
         "warnings": warnings,
         "source": proj.get("source"),
     }
