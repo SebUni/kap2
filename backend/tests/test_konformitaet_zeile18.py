@@ -1,10 +1,11 @@
-"""T-0765: Zeile 18 der Konformitäts-Checkliste ist auf 'erfüllt' gesetzt und gegen
-die genannten Belege abgesichert.
+"""T-0765: Zeile 18 der Konformitäts-Checkliste gegen die genannten Belege abgesichert.
+T-0929-cto: Status nach der Gegenprobe gegen UBA-Handlungsempfehlungen, Abschnitt 2.2.5,
+auf 'teilweise' gesetzt, Lücke neu.
 
 Prüft wörtlich gegen docs/KONFORMITAET_CHECKLISTE.md:
 - es gibt genau eine Zeile, die mit '| 18 |' beginnt,
 - diese Zeile hat sieben Spalten,
-- fünfte Spalte (Status) ist genau 'erfüllt',
+- fünfte Spalte (Status) ist genau 'teilweise',
 - sechste Spalte (Fundstelle/Beleg) ist genau die fünf erwarteten Pfade,
 - siebte Spalte (Lücke) ist genau der erwartete Satz,
 - jeder der fünf genannten Pfade existiert als Datei im Repo.
@@ -23,9 +24,14 @@ ERWARTETE_BELEGE = (
     "docs/ANPASSUNGSKAPAZITAET.md"
 )
 LUECKE = (
-    "Keine Lücke im Produkt; der nach ISO 14091 optionale Schritt ist als "
-    "Selbsteinschätzung der Kommune je Komponente und Reifegrad umgesetzt und im "
-    "Bericht als optionaler Analyseschritt ausgewiesen."
+    "Umgesetzt sind die vier Komponenten nach Fußnote 32 der UBA-Handlungsempfehlungen "
+    "und eine Selbsteinschätzung je Komponente auf den Stufen 0 bis 3. Es fehlen: die "
+    "Verknüpfung mit dem bewerteten Klimarisiko zu einem Klimarisiko mit Anpassung "
+    "(UBA-Handlungsempfehlungen, Tabelle 5); ein Beleg, dass die Stufen den Niveaus nach "
+    "Anhang H der ISO 14091 entsprechen; Aussagen zu Anpassungsmöglichkeiten, zum Bedarf "
+    "an zusätzlicher oder transformativer Anpassung, zu Wechselwirkungen und "
+    "Zielkonflikten zwischen Maßnahmen und zu den Grenzen der Anpassung; ein Vermerk, wer "
+    "eingestuft hat und ob im Konsens. Einzelnachweis: Abschnitt „Gegenprobe Zeile 18“."
 )
 
 
@@ -55,9 +61,9 @@ def test_zeile_18_hat_sieben_spalten():
     assert len(spalten) == 7, f"Erwartet 7 Spalten, gefunden: {len(spalten)} -> {spalten}"
 
 
-def test_zeile_18_status_ist_erfuellt():
+def test_zeile_18_status_ist_teilweise():
     spalten = _spalten(_zeile_18())
-    assert spalten[4].strip() == "erfüllt"
+    assert spalten[4].strip() == "teilweise"
 
 
 def test_zeile_18_beleg_ist_exakt():
