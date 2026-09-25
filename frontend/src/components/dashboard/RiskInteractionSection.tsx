@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
-import type { QuerverbindungsAuswertung, QuerverbindungKlimawirkung } from '../../api/client'
+import type { Netzrolle, QuerverbindungsAuswertung } from '../../api/client'
 import InfoTooltip from '../InfoTooltip'
 
 /**
  * Querverbindungen zwischen Klimawirkungen (KWRA 2021, Teilbericht 6, Kap. 3.4).
  *
- * Zeigt je im Katalog geführter Klimawirkung die ausdrücklich belegte Netzrolle
- * („stark ausgehend" / „stark eingehend") und die Zahl der im Fließtext benannten
- * Einzelbeziehungen („wirkt auf" = ausgehend, „beeinflusst von" = eingehend).
+ * Zeigt je im Katalog geführter Klimawirkung die ausdrücklich belegten Netzrollen
+ * („stark ausgehend" / „stark eingehend", auch beide zugleich) und die Zahl der im
+ * Fließtext benannten Einzelbeziehungen („wirkt auf" = ausgehend, „beeinflusst von"
+ * = eingehend). Netzknoten der Gesamtbetrachtung außerhalb des Katalogs erscheinen
+ * als benannte Knoten mit dem Hinweis „nicht im Katalog" — nie mit Index, Betrag
+ * oder Rang (Verwechslungssperre, P2).
  * Daten kommen unverändert aus GET /catalog/querverbindungen; hier wird nichts
  * modelliert oder ergänzt — die Modellgrenze des Backends wird wörtlich angezeigt.
  */
@@ -17,10 +20,15 @@ import InfoTooltip from '../InfoTooltip'
  *  falls die Kennzahl in der API-Antwort fehlt (Quelle wie backend/app/data/kwra_querverbindungen.py). */
 const KWRA_QUERVERBINDUNGEN_GESAMT = 257
 
-function netzrolleText(rolle: QuerverbindungKlimawirkung['netzrolle']): string {
-  if (rolle === 'stark ausgehend') return 'stark ausgehend (Sender)'
-  if (rolle === 'stark eingehend') return 'stark eingehend (Empfänger)'
-  return '—'
+const NETZROLLE_TEXT: Record<Netzrolle, string> = {
+  'stark ausgehend': 'stark ausgehend (Sender)',
+  'stark eingehend': 'stark eingehend (Empfänger)',
+}
+
+function netzrollenText(rollen: Netzrolle[], zentral: boolean): string {
+  if (rollen.length === 0) return '—'
+  const text = rollen.map(r => NETZROLLE_TEXT[r]).join(' und ')
+  return zentral ? `${text}, zentral` : text
 }
 
 export default function RiskInteractionSection({ className = '' }: { className?: string }) {
@@ -37,8 +45,9 @@ export default function RiskInteractionSection({ className = '' }: { className?:
 
   const gesamt = daten?.kennzahlen?.querverbindungen_gesamt ?? KWRA_QUERVERBINDUNGEN_GESAMT
   const zeilen = (daten?.klimawirkungen ?? []).filter(
-    k => k.netzrolle !== null || k.ausgehende_benannte > 0 || k.eingehende_benannte > 0,
+    k => (k.netzrollen ?? []).length > 0 || k.ausgehende_benannte > 0 || k.eingehende_benannte > 0,
   )
+  const ausserhalb = daten?.netzknoten_ausserhalb_katalog ?? []
 
   return (
     <section className={`dashboard-section ${className}`}>
@@ -64,6 +73,12 @@ export default function RiskInteractionSection({ className = '' }: { className?:
               {' '}Von den {daten.abdeckung.klimawirkungen_im_katalog} im Produkt geführten Klimawirkungen
               haben {daten.abdeckung.mit_ausgewiesener_netzrolle} eine ausgewiesene Netzrolle und{' '}
               {daten.abdeckung.mit_benannter_einzelbeziehung} mindestens eine benannte Einzelbeziehung.
+              {ausserhalb.length > 0 && (
+                <>
+                  {' '}Weitere {ausserhalb.length} Netzknoten der Gesamtbetrachtung stehen nicht im Katalog;
+                  sie sind nur benannt, ohne Index, Betrag oder Rang.
+                </>
+              )}
             </p>
             <table className="data-table">
               <thead>
@@ -81,12 +96,26 @@ export default function RiskInteractionSection({ className = '' }: { className?:
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>#{k.kwra_id}</span>{' '}
                       {k.name}
                     </td>
-                    <td>{netzrolleText(k.netzrolle)}</td>
+                    <td>{netzrollenText(k.netzrollen ?? [], k.zentral ?? false)}</td>
                     <td style={{ textAlign: 'right' }}>{k.ausgehende_benannte}</td>
                     <td style={{ textAlign: 'right' }}>{k.eingehende_benannte}</td>
                   </tr>
                 ))}
-                {zeilen.length === 0 && (
+                {ausserhalb.map(n => (
+                  <tr key={`ausserhalb-${n.kwra_id}`}>
+                    <td style={{ fontWeight: 500 }}>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>#{n.kwra_id}</span>{' '}
+                      {n.name}{' '}
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                        ({n.hinweis || 'nicht im Katalog'}; Handlungsfeld {n.handlungsfeld})
+                      </span>
+                    </td>
+                    <td>{netzrollenText(n.netzrollen, n.zentral)}</td>
+                    <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>—</td>
+                    <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>—</td>
+                  </tr>
+                ))}
+                {zeilen.length === 0 && ausserhalb.length === 0 && (
                   <tr><td colSpan={4} style={{ color: 'var(--text-muted)' }}>
                     Für keine der im Produkt geführten Klimawirkungen ist eine Netzrolle oder Einzelbeziehung belegt.
                   </td></tr>

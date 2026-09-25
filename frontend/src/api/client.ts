@@ -77,16 +77,35 @@ async function requestWithProgress<T>(path: string, onProgress?: ProgressCallbac
 }
 
 /** Antwort von GET /catalog/querverbindungen (backend/app/services/querverbindungen.py). */
+export type Netzrolle = 'stark ausgehend' | 'stark eingehend'
+
 export interface QuerverbindungKlimawirkung {
   kwra_id: number
+  /** Amtlicher Name aus dem Katalog (über die kwra_id), nicht die Schreibweise des Fließtexts. */
   name: string
-  netzrolle: 'stark ausgehend' | 'stark eingehend' | null
+  /** Erste Netzrolle (einwertig, Altfeld); mehrwertig steht in `netzrollen`. */
+  netzrolle: Netzrolle | null
+  /** Alle Netzrollen — eine Klimawirkung kann Sender und Empfänger zugleich sein (TB 6, Fn. 21, S. 84). */
+  netzrollen: Netzrolle[]
+  zentral: boolean
+  netzrolle_auswertungen: ('gesamt' | 'hochrisiko')[]
   ausgehende_benannte: number
   eingehende_benannte: number
 }
 
+/** Netzknoten der Gesamtbetrachtung (TB 6 Kap. 3.4) außerhalb des Katalogs — ohne Index, Betrag oder Rang. */
+export interface QuerverbindungNetzknotenAusserhalbKatalog {
+  kwra_id: number
+  name: string
+  handlungsfeld: string
+  netzrollen: Netzrolle[]
+  zentral: boolean
+  hinweis: string
+}
+
 export interface QuerverbindungsAuswertung {
   klimawirkungen: QuerverbindungKlimawirkung[]
+  netzknoten_ausserhalb_katalog: QuerverbindungNetzknotenAusserhalbKatalog[]
   kennzahlen: Record<string, string | number>
   systembereich_matrix: Record<string, Record<string, number>>
   abdeckung: {
