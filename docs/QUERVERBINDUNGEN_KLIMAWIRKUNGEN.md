@@ -161,6 +161,12 @@ Bedarf an Kühlenergie bildet das zweite Paar den einzigen Rückkopplungskreisla
 aber nicht im Blatt „Wirkbeziehungen“ der Arbeitsmappe; die Arbeitsmappe bleibt unverändert, die
 Abweichung steht als Befund 2 in `reviews/BEFUNDE_QUERVERBINDUNGEN.md`.
 
+Ob die 15 Beziehungen auf Ebene einzelner Klimawirkungen und die gegenseitigen Beziehungen schon in
+den Klimawirkungsketten des Umweltbundesamts von 2016 dargestellt sind, steht im Abgleich
+[`QUERVERBINDUNGEN_ABGLEICH_UBA2016.md`](QUERVERBINDUNGEN_ABGLEICH_UBA2016.md): 7 × bestätigt,
+6 × teilweise, 2 × nicht dargestellt. Vom Rückkopplungskreislauf zeigt UBA 2016 nur Stadtklima/Wärmeinseln
+→ Hitzebelastung; der Kreislauf selbst ist eine Aussage von Teilbericht 6.
+
 | Quelle | Ziel | Ebene | Richtung | Beleg |
 |---|---|---|---|---|
 | Hochwasser | zahlreiche Klimawirkungen in mehreren Handlungsfeldern | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 84, 88: zentrale Klimawirkung, wirkt sich auf die meisten anderen aus |
