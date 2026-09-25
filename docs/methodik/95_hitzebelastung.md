@@ -200,28 +200,33 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   die Zelle Berlin-Mitte und die Fortschreibung aus Ebene 1 an. Die Zelle Berlin-Mitte ist
   praktisch der Gemeindepunkt der Kalibrierung (§4): Dessen Reihe in
   `sommermittel_bundesland_povw.csv` [50] ergibt für die Sommer 2016–2025 im Mittel 20,06 °C.
-  Nachgerechnet mit allen 40.663 bewohnten 100-m-Zellen Berlins (Zensus 2022, Gitterdaten [67]),
-  jede mit ihrem Wert aus dem 1-km-Raster [33] und ihrer Bevölkerung nach der Logik des Produkts
+  Nachgerechnet mit allen 40.669 bewohnten 100-m-Zellen innerhalb der Gemeindegrenze Berlins
+  aus VG250 [65] (Zensus 2022, Gitterdaten [67]), jede mit ihrem Wert aus dem 1-km-Raster [33]
+  und ihrer Bevölkerung nach der Logik des Produkts
   (`zensus_loader.apply_zensus_to_cell_inputs`: Einwohner × Anteil 65+, Aufteilung der 65+ aus
-  den 5er-Jahresgruppen), ergeben sich vier Wirkungen, jede auf die vorige gerechnet:
+  den 5er-Jahresgruppen), ergeben sich vier Wirkungen, jede auf die vorige gerechnet.
+  Die Rechnung liegt als Skript `docs/methodik/anlagen/95_zellvergleich.py` bei; Aufruf für Berlin:
+  `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000`
+  (lädt Zensus-Gitter, DWD-Raster und VG250 in einen Cache außerhalb des Repos; mit
+  `--gemeinde` und einem anderen Gemeindeschlüssel für jede Kommune):
   (a) **Temperatur je Zelle: × 0,948.** Das Bevölkerungsmittel liegt bei 19,96 °C, also 0,11 K
   unter Berlin-Mitte (Zellen 19,38–20,38 °C); drei Viertel der Einwohner wohnen kühler als
   Berlin-Mitte.
-  (b) **Einwohnersumme: × 0,982.** Das Zensus-Gitter (Stichtag 15.05.2022) zählt in Berlin
-  3.595.270 Einwohner, die Fortschreibung aus Ebene 1 (Stichtag 31.12.2023) 3.662.381
+  (b) **Einwohnersumme: × 0,981.** Das Zensus-Gitter (Stichtag 15.05.2022) zählt in Berlin
+  3.593.357 Einwohner, die Fortschreibung aus Ebene 1 (Stichtag 31.12.2023) 3.662.381
   (Befund 99).
-  (c) **Altersbänder je Zelle wie im Produkt: × 0,981.** Davon × 0,980 durch eine Eigenheit des
-  Produkts: In 4770 Zellen mit 99.026 Einwohnern ist der Anteil 65+ im Gitter geheimgehalten
-  („–“), und das Produkt setzt dort 65+ = 0 (Befund 104). Der Rest, × 1,001, sind
+  (c) **Altersbänder je Zelle wie im Produkt: × 0,982.** Davon × 0,9802 durch eine Eigenheit des
+  Produkts: In 4774 Zellen mit 99.098 Einwohnern ist der Anteil 65+ im Gitter geheimgehalten
+  („–“), und das Produkt setzt dort 65+ = 0 (Befund 104). Der Rest, × 1,0014, sind
   Altersstruktur und Wohnlage der Älteren.
-  (d) **Wärmeinsel-Feinstruktur unter 1 km: × 1,020.** Modellrechnung mit derselben gesetzten
+  (d) **Wärmeinsel-Feinstruktur unter 1 km: × 1,021.** Modellrechnung mit derselben gesetzten
   Streuung σ = 0,5 K wie in §4, keine Messung; die gekrümmte Kurve hebt die Summe.
-  Zusammen 0,948 × 0,982 × 0,981 × 1,020 = 0,932: Der Zelllauf ergibt für Berlin rund
+  Zusammen 0,948 × 0,981 × 0,982 × 1,021 = 0,932: Der Zelllauf ergibt für Berlin rund
   338 Mio. € je Jahr (Preisstand 2024), 7 % weniger als die Kette; ohne die Eigenheit aus (c)
   wären es rund 345 Mio. €. Die Kette zeigt den Rechenweg, der Betrag für Berlin ist der
-  Zelllauf des Produkts. Die Wirkungen (a) und (d) zusammen (× 0,967) widersprechen der
-  Erklärung des Berlin-Ankers in §4, wonach das Zellmodell über dem Gemeindepunkt liegt
-  (Befund 101).
+  Zelllauf des Produkts. Die Wirkungen (a) und (d) zusammen (× 0,967, aus den ungerundeten
+  Faktoren) widersprechen der Erklärung des Berlin-Ankers in §4, wonach das Zellmodell über dem
+  Gemeindepunkt liegt (Befund 101).
 - **Ebene 6, \(v_{\text{vers},a}\) = 1.** Auf Ebene der Kommune ist der Modifikator genau 1:
   \(\beta_{\text{iso}}\) wirkt heute nicht, weil \(q_{\text{1P}}\) mangels Zellquelle gleich dem
   Bundesmittel gesetzt ist (§3.6), und die Ebene \(q_{\text{pfl}}\) verteilt die Heimbewohner
@@ -282,13 +287,13 @@ assert abs(d[3] / sum(d) - 0.55) < 0.01
 assert sum(c_kal * p * mm / 100_000 * (math.exp(b85 * f * max(0.0, t_mittel - t0)) - 1)
            for p, mm, f in zip(pop, m, fa)) == 0.0    # nur Sommermittel => null
 # Eine Zelle statt aller Zellen (Zelllauf Berlin, Messwerte aus dem Text): (a) x (b) x (c) x (d)
-assert abs(3_595_270 / sum(pop) - 0.982) < 0.0005        # (b) Einwohnersumme Gitter / Fortschreibung
-assert abs(0.980 * 1.001 - 0.981) < 0.001                # (c) = Produkt-Eigenheit x Rest
-gesamt = 0.948 * 0.982 * 0.981 * 1.020
+assert abs(3_593_357 / sum(pop) - 0.981) < 0.0005        # (b) Einwohnersumme Gitter / Fortschreibung
+assert abs(0.9802 * 1.0014 - 0.982) < 0.0005             # (c) = Produkt-Eigenheit x Rest
+gesamt = 0.948 * 0.981 * 0.982 * 1.021                   # Skript anlagen/95_zellvergleich.py
 assert abs(gesamt - 0.932) < 0.001
 assert abs((eur_mort + eur_morb) / 1e6 * gesamt - 338) < 1
-assert abs((eur_mort + eur_morb) / 1e6 * gesamt / 0.980 - 345) < 1
-assert abs(0.948 * 1.020 - 0.967) < 0.001                # (a) x (d), Befund 101
+assert abs((eur_mort + eur_morb) / 1e6 * gesamt / 0.9802 - 345) < 1
+assert abs(0.948 * 1.021 - 0.967) < 0.001                # (a) x (d), Befund 101 (ungerundet 0,9674)
 # (d) nachgerechnet am Punkt: sigma 0,5 K, mittelwerttreu, Gauss-Hermite-Mittel
 zs = [-2.0201828705, -0.9585724646, 0.0, 0.9585724646, 2.0201828705]
 ws = [0.0199532421, 0.3936193232, 0.9453087205, 0.3936193232, 0.0199532421]
@@ -1265,7 +1270,10 @@ DOI-Links die persistenten Referenzen.
   (https://www.destatis.de/static/DE/zensus/gitterdaten/Zensus2022_Bevoelkerungszahl.zip) und
   „Alter in 5er-Jahresgruppen“
   (https://www.destatis.de/static/DE/zensus/gitterdaten/Alter_5er-Jahresgruppen_100mGitter.zip),
-  abgerufen 25.09.2026 — dl-de/by-2-0. Verwendet für den Zellvergleich Berlin in §3.0.
+  „Anteil ab 65-Jährige in Gitterzellen“
+  (https://www.destatis.de/static/DE/zensus/gitterdaten/Anteil_ab_65-jaehrige_in_Gitterzellen.zip),
+  abgerufen 25.09.2026 — dl-de/by-2-0. Verwendet für den Zellvergleich Berlin in §3.0
+  (Skript `docs/methodik/anlagen/95_zellvergleich.py`).
 - **[68]** W. Kahlenborn, L. Porst, M. Voß, L. Hölscher, S. Undorf, M. Wolf, K. Schönthaler,
   A. Crespi, K. Renner, M. Zebisch, U. Fritsch, I. Schauser, „Klimawirkungs- und Risikoanalyse 2021
   für Deutschland — Teilbericht 6: Integrierte Auswertung – Klimarisiken, Handlungserfordernisse und

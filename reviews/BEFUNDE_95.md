@@ -530,3 +530,35 @@ frischer Sitzung hat die Nacharbeit aus Runde 14 (Befunde 112–114) geprüft un
 oder C gefunden; „Runde 1“ ist die Zählung im Ticket, im Ledger ist es die Runde nach Runde 14. Merge des Schritts nach
 `main`: Commit 31673734. Neue Befunde: keine. Zurückgestellt bleiben 99, 100, 101 und 104; keiner davon ist ein
 A-Befund. Eingetragen mit T-1120-methodik_manager (Schritt 3), ohne Änderung am Bericht.
+
+## Runde 16 — Zellvergleich Berlin als Skript (T-1198, 25.09.2026): neuer Befund 115
+
+Anlass: T-1198-methodik_manager (Vorhaben T-1196-cmo). Die Messung „Zellvergleich Berlin, Fassung 2“ aus Runde 12 lag
+nur im Probeverzeichnis. Sie liegt jetzt als Skript `docs/methodik/anlagen/95_zellvergleich.py` im Repo, Aufruf:
+`python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000`. Das Skript braucht nur die
+Python-Standardbibliothek. Die Daten lädt es in einen Cache außerhalb des Repos (Vorgabe `~/.cache/kap3/95_zellvergleich`,
+Option `--cache`); eingecheckt ist davon nichts. Grundlagen: Zensus-Gitter 100 m [67] mit Download-Adressen und
+Einlese-Logik aus `backend/app/services/zensus_loader.py` (importiert, `load_dataset_bbox` und
+`apply_zensus_to_cell_inputs` unverändert aufgerufen), DWD-Raster [33] wie `dwd_cdc_grid.climatology_grid`, 2016–2025,
+Gemeindegebiet BKG VG250 [65] (`vg250_gem`, AGS, GF = 4), Parameter aus Kapitel 7, Wochenquantile aus der Tabelle §3.2,
+Reihe `sommermittel_bundesland_povw.csv` [50]. Mit `--gemeinde <AGS>` rechnet es jede Kommune; ohne Ebene 1 für eine
+Kommune, die kein Stadtstaat ist, setzt es Gitter-Summe × Altersstruktur des Landes an (Option `--einwohner`), den Punkt
+der Kette über `--punkt`. Probelauf Treuenbrietzen (12069632): 558 Zellen, läuft durch.
+
+**Ergebnis Berlin (Lauf 25.09.2026):** VG250-Fläche 893,0 km², 40.669 bewohnte Zellen, 3.593.357 Einwohner; Punkt
+Berlin-Mitte 20,07 °C und 17,5 Hitzetage; Bevölkerungsmittel 19,96 °C (19,38–20,38 °C), 24,8 % der Einwohner wärmer
+als der Punkt. Kette 362,89 Mio. € → (a) Temperatur je Zelle 344,00 (× 0,948) → (b) Einwohnersumme 337,52 (× 0,981) →
+(c) Bänder je Zelle wie im Produkt 331,30 (× 0,982) → (d) Feinstruktur σ = 0,5 K 338,10 (× 1,021, genau 1,02051);
+zusammen × 0,932; (a) und (d) zusammen × 0,967. Bänder nach Produktlogik 2.898.960 · 334.709 · 262.921 · 96.767, gegen
+Ebene 1 × 0,979 · 0,986 · 1,037 · 0,897. Eigenheit (Befund 104): 4774 Zellen mit 99.098 Einwohnern ohne Anteil 65+;
+Ersatz mit dem Anteil der übrigen Zellen (19,87 %) 338,00, Produkt gegen Ersatz × 0,9802, Rest × 1,0014; Zelllauf ohne
+Eigenheit 344,94 Mio. €. Reihe Berlin 2016–2025 im Mittel 20,06 °C. Gegenprobe mit
+`--wochenquantile produkt` (Anlage `wochenquantile_region.csv` wie das Produkt): Kette 362,80 Mio. €, alle Faktoren
+gleich bis zur dritten Stelle. Die Zahlen in den Nachträgen zu 99 und 104 aus Runde 12 (3.595.270 Einwohner, Bänder
+× 0,980 · 0,986 · 1,038 · 0,897, 4770 Zellen mit 99.026 Einwohnern) sind damit durch diese Messung ersetzt; beide
+bleiben zurückgestellt.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 105 | §3.0, Liste der Zusammenfassungen | Nachtrag Runde 16 | Zahlenfolge berichtigt (Befund 115); der Prüfausdruck aus Runde 12 prüfte die alte Folge | — | B | `grep -q '0,948 × 0,981 × 0,982 × 1,021 = 0,932' docs/methodik/95_hitzebelastung.md` | behoben (T-1198): Wirkungen (b) und (c) weiter ausgewiesen, Werte aus dem Skript; Zelllauf rund 338 Mio. €, ohne Eigenheit rund 345 Mio. € (Preisstand 2024) |
+| 115 | §3.0, Wirkungen (b)–(d) und Beispiel-Block rechenkette_95 | Abweichung Messung Runde 12 ↔ Skript | Das Skript reproduziert (a) × 0,948 und zusammen × 0,932, weicht aber in der dritten Stelle ab: (b) × 0,981 statt 0,982, (c) × 0,982 statt 0,981, (d) × 1,021 statt 1,020. Ursache 1, Gemeindegrenze: Runde 11/12 nahm die Grenze aus OpenStreetMap/Nominatim (891,1 km², 40.663 Zellen, 3.595.270 Einwohner), das Skript die amtliche VG250 (893,0 km², 40.669 Zellen, 3.593.357 Einwohner). Das verschiebt (b) von 0,98168 auf 0,98115 und (c) von 0,98140 auf 0,98158 (andere Randzellen). Ursache 2, Rundung: (d) war schon in Runde 12 × 1,0205 (338,22/331,42 = 1,02052) und hätte als 1,021 stehen müssen, nicht als 1,020. Kette (362,89 Mio. €), Temperaturen und die Aussagen in §3.0 (rund 7 % Überschätzung, rund 338 bzw. 345 Mio. €, × 0,967 für Befund 101) bleiben gleich; kein Wert aus Kapitel 7 betroffen | Werte des Skripts in §3.0 und in den Block übernehmen, Pfad und Aufruf nennen | C | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('### 3.0'):s.index('### 3.1')]; sys.exit(not ('Einwohnersumme: × 0,981' in t and 'Produkt: × 0,982' in t and 'unter 1 km: × 1,021' in t and '3_593_357' in t and '3.595.270' not in t and 'python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000' in t))"` | behoben (T-1198): §3.0 (b) 3.593.357 Einwohner × 0,981, (c) × 0,982 = × 0,9802 Eigenheit (4774 Zellen, 99.098 Einwohner) × 1,0014 Rest, (d) × 1,021; Grenze VG250 [65] genannt; Skript und Aufruf in §3.0, [67] um den Datensatz Anteil 65+ ergänzt; Block rechenkette_95 nachgezogen |
