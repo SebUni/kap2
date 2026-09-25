@@ -22,7 +22,26 @@ def test_auswertung_hat_genau_die_erwarteten_schluessel():
     assert set(ergebnis.keys()) == {
         "klimawirkungen", "netzknoten_ausserhalb_katalog", "kennzahlen", "systembereich_matrix",
         "abdeckung", "quelle", "modellgrenze",
+        "handlungsfelder", "rueckkopplungen", "rueckkopplungen_quelle", "hochrisiko", "aussagen",
     }
+
+
+def test_auswertung_liefert_handlungsfelder_rueckkopplungen_hochrisiko_aussagen():
+    ergebnis = querverbindungs_auswertung()
+    assert {"handlungsfelder", "rueckkopplungen", "hochrisiko", "aussagen"} <= set(ergebnis)
+    assert ergebnis["rueckkopplungen"]
+    for eintrag in ergebnis["rueckkopplungen"]:
+        for knoten in eintrag["knoten"]:
+            assert isinstance(knoten["im_katalog"], bool)
+    katalog_ids = {r["kwra_id"] for r in catalog.RISKS} | {p["kwra_id"] for p in catalog.PLANNED_RISKS}
+    je_id = {k["kwra_id"]: k["im_katalog"] for e in ergebnis["rueckkopplungen"] for k in e["knoten"]}
+    assert je_id[95] is True and je_id[62] is True and je_id[65] is False
+    assert all(v == (i in katalog_ids) for i, v in je_id.items())
+    assert len(ergebnis["handlungsfelder"]["felder"]) == 13
+    assert ergebnis["hochrisiko"] == kq.HOCHRISIKO_BEFUNDE
+    assert ergebnis["aussagen"] == kq.AUSSAGEN
+    for a in ergebnis["aussagen"].values():
+        assert isinstance(a["seite"], int) and isinstance(a["seiten"], list)
 
 
 def test_klimawirkungen_genau_ein_eintrag_je_kwra_id():
