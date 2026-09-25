@@ -18,10 +18,12 @@ from app.models.models import (
     MeasureImpact, ProjectStatus, RiskZone, GeoExportJob,
 )
 from app.data import catalog
+from app.data.kang_handlungsfelder import handlungsfeld_fuer_risiko
 from app.data.kang_zustaendigkeit import zustaendigkeit_fuer
+from app.services import kang_beruecksichtigung
 from app.services.bestandsaufnahme_markdown import bestandsaufnahme_markdown
 from app.services.kurzfassung_markdown import kurzfassung_fuer_kommune
-from app.services.measure_service import get_risk_aggregate
+from app.services.measure_service import get_risk_aggregate, kommune_measures_query
 from app.services.systembereiche import systembereich_auswertung
 from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
@@ -244,6 +246,74 @@ def get_kommune_systembereiche(kommune_id: int, db: Session = Depends(get_db)):
             grund = None
         bereiche.append({"systembereich": name, **eintrag, "leer_grund": grund})
     return {"kommune_id": kommune.id, "bereiche": bereiche}
+
+
+def _risiko_zuordenbar(code) -> bool:
+    """True, wenn der Nachweis den Risikocode einem KAnG-Handlungsfeld zuordnen kann."""
+    try:
+        handlungsfeld_fuer_risiko(code)
+    except KeyError:
+        return False
+    return True
+
+
+def _massnahme_zuordenbar(code) -> bool:
+    """True, wenn der Katalog die Maßnahme samt Handlungsfeld und verknüpften Risiken kennt."""
+    eintrag = catalog.MEASURES_BY_CODE.get(code)
+    if eintrag is None or "kang_cluster" not in eintrag or "kang_field" not in eintrag:
+        return False
+    return all(_risiko_zuordenbar(r) for r in (eintrag.get("linked_risk_codes") or []))
+
+
+@router.get("/{kommune_id}/kang-nachweis")
+def get_kommune_kang_nachweis(kommune_id: int, db: Session = Depends(get_db)):
+    """Nachweis der fachübergreifenden Berücksichtigung nach § 8 Abs. 1 KAnG
+    (Checkliste Zeile 13, T-1064).
+
+    ``schaeden`` ist die jährliche Schadenssumme je Risikocode aus dem Risiko-Aggregat
+    (leer, solange keine Berechnung vorliegt), ``massnahmen`` die Maßnahmencodes der
+    Kommune. Codes, die der Katalog nicht kennt, werden nicht still weggelassen, sondern
+    unter ``nicht_zugeordnet`` mit ihrem Betrag bzw. Code ausgewiesen.
+    """
+    kommune = (
+        db.query(Kommune)
+        .options(load_only(Kommune.id))
+        .filter(Kommune.id == kommune_id)
+        .first()
+    )
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+
+    # Wie bei den Systembereichen: ohne Berechnung legt die Engine Nulleinträge an.
+    schaeden: dict = {}
+    if assessment_is_done(db, kommune.id):
+        agg = get_risk_aggregate(db, kommune.id, apply_measures=False)
+        for eintrag in agg["cost"]["by_risk"]:
+            code = eintrag["code"]
+            schaeden[code] = schaeden.get(code, 0.0) + float(eintrag.get("cost_eur") or 0.0)
+
+    massnahmen = [
+        m.measure_type
+        for m in kommune_measures_query(db, kommune.id).options(
+            load_only(AdaptationMeasure.id, AdaptationMeasure.measure_type)
+        )
+    ]
+
+    risiken_bekannt = {c: b for c, b in schaeden.items() if _risiko_zuordenbar(c)}
+    risiken_unbekannt = [
+        {"code": c, "schaden_eur": b} for c, b in schaeden.items() if c not in risiken_bekannt
+    ]
+    massnahmen_bekannt = [c for c in massnahmen if _massnahme_zuordenbar(c)]
+    massnahmen_unbekannt = sorted({c for c in massnahmen if not _massnahme_zuordenbar(c)})
+
+    nachweis = kang_beruecksichtigung.nachweis_fachuebergreifend(
+        risiken_bekannt, massnahmen_bekannt,
+    )
+    nachweis["nicht_zugeordnet"] = {
+        "risiken": risiken_unbekannt,
+        "massnahmen": massnahmen_unbekannt,
+    }
+    return nachweis
 
 
 @router.get("")
