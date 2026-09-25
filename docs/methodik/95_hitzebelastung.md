@@ -121,6 +121,102 @@ Teil-Ausweise unter der KWRA-Klammer: hitzebedingte Todesfälle \(D\), Erkrankun
 Umrechnungsfaktoren je Satz in der Zeichentabelle (Destatis-VPI-Jahresmittel, 2020 = 100:
 2023 = 116,7 · 2024 = 119,3 [19]).
 
+### 3.0 Rechenkette
+
+Die Rechenkette erzählt die Methodik von der amtlichen Quelle bis zum Euro-Betrag am Beispiel
+einer Kommune. Die Formeln in 3.1–3.5 sind die genaue Fassung derselben Kette und keine zweite
+Methodik; alle Parameter sind die Werte aus Kapitel 7. **Beispielkommune: Berlin** (Gemeinde
+11000000, Land Berlin, damit ERF-Region Mitte nach §3.2). Temperatur und Hitzetage stammen aus
+der 1-km-Rasterzelle Berlin-Mitte (52,520 °N, 13,405 °E), abgegriffen mit denselben
+Produktfunktionen wie im Produkt (`dwd_cdc_grid.summer_mean_temp_at`, `hot_days_at`: Mittel der
+zehn jüngsten verfügbaren Jahre, Abruf 25.09.2026).
+
+| Ebene | Rechenschritt | Wert (Beispielkommune Berlin) | Quelle |
+|---|---|---|---|
+| 1 | Einwohner je Altersband \(\text{pop}_a\) (u65 · 65–74 · 75–84 · 85+) | 2.961.430 · 339.490 · 253.528 · 107.933 | Fortschreibung des Bevölkerungsstandes, Stichtag 31.12.2023, Basis Zensus 2022, Tab. 12411-09-01-4-B [48]; Anlage `bevoelkerung_bundesland_altersband.csv` (Befund 99) |
+| 2 | Sommermittel der Temperatur \(\bar T\) (Juni–August, 24-h-Mittel) | 20,07 °C | DWD-CDC-Raster air_temperature_mean, 1 km [33] |
+| 3 | Schwelle und Steigung der Region Mitte: \(T_0\); \(\beta_a = \beta_{85+} \times f_a\) | \(T_0\) = 20,2 °C; \(\beta_{85+}\) = 0,0625 K⁻¹ × \(f_a\) 0,357 · 0,588 · 0,631 · 1,0 = 0,0223 · 0,0368 · 0,0394 · 0,0625 K⁻¹ | Winklmayr 2022 [11] (§3.3); \(f_a\) Rückrechnung §3.3a [12,49] |
+| 4 | Wochenexzess: 13 Sommerwochen \(T_w = \bar T + q_w\), je Woche Übersterblichkeit \(e^{\beta_a (T_w - T_0)_+} - 1\), summiert | 6 von 13 Wochen über 20,2 °C (20,58 bis 24,67 °C); Summe 0,289 · 0,486 · 0,524 · 0,860 | Wochenquantile Mitte, Tabelle §3.2 [33,50] |
+| 5 | Basissterbefälle je Woche: \(\text{pop}_a \times m_a / 100.000 / 52\) | \(m_a\) 213,2 · 1.737,9 · 4.812,3 · 14.800,2 je 100.000 ⇒ 121,4 · 113,5 · 234,6 · 307,2 Sterbefälle je Woche | Sterbefälle 2023 [49] (§3.5) |
+| 6 | Zusätzliche Sterbefälle \(D_a\) = \(c_{\text{kal}}\) × \(v_{\text{vers},a}\) × Ebene 5 × Ebene 4 | 0,581 × 1 × … = 20,4 · 32,0 · 71,4 · 153,6 = **277,4 Todesfälle je Jahr** | \(c_{\text{kal}}\) Kalibrierung §4 [50]; \(v_{\text{vers}}\) §3.3 |
+| 7 | Verlorene Lebensjahre: \(\text{YLL} = \sum_a D_a \times \bar L_a\) | \(\bar L_a\) 23,39 · 15,59 · 8,90 · 4,16 J ⇒ 476,3 + 499,5 + 635,4 + 638,8 = **2.250 YLL je Jahr** (native Ergebnisgröße) | Sterbetafel 2022/2024 [48], Sterbefälle 2023 [49] (§3.5) |
+| 8 | Mortalität in Euro: YLL × VOLY | 2.250 × 160.800 € = 361,8 Mio. € (Preisstand 2024) | VOLY-Kette §3.5 [19] |
+| 9 | Morbidität: Fälle \(F = \sum_a \text{pop}_a \times r_{0,a} / 100.000 \times [1 + e_{\text{HD}} (\text{HD} - \text{HD}_{\text{ref}})]\), dann × \(c_{\text{Fall}}\) | HD = 17,5 Tage; Faktor 1 + 0,024 × (17,5 − 7,2) = 1,247; \(r_{0,a}\) 1,9 · 6,3 · 10,8 · 15,6 ⇒ 70,2 + 26,7 + 34,2 + 21,0 = 152,0 Fälle × 7.152 € = 1,09 Mio. € (Preisstand 2024) | hot_days-Raster [33]; K&Z [18,62]; \(c_{\text{Fall}}\) [17,19] (§3.4, §3.5) |
+| 10 | Bewerteter Schaden (Konto K1) je Jahr = Mortalität + Morbidität | 361,8 Mio. € + 1,09 Mio. € = **362,9 Mio. € je Jahr (Preisstand 2024)** | Ebenen 8 und 9 |
+
+**Stärkster Treiber** ist die Temperatur: Ist der Sommer in Berlin 0,5 K kühler, sinkt der Betrag
+um 23 %, ist er 0,5 K wärmer, steigt er um 27 %. Danach folgen das Band 85+ (55 % der Todesfälle)
+und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis skaliert.
+
+**Wo die Kette zusammenfasst und was eine gröbere Rechnung verfälschen würde:**
+
+- **Ebene 4, Wochen statt Sommermittel.** Mit dem Sommermittel allein (20,07 °C liegt unter der
+  Schwelle 20,2 °C) käme für Berlin null heraus, also −100 %. Die Hitzetoten entstehen in den
+  sechs heißen Wochen; deshalb rechnet die Kette jede der 13 Sommerwochen einzeln. Der Teiler 52
+  ist keine Vereinfachung: Die 39 Wochen außerhalb des Sommers tragen nach dem Modell nichts bei.
+- **Ebenen 2 und 6, eine Zelle statt aller Zellen.** Das Produkt rechnet jede 100-m-Zelle mit
+  ihrer eigenen Temperatur (§3.1) und summiert. Die Kette setzt für ganz Berlin den Wert der
+  Zelle Berlin-Mitte an. Zwei Wirkungen: Die Wärmeinsel-Feinstruktur (±1 K um das 1-km-Mittel)
+  hebt die Zellsumme wegen der gekrümmten Kurve um 2,8 % über den Wert der Kette. Die Außenbezirke
+  sind kühler als Berlin-Mitte; jedes halbe Kelvin, um das das Bevölkerungsmittel der Stadt unter
+  20,07 °C liegt, senkt den Betrag um 23 %. Die Kette zeigt den Rechenweg, der Betrag für ganz
+  Berlin ist der Zelllauf des Produkts.
+- **Ebene 6, \(v_{\text{vers},a}\) = 1.** Auf Ebene der Kommune ist der Modifikator genau 1:
+  \(\beta_{\text{iso}}\) wirkt heute nicht, weil \(q_{\text{1P}}\) mangels Zellquelle gleich dem
+  Bundesmittel gesetzt ist (§3.6), und die Ebene \(q_{\text{pfl}}\) verteilt die Heimbewohner
+  erwartungstreu auf die Zellen der Kommune. Innerhalb der Kommune verschiebt \(\beta_{\text{pfl}}\)
+  nur, *wo* die Todesfälle anfallen. Abweichen kann die Zellsumme nur, wenn Heime systematisch in
+  wärmeren oder kühleren Zellen liegen, und durch die Kappung bei 1 (nur abwärts). Abschätzung von
+  KAP3 für den Extremfall, dass alle Heime in Zellen 1 K über dem Stadtmittel liegen: +6 % auf
+  den Betrag; im Normalfall deutlich weniger.
+
+```python test: rechenkette_95
+# Rechenkette 3.0, Beispielkommune Berlin (Region Mitte); Parameter unveraendert aus Kapitel 7
+import math
+q = [-4.59, -3.04, -2.27, -1.64, -1.12, -0.57, -0.04, 0.51, 1.05, 1.65, 2.32, 3.16, 4.60]
+pop = [2_961_430, 339_490, 253_528, 107_933]          # Ebene 1 (12411-09-01-4-B)
+t_mittel, t0, b85, c_kal = 20.07, 20.2, 0.0625, 0.581  # Ebenen 2, 3, 6
+fa = [0.357, 0.588, 0.631, 1.0]
+m = [213.2, 1737.9, 4812.3, 14800.2]
+L = [23.39, 15.59, 8.90, 4.16]
+r0 = [1.9, 6.3, 10.8, 15.6]
+voly, c_fall, e_hd, hd, hd_ref = 160_800, 7_152, 0.024, 17.5, 7.2
+
+def exzess(beta, t):                                    # Ebene 4
+    return sum(math.exp(beta * max(0.0, t + qw - t0)) - 1 for qw in q)
+
+def yll(t):
+    d = [c_kal * 1.0 * p * mm / 100_000 / 52 * exzess(b85 * f, t) for p, mm, f in zip(pop, m, fa)]
+    return d, sum(di * li for di, li in zip(d, L))
+
+assert sum(1 for qw in q if t_mittel + qw > t0) == 6
+for f, soll in zip(fa, [0.289, 0.486, 0.524, 0.860]):
+    assert abs(exzess(b85 * f, t_mittel) - soll) < 0.001
+for p, mm, soll in zip(pop, m, [121.4, 113.5, 234.6, 307.2]):
+    assert abs(p * mm / 100_000 / 52 - soll) < 0.05     # Ebene 5
+d, y = yll(t_mittel)
+for di, soll in zip(d, [20.4, 32.0, 71.4, 153.6]):
+    assert abs(di - soll) < 0.05                        # Ebene 6
+assert abs(sum(d) - 277.4) < 0.05
+assert abs(y - 2250) < 1                                # Ebene 7
+eur_mort = y * voly
+assert abs(eur_mort / 1e6 - 361.8) < 0.05               # Ebene 8
+faktor = max(0.0, 1 + e_hd * (hd - hd_ref))
+fall = [p * r / 100_000 * faktor for p, r in zip(pop, r0)]
+assert abs(faktor - 1.247) < 0.001 and abs(sum(fall) - 152.0) < 0.05
+eur_morb = sum(fall) * c_fall
+assert abs(eur_morb / 1e6 - 1.09) < 0.005               # Ebene 9
+assert abs((eur_mort + eur_morb) / 1e6 - 362.9) < 0.05  # Ebene 10
+# Staerkster Treiber und E3-Aussagen
+assert abs(yll(t_mittel - 0.5)[1] / y - 0.77) < 0.005
+assert abs(yll(t_mittel + 0.5)[1] / y - 1.27) < 0.005
+assert abs(d[3] / sum(d) - 0.55) < 0.01
+assert sum(c_kal * p * mm / 100_000 * (math.exp(b85 * f * max(0.0, t_mittel - t0)) - 1)
+           for p, mm, f in zip(pop, m, fa)) == 0.0    # nur Sommermittel => null
+spreizung = sum(yll(t_mittel + k / 10)[1] for k in range(-10, 11)) / 21
+assert abs(spreizung / y - 1.028) < 0.001               # Waermeinsel +-1 K => +2,8 %
+```
+
 ### 3.1 Zelltemperatur (vorgelagerter Knoten W124; produktseitig implementiert)
 
 $$ T_{\text{Zelle}} \;=\; T_{\text{DWD}} \;+\; \bigl[\, \Delta T_{\text{UHI}} - \overline{\Delta T_{\text{UHI}}}^{\,1\,\text{km}} \,\bigr] \;-\; \gamma_h \cdot ( h - \bar{h} ) $$
@@ -445,7 +541,7 @@ Beispiel `beispiel_95_zelle_yll`, Zeichentabelle, §7-Block, Sanity-Anker.
 | \(r_{0,a}\) | Baseline-Einweisungsrate je Band | 1/100.000·a | 1,9 / 6,3 / 10,8 / 15,6 (= 1:3,3:5,7:8,2; Summe 3,54; Band ×0,6–1,6 = Summen-Band 2,9–4,4 [×0,83–1,26] kombiniert mit Altersprofil-Unsicherheit ±25 % [Option-B-Profil §3.4] ⇒ ≈ ×0,6–1,6) — Herleitung §3.4, Altersprofil gekennzeichnete Abschätzung [16,18,62]; herleitung:#r0-a |
 | \(T_{0,\text{Region}}\) | Wirkschwelle Wochenmittel | °C | 19,7 / 20,2 / 20,8 (N/M/S), Winklmayr [11]; register:95-E02-01 |
 | \(T_w\) | Wochenmitteltemperatur der Sommerwoche | °C | berechnet |
-| \(\bar T_{\text{Zelle}}\) | Sommermitteltemperatur (24-h, §3.1) — Kartenebene | °C | DWD 1 km + UHI |
+| \(\bar T_{\text{Zelle}}\) | Sommermitteltemperatur (24-h, §3.1) — Kartenebene | °C | DWD-CDC-Raster 1 km [33] + Stadtklima-Zuschlag, mittelwerttreu (§3.1); register:95-W124-01 |
 | \(v_{\text{vers},a}\) | bandweiser Versorgungs-/Isolations-Modifikator (§3.3; Demografie steckt genau einmal in \(\text{pop}_a\)) | — | berechnet |
 | \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | 160.800 (Band 136,4–165,6 T€; Herleitung §3.5 [19]); herleitung:#voly |
 | \(\text{YLL}_{\text{Zelle}}\) | verlorene Lebensjahre — **nativer Ausweis** | Jahre/Jahr | Ergebnis |
@@ -992,8 +1088,8 @@ DOI-Links die persistenten Referenzen.
   20:124071, 2025 (online 23.12.2025). doi:10.1088/1748-9326/ae2775 (Open Access;
   102 Standorte, 14 Länder, 1990–2019; HAF-Reduktion 25,2 % [19,8–31,9], regional
   −11,9…−33,2 %, ohne 2003: 15,2 % [4,1–23,7] — Effektzahlen aus dem Volltext korrigiert
-  26.08.2026, Befund 68; die frühere Angabe „2–23 %" stammte aus dem unverifizierten
-  Rev.-5-Platzhalterzitat und steht nicht in der Studie).
+  26.08.2026, Befund 68; die frühere Angabe „2–23 %" stammte aus einem in Rev. 5 nicht
+  am Volltext belegten Zitat und steht nicht in der Studie).
 - **[48]** Destatis, Statistischer Bericht „Sterbetafeln 2022/2024" (Juli 2025), Blätter
   12613-b01/-b02, destatis.de; Bevölkerungsgewichte: Fortschreibung 31.12.2023
   (regionalstatistik.de, Tab. 12411-09-01-4-B, Basis Zensus 2022).
@@ -1030,34 +1126,14 @@ DOI-Links die persistenten Referenzen.
   Gemeinde; Repo-Aufbereitung `backend/data/lite/zensus_gemeinde.json` (sha256-Pin
   s. §4 `#t-povw`), zensus2022.de — dl-de/by-2-0.
 
-## 9 Ansatz-Vergleich (§3.7 — erster Vertreter der Familie „K1-Gesundheit bottom-up")
-
-Vollständige Beschreibung der Alternativen in M0 Rev. 5, Kap. 2 (95-B/95-C) und Kap. 5;
-hier die Entscheidungssubstanz (Parameter der Alternativen bis zur Quelle, §3.9-Geltungsbereich):
-
-- **95-A — RKI-ERF, bottom-up (Umsetzungsgrundlage):** publizierte Kurvenform, implementiert,
-  empirisch kalibriert, volle Zell-Differenzierung, sauberer Maßnahmen-Anschluss,
-  architektur-konform. Kriterien: kausale Treue ●●● · Kalibrierbarkeit ●●● · lokale
-  Differenzierung ●●● · Daten M0 ●●● · Maßnahmen ●●● · Architektur ●●● · Aufwand klein–mittel.
-- **95-B — Nationaler Anker, top-down (Indexmasse-Verteilung): per §3.1 ausgeschieden**
-  (Verteilschlüssel; treiberfreie Kommune könnte Fälle erhalten; zweite fixe Indexmasse +
-  Deutschland-Nenner nötig). Nur Negativ-Beispiel.
-- **95-C — Personen-Hitzegradtage-Regression, lokal:** dokumentierte Alternative (linear mit
-  aufgesetzter Konvexität \(\kappa\) ≈ 1,2–1,5; verwirft die publizierte Kurvenform, die A
-  bereits hat). Kriterien: ●● / ●● / ●● / ●●● / ●● / ●●● · Aufwand mittel.
-
-Begründung der Empfehlung: Die publizierte RKI-Kurve ist implementiert, empirisch kalibriert
-(Rev. 7: **ein** nationaler Skalar 0,581 auf bevölkerungsgewichteter Kalibrierbasis, ohne
-Pauschalkorrektur und ohne Regionalfaktoren; Kalibrier-Prüfstein 12/16 bestanden §4) und
-über Altersverteilung + Berlin-Anker validiert — jeder andere Ansatz wäre ein Rückschritt.
-Folge-Risiken der Familie erben diese Struktur (§2.6).
-
 ## Entscheidungslog
 
 Einträge 1–18: in M0 (Rev. 1–5) getroffene Setzungen (rückwirkend dokumentiert bei der
 Migration). Einträge 19–27: Rev.-6-Entscheidungen (`/risiko-auto`, Gate 1); Einträge 28–30:
 Revision nach Review-Runde 1 (Befunde 58/59/62); Einträge 31–33: Rev.-7-Kalibrier-Revision
-(Auflösung der §6-Eskalation, 30.08.2026).
+(Auflösung der §6-Eskalation, 30.08.2026). Einträge 37–38: verworfene Ansätze aus dem früheren
+Kapitel 9 (Ansatz-Vergleich), das mit Fortschreibung 7 entfällt (eine Methodik je Risiko,
+Befund 95); der gewählte Ansatz 95-A ist Nr. 1.
 **Überstimmungsweg für alle Einträge:** „Entscheidung Nr. X ändern auf …" → Delta-Lauf
 (Neurechnung betroffener Kopplungen + Re-Review). ⚠ = Ermessensfall.
 
@@ -1099,3 +1175,5 @@ Revision nach Review-Runde 1 (Befunde 58/59/62); Einträge 31–33: Rev.-7-Kalib
 | 34 ⚠ | Finaler Kalibrier-Abgleich ohne Zell-Lauf? | **kommunale Stichproben-Abgleiche** (Anker-Kommunen, Produktionsmodell) ersetzen den nationalen 100-m-Vollraster-Lauf überall im Bericht | Nutzer-Entscheid 30.08.2026 + §3.4-Ressourcen-Regel (Aufgaben-Fortschreibung): Vollraster-Läufe fressen zu viele Ressourcen und dürfen nie Prüf-/Abgleichvoraussetzung sein | nationaler Zell-Lauf (verworfen per Regel) | Rest-Bias-Prüfung (×1,02, Topographie-Anteil Süd) läuft über Stichproben statt Vollraster |
 | 35 ⚠ | q_pfl-Ebene ohne Kreis-Pflegestatistik? | `CARE_HOME_SHARE_85P` aus OSM, **kommunen-erwartungstreu** auf q̄_pfl normiert (statt Kreis-Skalierung); q_1P-Ebene **geparkt** (keine offene Quelle) | §3.1-Anlagepflicht; Tab. 22421 je Kreis nicht keyless; Erwartungstreue hält die Kalibrierneutralität je Kommune | Kreis-Skalierung (nicht keyless) · dauerhafter Neutral-Fallback (per §3.1 unzulässig) | intra-kommunale 85+-Differenzierung aktiv; zwischen Kommunen weiter q̄ |
 | 36 | L̄_85+ exakt statt Approximation? | **4,16 J** — Einzeljahres-Sterbefälle 85–94 × e(x), 95+-Rest tafelintern gewichtet, m/w sterbefallgewichtet kombiniert | Befund-22-Auflösung wie in §3.5 terminiert; Kreuzcheck 12613-02↔-03 exakt | Stützstellen-Variante (4,83 — behebt nur den Gewichte-Fehler, nicht die Untergrenzen-Stützstellen) | YLL-Bundessumme ≈ −8 %; €-Ausweis sinkt entsprechend (konservativ) |
+| 37 | Ansatz 95-B (nationaler Anker, top-down)? | **verworfen** | 95-B verteilt eine feste nationale Zahl von Hitzetoten über einen Schlüssel und scheidet nach §3.1 aus, weil damit auch eine Kommune ohne Hitze Todesfälle erhielte. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
+| 38 | Ansatz 95-C (Personen-Hitzegradtage-Regression)? | **verworfen** | 95-C ersetzt die publizierte und kalibrierte RKI-Kurve durch eine lineare Regression mit aufgesetzter Krümmung (κ ≈ 1,2–1,5) und wäre gegenüber 95-A ein Rückschritt. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
