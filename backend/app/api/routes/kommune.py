@@ -17,9 +17,12 @@ from app.models.models import (
     CellAssessment, GridCell, AdaptationMeasure,
     MeasureImpact, ProjectStatus, RiskZone, GeoExportJob,
 )
+from app.data import catalog
 from app.data.kang_zustaendigkeit import zustaendigkeit_fuer
 from app.services.bestandsaufnahme_markdown import bestandsaufnahme_markdown
 from app.services.kurzfassung_markdown import kurzfassung_fuer_kommune
+from app.services.measure_service import get_risk_aggregate
+from app.services.systembereiche import systembereich_auswertung
 from app.services.geodata_export_service import get_exports_dir, assessment_is_done
 from app.schemas.schemas import KommuneCreate, KommuneOut, KommuneSearch, GridGenerateRequest
 from app.services import (
@@ -200,6 +203,49 @@ def get_kommune_unsicherheits_zusammenschau(kommune_id: int, db: Session = Depen
     if not kommune:
         raise HTTPException(404, "Kommune nicht gefunden")
     return unsicherheits_zusammenschau.unsicherheits_zusammenschau(kommune.id)
+
+
+@router.get("/{kommune_id}/systembereiche")
+def get_kommune_systembereiche(kommune_id: int, db: Session = Depends(get_db)):
+    """Auswertung über die fünf KWRA-Systembereiche (Checkliste Zeile 10, KWRA TB 6 Kap. 7).
+
+    Alle fünf Bereiche stehen immer da, in der Reihenfolge ``catalog.KWRA_SYSTEMBEREICHE``.
+    Ein Bereich ohne Klimawirkung wird nicht ausgeblendet, sondern mit ``leer_grund``
+    ausgewiesen (P2); ohne Risiko-Aggregat sind alle fünf so leer.
+    """
+    kommune = (
+        db.query(Kommune)
+        .options(load_only(Kommune.id))
+        .filter(Kommune.id == kommune_id)
+        .first()
+    )
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+    try:
+        agg = get_risk_aggregate(db, kommune.id, apply_measures=False)
+    except Exception:  # noqa: BLE001 - kein Aggregat ⇒ leere Bereiche mit Grund, nie 500
+        agg = None
+    if not isinstance(agg, dict) or not (agg.get("cost") or {}).get("by_risk"):
+        agg = {"cost": {"by_risk": []}}
+        liegt_aggregat_vor = False
+    else:
+        liegt_aggregat_vor = True
+    auswertung = systembereich_auswertung(agg)
+    bereiche = []
+    for name in catalog.KWRA_SYSTEMBEREICHE:
+        eintrag = auswertung[name]
+        if eintrag["anzahl_klimawirkungen"] == 0:
+            grund = (
+                f"Für den Systembereich „{name}“ ist in KAP3 heute keine Klimawirkung "
+                "gerechnet; der Bereich bleibt als leer ausgewiesen."
+                if liegt_aggregat_vor else
+                f"Für diese Kommune liegt noch keine Risikoberechnung vor; der Systembereich "
+                f"„{name}“ ist deshalb leer."
+            )
+        else:
+            grund = None
+        bereiche.append({"systembereich": name, **eintrag, "leer_grund": grund})
+    return {"kommune_id": kommune.id, "bereiche": bereiche}
 
 
 @router.get("")
