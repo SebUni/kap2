@@ -33,28 +33,62 @@ function HiddenChip() {
  * Beleglage je Parameter (Vorgabe P1): ohne Klick und ohne Hover lesbar, ob der
  * Wert belegt ist oder eine begründete Abschätzung von KAP3. Der Wert kommt aus
  * dem Backend-Feld `evidence_class` — keine Heuristik über den Freitext `source`.
- * Die Herleitung steht zusätzlich (nicht ersatzweise) im Tooltip.
+ * Die Herleitung (Wert, Bandbreite, Sensitivität bzw. der Vermerk) ist über die
+ * sichtbare Schaltfläche „Herleitung“ als Text in der Tabelle aufklappbar; der
+ * Tooltip bleibt zusätzlich erhalten.
  */
 function EvidenceCell({ p }: { p: ModelParameter }) {
+  const [open, setOpen] = useState(false)
   // Demo: bei verborgenen Ebenen bleibt die Spalte leer (demo_hidden nicht umgehen).
   if (p.demo_hidden) return null
   const abgeschaetzt = p.evidence_class === 'abgeschaetzt'
   const d = p.evidence_derivation
+  const hatHerleitung = Boolean(d || p.evidence_note)
   return (
-    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-      <span className={`kap-param-evidence ${abgeschaetzt ? 'is-estimated' : 'is-sourced'}`}>
-        {abgeschaetzt ? 'abgeschätzt (KAP3)' : 'belegt'}
+    <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <span style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+        <span className={`kap-param-evidence ${abgeschaetzt ? 'is-estimated' : 'is-sourced'}`}>
+          {abgeschaetzt ? 'abgeschätzt (KAP3)' : 'belegt'}
+        </span>
+        {d && (
+          <InfoTooltip
+            title={abgeschaetzt ? 'Abschätzung KAP3 — Herleitung' : 'Beleglage — Herleitung'}
+            description={p.evidence_note}
+            rows={[
+              { label: 'Wert', value: d.wert },
+              { label: 'Bandbreite', value: d.band },
+              { label: 'Sensitivität', value: d.sensitivitaet },
+            ]}
+          />
+        )}
+        {hatHerleitung && (
+          <button
+            type="button"
+            className="btn btn-secondary"
+            aria-expanded={open}
+            onClick={() => setOpen(o => !o)}
+            style={{ fontSize: '0.68rem', padding: '0 6px', lineHeight: 1.6 }}
+          >
+            {open ? '▾' : '▸'} Herleitung
+          </button>
+        )}
       </span>
-      {d && (
-        <InfoTooltip
-          title={abgeschaetzt ? 'Abschätzung KAP3 — Herleitung' : 'Beleglage — Herleitung'}
-          description={p.evidence_note}
-          rows={[
-            { label: 'Wert', value: d.wert },
-            { label: 'Bandbreite', value: d.band },
-            { label: 'Sensitivität', value: d.sensitivitaet },
-          ]}
-        />
+      {hatHerleitung && open && (
+        <span
+          className="kap-param-evidence-derivation"
+          style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'normal', lineHeight: 1.4 }}
+        >
+          {d && (
+            <>
+              <span style={{ display: 'block' }}><strong>Wert:</strong> {d.wert}</span>
+              <span style={{ display: 'block' }}><strong>Bandbreite:</strong> {d.band}</span>
+              <span style={{ display: 'block' }}><strong>Sensitivität:</strong> {d.sensitivitaet}</span>
+            </>
+          )}
+          {p.evidence_note && (
+            <span style={{ display: 'block' }}><strong>Vermerk:</strong> {p.evidence_note}</span>
+          )}
+        </span>
       )}
     </span>
   )
