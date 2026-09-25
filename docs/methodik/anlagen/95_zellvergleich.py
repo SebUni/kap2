@@ -20,17 +20,23 @@ Mit --ersatz zusätzlich die Ersatzregel aus §3.3 für Zellen, deren Anteil 65+
 ist („–“; das Produkt setzt dort heute 65+ = 0, Befund 104):
   Stufe 1  Ist in der Zelle mindestens eine 5er-Jahresgruppe ab 65 im Altersgitter veröffentlicht, gilt
            die Summe der veröffentlichten Gruppen ab 65 geteilt durch die Einwohner der Zelle.
-  Stufe 2  Sonst gilt der einwohnergewichtete Anteil 65+ aller Zellen derselben Gemeinde, in denen er
-           veröffentlicht ist.
-  Hat die Gemeinde keine Zelle mit veröffentlichtem Anteil, bleibt der Fall als Modellgrenze stehen
-  (Ausgabe „ohne Ersatzwert“, die Zellen rechnen dann wie heute).
-Ausgegeben werden der Jahresbetrag nach heutiger Produktlogik (Zellen wie (c), dazu (d)), der
-Jahresbetrag mit Ersatzregel (ebenso mit (d)) und der Faktor heute gegen Ersatzregel.
+  Stufe 2  Sonst bekommt die Zelle einen Anteil am Rest aus der Gemeindesumme: Zielzahl
+           Z = A_G × Einwohner der Gemeinde im Gitter, mit A_G = (Einwohner ab 67 + 2/7 der Gruppe 60–66) /
+           Einwohner aus dem Zensus 2022 [69] (2/7 ist eine Abschätzung von KAP3, [69] trennt bei 67);
+           Rest R = Z − Einwohner ab 65 der Zellen mit veröffentlichtem Anteil − Einwohner ab 65 aus Stufe 1;
+           jede übrige geheimgehaltene Zelle bekommt R / Einwohner dieser Zellen, begrenzt auf 0–100 %
+           (R < 0 gibt 0). Das gilt auch für Gemeinden ohne Zelle mit veröffentlichtem Anteil.
+  Ohne Zeile in [69] (Gebietsstand) oder mit „.“ dort bleibt Stufe 2 aus (Ausgabe „ohne Ersatzwert“).
+Ausgegeben werden die Einwohner ab 65 heute und mit Regel, der Jahresbetrag nach heutiger Produktlogik
+(Zellen wie (c), dazu (d)), der Jahresbetrag mit Ersatzregel (ebenso mit (d)), der Faktor heute gegen
+Ersatzregel und die Spanne des Faktors, wenn die Gruppe 60–66 gar nicht (0/7) oder ganz (7/7) zählt.
 Beispiel: python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz
 
 Mit --rangliste (ohne --gemeinde) zählt das Skript für alle Gemeinden aus VG250 den Anteil der Einwohner in
 Zellen mit geheimgehaltenem Anteil 65+ aus und nennt die Gemeinden mit dem höchsten Anteil unter denen mit
-2.000 bis unter 10.000 Einwohnern im Gitter (Wahl der ländlichen Beispielkommune in §3.3; einige Minuten).
+2000 bis unter 10.000 Einwohnern im Gitter (Wahl der ländlichen Beispielkommune in §3.3; einige Minuten).
+Dazu zählt es, in wie vielen Gemeinden der Rest R der Stufe 2 unter null liegt (Modellgrenze §3.3), in
+wie vielen der Anteil der Stufe 2 auf 100 % begrenzt wird und wie viele keine Zeile in [69] haben.
 
 Parameter: Kapitel 7 des Berichts (Zeilen „wert:“), Wochenquantile aus der Tabelle §3.2 wie die
 Rechenkette (mit --wochenquantile produkt aus backend/data/kalibrierung/wochenquantile_region.csv
@@ -323,6 +329,73 @@ def lade(url: str, ziel: Path, *, pflicht: bool = True) -> Path | None:
         raise
     os.replace(str(ziel) + ".tmp", ziel)
     return ziel
+
+
+# ── Zensus 2022, Regionaltabelle „Demografie“ [69] (Stufe 2 der Ersatzregel §3.3) ──
+
+DEMOGRAFIE_URL = "https://www.destatis.de/static/DE/zensus/gitterdaten/Regionaltabelle_Demografie.xlsx"
+# Abschätzung von KAP3 (§3.3, Log 41): [69] trennt bei 67. Von der Gruppe 60–66 (sieben Jahrgänge) zählen die
+# Jahrgänge 65 und 66, also 2/7, zu den Menschen ab 65 (gleich viele Menschen je Jahrgang angenommen).
+ANTEIL_60_66 = 2 / 7
+
+
+def zensus_demografie(cache: Path) -> dict:
+    """AGS (8 Stellen) -> (Insgesamt, 60–66, ab 67) je Gemeinde aus dem Blatt „CSV-Demografie“ von [69].
+
+    Zeichen nach der Zeichenerklärung von [69]: „–“ = genau null oder auf null geändert (zählt als 0),
+    „.“ = Zahlenwert unbekannt oder geheim (die Gemeinde bekommt keinen Wert, None)."""
+    import xml.etree.ElementTree as ET
+    import re
+    ns = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+    rel_ns = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id"
+    z = zipfile.ZipFile(lade(DEMOGRAFIE_URL, cache / "zensus" / "Regionaltabelle_Demografie.xlsx"))
+    texte = [''.join(t.text or '' for t in si.iter(ns + "t"))
+             for si in ET.fromstring(z.read("xl/sharedStrings.xml")).iter(ns + "si")]
+    rid = next(s.get(rel_ns) for s in ET.fromstring(z.read("xl/workbook.xml")).iter(ns + "sheet")
+               if s.get("name") == "CSV-Demografie")
+    ziel = next(r.get("Target") for r in ET.fromstring(z.read("xl/_rels/workbook.xml.rels"))
+                if r.get("Id") == rid)
+    kopf, daten = None, {}
+    for _, el in ET.iterparse(z.open("xl/" + ziel.lstrip("/").removeprefix("xl/"))):
+        if el.tag != ns + "row":
+            continue
+        zeile = {}
+        for c in el.iter(ns + "c"):
+            v = c.find(ns + "v")
+            wert = "" if v is None else (texte[int(v.text)] if c.get("t") == "s" else v.text)
+            zeile[re.match(r"[A-Z]+", c.get("r")).group()] = wert
+        el.clear()
+        if kopf is None:
+            kopf = {name: sp for sp, name in zeile.items()}
+            continue
+        if zeile.get(kopf["Regionalebene"]) != "Gemeinde":
+            continue
+
+        def zahl(name):
+            w = zeile.get(kopf[name], "").strip()
+            return 0.0 if w == "–" else (float(w) if w.isdigit() else None)
+        ges, g60, g67, g75 = (zahl(n) for n in ("0_Insgesamt_", "Alter_infr__09", "Alter_infr__10",
+                                                 "Alter_infr__11"))
+        ars = zeile[kopf["_RS"]]
+        ok = None not in (ges, g60, g67, g75) and ges > 0
+        daten[ars[:5] + ars[9:]] = (ges, g60, g67 + g75) if ok else None
+    return daten
+
+
+def zielanteil_ab65(zeile, teil: float = ANTEIL_60_66) -> float:
+    """A_G = (Einwohner ab 67 + teil × Gruppe 60–66) / Einwohner der Gemeinde [69]."""
+    ges, g60, ab67 = zeile
+    return (ab67 + teil * g60) / ges
+
+
+def stufe2_anteil(a_g: float, ew_gitter: float, ew65_fest: float, ew_stufe2: float):
+    """Stufe 2 (§3.3): Zielzahl Z = A_G × E_Gitter; Rest R = Z − Einwohner ab 65, die schon feststehen
+    (Zellen mit veröffentlichtem Anteil und Stufe 1); jede übrige geheimgehaltene Zelle bekommt R / ihre
+    Einwohner, begrenzt auf 0–100 %. Gibt (Anteil, Z, R) zurück."""
+    z = a_g * ew_gitter
+    r = z - ew65_fest
+    anteil = min(1.0, max(0.0, r / ew_stufe2)) if ew_stufe2 > 0 else 0.0
+    return anteil, z, r
 
 
 # ── Gemeindegebiet aus VG250 (GeoPackage über sqlite3) ────────────────────────
@@ -618,14 +691,29 @@ def rangliste(cache: Path, vg250_url: str, von: int = 2_000, bis: int = 10_000, 
     zl = zensus_loader_laden(cache)
     lies = lambda key: csv.DictReader(open(zl.ensure_zensus_dataset(key), newline="", encoding="utf-8"),  # noqa: E731
                                       delimiter=";")
-    geheim = {zl._gitter_id_from_row(r) for r in lies("share_over_65")
-              if not zl._parse_float(r.get("AnteilUeber65"), dash_zero=True)}
+    anteil = {zl._gitter_id_from_row(r): zl._parse_float(r.get("AnteilUeber65"), dash_zero=True) or 0.0
+              for r in lies("share_over_65")}
+    # Stufe 1 der Ersatzregel: Summe der veröffentlichten 5er-Jahresgruppen ab 65 (nur geheimgehaltene Zellen)
+    spalten65 = [c for b in ("a65_74", "a75_84", "a85p") for c in zl.AGE_BAND_COLUMNS[b]]
+    stufe1: dict = {}
+    for r in lies("age_groups"):
+        gid = zl._gitter_id_from_row(r)
+        if not anteil.get(gid):
+            s = sum(zl._parse_float(r.get(c), dash_zero=True) or 0.0 for c in spalten65)
+            if s > 0:
+                stufe1[gid] = s
     kacheln: dict = {}
     for r in lies("population"):
         e = zl._parse_float(r.get("Einwohner"), dash_zero=True) or 0.0
         if e > 0:
             x, y = int(r["x_mp_100m"]), int(r["y_mp_100m"])
-            kacheln.setdefault((x // 1000, y // 1000), []).append((x, y, e, zl._gitter_id_from_row(r) in geheim))
+            gid = zl._gitter_id_from_row(r)
+            a = anteil.get(gid, 0.0)
+            # je Zelle: Einwohner, geheimgehalten?, Einwohner ab 65 fest (veröffentlicht oder Stufe 1), Stufe 2?
+            fest = e * a / 100.0 if a else stufe1.get(gid, 0.0)
+            kacheln.setdefault((x // 1000, y // 1000), []).append(
+                (x, y, e, not a, fest, not a and gid not in stufe1))
+    demografie = zensus_demografie(cache)
     gemeindegebiet("11000000", cache, vg250_url)  # entpackt das GeoPackage, falls nötig
     con = sqlite3.connect(f"file:{cache / 'vg250' / 'DE_VG250.gpkg'}?mode=ro", uri=True)
     try:
@@ -643,20 +731,28 @@ def rangliste(cache: Path, vg250_url: str, von: int = 2_000, bis: int = 10_000, 
     for ags, (name, polys) in gebiete.items():
         innen = Innen([[LAEA3035.vor(*UTM32.zurueck(x, y)) for x, y in r] for p in polys for r in p])
         x0, y0, x1, y1 = innen.bbox
-        ew = ew_g = 0.0
+        ew = ew_g = ew_fest = ew_s2 = 0.0
         offen = 0
         for kx in range(int(x0 // 1000), int(x1 // 1000) + 1):
             for ky in range(int(y0 // 1000), int(y1 // 1000) + 1):
-                for x, y, e, g in kacheln.get((kx, ky), ()):
+                for x, y, e, g, fest, s2 in kacheln.get((kx, ky), ()):
                     if innen(x, y):
                         ew += e
                         ew_g += e if g else 0.0
                         offen += 0 if g else 1
+                        ew_fest += fest
+                        ew_s2 += e if s2 else 0.0
         if ew > 0:
-            liste.append((ags, name, ew, ew_g, offen))
+            zeile = demografie.get(ags)
+            r = zielanteil_ab65(zeile) * ew - ew_fest if zeile is not None else None
+            liste.append((ags, name, ew, ew_g, offen, ew_s2, r))
     klein = [z for z in liste if z[2] < bis]
     quoten = sorted(z[3] / z[2] for z in klein)
     ohne = [z for z in liste if z[4] == 0]
+    mit_s2 = [z for z in liste if z[5] > 0]
+    ohne_zeile = [z for z in mit_s2 if z[6] is None]
+    negativ = [z for z in mit_s2 if z[6] is not None and z[6] < 0]
+    voll = [z for z in mit_s2 if z[6] is not None and z[6] > z[5]]
     print(f"Rangliste #95 — {de_int(len(liste))} Gemeinden mit Einwohnern im Zensus-Gitter, "
           f"{de_int(sum(z[2] for z in liste))} Einwohner")
     print(f"Anteil der Einwohner in Zellen mit geheimgehaltenem Anteil 65+: alle Gemeinden "
@@ -664,11 +760,23 @@ def rangliste(cache: Path, vg250_url: str, von: int = 2_000, bis: int = 10_000, 
           f"{de_int(len(klein))} Gemeinden unter {de_int(bis)} Einwohnern zusammen "
           f"{de(100 * sum(z[3] for z in klein) / sum(z[2] for z in klein), 1)} %, "
           f"Median je Gemeinde {de(100 * quoten[len(quoten) // 2], 1)} %")
-    print(f"Gemeinden ohne Zelle mit veröffentlichtem Anteil 65+ (Modellgrenze der Ersatzregel): "
-          f"{de_int(len(ohne))} mit zusammen {de_int(sum(z[2] for z in ohne))} Einwohnern")
+    print(f"Gemeinden ohne Zelle mit veröffentlichtem Anteil 65+: {de_int(len(ohne))} mit zusammen "
+          f"{de_int(sum(z[2] for z in ohne))} Einwohnern (Stufe 2 gilt auch für sie)")
+    ew_s2 = sum(z[5] for z in mit_s2)
+    print(f"Stufe 2 der Ersatzregel (Rest aus der Gemeindesumme [69], 2/7 der Gruppe 60–66): "
+          f"{de_int(len(mit_s2))} Gemeinden mit Zellen der Stufe 2, darin {de_int(ew_s2)} Einwohner")
+    for text, gruppe in (("Rest R < 0 (Stufe 2 gibt 0 %, Modellgrenze)", negativ),
+                         ("Rest R über den Einwohnern der Stufe 2 (auf 100 % begrenzt)", voll),
+                         ("keine Zeile in [69] oder „.“ dort (ohne Ersatzwert)", ohne_zeile)):
+        e2 = sum(z[5] for z in gruppe)
+        print(f"  {text}: {de_int(len(gruppe))} Gemeinden, {de_int(e2)} Einwohner in Zellen der Stufe 2 "
+              f"({de(100 * e2 / ew_s2, 1) if ew_s2 else '–'} %)")
+    if negativ:
+        print(f"    R < 0 im Median {de_int(sorted(z[6] for z in negativ)[len(negativ) // 2])} Einwohner ab 65; "
+              f"größter Überhang {de_int(min(z[6] for z in negativ))}")
     print(f"Höchster Anteil unter den Gemeinden mit {de_int(von)} bis unter {de_int(bis)} Einwohnern:")
-    for ags, name, ew, ew_g, offen in sorted((z for z in klein if z[2] >= von),
-                                             key=lambda z: -z[3] / z[2])[:n]:
+    for ags, name, ew, ew_g, offen, _s2, _r in sorted((z for z in klein if z[2] >= von),
+                                                     key=lambda z: -z[3] / z[2])[:n]:
         print(f"  {ags} {name}: {de_int(ew)} Einwohner, davon {de_int(ew_g)} ({de(100 * ew_g / ew, 1)} %) "
               f"in geheimgehaltenen Zellen; {de_int(offen)} Zellen mit veröffentlichtem Anteil")
 
@@ -811,20 +919,31 @@ def main():
     # veröffentlicht erst ab 3 Personen, „–“ liest der Loader als 0), geteilt durch die Einwohner der Zelle
     spalten65 = [c for b in ("a65_74", "a75_84", "a85p") for c in zl.AGE_BAND_COLUMNS[b]]
     stufe = {}
-    regel = []
-    for i, (bd, t, h) in enumerate(zell_c):
-        if i in ohne_set:
-            werte = [float(zensus["age_groups"].get(gids[i], {}).get(c) or 0.0) for c in spalten65]
-            if any(v > 0 for v in werte):
-                a65 = sum(werte) / ew[i]
-                stufe[i] = (1, a65)
-                bd = mit_anteil(i, bd, a65)
-            elif anteil65 is not None:
-                stufe[i] = (2, anteil65)
-                bd = mit_anteil(i, bd, anteil65)
-            else:
-                stufe[i] = (0, 0.0)
-        regel.append((bd, t, h))
+    for i in ohne:
+        werte = [float(zensus["age_groups"].get(gids[i], {}).get(c) or 0.0) for c in spalten65]
+        if any(v > 0 for v in werte):
+            stufe[i] = (1, sum(werte) / ew[i])
+    # Stufe 2 der Ersatzregel §3.3 (Log 41): Rest aus der Gemeindesumme des Zensus 2022 [69]
+    stufe2_idx = [i for i in ohne if i not in stufe]
+    ew_stufe2 = sum(ew[i] for i in stufe2_idx)
+    ew65_mit = sum(cell_inputs[i]["pop_over_65"] for i in mit)
+    ew65_stufe1 = sum(ew[i] * stufe[i][1] for i in stufe)
+    demo = zensus_demografie(cache).get(ags) if args.ersatz else None
+
+    def regel_zellen(teil):
+        """Zellen mit Ersatzregel; teil = gezählter Anteil der Gruppe 60–66 (Vorgabe 2/7)."""
+        st2 = stufe2_anteil(zielanteil_ab65(demo, teil), sum_ew, ew65_mit + ew65_stufe1, ew_stufe2) \
+            if demo is not None else None
+        zellen = []
+        for i, (bd, t, h) in enumerate(zell_c):
+            if i in stufe:
+                bd = mit_anteil(i, bd, stufe[i][1])
+            elif i in ohne_set and st2 is not None:
+                bd = mit_anteil(i, bd, st2[0])
+            zellen.append((bd, t, h))
+        return zellen, st2
+
+    regel, st2 = regel_zellen(ANTEIL_60_66) if args.ersatz else (zell_c, None)
 
     # Ausgabe
     def mio(v):  # kap3-stil: ab einer Million in Mio. €, darunter ausgeschrieben
@@ -875,19 +994,29 @@ def main():
         print("Ersatzregel §3.3 für den geheimgehaltenen Anteil 65+ (Abschätzung von KAP3, Befund 104):")
         print(f"  Einwohner (Zensus-Gitter 2022): {de_int(sum_ew)}; davon in Zellen mit geheimgehaltenem "
               f"Anteil 65+: {de_int(ew_ohne)} ({de(100 * ew_ohne / sum_ew, 1)} %) in {de_int(len(ohne))} Zellen")
-        for s, text in ((1, "Stufe 1, 5er-Jahresgruppen ab 65 der Zelle"),
-                        (2, "Stufe 2, Anteil der Zellen mit veröffentlichtem Anteil"
-                            + (f" ({de(100 * anteil65, 2)} %)" if anteil65 is not None else "")),
-                        (0, "ohne Ersatzwert (Modellgrenze: keine Zelle der Gemeinde mit veröffentlichtem "
-                            "Anteil 65+; rechnet wie heute)")):
-            idx = [i for i, (st, _) in stufe.items() if st == s]
-            e = sum(ew[i] for i in idx)
-            zeile = f"  {text}: {de_int(len(idx))} Zellen, {de_int(e)} Einwohner"
-            if s == 1 and idx:
-                a1 = sum(ew[i] * stufe[i][1] for i in idx) / e
-                ueber = sum(1 for i in idx if stufe[i][1] > 1)
-                zeile += f", Anteil 65+ im Mittel {de(100 * a1, 2)} %, davon über 100 %: {ueber} Zellen"
-            print(zeile)
+        idx1 = list(stufe)
+        e1 = sum(ew[i] for i in idx1)
+        zeile = f"  Stufe 1, 5er-Jahresgruppen ab 65 der Zelle: {de_int(len(idx1))} Zellen, {de_int(e1)} Einwohner"
+        if idx1:
+            zeile += (f", Anteil 65+ im Mittel {de(100 * ew65_stufe1 / e1, 2)} %, davon über 100 %: "
+                      f"{sum(1 for i in idx1 if stufe[i][1] > 1)} Zellen")
+        print(zeile)
+        if demo is None:
+            print(f"  Stufe 2: keine Zeile für {ags} in der Regionaltabelle Demografie [69] (oder „.“ dort); "
+                  f"{de_int(len(stufe2_idx))} Zellen mit {de_int(ew_stufe2)} Einwohnern ohne Ersatzwert, "
+                  f"rechnen wie heute")
+        else:
+            ges, g60, ab67 = demo
+            a_g = zielanteil_ab65(demo)
+            print(f"  Stufe 2, Rest aus der Gemeindesumme: {de_int(len(stufe2_idx))} Zellen, "
+                  f"{de_int(ew_stufe2)} Einwohner")
+            print(f"    Zensus 2022 [69]: {de_int(ges)} Einwohner, 60–66: {de_int(g60)}, ab 67: {de_int(ab67)}; "
+                  f"A_G = ({de_int(ab67)} + 2/7 × {de_int(g60)}) / {de_int(ges)} = {de(100 * a_g, 2)} %")
+            print(f"    Zielzahl Z = {de(100 * a_g, 2)} % × {de_int(sum_ew)} = {de_int(st2[1])}; "
+                  f"fest: {de_int(ew65_mit)} (Zellen mit veröffentlichtem Anteil) + {de_int(ew65_stufe1)} "
+                  f"(Stufe 1); Rest R = {de_int(st2[2])}")
+            print(f"    Anteil je Zelle der Stufe 2: R / {de_int(ew_stufe2)} = {de(100 * st2[0], 2)} %"
+                  + (" (begrenzt)" if ew_stufe2 > 0 and not 0 <= st2[2] / ew_stufe2 <= 1 else ""))
         alle_sp = zl.ALL_AGE_COLUMNS
         g_alle = sum(float(zensus["age_groups"].get(gids[i], {}).get(c) or 0.0) for i in ohne for c in alle_sp)
         g_65 = sum(float(zensus["age_groups"].get(gids[i], {}).get(c) or 0.0) for i in ohne for c in spalten65)
@@ -901,9 +1030,16 @@ def main():
         print(f"  Jahresbetrag nach heutiger Produktlogik (65+ = 0, mit (d)): {mio(eur['d'])} (Preisstand 2024)")
         print(f"  Jahresbetrag mit Ersatzregel (mit (d)): {mio(eur_regel)} (Preisstand 2024)")
         print(f"  Faktor heutige Produktlogik gegen Ersatzregel: × {de(eur['d'] / eur_regel, 3)}")
-        if anteil65 is not None:
-            print(f"  Vergleich nur Stufe 2 für alle geheimgehaltenen Zellen (Variante Runde 12): "
-                  f"{mio(modell.euro(ersatz, args.sigma, gh))}")
+        if demo is not None:
+            spanne = []
+            for teil, text in ((0.0, "0/7, nur ab 67"), (1.0, "7/7, ab 60")):
+                zellen, _ = regel_zellen(teil)
+                s65 = sum(bd[b] for bd, _, _ in zellen for b in BANDS[1:])
+                betrag = modell.euro(zellen, args.sigma, gh)
+                spanne.append(eur["d"] / betrag)
+                print(f"  Gruppe 60–66 zählt {text}: Einwohner ab 65 {de_int(s65)}, Jahresbetrag {mio(betrag)}, "
+                      f"Faktor × {de(eur['d'] / betrag, 3)}")
+            print(f"  Spanne des Faktors (60–66 ganz oder gar nicht): × {de(min(spanne), 3)}–{de(max(spanne), 3)}")
     with open(KALIB / "sommermittel_bundesland_povw.csv", newline="", encoding="utf-8") as fh:
         reihe = [float(r["t_sommer_povw"]) for r in csv.DictReader(fh)
                  if r["bundesland"] == land and args.bis_jahr - 9 <= int(r["jahr"]) <= args.bis_jahr]

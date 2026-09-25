@@ -386,24 +386,66 @@ Zensus-Gitter [67]: Einwohner der Zelle × Anteil 65+ ergibt die Menschen ab 65;
 Aufteilung des Gebiets). Heute setzt das Produkt 65+ = 0, wo der Anteil 65+ im Gitter
 geheimgehalten ist („–“).
 **Regel (Abschätzung von KAP3, festgelegt vom methodik_manager):** Ist der Anteil 65+ einer
-Zelle im Zensus-Gitter geheimgehalten („–“), ersetzt das Produkt ihn in Stufe 1 durch die Summe
-der im Altersgitter veröffentlichten 5er-Jahresgruppen ab 65 der Zelle geteilt durch die
-Einwohner der Zelle, sofern dort mindestens eine dieser sechs Gruppen veröffentlicht ist, und
-sonst in Stufe 2 durch den einwohnergewichteten Anteil 65+ aller Zellen derselben Gemeinde, in
-denen er veröffentlicht ist.
-Nicht veröffentlichte Gruppen (dort „–“, also 0, 1 oder 2 Personen) zählen in Stufe 1 als 0.
-Hat eine Gemeinde keine Zelle mit veröffentlichtem Anteil 65+, gibt die Regel keinen Ersatzwert;
-dafür legt der Bericht keine Regel fest (Modellgrenze). Gemessen betrifft das in Deutschland
-30 Gemeinden mit zusammen 376 Einwohnern, in den beiden Beispielkommunen unten keine Zelle.
+Zelle im Zensus-Gitter geheimgehalten („–“), ersetzt das Produkt ihn in zwei Stufen.
+*Stufe 1:* Ist in der Zelle mindestens eine der sechs 5er-Jahresgruppen ab 65 im Altersgitter
+veröffentlicht, gilt die Summe der veröffentlichten Gruppen ab 65 geteilt durch die Einwohner der
+Zelle. Nicht veröffentlichte Gruppen (dort „–“, also 0, 1 oder 2 Personen) zählen als 0.
+*Stufe 2:* Die übrigen geheimgehaltenen Zellen bekommen den Rest aus der Gemeindesumme. Das Gitter
+der Gemeinde soll so viele Menschen ab 65 tragen, wie der Anteil der Gemeinde im Zensus 2022 [69]
+verlangt:
+
+1. Anteil ab 65 der Gemeinde: A_G = (Einwohner ab 67 + 2/7 der Gruppe 60–66) / Einwohner, alle
+   drei Zahlen aus [69]. [69] trennt bei 67, nicht bei 65. Von den sieben Jahrgängen 60–66 zählen
+   deshalb die Jahrgänge 65 und 66, also 2/7 der Gruppe; das setzt gleich viele Menschen je
+   Jahrgang voraus und ist eine Abschätzung von KAP3.
+2. Zielzahl: Z = A_G × Einwohnersumme der Gemeinde im Zensus-Gitter.
+3. Rest: R = Z − Einwohner ab 65 der Zellen mit veröffentlichtem Anteil − Einwohner ab 65 aus
+   Stufe 1.
+4. Jede Zelle der Stufe 2 bekommt denselben Anteil R / Einwohner aller Zellen der Stufe 2,
+   begrenzt auf 0–100 %. Ist R kleiner als null, gilt 0.
+
+Die Regel gilt auch für Gemeinden ohne Zelle mit veröffentlichtem Anteil 65+ (dann ist der erste
+Abzug in Schritt 3 null). Die frühere Modellgrenze „keine Zelle mit veröffentlichtem Anteil,
+kein Ersatzwert“ (30 Gemeinden mit zusammen 376 Einwohnern) fällt damit weg.
+
+*Rechenbeispiel Warmsen* (Ausgabe von `--ersatz`, Zahlen gerundet): [69] zählt 3158 Einwohner,
+388 im Alter von 60–66 und 602 ab 67. A_G = (602 + 2/7 × 388) / 3158 = 712,9 / 3158 = 22,57 %.
+Das Gitter zählt 3087 Einwohner: Z = 22,57 % × 3087 = 697. Fest stehen 508 Einwohner ab 65 in den
+Zellen mit veröffentlichtem Anteil und 36 aus Stufe 1: R = 697 − 508 − 36 = 153. Die 362 Zellen
+der Stufe 2 zählen 1897 Einwohner, jede bekommt 153 / 1897 = 8,07 % Anteil 65+.
+
+```python test: beispiel_95_ersatz_stufe2_warmsen
+# Stufe 2 der Ersatzregel (§3.3), Warmsen: A_G aus [69], Zielzahl, Rest, Anteil je Zelle
+a_g = (602 + 2 / 7 * 388) / 3158
+assert abs(a_g - 0.2257) < 0.00005
+z = a_g * 3087
+assert round(z) == 697
+r = 697 - 508 - 36
+assert r == 153
+assert abs(r / 1897 - 0.0807) < 0.00005
+```
+
+*Modellgrenzen.* Ist R kleiner als null, tragen die Zellen mit veröffentlichtem Anteil und Stufe 1
+schon mehr Menschen ab 65, als der Anteil der Gemeinde verlangt; die Zellen der Stufe 2 bekommen
+dann 0 %, der Überhang bleibt stehen. Gemessen (`python3 docs/methodik/anlagen/95_zellvergleich.py
+--rangliste`) betrifft das 1323 der 10.811 Gemeinden mit Zellen der Stufe 2; in deren Zellen der
+Stufe 2 wohnen 320.504 der bundesweit 8.739.209 Einwohner solcher Zellen (3,7 %). Der Überhang ist
+klein: im Median 5 Einwohner ab 65 je Gemeinde, höchstens 195. In 3 Gemeinden ist R größer als die
+Einwohner der Stufe 2 und der Anteil wird auf 100 % begrenzt (19 Einwohner). Hat eine Gemeinde aus
+VG250 keine Zeile in [69] (anderer Gebietsstand) oder dort „.“, gibt Stufe 2 keinen Wert, und ihre
+Zellen rechnen wie heute: 69 Gemeinden mit 9133 Einwohnern in Zellen der Stufe 2 (0,1 %).
+Innerhalb einer Gemeinde bekommen alle Zellen der Stufe 2 denselben Anteil; wo die Älteren unter
+ihnen wohnen, weiß die Regel nicht.
 
 *Gemessene Wirkung.* Das Skript `docs/methodik/anlagen/95_zellvergleich.py` rechnet mit der
 Option `--ersatz` jede Kommune zweimal, nach heutiger Produktlogik und mit der Regel, beide Male
-wie der Zelllauf in §3.0 (Wirkungen (a)–(d)):
+wie der Zelllauf in §3.0 (Wirkungen (a)–(d)). Derselbe Aufruf gibt auch die Spanne aus, wenn die
+Gruppe 60–66 gar nicht (0/7) oder ganz (7/7) zu den Menschen ab 65 zählt:
 
-| Beispielkommune | Aufruf | Einwohner (Zensus-Gitter) | davon in Zellen mit geheimgehaltenem Anteil 65+ | Jahresbetrag heute | Jahresbetrag mit Regel | Faktor heute gegen Regel |
-|---|---|---|---|---|---|---|
-| Berlin (AGS 11000000) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz` | 3.593.357 | 2,8 % | 338,10 Mio. € | 344,17 Mio. € | × 0,982 |
-| Warmsen, Landkreis Nienburg (Weser) (AGS 03256034) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz` | 3087 | 64,2 % | 138.543 € | 305.088 € | × 0,454 |
+| Beispielkommune | Aufruf | Einwohner (Zensus-Gitter) | davon in Zellen mit geheimgehaltenem Anteil 65+ | Einwohner ab 65 heute | Einwohner ab 65 mit Regel | Jahresbetrag heute | Jahresbetrag mit Regel | Faktor heute gegen Regel | Spanne des Faktors (60–66 ganz oder gar nicht) |
+|---|---|---|---|---|---|---|---|---|---|
+| Berlin (AGS 11000000) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz` | 3.593.357 | 2,8 % | 694.397 | 707.318 | 338,10 Mio. € | 342,67 Mio. € | × 0,987 | × 0,925–0,998 |
+| Warmsen, Landkreis Nienburg (Weser) (AGS 03256034) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz` | 3087 | 64,2 % | 508 | 697 | 138.543 € | 173.099 € | × 0,800 | × 0,622–0,904 |
 
 Beträge je Jahr (Preisstand 2024). Warmsen zählt nach dem Zensus 2022 amtlich 3158 Einwohner
 [69], liegt also unter 10.000. Gewählt ist Warmsen, weil sie unter allen Gemeinden mit 2000 bis
@@ -411,20 +453,28 @@ unter 10.000 Einwohnern im Zensus-Gitter den höchsten Anteil der Einwohner in Z
 geheimgehaltenem Anteil 65+ hat (Median der Gemeinden unter 10.000 Einwohnern 27,9 %; Aufruf
 `python3 docs/methodik/anlagen/95_zellvergleich.py --rangliste`).
 
-*Was die Regel verfälscht (Befund 117).* Die Regel nimmt an, dass „–“ nur Geheimhaltung ist und
-in diesen Zellen so viele Ältere wohnen wie anderswo. Das Altersgitter derselben Zellen spricht
-dagegen: In Berlin zählen die geheimgehaltenen Zellen 85.046 Personen in veröffentlichten
-5er-Jahresgruppen, davon 2252 ab 65 (2,6 %); in Warmsen 692, davon 36 (5,2 %). Stufe 2
-überträgt dagegen den Anteil der Zellen, in denen er veröffentlicht ist, und das sind in einer
-ländlichen Kommune vor allem kleine Zellen mit Älteren: in Warmsen 46,00 %. Damit kommt Warmsen
-auf 1416 Einwohner ab 65 (45,9 %). Der Zensus 2022 zählt dort 602 Einwohner ab 67 und 990 ab 60
-[69]; die Regel setzt also mehr Menschen ab 65 an, als in Warmsen Menschen ab 60 leben, und hebt
-den Betrag auf mehr als das Doppelte. Die heutige Produktlogik liegt mit 508 Einwohnern ab 65
-unter den 602 ab 67 und unterschätzt. In Berlin liegen beide Summen, 694.397 heute und 711.519
-mit der Regel, zwischen 624.505 Einwohnern ab 67 und 916.859 ab 60 [69]; dort lässt sich
-zwischen beiden nicht entscheiden. Für ländliche Kommunen ist die Regel damit noch nicht
-belastbar. Die Entscheidung liegt beim methodik_manager (Befund 117); der Code-Nachzug beim cto
-wartet darauf (Befund 116).
+*Warum Stufe 2 den Rest aus der Gemeindesumme nimmt (Befund 117).* Das „–“ steht meist für Zellen
+mit wenigen Älteren: Das Altersgitter derselben Zellen zählt in Berlin 85.046 Personen in
+veröffentlichten 5er-Jahresgruppen, davon 2252 ab 65 (2,6 %), in Warmsen 692, davon 36 (5,2 %).
+Die frühere Stufe 2 übertrug den einwohnergewichteten Anteil 65+ der Zellen mit veröffentlichtem
+Anteil, in einer ländlichen Kommune vor allem kleine Zellen mit Älteren: in Warmsen 46,00 %. Damit
+kam Warmsen auf 1416 Einwohner ab 65, mehr als die 990 ab 60 im Zensus 2022 [69], und der Betrag
+auf mehr als das Doppelte (305.088 € gegen 138.543 €, Messung der früheren Fassung). Der Rest aus der Gemeindesumme hält dagegen
+die amtliche Zahl der Gemeinde: Warmsen kommt auf 697 Einwohner ab 65, zwischen den 602 ab 67 und
+den 990 ab 60; Berlin auf 707.318, zwischen 624.505 ab 67 und 916.859 ab 60 [69]. Beide Summen
+treffen die Zielzahl Z, weil R in beiden Kommunen zwischen null und den Einwohnern der Stufe 2
+liegt.
+
+*Was eine einfachere Rechnung verfälschen würde.* Ließe das Produkt 65+ = 0 stehen (heutige
+Produktlogik), zählte Warmsen 508 Einwohner ab 65, weniger als die 602 ab 67 allein, und der Betrag
+läge um 20 % zu niedrig (Faktor × 0,800). Die Aufteilung der Gruppe 60–66 ist die größte
+Unsicherheit der Regel: Zählt die ganze Gruppe oder gar nichts davon, liegt der Faktor in Warmsen
+bei × 0,622–0,904, in Berlin bei × 0,925–0,998 (Tabelle oben). In jeder Lesart liegt der Betrag mit
+Regel über dem heutigen; die Richtung der Korrektur hängt an der Aufteilung nicht.
+
+*Stichtag.* Gitter und [69] zählen beide zum Stichtag 15.05.2022. Ebene 1 der Rechenkette (§3.0)
+bleibt die Fortschreibung zum Stichtag 31.12.2023 (Befund 99); der Unterschied zum Gitter steht dort
+als Wirkung (b). Der Code-Nachzug der Regel liegt beim cto (Befund 116).
 
 **Herleitung der ERF-Steigungen \(\beta_{85+,\text{Region}}\)** (Anker `#beta-erf`;
 Befund 60i): Winklmayr Abb. 3 publiziert Kurven, keine Steigungszahlen. Ablesekette:
@@ -1324,8 +1374,11 @@ DOI-Links die persistenten Referenzen.
   (Repo-Bestand `backend/data/vg250/`, sha256-Pin s. §4 `#t-povw`), gdz.bkg.bund.de —
   Datenlizenz Deutschland Namensnennung 2.0 (dl-de/by-2-0), © GeoBasis-DE / BKG.
 - **[66]** Statistische Ämter des Bundes und der Länder, Zensus 2022 — Bevölkerung je
-  Gemeinde; Repo-Aufbereitung `backend/data/lite/zensus_gemeinde.json` (sha256-Pin
-  s. §4 `#t-povw`), zensus2022.de — dl-de/by-2-0.
+  Gemeinde, aufsummiert aus den Gitterdaten 100 m [67] auf die Gemeinden aus VG250 [65] durch das
+  Modul `backend/app/services/lite/zensus_gemeinde.py`. Die Aufbereitung `zensus_gemeinde.json`
+  erzeugt das Modul im Datenverzeichnis des Backends; sie liegt nicht im Repo, ihr sha256-Pin
+  `124fd7a7a15b` steht beim Kalibrierlauf in §4 (`#t-povw`). Amtliche Gegenprobe je Gemeinde:
+  Regionaltabelle Demografie [69], Spalte „Insgesamt“. zensus2022.de — dl-de/by-2-0.
 - **[67]** Statistische Ämter des Bundes und der Länder, Zensus 2022 — Gitterdaten 100 m,
   Stichtag 15.05.2022: „Bevölkerungszahl in Gitterzellen“
   (https://www.destatis.de/static/DE/zensus/gitterdaten/Zensus2022_Bevoelkerungszahl.zip) und
@@ -1351,7 +1404,11 @@ DOI-Links die persistenten Referenzen.
   292.354 · 261.676 · 362.829) (https://www.destatis.de/static/DE/zensus/gitterdaten/Regionaltabelle_Demografie.xlsx,
   abgerufen 25.09.2026; Archiv
   https://web.archive.org/web/20260925192632/https://www.destatis.de/static/DE/zensus/gitterdaten/Regionaltabelle_Demografie.xlsx)
-  — dl-de/by-2-0. Verwendet in §3.3 (Ersatzregel für den geheimgehaltenen Anteil 65+).
+  — dl-de/by-2-0. Verwendet in §3.3 (Stufe 2 der Ersatzregel für den geheimgehaltenen Anteil 65+).
+  Das Skript `docs/methodik/anlagen/95_zellvergleich.py` liest dieselben Zahlen aus dem Blatt
+  „CSV-Demografie“ (Spalten `0_Insgesamt_`, `Alter_infr__09` = 60–66, `Alter_infr__10` = 67–74,
+  `Alter_infr__11` = 75 und älter); Zeichenerklärung dort: „–“ = genau null oder auf null geändert,
+  „.“ = Zahlenwert unbekannt oder geheim.
 
 ## Entscheidungslog
 
@@ -1408,4 +1465,4 @@ Eintrag 41: Ersatzregel für den geheimgehaltenen Anteil 65+ (T-1199, Befunde 10
 | 38 | Ansatz 95-C (Personen-Hitzegradtage-Regression)? | **verworfen** | 95-C ersetzt die publizierte und kalibrierte RKI-Kurve durch eine lineare Regression mit aufgesetzter Krümmung (κ ≈ 1,2–1,5) und wäre gegenüber 95-A ein Rückschritt. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
 | 39 ⚠ | Satz „Bestand an Klimaanlagen und Hitzeaktionsplänen im Basiswert“ (Kapitel 1, Absatz (a))? | **gestrichen** — Absatz (a) sagt nur noch, was aus der Kalibrierung folgt: \(c_{\text{kal}}\) ist an die RKI-Reihe 2012–2024 angepasst, der Anpassungsstand dieser Jahre steckt damit im Niveau; genannt bleibt nur das DWD-Hitzewarnsystem mit Beleg [45] | Der Bericht hat keine Quelle für die Klimaanlagen-Quote und keine für die Verbreitung kommunaler Hitzeaktionspläne in den Kalibrierjahren; eine Behauptung ohne Beleg bleibt nicht stehen (P1) | Satz belegen: Klimaanlagen-Quote der Haushalte und Pflegeheime sowie Einführungsjahre der Hitzeaktionspläne gegen das Fenster 2012–2024 (Fortschreibung) | keine Zahl betroffen; Aussage (a) schmaler, aber belegt |
 | 40 ⚠ | Kennzeichnung der Grenzfälle in Kapitel 7? | **`abschaetzung_kap3`**, sobald eine Setzung von KAP3 im Wert steckt (\(\beta_{85+}\) Süd-Nachschätzung, \(f_a\) lineare Näherung, VOLY-Elastizität beim Raumtransfer, \(c_{\text{Fall}}\) als Proxy aus dem Durchschnitt aller Krankenhausfälle, Stützstellen e(60)/e(70)/e(80) für die Bänder u65, 65–74 und 75–84 in \(\bar L_a\), \(r_{0,a}\)-Altersprofil, \(\delta_{\text{HAP}}\), Distanzterm); **`quelle`** für reine Rechnungen aus amtlichen oder gemessenen Zahlen ohne Setzung (Quotienten, ausgezählte Quantile); Prüfstein: Misst der Wert die Zielgröße selbst, ist die bloße Wahl zwischen Quellenwerten keine Setzung (\(e_{\text{HD}}\) konditional statt unkonditional, Log 19; Stationsauswahl für \(q_w\), Log 5) — steht er für eine andere Größe (Proxy) oder nähert er ein Bandmittel durch einen Punkt an, ist es eine; **`berechnet`** nur, wo der Wert aus anderen Blöcken folgt (\(c_{\text{kal}}\), \(\beta_{\text{iso}}\), \(\beta_{\text{pfl}}\)) | Die Parameterliste im Produkt (P1) soll eine Setzung nie als Quellenwert zeigen; gleiche Lesart wie die Blöcke in `60_*.md` („Quotient zweier amtlicher Summen“ = `quelle`) | alle aus Quellen abgeleiteten Werte als `abschaetzung_kap3` (überzeichnet die Unsicherheit amtlicher Quotienten) | keine Zahl betroffen; Anzeige „Quelle“ oder „Abschätzung von KAP3“ im Produkt |
-| 41 ⚠ | Womit ersetzt das Produkt den Anteil 65+ einer Zelle, der im Zensus-Gitter geheimgehalten ist („–“)? | **zweistufige Ersatzregel, Abschätzung von KAP3** (§3.3, festgelegt vom methodik_manager in T-1199): Stufe 1 Summe der veröffentlichten 5er-Jahresgruppen ab 65 der Zelle geteilt durch ihre Einwohner, sofern mindestens eine der sechs Gruppen veröffentlicht ist; Stufe 2 sonst der einwohnergewichtete Anteil 65+ aller Zellen derselben Gemeinde mit veröffentlichtem Anteil; ohne solche Zelle keine Regel (Modellgrenze, 30 Gemeinden mit 376 Einwohnern) | Das „–“ ist Geheimhaltung, nicht null: In Berlin tragen dieselben Zellen im Altersgitter veröffentlichte Seniorenfelder über null, 65+ = 0 zählt dort alle Einwohner als unter 65 (Befund 104). Lesart „mindestens eine Gruppe“, weil mit „alle sechs Gruppen“ Stufe 1 leer bliebe. **Gegenargument (gemessen, Befund 117):** Das Altersgitter derselben Zellen zeigt kaum Ältere (Berlin 2,6 %, Warmsen 5,2 % der Personen in veröffentlichten Gruppen); Stufe 2 überträgt den Anteil der Zellen mit veröffentlichtem Anteil (Warmsen 46,00 %) und setzt in Warmsen 1416 Einwohner ab 65 an, mehr als die 990 ab 60 im Zensus 2022 [69] | 65+ = 0 lassen (heutige Produktlogik; unterschätzt Warmsen: 508 gegen 602 ab 67 [69]) · Stufe 2 durch den Rest aus der Gemeindesumme des Zensus ersetzen (Menschen ab 65 der Gemeinde abzüglich der Zellen mit veröffentlichtem Anteil, verteilt auf die geheimgehaltenen Zellen; [69] trennt bei 67, die Gruppe 60–66 wäre aufzuteilen) | Berlin heute gegen Regel × 0,982, Warmsen × 0,454 (§3.3); Code-Nachzug beim cto erst nach der Entscheidung zu Befund 117 (Befund 116) |
+| 41 ⚠ | Womit ersetzt das Produkt den Anteil 65+ einer Zelle, der im Zensus-Gitter geheimgehalten ist („–“)? | **zweistufige Ersatzregel, Abschätzung von KAP3** (§3.3, festgelegt vom methodik_manager in T-1199, Stufe 2 neu gefasst in T-1233): Stufe 1 Summe der veröffentlichten 5er-Jahresgruppen ab 65 der Zelle geteilt durch ihre Einwohner, sofern mindestens eine der sechs Gruppen veröffentlicht ist; Stufe 2 der Rest aus der Gemeindesumme: Zielzahl Z = A_G × Einwohnersumme der Gemeinde im Gitter mit A_G = (Einwohner ab 67 + 2/7 der Gruppe 60–66) / Einwohner aus dem Zensus 2022 [69], Rest R = Z − Einwohner ab 65 der Zellen mit veröffentlichtem Anteil − Einwohner ab 65 aus Stufe 1, jede übrige geheimgehaltene Zelle bekommt R / Einwohner dieser Zellen, begrenzt auf 0–100 % (R < 0 gibt 0); gilt auch für Gemeinden ohne Zelle mit veröffentlichtem Anteil (die frühere Modellgrenze, 30 Gemeinden mit 376 Einwohnern, entfällt) | Das „–“ ist Geheimhaltung, nicht null (Befund 104), steht aber meist für Zellen mit wenigen Älteren: Das Altersgitter derselben Zellen zeigt Berlin 2,6 %, Warmsen 5,2 % Personen ab 65. Die frühere Stufe 2 (einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil, Warmsen 46,00 %) setzte in Warmsen 1416 Einwohner ab 65 an, mehr als die 990 ab 60 [69] (Befund 117). Der Rest aus der Gemeindesumme hält die amtliche Zahl der Gemeinde: Warmsen 697, Berlin 707.318 Einwohner ab 65, je zwischen „ab 67“ und „ab 60“ aus [69]. Lesart „mindestens eine Gruppe“ in Stufe 1, weil mit „alle sechs Gruppen“ Stufe 1 leer bliebe. **Gegenargumente:** (1) Aufteilung der Gruppe 60–66: [69] trennt bei 67; die 2/7 (Jahrgänge 65 und 66 von sieben, gleich viele Menschen je Jahrgang) sind eine Abschätzung von KAP3; zählt die Gruppe ganz oder gar nicht, liegt der Faktor heute gegen Regel in Warmsen bei × 0,622–0,904, in Berlin bei × 0,925–0,998. (2) Stichtag: Gitter und [69] zählen zum 15.05.2022, Ebene 1 der Rechenkette zum 31.12.2023 (Befund 99, Wirkung (b) in §3.0); die Regel gleicht die Zellen an den Zensus an, nicht an die Fortschreibung. (3) Ist R < 0, bleibt ein Überhang stehen (1323 Gemeinden, 3,7 % der Einwohner in Zellen der Stufe 2, im Median 5 Einwohner ab 65); ohne Zeile in [69] rechnen 69 Gemeinden wie heute | 65+ = 0 lassen (heutige Produktlogik; unterschätzt Warmsen: 508 gegen 602 ab 67 [69]) · Stufe 2 als einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil (Fassung T-1199; verdoppelt ländliche Kommunen, Befund 117) · Gruppe 60–66 ganz oder gar nicht zählen (Spanne oben) | Berlin heute gegen Regel × 0,987, Warmsen × 0,800 (§3.3, `--ersatz`); Code-Nachzug beim cto nach dieser Fassung (Befund 116) |
