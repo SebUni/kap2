@@ -438,3 +438,28 @@ Anlass: A-0048 / T-1113-cmo (Fortschreibung 7 der Aufgabe vom 24.09.2026). Ausga
 | 98 | §8 Quelle [47], Zeile 996 | verbotene Formulierung | Lint: verbotenes Wort in „Rev.-5-…zitat“ (Zeile 996) | sachlich ersetzen: nicht belegtes Zitat aus Rev. 5 | C | `! grep -q 'Platzhalter' docs/methodik/95_hitzebelastung.md` | behoben (T-1118): ersetzt durch „einem in Rev. 5 nicht am Volltext belegten Zitat“ |
 | 99 | §3.0 Rechenkette, Ebene 1 | Abweichung vom Ticket (Datenstand) | Das Ticket verlangt Einwohner je Altersband aus dem Zensus 2022 (Stichtag 15.05.2022). Die Zensus-Datenbank (ergebnisse.zensus2022.de) ist laut Betreiber bis 05.10.2026 in Wartung, der API-Abruf am 25.09.2026 scheitert (HTTP 400). Verwendet ist die amtliche Fortschreibung auf Basis Zensus 2022, Stichtag 31.12.2023 (Tab. 12411-09-01-4-B, Anlage bevoelkerung_bundesland_altersband.csv); das ist derselbe Stichtag wie der Nenner der Basissterberaten m_a [49], also in sich stimmiger. Abstand zum Zensus-Stichtag: 19 Monate Fortschreibung | Entscheidung methodik_manager: Fortschreibung 31.12.2023 behalten (Stichtag gleich m_a) oder nach dem 05.10.2026 auf Zensus-Tabelle 1000A umstellen | C | `grep -q 'Stichtag 31.12.2023, Basis Zensus 2022' docs/methodik/95_hitzebelastung.md` | zurückgestellt (Entscheidung methodik_manager; Zensus-Datenbank bis 05.10.2026 in Wartung) |
 | 100 | §8 Quelle [66] | falscher Pfad | [66] nennt die Repo-Aufbereitung backend/data/lite/zensus_gemeinde.json; die Datei gibt es auf dem Branch nicht (Verzeichnis backend/data/lite/ fehlt) | Pfad in [66] korrigieren oder Aufbereitung nachweisen | C | `test -f backend/data/lite/zensus_gemeinde.json` | zurückgestellt (Schritt 2 von T-1113, Quellenpflege) |
+
+## Runde 11 — Nacharbeit 1 zu T-1118 nach Urteil methodik_manager (25.09.2026): neue Befunde 101–103
+
+Urteil Runde 0: Nacharbeit mit zwei Punkten (E3 und P1), hier Befunde 102 und 103. Befund 101 hat sich
+bei der Messung zu Befund 102 ergeben.
+
+**Messung Zellvergleich Berlin** (Grundlage für 101 und 102; das Skript liegt nicht im Repo, weil T-1118
+nur Bericht und Ledger zulässt): Alle 40.663 bewohnten 100-m-Zellen des Zensus 2022 innerhalb der
+Stadtgrenze Berlin (Grenze aus OpenStreetMap/Nominatim, nur für die Zellauswahl; 891,1 km²; 3.595.270
+Einwohner) aus den Gitterdaten [67]. Jede Zelle erhält ihren Wert aus der DWD-Klimatologie mit den
+Produktfunktionen `dwd_cdc_grid.climatology_grid` („air_temp_mean“, Monate 6–8, bzw. „hot_days“, je 10
+Jahre) und `sample_grid_points`. Formeln §3.3–§3.5 mit den Werten aus Kapitel 7, Bandsummen wie
+Ebene 1. Ergebnisse: Berlin-Mitte 20,07 °C, Bevölkerungsmittel 19,96 °C (19,38–20,38 °C), Zellen
+wärmer als Mitte: 24,8 % der Einwohner. Betrag Kette 362,89 Mio. €; Zellen mit Berliner
+Altersstruktur 343,73 Mio. € (× 0,947); dazu Feinstruktur σ = 0,5 K (Gauß-Hermite, 21 Punkte) × 1,0204;
+Altersgewichtung aus den 2.815 Zellen mit vollständigen Altersangaben (241.174 Einwohner; 85+ im
+Mittel 19,926 °C statt 19,963 °C) × 0,988. Zusammen × 0,955, rund 347 Mio. €. Die Reihe des
+Berlin-Gemeindepunkts in `sommermittel_bundesland_povw.csv` ergibt für 2016–2025 im Mittel 20,06 °C,
+also dieselbe Lage wie Berlin-Mitte.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 101 | §4 Zusatz-Anker Berlin 2018 („das Zellmodell wird für Berlin … über dem Gemeindepunkt-Wert liegen“) | Widerspruch Messung ↔ Begründung | Der Zellvergleich zeigt das Gegenteil: Der Gemeindepunkt (20,06 °C) liegt 0,1 K über dem Bevölkerungsmittel. Das Zellmodell liegt mit Feinstruktur σ = 0,5 K und Altersgewichtung 4,5 % unter dem Gemeindepunkt-Wert. Die Unterschätzung des Ankers (−15 %) wird damit nicht kleiner, sondern größer (rund −19 %). Sie bleibt unerklärt. Kein Wert aus Kapitel 7 ist betroffen | Begründung in §4 neu fassen: Richtung gemessen, verbleibende Lücke offen benennen; Anker-Aussage „konservativ = unterschätzend“ bleibt | B | `! grep -q 'das Zellmodell wird für Berlin' docs/methodik/95_hitzebelastung.md` | zurückgestellt (Entscheidung methodik_manager; §4 gehört nicht zum Auftrag von T-1118, kein Wert betroffen) |
+| 102 | §3.0, Zusammenfassung „eine Zelle statt aller Zellen“ | E3: Richtung und Größe nicht belegt, Widerspruch zu §4 (Urteil Runde 0, Punkt 1) | Der Text nannte +2,8 % (±1 K gleichverteilt, abweichend von σ = 0,5 K in §4) und −23 % je 0,5 K ohne gemessene Richtung | Zellvergleich messen, Richtung und Größe beziffern, Beziehung zu §4 benennen | B | `grep -q '0,947 × 1,020 × 0,988 = 0,955' docs/methodik/95_hitzebelastung.md` | behoben (T-1118 Nacharbeit 1): gemessen (a) −5,3 %, (b) +2,0 % Modellrechnung σ = 0,5 K wie §4, (c) −1,2 %; Kette überschätzt Berlin um rund 4,5 %; Widerspruch zu §4 als Befund 101; Quelle [67] neu; Block rechenkette_95 prüft die Verknüpfung und (b) am Punkt |
+| 103 | §3.0, Abschätzung „+6 %“ (Heim-Extremfall) | P1: Abschätzung ohne Herleitung (Urteil Runde 0, Punkt 2) | Zahl stand ohne Rechenweg im Bericht | Herleitung Schritt für Schritt in den Text und in den Beispiel-Block | B | `grep -q '0,344 × 1,598 + 0,656 = 1,206' docs/methodik/95_hitzebelastung.md` | behoben (T-1118 Nacharbeit 1): Herleitung v 2,31/0,77, Anteile 0,344/0,656, Exzess × 1,598, 85+ × 1,206, Anteil YLL 28,4 % ⇒ +5,8 % als Obergrenze; im Block rechenkette_95 nachgerechnet |
