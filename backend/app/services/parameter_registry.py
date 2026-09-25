@@ -454,6 +454,46 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 },
             ))
 
+    # Diskontierung (Kostenprojektion): Reine Zeitpräferenzrate (RZPR) und Komponente der
+    # relativen Preise getrennt (UBA Methodenkonvention 4.0, Kap. 2.2.3, S. 14–15). Werte aus
+    # app.data.diskontierung (Single Source), nicht editierbar. Die Diskontrate selbst
+    # (RZPR + Komponente) weist die Kostenprojektion aus, nicht die Parameterliste.
+    if emit_globals("diskontierung"):
+        from app.data import diskontierung
+
+        refs_rzpr = sources.resolve(["UBA_MK40_Diskontierung"])
+        for i in range(len(diskontierung.PURE_TIME_PREFERENCE_RATES)):
+            params.append(_base_param(
+                f"diskontierung.rzpr_{i}",
+                layer_code="", layer_category="diskontierung",
+                label=f"Reine Zeitpräferenzrate (RZPR), Variante {i + 1}",
+                value=diskontierung.PURE_TIME_PREFERENCE_RATES[i],
+                unit="Dezimalzahl (0,01 = 1 %)",
+                source="UBA Methodenkonvention 4.0, Kap. 2.2.3, S. 14–15",
+                source_detail=(
+                    "Die Konvention stellt die Ergebnisse für eine RZPR von 0 % und 1 % dar "
+                    "(S. 15). Die RZPR ist ein Bestandteil der Diskontrate, nicht die "
+                    "Diskontrate selbst (S. 10, 14–15)."
+                ),
+                references=refs_rzpr,
+                editable=False,
+                evidence_class="belegt",
+            ))
+        spec = diskontierung.RELATIVE_PRICE_COMPONENT_SPEC
+        params.append(_base_param(
+            "diskontierung.relative_preise",
+            layer_code="", layer_category="diskontierung",
+            label=spec["label"],
+            value=diskontierung.RELATIVE_PRICE_COMPONENT,
+            unit=spec["unit"],
+            source=spec["source"],
+            source_detail=spec["source_detail"],
+            references=sources.resolve(["UBA_MK40_Diskontierung"]),
+            editable=False,
+            evidence_class=spec["evidence_class"],
+            evidence_derivation=spec["evidence_derivation"],
+        ))
+
     return params
 
 
