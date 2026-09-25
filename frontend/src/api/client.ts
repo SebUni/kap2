@@ -132,8 +132,39 @@ export interface QuerverbindungAussage {
   beleg: string
 }
 
+/** Beteiligte Klimawirkung einer Rückkopplung; `im_katalog` setzt der Dienst über die kwra_id. */
+export interface RueckkopplungKnoten {
+  kwra_id: number
+  name: string
+  handlungsfeld: string
+  im_katalog: boolean
+}
+
+/** Gerichtete Wirkbeziehung; eine gegenseitige Wirkung steht als zwei Kanten. */
+export interface RueckkopplungKante {
+  von_kwra_id: number
+  nach_kwra_id: number
+}
+
+/** Gegenseitige Wechselwirkung oder Rückkopplungskreislauf (TB 6, S. 82, 85–86, Abb. 9;
+ *  backend/app/data/kwra_rueckkopplungen.py). */
+export interface Rueckkopplung {
+  id: string
+  art: 'wechselwirkung' | 'kreislauf'
+  knoten: RueckkopplungKnoten[]
+  kanten: RueckkopplungKante[]
+  staerke: string | null
+  seiten: number[]
+  abbildung: string | null
+  beleg: string
+  quellen: string[]
+}
+
 export interface QuerverbindungsAuswertung {
   klimawirkungen: QuerverbindungKlimawirkung[]
+  /** Die drei gegenseitigen Wechselwirkungen, darunter der einzige Rückkopplungskreislauf. */
+  rueckkopplungen?: Rueckkopplung[]
+  rueckkopplungen_quelle?: string
   netzknoten_ausserhalb_katalog: QuerverbindungNetzknotenAusserhalbKatalog[]
   kennzahlen: Record<string, string | number>
   systembereich_matrix: Record<string, Record<string, number>>
