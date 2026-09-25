@@ -8,7 +8,7 @@ Die Bestandsaufnahme rechnet nichts. Sie führt Größen auf und weist je Größ
 
 ## Erhobene Größen
 
-Das Produkt führt 15 Größen in drei Gruppen. Je Größe steht entweder die Datenquelle (Quellschlüssel und Klartext) oder der Hinweis, dass keine Quelle je Kommune vorliegt.
+Das Produkt führt 20 Größen in vier Gruppen. Je Größe steht entweder die Datenquelle (Quellschlüssel und Klartext) oder der Hinweis, dass keine Quelle je Kommune vorliegt.
 
 | Code | Größe | Gruppe | Einheit | Quelle oder Lücke |
 |---|---|---|---|---|
@@ -19,6 +19,10 @@ Das Produkt führt 15 Größen in drei Gruppen. Je Größe steht entweder die Da
 | alleinlebende_aeltere | Alleinlebende ältere Menschen | Vulnerable Personen | – | Für die Größe Alleinlebende ältere Menschen liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. |
 | vorerkrankte | Menschen mit Vorerkrankungen | Vulnerable Personen | – | Für die Größe Menschen mit Vorerkrankungen liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. |
 | wohnungslose | Wohnungslose Menschen | Vulnerable Personen | – | Für die Größe Wohnungslose Menschen liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. |
+| gewaesser | Gewässer | Natürliche Systeme | – | Für die Größe Gewässer liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. Hinweis: nicht im Katalog. |
+| wald | Wald | Natürliche Systeme | – | Für die Größe Wald liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. Hinweis: nicht im Katalog. |
+| boeden | Böden | Natürliche Systeme | – | Für die Größe Böden liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. Hinweis: nicht im Katalog. |
+| schutzgebiete | Schutzgebiete | Natürliche Systeme | – | Für die Größe Schutzgebiete liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. Hinweis: nicht im Katalog. |
 | energie | Energieinfrastruktur | Klimasensible Strukturen | Vorkommen | OSM_Data (OpenStreetMap-Daten); BBK_KRITIS (Kritische Infrastrukturen, BBK) |
 | wasser_abwasser | Wasser- und Abwasserinfrastruktur | Klimasensible Strukturen | Vorkommen | OSM_Data (OpenStreetMap-Daten); BBK_KRITIS (Kritische Infrastrukturen, BBK) |
 | verkehrsknoten | Verkehrsknoten | Klimasensible Strukturen | Vorkommen | OSM_Data (OpenStreetMap-Daten); BBK_KRITIS (Kritische Infrastrukturen, BBK) |
@@ -26,10 +30,11 @@ Das Produkt führt 15 Größen in drei Gruppen. Je Größe steht entweder die Da
 | krankenhaeuser | Krankenhäuser | Klimasensible Strukturen | Anzahl | OSM_Data (OpenStreetMap-Daten) |
 | pflegeeinrichtungen | Pflegeeinrichtungen | Klimasensible Strukturen | Anzahl | OSM_Data (OpenStreetMap-Daten) |
 | kitas_schulen | Kindertagesstätten und Schulen | Klimasensible Strukturen | – | Für die Größe Kindertagesstätten und Schulen liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. |
+| lieferketten | Lieferketten | Klimasensible Strukturen | – | Für die Größe Lieferketten liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. Hinweis: nicht im Katalog. |
 | schadensereignisse | Vergangene Schadensereignisse durch Wetterextreme | Vergangene Ereignisse | – | Für die Größe Vergangene Schadensereignisse durch Wetterextreme liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. |
 
 ## Lücken und Abgrenzung
 
-Sechs Größen haben keine Datenquelle je Kommune. Für sie zeigt das Produkt den Lückensatz aus der Tabelle, statt einen Wert zu schätzen. Ist eine sonst vorhandene Quelle für eine Kommune nicht abrufbar, weist das Produkt den Wert in der Bestandsaufnahme als fehlend aus.
+Elf Größen haben keine Datenquelle je Kommune. Für sie zeigt das Produkt den Lückensatz aus der Tabelle, statt einen Wert zu schätzen. Ist eine sonst vorhandene Quelle für eine Kommune nicht abrufbar, weist das Produkt den Wert in der Bestandsaufnahme als fehlend aus.
 
 Workshops und lokale Erhebungen bleiben Arbeitsschritt des Beratungsbüros. Sozioökonomische und geographische Rahmenbedingungen sowie Klimatrends liefert das Kommunenprofil (Route /{kommune_id}/profile); sie sind nicht Teil der Bestandsaufnahme.
