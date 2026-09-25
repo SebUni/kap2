@@ -125,7 +125,7 @@ def _wert(code: str, zellen: list[dict], sozio: dict) -> Optional[float | int]:
 
 
 def bestandsaufnahme_aus_daten(zellen: list[dict], sozio: dict) -> list[dict]:
-    """Reine Funktion: 15 Einträge in Katalogreihenfolge aus Zell- und Sozialdaten.
+    """Reine Funktion: 20 Einträge in Katalogreihenfolge aus Zell- und Sozialdaten.
 
     ``zellen`` sind die ``inputs``-Dicts der gespeicherten Zellen, ``sozio`` die
     Rohgrößen der Regionalstatistik (``unemployment_rate_pct``).
@@ -138,7 +138,7 @@ def bestandsaufnahme_aus_daten(zellen: list[dict], sozio: dict) -> list[dict]:
         else:
             wert = _wert(g["code"], zellen or [], sozio or {})
             satz = LAUFZEITSATZ_VORLAGE.format(label=g["label"]) if wert is None else ""
-        eintraege.append({
+        eintrag = {
             "code": g["code"],
             "gruppe": g["gruppe"],
             "label": g["label"],
@@ -146,7 +146,10 @@ def bestandsaufnahme_aus_daten(zellen: list[dict], sozio: dict) -> list[dict]:
             "wert": wert,
             "quellen": list(g["quellen"]),
             "luecke_satz": satz,
-        })
+        }
+        if g.get("hinweis"):
+            eintrag["hinweis"] = g["hinweis"]
+        eintraege.append(eintrag)
     return eintraege
 
 

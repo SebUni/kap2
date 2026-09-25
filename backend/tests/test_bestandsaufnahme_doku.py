@@ -58,15 +58,15 @@ def test_ueberschriften_je_einmal_in_reihenfolge():
     assert positionen == sorted(positionen)
 
 
-def test_tabelle_15_zeilen_codes_in_katalogreihenfolge():
+def test_tabelle_20_zeilen_codes_in_katalogreihenfolge():
     zeilen = _tabellenzeilen(_abschnitt(_text(), "## Erhobene Größen"))
-    assert len(zeilen) == 15
+    assert len(zeilen) == 20
     assert [z[0] for z in zeilen] == [g["code"] for g in GROESSEN]
 
 
-def test_alle_sechs_lueckensaetze_wortlich():
+def test_alle_elf_lueckensaetze_wortlich():
     text = _text()
     saetze = [g["luecke"] for g in GROESSEN if g["luecke"]]
-    assert len(saetze) == 6
+    assert len(saetze) == 11
     for satz in saetze:
         assert satz in text, f"Lückensatz fehlt: {satz}"
