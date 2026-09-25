@@ -1329,6 +1329,19 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122023_Auszug_GV.xlsx",
         "accessed": "2026-09-25",
     },
+    "UBA_MK40_Diskontierung": {
+        "ieee": "Umweltbundesamt (UBA), „Methodenkonvention 4.0 zur Ermittlung von "
+                "Umweltkosten,“ Kap. 2.2.3 „Diskontierung“, S. 14–15 (Reine "
+                "Zeitpräferenzrate von 0 % und 1 %), Dessau-Roßlau, Deutschland. [Online]. "
+                "Verfügbar: https://www.umweltbundesamt.de/publikationen/methodenkonvention-"
+                "umweltkosten. [Zugriff: 25. September 2026].",
+        "url": "https://www.umweltbundesamt.de/publikationen/methodenkonvention-"
+               "umweltkosten",
+        "archive_url": "https://web.archive.org/web/20260415021252/"
+                       "https://www.umweltbundesamt.de/publikationen/"
+                       "methodenkonvention-umweltkosten",
+        "accessed": "2026-09-25",
+    },
 }
 
 
