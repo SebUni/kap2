@@ -582,8 +582,10 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         "annual_benefit_flat_eur": round(annual_benefit_flat, 2),
         "annual_benefit_direct_eur": round(annual_benefit_direct, 2),
         "benefit_capped": benefit_capped,
-        # Verwechslungssperre Klasse A/B (T-0838): Vermerk statt Betrag für reine
-        # Screening-Maßnahmen, Zusatz „ohne x Wirkungen im Screening“ für gemischte.
+        # Verwechslungssperre Klasse A/B (T-0838, T-0872): Vermerk statt Betrag für reine
+        # Screening-Maßnahmen ohne direkten Zusatznutzen. Hat eine reine Screening-
+        # Maßnahme einen direkten Zusatznutzen > 0, gilt dieser Betrag mit dem Zusatz
+        # „ohne x Wirkungen im Screening“ — derselbe Zusatz wie für gemischte Maßnahmen.
         # ``annual_benefit_eur`` bleibt eine Zahl (Klasse-A-Anteil + direkter Nutzen),
         # weil Export und Maßnahmentabelle sie als Zahl lesen.
         **_benefit_euro_layer_fields(linked, annual_benefit_direct),
