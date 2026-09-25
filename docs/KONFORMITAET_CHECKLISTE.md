@@ -29,7 +29,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 15 | Klimaanpassungskonzepte sollen auf einer Klimarisikoanalyse im Sinne einer Feststellung von potentiellen prioritären Risiken und sehr dringlichen Handlungserfordernissen (Betroffenheitsanalyse) oder vergleichbaren Entscheidungsgrundlagen beruhen. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 3 | teilweise | backend/app/data/catalog.py, frontend/src/pages/roadmap/roadmapData.ts | Wie bereits zu Zeile 6 festgehalten, übernimmt das Produkt die Kategorie "sehr dringend" punktuell in der Roadmap, ohne die zugrunde liegende Klimarisikoanalyse systematisch und vollständig nach dieser gesetzlichen Vorgabe herzuleiten; laut docs/KATALOG_KRITIK.md fehlen im heutigen Katalog Klimawirkungen, die bundesweit als sehr dringend eingestuft sind. |
 | 16 | Vor der eigentlichen Risikobewertung ist der Kontext festzulegen (Bestandsaufnahme): lokale sozioökonomische und geographische Rahmenbedingungen sowie Trends sind zu erfassen, ebenso bereits vorhandene Informationen zu vergangenen und erwarteten Klimarisiken, einschließlich besonders klimasensibler Strukturen (z. B. kritische Infrastruktur) und vulnerabler Personengruppen. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Bestandsaufnahme"/"Festlegung des Kontexts", S. 12) | teilweise | backend/app/data/bestandsaufnahme.py, backend/app/services/bestandsaufnahme_service.py, backend/app/services/bestandsaufnahme_markdown.py, docs/BESTANDSAUFNAHME.md | Die Bestandsaufnahme erfasst vulnerable Personengruppen und klimasensible Strukturen nur zum Teil: vier von sieben Personengruppen und Kindertagesstätten und Schulen stehen ohne Wert mit Lückensatz, Naturschutzgebiete und Lieferketten fehlen. Trends wie demographischer Wandel und Urbanisierung, natürliche Systeme, vergangene Extremereignisse und ihre Schäden sowie vorhandene Untersuchungen der Kommune (etwa Hochwasser- und Starkregengefahrenkarten, Klimaanalysekarten) erhebt sie nicht, und sie identifiziert keine betroffenen Handlungsfelder. Sozioökonomische und geographische Rahmenbedingungen und den Temperaturverlauf zeigt nur das Kommunenprofil, dieser nur je Bundesland. Einzelnachweis: Abschnitt „Gegenprobe Zeile 16“. |
 | 17 | In der Vorbereitungsphase sind interessierte Parteien mit einschlägiger Fachexpertise zu identifizieren und über partizipative Ansätze frühzeitig in die Entscheidungsfindung einzubeziehen, um ein gemeinsames Verständnis und Verantwortungsgefühl unter den Beteiligten zu fördern. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Interessierte Parteien identifizieren und partizipative Ansätze planen", S. 13) | offen | — | Das Produkt bietet keinen Prozess und keine Funktion, mit der eine Kommune interessierte Parteien identifiziert oder einen partizipativen Beteiligungsprozess plant und begleitet; es ist ein Analysewerkzeug für die inhaltliche Berechnung von Klimarisiken, keine Prozessunterstützung für Beteiligungsverfahren. |
-| 18 | Optional kann die Anpassungskapazität eines betroffenen Systems analysiert und bewertet werden, unterschieden nach mehreren Komponenten (u. a. organisationsbezogene Fähigkeit, technisches Vermögen, finanzielle Fähigkeit, Fähigkeit des Ökosystems) und nach unterschiedlichen Reifegraden, um abzuleiten, wie stark sich das Klimarisiko durch Anpassung verringern lässt. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6, Anhang G und H (Abschnitt 2.2.5 "Optional: Anpassungskapazität analysieren und bewerten", S. 28f.) | erfüllt | backend/app/data/anpassungskapazitaet.py, backend/app/services/anpassungskapazitaet.py, backend/app/services/anpassungskapazitaet_markdown.py, backend/app/api/routes/anpassungskapazitaet.py, docs/ANPASSUNGSKAPAZITAET.md | Keine Lücke im Produkt; der nach ISO 14091 optionale Schritt ist als Selbsteinschätzung der Kommune je Komponente und Reifegrad umgesetzt und im Bericht als optionaler Analyseschritt ausgewiesen. |
+| 18 | Optional kann die Anpassungskapazität eines betroffenen Systems analysiert und bewertet werden, unterschieden nach mehreren Komponenten (u. a. organisationsbezogene Fähigkeit, technisches Vermögen, finanzielle Fähigkeit, Fähigkeit des Ökosystems) und nach unterschiedlichen Reifegraden, um abzuleiten, wie stark sich das Klimarisiko durch Anpassung verringern lässt. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6, Anhang G und H (Abschnitt 2.2.5 "Optional: Anpassungskapazität analysieren und bewerten", S. 28f.) | teilweise | backend/app/data/anpassungskapazitaet.py, backend/app/services/anpassungskapazitaet.py, backend/app/services/anpassungskapazitaet_markdown.py, backend/app/api/routes/anpassungskapazitaet.py, docs/ANPASSUNGSKAPAZITAET.md | Umgesetzt sind die vier Komponenten nach Fußnote 32 der UBA-Handlungsempfehlungen und eine Selbsteinschätzung je Komponente auf den Stufen 0 bis 3. Es fehlen: die Verknüpfung mit dem bewerteten Klimarisiko zu einem Klimarisiko mit Anpassung (UBA-Handlungsempfehlungen, Tabelle 5); ein Beleg, dass die Stufen den Niveaus nach Anhang H der ISO 14091 entsprechen; Aussagen zu Anpassungsmöglichkeiten, zum Bedarf an zusätzlicher oder transformativer Anpassung, zu Wechselwirkungen und Zielkonflikten zwischen Maßnahmen und zu den Grenzen der Anpassung; ein Vermerk, wer eingestuft hat und ob im Konsens. Einzelnachweis: Abschnitt „Gegenprobe Zeile 18“. |
 | 19 | Bei der Interpretation der Analyseergebnisse sind bestehende Unsicherheiten in den zugrunde liegenden Informationen und Daten explizit zu berücksichtigen, ebenso handlungsfeld- und regionsübergreifende Abhängigkeiten, bevor daraus Handlungsoptionen formuliert werden. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6 (Abschnitt 2.2.6 "Ergebnisse interpretieren", S. 29f.) | teilweise | backend/app/services/unsicherheits_zusammenschau.py, backend/app/api/routes/kommune.py, backend/tests/test_unsicherheits_zusammenschau.py, backend/app/services/gewissheit.py, docs/evidenz/register.md | Die Unsicherheit der Daten trägt das Produkt: Die Zusammenschau nennt je Handlungsfeld die niedrigste Gewissheitsstufe und die Zahl der nicht belegten Parameter und verlangt ab „gering“ vorsichtige Interpretation. Es fehlt aber, was Abschnitt 2.2.6 darüber hinaus verlangt. Handlungsfeldübergreifend ist die Zusammenschau nicht: Der aktive Katalog hat nur das Handlungsfeld „Menschliche Gesundheit“, und auch mit mehreren Feldern stellte sie diese nur nebeneinander, statt wechselseitige Abhängigkeiten zu ermitteln. Nur die übernommenen KWRA-Querverbindungen (Zeile 9) zeigen bundesweite Beziehungen. Regionsübergreifende Abhängigkeiten, etwa zu Nachbarkommunen, werden nicht betrachtet. Die Unsicherheit ist nicht mit den einzelnen Handlungsoptionen verbunden. Leitfragen der Kommune, die Einbeziehung von Fachabteilungen, externer Expertise und angrenzenden Kommunen sowie die Trennung der Maßnahmen danach, ob die Kommune sie allein umsetzen kann, fehlen. Gender- und Diversitätsaspekte gehen nur über das Alter ein. Primärtext ISO 14091 nicht gelesen (T-0531-ceo). Einzelnachweis: Abschnitt „Gegenprobe Zeile 19“. |
 | 20 | Die Ergebnisse der Risikobewertung sind zielgruppenspezifisch zu kommunizieren, etwa durch einen ausführlichen Bericht mit Datengrundlagen und Methodik für die Fachöffentlichkeit sowie durch leicht verständliche, prägnante Kommunikationsprodukte (z. B. Karten, Zusammenfassungen) für politische Entscheidungsträger und die breite Öffentlichkeit. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 7 (Abschnitt 2.3.2 "Ergebnisse zielgruppenspezifisch kommunizieren", S. 31) | teilweise | docs/methodik/95_hitzebelastung.md, backend/app/services/kurzfassung_markdown.py, backend/app/api/routes/kommune.py, backend/tests/test_kurzfassung_export.py, backend/app/services/geodata_export_service.py | Neben dem Methodik-Bericht für die Fachöffentlichkeit erzeugt das Produkt eine prägnante Kurzfassung mit fünf festen Abschnitten für politische Entscheidungsträger, und der GeoPackage-Export bringt die Ergebnisse je Zelle in GIS-Systeme. Es fehlt aber, was Abschnitt 2.3.2 darüber hinaus nennt. Für die breite Öffentlichkeit gibt es kein Produkt: Die öffentliche Deutschland-Karte ist abgeschaltet, die Karte der Anwendung nur nach Anmeldung zugänglich, es gibt weder Broschüre noch Online-Auftritt mit Ergebnissen der Kommune noch Hinweise auf Eigenvorsorge; Karten und Broschüren nennt das UBA dabei nur als Beispiel. Die Kurzfassung weist keine Handlungserfordernisse (Dringlichkeit) aus, nennt als Handlungsmöglichkeiten nur schon geplante Maßnahmen, erklärt ihre Begriffe nicht und enthält keine Karte. Einen Abschlussbericht der Kommune mit Detailergebnissen gibt es nicht; die Methodik-Berichte sind bundesweit gleich und liegen nur im Repo. Ziele der Kommunikation je Akteursgruppe, Beschlussvorlagen, Veranstaltungen und Kampagnen sind Verfahrensschritte ohne Gegenstück im Produkt. Primärtext ISO 14091 nicht gelesen (T-0531-ceo). Einzelnachweis: Abschnitt „Gegenprobe Zeile 20“. |
 | 21 | Die Monetarisierung von Umweltauswirkungen soll durchgängig auf dem Schadenskostenansatz beruhen; Vermeidungs- oder Wiederherstellungskosten sollen nicht als Ersatz für Schadenskosten verwendet werden, um Datenlücken zu schließen, da sie vom Minderungsziel abhängen bzw. real oder virtuell sein können und daher kein aussagekräftiger Ersatzwert sind. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 1 (S. 8f.) und Kap. 2.2.1 (S. 12) | teilweise | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, backend/app/data/catalog.py | Für Gesundheitswirkungen (z. B. hitzebedingte Mortalität) folgt das Produkt dem Schadenskostenansatz (VSL/VOLY-artige Kostensätze), für Gebäudeschäden bei Flusshochwasser (#60) wird jedoch ausdrücklich mit Wiederherstellungskosten zum Neuwert (NHK, indexiert) bewertet (docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, Konto K3); das Produkt wendet damit je nach Schadenskategorie unterschiedliche, nicht vereinheitlichte Kostenkonzepte an, statt durchgängig den von der Methodenkonvention empfohlenen Schadenskostenansatz zu verwenden, und dokumentiert diesen Methodenwechsel nicht als bewusste Abweichung von der Konvention. |
@@ -923,6 +923,130 @@ Belegen gehört und nur Werte je Bundesland zeigt. Der Status der Zeile 16 ist i
 gesetzt; die Spalte „Lücke“ nennt, was fehlt. Die Zählungen in den Abschnitten „Nachtrag: Abschlusszählung“ und
 „Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist Sache der Gesamtzählung (T-0821-ceo, T-0487), nicht
 dieser Gegenprobe.
+
+### Gegenprobe Zeile 18 gegen UBA-Handlungsempfehlungen zur ISO 14091, Abschnitt 2.2.5
+
+Frage: Entsprechen die Komponenten und Reifegrade des Produkts denen der Anhänge G und H der ISO 14091, und tragen die
+fünf Belege der Zeile 18, was Abschnitt 2.2.5 „Optional: Anpassungskapazität analysieren und bewerten“ verlangt — vor
+allem, abzuleiten, wie stark sich das Klimarisiko durch Anpassung verringern lässt? Gelesen wurde gegen die
+Sekundärquelle Umweltbundesamt (Porst, Voß, Kahlenborn, Schauser), „Klimarisikoanalysen auf kommunaler Ebene –
+Handlungsempfehlungen zur Umsetzung der ISO 14091“, Juni 2022, 40 Seiten, abgerufen am 25.09.2026 um 06:53:03 GMT
+(`Date`-Kopf des Servers, HTTP 200, 5.321.922 Byte) von
+https://www.umweltbundesamt.de/system/files/medien/479/publikationen/2022_uba-fachbroschuere_kra_auf_kommunaler_ebene.pdf
+(Verweis von der Publikationsseite in der Spalte „Quelle“). Die Datei liegt nicht im Repo. PDF-Seitenzahl und gedruckte
+Seitenzahl stimmen überein (S. 28 und S. 29 tragen die gedruckten Zahlen 28 und 29); die Spalte „Seite“ nennt beide
+zugleich.
+
+Abgrenzung: Abschnitt 2.2.5 beginnt auf S. 28 in der rechten Spalte, links endet dort 2.2.4 mit „Identifikation von
+dringendem Handlungsbedarf“; Tabelle 4 auf S. 28 gehört zu 2.2.4. Er endet auf S. 29 in der rechten Spalte vor 2.2.6.
+Zu ihm gehören die Fußnoten 32–34 und Tabelle 5 (S. 29), auf die er verweist, sowie Abbildung 3 (S. 18, im Abschnitt
+2.1.4), auf die er für den Ansatz der KWRA 2021 verweist. Fußnote 27 (S. 20) ordnet Abschnitt 2.2 dem Kapitel 6 der
+ISO 14091 zu; die Angabe „Kap. 6“ der Zeile stimmt, ebenso die Fundstelle „S. 28f.“.
+
+**Befund Primärquelle:** Der Normtext ISO 14091:2021 wurde nicht gelesen, also auch nicht die Anhänge G
+(„Komponenten der Anpassungskapazität“) und H („Bewertung der Anpassungskapazität“). Er wird nicht gekauft; das
+Menschenticket T-0531-ceo ist offen. Die Broschüre gibt aus Anhang G nur die Namen der vier Komponenten wieder
+(Fußnote 32, S. 29) und aus Anhang H nur, dass es „verschiedene Niveaus der Anpassungskapazität“ gibt (S. 29 mit
+Fußnote 33); die Niveaus selbst nennt sie nicht. Soweit die Anhänge Komponenten und Reifegrade festlegen, stehen sie in
+der Tabelle deshalb nur in dieser Wiedergabe (A7, A8). Die Broschüre spricht in „kann“, „sollte“ und „empfiehlt“; der
+ganze Schritt ist optional.
+
+Im Produkt wurden `backend/app/data/anpassungskapazitaet.py`, `backend/app/services/anpassungskapazitaet.py`,
+`backend/app/services/anpassungskapazitaet_markdown.py`, `backend/app/api/routes/anpassungskapazitaet.py` und
+`docs/ANPASSUNGSKAPAZITAET.md` vollständig gelesen, dazu die Einbindung der Route in `backend/app/main.py`
+(`include_router` mit `_PROTECTED`). Weitere Nutzer der Module gibt es in `backend/app` nicht; im Frontend unter `frontend/src`
+ruft niemand die Route auf. Weil Abschnitt 2.2.5 die Wirksamkeit von Maßnahmen und Kosteneinschätzungen nennt, wurden außerhalb der
+Belege gelesen: der Kopf von `backend/app/services/measure_service.py` (Maßnahmen-Engine, Index-Reduktion je Zelle,
+Kosten aus Katalog-Kostensätzen) und dort `get_risk_aggregate()` und der Kopf von `build_cost_summary()` (Schäden ohne
+und mit Maßnahmen, vermiedene Schäden, CAPEX und OPEX). Ausgeführt wurde nichts. Ob die Selbsteinschätzung im Frontend
+sichtbar ist, ist nicht Gegenstand dieser Gegenprobe (Sichtbarkeit, T-0483).
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | „Bei einer KRA kann optional neben den Auswirkungen des Klimawandels auch eine Untersuchung der Anpassungskapazität durchgeführt werden.“ | 28 | `anpassungskapazitaet.py` (data), `OPTIONAL_SATZ`; `bewerte_anpassungskapazitaet()`, Feld `optional_hinweis`; `anpassungskapazitaet_als_markdown()`, Titel „(optionaler Analyseschritt)“; `docs/ANPASSUNGSKAPAZITAET.md`, Abschnitt „Zweck“ | trägt |
+| A2 | „Die ISO 14091 empfiehlt die Analyse und Bewertung der Anpassungskapazität, um einschätzen zu können, wie sich die Risiken durch Anpassung vermindern lassen …“ | 28 | `anpassungskapazitaet.py` (data), `MINDERUNGSSAETZE` (ein Satz je Gesamtstufe 0 bis 3, einer für „nicht bewertet“); `bewerte_anpassungskapazitaet()`, Feld `minderung`; `docs/ANPASSUNGSKAPAZITAET.md`, Abschnitt „Gesamtstufe und Ableitung der Risikominderung“ | trägt teilweise |
+| A3 | Derselbe Satz: „… welche Anpassungsmöglichkeiten grundsätzlich bestehen …“ | 28 | keiner. Die Bewertung nennt keine Anpassungsmöglichkeit, weder je Komponente noch je Gesamtstufe. | trägt nicht |
+| A4 | Derselbe Satz: „… und wie groß der Bedarf nach zusätzlicher, möglicherweise transformativer Anpassung ist.“ | 28 | keiner. Weder Bedarf an zusätzlicher noch an transformativer Anpassung kommt in den Belegen vor. | trägt nicht |
+| A5 | „Die Analyse und Bewertung der Anpassungskapazität können parallel zur oder im Anschluss an die Bewertung der Risiken erfolgen.“ | 28 | `routes/anpassungskapazitaet.py`, `post_anpassungskapazitaet_bewertung()` (zustandslos, ohne Kommunendaten, unabhängig von der Risikobewertung aufrufbar) | trägt |
+| A6 | „Die Anpassungskapazität kann z. B. analysiert und bewertet werden, indem das Ausmaß eingeschätzt wird, in welchem ausgewählte Anpassungsmaßnahmen wirksam werden und dadurch Klimarisiken reduzieren (vgl. Kahlenborn et al. 2021c und Abbildung 3). Auch andere Ansätze sind denkbar.“ | 28–29 | `anpassungskapazitaet.py` (data), `KOMPONENTEN`, `REIFEGRADE`; `bewerte_anpassungskapazitaet()` (anderer Ansatz: Selbsteinschätzung je Komponente mit Engpassregel) | trägt |
+| A7 | „Die ISO 14091 unterscheidet in vier Komponenten“, Fußnote 32: „Organisationsbezogene Fähigkeit, technisches Vermögen, finanzielle Fähigkeit, Fähigkeit des Ökosystems.“ (Anhang G nach Fußnote 33) | 29 | `anpassungskapazitaet.py` (data), `KOMPONENTEN` (vier Einträge mit genau diesen Bezeichnungen, in dieser Reihenfolge); `docs/ANPASSUNGSKAPAZITAET.md`, Abschnitt „Komponenten“ | trägt |
+| A8 | „… sowie verschiedene Niveaus der Anpassungskapazität als Ausgangspunkt für die Bewertung.“ (Anhang H nach Fußnote 33) | 29 | `anpassungskapazitaet.py` (data), `REIFEGRADE` (Stufen 0 bis 3) und `HERLEITUNG_REIFEGRADE` (als Abschätzung von KAP3 ausgewiesen); `docs/ANPASSUNGSKAPAZITAET.md`, Abschnitt „Reifegradskala“ | trägt teilweise |
+| A9 | „Es müssen meist zusätzliche Informationen gesammelt beziehungsweise bereitgestellt werden. Dies betrifft unter anderem Daten oder Einschätzungen zu verschiedenen Komponenten oder Dimensionen der Anpassungskapazität (z. B. Wissen, Motivation, Technologie, natürliche Ressourcen, Institutionalisierung, personelle Kapazitäten, finanzielle Ressourcen) …“ | 29 | `anpassungskapazitaet.py` (data), `KOMPONENTEN`, Feld `beschreibung` (Fachwissen, Personal, Zuständigkeiten; Technik und Daten; Haushalts- und Fördermittel; Grünflächen, Gewässer, Böden); `bewerte_anpassungskapazitaet()`, Eingabe `einschaetzung` | trägt teilweise |
+| A10 | Derselbe Satz: „… Kosteneinschätzungen zu spezifischen Anpassungsmaßnahmen, Informationen zur Kombination von Maßnahmen oder Übersichten über eventuell bereits geplante Maßnahmen und weitere, plausible oder transformative Möglichkeiten der Anpassung.“ | 29 | keiner in den Belegen der Zeile; außerhalb: `measure_service.py`, `compute_costs()` (CAPEX und OPEX je Maßnahme) und `build_cost_summary()` (alle Maßnahmen einer Kommune zusammen) | trägt teilweise |
+| A11 | „Zu beachten sind auch Wechselwirkungen sowohl zwischen Anpassungsmaßnahmen als auch mit anderen strategischen Zielen (z. B. Klimaschutz) oder Pflichtaufgaben von Kommunen. Dadurch können mögliche Synergien sowie Widersprüche einzelner Maßnahmen untereinander sowie Zielkonflikte identifiziert werden.“ | 29 | keiner. Die Belege kennen keine Maßnahme; Wechselwirkungen, Synergien und Zielkonflikte kommen nicht vor. | trägt nicht |
+| A12 | „Darüber hinaus sollten die Grenzen der Klimaanpassung beleuchtet werden.“ | 29 | keiner. Der Abschnitt „Grenzen“ in `docs/ANPASSUNGSKAPAZITAET.md` beschreibt die Grenzen der Methode, nicht die der Klimaanpassung. | trägt nicht |
+| A13 | „Auch hier sollte nach der fachlichen Analyse eine normative Bewertung durch legitimierte Expert*innen erfolgen, die transparent und weitgehend im Konsens verlaufen sollte.“ | 29 | `docs/ANPASSUNGSKAPAZITAET.md`, Abschnitte „Zweck“ und „Grenzen“ (Einstufung durch Kommune oder Beratungshaus, Regeln offengelegt); `REGEL_GESAMTSTUFE` | trägt teilweise |
+| A14 | „Aus der Kombination der Bewertung der Klimarisiken ohne weitere Anpassung und der Anpassungskapazität kann die Höhe der Klimarisiken mit Anpassung abgeleitet werden (siehe Tabelle 5).“ Tabelle 5: „Klimarisiko mit Anpassung = Klimarisiko ohne Anpassung – Anpassungskapazität“, Klimarisiko 1 (gering) bis 3 (hoch), Wirksamkeit der Anpassung 0 (gering) bis 2 (hoch) in Schritten von 0,5. | 29 | keiner. `bewerte_anpassungskapazitaet()` nimmt kein Klimarisiko entgegen und gibt keines aus; die Route arbeitet ohne Kommunendaten. | trägt nicht |
+| A15 | „Aus der Einstufung der Anpassungskapazität in Dimensionen kann grob abgeleitet werden, welche Art von Anpassung benötigt wird (z. B. mehr Wissen, Geld, Personen).“ | 29 | `bewerte_anpassungskapazitaet()`, Feld `engpaesse`; `docs/ANPASSUNGSKAPAZITAET.md`, Rechenbeispiel (Engpass `finanzen`) | trägt teilweise |
+
+**Begründung je Urteil:**
+
+- A1: Der optionale Charakter steht in Daten, Bewertung, Markdown-Titel und Methodendokument gleichlautend.
+- A2: Das Produkt sagt in Worten, ob sich „das Klimarisiko“ kaum, in geringem Umfang, teilweise oder weitgehend
+  verringern lässt. Der Satz bezieht sich auf kein bestimmtes Klimarisiko und auf keinen Betrag; er folgt allein aus der
+  Selbsteinschätzung. Die Rechnung „Schäden ohne und mit Maßnahmen“ in `measure_service.py` leistet das je Maßnahme,
+  steht aber außerhalb der Belege und ist mit der Anpassungskapazität nicht verbunden.
+- A3: Welche Anpassungsmöglichkeiten bestehen, beantwortet die Bewertung nicht. Die Maßnahmen-Engine rechnet Maßnahmen,
+  die der Nutzer anlegt; aus der Kapazität leitet sie keine ab.
+- A4: Die vier Minderungssätze sagen, wie viel die vorhandene Kapazität leistet, nicht, wie viel zusätzliche Anpassung
+  nötig ist.
+- A5: Eine Kann-Regel zur Reihenfolge. Die Route hängt von keiner Risikobewertung ab und lässt beide Reihenfolgen zu.
+- A6: Die Broschüre nennt den Ansatz der KWRA 2021 als Beispiel und lässt andere Ansätze ausdrücklich zu. Das Produkt
+  wählt einen anderen: die Einstufung je Komponente. Das ist zulässig.
+- A7: Bezeichnungen und Reihenfolge der vier Komponenten stimmen wörtlich mit Fußnote 32 überein. Die Beschreibungen je
+  Komponente sind Formulierungen von KAP3; ob sie Anhang G entsprechen, lässt sich ohne Primärtext nicht prüfen.
+- A8: Stufen gibt es, und sie sind als Abschätzung von KAP3 ausgewiesen (Vorgabe P1). Ob sie den Niveaus aus Anhang H
+  entsprechen, ist nicht belegt: Die Broschüre nennt die Niveaus nicht, und `HERLEITUNG_REIFEGRADE` behauptet eine
+  Anlehnung „an die in der Quelle genannten Reifegrade“, die sich an der gelesenen Quelle nicht findet. Die einzige
+  Stufung in der Broschüre, die Wirksamkeit der Anpassung in Tabelle 5, hat fünf Stufen von 0 bis 2; das Produkt hat
+  vier von 0 bis 3.
+- A9: Wissen, Technologie, natürliche Ressourcen, Institutionalisierung, personelle Kapazitäten und finanzielle
+  Ressourcen stecken in den Beschreibungen der vier Komponenten; Motivation fehlt. Das Produkt nimmt nur eine Einschätzung
+  je Komponente entgegen, keine Daten.
+- A10: Kosten je Maßnahme und die Kombination aller Maßnahmen einer Kommune rechnet die Maßnahmen-Engine, außerhalb der
+  Belege und ohne Verbindung zur Anpassungskapazität. Übersichten über bereits geplante Maßnahmen und transformative
+  Möglichkeiten führt das Produkt nicht.
+- A11: Nichts in den Belegen betrachtet Maßnahmen untereinander oder gegenüber Klimaschutz und Pflichtaufgaben.
+- A12: Grenzen der Klimaanpassung, also Risiken, die auch bei voller Anpassung bleiben, benennt das Produkt nicht.
+- A13: Die Einstufung ist normativ und liegt bei Kommune oder Beratungshaus; Regel und Herleitung sind offengelegt. Wer
+  eingestuft hat, ob die Personen legitimiert waren und ob im Konsens, hält das Produkt nicht fest.
+- A14: Das ist der Kern der Frage „wie stark lässt sich das Klimarisiko durch Anpassung verringern“. Die Broschüre
+  verlangt ein Klimarisiko mit Anpassung, abgeleitet aus dem Klimarisiko ohne Anpassung und der Kapazität, zum Beispiel
+  „hoch“ (3) mit Wirksamkeit „mittel“ (1) ergibt 2, also „mittel“. Das Produkt verbindet seine Risikobewertung nicht mit
+  der Anpassungskapazität und weist kein Klimarisiko mit Anpassung aus.
+- A15: Die Bewertung nennt die Komponenten mit der niedrigsten Stufe (`engpaesse`), und das Rechenbeispiel folgert daraus
+  „nicht mehr umsetzen, als das Geld erlaubt“. Welche Art von Anpassung nötig ist, sagt die Ausgabe nicht selbst; die
+  Markdown-Fassung führt die Engpässe nicht auf, sie stehen nur im Rückgabewert der Bewertung.
+
+Nicht als eigene Anforderung gewertet: der Satz „Die Analyse der Anpassungskapazität ist aufwendig“ (S. 29), eine
+Feststellung ohne Vorgabe; Fußnote 34 (S. 29), die für methodische Details auf Kahlenborn et al. 2021a verweist; die
+Definition „Anpassungskapazität“ im Glossar „Zentrale Begriffe“ (S. 19), die A1 bis A15 nichts hinzufügt; Abbildung 3
+(S. 18), die den Rahmen der KWRA 2021 zeigt (Klimarisiko ohne Anpassung aus klimatischem Einfluss, Sensitivität und
+räumlicher Exposition, daraus mit der Anpassungskapazität das Klimarisiko mit Anpassung) und damit A6 und A14 nur
+bebildert; Tabelle 4 (S. 28), die zu 2.2.4 gehört.
+
+**Gelesene Seiten und Abschnitte:** Inventar mit `python3 /opt/overlord/overlord/skripte/dokumente.py inventar`
+(40 Seiten). Inhaltsverzeichnis S. 5 ganz. Einführung S. 7–9 ganz, einschließlich des Hinweises auf S. 8, dass jedem
+Teilkapitel eine Kurzfassung des ISO-Abschnitts in kursiver Schrift vorangestellt ist, und der Infobox
+„Klimarisikoanalysen (KRA)“ auf S. 9 („ggf. die Anpassungskapazität einzuschätzen“). S. 18–20 ganz: Ende von 2.1.4 mit
+Abbildung 3 (S. 18, als Bild angesehen), Infobox „Zentrale Begriffe“ (S. 19), 2.1.5 und Beginn von 2.2 mit Fußnote 27
+und Abbildung 4 (S. 20, im Text; „Optional: Anpassungskapazität bewerten“ als fünfter Schritt). S. 27–30 ganz: Ende von
+2.2.4 mit Fußnote 31 und Tabelle 4 (Kapitelgrenze geprüft), Abschnitt 2.2.5 auf S. 28–29 vollständig im Text samt
+Fußnoten 32–34, Tabelle 5 (S. 29, als Bild angesehen, um Formel, Stufen und Zellwerte der Matrix zu prüfen), 2.2.6 und
+Beginn von 2.3 (Kapitelgrenze geprüft). **Nicht gelesen:** S. 1–4, 6, 10–17, 21–26, 31–40 der Broschüre; S. 28 nicht
+als Bild; Kahlenborn et al. 2021a und 2021c; der Primärtext der ISO 14091 mit den Anhängen G und H.
+
+**Schluss:** Zeile 18 bleibt nicht `erfüllt`. Von 15 Anforderungen trägt der Bestand vier voll (A1, A5, A6, A7), sechs
+teilweise (A2, A8, A9, A10, A13, A15) und fünf nicht (A3, A4, A11, A12, A14). Zur Frage der Gegenprobe: Die
+Komponenten entsprechen der Wiedergabe von Anhang G wörtlich; ob die Stufen 0 bis 3 den Niveaus von Anhang H
+entsprechen, ist nicht belegt, und die Herleitung beruft sich auf Reifegrade, die die Broschüre nicht nennt. Wie stark
+sich das Klimarisiko durch Anpassung verringern lässt, sagt das Produkt nur in einem allgemeinen Satz je Gesamtstufe,
+ohne Bezug auf ein bewertetes Klimarisiko; ein Klimarisiko mit Anpassung nach Tabelle 5 weist es nicht aus. Dass der
+Schritt nach ISO 14091 optional ist, macht eine umgesetzte Fassung nicht vollständig. Der Status der Zeile 18 ist in
+derselben Änderung auf `teilweise` gesetzt; die Spalte „Lücke“ nennt, was fehlt, und
+`backend/tests/test_konformitaet_zeile18.py` verlangt Status und Lücke neu. Die Zählungen in den Abschnitten „Nachtrag:
+Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist Sache der Gesamtzählung
+(T-0821-ceo, T-0487), nicht dieser Gegenprobe.
 
 ## Ergebnis
 
