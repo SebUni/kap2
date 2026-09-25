@@ -579,6 +579,10 @@ function GroupedParameterList({
   const uhiCount = byCategory('uhi').length
   const impactCount = byCategory('impact').length
   const regionalCount = byCategory('regional').length
+  const schwellenParams = parameters.filter(
+    p => p.layer_category === 'charakterisierung' || p.layer_category === 'gewissheit',
+  )
+  const schwellenCount = schwellenParams.length
   const hazardCount = parameters.filter(p => p.layer_category === 'hazards').length
   const exposureCount = parameters.filter(p => p.layer_category === 'exposures').length
   const vulnCount = parameters.filter(p => p.layer_category === 'vulnerabilities').length
@@ -651,6 +655,19 @@ function GroupedParameterList({
           onToggle={toggleSection}
         >
           {renderTable(byCategory('regional'))}
+        </CollapsibleParamSection>
+      )}
+
+      {schwellenCount > 0 && (
+        <CollapsibleParamSection
+          sectionKey="einordnung"
+          title="Einordnungsschwellen (Charakterisierung, Gewissheit)"
+          anchorId={paramSectionId('einordnung')}
+          count={schwellenCount}
+          expanded={expandedSections.has('einordnung')}
+          onToggle={toggleSection}
+        >
+          {renderTable(schwellenParams)}
         </CollapsibleParamSection>
       )}
 
