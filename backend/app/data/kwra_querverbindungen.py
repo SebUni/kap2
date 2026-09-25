@@ -14,7 +14,9 @@ Teilbericht 6 ausdrücklich belegt**:
 
   NETZROLLEN            — die 25 Klimawirkungen, die TB 6 Kap. 3.4 ausdrücklich als
                            starke Sender ("stark ausgehend") oder starke Empfänger
-                           ("stark eingehend") im Wirkungsnetz benennt.
+                           ("stark eingehend") im Wirkungsnetz benennt; ``rollen``
+                           mehrwertig (Sender und Empfänger zugleich, Fn. 21, S. 84),
+                           ``zentral`` für die ausdrücklich zentralen Klimawirkungen.
   BENANNTE_BEZIEHUNGEN   — die im Fließtext von TB 6 Kap. 3.4 wörtlich genannten
                            Einzelbeziehungen (Auszug, nicht vollständig; 27 Einträge,
                            je mit ``richtung`` „gerichtet“ oder „gegenseitig“ und
@@ -48,58 +50,105 @@ QUELLE = (
 # ── Netzrollen: Klimawirkungen mit ausdrücklich benannter starker Netzrolle ──────
 #
 # Jeder Eintrag: kwra_id (1–102, siehe Blatt "Klimawirkungen" Spalte "ID"),
-# name (Klimawirkung), handlungsfeld, rolle ("stark ausgehend" | "stark eingehend").
+# name (Klimawirkung), handlungsfeld, rolle ("stark ausgehend" | "stark eingehend"),
+# rollen, zentral und — wo rollen zwei Werte hat oder zentral True ist — beleg_rolle.
+#
+# rolle:   Hauptrolle aus der Arbeitsmappe (Spalte „Netzrolle“), einwertig; bleibt für
+#          bestehende Leser unverändert.
+# rollen:  alle Rollen, die TB 6 Kap. 3.4 der Klimawirkung zuschreibt. Eine Klimawirkung
+#          kann Sender und Empfänger zugleich sein (Fn. 21, S. 84); ausdrücklich belegt
+#          ist das für #4 (S. 87, 88). Die zweite Rolle stammt aus dem Fließtext, nicht aus
+#          der Arbeitsmappe.
+# zentral: True, wo TB 6 Kap. 3.4 die Klimawirkung ausdrücklich „zentral“ nennt —
+#          #49 Hochwasser in der Gesamtbetrachtung (S. 84, 88), #4 unter den hoch
+#          bewerteten Klimawirkungen (S. 87, 88).
+# beleg_rolle: Seite und Wortlaut für die zweite Rolle bzw. die Kennzeichnung „zentral“.
 NETZROLLEN: list[dict] = [
     {"kwra_id": 1, "name": "Veränderung der Länge der Vegetationsperiode und Phänologie",
-     "handlungsfeld": "Biologische Vielfalt", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Biologische Vielfalt", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 4, "name": "Verschiebung von Arealen und Rückgang der Bestände",
-     "handlungsfeld": "Biologische Vielfalt", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Biologische Vielfalt", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend", "stark eingehend"], "zentral": True,
+     "beleg_rolle": "TB6 Kap. 3.4, S. 84, 87, 88 (Fn. 21 S. 84): viele ausgehende "
+                    "Wirkbeziehungen (S. 84) und unter den hoch bewerteten Klimawirkungen "
+                    "zugleich von vielen anderen beeinflusst (S. 87); nimmt dort „eine zentrale "
+                    "Position mit vielen ausgehenden und eingehenden Wirkbeziehungen“ ein (S. 88). "
+                    "Zentral bezogen auf die hoch bewerteten Klimawirkungen, nicht auf die "
+                    "Gesamtbetrachtung."},
     {"kwra_id": 5, "name": "Schäden an Küstenökosystemen",
-     "handlungsfeld": "Biologische Vielfalt", "rolle": "stark eingehend"},
+     "handlungsfeld": "Biologische Vielfalt", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 12, "name": "Rutschungen und Muren",
-     "handlungsfeld": "Boden", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Boden", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 13, "name": "Wassermangel im Boden",
-     "handlungsfeld": "Boden", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Boden", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 14, "name": "Sickerwasser",
-     "handlungsfeld": "Boden", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Boden", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 15, "name": "Vernässung",
-     "handlungsfeld": "Boden", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Boden", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 25, "name": "Ertragsausfälle",
-     "handlungsfeld": "Landwirtschaft", "rolle": "stark eingehend"},
+     "handlungsfeld": "Landwirtschaft", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 26, "name": "Qualität der Ernteprodukte",
-     "handlungsfeld": "Landwirtschaft", "rolle": "stark eingehend"},
+     "handlungsfeld": "Landwirtschaft", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 31, "name": "Nutzfunktion: Holzertrag",
-     "handlungsfeld": "Wald- und Forstwirtschaft", "rolle": "stark eingehend"},
+     "handlungsfeld": "Wald- und Forstwirtschaft", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 38, "name": "Meerestemperatur und Eisbedeckung",
-     "handlungsfeld": "Küsten- und Meeresschutz", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Küsten- und Meeresschutz", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 39, "name": "Wasserqualität und Grundwasserversalzung",
-     "handlungsfeld": "Küsten- und Meeresschutz", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Küsten- und Meeresschutz", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 40, "name": "Meeresspiegelhöhe",
-     "handlungsfeld": "Küsten- und Meeresschutz", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Küsten- und Meeresschutz", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 43, "name": "Sturmfluten",
-     "handlungsfeld": "Küsten- und Meeresschutz", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Küsten- und Meeresschutz", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 48, "name": "Niedrigwasser",
-     "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 49, "name": "Hochwasser",
-     "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": True,
+     "beleg_rolle": "TB6 Kap. 3.4, S. 84, 88: „Eine zentrale Bedeutung in der Gesamtbetrachtung "
+                    "aller Handlungsfelder hat die vorgelagerte Klimawirkung ›Hochwasser‹, die "
+                    "sich auf die meisten anderen Klimawirkungen auswirkt“ (S. 84); weist „die "
+                    "meisten ausgehenden Wirkbeziehungen“ auf (S. 88)."},
     {"kwra_id": 53, "name": "Gewässertemperatur und Eisbedeckung und biologische Wasserqualität",
-     "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark ausgehend"},
+     "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark ausgehend",
+     "rollen": ["stark ausgehend"], "zentral": False},
     {"kwra_id": 55, "name": "Grundwasserstand und Grundwasserqualität",
-     "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark eingehend"},
+     "handlungsfeld": "Wasserhaushalt, Wasserwirtschaft", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 73, "name": "Schiffbarkeit der Seeschifffahrtsstraßen",
-     "handlungsfeld": "Verkehr, Verkehrsinfrastruktur", "rolle": "stark eingehend"},
+     "handlungsfeld": "Verkehr, Verkehrsinfrastruktur", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 82, "name": "Beeinträchtigung des Warenverkehrs über Wasserstraßen (Inland)",
-     "handlungsfeld": "Industrie und Gewerbe", "rolle": "stark eingehend"},
+     "handlungsfeld": "Industrie und Gewerbe", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 92, "name": "Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen",
-     "handlungsfeld": "Tourismuswirtschaft", "rolle": "stark eingehend"},
+     "handlungsfeld": "Tourismuswirtschaft", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 95, "name": "Hitzebelastung",
-     "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend"},
+     "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 96, "name": "Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft",
-     "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend"},
+     "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 97, "name": "Potenziell schädliche Mikroorganismen und Algen",
-     "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend"},
+     "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
     {"kwra_id": 101, "name": "Verletzungen und Todesfälle infolge von Extremereignissen",
-     "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend"},
+     "handlungsfeld": "Menschliche Gesundheit", "rolle": "stark eingehend",
+     "rollen": ["stark eingehend"], "zentral": False},
 ]
 
 # ── Im Fließtext ausdrücklich benannte Einzelbeziehungen (Auszug) ───────────────
