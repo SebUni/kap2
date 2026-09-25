@@ -76,6 +76,21 @@ def querverbindungs_auswertung() -> dict:
         for kid, eintrag in sorted(klimawirkungen_je_id.items())
     ]
 
+    # Netzknoten der Gesamtbetrachtung (TB 6 Kap. 3.4), die nicht im Katalog stehen
+    # (weder RISKS noch PLANNED_RISKS) — z. B. #49 Hochwasser, der zentrale Knoten.
+    netzknoten_ausserhalb_katalog = [
+        {
+            "kwra_id": e["kwra_id"],
+            "name": e["name"],
+            "handlungsfeld": e["handlungsfeld"],
+            "netzrollen": list(e["rollen"]),
+            "zentral": e["zentral"],
+            "hinweis": "nicht im Katalog",
+        }
+        for e in sorted(kq.NETZROLLEN, key=lambda x: x["kwra_id"])
+        if "gesamt" in e["auswertungen"] and e["kwra_id"] not in klimawirkungen_je_id
+    ]
+
     mit_netzrolle = sum(1 for e in klimawirkungen if e["netzrolle"] is not None)
     mit_benannter_beziehung = sum(
         1 for e in klimawirkungen
@@ -111,6 +126,7 @@ def querverbindungs_auswertung() -> dict:
 
     return {
         "klimawirkungen": klimawirkungen,
+        "netzknoten_ausserhalb_katalog": netzknoten_ausserhalb_katalog,
         "kennzahlen": kq.KENNZAHLEN,
         "systembereich_matrix": kq.SYSTEMBEREICH_MATRIX,
         "abdeckung": abdeckung,

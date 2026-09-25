@@ -20,7 +20,7 @@ def test_route_registriert():
 def test_auswertung_hat_genau_die_erwarteten_schluessel():
     ergebnis = querverbindungs_auswertung()
     assert set(ergebnis.keys()) == {
-        "klimawirkungen", "kennzahlen", "systembereich_matrix",
+        "klimawirkungen", "netzknoten_ausserhalb_katalog", "kennzahlen", "systembereich_matrix",
         "abdeckung", "quelle", "modellgrenze",
     }
 
@@ -72,3 +72,18 @@ def test_netzrollen_mehrwertig_und_zentral_im_dienst():
         assert set(e["netzrollen"]) <= {"stark ausgehend", "stark eingehend"}
         assert (e["netzrolle"] is None) == (e["netzrollen"] == [])
         assert isinstance(e["zentral"], bool)
+
+
+def test_netzknoten_ausserhalb_katalog():
+    katalog_ids = {r["kwra_id"] for r in catalog.RISKS} | {p["kwra_id"] for p in catalog.PLANNED_RISKS}
+    erwartet = {
+        e["kwra_id"] for e in kq.NETZROLLEN if "gesamt" in e["auswertungen"]
+    } - katalog_ids
+    eintraege = querverbindungs_auswertung()["netzknoten_ausserhalb_katalog"]
+    assert {e["kwra_id"] for e in eintraege} == erwartet
+    for e in eintraege:
+        assert set(e.keys()) == {"kwra_id", "name", "handlungsfeld", "netzrollen", "zentral", "hinweis"}
+        assert e["hinweis"] == "nicht im Katalog"
+    je_id = {e["kwra_id"]: e for e in eintraege}
+    assert 49 in je_id
+    assert je_id[49]["zentral"] is True
