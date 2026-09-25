@@ -51,7 +51,7 @@ function KnotenName({ k }: { k: RueckkopplungKnoten }) {
     <>
       <strong>{k.name}</strong>{' '}
       <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-        {k.im_katalog ? `(#${k.kwra_id}, ${k.handlungsfeld})` : `(nicht im Katalog; Handlungsfeld ${k.handlungsfeld})`}
+        {k.im_katalog ? `(#${k.kwra_id}, ${k.handlungsfeld})` : `(#${k.kwra_id}, nicht im Katalog; Handlungsfeld ${k.handlungsfeld})`}
       </span>
     </>
   )

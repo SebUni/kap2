@@ -530,3 +530,112 @@ frischer Sitzung hat die Nacharbeit aus Runde 14 (Befunde 112–114) geprüft un
 oder C gefunden; „Runde 1“ ist die Zählung im Ticket, im Ledger ist es die Runde nach Runde 14. Merge des Schritts nach
 `main`: Commit 31673734. Neue Befunde: keine. Zurückgestellt bleiben 99, 100, 101 und 104; keiner davon ist ein
 A-Befund. Eingetragen mit T-1120-methodik_manager (Schritt 3), ohne Änderung am Bericht.
+
+## Runde 16 — Zellvergleich Berlin als Skript (T-1198, 25.09.2026): neuer Befund 115
+
+Anlass: T-1198-methodik_manager (Vorhaben T-1196-cmo). Die Messung „Zellvergleich Berlin, Fassung 2“ aus Runde 12 lag
+nur im Probeverzeichnis. Sie liegt jetzt als Skript `docs/methodik/anlagen/95_zellvergleich.py` im Repo, Aufruf:
+`python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000`. Das Skript braucht nur die
+Python-Standardbibliothek. Die Daten lädt es in einen Cache außerhalb des Repos (Vorgabe `~/.cache/kap3/95_zellvergleich`,
+Option `--cache`); eingecheckt ist davon nichts. Grundlagen: Zensus-Gitter 100 m [67] mit Download-Adressen und
+Einlese-Logik aus `backend/app/services/zensus_loader.py` (importiert, `load_dataset_bbox` und
+`apply_zensus_to_cell_inputs` unverändert aufgerufen), DWD-Raster [33] wie `dwd_cdc_grid.climatology_grid`, 2016–2025,
+Gemeindegebiet BKG VG250 [65] (`vg250_gem`, AGS, GF = 4), Parameter aus Kapitel 7, Wochenquantile aus der Tabelle §3.2,
+Reihe `sommermittel_bundesland_povw.csv` [50]. Mit `--gemeinde <AGS>` rechnet es jede Kommune; ohne Ebene 1 für eine
+Kommune, die kein Stadtstaat ist, setzt es Gitter-Summe × Altersstruktur des Landes an (Option `--einwohner`), den Punkt
+der Kette über `--punkt`. Probelauf Treuenbrietzen (12069632): 558 Zellen, läuft durch.
+
+**Ergebnis Berlin (Lauf 25.09.2026):** VG250-Fläche 893,0 km², 40.669 bewohnte Zellen, 3.593.357 Einwohner; Punkt
+Berlin-Mitte 20,07 °C und 17,5 Hitzetage; Bevölkerungsmittel 19,96 °C (19,38–20,38 °C), 24,8 % der Einwohner wärmer
+als der Punkt. Kette 362,89 Mio. € → (a) Temperatur je Zelle 344,00 (× 0,948) → (b) Einwohnersumme 337,52 (× 0,981) →
+(c) Bänder je Zelle wie im Produkt 331,30 (× 0,982) → (d) Feinstruktur σ = 0,5 K 338,10 (× 1,021, genau 1,02051);
+zusammen × 0,932; (a) und (d) zusammen × 0,967. Bänder nach Produktlogik 2.898.960 · 334.709 · 262.921 · 96.767, gegen
+Ebene 1 × 0,979 · 0,986 · 1,037 · 0,897. Eigenheit (Befund 104): 4774 Zellen mit 99.098 Einwohnern ohne Anteil 65+;
+Ersatz mit dem Anteil der übrigen Zellen (19,87 %) 338,00, Produkt gegen Ersatz × 0,9802, Rest × 1,0014; Zelllauf ohne
+Eigenheit 344,94 Mio. €. Reihe Berlin 2016–2025 im Mittel 20,06 °C. Gegenprobe mit
+`--wochenquantile produkt` (Anlage `wochenquantile_region.csv` wie das Produkt): Kette 362,80 Mio. €, alle Faktoren
+gleich bis zur dritten Stelle. Die Zahlen in den Nachträgen zu 99 und 104 aus Runde 12 (3.595.270 Einwohner, Bänder
+× 0,980 · 0,986 · 1,038 · 0,897, 4770 Zellen mit 99.026 Einwohnern) sind damit durch diese Messung ersetzt; beide
+bleiben zurückgestellt.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 105 | §3.0, Liste der Zusammenfassungen | Nachtrag Runde 16 | Zahlenfolge berichtigt (Befund 115); der Prüfausdruck aus Runde 12 prüfte die alte Folge | — | B | `grep -q '0,948 × 0,981 × 0,982 × 1,021 = 0,932' docs/methodik/95_hitzebelastung.md` | behoben (T-1198): Wirkungen (b) und (c) weiter ausgewiesen, Werte aus dem Skript; Zelllauf rund 338 Mio. €, ohne Eigenheit rund 345 Mio. € (Preisstand 2024) |
+| 115 | §3.0, Wirkungen (b)–(d) und Beispiel-Block rechenkette_95 | Abweichung Messung Runde 12 ↔ Skript | Das Skript reproduziert (a) × 0,948 und zusammen × 0,932, weicht aber in der dritten Stelle ab: (b) × 0,981 statt 0,982, (c) × 0,982 statt 0,981, (d) × 1,021 statt 1,020. Ursache 1, Gemeindegrenze: Runde 11/12 nahm die Grenze aus OpenStreetMap/Nominatim (891,1 km², 40.663 Zellen, 3.595.270 Einwohner), das Skript die amtliche VG250 (893,0 km², 40.669 Zellen, 3.593.357 Einwohner). Das verschiebt (b) von 0,98168 auf 0,98115 und (c) von 0,98140 auf 0,98158 (andere Randzellen). Ursache 2, Rundung: (d) war schon in Runde 12 × 1,0205 (338,22/331,42 = 1,02052) und hätte als 1,021 stehen müssen, nicht als 1,020. Kette (362,89 Mio. €), Temperaturen und die Aussagen in §3.0 (rund 7 % Überschätzung, rund 338 bzw. 345 Mio. €, × 0,967 für Befund 101) bleiben gleich; kein Wert aus Kapitel 7 betroffen | Werte des Skripts in §3.0 und in den Block übernehmen, Pfad und Aufruf nennen | C | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('### 3.0'):s.index('### 3.1')]; sys.exit(not ('Einwohnersumme: × 0,981' in t and 'Produkt: × 0,982' in t and 'unter 1 km: × 1,021' in t and '3_593_357' in t and '3.595.270' not in t and 'python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000' in t))"` | behoben (T-1198): §3.0 (b) 3.593.357 Einwohner × 0,981, (c) × 0,982 = × 0,9802 Eigenheit (4774 Zellen, 99.098 Einwohner) × 1,0014 Rest, (d) × 1,021; Grenze VG250 [65] genannt; Skript und Aufruf in §3.0, [67] um den Datensatz Anteil 65+ ergänzt; Block rechenkette_95 nachgezogen |
+
+## Runde 17 — Ersatzregel für den geheimgehaltenen Anteil 65+ (T-1199, 25.09.2026): Befund 104 behoben, neue Befunde 116–117
+
+Anlass: T-1199-methodik_manager (Vorhaben T-1196-cmo). Der methodik_manager hat die Regel vorgegeben: Stufe 1 Summe der
+veröffentlichten 5er-Jahresgruppen ab 65 der Zelle geteilt durch ihre Einwohner, Stufe 2 der einwohnergewichtete Anteil 65+
+aller Zellen derselben Gemeinde mit veröffentlichtem Anteil. Sie steht jetzt als ein Satz in §3.3, gekennzeichnet als
+Abschätzung von KAP3, mit Entscheidungslog Nr. 41; §3.0 (c) verweist darauf, Kapitel 7 ist unverändert, kein neuer
+Parameter-Block. `backend/app/services/zensus_loader.py` ist nicht geändert; der Nachzug gehört dem cto (Befund 116).
+
+**Lesart von Stufe 1.** „Veröffentlicht“ heißt: mindestens eine der sechs Gruppen a65bis69 … a90undaelter trägt eine Zahl
+(das Gitter veröffentlicht erst ab 3 Personen; „–“ liest der Loader als 0 und zählt als 0). Die strenge Lesart „alle
+sechs Gruppen“ ließe Stufe 1 leer: Probelauf über das ganze Gitter [67] (Datei `Zensus2022_Anteil_ueber_65_100m-Gitter.csv`,
+Spalte AnteilUeber65 = „–“, verknüpft über GITTER_ID mit dem Altersgitter): 1.099.879 Zellen mit geheimgehaltenem Anteil
+65+, davon 1.020.763 ohne veröffentlichte Gruppe ab 65, 79.116 mit einer bis vier, keine mit fünf oder sechs. Im selben
+Probelauf haben 107 Zellen der Stufe 1 mehr veröffentlichte Personen ab 65 als Einwohner (Anteil über 100 %; in Berlin 1,
+in Warmsen 0). Eine Kappung legt die Regel nicht fest; das Skript kappt nicht und weist die Zahl aus. Im Gitter kommt
+„0“ als Anteil 65+ nicht vor (kleinster veröffentlichter Wert 0,34 %); „–“ und „fehlt“ sind damit dasselbe.
+
+**Messung (Skript `docs/methodik/anlagen/95_zellvergleich.py`, neue Optionen `--ersatz` und `--rangliste`, Lauf 25.09.2026,
+Cache außerhalb des Repos).** Beide Jahresbeträge sind der Zelllauf mit den Wirkungen (a)–(d) aus §3.0; der Betrag
+„heute“ ist der Zelllauf aus §3.0 (Berlin 338,10 Mio. €).
+
+- `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz`: 3.593.357 Einwohner im Zensus-Gitter,
+  davon 99.098 (2,8 %) in 4774 Zellen mit geheimgehaltenem Anteil 65+; Stufe 1 670 Zellen mit 24.269 Einwohnern (Anteil 65+
+  im Mittel 9,28 %), Stufe 2 4104 Zellen mit 74.829 Einwohnern (19,87 %), ohne Ersatzwert 0; Altersgitter dieser Zellen
+  85.046 Personen, davon 2252 ab 65 (2,6 %); Einwohner ab 65 heute 694.397 (19,3 %), mit Regel 711.519 (19,8 %);
+  Jahresbetrag heute 338,10 Mio. €, mit Regel 344,17 Mio. € (Preisstand 2024), Faktor × 0,982. Nur Stufe 2 (Variante
+  Runde 12): 344,94 Mio. €. Ohne `--ersatz` sind die Zahlen gleich wie in Runde 16; geändert ist nur die
+  Schreibweise ganzer Zahlen unter 10.000 (ohne Tausenderpunkt, kap3-stil).
+- `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz` (Warmsen, Landkreis Nienburg (Weser),
+  Niedersachsen, ERF-Region Nord): 3087 Einwohner im Zensus-Gitter (amtlich 3158 [69]), davon 1983 (64,2 %) in 374 Zellen
+  mit geheimgehaltenem Anteil 65+; Stufe 1 12 Zellen mit 86 Einwohnern (41,86 %), Stufe 2 362 Zellen mit 1897 Einwohnern
+  (46,00 %), ohne Ersatzwert 0; Altersgitter dieser Zellen 692 Personen, davon 36 ab 65 (5,2 %); Einwohner ab 65 heute 508
+  (16,4 %), mit Regel 1416 (45,9 %); Jahresbetrag heute 138.543 €, mit Regel 305.088 € (Preisstand 2024), Faktor × 0,454.
+  Nur Stufe 2: 304.669 €.
+- `python3 docs/methodik/anlagen/95_zellvergleich.py --rangliste`: 10.828 Gemeinden mit Einwohnern im Gitter; Anteil der
+  Einwohner in Zellen mit geheimgehaltenem Anteil 65+ bundesweit 12,5 %, in den 9239 Gemeinden unter 10.000 Einwohnern
+  zusammen 23,6 %, Median je Gemeinde 27,9 %; 30 Gemeinden mit zusammen 376 Einwohnern haben keine Zelle mit veröffentlichtem
+  Anteil (Modellgrenze der Regel). Höchster Anteil unter den Gemeinden mit 2000 bis unter 10.000 Einwohnern: Warmsen
+  (64,2 %), dann Kollnburg (63,3 %) und Laar (63,1 %). Deshalb ist Warmsen die ländliche Beispielkommune.
+- Gegenprobe amtlich [69] (Regionaltabelle Demografie des Zensus 2022, neu in Kapitel 8): Warmsen 60–66 · 67–74 · 75+ =
+  388 · 257 · 345, also 602 ab 67 und 990 ab 60; Berlin 292.354 · 261.676 · 362.829, also 624.505 ab 67 und 916.859 ab 60.
+
+**Befund aus der Messung (117).** Die Regel setzt in Warmsen mehr Menschen ab 65 an (1416), als dort Menschen ab 60 leben
+(990). Die Prämisse der Regel („–“ ist Geheimhaltung, dieselben Zellen haben Ältere wie anderswo) trägt nur für einen kleinen
+Teil der Zellen: Das Altersgitter der geheimgehaltenen Zellen zeigt 2,6 % (Berlin) und 5,2 % (Warmsen) Personen ab 65,
+bundesweit im Probelauf 3,1 % in den geheimgehaltenen Zellen ab 20 Einwohnern (107.452 Zellen, 3.588.180 Einwohner, 97,7 %
+davon im Altersgitter erfasst). Stufe 2 überträgt dagegen den Anteil der Zellen mit veröffentlichtem Anteil; in Zellen unter
+20 Einwohnern ist er nach demselben Probelauf einwohnergewichtet 39,3 %, weil dort vor allem Zellen mit Älteren einen Anteil tragen. Die heutige
+Produktlogik (65+ = 0) liegt in Warmsen unter den 602 ab 67 und unterschätzt ebenfalls, aber um weniger (508 gegen 1416).
+Die 1312 veröffentlichten Seniorenfelder aus Befund 104 stimmen, betreffen aber in Berlin 670 von 4774 Zellen. Der Bericht
+führt die Regel wie vorgegeben und nennt die Verfälschung an derselben Stelle (§3.3, „Was die Regel verfälscht“); still
+korrigiert ist nichts.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 104 | §3.3 (Regelsatz) ↔ Produkt `zensus_loader.apply_zensus_to_cell_inputs` | Divergenz Bericht ↔ Code, Nachtrag Runde 17 | Der Bericht legt die Ersatzregel jetzt in §3.3 fest (Log 41). Die Messungen aus Runde 12 und 16 (4774 Zellen, 99.098 Einwohner, × 0,9802 gegen Stufe 2 allein) bleiben; die Wirkung der Regel ist für Berlin und Warmsen gemessen (× 0,982, × 0,454). Der Code-Teil steht als Befund 116 | — | B | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('### 3.3'):s.index('### 3.4')]; sys.exit(not ('**Regel (Abschätzung von KAP3, festgelegt vom methodik_manager):** Ist der Anteil 65+ einer' in t and 'ersetzt das Produkt ihn in Stufe 1 durch die Summe' in t and 'sonst in Stufe 2 durch den einwohnergewichteten Anteil 65+' in t and 'Hat eine Gemeinde keine Zelle mit veröffentlichtem Anteil 65+' in t))"` | behoben (T-1199): Berichtsteil; Regelsatz in §3.3 mit Kennzeichnung als Abschätzung von KAP3, Modellgrenze mit gemessener Häufigkeit, Wirkung Berlin und Warmsen mit Aufruf; Entscheidungslog Nr. 41; §3.0 (c) verweist auf §3.3 |
+| 116 | Produkt: `zensus_loader.apply_zensus_to_cell_inputs` (share_o = … or 0.0) ↔ Bericht §3.3 (Ersatzregel) | Code-Nachzug (Eiserne Regel 5) | Das Produkt setzt bei geheimgehaltenem Anteil 65+ weiter 65+ = 0; der Bericht legt seit Runde 17 eine Ersatzregel fest. Nachzug erst nach der Entscheidung zu Befund 117, sonst wird eine Regel eingebaut, die ländliche Kommunen verdoppelt | Code-Nachzug beim cto nach Log 41 in der dann geltenden Fassung; Test mit Berlin und Warmsen aus §3.3 | B | `! grep -q 'share_o = ci.get("share_over_65") or 0.0' backend/app/services/zensus_loader.py` | zurückgestellt (Code-Nachzug cto; wartet auf die Entscheidung zu Befund 117) |
+| 117 | §3.3, Ersatzregel Stufe 2 (Log 41) | Widerspruch Messung ↔ Regel (P3: Ergebnis stellt die Lage falsch dar) | Warmsen mit Regel 1416 Einwohner ab 65 (45,9 %) gegen 990 ab 60 und 602 ab 67 im Zensus 2022 [69]; Betrag × 2,20 gegenüber heute. Das Altersgitter der geheimgehaltenen Zellen zeigt 2,6 % (Berlin) bzw. 5,2 % (Warmsen) Personen ab 65; Stufe 2 überträgt den Anteil der Zellen mit veröffentlichtem Anteil (Warmsen 46,00 %), die in ländlichen Kommunen vor allem Zellen mit Älteren sind. In Berlin liegen heute (694.397) und Regel (711.519) beide zwischen 624.505 ab 67 und 916.859 ab 60 | Entscheidung methodik_manager: Stufe 2 ersetzen, etwa durch den Rest aus der Gemeindesumme des Zensus (Menschen ab 65 der Gemeinde [69] abzüglich der Zellen mit veröffentlichtem Anteil und der Stufe 1, verteilt auf die übrigen geheimgehaltenen Zellen), oder 65+ = 0 mit Stufe 1 lassen; Messung mit `--ersatz` für Berlin und Warmsen wiederholen | A | `! grep -q 'sonst in Stufe 2 durch den einwohnergewichteten Anteil 65+' docs/methodik/95_hitzebelastung.md` | zurückgestellt (Entscheidung methodik_manager; die Regel ist dessen Vorgabe aus T-1199 und steht wie vorgegeben im Bericht) |
+
+## Runde 18 — Berlin-Anker, YLL/VOLY, VOLY-Infokasten (T-1200, 25.09.2026): Befund 101 behoben
+
+Anlass: T-1200-methodik_manager (Vorhaben T-1196-cmo, Paket 3). Grundlage für 101 ist die Messung aus Runde 16 (Skript
+`docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000`): (a) Temperatur je Zelle × 0,948, (d) Feinstruktur
+σ = 0,5 K × 1,021 (genau 1,02051), zusammen × 0,967 (0,948 × 1,02051 = 0,9674). Das bestätigt den Nachtrag aus Runde 12;
+ein berichtigter Wert liegt nicht vor. Anker: 221 × 0,9674 = 213,8, rund 214 je 100.000; gegen die Untergrenze 260 der
+RKI-Referenz 213,8 / 260 − 1 = −17,8 %, rund −18 % (bisher 221 / 260 − 1 = −15 %). Kein Wert aus Kapitel 7 geändert;
+§3.0 verweist jetzt auf die neue Fassung in §4 statt auf einen Widerspruch. Ohne neuen Befund umgesetzt, weil vom Ticket
+verlangt: YLL und VOLY in Kapitel 1, Konto-Einbettung, bei der ersten Verwendung erklärt; Infokasten 2 (§6) sagt in einem
+Satz, dass die 160.800 € vom Wert der UBA-Methodenkonvention 4.0 für den EU-Durchschnitt ausgehen und die Übertragung auf
+deutsche Einkommen eine Abschätzung von KAP3 ist (Elastizität 0,85, Log 4; Spanne 136.400–165.600 € wie §3.5), passend zur
+Kennzeichnung `abschaetzung_kap3` des Blocks heat.voly. Die Zahl 4770 kommt im Bericht schon seit T-1198 nicht mehr vor
+(dort 4774, aus dem Skript).
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 101 | §4 Zusatz-Anker Berlin 2018 | Widerspruch Messung ↔ Begründung, Nachtrag Runde 18 | Begründung „das Zellmodell wird für Berlin … über dem Gemeindepunkt-Wert liegen“ war durch die Messung widerlegt (Runden 11, 12, 16) | wie Runde 11 | B | `! grep -q 'das Zellmodell wird für Berlin' docs/methodik/95_hitzebelastung.md` | behoben (T-1200): §4 neu gefasst — Richtung gemessen (Gemeindepunkt 20,06 °C, 0,1 K über dem Bevölkerungsmittel 19,96 °C; (a) × 0,948 und (d) × 1,021, zusammen × 0,967), Anker 221 × 0,967 ≈ 214 je 100.000, rund −18 % gegen 260; Lücke offen als unerklärt benannt; „konservativ = unterschätzend“ bleibt; Kapitel 7 unverändert |
