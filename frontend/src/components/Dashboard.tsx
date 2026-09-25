@@ -7,6 +7,7 @@ import RiskDistributionSection from './dashboard/RiskDistributionSection'
 import CostTablesSection from './dashboard/CostTablesSection'
 import RiskInteractionSection from './dashboard/RiskInteractionSection'
 import SystembereicheSection from './dashboard/SystembereicheSection'
+import KangNachweisSection from './dashboard/KangNachweisSection'
 
 /**
  * Dashboard „Executive Story" (Variante C): Hero-Kopf mit Euro-Kernzahlen und
@@ -45,6 +46,7 @@ export default function Dashboard() {
       <TopRisksCard className="col-span-6" />
       <GroupRadarGrid className="col-span-12" />
       <SystembereicheSection className="col-span-12" />
+      <KangNachweisSection className="col-span-12" />
       <RiskInteractionSection className="col-span-12" />
 
       {riskSummary && (
