@@ -423,3 +423,71 @@ Produkt-Nachzug vollzogen (Integrationsvermerke Rev. 7/Rev. 8 oben): Werte,
 Ebene CARE_HOME_SHARE_85P (Producer-getestet), Ledger konsistent — **keine
 offenen Befunde** (I-1/I-2/I-3 geschlossen; q_1P-Ebene regulär geparkt mit
 Watchlist).
+
+## Runde 10 — Fortschreibung 7, Schritt 1 (T-1118, 25.09.2026): neue Befunde 95–100
+
+Anlass: A-0048 / T-1113-cmo (Fortschreibung 7 der Aufgabe vom 24.09.2026). Ausgangslage vor jeder
+Änderung am Bericht: `python3 backend/scripts/lint_methodik.py 95` meldet 161 grün und 4 ROT (Befunde
+95–98). Befunde 99 und 100 sind bei der Arbeit an der Rechenkette aufgefallen.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 95 | Kapitel 9 (Ansatz-Vergleich) | Formverstoß (Fortschreibung 7: eine Methodik je Risiko) | Lint: „Kein Kapitel 9 (eine Methodik je Risiko)“ ROT; Kapitel 9 führt 95-A, 95-B und 95-C nebeneinander | Kapitel 9 streichen; 95-B und 95-C mit je einem Satz ins Entscheidungslog | B | `! grep -q '^## 9 ' docs/methodik/95_hitzebelastung.md` | behoben (T-1118): Kapitel 9 gestrichen; 95-B und 95-C als Entscheidungslog Nr. 37 und 38 mit je einem Satz, 95-A bleibt Nr. 1 |
+| 96 | Kapitel 3, Anfang | Lücke (Aufgabe §4, §8 E1) | Lint: „### 3.0 Rechenkette“ fehlt; der Bericht erzählt den Weg von der amtlichen Quelle zum Euro-Betrag nirgends am Stück | Rechenkette 3.0 mit Beispielkommune, höchstens zehn Ebenen, und genau einem Beispiel-Block rechenkette_95 | A | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md').read(); sys.exit(not ('### 3.0 Rechenkette' in s and s.count('python test: rechenkette_95') == 1))"` | behoben (T-1118): Abschnitt 3.0 Rechenkette, Beispielkommune Berlin, 10 Ebenen bis zum bewerteten Schaden K1, Beispiel-Block rechenkette_95 |
+| 97 | §3.6 Zeichentabelle, Zeile Sommermitteltemperatur (T̄_Zelle) | Lücke (Herkunft) | Lint: Herkunft „DWD 1 km + UHI“ ohne Register-ID, Herleitung oder Quellennummer | Herkunft mit [33] und register:95-W124-01 | C | `python3 -c "import sys; z=[l for l in open('docs/methodik/95_hitzebelastung.md') if 'Sommermitteltemperatur (24-h' in l]; sys.exit(not (len(z) == 1 and 'register:95-W124-01' in z[0]))"` | behoben (T-1118): Herkunft DWD-CDC-Raster [33] plus Stadtklima-Zuschlag, register:95-W124-01 |
+| 98 | §8 Quelle [47], Zeile 996 | verbotene Formulierung | Lint: verbotenes Wort in „Rev.-5-…zitat“ (Zeile 996) | sachlich ersetzen: nicht belegtes Zitat aus Rev. 5 | C | `! grep -q 'Platzhalter' docs/methodik/95_hitzebelastung.md` | behoben (T-1118): ersetzt durch „einem in Rev. 5 nicht am Volltext belegten Zitat“ |
+| 99 | §3.0 Rechenkette, Ebene 1 | Abweichung vom Ticket (Datenstand) | Das Ticket verlangt Einwohner je Altersband aus dem Zensus 2022 (Stichtag 15.05.2022). Die Zensus-Datenbank (ergebnisse.zensus2022.de) ist laut Betreiber bis 05.10.2026 in Wartung, der API-Abruf am 25.09.2026 scheitert (HTTP 400). Verwendet ist die amtliche Fortschreibung auf Basis Zensus 2022, Stichtag 31.12.2023 (Tab. 12411-09-01-4-B, Anlage bevoelkerung_bundesland_altersband.csv); das ist derselbe Stichtag wie der Nenner der Basissterberaten m_a [49], also in sich stimmiger. Abstand zum Zensus-Stichtag: 19 Monate Fortschreibung | Entscheidung methodik_manager: Fortschreibung 31.12.2023 behalten (Stichtag gleich m_a) oder nach dem 05.10.2026 auf Zensus-Tabelle 1000A umstellen | C | `grep -q 'Stichtag 31.12.2023, Basis Zensus 2022' docs/methodik/95_hitzebelastung.md` | zurückgestellt (Entscheidung methodik_manager; Zensus-Datenbank bis 05.10.2026 in Wartung) |
+| 100 | §8 Quelle [66] | falscher Pfad | [66] nennt die Repo-Aufbereitung backend/data/lite/zensus_gemeinde.json; die Datei gibt es auf dem Branch nicht (Verzeichnis backend/data/lite/ fehlt) | Pfad in [66] korrigieren oder Aufbereitung nachweisen | C | `test -f backend/data/lite/zensus_gemeinde.json` | zurückgestellt (Schritt 2 von T-1113, Quellenpflege) |
+
+## Runde 11 — Nacharbeit 1 zu T-1118 nach Urteil methodik_manager (25.09.2026): neue Befunde 101–103
+
+Urteil Runde 0: Nacharbeit mit zwei Punkten (E3 und P1), hier Befunde 102 und 103. Befund 101 hat sich
+bei der Messung zu Befund 102 ergeben.
+
+**Messung Zellvergleich Berlin** (Grundlage für 101 und 102; das Skript liegt nicht im Repo, weil T-1118
+nur Bericht und Ledger zulässt): Alle 40.663 bewohnten 100-m-Zellen des Zensus 2022 innerhalb der
+Stadtgrenze Berlin (Grenze aus OpenStreetMap/Nominatim, nur für die Zellauswahl; 891,1 km²; 3.595.270
+Einwohner) aus den Gitterdaten [67]. Jede Zelle erhält ihren Wert aus der DWD-Klimatologie mit den
+Produktfunktionen `dwd_cdc_grid.climatology_grid` („air_temp_mean“, Monate 6–8, bzw. „hot_days“, je 10
+Jahre) und `sample_grid_points`. Formeln §3.3–§3.5 mit den Werten aus Kapitel 7, Bandsummen wie
+Ebene 1. Ergebnisse: Berlin-Mitte 20,07 °C, Bevölkerungsmittel 19,96 °C (19,38–20,38 °C), Zellen
+wärmer als Mitte: 24,8 % der Einwohner. Betrag Kette 362,89 Mio. €; Zellen mit Berliner
+Altersstruktur 343,73 Mio. € (× 0,947); dazu Feinstruktur σ = 0,5 K (Gauß-Hermite, 21 Punkte) × 1,0204;
+Altersgewichtung aus den 2.815 Zellen mit vollständigen Altersangaben (241.174 Einwohner; 85+ im
+Mittel 19,926 °C statt 19,963 °C) × 0,988. Zusammen × 0,955, rund 347 Mio. €. Die Reihe des
+Berlin-Gemeindepunkts in `sommermittel_bundesland_povw.csv` ergibt für 2016–2025 im Mittel 20,06 °C,
+also dieselbe Lage wie Berlin-Mitte.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 101 | §4 Zusatz-Anker Berlin 2018 („das Zellmodell wird für Berlin … über dem Gemeindepunkt-Wert liegen“) | Widerspruch Messung ↔ Begründung | Der Zellvergleich zeigt das Gegenteil: Der Gemeindepunkt (20,06 °C) liegt 0,1 K über dem Bevölkerungsmittel. Das Zellmodell liegt mit Feinstruktur σ = 0,5 K und Altersgewichtung 4,5 % unter dem Gemeindepunkt-Wert. Die Unterschätzung des Ankers (−15 %) wird damit nicht kleiner, sondern größer (rund −19 %). Sie bleibt unerklärt. Kein Wert aus Kapitel 7 ist betroffen | Begründung in §4 neu fassen: Richtung gemessen, verbleibende Lücke offen benennen; Anker-Aussage „konservativ = unterschätzend“ bleibt | B | `! grep -q 'das Zellmodell wird für Berlin' docs/methodik/95_hitzebelastung.md` | zurückgestellt (Entscheidung methodik_manager; §4 gehört nicht zum Auftrag von T-1118, kein Wert betroffen) |
+| 102 | §3.0, Zusammenfassung „eine Zelle statt aller Zellen“ | E3: Richtung und Größe nicht belegt, Widerspruch zu §4 (Urteil Runde 0, Punkt 1) | Der Text nannte +2,8 % (±1 K gleichverteilt, abweichend von σ = 0,5 K in §4) und −23 % je 0,5 K ohne gemessene Richtung | Zellvergleich messen, Richtung und Größe beziffern, Beziehung zu §4 benennen | B | `grep -q '0,947 × 1,020 × 0,988 = 0,955' docs/methodik/95_hitzebelastung.md` | behoben (T-1118 Nacharbeit 1): gemessen (a) −5,3 %, (b) +2,0 % Modellrechnung σ = 0,5 K wie §4, (c) −1,2 %; Kette überschätzt Berlin um rund 4,5 %; Widerspruch zu §4 als Befund 101; Quelle [67] neu; Block rechenkette_95 prüft die Verknüpfung und (b) am Punkt |
+| 103 | §3.0, Abschätzung „+6 %“ (Heim-Extremfall) | P1: Abschätzung ohne Herleitung (Urteil Runde 0, Punkt 2) | Zahl stand ohne Rechenweg im Bericht | Herleitung Schritt für Schritt in den Text und in den Beispiel-Block | B | `grep -q '0,344 × 1,598 + 0,656 = 1,206' docs/methodik/95_hitzebelastung.md` | behoben (T-1118 Nacharbeit 1): Herleitung v 2,31/0,77, Anteile 0,344/0,656, Exzess × 1,598, 85+ × 1,206, Anteil YLL 28,4 % ⇒ +5,8 % als Obergrenze; im Block rechenkette_95 nachgerechnet |
+
+## Runde 12 — Nacharbeit 2 zu T-1118 nach Urteil methodik_manager Runde 1 (25.09.2026): neue Befunde 104–106
+
+Urteil Runde 1: Nacharbeit wegen E3 (Unterschied Fortschreibung ↔ Zensus-Gitter im Produkt nicht
+ausgewiesen, Befund 105) und zweier Stilverstöße gegen kap3-stil (Befund 106).
+
+**Messung Zellvergleich Berlin, Fassung 2** (ersetzt die Zerlegung aus Runde 11; Skript wieder nur im
+Probeverzeichnis): wie Runde 11, aber jede Zelle mit ihrer Bevölkerung nach der Logik des Produkts
+(`zensus_loader.apply_zensus_to_cell_inputs`): Einwohner aus „Bevölkerungszahl“ [67], 65+ = Einwohner ×
+AnteilUeber65 aus „Anteil ab 65-Jährige in Gitterzellen“ (destatis.de/static/DE/zensus/gitterdaten/
+Anteil_ab_65-jaehrige_in_Gitterzellen.zip), Aufteilung der 65+ aus den 5er-Jahresgruppen der Zelle,
+sonst aus dem Gebiet. Bandsummen Produkt: 2.900.648 · 334.805 · 263.035 · 96.781 = 3.595.270, gegen
+Ebene 1 × 0,980 · 0,986 · 1,038 · 0,897. Schritte, jeder auf den vorigen: Kette 362,89 Mio. € →
+(a) Temperatur je Zelle, Berliner Altersstruktur 344,01 (× 0,948) → (b) Einwohnersumme Gitter
+337,70 (× 0,982) → (c) Bänder je Zelle wie im Produkt 331,42 (× 0,981) → (d) Feinstruktur
+σ = 0,5 K 338,22 (× 1,0205); zusammen × 0,932. Variante (c) mit Ersatz: Zellen ohne Anteil 65+
+erhalten den Anteil 65+ der übrigen Berliner Zellen (19,87 %): 338,13 statt 331,42, also Produkt ×
+0,980 gegenüber Ersatz, Rest × 1,001. Die frühere Wirkung „Altersverteilung −1,2 %“ aus Runde 11 stammte
+aus den 2.815 Zellen mit vollständigen Altersangaben, einer verzerrten Teilmenge. Sie ist durch (c) ersetzt.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 99 | §3.0 Rechenkette, Ebene 1 | Abweichung vom Ticket (Datenstand), Nachtrag Runde 12 | Wie Runde 11. Gemessen: Das Produkt rechnet mit dem Zensus-Gitter (Stichtag 15.05.2022), in Berlin 3.595.270 Einwohner gegen 3.662.381 in Ebene 1 (× 0,982); Bänder nach Produktlogik × 0,980 · 0,986 · 1,038 · 0,897 (85+ zum Teil wegen Befund 104). Im Bericht als Wirkung (b) und (c) ausgewiesen | Entscheidung methodik_manager: Ebene 1 behalten und den Unterschied wie jetzt ausweisen, oder Ebene 1 auf die Zensus-Tabelle 1000A umstellen (nach dem 05.10.2026) | C | `grep -q 'Stichtag 31.12.2023, Basis Zensus 2022' docs/methodik/95_hitzebelastung.md` | zurückgestellt (Entscheidung methodik_manager) |
+| 101 | §4 Zusatz-Anker Berlin 2018 | Widerspruch Messung ↔ Begründung, Nachtrag Runde 12 | Zahl aus Runde 11 berichtigt: Für die Aussage zum Gemeindepunkt zählen nur Temperatur je Zelle und Feinstruktur, zusammen × 0,967 (−3,3 %); die Unterschätzung des Ankers wächst damit von −15 % auf rund −18 %. Die übrigen Wirkungen betreffen die Bevölkerungsgrundlage, nicht den Gemeindepunkt | wie Runde 11 | B | `! grep -q 'das Zellmodell wird für Berlin' docs/methodik/95_hitzebelastung.md` | zurückgestellt (Entscheidung methodik_manager; §4 gehört nicht zum Auftrag von T-1118, kein Wert betroffen) |
+| 102 | §3.0, Zusammenfassung „eine Zelle statt aller Zellen“ | Nachtrag Runde 12 | Zerlegung aus Runde 11 erweitert und berichtigt (siehe Befund 105); der Prüfausdruck aus Runde 11 prüfte die alte Zahlenfolge | — | B | `grep -q 'Die Kette überschätzt Berlin um rund' docs/methodik/95_hitzebelastung.md` | behoben (T-1118 Nacharbeit 2): Aussage und Richtung bleiben, Größe jetzt × 0,932 |
+| 104 | Produkt: `zensus_loader.apply_zensus_to_cell_inputs` (share_o = … or 0.0) ↔ Bericht §3.3 (pop_a aus Zensus 2022) | Divergenz Bericht ↔ Code | Ist der Anteil 65+ einer Zelle im Gitter geheimgehalten („–“), setzt das Produkt 65+ = 0 und zählt alle Einwohner als u65. Das „–“ bedeutet dort nicht „keine Älteren“: Im Raum Berlin tragen dieselben Zellen im Altersgitter 1312 veröffentlichte Seniorenfelder mit Wert > 0. Berlin: 4770 Zellen, 99.026 Einwohner; Betrag × 0,980 (−2,0 %) gegenüber einem Ersatz mit dem Anteil 65+ des Gebiets. Die Wirkung in ländlichen Kommunen mit vielen kleinen Zellen ist nicht gemessen und kann größer sein | Code-Nachzug beim cto: bei fehlendem Anteil 65+ die 5er-Jahresgruppen der Zelle oder den Anteil des Gebiets verwenden; Regeln dafür im Bericht §3.3 festlegen | B | `! grep -q 'share_o = ci.get("share_over_65") or 0.0' backend/app/services/zensus_loader.py` | zurückgestellt (Code-Nachzug cto; Code liegt außerhalb des Dateirahmens von T-1118) |
+| 105 | §3.0, Liste der Zusammenfassungen | E3: stille Vereinfachung (Urteil Runde 1) | Ebene 1 nimmt die Fortschreibung (3.662.381 Einwohner), das Produkt das Zensus-Gitter (3.595.270); der Unterschied und die Altersbänder nach Produktlogik fehlten in der Liste, die Aussage „rund 347 Mio. €“ war zu hoch | Unterschied messen und als eigene Wirkung ausweisen | B | `grep -q '0,948 × 0,982 × 0,981 × 1,020 = 0,932' docs/methodik/95_hitzebelastung.md` | behoben (T-1118 Nacharbeit 2): Wirkungen (b) Einwohnersumme × 0,982 und (c) Bänder je Zelle × 0,981 (davon Produkt-Eigenheit × 0,980, Befund 104) ausgewiesen; Zelllauf rund 338 Mio. € (Preisstand 2024), ohne Eigenheit rund 345 Mio. €; Block rechenkette_95 prüft die Verknüpfung |
+| 106 | §3.0, Text und Block | Stil (kap3-stil, Urteil Runde 1) | Spannen mit „bis“ statt Halbgeviertstrich (Ebene 4, Temperaturspanne der Zellen); „Stadt“/„Stadtmittel“ statt „Kommune“ als Betrachtungsebene; Betrag mit vier gültigen Stellen und ohne Preisstand im Fließtext | Halbgeviertstrich, „Kommune“, Betrag gerundet mit Preisstand | C | `python3 -c "import re,sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('### 3.0'):s.index('### 3.1')]; sys.exit(bool(re.search(r'[0-9] bis [0-9]', t)) or ('Stadtmittel' in t) or ('in der Stadt' in t))"` | behoben (T-1118 Nacharbeit 2): 20,58–24,67 °C, 19,38–20,38 °C, „Mittel der Kommune“, „rund 338 Mio. € je Jahr (Preisstand 2024)“ |
