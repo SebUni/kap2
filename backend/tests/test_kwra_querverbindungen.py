@@ -29,14 +29,47 @@ def test_netzrollen_kwra_id_eindeutig_und_im_bereich():
 # ── BENANNTE_BEZIEHUNGEN ─────────────────────────────────────────────────────
 
 def test_benannte_beziehungen_gesamtzahl():
-    assert len(k.BENANNTE_BEZIEHUNGEN) == 20
+    assert len(k.BENANNTE_BEZIEHUNGEN) == 27
+
+
+def _richtung_zwischen(id_a: int, id_b: int) -> list[str]:
+    """Richtungen aller Einträge zwischen zwei Klimawirkungen (Reihenfolge egal)."""
+    return [
+        b["richtung"] for b in k.BENANNTE_BEZIEHUNGEN
+        if {b["quelle_kwra_id"], b["ziel_kwra_id"]} == {id_a, id_b}
+    ]
+
+
+def test_benannte_beziehungen_richtung_und_seitenbeleg():
+    """T-0936: jede Beziehung trägt eine Richtung und eine Seitenangabe; die im Fließtext
+    von TB 6 Kap. 3.4 genannten Beziehungen (S. 82, 85, 86) sind mit Richtung erfasst."""
+    for b in k.BENANNTE_BEZIEHUNGEN:
+        assert b["richtung"] in {"gerichtet", "gegenseitig"}, b
+        assert "S. " in b["beleg"], b
+
+    # Gewässertemperatur (#53) ↔ Mangelndes Kühlwasser (#68), S. 82, 85
+    assert _richtung_zwischen(53, 68) == ["gegenseitig"]
+    # Bedarf an Kühlenergie (#65) ↔ Stadtklima/Wärmeinseln (#62), S. 85
+    assert _richtung_zwischen(65, 62) == ["gegenseitig"]
+    # Verschiebung von Arealen (#4) ↔ Vegetation in Siedlungen (#61), S. 86
+    assert _richtung_zwischen(4, 61) == ["gegenseitig"]
+    # Wassermangel im Boden (#13) → Schäden in Wäldern (#8), S. 82
+    wald = [
+        b for b in k.BENANNTE_BEZIEHUNGEN
+        if b["quelle_kwra_id"] == 13 and b["ziel_kwra_id"] == 8
+    ]
+    assert len(wald) == 1
+    assert wald[0]["richtung"] == "gerichtet"
+    assert "Kühlwasser" in next(
+        b["ziel"] for b in k.BENANNTE_BEZIEHUNGEN if b["ziel_kwra_id"] == 68
+    )
 
 
 def test_benannte_beziehungen_ebenenverteilung():
     klimawirkung = [b for b in k.BENANNTE_BEZIEHUNGEN if b["ebene"] == "Klimawirkung"]
     gemischt = [b for b in k.BENANNTE_BEZIEHUNGEN if b["ebene"] == "gemischt"]
     handlungsfeld = [b for b in k.BENANNTE_BEZIEHUNGEN if b["ebene"] == "Handlungsfeld"]
-    assert len(klimawirkung) == 8
+    assert len(klimawirkung) == 15
     assert len(gemischt) == 7
     assert len(handlungsfeld) == 5
 

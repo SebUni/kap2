@@ -16,7 +16,10 @@ Teilbericht 6 ausdrücklich belegt**:
                            starke Sender ("stark ausgehend") oder starke Empfänger
                            ("stark eingehend") im Wirkungsnetz benennt.
   BENANNTE_BEZIEHUNGEN   — die im Fließtext von TB 6 Kap. 3.4 wörtlich genannten
-                           Einzelbeziehungen (Auszug, nicht vollständig; 20 Einträge).
+                           Einzelbeziehungen (Auszug, nicht vollständig; 27 Einträge,
+                           je mit ``richtung`` „gerichtet“ oder „gegenseitig“ und
+                           Seitenangabe im ``beleg``; 7 davon aus dem Fließtext
+                           ergänzt, nicht aus der Arbeitsmappe).
                            ``quelle_kwra_id``/``ziel_kwra_id`` sind gesetzt, wenn die
                            Quelle bzw. das Ziel eine einzelne, eindeutig identifizierbare
                            Klimawirkung ist (nicht bei Handlungsfeld-Ebene oder mehreren
@@ -104,80 +107,144 @@ NETZROLLEN: list[dict] = [
 # quelle/ziel: Wortlaut aus TB 6 Kap. 3.4. quelle_kwra_id/ziel_kwra_id sind gesetzt,
 # wenn Quelle bzw. Ziel eine einzelne, eindeutig identifizierbare Klimawirkung ist
 # (sonst None — z. B. bei Handlungsfeld-Ebene oder mehreren genannten Zielen).
+# richtung: "gerichtet" (quelle wirkt auf ziel) oder "gegenseitig" (Wechselwirkung in
+# beide Richtungen, TB 6 S. 82 und 85–86; quelle/ziel sind dann nur die Lesereihenfolge).
+# beleg: Kapitel und Seite in TB 6 (Seitenzahl = gedruckte Seite = PDF-Seite).
 BENANNTE_BEZIEHUNGEN: list[dict] = [
     {"quelle": "Hochwasser", "quelle_kwra_id": 49,
      "ziel": "zahlreiche Klimawirkungen in mehreren Handlungsfeldern", "ziel_kwra_id": None,
      "ebene": "Klimawirkung",
-     "beleg": "TB6 Kap. 3.4: zentrale Klimawirkung, wirkt sich auf die meisten anderen aus"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84, 88: zentrale Klimawirkung, wirkt sich auf die meisten anderen aus"},
     {"quelle": "Gewässertemperatur und Eisbedeckung und biologische Wasserqualität",
      "quelle_kwra_id": 53,
      "ziel": "Potenziell schädliche Mikroorganismen und Algen", "ziel_kwra_id": 97,
-     "ebene": "Klimawirkung", "beleg": "TB6 Kap. 3.4: fördert deren Entwicklung"},
+     "ebene": "Klimawirkung", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84: fördert deren Entwicklung"},
     {"quelle": "Stadtklima / Wärmeinseln", "quelle_kwra_id": 62,
      "ziel": "Hitzebelastung", "ziel_kwra_id": 95,
      "ebene": "Klimawirkung",
-     "beleg": "TB6 Kap. 3.4: zunehmender urbaner Wärmeinseleffekt erhöht die Hitzebelastung"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 85: zunehmender urbaner Wärmeinseleffekt erhöht die Hitzebelastung"},
     {"quelle": "Veränderung der Länge der Vegetationsperiode und Phänologie",
      "quelle_kwra_id": 1,
      "ziel": "Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft",
      "ziel_kwra_id": 96, "ebene": "Klimawirkung",
-     "beleg": "TB6 Kap. 3.4: verlängerte Vegetationsperiode verstärkt Pollenreaktionen"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 85: verlängerte Vegetationsperiode verstärkt Pollenreaktionen"},
     {"quelle": "Hochwasser", "quelle_kwra_id": 49,
      "ziel": "Verletzungen und Todesfälle infolge von Extremereignissen", "ziel_kwra_id": 101,
-     "ebene": "Klimawirkung", "beleg": "TB6 Kap. 3.4"},
+     "ebene": "Klimawirkung", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 85"},
     {"quelle": "Sturzfluten (Versagen von Entwässerungseinrichtungen und "
                "Überflutungsschutzsystemen)", "quelle_kwra_id": 51,
      "ziel": "Verletzungen und Todesfälle infolge von Extremereignissen", "ziel_kwra_id": 101,
-     "ebene": "Klimawirkung", "beleg": "TB6 Kap. 3.4"},
+     "ebene": "Klimawirkung", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 85"},
     {"quelle": "Niedrigwasser", "quelle_kwra_id": 48,
      "ziel": "Beeinträchtigung des Warenverkehrs über Wasserstraßen (Inland)",
      "ziel_kwra_id": 82, "ebene": "Klimawirkung",
-     "beleg": "TB6 Kap. 3.4: niedrigwasserbedingte Einschränkungen im Warentransport"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84, 85: niedrigwasserbedingte Einschränkungen im Warentransport"},
     {"quelle": "Hochwasser", "quelle_kwra_id": 49,
      "ziel": "Schäden / Hindernisse bei Straßen und Schienenwegen (Hochwasser)",
      "ziel_kwra_id": 74, "ebene": "Klimawirkung",
-     "beleg": "TB6 Kap. 3.4: Beeinträchtigung der Verkehrswege"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84: Beeinträchtigung der Verkehrswege"},
     {"quelle": "Boden (Handlungsfeld)", "quelle_kwra_id": None,
      "ziel": "Grundwasserstand und Grundwasserqualität", "ziel_kwra_id": 55,
      "ebene": "gemischt",
-     "beleg": "TB6 Kap. 3.4: viele Klimawirkungen des Bodens wirken hierauf ein"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84: viele Klimawirkungen des Bodens wirken hierauf ein"},
     {"quelle": "Boden und Biologische Vielfalt (Handlungsfelder)", "quelle_kwra_id": None,
      "ziel": "Ertragsausfälle", "ziel_kwra_id": 25, "ebene": "gemischt",
-     "beleg": "TB6 Kap. 3.4: landwirtschaftliche Ertragsausfälle werden von vielen "
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84, 85: landwirtschaftliche Ertragsausfälle werden von vielen "
               "Klimawirkungen dieser Handlungsfelder beeinflusst"},
     {"quelle": "Boden und Biologische Vielfalt (Handlungsfelder)", "quelle_kwra_id": None,
      "ziel": "Qualität der Ernteprodukte", "ziel_kwra_id": 26, "ebene": "gemischt",
-     "beleg": "TB6 Kap. 3.4"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84"},
     {"quelle": "Boden und Biologische Vielfalt (Handlungsfelder)", "quelle_kwra_id": None,
      "ziel": "Nutzfunktion: Holzertrag", "ziel_kwra_id": 31, "ebene": "gemischt",
-     "beleg": "TB6 Kap. 3.4: weitere Auswirkungen auf Holzerträge in der Forstwirtschaft"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84: weitere Auswirkungen auf Holzerträge in der Forstwirtschaft"},
     {"quelle": "Küsten- und Meeresschutz (Handlungsfeld)", "quelle_kwra_id": None,
      "ziel": "Schiffbarkeit der Seeschifffahrtsstraßen", "ziel_kwra_id": 73,
-     "ebene": "gemischt", "beleg": "TB6 Kap. 3.4"},
+     "ebene": "gemischt", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84"},
     {"quelle": "Küsten- und Meeresschutz (Handlungsfeld)", "quelle_kwra_id": None,
      "ziel": "Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen",
-     "ziel_kwra_id": 92, "ebene": "gemischt", "beleg": "TB6 Kap. 3.4"},
+     "ziel_kwra_id": 92, "ebene": "gemischt", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84"},
     {"quelle": "Küsten- und Meeresschutz (Handlungsfeld)", "quelle_kwra_id": None,
      "ziel": "Schäden an Küstenökosystemen", "ziel_kwra_id": 5,
-     "ebene": "gemischt", "beleg": "TB6 Kap. 3.4"},
+     "ebene": "gemischt", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84"},
     {"quelle": "Wasserhaushalt, Wasserwirtschaft (Handlungsfeld)", "quelle_kwra_id": None,
      "ziel": "Industrie und Gewerbe (Handlungsfeld)", "ziel_kwra_id": None,
      "ebene": "Handlungsfeld",
-     "beleg": "TB6 Kap. 3.4: Einschränkungen der Wasserversorgung treffen die Produktion"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 85: Einschränkungen der Wasserversorgung treffen die Produktion"},
     {"quelle": "Energiewirtschaft (Handlungsfeld)", "quelle_kwra_id": None,
      "ziel": "Industrie und Gewerbe (Handlungsfeld)", "ziel_kwra_id": None,
      "ebene": "Handlungsfeld",
-     "beleg": "TB6 Kap. 3.4: Einschränkungen der Energieversorgung treffen die Produktion"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 85: Einschränkungen der Energieversorgung treffen die Produktion"},
     {"quelle": "Küsten- und Meeresschutz (Handlungsfeld)", "quelle_kwra_id": None,
      "ziel": "Tourismuswirtschaft (Handlungsfeld)", "ziel_kwra_id": None,
      "ebene": "Handlungsfeld",
-     "beleg": "TB6 Kap. 3.4: viele eingehende Wirkungen beim Tourismus"},
+     "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 84, 85: viele eingehende Wirkungen beim Tourismus"},
     {"quelle": "Biologische Vielfalt (Handlungsfeld)", "quelle_kwra_id": None,
      "ziel": "Tourismuswirtschaft (Handlungsfeld)", "ziel_kwra_id": None,
-     "ebene": "Handlungsfeld", "beleg": "TB6 Kap. 3.4"},
+     "ebene": "Handlungsfeld", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 85"},
     {"quelle": "Wasserhaushalt, Wasserwirtschaft (Handlungsfeld)", "quelle_kwra_id": None,
      "ziel": "Tourismuswirtschaft (Handlungsfeld)", "ziel_kwra_id": None,
-     "ebene": "Handlungsfeld", "beleg": "TB6 Kap. 3.4"},
+     "ebene": "Handlungsfeld", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 85"},
+    # Ab hier: im Fließtext genannt, nicht aus der Arbeitsmappe (Blatt „Wirkbeziehungen“
+    # führt diese Beziehungen nicht; Befund 2 in reviews/BEFUNDE_QUERVERBINDUNGEN.md).
+    {"quelle": "Wassermangel im Boden", "quelle_kwra_id": 13,
+     "ziel": "Schäden in Wäldern", "ziel_kwra_id": 8,
+     "ebene": "Klimawirkung", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 82 (nicht aus der Arbeitsmappe): verstärkter Wassermangel im "
+              "Boden kann zu trockenheitsbedingten Schäden in Wäldern führen"},
+    {"quelle": "Schäden in Wäldern", "quelle_kwra_id": 8,
+     "ziel": "Nutzfunktion: Holzertrag", "ziel_kwra_id": 31,
+     "ebene": "Klimawirkung", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 82 (nicht aus der Arbeitsmappe): Schäden in Wäldern wirken "
+              "auf die Nutzfunktion Holzertrag"},
+    {"quelle": "Schäden in Wäldern", "quelle_kwra_id": 8,
+     "ziel": "Nutzfunktion: Erholung", "ziel_kwra_id": 32,
+     "ebene": "Klimawirkung", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 82 (nicht aus der Arbeitsmappe): Schäden in Wäldern wirken "
+              "auf die Nutzfunktion Erholung"},
+    {"quelle": "Gewässertemperatur und Eisbedeckung und biologische Wasserqualität",
+     "quelle_kwra_id": 53,
+     "ziel": "Mangelndes Kühlwasser für thermische Kraftwerke", "ziel_kwra_id": 68,
+     "ebene": "Klimawirkung", "richtung": "gegenseitig",
+     "beleg": "TB6 Kap. 3.4, S. 82, 85 (nicht aus der Arbeitsmappe): steigende "
+              "Gewässertemperatur schränkt Entnahme und Einleitung von Kühlwasser ein; "
+              "eingeleitetes Kühlwasser erhöht die Gewässertemperatur"},
+    {"quelle": "Bedarf an Kühlenergie", "quelle_kwra_id": 65,
+     "ziel": "Stadtklima/Wärmeinseln", "ziel_kwra_id": 62,
+     "ebene": "Klimawirkung", "richtung": "gegenseitig",
+     "beleg": "TB6 Kap. 3.4, S. 85, Abb. 9 S. 86 (nicht aus der Arbeitsmappe): wärmeres "
+              "Stadtklima steigert den Bedarf an Kühlenergie; Kühlenergieverbrauch erhöht die "
+              "Temperatur im innerstädtischen Raum"},
+    {"quelle": "Hitzebelastung", "quelle_kwra_id": 95,
+     "ziel": "Bedarf an Kühlenergie", "ziel_kwra_id": 65,
+     "ebene": "Klimawirkung", "richtung": "gerichtet",
+     "beleg": "TB6 Kap. 3.4, S. 85–86, Abb. 9 S. 86 (nicht aus der Arbeitsmappe): "
+              "Hitzebelastung wirkt auf den Bedarf an Kühlenergie; schließt den einzigen "
+              "Rückkopplungskreislauf der Gesamtauswertung"},
+    {"quelle": "Verschiebung von Arealen und Rückgang der Bestände", "quelle_kwra_id": 4,
+     "ziel": "Vegetation in Siedlungen", "ziel_kwra_id": 61,
+     "ebene": "Klimawirkung", "richtung": "gegenseitig",
+     "beleg": "TB6 Kap. 3.4, S. 86 (nicht aus der Arbeitsmappe): etwas schwächer ausgeprägte "
+              "Wechselwirkung zwischen Stadtvegetation und Rückgang der Bestände"},
 ]
 
 # ── Kennzahlen (TB 6 Kap. 3.4) ───────────────────────────────────────────────────

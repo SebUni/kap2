@@ -90,10 +90,11 @@ def test_netzrollen_ids_identisch_mit_datenmodul():
 
 # ── Benannte Einzelbeziehungen ────────────────────────────────────────────────
 
-def test_benannte_beziehungen_tabelle_20_datenzeilen():
+def test_benannte_beziehungen_tabelle_27_datenzeilen():
     abschnitt = _abschnitt(_text(), "## Benannte Einzelbeziehungen")
     zeilen = _tabellenzeilen(abschnitt)
-    assert len(zeilen) == 20
+    assert len(zeilen) == 27
+    assert len(zeilen) == len(k.BENANNTE_BEZIEHUNGEN)
 
 
 # ── Querverbindungen zwischen den Systembereichen ────────────────────────────

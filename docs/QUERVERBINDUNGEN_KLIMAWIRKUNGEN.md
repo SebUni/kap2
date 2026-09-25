@@ -23,7 +23,7 @@ zugrunde liegende Datenmodul wörtlich übernehmen:
 1. die **Netzrollen** — 25 Klimawirkungen, die Kap. 3.4 (S. 82–88) ausdrücklich als starke Sender
    oder starke Empfänger im Wirkungsnetz benennt (Abschnitt „Netzrollen");
 2. die im Fließtext von Kap. 3.4 (S. 82–88) **wörtlich genannten Einzelbeziehungen** (Auszug,
-   20 Einträge, Abschnitt „Benannte Einzelbeziehungen").
+   27 Einträge, Abschnitt „Benannte Einzelbeziehungen").
 
 Zusätzlich belegt **Tabelle 28** in **Kapitel 7** „Querbetrachtung der Systembereiche" (S. 153) die
 Querverbindungen auf der Ebene der fünf Systembereiche (Abschnitt „Querverbindungen zwischen den
@@ -73,32 +73,50 @@ Einzelbeziehungen, siehe unten) ausschließlich eingehende.
 ## Benannte Einzelbeziehungen
 
 Im Fließtext von Teilbericht 6 Kap. 3.4 „Analyse der Querverbindungen" (S. 82–88) wörtlich genannte
-Einzelbeziehungen (Auszug, nicht vollständig — `app.data.kwra_querverbindungen.BENANNTE_BEZIEHUNGEN`). Acht Beziehungen liegen auf
+Einzelbeziehungen (Auszug, nicht vollständig — `app.data.kwra_querverbindungen.BENANNTE_BEZIEHUNGEN`). 15 Beziehungen liegen auf
 Ebene einzelner Klimawirkungen, sieben auf gemischter Ebene (ein oder beide Enden ein
 Handlungsfeld mit mehreren Klimawirkungen) und fünf zwischen ganzen Handlungsfeldern.
 
-| Quelle | Ziel | Ebene | Beleg |
-|---|---|---|---|
-| Hochwasser | zahlreiche Klimawirkungen in mehreren Handlungsfeldern | Klimawirkung | TB6 Kap. 3.4: zentrale Klimawirkung, wirkt sich auf die meisten anderen aus |
-| Gewässertemperatur und Eisbedeckung und biologische Wasserqualität | Potenziell schädliche Mikroorganismen und Algen | Klimawirkung | TB6 Kap. 3.4: fördert deren Entwicklung |
-| Stadtklima / Wärmeinseln | Hitzebelastung | Klimawirkung | TB6 Kap. 3.4: zunehmender urbaner Wärmeinseleffekt erhöht die Hitzebelastung |
-| Veränderung der Länge der Vegetationsperiode und Phänologie | Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft | Klimawirkung | TB6 Kap. 3.4: verlängerte Vegetationsperiode verstärkt Pollenreaktionen |
-| Hochwasser | Verletzungen und Todesfälle infolge von Extremereignissen | Klimawirkung | TB6 Kap. 3.4 |
-| Sturzfluten (Versagen von Entwässerungseinrichtungen und Überflutungsschutzsystemen) | Verletzungen und Todesfälle infolge von Extremereignissen | Klimawirkung | TB6 Kap. 3.4 |
-| Niedrigwasser | Beeinträchtigung des Warenverkehrs über Wasserstraßen (Inland) | Klimawirkung | TB6 Kap. 3.4: niedrigwasserbedingte Einschränkungen im Warentransport |
-| Hochwasser | Schäden / Hindernisse bei Straßen und Schienenwegen (Hochwasser) | Klimawirkung | TB6 Kap. 3.4: Beeinträchtigung der Verkehrswege |
-| Boden (Handlungsfeld) | Grundwasserstand und Grundwasserqualität | gemischt | TB6 Kap. 3.4: viele Klimawirkungen des Bodens wirken hierauf ein |
-| Boden und Biologische Vielfalt (Handlungsfelder) | Ertragsausfälle | gemischt | TB6 Kap. 3.4: landwirtschaftliche Ertragsausfälle werden von vielen Klimawirkungen dieser Handlungsfelder beeinflusst |
-| Boden und Biologische Vielfalt (Handlungsfelder) | Qualität der Ernteprodukte | gemischt | TB6 Kap. 3.4 |
-| Boden und Biologische Vielfalt (Handlungsfelder) | Nutzfunktion: Holzertrag | gemischt | TB6 Kap. 3.4: weitere Auswirkungen auf Holzerträge in der Forstwirtschaft |
-| Küsten- und Meeresschutz (Handlungsfeld) | Schiffbarkeit der Seeschifffahrtsstraßen | gemischt | TB6 Kap. 3.4 |
-| Küsten- und Meeresschutz (Handlungsfeld) | Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen | gemischt | TB6 Kap. 3.4 |
-| Küsten- und Meeresschutz (Handlungsfeld) | Schäden an Küstenökosystemen | gemischt | TB6 Kap. 3.4 |
-| Wasserhaushalt, Wasserwirtschaft (Handlungsfeld) | Industrie und Gewerbe (Handlungsfeld) | Handlungsfeld | TB6 Kap. 3.4: Einschränkungen der Wasserversorgung treffen die Produktion |
-| Energiewirtschaft (Handlungsfeld) | Industrie und Gewerbe (Handlungsfeld) | Handlungsfeld | TB6 Kap. 3.4: Einschränkungen der Energieversorgung treffen die Produktion |
-| Küsten- und Meeresschutz (Handlungsfeld) | Tourismuswirtschaft (Handlungsfeld) | Handlungsfeld | TB6 Kap. 3.4: viele eingehende Wirkungen beim Tourismus |
-| Biologische Vielfalt (Handlungsfeld) | Tourismuswirtschaft (Handlungsfeld) | Handlungsfeld | TB6 Kap. 3.4 |
-| Wasserhaushalt, Wasserwirtschaft (Handlungsfeld) | Tourismuswirtschaft (Handlungsfeld) | Handlungsfeld | TB6 Kap. 3.4 |
+Die Spalte „Richtung“ unterscheidet, wie Kap. 3.4 selbst (S. 82 und 85), Wirkungen in eine Richtung
+(„gerichtet“: Quelle wirkt auf Ziel) von gegenseitigen Wechselwirkungen („gegenseitig“: beide wirken
+aufeinander; Quelle und Ziel sind dann nur die Lesereihenfolge). Gegenseitig sind drei Paare:
+Gewässertemperatur ↔ Mangelndes Kühlwasser für thermische Kraftwerke (S. 82, 85), Bedarf an
+Kühlenergie ↔ Stadtklima/Wärmeinseln (S. 85) und, schwächer ausgeprägt, Verschiebung von Arealen ↔
+Vegetation in Siedlungen (S. 86). Mit Stadtklima/Wärmeinseln → Hitzebelastung und Hitzebelastung →
+Bedarf an Kühlenergie bildet das zweite Paar den einzigen Rückkopplungskreislauf der Gesamtauswertung
+(Abb. 9, S. 86). Die sieben Einträge mit dem Vermerk „nicht aus der Arbeitsmappe“ stehen im Fließtext,
+aber nicht im Blatt „Wirkbeziehungen“ der Arbeitsmappe; die Arbeitsmappe bleibt unverändert, die
+Abweichung steht als Befund 2 in `reviews/BEFUNDE_QUERVERBINDUNGEN.md`.
+
+| Quelle | Ziel | Ebene | Richtung | Beleg |
+|---|---|---|---|---|
+| Hochwasser | zahlreiche Klimawirkungen in mehreren Handlungsfeldern | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 84, 88: zentrale Klimawirkung, wirkt sich auf die meisten anderen aus |
+| Gewässertemperatur und Eisbedeckung und biologische Wasserqualität | Potenziell schädliche Mikroorganismen und Algen | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 84: fördert deren Entwicklung |
+| Stadtklima / Wärmeinseln | Hitzebelastung | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 85: zunehmender urbaner Wärmeinseleffekt erhöht die Hitzebelastung |
+| Veränderung der Länge der Vegetationsperiode und Phänologie | Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 85: verlängerte Vegetationsperiode verstärkt Pollenreaktionen |
+| Hochwasser | Verletzungen und Todesfälle infolge von Extremereignissen | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 85 |
+| Sturzfluten (Versagen von Entwässerungseinrichtungen und Überflutungsschutzsystemen) | Verletzungen und Todesfälle infolge von Extremereignissen | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 85 |
+| Niedrigwasser | Beeinträchtigung des Warenverkehrs über Wasserstraßen (Inland) | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 84, 85: niedrigwasserbedingte Einschränkungen im Warentransport |
+| Hochwasser | Schäden / Hindernisse bei Straßen und Schienenwegen (Hochwasser) | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 84: Beeinträchtigung der Verkehrswege |
+| Boden (Handlungsfeld) | Grundwasserstand und Grundwasserqualität | gemischt | gerichtet | TB6 Kap. 3.4, S. 84: viele Klimawirkungen des Bodens wirken hierauf ein |
+| Boden und Biologische Vielfalt (Handlungsfelder) | Ertragsausfälle | gemischt | gerichtet | TB6 Kap. 3.4, S. 84, 85: landwirtschaftliche Ertragsausfälle werden von vielen Klimawirkungen dieser Handlungsfelder beeinflusst |
+| Boden und Biologische Vielfalt (Handlungsfelder) | Qualität der Ernteprodukte | gemischt | gerichtet | TB6 Kap. 3.4, S. 84 |
+| Boden und Biologische Vielfalt (Handlungsfelder) | Nutzfunktion: Holzertrag | gemischt | gerichtet | TB6 Kap. 3.4, S. 84: weitere Auswirkungen auf Holzerträge in der Forstwirtschaft |
+| Küsten- und Meeresschutz (Handlungsfeld) | Schiffbarkeit der Seeschifffahrtsstraßen | gemischt | gerichtet | TB6 Kap. 3.4, S. 84 |
+| Küsten- und Meeresschutz (Handlungsfeld) | Schäden an touristischen Infrastrukturen und Betriebsunterbrechungen | gemischt | gerichtet | TB6 Kap. 3.4, S. 84 |
+| Küsten- und Meeresschutz (Handlungsfeld) | Schäden an Küstenökosystemen | gemischt | gerichtet | TB6 Kap. 3.4, S. 84 |
+| Wasserhaushalt, Wasserwirtschaft (Handlungsfeld) | Industrie und Gewerbe (Handlungsfeld) | Handlungsfeld | gerichtet | TB6 Kap. 3.4, S. 85: Einschränkungen der Wasserversorgung treffen die Produktion |
+| Energiewirtschaft (Handlungsfeld) | Industrie und Gewerbe (Handlungsfeld) | Handlungsfeld | gerichtet | TB6 Kap. 3.4, S. 85: Einschränkungen der Energieversorgung treffen die Produktion |
+| Küsten- und Meeresschutz (Handlungsfeld) | Tourismuswirtschaft (Handlungsfeld) | Handlungsfeld | gerichtet | TB6 Kap. 3.4, S. 84, 85: viele eingehende Wirkungen beim Tourismus |
+| Biologische Vielfalt (Handlungsfeld) | Tourismuswirtschaft (Handlungsfeld) | Handlungsfeld | gerichtet | TB6 Kap. 3.4, S. 85 |
+| Wasserhaushalt, Wasserwirtschaft (Handlungsfeld) | Tourismuswirtschaft (Handlungsfeld) | Handlungsfeld | gerichtet | TB6 Kap. 3.4, S. 85 |
+| Wassermangel im Boden | Schäden in Wäldern | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 82 (nicht aus der Arbeitsmappe): verstärkter Wassermangel im Boden kann zu trockenheitsbedingten Schäden in Wäldern führen |
+| Schäden in Wäldern | Nutzfunktion: Holzertrag | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 82 (nicht aus der Arbeitsmappe): Schäden in Wäldern wirken auf die Nutzfunktion Holzertrag |
+| Schäden in Wäldern | Nutzfunktion: Erholung | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 82 (nicht aus der Arbeitsmappe): Schäden in Wäldern wirken auf die Nutzfunktion Erholung |
+| Gewässertemperatur und Eisbedeckung und biologische Wasserqualität | Mangelndes Kühlwasser für thermische Kraftwerke | Klimawirkung | gegenseitig | TB6 Kap. 3.4, S. 82, 85 (nicht aus der Arbeitsmappe): steigende Gewässertemperatur schränkt Entnahme und Einleitung von Kühlwasser ein; eingeleitetes Kühlwasser erhöht die Gewässertemperatur |
+| Bedarf an Kühlenergie | Stadtklima/Wärmeinseln | Klimawirkung | gegenseitig | TB6 Kap. 3.4, S. 85, Abb. 9 S. 86 (nicht aus der Arbeitsmappe): wärmeres Stadtklima steigert den Bedarf an Kühlenergie; Kühlenergieverbrauch erhöht die Temperatur im innerstädtischen Raum |
+| Hitzebelastung | Bedarf an Kühlenergie | Klimawirkung | gerichtet | TB6 Kap. 3.4, S. 85–86, Abb. 9 S. 86 (nicht aus der Arbeitsmappe): Hitzebelastung wirkt auf den Bedarf an Kühlenergie; schließt den einzigen Rückkopplungskreislauf der Gesamtauswertung |
+| Verschiebung von Arealen und Rückgang der Bestände | Vegetation in Siedlungen | Klimawirkung | gegenseitig | TB6 Kap. 3.4, S. 86 (nicht aus der Arbeitsmappe): etwas schwächer ausgeprägte Wechselwirkung zwischen Stadtvegetation und Rückgang der Bestände |
 
 ## Querverbindungen zwischen den Systembereichen
 
@@ -137,13 +155,13 @@ kein vollständiges Kantenverzeichnis ist.
 ## Modellgrenze
 
 - Die 257 Querverbindungen aus Teilbericht 6 sind eine **Gesamtzahl**, keine Kantenliste. Nur 25
-  Netzrollen und 20 im Fließtext benannte Einzelbeziehungen sind wörtlich belegt; die übrigen
+  Netzrollen und 27 im Fließtext benannte Einzelbeziehungen sind wörtlich belegt; die übrigen
   Kanten des Netzes sind aus dem Teilbericht nicht rekonstruierbar (Chord-Diagramm ohne
   Achsenbeschriftung auf Klimawirkungsebene).
 - Eine vollständige Kantenliste aller 257 Querverbindungen wäre keine KWRA-Angabe, sondern eine
   eigenständige Modellierung, die als solche ausgewiesen werden müsste (Vorgabe P1/P2) — sie ist
   nicht Gegenstand dieses Dokuments und des zugrunde liegenden Datenmoduls.
-- Von den 20 benannten Einzelbeziehungen sind 7 auf gemischter Ebene und 5 auf Handlungsfeldebene
+- Von den 27 benannten Einzelbeziehungen sind 7 auf gemischter Ebene und 5 auf Handlungsfeldebene
   formuliert; sie lassen sich nicht auf eine einzelne Klimawirkung als Quelle oder Ziel verengen,
   ohne den Wortlaut der KWRA zu überstimmen (`quelle_kwra_id`/`ziel_kwra_id` sind dort bewusst auf
   `None` gesetzt).
