@@ -152,6 +152,7 @@ def querverbindungs_auswertung() -> dict:
         "netzknoten_ausserhalb_katalog": netzknoten_ausserhalb_katalog,
         "kennzahlen": kq.KENNZAHLEN,
         "systembereich_matrix": kq.SYSTEMBEREICH_MATRIX,
+        "systembereich_matrix_quelle": dict(kq.SYSTEMBEREICH_MATRIX_QUELLE),
         "abdeckung": abdeckung,
         "handlungsfelder": handlungsfelder,
         "rueckkopplungen": rueckkopplungen,

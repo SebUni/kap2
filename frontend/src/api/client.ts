@@ -168,6 +168,15 @@ export interface QuerverbindungsAuswertung {
   netzknoten_ausserhalb_katalog: QuerverbindungNetzknotenAusserhalbKatalog[]
   kennzahlen: Record<string, string | number>
   systembereich_matrix: Record<string, Record<string, number>>
+  /** Fundstelle der Matrix: Tabelle 28, TB 6, Kap. 7, S. 153. */
+  systembereich_matrix_quelle?: {
+    tabelle: number
+    seite: number
+    titel: string
+    kapitel: number
+    kapitel_titel: string
+    bericht: string
+  }
   handlungsfelder: QuerverbindungHandlungsfelder
   /** Schlüssel u. a. „annahme“ (S. 82), „einordnung_cluster“, „kaskadeneffekte“. */
   aussagen: Record<string, QuerverbindungAussage>

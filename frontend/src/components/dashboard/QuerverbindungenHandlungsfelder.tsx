@@ -9,7 +9,8 @@ import InfoTooltip from '../InfoTooltip'
  * 2. die Ablesung aus Abbildung 8 (S. 83) als Rangfolge der 13 Handlungsfelder mit „rund N“ —
  *    Genauigkeit und Herleitung stehen im Info-Symbol, nicht in der Tabelle (A-0034),
  * 3. die Kennzahlen der Auswertung (Text S. 84–85),
- * 4. die Einordnung nach Systembereichen (`aussagen.einordnung_cluster`, Tabelle 28).
+ * 4. die Einordnung nach Systembereichen (`aussagen.einordnung_cluster`, Tabelle 28; Fundstelle
+ *    aus `systembereich_matrix_quelle`, S. 153).
  * Die Stärke der Verbindung von Handlungsfeld zu Handlungsfeld (Dicke der Bänder) ist nicht
  * abgelesen und steht als Modellgrenze. Daten kommen unverändert aus GET /catalog/querverbindungen.
  */
@@ -50,6 +51,7 @@ export default function QuerverbindungenHandlungsfelder({ daten }: { daten: Quer
   const summeAblesung = felder.reduce((s, f) => s + f.ausgehend, 0)
 
   const matrix = daten.systembereich_matrix ?? {}
+  const matrixQuelle = daten.systembereich_matrix_quelle
   const bereiche = Object.keys(matrix)
   const systembereiche = bereiche.map(b => {
     const zeile = matrix[b] ?? {}
@@ -181,7 +183,11 @@ export default function QuerverbindungenHandlungsfelder({ daten }: { daten: Quer
                 </tbody>
               </table>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>
-                Quelle: {TB6}, Tabelle 28 (Querverbindungen zwischen den Systembereichen). „Beeinflusst von anderen
+                Quelle:{' '}
+                {matrixQuelle
+                  ? <>{TB6}, Tabelle {matrixQuelle.tabelle} „{matrixQuelle.titel}“, Kap. {matrixQuelle.kapitel} „{matrixQuelle.kapitel_titel}“, S. {matrixQuelle.seite}.</>
+                  : <>{TB6}, Tabelle 28 (Querverbindungen zwischen den Systembereichen).</>}
+                {' '}„Beeinflusst von anderen
                 Bereichen“ ist die Spaltensumme der Tabelle ohne den eigenen Bereich. Rein vorgelagerte
                 Klimawirkungen sind in der Tabelle nicht enthalten.
               </p>
