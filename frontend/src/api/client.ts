@@ -182,6 +182,22 @@ export interface QuerverbindungsAuswertung {
   modellgrenze: string
 }
 
+/** Ein KWRA-Systembereich in der Antwort von GET /kommune/{id}/systembereiche. */
+export interface Systembereich {
+  systembereich: string
+  anzahl_klimawirkungen: number
+  risk_codes: string[]
+  mittlerer_index: number | null
+  schadenskosten_eur: number | null
+  /** Gesetzt, wenn der Bereich leer ist: Begründung, die in der Zeile steht (nie ausgeblendet). */
+  leer_grund: string | null
+}
+
+export interface SystembereicheAuswertung {
+  kommune_id: number
+  bereiche: Systembereich[]
+}
+
 /** Antwort von GET /kommune/{id}/kang-zustaendigkeit (§ 12 Abs. 1 KAnG, Landesrecht). */
 export interface KangZustaendigkeit {
   bundesland: string
@@ -520,6 +536,8 @@ export const api = {
     request<Record<string, unknown>>(`/measures/${id}`, { method: 'DELETE' }),
   calculateImpact: (measureId: number) =>
     request<Record<string, unknown>>(`/measures/${measureId}/calculate-impact`, { method: 'POST' }),
+  getSystembereiche: (kommuneId: number) =>
+    request<SystembereicheAuswertung>(`/kommune/${kommuneId}/systembereiche`),
   getCostSummary: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/cost-summary`),
 
