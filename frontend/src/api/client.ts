@@ -103,11 +103,43 @@ export interface QuerverbindungNetzknotenAusserhalbKatalog {
   hinweis: string
 }
 
+/** Ein Handlungsfeld der Ablesung aus Abbildung 8 (TB 6, S. 83) — ausgewiesene Ablesung von KAP3, keine Tabelle der Quelle. */
+export interface QuerverbindungHandlungsfeld {
+  name: string
+  ausgehend: number
+  eingehend: number
+  /** ausgehend + eingehend (Bogenlänge in Abbildung 8). */
+  summe: number
+}
+
+/** Handlungsfeld-Ablesung aus Abbildung 8 (backend/app/data/kwra_handlungsfeld_querbezuege.py). */
+export interface QuerverbindungHandlungsfelder {
+  felder: QuerverbindungHandlungsfeld[]
+  /** Wie abgelesen wurde und wie genau (Herleitung nach P1). */
+  ablesung: string
+  genauigkeit_summe: number
+  genauigkeit_aufteilung: number
+  quelle: string
+}
+
+/** Übernommene Aussage der Auswertung (TB 6 Kap. 3.4), wörtlich mit Fundstelle. */
+export interface QuerverbindungAussage {
+  titel: string
+  wortlaut: string
+  /** Gedruckte Seite der Hauptstelle (= PDF-Seite). */
+  seite: number
+  seiten: number[]
+  beleg: string
+}
+
 export interface QuerverbindungsAuswertung {
   klimawirkungen: QuerverbindungKlimawirkung[]
   netzknoten_ausserhalb_katalog: QuerverbindungNetzknotenAusserhalbKatalog[]
   kennzahlen: Record<string, string | number>
   systembereich_matrix: Record<string, Record<string, number>>
+  handlungsfelder: QuerverbindungHandlungsfelder
+  /** Schlüssel u. a. „annahme“ (S. 82), „einordnung_cluster“, „kaskadeneffekte“. */
+  aussagen: Record<string, QuerverbindungAussage>
   abdeckung: {
     klimawirkungen_im_katalog: number
     klimawirkungen_kwra_gesamt: number
