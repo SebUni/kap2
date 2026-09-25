@@ -85,6 +85,45 @@ GE-SO-06 (Einpersonenhaushalte).
 - **Nur K1 aktiv (M0):** bewusst als Untergrenze (Begriff definiert in §4); K2 (#87) ab M3,
   K8 (#102, #65) ab Stufe M5 — nichts geht verloren, nichts wird doppelt gezählt.
 
+### Risiko ohne (weitere) Anpassung
+
+**KWRA-Stufe „ohne Anpassung“.** Die KWRA 2021 stuft die Klimawirkung „Hitzebelastung“ ohne (weitere)
+Anpassung so ein: Gegenwart **hoch**; Mitte des Jahrhunderts (2031–2060) im optimistischen Fall **mittel**,
+im pessimistischen Fall **hoch**; Ende des Jahrhunderts (2071–2100) im optimistischen Fall **mittel**, im
+pessimistischen Fall **hoch**. Fundstelle: `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt `Klimawirkungen`,
+Zeile 97 (ID 95), Spalten N–R (Kopfzellen N2 „Risiko o. Anp. – Gegenwart“ bis R2 „Risiko o. Anp. – Ende
+pessim.“); gleichlautend in Teilbericht 6, Tabelle 1, S. 41 [68].
+
+**Gewissheit der KWRA-Bewertung.** Mitte des Jahrhunderts **hoch**, Ende des Jahrhunderts **mittel**
+(dieselbe Zeile 97, Spalte S „Gewissheit – Mitte“ und Spalte T „Gewissheit – Ende“; gleichlautend in [68],
+Tabelle 1, S. 41). Für die Gegenwart nennt die KWRA keine Gewissheit. Teilbericht 6 rechnet die vier Stufen
+in Zahlen um (1 = sehr gering, 2 = gering, 3 = mittel, 4 = hoch; [68], S. 78, Fußnote 18); für die
+Hitzebelastung ergibt das im Mittel beider Zeitscheiben (4 + 3) / 2 = 3,5. Damit zählt [68] auf S. 78–79
+die Hitzebelastung zu den Klimawirkungen mit vergleichsweise hoher Gewissheit (gemittelter Wert 3,5 über
+beide Zeitscheiben). Mappe und Teilbericht stimmen überein; die Vorrangregel der Aufgabe muss nicht
+angewendet werden. **Warum die eigene Quellenlage davon abweicht:** Die KWRA bewertet, wie sicher die
+Einstufung des *künftigen* Risikos in eine von drei Stufen ist, und hängt damit an Klimaprojektionen und an
+der künftigen Bevölkerung; dieser Bericht rechnet das *heutige* Klima (§6) aus gemessenen Größen — den vom
+RKI geschätzten Hitzetoten 2012–2024 und amtlichen Bevölkerungs- und Sterbezahlen — und weist seine
+Unsicherheit deshalb nicht als Stufe aus, sondern als Band je Parameter (Kapitel 7), etwa beim
+Kalibrierfaktor \(c_{\text{kal}}\) 0,55–0,67 um 0,581 (§4).
+
+**(a) Zuordnung der Zahlen.** Alle in diesem Bericht ausgewiesenen Zahlen des Basiswerts —
+zusätzliche Sterbefälle, YLL, Morbiditätsfälle und die daraus bewerteten Euro-Beträge in K1 — gehören
+zum KWRA-Zustand **„Risiko ohne (weitere) Anpassung"**. Gemeint ist der heutige Anpassungsstand ohne
+zusätzliche Maßnahmen. Er steckt im Basiswert über die Kalibrierung: \(c_{\text{kal}}\) ist an die vom RKI
+geschätzten Hitzetoten der Jahre 2012–2024 angepasst (§4). Was in diesen Jahren an Anpassung schon wirkte,
+etwa das laufende Hitzewarnsystem des DWD [45], ist damit im Niveau des Basiswerts enthalten
+(Doppelzählungs-Wächter, §5). Weitere Maßnahmen sind im Basiswert nicht enthalten.
+
+**(b) Zustand „mit Anpassung".** Dargestellt wird er nur als Wirkung einzelner Maßnahmen-Hebel auf den
+Basiswert (§5): Hitzeaktionsplan und Frühwarnkette über \(\delta_{\text{HAP}}\), gekühlte Räume in
+Pflegeheimen am \(\beta_{\text{pfl}}\)-Term und Schutzprogramme für vulnerable Gruppen über
+\(v_{\text{vers},a}\). Im Produkt entsteht daraus der Wert „mit Anpassung" erst, wenn eine Kommune
+Maßnahmen wählt. Ein KWRA-Restrisiko „mit Anpassung" als eigene Zahl weist der Bericht nicht aus; auch
+die spontane Anpassung der Bevölkerung (abflachende Expositions-Wirkung über die Dekaden) ist nicht
+modelliert, sondern als Modellgrenze in §6 geführt.
+
 ## 2 Evidenz-Register (§2.2)
 
 Risikoübergreifend wiederverwendbare Zeilen zusätzlich in `docs/evidenz/register.md`.
@@ -841,6 +880,10 @@ zunehmende Hitzewellen-Variabilität, der reine Mittelwert-Shift ist daher eine 
 (2) ERF-Stationarität — das Anpassungssignal (s. u.) wirkt gegenläufig. **M0 weist das
 Ist-Klima aus**; Szenariofähigkeit folgt mit der Klimaprojektions-Anbindung (Stufe M1+).
 
+**Jahresbeträge ohne Abzinsung.** Alle Euro-Beträge dieses Berichts sind Jahresbeträge ohne Abzinsung:
+Sie gelten für ein Jahr im heutigen Klima (Preisstand 2024) und werden weder über mehrere Jahre summiert
+noch auf einen Barwert abgezinst.
+
 **Modellgrenzen (dokumentiert):**
 1. Klimatologische Quantile bilden das **mittlere** Jahr ab — Jahre mit ausgeprägten
    Hitzewellen bei moderatem Sommermittel werden strukturell unterschätzt; genau das zeigen
@@ -896,6 +939,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: quelle   # Ablesewerte Winklmayr 2022, Abb. 3 [11]
+  abgeleitet_aus: []
 parameter:
   id: heat.beta_85plus_region
   wert: {nord: 0.0634, mitte: 0.0625, sued: 0.0876}
@@ -906,6 +951,8 @@ parameter:
   preisstand: null
   bandzuordnung: [85+]
   endpunkt: mortalitaet
+  kennzeichnung: abschaetzung_kap3   # Nord/Mitte Ablesewerte [11]; Sued KAP3-Nachschaetzung s_Sued 1,65 (§4 #beta-sued, Log 32)
+  abgeleitet_aus: []
 parameter:
   id: heat.f_alter
   wert: {u65: 0.357, 65-74: 0.588, 75-84: 0.631, 85+: 1.0}
@@ -916,6 +963,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: abschaetzung_kap3   # Rueckrechnung aus RKI-Anteilen [12] und Sterbefaellen [49] mit linearer Naeherung (§3.3a)
+  abgeleitet_aus: []
 parameter:
   id: heat.m_basissterberate
   wert: {u65: 213.2, 65-74: 1737.9, 75-84: 4812.3, 85+: 14800.2}
@@ -926,6 +975,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: quelle   # Quotient amtlicher Summen: Sterbefaelle 2023 / Bevoelkerung 31.12.2023 [49]
+  abgeleitet_aus: []
 parameter:
   id: heat.l_restlebenserwartung
   wert: {u65: 23.39, 65-74: 15.59, 75-84: 8.90, 85+: 4.16}
@@ -936,6 +987,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: quelle   # Sterbetafel 2022/2024 [48]; 85+ sterbefallgewichtet aus amtlichen Zahlen (§3.5 #l-a)
+  abgeleitet_aus: []
 parameter:
   id: heat.voly
   wert: 160800
@@ -946,6 +999,8 @@ parameter:
   preisstand: "2024"
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: abschaetzung_kap3   # Ausgangswert 79.500 EUR2005 aus Amann 2020a Tab. 3.15; Elastizitaet 0,85 beim Raumtransfer Setzung von KAP3 (§3.5, Log 4)
+  abgeleitet_aus: []
 parameter:
   id: heat.c_fall
   wert: 7152
@@ -956,6 +1011,8 @@ parameter:
   preisstand: "2024"
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: quelle   # Kostennachweis 2023 [17], mit VPI auf 2024 indexiert; als Proxy gekennzeichnet (§3.5, Log 17)
+  abgeleitet_aus: []
 parameter:
   id: heat.c_kal
   wert: 0.581   # Fit Fenster 2012-2024 auf bevoelkerungsgewichteten Reihen (Rev. 7, Log 31)
@@ -966,6 +1023,9 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: berechnet   # Kleinste-Quadrate-Fit des Modells gegen die RKI-Reihe 2012-2024 (§4 #c-kal)
+  abgeleitet_aus: [heat.t0_region, heat.beta_85plus_region, heat.f_alter, heat.m_basissterberate, heat.q_wochenquantile]
+  rolle: kalibrierung
 parameter:
   id: heat.q_wochenquantile
   wert: "backend/data/kalibrierung/wochenquantile_region.csv"
@@ -976,6 +1036,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet   # Befund 73: speist nur den D-/Temperaturpfad
+  kennzeichnung: quelle   # empirische Quantile aus DWD-CDC-Tageswerten ausgezaehlt (§3.2 #q-w, Log 5)
+  abgeleitet_aus: []
 parameter:
   id: heat.e_hd
   wert: 0.024
@@ -986,6 +1048,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: quelle   # Karlsson & Ziebarth 2018 [18], IZA-DP 7875 Tab. 1 [62]
+  abgeleitet_aus: []
 parameter:
   id: heat.hd_ref
   wert: 7.2
@@ -996,6 +1060,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: quelle   # Panelbeschreibung Karlsson & Ziebarth 2018 [18]/[62] (§3.4 #hd-ref)
+  abgeleitet_aus: []
 parameter:
   id: heat.r0_einweisungsrate
   wert: {u65: 1.9, 65-74: 6.3, 75-84: 10.8, 85+: 15.6}
@@ -1006,6 +1072,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: abschaetzung_kap3   # Altersprofil 1:3,3:5,7:8,2 gekennzeichnete Abschaetzung (§3.4 #r0-a, Log 16)
+  abgeleitet_aus: []
 parameter:
   id: heat.beta_iso
   wert: 0.90
@@ -1016,6 +1084,8 @@ parameter:
   preisstand: null
   bandzuordnung: [65-74, 75-84, 85+]
   endpunkt: mortalitaet   # F-Pfad Default 1 (Log 28): keine Morbiditaetsevidenz
+  kennzeichnung: berechnet   # (OR-1)/[1+q(OR-1)] mit OR 2,3 aus Semenza 1996 [40] (§3.3)
+  abgeleitet_aus: [heat.qbar_1p]
 parameter:
   id: heat.beta_pfl
   wert: 1.54
@@ -1026,6 +1096,8 @@ parameter:
   preisstand: null
   bandzuordnung: [85+]
   endpunkt: mortalitaet
+  kennzeichnung: berechnet   # (OR-1)/[1+q(OR-1)], OR 3,0 aus der Kette §3.3b (Fouillet, WIdO [61]; Log 23)
+  abgeleitet_aus: [heat.m_basissterberate, heat.qbar_pfl]
 parameter:
   id: heat.beta_dist_sensitivitaet
   wert: 0.0
@@ -1036,6 +1108,9 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: abschaetzung_kap3   # Basiswert 0 = neutraler Default fuer unbelegte Modulatoren (§3.2, Log 20); Band nach Nicholl 2007
+  abgeleitet_aus: []
+  rolle: sensitivitaet
 parameter:
   id: heat.qbar_1p
   wert: 0.346
@@ -1046,6 +1121,8 @@ parameter:
   preisstand: null
   bandzuordnung: [65-74, 75-84, 85+]
   endpunkt: mortalitaet   # Befund 73: speist nur den D-/Temperaturpfad
+  kennzeichnung: quelle   # Mikrozensus 2023 [63]
+  abgeleitet_aus: []
 parameter:
   id: heat.qbar_pfl
   wert: 0.149
@@ -1056,6 +1133,8 @@ parameter:
   preisstand: null
   bandzuordnung: [85+]
   endpunkt: mortalitaet
+  kennzeichnung: quelle   # Quotient amtlicher Summen 424.300 / 2.844.213 [61]
+  abgeleitet_aus: []
 parameter:
   id: heat.delta_hap
   wert: 0.95
@@ -1066,6 +1145,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: abschaetzung_kap3   # zentral 0,95 zwischen DiD roh 1,00 und adjustiert 0,85 [45] (§5, Log 10)
+  abgeleitet_aus: []
 parameter:
   id: heat.gamma_hoehe
   wert: 0.0065
@@ -1076,6 +1157,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet   # Befund 73: speist nur den D-/Temperaturpfad
+  kennzeichnung: quelle   # ICAO-Standardatmosphaere
+  abgeleitet_aus: []
 ```
 
 ## 8 Quellen (§3.8 — #95-relevanter Auszug; Nummern [11]–[62] = M0-Zählung)
@@ -1182,6 +1265,13 @@ DOI-Links die persistenten Referenzen.
   „Alter in 5er-Jahresgruppen“
   (https://www.destatis.de/static/DE/zensus/gitterdaten/Alter_5er-Jahresgruppen_100mGitter.zip),
   abgerufen 25.09.2026 — dl-de/by-2-0. Verwendet für den Zellvergleich Berlin in §3.0.
+- **[68]** W. Kahlenborn, L. Porst, M. Voß, L. Hölscher, S. Undorf, M. Wolf, K. Schönthaler,
+  A. Crespi, K. Renner, M. Zebisch, U. Fritsch, I. Schauser, „Klimawirkungs- und Risikoanalyse 2021
+  für Deutschland — Teilbericht 6: Integrierte Auswertung – Klimarisiken, Handlungserfordernisse und
+  Forschungsbedarfe“, Umweltbundesamt, Climate Change 25/2021, Dessau-Roßlau, Juni 2021
+  (http://www.umweltbundesamt.de/publikationen; im Repo `docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`).
+  Verwendet: Tabelle 1, S. 41 (Stufen und Gewissheit „Hitzebelastung“), Kapitel 3.3, S. 78–79 mit
+  Fußnote 18 (Zahlenskala der Gewissheit). Aufbereitet in `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`.
 
 ## Entscheidungslog
 
@@ -1190,7 +1280,8 @@ Migration). Einträge 19–27: Rev.-6-Entscheidungen (`/risiko-auto`, Gate 1); E
 Revision nach Review-Runde 1 (Befunde 58/59/62); Einträge 31–33: Rev.-7-Kalibrier-Revision
 (Auflösung der §6-Eskalation, 30.08.2026). Einträge 37–38: verworfene Ansätze aus dem früheren
 Kapitel 9 (Ansatz-Vergleich), das mit Fortschreibung 7 entfällt (eine Methodik je Risiko,
-Befund 95); der gewählte Ansatz 95-A ist Nr. 1.
+Befund 95); der gewählte Ansatz 95-A ist Nr. 1. Einträge 39–40: Fortschreibung 7, Schritt 2
+(Pflichtabschnitt „Risiko ohne (weitere) Anpassung“, Kennzeichnung der Parameter; Befunde 107–111).
 **Überstimmungsweg für alle Einträge:** „Entscheidung Nr. X ändern auf …" → Delta-Lauf
 (Neurechnung betroffener Kopplungen + Re-Review). ⚠ = Ermessensfall.
 
@@ -1234,3 +1325,5 @@ Befund 95); der gewählte Ansatz 95-A ist Nr. 1.
 | 36 | L̄_85+ exakt statt Approximation? | **4,16 J** — Einzeljahres-Sterbefälle 85–94 × e(x), 95+-Rest tafelintern gewichtet, m/w sterbefallgewichtet kombiniert | Befund-22-Auflösung wie in §3.5 terminiert; Kreuzcheck 12613-02↔-03 exakt | Stützstellen-Variante (4,83 — behebt nur den Gewichte-Fehler, nicht die Untergrenzen-Stützstellen) | YLL-Bundessumme ≈ −8 %; €-Ausweis sinkt entsprechend (konservativ) |
 | 37 | Ansatz 95-B (nationaler Anker, top-down)? | **verworfen** | 95-B verteilt eine feste nationale Zahl von Hitzetoten über einen Schlüssel und scheidet nach §3.1 aus, weil damit auch eine Kommune ohne Hitze Todesfälle erhielte. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
 | 38 | Ansatz 95-C (Personen-Hitzegradtage-Regression)? | **verworfen** | 95-C ersetzt die publizierte und kalibrierte RKI-Kurve durch eine lineare Regression mit aufgesetzter Krümmung (κ ≈ 1,2–1,5) und wäre gegenüber 95-A ein Rückschritt. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
+| 39 ⚠ | Satz „Bestand an Klimaanlagen und Hitzeaktionsplänen im Basiswert“ (Kapitel 1, Absatz (a))? | **gestrichen** — Absatz (a) sagt nur noch, was aus der Kalibrierung folgt: \(c_{\text{kal}}\) ist an die RKI-Reihe 2012–2024 angepasst, der Anpassungsstand dieser Jahre steckt damit im Niveau; genannt bleibt nur das DWD-Hitzewarnsystem mit Beleg [45] | Der Bericht hat keine Quelle für die Klimaanlagen-Quote und keine für die Verbreitung kommunaler Hitzeaktionspläne in den Kalibrierjahren; eine Behauptung ohne Beleg bleibt nicht stehen (P1) | Satz belegen: Klimaanlagen-Quote der Haushalte und Pflegeheime sowie Einführungsjahre der Hitzeaktionspläne gegen das Fenster 2012–2024 (Fortschreibung) | keine Zahl betroffen; Aussage (a) schmaler, aber belegt |
+| 40 ⚠ | Kennzeichnung der Grenzfälle in Kapitel 7? | **`abschaetzung_kap3`**, sobald eine Setzung von KAP3 im Wert steckt (\(\beta_{85+}\) Süd-Nachschätzung, \(f_a\) lineare Näherung, VOLY-Elastizität beim Raumtransfer, \(r_{0,a}\)-Altersprofil, \(\delta_{\text{HAP}}\), Distanzterm); **`quelle`** für reine Rechnungen aus amtlichen oder gemessenen Zahlen ohne Setzung (Quotienten, Indexierung, ausgezählte Quantile); **`berechnet`** nur, wo der Wert aus anderen Blöcken folgt (\(c_{\text{kal}}\), \(\beta_{\text{iso}}\), \(\beta_{\text{pfl}}\)) | Die Parameterliste im Produkt (P1) soll eine Setzung nie als Quellenwert zeigen; gleiche Lesart wie die Blöcke in `60_*.md` („Quotient zweier amtlicher Summen“ = `quelle`) | alle aus Quellen abgeleiteten Werte als `abschaetzung_kap3` (überzeichnet die Unsicherheit amtlicher Quotienten) | keine Zahl betroffen; Anzeige „Quelle“ oder „Abschätzung von KAP3“ im Produkt |
