@@ -1,6 +1,6 @@
 """Test des Katalogs der Bestandsaufnahme-Größen (Ticket T-0754, Vorhaben T-0447).
 
-Deckt ab: (a) 15 Codes in fester Reihenfolge, (b) Gruppe/Label/Einheit wie im Ticket,
+Deckt ab: (a) 20 Codes in fester Reihenfolge, (b) Gruppe/Label/Einheit wie im Ticket,
 (c) je Größe Quellschlüssel (im Register) XOR Lückensatz, (d) Lückensätze wörtlich.
 """
 
@@ -11,11 +11,13 @@ from app.data.sources import SOURCE_REFERENCES
 
 CODES = [
     "aeltere_ab_65", "kinder_unter_18", "arbeitslosenquote", "pflegebeduerftige",
-    "alleinlebende_aeltere", "vorerkrankte", "wohnungslose", "energie",
+    "alleinlebende_aeltere", "vorerkrankte", "wohnungslose",
+    "gewaesser", "wald", "boeden", "schutzgebiete", "energie",
     "wasser_abwasser", "verkehrsknoten", "kommunikation", "krankenhaeuser",
-    "pflegeeinrichtungen", "kitas_schulen", "schadensereignisse",
+    "pflegeeinrichtungen", "kitas_schulen", "lieferketten", "schadensereignisse",
 ]
-VP, KS, VE = "vulnerable_personen", "klimasensible_strukturen", "vergangene_ereignisse"
+VP, NS, KS, VE = ("vulnerable_personen", "natuerliche_systeme", "klimasensible_strukturen",
+                   "vergangene_ereignisse")
 TABELLE = {
     "aeltere_ab_65": (VP, "Ältere Menschen ab 65 Jahren", "%"),
     "kinder_unter_18": (VP, "Kinder und Jugendliche unter 18 Jahren", "%"),
@@ -24,6 +26,11 @@ TABELLE = {
     "alleinlebende_aeltere": (VP, "Alleinlebende ältere Menschen", ""),
     "vorerkrankte": (VP, "Menschen mit Vorerkrankungen", ""),
     "wohnungslose": (VP, "Wohnungslose Menschen", ""),
+    "gewaesser": (NS, "Gewässer", ""),
+    "wald": (NS, "Wald", ""),
+    "boeden": (NS, "Böden", ""),
+    "schutzgebiete": (NS, "Schutzgebiete", ""),
+    "lieferketten": (KS, "Lieferketten", ""),
     "energie": (KS, "Energieinfrastruktur", "Vorkommen"),
     "wasser_abwasser": (KS, "Wasser- und Abwasserinfrastruktur", "Vorkommen"),
     "verkehrsknoten": (KS, "Verkehrsknoten", "Vorkommen"),
@@ -34,7 +41,9 @@ TABELLE = {
     "schadensereignisse": (VE, "Vergangene Schadensereignisse durch Wetterextreme", ""),
 }
 LUECKEN = {"pflegebeduerftige", "alleinlebende_aeltere", "vorerkrankte",
-           "wohnungslose", "kitas_schulen", "schadensereignisse"}
+           "wohnungslose", "kitas_schulen", "schadensereignisse",
+           "gewaesser", "wald", "boeden", "schutzgebiete", "lieferketten"}
+NICHT_IM_KATALOG = ["gewaesser", "wald", "boeden", "schutzgebiete", "lieferketten"]
 
 
 def test_codes_und_reihenfolge():
@@ -69,3 +78,11 @@ def test_laufzeitsatz():
         "Für die Größe X war die Datenquelle für diese Kommune nicht abrufbar; "
         "der Wert fehlt in dieser Bestandsaufnahme."
     )
+
+
+def test_hinweis_nicht_im_katalog():
+    for g in b.BESTANDSAUFNAHME_GROESSEN:
+        if g["code"] in NICHT_IM_KATALOG:
+            assert g["hinweis"] == "nicht im Katalog"
+        else:
+            assert "hinweis" not in g

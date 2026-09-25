@@ -19,8 +19,11 @@ LAUFZEITSATZ_VORLAGE = (
 )
 
 
-def _g(code, gruppe, label, einheit, quellen=None):
-    return {
+HINWEIS_NICHT_IM_KATALOG = "nicht im Katalog"
+
+
+def _g(code, gruppe, label, einheit, quellen=None, hinweis=None):
+    eintrag = {
         "code": code,
         "gruppe": gruppe,
         "label": label,
@@ -28,9 +31,13 @@ def _g(code, gruppe, label, einheit, quellen=None):
         "quellen": list(quellen or []),
         "luecke": "" if quellen else LUECKENSATZ_VORLAGE.format(label=label),
     }
+    if hinweis:
+        eintrag["hinweis"] = hinweis
+    return eintrag
 
 
 _VP = "vulnerable_personen"
+_NS = "natuerliche_systeme"
 _KS = "klimasensible_strukturen"
 _VE = "vergangene_ereignisse"
 
@@ -42,6 +49,10 @@ BESTANDSAUFNAHME_GROESSEN: list[dict] = [
     _g("alleinlebende_aeltere", _VP, "Alleinlebende ältere Menschen", ""),
     _g("vorerkrankte", _VP, "Menschen mit Vorerkrankungen", ""),
     _g("wohnungslose", _VP, "Wohnungslose Menschen", ""),
+    _g("gewaesser", _NS, "Gewässer", "", hinweis=HINWEIS_NICHT_IM_KATALOG),
+    _g("wald", _NS, "Wald", "", hinweis=HINWEIS_NICHT_IM_KATALOG),
+    _g("boeden", _NS, "Böden", "", hinweis=HINWEIS_NICHT_IM_KATALOG),
+    _g("schutzgebiete", _NS, "Schutzgebiete", "", hinweis=HINWEIS_NICHT_IM_KATALOG),
     _g("energie", _KS, "Energieinfrastruktur", "Vorkommen", ["OSM_Data", "BBK_KRITIS"]),
     _g("wasser_abwasser", _KS, "Wasser- und Abwasserinfrastruktur", "Vorkommen", ["OSM_Data", "BBK_KRITIS"]),
     _g("verkehrsknoten", _KS, "Verkehrsknoten", "Vorkommen", ["OSM_Data", "BBK_KRITIS"]),
@@ -49,5 +60,6 @@ BESTANDSAUFNAHME_GROESSEN: list[dict] = [
     _g("krankenhaeuser", _KS, "Krankenhäuser", "Anzahl", ["OSM_Data"]),
     _g("pflegeeinrichtungen", _KS, "Pflegeeinrichtungen", "Anzahl", ["OSM_Data"]),
     _g("kitas_schulen", _KS, "Kindertagesstätten und Schulen", ""),
+    _g("lieferketten", _KS, "Lieferketten", "", hinweis=HINWEIS_NICHT_IM_KATALOG),
     _g("schadensereignisse", _VE, "Vergangene Schadensereignisse durch Wetterextreme", ""),
 ]

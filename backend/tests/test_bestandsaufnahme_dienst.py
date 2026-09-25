@@ -1,6 +1,6 @@
 """Test des Bestandsaufnahme-Dienstes (Ticket T-0755, Vorhaben T-0447).
 
-Deckt ab: (a) 15 Einträge in Katalogreihenfolge mit allen Feldern,
+Deckt ab: (a) 20 Einträge in Katalogreihenfolge mit allen Feldern,
 (b) bevölkerungsgewichteter 65+-Anteil, (c) Katalog-Lücken, (d) fehlende
 Arbeitslosenquote → Laufzeitsatz, (e) Kommunen-Einstieg ohne Netzdienst.
 Feste Eingaben, kein Netz, keine Datenbank.
@@ -18,7 +18,8 @@ from app.services import bestandsaufnahme_service as dienst
 
 FELDER = ["code", "gruppe", "label", "einheit", "wert", "quellen", "luecke_satz"]
 LUECKEN = ["pflegebeduerftige", "alleinlebende_aeltere", "vorerkrankte",
-           "wohnungslose", "kitas_schulen", "schadensereignisse"]
+           "wohnungslose", "kitas_schulen", "schadensereignisse",
+           "gewaesser", "wald", "boeden", "schutzgebiete", "lieferketten"]
 
 ZELLEN = [
     {"pop": 100.0, "share_over_65": 20.0, "share_under_18": 10.0,
@@ -35,12 +36,12 @@ def _nach_code(eintraege):
     return {e["code"]: e for e in eintraege}
 
 
-def test_a_fuenfzehn_eintraege_in_katalogreihenfolge():
+def test_a_zwanzig_eintraege_in_katalogreihenfolge():
     eintraege = dienst.bestandsaufnahme_aus_daten(ZELLEN, SOZIO)
-    assert len(eintraege) == 15
+    assert len(eintraege) == 20
     assert [e["code"] for e in eintraege] == [g["code"] for g in katalog.BESTANDSAUFNAHME_GROESSEN]
     for e, g in zip(eintraege, katalog.BESTANDSAUFNAHME_GROESSEN):
-        assert list(e.keys()) == FELDER
+        assert list(e.keys()) == FELDER + (["hinweis"] if "hinweis" in g else [])
         assert (e["gruppe"], e["label"], e["einheit"], e["quellen"]) == (
             g["gruppe"], g["label"], g["einheit"], g["quellen"])
 
