@@ -61,6 +61,7 @@ def test_kang_zustaendigkeit_vorhandene_kommune(client):
 def test_kang_zustaendigkeit_unbekannte_kommune_404(client):
     antwort = client.get(f"/api/kommune/{UNBEKANNTE_KOMMUNE_ID}/kang-zustaendigkeit")
     assert antwort.status_code == 404
+    assert antwort.json()["detail"] == "Kommune nicht gefunden"
 
 
 def test_unsicherheits_zusammenschau_vorhandene_kommune(client):
@@ -74,3 +75,4 @@ def test_unsicherheits_zusammenschau_vorhandene_kommune(client):
 def test_unsicherheits_zusammenschau_unbekannte_kommune_404(client):
     antwort = client.get(f"/api/kommune/{UNBEKANNTE_KOMMUNE_ID}/unsicherheits-zusammenschau")
     assert antwort.status_code == 404
+    assert antwort.json()["detail"] == "Kommune nicht gefunden"
