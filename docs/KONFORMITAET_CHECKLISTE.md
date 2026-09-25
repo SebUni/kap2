@@ -33,7 +33,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 19 | Bei der Interpretation der Analyseergebnisse sind bestehende Unsicherheiten in den zugrunde liegenden Informationen und Daten explizit zu berücksichtigen, ebenso handlungsfeld- und regionsübergreifende Abhängigkeiten, bevor daraus Handlungsoptionen formuliert werden. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 6 (Abschnitt 2.2.6 "Ergebnisse interpretieren", S. 29f.) | teilweise | backend/app/services/unsicherheits_zusammenschau.py, backend/app/api/routes/kommune.py, backend/tests/test_unsicherheits_zusammenschau.py, backend/app/services/gewissheit.py, docs/evidenz/register.md | Die Unsicherheit der Daten trägt das Produkt: Die Zusammenschau nennt je Handlungsfeld die niedrigste Gewissheitsstufe und die Zahl der nicht belegten Parameter und verlangt ab „gering“ vorsichtige Interpretation. Es fehlt aber, was Abschnitt 2.2.6 darüber hinaus verlangt. Handlungsfeldübergreifend ist die Zusammenschau nicht: Der aktive Katalog hat nur das Handlungsfeld „Menschliche Gesundheit“, und auch mit mehreren Feldern stellte sie diese nur nebeneinander, statt wechselseitige Abhängigkeiten zu ermitteln. Nur die übernommenen KWRA-Querverbindungen (Zeile 9) zeigen bundesweite Beziehungen. Regionsübergreifende Abhängigkeiten, etwa zu Nachbarkommunen, werden nicht betrachtet. Die Unsicherheit ist nicht mit den einzelnen Handlungsoptionen verbunden. Leitfragen der Kommune, die Einbeziehung von Fachabteilungen, externer Expertise und angrenzenden Kommunen sowie die Trennung der Maßnahmen danach, ob die Kommune sie allein umsetzen kann, fehlen. Gender- und Diversitätsaspekte gehen nur über das Alter ein. Primärtext ISO 14091 nicht gelesen (T-0531-ceo). Einzelnachweis: Abschnitt „Gegenprobe Zeile 19“. |
 | 20 | Die Ergebnisse der Risikobewertung sind zielgruppenspezifisch zu kommunizieren, etwa durch einen ausführlichen Bericht mit Datengrundlagen und Methodik für die Fachöffentlichkeit sowie durch leicht verständliche, prägnante Kommunikationsprodukte (z. B. Karten, Zusammenfassungen) für politische Entscheidungsträger und die breite Öffentlichkeit. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 7 (Abschnitt 2.3.2 "Ergebnisse zielgruppenspezifisch kommunizieren", S. 31) | erfüllt | docs/methodik/95_hitzebelastung.md, backend/app/services/kurzfassung_markdown.py, backend/app/api/routes/kommune.py, backend/tests/test_kurzfassung_export.py | Neben dem ausführlichen Methodik-Bericht für die Fachöffentlichkeit erzeugt das Produkt eine Kurzfassung mit fünf festen Abschnitten für politische Entscheidungsträger. |
 | 21 | Die Monetarisierung von Umweltauswirkungen soll durchgängig auf dem Schadenskostenansatz beruhen; Vermeidungs- oder Wiederherstellungskosten sollen nicht als Ersatz für Schadenskosten verwendet werden, um Datenlücken zu schließen, da sie vom Minderungsziel abhängen bzw. real oder virtuell sein können und daher kein aussagekräftiger Ersatzwert sind. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 1 (S. 8f.) und Kap. 2.2.1 (S. 12) | teilweise | docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, backend/app/data/catalog.py | Für Gesundheitswirkungen (z. B. hitzebedingte Mortalität) folgt das Produkt dem Schadenskostenansatz (VSL/VOLY-artige Kostensätze), für Gebäudeschäden bei Flusshochwasser (#60) wird jedoch ausdrücklich mit Wiederherstellungskosten zum Neuwert (NHK, indexiert) bewertet (docs/methodik/60_gebaeudeschaeden_flusshochwasser.md, Konto K3); das Produkt wendet damit je nach Schadenskategorie unterschiedliche, nicht vereinheitlichte Kostenkonzepte an, statt durchgängig den von der Methodenkonvention empfohlenen Schadenskostenansatz zu verwenden, und dokumentiert diesen Methodenwechsel nicht als bewusste Abweichung von der Konvention. |
-| 22 | Zukünftige Kosten und Nutzen sind unter Verwendung einer Diskontrate (u. a. der Reinen Zeitpräferenzrate) auf den heutigen Tag abzuzinsen; es werden mindestens zwei Werte (0 % und 1 % RZPR) berichtet, um die Sensitivität der Ergebnisse gegenüber der Zeitpräferenz zu zeigen. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 2.2.3 (S. 14f.) | erfüllt | backend/app/services/cost_projection_service.py, backend/tests/test_kostenprojektion_diskontierung.py | Die Kostenprojektion 2025–2065 weist die kumulierten Kosten zusätzlich als Barwerte mit 0 % und 1 % Reiner Zeitpräferenzrate aus; die Sensitivität gegenüber der Zeitpräferenz ist damit berichtet. |
+| 22 | Zukünftige Kosten und Nutzen sind unter Verwendung einer Diskontrate (u. a. der Reinen Zeitpräferenzrate) auf den heutigen Tag abzuzinsen; es werden mindestens zwei Werte (0 % und 1 % RZPR) berichtet, um die Sensitivität der Ergebnisse gegenüber der Zeitpräferenz zu zeigen. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 2.2.3 (S. 14f.) | teilweise | backend/app/services/cost_projection_service.py, backend/tests/test_kostenprojektion_diskontierung.py | Die Kostenprojektion 2025–2065 weist die kumulierten Kosten zusätzlich als Barwerte mit 0 % und 1 % aus, auf 2025 abgezinst und ohne Marktzinssatz; die beiden Werte entsprechen der Konvention. Abgezinst wird aber mit der Reinen Zeitpräferenzrate allein. Die Konvention verlangt eine Diskontrate aus zwei Teilen: der Zeitpräferenz und der Veränderung der relativen Preise (Ramsey: RZPR plus Konsumwachstum, gewichtet mit dem Grenznutzen). RZPR und Diskontrate trennt sie ausdrücklich (S. 10, S. 14–15). Die zweite Komponente fehlt, ohne Begründung und ohne ausgewiesene Abschätzung von KAP3. Damit fehlt auch die Aussage, ob für die bewerteten Gesundheitsschäden eine höhere Rate gilt (wie für Konsumgüter mit sinkendem relativem Preis) oder eine niedrigere (wie für knapper werdende Umweltgüter). Der „Barwert mit 0 % RZPR“ ist deshalb die unabgezinste Summe und der „Barwert mit 1 % RZPR“ ein Barwert zu 1 % Diskontrate. Risikoaversion geht nicht ein. Einzelnachweis: Abschnitt „Gegenprobe Zeile 22“. |
 | 23 | Kostensätze sind einem eindeutigen Preisbasisjahr zuzuordnen; für die Anwendung auf Aktivitäten oder Emissionen anderer Jahre ist eine Preisanpassung anhand eines Preis- bzw. Verbraucherpreisindexes vorzunehmen. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 1 (S. 9) | erfüllt | docs/evidenz/register.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | — |
 | 24 | Ergebnisse der Monetarisierung sind als Schätzungen mit ausgewiesener Unsicherheit (Bandbreiten, Größenordnung statt Scheingenauigkeit) darzustellen; Modelle mit stochastischen Komponenten sollen die Unsicherheit einzelner Bestandteile und des Gesamtprozesses systematisch abbilden. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 1 (S. 9) und Kap. 2.2.2 (S. 13) | erfüllt | docs/evidenz/register.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | — |
 | 25 | Wirkungskategorien, die im gewählten Bewertungsmodell nicht oder nicht vollständig erfasst werden (z. B. Biodiversität, weitere nicht abgedeckte Klimafolgen), sind zu benennen; die resultierenden Kostensätze sind dann als konservative Schätzung bzw. Untergrenze der tatsächlichen Auswirkungen kenntlich zu machen, statt die fehlende Wirkung stillschweigend weg­zulassen. | UBA Methodenkonvention 4.0 | UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf, Kap. 2.2.2 (S. 13f.) und Kap. 3.1, Fn. 14 (S. 17) | teilweise | backend/app/data/catalog.py, docs/MODELL_KRITIK.md | Der Katalog kennzeichnet Risiken, die aus Doppelzählungsgründen bewusst mit Kostensatz 0 € geführt werden, mit einer erklärenden `cost_source`/`cost_source_detail` (Verweis auf docs/MODELL_KRITIK.md §6); für nicht bewusst ausgeschlossene, sondern methodisch schlicht (noch) nicht abgedeckte Wirkungen greift dagegen das im Code selbst so benannte „Sicherheitsnetz“ (`cost_per_outcome_eur` Default 0,0, Quelle „Modellannahme (Kostensatz, unbelegt)“), ohne dass die daraus resultierende Gesamtsumme im Produkt als konservative Untergrenze ausgewiesen wird. |
@@ -496,6 +496,90 @@ Gewissheit des Klimarisikos, und kehrt bei #98 die Einstufung der KWRA um. Der S
 Änderung auf `teilweise` gesetzt; die Spalte „Lücke“ nennt, was fehlt. Die Zählungen in den Abschnitten „Nachtrag:
 Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt; sie nachzuziehen ist Sache der Gesamtzählung
 (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 22 gegen UBA Methodenkonvention 4.0, Kap. 2.2.3
+
+Frage: Tragen die Belege der Zeile 22, was Kap. 2.2.3 „Diskontierung und die Reine Zeitpräferenzrate“ an die
+Diskontierung stellt? Verlangt die Konvention neben der Reinen Zeitpräferenzrate (RZPR) weitere Bestandteile der
+Diskontrate, und entsprechen die berichteten Werte dem? Zeile 22 steht seit T-0443 auf `erfüllt`, weil die
+Kostenprojektion Barwerte mit 0 % und 1 % RZPR ausweist; der Normtext war dafür nicht gelesen worden. Gelesen wurde
+gegen `docs/UBA/UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf`. In den gelesenen Seiten stimmen PDF-Seitenzahl
+und gedruckte Seitenzahl überein. Kap. 2.2.3 beginnt auf S. 14 und endet auf S. 15; Kap. 2.2.4 beginnt auf S. 16. Die
+Fundstelle „S. 14f.“ stimmt.
+
+Im Produkt wurden `backend/app/services/cost_projection_service.py` und
+`backend/tests/test_kostenprojektion_diskontierung.py` vollständig gelesen, dazu in
+`backend/app/services/climate/dwd_data.py` der Beginn von `_HOT_DAYS_PROJECTION_RCP45` (erstes Jahr 2025). Die
+Kostenprojektion rechnet in `project_costs()`, innere Funktion `_discounted()`, für jede Rate aus
+`PURE_TIME_PREFERENCE_RATES = (0.0, 0.01)` den Barwert mit dem Faktor 1/(1 + r)^(Jahr − 2025). Die Rate r ist die RZPR
+selbst; eine weitere Komponente gibt es nicht. Die Reihe zu 0 % ist deshalb gleich der unabgezinsten Summe
+(`test_rate_null_ist_die_undiskontierte_reihe`).
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | „Um gegenwärtige und zukünftige Kosten und Nutzen zu vergleichen, werden zukünftige Kosten und Nutzen unter Verwendung einer Diskontrate auf den heutigen Tag abgezinst.“ | 14 | `cost_projection_service.py`, `project_costs()` → `_discounted()`: kumulierte Kosten je Pfad und Szenario als Barwert, abgezinst auf das Basisjahr `years[0]` = 2025; Feld `discounted` und Eintrag in `assumptions` | trägt |
+| A2 | „Diese Diskontrate soll zwei Aspekte abbilden: (1) die individuelle oder gesellschaftliche Zeitpräferenz und (2) die relative Veränderung zwischen heutigen und künftigen Preisen verschiedener Güter und Dienstleistungen.“ | 14 | `cost_projection_service.py`, `PURE_TIME_PREFERENCE_RATES` (nur Aspekt 1) | trägt teilweise |
+| A3 | Bedeutung der RZPR: 0 % gewichtet den Nutzen künftiger und heutiger Generationen gleich, eine RZPR > 0 gewichtet heutige höher (Fn. 13: eine RZPR < 0 ist nicht bekannt). „Numerisch bedeutet eine RZPR von 1%, dass … nur 74% des Nutzens (Wohlfahrt) der in 30 Jahren auftritt und nur 55% des Nutzens der in 60 Jahren auftritt, berücksichtigt werden.“ | 14 | `_discounted()`, Faktor 1/(1 + r)^t: bei 1 % nach 30 Jahren 0,742, nach 60 Jahren 0,550 (nachgerechnet); keine Rate unter 0 % | trägt |
+| A4 | Die soziale Diskontrate nach Ramsey (1928) „kombiniert“ beide Elemente: „i) die Reine Zeitpräferenzrate (RZPR) und ii) das erwartete Konsumwachstum, gewichtet nach seinen Auswirkungen auf den Grenznutzen der Verbraucher“. Schon S. 10 hält fest, „dass sich die RZPR von der Diskontrate unterscheidet“. | 14, 15 | keiner. `_discounted()` setzt die Diskontrate gleich der RZPR; eine Wachstumskomponente fehlt, ohne Begründung. | trägt nicht |
+| A5 | „Die reine Zeitpräferenzrate wird jedoch über die Monte Carlo-Läufe hinweg konstant gehalten, und die Ergebnisse werden für eine RZPR von 0 % und 1 % dargestellt.“ (S. 10 dazu: Kostensatz mit einer der beiden Raten und „eine Sensitivitätsanalyse mit dem jeweils anderen Wert“.) | 15 | `PURE_TIME_PREFERENCE_RATES = (0.0, 0.01)`, über den ganzen Horizont konstant; `test_rate_null_ist_die_undiskontierte_reihe` (beide Schlüssel `0.0` und `0.01` je Pfad und Szenario), `test_rate_ein_prozent_senkt_den_endwert` | trägt |
+| A6 | Für die ökonomische Bewertung der meisten Umweltauswirkungen besteht Konsens, „dass die relative Verknappung von Ökosystemleistungen zu relativen Preissteigerungen führt und darum eine niedrigere Diskontrate anzuwenden ist“; bei weiterem Rückgang „eine noch niedrigere Diskontrate“. Dagegen erhöhen sinkende relative Preise von Konsumgütern die Diskontrate für diese Güter. | 15 | keiner. Das Produkt unterscheidet die Diskontrate nicht nach Gütern und begründet nicht, welche Richtung für die bewerteten Gesundheitsschäden gilt. | trägt nicht |
+| A7 | „Für politische Entscheidungen ist der Marktzinssatz jedoch kein geeignetes Konzept.“ | 15 | `PURE_TIME_PREFERENCE_RATES`: nur 0 % und 1 %, kein Marktzinssatz | trägt |
+| A8 | Die bei politischen Entscheidungen anzuwendende Diskontrate muss „auch die höhere gesellschaftliche Risikoaversion sowie langfristige staatliche Ziele wie Generationengerechtigkeit und langfristige gesellschaftliche Wohlfahrt berücksichtigen“. | 15 | `PURE_TIME_PREFERENCE_RATES`, Wert 0 % (gleiche Gewichtung der Generationen) | trägt teilweise |
+
+**Begründung je Urteil:**
+
+- A1: Abgezinst wird auf 2025, das erste Jahr der DWD-Projektion und das Basisjahr der Schadenskosten. Das ist der
+  „heutige Tag“ der Rechnung; der Ausweis nennt das Basisjahr ausdrücklich.
+- A2: Das ist der Kern der Frage. Die Konvention verlangt eine Diskontrate aus zwei Teilen. Das Produkt bildet nur die
+  Zeitpräferenz ab, die Veränderung der relativen Preise fehlt.
+- A3: Die Rechnung des Produkts gibt die Zahlen der Konvention genau wieder. Die Rate 3 %, die der Text zum Vergleich
+  nennt (41 % und 17 %), ist keine Empfehlung und wird nicht verlangt.
+- A4: Die Konvention nennt die RZPR einen Bestandteil der Diskontrate, nicht die Diskontrate selbst. Das Produkt
+  zinst aber mit der RZPR allein ab. Seine Werte sind daher Barwerte zu einer Diskontrate von 0 % und 1 %, nicht zu einer
+  RZPR von 0 % und 1 %, wie der Ausweis sagt. Nach Ramsey kommt zur RZPR das Konsumwachstum hinzu, gewichtet mit der
+  Elastizität des Grenznutzens. Bei wachsendem Konsum wäre die Diskontrate auch bei 0 % RZPR größer als null. Der
+  Barwert „0 % RZPR“ des Produkts ist dagegen die unabgezinste Summe. Eine Zahl für die Diskontrate gibt die Konvention
+  nicht vor: Im GIVE-Modell ist das Konsumwachstum eine abhängige Größe, deshalb ist es „nicht möglich, die genaue
+  Diskontrate anzugeben“ (S. 15). Das Produkt müsste also selbst entscheiden und begründen, wie es die zweite Komponente
+  ansetzt. Heute steht dazu nichts im Code und nichts in den Annahmen.
+- A5: Zwei Werte, 0 % und 1 %, konstant über den Horizont, beide ausgewiesen und im Test abgesichert. Die Werte
+  stimmen mit der Konvention überein. Was mit ihnen abgezinst wird, ist aber wegen A4 nicht die Diskontrate der Konvention.
+- A6: Die Richtung der zweiten Komponente hängt vom Gut ab. Konsumgüter werden relativ billiger, das hebt die
+  Diskontrate. Knapper werdende Umweltgüter werden relativ teurer, das senkt sie. Welche Richtung für die bewerteten
+  Gesundheitsschäden gilt, ist im Produkt nicht gesagt. Die Wahl „Diskontrate gleich RZPR“ wäre vertretbar, wenn beide
+  Effekte sich aufheben. Diese Annahme müsste dann als Abschätzung von KAP3 ausgewiesen und begründet sein (Vorgabe P1);
+  das fehlt.
+- A7: Das Produkt nutzt keinen Marktzinssatz; beide Raten liegen weit unter einem Kapitalmarktzins.
+- A8: Die Rate 0 % bildet Generationengerechtigkeit ab. Risikoaversion geht nirgends ein.
+
+Nicht als eigene Anforderung gewertet: die Begründung, warum private Zeitpräferenz bei öffentlichen Gütern Fragen
+aufwirft (S. 14), die Erklärung des Marktzinssatzes für private Entscheidungen und seine Annahmen i) und ii) (S. 15)
+sowie der Einkommens- und der Knappheitseffekt als Begründung (S. 15). Sie begründen A3, A6 und A7, stellen aber keine
+eigene Anforderung. Die Kostensätze 990 € und 345 € je t CO₂-Äq. (S. 10) betreffen Treibhausgase und sind nicht
+Gegenstand der Zeile 22.
+
+**Gelesene Seiten und Abschnitte:** Inventar mit `python3 /opt/overlord/overlord/skripte/dokumente.py inventar`
+(82 Seiten). Inhaltsverzeichnis S. 4–5 ganz. Kap. 1 „Einleitung“ S. 8–9 ganz. Kap. 2.1 S. 10–12 ganz, einschließlich
+Fußnote 2 (S. 10, Verweis auf Abschnitt 2.2) und Tabelle 1 (S. 11) im Text. Kap. 2.2.1 und 2.2.2 S. 12–14 ganz
+(S. 13: Diskontierung im GIVE-Modell). Kap. 2.2.3 S. 14–15 vollständig im Text gelesen, einschließlich Fußnote 13
+(S. 14). S. 16 mit Kap. 2.2.4 „Equity Weighting“ samt Kasten (Kapitelgrenze geprüft) und S. 17 mit dem Anfang von
+Kap. 3.1. Als Bild angesehen: keine Seite. Kap. 2.2.3 enthält keine Tabelle, keinen Kasten und keine Abbildung: Das
+Inventar führt dort keine Tabelle, eingebettete Bilder gibt es nur auf S. 1, und der Text der S. 14–15 ist durchgehend
+Fließtext mit Aufzählungen. Tabelle 1 (S. 11) liegt außerhalb von Kap. 2.2.3, enthält keine Anforderungen an die
+Diskontierung und wurde nicht als Bild angesehen. Nicht gelesen: der Rest des Handbuchs ab Kap. 3, der Anhang
+(S. 68–76) und das Literaturverzeichnis (ab S. 77). Ebenfalls nicht gelesen wurden die zitierten Quellen Ramsey (1928),
+Drupp et al. (2024) und Baumgärtner et al. (2015) sowie die Forschungsberichte zur Methodenkonvention (Osterwald et al.
+2024, Walther et al. 2024a, Anthoff 2025).
+
+**Schluss:** Zeile 22 bleibt nicht `erfüllt`. Von 8 Anforderungen trägt der Bestand vier voll (A1, A3, A5, A7), zwei
+teilweise (A2, A8) und zwei nicht (A4, A6). Zur Frage nach weiteren Bestandteilen: Ja, die Konvention verlangt eine
+Diskontrate aus RZPR und einer Komponente für die Veränderung der relativen Preise (Ramsey: Konsumwachstum, gewichtet
+mit dem Grenznutzen). Sie trennt RZPR und Diskontrate ausdrücklich. Das Produkt zinst mit der RZPR allein ab. Die Werte
+0 % und 1 % entsprechen der Konvention, der als „Barwert mit 1 % RZPR“ ausgewiesene Betrag aber nicht: Er ist ein
+Barwert zu 1 % Diskontrate. Der Status der Zeile 22 ist in derselben Änderung auf `teilweise` gesetzt; die Spalte
+„Lücke“ nennt, was fehlt. Die Zählungen in den Abschnitten „Nachtrag: Zeilen 21–25“, „Nachtrag: Abschlusszählung“ und
+„Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist Sache der Gesamtzählung (T-0821-ceo, T-0487),
+nicht dieser Gegenprobe.
 
 ## Ergebnis
 
