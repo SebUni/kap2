@@ -58,8 +58,9 @@ _PAKT_OEGD = (
 EBENEN_WERTE = ("gemeinde", "kreis", "land")
 
 _GESUNDHEITSAMT = (
-    "Gesundheitsamt (untere Gesundheitsbehörde): bei kreisangehörigen Gemeinden beim Landkreis, also außerhalb der "
-    "eigenen Verwaltung; bei kreisfreien Städten bei der Stadt selbst"
+    "Gesundheitsamt (untere Gesundheitsbehörde): außerhalb der Stadtstaaten in der Regel beim Landkreis, bei "
+    "kreisangehörigen Gemeinden also außerhalb der eigenen Verwaltung, bei kreisfreien Städten in der Regel bei der "
+    "Stadt selbst; in den Stadtstaaten gilt eigenes Landesrecht. Die Zuständigkeit vor Ort bestätigen."
 )
 
 _BELEG_GESUNDHEITSAMT = [

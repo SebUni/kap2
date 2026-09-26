@@ -126,6 +126,22 @@ def test_starkregen_zeigt_anzahl_juengstes_datum_und_catrare_modellgrenze():
     assert abschnitt.index("Jüngstes Ereignis") < abschnitt.index(MODELLGRENZE)
 
 
+def test_abschnitt_vorhandene_untersuchungen_mit_und_ohne_bundesland():
+    from app.data import vorhandene_untersuchungen as v
+    from app.services.bestandsaufnahme_markdown import LAND_FEHLT_SATZ, bestandsaufnahme_markdown as m
+    from app.services.bestandsaufnahme_service import bestandsaufnahme_aus_daten as d
+
+    land = sorted(v.LANDESPORTALE)[0]
+    mit = m({"kommune_id": 1, "name": "X", "bundesland": land, "groessen": d([], {})})
+    ohne = m({"kommune_id": 1, "name": "X", "groessen": d([], {})})
+    assert mit.count("## Vorhandene Untersuchungen") == 1
+    assert all(u["bezeichnung"] in mit for u in v.UNTERSUCHUNGEN)
+    assert v.LANDESPORTALE[land]["hochwasser"] in mit and v.LANDESPORTALE[land]["kra_land"] in mit
+    assert v.NACHBAR_SATZ in mit and LAND_FEHLT_SATZ not in mit
+    assert ohne.count("## Vorhandene Untersuchungen") == 1
+    assert LAND_FEHLT_SATZ in ohne and v.NACHBAR_SATZ in ohne
+
+
 if __name__ == "__main__":
     import pytest
     sys.exit(pytest.main([__file__, "-q"]))

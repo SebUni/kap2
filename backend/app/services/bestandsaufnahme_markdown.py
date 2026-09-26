@@ -10,8 +10,10 @@ Größe ohne Wert steht mit ihrem ``luecke_satz`` unter „Datenlücken“.
 from __future__ import annotations
 
 from app.data import sources
+from app.data.vorhandene_untersuchungen import LANDESPORTALE, NACHBAR_SATZ, UNTERSUCHUNGEN
 from app.data.bevoelkerungsentwicklung import MODELLGRENZE
 from app.data.catrare import MODELLGRENZE as MODELLGRENZE_CATRARE
+from app.services.bestandsaufnahme_handlungsfelder import handlungsfelder_im_katalog
 from app.services.kang_nachweis_markdown import _de_betrag
 
 TITEL = "# Bestandsaufnahme"
@@ -34,7 +36,27 @@ GRUPPEN = [
 # Modellgrenzen je Gruppe, wörtlich unter der Tabelle der Gruppe.
 GRUPPEN_MODELLGRENZEN = {"vergangene_ereignisse": MODELLGRENZE_CATRARE, "trends": MODELLGRENZE}
 
-UEBERSCHRIFT_LUECKEN = "## Datenlücken"
+UEBERSCHRIFT_HANDLUNGSFELDER = "## Handlungsfelder"
+
+HANDLUNGSFELDER_SATZ = (
+    "Für die Felder im Katalog rechnet das Produkt Schäden, der KAnG-Nachweis zeigt den "
+    "Stand; ob ein Feld „nicht im Katalog“ die Kommune betrifft, schätzt sie selbst ein."
+)
+
+UEBERSCHRIFT_LUECKEN ="## Datenlücken"
+
+UEBERSCHRIFT_UNTERSUCHUNGEN = "## Vorhandene Untersuchungen"
+
+UNTERSUCHUNGEN_EINLEITUNG = (
+    "Bevor die Kommune neue Daten erhebt, sichtet sie vorhandene Untersuchungen. "
+    "Die folgende Liste nennt sie und ihre Fundorte."
+)
+
+LAND_FEHLT_SATZ = (
+    "Für diese Kommune ist kein Bundesland bekannt oder das Bundesland ist dem Produkt "
+    "nicht bekannt; die Fundorte des Landes (Hochwassergefahrenkarten, Klimarisikoanalyse "
+    "des Landes) fehlen in dieser Bestandsaufnahme und sind beim Landesportal zu erfragen."
+)
 
 
 def _de_wert(wert: float | int) -> str:
@@ -90,6 +112,26 @@ def _zusatz_starkregen(g: dict) -> str:
     return f"Jüngstes Ereignis: {_datum_de(g['zusatz']['juengstes_beginn'])}"
 
 
+def _untersuchungen(bundesland: str | None) -> list[str]:
+    """Abschnitt „Vorhandene Untersuchungen“; nie leer, auch ohne (bekanntes) Bundesland."""
+    teile = [UEBERSCHRIFT_UNTERSUCHUNGEN, "", UNTERSUCHUNGEN_EINLEITUNG, ""]
+    teile += [f"- {u['bezeichnung']}: {u['wo_erhaeltlich']}" for u in UNTERSUCHUNGEN]
+    teile.append("")
+    portale = LANDESPORTALE.get(bundesland) if bundesland else None
+    if portale:
+        teile += [
+            f"Fundorte des Landes {bundesland}:",
+            "",
+            f"- Hochwassergefahren- und Hochwasserrisikokarten: {portale['hochwasser']}",
+            f"- Klimarisikoanalyse des Landes: {portale['kra_land']}",
+            "",
+        ]
+    else:
+        teile += [LAND_FEHLT_SATZ, ""]
+    teile += [NACHBAR_SATZ, ""]
+    return teile
+
+
 def bestandsaufnahme_markdown(ergebnis: dict) -> str:
     """Formatiert das Ergebnis von ``bestandsaufnahme_fuer_kommune`` als Markdown."""
     groessen = ergebnis["groessen"]
@@ -112,6 +154,12 @@ def bestandsaufnahme_markdown(ergebnis: dict) -> str:
                 teile += [zeile, ""]
         if gruppe in GRUPPEN_MODELLGRENZEN:
             teile += [GRUPPEN_MODELLGRENZEN[gruppe], ""]
+
+    teile += _untersuchungen(ergebnis.get("bundesland"))
+
+    teile += [UEBERSCHRIFT_HANDLUNGSFELDER, "", HANDLUNGSFELDER_SATZ, ""]
+    teile += [f"- {f['label']}: {f['status']}" for f in handlungsfelder_im_katalog()]
+    teile.append("")
 
     saetze: list[str] = []
     for g in groessen:
