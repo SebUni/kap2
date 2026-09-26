@@ -62,6 +62,7 @@ BESTANDSAUFNAHME_GROESSEN: list[dict] = [
     _g("pflegeeinrichtungen", _KS, "Pflegeeinrichtungen", "Anzahl", ["OSM_Data"]),
     _g("kitas_schulen", _KS, "Kindertagesstätten und Schulen", ""),
     _g("lieferketten", _KS, "Lieferketten", "", hinweis=HINWEIS_NICHT_IM_KATALOG),
+    _g("starkregenereignisse", _VE, "Vergangene Starkregenereignisse seit 2001 (CatRaRE)", "Anzahl", ["DWD_CatRaRE"]),
     _g("schadensereignisse", _VE, "Vergangene Schadensereignisse durch Wetterextreme", ""),
     _g("bevoelkerungsentwicklung", _TR, "Bevölkerungsentwicklung", "%", ["Destatis_GVISys_Bevoelkerung"]),
 ]
