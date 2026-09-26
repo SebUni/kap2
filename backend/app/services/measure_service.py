@@ -160,12 +160,20 @@ def _s157_input(config: dict | None) -> float | None:
         return None
 
 
-def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict) -> float:
+def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict,
+                      delta_hap: float = 1.0) -> float:
     """Faktor (0..1) auf das Mortalitäts-Outcome (YLL) einer Zelle durch S157.
 
     ``frac`` ist der Deckungsgrad der Zelle durch die Maßnahmen-Geometrie; der
     gekühlte Anteil wirkt nur im abgedeckten Teil (bei ganzer Kommune = 1).
     Zellen ohne Teil-Ausweis D_85+ (vor der Neuberechnung) bleiben unverändert.
+
+    ``delta_hap`` (Befund 129): Faktor des Hitzeaktionsplans in dieser Zelle, wenn
+    die Kommune ihn zugleich gewählt hat. Nur für den **Einzelnutzen** von S157
+    setzen — im Aggregat „mit Maßnahmen“ bleibt er 1, weil dort der Faktor des
+    Hitzeaktionsplans ohnehin mit diesem Faktor multipliziert wird
+    (YLL · δ_HAP · (1 − ΔYLL/YLL) = YLL · δ_HAP − δ_HAP · ΔYLL); zweimal gesetzt,
+    dämpfte er S157 doppelt.
     """
     from app.services.engine.impact import health
 
@@ -183,19 +191,55 @@ def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict) -> floa
     delta_d = health.s157_avoided_deaths(
         float(d85), s_gek * max(0.0, min(1.0, frac)),
         g_s157=_p("g_s157", health.G_S157), qbar_pfl=_p("qbar_pfl", 0.149),
-        beta_pfl=_p("beta_pfl", 1.54)) or 0.0
+        beta_pfl=_p("beta_pfl", 1.54), delta_hap=delta_hap) or 0.0
     delta_yll = delta_d * _p("life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
     return max(0.0, min(1.0, 1.0 - delta_yll / yll))
 
 
 def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float,
-                         unit_factor: float, cell_risk: dict) -> float:
-    """Faktor einer Maßnahme auf ein verknüpftes Risiko in einer Zelle."""
+                         unit_factor: float, cell_risk: dict,
+                         delta_hap: float = 1.0) -> float:
+    """Faktor einer Maßnahme auf ein verknüpftes Risiko in einer Zelle.
+
+    ``delta_hap`` wirkt nur auf S157 (siehe ``_s157_cell_factor``), sonst ohne Belang.
+    """
     if _is_s157(mdef):
         if code != S157_RISK_CODE:
             return 1.0
-        return _s157_cell_factor(_s157_input(config), frac, cell_risk)
+        return _s157_cell_factor(_s157_input(config), frac, cell_risk, delta_hap)
     return _reduction_factor(mdef, frac, unit_factor)
+
+
+# Befund 129: Hitzeaktionsplan und S157 zusammen — Faktoren multiplizieren.
+S157_HAP_CODE = "HEAT_ACTION_PLANS"
+
+
+def _hap_measures(db: Session, measure: AdaptationMeasure) -> list[AdaptationMeasure]:
+    """Hitzeaktionspläne derselben Kommune (und derselben Demo-Sitzung) wie ``measure``."""
+    return [m for m in kommune_measures_query(db, measure.kommune_id, measure.demo_session_id)
+            .filter(AdaptationMeasure.measure_type == S157_HAP_CODE).all()
+            if m.id != measure.id]
+
+
+def _hap_cell_factors(db: Session, measure: AdaptationMeasure,
+                      overrides: dict) -> dict[int, float]:
+    """δ_HAP je Zelle aus den gewählten Hitzeaktionsplänen der Kommune.
+
+    Derselbe Faktor wie im Aggregat „mit Maßnahmen“ (``_reduction_factor`` mit
+    Deckungsgrad und Stückfaktor); mehrere Pläne wirken wie dort multiplikativ.
+    """
+    mbase = catalog.MEASURES_BY_CODE.get(S157_HAP_CODE)
+    if not mbase or S157_RISK_CODE not in (mbase.get("linked_risk_codes") or []):
+        return {}
+    mdef = parameter_registry.resolve_measure_def(mbase, overrides)
+    out: dict[int, float] = {}
+    for m in _hap_measures(db, measure):
+        frac_map, covered_area_m2 = _coverage(db, m)
+        count, _, recommended = _resolve_count(mdef, m.config, covered_area_m2)
+        unit_factor = _unit_effect_factor(count, recommended)
+        for cid, frac in frac_map.items():
+            out[cid] = out.get(cid, 1.0) * _reduction_factor(mdef, frac, unit_factor)
+    return out
 
 
 def _s157_summary_fields(mdef: dict, config: dict | None) -> dict:
@@ -429,6 +473,12 @@ def _params_fingerprint(db: Session, measure: AdaptationMeasure, mdef: dict,
             if c in catalog.RISKS_BY_CODE
         },
     }
+    if _is_s157(mdef):
+        # Befund 129: der Nutzen von S157 hängt an den Hitzeaktionsplänen der Kommune;
+        # kommt einer hinzu, ändert sich oder fällt weg, ist das Summary veraltet.
+        payload["hap"] = sorted(
+            (m.id, json.dumps(m.config or {}, sort_keys=True, default=str), str(m.geometry))
+            for m in _hap_measures(db, measure))
     return hashlib.sha1(
         json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
 
@@ -547,6 +597,14 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     # mitreduziert; damit der Einzelmaßnahmen-Nutzen dazu passt, wird er hier ergänzt (§8/B3).
     k_indirect = float(override_context.get_override("impact.k_indirect", _K_INDIRECT_DEFAULT))
 
+    # Befund 129: Hat die Kommune zugleich einen Hitzeaktionsplan, rechnet S157 seinen
+    # Nutzen aus dem schon mit δ_HAP gedämpften Heim-Exzess (Faktoren multipliziert).
+    # So ergibt die Summe der Einzelnutzen genau das Aggregat „mit Maßnahmen“.
+    hap_by_cell: dict[int, float] = {}
+    if _is_s157(mdef):
+        hap_by_cell = _hap_cell_factors(db, measure, parameter_registry.overrides_map(
+            parameter_registry.load_db_overrides(db, measure.kommune_id)))
+
     for cid, frac in coverage.items():
         ca = assessments.get(cid)
         if not ca:
@@ -557,7 +615,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         deltas = {}
         for code in linked:
             r = cell_risks.get(code, {})
-            factor = _measure_cell_factor(mdef, measure.config, code, frac, unit_factor, r)
+            factor = _measure_cell_factor(mdef, measure.config, code, frac, unit_factor, r,
+                                          hap_by_cell.get(cid, 1.0))
             base_idx = float(r.get("index", 0.0))
             new_idx = base_idx * factor
             deltas[code] = round(new_idx - base_idx, 3)
@@ -673,6 +732,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # S157 ohne Eingabe s_gek: Vermerk statt Betrag (Bericht #95 §5 trägt keine
         # Voreinstellung; Divergenz an den CMO, T-1367).
         **_s157_summary_fields(mdef, measure.config),
+        # Befund 129: S157 zusammen mit dem Hitzeaktionsplan gerechnet (Faktoren multipliziert)
+        **({"s157_with_hap": bool(hap_by_cell)} if _is_s157(mdef) else {}),
         "params_fingerprint": fingerprint,
         "count": count,
         "count_is_default": count_is_default,
