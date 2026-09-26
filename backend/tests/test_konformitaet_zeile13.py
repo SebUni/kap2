@@ -6,9 +6,9 @@ Prüft wörtlich gegen docs/KONFORMITAET_CHECKLISTE.md:
 - es gibt genau eine Zeile, die mit '| 13 |' beginnt,
 - diese Zeile hat sieben Spalten,
 - fünfte Spalte (Status) ist genau 'teilweise',
-- sechste Spalte (Fundstelle/Beleg) ist genau die vier erwarteten Pfade,
+- sechste Spalte (Fundstelle/Beleg) ist genau die sechs erwarteten Pfade,
 - siebte Spalte (Lücke) ist weder leer noch '—',
-- jeder der vier genannten Pfade existiert als Datei im Repo.
+- jeder der sechs genannten Pfade existiert als Datei im Repo.
 """
 
 from pathlib import Path
@@ -20,7 +20,9 @@ ERWARTETE_BELEGE = (
     "backend/app/data/kang_handlungsfelder.py, "
     "backend/app/services/kang_beruecksichtigung.py, "
     "backend/app/services/kang_nachweis_markdown.py, "
-    "docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md"
+    "docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md, "
+    "frontend/src/components/dashboard/KangNachweisSection.tsx, "
+    "backend/app/api/routes/kommune.py"
 )
 
 
@@ -68,7 +70,7 @@ def test_zeile_13_luecke_ist_benannt():
 
 def test_zeile_13_belegte_pfade_existieren():
     pfade = [pfad.strip() for pfad in ERWARTETE_BELEGE.split(",")]
-    assert len(pfade) == 4
+    assert len(pfade) == 6
     for pfad in pfade:
         datei = REPO_ROOT / pfad
         assert datei.is_file(), f"Beleg-Datei fehlt: {pfad}"
