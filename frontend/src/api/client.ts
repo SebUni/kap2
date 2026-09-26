@@ -210,6 +210,72 @@ export interface SystembereicheAuswertung {
   bereiche: Systembereich[]
 }
 
+/** Ein Bereich des Bundesvergleichs (KWRA 2021, Teilbericht 6, Kap. 7); es wird nichts gerechnet. */
+export interface BundesanalyseBereich {
+  systembereich: string
+  risiko: {
+    anzahl_klimawirkungen: number
+    risiko_ohne_anpassung: { vergleich: string; seiten: number[] }
+    handlungserfordernisse: { sehr_dringend: number; dringend: number; seiten: number[] }
+  }
+  anpassung: {
+    wirksamkeit: { valide_aussage: boolean; vergleich?: string | null; seiten: number[] }
+    anpassungsdauer: { valide_aussage: boolean; vergleich?: string | null; seiten: number[] }
+  }
+}
+
+export interface SystembereicheBundesanalyse {
+  quelle: string
+  bereiche: BundesanalyseBereich[]
+  methodische_grenze: { titel: string; aussage: string }
+}
+
+/** Ein KAnG-Handlungsfeld in der Antwort von GET /kommune/{id}/kang-nachweis. */
+export interface KangNachweisHandlungsfeld {
+  cluster: string
+  feld: string
+  status: 'berücksichtigt' | 'offen' | 'nicht betroffen'
+  risiken: string[]
+  /** Jährliche Schadenssumme des Feldes in Euro. */
+  schaden_eur: number
+  massnahmen: string[]
+}
+
+/** Antwort von GET /kommune/{id}/kang-nachweis (§ 8 Abs. 1 KAnG, fachübergreifende Berücksichtigung). */
+export interface KangNachweis {
+  handlungsfelder: KangNachweisHandlungsfeld[]
+  zusammenfassung: {
+    betroffen_n: number
+    beruecksichtigt_n: number
+    offen_n: number
+    offene_handlungsfelder: { cluster: string; feld: string }[]
+    integrierende_massnahmen: string[]
+  }
+  /** Abgrenzungstext: keine Rechtskonformität bescheinigt; wörtlich anzuzeigen. */
+  abgrenzung: string
+  nicht_zugeordnet: {
+    risiken: { code: string; schaden_eur: number | null }[]
+    massnahmen: string[]
+  }
+}
+
+/** Ein Handlungsfeld in der Antwort von GET /kommune/{id}/unsicherheits-zusammenschau. */
+export interface UnsicherheitsZusammenschauFeld {
+  handlungsfeld: string
+  niedrigste_gewissheit: string
+  parameter_nicht_belegt: number
+  klimawirkungen_niedrigste_stufe: string[]
+}
+
+/** Antwort von GET /kommune/{id}/unsicherheits-zusammenschau (ISO 14091, UBA 2.2.6). */
+export interface UnsicherheitsZusammenschau {
+  kommune_id: number
+  handlungsfelder: UnsicherheitsZusammenschauFeld[]
+  handlungsfelder_vorsicht: string[]
+  /** Interpretationshinweis; null, wenn kein Feld gering oder sehr gering ist. */
+  hinweis: string | null
+}
+
 /** Antwort von GET /kommune/{id}/kang-zustaendigkeit (§ 12 Abs. 1 KAnG, Landesrecht). */
 export interface KangZustaendigkeit {
   bundesland: string
@@ -550,6 +616,12 @@ export const api = {
     request<Record<string, unknown>>(`/measures/${measureId}/calculate-impact`, { method: 'POST' }),
   getSystembereiche: (kommuneId: number) =>
     request<SystembereicheAuswertung>(`/kommune/${kommuneId}/systembereiche`),
+  getSystembereicheBundesanalyse: () =>
+    request<SystembereicheBundesanalyse>('/catalog/systembereiche/bundesanalyse'),
+  getKangNachweis: (kommuneId: number) =>
+    request<KangNachweis>(`/kommune/${kommuneId}/kang-nachweis`),
+  getUnsicherheitsZusammenschau: (kommuneId: number) =>
+    request<UnsicherheitsZusammenschau>(`/kommune/${kommuneId}/unsicherheits-zusammenschau`),
   getCostSummary: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/cost-summary`),
 
