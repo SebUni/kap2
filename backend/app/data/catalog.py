@@ -183,6 +183,8 @@ RISKS: list[dict] = [
      # 6,5/12,9/25,2/55,5 % × L̄_a 23,39/15,59/8,90/4,16 — Rev. 8) ≈ 145 YLL/100k.
      # cost_per_outcome_eur: VOLY 160.800 €₂₀₂₄ (UBA MK 4.0; Herleitung s. _RISK_COST_RATES).
      "ref_value": 145.0, "scale": "pop", "cost_per_outcome_eur": 160800.0,
+     # Kostensatz = Block heat.voly in Kapitel 7 des Berichts #95.
+     "cost_methodik_block": "heat.voly",
      "source": "Bericht #95 Rev. 7 (Winklmayr 2022 / RKI EB 19/2025 / UBA MK 4.0)",
      "source_detail": "Sanity-Anker in YLL je 100.000 EW: 18 Todesfälle/100k (≈ 1,7× "
                       "schlimmstes beobachtetes Jahr; 2018 revidiert: 8.500 ≈ 10,2/100k) "
@@ -212,6 +214,8 @@ RISKS: list[dict] = [
      # e_HD-Obergrenze ≈ 4,5/100k — Anker auf das Hitzejahr gesetzt.
      # cost_per_outcome_eur: c_Fall 7.152 €₂₀₂₄ (Destatis-Kostennachweis, Proxy).
      "ref_value": 4.5, "scale": "pop", "cost_per_outcome_eur": 7152.0,
+     # Kostensatz = Block heat.c_fall in Kapitel 7 des Berichts #95.
+     "cost_methodik_block": "heat.c_fall",
      "source": "Bericht #95 Rev. 7 (Destatis T67 / Karlsson & Ziebarth 2018)",
      "source_detail": "Sanity-Anker in Fällen je 100.000 EW: Baseline 3,54/100k·a "
                       "(bevölkerungsgewichtete Summe der r_0,a, Bericht #95 §3.4); "
@@ -1368,6 +1372,9 @@ MEASURES: list[dict] = [
      "source_refs": {"default_reduction": ["Feldbusch_2025_HHWS",
                                            "Urban_HHAP_Wirksamkeit_2025"]},
      "evidence_classes": {"default_reduction": "belegt"},
+     # Block heat.delta_hap (Bericht #95 Kapitel 7): Faktor 0,95 auf den Exzess,
+     # hier als Minderung 1 − 0,95 = 0,05 geführt.
+     "methodik_bloecke": {"default_reduction": "heat.delta_hap"},
      # Herleitungen der Abschätzungen nach P1/§3.9 (Zahlenwert, Bandbreite,
      # Sensitivität) als Datenfeld — ein Code-Kommentar allein genügt nicht.
      "evidence_derivations": {
