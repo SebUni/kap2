@@ -42,3 +42,7 @@ Die Größe `starkregenereignisse` zählt die Ereignisse des DWD-Katalogs CatRaR
 Elf Größen haben keine Datenquelle je Kommune. Für sie zeigt das Produkt den Lückensatz aus der Tabelle, statt einen Wert zu schätzen. Ist eine sonst vorhandene Quelle für eine Kommune nicht abrufbar, weist das Produkt den Wert in der Bestandsaufnahme als fehlend aus.
 
 Workshops und lokale Erhebungen bleiben Arbeitsschritt des Beratungsbüros. Sozioökonomische und geographische Rahmenbedingungen sowie Klimatrends liefert das Kommunenprofil (Route /{kommune_id}/profile); sie sind nicht Teil der Bestandsaufnahme.
+
+## Vorhandene Untersuchungen
+
+Die Markdown-Fassung der Bestandsaufnahme enthält nach den fünf Gruppen den Abschnitt „Vorhandene Untersuchungen“. Er nennt je Eintrag aus `app.data.vorhandene_untersuchungen.UNTERSUCHUNGEN` die Bezeichnung und wo die Untersuchung erhältlich ist. Für das Bundesland der Kommune stehen zusätzlich die beiden Fundorte aus `LANDESPORTALE` (Hochwassergefahren- und Hochwasserrisikokarten, Klimarisikoanalyse des Landes); darunter steht der Nachbarsatz wörtlich. Ist kein Bundesland bekannt oder ist es dem Produkt unbekannt, bleibt der Abschnitt bestehen und sagt in einem Satz, dass die Fundorte des Landes fehlen. Dafür gibt `bestandsaufnahme_fuer_kommune` zusätzlich den Schlüssel `bundesland` aus. Die Größenliste bleibt bei 22 Größen.

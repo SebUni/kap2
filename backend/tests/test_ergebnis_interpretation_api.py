@@ -29,6 +29,7 @@ ERWARTET = {
     ("GET", "/interpretation/massnahmen-umsetzung"),
     ("GET", "/interpretation/diversitaet"),
     ("GET", "/interpretation/leitfragen"),
+    ("GET", "/kommune/{kommune_id}/interpretation/bericht"),
 }
 
 
@@ -83,6 +84,7 @@ def test_main_bindet_router_geschuetzt_ein():
     ),
     lambda db: route.delete_nachweis(99, 1, db),
     lambda db: route.get_abhaengigkeiten(99, db),
+    lambda db: route.get_interpretationsbericht(99, db),
 ])
 def test_unbekannte_kommune_404(aufruf):
     with pytest.raises(HTTPException) as fehler:

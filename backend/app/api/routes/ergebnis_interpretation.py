@@ -10,6 +10,8 @@ unverändert weiter; hier wird nichts gerechnet oder umgeformt:
 - ``/interpretation/massnahmen-umsetzung`` → ``data.massnahmen_umsetzung``
 - ``/interpretation/diversitaet`` → ``data.diversitaet_aspekte``
 - ``/interpretation/leitfragen`` → ``data.kra_leitfragen``
+- ``/kommune/{id}/interpretation/bericht`` → ``ergebnis_interpretation_markdown``
+  (Markdown mit sieben festen Abschnitten, T-1141)
 
 Eine unbekannte Kommune ergibt HTTP 404, ein ``ValueError`` des Nachweisdienstes
 HTTP 400. Den Zugriff schützt die Router-Einbindung in ``main.py`` (``_PROTECTED``).
@@ -17,7 +19,7 @@ HTTP 400. Den Zugriff schützt die Router-Einbindung in ``main.py`` (``_PROTECTE
 
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
@@ -27,6 +29,7 @@ from app.data.massnahmen_umsetzung import MASSNAHMEN_UMSETZUNG
 from app.db.database import get_db
 from app.models.models import Kommune
 from app.services import ergebnis_nachweise
+from app.services.ergebnis_interpretation_markdown import interpretationsbericht_fuer_kommune
 from app.services.handlungsfeld_abhaengigkeiten import abhaengigkeiten_der_kommune
 from app.services.massnahmen_gewissheit import massnahmen_gewissheit
 from app.services.nachbarkommunen_screening import nachbar_screening_fuer_kommune
@@ -113,3 +116,10 @@ def get_diversitaet():
 @router.get("/interpretation/leitfragen")
 def get_leitfragen():
     return LEITFRAGEN
+
+
+@router.get("/kommune/{kommune_id}/interpretation/bericht")
+def get_interpretationsbericht(kommune_id: int, db: Session = Depends(get_db)):
+    kommune = _kommune_oder_404(db, kommune_id)
+    inhalt = interpretationsbericht_fuer_kommune(db, kommune)
+    return Response(content=inhalt, media_type="text/markdown; charset=utf-8")
