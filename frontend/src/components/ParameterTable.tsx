@@ -74,10 +74,7 @@ function EvidenceCell({ p }: { p: ModelParameter }) {
         )}
       </span>
       {hatHerleitung && open && (
-        <span
-          className="kap-param-evidence-derivation"
-          style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'normal', lineHeight: 1.4 }}
-        >
+        <span className="kap-param-evidence-derivation">
           {d && (
             <>
               <span style={{ display: 'block' }}><strong>Wert:</strong> {d.wert}</span>
