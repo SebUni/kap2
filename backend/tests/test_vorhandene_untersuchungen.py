@@ -32,7 +32,8 @@ def test_ueberregionale_mit_url():
         if u["ebene"] == "bund":
             assert re.search(r"https://\S+", u["wo_erhaeltlich"]), u["code"]
         if u["ebene"] == "land":
-            assert "LANDESPORTALE" in u["wo_erhaeltlich"], u["code"]
+            assert "LANDESPORTALE" not in u["wo_erhaeltlich"], u["code"]
+            assert "[" not in u["wo_erhaeltlich"], u["code"]
 
 
 def test_landesportale_schluessel_gleich_bundeslaender():
