@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import { api } from '../../api/client'
 import { useStore } from '../../store'
 import NachweiseEinbeziehung from './NachweiseEinbeziehung'
+import NachbarkommunenScreening from './NachbarkommunenScreening'
 
 export interface StrukturierterAbschnittProps {
   kommuneId: number
@@ -18,6 +19,7 @@ export interface StrukturierterAbschnittProps {
  */
 export const STRUKTURIERTE_ABSCHNITTE: Record<string, ComponentType<StrukturierterAbschnittProps>> = {
   Einbeziehung: NachweiseEinbeziehung,
+  Nachbarkommunen: NachbarkommunenScreening,
 }
 
 interface Abschnitt {
