@@ -210,6 +210,26 @@ export interface SystembereicheAuswertung {
   bereiche: Systembereich[]
 }
 
+/** Ein Bereich des Bundesvergleichs (KWRA 2021, Teilbericht 6, Kap. 7); es wird nichts gerechnet. */
+export interface BundesanalyseBereich {
+  systembereich: string
+  risiko: {
+    anzahl_klimawirkungen: number
+    risiko_ohne_anpassung: { vergleich: string; seiten: number[] }
+    handlungserfordernisse: { sehr_dringend: number; dringend: number; seiten: number[] }
+  }
+  anpassung: {
+    wirksamkeit: { valide_aussage: boolean; vergleich?: string | null; seiten: number[] }
+    anpassungsdauer: { valide_aussage: boolean; vergleich?: string | null; seiten: number[] }
+  }
+}
+
+export interface SystembereicheBundesanalyse {
+  quelle: string
+  bereiche: BundesanalyseBereich[]
+  methodische_grenze: { titel: string; aussage: string }
+}
+
 /** Ein KAnG-Handlungsfeld in der Antwort von GET /kommune/{id}/kang-nachweis. */
 export interface KangNachweisHandlungsfeld {
   cluster: string
@@ -579,6 +599,8 @@ export const api = {
     request<Record<string, unknown>>(`/measures/${measureId}/calculate-impact`, { method: 'POST' }),
   getSystembereiche: (kommuneId: number) =>
     request<SystembereicheAuswertung>(`/kommune/${kommuneId}/systembereiche`),
+  getSystembereicheBundesanalyse: () =>
+    request<SystembereicheBundesanalyse>('/catalog/systembereiche/bundesanalyse'),
   getKangNachweis: (kommuneId: number) =>
     request<KangNachweis>(`/kommune/${kommuneId}/kang-nachweis`),
   getCostSummary: (kommuneId: number) =>
