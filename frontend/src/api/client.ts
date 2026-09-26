@@ -246,6 +246,7 @@ export interface SystembereicheBundesanalyse {
   quelle: string
   bereiche: BundesanalyseBereich[]
   methodische_grenze: { titel: string; aussage: string }
+  schluesse: { schluss: string; titel: string; aussage: string; seiten: number[] }[]
 }
 
 /** Ein KAnG-Handlungsfeld in der Antwort von GET /kommune/{id}/kang-nachweis. */
