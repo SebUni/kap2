@@ -1,8 +1,12 @@
 # Methodik-Bericht #96 — Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft
 
-Status: **Rev. 3 (08.09.2026, Revision nach Vorgabe P2 des Aufsichtsrats — F-0007 Punkt 1:
-Wirkungsabschätzung des S158-Hebels statt „qualitativ"/Wirkung null, §5.1 + Modellgrenze 8 +
-Entscheidungslog 20; Review der Rev. 3 steht aus, Ledger-Befund 151)** · Rev. 2 abgenommen ·
+Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048: Schritt 1 Rechenkette §3.0
+(T-1238, Ledger-Befunde 152–155), Schritt 2 S158 nach Tagen und Belastung und Stadtbaumwahl (T-1239,
+Log 23/24, Befunde 156–167), Schritt 3 Pflichtinhalte — Kap. 1 „Risiko ohne (weitere) Anpassung“,
+Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–178);
+Gegenprüfung durch den methodik_manager bis zur Null-Runde läuft)** · Rev. 3 (08.09.2026, Wirkungsabschätzung
+des S158-Hebels nach Vorgabe P2 des Aufsichtsrats — F-0007 Punkt 1; §5.1, Modellgrenze 8, Log 20,
+Ledger-Befund 151; in Rev. 4 fortgeschrieben) · Rev. 2 abgenommen ·
 Rev. 2: **(P̂-Zentrierung auf die eigene Kommune statt auf ein Bundesmittel —
 Aufgabe §3.2 „geschlossene Betrachtungsebene", Nutzer-Entscheid 31.08.2026;
 Log 18/19) — ABNAHMEREIF & INTEGRIERT (Null-Runde: Review Runde 10; Befunde
@@ -19,7 +23,19 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > 100-m-Vollraster-Lauf als Prüf-/Abgleichinstrument; die P̂-Zentrierung nutzt
 > seit Rev. 2 ausschließlich das Mittel der **eigenen Kommune** (§3.3, Log 18/19); die Ebenen POLLEN_LOAD (OSM-Vegetation, §3.3), POPULATION_U20 (§3.2) und CANOPY_BIRCH_FRACTION **sind mit der Integration am 31.08.2026 angelegt** (§3.1-Anlagepflicht erfüllt); alle übrigen Zellgrößen sind vorhanden oder regional/national — keine Zellgröße läuft auf einem unspezifizierten Neutral-Fallback.
 
-> **Revisionsstand.** **Rev. 3 (08.09.2026)** = Wirkungsabschätzung des S158-Hebels
+> **Revisionsstand.** **Rev. 4 (26.09.2026)** = Fortschreibung 7 der Aufgabe für M0 (A-0048, P3) in
+> drei Schritten, jeweils ohne Änderung eines Schadenswerts. **Schritt 1 (T-1238):** Rechenkette §3.0
+> an der Beispielkommune Berlin mit Zelllauf des Produkts; Kapitel 9 gestrichen (Log 21/22, Befunde
+> 152–155). **Schritt 2 (T-1239):** S158 wirkt nur an gewarnten Tagen (DWD-Index mindestens „mittel“
+> [70]), neuer Block `pollen.t_warn_s158` = 0,75, wirksamer Wert 0,03 × 0,75 = 2,25 % der Zusatztage im
+> Geltungsbereich; allergenarme Stadtbaumwahl als Abschätzung je Zelle; betroffen §2, §3.6, §5, §5.1,
+> §6 Modellgrenze 8, §7 (Log 23/24, Befunde 156–167). **Schritt 3 (T-1240):** Kap. 1 Unterabschnitt
+> „Risiko ohne (weitere) Anpassung“ mit KWRA-Stufen und Gewissheit je Zeitscheibe; Kap. 6 Satz zu
+> Jahresbeträgen ohne Abzinsung; Kap. 7 `kennzeichnung` in allen 13 Blöcken; Quellen [15] (Vollzitat)
+> und [73] (neu) (Log 25, Befunde 168–178). **Code-Stand:** Der Katalogwert `default_reduction` von
+> `POLLEN_EARLY_WARNING` ist 0,03 (`backend/app/data/catalog.py`); `linked_risk_codes` bleibt leer
+> (Sperre aus Befund 124), die Maßnahme wirkt im Produkt also noch nicht auf #96.
+> **Rev. 3 (08.09.2026)** = Wirkungsabschätzung des S158-Hebels
 > (Pollen-Frühwarnung): Der Hebel läuft nicht mehr „qualitativ" mit Wirkung null, sondern
 > mit \(r_{\text{S158}}\) = 0,03 (Band 0,005–0,10) als §3.9-Abschätzung — **Vorgabe P2 des
 > Aufsichtsrats (F-0007 Punkt 1)**, Aufgabe §3.5 i. d. F. 06.09.2026. Betroffen: Kap. 1
@@ -110,8 +126,12 @@ Symptomtage und die daraus bewerteten Euro-Beträge in K1-Morbidität, für die 
 in den gemessenen Größen, nicht in einem eigenen Faktor: Die Prävalenz \(p_{\text{AR},a}\) stammt aus
 DEGS1 [1] und KiGGS Welle 2 [2], die Kosten je Betroffenem aus der TOTALL-Erhebung 2014 [65]. Beide sind
 unter der Versorgung ihres Erhebungszeitraums erhoben; was Betroffene damals schon taten (Medikation,
-Meiden von Pollen), steckt in diesen Zahlen. Die KWRA zählt solche individuelle Anpassung (Meiden bestimmter
-Orte, Lüften, Pollen-Apps) zum bereits bestehenden Stand (Teilbericht 5, S. 180 [15]). Eine Wirkung der
+Meiden von Pollen), steckt in diesen Zahlen. Das folgt der Regel der KWRA für den Zustand ohne Anpassung:
+„Bei der Bewertung der Klimarisiken wurden nur bestehende und umgesetzte Anpassungsmaßnahmen als Teil der
+Sensitivität berücksichtigt. Bisher nur geplante und zukünftig mögliche Anpassungsoptionen und -maßnahmen
+wurden nicht einbezogen.“ (Teilbericht 1, S. 68 [73]). Dass an diesen Faktoren schon angesetzt wird, etwa mit
+Pollen-Apps, die bereits im Einsatz sind, beschreibt Teilbericht 5, S. 180 [15]; die dort anschließend
+aufgeführten Maßnahmen des Aktionsplans Anpassung III (S. 180 f.) gehören dagegen zum Restrisiko in (b). Eine Wirkung der
 heutigen Pollenflug-Warnung rechnet der Basiswert weder heraus noch hinzu (S158 im Basiswert Default 1,
 Knoten-Bilanz). Die heutige Stadtbaum- und Vegetationsausstattung wirkt über \(\hat G\) nur auf die
 Verteilung der Zusatztage innerhalb der Kommune. Weil \(\hat P\) auf die eigene Kommune zentriert ist
@@ -141,7 +161,7 @@ bewerten die Maßnahmen des Bundes (Aktionsplan Anpassung III und weiterreichend
 
 | Zeitscheibe (KWRA) | Fall | Risiko ohne Anpassung | Zelle | Gewissheit | Zelle |
 |---|---|---|---|---|---|
-| Gegenwart (Bezug 1971–2000) | — | gering | N98 | nicht ausgewiesen | — |
+| Gegenwart (jüngere Gegenwart, qualitative Bewertung; Teilbericht 1, S. 68, Fn. 7) | — | gering | N98 | nicht ausgewiesen | — |
 | Mitte des Jahrhunderts (2031–2060) | optimistisch | mittel | O98 | mittel | S98 |
 | Mitte des Jahrhunderts (2031–2060) | pessimistisch | hoch | P98 | mittel | S98 |
 | Ende des Jahrhunderts (2071–2100) | optimistisch | mittel | Q98 | mittel | T98 |
@@ -150,8 +170,18 @@ bewerten die Maßnahmen des Bundes (Aktionsplan Anpassung III und weiterreichend
 Fundstelle: `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt `Klimawirkungen` (ID 96 in Spalte A), Zeile 98, Spalten N bis R
 (Risiko ohne Anpassung) und Spalten S und T (Gewissheit Mitte und Ende). Gleichlautend im zuständigen
 Teilbericht: `docs/KWAR/kwra2021_teilbericht_5_cluster_wirtschaft_gesundheit_bf_211027_0.pdf`, Tabelle 55,
-S. 179 [15]. Optimistisch und pessimistisch sind das 85. und das 15. Perzentil des Modellensembles unter
-RCP8.5 (Teilbericht 5, S. 177). Für die Gegenwart weist die KWRA keine Gewissheit aus: Tabelle 55 lässt das
+S. 179 [15]. Die Stufen sind eine qualitative Bewertung. Optimistisch und pessimistisch sind dort die für die
+Klimawirkung günstigere und die ungünstigere Szenarienkombination; für die Mitte des Jahrhunderts aus Klima-
+und sozioökonomischen Projektionen, für das Ende nur aus Klimaprojektionen (Teilbericht 1, S. 68 [73]).
+Fußnote 7 derselben Seite grenzt die Bewertung von der quantitativen Analyse ab: „zum Beispiel wurde bei der
+quantitativen Analyse als Gegenwart der Bezugszeitraum (1971 bis 2000) und meist der untere Rand des RCP8.5
+Szenarios für den optimistischen Fall verwendet; bei der qualitativen Bewertung hingegen wurde unter dem
+optimistischen Fall meist die jüngere Gegenwart und ein schwächerer oder moderater Klimawandel verstanden“.
+Wir lesen das so: Die Zeitscheibe Gegenwart der Stufen meint die jüngere Gegenwart, nicht den Bezugszeitraum
+1971–2000. Dieser Bezugszeitraum und die Perzentile des Modellensembles in Teilbericht 5, S. 177–178 gehören
+zur quantitativen Auswertung des Indikators GE-KL-07, nicht zu den Stufen. Der Basiswert dieses Berichts
+(Ist-Klima, Normalperiode 1991–2020 gegen 1961–1990) passt damit zur Zeitscheibe Gegenwart der Bewertung.
+Für die Gegenwart weist die KWRA keine Gewissheit aus: Tabelle 55 lässt das
 Feld leer, die Mappe hat dafür keine Spalte. Beide Digitalisate widersprechen sich hier nicht; die Bewertungen
 stehen nach der Vorrangregel am Ende der Aufgabe ohnehin nur in der KWRA-2021-Mappe.
 
@@ -1419,10 +1449,10 @@ parameter:
 parameter:
   # Maßnahmen-Wirkungsfaktor S158 (Vorgabe P2 / Aufgabe §3.5 i. d. F. 06.09.2026).
   # KEIN Parameter der Schadensformel: wirkt ausschliesslich im Maßnahmen-Modul
-  # (Katalog POLLEN_EARLY_WARNING, default_reduction). Der Katalogwert steht in
-  # dieser Revision noch auf 0,0 — Code-Nachzug als eigener Schritt (L2), damit
-  # die Parameterliste den Faktor vorher als „Abschätzung von KAP3" kennzeichnet
-  # (Vorgabe P1); Divergenz Bericht ⇄ Code ausgewiesen im Ledger (Befund 151).
+  # (Katalog POLLEN_EARLY_WARNING, default_reduction). Code-Stand 26.09.2026:
+  # default_reduction = 0,03 (backend/app/data/catalog.py); linked_risk_codes
+  # bleibt leer (Sperre aus Befund 124), im Produkt wirkt der Faktor auf #96
+  # erst nach der Integrationsauflage (S158) in §5.1 (Ledger-Befunde 151, 178).
   id: pollen.r_s158
   wert: 0.03     # = 0,35 x 0,40 x 0,20 (Dreifaktor-Kette §5.1)
   einheit: "-"
@@ -1637,6 +1667,13 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   https://opendata.dwd.de/climate_environment/health/alerts/s31fg.json
   (Abruf 26.09.2026; Permalink https://web.archive.org/web/20260823013619/https://opendata.dwd.de/climate_environment/health/alerts/s31fg.json).
   Gebietszeichen \(V\) und die Bedingung „jedes DWD-Gebiet in genau einer Modellregion“ (§5.1).
+- **[73]** Kahlenborn, W.; Linsenmeier, M.; Porst, L. u. a. (adelphi, Eurac Research, Bosch & Partner, GWS,
+  BBSR, DWD, BfG, BSH): Klimawirkungs- und Risikoanalyse 2021 für Deutschland, Teilbericht 1: Grundlagen.
+  Hrsg. Umweltbundesamt, Climate Change 20/2021, Dessau-Roßlau, Juni 2021 (sprachliche Korrekturen Oktober
+  2021); Forschungskennzahl 3717 48 102 0. S. 68 mit Fußnote 7 (nur
+  bestehende und umgesetzte Anpassung im Zustand ohne Anpassung; optimistischer und pessimistischer Fall;
+  Gegenwart der qualitativen Bewertung), umweltbundesamt.de/publikationen (lokal:
+  `docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf`, Druckseite 68 = PDF-Seite 69).
 
 ## Entscheidungslog
 
