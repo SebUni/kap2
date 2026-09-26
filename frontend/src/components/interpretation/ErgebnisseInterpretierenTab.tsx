@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { api } from '../../api/client'
 import { useStore } from '../../store'
+import NachweiseEinbeziehung from './NachweiseEinbeziehung'
 
 export interface StrukturierterAbschnittProps {
   kommuneId: number
@@ -15,7 +16,9 @@ export interface StrukturierterAbschnittProps {
  * gerendert, nicht zusätzlich das Markdown. Die Einträge folgen mit den
  * späteren Paketen.
  */
-export const STRUKTURIERTE_ABSCHNITTE: Record<string, ComponentType<StrukturierterAbschnittProps>> = {}
+export const STRUKTURIERTE_ABSCHNITTE: Record<string, ComponentType<StrukturierterAbschnittProps>> = {
+  Einbeziehung: NachweiseEinbeziehung,
+}
 
 interface Abschnitt {
   /** Überschrift ohne "## "; leer für den Text vor der ersten Überschrift. */
