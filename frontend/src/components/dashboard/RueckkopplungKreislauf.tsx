@@ -8,7 +8,8 @@ import InfoTooltip from '../InfoTooltip'
  * Kühlenergie ↔ Stadtklima/Wärmeinseln → Hitzebelastung (S. 85–86, Abbildung 9) — als kurze Liste
  * der Wirkschritte, ohne Netzwerkformeln (A-0034), und darunter die beiden weiteren gegenseitigen
  * Wechselwirkungen. Klimawirkungen außerhalb des Katalogs stehen nur mit Namen und dem Hinweis
- * „nicht im Katalog“ — nie mit Index, Betrag oder Rang (Verwechslungssperre, P2).
+ * „nicht im Katalog“ — nie mit Index, Betrag oder Rang (Verwechslungssperre, P2). Ausnahme: Ihre
+ * KWRA-Nummer steht dabei, allein zum Nachschlagen in der Quelle (Entscheidung T-1072-ceo).
  * Daten kommen unverändert aus `rueckkopplungen` von GET /catalog/querverbindungen; die Pfeilrichtungen
  * sind die ausgewiesene Ablesung aus Abbildung 9 (backend/app/data/kwra_rueckkopplungen.py).
  */
