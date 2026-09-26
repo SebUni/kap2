@@ -18,6 +18,15 @@ LAUFZEITSATZ_VORLAGE = (
     "der Wert fehlt in dieser Bestandsaufnahme."
 )
 
+# Lückensatz, wenn eine flächenbezogene Größe (Starkregenereignisse) nicht zählbar ist,
+# weil dem Produkt weder die Gemeindegrenze noch gespeicherte Rasterzellen der Kommune
+# vorliegen. Die Quelle selbst ist vorhanden; es fehlt die Fläche (T-1297).
+FLAECHE_FEHLT_SATZ_VORLAGE = (
+    "Für die Größe {label} fehlt dem Produkt die Fläche der Kommune: Weder die "
+    "Gemeindegrenze noch Rasterzellen der Kommune sind gespeichert. Der Wert fehlt in "
+    "dieser Bestandsaufnahme."
+)
+
 
 HINWEIS_NICHT_IM_KATALOG = "nicht im Katalog"
 

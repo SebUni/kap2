@@ -36,6 +36,13 @@ GRUPPEN = [
 # Modellgrenzen je Gruppe, wörtlich unter der Tabelle der Gruppe.
 GRUPPEN_MODELLGRENZEN = {"vergangene_ereignisse": MODELLGRENZE_CATRARE, "trends": MODELLGRENZE}
 
+# Modellgrenze, wenn die Fläche aus der Hülle der Rasterzellen genähert ist (T-1297).
+FLAECHE_GENAEHERT_SATZ = (
+    "Dem Produkt fehlt die Gemeindegrenze; die Fläche der Kommune ist deshalb aus der Hülle "
+    "der Rasterzellen genähert. Die Hülle kann über die Gemeindegrenze hinausreichen: "
+    "Starkregenereignisse knapp außerhalb der Gemeindegrenze können mitgezählt sein."
+)
+
 UEBERSCHRIFT_HANDLUNGSFELDER = "## Handlungsfelder"
 
 HANDLUNGSFELDER_SATZ = (
@@ -108,8 +115,15 @@ def _datum_de(iso: str) -> str:
     return f"{t}.{m}.{j}"
 
 
-def _zusatz_starkregen(g: dict) -> str:
-    return f"Jüngstes Ereignis: {_datum_de(g['zusatz']['juengstes_beginn'])}"
+def _zusatz_starkregen(g: dict) -> list[str]:
+    """Datum des jüngsten Ereignisses und, bei genäherter Fläche, deren Modellgrenze."""
+    z = g["zusatz"]
+    zeilen = []
+    if z.get("juengstes_beginn"):
+        zeilen.append(f"Jüngstes Ereignis: {_datum_de(z['juengstes_beginn'])}")
+    if z.get("flaeche_genaehert"):
+        zeilen.append(FLAECHE_GENAEHERT_SATZ)
+    return zeilen
 
 
 def _untersuchungen(bundesland: str | None) -> list[str]:
@@ -150,8 +164,9 @@ def bestandsaufnahme_markdown(ergebnis: dict) -> str:
             teile += ["\n".join(hinweise), ""]
         for g in mit_wert:
             if g.get("zusatz"):
-                zeile = _zusatz_starkregen(g) if g["code"] == "starkregenereignisse" else _zusatz_zeile(g)
-                teile += [zeile, ""]
+                zeilen = _zusatz_starkregen(g) if g["code"] == "starkregenereignisse" else [_zusatz_zeile(g)]
+                for zeile in zeilen:
+                    teile += [zeile, ""]
         if gruppe in GRUPPEN_MODELLGRENZEN:
             teile += [GRUPPEN_MODELLGRENZEN[gruppe], ""]
 
