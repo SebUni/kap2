@@ -898,6 +898,7 @@ def apply_cell_temperature(
     Feinstruktur darunter kommt aus dem UHI-Modell. Analog beim Höhenterm.
     """
     from app.services.climate import dwd_cdc_grid
+    from app.services.engine import override_context
 
     cells = [ci for ci in cell_inputs if ci is not None]
     if not cells:
@@ -923,6 +924,11 @@ def apply_cell_temperature(
         y = int(cell.get("y_3035", cell.get("row", 0) * 100))
         groups.setdefault((x // 1000, y // 1000), []).append(idx)
 
+    # γ_h aus der Registry (risks.EXPECTED_ANNUAL_MORTALITY.impact.gamma_hoehe,
+    # Block heat.gamma_hoehe); ohne Überschreibung der ICAO-Wert.
+    lapse_rate = float(override_context.get_override(
+        "risks.EXPECTED_ANNUAL_MORTALITY.impact.gamma_hoehe", LAPSE_RATE_K_PER_M))
+
     n = len(cell_inputs)
     for _key, idxs in groups.items():
         valid = [i for i in idxs if i < n and cell_inputs[i] is not None]
@@ -937,7 +943,7 @@ def apply_cell_temperature(
             base = sampled[i] if i < len(sampled) and sampled[i] is not None else fallback
             uhi_dev = float(ci.get("uhi_delta_mean") or 0.0) - uhi_mean
             elev_dev = float(ci.get("mean_elevation_m") or 0.0) - elev_mean
-            lapse = -LAPSE_RATE_K_PER_M * elev_dev
+            lapse = -lapse_rate * elev_dev
             ci["summer_temp_raster"] = round(float(base), 2)
             ci["summer_temp_uhi_dev"] = round(uhi_dev, 3)
             ci["summer_temp_lapse"] = round(lapse, 3)

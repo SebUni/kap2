@@ -220,6 +220,35 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "Bevölkerung 85+ (2.844.213) = 0,149. Zentrierungsmittel des "
                       "β_pfl-Terms (Golden-Test beispiel_95_or_uebersetzungen).",
      "source_refs": ["Destatis_Pflegestatistik_2023"]},
+    # ── Konstanten des Temperaturpfads (Bericht #95 Kapitel 7, T-1370) ─────────
+    # Beide speisen nur den D-/Temperaturpfad (Befund 73). Die Wochenquantile sind
+    # eine Tabelle (3 Regionen × 13 Wochen) und kein Einzelwert: sichtbar, nicht
+    # editierbar. Der Temperaturgradient ist editierbar und wirkt über
+    # inputs.apply_cell_temperature.
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "q_wochenquantile",
+     "value": "backend/data/kalibrierung/wochenquantile_region.csv",
+     "label": "Wochenquantile der Sommertemperatur je Region (q_w, 13 Wochen)", "unit": "K",
+     "source": "DWD CDC, Tageswerte 1991–2020 (Bericht #95 §3.2, Block heat.q_wochenquantile)",
+     "source_detail": "Abweichung der Wochenmitteltemperatur vom Sommermittel in den 13 "
+                      "Sommerwochen, als empirische Quantile an p_w = (w − 0,5)/13 aus "
+                      "Tageswerten von 7 DWD-Stationen je Region über 30 Sommer (1991–2020) "
+                      "ausgezählt: T_w = T̄ + q_w,Region. Nord von −4,17 bis +4,22 K, Mitte "
+                      "von −4,59 bis +4,60 K, Süd von −4,67 bis +4,46 K. Die Kurve wird über "
+                      "diese Wochen integriert, nicht am Mittelwert ausgewertet. Anlage "
+                      "backend/data/kalibrierung/wochenquantile_region.csv, Skript "
+                      "dwd_wochenquantile.py; als Tabelle nicht einzeln editierbar.",
+     "source_refs": ["DWD_CDC"],
+     "editable": False,
+     "evidence_class": "belegt"},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "gamma_hoehe", "value": 0.0065,
+     "label": "Temperaturgradient mit der Höhe γ_h", "unit": "K/m",
+     "source": "ICAO-Standardatmosphäre (Bericht #95 §3.1, Block heat.gamma_hoehe)",
+     "source_detail": "Die Lufttemperatur sinkt nach der ICAO-Standardatmosphäre um 0,0065 K "
+                      "je Meter Höhe. Die Zelltemperatur erhält den Höhenterm −γ_h × "
+                      "(Höhe der Zelle − mittlere Höhe der 1-km-Rasterzelle); der Mittelwert "
+                      "der Rasterzelle bleibt dabei der gemessene DWD-Wert.",
+     "source_refs": [],
+     "evidence_class": "belegt"},
     # ── Ersatzregel für den geheimgehaltenen Anteil 65+ (Bericht #95 §3.3, Log 41) ──
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "anteil_60_66_ab65", "value": 2 / 7,
      "label": "Anteil der Gruppe 60–66, der zu den Menschen ab 65 zählt (Ersatzregel 65+)",
@@ -1352,3 +1381,44 @@ def _infra_value_specs() -> list[dict]:
 
 
 IMPACT_GLOBAL_SPECS += _infra_value_specs()
+
+# ── Block-Kennung je Parameter: Abgleich mit Kapitel 7 des Berichts #95 (T-1370) ──
+# Jeder Registry-Parameter der Hitzebelastung trägt die Kennung des Parameter-Blocks,
+# aus dem er stammt. Ein Block kann mehrere Parameter tragen (je Region oder
+# Altersband). Die Kostensätze heat.voly und heat.c_fall stehen am Risiko im Katalog
+# (cost_methodik_block), heat.delta_hap an der Maßnahme HEAT_ACTION_PLANS
+# (methodik_bloecke). anteil_60_66_ab65 ist kein Block in Kapitel 7 (Ersatzregel §3.3)
+# und bleibt ohne Kennung. Geprüft in tests/test_methodik_95_bloecke.py.
+_HEAT_BLOECKE: dict[tuple[str, str], str] = {
+    **{("EXPECTED_ANNUAL_MORTALITY", f"threshold_{r}"): "heat.t0_region"
+       for r in ("nord", "mitte", "sued")},
+    **{("EXPECTED_ANNUAL_MORTALITY", f"beta_85p_{r}"): "heat.beta_85plus_region"
+       for r in ("nord", "mitte", "sued")},
+    **{("EXPECTED_ANNUAL_MORTALITY", f"beta_factor_{a}"): "heat.f_alter"
+       for a in ("u65", "a65_74", "a75_84", "a85p")},
+    **{("EXPECTED_ANNUAL_MORTALITY", f"baseline_mort_{a}"): "heat.m_basissterberate"
+       for a in ("u65", "a65_74", "a75_84", "a85p")},
+    **{("EXPECTED_ANNUAL_MORTALITY", f"life_years_{a}"): "heat.l_restlebenserwartung"
+       for a in ("u65", "a65_74", "a75_84", "a85p")},
+    ("EXPECTED_ANNUAL_MORTALITY", "calibration"): "heat.c_kal",
+    ("EXPECTED_ANNUAL_MORTALITY", "q_wochenquantile"): "heat.q_wochenquantile",
+    ("EXPECTED_ANNUAL_MORTALITY", "beta_iso"): "heat.beta_iso",
+    ("EXPECTED_ANNUAL_MORTALITY", "beta_pfl"): "heat.beta_pfl",
+    ("EXPECTED_ANNUAL_MORTALITY", "beta_dist_km"): "heat.beta_dist_sensitivitaet",
+    ("EXPECTED_ANNUAL_MORTALITY", "qbar_1p"): "heat.qbar_1p",
+    ("EXPECTED_ANNUAL_MORTALITY", "qbar_pfl"): "heat.qbar_pfl",
+    ("EXPECTED_ANNUAL_MORTALITY", "gamma_hoehe"): "heat.gamma_hoehe",
+    ("EXPECTED_ANNUAL_MORTALITY", "ror_s157"): "heat.ror_s157",
+    ("EXPECTED_ANNUAL_MORTALITY", "g_s157"): "heat.g_s157",
+    ("EXPECTED_ANNUAL_MORTALITY", "delta_vg"): "heat.delta_vg",
+    **{("EXPECTED_ANNUAL_MORBIDITY", f"r0_{a}"): "heat.r0_einweisungsrate"
+       for a in ("u65", "a65_74", "a75_84", "a85p")},
+    ("EXPECTED_ANNUAL_MORBIDITY", "excess_per_hotday"): "heat.e_hd",
+    ("EXPECTED_ANNUAL_MORBIDITY", "hotday_ref_days"): "heat.hd_ref",
+    ("EXPECTED_ANNUAL_MORBIDITY", "delta_vg_morb"): "heat.delta_vg_morb",
+}
+for _spec in IMPACT_PARAM_SPECS:
+    _block = _HEAT_BLOECKE.get((_spec["risk"], _spec["key"]))
+    if _block:
+        _spec["methodik_block"] = _block
+del _spec, _block

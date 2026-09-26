@@ -136,6 +136,9 @@ class ModelParameter(BaseModel):
     evidence_class: str = "abgeschaetzt"
     evidence_note: str = ""
     evidence_derivation: Optional[dict] = None
+    # Kennung des Parameter-Blocks in Kapitel 7 des Methodik-Berichts (etwa
+    # "heat.voly"); None, wenn der Parameter keinem Block entspricht.
+    methodik_block: Optional[str] = None
 
 
 # ── Measures ───────────────────────────────────────────────────────────────────

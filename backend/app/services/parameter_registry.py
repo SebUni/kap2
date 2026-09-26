@@ -121,6 +121,7 @@ def _base_param(
     applicable: bool = True,
     evidence_class: Any = None,
     evidence_derivation: dict | None = None,
+    methodik_block: str | None = None,
 ) -> dict:
     return {
         "id": pid,
@@ -143,6 +144,10 @@ def _base_param(
         "evidence_class": _evidence_class(evidence_class, references),
         "evidence_note": source_detail,
         "evidence_derivation": evidence_derivation or None,
+        # Kennung des Parameter-Blocks in Kapitel 7 des Methodik-Berichts (etwa
+        # "heat.voly"). Ein Block kann mehrere Registry-Parameter tragen (je Region
+        # oder Altersband); None, wenn der Parameter keinem Block entspricht.
+        "methodik_block": methodik_block or None,
     }
 
 
@@ -171,6 +176,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             references=sources.resolve(r.get("source_refs")),
             evidence_class=r.get("evidence_class"),
             evidence_derivation=r.get("evidence_derivation"),
+            methodik_block=r.get("methodik_block"),
         ))
         # Monetarisierungs-Kostensatz je nicht-monetärem Risiko: eigenständiger,
         # editierbarer Parameter (€ je Outcome-Einheit). Monetäre Risiken (ref_value
@@ -187,6 +193,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 references=sources.resolve(r.get("cost_source_refs")),
                 evidence_class=r.get("cost_evidence_class"),
                 evidence_derivation=r.get("cost_evidence_derivation"),
+                methodik_block=r.get("cost_methodik_block"),
             ))
         # Schicht-B-Schadensfunktions-Parameter (baseline_mort, β, Schwellen, Raten …).
         for spec in _IMPACT_SPECS_BY_RISK.get(r["code"], []):
@@ -199,8 +206,10 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 source=spec.get("source", ""),
                 source_detail=spec.get("source_detail", ""),
                 references=sources.resolve(spec.get("source_refs")),
+                editable=spec.get("editable", True),
                 evidence_class=spec.get("evidence_class"),
                 evidence_derivation=spec.get("evidence_derivation"),
+                methodik_block=spec.get("methodik_block"),
             ))
 
     for cat_key, items in (
@@ -281,6 +290,8 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             # Herleitung).
             if not applicable and not ev_derivation:
                 ev_derivation = dict(_NOT_APPLICABLE_DERIVATION)
+            # Block-Kennung je Feld (Kapitel 7 des Methodik-Berichts), nur wenn anwendbar.
+            block = (m.get("methodik_bloecke") or {}).get(field) if applicable else None
             params.append(_base_param(
                 f"measures.{m['code']}.{field}",
                 layer_code=m["code"], layer_category="measures",
@@ -294,6 +305,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 applicable=applicable,
                 evidence_class=ev_class,
                 evidence_derivation=ev_derivation,
+                methodik_block=block,
             ))
 
     def emit_globals(cat: str) -> bool:
@@ -392,6 +404,7 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
                 references=sources.resolve(spec.get("source_refs")),
                 evidence_class=spec.get("evidence_class"),
                 evidence_derivation=spec.get("evidence_derivation"),
+                methodik_block=spec.get("methodik_block"),
             ))
 
     # Modellweite Stellschrauben (Referenzskalierung, Risikozonen-Schwelle,

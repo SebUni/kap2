@@ -345,6 +345,9 @@ export interface ModelParameter {
   evidence_class: EvidenceClass
   evidence_note?: string
   evidence_derivation?: { wert: string; band: string; sensitivitaet: string } | null
+  // Kennung des Parameter-Blocks in Kapitel 7 des Methodik-Berichts (z. B. "heat.voly");
+  // null, wenn der Parameter keinem Block entspricht.
+  methodik_block?: string | null
   // Demo: read-only (demo_locked) bzw. Wert/Quelle verborgen (demo_hidden)
   demo_locked?: boolean
   demo_hidden?: boolean
