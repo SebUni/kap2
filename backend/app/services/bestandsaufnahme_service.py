@@ -279,5 +279,6 @@ def bestandsaufnahme_fuer_kommune(db, kommune) -> dict:
     return {
         "kommune_id": kommune.id,
         "name": kommune.name,
+        "bundesland": getattr(kommune, "bundesland", None),
         "groessen": bestandsaufnahme_aus_daten(zellen, sozio, entwicklung, starkregen),
     }
