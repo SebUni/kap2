@@ -27,12 +27,15 @@ const NETZROLLE_TEXT: Record<Netzrolle, string> = {
   'stark eingehend': 'stark eingehend (Empfänger)',
 }
 
-/** Netzrolle mit Seitenbeleg aus TB 6 Kap. 3.4, sichtbar ohne Hover, z. B. „stark ausgehend (Sender) (TB 6, S. 84, 88)“. */
+/** Netzrolle mit Seitenbeleg aus TB 6 Kap. 3.4, sichtbar ohne Hover, z. B. „stark ausgehend (Sender; TB 6, S. 84, 88)“ — der Seitenbeleg steht in der Klammer des Zusatzes, nie in einer zweiten. */
 function netzrollenText(rollen: Netzrolle[], zentral: boolean, seiten: number[]): string {
   if (rollen.length === 0) return '—'
-  const text = rollen.map(r => NETZROLLE_TEXT[r]).join(' und ')
-  const mitZentral = zentral ? `${text}, zentral` : text
-  return seiten.length > 0 ? `${mitZentral} (TB 6, S. ${seiten.join(', ')})` : mitZentral
+  const roh = rollen.map(r => NETZROLLE_TEXT[r]).join(' und ')
+  const beleg = `TB 6, S. ${seiten.join(', ')}`
+  const text = seiten.length === 0
+    ? roh
+    : roh.endsWith(')') ? `${roh.slice(0, -1)}; ${beleg})` : `${roh} (${beleg})`
+  return zentral ? `${text}, zentral` : text
 }
 
 export default function RiskInteractionSection({ className = '' }: { className?: string }) {
