@@ -337,8 +337,12 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
     # None, auch in risks[code]. Die Rangfolge nach Betrag gilt nur für
     # Klasse A; Klasse B folgt danach alphabetisch nach Name — eine Rangfolge nach dem
     # unterdrückten Betrag würde ihn verraten.
+    # kwra_id (T-1432): Nummer der amtlichen Klimawirkung, None ohne Zuordnung. Teil-Ausweise
+    # derselben Klimawirkung (#95 = Mortalität + Erkrankungen) tragen dieselbe Nummer; die
+    # Kostentabelle fasst sie darüber zu einer Summenzeile zusammen.
     eintraege = [
         {"code": c, "name": r["name"],
+         "kwra_id": catalog.RISKS_BY_CODE[c].get("kwra_id"),
          "cost_eur": r["cost_eur"] if has_euro[c] else None,
          "outcome": r["outcome"], "outcome_unit": r["outcome_unit"],
          "cost_dimension": r["cost_dimension"], "index": r["index"],
