@@ -3,7 +3,8 @@
 Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048: Schritt 1 Rechenkette §3.0
 (T-1238, Ledger-Befunde 152–155), Schritt 2 S158 nach Tagen und Belastung und Stadtbaumwahl (T-1239,
 Log 23/24, Befunde 156–167), Schritt 3 Pflichtinhalte — Kap. 1 „Risiko ohne (weitere) Anpassung“,
-Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181);
+Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181),
+Schritt 4 Bezugswert Ḡ₀ der Stadtbaumwahl (T-1323, T-1362, Log 26, Befund 182), Nachzug der Befunde 183–185 (T-1330);
 Gegenprüfung durch den methodik_manager bis zur Null-Runde läuft, Abnahme der Rev. 4 steht aus)** ·
 Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
@@ -18,7 +19,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > seit Rev. 2 ausschließlich das Mittel der **eigenen Kommune** (§3.3, Log 18/19); die Ebenen POLLEN_LOAD (OSM-Vegetation, §3.3), POPULATION_U20 (§3.2) und CANOPY_BIRCH_FRACTION **sind mit der Integration am 31.08.2026 angelegt** (§3.1-Anlagepflicht erfüllt); alle übrigen Zellgrößen sind vorhanden oder regional/national — keine Zellgröße läuft auf einem unspezifizierten Neutral-Fallback.
 
 > **Revisionsstand.** **Rev. 4 (26.09.2026)** = Fortschreibung 7 der Aufgabe für M0 (A-0048, P3) in
-> drei Schritten, jeweils ohne Änderung eines Schadenswerts. **Schritt 1 (T-1238):** Rechenkette §3.0
+> vier Schritten, jeweils ohne Änderung eines Basiswerts oder eines Parameterwerts in Kapitel 7. **Schritt 1 (T-1238):** Rechenkette §3.0
 > an der Beispielkommune Berlin mit Zelllauf des Produkts; Kapitel 9 gestrichen (Log 21/22, Befunde
 > 152–155). **Schritt 2 (T-1239):** S158 wirkt nur an gewarnten Tagen (DWD-Index mindestens „mittel“
 > [70]), neuer Block `pollen.t_warn_s158` = 0,75, wirksamer Wert 0,03 × 0,75 = 2,25 % der Zusatztage im
@@ -27,7 +28,12 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > „Risiko ohne (weitere) Anpassung“ mit KWRA-Stufen und Gewissheit je Zeitscheibe; Kap. 6 Satz zu
 > Jahresbeträgen ohne Abzinsung; Kap. 7 `kennzeichnung` in allen 13 Blöcken; Quellen [15] (Vollzitat)
 > und [73] (neu); Kap. 1 (a) mit Erhebungsjahren und Lücke bis heute, Unsicherheit in drei Bändern (Log 25,
-> Befunde 168–181). **Code-Stand:** Der Katalogwert `default_reduction` von
+> Befunde 168–181). **Schritt 4 (T-1323, T-1362):** Bezugswert Ḡ₀ der Zentrierung im Ausgangsstand
+> festgehalten, die allergenarme Stadtbaumwahl senkt damit die Summe der Kommune; betroffen §3.3, §3.4,
+> §3.6, §5, Ebene 7, Kap. 1 (b), Modellgrenze 7, Quelle [74] (Log 26, Log 19 verworfen, Befund 182).
+> **Nachzug (T-1330):** Befunde 183–185 aus Runde 13 — Untergrenze 4,38 Mio. € in Kap. 1, Restrisiko-Werte
+> AB bis AF in Kap. 1 (b) mit Maßnahmenpaket und Zeitscheibe, Publikationslinks für [15] und [73] in Kap. 8.
+> **Code-Stand:** Der Katalogwert `default_reduction` von
 > `POLLEN_EARLY_WARNING` ist 0,03 (`backend/app/data/catalog.py`); `linked_risk_codes` bleibt leer
 > (Sperre aus Befund 124), die Maßnahme wirkt im Produkt also noch nicht auf #96.
 > **Stand der früheren Revisionen** (bis Rev. 4 in der Statuszeile geführt, Befund 181): Rev. 3 (08.09.2026)
@@ -172,9 +178,15 @@ Basiswert dar, nicht als eigenen Basiswert:
 Im Produkt sind beide Wirkungen heute nicht sichtbar (Sperre aus Befund 124; Integrationsauflagen S158 und
 Stadtbaumwahl in §5.1 und §5). Einen Wert „mit Anpassung“ gibt es dort erst nach der Integration und nur, wenn
 eine Kommune Maßnahmen wählt. Die KWRA-Stufen „mit Anpassung“ (Restrisiko, Blatt `Klimawirkungen`, Zeile 98,
-Spalten AB bis AF: gering · gering · mittel · gering · mittel) übernimmt der Bericht nicht als Zahl: Sie
-bewerten die Maßnahmen des Bundes (Aktionsplan Anpassung III und weiterreichende Maßnahmen; Blatt
-`Lesehinweise`, Zeile 27), nicht die Hebel einer Kommune.
+Spalten AB bis AF, Maßnahmenpaket und Zeitscheibe nach Kopfzeile 2 der Mappe) sind:
+
+- AB: Aktionsplan Anpassung III (APA III), 2020–2030: gering
+- AC und AD: APA III, Mitte des Jahrhunderts, optimistisch und pessimistisch: gering und mittel
+- AE und AF: weiterreichende Maßnahmen, Mitte des Jahrhunderts, optimistisch und pessimistisch: gering und mittel
+
+Für das Ende des Jahrhunderts führt die Mappe kein Restrisiko; die Zeilen „Ende des Jahrhunderts“ in (c) gelten
+nur ohne Anpassung. Der Bericht übernimmt diese Stufen nicht als Zahl: Sie bewerten die Maßnahmen des Bundes
+(APA III und weiterreichende Maßnahmen; Blatt `Lesehinweise`, Zeile 27), nicht die Hebel einer Kommune.
 
 **(c) KWRA-Stufe ohne Anpassung und Gewissheit je Zeitscheibe.**
 
@@ -216,7 +228,7 @@ Unsicherheit liegt nicht in einer Klimaprojektion, sondern in drei Bändern (Bei
   Erkrankte): wirkt nur auf den Euro-Betrag und nur nach oben, bis 17,9 Mio. € je Jahr; die Tage ändert er nicht.
 - **Sensibilisierungsprofil \(p_B/p_G\)** (Abschätzung von KAP3, §3.4; Bänder 0,4–0,7 und 0,6–0,85): wirkt fast
   nur auf die Tage, 580.958–901.837 Tage (−23 % bis +19 %). Im Euro-Betrag kürzt es sich fast heraus, weil es
-  über \(d_{\text{Saison}}\) auch im Kostensatz je Tag steht: 4,39–5,07 Mio. € (−6 % bis +8 %).
+  über \(d_{\text{Saison}}\) auch im Kostensatz je Tag steht: 4,38–5,07 Mio. € (−6 % bis +8 %).
 
 ## 2 Evidenz-Register (§2.2)
 
@@ -1630,9 +1642,10 @@ parameter:
   abgeleitet_aus: [pollen.c_jahr_direkt, pollen.d_saison]
 ```
 
-## 8 Quellen (§3.8 — #96-relevanter Auszug; Nummern [1]–[56] = M0-Zählung, [65]–[67] neu)
+## 8 Quellen (§3.8 — #96-relevanter Auszug; Nummern [1]–[56] = M0-Zählung, [65]–[74] neu)
 
-Zugriff 17./18.08.2026 ([1]–[3], [65], [66]: 30.08.2026, Volltext/Abstract gegengelesen).
+Zugriff 17./18.08.2026 ([1]–[3], [65], [66]: 30.08.2026, Volltext/Abstract gegengelesen). Nennt ein Eintrag ein
+eigenes Abrufdatum, gilt dieses.
 **Archiv-Snapshots:** wie #95 (Kap. 8) — deterministisch über die `sources.py`-Ratchet-
 Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Referenzen.
 
@@ -1675,7 +1688,9 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
 - **[15]** UBA (Hrsg.), KWRA 2021, Teilbericht 5: Risiken und Anpassung in den Clustern Wirtschaft
   und Gesundheit (Climate Change 24/2021, Dessau-Roßlau, Juni 2021), Kap. 4.2.2 (Aeroallergene;
   GE-KL-07-Projektion ≈ 2 Wochen früher bis 2100, RCP8.5, S. 177–178; Tabelle 55 Klimarisiko ohne
-  Anpassung und Gewissheit, S. 179; beschlossene Maßnahmen APA III, S. 180), umweltbundesamt.de
+  Anpassung und Gewissheit, S. 179; beschlossene Maßnahmen APA III, S. 180),
+  https://www.umweltbundesamt.de/publikationen/KWRA-Teil-5-Wirtschaft-Gesundheit (Abruf 26.09.2026; Permalink
+  https://web.archive.org/web/20260519124624/https://www.umweltbundesamt.de/publikationen/KWRA-Teil-5-Wirtschaft-Gesundheit)
   (lokal: `docs/KWAR/kwra2021_teilbericht_5_cluster_wirtschaft_gesundheit_bf_211027_0.pdf`; Seitenzahlen
   = PDF-Seiten = Druckseiten). Aufbereitet in `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt
   `Klimawirkungen`, Zeile 98.
@@ -1783,8 +1798,10 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   Hrsg. Umweltbundesamt, Climate Change 20/2021, Dessau-Roßlau, Juni 2021 (sprachliche Korrekturen Oktober
   2021); Forschungskennzahl 3717 48 102 0. S. 68 mit Fußnote 7 (nur
   bestehende und umgesetzte Anpassung im Zustand ohne Anpassung; optimistischer und pessimistischer Fall;
-  Gegenwart der qualitativen Bewertung), umweltbundesamt.de/publikationen (lokal:
-  `docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf`, Druckseite 68 = PDF-Seite 69).
+  Gegenwart der qualitativen Bewertung),
+  https://www.umweltbundesamt.de/publikationen/KWRA-Teil-1-Grundlagen (Abruf 26.09.2026; Permalink
+  https://web.archive.org/web/20260311080137/https://www.umweltbundesamt.de/publikationen/KWRA-Teil-1-Grundlagen)
+  (lokal: `docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf`, Druckseite 68 = PDF-Seite 69).
 - **[74]** T. T. Hugg, J. Hjort, H. Antikainen, J. Rusanen, M. Tuokila, S. Korkonen, J. Weckström,
   M. S. Jaakkola, J. J. K. Jaakkola, „Urbanity as a determinant of exposure to grass pollen in Helsinki
   Metropolitan area, Finland“, PLoS ONE 12(10):e0186348, 2017. doi:10.1371/journal.pone.0186348 (PMC5638505),
