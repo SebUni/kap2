@@ -29,6 +29,20 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json()
 }
 
+/** Wie ``request``, gibt aber die Textantwort (etwa Markdown) unverändert zurück. */
+async function requestText(path: string, options?: RequestInit): Promise<string> {
+  const res = await fetch(`${BASE}${path}`, options)
+  if (!res.ok) {
+    if (res.status === 401) handleUnauthorized(path)
+    const body = await res.text()
+    if (res.status === 500 && !body.trim()) {
+      throw new Error('Backend nicht erreichbar (Port 8000). Bitte Backend starten: cd backend && python3 -m uvicorn app.main:app --reload')
+    }
+    throw new Error(`API ${res.status}: ${body || res.statusText}`)
+  }
+  return res.text()
+}
+
 export type ProgressCallback = (fraction: number) => void
 
 /**
@@ -402,6 +416,85 @@ export interface AiUsage {
   blocked: boolean
 }
 
+// ── Interpretationsbelege (backend/app/api/routes/ergebnis_interpretation.py) ──
+/** Eintrag von GET /kommune/{id}/interpretation/nachbarkommunen (nachbar_screening_aus). */
+export interface NachbarIndex {
+  ags: string
+  name: string | null
+  index: number | null
+}
+export interface NachbarScreeningEintrag {
+  code: string
+  name: string | null
+  index_vorhanden: boolean
+  eigener_index: number | null
+  nachbarn: NachbarIndex[]
+}
+
+/** Nachweisarten (ergebnis_nachweise.NACHWEIS_ARTEN). */
+export type NachweisArt = 'fachabteilung' | 'externe_expertise' | 'angrenzende_kommune' | 'land'
+
+export interface NachweisEintrag {
+  id: number
+  stelle: string
+  datum: string // ISO-Datum
+  vermerk: string | null
+}
+/** Je Art ein Eintrag von GET /kommune/{id}/interpretation/nachweise; ``status`` ist ohne Einträge „nicht erfasst“. */
+export interface NachweisJeArt {
+  art: NachweisArt
+  bezeichnung: string
+  eintraege: NachweisEintrag[]
+  status: string | null
+}
+export interface NachweisEingabe {
+  art: NachweisArt
+  stelle: string
+  datum: string // ISO-Datum, nicht in der Zukunft
+  vermerk?: string | null
+}
+export interface NachweisOut {
+  id: number
+  kommune_id: number
+  art: NachweisArt
+  stelle: string
+  datum: string
+  vermerk: string | null
+}
+
+/** Eintrag von GET /interpretation/massnahmen-gewissheit (massnahmen_gewissheit). */
+export interface MassnahmeKlimawirkung {
+  code: string
+  name: string
+  gewissheitsstufe: string
+  qualitativ: boolean
+}
+export interface MassnahmeGewissheit {
+  code: string
+  name: string
+  klimawirkungen: MassnahmeKlimawirkung[]
+  wirkung_evidenz: string
+}
+
+/** Eintrag von GET /interpretation/massnahmen-umsetzung; Schlüssel der Antwort = Maßnahmencode. */
+export interface MassnahmeUmsetzungBeleg {
+  quelle?: string
+  seite?: string
+  abschaetzung?: string
+  herleitung?: string
+  ebenen_begruendung?: string
+  weitere_quellen?: unknown
+  fundstelle?: string
+  [feld: string]: unknown
+}
+export interface MassnahmeUmsetzung {
+  umsetzung: 'kommune_allein' | 'mit_partnern'
+  partner: string[]
+  ebenen: Array<'gemeinde' | 'kreis' | 'land'>
+  beleg: MassnahmeUmsetzungBeleg
+}
+export type MassnahmenUmsetzung = Record<string, MassnahmeUmsetzung>
+
 /** Strukturierter Fehler des /ai/chat-Endpunkts (vor Stream-Start). */
 export class ChatError extends Error {
   code: 'no_api_key' | 'quota_exceeded' | 'forbidden' | 'unknown'
@@ -663,4 +756,22 @@ export const api = {
     request<AiSettings>('/ai/settings', { method: 'PUT', body: JSON.stringify(payload) }),  // admin-only
   getAiUsage: () => request<AiUsage>('/ai/usage'),
   chatStream,
+
+  // ── Interpretationsbelege ───────────────────────────────────────────
+  getInterpretationNachbarkommunen: (kommuneId: number) =>
+    request<NachbarScreeningEintrag[]>(`/kommune/${kommuneId}/interpretation/nachbarkommunen`),
+  getInterpretationNachweise: (kommuneId: number) =>
+    request<NachweisJeArt[]>(`/kommune/${kommuneId}/interpretation/nachweise`),
+  createInterpretationNachweis: (kommuneId: number, eingabe: NachweisEingabe) =>
+    request<NachweisOut>(`/kommune/${kommuneId}/interpretation/nachweise`, {
+      method: 'POST', body: JSON.stringify(eingabe),
+    }),
+  deleteInterpretationNachweis: (kommuneId: number, nachweisId: number) =>
+    request<boolean>(`/kommune/${kommuneId}/interpretation/nachweise/${nachweisId}`, { method: 'DELETE' }),
+  getMassnahmenGewissheit: () =>
+    request<MassnahmeGewissheit[]>('/interpretation/massnahmen-gewissheit'),
+  getMassnahmenUmsetzung: () =>
+    request<MassnahmenUmsetzung>('/interpretation/massnahmen-umsetzung'),
+  getInterpretationsbericht: (kommuneId: number): Promise<string> =>
+    requestText(`/kommune/${kommuneId}/interpretation/bericht`),
 }
