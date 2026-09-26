@@ -222,19 +222,20 @@ export default function MeasuresTableTab() {
                         {(() => {
                           const u = umsetzung[m.measure_type]
                           if (!u) return 'nicht hinterlegt'
+                          const istAbschaetzung = !u.beleg?.quelle && !!u.beleg?.abschaetzung
                           const beleg = u.beleg?.quelle
-                            ? `${u.beleg.quelle}${u.beleg.seite ? `, S. ${u.beleg.seite}` : ''}`
-                            : u.beleg?.abschaetzung
-                              ? `Abschätzung: ${u.beleg.abschaetzung}`
+                            ? `Quelle: ${u.beleg.quelle}${u.beleg.seite ? `, S. ${u.beleg.seite}` : ''}`
+                            : istAbschaetzung
+                              ? `Abschätzung von KAP3${u.beleg.herleitung ? `: ${u.beleg.herleitung}` : ''}`
                               : ''
                           return (
-                            <div title={beleg ? `Quelle: ${beleg}` : undefined}>
+                            <div title={beleg || undefined}>
                               <div>{u.umsetzung === 'kommune_allein' ? 'Kommune allein' : 'mit Partnern'}</div>
                               <div>Ebenen: {u.ebenen.map(e => ebeneLabel[e] || e).join(', ') || '–'}</div>
                               {u.partner.length > 0 && (
                                 <div style={{ color: 'var(--text-muted)' }}>Partner: {u.partner.join(', ')}</div>
                               )}
-                              {beleg && <div style={{ color: 'var(--text-muted)' }}>Quelle: {beleg}</div>}
+                              {beleg && <div style={{ color: 'var(--text-muted)' }}>{beleg}</div>}
                             </div>
                           )
                         })()}
