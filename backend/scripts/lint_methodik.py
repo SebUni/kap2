@@ -1109,27 +1109,45 @@ def ist_steckbrief(pfad: str) -> bool:
     return os.path.basename(pfad).endswith(STECKBRIEF_SUFFIX)
 
 
-def berichtsauswahl(ziel: str | None = None) -> tuple[list[str], list[str]]:
-    """Treffer des Glob-Musters in Euro-Berichte und Steckbriefe trennen."""
+# Querschnittsdateien der Methodik (docs/methodik/querschnitt_*.md) formulieren eine
+# Regel fuer alle Klimawirkungen (Gewissheit, Diskontrate, ...), keinen Euro-Bericht.
+# Gegen die Pflichtkapitel eines Berichts geprueft waeren sie strukturell rot — ein
+# Werkzeugbefund, kein Methodikbefund. Erkennungsmerkmal ist AUSSCHLIESSLICH das
+# Dateinamen-Praefix; jede uebersprungene Datei bekommt eine Ausgabezeile.
+QUERSCHNITT_PRAEFIX = "querschnitt_"
+
+
+def ist_querschnitt(pfad: str) -> bool:
+    """Querschnittsdatei allein am Dateinamen-Praefix erkennen."""
+    return os.path.basename(pfad).startswith(QUERSCHNITT_PRAEFIX)
+
+
+def berichtsauswahl(ziel: str | None = None) -> tuple[list[str], list[str], list[str]]:
+    """Treffer des Glob-Musters in Euro-Berichte, Steckbriefe und Querschnittsdateien trennen."""
     muster = f"{ziel}_*.md" if ziel else "*.md"
     treffer = [p for p in sorted(glob.glob(os.path.join(DOCS, muster)))
                if not p.endswith(".pdf")]
-    berichte = [p for p in treffer if not ist_steckbrief(p)]
     steckbriefe = [p for p in treffer if ist_steckbrief(p)]
-    return berichte, steckbriefe
+    querschnitte = [p for p in treffer if ist_querschnitt(p) and not ist_steckbrief(p)]
+    berichte = [p for p in treffer if p not in steckbriefe and p not in querschnitte]
+    return berichte, steckbriefe, querschnitte
 
 
 def main() -> int:
     ziel = sys.argv[1] if len(sys.argv) > 1 else None
     muster = f"{ziel}_*.md" if ziel else "*.md"
-    berichte, steckbriefe = berichtsauswahl(ziel)
+    berichte, steckbriefe, querschnitte = berichtsauswahl(ziel)
     for pfad in steckbriefe:
         print(f"UEBERSPRUNGEN (Steckbrief): {os.path.basename(pfad)} — "
               f"Kurzformat ohne Pflichtkapitel und Parameter-Blöcke, "
               f"nicht als Euro-Bericht geprüft")
+    for pfad in querschnitte:
+        print(f"UEBERSPRUNGEN (Querschnitt): {os.path.basename(pfad)} — "
+              f"Regel für alle Klimawirkungen, kein Euro-Bericht, "
+              f"nicht als Bericht geprüft")
     if not berichte:
-        if steckbriefe:
-            # Nur Steckbriefe getroffen: nichts zu pruefen ist kein Fehler.
+        if steckbriefe or querschnitte:
+            # Nur uebersprungene Dateien getroffen: nichts zu pruefen ist kein Fehler.
             print("\nALLE LINTS GRÜN")
             return 0
         print(f"Kein Bericht gefunden: {os.path.join(DOCS, muster)}")
