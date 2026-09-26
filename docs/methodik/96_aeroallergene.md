@@ -1416,9 +1416,13 @@ Zelllauf rechnet, nicht als Faktor auf gespeicherte Ergebnisse. Er braucht dafü
 5. als Ausgabe die vermiedenen Tage und Euro je Zelle und für die Kommune, gekennzeichnet als
    „Abschätzung von KAP3“ (Vorgabe P1).
 
-Die Sperre aus Befund 124 gilt weiter: `linked_risk_codes` für `EXPECTED_ANNUAL_ALLERGY_DAYS` bleibt
-leer, der Test `test_no_flat_measure_on_allergy_days` bleibt grün, `default_reduction` im Katalog
-bleibt 0,0, bis der CTO die Rechnung im Zelllauf gebaut hat. Mit den heutigen Werten wäre ein
+Die Sperre aus Befund 124 gilt weiter, bis der CTO die Rechnung im Zelllauf gebaut hat:
+`linked_risk_codes` von `POLLEN_EARLY_WARNING` bleibt leer, `EXPECTED_ANNUAL_ALLERGY_DAYS` steht dort nur
+unter `qualitative_risk_codes` (Zuordnung ohne Rechenwirkung), und der Test
+`test_no_flat_measure_on_allergy_days` bleibt grün. Der Katalog führt `default_reduction` = 0,03
+(`backend/app/data/catalog.py`, Code-Stand im Revisionsstand, Ledger-Befund 215). Weil
+`linked_risk_codes` leer ist, wird der Faktor nur ausgewiesen und ändert keinen Karten- oder
+Ergebniswert von #96. Mit den heutigen Werten wäre ein
 Faktor 0,0225 auf die gespeicherten Zusatztage der Zellen im Geltungsbereich zahlengleich (siehe
 „Was die Formel heute von einem Faktor unterscheidet“). Verlangt wird der Zelllauf mit getrennten
 Gruppen trotzdem, weil nur er den Ersetzungspfad ohne Umbau aufnimmt: Mit
@@ -1494,7 +1498,7 @@ gegenläufige Evidenz (Neophyten [23], CO₂ [21,22]) macht das zur Untergrenze;
    Betroffene (§5, Rechenbeispiel). **Richtung des Fehlers:** λ ist dabei als Anteil der
    örtlichen Quellen an der Pollenlast gelesen, 1 − λ als regionaler Hintergrund. Belegt ist das
    mit Hugg 2017 [74] (Gräser, je acht Messstellen in Helsinki und Espoo; abgeleitet 0,22–0,94,
-   drei von vier Werten im Band 0,3–1,0). Zwei Fehler wirken gegeneinander: Die Bezugsstelle der
+   drei von vier Werten im Band 0,3–1,0; Rechnung in Kap. 8 [74]). Zwei Fehler wirken gegeneinander: Die Bezugsstelle der
    Quelle liegt selbst in der Stadt, die abgeleiteten Werte sind Untergrenzen, und λ = 0,7
    **unterzeichnet** die Senkung eher. Birkenpollen fliegen weiter als Gräserpollen (Modellgrenze 2);
    für Bäume kann der örtliche Anteil kleiner sein, und λ **überzeichnet** die Senkung dann. Einen
@@ -1558,7 +1562,7 @@ parameter:
   id: pollen.delta_s_region
   wert: "backend/data/kalibrierung/pollensaison_region.csv"
   einheit: "Tage"
-  band: null   # SD/SE je Zeile in der CSV; Birke-Marker-Offset bis -1,3 d (§3.1)
+  band: null   # SD/SE je Zeile in der CSV; Birke-Marker-Offset bis −1,3 Tage (§3.1)
   herkunft: register:96-W025-01
   quelle: dwd_cdc_phaenologie_jahresmelder
   preisstand: null
@@ -1582,13 +1586,13 @@ parameter:
   id: pollen.p_ar
   wert: {u20: 0.088, 20-64: 0.132, 65-74: 0.067, 75-84: 0.050, 85+: 0.050}
   einheit: "-"
-  band: null   # 75+/85+ Extrapolation ueber DEGS1-Ende 79 (gekennzeichnet, §3.2)
+  band: null   # 80–84 und 85+ extrapoliert ueber das DEGS1-Ende 79 (gekennzeichnet, §3.2)
   herkunft: register:96-R35-01
   quelle: langen2013_thamm2018_destatis2023
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
-  kennzeichnung: quelle   # DEGS1/KiGGS W2 [1,2]; 80-84 und 85+ extrapoliert, gekennzeichnet in 3.2
+  kennzeichnung: quelle   # DEGS1/KiGGS W2 [1,2]; 80–84 und 85+ extrapoliert, gekennzeichnet in 3.2
   abgeleitet_aus: []
 parameter:
   id: pollen.p_sens_gruppen
@@ -1662,7 +1666,9 @@ parameter:
   # (Katalog POLLEN_EARLY_WARNING, default_reduction). Code-Stand 26.09.2026:
   # default_reduction = 0,03 (backend/app/data/catalog.py); linked_risk_codes
   # bleibt leer (Sperre aus Befund 124), im Produkt wirkt der Faktor auf #96
-  # erst nach der Integrationsauflage (S158) in §5.1 (Ledger-Befunde 151, 178).
+  # erst nach der Integrationsauflage (S158) in §5.1 (Ledger-Befunde 151, 178, 215).
+  # Kettenprodukt 0,35 x 0,40 x 0,20 = 0,028, gerundet 0,03 (§5.1); der Kommentar
+  # an der wert-Zeile meint diese Rundung (Befund 220).
   id: pollen.r_s158
   wert: 0.03     # = 0,35 x 0,40 x 0,20 (Dreifaktor-Kette §5.1)
   einheit: "-"
@@ -1695,7 +1701,7 @@ parameter:
   id: pollen.c_jahr_direkt
   wert: 266.90
   einheit: "EUR/Jahr"
-  band: [266.90, 1018.6]   # Obergrenze Schramm (moderate-schwere SAR); Kinder 1027-1335
+  band: [266.90, 1018.6]   # Obergrenze Schramm (moderate-schwere SAR); Kinder 1.027–1.335 (§3.5)
   herkunft: register:96-K1-01
   quelle: cardell2016_totall_schramm2003
   preisstand: "2024"
@@ -1713,7 +1719,7 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
-  kennzeichnung: berechnet   # = f x (p_B L_B + p_G L_G) = 0,70 x 61,5
+  kennzeichnung: berechnet   # = f x (p_B L_B + p_G L_G) = 0,70 x (0,55 x 30 + 0,75 x 60) = 43,05 (§3.5)
   abgeleitet_aus: [pollen.f_symptomtage, pollen.p_sens_gruppen, pollen.l_saison]
 parameter:
   id: pollen.c_tag
@@ -1903,10 +1909,14 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   Metropolitan area, Finland“, PLoS ONE 12(10):e0186348, 2017. doi:10.1371/journal.pone.0186348 (PMC5638505),
   https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0186348 (Abruf 26.09.2026; Permalink
   https://web.archive.org/web/20250629111255/https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0186348).
-  Gräser, je acht Messstellen in Helsinki und Espoo entlang eines Stadt-Land-Gefälles; Tabelle 3 (Mittelwerte
+  Gräser, je acht Messstellen in Helsinki und Espoo entlang eines Stadt-Land-Gefälles; Tabelle 3, S. 6 (Mittelwerte
   je Messstelle, Pollen je m³): Helsinki 1 „Most urban“ 2,55/4,38, Espoo 1 „Most urban“ 3,59/5,40
-  (vormittags/nachmittags); Abstract und Conclusions. Beleg der Lesart von λ als Anteil der örtlichen Quellen
-  (Log 26, Modellgrenze 7); Auswertung im Ergebnis von T-1361.
+  (vormittags/nachmittags); Abstract, S. 1; Conclusions, S. 13. Beleg der Lesart von λ als Anteil der örtlichen
+  Quellen (Log 26, Modellgrenze 7). **Rechnung von KAP3 aus Tabelle 3:** Der Hintergrund ist die städtischste
+  Messstelle, verglichen wird mit dem Mittel aller acht Messstellen; λ = 1 − Hintergrund ÷ Mittel. Mittel aller acht:
+  Helsinki 5,79 (vormittags) und 5,61 (nachmittags), Espoo 26,41 und 84,92 Pollen je m³. Damit Helsinki
+  1 − 2,55 / 5,79 = 0,56 und 1 − 4,38 / 5,61 = 0,22, Espoo 1 − 3,59 / 26,41 = 0,86 und 1 − 5,40 / 84,92 = 0,94:
+  abgeleitet 0,22–0,94, drei von vier Werten im Band 0,3–1,0 (§3.3, Modellgrenze 7, Log 26).
 
 ## Entscheidungslog
 
@@ -1938,7 +1948,7 @@ bewusste Überstimmung von Eintrag 19 (Ledger-Befund 182).
 | 7 ⚠ | f-Herleitung? | **Modellannahme 0,70 (0,50–0,85)**; Pfaar-r nur qualitativ; Bastl [53] geprüft — liefert die Größe nicht | behebt Kategorienfehler (Rev.-5-Befund 14) exakt entlang des Gegenprüfungs-Vorschlags | f aus PHD-Tagesdaten (Ersetzungspfad) | nur nativer Ausweis −28,6 % bis +21,4 % (§3.4); € unabhängig von f (§3.5) |
 | 8 ⚠ | p_B/p_G? | **0,55/0,75 als gekennzeichnete Abschätzung** (Rangfolge-Stütze [3]); additive Saisonform als €-konservativ dokumentiert | Anteil unter AR-Patienten nicht publiziert (Befund 36a); Überlappungskorrektur würde € erhöhen (36b) | PID-/Versorgungsdaten (Ersetzungspfad) | δ: p_B −11,7 % bis +11,7 %, p_G −11,4 % bis +7,6 %, zusammen −23 % bis +19 % (Region Mitte, §3.4); Euro nur −6 % bis +8 % (Kap. 1 (a)) |
 | 9 ⚠ | Kostensatz-Basis? | **TOTALL 266,90 €₂₀₂₄ (populationsbasiert)**; Schramm nur Obergrenze/Kinder-Band | Schramm (moderate–schwer) auf alle Betroffenen = bekannte Überschätzung um grob Faktor 4 (§3.5) — verletzt Untergrenzen-Zusage (#95-Befund-62-Lehre); impliziter Baseline-Check §4 bestätigt | Schramm als Basis (M0-Linie; 9,1 Mrd. implizite Basis, Kap. 4 — verworfen) | € −74 % ggü. Schramm-Basis (§3.5) |
-| 10 ⚠ | Prävalenz-Bänder? | **u20-Ebene neu** (Zensus 5er-Jahresgruppen 0–4, 5–9, 10–14, 15–19); 18/19 mit KiGGS-Wert (unterschätzend); 75+/85+ = 5,0 % Extrapolation (gekennzeichnet, §3.2) | behebt Rev.-5-Befunde 27/35 entlang Variante (a) der Gegenprüfung | Misch-Prävalenz je Zelle ohne u20-Ebene | Alterslast korrekt verteilt |
+| 10 ⚠ | Prävalenz-Bänder? | **u20-Ebene neu** (Zensus 5er-Jahresgruppen 0–4, 5–9, 10–14, 15–19); 18/19 mit KiGGS-Wert (unterschätzend); 75–84 und 85+ = 5,0 %, davon 80–84 und 85+ extrapoliert (gekennzeichnet, §3.2) | behebt Rev.-5-Befunde 27/35 entlang Variante (a) der Gegenprüfung | Misch-Prävalenz je Zelle ohne u20-Ebene | Alterslast korrekt verteilt |
 | 11 | Attribution? | **a_attr = 0,50 (0,19–0,84)** [9] | einzige publizierte Attribution des Saisontrends; IQR als Band | 1,0 (volle Anrechnung — nicht belegbar) | zentraler Hebel −62 % bis +68 % (§3.0) |
 | 12 | Vegetations-Modulation? | **λ = 0,7 (0,3–1,0)** (aktualisiert Runde 2, Befund 110: wörtliche Zuwachs-Lesart der Werchan-Prozente; Verhältnis-Lesart im Band), P̂ in beiden Pfaden; Ḡ₀-Zentrierung §3.3 | Kette #lambda-veg reproduzierbar; Kommunensumme im Ausgangsstand λ-invariant (§3.4; seit Log 18 je Kommune, damit auch die Bundessumme) — Lesart wirkt im Ausgangsstand nur verteilend (mit Maßnahme ist die Senkung proportional zu λ, Log 26) | Verhältnis-Lesart als Basiswert (in M0 λ = 0,6; verworfen, geht als untere Lesart ins Band ein, §3.4) | lokale Differenzierung: \(\hat P\) = 0,65…1,35 bei \(\hat G/\bar G_0\) = 0,5…1,5 (§3.6); zwischen vegetationsarmer Zelle (0,3) und Allee-Zelle (1,7) der Faktor 5,7 (§3.0) |
 | 13 | Ambrosia (W024)? | **bewusst inaktiv in M0**, Modul 96-B ab M1 | Zeithorizont 2041–2060 ≠ „heute"; Teilausschnitt | sofortiges Zusatzmodul | Untergrenze |
