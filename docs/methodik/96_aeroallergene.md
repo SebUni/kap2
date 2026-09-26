@@ -4,7 +4,7 @@ Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048: Schr
 (T-1238, Ledger-Befunde 152–155), Schritt 2 S158 nach Tagen und Belastung und Stadtbaumwahl (T-1239,
 Log 23/24, Befunde 156–167), Schritt 3 Pflichtinhalte — Kap. 1 „Risiko ohne (weitere) Anpassung“,
 Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181),
-Schritt 4 Bezugswert Ḡ₀ der Stadtbaumwahl (T-1323, T-1362, Log 26, Befund 182), Nachzug der Befunde 183–185, Runde 14 mit Befunden 186–194 Runde 15 mit Befunden 195–197 (T-1330) und Runde 16 mit Befunden 199–200 (T-1427);
+Schritt 4 Bezugswert Ḡ₀ der Stadtbaumwahl (T-1323, T-1362, Log 26, Befund 182), Nachzug der Befunde 183–185, Runde 14 mit Befunden 186–194, Runde 15 mit Befunden 195–197 (T-1330), Runde 16 mit Befunden 199–200 und Runde 17 mit Befunden 201–204 und 206 (T-1427);
 Gegenprüfung durch den methodik_manager bis zur Null-Runde läuft, Abnahme der Rev. 4 steht aus)** ·
 Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
@@ -43,6 +43,9 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > **Runde 16 (T-1427):** Befunde 199–200 — Abgrenzung in §5.1 auf die Regel nach Log 26 (Vegetationsmaßnahme,
 > auch flächig, nur im Zelllauf über Ĝ′ bei festgehaltenem Ḡ₀; r_S158 als Verhaltenskanal), Log 24 nachgezogen;
 > flächiges Programm in §5 mit der Bedingung „keine Kronen ohne Gattungs-Tag“ (sonst 6,5 % als Obergrenze).
+> **Runde 17 (T-1427):** Befunde 201–204 — Sensitivität von p_B/p_G in §3.4 nachgerechnet (−11,7 % bis +11,7 %
+> und −11,4 % bis +7,6 % statt ±6 % und ±8 %), k̄_unbek beim flächigen Programm, Komma in der Statuszeile,
+> u20 in §3.2 aus 5er-Jahresgruppen; Sensitivität von f in §3.4 und Log 7 nachgerechnet (Befund 206).
 > **Code-Stand:** Der Katalogwert `default_reduction` von
 > `POLLEN_EARLY_WARNING` ist 0,03 (`backend/app/data/catalog.py`); `linked_risk_codes` bleibt leer
 > (Sperre aus Befund 124), die Maßnahme wirkt im Produkt also noch nicht auf #96.
@@ -491,7 +494,7 @@ sie (Befund 105).
 
 **Bänder und Herleitung** (Rev.-5-Befunde 27/35): Das Produkt führt die Zensus-Bänder
 u65/65–74/75–84/85+; für die Prävalenz-Schichtung wird zusätzlich die Ebene **u20 neu
-angelegt** (Zensus-2022-Gitter, 10-Jahres-Klassen 0–9 + 10–19; §3.1-Kennzeichnung „neu
+angelegt** (Zensus-2022-Gitter, 5er-Jahresgruppen 0–4, 5–9, 10–14, 15–19; §3.1-Kennzeichnung „neu
 anzulegen"); das Band 20–64 ergibt sich je Zelle als u65 − u20.
 **Ergebnis der Integration (31.08.2026):** Ebene `POPULATION_U20` **angelegt** —
 der Zensus-Gitterdatensatz „Alter in 5er-Jahresgruppen" liegt bereits im Produkt;
@@ -711,13 +714,15 @@ for r, (db, dg) in DS.items():
   Symptom-Score-Berechnungsmethoden und publiziert **keinen** Anteil symptomatischer
   Saisontage — \(f\) bleibt Annahme mit Band und Ersetzungspfad (PHD-Tagesdaten).
   **Entlastung:** \(f\) kürzt sich im €-Pfad vollständig heraus (§3.5) und wirkt nur auf
-  den nativen ΔTage-Ausweis (±29 % am Band).
+  den nativen ΔTage-Ausweis: am Band 0,50–0,85 um −28,6 % bis +21,4 % (0,50 / 0,70 und 0,85 / 0,70).
 - **\(p_B\) = 0,55 (0,4–0,7), \(p_G\) = 0,75 (0,6–0,85) — gekennzeichnete Abschätzung**
   (Log 8; Rev.-5-Befund 36a): benötigt wird der Anteil der AR-Patienten mit
   Birkengruppen- bzw. Gräser-relevanter Saison; publiziert sind nur
   Bevölkerungs-Sensibilisierungen (Haftenberger [3]: Gräserpollen 19,4 %, Birke 17,4 %,
   Erle 16,5 %, Hasel 16,2 % — Rangfolge Gräser > Birkengruppe konsistent zur Setzung).
-  Sensitivität: ±0,15 auf \(p_G\) bzw. \(p_B\) verschiebt \(\delta\) um ±8 % bzw. ±6 %.
+  Sensitivität (Region Mitte, \(p_B \Delta S_B + p_G \Delta S_G\) = 5,37 Tage): \(p_B\) 0,4–0,7 verschiebt
+  \(\delta\) um −11,7 % bis +11,7 % (±0,15 × 4,20 = ±0,63 Tage), \(p_G\) 0,6–0,85 um −11,4 % bis +7,6 %
+  (−0,15 × 4,08 = −0,612 Tage, +0,10 × 4,08 = +0,408 Tage), zusammen −23 % bis +19 % (Kap. 1 (a)).
   Ersetzungspfad: PID-/Versorgungsdaten (Registry-Vermerk).
 - **\(\lambda\) = 0,7 (0,3–1,0) — Herleitungskette** (Anker `#lambda-veg`; Befunde
   102/110): Werchan 2017 [54] misst über 14 Pollenfallen in Berlin die Spanne der
@@ -1043,7 +1048,7 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   das in allen Zellen ein Fünftel der allergenen Kronen mit Gattungs-Tag ersetzt, senkt jetzt die Summe, um
   λ × 0,464 × 0,2 × (betroffenengewichteter Kronenanteil) / Ḡ₀; sind Kronen- und Grünanteil im
   Mittel gleich groß und gibt es keine Kronen ohne Gattungs-Tag, sind das 0,7 × 0,464 × 0,2 = 6,5 %.
-  Gibt es Kronen ohne Gattungs-Tag, ist Ḡ₀ um 0,464 × 0,12 × (Anteil der Kronen ohne Tag) größer, die
+  Gibt es Kronen ohne Gattungs-Tag, ist Ḡ₀ um 0,464 × 0,12 × \(\bar k_{\text{unbek}}\) (betroffenengewichtetes Mittel von \(k_{\text{unbek},z}\), dem Kronenflächenanteil ohne Gattungs-Tag) größer, die
   Senkung kleiner, und 6,5 % sind eine Obergrenze. Gerechnet wird es trotzdem im Zelllauf
   über \(\hat G'\), nie als pauschaler Faktor (Integrationsauflage unten).
 
@@ -1923,7 +1928,7 @@ bewusste Überstimmung von Eintrag 19 (Ledger-Befund 182).
 | 4 ⚠ | Gräser-Saisonende? | **konstant** (nur Sukzessions-Spreizung Fuchsschwanz→Knäuelgras) | kein Phänologie-Marker fürs Saisonende; Herbst-Verlängerung [6] bewusst nicht angesetzt | Literatur-Zuschlag für Herbst-Verlängerung | Untergrenze (§6 Grenze 1) |
 | 5 | Regionenzuschnitt? | **Bundesland → N/M/S wie #95** (`health.REGION_BY_BUNDESLAND`) | Produktkonsistenz; ΔS-Regionalstreuung gering (±20 %) | Naturraumgruppen (feiner) | einheitliche Regionslogik |
 | 6 ⚠ | Kalibrierfaktor? | **c_kal ≡ 1 — dokumentierte Ausnahme** von §3.4: keine amtliche Anker-Zeitreihe existiert [66]; Modell voll messungs-/prävalenzverankert; Sanity-Bänder ersetzen den Fit | ein Fit ohne Anker wäre Scheinkalibrierung; BT-Drs. belegt die Lücke | J30-KKR-Anker bei Integration interaktiv ziehen (Registry-Vermerk) | kein Fit-Schritt; §4-Bänder tragen die Validierung |
-| 7 ⚠ | f-Herleitung? | **Modellannahme 0,70 (0,50–0,85)**; Pfaar-r nur qualitativ; Bastl [53] geprüft — liefert die Größe nicht | behebt Kategorienfehler (Rev.-5-Befund 14) exakt entlang des Gegenprüfungs-Vorschlags | f aus PHD-Tagesdaten (Ersetzungspfad) | nur nativer Ausweis ±29 %; € unabhängig von f |
+| 7 ⚠ | f-Herleitung? | **Modellannahme 0,70 (0,50–0,85)**; Pfaar-r nur qualitativ; Bastl [53] geprüft — liefert die Größe nicht | behebt Kategorienfehler (Rev.-5-Befund 14) exakt entlang des Gegenprüfungs-Vorschlags | f aus PHD-Tagesdaten (Ersetzungspfad) | nur nativer Ausweis −28,6 % bis +21,4 %; € unabhängig von f |
 | 8 ⚠ | p_B/p_G? | **0,55/0,75 als gekennzeichnete Abschätzung** (Rangfolge-Stütze [3]); additive Saisonform als €-konservativ dokumentiert | Anteil unter AR-Patienten nicht publiziert (Befund 36a); Überlappungskorrektur würde € erhöhen (36b) | PID-/Versorgungsdaten (Ersetzungspfad) | δ ±8 % Sensitivität |
 | 9 ⚠ | Kostensatz-Basis? | **TOTALL 266,90 €₂₀₂₄ (populationsbasiert)**; Schramm nur Obergrenze/Kinder-Band | Schramm (moderate–schwer) auf alle Betroffenen = bekannte ~4-fache Überschätzung — verletzt Untergrenzen-Zusage (#95-Befund-62-Lehre); impliziter Baseline-Check §4 bestätigt | Schramm als Basis (M0-Linie; 9,1 Mrd. implizite Basis — verworfen) | € −76 % ggü. Schramm-Basis |
 | 10 ⚠ | Prävalenz-Bänder? | **u20-Ebene neu** (Zensus 10er-Klassen); 18/19 mit KiGGS-Wert (unterschätzend); 75+/85+ = 5,0 % Extrapolation (gekennzeichnet) | behebt Rev.-5-Befunde 27/35 entlang Variante (a) der Gegenprüfung | Misch-Prävalenz je Zelle ohne u20-Ebene | Alterslast korrekt verteilt |
