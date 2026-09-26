@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useStore } from '../store'
 import { api } from '../api/client'
+import UnsicherheitsZusammenschau from './UnsicherheitsZusammenschau'
 import type { Measure, MeasureImpactSummary } from '../types'
 
 export default function MeasuresTableTab() {
@@ -103,6 +104,8 @@ export default function MeasuresTableTab() {
           <input ref={fileInputRef} type="file" accept=".xlsx,.xls" onChange={handleImport} style={{ display: 'none' }} />
         </div>
       </div>
+
+      <UnsicherheitsZusammenschau kommuneId={kommune.id} />
 
       {measures.length > 0 && (
         <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
