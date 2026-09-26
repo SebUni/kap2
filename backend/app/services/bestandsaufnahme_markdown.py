@@ -13,6 +13,7 @@ from app.data import sources
 from app.data.vorhandene_untersuchungen import LANDESPORTALE, NACHBAR_SATZ, UNTERSUCHUNGEN
 from app.data.bevoelkerungsentwicklung import MODELLGRENZE
 from app.data.catrare import MODELLGRENZE as MODELLGRENZE_CATRARE
+from app.services.bestandsaufnahme_handlungsfelder import handlungsfelder_im_katalog
 from app.services.kang_nachweis_markdown import _de_betrag
 
 TITEL = "# Bestandsaufnahme"
@@ -35,7 +36,14 @@ GRUPPEN = [
 # Modellgrenzen je Gruppe, wörtlich unter der Tabelle der Gruppe.
 GRUPPEN_MODELLGRENZEN = {"vergangene_ereignisse": MODELLGRENZE_CATRARE, "trends": MODELLGRENZE}
 
-UEBERSCHRIFT_LUECKEN = "## Datenlücken"
+UEBERSCHRIFT_HANDLUNGSFELDER = "## Handlungsfelder"
+
+HANDLUNGSFELDER_SATZ = (
+    "Für die Felder im Katalog rechnet das Produkt Schäden, der KAnG-Nachweis zeigt den "
+    "Stand; ob ein Feld „nicht im Katalog“ die Kommune betrifft, schätzt sie selbst ein."
+)
+
+UEBERSCHRIFT_LUECKEN ="## Datenlücken"
 
 UEBERSCHRIFT_UNTERSUCHUNGEN = "## Vorhandene Untersuchungen"
 
@@ -148,6 +156,10 @@ def bestandsaufnahme_markdown(ergebnis: dict) -> str:
             teile += [GRUPPEN_MODELLGRENZEN[gruppe], ""]
 
     teile += _untersuchungen(ergebnis.get("bundesland"))
+
+    teile += [UEBERSCHRIFT_HANDLUNGSFELDER, "", HANDLUNGSFELDER_SATZ, ""]
+    teile += [f"- {f['label']}: {f['status']}" for f in handlungsfelder_im_katalog()]
+    teile.append("")
 
     saetze: list[str] = []
     for g in groessen:

@@ -41,6 +41,10 @@ def systembereich_auswertung(agg: dict) -> dict[str, dict]:
       Klimawirkung, tragen aber keinen Euro-Betrag bei. Ein Bereich ohne jede
       Klasse-A-Wirkung erhält ``schadenskosten_eur = None`` (nie 0 €).
 
+    Gezählt werden verschiedene KWRA-Kennungen (``kwra_id``), nicht Risikocodes:
+    ``anzahl_klimawirkungen`` und das x in ``euro_beziffert`` zählen dieselbe
+    Einheit wie der Nenner y. ``risk_codes`` bleibt die Liste der Codes.
+
     Rückgabe: alle fünf Bereiche in der Reihenfolge ``catalog.KWRA_SYSTEMBEREICHE``,
     je ``{"anzahl_klimawirkungen", "risk_codes", "mittlerer_index",
     "schadenskosten_eur", "klimawirkungen_im_katalog", "euro_beziffert"}``.
@@ -52,7 +56,8 @@ def systembereich_auswertung(agg: dict) -> dict[str, dict]:
     codes: dict[str, list[str]] = {b: [] for b in catalog.KWRA_SYSTEMBEREICHE}
     indizes: dict[str, list[float]] = {b: [] for b in catalog.KWRA_SYSTEMBEREICHE}
     kosten: dict[str, float | None] = {b: None for b in catalog.KWRA_SYSTEMBEREICHE}
-    euro: dict[str, int] = {b: 0 for b in catalog.KWRA_SYSTEMBEREICHE}
+    wirkungen: dict[str, set] = {b: set() for b in catalog.KWRA_SYSTEMBEREICHE}
+    euro: dict[str, set] = {b: set() for b in catalog.KWRA_SYSTEMBEREICHE}
     im_katalog = {b: len(i) for b, i in _katalog_ids_je_bereich().items()}
 
     for r in agg["cost"]["by_risk"]:
@@ -61,24 +66,27 @@ def systembereich_auswertung(agg: dict) -> dict[str, dict]:
             continue
         bereich = catalog.RISK_SYSTEMBEREICH[code]
         codes[bereich].append(code)
+        spec = catalog.RISKS_BY_CODE.get(code)
+        # Eine Klimawirkung ist eine KWRA-Kennung, nicht ein Rechencode.
+        kennung = spec["kwra_id"] if spec is not None else code
+        wirkungen[bereich].add(kennung)
         if r.get("index") is not None:
             indizes[bereich].append(float(r["index"]))
-        spec = catalog.RISKS_BY_CODE.get(code)
         if (r.get("has_euro_layer") is False
                 or (spec is not None and not catalog.risk_has_euro_layer(spec))):
             continue
-        euro[bereich] += 1
+        euro[bereich].add(kennung)
         kosten[bereich] = (kosten[bereich] or 0.0) + float(r["cost_eur"] or 0.0)
 
     return {
         b: {
-            "anzahl_klimawirkungen": len(codes[b]),
+            "anzahl_klimawirkungen": len(wirkungen[b]),
             "risk_codes": codes[b],
             "mittlerer_index": (round(sum(indizes[b]) / len(indizes[b]), 2)
                                 if indizes[b] else None),
             "schadenskosten_eur": None if kosten[b] is None else round(kosten[b], 2),
             "klimawirkungen_im_katalog": im_katalog[b],
-            "euro_beziffert": (f"{euro[b]} von {im_katalog[b]} Klimawirkungen "
+            "euro_beziffert": (f"{len(euro[b])} von {im_katalog[b]} Klimawirkungen "
                                "in Euro beziffert"),
         }
         for b in catalog.KWRA_SYSTEMBEREICHE
