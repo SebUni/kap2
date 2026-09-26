@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
 import type { InterpretationDiversitaet } from '../../api/client'
+import { useStore } from '../../store'
 
 /** Gender- und Diversitätsaspekte je Klimawirkung im Wortlaut der Schnittstelle, mit Quelle. Keine Bewertung. */
 export default function DiversitaetAspekte() {
   const [daten, setDaten] = useState<InterpretationDiversitaet | null>(null)
   const [fehler, setFehler] = useState<string | null>(null)
+  const catalog = useStore(s => s.catalog)
+  const loadCatalog = useStore(s => s.loadCatalog)
+
+  useEffect(() => {
+    if (!catalog) void loadCatalog().catch(() => undefined)
+    // Der Katalog liefert nur die Klarnamen; ohne ihn steht der Code als Überschrift.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     let aktiv = true
@@ -52,7 +61,7 @@ export default function DiversitaetAspekte() {
       {eintraege.length === 0 && <p>Für keine Klimawirkung sind Aspekte hinterlegt.</p>}
       {eintraege.map(([code, e]) => (
         <div key={code} style={{ marginBottom: '1rem' }}>
-          <h3>{code}</h3>
+          <h3>{catalog?.risks.find(r => r.code === code)?.name ?? code}</h3>
           {e.beruecksichtigt.length > 0 && (
             <>
               <p>Geht in die Rechnung ein:</p>
