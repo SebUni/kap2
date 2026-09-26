@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { useStore } from '../store'
 import { api } from '../api/client'
 import type { MassnahmeGewissheit, MassnahmeUmsetzung } from '../api/client'
+import { evidenzAnzeige, istEvidenzklasse } from '../utils/evidenceLabel'
 import UnsicherheitsZusammenschau from './UnsicherheitsZusammenschau'
 import type { Measure, MeasureImpactSummary } from '../types'
 
@@ -14,10 +15,11 @@ export default function MeasuresTableTab() {
 
   // Gewissheit je Maßnahmentyp (Code measure_type), einmal geladen.
   const [gewissheit, setGewissheit] = useState<Record<string, MassnahmeGewissheit>>({})
+  const [gewissheitFehler, setGewissheitFehler] = useState(false)
   useEffect(() => {
     api.getMassnahmenGewissheit()
       .then(list => setGewissheit(Object.fromEntries(list.map(g => [g.code, g]))))
-      .catch(() => {})
+      .catch(() => setGewissheitFehler(true))
   }, [])
 
   // Umsetzung (allein/mit Partnern, Ebenen, Quelle) je Maßnahmentyp, einmal geladen.
@@ -205,7 +207,7 @@ export default function MeasuresTableTab() {
                       <td style={{ fontSize: '0.75rem' }}>
                         {(() => {
                           const g = gewissheit[m.measure_type]
-                          if (!g) return 'nicht hinterlegt'
+                          if (!g) return gewissheitFehler ? 'Gewissheit konnte nicht geladen werden' : 'nicht hinterlegt'
                           return (
                             <>
                               {g.klimawirkungen.map(k => (
@@ -213,7 +215,7 @@ export default function MeasuresTableTab() {
                                   {k.name}: {k.gewissheitsstufe}{k.qualitativ ? ' (qualitativ)' : ''}
                                 </div>
                               ))}
-                              <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{g.wirkung_evidenz}</div>
+                              <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{istEvidenzklasse(g.wirkung_evidenz) ? evidenzAnzeige(g.wirkung_evidenz) : g.wirkung_evidenz}</div>
                             </>
                           )
                         })()}

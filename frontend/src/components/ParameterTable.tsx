@@ -11,6 +11,7 @@ import {
   type ParamSectionLink,
 } from '../utils/paramSectionLinks'
 import { fmtParamValue } from '../utils/layerInfoFormat'
+import { evidenzAnzeige } from '../utils/evidenceLabel'
 import InfoTooltip from './InfoTooltip'
 
 /** Demo: Wert/Quelle gesperrter Ebenen verborgen (nur in der Vollversion sichtbar). */
@@ -45,9 +46,7 @@ function EvidenceCell({ p }: { p: ModelParameter }) {
   const abgeschaetzt = p.evidence_class === 'abgeschaetzt'
   const berechnet = p.evidence_class === 'berechnet'
   const klassenName = abgeschaetzt ? 'is-estimated' : berechnet ? 'is-computed' : 'is-sourced'
-  const anzeige = abgeschaetzt
-    ? 'abgeschätzt (KAP3)'
-    : berechnet ? 'berechnet aus amtlichen Daten' : 'belegt'
+  const anzeige = evidenzAnzeige(p.evidence_class)
   const d = p.evidence_derivation
   const hatHerleitung = Boolean(d || p.evidence_note)
   return (

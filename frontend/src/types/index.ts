@@ -717,7 +717,7 @@ export interface CostDiskontierung {
   /** Reine Zeitpräferenzrate(n) als Dezimalanteil. */
   rzpr: number[]
   /** Komponente der relativen Preise (Dezimalanteil, Abschätzung von KAP3). */
-  relative_preise: { wert: number; evidence_class: string; begruendung: string }
+  relative_preise: { wert: number; evidence_class: EvidenceClass; begruendung: string }
   /** Diskontrate je RZPR; gleiche Schlüssel wie `discounted`. */
   diskontraten: Record<string, number>
   modellgrenzen: string[]

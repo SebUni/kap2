@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { api } from '../../api/client'
 import { useStore } from '../../store'
+import AbhaengigkeitenHandlungsfelder from './AbhaengigkeitenHandlungsfelder'
 import NachweiseEinbeziehung from './NachweiseEinbeziehung'
 import NachbarkommunenScreening from './NachbarkommunenScreening'
 
@@ -18,6 +19,7 @@ export interface StrukturierterAbschnittProps {
  * späteren Paketen.
  */
 export const STRUKTURIERTE_ABSCHNITTE: Record<string, ComponentType<StrukturierterAbschnittProps>> = {
+  'Abhängigkeiten über Handlungsfelder': AbhaengigkeitenHandlungsfelder,
   Einbeziehung: NachweiseEinbeziehung,
   Nachbarkommunen: NachbarkommunenScreening,
 }
@@ -52,6 +54,8 @@ export default function ErgebnisseInterpretierenTab() {
   const kommune = useStore(s => s.kommune)
   const kommuneId = kommune?.id
   const [bericht, setBericht] = useState<string | null>(null)
+  // Download-Name vom Server (Art, Name der Kommune, Gemeindeschlüssel; T-1424).
+  const [dateiname, setDateiname] = useState<string | null>(null)
   const [laedt, setLaedt] = useState(false)
   const [fehler, setFehler] = useState<string | null>(null)
   const [version, setVersion] = useState(0)
@@ -63,8 +67,13 @@ export default function ErgebnisseInterpretierenTab() {
     let abgebrochen = false
     setLaedt(true)
     setFehler(null)
-    api.getInterpretationsbericht(kommuneId)
-      .then(text => { if (!abgebrochen) setBericht(text) })
+    api.getInterpretationsberichtDatei(kommuneId)
+      .then(({ inhalt, dateiname: name }) => {
+        if (!abgebrochen) {
+          setBericht(inhalt)
+          setDateiname(name)
+        }
+      })
       .catch(e => {
         if (!abgebrochen) setFehler(e instanceof Error ? e.message : 'Der Bericht konnte nicht geladen werden.')
       })
@@ -78,7 +87,7 @@ export default function ErgebnisseInterpretierenTab() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `ergebnisse-interpretieren-${kommuneId ?? 'kommune'}.md`
+    a.download = dateiname ?? 'ergebnisse-interpretieren.md'
     document.body.appendChild(a)
     a.click()
     a.remove()
