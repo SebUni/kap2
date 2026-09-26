@@ -411,6 +411,24 @@ def zahlenformat(src: str, lint: Lint) -> None:
         lint.ok.append("Zahlenformat nach kap3-stil")
 
 
+# Pflichtabsatz „Risiko ohne (weitere) Anpassung“ (Aufsichtsrat 25.09.2026, T-1121-cmo; eingetragen in die
+# Methodik-Aufgabe mit T-1237): Jeder Bericht trägt ihn in Kapitel 1. Bis dahin hing die Prüfung an der freien
+# Gegenprüfung (Q-20260925T221511Z-methodik_manager-43d661-1). Querschnittsdateien und Steckbriefe erreichen diese
+# Funktion nicht — `main()` überspringt sie vorher.
+PFLICHTABSATZ_KAP1 = "### Risiko ohne (weitere) Anpassung"
+PFLICHTABSATZ_KAP1_ROT = "Pflichtabsatz „Risiko ohne (weitere) Anpassung“ fehlt in Kapitel 1"
+
+
+def pflichtabsatz_ohne_anpassung(src: str, lint: Lint) -> None:
+    """Zwischen `## 1…` (keine weitere Ziffer nach der 1) und der nächsten `##`-Überschrift steht eine Zeile,
+    die mit `### Risiko ohne (weitere) Anpassung` beginnt."""
+    kap1 = re.search(r"^## 1(?!\d)[^\n]*\n(.*?)(?=^## |\Z)", src, re.S | re.M)
+    if kap1 and any(z.startswith(PFLICHTABSATZ_KAP1) for z in kap1.group(1).split("\n")):
+        lint.ok.append("Pflichtabsatz „Risiko ohne (weitere) Anpassung“ in Kapitel 1")
+    else:
+        lint.fehler.append(PFLICHTABSATZ_KAP1_ROT)
+
+
 def ansatzkapitel_entfaellt(src: str, lint: Lint) -> None:
     """Fortschreibung 7 (24.09.2026): eine Methodik je Risiko — kein Kapitel 9 (Ansatz-Vergleich)."""
     lint.pruefe(not re.search(r"^## 9 ", src, re.M), "Kein Kapitel 9 (eine Methodik je Risiko)",
@@ -906,7 +924,9 @@ def quellen_ratchet(lint: Lint) -> None:
 # Knoten je Risiko in der Schadensbaum-Arbeitsmappe (§7: „Skript liest die xlsx").
 XLSX = os.path.abspath(os.path.join(ROOT, "..", "docs", "Schadensbaum",
                                     "KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx"))
-RISIKO_KNOTEN = {"98": "W186"}
+# #95 W182 (Z405), #96 W189 (Z412) — Blatt „Klimawirkungsketten“, wie in §1 der Berichte genannt (T-1263,
+# Q-20260926T011048Z-methodik_manager-dabc26-1: der Abgleich für #95 lief bis dahin von Hand).
+RISIKO_KNOTEN = {"95": "W182", "96": "W189", "98": "W186"}
 
 
 def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
@@ -1010,6 +1030,7 @@ def pruefe_bericht(pfad: str) -> bool:
     MARKER_ZAEHLER.clear()
     beispiel_bloecke(src, lint)
     pflichtkapitel_gefuellt(src, lint)
+    pflichtabsatz_ohne_anpassung(src, lint)
     ansatzkapitel_entfaellt(src, lint)
     rechenkette(src, lint)
     zahlenformat(src, lint)
