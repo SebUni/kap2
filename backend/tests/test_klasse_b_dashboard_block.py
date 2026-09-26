@@ -107,3 +107,34 @@ def test_by_risk_cost_eur_nullable():
     assert m, "types/index.ts: Typ von by_risk nicht gefunden"
     assert re.search(r"\bcost_eur\s*:\s*number\s*\|\s*null\b", m.group(1)), (
         "types/index.ts: cost_eur in by_risk ist nicht als number | null deklariert")
+
+
+def test_histogramm_fehlender_cost_eur_wird_none(monkeypatch):
+    """Fehlt einem Aggregat der Schlüssel cost_eur, steht None (nicht 0.0) im Cache;
+    ein vorhandener Wert 0.0 bleibt 0.0 (T-1195, A-0010/P2)."""
+    from app.data import catalog
+    from app.services import dashboard_cache, measure_service
+
+    codes = [r["code"] for r in catalog.RISKS]
+    mit_null, ohne = codes[0], codes[1]
+
+    def _aggregat(db, kommune_id, apply_measures=False):
+        risks = {c: {"index": 1.0} for c in codes}
+        risks[mit_null] = {"index": 1.0, "cost_eur": 0.0}
+        return {"risks": risks}
+
+    class _Abfrage:
+        def filter(self, *a, **k):
+            return self
+
+        def yield_per(self, *a, **k):
+            return iter([])
+
+    class _DB:
+        def query(self, *a, **k):
+            return _Abfrage()
+
+    monkeypatch.setattr(measure_service, "get_risk_aggregate", _aggregat)
+    out = dashboard_cache._build_risk_histogram(_DB(), 1)
+    assert out["risks"][ohne]["cost_eur"] is None
+    assert out["risks"][mit_null]["cost_eur"] == 0.0

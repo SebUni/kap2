@@ -145,4 +145,25 @@ def test_bewertung_100m_euro_spalten_bleiben_float(geschriebene_layer):
         if r["code"] == KLASSE_B_CODE:
             continue
         spalte = spalten[f"{r['code']}_cost_eur"]
-        assert all(type(w) is float for w in spalte), (r["code"], spalte)
+        # float oder None (fehlender Betrag, T-1195) — nie ein Vermerk-Text, nie int
+        assert all(w is None or type(w) is float for w in spalte), (r["code"], spalte)
+
+
+# ── (3) fehlender Betrag → None, nie 0.0 (T-1195) ────────────────────────────
+
+def test_reine_funktion_fehlender_betrag_bleibt_none():
+    risk = next(r for r in catalog.RISKS if catalog.risk_has_euro_layer(r))
+    werte = gx.cost_column_values(risk, [None, 0.0, 12.5])
+    assert werte == [None, 0.0, 12.5]
+    assert werte[0] is None
+    assert type(werte[1]) is float
+
+
+def test_bewertung_100m_fehlender_schluessel_wird_none(geschriebene_layer):
+    """Die Zellen tragen keinen Betrag für die Euro-Wirkungen: NULL statt 0.0."""
+    spalten = geschriebene_layer["bewertung_100m"]
+    for r in catalog.RISKS:
+        if r["code"] == KLASSE_B_CODE or not catalog.risk_has_euro_layer(r):
+            continue
+        spalte = spalten[f"{r['code']}_cost_eur"]
+        assert spalte == [None, None, None], (r["code"], spalte)
