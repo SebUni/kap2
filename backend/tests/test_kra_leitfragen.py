@@ -11,13 +11,14 @@ from __future__ import annotations
 
 import importlib
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.data.kra_leitfragen import LEITFRAGEN, QUELLE  # noqa: E402
 
-SCHLUESSEL = ("nr", "wortlaut", "seite", "beantwortet_durch", "begruendung")
+SCHLUESSEL = ("nr", "wortlaut", "seite", "beantwortet_durch", "stelle_im_produkt", "begruendung")
 
 
 def test_quelle_hat_titel_url_und_abrufdatum():
@@ -53,3 +54,20 @@ def test_fundstellen_lassen_sich_laden():
         assert sep and modul.startswith("app.") and attribut, (eintrag["nr"], fundstelle)
         geladen = importlib.import_module(modul)
         assert hasattr(geladen, attribut), (eintrag["nr"], fundstelle)
+
+
+CODE_PFAD = re.compile(r"\bapp\.[a-z_]+")
+
+
+def test_kein_code_pfad_in_begruendung_und_stelle_im_produkt():
+    for eintrag in LEITFRAGEN:
+        for feld in ("begruendung", "stelle_im_produkt"):
+            assert not CODE_PFAD.search(eintrag[feld]), (eintrag["nr"], feld)
+
+
+def test_stelle_im_produkt_passt_zum_stand():
+    for eintrag in LEITFRAGEN:
+        if eintrag["beantwortet_durch"] == "nicht beantwortet":
+            assert eintrag["stelle_im_produkt"] == "nicht beantwortet", eintrag["nr"]
+        else:
+            assert eintrag["stelle_im_produkt"] != "nicht beantwortet", eintrag["nr"]

@@ -70,6 +70,16 @@ def _abschnitt(text: str, ueberschrift: str) -> str:
     return rest.split("\n## ", 1)[0]
 
 
+def test_leitfragen_abschnitt_nennt_stelle_im_produkt_und_keinen_code_pfad():
+    text = interpretationsbericht_markdown("Testort", _daten(_nachweise()))
+    abschnitt = _abschnitt(text, "## Leitfragen")
+    assert not re.search(r"\bapp\.[a-z_]+", abschnitt)
+    beantwortet = [f for f in LEITFRAGEN if f["beantwortet_durch"] != "nicht beantwortet"]
+    assert beantwortet
+    for f in beantwortet:
+        assert f"beantwortet in: {f['stelle_im_produkt']}" in abschnitt, f["nr"]
+
+
 def test_sieben_ueberschriften_in_reihenfolge():
     text = interpretationsbericht_markdown("Beispielkommune", _daten(_nachweise()))
     gefunden = [z for z in text.splitlines() if z.startswith("## ")]

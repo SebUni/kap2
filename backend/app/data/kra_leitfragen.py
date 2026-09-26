@@ -7,8 +7,13 @@ Abschnitt 2.2.2 „Wirkungsketten erstellen“ (S. 25, drei Beispiele „für je
 Seitenzahlen sind die gedruckten Seiten; in dieser Broschüre stimmen sie mit den PDF-Seiten überein.
 
 ``beantwortet_durch`` zeigt im Format ``app.modul:attribut`` auf die Stelle im Code, die die Frage
-für die Kommune beantwortet, oder lautet genau „nicht beantwortet“. ``begruendung`` sagt in einem
-Satz, warum. Das Modul ändert keine Rechnung (T-1139-cto, Vorhaben T-1010-ceo).
+für die Kommune beantwortet, oder lautet genau „nicht beantwortet“; es ist eine interne Fundstelle
+und erscheint in keinem Text für die Kommune. ``stelle_im_produkt`` nennt den Ort mit der
+Bezeichnung, unter der die Kommune die Antwort sieht (oder genau „nicht beantwortet“);
+``begruendung`` sagt in einem Satz, warum. Beide enthalten keinen Code-Pfad (A-0034).
+Die Bezeichnungen stehen in: Frage 1 ``frontend/src/components/dashboard/CostTimelineSection.tsx``;
+Frage 4 ``backend/app/services/ergebnis_interpretation_markdown.py`` (``UEBERSCHRIFTEN``);
+Frage 5 ``backend/app/services/bestandsaufnahme_markdown.py`` (``TITEL``, Abschnittsüberschriften). Das Modul ändert keine Rechnung (T-1139-cto, Vorhaben T-1010-ceo).
 
 Gelesen: S. 5 (Inhaltsverzeichnis), S. 10–12 (Abschnitt 2.1.1 vollständig mit Fußnoten 5 und 6
 und Abbildung 2, Beginn 2.1.2), S. 24–25 (Abschnitt 2.2.2 vollständig, Beginn 2.2.3), S. 29–30
@@ -36,6 +41,7 @@ LEITFRAGEN: list[dict] = [
         "wortlaut": "Wie wirkt sich der Klimawandel zukünftig auf meine Kommune aus?",
         "seite": 11,
         "beantwortet_durch": "app.services.cost_projection_service:project_costs",
+        "stelle_im_produkt": "Reiter Dashboard, Abschnitt Kostenentwicklung durch den Klimawandel",
         "begruendung": "Die Kosten-Projektion schreibt die erwarteten Jahresschäden der Kommune mit "
                        "dem regionalisierten DWD-Klimasignal je Szenario bis 2065 fort, je "
                        "Klimawirkungsgruppe und mit und ohne Maßnahmen.",
@@ -45,18 +51,21 @@ LEITFRAGEN: list[dict] = [
         "wortlaut": "In welchen Bereichen ist dringendes Handeln erforderlich?",
         "seite": 11,
         "beantwortet_durch": NICHT_BEANTWORTET,
+        "stelle_im_produkt": NICHT_BEANTWORTET,
         "begruendung": "Das Produkt reiht die Bereiche der Kommune nach Risikohöhe und "
-                       "Schadenskosten (app.services.systembereiche:systembereich_auswertung), "
+                       "Schadenskosten (Reiter Dashboard, Abschnitt Auswertung je "
+                       "KWRA-Systembereich), "
                        "schätzt aber keine Dringlichkeit für die Kommune ein, die die Broschüre "
                        "auf S. 30 zusätzlich zur Risikohöhe verlangt; die Dringlichkeit aus "
-                       "app.data.kwra_kap7_risiko gilt für Deutschland, nicht für die Kommune.",
+                       "Kapitel 7 der KWRA 2021 gilt für Deutschland, nicht für die Kommune.",
     },
     {
         "nr": 3,
         "wortlaut": "Wie haben sich klimatische Veränderungen ausgewirkt?",
         "seite": 25,
         "beantwortet_durch": NICHT_BEANTWORTET,
-        "begruendung": "Das Produkt führt vergangene Starkregenereignisse (app.data.catrare), aber "
+        "stelle_im_produkt": NICHT_BEANTWORTET,
+        "begruendung": "Das Produkt führt vergangene Starkregenereignisse (Katalog CatRaRE des DWD), aber "
                        "keine Folgen vergangener Veränderungen; die Größe „Vergangene "
                        "Schadensereignisse durch Wetterextreme“ der Bestandsaufnahme trägt einen "
                        "Lückensatz statt eines Werts.",
@@ -66,6 +75,7 @@ LEITFRAGEN: list[dict] = [
         "wortlaut": "Welche Auswirkungen (primär und sekundär) gibt es?",
         "seite": 25,
         "beantwortet_durch": "app.services.handlungsfeld_abhaengigkeiten:abhaengigkeiten_der_kommune",
+        "stelle_im_produkt": "Interpretationsbericht, Abschnitt Abhängigkeiten über Handlungsfelder",
         "begruendung": "Die Funktion nennt je gerechneter Klimawirkung der Kommune (primär) die in "
                        "der KWRA 2021 benannten Beziehungen zu weiteren Klimawirkungen und "
                        "Handlungsfeldern (sekundär), ohne deren Stärke zu beziffern.",
@@ -75,6 +85,8 @@ LEITFRAGEN: list[dict] = [
         "wortlaut": "Wer oder was ist besonders betroffen?",
         "seite": 25,
         "beantwortet_durch": "app.services.bestandsaufnahme_service:bestandsaufnahme_fuer_kommune",
+        "stelle_im_produkt": "Bestandsaufnahme, Abschnitte Vulnerable Personengruppen und "
+                             "Klimasensible Strukturen",
         "begruendung": "Die Bestandsaufnahme weist für die Kommune vulnerable Personengruppen "
                        "(Anteile unter 18 und ab 65 Jahren) und klimasensible Strukturen "
                        "(KRITIS-Sektoren) aus, wie die Broschüre sie auf S. 12 nennt; "
