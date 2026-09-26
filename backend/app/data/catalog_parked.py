@@ -1257,44 +1257,6 @@ _PARKED_MEASURES: list[dict] = [
             "Anwendung eher zu hoch.",
         "opex_per_m2_year": "Modellannahme: 0,30 €/m²/a für den Unterhalt der "
             "Wundstreifen und das laufende Monitoring."}},
-    {"code": "COOLING_ROOMS_DRINKING_WATER", "name": "Kühle Räume / Kühlzentren",
-     "description": "Öffentliche Kühl- und Trinkwasserinfrastruktur.", "measure_type": "structural",
-     "effect_target": ["exposure"], "default_reduction": 0.18, "coverage_scaling": "saturating",
-     "linked_risk_codes": ["EXPECTED_THERMAL_STRESS_HOURS", "EXPECTED_ANNUAL_MORTALITY"],
-     "capex_fixed": 0.0, "capex_per_unit": 8000.0, "capex_per_m2": None,
-     "opex_fixed_year": None, "opex_per_unit_year": 800.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
-     "unit_label": "Raum",
-     # Herleitung unit_density_per_ha: Modellannahme (mangels belastbarer Quelle) — an
-     # HAP-Konzept "kühle Orte" angelehnt: ein fußläufig (~800 m Radius, ~20 ha Einzugs-
-     # gebiet) erreichbarer Kühlraum je Quartier → Punktwert 0,05 Räume/ha (1 je 20 ha).
-     "unit_density_per_ha": 0.05,
-     "source": "Modellannahme (mangels belastbarer Quelle)",
-     "sources": {"capex_per_unit": "Modellannahme (Marktpreise Klimatechnik)",
-                 "opex_per_unit_year": "VDI 2067 (Wartung Klimatechnik) + Saisonbetrieb",
-                 "default_reduction": "Kühle-Orte-Prinzip der Hitzeaktionspläne (Modellannahme)",
-                 "unit_density_per_ha": "Modellannahme (HAP-Konzept \"kühle Orte\")"},
-     "source_refs": {"opex_per_unit_year": ["VDI_2067_Blatt1"],
-                     "default_reduction": ["Urban_HHAP_Wirksamkeit_2025"]},
-     "source_details": {
-        "default_reduction": "Wirkmechanismus: Fußläufig erreichbare gekühlte Aufenthaltsorte "
-            "mit Trinkwasser senken die individuelle Hitzeexposition besonders vulnerabler "
-            "Personen und damit Wärmebelastungsstunden und Hitzemortalität im Einzugsgebiet. "
-            "Kühle Orte sind ein Kernbaustein der Hitzeaktionspläne, deren Gesamtpaket europaweit "
-            "−25,2 % Hitzemortalität erzielt (Urban u. a. 2025); als EINZELNER Baustein wird mit "
-            "18 % ein Wert knapp darunter angesetzt. Editierbare, dokumentierte Modellannahme.",
-        "capex_per_unit": "Keine belastbare Primärquelle für die Herrichtung eines "
-            "\"Kühlraums\" als Gesamtpaket auffindbar – daher Modellannahme. Plausibilisiert "
-            "anhand Marktpreisen gewerblicher Split-Klimaanlagen 1.500–5.000 € (Gerät + "
-            "Einbau, ADAC/Heizcenter 2026) zzgl. Ausstattung, Trinkwasserstation und "
-            "Beschilderung ~2.000–3.000 €. Punktwert 8.000 € je hergerichtetem Raum.",
-        "opex_per_unit_year": "Klimatechnik läuft nicht kostenlos: VDI-2067-Wartungssätze für "
-            "Klima-/Splitgeräte (~4-6 %/a der Investition) plus Strom im Saisonbetrieb und "
-            "Reinigung/Aufsicht des Raums. 10 % von 8.000 € → 800 €/(Raum·a) als "
-            "Vollkosten-Punktwert des Sommerbetriebs.",
-        "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle, angelehnt an das "
-            "Konzept fußläufig erreichbarer \"kühler Orte\" aus kommunalen Hitzeaktionsplänen: "
-            "ein in ~800 m Radius (~20 ha Einzugsgebiet) erreichbarer Kühlraum je Quartier "
-            "→ 0,05 Räume/ha (1 je 20 ha)."}},
     {"code": "EARLY_WARNING_MEASURE", "name": "Frühwarnsysteme (Maßnahme)",
      "description": "Ausbau von Frühwarnsystemen.", "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.25, "coverage_scaling": "saturating",

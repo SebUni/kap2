@@ -53,7 +53,9 @@ def test_measure_count_is_47():
     # #96 S158 — Maßnahmen-Hebel qualitativ, kein linked_risk_codes-Kanal, Befund 124);
     # wird 4 mit Aktivierung der #98-Hebel. Die 45 geparkten liegen verbatim in
     # catalog_parked (unverändert, daher bleibt die Gesamtzahl bei 48).
-    assert len(catalog.MEASURES) == 3
+    # T-1367: 4 aktive — COOLING_ROOMS_DRINKING_WATER (#95 Hebel S157) aus catalog_parked
+    # aktiviert (verschoben, nicht neu: Gesamtzahl bleibt 48).
+    assert len(catalog.MEASURES) == 4
     assert len(_ALL_MEASURES) == 48
 
 
