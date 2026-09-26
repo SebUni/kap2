@@ -1,4 +1,4 @@
-"""T-0451: Handlungsfeldübergreifende Unsicherheits-Zusammenschau (Checkliste Zeile 19).
+"""T-0451: Unsicherheits-Zusammenschau je Handlungsfeld (Checkliste Zeile 19).
 
 Prüft ``app.services.unsicherheits_zusammenschau``:
 (a) jedes Handlungsfeld des Katalogs kommt in der Zusammenschau genau einmal vor,

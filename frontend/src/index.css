@@ -1710,6 +1710,14 @@ body {
 }
 .kap-param-evidence.is-estimated { color: var(--warning, #b45309); }
 .kap-param-evidence.is-sourced { color: var(--text-muted); }
+.kap-param-evidence-derivation {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: normal;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
 
 .kap-param-table--grouped td {
   overflow: hidden;
