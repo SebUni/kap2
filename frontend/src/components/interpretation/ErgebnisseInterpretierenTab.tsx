@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import { api } from '../../api/client'
 import { useStore } from '../../store'
 import AbhaengigkeitenHandlungsfelder from './AbhaengigkeitenHandlungsfelder'
+import DiversitaetAspekte from './DiversitaetAspekte'
 import NachweiseEinbeziehung from './NachweiseEinbeziehung'
 import NachbarkommunenScreening from './NachbarkommunenScreening'
 
@@ -20,6 +21,7 @@ export interface StrukturierterAbschnittProps {
  */
 export const STRUKTURIERTE_ABSCHNITTE: Record<string, ComponentType<StrukturierterAbschnittProps>> = {
   'Abhängigkeiten über Handlungsfelder': AbhaengigkeitenHandlungsfelder,
+  'Gender und Diversität': DiversitaetAspekte,
   Einbeziehung: NachweiseEinbeziehung,
   Nachbarkommunen: NachbarkommunenScreening,
 }
