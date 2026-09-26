@@ -979,3 +979,15 @@ wird; Ledger und Bericht liegen im selben Commit. Wirkung auf Kapitel 7: kein `w
 | 204 | §3.2 Z. 494 | Widerspruch (klein) — Runde 17 des methodik_manager | „10-Jahres-Klassen 0–9 + 10–19“ widerspricht Z. 497–498 und Ebene 1 der Rechenkette, dort sind es 5er-Jahresgruppen. | Auf 5er-Jahresgruppen angleichen. | C | `python3 -c "import sys; sys.exit('10-Jahres-Klassen 0–9 + 10–19' in open('docs/methodik/96_aeroallergene.md',encoding='utf-8').read())"` | behoben (Autor, T-1427, Runde 17, 26.09.2026): §3.2 schreibt „5er-Jahresgruppen 0–4, 5–9, 10–14, 15–19“, gleich wie Z. 497–498. |
 | 205 | Ledger, Status von 199 | Genauigkeit — Runde 17 des methodik_manager | „stehen als verworfen gekennzeichnet (Rev.-2-Vermerk, Log 18, Log 19)“: Log 18 ist nicht verworfen, es gilt für den Ausgangsstand. | Log 18 zur Gruppe „gilt nur für den Ausgangsstand“ stellen. | C | `python3 -c "import sys; z=[x for x in open('reviews/BEFUNDE_96.md',encoding='utf-8') if x.startswith(chr(124)+' 199 ')]; sys.exit(len(z)!=1 or ('Log 18, Log '+'19)') in z[0])"` (vom Autor ergänzt nach W7; im Urteil „—“) | behoben (Autor, T-1427, Runde 17, 26.09.2026): Status von 199 stellt Log 18 zu den Stellen, die für den Ausgangsstand gelten; als überstimmt bzw. verworfen gekennzeichnet sind nur Rev.-2-Vermerk und Log 19. |
 | 206 | §3.4, Punkt f, „±29 % am Band“ (Z. 717); Log 7, Spalte Auswirkung | Fehler (LF 7 Zahlen, E3) — Selbstprüfung des Autors in Runde 17, nach dem Muster von Befund 201 | Die Angabe ist symmetrisch, das Band nicht: f = 0,70 mit Band 0,50–0,85 verschiebt den nativen Ausweis um 0,50 / 0,70 − 1 = −28,6 % und 0,85 / 0,70 − 1 = +21,4 %. „±29 %“ überzeichnet die Wirkung nach oben. Der Euro-Betrag ist nicht betroffen (f kürzt sich im Euro-Pfad heraus, §3.5). Kein `wert:` betroffen. | „−28,6 % bis +21,4 %“ in §3.4 und Log 7 | C | `! grep -qF '±29 %' docs/methodik/96_aeroallergene.md` | behoben (Autor, T-1427, Runde 17, 26.09.2026): §3.4 schreibt „am Band 0,50–0,85 um −28,6 % bis +21,4 % (0,50 / 0,70 und 0,85 / 0,70)“, Log 7 „−28,6 % bis +21,4 %“. |
+
+## Runde 18 — Gegenprüfung nach Fortschreibung 7 (frische Sitzung, 26.09.2026): Null-Runde
+
+Anlass: Urteil „freigabe“ des methodik_manager zu T-1427 (M0 Schritt 3c), Firmen-Repo
+`tickets/T-1427-methodik_manager.md`, Abschnitt „Urteil“, Eintrag 2026-09-26T16:50:53Z (Runde 1 des Tickets). Das
+Urteil beginnt mit „VERDIKT #96 T-1427 Runde 18 · Null-Runde: ja“ und stellt fest, dass die geprüften Teile keinen
+neuen A- oder B-Befund enthalten. Gemerged nach `main` mit `1b9e6efc`. Eingetragen in T-1428 (M0 Schritt 4).
+
+C-Befunde dieser Runde: keine. Das Urteil nennt keinen neuen Befund, also ist hier auch keiner als zurückgestellt
+einzutragen. Befund 198 bleibt, wie er ist: zurückgestellt (terminiert: nächstes Paket des CMO mit Rahmen
+`docs/quellen/`). Vor dem Export geprüft: Die Befunde 188–194 (Nachtrag des CEO zu T-1330) und 199 und 200 stehen
+auf „behoben“. Wirkung auf Kapitel 7: kein `wert:` geändert.
