@@ -1,0 +1,73 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1773 >>
+stream
+BT /F1 9 Tf 12 TL 50 800 Td
+(Deutscher Wetterdienst: Pollen - Einstufung der Belastungsintensit‰ten) Tj T*
+(Textdruck des Hauptbereichs \(HTML-Element main\), kein Bilddruck, erzeugt mit Python 3 \(urllib, eigener PDF-) Tj T*
+(Schreiber, Schrift Helvetica\).) Tj T*
+(Stand: Live-Stand) Tj T*
+(Adresse: https://www.dwd.de/DE/leistungen/gefahrenindizespollen/erklaerungen.html) Tj T*
+(Abgerufen: 26.09.2026 13:42 UTC durch KAP3 \(methodik_consultant\)) Tj T*
+(Tabellenzellen sind durch " ; " getrennt.) Tj T*
+(----------------------------------------------------------------------------------------------------) Tj T*
+() Tj T*
+(Breadcrumb- Men¸) Tj T*
+() Tj T*
+(Startseite) Tj T*
+(Leistungen) Tj T*
+() Tj T*
+(Einstufung der Belastungsintensit‰ten) Tj T*
+() Tj T*
+(Einstufung der Belastungsintensit‰t entsprechend der Pollenkonzentration 1\) \(Anzahl Pollen als) Tj T*
+(Tagesmittelwerte pro m3 Luft\)) Tj T*
+() Tj T*
+(; keine Belastung) Tj T*
+() Tj T*
+(; geringe Belastung) Tj T*
+() Tj T*
+(; mittlere Belastung) Tj T*
+() Tj T*
+(; hohe Belastung) Tj T*
+() Tj T*
+(Hasel ; 0 ; 1 - 10 ; 11 - 100 ; ‹ber 100) Tj T*
+(Erle ; 0 ; 1 - 10 ; 11 - 100 ; ‹ber 100) Tj T*
+(Esche ; 0 ; 1 - 50 ; 51 - 75 ; ‹ber 75) Tj T*
+(Birke ; 0 ; 1 - 10 ; 11 - 50 ; ‹ber 50) Tj T*
+(Gr‰ser ; 0 ; 1 - 5 ; 6 - 30 ; ‹ber 30) Tj T*
+(Roggen ; 0 ; 1 - 2 ; 3 - 6 ; ‹ber 6) Tj T*
+(Beifuﬂ ; 0 ; 1 - 5 ; 6 - 10 ; ‹ber 10) Tj T*
+(Ambrosia ; 0 ; 1 - 5 ; 6 - 10 ; ‹ber 10) Tj T*
+() Tj T*
+(Bei der Darstellung des Pollenflug-Gefahrenindex werden zus‰tzlich Zwischenabstufungen verwendet \(z. B.) Tj T*
+(mittlere bis hohe Belastung\). Dies erscheint sinnvoll, da insbesondere aufgrund der Grˆﬂe der) Tj T*
+(Vorhersagegebiete innerhalb eines Gebietes sowohl die eine als auch die andere Belastung vorkommen kann.) Tj T*
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000344 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2169
+%%EOF
