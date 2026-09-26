@@ -67,6 +67,8 @@ def querverbindungs_auswertung() -> dict:
             "netzrolle": netzrolle_je_id[kid]["rolle"] if kid in netzrolle_je_id else None,
             "netzrollen": list(netzrolle_je_id[kid]["rollen"]) if kid in netzrolle_je_id else [],
             "zentral": netzrolle_je_id[kid]["zentral"] if kid in netzrolle_je_id else False,
+            # Gedruckte Seiten in TB 6 Kap. 3.4, auf denen die Netzrolle belegt ist; leer ohne Netzrolle.
+            "seiten": list(netzrolle_je_id[kid]["seiten"]) if kid in netzrolle_je_id else [],
             # „gesamt“ und/oder „hochrisiko“ (Auswertung der hoch bewerteten
             # Klimawirkungen, TB 6 S. 86–87); leer ohne Netzrolle.
             "netzrolle_auswertungen": (
@@ -87,6 +89,7 @@ def querverbindungs_auswertung() -> dict:
             "handlungsfeld": e["handlungsfeld"],
             "netzrollen": list(e["rollen"]),
             "zentral": e["zentral"],
+            "seiten": list(e["seiten"]),
             "hinweis": "nicht im Katalog",
         }
         for e in sorted(kq.NETZROLLEN, key=lambda x: x["kwra_id"])

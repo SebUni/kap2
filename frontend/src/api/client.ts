@@ -88,6 +88,8 @@ export interface QuerverbindungKlimawirkung {
   /** Alle Netzrollen — eine Klimawirkung kann Sender und Empfänger zugleich sein (TB 6, Fn. 21, S. 84). */
   netzrollen: Netzrolle[]
   zentral: boolean
+  /** Gedruckte Seiten in TB 6 Kap. 3.4, auf denen die Netzrolle belegt ist; leer ohne Netzrolle. */
+  seiten: number[]
   netzrolle_auswertungen: ('gesamt' | 'hochrisiko')[]
   ausgehende_benannte: number
   eingehende_benannte: number
@@ -100,6 +102,8 @@ export interface QuerverbindungNetzknotenAusserhalbKatalog {
   handlungsfeld: string
   netzrollen: Netzrolle[]
   zentral: boolean
+  /** Gedruckte Seiten in TB 6 Kap. 3.4, auf denen die Netzrolle belegt ist. */
+  seiten: number[]
   hinweis: string
 }
 
