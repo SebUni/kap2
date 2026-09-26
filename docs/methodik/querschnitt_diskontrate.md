@@ -2,9 +2,9 @@
 
 Querschnittsdatei der Methodik, gültig für alle Klimawirkungen. Einen Wert bekommen zuerst die Gesundheitsschäden von
 M0 (#95, #96, #98). Für die übrigen Schadensarten ruht die Anwendung bis zur Abnahme von M0 (A-0048). Schritt 1 (Ticket
-T-1242-methodik_manager, Vorhaben T-1116-cmo) hat die Regel und ihre Werte festgelegt. Dieser Stand ist Schritt 2
-(T-1243-methodik_manager): die Rechenkette vom Jahresbetrag zum Barwert mit Beispiel-Block für #95. Schritt 3 und 4
-rechnen #96 und #98 nach.
+T-1242-methodik_manager, Vorhaben T-1116-cmo) hat die Regel und ihre Werte festgelegt. Schritt 2
+(T-1243-methodik_manager) hat die Rechenkette vom Jahresbetrag zum Barwert mit Beispiel-Block für #95 gebaut. Dieser
+Stand ist Schritt 3 (T-1244-methodik_manager): derselbe Block rechnet #96 nach. Schritt 4 rechnet #98 nach.
 
 Abkürzungen: **MK 4.0** = Umweltbundesamt, Handbuch Umweltkosten – Methodenkonvention 4.0
 (`docs/UBA/UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf`; PDF-Seite und gedruckte Seite stimmen auf S. 4–22
@@ -291,6 +291,48 @@ M0 nicht liefert, steht als Befund B1 unter „Befunde an Berichte“.
 Verhältnis: 13,59 Mrd. € zur RZPR 0 % und 11,24 Mrd. € zur RZPR 1 %. Die Abweichungen in Prozent in der Tabelle unten
 bleiben gleich, weil derselbe Barwertfaktor auf beide Beträge wirkt.
 
+**Dieselbe Kette für #96 Aeroallergene, Beispielkommune Berlin.** Der Jahresbetrag stammt aus der letzten Ebene der
+Rechenkette 3.0 von `docs/methodik/96_aeroallergene.md`, Zeile 304: „4,69 Mio. € je Jahr (Preisstand 2024)“. Er
+besteht ganz aus Behandlungskosten (Konto K1, nur Morbidität). Die Ebenen 3–5 und 7–9 hängen nicht vom Jahresbetrag ab
+und sind dieselben wie bei #95.
+
+| Ebene | Rechenschritt | Wert (Beispielkommune Berlin, #96) | Quelle |
+|---|---|---|---|
+| 1 | Jahresbetrag: bewerteter Schaden (Konto K1, nur Morbidität) je Jahr | 4,69 Mio. € je Jahr (Preisstand 2024) | Bericht 96, Kap. 3.0, Ebene 10, Zeile 304 |
+| 2 | × 41 Jahre 2025–2065, Jahresbetrag in jedem Jahr gleich = Summe ohne Abzinsung | 4,69 Mio. € × 41 = 192,3 Mio. € | Zeitraum: Festlegung, „Bezugsjahr und Zeitraum der Abzinsung“; gleichbleibender Verlauf: Bericht 96, Kap. 6, Zeilen 1456–1458 und 1467–1468 (M0 weist das Ist-Klima aus) |
+| 3 | Diskontrate zur RZPR 0 % | 0,1 %, wie #95 | Festlegung, Regel D |
+| 4 | Abzinsfaktor je Jahr = 1 ÷ 1,001 hoch (Jahr − 2025) | wie #95: 2025: 1,000 · 2045: 0,980 · 2065: 0,961 | Rechnung |
+| 5 | Barwertfaktor = Summe der 41 Abzinsfaktoren | 40,19, wie #95 | Rechnung |
+| 6 | **Barwert zur RZPR 0 %** = Ebene 1 × Ebene 5 | 4,69 Mio. € × 40,19 = **188,5 Mio. € (Preisstand 2024)** | Rechnung |
+| 7 | Diskontrate zur RZPR 1 % | 1,1 %, wie #95 | Festlegung, Regel D |
+| 8 | Abzinsfaktor je Jahr = 1 ÷ 1,011 hoch (Jahr − 2025) | wie #95: 2025: 1,000 · 2045: 0,803 · 2065: 0,646 | Rechnung |
+| 9 | Barwertfaktor = Summe der 41 Abzinsfaktoren | 33,22, wie #95 | Rechnung |
+| 10 | **Barwert zur RZPR 1 %** = Ebene 1 × Ebene 9 | 4,69 Mio. € × 33,22 = **155,8 Mio. € (Preisstand 2024)** | Rechnung |
+
+**Ergebnis nach Regel D für #96, Beispielkommune Berlin:** Der bewertete Schaden der 41 Jahre 2025–2065 hat einen
+Barwert von 188,5 Mio. € zur RZPR 0 % und von 155,8 Mio. € zur RZPR 1 % (Preisstand 2024, Bezugsjahr 2025). Wie bei #95
+setzt die Kette in jedem Jahr denselben Betrag an, weil Bericht 96 in M0 nur das Ist-Klima ausweist (Befund B2).
+
+**Kette und Produkt, #96.** Der Betrag des Produkts für Berlin ist der Zelllauf: 4,59 Mio. € je Jahr, 2,0 % weniger als
+die Kette (Bericht 96, Kap. 3.0, Zeilen 343–346). Sein Barwert ist 4,59 Mio. € × 40,19 = 184,5 Mio. € zur RZPR 0 % und
+4,59 Mio. € × 33,22 = 152,5 Mio. € zur RZPR 1 %.
+
+**Behandlungskosten mit demselben Wert: die Wirkung am Endstand von #96.** Die Festlegung gibt Behandlungskosten
+dieselbe Komponente von 0,1 Pp. wie den immateriellen Schäden, als Abschätzung von KAP3 (Abschnitt „Geltung für die
+Schadensarten von M0“). Bei #96 hängt der ganze Betrag daran. Am Endstand von Bericht 96 wirkt die Wahl so:
+
+| Veränderung der relativen Preise | Barwert zur RZPR 0 % | gegen Regel D | Barwert zur RZPR 1 % | gegen Regel D |
+|---|---|---|---|---|
+| 0,1 Pp. (Regel D) | 188,5 Mio. € | — | 155,8 Mio. € | — |
+| 0 Pp. (Untergrenze des Bandes) | 192,3 Mio. € | +2,0 % | 158,7 Mio. € | +1,9 % |
+| 0,7 Pp. (Obergrenze des Bandes) | 167,8 Mio. € | −11 % | 140,0 Mio. € | −10 % |
+| −0,5 Pp. (Behandlung je Fall wird aufwendiger, außerhalb des Bandes) | 212,9 Mio. € | +13 % | 174,3 Mio. € | +12 % |
+
+Selbst der Fall außerhalb des Bandes verschiebt den Barwert um weniger als die Wahl der RZPR (17 %) und weit weniger als
+das Band des Klimaanteils am Saisontrend im Jahresbetrag (Bericht 96, Kap. 3.0, Zeilen 358–360: 1,78–7,87 Mio. € je
+Jahr, als Barwert nach Regel D 71,5–316,3 Mio. € zur RZPR 0 % und 59,1–261,4 Mio. € zur RZPR 1 %). Die Abschätzung
+„derselbe Wert“ ändert deshalb weder die Richtung noch die Größenordnung des Barwerts von #96.
+
 ```python test: diskontrate_m0
 # Rechenkette Diskontrate, #95 Hitzebelastung, Beispielkommune Berlin: Jahresbetrag -> Barwert nach Regel D
 jahresbetrag = 362.9                 # Mio. EUR je Jahr (Preisstand 2024), Bericht 95, Kap. 3.0, Ebene 10, Zeile 188
@@ -349,20 +391,57 @@ assert abs(steigend(0.001) / bw_regel[0] - 1.50) < 0.005 and abs(steigend(0.011)
 assert abs(steigend(0.0) / steigend(0.001) - 1 - 0.0225) < 0.0005
 assert abs(steigend(0.01) / steigend(0.011) - 1 - 0.0209) < 0.0005
 
+# --- #96 Aeroallergene, Beispielkommune Berlin: dieselben Ebenen, Betrag in Mio. EUR
+jahresbetrag_96 = 4.69               # Mio. EUR je Jahr (Preisstand 2024), Bericht 96, Kap. 3.0, Ebene 10, Zeile 304
+# Ebene 2: Summe ohne Abzinsung
+assert abs(jahresbetrag_96 * 41 - 192.3) < 0.05
+# Ebenen 3-5 und 7-9 wie #95; Ebene 6 und 10: Barwert nach Regel D
+bw96_regel = [barwert(d, jahresbetrag_96) for d in regel]
+assert abs(bw96_regel[0] - 188.5) < 0.05 and abs(bw96_regel[1] - 155.8) < 0.05
+assert abs(jahresbetrag_96 * 40.19 - 188.5) < 0.05 and abs(jahresbetrag_96 * 33.22 - 155.8) < 0.05
+# Sensitivitaet: Diskontrate 0 % und 1 % (RZPR allein, Komponente 0)
+bw96_0, bw96_1 = barwert(0.0, jahresbetrag_96), barwert(0.01, jahresbetrag_96)
+assert abs(bw96_0 - 192.3) < 0.05 and abs(bw96_1 - 158.7) < 0.05
+abw96_0 = bw96_0 / bw96_regel[0] - 1 # 0 % gegen 0,1 % (gleiche RZPR 0 %)
+abw96_1 = bw96_1 / bw96_regel[1] - 1 # 1 % gegen 1,1 % (gleiche RZPR 1 %)
+assert abs(abw96_0 - 0.020) < 0.0005 and abs(abw96_1 - 0.019) < 0.0005
+# Spannweite ueber alle vier Varianten und staerkster Treiber (Wahl der RZPR)
+assert abs(bw96_regel[1] / bw96_regel[0] - 1 + 0.173) < 0.0005
+assert abs(bw96_0 / bw96_regel[1] - 1 - 0.234) < 0.0005
+# Kette und Produkt: Zelllauf Berlin 4,59 Mio. EUR, 2,0 % unter der Kette (Bericht 96, Kap. 3.0, Zeilen 343-346)
+assert abs(4.59 * barwertfaktor(0.001) - 184.5) < 0.05 and abs(4.59 * barwertfaktor(0.011) - 152.5) < 0.05
+# Behandlungskosten mit derselben Komponente: Bandgrenzen 0 und 0,7 Pp., Fall -0,5 Pp.; RZPR 0 % und 1 %
+for k, s0, s1, a0, a1 in ((0.0, 192.3, 158.7, 0.020, 0.019), (0.007, 167.8, 140.0, -0.110, -0.101),
+                          (-0.005, 212.9, 174.3, 0.130, 0.119)):
+    r0, r1 = barwert(k, jahresbetrag_96), barwert(0.01 + k, jahresbetrag_96)
+    assert abs(r0 - s0) < 0.05 and abs(r1 - s1) < 0.05
+    assert abs(r0 / bw96_regel[0] - 1 - a0) < 0.0005 and abs(r1 / bw96_regel[1] - 1 - a1) < 0.0005
+# Band des Klimaanteils im Jahresbetrag, 1,78-7,87 Mio. EUR (Bericht 96, Kap. 3.0, Zeilen 358-360), als Barwert
+assert abs(1.78 * barwertfaktor(0.001) - 71.5) < 0.05 and abs(7.87 * barwertfaktor(0.001) - 316.3) < 0.05
+assert abs(1.78 * barwertfaktor(0.011) - 59.1) < 0.05 and abs(7.87 * barwertfaktor(0.011) - 261.4) < 0.05
+
 de = lambda x, n=2: f"{x:,.{n}f}".replace(",", "X").replace(".", ",").replace("X", ".")
 print(f"Barwert nach Regel D, RZPR 0 % (Rate 0,1 %): {de(bw_regel[0])} Mrd. €, Barwertfaktor {de(barwertfaktor(0.001))}")
 print(f"Barwert nach Regel D, RZPR 1 % (Rate 1,1 %): {de(bw_regel[1])} Mrd. €, Barwertfaktor {de(barwertfaktor(0.011))}")
 print(f"Barwert zur Diskontrate 0 %: {de(bw_0)} Mrd. €, Abweichung zur Regel (RZPR 0 %) {de(abw_0 * 100, 1)} %")
 print(f"Barwert zur Diskontrate 1 %: {de(bw_1)} Mrd. €, Abweichung zur Regel (RZPR 1 %) {de(abw_1 * 100, 1)} %")
+print(f"#96: Barwert nach Regel D, RZPR 0 % (Rate 0,1 %): {de(bw96_regel[0], 1)} Mio. €, Barwertfaktor {de(barwertfaktor(0.001))}")
+print(f"#96: Barwert nach Regel D, RZPR 1 % (Rate 1,1 %): {de(bw96_regel[1], 1)} Mio. €, Barwertfaktor {de(barwertfaktor(0.011))}")
+print(f"#96: Barwert zur Diskontrate 0 %: {de(bw96_0, 1)} Mio. €, Abweichung zur Regel (RZPR 0 %) {de(abw96_0 * 100, 1)} %")
+print(f"#96: Barwert zur Diskontrate 1 %: {de(bw96_1, 1)} Mio. €, Abweichung zur Regel (RZPR 1 %) {de(abw96_1 * 100, 1)} %")
 ```
 
-Ausgabe des Blocks (gelaufen am 26.09.2026):
+Ausgabe des Blocks (gelaufen am 26.09.2026; die ersten vier Zeilen gelten für #95, die mit „#96:“ für #96):
 
 ```text
 Barwert nach Regel D, RZPR 0 % (Rate 0,1 %): 14,59 Mrd. €, Barwertfaktor 40,19
 Barwert nach Regel D, RZPR 1 % (Rate 1,1 %): 12,06 Mrd. €, Barwertfaktor 33,22
 Barwert zur Diskontrate 0 %: 14,88 Mrd. €, Abweichung zur Regel (RZPR 0 %) 2,0 %
 Barwert zur Diskontrate 1 %: 12,28 Mrd. €, Abweichung zur Regel (RZPR 1 %) 1,9 %
+#96: Barwert nach Regel D, RZPR 0 % (Rate 0,1 %): 188,5 Mio. €, Barwertfaktor 40,19
+#96: Barwert nach Regel D, RZPR 1 % (Rate 1,1 %): 155,8 Mio. €, Barwertfaktor 33,22
+#96: Barwert zur Diskontrate 0 %: 192,3 Mio. €, Abweichung zur Regel (RZPR 0 %) 2,0 %
+#96: Barwert zur Diskontrate 1 %: 158,7 Mio. €, Abweichung zur Regel (RZPR 1 %) 1,9 %
 ```
 
 **Sensitivität gegenüber 0 % und 1 %.** Die Varianten 0 % und 1 % sind die RZPR allein, also der heutige Stand im
@@ -372,10 +451,15 @@ Produkt (Befund C1). Jede Variante wird mit dem Barwert nach Regel D zur selben 
 | Klimawirkung | Barwert nach Regel | Barwert 0 % | Barwert 1 % | Abweichung zur Regel in % |
 |---|---|---|---|---|
 | #95 Hitzebelastung, Beispielkommune Berlin | 14,59 Mrd. € (RZPR 0 %, Rate 0,1 %) · 12,06 Mrd. € (RZPR 1 %, Rate 1,1 %) | 14,88 Mrd. € | 12,28 Mrd. € | 0 % gegen 0,1 %: +2,0 % · 1 % gegen 1,1 %: +1,9 % |
+| #96 Aeroallergene, Beispielkommune Berlin | 188,5 Mio. € (RZPR 0 %, Rate 0,1 %) · 155,8 Mio. € (RZPR 1 %, Rate 1,1 %) | 192,3 Mio. € | 158,7 Mio. € | 0 % gegen 0,1 %: +2,0 % · 1 % gegen 1,1 %: +1,9 % |
 
 Zwischen den vier Varianten schwankt der Barwert von #95 von 12,06 bis 14,88 Mrd. €, also um 23 %; davon entfallen
 nur 1,9–2,0 % auf die Veränderung der relativen Preise, der **stärkste Treiber** ist die Wahl der RZPR: 1 % statt 0 %
 senkt den Barwert nach Regel D um 17 %.
+
+Der Barwert von #96 schwankt zwischen den vier Varianten von 155,8 bis 192,3 Mio. €, also ebenfalls um 23 %, mit der
+Wahl der RZPR als stärkstem Treiber (17 %); die Prozente sind dieselben wie bei #95, weil beide Ketten einen
+gleichbleibenden Jahresbetrag mit denselben Barwertfaktoren multiplizieren.
 
 **Was eine einfachere Rechnung verfälschen würde (§8 E3):**
 
@@ -430,20 +514,42 @@ Zur Rechenkette (Schritt 2); Regel D bleibt dabei unverändert:
     die letzte Ebene der Rechenkette 3.0 anschließen soll; der Barwert des Zelllaufs steht als Umrechnung mit dem Faktor
     0,932 daneben.
 
+Zur Rechenkette von #96 (Schritt 3); Regel D und die Werte für #95 bleiben dabei unverändert:
+
+14. **Der ungerundete Betrag 755.753 × 6,20 € = 4,686 Mio. € als Jahresbetrag der Kette für #96** ist verworfen, weil
+    die Kette die Zahl der letzten Ebene übernimmt, wie Bericht 96 sie ausweist (4,69 Mio. €, Zeile 304), so wie bei #95;
+    der Unterschied im Barwert ist 0,09 %.
+15. **Der Zelllauf des Produkts (4,59 Mio. € je Jahr) als Jahresbetrag der Kette für #96** ist verworfen, aus demselben
+    Grund wie Nr. 13; sein Barwert steht daneben (184,5 und 152,5 Mio. €).
+16. **Ein eigener Wert der Komponente für #96, weil sein Betrag ganz aus Behandlungskosten besteht,** ist verworfen, weil
+    Nr. 8 dafür weiter gilt und die Wirkung am Endstand beziffert ist: im Band +2,0 % bis −11 %, im Fall −0,5 Pp. +13 %,
+    jeweils weniger als die Wahl der RZPR (Abschnitt „Rechenkette“).
+
 ## Befunde an Berichte
 
 Gelesen am 26.09.2026: Bericht 95, Kap. 3.0 (Zeilen 167–321), Kap. 3.5 (VOLY-Kette, Zeilen 668–672) und Kap. 6 (Zeilen 999–1056).
-Diese Datei ändert keinen Bericht.
+Bericht 96, Endstand aus T-1114-cmo: Statuskopf (Zeilen 1–85), Kap. 1 (Zeilen 87–247), Kap. 2 (Zeilen 249–269), Kap. 3.0
+(Zeilen 271–434), Kap. 3.5 (Zeilen 759–849) und Kap. 6 (Zeilen 1454–1549). Diese Datei ändert keinen Bericht.
 
 | Nr | Bericht, Stelle | Stand im Bericht | Festlegung | Art |
 |---|---|---|---|---|
 | B1 | Bericht 95, Kap. 6, Zeilen 1001–1012 | „M0 weist das Ist-Klima aus“; die Euro-Beträge „gelten für ein Jahr im heutigen Klima“; Szenariofähigkeit folgt mit Stufe M1+. Einen Jahresbetrag für die Jahre nach dem Ist-Klima nennt der Bericht nicht | Barwert über die 41 Jahre 2025–2065 („Bezugsjahr und Zeitraum der Abzinsung“); das Produkt schreibt die Jahresbeträge mit dem Klimasignal fort („Warum der Preiseffekt in die Diskontrate gehört“) | Verlauf fehlt im Bericht. Die Rechenkette rechnet deshalb mit gleichbleibendem Jahresbetrag; bei wärmer werdendem Klima ist ihr Barwert eine Untergrenze. Zu klären ist, welchen Verlauf das Produkt für #95 in M0 abzinst: Ist-Klima in jedem Jahr oder Szenario 95-A (Kap. 6, Zeilen 1001–1004) |
+| B2 | Bericht 96, Kap. 6, Zeilen 1456–1458 und 1460–1468 | Die Euro-Beträge „gelten für ein Jahr im Ist-Klima zum Preisstand 2024“; „M0 weist das Ist-Klima aus“; die Szenario-Anwendung verschiebt nur das Klimasignal der Saison-Spreizung und braucht Phänologie-Modelle der Stufe M1+. Einen Jahresbetrag für die Jahre nach dem Ist-Klima nennt der Bericht nicht | wie B1: Barwert über die 41 Jahre 2025–2065, Jahresbeträge mit dem Klimasignal fortgeschrieben | Verlauf fehlt im Bericht, wie B1. Die Rechenkette für #96 rechnet mit gleichbleibendem Jahresbetrag; weil der Blühbeginn der Erle nach der Projektion bis 2100 um etwa zwei Wochen weiter vorrückt (Bericht 96, Kap. 6, Zeilen 1461–1462), ist ihr Barwert eine Untergrenze. Zu klären ist, welchen Verlauf das Produkt für #96 in M0 abzinst |
+| B3 | Bericht 96, Kap. 6, Zeile 1458 | „Die Diskontrate für mehrjährige Rechnungen legt T-1116 fest.“ | Die Regel steht in `docs/methodik/querschnitt_diskontrate.md`, Abschnitt „Festlegung“ (Regel D) | Verweis auf ein Ticket des Firmen-Repos statt auf die Festlegung; ein Leser des Berichts kann ihn nicht auflösen. Bericht 95 hat den Satz ohne diesen Verweis (Kap. 6, Zeilen 1146–1148) |
 
 **Ohne Abweichung:** Jahresbetrag 362,9 Mio. € je Jahr (Preisstand 2024) in Kap. 3.0, Ebene 10, Zeile 188; Anteil
 Mortalität 361,8 Mio. € und Morbidität 1,09 Mio. € (Ebenen 8 und 9) wie unter „Geltung für die Schadensarten von M0“;
 225 der 277,4 Todesfälle ab 75 Jahren (Ebene 6: 71,4 + 153,6) wie unter A9; VOLY 160.800 € mit dem Faktor
 „Einkommensentwicklung ^0,85 ×1,1719“ in Kap. 3.5, Zeilen 668–669. Den Satz zu Jahresbeträgen ohne Abzinsung hat
 Bericht 95 bereits (Kap. 6, Zeilen 1010–1012).
+
+**Ohne Abweichung für #96:** Jahresbetrag 4,69 Mio. € je Jahr (Preisstand 2024) in Kap. 3.0, Ebene 10, Zeile 304, und
+Zelllauf 4,59 Mio. € in den Zeilen 343–346, wie im Abschnitt „Rechenkette“; nur Behandlungskosten ohne
+Mortalitätskomponente (Konto-Einbettung Kap. 1, Zeilen 128–131; Register 96-K1-01, Zeile 266), wie unter „Geltung für
+die Schadensarten von M0“; alle Kostensätze in festen Preisen, mit dem Verbraucherpreisindex auf den Preisstand 2024
+gebracht (Kap. 3, Zeilen 277–279; Kap. 3.5, Zeilen 763–766), wie unter „Nur feste Preise werden abgezinst“; in der
+Szenario-Anwendung bleiben die Kostensätze konstant (Kap. 6, Zeilen 1463–1464), wie unter „Warum der Preiseffekt in die
+Diskontrate gehört“. Den Satz zu Jahresbeträgen ohne Abzinsung hat Bericht 96 (Kap. 6, Zeilen 1456–1458).
 
 ## Befunde an Code
 
@@ -505,7 +611,10 @@ Abruf gesperrt ist. Er ist in der Quellenpflege nachzutragen (Aufgabe §3.8).
 - **[Bericht 95]** `docs/methodik/95_hitzebelastung.md`, Kap. 3.0 (Ebenen 6–10; Ebene 10 in Zeile 188; Zelllauf
   Zeilen 231–234), Kap. 3.5 (VOLY-Kette), Kap. 6 (Szenario-Anwendung und Jahresbeträge ohne Abzinsung, Zeilen
   1001–1012). Zeilennummern gemessen am 26.09.2026.
-- **[Bericht 96]** `docs/methodik/96_aeroallergene.md`, Evidenz-Register 96-K1-01.
+- **[Bericht 96]** `docs/methodik/96_aeroallergene.md`, Endstand aus T-1114-cmo: Kap. 1, Konto-Einbettung (Zeilen
+  128–131); Evidenz-Register 96-K1-01 (Zeile 266); Kap. 3.0 (Ebene 10 in Zeile 304; Zelllauf Zeilen 343–346; stärkster
+  Treiber Zeilen 358–360); Kap. 3.5 (Zeilen 763–766); Kap. 6 (Jahresbeträge ohne Abzinsung und Szenario-Anwendung,
+  Zeilen 1456–1468). Zeilennummern gemessen am 26.09.2026.
 - **[Bericht 98]** `docs/methodik/98_uv_schaedigungen.md`, Kap. 3.5.
 - **[Produkt]** `backend/app/data/diskontierung.py`; `backend/app/services/cost_projection_service.py`
   (`_diskontraten()`, `project_costs()`, `_discounted()`); `backend/app/services/climate/dwd_data.py`
