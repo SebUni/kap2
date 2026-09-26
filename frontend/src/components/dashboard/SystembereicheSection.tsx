@@ -141,7 +141,6 @@ export default function SystembereicheSection({ className = '' }: { className?: 
                   {bund.schluesse.map(s => (
                     <li key={s.schluss} style={{ marginBottom: 4 }}>
                       <strong>{s.titel}</strong>: {s.aussage}
-                      <span style={{ color: 'var(--text-muted)' }}> (S. {s.seiten.join(', ')})</span>
                     </li>
                   ))}
                 </ul>

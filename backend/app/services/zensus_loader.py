@@ -440,6 +440,70 @@ def _area_u20_share(ages: dict[str, dict[str, Any]]) -> float:
     return u20 / u65 if u65 > 0 else NATIONAL_U20_SHARE_OF_U65
 
 
+# ── Ersatzregel für den geheimgehaltenen Anteil 65+ (Bericht #95 §3.3, Log 41) ──
+# Stufe 2 nimmt den Anteil ab 65 der Gemeinde aus der Zensus-2022-Regionaltabelle
+# „Demografie“ [69]; die Anlage erzeugt backend/scripts/zensus_demografie_ab65.py.
+DEMOGRAFIE_AB65_CSV = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "data", "kalibrierung", "zensus2022_demografie_ab65.csv",
+)
+#: Registry-Parameter (params.py, Abschätzung von KAP3): Anteil der Gruppe 60–66,
+#: der zu den Menschen ab 65 zählt — [69] trennt bei 67, gezählt werden 2 von 7 Jahrgängen.
+ANTEIL_60_66_PARAM_ID = "risks.EXPECTED_ANNUAL_MORTALITY.impact.anteil_60_66_ab65"
+ANTEIL_60_66_DEFAULT = 2 / 7
+
+_demografie_ab65_cache: dict[str, tuple[float, float, float] | None] | None = None
+
+
+def _demografie_ab65() -> dict[str, tuple[float, float, float] | None]:
+    """(Einwohner, Gruppe 60–66, ab 67) je Gemeinde (AGS, 8 Stellen) und Kreis (5 Stellen).
+
+    ``None`` = in [69] „.“ (unbekannt oder geheim) — dann gilt die Kreiszeile."""
+    global _demografie_ab65_cache
+    if _demografie_ab65_cache is None:
+        daten: dict[str, tuple[float, float, float] | None] = {}
+        try:
+            with open(DEMOGRAFIE_AB65_CSV, newline="", encoding="utf-8") as fh:
+                for r in csv.DictReader(fh):
+                    if r["insgesamt"] and r["g60_66"] and r["ab67"]:
+                        daten[r["schluessel"]] = (float(r["insgesamt"]), float(r["g60_66"]),
+                                                  float(r["ab67"]))
+                    else:
+                        daten[r["schluessel"]] = None
+        except FileNotFoundError:
+            log.warning("Anlage %s fehlt — Stufe 2 der Ersatzregel 65+ entfällt", DEMOGRAFIE_AB65_CSV)
+        _demografie_ab65_cache = daten
+    return _demografie_ab65_cache
+
+
+def demografie_zeile_ab65(ags: str | None) -> tuple[tuple[float, float, float] | None, str | None]:
+    """Zeile aus [69] für eine Gemeinde: die Gemeindezeile; fehlt sie (anderer Gebietsstand)
+    oder steht dort „.“, die Kreiszeile (erste fünf Stellen des AGS, Befund 119); sonst keine.
+    Gibt (Zeile, "gemeinde"|"kreis"|None)."""
+    if not ags:
+        return None, None
+    daten = _demografie_ab65()
+    ags = str(ags).strip()
+    if daten.get(ags) is not None:
+        return daten[ags], "gemeinde"
+    if daten.get(ags[:5]) is not None:
+        return daten[ags[:5]], "kreis"
+    return None, None
+
+
+def anteil_ab65_gemeinde(zeile: tuple[float, float, float], teil_60_66: float) -> float:
+    """A_G = (Einwohner ab 67 + teil × Gruppe 60–66) / Einwohner (Bericht #95 §3.3, Schritt 1)."""
+    ges, g60, ab67 = zeile
+    return (ab67 + teil_60_66 * g60) / ges
+
+
+def _anteil_60_66() -> float:
+    """Override-fähiger Registry-Wert des Anteils 60–66 (Vorgabe 2/7)."""
+    from app.services.engine import override_context
+    v = override_context.get_override(ANTEIL_60_66_PARAM_ID, ANTEIL_60_66_DEFAULT)
+    return float(v) if v is not None else ANTEIL_60_66_DEFAULT
+
+
 def _senior_split(counts: dict[str, float], fallback: dict[str, float]) -> dict[str, float]:
     """Anteile der drei Senioren-Bänder an 65+; ``fallback`` bei zu dünner Besetzung."""
     total = sum(counts.values())
@@ -540,8 +604,16 @@ def apply_zensus_to_cell_inputs(
     cell_inputs: list[dict],
     grid_cells: list[dict],
     zensus: dict[str, dict[str, dict[str, Any]]] | None = None,
+    ags: str | None = None,
+    *,
+    ersatzregel_stufe2: bool = True,
 ) -> None:
-    """Set Zensus fields on each cell_input in-place."""
+    """Set Zensus fields on each cell_input in-place.
+
+    ``ags`` = amtlicher Gemeindeschlüssel der Kommune, deren Zellen ``grid_cells`` sind;
+    er wählt die Zeile der Regionaltabelle [69] für Stufe 2 der Ersatzregel 65+ (Bericht
+    #95 §3.3). Ohne ``ags`` (oder mit ``ersatzregel_stufe2=False``) entfällt Stufe 2, und
+    die Zellen der Stufe 2 behalten 65+ = 0."""
     if zensus is None:
         zensus = load_zensus_for_cells(grid_cells)
 
@@ -561,6 +633,9 @@ def apply_zensus_to_cell_inputs(
     area_split = _area_senior_split(ages) if ages else dict(NATIONAL_SENIOR_SPLIT)
     area_u20 = _area_u20_share(ages) if ages else NATIONAL_U20_SHARE_OF_U65
 
+    shares_o: dict[int, float] = {}
+    processed: list[int] = []
+    stufe2: list[int] = []
     for idx, ci in enumerate(cell_inputs):
         gid = gid_by_idx.get(idx) or ci.get("gitter_id")
         if not gid:
@@ -602,7 +677,55 @@ def apply_zensus_to_cell_inputs(
         )
         ci["gitter_id"] = gid
 
-        share_o = ci.get("share_over_65") or 0.0
+        # Anteil 65+ der Zelle. Ist er im Gitter geheimgehalten („–“ bzw. leer),
+        # greift die Ersatzregel aus Bericht #95 §3.3 (Log 41, Befund 116) statt 65+ = 0.
+        # ``share_over_65`` bleibt der veröffentlichte Zensuswert; der angesetzte Wert
+        # steht in ``share_over_65_ersatz`` mit Herkunft ``share_over_65_herkunft``.
+        pop = ci.get("pop") or 0.0
+        published = ci.get("share_over_65")
+        if published:
+            shares_o[idx] = float(published)
+            ci["share_over_65_herkunft"] = "zensus"
+        else:
+            # Stufe 1: veröffentlichte 5er-Jahresgruppen ab 65 der Zelle (nicht
+            # veröffentlichte Gruppen zählen als 0) geteilt durch ihre Einwohner.
+            counts = _senior_band_counts(ages.get(gid, {})) if ages else {}
+            n65 = sum(counts.values())
+            if n65 > 0 and pop > 0:
+                shares_o[idx] = min(100.0, 100.0 * n65 / pop)
+                ci["share_over_65_herkunft"] = "ersatz_stufe1"
+            else:
+                shares_o[idx] = 0.0
+                stufe2.append(idx)
+        processed.append(idx)
+
+    # Stufe 2: der Rest aus der Gemeindesumme [69]. Zielzahl Z = A_G × Einwohner der
+    # Gemeinde im Gitter; Rest R = Z − Einwohner ab 65, die schon feststehen; jede
+    # übrige geheimgehaltene Zelle bekommt R / Einwohner dieser Zellen, begrenzt auf
+    # 0–100 % (R < 0 gibt 0). Ohne Gemeinde- und Kreiszeile bleibt 65+ = 0 (Modellgrenze).
+    if stufe2:
+        zeile, ebene = demografie_zeile_ab65(ags) if ersatzregel_stufe2 else (None, None)
+        if zeile is not None:
+            pops = {i: float(cell_inputs[i].get("pop") or 0.0) for i in processed}
+            ew_gitter = sum(pops.values())
+            stufe2_set = set(stufe2)
+            ew65_fest = sum(pops[i] * shares_o[i] / 100.0 for i in processed if i not in stufe2_set)
+            ew_stufe2 = sum(pops[i] for i in stufe2)
+            z = anteil_ab65_gemeinde(zeile, _anteil_60_66()) * ew_gitter
+            r = z - ew65_fest
+            anteil = min(1.0, max(0.0, r / ew_stufe2)) if ew_stufe2 > 0 else 0.0
+            for i in stufe2:
+                shares_o[i] = 100.0 * anteil
+                cell_inputs[i]["share_over_65_herkunft"] = f"ersatz_stufe2_{ebene}"
+        else:
+            for i in stufe2:
+                cell_inputs[i]["share_over_65_herkunft"] = "ohne_ersatzwert"
+
+    for idx in processed:
+        ci = cell_inputs[idx]
+        gid = ci["gitter_id"]
+        share_o = shares_o[idx]
+        ci["share_over_65_ersatz"] = share_o
         share_u = ci.get("share_under_18") or 0.0
         ci["share_vulnerable"] = min(100.0, share_o + share_u)
         pop = ci.get("pop") or 0.0
@@ -610,9 +733,9 @@ def apply_zensus_to_cell_inputs(
         ci["pop_under_18"] = pop * share_u / 100.0 if pop > 0 else 0.0
 
         # Altersbänder für die Expositions-Wirkungs-Rechnung. Bewusst aus ZWEI
-        # Quellen: ``share_over_65`` (gut besetzt) legt die 65+-Menge fest, die
-        # 5-Jahres-Gruppen nur deren Binnenaufteilung. So trägt jeder Datensatz
-        # das, was er belastbar hergibt — siehe AGE_BAND_COLUMNS.
+        # Quellen: ``share_over_65`` (gut besetzt, sonst Ersatzregel) legt die
+        # 65+-Menge fest, die 5-Jahres-Gruppen nur deren Binnenaufteilung. So trägt
+        # jeder Datensatz das, was er belastbar hergibt — siehe AGE_BAND_COLUMNS.
         senior_counts = _senior_band_counts(ages.get(gid, {})) if ages else {}
         split = _senior_split(senior_counts, area_split) if senior_counts else dict(area_split)
         pop_65p = ci["pop_over_65"]
