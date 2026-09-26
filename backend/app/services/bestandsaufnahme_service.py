@@ -19,7 +19,10 @@ Rechenregeln (keine neuen Zahlenparameter):
   Fläche der Kommune liegt (``app.data.catrare.ereignisse_in_flaeche``); Datum des
   jüngsten Ereignisses im Eintragsfeld ``zusatz``. Die Fläche ist ``Kommune.boundary``
   (Grenze der Kommune), ersatzweise die Hülle der gespeicherten Gitterzellen
-  (``GridCell.geometry``). Ohne Fläche ist der Wert ``None`` mit Laufzeitsatz, nie 0.
+  (``GridCell.geometry``); ist die Fläche so genähert, trägt ``zusatz`` den Schlüssel
+  ``flaeche_genaehert`` (Modellgrenze: Ereignisse knapp außerhalb der Gemeindegrenze
+  können mitgezählt sein). Ohne Fläche ist der Wert ``None`` mit eigenem Lückensatz
+  (``FLAECHE_FEHLT_SATZ_VORLAGE``), scheitert der Katalogabruf, mit Laufzeitsatz; nie 0.
 - Trägt keine Zelle das Feld (bzw. fehlt der Sozialwert), ist der Wert ``None``
   mit Laufzeitsatz, nie 0.
 """
@@ -30,7 +33,11 @@ import logging
 from typing import Any, Optional
 
 from app.data import bevoelkerungsentwicklung, catrare
-from app.data.bestandsaufnahme import BESTANDSAUFNAHME_GROESSEN, LAUFZEITSATZ_VORLAGE
+from app.data.bestandsaufnahme import (
+    BESTANDSAUFNAHME_GROESSEN,
+    FLAECHE_FEHLT_SATZ_VORLAGE,
+    LAUFZEITSATZ_VORLAGE,
+)
 
 log = logging.getLogger(__name__)
 
@@ -143,13 +150,18 @@ def _wert(
 def bestandsaufnahme_aus_daten(
     zellen: list[dict], sozio: dict, entwicklung: Optional[dict] = None,
     starkregen: Optional[list[dict]] = None,
+    starkregen_ohne_flaeche: bool = False,
+    flaeche_genaehert: bool = False,
 ) -> list[dict]:
     """Reine Funktion: 22 Einträge in Katalogreihenfolge aus Zell- und Sozialdaten.
 
     ``zellen`` sind die ``inputs``-Dicts der gespeicherten Zellen, ``sozio`` die
     Rohgrößen der Regionalstatistik (``unemployment_rate_pct``), ``entwicklung`` das
     Ergebnis von ``bevoelkerungsentwicklung.entwicklung`` (oder ``None``), ``starkregen`` die CatRaRE-Ereignisse der Kommune (oder ``None``,
-    wenn keine Fläche vorlag; eine leere Liste ist ein echter Wert 0).
+    wenn keine Fläche vorlag oder der Abruf scheiterte; eine leere Liste ist ein echter Wert 0).
+    ``starkregen_ohne_flaeche`` unterscheidet die beiden ``None``-Fälle: ``True`` heißt, der
+    Kommune fehlt die Fläche (eigener Lückensatz statt Laufzeitsatz). ``flaeche_genaehert``
+    heißt, die Fläche ist die Hülle der Gitterzellen statt der Grenze der Kommune.
     """
     eintraege: list[dict] = []
     for g in BESTANDSAUFNAHME_GROESSEN:
@@ -158,7 +170,10 @@ def bestandsaufnahme_aus_daten(
             satz = g["luecke"]
         else:
             wert = _wert(g["code"], zellen or [], sozio or {}, entwicklung, starkregen)
-            satz = LAUFZEITSATZ_VORLAGE.format(label=g["label"]) if wert is None else ""
+            if wert is None and g["code"] == "starkregenereignisse" and starkregen_ohne_flaeche:
+                satz = FLAECHE_FEHLT_SATZ_VORLAGE.format(label=g["label"])
+            else:
+                satz = LAUFZEITSATZ_VORLAGE.format(label=g["label"]) if wert is None else ""
         eintrag = {
             "code": g["code"],
             "gruppe": g["gruppe"],
@@ -175,8 +190,14 @@ def bestandsaufnahme_aus_daten(
                 k: entwicklung[k]
                 for k in ("jahr_alt", "jahr_neu", "einwohner_alt", "einwohner_neu")
             }
-        if g["code"] == "starkregenereignisse" and starkregen:
-            eintrag["zusatz"] = {"juengstes_beginn": max(e["beginn"] for e in starkregen)}
+        if g["code"] == "starkregenereignisse":
+            zusatz = {}
+            if starkregen:
+                zusatz["juengstes_beginn"] = max(e["beginn"] for e in starkregen)
+            if flaeche_genaehert and not starkregen_ohne_flaeche:
+                zusatz["flaeche_genaehert"] = True
+            if zusatz:
+                eintrag["zusatz"] = zusatz
         eintraege.append(eintrag)
     return eintraege
 
@@ -234,40 +255,53 @@ def _entwicklung(kommune) -> Optional[dict]:
 
 
 def _flaeche_der_kommune(db, kommune):
-    """Fläche der Kommune als shapely-Geometrie (WGS84); ``None``, wenn keine vorliegt.
+    """Fläche der Kommune als ``(shapely-Geometrie in WGS84, genähert)``; ``(None, False)``,
+    wenn keine vorliegt.
 
     Das Produkt speichert die Grenze in ``Kommune.boundary`` (MULTIPOLYGON, SRID 4326);
-    fehlt sie, dient die Hülle der gespeicherten Gitterzellen (``GridCell.geometry``).
+    fehlt sie, dient die Hülle der gespeicherten Gitterzellen (``GridCell.geometry``),
+    und ``genähert`` ist ``True``. Ein Fehler beim Lesen (Datenbank, Geometrie) wird nicht
+    hier abgefangen, sondern in ``_starkregen`` als gescheiterter Abruf gewertet — er ist
+    kein Beleg dafür, dass der Kommune die Fläche fehlt.
     """
     from geoalchemy2.shape import to_shape
 
+    grenze = getattr(kommune, "boundary", None)
+    if grenze is not None:
+        return to_shape(grenze), False
+    from shapely.geometry import MultiPolygon
+    from app.models.models import GridCell
+
+    zeilen = db.query(GridCell.geometry).filter(GridCell.kommune_id == kommune.id).all()
+    polygone = [to_shape(z[0]) for z in zeilen if z[0] is not None]
+    if not polygone:
+        return None, False
+    return MultiPolygon(polygone).convex_hull, True
+
+
+def _starkregen(db, kommune) -> dict:
+    """CatRaRE-Ereignisse der Kommune mit Herkunft der Fläche.
+
+    Liefert die Schlüsselwortargumente für ``bestandsaufnahme_aus_daten``:
+    ``starkregen`` (Liste oder ``None``), ``starkregen_ohne_flaeche`` (keine Fläche, der
+    Katalog wurde nicht gefragt) und ``flaeche_genaehert`` (Hülle der Gitterzellen).
+    Scheitert der Katalogabruf oder das Lesen der Fläche, ist ``starkregen`` ``None`` mit
+    ``starkregen_ohne_flaeche=False`` (Laufzeitsatz).
+    """
+    kid = getattr(kommune, "id", None)
     try:
-        grenze = getattr(kommune, "boundary", None)
-        if grenze is not None:
-            return to_shape(grenze)
-        from shapely.geometry import MultiPolygon
-        from app.models.models import GridCell
-
-        zeilen = db.query(GridCell.geometry).filter(GridCell.kommune_id == kommune.id).all()
-        polygone = [to_shape(z[0]) for z in zeilen if z[0] is not None]
-        if not polygone:
-            return None
-        return MultiPolygon(polygone).convex_hull
+        flaeche, genaehert = _flaeche_der_kommune(db, kommune)
     except Exception as exc:  # niemals die Bestandsaufnahme abbrechen
-        log.warning("Fläche fehlgeschlagen (kommune=%s): %s", getattr(kommune, "id", None), exc)
-        return None
-
-
-def _starkregen(db, kommune) -> Optional[list[dict]]:
-    """CatRaRE-Ereignisse der Kommune; ``None`` ohne Fläche oder bei Fehlschlag."""
-    flaeche = _flaeche_der_kommune(db, kommune)
+        log.warning("Fläche fehlgeschlagen (kommune=%s): %s", kid, exc)
+        return {"starkregen": None, "starkregen_ohne_flaeche": False, "flaeche_genaehert": False}
     if flaeche is None:
-        return None
+        return {"starkregen": None, "starkregen_ohne_flaeche": True, "flaeche_genaehert": False}
     try:
-        return catrare.ereignisse_in_flaeche(flaeche)
+        ereignisse = catrare.ereignisse_in_flaeche(flaeche)
     except Exception as exc:  # niemals die Bestandsaufnahme abbrechen
-        log.warning("Starkregenereignisse fehlgeschlagen (kommune=%s): %s", getattr(kommune, "id", None), exc)
-        return None
+        log.warning("Starkregenereignisse fehlgeschlagen (kommune=%s): %s", kid, exc)
+        ereignisse = None
+    return {"starkregen": ereignisse, "starkregen_ohne_flaeche": False, "flaeche_genaehert": genaehert}
 
 
 def bestandsaufnahme_fuer_kommune(db, kommune) -> dict:
@@ -280,5 +314,5 @@ def bestandsaufnahme_fuer_kommune(db, kommune) -> dict:
         "kommune_id": kommune.id,
         "name": kommune.name,
         "bundesland": getattr(kommune, "bundesland", None),
-        "groessen": bestandsaufnahme_aus_daten(zellen, sozio, entwicklung, starkregen),
+        "groessen": bestandsaufnahme_aus_daten(zellen, sozio, entwicklung, **starkregen),
     }

@@ -126,6 +126,41 @@ def test_starkregen_zeigt_anzahl_juengstes_datum_und_catrare_modellgrenze():
     assert abschnitt.index("Jüngstes Ereignis") < abschnitt.index(MODELLGRENZE)
 
 
+def _starkregen_md(zusatz: dict) -> str:
+    g = {"code": "starkregenereignisse", "gruppe": "vergangene_ereignisse",
+         "label": "Vergangene Starkregenereignisse seit 2001 (CatRaRE)", "einheit": "Anzahl",
+         "wert": 12, "quellen": ["DWD_CatRaRE"], "luecke_satz": "", "zusatz": zusatz}
+    md = bestandsaufnahme_markdown({"kommune_id": 1, "name": "X", "groessen": [g]})
+    return _abschnitt(md, "## Vergangene Klimarisiken")
+
+
+def test_starkregen_genaeherte_flaeche_zeigt_modellgrenze():
+    from app.services.bestandsaufnahme_markdown import FLAECHE_GENAEHERT_SATZ
+
+    abschnitt = _starkregen_md({"juengstes_beginn": "2021-07-14T03:20:00", "flaeche_genaehert": True})
+    assert abschnitt.count(FLAECHE_GENAEHERT_SATZ) == 1
+    assert "aus der Hülle der Rasterzellen genähert" in FLAECHE_GENAEHERT_SATZ
+    assert "knapp außerhalb der Gemeindegrenze" in FLAECHE_GENAEHERT_SATZ
+    assert "mitgezählt" in FLAECHE_GENAEHERT_SATZ
+    assert "Jüngstes Ereignis: 14.07.2021" in abschnitt
+
+
+def test_starkregen_genaeherte_flaeche_ohne_ereignis_zeigt_modellgrenze():
+    from app.services.bestandsaufnahme_markdown import FLAECHE_GENAEHERT_SATZ
+
+    abschnitt = _starkregen_md({"flaeche_genaehert": True})
+    assert FLAECHE_GENAEHERT_SATZ in abschnitt
+    assert "Jüngstes Ereignis" not in abschnitt
+
+
+def test_starkregen_mit_grenze_ohne_genaeherte_flaeche():
+    from app.services.bestandsaufnahme_markdown import FLAECHE_GENAEHERT_SATZ
+
+    md_abschnitt = _starkregen_md({"juengstes_beginn": "2021-07-14T03:20:00"})
+    assert FLAECHE_GENAEHERT_SATZ not in md_abschnitt
+    assert "Hülle" not in md_abschnitt
+
+
 def test_abschnitt_vorhandene_untersuchungen_mit_und_ohne_bundesland():
     from app.data import vorhandene_untersuchungen as v
     from app.services.bestandsaufnahme_markdown import LAND_FEHLT_SATZ, bestandsaufnahme_markdown as m
