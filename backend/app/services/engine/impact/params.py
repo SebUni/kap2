@@ -1417,8 +1417,82 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
     ("EXPECTED_ANNUAL_MORBIDITY", "hotday_ref_days"): "heat.hd_ref",
     ("EXPECTED_ANNUAL_MORBIDITY", "delta_vg_morb"): "heat.delta_vg_morb",
 }
+# Kennzeichnung je Block nach Kapitel 7 (Feld ``kennzeichnung``), übersetzt in die
+# Evidenzklasse der Parameterliste (P1): quelle → belegt, abschaetzung_kap3 →
+# abgeschaetzt, berechnet → berechnet. 9 × belegt, 11 × abgeschaetzt, 3 × berechnet.
+# Die Klasse der drei Katalog-Blöcke (heat.voly, heat.c_fall, heat.delta_hap) steht
+# in data/catalog.py. Geprüft in tests/test_methodik_95_kennzeichnung.py.
+_HEAT_KLASSE: dict[str, str] = {
+    "heat.t0_region": "belegt",
+    "heat.beta_85plus_region": "abgeschaetzt",
+    "heat.f_alter": "abgeschaetzt",
+    "heat.m_basissterberate": "belegt",
+    "heat.l_restlebenserwartung": "abgeschaetzt",
+    "heat.c_kal": "berechnet",
+    "heat.q_wochenquantile": "belegt",
+    "heat.beta_iso": "berechnet",
+    "heat.beta_pfl": "berechnet",
+    "heat.beta_dist_sensitivitaet": "abgeschaetzt",
+    "heat.qbar_1p": "belegt",
+    "heat.qbar_pfl": "belegt",
+    "heat.gamma_hoehe": "belegt",
+    "heat.ror_s157": "belegt",
+    "heat.g_s157": "abgeschaetzt",
+    "heat.delta_vg": "abgeschaetzt",
+    "heat.delta_vg_morb": "abgeschaetzt",
+    "heat.r0_einweisungsrate": "abgeschaetzt",
+    "heat.e_hd": "belegt",
+    "heat.hd_ref": "belegt",
+}
+# Herleitung nach P1 für die Blöcke, deren Spec noch keine eigene trägt (Bericht #95).
+_HEAT_HERLEITUNG: dict[str, dict[str, str]] = {
+    "heat.beta_85plus_region": {
+        "wert": "Nord 0,0634 und Mitte 0,0625 K⁻¹ aus Ablesewerten von Winklmayr 2022; Süd "
+                "0,0876 K⁻¹ = 0,0531 × s_Süd 1,65, eine Nachschätzung von KAP3 auf den "
+                "Bundesland-Jahren 2012–2024 ohne 2018/2019/2022 (Bericht #95 §4, "
+                "Anker #beta-sued, Entscheidungslog Nr. 32).",
+        "band": "Süd 0,0770–0,0982 K⁻¹ (s_Süd 1,45–1,85; Bandränder bei höchstens +10 % "
+                "Zielfunktion, gekennzeichnete Bandregel, kein Konfidenzintervall). Nord "
+                "und Mitte ohne Band; Nord ist nicht identifizierbar und bleibt bei s = 1,0.",
+        "sensitivitaet": "β_85+ geht über die RR-Steigung in den Wochenexzess ein; der "
+                         "Kalibrierfaktor c_kal gleicht das aus (Bericht #95 §4 #c-kal: "
+                         "0,559 bei s_Süd 1,85, 0,661 ohne Süd-Nachschätzung).",
+    },
+    "heat.f_alter": {
+        "wert": "0,357 / 0,588 / 0,631 / 1,0 (u65 / 65–74 / 75–84 / 85+) als Rückrechnung "
+                "aus den RKI-Altersanteilen der Hitzesterbefälle und den Sterbefällen "
+                "2023 mit linearer Näherung (Bericht #95 §3.3a, Anker #f-a).",
+        "band": "Der Bericht nennt kein eigenes Band für f_a; die lineare Näherung ist dort "
+                "als gekennzeichnete Abschätzung geführt.",
+        "sensitivitaet": "f_a skaliert die RR-Steigung des Bandes (β_a = f_a × β_85+) und "
+                         "damit den Wochenexzess des Bandes proportional; der Kalibrierfaktor "
+                         "c_kal gleicht die Summe über die Bänder wieder aus.",
+    },
+    "heat.l_restlebenserwartung": {
+        "wert": "23,39 / 15,59 / 8,90 / 4,16 Jahre (u65 / 65–74 / 75–84 / 85+): Sterbetafel "
+                "2022/2024 an den Stützstellen e(60)/e(70)/e(80), eine Setzung von KAP3; "
+                "85+ sterbefallgewichtet über die Einzelaltersjahre 85–94 (Bericht #95 §3.5, "
+                "Anker #l-a).",
+        "band": "85+: 4,16–4,20 Jahre (Obergrenze mit der Stützstelle e(95) statt des "
+                "Mittelwerts 95+). Für die drei jüngeren Bänder nennt der Bericht kein Band.",
+        "sensitivitaet": "Linear: Die verlorenen Lebensjahre (YLL) eines Bandes wachsen im "
+                         "gleichen Verhältnis wie L̄_a; die Zahl der Sterbefälle bleibt gleich.",
+    },
+    "heat.r0_einweisungsrate": {
+        "wert": "1,9 / 6,3 / 10,8 / 15,6 je 100.000 und Jahr (u65 / 65–74 / 75–84 / 85+), "
+                "Summe 3,54; Altersprofil 1 : 3,3 : 5,7 : 8,2 ist eine gekennzeichnete "
+                "Abschätzung von KAP3 (Bericht #95 §3.4, Anker #r0-a, Entscheidungslog Nr. 16).",
+        "band": "×0,6–1,6: Summenband 2,9–4,4 (×0,83–1,26) kombiniert mit ±25 % Unsicherheit "
+                "des Altersprofils (Bericht #95 §3.4).",
+        "sensitivitaet": "Linear: Die Fälle und ihr Euro-Betrag wachsen im gleichen "
+                         "Verhältnis wie r_0,a (Bericht #95 §3.4, Formel F).",
+    },
+}
 for _spec in IMPACT_PARAM_SPECS:
     _block = _HEAT_BLOECKE.get((_spec["risk"], _spec["key"]))
     if _block:
         _spec["methodik_block"] = _block
+        _spec["evidence_class"] = _HEAT_KLASSE[_block]
+        if _block in _HEAT_HERLEITUNG:
+            _spec.setdefault("evidence_derivation", dict(_HEAT_HERLEITUNG[_block]))
 del _spec, _block
