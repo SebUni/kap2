@@ -132,6 +132,21 @@ export default function SystembereicheSection({ className = '' }: { className?: 
               Rechnung; sie sind nicht der Produkt-Risikoindex und nicht mit ihm verrechnet.
               {bund && <> {bund.methodische_grenze.titel}: {bund.methodische_grenze.aussage}</>}
             </p>
+            {bund && (
+              <>
+                <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginTop: 12 }}>
+                  Schlüsse der Bundesanalyse für die Anpassungsplanung (KWRA 2021, Teilbericht 6, Kap. 7)
+                </h3>
+                <ul style={{ fontSize: '0.8rem', marginTop: 6, paddingLeft: 18 }}>
+                  {bund.schluesse.map(s => (
+                    <li key={s.schluss} style={{ marginBottom: 4 }}>
+                      <strong>{s.titel}</strong>: {s.aussage}
+                      <span style={{ color: 'var(--text-muted)' }}> (S. {s.seiten.join(', ')})</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </>
         )}
       </div>
