@@ -190,7 +190,8 @@ def _build_risk_histogram(db: Session, kommune_id: int) -> dict:
             "max_index": a.get("max_index", 0.0),
             "outcome": a.get("outcome", 0.0),
             "outcome_sum": a.get("outcome_sum", 0.0),
-            "cost_eur": a.get("cost_eur", 0.0),
+            # Fehlender Betrag → None (NULL), nie 0.0: eine 0 wäre eine Nullwirkung (A-0010/P2).
+            "cost_eur": a.get("cost_eur"),
             # Schicht-B-Aggregationskennzahlen (Σ über Zellen vs. P90; Konzentration/Fläche)
             "aggregation": a.get("aggregation", "sum"),
             "top5_share": a.get("top5_share", 0.0),
