@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from app.data import sources
 from app.data.bevoelkerungsentwicklung import MODELLGRENZE
+from app.data.catrare import MODELLGRENZE as MODELLGRENZE_CATRARE
 from app.services.kang_nachweis_markdown import _de_betrag
 
 TITEL = "# Bestandsaufnahme"
@@ -31,7 +32,7 @@ GRUPPEN = [
 ]
 
 # Modellgrenzen je Gruppe, wörtlich unter der Tabelle der Gruppe.
-GRUPPEN_MODELLGRENZEN = {"trends": MODELLGRENZE}
+GRUPPEN_MODELLGRENZEN = {"vergangene_ereignisse": MODELLGRENZE_CATRARE, "trends": MODELLGRENZE}
 
 UEBERSCHRIFT_LUECKEN = "## Datenlücken"
 
@@ -79,6 +80,16 @@ def _zusatz_zeile(g: dict) -> str:
     )
 
 
+def _datum_de(iso: str) -> str:
+    """ISO-Zeitstempel (``2025-06-29T14:50:00``) als Datum ``29.06.2025``."""
+    j, m, t = str(iso)[:10].split("-")
+    return f"{t}.{m}.{j}"
+
+
+def _zusatz_starkregen(g: dict) -> str:
+    return f"Jüngstes Ereignis: {_datum_de(g['zusatz']['juengstes_beginn'])}"
+
+
 def bestandsaufnahme_markdown(ergebnis: dict) -> str:
     """Formatiert das Ergebnis von ``bestandsaufnahme_fuer_kommune`` als Markdown."""
     groessen = ergebnis["groessen"]
@@ -97,7 +108,8 @@ def bestandsaufnahme_markdown(ergebnis: dict) -> str:
             teile += ["\n".join(hinweise), ""]
         for g in mit_wert:
             if g.get("zusatz"):
-                teile += [_zusatz_zeile(g), ""]
+                zeile = _zusatz_starkregen(g) if g["code"] == "starkregenereignisse" else _zusatz_zeile(g)
+                teile += [zeile, ""]
         if gruppe in GRUPPEN_MODELLGRENZEN:
             teile += [GRUPPEN_MODELLGRENZEN[gruppe], ""]
 
