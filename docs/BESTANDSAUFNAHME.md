@@ -8,7 +8,7 @@ Die Bestandsaufnahme rechnet nichts. Sie führt Größen auf und weist je Größ
 
 ## Erhobene Größen
 
-Das Produkt führt 21 Größen in fünf Gruppen. Je Größe steht entweder die Datenquelle (Quellschlüssel und Klartext) oder der Hinweis, dass keine Quelle je Kommune vorliegt.
+Das Produkt führt 22 Größen in fünf Gruppen. Je Größe steht entweder die Datenquelle (Quellschlüssel und Klartext) oder der Hinweis, dass keine Quelle je Kommune vorliegt.
 
 | Code | Größe | Gruppe | Einheit | Quelle oder Lücke |
 |---|---|---|---|---|
@@ -31,8 +31,11 @@ Das Produkt führt 21 Größen in fünf Gruppen. Je Größe steht entweder die D
 | pflegeeinrichtungen | Pflegeeinrichtungen | Klimasensible Strukturen | Anzahl | OSM_Data (OpenStreetMap-Daten) |
 | kitas_schulen | Kindertagesstätten und Schulen | Klimasensible Strukturen | – | Für die Größe Kindertagesstätten und Schulen liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. |
 | lieferketten | Lieferketten | Klimasensible Strukturen | – | Für die Größe Lieferketten liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. Hinweis: nicht im Katalog. |
+| starkregenereignisse | Vergangene Starkregenereignisse seit 2001 (CatRaRE) | Vergangene Ereignisse | Anzahl | DWD_CatRaRE (CatRaRE T5, Version 2026.01, Deutscher Wetterdienst) |
 | schadensereignisse | Vergangene Schadensereignisse durch Wetterextreme | Vergangene Ereignisse | – | Für die Größe Vergangene Schadensereignisse durch Wetterextreme liegt dem Produkt keine Datenquelle je Kommune vor; sie ist im Rahmen der Konzepterstellung vor Ort zu erheben. |
 | bevoelkerungsentwicklung | Bevölkerungsentwicklung | Trends | % | Destatis_GVISys_Bevoelkerung (Gemeindeverzeichnis GV-ISys, Destatis, Stichtage 31.12.2017 und 31.12.2023) |
+
+Die Größe `starkregenereignisse` zählt die Ereignisse des DWD-Katalogs CatRaRE seit 2001, deren Mittelpunkt (Ort des Niederschlagsmaximums) in der Fläche der Kommune liegt; die Markdown-Fassung nennt zusätzlich das Datum des jüngsten Ereignisses. Als Fläche dient die Grenze der Kommune, ersatzweise die Hülle ihrer gespeicherten Zellen; liegt keine Fläche vor, steht der Laufzeitsatz statt eines Werts. Unter der Gruppe „Vergangene Klimarisiken“ steht die Modellgrenze des Katalogs wörtlich. Schäden trägt der Katalog nicht: `schadensereignisse` behält den Lückensatz.
 
 ## Lücken und Abgrenzung
 

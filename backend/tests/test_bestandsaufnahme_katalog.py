@@ -1,6 +1,6 @@
 """Test des Katalogs der Bestandsaufnahme-Größen (Ticket T-0754, Vorhaben T-0447).
 
-Deckt ab: (a) 21 Codes in fester Reihenfolge, (b) Gruppe/Label/Einheit wie im Ticket,
+Deckt ab: (a) 22 Codes in fester Reihenfolge, (b) Gruppe/Label/Einheit wie im Ticket,
 (c) je Größe Quellschlüssel (im Register) XOR Lückensatz, (d) Lückensätze wörtlich.
 """
 
@@ -14,7 +14,7 @@ CODES = [
     "alleinlebende_aeltere", "vorerkrankte", "wohnungslose",
     "gewaesser", "wald", "boeden", "schutzgebiete", "energie",
     "wasser_abwasser", "verkehrsknoten", "kommunikation", "krankenhaeuser",
-    "pflegeeinrichtungen", "kitas_schulen", "lieferketten", "schadensereignisse",
+    "pflegeeinrichtungen", "kitas_schulen", "lieferketten", "starkregenereignisse", "schadensereignisse",
     "bevoelkerungsentwicklung",
 ]
 VP, NS, KS, VE, TR = ("vulnerable_personen", "natuerliche_systeme", "klimasensible_strukturen",
@@ -39,6 +39,7 @@ TABELLE = {
     "krankenhaeuser": (KS, "Krankenhäuser", "Anzahl"),
     "pflegeeinrichtungen": (KS, "Pflegeeinrichtungen", "Anzahl"),
     "kitas_schulen": (KS, "Kindertagesstätten und Schulen", ""),
+    "starkregenereignisse": (VE, "Vergangene Starkregenereignisse seit 2001 (CatRaRE)", "Anzahl"),
     "schadensereignisse": (VE, "Vergangene Schadensereignisse durch Wetterextreme", ""),
     "bevoelkerungsentwicklung": (TR, "Bevölkerungsentwicklung", "%"),
 }

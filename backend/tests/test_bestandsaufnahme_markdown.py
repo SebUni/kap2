@@ -112,6 +112,20 @@ def test_trends_zeigt_beide_jahre_veraenderung_und_modellgrenze():
     assert abschnitt.index("Veränderung") < abschnitt.index(MODELLGRENZE)
 
 
+def test_starkregen_zeigt_anzahl_juengstes_datum_und_catrare_modellgrenze():
+    from app.data.catrare import MODELLGRENZE
+
+    g = {"code": "starkregenereignisse", "gruppe": "vergangene_ereignisse",
+         "label": "Vergangene Starkregenereignisse seit 2001 (CatRaRE)", "einheit": "Anzahl",
+         "wert": 12, "quellen": ["DWD_CatRaRE"], "luecke_satz": "",
+         "zusatz": {"juengstes_beginn": "2021-07-14T03:20:00"}}
+    md = bestandsaufnahme_markdown({"kommune_id": 1, "name": "X", "groessen": [g]})
+    abschnitt = _abschnitt(md, "## Vergangene Klimarisiken")
+    assert "| Vergangene Starkregenereignisse seit 2001 (CatRaRE) | 12 | Anzahl |" in abschnitt
+    assert "Jüngstes Ereignis: 14.07.2021" in abschnitt
+    assert abschnitt.index("Jüngstes Ereignis") < abschnitt.index(MODELLGRENZE)
+
+
 if __name__ == "__main__":
     import pytest
     sys.exit(pytest.main([__file__, "-q"]))
