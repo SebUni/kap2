@@ -1,0 +1,356 @@
+Textabbild (pdftotext -layout, poppler) von bmg_pakt_oegd_2020.pdf
+Quelle: https://www.bundesgesundheitsministerium.de/fileadmin/Dateien/3_Downloads/O/OEGD/Pakt_fuer_den_OEGD.pdf, abgerufen am 25.09.2026
+Seitenmarken = PDF-Seiten; sie stimmen mit der gedruckten Seitenzahl überein.
+
+=== Seite 1 ===
+                   Pakt für den Öffentlichen Gesundheitsdienst
+
+Bund und Länder unterstreichen die herausragende Bedeutung des Öffentlichen Ge-
+sundheitsdienstes (ÖGD) für einen wirksamen Schutz der Gesundheit der Bevölke-
+rung. Die aktuelle Corona-Pandemie hat gezeigt, wie wichtig gerade der Öffentliche
+Gesundheitsdienst ist, um eine Schadens- oder Gefahrenlage dieses Ausmaßes und
+ihre Auswirkungen auf alle Bereiche des täglichen Lebens wirksam in den Griff zu be-
+kommen. Die Corona-Krise hat aber auch allen vor Augen geführt, dass eine nachhal-
+tige Verstärkung des Öffentlichen Gesundheitsdienstes als eine unverzichtbare Säule
+des Gesundheitswesens dringend geboten ist.
+
+Um die aktuellen Erfahrungen aus dieser Pandemie aufzugreifen und die Aufgaben
+des Gesundheitsschutzes, der Prävention, Planung und Koordinierung noch effektiver
+erfüllen zu können, vereinbaren Bund und Länder hiermit einen „Pakt für den Öffentli-
+chen Gesundheitsdienst“. Dieser hat das Ziel, den Öffentlichen Gesundheitsdienst in
+seiner ganzen Aufgabenvielfalt und auf allen Verwaltungsebenen zu stärken und zu
+modernisieren.
+
+Die Beteiligten sind sich einig, dass für die Umsetzung des Paktes für den ÖGD die
+Mitwirkung der kreisfreien Städte und der Landkreise wesentlich ist. Dies gilt insbe-
+sondere für den Personalaufbau in den unteren Gesundheitsbehörden, die Digitalisie-
+rung, für die Steigerung der Attraktivität des Öffentlichen Gesundheitsdienstes und das
+geplante Monitoring.
+
+Der föderal organisierte Öffentliche Gesundheitsdienst in den Ländern hat in den letz-
+ten Monaten einen ganz wesentlichen Beitrag zur Eindämmung der Corona-Pandemie
+geleistet. Um den Öffentlichen Gesundheitsdienst auch für die weiteren Herausforde-
+rungen zu stärken, haben einige Länder im Vorgriff auf den Pakt schon kurzfristig sehr
+rasch bedeutende Verbesserungen in der personellen und apparativen Ausstattung
+veranlasst. Aufbauend auf diesen Strukturen soll mit dem Pakt der ÖGD insbesondere
+in den Ländern zum Schutz der Bevölkerung vor den bestehenden Gesundheitsgefah-
+ren gestärkt und ausgebaut werden.
+
+Der Bund stellt für die Umsetzung des Paktes insgesamt Mittel in Höhe von 4 Milliarden
+Euro bis 2026 zur Verfügung. Bund und Länder sind sich auch darüber einig, dass sie
+zur Stärkung des Öffentlichen Gesundheitsdienstes jeweils weitere Maßnahmen in ih-
+ren Zuständigkeitsbereichen auf den Weg bringen müssen.
+
+
+
+
+                                                                                     1
+=== Seite 2 ===
+Die Maßnahmen im Einzelnen:
+1. Personalaufbau
+
+In Umsetzung des Paktes für den ÖGD verbessern Bund und Länder, einschließlich
+Kommunen, jeweils in ihren Zuständigkeitsbereichen nachhaltig die Personalausstat-
+tung und stärken damit tiefgreifend die Strukturen des Öffentlichen Gesundheitsdiens-
+tes.
+
+Die Länder tragen in einem ersten Schritt dafür Sorge, dass im Zeitraum vom 1. Feb-
+ruar 2020 bis zum 31. Dezember 2021 mindestens 1.500 neue, unbefristete Vollzeit-
+stellen (Vollzeitäquivalente) für Ärztinnen und Ärzte, weiteres Fachpersonal sowie Ver-
+waltungspersonal in den Behörden des Öffentlichen Gesundheitsdienstes geschaffen
+und besetzt werden, in einem weiteren Schritt werden bis Ende 2022 mindestens wei-
+tere 3.500 Vollzeitstellen (Vollzeitäquivalente) geschaffen.
+
+Die Länder verpflichten sich, dem Bund ihre jeweiligen konkreten Personalaufwuchs-
+konzepte und -zielsetzungen im Rahmen des Paktes für den ÖGD in einem Bericht
+zum 31. Dezember 2021 vorzulegen. Diese legen dar, für welche Aufgaben befristete
+und unbefristete Stellen geschaffen und besetzt werden. Die Länder verständigen sich
+unter Beteiligung der kommunalen Spitzenverbände und des Bundes auf eine einheit-
+liche Erfassungsgrundlage. Zur Unterstützung bei der Erstellung des Personalauf-
+wuchskonzeptes können die Länder Mittel des Paktes für den ÖGD auch für eine ent-
+sprechende Organisationsanalyse/-entwicklung verwenden.
+
+Der Personalaufwuchs soll auf allen Ebenen (örtliche Gesundheitsämter und Behör-
+den, befasste Landesstellen und oberste Landesbehörden) stattfinden, dabei sollen
+grundsätzlich 90 Prozent der Stellen in den unteren Gesundheitsbehörden/örtlichen
+Gesundheitsämtern geschaffen werden. Teilzeitstellen, die aufgestockt werden, kön-
+nen ebenfalls berücksichtigt werden.
+
+Maßgeblich für die personelle Verbesserung sind die im Leitbild des Öffentlichen Ge-
+sundheitsdienstes gemäß Beschluss der 91. Gesundheitsministerkonferenz beschrie-
+benen Aufgaben.
+
+Zur Umsetzung des Paktes für den ÖGD sowie zur Evaluierung der Maßnahmen
+schafft der Bund in der Bundesverwaltung bis zum 31. Dezember 2021 insgesamt 40
+Stellen.
+
+2. Digitalisierung
+
+Bund und Länder sind sich darin einig, dass die Digitalisierung einen wichtigen Beitrag
+dazu leistet, die Arbeit des ÖGD effizienter zu gestalten und Verfahren zu beschleuni-
+gen. Bund und Länder haben bereits verschiedene Maßnahmen zur Digitalisierung des
+ÖGD ergriffen, die es auszubauen, zu harmonisieren und zügig voranzubringen gilt.
+
+Vor dem Hintergrund der Pandemie ist das Deutsche Elektronische Melde- und Infor-
+mationssystem für den Infektionsschutz (DEMIS) nach § 14 des Infektionsschutzge-
+setzes von besonderer Bedeutung, dessen Aufbau beim RKI der Bund finanziert. Bund
+                                                                                     2
+=== Seite 3 ===
+und Länder sind sich darin einig, diese gemeinsame Kommunikationsplattform des
+ÖGD unter Berücksichtigung bereits bestehender Systeme, wie zum Beispiel SOR-
+MAS, bis Ende 2022 allen Gesundheitsbehörden in Bund und Ländern zur Verfügung
+zu stellen.
+
+Der Bund stellt über die 4 Mrd. Euro hinaus zu diesem Zweck bereits in 2020 Finanz-
+hilfen in Höhe von 50 Millionen Euro gemäß Artikel 104b Absatz 1 des Grundgesetzes
+für Investitionen der Länder, einschließlich der Gemeinden und Gemeindeverbände,
+zur technischen Modernisierung des ÖGD zur Verfügung.
+
+Ein entscheidendes Ziel der Digitalisierung ist es, eine Interoperabilität über alle Ebe-
+nen hinweg sicherzustellen und die für das Melde- und Berichtswesen erforderlichen
+Schnittstellen und Systeme zu definieren, zu schaffen und die entsprechenden Stan-
+dards einzuhalten. Zur Beschleunigung und Vereinfachung von Meldeverfahren wer-
+den zentrale Plattformen des Bundes geschaffen, bereitgestellt und deren konse-
+quente Nutzung vorangetrieben. Dafür vereinbaren Bund und Länder zuvor zentrale
+Standards zur Sicherstellung einer übergreifenden Kommunikation sowie Interopera-
+bilität.
+
+Die Länder ihrerseits werden dafür Sorge tragen, dass der ÖGD digital zukunftsfähig
+wird und die gemeinsam festgelegten zentralen Standards erfüllt werden. Die Länder
+verpflichten sich, entsprechende Mindeststandards einzuhalten. Diese Mindeststan-
+dards, die von der digitalen Reife einer Organisation in den fünf Kategorien „IT-Infra-
+struktur“, „Hardware“, „Software“, „Informationssicherheit“ und „Prozessunterstützung“
+abhängen (Reifegradmodell), werden im Rahmen eines Forschungsvorhabens des
+Bundesministeriums für Gesundheit unter Einbeziehung der wesentlichen Akteure,
+insbesondere der Länder, Städte und Kommunen sowie weiterer Expertinnen und Ex-
+perten vor allem aus dem Bereich des Öffentlichen Gesundheitsdienstes bis zum Früh-
+jahr 2021 erarbeitet und fortlaufend weiterentwickelt werden („Digitales Gesundheits-
+amt 2025“); die Umsetzung der Mindestanforderungen wird durch das Forschungsvor-
+haben fortlaufend evaluiert.
+
+Um diese Maßnahmen umzusetzen, werden durch das Bundesministerium für Ge-
+sundheit ein auf den Ergebnissen des Forschungsvorhabens aufbauendes und von
+den Reifegradstufen abhängiges Förderprogramm aufgelegt, die entsprechenden
+Standards und Vorgaben entwickelt und die notwendigen zentralen Systeme (u.a.
+Clouddienste, Dashboards) und Tools (u.a. Informations- und Kommunikationsanwen-
+dungen) bereitgestellt.
+
+3. Steigerung der Attraktivität des ÖGD
+
+Bund und Länder sind sich einig, dass neben der Schaffung von Stellen weitere Maß-
+nahmen zur Steigerung der Attraktivität einer Tätigkeit im ÖGD dringend erforderlich
+sind.
+
+
+
+
+                                                                                       3
+=== Seite 4 ===
+Der ÖGD konkurriert bei der Besetzung von Stellen mit anderen Bereichen des Ge-
+sundheitssystems. Damit die vereinbarte personelle Stärkung auch vollumfänglich re-
+alisiert werden kann, sollen Anreize für eine Tätigkeit sowohl über das Besoldungs-
+recht als auch über tarifvertragliche Regelungen sowie flankierende Maßnahmen wie
+attraktive Arbeitsbedingungen erreicht werden.
+Die Länder streben unter Beachtung der Tarifautonomie an, für das ärztliche Personal
+im Öffentlichen Gesundheitsdienst eine attraktive Bezahlung, etwa im Rahmen beste-
+hender Tarifverträge, zu erzielen. Die Länder streben an, im Rahmen des Besoldungs-
+rechts entsprechende Verbesserungen auch für das beamtete ärztliche Personal im
+Öffentlichen Gesundheitsdienst herbei zu führen. Bis dies erfolgt ist, führen die Länder
+Verbesserungen der finanziellen Anreize durch in der Wirkung gleiche Maßnahmen
+bereits ab dem Jahr 2021 herbei. Jedes Land kann hierfür bis zu zehn Prozent seines
+Anteils der Finanzmittel aus dem Pakt nutzen. Die Tarifautonomie und das Selbstver-
+waltungsrecht der Kommunen begrenzen die Möglichkeit der Länder, auf die Ausge-
+staltung der Bezahlung von Tarifbeschäftigten der Kommunen Einfluss zu nehmen.
+Dies gilt auch für solche Maßnahmen der Flächenländer, die ähnliche Wirkungen er-
+zielen sollen. Die Länder werden diese Schritte im Einvernehmen mit den jeweiligen
+kommunalen Spitzenverbänden auf Landesebene gehen.
+
+Bund und Länder sind sich darin einig, dass die Verbindung des Öffentlichen Gesund-
+heitsdienstes mit der Wissenschaft sowohl in der Fort-, Aus- und Weiterbildung als
+auch in der Forschung vertieft werden soll.
+Studierende der Medizin sollen bereits im Studium stärker an die Themenfelder der
+Öffentlichen Gesundheit herangeführt werden. Im Rahmen der anstehenden Reform
+der Approbationsordnung für Ärzte streben Bund und Länder daher an, den Bereich
+des Öffentlichen Gesundheitswesens und der Bevölkerungsmedizin stärker in der me-
+dizinischen Ausbildung zu verankern. Es soll ausdrücklich klargestellt werden, dass
+Famulaturen und Praktisches Jahr als praktische Teile des Medizinstudiums im Zu-
+sammenhang mit der Versorgung von Patientinnen und Patienten grundsätzlich auch
+im Gesundheitsamt abgeleistet werden können. Themen des Öffentlichen Gesund-
+heitswesens und der Bevölkerungsmedizin sollen zudem stärker in den Ausbildungs-
+zielen- und -inhalten verankert werden.
+Die Länder bitten die Ärztekammern zu prüfen, inwieweit im Rahmen bzw. in Fortent-
+wicklung der Weiterbildungsordnungen in weiteren Gebieten als denen, in denen es
+bereits möglich ist, Kenntnisse, Erfahrungen und Fertigkeiten, die im Öffentlichen Ge-
+sundheitswesen, insbesondere in Gesundheitsämtern, erworben werden, auf die Wei-
+terbildung angerechnet werden können.
+
+Zur Stärkung der wissenschaftlichen Grundlage des Öffentlichen Gesundheitsdienstes
+fördert der Bund Forschungsprogramme. Um die universitäre Verankerung und somit
+Lehre und Forschung auf dem Gebiet des Öffentlichen Gesundheitswesens auszu-
+bauen, werden Bund und Länder prüfen, inwieweit strukturelle Maßnahmen, wie die
+Einrichtung von Stiftungsprofessuren, gefördert werden können.
+
+                                                                                      4
+=== Seite 5 ===
+Um dem Mangel an (medizinischem) Fachpersonal wirksam zu begegnen, wird die
+Fort-, Weiter- und Ausbildung für die Fachberufe im ÖGD gestärkt. Hierzu müssen die
+Bildungsinstitutionen für das Öffentliche Gesundheitswesen bereits jetzt Strukturen
+aufbauen, um die erhöhten Anforderungen an die Fortbildungsbedarfe auch sofort er-
+füllen zu können. Die Länder verpflichten sich, eine adäquate personelle und sachliche
+Ausstattung der Bildungsinstitutionen- inklusive länderübergreifender Institutionen- für
+das Öffentliche Gesundheitswesen zu Beginn der Förderperiode aus dem Paktvolu-
+men in Höhe von 35 Millionen Euro für fünf Jahre bereit zu stellen, damit diese den
+vermehrten Bedarf für Aus- und Weiterbildung erfüllen können. Ein Konzept zur Auf-
+teilung dieser Mittel beschließt die Gesundheitsministerkonferenz (GMK) bis Ende
+2020. Darüber hinaus werden die Länder/ Kommunen genügend Finanzressourcen für
+Fortbildungen bei den Bildungsinstitutionen für das Öffentliche Gesundheitswesen vor-
+halten.
+
+Für eine positive Wahrnehmung des ÖGD ist es wichtig, dass die Tätigkeit und Maß-
+nahmen des Öffentlichen Gesundheitsdienstes sichtbar sind und verständlich erläutert
+werden. Ziel ist es daher, die Kommunikation zur Tätigkeit und Bedeutung des ÖGD
+auf allen Ebenen weiter zu verbessern und auszubauen. Hierzu gehört auch eine ge-
+meinsame Kampagne, die sich an die Bürgerinnen und Bürger mit dem Ziel wenden
+soll, den ÖGD in seiner ganzen Aufgabenbreite und Bedeutung für den Gesundheits-
+schutz der Bevölkerung sichtbar und verständlicher zu machen.
+
+4. Umsetzung der Internationalen Vorschriften zur Gesundheitssicherheit
+
+Die Auswirkungen der Globalisierung haben auch im Bereich der Infektionsepidemio-
+logie zu neuen Aufgaben und Herausforderungen für Nationen und Staatenverbünde
+geführt. Wie die aktuelle Pandemie eindrucksvoll belegt, zieht die wachsende Mobilität
+der Menschen auch einen schnellen Transfer von Gesundheitsrisiken wie Infektionen
+nach sich. Vor dem Hintergrund zum Beispiel der rasanten Ausbreitung der SARS-
+Infektion 2003 und der drohenden Entstehung eines hochpathogenen Influenzaerre-
+gers für den Menschen wurden die Internationalen Gesundheitsvorschriften (IGV)
+überarbeitet und in neuer Fassung im Juni 2005 von der 58. Weltgesundheitsver-
+sammlung der WHO verabschiedet und sind seit dem 15. Juni 2007 völkerrechtlich
+verbindlich.
+Zur Umsetzung der IGV wurden gesetzlich Flug- und Seehäfen in Deutschland be-
+nannt, die bestimmte Bedingungen erfüllen und definierte Kapazitäten, personeller wie
+infrastruktureller Art, vorhalten müssen. Diese Einrichtungen sind ein essentieller Teil
+des öffentlichen Gesundheitsdienstes bei der schnellen Reaktion auf Ereignisse, die
+gesundheitliche Notlagen internationaler Tragweite darstellen können. Zur Stärkung
+dieser Strukturen wird der Bund 50 Millionen Euro in einem Förderprogramm bereit-
+stellen.
+
+5. Zukunftsfähige Strukturen des ÖGD
+Das Aufgabenprofil des ÖGD hat einen starken Wandel erfahren. Neben der Erfüllung
+seiner klassischen Amtsaufgaben ist der ÖGD zunehmend zentraler Ansprechpartner
+                                                                                      5
+=== Seite 6 ===
+in Bereichen der Gesundheitsförderung und Prävention, der Gesundheitsversorgung
+benachteiligter Gruppen sowie im Rahmen der Gesundheitsplanung auf kommunaler
+Ebene. Nicht zuletzt die COVID-19-Pandemie hat verdeutlicht, dass der Öffentliche
+Gesundheitsdienst über alle Ebenen hinweg noch besser auf akute Herausforderun-
+gen eingestellt und strukturell aufgestellt sein muss.
+
+Gemeinsam mit einem externen und unabhängigen Expertenbeirat – berufen vom
+Bundesminister für Gesundheit im Einvernehmen mit der GMK – soll der ÖGD in
+Deutschland auf dieser Grundlage für kommende Pandemien und andere nationale
+gesundheitliche Notlagen organisatorisch und rechtlich auf ein angepasstes Funda-
+ment gestellt werden. Kommunikationswege müssen beschleunigt und vereinfacht und
+der Öffentliche Gesundheitsdienst in Krisensituationen zügig umstrukturiert werden
+können. Zur personellen Unterstützung sollen sowohl internes Personal außerhalb des
+Bereiches „Infektionsschutz“ als auch externe Freiwillige im Krisenmanagement fort-
+gebildet und als „Freiwilligen-Pools“ eingesetzt werden.
+
+Bund und Länder verständigen sich daher darauf, bis zum 31. Dezember 2021 Berei-
+che für weitere strukturelle Anpassungen zu definieren und einen Umsetzungsplan
+vorzulegen. Hierbei wird das von der GMK verabschiedete Leitbild für einen modernen
+Öffentlichen Gesundheitsdienst berücksichtigt.
+
+Eine gute Gesundheitsberichterstattung bildet hierbei die Grundlage für die Planung
+von Maßnahmen sowohl in Bezug auf die Gesundheitsförderung, Prävention, Bera-
+tung als auch das Krisenmanagement.
+
+6. Umsetzung
+
+Für die Umsetzung des Paktes für den Öffentlichen Gesundheitsdienst stellt der Bund
+Finanzmittel in Höhe von 4 Milliarden Euro bereit.
+
+Um den notwendigen besonderen Anforderungen zur Stärkung des ÖGD im Rahmen
+dieses Paktes gerecht zu werden, stellt der Bund den Ländern gegen Nachweis ein-
+malig Mittel in Höhe von 3.100 Millionen Euro - aufgeteilt auf sechs Tranchen - durch
+Festbeträge im Rahmen der vertikalen Umsatzsteuerverteilung zur Verfügung. Die Mit-
+tel fließen vorrangig in den vereinbarten Personalaufwuchs und die Stärkung der At-
+traktivität der Tätigkeit im ÖGD. Die Aufteilung der Finanzmittel wird wie in der folgen-
+den Tabelle dargestellt erfolgen:
+
+                 Haushaltsjahr            Millionen Euro Insgesamt
+                 (Bund)                    (6 Jahre)
+                 2021                     200
+                 2022                     350
+                 2023                     500
+                 2024                     600
+                 2025                     700
+                 2026                     750
+                 Insgesamt                3.100
+                                                                                       6
+=== Seite 7 ===
+Der Bund wird die für die erste Tranche notwendigen gesetzlichen Änderungen recht-
+zeitig vor dem 30.12.2020 auf den Weg bringen und beschließen sowie für die folgen-
+den Tranchen die Umsetzung zeitgerecht realisieren. Die Tranchen werden jeweils am
+01.07. jeden Jahres gezahlt, beginnend 2021.
+
+Die Personalaufwuchskonzepte und -zielsetzungen bilden die Grundlage zur Bemes-
+sung der Umsatzsteueranteile zur Festlegung der Höhe und Zeitpunkte der einzelnen
+Tranchen.
+Sofern die Länder die Vorgaben zur Besetzung von Stellen nur anteilig erfüllen, wird
+die Berechnung der Festbeträge im Rahmen der vertikalen Umsatzsteuerverteilung
+entsprechend angepasst. Dabei ist eine zielgenaue Regelung sicherzustellen, dass im
+Rahmen des Systems der Finanzbeziehungen zwischen Bund und Ländern bei den
+Ländern, die die aus diesem Pakt entstehenden Verpflichtungen nicht erfüllen, eine
+entsprechende landesspezifische Anpassung bzw. Verrechnung vorgenommen wird.
+
+Der aus dem Pakt für den ÖGD entstehende Sach- und Personalaufwand in den kreis-
+freien Städten und Landkreisen ist beachtlich. Die durch diesen Pakt bei ihnen veran-
+lassten Mehrausgaben werden von den Ländern ausgeglichen. Die Länder können
+Aufgaben im Rahmen der Umsetzung dieses Paktes an andere Landesbehörden und
+örtliche Gebietskörperschaften gemäß jeweiliger landesinterner Zuständigkeitsvertei-
+lung für den Öffentlichen Gesundheitsdienst übertragen.
+50 Millionen Euro werden zur Stärkung der den Ländern dienenden Strukturen auf
+Bundesebene bereitgestellt: 24 Millionen Euro für den Aufbau von DEMIS beim Robert
+Koch-Institut sowie 10 Millionen Euro für Forschungs- und Evaluierungszwecke und
+16 Millionen Euro zur personellen Stärkung der beteiligten Bundesbehörden.
+
+Für ein Förderprogramm für den weiteren Ausbau der digitalen Infrastruktur im Sinne
+eines Reifegrad-Modells, die Festlegung und Schaffung interoperabler Standards und
+Schnittstellen sowie die beschriebenen notwendigen zentralen Systeme und Tools
+wird die Bundesregierung 800 Millionen Euro zur Verfügung stellen. Dies beinhaltet
+die Schaffung von zwölf Stellen im Bereich des Bundes.
+
+50 Millionen Euro werden für ein Förderprogramm zur Modernisierung von Flug- und
+Seehäfen nach dem IGV-Gesetz vom Bund bereitgestellt.
+
+Bund und Länder werden bis Ende 2022 einen gemeinsamen Zwischenbericht und bis
+Mitte 2027 einen finalen Bericht über die Umsetzung der vereinbarten Maßnahmen
+vorlegen.
+
+Die Länder stellen sicher und machen transparent, dass die oben genannten Mittel in
+der Höhe ihres jeweiligen Anteils an der Umsatzsteuerverteilung nach dem Gesetz
+über den Finanzausgleich zwischen Bund und Ländern zur Umsetzung des Paktes für
+den ÖGD verwendet werden.
+
+Die personelle Stärkung muss mit Blick auf das Monitoring und die Evaluierung der
+Maßnahmen messbar sein. Um die personelle Stärkung messen zu können, ist zu-
+
+                                                                                   7
+=== Seite 8 ===
+nächst der Personalbestand der Gesundheitsbehörden zu Beginn des Förderzeit-
+raums zu erheben (Ist-Zustand). Des Weiteren soll das ÖGD-Personal zukünftig routi-
+nemäßig auf Bundesebene statistisch erfasst werden. Die Erhebung soll u.a. Angaben
+zum Stellenbestand, zur jeweiligen beruflichen Qualifikation, Angaben zu Vollzeit/Teil-
+zeitstellen sowie zur Altersgruppe erfassen. Der Bund wird ein regionales Fachkräfte-
+monitoring als Bundesstatistik etablieren und über eine Verordnung u.a. die Erfassung
+des ÖGD-Personals veranlassen. In 2021 wird eine erste Erhebung des Personals im
+ÖGD erfolgen.
+
+Bund und Länder sind sich darüber einig, dass die Finanzierung des Personalaufwuch-
+ses nachhaltig sein muss und über das Jahr 2026 hinaus verstetigt wird. Bund und
+Länder werden sich hierzu Mitte 2023 austauschen.
+
+
+
+
+                                                                                     8
