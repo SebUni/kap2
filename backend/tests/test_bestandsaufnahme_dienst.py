@@ -119,9 +119,10 @@ def test_e_kommune_ohne_netzdienst(monkeypatch):
     kommune = SimpleNamespace(id=7, name="Musterstadt", osm_id="R123", bundesland="Sachsen")
     ergebnis = dienst.bestandsaufnahme_fuer_kommune(object(), kommune)
 
-    assert list(ergebnis.keys()) == ["kommune_id", "name", "groessen"]
+    assert list(ergebnis.keys()) == ["kommune_id", "name", "bundesland", "groessen"]
     assert ergebnis["kommune_id"] == 7
     assert ergebnis["name"] == "Musterstadt"
+    assert ergebnis["bundesland"] == "Sachsen"
     assert ergebnis["groessen"] == dienst.bestandsaufnahme_aus_daten(ZELLEN, SOZIO, None)
     assert aufrufe == [("zellen", 7), ("sozio", 7), ("entwicklung", 7)]
 
