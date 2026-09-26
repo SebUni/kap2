@@ -77,9 +77,10 @@ S010–S020 Habitat/Landnutzung, R03/R04).
 
 KWRA-Indikator (intensive Betrachtung „Blühbeginn der Erle"): **GE-KL-07** „Tag des
 Blühbeginns der Erle im Jahr" — geht direkt als Front-Marker in \(\Delta S_B\) ein (§3.1).
-KWRA-Einstufung: Risiko Gegenwart „gering", Mitte des Jahrhunderts „mittel" (starker Wandel
-„hoch"); Handlungserfordernis dennoch **sehr dringend** (lange Anpassungsvorlaufzeiten:
-Stadtbaum-Generationen) [15].
+KWRA-Einstufung ohne Anpassung je Zeitscheibe mit Fundstelle: Tabelle im Unterabschnitt
+„Risiko ohne (weitere) Anpassung“, Aussage (c). Handlungserfordernis dennoch **sehr dringend**
+(KWRA-2021-Mappe, Blatt `Klimawirkungen`, Zelle AG98; Anpassungsdauer 10–50 Jahre, Zelle U98 —
+lange Anpassungsvorlaufzeiten: Stadtbaum-Generationen) [15].
 
 ### Weitergaben (zweispaltig; Quelle: Netzwerkliste + Abgleich-Protokoll)
 
@@ -98,6 +99,68 @@ Stadtbaum-Generationen) [15].
   durchgängig *unterschätzend*, wie in #95 §4); der größte Teil der volkswirtschaftlichen
   Allergie-Last (Produktivität, Präsentismus [8,65]) folgt per R9 in K2/#87 ab M3 — nichts
   geht verloren, nichts wird doppelt gezählt.
+
+### Risiko ohne (weitere) Anpassung
+
+**(a) Zuordnung der Zahlen.** Alle Zahlen des Basiswerts in diesem Bericht — Betroffene, zusätzliche
+Symptomtage und die daraus bewerteten Euro-Beträge in K1-Morbidität, für die Beispielkommune Berlin
+755.753 Tage und 4,69 Mio. € je Jahr (Preisstand 2024) in der Rechenkette §3.0 — gehören zum KWRA-Zustand
+**„Risiko ohne (weitere) Anpassung“**, und zwar zur Zeitscheibe Gegenwart: M0 weist das Ist-Klima aus
+(Normalperioden 1961–1990 gegen 1991–2020, Kapitel 6). Der heute schon umgesetzte Anpassungsstand steckt
+in den gemessenen Größen, nicht in einem eigenen Faktor: Die Prävalenz \(p_{\text{AR},a}\) stammt aus
+DEGS1 [1] und KiGGS Welle 2 [2], die Kosten je Betroffenem aus der TOTALL-Erhebung 2014 [65]. Beide sind
+unter der Versorgung ihres Erhebungszeitraums erhoben; was Betroffene damals schon taten (Medikation,
+Meiden von Pollen), steckt in diesen Zahlen. Die KWRA zählt solche individuelle Anpassung (Meiden bestimmter
+Orte, Lüften, Pollen-Apps) zum bereits bestehenden Stand (Teilbericht 5, S. 180 [15]). Eine Wirkung der
+heutigen Pollenflug-Warnung rechnet der Basiswert weder heraus noch hinzu (S158 im Basiswert Default 1,
+Knoten-Bilanz). Die heutige Stadtbaum- und Vegetationsausstattung wirkt über \(\hat G\) nur auf die
+Verteilung der Zusatztage innerhalb der Kommune. Weil \(\hat P\) auf die eigene Kommune zentriert ist
+(\(\sum B \hat P = \sum B\), §3.3, Log 18/19), gilt: Die Vegetation hebt oder senkt den Basiswert der Kommune nicht
+(Modellgrenze 7). Eine Kommune, die schon allergenarm pflanzt, sieht das heute nur in der Verteilung.
+
+**(b) Zustand „mit Anpassung“.** Der Bericht stellt ihn nur als Wirkung der beiden Maßnahmen-Hebel auf den
+Basiswert dar, nicht als eigenen Basiswert:
+
+- **Pollen-Frühwarnung S158** (§5.1, Abschätzung von KAP3 nach Vorgabe P2): Sie wirkt nur an gewarnten Tagen
+  (DWD-Pollenflug-Gefahrenindex mindestens „mittel“ [70], je Pollengruppe) und nur in Zellen im
+  Geltungsbereich. Dort mindert sie \(r_{\text{S158}} \cdot t_{\text{warn}}\) = 0,03 × 0,75 = 2,25 % der
+  Zusatztage. Beispielkommune Berlin, ganze Stadt im Geltungsbereich: 17.004 vermiedene Tage und
+  ≈ 105.400 € je Jahr (Preisstand 2024).
+- **Allergenarme Stadtbaumwahl** (§5, Log 24): Sie senkt \(\hat P\) einer Zelle um 0,14 je Senkung von
+  \(\hat G/\bar G\) um 0,2. Die Summe der Kommune bleibt gleich (Modellgrenze 7); die Wirkung ist eine
+  Umverteilung zwischen Zellen.
+
+Im Produkt sind beide Wirkungen heute nicht sichtbar (Sperre aus Befund 124; Integrationsauflagen S158 und
+Stadtbaumwahl in §5.1 und §5). Einen Wert „mit Anpassung“ gibt es dort erst nach der Integration und nur, wenn
+eine Kommune Maßnahmen wählt. Die KWRA-Stufen „mit Anpassung“ (Restrisiko, Blatt `Klimawirkungen`, Zeile 98,
+Spalten AB bis AF: gering · gering · mittel · gering · mittel) übernimmt der Bericht nicht als Zahl: Sie
+bewerten die Maßnahmen des Bundes (Aktionsplan Anpassung III und weiterreichende Maßnahmen; Blatt
+`Lesehinweise`, Zeile 27), nicht die Hebel einer Kommune.
+
+**(c) KWRA-Stufe ohne Anpassung und Gewissheit je Zeitscheibe.**
+
+| Zeitscheibe (KWRA) | Fall | Risiko ohne Anpassung | Zelle | Gewissheit | Zelle |
+|---|---|---|---|---|---|
+| Gegenwart (Bezug 1971–2000) | — | gering | N98 | nicht ausgewiesen | — |
+| Mitte des Jahrhunderts (2031–2060) | optimistisch | mittel | O98 | mittel | S98 |
+| Mitte des Jahrhunderts (2031–2060) | pessimistisch | hoch | P98 | mittel | S98 |
+| Ende des Jahrhunderts (2071–2100) | optimistisch | mittel | Q98 | mittel | T98 |
+| Ende des Jahrhunderts (2071–2100) | pessimistisch | hoch | R98 | mittel | T98 |
+
+Fundstelle: `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt `Klimawirkungen` (ID 96 in Spalte A), Zeile 98, Spalten N bis R
+(Risiko ohne Anpassung) und Spalten S und T (Gewissheit Mitte und Ende). Gleichlautend im zuständigen
+Teilbericht: `docs/KWAR/kwra2021_teilbericht_5_cluster_wirtschaft_gesundheit_bf_211027_0.pdf`, Tabelle 55,
+S. 179 [15]. Optimistisch und pessimistisch sind das 85. und das 15. Perzentil des Modellensembles unter
+RCP8.5 (Teilbericht 5, S. 177). Für die Gegenwart weist die KWRA keine Gewissheit aus: Tabelle 55 lässt das
+Feld leer, die Mappe hat dafür keine Spalte. Beide Digitalisate widersprechen sich hier nicht; die Bewertungen
+stehen nach der Vorrangregel am Ende der Aufgabe ohnehin nur in der KWRA-2021-Mappe.
+
+**Warum die eigene Quellenlage von der KWRA-Gewissheit abweicht.** Die KWRA-Gewissheit „mittel“ bewertet,
+wie sicher die Projektion für 2031–2060 und 2071–2100 ist; der Basiswert dieses Berichts rechnet dagegen die
+Gegenwart aus gemessenen Größen (Phänologie an über 1.000 DWD-Stationen, Prävalenz aus Surveys), und seine
+Unsicherheit liegt nicht in einer Klimaprojektion, sondern vor allem im Klimaanteil \(a_{\text{attr}}\) = 0,50
+(0,19–0,84), übertragen aus einer nordamerikanischen Studie [9] (Berlin 1,78–7,87 Mio. € je Jahr, §3.0), und im
+Sensibilisierungsprofil \(p_B/p_G\) (Abschätzung von KAP3, §3.4).
 
 ## 2 Evidenz-Register (§2.2)
 
@@ -1160,6 +1223,10 @@ Ersetzungspfad); eine Herleitung allein als Code-Kommentar genügt nicht.
 
 ## 6 Szenario-Anwendung & Modellgrenzen (§3.2/§3.6)
 
+**Jahresbeträge ohne Abzinsung.** Alle Euro-Beträge dieses Berichts sind Jahresbeträge ohne Abzinsung: Sie
+gelten für ein Jahr im Ist-Klima zum Preisstand 2024 und werden weder über mehrere Jahre summiert noch auf
+einen Barwert abgezinst. Die Diskontrate für mehrjährige Rechnungen legt T-1116 fest.
+
 **Szenario-Anwendung 96-A:** Verschoben wird ausschließlich das Klimasignal
 \(\Delta S_{B/G,R}\) (Fortschreibung der Phänologie-Reihen bzw. GE-KL-07-Projektion:
 Blühbeginn Erle ≈ 2 Wochen früher bis 2100, RCP8.5 [15]; die Spreizungs-Projektion
@@ -1257,6 +1324,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: quelle   # amtliche DWD-Messreihe [33], ausgewertet mit Anlage [67]
+  abgeleitet_aus: []
 parameter:
   id: pollen.a_attr
   wert: 0.50
@@ -1267,6 +1336,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: quelle   # Anderegg 2021 [9]
+  abgeleitet_aus: []
 parameter:
   id: pollen.p_ar
   wert: {u20: 0.088, 20-64: 0.132, 65-74: 0.067, 75-84: 0.050, 85+: 0.050}
@@ -1277,6 +1348,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: quelle   # DEGS1/KiGGS W2 [1,2]; 80-84 und 85+ extrapoliert, gekennzeichnet in 3.2
+  abgeleitet_aus: []
 parameter:
   id: pollen.p_sens_gruppen
   wert: {birkengruppe: 0.55, graeser: 0.75}
@@ -1287,6 +1360,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: abschaetzung_kap3   # Herleitung 3.4 #p-sens
+  abgeleitet_aus: []
 parameter:
   id: pollen.l_saison
   wert: {birkengruppe: 30, graeser: 60}
@@ -1297,6 +1372,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: abschaetzung_kap3   # Herleitung 3.5 #d-saison
+  abgeleitet_aus: []
 parameter:
   id: pollen.f_symptomtage
   wert: 0.70
@@ -1307,6 +1384,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: abschaetzung_kap3   # Herleitung 3.4 #f-sympt
+  abgeleitet_aus: []
 parameter:
   id: pollen.lambda_veg
   wert: 0.7
@@ -1317,6 +1396,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: abschaetzung_kap3   # Herleitung 3.4 #lambda-veg
+  abgeleitet_aus: []
 parameter:
   # Baustein der Ebene POLLEN_LOAD (Detailspezifikation der Integration, §3.3).
   # w_B ist KEIN Parameter-Block: Es ist eine Definitionskonstante der Ebene
@@ -1333,6 +1414,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: abschaetzung_kap3   # Herleitung 3.3 #p-hat; geht in jedem Lauf in G-Dach ein, daher keine rolle
+  abgeleitet_aus: []
 parameter:
   # Maßnahmen-Wirkungsfaktor S158 (Vorgabe P2 / Aufgabe §3.5 i. d. F. 06.09.2026).
   # KEIN Parameter der Schadensformel: wirkt ausschliesslich im Maßnahmen-Modul
@@ -1349,6 +1432,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: abschaetzung_kap3   # Herleitung 5.1 #s158-wirkung; rolle abschaetzung gibt es nach Aufgabe 4 nicht
+  abgeleitet_aus: []
 parameter:
   # Anteil gewarnter Zusatztage fuer S158 (T-1239): Tage mit DWD-Pollenflug-
   # Gefahrenindex mindestens "mittel" [70], je Pollengruppe; gleicher Wert fuer
@@ -1364,6 +1449,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: abschaetzung_kap3   # Herleitung 5.1 #s158-wirkung
+  abgeleitet_aus: []
 parameter:
   id: pollen.c_jahr_direkt
   wert: 266.90
@@ -1374,6 +1461,8 @@ parameter:
   preisstand: "2024"
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: quelle   # Cardell 2016 [65], mit VPI [19] auf 2024
+  abgeleitet_aus: []
 parameter:
   id: pollen.d_saison
   wert: 43.05
@@ -1384,6 +1473,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: berechnet   # = f x (p_B L_B + p_G L_G) = 0,70 x 61,5
+  abgeleitet_aus: [pollen.f_symptomtage, pollen.p_sens_gruppen, pollen.l_saison]
 parameter:
   id: pollen.c_tag
   wert: 6.20
@@ -1394,6 +1485,8 @@ parameter:
   preisstand: "2024"
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: berechnet   # = c_jahr_direkt / d_saison = 266,90 / 43,05
+  abgeleitet_aus: [pollen.c_jahr_direkt, pollen.d_saison]
 ```
 
 ## 8 Quellen (§3.8 — #96-relevanter Auszug; Nummern [1]–[56] = M0-Zählung, [65]–[67] neu)
@@ -1438,9 +1531,13 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   Saisontrends anthropogen).
 - **[10]** C. Ziello u. a., „Changes to Airborne Pollen Counts across Europe", PLoS ONE
   7(4):e34076, 2012. doi:10.1371/journal.pone.0034076
-- **[15]** UBA (Hrsg.), KWRA 2021, Teilbericht 5 (CC 26/2021), Kap. 4.2.2 (Aeroallergene;
-  GE-KL-07-Projektion ≈ 2 Wochen früher bis 2100, RCP8.5), umweltbundesamt.de (lokal:
-  `docs/KWAR/`).
+- **[15]** UBA (Hrsg.), KWRA 2021, Teilbericht 5: Risiken und Anpassung in den Clustern Wirtschaft
+  und Gesundheit (Climate Change 24/2021, Dessau-Roßlau, Juni 2021), Kap. 4.2.2 (Aeroallergene;
+  GE-KL-07-Projektion ≈ 2 Wochen früher bis 2100, RCP8.5, S. 177–178; Tabelle 55 Klimarisiko ohne
+  Anpassung und Gewissheit, S. 179; beschlossene Maßnahmen APA III, S. 180), umweltbundesamt.de
+  (lokal: `docs/KWAR/kwra2021_teilbericht_5_cluster_wirtschaft_gesundheit_bf_211027_0.pdf`; Seitenzahlen
+  = PDF-Seiten = Druckseiten). Aufbereitet in `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt
+  `Klimawirkungen`, Zeile 98.
 - **[19]** Destatis, VPI für Deutschland, lange Reihen (2020 = 100): 2000 = **75,9** ·
   2014 = **94,0** · 2023 = 116,7 · 2024 = 119,3 (Statistischer Bericht „VPI lange Reihen",
   destatis.de; Werte gegen die publizierte Basis-2020-Tabelle geprüft 30.08.2026).
@@ -1580,3 +1677,4 @@ Aufsichtsrats (F-0007 Punkt 1); bewusste Überstimmung von Eintrag 15 (Ledger-Be
 | 22 | Quelle von u20 für die Beispielkommune Berlin in der Rechenkette? | **Direkt aus Tab. 12411-09-01-4-B [68]**: u20 = unter 5 + 5–10 + 10–15 + 15–20 = 673.277, 20–64 = u65 − u20 = 2.288.153; die Zahlen nach Altersjahren stehen gleichlautend in Destatis Tab. 12411-09 [69] | Die Tabelle, aus der Ebene 1 schon u65 und die Seniorenbänder nimmt, führt die vier Gruppen selbst: gleicher Stichtag, gleiche Basis Zensus 2022, und ein Sachbearbeiter, der [68] öffnet, kommt auf dieselbe Zahl. | Anteil u20 aus dem Berliner Landesbericht A I 3 – j / 23 (verworfen: noch auf Basis Zensus 2011, 3.070.537 statt 2.961.430 unter 65-Jährige, Mischung zweier Basen; Runde 0 des Managers) · Bundesanteil 24,07 % (Rückfall des Produkts; für Berlin 1.737 Betroffene oder 0,43 % zu wenig) | u20 673.277 statt 677.877 im ersten Entwurf; Betroffene 402.103, Tage 755.753, bewerteter Schaden 4,69 Mio. € je Jahr (§3.0) |
 | 23 ⚠ | S158: an welchen Tagen und ab welcher Belastung wirkt die Warnung, und gilt \(e_{\text{Tag}}\) je gewarntem Tag? | **Nur an gewarnten Tagen:** DWD-Pollenflug-Gefahrenindex mindestens „mittel“ [70], je Pollengruppe; Anteil gewarnter Symptom-Zusatztage \(t_{\text{warn}}\) = 0,75 (0,50–1,00, §3.9 ABGESCHÄTZT; eigenes Zeichen, weil \(w_B\) das Ĝ-Gewicht ist; Ersetzungspfad \(\min(1;\ m_{g,V}/f)\), nie \(m_{g,V}\) direkt); \(r_{\text{S158}}\) = 0,03 gilt je gewarntem Tag, Formel zellscharf im Zelllauf mit Geltungsbereich \(A_{\text{Zelle}}\) (§5.1) | Die Anker von \(e_{\text{Tag}}\) beschreiben die Minderung an einem Tag, an dem gehandelt wird, also an einem gewarnten Tag; Rev. 3 hat sie auf alle Zusatztage gerechnet und damit \(t_{\text{warn}} = 1\) unterstellt. Befund 124 verbietet eine Wirkung auf alle Tage pauschal. Mit der Tagesauswahl wirkt jede Größe genau einmal (Tage, Menschen, Tageswirkung) | \(e_{\text{Tag}}\) als Mittel über alle Zusatztage lesen und \(t_{\text{warn}}\) weglassen (verworfen: widerspricht den eigenen Ankern, Befund 124 bliebe verletzt) · \(e_{\text{Tag}}\) durch \(t_{\text{warn}}\) teilen, damit der wirksame Wert gleich bleibt (verworfen: hebt die Wirkung am gewarnten Tag ohne Beleg an) · Schwelle „hoch“ (verworfen als Basiswert: steckt im unteren Band von \(t_{\text{warn}}\)) · DWD-Anteil aller Tage \(m_{g,V}\) direkt einsetzen (verworfen: wählt die Tage über \(f\) und \(m\) zweimal aus und verdünnt um den Faktor \(f\); Befund 162) | wirksamer Wert über alle Zusatztage 0,03 → 0,03 × 0,75 = 0,0225 (0,028 ist nur das Kettenprodukt vor dem Runden); heute zahlengleich mit einem Faktor 0,0225 auf die Zusatztage im Geltungsbereich, geändert ist der Wert, nicht die Verteilung; Berlin 17.004 statt 22.673 vermiedene Tage, ≈ 105.400 statt ≈ 140.600 € je Jahr; Kapitel 7: `pollen.r_s158` unverändert, `pollen.t_warn_s158` neu; Ledger-Befunde 156, 157, 161, 162, 163, 165, 167 (DWD-Gebiet \(V\) statt \(R\)) |
 | 24 | Allergenarme Stadtbaumwahl: Wirkung abschätzen oder verwerfen (P2)? | **Abschätzen, zellscharf über \(\hat G\):** −0,14 auf \(\hat P\) je Senkung von \(\hat G/\bar G\) um 0,2 (Band 0,06–0,20 über λ); Berliner Allee-Zelle mit 100 Betroffenen −26,3 Tage und ≈ 163 € je Jahr (Band −11,3 bis −37,6 Tage); die gleichbleibende Kommunensumme ist Modellgrenze der Abschätzung (Modellgrenze 7) | P2 geht Methodik-Regeln vor; die Wirkung je Zelle ist mechanisch aus \(\hat P\) ableitbar und im Bericht mit Zahl, Band und Sensitivität abgeschätzt; die gleichbleibende Kommunensumme folgt aus der Zentrierung und ist keine gesetzte Null. Im Produkt ist die Wirkung heute nicht sichtbar (Sperre aus Befund 124, keine Katalogmaßnahme); sichtbar wird sie über die Integrationsauflage (Stadtbaumwahl) in §5. Die Kommunensumme ist per Zentrierung invariant (Log 18/19), und ein Niveaueffekt ist unbelegt und durch Befund 124 gesperrt | mit einem Satz verwerfen (verworfen: die Wirkung je Zelle ist ableitbar, eine Verwerfung ließe sie ohne Zahl) · Niveaueffekt für die Kommune schätzen (verworfen: λ-Evidenz intra-urban, Modellgrenze 7, Befund 124) | keine Wirkung auf den Schadenswert; der Satz, die Umverteilung senke den kommunalen Ausweis, ist ersetzt (Ledger-Befund 158); die P2-Begründung stützt sich nicht mehr auf eine Produktanzeige (Ledger-Befund 164) |
+| 25 | Kennzeichnung der Parameter-Blöcke (Aufgabe §4): welcher Wert je Block, und wo trägt ein Block ein Feld `rolle`? | **13 von 13 gekennzeichnet:** `quelle` für \(\Delta S\), \(a_{\text{attr}}\), \(p_{\text{AR}}\), \(c_{\text{jahr}}\); `abschaetzung_kap3` für \(p_B/p_G\), \(L\), \(f\), \(\lambda\), \(s_{\text{unbek}}\), \(r_{\text{S158}}\), \(t_{\text{warn}}\) (Herleitung je Block im Kommentar); `berechnet` für \(d_{\text{Saison}}\) (aus f, p_sens, L) und \(c_{\text{Tag}}\) (aus c_jahr, d_Saison); **kein** Feld `rolle` | \(\Delta S\) ist eine amtliche Messreihe, die Anlage [67] nur auswertet; \(p_{\text{AR}}\) folgt je Band einer Quelle, die Extrapolation 80+ ist in §3.2 gekennzeichnet; \(c_{\text{jahr}}\) ist der Quellwert, nur im Preisstand umgerechnet. Von den vier Rollen nach §4 trifft keine zu: \(s_{\text{unbek}}\) geht in jedem Lauf in \(\hat G\) ein und ist damit ein gewöhnlicher Rechenparameter, keine Sensitivitätsgröße; eine Rolle „abschaetzung“ kennt §4 nicht, die Abschätzung trägt \(r_{\text{S158}}\) schon in `kennzeichnung` | \(s_{\text{unbek}}\) mit `rolle: sensitivitaet` (verworfen: sagte, der Wert diene nur der Sensitivität) · \(r_{\text{S158}}\) mit `rolle: abschaetzung` (verworfen: kein zulässiger Wert nach §4) · \(p_{\text{AR}}\) als `abschaetzung_kap3` (verworfen: vier von fünf Bändern tragen einen Quellwert; die Extrapolation ist am Band gekennzeichnet) | keine Wirkung auf Zahlen; kein `wert:` in Kapitel 7 geändert; Ledger-Befund 173 |
