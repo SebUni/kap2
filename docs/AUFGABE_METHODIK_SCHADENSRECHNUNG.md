@@ -410,6 +410,7 @@ Herleitung (Register-ID oder Herleitungs-Anker) — kein Verweis auf später.
 ```
 docs/methodik/<nn>_<risiko>.md
 1  Wirkungskette & Knoten-Bilanz          (§2.1; Weitergaben zweispaltig)
+   ### Risiko ohne (weitere) Anpassung     (§2.1 Pflichtabsatz; Unterabschnitt, kein eigenes Kapitel)
 2  Evidenz-Register                        (§2.2; Register-IDs, Entscheidungsspalte)
 3  Modell                                  (§2.3; beginnt mit 3.0 Rechenkette, dann Formeln + Zeichentabellen + Beispiele)
 4  Kalibrierung & Validierung              (§2.4/§3.4; Skripte/CSVs als Anlage verlinkt)
@@ -511,6 +512,15 @@ beantworten (nicht „nichts weiter gefunden", sondern je Frage: bestanden/Befun
 14. **Quellen-Synchronität:** Widerspricht der Bericht den Arbeitsmappen oder dieser Aufgabe in
     einem verbindlichen Punkt (Bewertungslogik, Kanten, Konten, Rollen)? Jede bewusste
     Fortschreibung in der Quelle nachgezogen und im Abgleich-Protokoll dokumentiert?
+15. **Risiko ohne (weitere) Anpassung:** Trägt der Unterabschnitt in Kapitel 1 die drei Aussagen aus §2.1, und stimmen
+    sie? Je Aussage ein Verdikt: (a) Die Zahlen des Basiswerts (Fälle, Tage, Euro-Beträge) sind ausdrücklich dem
+    Zustand „ohne (weitere) Anpassung“ zugeordnet, und der Bericht sagt, wo der heutige Anpassungsstand im Basiswert
+    steckt (etwa über die Kalibrierjahre)? (b) Der Zustand „mit Anpassung“ ist dargestellt (etwa als Wirkung der
+    Maßnahmen-Hebel aus Kapitel 5 auf den Basiswert) oder mit Begründung ausdrücklich nicht dargestellt? (c) Die
+    Risikostufe der KWRA 2021 steht je Zeitscheibe mit Fundstelle in `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`
+    (Blatt und Zeile)? **Die genannte Risikostufe direkt gegen die Arbeitsmappe abgleichen, nicht gegen die
+    Behauptung des Berichts** (wie LF 1 und LF 14). Ob Überschrift und Unterabschnitt vorhanden sind, prüft der Lint;
+    das wird übernommen und nicht von Hand nachgezählt (siehe „Ablauf“). Die Leitfrage prüft den Inhalt.
 
 **Ergebnisformat:** nummerierte Befunde (Stelle · Art: Lücke/Fehler/Widerspruch · Begründung ·
 Vorschlag · Kategorie A/B/C) — fortlaufend in das Befund-Ledger `reviews/BEFUNDE_<risiko>.md`
@@ -535,7 +545,7 @@ ist blind für die eigenen Annahmen):
 
 **Konvergenzkriterium („Review tatsächlich abgeschlossen"):** nicht Gefühl, sondern vier Bedingungen —
 1. alle deterministischen Lints grün (§7);
-2. alle 14 Leitfragen mit explizitem Verdikt beantwortet;
+2. alle 15 Leitfragen mit explizitem Verdikt beantwortet;
 3. **Null-Runde:** eine frische Review-Session über das vollständige Bundle findet keine neuen
    A-/B-Befunde;
 4. Abnahmekriterien erfüllt: alle A-Befunde geschlossen (B geschlossen oder terminiert
