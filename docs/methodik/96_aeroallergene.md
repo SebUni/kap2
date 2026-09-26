@@ -923,7 +923,7 @@ Näherungslauf involviert).
   **J30-Untergrenze existiert nicht** — dokumentierte Datenlücke mit Beleg [66]
   (Ersetzungspfad: exakte J30-Beträge aus GENESIS 23631/GBE-Bund interaktiv ziehen,
   Registry-Vermerk vor Integration).
-- **Impliziter Baseline-Check:** Betroffene × \(c_{\text{Jahr,direkt}}\) = 8,96 Mio ×
+- **Impliziter Baseline-Check:** Betroffene × \(c_{\text{Jahr,direkt}}\) = 8,96 Mio. ×
   266,90 € ≈ 2,39 Mrd. €₂₀₂₄ als implizite AR-Behandlungskosten-Basis — plausible
   Größenordnung zwischen Asthma-KKR (1,9 Mrd. [66]) und J-Kapitel (16,5 Mrd. [66]);
   mit der Schramm-Obergrenze wären es 9,1 Mrd. — erkennbar zu hoch, bestätigt die
@@ -952,7 +952,9 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   gegen unabhängig publizierte Werte: Hasel −14,6 Tage (Endler/KWRA: „bis zu 26" als
   Stationsspitzen, Mittel darunter — konsistent), Birke −6,4 (Endler: 1–1,5 Wochen für
   1991–2017 — konsistent), Vorfrühlings-Verschiebung DWD ≈ −17 Tage [5] als Rahmen ✓.
-  Regionale Streuung der \(\Delta S\)-Werte gering (±20 % um das Bundesmittel) —
+  Regionale Streuung der \(\Delta S\)-Werte: \(\Delta S_B\) −17 % bis +24 %, \(\Delta S_G\)
+  −9 % bis +18 % um das Bundesmittel; \(\delta\) je Region nur −5 % bis +6 % (1,88–2,12
+  gegen 1,99) —
   die Zellverteilung wird von \(\text{pop} \times p_{\text{AR}} \times \hat P\) dominiert.
   **Toleranzen je Referenz (vorab fixiert, nur Referenzen mit definierter
   Vergleichsgröße; Befund 108):** (a) früheste Frühblüher (Hasel) gegen die
@@ -1926,10 +1928,10 @@ bewusste Überstimmung von Eintrag 19 (Ledger-Befund 182).
 | 2 ⚠ | Klimasignal-Konstruktion? | **Spreizung zwischen Saison-Markern** (Erle→Birke; Fuchsschwanz→Knäuelgras), gemessen aus gepaarten DWD-Stationen | reine Verschiebung erzeugt keine Zusatztage; Spreizung ist messbar und RKI-konform [6]; behebt Rev.-5-Befund 11 (ΔS/S_ref nicht hergeleitet) | M0-Ratio ΔS/S_ref aus Trend-Zitaten (nicht reproduzierbar) | Klimasignal G14-fest; δ ≈ 2,0 statt implizit ~4–5 Tage |
 | 3 ⚠ | Birken-Marker? | **Phase 4 (Blattentfaltung)** — Phase 5 hat Meldelücke 1960–90; Offset-Diagnose (+3,29 d; Trend −1,3 d) ins Band | einzige durchgängige Birken-Reihe; Offset kürzt sich in der Spreizungs-Differenz bis auf den Trend | Phase 5 (nur 1 gepaarte Station) oder Literaturwert | ΔS_B-Band −1,3 d |
 | 4 ⚠ | Gräser-Saisonende? | **konstant** (nur Sukzessions-Spreizung Fuchsschwanz→Knäuelgras) | kein Phänologie-Marker fürs Saisonende; Herbst-Verlängerung [6] bewusst nicht angesetzt | Literatur-Zuschlag für Herbst-Verlängerung | Untergrenze (§6 Grenze 1) |
-| 5 | Regionenzuschnitt? | **Bundesland → N/M/S wie #95** (`health.REGION_BY_BUNDESLAND`) | Produktkonsistenz; ΔS-Regionalstreuung gering (±20 %) | Naturraumgruppen (feiner) | einheitliche Regionslogik |
+| 5 | Regionenzuschnitt? | **Bundesland → N/M/S wie #95** (`health.REGION_BY_BUNDESLAND`) | Produktkonsistenz; ΔS-Regionalstreuung −17 % bis +24 % (δ −5 % bis +6 %) | Naturraumgruppen (feiner) | einheitliche Regionslogik |
 | 6 ⚠ | Kalibrierfaktor? | **c_kal ≡ 1 — dokumentierte Ausnahme** von §3.4: keine amtliche Anker-Zeitreihe existiert [66]; Modell voll messungs-/prävalenzverankert; Sanity-Bänder ersetzen den Fit | ein Fit ohne Anker wäre Scheinkalibrierung; BT-Drs. belegt die Lücke | J30-KKR-Anker bei Integration interaktiv ziehen (Registry-Vermerk) | kein Fit-Schritt; §4-Bänder tragen die Validierung |
 | 7 ⚠ | f-Herleitung? | **Modellannahme 0,70 (0,50–0,85)**; Pfaar-r nur qualitativ; Bastl [53] geprüft — liefert die Größe nicht | behebt Kategorienfehler (Rev.-5-Befund 14) exakt entlang des Gegenprüfungs-Vorschlags | f aus PHD-Tagesdaten (Ersetzungspfad) | nur nativer Ausweis −28,6 % bis +21,4 %; € unabhängig von f |
-| 8 ⚠ | p_B/p_G? | **0,55/0,75 als gekennzeichnete Abschätzung** (Rangfolge-Stütze [3]); additive Saisonform als €-konservativ dokumentiert | Anteil unter AR-Patienten nicht publiziert (Befund 36a); Überlappungskorrektur würde € erhöhen (36b) | PID-/Versorgungsdaten (Ersetzungspfad) | δ ±8 % Sensitivität |
+| 8 ⚠ | p_B/p_G? | **0,55/0,75 als gekennzeichnete Abschätzung** (Rangfolge-Stütze [3]); additive Saisonform als €-konservativ dokumentiert | Anteil unter AR-Patienten nicht publiziert (Befund 36a); Überlappungskorrektur würde € erhöhen (36b) | PID-/Versorgungsdaten (Ersetzungspfad) | δ: p_B −11,7 % bis +11,7 %, p_G −11,4 % bis +7,6 %, zusammen −23 % bis +19 % (Region Mitte, §3.4); Euro nur −6 % bis +8 % (Kap. 1 (a)) |
 | 9 ⚠ | Kostensatz-Basis? | **TOTALL 266,90 €₂₀₂₄ (populationsbasiert)**; Schramm nur Obergrenze/Kinder-Band | Schramm (moderate–schwer) auf alle Betroffenen = bekannte ~4-fache Überschätzung — verletzt Untergrenzen-Zusage (#95-Befund-62-Lehre); impliziter Baseline-Check §4 bestätigt | Schramm als Basis (M0-Linie; 9,1 Mrd. implizite Basis — verworfen) | € −76 % ggü. Schramm-Basis |
 | 10 ⚠ | Prävalenz-Bänder? | **u20-Ebene neu** (Zensus 10er-Klassen); 18/19 mit KiGGS-Wert (unterschätzend); 75+/85+ = 5,0 % Extrapolation (gekennzeichnet) | behebt Rev.-5-Befunde 27/35 entlang Variante (a) der Gegenprüfung | Misch-Prävalenz je Zelle ohne u20-Ebene | Alterslast korrekt verteilt |
 | 11 | Attribution? | **a_attr = 0,50 (0,19–0,84)** [9] | einzige publizierte Attribution des Saisontrends; IQR als Band | 1,0 (volle Anrechnung — nicht belegbar) | zentraler Hebel ±62 % |
