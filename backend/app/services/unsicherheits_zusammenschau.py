@@ -1,4 +1,7 @@
-"""Handlungsfeldübergreifende Unsicherheits-Zusammenschau (Konformitäts-Checkliste Zeile 19).
+"""Fasst die Unsicherheit je Handlungsfeld nebeneinander zusammen (Konformitäts-Checkliste Zeile 19).
+
+Abhängigkeiten zwischen Handlungsfeldern behandelt dieser Dienst nicht; dafür siehe
+``backend/app/services/handlungsfeld_abhaengigkeiten.py``.
 
 ISO 14091 (Sekundärquelle UBA, „Klimarisikoanalysen auf kommunaler Ebene", Abschnitt
 2.2.6 „Ergebnisse interpretieren", S. 29f.) verlangt, bestehende Unsicherheiten bei der

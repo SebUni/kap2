@@ -194,7 +194,7 @@ def get_kommune_kang_zustaendigkeit(kommune_id: int, db: Session = Depends(get_d
 
 @router.get("/{kommune_id}/unsicherheits-zusammenschau")
 def get_kommune_unsicherheits_zusammenschau(kommune_id: int, db: Session = Depends(get_db)):
-    """Handlungsfeldübergreifende Unsicherheits-Zusammenschau vor der Ableitung von
+    """Unsicherheits-Zusammenschau je Handlungsfeld vor der Ableitung von
     Handlungsoptionen (Checkliste Zeile 19, T-0451)."""
     kommune = (
         db.query(Kommune)
