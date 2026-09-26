@@ -1,11 +1,12 @@
 # Methodik-Bericht #95 — Hitzebelastung
 
 Status: **Rev. 8, Fortschreibung 7 — ABNAHMEREIF** (A-0048; Null-Runde der Gegenprüfung in
-Ledger-Runde 23; Abnahme durch den methodik_manager steht aus) · 26.09.2026 · Rev. 8 vom 30.08.2026
-(§3.4-Ressourcen-Regel, q_pfl-Ebene angelegt, q_1P geparkt, L̄_85+ exakt 4,16 J; Befunde 86–94 behoben) hat
-Fortschreibung 7 in den Ledger-Runden 10–22 um die Rechenkette 3.0, den Pflichtabschnitt „Risiko ohne (weitere)
-Anpassung“, die Kennzeichnung der Parameter, die Ersatzregel für den Anteil 65+ und den Berlin-Anker ergänzt; im
-Produkt stehen die Ersatzregel (Befund 116) und die Kennzeichnung der Parameter noch aus ·
+Ledger-Runde 30; abgenommen vom methodik_manager am 26.09.2026, `MANAGER-REVIEW: ABGENOMMEN`) · 26.09.2026 ·
+Rev. 8 vom 30.08.2026 (§3.4-Ressourcen-Regel, q_pfl-Ebene angelegt, q_1P geparkt, L̄_85+ exakt 4,16 J; Befunde
+86–94 behoben) hat Fortschreibung 7 in den Ledger-Runden 10–29 um die Rechenkette 3.0, den Pflichtabschnitt „Risiko
+ohne (weitere) Anpassung“, die Kennzeichnung der Parameter, die Ersatzregel für den Anteil 65+, den Berlin-Anker und
+die Maßnahmen-Hebel S157 und Schutzprogramme vulnerable Gruppen ergänzt; im Produkt stehen die Ersatzregel (Befund
+116), die Kennzeichnung der Parameter und die beiden Hebel noch aus ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 95-A** (RKI-Expositions-Wirkungs-Funktion, bottom-up; Entscheidungslog Nr. 1)
 
