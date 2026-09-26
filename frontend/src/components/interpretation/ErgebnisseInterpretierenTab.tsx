@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { api } from '../../api/client'
 import { useStore } from '../../store'
+import AbhaengigkeitenHandlungsfelder from './AbhaengigkeitenHandlungsfelder'
 import NachweiseEinbeziehung from './NachweiseEinbeziehung'
 import NachbarkommunenScreening from './NachbarkommunenScreening'
 
@@ -18,6 +19,7 @@ export interface StrukturierterAbschnittProps {
  * späteren Paketen.
  */
 export const STRUKTURIERTE_ABSCHNITTE: Record<string, ComponentType<StrukturierterAbschnittProps>> = {
+  'Abhängigkeiten über Handlungsfelder': AbhaengigkeitenHandlungsfelder,
   Einbeziehung: NachweiseEinbeziehung,
   Nachbarkommunen: NachbarkommunenScreening,
 }
