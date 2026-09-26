@@ -733,6 +733,19 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "https://pmc.ncbi.nlm.nih.gov/articles/PMC12724396/",
         "accessed": "2026-07-06",
     },
+    # Bericht #95 [70]: Wirkung bei Erreichten w_VG der Schutzprogramme (Block heat.delta_vg).
+    "Liotta_Rom_Hitze_2018": {
+        "ieee": "G. Liotta, M. C. Inzerilli, L. Palombi, O. Madaro, S. Orlando, P. Scarcella, "
+                "D. Betti, M. C. Marazzi, „Social Interventions to Prevent Heat-Related "
+                "Mortality in the Older Adult in Rome, Italy: A Quasi-Experimental Study,“ "
+                "International Journal of Environmental Research and Public Health, Bd. 15, "
+                "Nr. 4, 715, 2018, doi: 10.3390/ijerph15040715. [Online]. Verfügbar: "
+                "https://pmc.ncbi.nlm.nih.gov/articles/PMC5923757/. [Zugriff: 26. Sept. 2026].",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5923757/",
+        "archive_url": "https://web.archive.org/web/20250330063225/"
+                       "https://pmc.ncbi.nlm.nih.gov/articles/PMC5923757/",
+        "accessed": "2026-09-26",
+    },
     "WMO_EarlyWarnings": {
         "ieee": "World Meteorological Organization (WMO), „Early warning system / Early "
                 "Warnings for All,“ Genf, Schweiz. [Online]. Verfügbar: "

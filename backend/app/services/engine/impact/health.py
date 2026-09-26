@@ -275,6 +275,7 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
 
     deaths = 0.0
     deaths_85p = 0.0
+    deaths_7584 = 0.0
     yll = 0.0
     for band in AGE_BANDS:
         pop_a = bands.get(band, 0.0)
@@ -288,18 +289,23 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
         deaths += d_a
         if band == "a85p":
             deaths_85p = d_a
+        elif band == "a75_84":
+            deaths_7584 = d_a
         yll += d_a * ctx.p(code, f"life_years_{band}", AGE_LIFE_YEARS[band])
 
     if beta_d > 0.0 and dist_km > 0.0:
         factor = 1.0 + beta_d * dist_km
         deaths *= factor
         deaths_85p *= factor
+        deaths_7584 *= factor
         yll *= factor
 
     out = _result(risk, yll)
     out["deaths"] = max(0.0, deaths)
     # Teil-Ausweis D_85+ — Andockpunkt des Hebels S157 (Bericht #95 §5).
     out["deaths_a85p"] = max(0.0, deaths_85p)
+    # Teil-Ausweis D_75–84 — Andockpunkt der Schutzprogramme δ_VG (Bericht #95 §5).
+    out["deaths_a75_84"] = max(0.0, deaths_7584)
     return out
 
 
@@ -342,6 +348,53 @@ def s157_avoided_deaths(d85: float, s_gek: float | None, g_s157: float = G_S157,
     return max(0.0, d85) * d * h_heim(qbar_pfl, beta_pfl) * s * (1.0 - g_s157)
 
 
+# ── Hebel S152: Schutzprogramme vulnerable Gruppen (Bericht #95 §5, Befunde 123, 125–134) ──
+
+# δ_VG = 1 − r_VG × w_VG = 1 − 0,20 × 0,34 (Block heat.delta_vg, Band 0,794–1,0).
+# Muss mit dem Registry-Spec delta_vg in impact/params.py übereinstimmen.
+DELTA_VG: float = 0.931
+# δ_VG,morb = 1,0 (Block heat.delta_vg_morb, Band 0,931–1,069); Spec delta_vg_morb.
+DELTA_VG_MORB: float = 1.0
+# Paketwert Deutschland: Hitzeschutzpläne senken den hitzebedingten Anteil der
+# Sterbefälle um 20,6 % (Urban u. a. 2025 [47], Tabelle 1) — ein Baustein allein
+# und beide Hebel zusammen wirken nie stärker (Kappung, Befunde 126, 128).
+VG_PAKET_DE: float = 1.0 - 0.206
+
+
+def vg_effective_delta(delta_vg: float = DELTA_VG, delta_hap: float = 1.0,
+                       paket: float = VG_PAKET_DE) -> float:
+    """Wirksamer Faktor δ_VG nach der Kappung am Paketwert (Bericht #95 §5).
+
+    Mit dem Hitzeaktionsplan zusammen gilt auf den Bändern 75–84 und 85+ ohne Heim
+    ``max(δ_HAP × δ_VG; 0,794)``. Zurückgegeben wird der Anteil, der davon auf δ_VG
+    entfällt: ``max(δ_VG; 0,794 / δ_HAP)``, höchstens 1 — so ergibt
+    δ_HAP × Rückgabe genau den gekappten Produktwert.
+    """
+    d_hap = max(0.0, min(1.0, float(delta_hap)))
+    d_vg = max(0.0, min(1.0, float(delta_vg)))
+    if d_hap <= 0.0:
+        return 1.0
+    return min(1.0, max(d_vg, paket / d_hap))
+
+
+def vg_avoided(x_7584: float, x_85p: float, delta: float,
+               qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
+               delta_hap: float = 1.0) -> float:
+    """Vermiedene Menge durch Schutzprogramme vulnerable Gruppen (Bericht #95 §5).
+
+    ``ΔX_VG = [X_75–84 + X_85+ · (1 − h_Heim)] · δ_HAP · (1 − δ)``
+
+    X sind Todesfälle (δ = δ_VG, nach Kappung) oder, mit gleicher Formelzeile,
+    Einweisungen (δ = δ_VG,morb). Heimbewohner ab 85 sind herausgenommen (Hebel
+    S157, Befund 125). ``delta_hap`` dämpft den Exzess, wenn der Hitzeaktionsplan
+    zugleich gewählt ist (nur für den Einzelnutzen; im Aggregat multipliziert
+    der Faktor des Plans ohnehin). Negativ, wenn δ > 1 (Einweisungen vorgezogen).
+    """
+    base = max(0.0, x_7584) + max(0.0, x_85p) * (1.0 - h_heim(qbar_pfl, beta_pfl))
+    d = max(0.0, min(1.0, float(delta_hap)))
+    return base * d * (1.0 - float(delta))
+
+
 # ── 2. Hitzemorbidität (Bericht #95 §3.4 — Einweisungen) ──────────────────────
 
 def morbidity(risk: dict, ctx: CellContext) -> dict:
@@ -364,12 +417,16 @@ def morbidity(risk: dict, ctx: CellContext) -> dict:
     factor = max(0.0, 1.0 + e_hd * (hd - hd_ref))
 
     bands = _age_bands(ctx)
-    outcome = sum(
-        bands.get(band, 0.0) * (ctx.p(code, f"r0_{band}", AGE_MORBIDITY_R0[band])
-                                / 100_000.0) * factor
+    per_band = {
+        band: bands.get(band, 0.0) * (ctx.p(code, f"r0_{band}", AGE_MORBIDITY_R0[band])
+                                      / 100_000.0) * factor
         for band in AGE_BANDS
-    )
-    return _result(risk, outcome)
+    }
+    out = _result(risk, sum(per_band.values()))
+    # Teil-Ausweis F_75–84 und F_85+ — Andockpunkt von δ_VG,morb (Bericht #95 §5).
+    out["cases_a75_84"] = max(0.0, per_band["a75_84"])
+    out["cases_a85p"] = max(0.0, per_band["a85p"])
+    return out
 
 
 # ── 2b. Aeroallergene: klimaattribuierte Symptomtage (#96) ────────────────────

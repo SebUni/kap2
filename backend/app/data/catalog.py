@@ -1525,8 +1525,14 @@ MEASURES: list[dict] = [
     # aufsuchende Betreuung, Aufklärung) sind organisatorisch; kein einheitlicher Kennwert.
     # Modellannahme als Programmbudget (Konzeption/Koordination) → 35.000 €.
     {"code": "VULNERABLE_GROUP_PROGRAMS", "name": "Schutzprogramme vulnerable Gruppen",
-     "description": "Gezielte Programme für vulnerable Gruppen.", "measure_type": "organizational",
-     "effect_target": ["vulnerability"], "default_reduction": 0.22, "coverage_scaling": "saturating",
+     "description": "Gezielte Programme für Menschen ab 75 zu Hause (Hitzetelefon, aufsuchende Betreuung, Besuchsdienste; Hebel S152 aus Bericht #95 §5). Wirkung: δ_VG = 0,931 auf die Hitze-Todesfälle 75–84 und 85+ ohne Heimbewohner, δ_VG,morb = 1,0 auf die Einweisungen derselben Bänder; mit dem Hitzeaktionsplan zusammen höchstens bis zum Paketwert 0,794.", "measure_type": "organizational",
+     # Hebel S152 (Bericht #95 §5, Log 43, Befunde 123, 125–134): die Wirkung läuft NICHT
+     # über default_reduction auf alle Bänder (früher 0.22), sondern über δ_VG auf
+     # D_75–84 + D_85+ × (1 − h_Heim) und δ_VG,morb auf F derselben Bänder
+     # (measure_service._vg_cell_factor; Werte als Registry-Specs delta_vg/delta_vg_morb
+     # in impact/params.py). Deshalb kein default_reduction (None = nicht anwendbar).
+     "effect_target": ["vulnerability"], "default_reduction": None, "coverage_scaling": "saturating",
+     "effect_model": "vg",
      # SOCIAL_INEQUALITY_AMPLIFICATION_RISK_INDEX ist geparkt (M5) — Link auf den
      # zweiten Teil-Ausweis von #95 umgehängt (Schutzprogramme senken die
      # Erkrankungslast vulnerabler Gruppen ebenso wie die Mortalität).
@@ -1536,9 +1542,8 @@ MEASURES: list[dict] = [
      "unit_label": None, "unit_density_per_ha": None,
      "source": "Modellannahme (Programmbudget)",
      "sources": {"opex_fixed_year": "Modellannahme (laufender Programmbetrieb)",
-                 "capex_fixed": "Modellannahme (organisatorisches Programmbudget)",
-                 "default_reduction": "Urban u. a. 2025 (HHAP-Kernbaustein) / RKI-Risikogruppen"},
-     "source_refs": {"default_reduction": ["Urban_HHAP_Wirksamkeit_2025", "RKI_Hitzemortalitaet"]},
+                 "capex_fixed": "Modellannahme (organisatorisches Programmbudget)"},
+     "source_refs": {},
      # Herleitungen der Abschätzungen nach P1/§3.9 (Zahlenwert, Bandbreite,
      # Sensitivität) als Datenfeld — ein Code-Kommentar allein genügt nicht.
      "evidence_derivations": {
@@ -1558,7 +1563,7 @@ MEASURES: list[dict] = [
             "sensitivitaet": "Einmalkosten neben laufenden 10.000 €/a: über 30 Jahre rund "
                 "ein Zehntel der Lebenszykluskosten. Die volle Bandbreite verschiebt die "
                 "Gesamtkosten um etwa −4 % bis +7 %; die Kosten-Nutzen-Kennzahl bleibt "
-                "robust, weil die angesetzte Risikominderung (0,22) den Nutzen dominiert.",
+                "robust, weil die Risikominderung (δ_VG, Bericht #95 §5) den Nutzen dominiert.",
         },
         "opex_fixed_year": {
             "wert": "10.000 €/a für den laufenden Programmbetrieb (aufsuchende Beratung, "
@@ -1583,8 +1588,8 @@ MEASURES: list[dict] = [
                 "Personen, nicht über Flächen: kein baulicher Eingriff, keine "
                 "flächenproportionale Einsparung oder Aufwertung. Das Feld ist anwendbar "
                 "und begründet mit null angesetzt — nicht \"unbelegt\". Der Nutzen steckt "
-                "vollständig in der Risikominderung (default_reduction 0,22 auf "
-                "Mortalität/Morbidität); ein zusätzlicher Flächennutzen wäre "
+                "vollständig in der Risikominderung (δ_VG 0,931 auf die Mortalität "
+                "75–84 und 85+ ohne Heim, δ_VG,morb 1,0); ein zusätzlicher Flächennutzen wäre "
                 "Doppelzählung.",
             "band": "0,00–0,10 €/(m²·a). Ein positiver Wert ließe sich nur konstruieren, "
                 "wenn man vermiedene Behandlungs- oder Pflegekosten auf die Stadtfläche "
@@ -1600,13 +1605,6 @@ MEASURES: list[dict] = [
         },
      },
      "source_details": {
-        "default_reduction": "Wirkmechanismus: Hitzemortalität konzentriert sich stark auf "
-            "Risikogruppen (Hochaltrige, Pflegebedürftige, Vorerkrankte — RKI/Winklmayr); "
-            "aufsuchende Programme (Hitzetelefon, Pflegeheim-Protokolle, Nachbarschaftshilfe) "
-            "adressieren genau diese Gruppe und sind Kernbaustein wirksamer Hitzeaktionspläne "
-            "(Gesamtpaket: −25,2 % Hitzemortalität, Urban u. a. 2025). Angesetzt: 22 % Reduktion "
-            "des verknüpften Mortalitäts-/Ungleichheitsrisikos — nahe an der HHAP-Gesamtwirkung, "
-            "da die Zielgruppe den Großteil der Übersterblichkeit trägt. Editierbar.",
         "opex_fixed_year":
             "Modellannahme für den laufenden Betrieb der Schutzprogramme für vulnerable Gruppen (aufsuchende Beratung, Netzwerkpflege) — überwiegend Personalaufwand, daher höherer Jahresanteil. Punktwert 10.000 €/a; kein belastbarer Kostenkennwert; editierbar.",
         "capex_fixed": "Gezielte Schutzprogramme für vulnerable Gruppen (z. B. Hitzetelefon, "

@@ -284,6 +284,39 @@ IMPACT_PARAM_SPECS: list[dict] = [
                           "3,6–35,4 Mio. € (Bericht #95 §5, Beispiel-Block s157_berlin); "
                           "0,93 unmittelbar auf den Exzess ergäbe nur 2,5 Mio. €.",
      }},
+    # ── Hebel S152: Schutzprogramme vulnerable Gruppen (Bericht #95 §5, Kapitel 7, Log 43) ──
+    # Wirkt nur über die Maßnahme VULNERABLE_GROUP_PROGRAMS (measure_service); auf die
+    # Basisrechnung ohne Maßnahme hat der Wert keinen Einfluss. Muss mit
+    # health.DELTA_VG übereinstimmen.
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "delta_vg", "value": 0.931,
+     "label": "Schutzprogramme vulnerable Gruppen: Faktor δ_VG auf den Hitze-Exzess der "
+              "Todesfälle 75–84 und 85+ ohne Heimbewohner", "unit": "Faktor",
+     "source": "Abschätzung von KAP3 aus Liotta u. a. 2018 [70] und Urban u. a. 2025 [47] "
+               "(Bericht #95 §5, Block heat.delta_vg)",
+     "source_detail": "δ_VG = 1 − r_VG × w_VG = 1 − 0,20 × 0,34 = 0,931. w_VG = 24,4 / 97,3 / "
+                      "0,728 = 0,34: bereinigte Senkung des Anstiegs der Sterberate ab 75 im "
+                      "Hitzesommer 2015 in Rom ([70] Tabelle 3), geteilt durch den Anstieg ohne "
+                      "Programm und den Einschreibeanteil. r_VG = 20 % der Menschen ab 75, "
+                      "Setzung von KAP3. Kappung: δ_VG nie unter 0,794, mit dem "
+                      "Hitzeaktionsplan zusammen max(δ_HAP × δ_VG; 0,794) — Paketwert "
+                      "Deutschland −20,6 % ([47] Tabelle 1). Wirkt auf D_75–84 + D_85+ × "
+                      "(1 − h_Heim); Heimbewohner ab 85 zählen über S157. Register 95-S152-03.",
+     "source_refs": ["Liotta_Rom_Hitze_2018", "Urban_HHAP_Wirksamkeit_2025"],
+     "evidence_class": "abgeschaetzt",
+     "evidence_derivation": {
+         "wert": "0,931 = 1 − 0,20 × 0,34: Reichweite 20 % (Setzung von KAP3) mal Wirkung bei "
+                 "Erreichten 0,34 = 24,4 / 97,3 / 0,728 aus [70] Tabellen 1–3 (bereinigt um die "
+                 "Sterberate vor dem Sommer und den Anteil ab 90; Befunde 128, 134).",
+         "band": "0,794–1,0: Reichweite 5–40 %, Wirkung bei Erreichten 0–0,68 (unten aus [70] "
+                 "Tabelle 2, Befund 132; oben der rohe Unterschied 0,498 / 0,728); nie unter dem "
+                 "Paketwert Deutschland 0,794 [47] (Befund 128).",
+         "sensitivitaet": "Berlin: 11,7 Mio. € je Jahr weniger Schaden (Band 0–34,9 Mio. €), "
+                          "3,2 % des Jahresbetrags 362,9 Mio. €. Stärkster Treiber ist die "
+                          "Wirkung bei Erreichten (0–23,1 Mio. €), knapp vor der Reichweite "
+                          "(2,9–23,3 Mio. €). Der frühere Katalogwert 0,22 auf alle Bänder "
+                          "ergab rund 79,8 Mio. € (Bericht #95 §5, Beispiel-Block "
+                          "schutzprogramme_berlin).",
+     }},
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_dist_km", "value": 0.0,
      "label": "Distanz-Effekt (Sensitivität)", "unit": "1/km",
      "source": "Nicholl u. a. 2007 (Sensitivitätsband, Basiswert 0)",
@@ -369,6 +402,28 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source": "Destatis T67 + Karlsson & Ziebarth (Herleitung Bericht #95 §3.4)",
      "source_detail": "Band 85+ der altersgeschichteten Baseline (Herleitung s. r0_u65).",
      "source_refs": ["Destatis_T67_Hitzeeinweisungen", "Karlsson_Ziebarth_2018"]},
+    # Schutzprogramme vulnerable Gruppen auf die Einweisungen (Bericht #95 §5, Block
+    # heat.delta_vg_morb, Befund 131). Muss mit health.DELTA_VG_MORB übereinstimmen.
+    {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "delta_vg_morb", "value": 1.0,
+     "label": "Schutzprogramme vulnerable Gruppen: Faktor δ_VG,morb auf die Einweisungen "
+              "75–84 und 85+ ohne Heimbewohner", "unit": "Faktor",
+     "source": "Abschätzung von KAP3 aus Liotta u. a. 2018 [70] und Urban u. a. 2025 [47] "
+               "(Bericht #95 §5, Block heat.delta_vg_morb)",
+     "source_detail": "1,0: Aufsuchende Betreuung verhindert Einweisungen, wie sie Todesfälle "
+                      "verhindert, zieht aber auch Einweisungen von Menschen vor, die ohne "
+                      "Besuch zu Hause geblieben wären. Welche Richtung überwiegt, misst keine "
+                      "Quelle; der Zentralwert setzt beide gleich. Wirkt auf F_75–84 + F_85+ × "
+                      "(1 − h_Heim). Register 95-S152-03.",
+     "source_refs": ["Liotta_Rom_Hitze_2018", "Urban_HHAP_Wirksamkeit_2025"],
+     "evidence_class": "abgeschaetzt",
+     "evidence_derivation": {
+         "wert": "1,0: Verhindern und Vorziehen von Einweisungen gleich gesetzt (Befund 131).",
+         "band": "0,931–1,069: unten wie δ_VG (Einweisungen verhindert), oben 1 + 0,20 × 0,34 "
+                 "(so viele Einweisungen zusätzlich, wie Todesfälle wegfallen; Befund 134).",
+         "sensitivitaet": "Berlin: 48,0 Einweisungen ab 75 außerhalb der Heime × 7.152 € = "
+                          "0,34 Mio. € je Jahr; über das Band ändert sich der Betrag um "
+                          "± 0,02 Mio. € (Bericht #95 §5).",
+     }},
     {"risk": "EXPECTED_ANNUAL_MORBIDITY", "key": "excess_per_hotday", "value": 0.024,
      "label": "Mehr-Einweisungen je Hitzetag (e_HD)", "unit": "1/Hitzetag",
      "source": "Karlsson & Ziebarth 2018, Tab. 1 (konditional)",
