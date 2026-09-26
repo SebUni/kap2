@@ -61,6 +61,7 @@ export default function SystembereicheSection({ className = '' }: { className?: 
         )}
         {daten && (
           <>
+            <div style={{ overflowX: 'auto' }}>
             <table className="data-table">
               <thead>
                 <tr>
@@ -113,7 +114,9 @@ export default function SystembereicheSection({ className = '' }: { className?: 
                             : 'keine belastbare Aussage der Bundesanalyse'}
                         </td>
                         <td style={muted}>
-                          {bv.anpassung.anpassungsdauer.vergleich ?? 'keine belastbare Aussage der Bundesanalyse'}
+                          {bv.anpassung.anpassungsdauer.valide_aussage && bv.anpassung.anpassungsdauer.vergleich
+                            ? bv.anpassung.anpassungsdauer.vergleich
+                            : 'keine belastbare Aussage der Bundesanalyse'}
                         </td>
                       </>
                     ) : (
@@ -126,6 +129,7 @@ export default function SystembereicheSection({ className = '' }: { className?: 
                 })}
               </tbody>
             </table>
+            </div>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 6 }}>
               Die Tabelle vergleicht den Risikoindex des Produkts je Systembereich. Die Spalten des
               Bundesvergleichs sind die Aussagen der KWRA 2021, Teilbericht 6, Kap. 7, ohne eigene
