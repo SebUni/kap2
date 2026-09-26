@@ -52,6 +52,8 @@ export default function ErgebnisseInterpretierenTab() {
   const kommune = useStore(s => s.kommune)
   const kommuneId = kommune?.id
   const [bericht, setBericht] = useState<string | null>(null)
+  // Download-Name vom Server (Art, Name der Kommune, Gemeindeschlüssel; T-1424).
+  const [dateiname, setDateiname] = useState<string | null>(null)
   const [laedt, setLaedt] = useState(false)
   const [fehler, setFehler] = useState<string | null>(null)
   const [version, setVersion] = useState(0)
@@ -63,8 +65,13 @@ export default function ErgebnisseInterpretierenTab() {
     let abgebrochen = false
     setLaedt(true)
     setFehler(null)
-    api.getInterpretationsbericht(kommuneId)
-      .then(text => { if (!abgebrochen) setBericht(text) })
+    api.getInterpretationsberichtDatei(kommuneId)
+      .then(({ inhalt, dateiname: name }) => {
+        if (!abgebrochen) {
+          setBericht(inhalt)
+          setDateiname(name)
+        }
+      })
       .catch(e => {
         if (!abgebrochen) setFehler(e instanceof Error ? e.message : 'Der Bericht konnte nicht geladen werden.')
       })
@@ -78,7 +85,7 @@ export default function ErgebnisseInterpretierenTab() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `ergebnisse-interpretieren-${kommuneId ?? 'kommune'}.md`
+    a.download = dateiname ?? 'ergebnisse-interpretieren.md'
     document.body.appendChild(a)
     a.click()
     a.remove()

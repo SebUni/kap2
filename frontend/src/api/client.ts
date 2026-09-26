@@ -775,6 +775,19 @@ export const api = {
     request<MassnahmenUmsetzung>('/interpretation/massnahmen-umsetzung'),
   getInterpretationsbericht: (kommuneId: number): Promise<string> =>
     requestText(`/kommune/${kommuneId}/interpretation/bericht`),
+  /** Bericht samt Download-Namen aus dem Header Content-Disposition (T-1424). */
+  getInterpretationsberichtDatei: async (kommuneId: number): Promise<{ inhalt: string; dateiname: string | null }> => {
+    const path = `/kommune/${kommuneId}/interpretation/bericht`
+    const res = await fetch(`${BASE}${path}`)
+    if (!res.ok) {
+      if (res.status === 401) handleUnauthorized(path)
+      const body = await res.text()
+      throw new Error(`API ${res.status}: ${body || res.statusText}`)
+    }
+    const kopf = res.headers.get('Content-Disposition') ?? ''
+    const treffer = /filename="?([^";]+)"?/.exec(kopf)
+    return { inhalt: await res.text(), dateiname: treffer ? treffer[1] : null }
+  },
   getInterpretationAbhaengigkeiten: (kommuneId: number) =>
     request<InterpretationAbhaengigkeiten>(`/kommune/${kommuneId}/interpretation/abhaengigkeiten`),
   getInterpretationDiversitaet: () =>
