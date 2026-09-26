@@ -544,11 +544,13 @@ def gather_cell_inputs(
     progress_callback: Any = None,
     osm_id: str | None = None,
     centroid: tuple[float, float] | None = None,
+    ags: str | None = None,
 ) -> tuple[list[dict], dict]:
     """Berechnet pro Zelle alle Rohgrößen. Gibt (cell_inputs, regional) zurück.
 
     ``cell_inputs`` ist an die Reihenfolge von ``grid_cells`` gekoppelt.
     ``centroid`` = (lon, lat) des Kommune-Zentroids für ortsaufgelöste Treiber.
+    ``ags`` = Gemeindeschlüssel der Kommune für Stufe 2 der Ersatzregel 65+ (Bericht #95 §3.3).
     """
     from app.services.climate.heat.osm_data import (
         build_water_spatial_index,
@@ -695,7 +697,7 @@ def gather_cell_inputs(
     if progress_callback:
         progress_callback(ZENSUS_APPLY[0], "Zensus-Daten anwenden")
     zensus = load_zensus_for_cells(grid_cells)
-    apply_zensus_to_cell_inputs(list(cell_inputs), grid_cells, zensus)
+    apply_zensus_to_cell_inputs(list(cell_inputs), grid_cells, zensus, ags)
     if progress_callback:
         progress_callback(ZENSUS_APPLY[1], "Zensus-Daten anwenden")
 
