@@ -259,6 +259,23 @@ export interface KangNachweis {
   }
 }
 
+/** Ein Handlungsfeld in der Antwort von GET /kommune/{id}/unsicherheits-zusammenschau. */
+export interface UnsicherheitsZusammenschauFeld {
+  handlungsfeld: string
+  niedrigste_gewissheit: string
+  parameter_nicht_belegt: number
+  klimawirkungen_niedrigste_stufe: string[]
+}
+
+/** Antwort von GET /kommune/{id}/unsicherheits-zusammenschau (ISO 14091, UBA 2.2.6). */
+export interface UnsicherheitsZusammenschau {
+  kommune_id: number
+  handlungsfelder: UnsicherheitsZusammenschauFeld[]
+  handlungsfelder_vorsicht: string[]
+  /** Interpretationshinweis; null, wenn kein Feld gering oder sehr gering ist. */
+  hinweis: string | null
+}
+
 /** Antwort von GET /kommune/{id}/kang-zustaendigkeit (§ 12 Abs. 1 KAnG, Landesrecht). */
 export interface KangZustaendigkeit {
   bundesland: string
@@ -603,6 +620,8 @@ export const api = {
     request<SystembereicheBundesanalyse>('/catalog/systembereiche/bundesanalyse'),
   getKangNachweis: (kommuneId: number) =>
     request<KangNachweis>(`/kommune/${kommuneId}/kang-nachweis`),
+  getUnsicherheitsZusammenschau: (kommuneId: number) =>
+    request<UnsicherheitsZusammenschau>(`/kommune/${kommuneId}/unsicherheits-zusammenschau`),
   getCostSummary: (kommuneId: number) =>
     request<Record<string, unknown>>(`/kommune/${kommuneId}/cost-summary`),
 
