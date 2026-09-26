@@ -3,7 +3,8 @@
 Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048: Schritt 1 Rechenkette §3.0
 (T-1238, Ledger-Befunde 152–155), Schritt 2 S158 nach Tagen und Belastung und Stadtbaumwahl (T-1239,
 Log 23/24, Befunde 156–167), Schritt 3 Pflichtinhalte — Kap. 1 „Risiko ohne (weitere) Anpassung“,
-Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181);
+Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181),
+Schritt 4 Bezugswert Ḡ₀ der Stadtbaumwahl (T-1323, T-1362, Log 26, Befund 182), Nachzug der Befunde 183–185, Runde 14 mit Befunden 186–194, Runde 15 mit Befunden 195–197 (T-1330), Runde 16 mit Befunden 199–200 und Runde 17 mit Befunden 201–204 und 206 (T-1427);
 Gegenprüfung durch den methodik_manager bis zur Null-Runde läuft, Abnahme der Rev. 4 steht aus)** ·
 Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
@@ -18,7 +19,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > seit Rev. 2 ausschließlich das Mittel der **eigenen Kommune** (§3.3, Log 18/19); die Ebenen POLLEN_LOAD (OSM-Vegetation, §3.3), POPULATION_U20 (§3.2) und CANOPY_BIRCH_FRACTION **sind mit der Integration am 31.08.2026 angelegt** (§3.1-Anlagepflicht erfüllt); alle übrigen Zellgrößen sind vorhanden oder regional/national — keine Zellgröße läuft auf einem unspezifizierten Neutral-Fallback.
 
 > **Revisionsstand.** **Rev. 4 (26.09.2026)** = Fortschreibung 7 der Aufgabe für M0 (A-0048, P3) in
-> drei Schritten, jeweils ohne Änderung eines Schadenswerts. **Schritt 1 (T-1238):** Rechenkette §3.0
+> vier Schritten, jeweils ohne Änderung eines Basiswerts oder eines Parameterwerts in Kapitel 7. **Schritt 1 (T-1238):** Rechenkette §3.0
 > an der Beispielkommune Berlin mit Zelllauf des Produkts; Kapitel 9 gestrichen (Log 21/22, Befunde
 > 152–155). **Schritt 2 (T-1239):** S158 wirkt nur an gewarnten Tagen (DWD-Index mindestens „mittel“
 > [70]), neuer Block `pollen.t_warn_s158` = 0,75, wirksamer Wert 0,03 × 0,75 = 2,25 % der Zusatztage im
@@ -27,7 +28,25 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > „Risiko ohne (weitere) Anpassung“ mit KWRA-Stufen und Gewissheit je Zeitscheibe; Kap. 6 Satz zu
 > Jahresbeträgen ohne Abzinsung; Kap. 7 `kennzeichnung` in allen 13 Blöcken; Quellen [15] (Vollzitat)
 > und [73] (neu); Kap. 1 (a) mit Erhebungsjahren und Lücke bis heute, Unsicherheit in drei Bändern (Log 25,
-> Befunde 168–181). **Code-Stand:** Der Katalogwert `default_reduction` von
+> Befunde 168–181). **Schritt 4 (T-1323, T-1362):** Bezugswert Ḡ₀ der Zentrierung im Ausgangsstand
+> festgehalten, die allergenarme Stadtbaumwahl senkt damit die Summe der Kommune; betroffen §3.3, §3.4,
+> §3.6, §5, Ebene 7, Kap. 1 (b), Modellgrenze 7, Quelle [74] (Log 26, Log 19 verworfen, Befund 182).
+> **Nachzug (T-1330):** Befunde 183–185 aus Runde 13 — Untergrenze 4,38 Mio. € in Kap. 1, Restrisiko-Werte
+> AB bis AF in Kap. 1 (b) mit Maßnahmenpaket und Zeitscheibe, Publikationslinks für [15] und [73] in Kap. 8.
+> **Runde 14 (T-1330):** Befunde 186–194 — Stadtbaumwahl über den Kronenanteil gerechnet (§5, Kap. 1 (b),
+> Log 26: −1.179 statt −2.541 Tage), Lesart im Ausgangsstand (Kap. 1 (a), Ebene 7, §3.3), DEGS1-Wert 40–49 Jahre
+> 14,4 % statt 14,3 % (20–64 bleibt 13,2 %), Fundstellen [6], [15], [68], [70], min(1; m/f) als Abschätzung, Zeichen Ḡ₀ für den Bezugswert.
+> **Runde 15 (T-1330):** Befunde 195–197 — Stadtbaumwahl mit der vollen Ebenendefinition: Senkung im Term,
+> in dem die Kronen im Ausgangsstand stehen (Kronen ohne Gattungs-Tag nur mit 0,12), Grenze
+> Ĝ′ ≥ 0,536 × Grünanteil (§5, Integrationsauflage, Kap. 1 (b), Log 24/26); Berliner Zelle mit 0,2 × Ḡ₀ / 0,464;
+> Schreibweise „Pp.“. Befund 198 (QUELLEN.md) liegt außerhalb des Rahmens und ist an den CMO zurückgestellt.
+> **Runde 16 (T-1427):** Befunde 199–200 — Abgrenzung in §5.1 auf die Regel nach Log 26 (Vegetationsmaßnahme,
+> auch flächig, nur im Zelllauf über Ĝ′ bei festgehaltenem Ḡ₀; r_S158 als Verhaltenskanal), Log 24 nachgezogen;
+> flächiges Programm in §5 mit der Bedingung „keine Kronen ohne Gattungs-Tag“ (sonst 6,5 % als Obergrenze).
+> **Runde 17 (T-1427):** Befunde 201–204 — Sensitivität von p_B/p_G in §3.4 nachgerechnet (−11,7 % bis +11,7 %
+> und −11,4 % bis +7,6 % statt ±6 % und ±8 %), k̄_unbek beim flächigen Programm, Komma in der Statuszeile,
+> u20 in §3.2 aus 5er-Jahresgruppen; Sensitivität von f in §3.4 und Log 7 nachgerechnet (Befund 206).
+> **Code-Stand:** Der Katalogwert `default_reduction` von
 > `POLLEN_EARLY_WARNING` ist 0,03 (`backend/app/data/catalog.py`); `linked_risk_codes` bleibt leer
 > (Sperre aus Befund 124), die Maßnahme wirkt im Produkt also noch nicht auf #96.
 > **Stand der früheren Revisionen** (bis Rev. 4 in der Statuszeile geführt, Befund 181): Rev. 3 (08.09.2026)
@@ -44,7 +63,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > `default_reduction` bleibt in dieser Revision 0,0 (Code-Nachzug L2 als eigener Schritt);
 > die Sperre aus Befund 124 (kein pauschaler `linked_risk_codes`-Kanal) bleibt bestehen.
 > **Rev. 2 (31.08.2026)** = Bezugsebene der P̂-Zentrierung:
-> \(\bar G\) ist nicht mehr ein bundesweites Referenzmittel, sondern das
+> Der Bezugswert der Zentrierung (heute Ḡ₀, Log 26) ist nicht mehr ein bundesweites Referenzmittel, sondern das
 > betroffenengewichtete Mittel der **betrachteten Kommune**, im Lauf aus ihren
 > eigenen Zellen gebildet (Aufgabe §3.2 „geschlossene Betrachtungsebene",
 > Nutzer-Entscheid; Log 18). Damit gilt Σ B·P̂ = Σ B je Kommune **exakt**, ein
@@ -152,7 +171,7 @@ Teilbericht 5 ab S. 180 aufführt, gehören zum Restrisiko in (b). Eine Wirkung 
 heutigen Pollenflug-Warnung rechnet der Basiswert weder heraus noch hinzu (S158 im Basiswert Default 1,
 Knoten-Bilanz). Die heutige Stadtbaum- und Vegetationsausstattung wirkt über \(\hat G\) nur auf die
 Verteilung der Zusatztage innerhalb der Kommune. Weil \(\hat P\) auf die eigene Kommune zentriert ist
-(\(\sum B \hat P = \sum B\), §3.3, Log 18/19), gilt: Die Vegetation hebt oder senkt den Basiswert der Kommune nicht
+(im Ausgangsstand \(\sum B \hat P = \sum B\), §3.3, Log 18, 26), gilt: Die Vegetation hebt oder senkt den Basiswert der Kommune nicht
 (Modellgrenze 7). Eine Kommune, die schon allergenarm pflanzt, sieht das heute nur in der Verteilung.
 
 **(b) Zustand „mit Anpassung“.** Der Bericht stellt ihn nur als Wirkung der beiden Maßnahmen-Hebel auf den
@@ -163,18 +182,27 @@ Basiswert dar, nicht als eigenen Basiswert:
   Geltungsbereich. Dort mindert sie \(r_{\text{S158}} \cdot t_{\text{warn}}\) = 0,03 × 0,75 = 2,25 % der
   Zusatztage. Beispielkommune Berlin, ganze Stadt im Geltungsbereich: 17.004 vermiedene Tage und
   ≈ 105.400 € je Jahr (Preisstand 2024).
-- **Allergenarme Stadtbaumwahl** (§5, Log 24): Sie senkt \(\hat P\) einer Zelle um 0,14 je Senkung von
+- **Allergenarme Stadtbaumwahl** (§5, Log 24): Sie senkt den Kronenanteil allergener Bäume einer Zelle;
+  \(\hat G\) sinkt um 0,464 × diese Änderung bei Kronen mit Gattungs-Tag der Birkengruppe, bei Kronen
+  ohne Gattungs-Tag nur um 0,464 × 0,12 × diese Änderung, so wie der Ausgangsstand sie zählt
+  (Ebenendefinition §3.3), \(\hat P\) um 0,14 je Senkung von
   \(\hat G/\bar G_0\) um 0,2. Weil der Bezugswert Ḡ₀ im Ausgangsstand festgehalten wird, sinkt die
   Summe der Kommune um die Senkung in den bepflanzten Zellen (Rechenbeispiel §5: vier Zellen,
-  8.000 Betroffene, 2.541 Tage und ≈ 15.750 € weniger je Jahr; Richtung des Fehlers in
+  8.000 Betroffene, 1.179 Tage und ≈ 7.310 € weniger je Jahr; Richtung des Fehlers in
   Modellgrenze 7).
 
 Im Produkt sind beide Wirkungen heute nicht sichtbar (Sperre aus Befund 124; Integrationsauflagen S158 und
 Stadtbaumwahl in §5.1 und §5). Einen Wert „mit Anpassung“ gibt es dort erst nach der Integration und nur, wenn
 eine Kommune Maßnahmen wählt. Die KWRA-Stufen „mit Anpassung“ (Restrisiko, Blatt `Klimawirkungen`, Zeile 98,
-Spalten AB bis AF: gering · gering · mittel · gering · mittel) übernimmt der Bericht nicht als Zahl: Sie
-bewerten die Maßnahmen des Bundes (Aktionsplan Anpassung III und weiterreichende Maßnahmen; Blatt
-`Lesehinweise`, Zeile 27), nicht die Hebel einer Kommune.
+Spalten AB bis AF, Maßnahmenpaket und Zeitscheibe nach Kopfzeile 2 der Mappe) sind:
+
+- AB: Aktionsplan Anpassung III (APA III), 2020–2030: gering
+- AC und AD: APA III, Mitte des Jahrhunderts, optimistisch und pessimistisch: gering und mittel
+- AE und AF: weiterreichende Maßnahmen, Mitte des Jahrhunderts, optimistisch und pessimistisch: gering und mittel
+
+Für das Ende des Jahrhunderts führt die Mappe kein Restrisiko; die Zeilen „Ende des Jahrhunderts“ in (c) gelten
+nur ohne Anpassung. Der Bericht übernimmt diese Stufen nicht als Zahl: Sie bewerten die Maßnahmen des Bundes
+(APA III und weiterreichende Maßnahmen; Blatt `Lesehinweise`, Zeile 27), nicht die Hebel einer Kommune.
 
 **(c) KWRA-Stufe ohne Anpassung und Gewissheit je Zeitscheibe.**
 
@@ -197,7 +225,7 @@ quantitativen Analyse als Gegenwart der Bezugszeitraum (1971 bis 2000) und meist
 Szenarios für den optimistischen Fall verwendet; bei der qualitativen Bewertung hingegen wurde unter dem
 optimistischen Fall meist die jüngere Gegenwart und ein schwächerer oder moderater Klimawandel verstanden“.
 Wir lesen das so: Die Zeitscheibe Gegenwart der Stufen meint die jüngere Gegenwart, nicht den Bezugszeitraum
-1971–2000. Dieser Bezugszeitraum und die Perzentile des Modellensembles in Teilbericht 5, S. 177–178 gehören
+1971–2000. Dieser Bezugszeitraum und die Perzentile des Modellensembles in Teilbericht 5, S. 177 (Indikator GE-KL-07 S. 176, Projektion S. 178) gehören
 zur quantitativen Auswertung des Indikators GE-KL-07, nicht zu den Stufen. Der Basiswert dieses Berichts
 (Ist-Klima, Normalperiode 1991–2020 gegen 1961–1990) passt damit zur Zeitscheibe Gegenwart der Bewertung.
 Für die Gegenwart weist die KWRA keine Gewissheit aus: Tabelle 55 lässt das
@@ -216,7 +244,7 @@ Unsicherheit liegt nicht in einer Klimaprojektion, sondern in drei Bändern (Bei
   Erkrankte): wirkt nur auf den Euro-Betrag und nur nach oben, bis 17,9 Mio. € je Jahr; die Tage ändert er nicht.
 - **Sensibilisierungsprofil \(p_B/p_G\)** (Abschätzung von KAP3, §3.4; Bänder 0,4–0,7 und 0,6–0,85): wirkt fast
   nur auf die Tage, 580.958–901.837 Tage (−23 % bis +19 %). Im Euro-Betrag kürzt es sich fast heraus, weil es
-  über \(d_{\text{Saison}}\) auch im Kostensatz je Tag steht: 4,39–5,07 Mio. € (−6 % bis +8 %).
+  über \(d_{\text{Saison}}\) auch im Kostensatz je Tag steht: 4,38–5,07 Mio. € (−6 % bis +8 %).
 
 ## 2 Evidenz-Register (§2.2)
 
@@ -283,13 +311,13 @@ deshalb heraus (§3.5). Es wirkt nur auf die Zahl der Tage.
 \(\hat P\) ist so gebaut, dass sein mit den Betroffenen gewichtetes Mittel über die Zellen der
 eigenen Kommune im Ausgangsstand genau 1 ist (Bezugswert Ḡ₀ aus den eigenen Zellen, Log 17, 18
 und 26). Für die Summe über Berlin gilt deshalb heute \(\sum B \hat P = \sum B\), gleich wie grün
-die Stadt ist. Ḡ₀ wird für Maßnahmen festgehalten; eine allergenarme Pflanzung senkt deshalb die
-Summe (§5). Der Vegetationsfaktor ändert
+die Stadt ist. Im Ausgangsstand ändert der Vegetationsfaktor
 also nicht, *wie viele* Symptomtage Berlin hat, sondern nur, *wo* sie anfallen: Eine Zelle an
 einer Birkenallee mit doppelt so viel allergener Vegetation wie im Mittel bekommt
 \(\hat P\) = 1 + 0,7 × (2 − 1) = 1,7, eine Zelle ohne kartierte Vegetation 1 − 0,7 = 0,3. Eine
 insgesamt grünere Kommune hat damit nicht mehr Tage als eine graue; das trägt die Evidenz nicht
-(Log 18, Modellgrenze 7 in §6).
+(Log 18, Modellgrenze 7 in §6). Anders eine Maßnahme: Ḡ₀ wird für Maßnahmen festgehalten; eine
+allergenarme Pflanzung senkt deshalb die Summe (§5).
 
 **Kommune statt Zellen: was die Kette verfälscht und was nicht.** Das Produkt rechnet je
 100-m-Zelle mit der Bevölkerung aus dem Zensus-Gitter (Stichtag 15.05.2022) und summiert; die
@@ -466,7 +494,7 @@ sie (Befund 105).
 
 **Bänder und Herleitung** (Rev.-5-Befunde 27/35): Das Produkt führt die Zensus-Bänder
 u65/65–74/75–84/85+; für die Prävalenz-Schichtung wird zusätzlich die Ebene **u20 neu
-angelegt** (Zensus-2022-Gitter, 10-Jahres-Klassen 0–9 + 10–19; §3.1-Kennzeichnung „neu
+angelegt** (Zensus-2022-Gitter, 5er-Jahresgruppen 0–4, 5–9, 10–14, 15–19; §3.1-Kennzeichnung „neu
 anzulegen"); das Band 20–64 ergibt sich je Zelle als u65 − u20.
 **Ergebnis der Integration (31.08.2026):** Ebene `POPULATION_U20` **angelegt** —
 der Zensus-Gitterdatensatz „Alter in 5er-Jahresgruppen" liegt bereits im Produkt;
@@ -479,8 +507,8 @@ die Produktbänder (Gewichte: Bevölkerung 31.12.2023 nach Altersjahren [48]):
 
 - **u20 = 8,8 %** (KiGGS W2, 0–17; die 18/19-Jährigen erhalten den Kinder- statt des
   höheren DEGS1-Werts 14,6 % — dokumentiert **unterschätzend**, Log 10).
-- **20–64 = 13,2 %**: (9.301.783·14,6 + 10.947.845·17,2 + 10.275.235·14,3 + 12.293.757·10,1
-  + 6.345.372·8,2) / 49.163.992 = 13,16 ≈ 13,2 % (DEGS1-Dekadenwerte 14,6/17,2/14,3/10,1;
+- **20–64 = 13,2 %**: (9.301.783·14,6 + 10.947.845·17,2 + 10.275.235·14,4 + 12.293.757·10,1
+  + 6.345.372·8,2) / 49.163.992 = 13,19 ≈ 13,2 % (DEGS1-Dekadenwerte 14,6/17,2/14,4/10,1;
   60–64 mit dem 60–69-Wert 8,2).
 - **65–74 = 6,7 %**: (5.180.675·8,2 + 4.388.965·5,0)/9.569.640 = 6,73 (65–69 → 8,2;
   70–74 → 5,0).
@@ -492,12 +520,12 @@ die Produktbänder (Gewichte: Bevölkerung 31.12.2023 nach Altersjahren [48]):
 # p_AR 20-64 und 65-74: bevoelkerungsgewichtete DEGS1-Werte (Bev. 31.12.2023)
 pop = {"20-29": 9_301_783, "30-39": 10_947_845, "40-49": 10_275_235,
        "50-59": 12_293_757, "60-64": 6_345_372, "65-69": 5_180_675, "70-74": 4_388_965}
-p = {"20-29": 14.6, "30-39": 17.2, "40-49": 14.3, "50-59": 10.1, "60-64": 8.2,
+p = {"20-29": 14.6, "30-39": 17.2, "40-49": 14.4, "50-59": 10.1, "60-64": 8.2,
      "65-69": 8.2, "70-74": 5.0}
 g2064 = sum(pop[k]*p[k] for k in ["20-29","30-39","40-49","50-59","60-64"]) / \
         sum(pop[k] for k in ["20-29","30-39","40-49","50-59","60-64"])
 g6574 = (pop["65-69"]*p["65-69"] + pop["70-74"]*p["70-74"]) / (pop["65-69"] + pop["70-74"])
-assert abs(g2064 - 13.16) < 0.01
+assert abs(g2064 - 13.19) < 0.01
 assert abs(g6574 - 6.73) < 0.01
 # Bundes-Betroffene mit gerundeten Bandwerten:
 band_pop = {"u20": 15_583_456, "20-64": 49_163_992, "65-74": 9_569_640,
@@ -535,8 +563,8 @@ $$ \Delta\text{Tage}_{\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_R \cdot 
 
   $$ \sum_{\text{Zellen}} B \cdot \hat P' \;=\; (1-\lambda)\sum_{\text{Zellen}} B \;+\; \lambda \sum_{\text{Zellen}} B \cdot \frac{\hat G'}{\bar G_0}, \qquad \text{Senkung} \;=\; \lambda \cdot \frac{\sum_{\text{Zellen}} B \cdot (\hat G - \hat G')}{\bar G_0}. $$
 
-  Senkt die Maßnahme \(\hat G\), sinkt die Kommunensumme; Rechenbeispiel in §5. Wo ältere
-  Stellen des Berichts kurz \(\bar G\) schreiben, ist Ḡ₀ gemeint.
+  Senkt die Maßnahme \(\hat G\), sinkt die Kommunensumme; Rechenbeispiel in §5. 
+  Ḡ ohne Index steht im Bericht nur noch für den in jedem Lauf neu gebildeten Wert der verworfenen Regel (Log 19).
 
   Mit dieser Gewichtung ist die **Kommunensumme im Ausgangsstand per Konstruktion invariant** gegen
   \(\lambda\) und gegen jede Korrelation zwischen \(\hat G\) und Bevölkerung — ein
@@ -561,7 +589,7 @@ $$ \Delta\text{Tage}_{\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_R \cdot 
   Ein Bundesmittel über alle Zellen wäre eine modellinterne Aggregation über eine
   **höhere Ebene als die Betrachtungsebene**; das Ergebnis einer Kommune hinge dann
   an Daten außerhalb ihrer selbst und wäre nur mit einem (per §3.4 unzulässigen)
-  Bundeslauf bestimmbar. Beides entfällt: \(\bar G\) entsteht im Lauf aus den
+  Bundeslauf bestimmbar. Beides entfällt: \(\bar G_0\) entsteht im Lauf des Ausgangsstands aus den
   eigenen Zellen (`inputs.kommunale_pollen_referenz`).
   (3) **Konsequenz — ehrlich benannt, nicht beschönigt:** Die Vegetationsstruktur des
   Ausgangsstands verschiebt die **Kommunensumme nicht**; \(\hat P\) ist im Ausgangsstand
@@ -580,7 +608,7 @@ $$ \Delta\text{Tage}_{\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_R \cdot 
   0,3). **Proxy-Grenze, dokumentiert:** OSM-Baumkataster sind lückenhaft — eine
   unkartierte Zelle ist von einer vegetationsfreien nicht unterscheidbar; die
   Zentrierung fängt das teilweise auf (fehlen Kronen flächendeckend, sinkt
-  \(\bar G\) mit). Richtung: In Kommunen mit schwacher OSM-Erfassung
+  \(\bar G_0\) mit). Richtung: In Kommunen mit schwacher OSM-Erfassung
   differenziert \(\hat P\) schwächer; die Kommunensumme bleibt unberührt. Ebenen-Definition: OSM-basierter Anteil allergener Gehölze
   (Birke/Erle/Hasel-anteilige Baumkronen-/Gehölzfläche) + Grünflächenanteil als
   Gräser-Proxy, **neu anzulegen** (§3.1) — die Gewichtsregel ist hiermit festgelegt,
@@ -630,7 +658,7 @@ $$ \Delta\text{Tage}_{\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_R \cdot 
   Park- und Gehölzstrukturen mit Hasel/Hainbuche liegen deutlich höher (oberes
   Bandende 0,25); der Basiswert ist die Mitte dieser Spanne. Band 0,05–0,25. **Ergebnis-Sensitivität** (Bandbreite über den dokumentierten
   Zelltypen-Satz Allee/Park · Wohnblock · Grünanlage · Mischlage, jeweils
-  \(\hat G/\bar G\) bei s_unbek 0,05 → 0,25):
+  \(\hat G/\bar G_0\) bei s_unbek 0,05 → 0,25, Ḡ₀ je Wert von s_unbek im Ausgangsstand gebildet):
   gehölzreich 0,665 → 0,752 (**+13,0 %**), vegetationsarm 0,255 → 0,258
   (+0,9 %), grünlastig 2,014 → 1,918 (**−4,7 %**), Mischlage 1,066 → 1,072
   (+0,6 %) — die Wirkung hängt vom Vegetationsprofil der Zelle ab und liegt für
@@ -649,9 +677,9 @@ $$ \Delta\text{Tage}_{\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_R \cdot 
   Golden-Test `test_veg_weight_derives_from_delta_contributions` wird rot,
   sobald einer dieser Werte ohne Nachziehen der Konstante geändert wird; ein
   zweiter Test (`test_layer_is_independent_of_layer_b_parameters`) hält die
-  Schichtentrennung fest. \(\bar G\) dagegen wird im Lauf
-  aus den Zellen der jeweiligen Kommune gebildet (`inputs.kommunale_pollen_referenz`;
-  Rev. 2, Log 18) — damit gilt \(\sum_z B_z \hat P_z = \sum_z B_z\) **exakt**
+  Schichtentrennung fest. \(\bar G_0\) dagegen wird im Lauf
+  des Ausgangsszenarios aus den Zellen der jeweiligen Kommune gebildet (`inputs.kommunale_pollen_referenz`;
+  Rev. 2, Log 18, 26) — damit gilt im Ausgangsstand \(\sum_z B_z \hat P_z = \sum_z B_z\) **exakt**
   (Golden-Test `test_reference_is_closed_within_the_kommune`) und die Betrachtungsebene
   bleibt geschlossen. Zur Plausibilisierung der Ebene dokumentiert das Skript
   `pollen_g_bar.py` (Anlagen `pollen_g_bar.csv`/`.md`) Größenordnung und Streuung von
@@ -686,13 +714,15 @@ for r, (db, dg) in DS.items():
   Symptom-Score-Berechnungsmethoden und publiziert **keinen** Anteil symptomatischer
   Saisontage — \(f\) bleibt Annahme mit Band und Ersetzungspfad (PHD-Tagesdaten).
   **Entlastung:** \(f\) kürzt sich im €-Pfad vollständig heraus (§3.5) und wirkt nur auf
-  den nativen ΔTage-Ausweis (±29 % am Band).
+  den nativen ΔTage-Ausweis: am Band 0,50–0,85 um −28,6 % bis +21,4 % (0,50 / 0,70 und 0,85 / 0,70).
 - **\(p_B\) = 0,55 (0,4–0,7), \(p_G\) = 0,75 (0,6–0,85) — gekennzeichnete Abschätzung**
   (Log 8; Rev.-5-Befund 36a): benötigt wird der Anteil der AR-Patienten mit
   Birkengruppen- bzw. Gräser-relevanter Saison; publiziert sind nur
   Bevölkerungs-Sensibilisierungen (Haftenberger [3]: Gräserpollen 19,4 %, Birke 17,4 %,
   Erle 16,5 %, Hasel 16,2 % — Rangfolge Gräser > Birkengruppe konsistent zur Setzung).
-  Sensitivität: ±0,15 auf \(p_G\) bzw. \(p_B\) verschiebt \(\delta\) um ±8 % bzw. ±6 %.
+  Sensitivität (Region Mitte, \(p_B \Delta S_B + p_G \Delta S_G\) = 5,37 Tage): \(p_B\) 0,4–0,7 verschiebt
+  \(\delta\) um −11,7 % bis +11,7 % (±0,15 × 4,20 = ±0,63 Tage), \(p_G\) 0,6–0,85 um −11,4 % bis +7,6 %
+  (−0,15 × 4,08 = −0,612 Tage, +0,10 × 4,08 = +0,408 Tage), zusammen −23 % bis +19 % (Kap. 1 (a)).
   Ersetzungspfad: PID-/Versorgungsdaten (Registry-Vermerk).
 - **\(\lambda\) = 0,7 (0,3–1,0) — Herleitungskette** (Anker `#lambda-veg`; Befunde
   102/110): Werchan 2017 [54] misst über 14 Pollenfallen in Berlin die Spanne der
@@ -942,17 +972,35 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
 - **Allergenarme Stadtbaumwahl (W024-Pfad):** Wirkungsort **definiert**: senkt
   \(\hat G_{\text{Zelle}}\) — multiplikativ via \(\hat P = 1+\lambda(\hat G/\bar G_0-1)\)
   auf ΔTage **und** € (zellscharf; Bezugswert Ḡ₀ aus dem Ausgangsstand festgehalten, §3.3,
-  Log 26). Die Effektgröße ist **mechanisch**: ein
-  Pflanzprogramm, das den allergenen Gehölzanteil einer Zelle **relativ zur Kommune**
-  um Δ\(\hat G/\bar G_0\) = −0,2 senkt, senkt \(\hat P\) **dieser Zelle** um
+  Log 26). **Die Eingabe ist die Änderung des Kronenanteils der Birkengruppe**, nicht eine
+  anteilige Senkung von \(\hat G\): Nach der Ebenendefinition (§3.3) ist
+  \(\hat G\) = 0,464 × (Kronenanteil mit Gattungs-Tag der Birkengruppe + 0,12 × Kronenanteil ohne
+  Gattungs-Tag) + 0,536 × Grünanteil, also \(\hat G_z = w_B\,[k_{\text{Birke},z} +
+  s_{\text{unbek}}\,k_{\text{unbek},z}] + (1-w_B)\,\text{Grün}_z\) mit \(w_B\) = 0,464 und
+  \(s_{\text{unbek}}\) = 0,12. Ein Austausch allergener Bäume senkt nur den Kronen-Summanden, und
+  zwar **in dem Term, in dem die ersetzten Kronen im Ausgangsstand stehen**:
+  \(\Delta\hat G = -0{,}464 \cdot (\Delta k_{\text{Birke}} + 0{,}12 \cdot \Delta k_{\text{unbek}})\).
+  Kronen mit Gattungs-Tag der Birkengruppe zählen voll, Kronen ohne Gattungs-Tag (in OSM der
+  Regelfall) nur mit 0,12, so wie der Ausgangsstand sie gezählt hat. Der Grünanteil (Gräser)
+  bleibt. **Grenze:** Die Senkung ist höchstens so groß wie der Kronen-Summand im Ausgangsstand,
+  also \(\hat G' \ge 0{,}536 \times\) Grünanteil; der Beitrag der Gehölze sinkt nie unter null.
+  Kennt die Kommune die Gattungen ihrer Bäume selbst (Baumkataster), gehen diese Angaben schon in
+  den Ausgangsstand und in Ḡ₀ ein, nicht erst in das Maßnahmenszenario; sonst würde die Senkung
+  an Kronen gerechnet, die der Ausgangsstand nur mit 0,12 kennt. Die Effektgröße ist damit
+  **mechanisch**: Sinkt \(\hat G/\bar G_0\) einer Zelle so um 0,2, sinkt \(\hat P\) **dieser Zelle** um
   \(\lambda \times 0{,}2\) = 0,14 (Band 0,06–0,20 über das λ-Band 0,3–1,0); in einer Zelle mit
-  \(\hat P\) = 1 sind das 14 % ihrer Zusatztage. Artenwahl nach GALK-/allergologischer Liste [6].
+  \(\hat P\) = 1 sind das 14 % ihrer Zusatztage. Dafür braucht es 0,2 × Ḡ₀ / 0,464 weniger
+  Kronenanteil mit Gattungs-Tag der Birkengruppe in der Zelle; bei Ḡ₀ = 0,18125 (Rechenbeispiel
+  unten) sind das 0,078, also 7,8 Pp. weniger Kronenfläche. Artenwahl nach GALK-/allergologischer
+  Liste [6].
   **Abschätzung am Zahlenbeispiel (§3.9 ABGESCHÄTZT, Log 24):** Eine Allee-Zelle in Berlin mit
-  100 Betroffenen und \(\hat G/\bar G\) = 2 hat \(\hat P\) = 1,7 und 100 × 1,8795 × 1,7 = 319,5
-  Zusatztage; nach der Pflanzung ist \(\hat G/\bar G\) = 1,8, \(\hat P\) = 1,56, also 293,2 Tage.
+  100 Betroffenen und \(\hat G/\bar G_0\) = 2 hat \(\hat P\) = 1,7 und 100 × 1,8795 × 1,7 = 319,5
+  Zusatztage; nach der Pflanzung (Kronenanteil mit Gattungs-Tag der Birkengruppe um
+  0,2 × Ḡ₀ / 0,464 gesenkt; bei Ḡ₀ = 0,18125 der Beispielkommune wären das 0,078, das Ḡ₀ Berlins
+  weist der Bericht nicht aus) ist \(\hat G/\bar G_0\) = 1,8, \(\hat P\) = 1,56, also 293,2 Tage.
   **Wirkung: −26,3 Tage je Jahr (−8,2 %), ≈ 163 € je Jahr** (\(c_{\text{Tag}}\) = 6,20 €); Band über
   λ: −11,3 Tage (λ = 0,3) bis −37,6 Tage (λ = 1,0). **Sensitivität:** linear in λ und in der
-  Senkung Δ\(\hat G/\bar G\); stärkster Treiber ist λ (Faktor 3,3 zwischen den Bandenden).
+  Senkung des Kronenanteils; stärkster Treiber ist λ (Faktor 3,3 zwischen den Bandenden).
   **Wirkungsort:** ausschließlich über \(\hat G\) der Zelle, die im Zelllauf neu berechnet wird.
   **Wirkung auf die Kommunensumme (Rev. 4, Log 26; Log 19 verworfen):** Weil Ḡ₀ festgehalten
   wird, ändern sich die übrigen Zellen nicht. Die Kommunensumme sinkt um genau die Senkung in den
@@ -966,6 +1014,10 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   1,8795 Tage je Betroffenem aus Ebene 6, \(c_{\text{Tag}}\) = 6,20 € aus Kapitel 7
   `pollen.c_tag`, λ = 0,7 aus Kapitel 7 `pollen.lambda_veg`).** Eine Kommune hat vier bewohnte
   Zellen mit B = 1.000 / 4.000 / 2.500 / 500 Betroffenen und \(\hat G\) = 0 / 0,10 / 0,30 / 0,60.
+  Zelle 3 (Grünanlage) hat den Kronenanteil mit Gattungs-Tag der Birkengruppe 0,30 und den
+  Grünanteil 0,30, Zelle 4 (Park mit Birken) 0,60 und 0,60; Kronen ohne Gattungs-Tag gibt es im
+  Beispiel nicht. Nach §3.3 ist das \(\hat G\) = 0,464 × 0,30 + 0,536 × 0,30 = 0,30
+  und 0,464 × 0,60 + 0,536 × 0,60 = 0,60.
 
   | Schritt | Rechnung | Ergebnis |
   |---|---|---|
@@ -973,26 +1025,45 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   | 2 \(\hat P\) vorher | 1 + 0,7 × (\(\hat G\)/0,18125 − 1) | 0,300 / 0,686 / 1,459 / 2,617 |
   | 3 Summe vorher | 300 + 2.745 + 3.647 + 1.309 | Σ B·P̂ = **8.000** = Σ B |
   | 4 Tage und Euro vorher | 8.000 × 1,8795; × 6,20 € | **15.036 Tage**, 93.223 € |
-  | 5 Maßnahme | Zellen 3 (Grünanlage) und 4 (Allee): ein Drittel der allergenen Bäume durch allergenarme Arten ersetzt | \(\hat G'\) = 0,20 und 0,40; Ḡ₀ bleibt 0,18125 |
-  | 6 \(\hat P\) nachher | 1 + 0,7 × (0,20/0,18125 − 1); 1 + 0,7 × (0,40/0,18125 − 1) | 1,072 und 1,845; Zellen 1 und 2 unverändert |
-  | 7 Summe nachher | 300 + 2.745 + 2.681 + 922 | Σ B·P̂′ = **6.648** |
-  | 8 Tage und Euro nachher | 6.648,3 × 1,8795; × 6,20 € | **12.495 Tage**, 77.472 € |
-  | 9 Senkung | 15.036 − 12.495; Kontrolle: 0,7 × (2.500 × 0,10 + 500 × 0,20) / 0,18125 × 1,8795 | **−2.541 Tage je Jahr (−16,9 %), ≈ 15.750 € je Jahr** (Preisstand 2024) |
+  | 5 Maßnahme | Zellen 3 und 4: ein Drittel der allergenen Bäume durch allergenarme Arten ersetzt, Kronenanteil der Birkengruppe 0,30 → 0,20 und 0,60 → 0,40, Grünanteil unverändert; \(\hat G'\) = 0,30 − 0,464 × 0,10 und 0,60 − 0,464 × 0,20 | \(\hat G'\) = 0,2536 und 0,5072; Ḡ₀ bleibt 0,18125 |
+  | 6 \(\hat P\) nachher | 1 + 0,7 × (0,2536/0,18125 − 1); 1 + 0,7 × (0,5072/0,18125 − 1) | 1,279 und 2,259; Zellen 1 und 2 unverändert |
+  | 7 Summe nachher | 300 + 2.745 + 3.199 + 1.129 | Σ B·P̂′ = **7.373** |
+  | 8 Tage und Euro nachher | 7.372,8 × 1,8795; × 6,20 € | **13.857 Tage**, 85.915 € |
+  | 9 Senkung | 15.036 − 13.857; Kontrolle: 0,7 × (2.500 × 0,0464 + 500 × 0,0928) / 0,18125 × 1,8795 | **−1.179 Tage je Jahr (−7,8 %), ≈ 7.310 € je Jahr** (Preisstand 2024) |
 
   **Sensitivität:** Die Senkung ist linear in λ und in der Summe \(\sum B\,(\hat G - \hat G')\);
-  stärkster Treiber ist λ: bei λ = 0,3 sind es 1.089 Tage und ≈ 6.750 €, bei λ = 1,0 3.629 Tage
-  und ≈ 22.500 €. **Gegenprobe zur verworfenen Regel:** Bildete man Ḡ nach der Maßnahme neu,
-  wäre es 1.100 / 8.000 = 0,1375, und die Summe läge wieder genau bei 8.000 — die Senkung wäre
+  stärkster Treiber ist λ: bei λ = 0,3 sind es 505 Tage und ≈ 3.130 €, bei λ = 1,0 1.684 Tage
+  und ≈ 10.440 €. **Was die einfachere Rechnung verfälschen würde:** Setzte man „ein Drittel der
+  Bäume ersetzt“ gleich mit einem Drittel weniger \(\hat G\) (0,30 → 0,20, 0,60 → 0,40), sänke
+  auch der Gräser-Anteil mit, und die Senkung wäre mit 2.541 Tagen mehr als doppelt so groß
+  (Faktor 1 / 0,464). Stehen die ersetzten Bäume in OSM **ohne Gattungs-Tag**, kennt der
+  Ausgangsstand sie nur mit 0,12 ihrer Kronenfläche. Zöge man trotzdem 0,464 × ΔKronenanteil voll
+  ab, sänke \(\hat G\) bis zu 1 / 0,12 ≈ 8-mal stärker, als der Ausgangsstand den Bäumen
+  zugeschrieben hat. Beispiel: Kronenanteil 0,30, alles ohne Tag, Senkung 0,10. Im Ausgangsstand
+  tragen die Gehölze 0,464 × 0,12 × 0,30 = 0,017 zu \(\hat G\) bei; voll abgezogen würden 0,046,
+  der Beitrag der Gehölze würde negativ. Richtig abgezogen werden 0,464 × 0,12 × 0,10 = 0,0056.
+  **Gegenprobe zur verworfenen Regel (Log 19):** Bildete man Ḡ nach der Maßnahme neu,
+  wäre es 1.287,6 / 8.000 = 0,16095, und die Summe läge wieder genau bei 8.000 — die Senkung wäre
   null, obwohl in zwei Zellen weniger allergene Bäume stehen. Auch ein **flächiges** Programm,
-  das alle Zellen gleichmäßig allergenärmer macht, senkt jetzt die Summe (20 % weniger
-  \(\hat G\) in jeder Zelle: −λ × 20 % = −14 %); gerechnet wird es trotzdem im Zelllauf über
-  \(\hat G'\), nie als pauschaler Faktor (Integrationsauflage unten).
+  das in allen Zellen ein Fünftel der allergenen Kronen mit Gattungs-Tag ersetzt, senkt jetzt die Summe, um
+  λ × 0,464 × 0,2 × (betroffenengewichteter Kronenanteil) / Ḡ₀; sind Kronen- und Grünanteil im
+  Mittel gleich groß und gibt es keine Kronen ohne Gattungs-Tag, sind das 0,7 × 0,464 × 0,2 = 6,5 %.
+  Gibt es Kronen ohne Gattungs-Tag, ist Ḡ₀ um 0,464 × 0,12 × \(\bar k_{\text{unbek}}\) (betroffenengewichtetes Mittel von \(k_{\text{unbek},z}\), dem Kronenflächenanteil ohne Gattungs-Tag) größer, die
+  Senkung kleiner, und 6,5 % sind eine Obergrenze. Gerechnet wird es trotzdem im Zelllauf
+  über \(\hat G'\), nie als pauschaler Faktor (Integrationsauflage unten).
 
 ```python test: beispiel_96_stadtbaum_kommunensumme
 lam, delta, c_tag = 0.7, 1.8795, 6.20       # Kap. 7 pollen.lambda_veg, Ebene 6, Kap. 7 pollen.c_tag
 B = [1_000, 4_000, 2_500, 500]              # Betroffene je Zelle (wie Ebene 7)
 G_vor = [0.00, 0.10, 0.30, 0.60]            # G^ im Ausgangsstand
-G_nach = [0.00, 0.10, 0.20, 0.40]           # Zellen 3 und 4: ein Drittel allergenarm ersetzt
+w_b = 0.464                                  # Gewicht der Kronen in G^ (Ebenendefinition §3.3)
+krone = [0.00, 0.00, 0.30, 0.60]             # Kronenanteil Birkengruppe (Zellen 3, 4)
+gruen = [0.00, 0.00, 0.30, 0.60]             # Grünanteil (Zellen 3, 4)
+for i in (2, 3):
+    assert abs(w_b * krone[i] + (1 - w_b) * gruen[i] - G_vor[i]) < 1e-12
+d_krone = [0.00, 0.00, -0.10, -0.20]         # ein Drittel der allergenen Kronen ersetzt
+G_nach = [g + w_b * d for g, d in zip(G_vor, d_krone)]   # nur der Kronen-Summand sinkt
+assert abs(G_nach[2] - 0.2536) < 1e-12 and abs(G_nach[3] - 0.5072) < 1e-12
 g0 = sum(b * g for b, g in zip(B, G_vor)) / sum(B)   # Bezugswert im Ausgangsstand
 assert abs(g0 - 0.18125) < 1e-12
 p_vor = [1 + lam * (g / g0 - 1) for g in G_vor]
@@ -1001,20 +1072,28 @@ s_vor = sum(b * p for b, p in zip(B, p_vor))
 s_nach = sum(b * p for b, p in zip(B, p_nach))
 assert abs(s_vor - sum(B)) < 1e-9          # Ausgangsstand: Summe B*P^ = Summe B
 assert s_nach < s_vor                        # Maßnahme senkt die Kommunensumme
-assert abs(s_nach - 6_648.28) < 0.01
+assert abs(s_nach - 7_372.8) < 0.01
 tage_vor, tage_nach = s_vor * delta, s_nach * delta
-assert abs(tage_vor - 15_036) < 0.5 and abs(tage_nach - 12_495.4) < 0.1
+assert abs(tage_vor - 15_036) < 0.5 and abs(tage_nach - 13_857.2) < 0.1
 senkung = tage_vor - tage_nach
-assert abs(senkung - 2_540.6) < 0.1 and abs(senkung / tage_vor - 0.169) < 0.001
+assert abs(senkung - 1_178.8) < 0.1 and abs(senkung / tage_vor - 0.078) < 0.001
 assert abs(senkung - lam * sum(b * (v - n) for b, v, n in zip(B, G_vor, G_nach)) / g0 * delta) < 1e-6
-assert abs(tage_vor * c_tag - 93_223) < 1 and abs(tage_nach * c_tag - 77_472) < 1
-assert abs(senkung * c_tag - 15_750) < 5
+assert abs(tage_vor * c_tag - 93_223) < 1 and abs(tage_nach * c_tag - 85_915) < 1
+assert abs(senkung * c_tag - 7_310) < 5
 k = senkung / lam
-assert abs(k * 0.3 - 1_089) < 1 and abs(k * 1.0 - 3_629) < 1
-assert abs(k * 0.3 * c_tag - 6_750) < 5 and abs(k * 1.0 * c_tag - 22_500) < 5
+assert abs(k * 0.3 - 505) < 1 and abs(k * 1.0 - 1_684) < 1
+assert abs(k * 0.3 * c_tag - 3_130) < 5 and abs(k * 1.0 * c_tag - 10_440) < 5
+assert abs(senkung / w_b - 2_540.6) < 0.1    # anteilige Senkung von G^ waere Faktor 1/w_b zu hoch
 g_neu = sum(b * g for b, g in zip(B, G_nach)) / sum(B)   # verworfene Regel (Log 19)
+assert abs(g_neu - 0.16095) < 1e-12
 assert abs(sum(b * (1 + lam * (g / g_neu - 1)) for b, g in zip(B, G_nach)) - sum(B)) < 1e-9
-assert abs((1 - lam) + lam * 0.8 - (1 - 0.14)) < 1e-12    # flaechig -20 % G^ -> -14 %
+assert abs(lam * w_b * 0.2 - 0.065) < 0.001   # flaechig ein Fuenftel der Kronen, Krone = Gruen
+s_unbek, k_unbek, dk_unbek = 0.12, 0.30, -0.10   # Fall ohne Gattungs-Tag (Befund 195)
+beitrag = w_b * s_unbek * k_unbek                # Beitrag der Gehoelze im Ausgangsstand
+assert abs(beitrag - 0.0167) < 1e-4
+assert beitrag + w_b * dk_unbek < 0              # voll abgezogen: Beitrag waere negativ
+assert abs(w_b * s_unbek * dk_unbek + 0.0056) < 1e-4   # richtig: nur im Term s_unbek
+assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze nie unter null
 ```
 
   **Zusammen mit S158:** Die Stadtbaumwahl wirkt auf die Quelle (\(\hat P\)), die Frühwarnung auf
@@ -1028,8 +1107,16 @@ assert abs((1 - lam) + lam * 0.8 - (1 - 0.14)) < 1e-12    # flaechig -20 % G^ ->
   `test_no_flat_measure_on_allergy_days`), eine Katalogmaßnahme zur Stadtbaumwahl gibt es nicht, und
   das Maßnahmen-Modul rechnet \(\hat G\) nicht neu. **Integrationsauflage (Stadtbaumwahl)**, im
   Rahmen der Auflage aus §3.3 (nur zellscharfe Änderung von \(\hat G\) mit Neuberechnung, nie ein
-  Faktor): Der CTO braucht (1) die vom Nutzer gewählten Zellen, (2) die Senkung des allergenen
-  Gehölzanteils in diesen Zellen (Beispiel: \(\hat G/\bar G_0\) um 0,2), (3) den Zelllauf mit
+  Faktor): Der CTO braucht (1) die vom Nutzer gewählten Zellen, (2) als Eingabe die Änderung des
+  Kronenanteils der Birkengruppe in diesen Zellen (Beispiel: 0,30 → 0,20), getrennt nach Kronen mit
+  und ohne Gattungs-Tag; \(\hat G'\) folgt aus der vollen Ebenendefinition
+  \(\hat G_z = w_B\,[k_{\text{Birke},z} + s_{\text{unbek}}\,k_{\text{unbek},z}] + (1-w_B)\,\text{Grün}_z\)
+  (§3.3). Die Senkung wird in dem Term abgezogen, in dem die ersetzten Kronen im Ausgangsstand
+  stehen, \(\hat G' = \hat G - 0{,}464 \cdot (\Delta k_{\text{Birke}} + 0{,}12 \cdot \Delta
+  k_{\text{unbek}})\), mit der Grenze \(\hat G' \ge 0{,}536 \times\) Grünanteil (Beitrag der
+  Gehölze nie unter null), nie aus einer anteiligen Senkung von \(\hat G\) und nie mit 0,464 voll
+  auf Kronen, die der Ausgangsstand ohne Gattungs-Tag führt; eigene Gattungsangaben der Kommune
+  gehen schon in den Ausgangsstand und in Ḡ₀ ein, (3) den Zelllauf mit
   dem im Ausgangsszenario gebildeten und festgehaltenen Ḡ₀ und neuem \(\hat P\) je Zelle und (4) als
   Ausgabe die Änderung der Zusatztage und Euro je Zelle und für die Kommune, gekennzeichnet als
   „Abschätzung von KAP3“, mit dem Hinweis auf die Richtung des Fehlers in λ (Modellgrenze 7).
@@ -1133,8 +1220,14 @@ die Kalibrierjahre enthalten keinen Frühwarn-Effekt, der bereits eingerechnet w
   **aller** Tage mit Index ab „mittel“. Das ist nicht \(t_{\text{warn}}\): Setzte man \(m_{g,V}\)
   direkt ein, wählte die Rechnung die Tage zweimal aus (einmal über \(f\), einmal über \(m\)), und
   die Wirkung fiele um den Faktor \(f\) zu tief aus. Umgerechnet wird deshalb
-  \(t_{\text{warn},g,V} = \min(1;\ m_{g,V}/f)\), unter der Annahme, dass die Beschwerden an den Tagen
-  mit der höchsten Belastung auftreten (Pollenflug treibt die Symptomlast, Pfaar [52], qualitativ).
+  \(t_{\text{warn},g,V} = \min(1;\ m_{g,V}/f)\). **Abschätzung von KAP3 (§3.9 ABGESCHÄTZT):** Die
+  Formel legt die Beschwerdetage auf die Tage mit der höchsten Belastung (Pollenflug treibt die
+  Symptomlast, Pfaar [52], qualitativ). Herleitung: Von allen Saisontagen sind der Anteil \(f\)
+  Beschwerdetage und der Anteil \(m\) gewarnte Tage. Liegen die Beschwerdetage so weit wie möglich
+  auf gewarnten Tagen, ist von ihnen der Anteil \(m/f\) gewarnt, höchstens alle.
+  **Richtung des Fehlers:** Das ist die größtmögliche Überlappung und damit eine Obergrenze. Treten
+  Beschwerden auch an Tagen unter „mittel“ auf (etwa bei stark sensibilisierten Personen), ist der
+  wahre Anteil kleiner, und die Formel überzeichnet \(t_{\text{warn}}\) und die Wirkung von S158.
   Zahlenbeispiel: Meldet [71] für die Dekaden der Zusatztage \(m\) = 0,525, dann ist
   \(t_{\text{warn}}\) = 0,525 / 0,70 = 0,75, der heutige Basiswert; direkt eingesetzt ergäbe
   \(m\) = 0,525 nur 70 % der Wirkung. Treten die Beschwerden unabhängig von der Belastung auf, ist
@@ -1342,11 +1435,14 @@ Hayfever Diary) gegen die Einführung kommunaler Warnkanäle ersetzt den Persone
 gemessene Effektgröße, die DWD-Pollenflugstatistik [71] den Anteil \(t_{\text{warn}}\) (umgerechnet
 über \(m_{g,V}/f\), siehe oben); bis dahin ist die Kette oben der vollständige Nachweis des Werts.
 
-**Abgrenzung zu Modellgrenze 7 / Ledger-Befund 124 — beide bleiben bestehen.**
-Modellgrenze 7 verbietet einen **Vegetations-Niveaueffekt**: Ein flächiges Pflanzprogramm
-darf nicht über \(\hat G/\lambda\) gebucht werden, weil die λ-Evidenz intra-urban ist.
-\(r_{\text{S158}}\) ist kein Vegetationskanal, sondern eine Verhaltens-/Expositionsminderung an
-gewarnten Tagen, inhaltlich also keine Verletzung von Modellgrenze 7. Die Sperre aus Befund 124
+**Abgrenzung zu Modellgrenze 7 / Ledger-Befund 124.**
+Nach Modellgrenze 7 (Log 26) wirkt eine Vegetationsmaßnahme, auch eine flächige, nur im Zelllauf:
+Sie ändert \(\hat G\) der Zellen, die sie trifft, zu \(\hat G'\), und \(\hat P\) wird bei
+festgehaltenem Ḡ₀ neu gerechnet. So senkt auch ein flächiges Pflanzprogramm die Summe der Kommune
+(§5, Stadtbaumwahl). Nie wirkt sie als pauschaler Faktor auf alle Zellen (Befunde 124 und 129).
+\(r_{\text{S158}}\) läuft nicht über \(\hat G/\lambda\): Die Frühwarnung ändert keine Bäume und
+keine Pollenlast, sie ist eine Verhaltens- und Expositionsminderung an gewarnten Tagen, also ein
+Verhaltenskanal und kein Vegetationskanal. Die Sperre aus Befund 124
 bleibt **unangetastet** (Integrationsauflage oben). Die Divergenz Bericht ⇄ Code ist
 **ausgewiesen und im Ledger geführt** (Befunde 151 und 156), nicht still (Eiserne Regel 5).
 
@@ -1630,16 +1726,18 @@ parameter:
   abgeleitet_aus: [pollen.c_jahr_direkt, pollen.d_saison]
 ```
 
-## 8 Quellen (§3.8 — #96-relevanter Auszug; Nummern [1]–[56] = M0-Zählung, [65]–[67] neu)
+## 8 Quellen (§3.8 — #96-relevanter Auszug; Nummern [1]–[56] = M0-Zählung, [65]–[74] neu)
 
-Zugriff 17./18.08.2026 ([1]–[3], [65], [66]: 30.08.2026, Volltext/Abstract gegengelesen).
+Zugriff 17./18.08.2026 ([1]–[3], [65], [66]: 30.08.2026, Volltext/Abstract gegengelesen). Nennt ein Eintrag ein
+eigenes Abrufdatum, gilt dieses.
 **Archiv-Snapshots:** wie #95 (Kap. 8) — deterministisch über die `sources.py`-Ratchet-
 Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Referenzen.
 
 - **[1]** U. Langen, R. Schmitz, H. Steppuhn, „Häufigkeit allergischer Erkrankungen in
   Deutschland (DEGS1)", Bundesgesundheitsbl 56(5–6):698–706, 2013. doi:10.1007/s00103-012-1652-7
-  — **Tab. 3** (12-Monats-Prävalenz Heuschnupfen gesamt: 14,6/17,2/14,3/10,1/8,2/5,0 % für
-  18–29/30–39/40–49/50–59/60–69/70–79; gesamt 12,0 %; Volltext gegengelesen 30.08.2026).
+  — **Tab. 3** (12-Monats-Prävalenz Heuschnupfen gesamt: 14,6/17,2/14,4/10,1/8,2/5,0 % für
+  18–29/30–39/40–49/50–59/60–69/70–79; gesamt 12,0 %; Volltext gegengelesen 30.08.2026; 40–49 Jahre am Textabbild
+  `docs/quellen/methodik/96/01_Langen2013_DEGS1_Allergien.md` berichtigt 26.09.2026, Befund 188).
 - **[2]** R. Thamm u. a., „Allergische Erkrankungen bei Kindern und Jugendlichen in
   Deutschland (KiGGS Welle 2)", J Health Monit 3(3):3–18, 2018. doi:10.17886/RKI-GBE-2018-075
   (12-Monats-Prävalenz Heuschnupfen 0–17: 8,8 %).
@@ -1655,8 +1753,8 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   DWD Nationaler Klimareport, 6. Aufl. 2022.
 - **[6]** K.-C. Bergmann u. a., „Auswirkungen des Klimawandels auf allergische Erkrankungen
   in Deutschland", J Health Monit 8(S4):82–110, 2023 (RKI-Sachstandsbericht Klimawandel und
-  Gesundheit). doi:10.25646/11648 — Spreizungs-Mechanismus wörtlich (S. 12 f.:
-  „Spreizung der Pollensaison … Verlängerung [der Expositionszeit]"); Birkenpollengruppe;
+  Gesundheit). doi:10.25646/11648 — Spreizungs-Mechanismus wörtlich (S. 90:
+  „Spreizung der Pollensaison … Verlängerung [der Expositionszeit]"); Birkenpollengruppe (S. 89);
   Ferntransport; GALK-/Artenlisten (Volltext gegengelesen 30.08.2026).
 - **[7]** B. Schramm u. a., „Cost of illness of atopic asthma and seasonal allergic
   rhinitis in Germany: 1-yr retrospective study", Eur Respir J 21(1):116–122, 2003.
@@ -1674,8 +1772,11 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   7(4):e34076, 2012. doi:10.1371/journal.pone.0034076
 - **[15]** UBA (Hrsg.), KWRA 2021, Teilbericht 5: Risiken und Anpassung in den Clustern Wirtschaft
   und Gesundheit (Climate Change 24/2021, Dessau-Roßlau, Juni 2021), Kap. 4.2.2 (Aeroallergene;
-  GE-KL-07-Projektion ≈ 2 Wochen früher bis 2100, RCP8.5, S. 177–178; Tabelle 55 Klimarisiko ohne
-  Anpassung und Gewissheit, S. 179; beschlossene Maßnahmen APA III, S. 180), umweltbundesamt.de
+  Indikator GE-KL-07, Blühbeginn der Erle, S. 176; Bezugsperiode 1971–2000 und 15./85. Perzentil des
+  RCP8.5-Ensembles S. 177; Projektion „um rund zwei Wochen früher“ bis Ende des Jahrhunderts S. 178; Tabelle 55 Klimarisiko ohne
+  Anpassung und Gewissheit, S. 179; beschlossene Maßnahmen APA III, S. 180),
+  https://www.umweltbundesamt.de/publikationen/KWRA-Teil-5-Wirtschaft-Gesundheit (Abruf 26.09.2026; Permalink
+  https://web.archive.org/web/20260519124624/https://www.umweltbundesamt.de/publikationen/KWRA-Teil-5-Wirtschaft-Gesundheit)
   (lokal: `docs/KWAR/kwra2021_teilbericht_5_cluster_wirtschaft_gesundheit_bf_211027_0.pdf`; Seitenzahlen
   = PDF-Seiten = Druckseiten). Aufbereitet in `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt
   `Klimawirkungen`, Zeile 98.
@@ -1740,7 +1841,10 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
 - **[68]** Statistische Ämter des Bundes und der Länder, Regionaldatenbank Deutschland,
   Tab. 12411-09-01-4-B „Bevölkerung nach Geschlecht und Altersgruppen (20) – Stichtag 31.12. –
   regionale Ebenen", Stichtag 31.12.2023, Fortschreibung auf Basis Zensus 2022; Abruf
-  22.08.2026 über GENESIS-REST; https://www.regionalstatistik.de/genesis//online?operation=table&code=12411-09-01-4-B;
+  22.08.2026 über die GENESIS-REST-Schnittstelle der Regionaldatenbank (GENESIS-WS-2020,
+  `data/tablefile`, ffcsv) mit angemeldetem Konto; der Gastzugang antwortet mit 401 (geprüft 26.09.2026),
+  deshalb ist das Original nicht archiviert, und die Werte sind aus den Altersjahren von [69]
+  nachgerechnet (`docs/quellen/methodik/96/QUELLEN.md`); https://www.regionalstatistik.de/genesis//online?operation=table&code=12411-09-01-4-B;
   Anlage `backend/data/kalibrierung/bevoelkerung_bundesland_altersband.csv` (.md mit
   Verarbeitung), Zeile Berlin: u65 2.961.430 · 65–74 339.490 · 75–84 253.528 · 85+ 107.933.
   Die Tabelle führt 20 Altersgruppen; für u20 zählen unter 5 · 5–10 · 10–15 · 15–20 =
@@ -1760,7 +1864,11 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   Hasel/Erle 11–100 mittel, über 100 hoch; Birke 11–50 mittel, über 50 hoch; Gräser 6–30 mittel,
   über 30 hoch), https://www.dwd.de/DE/leistungen/gefahrenindizespollen/erklaerungen.html
   (Abruf 26.09.2026; Permalink https://web.archive.org/web/20260223181518/https://www.dwd.de/DE/leistungen/gefahrenindizespollen/erklaerungen.html).
-  Belastungsschwelle der S158-Festlegung (§5.1).
+  Belastungsschwelle der S158-Festlegung (§5.1). Abgelegte Textabbilder:
+  `docs/quellen/methodik/96/70_DWD_Pollen_Einstufung_live_20260926.md` (Abruf 26.09.2026),
+  `docs/quellen/methodik/96/70_DWD_Pollen_Einstufung_Wayback_20260223.md` (Wayback-Stand 23.02.2026),
+  dazu `docs/quellen/pollen/dwd_einstufung_belastungsintensitaeten_live.txt` (Hasel Z. 14, Birke Z. 17,
+  Gräser Z. 18) und `docs/quellen/pollen/dwd_einstufung_belastungsintensitaeten_wayback_20260223181518.txt`.
 - **[71]** Deutscher Wetterdienst, „Pollenflugstatistik“ (Zehntagesmittel des Anteils der
   Meldungen je Belastungsstufe, je Pollenart und Gebiet, 1997–2026; Daten Stiftung Deutscher
   Polleninformationsdienst), https://www.dwd.de/DE/leistungen/pollen/pollenstatistik.html
@@ -1783,8 +1891,10 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   Hrsg. Umweltbundesamt, Climate Change 20/2021, Dessau-Roßlau, Juni 2021 (sprachliche Korrekturen Oktober
   2021); Forschungskennzahl 3717 48 102 0. S. 68 mit Fußnote 7 (nur
   bestehende und umgesetzte Anpassung im Zustand ohne Anpassung; optimistischer und pessimistischer Fall;
-  Gegenwart der qualitativen Bewertung), umweltbundesamt.de/publikationen (lokal:
-  `docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf`, Druckseite 68 = PDF-Seite 69).
+  Gegenwart der qualitativen Bewertung),
+  https://www.umweltbundesamt.de/publikationen/KWRA-Teil-1-Grundlagen (Abruf 26.09.2026; Permalink
+  https://web.archive.org/web/20260311080137/https://www.umweltbundesamt.de/publikationen/KWRA-Teil-1-Grundlagen)
+  (lokal: `docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf`, Druckseite 68 = PDF-Seite 69).
 - **[74]** T. T. Hugg, J. Hjort, H. Antikainen, J. Rusanen, M. Tuokila, S. Korkonen, J. Weckström,
   M. S. Jaakkola, J. J. K. Jaakkola, „Urbanity as a determinant of exposure to grass pollen in Helsinki
   Metropolitan area, Finland“, PLoS ONE 12(10):e0186348, 2017. doi:10.1371/journal.pone.0186348 (PMC5638505),
@@ -1818,23 +1928,23 @@ bewusste Überstimmung von Eintrag 19 (Ledger-Befund 182).
 | 4 ⚠ | Gräser-Saisonende? | **konstant** (nur Sukzessions-Spreizung Fuchsschwanz→Knäuelgras) | kein Phänologie-Marker fürs Saisonende; Herbst-Verlängerung [6] bewusst nicht angesetzt | Literatur-Zuschlag für Herbst-Verlängerung | Untergrenze (§6 Grenze 1) |
 | 5 | Regionenzuschnitt? | **Bundesland → N/M/S wie #95** (`health.REGION_BY_BUNDESLAND`) | Produktkonsistenz; ΔS-Regionalstreuung gering (±20 %) | Naturraumgruppen (feiner) | einheitliche Regionslogik |
 | 6 ⚠ | Kalibrierfaktor? | **c_kal ≡ 1 — dokumentierte Ausnahme** von §3.4: keine amtliche Anker-Zeitreihe existiert [66]; Modell voll messungs-/prävalenzverankert; Sanity-Bänder ersetzen den Fit | ein Fit ohne Anker wäre Scheinkalibrierung; BT-Drs. belegt die Lücke | J30-KKR-Anker bei Integration interaktiv ziehen (Registry-Vermerk) | kein Fit-Schritt; §4-Bänder tragen die Validierung |
-| 7 ⚠ | f-Herleitung? | **Modellannahme 0,70 (0,50–0,85)**; Pfaar-r nur qualitativ; Bastl [53] geprüft — liefert die Größe nicht | behebt Kategorienfehler (Rev.-5-Befund 14) exakt entlang des Gegenprüfungs-Vorschlags | f aus PHD-Tagesdaten (Ersetzungspfad) | nur nativer Ausweis ±29 %; € unabhängig von f |
+| 7 ⚠ | f-Herleitung? | **Modellannahme 0,70 (0,50–0,85)**; Pfaar-r nur qualitativ; Bastl [53] geprüft — liefert die Größe nicht | behebt Kategorienfehler (Rev.-5-Befund 14) exakt entlang des Gegenprüfungs-Vorschlags | f aus PHD-Tagesdaten (Ersetzungspfad) | nur nativer Ausweis −28,6 % bis +21,4 %; € unabhängig von f |
 | 8 ⚠ | p_B/p_G? | **0,55/0,75 als gekennzeichnete Abschätzung** (Rangfolge-Stütze [3]); additive Saisonform als €-konservativ dokumentiert | Anteil unter AR-Patienten nicht publiziert (Befund 36a); Überlappungskorrektur würde € erhöhen (36b) | PID-/Versorgungsdaten (Ersetzungspfad) | δ ±8 % Sensitivität |
 | 9 ⚠ | Kostensatz-Basis? | **TOTALL 266,90 €₂₀₂₄ (populationsbasiert)**; Schramm nur Obergrenze/Kinder-Band | Schramm (moderate–schwer) auf alle Betroffenen = bekannte ~4-fache Überschätzung — verletzt Untergrenzen-Zusage (#95-Befund-62-Lehre); impliziter Baseline-Check §4 bestätigt | Schramm als Basis (M0-Linie; 9,1 Mrd. implizite Basis — verworfen) | € −76 % ggü. Schramm-Basis |
 | 10 ⚠ | Prävalenz-Bänder? | **u20-Ebene neu** (Zensus 10er-Klassen); 18/19 mit KiGGS-Wert (unterschätzend); 75+/85+ = 5,0 % Extrapolation (gekennzeichnet) | behebt Rev.-5-Befunde 27/35 entlang Variante (a) der Gegenprüfung | Misch-Prävalenz je Zelle ohne u20-Ebene | Alterslast korrekt verteilt |
 | 11 | Attribution? | **a_attr = 0,50 (0,19–0,84)** [9] | einzige publizierte Attribution des Saisontrends; IQR als Band | 1,0 (volle Anrechnung — nicht belegbar) | zentraler Hebel ±62 % |
-| 12 | Vegetations-Modulation? | **λ = 0,7 (0,3–1,0)** (aktualisiert Runde 2, Befund 110: wörtliche Zuwachs-Lesart der Werchan-Prozente; Verhältnis-Lesart im Band), P̂ in beiden Pfaden; Ḡ-Zentrierung §3.3 | Kette #lambda-veg reproduzierbar; Bundessumme λ-invariant — Lesart wirkt im Ausgangsstand nur verteilend (mit Maßnahme ist die Senkung proportional zu λ, Log 26) | Verhältnis-Lesart (M0): λ = 0,6 | lokale Differenzierung ±35 % |
+| 12 | Vegetations-Modulation? | **λ = 0,7 (0,3–1,0)** (aktualisiert Runde 2, Befund 110: wörtliche Zuwachs-Lesart der Werchan-Prozente; Verhältnis-Lesart im Band), P̂ in beiden Pfaden; Ḡ₀-Zentrierung §3.3 | Kette #lambda-veg reproduzierbar; Bundessumme λ-invariant — Lesart wirkt im Ausgangsstand nur verteilend (mit Maßnahme ist die Senkung proportional zu λ, Log 26) | Verhältnis-Lesart (M0): λ = 0,6 | lokale Differenzierung ±35 % |
 | 13 | Ambrosia (W024)? | **bewusst inaktiv in M0**, Modul 96-B ab M1 | Zeithorizont 2041–2060 ≠ „heute"; Teilausschnitt | sofortiges Zusatzmodul | Untergrenze |
 | 14 | E09 Trockenheit / Intensität? | **bewusst inaktiv** (Register 96-W025-03/-04) | keine quantifizierte ERF; Wirkrichtung erhöhend → konservativ | Sensitivitätsband nach Literatur | Untergrenze |
 | 15 | S158 Pollenmonitoring? | **Maßnahmen-Hebel qualitativ** (§3.5); Stadtbaumwahl als mechanischer Hebel über Ĝ quantifiziert — **durch Nr. 20 überstimmt (08.09.2026, Vorgabe P2)**: der Hebel ist jetzt abgeschätzt statt null | keine Interventions-Effektgröße publiziert (Befunde 26/34); ehrlich statt gesetzt | gesetzte Dämpfungsannahme (Rev.-5-„v_monitor" — gestrichen, Befund 32) | Hebelliste ehrlich; Wirkung bis Rev. 2 null |
 | 16 | R36 im Basiswert? | **Default 1** (nur Schicht A) | ambulantes Krankheitsbild; keine Evidenz für Distanzeffekt (§3.2) | Sensitivitätsband analog #95-β_d | Basiswert schlanker |
-| 17 ⚠ | Ḡ-Gewichtsregel (P̂-Zentrierung)? | **betroffenengewichtetes Mittel über bewohnte Zellen** (Formel §3.3; Bezugsebene in Rev. 2 durch Log 18 auf die Kommune festgelegt) | macht die Bundessumme per Konstruktion invariant gegen λ und Ĝ×pop-Korrelation (Befund 101); c_kal ≡ 1 hat keinen nachgeschalteten Fit, der eine Fehlgewichtung auffangen würde | flächen-/zellgewichtetes Mittel (Bundessumme würde mit Ĝ×pop-Korrelation driften) | Sanity-Rechnung §4 exakt; P̂ verteilt im Ausgangsstand nur um (Maßnahmen: Log 26) |
-| 18 ⚠ | Bezugsebene der P̂-Zentrierung: Bund oder Kommune? | **die eigene Kommune** — Ḡ = betroffenengewichtetes Mittel über die Zellen der betrachteten Kommune, im Lauf gebildet (kein Registry-/Bundeswert); ohne Referenz P̂ ≡ 1 | (a) **Evidenz-Reichweite**: λ stammt aus intra-urbanen Messungen (Werchan Berlin [54,55], Bogawski [56]) — sie tragen Umverteilung INNERHALB einer Stadt, nicht interkommunale Niveauunterschiede; (b) **Aufgabe §3.2 „geschlossene Betrachtungsebene"** (Fortschreibung 31.08.2026, Nutzer-Entscheid): Referenzmittel nie aus Aggregation über eine höhere Ebene; (c) ein Bundesmittel wäre nur mit einem per §3.4 unzulässigen Bundeslauf bestimmbar | Bundesmittel aus Stichprobe (Rev. 1; verworfen: Skalentransfer unbelegt + Ebenenbruch) · amtlicher Vegetations-Referenzwert (existiert nicht) | Kommunensumme jetzt EXAKT invariant gegen λ (statt näherungsweise); Vegetationsstruktur verschiebt nur INNERHALB der Kommune — interkommunal wirkt sie nicht mehr; die Wirkung ist **nullsummig umverteilend** (betroffenengewichtet erwartungstreu), NICHT „konservativ" im Sinne einer Unterschätzung (§3.3(3), Modellgrenze 7); gilt für den Ausgangsstand, Maßnahmen werden am festgehaltenen Ḡ₀ gemessen (Log 26) |
+| 17 ⚠ | Ḡ₀-Gewichtsregel (P̂-Zentrierung)? | **betroffenengewichtetes Mittel über bewohnte Zellen** (Formel §3.3; Bezugsebene in Rev. 2 durch Log 18 auf die Kommune festgelegt) | macht die Bundessumme per Konstruktion invariant gegen λ und Ĝ×pop-Korrelation (Befund 101); c_kal ≡ 1 hat keinen nachgeschalteten Fit, der eine Fehlgewichtung auffangen würde | flächen-/zellgewichtetes Mittel (Bundessumme würde mit Ĝ×pop-Korrelation driften) | Sanity-Rechnung §4 exakt; P̂ verteilt im Ausgangsstand nur um (Maßnahmen: Log 26) |
+| 18 ⚠ | Bezugsebene der P̂-Zentrierung: Bund oder Kommune? | **die eigene Kommune** — Ḡ₀ = betroffenengewichtetes Mittel über die Zellen der betrachteten Kommune, im Lauf gebildet (kein Registry-/Bundeswert); ohne Referenz P̂ ≡ 1 | (a) **Evidenz-Reichweite**: λ stammt aus intra-urbanen Messungen (Werchan Berlin [54,55], Bogawski [56]) — sie tragen Umverteilung INNERHALB einer Stadt, nicht interkommunale Niveauunterschiede; (b) **Aufgabe §3.2 „geschlossene Betrachtungsebene"** (Fortschreibung 31.08.2026, Nutzer-Entscheid): Referenzmittel nie aus Aggregation über eine höhere Ebene; (c) ein Bundesmittel wäre nur mit einem per §3.4 unzulässigen Bundeslauf bestimmbar | Bundesmittel aus Stichprobe (Rev. 1; verworfen: Skalentransfer unbelegt + Ebenenbruch) · amtlicher Vegetations-Referenzwert (existiert nicht) | Kommunensumme jetzt EXAKT invariant gegen λ (statt näherungsweise); Vegetationsstruktur verschiebt nur INNERHALB der Kommune — interkommunal wirkt sie nicht mehr; die Wirkung ist **nullsummig umverteilend** (betroffenengewichtet erwartungstreu), NICHT „konservativ" im Sinne einer Unterschätzung (§3.3(3), Modellgrenze 7); gilt für den Ausgangsstand, Maßnahmen werden am festgehaltenen Ḡ₀ gemessen (Log 26) |
 | 19 ⚠ | Ḡ-Fixierung (Befund 113) unter der kommunalen Zentrierung? | **Verworfen durch Log 26 (26.09.2026), weil ein in jedem Lauf neu gebildetes Ḡ jede Senkung durch eine Maßnahme aufhebt und damit die Nullwirkung setzt, die Vorgabe P2 ausschließt.** Ursprüngliche Entscheidung: **kein Pinning** — Ḡ wird in jedem Lauf aus dem aktuellen Vegetationszustand der Kommune gebildet; der flächige Niveaueffekt bleibt bewusst unbuchbar (§5, Modellgrenze 7) | Ein eingefrorener Referenzwert würde einem flächigen Programm einen Niveaueffekt zubuchen, den die λ-Evidenz (intra-urbane Gradienten) nicht trägt — Befund 113 war an das Bundesmittel gebunden und ist mit der kommunalen Zentrierung keine Fixierungs-, sondern eine Evidenzfrage; die Produktmechanik (measure_service skaliert gespeicherte Outcomes) ist KEIN Beleg, sondern begründet die Integrationsauflage: keine pauschal verknüpfte Maßnahme, sonst würde genau der unbelegte Niveaueffekt gebucht (Befund 124/129; Test test_no_flat_measure_on_allergy_days) | Baseline-Pinning je Kommune (verworfen: bucht unbelegten Niveaueffekt) · Emissions-/Ausbreitungsmodell (Ersetzungspfad §6, Datenlage fehlt) | Maßnahme wirkt als Umverteilung (gezielte Hotspot-Entschärfung), nicht als flächiger Niveauhebel |
 | 20 ⚠ | S158-Hebel: „qualitativ" (Wirkung null) beibehalten oder abschätzen? | **Abschätzung statt Nullwirkung** — \(r_{\text{S158}}\) = 0,03 (Band 0,005–0,10), Dreifaktor-Kette §5.1, §3.9 ABGESCHÄTZT; Wirkungsort multiplikativ auf ΔTage (Maßnahmen-Modul), Bauform-Grenze als Modellgrenze 8 dokumentiert; Katalogwert `default_reduction` bleibt in diesem Schritt 0,0 (Code-Nachzug L2 nach der P1-Kennzeichnung) | **Vorgabe P2 des Aufsichtsrats (F-0007 Punkt 1)** und Aufgabe §3.5 i. d. F. 06.09.2026: Ein Hebel ohne publizierte Effektgröße läuft nicht mehr als „qualitativ" mit Wirkung null; das Fehlen der Studie ist der Anlass der Abschätzung, nicht ihr Ersatz. Bewusste Überstimmung von Log 15 (Ledger-Befund 151) | Log 15 beibehalten (verworfen: widerspricht P2) · Effektzahl aus fremder Domäne übertragen, z. B. Hitzewarn-Effekt aus #95 (verworfen: Kategorienfehler §3.9 — anderer Endpunkt, andere Handlungskette) | Maßnahmen-Ausweis ≈ 3 % des K1-Werts (bundesweit ≈ 3,3 Mio. €/a; Band 0,55–11,0); Schadenswert selbst unverändert; Befund-124-Sperre (linked_risk_codes leer) bleibt bestehen |
 | 21 | Kapitel 9 (Familien-Einordnung und Verworfen-Liste) nach Fortschreibung 7? | **gestrichen**; es bleibt genau eine Methodik (96-A, Familie „K1-Gesundheit bottom-up“ mit Prototyp #95), die verworfenen Ansätze stehen hier | **96-B (Neophyten-Szenario Ambrosia; Lake [23], Born [25], Hamaoui [24])** ersetzt 96-A nicht, weil es nur eine Art abbildet, Birke und Gräser als Hauptlast fehlen und es 2041–2060 statt heute projiziert (Ergänzungsmodul ab M1, Register 96-W024-02, Log 13). **96-C (nationaler Kostenanker, top-down)** ist nach §3.1 ausgeschieden, weil er einen Verteilschlüssel mit Deutschland-Nenner und einen normativ gesetzten Klimaanteil braucht. | Kapitel 9 behalten (verworfen: Fortschreibung 7, eine Methodik je Risiko; Ledger-Befund 152) | keine Zahlenwirkung |
 | 22 | Quelle von u20 für die Beispielkommune Berlin in der Rechenkette? | **Direkt aus Tab. 12411-09-01-4-B [68]**: u20 = unter 5 + 5–10 + 10–15 + 15–20 = 673.277, 20–64 = u65 − u20 = 2.288.153; die Zahlen nach Altersjahren stehen gleichlautend in Destatis Tab. 12411-09 [69] | Die Tabelle, aus der Ebene 1 schon u65 und die Seniorenbänder nimmt, führt die vier Gruppen selbst: gleicher Stichtag, gleiche Basis Zensus 2022, und ein Sachbearbeiter, der [68] öffnet, kommt auf dieselbe Zahl. | Anteil u20 aus dem Berliner Landesbericht A I 3 – j / 23 (verworfen: noch auf Basis Zensus 2011, 3.070.537 statt 2.961.430 unter 65-Jährige, Mischung zweier Basen; Runde 0 des Managers) · Bundesanteil 24,07 % (Rückfall des Produkts; für Berlin 1.737 Betroffene oder 0,43 % zu wenig) | u20 673.277 statt 677.877 im ersten Entwurf; Betroffene 402.103, Tage 755.753, bewerteter Schaden 4,69 Mio. € je Jahr (§3.0) |
 | 23 ⚠ | S158: an welchen Tagen und ab welcher Belastung wirkt die Warnung, und gilt \(e_{\text{Tag}}\) je gewarntem Tag? | **Nur an gewarnten Tagen:** DWD-Pollenflug-Gefahrenindex mindestens „mittel“ [70], je Pollengruppe; Anteil gewarnter Symptom-Zusatztage \(t_{\text{warn}}\) = 0,75 (0,50–1,00, §3.9 ABGESCHÄTZT; eigenes Zeichen, weil \(w_B\) das Ĝ-Gewicht ist; Ersetzungspfad \(\min(1;\ m_{g,V}/f)\), nie \(m_{g,V}\) direkt); \(r_{\text{S158}}\) = 0,03 gilt je gewarntem Tag, Formel zellscharf im Zelllauf mit Geltungsbereich \(A_{\text{Zelle}}\) (§5.1) | Die Anker von \(e_{\text{Tag}}\) beschreiben die Minderung an einem Tag, an dem gehandelt wird, also an einem gewarnten Tag; Rev. 3 hat sie auf alle Zusatztage gerechnet und damit \(t_{\text{warn}} = 1\) unterstellt. Befund 124 verbietet eine Wirkung auf alle Tage pauschal. Mit der Tagesauswahl wirkt jede Größe genau einmal (Tage, Menschen, Tageswirkung) | \(e_{\text{Tag}}\) als Mittel über alle Zusatztage lesen und \(t_{\text{warn}}\) weglassen (verworfen: widerspricht den eigenen Ankern, Befund 124 bliebe verletzt) · \(e_{\text{Tag}}\) durch \(t_{\text{warn}}\) teilen, damit der wirksame Wert gleich bleibt (verworfen: hebt die Wirkung am gewarnten Tag ohne Beleg an) · Schwelle „hoch“ (verworfen als Basiswert: steckt im unteren Band von \(t_{\text{warn}}\)) · DWD-Anteil aller Tage \(m_{g,V}\) direkt einsetzen (verworfen: wählt die Tage über \(f\) und \(m\) zweimal aus und verdünnt um den Faktor \(f\); Befund 162) | wirksamer Wert über alle Zusatztage 0,03 → 0,03 × 0,75 = 0,0225 (0,028 ist nur das Kettenprodukt vor dem Runden); heute zahlengleich mit einem Faktor 0,0225 auf die Zusatztage im Geltungsbereich, geändert ist der Wert, nicht die Verteilung; Berlin 17.004 statt 22.673 vermiedene Tage, ≈ 105.400 statt ≈ 140.600 € je Jahr; Kapitel 7: `pollen.r_s158` unverändert, `pollen.t_warn_s158` neu; Ledger-Befunde 156, 157, 161, 162, 163, 165, 167 (DWD-Gebiet \(V\) statt \(R\)) |
-| 24 | Allergenarme Stadtbaumwahl: Wirkung abschätzen oder verwerfen (P2)? | (Die Aussagen zur gleichbleibenden Kommunensumme sind durch Log 26 überholt: Mit festgehaltenem Ḡ₀ sinkt die Summe, Rechenbeispiel §5.) **Abschätzen, zellscharf über \(\hat G\):** −0,14 auf \(\hat P\) je Senkung von \(\hat G/\bar G\) um 0,2 (Band 0,06–0,20 über λ); Berliner Allee-Zelle mit 100 Betroffenen −26,3 Tage und ≈ 163 € je Jahr (Band −11,3 bis −37,6 Tage); die gleichbleibende Kommunensumme ist Modellgrenze der Abschätzung (Modellgrenze 7) | P2 geht Methodik-Regeln vor; die Wirkung je Zelle ist mechanisch aus \(\hat P\) ableitbar und im Bericht mit Zahl, Band und Sensitivität abgeschätzt; die gleichbleibende Kommunensumme folgt aus der Zentrierung und ist keine gesetzte Null. Im Produkt ist die Wirkung heute nicht sichtbar (Sperre aus Befund 124, keine Katalogmaßnahme); sichtbar wird sie über die Integrationsauflage (Stadtbaumwahl) in §5. Die Kommunensumme ist per Zentrierung invariant (Log 18/19), und ein Niveaueffekt ist unbelegt und durch Befund 124 gesperrt | mit einem Satz verwerfen (verworfen: die Wirkung je Zelle ist ableitbar, eine Verwerfung ließe sie ohne Zahl) · Niveaueffekt für die Kommune schätzen (verworfen: λ-Evidenz intra-urban, Modellgrenze 7, Befund 124) | keine Wirkung auf den Schadenswert; der Satz, die Umverteilung senke den kommunalen Ausweis, ist ersetzt (Ledger-Befund 158); die P2-Begründung stützt sich nicht mehr auf eine Produktanzeige (Ledger-Befund 164) |
+| 24 | Allergenarme Stadtbaumwahl: Wirkung abschätzen oder verwerfen (P2)? | (Die Aussagen zur gleichbleibenden Kommunensumme sind durch Log 26 überholt: Mit festgehaltenem Ḡ₀ sinkt die Summe, Rechenbeispiel §5.) **Abschätzen, zellscharf über \(\hat G\):** −0,14 auf \(\hat P\) je Senkung von \(\hat G/\bar G_0\) um 0,2 (Band 0,06–0,20 über λ; Eingabe ist die Änderung des Kronenanteils, abgezogen im Term, in dem die Kronen im Ausgangsstand stehen, Kronen ohne Gattungs-Tag nur mit 0,12, Befunde 186, 195); Berliner Allee-Zelle mit 100 Betroffenen −26,3 Tage und ≈ 163 € je Jahr (Band −11,3 bis −37,6 Tage); ursprünglich war die gleichbleibende Kommunensumme als Modellgrenze der Abschätzung gesetzt, seit Log 26 senkt die Maßnahme die Summe (Modellgrenze 7) | P2 geht Methodik-Regeln vor; die Wirkung je Zelle ist mechanisch aus \(\hat P\) ableitbar und im Bericht mit Zahl, Band und Sensitivität abgeschätzt; die Summe der Kommune sinkt am festgehaltenen Ḡ₀ mit (Log 26), eine Nullwirkung ist nicht gesetzt. Im Produkt ist die Wirkung heute nicht sichtbar (Sperre aus Befund 124, keine Katalogmaßnahme); sichtbar wird sie über die Integrationsauflage (Stadtbaumwahl) in §5. Die ursprüngliche Begründung (Summe der Kommune per Zentrierung gleichbleibend nach Log 18/19, flächige Wirkung gesperrt) ist durch Log 26 überholt; Befund 124 sperrt nur den pauschalen Faktor, gerechnet wird im Zelllauf über Ĝ′ | mit einem Satz verwerfen (verworfen: die Wirkung je Zelle ist ableitbar, eine Verwerfung ließe sie ohne Zahl) · eigenen Parameter für eine flächige Wirkung schätzen (ursprünglich verworfen mit der λ-Evidenz aus Messungen innerhalb einer Stadt; seit Log 26 läuft die flächige Wirkung über λ am festgehaltenen Ḡ₀, ein zweiter Parameter bleibt verworfen, Log 26) | keine Wirkung auf den Schadenswert im Ausgangsstand, mit Maßnahme sinkt er (Log 26); der Satz, die Umverteilung senke den kommunalen Ausweis, ist ersetzt (Ledger-Befund 158); die P2-Begründung stützt sich nicht mehr auf eine Produktanzeige (Ledger-Befund 164) |
 | 25 | Kennzeichnung der Parameter-Blöcke (Aufgabe §4): welcher Wert je Block, und wo trägt ein Block ein Feld `rolle`? | **13 von 13 gekennzeichnet:** `quelle` für \(\Delta S\), \(a_{\text{attr}}\), \(p_{\text{AR}}\), \(c_{\text{jahr}}\); `abschaetzung_kap3` für \(p_B/p_G\), \(L\), \(f\), \(\lambda\), \(s_{\text{unbek}}\), \(r_{\text{S158}}\), \(t_{\text{warn}}\) (Herleitung je Block im Kommentar); `berechnet` für \(d_{\text{Saison}}\) (aus f, p_sens, L) und \(c_{\text{Tag}}\) (aus c_jahr, d_Saison); **kein** Feld `rolle` | \(\Delta S\) ist eine amtliche Messreihe, die Anlage [67] nur auswertet; \(p_{\text{AR}}\) folgt je Band einer Quelle, die Extrapolation 80+ ist in §3.2 gekennzeichnet; \(c_{\text{jahr}}\) ist der Quellwert, nur im Preisstand umgerechnet. Von den vier Rollen nach §4 trifft keine zu: \(s_{\text{unbek}}\) geht in jedem Lauf in \(\hat G\) ein und ist damit ein gewöhnlicher Rechenparameter, keine Sensitivitätsgröße; eine Rolle „abschaetzung“ kennt §4 nicht, die Abschätzung trägt \(r_{\text{S158}}\) schon in `kennzeichnung` | \(s_{\text{unbek}}\) mit `rolle: sensitivitaet` (verworfen: sagte, der Wert diene nur der Sensitivität) · \(r_{\text{S158}}\) mit `rolle: abschaetzung` (verworfen: kein zulässiger Wert nach §4) · \(p_{\text{AR}}\) als `abschaetzung_kap3` (verworfen: vier von fünf Bändern tragen einen Quellwert; die Extrapolation ist am Band gekennzeichnet) | keine Wirkung auf Zahlen; kein `wert:` in Kapitel 7 geändert; Ledger-Befund 173 |
-| 26 ⚠ | Bezugswert der Zentrierung bei Maßnahmen: Ḡ in jedem Lauf neu bilden (Log 19) oder im Ausgangsstand festhalten? | **Festhalten (Weg (a), Festlegung CMO in T-1323):** Ḡ₀ = betroffenengewichtetes Mittel über die bewohnten Zellen der eigenen Kommune im Ausgangsstand ohne die bewerteten Maßnahmen, im Ausgangsszenario gebildet und für jedes Maßnahmenszenario festgehalten; Formel bleibt \(\hat P = 1 + \lambda(\hat G/\bar G_0 - 1)\) (§3.3). Im Ausgangsstand gilt weiter \(\sum B\hat P = \sum B\) exakt; mit Maßnahme sinkt die Summe um \(\lambda \cdot \sum B(\hat G - \hat G')/\bar G_0\) (Rechenbeispiel §5: 15.036 → 12.495 Tage, −2.541 Tage, ≈ 15.750 € je Jahr) | (1) **Vorgabe P2:** Ein in jedem Lauf neu gebildetes Ḡ hebt jede Senkung genau auf (Rechenbeispiel §5: Summe bliebe 8.000); weniger Quellbäume hießen dann nicht weniger Pollen — das wäre eine gesetzte Nullwirkung. (2) **Einwand aus Log 19 beantwortet:** Log 19 sah die λ-Evidenz nur für Gradienten innerhalb einer Stadt. Eine Maßnahme wird mit dem Ausgangsstand derselben Kommune verglichen, also innerhalb einer Stadt. Die Lesart von λ als Anteil der örtlichen Quellen an der Pollenlast einer Zelle (1 − λ = regionaler Hintergrund) belegt Hugg 2017 [74], Tabelle 3: städtischste gegenüber allen acht Messstellen, λ = 1 − Hintergrund ÷ Mittel = 0,56 und 0,22 (Helsinki, vormittags/nachmittags), 0,86 und 0,94 (Espoo); drei von vier Werten im Band 0,3–1,0; Conclusions: „The local sources, such as unmanaged open lands, may substantially contribute to pollen exposure.“ (3) Log 17 und 18 bleiben: Gewichtsregel und Bezugsebene Kommune; zwischen Kommunen wirkt die Vegetation weiter nicht. (4) Befunde 124 und 129 bleiben: keine pauschal verknüpfte Maßnahme, gerechnet wird im Zelllauf | Ḡ in jedem Lauf neu (Log 19; verworfen: Nullwirkung, P2) · Summe gleich lassen, Wirkung nur je Zelle (Weg (b); verworfen vom CMO: weniger Quellbäume heißt weniger Pollen) · zweiter Parameter für den Niveaueffekt (verworfen: die Quelle liegt im Band von λ, T-1323 Punkt 1) | Basiswert (Ausgangsstand) unverändert, kein `wert:` in Kapitel 7 geändert; Stadtbaumwahl senkt jetzt die Kommunensumme; Richtung des Fehlers in λ: Modellgrenze 7 (Bezugsstelle in der Stadt → λ unterzeichnet eher; Gräser statt Birke → λ überzeichnet für Bäume eher; nicht bestimmbar, welche überwiegt); Log 19 verworfen; Ledger-Befund 182 |
+| 26 ⚠ | Bezugswert der Zentrierung bei Maßnahmen: Ḡ in jedem Lauf neu bilden (Log 19) oder im Ausgangsstand festhalten? | **Festhalten (Weg (a), Festlegung CMO in T-1323):** Ḡ₀ = betroffenengewichtetes Mittel über die bewohnten Zellen der eigenen Kommune im Ausgangsstand ohne die bewerteten Maßnahmen, im Ausgangsszenario gebildet und für jedes Maßnahmenszenario festgehalten; Formel bleibt \(\hat P = 1 + \lambda(\hat G/\bar G_0 - 1)\) (§3.3). Im Ausgangsstand gilt weiter \(\sum B\hat P = \sum B\) exakt; mit Maßnahme sinkt die Summe um \(\lambda \cdot \sum B(\hat G - \hat G')/\bar G_0\) (Rechenbeispiel §5: 15.036 → 13.857 Tage, −1.179 Tage, ≈ 7.310 € je Jahr; Eingabe ist die Änderung des Kronenanteils, abgezogen im Term, in dem die Kronen im Ausgangsstand stehen, Kronen ohne Gattungs-Tag nur mit 0,12, Befunde 186, 195) | (1) **Vorgabe P2:** Ein in jedem Lauf neu gebildetes Ḡ hebt jede Senkung genau auf (Rechenbeispiel §5: Summe bliebe 8.000); weniger Quellbäume hießen dann nicht weniger Pollen — das wäre eine gesetzte Nullwirkung. (2) **Einwand aus Log 19 beantwortet:** Log 19 sah die λ-Evidenz nur für Gradienten innerhalb einer Stadt. Eine Maßnahme wird mit dem Ausgangsstand derselben Kommune verglichen, also innerhalb einer Stadt. Die Lesart von λ als Anteil der örtlichen Quellen an der Pollenlast einer Zelle (1 − λ = regionaler Hintergrund) belegt Hugg 2017 [74], Tabelle 3: städtischste gegenüber allen acht Messstellen, λ = 1 − Hintergrund ÷ Mittel = 0,56 und 0,22 (Helsinki, vormittags/nachmittags), 0,86 und 0,94 (Espoo); drei von vier Werten im Band 0,3–1,0; Conclusions: „The local sources, such as unmanaged open lands, may substantially contribute to pollen exposure.“ (3) Log 17 und 18 bleiben: Gewichtsregel und Bezugsebene Kommune; zwischen Kommunen wirkt die Vegetation weiter nicht. (4) Befunde 124 und 129 bleiben: keine pauschal verknüpfte Maßnahme, gerechnet wird im Zelllauf | Ḡ in jedem Lauf neu (Log 19; verworfen: Nullwirkung, P2) · Summe gleich lassen, Wirkung nur je Zelle (Weg (b); verworfen vom CMO: weniger Quellbäume heißt weniger Pollen) · zweiter Parameter für den Niveaueffekt (verworfen: die Quelle liegt im Band von λ, T-1323 Punkt 1) | Basiswert (Ausgangsstand) unverändert, kein `wert:` in Kapitel 7 geändert; Stadtbaumwahl senkt jetzt die Kommunensumme; Richtung des Fehlers in λ: Modellgrenze 7 (Bezugsstelle in der Stadt → λ unterzeichnet eher; Gräser statt Birke → λ überzeichnet für Bäume eher; nicht bestimmbar, welche überwiegt); Log 19 verworfen; Ledger-Befund 182 |
