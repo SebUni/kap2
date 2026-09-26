@@ -894,3 +894,37 @@ endet bei mdpi.com und europepmc.org mit HTTP 403; die Fundstellen bleiben Tabel
 | 135 | §5 Hebel Schutzprogramme („vorerst die rohe Lesart … dem methodik_manager als Befund 134 vorgelegt“), Log 43 („über den Zentralwert entscheidet der methodik_manager“), Register 95-S152-03 („Entscheidung beim methodik_manager“) | Widerspruch zu P3/E3 | Die Kundenfassung stellt zwei Lesarten mit zwei Beträgen nebeneinander und nennt eine offene Entscheidung. Das ist nicht genau eine Methodik | Mit 134 auflösen. Die Hinweise auf den Arbeitsablauf fallen weg | B | `! grep -qE 'vorerst die rohe\|entscheidet der methodik_manager\|dem methodik_manager als Befund' docs/methodik/95_hitzebelastung.md && ! grep -qF 'Entscheidung beim methodik_manager' docs/evidenz/register.md` | behoben (T-1333): §5, Log 43 und Register nennen eine Lesart mit einem Betrag (11,7 Mio. €); die rohe Lesart steht nur noch als Obergrenze des Bands und in Log 43 als verworfene Variante |
 | 128 | §5 Herleitung \(\delta_{\text{VG}}\), Block `heat.delta_vg`, Register 95-S152-03 | Fortschreibung des Prüfausdrucks (Befund 134) | Der Ausdruck aus Runde 25 prüft `wert: 0.864`; nach Befund 134 steht im Block 0.931. Die Fundstellen aus [70] (4.720, 72,8 %, Tabelle 1) bleiben | Ausdruck aus Runde 25 mit `wert: 0.931` statt `wert: 0.864` | B | `grep -qF 'wert: 0.931' docs/methodik/95_hitzebelastung.md && grep -qF '4.720' docs/methodik/95_hitzebelastung.md && grep -qF '72,8 %' docs/evidenz/register.md && grep -qF 'Tabelle 1' docs/evidenz/register.md` | behoben, Prüfausdruck fortgeschrieben in Runde 29 wegen Befund 134 (T-1333): Einschreibeanteil 0,728 aus [70] bleibt, \(\delta_{\text{VG}}\) jetzt 0,931 |
 | 131 | §5 Hebel Schutzprogramme (Morbidität), Kapitel 7 `heat.delta_vg_morb`, Zeichentabelle | Fortschreibung des Prüfausdrucks (Befund 134) | Der Ausdruck aus Runde 27 prüft `band: [0.864, 1.136]`; nach Befund 134 ist das Band 0,931–1,069 (unten wie \(\delta_{\text{VG}}\), oben 1 + 0,20 × 0,34) | Ausdruck aus Runde 27 mit `band: [0.931, 1.069]` statt `band: [0.864, 1.136]` | B | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); k=s[s.index('## 7 '):s.index('## 8 ')].split('parameter:'); f=[x for x in k if 'id: heat.delta_vg_morb' in x]; sys.exit(not (len(f) == 1 and 'wert: 1.0' in f[0] and 'band: [0.931, 1.069]' in f[0] and 'kennzeichnung: abschaetzung_kap3' in f[0] and 'keine Wirkung angesetzt' not in s and 'VG,morb' in s))"` | behoben, Prüfausdruck fortgeschrieben in Runde 29 wegen Befund 134 (T-1333): Zentralwert 1,0 bleibt, Band 0,931–1,069, Berlin ± 0,02 Mio. € |
+
+## Runde 30 — Gegenprüfung nach Befund 134 und 135 (frische Sitzung, 26.09.2026): Null-Runde
+
+Nachweis: Firmen-Repo, `tickets/T-1333-methodik_manager.md`, Abschnitt „Urteil“, Eintrag „2026-09-26T07:58:46Z ·
+Runde 0 · methodik_manager (opus/high)“:
+
+**Urteil:** freigabe
+
+Das Urteil schließt mit den eigenen Zeilen:
+
+VERDIKT: NULL-RUNDE
+
+MANAGER-REVIEW: ABGENOMMEN
+
+Die Gegenprüfung nach §5 in frischer Sitzung ist zugleich die fachliche Abnahme. Geprüft hat sie die Arbeit aus Runde 29
+(Befunde 134 und 135, fortgeschriebene Prüfausdrücke 128 und 131) als Re-Review des Diffs 27a98a4f..HEAD nach LF 5, 7
+und 11; die volle Runde nach den Leitfragen lief im Urteil zu T-1329 vom 26.09.2026, 07:04:00Z. Maschinell: Lint „ALLE
+LINTS GRÜN“ (252 Checks), Ledger-Gate „GRÜN“. „Runde 0“ ist die Zählung im Ticket, im Ledger ist es Runde 30, die Runde
+nach Runde 29. Nach A-0046 ist sie die siebte Runde seit der Null-Runde 23 (Runden 24–30); die Zählung endet hier, die
+Grenze Runde 33 ist nicht erreicht. Merge des Pakets nach `main`: Commit 6ac0e9c8. Neue Befunde: keine.
+
+Zurückgestellt, jeweils mit Code-Nachzug beim cto, ohne neue Befundzeile:
+- Befund 116: Ersatzregel für den geheimgehaltenen Anteil 65+ in `backend/app/services/zensus_loader.py` (Log 41,
+  Fassung T-1233); das ist kein A-Befund.
+- Registry-Parameter ohne Block, die der Bericht nicht löst: `risks.EXPECTED_ANNUAL_MORTALITY.ref_value` (145 YLL je
+  100.000 EW) und `risks.EXPECTED_ANNUAL_MORBIDITY.ref_value` (4,5 Fälle je 100.000 EW). Beide sind Bezugswert der
+  Index-Anzeige und Anker der Plausibilitätsprüfung, keine Rechenparameter der Schadensfunktion; am Jahresbetrag ändern
+  sie nichts. Der Bericht führt sie nicht, die Registry zeigt sie als „belegt“, obwohl der Anker 18 Todesfälle je
+  100.000 EW (etwa 1,7 × das schlimmste beobachtete Jahr) eine Setzung ist. Code-Nachzug: Kennzeichnung als
+  Abschätzung von KAP3 mit Herleitung als Datenfeld (P1) in `backend/app/data/catalog.py`.
+
+Die Befunde 99 und 100, in Runde 15 noch zurückgestellt, sind seit Runde 19 geschlossen (99 entschieden vom
+methodik_manager, 100 behoben in T-1233). Eingetragen mit T-1334-methodik_manager; am Bericht ändert sich nur die
+Statuszeile (ABNAHMEREIF, abgenommen am 26.09.2026, `MANAGER-REVIEW: ABGENOMMEN`).
