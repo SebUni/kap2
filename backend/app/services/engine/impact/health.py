@@ -274,6 +274,7 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
     bands = _age_bands(ctx)
 
     deaths = 0.0
+    deaths_85p = 0.0
     yll = 0.0
     for band in AGE_BANDS:
         pop_a = bands.get(band, 0.0)
@@ -285,16 +286,53 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
         d_a = (calib * _v_vers(ctx, code, band) * pop_a
                * (m_a / 100_000.0) * (1.0 / 52.0) * excess)
         deaths += d_a
+        if band == "a85p":
+            deaths_85p = d_a
         yll += d_a * ctx.p(code, f"life_years_{band}", AGE_LIFE_YEARS[band])
 
     if beta_d > 0.0 and dist_km > 0.0:
         factor = 1.0 + beta_d * dist_km
         deaths *= factor
+        deaths_85p *= factor
         yll *= factor
 
     out = _result(risk, yll)
     out["deaths"] = max(0.0, deaths)
+    # Teil-Ausweis D_85+ — Andockpunkt des Hebels S157 (Bericht #95 §5).
+    out["deaths_a85p"] = max(0.0, deaths_85p)
     return out
+
+
+# ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5, Befunde 122, 124, 130) ──
+
+def h_heim(qbar_pfl: float = 0.149, beta_pfl: float = 1.54) -> float:
+    """Anteil der Heimbewohner an den Todesfällen 85+ (Bericht #95 §3.0/§5).
+
+    ``h_Heim = q̄_pfl · [1 + β_pfl · (1 − q̄_pfl)]`` = 0,344 mit den Basiswerten.
+    """
+    return qbar_pfl * (1.0 + beta_pfl * (1.0 - qbar_pfl))
+
+
+# g_S157 = (rOR · OR_ohne − 1)/(OR_ohne − 1) mit rOR 0,93 und OR_ohne 1,11 [46],
+# ungerundet 0,2936 wie im Beispiel-Block s157_berlin (Block heat.g_s157: 0,29).
+# Muss mit dem Registry-Spec g_s157 in impact/params.py übereinstimmen.
+G_S157: float = (0.93 * 1.11 - 1.0) / (1.11 - 1.0)
+
+
+def s157_avoided_deaths(d85: float, s_gek: float | None, g_s157: float = G_S157,
+                        qbar_pfl: float = 0.149, beta_pfl: float = 1.54) -> float | None:
+    """Vermiedene Todesfälle 85+ durch gekühlte Heimplätze (Bericht #95 §5).
+
+    ``ΔD_S157 = D_85+ · h_Heim · s_gek · (1 − g_S157)``
+
+    ``s_gek`` ist der gekühlte Anteil der Heimplätze, eine Eingabe der Kommune.
+    Der Bericht trägt dafür keine Voreinstellung: Fehlt die Eingabe (None),
+    entsteht **kein Betrag** — auch keine 0 (Rückgabe None).
+    """
+    if s_gek is None:
+        return None
+    s = max(0.0, min(1.0, float(s_gek)))
+    return max(0.0, d85) * h_heim(qbar_pfl, beta_pfl) * s * (1.0 - g_s157)
 
 
 # ── 2. Hitzemorbidität (Bericht #95 §3.4 — Einweisungen) ──────────────────────

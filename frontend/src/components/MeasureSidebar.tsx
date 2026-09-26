@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useStore } from '../store'
 import InfoTooltip from './InfoTooltip'
 import type { MeasureImpactSummary } from '../types'
+import { measureReductionText } from '../utils/measureEffect'
 
 export default function MeasureSidebar() {
   const { selectedMeasure, setSelectedMeasure, calculateImpact, deleteMeasure, updateMeasure, catalog } = useStore()
@@ -10,6 +11,8 @@ export default function MeasureSidebar() {
   const [editName, setEditName] = useState('')
   const [editYear, setEditYear] = useState<number>(2026)
   const [editCount, setEditCount] = useState<number | null>(null)
+  // S157 (#95 §5): gekühlter Anteil der Heimplätze in Prozent; null = keine Eingabe.
+  const [editSgek, setEditSgek] = useState<number | null>(null)
   const [showBreakdown, setShowBreakdown] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -19,6 +22,8 @@ export default function MeasureSidebar() {
       setEditName(selectedMeasure.name)
       setEditYear(selectedMeasure.implementation_year || 2026)
       setEditCount(null)
+      const sg = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.s_gek
+      setEditSgek(typeof sg === 'number' ? Math.round(sg * 1000) / 10 : null)
       setShowBreakdown(false)
       setDirty(false)
       setImpact(null)
@@ -38,6 +43,7 @@ export default function MeasureSidebar() {
   if (!selectedMeasure) return null
 
   const def = catalog?.measures.find(m => m.code === selectedMeasure.measure_type)
+  const isS157 = selectedMeasure.measure_type === 'COOLING_ROOMS_DRINKING_WATER'
   const reductionIsEstimated = def?.evidence_classes?.default_reduction === 'abgeschaetzt'
   const linkedRisks = (def?.linked_risk_codes || [])
     .map(c => catalog?.risks.find(r => r.code === c)?.name || c)
@@ -55,6 +61,12 @@ export default function MeasureSidebar() {
       const payload: Record<string, unknown> = { name: editName, implementation_year: editYear }
       if (impact?.unit_label != null && editCount != null) {
         payload.config = { ...(selectedMeasure.config || {}), count: editCount }
+      }
+      if (isS157) {
+        const base = { ...((payload.config as Record<string, unknown>) || selectedMeasure.config || {}) }
+        if (editSgek == null) delete base.s_gek
+        else base.s_gek = Math.max(0, Math.min(100, editSgek)) / 100
+        payload.config = base
       }
       const updated = await updateMeasure(selectedMeasure.id, payload)
       setSelectedMeasure(updated)
@@ -92,7 +104,7 @@ export default function MeasureSidebar() {
           Typ
           {def && <InfoTooltip title={def.name} description={def.description} rows={[
             { label: 'Wirkt auf', value: def.effect_target.join(', ') },
-            { label: 'Minderung', value: `${Math.round((def.default_reduction || 0) * 100)} %` },
+            { label: 'Minderung', value: measureReductionText(def) },
           ]} />}
         </h3>
         <div className="value" style={{ fontSize: '1rem' }}>{def?.name || selectedMeasure.measure_type}</div>
@@ -169,6 +181,22 @@ export default function MeasureSidebar() {
               />
               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
                 Richtwert: {impact.recommended_count}
+              </div>
+            </div>
+          )}
+
+          {isS157 && (
+            <div className="card">
+              <h3>Gekühlter Anteil der Heimplätze (%)</h3>
+              <input
+                type="number" min={0} max={100} step={1} value={editSgek ?? ''}
+                placeholder="nicht eingegeben"
+                onChange={e => { setEditSgek(e.target.value === '' ? null : Number(e.target.value)); setDirty(true) }}
+                style={{ fontSize: '0.9rem', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 6px', width: 120, background: 'var(--surface)' }}
+              />
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                Nur Heimplätze mit Klimaanlage im Wohnbereich zählen. Ohne Eingabe entsteht kein Betrag
+                (Methodik-Bericht #95, Hebel S157).
               </div>
             </div>
           )}

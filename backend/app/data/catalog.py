@@ -1864,6 +1864,68 @@ MEASURES: list[dict] = [
     # Presseberichte (Berliner Zeitung/Tagesspiegel 2026): 12.000-15.000 €/Brunnen.
     # Herleitung opex_per_unit_year: Betrieb/Wartung/Beprobung ~2,5-5 T€/a → 3.500 €.
     # Presseberichte nennen ~4.500 €/a für Wartung/Beprobung (innerhalb der Spanne).
+    {"code": "COOLING_ROOMS_DRINKING_WATER", "name": "Kühle Räume / Kühlzentren",
+     "description": "Gekühlte Heimplätze (Klimaanlagen in Pflegeheimen, Hebel S157 aus Bericht #95 §5). Wirkung: g_S157 auf die Todesfälle 85+ der Heimbewohner im gekühlten Anteil s_gek der Heimplätze, den die Kommune eingibt; ohne Eingabe kein Betrag.",
+     "measure_type": "structural",
+     # Hebel S157 (Bericht #95 §5, Log 44, Befund 130): die Wirkung läuft NICHT über
+     # default_reduction auf die Exposition (früher 0.18), sondern über g_S157 auf
+     # D_85+ × h_Heim × s_gek (measure_service._s157_cell_factor). Deshalb kein
+     # default_reduction (None = nicht anwendbar) und nur die Mortalität verknüpft.
+     "effect_target": ["vulnerability"], "default_reduction": None, "coverage_scaling": "saturating",
+     "effect_model": "s157",
+     "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY"],
+     "capex_fixed": 0.0, "capex_per_unit": 8000.0, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": 800.0, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
+     "unit_label": "Raum",
+     # Herleitung unit_density_per_ha: Modellannahme (mangels belastbarer Quelle) — an
+     # HAP-Konzept "kühle Orte" angelehnt: ein fußläufig (~800 m Radius, ~20 ha Einzugs-
+     # gebiet) erreichbarer Kühlraum je Quartier → Punktwert 0,05 Räume/ha (1 je 20 ha).
+     "unit_density_per_ha": 0.05,
+     "source": "Modellannahme (mangels belastbarer Quelle)",
+     "sources": {"capex_per_unit": "Modellannahme (Marktpreise Klimatechnik)",
+                 "opex_per_unit_year": "VDI 2067 (Wartung Klimatechnik) + Saisonbetrieb",
+                 "unit_density_per_ha": "Modellannahme (HAP-Konzept \"kühle Orte\")"},
+     "source_refs": {"opex_per_unit_year": ["VDI_2067_Blatt1"]},
+     "source_details": {
+        "capex_per_unit": "Keine belastbare Primärquelle für die Herrichtung eines "
+            "\"Kühlraums\" als Gesamtpaket auffindbar – daher Modellannahme. Plausibilisiert "
+            "anhand Marktpreisen gewerblicher Split-Klimaanlagen 1.500–5.000 € (Gerät + "
+            "Einbau, ADAC/Heizcenter 2026) zzgl. Ausstattung, Trinkwasserstation und "
+            "Beschilderung ~2.000–3.000 €. Punktwert 8.000 € je hergerichtetem Raum.",
+        "opex_per_unit_year": "Klimatechnik läuft nicht kostenlos: VDI-2067-Wartungssätze für "
+            "Klima-/Splitgeräte (~4-6 %/a der Investition) plus Strom im Saisonbetrieb und "
+            "Reinigung/Aufsicht des Raums. 10 % von 8.000 € → 800 €/(Raum·a) als "
+            "Vollkosten-Punktwert des Sommerbetriebs.",
+        "unit_density_per_ha": "Modellannahme mangels belastbarer Quelle, angelehnt an das "
+            "Konzept fußläufig erreichbarer \"kühler Orte\" aus kommunalen Hitzeaktionsplänen: "
+            "ein in ~800 m Radius (~20 ha Einzugsgebiet) erreichbarer Kühlraum je Quartier "
+            "→ 0,05 Räume/ha (1 je 20 ha)."},
+     # Herleitungen nach P1/§3.9 (T-1367: mit der Aktivierung nutzersichtbar). Die
+     # Kostenansätze stammen aus dem geparkten Kühlraum-Konzept; Bericht #95 nennt
+     # keine Kosten für gekühlte Heimplätze (Divergenz an den CMO).
+     "evidence_derivations": {
+        "capex_fixed": {
+            "wert": "0 €: keine mengenunabhängigen Grundkosten angesetzt; die Kosten "
+                    "entstehen je gekühltem Raum.",
+            "band": "0 € bis rund 10.000 € für Planung und Abstimmung mit den "
+                    "Heimträgern (Modellannahme).",
+            "sensitivitaet": "Wirkt nur auf die Kosten, nicht auf den vermiedenen Schaden."},
+        "capex_per_unit": {
+            "wert": "8.000 € je Raum: Split-Klimaanlage 1.500–5.000 € (Gerät und Einbau, "
+                    "ADAC/Heizcenter 2026) plus Ausstattung rund 2.000–3.000 €.",
+            "band": "3.500–8.000 € je Raum.",
+            "sensitivitaet": "Linear in der Zahl der Räume; wirkt nur auf die Kosten."},
+        "unit_density_per_ha": {
+            "wert": "0,05 Räume je ha: ein fußläufig erreichbarer kühler Ort je rund 20 ha "
+                    "(Konzept „kühle Orte“ der Hitzeaktionspläne).",
+            "band": "0,02–0,1 Räume je ha.",
+            "sensitivitaet": "Bestimmt nur den Richtwert der Anzahl und damit die Kosten; "
+                             "die Wirkung von S157 hängt allein an s_gek, nicht an der Anzahl."},
+        "benefit_per_m2_year": {
+            "wert": "0 €: kein direkter Zusatznutzen neben dem vermiedenen Schaden.",
+            "band": "0 €.",
+            "sensitivitaet": "Keine; der Nutzen entsteht über ΔD_S157 (Bericht #95 §5)."},
+     }},
 ]
 
 

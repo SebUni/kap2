@@ -150,6 +150,32 @@ MASSNAHMEN_UMSETZUNG: dict[str, dict] = {
             ),
         },
     },
+    # T-1367: aktiviert als Hebel S157 (#95 §5) — gekühlte Heimplätze.
+    "COOLING_ROOMS_DRINKING_WATER": {
+        "umsetzung": "mit_partnern",
+        "partner": [
+            "Träger der stationären Pflegeeinrichtungen (Einbau und Betrieb der Klimatechnik)",
+            "Heimaufsicht",
+        ],
+        "ebenen": ["gemeinde", "kreis"],
+        "beleg": {
+            "quelle": _BMU_HAP,
+            "seite": "21, 22",
+            "ebenen_begruendung": (
+                "gemeinde: Die Mitwirkenden auf kommunaler Ebene planen die Maßnahmen zu Kernelement VI "
+                "„Vorbereitung der Gesundheits- und Sozialsysteme“ (S. 11, 21). kreis: Heimaufsicht und "
+                "Gesundheitsamt als untere Behörden der Landkreise und kreisfreien Städte (weitere_quellen); "
+                "Maßnahmenpläne für Alten- und Pflegeheime, Beispiel der hessischen Heimaufsicht (S. 21)."
+            ),
+            "weitere_quellen": _BELEG_GESUNDHEITSAMT,
+            "fundstelle": (
+                "S. 22: „Besonders in Einrichtungen des Gesundheitswesens sollten kühle Räume zur Verfügung "
+                "gestellt werden.“ „In Einrichtungen des Gesundheitswesens sind ggf. bauliche Maßnahmen zum "
+                "Schutz vor Hitze in Angriff zu nehmen (Verschattungen, Raumventilatoren, ggf. Klimaanlagen).“ "
+                "Umsetzen muss das der Träger der Einrichtung, nicht die Kommunalverwaltung."
+            ),
+        },
+    },
     "POLLEN_EARLY_WARNING": {
         "umsetzung": "mit_partnern",
         "partner": [

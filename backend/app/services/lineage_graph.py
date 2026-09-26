@@ -2112,7 +2112,11 @@ def build_measure_lineage(code: str) -> dict:
         rname = catalog.RISKS_BY_CODE.get(rcode, {}).get("name", rcode)
         rid = f"risk:{rcode}"
         b.add_node(rid, "aggregation", rname, column=4, collapse_group="outcome")
-        b.add_edge(mid, rid, label=f"−{m.get('default_reduction', 0)*100:.0f}%")
+        # S157 (effect_model) wirkt über g_S157 auf den Heim-Exzess 85+, nicht über
+        # default_reduction (None) — Kante dann mit dem Faktor statt mit „−0 %“.
+        label = ("g_S157 auf Heim-Exzess 85+" if m.get("effect_model") == "s157"
+                 else f"−{(m.get('default_reduction') or 0)*100:.0f}%")
+        b.add_edge(mid, rid, label=label)
     return _finalize_graph(b.build())
 
 
