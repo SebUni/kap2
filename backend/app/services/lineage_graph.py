@@ -2114,7 +2114,9 @@ def build_measure_lineage(code: str) -> dict:
         b.add_node(rid, "aggregation", rname, column=4, collapse_group="outcome")
         # S157 (effect_model) wirkt über g_S157 auf den Heim-Exzess 85+, nicht über
         # default_reduction (None) — Kante dann mit dem Faktor statt mit „−0 %“.
+        # Schutzprogramme (effect_model "vg", Bericht #95 §5) ebenso über δ_VG.
         label = ("g_S157 auf Heim-Exzess 85+" if m.get("effect_model") == "s157"
+                 else "δ_VG auf 75–84 und 85+ ohne Heim" if m.get("effect_model") == "vg"
                  else f"−{(m.get('default_reduction') or 0)*100:.0f}%")
         b.add_edge(mid, rid, label=label)
     return _finalize_graph(b.build())
