@@ -998,7 +998,9 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   durchschnittliche Warnwirkung steckt im Basiswert; ein Fouillet-großer Hebel (≈ 4.400
   Fälle [42]) würde doppelt buchen. Wählt die Kommune zugleich Schutzprogramme für vulnerable
   Gruppen, gilt auf den Bändern 75–84 und 85+ die Kappung am Paketwert, die beim Hebel
-  \(\delta_{\text{VG}}\) steht (Befund 126).
+  \(\delta_{\text{VG}}\) steht (Befund 126). Wählt sie zugleich gekühlte Heimplätze (S157), wirkt
+  \(g_{\text{S157}}\) auf den schon mit \(\delta_{\text{HAP}}\) gedämpften Heim-Exzess (Regel beim Hebel
+  S157, Befund 129).
 - **Gekühlte Räume / Klimaanlagen in Pflegeheimen (S157):** rOR ≈ 0,93 an Extremhitzetagen
   (Ontario [46]; Block `heat.ror_s157`, Befunde 122 und 124). **Was [46] misst:** 73.578 Todesfälle
   in 615 Heimen; an Extremhitzetagen (ab dem 90. Perzentil des Hitzeindex) steigen die Odds des Todes
@@ -1019,6 +1021,14 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   (Beispiel-Block `s157_berlin`, Kapitel 7): 153,6 Todesfälle 85+ × 0,344 = 52,9 Todesfälle von
   Heimbewohnern; sind alle Heimplätze gekühlt, fallen 52,9 × 0,71 = 37,4 weg, das sind 155 YLL und
   **25,0 Mio. € je Jahr** (Band 3,6–35,4 Mio. €); bei einem gekühlten Anteil von 10 % ein Zehntel davon.
+  **Zusammen mit dem Hitzeaktionsplan (Befund 129):** \(\delta_{\text{HAP}}\) dämpft den Exzess aller
+  Bänder, also auch den Heim-Exzess. Wählt die Kommune beide Hebel, wird \(\Delta D_{\text{S157}}\) deshalb
+  aus \(D_{85+} \times \delta_{\text{HAP}}\) gerechnet statt aus \(D_{85+}\): Die beiden Faktoren werden
+  multipliziert, nicht ihre Wirkungen addiert. Berlin, alle Heime gekühlt: Zusammen fallen
+  1 − 0,95 × 0,294 = 72,1 % des Heim-Exzesses weg, das sind 38,1 der 52,9 Todesfälle. Davon entfallen
+  auf S157 52,9 × 0,95 × 0,706 = 35,5 Todesfälle oder 23,7 Mio. € je Jahr. Addiert man stattdessen
+  5 % und 70,6 %, wären es 75,6 %, also 1,9 Todesfälle oder 1,2 Mio. € je Jahr doppelt gebucht, bei
+  \(\delta_{\text{HAP}}\) = 0,85 schon 3,7 Mio. €.
   **Beide Fassungen (Befund 124):** Legte man 0,93 unmittelbar auf den Exzess, fielen nur 7 % weg,
   2,5 Mio. € je Jahr, rund ein Zehntel. Das ist einfacher zu lesen, stellt [46] aber falsch dar, weil
   der Faktor dort das ganze Risiko am Hitzetag senkt; gewählt ist deshalb die Übersetzung.
@@ -1392,7 +1402,7 @@ parameter:
   preisstand: null
   bandzuordnung: [85+]
   endpunkt: mortalitaet
-  kennzeichnung: abschaetzung_kap3   # (rOR x OR_ohne - 1)/(OR_ohne - 1) mit OR_ohne 1,11 [46]; Setzung: gilt in allen Hitzewochen (§5, Befund 124). Wirkt nur auf D_85+ x h_Heim x s_gek; Andockpunkt Produkt COOLING_ROOMS_DRINKING_WATER
+  kennzeichnung: abschaetzung_kap3   # (rOR x OR_ohne - 1)/(OR_ohne - 1) mit OR_ohne 1,11 [46]; Setzung: gilt in allen Hitzewochen (§5, Befund 124). Wirkt nur auf D_85+ x h_Heim x s_gek, mit heat.delta_hap zusammen auf D_85+ x delta_hap x h_Heim x s_gek (Befund 129); Andockpunkt Produkt COOLING_ROOMS_DRINKING_WATER
   abgeleitet_aus: [heat.ror_s157]
 parameter:
   id: heat.delta_vg
@@ -1426,6 +1436,17 @@ assert abs(d85 * h_heim * (1 - g(0.99)) * L85 * voly / 1e6 - 3.6) < 0.05   # Ban
 assert abs(d85 * h_heim * (1 - g(0.87)) * L85 * voly / 1e6 - 35.4) < 0.05  # Band oben
 naiv = d85 * h_heim * (1 - ror) * L85 * voly / 1e6                         # 0,93 direkt auf den Exzess
 assert abs(naiv - 2.5) < 0.05 and 9 < eur / naiv < 11
+# zusammen mit dem Hitzeaktionsplan (Befund 129): S157 wirkt auf den schon mit delta_hap gedaempften Heim-Exzess
+d_heim = d85 * h_heim                                        # 52,9 Todesfaelle von Heimbewohnern
+for delta_hap, zu_viel in ((0.95, 1.25), (0.85, 3.75)):
+    s157_mit_hap = d85 * delta_hap * h_heim * s_gek * (1 - g(ror))
+    gesamt = d_heim * (1 - delta_hap) + s157_mit_hap         # multiplikativ: 1 - delta_hap x g
+    assert abs(gesamt - d_heim * (1 - delta_hap * g(ror))) < 1e-9
+    additiv = d_heim * ((1 - delta_hap) + (1 - g(ror)))
+    assert abs((additiv - gesamt) * L85 * voly / 1e6 - zu_viel) < 0.05
+s157_mit_hap = d85 * 0.95 * h_heim * s_gek * (1 - g(ror))
+assert abs(1 - 0.95 * g(ror) - 0.721) < 0.001 and abs(d_heim * (1 - 0.95 * g(ror)) - 38.1) < 0.05
+assert abs(s157_mit_hap - 35.5) < 0.05 and abs(s157_mit_hap * L85 * voly / 1e6 - 23.7) < 0.05
 ```
 
 ```python test: schutzprogramme_berlin
