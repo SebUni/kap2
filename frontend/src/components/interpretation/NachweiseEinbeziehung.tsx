@@ -28,6 +28,7 @@ export default function NachweiseEinbeziehung({ kommuneId, berichtNeuLaden }: St
     setLaedt(true)
     try {
       setArten(await api.getInterpretationNachweise(kommuneId))
+      setFehler(null)
     } catch (e) {
       setFehler(e instanceof Error ? e.message : 'Die Nachweise konnten nicht geladen werden.')
     } finally {
