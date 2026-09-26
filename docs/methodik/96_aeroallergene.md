@@ -3,15 +3,9 @@
 Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048: Schritt 1 Rechenkette §3.0
 (T-1238, Ledger-Befunde 152–155), Schritt 2 S158 nach Tagen und Belastung und Stadtbaumwahl (T-1239,
 Log 23/24, Befunde 156–167), Schritt 3 Pflichtinhalte — Kap. 1 „Risiko ohne (weitere) Anpassung“,
-Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–178);
-Gegenprüfung durch den methodik_manager bis zur Null-Runde läuft)** · Rev. 3 (08.09.2026, Wirkungsabschätzung
-des S158-Hebels nach Vorgabe P2 des Aufsichtsrats — F-0007 Punkt 1; §5.1, Modellgrenze 8, Log 20,
-Ledger-Befund 151; in Rev. 4 fortgeschrieben) · Rev. 2 abgenommen ·
-Rev. 2: **(P̂-Zentrierung auf die eigene Kommune statt auf ein Bundesmittel —
-Aufgabe §3.2 „geschlossene Betrachtungsebene", Nutzer-Entscheid 31.08.2026;
-Log 18/19) — ABNAHMEREIF & INTEGRIERT (Null-Runde: Review Runde 10; Befunde
-116–150 behoben)** · 31.08.2026 · Rev. 1 war abnahmereif (Null-Runde
-Runde 3) und ist integriert ·
+Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181);
+Gegenprüfung durch den methodik_manager bis zur Null-Runde läuft, Abnahme der Rev. 4 steht aus)** ·
+Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 96-A** (Prävalenz × gemessene Pollensaison-Spreizung, bottom-up; Entscheidungslog Nr. 1)
 · Familie: **K1-Gesundheit bottom-up** (Prototyp #95; §2.6 — kein erneuter Drei-Ansätze-Vergleich)
@@ -32,9 +26,15 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > §6 Modellgrenze 8, §7 (Log 23/24, Befunde 156–167). **Schritt 3 (T-1240):** Kap. 1 Unterabschnitt
 > „Risiko ohne (weitere) Anpassung“ mit KWRA-Stufen und Gewissheit je Zeitscheibe; Kap. 6 Satz zu
 > Jahresbeträgen ohne Abzinsung; Kap. 7 `kennzeichnung` in allen 13 Blöcken; Quellen [15] (Vollzitat)
-> und [73] (neu) (Log 25, Befunde 168–178). **Code-Stand:** Der Katalogwert `default_reduction` von
+> und [73] (neu); Kap. 1 (a) mit Erhebungsjahren und Lücke bis heute, Unsicherheit in drei Bändern (Log 25,
+> Befunde 168–181). **Code-Stand:** Der Katalogwert `default_reduction` von
 > `POLLEN_EARLY_WARNING` ist 0,03 (`backend/app/data/catalog.py`); `linked_risk_codes` bleibt leer
 > (Sperre aus Befund 124), die Maßnahme wirkt im Produkt also noch nicht auf #96.
+> **Stand der früheren Revisionen** (bis Rev. 4 in der Statuszeile geführt, Befund 181): Rev. 3 (08.09.2026)
+> hatte noch kein eigenes Review (Ledger-Befund 151); sie ist in Rev. 4 fortgeschrieben und wird mit ihr
+> geprüft. Rev. 2 (31.08.2026) war
+> abnahmereif und ist integriert (Null-Runde: Review Runde 10; Befunde 116–150 behoben); Rev. 1 war abnahmereif
+> (Null-Runde Runde 3) und ist integriert.
 > **Rev. 3 (08.09.2026)** = Wirkungsabschätzung des S158-Hebels
 > (Pollen-Frühwarnung): Der Hebel läuft nicht mehr „qualitativ" mit Wirkung null, sondern
 > mit \(r_{\text{S158}}\) = 0,03 (Band 0,005–0,10) als §3.9-Abschätzung — **Vorgabe P2 des
@@ -122,16 +122,33 @@ lange Anpassungsvorlaufzeiten: Stadtbaum-Generationen) [15].
 Symptomtage und die daraus bewerteten Euro-Beträge in K1-Morbidität, für die Beispielkommune Berlin
 755.753 Tage und 4,69 Mio. € je Jahr (Preisstand 2024) in der Rechenkette §3.0 — gehören zum KWRA-Zustand
 **„Risiko ohne (weitere) Anpassung“**, und zwar zur Zeitscheibe Gegenwart: M0 weist das Ist-Klima aus
-(Normalperioden 1961–1990 gegen 1991–2020, Kapitel 6). Der heute schon umgesetzte Anpassungsstand steckt
-in den gemessenen Größen, nicht in einem eigenen Faktor: Die Prävalenz \(p_{\text{AR},a}\) stammt aus
-DEGS1 [1] und KiGGS Welle 2 [2], die Kosten je Betroffenem aus der TOTALL-Erhebung 2014 [65]. Beide sind
-unter der Versorgung ihres Erhebungszeitraums erhoben; was Betroffene damals schon taten (Medikation,
-Meiden von Pollen), steckt in diesen Zahlen. Das folgt der Regel der KWRA für den Zustand ohne Anpassung:
-„Bei der Bewertung der Klimarisiken wurden nur bestehende und umgesetzte Anpassungsmaßnahmen als Teil der
-Sensitivität berücksichtigt. Bisher nur geplante und zukünftig mögliche Anpassungsoptionen und -maßnahmen
-wurden nicht einbezogen.“ (Teilbericht 1, S. 68 [73]). Dass an diesen Faktoren schon angesetzt wird, etwa mit
-Pollen-Apps, die bereits im Einsatz sind, beschreibt Teilbericht 5, S. 180 [15]; die dort anschließend
-aufgeführten Maßnahmen des Aktionsplans Anpassung III (S. 180 f.) gehören dagegen zum Restrisiko in (b). Eine Wirkung der
+(Normalperioden 1961–1990 gegen 1991–2020, Kapitel 6). Der umgesetzte Anpassungsstand steckt über die
+Erhebungsjahre der gemessenen Größen im Basiswert, nicht in einem eigenen Faktor:
+
+- **Prävalenz \(p_{\text{AR},a}\):** Erwachsene aus DEGS1, erhoben 2008–2011 ([1], S. 698, Abschnitt Methoden),
+  Kinder und Jugendliche aus KiGGS Welle 2, erhoben 2014–2017 ([2], S. 3, Abstract). Gezählt ist, wer in den
+  letzten zwölf Monaten Beschwerden hatte, also unter der Versorgung und dem Verhalten dieser Jahre.
+- **Kosten je Betroffenem:** aus der schwedischen TOTALL-Studie (18–65 Jahre, Kosten in Preisen von 2014; einen
+  Erhebungszeitraum nennt der Artikel nicht, Abschnitt Materials and methods [65]), 1:1 auf Deutschland
+  übertragen (§3.5, Modellgrenze 6). Im Euro-Betrag steckt damit der schwedische Versorgungsstand um 2014,
+  nicht der deutsche.
+- **Anteil der Saisontage mit Beschwerden \(f\):** eine Abschätzung von KAP3 ohne Erhebungsjahr (§3.4); er
+  kürzt sich im Euro-Pfad heraus.
+
+Der Basiswert trägt also den Anpassungsstand dieser Erhebungsjahre, nicht den von heute. Das entspricht der
+Regel der KWRA für den Zustand ohne Anpassung: „Bei der Bewertung der Klimarisiken wurden
+nur bestehende und umgesetzte Anpassungsmaßnahmen als Teil der Sensitivität berücksichtigt. Bisher nur geplante
+und zukünftig mögliche Anpassungsoptionen und -maßnahmen wurden nicht einbezogen.“ (Teilbericht 1, S. 68 [73]). **Die Lücke
+bis heute:** Anpassung, die seit den Erhebungsjahren hinzugekommen ist, fehlt im Basiswert. Dazu gehören
+möglicherweise die Pollen-Apps, die Teilbericht 5, S. 180 [15] für den Stand 2021 als „bereits“ im Einsatz
+beschreibt; wie weit sie 2008–2017 verbreitet waren, weiß der Bericht nicht, er behauptet deshalb nicht, dass sie im
+Basiswert stecken. Die Richtung der Lücke ist **nicht bestimmbar**: Bei den Tagen würde mehr Vermeidung die Zahl
+der Betroffenen mit Beschwerden senken; die 12-Monats-Prävalenz der Kinder und Jugendlichen ist zwischen der
+KiGGS-Basiserhebung (2003–2006) und Welle 2 aber ohne wesentliche Veränderung geblieben ([2], S. 3). Bei den
+Euro-Beträgen kann mehr Anpassung die Kosten je Betroffenem senken (weniger schwere Verläufe) oder heben (mehr
+Medikation); eine Quelle, die das für Deutschland beziffert, gibt es nicht, und schon die Übertragung aus
+Schweden wirkt nach Modellgrenze 6 in beide Richtungen. Die Maßnahmen des Aktionsplans Anpassung III, die
+Teilbericht 5 ab S. 180 aufführt, gehören zum Restrisiko in (b). Eine Wirkung der
 heutigen Pollenflug-Warnung rechnet der Basiswert weder heraus noch hinzu (S158 im Basiswert Default 1,
 Knoten-Bilanz). Die heutige Stadtbaum- und Vegetationsausstattung wirkt über \(\hat G\) nur auf die
 Verteilung der Zusatztage innerhalb der Kommune. Weil \(\hat P\) auf die eigene Kommune zentriert ist
@@ -186,11 +203,18 @@ Feld leer, die Mappe hat dafür keine Spalte. Beide Digitalisate widersprechen s
 stehen nach der Vorrangregel am Ende der Aufgabe ohnehin nur in der KWRA-2021-Mappe.
 
 **Warum die eigene Quellenlage von der KWRA-Gewissheit abweicht.** Die KWRA-Gewissheit „mittel“ bewertet,
-wie sicher die Projektion für 2031–2060 und 2071–2100 ist; der Basiswert dieses Berichts rechnet dagegen die
-Gegenwart aus gemessenen Größen (Phänologie an über 1.000 DWD-Stationen, Prävalenz aus Surveys), und seine
-Unsicherheit liegt nicht in einer Klimaprojektion, sondern vor allem im Klimaanteil \(a_{\text{attr}}\) = 0,50
-(0,19–0,84), übertragen aus einer nordamerikanischen Studie [9] (Berlin 1,78–7,87 Mio. € je Jahr, §3.0), und im
-Sensibilisierungsprofil \(p_B/p_G\) (Abschätzung von KAP3, §3.4).
+wie sicher die Projektion für 2031–2060 und 2071–2100 ist. Der Basiswert dieses Berichts rechnet dagegen die
+Gegenwart aus gemessenen Größen (Phänologie an über 1.000 DWD-Stationen, Prävalenz aus Surveys). Seine
+Unsicherheit liegt nicht in einer Klimaprojektion, sondern in drei Bändern (Beispielkommune Berlin, Basis
+755.753 Tage und 4,69 Mio. € je Jahr, §3.0):
+
+- **Klimaanteil \(a_{\text{attr}}\)** = 0,50 (0,19–0,84), übertragen aus einer nordamerikanischen Studie [9]:
+  stärkster Treiber für Tage und Euro gleichermaßen, 1,78–7,87 Mio. € je Jahr.
+- **Kostensatz \(c_{\text{Tag}}\)** = 6,20 € je Tag, Band bis 23,66 € (Schramm [7], mittelschwer bis schwer
+  Erkrankte): wirkt nur auf den Euro-Betrag und nur nach oben, bis 17,9 Mio. € je Jahr; die Tage ändert er nicht.
+- **Sensibilisierungsprofil \(p_B/p_G\)** (Abschätzung von KAP3, §3.4; Bänder 0,4–0,7 und 0,6–0,85): wirkt fast
+  nur auf die Tage, 580.958–901.837 Tage (−23 % bis +19 %). Im Euro-Betrag kürzt es sich fast heraus, weil es
+  über \(d_{\text{Saison}}\) auch im Kostensatz je Tag steht: 4,39–5,07 Mio. € (−6 % bis +8 %).
 
 ## 2 Evidenz-Register (§2.2)
 
