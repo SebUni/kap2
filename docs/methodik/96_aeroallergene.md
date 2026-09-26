@@ -709,8 +709,9 @@ assert abs(dt * 6.20 - 1252) < 5
 | \(\hat P_{\text{Zelle}}\) | lokaler Pollen-Hazard-Faktor (auf die **Kommune** zentriert; in ΔTage **und** €) | — | \(1+\lambda(\hat G/\bar G - 1)\); Spanne bei \(\hat G/\bar G\) = 0,5…1,5: 0,65…1,35; ohne Kommunen-Referenz \(\hat P \equiv 1\) (§3.3); berechnet |
 | \(\text{pop}_a\) | Bevölkerung der Zelle je Band | Personen | Zensus 2022, 100 m (+ Ebene u20 neu); register:96-R35-01 |
 | \(r_{\text{S158}}\) | Wirkungsfaktor der Pollen-Frühwarnung **je gewarntem Tag** (**nur Maßnahmen-Modul**, nicht im Basiswert) | — | **0,03** (Band 0,005–0,10) = \(q_{\text{reich}} q_{\text{handel}} e_{\text{Tag}}\) = 0,35·0,40·0,20 — **§3.9 ABGESCHÄTZT, keine Primärquelle** (Vorgabe P2); Kette, Bandenden und Sensitivität in §5.1; register:96-S158-01; herleitung:#s158-wirkung |
-| \(t_{\text{warn},g}\) | Anteil der zusätzlichen Symptomtage der Pollengruppe \(g\) (B, G), an denen der DWD-Index mindestens „mittel“ meldet (gewarnte Tage; nur Maßnahmen-Modul; nicht zu verwechseln mit dem Ĝ-Gewicht \(w_B\)) | — | **0,75** (Band 0,50–1,00), beide Gruppen — **§3.9 ABGESCHÄTZT**; Schwelle nach DWD [70], Ersetzungspfad \(\min(1;\ m_{g,R}/f)\) aus [71]; herleitung:#s158-wirkung |
-| \(m_{g,R}\) | Anteil **aller** Tage der Dekaden mit Zusatztagen, an denen der DWD-Index der Gruppe \(g\) im Gebiet \(R\) mindestens „mittel“ meldet (nur Ersetzungspfad von \(t_{\text{warn}}\)) | — | noch nicht ausgewertet; Quelle DWD-Pollenflugstatistik [71]; wird über \(m_{g,R}/f\) umgerechnet, nie direkt eingesetzt; herleitung:#s158-wirkung |
+| \(t_{\text{warn},g}\) | Anteil der zusätzlichen Symptomtage der Pollengruppe \(g\) (B, G), an denen der DWD-Index mindestens „mittel“ meldet (gewarnte Tage; nur Maßnahmen-Modul; nicht zu verwechseln mit dem Ĝ-Gewicht \(w_B\)) | — | **0,75** (Band 0,50–1,00), beide Gruppen — **§3.9 ABGESCHÄTZT**; Schwelle nach DWD [70], Ersetzungspfad \(\min(1;\ m_{g,V}/f)\) aus [71]; herleitung:#s158-wirkung |
+| \(m_{g,V}\) | Anteil **aller** Tage der Dekaden mit Zusatztagen, an denen der DWD-Index der Gruppe \(g\) im DWD-Gebiet \(V\) mindestens „mittel“ meldet (nur Ersetzungspfad von \(t_{\text{warn}}\)) | — | noch nicht ausgewertet; Quelle DWD-Pollenflugstatistik [71]; wird über \(m_{g,V}/f\) umgerechnet, nie direkt eingesetzt; herleitung:#s158-wirkung |
+| \(V\) | Gebiet des DWD-Pollenflug-Gefahrenindex (12 Gebiete mit 27 Vorhersageflächen [72]), für das [71] den Anteil ausweist; **nicht** die Modellregion \(R\) (Nord/Mitte/Süd, §3.3). Jedes Gebiet liegt in genau einer Modellregion | — | Zuordnung Zelle → DWD-Gebiet über das Bundesland (und das Teilgebiet) der Zelle; herleitung:#s158-wirkung |
 | \(A_{\text{Zelle}}\) | Geltungsbereich der Pollen-Frühwarnung: 1, wenn die Zelle im Gebiet der kommunalen Warnkanäle liegt, sonst 0 (Eingabe im Maßnahmen-Modul) | — | Eingabe des Nutzers, kein Parameter; herleitung:#s158-wirkung |
 | \(\delta_B,\ \delta_G\) | Zusatztage je Betroffenem der Birkengruppe bzw. der Gräser, \(\delta_B + \delta_G = \delta_R\) | Tage/(Betroffener·Jahr) | Teilung von \(\delta_R\) nach den beiden Summanden (§3.3); Berlin 0,8085 / 1,0710; herleitung:#s158-wirkung |
 
@@ -893,7 +894,7 @@ die Kalibrierjahre enthalten keinen Frühwarn-Effekt, der bereits eingerechnet w
 **An welchen Tagen und ab welcher Belastung die Warnung wirkt (Festlegung, T-1239).**
 
 - **Belastungsschwelle: Pollenflug-Gefahrenindex des DWD mindestens „mittlere Belastung“
-  (Stufe 2)** für mindestens eine Pollenart der Gruppe im Vorhersagegebiet der Zelle. Der DWD
+  (Stufe 2)** für mindestens eine Pollenart der Gruppe im DWD-Gebiet \(V\) der Zelle. Der DWD
   stuft je Pollenart nach dem Tagesmittel der Pollen je m³ Luft ein [70]:
 
   | Pollenart | keine | gering | mittel | hoch |
@@ -931,11 +932,11 @@ die Kalibrierjahre enthalten keinen Frühwarn-Effekt, der bereits eingerechnet w
   Gruppe gibt; eine Setzung je Gruppe wäre Scheingenauigkeit.
 - **Ersetzungspfad für \(t_{\text{warn},g}\), ohne Verdünnung.** Die Pollenflugstatistik des DWD [71]
   (Anteil der Meldungen je Belastungsstufe in Zehntagesmitteln, je Pollenart und Gebiet,
-  1997–2026) liefert für die Dekaden, in denen die Zusatztage liegen, den Anteil \(m_{g,R}\)
-  **aller** Tage mit Index ab „mittel“. Das ist nicht \(t_{\text{warn}}\): Setzte man \(m_{g,R}\)
+  1997–2026) liefert für die Dekaden, in denen die Zusatztage liegen, je DWD-Gebiet \(V\) den Anteil \(m_{g,V}\)
+  **aller** Tage mit Index ab „mittel“. Das ist nicht \(t_{\text{warn}}\): Setzte man \(m_{g,V}\)
   direkt ein, wählte die Rechnung die Tage zweimal aus (einmal über \(f\), einmal über \(m\)), und
   die Wirkung fiele um den Faktor \(f\) zu tief aus. Umgerechnet wird deshalb
-  \(t_{\text{warn},g,R} = \min(1;\ m_{g,R}/f)\), unter der Annahme, dass die Beschwerden an den Tagen
+  \(t_{\text{warn},g,V} = \min(1;\ m_{g,V}/f)\), unter der Annahme, dass die Beschwerden an den Tagen
   mit der höchsten Belastung auftreten (Pollenflug treibt die Symptomlast, Pfaar [52], qualitativ).
   Zahlenbeispiel: Meldet [71] für die Dekaden der Zusatztage \(m\) = 0,525, dann ist
   \(t_{\text{warn}}\) = 0,525 / 0,70 = 0,75, der heutige Basiswert; direkt eingesetzt ergäbe
@@ -972,11 +973,15 @@ Geltungsbereich um denselben Anteil ihrer Zusatztage, 0,03 × 0,75 = 2,25 %. Das
 deshalb heute **zahlengleich** mit einem Faktor 0,0225 auf die gespeicherten Zusatztage der Zellen
 im Geltungsbereich; für Berlin ergeben beide Wege 16.666 Tage (Zelllauf, unten). Die Festlegung
 ändert heute den **Wert**, nicht die Verteilung: 2,25 % statt der 3 % von Rev. 3, weil nur noch
-gewarnte Tage zählen. Die Verteilung ändert erst der Ersetzungspfad: Mit \(t_{\text{warn},g,R}\) je
-Gruppe und Vorhersagegebiet hängt der Anteil am Gebiet und an der Mischung aus Birken- und
+gewarnte Tage zählen. Die Verteilung ändert erst der Ersetzungspfad: Mit \(t_{\text{warn},g,V}\) je
+Gruppe und DWD-Gebiet \(V\) hängt der Anteil am Gebiet und an der Mischung aus Birken- und
 Gräsertagen (Nord, Mitte und Süd teilen \(\delta\) verschieden, §3.3). Innerhalb eines
-Vorhersagegebiets bleibt er auch dann für alle Zellen gleich, weil \(\hat P\) die Zusatztage beider
-Gruppen im gleichen Verhältnis hebt. Das ist der Teil, der vom Pauschalfaktor bleibt
+DWD-Gebiets \(V\) bleibt er auch dann für alle Zellen gleich, weil \(\hat P\) die Zusatztage beider
+Gruppen im gleichen Verhältnis hebt und jedes DWD-Gebiet in genau einer Modellregion \(R\) liegt,
+also überall dieselbe Teilung von \(\delta\) hat. Die Bedingung ist erfüllt: Die Gebiete folgen den
+Ländergrenzen, zusammengefasst sind nur Länder derselben Modellregion (Schleswig-Holstein und
+Hamburg, Niedersachsen und Bremen: Nord; Brandenburg und Berlin, Rheinland-Pfalz und Saarland:
+Mitte; Gebietsliste [72], Regionen nach §3.3). Das ist der Teil, der vom Pauschalfaktor bleibt
 (Modellgrenze 8, §6; Ledger-Befund 163).
 
 **Kette und Zahlenwert.**
@@ -1108,8 +1113,9 @@ Zelllauf rechnet, nicht als Faktor auf gespeicherte Ergebnisse. Er braucht dafü
 1. die Zusatztage je Zelle **getrennt nach Gruppe**, \(\Delta\text{Tage}_{B,\text{Zelle}}\) und
    \(\Delta\text{Tage}_{G,\text{Zelle}}\) (heute führt die Schicht-B-Funktion nur ihre Summe);
 2. den Anteil gewarnter Tage \(t_{\text{warn},g}\) (Kapitel 7 `pollen.t_warn_s158`, 0,75 für beide
-   Gruppen; nach dem Ersetzungspfad \(t_{\text{warn},g,R} = \min(1;\ m_{g,R}/f)\) je
-   DWD-Vorhersagegebiet aus [71] — **nicht** den DWD-Anteil \(m_{g,R}\) selbst, der die Wirkung um
+   Gruppen; nach dem Ersetzungspfad \(t_{\text{warn},g,V} = \min(1;\ m_{g,V}/f)\) je
+   DWD-Gebiet \(V\) aus [71], dazu die Zuordnung Zelle → DWD-Gebiet (über Bundesland und
+   Teilgebiet der Zelle, Gebietsliste [72]) — **nicht** den DWD-Anteil \(m_{g,V}\) selbst, der die Wirkung um
    den Faktor \(f\) verdünnen würde);
 3. den Wirkungsfaktor je gewarntem Tag \(r_{\text{S158}}\) (Kapitel 7 `pollen.r_s158`, 0,03);
 4. den Geltungsbereich \(A_{\text{Zelle}}\) als Eingabe im Maßnahmen-Modul (ganze Kommune oder
@@ -1123,21 +1129,21 @@ bleibt 0,0, bis der CTO die Rechnung im Zelllauf gebaut hat. Mit den heutigen We
 Faktor 0,0225 auf die gespeicherten Zusatztage der Zellen im Geltungsbereich zahlengleich (siehe
 „Was die Formel heute von einem Faktor unterscheidet“). Verlangt wird der Zelllauf mit getrennten
 Gruppen trotzdem, weil nur er den Ersetzungspfad ohne Umbau aufnimmt: Mit
-\(t_{\text{warn},g,R}\) je Gruppe und Vorhersagegebiet gäbe ein einziger Katalogfaktor für alle
+\(t_{\text{warn},g,V}\) je Gruppe und DWD-Gebiet gäbe ein einziger Katalogfaktor für alle
 Kommunen den falschen Wert.
 
 **Modellgrenze der Abschätzung (Bauform) — nicht Grund für eine Null.** Tage und Belastung sind
 jetzt festgelegt, der Geltungsbereich ist zellscharf. Pauschal bleibt der Personenteil
 \(q_{\text{reich}} q_{\text{handel}} e_{\text{Tag}}\): Reichweite, Handlungsbereitschaft und
 Tageswirkung sind je Zelle nicht beobachtbar und gelten in allen Zellen gleich; dazu
-\(t_{\text{warn}}\), solange keine Auswertung je Vorhersagegebiet vorliegt. Heute mindert die
+\(t_{\text{warn}}\), solange keine Auswertung je DWD-Gebiet \(V\) vorliegt. Heute mindert die
 Maßnahme deshalb jede Zelle im Geltungsbereich um denselben Anteil (2,25 %), zahlengleich mit einem
 Faktor. Das ist die **Modellgrenze der Abschätzung** (§6, Modellgrenze 8); sie wird dokumentiert,
 nicht als Argument für Wirkung null verwendet (Aufgabe §3.5, Fortschreibung 06.09.2026).
 **Ersetzungspfad:** eine Vorher-Nachher-/DiD-Auswertung von Symptomtagebuch-Daten (Patient's
 Hayfever Diary) gegen die Einführung kommunaler Warnkanäle ersetzt den Personenteil durch eine
 gemessene Effektgröße, die DWD-Pollenflugstatistik [71] den Anteil \(t_{\text{warn}}\) (umgerechnet
-über \(m_{g,R}/f\), siehe oben); bis dahin ist die Kette oben der vollständige Nachweis des Werts.
+über \(m_{g,V}/f\), siehe oben); bis dahin ist die Kette oben der vollständige Nachweis des Werts.
 
 **Abgrenzung zu Modellgrenze 7 / Ledger-Befund 124 — beide bleiben bestehen.**
 Modellgrenze 7 verbietet einen **Vegetations-Niveaueffekt**: Ein flächiges Pflanzprogramm
@@ -1200,12 +1206,12 @@ gegenläufige Evidenz (Neophyten [23], CO₂ [21,22]) macht das zur Untergrenze;
    Innerhalb des Geltungsbereichs mindert die Maßnahme deshalb jede Zelle um denselben Anteil
    (2,25 %). **Heute ist das zahlengleich mit einem Faktor 0,0225** auf die Zusatztage der Zellen im
    Geltungsbereich: Die Festlegung hat den Wert geändert (nur gewarnte Tage, 2,25 % statt 3 %),
-   nicht die Verteilung. Auch nach dem Ersetzungspfad bleibt je Vorhersagegebiet ein einheitlicher
-   Anteil, weil \(\hat P\) beide Gruppen im gleichen Verhältnis hebt; er unterscheidet sich dann
-   nur zwischen Gebieten. Das ist eine **Modellgrenze der Abschätzung**, kein Grund für eine
+   nicht die Verteilung. Auch nach dem Ersetzungspfad bleibt je DWD-Gebiet \(V\) ein einheitlicher
+   Anteil, weil \(\hat P\) beide Gruppen im gleichen Verhältnis hebt und jedes DWD-Gebiet in genau
+   einer Modellregion \(R\) liegt ([72], §3.3); er unterscheidet sich dann nur zwischen Gebieten. Das ist eine **Modellgrenze der Abschätzung**, kein Grund für eine
    Nullwirkung; Ersetzungspfad: gemessene Effektgröße aus einer Vorher-Nachher-/DiD-Auswertung von
    Symptomtagebuch-Daten für den Personenteil, DWD-Pollenflugstatistik [71] für
-   \(t_{\text{warn},g,R} = \min(1;\ m_{g,R}/f)\).
+   \(t_{\text{warn},g,V} = \min(1;\ m_{g,V}/f)\).
    Abgrenzung: **Modellgrenze 7 bleibt bestehen** — \(r_{\text{S158}}\) läuft **nicht** über
    \(\hat G/\lambda\) (Verhaltens-, kein Vegetationskanal). **Die Sperre aus Befund 124 bleibt
    bestehen:** kein pauschaler `linked_risk_codes`-Kanal auf #96, Verknüpfung nur im Zelllauf nach
@@ -1521,8 +1527,19 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   Meldungen je Belastungsstufe, je Pollenart und Gebiet, 1997–2026; Daten Stiftung Deutscher
   Polleninformationsdienst), https://www.dwd.de/DE/leistungen/pollen/pollenstatistik.html
   (Abruf 26.09.2026; Permalink https://web.archive.org/web/20260310113821/https://www.dwd.de/DE/leistungen/pollen/pollenstatistik.html).
-  Liefert den Anteil \(m_{g,R}\) aller Tage ab „mittel“; Ersetzungspfad für den Anteil gewarnter
-  Symptomtage \(t_{\text{warn},g,R} = \min(1;\ m_{g,R}/f)\) (§5.1); im Bericht noch nicht ausgewertet.
+  Liefert den Anteil \(m_{g,V}\) aller Tage ab „mittel“; Ersetzungspfad für den Anteil gewarnter
+  Symptomtage \(t_{\text{warn},g,V} = \min(1;\ m_{g,V}/f)\) je DWD-Gebiet \(V\) (§5.1); im Bericht noch nicht
+  ausgewertet.
+- **[72]** Deutscher Wetterdienst, Open Data „Pollenflug-Gefahrenindex für Deutschland“ (Datei
+  s31fg.json; Gebiete und Teilgebiete mit Kennung: 10 Schleswig-Holstein und Hamburg (11, 12),
+  20 Mecklenburg-Vorpommern, 30 Niedersachsen und Bremen (31, 32), 40 Nordrhein-Westfalen (41–43),
+  50 Brandenburg und Berlin, 60 Sachsen-Anhalt (61, 62), 70 Thüringen (71, 72), 80 Sachsen (81, 82),
+  90 Hessen (91, 92), 100 Rheinland-Pfalz und Saarland (101–103), 110 Baden-Württemberg (111–113),
+  120 Bayern (121–124); 12 Gebiete mit 27 Vorhersageflächen, Mecklenburg-Vorpommern sowie
+  Brandenburg und Berlin ohne Teilgebiete),
+  https://opendata.dwd.de/climate_environment/health/alerts/s31fg.json
+  (Abruf 26.09.2026; Permalink https://web.archive.org/web/20260823013619/https://opendata.dwd.de/climate_environment/health/alerts/s31fg.json).
+  Gebietszeichen \(V\) und die Bedingung „jedes DWD-Gebiet in genau einer Modellregion“ (§5.1).
 
 ## Entscheidungslog
 
@@ -1561,5 +1578,5 @@ Aufsichtsrats (F-0007 Punkt 1); bewusste Überstimmung von Eintrag 15 (Ledger-Be
 | 20 ⚠ | S158-Hebel: „qualitativ" (Wirkung null) beibehalten oder abschätzen? | **Abschätzung statt Nullwirkung** — \(r_{\text{S158}}\) = 0,03 (Band 0,005–0,10), Dreifaktor-Kette §5.1, §3.9 ABGESCHÄTZT; Wirkungsort multiplikativ auf ΔTage (Maßnahmen-Modul), Bauform-Grenze als Modellgrenze 8 dokumentiert; Katalogwert `default_reduction` bleibt in diesem Schritt 0,0 (Code-Nachzug L2 nach der P1-Kennzeichnung) | **Vorgabe P2 des Aufsichtsrats (F-0007 Punkt 1)** und Aufgabe §3.5 i. d. F. 06.09.2026: Ein Hebel ohne publizierte Effektgröße läuft nicht mehr als „qualitativ" mit Wirkung null; das Fehlen der Studie ist der Anlass der Abschätzung, nicht ihr Ersatz. Bewusste Überstimmung von Log 15 (Ledger-Befund 151) | Log 15 beibehalten (verworfen: widerspricht P2) · Effektzahl aus fremder Domäne übertragen, z. B. Hitzewarn-Effekt aus #95 (verworfen: Kategorienfehler §3.9 — anderer Endpunkt, andere Handlungskette) | Maßnahmen-Ausweis ≈ 3 % des K1-Werts (bundesweit ≈ 3,3 Mio. €/a; Band 0,55–11,0); Schadenswert selbst unverändert; Befund-124-Sperre (linked_risk_codes leer) bleibt bestehen |
 | 21 | Kapitel 9 (Familien-Einordnung und Verworfen-Liste) nach Fortschreibung 7? | **gestrichen**; es bleibt genau eine Methodik (96-A, Familie „K1-Gesundheit bottom-up“ mit Prototyp #95), die verworfenen Ansätze stehen hier | **96-B (Neophyten-Szenario Ambrosia; Lake [23], Born [25], Hamaoui [24])** ersetzt 96-A nicht, weil es nur eine Art abbildet, Birke und Gräser als Hauptlast fehlen und es 2041–2060 statt heute projiziert (Ergänzungsmodul ab M1, Register 96-W024-02, Log 13). **96-C (nationaler Kostenanker, top-down)** ist nach §3.1 ausgeschieden, weil er einen Verteilschlüssel mit Deutschland-Nenner und einen normativ gesetzten Klimaanteil braucht. | Kapitel 9 behalten (verworfen: Fortschreibung 7, eine Methodik je Risiko; Ledger-Befund 152) | keine Zahlenwirkung |
 | 22 | Quelle von u20 für die Beispielkommune Berlin in der Rechenkette? | **Direkt aus Tab. 12411-09-01-4-B [68]**: u20 = unter 5 + 5–10 + 10–15 + 15–20 = 673.277, 20–64 = u65 − u20 = 2.288.153; die Zahlen nach Altersjahren stehen gleichlautend in Destatis Tab. 12411-09 [69] | Die Tabelle, aus der Ebene 1 schon u65 und die Seniorenbänder nimmt, führt die vier Gruppen selbst: gleicher Stichtag, gleiche Basis Zensus 2022, und ein Sachbearbeiter, der [68] öffnet, kommt auf dieselbe Zahl. | Anteil u20 aus dem Berliner Landesbericht A I 3 – j / 23 (verworfen: noch auf Basis Zensus 2011, 3.070.537 statt 2.961.430 unter 65-Jährige, Mischung zweier Basen; Runde 0 des Managers) · Bundesanteil 24,07 % (Rückfall des Produkts; für Berlin 1.737 Betroffene oder 0,43 % zu wenig) | u20 673.277 statt 677.877 im ersten Entwurf; Betroffene 402.103, Tage 755.753, bewerteter Schaden 4,69 Mio. € je Jahr (§3.0) |
-| 23 ⚠ | S158: an welchen Tagen und ab welcher Belastung wirkt die Warnung, und gilt \(e_{\text{Tag}}\) je gewarntem Tag? | **Nur an gewarnten Tagen:** DWD-Pollenflug-Gefahrenindex mindestens „mittel“ [70], je Pollengruppe; Anteil gewarnter Symptom-Zusatztage \(t_{\text{warn}}\) = 0,75 (0,50–1,00, §3.9 ABGESCHÄTZT; eigenes Zeichen, weil \(w_B\) das Ĝ-Gewicht ist; Ersetzungspfad \(\min(1;\ m_{g,R}/f)\), nie \(m_{g,R}\) direkt); \(r_{\text{S158}}\) = 0,03 gilt je gewarntem Tag, Formel zellscharf im Zelllauf mit Geltungsbereich \(A_{\text{Zelle}}\) (§5.1) | Die Anker von \(e_{\text{Tag}}\) beschreiben die Minderung an einem Tag, an dem gehandelt wird, also an einem gewarnten Tag; Rev. 3 hat sie auf alle Zusatztage gerechnet und damit \(t_{\text{warn}} = 1\) unterstellt. Befund 124 verbietet eine Wirkung auf alle Tage pauschal. Mit der Tagesauswahl wirkt jede Größe genau einmal (Tage, Menschen, Tageswirkung) | \(e_{\text{Tag}}\) als Mittel über alle Zusatztage lesen und \(t_{\text{warn}}\) weglassen (verworfen: widerspricht den eigenen Ankern, Befund 124 bliebe verletzt) · \(e_{\text{Tag}}\) durch \(t_{\text{warn}}\) teilen, damit der wirksame Wert gleich bleibt (verworfen: hebt die Wirkung am gewarnten Tag ohne Beleg an) · Schwelle „hoch“ (verworfen als Basiswert: steckt im unteren Band von \(t_{\text{warn}}\)) · DWD-Anteil aller Tage \(m_{g,R}\) direkt einsetzen (verworfen: wählt die Tage über \(f\) und \(m\) zweimal aus und verdünnt um den Faktor \(f\); Befund 162) | wirksamer Wert über alle Zusatztage 0,03 → 0,03 × 0,75 = 0,0225 (0,028 ist nur das Kettenprodukt vor dem Runden); heute zahlengleich mit einem Faktor 0,0225 auf die Zusatztage im Geltungsbereich, geändert ist der Wert, nicht die Verteilung; Berlin 17.004 statt 22.673 vermiedene Tage, ≈ 105.400 statt ≈ 140.600 € je Jahr; Kapitel 7: `pollen.r_s158` unverändert, `pollen.t_warn_s158` neu; Ledger-Befunde 156, 157, 161, 162, 163, 165 |
+| 23 ⚠ | S158: an welchen Tagen und ab welcher Belastung wirkt die Warnung, und gilt \(e_{\text{Tag}}\) je gewarntem Tag? | **Nur an gewarnten Tagen:** DWD-Pollenflug-Gefahrenindex mindestens „mittel“ [70], je Pollengruppe; Anteil gewarnter Symptom-Zusatztage \(t_{\text{warn}}\) = 0,75 (0,50–1,00, §3.9 ABGESCHÄTZT; eigenes Zeichen, weil \(w_B\) das Ĝ-Gewicht ist; Ersetzungspfad \(\min(1;\ m_{g,V}/f)\), nie \(m_{g,V}\) direkt); \(r_{\text{S158}}\) = 0,03 gilt je gewarntem Tag, Formel zellscharf im Zelllauf mit Geltungsbereich \(A_{\text{Zelle}}\) (§5.1) | Die Anker von \(e_{\text{Tag}}\) beschreiben die Minderung an einem Tag, an dem gehandelt wird, also an einem gewarnten Tag; Rev. 3 hat sie auf alle Zusatztage gerechnet und damit \(t_{\text{warn}} = 1\) unterstellt. Befund 124 verbietet eine Wirkung auf alle Tage pauschal. Mit der Tagesauswahl wirkt jede Größe genau einmal (Tage, Menschen, Tageswirkung) | \(e_{\text{Tag}}\) als Mittel über alle Zusatztage lesen und \(t_{\text{warn}}\) weglassen (verworfen: widerspricht den eigenen Ankern, Befund 124 bliebe verletzt) · \(e_{\text{Tag}}\) durch \(t_{\text{warn}}\) teilen, damit der wirksame Wert gleich bleibt (verworfen: hebt die Wirkung am gewarnten Tag ohne Beleg an) · Schwelle „hoch“ (verworfen als Basiswert: steckt im unteren Band von \(t_{\text{warn}}\)) · DWD-Anteil aller Tage \(m_{g,V}\) direkt einsetzen (verworfen: wählt die Tage über \(f\) und \(m\) zweimal aus und verdünnt um den Faktor \(f\); Befund 162) | wirksamer Wert über alle Zusatztage 0,03 → 0,03 × 0,75 = 0,0225 (0,028 ist nur das Kettenprodukt vor dem Runden); heute zahlengleich mit einem Faktor 0,0225 auf die Zusatztage im Geltungsbereich, geändert ist der Wert, nicht die Verteilung; Berlin 17.004 statt 22.673 vermiedene Tage, ≈ 105.400 statt ≈ 140.600 € je Jahr; Kapitel 7: `pollen.r_s158` unverändert, `pollen.t_warn_s158` neu; Ledger-Befunde 156, 157, 161, 162, 163, 165, 167 (DWD-Gebiet \(V\) statt \(R\)) |
 | 24 | Allergenarme Stadtbaumwahl: Wirkung abschätzen oder verwerfen (P2)? | **Abschätzen, zellscharf über \(\hat G\):** −0,14 auf \(\hat P\) je Senkung von \(\hat G/\bar G\) um 0,2 (Band 0,06–0,20 über λ); Berliner Allee-Zelle mit 100 Betroffenen −26,3 Tage und ≈ 163 € je Jahr (Band −11,3 bis −37,6 Tage); die gleichbleibende Kommunensumme ist Modellgrenze der Abschätzung (Modellgrenze 7) | P2 geht Methodik-Regeln vor; die Wirkung je Zelle ist mechanisch aus \(\hat P\) ableitbar und im Bericht mit Zahl, Band und Sensitivität abgeschätzt; die gleichbleibende Kommunensumme folgt aus der Zentrierung und ist keine gesetzte Null. Im Produkt ist die Wirkung heute nicht sichtbar (Sperre aus Befund 124, keine Katalogmaßnahme); sichtbar wird sie über die Integrationsauflage (Stadtbaumwahl) in §5. Die Kommunensumme ist per Zentrierung invariant (Log 18/19), und ein Niveaueffekt ist unbelegt und durch Befund 124 gesperrt | mit einem Satz verwerfen (verworfen: die Wirkung je Zelle ist ableitbar, eine Verwerfung ließe sie ohne Zahl) · Niveaueffekt für die Kommune schätzen (verworfen: λ-Evidenz intra-urban, Modellgrenze 7, Befund 124) | keine Wirkung auf den Schadenswert; der Satz, die Umverteilung senke den kommunalen Ausweis, ist ersetzt (Ledger-Befund 158); die P2-Begründung stützt sich nicht mehr auf eine Produktanzeige (Ledger-Befund 164) |
