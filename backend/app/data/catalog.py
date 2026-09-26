@@ -185,6 +185,19 @@ RISKS: list[dict] = [
      "ref_value": 145.0, "scale": "pop", "cost_per_outcome_eur": 160800.0,
      # Kostensatz = Block heat.voly in Kapitel 7 des Berichts #95.
      "cost_methodik_block": "heat.voly",
+     # Kennzeichnung nach Kapitel 7: abschaetzung_kap3 (Elastizität 0,85 beim Raumtransfer
+     # ist eine Setzung von KAP3, Log 4).
+     "cost_evidence_class": "abgeschaetzt",
+     "cost_evidence_derivation": {
+         "wert": "160.800 €₂₀₂₄ je verlorenem Lebensjahr: Ausgangswert 79.500 €₂₀₀₅ aus "
+                 "Amann 2020a Tab. 3.15 (UBA MK 4.0), auf 2024 hochgerechnet; die "
+                 "Elastizität 0,85 beim Raumtransfer ist eine Setzung von KAP3 (Bericht "
+                 "#95 §3.5, Entscheidungslog Nr. 4).",
+         "band": "136.400–165.600 €₂₀₂₄ (Bericht #95 §3.5, Kapitel 7, Block heat.voly).",
+         "sensitivitaet": "Linear: ±15 % beim Zahlenwert verschieben den Euro-Betrag der "
+                          "Sterblichkeit um ±15 % (Bericht #95, Entscheidungslog Nr. 4); "
+                          "die Zahl der Lebensjahre ändert sich nicht.",
+     },
      "source": "Bericht #95 Rev. 7 (Winklmayr 2022 / RKI EB 19/2025 / UBA MK 4.0)",
      "source_detail": "Sanity-Anker in YLL je 100.000 EW: 18 Todesfälle/100k (≈ 1,7× "
                       "schlimmstes beobachtetes Jahr; 2018 revidiert: 8.500 ≈ 10,2/100k) "
@@ -216,6 +229,20 @@ RISKS: list[dict] = [
      "ref_value": 4.5, "scale": "pop", "cost_per_outcome_eur": 7152.0,
      # Kostensatz = Block heat.c_fall in Kapitel 7 des Berichts #95.
      "cost_methodik_block": "heat.c_fall",
+     # Kennzeichnung nach Kapitel 7: abschaetzung_kap3 (Proxy aus dem Durchschnitt aller
+     # Krankenhausfälle, Log 17).
+     "cost_evidence_class": "abgeschaetzt",
+     "cost_evidence_derivation": {
+         "wert": "7.152 €₂₀₂₄ je Fall: 6.996 €₂₀₂₃ (Durchschnitt aller Krankenhausfälle, "
+                 "Destatis-Kostennachweis 2023) × 119,3/116,7 (VPI-Indexierung auf 2024). "
+                 "Proxy von KAP3, weil ein Satz für hitzebedingte Einweisungen nicht "
+                 "veröffentlicht ist (Bericht #95 §3.5, Entscheidungslog Nr. 17).",
+         "band": "Der Bericht nennt kein Band; DRG-Sätze der hitzetypischen Diagnosen "
+                 "sind als Sensitivität vorgesehen (Kapitel 7, Block heat.c_fall).",
+         "sensitivitaet": "Linear: Der Betrag der Morbidität wächst und fällt im gleichen "
+                          "Verhältnis wie der Kostensatz; die Zahl der Fälle ändert sich "
+                          "nicht (Bericht #95 §3.5).",
+     },
      "source": "Bericht #95 Rev. 7 (Destatis T67 / Karlsson & Ziebarth 2018)",
      "source_detail": "Sanity-Anker in Fällen je 100.000 EW: Baseline 3,54/100k·a "
                       "(bevölkerungsgewichtete Summe der r_0,a, Bericht #95 §3.4); "
@@ -1371,13 +1398,24 @@ MEASURES: list[dict] = [
                  "default_reduction": "Bericht #95 §5: δ_HAP = 0,95 (Band 0,85–1,00), marginal"},
      "source_refs": {"default_reduction": ["Feldbusch_2025_HHWS",
                                            "Urban_HHAP_Wirksamkeit_2025"]},
-     "evidence_classes": {"default_reduction": "belegt"},
+     # Kennzeichnung nach Kapitel 7: abschaetzung_kap3 — der zentrale Wert 0,95 ist eine
+     # Setzung zwischen DiD roh 1,00 und adjustiert 0,85 (Feldbusch u. a. 2025), Log 10.
+     "evidence_classes": {"default_reduction": "abgeschaetzt"},
      # Block heat.delta_hap (Bericht #95 Kapitel 7): Faktor 0,95 auf den Exzess,
      # hier als Minderung 1 − 0,95 = 0,05 geführt.
      "methodik_bloecke": {"default_reduction": "heat.delta_hap"},
      # Herleitungen der Abschätzungen nach P1/§3.9 (Zahlenwert, Bandbreite,
      # Sensitivität) als Datenfeld — ein Code-Kommentar allein genügt nicht.
      "evidence_derivations": {
+        "default_reduction": {
+            "wert": "0,05 = 1 − δ_HAP mit δ_HAP = 0,95 als Faktor auf den Wochenexzess: "
+                    "zentraler Wert zwischen der DiD-Schätzung roh (1,00) und adjustiert "
+                    "(0,85) von Feldbusch u. a. 2025; die Wahl der Mitte ist eine "
+                    "Setzung von KAP3 (Bericht #95 §5, Entscheidungslog Nr. 10).",
+            "band": "0–0,15 Minderung (δ_HAP 0,85–1,00).",
+            "sensitivitaet": "Linear: Die vermiedenen Schäden der Maßnahme wachsen mit der "
+                             "Minderung; 0,15 statt 0,05 verdreifacht sie (Bericht #95 §5).",
+        },
         "capex_fixed": {
             "wert": "100.000 € einmalig für die Erstellung eines kommunalen "
                 "Hitzeaktionsplans (Mittelstadt ~80.000 EW). Abgeschätzt von KAP3 aus dem "
