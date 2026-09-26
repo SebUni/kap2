@@ -177,7 +177,7 @@ def test_starkregenereignisse_anzahl_und_juengstes_datum_per_stub(monkeypatch):
 
     _ohne_db(monkeypatch, "14612000")
     flaeche = box(13.0, 51.0, 14.0, 52.0)
-    monkeypatch.setattr(dienst, "_flaeche_der_kommune", lambda db, k: flaeche)
+    monkeypatch.setattr(dienst, "_flaeche_der_kommune", lambda db, k: (flaeche, False))
     gefragt = []
 
     def _ereignisse(f):
@@ -197,13 +197,96 @@ def test_starkregenereignisse_anzahl_und_juengstes_datum_per_stub(monkeypatch):
     assert e["schadensereignisse"]["wert"] is None
 
 
-def test_starkregenereignisse_ohne_flaeche_ist_laufzeitsatz_nie_null(monkeypatch):
+class _GitterDb:
+    """Stub der Datenbank: ``query(...).filter(...).all()`` liefert die Gitterzeilen."""
+
+    def __init__(self, zeilen):
+        self._zeilen = zeilen
+
+    def query(self, *_a):
+        return self
+
+    def filter(self, *_a):
+        return self
+
+    def all(self):
+        return self._zeilen
+
+
+def test_starkregenereignisse_ohne_flaeche_eigener_satz_nie_null(monkeypatch):
+    from app.data import catrare
+
     _ohne_db(monkeypatch, "14612000")
-    monkeypatch.setattr(dienst, "_flaeche_der_kommune", lambda db, k: None)
+    gefragt = []
+    monkeypatch.setattr(catrare, "ereignisse_in_flaeche", lambda f: gefragt.append(f) or [])
+    # Weder Kommune.boundary noch eine Gitterzelle.
+    kommune = SimpleNamespace(id=3, name="Dresden", osm_id="R191645", boundary=None)
+    g = _nach_code(dienst.bestandsaufnahme_fuer_kommune(_GitterDb([]), kommune)["groessen"])["starkregenereignisse"]
+    assert gefragt == []
+    assert g["wert"] is None and "zusatz" not in g
+    assert g["luecke_satz"] == katalog.FLAECHE_FEHLT_SATZ_VORLAGE.format(label=g["label"])
+    assert "Fläche der Kommune" in g["luecke_satz"]
+    assert "nicht abrufbar" not in g["luecke_satz"]
+
+
+def test_starkregenereignisse_abruf_gescheitert_bleibt_laufzeitsatz(monkeypatch):
+    from shapely.geometry import box
+
+    from app.data import catrare
+
+    _ohne_db(monkeypatch, "14612000")
+    monkeypatch.setattr(dienst, "_flaeche_der_kommune", lambda db, k: (box(13.0, 51.0, 14.0, 52.0), False))
+
+    def _kaputt(f):
+        raise RuntimeError("Katalog nicht erreichbar")
+
+    monkeypatch.setattr(catrare, "ereignisse_in_flaeche", _kaputt)
     kommune = SimpleNamespace(id=3, name="Dresden", osm_id="R191645")
     g = _nach_code(dienst.bestandsaufnahme_fuer_kommune(object(), kommune)["groessen"])["starkregenereignisse"]
     assert g["wert"] is None
     assert g["luecke_satz"] == katalog.LAUFZEITSATZ_VORLAGE.format(label=g["label"])
+    assert "Fläche der Kommune" not in g["luecke_satz"]
+
+
+def _starkregen_mit_flaeche(monkeypatch, db, kommune):
+    from app.data import catrare
+
+    _ohne_db(monkeypatch, "14612000")
+    gefragt = []
+
+    def _ereignisse(f):
+        gefragt.append(f)
+        return [{"id": "a", "beginn": "2021-07-14T03:20:00"}]
+
+    monkeypatch.setattr(catrare, "ereignisse_in_flaeche", _ereignisse)
+    g = _nach_code(dienst.bestandsaufnahme_fuer_kommune(db, kommune)["groessen"])["starkregenereignisse"]
+    return g, gefragt
+
+
+def test_starkregenereignisse_huelle_der_gitterzellen_ist_genaehert(monkeypatch):
+    from geoalchemy2.shape import from_shape
+    from shapely.geometry import box
+
+    zellen = [(from_shape(box(13.0, 51.0, 13.1, 51.1), srid=4326),),
+              (from_shape(box(13.5, 51.5, 13.6, 51.6), srid=4326),)]
+    kommune = SimpleNamespace(id=3, name="Dresden", osm_id="R191645", boundary=None)
+    g, gefragt = _starkregen_mit_flaeche(monkeypatch, _GitterDb(zellen), kommune)
+    assert len(gefragt) == 1 and gefragt[0].geom_type == "Polygon"  # konvexe Hülle
+    assert g["wert"] == 1 and g["luecke_satz"] == ""
+    assert g["zusatz"] == {"juengstes_beginn": "2021-07-14T03:20:00", "flaeche_genaehert": True}
+
+
+def test_starkregenereignisse_mit_grenze_nicht_genaehert(monkeypatch):
+    from geoalchemy2.shape import from_shape
+    from shapely.geometry import MultiPolygon, box
+
+    grenze = from_shape(MultiPolygon([box(13.0, 51.0, 14.0, 52.0)]), srid=4326)
+    kommune = SimpleNamespace(id=3, name="Dresden", osm_id="R191645", boundary=grenze)
+    g, gefragt = _starkregen_mit_flaeche(monkeypatch, object(), kommune)
+    assert len(gefragt) == 1
+    assert g["wert"] == 1
+    assert "flaeche_genaehert" not in g["zusatz"]
+    assert g["zusatz"] == {"juengstes_beginn": "2021-07-14T03:20:00"}
 
 
 def test_sozialdaten_fehler_ergibt_leeres_dict(monkeypatch):
