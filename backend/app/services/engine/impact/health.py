@@ -303,7 +303,7 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
     return out
 
 
-# ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5, Befunde 122, 124, 130) ──
+# ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5, Befunde 122, 124, 129, 130) ──
 
 def h_heim(qbar_pfl: float = 0.149, beta_pfl: float = 1.54) -> float:
     """Anteil der Heimbewohner an den Todesfällen 85+ (Bericht #95 §3.0/§5).
@@ -320,19 +320,26 @@ G_S157: float = (0.93 * 1.11 - 1.0) / (1.11 - 1.0)
 
 
 def s157_avoided_deaths(d85: float, s_gek: float | None, g_s157: float = G_S157,
-                        qbar_pfl: float = 0.149, beta_pfl: float = 1.54) -> float | None:
+                        qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
+                        delta_hap: float = 1.0) -> float | None:
     """Vermiedene Todesfälle 85+ durch gekühlte Heimplätze (Bericht #95 §5).
 
-    ``ΔD_S157 = D_85+ · h_Heim · s_gek · (1 − g_S157)``
+    ``ΔD_S157 = D_85+ · δ_HAP · h_Heim · s_gek · (1 − g_S157)``
 
     ``s_gek`` ist der gekühlte Anteil der Heimplätze, eine Eingabe der Kommune.
     Der Bericht trägt dafür keine Voreinstellung: Fehlt die Eingabe (None),
     entsteht **kein Betrag** — auch keine 0 (Rückgabe None).
+
+    ``delta_hap`` ist der Faktor des Hitzeaktionsplans, wenn die Kommune ihn
+    zugleich gewählt hat (sonst 1): S157 wirkt dann auf den schon mit δ_HAP
+    gedämpften Heim-Exzess — Faktoren multipliziert, Wirkungen nicht addiert
+    (Befund 129; Berlin zusammen 1 − 0,95 × 0,294 = 72,1 %).
     """
     if s_gek is None:
         return None
     s = max(0.0, min(1.0, float(s_gek)))
-    return max(0.0, d85) * h_heim(qbar_pfl, beta_pfl) * s * (1.0 - g_s157)
+    d = max(0.0, min(1.0, float(delta_hap)))
+    return max(0.0, d85) * d * h_heim(qbar_pfl, beta_pfl) * s * (1.0 - g_s157)
 
 
 # ── 2. Hitzemorbidität (Bericht #95 §3.4 — Einweisungen) ──────────────────────
