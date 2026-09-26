@@ -1710,6 +1710,7 @@ body {
 }
 .kap-param-evidence.is-estimated { color: var(--warning, #b45309); }
 .kap-param-evidence.is-sourced { color: var(--text-muted); }
+.kap-param-evidence.is-computed { color: var(--text-muted); font-style: italic; }
 .kap-param-evidence-derivation {
   display: block;
   font-size: 0.7rem;

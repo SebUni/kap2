@@ -16,7 +16,8 @@ Je Handlungsfeld (KWRA-Handlungsfeld ``kwra_field`` der Klimawirkungen aus
 * ``niedrigste_gewissheit`` — die niedrigste Gewissheitsstufe
   (``gewissheit.GEWISSHEITSSTUFEN``) unter den Klimawirkungen des Handlungsfelds,
 * ``parameter_nicht_belegt`` — Zahl der Parameter dieser Klimawirkungen, deren
-  ``evidence_class`` nicht ``"belegt"`` ist (dieselbe Parametermenge wie in
+  ``evidence_class`` weder ``"belegt"`` noch ``"berechnet"`` ist
+  (``parameter_registry.BELEGTE_KLASSEN``; dieselbe Parametermenge wie in
   ``gewissheit.gewissheitsstufe``),
 * ``klimawirkungen_niedrigste_stufe`` — die Codes der Klimawirkungen, die genau diese
   niedrigste Stufe tragen.
@@ -94,7 +95,8 @@ def unsicherheits_zusammenschau(
         niedrigste = min((stufen[c] for c in codes), key=lambda s: rang[s])
         nicht_belegt = sum(
             1 for p in parameter
-            if p.get("layer_code") in codes and p.get("evidence_class") != "belegt"
+            if p.get("layer_code") in codes
+            and p.get("evidence_class") not in parameter_registry.BELEGTE_KLASSEN
         )
         eintraege.append({
             "handlungsfeld": feld,

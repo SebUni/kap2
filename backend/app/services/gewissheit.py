@@ -63,8 +63,9 @@ def gewissheitsstufe(risk_code: str, *, _parameter: list[dict] | None = None) ->
     Parameter, die ``parameter_registry.catalog_parameters`` mit
     ``layer_code == risk_code`` zu diesem Risiko führt):
 
-    1. n = Anzahl dieser Parameter, b = Anzahl davon mit ``evidence_class == "belegt"``
-       (jeder andere Wert, insbesondere ``"abgeschaetzt"``, zählt als unbelegt).
+    1. n = Anzahl dieser Parameter, b = Anzahl davon mit ``evidence_class`` in
+       ``parameter_registry.BELEGTE_KLASSEN`` (``"belegt"`` und ``"berechnet"``;
+       jeder andere Wert, insbesondere ``"abgeschaetzt"``, zählt als unbelegt).
     2. Anteil a = b / n; ohne Parameter (n = 0) gilt a = 0.
     3. Stufe:
        - a == 0          → ``"sehr gering"`` (kein Parameter belegt),
@@ -82,7 +83,7 @@ def gewissheitsstufe(risk_code: str, *, _parameter: list[dict] | None = None) ->
     ]
     klassen = [p.get("evidence_class") for p in params]
     n = len(klassen)
-    belegt = sum(1 for k in klassen if k == "belegt")
+    belegt = sum(1 for k in klassen if k in parameter_registry.BELEGTE_KLASSEN)
     anteil = belegt / n if n else 0.0
     if anteil == 0:
         return "sehr gering"

@@ -1,7 +1,7 @@
 """Ratchet der Evidenzklasse: belegt vs. begründete Abschätzung (Vorgabe P1).
 
 Jeder Parameter der Registry trägt maschinenlesbar ``evidence_class``
-("belegt"/"abgeschaetzt"). Für eine Abschätzung verlangt P1 zusätzlich eine
+("belegt"/"abgeschaetzt"/"berechnet"). Für eine Abschätzung verlangt P1 zusätzlich eine
 Herleitung als **Datenfeld** (``evidence_derivation`` mit ``wert``, ``band``,
 ``sensitivitaet``) — ein Code-Kommentar erfüllt die Vorgabe nicht.
 
@@ -35,7 +35,7 @@ KNOWN_WITHOUT_DERIVATION: set[str] = set(
     # diese Menge). Der Bestand ist damit leer.
 )
 
-VALID_CLASSES = {"belegt", "abgeschaetzt"}
+VALID_CLASSES = set(parameter_registry.EVIDENCE_CLASSES)
 DERIVATION_FIELDS = ("wert", "band", "sensitivitaet")
 
 
@@ -64,7 +64,9 @@ def test_every_parameter_has_valid_evidence_class():
         (p["id"], p.get("evidence_class"))
         for p in _params() if p.get("evidence_class") not in VALID_CLASSES
     )
-    assert not bad, f"Parameter ohne gültige evidence_class (belegt/abgeschaetzt): {bad}"
+    assert not bad, (
+        f"Parameter ohne gültige evidence_class (belegt/abgeschaetzt/berechnet): {bad}"
+    )
 
 
 # ── (b) Ratchet: Abschätzung braucht eine Herleitung ────────────────────────────
