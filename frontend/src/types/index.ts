@@ -594,6 +594,8 @@ export interface RiskAggregate {
     by_risk: {
       /** cost_eur: null für Klasse B (Screening ohne Euro-Bezifferung, T-0823). */
       code: string; name: string; cost_eur: number | null; outcome: number
+      /** Nummer der amtlichen Klimawirkung (KWRA); null ohne Zuordnung. Teil-Ausweise teilen sie (T-1432). */
+      kwra_id?: number | null
       outcome_unit: string; cost_dimension: string; index: number
       exposed_p90_index?: number; risk_class?: RiskClass
       aggregation?: 'sum' | 'p90'; top5_share?: number
