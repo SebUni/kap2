@@ -83,8 +83,9 @@ def test_gesundheitsamt_nennt_kreis_und_kreisfreie_stadt(code):
     eintrag = MASSNAHMEN_UMSETZUNG[code]
     for partner in eintrag["partner"]:
         if "Gesundheitsamt" in partner:
-            assert "kreisangehörigen Gemeinden beim Landkreis" in partner
-            assert "kreisfreien Städten bei der Stadt selbst" in partner
+            assert "in der Regel beim Landkreis" in partner
+            assert "kreisfreien Städten in der Regel bei der Stadt selbst" in partner
+            assert "Stadtstaaten" in partner
             assert "kreis" in eintrag["ebenen"]
 
 
