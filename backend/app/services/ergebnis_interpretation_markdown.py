@@ -86,7 +86,7 @@ def _abschnitt_leitfragen(leitfragen: list[dict]) -> str:
         if f["beantwortet_durch"] == NICHT_BEANTWORTET:
             stand = "nicht beantwortet"
         else:
-            stand = f"beantwortet durch `{f['beantwortet_durch']}`"
+            stand = f"beantwortet in: {f['stelle_im_produkt']}"
         zeilen.append(
             f"{f['nr']}. {f['wortlaut']} (S. {f['seite']}) — {stand}. {f['begruendung']}"
         )
