@@ -34,6 +34,12 @@ if [ "$SOLL" != "$IST" ]; then
   echo "$SOLL" >"$STEMPEL"
 fi
 
+# Druckumgebung (T-1423): Playwright-Chromium für scripts/html_to_pdf.py.
+# Der Aufruf ist idempotent und lädt nur, was noch fehlt.
+if ! "$PY" -m playwright install chromium >/dev/null 2>&1; then
+  echo "[testlauf] Warnung: Playwright-Chromium konnte nicht installiert werden" >&2
+fi
+
 # backend/ auf den Importpfad legen: Die Testmodule importieren teils direkt
 # `app...` (erwarten also backend/ als Arbeitsverzeichnis), teils setzen sie den
 # Pfad selbst. Über PYTHONPATH laufen beide Sorten unabhängig davon, aus welchem
