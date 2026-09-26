@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useStore } from '../store'
 import { api } from '../api/client'
+import type { MassnahmeGewissheit } from '../api/client'
 import UnsicherheitsZusammenschau from './UnsicherheitsZusammenschau'
 import type { Measure, MeasureImpactSummary } from '../types'
 
@@ -10,6 +11,14 @@ export default function MeasuresTableTab() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { loadCatalog().catch(() => {}) }, [])
+
+  // Gewissheit je Maßnahmentyp (Code measure_type), einmal geladen.
+  const [gewissheit, setGewissheit] = useState<Record<string, MassnahmeGewissheit>>({})
+  useEffect(() => {
+    api.getMassnahmenGewissheit()
+      .then(list => setGewissheit(Object.fromEntries(list.map(g => [g.code, g]))))
+      .catch(() => {})
+  }, [])
 
   const measureCat = (code: string) => catalog?.measures.find(m => m.code === code)
   const measureName = (code: string) => measureCat(code)?.name || code
@@ -158,6 +167,7 @@ export default function MeasuresTableTab() {
                   <th style={{ textAlign: 'right' }}>OPEX/Jahr</th>
                   <th style={{ textAlign: 'right' }}>Nutzen/Jahr</th>
                   <th style={{ textAlign: 'right' }}>Risiko-Minderung</th>
+                  <th>Gewissheit</th>
                   <th>Aktionen</th>
                 </tr>
               </thead>
@@ -181,6 +191,22 @@ export default function MeasuresTableTab() {
                       : <>{fmtCurrency(imp.annual_benefit_eur || 0)}{imp.benefit_note && <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{imp.benefit_note}</span>}</>) : '–'}</td>
                       <td style={{ textAlign: 'right', fontSize: '0.85rem', color: 'var(--success)' }}>
                         {imp?.avg_index_reduction_pct != null ? `−${imp.avg_index_reduction_pct.toFixed(1)} %` : '–'}
+                      </td>
+                      <td style={{ fontSize: '0.75rem' }}>
+                        {(() => {
+                          const g = gewissheit[m.measure_type]
+                          if (!g) return 'nicht hinterlegt'
+                          return (
+                            <>
+                              {g.klimawirkungen.map(k => (
+                                <div key={k.code}>
+                                  {k.name}: {k.gewissheitsstufe}{k.qualitativ ? ' (qualitativ)' : ''}
+                                </div>
+                              ))}
+                              <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{g.wirkung_evidenz}</div>
+                            </>
+                          )
+                        })()}
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: 4 }}>

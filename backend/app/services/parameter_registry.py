@@ -80,8 +80,17 @@ def _param_doc_source(inp: dict) -> str:
     return "Modellannahme (mangels lokaler Daten)"
 
 
-#: Zulässige Werte der maschinenlesbaren Evidenzklasse (Vorgabe P1).
-EVIDENCE_CLASSES = ("belegt", "abgeschaetzt")
+#: Zulässige Werte der maschinenlesbaren Evidenzklasse (Vorgabe P1):
+#: "belegt" (Wert aus einer Quelle), "abgeschaetzt" (begründete Abschätzung von KAP3)
+#: und "berechnet" (aus amtlichen Daten berechnet, Anzeige „berechnet aus amtlichen Daten“).
+EVIDENCE_CLASSES = ("belegt", "abgeschaetzt", "berechnet")
+
+#: Evidenzklassen, die bei Gewissheit und Unsicherheits-Zusammenschau als belegt zählen.
+#: "berechnet" zählt wie "belegt" (heutiger Stand, T-1363-cto): Eine berechnete Größe
+#: beruht auf amtlichen Daten und ist keine Abschätzung von KAP3. So ändert die dritte
+#: Klasse keine Stufe und keine Zählung still; ob sie eigens gewichtet werden soll,
+#: ist eine fachliche Frage an den CMO.
+BELEGTE_KLASSEN = frozenset({"belegt", "berechnet"})
 
 
 def _evidence_class(explicit: Any, references: list[dict] | None) -> str:
@@ -129,8 +138,8 @@ def _base_param(
         "overridden": False,
         "custom_source": None,
         "applicable": applicable,
-        # Vorgabe P1: maschinenlesbar, ob der Wert belegt oder eine begründete
-        # Abschätzung von KAP3 ist — samt Herleitung als Datenfeld (nicht als Kommentar).
+        # Vorgabe P1: maschinenlesbar, ob der Wert belegt, aus amtlichen Daten
+        # berechnet oder eine begründete Abschätzung von KAP3 ist — samt Herleitung als Datenfeld (nicht als Kommentar).
         "evidence_class": _evidence_class(evidence_class, references),
         "evidence_note": source_detail,
         "evidence_derivation": evidence_derivation or None,
