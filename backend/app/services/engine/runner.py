@@ -87,6 +87,10 @@ def build_cell_risks(indices: dict[str, float], impacts: dict[str, dict]) -> dic
         # Teilwert Todesfälle ab 85 (Bericht #95 §5): Basis für S157 (Kühlung in Heimen).
         if "deaths_a85p" in imp:
             risks[code]["deaths_a85p"] = round(imp["deaths_a85p"], 6)
+        # Teilwerte 75–84 und 85+ (Bericht #95 §5): Basis für δ_VG und δ_VG,morb.
+        for key in ("deaths_a75_84", "cases_a75_84", "cases_a85p"):
+            if key in imp:
+                risks[code][key] = round(imp[key], 6)
         # UV (#98 §3.4): nativ YLL, Zusatzfälle je Entität als Teil-Ausweis.
         for key in ("cases_melanoma", "cases_c44"):
             if key in imp:

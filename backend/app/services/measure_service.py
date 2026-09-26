@@ -196,17 +196,81 @@ def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict,
     return max(0.0, min(1.0, 1.0 - delta_yll / yll))
 
 
+# ── Hebel S152: Schutzprogramme vulnerable Gruppen (Bericht #95 §5; VULNERABLE_GROUP_PROGRAMS) ──
+# Die Wirkung ist kein default_reduction-Faktor auf alle Bänder (früher 0.22), sondern
+# ΔD_VG = [D_75–84 + D_85+ · (1 − h_Heim)] · (1 − δ_VG) je Zelle, bewertet mit L̄_a (YLL),
+# und dieselbe Formelzeile mit F und δ_VG,morb auf die Einweisungen. Mit dem
+# Hitzeaktionsplan zusammen gilt max(δ_HAP × δ_VG; 0,794) (Kappung, Befund 126).
+
+VG_MORB_RISK_CODE = "EXPECTED_ANNUAL_MORBIDITY"
+
+
+def _is_vg(mdef: dict) -> bool:
+    return mdef.get("effect_model") == "vg"
+
+
+def _vg_cell_factor(code: str, frac: float, cell_risk: dict,
+                    delta_hap: float = 1.0, hap_cap: float = 1.0) -> float:
+    """Faktor der Schutzprogramme auf das Outcome einer Zelle (Mortalität oder Morbidität).
+
+    ``frac`` ist der Deckungsgrad der Zelle; das Programm wirkt im abgedeckten Teil.
+    ``hap_cap`` ist der Faktor des Hitzeaktionsplans in der Zelle für die Kappung
+    am Paketwert (im Aggregat und im Einzelnutzen). ``delta_hap`` dämpft zusätzlich
+    den Exzess — nur für den **Einzelnutzen** setzen, im Aggregat bleibt er 1, weil
+    dort der Faktor des Plans ohnehin mitmultipliziert wird (wie bei S157).
+    Zellen ohne Teil-Ausweis der Bänder (vor der Neuberechnung) bleiben unverändert.
+    Auf die Morbidität kann der Faktor über 1 liegen (δ_VG,morb bis 1,069).
+    """
+    from app.services.engine.impact import health
+
+    if frac <= 0.0:
+        return 1.0
+    outcome = float(cell_risk.get("outcome") or 0.0)
+    if outcome <= 0.0:
+        return 1.0
+
+    def _p(risk_code: str, key: str, default: float) -> float:
+        v = override_context.get_override(f"risks.{risk_code}.impact.{key}", default)
+        return float(v) if v is not None else default
+
+    f = max(0.0, min(1.0, frac))
+    qbar = _p(S157_RISK_CODE, "qbar_pfl", 0.149)
+    beta = _p(S157_RISK_CODE, "beta_pfl", 1.54)
+    if code == S157_RISK_CODE:
+        d75, d85 = cell_risk.get("deaths_a75_84"), cell_risk.get("deaths_a85p")
+        if d75 is None or d85 is None:
+            return 1.0
+        delta = health.vg_effective_delta(
+            _p(S157_RISK_CODE, "delta_vg", health.DELTA_VG), hap_cap)
+        l75 = _p(S157_RISK_CODE, "life_years_a75_84", health.AGE_LIFE_YEARS["a75_84"])
+        l85 = _p(S157_RISK_CODE, "life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
+        delta_x = health.vg_avoided(float(d75) * l75, float(d85) * l85, delta,
+                                    qbar, beta, delta_hap)
+        return max(0.0, min(1.0, 1.0 - f * delta_x / outcome))
+    if code == VG_MORB_RISK_CODE:
+        f75, f85 = cell_risk.get("cases_a75_84"), cell_risk.get("cases_a85p")
+        if f75 is None or f85 is None:
+            return 1.0
+        delta = _p(VG_MORB_RISK_CODE, "delta_vg_morb", health.DELTA_VG_MORB)
+        delta_x = health.vg_avoided(float(f75), float(f85), delta, qbar, beta, delta_hap)
+        return max(0.0, 1.0 - f * delta_x / outcome)
+    return 1.0
+
+
 def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float,
                          unit_factor: float, cell_risk: dict,
-                         delta_hap: float = 1.0) -> float:
+                         delta_hap: float = 1.0, hap_cap: float = 1.0) -> float:
     """Faktor einer Maßnahme auf ein verknüpftes Risiko in einer Zelle.
 
-    ``delta_hap`` wirkt nur auf S157 (siehe ``_s157_cell_factor``), sonst ohne Belang.
+    ``delta_hap`` wirkt nur auf S157 und die Schutzprogramme (Einzelnutzen),
+    ``hap_cap`` nur auf die Kappung der Schutzprogramme; sonst ohne Belang.
     """
     if _is_s157(mdef):
         if code != S157_RISK_CODE:
             return 1.0
         return _s157_cell_factor(_s157_input(config), frac, cell_risk, delta_hap)
+    if _is_vg(mdef):
+        return _vg_cell_factor(code, frac, cell_risk, delta_hap, hap_cap)
     return _reduction_factor(mdef, frac, unit_factor)
 
 
@@ -473,8 +537,9 @@ def _params_fingerprint(db: Session, measure: AdaptationMeasure, mdef: dict,
             if c in catalog.RISKS_BY_CODE
         },
     }
-    if _is_s157(mdef):
-        # Befund 129: der Nutzen von S157 hängt an den Hitzeaktionsplänen der Kommune;
+    if _is_s157(mdef) or _is_vg(mdef):
+        # Befund 129: der Nutzen von S157 hängt an den Hitzeaktionsplänen der Kommune
+        # (Schutzprogramme ebenso, Kappung mit δ_HAP, Befund 126);
         # kommt einer hinzu, ändert sich oder fällt weg, ist das Summary veraltet.
         payload["hap"] = sorted(
             (m.id, json.dumps(m.config or {}, sort_keys=True, default=str), str(m.geometry))
@@ -600,8 +665,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     # Befund 129: Hat die Kommune zugleich einen Hitzeaktionsplan, rechnet S157 seinen
     # Nutzen aus dem schon mit δ_HAP gedämpften Heim-Exzess (Faktoren multipliziert).
     # So ergibt die Summe der Einzelnutzen genau das Aggregat „mit Maßnahmen“.
+    # Die Schutzprogramme ebenso, dazu Kappung max(δ_HAP × δ_VG; 0,794) (Befund 126).
     hap_by_cell: dict[int, float] = {}
-    if _is_s157(mdef):
+    if _is_s157(mdef) or _is_vg(mdef):
         hap_by_cell = _hap_cell_factors(db, measure, parameter_registry.overrides_map(
             parameter_registry.load_db_overrides(db, measure.kommune_id)))
 
@@ -615,8 +681,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         deltas = {}
         for code in linked:
             r = cell_risks.get(code, {})
+            d_hap = hap_by_cell.get(cid, 1.0)
             factor = _measure_cell_factor(mdef, measure.config, code, frac, unit_factor, r,
-                                          hap_by_cell.get(cid, 1.0))
+                                          d_hap, d_hap)
             base_idx = float(r.get("index", 0.0))
             new_idx = base_idx * factor
             deltas[code] = round(new_idx - base_idx, 3)
@@ -734,6 +801,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         **_s157_summary_fields(mdef, measure.config),
         # Befund 129: S157 zusammen mit dem Hitzeaktionsplan gerechnet (Faktoren multipliziert)
         **({"s157_with_hap": bool(hap_by_cell)} if _is_s157(mdef) else {}),
+        # Befund 126: Schutzprogramme zusammen mit dem Hitzeaktionsplan (mit Kappung 0,794)
+        **({"vg_with_hap": bool(hap_by_cell)} if _is_vg(mdef) else {}),
         "params_fingerprint": fingerprint,
         "count": count,
         "count_is_default": count_is_default,
@@ -787,6 +856,22 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
     overrides = parameter_registry.overrides_map(
         parameter_registry.load_db_overrides(db, kommune_id)
     )
+    # Befund 126: δ_HAP je Zelle vorab, damit die Schutzprogramme am Paketwert kappen
+    # (max(δ_HAP × δ_VG; 0,794)); gedämpft wird hier nicht, das macht die Multiplikation.
+    hap_cap: dict[int, float] = {}
+    if any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
+           for m in measures):
+        hap_base = catalog.MEASURES_BY_CODE.get(S157_HAP_CODE)
+        if hap_base:
+            hap_def = parameter_registry.resolve_measure_def(hap_base, overrides)
+            for m in measures:
+                if m.measure_type != S157_HAP_CODE:
+                    continue
+                frac_map, covered_area_m2 = _coverage(db, m)
+                count, _, recommended = _resolve_count(hap_def, m.config, covered_area_m2)
+                uf = _unit_effect_factor(count, recommended)
+                for cid, frac in frac_map.items():
+                    hap_cap[cid] = hap_cap.get(cid, 1.0) * _reduction_factor(hap_def, frac, uf)
     for m in measures:
         mbase = catalog.MEASURES_BY_CODE.get(m.measure_type)
         if not mbase:
@@ -800,7 +885,8 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
             cell_risks = (base.get(cid) or {}).get("risks", {})
             for code in mdef.get("linked_risk_codes", []):
                 factor = _measure_cell_factor(mdef, m.config, code, frac, unit_factor,
-                                              cell_risks.get(code, {}))
+                                              cell_risks.get(code, {}),
+                                              hap_cap=hap_cap.get(cid, 1.0))
                 cell_factors[code] = cell_factors.get(code, 1.0) * factor
 
     out = []
