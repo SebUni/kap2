@@ -45,6 +45,10 @@ def _stand(status: str) -> str:
         teile.append("nicht abnahmereif")
     elif "ABNAHMEREIF" in gross:
         teile.append("abnahmereif")
+    # Stand nach der Abnahme durch den Manager (#95, Q-20260925T201653Z-methodik_manager-2cb821-2). Groß geschrieben
+    # und als ganzes Wort, sonst zählte „noch kein abgenommener Prototyp“ (#25, #47) als Abnahme.
+    if re.search(r"\bABGENOMMEN\b", status) and not re.search(r"\bNICHT ABGENOMMEN\b", status):
+        teile.append("abgenommen")
     if "INTEGRIERT" in gross:
         teile.append("integriert")
     return ", ".join(teile) or (status[:60] + ("…" if len(status) > 60 else "")) or "—"
