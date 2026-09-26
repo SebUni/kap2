@@ -43,7 +43,7 @@ export default function MeasureSidebar() {
 
   const def = catalog?.measures.find(m => m.code === selectedMeasure.measure_type)
   const isS157 = selectedMeasure.measure_type === 'COOLING_ROOMS_DRINKING_WATER'
-  const reductionIsEstimated =def?.evidence_classes?.default_reduction === 'abgeschaetzt'
+  const reductionIsEstimated = def?.evidence_classes?.default_reduction === 'abgeschaetzt'
   const linkedRisks = (def?.linked_risk_codes || [])
     .map(c => catalog?.risks.find(r => r.code === c)?.name || c)
 

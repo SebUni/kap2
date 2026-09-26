@@ -15,8 +15,9 @@ import pytest
 
 from app.data import catalog, catalog_parked
 from app.services import measure_service, parameter_registry
-from app.services.engine import risk_engine
+from app.services.engine import impact, override_context, risk_engine, runner
 from app.services.engine.impact import health
+from app.services.engine.impact.base import CellContext
 
 CODE = "COOLING_ROOMS_DRINKING_WATER"
 MORT = "EXPECTED_ANNUAL_MORTALITY"
@@ -86,6 +87,28 @@ def test_only_mortality_and_old_cells_unchanged():
     # Zelle vor der Neuberechnung (ohne Teil-Ausweis D_85+): keine Wirkung
     assert measure_service._measure_cell_factor(
         mdef, cfg, MORT, 1.0, 1.0, {"outcome": 10.0}) == 1.0
+
+
+def test_real_path_stores_deaths_a85p_and_measure_acts():
+    """Zelle über den echten Weg: Schadensfunktion → gespeichertes risks-Dict (runner)."""
+    override_context.set_overrides({})
+    pop = 100_000.0
+    bands = {b: pop * 0.2186 * f for b, f in
+             {"a65_74": 0.5003, "a75_84": 0.3555, "a85p": 0.1442}.items()}
+    bands["u65"] = pop * (1.0 - 0.2186)
+    ci = {"pop": pop, "summer_temp_cell": 19.0, "pop_age_bands": bands}
+    hev = {"hazards": {"HEAT_WAVE": 20.0}, "exposures": {}, "vulnerabilities": {}}
+    hn = {"hazards": {}, "exposures": {}, "vulnerabilities": {
+        v: 0.5 for r in catalog.RISKS for v in r["vulnerabilities"]}}
+    ctx = CellContext(ci=ci, hev=hev, hev_norm=hn, indices={MORT: 50.0},
+                      regional={"bundesland": "Nordrhein-Westfalen"})
+    impacts = impact.compute_all_cell_impacts(ctx)
+    stored = runner.build_cell_risks({MORT: 50.0}, impacts)[MORT]
+    assert stored["deaths_a85p"] > 0.0
+    assert stored["deaths_a85p"] < stored["deaths"]
+    factor = measure_service._measure_cell_factor(
+        catalog.MEASURES_BY_CODE[CODE], {"s_gek": 1.0}, MORT, 1.0, 1.0, stored)
+    assert 0.0 < factor < 1.0
 
 
 def test_parameters_visible_in_registry():
