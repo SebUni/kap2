@@ -639,3 +639,115 @@ Kennzeichnung `abschaetzung_kap3` des Blocks heat.voly. Die Zahl 4770 kommt im B
 | Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
 |---|---|---|---|---|---|---|---|
 | 101 | §4 Zusatz-Anker Berlin 2018 | Widerspruch Messung ↔ Begründung, Nachtrag Runde 18 | Begründung „das Zellmodell wird für Berlin … über dem Gemeindepunkt-Wert liegen“ war durch die Messung widerlegt (Runden 11, 12, 16) | wie Runde 11 | B | `! grep -q 'das Zellmodell wird für Berlin' docs/methodik/95_hitzebelastung.md` | behoben (T-1200): §4 neu gefasst — Richtung gemessen (Gemeindepunkt 20,06 °C, 0,1 K über dem Bevölkerungsmittel 19,96 °C; (a) × 0,948 und (d) × 1,021, zusammen × 0,967), Anker 221 × 0,967 ≈ 214 je 100.000, rund −18 % gegen 260; Lücke offen als unerklärt benannt; „konservativ = unterschätzend“ bleibt; Kapitel 7 unverändert |
+
+## Runde 19 — Entscheidung methodik_manager zu den Befunden 117, 99 und 100 (T-1233, 25.09.2026): 117, 100 behoben, 99 entschieden
+
+Anlass: T-1233-methodik_manager (Vorhaben T-1197-cmo). Der methodik_manager hat entschieden: Stufe 1 der Ersatzregel bleibt,
+Stufe 2 wird der Rest aus der Gemeindesumme des Zensus 2022 [69] (Befund 117); Ebene 1 bleibt die Fortschreibung zum
+Stichtag 31.12.2023 (Befund 99); Quelle [66] ohne falschen Repo-Pfad (Befund 100). Umgesetzt in §3.3 (Regel in vier
+Schritten, Rechenbeispiel Warmsen mit Test `beispiel_95_ersatz_stufe2_warmsen`, Modellgrenzen gemessen, Tabelle mit
+Einwohnern ab 65 und Spanne), Entscheidungslog Nr. 41, Quellen [66] und [69]. Kapitel 7 ist unverändert, kein neuer
+Parameter-Block; die Faktoren (a)–(d) in §3.0 und der Jahresbetrag der Kette (362,89 Mio. €) bleiben.
+`backend/app/services/zensus_loader.py` ist nicht geändert. Befund 104 bekommt einen Nachtrag: Sein Prüfausdruck aus
+Runde 17 verlangte den Satz der früheren Stufe 2 und widerspricht damit dem Ausdruck von 117; er prüft jetzt die neue Fassung.
+
+**Messung (Skript `docs/methodik/anlagen/95_zellvergleich.py`, Stufe 2 neu, liest [69] aus dem Blatt „CSV-Demografie“,
+Lauf 25.09.2026, Cache außerhalb des Repos).**
+
+- `--gemeinde 03256034 --ersatz` (Warmsen): A_G = (602 + 2/7 × 388) / 3158 = 22,57 %; Z = 22,57 % × 3087 = 697; fest 508
+  (Zellen mit veröffentlichtem Anteil) + 36 (Stufe 1); R = 153; Anteil je Zelle der Stufe 2 153 / 1897 = 8,07 %. Einwohner
+  ab 65 heute 508, mit Regel 697 (zwischen 602 ab 67 und 990 ab 60 [69]); Jahresbetrag heute 138.543 €, mit Regel
+  173.099 € (Preisstand 2024), Faktor × 0,800; 60–66 gar nicht (0/7) × 0,904, ganz (7/7) × 0,622.
+- `--gemeinde 11000000 --ersatz` (Berlin): A_G = 19,68 %; Z = 707.318; fest 694.397 + 2252; R = 10.669; Anteil 14,26 %.
+  Einwohner ab 65 heute 694.397, mit Regel 707.318; Jahresbetrag heute 338,10 Mio. €, mit Regel 342,67 Mio. €, Faktor
+  × 0,987; 0/7 × 0,998, 7/7 × 0,925. Kette unverändert 362,89 Mio. €.
+- `--rangliste`: 10.811 Gemeinden mit Zellen der Stufe 2 (8.739.209 Einwohner in diesen Zellen); R < 0 in 1323 Gemeinden
+  mit 320.504 Einwohnern in Zellen der Stufe 2 (3,7 %), Überhang im Median 5, höchstens 195 Einwohner ab 65; Anteil auf
+  100 % begrenzt in 3 Gemeinden (19 Einwohner); keine Zeile in [69] oder „.“ in 69 Gemeinden (9133 Einwohner, 0,1 %). Die
+  30 Gemeinden mit 376 Einwohnern ohne Zelle mit veröffentlichtem Anteil bekommen jetzt einen Wert; die frühere
+  Modellgrenze entfällt.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 117 | §3.3, Ersatzregel Stufe 2 (Log 41) | Widerspruch Messung ↔ Regel, Nachtrag Runde 19 | Entscheidung methodik_manager (T-1233): Stufe 2 wird der Rest aus der Gemeindesumme [69] | wie Runde 17 | A | `! grep -q 'sonst in Stufe 2 durch den einwohnergewichteten Anteil 65+' docs/methodik/95_hitzebelastung.md` | behoben (T-1233): §3.3 legt Stufe 2 als Rest aus der Gemeindesumme fest (A_G mit 2/7 der Gruppe 60–66 als Abschätzung von KAP3, Z, R, Anteil begrenzt auf 0–100 %); Warmsen 697 statt 1416 Einwohner ab 65 (zwischen 602 ab 67 und 990 ab 60), Faktor × 0,800; Berlin × 0,987; Spanne 0/7–7/7 mit Aufruf; Modellgrenze R < 0 gemessen (1323 Gemeinden, 3,7 %); Log 41 neu mit Gegenargumenten Aufteilung 60–66 und Stichtag; Prüfausdruck unverändert |
+| 99 | §3.0 Rechenkette, Ebene 1 | Abweichung vom Ticket (Datenstand), Nachtrag Runde 19 | Entscheidung methodik_manager (T-1233): Ebene 1 bleibt die Fortschreibung zum Stichtag 31.12.2023, Basis Zensus 2022; derselbe Stichtag gilt für den Nenner von m_a [49], der Unterschied zum Gitter steht als Wirkung (b) in §3.0; nach dem 05.10.2026 wird nicht umgestellt | — | C | `grep -q 'Stichtag 31.12.2023, Basis Zensus 2022' docs/methodik/95_hitzebelastung.md` | entschieden (methodik_manager) → geschlossen: Ebene 1 bleibt; §3.3 nennt den Stichtag der Ersatzregel (15.05.2022) neben Ebene 1 (31.12.2023); Prüfausdruck unverändert |
+| 100 | §8 Quelle [66] | falscher Pfad, Nachtrag Runde 19 | [66] nannte den Repo-Pfad backend/data/lite/zensus_gemeinde.json, die Datei ist eine erzeugte Aufbereitung und liegt nicht im Repo | [66] nennt das erzeugende Modul und den sha256-Pin in §4 | C | `! grep -q 'backend/data/lite/zensus_gemeinde.json' docs/methodik/95_hitzebelastung.md && grep -q 'backend/app/services/lite/zensus_gemeinde.py' docs/methodik/95_hitzebelastung.md && test -f backend/app/services/lite/zensus_gemeinde.py` | behoben (T-1233): [66] nennt das Modul `backend/app/services/lite/zensus_gemeinde.py` (im Repo), sagt, dass die Aufbereitung `zensus_gemeinde.json` nicht im Repo liegt, verweist für den sha256-Pin `124fd7a7a15b` auf §4 (`#t-povw`) und nennt [69] als amtliche Gegenprobe; neuer Prüfausdruck auf den Bericht statt `test -f` auf die fehlende Datei |
+| 104 | §3.3 (Regelsatz) ↔ Produkt `zensus_loader.apply_zensus_to_cell_inputs` | Divergenz Bericht ↔ Code, Nachtrag Runde 19 | Der Prüfausdruck aus Runde 17 verlangte den Satz der früheren Stufe 2 („sonst in Stufe 2 durch den einwohnergewichteten Anteil 65+“), den T-1233 mit Befund 117 entfernt; er wäre damit rot, obwohl der Berichtsteil von 104 weiter erfüllt ist. Der Ausdruck prüft jetzt die Regel in der Fassung T-1233 | — | B | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('### 3.3'):s.index('### 3.4')]; sys.exit(not ('**Regel (Abschätzung von KAP3, festgelegt vom methodik_manager):** Ist der Anteil 65+ einer' in t and '*Stufe 1:* Ist in der Zelle mindestens eine der sechs 5er-Jahresgruppen ab 65' in t and '*Stufe 2:* Die übrigen geheimgehaltenen Zellen bekommen den Rest aus der Gemeindesumme' in t and 'ist eine Abschätzung von KAP3' in t))"` | behoben (T-1233): Berichtsteil unverändert erfüllt — Regel in §3.3 mit Stufe 1 und Stufe 2 (neu), gekennzeichnet als Abschätzung von KAP3; Prüfausdruck auf die neue Fassung umgestellt, weil der Ausdruck aus Runde 17 dem von Befund 117 widerspricht; Code-Teil weiter Befund 116 |
+| 116 | Produkt: `zensus_loader.apply_zensus_to_cell_inputs` (share_o = … or 0.0) ↔ Bericht §3.3 (Ersatzregel) | Code-Nachzug (Eiserne Regel 5), Nachtrag Runde 19 | Die Entscheidung zu Befund 117 liegt vor; das Produkt setzt weiter 65+ = 0 | Code-Nachzug beim cto nach Log 41 in der Fassung T-1233: Stufe 1 wie bisher, Stufe 2 Rest aus der Gemeindesumme [69] (A_G mit 2/7 der Gruppe 60–66, Z = A_G × Einwohnersumme im Gitter, R, Anteil begrenzt auf 0–100 %, R < 0 gibt 0), [69] je Gemeinde als Datenquelle; Test mit Berlin (707.318 Einwohner ab 65, 342,67 Mio. €) und Warmsen (697, 173.099 €) aus §3.3 | B | `! grep -q 'share_o = ci.get("share_over_65") or 0.0' backend/app/services/zensus_loader.py` | zurückgestellt (Code-Nachzug cto): Vorschlag auf Log 41 in der Fassung T-1233 fortgeschrieben; Code-Prüfausdruck unverändert |
+
+## Runde 20 — Nacharbeit 1 zu T-1233 nach Urteil methodik_manager Runde 0 (25.09.2026): neue Befunde 118–119, behoben
+
+Anlass: Urteil des methodik_manager zu T-1233 (Runde 0, 25.09.2026): Abnahmekriterium erfüllt, aber zwei neue Befunde der
+Kategorie C aus der Gegenprüfung der geänderten Stellen (N1 → 118, N2 → 119), dazu vier Hinweise. Umgesetzt:
+
+- 118: Quelle [66] nennt die Näherung des Moduls `backend/app/services/lite/zensus_gemeinde.py`: 100-m-Zellen werden zu
+  1-km-Zellen zusammengefasst (Z. 31–72), jede 1-km-Zelle geht ganz an die Gemeinde, in der ihr Mittelpunkt liegt
+  (Z. 106–125). [66] verweist auf die 96 VG250-Gemeinden ohne Zensus-Eintrag in §4 und nennt [69] als Gegenprobe nur mit
+  diesem Vorbehalt.
+- 119: Entscheidung methodik_manager: Fehlt die Gemeindezeile in [69] oder steht dort „.“, gilt A_G der Kreiszeile (erste
+  fünf Stellen des AGS). Umgesetzt in §3.3 (Schritt 1 und Modellgrenzen), Log 41 (Regel und Gegenargument 4) und im Skript
+  (`zensus_demografie` liest jetzt auch die Kreiszeilen, neue Funktion `demografie_fuer`, `--rangliste` zählt Kreiszeile
+  und Rest ohne jede Zeile getrennt).
+- Hinweise: (a) Kopf des Entscheidungslogs nennt für Eintrag 41 jetzt auch T-1233 und die Befunde 99, 117 und 119;
+  (b) 305.088 € in §3.3 mit Fundort (Befund-Ledger Runde 17, T-1199), Zeilenumbruch gerichtet; (c) `--rangliste` gibt
+  den Überhang als positiven Betrag aus; (d) Export folgt nach der Null-Runde, hier nicht erzeugt.
+
+**Messung (Lauf 25.09.2026, Cache außerhalb des Repos).** `python3 docs/methodik/anlagen/95_zellvergleich.py --rangliste`:
+R < 0 in 1342 von 10.811 Gemeinden mit Zellen der Stufe 2, darin 320.780 der 8.739.209 Einwohner solcher Zellen (3,7 %);
+Überhang Median 5, größter 195 Einwohner ab 65; auf 100 % begrenzt 3 Gemeinden (19 Einwohner); A_G aus der Kreiszeile
+68 Gemeinden (5240 Einwohner in Zellen der Stufe 2, 0,1 %); weder Gemeinde- noch Kreiszeile 1 Gemeinde (3893 Einwohner):
+Hanau, in VG250 06415000, in [69] noch 06435014 im Main-Kinzig-Kreis (Abfrage über `zensus_demografie` und
+`demografie_fuer` gegen `vg250_gem`, GF = 4). Die 69 Gemeinden ohne Gemeindezeile aus Runde 19 (9133 Einwohner) teilen
+sich damit in 68 mit Kreiszeile (5240) und Hanau (3893). R < 0 steigt von 1323 auf 1342 Gemeinden, weil Gemeinden mit
+Kreiszeile jetzt ein R haben. Berlin und Warmsen haben eine Gemeindezeile; beide `--ersatz`-Aufrufe geben dieselben Werte
+wie in Runde 19 aus (Berlin 707.318, 342,67 Mio. €, × 0,987, × 0,925–0,998; Warmsen 697, 173.099 €, × 0,800,
+× 0,622–0,904), die Tabelle in §3.3 bleibt.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 118 | §8 Quelle [66] | verschwiegene Näherung | „aufsummiert aus den Gitterdaten 100 m [67] auf die Gemeinden aus VG250 [65]“ verschwieg, dass das Modul auf 1-km-Zellen faltet und über den Mittelpunkt zuordnet (Ursache der 96 Gemeinden ohne Zensus-Eintrag in §4); [69] stand ohne Vorbehalt als Gegenprobe da | [66] nennt 1-km-Faltung und Zuordnung über den Mittelpunkt als Näherung, verweist auf die 96 Gemeinden in §4, Gegenprobe nur mit Vorbehalt | C | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('**[66]**'):s.index('**[67]**')]; sys.exit(not ('1-km' in t and 'Mittelpunkt' in t and '96 VG250-Gemeinden' in t and 'Vorbehalt' in t))"` | behoben (T-1233, Nacharbeit 1): [66] neu gefasst wie vorgeschlagen |
+| 119 | §3.3 Modellgrenzen, Log 41 (P3) | Modellgrenze ohne Ersatz, obwohl Ersatzquelle vorhanden | 69 Gemeinden ohne Gemeindezeile in [69] oder mit „.“ rechneten in Stufe 2 weiter mit 65+ = 0 (9133 Einwohner), also mit der Logik, die der Bericht selbst als Unterschätzung ausweist; [69] führt Kreiszeilen | Entscheidung methodik_manager: ohne Gemeindezeile oder bei „.“ gilt A_G der Kreiszeile (ARS-Präfix 5 Stellen); Modellgrenze nur noch ohne Kreiszeile, neu gemessen | C | `grep -qF 'gilt A_G der Kreiszeile aus [69]' docs/methodik/95_hitzebelastung.md && grep -qF 'Kreiszeile, Befund 119' docs/methodik/95_hitzebelastung.md && grep -qF 'return demografie[ags[:5]], "Kreis"' docs/methodik/anlagen/95_zellvergleich.py` | behoben (T-1233, Nacharbeit 1): §3.3 Schritt 1 und Modellgrenzen, Log 41, Skript; 68 Gemeinden nehmen die Kreiszeile, ohne Ersatzwert bleibt nur Hanau (3893 Einwohner) |
+| 116 | Produkt: `zensus_loader.apply_zensus_to_cell_inputs` (share_o = … or 0.0) ↔ Bericht §3.3 (Ersatzregel) | Code-Nachzug (Eiserne Regel 5), Nachtrag Runde 20 | Log 41 hat mit Befund 119 den Rückfall auf die Kreiszeile bekommen | Code-Nachzug beim cto nach Log 41 in der Fassung T-1233 einschließlich Nacharbeit 1: Stufe 1 wie bisher, Stufe 2 Rest aus der Gemeindesumme [69] (A_G mit 2/7 der Gruppe 60–66, ohne Gemeindezeile oder bei „.“ aus der Kreiszeile; Z = A_G × Einwohnersumme im Gitter, R, Anteil begrenzt auf 0–100 %, R < 0 gibt 0); Test mit Berlin (707.318 Einwohner ab 65, 342,67 Mio. €) und Warmsen (697, 173.099 €) aus §3.3 | B | `! grep -q 'share_o = ci.get("share_over_65") or 0.0' backend/app/services/zensus_loader.py` | zurückgestellt (Code-Nachzug cto): Vorschlag um den Rückfall auf die Kreiszeile fortgeschrieben; Code-Prüfausdruck unverändert |
+
+## Runde 21 — Nacharbeit 2 zu T-1233 nach Urteil methodik_manager Runde 1 (25.09.2026): neuer Befund 120, behoben
+
+Anlass: Urteil des methodik_manager zu T-1233 (Runde 1, 25.09.2026): Abnahmekriterium erfüllt, ein neuer Befund der
+Kategorie C (N1 → 120): Die Entscheidung zu Befund 99 stand nur in der Prüfakte, nicht im Bericht (Gate 1). Umgesetzt:
+neuer Entscheidungslog-Eintrag Nr. 42 ⚠ (Frage, Entscheidung, Begründung mit Gegenargument, Alternative Zensus-Tabelle
+1000A, Auswirkung); der Absatz „Stichtag“ in §3.3 nennt den Grund in einem Satz (m_a [49] teilt Sterbefälle 2023 durch
+die Bevölkerung am 31.12.2023) und die Wirkung (b) mit × 0,981; der Kopf des Entscheidungslogs nennt Eintrag 42. Der
+Überstimmungsweg gilt wie für alle Einträge über den Kopf des Logs. Keine Zahl geändert, Kapitel 7 unverändert, Skript
+unverändert.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 120 | §3.3 „Stichtag“ und §3.0 Ebene 1 ↔ Entscheidungslog | Lücke (Gate 1 der Aufgabe: Ermessensfall nicht im Bericht dokumentiert) | Die Entscheidung zu Befund 99 stand nur in der Prüfakte. Entschieden ist: Ebene 1 bleibt die Fortschreibung 31.12.2023 und wird nach dem 05.10.2026 nicht auf die Zensus-Tabelle 1000A (15.05.2022) umgestellt. Der Bericht sagte nur „bleibt (Befund 99)“, ohne Grund, Alternative und Überstimmungsweg | Neuer Log-Eintrag 42 ⚠ mit Begründung (gleicher Stichtag wie der Nenner von m_a [49]; Abstand zum Gitter als Wirkung (b), × 0,981 in Berlin), Alternative 1000A, Wirkung keine Zahl; Grund in einem Satz im Absatz „Stichtag“ in §3.3; Kopf des Logs nachziehen; Kapitel 7 unverändert | C | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('## Entscheidungslog'):]; sys.exit(not any('31.12.2023' in z and '1000A' in z and 'm_a' in z for z in t.splitlines() if z.startswith('\| 42')))"` | behoben (T-1233, Nacharbeit 2): Log-Eintrag 42 ⚠ angelegt, Absatz „Stichtag“ in §3.3 mit Grund, Kopf des Logs nachgezogen; Kapitel 7 unverändert |
+
+## Runde 22 — Befund 121 aus dem Urteil zu T-1233 Runde 2 (T-1266, 25.09.2026): neuer Befund 121, behoben
+
+Anlass: Urteil des methodik_manager zu T-1233 (Runde 2, 25.09.2026): Abnahmekriterium erfüllt, ein neuer Befund der
+Kategorie C, eine Regression durch T-1233. T-1233 wurde nach drei Nacharbeitsrunden eskaliert; T-1266 ersetzt es. Die
+Arbeit von T-1233 (Runden 19–21) ist Byte für Byte aus `origin/ticket/T-1233-methodik_manager` übernommen; Lint und
+Ledger-Gate waren vor der Änderung grün (25 Befunde belegt, zurückgestellt nur 116). Runde 22 ist die siebte seit der
+letzten Null-Runde (Runde 15), Zählung nach A-0046. Umgesetzt:
+
+- Skript: Die Zeile „Eigenheit in (c)“ teilt (c) mit `--ersatz` gegen die Ersatzregel aus §3.3 auf (Stufe 1 und 2,
+  ohne (d)): Produkt gegen Regel = Betrag (c) / Betrag mit Regel, Rest = Betrag mit Regel / Betrag (b). „Zelllauf ohne
+  Eigenheit“ ist jetzt der Jahresbetrag mit Regel samt (d), derselbe Wert wie in der Tabelle in §3.3. Der Vergleich mit
+  dem einheitlichen Anteil 65+ der übrigen Zellen ist entfernt. Ohne `--ersatz` nennt die Zeile nur Zellen und
+  Einwohner, weil die Aufteilung [69] braucht.
+- §3.0 (c): × 0,982 = 0,9867 × 0,9948, erster Faktor Produkt gegen Regel mit Verweis auf §3.3 und Befund 121, zweiter
+  Faktor der Rest in einem Satz erklärt. Der Satz zum Zelllauf ohne die Eigenheit nennt rund 343 Mio. € (342,67 Mio. €,
+  Tabelle in §3.3) statt rund 345 Mio. €. Beispielblock `rechenkette_95`: die zwei Zeilen mit den alten Faktoren rechnen
+  mit 0,9867 und 0,9948 und mit 343 statt 345.
+
+**Messung (Lauf 25.09.2026, Cache außerhalb des Repos).** `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde
+11000000 --ersatz`: Regel ohne (d) 335,78 Mio. €, Produkt gegen Regel × 0,9867, Rest × 0,9948 (Produkt der gerundeten
+Faktoren 0,98157, (c) genau 0,98158); Zelllauf ohne Eigenheit 342,67 Mio. €. Warmsen (`--gemeinde 03256034 --ersatz`):
+Regel ohne (d) 167.246 €, Produkt gegen Regel × 0,8004, Rest × 0,9159, Zelllauf ohne Eigenheit 173.099 €. Die Tabelle in
+§3.3 bleibt (Berlin 338,10 Mio. €, 342,67 Mio. €, × 0,987, × 0,925–0,998; Warmsen 138.543 €, 173.099 €, × 0,800,
+× 0,622–0,904); (a)–(d), die Kette (362,89 Mio. €) und Kapitel 7 sind unverändert.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 121 | §3.0 Wirkung (c) ↔ §3.3 (Regel Fassung T-1233) | Widerspruch (Regression durch T-1233) | §3.0 (c) teilt × 0,982 auf in „× 0,9802 durch eine Eigenheit des Produkts … (Befund 104; Ersatzregel dafür in §3.3)“ und „Der Rest, × 1,0014, sind Altersstruktur und Wohnlage der Älteren“. Gemessen ist das gegen den einheitlichen Anteil 65+ der übrigen Zellen (19,87 %, Skriptzeile „Eigenheit in (c), Befund 104“), also gegen genau die Annahme, die §3.3 mit Befund 117 verwirft. Für dieselbe Eigenheit nennt §3.3 in Berlin × 0,987 (heute gegen Regel). Damit läge der Rest bei rund × 0,995 statt × 1,0014, seine Richtung kehrt sich um. Der Adressat liest für eine Sache zwei Zahlen | (c) im Skript gegen die Regel aus §3.3 aufteilen (Stufe 1 und 2, ohne (d)) und die Zeile „Eigenheit in (c)“ entsprechend beschriften. §3.0 (c) mit den gemessenen Werten neu fassen und dort auf Befund 121 verweisen. (c) × 0,982, (a)–(d), die Kette (362,89 Mio. €) und Kapitel 7 bleiben unverändert | C | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('### 3.0'):s.index('### 3.1')]; sys.exit(not ('Der Rest, × 1,0014' not in t and 'Befund 121' in t))"` | behoben (T-1266): Skriptzeile „Eigenheit in (c)“ teilt mit `--ersatz` gegen die Regel aus §3.3 (Berlin × 0,9867 und × 0,9948); §3.0 (c) neu gefasst mit Verweis auf §3.3 und Befund 121, rund 343 Mio. € statt rund 345 Mio. €; Tabelle in §3.3, (a)–(d), Kette und Kapitel 7 unverändert |
