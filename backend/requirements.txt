@@ -17,6 +17,7 @@ numpy>=1.26.0
 Pillow>=10.0.0
 bcrypt>=4.1
 mistralai==1.12.4  # KI-Assistent (EU-Anbieter, La Plateforme)
+playwright>=1.45  # Druckumgebung: scripts/html_to_pdf.py (Chromium, T-1423)
 
 # Optional, nur für scripts/fetch_era5_storm.py (einmaliger ERA5-Sturmtage-Raster-Bau
 # mit kostenlosem CDS-Key). Die App läuft ohne diese Pakete; der Loader fällt dann auf
