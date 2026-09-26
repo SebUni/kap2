@@ -775,4 +775,81 @@ export const api = {
     request<MassnahmenUmsetzung>('/interpretation/massnahmen-umsetzung'),
   getInterpretationsbericht: (kommuneId: number): Promise<string> =>
     requestText(`/kommune/${kommuneId}/interpretation/bericht`),
+  getInterpretationAbhaengigkeiten: (kommuneId: number) =>
+    request<InterpretationAbhaengigkeiten>(`/kommune/${kommuneId}/interpretation/abhaengigkeiten`),
+  getInterpretationDiversitaet: () =>
+    request<InterpretationDiversitaet>('/interpretation/diversitaet'),
+  getInterpretationLeitfragen: () =>
+    request<InterpretationLeitfragen>('/interpretation/leitfragen'),
+}
+
+// ── Interpretationsbelege, Teil 2 (T-1299: Abhängigkeiten, Diversität, Leitfragen) ──
+/** Quellenangabe der Antworten von /interpretation/diversitaet und /interpretation/leitfragen (``QUELLE``). */
+export interface InterpretationQuelle {
+  titel: string
+  url: string
+  abgerufen?: string // ISO-Datum
+  seite?: number
+  pdf?: string
+}
+
+/** Beziehung einer Klimawirkung (handlungsfeld_abhaengigkeiten.abhaengigkeiten_der_kommune). */
+export interface AbhaengigkeitBeziehung {
+  beziehung_nr: number
+  partner_kwra_id: number
+  partner_name: string
+  partner_handlungsfeld: string
+  partner_gerechnet: boolean
+  anderes_handlungsfeld: boolean
+  richtung: string
+  wirkt_auf_partner: boolean
+  partner_wirkt_ein: boolean
+  beleg: string
+}
+export interface AbhaengigkeitKlimawirkung {
+  kwra_id: number
+  name: string
+  handlungsfeld: string
+  beziehungen: AbhaengigkeitBeziehung[]
+  andere_handlungsfelder: string[]
+}
+/** GET /kommune/{id}/interpretation/abhaengigkeiten; ``umfang`` „gerechnet“ = nur berechnete Klimawirkungen, „katalog“ = ganzer Katalog. */
+export interface InterpretationAbhaengigkeiten {
+  kommune_id: number
+  umfang: 'gerechnet' | 'katalog'
+  klimawirkungen: AbhaengigkeitKlimawirkung[]
+}
+
+export interface DiversitaetBeruecksichtigt {
+  aspekt: string
+  wie: string
+  fundstelle: string
+}
+export interface DiversitaetNichtBeruecksichtigt {
+  aspekt: string
+  quelle: string
+  seite: number
+}
+export interface DiversitaetJeKlimawirkung {
+  beruecksichtigt: DiversitaetBeruecksichtigt[]
+  nicht_beruecksichtigt: DiversitaetNichtBeruecksichtigt[]
+}
+/** GET /interpretation/diversitaet; Schlüssel von ``je_klimawirkung`` = Klimawirkungscode. */
+export interface InterpretationDiversitaet {
+  quelle: InterpretationQuelle
+  je_klimawirkung: Record<string, DiversitaetJeKlimawirkung>
+}
+
+export interface Leitfrage {
+  nr: number
+  wortlaut: string
+  seite: number
+  beantwortet_durch: string
+  stelle_im_produkt: string
+  begruendung: string
+}
+/** GET /interpretation/leitfragen. */
+export interface InterpretationLeitfragen {
+  quelle: InterpretationQuelle
+  leitfragen: Leitfrage[]
 }
