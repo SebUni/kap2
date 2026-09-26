@@ -91,11 +91,12 @@ def cost_column_values(risk: dict, raw_costs: list) -> list:
     Klasse B (Katalogeintrag ``"euro_layer": False``) hat keine Euro-Schicht:
     Dort steht je Zelle der Vermerk ``catalog.NO_EURO_LAYER_TEXT`` statt einer
     0, die als „kein Schaden" gelesen würde. Alle anderen Wirkungen behalten
-    ihre Euro-Werte unverändert als float.
+    ihre Euro-Werte unverändert als float; ein fehlender Betrag (None) bleibt
+    None (NULL), ein vorhandener 0.0 bleibt 0.0.
     """
     if not catalog.risk_has_euro_layer(risk):
         return [catalog.NO_EURO_LAYER_TEXT for _ in raw_costs]
-    return [float(v) for v in raw_costs]
+    return [_float_oder_none(v) for v in raw_costs]
 
 
 def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
@@ -180,7 +181,7 @@ def build_geopackage(db: Session, kommune_id: int, export_id: int) -> str:
             out = rdata.get("outcome")
             risk_index_cols[code].append(float(idx) if idx is not None else None)
             risk_outcome_cols[f"{code}_outcome"].append(float(out) if out is not None else None)
-            risk_cost_cols[f"{code}_cost_eur"].append(rdata.get("cost_eur", 0.0))
+            risk_cost_cols[f"{code}_cost_eur"].append(rdata.get("cost_eur"))
 
         auxiliary = data.get("auxiliary", {})
         for code in auxiliary_codes:
