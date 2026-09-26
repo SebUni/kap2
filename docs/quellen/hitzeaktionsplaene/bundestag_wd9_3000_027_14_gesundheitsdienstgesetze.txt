@@ -1,0 +1,2140 @@
+Textabbild (pdftotext -layout, poppler) von bundestag_wd9_3000_027_14_gesundheitsdienstgesetze.pdf
+Quelle: https://www.bundestag.de/resource/blob/410444/a2f24acb7bdabf15da541c95d2946167/wd-9-027-14-pdf-data.pdf, abgerufen am 25.09.2026
+Seitenmarken = PDF-Seiten; sie stimmen mit der gedruckten Seitenzahl überein.
+
+=== Seite 1 ===
+Wissenschaftliche Dienste                 Deutscher Bundestag
+
+
+
+
+Ausarbeitung
+
+
+
+Die Gesundheitsdienstgesetze der Länder
+
+
+
+
+© 2015 Deutscher Bundestag                       WD 9 – 3000 – 027/14
+=== Seite 2 ===
+Wissenschaftliche Dienste              Ausarbeitung                                                        Seite 2
+                                       WD 9 – 3000 – 027/14
+
+
+
+
+Die Gesundheitsdienstgesetze der Länder
+
+
+
+
+Aktenzeichen:                   WD 9 – 3000 – 027/14
+Abschluss der Arbeit:           30. April 2014
+Fachbereich:                    WD 9: Gesundheit, Familie, Senioren, Frauen und Jugend
+
+
+
+
+Ausarbeitungen und andere Informationsangebote der Wissenschaftlichen Dienste geben nicht die Auffassung des
+Deutschen Bundestages, eines seiner Organe oder der Bundestagsverwaltung wieder. Vielmehr liegen sie in der
+fachlichen Verantwortung der Verfasserinnen und Verfasser sowie der Fachbereichsleitung. Der Deutsche Bundestag
+behält sich die Rechte der Veröffentlichung und Verbreitung vor. Beides bedarf der Zustimmung der Leitung
+der Abteilung W, Platz der Republik 1, 11011 Berlin.
+=== Seite 3 ===
+Wissenschaftliche Dienste        Ausarbeitung                                    Seite 3
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+1.          Einleitung                                                      6
+1.1.        Der Öffentliche Gesundheitsdienst                               6
+1.2.        Die Gesundheitsdienstgesetze der Länder – Einführung            6
+1.3.        Zum Aufbau der vorliegenden Auswertung der ÖGD-Gesetze der
+            Länder                                                           8
+1.4.        Ziele und allgemeine Aufgaben des ÖGD                           10
+1.5.        Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                               10
+1.6.        Spezifische Aufgaben des ÖGD im Bereich der Prävention          10
+1.7.        Besondere Strukturen der Planung , Koordination und Steuerung   11
+
+2.          Bayern                                                          12
+2.1.        Ziele und allgemeine Aufgaben des ÖGD                           12
+2.2.        Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                               12
+2.3.        Spezifische Aufgaben des ÖGD im Bereich der Prävention          12
+
+3.          Berlin                                                          14
+3.1.        Ziele und allgemeine Aufgaben des ÖGD                           14
+3.2.        Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                               14
+3.3.        Spezifische Aufgaben des ÖGD im Bereich der Prävention          14
+3.4.        Besondere Strukturen der Planung, Koordination und Steuerung    15
+
+4.          Brandenburg                                                     17
+4.1.        Ziele und allgemeine Aufgaben des ÖGD                           17
+4.2.        Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                               17
+4.3.        Spezifische Aufgaben des ÖGD im Bereich der Prävention          17
+4.4.        Besondere Strukturen der Planung, Koordination und Steuerung    18
+
+5.          Bremen                                                          19
+5.1.        Ziele und allgemeine Aufgaben des ÖGD                           19
+5.2.        Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                               19
+5.3.        Spezifische Aufgaben des ÖGD im Bereich der Prävention          19
+5.4.        Besondere Strukturen der Planung, Koordination und Steuerung    21
+
+6.          Hamburg                                                         22
+6.1.        Ziele und allgemeine Aufgaben des ÖGD                           22
+6.2.        Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                               22
+6.3.        Spezifische Aufgaben des ÖGD im Bereich der Prävention          22
+6.4.        Besondere Strukturen der Planung, Koordination und Steuerung    23
+
+7.          Hessen                                                          24
+=== Seite 4 ===
+Wissenschaftliche Dienste        Ausarbeitung                                   Seite 4
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+7.1.        Ziele und allgemeine Aufgaben des ÖGD                          24
+7.2.        Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              24
+7.3.        Spezifische Aufgaben des ÖGD im Bereich der Prävention         24
+7.4.        Besondere Strukturen der Planung, Koordination und Steuerung   25
+
+8.          Mecklenburg-Vorpommern                                         26
+8.1.        Ziele und allgemeine Aufgaben des ÖGD                          26
+8.2.        Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              26
+8.3.        Spezifische Aufgaben des ÖGD im Bereich der Prävention         26
+8.4.        Besondere Strukturen der Planung, Koordination und Steuerung   27
+
+9.          Niedersachsen                                                  28
+9.1.        Ziele und allgemeine Aufgaben des ÖGD                          28
+9.2.        Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              28
+9.3.        Spezifische Aufgaben des ÖGD im Bereich der Prävention         28
+9.4.        Besondere Strukturen der Planung, Koordination und Steuerung   29
+
+10.         Nordrhein-Westfalen                                            30
+10.1.       Ziele und allgemeine Aufgaben des ÖGD                          30
+10.2.       Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              30
+10.3.       Spezifische Aufgaben des ÖGD im Bereich der Prävention         30
+10.4.       Besondere Strukturen der Planung, Koordination und Steuerung   31
+
+11.         Rheinland-Pfalz                                                33
+11.1.       Ziele und allgemeine Aufgaben des ÖGD                          33
+11.2.       Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              33
+11.3.       Spezifische Aufgaben des ÖGD im Bereich der Prävention         33
+11.4.       Besondere Strukturen der Planung, Koordination und Steuerung   34
+
+12.         Saarland                                                       35
+12.1.       Ziele und allgemeine Aufgaben des ÖGD                          35
+12.2.       Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              35
+12.3.       Spezifische Aufgaben des ÖGD im Bereich der Prävention         35
+12.4.       Besondere Strukturen der Planung, Koordination und Steuerung   36
+
+13.         Sachsen                                                        37
+13.1.       Ziele und allgemeine Aufgaben des ÖGD                          37
+13.2.       Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              37
+13.3.       Spezifische Aufgaben des ÖGD im Bereich der Prävention         37
+=== Seite 5 ===
+Wissenschaftliche Dienste        Ausarbeitung                                   Seite 5
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+13.4.       Besondere Strukturen der Planung, Koordination und Steuerung   38
+
+14.         Sachsen-Anhalt                                                 39
+14.1.       Ziele und allgemeine Aufgaben des ÖGD                          39
+14.2.       Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              39
+14.3.       Spezifische Aufgaben des ÖGD im Bereich der Prävention         39
+14.4.       Besondere Strukturen der Planung, Koordination und Steuerung   40
+
+15.         Schleswig-Holstein                                             42
+15.1.       Ziele und allgemeine Aufgaben des ÖGD                          42
+15.2.       Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              42
+15.3.       Spezifische Aufgaben des ÖGD im Bereich der Prävention         42
+15.4.       Besondere Strukturen der Planung, Koordination und Steuerung   43
+
+16.         Thüringen                                                      44
+16.1.       Ziele und allgemeine Aufgaben des ÖGD                          44
+16.2.       Struktur und Organisation des ÖGD, Grundsätze der
+            Aufgabenerfüllung                                              44
+16.3.       Spezifische Aufgaben des ÖGD im Bereich der Prävention         44
+16.4.       Besondere Strukturen der Planung, Koordination und Steuerung   45
+=== Seite 6 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                                          Seite 6
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+1.       Einleitung
+
+1.1. Der Öffentliche Gesundheitsdienst
+
+Der Begriff „Öffentlicher Gesundheitsdienst“ (ÖGD) bezeichnet im Allgemeinen die staatlichen
+und kommunalen Gesundheitsämter, Einrichtungen der Veterinär- und Lebensmittelaufsicht so-
+wie weitere Gesundheitsbehörden des Bundes und der Länder. Traditionelle Zuständigkeiten des
+ÖGD sind die Gesundheitsvorsorge und Gesundheitsfürsorge (u. a. Einschulungsuntersuchungen,
+Schwangeren- und Mütterberatung), die gemeindenahe psychiatrische und sozialpsychiatrische
+Versorgung sowie Überwachungs- und Beratungsaufgaben in den Bereichen Hygiene, Infektions-
+krankheiten, Arzneimittelverkehr und Umweltmedizin.1 Der ÖGD hat insbesondere folgende
+Aufgaben:
+
+     -    Im Rahmen der Gesundheitsvorsorge werden Aufklärung, Gesundheitserziehung und
+          -beratung angeboten.
+     -    Unter Gesundheitshilfe bzw. Gesundheitsfürsorge versteht man die Bereiche Jugend- und
+          Schulgesundheitspflege, die Behindertenbetreuung sowie sozialpsychiatrische Dienste.
+     -    Gesundheitsförderung soll dazu beitragen, dass Menschen Gesundheit als ihr eigenes Inte-
+          resse erkennen und verfolgen, ggf. in Netzwerken, die gegenseitige Hilfeleistung bieten.
+     -    Im Rahmen des Gesundheitsschutzes soll der ÖGD übertragbare Krankheiten durch Auf-
+          rechterhaltung eines ausreichenden Impfschutzes verhindern und bekämpfen.
+     -    Beteiligung an der Lebensmittelüberwachung und am gesundheitlichen Umweltschutz.2
+
+Eine in den letzten Jahren verstärkt ausgebaute Aufgabe ist ferner die Gesundheitsberichterstat-
+tung, die auf Landes- und teilweise auch auf kommunaler Ebene stattfindet. Die Gesundheitsbe-
+richterstattung liefert Daten und Fakten zur gesundheitlichen Situation der Bevölkerung bezie-
+hungsweise zu Strukturen und Leistungen des Gesundheitswesens.3
+
+1.2. Die Gesundheitsdienstgesetze der Länder – Einführung
+
+Ziele, Aufgaben und Struktur des ÖGD sind von allen Ländern in formellen Gesetzen geregelt
+worden. Nur in Thüringen ist dies in Form einer Rechtsverordnung geschehen. Typische Elemen-
+te der ÖGD-Gesetze sind Regelungen zu folgenden Punkten:
+
+
+
+
+1        Bundeszentrale für politische Bildung: Die wichtigsten Akteure im deutschen Gesundheitswesen
+         http://www.bpb.de/politik/innenpolitik/gesundheitspolitik/72565/staat-und-politik?p=all (zuletzt aufgerufen
+         am 24. April 2014).
+
+2        Die vorstehende Definition wurde – teilweise auch wörtlich – der Webseite Gesundheitsberichterstattung des
+         Bundes (Gesundheitsbericht für Deutschland 1998) entnommen: http://www.gbe-
+         bund.de/gbe10/abrechnung.prc_abr_test_logon?p_uid=gasts&p_aid=&p_knoten=FID&p_sprache=D&p_suchstrin
+         g=1105 (zuletzt aufgerufen am 24. April 2014).
+
+3        Bundeszentrale für politische Bildung: Die wichtigsten Akteure im deutschen Gesundheitswesen
+         http://www.bpb.de/politik/innenpolitik/gesundheitspolitik/72565/staat-und-politik?p=all (zuletzt aufgerufen
+         am 24. April 2014).
+=== Seite 7 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                                       Seite 7
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+    -    Allgemeine Ziele, Aufgaben und Behörden des ÖGD,
+    -    Gesundheitsschutz, -vorsorge und -förderung,
+    -    Gesundheitshilfe,
+    -    Gesundheitsaufsicht/-überwachung,
+    -    Gesundheitsberichterstattung/-planung,
+    -    gutachterliche Tätigkeiten.4
+
+Jenseits dieser Grundstruktur weisen die ÖGD-Gesetze5 aber in vielerlei Hinsicht deutliche struk-
+turelle und inhaltliche Unterschiede auf. Auch die Regelungsdichte und die inhaltliche Schwer-
+punktsetzung der Gesetze (z. B. im Bereich Gesundheitsberichterstattung oder Koordinierungs-
+aufgaben) differieren zum Teil beträchtlich.6
+
+So beziehen sich manche der Gesetze nur auf den humanmedizinischen Bereich, andere regeln
+auch veterinärmedizinische Aufgaben (z. B. Bayern und Hamburg ), die Einrichtung von Ethik-
+Kommissionen (z. B. Bremen und Mecklenburg-Vorpommern) oder Fragen des gesundheitsbezo-
+genen Verbraucherschutzes (z. B. Berlin, Hamburg und Mecklenburg-Vorpommern). Fragen des
+Datenschutzes werden in einigen Gesetzen ausführlich geregelt, andere Gesetze enthalten keine
+Regelungen zu datenschutzrechtlichen Fragen (z. B. Niedersachsen).
+
+Auch die Organisation und Leitung des ÖGD ist in den Gesetzen sehr unterschiedlich geregelt.
+Viele Landesgesetze benennen die Träger des ÖGD (außerhalb der Stadtstaaten sind dies in der
+Regel das Land, die Landkreise sowie die kreisfreien Städte) und enthalten weitergehende orga-
+nisatorische Vorgaben. So wird in vielen Gesetzen die Einrichtung eines „Gesundheitsamtes“ als
+untere Gesundheitsbehörde ausdrücklich vorgeschrieben. Dies gilt aber z. B. nicht für Schleswig-
+Holstein, Hamburg und Nordrhein-Westfalen.7 Die Leitung des Gesundheitsamtes ist in einigen
+Ländern einer Amtsärztin oder einem Amtsarzt zu übertragen, andere Gesetze verzichten auf sol-
+che Festlegungen oder treffen abweichende Bestimmungen.8
+
+In einigen Landesgesetzen finden sich Hinweise dazu, welche der Aufgaben des ÖGD von den
+Kreisen und kreisfreien Städten als Aufgaben des übertragenen Wirkungskreises oder als Aufga-
+ben des eigenen Wirkungskreises wahrgenommen werden.9 Diese Regelungen fallen aber in den
+
+
+
+4       Müller, Wolfgang, Entwicklungslinien öffentlicher Gesundheit in den Ländern der Bundesrepublik Deutsch-
+        land, in: Bundesverband der Ärztinnen und Ärzte des Öffentlichen Gesundheitsdienstes e. V., 1950-2010 60
+        Jahre BVÖGD – Engagement für die Gesundheit der Bevölkerung", 2010, S. 56 (59), online abrufbar auf der Web-
+        seite des Ärzteverbands öffentlicher Gesundheitsdienst Baden-Württemberg e. V. unter: http://aerzte-oegd-
+        bw.de/daten/verbandsnachrichten/2011/buchbvoegd/bvoegd_buch_kapitel_06_4865_entwicklungslinien.pdf
+        (zuletzt aufgerufen am 24. April 2014).
+
+5       unter Einschluss der Rechtsverordnung des Landes Thüringen.
+
+6       Vgl. auch Müller, S. 59, 65.
+
+7       Zu weiteren Einzelheiten vgl. Müller, S. 60.
+
+8       Zu weiteren Einzelheiten vgl. Müller, S. 60.
+
+9       Vgl. zu weiteren Einzelheiten Müller, S. 60-62.
+=== Seite 8 ===
+Wissenschaftliche Dienste              Ausarbeitung                                                        Seite 8
+                                       WD 9 – 3000 – 027/14
+
+
+
+
+verschiedenen Ländern sehr unterschiedlich aus. Teilweise ist hier ein Trend der Kommunalisie-
+rung (d. h. der ÖGD als Selbstverwaltungsaufgabe der Kreise und kreisfreien Städte) auszu-
+machen, der aber z. B. in Hessen nicht aufgegriffen wurde.10 Dieselbe Heterogenität der Regelun-
+gen findet sich in Fragen der Fach- und Rechtsaufsicht über die Behörden des ÖGD.
+
+Für die Wahrnehmung der Aufgaben des ÖGD gilt in Berlin der Grundsatz der Subsidiarität (§ 1
+Abs. 2 GDG Berlin), in Bremen hingegen im Sinne eines eigenständigen Versorgungsauftrags die
+Maßgabe, dass der ÖGD an der Erbringung gesundheitlicher Leistungen mit eigenständigen Auf-
+gaben teilnimmt (§ 1 ÖGDG Bremen). Die anderen Landesgesetze bewegen sich inhaltlich zwi-
+schen diesen beiden Positionen.11 Weitere Unterschiede betreffen z. B. die gesetzlichen Möglich-
+keiten der Delegation von Aufgaben auf Dritte.12
+
+1.3. Zum Aufbau der vorliegenden Auswertung der ÖGD-Gesetze der Länder
+
+Auftragsgemäß bietet diese Ausarbeitung eine Übersicht der ÖGD-Gesetze der Länder zu Fragen
+der Prävention und Gesundheitsförderung.
+
+Vor dem Hintergrund der oben beschriebenen sehr unterschiedlichen Ausgestaltung der ÖGD-
+Gesetze sind die 16 Landesgesetze kaum miteinander vergleichbar. Im Übrigen werden in den
+einzelnen Gesetzen die Bereiche Prävention, Gesundheitsförderung, Gesundheitsvorsorge und
+Gesundheitshilfe kaum voneinander abgegrenzt.13
+
+Daher wird der wesentliche Inhalt der jeweiligen gesetzlichen Bestimmungen im Folgenden
+stichwortartig wiedergeben. Die im Gesetz verwandten Begriffe werden dabei weitgehend über-
+nommen. Die Darstellung für jedes Bundesland ist wie folgt gegliedert:
+
+     1. Ziele und allgemeine Aufgaben des ÖGD
+     2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+     3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+        (im weitesten Sinne, d. h. alle Aufgaben in den Bereichen Gesundheitsschutz, -vorsorge
+        und -förderung, Gesundheitshilfe), d. h. insbesondere:
+        -      Grundsätze der Prävention und Gesundheitsförderung
+        -      Kinder und Jugendliche
+        -      Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+        -      Schwangeren- und Mütterberatung
+        -      Umweltbezogene Aufgaben
+        -      Impfungen
+
+
+
+10    Müller, S. 61 f.
+
+11    Müller, S. 62.
+
+12    Einen Überblick der Entwicklung der ÖGD-Gesetze liefert auch die Powerpoint-Präsentation „Entwicklung des
+      ÖGD und der Gesundheitsdienstgesetze (GDG) in den Ländern Deutschlands“ von Dr. Wolfgang Müller, Aka-
+      demie für öffentliches Gesundheitswesen, 2013, Anlage.
+
+13    Ebenso Hegger, Ursula/Beske, Fritz, Prävention und Gesundheitsförderung als Aufgabe des Öffentlichen Ge-
+      sundheitsdienstes, Kiel 2003, S. 80.
+=== Seite 9 ===
+Wissenschaftliche Dienste                Ausarbeitung                                                             Seite 9
+                                         WD 9 – 3000 – 027/14
+
+
+
+
+        -       Infektionskrankheiten (einschließlich AIDS, sexuell übertragbare Krankheiten),
+     4. Besondere Strukturen der Planung, Koordination und Steuerung
+        (z. B. Gesundheitskonferenzen, Gesundheitsberichterstattung).
+
+Die Auswertung zu den einzelnen Punkten kann – entsprechend der unterschiedlichen Struktur
+der Gesetze – nicht in allen Aspekten vollständig und vergleichbar erfolgen. So werden sexuell
+übertragbare Krankheiten (oder „Geschlechtskrankheiten“) in einem Teil der Gesetze ausdrück-
+lich erwähnt (Berlin, Hamburg, Mecklenburg-Vorpommern, Nordrhein-Westfalen, Saarland und
+Sachsen-Anhalt). Andere Gesetze enthalten allgemeine Regelungen, die sich auf alle übertragba-
+ren Krankheiten beziehen, oder verweisen auf das bundesrechtliche Infektionsschutzgesetz
+(IfSG)14 (so z. B. Niedersachen). Im IfSG werden dem ÖGD weitere Aufgaben im Bereich des In-
+fektionsschutzes zugewiesen. So bietet das Gesundheitsamt nach § 19 IfSG bezüglich sexuell
+übertragbarer Krankheiten Beratung und Untersuchung an oder stellt diese in Zusammenarbeit
+mit anderen Einrichtungen sicher. Diese Leistungen sollen nach § 19 IfSG für Personen, deren
+Lebensumstände eine erhöhte Ansteckungsgefahr mit sich bringen, auch aufsuchend angeboten
+werden und können im Einzelfall auch die ambulante Behandlung durch einen Arzt des Ge-
+sundheitsamtes umfassen.
+
+Ein Teil der Gesetze weist keine gesonderten Regelungen für die Schwangeren- und Mütterbera-
+tung auf (Baden-Württemberg, Brandenburg, Hessen, Niedersachsen, Rheinland-Pfalz und Saar-
+land). Die Regelwerke der Länder Sachsen und Thüringen enthalten keine ausdrücklichen Vor-
+schriften über Gesundheitsberichterstattung oder Gesundheitskonferenzen.
+
+Alle ÖGD-Gesetze enthalten weitere Regelungen zu den Bereichen hygienische und gesundheits-
+rechtliche Überwachung von Einrichtungen, Ausstellung von Bescheinigungen, Zeugnissen und
+Gutachten, Aufsicht über Berufe im Gesundheitswesen sowie teilweise auch zum Arzneimittel-
+verkehr. Diese Regelungen wurden in der Übersicht nicht berücksichtigt.
+
+Im Übrigen ist darauf hinzuweisen, dass das Fehlen ausdrücklicher Detailregelungen zu einzel-
+nen Aufgabenbereichen in den ÖGD-Gesetzen keine Rückschlüsse darauf zulässt, dass die jewei-
+lige Leistung nicht angeboten oder Aufgaben nicht wahrgenommen werden. Vielmehr können
+insoweit auch allgemein gefasste Regelungen der ÖGD-Gesetze oder Vorschriften in anderen Ge-
+setzen oder Verordnungen als Rechtsgrundlage für ein Tätigwerden des ÖGD in Betracht kom-
+men.
+
+
+
+
+14     Infektionsschutzgesetz vom 20. Juli 2000 (BGBl. I S. 1045), das zuletzt durch Artikel 2 Absatz 36 u. Artikel 4
+       Absatz 21 des Gesetzes vom 7. August 2013 (BGBl. I S. 3154) geändert worden ist.
+=== Seite 10 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                                       Seite 10
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+Baden-Württemberg
+
+1.4. Ziele und allgemeine Aufgaben des ÖGD
+
+Nach § 1 Gesundheitsdienstgesetz (ÖGDG)15 fördert und schützt der ÖGD die Gesundheit der
+Bevölkerung und beobachtet bzw. bewertet deren gesundheitliche Verhältnisse einschließlich der
+Auswirkungen von Umwelteinflüssen. Hierzu hat er insbesondere
+
+     -    den Ursachen von Gesundheitsgefährdungen und Gesundheitsschäden nachzugehen und
+          auf die Beseitigung von Gesundheitsgefährdungen hinzuwirken,
+     -    darüber zu wachen, dass die Anforderungen der Hygiene eingehalten werden und über-
+          tragbare Krankheiten bei Menschen verhütet und bekämpft werden,
+     -    Maßnahmen der Gesundheitsförderung und Gesundheitserziehung zu initiieren und zu
+          koordinieren,
+     -    Krankheiten epidemiologisch zu erfassen und zu bewerten sowie Gesundheitsberichte zu
+          erstellen.
+
+1.5. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Behörden des ÖGD sind u. a. das Sozialministerium, das Regierungspräsidium sowie Land- und
+Stadtkreise (§ 2).
+
+Der ÖGD berät Behörden und andere öffentliche Stellen in allen Fachfragen seines Aufgabenge-
+biets, soweit nicht besondere Dienste der öffentlichen Verwaltung zuständig sind (§ 1 Abs. 3).
+
+1.6. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+     -    Gesundheitliche Prävention, Gesundheitsförderung (§ 7 Abs. 1): Aufklärung der Bevölke-
+          rung über gesunde Lebensweise, Gesundheitsgefährdungen und die Verhütung von
+          Krankheiten; Information und Beratung über Gesundheitsförderung; Vermeidung von Ge-
+          fährdungen und Krankheitsverhütung.
+     -    Beratung anderer Stellen, die mit der Prävention und Gesundheitsförderung befasst sind,
+          sowie die Koordination von Maßnahmen (§ 7 Abs. 2).
+
+Kinder und Jugendliche
+
+     -    Schulgesundheitspflege, Jugendzahnpflege (§ 8): Einschulungsuntersuchung und Unter-
+          suchung der vierjährigen Kinder (unter Einbeziehung des Impfausweises und des Früher-
+          kennungsheftes).
+     -    Beratung von Kindern, Schülern, Sorgeberechtigten, Kindertagesstätten und Schulen zu
+          gesundheitlichen Fragen, erforderlichenfalls Entwicklung zielgruppenspezifischer Unter-
+          suchungen und Maßnahmen.
+
+
+
+15       Gesetz über den öffentlichen Gesundheitsdienst vom 12. Dezember 1994 (GBl. 1994, 663) in der am 1. April
+         2014 geltenden Fassung.
+=== Seite 11 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                                        Seite 11
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+     -    evtl. Durchführung der Sprachstandsdiagnose nach § 91 Abs. 2 des Schulgesetzes als Ne-
+          bentätigkeit (§ 8 Abs. 2).
+     -    Maßnahmen zur Erkennung und Verhütung von Zahnerkrankungen (Gruppenprophylaxe)
+          bei Kindern und Jugendlichen von drei bis achtzehn Jahren, soweit diese nicht von ande-
+          ren Stellen durchgeführt werden16 (§ 8 Abs. 3).
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+     -    Informationen für behinderte und von Behinderung bedrohte Menschen, chronisch Kran-
+          ke, psychisch Kranke und Suchtkranke über Beratungs-, Betreuungs- und Versorgungsan-
+          gebote (erforderlichenfalls zielgruppenspezifische Beratungs- und Betreuungsleistungen
+          durch den ÖGD selbst, § 7 Abs. 2).
+
+Umweltbezogene Aufgaben
+
+     -    Umwelthygiene (§ 6): Beobachtung und Bewertung von Einwirkungen aus der Umwelt auf
+          die menschliche Gesundheit; Information und Beratung zum umweltbezogenen Gesund-
+          heitsschutz; Stellungnahmen zu den gesundheitlichen Umweltauswirkungen bei Pla-
+          nungsvorhaben und sonstigen Maßnahmen.
+
+Impfungen
+
+     -    (Prüfung des Impfausweises im Rahmen der Einschulungsuntersuchung, s. o. ).
+
+Infektionskrankheiten
+
+     -    Anonyme AIDS-Beratung sowie Angebote anonymer Tests (Art. 7 Abs. 2).
+     -    Information bei übertragbaren Krankheit über Beratungs-, Betreuungs- und Versorgungs-
+          angebote (erforderlichenfalls zielgruppenspezifische Beratungs- und Betreuungsleistungen
+          durch den ÖGD selbst, § 7 Abs. 2).
+
+1.7. Besondere Strukturen der Planung , Koordination und Steuerung
+
+     -    Gesundheitsberichterstattung (§ 11): Beobachtung und Beschreibung der gesundheitlichen
+          Situation der örtlichen Bevölkerung, Datenerhebung und –übermittlung; epidemiologi-
+          sche Untersuchungen.
+     -    Zusammenarbeit mit den regionalen Arbeitsgemeinschaften für Gesundheitserziehung
+          und für Jugendzahnpflege (§ 7 Abs. 5, Geschäftsführung dieser Arbeitsgemeinschaften
+          durch den ÖGD).
+
+
+
+
+16       Vgl. § 21 SGB V – Fünftes Buch Sozialgesetzbuch – Gesetzliche Krankenversicherung – (Artikel 1 des Gesetzes
+         vom 20. Dezember 1988, BGBl. I S. 2477, 2482), das zuletzt durch Artikel 1 des Gesetzes vom 27. März 2014
+         (BGBl. I S. 261) geändert worden ist.
+=== Seite 12 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                                       Seite 12
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+2.       Bayern
+
+2.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Mit dem Ziel der Wahrung und Förderung der öffentlichen Gesundheit (Art. 1 Abs. 1 des Ge-
+sundheitsdienst- und Verbraucherschutzgesetz – GDVG)17) übernimmt der ÖGD insbesondere
+folgende Aufgaben:
+
+     -    Mitwirkung an der allgemeinen Aufklärung und Information der Bevölkerung in allen
+          Fragen des ÖGD (Art. 8),
+     -    Gesundheitsförderung und Prävention (Art. 9),
+     -    Risikoanalyse, Risikokommunikation, Gesundheitsberichterstattung (Art. 10).
+
+2.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Allgemeine staatliche Behörden für Gesundheit sind das zuständige Staatsministerium, die Re-
+gierungen und die Landratsämter (Art. 3). Daneben bestehen besondere staatliche Behörden für
+Gesundheit (Art. 5, z. B. Bayerisches Landesamt für Gesundheit und Lebensmittelsicherheit).
+
+Es gelten das Gebot der Kooperation der einzelnen Behördenbereiche sowie Informations- und
+Beteiligungspflichten (Art. 6).
+
+2.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+     -    Unterstützung der Bevölkerung bei der Gesundheitsförderung sowie der Schaffung und
+          Erhaltung gesunder Lebensbedingungen; Aufklärung über Gesundheitsförderung und Prä-
+          vention, Initiierung gesundheitsfördernder, präventiver, umwelt- und sozialmedizinischer
+          Maßnahmen (Art. 9).
+     -    Gesundheitliche Aufklärung und Beratung (Art. 13): Aufklärung in Fragen der Gesundheit
+          in körperlicher, psychischer und sozialer Hinsicht; Beratung über Gesunderhaltung und
+          Krankheitsverhütung.
+
+Kinder und Jugendliche
+
+     -    Schutz und Förderung der Gesundheit von Kindern und Jugendlichen (Art. 14 Abs. 2).
+     -    Verpflichtung der Personensorgeberechtigten, die Teilnahme ihrer Kinder an Früherken-
+          nungsuntersuchungen sicherzustellen (Art. 14 Abs. 1).
+     -    Einschaltung des Jugendamts bei Verdacht einer Gefährdung des Kindes oder Jugendli-
+          chen (Art. 14 Abs. 3).
+     -    Gesundheitliche Beratung und Untersuchung im Kindes- und Jugendalter (Art. 14 Abs. 4).
+
+
+
+
+17       Gesetz über den öffentlichen Gesundheits- und Veterinärdienst, die Ernährung und den Verbraucherschutz
+         sowie die Lebensmittelüberwachung vom 24. Juli 2003 (GVBl. 2003, 452) in der am 1. April 2014 geltenden Fas-
+         sung.
+=== Seite 13 ===
+Wissenschaftliche Dienste         Ausarbeitung                                            Seite 13
+                                  WD 9 – 3000 – 027/14
+
+
+
+
+    -   Wahrnehmung der Schulgesundheitspflege in Zusammenarbeit mit der Schule und den
+        Personensorgeberechtigten (u. a. Verpflichtung zum Nachweis der Teilnahme an der U 9-
+        Früherkennungsuntersuchung und Regelungen für das Verfahren im Falle fehlender
+        Nachweise, schulische Impfberatungen, Art. 14 Abs. 5).
+    -   Mitteilungspflichten von Ärzten, Hebammen etc. bei gewichtigen Anhaltspunkten für eine
+        Misshandlung, Vernachlässigung oder einen sexuellen Missbrauch (Art. 14 Abs. 6).
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Beratung für Menschen, die an einer Sucht, an einer psychischen oder chronischen
+        Krankheit oder an einer Behinderung leiden, über Einrichtungen, die vorsorgende, beglei-
+        tende und nachsorgende Hilfen gewähren (Art. 13 Abs. 1).
+    -   Bei der gesundheitlichen Beratung haben die Förderung und der Schutz von älteren Men-
+        schen einen besonderen Stellenwert (Art. 13 Abs. 1).
+
+Schwangeren- und Mütterberatung
+
+    -   Familienberatung, Beratung bei der Familienplanung (einschließlich der Beratung
+        Schwangerer über Einrichtungen zur Vermeidung und Beseitigung von Gesundheitsgefah-
+        ren während der Schwangerschaft (Art. 13 Abs. 1).
+
+Umweltbezogene Aufgaben
+
+    -   Umweltbezogener Gesundheitsschutz (Art. 15): Beobachtung und Bewertung von Um-
+        welteinflüssen; Beratung und Aufklärung; Mitwirkung an der Verhütung gesundheits-
+        schädlicher Langzeitwirkungen; anlassbezogene Stellungnahmen für andere Behörden; In-
+        formation über umweltmedizinische Leistungen anderer Einrichtungen; Mitwirkung an
+        umweltepidemiologischen Erhebungen.
+
+Impfungen
+
+    -   (Schulische Impfberatungen für Kinder und Jugendliche, s. o.).
+
+Infektionskrankheiten
+
+    -   Wahrnehmung von Aufgaben nach dem IfSG durch die zuständigen Behörden (Art. 16
+        Abs. 1).
+
+4.4.    Besondere Strukturen der Planung, Koordination und Steuerung
+
+-       Risikoanalyse, Risikokommunikation, Gesundheitsberichterstattung (Art. 10): Beobach-
+        tung und Bewertung der gesundheitlichen Verhältnisse (einschließlich der Auswirkungen
+        von Umwelteinflüssen und der Ernährung), Datenerhebung und -übermittlung, Erarbei-
+        tung von Konzepten.
+=== Seite 14 ===
+Wissenschaftliche Dienste                Ausarbeitung                                                      Seite 14
+                                         WD 9 – 3000 – 027/14
+
+
+
+
+3.       Berlin
+
+3.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Leitbild des ÖGD nach § 1 Gesundheitsdienst-Gesetz (GDG)18: Der ÖGD stellt sich den großstadt-
+typischen gesundheitlichen und sozialen Problemen und reagiert flexibel auf sich ändernde
+Rahmenbedingungen. Er achtet besonders auf die Stärkung der Eigenverantwortung sowie des
+bürgerschaftlichen Engagements und berücksichtigt geschlechtsspezifische, behindertenspezifi-
+sche und ethnisch-kulturelle Aspekte. Der ÖGD orientiert sich am Programm des Gesunde-
+Städte-Netzwerkes und an den Grundsätzen von Public Health (§ 1 Abs. 1).
+
+Kernaufgaben sind u. a. die Qualitätsentwicklung, Planung und Koordination, Prävention, Ge-
+sundheitsförderung sowie Gesundheitshilfe (§ 1 Abs. 3).
+
+3.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Für den ÖGD zuständig sind u. a. die Senatsverwaltung, zuständige Ämter der Bezirke sowie
+Sonderbehörden, z. B. für die Aufgaben einer Zentralen medizinischen Gutachtenstelle (§ 2). Der
+ÖGD nimmt seine Aufgaben „grundsätzlich subsidiär und sozialkompensatorisch wahr, soweit
+durch Gesetz nichts anderes bestimmt ist“ (§ 1 Abs. 2).
+
+3.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+     -    Gesundheitsförderung und Prävention (§ 7 Abs. 1): Förderung der persönlichen Kompe-
+          tenz im Umgang mit Gesundheit und Krankheit sowie der Übernahme sozialer Verantwor-
+          tung für sich und andere; Verzögerung des Eintritts von Pflegebedürftigkeit.
+     -    Sicherstellung des Zusammenwirkens der im Bereich der Gesundheitsförderung tätigen
+          Institutionen; Förderung und Bewertung kommunaler und regionaler gesundheitsfördern-
+          der Aktivitäten sowie von Selbsthilfegruppen (§ 7 Abs.2).
+
+Kinder und Jugendliche
+
+     -    Initiierung und Durchführung von Maßnahmen der Gesundheitsförderung; Aufklärung
+          und Beratung zu Gesundheitsthemen; kinder- und jugendärztliche sowie kinder- und ju-
+          gendpsychiatrische Diagnostik, Beratung sowie Vermittlung von Betreuung und Hilfsan-
+          geboten; kinder- und jugendpsychiatrische Krisenintervention; Sicherstellung der vorbeu-
+          genden und nachgehenden Gesundheitshilfe (einschließlich der Anordnung therapeuti-
+          scher Leistungen); Prävention von zivilisationsbedingten Krankheiten; zahnmedizinische
+          Vorsorge und Beratung in Kindertagesstätten und Schulen; ambulante therapeutische Ver-
+          sorgung behinderter Kinder und Jugendlicher insbesondere im Schulbereich (§ 1 Abs. 3).
+     -    Beratung, psychosoziale Unterstützung und Hilfevermittlung für Säuglinge und Kleinkin-
+          der z. B. bei regelwidrigem Verlauf von Schwangerschaft bzw. Geburt oder der frühkindli-
+
+
+
+18       Gesetz über den öffentlichen Gesundheitsdienst im Land Brandenburg vom 25. Mai 2006 (GVBl. 2006, 450) in
+         der am 1. April 2014 geltenden Fassung.
+=== Seite 15 ===
+Wissenschaftliche Dienste         Ausarbeitung                                            Seite 15
+                                  WD 9 – 3000 – 027/14
+
+
+
+
+        chen Entwicklung (Kooperation mit Ärzten, Hebammen sowie Jugendämtern) sowie für
+        Kinder und Jugendliche hinsichtlich ihrer gesundheitlichen Entwicklung, psychischer
+        Störungen sowie in Fragen der Zahngesundheit (§ 8 Abs. 2).
+    -   Information des Jugendamts bei Anhaltspunkten für eine Misshandlung oder grobe Ver-
+        nachlässigung (§ 8 Abs. 3).
+    -   (Impfangebote für Kinder und Jugendliche, s. u.).
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Gesundheitshilfe (§ 8): Angebote zur Gesundheitshilfe unter sozialkompensatorischen
+        Kriterien speziell für Menschen, die aus gesundheitlichen, sozialen, sprachlichen, kultu-
+        rellen oder finanziellen Gründen keinen ausreichenden Zugang zu den Hilfesystemen fin-
+        den oder besonderer Betreuung bedürfen.
+    -   Beratung oder psychosoziale Unterstützung u. a. für folgende Zielgruppen bzw. Fragen:
+        Opfer häuslicher oder sexueller Gewalt; Opfer von Menschenhandel; geistig, seelisch oder
+        körperlich behinderte Menschen; krebs- und andere chronisch kranke Menschen; AIDS-
+        und Tuberkulosekranke.
+    -   Sozialpsychiatrische Aufgaben; Mitwirkung bei der Planung, Qualitätssicherung und Wei-
+        terentwicklung der gemeindepsychiatrischen Versorgungsstruktur.
+
+Schwangeren- und Mütterberatung
+
+    -   Beratung, psychosoziale Unterstützung und Hilfevermittlung in Fragen der Familienpla-
+        nung und Partnerschaft, Sexualität und Schwangerschaft (§ 8 Abs. 2).
+
+Umweltbezogene Aufgaben
+
+    -   Umweltbezogener Gesundheitsschutz (§ 10): Abwehr umweltbedingter Gesundheitsgefah-
+        ren; vorsorgende Umwelthygiene und krankheitsorientierte Umweltmedizin.
+
+Impfungen
+
+    -   Ermittlung von Impflücken der Bevölkerung; Impfangebote für Kinder und Jugendliche;
+        Impfberatung (§ 9 Abs. 2).
+
+Infektionskrankheiten
+
+    -   Vorsorgender und abwehrender Infektionsschutz (§ 9 Abs. 1): Aufklärung, Beratung, Er-
+        kennung, Verhütung und Bekämpfung übertragbarer Erkrankungen, Epidemien und Pan-
+        demien.
+    -   Beratung, Hilfevermittlung bei AIDS und sexuell übertragbaren Krankheiten (§ 8 Abs. 2).
+
+3.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+    -   System zur Planung und Steuerung (§ 4 Abs.1, u. a. Berücksichtigung sozialräumlicher
+        Problemlagen Bewertung der Wirksamkeit von Maßnahmen).
+    -   Qualitätsmanagementsystem des ÖGD (§ 4 Abs. 2).
+    -   Organisationseinheiten der Bezirksämter für Qualitätsentwicklung, Planung und Koordi-
+        nation (Einbeziehung eines Psychiatriekoordinators und ein Drogen- und Suchhilfekoor-
+        dinators, §§ 1 Abs. 1, 3 Abs. 3);
+=== Seite 16 ===
+Wissenschaftliche Dienste        Ausarbeitung                                           Seite 16
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+    -   Psychiatriebeirat auf Bezirksebene (§ 3 Abs. 4).
+    -   Gesundheitskonferenzen zur Erarbeitung von bezirklichen Gesundheitszielen und zur
+        Förderung der Zusammenarbeit (§ 3 Abs. 5), Landesgesundheitskonferenz (§ 3 Abs. 6).
+    -   Integrierte Gesundheits- und Sozialberichterstattung (§ 5).
+    -   Sozialindikative Gesundheitsplanung (§ 6).
+=== Seite 17 ===
+Wissenschaftliche Dienste                Ausarbeitung                                                       Seite 17
+                                         WD 9 – 3000 – 027/14
+
+
+
+
+4.       Brandenburg
+
+4.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Nach § 1 des Brandenburgischen Gesundheitsdienstgesetzes (BbgGDG)19 ist es Ziel und Aufgabe
+des ÖGD, durch Beratung und Aufklärung auf gesunde und gesundheitsfördernde Lebensverhält-
+nisse und gleiche Gesundheitschancen hinzuwirken. Der ÖGD stärkt die gesundheitliche Eigen-
+verantwortung, wirkt auf die Vermeidung von Gesundheitsrisiken sowie von gesundheitlichen
+Beeinträchtigungen hin und stellt die Wahrnehmung folgender Aufgaben sicher:
+
+     -    Infektionsschutz, Hygiene, umweltbezogener Gesundheitsschutz,
+     -    Gesundheitsvorsorge, Gesundheitsförderung, Schutz der Gesundheit insbesondere von
+          Kindern und Jugendlichen,
+     -    Gesundheitsberichterstattung und Koordinierung von gesundheitlichen Leistungen und
+          Angeboten.
+
+4.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Träger des ÖGD sind das Land, Landkreise und kreisfreie Städte. In den Landkreisen und kreis-
+freien Städte sind die Gesundheitsämter zuständig. Die Aufgabenwahrnehmung erfolgt grund-
+sätzlich subsidiär, soweit gesetzlich nichts anderes geregelt ist. Die Leistungen umfassen auch
+aufsuchende Hilfen. Der ÖGD kooperiert mit Einrichtungen in gesundheitsrelevanten Bereichen
+und fördert den Verbund gesundheitlicher Leistungen (§ 1).
+
+4.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+     -    Gesundheitsförderung und Gesundheitshilfen (§ 5 Abs. 1, 2): Koordination und Unterstüt-
+          zung von Maßnahmen zur Förderung der Gesundheit sowie gesunder Lebensbedingungen.
+          Der ÖDG kann diese Maßnahmen auch subsidiär selbst durchführen. Der ÖGD wirkt auf
+          eine ausreichende Beratung und Aufklärung über Gesundheitsrisiken, gesundheitsför-
+          derndes Verhalten und Möglichkeiten der Prävention, Vorsorge und Versorgung hin und
+          ist Anlaufstelle in gesundheitlichen Problemlagen.
+
+Kinder und Jugendliche
+
+     -    Schutz und Förderung der Gesundheit von Kindern und Jugendlichen (§ 6): Der ÖGD
+          wirkt gemeinsam mit Sorgeberechtigten und Betreuungseinrichtungen auf eine gesunde
+          Entwicklung von Kindern und Jugendlichen sowie auf ein ausreichendes Frühförder- und
+          Beratungsangebot für behinderte Kinder und Jugendliche hin; Beratung von Kindern und
+          Jugendlichen, Sorgeberechtigten, Lehrern, Erziehern sowie Trägern von Kinderbetreu-
+          ungseinrichtungen und Schulen;
+
+
+
+19       Gesetz über den Öffentlichen Gesundheitsdienst im Land Brandenburg vom 23. April 2008 (GVBl. 2008, 95) in
+         der am 1. April 2014 geltenden Fassung.
+=== Seite 18 ===
+Wissenschaftliche Dienste         Ausarbeitung                                            Seite 18
+                                  WD 9 – 3000 – 027/14
+
+
+
+
+    -   Zur Prävention von Kindesvernachlässigungen und -misshandlungen arbeiten der ÖGD
+        und Betreuungseinrichtungen eng zusammen (§ 6 Abs. 1).
+    -   Der ÖGD führt Vorsorgeuntersuchungen für alle Kinder vom 30. bis 42. Lebensmonat
+        (ggfs. in der Kindertagesstätte), die Schuleingangs- und Schulabgangsuntersuchung sowie
+        zahnärztliche Untersuchungen durch. Bei Kindern und Jugendlichen mit auffälligen Be-
+        funden erfolgt ein Betreuungscontrolling (§ 6 Abs. 2).
+    -   Erhöhung der Teilnahmequote an kindlichen Früherkennungsuntersuchungen(§ 7): u. a.
+        zentralisiertes Einladungsverfahren sowie Rückmeldung durch die untersuchenden Ärzte.
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Der ÖGD vermittelt Gesundheitshilfen im Rahmen aufsuchender Hilfen für Personen, die
+        keinen ausreichenden Zugang zum medizinischen Versorgungssystem finden oder beson-
+        derer Betreuung bedürfen. Dies gilt auch bei häuslicher Gewalt und sexueller Misshand-
+        lung (§ 5 Abs. 3).
+    -   Beratung und Betreuung psychisch kranker, seelisch und geistig behinderter sowie abhän-
+        gigkeitskranker Menschen (§ 8) durch sozialpsychiatrische Dienste, ggfs. auch psychisch
+        kranker Kinder und Jugendlicher, soweit keine eigenständigen Kinder- und Jugendpsychi-
+        atrischen Dienste bestehen.
+
+Umweltbezogene Aufgaben
+
+    -   Umweltbezogener Gesundheitsschutz (§ 4): Beratung und Aufklärung der Bevölkerung;
+        Bewertung von Umwelteinflüssen; Maßnahmen zur Abwehr akuter gesundheitlicher
+        Schäden und Verhütung gesundheitlicher Langzeitwirkungen (ggf. nach Maßgabe der
+        Grenz- und Richtwerte der obersten Gesundheitsbehörde); Stellungnahmen in Planungs-
+        und Genehmigungsverfahren.
+
+Impfungen
+
+    -   Förderung öffentlich empfohlener Schutzimpfungen; subsidiäre Durchführung von Imp-
+        fungen auf der Grundlage von Verträgen mit Kosten- und Leistungsträgern (§ 3 Abs. 3).
+
+Infektionskrankheiten
+
+    -   Wahrnehmung von Aufgaben nach dem IfSG (§ 3 Abs. 1).
+    -   Sicherstellung von Angeboten der AIDS-Beratung und HIV-Testung (§ 3 Abs. 4).
+
+4.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+    -   Gesundheitsberichterstattung und Gesundheitsplanung (§ 9): Die Gesundheitsberichter-
+        stattung bildet die fachliche Grundlage für eine zielorientierte Gesundheitsplanung und
+        für Maßnahmen zur Überwindung von Defiziten. Auf der Grundlage der Gesundheitsbe-
+        richte verständigen sich die Beteiligten im Gesundheitswesen auf Zielvorstellungen und
+        Planungen sowie Maßnahmen zur Überwindung von ausgewiesenen Defiziten.
+=== Seite 19 ===
+Wissenschaftliche Dienste                Ausarbeitung                                                      Seite 19
+                                         WD 9 – 3000 – 027/14
+
+
+
+
+5.       Bremen
+
+5.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Der ÖGD nimmt nach § 1 des Gesundheitsdienstgesetzes (ÖGDG)20 an der Erbringung gesundheit-
+licher Leistungen für die Bevölkerung mit eigenständigen Aufgaben teil. Er schützt die Gesund-
+heit der Allgemeinheit und fördert die Sicherung und Herstellung gesunder Lebensverhältnisse.
+Hierbei berücksichtigt er das unterschiedliche gesundheitliche Verhalten, die unterschiedlichen
+Lebenslagen, die unterschiedlichen Gesundheitsrisiken sowie die unterschiedliche Versorgungs-
+situation von Frauen und Männern. Der ÖGD nimmt u. a. folgende Aufgaben wahr (§ 2):
+
+     -    Hinwirken auf gesundheitserhaltende und -fördernde ökologische und soziale Rahmenbe-
+          dingungen,
+     -    gesundheitliche Aufklärung,
+     -    Gesundheitsbildung und Gesundheitsvorsorge zur Förderung gesunder Lebensweise ein-
+          schließlich der Bewertung der Auswirkungen von Umwelteinflüssen,
+     -    Durchführung von Maßnahmen der Prävention,
+     -    gesundheitliche Hilfen,
+     -    Hinwirken auf gesundheitlich, insbesondere hygienisch unbedenkliche Verhältnisse zur
+          Vermeidung von Gesundheitsgefährdungen oder -schädigungen, Verhütung und Eingren-
+          zung übertragbarer Krankheiten.
+
+5.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Träger des ÖGD sind Land und Stadtgemeinden (§ 4). Behörden und Einrichtungen des ÖGD
+sind u. a. die zuständige Senatsverwaltung, Gesundheitsämter und das Landesuntersuchungsamt
+(§ 5).
+
+Weitere Regelungen: obligatorische Qualitätssicherung (§ 8); Kooperation mit anderen Trägern
+gesundheitlicher Dienste sowie mit Behörden, Verbänden und Selbsthilfegruppen (§ 1); Beteili-
+gung des ÖGD in öffentlichen Planungsprozessen (§ 2); öffentlichkeitsorientierten Arbeitsweise
+(insbesondere macht der ÖGD wesentliche Ergebnisse seiner Arbeit der Allgemeinheit, Behörden,
+Institutionen und Gruppen zugänglich, § 1); Recht jedes Bürgers auf Inanspruchnahme der Bera-
+tungsangebote des ÖGD (§ 3).
+
+5.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+     -    Gesundheitsförderung (§ 13): Förderung gesunder Lebens- und Umweltbedingungen ein-
+          schließlich der Gesundheitsbildung; Koordinierung der im Bereich der Gesundheitsförde-
+          rung tätigen Institutionen; Förderung kommunaler Aktivitäten und von Selbsthilfegrup-
+          pen; Durchführung eigener Maßnahmen der Verhaltens- und Verhältnisprävention.
+
+
+
+
+20       Gesetz über den öffentlichen Gesundheitsdienst im Lande Bremen vom 27. März 1995 (Brem.GBl. 1995, 175) in
+         der am 1. April 2014 geltenden Fassung.
+=== Seite 20 ===
+Wissenschaftliche Dienste        Ausarbeitung                                            Seite 20
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+Kinder und Jugendliche
+
+    -   Kinder- und Jugendgesundheitspflege (§ 14): Gesundheitsförderung und Gesundheits-
+        schutz von Säuglingen, Kindern und Jugendlichen; Beobachtung und Bewertung gesunder
+        Lebensbedingungen; aufsuchende und nachgehende Hilfen zum Schutz vor Kindesver-
+        nachlässigung; Untersuchungen von Säuglingen, Kindern und Jugendlichen zur Früher-
+        kennung (soweit dies nicht durch andere Vorsorgeangebote abgedeckt ist); Beratung und
+        Betreuung von Kindern und Jugendlichen, deren körperliche, seelische oder geistige Ge-
+        sundheit gefährdet oder gestört ist; Förderung der gesundheitsgerechten Ausgestaltung
+        von Einrichtungen und Lehrinhalten; Untersuchungen von Kindern in Kindergärten;
+        schulärztlicher Dienst; Mitwirkung bei der zahnärztlichen Gruppenprophylaxe.
+    -   Früherkennungsuntersuchungen für Kinder (§ 14a): Einladung zur Teilnahme an der
+        Früherkennungsuntersuchung; Rückmeldung des Arztes nach Durchführung der Früher-
+        kennungsuntersuchung; Verfahren bei Nichtteilnahme eines Kindes.
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Grundsätze der Gesundheitshilfe (§ 17): Beratung, Betreuung und Behandlung für Perso-
+        nen, die der gesundheitlichen Versorgung durch andere Leistungsträger nicht zugänglich
+        sind, soweit dies anderweitig nicht bedarfsdeckend erfolgt.
+    -   Sozialpsychiatrische Dienste (§ 18).
+    -   Sonstige Angebote Gesundheitshilfe (§ 19): Beratung zu Ansprüchen und Hilfeleistungen
+        bei Behinderungen; Unterstützung von Beratungsangeboten für Personen, die an gesund-
+        heitlichen Folgen von sexueller Gewalt leiden.
+    -   Gesundheitssicherung und Gesundheitsförderung für ältere Menschen (§ 16): Der ÖGD be-
+        teiligt sich an der Koordination von Angeboten im ambulanten, stationären, rehabilitati-
+        ven und sozialen Bereich mit dem Ziel, älteren Menschen einen langen Verbleib in häus-
+        licher Umgebung zu ermöglichen.
+
+Schwangeren- und Mütterberatung
+
+    -   Gesundheitsförderung und Gesundheitsschutz von Schwangeren (§ 14 Abs. 1).
+    -   Beratung und Einzelfallhilfe durch Familienhebammen für benachteiligte Frauen und
+        Familien (§ 14 Abs. 7).
+
+Umweltbezogene Aufgaben
+
+    -   Schutz vor schädigenden Umwelteinflüssen (§ 20): Bewertung der gesundheitlichen Aus-
+        wirkungen von Umwelteinflüssen; Förderung einer gesundheitsgerechten Gestaltung der
+        Umwelt- und Lebensbedingungen; Beratung der Bürger; Mitwirkung bei Planungen für
+        Vorhaben oder Maßnahmen mit gesundheitliche Auswirkungen; gesundheitliche Prüfung
+        im Rahmen von Umweltverträglichkeitsprüfungen.
+
+Impfungen
+
+    -   Ermittlung von Impflücken; Beratungsangebote zu übertragbaren Erkrankungen; Förde-
+        rung empfohlener Impfungen und eigenes Impfangebot (§ 22 Abs. 3).
+=== Seite 21 ===
+Wissenschaftliche Dienste        Ausarbeitung                                           Seite 21
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+Infektionskrankheiten
+
+    -   Infektionshygiene (§ 22 Abs. 1): Aufklärung, Beratung und Verhütung von übertragbaren
+        Krankheiten.
+
+Sonstiges
+
+    -   Reisemedizinische Beratung (§ 22 Abs. 3).
+
+5.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+    -   Betrachtung und Darstellung der Gesundheitssituation der Bevölkerung (Gesundheitsbe-
+        richterstattung) sowie Entwicklung der sich daraus ergebenden Gesundheitsplanung
+        (§§ 9-12).
+=== Seite 22 ===
+Wissenschaftliche Dienste                Ausarbeitung                                                      Seite 22
+                                         WD 9 – 3000 – 027/14
+
+
+
+
+6.       Hamburg
+
+6.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Nach § 1 des Hamburgischen Gesundheitsdienstgesetzes (HmgGDG)21 ist es Ziel des ÖGD, die
+Gesundheit des Einzelnen und damit der Bevölkerung zu fördern und zu schützen.
+
+6.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Angebote des ÖGD sind zielgruppenorientiert, möglichst dezentral und niedrigschwellig. Sie
+sollten die Selbstverantwortung des Einzelnen stärken und umfassen auch aufsuchende Arbeit.
+Der ÖGD bietet im Zusammenwirken mit den vorrangig zur Sicherstellung der gesundheitlichen
+Versorgung Verpflichteten auch Möglichkeiten zur Besserung von Krankheitsbeschwerden an,
+soweit dies nicht durch andere Beteiligte gewährleistet ist (§ 2). Weitere Regelungen: Gebot der
+Zusammenarbeit mit anderen Einrichtungen, Verbänden und Selbsthilfegruppen (§ 3); initiieren-
+de und koordinierende Funktion des ÖGD (§ 3), Gebot der Stellungnahme in Planungs- und Ge-
+nehmigungsverfahren mit gesundheitlichen Auswirkungen (§ 17); Gebot der Qualitätssicherung
+und des Qualitätsmanagement (§ 22); Recht jedes Bürgers auf Inanspruchnahme der Leistungsan-
+gebote des ÖGD (§ 2).
+
+6.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+     -    Gesundheitsförderung und Prävention (§ 6): Unterstützung der Bürger bei der Förderung
+          ihrer Gesundheit; Schaffung gesundheitsfördernder Lebensbedingungen; Aufklärung über
+          Gesundheitsförderung; Ermutigung der Bürger zur Mitwirkung; Initiieren und Durchfüh-
+          rung (allein oder gemeinschaftlich) gesundheitsfördernder bzw. präventiver Maßnahmen.
+
+Kinder und Jugendliche
+
+     -    Beteiligung an Gesundheitsförderung und Gesundheitsschutz (§ 7 Abs. 1).
+     -    Im Bedarfsfall ergänzende Vorsorgeuntersuchungen; Beratung von Kindertagesstätten und
+          Schulen sowie von Kindern und Jugendlichen, deren körperliche, seelische oder geistige
+          Gesundheit beeinträchtigt ist; ÖGD als Ansprechpartner bei Gewalt in der Familie und se-
+          xuellem Missbrauch (§ 7 Abs. 2 und 3).
+     -    Schulärztliche Beratung, Betreuung und Untersuchung nach Maßgabe der geltenden Best-
+          immungen; Unterstützung schulischer Gesundheitsförderung; Angebot schulärztlicher
+          Sprechstunden in den Schulen.
+     -    Zahnmedizinische Beratung und Betreuung; vorbeugende zahnmedizinische Untersu-
+          chungen in den Schulen; Mitwirkung an Maßnahmen der Gruppenprophylaxe nach § 21
+          SGB V; Beteiligung an Arbeitsgemeinschaften der Zahngesundheit (§ 7 Abs. 5).
+     -    Teilnahme an Früherkennungsuntersuchung (§ 7a ): Verfahren bei Nichtteilnahme von
+          Kindern im Alter von 9 Monaten bis zu 27 Monaten an den U 6 oder U 7.
+
+
+
+21       Gesetz über den Öffentlichen Gesundheitsdienst in Hamburg vom 18. Juli 2001 (HmbGVBl. 2001, 201) in der am
+         1. April 2014 geltenden Fassung.
+=== Seite 23 ===
+Wissenschaftliche Dienste         Ausarbeitung                                            Seite 23
+                                  WD 9 – 3000 – 027/14
+
+
+
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Psychisch Kranke, Abhängigkeitskranke, Menschen mit seelischen oder geistigen Behin-
+        derungen (§ 10): Beratung, Betreuung und Vermittlung von Hilfen; Förderung der Selbst-
+        bestimmung; Mitwirkung an der Entwicklung und Qualitätssicherung der gemeindepsy-
+        chiatrischen Versorgung und der Prävention psychischer Störungen.
+    -   Chronisch Kranke, Behinderte (§ 11): Beratung, Betreuung und Vermittlung von Hilfen.
+    -   Ältere Menschen (§ 9): Beratung und Betreuung mit dem Ziel, die Selbstbestimmung und
+        eigenständige Lebensführung zu unterstützen; Unterstützung regionaler Qualitätszir-
+        kel/Pflegekonferenzen (auch mit dem Ziel der Weiterentwicklung einer regional geglieder-
+        ten, bedarfsgerechten pflegerischen Versorgungsstruktur).
+
+Schwangeren- und Mütterberatung
+
+    -   Frauengesundheit (§ 8): der ÖGD als Ansprechpartner bei Gewalt und sexuellem Miss-
+        brauch; Beteiligung an der Förderung und dem Schutz der Gesundheit von Schwangeren
+        und Säuglingen; Beratung von Frauen in Fragen der Gesundheitspflege von Kleinkindern
+        und Säuglingen.
+
+Umweltbezogene Aufgaben
+
+    -   Schutz vor gesundheitsschädigenden Einflüssen aus der Umwelt (§ 15): Bewertung ge-
+        sundheitlicher Auswirkungen von Umwelteinflüssen; Beratung und Aufklärung in um-
+        weltmedizinischen Fragen; Maßnahmen zur Abwehr akuter gesundheitlicher Schäden.
+
+Impfungen
+
+    -   Förderung und Durchführung empfohlener Impfungen (§ 12 Abs. 3).
+
+Infektionskrankheiten
+
+    -   Verhütung und Bekämpfung übertragbarer Krankheiten (§ 12): bedarfsgerechte Betreu-
+        ungs- und Hilfsangebote.
+    -   Untersuchung und Beratung (ggfs. Behandlung) bei sexuell übertragbaren Krankheiten
+        und Tuberkulose, anonyme AIDS-Beratung und HIV-Testung (§ 12 Abs. 2).
+
+Sonstiges
+
+    -   Der ÖGD wirkt auf die Gewährleistung einer unabhängigen Beratung und Betreuung von
+        Patienten hin (§ 23).
+
+6.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+    -   Gesundheitsberichterstattung und -planung (§§ 4, 5): Vorlage von Berichten auf der
+        Grundlage abgestimmter einheitlicher Indikatoren und Kriterien (jeweils gesonderte Teil-
+        berichte zur Frauengesundheit); Entwicklung fachlicher Zielvorstellungen für die Sicher-
+        stellung der gesundheitlichen Versorgung und deren Weiterentwicklung auf der Grundla-
+        ge der Gesundheitsberichterstattung.
+    -   Der ÖGD richtet Gesundheitskonferenzen in den Bezirken ein (§ 6 Abs. 3).
+    -   Unterstützung regionaler Qualitätszirkel/Pflegekonferenzen (§ 9).
+=== Seite 24 ===
+Wissenschaftliche Dienste                Ausarbeitung                                          Seite 24
+                                         WD 9 – 3000 – 027/14
+
+
+
+
+7.       Hessen
+
+7.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Mit dem Ziel der Gesundheitsförderung und des Gesundheitsschutzes übernimmt der ÖGD nach
+§ 1 Abs. 2 des Hessischen Gesetzes über den öffentlichen Gesundheitsdienst (HGöGD)22 u. a. fol-
+gende Aufgaben:
+
+     -    die Abwehr gesundheitlicher Gefahren,
+     -    die Verhütung und die Bekämpfung übertragbarer Krankheiten,
+     -    die Veranlassung und die Koordination von Maßnahmen der Prävention und Gesund-
+          heitsförderung,
+     -    die Beobachtung und die Bewertung von Umwelteinwirkungen auf die Gesundheit,
+     -    die Gesundheitsberichterstattung.
+
+7.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Träger des ÖGD sind das Land, die Landkreise und die kreisfreien Städte (§ 2 Abs. 1). Zuständig
+sind die Gesundheitsämter (§ 3, besondere Regelungen in § 5).
+
+Es gilt das Gebot der kooperativen Zusammenarbeit (§ 2 Abs. 5). Der ÖGD arbeitet eng mit den
+Behörden und Stellen zusammen, die Leistungen der gesundheitlichen Versorgung erbringen
+oder gesundheitliche Interessen vertreten (§ 1 Abs. 3). Dem ÖGD kommt eine zentrale Informa-
+tions-, Steuerungs- und Koordinierungsfunktion in allen gesundheitlichen Fragen zu (§ 1 Abs. 3).
+
+7.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+     -    Prävention und Gesundheitsförderung (§ 7 Abs. 1): Aufklärung und Beratung der Bevölke-
+          rung.
+     -    Beratung und Unterstützung anderer Stellen (insbesondere freier Träger und Selbsthilfe-
+          gruppen), die mit Prävention und Gesundheitsförderung befasst sind; Koordination und
+          Förderung entsprechender Angebote anderer Stellen (§ 7 Abs. 3)
+
+Kinder und Jugendliche
+
+     -    Kinder- und Jugendgesundheit (§ 10): Schutz und Förderung der Gesundheit von Kindern
+          und Jugendlichen insbesondere durch ärztliche Einschulungsuntersuchungen; Beratung
+          von Schülern, Sorgeberechtigten und Schulen; eventuell weitere Untersuchungen zur
+          Früherkennung; Beratung und Betreuung von Kindern und Jugendlichen, deren körperli-
+          che, seelische oder geistige Gesundheit beeinträchtigt ist.
+     -    Zahngesundheit (§ 11): Beratung und Betreuung von Kindern und Jugendlichen, Erzie-
+          hern und Lehrern bei Gesunderhaltung der Zähne sowie des Mund- und Kieferbereichs;
+          regelmäßige zahnärztliche Untersuchungen; Beteiligung der Gesundheitsämter an der
+
+
+22       vom 28. September 2007 (GVBl. 2007, 659) in der am 1. April 2014 geltenden Fassung.
+=== Seite 25 ===
+Wissenschaftliche Dienste                  Ausarbeitung                                                          Seite 25
+                                           WD 9 – 3000 – 027/14
+
+
+
+
+          Gruppenprophylaxe nach § 21 SGB V in Schulen, Kindergärten und Behinderteneinrich-
+          tungen (im Zusammenwirken mit den Arbeitskreisen Zahngesundheit).
+     -    Eventuell Angebot eines kinder- und jugendpsychiatrischen Dienstes sowie die Vermitt-
+          lung weitergehender Hilfsangebote für Kinder und Jugendliche mit psychischen Krankhei-
+          ten, Suchtproblemen oder Verhaltensauffälligkeiten (§ 7 Abs. 3).
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+     -    Information und Beratung insbesondere sozial benachteiligter oder besonders schutzbe-
+          dürftiger Personen (auch ambulante Behandlungen im Einzelfall, § 7 Abs. 1).
+     -    Beratung nach § 59 SGB XII23 (Beratung behinderter Menschen in Fragen der Eingliede-
+          rungshilfe, § 7 Abs. 2).
+     -    Beratungs- und Betreuungsangebote durch einen sozialpsychiatrischen Dienst für Men-
+          schen mit psychischen Krankheiten, Suchterkrankungen und seelischen oder geistigen
+          Behinderungen (§ 7 Abs. 3).
+     -    Förderung einer vernetzten ambulanten und stationären medizinischen und pflegerischen
+          Versorgungsstruktur insbesondere für ältere Menschen (in Zusammenarbeit mit anderen
+          Stellen, § 7 Abs. 5).
+
+Umweltbezogene Aufgaben
+
+     -    Umweltbezogener Gesundheitsschutz (§ 8): Beobachtung und Bewertung von Umwelt-
+          einwirkungen auf die menschliche Gesundheit; Information und Beratung der Bevölke-
+          rung; Stellungnahmen der Gesundheitsämter bei Maßnahmen, die gesundheitliche Belan-
+          ge berühren.
+
+Impfungen
+
+     -    Förderung und Durchführung empfohlener Impfungen; Beobachtung und Bewertung der
+          Impfsituation der Bevölkerung (§ 6 Abs. 2).
+
+Infektionskrankheiten
+
+     -    Verhütung und Bekämpfung übertragbarer Krankheiten (§ 6 Abs. 1): Aufklärung und Bera-
+          tung; Aufdeckung von Infektionsketten.
+
+7.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+     -    Gesundheitsberichterstattung (§ 13): Beobachtung, Bewertung und Beschreibung der ge-
+          sundheitlichen Situation durch die Gesundheitsämter; Übermittlung der Daten an das zu-
+          ständige Landesamt; epidemiologische Untersuchungen.
+     -    Zusammenwirken mit Arbeitskreisen Zahngesundheit (§ 11).
+
+
+
+
+23       Das Zwölfte Buch Sozialgesetzbuch – Sozialhilfe – (Artikel 1 des Gesetzes vom 27. Dezember 2003, BGBl. I S.
+         3022, 3023), das zuletzt durch Artikel 1 des Gesetzes vom 1. Oktober 2013 (BGBl. I S. 3733) geändert worden ist.
+=== Seite 26 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                         Seite 26
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+8.       Mecklenburg-Vorpommern
+
+8.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Der ÖGD hat nach § 1 des Gesetzes über den Öffentlichen Gesundheitsdienst im Land Mecklen-
+burg-Vorpommern (ÖGDG M-V)24 die Gesundheit der Bevölkerung zu fördern und zu schützen.
+Er wirkt nach Maßgabe des Gesetzes an der bedarfsgerechten gesundheitlichen Versorgung der
+Bevölkerung komplementär mit. Seine Pflichtaufgaben sind nach § 1 Abs. 2 u. a.:
+
+     -    Gesundheitsvorsorge, Gesundheitsschutz und Gesundheitshilfe einschließlich der ge-
+          sundheitlichen Bewertung von Umwelteinflüssen sowie die entsprechenden Koordinie-
+          rungsaufgaben,
+     -    Gesundheitsberichterstattung und Gesundheitsplanung.
+
+8.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Träger des ÖGD sind das Land, die Landkreise und die kreisfreien Städte (§ 3 Abs. 1). Landkreise
+und kreisfreie Städte richten Gesundheitsämter ein (§ 3 Abs. 3). Es gilt das Gebot der Zusammen-
+arbeit u. a. mit den anderen an der gesundheitlichen Versorgung Beteiligten, mit Verbänden und
+Selbsthilfegruppen sowie mit Trägern der Gesundheitsförderung, um aufeinander abgestimmte
+regionale Systeme der Gesundheitsförderung und Gesundheitsvorsorge und der medizinischen
+Behandlung und Beratung zu schaffen und zu verbessern. Dies gilt insbesondere für die Beratung
+von Schwangeren, Müttern, behinderten Menschen und Suchtkranken (§ 5). Erforderlichenfalls
+sucht der ÖGD Betroffene auch auf (§ 2 Abs. 2). Der ÖGD soll sich Maßnahmen der Qualitätssi-
+cherung unterziehen (§ 28).
+
+8.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+     -    Gesundheitsförderung (§ 13): Aufklärung über Gesundheitsförderung und Krankheitsver-
+          hütung mit dem Ziel, persönliche und gesellschaftliche Verantwortung für die Gesundheit
+          zu entwickeln.
+
+Kinder und Jugendliche
+
+     -    Kinder- und Jugendärztlicher Dienst (§ 15): Ergänzend zu vorhandenen Einrichtungen
+          Angebote von Säuglings-, Kinder- und Jugendberatung; besonders gefährdete Fälle sollen
+          aufgesucht werden.
+     -    Förderung der Teilnahme an der Früherkennungsuntersuchung (§ 15 b): Verfahren bei
+          Nichtteilnahme von Kindern bis zur Vollendung des 6. Lebensjahres.
+     -    Zahnärztlicher Dienst (§ 16): Beratung und Betreuung von Kindern und Jugendlichen zur
+          Gesunderhaltung der Zähne sowie des Mund- und Kieferbereichs; vorbeugende Untersu-
+          chungen in Schulen und Kitas; Mitwirkung an der Gruppenprophylaxe nach § 21 SGB V
+          und Beteiligung an Arbeitsgemeinschaften der Zahngesundheit.
+
+
+
+24       vom 19. Juli 1994 (GVOBl. M-V 1994, 747) in der am 1. April 2014 geltenden Fassung.
+=== Seite 27 ===
+Wissenschaftliche Dienste         Ausarbeitung                                            Seite 27
+                                  WD 9 – 3000 – 027/14
+
+
+
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Gesundheitshilfe (§ 17): Die Gesundheitsämter leisten Gesundheitshilfe (Beratung, Be-
+        treuung und erforderlichenfalls auch Behandlung) für Personen, die aufgrund körperli-
+        cher, seelischer, geistiger oder sozialer Umstände besonderer Fürsorge bedürfen; Ziel ist
+        die Rehabilitation dieser Personen und die Abwehr weiterer Schäden (§ 17).
+    -   Beratung von Menschen mit Behinderungen nach § 59 SGB XII in Fragen der Eingliede-
+        rungshilfe (§ 18).
+    -   Beratung von Suchtkranken (§ 21).
+    -   Beratung und Betreuung nach einem Krankenhausaufenthalt, bei Diabetes, Krebs, Rheuma
+        sowie Tuberkulose (§ 22).
+    -   Hilfen für Menschen mit psychischen Beeinträchtigungen (§ 23).
+
+Schwangeren- und Mütterberatung
+
+    -   Sexualberatung, Schwangeren- und Mütterberatung, genetische Beratung (§ 14): Hinweise
+        auf anderweitige Beratungsstellen; im Bedarfsfalle eigene Angebote des ÖGD; Vermittlung
+        genetischer Beratungshilfen in Zusammenarbeit mit den genetischen Beratungsstellen im
+        Land.
+
+Umweltbezogene Aufgaben
+
+    -   Schutz vor gesundheitsschädigenden Umwelteinflüssen (§ 6): Förderung gesundheitsge-
+        rechter Gestaltung der Lebens- und Umweltbedingungen; Beratung und Aufklärung der
+        Bevölkerung; Bewertung gesundheitlicher Auswirkungen von Umwelteinflüssen.
+
+Impfungen
+
+    -   Förderung eines ausreichenden Impfschutzes der Bevölkerung sowie der Durchführung
+        empfohlener Impfungen (auch eigenes Impfangebot, § 10 Abs. 2).
+
+Infektionskrankheiten
+
+    -   Verhütung und Bekämpfung übertragbarer Krankheiten (§ 10 Abs. 1): u. a. Planung von
+        Abwehrmaßnahmen im Seuchenfall.
+    -   Aufgaben bei sexuell übertragbaren Krankheiten nach § 19 IfSG (§ 19).
+    -   AIDS-Beratung (§ 20): anonyme AIDS-Beratung und HIV-Testung durch den ÖGD.
+
+8.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+    -   Gesundheitsberichterstattung (§ 24): Sammlung von Daten über die gesundheitliche Situa-
+        tion und Weiterleitung an das Landesministerium; Bewertung der Daten durch das Minis-
+        terium und Veröffentlichung im Internet.
+    -   Der ÖGD soll die Bildung regionaler Arbeitsgemeinschaften zur Gesundheitsförderung
+        und Gesundheitserziehung anregen und sich daran beteiligen (§ 5).
+    -   Beteiligung an Arbeitsgemeinschaften der Zahngesundheit (§ 16).
+=== Seite 28 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                                Seite 28
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+9.       Niedersachsen
+
+9.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Nach § 1 des Niedersächsischen Gesetzes über den öffentlichen Gesundheitsdienst (NGöGD)25 ist
+es Aufgabe des ÖGD
+
+     -    die Gesundheit der Bevölkerung zu fördern und zu schützen,
+     -    auf die Stärkung der Eigenverantwortung der Bürgerinnen und Bürger hinzuwirken.
+
+9.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Behörden des ÖGD sind neben dem Fachministerium des Landes und dem Landesgesundheits-
+amt die Landkreise und kreisfreien Städte. Landkreise und kreisfreie Städte richten „medizini-
+sche Fachdienste“ ein (§ 2).
+
+Der ÖGD arbeitet mit anderen Trägern, Einrichtungen und Vereinigungen zusammen (§ 1).
+
+9.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+     -    Prävention und Gesundheitsförderung (§ 4 Abs. 1): Unterstützung, Koordination und ei-
+          gene Durchführung präventiver und gesundheitsfördernder Maßnahmen (z. B. Informati-
+          on, Beratung und Aufklärung über Gesundheitsgefährdungen, gesundheitsfördernde Ver-
+          haltensweisen und über Vorsorge, Krankheitsfrüherkennung und Maßnahmen zur Versor-
+          gung und Rehabilitation).
+
+Kinder und Jugendliche
+
+     -    Kinder- und Jugendgesundheit (§ 5): Schutz und Förderung der Gesundheit von Kindern
+          und Jugendlichen. Dazu soll insbesondere gemeinsam mit Tageseinrichtungen für Kinder
+          und Schulen zielgruppen- und lebensraumbezogen auf die Prävention und auf eine ge-
+          sunde Entwicklung von Kindern und Jugendlichen hingewirkt werden. Der ÖGD über-
+          nimmt die Schuleingangsuntersuchungen sowie die Aufgaben der Zahngesundheitspflege
+          (Gruppenprophylaxe) nach § 21 Abs. 1 Satz 1 SGB V.
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+     -    Der ÖGD wirkt darauf hin, dass Menschen Hilfen und Leistungen zur Gesundheitsversor-
+          gung erhalten, die diese aufgrund ihrer besonderen Lebensverhältnisse nicht selbständig
+          in Anspruch nehmen können (§ 4 Abs. 2).
+
+
+
+
+25       Gesetz vom 24. März 2006 (Nds. GVBl. 2006, 178) in der am 1. April 2014 geltenden Fassung.
+=== Seite 29 ===
+Wissenschaftliche Dienste        Ausarbeitung                                            Seite 29
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+Umweltbezogene Aufgaben
+
+    -   Umweltbezogener Gesundheitsschutz (§ 6): Beobachtung, Untersuchung sowie Verhütung
+        und Beseitigung von umweltbedingten Gesundheitsgefährdungen und -schäden.
+
+Impfungen
+
+    -   Erhöhung der Impfquote für empfohlene Schutzimpfungen (§ 3 Abs. 1 Satz 2).
+
+Infektionskrankheiten
+
+    -   Infektionsschutz (§ 3 Abs. 1): Wahrnehmung von Aufgaben nach dem IfSG.
+
+9.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+    -   Gesundheitsberichterstattung (§ 8), ggfs. nach Vorgaben des Landesgesundheitsamts.
+=== Seite 30 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                           Seite 30
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+10.       Nordrhein-Westfalen
+
+10.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Nach §§ 1, 2 des Gesetzes über den öffentlichen Gesundheitsdienst des Landes Nordrhein-
+Westfalen (ÖGDG NRW)26 nimmt der ÖGD eigenständige Aufgaben im Gesundheitswesen wahr.
+Er unterstützt eine bedarfsgerechte, wirtschaftliche, dem Stand der gesundheitswissenschaftli-
+chen und medizinischen Erkenntnisse entsprechende Versorgung der Bevölkerung. Hierbei be-
+rücksichtigt er u. a. unterschiedliche gesundheitliche Verhalten und kulturelle Hintergründe.
+
+10.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Träger des ÖGD sind die Kreise, kreisfreien Städte und das Land (§ 5). Es besteht das Gebot der
+Zusammenarbeit mit anderen an der Gesundheitsversorgung Beteiligten. Der ÖGD wirkt auf eine
+gegenseitige Information und Koordination hin und regt Maßnahmen vorrangig Verpflichteter an
+(§ 3). Der ÖGD kann erforderlichenfalls Leistungen der medizinisch-sozialen Versorgung erbrin-
+gen (im Benehmen mit primär zuständigen Handlungsträgern, § 4). Der ÖGD hat auf eine enge
+räumliche und funktionale Abstimmung gesundheitlicher Leistungen und Einrichtungen hinzu-
+wirken (§ 6 Abs. 3) und wirkt an kommunalen Stellungnahmen zu Planungs- und Genehmi-
+gungsverfahren mit (§ 8).
+
+10.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+      -    Mitwirkung des ÖGD an der Gestaltung gesundheitsförderlicher Umwelt-, Arbeits- und
+           Lebensverhältnisse und an der Förderung gesundheitsdienlicher Lebensweisen durch Ge-
+           sundheitsaufklärung und Gesundheitsbildung, an der Verhütung von Gesundheitsgefah-
+           ren und an einer möglichst frühzeitigen Erkennung von Gesundheitsschäden; vorrangige
+           Koordinationsaufgabe des ÖGD (Koordination der Planung und Umsetzung von Gesund-
+           heitsförderung und Prävention sowie gegebenenfalls Hinwirken auf zusätzliche Aktivitä-
+           ten der in diesem Bereich tätigen Einrichtungen und Organisationen); Förderung der Ar-
+           beit von Selbsthilfegruppen; ggfs. Einrichtung von Kontakt- und Informationsstellen für
+           Selbsthilfegruppen (§ 7).
+
+Kinder und Jugendliche
+
+      -    Kinder- und Jugendgesundheit (§ 12) sowie Kinder- und Jugendzahngesundheit (§ 13):
+           Schutz von Gesundheitsgefahren und Förderung der Gesundheit in Zusammenarbeit mit
+           anderen Behörden, Trägern und Einrichtungen; Wahrnehmung betriebsmedizinischer
+           Aufgaben für Kindertageseinrichtungen und Schulen; Beratung; schulische Eingangsun-
+           tersuchungen; Angebot von Gesundheitsförderprogrammen; ärztliche Untersuchungen zur
+           Früherkennung (als Ergänzung von Vorsorgeangeboten); erforderlichenfalls Durchführung
+           von Impfungen; im Bedarfsfall Vermittlung von Behandlungs- und Betreuungsangeboten
+           in Zusammenarbeit mit den für Jugendhilfe und Sozialhilfe zuständigen Stellen (§ 12).
+
+
+
+26        vom 25. November 1997 (GV. NRW 1997, 430) in der am 1. April 2014 geltenden Fassung.
+=== Seite 31 ===
+Wissenschaftliche Dienste         Ausarbeitung                                             Seite 31
+                                  WD 9 – 3000 – 027/14
+
+
+
+
+    -   Beratung in Fragen der Gesunderhaltung des Zahn-, Mund- und Kieferbereiches; erforder-
+        lichenfalls Durchführung zahnärztlicher Untersuchungen; Maßnahmen der Gruppenpro-
+        phylaxe, insbesondere der Ernährungsberatung, Zahnschmelzhärtung und Mundhygiene
+        sowie erforderlichenfalls Maßnahmen der Individualprophylaxe vor allem bei Klein- und
+        Schulkindern sowie behinderten Kindern (§ 13).
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Grundsatz der Gesundheitshilfe (§ 14): Beratung und Unterstützung von Menschen, die
+        z. B. wegen ihres körperlichen, geistigen oder seelischen Zustandes besonderer gesund-
+        heitlicher Fürsorge bedürfen; Zielvorstellung ist die möglichst selbständige Teilnahme der
+        Betroffenen an der Gesellschaft; erforderlichenfalls ist aufsuchende Hilfe zu leisten.
+    -   Besondere Beratungsangebote (§ 15 Abs. 1): Der ÖGD wirkt bei besonderen Erkrankungen
+        oder Behinderungen auf ein Beratungsangebot hin.
+    -   Beratung von Menschen mit körperlichen, geistigen oder seelischen Behinderungen, psy-
+        chisch Kranken und Abhängigkeitskranken; Sozialpsychiatrischer Dienst (§ 16).
+
+Schwangeren- und Mütterberatung
+
+    -   Hinwirken auf ausreichendes Beratungsangebot; eigenes Beratungsangebot des ÖGD ins-
+        besondere für Fälle, die aufsuchender Hilfe bedürfen (§ 11).
+
+Umweltbezogene Aufgaben
+
+    -   Umweltmedizin (§ 10): Schutz der Bevölkerung vor gesundheitsgefährdenden und -
+        schädigenden Umwelteinflüssen; Aufklärung der Bevölkerung; Bewertung von Umwelt-
+        einflüssen; Anordnung von Maßnahmen zur Gefahrenabwehr.
+
+Impfungen
+
+    -   Sicherstellung von notwendigem Impfangebot und Impfberatung (ggfs. auch eigenes Impf-
+        angebot); Bewertung der Impfquote (§ 9 Abs. 2).
+
+Infektionskrankheiten
+
+    -   Verhütung und Bekämpfung übertragbarer Krankheiten (§ 9 Abs. 1): Aufklärung und Bera-
+        tung; Aufdeckung von Infektionsketten.
+    -   Mitwirkung an Aufklärung und Beratung zu AIDS und anderen sexuell übertragbaren
+        Krankheiten; Angebote anonymer HIV-Untersuchungen (§ 15 Abs. 2).
+
+10.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+    -   Kommunale Gesundheitsberichte (§ 22) sowie Landesgesundheitsberichterstattung (§ 25)
+        als Grundlage gesundheitspolitischer Planungen.
+    -   Kommunale Gesundheitskonferenzen (§ 24) aus Vertretern u. a. der an der Gesundheits-
+        förderung Beteiligten, der Selbsthilfegruppen, der Einrichtungen für Gesundheitsvorsorge
+        sowie aus Mitgliedern des Rates bzw. Kreistages (Koordinierung und Empfehlungen in
+        Fragen der örtlichen gesundheitlichen Versorgung).
+    -   Landesgesundheitskonferenzen (§ 26) aus Vertretern der Sozialversicherungsträger, der
+        Ärzte- und Zahnärzte, der Apotheker, der Krankenhausgesellschaft, der freien Wohl-
+        fahrtsverbände, der gesundheitlichen Selbsthilfe, der Einrichtungen für Gesundheitsvor-
+=== Seite 32 ===
+Wissenschaftliche Dienste        Ausarbeitung                                            Seite 32
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+        sorge, der Gewerkschaften und Arbeitgeberverbände und der kommunalen Spitzenver-
+        bände (Koordinierung und Empfehlungen in Fragen von grundsätzlicher Bedeutung). Die
+        Umsetzung erfolgt auf beiden Ebenen jeweils unter Selbstverpflichtung der Beteiligten.
+=== Seite 33 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                         Seite 33
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+11.       Rheinland-Pfalz
+
+11.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Nach § 1 des Landesgesetzes über den öffentlichen Gesundheitsdienst (ÖGdG)27 sind Ziele und
+Aufgabe des ÖGD u. a.
+
+      -    die Beobachtung, Untersuchung und Bewertung der gesundheitlichen Verhältnisse der
+           Bevölkerung einschließlich der Auswirkungen von Umwelteinflüssen auf die Gesundheit;
+           dabei geht der ÖGD den Ursachen von Gesundheitsgefährdungen und Gesundheitsschä-
+           den nach und wirkt auf deren Beseitigung hin,
+      -    die Koordination der Angebote der Gesundheitsförderung sowie bei Bedarf das Angebot
+           eigener ergänzender Leistungen,
+      -    Beratung der Bevölkerung und der Träger öffentlicher Aufgaben bei gesundheitlichen Fra-
+           gestellungen sowie Stellungnahmen zu Planungen und Maßnahmen hinsichtlich gesund-
+           heitlicher Auswirkungen,
+      -    Unterstützung bei der Erarbeitung und Weiterentwicklung fachlicher Standards zur Siche-
+           rung der Qualität medizinischer Leistungen,
+      -    Mitwirkung bei der epidemiologischen Erfassung und Bewertung von Krankheiten.
+
+11.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Allgemeine Behörden des ÖGD sind das fachlich zuständige Landesministerium, das Landesamt
+für Soziales, Jugend und Versorgung sowie die Kreisverwaltungen (§ 2). Besondere Behörde des
+ÖGD ist das Landesuntersuchungsamt (§ 3). Die Landkreise unterhalten Gesundheitsämter (§ 4).
+
+Die Behörden des ÖGD beteiligen und unterstützen sich gegenseitig sowie andere Behörden und
+Gerichte. Die übrigen Behörden beteiligen und unterstützen ihrerseits die Behörden des öffentli-
+chen Gesundheitsdienstes. Insbesondere beteiligen sie den ÖGD bei Planungsvorhaben, die für
+die Gesundheit bedeutsam sind (§ 12).
+
+11.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+      -    Allgemeine und Schwerpunktaufgaben der Gesundheitsämter (§ 5): Beobachtung, Unter-
+           suchung und Bewertung der gesundheitlichen Verhältnisse der Bevölkerung; Beratung
+           (auch im Rahmen von regionalen Gesundheitskonferenzen) der für die Gesundheitsver-
+           sorgung zuständigen Stellen über den Bedarf an Angeboten zur Gesundheitsförderung; die
+           Beratung umfasst insbesondere Angebote der aufklärenden Gesundheitsberatung der Be-
+           völkerung (Primärprävention), Beratung über Vorsorge und Krankheitsfrüherkennung (Se-
+           kundärprävention) und Beratung über Maßnahmen zur Versorgung und Rehabilitation
+           chronisch Kranker (Tertiärprävention).
+
+
+
+
+27        vom 17. November 1995 (GVBl. 1995, 485) in der am 1. April 2014 geltenden Fassung.
+=== Seite 34 ===
+Wissenschaftliche Dienste               Ausarbeitung                                                    Seite 34
+                                        WD 9 – 3000 – 027/14
+
+
+
+
+Kinder und Jugendliche
+
+       -   Der ÖGD informiert über die Untersuchungsangebote zur Früherkennung von Krankheiten
+           insbesondere für Kinder und wirkt auf die Inanspruchnahme der Angebote hin (§ 5).
+       -   Daneben bestehen weitere Aufgaben nach dem LKindSchuG28.
+       -   (Lokale Netzwerke zum Schutz von Kindern vor Vernachlässigung, Missbrauch oder
+           Misshandlung nach § 12 Abs. 2, s. u.).
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+       -   Der ÖGD führt selber Maßnahmen der Primär-, Sekundär- und Tertiärprävention sowie
+           der aufsuchenden Gesundheitshilfe für Personen und Personengruppen durch, die auf-
+           grund ihrer besonderen Situation Leistungen anderer für die Gesundheitsversorgung zu-
+           ständiger Stellen nicht in Anspruch nehmen (§ 5).
+       -   Beratung über Maßnahmen zur Versorgung und Rehabilitation chronisch Kranker (Terti-
+           ärprävention, § 5).
+
+Umweltbezogene Aufgaben
+
+       -   Umweltbezogener Gesundheitsschutz (§ 6): Beobachtung, Untersuchung und Bewertung
+           von Umwelteinwirkungen; Information und Beratung der Bevölkerung sowie anderer Be-
+           hörden in Fragen des umweltbezogenen Gesundheitsschutzes; Stellungnahmen bei Pla-
+           nungen und Maßnahmen, die gesundheitliche Belange der Bevölkerung wesentlich berüh-
+           ren.
+
+Impfungen
+
+       -   Veranlassung von Schutzimpfungen (§ 1).
+
+Infektionskrankheiten
+
+       -   Hinwirken auf die Verhütung und Bekämpfung übertragbarer Krankheiten sowie die Er-
+           mittlung von Infektionswegen (§ 1).
+
+11.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+       -   Gesundheitsbericht (§ 10) des Landesministeriums (in der Regel alle fünf Jahre) auf der
+           Grundlage von Daten der übrigen Behörden des ÖGD.
+       -   Lokale Netzwerke: Der ÖGD arbeitet zum Schutz von Kindern vor Vernachlässigung,
+           Missbrauch oder Misshandlung im Rahmen lokaler Netzwerke nach § 3 LKindSchuG eng
+           mit den Jugendämtern und den übrigen Beteiligten der lokalen Netzwerke zusammen (§
+           12 Abs. 2).
+       -   Regionale Gesundheitskonferenzen (genannt in § 5 ohne weitere Details).
+
+
+
+
+28
+     Landesgesetz zum Schutz von Kindeswohl und Kindergesundheit (LKindSchuG) vom 7. März 2008 (GVBl. 2008, 52).
+=== Seite 35 ===
+Wissenschaftliche Dienste                  Ausarbeitung                                                        Seite 35
+                                           WD 9 – 3000 – 027/14
+
+
+
+
+12.       Saarland
+
+12.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Nach § 1 des Gesundheitsdienstgesetzes (ÖGDG)29 fördert und schützt der ÖDG die Gesundheit
+der Bevölkerung. Hierzu hat er u. a.
+
+      -    die Erarbeitung und Weiterentwicklung fachlicher Standards zur Sicherung der Qualität
+           der Leistungen der Gesundheitssysteme voranzubringen,
+      -    die gesundheitlichen Verhältnisse der Bevölkerung einschließlich der Auswirkungen von
+           Umwelteinflüssen zu beobachten und zu bewerten, relevante Daten aus dem Gesund-
+           heitsbereich epidemiologisch zu erfassen sowie Gesundheitsberichte zu erstellen,
+      -    Maßnahmen der Gesundheitsförderung und Gesundheitserziehung zu initiieren, zu koor-
+           dinieren, durchzuführen und auf die Beseitigung von Versorgungslücken hinzuwirken,
+      -    den Ursachen von Gesundheitsgefährdungen und Gesundheitsschäden nachzugehen und
+           auf die Beseitigung von Gesundheitsgefährdungen hinzuwirken, insbesondere darüber zu
+           wachen, dass die Anforderungen der Hygiene eingehalten und übertragbare Krankheiten
+           bei Menschen verhütet und bekämpft werden.
+
+12.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Zuständig für den ÖDG sind u. a. das Landesministerium für Justiz, Gesundheit und Soziales, das
+Landesamt für Gesundheit und Verbraucherschutz und die Gemeindeverbände (§ 2). Letztere
+unterhalten ein Gesundheitsamt (§ 3).
+
+Der ÖGD ist zur Durchführung einer eigenen Qualitätssicherung verpflichtet (§ 5). Er berät Be-
+hörden und andere öffentliche Stellen und hat Belange der Gesundheitsförderung und des Ge-
+sundheitsschutzes in Planungsprozesse einzubringen. (§ 1 Abs. 2).
+
+12.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+      -    Förderung gesunder Lebens- und Umweltbedingungen einschließlich des gesundheitli-
+           chen Kompetenzerwerbs zur Gesundheitsbildung in enger Zusammenarbeit mit den im
+           Bereich der Gesundheitsförderung tätigen Organisationen und Gruppen; der ÖGD arbeitet
+           nach den Grundsätzen des Subsidiaritätsprinzips mit geeigneten Trägern zusammen; Ko-
+           ordinierung der im Bereich der Gesundheitsförderung tätigen Institutionen, Träger und
+           Körperschaften; Initiierung, Unterstützung, Förderung und Evaluierung kommunaler und
+           regionaler gesundheitsfördernder Aktivitäten und von Selbsthilfegruppen; Durchführung
+           von eigenen Maßnahmen der Verhaltens- und Verhältnisprävention (§ 7).
+
+
+
+
+29        Gesetz über den öffentlichen Gesundheitsdienst vom 19. Mai 1999 (Amtsblatt 1999, 844) in der am 1. April
+          2014 geltenden Fassung.
+=== Seite 36 ===
+Wissenschaftliche Dienste          Ausarbeitung                                              Seite 36
+                                   WD 9 – 3000 – 027/14
+
+
+
+
+Kinder und Jugendliche
+
+    -   Kinder- und Jugendgesundheitspflege (§ 8): Gesundheitsförderung und -schutz von Säug-
+        lingen, Kindern und Jugendlichen in Zusammenarbeit mit anderen Institutionen, Initiati-
+        ven und mit Ärzten sowie in eigenständiger Aufgabenwahrnehmung; Beobachtung und
+        Bewertung der Bedingungen für eine gesunde Entwicklung von Kindern.
+    -   Früherkennungsuntersuchungen von Säuglingen, Kindern und Jugendlichen in Gemein-
+        schaftseinrichtungen (ergänzend zu anderen Angeboten); Beratung von Einrichtungen
+        über gesundheitsfördernde Maßnahmen; beratende Mitwirkung bei Integrationsmaßnah-
+        men in Schulen und Kindergärten.
+    -   Flächendeckende ärztliche Einschulungsuntersuchungen; Gruppenprophylaxe für Kinder
+        und Jugendliche zur Gesunderhaltung des Zahnbereichs nach § 21 SGB V.
+    -   Teilnahme an Früherkennungsuntersuchungen für Kinder (§ 8a): Verfahren bei Nichtteil-
+        nahme an einer Früherkennungsuntersuchung für Kinder bis zur Vollendung von
+        fünfeinhalb Lebensjahren.
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Gesundheitshilfe (§ 9) für Personen, die wegen körperlicher, seelischer, geistiger oder so-
+        zialer Umstände in gesundheitlicher Hinsicht besonders hilfebedürftig sind; Beratung,
+        Unterstützung und Initiierung gesundheitlicher Angebote; Beteiligung an sozialpsychiat-
+        rischen Aufgaben durch Beratung, Initiierung und Koordinierung von Maßnahmen.
+
+Umweltbezogene Aufgaben
+
+    -   Umweltbezogener Gesundheitsschutz (§ 10): Bewertung der Umwelteinflüsse auf die
+        menschliche Gesundheit mit dem Ziel, gesundheitsgefährdende Umwelteinwirkungen zu
+        erkennen und auf deren Beseitigung hinzuwirken; Beratung über die Nutzung förderlicher
+        und Vermeidung schädlicher Umwelteinflüsse.
+
+Impfungen
+
+    -   Hinwirken auf einen ausreichenden Impfschutz; Beteiligung an der Durchführung emp-
+        fohlener Impfungen; eigenes Impfangebot bei Impflücken; Impfberatung (§ 11 Abs. 4).
+
+Infektionskrankheiten
+
+    -   Infektionshygiene (§ 11): Aufklärung, Beratung, Verhütung und Bekämpfung von über-
+        tragbaren Krankheiten; Alarm- und Einsatzpläne für den Seuchenfall.
+    -   Präventions- und Beratungsangebot zur HIV-Infektion und anderen sexuell übertragbaren
+        Krankheiten (anonyme Beratung, § 11 Abs. 3).
+
+12.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+    -   Gesundheitsberichterstattung als fachliche Grundlage der Planung und Durchführung von
+        Maßnahmen; kommunale Gesundheitsberichterstattung durch die Gesundheitsämter;
+        Landesgesundheitsberichterstattung durch das Landesministerium (§ 6).
+=== Seite 37 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                              Seite 37
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+13.       Sachsen
+
+13.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Nach § 1 des Gesetzes über den öffentlichen Gesundheitsdienst im Freistaat Sachsen (Sächs-
+GDG)30
+
+      -    fördert und schützt der ÖGD die Gesundheit des Menschen,
+      -    beobachtet und bewertet die gesundheitlichen Verhältnisse von Menschen einschließlich
+           der Auswirkungen von Umwelteinflüssen (gesundheitlicher Umweltschutz),
+      -    wacht über die Einhaltung der Hygieneanforderungen,
+      -    wirkt auf die Verhütung und Bekämpfung übertragbarer Krankheiten hin und führt
+           Schutzimpfungen durch,
+      -    wirkt bei der epidemiologischen Erfassung von Krankheiten mit und nimmt Einfluss auf
+           die Gestaltung gesunder Lebensbedingungen.
+
+13.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Behörden des ÖGD sind u. a. das Staatsministerium für Soziales und Verbraucherschutz, die
+Landesdirektion Sachsen sowie die Gesundheitsämter (§ 2).
+
+Die Behörden des ÖGD beteiligen und unterstützen sich gegenseitig sowie andere Behörden (§ 7
+Abs. 1). Der ÖGD ist bei örtlichen Planungsvorhaben mit Bedeutung für die Gesundheit zu betei-
+ligen (§ 7 Abs. 2). Der ÖGD berät andere Behörden in humanmedizinischen Fragen (§ 1 Abs. 2).
+
+13.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+      -    Gesundheitliche Aufklärung in Fragen der körperlichen, geistig-seelischen und sozialen
+           Gesundheit und Beratung über Gesunderhaltung und Krankheitsverhütung (§ 11 Abs. 1).
+      -    Beratung zu Fragen einer gesundheitsbewussten und altersgerechten Lebensweise und
+           Aufklärung über die Folgen falscher Ernährung, des Rauchens und des Alkoholmiss-
+           brauchs (§ 11 Abs. 1).
+      -    Die Gesundheitsämter unterstützen Bestrebungen zur Förderung der Gesundheitspflege
+           und der Gesundheitsvorsorge und wirken insbesondere bei der Förderung der Individual-
+           hygiene mit (§ 11 Abs. 2).
+
+Kinder und Jugendliche
+
+      -    Untersuchung und Betreuung von Kindern und Jugendlichen hinsichtlich ihrer gesund-
+           heitlichen Entwicklung sowie diesbezügliche Beratung der Sorgeberechtigten, insbeson-
+           dere im Rahmen der gesundheitlichen Vorsorge in Kindertagesstätten und Schulen und in
+           Fragen der Zahngesundheit (§ 11 Abs. 1).
+
+
+
+
+30        vom 11. Dezember 1991 (SächsGVBl. 1991, 413) in der am 1. April 2014 geltenden Fassung.
+=== Seite 38 ===
+Wissenschaftliche Dienste        Ausarbeitung                                            Seite 38
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+-       Beratung von Menschen, die an einer chronischen Erkrankung oder an einer Behinderung
+        leiden, und von Tumorpatienten (§ 11 Abs. 1).
+
+-       Beratung und Betreuung von Menschen, die an einer Sucht oder psychischen Krankheit
+        leiden, von ihr bedroht oder dadurch gefährdet sind, sowie von deren Angehörigen(§ 11
+        Abs. 1).
+
+Schwangeren- und Mütterberatung
+
+    -   Familienberatung und Beratung bei der Familienplanung einschließlich der Beratung
+        Schwangerer sowie Partnerschafts- und Sexualberatung (§ 11 Abs. 1).
+
+Umweltbezogene Aufgaben
+
+    -   Beratung der Bevölkerung zu Fragen des gesundheitlichen Umweltschutzes (§ 11 Abs. 1).
+
+Impfungen
+
+    -   Durchführung von Schutzimpfungen (§1 Abs. 1).
+
+Infektionskrankheiten
+
+    -   Beratung von Menschen, die an einer übertragbaren Krankheit leiden, von ihr bedroht o-
+        der dadurch gefährdet sind, insbesondere über Schutz- und Vorbeugemaßnahmen (§ 11
+        Abs. 1).
+
+Sonstiges
+
+    -   Beratung der Bevölkerung in sportmedizinischen Fragen und Unterstützung von Maß-
+        nahmen zur Förderung des Breiten- und Behindertensports (§ 11 Abs. 1).
+
+13.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+Keine Regelungen.
+=== Seite 39 ===
+Wissenschaftliche Dienste                Ausarbeitung                                                     Seite 39
+                                         WD 9 – 3000 – 027/14
+
+
+
+
+14.       Sachsen-Anhalt
+
+14.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Nach § 1 des Gesundheitsdienstgesetzes (GDG-LSA)31 schützt und fördert der ÖGD die Gesund-
+heit der Bevölkerung. Er wirkt an einer bedarfsgerechten gesundheitlichen Versorgung nach
+Maßgabe dieses Gesetzes u. a. in folgenden Aufgabenbereichen mit:
+
+      -    Gesundheitsförderung, Gesundheitsvorsorge, Gesundheitsschutz und Gesundheitshilfe,
+      -    Gesundheitsberichterstattung und Gesundheitsplanung,
+      -    Überwachung der Berufsangehörigen im Gesundheitswesen und ihrer Einrichtungen.
+
+14.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Träger des ÖGD sind die Landkreise, kreisfreien Städte sowie Landesbehörden (§ 19).
+
+Der ÖGD ergänzt bei Bedarf die gesundheitliche Versorgung der Bevölkerung und leistet die er-
+forderlichen Hilfen (§ 2). Er wirkt im Verhältnis zu den an der gesundheitlichen Versorgung Be-
+teiligten auf gegenseitige Information und auf Koordination hin. Ziel ist die Verzahnung von Ge-
+sundheitsvorsorge, Behandlung, Beratung, Betreuung und Nachsorge. Förderung des Zusam-
+menwirkens von gesundheitlichen und sozialen Diensten (§ 3, vgl. § 22 zur Beteiligung des ÖGD
+durch andere Verwaltungszweige).
+
+14.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+      -    Aufklärung der Bevölkerung über Möglichkeiten der Gesundheitsförderung und Krank-
+           heitsverhütung bei Mitwirkung der Betroffenen; Vorbeugung gegen Missbrauch und Ab-
+           hängigkeit von legalen und illegalen Drogen und anderen Suchtgefahren (nur soweit keine
+           Aufgabenzuweisung an andere Träger nach bundesrechtlichen und landesrechtlichen
+           Vorschriften); enge Zusammenarbeit des ÖGD u. a. mit den Sozialversicherungsträgern,
+           der Kassenärztlichen Vereinigung, Ärzten, der Bundeszentrale für gesundheitliche Auf-
+           klärung (§ 7).
+
+Kinder und Jugendliche
+
+      -    Kinder- und Jugendgesundheitsdienst (§ 9): Nach Maßgabe bundesrechtlicher Vorschrif-
+           ten wirkt der ÖGD auf ein ausreichendes Angebot zur gesundheitlichen Frühförderung für
+           behinderte Kinder und Jugendliche hin und vermittelt notwendige Hilfen.
+      -    Mitwirkung an gesundheitlichen Maßnahmen zur Sicherung des Kindeswohls und zum
+           Schutz vor Vernachlässigung (in Abstimmung mit den örtlichen Trägern der öffentlichen
+           Jugendhilfe); Untersuchungen vor der Einschulung und während der Schulzeit; Untersu-
+           chungen nach dem Jugendarbeitsschutzgesetz (§ 9 Abs. 2).
+
+
+
+31        Gesetz über den Öffentlichen Gesundheitsdienst und die Berufsausübung im Gesundheitswesen im Land Sach-
+          sen-Anhalt vom 27. November 1997 (GVBl. LSA 1997, 1023) in der am 1. April 2014 geltenden Fassung.
+=== Seite 40 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                     Seite 40
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+     -    Zahnärztliche (Vorsorge-)untersuchungen in Schulen und Betreuungseinrichtungen; Mit-
+          wirkung an der Gruppenprophylaxe nach § 21 SGB V (§ 9 Abs. 3).
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+     -    Beratung und Betreuung bei besonderen Erkrankungen und Behinderung: Gesundheitshil-
+          fe nach dem Landesgesetz über Hilfen für psychisch Kranke und Schutzmaßnahmen32 für
+          Personen mit seelischen oder geistigen Behinderungen oder Erkrankungen (§ 10 Abs. 1).
+     -    Förderung der Zusammenarbeit aller auf dem Gebiet der Suchtprävention und Suchtkran-
+          kenhilfe tätigen Personen und Institutionen (§ 10 Abs. 3).
+     -    Beratungs- und Betreuungsangebot (nur falls bundesrechtlich nicht andere Träger zustän-
+          dig sind) für Betroffene und Angehörige bei besonderen Erkrankungen (§ 10 Abs. 1).
+
+Schwangeren- und Mütterberatung
+
+     -    Sexualberatung, Schwangeren- und Mütterberatung, genetische Beratung (§ 8): Ergänzen-
+          de Beratung in gesundheitlichen Fragen der Sexualpartnerschaft, der Familienplanung
+          und Vererbung; Beratung von Schwangeren und Müttern von Säuglingen und Kleinkin-
+          dern, insbesondere sozial und gesundheitlich besonders gefährdete Personen.
+
+Umweltbezogene Aufgaben
+
+     -    Umweltbezogener Gesundheitsschutz (§ 6): Mitwirkung an Maßnahmen zum Schutz der
+          Gesundheit vor schädigenden Umwelteinflüssen, Aufklärung und Beratung. Beobachtung
+          und Bewertung der gesundheitlichen Auswirkungen von Umwelteinflüssen;
+
+Impfungen
+
+     -    Hinwirken auf einen ausreichenden Impfschutz der Bevölkerung; Förderung der Durch-
+          führung empfohlener Impfungen; bei Bedarf Durchführung eigener Impfungen; Registrie-
+          rung durchgeführter Impfungen (§ 4 Abs. 2, 3).
+
+Infektionskrankheiten
+
+     -    Maßnahmen zur Verhütung und Bekämpfung auf Menschen übertragbarer Krankheiten
+          nach Maßgabe bundes- oder landesrechtlicher Vorschriften (§ 4 Abs. 1).
+     -    Beratung und Betreuung (nur falls bundesrechtlich nicht andere Träger zuständig sind)
+          bei AIDS, Geschlechtskrankheiten, Tuberkulose; im Bedarfsfall Maßnahmen zur Früher-
+          kennung dieser Krankheiten (§ 10 Abs. 3).
+
+14.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+     -    Gesundheitsberichterstattung (§ 11) zu Planung und Durchführung von Maßnahmen zur
+          Gesundheitsförderung und Krankheitsverhütung sowie der Krankenversorgung.
+     -    Gesundheitsplanung (§ 12) auf der Grundlage der Gesundheitsberichte und in Abstim-
+          mung mit den nach dem SGB V zuständigen Körperschaften (fachliche Zielvorstellungen
+
+
+32       vom 30. Januar 1992 (GVBl. LSA 1992, 88, ber. 432).
+=== Seite 41 ===
+Wissenschaftliche Dienste       Ausarbeitung                                          Seite 41
+                                WD 9 – 3000 – 027/14
+
+
+
+
+        zur medizinischen Beratung, Betreuung und Versorgung, insbesondere für die Betreuung
+        und Versorgung von behinderten, psychisch kranken und abhängigkeitskranken sowie äl-
+        teren Menschen).
+    -   Beteiligung an Arbeitsgemeinschaften für die Zahngesundheitspflege (§ 9 Abs. 3).
+=== Seite 42 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                                       Seite 42
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+15.       Schleswig-Holstein
+
+15.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Ziele des ÖGD sind nach § 1 Gesundheitsdienst-Gesetz (GDG)33:
+
+      -    auf gesunde Lebensverhältnisse hinzuwirken und gleiche Gesundheitschancen für alle
+           anzustreben,
+      -    die gesundheitliche Eigenverantwortung der Bürgerinnen und Bürger zu stärken,
+      -    auf die Vermeidung von Gesundheitsrisiken und auf den Schutz der Einzelnen und der
+           Allgemeinheit vor gesundheitlichen Beeinträchtigungen hinzuwirken,
+      -    eine neutrale Sachverständigenfunktion für andere Stellen vorzuhalten.
+
+15.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Träger sind nach § 2 das Land sowie Kreise und kreisfreie Städte.
+
+Der ÖGD hat eine enge Zusammenarbeit mit allen betroffenen Stellen und eine Koordination der
+Angebote anzustreben (§ 2).
+
+15.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+      -    Kreise und kreisfreie Städte stellen sicher, dass ihre Maßnahmen auch auf anderen in Be-
+           tracht kommenden Handlungsfeldern, insbesondere Siedlungsentwicklung, Wohnen,
+           Schule, Jugend, Menschen im Alter, Verkehr, Umwelt, Arbeitswelt und Soziales, die Ziele
+           des öffentlichen Gesundheitsdienstes angemessen berücksichtigen (Gesundheitsförde-
+           rung). Sie können hierzu insbesondere gesundheitsfördernde Aktivitäten unterstützen
+           und koordinieren und die Bevölkerung oder benachteiligte Gruppen durch Information,
+           Beratung und Aufklärung unterrichten und sie zu gesundheitsbewusstem Verhalten akti-
+           vieren (§ 5).
+
+Kinder und Jugendliche
+
+      -    Untersuchungen zur Früherkennung; Ermittlung des Impfstatus; Vermittlung von Angebo-
+           ten; Gruppenprophylaxe gegen Zahnerkrankungen im Rahmen des § 21 SGB V (§ 7).
+      -    Verfahren bei Nichtteilnahme an Früherkennungsuntersuchungen für Kinder (§ 7a): u. a.
+           bei Anhaltspunkten für eine Gefährdung des Kindeswohls Einschaltung des Familienge-
+           richts möglich; im Notfall Inobhutnahme des Kindes durch das Jugendamt.
+
+
+
+
+33        Gesetz über den öffentlichen Gesundheitsdienst vom 14. Dezember 2001 (GVOBl. 2001, 398) in der am 1. April
+          2014 geltenden Fassung.
+=== Seite 43 ===
+Wissenschaftliche Dienste         Ausarbeitung                                            Seite 43
+                                  WD 9 – 3000 – 027/14
+
+
+
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Gesundheitshilfe (Beratung und Betreuung, ggf. aufsuchende Hilfe, § 8) insbesondere für
+        bestimmte Bevölkerungsgruppen (u. a. Behinderte, Obdachlose, Menschen mit Infektions-
+        krankheiten, Migranten).
+
+Schwangeren- und Mütterberatung
+
+    -   Berücksichtigung im Rahmen der Gesundheitshilfe (Beratung und Betreuung, ggf. aufsu-
+        chende Hilfe, § 8) für bestimmte Bevölkerungsgruppen (u. a. für unterstützungsbedürftige
+        Eltern von Säuglingen und Kleinkindern).
+    -   Gesundheitshilfe in Fragen der Sexualaufklärung, Verhütung und Familienplanung sowie
+        bei Schwangerschaftskonflikten.
+
+Umweltbezogene Aufgaben
+
+    -   Umweltbezogener Gesundheitsschutz (§ 9): Information und Beratung in umweltmedizi-
+        nischen Fragen.
+
+Impfungen
+
+    -   Der ÖGD wirkt auf einen umfassenden Impfschutz der Bevölkerung und die Erhöhung der
+        Impfquote hin (§ 10).
+
+Infektionskrankheiten
+
+    -   Infektionsschutz (§ 10): Der ÖGD nimmt Aufgaben nach dem gemäß IfSG wahr.
+    -   Berücksichtigung auch im Rahmen der Gesundheitshilfe für bestimmte Bevölkerungs-
+        gruppen (u. a. für Menschen mit Infektionskrankheiten, § 8).
+
+15.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+    -   Gesundheitsberichterstattung nach Vorgaben der obersten Landesbehörde (§ 6).
+=== Seite 44 ===
+Wissenschaftliche Dienste                 Ausarbeitung                                                        Seite 44
+                                          WD 9 – 3000 – 027/14
+
+
+
+
+16.       Thüringen
+
+Nur in Thüringen ist der Gesundheitsdienst auf der Grundlage einer Rechtsverordnung geregelt
+(Verordnung über den öffentlichen Gesundheitsdienst und die Aufgaben der Gesundheitsämter
+in den Landkreisen und kreisfreien Städten34).
+
+16.1. Ziele und allgemeine Aufgaben des ÖGD
+
+Aufgaben des ÖGD sind nach § 1:
+
+      -    die Förderung und der Schutz der Gesundheit der Menschen,
+      -    die Beobachtung und Bewertung der gesundheitlichen Verhältnisse einschließlich der
+           Auswirkungen von Umwelteinflüssen,
+      -    die Überwachung der Anforderungen der Hygiene, um gesundheitliche Beeinträchtigun-
+           gen oder Schädigungen zu vermeiden oder zu beseitigen,
+      -    die Verhütung und Bekämpfung übertragbarer Krankheiten,
+      -    die Gewährleistung der Durchführung von öffentlich festgelegten oder empfohlenen
+           Schutzimpfungen sowie der Impfberatung,
+      -    die Gewährleistung der epidemiologischen Erfassung von Infektionskrankheiten,
+
+16.2. Struktur und Organisation des ÖGD, Grundsätze der Aufgabenerfüllung
+
+Träger sind die Gesundheitsämter der Landkreise und kreisfreien Städte (§ 2).
+
+Der ÖGD hat andere Behörden zu unterstützen, soweit dies zur rechtmäßigen Erfüllung der ge-
+setzlichen Aufgaben der anderen Behörden erforderlich ist. Andere Behörden beteiligen und un-
+terstützen ihrerseits den ÖGD insbesondere bei örtlichen Planungen, die für Gesundheit von Be-
+deutung sind (§ 5).
+
+16.3. Spezifische Aufgaben des ÖGD im Bereich der Prävention
+
+Grundsätze der Prävention und Gesundheitsförderung
+
+      -    Gesundheitliche Aufklärung und Beratung (§ 8 Abs. 1) in Fragen der körperlichen, geistig-
+           seelischen und sozialen Gesundheit (Gesundheitshilfe), Beratung über Gesunderhaltung
+           und Krankheitsverhütung.
+
+Kinder und Jugendliche
+
+      -    Beratung und Betreuung von Kindern, Jugendlichen und Sorgeberechtigten hinsichtlich
+           ihrer gesundheitlichen Entwicklung (§ 8 Abs. 1).
+      -    Regelmäßige zahnärztliche Untersuchung von Kindern und Jugendlichen (§ 8 Abs. 1).
+
+
+
+
+34        vom 8. August 1990 (GBI. I Nr. 53 S. 1068) in der Fassung der Bekanntmachung vom 2. Oktober 1998.
+=== Seite 45 ===
+Wissenschaftliche Dienste        Ausarbeitung                                           Seite 45
+                                 WD 9 – 3000 – 027/14
+
+
+
+
+Personen mit besonderem Hilfebedarf (z. B. kranke oder ältere Menschen)
+
+    -   Gesundheitliche Beratung für Menschen, die an einer Sucht, einer psychischen Krankheit
+        oder einer Behinderung leiden oder dadurch gefährdet sind, sowie deren Angehörige über
+        Hilfsangebote (§ 8 Abs. 1).
+
+Schwangeren- und Mütterberatung
+
+    -   Beratung von Frauen in der Schwangerschaft (§ 8 Abs. 1).
+
+Umweltbezogene Aufgaben
+
+    -   Beobachtung und Bewertung der gesundheitlichen Verhältnisse einschließlich der Aus-
+        wirkungen von Umwelteinflüssen.
+
+Impfungen
+
+    -   Gewährleistung der Durchführung von öffentlich festgelegten oder empfohlenen Schutz-
+        impfungen sowie der Impfberatung (§ 1).
+
+Infektionskrankheiten
+
+    -   Gesundheitliche Beratung für Menschen, die an einer übertragbaren Krankheit leiden oder
+        dadurch gefährdet sind, über Schutz- und Vorbeugemaßnahmen sowie zu weiteren ge-
+        sundheitlichen Hilfsangeboten (§ 8 Abs. 1).
+    -   Verhütung und Bekämpfung übertragbarer Krankheiten (§ 1).
+
+Sonstiges
+
+    -   Beratung in sportmedizinischen Fragen, Unterstützung von Maßnahmen zur Förderung
+        des Sports, Ernährungsberatung (§ 8 Abs. 1).
+    -   Unterstützung von Bestrebungen zur Förderung der Gesundheitspflege und Gesundheits-
+        vorsorge, Förderung der Individualhygiene (§ 8 Abs. 2).
+
+16.4. Besondere Strukturen der Planung, Koordination und Steuerung
+
+Keine Regelungen.
