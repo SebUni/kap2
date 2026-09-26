@@ -751,3 +751,18 @@ Regel ohne (d) 167.246 €, Produkt gegen Regel × 0,8004, Rest × 0,9159, Zelll
 | Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
 |---|---|---|---|---|---|---|---|
 | 121 | §3.0 Wirkung (c) ↔ §3.3 (Regel Fassung T-1233) | Widerspruch (Regression durch T-1233) | §3.0 (c) teilt × 0,982 auf in „× 0,9802 durch eine Eigenheit des Produkts … (Befund 104; Ersatzregel dafür in §3.3)“ und „Der Rest, × 1,0014, sind Altersstruktur und Wohnlage der Älteren“. Gemessen ist das gegen den einheitlichen Anteil 65+ der übrigen Zellen (19,87 %, Skriptzeile „Eigenheit in (c), Befund 104“), also gegen genau die Annahme, die §3.3 mit Befund 117 verwirft. Für dieselbe Eigenheit nennt §3.3 in Berlin × 0,987 (heute gegen Regel). Damit läge der Rest bei rund × 0,995 statt × 1,0014, seine Richtung kehrt sich um. Der Adressat liest für eine Sache zwei Zahlen | (c) im Skript gegen die Regel aus §3.3 aufteilen (Stufe 1 und 2, ohne (d)) und die Zeile „Eigenheit in (c)“ entsprechend beschriften. §3.0 (c) mit den gemessenen Werten neu fassen und dort auf Befund 121 verweisen. (c) × 0,982, (a)–(d), die Kette (362,89 Mio. €) und Kapitel 7 bleiben unverändert | C | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('### 3.0'):s.index('### 3.1')]; sys.exit(not ('Der Rest, × 1,0014' not in t and 'Befund 121' in t))"` | behoben (T-1266): Skriptzeile „Eigenheit in (c)“ teilt mit `--ersatz` gegen die Regel aus §3.3 (Berlin × 0,9867 und × 0,9948); §3.0 (c) neu gefasst mit Verweis auf §3.3 und Befund 121, rund 343 Mio. € statt rund 345 Mio. €; Tabelle in §3.3, (a)–(d), Kette und Kapitel 7 unverändert |
+
+## Runde 23 — Gegenprüfung nach Befund 121 (frische Sitzung, 26.09.2026): Null-Runde
+
+Nachweis: Firmen-Repo, `tickets/T-1266-methodik_manager.md`, Abschnitt „Urteil“, Eintrag „2026-09-26T00:22:47Z ·
+Runde 0 · methodik_manager (opus/xhigh)“: Urteil **freigabe** („**Urteil:** freigabe“). Eine eigene Zeile
+`VERDIKT: …` wie in Runde 15 enthält dieses Urteil nicht; die Verdiktzeile ist der Schlusssatz der Begründung:
+„Neue Befunde der Kategorien A, B und C gibt es keine, das ist eine Null-Runde; T-1234 trägt sie ein.“ Die
+Gegenprüfung nach §5 in frischer Sitzung (Lints, 14 Leitfragen, E1–E5) hat die Arbeit aus Runde 22 (Befund 121) und
+die übernommenen Runden 19–21 geprüft. „Runde 0“ ist die Zählung im Ticket, im Ledger ist es Runde 23, die Runde nach
+Runde 22. Nach A-0046 ist sie die achte Runde seit der letzten Null-Runde (Runde 15); die Zählung endet hier, die Grenze
+von zehn Runden ist nicht erreicht. Merge des Pakets nach `main`: Commit fc124562. Neue Befunde: keine.
+Zurückgestellt bleibt 116 (Code-Nachzug beim cto); das ist kein A-Befund. Der Hinweis ohne Befund aus dem Urteil
+(Aufruf in §3.0 ohne `--ersatz`) bleibt für die nächste inhaltliche Berührung vorgemerkt. Eingetragen mit
+T-1234-methodik_manager; am Bericht ändert sich nur die Statuszeile (ABNAHMEREIF, Abnahme durch den methodik_manager
+steht aus).
