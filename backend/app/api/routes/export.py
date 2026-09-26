@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.models.models import GeoExportJob, ExportStatus, Kommune
+from app.services.download_namen import content_disposition, download_dateiname_fuer
 from app.services.export_service import export_measures_xlsx, import_measures_xlsx
 from app.services.geodata_export_service import assessment_is_done
 from app.tasks.geodata_export_task import run_geodata_export_background
@@ -79,11 +80,13 @@ def download_export(kommune_id: int, export_id: int, db: Session = Depends(get_d
     if not job.file_path or not os.path.isfile(job.file_path):
         raise HTTPException(404, "Exportdatei nicht gefunden")
 
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
     # FileResponse streamt von Platte, statt die ganze .gpkg in den RAM zu lesen.
+    # Download-Name nach T-1424: Art, Name der Kommune, Gemeindeschlüssel.
     return FileResponse(
         job.file_path,
         media_type="application/geopackage+sqlite3",
-        filename=os.path.basename(job.file_path),
+        filename=download_dateiname_fuer("geodaten", kommune, "gpkg"),
     )
 
 
@@ -91,10 +94,12 @@ def download_export(kommune_id: int, export_id: int, db: Session = Depends(get_d
 def export_measures(kommune_id: int, db: Session = Depends(get_db)):
     """Export all measures as an Excel file."""
     xlsx_bytes = export_measures_xlsx(db, kommune_id)
+    kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    dateiname = download_dateiname_fuer("massnahmen", kommune, "xlsx")
     return Response(
         content=xlsx_bytes,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename=massnahmen_kommune_{kommune_id}.xlsx"},
+        headers={"Content-Disposition": content_disposition(dateiname)},
     )
 
 

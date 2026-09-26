@@ -34,6 +34,7 @@ from app.data.massnahmen_umsetzung import MASSNAHMEN_UMSETZUNG
 from app.db.database import get_db
 from app.models.models import Kommune
 from app.services import ergebnis_nachweise
+from app.services.download_namen import content_disposition, download_dateiname_fuer
 from app.services.ergebnis_interpretation_markdown import interpretationsbericht_fuer_kommune
 from app.services.geodata_export_service import assessment_is_done
 from app.services.handlungsfeld_abhaengigkeiten import abhaengigkeiten_der_kommune
@@ -149,4 +150,9 @@ def get_leitfragen():
 def get_interpretationsbericht(kommune_id: int, db: Session = Depends(get_db)):
     kommune = _kommune_oder_404(db, kommune_id)
     inhalt = interpretationsbericht_fuer_kommune(db, kommune)
-    return Response(content=inhalt, media_type="text/markdown; charset=utf-8")
+    dateiname = download_dateiname_fuer("ergebnisse-interpretieren", kommune, "md")
+    return Response(
+        content=inhalt,
+        media_type="text/markdown; charset=utf-8",
+        headers={"Content-Disposition": content_disposition(dateiname)},
+    )

@@ -7,6 +7,7 @@ from app.db.database import get_db
 from app.models.models import ConfigParameter, Kommune, RiskZone, RiskZoneCell
 from app.schemas.schemas import ParameterUpdate
 from app.services import artifact_rebuild, parameter_registry
+from app.services.download_namen import content_disposition, download_dateiname_fuer
 from app.services.export_service import export_parameters_xlsx
 
 router = APIRouter()
@@ -171,5 +172,5 @@ def export_parameters(kommune_id: int, db: Session = Depends(get_db)):
     return Response(
         content=xlsx_bytes,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename=parameter_kommune_{kommune_id}.xlsx"},
+        headers={"Content-Disposition": content_disposition(download_dateiname_fuer("parameter", kommune, "xlsx"))},
     )
