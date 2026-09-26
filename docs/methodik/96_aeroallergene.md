@@ -154,7 +154,7 @@ Beschwerden, und jeder zusätzliche Beschwerdetag kostet Behandlung.
 | 7 | Vegetationsfaktor \(\hat P\) je Zelle (allergene Bäume und Grünflächen), zentriert auf das betroffenengewichtete Mittel der eigenen Kommune | je Zelle ab 0,3 (keine allergene Vegetation) bis über 1 (Allee, Park); Mittel über Berlin genau **1**, also \(\sum B \hat P = \sum B\) = 402.103 | \(\lambda\) = 0,7 aus Werchan [54,55], Bogawski [56] (§3.3, §3.4, Log 12, 17, 18); Kap. 7 `pollen.lambda_veg` |
 | 8 | Zusätzliche Symptomtage \(\Delta\text{Tage} = B \times \delta \times \hat P\) (native Ergebnisgröße) | 402.103 × 1,8795 × 1 = **755.753 Tage je Jahr** (u20 111.357 · 20–64 567.677 · 65–74 42.751 · 75–84 23.825 · 85+ 10.143) | Ebenen 3, 6 und 7 |
 | 9 | Kostensatz je Symptomtag \(c_{\text{Tag}} = c_{\text{Jahr,direkt}} / d_{\text{Saison}}\) mit \(d_{\text{Saison}} = f \times (p_B L_B + p_G L_G)\) | 266,90 € / (0,70 × (0,55 × 30 + 0,75 × 60)) = 266,90 € / 43,05 Tage = **6,20 € je Tag** (Preisstand 2024) | TOTALL [65], VPI [19]; \(L_B\), \(L_G\): Abschätzung von KAP3 nach [51] (§3.5); Kap. 7 `pollen.c_jahr_direkt`, `pollen.d_saison`, `pollen.c_tag` |
-| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 755.753 × 6,20 € = **4,69 Mio. € je Jahr (Preisstand 2024)**, das sind 1,28 € je Einwohner | Ebenen 8 und 9 |
+| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 755.753 × 6,20 € = **4,69 Mio. € je Jahr (Preisstand 2024)**, das sind 1,28 € je Einwohner; der Zelllauf des Produkts ergibt 4,59 Mio. € (Unterschied unten) | Ebenen 8 und 9 |
 
 **Warum \(f\) im Euro-Betrag keine Rolle spielt.** \(f\) steht in Ebene 6 (mehr Tage) und in
 Ebene 9 (mehr Tage in der Referenzsaison, also billigerer Tag); in Ebene 10 kürzt es sich
@@ -171,21 +171,40 @@ insgesamt grünere Kommune hat damit nicht mehr Tage als eine graue; das trägt 
 (Log 18, Modellgrenze 7 in §6).
 
 **Kommune statt Zellen: was die Kette verfälscht und was nicht.** Das Produkt rechnet je
-100-m-Zelle und summiert; die Kette rechnet mit Summen für ganz Berlin. Für die Kommunensumme
-ist das keine Näherung: \(B\) ist eine Summe aus Einwohnern mal Anteil, \(\delta\) ist in der
-ganzen Kommune gleich (eine Region), und \(\hat P\) mittelt auf 1 (Ebene 7). Zwei Unterschiede
-bleiben. (1) Die Kette verliert die Verteilung innerhalb der Stadt: Zwischen einer
-vegetationsarmen Zelle (0,3) und einer Allee-Zelle (1,7) liegt der Faktor 5,7. Wer wissen will,
-welches Quartier die Tage trägt, braucht die Zellen. (2) Die Altersbänder müssen die der
-Kommune sein. Die Kette nimmt Berlins eigene Altersgruppen aus [68]; das Produkt teilt die unter
-65-Jährigen je Zelle nach dem Zensus-2022-Gitter und fällt nur ohne Gitterwert auf den
-Bundesanteil der unter 20-Jährigen zurück (24,07 %, §3.2). Rechnete man Berlin mit diesem
-Bundesanteil statt mit dem eigenen (22,73 %), kämen 39.482 Menschen mehr in das Band mit 8,8 %
-statt 13,2 % Prävalenz, und \(B\) läge um 1.737 (0,43 %) **zu niedrig**, weil Berlin weniger
-junge Menschen hat als der Bund. Je Prozentpunkt u20-Anteil sind es 1.303 Betroffene (0,32 %).
-Größer wird dieser Fehler bei Kommunen, deren Altersaufbau stärker vom Bund oder Land abweicht
-(Universitätsstadt, Kurort): Dort gehören die Altersbänder der Kommune in Ebene 1, nie die des
-Landes.
+100-m-Zelle mit der Bevölkerung aus dem Zensus-Gitter (Stichtag 15.05.2022) und summiert; die
+Kette rechnet mit der Fortschreibung für ganz Berlin (Stichtag 31.12.2023, Ebene 1). **Die Kette
+überschätzt Berlin um 2,0 %.** Zwei Schritte sind auf der Ebene der Kommune exakt: \(\delta\) ist
+in der ganzen Kommune gleich (eine Region), und \(\hat P\) mittelt auf 1 (Ebene 7). Wirkungen wie
+in #95 für die Temperatur je Zelle und die Feinstruktur unter 1 km gibt es in #96 deshalb nicht.
+Was bleibt, ist die Bevölkerung. Nachgerechnet mit allen 40.669 bewohnten 100-m-Zellen innerhalb
+der Gemeindegrenze Berlins nach der Logik des Produkts (`zensus_loader.apply_zensus_to_cell_inputs`,
+u20 je Zelle aus den 5er-Jahresgruppen, §3.2; Gemeindegebiet, Gitter und Ersatzregel mit den
+Funktionen aus `docs/methodik/anlagen/95_zellvergleich.py`, Lauf 26.09.2026), ergeben sich zwei
+Wirkungen, jede auf die vorige gerechnet:
+(1) **Einwohnersumme: × 0,981.** Das Gitter zählt 3.593.357 Einwohner, die Fortschreibung
+3.662.381 (#95 Befund 99).
+(2) **Altersbänder je Zelle wie im Produkt: × 0,999 = 0,9969 × 1,0021.** Der erste Faktor ist der
+Altersaufbau im Gitter (u20 658.325 · 20–64 2.240.635 · 65–74 334.709 · 75–84 262.921 ·
+85+ 96.767; Anteil u20 an den unter 65-Jährigen 22,71 % gegen 22,73 % in Ebene 1), gemessen mit
+der Ersatzregel aus #95 §3.3 für Zellen mit geheimgehaltenem Anteil 65+. Der zweite Faktor ist
+eine Eigenheit des Produkts: In 4.774 Zellen mit 99.098 Einwohnern setzt es 65+ = 0 (#95
+Befund 104). In #96 wirkt sie **nach oben**: Die dort nach der Ersatzregel fehlenden 12.921
+Menschen ab 65 zählt das Produkt in den Bändern u20 und 20–64 mit 8,8 % und 13,2 % statt mit
+6,7 % und 5,0 % Prävalenz. In #95 senkt dieselbe Eigenheit den Betrag.
+Zusammen 0,981 × 0,999 = 0,980: Der Zelllauf ergibt für Berlin 394.106 Betroffene, 740.723
+zusätzliche Symptomtage und **4,59 Mio. € je Jahr (Preisstand 2024)**, 2,0 % weniger als die
+Kette; mit der Ersatzregel statt der Eigenheit wären es 4,58 Mio. €. Die Kette zeigt den
+Rechenweg, der Betrag für Berlin ist der Zelllauf des Produkts.
+Außerdem verliert die Kette die Verteilung innerhalb der Stadt: Zwischen einer vegetationsarmen
+Zelle (0,3) und einer Allee-Zelle (1,7) liegt der Faktor 5,7. Wer wissen will, welches Quartier
+die Tage trägt, braucht die Zellen.
+Die Altersbänder müssen die der Kommune sein: Rechnete man Berlin mit dem Bundesanteil der unter
+20-Jährigen (24,07 %, letzter Rückfall des Produkts, §3.2) statt mit dem eigenen (22,73 %), kämen
+39.482 Menschen mehr in das Band mit 8,8 % statt 13,2 % Prävalenz, und \(B\) läge um 1.737
+(0,43 %) **zu niedrig**, weil Berlin weniger junge Menschen hat als der Bund. Je Prozentpunkt
+u20-Anteil sind es 1.303 Betroffene (0,32 %). Größer wird dieser Fehler bei Kommunen, deren
+Altersaufbau stärker vom Bund oder Land abweicht (Universitätsstadt, Kurort): Dort gehören die
+Altersbänder der Kommune in Ebene 1, nie die des Landes.
 
 **Stärkster Treiber** ist der Klimaanteil \(a_{\text{attr}}\) (Ebene 6): Sein Band 0,19–0,84
 (Anderegg [9]) setzt Tage und Euro für Berlin auf das 0,38- bis 1,68-Fache, also 1,78–7,87 Mio. €
@@ -247,6 +266,21 @@ assert abs(verschiebung - 1_737) < 1 and abs(verschiebung / B - 0.0043) < 0.0001
 assert abs(euro * 0.19 / 0.50 / 1e6 - 1.78) < 0.005
 assert abs(euro * 0.84 / 0.50 / 1e6 - 7.87) < 0.005
 assert abs(tage * 23.66 / 1e6 - 17.9) < 0.05
+# Zelllauf des Produkts (Lauf 26.09.2026, 40.669 Zellen): Bandsummen und Zerlegung
+zell = {"u20": 658_325, "20-64": 2_240_635, "65-74": 334_709, "75-84": 262_921, "85+": 96_767}
+assert sum(zell.values()) == 3_593_357
+assert abs(zell["u20"] / (zell["u20"] + zell["20-64"]) - 0.2271) < 1e-4
+B_zell = sum(zell[k] * p_ar[k] for k in zell)
+assert abs(B_zell - 394_106) < 1
+assert abs(B_zell * delta - 740_723) < 1
+assert abs(B_zell * delta * c_tag / 1e6 - 4.59) < 0.005
+f_ew = 3_593_357 / 3_662_381
+assert abs(f_ew - 0.981) < 0.0005
+B_regel = 393_298.8                 # Ersatzregel #95 §3.3 statt 65+ = 0
+assert abs(B_regel / (B * f_ew) - 0.9969) < 0.0001 and abs(B_zell / B_regel - 1.0021) < 0.0001
+assert abs(B_zell / B - 0.980) < 0.0005 and abs(1 - B_zell / B - 0.020) < 0.0005
+assert abs(B_regel * delta * c_tag / 1e6 - 4.58) < 0.005
+assert 707_318 - 694_397 == 12_921
 ```
 
 ### 3.1 Klimasignal: gemessene Saison-Spreizung ΔS (Anker `#delta-s`)
