@@ -929,6 +929,37 @@ XLSX = os.path.abspath(os.path.join(ROOT, "..", "docs", "Schadensbaum",
 RISIKO_KNOTEN = {"95": "W182", "96": "W189", "98": "W186"}
 
 
+def _unterabschnitt(src: str, ueberschrift: str) -> str:
+    """Text unter `ueberschrift` bis zur nächsten `##`- oder `###`-Überschrift (T-1464-ceo)."""
+    if ueberschrift not in src:
+        return ""
+    rest = src.split(ueberschrift, 1)[1]
+    return re.split(r"\n#{2,3} ", rest, maxsplit=1)[0]
+
+
+def _erste_spalte_ids(abschnitt: str) -> list[str]:
+    """Kennungen aus der ersten Spalte der Tabellen im Abschnitt (T-1464-ceo, Regel a/c).
+
+    Kopfzeile (erste Tabellenzeile) und Trennzeile zählen nicht. Ein Bereich
+    `S010–S020` ergibt die beiden genannten Kennungen.
+    """
+    ids: list[str] = []
+    in_tabelle = False
+    for zeile in abschnitt.splitlines():
+        z = zeile.strip()
+        if not z.startswith("|"):
+            in_tabelle = False
+            continue
+        zellen = z.split("|")
+        if not in_tabelle:  # Kopfzeile
+            in_tabelle = True
+            continue
+        if re.fullmatch(r"[\s|:\-]+", z):  # Trennzeile
+            continue
+        ids.extend(re.findall(r"\b([ERSW]\d{2,3})\b", zellen[1]))
+    return ids
+
+
 def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
     """Knoten der Arbeitsmappe ⇄ Knoten-Bilanz des Berichts (Aufgabe §7, LF 1/14).
 
@@ -951,46 +982,95 @@ def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
     wb = openpyxl.load_workbook(XLSX, data_only=True, read_only=True)
     ws = wb["Klimawirkungsketten"]
     kopf = [c.value for c in next(ws.iter_rows(min_row=1, max_row=1))]
-    soll: set[str] = set()
+    inputs: dict[str, set[str]] = {}
+    knoten_name: dict[str, str] = {}
     for row in ws.iter_rows(min_row=2, values_only=True):
-        if not row or str(row[0]).strip() != knoten_id:
+        if not row or not row[0]:
             continue
+        kid = str(row[0]).strip()
+        knoten_name[kid] = str(row[1] or "")
+        ids = inputs.setdefault(kid, set())
         for spalte, wert in zip(kopf, row):
             if spalte and str(spalte).startswith("Input_IDs") and wert:
-                soll.update(t.strip() for t in str(wert).split(";") if t.strip())
+                ids.update(t.strip() for t in str(wert).split(";") if t.strip())
     wb.close()
+    soll = inputs.get(knoten_id, set())
     lint.pruefe(bool(soll), f"Knoten-Abgleich {knoten_id}: Inputs gefunden")
-    bilanz = src.split("### Knoten-Bilanz")[1].split("### Weitergaben")[0] \
-        if "### Knoten-Bilanz" in src else ""
-    genannt = set(re.findall(r"\b([ERSW]\d{2,3})\b", bilanz))
+    # Regeln des Abgleichs nach T-1464-ceo (Fehlalarme bei #95/#96, sobald
+    # T-1263-ceo RISIKO_KNOTEN richtiggestellt hatte):
+    # (a) „Geführt“ sind nur die Kennungen in der ERSTEN Spalte (`Knoten`) der
+    #     Tabelle unter `### Knoten-Bilanz`; andere Spalten und Fließtext zählen
+    #     nicht. Ein Bereich `S010–S020` zählt als die beiden genannten Kennungen.
+    # (b) Ein geführter Knoten ist gedeckt, wenn er in den Input_IDs-Spalten des
+    #     Risikoknotens steht, ODER in den Input_IDs-Spalten eines dieser Input-
+    #     Knoten (eine Ebene tief), ODER der Knoten eines Risikos ist, das die
+    #     Schadensbaum-Netzwerkliste als eingehende Kante dieses Risikos führt.
+    #     Die Zuordnung Risiko → Knoten liest der Lint aus den Namen der Mappe
+    #     (Knotenname im Risikonamen enthalten oder gleich, nie umgekehrt; ohne Leerzeichen,
+    #     Schrägstriche und Groß-/Kleinschreibung), z. B. #1 „Veränderung der
+    #     Länge der Vegetationsperiode und Phänologie“ → W022 „Phänologie“.
+    # (c) Der Kanten-Abgleich liest nur `### Weitergaben` bis zur nächsten
+    #     Überschrift der Ebene `##` oder `###`, darin nur die erste Tabellenspalte.
+    # Die Pflichtrichtung (jeder Input der Mappe steht in der Bilanz) liest
+    # ebenfalls nur die erste Spalte (Regel a).
+    genannt = set(_erste_spalte_ids(_unterabschnitt(src, "### Knoten-Bilanz")))
     for k in sorted(soll):
         lint.pruefe(k in genannt, f"Knoten-Bilanz enthält {k}",
                     "Knoten der Arbeitsmappe fehlt in der Bilanz")
-    for k in sorted(genannt - soll - {knoten_id}):
-        lint.pruefe(False, f"Knoten-Bilanz führt {k}",
-                    "steht nicht in den Input-Spalten der Arbeitsmappe")
+    eine_ebene_tief: set[str] = set()
+    for k in soll:
+        eine_ebene_tief |= inputs.get(k, set())
     # KANTEN-Haelfte des §7-Auftrags (Befund 298i): Behauptet der Bericht
     # Output-Kanten, muss die Netzwerkliste sie fuehren — und umgekehrt.
     wb2 = openpyxl.load_workbook(XLSX, data_only=True, read_only=True)
     ws2 = wb2["Schadensbaum-Netzwerkliste"]
     kopf2 = [c.value for c in next(ws2.iter_rows(min_row=1, max_row=1))]
     kanten: set[str] = set()
+    eingehend: set[str] = set()
+    risiko_name: dict[str, str] = {}
     for row in ws2.iter_rows(min_row=2, values_only=True):
-        if not row or str(row[0]).strip() != nr:
+        if not row or row[0] is None:
+            continue
+        risiko_name[str(row[0]).strip()] = str(row[1] or "")
+        if str(row[0]).strip() != nr:
             continue
         for spalte, wert in zip(kopf2, row):
             if spalte and ("Output_IDs" in str(spalte)
                            or "Ergänzte Kanten" in str(spalte)) and wert:
                 kanten.update(t.strip() for t in str(wert).split(";") if t.strip())
+            # Eingehende Kanten für Regel (b), dritter Fall (T-1464-ceo).
+            if spalte and ("Input_IDs" in str(spalte)
+                           or "Ergänzte Kanten" in str(spalte)) and wert:
+                eingehend.update(t.strip() for t in str(wert).split(";") if t.strip())
     wb2.close()
-    weitergaben = (src.split("### Weitergaben")[1].split("\n## ")[0]
-                   if "### Weitergaben" in src else "")
+
+    def _norm(text: str) -> str:
+        return re.sub(r"[\s/]+", "", text).lower()
+
+    def _knoten_eines_eingehenden_risikos(k: str) -> bool:
+        kn = _norm(knoten_name.get(k, ""))
+        if not kn:
+            return False
+        for r in eingehend:
+            rn = _norm(risiko_name.get(r, ""))
+            # Nur Knotenname im Risikonamen (oder gleich), nie umgekehrt: sonst
+            # gälten W112/W190 („…Innenraumklima…“) als Knoten von #63
+            # (Prüfer T-1464-ceo, Runde 0).
+            if rn and kn in rn:
+                return True
+        return False
+
+    for k in sorted(genannt - soll - {knoten_id}):
+        gedeckt = k in eine_ebene_tief or _knoten_eines_eingehenden_risikos(k)
+        lint.pruefe(gedeckt, f"Knoten-Bilanz führt {k}",
+                    "steht nicht in den Input-Spalten der Arbeitsmappe")
+    weitergaben = _unterabschnitt(src, "### Weitergaben")
     behauptet_keine = bool(re.search(r"\*\*keine\*\*", weitergaben[:400]))
     # Befund 344(6): Bis Rev. 13 war der Check einseitig — `or not kanten` machte
     # ihn immer gruen, sobald die Mappe keine Kanten fuehrt. Damit fiel eine im
     # BERICHT behauptete Kante, die die Mappe nicht kennt, nie auf. Jetzt beide
-    # Richtungen:
-    behauptet_kanten = set(re.findall(r"\b([ERSW]\d{2,3})\b", weitergaben))
+    # Richtungen (seit T-1464-ceo nur erste Tabellenspalte, Regel c):
+    behauptet_kanten = set(_erste_spalte_ids(weitergaben))
     lint.pruefe(not (kanten and behauptet_keine), f"Kanten-Abgleich {nr} (Mappe → Bericht)",
                 f"Netzwerkliste führt {sorted(kanten)}, Bericht behauptet keine")
     ohne_deckung = sorted(behauptet_kanten - kanten - {knoten_id})
@@ -1155,6 +1235,15 @@ def berichtsauswahl(ziel: str | None = None) -> tuple[list[str], list[str], list
 
 
 def main() -> int:
+    # Option --datei <pfad> (T-1464-ceo): prüft genau diese Datei, etwa eine Kopie
+    # für eine Rotprobe; die Risikonummer folgt aus dem Dateinamen (96_…md → 96).
+    if len(sys.argv) > 1 and sys.argv[1] == "--datei":
+        if len(sys.argv) != 3 or not os.path.isfile(sys.argv[2]):
+            print("Aufruf: lint_methodik.py --datei <pfad zu <nr>_<slug>.md>")
+            return 1
+        gruen = pruefe_bericht(sys.argv[2])
+        print("\n" + ("ALLE LINTS GRÜN" if gruen else "LINTS ROT"))
+        return 0 if gruen else 1
     ziel = sys.argv[1] if len(sys.argv) > 1 else None
     muster = f"{ziel}_*.md" if ziel else "*.md"
     berichte, steckbriefe, querschnitte = berichtsauswahl(ziel)
