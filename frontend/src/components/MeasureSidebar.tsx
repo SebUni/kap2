@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useStore } from '../store'
 import InfoTooltip from './InfoTooltip'
 import type { MeasureImpactSummary } from '../types'
+import { measureReductionText } from '../utils/measureEffect'
 
 export default function MeasureSidebar() {
   const { selectedMeasure, setSelectedMeasure, calculateImpact, deleteMeasure, updateMeasure, catalog } = useStore()
@@ -103,7 +104,7 @@ export default function MeasureSidebar() {
           Typ
           {def && <InfoTooltip title={def.name} description={def.description} rows={[
             { label: 'Wirkt auf', value: def.effect_target.join(', ') },
-            { label: 'Minderung', value: `${Math.round((def.default_reduction || 0) * 100)} %` },
+            { label: 'Minderung', value: measureReductionText(def) },
           ]} />}
         </h3>
         <div className="value" style={{ fontSize: '1rem' }}>{def?.name || selectedMeasure.measure_type}</div>

@@ -5,6 +5,7 @@ import { useStore } from '../store'
 import { kangClusterColor, KANG_CLUSTER_COLORS } from '../utils/kangColors'
 import { gridAlignBearing, firstPolygonRing } from '../utils/gridBearing'
 import { escHtml } from '../utils/escapeHtml'
+import { measureReductionText } from '../utils/measureEffect'
 import type {
   CellOutcomeBreakdown, CellPathwayBreakdown, HevRecipeMeta, IndicatorRecipe,
   LayerMeta, LayerRecipe, OutcomeFactorMeta, ResolvedInput, RiskRecipe,
@@ -1032,7 +1033,7 @@ function MeasureCreateModal({ onClose }: { onClose: () => void }) {
           {current.description}
           <div style={{ marginTop: 4 }}>
             <strong>Wirkt auf:</strong> {current.effect_target.join(', ')} ·{' '}
-            <strong>Minderung:</strong> {Math.round((current.default_reduction || 0) * 100)}%
+            <strong>Minderung:</strong> {measureReductionText(current)}
           </div>
           {current.linked_risk_codes.length > 0 && (
             <div style={{ marginTop: 2 }}>

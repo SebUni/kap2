@@ -424,7 +424,9 @@ export interface CatalogMeasure {
   measure_type: string
   effect_target: string[]
   linked_risk_codes: string[]
-  default_reduction: number
+  default_reduction: number | null
+  /** Eigenes Wirkungsmodell statt default_reduction, z. B. 's157' (Bericht #95 §5). */
+  effect_model?: string
   coverage_scaling: string
   capex_fixed: number | null
   capex_per_unit: number | null
