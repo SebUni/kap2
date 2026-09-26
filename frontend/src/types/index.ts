@@ -312,6 +312,13 @@ export interface LineageGraph {
   collapse_groups: LineageCollapseGroup[]
 }
 
+/**
+ * Evidenzklasse eines Parameters (Vorgabe P1), gespiegelt aus
+ * `parameter_registry.EVIDENCE_CLASSES`: belegt (Quelle), abgeschaetzt
+ * (begründete Abschätzung von KAP3) oder berechnet (aus amtlichen Daten berechnet).
+ */
+export type EvidenceClass = 'belegt' | 'abgeschaetzt' | 'berechnet'
+
 export interface ModelParameter {
   id: string
   layer_code: string
@@ -328,9 +335,10 @@ export interface ModelParameter {
   overridden: boolean
   custom_source?: string | null
   applicable?: boolean
-  // Vorgabe P1: Beleglage je Parameter — belegt (Quelle) oder begründete
-  // Abschätzung von KAP3 samt Herleitung (Wert, Bandbreite, Sensitivität).
-  evidence_class: 'belegt' | 'abgeschaetzt'
+  // Vorgabe P1: Beleglage je Parameter — belegt (Quelle), berechnet aus amtlichen
+  // Daten oder begründete Abschätzung von KAP3 samt Herleitung (Wert, Bandbreite,
+  // Sensitivität).
+  evidence_class: EvidenceClass
   evidence_note?: string
   evidence_derivation?: { wert: string; band: string; sensitivitaet: string } | null
   // Demo: read-only (demo_locked) bzw. Wert/Quelle verborgen (demo_hidden)
@@ -426,7 +434,7 @@ export interface CatalogMeasure {
   source: string
   sources?: Record<string, string>
   source_details?: Record<string, string>
-  evidence_classes?: Record<string, 'belegt' | 'abgeschaetzt'>
+  evidence_classes?: Record<string, EvidenceClass>
   kang_cluster?: string
   kang_field?: string
 }
