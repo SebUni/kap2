@@ -1,0 +1,254 @@
+"""Die Teile des PDF-Ergebnisberichts als HTML-Abschnitte.
+
+Gliederung: ``dokumente/produkt/pdf-ergebnisbericht-gliederung.md`` (Firmen-Repo), Teile 0 bis 9.
+Der Formatpilot (T-1414) setzt die Teile 0, 1, 4 (nur #95), 7 und 8 um. Jeder Teil ist eine
+Funktion ``(Berichtsdaten) -> str``; ``TEILE`` ordnet die Nummern zu.
+
+Harte Regeln der Gliederung, die hier schon gelten: kein Euro-Feld mit Null oder leer (wo kein
+Betrag steht, steht der Grund), jede Summe nennt ihren Nenner („x von y Klimawirkungen in Euro
+beziffert“), jeder Teil trägt seinen Stand, kein Pfad aus dem Produkt-Repo im Text.
+"""
+
+from __future__ import annotations
+
+import math
+from html import escape
+from typing import Callable
+
+from app.services.ergebnisbericht.sammler import DATENSTAENDE, Berichtsdaten
+from app.services.kurzfassung_markdown import _de_euro
+
+UEBERSCHRIFTEN = {
+    0: "Teil 0 · Kopf und Identität",
+    1: "Teil 1 · Beschlussfähige Zusammenfassung",
+    4: "Teil 4 · Betroffenheitsanalyse je Klimawirkung",
+    7: "Teil 7 · Parameter- und Quellenverzeichnis",
+    8: "Teil 8 · Grenzen und Vollständigkeitsanzeige",
+}
+
+SCREENING_SATZ = "Screening-Analyse, kein Ersatz für ein Detailgutachten."
+
+# Bezeichnungen wie in der Parameterliste des Produkts (frontend/src/utils/evidenceLabel.ts);
+# für Abschätzungen der Wortlaut der Gliederung (Teil 7: „ausgewiesene Abschätzung“).
+_KLASSE = {
+    "belegt": "belegt",
+    "berechnet": "berechnet aus amtlichen Daten",
+    "abgeschaetzt": "ausgewiesene Abschätzung von KAP3",
+}
+
+
+def de_zahl(wert: float, stellen: int = 0) -> str:
+    """Deutsche Zahlschreibweise (Tausenderpunkt, Dezimalkomma)."""
+    return f"{wert:,.{stellen}f}".replace(",", "⁣").replace(".", ",").replace("⁣", ".")
+
+
+def de_euro(wert: float) -> str:
+    """Betrag in der Schreibweise des Produkts (ganze Euro, Tausenderpunkt, „€“)."""
+    return _de_euro(wert)
+
+
+def _h(text: object) -> str:
+    return escape(str(text))
+
+
+def _kopf(nr: int) -> str:
+    return f'<h1 id="teil-{nr}">{_h(UEBERSCHRIFTEN[nr])}</h1>\n'
+
+
+def _stand(d: Berichtsdaten) -> str:
+    return f'<p class="stand">{_h(d.stand.zeile())}</p>\n'
+
+
+def _preisstand(betrag: float) -> str:
+    return f"{de_euro(betrag)} je Jahr (Preisstand 2024)"
+
+
+# ── Teil 0 ──────────────────────────────────────────────────────────────────────
+
+def teil_0(d: Berichtsdaten) -> str:
+    k, e, s = d.kommune, d.ergebnis95, d.stand
+    zeilen = [
+        ("Kommune", f"{k.name} ({k.kreis}, {k.bundesland})"),
+        ("Amtlicher Gemeindeschlüssel", k.ags),
+        ("Gebietsstand", "Gemeindegrenze nach VG250 (BKG), Gebietsstand 01.01. der aktuellen Ausgabe"),
+        ("Einwohner (Zensus 2022)", f"{de_zahl(e.einwohner)}, davon {de_zahl(e.einwohner_ab65)} ab 65 Jahren"),
+        ("Berichtsversion", s.bericht),
+        ("Methodikversion", f"{s.methodik} (Modellstand {s.modell})"),
+        ("Erstellt am", f"{s.erstellt:%d.%m.%Y}"),
+    ]
+    html = [_kopf(0), '<table class="kopf">']
+    html += [f"<tr><th>{_h(a)}</th><td>{_h(b)}</td></tr>" for a, b in zeilen]
+    html.append("</table>")
+    html.append("<h2>Datenstände je Quelle</h2>")
+    html.append('<table class="kopf">')
+    html += [f"<tr><th>{_h(a)}</th><td>{_h(b)}</td></tr>" for a, b in DATENSTAENDE]
+    html.append("</table>")
+    html.append(f'<p class="hinweis">{_h(SCREENING_SATZ)}</p>')
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
+# ── Teil 1 ──────────────────────────────────────────────────────────────────────
+
+def teil_1(d: Berichtsdaten) -> str:
+    k, e = d.kommune, d.ergebnis95
+    summe = sum(w["betrag_eur"] for w in d.klimawirkungen_im_bericht)
+    band = e.band_eur
+    band_satz = (f" Band {de_euro(band[0])} bis {de_euro(band[1])}, abgeleitet aus der Bandbreite "
+                 f"des Kostensatzes je verlorenem Lebensjahr." if band else "")
+    kernsaetze = [
+        f"Die in Euro bezifferten Klimaschäden in {k.name} betragen mindestens "
+        f"{_preisstand(summe)}; {d.beziffert_text}.{band_satz}",
+        f"Größte bezifferte Klimawirkung ist die Hitzebelastung: rechnerisch "
+        f"{de_zahl(e.todesfaelle, 2)} hitzebedingte Todesfälle und {de_zahl(e.einweisungen, 2)} "
+        f"Krankenhauseinweisungen im Jahr.",
+        f"Von den {de_zahl(e.einwohner)} Einwohnern sind {de_zahl(e.einwohner_ab65)} 65 Jahre oder "
+        f"älter; auf sie entfällt der größte Teil der Hitzesterblichkeit.",
+        "Der Betrag ist eine Untergrenze: Klimawirkungen ohne Euro-Bezifferung gehen nicht in die "
+        "Summe ein (Teil 8).",
+        "Unsicherheit: Der Betrag hängt linear am Kostensatz je verlorenem Lebensjahr; die "
+        "Modellgrenzen stehen mit Zahl in Teil 8.",
+    ]
+    html = [_kopf(1), "<h2>Kernsätze</h2>", "<ol>"]
+    html += [f"<li>{_h(s)}</li>" for s in kernsaetze]
+    html.append("</ol>")
+    html.append("<h2>Höchste Risiken</h2>")
+    html.append('<table><tr><th>Klimawirkung (KWRA)</th><th>Handlungsfeld</th>'
+                '<th class="zahl">Betrag je Jahr</th></tr>')
+    for w in sorted(d.klimawirkungen_im_bericht, key=lambda w: -w["betrag_eur"]):
+        html.append(f"<tr><td>#{w['kwra_id']} {_h(w['kwra_name'])}</td><td>{_h(w['kwra_field'])}</td>"
+                    f'<td class="zahl">{_h(de_euro(w["betrag_eur"]))}</td></tr>')
+    html.append(f'<tr class="summe"><td colspan="2">Summe ({_h(d.beziffert_text)})</td>'
+                f'<td class="zahl">{_h(de_euro(summe))}</td></tr>')
+    html.append("</table>")
+    html.append("<h2>Wirtschaftlichste Maßnahmen</h2>")
+    html.append("<p>In dieser Fassung des Berichts ist keine Maßnahme bewertet: Die Maßnahmen "
+                "mit Kosten und vermiedenem Schaden folgen mit Teil 6. Deshalb steht hier noch "
+                "keine Rangfolge.</p>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
+# ── Teil 4 ──────────────────────────────────────────────────────────────────────
+
+def teil_4(d: Berichtsdaten) -> str:
+    k, e = d.kommune, d.ergebnis95
+    html = [_kopf(4)]
+    html.append(f"<h2>#95 Hitzebelastung</h2>")
+    html.append("<p>Handlungsfeld Menschliche Gesundheit · Klasse A (in Euro beziffert) · "
+                "bewerteter Schaden im Konto K1 Gesundheit.</p>")
+    html.append("<h3>Rechenkette</h3>")
+    html.append('<table><tr><th>Ebene</th><th class="zahl">Wert</th><th>Quelle</th></tr>')
+    kette = [
+        ("Einwohner", de_zahl(e.einwohner), "Zensus 2022, 100-m-Zellen"),
+        ("davon ab 65 Jahren", de_zahl(e.einwohner_ab65), "Zensus 2022, Altersgruppen"),
+        ("Bewohnte Zellen", de_zahl(e.zellen), "Zensus 2022, Gitter 100 m"),
+        ("Sommermittel (einwohnergewichtet)", f"{de_zahl(e.t_sommer_mittel, 1)} °C",
+         "DWD, Raster 1 km, 2016–2025"),
+        ("Hitzetage je Jahr (einwohnergewichtet)", de_zahl(e.hitzetage_mittel, 1),
+         "DWD, Raster 1 km, 2016–2025"),
+        ("Hitzebedingte Todesfälle je Jahr", de_zahl(e.todesfaelle, 2),
+         "Expositions-Wirkungs-Kurve des RKI, vier Altersbänder"),
+        ("Verlorene Lebensjahre je Jahr", de_zahl(e.yll, 2), "Todesfälle × Restlebenserwartung "
+         "(Destatis-Sterbetafeln)"),
+        ("× Kostensatz je Lebensjahr", de_euro(e.voly_eur), "UBA Methodenkonvention 4.0"),
+        ("= Betrag Sterblichkeit", de_euro(e.betrag_mortalitaet_eur), "Rechnung"),
+        ("Hitzebedingte Krankenhauseinweisungen je Jahr", de_zahl(e.einweisungen, 2),
+         "Destatis, Karlsson und Ziebarth 2018"),
+        ("× Kostensatz je Fall", de_euro(e.c_fall_eur), "Destatis-Kostennachweis 2023"),
+        ("= Betrag Erkrankungen", de_euro(e.betrag_morbiditaet_eur), "Rechnung"),
+    ]
+    html += [f'<tr><td>{_h(a)}</td><td class="zahl">{_h(b)}</td><td>{_h(c)}</td></tr>'
+             for a, b, c in kette]
+    html.append(f'<tr class="summe"><td>Jahresbetrag #95</td><td class="zahl">'
+                f'{_h(de_euro(e.jahresbetrag_eur))}</td><td>Summe beider Beträge</td></tr>')
+    html.append("</table>")
+    html.append(f"<p>Jahresbetrag der Hitzebelastung in {_h(k.name)}: "
+                f"<strong>{_h(_preisstand(e.jahresbetrag_eur))}</strong>. "
+                f"Der Betrag gilt für die ganze Kommune; eine Aufteilung nach Ortsteilen enthält "
+                f"diese Fassung nicht.</p>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
+# ── Teil 7 ──────────────────────────────────────────────────────────────────────
+
+def _wert(p: dict) -> str:
+    v = p.get("value")
+    if isinstance(v, bool) or v is None:
+        return "—"
+    if isinstance(v, (int, float)):
+        v = float(v)
+        if v.is_integer():
+            return de_zahl(v, 0)
+        # höchstens vier gültige Stellen, ohne angehängte Nullen (0,0065 bleibt 0,0065)
+        stellen = max(0, 3 - math.floor(math.log10(abs(v))))
+        text = de_zahl(round(v, stellen), stellen)
+        return text.rstrip("0").rstrip(",") if "," in text else text
+    return "Tabelle (13 Sommerwochen je Region)"
+
+
+def _herkunft(p: dict) -> str:
+    klasse = p.get("evidence_class") or "belegt"
+    quelle = p.get("source") or ""
+    if klasse == "abgeschaetzt":
+        herleitung = (p.get("evidence_derivation") or {}).get("wert") or p.get("evidence_note") or quelle
+        return f"{_KLASSE[klasse]}: {herleitung}"
+    return f"{_KLASSE.get(klasse, 'belegt')}: {quelle}"
+
+
+def teil_7(d: Berichtsdaten) -> str:
+    html = [_kopf(7)]
+    html.append("<p>Jeder Parameter der Rechnung mit Wert, Einheit und Quelle oder dem Vermerk "
+                "„ausgewiesene Abschätzung von KAP3“ samt Herleitung.</p>")
+    html.append("<h2>#95 Hitzebelastung</h2>")
+    html.append('<table class="parameter"><tr><th>Parameter</th><th class="zahl">Wert</th>'
+                '<th>Einheit</th><th>Quelle oder Abschätzung</th></tr>')
+    for p in d.parameter:
+        label = str(p.get("label") or "").removeprefix("Schadensfunktion: ")
+        html.append(f"<tr><td>{_h(label)}</td><td class=\"zahl\">{_h(_wert(p))}</td>"
+                    f"<td>{_h(p.get('unit') or '')}</td><td>{_h(_herkunft(p))}</td></tr>")
+    html.append("</table>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
+# ── Teil 8 ──────────────────────────────────────────────────────────────────────
+
+def teil_8(d: Berichtsdaten) -> str:
+    e = d.ergebnis95
+    html = [_kopf(8)]
+    html.append("<h2>Vollständigkeit</h2>")
+    html.append(f"<p>In der Summe dieses Berichts: {_h(d.beziffert_text)}. Die Summe läuft nur "
+                f"über Klimawirkungen mit Euro-Betrag (Klasse A). Alle übrigen Klimawirkungen "
+                f"fehlen in der Summe; der Gesamtwert ist deshalb eine <strong>Untergrenze</strong>.</p>")
+    html.append("<h2>Aktive Schadenskonten</h2>")
+    html.append("<p>#95 Hitzebelastung bucht in das Konto K1 Gesundheit (verlorene Lebensjahre "
+                "und Krankenhauseinweisungen). Weitere Folgen der Hitze für die Gesundheit sind "
+                "im Betrag nicht enthalten; auch deshalb ist er eine Untergrenze.</p>")
+    html.append("<h2>Benannte Modellgrenzen</h2>")
+    grenzen = []
+    if e.band_eur:
+        grenzen.append(
+            f"Kostensatz je verlorenem Lebensjahr: {de_euro(e.voly_eur)}, Band "
+            f"{de_euro(e.band_voly_eur[0])} bis {de_euro(e.band_voly_eur[1])}; der Jahresbetrag "
+            f"liegt damit zwischen {de_euro(e.band_eur[0])} und {de_euro(e.band_eur[1])}.")
+    grenzen += [
+        "Kostensatz je Krankenhausfall: Durchschnitt aller Krankenhausfälle als Ersatz, weil ein "
+        "Satz für hitzebedingte Einweisungen nicht veröffentlicht ist (ausgewiesene Abschätzung "
+        "von KAP3, Teil 7).",
+        "Temperatur je Zelle: Rasterwert 1 km mit einer Feinstruktur von 0,5 K darunter; lokale "
+        "Wärmeinseln einzelner Straßenzüge sind darin nur gemittelt enthalten.",
+        "Zeitraum: Klima der Sommer 2016–2025; die Projektion bis 2065 ist nicht Teil dieses "
+        "Betrags.",
+    ]
+    html.append("<ul>")
+    html += [f"<li>{_h(g)}</li>" for g in grenzen]
+    html.append("</ul>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
+TEILE: dict[int, Callable[[Berichtsdaten], str]] = {
+    0: teil_0, 1: teil_1, 4: teil_4, 7: teil_7, 8: teil_8,
+}

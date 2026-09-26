@@ -1,4 +1,4 @@
-"""CLI entry point: python -m app.cli zensus-download [--keys ...] | create-admin"""
+"""CLI entry point: python -m app.cli zensus-download [--keys ...] | create-admin | ergebnisbericht"""
 
 from __future__ import annotations
 
@@ -133,6 +133,24 @@ def cmd_lod2_prefetch(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_ergebnisbericht(args: argparse.Namespace) -> int:
+    """PDF-Ergebnisbericht für eine Beispielkommune (HTML-Vorstufe neben dem PDF)."""
+    from app.services.ergebnisbericht import erzeuge
+    from app.services.ergebnisbericht.beispiel import beispiel
+    from app.services.ergebnisbericht.render import teile_lesen
+
+    try:
+        kommune = beispiel(args.beispiel)
+        teile = teile_lesen(args.teile)
+    except (KeyError, ValueError) as exc:
+        print(str(exc).strip("'\""), file=sys.stderr)
+        return 1
+    pdf, html = erzeuge(kommune, teile, args.aus)
+    print(pdf)
+    print(html)
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="app.cli", description="KAP2 administration CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -163,6 +181,15 @@ def main() -> int:
     lp.add_argument("--keep-raw", action="store_true",
                     help="Roh-GML/-ZIP zusätzlich unter data/lod2/raw/ behalten")
     lp.set_defaults(func=cmd_lod2_prefetch)
+
+    eb = sub.add_parser("ergebnisbericht",
+                        help="PDF-Ergebnisbericht für eine Beispielkommune erzeugen")
+    eb.add_argument("--beispiel", required=True, help="Beispielkommune, z. B. warmsen")
+    eb.add_argument("--teile", default="0,1,4,7,8",
+                    help="Kommagetrennte Teile der Gliederung (Default: 0,1,4,7,8)")
+    eb.add_argument("--aus", required=True,
+                    help="Pfad des PDF; die HTML-Vorstufe entsteht daneben (.html)")
+    eb.set_defaults(func=cmd_ergebnisbericht)
 
     args = parser.parse_args()
     return args.func(args)

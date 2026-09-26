@@ -1,0 +1,23 @@
+/* Druckvorlage des PDF-Ergebnisberichts (A4, Chromium). */
+@page { size: A4; }
+body { font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif; font-size: 9.5pt;
+       color: #1d2733; line-height: 1.4;
+       /* Keine Ligaturen: „ff“ bleibt beim Kopieren und in der Textsuche des PDF „ff“. */
+       font-variant-ligatures: none; font-feature-settings: "liga" 0, "clig" 0; }
+header.titel { border-bottom: 2px solid #1f5c8b; margin-bottom: 8mm; padding-bottom: 3mm; }
+header.titel .art { font-size: 10pt; color: #5a6675; text-transform: uppercase; letter-spacing: .05em; }
+header.titel .kommune { font-size: 20pt; font-weight: bold; color: #1f5c8b; }
+section.teil { page-break-before: always; }
+section.teil:first-of-type { page-break-before: auto; }
+h1 { font-size: 14pt; color: #1f5c8b; margin: 0 0 4mm 0; }
+h2 { font-size: 11pt; margin: 5mm 0 2mm 0; }
+h3 { font-size: 10pt; margin: 4mm 0 2mm 0; }
+table { border-collapse: collapse; width: 100%; margin: 2mm 0; }
+th, td { border-bottom: 1px solid #d5dbe2; padding: 1.2mm 2mm; text-align: left; vertical-align: top; }
+th { background: #eef2f6; }
+table.kopf th { width: 38%; }
+table.parameter { font-size: 8pt; }
+td.zahl, th.zahl { text-align: right; white-space: nowrap; }
+tr.summe td { font-weight: bold; border-top: 1.5px solid #1d2733; }
+p.stand { font-size: 7.5pt; color: #5a6675; margin-top: 4mm; }
+p.hinweis { font-style: italic; }
