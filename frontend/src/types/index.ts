@@ -682,7 +682,8 @@ export interface KommuneProfile {
 export interface CostProjectionSeries {
   annual: number[]
   cumulative: number[]
-  /** Kumulierte Barwerte je Reiner Zeitpräferenzrate; Schlüssel '0.0' und '0.01'. */
+  /** Kumulierte Barwerte je Reiner Zeitpräferenzrate (RZPR), abgezinst mit RZPR plus
+   *  Komponente der relativen Preise; Schlüssel '0.0' und '0.01'. */
   discounted?: Record<string, number[]>
 }
 
@@ -694,11 +695,23 @@ export interface CostProjectionScenario {
   }
 }
 
+/** Zusammensetzung der Diskontrate (Feld `diskontierung` der Kostenprojektion). */
+export interface CostDiskontierung {
+  /** Reine Zeitpräferenzrate(n) als Dezimalanteil. */
+  rzpr: number[]
+  /** Komponente der relativen Preise (Dezimalanteil, Abschätzung von KAP3). */
+  relative_preise: { wert: number; evidence_class: string; begruendung: string }
+  /** Diskontrate je RZPR; gleiche Schlüssel wie `discounted`. */
+  diskontraten: Record<string, number>
+  modellgrenzen: string[]
+}
+
 export interface CostProjection {
   years: number[]
   base_year_damages_eur: number
   has_measures: boolean
   scenarios: { rcp45: CostProjectionScenario; rcp85: CostProjectionScenario }
+  diskontierung?: CostDiskontierung
   by_group_base: Record<string, number>
   measures: {
     id: number; name: string; implementation_year: number
