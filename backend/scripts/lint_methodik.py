@@ -1006,7 +1006,7 @@ def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
     #     Knoten (eine Ebene tief), ODER der Knoten eines Risikos ist, das die
     #     Schadensbaum-Netzwerkliste als eingehende Kante dieses Risikos führt.
     #     Die Zuordnung Risiko → Knoten liest der Lint aus den Namen der Mappe
-    #     (Knotenname in Risikoname enthalten oder umgekehrt, ohne Leerzeichen,
+    #     (Knotenname im Risikonamen enthalten oder gleich, nie umgekehrt; ohne Leerzeichen,
     #     Schrägstriche und Groß-/Kleinschreibung), z. B. #1 „Veränderung der
     #     Länge der Vegetationsperiode und Phänologie“ → W022 „Phänologie“.
     # (c) Der Kanten-Abgleich liest nur `### Weitergaben` bis zur nächsten
@@ -1053,7 +1053,10 @@ def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
             return False
         for r in eingehend:
             rn = _norm(risiko_name.get(r, ""))
-            if rn and (kn in rn or rn in kn):
+            # Nur Knotenname im Risikonamen (oder gleich), nie umgekehrt: sonst
+            # gälten W112/W190 („…Innenraumklima…“) als Knoten von #63
+            # (Prüfer T-1464-ceo, Runde 0).
+            if rn and kn in rn:
                 return True
         return False
 
