@@ -1,0 +1,1085 @@
+Textabbild (pdftotext -layout, poppler) von hap_handlungsempfehlungen_bf.pdf
+Quelle: https://www.bundesumweltministerium.de/fileadmin/Daten_BMU/Download_PDF/Klimaschutz/hap_handlungsempfehlungen_bf.pdf, abgerufen am 25.09.2026
+Seitenmarken = PDF-Seiten; die gedruckte Seitenzahl steht jeweils am Seitenfuß.
+
+=== Seite 1 ===
+         Handlungsempfehlungen
+
+      für die Erstellung von Hitzeaktionsplänen
+      zum Schutz der menschlichen Gesundheit
+
+
+
+
+Version: 1.0
+Stand:   24. März 2017
+=== Seite 2 ===
+Autorenteam
+Leitung
+Dr. Wolfgang Straff,                     Umweltbundesamt
+Dr. Hans-Guido Mücke,                    Umweltbundesamt
+
+
+Mitglieder
+Regine Baeker                            Ministerium für Arbeit, Soziales, Gesundheit, Frauen und
+                                         Familie, Brandenburg
+
+Dr. Cornelia Baldermann                  Bundesamt für Strahlenschutz
+Dr. Angela Braubach                      Bundesamt für Bevölkerungsschutz und Katastrophenhilfe
+Dr. Jutta Litvinovitch                   Bundesministerium für Umwelt, Naturschutz, Bau und Reak­
+                                         torsicherheit
+Prof. Dr. Andreas Matzarakis             Deutscher Wetterdienst
+Gudrun Petzold                           Ministerium für Soziales, Gesundheit, Wissenschaft und
+                                         Gleichstellung, Schleswig-Holstein
+Dr. Ute Rexroth                          Robert Koch-Institut
+Susanne Schroth                          Landesamt für Naturschutz, Umwelt und Geologie, Hessen
+Norbert Stutzinger-Schwarz               Bundesministerium für Umwelt, Naturschutz, Bau und
+                                         Reaktorsicherheit
+
+
+Alle übrigen Mitglieder der ehemaligen Bund/Länder Ad-hoc Arbeitsgruppe ‚Gesundheitliche
+Anpassung an die Folgen des Klimawandels (GAK)‘
+
+Dr. Michael von Abercron, Ministerium f. Energiewende und Umwelt, Schleswig-Holstein
+Daniela Bärtling, Sächsisches Staatsministerium für Umwelt und Landwirtschaft
+Dr. Frank Benkwitz, Ministerium für Arbeit, Soziales und Integration, Sachsen-Anhalt
+Dr. Anja Beuter, Ministerium f. Umwelt, Klima und Energiewirtschaft, Baden-Württemberg
+Dr. Ute Birk, Bundesinstitut für Bau-, Stadt- und Raumforschung
+Dr. Nadine Bräsicke, Julius-Kühn-Institut
+Dr. Henning Bruno, Bundesinstitut für Risikobewertung
+Ullrich Buchta, Ministerium f. Energie, Infrastruktur und Landesentwicklung, Mecklenburg-Vorpommern
+Dr. Anne-Katrin Dau, Ministerium f. Wirtschaft, Arbeit und Gesundheit, Mecklenburg-Vorpommern
+Dr. Fabian Dosch, Bundesinstitut für Bau-, Stadt- und Raumforschung
+Dr. Mirko Faber, Robert Koch-Institut
+Dr. Peter Fey, Ministerium f. Umwelt und Verbraucherschutz, Saarland
+Dr. Claudia Fiebig, Ministerium f. Klimaschutz und Umwelt, Landwirtschaft, Nordrhein-Westfalen
+Dr. Birgit Habedank, Umweltbundesamt
+Dr. Martin Hicke, Bayerisches Staatsministerium für Umwelt und Gesundheit
+Karin Höppner, Bundesministerium für Gesundheit
+Dr. Hartmut Hoppenworth, Ministerium f. Landwirtschaft und Umwelt, Sachsen-Anhalt
+Dr. Christian Jacobs, Ministerium f. Umwelt, Energie und Klimaschutz, Niedersachsen
+Dr. Klaus Jahn, Ministerium f. Soziales, Arbeit und Gesundheit, Rheinland-Pfalz
+Dr. Ingeborg Kirchhoff, Behörde f. Gesundheit und Verbraucherschutz, Freie Hansestadt Hamburg
+Dr. Ansgar Knobling, Ministerium f. Soziales, Gesundheit und Familie, Schleswig-Holstein
+                                                                                                      2
+=== Seite 3 ===
+Jan Körner, Sächsisches Staatsministerium f. Soziales und Verbraucherschutz
+Susanne Krings, Bundesamt für Bevölkerungsschutz
+Dr. Gudrun Luck-Bertschat, Senatsverwaltung für Gesundheit, Pflege und Gleichstellung, Berlin
+Dr. W. Marzi, Bundesministerium des Innern
+Dr. Ludwig Müller, Senator für Gesundheit, Freie Hansestadt Bremen
+Dr. Ralf Nehring, Ministerium für Umwelt, Energie, Ernährung und Forsten, Rheinland-Pfalz
+Prof. Dr. Matthias Niedrig, Robert Koch-Institut
+Dr. Anita Plenge-Bönig, Behörde für Gesundheit, Hamburg
+Andrea Rosenbaum, Ministerium für Umwelt, Energie und Naturschutz, Thüringen
+Dr. Michael Scheel, Ministerium für Arbeit und Sozialordnung, Familie, Baden-Württemberg
+Dr. Christa Scheidt-Nave, Robert Koch-Institut
+Helga Schenk, Behörde für Umwelt und Energie, Freie Hansestadt Hamburg
+Dr. Erik Schmolz, Umweltbundesamt
+Dr. Karola Schorn, Bundesministerium für Ernährung und Landwirtschaft
+Dieter Seidler, Ministerium für Ländliche Entwicklung, Umwelt und Landwirtschaft, Brandenburg
+Dr. Uwe Starfinger, Julius-Kühn-Institut
+Prof. Dr. Klaus Stark, Robert Koch-Institut
+Lothar Stock, Senatsverwaltung für Stadtentwicklung und Umwelt, Berlin
+Dr. Christof Voßeler, Senator für Umwelt, Freie Hansestadt Bremen
+Dr. Jutta Witten, Ministerium für Soziales und Integration, Hessen
+Dr. Sibylle Zielke, Ministerium für Soziales, Frauen, Familie, Gesundheit und Integration, Niedersachsen
+
+
+
+Kontakt
+Bundesministerium für Umwelt, Naturschutz, Bau und Reaktorsicherheit
+Referat IG II 7 (Gesundheit und Klimawandel)
+Postfach 12 06 29
+53048 Bonn
+IGII7[at]bmub.bund.de
+
+
+
+
+                                                                                                           3
+=== Seite 4 ===
+Vorwort
+
+
+Die vorliegenden Handlungsempfehlungen wurden von den Mitglie­
+dern der vom Bundesumweltministerium (BMUB) geleiteten ehema­
+ligen Bund/Länder-Ad-hoc Arbeitsgruppe ‚Gesundheitliche Anpassung
+an die Folgen des Klimawandels (GAK)‘ erarbeitet.
+
+
+Im Gremium sind die Bundes- und Landesministerien für Gesundheit
+und für Umwelt sowie verschiedene Bundes- und Landesoberbehör­
+den vertreten. Es wurde im Jahr 2012 zunächst mit einer Befristung
+auf ein Jahr unter dem Dach der Umweltministerkonferenz eingesetzt
+und hatte vornehmlich die Aufgabe, eine Bestandsaufnahme des
+durch den Klimawandel bedingten, gesundheitlichen Gefährdungspo­
+tenzials für Deutschland zu ermitteln und zu diskutieren. Es unter­
+breitete weiteren B/L-Arbeitskreisen sowohl der Gesundheits- als
+auch der Umweltseite Vorschläge zu aus seiner Sicht erforderlichem
+Anpassungs- und Handlungsbedarf. Das Mandat für die B/L-Ad-hoc
+AG GAK wurde letztmalig mit Beschluss der Umweltministerkonfe­
+renz im November 2015 um ein Jahr bis November 2016 verlängert.
+
+
+Im Anschluss an die letzte ordentliche Sitzung der B/L-Ad-hoc AG GAK
+im März 2016 nahm das auf dieser Sitzung einvernehmlich eingesetz­
+te Autorenteam unter der Leitung des Umweltbundesamtes die Ar­
+beiten zur Erstellung der Handlungsempfehlungen auf. In der Ab­
+schlusssitzung des Ad-hoc Gremiums im März 2017 wurden die Hand­
+lungsempfehlungen beschlossen.
+
+Rechtlicher Hinweis: Die Handlungsempfehlungen wurden im Bundesgesundheitsblatt im Mai 2017
+erstveröffentlicht (DOI: 10.1007/s00103-017-2554-5) und liegen hier in einer inhaltlich unveränder­
+ten Form vor. Sie können grundsätzlich gemäß der Creative Commons Lizenz
+(http://creativecommons.org/licenses/by/4.0/deed.de) von allen Interessierten weiter verbreitet
+werden.
+
+                                                                                                      4
+=== Seite 5 ===
+Inhaltsverzeichnis
+
+
+   Einleitung
+
+   Hintergrund
+
+   Handlungsempfehlungen zu den acht Kernelementen:
+
+       I.   Zentrale Koordinierung und interdisziplinäre Zusammen­
+            arbeit
+
+      II.   Nutzung des Hitzewarnsystems
+
+     III.   Information und Kommunikation
+
+     IV.    Reduzierung von Hitze in Innenräumen
+
+      V.    Besondere Beachtung von Risikogruppen
+
+     VI.    Vorbereitung der Gesundheits- und Sozialsysteme
+
+    VII.    Langfristige Stadtplanung und Bauwesen
+
+    VIII.   Monitoring und Evaluierung der Maßnahmen
+
+   Fazit
+
+   Literatur
+
+
+
+                                                                     5
+=== Seite 6 ===
+Einleitung
+
+Die durch den Klimawandel verursachte globale Erwärmung hat in vielen Regionen der Welt,
+so auch in Deutschland, eine vermehrte Häufigkeit und Dauer von Hitzeereignissen zur Folge.
+Hitze kann den menschlichen Organismus gesundheitlich stark belasten und auch für das
+Gesundheitswesen können Hitzeperioden ein Problem darstellen. Abhilfe können hier - ne­
+ben Klimaschutzmaßnahmen - gemeinsame Anstrengungen zur Prävention von Hitzeauswir­
+kungen auf die Bevölkerung schaffen [1].
+Bezüglich der Anpassung an die gesundheitlichen Risiken des Klimawandels als Aufgabe des
+umweltbezogenen Gesundheitsschutzes liegt eine detaillierte Erhebung des Umweltbundes­
+amtes (UBA) aus dem Jahr 2014 vor [2]. Demnach werden zur Vorbereitung auf Hitzeereig­
+nisse zu selten ein klarer Handlungsbedarf formuliert oder konkrete Anpassungsmaßnahmen
+unternommen.
+Hierzu sind Aktionspläne geeignet, um zum einen die gesundheitlichen Folgen des Klima­
+wandels, insbesondere von extremer Hitze, effizient zu kommunizieren und zum anderen ein
+an die Situation angepasstes Risikoverhalten zu erreichen und präventive Handlungsmög­
+lichkeiten zu etablieren [3, 4, 5]. Die Aktionspläne sollten sowohl Verhaltens- als auch ver­
+hältnispräventive Maßnahmen in allen Präventionsbereichen beinhalten.
+Da es in Deutschland bislang keine harmonisierten Empfehlungen zu Aktionsplänen zur Hit­
+zeprävention gibt, hat hierzu die Bund/Länder Ad-hoc AG GAK die vorliegenden allgemeinen
+Handlungsempfehlungen für die Erstellung von Hitzeaktionsplänen zum Schutz der mensch­
+lichen Gesundheit ausgearbeitet. Diese sind als einheitliche Grundlage für die konkrete Erar­
+beitung und Etablierung von auf die jeweilige Region abgestimmten, praktikablen Hitzeakti­
+onsplänen zu verstehen und richten sich in erster Linie an die Länder. Die Umsetzung erfolgt
+im Wesentlichen in den einzelnen Ländern auf kommunaler Ebene. Die Erarbeitung von Hit­
+zeaktionsplänen kann ein Beitrag zu einer übergreifenden Strategie zur Anpassung an den
+Klimawandel im Handlungsfeld menschliche Gesundheit sein.
+In vielen Fällen sind Anpassungsmaßnahmen, welche vor Hitze schützen, ebenfalls zum
+Schutz vor erhöhter UV-Belastung im Freien geeignet. Deshalb beinhalten diese Empfehlun­
+gen auch Maßnahmen zur Reduzierung der UV-Belastung.
+
+
+
+
+                                                                                           6
+=== Seite 7 ===
+Hintergrund
+
+Im Laufe des vergangenen Jahrhunderts stieg die mittlere Lufttemperatur in Deutschland um
+etwa 0,9 °C an [1]. Während mehrerer aufeinanderfolgender, mehrtägiger Hitzeereignisse,
+sogenannter „Hitzewellen“, in den Sommern 2003 und 2010 verstarben in Europa jeweils
+mehr als 40.000 Menschen zusätzlich aufgrund der Auswirkungen von ungünstigen meteoro­
+logischen Bedingungen (z.B. aufgrund extrem hoher Temperaturen) [6, 7, 8, 9]. Allein in
+Deutschland forderte die Hitzeperiode im Jahr 2003 etwa 7.000 Tote [7] sowie zahlreiche
+hitzebedingte Krankheitsfälle aufgrund von Dehydrierung, Hitzschlag sowie Herz- und Kreis­
+lauferkrankungen.
+Erkrankungen aufgrund starker Hitze führen zu hohen Kosten, die das Gesundheitswesen
+und das Gemeinwohl stark belasten [10]. Für die Zeiträume 2021 bis 2050 bzw. 2071 bis
+2100 wird eine weitere Zunahme der mittleren Jahrestemperatur für Deutschland um 0,5 -
+1,5 °C bzw. 1,5 - 3,5 °C mit einer erhöhten Häufigkeit von Hitzeperioden und einer damit
+einhergehenden Zunahme der hitzebedingten Todesfälle erwartet [1]. Schätzungen zufolge
+könnten Ende dieses Jahrhunderts bundesweit jährlich bis zu 8.500 zusätzliche hitzebedingte
+Todesfälle eintreten [11].
+Abhilfe kann hier - neben den weltweiten Bemühungen zur Bekämpfung des Klimawandels -
+nur durch koordinierte Aktivitäten zur Prävention von Hitzeauswirkungen auf die Bevölke­
+rung geschaffen werden. Hierzu eignen sich Hitzeaktionspläne auf der Grundlage der Emp­
+fehlungen der Weltgesundheitsorganisation (WHO), die den Handlungsbedarf formulieren
+und Vorgaben machen, auf welcher Ebene und von welcher Stelle welche Maßnahmen um­
+gesetzt werden sollen. Konkrete Pläne sollten auf die jeweilige Region abgestimmt sein [12].
+Ziel eines Hitzeaktionsplans ist, mittels Verhaltens- und verhältnispräventiver Maßnahmen
+die Hitze- und – soweit mit den gleichen Maßnahmen möglich – die UV-Exposition zu redu­
+zieren, um hitze- und UV-bedingten Erkrankungen und möglichen Todesfällen vorzubeugen.
+Verhaltenspräventive Maßnahmen können von jeder einzelnen Person geleistet werden.
+Hierzu ist eine zielgruppenspezifische Aufklärung notwendig. Ergänzend sind verhältnisprä­
+ventive Maßnahmen zu ergreifen, die Veränderungen des Lebens- und Arbeitsumfeldes be­
+rücksichtigen [13].
+Verhältnispräventive Ansätze zur Vorbeugung hitze- und UV-bedingter gesundheitlicher Fol­
+gen fehlen derzeit noch fast vollständig, obwohl sie leicht umsetzbar wären. Zu berücksichti­
+gen sind hier vor allem vulnerable Personenkreise. Dazu zählen ältere Menschen, Pflegebe­
+dürftige und chronisch Kranke, die von einer Zunahme der Häufigkeit und Intensität extre­
+mer Hitzeereignisse besonders betroffen sind. Aber auch Säuglinge und Kleinkinder sind be­
+sonders anfällig. Auch Personen, die aufgrund von schwerer körperlicher Arbeit im Freien
+oder von Freizeitaktivitäten gegenüber Hitze und UV-Strahlung verstärkt exponiert sind, ha­
+ben eine erhöhte Vulnerabilität gegenüber Hitze.
+Neben der Belastung durch Hitze stellen auch die UV-Belastung sowie das Auftreten UV-
+Strahlungs-assoziierter Luftverunreinigungen, wie bodennahes Ozon, gesundheitliche Prob­
+leme dar, die bei der Betrachtung von Anpassungsmaßnahmen relevant sind (siehe Infobox
+1).
+
+
+                                                                                           7
+=== Seite 8 ===
+Infobox 1: UV-Strahlung und Luftbelastung
+In den letzten Jahrzehnten haben Hautkrebserkrankungen um ein Vielfaches zugenommen.
+2012 waren in Deutschland knapp 1,6 Millionen Menschen von einer Hautkrebs-Diagnose
+betroffen [14] – Tendenz weiter steigend. Jährlich versterben in Deutschland ca. 3.000 Men­
+schen an Hautkrebs [15].
+Eine Ursache für diese hohen Hautkrebserkrankungszahlen liegt in der Exposition jedes Ein­
+zelnen mit UV-Strahlung. Risikofaktoren sind unter anderem Sonnenbrände (vor allem in der
+Kindheit), mit Unterbrechungen bzw. zeitlichen Zwischenräumen erfolgende hohe UV-
+Belastungen (z.B. Sonne bei Jahresurlauben auf nicht-adaptierte Haut) und die lebenslang
+erhaltene UV-Dosis [16].
+Der Klimawandel bringt noch eine Verschärfung dieser Situation mit sich:
+So wird davon ausgegangen, dass es als Folge der Klimaerwärmung zu einem veränderten
+Freizeitverhalten mit vermehrten Aktivitäten im Freien und einer dadurch erhöhten UV-
+Belastung kommen wird. Zudem treten im Frühjahr in Deutschland Niedrig-Ozon-Ereignisse
+in der Stratosphäre auf, durch die ein erhöhter UV-Strahlungsanteil bis zur Erdoberfläche
+gelangt. Je höher die UV-Exposition ist, desto höher wird das Hautkrebsrisiko.
+Bodennahes Ozon wird bei intensiver Sonneneinstrahlung durch komplexe photochemische
+Prozesse aus Vorläuferschadstoffen − überwiegend Stickstoffoxiden und flüchtigen organi­
+schen Verbindungen − gebildet. Die gesundheitlichen Wirkungen von bodennahem Ozon
+bestehen in einer verminderten Lungenfunktion, entzündlichen Reaktionen in den Atemwe­
+gen und Atemwegsbeschwerden. Bei körperlicher Anstrengung, also bei erhöhtem Atemvo­
+lumen, können sich diese Auswirkungen verstärken. Empfindliche oder vorgeschädigte Per­
+sonen, zum Beispiel an Asthma erkrankte Menschen, sind besonders anfällig.
+Da Empfehlungen zum richtigen Verhalten bei Hitze in vielen Fällen ebenfalls eine Präventi­
+on gegenüber den gesundheitsschädlichen Wirkungen von bodennahem Ozon und seinen
+Vorläuferschadstoffen sowie gegenüber der erhöhten UV-Belastung bieten können, emp­
+fiehlt es sich, diese Belastungen hinsichtlich der Handlungsempfehlungen mit zu berücksich­
+tigen.
+
+
+Die vorliegenden Handlungsempfehlungen für die Erstellung von Hitzeaktionsplänen zum
+Schutz der menschlichen Gesundheit in Deutschland basieren auf der von der Weltgesund­
+heitsorganisation (WHO) veröffentlichten Leitlinie für die Erarbeitung eines Hitzeaktions­
+plans [12] und auf den Ergebnissen der Hessischen HEAT-Studie (durchgeführt von der Fach­
+hochschule Fulda 2009 – 2012) [17].
+Die Handlungsempfehlungen bestehen in Anlehnung an die WHO-Leitlinie aus acht Kern­
+elementen, die in ihrer Reihenfolge nicht zwingend nacheinander folgend bzw. aufeinan­
+der aufbauend zu verstehen sind.
+Sie beinhalten sowohl kurzfristige, ohne große Investitionen umsetzbare Sofortmaßnahmen
+als auch langfristige Maßnahmen, die bei einer Planung grundsätzlich berücksichtigt werden
+sollten.
+
+
+
+
+                                                                                         8
+=== Seite 9 ===
+Die acht Kernelemente der WHO sind:
+
+   I.   Zentrale Koordinierung und interdisziplinäre Zusammenarbeit
+  II.   Nutzung eines Hitzewarnsystems
+ III.   Information und Kommunikation
+ IV.    Reduzierung von Hitze in Innenräumen
+  V.    Besondere Beachtung von Risikogruppen
+ VI.    Vorbereitung der Gesundheits- und Sozialsysteme
+VII.    Langfristige Stadtplanung und Bauwesen
+VIII.   Monitoring und Evaluation der Maßnahmen
+
+
+Für die Umsetzung der vorgenannten acht Kernelemente empfiehlt die WHO ein Vorgehen
+in fünf Zeithorizonten [12]:
+
+             Langfristige Entwicklung und Planung
+             Vorbereitungen rechtzeitig vor dem Sommer
+             Schutz während des Sommers
+             Spezielle Maßnahmen während akuter Hitzeperioden/Hitzewellen
+             Monitoring und Evaluation
+Diese sind in der nachfolgenden Abbildung schematisch dargestellt.
+
+
+
+
+Abb. 1: Schematische Darstellung der für die Umsetzung der Kernelemente eines Hitzeakti­
+onsplans von der WHO vorgesehenen Zeithorizonte
+
+
+
+
+                                                                                           9
+=== Seite 10 ===
+Die Organisation, Zusammenarbeit und Kommunikation von Informationen zwischen einer
+koordinierenden Stelle/Institution und den eingebundenen Mitwirkenden eines Hitzeakti­
+onsplans kann gemäß den in Abbildung 2 dargestellten, von der WHO vorgeschlagenen In­
+formationswegen erfolgen:
+
+
+
+
+Abb. 2: Möglicher Informationsfluss zwischen einer koordinierenden Stelle und anderen Be­
+teiligten in Hitzeaktionsplänen (nach Matthies et al. 2008, Abbildung 2, S. 9 [12])
+
+
+
+
+                                                                                        10
+=== Seite 11 ===
+Handlungsempfehlung zu Kernelement I:
+
+Zentrale Koordinierung und interdisziplinäre Zusammenarbeit
+Laut WHO ist die Verständigung auf eine Leitungsinstitution sinnvoll. Vor dem Hintergrund
+der in Deutschland dezentral bzw. föderal geteilten Zuständigkeiten wird die Einrichtung ei­
+ner zentralen Koordinierungsstelle empfohlen. Diese hat die Koordinierungsfunktion und be­
+hördenübergreifende Zuständigkeit, um in Zusammenarbeit mit weiteren Behörden und Ein­
+richtungen unterschiedlicher Zuständigkeit einen Hitzeaktionsplan in Kommunen einzufüh­
+ren. Sie hat die Aufgabe, kurz- bis langfristige Maßnahmen einzuleiten.
+
+
+   1. Eine zentrale Koordinierungsstelle sollte auf Landesebene bspw. in einer Gesund­
+      heitsbehörde eingerichtet werden. Je nach Dauer und Ausprägung der Hitzesituation
+      könnte im akuten Fall die Koordination auch von einer anderen Behörde ausgeübt
+      werden.
+   2. Die zentrale Koordinierungsstelle soll die behördenübergreifende Zuständigkeit zur
+      Koordinierung der Zusammenarbeit von einzubeziehenden Behörden und Einrichtun­
+      gen haben (analog einem Krisenmanagement im Katastrophenfall).
+   3. Es wird empfohlen, dass sich die zentralen Koordinierungsstellen der Länder austau­
+      schen.
+   4. Die Aufgaben der zentralen Koordinierungsstelle sind im Einzelnen:
+     o Einrichtung eines zentralen Netzwerks aller Beteiligten, die mit der Entwicklung von
+        Hitzeaktionsplänen befasst sind (z.B. Landesgesundheitsbehörden, kommunale
+        Landesverbände, kassenärztliche Verbände, Landesärztekammern, Träger öffentli­
+        cher Einrichtungen).
+     o Gemeinsam mit dem zentralen Netzwerk identifiziert die zentrale Koordinierungs­
+        stelle die relevanten Institutionen (staatliche und nicht-staatliche), die vor Ort in
+        den jeweiligen Kommunen Maßnahmen umsetzen können. Beispiele sind Feuer­
+        wehren, Not- und Rettungsdienste, Krankenhäuser, Ärzteschaft/Praxen, Apotheker­
+        schaft, ambulante und stationäre Pflegeeinrichtungen, Einrichtungen zur Rehabilita­
+        tion, Kindergärten, Schulen, Hilfsorganisationen, Behindertenhilfen und Heimauf­
+        sichten.
+     o Zur genaueren Situationsanalyse und Planung der konkreten Maßnahmen können
+        weitere Organisationen sowie interdisziplinäre Fachkräfte hinzugezogen werden,
+        z.B. aus den Gebieten Gesundheits-, Pflege-, Ernährungs- und Sozialwissenschaften,
+        Medizin, Gesundheitsingenieurwesen sowie Medizinischer Dienst und Krankenver­
+        sicherungen.
+   5. Aufgaben des zentralen Netzwerks:
+     o Es unterrichtet die Kommunen als dezentrale Koordinierungsstellen über die zur
+        Einbindung empfohlenen Institutionen. Die Festlegung der Zuständigkeiten in den
+        einzubeziehenden Einrichtungen vor Ort sowie die Planung konkreter Maßnahmen
+        und deren zeitliche Umsetzung auf Basis der Handlungsempfehlungen zu den Kern­
+        elementen II bis VIII obliegt den Mitwirkenden auf kommunaler Ebene, die hierfür
+        ein dezentrales Netzwerk bilden. Die Festlegungen werden der Koordinierungsstelle
+        rückgemeldet.
+                                                                                          11
+=== Seite 12 ===
+   o Als notwendig erachtete übergeordnete Maßnahmen, die auf kommunaler Ebene
+      nicht umsetzbar sind (bspw. Regionalplanung), sollten vom zentralen Netzwerk in
+      direktem Kontakt mit den relevanten Institutionen geplant werden.
+  6. Nach der Umsetzung von Maßnahmen - insbesondere nach akuten Hitzeereignissen -
+     evaluieren die zentrale Koordinierungsstelle, das zentrale Netzwerk sowie kommuna­
+     le Mitwirkende die getroffenen Maßnahmen und Abläufe und passen daraufhin die
+     Koordination, Empfehlungen und deren Umsetzung an (siehe auch Handlungsemp­
+     fehlungen zu Kernelement VIII ‚Monitoring und Evaluation‘).
+
+
+Zur Verdeutlichung der Ebenen der Koordinierung und der interdisziplinären Zusammenar­
+beit siehe nachfolgende Abbildung 3.
+
+
+
+
+                                                                                    12
+=== Seite 13 ===
+Abb. 3: Skizze zur zentralen Koordinierung und zur interdisziplinären Zusammenarbeit (Kern­
+element I mit teilweiser Berücksichtigung weiterer Kernelemente)
+
+
+
+                                                                                         13
+=== Seite 14 ===
+Handlungsempfehlung zu Kernelement II:
+Nutzung des Hitzewarnsystems
+Die WHO empfiehlt die Verständigung auf die Nutzung eines verlässlichen Hitzewarnsystems,
+das die Dauer des bevorstehenden Hitzeereignisses, Verhaltensempfehlungen sowie die ge­
+sundheitlichen Risiken kommuniziert.
+
+
+Das Hitzewarnsystem wird vom Deutschen Wetterdienst (DWD) betrieben und ist in
+Deutschland seit mehr als zehn Jahren etabliert. Der DWD gibt die für Deutschland gelten­
+den Hitzewarnungen aus.
+Hitzewarnungen richten sich an zuständige Stellen und sind insbesondere für Alten- und
+Pflegeheime sowie Kindergärten vorgesehen. Sie richten sich aber auch an andere Einrich­
+tungen, z.B. ambulante und stationäre Pflegedienste sowie an die Allgemeinbevölkerung. Die
+Warnungen werden landkreisbezogen herausgegeben.
+
+
+   1. Es wird empfohlen, Hitzeaktionspläne auf Basis des Hitzewarnsystems des DWD aus­
+      zuarbeiten. Der DWD gibt Hitzewarnungen heraus, wenn eine starke Wärmebelas­
+      tung für mindestens 2 Tage in Folge vorhergesagt wird und eine ausreichende nächt­
+      liche Auskühlung der Wohnräume nicht mehr gewährleistet ist. Es gibt zwei Warnstu­
+      fen [18]:
+       Hitzewarnstufe I: „starke Wärmebelastung“ („Gefühlte Temperatur" an zwei Tagen
+       in Folge über 32 C, zusätzlich nur geringe nächtliche Abkühlung);
+       Hitzewarnstufe II: „extreme Wärmebelastung“ („Gefühlte Temperatur" über 38 C
+       am frühen Nachmittag).
+       Die Warnungen gelten grundsätzlich für einen ganzen Tag und damit auch für die
+       Nachtsituation. Die Hitzewarnungen werden vom DWD per Newsletter
+       (www.dwd.de/newsletter) über die Internetseite des DWD oder über Apps (erhältlich
+       in den üblichen App-Stores) veröffentlicht.
+       Sinnvoll ist auch der gleichzeitige Bezug weiterer hitzeassoziierter gesundheitsrele­
+       vanter Meldungen:
+          o Über herrschende UV-Bestrahlungsstärken (UV-Index) informieren das Bun­
+            desamt für Strahlenschutz (BfS) (www.bfs.de/uv-index) und der DWD
+            (www.dwd.de/uvindex)
+          o Informationen über UV-Bestrahlungsstärken werden vom BfS und vom DWD
+            auch per Newsletter (www.bfs.de/uv-newsletter) bzw.
+            (www.dwd.de/newsletter) oder über Apps (erhältlich in den üblichen App-
+            Stores) veröffentlicht.
+          o Informationen über bodennahes Ozon von den zuständigen Länderbehörden
+            (meist Landesumweltämter); Verbreitung z.B. über Rundfunk und Fernsehen
+
+       Auch die Informationsdienste/Apps des Bevölkerungsschutzes wie z.B. ‚Katwarn‘ o­
+       der ‚Nina‘ informieren über wetterassoziierte Extremsituationen.
+
+
+                                                                                         14
+=== Seite 15 ===
+2. Die Behörden und Organisationen, die laut dem Hitzeaktionsplan aktiv Maßnahmen
+   einleiten, sollen angehalten werden, den Hitzewarn-Newsletter des DWD zu abonnie­
+   ren. Dies sollten mindestens folgende Einrichtungen vornehmen:
+
+       o Gesundheitsministerien der Länder
+       o Gesundheitsämter der Kommunen
+       o Verbände und Einrichtungen, die in der gesundheitlichen und sozialen Ver­
+         sorgung der Bevölkerung tätig sind (z.B. Schulen, Kindergärten, Rettungs­
+         dienste, Krankenhäuser sowie Pflegedienste und -einrichtungen)
+       o Soziale Netzwerke und Nachbarschaftshilfen zur Verbreitung der Hitzewar­
+         nungen
+3. Es wird empfohlen, als Reaktion auf Hitzewarnstufe I kurzfristig anzuwendende Maß­
+   nahmen (s. Handlungsempfehlungen zu Kernelement IV) über die etablierte Kommu­
+   nikationskaskade (s. Handlungsempfehlungen zu Kernelement III) innerhalb der rele­
+   vanten staatlichen und nicht-staatlichen Einrichtungen, die Maßnahmen vor Ort um­
+   zusetzen haben (s. Handlungsempfehlungen zu Kernelement I), zu kommunizieren.
+   Als Reaktion auf Hitzewarnstufe II ist es empfehlenswert, die Warnung vor einem
+   prognostizierten Extremhitzeereignis und kurzfristig anzuwendende Maßnahmen zu­
+   sätzlich über Massenmedien wie Rundfunk und Fernsehen aktiv zu kommunizieren.
+
+
+
+
+                                                                                  15
+=== Seite 16 ===
+Handlungsempfehlung zu Kernelement III:
+Information und Kommunikation
+Die WHO empfiehlt die Erstellung und Kommunikation von hitzebezogenen Gesundheitsin­
+formationen für die Bevölkerung (wer kommuniziert was, wann und wie?).
+
+Bei der Kommunikation von hitzeassoziierten Gesundheitsinformationen sind die voraus­
+schauende Planung sowie der Akutfall eines unmittelbar bevorstehenden Hitzeereignisses
+getrennt zu berücksichtigen.
+Informationspakete sind für verschiedene Zielgruppen zu erarbeiten.
+
+Vorausschauende Planung
+
+   1. Die Kommunikationsinhalte sowie die Kommunikationswege sollten unabhängig vom
+      Vorliegen einer Hitzesituation festgelegt werden (analog der Netzwerkstruktur, siehe
+      Handlungsempfehlung zu Kernelement I).
+      Es ist erforderlich, die Zuständigkeit und Verantwortlichkeit für die Kommunikation
+      festzulegen (Kommunikationskaskade), idealerweise in Form eines Ablaufplans im
+      Fall einer DWD-Hitzewarnung (vergleichbar mit einem Alarmplan).
+
+   2. Zentrale Fragestellungen hierbei sind:
+
+      Was soll kommuniziert werden?
+      Die gesundheitlichen Präventionsempfehlungen sollten möglichst zielgruppenspezi­
+      fisch ausgearbeitet werden.
+      Beispiele für grundlegende Informationen:
+      o Internetseite des DWD
+          http://www.dwd.de/DE/leistungen/hitzewarnung/hitzewarnung.html
+      o Publikation UBA und DWD
+          „Ratgeber: Klimawandel und Gesundheit. Informationen zu gesundheitlichen
+          Auswirkungen sommerlicher Hitze, Hitzewellen und Tipps zum vorbeugenden Ge­
+          sundheitsschutz“
+          https://www.umweltbundesamt.de/publikationen/ratgeber-klimawandel-gesund
+          heit
+      o Publikation „Hitzeknigge“ des UBA
+          https://www.umweltbundesamt.de/sites/default/files/medien/364/dokumente/
+          schattenspender_hitzeknigge.pdf
+
+      Wie soll kommuniziert werden?
+      Es kommen verschiedene Möglichkeiten in Frage: Zeitungen, Fernsehen, Radio, sozia­
+      le Medien sowie weitere Multiplikatorengruppen. Damit können bestimmte Bevölke­
+      rungsgruppen wie ältere Menschen und Jüngere gezielt angesprochen werden.
+
+
+
+
+                                                                                       16
+=== Seite 17 ===
+       Wann soll kommuniziert werden?
+       Es sollte genau festgelegt sein, in welchem Zeitabstand nach einer erfolgten DWD-
+       Hitzewarnung die Informationen durch die o.g. Medien kommuniziert werden sollen.
+       Da in der Regel nur ein kurzer Handlungsspielraum zur Verfügung steht, ist es not­
+       wendig, vorab formulierte Presseinformationen (evtl. auch Interviews oder andere
+       Medienbeiträge wie z. B. das Video „Hitzewarnsystem des DWD“ auf YouTube) bereit
+       zu halten oder darauf zu verlinken.
+
+   3. Auf den Internetseiten der Länder und Kommunen sollten dauerhaft Informationen
+      angeboten werden, die sich mit Vorsorgemaßnahmen bezüglich der Anpassung an
+      Hitzesituationen befassen. Auch Informationsbroschüren sollten unabhängig von der
+      konkreten Gefährdungssituation vorgehalten werden und im Internet als Download
+      verfügbar sein.
+
+   4. Die verschiedenen Informationsangebote von Bund, Ländern, Kommunen, Kranken­
+      versicherungen usw. sollten aufeinander abgestimmt sein.
+
+   5. Jahreszeitlich aktuelle Beiträge z.B. in Apothekenzeitschriften sind eine Möglichkeit,
+      besonders ältere Menschen zu erreichen. Des Weiteren kann es für einige Personen­
+      gruppen vorteilhaft sein, wenn zusätzlich telefonische Beratung angeboten wird (ana­
+      log dem Hitzetelefon „Sonnenschirm“ des Gesundheitsamtes der Region Kassel).
+
+   6. Fremdsprachliche Hinweise sollten bereitgehalten werden (z.B. für Personen mit Mig­
+      rationshintergrund, Touristen).
+
+
+Kommunikation im Akutfall eines Hitzeereignisses
+
+   1. Bei Bevorstehen oder Vorliegen eines Hitzeereignisses können verhaltensbezogene
+      Informationen auch im persönlichen Gespräch von Ärzten und Ärztinnen an Patien­
+      tinnen und Patienten weitergegeben werden. In Flyern/Broschüren oder TV-Spots in
+      Praxiswartezimmern oder in Apotheken (Verteilung über die Ärzte- bzw. Apotheken­
+      kammern) kann auf die gesundheitlichen Risiken und Maßnahmen zum Schutz hin­
+      gewiesen werden. Auch Angehörige von allein lebenden älteren Personen oder Per­
+      sonen, die in der Handlungsempfehlung zu Kernelement V aufgeführt sind, sollten in
+      die Informationsweitergabe eingebunden werden.
+
+   2. Kindergärten, Schulen, Krankenhäuser und Alten- sowie Pflegeheime sollten im
+      akuten Fall aktiv benachrichtigt und mit Informationsmaterial versorgt werden.
+      Auch das deutsche Hotel- und Gaststättengewerbe sollte zur Information von Rei­
+      senden über drohende Hitze und Anpassungsmöglichkeiten in Kenntnis gesetzt wer­
+      den.
+
+
+
+
+                                                                                         17
+=== Seite 18 ===
+Handlungsempfehlung zu Kernelement IV:
+Reduzierung von Hitze in Innenräumen
+Die WHO empfiehlt die Etablierung von Maßnahmen zur Reduzierung von Hitze in Innenräu­
+men (kurz- und mittelfristige Maßnahmen, um die Innenraumtemperaturen während starker
+und extremer Hitze zu mindern).
+Die Vermeidung des Aufheizens von Innenräumen ist besonders bedeutsam. Die zu empfeh­
+lenden Maßnahmen sollten den entsprechenden Zielgruppen (z.B. Personen, die die Gebäu­
+de/Räumlichkeiten planen oder nutzen) kommuniziert werden. Die mittelfristigen Maßnah­
+men bedürfen einer baulichen Anpassung oder sogar einer längerfristigen Planung. Langfris­
+tige Maßnahmen finden sich unter Handlungsempfehlung VII.
+1. Kurzfristige Maßnahmen - Empfehlungen zum Verhalten sowie einfache technische Mög­
+   lichkeiten:
+       o Insbesondere bei direkter Sonneneinstrahlung ist ein Verdunkeln/Verschatten
+           durch Vorhänge, Jalousien, Markisen, Sonnenschirme, Fenster- oder Rollläden zu
+           empfehlen.
+       o Innerhalb eines Hauses/einer Wohnung sollten kühle Räume aufgesucht werden.
+       o Ventilatoren können eingesetzt werden, falls dies vertragen oder als angenehm
+           empfunden wird.
+       o Das Lüftungsverhalten sollte im Fall ausgeprägter Hitze angepasst werden:
+           So ist es zweckmäßig, nur während der kühleren Nacht- und Morgenstunden die
+           Fenster zu öffnen und zu lüften. Je nach Situation des Umfeldes ist es sinnvoll, vor
+           den entsprechenden Fenstern Mückenschutzgitter anzubringen.
+       o Wärme abgebende Geräte sollten möglichst nicht verwendet werden, da sie zu
+           einer zusätzlichen Wärmebelastung führen können.
+
+2. Mittelfristige Maßnahmen - Gebäude bezogene Kühlungsmaßnahmen :
+      o Installation von Rollläden, Außenjalousien, Blendläden mit Luftschlitzen, Markisen
+           und Sonnensegeln
+      o Wand- und Dachisolierungen schützen nicht nur im Sommer vor dem Aufheizen
+           der Gebäude, sondern im Winter auch vor der Auskühlung der Räumlichkeiten.
+      o Mikroklimatische Abkühlungseffekte können für Innenräume auch durch Dach-
+           und Fassadenbegrünung sowie durch Laubbäume an Straßen, in Gärten und
+           Grünanlagen erzielt werden.
+      o Der Einbau technischer Kühlverfahren (auch Klimaanlagen) sollte bei jeder Reno­
+           vierung z.B. von Krankenhäusern, Alten- und Pflegeheimen in Betracht gezogen
+           werden.
+
+3. Aktive Kühlung von Innenräumen:
+       o Klimaanlagen (auch mobile Geräte) für den privaten Bereich sind nur dann zu
+          empfehlen, wenn andere Maßnahmen nicht zum Erfolg führen und alle baulichen
+          und technischen Möglichkeiten ausgeschöpft sind. Durch ihren hohen Stromver­
+          brauch und die Abgabe von Wärme an die Außenluft tragen sie zum Klimawandel
+          und zu einer weiteren Aufheizung der allgemeinen Atmosphäre im Außenbereich
+          vor allem in Städten (Wärmeinseleffekt) bei.
+
+
+
+                                                                                            18
+=== Seite 19 ===
+Handlungsempfehlung zu Kernelement V:
+
+Besondere Beachtung von Risikogruppen
+Die WHO empfiehlt die besondere Beachtung von Risikogruppen, die bei Hitzeereignissen
+besonders gefährdet oder besonders schutzbedürftig sind.
+
+Bestimmte Risikopersonen bzw. –gruppen (vulnerable Personengruppen) müssen bei der
+Auswahl von geeigneten Maßnahmen besonders berücksichtigt werden. Auch hinsichtlich
+einer geeigneten Herangehensweise bei der Kommunikation von Hitzerisiken für die Ge­
+sundheit bestehen Besonderheiten. Dies ist vor allem wichtig vor dem Hintergrund einer
+älter werdenden Gesellschaft.
+
+Insbesondere bei mehreren aufeinanderfolgenden Hitzetagen (einer sogenannten Hitze­
+welle) ist durch die Hitzebelastung mit einer Verstärkung von negativen Folgen, zum Bei­
+spiel für das Herz-Kreislaufsystem und die Nieren, zu rechnen. In der Regel sollten Perso­
+nen, die zu den vulnerablen Gruppen zählen, vor allem auf eine verstärkte Flüssigkeitszu­
+fuhr achten bzw. sollte ihnen eine höhere Flüssigkeitsmenge als bei normalen Temperatu­
+ren zugeführt werden. Evtl. ist eine Anpassung der Medikation (insbesondere von Diureti­
+ka) vorzunehmen. Zudem sollten vulnerable Personen während eines Hitzeereignisses
+angemessen gekleidet sein (luftige Kleidung, die bei Sonnenexposition einen ausreichen­
+den UV-Schutz gewährleistet) und sich möglichst wenig im Freien aufhalten, sondern eher
+in kühleren Innenräumen (vgl. auch Handlungsempfehlungen zu Kernelement VI).
+
+   1. Folgende Risikogruppen bedürfen besonderer Beachtung:
+
+          o Ältere Menschen
+            In der Regel liegt bei dieser Gruppe eine reduzierte Fähigkeit des Körpers
+            zur Hitzeregulation vor und das Durstgefühl nimmt mit zunehmendem Alter
+            ab.
+
+          o Isoliert lebende Menschen
+            Insbesondere bei isoliert lebenden älteren Menschen ist das Risiko für ge­
+            sundheitliche Hitzeauswirkungen groß, weil eine soziale Kontrolle und
+            Hilfsangebote fehlen.
+
+          o Pflegebedürftige Menschen
+            Bei diesen Personen bestehen oft gesundheitlich bedingte Beeinträchtigun­
+            gen, die deren Handlungsmöglichkeiten stark einschränken. Ein zusätzliches
+            Risiko kann durch bestimmte Erkrankungen im Einzelfall vorliegen.
+
+          o Personen mit starkem Übergewicht
+            Sie reagieren auf Hitzebelastungen besonders intensiv, weil der Organismus
+            dann neben der ohnehin bestehenden gesundheitlichen Grundbelastung
+            einer weiteren außergewöhnlichen Belastung ausgesetzt ist und z.B. das
+            Herz-Kreislaufsystem kaum Reservekapazitäten aufweist.
+
+
+
+
+                                                                                             19
+=== Seite 20 ===
+       o Menschen mit chronischen Erkrankungen
+         Der Organismus dieser Menschen ist oft aufgrund seines Gesundheitszu­
+         standes nicht in dem Maße in der Lage, auf extreme Situationen zu reagie­
+         ren wie es bei Gesunden der Fall ist. Außerdem kommt es bei chronischen
+         Erkrankungen in extremen Situationen oftmals zu einer Verschlechterung
+         der Symptomatik.
+
+       o Menschen mit fieberhaften Erkrankungen
+         Bei fieberhaften Erkrankungen ist es wichtig, dass der Körper Hitze abgeben
+         kann. Daher ist eine deutliche Erhöhung der Raumtemperatur des Kranken­
+         zimmers hier besonders problematisch und sollte durch entsprechende
+         Maßnahmen vermieden werden.
+
+       o Menschen mit Demenz
+         Bei Menschen mit Demenz liegt eine reduzierte Möglichkeit vor, auf extre­
+         me Situationen adäquat zu reagieren. Insbesondere die Aufnahme von aus­
+         reichend Flüssigkeit ist bei Menschen mit Demenzerkrankungen ohne Be­
+         treuung häufig nicht gewährleistet.
+
+       o Menschen, die bestimmte Medikamente einnehmen
+         Die Wirkungen und Nebenwirkungen von Medikamenten (insb. Diuretika
+         und blutdrucksenkende Mittel) können bei Hitzeeinfluss verändert sein. In
+         einigen Fällen wird eine Anpassung der Medikation erforderlich sein, um
+         Dekompensation zu vermeiden.
+
+       o Personen, die thermophysiologische Anpassungsprobleme haben
+         Nicht alle Menschen vertragen Hitze gleich gut. Bei manchen Menschen
+         führt eine starke Hitzebelastung beispielsweise zu Kreislaufproblemen auf­
+         grund von Blutdruckabfall.
+
+       o Säuglinge und Kleinkinder
+         Hier besteht eine besondere Schutzbedürftigkeit, zum einen weil eine be­
+         sondere Empfindlichkeit besteht, aber auch weil hier eine ausgeprägte Ab­
+         hängigkeit von den Aufsichtspersonen gegeben ist. Ohne Anleitung ist bei
+         Kindern keine Einsicht oder sinnvolles Handeln im Hinblick auf Hitze- und
+         UV-Schutz zu erwarten.
+
+2. Berücksichtigung finden sollten außerdem Personen, die im Freien körperlich in­
+   tensiv tätig sind (z.B. Berufe des Baugewerbes, der Landwirtschaft und Gastrono­
+   mie). Obgleich sie keine der typischen Risikogruppen darstellen, bedürfen diese
+   Personen aufgrund ihrer oft extremen Hitze- und UV-Exposition besonderer Auf­
+   merksamkeit und einer Anpassung der Arbeitsbedingungen durch den Arbeitgeber
+   (z.B. durch Anpassung der Arbeitszeit und Pausenregelung).
+
+3. Obdachlose bedürfen in Extremsituationen oftmals einer individuellen Betreuung
+   durch die Sozialdienste.
+
+
+
+                                                                                       20
+=== Seite 21 ===
+Handlungsempfehlung zu Kernelement VI:
+Vorbereitung der Gesundheits- und Sozialsysteme
+Die WHO empfiehlt die Vorbereitung des Gesundheits- und Sozialsystems (u.a. durch Fort-
+und Weiterbildung des Medizin- und Pflegepersonals).
+
+
+Bei der Vermeidung von gesundheitlichen Auswirkungen von Hitzeereignissen kommt den
+Beteiligten des Gesundheits- und Sozialwesens eine zentrale Bedeutung zu, da diese eine
+direkte Schnittstelle zu den Hauptrisikogruppen, insbesondere den älteren und kranken
+Menschen, darstellen. Dies ist vor dem Hintergrund einer zunehmend älter werdenden Ge­
+sellschaft von besonderer Bedeutung.
+Fort- und Weiterbildung von Beschäftigten im Gesundheits- und Sozialwesen kann dazu bei­
+tragen, wichtige Inhalte zum adäquaten Handeln während Hitzeperioden zu vermitteln. Es ist
+zu prüfen, welche Berufsgruppen über Fort- und Weiterbildungsmaßnahmen geschult wer­
+den sollten und wie die Schulungen das bereitgestellte Informationsmaterial sinnvoll ergän­
+zen.
+
+Maßnahmenpläne für Einrichtungen zur Vorbereitung auf Hitzeereignisse sollten insbeson­
+dere entwickelt werden für:
+              o Alten- und Pflegeheime
+              o Einrichtungen für Menschen mit körperlichen und geistigen Einschränkun­
+                  gen
+              o Krankenhäuser, Not- und Rettungsdienste
+              o Einrichtungen zur Rehabilitation
+              o Schulen
+              o Kindertageseinrichtungen
+              o bestimmte Arbeitsstätten
+
+Ein Beispiel für Einrichtungen der stationären Pflege sind die Handlungsempfehlungen der
+hessischen Heimaufsicht (siehe Infobox 2 und Weiterführende Literatur).
+
+Konkrete Pflege- und Betreuungsmaßnahmen auch in der ambulanten Pflege können bei­
+spielsweise sein:
+               o Anpassung und Überwachung des Trinkverhaltens
+               o Anpassung der Ernährung
+               o Anpassung der Kleidung, z.B. bei pflegebedürftigen Personen
+               o Anpassung der Medikation
+               o Tageszeitliche Anpassung der Aufenthalte an beschatteten Plätzen im
+                  Freien bzw. in kühlen Räumen
+               o Anpassung der Freizeitaktivitäten
+
+Hitzebedingte Auswirkungen auf Infrastrukturen können auch Auswirkungen auf die Versor­
+gung haben. Es ist wichtig, an mögliche Nebeneffekte wie Wasserknappheit und Ausfälle im
+Bereich der Stromversorgung zu denken. Bei großer Hitze ist außerdem eine intakte Kühlket­
+te in der Lebensmittelversorgung evtl. nicht mehr gewährleistet.
+
+Es sollte geprüft werden, ob ärztliche Behandlungsmaßnahmen anzupassen sind.
+                                                                                        21
+=== Seite 22 ===
+Mögliche Hitzeereignisse sollten frühzeitig im Rahmen des Personalkräfteeinsatzes sowie der
+Urlaubsregelung im Gesundheitswesen in der Sommerzeit berücksichtigt werden. Bei akuter
+Hitze können Anpassungen der Personalausstattung erforderlich sein.
+
+Besonders in Einrichtungen des Gesundheitswesens sollten kühle Räume zur Verfügung ge­
+stellt werden. Dafür ist es erforderlich, solche Bereiche frühzeitig zu identifizieren und als
+solche in den Maßnahmenplänen auszuweisen.
+
+In Einrichtungen des Gesundheitswesens sind ggf. bauliche Maßnahmen zum Schutz vor Hit­
+ze in Angriff zu nehmen (Verschattungen, Raumventilatoren, ggf. Klimaanlagen). Über diese
+Maßnahmen informieren die Handlungsempfehlungen IV und VII.
+
+
+
+
+                                                                                           22
+=== Seite 23 ===
+Handlungsempfehlung zu Kernelement VII:
+Langfristige Stadtplanung und Bauwesen
+Die WHO empfiehlt die langfristig ausgerichtete Stadtplanung zur Reduzierung der Hitzebe­
+lastung im Bau-, Energie- und Transportsektor.
+Bei der Planung und Umsetzung von bau- und stadtplanerischen Maßnahmen ist Augenmaß
+erforderlich. Es bedarf der Berücksichtigung der ganzjährigen, regionalspezifischen und kli­
+matischen Situation. So kommen manche Maßnahmen in Gegenden Deutschlands, die oh­
+nehin kühler sind, möglicherweise nicht oder in anderer Form in Frage. Langfristige und auf­
+wendige Anpassungsmaßnahmen im Bereich Hitzeschutz stellen immer einen Abwägungs­
+prozess unter Berücksichtigung anderer Belange dar und sollten regionaldifferenziert be­
+trachtet werden.
+Gebäudebezogene Maßnahmen:
+   o Vorgaben entwickeln für den Hitzeschutz von Gebäuden (z.B. Thermoglas, in Fenster
+     integrierte Lamellenjalousien, Beschattung durch Dachüberhänge, Verschattung von
+     Dächern mittels Anlagen für solare Energiegewinnung).
+   o Technische bauliche Maßnahmen wie Belüftungstechnik, Wärme-/Kältetauscher,
+     Raumventilatoren, evtl. auch Einsatz von Klimaanlagen in besonders sensiblen Berei­
+     chen.
+   o Hitzeadäquate Gebäudeplanung bei Neubauten (Berücksichtigung u.a. der Architek­
+     tur, des Breiten-/Höhenverhältnisses, der Bebauung entlang von Straßen sowie der
+     Ausrichtung und Lage) im städtischen wie auch im ländlichen Raum.
+   o Verwendung von hitzereduzierenden und Vermeidung von hitzespeichernden Bauma­
+     terialien.
+   o Trinkwasserspender in Gebäuden und im öffentlichen Raum installieren.
+   o Einrichtung und Nutzung sogenannter „Cooling Centres“, z.B. öffentliche, kühle
+     Räumlichkeiten, z.B. in Behörden, Einkaufspassagen, Kirchengebäuden, Büchereien
+     und Bahnhöfen.
+
+Stadt- und bauplanerische Maßnahmen:
+   o Erhalt oder Schaffung von schattenspendenden Grünanlagen und Parks bestenfalls
+     mit kühlenden Verdunstungsflächen wie Wasserflächen oder -spielen.
+   o Einrichten von großzügigen Schattenplätzen (baulich mittels Pavillons, Außendächern,
+     Markisen, feststehenden Sonnenschirmen oder Sonnensegeln, grünplanerisch durch
+     Neuanpflanzungen oder den Erhalt von Baumbeständen mit dichten Blattkronen).
+   o Einrichten von Befeuchtungsanlagen in Außenanlagen und für Terrassen.
+   o Hitzereduktion durch Freihalten bzw. Schaffen von Luftleitbahnen und Kaltluftentste­
+     hungsgebieten.
+   o Reduzierung des Versiegelungsgrades von offenen und öffentlichen Plätzen zur Ver­
+     meidung der Entstehung von hohen Hitze- und UV-Belastungen aufgrund von Reflexi­
+     on.
+   o Förderung von Baum- und Buschpflanzungen und Dachbegrünungen (hier auf aller­
+     genarme und hitze-/trockentolerante Pflanzen achten).
+   o Einrichten von schattenspendenden Vordächern und Überdachungen, vorzugsweise
+     mit Materialien, die auch die Belastung durch UV-Strahlung reduzieren.
+   o Einrichtung von fest installierten Trinkwasserspendern im öffentlichen Raum.
+
+                                                                                         23
+=== Seite 24 ===
+Weitere Hinweise sind zu finden auf den Internetseiten des Kompetenzzentrums Klimafolgen
+und Anpassung (KomPass) unter http://www.stadtklimalotse.net/massnahmenkatalog/.
+
+
+
+
+                                                                                      24
+=== Seite 25 ===
+Handlungsempfehlung zu Kernelement VIII:
+Monitoring und Evaluierung der Maßnahmen
+Die WHO empfiehlt eine zeitnahe epidemiologische Beobachtung und die Evaluation der Hit­
+zeschutzmaßnahmen.
+Monitoringsysteme und Evaluierungen haben die Aufgabe, Hitzeereignisse und deren Folgen
+quantitativ zu erfassen und zu bewerten, um gegebenenfalls Nachbesserungen und Weiter­
+entwicklungen der Interventionsmaßnahmen zu veranlassen. Sie sind zur Implementierung
+erster wichtiger Anpassungsmaßnahmen zunächst nicht erforderlich, langfristig jedoch sehr
+sinnvoll. Keinesfalls sollten Maßnahmen - gleich welcher Art - aufgrund von Monitoring-
+Schwierigkeiten nicht geplant und durchgeführt werden.
+
+
+   1. Monitoring: Um die gesundheitlichen Auswirkungen einer Hitzeperiode wirkungsvoll
+      zu überwachen, müssen die Daten zeitnah zur Verfügung stehen. Dies dient dazu,
+      Anpassungen an Hitzeperioden und Gegenmaßnahmen einschließlich einer besseren
+      Information der Bevölkerung ergreifen zu können.
+      Des Weiteren kann auf diese Weise die Wirksamkeit von Interventionsmaßnahmen
+      bewertet werden.
+
+       Die für diese zeitnahen Auswertungen erforderlichen Daten stammen z.B. aus fol­
+       genden Quellen:
+          o Notaufnahmen und Aufnahmeregister der Krankenhäuser
+          o Rettungsdienste
+          o Ärztliche Bereitschaftsdienste
+          o Notfalltelefone
+          o Standesämter, Statistische Landesämter (Anzahl Todesfälle)
+
+   2. Wichtig ist, dass überhaupt Daten erhoben werden. Es sollte eine Erhebung tagesbe­
+      zogener Morbiditäts- und Mortalitätsfälle für die spätere Untersuchung von Expositi­
+      ons-Effektbeziehungen erfolgen, auch unter Berücksichtigung kombinierter Gesund­
+      heitswirkungen von sommerlicher Hitze und verstärkter Verunreinigung der Luft.
+
+       Die Informations- und Datensammlung könnte aus folgenden Quellen erfolgen:
+           o Notaufnahmen und Aufnahmeregister der Krankenhäuser
+           o Notdienste
+           o Krankenkassen
+           o Gesundheitsämter, Standesämter, Statistische Landesämter
+
+   3. Die Maßnahmen des Hitzeaktionsplans sollten evaluiert werden, damit der Gesund­
+      heitsschutz der Bevölkerung weiter verbessert werden kann. Hierfür ist es erforder­
+      lich, die tatsächlich erfolgten Maßnahmen zu dokumentieren.
+
+   4. Es sollte geprüft werden, ob und wie die Auswertung und die Nutzung der Daten auf
+      verschiedenen Ebenen des öffentlichen Gesundheitswesens erfolgen kann (z.B. Ge­
+      sundheitsämter, Landesgesundheitsbehörden, Robert Koch-Institut).
+
+
+
+                                                                                       25
+=== Seite 26 ===
+Fazit
+Hitzeaktionspläne sind von Ländern bzw. Kommunen individuell zu erstellen, da jeweils die
+örtlichen Gegebenheiten und hier insbesondere die klimatischen Bedingungen die Basis für
+die Entwicklung und Umsetzung geeigneter und sinnvoller Maßnahmen darstellen. Die vor­
+liegenden Empfehlungen sollen Hilfe bei der Erstellung solch angepasster Hitzeaktionspläne
+sein. Zusätzlich zu diesen Handlungsempfehlungen dienen auch Anregungen aus der Praxis
+(Infobox 2).
+
+Infobox 2: Ein Beispiel zur Umsetzung aus der Praxis
+Einzelne Ansätze zur Aktionsplanung bei Hitzeereignissen gibt es in Deutschland bereits. Im
+Bundesland Hessen wurde beispielsweise als Reaktion auf den Hitzesommer 2003 eine Ar­
+beitsgruppe zur Gesundheitsprävention bei Hitzeperioden eingerichtet, die Maßnahmen­
+empfehlungen für die Pflege (siehe Weiterführende Literatur zu weiteren hilfreichen Hinwei­
+sen) oder allgemeine Verhaltenstipps für Hessen erarbeiteten. Teilgenommen haben unter
+anderem das hessische Sozialministerium, die Ebene der Regierungspräsidien, einige kom­
+munale Gesundheitsämter, der DWD und Vertreter des medizinischen Dienstes der Kran­
+kenversicherung, der AOK und der kassenärztlichen Vereinigung. Für eine nachhaltige Hitze­
+aktionsplanung müsste ein entsprechend ausgerichtetes und zusammengesetztes Fachgre­
+mium gemäß den Empfehlungen zum Kernelement I eingerichtet und verstetigt werden.
+Zurückgehend auf ein Ergebnis aus der vorgenannten Arbeitsgruppe wurde in Hessen eine
+weitere Warnstufe etabliert. So wird bei Hitzeperioden die sogenannte Warnstufe 2 ausge­
+rufen, wenn der DWD vor extremer Hitzebelastung warnt oder für mindestens drei Tage in
+Folge eine starke Hitzebelastung besteht. Bei Erreichen der Warnstufe 2 gibt das Hessische
+Ministerium für Soziales und Integration eine Pressemitteilung heraus (siehe
+https://soziales.hessen.de/presse/pressemitteilung/hitzewarnstufe-2-wird-morgen-
+erreicht), die nicht nur die stationäre Pflege, sondern die Allgemeinbevölkerung einschließ­
+lich der Pflegebedürftigen und älteren Menschen anspricht. Auch wird dabei auf Tipps zum
+Verhalten bei extremer Hitze und zu Sonnenschutzmaßnahmen verwiesen.
+
+
+Die vorliegenden Handlungsempfehlungen umfassen sowohl kurzfristig umsetzbare Aktivitä­
+ten (z.B. Einrichten von Kommunikationswegen, Handlungsfeld III) als auch erst längerfristig
+umsetzbare Aktivitäten (z.B. Stadtplanerische Maßnahmen, Handlungsfeld VII). Während in
+einigen Fällen die Implementierung schon weit fortgeschritten ist (z.B. Etablierung des Hit­
+zewarnsystems, Handlungsfeld II), geben andere Aktivitäten noch viel Raum für Entwicklung
+und stellen vor allem eine Herausforderung für die Zukunft dar (z.B. Einrichtung eines zeit­
+nahen Monitorings, Handlungsfeld VIII).
+
+Jede zuständige Behörde soll mit diesen Empfehlungen ermutigt werden, selbst bei geringen
+personellen und finanziellen Ressourcen, die Entwicklung eines Hitzeaktionsplans mit den
+verfügbaren „Bordmitteln“ voranzubringen, um für den nächsten Hitzesommer besser ge­
+wappnet zu sein. Viele der Maßnahmen können kostengünstig umgesetzt werden, da es im
+Wesentlichen um die Bewusstseinsschärfung für diese Thematik geht, um hierdurch Ände­
+rungen von Verhaltensweisen bei den Betroffenen zu bewirken.
+
+
+
+
+                                                                                         26
+=== Seite 27 ===
+Auch bauliche Maßnahmen können mitunter mit relativ geringem Aufwand durchgeführt
+werden, z.B. bei ohnehin notwendigen Änderungen an bestehenden Bauten, bei Stadtpla­
+nungen oder bei Bauvorhaben.
+
+Wichtig ist hierfür ein Konsens aller Beteiligten: Das Ziel ist, die Gesundheit der Bevölkerung
+vor den negativen Folgen extremer Hitze zu schützen.
+
+
+
+
+                                                                                            27
+=== Seite 28 ===
+Weiterführende Literatur, die für die Erarbeitung regionaler Hitzeaktionspläne hilfreich
+sein kann
+
+WHO-Veröffentlichungen
+
+       Heat Health Action Plan, WHO Regional Office for Europe, 2008
+        http://www.euro.who.int/__data/assets/pdf_file/0006/95919/E91347.pdf
+       Public health advice on preventing health effects of heat. New and updated infor­
+        mation for different audiences, 2011
+         http://www.euro.who.int/__data/assets/pdf_file/0007/147265/Heat_information_
+         sheet.pdf?ua=1
+       Improving public health responses to extreme weather/heat-waves – EuroHEAT,
+        2009
+        http://www.euro.who.int/__data/assets/pdf_file/0010/95914/E92474.pdf?ua=1
+
+
+Deutschsprachige Veröffentlichungen
+
+       Umweltbundesamt und Deutscher Wetterdienst (2008):
+        Ratgeber: Klimawandel und Gesundheit. Informationen zu gesundheitlichen Auswir­
+        kungen sommerlicher Hitze, Hitzewellen und Tipps zum vorbeugenden Gesundheits­
+        schutz
+        https://www.umweltbundesamt.de/publikationen/ratgeber-klimawandel-
+        gesundheit
+       Umweltbundesamt und Robert Koch-Institut (2013):
+        Klimawandel und Gesundheit – Allgemeiner Rahmen zu Handlungsempfehlungen für
+        Behörden und weitere Akteure in Deutschland.
+        http://www.apug.de/archiv/pdf/klimawandel/allgemeiner_rahmen_zu_handlungse
+        mpfehlungen_klimawandel_und_gesundheit_final.pdf
+       Capellaro M, Sturm D (2015):
+        Evaluation von Informationssystemen zu Klimawandel und Gesundheit
+         Band 1: Anpassung an den Klimawandel: Evaluation bestehender nationaler Infor­
+         mationssysteme (UV-Index, Hitzewarnsystem, Pollenflug- und Ozonvorhersage) aus
+         gesundheitlicher Sicht – Wie erreichen wir die empfindlichen Bevölkerungsgrup­
+         pen? Umweltbundesamt (Hrsg.). Umwelt und Gesundheit 03/2015.
+         Band 2: Anpassung an den Klimawandel: Strategie für die Versorgung bei Extrem­
+         wetterereignissen. Umweltbundesamt (Hrsg.). Umwelt und Gesundheit 04/2015.
+         Erhältlich unter www.umweltbundesamt.de
+
+
+
+
+                                                                                           28
+=== Seite 29 ===
+       Regierungspräsidium Gießen - Hessische Heimaufsicht (2009):
+        Außergewöhnliche Hitzeperioden: Vorbereitung und Vorgehen stationärer Pflege­
+        einrichtungen
+        https://rp-giessen.hessen.de/sites/rp-giessen.hessen.de/files/content-
+        downloads/Handlungsempfehlung_Hitze_0.pdf)
+       Hochschule Fulda (2012):
+        Hessischer Aktionsplan zur Vermeidung hitzebedingter Gesundheitsbeeinträchtigun­
+        gen der Bevölkerung (HEAT)
+        http://www.hlnug.de/fileadmin/dokumente/klima/inklim_a/heat.pdf
+       Bundesministerium für Umwelt, Naturschutz und Reaktorsicherheit (2010):
+        Klimawandel, Extremwetterereignisse und Gesundheit. Bericht der Internationalen
+        Fachkonferenz vom 29./30. November 2010.
+        http://www.bmub.bund.de/fileadmin/Daten_BMU/Pools/Broschueren/klimawandel
+        _extremwetter_konferenzbericht_bf.pdf
+
+Literatur
+
+1. Bundesregierung (2008) Deutsche Anpassungsstrategie an den Klimawandel. Berlin
+2. Kandarr J, Reckert H, Mücke H-G (2014) Anpassung an die gesundheitlichen Risiken des
+    Klimawandels als Aufgabe des umweltbezogenen Gesundheitsschutzes. Bundesgesundheitsblatt
+    - Gesundheitsforschung - Gesundheitsschutz 57:1209-1215
+3. Zielo B (2016) Die Auswirkungen des Klimawandels auf die menschliche Gesundheit am Beispiel
+    von Hitzewellen als Extremwetterereignis. In: Fakultät für Umwelt und Natürliche Ressourcen.
+    Albert-Ludwigs-Universität Freiburg
+4. Zielo B., Matzarakis A (2017) Bedeutung von Hitzeaktionsplänen für den präventiven
+    Gesundheitsschutz in Deutschland. Das Gesundheitswesen (akzeptiert)
+5. Umweltbundesamt, Robert Koch-Institut (2013) Klimawandel und Gesundheit - Allgemeiner
+    Rahmen zu Handlungsempfehlungen für Behörden und weitere Akteure in Deutschland. In:
+    Umweltbundesamt und Robert-Koch Institut, Berlin, p 34
+6. Kovats S, Jendritzky G (2006) Heat-waves and human health. In: Menne B und Ebi KL (ed) Climate
+    change and adaptation strategies for human health. Steinkopff, Darmstadt, p 63–97
+7. Jendritzky G, Koppe C (2008) Die Auswirkungen von thermischen Belastungen auf die Mortalität.
+    Warnsignal Klima - Gesundheitsrisiken:149-153
+8. EEA (2012) Impacts of Europe's changing climate 2008 indicator-based assessment. In: EEA
+    Report No 4/2008.
+9. Barriopedro D, Fischer EM, Luterbacher J, Trigo RM, García-Herrera R (2011) The hot summer of
+    2010: Redrawing the temperature record map of Europe. Science 332:220-224
+10. Tröltzsch J, Görlach B, Lückge H, Peter M, Sartorius C (2011) Ökonomische Aspekte der
+    Anpassung an den Klimawandel - Literaturauswertung zu Kosten und Nutzen von
+    Anpassungsmaßnahmen an den Klimawandel. Umweltbundesamt, Dessau
+11. Eis D, Helm D, Laußmann D, Stark K (2010) Klimawandel und Gesundheit - Ein Sachstandsbericht.
+    In: Robert Koch-Institut, Berlin
+12. Matthies F, Bickler G, Marin N, Hales S (2008) Heat-Health Action Plans. In: Regional Office for
+    Europe (ed), Copenhagen
+13. Mücke H-G, Straff W, Faber M. et al. (2013) Klimawandel und Gesundheit: Allgemeiner Rahmen
+    zu Handlungsempfehlungen für Behörden und weitere Akteure in Deutschland. In: Robert Koch-
+    Institut und Umweltbundesamt (ed), Berlin, p 34
+14. Grobe TG, Heller G, Szecsenyi J (2014) Arztreport Schwerpunkt: Hautkrebs. In:Barmer GEK
+    Siegburg
+                                                                                                     29
+=== Seite 30 ===
+15. Gesellschaft der Epidemiologischen Krebsregister in Deutschland e.V. (2016) Atlas der
+    Krebsinzidenz und -mortalität in Deutschland (GEKID-Atlas).
+16. Arbeitsgemeinschaft der Wissenschaftlichen Medizinischen Fachgesellschaften e.V. (2014) S3-
+    Leitlinie Prävention von Hautkrebs, Langversion 1.0. In: Leitlinienprogramm Onkologie. Deutsche
+    Krebsgesellschaft, Deutsche Krebshilfe
+17. Grewe HA (2012) Hessischer Aktionsplan zur Vermeidung hitzebedingter
+    Gesundheitsbeeinträchtigungen der Bevölkerung (HEAT). Hochschule Fulda - Fachbereich Pflege
+    und Gesundheit, Fulda
+18. Matzarakis A (2016) Das Hitzewarnsystem des Deutschen Wetterdienstes (DWD) und seine
+    Relevanz für die menschliche Gesundheit. Gefahrstoffe Reinhaltung der Luft 76
+
+
+
+
+                                                                                                 30
