@@ -1,9 +1,10 @@
 # Querschnitt: Diskontrate
 
 Querschnittsdatei der Methodik, gültig für alle Klimawirkungen. Einen Wert bekommen zuerst die Gesundheitsschäden von
-M0 (#95, #96, #98). Für die übrigen Schadensarten ruht die Anwendung bis zur Abnahme von M0 (A-0048). Dieser Stand ist
-Schritt 1 (Ticket T-1242-methodik_manager, Vorhaben T-1116-cmo) und enthält die Regel und ihre Werte. Schritt 2 bringt
-die Rechenkette vom Jahresbetrag zum Barwert mit Beispiel-Block, Schritt 3 und 4 rechnen #96 und #98 nach.
+M0 (#95, #96, #98). Für die übrigen Schadensarten ruht die Anwendung bis zur Abnahme von M0 (A-0048). Schritt 1 (Ticket
+T-1242-methodik_manager, Vorhaben T-1116-cmo) hat die Regel und ihre Werte festgelegt. Dieser Stand ist Schritt 2
+(T-1243-methodik_manager): die Rechenkette vom Jahresbetrag zum Barwert mit Beispiel-Block für #95. Schritt 3 und 4
+rechnen #96 und #98 nach.
 
 Abkürzungen: **MK 4.0** = Umweltbundesamt, Handbuch Umweltkosten – Methodenkonvention 4.0
 (`docs/UBA/UBA_Handbuch Umweltkosten_Methodenkonvention 4.0.pdf`; PDF-Seite und gedruckte Seite stimmen auf S. 4–22
@@ -250,6 +251,144 @@ geht über die Bauweise der Regel ein, ohne eigene Zahl:**
 - **Ein Kapitalmarktzins** ist nach S. 15 unzulässig und würde künftige Schäden stark abwerten. Wie stark, zeigt das
   Rechenbeispiel der Konvention: Bei einer Rate von 3 % zählt ein Schaden in 30 Jahren nur noch mit 41 % (S. 14).
 
+## Rechenkette
+
+Die Rechenkette führt vom Jahresbetrag eines Berichts zum Barwert nach Regel D. Sie beginnt dort, wo die Rechenkette 3.0
+des Berichts endet. **Beispielkommune: Berlin, Klimawirkung #95 Hitzebelastung.** Der Jahresbetrag stammt aus der
+letzten Ebene der Rechenkette 3.0 von `docs/methodik/95_hitzebelastung.md`, Zeile 188: „362,9 Mio. € je Jahr
+(Preisstand 2024)“. Regel D liefert zwei Barwerte, einen je RZPR; die Kette rechnet beide.
+
+**Wie ein Abzinsfaktor zu lesen ist.** Der Abzinsfaktor eines Jahres sagt, mit welchem Anteil der Betrag dieses Jahres
+im Barwert zählt: 0,980 heißt, 1 € Schaden im Jahr 2045 zählt wie 98 Cent im Jahr 2025. Der **Barwertfaktor** ist die
+Summe der 41 Abzinsfaktoren. Er sagt, wie vielen vollen Jahresbeträgen der Barwert entspricht. Ohne Abzinsung wären es
+genau 41.
+
+| Ebene | Rechenschritt | Wert (Beispielkommune Berlin, #95) | Quelle |
+|---|---|---|---|
+| 1 | Jahresbetrag: bewerteter Schaden (Konto K1) je Jahr | 362,9 Mio. € je Jahr (Preisstand 2024) | Bericht 95, Kap. 3.0, Ebene 10, Zeile 188 |
+| 2 | × 41 Jahre 2025–2065, Jahresbetrag in jedem Jahr gleich = Summe ohne Abzinsung | 362,9 Mio. € × 41 = 14,88 Mrd. € | Zeitraum: Festlegung, „Bezugsjahr und Zeitraum der Abzinsung“; gleichbleibender Verlauf: Bericht 95, Kap. 6, Zeilen 1008 und 1010–1012 (M0 weist das Ist-Klima aus) |
+| 3 | Diskontrate zur RZPR 0 % = RZPR + Veränderung der relativen Preise | 0 % + 0,1 Pp. = 0,1 % | Festlegung, Regel D |
+| 4 | Abzinsfaktor je Jahr = 1 ÷ 1,001 hoch (Jahr − 2025) | 2025: 1,000 · 2035: 0,990 · 2045: 0,980 · 2055: 0,970 · 2065: 0,961 | Rechnung |
+| 5 | Barwertfaktor = Summe der 41 Abzinsfaktoren, je Jahrzehnt zusammengezählt | 9,955 (2025–2034) + 9,856 (2035–2044) + 9,758 (2045–2054) + 9,661 (2055–2064) + 0,961 (2065) = 40,19 | Rechnung |
+| 6 | **Barwert zur RZPR 0 %** = Ebene 1 × Ebene 5 | 362,9 Mio. € × 40,19 = **14,59 Mrd. € (Preisstand 2024)** | Rechnung |
+| 7 | Diskontrate zur RZPR 1 % = RZPR + Veränderung der relativen Preise | 1 % + 0,1 Pp. = 1,1 % | Festlegung, Regel D |
+| 8 | Abzinsfaktor je Jahr = 1 ÷ 1,011 hoch (Jahr − 2025) | 2025: 1,000 · 2035: 0,896 · 2045: 0,803 · 2055: 0,720 · 2065: 0,646 | Rechnung |
+| 9 | Barwertfaktor = Summe der 41 Abzinsfaktoren, je Jahrzehnt zusammengezählt | 9,524 (2025–2034) + 8,537 (2035–2044) + 7,653 (2045–2054) + 6,860 (2055–2064) + 0,646 (2065) = 33,22 | Rechnung |
+| 10 | **Barwert zur RZPR 1 %** = Ebene 1 × Ebene 9 | 362,9 Mio. € × 33,22 = **12,06 Mrd. € (Preisstand 2024)** | Rechnung |
+
+**Ergebnis nach Regel D für #95, Beispielkommune Berlin:** Der bewertete Schaden der 41 Jahre 2025–2065 hat einen
+Barwert von 14,59 Mrd. € zur RZPR 0 % und von 12,06 Mrd. € zur RZPR 1 % (Preisstand 2024, Bezugsjahr 2025). Das Produkt
+zeigt beide Werte nebeneinander (Festlegung, „Erste Komponente“).
+
+**Verlauf der Jahresbeträge.** Die Festlegung schreibt keinen Verlauf vor. Sie sagt nur, dass jeder Jahresbetrag der
+Jahre 2025–2065 abgezinst wird, und rechnet ihre eigenen Beispiele mit gleichbleibendem Jahresbetrag. Bericht 95 weist in
+M0 das Ist-Klima aus und nennt keinen Betrag für spätere Jahre (Kap. 6, Zeile 1008). Die Kette setzt deshalb in jedem
+Jahr denselben Betrag an. Dass die Festlegung für das Produkt einen Verlauf mit Klimasignal voraussetzt, den Bericht 95 in
+M0 nicht liefert, steht als Befund B1 unter „Befunde an Berichte“.
+
+**Kette und Produkt.** Der Betrag des Produkts für Berlin ist der Zelllauf, nicht die Kette. Er liegt um den Faktor
+0,932 niedriger, bei rund 338 Mio. € je Jahr (Bericht 95, Kap. 3.0, Zeilen 231–234). Der Barwert ändert sich im selben
+Verhältnis: 13,59 Mrd. € zur RZPR 0 % und 11,24 Mrd. € zur RZPR 1 %. Die Abweichungen in Prozent in der Tabelle unten
+bleiben gleich, weil derselbe Barwertfaktor auf beide Beträge wirkt.
+
+```python test: diskontrate_m0
+# Rechenkette Diskontrate, #95 Hitzebelastung, Beispielkommune Berlin: Jahresbetrag -> Barwert nach Regel D
+jahresbetrag = 362.9                 # Mio. EUR je Jahr (Preisstand 2024), Bericht 95, Kap. 3.0, Ebene 10, Zeile 188
+jahre = list(range(2025, 2066))      # Zeitraum 2025-2065, Bezugsjahr 2025
+komponente = 0.001                   # Veraenderung der relativen Preise, 0,1 Pp. (Festlegung)
+rzpr = (0.0, 0.01)                   # beide Werte werden ausgewiesen (MK 4.0, S. 10)
+
+def faktor(d, jahr):                 # Ebenen 4 und 8
+    return 1 / (1 + d) ** (jahr - 2025)
+
+def barwertfaktor(d):                # Ebenen 5 und 9
+    return sum(faktor(d, j) for j in jahre)
+
+def barwert(d, betrag=jahresbetrag): # Ebenen 6 und 10, Betrag gleich in jedem Jahr
+    return betrag * barwertfaktor(d)
+
+def zehner(d):                       # Summen je Jahrzehnt und das Jahr 2065
+    return [sum(faktor(d, j) for j in range(a, a + 10)) for a in (2025, 2035, 2045, 2055)] + [faktor(d, 2065)]
+
+assert len(jahre) == 41
+# Ebene 2: Summe ohne Abzinsung
+assert abs(jahresbetrag * 41 / 1000 - 14.88) < 0.005
+# Ebenen 3 und 7: Diskontrate nach Regel D
+regel = [round(r + komponente, 4) for r in rzpr]
+assert regel == [0.001, 0.011]
+# Ebene 4 und 8: Abzinsfaktoren 2025, 2035, 2045, 2055, 2065
+for d, soll in zip(regel, [[1.000, 0.990, 0.980, 0.970, 0.961], [1.000, 0.896, 0.803, 0.720, 0.646]]):
+    for j, s in zip((2025, 2035, 2045, 2055, 2065), soll):
+        assert abs(faktor(d, j) - s) < 0.0005
+# Ebene 5 und 9: Barwertfaktor, je Jahrzehnt
+for d, soll, summe in zip(regel, [[9.955, 9.856, 9.758, 9.661, 0.961], [9.524, 8.537, 7.653, 6.860, 0.646]], [40.19, 33.22]):
+    for ist, s in zip(zehner(d), soll):
+        assert abs(ist - s) < 0.0005
+    assert abs(sum(zehner(d)) - barwertfaktor(d)) < 1e-9
+    assert abs(barwertfaktor(d) - summe) < 0.005
+# Ebene 6 und 10: Barwert nach Regel D in Mrd. EUR
+bw_regel = [barwert(d) / 1000 for d in regel]
+assert abs(bw_regel[0] - 14.59) < 0.005 and abs(bw_regel[1] - 12.06) < 0.005
+# Sensitivitaet: Diskontrate 0 % und 1 % (RZPR allein, Komponente 0)
+bw_0, bw_1 = barwert(0.0) / 1000, barwert(0.01) / 1000
+assert abs(barwertfaktor(0.01) - 33.83) < 0.005
+assert abs(bw_0 - 14.88) < 0.005 and abs(bw_1 - 12.28) < 0.005
+abw_0 = bw_0 / bw_regel[0] - 1       # 0 % gegen 0,1 % (gleiche RZPR 0 %)
+abw_1 = bw_1 / bw_regel[1] - 1       # 1 % gegen 1,1 % (gleiche RZPR 1 %)
+assert abs(abw_0 - 0.020) < 0.0005 and abs(abw_1 - 0.019) < 0.0005
+# Spannweite ueber alle vier Varianten und staerkster Treiber (Wahl der RZPR)
+assert abs(bw_regel[1] / bw_regel[0] - 1 + 0.173) < 0.0005
+assert abs(bw_0 / bw_regel[1] - 1 - 0.234) < 0.0005
+# Kette und Produkt: Zelllauf Berlin = Kette x 0,932 (Bericht 95, Kap. 3.0, Zeilen 231-234)
+assert abs(jahresbetrag * 0.932 - 338) < 0.5
+assert abs(bw_regel[0] * 0.932 - 13.59) < 0.005 and abs(bw_regel[1] * 0.932 - 11.24) < 0.005
+# Pruefall zum Verlauf (keine Projektion): Jahresbetrag steigt gleichmaessig bis 2065 auf das Doppelte
+steigend = lambda d: sum(jahresbetrag * (1 + (j - 2025) / 40) * faktor(d, j) for j in jahre) / 1000
+assert abs(steigend(0.001) - 21.83) < 0.005 and abs(steigend(0.011) - 17.62) < 0.005
+assert abs(steigend(0.001) / bw_regel[0] - 1.50) < 0.005 and abs(steigend(0.011) / bw_regel[1] - 1.46) < 0.005
+assert abs(steigend(0.0) / steigend(0.001) - 1 - 0.0225) < 0.0005
+assert abs(steigend(0.01) / steigend(0.011) - 1 - 0.0209) < 0.0005
+
+de = lambda x, n=2: f"{x:,.{n}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+print(f"Barwert nach Regel D, RZPR 0 % (Rate 0,1 %): {de(bw_regel[0])} Mrd. €, Barwertfaktor {de(barwertfaktor(0.001))}")
+print(f"Barwert nach Regel D, RZPR 1 % (Rate 1,1 %): {de(bw_regel[1])} Mrd. €, Barwertfaktor {de(barwertfaktor(0.011))}")
+print(f"Barwert zur Diskontrate 0 %: {de(bw_0)} Mrd. €, Abweichung zur Regel (RZPR 0 %) {de(abw_0 * 100, 1)} %")
+print(f"Barwert zur Diskontrate 1 %: {de(bw_1)} Mrd. €, Abweichung zur Regel (RZPR 1 %) {de(abw_1 * 100, 1)} %")
+```
+
+Ausgabe des Blocks (gelaufen am 26.09.2026):
+
+```text
+Barwert nach Regel D, RZPR 0 % (Rate 0,1 %): 14,59 Mrd. €, Barwertfaktor 40,19
+Barwert nach Regel D, RZPR 1 % (Rate 1,1 %): 12,06 Mrd. €, Barwertfaktor 33,22
+Barwert zur Diskontrate 0 %: 14,88 Mrd. €, Abweichung zur Regel (RZPR 0 %) 2,0 %
+Barwert zur Diskontrate 1 %: 12,28 Mrd. €, Abweichung zur Regel (RZPR 1 %) 1,9 %
+```
+
+**Sensitivität gegenüber 0 % und 1 %.** Die Varianten 0 % und 1 % sind die RZPR allein, also der heutige Stand im
+Produkt (Befund C1). Jede Variante wird mit dem Barwert nach Regel D zur selben RZPR verglichen: 0 % mit 0,1 %, 1 % mit
+1,1 %.
+
+| Klimawirkung | Barwert nach Regel | Barwert 0 % | Barwert 1 % | Abweichung zur Regel in % |
+|---|---|---|---|---|
+| #95 Hitzebelastung, Beispielkommune Berlin | 14,59 Mrd. € (RZPR 0 %, Rate 0,1 %) · 12,06 Mrd. € (RZPR 1 %, Rate 1,1 %) | 14,88 Mrd. € | 12,28 Mrd. € | 0 % gegen 0,1 %: +2,0 % · 1 % gegen 1,1 %: +1,9 % |
+
+Zwischen den vier Varianten schwankt der Barwert von #95 von 12,06 bis 14,88 Mrd. €, also um 23 %; davon entfallen
+nur 1,9–2,0 % auf die Veränderung der relativen Preise, der **stärkste Treiber** ist die Wahl der RZPR: 1 % statt 0 %
+senkt den Barwert nach Regel D um 17 %.
+
+**Was eine einfachere Rechnung verfälschen würde (§8 E3):**
+
+- **Jahresbetrag × 41 ohne Abzinsung** (Ebene 2) ist der Barwert zur Diskontrate 0 %. Er liegt 2,0 % über dem Barwert
+  nach Regel D zur RZPR 0 % und 23 % über dem zur RZPR 1 %. Er zeigt nur eine der beiden Wertentscheidungen, die MK 4.0
+  verlangt (S. 10).
+- **Gleichbleibender Jahresbetrag.** Steigt der Jahresbetrag mit dem Klimasignal, steigt der Barwert. Die Abweichungen in
+  Prozent ändern sich dabei kaum. Prüffall, keine Projektion: Verdoppelt sich der Jahresbetrag gleichmäßig bis 2065,
+  liegt der Barwert nach Regel D bei 21,83 Mrd. € (RZPR 0 %) und 17,62 Mrd. € (RZPR 1 %), also 50 % bzw. 46 % höher.
+  Die Abweichung der Variante 0 % steigt nur von 2,0 % auf 2,3 %, die der Variante 1 % von 1,9 % auf 2,1 %. Die
+  Aussage der Sensitivität hängt also nicht am Verlauf, der Betrag des Barwerts schon. Mit dem Ist-Klima in jedem Jahr
+  ist er bei einem wärmer werdenden Klima eine Untergrenze (Befund B1).
+
 ## Entscheidungslog
 
 Gewählt ist Regel D. Die zweite Komponente für die Gesundheitsschäden von M0 ist ein eigener Wert von 0,1 Pp. mit Band
@@ -281,6 +420,30 @@ Gewählt ist Regel D. Die zweite Komponente für die Gesundheitsschäden von M0 
     vergangene Projektionsjahre aufzinsen würde, was [GB] §2.20 ausschließt.
 11. **Eine nominale Diskontrate** (Diskontrate plus Inflation) ist verworfen, weil die Jahresbeträge in festen Preisen
     stehen und Inflation nicht zur Rate addiert wird ([GB] §2.19; MK 4.0, S. 9).
+
+Zur Rechenkette (Schritt 2); Regel D bleibt dabei unverändert:
+
+12. **Ein steigender Jahresbetrag in der Rechenkette von #95** ist verworfen, weil Bericht 95 in M0 nur das Ist-Klima
+    ausweist (Kap. 6, Zeile 1008) und jeder angesetzte Anstieg eine Zahl ohne Quelle wäre; der Prüffall mit Verdopplung
+    bis 2065 zeigt, dass die Abweichungen in Prozent sich dadurch um höchstens 0,3 Pp. ändern (Abschnitt „Rechenkette“).
+13. **Der Zelllauf des Produkts (rund 338 Mio. € je Jahr) als Jahresbetrag der Kette** ist verworfen, weil die Kette an
+    die letzte Ebene der Rechenkette 3.0 anschließen soll; der Barwert des Zelllaufs steht als Umrechnung mit dem Faktor
+    0,932 daneben.
+
+## Befunde an Berichte
+
+Gelesen am 26.09.2026: Bericht 95, Kap. 3.0 (Zeilen 167–321), Kap. 3.5 (VOLY-Kette, Zeilen 668–672) und Kap. 6 (Zeilen 999–1056).
+Diese Datei ändert keinen Bericht.
+
+| Nr | Bericht, Stelle | Stand im Bericht | Festlegung | Art |
+|---|---|---|---|---|
+| B1 | Bericht 95, Kap. 6, Zeilen 1001–1012 | „M0 weist das Ist-Klima aus“; die Euro-Beträge „gelten für ein Jahr im heutigen Klima“; Szenariofähigkeit folgt mit Stufe M1+. Einen Jahresbetrag für die Jahre nach dem Ist-Klima nennt der Bericht nicht | Barwert über die 41 Jahre 2025–2065 („Bezugsjahr und Zeitraum der Abzinsung“); das Produkt schreibt die Jahresbeträge mit dem Klimasignal fort („Warum der Preiseffekt in die Diskontrate gehört“) | Verlauf fehlt im Bericht. Die Rechenkette rechnet deshalb mit gleichbleibendem Jahresbetrag; bei wärmer werdendem Klima ist ihr Barwert eine Untergrenze. Zu klären ist, welchen Verlauf das Produkt für #95 in M0 abzinst: Ist-Klima in jedem Jahr oder Szenario 95-A (Kap. 6, Zeilen 1001–1004) |
+
+**Ohne Abweichung:** Jahresbetrag 362,9 Mio. € je Jahr (Preisstand 2024) in Kap. 3.0, Ebene 10, Zeile 188; Anteil
+Mortalität 361,8 Mio. € und Morbidität 1,09 Mio. € (Ebenen 8 und 9) wie unter „Geltung für die Schadensarten von M0“;
+225 der 277,4 Todesfälle ab 75 Jahren (Ebene 6: 71,4 + 153,6) wie unter A9; VOLY 160.800 € mit dem Faktor
+„Einkommensentwicklung ^0,85 ×1,1719“ in Kap. 3.5, Zeilen 668–669. Den Satz zu Jahresbeträgen ohne Abzinsung hat
+Bericht 95 bereits (Kap. 6, Zeilen 1010–1012).
 
 ## Befunde an Code
 
@@ -339,7 +502,9 @@ Abruf gesperrt ist. Er ist in der Quellenpflege nachzutragen (Aufgabe §3.8).
   Deutschland, 1991–2024.
   https://api.worldbank.org/v2/country/DEU/indicator/NY.GDP.PCAP.KD?format=json&per_page=100&date=1991:2024. Verwendet:
   1991 = 31.056,59 US-$, 2024 = 44.027,76 US-$; Rechnung von KAP3: 1,06 % je Jahr.
-- **[Bericht 95]** `docs/methodik/95_hitzebelastung.md`, Kap. 3.0 (Ebenen 6–10), Kap. 3.5 (VOLY-Kette).
+- **[Bericht 95]** `docs/methodik/95_hitzebelastung.md`, Kap. 3.0 (Ebenen 6–10; Ebene 10 in Zeile 188; Zelllauf
+  Zeilen 231–234), Kap. 3.5 (VOLY-Kette), Kap. 6 (Szenario-Anwendung und Jahresbeträge ohne Abzinsung, Zeilen
+  1001–1012). Zeilennummern gemessen am 26.09.2026.
 - **[Bericht 96]** `docs/methodik/96_aeroallergene.md`, Evidenz-Register 96-K1-01.
 - **[Bericht 98]** `docs/methodik/98_uv_schaedigungen.md`, Kap. 3.5.
 - **[Produkt]** `backend/app/data/diskontierung.py`; `backend/app/services/cost_projection_service.py`
