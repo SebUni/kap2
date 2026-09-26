@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useStore } from '../store'
 import { api } from '../api/client'
-import type { MassnahmeGewissheit } from '../api/client'
+import type { MassnahmeGewissheit, MassnahmeUmsetzung } from '../api/client'
 import UnsicherheitsZusammenschau from './UnsicherheitsZusammenschau'
 import type { Measure, MeasureImpactSummary } from '../types'
 
@@ -19,6 +19,15 @@ export default function MeasuresTableTab() {
       .then(list => setGewissheit(Object.fromEntries(list.map(g => [g.code, g]))))
       .catch(() => {})
   }, [])
+
+  // Umsetzung (allein/mit Partnern, Ebenen, Quelle) je Maßnahmentyp, einmal geladen.
+  const [umsetzung, setUmsetzung] = useState<Record<string, MassnahmeUmsetzung>>({})
+  useEffect(() => {
+    api.getMassnahmenUmsetzung()
+      .then(setUmsetzung)
+      .catch(() => {})
+  }, [])
+  const ebeneLabel: Record<string, string> = { gemeinde: 'Gemeinde', kreis: 'Kreis', land: 'Land' }
 
   const measureCat = (code: string) => catalog?.measures.find(m => m.code === code)
   const measureName = (code: string) => measureCat(code)?.name || code
@@ -168,6 +177,7 @@ export default function MeasuresTableTab() {
                   <th style={{ textAlign: 'right' }}>Nutzen/Jahr</th>
                   <th style={{ textAlign: 'right' }}>Risiko-Minderung</th>
                   <th>Gewissheit</th>
+                  <th>Umsetzung</th>
                   <th>Aktionen</th>
                 </tr>
               </thead>
@@ -205,6 +215,27 @@ export default function MeasuresTableTab() {
                               ))}
                               <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{g.wirkung_evidenz}</div>
                             </>
+                          )
+                        })()}
+                      </td>
+                      <td style={{ fontSize: '0.75rem' }}>
+                        {(() => {
+                          const u = umsetzung[m.measure_type]
+                          if (!u) return 'nicht hinterlegt'
+                          const beleg = u.beleg?.quelle
+                            ? `${u.beleg.quelle}${u.beleg.seite ? `, S. ${u.beleg.seite}` : ''}`
+                            : u.beleg?.abschaetzung
+                              ? `Abschätzung: ${u.beleg.abschaetzung}`
+                              : ''
+                          return (
+                            <div title={beleg ? `Quelle: ${beleg}` : undefined}>
+                              <div>{u.umsetzung === 'kommune_allein' ? 'Kommune allein' : 'mit Partnern'}</div>
+                              <div>Ebenen: {u.ebenen.map(e => ebeneLabel[e] || e).join(', ') || '–'}</div>
+                              {u.partner.length > 0 && (
+                                <div style={{ color: 'var(--text-muted)' }}>Partner: {u.partner.join(', ')}</div>
+                              )}
+                              {beleg && <div style={{ color: 'var(--text-muted)' }}>Quelle: {beleg}</div>}
+                            </div>
                           )
                         })()}
                       </td>
