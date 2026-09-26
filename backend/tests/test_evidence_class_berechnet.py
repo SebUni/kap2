@@ -147,4 +147,4 @@ def test_frontend_typ_fuehrt_berechnet():
 def test_frontend_anzeige_berechnet_aus_amtlichen_daten():
     tabelle = (FRONTEND / "components" / "ParameterTable.tsx").read_text(encoding="utf-8")
     assert "p.evidence_class === 'berechnet'" in tabelle
-    assert "'berechnet aus amtlichen Daten'" in tabelle
+    assert "Berechnet aus amtlichen Daten" in tabelle
