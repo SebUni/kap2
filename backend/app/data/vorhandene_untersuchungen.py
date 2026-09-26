@@ -22,7 +22,7 @@ UNTERSUCHUNGEN: list[dict[str, str]] = [
         "code": "hochwassergefahrenkarten",
         "bezeichnung": "Hochwassergefahren- und Hochwasserrisikokarten nach EU-Hochwasserrisikomanagement-Richtlinie",
         "ebene": "land",
-        "wo_erhaeltlich": "Landesportal des Bundeslands, URL je Land unter LANDESPORTALE[Land]['hochwasser']; "
+        "wo_erhaeltlich": "Landesportal des Bundeslands (Link unten beim Bundesland der Kommune); "
                           "länderübergreifend im Kartenviewer der Bundesanstalt für Gewässerkunde: "
                           "https://geoportal.bafg.de/karten/HWRM/",
     },
@@ -79,7 +79,7 @@ UNTERSUCHUNGEN: list[dict[str, str]] = [
         "code": "kra_land",
         "bezeichnung": "Klimarisikoanalyse (KRA) des Landes",
         "ebene": "land",
-        "wo_erhaeltlich": "Landesregierung des Bundeslands, URL je Land unter LANDESPORTALE[Land]['kra_land']",
+        "wo_erhaeltlich": "Landesregierung des Bundeslands (Link unten beim Bundesland der Kommune)",
     },
     {
         "code": "kwra",
