@@ -242,6 +242,48 @@ IMPACT_PARAM_SPECS: list[dict] = [
                           "Warmsen × 0,622–0,904 (Bericht #95 §3.3, Tabelle „Gemessene "
                           "Wirkung“); die Richtung der Korrektur hängt an der Aufteilung nicht.",
      }},
+    # ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5, Kapitel 7, Befunde 122, 124, 130) ──
+    # Wirkt nur über die Maßnahme COOLING_ROOMS_DRINKING_WATER mit Eingabe s_gek
+    # (measure_service); auf die Basisrechnung ohne Maßnahme hat keiner der beiden Werte Einfluss.
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "ror_s157", "value": 0.93,
+     "label": "S157: Verhältnis der Odds des Todes an Extremhitzetagen, Heime mit gegen ohne "
+              "Klimaanlage (rOR)", "unit": "Faktor",
+     "source": "Katz u. a. 2026 [46] (Bericht #95 §5, Block heat.ror_s157)",
+     "source_detail": "Case-Crossover-Studie Ontario 2010–2023, 73.578 Todesfälle in 615 Heimen: "
+                      "an Extremhitzetagen Odds ohne Klimaanlage 1,11 (1,06–1,16), mit "
+                      "Klimaanlage 1,03 (0,98–1,07); Verhältnis ohne gegen mit 1,08 (1,01–1,15), "
+                      "umgekehrt 0,93 (Band 0,87–0,99). Keine Setzung (Log 40); Register "
+                      "95-S157-01.",
+     "source_refs": [],
+     # Kennzeichnung im Bericht: quelle (Kehrwert aus [46]); [46] steht noch nicht
+     # in der Bibliografie, deshalb explizit statt über aufgelöste Referenzen.
+     "evidence_class": "belegt"},
+    # Wert ungerundet aus der Formel des Berichts: Block heat.g_s157 nennt 0,29, das
+    # Rechenbeispiel s157_berlin (25,0 Mio. €) rechnet mit g(0,93) = 0,2936 — mit 0,29
+    # ergäbe Berlin 25,1 Mio. €. Divergenz an den CMO gemeldet (T-1367).
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "g_s157", "value": (0.93 * 1.11 - 1) / (1.11 - 1),
+     "label": "S157: Exzessfaktor gekühlter Heimplätze g_S157 (Anteil des Hitze-Exzesses, "
+              "der mit Klimaanlage bleibt)", "unit": "Anteil",
+     "source": "Abschätzung von KAP3 aus Katz u. a. 2026 [46] (Bericht #95 §5, Block heat.g_s157)",
+     "source_detail": "g_S157 = (rOR × OR_ohne − 1)/(OR_ohne − 1) = (0,93 × 1,11 − 1)/0,11 = "
+                      "0,29: mit Klimaanlage bleiben 29 % des Hitze-Exzesses, 71 % fallen weg. "
+                      "Wirkt nur auf D_85+ × h_Heim × s_gek (Todesfälle 85+ der Heimbewohner im "
+                      "gekühlten Anteil der Heimplätze); h_Heim = q̄_pfl × [1 + β_pfl × "
+                      "(1 − q̄_pfl)] = 0,344. Andockpunkt: Maßnahme „Kühle Räume / Kühlzentren“ "
+                      "(COOLING_ROOMS_DRINKING_WATER).",
+     "source_refs": [],
+     "evidence_class": "abgeschaetzt",
+     "evidence_derivation": {
+         "wert": "0,29 = (0,93 × 1,11 − 1)/(1,11 − 1) aus rOR 0,93 und OR_ohne 1,11 [46]; "
+                 "Setzung: derselbe Anteil gilt in allen Hitzewochen des Modells, nicht nur an "
+                 "den Extremtagen von [46] (Bericht #95 §5, Befund 124).",
+         "band": "0–0,90 aus dem Band von rOR (0,87 ⇒ 0, 0,99 ⇒ 0,90); OR_ohne über sein "
+                 "Intervall 1,06–1,16 ergibt 0–0,49, beide Intervalle zugleich 0–0,83 "
+                 "(Befund 132).",
+         "sensitivitaet": "Berlin, alle Heimplätze gekühlt: 25,0 Mio. € je Jahr, Band "
+                          "3,6–35,4 Mio. € (Bericht #95 §5, Beispiel-Block s157_berlin); "
+                          "0,93 unmittelbar auf den Exzess ergäbe nur 2,5 Mio. €.",
+     }},
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_dist_km", "value": 0.0,
      "label": "Distanz-Effekt (Sensitivität)", "unit": "1/km",
      "source": "Nicholl u. a. 2007 (Sensitivitätsband, Basiswert 0)",

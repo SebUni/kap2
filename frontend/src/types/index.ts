@@ -125,6 +125,10 @@ export interface MeasureImpactSummary {
   benefit_display?: string | null
   /** Zusatz „ohne x Wirkungen im Screening“ zum Euro-Nutzen einer gemischten Maßnahme. */
   benefit_note?: string | null
+  /** S157 (#95 §5): gekühlter Anteil der Heimplätze 0..1, Eingabe der Kommune; null = nicht eingegeben (kein Betrag). */
+  s_gek?: number | null
+  /** Name der fehlenden Eingabe, wenn deshalb kein Betrag entsteht (S157: "s_gek"). */
+  benefit_missing_input?: string | null
   count?: number
   count_is_default?: boolean
   recommended_count?: number
