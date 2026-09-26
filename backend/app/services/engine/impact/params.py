@@ -220,6 +220,28 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "Bevölkerung 85+ (2.844.213) = 0,149. Zentrierungsmittel des "
                       "β_pfl-Terms (Golden-Test beispiel_95_or_uebersetzungen).",
      "source_refs": ["Destatis_Pflegestatistik_2023"]},
+    # ── Ersatzregel für den geheimgehaltenen Anteil 65+ (Bericht #95 §3.3, Log 41) ──
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "anteil_60_66_ab65", "value": 2 / 7,
+     "label": "Anteil der Gruppe 60–66, der zu den Menschen ab 65 zählt (Ersatzregel 65+)",
+     "unit": "Anteil",
+     "source": "Abschätzung von KAP3 (Bericht #95 §3.3, Entscheidungslog Nr. 41)",
+     "source_detail": "Stufe 2 der Ersatzregel für Zellen mit geheimgehaltenem Anteil 65+: "
+                      "Anteil ab 65 der Gemeinde A_G = (Einwohner ab 67 + 2/7 × Gruppe 60–66) "
+                      "/ Einwohner, alle drei Zahlen aus der Zensus-2022-Regionaltabelle "
+                      "„Demografie“. Die Tabelle trennt bei 67, nicht bei 65; von den sieben "
+                      "Jahrgängen 60–66 zählen die Jahrgänge 65 und 66, also 2/7 — unter der "
+                      "Annahme gleich vieler Menschen je Jahrgang. Anlage "
+                      "backend/data/kalibrierung/zensus2022_demografie_ab65.csv.",
+     "source_refs": ["Destatis_Zensus2022_Gemeinden"],
+     "evidence_class": "abgeschaetzt",
+     "evidence_derivation": {
+         "wert": "2/7: Jahrgänge 65 und 66 von den sieben Jahrgängen 60–66, gleich viele "
+                 "Menschen je Jahrgang angenommen (Bericht #95 §3.3, Stufe 2, Schritt 1).",
+         "band": "0/7 bis 7/7 (Gruppe 60–66 gar nicht oder ganz zu den Menschen ab 65).",
+         "sensitivitaet": "Faktor heute gegen Regel über das Band: Berlin × 0,925–0,998, "
+                          "Warmsen × 0,622–0,904 (Bericht #95 §3.3, Tabelle „Gemessene "
+                          "Wirkung“); die Richtung der Korrektur hängt an der Aufteilung nicht.",
+     }},
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_dist_km", "value": 0.0,
      "label": "Distanz-Effekt (Sensitivität)", "unit": "1/km",
      "source": "Nicholl u. a. 2007 (Sensitivitätsband, Basiswert 0)",
