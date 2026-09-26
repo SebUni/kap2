@@ -350,7 +350,33 @@ def _graph_98() -> tuple[dict, list[dict]]:
 
 
 
-# ── #95 Hitzebelastung (Ziel-Modell laut Bericht Rev. 7) ─────────────────────
+# ── Stand aus der Statuszeile des Berichts ───────────────────────────────────
+
+def bericht_stand(nr: str) -> dict:
+    """Revision und Integrationsstand aus der Statuszeile des Methodik-Berichts.
+
+    Liest die Zeile „Status: **Rev. N, …**“ und, falls vorhanden, den Satz
+    „im Produkt stehen … noch aus“ aus dem Kopf des Berichts. Nichts davon ist
+    im Skript fest eingetragen; fehlt eine Angabe, steht das ausdrücklich da.
+    """
+    files = sorted(OUT_DIR.glob(f"{nr}_*.md"))
+    kopf = ""
+    if files:
+        kopf = "\n".join(files[0].read_text(encoding="utf-8").splitlines()[:20])
+    m = re.search(r"^Status:\s*\*\*(.+?)\*\*", kopf, re.M | re.S)
+    status = m.group(1).strip() if m else ""
+    r = re.match(r"(Rev\.\s*\d+)", status)
+    revision = r.group(1) if r else "Revision unbekannt"
+    i = re.search(r"im Produkt stehen\s+(.+?)\s+noch aus", kopf, re.S)
+    if i:
+        offen = re.sub(r"\s+", " ", i.group(1)).strip()
+        integration = f"Im Produkt stehen noch aus: {offen}."
+    else:
+        integration = "Integrationsstand steht nicht in der Statuszeile des Berichts."
+    return {"revision": revision, "status": status, "integration": integration}
+
+
+# ── #95 Hitzebelastung (Ziel-Modell laut Bericht, Revision aus Statuszeile) ──
 
 def _graph_95_plan() -> tuple[dict, list[dict]]:
     b = LineageBuilder()
@@ -530,8 +556,10 @@ def build_payload(nr: str) -> dict:
     if nr == "95":
         from app.data import catalog
         g, p = _graph_95_plan()
+        stand = bericht_stand("95")
+        rev = stand["revision"]
         tabs = [{
-            "label": "Ziel-Modell (Bericht Rev. 7): YLL & €",
+            "label": f"Ziel-Modell (Bericht {rev}): YLL & €",
             "note": "So wird #95 nach der Integration (cto-integration 95) im Produkt gerechnet und "
                     "dargestellt (YLL × VOLY, empirische Wochenquantile, ein nationaler "
                     "Skalar c_kal 0,581 auf bevölkerungsgewichteter Kalibrierbasis, "
@@ -547,22 +575,19 @@ def build_payload(nr: str) -> dict:
             if code in catalog.RISKS_BY_CODE:
                 tabs.append({
                     "label": label,
-                    "note": "Ist-Stand aus Backend-Registry/Lineage-Builder — seit der "
-                            "Integration (30.08.2026) der Rev.-7-Stand (Befund 76 "
-                            "geschlossen).",
+                    "note": "Ist-Stand aus Backend-Registry/Lineage-Builder. "
+                            + stand["integration"],
                     "lineage": lineage_graph.build_risk_lineage(code),
                     "parameters": params,
                 })
         return {
             "title": "#95 Hitzebelastung",
-            "subtitle": "Ziel-Modell laut Methodik-Bericht Rev. 7 "
+            "subtitle": f"Ziel-Modell laut Methodik-Bericht {rev} "
                         "(docs/methodik/95_hitzebelastung.md); Ist-Produktstand als "
                         "Vergleichstabs.",
-            "banner": "Integration vollzogen (30.08.2026): Das Produkt rechnet den "
-                      "Rev.-7-Stand des abgenommenen Berichts (YLL × VOLY, empirische "
-                      "Wochenquantile, c_kal 0,581). Die Ist-Tabs kommen live aus "
-                      "Backend-Registry/Lineage-Builder; Ledger-Befund 76 ist "
-                      "geschlossen.",
+            "banner": f"Stand laut Statuszeile des Berichts: {stand['status']}. "
+                      + stand["integration"]
+                      + " Die Ist-Tabs kommen live aus Backend-Registry/Lineage-Builder.",
             "generated": today,
             "tabs": tabs,
         }
