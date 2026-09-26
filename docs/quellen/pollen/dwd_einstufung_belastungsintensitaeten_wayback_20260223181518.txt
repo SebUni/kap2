@@ -1,0 +1,23 @@
+https://web.archive.org/web/20260223181518/https://www.dwd.de/DE/leistungen/gefahrenindizespollen/erklaerungen.html — Abruf 26.09.2026
+
+Textabbild (maschinell aus dem HTML gewonnen, nur Hauptbereich; Navigation, Kopf- und Fußleiste weggelassen).
+Seitentitel: Wetter und Klima - Deutscher Wetterdienst - Leistungen - Einstufung der Belastungsintensitäten
+Quelle im Bericht: docs/methodik/96_aeroallergene.md, Kapitel 8, [70].
+Snapshot vom 23.02.2026, 18:15:18 UTC; Rohabruf über https://web.archive.org/web/20260223181518id_/https://www.dwd.de/DE/leistungen/gefahrenindizespollen/erklaerungen.html.
+Vergleich mit der Live-Seite vom 26.09.2026: Hauptbereich wortgleich (siehe dwd_einstufung_belastungsintensitaeten_live.txt).
+SHA-256 des abgerufenen HTML: 121a9d62f8451a7d4152a6b38ad6d2e090b6b14cf994cfc0262191dc38a04a06
+
+---
+
+Einstufung der Belastungsintensitäten
+Einstufung der Belastungsintensität entsprechend der Pollenkonzentration 1) (Anzahl Pollen als Tagesmittelwerte pro m3 Luft)
+| | keine Belastung | geringe Belastung | mittlere Belastung | hohe Belastung |
+| Hasel | 0 | 1 - 10 | 11 - 100 | Über 100 |
+| Erle | 0 | 1 - 10 | 11 - 100 | Über 100 |
+| Esche | 0 | 1 - 50 | 51 - 75 | Über 75 |
+| Birke | 0 | 1 - 10 | 11 - 50 | Über 50 |
+| Gräser | 0 | 1 - 5 | 6 - 30 | Über 30 |
+| Roggen | 0 | 1 - 2 | 3 - 6 | Über 6 |
+| Beifuß | 0 | 1 - 5 | 6 - 10 | Über 10 |
+| Ambrosia | 0 | 1 - 5 | 6 - 10 | Über 10 |
+Bei der Darstellung des Pollenflug-Gefahrenindex werden zusätzlich Zwischenabstufungen verwendet (z. B. mittlere bis hohe Belastung). Dies erscheint sinnvoll, da insbesondere aufgrund der Größe der Vorhersagegebiete innerhalb eines Gebietes sowohl die eine als auch die andere Belastung vorkommen kann.

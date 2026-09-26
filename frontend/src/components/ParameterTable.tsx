@@ -31,7 +31,8 @@ function HiddenChip() {
 
 /**
  * Beleglage je Parameter (Vorgabe P1): ohne Klick und ohne Hover lesbar, ob der
- * Wert belegt ist oder eine begründete Abschätzung von KAP3. Der Wert kommt aus
+ * Wert belegt ist, aus amtlichen Daten berechnet oder eine begründete Abschätzung
+ * von KAP3. Der Wert kommt aus
  * dem Backend-Feld `evidence_class` — keine Heuristik über den Freitext `source`.
  * Die Herleitung (Wert, Bandbreite, Sensitivität bzw. der Vermerk) ist über die
  * sichtbare Schaltfläche „Herleitung“ als Text in der Tabelle aufklappbar; der
@@ -42,17 +43,24 @@ function EvidenceCell({ p }: { p: ModelParameter }) {
   // Demo: bei verborgenen Ebenen bleibt die Spalte leer (demo_hidden nicht umgehen).
   if (p.demo_hidden) return null
   const abgeschaetzt = p.evidence_class === 'abgeschaetzt'
+  const berechnet = p.evidence_class === 'berechnet'
+  const klassenName = abgeschaetzt ? 'is-estimated' : berechnet ? 'is-computed' : 'is-sourced'
+  const anzeige = abgeschaetzt
+    ? 'abgeschätzt (KAP3)'
+    : berechnet ? 'berechnet aus amtlichen Daten' : 'belegt'
   const d = p.evidence_derivation
   const hatHerleitung = Boolean(d || p.evidence_note)
   return (
     <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <span style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-        <span className={`kap-param-evidence ${abgeschaetzt ? 'is-estimated' : 'is-sourced'}`}>
-          {abgeschaetzt ? 'abgeschätzt (KAP3)' : 'belegt'}
+        <span className={`kap-param-evidence ${klassenName}`}>
+          {anzeige}
         </span>
         {d && (
           <InfoTooltip
-            title={abgeschaetzt ? 'Abschätzung KAP3 — Herleitung' : 'Beleglage — Herleitung'}
+            title={abgeschaetzt
+              ? 'Abschätzung KAP3 — Herleitung'
+              : berechnet ? 'Berechnet aus amtlichen Daten — Herleitung' : 'Beleglage — Herleitung'}
             description={p.evidence_note}
             rows={[
               { label: 'Wert', value: d.wert },
