@@ -43,6 +43,25 @@ def _risk_worker(idx: int) -> tuple[int, dict]:
     # GeoPackage-Export erhält gefüllte Spalten.
     ctx = CellContext(ci=ci, hev=hev, hev_norm=hev_norm, indices=indices, regional=regional)
     impacts = impact.compute_all_cell_impacts(ctx)
+    risks = build_cell_risks(indices, impacts)
+
+    data = {
+        "hazards": hev["hazards"],
+        "exposures": hev["exposures"],
+        "vulnerabilities": hev["vulnerabilities"],
+        "risks": risks,
+        "auxiliary": build_auxiliary(ci, regional),
+        "inputs": {
+            k: (round(v, 4) if isinstance(v, float) else v)
+            for k, v in ci.items()
+            if k not in ("grid_cell_id", "row", "col")
+        },
+    }
+    return idx, {"grid_cell_id": ci["grid_cell_id"], "data": data}
+
+
+def build_cell_risks(indices: dict[str, float], impacts: dict[str, dict]) -> dict[str, dict]:
+    """Gespeicherte ``risks``-Einträge einer Zelle aus Index und Schadensfunktions-Ergebnis."""
     risks: dict[str, dict] = {}
     for code, risk_idx in indices.items():
         imp = impacts.get(code, {})
@@ -65,24 +84,14 @@ def _risk_worker(idx: int) -> tuple[int, dict]:
         # rechnet nativ YLL und weist die Todesfälle zusätzlich aus.
         if "deaths" in imp:
             risks[code]["deaths"] = round(imp["deaths"], 6)
+        # Teilwert Todesfälle ab 85 (Bericht #95 §5): Basis für S157 (Kühlung in Heimen).
+        if "deaths_a85p" in imp:
+            risks[code]["deaths_a85p"] = round(imp["deaths_a85p"], 6)
         # UV (#98 §3.4): nativ YLL, Zusatzfälle je Entität als Teil-Ausweis.
         for key in ("cases_melanoma", "cases_c44"):
             if key in imp:
                 risks[code][key] = round(imp[key], 6)
-
-    data = {
-        "hazards": hev["hazards"],
-        "exposures": hev["exposures"],
-        "vulnerabilities": hev["vulnerabilities"],
-        "risks": risks,
-        "auxiliary": build_auxiliary(ci, regional),
-        "inputs": {
-            k: (round(v, 4) if isinstance(v, float) else v)
-            for k, v in ci.items()
-            if k not in ("grid_cell_id", "row", "col")
-        },
-    }
-    return idx, {"grid_cell_id": ci["grid_cell_id"], "data": data}
+    return risks
 
 
 def run_full_assessment(

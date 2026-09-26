@@ -129,6 +129,87 @@ def _reduction_factor(mdef: dict, fraction: float, unit_factor: float = 1.0) -> 
     return (1.0 - r) ** n
 
 
+# ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5; Maßnahme COOLING_ROOMS_DRINKING_WATER) ──
+# Die Wirkung ist kein default_reduction-Faktor auf den Index, sondern
+# ΔD_S157 = D_85+ · h_Heim · s_gek · (1 − g_S157) je Zelle, bewertet mit L̄_85+ (YLL).
+# Im bestehenden multiplikativen Rahmen wird daraus je Zelle der Faktor
+# 1 − ΔYLL_S157 / YLL_Zelle auf das Mortalitäts-Outcome — so bleiben Einzelnutzen
+# und Aggregat „mit Maßnahmen“ dieselbe Rechnung.
+
+S157_RISK_CODE = "EXPECTED_ANNUAL_MORTALITY"
+S157_NO_INPUT_TEXT = ("kein Betrag: gekühlter Anteil der Heimplätze (s_gek) "
+                      "nicht eingegeben")
+
+
+def _is_s157(mdef: dict) -> bool:
+    return mdef.get("effect_model") == "s157"
+
+
+def _s157_input(config: dict | None) -> float | None:
+    """Eingabe s_gek der Kommune (Anteil 0..1) aus der Maßnahmen-Konfiguration.
+
+    Der Bericht trägt keine Voreinstellung; fehlt die Eingabe, gilt None —
+    dann entsteht kein Betrag (auch keine 0).
+    """
+    raw = (config or {}).get("s_gek")
+    if raw is None or raw == "":
+        return None
+    try:
+        return max(0.0, min(1.0, float(raw)))
+    except (TypeError, ValueError):
+        return None
+
+
+def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict) -> float:
+    """Faktor (0..1) auf das Mortalitäts-Outcome (YLL) einer Zelle durch S157.
+
+    ``frac`` ist der Deckungsgrad der Zelle durch die Maßnahmen-Geometrie; der
+    gekühlte Anteil wirkt nur im abgedeckten Teil (bei ganzer Kommune = 1).
+    Zellen ohne Teil-Ausweis D_85+ (vor der Neuberechnung) bleiben unverändert.
+    """
+    from app.services.engine.impact import health
+
+    if s_gek is None or frac <= 0.0:
+        return 1.0
+    yll = float(cell_risk.get("outcome") or 0.0)
+    d85 = cell_risk.get("deaths_a85p")
+    if yll <= 0.0 or d85 is None:
+        return 1.0
+
+    def _p(key: str, default: float) -> float:
+        v = override_context.get_override(f"risks.{S157_RISK_CODE}.impact.{key}", default)
+        return float(v) if v is not None else default
+
+    delta_d = health.s157_avoided_deaths(
+        float(d85), s_gek * max(0.0, min(1.0, frac)),
+        g_s157=_p("g_s157", health.G_S157), qbar_pfl=_p("qbar_pfl", 0.149),
+        beta_pfl=_p("beta_pfl", 1.54)) or 0.0
+    delta_yll = delta_d * _p("life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
+    return max(0.0, min(1.0, 1.0 - delta_yll / yll))
+
+
+def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float,
+                         unit_factor: float, cell_risk: dict) -> float:
+    """Faktor einer Maßnahme auf ein verknüpftes Risiko in einer Zelle."""
+    if _is_s157(mdef):
+        if code != S157_RISK_CODE:
+            return 1.0
+        return _s157_cell_factor(_s157_input(config), frac, cell_risk)
+    return _reduction_factor(mdef, frac, unit_factor)
+
+
+def _s157_summary_fields(mdef: dict, config: dict | None) -> dict:
+    """Zusatzfelder des impact_summary für S157 (Eingabe und Vermerk ohne Eingabe)."""
+    if not _is_s157(mdef):
+        return {}
+    s_gek = _s157_input(config)
+    out: dict = {"s_gek": s_gek}
+    if s_gek is None:
+        out["benefit_display"] = S157_NO_INPUT_TEXT
+        out["benefit_missing_input"] = "s_gek"
+    return out
+
+
 def _resolve_count(
     mdef: dict, config: dict | None, covered_area_m2: float
 ) -> tuple[int, bool, int]:
@@ -470,13 +551,13 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         ca = assessments.get(cid)
         if not ca:
             continue
-        factor = _reduction_factor(mdef, frac, unit_factor)
         data = ca.data or {}
         cell_pop = float(data.get("inputs", {}).get("pop", 0.0) or 0.0)
         cell_risks = data.get("risks", {})
         deltas = {}
         for code in linked:
             r = cell_risks.get(code, {})
+            factor = _measure_cell_factor(mdef, measure.config, code, frac, unit_factor, r)
             base_idx = float(r.get("index", 0.0))
             new_idx = base_idx * factor
             deltas[code] = round(new_idx - base_idx, 3)
@@ -589,6 +670,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # ``annual_benefit_eur`` bleibt eine Zahl (Klasse-A-Anteil + direkter Nutzen),
         # weil Export und Maßnahmentabelle sie als Zahl lesen.
         **_benefit_euro_layer_fields(linked, annual_benefit_direct),
+        # S157 ohne Eingabe s_gek: Vermerk statt Betrag (Bericht #95 §5 trägt keine
+        # Voreinstellung; Divergenz an den CMO, T-1367).
+        **_s157_summary_fields(mdef, measure.config),
         "params_fingerprint": fingerprint,
         "count": count,
         "count_is_default": count_is_default,
@@ -651,9 +735,11 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
         count, _, recommended = _resolve_count(mdef, m.config, covered_area_m2)
         unit_factor = _unit_effect_factor(count, recommended)
         for cid, frac in frac_map.items():
-            factor = _reduction_factor(mdef, frac, unit_factor)
             cell_factors = factors.setdefault(cid, {})
+            cell_risks = (base.get(cid) or {}).get("risks", {})
             for code in mdef.get("linked_risk_codes", []):
+                factor = _measure_cell_factor(mdef, m.config, code, frac, unit_factor,
+                                              cell_risks.get(code, {}))
                 cell_factors[code] = cell_factors.get(code, 1.0) * factor
 
     out = []
