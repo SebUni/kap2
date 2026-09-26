@@ -495,10 +495,79 @@ def _graph_95_plan() -> tuple[dict, list[dict]]:
                meta={"unit": "1/Jahr"})
     b.add_edge(mul_d, "int:d_faelle")
 
+    # Maßnahmen-Hebel (Bericht §5): Hitzeaktionsplan δ_HAP, Kühlräume S157,
+    # Schutzprogramme vulnerable Gruppen δ_VG — Faktoren auf den Exzess.
+    b.add_node("mass:hap", "vulnerability", "Maßnahme Hitzeaktionsplan (S158, δ_HAP)",
+               column=1, collapse_group="indicators",
+               meta={"note": "Faktor δ_HAP auf den Wochenexzess (RR − 1) aller Bänder "
+                             "(Bericht §5)."})
+    b.add_node("mass:s157", "vulnerability",
+               "Maßnahme Kühlräume und Trinkwasser (S157, COOLING_ROOMS_DRINKING_WATER)",
+               column=1, collapse_group="indicators",
+               meta={"note": "Gekühlte Heimplätze: Exzessfaktor g_S157 nur auf den Exzess "
+                             "85+ der Heimbewohner im gekühlten Anteil s_gek (Eingabe der "
+                             "Kommune); im Produkt heute geparkt (Bericht §5, Befund 130)."})
+    b.add_node("mass:vg", "vulnerability",
+               "Maßnahme Schutzprogramme vulnerable Gruppen (S152, "
+               "VULNERABLE_GROUP_PROGRAMS)",
+               column=1, collapse_group="indicators",
+               meta={"note": "Hitzetelefon, aufsuchende Betreuung, Besuchsdienste ab 75: "
+                             "Faktor δ_VG auf den Wochenexzess 75–84 und 85+ ohne "
+                             "Heimbewohner; Morbidität δ_VG,morb (Bericht §5)."})
+    op_s157 = _op(b, "op:compute:g_s157", "compute", "g_S157",
+                  "Übersetzung des Odds-Verhältnisses auf den Exzess (Abschätzung von "
+                  "KAP3, Bericht §5): mit Klimaanlage bleibt der Anteil g des Exzesses.\n"
+                  r"$$g_{S157} = \frac{\mathrm{rOR}\cdot\mathrm{OR}_{ohne} - 1}"
+                  r"{\mathrm{OR}_{ohne} - 1},\quad \mathrm{OR}_{ohne} = 1{,}11$$")
+    b.add_edge("mass:s157", op_s157)
+    P("heat.ror_s157", "Klimaanlagen-Effekt rOR (S157)", 0.93, "—",
+      "Katz u. a. 2026 [46] (Kehrwert von rOR 1,08; Band 0,87–0,99)", op_s157)
+    P("heat.g_s157", "Exzessfaktor gekühlter Heimplätze g_S157", 0.29, "—",
+      "Abschätzung von KAP3 aus Katz u. a. 2026 [46] (Band 0–0,90)", op_s157,
+      "wirkt nur auf D₈₅₊ × h_Heim × s_gek; mit δ_HAP multiplikativ (Befund 129).")
+    b.add_node("int:g_s157", "intermediate", "Heim-Exzess 85+ mit Kühlräumen",
+               column=2, collapse_group="intermediates")
+    b.add_edge(op_s157, "int:g_s157")
+    op_vg = _op(b, "op:compute:delta_vg", "compute", "δ_VG",
+                "Schutzprogramme vulnerable Gruppen (Abschätzung von KAP3, Bericht §5), "
+                "mit dem Hitzeaktionsplan zusammen gekappt am Paketwert Deutschland "
+                "0,794 [47].\n"
+                r"$$\delta_{VG} = 1 - r_{VG}\,w_{VG} = 1 - 0{,}20 \times 0{,}34;\quad"
+                r"\ \max(\delta_{HAP}\,\delta_{VG};\ 0{,}794)$$")
+    b.add_edge("mass:vg", op_vg)
+    P("heat.delta_vg", "Faktor Schutzprogramme δ_VG (Mortalität)", 0.931, "—",
+      "Abschätzung von KAP3 aus Liotta 2018 [70] / Urban 2025 [47] "
+      "(Band 0,794–1,0)", op_vg,
+      "auf den Wochenexzess 75–84 und 85+ ohne Heimbewohner, nicht auf v_vers,a.")
+    b.add_node("int:delta_vg", "intermediate", "Exzess 75+ zu Hause mit Schutzprogrammen",
+               column=2, collapse_group="intermediates")
+    b.add_edge(op_vg, "int:delta_vg")
+
+    mul_hebel = _op(b, "op:mul:hebel", "multiply", "×",
+                    "Maßnahmen-Hebel auf die Todesfälle je Band (Bericht §5; ohne gewählte "
+                    "Maßnahme ist jeder Faktor 1, s_gek = 0).\n"
+                    r"$$D'_{a<75} = D_a\,\delta_{HAP},\quad "
+                    r"D'_{75\text{–}84} = D_{75\text{–}84}\,\max(\delta_{HAP}\delta_{VG};\,0{,}794)$$"
+                    "\n"
+                    r"$$D'_{85+} = D_{85+}\bigl[(1-h_{Heim})\max(\delta_{HAP}\delta_{VG};\,0{,}794)"
+                    r" + h_{Heim}\,\delta_{HAP}\,(1 - s_{gek}(1-g_{S157}))\bigr]$$"
+                    "\n"
+                    r"$$h_{Heim} = \bar q_{pfl}\,[1 + \beta_{pfl}(1-\bar q_{pfl})] = 0{,}344$$")
+    b.add_edge("int:d_faelle", mul_hebel)
+    b.add_edge("mass:hap", mul_hebel)
+    b.add_edge("int:g_s157", mul_hebel)
+    b.add_edge("int:delta_vg", mul_hebel)
+    P("heat.delta_hap", "Faktor Hitzeaktionsplan δ_HAP", 0.95, "—",
+      "Abschätzung von KAP3 aus Feldbusch 2025 [45] (Band 0,85–1,00)", mul_hebel,
+      "auf den Wochenexzess aller Bänder (Bericht §5).")
+    b.add_node("int:d_mass", "intermediate", "Hitzebedingte Todesfälle D nach Maßnahmen",
+               column=4, collapse_group="intermediates", meta={"unit": "1/Jahr"})
+    b.add_edge(mul_hebel, "int:d_mass")
+
     mul_yll = _op(b, "op:mul:yll", "multiply", "×",
                   "Mortalitätsbewertung nach MK 4.0/P52: YLL statt Todesfall-Pauschale.\n"
-                  r"$$\mathrm{YLL}_z = \sum_a D_a \cdot \bar L_a$$")
-    b.add_edge("int:d_faelle", mul_yll)
+                  r"$$\mathrm{YLL}_z = \sum_a D'_a \cdot \bar L_a$$")
+    b.add_edge("int:d_mass", mul_yll)
     P("heat.l_restlebenserwartung", "Restlebenserwartung L̄_a",
       "23,39 / 15,59 / 8,90 / 4,16", "Jahre",
       "Sterbetafel 2022/2024 × Sterbefälle 2023 (§3.5; 85+ exakt sterbefallgewichtet, Rev. 8)", mul_yll)
@@ -529,13 +598,26 @@ def _graph_95_plan() -> tuple[dict, list[dict]]:
     b.add_node("int:f_faelle", "intermediate", "Erkrankungsfälle F (Teil-Ausweis)",
                column=4, collapse_group="intermediates", meta={"unit": "1/Jahr"})
     b.add_edge(mul_f, "int:f_faelle")
+    mul_vg_morb = _op(b, "op:mul:vg_morb", "multiply", "×",
+                      "Schutzprogramme vulnerable Gruppen auf die Einweisungen ab 75 "
+                      "außerhalb der Heime (Bericht §5, Befund 131; ohne gewählte "
+                      "Maßnahme 1).\n"
+                      r"$$F' = F_{a<75} + [F_{75\text{–}84} + F_{85+}(1-h_{Heim})]\,"
+                      r"\delta_{VG,morb} + F_{85+}\,h_{Heim}$$")
+    b.add_edge("int:f_faelle", mul_vg_morb)
+    b.add_edge("mass:vg", mul_vg_morb)
+    P("heat.delta_vg_morb", "Faktor Schutzprogramme δ_VG,morb (Morbidität)", 1.0, "—",
+      "Abschätzung von KAP3 (Band 0,931–1,069; Richtung nicht gemessen)", mul_vg_morb)
+    b.add_node("int:f_mass", "intermediate", "Erkrankungsfälle F nach Maßnahmen",
+               column=4, collapse_group="intermediates", meta={"unit": "1/Jahr"})
+    b.add_edge(mul_vg_morb, "int:f_mass")
 
     # €
     cost = _op(b, "op:cost", "cost_rate", "Kostensatz",
                "Monetarisierung K1 (Ursache Hitze).\n"
-               r"$$€_z = \mathrm{YLL}_z \cdot \mathrm{VOLY} + F_z \cdot c_{Fall}$$")
+               r"$$€_z = \mathrm{YLL}_z \cdot \mathrm{VOLY} + F'_z \cdot c_{Fall}$$")
     b.add_edge("out:native", cost)
-    b.add_edge("int:f_faelle", cost)
+    b.add_edge("int:f_mass", cost)
     P("heat.voly", "VOLY", 160800, "€₂₀₂₄/Jahr",
       "UBA MK 4.0 / Amann 2020a (P52; VSL nur Sensitivität)", cost)
     P("heat.c_fall", "Behandlungskosten je Fall", 7152, "€₂₀₂₄",
