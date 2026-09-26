@@ -200,6 +200,24 @@ def worker_main(kommune_id: int) -> int:
             except Exception:
                 centroid = None
 
+        # Gemeindeschlüssel der Kommune für Stufe 2 der Ersatzregel 65+ (Bericht #95
+        # §3.3): Gemeinde (VG250), die einen inneren Punkt der Kommune enthält. Fehlt
+        # die Tabelle oder trifft kein Polygon, entfällt Stufe 2 (65+ = 0 in diesen Zellen).
+        ags = None
+        if kommune is not None and kommune.boundary is not None:
+            try:
+                from sqlalchemy import func
+                from app.models.lite_models import Gemeinde
+                pt = to_shape(kommune.boundary).representative_point()
+                hit = (db.query(Gemeinde.ags)
+                       .filter(func.ST_Contains(Gemeinde.geometry,
+                                                func.ST_SetSRID(func.ST_MakePoint(pt.x, pt.y), 4326)))
+                       .first())
+                ags = hit[0] if hit else None
+            except Exception:  # noqa: BLE001 — die Zuordnung darf das Assessment nie kippen
+                db.rollback()
+                ags = None
+
         _last_pct = [0.0]
         _last_phase = [""]
         _steps: list[dict] = []
@@ -249,7 +267,7 @@ def worker_main(kommune_id: int) -> int:
         set_overrides(overrides)
         results = run_full_assessment(
             grid_cell_dicts, bundesland, population, area_km2, progress, overrides, osm_id,
-            centroid,
+            centroid, ags,
         )
 
         update_progress(FINALIZE[0], "Speichere Ergebnisse")
