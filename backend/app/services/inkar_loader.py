@@ -127,8 +127,19 @@ def resolve_ags(osm_id: str | None) -> str | None:
             val = tags.get(key)
             if val:
                 digits = re.sub(r"\D", "", val)
-                if digits:
-                    return digits[:8]
+                if not digits:
+                    continue
+                if key == "de:regionalschluessel":
+                    # Regionalschlüssel (12): Land 2, RB 1, Kreis 2, Verband 4, Gemeinde 3.
+                    # Gemeindeschlüssel = Stellen 1–5 und 10–12.
+                    if len(digits) != 12:
+                        log.warning(
+                            "resolve_ags: Regionalschlüssel %r der OSM-Relation %s hat %d statt 12 Stellen",
+                            val, rid, len(digits),
+                        )
+                        continue
+                    return digits[:5] + digits[9:12]
+                return digits[:8]
     log.info("resolve_ags: kein AGS-Tag in OSM-Relation %s", rid)
     return None
 
