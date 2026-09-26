@@ -36,9 +36,9 @@ def _nach_code(eintraege):
     return {e["code"]: e for e in eintraege}
 
 
-def test_a_einundzwanzig_eintraege_in_katalogreihenfolge():
+def test_a_zweiundzwanzig_eintraege_in_katalogreihenfolge():
     eintraege = dienst.bestandsaufnahme_aus_daten(ZELLEN, SOZIO)
-    assert len(eintraege) == 21
+    assert len(eintraege) == 22
     assert [e["code"] for e in eintraege] == [g["code"] for g in katalog.BESTANDSAUFNAHME_GROESSEN]
     for e, g in zip(eintraege, katalog.BESTANDSAUFNAHME_GROESSEN):
         assert list(e.keys()) == FELDER + (["hinweis"] if "hinweis" in g else [])
@@ -167,6 +167,42 @@ def test_bevoelkerungsentwicklung_ohne_gemeinde_ags_ist_laufzeitsatz(monkeypatch
     assert gefragt == []
     assert g["wert"] is None and "zusatz" not in g
     assert g["luecke_satz"] == katalog.LAUFZEITSATZ_VORLAGE.format(label="Bevölkerungsentwicklung")
+
+
+def test_starkregenereignisse_anzahl_und_juengstes_datum_per_stub(monkeypatch):
+    from shapely.geometry import box
+
+    from app.data import catrare
+
+    _ohne_db(monkeypatch, "14612000")
+    flaeche = box(13.0, 51.0, 14.0, 52.0)
+    monkeypatch.setattr(dienst, "_flaeche_der_kommune", lambda db, k: flaeche)
+    gefragt = []
+
+    def _ereignisse(f):
+        gefragt.append(f)
+        return [{"id": "a", "beginn": "2005-07-01T10:00:00"},
+                {"id": "b", "beginn": "2021-07-14T03:20:00"},
+                {"id": "c", "beginn": "2013-06-02T18:00:00"}]
+
+    monkeypatch.setattr(catrare, "ereignisse_in_flaeche", _ereignisse)
+    kommune = SimpleNamespace(id=3, name="Dresden", osm_id="R191645")
+    e = _nach_code(dienst.bestandsaufnahme_fuer_kommune(object(), kommune)["groessen"])
+    g = e["starkregenereignisse"]
+    assert gefragt == [flaeche]
+    assert g["wert"] == 3
+    assert g["luecke_satz"] == ""
+    assert g["zusatz"] == {"juengstes_beginn": "2021-07-14T03:20:00"}
+    assert e["schadensereignisse"]["wert"] is None
+
+
+def test_starkregenereignisse_ohne_flaeche_ist_laufzeitsatz_nie_null(monkeypatch):
+    _ohne_db(monkeypatch, "14612000")
+    monkeypatch.setattr(dienst, "_flaeche_der_kommune", lambda db, k: None)
+    kommune = SimpleNamespace(id=3, name="Dresden", osm_id="R191645")
+    g = _nach_code(dienst.bestandsaufnahme_fuer_kommune(object(), kommune)["groessen"])["starkregenereignisse"]
+    assert g["wert"] is None
+    assert g["luecke_satz"] == katalog.LAUFZEITSATZ_VORLAGE.format(label=g["label"])
 
 
 def test_sozialdaten_fehler_ergibt_leeres_dict(monkeypatch):

@@ -110,8 +110,24 @@ def test_netzknoten_ausserhalb_katalog():
     eintraege = querverbindungs_auswertung()["netzknoten_ausserhalb_katalog"]
     assert {e["kwra_id"] for e in eintraege} == erwartet
     for e in eintraege:
-        assert set(e.keys()) == {"kwra_id", "name", "handlungsfeld", "netzrollen", "zentral", "hinweis"}
+        assert set(e.keys()) == {
+            "kwra_id", "name", "handlungsfeld", "netzrollen", "zentral", "seiten", "hinweis",
+        }
         assert e["hinweis"] == "nicht im Katalog"
     je_id = {e["kwra_id"]: e for e in eintraege}
     assert 49 in je_id
     assert je_id[49]["zentral"] is True
+
+
+def test_seiten_je_netzrolle_in_beiden_listen():
+    # Seitenbeleg aus TB 6 Kap. 3.4 je Netzrolle (T-1072): mit Netzrolle nicht leer, ohne leer.
+    ergebnis = querverbindungs_auswertung()
+    eintraege = ergebnis["klimawirkungen"] + ergebnis["netzknoten_ausserhalb_katalog"]
+    assert any(e["netzrollen"] for e in eintraege)
+    for e in eintraege:
+        assert isinstance(e["seiten"], list)
+        assert all(isinstance(s, int) and not isinstance(s, bool) for s in e["seiten"])
+        if e["netzrollen"]:
+            assert e["seiten"], e["kwra_id"]
+        else:
+            assert e["seiten"] == [], e["kwra_id"]

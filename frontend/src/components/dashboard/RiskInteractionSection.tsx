@@ -27,10 +27,12 @@ const NETZROLLE_TEXT: Record<Netzrolle, string> = {
   'stark eingehend': 'stark eingehend (Empfänger)',
 }
 
-function netzrollenText(rollen: Netzrolle[], zentral: boolean): string {
+/** Netzrolle mit Seitenbeleg aus TB 6 Kap. 3.4, sichtbar ohne Hover, z. B. „stark ausgehend (Sender) (TB 6, S. 84, 88)“. */
+function netzrollenText(rollen: Netzrolle[], zentral: boolean, seiten: number[]): string {
   if (rollen.length === 0) return '—'
   const text = rollen.map(r => NETZROLLE_TEXT[r]).join(' und ')
-  return zentral ? `${text}, zentral` : text
+  const mitZentral = zentral ? `${text}, zentral` : text
+  return seiten.length > 0 ? `${mitZentral} (TB 6, S. ${seiten.join(', ')})` : mitZentral
 }
 
 export default function RiskInteractionSection({ className = '' }: { className?: string }) {
@@ -98,7 +100,7 @@ export default function RiskInteractionSection({ className = '' }: { className?:
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>#{k.kwra_id}</span>{' '}
                       {k.name}
                     </td>
-                    <td>{netzrollenText(k.netzrollen ?? [], k.zentral ?? false)}</td>
+                    <td>{netzrollenText(k.netzrollen ?? [], k.zentral ?? false, k.seiten ?? [])}</td>
                     <td style={{ textAlign: 'right' }}>{k.ausgehende_benannte}</td>
                     <td style={{ textAlign: 'right' }}>{k.eingehende_benannte}</td>
                   </tr>
@@ -112,7 +114,7 @@ export default function RiskInteractionSection({ className = '' }: { className?:
                         ({n.hinweis || 'nicht im Katalog'}; Handlungsfeld {n.handlungsfeld})
                       </span>
                     </td>
-                    <td>{netzrollenText(n.netzrollen, n.zentral)}</td>
+                    <td>{netzrollenText(n.netzrollen, n.zentral, n.seiten ?? [])}</td>
                     <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>—</td>
                     <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>—</td>
                   </tr>

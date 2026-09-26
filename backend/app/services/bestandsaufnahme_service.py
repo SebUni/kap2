@@ -15,6 +15,11 @@ Rechenregeln (keine neuen Zahlenparameter):
 - Bevölkerungsentwicklung: Veränderung in Prozent zwischen zwei Stichtagen aus
   ``app.data.bevoelkerungsentwicklung`` (Datei im Repo, je 8-stelligem Gemeinde-AGS);
   Einwohnerzahlen und Jahre stehen im Eintragsfeld ``zusatz``.
+- Starkregenereignisse: Zahl der CatRaRE-Ereignisse (seit 2001), deren Mittelpunkt in der
+  Fläche der Kommune liegt (``app.data.catrare.ereignisse_in_flaeche``); Datum des
+  jüngsten Ereignisses im Eintragsfeld ``zusatz``. Die Fläche ist ``Kommune.boundary``
+  (Grenze der Kommune), ersatzweise die Hülle der gespeicherten Gitterzellen
+  (``GridCell.geometry``). Ohne Fläche ist der Wert ``None`` mit Laufzeitsatz, nie 0.
 - Trägt keine Zelle das Feld (bzw. fehlt der Sozialwert), ist der Wert ``None``
   mit Laufzeitsatz, nie 0.
 """
@@ -24,7 +29,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from app.data import bevoelkerungsentwicklung
+from app.data import bevoelkerungsentwicklung, catrare
 from app.data.bestandsaufnahme import BESTANDSAUFNAHME_GROESSEN, LAUFZEITSATZ_VORLAGE
 
 log = logging.getLogger(__name__)
@@ -116,7 +121,12 @@ def _zaehl_summe(zellen: list[dict], feld: str) -> Optional[int]:
     return summe if gesehen else None
 
 
-def _wert(code: str, zellen: list[dict], sozio: dict, entwicklung: Optional[dict] = None) -> Optional[float | int]:
+def _wert(
+    code: str, zellen: list[dict], sozio: dict, entwicklung: Optional[dict] = None,
+    starkregen: Optional[list[dict]] = None,
+) -> Optional[float | int]:
+    if code == "starkregenereignisse":
+        return None if starkregen is None else len(starkregen)
     if code == "bevoelkerungsentwicklung":
         return _zahl((entwicklung or {}).get("veraenderung_prozent"))
     if code in _ANTEIL_FELDER:
@@ -131,13 +141,15 @@ def _wert(code: str, zellen: list[dict], sozio: dict, entwicklung: Optional[dict
 
 
 def bestandsaufnahme_aus_daten(
-    zellen: list[dict], sozio: dict, entwicklung: Optional[dict] = None
+    zellen: list[dict], sozio: dict, entwicklung: Optional[dict] = None,
+    starkregen: Optional[list[dict]] = None,
 ) -> list[dict]:
-    """Reine Funktion: 21 Einträge in Katalogreihenfolge aus Zell- und Sozialdaten.
+    """Reine Funktion: 22 Einträge in Katalogreihenfolge aus Zell- und Sozialdaten.
 
     ``zellen`` sind die ``inputs``-Dicts der gespeicherten Zellen, ``sozio`` die
     Rohgrößen der Regionalstatistik (``unemployment_rate_pct``), ``entwicklung`` das
-    Ergebnis von ``bevoelkerungsentwicklung.entwicklung`` (oder ``None``).
+    Ergebnis von ``bevoelkerungsentwicklung.entwicklung`` (oder ``None``), ``starkregen`` die CatRaRE-Ereignisse der Kommune (oder ``None``,
+    wenn keine Fläche vorlag; eine leere Liste ist ein echter Wert 0).
     """
     eintraege: list[dict] = []
     for g in BESTANDSAUFNAHME_GROESSEN:
@@ -145,7 +157,7 @@ def bestandsaufnahme_aus_daten(
             wert = None
             satz = g["luecke"]
         else:
-            wert = _wert(g["code"], zellen or [], sozio or {}, entwicklung)
+            wert = _wert(g["code"], zellen or [], sozio or {}, entwicklung, starkregen)
             satz = LAUFZEITSATZ_VORLAGE.format(label=g["label"]) if wert is None else ""
         eintrag = {
             "code": g["code"],
@@ -163,6 +175,8 @@ def bestandsaufnahme_aus_daten(
                 k: entwicklung[k]
                 for k in ("jahr_alt", "jahr_neu", "einwohner_alt", "einwohner_neu")
             }
+        if g["code"] == "starkregenereignisse" and starkregen:
+            eintrag["zusatz"] = {"juengstes_beginn": max(e["beginn"] for e in starkregen)}
         eintraege.append(eintrag)
     return eintraege
 
@@ -219,13 +233,51 @@ def _entwicklung(kommune) -> Optional[dict]:
         return None
 
 
+def _flaeche_der_kommune(db, kommune):
+    """Fläche der Kommune als shapely-Geometrie (WGS84); ``None``, wenn keine vorliegt.
+
+    Das Produkt speichert die Grenze in ``Kommune.boundary`` (MULTIPOLYGON, SRID 4326);
+    fehlt sie, dient die Hülle der gespeicherten Gitterzellen (``GridCell.geometry``).
+    """
+    from geoalchemy2.shape import to_shape
+
+    try:
+        grenze = getattr(kommune, "boundary", None)
+        if grenze is not None:
+            return to_shape(grenze)
+        from shapely.geometry import MultiPolygon
+        from app.models.models import GridCell
+
+        zeilen = db.query(GridCell.geometry).filter(GridCell.kommune_id == kommune.id).all()
+        polygone = [to_shape(z[0]) for z in zeilen if z[0] is not None]
+        if not polygone:
+            return None
+        return MultiPolygon(polygone).convex_hull
+    except Exception as exc:  # niemals die Bestandsaufnahme abbrechen
+        log.warning("Fläche fehlgeschlagen (kommune=%s): %s", getattr(kommune, "id", None), exc)
+        return None
+
+
+def _starkregen(db, kommune) -> Optional[list[dict]]:
+    """CatRaRE-Ereignisse der Kommune; ``None`` ohne Fläche oder bei Fehlschlag."""
+    flaeche = _flaeche_der_kommune(db, kommune)
+    if flaeche is None:
+        return None
+    try:
+        return catrare.ereignisse_in_flaeche(flaeche)
+    except Exception as exc:  # niemals die Bestandsaufnahme abbrechen
+        log.warning("Starkregenereignisse fehlgeschlagen (kommune=%s): %s", getattr(kommune, "id", None), exc)
+        return None
+
+
 def bestandsaufnahme_fuer_kommune(db, kommune) -> dict:
     """Bestandsaufnahme einer Kommune aus gespeicherten Zell- und Sozialdaten."""
     zellen = _zellen_der_kommune(db, kommune.id)
     sozio = _sozialdaten(kommune)
     entwicklung = _entwicklung(kommune)
+    starkregen = _starkregen(db, kommune)
     return {
         "kommune_id": kommune.id,
         "name": kommune.name,
-        "groessen": bestandsaufnahme_aus_daten(zellen, sozio, entwicklung),
+        "groessen": bestandsaufnahme_aus_daten(zellen, sozio, entwicklung, starkregen),
     }

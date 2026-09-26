@@ -1314,6 +1314,21 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "https://doi.org/10.1016/j.envint.2025.109746",
         "accessed": "2026-08-30",
     },
+    "DWD_CatRaRE": {
+        "ieee": "Deutscher Wetterdienst (DWD), „Heavy precipitation events Version 2026.01 "
+                "exceeding return period of 5 years based on RADKLIM-RW Version 2017.002 "
+                "(CatRaRE T5, v2026.01),“ Offenbach, Deutschland, 2026, "
+                "DOI 10.5676/DWD/CatRaRE_T5_Eta_v2026.01. [Online]. Verfügbar: "
+                "https://opendata.dwd.de/climate_environment/CDC/event_catalogues/germany/"
+                "precipitation/CatRaRE_v2026.01/data/CatRaRE_2001_2025_T5_Eta_v2026_01.csv. "
+                "Lizenz CC BY 4.0. [Zugriff: 25. September 2026].",
+        "url": "https://opendata.dwd.de/climate_environment/CDC/event_catalogues/germany/"
+               "precipitation/CatRaRE_v2026.01/data/CatRaRE_2001_2025_T5_Eta_v2026_01.csv",
+        "archive_url": "https://web.archive.org/web/2026/"
+                       "https://opendata.dwd.de/climate_environment/CDC/event_catalogues/germany/"
+                       "precipitation/CatRaRE_v2026.01/data/CatRaRE_2001_2025_T5_Eta_v2026_01.csv",
+        "accessed": "2026-09-25",
+    },
     "Destatis_GVISys_Bevoelkerung": {
         "ieee": "Statistisches Bundesamt (Destatis), „Gemeindeverzeichnis-Informationssystem "
                 "GV-ISys: Gemeinden nach Fläche, Bevölkerung und Postleitzahl, Stichtage "
