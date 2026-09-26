@@ -7,7 +7,7 @@ description: Einheitliche Schreibweise von KAP3 — Zahlen, Beträge, Einheiten,
 
 Aufsichtsrat, 24.09.2026: Wiederkehrende Arbeit wird immer gleich ausgeführt — von der Schreibweise („1,2 Mio. €“, nicht
 einmal so und einmal „1000000 €“) bis zur Methodik. Dieser Skill gilt für jede Rolle, die schreibt. Was davon maschinell
-prüfbar ist, prüft `backend/scripts/lint_methodik.py` (Zahlenformat); der Rest ist Sache der Prüfung.
+prüfbar ist, prüft `backend/scripts/lint_methodik.py` — vom Zahlenformat nur drei Teile: Beträge ab einer Million in voller Länge (`1.200.000 €` statt `1,2 Mio. €`), ausgeschriebene Währung (`Mio. Euro`, `EUR`) und fehlende Leerzeichen vor `%`; den Tausenderpunkt ab 1.000 (`12.400`) prüft er nicht. Der Rest ist Sache der Prüfung.
 
 ## Zahlen und Beträge
 
