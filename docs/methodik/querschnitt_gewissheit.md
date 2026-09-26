@@ -1,9 +1,9 @@
 # Querschnitt: Gewissheit einer Klimawirkung
 
 Querschnittsdatei der Methodik, gültig für alle 102 Klimawirkungen der KWRA 2021 (TB6 S. 35). Werte bekommen zuerst
-#95, #96 und #98 (A-0048); dieser Stand (Schritt 1, Ticket T-1172-methodik_manager, Vorhaben T-1117-cmo) rechnet
-nur #95. Schritt 2 liest TB6 Kap. 6.2 (Zeitscheibe und Schwellen der Charakterisierung), Schritt 3 und 4 rechnen #96
-und #98 nach.
+#95, #96 und #98 (A-0048; Vorhaben T-1117-cmo). Schritt 1 (Ticket T-1172-methodik_manager) rechnet #95. Schritt 2
+(T-1173-methodik_manager) liest TB6 Kap. 6.2 (Zeitscheibe und Schwellen der Charakterisierung). Schritt 3
+(T-1174-methodik_manager) rechnet #96 nach, Schritt 4 #98.
 
 Abkürzungen: **KWRA** = Klimawirkungs- und Risikoanalyse 2021 für Deutschland; **TB6** = deren Teilbericht 6
 „Integrierte Auswertung“ (`docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`; in Kap. 2 und
@@ -448,7 +448,8 @@ Entwicklung/Innovation, Treffer von 26, an AA — 0,5: 25 | Fehltreffer: [10]
 ## Rechenkette
 
 Format nach Aufgabe §4, hier „Zelle → Stufe“ statt „Zahl × Faktor“, weil Regel G übernimmt und nicht rechnet. Es gibt
-keinen Euro-Betrag am Ende: Die Gewissheit steht neben dem Betrag und ändert ihn nicht. Beispiel: #95 Hitzebelastung.
+keinen Euro-Betrag am Ende: Die Gewissheit steht neben dem Betrag und ändert ihn nicht. Beispiele: #95 Hitzebelastung
+(Schritt 1) und #96 Aeroallergene (Schritt 3, unten, in denselben zehn Ebenen).
 
 | Ebene | Rechenschritt | Wert (#95 Hitzebelastung) | Quelle |
 |---|---|---|---|
@@ -539,6 +540,148 @@ Mitte: hoch | Ende: mittel | heutiges Klima: in der KWRA nicht ausgewiesen
 Quellenlage (nur Vergleich): {'abschaetzung_kap3': 8, 'berechnet': 3, 'quelle': 8}
 ```
 
+### #96 Aeroallergene (Schritt 3)
+
+Schritt 3, Ticket T-1174-methodik_manager. Gerechnet mit dem Endstand von Bericht 96 nach T-1114-cmo (Status
+„fertig“; letzte Änderung am Bericht in Commit `f87bc789`, T-1427-methodik_manager). Dieselben zehn Ebenen wie #95,
+Regel G unverändert.
+
+| Ebene | Rechenschritt | Wert (#96 Aeroallergene) | Quelle |
+|---|---|---|---|
+| 1 | Risikocode des Produkts → Klimawirkung der KWRA | `EXPECTED_ANNUAL_ALLERGY_DAYS` → „Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft“, KWRA-ID 96 | Bericht 96; Konformitätsliste, „Gegenprobe Zeile 8“ |
+| 2 | KWRA-ID → Zeile der Mappe (Spalte A = 96) | Zeile 98; D98 = „Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft“ | Mappe, Blatt „Klimawirkungen“, A98, D98 |
+| 3 | Zelle S98 (Kopf S2 „Gewissheit – Mitte“) → Stufe Mitte | **mittel** | Mappe S98; gleichlautend TB6 Tabelle 1, S. 41 (als Bild gelesen am 26.09.2026) |
+| 4 | Zelle T98 (Kopf T2 „Gewissheit – Ende“) → Stufe Ende | **mittel** | Mappe T98; gleichlautend TB6 Tabelle 1, S. 41 |
+| 5 | Heutiges Klima (Euro-Betrag M0) → Gewissheit | „in der KWRA nicht ausgewiesen“ | TB6 Tabelle 1 (keine Spalte Gegenwart); Zuordnungstabelle |
+| 6 | Jahre 2025–2060 der Zeitreihe → Stufe Mitte | mittel | Zuordnungstabelle; Ebene 3 |
+| 7 | Jahre 2061–2065 der Zeitreihe → niedrigere Stufe von Mitte und Ende | niedrigere von mittel und mittel = mittel | Zuordnungstabelle; Ebenen 3 und 4 |
+| 8 | Jahre 2071–2100 → Stufe Ende (heute nicht im Produkt) | mittel | Zuordnungstabelle; Ebene 4 |
+| 9 | Alle Codes aus Ebene 1 → dieselbe Stufe je Zeitscheibe | ein Code, Allergietage: Mitte mittel, Ende mittel | Regel G, „Ein Wert je Klimawirkung“ |
+| 10 | Stufe → Vorsichtshinweis (ab „gering“, `VORSICHT_STUFEN`) | Mitte mittel, Ende mittel: kein Hinweis für #96 | `unsicherheits_zusammenschau.py`; Folgegrößen |
+
+Bei #96 sind Mitte und Ende gleich. Die Regel „niedrigere Stufe“ für 2061–2070 ändert deshalb nichts, und die ganze
+Zeitreihe 2025–2065 zeigt „mittel“. Den Ausschlag geben allein die Zellen S98 und T98.
+
+**Einordnung nach „Einordnung der Charakterisierung“ (Zeitscheibe Mitte).**
+
+| Schritt | Rechnung | Ergebnis | Quelle |
+|---|---|---|---|
+| Teil a) der Gesamtgewissheit | Regel G, Wert Mitte = mittel | 2 Punkte | Mappe S98; TB6 S. 141 (Punkte) |
+| Teil b) der Gesamtgewissheit | Gewissheit mit Anpassung, Mitte = gering | 1 Punkt | TB6 Tabelle 24, S. 128–129 (als Bild gelesen am 25.09.2026, Block `einordnung_charakterisierung`); Mappe V98 = „ja“ |
+| Gesamtgewissheit | (2 + 1) : 2 | 1,5, nicht über 1,5: nicht ausreichend | TB6 S. 141; TB1 S. 93 |
+| Gruppe | Wirksamkeit der beschlossenen Maßnahmen, Mitte, pessimistisch = mittel = 0,5; Schwelle Umsetzung 0,5 | „Umsetzung“, wie TB6 Tabelle 27, S. 142 | Mappe Y98; Schwelle als Abschätzung von KAP3 |
+| Zusatz „unter Unsicherheit“ | „Umsetzung“ hat keine Variante unter Unsicherheit; #96 ist die Ausnahme aus Fußnote 28 und 29 | kein Zusatz, trotz Gesamtgewissheit 1,5 | TB6 S. 140, S. 141, S. 143; TB1 S. 93–94 |
+| Kennzeichnung | eine Gruppe je Klimawirkung, gleich für alle Jahre der Zeitreihe und neben dem Betrag M0 | „Mitte des Jahrhunderts (2031–2060)“ | Abschnitt „Zuordnung zur Zeitscheibe des Produkts“ |
+
+- **Die Bedingung an den Maßnahmenraum trifft #96 nicht.** Die weiterreichende Anpassung hat ebenfalls „mittel“ = 0,5
+  (Mappe AA98). Die Gruppe „Umsetzung“ folgt also an Spalte Y wie an Spalte AA.
+- **Was die einfachere Rechnung verfälschen würde (§8 E3).** In der Gruppe „Umsetzung“ unterscheiden sich Regel G
+  allein und Gesamtgewissheit bei #96 nicht, weil „Umsetzung“ keinen Zusatz trägt. Sichtbar wird der Unterschied, sobald
+  der Eingang des Produkts unter 0,5 liegt. Heute liegt er bei 0, weil keine Maßnahme im Rechenweg wirkt
+  (Konformitätsliste, Zeile 7 und A10). Mit Regel G allein zeigt das Produkt dann „Innovation“ ohne Zusatz. Mit der
+  Gesamtgewissheit zeigt es „Innovation unter Unsicherheit“ (0 liegt unter der Entwicklungsschwelle 0,1). Die Gruppe der
+  KWRA, „Umsetzung“, erreicht das Produkt erst, wenn sein Eingang die beschlossenen Maßnahmen mit mindestens 0,5
+  abbildet. Das entscheidet T-1111-ceo.
+
+Zum Vergleich, geht **nicht** in die Gewissheit ein: die Quellenlage aus dem Endstand der Parameter-Blöcke von
+`docs/methodik/96_aeroallergene.md` (Kap. 7). Gezählt: 13 Blöcke, davon 4 mit Kennzeichnung `quelle`
+(`pollen.delta_s_region`, `pollen.a_attr`, `pollen.p_ar`, `pollen.c_jahr_direkt`), 7 `abschaetzung_kap3`
+(`pollen.p_sens_gruppen`, `pollen.l_saison`, `pollen.f_symptomtage`, `pollen.lambda_veg`, `pollen.s_unbekannt`,
+`pollen.r_s158`, `pollen.t_warn_s158`) und 2 `berechnet` (`pollen.d_saison`, `pollen.c_tag`). Das sind 4 von 13 = 31 %
+mit Quelle, mit den berechneten 6 von 13 = 46 %. Nach der alten Regel stünde #96 in beiden Zählweisen auf „gering“
+(unter 0,5). Die Registry kommt mit 20 von 21 Parametern zu „mittel“ (Konformitätsliste, „Gegenprobe Zeile 8“). Die
+KWRA sagt zur Mitte und zum Ende „mittel“. Dass Registry und KWRA hier gleich lauten, liegt an der Zerlegung: Aus den
+Blöcken des Berichts ergibt dieselbe alte Regel „gering“. Zwei der 13 Blöcke (`pollen.r_s158`, `pollen.t_warn_s158`)
+wirken nur im Maßnahmen-Modul. Ohne sie wären es 4 von 11 = 36 %, ebenfalls unter 0,5. Regel G zählt jeden Block
+einmal, also 13.
+
+Beispiel-Block `rechenkette_gewissheit_96`, aus dem Stamm des Produkt-Repos ausführbar (am 26.09.2026 gelaufen,
+Ausgabe darunter):
+
+```python
+# rechenkette_gewissheit_96 — Regel G an #96 nachgerechnet, dieselben Ebenen wie #95
+import re
+import openpyxl
+
+STUFEN = ("sehr gering", "gering", "mittel", "hoch")  # TB6 S. 78, aufsteigend
+PUNKTE = {"sehr gering": 0, "gering": 1, "mittel": 2, "hoch": 3}  # TB6 S. 141
+WIRKSAMKEIT = {"gering": 0.0, "gering-mittel": 0.25, "mittel": 0.5, "mittel-hoch": 0.75, "hoch": 1.0}  # S. 112
+
+ws = openpyxl.load_workbook("docs/KWAR/KWRA-2021_Klimawirkungen.xlsx", data_only=True)["Klimawirkungen"]
+
+# Ebene 2: Zeile der Klimawirkung über die KWRA-ID in Spalte A
+zeile = next(r for r in range(3, ws.max_row + 1) if ws.cell(r, 1).value == 96)
+assert zeile == 98
+assert ws["D98"].value == "Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft"
+
+# Ebenen 3 und 4: Kopfzellen, Werte, Quellvermerk
+assert (ws["S2"].value, ws["T2"].value) == ("Gewissheit – Mitte", "Gewissheit – Ende")
+mitte, ende = ws["S98"].value, ws["T98"].value
+assert (mitte, ende) == ("mittel", "mittel")
+assert ws["AJ98"].value.startswith("TB 6 Tab. 1")
+
+
+def gewissheit(jahr):
+    """Ebenen 6 bis 8: Jahr der Zeitreihe → Stufe nach der Zuordnungstabelle."""
+    if jahr <= 2060:
+        return mitte
+    if jahr <= 2070:
+        return min(mitte, ende, key=STUFEN.index)
+    return ende
+
+
+HEUTIGES_KLIMA = "in der KWRA nicht ausgewiesen"  # Ebene 5
+zeitreihe = {j: gewissheit(j) for j in range(2025, 2066)}  # Produkt: 2025–2065
+assert all(zeitreihe[j] == "mittel" for j in range(2025, 2066))
+assert gewissheit(2085) == "mittel"
+
+# Ebene 9: ein Wert je Klimawirkung; #96 hat einen Code
+codes = ("EXPECTED_ANNUAL_ALLERGY_DAYS",)
+je_code = {c: (mitte, ende) for c in codes}
+assert set(je_code.values()) == {("mittel", "mittel")}
+
+# Ebene 10: Vorsichtshinweis ab „gering“
+VORSICHT_STUFEN = ("sehr gering", "gering")
+assert mitte not in VORSICHT_STUFEN and ende not in VORSICHT_STUFEN
+
+# Einordnung der Charakterisierung (Zeitscheibe Mitte): Gesamtgewissheit und Gruppe
+TAB24_MITTE_96 = "gering"  # TB6 Tabelle 24, S. 128–129, „Gewissheit der Bewertung (Klimarisiken mit Anpassung)“, Mitte
+gesamt = (PUNKTE[mitte] + PUNKTE[TAB24_MITTE_96]) / 2
+assert gesamt == 1.5 and not gesamt > 1.5          # nicht ausreichend
+assert ws["V98"].value == "ja"                       # Anpassungskapazität analysiert, Tabelle 24 hat einen Wert
+assert ws["Y2"].value == "Wirksamkeit APA III – Mitte pessim."
+assert ws["AA2"].value == "Wirksamkeit weiterr. – Mitte pessim."
+w_y, w_aa = WIRKSAMKEIT[ws["Y98"].value], WIRKSAMKEIT[ws["AA98"].value]
+assert w_y == w_aa == 0.5
+SCHWELLE_UMSETZUNG = 0.5  # Abschätzung von KAP3, Band 0,33–0,5
+gruppe = "Umsetzung" if w_y >= SCHWELLE_UMSETZUNG else "(nicht Umsetzung)"
+assert gruppe == "Umsetzung"                         # wie TB6 Tabelle 27, S. 142; kein Zusatz (S. 140)
+
+# Vergleich, geht nicht in die Gewissheit ein: Quellenlage aus dem Endstand der Parameter-Blöcke
+text = open("docs/methodik/96_aeroallergene.md", encoding="utf-8").read()
+kap7 = text.split("## 7 Parameter-Blöcke", 1)[1].split("\n## ", 1)[0]
+kz = re.findall(r"^\s*kennzeichnung:\s*(\w+)", kap7, flags=re.M)
+zaehlung = {k: kz.count(k) for k in sorted(set(kz))}
+assert len(kz) == len(re.findall(r"^parameter:", kap7, flags=re.M)) == 13
+assert zaehlung == {"abschaetzung_kap3": 7, "berechnet": 2, "quelle": 4}
+assert round(4 / 13, 2) == 0.31 and round(6 / 13, 2) == 0.46
+
+print("Mitte:", mitte, "| Ende:", ende, "| heutiges Klima:", HEUTIGES_KLIMA)
+print("2025:", zeitreihe[2025], "| 2060:", zeitreihe[2060], "| 2061:", zeitreihe[2061], "| 2065:", zeitreihe[2065])
+print("Gesamtgewissheit Mitte:", gesamt, "| ausreichend:", gesamt > 1.5, "| Gruppe:", gruppe,
+      "| Wirksamkeit Y/AA:", w_y, w_aa)
+print("Quellenlage (nur Vergleich):", zaehlung)
+```
+
+Ausgabe:
+
+```
+Mitte: mittel | Ende: mittel | heutiges Klima: in der KWRA nicht ausgewiesen
+2025: mittel | 2060: mittel | 2061: mittel | 2065: mittel
+Gesamtgewissheit Mitte: 1.5 | ausreichend: False | Gruppe: Umsetzung | Wirksamkeit Y/AA: 0.5 0.5
+Quellenlage (nur Vergleich): {'abschaetzung_kap3': 7, 'berechnet': 2, 'quelle': 4}
+```
+
 ## Entscheidungslog
 
 Gewählt ist Regel G. Verworfen, je mit einem Satz:
@@ -611,15 +754,30 @@ folgen in Schritt 2“ durch das Ergebnis ersetzt, weil Schritt 2 sie beantworte
 gelesenen Fundstellen ergänzt, damit jede Seitenangabe dieser Datei dort steht. Sonst ist nichts aus Schritt 1
 geändert.
 
+Schritt 3 (T-1174-methodik_manager, #96). Regel G, Zuordnungstabelle und die Regel aus „Einordnung der
+Charakterisierung“ sind **unverändert** angewendet. Sie passen an #96 ohne Änderung: ein Risikocode, eine Zeile der
+Mappe, Mitte und Ende gleich, Tabelle 24 mit Wert, Gruppe „Umsetzung“ wie Tabelle 27. Keine weitere Option ist
+verworfen. Änderungen an Abschnitten aus Schritt 1 und 2: Der Vorspann nennt die Schritte mit ihren Tickets, weil er
+sonst „rechnet nur #95“ behauptete. Der Satz vor der Tabelle unter „Rechenkette“ nennt #96 als zweites Beispiel. Unter
+„Befunde an Berichte“ steht das Ergebnis je Klimawirkung, unter „Quellen“ die Fundstellen von Schritt 3. Sonst ist
+nichts aus Schritt 1 und 2 geändert.
+
 ## Befunde an Berichte
 
-Keine.
+#95: keine. #96: keine.
 
 Verglichen am 25.09.2026: Bericht 95, Abschnitt „Risiko ohne (weitere) Anpassung“, Absatz „Gewissheit der
 KWRA-Bewertung“, nennt Mitte **hoch** und Ende **mittel** mit Fundstelle Mappe Zeile 97, Spalten S und T, und TB6
 Tabelle 1, S. 41; Quelle [68] nennt dieselbe Tabelle und Seite. Die Zellen S97 = „hoch“ und T97 = „mittel“ stimmen
 damit überein, ebenso das Bild von TB6 Tabelle 1, S. 41. Der dort genannte Mittelwert 3,5 über beide Zeitscheiben
 stimmt mit TB6 S. 78–79.
+
+Verglichen am 26.09.2026 (Schritt 3): Bericht 96 im Endstand, Kap. 1, Abschnitt „Risiko ohne (weitere) Anpassung“,
+Aussage (c) „KWRA-Stufe ohne Anpassung und Gewissheit je Zeitscheibe“, nennt Mitte **mittel** (Zelle S98) und Ende
+**mittel** (Zelle T98), Zeile 98, und für die Gegenwart „nicht ausgewiesen“. Die Zellen S98 = „mittel“ und
+T98 = „mittel“ stimmen damit überein, ebenso das Bild von TB6 Tabelle 1, S. 41 (Zeile „Allergische Reaktionen durch
+Aeroallergene pflanzlicher Herkunft“). Bericht 96 nennt als gleichlautende Fundstelle TB5 Tabelle 55, S. 179, nicht
+TB6 Tabelle 1. Das ist keine Abweichung vom Wert. TB5 ist in diesem Schritt nicht nachgelesen worden.
 
 ## Quellen
 
@@ -642,5 +800,10 @@ stimmt mit TB6 S. 78–79.
   AJ97; Kopfzellen S2, T2.
 - **[Bericht 95]** `docs/methodik/95_hitzebelastung.md`, Abschnitt „Risiko ohne (weitere) Anpassung“, Absatz
   „Gewissheit der KWRA-Bewertung“; Kap. 6 „Szenario-Anwendung & Modellgrenzen“; Kap. 7 „Parameter-Blöcke“.
+- **[Schritt 3]** TB6 Tabelle 1, S. 41, Zeile „Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft“ (als
+  Bild gelesen am 26.09.2026). Mappe, Blatt „Klimawirkungen“, Zeile 98, Zellen A98, D98, S98, T98, V98, Y98, AA98,
+  AJ98. `docs/methodik/96_aeroallergene.md`, Kap. 1, Abschnitt „Risiko ohne (weitere) Anpassung“, Aussage (c);
+  Kap. 7 „Parameter-Blöcke“. `docs/KONFORMITAET_CHECKLISTE.md`, Zeile 7 mit „Gegenprobe Zeile 7“ (A10) und „Gegenprobe
+  Zeile 8“.
 - **[Produkt]** `backend/app/services/gewissheit.py`, `charakterisierung.py`, `unsicherheits_zusammenschau.py`;
   `backend/app/api/routes/assessment.py`; `docs/KONFORMITAET_CHECKLISTE.md`, „Gegenprobe Zeile 8“.
