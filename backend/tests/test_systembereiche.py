@@ -61,4 +61,24 @@ def test_c_bereichssummen_ergeben_gesamtsumme_ohne_nicht_additive():
     bereichssumme = round(sum(b["schadenskosten_eur"] or 0.0 for b in auswertung.values()), 2)
     assert bereichssumme == pytest.approx(gesamt)
     anzahl = sum(b["anzahl_klimawirkungen"] for b in auswertung.values())
-    assert anzahl == len(catalog.RISKS_BY_CODE)
+    assert anzahl == len({s["kwra_id"] for s in catalog.RISKS_BY_CODE.values()})
+
+
+def test_d_zaehlt_kwra_kennungen_statt_risikocodes():
+    codes = ["EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY",
+             "EXPECTED_ANNUAL_ALLERGY_DAYS", "EXPECTED_ANNUAL_UV_YLL"]
+    agg = {"cost": {"by_risk": [
+        {"code": c, "cost_eur": 1000.0, "index": 0.5, "has_euro_layer": True} for c in codes
+    ]}}
+    auswertung = systembereiche.systembereich_auswertung(agg)
+    menschen = auswertung["Menschen und soziale Systeme"]
+
+    assert menschen["risk_codes"] == codes
+    assert menschen["anzahl_klimawirkungen"] == 3
+    assert menschen["euro_beziffert"] == "3 von 6 Klimawirkungen in Euro beziffert"
+    assert menschen["schadenskosten_eur"] == 4000.0
+    assert menschen["mittlerer_index"] == 0.5
+
+    for name, b in auswertung.items():
+        x = int(b["euro_beziffert"].split(" von ")[0])
+        assert x <= b["klimawirkungen_im_katalog"], name
