@@ -15,6 +15,11 @@ const DISCOUNT_RATES = [
   { key: '0.01', label: '1 %' },
 ]
 
+/** Dezimalanteil als Prozentzahl mit Dezimalkomma (0.01 → „1“, 0.005 → „0,5“). */
+function fmtProzent(anteil: number): string {
+  return String(Math.round(anteil * 1e6) / 1e4).replace('.', ',')
+}
+
 type Scenario ='rcp45' | 'rcp85'
 type Mode = 'annual' | 'cumulative'
 
@@ -54,6 +59,13 @@ export default function CostTimelineSection({ className = '' }: { className?: st
 
   const proj = costProjection
   const scen = proj?.scenarios[scenario]
+  const disk = proj?.diskontierung
+  // Zeilen aus dem Feld `diskontierung` (Schlüssel wie in `discounted`); ohne das Feld die feste Liste.
+  const rateRows = disk
+    ? Object.entries(disk.diskontraten).map(([key, diskontrate], i) => ({
+        key, diskontrate, label: `${fmtProzent(disk.rzpr[i] ?? Number(key))} %`,
+      }))
+    : DISCOUNT_RATES.map(r => ({ ...r, diskontrate: null as number | null }))
 
   const data = proj && scen
     ? proj.years.map((year, i) => {
@@ -151,17 +163,28 @@ export default function CostTimelineSection({ className = '' }: { className?: st
               <thead>
                 <tr style={{ color: 'var(--text-muted)', textAlign: 'right' }}>
                   <th style={{ textAlign: 'left', paddingRight: 12, fontWeight: 400 }}>Reine Zeitpräferenzrate</th>
+                  {disk && <th style={{ paddingRight: 12, fontWeight: 400 }}>Komponente der relativen Preise</th>}
+                  {disk && <th style={{ paddingRight: 12, fontWeight: 400 }}>Diskontrate</th>}
                   <th style={{ paddingRight: 12, fontWeight: 400 }}>Ohne Maßnahmen</th>
                   {proj.has_measures && <th style={{ fontWeight: 400 }}>Mit Maßnahmen</th>}
                 </tr>
               </thead>
               <tbody>
-                {DISCOUNT_RATES.map(r => {
+                {rateRows.map(r => {
                   const ohne = scen?.no_measures.discounted?.[r.key]
                   const mit = scen?.with_measures.discounted?.[r.key]
                   return (
                     <tr key={r.key} style={{ textAlign: 'right' }}>
                       <td style={{ textAlign: 'left', paddingRight: 12 }}>{r.label}</td>
+                      {disk && (
+                        <td style={{ paddingRight: 12 }}>
+                          {fmtProzent(disk.relative_preise.wert)} Pp.
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                            abgeschätzt (KAP3)
+                          </div>
+                        </td>
+                      )}
+                      {disk && <td style={{ paddingRight: 12 }}>{r.diskontrate != null ? `${fmtProzent(r.diskontrate)} %` : '–'}</td>}
                       <td style={{ paddingRight: 12 }}>{ohne?.length ? fmtEurCompact(ohne[ohne.length - 1]) : '–'}</td>
                       {proj.has_measures && (
                         <td>{mit?.length ? fmtEurCompact(mit[mit.length - 1]) : '–'}</td>
@@ -172,7 +195,19 @@ export default function CostTimelineSection({ className = '' }: { className?: st
               </tbody>
             </table>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
-              Abgezinst wird nur die Zeitpräferenz (Reine Zeitpräferenzrate); die Komponente der relativen Preise (Ramsey) fehlt.
+              {disk ? (
+                <>
+                  Abgezinst wird mit der Diskontrate = Reine Zeitpräferenzrate + Komponente der relativen Preise.
+                  Die Komponente ist eine Abschätzung von KAP3: {disk.relative_preise.begruendung}
+                  {disk.modellgrenzen.length > 0 && (
+                    <ul style={{ margin: '2px 0 0', paddingLeft: 16 }} data-testid="cost-discounted-grenzen">
+                      {disk.modellgrenzen.map((g, i) => <li key={i}>{g}</li>)}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                'Abgezinst wird die Zeitpräferenz (Reine Zeitpräferenzrate).'
+              )}
             </div>
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 4 }}>
