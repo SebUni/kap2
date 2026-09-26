@@ -145,16 +145,16 @@ Beschwerden, und jeder zusätzliche Beschwerdetag kostet Behandlung.
 
 | Ebene | Rechenschritt | Wert (Beispielkommune Berlin) | Quelle |
 |---|---|---|---|
-| 1 | Einwohner je Altersband \(\text{pop}_a\) (u20 · 20–64 · 65–74 · 75–84 · 85+); die unter 65-Jährigen werden mit dem Berliner Anteil der unter 20-Jährigen (22,89 %) in u20 und 20–64 geteilt | 677.877 · 2.283.553 · 339.490 · 253.528 · 107.933 (zusammen 3.662.381) | Tab. 12411-09-01-4-B, Stichtag 31.12.2023, Basis Zensus 2022 [68] (u65 = 2.961.430 und die drei Seniorenbänder); Anteil u20: 702.852 von 3.070.537 unter 65-Jährigen, SB A I 3 – j / 23, Tab. 3.1, S. 6 [69] |
+| 1 | Einwohner je Altersband \(\text{pop}_a\) (u20 · 20–64 · 65–74 · 75–84 · 85+); u20 = unter 5 + 5–10 + 10–15 + 15–20, 20–64 = u65 − u20 | 673.277 · 2.288.153 · 339.490 · 253.528 · 107.933 (zusammen 3.662.381); u20 = 173.699 + 176.060 + 163.535 + 159.983 | Tab. 12411-09-01-4-B, Stichtag 31.12.2023, Basis Zensus 2022 [68], Gemeinde Berlin, Altersgruppen (20); dieselben Zahlen nach Altersjahren in Destatis Tab. 12411-09 [69] |
 | 2 | Anteil mit ärztlich diagnostiziertem Heuschnupfen (12 Monate) \(p_{\text{AR},a}\) je Band | 8,8 · 13,2 · 6,7 · 5,0 · 5,0 % | KiGGS W2 [2], DEGS1 [1], bevölkerungsgewichtet (§3.2); Kap. 7 `pollen.p_ar` |
-| 3 | Betroffene \(B = \sum_a \text{pop}_a \times p_{\text{AR},a}\) | 59.653 + 301.429 + 22.746 + 12.676 + 5.397 = **401.901 Betroffene** (11,0 % der Einwohner) | Ebenen 1 und 2 |
+| 3 | Betroffene \(B = \sum_a \text{pop}_a \times p_{\text{AR},a}\) | 59.248 + 302.036 + 22.746 + 12.676 + 5.397 = **402.103 Betroffene** (11,0 % der Einwohner) | Ebenen 1 und 2 |
 | 4 | Klimasignal der Region: Verlängerung der Saison als Spreizung \(\Delta S_B\) (Erle → Birke) und \(\Delta S_G\) (Fuchsschwanz → Knäuelgras), 1991–2020 gegen 1961–1990 | Region Mitte: \(\Delta S_B\) = 4,20 Tage, \(\Delta S_G\) = 4,08 Tage | DWD-Phänologie, `pollensaison_region.csv`, Zeilen `mitte` [67] (§3.1); Kap. 7 `pollen.delta_s_region` |
 | 5 | Gewichtet mit dem Anteil der Betroffenen, die auf die jeweilige Saison reagieren: \(p_B \Delta S_B + p_G \Delta S_G\) | 0,55 × 4,20 + 0,75 × 4,08 = 2,31 + 3,06 = 5,37 Tage | \(p_B\), \(p_G\): Abschätzung von KAP3, Rangfolge nach [3] (§3.4, Log 8); Kap. 7 `pollen.p_sens_gruppen` |
 | 6 | Zusätzliche Symptomtage je Betroffenem \(\delta = f \times \text{Ebene 5} \times a_{\text{attr}}\) (Anteil der Saisontage mit Beschwerden, Anteil des Klimawandels am Trend) | 0,70 × 5,37 × 0,50 = **1,8795 Tage** je Betroffenem und Jahr | \(f\): Abschätzung von KAP3 (§3.4, Log 7); \(a_{\text{attr}}\): Anderegg [9] (Log 11); Kap. 7 `pollen.f_symptomtage`, `pollen.a_attr` |
-| 7 | Vegetationsfaktor \(\hat P\) je Zelle (allergene Bäume und Grünflächen), zentriert auf das betroffenengewichtete Mittel der eigenen Kommune | je Zelle ab 0,3 (keine allergene Vegetation) bis über 1 (Allee, Park); Mittel über Berlin genau **1**, also \(\sum B \hat P = \sum B\) = 401.901 | \(\lambda\) = 0,7 aus Werchan [54,55], Bogawski [56] (§3.3, §3.4, Log 12, 17, 18); Kap. 7 `pollen.lambda_veg` |
-| 8 | Zusätzliche Symptomtage \(\Delta\text{Tage} = B \times \delta \times \hat P\) (native Ergebnisgröße) | 401.901 × 1,8795 × 1 = **755.373 Tage je Jahr** (u20 112.118 · 20–64 566.536 · 65–74 42.751 · 75–84 23.825 · 85+ 10.143) | Ebenen 3, 6 und 7 |
+| 7 | Vegetationsfaktor \(\hat P\) je Zelle (allergene Bäume und Grünflächen), zentriert auf das betroffenengewichtete Mittel der eigenen Kommune | je Zelle ab 0,3 (keine allergene Vegetation) bis über 1 (Allee, Park); Mittel über Berlin genau **1**, also \(\sum B \hat P = \sum B\) = 402.103 | \(\lambda\) = 0,7 aus Werchan [54,55], Bogawski [56] (§3.3, §3.4, Log 12, 17, 18); Kap. 7 `pollen.lambda_veg` |
+| 8 | Zusätzliche Symptomtage \(\Delta\text{Tage} = B \times \delta \times \hat P\) (native Ergebnisgröße) | 402.103 × 1,8795 × 1 = **755.753 Tage je Jahr** (u20 111.357 · 20–64 567.677 · 65–74 42.751 · 75–84 23.825 · 85+ 10.143) | Ebenen 3, 6 und 7 |
 | 9 | Kostensatz je Symptomtag \(c_{\text{Tag}} = c_{\text{Jahr,direkt}} / d_{\text{Saison}}\) mit \(d_{\text{Saison}} = f \times (p_B L_B + p_G L_G)\) | 266,90 € / (0,70 × (0,55 × 30 + 0,75 × 60)) = 266,90 € / 43,05 Tage = **6,20 € je Tag** (Preisstand 2024) | TOTALL [65], VPI [19]; \(L_B\), \(L_G\): Abschätzung von KAP3 nach [51] (§3.5); Kap. 7 `pollen.c_jahr_direkt`, `pollen.d_saison`, `pollen.c_tag` |
-| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 755.373 × 6,20 € = **4,68 Mio. € je Jahr (Preisstand 2024)**, das sind 1,28 € je Einwohner | Ebenen 8 und 9 |
+| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 755.753 × 6,20 € = **4,69 Mio. € je Jahr (Preisstand 2024)**, das sind 1,28 € je Einwohner | Ebenen 8 und 9 |
 
 **Warum \(f\) im Euro-Betrag keine Rolle spielt.** \(f\) steht in Ebene 6 (mehr Tage) und in
 Ebene 9 (mehr Tage in der Referenzsaison, also billigerer Tag); in Ebene 10 kürzt es sich
@@ -176,13 +176,14 @@ ist das keine Näherung: \(B\) ist eine Summe aus Einwohnern mal Anteil, \(\delt
 ganzen Kommune gleich (eine Region), und \(\hat P\) mittelt auf 1 (Ebene 7). Zwei Unterschiede
 bleiben. (1) Die Kette verliert die Verteilung innerhalb der Stadt: Zwischen einer
 vegetationsarmen Zelle (0,3) und einer Allee-Zelle (1,7) liegt der Faktor 5,7. Wer wissen will,
-welches Quartier die Tage trägt, braucht die Zellen. (2) Die Teilung der unter 65-Jährigen in
-u20 und 20–64 nimmt das Produkt je Zelle aus dem Zensus-2022-Gitter (§3.2), die Kette aus dem
-Berliner Landesbericht [69], der noch auf Basis Zensus 2011 fortgeschrieben ist. Ein
-Prozentpunkt mehr u20-Anteil verschiebt 29.614 Menschen von 13,2 % auf 8,8 % Prävalenz und senkt
-\(B\) um 1.303 (0,32 %); die Richtung ist offen, die Größe liegt unter 1 %. Rechnete man Berlin
-mit dem Bundesanteil 24,07 % (Rückfall des Produkts, §3.2), läge \(B\) um 1.535 (0,38 %) zu
-niedrig. Größer wird dieser Fehler bei Kommunen, deren Altersaufbau stark vom Land abweicht
+welches Quartier die Tage trägt, braucht die Zellen. (2) Die Altersbänder müssen die der
+Kommune sein. Die Kette nimmt Berlins eigene Altersgruppen aus [68]; das Produkt teilt die unter
+65-Jährigen je Zelle nach dem Zensus-2022-Gitter und fällt nur ohne Gitterwert auf den
+Bundesanteil der unter 20-Jährigen zurück (24,07 %, §3.2). Rechnete man Berlin mit diesem
+Bundesanteil statt mit dem eigenen (22,73 %), kämen 39.482 Menschen mehr in das Band mit 8,8 %
+statt 13,2 % Prävalenz, und \(B\) läge um 1.737 (0,43 %) **zu niedrig**, weil Berlin weniger
+junge Menschen hat als der Bund. Je Prozentpunkt u20-Anteil sind es 1.303 Betroffene (0,32 %).
+Größer wird dieser Fehler bei Kommunen, deren Altersaufbau stärker vom Bund oder Land abweicht
 (Universitätsstadt, Kurort): Dort gehören die Altersbänder der Kommune in Ebene 1, nie die des
 Landes.
 
@@ -195,17 +196,19 @@ wirkt nur auf den Euro-Betrag, nicht auf die Tage (§3.5).
 ```python test: rechenkette_96
 # Rechenkette 3.0, Beispielkommune Berlin; Parameter = Kapitel 7 (unveraendert)
 u65, a6574, a7584, a85p = 2_961_430, 339_490, 253_528, 107_933   # 12411-09-01-4-B [68]
-anteil_u20 = 702_852 / 3_070_537                                   # SB A I 3 Tab. 3.1 [69]
-assert abs(anteil_u20 - 0.2289) < 1e-4
-pop = {"u20": round(u65 * anteil_u20)}
-pop["20-64"] = u65 - pop["u20"]
-pop.update({"65-74": a6574, "75-84": a7584, "85+": a85p})
-assert pop["u20"] == 677_877 and pop["20-64"] == 2_283_553
+u20 = 173_699 + 176_060 + 163_535 + 159_983                        # unter 5 ... 15-20 [68, 69]
+pop = {"u20": u20, "20-64": u65 - u20, "65-74": a6574, "75-84": a7584, "85+": a85p}
+assert pop["u20"] == 673_277 and pop["20-64"] == 2_288_153
 assert sum(pop.values()) == 3_662_381
+anteil_u20 = u20 / u65
+assert abs(anteil_u20 - 0.2273) < 1e-4
 p_ar = {"u20": 0.088, "20-64": 0.132, "65-74": 0.067, "75-84": 0.050, "85+": 0.050}
 b_band = {k: pop[k] * p_ar[k] for k in pop}
+for k, soll in {"u20": 59_248, "20-64": 302_036, "65-74": 22_746,
+                "75-84": 12_676, "85+": 5_397}.items():
+    assert abs(b_band[k] - soll) < 1
 B = sum(b_band.values())
-assert abs(B - 401_901) < 1
+assert abs(B - 402_103) < 1
 assert abs(B / sum(pop.values()) - 0.110) < 0.001
 dS_B, dS_G = 4.20, 4.08          # pollensaison_region.csv, Region mitte
 p_B, p_G, f, a_attr = 0.55, 0.75, 0.70, 0.50
@@ -221,9 +224,9 @@ p_hat = [1 + lam * (g / g_bar - 1) for _, g in zellen]
 assert abs(sum(b * p for (b, _), p in zip(zellen, p_hat)) - sum(b for b, _ in zellen)) < 1e-9
 assert abs(p_hat[0] - 0.3) < 1e-9 and abs((1 + lam * (2 - 1)) - 1.7) < 1e-9
 tage = B * delta * 1.0
-assert abs(tage - 755_373) < 1
+assert abs(tage - 755_753) < 1
 tage_band = {k: v * delta for k, v in b_band.items()}
-for k, soll in {"u20": 112_118, "20-64": 566_536, "65-74": 42_751,
+for k, soll in {"u20": 111_357, "20-64": 567_677, "65-74": 42_751,
                 "75-84": 23_825, "85+": 10_143}.items():
     assert abs(tage_band[k] - soll) < 1
 d_saison = f * (p_B * 30 + p_G * 60)
@@ -231,14 +234,16 @@ assert abs(d_saison - 43.05) < 1e-9
 c_tag = 6.20                      # Kap. 7 pollen.c_tag (= 266,90 / 43,05, gerundet)
 assert abs(266.90 / d_saison - c_tag) < 0.01
 euro = tage * c_tag
-assert abs(euro / 1e6 - 4.68) < 0.005
+assert abs(euro / 1e6 - 4.69) < 0.005
 assert abs(euro / sum(pop.values()) - 1.28) < 0.005
-# Grenze der Kommunenrechnung (u20-Anteil) und staerkster Treiber
+# Grenze der Kommunenrechnung (Bundes- statt Kommunenanteil u20) und staerkster Treiber
 assert abs(0.01 * u65 * (0.132 - 0.088) - 1_303) < 1
 anteil_bund = 15_583_456 / 64_747_448
 assert abs(anteil_bund - 0.2407) < 1e-4
-verschiebung = (round(u65 * anteil_bund) - pop["u20"]) * (0.132 - 0.088)
-assert abs(verschiebung - 1_535) < 2 and abs(verschiebung / B - 0.0038) < 0.0001
+mehr_u20 = round(u65 * anteil_bund) - pop["u20"]
+verschiebung = mehr_u20 * (0.132 - 0.088)
+assert abs(mehr_u20 - 39_482) < 2
+assert abs(verschiebung - 1_737) < 1 and abs(verschiebung / B - 0.0043) < 0.0001
 assert abs(euro * 0.19 / 0.50 / 1e6 - 1.78) < 0.005
 assert abs(euro * 0.84 / 0.50 / 1e6 - 7.87) < 0.005
 assert abs(tage * 23.66 / 1e6 - 17.9) < 0.05
@@ -1238,14 +1243,18 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   22.08.2026 über GENESIS-REST; https://www.regionalstatistik.de/genesis//online?operation=table&code=12411-09-01-4-B;
   Anlage `backend/data/kalibrierung/bevoelkerung_bundesland_altersband.csv` (.md mit
   Verarbeitung), Zeile Berlin: u65 2.961.430 · 65–74 339.490 · 75–84 253.528 · 85+ 107.933.
+  Die Tabelle führt 20 Altersgruppen; für u20 zählen unter 5 · 5–10 · 10–15 · 15–20 =
+  173.699 · 176.060 · 163.535 · 159.983 = 673.277 (der Auszug im Repo fasst sie in u65 zusammen).
   Lizenz dl-de/by-2-0. Rechenkette Ebene 1 (§3.0), wie #95.
-- **[69]** Amt für Statistik Berlin-Brandenburg, Statistischer Bericht A I 3 – j / 23
-  „Bevölkerung in Berlin 2023", Potsdam, Juni 2024, Tab. 3.1 „Bevölkerung in Berlin am
-  31. Dezember 2023 nach Geburts-, Altersjahren und Geschlecht — Bevölkerung insgesamt", S. 6
-  (Fortschreibung noch auf Basis Zensus 2011, Summe 3.782.202; verwendet wird nur der Anteil
-  der 0- bis 19-Jährigen an den 0- bis 64-Jährigen: 702.852 / 3.070.537 = 22,89 %).
-  https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/BBHeft_derivate_00033524/SB_A01-03-00_2023j01_BE.pdf
-  (Abruf 25.09.2026). Lizenz CC BY 3.0 DE. Rechenkette Ebene 1 (§3.0).
+- **[69]** Statistisches Bundesamt (Destatis), Statistischer Bericht „Bevölkerungsfortschreibung
+  auf Basis Zensus 2022 — 2023", Tab. 12411-09 „Bevölkerung am 31.12.2023 nach Altersjahren,
+  Bundesländern, Nationalität und Geschlecht" (Blatt `csv-12411-09`, Bundesland Berlin,
+  Nationalität und Geschlecht insgesamt), XLSX,
+  https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Bevoelkerungsstand/Publikationen/Downloads-Bevoelkerungsstand/statistischer-bericht-bevoelkerungsfortschreibung-zensus-2022-jaehrlich-5124108237005.xlsx?__blob=publicationFile
+  (Abruf 26.09.2026; Permalink https://web.archive.org/web/20260926002751/https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Bevoelkerungsstand/Publikationen/Downloads-Bevoelkerungsstand/statistischer-bericht-bevoelkerungsfortschreibung-zensus-2022-jaehrlich-5124108237005.xlsx?__blob=publicationFile).
+  Dieselbe Fortschreibung wie [68], nach Altersjahren und ohne Anmeldung
+  abrufbar; Kontrolle: Summe 3.662.381, u65 2.961.430 und die drei Seniorenbänder stimmen auf
+  die Person mit [68] überein. Lizenz dl-de/by-2-0. Rechenkette Ebene 1 (§3.0).
 
 ## Entscheidungslog
 
@@ -1283,4 +1292,4 @@ Aufsichtsrats (F-0007 Punkt 1); bewusste Überstimmung von Eintrag 15 (Ledger-Be
 | 19 ⚠ | Ḡ-Fixierung (Befund 113) unter der kommunalen Zentrierung? | **kein Pinning** — Ḡ wird in jedem Lauf aus dem aktuellen Vegetationszustand der Kommune gebildet; der flächige Niveaueffekt bleibt bewusst unbuchbar (§5, Modellgrenze 7) | Ein eingefrorener Referenzwert würde einem flächigen Programm einen Niveaueffekt zubuchen, den die λ-Evidenz (intra-urbane Gradienten) nicht trägt — Befund 113 war an das Bundesmittel gebunden und ist mit der kommunalen Zentrierung keine Fixierungs-, sondern eine Evidenzfrage; die Produktmechanik (measure_service skaliert gespeicherte Outcomes) ist KEIN Beleg, sondern begründet die Integrationsauflage: keine pauschal verknüpfte Maßnahme, sonst würde genau der unbelegte Niveaueffekt gebucht (Befund 124/129; Test test_no_flat_measure_on_allergy_days) | Baseline-Pinning je Kommune (verworfen: bucht unbelegten Niveaueffekt) · Emissions-/Ausbreitungsmodell (Ersetzungspfad §6, Datenlage fehlt) | Maßnahme wirkt als Umverteilung (gezielte Hotspot-Entschärfung), nicht als flächiger Niveauhebel |
 | 20 ⚠ | S158-Hebel: „qualitativ" (Wirkung null) beibehalten oder abschätzen? | **Abschätzung statt Nullwirkung** — \(r_{\text{S158}}\) = 0,03 (Band 0,005–0,10), Dreifaktor-Kette §5.1, §3.9 ABGESCHÄTZT; Wirkungsort multiplikativ auf ΔTage (Maßnahmen-Modul), Bauform-Grenze als Modellgrenze 8 dokumentiert; Katalogwert `default_reduction` bleibt in diesem Schritt 0,0 (Code-Nachzug L2 nach der P1-Kennzeichnung) | **Vorgabe P2 des Aufsichtsrats (F-0007 Punkt 1)** und Aufgabe §3.5 i. d. F. 06.09.2026: Ein Hebel ohne publizierte Effektgröße läuft nicht mehr als „qualitativ" mit Wirkung null; das Fehlen der Studie ist der Anlass der Abschätzung, nicht ihr Ersatz. Bewusste Überstimmung von Log 15 (Ledger-Befund 151) | Log 15 beibehalten (verworfen: widerspricht P2) · Effektzahl aus fremder Domäne übertragen, z. B. Hitzewarn-Effekt aus #95 (verworfen: Kategorienfehler §3.9 — anderer Endpunkt, andere Handlungskette) | Maßnahmen-Ausweis ≈ 3 % des K1-Werts (bundesweit ≈ 3,3 Mio. €/a; Band 0,55–11,0); Schadenswert selbst unverändert; Befund-124-Sperre (linked_risk_codes leer) bleibt bestehen |
 | 21 | Kapitel 9 (Familien-Einordnung und Verworfen-Liste) nach Fortschreibung 7? | **gestrichen**; es bleibt genau eine Methodik (96-A, Familie „K1-Gesundheit bottom-up“ mit Prototyp #95), die verworfenen Ansätze stehen hier | **96-B (Neophyten-Szenario Ambrosia; Lake [23], Born [25], Hamaoui [24])** ersetzt 96-A nicht, weil es nur eine Art abbildet, Birke und Gräser als Hauptlast fehlen und es 2041–2060 statt heute projiziert (Ergänzungsmodul ab M1, Register 96-W024-02, Log 13). **96-C (nationaler Kostenanker, top-down)** ist nach §3.1 ausgeschieden, weil er einen Verteilschlüssel mit Deutschland-Nenner und einen normativ gesetzten Klimaanteil braucht. | Kapitel 9 behalten (verworfen: Fortschreibung 7, eine Methodik je Risiko; Ledger-Befund 152) | keine Zahlenwirkung |
-| 22 ⚠ | Quelle der Teilung u65 → u20 und 20–64 für die Beispielkommune Berlin in der Rechenkette? | **Anteil der 0- bis 19-Jährigen an den 0- bis 64-Jährigen aus dem Berliner Landesbericht** SB A I 3 – j / 23, Tab. 3.1 [69] (22,89 %), angewendet auf u65 aus Tab. 12411-09-01-4-B [68] | Tab. 12411-09-01-4-B liefert die Bänder u65 und älter wie in #95, aber im Repo keine u20-Spalte; der Landesbericht ist amtlich, frei abrufbar und nach Altersjahren gegliedert. Dasselbe Zwei-Quellen-Prinzip wie §3.2: die u65-Menge setzt das Niveau, die Feingliederung nur die Aufteilung. | Zensus-2022-Gitter (Produktweg je Zelle; für die Kette als Kommunensumme nicht als amtliche Tabelle zitierbar) · Bundesanteil 24,07 % (Rückfall des Produkts; für Berlin 0,38 % weniger Betroffene) | Betroffene je Prozentpunkt u20-Anteil ±0,32 %; Kommunensumme sonst exakt (§3.0) |
+| 22 | Quelle von u20 für die Beispielkommune Berlin in der Rechenkette? | **Direkt aus Tab. 12411-09-01-4-B [68]**: u20 = unter 5 + 5–10 + 10–15 + 15–20 = 673.277, 20–64 = u65 − u20 = 2.288.153; die Zahlen nach Altersjahren stehen gleichlautend in Destatis Tab. 12411-09 [69] | Die Tabelle, aus der Ebene 1 schon u65 und die Seniorenbänder nimmt, führt die vier Gruppen selbst: gleicher Stichtag, gleiche Basis Zensus 2022, und ein Sachbearbeiter, der [68] öffnet, kommt auf dieselbe Zahl. | Anteil u20 aus dem Berliner Landesbericht A I 3 – j / 23 (verworfen: noch auf Basis Zensus 2011, 3.070.537 statt 2.961.430 unter 65-Jährige, Mischung zweier Basen; Runde 0 des Managers) · Bundesanteil 24,07 % (Rückfall des Produkts; für Berlin 1.737 Betroffene oder 0,43 % zu wenig) | u20 673.277 statt 677.877 im ersten Entwurf; Betroffene 402.103, Tage 755.753, bewerteter Schaden 4,69 Mio. € je Jahr (§3.0) |
