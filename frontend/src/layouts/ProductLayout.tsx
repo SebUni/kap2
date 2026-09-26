@@ -7,6 +7,7 @@ import MapDashboardTab from '../components/MapDashboardTab'
 import Dashboard from '../components/Dashboard'
 import MeasuresTableTab from '../components/MeasuresTableTab'
 import ConfigPanelTab from '../components/ConfigPanelTab'
+import ErgebnisseInterpretierenTab from '../components/interpretation/ErgebnisseInterpretierenTab'
 import ExportModal from '../components/ExportModal'
 import ChatWidget from '../components/chat/ChatWidget'
 
@@ -15,11 +16,12 @@ interface Props {
   demo?: boolean
 }
 
-function tabRoutes(base: string) {
+function tabRoutes(base: string, demo: boolean) {
   return [
     { label: 'Dashboard', path: base },
     { label: 'Karte', path: `${base}/karte` },
     { label: 'Maßnahmen-Übersicht', path: `${base}/massnahmen` },
+    ...(demo ? [] : [{ label: 'Ergebnisse interpretieren', path: `${base}/interpretieren` }]),
   ]
 }
 
@@ -61,7 +63,7 @@ export default function ProductLayout({ demo = false }: Props) {
 
   const isAdmin = user?.role === 'admin'
   const base = demo ? '/demo' : '/app'
-  const TAB_ROUTES = tabRoutes(base)
+  const TAB_ROUTES = tabRoutes(base, demo)
 
   const handleReset = async () => {
     if (!kommune) return
@@ -111,7 +113,7 @@ export default function ProductLayout({ demo = false }: Props) {
 
   // Redirect away from locked tabs if no assessment done
   useEffect(() => {
-    if (!hasCompletedAssessment && (location.pathname === `${base}/karte` || location.pathname === `${base}/massnahmen`)) {
+    if (!hasCompletedAssessment && (location.pathname === `${base}/karte` || location.pathname === `${base}/massnahmen` || location.pathname === `${base}/interpretieren`)) {
       navigate(base, { replace: true })
     }
   }, [hasCompletedAssessment, location.pathname])
@@ -193,6 +195,7 @@ export default function ProductLayout({ demo = false }: Props) {
             } />
             <Route path="karte" element={<MapDashboardTab />} />
             <Route path="massnahmen" element={<MeasuresTableTab />} />
+            {!demo && <Route path="interpretieren" element={<ErgebnisseInterpretierenTab />} />}
             <Route path="*" element={
               kommune ? <div style={{ flex: 1, overflowY: 'auto' }}><Dashboard /></div> : <WelcomePlaceholder />
             } />
