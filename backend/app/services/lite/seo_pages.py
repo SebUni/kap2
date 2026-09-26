@@ -47,7 +47,8 @@ def _render_page(g: Gemeinde, rows: list[GemeindeLiteResult],
     bl = html.escape(g.bundesland or "")
     title = f"Klimarisiken in {name} ({bl}) – KAP2"
     desc = (f"Klimarisiken in {name}: Hitze, Starkregen und Dürre auf einen Blick – "
-            f"Index und erwartete Schäden in Euro. Grobschätzung je Gemeinde.")
+            f"Risikoindex und erwartete Auswirkung je Klimawirkung, im Vergleich "
+            f"zum Bundesland und zu Deutschland. Grobschätzung je Kommune.")
     risk_rows = []
     for r in rows:
         cat = catalog.RISKS_BY_CODE.get(r.risk_code, {})
