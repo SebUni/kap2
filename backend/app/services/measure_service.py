@@ -281,7 +281,8 @@ def _is_s158(mdef: dict) -> bool:
     return mdef.get("effect_model") == "s158"
 
 
-def _s158_cell_effect(mdef: dict, frac: float, cell_risk: dict) -> tuple[float, float | None, bool]:
+def _s158_cell_effect(mdef: dict, frac: float, cell_risk: dict,
+                      days_factor: float = 1.0) -> tuple[float, float | None, bool]:
     """(Faktor, vermiedene Tage, fehlende Gruppenaufteilung) einer Zelle durch S158.
 
     Die Gruppentage ΔTage_B/G,Zelle holt der Zweig FRISCH über ``health.pollen_zelltage``
@@ -293,6 +294,16 @@ def _s158_cell_effect(mdef: dict, frac: float, cell_risk: dict) -> tuple[float, 
     zuvor gespeicherten Summe überschrieben zu werden. λ (``lambda_veg``) wird nicht
     gespeichert und deshalb hier aus den Overrides gelesen, damit eine Überschreibung
     wirkt.
+
+    ``days_factor`` (Bericht §5 „Zusammen mit S158", T-1602-cto): deckt dieselbe Zelle
+    zugleich eine Stadtbaumwahl derselben Kommune ab, mindert die Frühwarnung nur die
+    Tage nach der Pflanzung — der Aufrufer übergibt hier den Ĝ′-Tage-Faktor der
+    Stadtbaumwahl (Verhältnis der Zusatztage NACH zu VOR der Pflanzung,
+    ``_stadtbaum_cell_factor``; Standard 1,0 ohne Stadtbaumwahl). Beide Gruppentage
+    skalieren mit demselben Faktor, weil er allein über P̂ wirkt (nur Ĝ ändert sich,
+    B, δ_B, δ_G bleiben gleich) — Bezugsgröße für die vermiedenen Tage UND Nenner des
+    Faktors sind dann die schon um die Pflanzung geminderten Tage, nicht der
+    Ausgangsstand: so zählt kein vermiedener Tag doppelt.
 
     ``vermiedene Tage`` ist ``None``, wenn die Zelle außerhalb des Geltungsbereichs liegt
     oder die Roheingaben fehlen (Alt-Zelle vor der Neuberechnung) — dann bleibt der
@@ -325,17 +336,25 @@ def _s158_cell_effect(mdef: dict, frac: float, cell_risk: dict) -> tuple[float, 
     if total <= 0.0:
         return 1.0, 0.0, False
 
+    df = max(0.0, float(days_factor))
+    tage_birke_adj = tage_birke * df
+    tage_graeser_adj = tage_graeser * df
+    total_adj = tage_birke_adj + tage_graeser_adj
+    if total_adj <= 0.0:
+        return 1.0, 0.0, False
+
     r = float(mdef.get("default_reduction") or 0.0)
     t_warn = _p("t_warn_s158", 0.75)
     vermieden = health.s158_vermiedene_tage(
-        tage_birke, tage_graeser, frac, r, t_warn, t_warn)
-    factor = max(0.0, min(1.0, 1.0 - vermieden / total))
+        tage_birke_adj, tage_graeser_adj, frac, r, t_warn, t_warn)
+    factor = max(0.0, min(1.0, 1.0 - vermieden / total_adj))
     return factor, vermieden, False
 
 
-def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
+def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict,
+                      days_factor: float = 1.0) -> float:
     """Faktor (0..1) auf das Symptomtage-Outcome einer Zelle durch S158 (Wrapper)."""
-    factor, _, _ = _s158_cell_effect(mdef, frac, cell_risk)
+    factor, _, _ = _s158_cell_effect(mdef, frac, cell_risk, days_factor)
     return factor
 
 
@@ -420,13 +439,64 @@ def _stadtbaum_cell_factor(config: dict | None, frac: float, cell_risk: dict) ->
     return max(0.0, total1 / total0)
 
 
+# S158 zusammen mit der Stadtbaumwahl (Bericht §5 „Zusammen mit S158", T-1602-cto): die
+# Frühwarnung mindert die Tage B·δ_g·P̂′, die NACH der Pflanzung noch anfallen — kein
+# vermiedener Tag zählt doppelt, weil die Frühwarnung nur auf Tage wirkt, die die
+# Pflanzung nicht schon vermieden hat. Muster analog Befund 129 (δ_HAP × S157).
+STADTBAUM_CODE = "LOW_ALLERGEN_TREE_SELECTION"
+
+
+def _stadtbaum_measures(db: Session, measure: AdaptationMeasure) -> list[AdaptationMeasure]:
+    """Stadtbaumwahl-Maßnahmen derselben Kommune (und derselben Demo-Sitzung) wie ``measure``."""
+    return [m for m in kommune_measures_query(db, measure.kommune_id, measure.demo_session_id)
+            .filter(AdaptationMeasure.measure_type == STADTBAUM_CODE).all()
+            if m.id != measure.id]
+
+
+def _stadtbaum_cell_days_factors(db: Session, measure: AdaptationMeasure) -> dict[int, float]:
+    """Ĝ′-Tage-Faktor je Zelle (Zusatztage NACH zu VOR der Pflanzung) aus den
+    Stadtbaumwahl-Maßnahmen derselben Kommune wie ``measure`` — für S158 (Bericht §5
+    „Zusammen mit S158"). Mehrere Stadtbaumwahl-Maßnahmen wirken multiplikativ (Muster
+    δ_HAP, Befund 129). Ohne eine solche Maßnahme, ohne ihre Deckung der Zelle oder ohne
+    die nötigen Zell-Roheingaben bleibt der Faktor 1,0 (``_stadtbaum_cell_factor``).
+    """
+    out: dict[int, float] = {}
+    stadtbaum_measures = _stadtbaum_measures(db, measure)
+    if not stadtbaum_measures:
+        return out
+    cell_ids: set[int] = set()
+    coverage_by_measure: list[tuple[AdaptationMeasure, dict[int, float]]] = []
+    for m in stadtbaum_measures:
+        frac_map, _ = _coverage(db, m)
+        coverage_by_measure.append((m, frac_map))
+        cell_ids.update(frac_map.keys())
+    if not cell_ids:
+        return out
+    assessments = {
+        ca.grid_cell_id: ca for ca in
+        db.query(CellAssessment).filter(CellAssessment.grid_cell_id.in_(cell_ids)).all()
+    }
+    for m, frac_map in coverage_by_measure:
+        for cid, frac in frac_map.items():
+            ca = assessments.get(cid)
+            if not ca:
+                continue
+            cell_risk = ((ca.data or {}).get("risks", {}) or {}).get(ALLERGY_RISK_CODE, {})
+            factor = _stadtbaum_cell_factor(m.config, frac, cell_risk)
+            out[cid] = out.get(cid, 1.0) * factor
+    return out
+
+
 def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float,
                          unit_factor: float, cell_risk: dict,
-                         delta_hap: float = 1.0, hap_cap: float = 1.0) -> float:
+                         delta_hap: float = 1.0, hap_cap: float = 1.0,
+                         s158_days_factor: float = 1.0) -> float:
     """Faktor einer Maßnahme auf ein verknüpftes Risiko in einer Zelle.
 
     ``delta_hap`` wirkt nur auf S157 und die Schutzprogramme (Einzelnutzen),
-    ``hap_cap`` nur auf die Kappung der Schutzprogramme; sonst ohne Belang.
+    ``hap_cap`` nur auf die Kappung der Schutzprogramme; ``s158_days_factor`` nur auf
+    S158 (Ĝ′-Tage-Faktor einer gleichzeitigen Stadtbaumwahl derselben Kommune); sonst
+    ohne Belang.
     """
     if _is_s157(mdef):
         if code != S157_RISK_CODE:
@@ -437,7 +507,7 @@ def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float
     if _is_s158(mdef):
         if code != ALLERGY_RISK_CODE:
             return 1.0
-        return _s158_cell_factor(mdef, frac, cell_risk)
+        return _s158_cell_factor(mdef, frac, cell_risk, s158_days_factor)
     if _is_stadtbaum(mdef):
         if code != ALLERGY_RISK_CODE:
             return 1.0
@@ -741,6 +811,13 @@ def _params_fingerprint(db: Session, measure: AdaptationMeasure, mdef: dict,
         payload["hap"] = sorted(
             (m.id, json.dumps(m.config or {}, sort_keys=True, default=str), str(m.geometry))
             for m in _hap_measures(db, measure))
+    if _is_s158(mdef):
+        # Bericht §5 „Zusammen mit S158" (T-1602-cto): der Nutzen von S158 hängt an
+        # der Stadtbaumwahl derselben Kommune (kein vermiedener Tag zählt doppelt);
+        # kommt eine hinzu, ändert sich oder fällt weg, ist das Summary veraltet.
+        payload["stadtbaum"] = sorted(
+            (m.id, json.dumps(m.config or {}, sort_keys=True, default=str), str(m.geometry))
+            for m in _stadtbaum_measures(db, measure))
     return hashlib.sha1(
         json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
 
@@ -868,6 +945,14 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         hap_by_cell = _hap_cell_factors(db, measure, parameter_registry.overrides_map(
             parameter_registry.load_db_overrides(db, measure.kommune_id)))
 
+    # Bericht §5 „Zusammen mit S158" (T-1602-cto): deckt zugleich eine Stadtbaumwahl
+    # derselben Kommune dieselbe Zelle ab, rechnet S158 seinen Nutzen aus den schon um
+    # die Pflanzung geminderten Tagen (Faktoren multipliziert) — kein vermiedener Tag
+    # zählt doppelt.
+    stadtbaum_by_cell: dict[int, float] = {}
+    if _is_s158(mdef):
+        stadtbaum_by_cell = _stadtbaum_cell_days_factors(db, measure)
+
     # S158-Integrationsauflage Punkt 5: vermiedene Symptomtage der Kommune (Summe der
     # Zellwerte, identisch zur Summe der MeasureImpact-Zeilen) und ihr Euro-Gegenwert
     # (Anteil #96 an ``annual_benefit_damage_eur`` — dieselbe Maßnahme verknüpft nur
@@ -887,15 +972,16 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         for code in linked:
             r = cell_risks.get(code, {})
             d_hap = hap_by_cell.get(cid, 1.0)
+            s158_days_factor = stadtbaum_by_cell.get(cid, 1.0)
             factor = _measure_cell_factor(mdef, measure.config, code, frac, unit_factor, r,
-                                          d_hap, d_hap)
+                                          d_hap, d_hap, s158_days_factor)
             base_idx = float(r.get("index", 0.0))
             new_idx = base_idx * factor
             deltas[code] = round(new_idx - base_idx, 3)
             covered_base_index[code] = covered_base_index.get(code, 0.0) + base_idx
             covered_new_index[code] = covered_new_index.get(code, 0.0) + new_idx
             if _is_s158(mdef) and code == ALLERGY_RISK_CODE:
-                _, avoided_days, missing = _s158_cell_effect(mdef, frac, r)
+                _, avoided_days, missing = _s158_cell_effect(mdef, frac, r, s158_days_factor)
                 if missing:
                     s158_missing_split = True
                 elif avoided_days is not None:
@@ -1093,6 +1179,23 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
                 uf = _unit_effect_factor(count, recommended)
                 for cid, frac in frac_map.items():
                     hap_cap[cid] = hap_cap.get(cid, 1.0) * _reduction_factor(hap_def, frac, uf)
+    # Bericht §5 „Zusammen mit S158" (T-1602-cto): Ĝ′-Tage-Faktor je Zelle aus den
+    # Stadtbaumwahl-Maßnahmen vorab, damit S158 seinen Nutzen aus den schon um die
+    # Pflanzung geminderten Tagen rechnet (kein vermiedener Tag zählt doppelt) —
+    # dieselbe Basis wie ``_stadtbaum_cell_factor`` selbst: die ungeänderten Roheingaben
+    # in ``base`` (keine erneute DB-Abfrage nötig, anders als in compute_impact).
+    stadtbaum_days_by_cell: dict[int, float] = {}
+    if any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "s158"
+           for m in measures):
+        for m in measures:
+            if catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") != "stadtbaum":
+                continue
+            frac_map, _ = _coverage(db, m)
+            for cid, frac in frac_map.items():
+                cell_risk = ((base.get(cid) or {}).get("risks", {}) or {}).get(
+                    ALLERGY_RISK_CODE, {})
+                factor = _stadtbaum_cell_factor(m.config, frac, cell_risk)
+                stadtbaum_days_by_cell[cid] = stadtbaum_days_by_cell.get(cid, 1.0) * factor
     for m in measures:
         mbase = catalog.MEASURES_BY_CODE.get(m.measure_type)
         if not mbase:
@@ -1107,7 +1210,8 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
             for code in mdef.get("linked_risk_codes", []):
                 factor = _measure_cell_factor(mdef, m.config, code, frac, unit_factor,
                                               cell_risks.get(code, {}),
-                                              hap_cap=hap_cap.get(cid, 1.0))
+                                              hap_cap=hap_cap.get(cid, 1.0),
+                                              s158_days_factor=stadtbaum_days_by_cell.get(cid, 1.0))
                 cell_factors[code] = cell_factors.get(code, 1.0) * factor
 
     out = []
