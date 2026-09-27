@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–437) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–440) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -1210,20 +1210,20 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   |---|---|---|---|
   | \(k_{\text{UV}} \times a_{\text{attr}}\), untere Kombination | 0,3622 × 0,50 | **115** | −66 % |
   | \(k_{\text{UV}} \times a_{\text{attr}} \times c_e\) oben, obere Kombination | 1,0616 × 1,00 × \(c_e\) oben (**beide** Entitäten) | **737** | +118 % |
-  | VOLY | 136.400 / 165.600 € | 304 – 345 | −10,1 % … +2,0 % |
-  | \(a_{\text{attr}}\) | 0,50 / 1,00 | 226 – 452 | −33,3 % … +33,3 % |
-  | BAF_MM | 0,2 / 1,0 | 241 – 436 | −28,8 % … +28,8 % |
-  | \(w_{\text{SCC}}\) (⇒ BAF_C44 1,675/1,95) | 0,25 / 0,50 | 339 – 370 | ±0 % … +9,3 % |
-  | **Transient-Faktor \(\tau\)** (Gleichgewichts- ↔ Jahres-Lesart, §3.4) | 0,20 / 1,00 | **67 – 339** | **−80 % … ±0 %** |
+  | VOLY | 136.400 / 165.600 € | 304–345 | −10,1 % … +2,0 % |
+  | \(a_{\text{attr}}\) | 0,50 / 1,00 | 226–452 | −33,3 % … +33,3 % |
+  | BAF_MM | 0,2 / 1,0 | 241–436 | −28,8 % … +28,8 % |
+  | \(w_{\text{SCC}}\) (⇒ BAF_C44 1,675/1,95) | 0,25 / 0,50 | 339–370 | ±0 % … +9,3 % |
+  | **Transient-Faktor \(\tau\)** (Gleichgewichts- ↔ Jahres-Lesart, §3.4) | 0,20 / 1,00 | **67–339** | **−80 % … ±0 %** |
   | \(r_{\text{out}}\) (geparkt) | \(q_{\text{out}}\) ∈ [0; 0,21] | 339 | **±0 %** (zentriert) |
-  | \(v_{\text{verh}}\) (geparkt) | \(\phi\) ∈ [0; 0,25] | 339 – 377 | ±0 % … +11,3 % |
+  | \(v_{\text{verh}}\) (geparkt) | \(\phi\) ∈ [0; 0,25] | 339–377 | ±0 % … +11,3 % |
 
   **Gesamtband ≈ 115–737 Mio. €** = nur die \(k_{\text{UV}}\)/\(a_{\text{attr}}\)/\(c_e\)-Kombination;
   die übrigen Zeilen sind **nicht** hineinmultipliziert. Größte Achse ist der
   einseitige Transient-Faktor \(\tau\) (§3.4); größter **zweiseitiger** Treiber ist die
   \(k_{\text{UV}}\)-Messunsicherheit (±49 %); danach folgen \(a_{\text{attr}}\)
-  (±33,3 %) und BAF_MM (±28,8 %) — die Reihenfolge entspricht der Tabelle darüber
-  (Befund 282; bis Rev. 8 stand hier eine abweichende Rangfolge). Seit Rev. 3 erzeugt
+  (±33,3 %) und BAF_MM (±28,8 %) — die Reihenfolge folgt dem Betrag der Spalte
+  »Δ gegen Basiswert« der Tabelle darüber (Befunde 282/439; bis Rev. 8 stand hier eine abweichende Rangfolge). Seit Rev. 3 erzeugt
   die Anlage [71] alle Zeilen; \(a_{\text{attr}}\) ist seit Rev. 8 als eigene Achse
   ausgewiesen (Befund 261).
 - **Unsicherheiten (nach Größe geordnet, Befunde 250/268/398):**
@@ -1240,10 +1240,10 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   **BAF_MM** (±67 % auf den MM-Pfad ⇒ ±28,8 % auf die Summe — Befund 356: die Achse
   steht hier **einmal**, nicht doppelt); **Verhaltens-Sensitivität \(v_{\text{verh}}\)**
   (geparkte Ebene, \(\phi\) ∈ [0; 0,25] ⇒ ±0 … **+11,3 %**, einseitig nach oben);
-  **VOLY** (136.400–165.600 € ⇒ **−10,1 … +2,0 %**); Entitäten-Split
-  \(w_{\text{SCC}}\) (0,25–0,50 ⇒ BAF_C44 1,675–1,95 ⇒ ±0 … +9,3 %); \(c_e\)-Proxy
-  (obere Kostenbänder beider Entitäten ⇒ Behandlungs-€ 113 → 145 Mio. € ⇒ +9,3 % auf die
-  Summe, einseitig); Anker-Auswahlregel (−4,3 … +2,8 %);
+  **VOLY** (136.400–165.600 € ⇒ **−10,1 … +2,0 %**); \(c_e\)-Proxy
+  (obere Kostenbänder beider Entitäten ⇒ Behandlungs-€ 113 → 145 Mio. € ⇒ +9,4 % auf die
+  Summe, einseitig; Befund 438); Entitäten-Split
+  \(w_{\text{SCC}}\) (0,25–0,50 ⇒ BAF_C44 1,675–1,95 ⇒ ±0 … +9,3 %); Anker-Auswahlregel (−4,3 … +2,8 %);
   **Binnenheterogenität des Bandes 20–64 (≈ ±4 % je Kommune, Bundessumme unberührt —
   §6 Modellgrenze 7, Befund 225)**; **Populationsbasis Kalibrierung ↔ Produktion
   (−1,19 %, §3.3, Befund 226)**; \(r_{\text{out}}\) (geparkt, zentriert ⇒ ±0 %).
