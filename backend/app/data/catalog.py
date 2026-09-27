@@ -1971,6 +1971,22 @@ MEASURES: list[dict] = [
      "methodik_bloecke": {},
      "source_details": {},
      "evidence_derivation": {},
+     # Vorgabe P1 (Vorhabenskriterium ii, T-1603-cto): nutzersichtbarer Eingabetext
+     # für config['anteil_ersetzt'] samt Herkunft — kein neues Registry-Feld
+     # (test_measure_pricing bindet 9 Felder je Maßnahme), deshalb NICHT in
+     # source_details (dessen Keys test_source_maps_keys_are_valid_field_names auf
+     # _ALL_NUMERIC_FIELDS bindet), sondern in diesem eigenen Feld. Wird über
+     # GET /catalog (catalog.MEASURES, unverändert durchgereicht) an das Frontend
+     # ausgeliefert und dort in MeasureSidebar.tsx angezeigt (Muster s_gek/S157).
+     "config_input_help": {
+        "anteil_ersetzt": "Änderung des Kronenanteils je gewählter Zelle: Anteil a "
+            "(0 < a ≤ 1) der allergenen Kronen (v. a. Birkengruppe), die im "
+            "Geltungsbereich durch allergenarme Arten ersetzt werden. Herkunft nach "
+            "P1: Die Kronenanteile selbst (mit und ohne Gattungs-Tag) kommen aus den "
+            "OSM-Tags der gewählten Zellen (canopy_birch_frac, canopy_unknown_frac); "
+            "der Anteil a ist eine Eingabe der Kommune. Gattungen aus einem "
+            "Baumkataster gehen — wo vorhanden — über den Ausgangsstand "
+            "(birch_group_share_default, s_unbek) ein, nicht über diese Maßnahme."},
     },
     # Herleitung capex_fixed: angepasste Arbeitszeitmodelle bei Hitze verursachen im Kern nur
     # organisatorischen Aufwand (Dienstplanung, Betriebsvereinbarung); kein Marktkennwert.

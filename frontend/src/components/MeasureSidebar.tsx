@@ -13,6 +13,9 @@ export default function MeasureSidebar() {
   const [editCount, setEditCount] = useState<number | null>(null)
   // S157 (#95 §5): gekühlter Anteil der Heimplätze in Prozent; null = keine Eingabe.
   const [editSgek, setEditSgek] = useState<number | null>(null)
+  // Stadtbaumwahl (#96 §5, T-1603-cto): Anteil ersetzter allergener Kronen in Prozent;
+  // null = keine Eingabe.
+  const [editAnteilErsetzt, setEditAnteilErsetzt] = useState<number | null>(null)
   const [showBreakdown, setShowBreakdown] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -24,6 +27,8 @@ export default function MeasureSidebar() {
       setEditCount(null)
       const sg = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.s_gek
       setEditSgek(typeof sg === 'number' ? Math.round(sg * 1000) / 10 : null)
+      const ae = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.anteil_ersetzt
+      setEditAnteilErsetzt(typeof ae === 'number' ? Math.round(ae * 1000) / 10 : null)
       setShowBreakdown(false)
       setDirty(false)
       setImpact(null)
@@ -45,6 +50,8 @@ export default function MeasureSidebar() {
   const def = catalog?.measures.find(m => m.code === selectedMeasure.measure_type)
   const isS157 = selectedMeasure.measure_type === 'COOLING_ROOMS_DRINKING_WATER'
   const isS158 = selectedMeasure.measure_type === 'POLLEN_EARLY_WARNING'
+  const isStadtbaum = selectedMeasure.measure_type === 'LOW_ALLERGEN_TREE_SELECTION'
+  const anteilErsetztHelp = def?.config_input_help?.anteil_ersetzt
   const reductionIsEstimated = def?.evidence_classes?.default_reduction === 'abgeschaetzt'
   const linkedRisks = (def?.linked_risk_codes || [])
     .map(c => catalog?.risks.find(r => r.code === c)?.name || c)
@@ -67,6 +74,12 @@ export default function MeasureSidebar() {
         const base = { ...((payload.config as Record<string, unknown>) || selectedMeasure.config || {}) }
         if (editSgek == null) delete base.s_gek
         else base.s_gek = Math.max(0, Math.min(100, editSgek)) / 100
+        payload.config = base
+      }
+      if (isStadtbaum) {
+        const base = { ...((payload.config as Record<string, unknown>) || selectedMeasure.config || {}) }
+        if (editAnteilErsetzt == null) delete base.anteil_ersetzt
+        else base.anteil_ersetzt = Math.max(0.1, Math.min(100, editAnteilErsetzt)) / 100
         payload.config = base
       }
       const updated = await updateMeasure(selectedMeasure.id, payload)
@@ -198,6 +211,22 @@ export default function MeasureSidebar() {
               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
                 Nur Heimplätze mit Klimaanlage im Wohnbereich zählen. Ohne Eingabe entsteht kein Betrag
                 (Methodik-Bericht #95, Hebel S157).
+              </div>
+            </div>
+          )}
+
+          {isStadtbaum && (
+            <div className="card">
+              <h3>Änderung des Kronenanteils (%)</h3>
+              <input
+                type="number" min={0.1} max={100} step={1} value={editAnteilErsetzt ?? ''}
+                placeholder="nicht eingegeben"
+                onChange={e => { setEditAnteilErsetzt(e.target.value === '' ? null : Number(e.target.value)); setDirty(true) }}
+                style={{ fontSize: '0.9rem', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 6px', width: 120, background: 'var(--surface)' }}
+              />
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                {anteilErsetztHelp || 'Anteil a (0 < a ≤ 1) der ersetzten allergenen Kronen '
+                  + '(Methodik-Bericht #96, Stadtbaumwahl).'}
               </div>
             </div>
           )}
