@@ -263,9 +263,11 @@ RISKS: list[dict] = [
      "outcome_unit": "Symptomtage/Jahr", "group": "pollen", "cost_dimension": "health",
      "hazards": ["POLLEN_LOAD"],
      "exposures": ["POPULATION_DENSITY", "AGE_STRUCTURE"],
-     # EARLY_WARNING_SYSTEMS (S158) führt der Bericht §5 ausdrücklich als
-     # qualitativen Hebel mit Default 1 (keine Interventions-Effektgröße) — er
-     # geht daher in keine Formel ein und ist im M0-Katalog nicht angelegt.
+     # S158 ist als Maßnahme POLLEN_EARLY_WARNING angelegt (default_reduction
+     # 0,03, abgeschätzt nach Vorgabe P2, Bericht #96 §5.1, Befund 215,
+     # Register-ID 96-S158-01). Sie wirkt als Hebel auf die Verwundbarkeit
+     # (qualitative_risk_codes) und hängt deshalb nicht hier in
+     # "vulnerabilities" (linked_risk_codes: []).
      "vulnerabilities": ["HEALTHCARE_ACCESS"],
      # Herleitung ref_value (Sanity-Anker, Symptomtage je 100.000 EW): Bundessumme
      # 8,96 Mio Betroffene × 1,988 Tage = 17,8 Mio Tage ÷ 83,456 Mio EW × 100.000
