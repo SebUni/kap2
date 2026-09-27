@@ -251,11 +251,14 @@ export function GroupRadarCard({ className = '' }: { className?: string }) {
 export function TopRisksCard({ className = '' }: { className?: string }) {
   const { riskSummary, costSummary } = useStore()
   const byRisk = costSummary?.by_risk || riskSummary?.cost.by_risk || []
+  const byRiskCode = new Map(byRisk.map(r => [r.code, r]))
+  const klimawirkungen = costSummary?.klimawirkungen || riskSummary?.cost.klimawirkungen || []
   // Verwechslungssperre Klasse A/B (T-0517, T-0823): Die Rangliste enthält nur Klasse A
   // (mit Euro-Bezifferung). Klasse B fällt nicht still weg, sondern steht in einem
-  // eigenen Block „Ohne Euro-Bezifferung (Screening)“ — ohne Rang, ohne Betrag.
-  const top = byRisk.filter(r => r.has_euro_layer !== false && (r.cost_eur ?? 0) > 0).slice(0, 5)
-  const screening = byRisk.filter(r => r.has_euro_layer === false)
+  // eigenen Block „Ohne Euro-Bezifferung (Screening)“ — ohne Rang, ohne Betrag. Je
+  // Klimawirkung eine Zeile (bezeichnung, T-1474-cto) statt je Einzelrisiko.
+  const top = klimawirkungen.filter(k => k.has_euro_layer !== false && (k.cost_eur ?? 0) > 0).slice(0, 5)
+  const screening = klimawirkungen.filter(k => k.has_euro_layer === false)
   const maxCost = top.length ? (top[0].cost_eur ?? 0) : 0
   const benefitDirect = costSummary?.measures.total_benefit_direct_eur ?? 0
   const annualBenefit = (costSummary?.damage_reduction_eur ?? 0) + benefitDirect
@@ -271,22 +274,34 @@ export function TopRisksCard({ className = '' }: { className?: string }) {
         <ChartSkeleton height={RADAR_HEIGHT} label="Kostendaten werden geladen …" />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: RADAR_HEIGHT }}>
-          {top.map(r => {
+          {top.map(k => {
             return (
-              <div key={r.code}>
+              <div key={k.codes[0]}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, fontSize: '0.82rem', marginBottom: 2 }}>
                   <span style={{ fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{k.bezeichnung}</span>
                   </span>
-                  <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtEurCompact(r.cost_eur ?? 0)}/a</span>
+                  <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtEurCompact(k.cost_eur ?? 0)}/a</span>
                 </div>
                 <div style={{ height: 6, background: 'var(--bg)', borderRadius: 4, overflow: 'hidden' }}>
                   <div style={{
                     height: '100%', borderRadius: 4, background: 'var(--danger)',
-                    width: `${maxCost > 0 ? Math.max(4, ((r.cost_eur ?? 0) / maxCost) * 100) : 0}%`,
+                    width: `${maxCost > 0 ? Math.max(4, ((k.cost_eur ?? 0) / maxCost) * 100) : 0}%`,
                     opacity: 0.75,
                   }} />
                 </div>
+                {/* Teilzeilen einer Klimawirkung mit mehreren Ausweisen (T-1474-cto),
+                    eingerückt und gedämpft — nur wenn teile nicht leer ist. */}
+                {k.teile.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 2, paddingLeft: '1rem' }}>
+                    {k.teile.map(t => (
+                      <div key={t.code} style={{ display: 'flex', justifyContent: 'space-between', gap: 6, fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</span>
+                        <span style={{ whiteSpace: 'nowrap' }}>{fmtEurCompact(t.cost_eur ?? 0)}/a</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )
           })}
@@ -295,11 +310,11 @@ export function TopRisksCard({ className = '' }: { className?: string }) {
               <h3 style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', margin: 0 }}>
                 Ohne Euro-Bezifferung (Screening)
               </h3>
-              {screening.map(r => (
-                <div key={r.code} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, fontSize: '0.82rem' }}>
-                  <span style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{r.name}</span>
+              {screening.map(k => (
+                <div key={k.codes[0]} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, fontSize: '0.82rem' }}>
+                  <span style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{k.bezeichnung}</span>
                   <span style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                    {String(r.cost_display ?? '')}
+                    {String(byRiskCode.get(k.codes[0])?.cost_display ?? '')}
                   </span>
                 </div>
               ))}
