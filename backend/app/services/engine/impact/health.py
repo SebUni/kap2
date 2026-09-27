@@ -486,6 +486,45 @@ def pollen_zelltage(betroffene: float, delta_b: float, delta_g: float,
     return b * delta_b * p_hat, b * delta_g * p_hat
 
 
+def stadtbaum_g_neu(g_zelle: float, k_birke: float, k_unbek: float, gruen: float,
+                     dk_birke: float, dk_unbek: float, s_unbek: float) -> float:
+    """Ĝ' der Zelle nach Stadtbaumwahl (Bericht #96 §5, Z. 975–989, 1115–1121).
+
+    Definition der Ebene POLLEN_LOAD (§3.3, ``indicators.pollen_load``):
+    ``Ĝ_z = w_B · [k_Birke,z + s_unbek · k_unbek,z] + (1 − w_B) · Grün_z``. Ein Austausch
+    allergener Bäume senkt nur den Kronen-Summanden, und zwar **in dem Term, in dem die
+    ersetzten Kronen im Ausgangsstand stehen**: Kronen mit Gattungs-Tag der Birkengruppe
+    zählen voll, Kronen ohne Gattungs-Tag nur mit ``s_unbek`` (Registry
+    ``birch_group_share_default``, Default 0,12) — wie der Ausgangsstand sie gezählt hat.
+
+    ``Ĝ' = Ĝ_z − w_B · (dk_Birke + s_unbek · dk_unbek)``
+
+    ``g_zelle`` ist der gespeicherte Ĝ der Zelle (``pollen_g``, auf 5 Stellen gerundet wie
+    in ``indicators.pollen_load``); die Senkung wird davon abgezogen, KEINE anteilige
+    Senkung von Ĝ (Faktor 1/w_B zu hoch gegenüber der tragenden Kronenfläche, §5 Z.
+    1039–1042/1089).
+
+    Grenze (§5 Z. 988–989, Befund 195): Die Senkung ist höchstens so groß wie der
+    Kronenanteil selbst im Ausgangsstand — der Beitrag der Gehölze sinkt nie unter null.
+    Deshalb wird ``dk_Birke``/``dk_unbek`` je Term an ``k_Birke``/``k_unbek`` gekappt,
+    bevor abgezogen wird (die Kronenterme kommen deshalb zusätzlich getrennt herein — Ĝ
+    allein trägt die Kappungsgrenze je Term nicht); daraus folgt insgesamt
+    ``Ĝ' ≥ (1 − w_B) · Grün`` — als zusätzliche Absicherung wird dieser Boden auch direkt
+    gehalten, falls ``g_zelle`` (Rundung, Alt-Daten) von den Kronentermen abweicht.
+
+    ``dk_Birke`` und ``dk_unbek`` sind Senkungen und damit ≥ 0 (negative Eingaben werden
+    wie Kronenanteile unter 0 defensiv auf 0 gestutzt).
+    """
+    from app.services.engine.indicators import POLLEN_G_WEIGHT_BIRKE
+
+    w_b = POLLEN_G_WEIGHT_BIRKE
+    dk_b = min(max(0.0, float(dk_birke)), max(0.0, float(k_birke)))
+    dk_u = min(max(0.0, float(dk_unbek)), max(0.0, float(k_unbek)))
+    g_neu = float(g_zelle) - w_b * (dk_b + float(s_unbek) * dk_u)
+    floor = (1.0 - w_b) * max(0.0, float(gruen))
+    return max(floor, g_neu)
+
+
 def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     """Zusätzliche Symptomtage durch die klimabedingt längere Pollensaison.
 
@@ -555,6 +594,12 @@ def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     out["delta_graeser"] = delta_graeser
     out["pollen_g"] = g_cell
     out["pollen_g_bar0"] = g_bar0
+    # Kronenterme der Zelle (§3.3), gleich den Zelleingaben — Grundlage für die
+    # Stadtbaumwahl (health.stadtbaum_g_neu, T-1599-cto): ohne sie ist die
+    # Kappungsgrenze je Term (dk ≤ k) im Maßnahmenlauf nicht rechenbar.
+    out["canopy_birch_frac"] = float(ctx.ci.get("canopy_birch_frac") or 0.0)
+    out["canopy_unknown_frac"] = float(ctx.ci.get("canopy_unknown_frac") or 0.0)
+    out["green_frac"] = float(ctx.ci.get("green_frac") or 0.0)
 
     # Kostensatz-Kopplung (Bericht #96 §3.5, Ledger-Befund 133): Der Ausweis
     # rechnet € = ΔTage · c_Tag mit c_Tag = c_Jahr,direkt / d_Saison und
