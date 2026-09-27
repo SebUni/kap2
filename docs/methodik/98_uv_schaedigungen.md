@@ -44,14 +44,14 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Zellen summiert — §3.4 „Kalibriermodell = Produktionsmodell" (Befund 223);
 > (2) \(\bar L_e\) wird über die **Jahres**mediane des Ankerfensters gerechnet
 > statt über das Sterbealter des Einzeljahrs 2023 (Befund 224). Dadurch ändern
-> sich alle Bundessummen: € 367 → **401 Mio**, YLL 1.521 → **1.664**.
+> sich alle Bundessummen: 367 → **401 Mio. €**, YLL 1.521 → **1.664**.
 > **Rev. 4 (01.09.2026)** = Review-Runde 6 (Befunde 230–237). Modellrelevant ist
 > **eine** Änderung (Entscheidungslog Nr. 23): \(k_{\text{UV}}\) wird mit einem
 > **ortsgleichen** Nenner hergeleitet — dem Raster-SSD-Trend an der Dortmunder
 > Messzelle (6,48 %/Dek.) statt dem NRW-Gebietsmittel (5,81 %/Dek.) ⇒
 > **0,7562 statt 0,8434**. Zugleich ist der Quellen-Widerspruch benannt, den Rev. 3
 > übersehen hatte: Der Stations-SSD-Trend 11,3 %/Dek. ist **belegt** (Abstract von
-> [31]) und nicht, wie fünfmal behauptet, unbelegt. Wirkung: € 401 → **360 Mio**,
+> [31]) und nicht, wie fünfmal behauptet, unbelegt. Wirkung: 401 → **360 Mio. €**,
 > YLL 1.664 → **1.492**.
 > **Rev. 5 (01.09.2026)** = Review-Runde 7 (Befunde 238–244). Modellrelevant ist
 > wieder \(k_{\text{UV}}\) (Entscheidungslog Nr. 24): Rev. 4 hatte den **Nenner**
@@ -60,14 +60,14 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Station: SSD 0,57, Globalstrahlung 0,76). Die Globalstrahlung liegt in beiden
 > Familien vor und trägt jetzt die Übersetzung ⇒ \(k_{\text{UV}}\) = **0,5782**;
 > beide Bandstützen sind gerechnet (**0,4336–0,6667** statt 0,4336–1,0, Befund 239).
-> Wirkung: € 360 → **275 Mio**, YLL 1.492 → **1.141**.
+> Wirkung: 360 → **275 Mio. €**, YLL 1.492 → **1.141**.
 > **Rev. 6 (01.09.2026)** = Review-Runde 8 (Befunde 245–251). Modellrelevant ist
 > Entscheidungslog Nr. 25: Der Stationsquotient Dosis/Globalstrahlung ist in [31]
 > **beziffert** (»Global radiation increases similarly to the UV data«) und war in
 > Rev. 5 fälschlich aus einer Relationsangabe geschätzt worden ⇒ k_UV = **0,6667**.
 > Das Band kommt jetzt aus der **räumlichen Streuung** über acht Standorte
 > (**0,3656–0,9187**) statt aus zwei Skalen-Grenzfällen — das ist die dominierende
-> Unsicherheit. Wirkung: € 275 → **317 Mio**, YLL 1.141 → **1.315**.
+> Unsicherheit. Wirkung: 275 → **317 Mio. €**, YLL 1.141 → **1.315**.
 > **Rev. 7 (01.09.2026)** = Review-Runde 9 (Befunde 252–263). Der **Volltext** von
 > [31] liegt seit 01.09.2026 vor (Open Access) und löst die beiden offenen
 > A-Befunde: Der Stationsquotient ist in Tab. 2/Tab. 4 **beziffert** (4,9/4,6 =
@@ -75,18 +75,18 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Bochum**, nicht aus Dortmund. Der Rasterquotient war dort **bevölkerungsgewichtet**
 > (0,6323) ⇒ \(k_{\text{UV}}\) = **0,6735**; das Band kam erstmals aus den
 > **publizierten Standardfehlern**, die räumliche Streuung wurde zur
-> **Modellgrenze 9** (Befunde 255/256). Wirkung: € 317 → **320 Mio**.
+> **Modellgrenze 9** (Befunde 255/256). Wirkung: 317 → **320 Mio. €**.
 > **Rev. 8 (01.09.2026)** = Review-Runde 10 (Befunde 264–273). Modellrelevant ist
 > Entscheidungslog Nr. 27: Der bevölkerungsgewichtete Rasterquotient war mit dem
 > **SSD-Trend 1997–2022** gewichtet, das Produktionsmodell multipliziert
 > \(k_{\text{UV}}\) aber mit der **Normalperioden-ΔSSD**; beide Felder korrelieren
 > nur mit r = 0,24. Mit dem richtigen Gewicht: q = **0,6774** statt 0,6320 ⇒
-> \(k_{\text{UV}}\) = **0,7216**. Wirkung: € 320 → **343 Mio**. Zusätzlich ist der
+> \(k_{\text{UV}}\) = **0,7216**. Wirkung: 320 → **343 Mio. €**. Zusätzlich ist der
 > Lint `backend/scripts/lint_methodik.py` gebaut, der Revisionsrückstände und
 > Bericht-⇄-Registry-Divergenzen maschinell abfängt (Befunde 248/258/264).
 > **Rev. 9 (01.09.2026)** = Review-Runde 11 (Befunde 274–282). Zwei Punkte:
 > (1) Der Rasterquotient wird jetzt mit **Baseline-Fällen** statt Köpfen gewichtet
-> (Befund 278) ⇒ q = **0,6843**, \(k_{\text{UV}}\) = **0,7289**, € **347 Mio**.
+> (Befund 278) ⇒ q = **0,6843**, \(k_{\text{UV}}\) = **0,7289**, **347 Mio. €**.
 > (2) Die Runde hat aufgedeckt, dass in Rev. 8 acht Befunde als „übernommen“
 > geschlossen waren, ohne umgesetzt zu sein — Ursache waren Ersetzungsskripte, deren
 > Fehlschläge ich nicht geprüft habe. Der Lint ist entsprechend verschärft: Er sieht
@@ -106,10 +106,10 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > **gewichtetes Mittel der Punktquotienten** — damit schlagen 57 Punkte mit
 > verschwindendem SSD-Trend (q bis 196) voll durch und hoben den Bundeswert um
 > 2,3 %. Sie sind jetzt ausgeschlossen, die **Aggregationsregel** ist dokumentiert
-> (§3.9) ⇒ q = **0,6683**, \(k_{\text{UV}}\) = **0,7119**, € **339 Mio**.
+> (§3.9) ⇒ q = **0,6683**, \(k_{\text{UV}}\) = **0,7119**, **339 Mio. €**.
 > **Rev. 12 (01.09.2026)** = Review-Runde 14 (Befunde 302–318). Keine
 > Modelländerung; abgearbeitet wurden Rückstände, Kennzeichnungen und
-> Lint-Lücken. \(k_{\text{UV}}\) unverändert **0,7119**, € **339 Mio**.
+> Lint-Lücken. \(k_{\text{UV}}\) unverändert **0,7119**, **339 Mio. €**.
 >
 > **Rev. 13 (02.09.2026)** = Review-Runde 15 (Befunde 319–335). Keine
 > Modelländerung. **Diese Fassung ist bei einem Werkzeugfehler verloren gegangen**
@@ -120,7 +120,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 >
 > **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 23 (Befunde 336–421). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
-> € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
+> **339 Mio. €** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
 > gefahrenen Review-Runde unabhängig nachgerechnet. **Eine Zählung steht hier bewusst nicht** (Befunde 400/407/416/427): Die Belege der Nachrechnungen führt das Ledger.
 > Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
 > (Gleichgewichtslesart mit Transient-Faktor \(\tau\) = 0,20–0,48, jetzt größte
@@ -198,8 +198,8 @@ Basiswert nicht enthalten.
 **(b) Zustand „mit Anpassung".** Einen KWRA-Wert „mit Anpassung" oder ein Restrisiko weist der Bericht
 nicht aus; beziffert ist die Wirkung eines der beiden Maßnahmen-Hebel (§5). **UV-Schutz im öffentlichen Raum
 mit Kommunikation (S155)** ist eine Abschätzung von KAP3: Er senkt die Dosis um 1,8 % (Band 0,5–4,5 %) und
-damit den Betrag für Berlin nach vollem Einlauf um 252.500 € je Jahr (Band 70.100–631.200 €, Preisstand
-2024), das sind 2,2 % des Basiswerts. Die Wirkung läuft über Jahrzehnte ein: nach 10, 20 und 30 Jahren
+damit den Betrag für Berlin nach vollem Einlauf um 252.500 € (Preisstand 2024) je Jahr (Band
+70.100–631.200 €), das sind 2,2 % des Basiswerts. Die Wirkung läuft über Jahrzehnte ein: nach 10, 20 und 30 Jahren
 werden 34.700, 69.400 und 104.000 € angerechnet. **Förderung der Früherkennung (S158)** bekommt keine eigene
 Zahl, weil der Basiswert die günstigeren Kostensätze früh erkannter Fälle schon für alle Fälle ansetzt; im
 Produkt steht dafür der Vermerk „Kostenwirkung im Basiswert voll angerechnet“, keine Nullwirkung. Der
@@ -276,7 +276,7 @@ Nur Zeilen mit Entscheidung **Basiswert** kommen in den Formeln (§3) vor.
 28). Teil-Ausweise unter der KWRA-Klammer: klimaattribuierte Zusatzfälle \(\Delta F_e\)
 (je Entität), €.
 
-**Gemeinsamer Preisstand aller Kostensätze dieses Berichts: €2024**; Umrechnungsfaktoren je
+**Gemeinsamer Preisstand aller Kostensätze dieses Berichts: 2024**; Umrechnungsfaktoren je
 Satz in der Zeichentabelle (Destatis-VPI, 2020 = 100: 2015 = 94,5 · 2024 = 119,3 [19]).
 
 ### 3.0 Rechenkette
@@ -655,7 +655,7 @@ der Formel — die Tabellenwerte sind Rohwerte, Befund 201):**
 240.973/243.158 = **0,9910** — damit reproduziert die Bundes-Baseline den
 ZfKD-Anker 2021–2023 auf der Bezugspopulation der Normierung. Ablese-Toleranz
 (vorab fixiert): ±15 % vor Normierung — **bestanden** (−0,1 % / +0,9 %; Rev. 1 gegen
-das Einzeljahr 2023: −2,2 % / +0,1 %). Rechenweg reproduzierbar in der Anlage
+das Einzeljahr 2023: −2,2 % / +0,1 %). Rechnung reproduzierbar in der Anlage
 `backend/scripts/kalibrierung/kid2025_baseline.py` [71].
 
 **Bezugspopulation der Normierung — gekennzeichnete Näherung (§3.9; Befund 226;
