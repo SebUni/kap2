@@ -9,9 +9,11 @@ klimawirkungen}``, ``diversitaet`` in ``{quelle, je_klimawirkung}`` und
 - ``/kommune/{id}/interpretation/nachbarkommunen`` → ``nachbarkommunen_screening``
 - ``/kommune/{id}/interpretation/nachweise`` (GET, POST, DELETE) → ``ergebnis_nachweise``
 - ``/kommune/{id}/interpretation/abhaengigkeiten`` → ``handlungsfeld_abhaengigkeiten``
+- ``/kommune/{id}/interpretation/diversitaet`` → ``data.diversitaet_aspekte``, nur die für die
+  Kommune gerechneten Klimawirkungen, nach ``kwra_id`` gruppiert (T-1475)
 - ``/interpretation/massnahmen-gewissheit`` → ``massnahmen_gewissheit``
 - ``/interpretation/massnahmen-umsetzung`` → ``data.massnahmen_umsetzung``
-- ``/interpretation/diversitaet`` → ``data.diversitaet_aspekte``
+- ``/interpretation/diversitaet`` → ``data.diversitaet_aspekte``, unverändert (Altbestand)
 - ``/interpretation/leitfragen`` → ``data.kra_leitfragen``
 - ``/kommune/{id}/interpretation/bericht`` → ``ergebnis_interpretation_markdown``
   (Markdown mit sieben festen Abschnitten, T-1141)
@@ -26,6 +28,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
+from app.data import catalog
 from app.data.diversitaet_aspekte import DIVERSITAET_JE_KLIMAWIRKUNG
 from app.data.diversitaet_aspekte import QUELLE as DIVERSITAET_QUELLE
 from app.data.kra_leitfragen import LEITFRAGEN
@@ -124,6 +127,52 @@ def get_abhaengigkeiten(kommune_id: int, db: Session = Depends(get_db)):
         "umfang": umfang,
         "klimawirkungen": abhaengigkeiten_der_kommune(codes),
     }
+
+
+def _diversitaet_je_kwra(codes: list[str]) -> dict[str, dict]:
+    """``DIVERSITAET_JE_KLIMAWIRKUNG`` nach ``kwra_id`` gruppiert, für ``codes``.
+
+    Mehrere Katalogcodes derselben Klimawirkung (z. B. #95 Mortalität und
+    Morbidität) tragen zu einer Überschrift zusammen; gleiche Aspekte (gleicher
+    Eintrag in ``beruecksichtigt``/``nicht_beruecksichtigt``, etwa der allgemeine
+    Diversitätshinweis) erscheinen dabei nur einmal.
+    """
+    je_kwra: dict[int, dict] = {}
+    for code in codes:
+        if code not in DIVERSITAET_JE_KLIMAWIRKUNG:
+            continue
+        risiko = catalog.RISKS_BY_CODE[code]
+        kwra_id = risiko["kwra_id"]
+        eintrag = je_kwra.setdefault(kwra_id, {
+            "bezeichnung": f"{risiko.get('kwra_name') or risiko['name']} (#{kwra_id})",
+            "beruecksichtigt": [],
+            "nicht_beruecksichtigt": [],
+        })
+        for feld in ("beruecksichtigt", "nicht_beruecksichtigt"):
+            for aspekt in DIVERSITAET_JE_KLIMAWIRKUNG[code][feld]:
+                if aspekt not in eintrag[feld]:
+                    eintrag[feld].append(aspekt)
+    return {str(kwra_id): eintrag for kwra_id, eintrag in sorted(je_kwra.items())}
+
+
+@router.get("/kommune/{kommune_id}/interpretation/diversitaet")
+def get_diversitaet_kommune(kommune_id: int, db: Session = Depends(get_db)):
+    """Gender- und Diversitätsaspekte nur der für diese Kommune gerechneten Klimawirkungen.
+
+    Die gerechneten Risiko-Codes stammen wie bei ``get_abhaengigkeiten`` aus
+    ``get_risk_aggregate(...)["cost"]["by_risk"]``, sofern ``assessment_is_done`` eine
+    Berechnung meldet; ohne Berechnung steht der ganze Bestand von
+    ``DIVERSITAET_JE_KLIMAWIRKUNG`` da. Gruppiert wird nach ``kwra_id``: eine Überschrift
+    je Klimawirkung (``bezeichnung`` = „<kwra_name> (#<kwra_id>)“), die Aspekte mehrerer
+    Codes derselben Klimawirkung stehen zusammen, ohne doppelte Einträge.
+    """
+    kommune = _kommune_oder_404(db, kommune_id)
+    if assessment_is_done(db, kommune.id):
+        agg = get_risk_aggregate(db, kommune.id, apply_measures=False)
+        codes = [eintrag["code"] for eintrag in agg["cost"]["by_risk"]]
+    else:
+        codes = list(DIVERSITAET_JE_KLIMAWIRKUNG.keys())
+    return {"quelle": DIVERSITAET_QUELLE, "je_klimawirkung": _diversitaet_je_kwra(codes)}
 
 
 @router.get("/interpretation/massnahmen-gewissheit")

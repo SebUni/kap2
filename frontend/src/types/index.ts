@@ -585,6 +585,24 @@ export interface LowerBoundNote {
   note: string
 }
 
+/**
+ * Eine Klimawirkung, ein Eintrag (T-1470-cto/T-1474-cto): fasst Zeilen von
+ * ``by_risk`` mit derselben ``kwra_id`` zusammen (Klasse A) bzw. eine Klasse-B-Zeile.
+ * ``teile`` listet die Teilzeilen nur, wenn es mindestens zwei sind — eine
+ * Klimawirkung mit genau einer Zeile hat keine Summenzeile.
+ */
+export interface KlimawirkungEintrag {
+  kwra_id: number | null
+  name: string
+  /** Amtlicher Name + „(#kwra_id)“, sonst nur der Name ohne Nummer. */
+  bezeichnung: string
+  /** null für Klasse B (Screening ohne Euro-Bezifferung). */
+  cost_eur: number | null
+  has_euro_layer: boolean
+  codes: string[]
+  teile: RiskAggregate['cost']['by_risk']
+}
+
 export interface RiskAggregate {
   risks: Record<string, RiskAggregateEntry>
   groups: Record<string, RiskGroupEntry>
@@ -604,6 +622,8 @@ export interface RiskAggregate {
       /** Anzeigewert: Betrag (Klasse A) oder Screening-Vermerk (Klasse B). */
       cost_display?: number | string
     }[]
+    /** Eine Zeile je Klimawirkung, Summenbildung serverseitig (T-1470-cto). */
+    klimawirkungen: KlimawirkungEintrag[]
     /** Vollständigkeitsanzeige neben der Summe (Text vom Backend). */
     euro_coverage?: { covered: number; total: number; text: string }
   }
@@ -622,6 +642,8 @@ export interface CostSummary {
   /** Untergrenzen-Hinweis zu den Schadenssummen (UBA MK 4.0, Anforderung 25). */
   lower_bound?: LowerBoundNote
   by_risk: RiskAggregate['cost']['by_risk']
+  /** Eine Zeile je Klimawirkung, Summenbildung serverseitig (T-1470-cto). */
+  klimawirkungen: KlimawirkungEintrag[]
   measures: {
     total_capex_eur: number
     total_opex_annual_eur: number
