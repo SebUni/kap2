@@ -366,19 +366,25 @@ if __name__ == "__main__":
 
 
 def test_no_flat_measure_on_allergy_days():
-    """Befund 124: keine pauschal wirkende Maßnahme auf #96.
+    """Befund 124: keine PAUSCHAL wirkende Maßnahme auf #96.
 
     Das Maßnahmen-Modul skaliert gespeicherte Zell-Outcomes mit einem
-    kommunenweiten Faktor. Auf EXPECTED_ANNUAL_ALLERGY_DAYS angewandt wäre das
-    genau der flächige Vegetations-Niveaueffekt, den Modellgrenze 7 des Berichts
-    als unbelegt führt (die λ-Evidenz ist intra-urban). Eine künftige Maßnahme
-    darf nur den Umverteilungsanteil abbilden — also Ĝ zellscharf ändern und die
-    Zellrechnung erneut anstoßen, nicht den Outcome pauschal kürzen.
+    kommunenweiten Faktor (``_reduction_factor``). Auf EXPECTED_ANNUAL_ALLERGY_DAYS
+    angewandt wäre das genau der flächige Vegetations-Niveaueffekt, den Modellgrenze 7
+    des Berichts als unbelegt führt (die λ-Evidenz ist intra-urban). Seit T-1513-cto darf
+    eine mit #96 verknüpfte Maßnahme deshalb NICHT über ``_reduction_factor`` rechnen,
+    sondern nur über ein eigenes Zelllauf-Modell (``effect_model``), das die
+    Vegetations-/Symptomlast zellscharf neu bildet (hier S158: Umverteilungsanteil der
+    gewarnten Tage, ``health.pollen_zelltage``/``s158_vermiedene_tage``) statt den
+    gespeicherten Outcome pauschal zu kürzen.
     """
-    verknuepft = [m["code"] for m in catalog.MEASURES
+    verknuepft = [m for m in catalog.MEASURES
                   if CODE in (m.get("linked_risk_codes") or [])]
-    assert not verknuepft, (
-        "Pauschal wirkende Maßnahme auf #96 verknüpft: " + ", ".join(verknuepft)
+    assert verknuepft, "Erwarte mindestens die Pollen-Frühwarnung (S158) verknüpft"
+    ohne_zelllaufmodell = [m["code"] for m in verknuepft if m.get("effect_model") != "s158"]
+    assert not ohne_zelllaufmodell, (
+        "Pauschal (über _reduction_factor) wirkende Maßnahme auf #96 verknüpft: "
+        + ", ".join(ohne_zelllaufmodell)
         + " — siehe Bericht §5/Modellgrenze 7 (flächiger Niveaueffekt unbelegt).")
 
 

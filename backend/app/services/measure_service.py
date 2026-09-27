@@ -258,6 +258,63 @@ def _vg_cell_factor(code: str, frac: float, cell_risk: dict,
     return 1.0
 
 
+# ── Hebel S158: Pollen-Frühwarnung (Bericht #96 §5.1; Maßnahme POLLEN_EARLY_WARNING) ──
+# Sperre aus Befund 124 aufgehoben (T-1513-cto): Die Wirkung ist kein flächiger Faktor
+# auf den Index, sondern ΔTage_vermieden = A_Zelle · r_S158 · Σ_g t_warn,g · ΔTage_g,Zelle
+# je Zelle (health.s158_vermiedene_tage), bewertet über denselben Zellfaktor-Rahmen wie
+# S157: 1 − ΔTage_vermieden / ΔTage_Zelle auf das Outcome (Symptomtage/€) der Zelle.
+
+ALLERGY_RISK_CODE = "EXPECTED_ANNUAL_ALLERGY_DAYS"
+
+
+def _is_s158(mdef: dict) -> bool:
+    return mdef.get("effect_model") == "s158"
+
+
+def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
+    """Faktor (0..1) auf das Symptomtage-Outcome einer Zelle durch S158.
+
+    Die Gruppentage ΔTage_B/G,Zelle holt der Zweig FRISCH über ``health.pollen_zelltage``
+    aus den gespeicherten Roheingaben der Zelle (``betroffene``, ``delta_birke``,
+    ``delta_graeser``, ``pollen_g``, ``pollen_g_bar0``) — nicht aus den gespeicherten
+    Summen ``tage_birke``/``tage_graeser``. So wirkt eine spätere Vegetationsmaßnahme
+    (Stadtbaumwahl, T-1483-cto), die nur Ĝ_Zelle auf Ĝ′ ändert und Ḡ₀ festhält,
+    multiplikativ zusammen mit S158 (Bericht §5 „Zusammen mit S158“), statt von einer
+    zuvor gespeicherten Summe überschrieben zu werden. λ (``lambda_veg``) wird nicht
+    gespeichert und deshalb hier aus den Overrides gelesen, damit eine Überschreibung
+    wirkt. Zellen ohne diese Roheingaben (Alt-Zellen vor der Neuberechnung) bleiben
+    unverändert — es gibt keine pauschale Ersatzwirkung.
+    """
+    from app.services.engine.impact import health
+
+    if frac <= 0.0:
+        return 1.0
+    betroffene = cell_risk.get("betroffene")
+    delta_b = cell_risk.get("delta_birke")
+    delta_g = cell_risk.get("delta_graeser")
+    g_cell = cell_risk.get("pollen_g")
+    if betroffene is None or delta_b is None or delta_g is None or g_cell is None:
+        return 1.0
+    g_bar0 = cell_risk.get("pollen_g_bar0")
+
+    def _p(key: str, default: float) -> float:
+        v = override_context.get_override(f"risks.{ALLERGY_RISK_CODE}.impact.{key}", default)
+        return float(v) if v is not None else default
+
+    lam = _p("lambda_veg", 0.70)
+    tage_birke, tage_graeser = health.pollen_zelltage(
+        float(betroffene), float(delta_b), float(delta_g), float(g_cell), g_bar0, lam)
+    total = tage_birke + tage_graeser
+    if total <= 0.0:
+        return 1.0
+
+    r = float(mdef.get("default_reduction") or 0.0)
+    t_warn = _p("t_warn_s158", 0.75)
+    vermieden = health.s158_vermiedene_tage(
+        tage_birke, tage_graeser, frac, r, t_warn, t_warn)
+    return max(0.0, min(1.0, 1.0 - vermieden / total))
+
+
 def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float,
                          unit_factor: float, cell_risk: dict,
                          delta_hap: float = 1.0, hap_cap: float = 1.0) -> float:
@@ -272,6 +329,10 @@ def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float
         return _s157_cell_factor(_s157_input(config), frac, cell_risk, delta_hap)
     if _is_vg(mdef):
         return _vg_cell_factor(code, frac, cell_risk, delta_hap, hap_cap)
+    if _is_s158(mdef):
+        if code != ALLERGY_RISK_CODE:
+            return 1.0
+        return _s158_cell_factor(mdef, frac, cell_risk)
     return _reduction_factor(mdef, frac, unit_factor)
 
 
