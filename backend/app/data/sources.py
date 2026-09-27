@@ -1390,7 +1390,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "[Zugriff: 27. Sep. 2026].",
         "url": "https://store.icao.int/en/manual-of-the-icao-standard-atmosphere-extended-"
                "to-80-kilometres-262500-feet-doc-7488",
-        "archive_url": "web.archive.org/web/20260918063019/https://store.icao.int/en/"
+        "archive_url": "https://web.archive.org/web/20260918063019/https://store.icao.int/en/"
                        "manual-of-the-icao-standard-atmosphere-extended-to-80-kilometres-"
                        "262500-feet-doc-7488",
         "accessed": "2026-09-27",
