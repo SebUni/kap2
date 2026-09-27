@@ -4,8 +4,9 @@ import type { InterpretationDiversitaetKommune } from '../../api/client'
 import type { StrukturierterAbschnittProps } from './ErgebnisseInterpretierenTab'
 
 /**
- * Gender- und Diversitätsaspekte nur der für diese Kommune gerechneten Klimawirkungen
- * (T-1475), im Wortlaut der Schnittstelle, mit Quelle. Keine Bewertung.
+ * Gender- und Diversitätsaspekte der für diese Kommune gerechneten Klimawirkungen (T-1475),
+ * ohne Rechnung der ganze Katalog (``umfang``, T-1580), im Wortlaut der Schnittstelle, mit
+ * Quelle. Keine Bewertung.
  */
 export default function DiversitaetAspekte({ kommuneId }: StrukturierterAbschnittProps) {
   const [daten, setDaten] = useState<InterpretationDiversitaetKommune | null>(null)
@@ -44,10 +45,14 @@ export default function DiversitaetAspekte({ kommuneId }: StrukturierterAbschnit
 
   const eintraege = Object.entries(daten.je_klimawirkung)
   const quelle = daten.quelle
+  const umfangSatz = daten.umfang === 'gerechnet'
+    ? 'Die Liste beruht auf den gerechneten Klimawirkungen dieser Kommune.'
+    : 'Die Liste beruht auf dem ganzen Katalog der Klimawirkungen, weil für diese Kommune noch keine Rechnung vorliegt.'
 
   return (
     <div>
       <h2>Gender und Diversität</h2>
+      <p>{umfangSatz}</p>
       <p>
         Quelle:{' '}
         <a href={quelle.url} target="_blank" rel="noopener noreferrer">{quelle.titel}</a>
