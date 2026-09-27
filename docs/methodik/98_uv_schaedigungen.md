@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–428) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–431) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -185,6 +185,31 @@ in längeren, sonnigeren Warmphasen" — Monetarisierung ID 98, Blattzeile 103).
   #95/#96); Augenschäden (Katarakt — im Monetarisierungs-Gegenstand genannt) und
   Produktivität (K2, ab M3) nicht enthalten — dokumentierte Untererfassung (§6).
 
+### Risiko ohne (weitere) Anpassung
+
+**(a) Zuordnung der Zahlen.** Alle in diesem Bericht ausgewiesenen Zahlen des Basiswerts — zusätzliche
+Hautkrebsfälle, YLL und die daraus bewerteten Euro-Beträge in K1 — gehören zum KWRA-Zustand
+**„Risiko ohne (weitere) Anpassung"**. Gemeint ist der heutige Anpassungsstand ohne zusätzliche
+Maßnahmen: das heutige Schutz- und Expositionsverhalten steckt in den beobachteten
+Inzidenzraten der Kalibrierjahre 2021–2023 (ZfKD, §3.3), das bestehende Hautkrebs-Screening in den
+SCS-Kostensätzen, die der Basiswert bereits für alle Fälle ansetzt (§5). Weitere Maßnahmen sind im
+Basiswert nicht enthalten.
+
+**(b) Zustand „mit Anpassung".** Er wird in diesem Bericht **nicht als Zahl dargestellt**: Beide
+Maßnahmen-Hebel (§5) — Förderung der Früherkennung (S158) und UV-Schutz im öffentlichen Raum mit
+Kommunikation (S155) — laufen qualitativ, weil es keine Effektgröße auf Dosis oder Inzidenz gibt
+beziehungsweise der Screening-Effekt schon im Basiswert steht. Einen KWRA-Wert „mit Anpassung" oder ein
+Restrisiko weist der Bericht deshalb nicht aus; der Ersetzungspfad (Detektionsmix-Parameter) steht in §5.
+
+**(c) Einstufung der KWRA 2021 ohne Anpassung.** Die KWRA 2021 stuft die Klimawirkung
+„UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)" im Zustand ohne Anpassung so ein:
+Gegenwart **mittel**; Mitte des Jahrhunderts **mittel** (optimistisch) und **hoch** (pessimistisch);
+Ende des Jahrhunderts **mittel** (optimistisch) und **hoch** (pessimistisch). Fundstelle:
+`docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt „Klimawirkungen", Zeile 100 (ID 98), Spalten N–R
+(„Risiko o. Anp. – Gegenwart" bis „Risiko o. Anp. – Ende pessim."). Der Basiswert dieses Berichts
+gehört zur Zeitscheibe Gegenwart, weil er das Ist-Klima ausweist (Normalperiode 1991–2020 gegen
+1961–1990, §6).
+
 ## 2 Evidenz-Register (§2.2)
 
 Risikoübergreifend wiederverwendbare Zeilen zusätzlich in `docs/evidenz/register.md`.
@@ -213,6 +238,94 @@ Nur Zeilen mit Entscheidung **Basiswert** kommen in den Formeln (§3) vor.
 
 **Gemeinsamer Preisstand aller Kostensätze dieses Berichts: €2024**; Umrechnungsfaktoren je
 Satz in der Zeichentabelle (Destatis-VPI, 2020 = 100: 2015 = 94,5 · 2024 = 119,3 [19]).
+
+### 3.0 Rechenkette
+
+Die Kette erzählt den Basiswert für **Berlin** von der amtlichen Einwohnerzahl bis zum Euro-Betrag. Die
+Abschnitte 3.1 bis 3.7 sind die genaue Fassung derselben Kette, keine zweite Methodik; wo die Kette
+zusammenfasst, steht unter der Tabelle, was das verfälscht.
+
+| Ebene | Rechenschritt | Wert (Beispielkommune Berlin) | Quelle |
+|---|---|---|---|
+| 1 | Einwohner nach Geschlecht und Altersband (u20 · 20–64 · 65–74 · 75–84 · 85+), Stichtag 31.12.2023, Fortschreibung auf Basis Zensus 2022 | Frauen 328.114 · 1.137.634 · 182.741 · 146.451 · 71.032; Männer 345.163 · 1.150.519 · 156.749 · 107.077 · 36.901; zusammen 3.662.381 | Destatis, Tab. 12411-09 [75] |
+| 2 | Neuerkrankungen je 100.000 Einwohner und Jahr je Band, Frauen und Männer zusammen, mit Normierung \(c_{\text{kal}}\) | MM 0,5 · 24,7 · 64,0 · 94,9 · 88,5 mit \(c_{\text{kal}}\) = 1,0012; C44 2,0 · 125,9 · 617,6 · 1.267,2 · 1.479,5 mit \(c_{\text{kal}}\) = 0,9910 | KID 2025 [27]; §3.3 |
+| 3 | Baseline-Fälle = Einwohner je Band × Rate ÷ 100.000, summiert, × \(c_{\text{kal}}\) | MM 1.123 · C44 9.712 Fälle je Jahr | Ebene 1 × Ebene 2 |
+| 4 | Änderung der Sonnenscheindauer \(\Delta\text{SSD}\), Normalperiode 1991–2020 gegen 1961–1990, am Berliner Gemeindepunkt | +7,165 % | DWD-Raster [33]; Anlage `ssd_povw.csv`, Zeile `land:Berlin` [72]; §3.2 |
+| 5 | \(\Delta\text{Dosis}\) = \(\Delta\text{SSD}\) × \(k_{\text{UV}}\) × \(a_{\text{attr}}\) = 7,165 % × 0,7119 × 0,75 | +3,826 % | [31], [73]; \(a_{\text{attr}}\) Abschätzung von KAP3; §3.2 |
+| 6 | Zusatzfälle \(\Delta F_e\) = Baseline-Fälle × \(\text{BAF}_e\) × \(\Delta\text{Dosis}\) (BAF MM 0,6, C44 1,675) | MM 25,8 · C44 622,3 Fälle je Jahr | [29], [30]; §3.4 |
+| 7 | Zusatztodesfälle = \(\Delta F_e\) × Letalität \(\lambda_e\) (MM 0,11466, C44 0,005236) | MM 2,96 · C44 3,26 | [27]; §3.4 |
+| 8 | YLL = Zusatztodesfälle × Restlebenserwartung \(\bar L_e\) (MM 10,4569, C44 5,4787 Jahre) | MM 30,9 · C44 17,9 · zusammen 48,8 YLL je Jahr | [48]; §3.4 |
+| 9 | Behandlung = \(\Delta F_e\) × \(c_e\) (MM 6.724 €, C44 5.883 €, Preisstand 2024); Mortalität = YLL × VOLY 160.800 € | Behandlung MM 173.400 € · C44 3,66 Mio. €; Mortalität MM 4,97 Mio. € · C44 2,87 Mio. € | [34], [19]; §3.4 |
+| 10 | Bewerteter Schaden im Konto K1 = Behandlung + Mortalität, Preisstand 2024 | MM 5,14 Mio. € · C44 6,53 Mio. € · zusammen **11,68 Mio. € (Preisstand 2024) je Jahr** | Ebene 9 |
+
+**Lesart des Jahresbetrags:** Ebene 10 beziffert die Fälle eines Jahres unter der heutigen, eingelaufenen
+Dosislage — die Latenz von Jahrzehnten steckt schon in den Inzidenzraten der Ebene 2, gemeint sind nicht
+die späteren Folgen der Belastung dieses Jahres, und deshalb wird nicht weiter abgezinst
+(Gleichgewichtslesart, §3.4; Modellgrenze 1).
+
+**Berlin gegen den Bund:** Je Einwohner ergibt die Kette 3,19 € je Jahr, der Bundeswert aus §3.4
+(339 Mio. € (Preisstand 2024) für 83,5 Mio. Einwohner) 4,06 €; Berlin liegt 21 % darunter, gut zwei
+Drittel davon, weil die Sonnenscheindauer in Berlin weniger zugenommen hat (7,17 % gegen 8,51 %,
+Faktor 0,84), der Rest, weil Berlin jünger ist und je Einwohner weniger Hautkrebsfälle hat (Faktor 0,93).
+
+**Stärkster Treiber:** \(k_{\text{UV}}\) in Ebene 5 (Band 0,3622–1,0616, ±49 %, §4); mit den
+Bandgrenzen ergibt Berlin 5,94 Mio. € bzw. 17,41 Mio. € (Preisstand 2024) je Jahr. Größer, aber einseitig, ist nur die
+Lesart \(\tau\) (unten).
+
+**Was die Kette zusammenfasst und was das verfälscht:**
+
+- **Frauen und Männer in einer Rate (Ebene 2):** Getrennt nach Geschlecht gerechnet läge Berlin um
+  0,3 % niedriger (MM und C44); die Kette liegt also geringfügig zu hoch.
+- **Breite Altersbänder (Ebene 1 und 2):** In Fünfjahresgruppen und nach Geschlecht getrennt ergäben
+  sich 1.077 statt 1.123 MM-Fälle und 9.340 statt 9.712 C44-Fälle; die Kette liegt um 4,3 % (MM) bzw.
+  4,0 % (C44) zu hoch. Das ist die in Modellgrenze 7 bezifferte Größenordnung (≈ ±4 % je Kommune).
+  Das Produkt rechnet mit denselben fünf Bändern, deshalb bleibt die Kette bei ihnen.
+- **MM und C44:** nicht zusammengefasst — beide laufen getrennt bis Ebene 10, weil sich BAF,
+  Letalität (Faktor 22) und Kostensatz unterscheiden; eine gemeinsame Rate würde die Mortalität falsch
+  gewichten.
+- **Lesart \(\tau\) = 1:** Die Kette setzt keinen Transient-Faktor an. Mit \(\tau\) = 0,20–0,48 (§3.4,
+  reine Jahres-Attribution) läge Berlin um 52–80 % niedriger, bei 2,34–5,60 Mio. € (Preisstand 2024) je
+  Jahr.
+- **Bevölkerung im Produkt:** Das Produkt liest Berlin mit 3.586.909 Einwohnern (Zensus 2022 am
+  Gemeindepunkt, Anlage [72]) statt 3.662.381; es rechnet damit mit 2,1 % weniger Einwohnern.
+
+```python test: rechenkette_98
+# Rechenkette Berlin (Abschnitt 3.0), Ebenen 1-10, Werte aus Kapitel 7
+f = [328_114, 1_137_634, 182_741, 146_451, 71_032]    # Frauen u20 ... 85+ [75]
+m = [345_163, 1_150_519, 156_749, 107_077, 36_901]    # Maenner
+ew = [a + b for a, b in zip(f, m)]
+assert sum(ew) == 3_662_381
+i_mm = [0.5, 24.7, 64.0, 94.9, 88.5]                  # je 100.000
+i_c44 = [2.0, 125.9, 617.6, 1267.2, 1479.5]
+f_mm = 1.0012 * sum(e * r / 1e5 for e, r in zip(ew, i_mm))
+f_c44 = 0.9910 * sum(e * r / 1e5 for e, r in zip(ew, i_c44))
+assert abs(f_mm - 1123) < 1 and abs(f_c44 - 9712) < 1
+dd = 0.07165 * (4.9 / 4.6) * 0.6683 * 0.75            # Ebenen 4 und 5
+assert abs(dd - 0.03826) < 0.00001
+d_mm, d_c44 = f_mm * 0.6 * dd, f_c44 * 1.675 * dd
+assert abs(d_mm - 25.8) < 0.05 and abs(d_c44 - 622.3) < 0.05
+lam_mm = (2928 + 3146 + 3169) / (26_140 + 27_040 + 27_430)
+lam_c44 = (1178 + 1275 + 1332) / (236_670 + 243_430 + 242_820)
+t_mm, t_c44 = d_mm * lam_mm, d_c44 * lam_c44
+assert abs(t_mm - 2.96) < 0.005 and abs(t_c44 - 3.26) < 0.005
+y_mm, y_c44 = t_mm * 10.4569, t_c44 * 5.4787
+assert abs(y_mm - 30.9) < 0.06 and abs(y_c44 - 17.9) < 0.06 and abs(y_mm + y_c44 - 48.8) < 0.05
+b_mm, b_c44 = d_mm * 6724, d_c44 * 5883
+assert abs(b_mm - 173_400) < 100 and abs(b_c44 / 1e6 - 3.66) < 0.005
+e_mm, e_c44 = b_mm + y_mm * 160_800, b_c44 + y_c44 * 160_800
+assert abs(y_mm * 160_800 / 1e6 - 4.97) < 0.005 and abs(y_c44 * 160_800 / 1e6 - 2.87) < 0.005
+assert abs(e_mm / 1e6 - 5.14) < 0.005 and abs(e_c44 / 1e6 - 6.53) < 0.005
+summe = e_mm + e_c44
+assert abs(summe / 1e6 - 11.68) < 0.005
+# je Einwohner: Berlin 3,19 EUR gegen Bund 339 Mio / 83.456.045 = 4,06 EUR
+assert abs(summe / sum(ew) - 3.19) < 0.005 and abs(339e6 / 83_456_045 - 4.06) < 0.005
+assert abs(0.07165 / 0.0851 - 0.84) < 0.005
+# staerkster Treiber k_UV (Band 0,3622-1,0616); Lesart tau 0,20-0,48
+assert abs(summe * 0.3622 / 0.7119 / 1e6 - 5.94) < 0.01
+assert abs(summe * 1.0616 / 0.7119 / 1e6 - 17.41) < 0.01
+assert abs(summe * 0.20 / 1e6 - 2.34) < 0.01 and abs(summe * 0.48 / 1e6 - 5.60) < 0.01
+assert abs(3_586_909 / 3_662_381 - 1 + 0.021) < 0.001
+```
 
 ### 3.1 Entitäten (§-Konvention)
 
@@ -1125,6 +1238,10 @@ Inzidenzraten, \(\lambda_e\), \(\bar L_e\), Kostensätze, Bevölkerung. **M0 wei
 Ist-Klima aus** (Normalperiodenvergleich). **Stationaritätsannahmen (dokumentiert):**
 Inzidenz-Baseline stationär (real steigend — Untergrenze); Detektionsmix konstant.
 
+**Jahresbeträge ohne Abzinsung:** Alle Beträge dieses Berichts sind Jahresbeträge ohne Abzinsung, in
+derselben Lesart wie der Satz unter der Rechenkette (§3.0, Ebene 10): Sie beziffern die Fälle eines
+Jahres unter der heutigen, eingelaufenen Dosislage; die Latenz steckt in den Inzidenzraten.
+
 **Modellgrenzen (dokumentiert):**
 1. **Latenz:** Hautkrebs entsteht mit einer Verzögerung von **Jahrzehnten** [35]
    (Quellenwortlaut; die verbreitete Angabe „20–40 Jahre" ist dort **nicht**
@@ -1496,7 +1613,7 @@ parameter:
 ```
 
 
-## 8 Quellen (§3.8 — #98-relevanter Auszug; Nummern = M0-Zählung, [69]–[74] neu)
+## 8 Quellen (§3.8 — #98-relevanter Auszug; Nummern = M0-Zählung, [69]–[75] neu)
 
 Zugriff 17./18.08.2026 ([27], [31], [34], [43], [70]: 30.08.2026 primär
 verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Integration).
@@ -1666,17 +1783,14 @@ verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Inte
   hier bezogenen Angaben stehen im **Volltext** von [31] (Tab. 2/4, Kap. 2), der seit
   01.09.2026 vorliegt. Der Konferenz-Abstract bleibt als Zweitfundstelle zitiert.
 
-## 9 Familien-Einordnung & Verworfen-Liste (§2.6 — kein erneuter Drei-Ansätze-Vergleich)
-
-#98 ist Folge-Risiko der Familie **„K1-Gesundheit bottom-up"** (Prototyp #95; vollständiger
-Ansatz-Vergleich für #98 in M0 Rev. 5 Kap. 4/5). Verworfene Alternativen (§2.6):
-
-- **98-B — Reine Dosis-Wirkungs-Kette (BfS-/Satelliten-UV-Klimatologie):** methodisch
-  strengste Kette, aber die UV-Rasterbeschaffung ist ein eigenes Datenprojekt (keine freie
-  Rasterklimatologie gefunden [31,36]) und der KWRA-Verhaltenspfad entfiele —
-  dokumentierte Alternative für M1+ (Parameter bis zur Quelle in M0 Kap. 4).
-- **98-C — Nationaler Kostenanker, top-down:** per §3.1 ausgeschieden (Verteilschlüssel;
-  normatives \(a_{\text{klima}}\); Deutschland-Nenner) — nur Negativ-Beispiel.
+- **[75]** Destatis, „Statistischer Bericht – Bevölkerungsfortschreibung auf Basis Zensus 2022 –
+  Berichtsjahr 2023" (Bericht 5124108237005), Tab. 12411-09 „Bevölkerung am 31.12.2023 nach
+  Altersjahren, Bundesländern, Nationalität und Geschlecht", Spalten Berlin, Bevölkerung insgesamt,
+  männlich und weiblich; https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Bevoelkerungsstand/Publikationen/Downloads-Bevoelkerungsstand/statistischer-bericht-bevoelkerungsfortschreibung-zensus-2022-jaehrlich-5124108237005.xlsx?__blob=publicationFile (Abruf 27.09.2026, 08:41 Uhr UTC, HTTP 200, SHA-256
+  60244663bc848a69af8c2dab307d62a03742ef25b8e70277287f76a4f77e4c70); Archiv:
+  https://web.archive.org/web/20260926002751/https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Bevoelkerungsstand/Publikationen/Downloads-Bevoelkerungsstand/statistischer-bericht-bevoelkerungsfortschreibung-zensus-2022-jaehrlich-5124108237005.xlsx?__blob=publicationFile. Altersjahre zu den Bändern aus §3.3 summiert:
+  Frauen 1.865.972, Männer 1.796.409, zusammen 3.662.381 (Ebene 1 der Rechenkette, §3.0). Derselbe
+  Bericht wie in [48] (dort Tab. 12411-06).
 
 ## Entscheidungslog
 
@@ -1695,6 +1809,14 @@ Entscheidungsregeln W1–W6 aus `.claude/methodik-loop.md` zitiert).
 **Eintrag 29: Rev.-11-Entscheidung** (Review-Runde 13, Gate 1, 01.09.2026).
 **Einträge 30–32: Rev.-14-Entscheidungen** (Revision nach Review-Runde 23, Gate 1,
 04.09.2026; W-Regeln aus `.claude/methodik-loop.md` zitiert).
+**Familie und verworfene Ansätze (bis Fortschreibung 7 eigenes Kapitel 9):** #98 ist Folge-Risiko der
+Familie „K1-Gesundheit bottom-up" (Prototyp #95; der vollständige Ansatz-Vergleich für #98 steht in M0
+Rev. 5 Kap. 4/5). 98-B, die reine Dosis-Wirkungs-Kette über eine BfS- oder Satelliten-UV-Klimatologie,
+ist verworfen, weil die UV-Rasterbeschaffung ein eigenes Datenprojekt ist (keine freie
+Rasterklimatologie gefunden [31,36]) und der KWRA-Verhaltenspfad entfiele; sie bleibt dokumentierte
+Alternative für M1+ (Parameter bis zur Quelle in M0 Kap. 4). 98-C, der nationale Kostenanker top-down,
+ist nach §3.1 ausgeschieden (Verteilschlüssel, normatives \(a_{\text{klima}}\), Deutschland-Nenner) und
+dient nur als Negativ-Beispiel.
 **Überstimmungsweg:** „Entscheidung Nr. X ändern auf …" → Delta-Lauf (Neurechnung +
 Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 
