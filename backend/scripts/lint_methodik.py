@@ -916,8 +916,9 @@ def quellen_ratchet(lint: Lint) -> None:
         if not eintrag:
             lint.fehler.append(f"Quelle {ref} fehlt im Register")
             continue
-        fehlend = [k for k in ("url", "archive_url", "accessed")
-                   if not eintrag.get(k)]
+        # archive_url ist Pflicht, außer es gibt keinen echten Schnappschuss mit Zeitstempel
+        # (T-1410, Punkt 7b) — dann entfällt das Feld, statt eine unbelegte Platzhalter-URL.
+        fehlend = [k for k in ("url", "accessed") if not eintrag.get(k)]
         lint.pruefe(not fehlend, f"Quelle {ref}", f"ohne {fehlend}")
 
 
