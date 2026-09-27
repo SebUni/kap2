@@ -1900,6 +1900,71 @@ MEASURES: list[dict] = [
                 "rechnerischer Effekt ohne fachliche Grundlage. Der Wert bleibt deshalb "
                 "bei 0,0, bis eine solche Grundlage vorliegt.",
         }}},
+    # Maßnahme allergenarme Stadtbaumwahl (Zelllauf) — Ticket T-1600-cto / Bericht #96
+    # §5 Z. 975–989, 1113–1125 (Integrationsauflage), Vorhaben T-1483-cto Teilpaket #2.
+    # Die Wirkung läuft NICHT über einen Katalog-Wirkungsfaktor (default_reduction),
+    # sondern ausschließlich über die Kommunen-Eingabe config['anteil_ersetzt'] (a):
+    # je Zelle mit Deckungsgrad frac (Anteil der Maßnahmen-Geometrie, ``_coverage``,
+    # wie bei S158) sinken die Kronenterme der Zelle dk_Birke = a·frac·k_Birke,z,
+    # dk_unbek = a·frac·k_unbek,z (measure_service._stadtbaum_cell_factor). Daraus
+    # bildet health.stadtbaum_g_neu (T-1599-cto) Ĝ′ bei FESTGEHALTENEM Ḡ₀ (der
+    # gespeicherte pollen_g_bar0 der Zelle, aus dem Ausgangsstand — die Maßnahme ruft
+    # inputs.kommunale_pollen_referenz nicht erneut auf); der Zellfaktor ist
+    # health.pollen_zelltage(Ĝ′)/health.pollen_zelltage(Ĝ) auf dieselben Roheingaben
+    # der Zelle (Muster wie _s158_cell_effect: frische Rechnung aus den gespeicherten
+    # Roheingaben, kein Faktor auf ein gespeichertes Ergebnis, Sperre aus Befund 124).
+    # default_reduction bleibt None (nicht anwendbar) wie bei VULNERABLE_GROUP_PROGRAMS
+    # (effect_model 'vg'): die Wirkung hat keinen eigenen Katalog-Wirkungsfaktor, sie
+    # ergibt sich vollständig aus a, frac und den OSM-Kronentermen der Zelle.
+    # Verteilungsregel (Entscheidung CEO in T-1431-ceo, Vorhaben-Planung T-1483-cto):
+    # Kronen MIT Gattungs-Tag (canopy_birch_frac) und OHNE (canopy_unknown_frac) sinken
+    # je EIGENEM Anteil a·frac — Kronen ohne Gattungs-Tag (auch neu gepflanzte
+    # allergenarme Bäume ohne Tag) zählen anteilig weiter, das ist eine Modellgrenze,
+    # keine eigene Regel (Q-…513da8-1). DIVERGENZ AN DEN CMO: Bericht #96 §5 Z.
+    # 1113–1115 verlangt stattdessen eine Eingabe GETRENNT nach Kronen mit und ohne
+    # Gattungs-Tag ("Eingabe getrennt nach Kronen mit und ohne Gattungs-Tag") — im
+    # Produkt gibt es nur EINE Eingabe a, die beide Kronenterme im selben Anteil senkt;
+    # eine getrennte zweite Eingabe für die ungetaggten Kronen existiert nicht (bewusste
+    # Überstimmung, CEO-Entscheidung T-1431-ceo geht der Bericht-Formulierung vor).
+    # DIVERGENZ AN DEN CMO (2): Der Bericht setzt in §5 Z. 990–992 ein zellscharfes
+    # Baumkataster voraus; das Produkt kennt Gattungsangaben nur über die OSM-Tags der
+    # Zellgeometrie (canopy_birch_frac/canopy_unknown_frac) und führt kommunenweit nur
+    # den ungetaggten Anteil s_unbek (Registry birch_group_share_default) — kein
+    # eigenständiges Baumkataster je Baum.
+    # DIVERGENZ AN DEN CMO (3): Der Bericht beziffert die Kosten der Stadtbaumwahl
+    # nicht (§5 nennt keinen Kostensatz je Baum/ha für den Austausch allergener
+    # Arten). Alle Kostenfelder bleiben deshalb None (nicht anwendbar) statt eines
+    # erfundenen Werts; Herkunft s. source/source_details unten.
+    {"code": "LOW_ALLERGEN_TREE_SELECTION", "name": "Allergenarme Stadtbaumwahl",
+     "description": "Ersatz allergener Straßen-/Stadtbäume (v. a. Birkengruppe) durch "
+                    "allergenarme Arten in den gewählten Zellen (Bericht #96 §5, "
+                    "Integrationsauflage Z. 1111–1125). Die Kommune gibt den Anteil "
+                    "der im Geltungsbereich ersetzten allergenen Kronen ein "
+                    "(config-Feld anteil_ersetzt); die Wirkung rechnet zellscharf im "
+                    "Zelllauf über die OSM-Kronenanteile der gewählten Zellen "
+                    "(canopy_birch_frac, canopy_unknown_frac) und senkt dort Ĝ, bei "
+                    "festgehaltener Referenz Ḡ₀ des Ausgangsstands — kein Katalog-"
+                    "Wirkungsfaktor (default_reduction). Kosten: nicht beziffert, "
+                    "Bericht #96 nennt keine Kosten.",
+     "measure_type": "structural",
+     "effect_target": ["hazard"], "default_reduction": None, "coverage_scaling": "linear",
+     "effect_model": "stadtbaum",
+     "linked_risk_codes": ["EXPECTED_ANNUAL_ALLERGY_DAYS"],
+     "qualitative_risk_codes": [],
+     "capex_fixed": None, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None,
+     "benefit_per_m2_year": None,
+     "unit_label": None, "unit_density_per_ha": None,
+     "source": "nicht beziffert, Bericht #96 nennt keine Kosten",
+     "sources": {},
+     "source_refs": {},
+     "evidence_classes": {},
+     # Kein Katalog-Wirkungsfaktor (default_reduction None) — kein Methodik-Block hier;
+     # die Rechnung selbst steht in health.stadtbaum_g_neu (Kapitel 7, Block pollen.g_neu).
+     "methodik_bloecke": {},
+     "source_details": {},
+     "evidence_derivation": {},
+    },
     # Herleitung capex_fixed: angepasste Arbeitszeitmodelle bei Hitze verursachen im Kern nur
     # organisatorischen Aufwand (Dienstplanung, Betriebsvereinbarung); kein Marktkennwert.
     # Modellannahme als geringes Einführungs-/Konzeptbudget → 10.000 €.

@@ -55,8 +55,11 @@ def test_measure_count_is_47():
     # catalog_parked (unverändert, daher bleibt die Gesamtzahl bei 48).
     # T-1367: 4 aktive — COOLING_ROOMS_DRINKING_WATER (#95 Hebel S157) aus catalog_parked
     # aktiviert (verschoben, nicht neu: Gesamtzahl bleibt 48).
-    assert len(catalog.MEASURES) == 4
-    assert len(_ALL_MEASURES) == 48
+    # T-1600-cto: 5 aktive — LOW_ALLERGEN_TREE_SELECTION (#96 Stadtbaumwahl, effect_model
+    # 'stadtbaum') neu im Katalog (nicht aus catalog_parked verschoben, deshalb steigt die
+    # Gesamtzahl auf 49).
+    assert len(catalog.MEASURES) == 5
+    assert len(_ALL_MEASURES) == 49
 
 
 def test_every_measure_has_source():
