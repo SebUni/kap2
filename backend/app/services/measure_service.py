@@ -266,6 +266,61 @@ def _is_vg(mdef: dict) -> bool:
     return mdef.get("effect_model") == "vg"
 
 
+# ── Doppelzählungs-Wächter (Bericht #95 §5, Befund 150, Log 47; Block
+#    heat.vg_in_kalibrierjahren) ──
+# Lief das Programm (Schutzprogramme) bzw. liefen die Kühlzentren in der Kommune schon
+# in den Kalibrierjahren 2012–2024, ist es keine zusätzliche Maßnahme: seine Wirkung
+# steckt über c_kal im Basiswert. Dann gilt δ_VG = δ_VG,morb = 1 bzw. δ_KZ = 1. Je
+# Maßnahme eine eigene Frage ja (1) / nein (0) in ``config['vg_in_kalibrierjahren']``;
+# ohne Eingabe gilt der Registry-Wert 0 („nein“, Abschätzung von KAP3 aus [76]).
+VG_KALIB_KEY = "vg_in_kalibrierjahren"
+VG_KALIB_ESTIMATE_NOTE = "Abschätzung von KAP3"
+
+_JA = {"1", "ja", "true", "yes", "j", "y"}
+_NEIN = {"0", "nein", "false", "no", "n"}
+
+
+def _vg_kalib_config_value(config: dict | None) -> int | None:
+    """Eingabe der Kommune zur Wächter-Frage: 1 (ja), 0 (nein), None ohne gültige Eingabe."""
+    raw = (config or {}).get(VG_KALIB_KEY)
+    if raw is None or raw == "":
+        return None
+    if isinstance(raw, bool):
+        return 1 if raw else 0
+    if isinstance(raw, (int, float)):
+        return 1 if float(raw) >= 0.5 else 0
+    s = str(raw).strip().lower()
+    if s in _JA:
+        return 1
+    if s in _NEIN:
+        return 0
+    return None
+
+
+def _vg_kalib_input(config: dict | None) -> int:
+    """Wächter-Frage „Lief das Programm schon 2012–2024?“: 1 = ja, 0 = nein.
+
+    Die Eingabe der Kommune aus der Maßnahmen-Konfiguration (analog ``_s157_input``);
+    fehlt sie, gilt der Registry-Parameter heat.vg_in_kalibrierjahren (0, „nein“,
+    Abschätzung von KAP3; Bericht #95 §5, Befund 150, Log 47).
+    """
+    v = _vg_kalib_config_value(config)
+    if v is not None:
+        return v
+    return 1 if _s157_param(VG_KALIB_KEY, 0.0) >= 0.5 else 0
+
+
+def _vg_kalib_summary_fields(mdef: dict, config: dict | None) -> dict:
+    """Zusatzfelder des impact_summary zur Wächter-Frage (Schutzprogramme, Kühlzentren)."""
+    if not (_is_vg(mdef) or _is_s157(mdef)):
+        return {}
+    return {
+        VG_KALIB_KEY: _vg_kalib_input(config),
+        "vg_in_kalibrierjahren_is_default": _vg_kalib_config_value(config) is None,
+        "vg_in_kalibrierjahren_estimate_note": VG_KALIB_ESTIMATE_NOTE,
+    }
+
+
 def _vg_cell_factor(code: str, frac: float, cell_risk: dict,
                     delta_hap: float = 1.0, hap_cap: float = 1.0) -> float:
     """Faktor der Schutzprogramme auf das Outcome einer Zelle (Mortalität oder Morbidität).
@@ -740,9 +795,15 @@ def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float
         if code != S157_RISK_CODE:
             return 1.0
         f_s157 = _s157_cell_factor(_s157_input(config), frac, cell_risk, delta_hap)
-        f_kz = _kz_cell_factor(frac, cell_risk, delta_hap, hap_cap, delta_vg, vg_cap)
+        # Wächter (Befund 150): liefen die Kühlzentren schon 2012–2024, gilt δ_KZ = 1;
+        # S157 bleibt davon unberührt (eigener Abzug über heat.s_gek_kalib).
+        f_kz = 1.0 if _vg_kalib_input(config) else _kz_cell_factor(
+            frac, cell_risk, delta_hap, hap_cap, delta_vg, vg_cap)
         return max(0.0, f_s157 + f_kz - 1.0)
     if _is_vg(mdef):
+        # Wächter (Befund 150): lief das Programm schon 2012–2024, gilt δ_VG = δ_VG,morb = 1.
+        if _vg_kalib_input(config):
+            return 1.0
         return _vg_cell_factor(code, frac, cell_risk, delta_hap, hap_cap)
     if _is_s158(mdef):
         if code != ALLERGY_RISK_CODE:
@@ -770,11 +831,14 @@ def _vg_measures(db: Session, measure: AdaptationMeasure) -> list[AdaptationMeas
     """Schutzprogramme (effect_model ``vg``) derselben Kommune und Demo-Sitzung wie ``measure``.
 
     Grundlage der Kappung der Kühlzentren ``max(δ_HAP × δ_VG × δ_KZ; kappung_vg)``.
+    Programme, die schon in den Kalibrierjahren liefen (Wächter, Befund 150), haben
+    δ_VG = 1 und zählen deshalb weder zur Dämpfung noch zur Kappung.
     """
     return [m for m in kommune_measures_query(db, measure.kommune_id, measure.demo_session_id)
             .all()
             if m.id != measure.id
-            and catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"]
+            and catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
+            and not _vg_kalib_input(m.config)]
 
 
 def _vg_cell_fracs(db: Session, measures: list[AdaptationMeasure]) -> dict[int, list[float]]:
@@ -1306,7 +1370,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                 reduced = _cell_cost(risk, r, cell_pop) * (1.0 - factor)
                 annual_benefit_damage += reduced
                 if _is_s157(mdef) and code == S157_RISK_CODE:
-                    f_kz = _kz_cell_factor(frac, r, d_hap, d_hap, d_vg, vg_cap)
+                    f_kz = 1.0 if _vg_kalib_input(measure.config) else _kz_cell_factor(
+                        frac, r, d_hap, d_hap, d_vg, vg_cap)
                     kz_benefit += min(reduced, _cell_cost(risk, r, cell_pop) * (1.0 - f_kz))
                 # gekoppelte Folgekosten (nur direkte Sektorschäden treiben k_indirekt)
                 if code in catalog.DIRECT_SECTOR_RISK_CODES:
@@ -1436,6 +1501,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # S157: gerechneter Anteil s_gek (ohne Eingabe Voreinstellung 0,11, Befund 138)
         # und Kennzeichnung als Abschätzung von KAP3.
         **_s157_summary_fields(mdef, measure.config),
+        **_vg_kalib_summary_fields(mdef, measure.config),
         # Befund 129: S157 zusammen mit dem Hitzeaktionsplan gerechnet (Faktoren multipliziert)
         **({"s157_with_hap": bool(hap_by_cell)} if _is_s157(mdef) else {}),
         # Befunde 139, 148: Betrag der öffentlichen Kühlzentren getrennt von S157,
@@ -1516,7 +1582,8 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
     if has_kz:
         vg_fracs_by_cell = _vg_cell_fracs(db, [
             m for m in measures
-            if catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"])
+            if catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
+            and not _vg_kalib_input(m.config)])   # Wächter: δ_VG = 1 (Befund 150)
     if has_kz or any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
                      for m in measures):
         hap_base = catalog.MEASURES_BY_CODE.get(S157_HAP_CODE)

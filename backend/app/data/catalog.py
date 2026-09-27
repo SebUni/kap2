@@ -1671,7 +1671,30 @@ MEASURES: list[dict] = [
         "capex_fixed": "Gezielte Schutzprogramme für vulnerable Gruppen (z. B. Hitzetelefon, "
             "aufsuchende Betreuung, Aufklärung in Pflegeeinrichtungen) sind organisatorisch "
             "ohne baulichen Anteil; ein einheitlicher Kennwert existiert nicht. Modellannahme "
-            "als einmaliges Programmbudget (Konzeption/Koordination) → 35.000 €."}},
+            "als einmaliges Programmbudget (Konzeption/Koordination) → 35.000 €."},
+     # Doppelzählungs-Wächter (Bericht #95 §5, Befund 150, Log 47; Block
+     # heat.vg_in_kalibrierjahren): Eingabe der Kommune ja (1) / nein (0) in
+     # config['vg_in_kalibrierjahren'], gelesen von measure_service._vg_kalib_input.
+     # Bei „ja“ gilt δ_VG = δ_VG,morb = 1. Die Oberfläche folgt gesondert.
+     "config_inputs": {
+        "vg_in_kalibrierjahren": {
+            "frage": "Lief das Programm schon in den Jahren 2012–2024?",
+            "typ": "ja_nein",
+            "werte": {"ja": 1, "nein": 0},
+            "voreinstellung": 0,
+            "voreinstellung_text": "nein",
+            "kennzeichnung": "Abschätzung von KAP3",
+            "parameter": "heat.vg_in_kalibrierjahren"}},
+     "config_input_help": {
+        "vg_in_kalibrierjahren": "Lief das Programm schon in den Jahren 2012–2024? Ja: "
+            "Seine Wirkung steckt schon im Basiswert (Kalibrierjahre 2012–2024), die "
+            "Schutzprogramme rechnen dann keine zusätzliche Wirkung (δ_VG = δ_VG,morb = 1). "
+            "Voreinstellung „nein“ (Abschätzung von KAP3): Solche Programme waren in den "
+            "Kalibrierjahren selten; bundesweit gab es am 10.06.2024 18 veröffentlichte "
+            "kommunale Hitzeaktionspläne, in Nordrhein-Westfalen hatten im Oktober 2023 "
+            "4 von 53 Kreisen und kreisfreien Städten einen, also 7,5 % [76] (Bericht #95 "
+            "§5, Befund 150)."},
+    },
     # Maßnahmen-Hebel S158 (Zelllauf) — Ticket T-1513-cto / Bericht #96 §5.1
     # (Integrationsauflage Z. 1408–1415), Sperre aus Befund 124 aufgehoben: Die Wirkung
     # läuft NICHT mehr über einen pauschalen linked_risk_codes-Faktor auf gespeicherte
@@ -2085,7 +2108,30 @@ MEASURES: list[dict] = [
             "wert": "0 €: kein direkter Zusatznutzen neben dem vermiedenen Schaden.",
             "band": "0 €.",
             "sensitivitaet": "Keine; der Nutzen entsteht über ΔD_S157 (Bericht #95 §5)."},
-     }},
+     },
+     # Doppelzählungs-Wächter der Kühlzentren (Bericht #95 §5 Hebel Kühlzentren, Befund
+     # 150, Log 47; Block heat.vg_in_kalibrierjahren): eigene Frage je Maßnahme, Eingabe
+     # ja (1) / nein (0) in config['vg_in_kalibrierjahren']. Bei „ja“ gilt δ_KZ = 1;
+     # S157 (gekühlte Heimplätze) bleibt davon unberührt. Die Oberfläche folgt gesondert.
+     "config_inputs": {
+        "vg_in_kalibrierjahren": {
+            "frage": "Liefen die Kühlzentren schon in den Jahren 2012–2024?",
+            "typ": "ja_nein",
+            "werte": {"ja": 1, "nein": 0},
+            "voreinstellung": 0,
+            "voreinstellung_text": "nein",
+            "kennzeichnung": "Abschätzung von KAP3",
+            "parameter": "heat.vg_in_kalibrierjahren"}},
+     "config_input_help": {
+        "vg_in_kalibrierjahren": "Liefen die öffentlichen Kühlzentren schon in den Jahren "
+            "2012–2024? Ja: Ihre Wirkung steckt schon im Basiswert (Kalibrierjahre "
+            "2012–2024), die Kühlzentren rechnen dann keine zusätzliche Wirkung "
+            "(δ_KZ = 1); die gekühlten Heimplätze (S157) zählen weiter. Voreinstellung "
+            "„nein“ (Abschätzung von KAP3) aus demselben Grund wie bei den "
+            "Schutzprogrammen: solche Angebote waren in den Kalibrierjahren selten, in "
+            "Nordrhein-Westfalen hatten im Oktober 2023 4 von 53 Kreisen und kreisfreien "
+            "Städten einen Hitzeaktionsplan, also 7,5 % [76] (Bericht #95 §5, Befund 150)."},
+    },
 ]
 
 
