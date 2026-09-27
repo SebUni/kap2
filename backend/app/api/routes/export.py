@@ -93,8 +93,11 @@ def download_export(kommune_id: int, export_id: int, db: Session = Depends(get_d
 @router.get("/kommune/{kommune_id}/measures/export")
 def export_measures(kommune_id: int, db: Session = Depends(get_db)):
     """Export all measures as an Excel file."""
-    xlsx_bytes = export_measures_xlsx(db, kommune_id)
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
+    if not kommune:
+        raise HTTPException(404, "Kommune nicht gefunden")
+
+    xlsx_bytes = export_measures_xlsx(db, kommune_id)
     dateiname = download_dateiname_fuer("massnahmen", db, kommune, "xlsx")
     return Response(
         content=xlsx_bytes,
