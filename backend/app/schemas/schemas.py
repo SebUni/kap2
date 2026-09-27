@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 # ── Kommune ────────────────────────────────────────────────────────────────────
@@ -143,6 +143,23 @@ class ModelParameter(BaseModel):
 
 # ── Measures ───────────────────────────────────────────────────────────────────
 
+def _validate_config_value_ranges(config: Optional[dict]) -> Optional[dict]:
+    """Eingabe-Werte in ``config``, deren Wertebereich unabhängig vom Maßnahmentyp
+    feststeht, werden hier geprüft — nicht erst im Frontend geklemmt (Vorgabe P1).
+
+    ``anteil_ersetzt`` (Maßnahme LOW_ALLERGEN_TREE_SELECTION, Eingabe „Änderung des
+    Kronenanteils“, Bericht #96 §5, T-1603-cto): Anteil a der ersetzten allergenen
+    Kronen, muss 0 < a ≤ 1 sein (0 hieße keine Wirkung, > 1 mehr als der gesamte
+    Kronenbestand — beides ohne Bedeutung).
+    """
+    if config and "anteil_ersetzt" in config:
+        a = config["anteil_ersetzt"]
+        if a is not None:
+            if isinstance(a, bool) or not isinstance(a, (int, float)) or not (0.0 < float(a) <= 1.0):
+                raise ValueError("config['anteil_ersetzt'] muss 0 < a ≤ 1 sein")
+    return config
+
+
 class MeasureCreate(BaseModel):
     name: str
     measure_type: str
@@ -151,6 +168,11 @@ class MeasureCreate(BaseModel):
     implementation_year: Optional[int] = None
     description: Optional[str] = None
 
+    @field_validator("config")
+    @classmethod
+    def _check_config_ranges(cls, v: dict) -> dict:
+        return _validate_config_value_ranges(v)
+
 
 class MeasureUpdate(BaseModel):
     name: Optional[str] = None
@@ -158,6 +180,11 @@ class MeasureUpdate(BaseModel):
     config: Optional[dict] = None
     implementation_year: Optional[int] = None
     description: Optional[str] = None
+
+    @field_validator("config")
+    @classmethod
+    def _check_config_ranges(cls, v: Optional[dict]) -> Optional[dict]:
+        return _validate_config_value_ranges(v)
 
 
 class MeasureOut(BaseModel):
