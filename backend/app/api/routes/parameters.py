@@ -172,5 +172,5 @@ def export_parameters(kommune_id: int, db: Session = Depends(get_db)):
     return Response(
         content=xlsx_bytes,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": content_disposition(download_dateiname_fuer("parameter", kommune, "xlsx"))},
+        headers={"Content-Disposition": content_disposition(download_dateiname_fuer("parameter", db, kommune, "xlsx"))},
     )

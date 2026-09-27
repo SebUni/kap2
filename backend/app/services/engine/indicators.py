@@ -71,8 +71,10 @@ def pollen_load(ci: dict) -> float:
     gesicherten Kronen und dem ungetaggten Rest zusammen; letzterer wird mit dem
     dokumentierten Gattungsanteil gewichtet (Registry
     ``birch_group_share_default``, gekennzeichnete Abschätzung). Ĝ ist eine reine
-    Verteilungsgröße: Die Zentrierung P̂ = 1 + λ(Ĝ/Ḡ − 1) macht die
-    Kommunensumme invariant, weil Ḡ aus denselben Zellen gebildet wird.
+    Verteilungsgröße: Die Zentrierung P̂ = 1 + λ(Ĝ/Ḡ₀ − 1) verwendet das
+    betroffenengewichtete Mittel Ḡ₀ des Ausgangsstands, das im Ausgangsstand
+    gebildet und für Maßnahmenszenarien festgehalten wird. Die Kommunensumme
+    ist nur im Ausgangsstand gleich; mit Maßnahme sinkt sie (Log 26, §3.3, §5).
     ``s_unbek`` verschiebt daher nur die Gewichtung von Kronen gegen Grün
     innerhalb der Kommune und wirkt auf die ZELLVERTEILUNG — gehölzgeprägte
     Zellen reagieren zweistellig, vegetationsarme kaum (Bericht §3.3,

@@ -3,6 +3,7 @@ import { useStore } from '../../store'
 import InfoTooltip from '../InfoTooltip'
 import ChartSkeleton from './ChartSkeleton'
 import { fmtEur, fmtEurCompact } from '../../utils/format'
+import { evidenzAnzeige } from '../../utils/evidenceLabel'
 import {
   ComposedChart, Line, Area, Bar, XAxis, YAxis, CartesianGrid,
   Legend, Tooltip, ResponsiveContainer,
@@ -180,7 +181,7 @@ export default function CostTimelineSection({ className = '' }: { className?: st
                         <td style={{ paddingRight: 12 }}>
                           {fmtProzent(disk.relative_preise.wert)} Pp.
                           <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                            abgeschätzt (KAP3)
+                            {evidenzAnzeige(disk.relative_preise.evidence_class)}
                           </div>
                         </td>
                       )}
