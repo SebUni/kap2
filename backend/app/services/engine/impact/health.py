@@ -572,6 +572,48 @@ def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     return out
 
 
+# ── Hebel S158: Pollen-Frühwarnung (Bericht #96 §5.1, Integrationsauflage Z. 1408–1415) ──
+# Sperre aus Befund 124 aufgehoben (T-1513-cto): Die Maßnahme POLLEN_EARLY_WARNING wirkt
+# im Zelllauf, nicht als pauschaler Faktor auf gespeicherte Ergebnisse (Modellgrenze 7
+# bleibt für Vegetationsmaßnahmen unberührt — S158 ändert kein Ĝ, sondern mindert die
+# Symptomlast an gewarnten Tagen, ein Verhaltens-, kein Vegetationskanal).
+
+def s158_vermiedene_tage(tage_birke: float, tage_graeser: float, a_zelle: float,
+                         r: float, t_warn_b: float, t_warn_g: float) -> float:
+    """Vermiedene Symptomtage einer Zelle durch die Pollen-Frühwarnung (Bericht §5.1 Z. 1255).
+
+    ``ΔTage_vermieden = A_Zelle · r_S158 · (t_warn,B · ΔTage_B,Zelle + t_warn,G · ΔTage_G,Zelle)``
+
+    ``a_zelle`` ist der Deckungsgrad der Maßnahmen-Geometrie in der Zelle (Anteil 0..1 —
+    im Produkt-Code, anders als im Bericht mit binärem 0/1, Muster S157/D3): außerhalb
+    des Geltungsbereichs (0) entsteht keine Wirkung. ``r`` ist die Wirkung je gewarntem
+    Tag (Katalog-Wert ``default_reduction`` der Maßnahme, Block ``pollen.r_s158``);
+    ``t_warn_b``/``t_warn_g`` der Anteil gewarnter Zusatztage je Gruppe (Risiko-Parameter
+    ``t_warn_s158``, Block ``pollen.t_warn_s158`` — nach dem Ersetzungspfad je DWD-Gebiet
+    unterschiedlich, siehe ``t_warn_aus_dwd_anteil``; heute für beide Gruppen gleich).
+    """
+    a = max(0.0, min(1.0, float(a_zelle)))
+    return a * max(0.0, r) * (
+        max(0.0, t_warn_b) * max(0.0, tage_birke) + max(0.0, t_warn_g) * max(0.0, tage_graeser))
+
+
+def t_warn_aus_dwd_anteil(m: float, f: float) -> float:
+    """Ersetzungspfad ohne Verdünnung: ``t_warn = min(1, m/f)`` (Bericht §5.1 Z. 1226).
+
+    ``m`` ist der DWD-Anteil aller Tage mit Index mindestens „mittel“ in den Dekaden der
+    Zusatztage, je Pollenart und DWD-Gebiet ([71]); ``f`` der Anteil der Symptomtage an
+    allen Saisontagen (Registry-Parameter ``f_symptomtage``). ``m`` direkt eingesetzt
+    verdünnte die Wirkung um den Faktor ``f`` (die Tage wären doppelt ausgewählt — einmal
+    über ``f``, einmal über ``m``); die Division macht ``t_warn`` zum Anteil unter den
+    Symptomtagen, gedeckelt bei 1 (kein Beleg für einen höheren Anteil). Noch ohne
+    angebundene DWD-Anlage [71]/Gebietszuordnung [72] (Modellgrenze 8) — der Basiswert
+    ``t_warn_s158 = 0,75`` bleibt der Registry-Parameter, bis diese Daten vorliegen.
+    """
+    if f <= 0.0:
+        return 0.0
+    return max(0.0, min(1.0, float(m) / float(f)))
+
+
 # ── 2c. UV-Schädigungen (Bericht #98 §3.2–3.4 — nativer Ausweis YLL) ─────────
 
 # Roh-Neuerkrankungsraten je 100.000 und Jahr, Bänder wie #96 §3.2 (Bericht §3.3,

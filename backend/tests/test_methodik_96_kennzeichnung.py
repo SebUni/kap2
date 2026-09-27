@@ -9,8 +9,10 @@ im Feld ``methodik_block``. Geprüft wird:
    gezählt über verschiedene Kennungen: 4 × belegt, 7 × abgeschätzt, 2 × berechnet.
 2. Jeder #96-Parameter der Registry trägt Kennung und Klasse seines Blocks; Katalog-Blöcke
    stehen am Risiko (pollen.c_tag) bzw. an der Maßnahme POLLEN_EARLY_WARNING (pollen.r_s158).
-3. pollen.t_warn_s158 = 0,75 ist ein Spec des Risikos, kein Feld der Maßnahme.
-4. pollen.d_saison und pollen.c_jahr_direkt stehen in der Parameterliste und rechnen nicht.
+3. pollen.t_warn_s158 = 0,75 ist ein Spec des Risikos, kein Feld der Maßnahme; seit
+   T-1513-cto editierbar (wirkt auf den S158-Maßnahmen-Faktor, nicht auf die Zelle).
+4. pollen.d_saison und pollen.c_jahr_direkt stehen in der Parameterliste, sind nicht
+   editierbar und rechnen nicht in der Schadensfunktion.
 5. Jeder belegte Block löst seine Quelle in sources.SOURCE_REFERENCES auf; jeder
    abgeschätzte Block trägt eine Herleitung mit Wert, Band und Sensitivität.
 6. Der Wert jedes Parameters stimmt mit dem ``wert`` seines Blocks überein.
@@ -129,7 +131,9 @@ def test_t_warn_ist_spec_des_risikos_nicht_der_massnahme():
     by_id = {p["id"]: p for p in parameter_registry.catalog_parameters()}
     t = by_id[f"risks.{CODE}.impact.t_warn_s158"]
     assert t["value"] == 0.75 and t["methodik_block"] == "pollen.t_warn_s158"
-    assert t["evidence_class"] == "abgeschaetzt" and t["editable"] is False
+    # Seit T-1513-cto editierbar (Nachtrag CEO T-1431-ceo, 27.09.2026): die Wirkung von
+    # S158 im Maßnahmen-Modul ist gebaut, eine Überschreibung wirkt auf den Zellfaktor.
+    assert t["evidence_class"] == "abgeschaetzt" and t["editable"] is True
     massnahme = [p for p in by_id if p.startswith("measures.POLLEN_EARLY_WARNING.")]
     assert len(massnahme) == 9, massnahme
     assert not [p for p in massnahme if "t_warn" in p]
@@ -148,10 +152,18 @@ def _ctx() -> CellContext:
 
 
 def test_nicht_rechnende_bloecke_aendern_keine_rechnung():
+    """d_saison und c_jahr_direkt: nicht editierbar, rechnen nicht in der Schadensfunktion.
+
+    t_warn_s158 steht seit T-1513-cto NICHT mehr in dieser Schleife — es ist editierbar
+    (test_t_warn_ist_spec_des_risikos_nicht_der_massnahme), weil eine Überschreibung
+    seither den Maßnahmen-Faktor von S158 bewegt (measure_service._s158_cell_factor).
+    Der Basiswert der Zelle (diese Funktion hier) bleibt aber unberührt: S158 wirkt
+    ausschließlich im Maßnahmen-Modul, nicht in ``impact.compute_all_cell_impacts``.
+    """
     by_id = {p["id"]: p for p in parameter_registry.catalog_parameters()}
     d = by_id[f"risks.{CODE}.impact.d_saison"]
     assert d["evidence_class"] == "berechnet" and d["value"] == 43.05
-    for key in ("d_saison", "c_jahr_direkt", "t_warn_s158"):
+    for key in ("d_saison", "c_jahr_direkt"):
         assert by_id[f"risks.{CODE}.impact.{key}"]["editable"] is False, key
     override_context.set_overrides({})
     try:
