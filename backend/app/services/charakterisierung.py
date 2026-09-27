@@ -33,6 +33,15 @@ from __future__ import annotations
 
 from app.data import catalog
 from app.services import gewissheit
+from app.services.engine.impact.params import IMPACT_PARAM_SPECS
+
+#: Anteil des Bands 85+ an den YLL der Rechenkette Berlin: 638,8 / 2.250 YLL (Bericht #95
+#: §3.5 Ebene 7, Tabelle „Verlorene Lebensjahre"). Keine Registry-Größe (§3.0 Rechenkette
+#: Berlin, gemeindespezifisch — anders als s_gek, s_gek_kalib, h_heim und g_S157, die
+#: kommunenunabhängige Modellparameter sind); deshalb hier als benannte Konstante mit
+#: Verweis, nicht als eigener Parameter (Bericht #95 §5 Hebel S157, Log 50, Beispiel-Block
+#: ``s157_voreinstellung``).
+A85_PLUS_BERLIN = 638.8 / 2250
 
 #: Die fünf KWRA-Charakterisierungsgruppen (TB6 Kap. 6.2, Gruppen I–V).
 CHARAKTERISIERUNGSGRUPPEN = (
@@ -110,6 +119,31 @@ ENTSCHEIDUNGSTABELLE: tuple[tuple[float, float, tuple[str, ...], str], ...] = (
 )
 
 
+def _registry_wert(risk_code: str, key: str) -> float:
+    """Wert eines Impact-Parameters aus der Registry (``IMPACT_PARAM_SPECS``)."""
+    for spec in IMPACT_PARAM_SPECS:
+        if spec.get("risk") == risk_code and spec.get("key") == key:
+            return float(spec["value"])
+    raise KeyError(f"Registry-Parameter {key!r} für {risk_code!r} nicht gefunden")
+
+
+def _s157_faktor(risk_code: str) -> float:
+    """Faktor (1 − r_S157), den die Maßnahme „Kühle Räume / Kühlzentren" (Hebel S157)
+    multiplikativ zum Anpassungspotenzial beiträgt.
+
+    r_S157 = a_85+ × h_Heim × max(s_gek − s_gek_kalib; 0) × (1 − g_S157); s_gek,
+    s_gek_kalib, h_Heim und g_S157 kommen aus der Registry (Voreinstellungen, keine
+    Kommunen-Eingabe), a_85+ ist ``A85_PLUS_BERLIN`` (Bericht #95 §5 Hebel S157, Log 50,
+    Beispiel-Block ``s157_voreinstellung``: „r_S157 = a_85+ × h × (s_gek − 0,06) × (1 − g)").
+    """
+    s_gek = _registry_wert(risk_code, "s_gek")
+    s_gek_kalib = _registry_wert(risk_code, "s_gek_kalib")
+    h_heim = _registry_wert(risk_code, "h_heim")
+    g_s157 = _registry_wert(risk_code, "g_s157")
+    r_s157 = A85_PLUS_BERLIN * h_heim * max(s_gek - s_gek_kalib, 0.0) * (1.0 - g_s157)
+    return max(0.0, min(1.0, 1.0 - r_s157))
+
+
 def anpassungspotenzial(risk_code: str, *, _massnahmen: list[dict] | None = None) -> float:
     """Relative Risikominderung (0..1) durch die im Katalog hinterlegten Maßnahmen.
 
@@ -119,7 +153,11 @@ def anpassungspotenzial(risk_code: str, *, _massnahmen: list[dict] | None = None
     Je Maßnahme gilt bei voller Abdeckung derselbe Faktor wie in
     ``measure_service._reduction_factor``: f = (1 − r)^n mit r = ``default_reduction``
     (auf 0..1 begrenzt) und n = Zahl der ``effect_target``-Komponenten (mindestens 1).
-    Mehrere Maßnahmen wirken multiplikativ: p = 1 − Π f. Ohne Maßnahme ist p = 0.
+    Ausnahme ``effect_model`` ``"s157"`` (Hebel S157, gekühlte Heimplätze): Die Maßnahme
+    setzt ``default_reduction`` nicht an (wirkt nicht über eine pauschale Minderung,
+    T-1410); ihr Faktor ist stattdessen ``1 − r_S157`` aus ``_s157_faktor`` (Bericht #95
+    §5 Hebel S157, Log 50). Mehrere Maßnahmen wirken multiplikativ: p = 1 − Π f. Ohne
+    Maßnahme ist p = 0.
     """
     if risk_code not in catalog.RISKS_BY_CODE:
         raise KeyError(f"Unbekannter Risiko-Code: {risk_code}")
@@ -127,6 +165,9 @@ def anpassungspotenzial(risk_code: str, *, _massnahmen: list[dict] | None = None
     rest = 1.0
     for m in massnahmen:
         if risk_code not in (m.get("linked_risk_codes") or []):
+            continue
+        if m.get("effect_model") == "s157":
+            rest *= _s157_faktor(risk_code)
             continue
         r = max(0.0, min(1.0, float(m.get("default_reduction") or 0.0)))
         n = max(1, len(m.get("effect_target") or []))

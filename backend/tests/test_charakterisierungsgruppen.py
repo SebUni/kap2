@@ -121,6 +121,14 @@ def test_anpassungspotenzial_ohne_massnahme_null_und_multiplikativ():
     assert charakterisierung.anpassungspotenzial(code, _massnahmen=zwei) == pytest.approx(0.75)
 
 
+def test_anpassungspotenzial_s157_hitzemortalitaet():
+    """Befunde 149/165/174 (docs/methodik/95_hitzebelastung.md §5 Hebel S157, Log 50):
+    r_S157 = a_85+ × h_Heim × max(s_gek − s_gek_kalib; 0) × (1 − g_S157), mit dem
+    Hitzeaktionsplan zusammen 1 − 0,95 × (1 − r_S157) = 0,053 (nachgerechnet
+    1 − 0,95 × (1 − 0,2839 × 0,34427 × 0,05 × 0,70636) = 0,0533)."""
+    assert round(charakterisierung.anpassungspotenzial("EXPECTED_ANNUAL_MORTALITY"), 3) == 0.053
+
+
 def test_unbekannter_code():
     with pytest.raises(KeyError):
         charakterisierung.charakterisierungsgruppe("GIBT_ES_NICHT")
