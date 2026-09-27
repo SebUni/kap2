@@ -201,6 +201,34 @@ MASSNAHMEN_UMSETZUNG: dict[str, dict] = {
             ),
         },
     },
+    # T-1600-cto: neu im Katalog (Bericht #96 §5, Stadtbaumwahl). Kein Partner außerhalb
+    # der Kommunalverwaltung genannt oder erforderlich: Straßen-/Stadtbäume stehen auf
+    # kommunalem Grund, die Baumartenwahl liegt beim kommunalen Grünflächen-/Garten- und
+    # Tiefbauamt (Pflanzung, Pflege, Ersatz im Zuge ohnehin fälliger Neupflanzungen).
+    "LOW_ALLERGEN_TREE_SELECTION": {
+        "umsetzung": "kommune_allein",
+        "partner": [],
+        "ebenen": ["gemeinde"],
+        "beleg": {
+            "ebenen_begruendung": (
+                "gemeinde: Straßen-/Stadtbäume stehen auf kommunalem Grund; die "
+                "Baumartenwahl bei Neupflanzung und Ersatz obliegt dem kommunalen "
+                "Grünflächen-/Garten- und Tiefbauamt. Keine der ausgewerteten Quellen "
+                "(UBA-Broschüre 2022, S. 29–30; kang_zustaendigkeit.py) nennt für diese "
+                "Maßnahme eine Stelle außerhalb der Kommune."
+            ),
+            "abschaetzung": True,
+            "herleitung": (
+                "Abschätzung von KAP3: Die allergenarme Stadtbaumwahl ist ein Sonderfall "
+                "der kommunalen Straßenbaum-/Grünflächenplanung — anders als bei der "
+                "Pollen-Frühwarnung (POLLEN_EARLY_WARNING) hängt sie an keinem "
+                "Frühwarnsystem oder externen Messnetz, sondern an der Artenwahl bei "
+                "ohnehin geplanten Neupflanzungen und Ersatzpflanzungen im "
+                "kommunaleigenen Bestand. Die Einstufung ersetzt eine Quelle, die die "
+                "Zuständigkeit ausdrücklich nennt, sobald eine gefunden ist."
+            ),
+        },
+    },
 }
 
 

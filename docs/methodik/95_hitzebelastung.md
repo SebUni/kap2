@@ -1,10 +1,12 @@
 # Methodik-Bericht #95 — Hitzebelastung
 
-Status: **Rev. 8, Fortschreibung 7 — in Revision** (A-0048; Ledger-Runde 31, Divergenzen aus der Integration,
-Vorhaben T-1534-cmo; zuletzt abgenommen vom methodik_manager am 26.09.2026 nach der Null-Runde 30; seit der Fortsetzung
-der Runde 31, Teil 2, hat der Hebel S157 eine Voreinstellung und die öffentlichen Kühlzentren einen eigenen Hebel; Teil 3
-ergänzt die Eingabe zum Doppelzählungs-Wächter, den Block der Kappung 0,794 und die Bänder und Sensitivitäten von \(f_a\)
-und \(\bar L_a\), ohne einen Betrag zu ändern; die Gegenprüfung steht aus) · 27.09.2026 ·
+Status: **Rev. 8, Fortschreibung 7 — ABNAHMEREIF, abgenommen am 27.09.2026** (A-0048; Null-Runde 38 über den ganzen
+Bericht, Vorhaben T-1535-cmo: Abschnitt A mit dem Urteil zu T-1598-methodik_manager, Runde 35, „Null-Runde: ja“,
+Abschnitt B mit dem Urteil zu T-1584-methodik_manager, Runde 38, „Null-Runde: ja“; seit der Null-Runde 30 hat Runde 31
+den Hebel S157 mit Voreinstellung, die öffentlichen Kühlzentren als eigenen Hebel, den Doppelzählungs-Wächter, die
+Kappung 0,794 und die Bänder von \(f_a\) und \(\bar L_a\) ergänzt, die Runden 32–38 den Abzug des Bestands der
+Kalibrierjahre bei S157 und den Berliner Betrag des Hitzeaktionsplans; `MANAGER-REVIEW: ABGENOMMEN` am 27.09.2026,
+T-1585-methodik_manager) · 27.09.2026 ·
 Rev. 8 vom 30.08.2026 (§3.4-Ressourcen-Regel, q_pfl-Ebene angelegt, q_1P geparkt, L̄_85+ exakt 4,16 J; Befunde
 86–94 behoben) hat Fortschreibung 7 in den Ledger-Runden 10–29 um die Rechenkette 3.0, den Pflichtabschnitt „Risiko
 ohne (weitere) Anpassung“, die Kennzeichnung der Parameter, die Ersatzregel für den Anteil 65+, den Berlin-Anker und

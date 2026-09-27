@@ -750,11 +750,16 @@ def kommunale_pollen_referenz(cell_inputs: list[dict | None]) -> float | None:
     """Betroffenengewichtete Referenz-Vegetationslast Ḡ der Kommune (#96 §3.3).
 
     ``Ḡ = Σ_z B_z · Ĝ_z / Σ_z B_z`` über die **bewohnten Zellen der Kommune**.
-    Damit gilt ``Σ_z B_z·P̂_z = Σ_z B_z`` EXAKT (P̂ = 1 + λ(Ĝ/Ḡ − 1) verteilt nur
-    innerhalb der Kommune um) und die Betrachtungsebene bleibt geschlossen: Das
-    Ergebnis einer Kommune hängt an keiner Größe außerhalb ihrer selbst
-    (Aufgabe §3.2). ``None``, wenn die Kommune keine bewohnte Zelle mit
-    Vegetationsangabe hat — dann bleibt P̂ neutral (Faktor 1).
+    Damit gilt ``Σ_z B_z·P̂_z = Σ_z B_z`` EXAKT im Ausgangsstand (P̂ = 1 + λ(Ĝ/Ḡ − 1)
+    verteilt nur innerhalb der Kommune um) und die Betrachtungsebene bleibt
+    geschlossen: Das Ergebnis einer Kommune hängt an keiner Größe außerhalb ihrer
+    selbst (Aufgabe §3.2). Diese Gleichheit **gilt im Ausgangsstand; mit einer
+    Maßnahme sinkt die Summe** — eine Vegetationsmaßnahme (Stadtbaumwahl,
+    T-1600-cto) ändert Ĝ_z einzelner Zellen und hält Ḡ₀ bewusst FEST (Bericht #96
+    §5, Log 26); die Funktion hier bildet Ḡ₀ deshalb ausschließlich im
+    Ausgangsszenario, nicht erneut je Maßnahmenszenario. ``None``, wenn die
+    Kommune keine bewohnte Zelle mit Vegetationsangabe hat — dann bleibt P̂
+    neutral (Faktor 1).
     """
     from app.services.engine import override_context
     from app.services.engine.impact.health import (
