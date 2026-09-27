@@ -944,6 +944,18 @@ def _erste_spalte_ids(abschnitt: str) -> list[str]:
     `S010–S020` ergibt die beiden genannten Kennungen.
     """
     ids: list[str] = []
+    for zelle in _erste_spalte_zellen(abschnitt):
+        ids.extend(re.findall(KNOTEN_KENNUNG, zelle))
+    return ids
+
+
+# Knotenkennung der Arbeitsmappe (E/R/S/W mit Ziffern), wie in Regel (a) T-1464-ceo.
+KNOTEN_KENNUNG = r"\b([ERSW]\d{2,3})\b"
+
+
+def _erste_spalte_zellen(abschnitt: str) -> list[str]:
+    """Inhalt der ersten Spalte jeder Tabellenzeile im Abschnitt, ohne Kopf- und Trennzeile."""
+    zellen_liste: list[str] = []
     in_tabelle = False
     for zeile in abschnitt.splitlines():
         z = zeile.strip()
@@ -956,8 +968,65 @@ def _erste_spalte_ids(abschnitt: str) -> list[str]:
             continue
         if re.fullmatch(r"[\s|:\-]+", z):  # Trennzeile
             continue
-        ids.extend(re.findall(r"\b([ERSW]\d{2,3})\b", zellen[1]))
-    return ids
+        zellen_liste.append(zellen[1])
+    return zellen_liste
+
+
+def _netzwerk_kanten(kopf: list, row: tuple) -> tuple[set[str], set[str]]:
+    """Ausgehende und eingehende Risikonummern einer Zeile der Netzwerkliste (T-1490-ceo, Regel g).
+
+    Ausgehend ist nur `Output_IDs_Wirkung`; `Input_IDs_Wirkung` und „Ergänzte Kanten aus
+    Abgleich (eingehend)“ zählen nur als eingehend.
+    """
+    ausgehend: set[str] = set()
+    eingehend: set[str] = set()
+    for spalte, wert in zip(kopf, row):
+        if not spalte or wert is None or str(wert).strip() == "":
+            continue
+        werte = {t.strip() for t in str(wert).split(";") if t.strip()}
+        if "Output_IDs" in str(spalte):
+            ausgehend |= werte
+        elif "Input_IDs" in str(spalte) or "Ergänzte Kanten" in str(spalte):
+            eingehend |= werte
+    return ausgehend, eingehend
+
+
+def _weitergaben_lesen(weitergaben: str) -> tuple[set[str], list[str]]:
+    """Risikonummern und fremde Kennungen aus der ersten Spalte der Weitergaben (T-1490-ceo, d–f).
+
+    Gibt die Nummern aus `#<Zahl>` zurück und die Knotenkennungen, die außerhalb einer
+    `**keine**`-Zelle stehen. Eine Zelle, die mit `**keine**` beginnt, ist Erklärtext.
+    """
+    risiken: set[str] = set()
+    fremde: list[str] = []
+    for zelle in _erste_spalte_zellen(weitergaben):
+        if zelle.strip().startswith("**keine**"):
+            continue
+        risiken.update(re.findall(r"#(\d+)", zelle))
+        fremde.extend(re.findall(KNOTEN_KENNUNG, zelle))
+    return risiken, fremde
+
+
+def _kanten_pruefen(nr: str, weitergaben: str, kanten: set[str], lint: "Lint") -> None:
+    """Kanten-Abgleich in beiden Richtungen, Regeln (d)–(h) aus T-1490-ceo."""
+    behauptet, fremde = _weitergaben_lesen(weitergaben)
+    # Die eigene Nummer (etwa „für #96“) ist keine Kante des Risikos zu sich selbst.
+    behauptet.discard(nr)
+
+    def _sortiert(nummern: set[str]) -> list[str]:
+        return [f"#{n}" for n in sorted(nummern, key=lambda n: (len(n), n))]
+
+    ohne_deckung = behauptet - kanten
+    lint.pruefe(not ohne_deckung, f"Kanten-Abgleich {nr} (Bericht → Mappe)",
+                f"Bericht behauptet Kanten zu {_sortiert(ohne_deckung)}, "
+                f"die Netzwerkliste nicht führt")
+    lint.pruefe(not fremde, f"Kanten-Abgleich {nr} (Bericht → Mappe, Kennungen)",
+                f"{sorted(set(fremde))} in der ersten Spalte der Weitergaben: keine Risikonummer "
+                f"(erwartet #<Zahl> oder eine Zelle, die mit **keine** beginnt)")
+    fehlend = kanten - behauptet
+    lint.pruefe(not fehlend, f"Kanten-Abgleich {nr} (Mappe → Bericht)",
+                f"Netzwerkliste führt {_sortiert(fehlend)}, die erste Spalte der "
+                f"Weitergaben nennt sie nicht")
 
 
 def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
@@ -1034,14 +1103,12 @@ def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
         risiko_name[str(row[0]).strip()] = str(row[1] or "")
         if str(row[0]).strip() != nr:
             continue
-        for spalte, wert in zip(kopf2, row):
-            if spalte and ("Output_IDs" in str(spalte)
-                           or "Ergänzte Kanten" in str(spalte)) and wert:
-                kanten.update(t.strip() for t in str(wert).split(";") if t.strip())
-            # Eingehende Kanten für Regel (b), dritter Fall (T-1464-ceo).
-            if spalte and ("Input_IDs" in str(spalte)
-                           or "Ergänzte Kanten" in str(spalte)) and wert:
-                eingehend.update(t.strip() for t in str(wert).split(";") if t.strip())
+        # Ausgehend nur Output_IDs_Wirkung; Input_IDs und „Ergänzte Kanten aus
+        # Abgleich (eingehend)“ nur eingehend, für Regel (b), dritter Fall
+        # (T-1464-ceo), und Regel (g) (T-1490-ceo).
+        aus, ein = _netzwerk_kanten(kopf2, row)
+        kanten |= aus
+        eingehend |= ein
     wb2.close()
 
     def _norm(text: str) -> str:
@@ -1065,17 +1132,28 @@ def knoten_abgleich(nr: str, src: str, lint: Lint) -> None:
         lint.pruefe(gedeckt, f"Knoten-Bilanz führt {k}",
                     "steht nicht in den Input-Spalten der Arbeitsmappe")
     weitergaben = _unterabschnitt(src, "### Weitergaben")
-    behauptet_keine = bool(re.search(r"\*\*keine\*\*", weitergaben[:400]))
     # Befund 344(6): Bis Rev. 13 war der Check einseitig — `or not kanten` machte
     # ihn immer gruen, sobald die Mappe keine Kanten fuehrt. Damit fiel eine im
-    # BERICHT behauptete Kante, die die Mappe nicht kennt, nie auf. Jetzt beide
-    # Richtungen (seit T-1464-ceo nur erste Tabellenspalte, Regel c):
-    behauptet_kanten = set(_erste_spalte_ids(weitergaben))
-    lint.pruefe(not (kanten and behauptet_keine), f"Kanten-Abgleich {nr} (Mappe → Bericht)",
-                f"Netzwerkliste führt {sorted(kanten)}, Bericht behauptet keine")
-    ohne_deckung = sorted(behauptet_kanten - kanten - {knoten_id})
-    lint.pruefe(not ohne_deckung, f"Kanten-Abgleich {nr} (Bericht → Mappe)",
-                f"Bericht behauptet Kanten {ohne_deckung}, die Netzwerkliste nicht führt")
+    # BERICHT behauptete Kante, die die Mappe nicht kennt, nie auf. Seit T-1464-ceo
+    # nur erste Tabellenspalte (Regel c). Regeln des Kanten-Abgleichs nach
+    # T-1490-ceo (bis dahin wurden Knotenkennungen E/R/S/W mit den Risikonummern
+    # der Netzwerkliste verglichen: #95 → #87/#101 blieb ungeprüft, W196/W197 aus
+    # dem Erklärtext von Bericht 96 war ein Fehlalarm):
+    # (d) Bericht → Mappe liest aus der ersten Spalte der Tabelle unter
+    #     `### Weitergaben` die Risikonummern der Form `#<Zahl>` (etwa `→ **#87**`)
+    #     und vergleicht sie mit `Output_IDs_Wirkung` der Netzwerkliste für dieses
+    #     Risiko.
+    # (e) Eine Zelle der ersten Spalte, die mit `**keine**` beginnt, ist
+    #     Erklärtext; Kennungen darin (etwa W196/W197 in Bericht 96) sind keine
+    #     behaupteten Kanten.
+    # (f) Eine Kennung E/R/S/W<Ziffern> in der ersten Spalte außerhalb einer
+    #     solchen Zelle ist keine Risikonummer und bleibt ROT („keine Risikonummer“).
+    # (g) „Ergänzte Kanten aus Abgleich (eingehend)“ zählt nur als eingehende Kante
+    #     (Regel b), nicht als ausgehende (oben, `_netzwerk_kanten`).
+    # (h) Mappe → Bericht: Jede Risikonummer aus `Output_IDs_Wirkung` steht als
+    #     `#<Zahl>` in der ersten Spalte. Ersetzt die frühere Prüfung, die nur
+    #     „Netzwerkliste führt Kanten, Bericht behauptet keine“ erkannte.
+    _kanten_pruefen(nr, weitergaben, kanten, lint)
 
 
 def revisionshistorie(src: str, lint: Lint) -> None:
