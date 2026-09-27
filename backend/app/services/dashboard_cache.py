@@ -244,7 +244,7 @@ def _build(db: Session, kommune_id: int, name: str) -> dict | None:
             return None
         finance = None
         try:
-            finance = finance_loader.finance_for_kommune(kommune.osm_id, kommune.name)
+            finance = finance_loader.finance_for_kommune(kommune.osm_id, kommune.name, db=db, kommune=kommune)
         except Exception:
             log.exception("dashboard_cache: finance_loader fehlgeschlagen kommune=%s", kommune_id)
         return kommune_profile_service.build_profile(db, kommune, finance=finance)

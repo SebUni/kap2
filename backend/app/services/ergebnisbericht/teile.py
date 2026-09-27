@@ -53,7 +53,7 @@ SCREENING_SATZ = "Screening-Analyse, kein Ersatz für ein Detailgutachten."
 # für Abschätzungen der Wortlaut der Gliederung (Teil 7: „ausgewiesene Abschätzung“).
 _KLASSE = {
     "belegt": "belegt",
-    "berechnet": "berechnet aus amtlichen Daten",
+    "berechnet": "berechnet aus anderen Parametern",
     "abgeschaetzt": "ausgewiesene Abschätzung von KAP3",
 }
 

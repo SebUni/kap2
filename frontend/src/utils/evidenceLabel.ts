@@ -3,7 +3,7 @@ import type { EvidenceClass } from '../types'
 /** Anzeigetext je Evidenzklasse (Vorgabe P1) — einzige Zuordnung, von Parameterliste und Maßnahmentabelle genutzt. */
 export function evidenzAnzeige(klasse: EvidenceClass): string {
   if (klasse === 'abgeschaetzt') return 'abgeschätzt (KAP3)'
-  if (klasse === 'berechnet') return 'berechnet aus amtlichen Daten'
+  if (klasse === 'berechnet') return 'berechnet aus anderen Parametern'
   return 'belegt'
 }
 
