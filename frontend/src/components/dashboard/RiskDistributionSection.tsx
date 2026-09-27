@@ -66,11 +66,16 @@ export default function RiskDistributionSection() {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
                           <div className="kpi-card" style={{ flex: '1 1 110px' }}>
                             <div className="kpi-label">P90-Index</div>
-                            <div className="kpi-value" style={{ fontSize: '0.95rem' }}>{r.p90_index.toFixed(1)}</div>
+                            {/* Fehlt die Klimawirkung im Aggregat, ist p90_index null — kein „0,0“ (A-0010/P2). */}
+                            <div className="kpi-value" style={{ fontSize: '0.95rem' }}>
+                              {r.p90_index == null ? '–' : r.p90_index.toFixed(1)}
+                            </div>
                           </div>
                           <div className="kpi-card" style={{ flex: '1 1 110px' }}>
                             <div className="kpi-label">Max. Index</div>
-                            <div className="kpi-value" style={{ fontSize: '0.95rem' }}>{r.max_index.toFixed(1)}</div>
+                            <div className="kpi-value" style={{ fontSize: '0.95rem' }}>
+                              {r.max_index == null ? '–' : r.max_index.toFixed(1)}
+                            </div>
                           </div>
                           <div className="kpi-card" style={{ flex: '1 1 110px' }}>
                             <div className="kpi-label">Betroffene Zellen</div>
@@ -84,7 +89,7 @@ export default function RiskDistributionSection() {
                               Ergebnis {r.aggregation === 'p90' ? '(P90 × Kommune)' : '(Σ über Zellen)'}
                             </div>
                             <div className="kpi-value" style={{ fontSize: '0.95rem' }}>
-                              {r.outcome.toLocaleString('de-DE', { maximumFractionDigits: 1 })}
+                              {r.outcome == null ? '–' : r.outcome.toLocaleString('de-DE', { maximumFractionDigits: 1 })}
                               <span className="kpi-unit"> {r.outcome_unit}</span>
                             </div>
                           </div>

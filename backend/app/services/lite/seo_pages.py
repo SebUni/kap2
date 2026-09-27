@@ -46,7 +46,9 @@ def _render_page(g: Gemeinde, rows: list[GemeindeLiteResult],
     name = html.escape(g.name)
     bl = html.escape(g.bundesland or "")
     title = f"Klimarisiken in {name} ({bl}) – KAP2"
-    desc = (f"Klimarisiken in {name}: Hitze, Starkregen und Dürre auf einen Blick – "
+    # Beschreibung nennt keine Klimawirkungen, die nicht aus den Zeilen der Seite
+    # (``rows``) kommen — sonst ein Versprechen, das die Seite nicht hält (A-0010/P2).
+    desc = (f"Klimarisiken in {name} auf einen Blick – "
             f"Risikoindex und erwartete Auswirkung je Klimawirkung, im Vergleich "
             f"zum Bundesland und zu Deutschland. Grobschätzung je Kommune.")
     risk_rows = []

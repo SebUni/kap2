@@ -68,9 +68,15 @@ def test_schadenswert_zweig_auf_has_euro_layer(name):
 
 @pytest.mark.parametrize("name", [COST_TABLES, RISK_DISTRIBUTION])
 def test_kein_strich_und_kein_null_euro_als_ersatz(name):
+    """Prüft nur an der Stelle des Schadenswerts (Docstring Punkt 1) — nicht im ganzen
+    Dateitext, sonst träfe die Prüfung auch einen Strich für andere, nicht-monetäre
+    Kennzahlen (etwa fehlenden Index, T-1290)."""
     code = _code(name)
-    assert not _STRICH.search(code), f"{name}: Literal '-' als Ersatzdarstellung"
-    assert not _NULL_EURO.search(code), f"{name}: Literal '0 €' als Ersatzdarstellung"
+    pos_schaden = code.find("Schaden/Jahr")
+    assert pos_schaden != -1, f"{name}: Schadenswert-Stelle „Schaden/Jahr“ fehlt"
+    ausschnitt = code[pos_schaden: pos_schaden + 800]
+    assert not _STRICH.search(ausschnitt), f"{name}: Literal '-' als Ersatzdarstellung"
+    assert not _NULL_EURO.search(ausschnitt), f"{name}: Literal '0 €' als Ersatzdarstellung"
 
 
 def test_top_risiken_filtern_nicht_allein_ueber_cost_eur():
