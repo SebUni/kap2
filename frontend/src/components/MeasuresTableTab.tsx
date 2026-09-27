@@ -11,7 +11,8 @@ export default function MeasuresTableTab() {
   const [filterType, setFilterType] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => { loadCatalog().catch(() => {}) }, [])
+  const [catalogFehler, setCatalogFehler] = useState(false)
+  useEffect(() => { loadCatalog().catch(() => setCatalogFehler(true)) }, [])
 
   // Gewissheit je Maßnahmentyp (Code measure_type), einmal geladen.
   const [gewissheit, setGewissheit] = useState<Record<string, MassnahmeGewissheit>>({})
@@ -24,10 +25,11 @@ export default function MeasuresTableTab() {
 
   // Umsetzung (allein/mit Partnern, Ebenen, Quelle) je Maßnahmentyp, einmal geladen.
   const [umsetzung, setUmsetzung] = useState<Record<string, MassnahmeUmsetzung>>({})
+  const [umsetzungFehler, setUmsetzungFehler] = useState(false)
   useEffect(() => {
     api.getMassnahmenUmsetzung()
       .then(setUmsetzung)
-      .catch(() => {})
+      .catch(() => setUmsetzungFehler(true))
   }, [])
   const ebeneLabel: Record<string, string> = { gemeinde: 'Gemeinde', kreis: 'Kreis', land: 'Land' }
 
@@ -124,6 +126,10 @@ export default function MeasuresTableTab() {
           <input ref={fileInputRef} type="file" accept=".xlsx,.xls" onChange={handleImport} style={{ display: 'none' }} />
         </div>
       </div>
+
+      {catalogFehler && (
+        <p style={{ fontSize: '0.85rem', marginBottom: 8, color: 'var(--danger)' }}>Maßnahmenkatalog konnte nicht geladen werden</p>
+      )}
 
       <UnsicherheitsZusammenschau kommuneId={kommune.id} />
 
@@ -223,7 +229,7 @@ export default function MeasuresTableTab() {
                       <td style={{ fontSize: '0.75rem' }}>
                         {(() => {
                           const u = umsetzung[m.measure_type]
-                          if (!u) return 'nicht hinterlegt'
+                          if (!u) return umsetzungFehler ? 'Umsetzung konnte nicht geladen werden' : 'nicht hinterlegt'
                           const istAbschaetzung = !u.beleg?.quelle && !!u.beleg?.abschaetzung
                           const beleg = u.beleg?.quelle
                             ? `Quelle: ${u.beleg.quelle}${u.beleg.seite ? `, S. ${u.beleg.seite}` : ''}`
