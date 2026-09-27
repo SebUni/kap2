@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–440) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–443) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -1219,24 +1219,38 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   | \(v_{\text{verh}}\) (geparkt) | \(\phi\) ∈ [0; 0,25] | 339–377 | ±0 % … +11,3 % |
 
   **Gesamtband ≈ 115–737 Mio. €** = nur die \(k_{\text{UV}}\)/\(a_{\text{attr}}\)/\(c_e\)-Kombination;
-  die übrigen Zeilen sind **nicht** hineinmultipliziert. Größte Achse ist der
-  einseitige Transient-Faktor \(\tau\) (§3.4); größter **zweiseitiger** Treiber ist die
-  \(k_{\text{UV}}\)-Messunsicherheit (±49 %); danach folgen \(a_{\text{attr}}\)
-  (±33,3 %) und BAF_MM (±28,8 %) — die Reihenfolge folgt dem Betrag der Spalte
-  »Δ gegen Basiswert« der Tabelle darüber (Befunde 282/439; bis Rev. 8 stand hier eine abweichende Rangfolge). Seit Rev. 3 erzeugt
+  die übrigen Zeilen sind **nicht** hineinmultipliziert. Die beiden Kombinationszeilen
+  kommen in keine Rangfolge, weil sie mehrere Achsen zugleich bewegen. Zwei Achsen haben
+  keine eigene Zeile und stecken nur in den Kombinationszeilen; allein bewegt ergeben sie
+  (nachgerechnet mit der Funktion `sums()` im Skript der Anlage [71], Befund 441):
+  \(k_{\text{UV}}\) 0,3622 / 1,0616 ⇒ 172–505 statt 339 Mio. € je Jahr ⇒ **±49 %**
+  (der Euro-Betrag ist linear in \(k_{\text{UV}}\): 338,6 × 0,3622 / 0,7119 = 172,3;
+  Band aus §3.2, Register 98-E20-02); \(c_e\) mit den oberen Kostenbändern beider
+  Entitäten ⇒ 370,6 statt 338,6 Mio. € je Jahr ⇒ **+9,4 %** (Befund 438). Unter den
+  Achsen ist der einseitige Transient-Faktor \(\tau\) die größte (−80 %, §3.4); größter
+  **zweiseitiger** Treiber ist die \(k_{\text{UV}}\)-Messunsicherheit (±49 %); danach
+  folgen \(a_{\text{attr}}\) (±33,3 %) und BAF_MM (±28,8 %) — die Reihenfolge
+  folgt dem Betrag der Spalte »Δ gegen Basiswert« der Tabelle darüber für die Einzelachsen und
+  ordnet \(k_{\text{UV}}\) mit seiner eben nachgerechneten Einzelwirkung ein (Befunde
+  282/439/441; bis Rev. 8 stand hier eine abweichende Rangfolge). Seit Rev. 3 erzeugt
   die Anlage [71] alle Zeilen; \(a_{\text{attr}}\) ist seit Rev. 8 als eigene Achse
   ausgewiesen (Befund 261).
 - **Unsicherheiten (nach Größe geordnet, Befunde 250/268/398):**
-  Aufgezählt wird hier **nach Größe** der bezifferten Ergebniswirkung (Spalte »Δ gegen
-  Basiswert« der Bändertabelle darüber, maximaler Betrag); die Bändertabelle selbst ist
-  nach Sachgruppen geordnet, nicht nach Größe (Befunde 361/370). **Größte Achse ist
+  Aufgezählt wird hier **nach Größe** der bezifferten Wirkung auf den Euro-Betrag
+  (maximaler Betrag). Fundstelle je Wert: \(\tau\), \(a_{\text{attr}}\), BAF_MM,
+  \(v_{\text{verh}}\), VOLY, \(w_{\text{SCC}}\) und \(r_{\text{out}}\) aus der Spalte
+  »Δ gegen Basiswert« der Bändertabelle darüber; \(k_{\text{UV}}\) und \(c_e\) aus der
+  Nachrechnung unter der Tabelle; die Anker-Auswahlregel aus dem Satz »Sensitivität der
+  Auswahlregel« beim Anker oben; die Binnenheterogenität aus §6 Modellgrenze 7; die Populationsbasis aus §3.3
+  (Befund 442). Die Bändertabelle selbst ist nach Sachgruppen geordnet, nicht nach
+  Größe (Befunde 361/370). **Größte Achse ist
   der Transient-Faktor \(\tau\)** (0,20–1,00 ⇒ **−80 %**, §3.4): Er trennt die
   ausgewiesene Gleichgewichtslesart von einer reinen Jahres-Attribution und ist
   einseitig — er kann das Ergebnis nur senken. Danach die
   **k_UV-Messunsicherheit** (Band **0,3622–1,0616** = **±49 %**) — der
   **Stichprobenfehler der publizierten Trendschätzungen**, *nicht* die räumliche
   Übertragbarkeit; letztere steht als Modellgrenze 9. Sie ist der größte
-  *zweiseitige* Treiber. Danach: Attribution \(a_{\text{attr}}\) (±33 %);
+  *zweiseitige* Treiber. Danach: Attribution \(a_{\text{attr}}\) (±33,3 %);
   **BAF_MM** (±67 % auf den MM-Pfad ⇒ ±28,8 % auf die Summe — Befund 356: die Achse
   steht hier **einmal**, nicht doppelt); **Verhaltens-Sensitivität \(v_{\text{verh}}\)**
   (geparkte Ebene, \(\phi\) ∈ [0; 0,25] ⇒ ±0 … **+11,3 %**, einseitig nach oben);
