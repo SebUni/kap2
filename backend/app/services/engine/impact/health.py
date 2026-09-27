@@ -314,12 +314,25 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
 
 # ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5, Befunde 122, 124, 129, 130) ──
 
-def h_heim(qbar_pfl: float = 0.149, beta_pfl: float = 1.54) -> float:
-    """Anteil der Heimbewohner an den Todesfällen 85+ (Bericht #95 §3.0/§5).
+def h_heim(qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
+           q_pfl: float | None = None) -> float:
+    """Anteil der Heimbewohner an den Todesfällen 85+ (Bericht #95 §3.0/§5, Befund 146).
 
-    ``h_Heim = q̄_pfl · [1 + β_pfl · (1 − q̄_pfl)]`` = 0,344 mit den Basiswerten.
+    Kommune bzw. Rückfall (kein Zellwert): ``h_Heim = q̄_pfl · [1 + β_pfl · (1 − q̄_pfl)]``
+    = 0,344 mit den Basiswerten (Block heat.h_heim).
+
+    Zelle mit Heimanteil ``q_pfl`` (Ebene CARE_HOME_SHARE_85P, ci-Feld
+    ``share_care_home_85p``): ``h_Heim,z = q_pfl,z · [1 + β_pfl(1 − q̄_pfl)]
+    / [1 + β_pfl(q_pfl,z − q̄_pfl)]`` — dieselben Faktoren wie in ``v_vers`` (§3.3).
+    Bei q_pfl,z = q̄_pfl ergibt das wieder 0,344, bei 0,5 den Wert 0,75, bei 1 den Wert 1.
     """
-    return qbar_pfl * (1.0 + beta_pfl * (1.0 - qbar_pfl))
+    if q_pfl is None:
+        return qbar_pfl * (1.0 + beta_pfl * (1.0 - qbar_pfl))
+    q = max(0.0, min(1.0, float(q_pfl)))
+    denom = 1.0 + beta_pfl * (q - qbar_pfl)
+    if denom <= 0.0:
+        return 0.0
+    return max(0.0, min(1.0, q * (1.0 + beta_pfl * (1.0 - qbar_pfl)) / denom))
 
 
 # g_S157 = (rOR · OR_ohne − 1)/(OR_ohne − 1) mit rOR 0,93 und OR_ohne 1,11 [46],
@@ -331,7 +344,8 @@ G_S157: float = (0.93 * 1.11 - 1.0) / (1.11 - 1.0)
 def s157_avoided_deaths(d85: float, s_gek: float | None, g_s157: float = G_S157,
                         qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
                         delta_hap: float = 1.0,
-                        s_gek_kalib: float = 0.0) -> float | None:
+                        s_gek_kalib: float = 0.0,
+                        q_pfl: float | None = None) -> float | None:
     """Vermiedene Todesfälle 85+ durch gekühlte Heimplätze (Bericht #95 §5).
 
     ``ΔD_S157 = D_85+ · δ_HAP · h_Heim · max(s_gek − s_gek_kalib; 0) · (1 − g_S157)``
@@ -349,12 +363,14 @@ def s157_avoided_deaths(d85: float, s_gek: float | None, g_s157: float = G_S157,
     zugleich gewählt hat (sonst 1): S157 wirkt dann auf den schon mit δ_HAP
     gedämpften Heim-Exzess — Faktoren multipliziert, Wirkungen nicht addiert
     (Befund 129; Berlin zusammen 1 − 0,95 × 0,294 = 72,1 %).
+
+    ``q_pfl`` ist der Heimanteil der Zelle (Befund 146); ohne ihn gilt 0,344.
     """
     if s_gek is None:
         return None
     s = max(0.0, min(1.0, float(s_gek)) - max(0.0, float(s_gek_kalib)))
     d = max(0.0, min(1.0, float(delta_hap)))
-    return max(0.0, d85) * d * h_heim(qbar_pfl, beta_pfl) * s * (1.0 - g_s157)
+    return max(0.0, d85) * d * h_heim(qbar_pfl, beta_pfl, q_pfl) * s * (1.0 - g_s157)
 
 
 # ── Hebel S152: Schutzprogramme vulnerable Gruppen (Bericht #95 §5, Befunde 123, 125–134) ──
@@ -388,7 +404,7 @@ def vg_effective_delta(delta_vg: float = DELTA_VG, delta_hap: float = 1.0,
 
 def vg_avoided(x_7584: float, x_85p: float, delta: float,
                qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
-               delta_hap: float = 1.0) -> float:
+               delta_hap: float = 1.0, q_pfl: float | None = None) -> float:
     """Vermiedene Menge durch Schutzprogramme vulnerable Gruppen (Bericht #95 §5).
 
     ``ΔX_VG = [X_75–84 + X_85+ · (1 − h_Heim)] · δ_HAP · (1 − δ)``
@@ -398,8 +414,9 @@ def vg_avoided(x_7584: float, x_85p: float, delta: float,
     S157, Befund 125). ``delta_hap`` dämpft den Exzess, wenn der Hitzeaktionsplan
     zugleich gewählt ist (nur für den Einzelnutzen; im Aggregat multipliziert
     der Faktor des Plans ohnehin). Negativ, wenn δ > 1 (Einweisungen vorgezogen).
+    ``q_pfl`` ist der Heimanteil der Zelle (Befund 146); ohne ihn gilt h_Heim = 0,344.
     """
-    base = max(0.0, x_7584) + max(0.0, x_85p) * (1.0 - h_heim(qbar_pfl, beta_pfl))
+    base = max(0.0, x_7584) + max(0.0, x_85p) * (1.0 - h_heim(qbar_pfl, beta_pfl, q_pfl))
     d = max(0.0, min(1.0, float(delta_hap)))
     return base * d * (1.0 - float(delta))
 

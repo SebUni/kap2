@@ -246,3 +246,49 @@ def test_without_hap_unchanged():
     assert health.s157_avoided_deaths(D85_BERLIN, 1.0, delta_hap=1.0) == \
         health.s157_avoided_deaths(D85_BERLIN, 1.0)
     assert health.s157_avoided_deaths(D85_BERLIN, None, delta_hap=0.95) is None
+
+
+# ── Befund 146: h_Heim je Zelle aus share_care_home_85p (Bericht #95 §5, Log 45) ──
+
+def test_h_heim_je_zelle_aus_heimanteil():
+    """h_Heim,z = q_pfl,z · [1 + β(1 − q̄)] / [1 + β(q_pfl,z − q̄)], Rückfall 0,344."""
+    # Beispielzelle des Berichts (§5): 0,5 × 2,31 / 1,541 = 0,75
+    assert health.h_heim(q_pfl=0.5) == pytest.approx(0.75, abs=0.005)
+    # Zelle im Mittel: dieselben 0,344 wie die Kommune
+    assert health.h_heim(q_pfl=0.149) == pytest.approx(0.344, abs=0.0005)
+    assert health.h_heim(q_pfl=0.149) == pytest.approx(health.h_heim(), rel=1e-12)
+    # Zelle nur mit Heimbewohnern ab 85
+    assert health.h_heim(q_pfl=1.0) == pytest.approx(1.0, abs=1e-9)
+    # Ohne Zellwert gilt der Rückfall 0,344 (Block heat.h_heim)
+    assert health.h_heim(q_pfl=None) == pytest.approx(0.344, abs=0.0005)
+    assert health.h_heim() == pytest.approx(0.344, abs=0.0005)
+
+
+def test_zellfaktoren_nutzen_heimanteil_der_zelle():
+    """_s157_cell_factor und _vg_cell_factor rechnen mit h_Heim,z der Zelle."""
+    override_context.set_overrides({})
+    ohne_heim = {**_berlin_cell(), "deaths_a75_84": 71.4, "share_care_home_85p": 0.0}
+    mit_heim = {**ohne_heim, "share_care_home_85p": 0.5}
+    ohne_wert = {k: v for k, v in ohne_heim.items() if k != "share_care_home_85p"}
+
+    s157 = [measure_service._s157_cell_factor(0.11, 1.0, c)
+            for c in (ohne_heim, mit_heim, ohne_wert)]
+    assert s157[0] != s157[1]
+    assert s157[0] == pytest.approx(1.0)         # Zelle ohne Heim: keine Wirkung von S157
+    assert s157[1] < s157[2] < 1.0               # Heimzelle stärker als der Rückfall 0,344
+    # Wirkung skaliert mit h_Heim: 0,75 / 0,344
+    assert (1.0 - s157[1]) / (1.0 - s157[2]) == pytest.approx(
+        health.h_heim(q_pfl=0.5) / health.h_heim(), rel=1e-9)
+
+    vg = [measure_service._vg_cell_factor(MORT, 1.0, c) for c in (ohne_heim, mit_heim, ohne_wert)]
+    assert vg[0] != vg[1]
+    assert vg[0] < vg[2] < vg[1] < 1.0           # Heimbewohner sind bei δ_VG herausgenommen
+
+
+def test_heimanteil_kommt_aus_den_zell_eingaben():
+    """Die Zellbewertung trägt share_care_home_85p unter data["inputs"], nicht im Risiko."""
+    cell = _berlin_cell()
+    merged = measure_service._with_cell_q_pfl(cell, {"share_care_home_85p": 0.5})
+    assert merged["share_care_home_85p"] == 0.5 and "share_care_home_85p" not in cell
+    assert measure_service._with_cell_q_pfl(cell, {"pop": 10.0}) is cell
+    assert measure_service._with_cell_q_pfl(cell, None) is cell
