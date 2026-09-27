@@ -192,7 +192,7 @@ zehn jüngsten verfügbaren Jahre, Abruf 25.09.2026).
 | 6 | Zusätzliche Sterbefälle \(D_a\) = \(c_{\text{kal}}\) × \(v_{\text{vers},a}\) × Ebene 5 × Ebene 4 | 0,581 × 1 × … = 20,4 · 32,0 · 71,4 · 153,6 = **277,4 Todesfälle je Jahr** | \(c_{\text{kal}}\) Kalibrierung §4 [50]; \(v_{\text{vers}}\) §3.3 |
 | 7 | Verlorene Lebensjahre: \(\text{YLL} = \sum_a D_a \times \bar L_a\) | \(\bar L_a\) 23,39 · 15,59 · 8,90 · 4,16 J ⇒ 476,3 + 499,5 + 635,4 + 638,8 = **2.250 YLL je Jahr** (native Ergebnisgröße) | Sterbetafel 2022/2024 [48], Sterbefälle 2023 [49] (§3.5) |
 | 8 | Mortalität in Euro: YLL × VOLY | 2.250 × 160.800 € = 361,8 Mio. € (Preisstand 2024) | VOLY-Kette §3.5 [19] |
-| 9 | Morbidität: Fälle \(F = \sum_a \text{pop}_a \times r_{0,a} / 100.000 \times [1 + e_{\text{HD}} (\text{HD} - \text{HD}_{\text{ref}})]\), dann × \(c_{\text{Fall}}\) | HD = 17,5 Tage; Faktor 1 + 0,024 × (17,5 − 7,2) = 1,247; \(r_{0,a}\) 1,9 · 6,3 · 10,8 · 15,6 ⇒ 70,2 + 26,7 + 34,2 + 21,0 = 152,0 Fälle × 7.152 € = 1,09 Mio. € (Preisstand 2024) | hot_days-Raster [33]; K&Z [18,62]; \(c_{\text{Fall}}\) [17,19] (§3.4, §3.5) |
+| 9 | Morbidität: Fälle \(F = \sum_a \text{pop}_a \times r_{0,a} / 100.000 \times [1 + e_{\text{HD}} (\text{HD} - \text{HD}_{\text{ref}})]\), dann × \(c_{\text{Fall}}\) | HD = 17,5 Tage; Faktor 1 + 0,024 × (17,5 − 7,2) = 1,247; \(r_{0,a}\) 1,9 · 6,3 · 10,8 · 15,6 ⇒ 70,2 + 26,7 + 34,1 + 21,0 = 152,0 Fälle × 7.152 € = 1,09 Mio. € (Preisstand 2024) | hot_days-Raster [33]; K&Z [18,62]; \(c_{\text{Fall}}\) [17,19] (§3.4, §3.5) |
 | 10 | Bewerteter Schaden (Konto K1) je Jahr = Mortalität + Morbidität | 361,8 Mio. € + 1,09 Mio. € = **362,9 Mio. € je Jahr (Preisstand 2024)** | Ebenen 8 und 9 |
 
 **Stärkster Treiber** ist die Temperatur: Ist der Sommer in Berlin 0,5 K kühler, sinkt der Betrag
@@ -293,6 +293,7 @@ eur_mort = y * voly
 assert abs(eur_mort / 1e6 - 361.8) < 0.05               # Ebene 8
 faktor = max(0.0, 1 + e_hd * (hd - hd_ref))
 fall = [p * r / 100_000 * faktor for p, r in zip(pop, r0)]
+for fi, soll in zip(fall, [70.2, 26.7, 34.1, 21.0]): assert abs(fi - soll) < 0.05
 assert abs(faktor - 1.247) < 0.001 and abs(sum(fall) - 152.0) < 0.05
 eur_morb = sum(fall) * c_fall
 assert abs(eur_morb / 1e6 - 1.09) < 0.005               # Ebene 9
@@ -432,11 +433,11 @@ Die Regel gilt auch für Gemeinden ohne Zelle mit veröffentlichtem Anteil 65+ (
 Abzug in Schritt 3 null). Die frühere Modellgrenze „keine Zelle mit veröffentlichtem Anteil,
 kein Ersatzwert“ (30 Gemeinden mit zusammen 376 Einwohnern) fällt damit weg.
 
-*Rechenbeispiel Warmsen* (Ausgabe von `--ersatz`, Zahlen gerundet): [69] zählt 3158 Einwohner,
-388 im Alter von 60–66 und 602 ab 67. A_G = (602 + 2/7 × 388) / 3158 = 712,9 / 3158 = 22,57 %.
-Das Gitter zählt 3087 Einwohner: Z = 22,57 % × 3087 = 697. Fest stehen 508 Einwohner ab 65 in den
+*Rechenbeispiel Warmsen* (Ausgabe von `--ersatz`, Zahlen gerundet): [69] zählt 3.158 Einwohner,
+388 im Alter von 60–66 und 602 ab 67. A_G = (602 + 2/7 × 388) / 3.158 = 712,9 / 3.158 = 22,57 %.
+Das Gitter zählt 3.087 Einwohner: Z = 22,57 % × 3.087 = 697. Fest stehen 508 Einwohner ab 65 in den
 Zellen mit veröffentlichtem Anteil und 36 aus Stufe 1: R = 697 − 508 − 36 = 153. Die 362 Zellen
-der Stufe 2 zählen 1897 Einwohner, jede bekommt 153 / 1897 = 8,07 % Anteil 65+.
+der Stufe 2 zählen 1.897 Einwohner, jede bekommt 153 / 1.897 = 8,07 % Anteil 65+.
 
 ```python test: beispiel_95_ersatz_stufe2_warmsen
 # Stufe 2 der Ersatzregel (§3.3), Warmsen: A_G aus [69], Zielzahl, Rest, Anteil je Zelle
@@ -452,15 +453,15 @@ assert abs(r / 1897 - 0.0807) < 0.00005
 *Modellgrenzen.* Ist R kleiner als null, tragen die Zellen mit veröffentlichtem Anteil und Stufe 1
 schon mehr Menschen ab 65, als der Anteil der Gemeinde verlangt; die Zellen der Stufe 2 bekommen
 dann 0 %, der Überhang bleibt stehen. Gemessen (`python3 docs/methodik/anlagen/95_zellvergleich.py
---rangliste`) betrifft das 1342 der 10.811 Gemeinden mit Zellen der Stufe 2; in deren Zellen der
+--rangliste`) betrifft das 1.342 der 10.811 Gemeinden mit Zellen der Stufe 2; in deren Zellen der
 Stufe 2 wohnen 320.780 der bundesweit 8.739.209 Einwohner solcher Zellen (3,7 %). Der Überhang ist
 klein: im Median 5 Einwohner ab 65 je Gemeinde, höchstens 195. In 3 Gemeinden ist R größer als die
 Einwohner der Stufe 2 und der Anteil wird auf 100 % begrenzt (19 Einwohner). 68 Gemeinden haben
-keine Gemeindezeile in [69] oder dort „.“ und nehmen A_G aus der Kreiszeile (5240 Einwohner in
+keine Gemeindezeile in [69] oder dort „.“ und nehmen A_G aus der Kreiszeile (5.240 Einwohner in
 Zellen der Stufe 2, 0,1 %); für sie gilt der Altersaufbau des Kreises statt der Gemeinde. Ohne
 Ersatzwert bleibt nur eine Gemeinde, die weder eine Gemeinde- noch eine Kreiszeile hat: Hanau,
 in VG250 unter dem Schlüssel 06415000, in [69] noch unter 06435014 im Main-Kinzig-Kreis. Ihre
-Zellen der Stufe 2 (3893 Einwohner) rechnen wie heute mit 65+ = 0.
+Zellen der Stufe 2 (3.893 Einwohner) rechnen wie heute mit 65+ = 0.
 Innerhalb einer Gemeinde bekommen alle Zellen der Stufe 2 denselben Anteil; wo die Älteren unter
 ihnen wohnen, weiß die Regel nicht.
 
@@ -472,7 +473,7 @@ Gruppe 60–66 gar nicht (0/7) oder ganz (7/7) zu den Menschen ab 65 zählt:
 | Beispielkommune | Aufruf | Einwohner (Zensus-Gitter) | davon in Zellen mit geheimgehaltenem Anteil 65+ | Einwohner ab 65 ohne Gemeindeschlüssel | Einwohner ab 65 mit Regel | Jahresbetrag ohne Gemeindeschlüssel | Jahresbetrag mit Regel | Faktor ohne Gemeindeschlüssel gegen Regel | Spanne des Faktors (60–66 ganz oder gar nicht) |
 |---|---|---|---|---|---|---|---|---|---|
 | Berlin (AGS 11000000) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz` | 3.593.357 | 2,8 % | 696.648 | 707.318 | 338,84 Mio. € | 342,67 Mio. € | × 0,989 | × 0,927–1,000 |
-| Warmsen, Landkreis Nienburg (Weser) (AGS 03256034) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz` | 3087 | 64,2 % | 544 | 697 | 145.025 € | 173.099 € | × 0,838 | × 0,651–0,947 |
+| Warmsen, Landkreis Nienburg (Weser) (AGS 03256034) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz` | 3.087 | 64,2 % | 544 | 697 | 145.025 € | 173.099 € | × 0,838 | × 0,651–0,947 |
 
 Beträge je Jahr (Preisstand 2024), gemessen am 27.09.2026. *Modellgrenze ohne Gemeindeschlüssel (Befund 141).* Das
 Produkt braucht für Stufe 2 den Gemeindeschlüssel der Kommune. Ist die Kommune kein Gemeindeteil der VG250 [65], rechnet
@@ -485,7 +486,7 @@ ohne Altersbänder den Ersatzwert (Befund 142).
 Faktoren und der Wochenquantile ab (§3.2: mit der Datei 342,58 Mio. € und 172.957 €). 362,9, 342,67 und 343 Mio. € meinen
 zwei Rechnungen: 362,9 ist die Kette an einem Punkt (§3.0), 342,67 der Zelllauf mit ungerundeten Faktoren, 343 derselbe
 Zelllauf aus den gerundeten Faktoren im Prüfblock §3.0 (362,9 × 0,934 nach Teilung durch 0,9888 = 342,8; mit dem
-ungerundeten Produkt 0,9343 der vier Faktoren, wie im Prüfblock, 342,9). Warmsen zählt nach dem Zensus 2022 amtlich 3158 Einwohner
+ungerundeten Produkt 0,9343 der vier Faktoren, wie im Prüfblock, 342,9). Warmsen zählt nach dem Zensus 2022 amtlich 3.158 Einwohner
 [69], liegt also unter 10.000. Gewählt ist Warmsen, weil sie unter allen Gemeinden mit 2000 bis
 unter 10.000 Einwohnern im Zensus-Gitter den höchsten Anteil der Einwohner in Zellen mit
 geheimgehaltenem Anteil 65+ hat (Median der Gemeinden unter 10.000 Einwohnern 27,9 %; Aufruf
@@ -493,10 +494,10 @@ geheimgehaltenem Anteil 65+ hat (Median der Gemeinden unter 10.000 Einwohnern 27
 
 *Warum Stufe 2 den Rest aus der Gemeindesumme nimmt (Befund 117).* Das „–“ steht meist für Zellen
 mit wenigen Älteren: Das Altersgitter derselben Zellen zählt in Berlin 85.046 Personen in
-veröffentlichten 5er-Jahresgruppen, davon 2252 ab 65 (2,6 %), in Warmsen 692, davon 36 (5,2 %).
+veröffentlichten 5er-Jahresgruppen, davon 2.252 ab 65 (2,6 %), in Warmsen 692, davon 36 (5,2 %).
 Die frühere Stufe 2 übertrug den einwohnergewichteten Anteil 65+ der Zellen mit veröffentlichtem
 Anteil, in einer ländlichen Kommune vor allem kleine Zellen mit Älteren: in Warmsen 46,00 %. Damit
-kam Warmsen auf 1416 Einwohner ab 65, mehr als die 990 ab 60 im Zensus 2022 [69], und der Betrag
+kam Warmsen auf 1.416 Einwohner ab 65, mehr als die 990 ab 60 im Zensus 2022 [69], und der Betrag
 auf mehr als das Doppelte: 305.088 € gegen 138.543 € (Messung der früheren Fassung, Befund-Ledger
 Runde 17, T-1199; das Skript rechnet diese Fassung nicht mehr). Der Rest aus der Gemeindesumme
 hält dagegen die amtliche Zahl der Gemeinde: Warmsen kommt auf 697 Einwohner ab 65, zwischen den
@@ -1199,7 +1200,7 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   multiplikativ auf (RR − 1). **Nicht** über \(v_{\text{vers},a}\): Das ist auf Ebene der Kommune genau 1
   (§3.0 Ebene 6), der Hebel wirkte dort nie. **Formelzeile:**
   \(\Delta D_{\text{VG}} = [D_{75\text{–}84} + D_{85+} \times (1 - h_{\text{Heim}})] \times (1 - \delta_{\text{VG}})\),
-  mit \(\delta_{\text{VG}} = 1 - r_{\text{VG}} \times w_{\text{VG}} = 1 - 0{,}20 \times 0{,}34 = 0{,}931\)
+  mit \(\delta_{\text{VG}} = 1 - r_{\text{VG}} \times w_{\text{VG}} = 1 - 0{,}20 \times 0{,}3445 = 0{,}931\)
   (**Abschätzung von KAP3**, Band 0,794–1,0). Heimbewohner ab 85 sind herausgenommen, weil für sie der
   Hebel S157 steht und ein Hausbesuchsprogramm sie nicht erreicht (Befund 125). Im Band 75–84 führt der
   Bericht keinen Heimanteil; das Band zählt ganz, der Fehler geht in Richtung einer etwas zu großen
@@ -1254,9 +1255,9 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   gleiche Formelzeile wie oben mit \(F\) statt \(D\). Die Wirkung geht in beide Richtungen: Aufsuchende Betreuung
   verhindert Einweisungen, wie sie Todesfälle verhindert (untere Grenze 0,931 wie \(\delta_{\text{VG}}\)). Sie findet
   aber auch Menschen, die ohne Besuch zu Hause geblieben wären, und zieht deren Einweisung vor (obere Grenze
-  \(1 + 0{,}20 \times 0{,}34 = 1{,}069\): so viele Einweisungen zusätzlich, wie Todesfälle wegfallen). Welche
-  Richtung überwiegt, misst keine Quelle; der Zentralwert 1,0 setzt beide gleich. **Berlin:** 34,2 + 21,0 × 0,656
-  = 48,0 Einweisungen ab 75 außerhalb der Heime × 7.152 € = 0,34 Mio. € je Jahr; über das Band ändert sich der
+  \(1 + 0{,}20 \times 0{,}3445 = 1{,}069\): so viele Einweisungen zusätzlich, wie Todesfälle wegfallen). Welche
+  Richtung überwiegt, misst keine Quelle; der Zentralwert 1,0 setzt beide gleich. **Berlin:** 34,1 + 21,0 × 0,656
+  = 47,9 Einweisungen ab 75 außerhalb der Heime × 7.152 € = 0,34 Mio. € je Jahr; über das Band ändert sich der
   Betrag um ± 0,02 Mio. € (± 0,007 % des Jahresbetrags). **Doppelzählungs-Wächter (Befund 150, Block
   `heat.vg_in_kalibrierjahren`):** Lief ein solches Programm in der Kommune schon in den Kalibrierjahren 2012–2024, ist es
   keine zusätzliche Maßnahme: Seine Wirkung gehört zum Anpassungsstand, den der Basiswert über \(c_{\text{kal}}\) abbildet
@@ -1836,8 +1837,8 @@ assert (23.1 - 0.0) > (23.3 - 2.9)
 assert abs(eur_7585 * (1 - delta_vg) / 79.8 - 0.15) < 0.005
 # verworfene Variante (Log 43): roher Unterschied als Zentralwert ergaebe 23,1 Mio. EUR, doppelt so viel
 assert abs(w_roh - 0.68) < 0.005 and abs(eur_7585 * (1 - dvg(r, 0.68)) - 23.1) < 0.05   # mit dem Bandwert 0,68
-f_75 = 34.2 + 21.0 * (1 - h_heim)             # Einweisungen ab 75 ausserhalb der Heime (Ebene 9)
-assert abs(f_75 - 48.0) < 0.05 and abs(f_75 * 7152 / 1e6 - 0.34) < 0.005
+f_75 = 34.1 + 21.0 * (1 - h_heim)             # Einweisungen ab 75 ausserhalb der Heime (Ebene 9)
+assert abs(f_75 - 47.9) < 0.05 and abs(f_75 * 7152 / 1e6 - 0.34) < 0.005
 morb_band = (delta_vg, 1 + r * w)             # heat.delta_vg_morb, Befunde 131, 134
 assert abs(morb_band[0] - 0.931) < 0.0005 and abs(morb_band[1] - 1.069) < 0.0005
 for m in morb_band:
@@ -2217,7 +2218,7 @@ Voreinstellung, Kappung 0,794 als eigener Parameter, Bänder von \(f_a\) und \(\
 | 21 ⚠ | \(\bar q_{\text{1P}}\)? | **0,346** (Mikrozensus 2023, amtlich [63]) | ersetzt Setzung 0,40; \(\beta_{\text{iso}}\) neu = 0,90 | 0,40 (Rev.-5-Setzung) | Zentrierung exakter |
 | 22 | \(f_a\)? | **0,357/0,588/0,631/1,0** (Rückrechnung mit neuen \(m_a\), §3.3a) | Kette reproduzierbar; Kopplung \(f_a\leftrightarrow m_a\) neu gerechnet (Befund 32) | Rev.-5-Werte 0,404/0,577/0,620 | u65-Band −12 %; Altersvalidierung < 1 pp |
 | 23 ⚠ | Pflegeheim-OR? | **3,0** (Band 2,2–6,0), Kette §3.3b; \(\beta_{\text{pfl}}\) = 1,54, nur 85+, nur D-Pfad | reproduzierbare Kette (Befund 9); Bänder = Evidenz (Befunde 8/44); F-Gegenevidenz [64] (Befund 7) | 3,5 (Rev.-5-Wahl, Kette nicht reproduzierbar) | 85+-Spreizung ±23 % statt ±27 % |
-| 24 | \(\beta_{\text{pfl}}\)/\(\beta_d\) im F-Pfad? | **Default 1** (nur \(\beta_{\text{iso}}\) wirkt auf F) | Flandern-Studie: kein Hospitalisierungseffekt [64] | Rev.-5: volles \(v_{\text{vers}}\) auf F | F-Verteilung plausibler |
+| 24 | \(\beta_{\text{pfl}}\)/\(\beta_d\) im F-Pfad? | **Default 1** (Stand Rev. 6, Historie; fortgeschrieben durch Nr. 28: auch \(\beta_{\text{iso}}\) wirkt nicht auf F, im F-Pfad gilt kein Modifikator) | Flandern-Studie: kein Hospitalisierungseffekt [64] | Rev.-5: volles \(v_{\text{vers}}\) auf F | F-Verteilung plausibler |
 | 25 ⚠ | HD-Datenquelle? | **DWD-CDC hot_days ohne UHI-Verschiebung** (Ist-Stand Produkt) | keine implementierte Umrechnungsregel; Rev.-5-Text beschrieb Nicht-Implementiertes (Befund 38) | UHI→hot_days-Regel definieren und implementieren (Fortschreibung) | Morbidität in UHI-Lagen Untergrenze |
 | 26 ⚠ | Kalibrierung: Skalar, Fenster, Regionen? | (Fensterwahl bleibt; Skalar-/Regionen-Teil **ersetzt durch Nr. 31–33**) ein nationaler Skalar, Fenster 2012–2024, ohne vorl. 2025 | §3.4; Holdout belegt Fensterwahl (2/9 out-of-sample bei Vollreihen-Fit) | Vollreihe als Basis | Fensterwahl unverändert in Rev. 7 |
 | 27 | (ersetzt durch Nr. 30 nach Review-Runde 1, Befund 62) | — | — | — | — |
