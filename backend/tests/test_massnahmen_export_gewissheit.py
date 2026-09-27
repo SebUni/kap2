@@ -29,6 +29,7 @@ from app.services import massnahmen_gewissheit as mg  # noqa: E402
 KOMMUNE_ID = 1
 EVIDENZ = {"abgeschaetzt": "abgeschätzt (KAP3)", "berechnet": "berechnet aus amtlichen Daten",
            "belegt": "belegt"}
+EBENE_LABEL = {"gemeinde": "Gemeinde", "kreis": "Kreis", "land": "Land"}
 
 
 class _Q:
@@ -112,9 +113,22 @@ def test_b_zellen_gleich_dem_wert_der_oberflaeche(exportiert):
         ev = g["wirkung_evidenz"]
         assert teile[-1] == EVIDENZ.get(ev, ev)
         u = MASSNAHMEN_UMSETZUNG[code]
-        assert z[-1].split("\n")[0] == (
-            "Kommune allein" if u["umsetzung"] == "kommune_allein" else "mit Partnern")
-        assert "Ebenen: " in z[-1]
+        b = u.get("beleg") or {}
+        if b.get("quelle"):
+            beleg = "Quelle: " + b["quelle"] + (", S. " + b["seite"] if b.get("seite") else "")
+        elif b.get("abschaetzung"):
+            beleg = "Abschätzung von KAP3" + (": " + b["herleitung"] if b.get("herleitung") else "")
+        else:
+            beleg = ""
+        zeilen_u = [
+            "Kommune allein" if u.get("umsetzung") == "kommune_allein" else "mit Partnern",
+            "Ebenen: " + (", ".join(EBENE_LABEL.get(e, e) for e in u.get("ebenen") or []) or "–"),
+        ]
+        if u.get("partner"):
+            zeilen_u.append("Partner: " + ", ".join(u["partner"]))
+        if beleg:
+            zeilen_u.append(beleg)
+        assert z[-1] == "\n".join(zeilen_u)
 
 
 def test_c_reimport_ergibt_dieselben_massnahmen(exportiert):
