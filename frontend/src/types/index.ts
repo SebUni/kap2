@@ -458,6 +458,9 @@ export interface CatalogMeasure {
   sources?: Record<string, string>
   source_details?: Record<string, string>
   evidence_classes?: Record<string, EvidenceClass>
+  /** Nutzersichtbarer Eingabetext samt Herkunft je config-Feld (Vorgabe P1), z. B.
+   *  anteil_ersetzt bei LOW_ALLERGEN_TREE_SELECTION (T-1603-cto). */
+  config_input_help?: Record<string, string>
   kang_cluster?: string
   kang_field?: string
 }
