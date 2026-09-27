@@ -673,9 +673,12 @@ IMPACT_PARAM_SPECS: list[dict] = [
      }},
     # ── #96: Kap.-7-Blöcke ohne eigene Rechenstelle (T-1480, Vorgabe P1) ─────────
     # Die drei folgenden Specs machen Blöcke aus Kapitel 7 in der Parameterliste
-    # sichtbar, rechnen aber nicht: editable=False, kein ctx.p-Aufruf. Sie stehen am
-    # Risiko, nicht an der Maßnahme POLLEN_EARLY_WARNING (test_measure_pricing legt
-    # jede Maßnahme auf 9 Registry-Felder fest).
+    # sichtbar. c_jahr_direkt und d_saison rechnen nicht (editable=False, kein
+    # ctx.p-Aufruf in der Schadensfunktion). t_warn_s158 ist seit T-1513-cto editierbar
+    # (Nachtrag CEO T-1431-ceo): Es rechnet ebenfalls nicht in der Schadensfunktion, aber
+    # measure_service._s158_cell_factor liest die Überschreibung für den Maßnahmen-Faktor.
+    # Alle drei stehen am Risiko, nicht an der Maßnahme POLLEN_EARLY_WARNING
+    # (test_measure_pricing legt jede Maßnahme auf 9 Registry-Felder fest).
     # c_Jahr,direkt: Herleitungsschritt hinter dem Kostensatz c_Tag (Bericht §3.5);
     # im Produkt maßgeblich ist der Katalog-Kostensatz 6,20 €/Tag.
     {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "c_jahr_direkt", "value": 266.90,
@@ -706,17 +709,20 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "Kap. 7).",
      "source_refs": ["Pfaar_2017_EAACI_Pollensaison"]},
     # t_warn,S158: Anteil gewarnter Zusatztage, Parameter der Wirkung von S158. Die
-    # Wirkung selbst (r_S158 × t_warn im Maßnahmen-Modul) ist noch nicht gebaut; bis
-    # dahin rechnet der Wert nicht und ist nicht editierbar.
+    # Wirkung selbst (r_S158 × t_warn im Maßnahmen-Modul, measure_service._s158_cell_factor)
+    # ist seit T-1513-cto gebaut; der Wert bleibt 0,75, ist aber editierbar (Nachtrag des
+    # CEO in T-1431-ceo, 27.09.2026, 07:20 UTC) — eine Überschreibung wirkt jetzt auf den
+    # Maßnahmen-Faktor, nicht auf den Basiswert der Zelle (S158 wirkt allein im
+    # Maßnahmen-Modul, nicht in der Schadensfunktion selbst).
     {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "t_warn_s158", "value": 0.75,
      "label": "Anteil gewarnter Zusatztage t_warn (Pollen-Frühwarnung S158)",
-     "unit": "Anteil", "editable": False,
+     "unit": "Anteil", "editable": True,
      "source": "Abschätzung von KAP3 (§3.9) — Bericht #96 §5.1; Schwelle nach DWD",
      "source_detail": "Anteil der zusätzlichen Symptomtage, an denen der "
                       "Pollenflug-Gefahrenindex des DWD mindestens „mittel“ meldet, gleich "
-                      "für Birkengruppe und Gräser: 0,75 (Band 0,50–1,00). Nur für die "
-                      "Wirkung der Pollen-Frühwarnung (S158), kein Parameter der "
-                      "Schadensformel; noch ohne Wirkung im Produkt.",
+                      "für Birkengruppe und Gräser: 0,75 (Band 0,50–1,00). Wirkt seit "
+                      "T-1513-cto auf den Maßnahmen-Faktor der Pollen-Frühwarnung (S158), "
+                      "nicht auf die Schadensfunktion selbst.",
      "source_refs": [],
      "evidence_derivation": {
          "wert": "0,75 als Mitte der beiden Anker 0,50 und 1,00, gleich für Birkengruppe "
@@ -727,11 +733,15 @@ IMPACT_PARAM_SPECS: list[dict] = [
          "band": "0,50–1,00. Unteres Ende 0,50: Die Zusatztage liegen am Saisonanfang, wo "
                  "die Konzentration erst steigt, nur jeder zweite erreicht „mittel“. "
                  "Oberes Ende 1,00: Beschwerden treten nur an Tagen ab „mittel“ auf. "
-                 "Ersetzbar durch min(1; m/f) aus der DWD-Pollenflugstatistik.",
+                 "Ersetzbar durch min(1; m/f) aus der DWD-Pollenflugstatistik "
+                 "(health.t_warn_aus_dwd_anteil, Modellgrenze 8, Daten [71]/[72] fehlen "
+                 "noch im Repo).",
          "sensitivitaet": "Linear: Der wirksame Faktor der Pollen-Frühwarnung ist "
                           "r_S158 × t_warn = 0,03 × 0,75 = 2,25 % der Zusatztage; am Band "
-                          "1,5 % bis 3 %. Solange die Wirkung von S158 nicht gebaut ist, "
-                          "ändert der Wert keine Zahl im Produkt.",
+                          "1,5 % bis 3 %. Der Basiswert der Zelle bleibt unberührt (S158 "
+                          "wirkt nur im Maßnahmen-Modul, nicht in der Schadensfunktion "
+                          "selbst); im Maßnahmen-Modul skaliert eine Überschreibung die "
+                          "vermiedenen Tage proportional.",
      }},
 
     # ── #98 UV-Schädigungen: klimaattribuierte Hautkrebsfälle (Bericht Rev. 1) ─
