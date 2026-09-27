@@ -71,8 +71,11 @@ def test_rotprobe_alter_unverankerter_ausdruck_schlaegt_fehl(tmp_path: Path) -> 
     """Belegt, dass der alte, nicht verankerte Ausdruck genau diesen Fall verletzt.
 
     Baut eine Kopie von `ledger.py` mit dem alten `re.sub` (ohne `^…$`/`re.M` und
-    ohne `count=1`), führt darauf dieselbe Prüfung wie oben aus und erwartet,
-    dass sie fehlschlägt — die Rotprobe für dieses Ticket.
+    ohne `count=1`), stellt daneben eine Testdatei auf, die dieselbe Prüfung wie
+    `test_schliesse_zieht_nur_ueberschriftszeile_nach` gegen diese alte Kopie
+    ausführt, und lässt pytest selbst darüberlaufen. Erwartet wird die echte
+    pytest-Fehlschlagzeile ('FAILED …') mit AssertionError — nicht eine selbst
+    geschriebene Assert-Meldung.
     """
     alt_text = LEDGER_PFAD.read_text(encoding="utf-8")
     neu_zeile_1 = ('    t = re.sub(r"^## Offene Befunde \\(\\d+\\)$", '
@@ -97,20 +100,52 @@ def test_rotprobe_alter_unverankerter_ausdruck_schlaegt_fehl(tmp_path: Path) -> 
     alte_kopie = tmp_path / "ledger_alt.py"
     alte_kopie.write_text(alt_variante, encoding="utf-8")
 
-    ledger_pfad = tmp_path / "BEFUNDE_99.md"
-    ledger_pfad.write_text(MINI_LEDGER, encoding="utf-8")
+    rotprobe_vorlage = (
+        '"""Generierte Rotprobe-Testdatei: dieselbe Pruefung wie\n'
+        'test_schliesse_zieht_nur_ueberschriftszeile_nach, aber gegen ledger_alt\n'
+        '(alter, unverankerter re.sub) statt gegen das reparierte ledger.py."""\n'
+        'import re\n'
+        'import sys\n'
+        '\n'
+        'sys.path.insert(0, {tmp_path!r})\n'
+        'import ledger_alt as ledger\n'
+        '\n'
+        'MINI_LEDGER = {mini_ledger!r}\n'
+        '\n'
+        '\n'
+        'def test_schliesse_zieht_nur_ueberschriftszeile_nach_ALT(tmp_path):\n'
+        '    pfad = tmp_path / "BEFUNDE_99.md"\n'
+        '    pfad.write_text(MINI_LEDGER, encoding="utf-8")\n'
+        '\n'
+        '    rc = ledger.cmd_schliesse(pfad)\n'
+        '    assert rc == 0\n'
+        '\n'
+        '    text = pfad.read_text(encoding="utf-8")\n'
+        '\n'
+        '    ueberschriften = re.findall(r"^## Geschlossene Befunde \\(\\d+\\)$", '
+        'text, flags=re.M)\n'
+        '    assert ueberschriften == ["## Geschlossene Befunde (2)"]\n'
+        '\n'
+        '    zitat = {zitat!r}\n'
+        '    ausdruck = {ausdruck!r}\n'
+        '    assert zitat in text\n'
+        '    assert ausdruck in text\n'
+    ).format(
+        tmp_path=str(tmp_path),
+        mini_ledger=MINI_LEDGER,
+        zitat='Text erwähnt mitten im Satz "## Geschlossene Befunde (1)" als Zitat',
+        ausdruck='echo "## Geschlossene Befunde (1)"',
+    )
 
-    code = f"""
-import sys
-sys.path.insert(0, {str(tmp_path)!r})
-import ledger_alt as ledger
-from pathlib import Path
-rc = ledger.cmd_schliesse(Path({str(ledger_pfad)!r}))
-text = Path({str(ledger_pfad)!r}).read_text(encoding="utf-8")
-assert rc == 0
-assert 'Text erwähnt mitten im Satz "## Geschlossene Befunde (1)" als Zitat' in text, \\
-    "ROTPROBE: Befundtext wurde vom unverankerten Ausdruck mitgeschrieben"
-"""
-    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    rotprobe_test = tmp_path / "test_rotprobe_generiert.py"
+    rotprobe_test.write_text(rotprobe_vorlage, encoding="utf-8")
+
+    r = subprocess.run(
+        [sys.executable, "-m", "pytest", str(rotprobe_test), "-q"],
+        capture_output=True, text=True, cwd=str(tmp_path),
+    )
+    ausgabe = r.stdout + r.stderr
     assert r.returncode != 0
-    assert "ROTPROBE" in r.stdout + r.stderr
+    assert "FAILED" in ausgabe
+    assert "test_schliesse_zieht_nur_ueberschriftszeile_nach_ALT" in ausgabe
+    assert "AssertionError" in ausgabe
