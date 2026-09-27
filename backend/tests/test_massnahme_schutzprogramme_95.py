@@ -120,6 +120,42 @@ def test_kappung_0_794_with_heat_action_plan():
     assert health.vg_effective_delta(0.5, 1.0) == pytest.approx(0.794, abs=1e-12)
 
 
+def test_kappung_ueber_registry_parameter_kappung_vg():
+    """Befund 151: Kappung kommt aus risks.EXPECTED_ANNUAL_MORTALITY.impact.kappung_vg,
+    nicht aus einer Konstante — override_scope auf 0,85 verschiebt die Kappungshöhe
+    im Aggregat (_factor) und im Einzelnutzen (_benefit_eur) gleichermaßen."""
+    d_hap = 0.85
+    # δ_HAP 0,85: Produkt 0,791 < 0,794 (Default) — mit 0,85 gilt die höhere Kappung
+    assert d_hap * health.DELTA_VG < 0.794 < 0.85
+    assert health.vg_effective_delta(health.DELTA_VG, d_hap, paket=0.794) != health.DELTA_VG
+    assert 0.85 * health.vg_effective_delta(health.DELTA_VG, d_hap, paket=0.85) == \
+        pytest.approx(0.85, abs=1e-12)
+
+    cell = _berlin_mort_cell()
+    base = risk_engine.cost_from_outcome(catalog.RISKS_BY_CODE[MORT], cell["outcome"])
+    einzel_hap = base * (1.0 - d_hap)  # HAP-Anteil, unabhängig von der VG-Kappung
+
+    default_eur = einzel_hap + _benefit_eur(d_hap)
+    aggregat_default = base * (1.0 - d_hap * _factor(MORT, cell, 1.0, d_hap))
+    assert default_eur == pytest.approx(aggregat_default, rel=1e-9)
+
+    with override_context.override_scope({f"risks.{MORT}.impact.kappung_vg": 0.85}):
+        override_eur = einzel_hap + _benefit_eur(d_hap)
+        aggregat_override = base * (1.0 - d_hap * _factor(MORT, cell, 1.0, d_hap))
+        assert override_eur == pytest.approx(aggregat_override, rel=1e-9)
+        # Mit Kappung 0,85 als Untergrenze greift sie sofort auf δ_HAP × δ_VG = 0,85:
+        # keine Wirkung der Schutzprogramme mehr auf 75–84/85+ ohne Heim
+        assert override_eur == pytest.approx(einzel_hap, rel=1e-9)
+
+    # Nach dem Scope gilt wieder der Registry-Default 0,794 (kein Leck der Overrides)
+    assert (einzel_hap + _benefit_eur(d_hap)) == pytest.approx(default_eur, rel=1e-9)
+
+    # die Kappung greift an einer anderen Höhe: der Nutzen sinkt (0,85 statt 0,794),
+    # anders als bei einer niedrigeren Kappung (0,79 hebt den Nutzen, siehe oben)
+    assert override_eur < default_eur
+    assert aggregat_override < aggregat_default
+
+
 def test_kappung_in_cell_factor_berlin():
     """Beide Hebel nehmen zusammen auf 75+ ohne Heim höchstens 20,6 % weg."""
     cell = _berlin_mort_cell()
