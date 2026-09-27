@@ -51,6 +51,7 @@ class Berichtsdaten:
     klimawirkungen_katalog: int
     klimawirkungen_im_bericht: list[dict]
     parameter: list[dict] = field(default_factory=list)
+    klima: list = field(default_factory=list)   # Klimazeile je bezifferter Klimawirkung (Teil 3)
 
     @property
     def beziffert_text(self) -> str:
@@ -97,9 +98,12 @@ def sammle(kommune: Beispielkommune, heute: dt.date | None = None) -> Berichtsda
         "kwra_field": mort.get("kwra_field", ""),
         "betrag_eur": ergebnis.jahresbetrag_eur,
     }]
+    from app.services.ergebnisbericht.klima import klimazeilen
+
     return Berichtsdaten(
         kommune=kommune, stand=stand, ergebnis95=ergebnis,
         klimawirkungen_katalog=len(kwra_ids),
         klimawirkungen_im_bericht=im_bericht,
         parameter=_parameter_95(),
+        klima=klimazeilen(kommune, ergebnis, im_bericht),
     )
