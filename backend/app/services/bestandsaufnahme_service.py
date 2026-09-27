@@ -216,17 +216,33 @@ def _zellen_der_kommune(db, kommune_id: int) -> list[dict]:
     return [((z[0] or {}).get("inputs") or {}) for z in zeilen]
 
 
-def _sozialdaten(kommune) -> dict:
+def _gemeindeschluessel(db, kommune) -> Optional[str]:
+    """Achtstelliger Gemeindeschlüssel aus der VG250-Tabelle ``gemeinden``; ``None`` bei jedem Fehlschlag.
+
+    Dieselbe Abfrage wie bei den Download-Namen (``download_namen.gemeindeschluessel``,
+    T-1469) — kein Netzabruf über Overpass mehr (T-1492).
+    """
+    from app.services import download_namen
+
+    try:
+        return download_namen.gemeindeschluessel(db, kommune)
+    except Exception as exc:  # niemals die Bestandsaufnahme abbrechen
+        log.warning("Gemeindeschlüssel fehlgeschlagen (kommune=%s): %s", getattr(kommune, "id", None), exc)
+        return None
+
+
+def _sozialdaten(db, kommune) -> dict:
     """Rohgrößen der Regionalstatistik; ``{}`` bei jedem Fehlschlag.
 
     ``inkar_loader.socioeconomic_for_kommune`` liefert nur die abgeleiteten
     Indizes, nicht den Rohwert ``unemployment_rate_pct`` — deshalb dieselben
-    Schritte (AGS auflösen, gecachte Rohgrößen lesen) ohne Indexbildung.
+    Schritte (AGS bestimmen, gecachte Rohgrößen lesen) ohne Indexbildung. Der AGS
+    kommt aus der VG250-Tabelle (``_gemeindeschluessel``).
     """
     from app.services import inkar_loader
 
     try:
-        ags = inkar_loader.resolve_ags(getattr(kommune, "osm_id", None))
+        ags = _gemeindeschluessel(db, kommune)
         if not ags:
             return {}
         return dict(inkar_loader.fetch_socioeconomic(ags) or {})
@@ -235,17 +251,15 @@ def _sozialdaten(kommune) -> dict:
         return {}
 
 
-def _entwicklung(kommune) -> Optional[dict]:
+def _entwicklung(db, kommune) -> Optional[dict]:
     """Bevölkerungsentwicklung der Gemeinde; ``None`` bei jedem Fehlschlag.
 
-    Der AGS wird wie in ``_sozialdaten`` über ``inkar_loader.resolve_ags`` aufgelöst.
+    Der AGS kommt wie in ``_sozialdaten`` aus der VG250-Tabelle (``_gemeindeschluessel``).
     Nur ein 8-stelliger Schlüssel (Gemeinde) wird nachgeschlagen; kürzere
     (Land, Kreis) haben keinen Gemeindewert.
     """
-    from app.services import inkar_loader
-
     try:
-        ags = inkar_loader.resolve_ags(getattr(kommune, "osm_id", None))
+        ags = _gemeindeschluessel(db, kommune)
         if not ags or len(str(ags)) != 8:
             return None
         return bevoelkerungsentwicklung.entwicklung(str(ags))
@@ -307,8 +321,8 @@ def _starkregen(db, kommune) -> dict:
 def bestandsaufnahme_fuer_kommune(db, kommune) -> dict:
     """Bestandsaufnahme einer Kommune aus gespeicherten Zell- und Sozialdaten."""
     zellen = _zellen_der_kommune(db, kommune.id)
-    sozio = _sozialdaten(kommune)
-    entwicklung = _entwicklung(kommune)
+    sozio = _sozialdaten(db, kommune)
+    entwicklung = _entwicklung(db, kommune)
     starkregen = _starkregen(db, kommune)
     return {
         "kommune_id": kommune.id,

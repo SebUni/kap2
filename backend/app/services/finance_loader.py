@@ -1,6 +1,7 @@
 """Kommunale Finanz-Kennzahlen für den Dashboard-Kopf (Regionalstatistik GENESIS).
 
-Liefert je Kommune (AGS via ``inkar_loader.resolve_ags``):
+Liefert je Kommune (AGS aus der VG250-Tabelle ``gemeinden`` über
+``download_namen.gemeindeschluessel``, T-1492):
   - **BIP** in jeweiligen Preisen — amtlich nur auf KREISebene verfügbar
     (``REGIONALSTATISTIK_TABLE_GDP``, Mio. €); letztes verfügbares Jahr.
   - **Kommunaler Haushalt** — Auszahlungen der Kern-/Extrahaushalte auf
@@ -16,7 +17,7 @@ durchgehen. :func:`parse_ffcsv_series` matcht deshalb Regionalschlüssel EXAKT
 Robustheit wie beim Schwestermodul: ohne Zugangsdaten/AGS/Netz wird ``None``
 geliefert, nie eine Exception — die Chips im Dashboard-Kopf sind optionaler
 Zusatz. Disk-Cache je Kommune (``finance_osm_<id>.json``) inkl. aufgelöstem
-AGS, damit Overpass nicht wiederholt befragt wird; leere Ergebnisse werden mit
+AGS, damit die Abfrage nicht wiederholt läuft; leere Ergebnisse werden mit
 KURZER TTL gecacht (Server-Hänger/Fehlkonfiguration friert die Anzeige sonst
 30 Tage ein).
 """
@@ -182,7 +183,7 @@ def _read_cache(osm_digits: str) -> dict | None:
         payload = blob.get("payload")
         ttl = settings.REGIONALSTATISTIK_CACHE_TTL_S if payload else _EMPTY_TTL_S
         if age > ttl:
-            # Stale — aber den aufgelösten AGS weiterreichen (spart Overpass).
+            # Stale — aber den aufgelösten AGS weiterreichen (spart die erneute Abfrage).
             return {"stale": True, "ags": blob.get("ags")}
         return {"stale": False, "ags": blob.get("ags"), "payload": payload}
     except Exception:
@@ -226,11 +227,15 @@ def fetch_finance(ags: str) -> dict | None:
     }}
 
 
-def _gdp_for_osm(osm_digits: str, osm_id: str) -> tuple[dict | None, str | None]:
+def _gdp_for_osm(osm_digits: str, osm_id: str, db=None, kommune=None) -> tuple[dict | None, str | None]:
     """Gecachtes BIP-Payload + aufgelöster AGS für eine OSM-Relation.
 
-    AGS wird auch ohne GENESIS-Zugang aufgelöst (aus Disk-Cache bzw. Overpass),
-    damit der netzfreie Budget-Lookup ihn nutzen kann; BIP nur mit Zugangsdaten.
+    AGS wird auch ohne GENESIS-Zugang aufgelöst, damit der netzfreie
+    Budget-Lookup ihn nutzen kann; BIP nur mit Zugangsdaten. Vorrang hat der
+    AGS aus dem Disk-Cache; sonst kommt er aus der VG250-Tabelle ``gemeinden``
+    (``download_namen.gemeindeschluessel``, dieselbe Abfrage wie bei den
+    Download-Namen). Ohne ``db``/``kommune`` oder ohne Treffer bleibt er leer —
+    ein Rückgriff auf Overpass findet nicht mehr statt (T-1492).
     """
     have_auth = inkar_loader._auth_headers() is not None
 
@@ -247,7 +252,7 @@ def _gdp_for_osm(osm_digits: str, osm_id: str) -> tuple[dict | None, str | None]
             _mem_cache[osm_digits] = (time.time(), payload, ags)
         return payload, ags
 
-    ags = (disk or {}).get("ags") or inkar_loader.resolve_ags(osm_id)
+    ags = (disk or {}).get("ags") or _gemeindeschluessel(db, kommune)
     if not ags:
         if have_auth:
             _write_cache(osm_digits, None, None)
@@ -260,10 +265,26 @@ def _gdp_for_osm(osm_digits: str, osm_id: str) -> tuple[dict | None, str | None]
     return payload, ags
 
 
-def finance_for_kommune(osm_id: str | None, name: str | None = None) -> dict | None:
+def _gemeindeschluessel(db, kommune) -> str | None:
+    """AGS aus der VG250-Tabelle; ``None`` ohne Session/Kommune oder bei Fehlschlag."""
+    if db is None or kommune is None:
+        return None
+    from app.services import download_namen
+
+    try:
+        return download_namen.gemeindeschluessel(db, kommune)
+    except Exception as exc:
+        log.warning("finance: Gemeindeschlüssel fehlgeschlagen (kommune=%s): %s",
+                    getattr(kommune, "id", None), exc)
+        return None
+
+
+def finance_for_kommune(osm_id: str | None, name: str | None = None, *,
+                        db=None, kommune=None) -> dict | None:
     """Öffentlicher Einstieg: BIP (GENESIS, gecacht) + Kommunalhaushalt (lokaler
-    Bulk-Store, via ``name``). Gibt bei jedem Fehlschlag ``None`` zurück und wirft
-    nie (Dashboard-Kopf ist optionaler Zusatz)."""
+    Bulk-Store, via ``name``). ``db`` und ``kommune`` dienen der Bestimmung des
+    Gemeindeschlüssels aus der VG250-Tabelle. Gibt bei jedem Fehlschlag ``None``
+    zurück und wirft nie (Dashboard-Kopf ist optionaler Zusatz)."""
     try:
         if not osm_id:
             return None
@@ -279,7 +300,7 @@ def finance_for_kommune(osm_id: str | None, name: str | None = None) -> dict | N
         if not have_auth and not budget_wanted:
             return None
 
-        gdp_payload, ags = _gdp_for_osm(osm_digits, osm_id)
+        gdp_payload, ags = _gdp_for_osm(osm_digits, osm_id, db=db, kommune=kommune)
         payload = dict(gdp_payload) if gdp_payload else {}
 
         # Kommunalhaushalt: netzfrei aus dem Bulk-Store (immer frisch, nicht im
