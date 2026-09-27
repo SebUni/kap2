@@ -214,6 +214,13 @@ export default function MeasuresTableTab() {
                               ? `${imp.s158_avoided_days_total.toLocaleString('de-DE', { maximumFractionDigits: 1 })} Tage/Jahr · ${imp.s158_estimate_note}`
                               : imp.s158_estimate_note}
                           </span>
+                        )}
+                        {m.measure_type === 'LOW_ALLERGEN_TREE_SELECTION' && imp.stadtbaum_estimate_note && (
+                          <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                            {imp.stadtbaum_avoided_days_total != null
+                              ? `${imp.stadtbaum_avoided_days_total.toLocaleString('de-DE', { maximumFractionDigits: 1 })} Tage/Jahr · ${imp.stadtbaum_estimate_note}`
+                              : imp.stadtbaum_estimate_note}
+                          </span>
                         )}</>) : '–'}</td>
                       <td style={{ textAlign: 'right', fontSize: '0.85rem', color: 'var(--success)' }}>
                         {imp?.avg_index_reduction_pct != null ? `−${imp.avg_index_reduction_pct.toFixed(1)} %` : '–'}
