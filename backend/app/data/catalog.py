@@ -1407,8 +1407,9 @@ MEASURES: list[dict] = [
                  "default_reduction": "Bericht #95 §5: δ_HAP = 0,95 (Band 0,85–1,00), marginal"},
      "source_refs": {"default_reduction": ["Feldbusch_2025_HHWS",
                                            "Urban_HHAP_Wirksamkeit_2025"]},
-     # Kennzeichnung nach Kapitel 7: abschaetzung_kap3 — der zentrale Wert 0,95 ist eine
-     # Setzung zwischen DiD roh 1,00 und adjustiert 0,85 (Feldbusch u. a. 2025), Log 10.
+     # Kennzeichnung nach Kapitel 7: abschaetzung_kap3 — 0,95 = 2/3 × 1,00 + 1/3 × 0,85:
+     # Mittel über 15 Städte doppelt gewichtet gegen den bereinigten Wert (Feldbusch u. a.
+     # 2025 [45]), nicht die Mitte 0,925 (Bericht §5, Log 10, Befund 164).
      "evidence_classes": {"default_reduction": "abgeschaetzt"},
      # Block heat.delta_hap (Bericht #95 Kapitel 7): Faktor 0,95 auf den Exzess,
      # hier als Minderung 1 − 0,95 = 0,05 geführt.
@@ -1417,10 +1418,16 @@ MEASURES: list[dict] = [
      # Sensitivität) als Datenfeld — ein Code-Kommentar allein genügt nicht.
      "evidence_derivations": {
         "default_reduction": {
-            "wert": "0,05 = 1 − δ_HAP mit δ_HAP = 0,95 als Faktor auf den Wochenexzess: "
-                    "zentraler Wert zwischen der DiD-Schätzung roh (1,00) und adjustiert "
-                    "(0,85) von Feldbusch u. a. 2025; die Wahl der Mitte ist eine "
-                    "Setzung von KAP3 (Bericht #95 §5, Entscheidungslog Nr. 10).",
+            "wert": "0,05 = 1 − δ_HAP mit δ_HAP = 0,95 als Faktor auf den Wochenexzess. "
+                    "Feldbusch u. a. 2025 [45] messen gemittelt über 15 Städte RR 1,00 "
+                    "(0,98–1,01), also keine Wirkung, und bereinigt um drei Merkmale der "
+                    "Städte, die das Produkt nicht nachbildet, RR 0,85 (0,75–0,97). KAP3 "
+                    "gibt dem Mittel doppeltes Gewicht: δ_HAP = "
+                    "2/3 × 1,00 + 1/3 × 0,85 = 0,95 (= 1,00 − 1/3 × 0,15), "
+                    "nicht die Mitte 0,925. Berlin: "
+                    "361,8 Mio. € × (1 − 0,95) = 18,1 Mio. € je Jahr (Preisstand 2024; "
+                    "Band 0–54,3 Mio. €). Abschätzung von KAP3 (Bericht #95 §5, "
+                    "Entscheidungslog Nr. 10, Befund 164).",
             "band": "0–0,15 Minderung (δ_HAP 0,85–1,00).",
             "sensitivitaet": "Linear: Die vermiedenen Schäden der Maßnahme wachsen mit der "
                              "Minderung; 0,15 statt 0,05 verdreifacht sie (Bericht #95 §5).",

@@ -109,6 +109,34 @@ def test_ohne_ags_nur_stufe1():
     assert round(_summe65(cis)) == 508 + 36
 
 
+def test_befund_142_rueckfaelle_lesen_den_ersatzwert():
+    # Ohne Gemeindeschlüssel bleibt nur Stufe 1; der angesetzte Wert steht in
+    # share_over_65_ersatz, share_over_65 bleibt leer. Die Rückfälle ohne
+    # pop_age_bands müssen denselben Wert lesen, nicht den leeren Zensuswert.
+    from app.services.engine.auxiliary import build_auxiliary
+    from app.services.engine.impact.base import CellContext
+    from app.services.engine.impact.health import _age_bands, pollen_age_bands
+
+    cis, grid, zensus = _gemeinde([], [(190.0, 36.0)], [])
+    zl.apply_zensus_to_cell_inputs(cis, grid, zensus)
+    ci = dict(cis[0])
+    assert ci.get("share_over_65") is None
+    ersatz = ci["share_over_65_ersatz"]
+    assert abs(ersatz - 100.0 * 36.0 / 190.0) < 1e-9
+    ci.pop("pop_age_bands")
+
+    assert abs(build_auxiliary(ci, {})["SHARE_OVER_65"] - ersatz) < 1e-3  # auf 4 Stellen gerundet
+    ctx = CellContext(ci=ci, hev={}, indices={}, hev_norm={},
+                      regional={"demographics": {"share_over_65": 22.0}})
+    assert abs(_age_bands(ctx)["u65"] - 190.0 * (1 - ersatz / 100.0)) < 1e-9
+    pb = pollen_age_bands(ci)
+    assert abs(pb["u20"] + pb["a20_64"] - 190.0 * (1 - ersatz / 100.0)) < 1e-9
+    for fn in ("auxiliary.py", "indicators.py", os.path.join("impact", "health.py")):
+        with open(os.path.join(REPO, "backend", "app", "services", "engine", fn),
+                  encoding="utf-8") as fh:
+            assert "share_over_65_ersatz" in fh.read(), fn
+
+
 def test_rest_negativ_gibt_null():
     # Zellen mit veröffentlichtem Anteil tragen schon mehr als Z → Stufe 2 bekommt 0 %
     cis, grid, zensus = _gemeinde([(3000.0, 40.0)], [], [87.0])

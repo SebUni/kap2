@@ -24,7 +24,7 @@ Gemessen (26.09.2026): Das Produkt lädt die Wochenquantile aus ``wochenquantile
 (zwei Nachkommastellen), wie sie der Zelllauf des Berichts nutzt, sind es 342,67 Mio. € und 173.099 €.
 Die Differenz liegt in der Toleranz und ist als Divergenz an den CMO gemeldet (T-1366-cto).
 
-Toleranzen: Berlin ± 1 Mio. € (Bericht §3.0, Prüfblock ``rechenkette_95``: ``… / 0.9867 - 343) < 1``);
+Toleranzen: Berlin ± 1 Mio. € (Bericht §3.0, Prüfblock ``rechenkette_95``: ``… / 0.9888 - 343) < 1``);
 Warmsen ± 505 €, dieselbe Toleranz relativ übertragen (1 / 342,67 × 173.099 €; Vorgabe CEO in
 T-1350-ceo, Nachtrag 26.09.2026, bis zur Bestätigung durch den CMO in T-1351-ceo).
 """
