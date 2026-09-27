@@ -193,6 +193,28 @@ def _s157_input(config: dict | None) -> float:
     return max(0.0, min(1.0, _s157_param("s_gek", S157_S_GEK_DEFAULT)))
 
 
+def _cell_q_pfl(cell_risk: dict) -> float | None:
+    """Heimanteil 85+ der Zelle (``share_care_home_85p``, Ebene CARE_HOME_SHARE_85P).
+
+    Grundlage für h_Heim,z (Bericht #95 §5, Befund 146); fehlt er, rechnet
+    ``health.h_heim`` mit dem Rückfallwert 0,344.
+    """
+    q = cell_risk.get("share_care_home_85p")
+    return float(q) if q is not None else None
+
+
+def _with_cell_q_pfl(cell_risk: dict, inputs: dict | None) -> dict:
+    """Risikoeintrag einer Zelle, ergänzt um ihren Heimanteil aus den Zell-Eingaben.
+
+    Der Heimanteil steht in ``data["inputs"]`` der Zellbewertung, nicht im
+    Risikoeintrag; S157 und die Schutzprogramme brauchen ihn für h_Heim,z (Befund 146).
+    """
+    q = (inputs or {}).get("share_care_home_85p")
+    if q is None or "share_care_home_85p" in cell_risk:
+        return cell_risk
+    return {**cell_risk, "share_care_home_85p": q}
+
+
 def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict,
                       delta_hap: float = 1.0) -> float:
     """Faktor (0..1) auf das Mortalitäts-Outcome (YLL) einer Zelle durch S157.
@@ -225,7 +247,8 @@ def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict,
         float(d85), s_gek,
         g_s157=_p("g_s157", health.G_S157), qbar_pfl=_p("qbar_pfl", 0.149),
         beta_pfl=_p("beta_pfl", 1.54), delta_hap=delta_hap,
-        s_gek_kalib=_p("s_gek_kalib", S157_S_GEK_KALIB_DEFAULT)) or 0.0
+        s_gek_kalib=_p("s_gek_kalib", S157_S_GEK_KALIB_DEFAULT),
+        q_pfl=_cell_q_pfl(cell_risk)) or 0.0
     delta_yll = delta_d * _p("life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
     return max(0.0, min(1.0, 1.0 - delta_yll / yll))
 
@@ -279,14 +302,15 @@ def _vg_cell_factor(code: str, frac: float, cell_risk: dict,
         l75 = _p(S157_RISK_CODE, "life_years_a75_84", health.AGE_LIFE_YEARS["a75_84"])
         l85 = _p(S157_RISK_CODE, "life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
         delta_x = health.vg_avoided(float(d75) * l75, float(d85) * l85, delta,
-                                    qbar, beta, delta_hap)
+                                    qbar, beta, delta_hap, _cell_q_pfl(cell_risk))
         return max(0.0, min(1.0, 1.0 - f * delta_x / outcome))
     if code == VG_MORB_RISK_CODE:
         f75, f85 = cell_risk.get("cases_a75_84"), cell_risk.get("cases_a85p")
         if f75 is None or f85 is None:
             return 1.0
         delta = _p(VG_MORB_RISK_CODE, "delta_vg_morb", health.DELTA_VG_MORB)
-        delta_x = health.vg_avoided(float(f75), float(f85), delta, qbar, beta, delta_hap)
+        delta_x = health.vg_avoided(float(f75), float(f85), delta, qbar, beta, delta_hap,
+                                    _cell_q_pfl(cell_risk))
         return max(0.0, 1.0 - f * delta_x / outcome)
     return 1.0
 
@@ -1098,7 +1122,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         deltas = {}
         cell_savings: dict[str, float] = {}
         for code in linked:
-            r = cell_risks.get(code, {})
+            r = _with_cell_q_pfl(cell_risks.get(code, {}), data.get("inputs"))
             d_hap = hap_by_cell.get(cid, 1.0)
             s158_days_factor = stadtbaum_by_cell.get(cid, 1.0)
             factor = _measure_cell_factor(mdef, measure.config, code, frac, unit_factor, r,
@@ -1361,9 +1385,11 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
         for cid, frac in frac_map.items():
             cell_factors = factors.setdefault(cid, {})
             cell_risks = (base.get(cid) or {}).get("risks", {})
+            cell_inputs = (base.get(cid) or {}).get("inputs")
             for code in mdef.get("linked_risk_codes", []):
                 factor = _measure_cell_factor(mdef, m.config, code, frac, unit_factor,
-                                              cell_risks.get(code, {}),
+                                              _with_cell_q_pfl(cell_risks.get(code, {}),
+                                                               cell_inputs),
                                               hap_cap=hap_cap.get(cid, 1.0),
                                               s158_days_factor=stadtbaum_days_by_cell.get(cid, 1.0))
                 cell_factors[code] = cell_factors.get(code, 1.0) * factor
