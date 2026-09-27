@@ -18,11 +18,15 @@ Berichts.
    (Wert + Herkunft, keine „später"-Formulierungen), Parameter-Blöcke vollständig mit Quelle
    und Preisstand, Quellen mit DOI/URL + Archiv, **Knoten- und Kanten-Abgleich direkt gegen
    die xlsx** (openpyxl), Beispiel-Blöcke ausführen, Preisstand-Einheitlichkeit.
-3. **Leitfragen 1–14** aus §5 **einzeln** mit Verdikt (`bestanden` / `Befund`) und Beleg;
+3. **Leitfragen 1–15** aus §5 **einzeln** mit Verdikt (`bestanden` / `Befund`) und Beleg;
    Herleitungen stichprobenhaft nachrechnen (Python). Bekannte Fehlerklassen besonders:
    Kalibriermodell ≠ Produktionsmodell, Band-/Endpunkt-Zuordnung, unzentrierte Modifikatoren,
    Fall-Kontroll-OR als Maßnahmeneffekt, Kategorienfehler, Referenzwert-Doppelzählung,
-   Quellen-Synchronität, Erklärbarkeit nach §8 E1–E5 (Rechenkette am Anfang von Kapitel 3, genau eine Methodik,
+   Quellen-Synchronität, Risiko ohne (weitere) Anpassung (LF 15: Basiswert dem Zustand „ohne
+   (weitere) Anpassung" zugeordnet, Zustand „mit Anpassung" dargestellt oder begründet nicht
+   dargestellt, KWRA-Risikostufe je Zeitscheibe mit Fundstelle — die Stufe direkt gegen
+   `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx` abgleichen, nicht gegen den Bericht), Erklärbarkeit
+   nach §8 E1–E5 (Rechenkette am Anfang von Kapitel 3, genau eine Methodik,
    Komplexität nur mit Begründung der Fehldarstellung), **Ressourcen-Regel-Verstoß** (§3.4: ein geplanter nationaler
    100-m-Vollraster-Lauf als Prüfstein/Abgleich = Befund), **fehlende
    Datenebenen-Spezifikation** (§3.1: benötigte Zellgröße ohne vollständige
@@ -50,7 +54,7 @@ VERDIKT: <n> NEUE BEFUNDE (A:<a> B:<b> C:<c>)
 ```
 
 Null-Runde nur, wenn diese Runde **keine neuen A- oder B-Befunde** ergab, alle Lints grün
-sind und alle 14 Leitfragen ein Verdikt haben.
+sind und alle 15 Leitfragen ein Verdikt haben.
 
 ## Abgrenzung zum Manager-Review
 
