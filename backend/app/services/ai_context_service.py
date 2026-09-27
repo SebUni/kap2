@@ -47,15 +47,15 @@ def _num(value, decimals: int = 1) -> str:
 
 
 def _euro(value) -> str:
-    """Kompakte €-Angabe (Mio./Tsd.), deutsch."""
+    """€-Angabe, deutsch. Ab 1 Mio. kompakt (Mio.); darunter ganze Euro — eine
+    Rundung auf Tausender (T-1473-cto Nacharbeit) würde Beträge im drei- bis
+    fünfstelligen Bereich um bis zu 50 % verzerren."""
     try:
         f = float(value or 0)
     except (TypeError, ValueError):
         return "?"
     if f >= 1_000_000:
         return f"{_num(f / 1_000_000, 2)} Mio. €"
-    if f >= 1_000:
-        return f"{_num(f / 1_000, 0)} Tsd. €"
     return f"{_num(f, 0)} €"
 
 

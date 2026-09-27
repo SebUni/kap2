@@ -82,12 +82,16 @@ def klimawirkung_lines(monkeypatch):
 def test_klimawirkung_95_einmal_mit_summe_und_teilen(klimawirkung_lines):
     treffer = [z for z in klimawirkung_lines if "Hitzebelastung (#95)" in z]
     assert len(treffer) == 1
-    # 1.000,0 € (Mortalität) + 500,0 € (Erkrankungen) = 1.500,0 € — dieselbe
-    # Euro-Formatierung wie im übrigen Kontext (ai_context_service._euro).
-    assert ai_context_service._euro(1500.0) in treffer[0]
-    zeilen = "\n".join(klimawirkung_lines)
-    assert "Hitzebelastung — Mortalität" in zeilen
-    assert "Hitzebelastung — Erkrankungen" in zeilen
+    # 1.000,0 € (Mortalität) + 500,0 € (Erkrankungen) = 1.500,0 € — als fester Betrag,
+    # nicht auf ganze Tausender gerundet (sonst würden daraus 2 Tsd. €).
+    i_95 = klimawirkung_lines.index(treffer[0])
+    assert "1.500 €" in treffer[0]
+    i_mortalitaet = next(i for i, z in enumerate(klimawirkung_lines)
+                         if "Hitzebelastung — Mortalität" in z)
+    i_erkrankungen = next(i for i, z in enumerate(klimawirkung_lines)
+                          if "Hitzebelastung — Erkrankungen" in z)
+    assert i_mortalitaet > i_95
+    assert i_erkrankungen > i_95
 
 
 def test_klimawirkung_96_traegt_nummer(klimawirkung_lines):
