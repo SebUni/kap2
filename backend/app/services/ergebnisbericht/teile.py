@@ -32,7 +32,7 @@ from app.services.ergebnisbericht.klima import (
     JAHR_START, JAHRE_PROJEKTION, SZENARIEN, Klimazahl,
 )
 from app.services.ergebnisbericht.konformitaet import (
-    STATUS, fundstelle_ohne_datei, lies_checkliste, lueckensatz, umschreibe,
+    STATUS, fundstelle_ohne_datei, kundensatz, lies_checkliste, umschreibe,
 )
 from app.services.ergebnisbericht.sammler import DATENSTAENDE, Berichtsdaten
 from app.services.kurzfassung_markdown import _de_euro
@@ -181,8 +181,10 @@ def teil_2(d: Berichtsdaten, checkliste: str | os.PathLike | None = None) -> str
     """Rechtlicher und methodischer Rahmen, erzeugt aus der Konformitäts-Checkliste (T-1416).
 
     Je Anforderungszeile der Checkliste eine Tabellenzeile ``tr.anforderung[data-nr]`` mit Status
-    (``td.status``) und Lückensatz (``td.luecke``, bei „erfüllt“ ein Strich). ``checkliste`` ist
-    für den Test: eine Kopie mit geändertem Status ändert die Ausgabe dieser Zeile.
+    (``td.status``) und Kundensatz (``td.luecke``, bei „erfüllt“ ein Strich; bei „teilweise“ und
+    „offen“ der Kundensatz aus ``konformitaet_kundentext.py`` statt der internen Spalte „Lücke“,
+    T-1530). ``checkliste`` ist für den Test: eine Kopie mit geändertem Status ändert die Ausgabe
+    dieser Zeile.
     """
     zeilen = lies_checkliste(checkliste)
     zaehlung = {s: sum(1 for z in zeilen if z.status == s) for s in STATUS}
@@ -200,7 +202,7 @@ def teil_2(d: Berichtsdaten, checkliste: str | os.PathLike | None = None) -> str
     html.append('<table class="konformitaet"><tr><th>Nr</th><th>Anforderung</th><th>Quelle</th>'
                 '<th>Fundstelle</th><th>Status</th><th>Lücke</th></tr>')
     for z in zeilen:
-        luecke = lueckensatz(z.luecke) if z.status != "erfüllt" else "—"
+        luecke = kundensatz(z.nr, z.status) if z.status != "erfüllt" else "—"
         html.append(
             f'<tr class="anforderung" data-nr="{z.nr}"><td>{z.nr}</td>'
             f"<td>{_h(umschreibe(z.anforderung))}</td><td>{_h(z.quelle)}</td>"

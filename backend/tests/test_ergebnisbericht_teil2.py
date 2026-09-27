@@ -1,12 +1,16 @@
-"""Teil 2 des PDF-Ergebnisberichts wird aus der Konformitäts-Checkliste erzeugt (T-1416).
+"""Teil 2 des PDF-Ergebnisberichts wird aus der Konformitäts-Checkliste erzeugt (T-1416, T-1530).
 
 Abnahme:
 
 (a) Teil 2 hat genau so viele Anforderungszeilen wie ``docs/KONFORMITAET_CHECKLISTE.md``;
 (b) jede Zeile trägt den Status der Checkliste als „erfüllt“, „teilweise“ oder „offen“, bei
-    „teilweise“ und „offen“ mit Lückensatz;
+    „teilweise“ und „offen“ mit dem Kundensatz aus ``konformitaet_kundentext.py`` (T-1530) statt
+    des internen Lückensatzes;
 (c) eine Kopie der Checkliste mit geändertem Status einer Zeile ändert die Ausgabe dieser Zeile —
     der Teil ist erzeugt, nicht von Hand geschrieben. Geändert wird nur die Kopie in ``tmp_path``.
+    Ändert der Statuswechsel den Status einer „teilweise“- oder „offen“-Zeile, bekommt
+    ``KUNDENTEXT`` für diese Zeile per Monkeypatch einen zum neuen Status passenden Kundensatz
+    mit — sonst bräche die Erzeugung wegen des in T-1530 geforderten Abgleichs ab.
 
 Die Checkliste wird hier mit einem eigenen, einfachen Zähler gelesen, nicht mit ``lies_checkliste``,
 damit der Test den Leser mitprüft.
@@ -30,9 +34,11 @@ REPO = os.path.dirname(BACKEND)
 sys.path.insert(0, BACKEND)
 sys.path.insert(0, HIER)
 
+from app.services.ergebnisbericht import konformitaet  # noqa: E402
 from app.services.ergebnisbericht.konformitaet import (  # noqa: E402
     CHECKLISTE, ERSATZSATZ, lies_checkliste, lueckensatz,
 )
+from app.data.konformitaet_kundentext import KUNDENTEXT  # noqa: E402
 from app.services.ergebnisbericht.sammler import Stand  # noqa: E402
 from app.services.ergebnisbericht.teile import TEILE, teil_2  # noqa: E402
 from test_ergebnisbericht_regeln import REGELN, baum, html_text  # noqa: E402
@@ -97,15 +103,18 @@ def test_a_gleich_viele_zeilen_wie_checkliste(teil):
 
 # (b) ─────────────────────────────────────────────────────────────────────────
 
-def test_b_status_und_lueckensatz_je_zeile(teil):
+def test_b_status_und_kundensatz_je_zeile(teil):
     roh = _checkliste_roh(PFAD)
-    for nr, (status, luecke) in _zeilen(teil).items():
+    for nr, (status, satz) in _zeilen(teil).items():
         assert status in ("erfüllt", "teilweise", "offen"), (nr, status)
         assert status == roh[nr], (nr, status, roh[nr])
         if status in ("teilweise", "offen"):
-            assert len(luecke) > 20 and luecke not in ("—", "-"), (nr, luecke)
+            assert len(satz) > 20 and satz not in ("—", "-"), (nr, satz)
+            kundentext_status, kundensatz = KUNDENTEXT[nr]
+            assert kundentext_status == status, (nr, kundentext_status, status)
+            assert satz == kundensatz, (nr, satz, kundensatz)
         else:
-            assert luecke == "—", (nr, luecke)
+            assert satz == "—", (nr, satz)
 
 
 def test_b_zaehlung_im_text(teil):
@@ -134,14 +143,23 @@ def _kopie_mit_status(tmp_path, nr: int, neu: str, luecke: str | None = None) ->
     return str(kopie)
 
 
-@pytest.mark.parametrize("nr, neu, luecke", [
-    (1, "offen", "Die Wirkungsketten fehlen im Produkt."),   # erfüllt → offen
-    (12, "teilweise", None),                                 # offen → teilweise
-    (2, "erfüllt", None),                                    # teilweise → erfüllt
+@pytest.mark.parametrize("nr, neu, luecke, neuer_kundensatz", [
+    # erfüllt → offen: neue Zeile braucht einen (im echten Bestand fehlenden) Kundensatz.
+    (1, "offen", "Die Wirkungsketten fehlen im Produkt.",
+     "Die Herleitung über Wirkungsketten fehlt im Produkt."),
+    # offen → teilweise: der bestehende Kundensatz zu Zeile 12 passt im Status nicht mehr.
+    (12, "teilweise", None,
+     "Die Bundesstrategie wird im Produkt nur zum Teil abgebildet."),
+    (2, "erfüllt", None, None),                              # teilweise → erfüllt, kein Kundensatz nötig
 ])
-def test_c_statuswechsel_in_kopie_aendert_nur_diese_zeile(tmp_path, teil, nr, neu, luecke):
+def test_c_statuswechsel_in_kopie_aendert_nur_diese_zeile(monkeypatch, tmp_path, teil, nr, neu, luecke,
+                                                           neuer_kundensatz):
     vorher_datei = open(PFAD, encoding="utf-8").read()
     kopie = _kopie_mit_status(tmp_path, nr, neu, luecke)
+    if neuer_kundensatz is not None:
+        kundentext = dict(KUNDENTEXT)
+        kundentext[nr] = (neu, neuer_kundensatz)
+        monkeypatch.setattr(konformitaet, "KUNDENTEXT", kundentext)
     neu_teil = teil_2(_daten(), checkliste=kopie)
     alt, neu_zeilen = _zeilen(teil), _zeilen(neu_teil)
     assert neu_zeilen[nr][0] == neu
