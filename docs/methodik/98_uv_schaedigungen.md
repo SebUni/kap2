@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–446) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–448) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -1134,11 +1134,15 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   [31], BAF [29,30]). **Kalibriermodell = Produktionsmodell** (lineares Modell, keine
   Näherungsläufe).
 - **Struktur-Validierung auf der Altersachse — out-of-sample (§3.4; Befund 214).**
-  Die kritischste Achse für die Verteilung auf die Kommunen ist die **Altersverteilung**
-  (größte Achse insgesamt ist der Transient-Faktor \(\tau\), §3.4 und die Rangfolge der
-  Unsicherheiten weiter unten in diesem Kapitel): Die Baseline stammt vollständig
-  aus einer Abbildungs-Ablesung, und ein reiner Verteilungsfehler lässt die
-  Bundessumme unberührt, verschiebt aber jede Kommune (Nachweis: Befund 212). Ein
+  Die kritischste Achse der Baseline für die Verteilung auf die Kommunen ist die
+  **Altersverteilung**: Die Baseline unterscheidet Kommunen nur nach Bevölkerung und
+  Alter (»Regionale Achse« unten), sie stammt vollständig aus einer
+  Abbildungs-Ablesung, und ein reiner Verteilungsfehler lässt die
+  Bundessumme unberührt, verschiebt aber jede Kommune (Nachweis: Befund 212).
+  Außerhalb der Baseline verschiebt die räumliche Streuung von \(k_{\text{UV}}\)
+  einzelne Kommunen stärker als die bezifferte Altersachse (−52 … +75 %, §6
+  Modellgrenze 9, gegen ≈ ±4 %, §6 Modellgrenze 7); größte Achse insgesamt ist der Transient-Faktor
+  \(\tau\) (§3.4 und die Rangfolge der Unsicherheiten weiter unten in diesem Kapitel). Ein
   Vergleich der **rohen** Gesamtrate taugt dafür **nicht** — auf sie wird
   \(c_{\text{kal}}\) gefittet, die Prüfung wäre in-sample.
   Geprüft wird deshalb die **altersstandardisierte Neuerkrankungsrate** (alter
@@ -1238,12 +1242,16 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   die Anlage [71] alle Zeilen; \(a_{\text{attr}}\) ist seit Rev. 8 als eigene Achse
   ausgewiesen (Befund 261).
 - **Unsicherheiten (nach Größe geordnet, Befunde 250/268/398):**
-  Aufgezählt wird hier **nach Größe** der bezifferten Wirkung auf den Euro-Betrag
-  (maximaler Betrag). Fundstelle je Wert: \(\tau\), \(a_{\text{attr}}\), BAF_MM,
-  \(v_{\text{verh}}\), VOLY, \(w_{\text{SCC}}\) und \(r_{\text{out}}\) aus der Spalte
+  Aufgezählt wird hier **nach Größe** der bezifferten Wirkung auf die Bundessumme
+  (maximaler Betrag). Achsen, die nur Kommunen gegeneinander verschieben und die
+  Bundessumme unberührt lassen, folgen danach in einer eigenen Gruppe, geordnet nach
+  ihrer Wirkung je Kommune (Befund 448). Fundstelle je Wert: \(\tau\), \(a_{\text{attr}}\), BAF_MM,
+  \(v_{\text{verh}}\), VOLY, \(w_{\text{SCC}}\) und \(r_{\text{out}}\) (Bundessumme) aus der Spalte
   »Δ gegen Basiswert« der Bändertabelle darüber; \(k_{\text{UV}}\) und \(c_e\) aus der
   Nachrechnung unter der Tabelle; die Anker-Auswahlregel aus dem Satz »Sensitivität der
-  Auswahlregel« beim Anker oben; die Binnenheterogenität aus §6 Modellgrenze 7; die Populationsbasis aus §3.3
+  Auswahlregel« beim Anker oben; die Populationsbasis aus §3.3; je Kommune die räumliche
+  Streuung aus §6 Modellgrenze 9, die Binnenheterogenität aus §6 Modellgrenze 7 und
+  \(r_{\text{out}}\) aus §3.4 (Bandgrenzen von \(q_{\text{out}}\))
   (Befund 442). Die Bändertabelle selbst ist nach Sachgruppen geordnet, nicht nach
   Größe (Befunde 361/370). **Größte Achse ist
   der Transient-Faktor \(\tau\)** (0,20–1,00 ⇒ **−80 %**, §3.4): Er trennt die
@@ -1260,9 +1268,12 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   (obere Kostenbänder beider Entitäten ⇒ Behandlungs-€ 113 → 145 Mio. € ⇒ +9,4 % auf die
   Summe, einseitig; Befund 438); Entitäten-Split
   \(w_{\text{SCC}}\) (0,25–0,50 ⇒ BAF_C44 1,675–1,95 ⇒ ±0 … +9,3 %); Anker-Auswahlregel (−4,3 … +2,8 %);
-  **Binnenheterogenität des Bandes 20–64 (≈ ±4 % je Kommune, Bundessumme unberührt —
-  §6 Modellgrenze 7, Befund 225)**; **Populationsbasis Kalibrierung ↔ Produktion
-  (−1,19 %, §3.3, Befund 226)**; \(r_{\text{out}}\) (geparkt, zentriert ⇒ ±0 %).
+  **Populationsbasis Kalibrierung ↔ Produktion (−1,19 %, §3.3, Befund 226)**.
+  **Nur je Kommune, Bundessumme (nahezu) unberührt:** **Räumliche Streuung des
+  \(k_{\text{UV}}\)-Rasterquotienten** (−52 … +75 % zwischen 5. und 95. Perzentil,
+  §6 Modellgrenze 9); **Binnenheterogenität des Bandes 20–64 (≈ ±4 % je Kommune —
+  §6 Modellgrenze 7, Befund 225)**; \(r_{\text{out}}\) (geparkt; −1,0 … +2,1 % je Kommune,
+  ±0 % auf die Bundessumme durch die Zentrierung, §3.4).
   **Nicht als Ergebnisachse beziffert** und deshalb hier am Ende, nicht der Größe
   nach eingeordnet: die Zeitinvarianz-Annahme der Elastizität (§3.2, Befund 222);
   die Ablesekette (±15 % je Ablesung, wirkt über \(c_{\text{kal}}\) auf den Anker
@@ -1436,7 +1447,8 @@ Jahres unter der heutigen, eingelaufenen Dosislage; die Latenz steckt in den Inz
 2. \(k_{\text{UV}}\)-Übersetzung: **ein** Messpunkt (UV-Dosis Dortmund, GR/SunD
    DWD-Station 1117 Bochum, 10 km entfernt); Band **0,3622–1,0616** (publizierte
    Standardfehler, 1 σ) ist der größte zweiseitige Treiber der Unsicherheit (größte Achse insgesamt ist der einseitige Transient-Faktor τ, §3.4/§4).
-   Station und Raster
+   Diese Rangfolge gilt für die Bundessumme; einzelne Kommunen verschiebt die räumliche
+   Streuung in Modellgrenze 9 stärker. Station und Raster
    unterscheiden sich an der Messzelle **metrikabhängig**: bei der
    Sonnenscheindauer um Faktor **1,71** (11,3 gegen 6,62 %/Dek.), bei der
    Globalstrahlung nur um **1,02** (4,6 gegen 4,51 %/Dek., §3.2). Genau deshalb
@@ -1484,7 +1496,12 @@ Jahres unter der heutigen, eingelaufenen Dosislage; die Latenz steckt in den Inz
 9. **Räumliche Streuung des \(k_{\text{UV}}\)-Rasterquotienten (Befunde 255/256).**
    Der Quotient ΔGlobal/ΔSSD variiert über die Gemeindepunkte erheblich (5. Perzentil
    0,3225 · Median 0,6305 · 95. Perzentil 1,1671; gewichteter Bundeswert **0,6683**).
-   Das verschiebt **einzelne Kommunen** gegeneinander. Die Bundessumme ist davon
+   Das verschiebt **einzelne Kommunen** gegeneinander, und zwar linear, weil der
+   Euro-Betrag linear in \(k_{\text{UV}}\) ist (Kapitel 4, Nachrechnung unter der
+   Bändertabelle): 0,3225 / 0,6683 = 0,48 und 1,1671 / 0,6683 = 1,75 ⇒ **−52 … +75 %**
+   auf den Euro-Betrag einer Kommune zwischen 5. und 95. Perzentil; zwischen 10. und 90.
+   Perzentil (0,3693 / 1,0046, `backend/data/kalibrierung/k_uv_herleitung.md`
+   Abschnitt 4) −45 … +50 %. Die Bundessumme ist davon
    **nahezu** unberührt, weil sie den mit Baseline-Fällen × ΔSSD gewichteten Wert
    verwendet — dasselbe Gewicht, mit dem das Produktionsmodell summiert (Befunde
    266/278). „Nahezu" statt „exakt", weil die beiden Entitäten leicht verschiedene
