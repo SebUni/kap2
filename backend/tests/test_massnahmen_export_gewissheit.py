@@ -27,7 +27,7 @@ from app.services import export_service, measure_service  # noqa: E402
 from app.services import massnahmen_gewissheit as mg  # noqa: E402
 
 KOMMUNE_ID = 1
-EVIDENZ = {"abgeschaetzt": "abgeschätzt (KAP3)", "berechnet": "berechnet aus amtlichen Daten",
+EVIDENZ = {"abgeschaetzt": "abgeschätzt (KAP3)", "berechnet": "berechnet aus anderen Parametern",
            "belegt": "belegt"}
 EBENE_LABEL = {"gemeinde": "Gemeinde", "kreis": "Kreis", "land": "Land"}
 
