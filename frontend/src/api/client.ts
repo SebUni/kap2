@@ -13,6 +13,23 @@ function handleUnauthorized(path: string) {
   }
 }
 
+/**
+ * Baut aus einer fehlgeschlagenen Antwort einen lesbaren Fehler. Enthält der Körper JSON mit
+ * einem Feld ``detail`` als Zeichenkette (FastAPI-Fehlerformat), wird genau dieser Text zur
+ * Meldung; sonst bleibt die bisherige Form ``API <status>: <body>``.
+ */
+function apiError(res: Response, body: string): Error {
+  try {
+    const parsed = JSON.parse(body)
+    if (parsed && typeof parsed.detail === 'string') {
+      return new Error(parsed.detail)
+    }
+  } catch {
+    // kein JSON – Standardformat unten
+  }
+  return new Error(`API ${res.status}: ${body || res.statusText}`)
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -24,7 +41,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     if (res.status === 500 && !body.trim()) {
       throw new Error('Backend nicht erreichbar (Port 8000). Bitte Backend starten: cd backend && python3 -m uvicorn app.main:app --reload')
     }
-    throw new Error(`API ${res.status}: ${body || res.statusText}`)
+    throw apiError(res, body)
   }
   return res.json()
 }
@@ -38,7 +55,7 @@ async function requestText(path: string, options?: RequestInit): Promise<string>
     if (res.status === 500 && !body.trim()) {
       throw new Error('Backend nicht erreichbar (Port 8000). Bitte Backend starten: cd backend && python3 -m uvicorn app.main:app --reload')
     }
-    throw new Error(`API ${res.status}: ${body || res.statusText}`)
+    throw apiError(res, body)
   }
   return res.text()
 }
@@ -55,7 +72,7 @@ async function requestWithProgress<T>(path: string, onProgress?: ProgressCallbac
   if (!res.ok) {
     if (res.status === 401) handleUnauthorized(path)
     const body = await res.text()
-    throw new Error(`API ${res.status}: ${body || res.statusText}`)
+    throw apiError(res, body)
   }
   const totalStr = res.headers.get('X-Uncompressed-Length') || res.headers.get('Content-Length')
   const total = totalStr ? parseInt(totalStr, 10) : 0
@@ -481,7 +498,7 @@ export interface MassnahmeGewissheit {
 export interface MassnahmeUmsetzungBeleg {
   quelle?: string
   seite?: string
-  abschaetzung?: string
+  abschaetzung?: boolean
   herleitung?: string
   ebenen_begruendung?: string
   weitere_quellen?: unknown
