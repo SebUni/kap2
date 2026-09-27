@@ -1120,7 +1120,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         cell_pop = float(data.get("inputs", {}).get("pop", 0.0) or 0.0)
         cell_risks = data.get("risks", {})
         deltas = {}
-        cell_savings: dict[str, float] = {}
+        cell_savings: dict[str, float | str] = {}
         for code in linked:
             r = _with_cell_q_pfl(cell_risks.get(code, {}), data.get("inputs"))
             d_hap = hap_by_cell.get(cid, 1.0)
@@ -1143,7 +1143,13 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     and stadtbaum_missing_reason is None):
                 _, avoided_days, reason = _stadtbaum_cell_effect(measure.config, frac, r)
                 if reason == "canopy":
+                    # Zellweiser Vermerk (Befund Prüfer, Runde 1): Eine kronenlose Zelle
+                    # bekommt einen Grund statt still zu verschwinden — auch bei
+                    # gemischter Deckung, wo die Kommunensumme insgesamt positiv bleibt
+                    # (dann bleibt ``stadtbaum_missing_reason`` auf Kommunenebene leer,
+                    # s. unten).
                     stadtbaum_saw_canopy_missing = True
+                    cell_savings["stadtbaum_missing_reason"] = "canopy"
                 elif avoided_days is not None:
                     cell_savings["stadtbaum_avoided_days"] = round(avoided_days, 3)
                     stadtbaum_avoided_days_total += avoided_days

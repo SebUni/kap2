@@ -114,22 +114,27 @@ def _no_canopy_cell() -> dict:
     return cell
 
 
-def _run(cell: dict, config: dict, monkeypatch,
-        area_m2: float = 1000.0, base_agg_cost_eur: float = 1_000_000_000.0) -> tuple[dict, list]:
-    """Führt ``compute_impact`` gegen eine Session-Doppel aus und gibt (summary,
-    gespeicherte MeasureImpact-Zeilen) zurück."""
+def _run_cells(cells: dict[int, dict], config: dict, monkeypatch,
+              area_m2: float = 1000.0, base_agg_cost_eur: float = 1_000_000_000.0
+              ) -> tuple[dict, list]:
+    """Führt ``compute_impact`` gegen eine Session-Doppel mit ggf. mehreren Zellen aus
+    und gibt (summary, gespeicherte MeasureImpact-Zeilen) zurück."""
     measure = AdaptationMeasure(
         id=1, kommune_id=KOMMUNE_ID, name="Stadtbaumwahl Test", measure_type=CODE,
         geometry=None, config=config, implementation_year=2027, description="",
         impact_summary={})
     kommune = Kommune(id=KOMMUNE_ID, name="Testheim", osm_id="R-STADTBAUM", population=10_000,
                       area_km2=5.0)
-    ca = CellAssessment(id=CELL_ID, kommune_id=KOMMUNE_ID, grid_cell_id=CELL_ID,
-                        data={"risks": {RISK: cell}, "inputs": {"pop": 100.0}})
-    db = _DB({AdaptationMeasure: [measure], CellAssessment: [ca],
+    assessments = [
+        CellAssessment(id=cid, kommune_id=KOMMUNE_ID, grid_cell_id=cid,
+                       data={"risks": {RISK: risk}, "inputs": {"pop": 100.0}})
+        for cid, risk in cells.items()
+    ]
+    db = _DB({AdaptationMeasure: [measure], CellAssessment: assessments,
              ConfigParameter: [], Kommune: [kommune]})
 
-    monkeypatch.setattr(measure_service, "_coverage", lambda _db, _m: ({CELL_ID: 1.0}, area_m2))
+    frac_map = {cid: 1.0 for cid in cells}
+    monkeypatch.setattr(measure_service, "_coverage", lambda _db, _m: (frac_map, area_m2))
     monkeypatch.setattr(measure_service, "_params_fingerprint",
                         lambda *a, **k: "fp-test-stadtbaum-ausgabe")
     monkeypatch.setattr(parameter_registry, "load_db_overrides", lambda *a, **k: [])
@@ -139,6 +144,12 @@ def _run(cell: dict, config: dict, monkeypatch,
 
     summary = measure_service.compute_impact(db, measure.id)
     return summary, db.added
+
+
+def _run(cell: dict, config: dict, monkeypatch,
+        area_m2: float = 1000.0, base_agg_cost_eur: float = 1_000_000_000.0) -> tuple[dict, list]:
+    """Einzelzellen-Fall (Muster ``test_massnahme_s158_ausgabe.py``)."""
+    return _run_cells({CELL_ID: cell}, config, monkeypatch, area_m2, base_agg_cost_eur)
 
 
 # ── (a) Allee-Zelle: 26,3 Tage, 163 €, Kennzeichnung, Hinweis Modellgrenze 7 ─────────
@@ -188,6 +199,33 @@ def test_zelle_ohne_kronen_vermerk_statt_0_euro(monkeypatch):
     assert summary["annual_benefit_damage_eur"] == 0.0
     zeile = next(o for o in added if o.measure_id == 1)
     assert (zeile.savings or {}).get("stadtbaum_avoided_days") is None
+    # Zellweiser Vermerk (Nacharbeit Runde 1): die kronenlose Zelle trägt selbst den
+    # Grund, verschwindet nicht nur stumm auf Kommunenebene.
+    assert (zeile.savings or {}).get("stadtbaum_missing_reason") == "canopy"
+
+
+# ── (d) gemischte Deckung: kronenlose Zelle bekommt eigenen Vermerk, Kommune bleibt
+#        eine Zahl (die andere Zelle trägt einen positiven Effekt) ──────────────────
+
+def test_gemischte_deckung_kronenlose_zelle_bekommt_eigenen_vermerk(monkeypatch):
+    cells = {CELL_ID: _allee_cell(), CELL_ID + 1: _no_canopy_cell()}
+    summary, added = _run_cells(cells, {"anteil_ersetzt": ANTEIL_ERSETZT}, monkeypatch)
+
+    # Kommune: die Allee-Zelle trägt einen positiven Effekt, deshalb eine Zahl statt
+    # eines Vermerks (kein 0 € insgesamt).
+    assert summary.get("benefit_missing_input") is None
+    assert summary.get("benefit_display") is None
+    assert summary["stadtbaum_avoided_days_total"] == pytest.approx(26.3, abs=0.05)
+
+    zeile_allee = next(o for o in added if o.grid_cell_id == CELL_ID)
+    zeile_ohne_kronen = next(o for o in added if o.grid_cell_id == CELL_ID + 1)
+    assert (zeile_allee.savings or {}).get("stadtbaum_avoided_days") == pytest.approx(
+        26.3, abs=0.05)
+    assert (zeile_allee.savings or {}).get("stadtbaum_missing_reason") is None
+    # Die kronenlose Zelle verschwindet nicht stumm: eigener Vermerk trotz positiver
+    # Kommunensumme.
+    assert (zeile_ohne_kronen.savings or {}).get("stadtbaum_avoided_days") is None
+    assert (zeile_ohne_kronen.savings or {}).get("stadtbaum_missing_reason") == "canopy"
 
 
 if __name__ == "__main__":
