@@ -32,7 +32,7 @@ from app.services.ergebnisbericht.klima import (
     JAHR_START, JAHRE_PROJEKTION, SZENARIEN, Klimazahl,
 )
 from app.services.ergebnisbericht.konformitaet import (
-    STATUS, fundstelle_ohne_datei, lies_checkliste, lueckensatz, umschreibe,
+    STATUS, fundstelle_ohne_datei, kundensatz, lies_checkliste, umschreibe,
 )
 from app.services.ergebnisbericht.sammler import DATENSTAENDE, Berichtsdaten
 from app.services.kurzfassung_markdown import _de_euro
@@ -181,8 +181,10 @@ def teil_2(d: Berichtsdaten, checkliste: str | os.PathLike | None = None) -> str
     """Rechtlicher und methodischer Rahmen, erzeugt aus der Konformitäts-Checkliste (T-1416).
 
     Je Anforderungszeile der Checkliste eine Tabellenzeile ``tr.anforderung[data-nr]`` mit Status
-    (``td.status``) und Lückensatz (``td.luecke``, bei „erfüllt“ ein Strich). ``checkliste`` ist
-    für den Test: eine Kopie mit geändertem Status ändert die Ausgabe dieser Zeile.
+    (``td.status``) und Kundensatz (``td.luecke``, bei „erfüllt“ ein Strich; bei „teilweise“ und
+    „offen“ der Kundensatz aus ``konformitaet_kundentext.py`` statt der internen Spalte „Lücke“,
+    T-1530). ``checkliste`` ist für den Test: eine Kopie mit geändertem Status ändert die Ausgabe
+    dieser Zeile.
     """
     zeilen = lies_checkliste(checkliste)
     zaehlung = {s: sum(1 for z in zeilen if z.status == s) for s in STATUS}
@@ -195,12 +197,12 @@ def teil_2(d: Berichtsdaten, checkliste: str | os.PathLike | None = None) -> str
         f"{zaehlung['offen']} offen. Wo eine Anforderung nicht voll erfüllt ist, nennt die "
         f"Spalte „Lücke“, was fehlt.</p>")
     html.append(
-        f"<p>Die KWRA 2021 bewertet 102 Klimawirkungen; im Bericht sind davon die Klimawirkungen "
-        f"des Produktkatalogs erfasst ({_h(d.beziffert_text)}).</p>")
+        f"<p>Die KWRA 2021 bewertet 102 Klimawirkungen. Dieser Bericht erfasst die Klimawirkungen "
+        f"des Produktkatalogs ({_h(d.beziffert_text)}).</p>")
     html.append('<table class="konformitaet"><tr><th>Nr</th><th>Anforderung</th><th>Quelle</th>'
                 '<th>Fundstelle</th><th>Status</th><th>Lücke</th></tr>')
     for z in zeilen:
-        luecke = lueckensatz(z.luecke) if z.status != "erfüllt" else "—"
+        luecke = kundensatz(z.nr, z.status) if z.status != "erfüllt" else "—"
         html.append(
             f'<tr class="anforderung" data-nr="{z.nr}"><td>{z.nr}</td>'
             f"<td>{_h(umschreibe(z.anforderung))}</td><td>{_h(z.quelle)}</td>"
@@ -295,11 +297,16 @@ def teil_3(d: Berichtsdaten) -> str:
 
 def _parameter_quelle(d: Berichtsdaten, param_id: str) -> str:
     """Kennzeichnung eines Parameters wie in Teil 7 (Quelle oder ausgewiesene Abschätzung von KAP3),
-    aus denselben Parameterdaten (``d.parameter``, ``_herkunft``), nicht als fester Text (Vorgabe P1)."""
+    aus denselben Parameterdaten (``d.parameter``, ``_herkunft``), nicht als fester Text (Vorgabe P1).
+
+    Eine unbekannte Kennung liefert keine leere Quellenzelle: Ein Bericht mit leerem Feld wird nicht
+    erzeugt (P1, Entscheidung des CEO, 27.09.2026), deshalb bricht die Erzeugung mit ``ValueError``
+    ab und nennt die Kennung.
+    """
     for p in d.parameter:
         if p.get("id") == param_id:
             return _herkunft(p)
-    return ""
+    raise ValueError(f"Parameter {param_id!r} ist in d.parameter nicht enthalten")
 
 
 def teil_4(d: Berichtsdaten) -> str:

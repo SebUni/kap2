@@ -339,6 +339,87 @@ def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
     return factor
 
 
+# ── Hebel Stadtbaumwahl (Bericht #96 §5, Integrationsauflage Z. 1111–1125; Maßnahme
+# LOW_ALLERGEN_TREE_SELECTION) — Vorhaben T-1483-cto Teilpaket #2, setzt auf der
+# Zellfunktion health.stadtbaum_g_neu (T-1599-cto) auf. Wie S158 (Sperre aus Befund 124)
+# rechnet der Zweig NICHT als Faktor auf ein gespeichertes Ergebnis, sondern bildet Ĝ′
+# frisch aus den in der Zelle gespeicherten Roheingaben und vergleicht ΔTage vorher/
+# nachher über dieselbe Zellfunktion ``health.pollen_zelltage`` wie S158/die
+# Schadensfunktion selbst.
+
+def _is_stadtbaum(mdef: dict) -> bool:
+    return mdef.get("effect_model") == "stadtbaum"
+
+
+def _stadtbaum_cell_factor(config: dict | None, frac: float, cell_risk: dict) -> float:
+    """Faktor (0..1) auf das Symptomtage-Outcome einer Zelle durch die Stadtbaumwahl.
+
+    Liest ausschließlich ``config['anteil_ersetzt']`` (a, Anteil der Kommune) — kein
+    eigenes Gattungsfeld der Maßnahme (Vorhabenskriterium iii, Entscheidung CEO in
+    T-1431-ceo). Je Zelle mit Deckungsgrad ``frac`` sinken die Kronenterme im
+    Ausgangsstand der Zelle ANTEILIG in dem Term, in dem sie stehen:
+    ``dk_Birke = a · frac · k_Birke,z`` (Kronen MIT Gattungs-Tag, ``canopy_birch_frac``),
+    ``dk_unbek = a · frac · k_unbek,z`` (Kronen OHNE Gattungs-Tag,
+    ``canopy_unknown_frac``) — Kronen ohne Gattungs-Tag (auch neu gepflanzte
+    allergenarme Bäume ohne Tag) zählen anteilig weiter, das ist eine Modellgrenze,
+    keine eigene Regel.
+
+    Ĝ′ entsteht über ``health.stadtbaum_g_neu`` (Kappung je Term, Boden
+    (1 − w_B)·Grün). Ḡ₀ ist der GESPEICHERTE ``pollen_g_bar0`` der Zelle aus dem
+    Ausgangsstand (``inputs.kommunale_pollen_referenz`` wird hier NICHT erneut
+    aufgerufen — Ḡ₀ bleibt für jedes Maßnahmenszenario festgehalten, Bericht §5 Z.
+    975–989/1115–1121). Der Faktor ist
+    ``health.pollen_zelltage(Ĝ′)/health.pollen_zelltage(Ĝ)`` (Summe beider
+    Pollengruppen) auf dieselben Roheingaben (``betroffene``, ``delta_birke``,
+    ``delta_graeser``) — dasselbe Muster wie ``_s158_cell_effect``: eine frische
+    Zellrechnung, kein Faktor auf ein gespeichertes Ergebnis (Sperre aus Befund 124).
+
+    Ohne Deckung (``frac`` ≤ 0), ohne ``anteil_ersetzt`` (bzw. ≤ 0) oder ohne die
+    nötigen Zell-Roheingaben (Alt-Zelle vor der Neuberechnung, T-1599-cto) bleibt der
+    Faktor 1,0 — keine pauschale Ersatzwirkung.
+    """
+    from app.services.engine.impact import health
+
+    if frac <= 0.0:
+        return 1.0
+    a = float((config or {}).get("anteil_ersetzt") or 0.0)
+    if a <= 0.0:
+        return 1.0
+
+    betroffene = cell_risk.get("betroffene")
+    delta_b = cell_risk.get("delta_birke")
+    delta_g = cell_risk.get("delta_graeser")
+    g_cell = cell_risk.get("pollen_g")
+    k_birke = cell_risk.get("canopy_birch_frac")
+    k_unbek = cell_risk.get("canopy_unknown_frac")
+    gruen = cell_risk.get("green_frac")
+    if None in (betroffene, delta_b, delta_g, g_cell, k_birke, k_unbek, gruen):
+        return 1.0
+    g_bar0 = cell_risk.get("pollen_g_bar0")
+
+    def _p(key: str, default: float) -> float:
+        v = override_context.get_override(f"risks.{ALLERGY_RISK_CODE}.impact.{key}", default)
+        return float(v) if v is not None else default
+
+    lam = _p("lambda_veg", 0.70)
+    s_unbek = _p("birch_group_share_default", 0.12)
+
+    dk_birke = a * frac * float(k_birke)
+    dk_unbek = a * frac * float(k_unbek)
+    g_neu = health.stadtbaum_g_neu(float(g_cell), float(k_birke), float(k_unbek),
+                                   float(gruen), dk_birke, dk_unbek, s_unbek)
+
+    tage_b0, tage_g0 = health.pollen_zelltage(
+        float(betroffene), float(delta_b), float(delta_g), float(g_cell), g_bar0, lam)
+    total0 = tage_b0 + tage_g0
+    if total0 <= 0.0:
+        return 1.0
+    tage_b1, tage_g1 = health.pollen_zelltage(
+        float(betroffene), float(delta_b), float(delta_g), g_neu, g_bar0, lam)
+    total1 = tage_b1 + tage_g1
+    return max(0.0, total1 / total0)
+
+
 def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float,
                          unit_factor: float, cell_risk: dict,
                          delta_hap: float = 1.0, hap_cap: float = 1.0) -> float:
@@ -357,6 +438,10 @@ def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float
         if code != ALLERGY_RISK_CODE:
             return 1.0
         return _s158_cell_factor(mdef, frac, cell_risk)
+    if _is_stadtbaum(mdef):
+        if code != ALLERGY_RISK_CODE:
+            return 1.0
+        return _stadtbaum_cell_factor(config, frac, cell_risk)
     return _reduction_factor(mdef, frac, unit_factor)
 
 
