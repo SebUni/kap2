@@ -7,6 +7,15 @@ Funktion ``(Berichtsdaten) -> str``; ``TEILE`` ordnet die Nummern zu.
 Harte Regeln der Gliederung, die hier schon gelten: kein Euro-Feld mit Null oder leer (wo kein
 Betrag steht, steht der Grund), jede Summe nennt ihren Nenner („x von y Klimawirkungen in Euro
 beziffert“), jeder Teil trägt seinen Stand, kein Pfad aus dem Produkt-Repo im Text.
+
+Auszeichnung, an der ``test_ergebnisbericht_regeln.py`` die Regeln prüft (T-1415):
+
+- jeder Euro-Betrag steht in ``<span class="betrag">`` mit den Attributen ``data-berichtsstand``,
+  ``data-methodikstand`` und ``data-datenstand`` (``_betrag``); ein Betrag, der gerundet 0 € zeigt,
+  bricht die Erzeugung ab, statt still eine Null zu drucken;
+- jedes Element ``.summe`` enthält ``<span class="nenner">x von y Klimawirkungen in Euro
+  beziffert</span>`` (``_nenner``);
+- jeder Teil endet mit der Standzeile ``<p class="stand">`` (``_stand``).
 """
 
 from __future__ import annotations
@@ -59,8 +68,32 @@ def _stand(d: Berichtsdaten) -> str:
     return f'<p class="stand">{_h(d.stand.zeile())}</p>\n'
 
 
-def _preisstand(betrag: float) -> str:
-    return f"{de_euro(betrag)} je Jahr (Preisstand 2024)"
+def _betrag(d: Berichtsdaten, wert: float) -> str:
+    """Euro-Betrag als ``<span class="betrag">`` mit Berichts-, Methodik- und Datenstand.
+
+    Harte Regel 1: Eine Null im Euro-Feld ist verboten. Zeigt der Betrag gerundet 0 € (oder ist er
+    nicht positiv), bricht die Erzeugung ab — der Teil muss dann statt des Betrags den Grund nennen.
+    """
+    gueltig = isinstance(wert, (int, float)) and math.isfinite(wert) and wert > 0
+    text = de_euro(wert) if gueltig else ""
+    if not gueltig or text.startswith("0 "):
+        raise ValueError(f"Euro-Betrag {wert!r} ergäbe eine Null oder ein leeres Feld im Bericht; "
+                         f"harte Regel 1 verbietet das — hier gehört der Grund hin")
+    s = d.stand
+    berichtsstand = f"{s.bericht} vom {s.erstellt:%d.%m.%Y}"
+    methodikstand = f"{s.methodik} (Modellstand {s.modell})"
+    return (f'<span class="betrag" data-berichtsstand="{_h(berichtsstand)}"'
+            f' data-methodikstand="{_h(methodikstand)}"'
+            f' data-datenstand="{_h(s.daten)}">{_h(text)}</span>')
+
+
+def _nenner(d: Berichtsdaten) -> str:
+    """Nenner einer Summe (harte Regel 2): „x von y Klimawirkungen in Euro beziffert“."""
+    return f'<span class="nenner">{_h(d.beziffert_text)}</span>'
+
+
+def _preisstand(d: Berichtsdaten, betrag: float) -> str:
+    return f"{_betrag(d, betrag)} je Jahr (Preisstand 2024)"
 
 
 # ── Teil 0 ──────────────────────────────────────────────────────────────────────
@@ -94,32 +127,33 @@ def teil_1(d: Berichtsdaten) -> str:
     k, e = d.kommune, d.ergebnis95
     summe = sum(w["betrag_eur"] for w in d.klimawirkungen_im_bericht)
     band = e.band_eur
-    band_satz = (f" Band {de_euro(band[0])} bis {de_euro(band[1])}, abgeleitet aus der Bandbreite "
-                 f"des Kostensatzes je verlorenem Lebensjahr." if band else "")
+    band_satz = (f" Band {_betrag(d, band[0])} bis {_betrag(d, band[1])}, abgeleitet aus der "
+                 f"Bandbreite des Kostensatzes je verlorenem Lebensjahr." if band else "")
+    # Kernsätze als HTML: Beträge tragen ihre Auszeichnung, alles Übrige ist maskiert.
     kernsaetze = [
-        f"Die in Euro bezifferten Klimaschäden in {k.name} betragen mindestens "
-        f"{_preisstand(summe)}; {d.beziffert_text}.{band_satz}",
-        f"Größte bezifferte Klimawirkung ist die Hitzebelastung: rechnerisch "
-        f"{de_zahl(e.todesfaelle, 2)} hitzebedingte Todesfälle und {de_zahl(e.einweisungen, 2)} "
-        f"Krankenhauseinweisungen im Jahr.",
-        f"Von den {de_zahl(e.einwohner)} Einwohnern sind {de_zahl(e.einwohner_ab65)} 65 Jahre oder "
-        f"älter; auf sie entfällt der größte Teil der Hitzesterblichkeit.",
-        "Der Betrag ist eine Untergrenze: Klimawirkungen ohne Euro-Bezifferung gehen nicht in die "
-        "Summe ein (Teil 8).",
-        "Unsicherheit: Der Betrag hängt linear am Kostensatz je verlorenem Lebensjahr; die "
-        "Modellgrenzen stehen mit Zahl in Teil 8.",
+        f"Die in Euro bezifferten Klimaschäden in {_h(k.name)} betragen mindestens "
+        f"{_preisstand(d, summe)}; {_nenner(d)}.{band_satz}",
+        _h(f"Größte bezifferte Klimawirkung ist die Hitzebelastung: rechnerisch "
+           f"{de_zahl(e.todesfaelle, 2)} hitzebedingte Todesfälle und {de_zahl(e.einweisungen, 2)} "
+           f"Krankenhauseinweisungen im Jahr."),
+        _h(f"Von den {de_zahl(e.einwohner)} Einwohnern sind {de_zahl(e.einwohner_ab65)} 65 Jahre "
+           f"oder älter; auf sie entfällt der größte Teil der Hitzesterblichkeit."),
+        _h("Der Betrag ist eine Untergrenze: Klimawirkungen ohne Euro-Bezifferung gehen nicht in "
+           "die Summe ein (Teil 8)."),
+        _h("Unsicherheit: Der Betrag hängt linear am Kostensatz je verlorenem Lebensjahr; die "
+           "Modellgrenzen stehen mit Zahl in Teil 8."),
     ]
     html = [_kopf(1), "<h2>Kernsätze</h2>", "<ol>"]
-    html += [f"<li>{_h(s)}</li>" for s in kernsaetze]
+    html += [f"<li>{s}</li>" for s in kernsaetze]
     html.append("</ol>")
     html.append("<h2>Höchste Risiken</h2>")
     html.append('<table><tr><th>Klimawirkung (KWRA)</th><th>Handlungsfeld</th>'
                 '<th class="zahl">Betrag je Jahr</th></tr>')
     for w in sorted(d.klimawirkungen_im_bericht, key=lambda w: -w["betrag_eur"]):
         html.append(f"<tr><td>#{w['kwra_id']} {_h(w['kwra_name'])}</td><td>{_h(w['kwra_field'])}</td>"
-                    f'<td class="zahl">{_h(de_euro(w["betrag_eur"]))}</td></tr>')
-    html.append(f'<tr class="summe"><td colspan="2">Summe ({_h(d.beziffert_text)})</td>'
-                f'<td class="zahl">{_h(de_euro(summe))}</td></tr>')
+                    f'<td class="zahl">{_betrag(d, w["betrag_eur"])}</td></tr>')
+    html.append(f'<tr class="summe"><td colspan="2">Summe ({_nenner(d)})</td>'
+                f'<td class="zahl">{_betrag(d, summe)}</td></tr>')
     html.append("</table>")
     html.append("<h2>Wirtschaftlichste Maßnahmen</h2>")
     html.append("<p>In dieser Fassung des Berichts ist keine Maßnahme bewertet: Die Maßnahmen "
@@ -151,20 +185,23 @@ def teil_4(d: Berichtsdaten) -> str:
          "Expositions-Wirkungs-Kurve des RKI, vier Altersbänder"),
         ("Verlorene Lebensjahre je Jahr", de_zahl(e.yll, 2), "Todesfälle × Restlebenserwartung "
          "(Destatis-Sterbetafeln)"),
-        ("× Kostensatz je Lebensjahr", de_euro(e.voly_eur), "UBA Methodenkonvention 4.0"),
-        ("= Betrag Sterblichkeit", de_euro(e.betrag_mortalitaet_eur), "Rechnung"),
+        ("× Kostensatz je Lebensjahr", _betrag(d, e.voly_eur), "UBA Methodenkonvention 4.0"),
+        ("= Betrag Sterblichkeit", _betrag(d, e.betrag_mortalitaet_eur), "Rechnung"),
         ("Hitzebedingte Krankenhauseinweisungen je Jahr", de_zahl(e.einweisungen, 2),
          "Destatis, Karlsson und Ziebarth 2018"),
-        ("× Kostensatz je Fall", de_euro(e.c_fall_eur), "Destatis-Kostennachweis 2023"),
-        ("= Betrag Erkrankungen", de_euro(e.betrag_morbiditaet_eur), "Rechnung"),
+        ("× Kostensatz je Fall", _betrag(d, e.c_fall_eur), "Destatis-Kostennachweis 2023"),
+        ("= Betrag Erkrankungen", _betrag(d, e.betrag_morbiditaet_eur), "Rechnung"),
     ]
-    html += [f'<tr><td>{_h(a)}</td><td class="zahl">{_h(b)}</td><td>{_h(c)}</td></tr>'
+    # Beträge kommen aus _betrag (schon ausgezeichnet und maskiert); alle übrigen Werte werden maskiert.
+    html += [f'<tr><td>{_h(a)}</td><td class="zahl">'
+             f'{b if b.startswith("<span class=") else _h(b)}</td><td>{_h(c)}</td></tr>'
              for a, b, c in kette]
     html.append(f'<tr class="summe"><td>Jahresbetrag #95</td><td class="zahl">'
-                f'{_h(de_euro(e.jahresbetrag_eur))}</td><td>Summe beider Beträge</td></tr>')
+                f'{_betrag(d, e.jahresbetrag_eur)}</td><td>Summe beider Beträge der '
+                f'Hitzebelastung; im Bericht {_nenner(d)}</td></tr>')
     html.append("</table>")
     html.append(f"<p>Jahresbetrag der Hitzebelastung in {_h(k.name)}: "
-                f"<strong>{_h(_preisstand(e.jahresbetrag_eur))}</strong>. "
+                f"<strong>{_preisstand(d, e.jahresbetrag_eur)}</strong>. "
                 f"Der Betrag gilt für die ganze Kommune; eine Aufteilung nach Ortsteilen enthält "
                 f"diese Fassung nicht.</p>")
     html.append(_stand(d))
@@ -230,10 +267,12 @@ def teil_8(d: Berichtsdaten) -> str:
     grenzen = []
     if e.band_eur:
         grenzen.append(
-            f"Kostensatz je verlorenem Lebensjahr: {de_euro(e.voly_eur)}, Band "
-            f"{de_euro(e.band_voly_eur[0])} bis {de_euro(e.band_voly_eur[1])}; der Jahresbetrag "
-            f"liegt damit zwischen {de_euro(e.band_eur[0])} und {de_euro(e.band_eur[1])}.")
-    grenzen += [
+            f"Kostensatz je verlorenem Lebensjahr: {_betrag(d, e.voly_eur)}, Band "
+            f"{_betrag(d, e.band_voly_eur[0])} bis {_betrag(d, e.band_voly_eur[1])}; der "
+            f"Jahresbetrag liegt damit zwischen {_betrag(d, e.band_eur[0])} und "
+            f"{_betrag(d, e.band_eur[1])}.")
+    # Grenzen als HTML: Beträge tragen ihre Auszeichnung, die übrigen Sätze werden maskiert.
+    grenzen += [_h(g) for g in [
         "Kostensatz je Krankenhausfall: Durchschnitt aller Krankenhausfälle als Ersatz, weil ein "
         "Satz für hitzebedingte Einweisungen nicht veröffentlicht ist (ausgewiesene Abschätzung "
         "von KAP3, Teil 7).",
@@ -241,9 +280,9 @@ def teil_8(d: Berichtsdaten) -> str:
         "Wärmeinseln einzelner Straßenzüge sind darin nur gemittelt enthalten.",
         "Zeitraum: Klima der Sommer 2016–2025; die Projektion bis 2065 ist nicht Teil dieses "
         "Betrags.",
-    ]
+    ]]
     html.append("<ul>")
-    html += [f"<li>{_h(g)}</li>" for g in grenzen]
+    html += [f"<li>{g}</li>" for g in grenzen]
     html.append("</ul>")
     html.append(_stand(d))
     return "\n".join(html)
