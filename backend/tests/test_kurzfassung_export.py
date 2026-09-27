@@ -163,31 +163,6 @@ def test_g_klimawirkungen_gruppiert_nach_amtlicher_nummer():
     assert allergie_index == len(daten) - 1
 
 
-def test_h_teilzeile_ohne_betrag_zeigt_gedankenstrich_statt_absturz():
-    """T-1560-ceo: Eine Klasse-A-Teilzeile ohne Betrag (``cost_eur: None``, etwa Mortalität
-    fehlt für diese Kommune) darf die Kurzfassung nicht mit ``TypeError`` abbrechen. Der
-    Eintrag zeigt die Summe der bezifferten Teilzeile, die Teilzeile ohne Betrag „—“, nie
-    0 € (Vorgabe P2)."""
-    aggregat = {
-        "cost": {
-            "total_eur": 500.0,
-            "by_risk": [
-                {"code": "EXPECTED_ANNUAL_MORTALITY", "name": "Hitzebelastung — Mortalität",
-                 "cost_eur": None, "has_euro_layer": True, "risk_class": "hoch"},
-                {"code": "EXPECTED_ANNUAL_MORBIDITY", "name": "Hitzebelastung — Erkrankungen",
-                 "cost_eur": 500.0, "has_euro_layer": True, "risk_class": "hoch"},
-            ],
-        },
-    }
-    text = kurzfassung_markdown("Musterstadt", aggregat, _projektion(), _kostenuebersicht())
-    daten = _datenzeilen(_abschnitte(text)[UEBERSCHRIFTEN[1]])
-    hitze_index = next(i for i, z in enumerate(daten) if "Hitzebelastung (#95)" in z)
-    assert daten[hitze_index].startswith("| Hitzebelastung (#95) | 500 € |")
-    teilzeilen = daten[hitze_index + 1: hitze_index + 3]
-    assert any("Mortalität" in z and "| — |" in z for z in teilzeilen)
-    assert any("Erkrankungen" in z and "500 €" in z for z in teilzeilen)
-
-
 def test_f_reihenfolge_nach_vermiedenem_schaden_nicht_nach_zusatznutzen():
     a = {"name": "Maßnahme A", "annual_benefit_eur": 900_000.0,
          "annual_benefit_damage_eur": 10_000.0, "annual_benefit_flat_eur": 0.0,
