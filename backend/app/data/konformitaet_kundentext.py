@@ -9,8 +9,8 @@ fehlenden Punkte wie die Spalte „Lücke“ — nur verständlich formuliert (A
 
 Der Status je Zeile ist hier ausdrücklich mitgeführt: Ändert eine künftige Normprüfung den Status
 einer Zeile der Checkliste, ohne dass jemand den Kundensatz nachzieht, bricht die Erzeugung von
-Teil 2 ab (``konformitaet.py``, ``kundensatz_oder_abbruch``), statt einen veralteten Kundensatz
-stillschweigend weiter zu zeigen.
+Teil 2 ab (``konformitaet.py``, ``kundensatz``), statt einen veralteten Kundensatz stillschweigend
+weiter zu zeigen.
 
 Nur Zeilen mit Status „teilweise“ oder „offen“ stehen hier; „erfüllt“ zeigt in Teil 2 einen Strich.
 """
@@ -49,8 +49,9 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
         "teilweise",
         "Die Skala für die Sicherheit der Einschätzung hat vier Stufen wie im amtlichen Vorbild, "
         "doch die Herleitung unterscheidet sich: Das Original bildet die Sicherheit je "
-        "Zeitabschnitt aus fünf Bausteinen (Datenlage, Verständnis der Wirkzusammenhänge, "
-        "Plausibilität der Modellannahmen, Eindeutigkeit der Trends), das Produkt misst "
+        "Zeitabschnitt aus fünf Bausteinen (Vorhandensein der Daten, Zuverlässigkeit der Daten, "
+        "Verständnis der Wirkzusammenhänge, Plausibilität der Modellannahmen, Eindeutigkeit der "
+        "Trends), das Produkt misst "
         "stattdessen nur, wie viele Rechenparameter belegt sind, ohne nach Zeitabschnitt zu "
         "unterscheiden. Das führt zu Widersprüchen zum amtlichen Vorbild: Bei der UV-Schädigung "
         "zeigt das Produkt hohe Sicherheit, wo die amtliche Einschätzung zum Jahrhundertende sehr "
@@ -168,7 +169,8 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
         "Entscheidungsträger nennt keine Dringlichkeit der Handlungserfordernisse, führt als "
         "Handlungsmöglichkeiten nur bereits geplante Maßnahmen auf, erklärt ihre Fachbegriffe "
         "nicht und enthält keine Karte. Einen ausführlichen Abschlussbericht mit Detailergebnissen "
-        "je Kommune gibt es nicht; die Methodik-Berichte sind bundesweit gleich. Auf einzelne "
+        "je Kommune gibt es nicht; die Methodik-Berichte sind bundesweit gleich und für eine "
+        "Kommune selbst nicht erreichbar, sondern nur beim Hersteller einsehbar. Auf einzelne "
         "Zielgruppen zugeschnittene Kommunikationsziele, Beschlussvorlagen, Veranstaltungen und "
         "Kampagnen bietet das Produkt nicht.",
     ),
@@ -186,8 +188,10 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
         "Abgezinst wird aber nur mit der reinen Zeitpräferenz; der zweite von der Methodenkonvention "
         "verlangte Bestandteil — die Veränderung relativer Preise über die Zeit — fehlt ohne "
         "Begründung und ohne ausgewiesene Abschätzung. Damit bleibt offen, ob für die bewerteten "
-        "Gesundheitsschäden eigentlich ein höherer oder ein niedrigerer Satz gelten müsste, und "
-        "der als „Barwert mit 0 Prozent“ bezeichnete Wert ist tatsächlich die unabgezinste Summe. "
+        "Gesundheitsschäden eigentlich ein höherer oder ein niedrigerer Satz gelten müsste. Der als "
+        "„Barwert mit 0 Prozent“ bezeichnete Wert ist deshalb tatsächlich nur die unabgezinste "
+        "Summe, und der als „Barwert mit 1 Prozent“ bezeichnete Wert ist nur ein zu 1 Prozent "
+        "abgezinster Wert, nicht der von der Methodenkonvention verlangte vollständige Barwert. "
         "Risikoaversion geht in die Rechnung nicht ein.",
     ),
     25: (

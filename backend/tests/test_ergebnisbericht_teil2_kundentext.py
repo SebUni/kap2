@@ -12,16 +12,19 @@ Abnahme:
     Funktionsaufruf mit ``()``, Wort mit Unterstrich) oder eines der Wörter „Repo“, „Test“,
     „Einzelnachweis“, „nicht gelesen“, „Primärtext“, „Gegenprobe“.
 (2) Weicht auf einer Kopie der Checkliste unter ``tmp_path`` der Status einer Zeile vom Status in
-    ``KUNDENTEXT`` ab, oder fehlt der Kundensatz ganz, bricht ``kundensatz()`` mit einer
-    Fehlermeldung ab, die die Zeilennummer nennt und auf ``konformitaet_kundentext.py`` verweist.
+    ``KUNDENTEXT`` ab, oder fehlt der Kundensatz ganz, bricht die Erzeugung von Teil 2
+    (``teil_2(..., checkliste=kopie)``) mit einer Fehlermeldung ab, die die Zeilennummer nennt und
+    auf ``konformitaet_kundentext.py`` verweist — nicht nur der isolierte Aufruf von ``kundensatz()``.
 """
 
 from __future__ import annotations
 
+import datetime as dt
 import os
 import re
 import shutil
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -34,8 +37,15 @@ from app.data.konformitaet_kundentext import KUNDENTEXT  # noqa: E402
 from app.services.ergebnisbericht.konformitaet import (  # noqa: E402
     CHECKLISTE, kundensatz, lies_checkliste,
 )
+from app.services.ergebnisbericht.sammler import Stand  # noqa: E402
+from app.services.ergebnisbericht.teile import teil_2  # noqa: E402
 
 PFAD = os.path.join(REPO, "docs", "KONFORMITAET_CHECKLISTE.md")
+
+
+def _daten():
+    stand = Stand("Fassung 0.1", "#95 Rev. 9", "M", "Zensus 2022", dt.date(2026, 9, 27))
+    return SimpleNamespace(stand=stand, beziffert_text="1 von 139 Klimawirkungen in Euro beziffert")
 
 
 def test_checkliste_ist_die_echte():
@@ -100,30 +110,31 @@ def _kopie_mit_status(tmp_path, nr: int, neuer_status: str) -> str:
     return str(kopie)
 
 
-def test_status_abweichend_von_kundentext_bricht_ab(tmp_path):
+def test_status_abweichend_von_kundentext_bricht_teil_2_ab(tmp_path):
     # Zeile 2 ist im Kundentext als "teilweise" geführt; die Kopie hebt sie auf "offen" — der
-    # Kundensatz ist damit veraltet und die Erzeugung muss abbrechen, nicht ihn einfach zeigen.
+    # Kundensatz ist damit veraltet, und die Erzeugung von Teil 2 muss daran abbrechen, nicht ihn
+    # einfach zeigen.
     nr = 2
     assert KUNDENTEXT[nr][0] == "teilweise"
     kopie = _kopie_mit_status(tmp_path, nr, "offen")
     zeilen = {z.nr: z.status for z in lies_checkliste(kopie)}
     assert zeilen[nr] == "offen"
     with pytest.raises(ValueError, match=rf"Zeile {nr}.*konformitaet_kundentext\.py") as fehler:
-        kundensatz(nr, zeilen[nr])
+        teil_2(_daten(), checkliste=kopie)
     assert f"Zeile {nr}" in str(fehler.value)
     assert "konformitaet_kundentext.py" in str(fehler.value)
 
 
-def test_fehlender_kundensatz_bricht_ab(tmp_path):
+def test_fehlender_kundensatz_bricht_teil_2_ab(tmp_path):
     # Zeile 14 ist heute "erfüllt" und hat deshalb keinen Eintrag in KUNDENTEXT; kippt ihr Status
-    # auf "offen", fehlt der nötige Kundensatz ganz.
+    # auf "offen", fehlt der nötige Kundensatz ganz, und die Erzeugung von Teil 2 muss abbrechen.
     nr = 14
     assert nr not in KUNDENTEXT
     kopie = _kopie_mit_status(tmp_path, nr, "offen")
     zeilen = {z.nr: z.status for z in lies_checkliste(kopie)}
     assert zeilen[nr] == "offen"
     with pytest.raises(ValueError, match=rf"Zeile {nr}.*konformitaet_kundentext\.py") as fehler:
-        kundensatz(nr, zeilen[nr])
+        teil_2(_daten(), checkliste=kopie)
     assert f"Zeile {nr}" in str(fehler.value)
     assert "konformitaet_kundentext.py" in str(fehler.value)
 
