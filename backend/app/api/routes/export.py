@@ -86,7 +86,7 @@ def download_export(kommune_id: int, export_id: int, db: Session = Depends(get_d
     return FileResponse(
         job.file_path,
         media_type="application/geopackage+sqlite3",
-        filename=download_dateiname_fuer("geodaten", kommune, "gpkg"),
+        filename=download_dateiname_fuer("geodaten", db, kommune, "gpkg"),
     )
 
 
@@ -95,7 +95,7 @@ def export_measures(kommune_id: int, db: Session = Depends(get_db)):
     """Export all measures as an Excel file."""
     xlsx_bytes = export_measures_xlsx(db, kommune_id)
     kommune = db.query(Kommune).filter(Kommune.id == kommune_id).first()
-    dateiname = download_dateiname_fuer("massnahmen", kommune, "xlsx")
+    dateiname = download_dateiname_fuer("massnahmen", db, kommune, "xlsx")
     return Response(
         content=xlsx_bytes,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
