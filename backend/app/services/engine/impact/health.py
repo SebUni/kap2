@@ -330,14 +330,20 @@ G_S157: float = (0.93 * 1.11 - 1.0) / (1.11 - 1.0)
 
 def s157_avoided_deaths(d85: float, s_gek: float | None, g_s157: float = G_S157,
                         qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
-                        delta_hap: float = 1.0) -> float | None:
+                        delta_hap: float = 1.0,
+                        s_gek_kalib: float = 0.0) -> float | None:
     """Vermiedene Todesfälle 85+ durch gekühlte Heimplätze (Bericht #95 §5).
 
-    ``ΔD_S157 = D_85+ · δ_HAP · h_Heim · s_gek · (1 − g_S157)``
+    ``ΔD_S157 = D_85+ · δ_HAP · h_Heim · max(s_gek − s_gek_kalib; 0) · (1 − g_S157)``
 
-    ``s_gek`` ist der gekühlte Anteil der Heimplätze, eine Eingabe der Kommune.
-    Der Bericht trägt dafür keine Voreinstellung: Fehlt die Eingabe (None),
-    entsteht **kein Betrag** — auch keine 0 (Rückgabe None).
+    ``s_gek`` ist der heute gekühlte Anteil der Heimplätze. Die Voreinstellung 0,11
+    (Block heat.s_gek, Befund 138), wenn die Kommune nichts eingibt, setzt die
+    Maßnahmen-Engine (``measure_service._s157_input``), nicht diese Funktion.
+    ``s_gek_kalib`` ist der gekühlte Anteil im Mittel der Kalibrierjahre (Block
+    heat.s_gek_kalib, 0,06; Befund 165, Log 50): Er steckt schon im Basiswert, S157
+    wirkt nur auf den Anteil darüber. Mit dem Standard 0 rechnet die Funktion je
+    vollen Anteil (Beispiel-Block s157_berlin: 37,35 Todesfälle, 25,0 Mio. €).
+    ``None`` (kein Anteil übergeben) ergibt None.
 
     ``delta_hap`` ist der Faktor des Hitzeaktionsplans, wenn die Kommune ihn
     zugleich gewählt hat (sonst 1): S157 wirkt dann auf den schon mit δ_HAP
@@ -346,7 +352,7 @@ def s157_avoided_deaths(d85: float, s_gek: float | None, g_s157: float = G_S157,
     """
     if s_gek is None:
         return None
-    s = max(0.0, min(1.0, float(s_gek)))
+    s = max(0.0, min(1.0, float(s_gek)) - max(0.0, float(s_gek_kalib)))
     d = max(0.0, min(1.0, float(delta_hap)))
     return max(0.0, d85) * d * h_heim(qbar_pfl, beta_pfl) * s * (1.0 - g_s157)
 
