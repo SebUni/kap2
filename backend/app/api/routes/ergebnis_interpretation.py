@@ -150,7 +150,7 @@ def get_leitfragen():
 def get_interpretationsbericht(kommune_id: int, db: Session = Depends(get_db)):
     kommune = _kommune_oder_404(db, kommune_id)
     inhalt = interpretationsbericht_fuer_kommune(db, kommune)
-    dateiname = download_dateiname_fuer("ergebnisse-interpretieren", kommune, "md")
+    dateiname = download_dateiname_fuer("ergebnisse-interpretieren", db, kommune, "md")
     return Response(
         content=inhalt,
         media_type="text/markdown; charset=utf-8",
