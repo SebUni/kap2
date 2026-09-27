@@ -51,3 +51,45 @@ def test_klasse_b_nicht_in_top_liste(lines):
 def test_klasse_a_bleibt_mit_betrag(lines):
     zeile = next(z for z in lines if KLASSE_A in z)
     assert "€" in zeile
+
+
+def _by_risk_klimawirkung():
+    return [
+        {"code": "EXPECTED_ANNUAL_MORTALITY", "name": "Hitzebelastung — Mortalität",
+         "cost_eur": 1000.0, "index": 40.0, "risk_class": "mittel",
+         "has_euro_layer": True, "cost_display": 1000.0},
+        {"code": "EXPECTED_ANNUAL_MORBIDITY", "name": "Hitzebelastung — Erkrankungen",
+         "cost_eur": 500.0, "index": 30.0, "risk_class": "mittel",
+         "has_euro_layer": True, "cost_display": 500.0},
+        {"code": "EXPECTED_ANNUAL_ALLERGY_DAYS", "name": "Aeroallergene — zusätzliche Symptomtage",
+         "cost_eur": 200.0, "index": 20.0, "risk_class": "niedrig",
+         "has_euro_layer": True, "cost_display": 200.0},
+    ]
+
+
+@pytest.fixture
+def klimawirkung_lines(monkeypatch):
+    agg = {"cost": {"total_eur": 1700.0, "by_risk": _by_risk_klimawirkung()}, "groups": {}}
+    monkeypatch.setattr(ai_context_service.measure_service, "get_risk_aggregate",
+                        lambda *a, **k: agg)
+    monkeypatch.setattr(ai_context_service.lower_bound, "qualifier_text",
+                        lambda *a, **k: "")
+    monkeypatch.setattr(ai_context_service.lower_bound, "overridden_cost_rate_codes",
+                        lambda *a, **k: [])
+    return ai_context_service._risk_lines(None, 1)
+
+
+def test_klimawirkung_95_einmal_mit_summe_und_teilen(klimawirkung_lines):
+    treffer = [z for z in klimawirkung_lines if "Hitzebelastung (#95)" in z]
+    assert len(treffer) == 1
+    # 1.000,0 € (Mortalität) + 500,0 € (Erkrankungen) = 1.500,0 € — dieselbe
+    # Euro-Formatierung wie im übrigen Kontext (ai_context_service._euro).
+    assert ai_context_service._euro(1500.0) in treffer[0]
+    zeilen = "\n".join(klimawirkung_lines)
+    assert "Hitzebelastung — Mortalität" in zeilen
+    assert "Hitzebelastung — Erkrankungen" in zeilen
+
+
+def test_klimawirkung_96_traegt_nummer(klimawirkung_lines):
+    treffer = [z for z in klimawirkung_lines if "(#96)" in z]
+    assert len(treffer) == 1
