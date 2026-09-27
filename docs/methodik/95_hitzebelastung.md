@@ -235,7 +235,9 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   alt die Einwohner im Gitter sind und in welchen Zellen die Älteren wohnen; er senkt den Betrag
   um 0,5 %.
   (d) **Wärmeinsel-Feinstruktur unter 1 km: × 1,021.** Modellrechnung mit derselben gesetzten
-  Streuung σ = 0,5 K wie in §4, keine Messung; die gekrümmte Kurve hebt die Summe.
+  Streuung σ = 0,5 K wie in §4, keine Messung; die gekrümmte Kurve hebt die Summe. Die Herleitung
+  in §4 ergäbe σ = 0,58 K; am Punkt nachgerechnet hebt 0,5 K den Betrag um × 1,019, 0,58 K um × 1,026.
+  Die Setzung hält den Betrag damit rund 0,7 % niedriger (§4).
   Zusammen 0,948 × 0,981 × 0,984 × 1,021 = 0,934: Ohne Gemeindeschlüssel ergibt der Zelllauf für Berlin
   rund 339 Mio. € je Jahr (Preisstand 2024); mit Gemeindeschlüssel, also mit der ganzen Ersatzregel, sind es
   rund 343 Mio. € (342,67 Mio. €, Tabelle in §3.3), 6 % weniger als die Kette. Die
@@ -314,6 +316,10 @@ zs = [-2.0201828705, -0.9585724646, 0.0, 0.9585724646, 2.0201828705]
 ws = [0.0199532421, 0.3936193232, 0.9453087205, 0.3936193232, 0.0199532421]
 uhi = sum(w * yll(t_mittel + 0.5 * math.sqrt(2) * z)[1] for z, w in zip(zs, ws)) / sum(ws)
 assert abs(uhi / y - 1.02) < 0.003
+s_her = 2 / math.sqrt(12)                                # Herleitung §4: 0,58 K statt gesetzt 0,5 K
+uhi_her = sum(w * yll(t_mittel + s_her * math.sqrt(2) * z)[1] for z, w in zip(zs, ws)) / sum(ws)
+assert abs(s_her - 0.577) < 0.001 and abs(uhi_her / y - 1.026) < 0.003
+assert abs(uhi_her / uhi - 1.007) < 0.001                # Betrag rund 0,7 % hoeher (Befund 157)
 # Heim-Extremfall (Abschaetzung von KAP3): alle Heimbewohner 1 K ueber dem Mittel der Kommune
 v_heim, v_rest = 1 + 1.54 * (1 - 0.149), 1 + 1.54 * (0 - 0.149)
 g_heim, g_rest = 0.149 * v_heim, 0.851 * v_rest
@@ -907,7 +913,10 @@ Stichproben-Abgleiche** — §3.4-Ressourcen-Regel: ein nationaler
 nicht abnahmerelevant): UHI-Feinstruktur unterhalb der Gemeinde — Konvexitätsbeitrag als
 **Modellrechnung gegen die weiterhin gesetzte** Streuung σ = 0,5 K: ×1,023–1,024
 (mittelwerttreu; σ-Abschätzung wie in Rev. 6 aus der ±1-K-Spanne der Zellabweichungen um
-das Gebietsmittel, Gleichverteilungsannahme ⇒ σ ≈ 2/√12 ≈ 0,5 K — **keine Messung**;
+das Gebietsmittel, Gleichverteilungsannahme ⇒ σ = 2/√12 = 0,58 K; gesetzt ist 0,5 K, abgerundet
+und damit den Betrag eher unterschätzend: mit 0,58 K läge Wirkung (d) in §3.0 für Berlin am Punkt
+bei × 1,026 statt × 1,019, der Betrag rund 0,7 % höher, mehr als die Toleranz von 0,29 % aus §3.3
+— **keine Messung**;
 der Messpfad „σ aus dem Stadtmodell" gehört zum Stichproben-Abgleich) — sowie
 intra-kommunale Bevölkerungsgewichtung.
 
