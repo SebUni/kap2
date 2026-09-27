@@ -132,7 +132,7 @@ selbst mit.
 Übergib: Risikonummer, Berichtspfad, Ledgerpfad, Rundennummer, höchste bereits vergebene
 Befundnummer — und ausdrücklich den **Prüfumfang**:
 
-- **volle Prüfung** (alle 14 Leitfragen), wenn in dieser Runde Kalibrierung oder
+- **volle Prüfung** (alle 15 Leitfragen), wenn in dieser Runde Kalibrierung oder
   Modellstruktur geändert wurden (§6) — im Erstdurchlauf immer, im Wiedereinstieg der Regelfall;
 - sonst Diff-Runde: geänderte Abschnitte, Regression der geschlossenen Befunde, offene Befunde.
 
