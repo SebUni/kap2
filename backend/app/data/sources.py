@@ -1370,6 +1370,31 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "methodenkonvention-umweltkosten",
         "accessed": "2026-09-25",
     },
+    "Katz_2026_Klimaanlagen_Pflegeheime": {
+        "ieee": "G. M. Katz, K. A. Brown, V. Giannakeas und N. M. Stall, „Air "
+                "Conditioning in Nursing Homes and Mortality During Extreme Heat,“ "
+                "JAMA Internal Medicine, Jg. 186, Nr. 2, S. 243–251, 2026 (online "
+                "15. Dez. 2025), doi: 10.1001/jamainternmed.2025.6595. [Online]. "
+                "Verfügbar: https://pmc.ncbi.nlm.nih.gov/articles/PMC12706679/. "
+                "[Zugriff: 26. Sep. 2026].",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12706679/",
+        "archive_url": "https://web.archive.org/web/20260924073047/"
+                       "https://pmc.ncbi.nlm.nih.gov/articles/PMC12706679/",
+        "accessed": "2026-09-26",
+    },
+    "ICAO_Standardatmosphaere": {
+        "ieee": "International Civil Aviation Organization (ICAO), „Manual of the ICAO "
+                "Standard Atmosphere (extended to 80 kilometres), Doc 7488/3,“ Montréal, "
+                "Kanada, 1993. [Online]. Verfügbar: https://store.icao.int/en/manual-of-the"
+                "-icao-standard-atmosphere-extended-to-80-kilometres-262500-feet-doc-7488. "
+                "[Zugriff: 27. Sep. 2026].",
+        "url": "https://store.icao.int/en/manual-of-the-icao-standard-atmosphere-extended-"
+               "to-80-kilometres-262500-feet-doc-7488",
+        "archive_url": "web.archive.org/web/20260918063019/https://store.icao.int/en/"
+                       "manual-of-the-icao-standard-atmosphere-extended-to-80-kilometres-"
+                       "262500-feet-doc-7488",
+        "accessed": "2026-09-27",
+    },
 }
 
 
