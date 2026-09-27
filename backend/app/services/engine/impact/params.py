@@ -624,8 +624,10 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_detail": "OSM-Bäume tragen nur teilweise genus/species. Für Kronen ohne "
                       "Gattungs-Tag wird der Birkengruppen-Anteil (Betula/Alnus/Corylus) "
                       "mit 0,12 angesetzt. Wirkung: s_unbek verschiebt die Gewichtung "
-                      "von Kronen gegen Grün INNERHALB der Kommune — die Kommunensumme "
-                      "bleibt unberührt (die Zentrierung über Ḡ macht sie invariant), "
+                      "von Kronen gegen Grün INNERHALB der Kommune und wirkt auf die "
+                      "Zellverteilung: Ḡ₀ wird im Ausgangsstand gebildet und "
+                      "festgehalten, die Kommunensumme ist nur im Ausgangsstand "
+                      "gleich, mit Maßnahme sinkt sie (Log 26, §5); "
                       "die Zellverteilung reagiert unterschiedlich stark "
                       "(gehölzgeprägt zweistellig, vegetationsarm kaum — Zahlen s. u.). "
                       "§3.9-Kategorie "
@@ -644,8 +646,10 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "(+13,0 %), Wohnblock 0,255 → 0,258 (+0,9 %), Grünanlage "
                       "2,014 → 1,918 (−4,7 %), Mischlage 1,066 → 1,072 (+0,6 %); "
                       "reproduzierbar im Golden-Test "
-                      "test_s_unbekannt_sensitivity_band. Die KOMMUNENSUMME bleibt "
-                      "unverändert (Zentrierung). Produkt-Kennzeichnung als Annahme; "
+                      "test_s_unbekannt_sensitivity_band. Die Kommunensumme ist nur "
+                      "im Ausgangsstand gleich (Ḡ₀ wird dort gebildet und für "
+                      "Maßnahmenszenarien festgehalten, Log 26 §5); Produkt-"
+                      "Kennzeichnung als Annahme; "
                       "ersetzbar durch ein kommunales Baumkataster.",
      "source_refs": [],
      "evidence_derivation": {
@@ -660,7 +664,9 @@ IMPACT_PARAM_SPECS: list[dict] = [
                           "Wohnblock 0,255 → 0,258 (+0,9 %), Grünanlage 2,014 → 1,918 "
                           "(−4,7 %), Mischlage 1,066 → 1,072 (+0,6 %); reproduzierbar "
                           "im Golden-Test test_s_unbekannt_sensitivity_band. Die "
-                          "Kommunensumme bleibt wegen der Zentrierung über Ḡ invariant.",
+                          "Kommunensumme ist nur im Ausgangsstand gleich, weil Ḡ₀ dort "
+                          "gebildet und für Maßnahmenszenarien festgehalten wird "
+                          "(Log 26 §5); mit Maßnahme sinkt sie.",
      }},
     # ── #96: Kap.-7-Blöcke ohne eigene Rechenstelle (T-1480, Vorgabe P1) ─────────
     # Die drei folgenden Specs machen Blöcke aus Kapitel 7 in der Parameterliste
