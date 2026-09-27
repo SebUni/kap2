@@ -27,6 +27,7 @@ ERWARTET = {
     ("POST", "/kommune/{kommune_id}/interpretation/nachweise"),
     ("DELETE", "/kommune/{kommune_id}/interpretation/nachweise/{nachweis_id}"),
     ("GET", "/kommune/{kommune_id}/interpretation/abhaengigkeiten"),
+    ("GET", "/kommune/{kommune_id}/interpretation/diversitaet"),
     ("GET", "/interpretation/massnahmen-gewissheit"),
     ("GET", "/interpretation/massnahmen-umsetzung"),
     ("GET", "/interpretation/diversitaet"),
@@ -86,6 +87,7 @@ def test_main_bindet_router_geschuetzt_ein():
     ),
     lambda db: route.delete_nachweis(99, 1, db),
     lambda db: route.get_abhaengigkeiten(99, db),
+    lambda db: route.get_diversitaet_kommune(99, db),
     lambda db: route.get_interpretationsbericht(99, db),
 ])
 def test_unbekannte_kommune_404(aufruf):
@@ -197,3 +199,29 @@ def test_leitfragen_traegt_quelle():
     assert quelle["titel"] == LEITFRAGEN_QUELLE["titel"]
     assert quelle["url"] == LEITFRAGEN_QUELLE["url"]
     assert quelle["url"].startswith("https://")
+
+
+# --- T-1475: /kommune/{id}/interpretation/diversitaet, nur gerechnete Klimawirkungen -----
+
+
+def test_diversitaet_kommune_nur_gerechnete_klimawirkung(monkeypatch):
+    codes = ["EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"]  # beide zu #95
+    monkeypatch.setattr(route, "assessment_is_done", lambda db, kid: True)
+    monkeypatch.setattr(
+        route, "get_risk_aggregate",
+        lambda db, kid, apply_measures=False: {"cost": {"by_risk": [{"code": c} for c in codes]}},
+    )
+    antwort = route.get_diversitaet_kommune(1, _Session(kommune=_Kommune()))
+    assert antwort["quelle"] == DIVERSITAET_QUELLE
+    eintraege = antwort["je_klimawirkung"]
+    assert len(eintraege) == 1
+    (eintrag,) = eintraege.values()
+    assert eintrag["bezeichnung"] == "Hitzebelastung (#95)"
+    bezeichnungen = [e["bezeichnung"] for e in eintraege.values()]
+    assert not any("#96" in b or "#98" in b for b in bezeichnungen)
+
+
+def test_diversitaet_kommune_unbekannt_404():
+    with pytest.raises(HTTPException) as fehler:
+        route.get_diversitaet_kommune(99, _Session(kommune=None))
+    assert fehler.value.status_code == 404

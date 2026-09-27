@@ -465,18 +465,47 @@ def _pollen_age_bands(ctx: CellContext) -> dict[str, float]:
     return pollen_age_bands(ctx.ci)
 
 
+def pollen_zelltage(betroffene: float, delta_b: float, delta_g: float,
+                     g_zelle: float, g_bar0: float | None,
+                     lam: float) -> tuple[float, float]:
+    """Zusatztage je Pollengruppe einer Zelle (reine Funktion, Bericht #96 §5.1 Z. 1255).
+
+    ``P̂ = max(0, 1 + λ·(Ĝ_z/Ḡ₀ − 1))``  (mittelwertzentriert, §3.3)
+    ``ΔTage_g,Zelle = B_z · δ_g · P̂``   (g ∈ {Birkengruppe, Gräser})
+
+    Ohne Ḡ₀ (``g_bar0`` None) bleibt P̂ = 1 wie im Ausgangsstand (§3.2, keine
+    Größe außerhalb der Kommune ersetzt eine fehlende Referenz). Architektur
+    dieses Pakets (T-1482-cto): eine Zellfunktion für beide Aufrufer —
+    ``allergy_symptom_days`` (Ḡ₀ = Ĝ der Kommune) und später das
+    Maßnahmen-Modul S158/Stadtbaumwahl (Ĝ′ bei festgehaltenem Ḡ₀).
+    """
+    p_hat = 1.0
+    if g_bar0:
+        p_hat = max(0.0, 1.0 + lam * (float(g_zelle) / float(g_bar0) - 1.0))
+    b = max(0.0, betroffene)
+    return b * delta_b * p_hat, b * delta_g * p_hat
+
+
 def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     """Zusätzliche Symptomtage durch die klimabedingt längere Pollensaison.
 
     ``B_z    = Σ_a pop_a · p_AR,a``                                    (§3.2)
     ``δ_R    = f · (p_B·ΔS_B,R + p_G·ΔS_G,R) · a_attr``                (§3.3)
+    ``δ_B    = f · p_B·ΔS_B,R · a_attr``, ``δ_G = f · p_G·ΔS_G,R · a_attr``
+    (§5.1 Z. 1200–1206; δ_B + δ_G = δ_R)
     ``P̂_z    = 1 + λ · (Ĝ_z/Ḡ − 1)``   (mittelwertzentriert, §3.3)
-    ``ΔTage_z = B_z · δ_R · P̂_z``      (nativ; € = ΔTage × c_Tag)
+    ``ΔTage_z = B_z · δ_R · P̂_z``      (nativ, unveränderte Summenformel);
+    ``ΔTage_g,z = B_z · δ_g · P̂_z``    (über ``pollen_zelltage``, nur Zellausgabe)
 
     P̂ steht in BEIDEN Pfaden — nativer Ausweis und €-Wert bleiben strikt
     proportional (Rev.-5-Befund 12). Der Kostensatz c_Tag = c_Jahr/d_Saison
     hängt am Registry-Kostensatz des Risikos (Herleitung dort; Golden-Test
-    beispiel_96_kostenkette).
+    beispiel_96_kostenkette). ``outcome`` und ``cost_eur`` rechnen weiter mit
+    der ursprünglichen Summenformel δ_R (bitgleich zum Vorzustand); die
+    Zusatztage je Gruppe (über ``pollen_zelltage``) legt zusätzlich nur die
+    Zellausgabe ab (tage_birke, tage_graeser, delta_birke, delta_graeser,
+    pollen_g, pollen_g_bar0) — die Methodik selbst legt nur die Größe fest
+    (Nachtrag CEO 26.09.2026, S158-Integrationsauflage Punkt 1).
     """
     code = risk["code"]
     region = region_for(ctx.regional.get("bundesland"))
@@ -493,23 +522,39 @@ def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     a_attr = ctx.p(code, "a_attr", 0.50)
     ds_b = ctx.p(code, f"delta_s_birke_{region}", POLLEN_DELTA_S_BIRKE[region])
     ds_g = ctx.p(code, f"delta_s_graeser_{region}", POLLEN_DELTA_S_GRAESER[region])
-    delta = f * (p_b * ds_b + p_g * ds_g) * a_attr
+    delta_birke = f * p_b * ds_b * a_attr
+    delta_graeser = f * p_g * ds_g * a_attr
+    delta_r = f * (p_b * ds_b + p_g * ds_g) * a_attr
 
     # Vegetations-Modulation, zentriert auf die REFERENZ DER EIGENEN KOMMUNE
     # (Aufgabe §3.2 „geschlossene Betrachtungsebene", Bericht #96 §3.3): Ḡ ist das
     # betroffenengewichtete Mittel von Ĝ über die Zellen dieser Kommune —
-    # dadurch ist Σ_z B_z·P̂_z = Σ_z B_z exakt und das Ergebnis hängt an keiner
-    # Größe außerhalb der Kommune. Liegt keine Referenz vor (Zelle ohne
-    # Kommunen-Kontext, Alt-Daten), bleibt P̂ NEUTRAL — kein Ersatz-Bundeswert.
+    # dadurch ist Σ_z B_z·P̂_z = Σ_z B_z exakt NUR im Ausgangsstand (Kommentar
+    # nach Log 26: das S158-Maßnahmen-Modul hält Ḡ₀ fest und ändert nur Ĝ_z,
+    # dann trägt die Zentrierung nicht mehr). Liegt keine Referenz vor (Zelle
+    # ohne Kommunen-Kontext, Alt-Daten), bleibt P̂ NEUTRAL — kein Ersatz-Bundeswert.
     lam = ctx.p(code, "lambda_veg", 0.70)
-    g_bar = ctx.regional.get("pollen_g_bar")
+    g_bar0 = ctx.regional.get("pollen_g_bar")
     g_cell = ctx.haz("POLLEN_LOAD")
     p_hat = 1.0
-    if g_bar:
-        p_hat = max(0.0, 1.0 + lam * (g_cell / float(g_bar) - 1.0))
+    if g_bar0:
+        p_hat = max(0.0, 1.0 + lam * (g_cell / float(g_bar0) - 1.0))
 
-    tage = betroffene * delta * p_hat
+    # outcome/cost_eur rechnen bitgleich zum Vorzustand über die alte
+    # Summenformel δ_R (nicht über delta_birke + delta_graeser aus
+    # pollen_zelltage — die Summation in anderer Reihenfolge wäre nur
+    # mathematisch, nicht bitgleich; Prüfer-Befund Runde 0, Mangel 2).
+    tage = betroffene * delta_r * p_hat
     out = _result(risk, tage)
+
+    tage_birke, tage_graeser = pollen_zelltage(
+        betroffene, delta_birke, delta_graeser, g_cell, g_bar0, lam)
+    out["tage_birke"] = max(0.0, tage_birke)
+    out["tage_graeser"] = max(0.0, tage_graeser)
+    out["delta_birke"] = delta_birke
+    out["delta_graeser"] = delta_graeser
+    out["pollen_g"] = g_cell
+    out["pollen_g_bar0"] = g_bar0
 
     # Kostensatz-Kopplung (Bericht #96 §3.5, Ledger-Befund 133): Der Ausweis
     # rechnet € = ΔTage · c_Tag mit c_Tag = c_Jahr,direkt / d_Saison und

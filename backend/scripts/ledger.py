@@ -766,8 +766,10 @@ def cmd_schliesse(pfad: Path) -> int:
     n_offen = sum(1 for x in nach if x.lage in ("offen", "unklar"))
     n_zu = sum(1 for x in nach if x.lage == "geschlossen")
     t = pfad.read_text(encoding="utf-8")
-    t = re.sub(r"## Offene Befunde \(\d+\)", f"## Offene Befunde ({n_offen})", t)
-    t = re.sub(r"## Geschlossene Befunde \(\d+\)", f"## Geschlossene Befunde ({n_zu})", t)
+    t = re.sub(r"^## Offene Befunde \(\d+\)$", f"## Offene Befunde ({n_offen})", t,
+               count=1, flags=re.M)
+    t = re.sub(r"^## Geschlossene Befunde \(\d+\)$", f"## Geschlossene Befunde ({n_zu})", t,
+               count=1, flags=re.M)
     pfad.write_text(t, encoding="utf-8")
 
     vor = {x.nr.split(" (")[0] for x in parse_text(text)}
