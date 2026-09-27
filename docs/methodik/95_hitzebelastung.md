@@ -356,7 +356,7 @@ Streuung \(\sigma_{\text{intra}}\) = 2,36/2,58/2,57 K (frühere Setzung 2,0 K zu
 zwischenjährliche Streuung wird nicht verwendet. Restannahme: UHI verschiebt nur den
 Mittelwert. Skript/Daten: `backend/scripts/kalibrierung/dwd_wochenquantile.py`,
 `backend/data/kalibrierung/wochenquantile_region.csv` [33,50]. Rechengrundlage ist die Datei (vier Nachkommastellen,
-Befund 144); die Tabelle oben ist die auf zwei Stellen gerundete Lesehilfe, mit der auch die Rechenkette §3.0 rechnet.
+Befund 144); die folgende Tabelle ist die auf zwei Stellen gerundete Lesehilfe, mit der auch die Rechenkette §3.0 rechnet.
 Mit der Datei ergibt die Kette für Berlin 362,80 statt 362,89 Mio. €, der Zelllauf 342,58 Mio. € statt 342,67 Mio. €,
 für Warmsen 172.957 € statt 173.099 € (`95_zellvergleich.py --wochenquantile produkt`); der Unterschied liegt unter
 0,1 % und innerhalb der Toleranz aus §3.3.
@@ -664,8 +664,11 @@ $$ F_{\text{Zelle}} \;=\; \sum_a \text{pop}_a \cdot \frac{r_{0,a}}{100\,000} \cd
   Mio. = **1,68**/100.000·Jahr [16]. (2) Kreislauf-Kern: Herz-Kreislauf trägt **11,9 %**
   des Einweisungs-Exzesses (K&Z Tab. 3 [62]) — je Hitzetag konditional 0,119 × 1,408 =
   0,168 bzw. unkonditional 0,119 × 3,106 = 0,370 je 100.000; × 7,2 Hitzetage/Jahr =
-  **1,21…2,66**/100.000·Jahr. (3) Summe: 1,68 + 1,21…2,67 ⇒ **3,5 (2,9–4,4)
-  je 100.000·Jahr** [16,18,62]. Altersaufteilung:
+  **1,21…2,66**/100.000·Jahr. (3) Summe: 1,68 + 1,21…2,66 ⇒ **3,5 (2,9–4,3)
+  je 100.000·Jahr** [16,18,62]. Die Bandgrenzen sind 1,68 + 1,21 = 2,89 und 1,68 + 2,66 = 4,34;
+  der Mittelwert 3,5 ist ihr geometrisches Mittel √(2,89 × 4,34) = 3,54, weil das Band als Faktor
+  um den Mittelwert gelesen wird (Zeichentabelle §3.6); die Mitte der Spanne, 3,61, läge 2 % höher.
+  Auf 3,54 sind die Altersraten normiert. Altersaufteilung:
   Raten **1,9 / 6,3 / 10,8 / 15,6** je 100.000 — bevölkerungsgewichtete Summe:
   (64.747.448·1,9 + 9.569.640·6,3 + 6.294.744·10,8 + 2.844.213·15,6)/83.456.045 = **3,54** ✓;
   das entspricht dem Verhältnis **1 : 3,3 : 5,7 : 8,2** (der Rev.-5-Text „1:5:8:10" war mit
@@ -681,7 +684,8 @@ $$ F_{\text{Zelle}} \;=\; \sum_a \text{pop}_a \cdot \frac{r_{0,a}}{100\,000} \cd
 u = 0.119 * 1.408 * 7.2   # konditional
 o = 0.119 * 3.106 * 7.2   # unkonditional
 assert abs(u - 1.21) < 0.01 and abs(o - 2.66) < 0.01
-assert abs(1.68 + u - 2.9) < 0.05 and abs(1.68 + o - 4.4) < 0.1
+assert abs(1.68 + u - 2.89) < 0.01 and abs(1.68 + o - 4.34) < 0.01
+assert abs(((1.68 + u) * (1.68 + o)) ** 0.5 - 3.54) < 0.01   # Mittelwert = geometrisches Mittel
 ```
 
 ```python test: beispiel_95_r0_normierung
@@ -796,7 +800,7 @@ Paket nicht; wie stark die Bänder den Betrag verschieben, steht in §5 (Sensiti
 | \(q_{\text{1P}},\ \bar q_{\text{1P}}\) | Anteil allein lebender 65+ der Zelle / Bundesmittel | — | Zelle: Zensus-2022-Haushaltsgitter (Fallback s. u.); \(\bar q\) = **0,346** (Mikrozensus 2023 [63]); Zensus-Gitterwert ersetzt bei Integration; herleitung:#qbar-1p |
 | \(q_{\text{pfl}},\ \bar q_{\text{pfl}}\) | Heimbewohner-Anteil an der 85+-Bevölkerung / Bundesmittel | — | OSM × Pflegestatistik 2023 (**Proxy**, Fallback s. u.); \(\bar q\) = 424.300/2.844.213 = **0,149** [61]; herleitung:#qbar-pfl |
 | \(q_{w,\text{Region}}\) | empirisches Anomalie-Quantil der Sommerwoche | K | Tabelle §3.2; wochenquantile_region.csv [33,50] |
-| \(r_{0,a}\) | Baseline-Einweisungsrate je Band | 1/100.000·a | 1,9 / 6,3 / 10,8 / 15,6 (= 1:3,3:5,7:8,2; Summe 3,54; Band ×0,6–1,6 = Summen-Band 2,9–4,4 [×0,83–1,26] kombiniert mit Altersprofil-Unsicherheit ±25 % [Option-B-Profil §3.4] ⇒ ≈ ×0,6–1,6) — Herleitung §3.4, Altersprofil gekennzeichnete Abschätzung [16,18,62]; herleitung:#r0-a |
+| \(r_{0,a}\) | Baseline-Einweisungsrate je Band | 1/100.000·a | 1,9 / 6,3 / 10,8 / 15,6 (= 1:3,3:5,7:8,2; Summe 3,54; Band ×0,6–1,6 = Summen-Band 2,9–4,3 [×0,83–1,23] kombiniert mit Altersprofil-Unsicherheit ±25 % [Option-B-Profil §3.4] ⇒ ≈ ×0,6–1,6) — Herleitung §3.4, Altersprofil gekennzeichnete Abschätzung [16,18,62]; herleitung:#r0-a |
 | \(\text{rOR}\) | Verhältnis der Odds des Todes an Extremhitzetagen, Heime mit gegen ohne Klimaanlage (Maßnahme S157, §5) | — | 0,93 (0,87–0,99) = Kehrwert von 1,08 (1,01–1,15) [46]; register:95-S157-01 |
 | \(r_{\text{KZ}},\ t_{\text{KZ}},\ w_{\text{KZ}}\) | öffentliche Kühlzentren: Reichweite (Anteil der Menschen ab 75 außerhalb der Heime, die an Hitzetagen hingehen) / geschützter Anteil des Tages / Wirkung bei Nutzern (Anteil ihres Exzesses, der wegfällt) | — | 0,05 (0,01–0,10), Setzung von KAP3 / 3/24 (2/24–6/24): 2 h Aufenthalt und 1 h Nachwirkung [73] / \(w_{\text{KZ}} = (1 - g_{\text{S157}}) \times t_{\text{KZ}}\) = 0,71 × 3/24 = 0,089, Abschätzung von KAP3 [46,73] (Befunde 139, 148); register:95-S157-02 |
 | \(r_{\text{VG}},\ w_{\text{VG}}\) | Reichweite eines Schutzprogramms (Anteil der Menschen ab 75) / Wirkung bei Erreichten (Anteil des Exzesses, der wegfällt) | — | 0,20 (0,05–0,40), Setzung von KAP3 / 0,34 (0–0,68), Abschätzung von KAP3 = bereinigte Senkung des Anstiegs 24,4 Pp. ([70] Tabelle 3) geteilt durch den Anstieg ohne Programm 97,3 % und den Einschreibeanteil 0,728 (Befunde 128, 134); untere Grenze aus [70] Tabelle 2 (Befund 132), obere Grenze der rohe Unterschied 0,498 / 0,728 = 0,68; register:95-S152-03 |
@@ -814,8 +818,8 @@ Paket nicht; wie stark die Bänder den Betrag verschieben, steht in §5 (Sensiti
 | \(\beta_{\text{pfl}}\) | Pflegeheim-Effekt (nur Band 85+, nur D-Pfad) | — | (3,0−1)/[1+0,149·2,0] = **1,54** (Band 1,0–2,9); Kette §3.3b [41,44,60,61]; register:95-S153-01 |
 | \(\delta_{\text{HAP}}\) | Hitzeaktionsplan-Dämpfung — multiplikativ auf den Wochen-Exzess (RR−1); Maßnahme §5 | — | 0,95 (0,85–1,00) [45,47]; register:95-S158-01 |
 | \(\delta_{\text{KZ}}\) | Dämpfung durch öffentliche Kühlzentren — multiplikativ auf den Wochen-Exzess der Bänder 75–84 und 85+ (85+ ohne Heimbewohner); Maßnahme §5 | — | 0,9956 (0,982–0,9994) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,089; Abschätzung von KAP3 [41,46,73] (Block `heat.delta_kuehlzentren`, Befunde 139, 148); register:95-S157-02 |
-| \(\delta_{\text{VG}}\) | Dämpfung durch Schutzprogramme vulnerable Gruppen — multiplikativ auf den Wochen-Exzess der Bänder 75–84 und 85+ (85+ ohne Heimbewohner); Maßnahme §5 | — | 0,931 (0,794–1,0) = 1 − \(r_{\text{VG}} \times w_{\text{VG}}\) = 1 − 0,20 × 0,34, Wirkung höchstens bis zum Paketwert 0,794 [47]; Abschätzung von KAP3 [47,70]; register:95-S152-03 |
-| \(\delta_{\text{VG,morb}}\) | Faktor der Schutzprogramme auf die Einweisungen (Morbidität) der Bänder 75–84 und 85+ ohne Heimbewohner; Maßnahme §5 | — | 1,0 (0,931–1,069), Abschätzung von KAP3: unten wie \(\delta_{\text{VG}}\), oben 1 + \(r_{\text{VG}} \times w_{\text{VG}}\) = 1 + 0,20 × 0,34 (Befunde 131, 134); register:95-S152-03 |
+| \(\delta_{\text{VG}}\) | Dämpfung durch Schutzprogramme vulnerable Gruppen — multiplikativ auf den Wochen-Exzess der Bänder 75–84 und 85+ (85+ ohne Heimbewohner); Maßnahme §5 | — | 0,931 (0,794–1,0) = 1 − \(r_{\text{VG}} \times w_{\text{VG}}\) = 1 − 0,20 × 0,3445 (\(w_{\text{VG}}\) ungerundet, gerundet 0,34), Wirkung höchstens bis zum Paketwert 0,794 [47]; Abschätzung von KAP3 [47,70]; register:95-S152-03 |
+| \(\delta_{\text{VG,morb}}\) | Faktor der Schutzprogramme auf die Einweisungen (Morbidität) der Bänder 75–84 und 85+ ohne Heimbewohner; Maßnahme §5 | — | 1,0 (0,931–1,069), Abschätzung von KAP3: unten wie \(\delta_{\text{VG}}\), oben 1 + \(r_{\text{VG}} \times w_{\text{VG}}\) = 1 + 0,20 × 0,3445 = 1,069 (\(w_{\text{VG}}\) ungerundet; Befunde 131, 134); register:95-S152-03 |
 | \(\Delta D_{\text{KZ}}\) | vermiedene Todesfälle 75–84 und 85+ außerhalb der Heime durch öffentliche Kühlzentren | 1/Jahr | berechnet (§5) |
 | \(\Delta D_{\text{S157}}\) | vermiedene Todesfälle 85+ durch gekühlte Heimplätze | 1/Jahr | berechnet (§5) |
 | \(\Delta D_{\text{VG}}\) | vermiedene Todesfälle 75–84 und 85+ außerhalb der Heime durch Schutzprogramme | 1/Jahr | berechnet (§5) |
