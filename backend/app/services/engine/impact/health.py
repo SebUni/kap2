@@ -210,7 +210,10 @@ def _age_bands(ctx: CellContext) -> dict[str, float]:
         return {b: float(bands.get(b) or 0.0) for b in AGE_BANDS}
     from app.services.zensus_loader import NATIONAL_SENIOR_SPLIT
     pop = ctx.pop
-    share_o = ctx.ci.get("share_over_65")
+    # Befund 142: angesetzter Wert der Ersatzregel vor dem veröffentlichten Zensuswert.
+    share_o = ctx.ci.get("share_over_65_ersatz")
+    if share_o is None:
+        share_o = ctx.ci.get("share_over_65")
     if share_o is None:
         share_o = ctx.regional.get("demographics", {}).get("share_over_65", 22.0)
     pop_65p = pop * float(share_o) / 100.0
@@ -449,7 +452,10 @@ def pollen_age_bands(ci: dict) -> dict[str, float]:
     u65 = float((bands or {}).get("u65") or 0.0)
     if not u65:
         pop = float(ci.get("pop") or 0.0)
-        share_o = ci.get("share_over_65")
+        # Befund 142: angesetzter Wert der Ersatzregel vor dem veröffentlichten Zensuswert.
+        share_o = ci.get("share_over_65_ersatz")
+        if share_o is None:
+            share_o = ci.get("share_over_65")
         u65 = max(0.0, pop - pop * float(share_o or 0.0) / 100.0)
     return {
         "u20": u65 * NATIONAL_U20_SHARE_OF_U65,
