@@ -1,7 +1,8 @@
 """Die Teile des PDF-Ergebnisberichts als HTML-Abschnitte.
 
 Gliederung: ``dokumente/produkt/pdf-ergebnisbericht-gliederung.md`` (Firmen-Repo), Teile 0 bis 9.
-Der Formatpilot (T-1414) setzt die Teile 0, 1, 4 (nur #95), 7 und 8 um. Jeder Teil ist eine
+Der Formatpilot (T-1414) setzt die Teile 0, 1, 4 (nur #95), 7 und 8 um, Teil 2 kommt aus der
+Konformitäts-Checkliste (T-1416, ``konformitaet.py``). Jeder Teil ist eine
 Funktion ``(Berichtsdaten) -> str``; ``TEILE`` ordnet die Nummern zu.
 
 Harte Regeln der Gliederung, die hier schon gelten: kein Euro-Feld mit Null oder leer (wo kein
@@ -21,16 +22,21 @@ Auszeichnung, an der ``test_ergebnisbericht_regeln.py`` die Regeln prüft (T-141
 from __future__ import annotations
 
 import math
+import os
 from html import escape
 from typing import Callable
 
 from app.services.ergebnisbericht.beispiel import MORB, MORT
+from app.services.ergebnisbericht.konformitaet import (
+    STATUS, fundstelle_ohne_datei, lies_checkliste, lueckensatz, umschreibe,
+)
 from app.services.ergebnisbericht.sammler import DATENSTAENDE, Berichtsdaten
 from app.services.kurzfassung_markdown import _de_euro
 
 UEBERSCHRIFTEN = {
     0: "Teil 0 · Kopf und Identität",
     1: "Teil 1 · Beschlussfähige Zusammenfassung",
+    2: "Teil 2 · Rechtlicher und methodischer Rahmen",
     4: "Teil 4 · Betroffenheitsanalyse je Klimawirkung",
     7: "Teil 7 · Parameter- und Quellenverzeichnis",
     8: "Teil 8 · Grenzen und Vollständigkeitsanzeige",
@@ -160,6 +166,42 @@ def teil_1(d: Berichtsdaten) -> str:
     html.append("<p>In dieser Fassung des Berichts ist keine Maßnahme bewertet: Die Maßnahmen "
                 "mit Kosten und vermiedenem Schaden folgen mit Teil 6. Deshalb steht hier noch "
                 "keine Rangfolge.</p>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
+# ── Teil 2 ──────────────────────────────────────────────────────────────────────
+
+def teil_2(d: Berichtsdaten, checkliste: str | os.PathLike | None = None) -> str:
+    """Rechtlicher und methodischer Rahmen, erzeugt aus der Konformitäts-Checkliste (T-1416).
+
+    Je Anforderungszeile der Checkliste eine Tabellenzeile ``tr.anforderung[data-nr]`` mit Status
+    (``td.status``) und Lückensatz (``td.luecke``, bei „erfüllt“ ein Strich). ``checkliste`` ist
+    für den Test: eine Kopie mit geändertem Status ändert die Ausgabe dieser Zeile.
+    """
+    zeilen = lies_checkliste(checkliste)
+    zaehlung = {s: sum(1 for z in zeilen if z.status == s) for s in STATUS}
+    html = [_kopf(2)]
+    html.append(
+        f"<p>Diese Tabelle stellt {len(zeilen)} Anforderungen aus dem Klimaanpassungsgesetz (KAnG), "
+        f"der Klimawirkungs- und Risikoanalyse 2021 für Deutschland (KWRA 2021), der ISO 14091 "
+        f"und der Methodenkonvention 4.0 des Umweltbundesamts dem Stand des Produkts gegenüber: "
+        f"{zaehlung['erfüllt']} erfüllt, {zaehlung['teilweise']} teilweise, "
+        f"{zaehlung['offen']} offen. Wo eine Anforderung nicht voll erfüllt ist, nennt die "
+        f"Spalte „Lücke“, was fehlt.</p>")
+    html.append(
+        f"<p>Die KWRA 2021 bewertet 102 Klimawirkungen; im Bericht sind davon die Klimawirkungen "
+        f"des Produktkatalogs erfasst ({_h(d.beziffert_text)}).</p>")
+    html.append('<table class="konformitaet"><tr><th>Nr</th><th>Anforderung</th><th>Quelle</th>'
+                '<th>Fundstelle</th><th>Status</th><th>Lücke</th></tr>')
+    for z in zeilen:
+        luecke = lueckensatz(z.luecke) if z.status != "erfüllt" else "—"
+        html.append(
+            f'<tr class="anforderung" data-nr="{z.nr}"><td>{z.nr}</td>'
+            f"<td>{_h(umschreibe(z.anforderung))}</td><td>{_h(z.quelle)}</td>"
+            f"<td>{_h(fundstelle_ohne_datei(z.fundstelle))}</td>"
+            f'<td class="status">{_h(z.status)}</td><td class="luecke">{_h(luecke)}</td></tr>')
+    html.append("</table>")
     html.append(_stand(d))
     return "\n".join(html)
 
@@ -301,5 +343,5 @@ def teil_8(d: Berichtsdaten) -> str:
 
 
 TEILE: dict[int, Callable[[Berichtsdaten], str]] = {
-    0: teil_0, 1: teil_1, 4: teil_4, 7: teil_7, 8: teil_8,
+    0: teil_0, 1: teil_1, 2: teil_2, 4: teil_4, 7: teil_7, 8: teil_8,
 }

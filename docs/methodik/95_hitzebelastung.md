@@ -201,7 +201,7 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   sechs heißen Wochen; deshalb rechnet die Kette jede der 13 Sommerwochen einzeln. Der Teiler 52
   ist keine Vereinfachung: Die 39 Wochen außerhalb des Sommers tragen nach dem Modell nichts bei.
 - **Ebenen 1, 2 und 6, eine Zelle statt aller Zellen: Die Kette überschätzt Berlin um rund
-  7 %.** Das Produkt rechnet jede 100-m-Zelle mit ihrer eigenen Temperatur (§3.1) und ihrer
+  6 %.** Das Produkt rechnet jede 100-m-Zelle mit ihrer eigenen Temperatur (§3.1) und ihrer
   eigenen Bevölkerung aus dem Zensus-Gitter und summiert. Die Kette setzt für die ganze Kommune
   die Zelle Berlin-Mitte und die Fortschreibung aus Ebene 1 an. Die Zelle Berlin-Mitte ist
   praktisch der Gemeindepunkt der Kalibrierung (§4): Dessen Reihe in
@@ -221,20 +221,20 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   (b) **Einwohnersumme: × 0,981.** Das Zensus-Gitter (Stichtag 15.05.2022) zählt in Berlin
   3.593.357 Einwohner, die Fortschreibung aus Ebene 1 (Stichtag 31.12.2023) 3.662.381
   (Befund 99).
-  (c) **Altersbänder je Zelle wie im Produkt: × 0,982 = 0,9867 × 0,9948.** Der erste Faktor,
-  Produkt gegen Regel, ist eine Eigenheit des Produkts: In 4.774 Zellen mit 99.098 Einwohnern ist
-  der Anteil 65+ im Gitter geheimgehalten („–“), und das Produkt setzt dort 65+ = 0 (Befund 104).
+  (c) **Altersbänder je Zelle wie im Produkt ohne Gemeindeschlüssel: × 0,984 = 0,9888 × 0,9948.** Der erste Faktor,
+  ohne gegen mit Gemeindeschlüssel, ist die Modellgrenze aus §3.3: In 4.774 Zellen mit 99.098 Einwohnern ist
+  der Anteil 65+ im Gitter geheimgehalten („–“); ohne Gemeindeschlüssel rechnet das Produkt dort nur Stufe 1 (Befund 141).
   Gemessen ist er gegen die Ersatzregel aus §3.3 (Stufe 1 und 2, ohne (d)); gerundet ist es
-  derselbe Faktor wie dort in der Tabelle (× 0,987, dort mit (d); Befund 121). Der zweite Faktor,
+  derselbe Faktor wie dort in der Tabelle (× 0,989, dort mit (d); Befund 121). Der zweite Faktor,
   der Rest, ist das, was die Altersbänder je Zelle nach dieser Regel gegenüber (b) ändern: wie
   alt die Einwohner im Gitter sind und in welchen Zellen die Älteren wohnen; er senkt den Betrag
   um 0,5 %.
   (d) **Wärmeinsel-Feinstruktur unter 1 km: × 1,021.** Modellrechnung mit derselben gesetzten
   Streuung σ = 0,5 K wie in §4, keine Messung; die gekrümmte Kurve hebt die Summe.
-  Zusammen 0,948 × 0,981 × 0,982 × 1,021 = 0,932: Der Zelllauf ergibt für Berlin
-  rund 338 Mio. € je Jahr (Preisstand 2024), 7 % weniger als die Kette; ohne die Eigenheit aus
-  (c), also mit der Ersatzregel, wären es rund 343 Mio. € (342,67 Mio. €, Tabelle in §3.3). Die
-  Kette zeigt den Rechenweg, der Betrag für Berlin ist der Zelllauf des Produkts. Die Wirkungen
+  Zusammen 0,948 × 0,981 × 0,984 × 1,021 = 0,934: Ohne Gemeindeschlüssel ergibt der Zelllauf für Berlin
+  rund 339 Mio. € je Jahr (Preisstand 2024); mit Gemeindeschlüssel, also mit der ganzen Ersatzregel, sind es
+  rund 343 Mio. € (342,67 Mio. €, Tabelle in §3.3), 6 % weniger als die Kette. Die
+  Kette zeigt den Rechenweg, der Betrag für Berlin ist der Zelllauf des Produkts mit Gemeindeschlüssel. Die Wirkungen
   (a) und (d) zusammen (× 0,967, aus den ungerundeten Faktoren) zeigen, dass das Zellmodell für Berlin unter dem Gemeindepunkt liegt; der Berlin-Anker
   in §4 rechnet damit (Befund 101).
 - **Ebene 6, \(v_{\text{vers},a}\) = 1.** Auf Ebene der Kommune ist der Modifikator genau 1:
@@ -298,11 +298,11 @@ assert sum(c_kal * p * mm / 100_000 * (math.exp(b85 * f * max(0.0, t_mittel - t0
            for p, mm, f in zip(pop, m, fa)) == 0.0    # nur Sommermittel => null
 # Eine Zelle statt aller Zellen (Zelllauf Berlin, Messwerte aus dem Text): (a) x (b) x (c) x (d)
 assert abs(3_593_357 / sum(pop) - 0.981) < 0.0005        # (b) Einwohnersumme Gitter / Fortschreibung
-assert abs(0.9867 * 0.9948 - 0.982) < 0.0005             # (c) = Produkt gegen Regel 3.3 x Rest (Befund 121)
-gesamt = 0.948 * 0.981 * 0.982 * 1.021                   # Skript anlagen/95_zellvergleich.py
-assert abs(gesamt - 0.932) < 0.001
-assert abs((eur_mort + eur_morb) / 1e6 * gesamt - 338) < 1
-assert abs((eur_mort + eur_morb) / 1e6 * gesamt / 0.9867 - 343) < 1  # mit Regel 3.3: 342,67
+assert abs(0.9888 * 0.9948 - 0.984) < 0.0005             # (c) = ohne gegen mit Gemeindeschluessel x Rest (Befunde 121, 141)
+gesamt = 0.948 * 0.981 * 0.984 * 1.021                   # Skript anlagen/95_zellvergleich.py
+assert abs(gesamt - 0.934) < 0.001
+assert abs((eur_mort + eur_morb) / 1e6 * gesamt - 339) < 1
+assert abs((eur_mort + eur_morb) / 1e6 * gesamt / 0.9888 - 343) < 1  # mit Regel 3.3: 342,67 (Befund 145)
 assert abs(0.948 * 1.021 - 0.967) < 0.001                # (a) x (d), Befund 101 (ungerundet 0,9674)
 # (d) nachgerechnet am Punkt: sigma 0,5 K, mittelwerttreu, Gauss-Hermite-Mittel
 zs = [-2.0201828705, -0.9585724646, 0.0, 0.9585724646, 2.0201828705]
@@ -350,7 +350,11 @@ Messung: Verteilung praktisch symmetrisch (Schiefe −0,003/−0,015/−0,089), 
 Streuung \(\sigma_{\text{intra}}\) = 2,36/2,58/2,57 K (frühere Setzung 2,0 K zu klein);
 zwischenjährliche Streuung wird nicht verwendet. Restannahme: UHI verschiebt nur den
 Mittelwert. Skript/Daten: `backend/scripts/kalibrierung/dwd_wochenquantile.py`,
-`backend/data/kalibrierung/wochenquantile_region.csv` [33,50].
+`backend/data/kalibrierung/wochenquantile_region.csv` [33,50]. Rechengrundlage ist die Datei (vier Nachkommastellen,
+Befund 144); die Tabelle oben ist die auf zwei Stellen gerundete Lesehilfe, mit der auch die Rechenkette §3.0 rechnet.
+Mit der Datei ergibt die Kette für Berlin 362,80 statt 362,89 Mio. €, der Zelllauf 342,58 Mio. € statt 342,67 Mio. €,
+für Warmsen 172.957 € statt 173.099 € (`95_zellvergleich.py --wochenquantile produkt`); der Unterschied liegt unter
+0,1 % und innerhalb der Toleranz aus §3.3.
 
 | \(w\) | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -390,8 +394,8 @@ Alle Faktoren mittelwertzentriert (§3.2; Bundesmittel = 1 je Band) — damit ka
 (Befund 104, Entscheidungslog Nr. 41). Das Produkt nimmt \(\text{pop}_a\) je Zelle aus dem
 Zensus-Gitter [67]: Einwohner der Zelle × Anteil 65+ ergibt die Menschen ab 65; die
 5er-Jahresgruppen der Zelle teilen sie auf die Bänder 65–74, 75–84 und 85+ auf (fehlen sie, die
-Aufteilung des Gebiets). Heute setzt das Produkt 65+ = 0, wo der Anteil 65+ im Gitter
-geheimgehalten ist („–“).
+Aufteilung des Gebiets). Wo der Anteil 65+ im Gitter geheimgehalten ist („–“), setzt das Produkt
+die Ersatzregel ein, ohne Gemeindeschlüssel nur Stufe 1 (Modellgrenze unter der Tabelle).
 **Regel (Abschätzung von KAP3, festgelegt vom methodik_manager):** Ist der Anteil 65+ einer
 Zelle im Zensus-Gitter geheimgehalten („–“), ersetzt das Produkt ihn in zwei Stufen.
 *Stufe 1:* Ist in der Zelle mindestens eine der sechs 5er-Jahresgruppen ab 65 im Altersgitter
@@ -404,7 +408,7 @@ verlangt:
 1. Anteil ab 65 der Gemeinde: A_G = (Einwohner ab 67 + 2/7 der Gruppe 60–66) / Einwohner, alle
    drei Zahlen aus [69]. [69] trennt bei 67, nicht bei 65. Von den sieben Jahrgängen 60–66 zählen
    deshalb die Jahrgänge 65 und 66, also 2/7 der Gruppe; das setzt gleich viele Menschen je
-   Jahrgang voraus und ist eine Abschätzung von KAP3. Fehlt die Gemeinde in [69] (anderer
+   Jahrgang voraus und ist eine Abschätzung von KAP3 (Block `heat.anteil_60_66`, Anker `#ersatz-65`). Fehlt die Gemeinde in [69] (anderer
    Gebietsstand) oder steht dort „.“, gilt A_G der Kreiszeile aus [69] (Kreis mit denselben ersten
    fünf Stellen des Gemeindeschlüssels; Befund 119).
 2. Zielzahl: Z = A_G × Einwohnersumme der Gemeinde im Zensus-Gitter.
@@ -450,16 +454,27 @@ Innerhalb einer Gemeinde bekommen alle Zellen der Stufe 2 denselben Anteil; wo d
 ihnen wohnen, weiß die Regel nicht.
 
 *Gemessene Wirkung.* Das Skript `docs/methodik/anlagen/95_zellvergleich.py` rechnet mit der
-Option `--ersatz` jede Kommune zweimal, nach heutiger Produktlogik und mit der Regel, beide Male
+Option `--ersatz` jede Kommune zweimal, ohne Gemeindeschlüssel (nur Stufe 1) und mit der ganzen Regel, beide Male
 wie der Zelllauf in §3.0 (Wirkungen (a)–(d)). Derselbe Aufruf gibt auch die Spanne aus, wenn die
 Gruppe 60–66 gar nicht (0/7) oder ganz (7/7) zu den Menschen ab 65 zählt:
 
-| Beispielkommune | Aufruf | Einwohner (Zensus-Gitter) | davon in Zellen mit geheimgehaltenem Anteil 65+ | Einwohner ab 65 heute | Einwohner ab 65 mit Regel | Jahresbetrag heute | Jahresbetrag mit Regel | Faktor heute gegen Regel | Spanne des Faktors (60–66 ganz oder gar nicht) |
+| Beispielkommune | Aufruf | Einwohner (Zensus-Gitter) | davon in Zellen mit geheimgehaltenem Anteil 65+ | Einwohner ab 65 ohne Gemeindeschlüssel | Einwohner ab 65 mit Regel | Jahresbetrag ohne Gemeindeschlüssel | Jahresbetrag mit Regel | Faktor ohne Gemeindeschlüssel gegen Regel | Spanne des Faktors (60–66 ganz oder gar nicht) |
 |---|---|---|---|---|---|---|---|---|---|
-| Berlin (AGS 11000000) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz` | 3.593.357 | 2,8 % | 694.397 | 707.318 | 338,10 Mio. € | 342,67 Mio. € | × 0,987 | × 0,925–0,998 |
-| Warmsen, Landkreis Nienburg (Weser) (AGS 03256034) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz` | 3087 | 64,2 % | 508 | 697 | 138.543 € | 173.099 € | × 0,800 | × 0,622–0,904 |
+| Berlin (AGS 11000000) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz` | 3.593.357 | 2,8 % | 696.648 | 707.318 | 338,84 Mio. € | 342,67 Mio. € | × 0,989 | × 0,927–1,000 |
+| Warmsen, Landkreis Nienburg (Weser) (AGS 03256034) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz` | 3087 | 64,2 % | 544 | 697 | 145.025 € | 173.099 € | × 0,838 | × 0,651–0,947 |
 
-Beträge je Jahr (Preisstand 2024). Warmsen zählt nach dem Zensus 2022 amtlich 3158 Einwohner
+Beträge je Jahr (Preisstand 2024), gemessen am 27.09.2026. *Modellgrenze ohne Gemeindeschlüssel (Befund 141).* Das
+Produkt braucht für Stufe 2 den Gemeindeschlüssel der Kommune. Ist die Kommune kein Gemeindeteil der VG250 [65], rechnet
+es nur Stufe 1, und die Zellen der Stufe 2 behalten 65+ = 0. Der Betrag liegt dann in Berlin um 1,1 % (338,84 statt
+342,67 Mio. €), in Warmsen um 16 % (145.025 statt 173.099 €) zu niedrig. Dieselbe Regel gilt überall, wo das Produkt
+den Anteil ab 65 liest: Es ist eine Methodik, deshalb nutzen auch die Hitze-Kennzahlen der Übersicht und der Rückfallpfad
+ohne Altersbänder den Ersatzwert (Befund 142).
+*Toleranz (Befunde 140 und 145).* Ein Nachrechnen trifft den Betrag, wenn es um höchstens ± 0,29 % des Betrags
+(1 Mio. € / 342,67 Mio. € = 0,2918 %) abweicht: Berlin ± 1 Mio. € um 342,67 Mio. €, Warmsen ± 505 € um 173.099 €. Die Toleranz deckt die Rundung der
+Faktoren und der Wochenquantile ab (§3.2: mit der Datei 342,58 Mio. € und 172.957 €). 362,9, 342,67 und 343 Mio. € meinen
+zwei Rechnungen: 362,9 ist die Kette an einem Punkt (§3.0), 342,67 der Zelllauf mit ungerundeten Faktoren, 343 derselbe
+Zelllauf aus den gerundeten Faktoren im Prüfblock §3.0 (362,9 × 0,934 nach Teilung durch 0,9888 = 342,8; mit dem
+ungerundeten Produkt 0,9343 der vier Faktoren, wie im Prüfblock, 342,9). Warmsen zählt nach dem Zensus 2022 amtlich 3158 Einwohner
 [69], liegt also unter 10.000. Gewählt ist Warmsen, weil sie unter allen Gemeinden mit 2000 bis
 unter 10.000 Einwohnern im Zensus-Gitter den höchsten Anteil der Einwohner in Zellen mit
 geheimgehaltenem Anteil 65+ hat (Median der Gemeinden unter 10.000 Einwohnern 27,9 %; Aufruf
@@ -478,12 +493,15 @@ hält dagegen die amtliche Zahl der Gemeinde: Warmsen kommt auf 697 Einwohner ab
 Beide Summen treffen die Zielzahl Z, weil R in beiden Kommunen zwischen null und den Einwohnern
 der Stufe 2 liegt.
 
-*Was eine einfachere Rechnung verfälschen würde.* Ließe das Produkt 65+ = 0 stehen (heutige
-Produktlogik), zählte Warmsen 508 Einwohner ab 65, weniger als die 602 ab 67 allein, und der Betrag
-läge um 20 % zu niedrig (Faktor × 0,800). Die Aufteilung der Gruppe 60–66 ist die größte
-Unsicherheit der Regel: Zählt die ganze Gruppe oder gar nichts davon, liegt der Faktor in Warmsen
-bei × 0,622–0,904, in Berlin bei × 0,925–0,998 (Tabelle oben). In jeder Lesart liegt der Betrag mit
-Regel über dem heutigen; die Richtung der Korrektur hängt an der Aufteilung nicht.
+*Was eine einfachere Rechnung verfälschen würde.* Rechnet das Produkt ohne Gemeindeschlüssel nur
+Stufe 1, zählt Warmsen 544 Einwohner ab 65, weniger als die 602 ab 67 allein, und der Betrag liegt um
+16 % zu niedrig (Faktor × 0,838). Mit 65+ = 0 (frühere Produktlogik vor Stufe 1) waren es
+508 Einwohner ab 65 und 20 % zu wenig (Faktor × 0,800; Messung vom 25.09.2026, Befund-Ledger
+Runde 19). Die Aufteilung der Gruppe 60–66 ist die größte Unsicherheit der Regel: Zählt die ganze
+Gruppe oder gar nichts davon, liegt der Faktor in Warmsen bei × 0,651–0,947, in Berlin bei
+× 0,927–1,000 (Tabelle oben). In jeder Lesart ist der Betrag mit der ganzen Regel mindestens so
+hoch wie ohne Gemeindeschlüssel; in Berlin ist er bei 0/7 gleich (× 1,000, 696.649 gegen 696.648
+Einwohner ab 65). Die Richtung der Korrektur hängt an der Aufteilung nicht.
 
 *Stichtag.* Gitter und [69] zählen beide zum Stichtag 15.05.2022. Ebene 1 der Rechenkette (§3.0)
 bleibt die Fortschreibung zum Stichtag 31.12.2023, weil die Basissterberaten m_a [49] Sterbefälle
@@ -669,13 +687,13 @@ $$ \text{€}_{\text{Zelle}} \;=\; \text{YLL}_{\text{Zelle}} \cdot \text{VOLY} \
 
 VOLY-Herleitung (MK-4.0-Regel): Amann 2020a Tab. 3.15: 79.500 €₂₀₀₅; Anpassung VPI
 2005→2024 ×1,4638 · Kaufkraft-Raumtransfer EU27→DE mit Elastizität 0,85 ×1,1792 ·
-Einkommensentwicklung ^0,85 ×1,1719 ⇒ **160.800 €₂₀₂₄** (Preisstand-Label korrigiert,
+Einkommensentwicklung ^0,85 ×1,1719 ⇒ **160.800 € (Preisstand 2024)** (Preisstand-Label korrigiert,
 Befund 10: alle Indexendpunkte sind 2024). **Band** (Befund 10, definiert): Untergrenze
 136,4 T€ (ohne Raumtransfer: 79.500 × 1,4638 × 1,1719); Obergrenze **165,6 T€**
 (Raumtransfer ohne Elastizität: 79.500 × 1,4638 × 1,2140 × 1,1719) — der Rev.-5-Wert
 169,5 T€ reproduzierte mit keiner Faktorkombination und ist ersetzt. VSL nur Sensitivität:
-6,19 Mio. €₂₀₂₄ (MK-konsistent; ÷ VOLY = 38,5 LJ, Konsistenz-Check ✓), 4,7 Mio. €₂₀₂₄
-(EU-Referenz) und 3,5 Mio. € (Nutzer-Setzung der Arbeitsmappe vor Fortschreibung, Befund 50).
+6,19 Mio. € (Preisstand 2024; MK-konsistent; ÷ VOLY = 38,5 LJ, Konsistenz-Check ✓), 4,7 Mio. € (Preisstand 2024;
+EU-Referenz) und 3,5 Mio. € (Nutzer-Setzung der Arbeitsmappe vor Fortschreibung, Befund 50).
 \(c_{\text{Fall}}\) = 6.996 €₂₀₂₃ × (119,3/116,7) = **7.152 €₂₀₂₄** — **Proxy**
 (Durchschnitt **aller** Krankenhausfälle; hitzeassoziierte Fälle haben einen anderen Fallmix;
 Befund 42; DRG-basierte Sätze als Sensitivität benannt).
@@ -1193,6 +1211,16 @@ Plattform); Kommune = Summe der Zellen bleibt die Rechenebene.
 
 ## 7 Parameter-Blöcke (maschinenlesbar, §4)
 
+**Kennzeichnung `berechnet` (Befunde 136 und 137).** `berechnet` heißt nur: Der Wert folgt aus anderen Blöcken dieses
+Berichts. Das gilt für \(c_{\text{kal}}\) (Fit des Modells aus fünf Blöcken gegen die RKI-Reihe [50]) und für
+\(\beta_{\text{pfl}}\) (Kette §3.3b aus \(m_{85+}\) und \(\bar q_{\text{pfl}}\)). \(\beta_{\text{iso}}\) ist die Odds Ratio
+2,3 aus Semenza 1996 [40], nur umgerechnet mit dem amtlichen Anteil aus [63], und ist deshalb `quelle`. Im Produkt
+lautet der Anzeigetext „berechnet aus anderen Parametern“, weil nicht alle Eingänge amtlich sind. Ein berechneter
+Wert erbt die schwächste Kennzeichnung seiner Eingangsblöcke: \(c_{\text{kal}}\) stützt sich auf \(\beta_{85+}\)
+(Süd-Nachschätzung) und \(f_a\), beide `abschaetzung_kap3`, und zählt damit wie eine Abschätzung; \(\beta_{\text{pfl}}\)
+stützt sich auf \(m_{85+}\) und \(\bar q_{\text{pfl}}\), beide `quelle`, und zählt wie belegt. Ob diese Regel für alle
+Klimawirkungen gilt, wird risikoübergreifend festgelegt; bis dahin zählt das Produkt `berechnet` wie „belegt“.
+
 ```yaml
 parameter:
   id: heat.t0_region
@@ -1349,7 +1377,7 @@ parameter:
   preisstand: null
   bandzuordnung: [65-74, 75-84, 85+]
   endpunkt: mortalitaet   # F-Pfad Default 1 (Log 28): keine Morbiditaetsevidenz
-  kennzeichnung: berechnet   # (OR-1)/[1+q(OR-1)] mit OR 2,3 aus Semenza 1996 [40] (§3.3)
+  kennzeichnung: quelle   # (OR-1)/[1+q(OR-1)] mit OR 2,3 aus Semenza 1996 [40] und q aus Mikrozensus 2023 [63]; Umrechnung ohne Setzung (§3.3, Log 40, Befund 136)
   abgeleitet_aus: [heat.qbar_1p]
 parameter:
   id: heat.beta_pfl
@@ -1472,6 +1500,18 @@ parameter:
   endpunkt: morbiditaet
   kennzeichnung: abschaetzung_kap3   # Richtung der Wirkung auf Einweisungen nicht gemessen; Zentralwert 1,0 setzt Verhindern und Vorziehen gleich (§5). Faktor auf F_75-84 + F_85+ x (1 - h_Heim); Berlin +-0,02 Mio. EUR je Jahr
   abgeleitet_aus: [heat.delta_vg]
+parameter:
+  id: heat.anteil_60_66
+  wert: 0.2857   # 2/7: Jahrgaenge 65 und 66 von sieben Jahrgaengen 60-66 (Befund 141)
+  einheit: "-"
+  band: [0.0, 1.0]   # Gruppe 60-66 gar nicht (0/7) oder ganz (7/7); Faktor Berlin x 0,927-1,000, Warmsen x 0,651-0,947 (§3.3)
+  herkunft: herleitung:#ersatz-65
+  quelle: zensus2022_demografie
+  preisstand: null
+  bandzuordnung: [65-74, 75-84, 85+]
+  endpunkt: mortalitaet
+  kennzeichnung: abschaetzung_kap3   # gleich viele Menschen je Jahrgang angenommen; [69] trennt bei 67, nicht bei 65 (§3.3 Stufe 2, Log 41)
+  abgeleitet_aus: []
 ```
 
 ```python test: s157_berlin
@@ -1594,7 +1634,7 @@ DOI-Links die persistenten Referenzen.
   1992–2017", Dtsch Arztebl Int 117:603–609, 2020. doi:10.3238/arztebl.2020.0603
 - **[14]** M. an der Heiden u. a., Bundesgesundheitsblatt 62(5):571–579, 2019.
   doi:10.1007/s00103-019-02932-y; dies., Berlin/Hessen 2018, Epid Bull 23/2019:193–202.
-- **[15]** UBA (Hrsg.), KWRA 2021, Teilbericht 5 (CC 26/2021), Kap. 4.2, umweltbundesamt.de
+- **[15]** UBA (Hrsg.), KWRA 2021, Teilbericht 5 (Climate Change 24/2021), Kap. 4.2.1 Hitzebelastung, S. 153–172, umweltbundesamt.de
   (lokal: `docs/KWAR/kwra2021_teilbericht_5_cluster_wirtschaft_gesundheit_bf_211027_0.pdf`).
 - **[16]** Destatis, Pressemitteilungen ICD-T67: N035 (15.07.2024), Zahl der Woche 27
   (01.07.2025), N045 (02.07.2026), destatis.de/DE/Presse.
@@ -1605,7 +1645,7 @@ DOI-Links die persistenten Referenzen.
 - **[19]** UBA, „Methodenkonvention 4.0", Abschn. 3.4 + Fn. 17–19; M. Amann u. a., IIASA
   2020a, Tab. 3.15 (VOLY 79.500 €₂₀₀₅; Archiv-Link vorhanden); Destatis-VPI lange Reihen
   (2020 = 100: 2005 81,5 · 2023 116,7 · 2024 119,3); Eurostat nama_10_pc; EUROCONTROL
-  Standard Inputs (VSL 4,7 Mio. €₂₀₂₄).
+  Standard Inputs (VSL 4,7 Mio. €, Preisstand 2024).
 - **[33]** DWD Climate Data Center (CDC): Raster air_temperature_mean, hot_days;
   Gebietsmittel; Tageswerte 21 Stationen.
 - **[38]** J. Nicholl u. a., Emerg Med J 24:665–668, 2007. doi:10.1136/emj.2007.047654 (+≈1 %/10 km).
@@ -1787,8 +1827,8 @@ gegenüber der geparkten Maßnahme im Produkt (T-1329, Befund 130).
 | 37 | Ansatz 95-B (nationaler Anker, top-down)? | **verworfen** | 95-B verteilt eine feste nationale Zahl von Hitzetoten über einen Schlüssel und scheidet nach §3.1 aus, weil damit auch eine Kommune ohne Hitze Todesfälle erhielte. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
 | 38 | Ansatz 95-C (Personen-Hitzegradtage-Regression)? | **verworfen** | 95-C ersetzt die publizierte und kalibrierte RKI-Kurve durch eine lineare Regression mit aufgesetzter Krümmung (κ ≈ 1,2–1,5) und wäre gegenüber 95-A ein Rückschritt. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
 | 39 ⚠ | Satz „Bestand an Klimaanlagen und Hitzeaktionsplänen im Basiswert“ (Kapitel 1, Absatz (a))? | **gestrichen** — Absatz (a) sagt nur noch, was aus der Kalibrierung folgt: \(c_{\text{kal}}\) ist an die RKI-Reihe 2012–2024 angepasst, der Anpassungsstand dieser Jahre steckt damit im Niveau; genannt bleibt nur das DWD-Hitzewarnsystem mit Beleg [45] | Der Bericht hat keine Quelle für die Klimaanlagen-Quote und keine für die Verbreitung kommunaler Hitzeaktionspläne in den Kalibrierjahren; eine Behauptung ohne Beleg bleibt nicht stehen (P1) | Satz belegen: Klimaanlagen-Quote der Haushalte und Pflegeheime sowie Einführungsjahre der Hitzeaktionspläne gegen das Fenster 2012–2024 (Fortschreibung) | keine Zahl betroffen; Aussage (a) schmaler, aber belegt |
-| 40 ⚠ | Kennzeichnung der Grenzfälle in Kapitel 7? | **`abschaetzung_kap3`**, sobald eine Setzung von KAP3 im Wert steckt (\(\beta_{85+}\) Süd-Nachschätzung, \(f_a\) lineare Näherung, VOLY-Elastizität beim Raumtransfer, \(c_{\text{Fall}}\) als Proxy aus dem Durchschnitt aller Krankenhausfälle, Stützstellen e(60)/e(70)/e(80) für die Bänder u65, 65–74 und 75–84 in \(\bar L_a\), \(r_{0,a}\)-Altersprofil, \(\delta_{\text{HAP}}\), Distanzterm); **`quelle`** für reine Rechnungen aus amtlichen oder gemessenen Zahlen ohne Setzung (Quotienten, ausgezählte Quantile); Prüfstein: Misst der Wert die Zielgröße selbst, ist die bloße Wahl zwischen Quellenwerten keine Setzung (\(e_{\text{HD}}\) konditional statt unkonditional, Log 19; Stationsauswahl für \(q_w\), Log 5) — steht er für eine andere Größe (Proxy) oder nähert er ein Bandmittel durch einen Punkt an, ist es eine; **`berechnet`** nur, wo der Wert aus anderen Blöcken folgt (\(c_{\text{kal}}\), \(\beta_{\text{iso}}\), \(\beta_{\text{pfl}}\)) | Die Parameterliste im Produkt (P1) soll eine Setzung nie als Quellenwert zeigen; gleiche Lesart wie die Blöcke in `60_*.md` („Quotient zweier amtlicher Summen“ = `quelle`) | alle aus Quellen abgeleiteten Werte als `abschaetzung_kap3` (überzeichnet die Unsicherheit amtlicher Quotienten) | keine Zahl betroffen; Anzeige „Quelle“ oder „Abschätzung von KAP3“ im Produkt |
-| 41 ⚠ | Womit ersetzt das Produkt den Anteil 65+ einer Zelle, der im Zensus-Gitter geheimgehalten ist („–“)? | **zweistufige Ersatzregel, Abschätzung von KAP3** (§3.3, festgelegt vom methodik_manager in T-1199, Stufe 2 neu gefasst in T-1233): Stufe 1 Summe der veröffentlichten 5er-Jahresgruppen ab 65 der Zelle geteilt durch ihre Einwohner, sofern mindestens eine der sechs Gruppen veröffentlicht ist; Stufe 2 der Rest aus der Gemeindesumme: Zielzahl Z = A_G × Einwohnersumme der Gemeinde im Gitter mit A_G = (Einwohner ab 67 + 2/7 der Gruppe 60–66) / Einwohner aus dem Zensus 2022 [69] (fehlt die Gemeindezeile oder steht dort „.“, A_G der Kreiszeile, Befund 119), Rest R = Z − Einwohner ab 65 der Zellen mit veröffentlichtem Anteil − Einwohner ab 65 aus Stufe 1, jede übrige geheimgehaltene Zelle bekommt R / Einwohner dieser Zellen, begrenzt auf 0–100 % (R < 0 gibt 0); gilt auch für Gemeinden ohne Zelle mit veröffentlichtem Anteil (die frühere Modellgrenze, 30 Gemeinden mit 376 Einwohnern, entfällt) | Das „–“ ist Geheimhaltung, nicht null (Befund 104), steht aber meist für Zellen mit wenigen Älteren: Das Altersgitter derselben Zellen zeigt Berlin 2,6 %, Warmsen 5,2 % Personen ab 65. Die frühere Stufe 2 (einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil, Warmsen 46,00 %) setzte in Warmsen 1416 Einwohner ab 65 an, mehr als die 990 ab 60 [69] (Befund 117). Der Rest aus der Gemeindesumme hält die amtliche Zahl der Gemeinde: Warmsen 697, Berlin 707.318 Einwohner ab 65, je zwischen „ab 67“ und „ab 60“ aus [69]. Lesart „mindestens eine Gruppe“ in Stufe 1, weil mit „alle sechs Gruppen“ Stufe 1 leer bliebe. **Gegenargumente:** (1) Aufteilung der Gruppe 60–66: [69] trennt bei 67; die 2/7 (Jahrgänge 65 und 66 von sieben, gleich viele Menschen je Jahrgang) sind eine Abschätzung von KAP3; zählt die Gruppe ganz oder gar nicht, liegt der Faktor heute gegen Regel in Warmsen bei × 0,622–0,904, in Berlin bei × 0,925–0,998. (2) Stichtag: Gitter und [69] zählen zum 15.05.2022, Ebene 1 der Rechenkette zum 31.12.2023 (Befund 99, Wirkung (b) in §3.0); die Regel gleicht die Zellen an den Zensus an, nicht an die Fortschreibung. (3) Ist R < 0, bleibt ein Überhang stehen (1342 Gemeinden, 3,7 % der Einwohner in Zellen der Stufe 2, im Median 5 Einwohner ab 65). (4) 68 Gemeinden ohne Gemeindezeile nehmen den Altersaufbau des Kreises; ohne jede Zeile rechnet nur Hanau (VG250 06415000, in [69] 06435014) wie heute | 65+ = 0 lassen (heutige Produktlogik; unterschätzt Warmsen: 508 gegen 602 ab 67 [69]) · Stufe 2 als einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil (Fassung T-1199; verdoppelt ländliche Kommunen, Befund 117) · Gruppe 60–66 ganz oder gar nicht zählen (Spanne oben) | Berlin heute gegen Regel × 0,987, Warmsen × 0,800 (§3.3, `--ersatz`); Code-Nachzug beim cto nach dieser Fassung (Befund 116) |
+| 40 ⚠ | Kennzeichnung der Grenzfälle in Kapitel 7? | **`abschaetzung_kap3`**, sobald eine Setzung von KAP3 im Wert steckt (\(\beta_{85+}\) Süd-Nachschätzung, \(f_a\) lineare Näherung, VOLY-Elastizität beim Raumtransfer, \(c_{\text{Fall}}\) als Proxy aus dem Durchschnitt aller Krankenhausfälle, Stützstellen e(60)/e(70)/e(80) für die Bänder u65, 65–74 und 75–84 in \(\bar L_a\), \(r_{0,a}\)-Altersprofil, \(\delta_{\text{HAP}}\), Distanzterm); **`quelle`** für reine Rechnungen aus amtlichen oder gemessenen Zahlen ohne Setzung (Quotienten, ausgezählte Quantile); Prüfstein: Misst der Wert die Zielgröße selbst, ist die bloße Wahl zwischen Quellenwerten keine Setzung (\(e_{\text{HD}}\) konditional statt unkonditional, Log 19; Stationsauswahl für \(q_w\), Log 5) — steht er für eine andere Größe (Proxy) oder nähert er ein Bandmittel durch einen Punkt an, ist es eine; **`berechnet`** nur, wo der Wert aus anderen Blöcken folgt (\(c_{\text{kal}}\), \(\beta_{\text{pfl}}\)); eine nur umgerechnete Studienzahl ist `quelle` (\(\beta_{\text{iso}}\), Befund 136) | Die Parameterliste im Produkt (P1) soll eine Setzung nie als Quellenwert zeigen; gleiche Lesart wie die Blöcke in `60_*.md` („Quotient zweier amtlicher Summen“ = `quelle`) | alle aus Quellen abgeleiteten Werte als `abschaetzung_kap3` (überzeichnet die Unsicherheit amtlicher Quotienten) | keine Zahl betroffen; Anzeige „Quelle“ oder „Abschätzung von KAP3“ im Produkt |
+| 41 ⚠ | Womit ersetzt das Produkt den Anteil 65+ einer Zelle, der im Zensus-Gitter geheimgehalten ist („–“)? | **zweistufige Ersatzregel, Abschätzung von KAP3** (§3.3, festgelegt vom methodik_manager in T-1199, Stufe 2 neu gefasst in T-1233): Stufe 1 Summe der veröffentlichten 5er-Jahresgruppen ab 65 der Zelle geteilt durch ihre Einwohner, sofern mindestens eine der sechs Gruppen veröffentlicht ist; Stufe 2 der Rest aus der Gemeindesumme: Zielzahl Z = A_G × Einwohnersumme der Gemeinde im Gitter mit A_G = (Einwohner ab 67 + 2/7 der Gruppe 60–66) / Einwohner aus dem Zensus 2022 [69] (fehlt die Gemeindezeile oder steht dort „.“, A_G der Kreiszeile, Befund 119), Rest R = Z − Einwohner ab 65 der Zellen mit veröffentlichtem Anteil − Einwohner ab 65 aus Stufe 1, jede übrige geheimgehaltene Zelle bekommt R / Einwohner dieser Zellen, begrenzt auf 0–100 % (R < 0 gibt 0); gilt auch für Gemeinden ohne Zelle mit veröffentlichtem Anteil (die frühere Modellgrenze, 30 Gemeinden mit 376 Einwohnern, entfällt) | Das „–“ ist Geheimhaltung, nicht null (Befund 104), steht aber meist für Zellen mit wenigen Älteren: Das Altersgitter derselben Zellen zeigt Berlin 2,6 %, Warmsen 5,2 % Personen ab 65. Die frühere Stufe 2 (einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil, Warmsen 46,00 %) setzte in Warmsen 1416 Einwohner ab 65 an, mehr als die 990 ab 60 [69] (Befund 117). Der Rest aus der Gemeindesumme hält die amtliche Zahl der Gemeinde: Warmsen 697, Berlin 707.318 Einwohner ab 65, je zwischen „ab 67“ und „ab 60“ aus [69]. Lesart „mindestens eine Gruppe“ in Stufe 1, weil mit „alle sechs Gruppen“ Stufe 1 leer bliebe. **Gegenargumente:** (1) Aufteilung der Gruppe 60–66: [69] trennt bei 67; die 2/7 (Jahrgänge 65 und 66 von sieben, gleich viele Menschen je Jahrgang) sind eine Abschätzung von KAP3; zählt die Gruppe ganz oder gar nicht, liegt der Faktor ohne Gemeindeschlüssel gegen Regel in Warmsen bei × 0,651–0,947, in Berlin bei × 0,927–1,000 (Block `heat.anteil_60_66`). (2) Stichtag: Gitter und [69] zählen zum 15.05.2022, Ebene 1 der Rechenkette zum 31.12.2023 (Befund 99, Wirkung (b) in §3.0); die Regel gleicht die Zellen an den Zensus an, nicht an die Fortschreibung. (3) Ist R < 0, bleibt ein Überhang stehen (1342 Gemeinden, 3,7 % der Einwohner in Zellen der Stufe 2, im Median 5 Einwohner ab 65). (4) 68 Gemeinden ohne Gemeindezeile nehmen den Altersaufbau des Kreises; ohne jede Zeile rechnet nur Hanau (VG250 06415000, in [69] 06435014) wie heute | 65+ = 0 lassen (frühere Produktlogik vor Stufe 1, Historie; unterschätzt Warmsen: 508 gegen 602 ab 67 [69]) · Stufe 2 als einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil (Fassung T-1199; verdoppelt ländliche Kommunen, Befund 117) · Gruppe 60–66 ganz oder gar nicht zählen (Spanne oben) | Berlin ohne Gemeindeschlüssel gegen Regel × 0,989, Warmsen × 0,838 (§3.3, `--ersatz`, gemessen 27.09.2026); Code-Nachzug beim cto nach dieser Fassung (Befund 116) |
 | 42 ⚠ | Stichtag der Einwohner je Altersband in Ebene 1 der Rechenkette (§3.0)? | **Fortschreibung des Bevölkerungsstandes zum 31.12.2023, Basis Zensus 2022** (Tab. 12411-09-01-4-B [48]; festgelegt vom methodik_manager in T-1233, Befund 99) | Gleicher Stichtag wie der Nenner der Basissterberaten m_a [49] (Sterbefälle 2023 / Bevölkerung 31.12.2023): Einwohner und Sterberate beziehen sich auf denselben Tag. Der Abstand zum Zensus-Gitter (15.05.2022) ist als Wirkung (b) in §3.0 beziffert, in Berlin × 0,981. **Gegenargument:** Gitter und Ersatzregel in §3.3 zählen zum 15.05.2022; ein Sachbearbeiter sieht in §3.0 und §3.3 zwei Stichtage | Zensus-Tabelle 1000A zum 15.05.2022 (Stichtag gleich dem Gitter, aber verschieden vom Nenner von m_a; die Zensus-Datenbank war bis 05.10.2026 in Wartung, nach dem 05.10.2026 wird nicht umgestellt) | keine Zahl betroffen; Kapitel 7 und Kette (362,89 Mio. €) unverändert |
 | 43 ⚠ | Wirkung der Schutzprogramme vulnerable Gruppen (`VULNERABLE_GROUP_PROGRAMS`) und ihr Andockpunkt? | **\(\delta_{\text{VG}}\) = 0,931 (Band 0,794–1,0) als Faktor auf den Wochenexzess der Bänder 75–84 und 85+ ohne Heimbewohner; auf die Einweisungen \(\delta_{\text{VG,morb}}\) = 1,0 (Band 0,931–1,069, Befund 131); mit \(\delta_{\text{HAP}}\) zusammen \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}};\ 0{,}794)\); Abschätzung von KAP3** (§5, Block `heat.delta_vg`, Befunde 123, 125–128, 134) | Der Katalog im Produkt setzt `default_reduction` 0.22 auf Mortalität und Morbidität aller Bänder und beruft sich auf das Gesamtpaket der Hitzeschutzpläne (Urban u. a. 2025 [47], −25,2 %). Das ist der Einführungseffekt des ganzen Pakets über drei Jahrzehnte; ein einzelner Baustein wirkt nicht stärker (für Deutschland ist das Paket −20,6 % [47, Tabelle 1], also Faktor 0,794, und \(\delta_{\text{VG}}\) liegt nie darunter), und er erreicht nur die Gemeldeten (Reichweite 20 %, Wirkung bei Erreichten 0,34 = 24,4 / 97,3 / 0,728 aus [70], Tabellen 1–3, bereinigt um die Sterberate vor dem Sommer und den Anteil ab 90). Heimbewohner ab 85 zählen über S157, nicht hier. Umgerechnet auf den Berlin-Betrag: 0.22 auf alle Bänder ergäbe rund 79,8 Mio. € je Jahr, \(\delta_{\text{VG}}\) ergibt 11,7 Mio. €, rund 15 %. **Kappung (Befund 126):** Ob \(\delta_{\text{HAP}}\) den Baustein schon enthält, lässt sich aus [45] nicht ausschließen; deshalb nehmen beide Hebel zusammen nie mehr weg als das Paket Deutschland (zentral 0,885, keine Kappung; sie greift bei \(\delta_{\text{HAP}}\) = 0,85). **Gegenargument:** Der Paketwert ist gemessen, die Reichweite ist eine Setzung; wer sie auf 40 % hebt, kommt auf 23,3 Mio. €, noch immer weniger als ein Drittel von 79,8 Mio. €; erst mit \(w_{\text{VG}}\) am oberen Bandende 0,68 erreicht er die Kappung bei 34,9 Mio. €. Andockpunkt nicht \(v_{\text{vers},a}\), weil es auf Ebene der Kommune genau 1 ist | 0.22 übernehmen (überzeichnet: Paketwert für einen Baustein, dazu auf Bänder und Morbidität ohne Evidenz); rohe Lesart als Zentralwert, Wirkung bei Erreichten aus dem rohen Unterschied der Anstiege, 0,68 = 0,498 / 0,728 aus [70] Tabelle 2 (Berlin 23,1 Mio. €; verworfen, weil der rohe Unterschied die höhere Altersstruktur der Stadtteile ohne Programm als Wirkung mitzählt und die Quelle selbst auf −24,4 Pp. bereinigt; bleibt als obere Grenze des Bands); Hebel streichen (P2 verbietet eine unbegründete Nullwirkung; die Maßnahme besteht im Produkt) | Kette 362,9 Mio. € unverändert (Hebel wirkt nur bei Wahl der Maßnahme); Abweichung Bericht ↔ Katalog (0.22 ↔ 0,931 auf 75+ ohne Heimbewohner, Kappung mit \(\delta_{\text{HAP}}\)) geht als Punkt in die Meldung an den cto (eiserne Regel 5) |
 | 44 ⚠ | Wie steht der Hebel S157 zur geparkten Maßnahme `COOLING_ROOMS_DRINKING_WATER`? | **Die Maßnahme bleibt im Produkt geparkt und hat heute keine Wirkung, auch keine Nullwirkung. Beim Aktivieren gilt \(g_{\text{S157}}\) = 0,29 (Band 0–0,90) auf den Heim-Exzess 85+ im gekühlten Anteil \(s_{\text{gek}}\), den die Kommune eingibt; Abschätzung von KAP3** (§5, Befund 130) | Der geparkte Katalog (`backend/app/data/catalog_parked.py`) führt die Maßnahme mit `default_reduction` 0.18 auf die Exposition (`effect_target: exposure`) für alle Menschen. [46] misst dagegen Klimaanlagen in Heimen: Mit ihnen bleiben 29 % des Heim-Exzesses (Faktor 0,29), 71 % fallen weg, und zwar nur bei Heimbewohnern ab 85 im gekühlten Anteil. 0.18 auf die Exposition ist also weder dieselbe Größe noch derselbe Personenkreis; wie groß ihre Wirkung in Euro wäre, hängt an der Expositionskette des Produkts und ist mit den 25,0 Mio. € für Berlin nicht vergleichbar. Wie viele Heimplätze gekühlt sind, weiß nur die Kommune, deshalb ist \(s_{\text{gek}}\) ihre Eingabe. Öffentliche Kühlzentren außerhalb der Heime bekommen beim Aktivieren eine eigene Abschätzung nach P2. **Gegenargument:** 0.18 wirkt auf alle Menschen und erfasst damit auch öffentliche Kühlzentren, die der Bericht heute nicht rechnet; wer sie ersetzt, verliert diesen Teil, bis die eigene Abschätzung vorliegt. Weil die Maßnahme geparkt ist, fehlt dadurch heute keiner Kommune eine Wirkung | 0.18 auf die Exposition übernehmen (ohne Beleg aus [46], anderer Personenkreis); S157 ohne Andockpunkt führen (die geparkte Maßnahme ist die einzige passende im Produkt) | Kette 362,9 Mio. € und S157 25,0 Mio. € unverändert; Empfehlung an den cto in der Meldung: beim Aktivieren von `COOLING_ROOMS_DRINKING_WATER` \(g_{\text{S157}}\) auf \(D_{85+} \times h_{\text{Heim}} \times s_{\text{gek}}\) statt 0.18 auf die Exposition (eiserne Regel 5) |
