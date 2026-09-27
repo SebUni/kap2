@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23, Befunde 336–421) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–428) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -121,11 +121,8 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 23 (Befunde 336–421). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
 > € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
-> gefahrenen Review-Runde unabhängig nachgerechnet. **Eine Zählung steht hier
-> bewusst nicht** (Befunde 400/407/416): Sie altert mit jeder Runde und ist in
-> neun aufeinanderfolgenden Runden zurückgefallen. Die Zahl der Reproduktionen
-> führt das Ledger, das sie ohnehin belegt — der Bericht verweist darauf,
-> statt sie zu duplizieren. Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
+> gefahrenen Review-Runde unabhängig nachgerechnet. **Eine Zählung steht hier bewusst nicht** (Befunde 400/407/416/427): Die Belege der Nachrechnungen führt das Ledger.
+> Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
 > (Gleichgewichtslesart mit Transient-Faktor \(\tau\) = 0,20–0,48, jetzt größte
 > Achse der §4-Bändertabelle) sowie die vollständig gemessene **Punktmengen-Kette**.
 > Prüfmechanik: Ledger auf eine Zeile je Befund, Status aus **Prüfausdrücken**
@@ -681,13 +678,13 @@ $$ \text{€}_{\text{Zelle}} \;=\; \sum_e \Delta F_{e,\text{Zelle}} \cdot c_e \;
   YLL netto +0,5 %.
 - **\(c_e\)** (Log 7; Register 98-K1-01): Basis = Erstjahreskosten **SCS-detektierter**
   Fälle (Speckemeier [34], Kohorte 2014/2015, Preisstand-Annahme 2015):
-  MM 5.326 × 119,3/94,5 = **6.724 €₂₀₂₄** (Band bis 11.410 = nicht-SCS-detektiert);
-  C44 4.660 ⇒ **5.883 €₂₀₂₄** (Band bis 7.436). **Proxy-Kennzeichnung** (§3.1) mit
+  MM 5.326 × 119,3/94,5 = **6.724 €** (Preisstand 2024) (Band bis 11.410 = nicht-SCS-detektiert);
+  C44 4.660 ⇒ **5.883 €** (Preisstand 2024) (Band bis 7.436). **Proxy-Kennzeichnung** (§3.1) mit
   Richtungsdiskussion: *überschätzend* — Gesamt- statt inkrementelle Kosten (enthält
   Grundversorgung der überwiegend alten Patienten); *unterschätzend* — nur Erstjahr
   (Folgejahre, Metastasen-Therapien fehlen), SCS-Werte als untere Detektionsweg-Stütze.
   Die Basiswert-Wahl folgt der Untergrenzen-Zusage (#95-Befund-62-Lehre).
-- **VOLY = 160.800 €₂₀₂₄** (MK 4.0/P52; Kette in #95 §3.5 [19]); VSL nur Sensitivität.
+- **VOLY = 160.800 €** (Preisstand 2024) (MK 4.0/P52; Kette in #95 §3.5 [19]); VSL nur Sensitivität.
   **Konsistenz-Check VSL ÷ VOLY (§3.2; Befund 217):** Die Fortschreibung P52 führt
   VSL 3,5 / 4,7 / 6,19 Mio €/Todesfall als Sensitivitäten. Der Quotient ergibt
   **21,8 / 29,2 / 38,5 Lebensjahre** je Todesfall. Dem stehen die hier tatsächlich
@@ -875,6 +872,8 @@ assert abs(euro - 4365) < 60               # ~4.400 EUR je 1.000 EW und Jahr
 
 ### 3.5 Zeichentabelle (alphabetisch; §3.2-Form)
 
+Sortierregel: nach dem Buchstaben des Zeichens ohne Groß- und Kleinschreibung; griechische Zeichen stehen unter ihrem lateinischen Namen (\(\Delta\) als »Delta«, \(\lambda\) als »lambda«, \(\tau\) als »tau«, \(\Phi\) und \(\phi\) als »phi«), € als »Euro«.
+
 | Zeichen | Name | Einheit | Wert / Herkunft |
 |---|---|---|---|
 | \(a\) | Altersband u20 · 20–64 · 65–74 · 75–84 · 85+ (Ebenen wie #96 §3.2) | — | Zensus-Altersbänder + Ebene u20 |
@@ -883,30 +882,30 @@ assert abs(euro - 4365) < 60               # ~4.400 EUR je 1.000 EW und Jahr
 | \(\text{BAF}_e\) | biologischer Verstärkungsfaktor (%-Inzidenz je +1 % Dosis) | — | MM **0,6** (±0,4) · C44 **1,675** (1,675–1,95; §3.1) [29,30]; register:98-E20-04 |
 | \(c_e\) | Erstjahres-Behandlungskosten je Fall (**Proxy**, §3.4) | €₂₀₂₄ | MM **6.724** (Band –11.410) · C44 **5.883** (–7.436) = [34]-Werte × 119,3/94,5 [19]; register:98-K1-01; herleitung:#c-e |
 | \(c_{\text{kal},e}\) | Normierungsskalar der Ablesekette (ein Skalar je Entität; wirkt in der §3.3-Formel auf die Roh-Bandraten; Anker 2021–2023) | — | MM **1,0012** · C44 **0,9910**; herleitung:#i-raten |
+| \(\Delta\text{Dosis}_{\text{Zelle}}\) | relative klimaattribuierte Dosisänderung | — | SSD-Normalperioden-Δ × \(k_{\text{UV}}\) × \(a_{\text{attr,UV}}\); DE 4,54 % (§3.2, fallgewichtet [72,73]); berechnet |
+| \(\Delta F_{e,\text{Zelle}}\) | klimaattribuierte Zusatzfälle (Teil-Ausweis) | 1/Jahr | berechnet |
+| \(\text{€}_{\text{Zelle}}\) | bewerteter Schaden K1 (Ursache UV) — Teil-Ausweis | €₂₀₂₄/Jahr | Ergebnis (§3.4) |
 | \(F_{e,\text{Zelle}}\) | Baseline-Neuerkrankungen der Zelle | 1/Jahr | berechnet (§3.3) |
 | \(I_{e,a}^{\text{roh}}\) | Roh-Neuerkrankungsrate je Entität und Band (Ablesekette; Anlage-CSV) | 1/(100.000 · Jahr) | Tabelle §3.3 [27,48]; register:98-R35-01; herleitung:#i-raten |
 | \(k_{\text{UV}}\) | Übersetzung SSD-Trend → erythemwirksame Dosis (Elastizität zeitinvariant angenommen, §3.2) | — | **0,7119** (0,3622–1,0616) = (4,9/4,6) × 0,6683, Brücke über die Globalstrahlung; Band = publizierte Standardfehler (§3.2) [31,73]; register:98-E20-02; herleitung:#k-uv |
+| \(\lambda_e\) | Letalitätsanteil (Perioden-Approximation, gekennzeichnet; Anker 2021–2023) | — | MM **0,11466** · C44 **0,005236** [27]; register:98-K1-02 |
 | \(\bar L_e\) | verlorene Lebensjahre je Sterbefall (Median-Approximation, gekennzeichnet; Jahresmediane des Ankerfensters) | Jahre | MM **10,4569** · C44 **5,4787** [27,48]; register:98-K1-02; herleitung:#l-quer |
 | \(\text{OR}_{\text{out}},\ q_{\text{out}},\ \bar q_{\text{out}},\ r_{\text{out}},\ w^Z\) | Außenberufs-Sensitivität (auf den SCC-Anteil am Zusatz \(w^Z\) = 0,373; nur Bänder 20–64…85+, **nicht** u20; **nicht im Basiswert**, §3.4) | — | OR **1,77** [1,37–2,30] [43]; \(\bar q_{\text{out}}\) = **0,070** [70]; \(r_{\text{out}}\) **0,981–1,038** über \(q_{\text{out}}\) ∈ [0; 0,21]; register:98-OUT-01; herleitung:#q-out |
+| \(\Phi(a_{\text{erk}})\) | kumulierte UV-Dosis bis zum Erkrankungsalter \(a_{\text{erk}}\) (Lebenszeitdosis) | relative Einheit | Definitionsgröße der BAF in [30]; herleitung:#gleichgewicht |
+| \(\phi_{\text{Komfort}}\) | dosisgewichteter Komforttag-Anteil (Ebene **geparkt**, Neutralwert 0) | — | **0** (Band 0–0,25, gekennzeichnete Abschätzung §3.4); herleitung:#v-verh |
 | \(\text{pop}_a\) | Bevölkerung der Zelle je Band | Personen | Zensus 2022, 100 m (+ u20); register:98-R35-01 |
 | \(q_{\text{R}}\) | Rasterquotient ΔGlobal/ΔSSD — fallgewichtetes Mittel der Punktquotienten \(q_{\text{R},z}\) über 10.682 Gemeindepunkte (Aggregationsregel §3.2; **nicht** der Außenberufsanteil \(q_{\text{out}}\), Befund 397) | — | **0,6683** (MM 0,6674 · C44 0,6689; Messzelle Bochum 0,6811) [73]; herleitung:#k-uv |
 | \(q_{\text{R},z}\) | Punktquotient \(\Delta\text{Global}_z/\Delta\text{SSD}_z\) am Gemeindepunkt \(z\) (Trends 1997–2022 beider DWD-Raster) | — | berechnet je Punkt, Anlage [73]; herleitung:#k-uv |
 | \(s\) | Tages-Multiplikator der persönlichen Dosis an einem Komforttag | — | **1,45** (1,25–1,60) [57–59]; register:98-S154-01 |
 | \(\text{SSD}\) | Sonnenscheindauer (Normalperioden-Mittel je Zelle) — Kartenebene **neu anzulegen** (angelegt, §3.6) | h/Jahr | DWD-CDC sunshine_duration 1 km [33]; Gebietsmittel-Referenzen [69]; register:98-E20-01 |
 | \(T\) | Dauer des Dosisanstiegs (Mittelpunktabstand der Normalperioden) | Jahre | **30** (1961–1990 ⇒ 1991–2020); herleitung:#gleichgewicht |
+| \(\tau\) | Transient-Faktor: Anteil der Lebenszeitdosis-Erhöhung an der Jahresdosis-Erhöhung, \(\tau=(T/2)/a_{\text{erk}}\) | — | **1,00** im Ausweis (Gleichgewichtslesart); Spanne **0,20–0,48** als §4-Achse; gekennzeichnete Abschätzung §3.9; herleitung:#gleichgewicht |
 | \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136,4–165,6 T€; Kette #95 §3.5) [19]; herleitung:#voly (in #95) |
 | \(v_{\text{verh}}\) | Verhaltens-Sensitivität — **Jahres**faktor, **abgeleitet** aus \(s\) und \(\phi_{\text{Komfort}}\) (kein eigener Parameter, §3.2 Kein-Doppelkanal) | — | \(1+\phi_{\text{Komfort}}(s-1)\) = **1,00** (Band 1,00–1,11); herleitung:#v-verh |
 | \(w_{\text{SCC}}\) | SCC-Anteil an C44 (altersinvariant, dokumentierte Annahme; Quellen-Widerspruch benannt §3.1) | — | **0,25** (Band 0,25–0,50) [27; obere Stütze 2015er-BfS-Split]; herleitung:#baf-c44 |
 | \(Y(a_{\text{erk}})\) | Inzidenz im Erkrankungsalter \(a_{\text{erk}}\); \(Y(a_{\text{erk}})\sim\Phi(a_{\text{erk}})^{c}\) mit \(c\) = BAF | 1/(100.000 · Jahr) | Funktionsform aus [30]; herleitung:#gleichgewicht |
 | \(\text{YLL}_{\text{Zelle}}\) | verlorene Lebensjahre — **nativer Ausweis** | Jahre/Jahr | Ergebnis |
 | \(z\) | Index der Gemeindepunkte (Kalibrierung, Anlagen [72,73]) bzw. der 100-m-Zellen (Produktion, §3.4-Summen) | — | BKG VG250 `vg250_pk` × Zensus 2022 [72]; berechnet |
-| \(\Delta\text{Dosis}_{\text{Zelle}}\) | relative klimaattribuierte Dosisänderung | — | SSD-Normalperioden-Δ × \(k_{\text{UV}}\) × \(a_{\text{attr,UV}}\); DE 4,54 % (§3.2, fallgewichtet [72,73]); berechnet |
-| \(\Delta F_{e,\text{Zelle}}\) | klimaattribuierte Zusatzfälle (Teil-Ausweis) | 1/Jahr | berechnet |
-| \(\lambda_e\) | Letalitätsanteil (Perioden-Approximation, gekennzeichnet; Anker 2021–2023) | — | MM **0,11466** · C44 **0,005236** [27]; register:98-K1-02 |
-| \(\tau\) | Transient-Faktor: Anteil der Lebenszeitdosis-Erhöhung an der Jahresdosis-Erhöhung, \(\tau=(T/2)/a_{\text{erk}}\) | — | **1,00** im Ausweis (Gleichgewichtslesart); Spanne **0,20–0,48** als §4-Achse; gekennzeichnete Abschätzung §3.9; herleitung:#gleichgewicht |
-| \(\Phi(a_{\text{erk}})\) | kumulierte UV-Dosis bis zum Erkrankungsalter \(a_{\text{erk}}\) (Lebenszeitdosis) | relative Einheit | Definitionsgröße der BAF in [30]; herleitung:#gleichgewicht |
-| \(\phi_{\text{Komfort}}\) | dosisgewichteter Komforttag-Anteil (Ebene **geparkt**, Neutralwert 0) | — | **0** (Band 0–0,25, gekennzeichnete Abschätzung §3.4); herleitung:#v-verh |
-| \(\text{€}_{\text{Zelle}}\) | bewerteter Schaden K1 (Ursache UV) — Teil-Ausweis | €₂₀₂₄/Jahr | Ergebnis (§3.4) |
 
 ### 3.6 Kartenebenen und Fallbacks
 
@@ -1038,7 +1037,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   (der native YLL-Ausweis und € enthalten nur den Zusatz, keinen Sockel).
 - **Sanity-Bänder (Unter- und Obergrenze):**
   Bundessummen (Basiswerte): \(\Delta F\) = **733 MM + 18.339 C44 ≈ 19.072 Fälle/Jahr**,
-  **YLL ≈ 1.404/Jahr**, **€ ≈ 339 Mio €₂₀₂₄/Jahr** (Behandlung 113 + Mortalität 226).
+  **YLL ≈ 1.404/Jahr**, **€ ≈ 339 Mio € pro Jahr** (Preisstand 2024) (Behandlung 113 + Mortalität 226).
   *Obergrenzen:* Behandlungs-€ = 6,2 % der amtlichen KKR C43/C44 (1.823 Mio €₂₀₂₃ [28]) ✓;
   klimaattribuierter Inzidenzanteil MM +2,73 %/C44 +7,61 % ≪ beobachteter
   Inzidenzanstieg (standardisierte MM-Rate 1999–2023 deutlich steigend; C44-Hospitali-
