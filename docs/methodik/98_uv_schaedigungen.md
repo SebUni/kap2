@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–444) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–446) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -793,8 +793,8 @@ Inzidenz im Erkrankungsalter \(a_{\text{erk}}\). Nach [27] liegt der Median bei 
 Jahren. Mit dem Mittelpunktabstand der Normalperioden \(T = 30\) Jahre folgt
 \(\tau \approx 0{,}20\text{–}0{,}24\); selbst bei doppelt so langem
 Anstiegsfenster (\(T = 60\)) bleibt \(\tau \le 0{,}48\).
-**Spanne: 0,20–0,48** — weit
-außerhalb des \(k_{\text{UV}}\)-Bandes (±49 %) und damit die **größte**
+**Spanne: 0,20–0,48** — vollständig
+außerhalb des \(k_{\text{UV}}\)-Bandes (−52 … −80 % gegen ±49 %) und damit die **größte**
 Einzelunsicherheit des Modells; sie ist als eigene Achse in der §4-Bändertabelle
 geführt.
 
@@ -1134,8 +1134,10 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   [31], BAF [29,30]). **Kalibriermodell = Produktionsmodell** (lineares Modell, keine
   Näherungsläufe).
 - **Struktur-Validierung auf der Altersachse — out-of-sample (§3.4; Befund 214).**
-  Die kritischste Achse dieses Modells ist die **Altersverteilung**: Die Baseline stammt
-  vollständig aus einer Abbildungs-Ablesung, und ein reiner Verteilungsfehler lässt die
+  Die kritischste Achse für die Verteilung auf die Kommunen ist die **Altersverteilung**
+  (größte Achse insgesamt ist der Transient-Faktor \(\tau\), §3.4 und die Rangfolge der
+  Unsicherheiten weiter unten in diesem Kapitel): Die Baseline stammt vollständig
+  aus einer Abbildungs-Ablesung, und ein reiner Verteilungsfehler lässt die
   Bundessumme unberührt, verschiebt aber jede Kommune (Nachweis: Befund 212). Ein
   Vergleich der **rohen** Gesamtrate taugt dafür **nicht** — auf sie wird
   \(c_{\text{kal}}\) gefittet, die Prüfung wäre in-sample.
