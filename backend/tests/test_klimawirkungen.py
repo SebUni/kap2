@@ -23,6 +23,14 @@ from app.services import measure_service  # noqa: E402
 from app.services.dashboard_cache import _SUMMARY_SCHEMA_VERSION  # noqa: E402
 from app.services.engine import override_context, risk_engine  # noqa: E402
 from app.services.klimawirkungen import klimawirkungen  # noqa: E402
+from app.services.kurzfassung_markdown import kurzfassung_markdown  # noqa: E402
+from test_kurzfassung_export import (  # noqa: E402
+    UEBERSCHRIFTEN,
+    _abschnitte,
+    _datenzeilen,
+    _kostenuebersicht,
+    _projektion,
+)
 
 ZEILE_MORTALITAET = {
     "code": "EXPECTED_ANNUAL_MORTALITY", "name": "Hitzebelastung — Mortalität",
@@ -141,3 +149,62 @@ def test_build_cost_summary_baut_klimawirkungen_ohne_feld_im_cache_nach(monkeypa
 
 def test_schema_version_ist_2():
     assert _SUMMARY_SCHEMA_VERSION == 2
+
+
+def test_klasse_a_teilzeile_ohne_betrag_bricht_nicht_ab_summe_der_anderen():
+    """T-1560-ceo: eine Klasse-A-Teilzeile mit ``cost_eur: None`` (Betrag fehlt für eine
+    Kommune) bricht ``klimawirkungen()`` nicht mit ``TypeError`` ab — die Gruppe summiert
+    nur die Teilzeile mit Betrag."""
+    zeile_ohne_betrag = dict(ZEILE_MORTALITAET, cost_eur=None)
+    eintraege = klimawirkungen([zeile_ohne_betrag, dict(ZEILE_MORBIDITAET)])
+    treffer_95 = next(e for e in eintraege if e["kwra_id"] == 95)
+    assert treffer_95["cost_eur"] == 500.0
+
+
+def test_einzelne_klasse_a_zeile_ohne_betrag_ist_none_und_steht_hinter_den_bezifferten():
+    """Hat keine Teilzeile eines Eintrags einen Betrag, ist ``cost_eur`` ``None`` — nie
+    ``0`` (Vorgabe P2) —, und der Eintrag steht in der Sortierung hinter allen
+    Klasse-A-Einträgen mit Betrag."""
+    zeile_ohne_betrag = {"code": "OHNE_BETRAG", "name": "Wirkung ohne Betrag",
+                         "kwra_id": 99, "cost_eur": None, "has_euro_layer": True}
+    eintraege = klimawirkungen([dict(ZEILE_MORTALITAET), zeile_ohne_betrag])
+    treffer_99 = next(e for e in eintraege if e["kwra_id"] == 99)
+    assert treffer_99["cost_eur"] is None
+    positionen = [e["kwra_id"] for e in eintraege]
+    assert positionen.index(99) > positionen.index(95)
+
+
+def test_risk_class_ist_die_hoechste_der_teilzeilen():
+    """Teilzeilen ``gering`` und ``hoch`` ergeben ``risk_class == "hoch"`` (Entscheidung
+    des CEO vom 27.09.2026: eine Zusammenfassung zeigt ein Risiko nie kleiner als
+    einer ihrer Teile)."""
+    zeile_gering = dict(ZEILE_MORTALITAET, risk_class="gering")
+    zeile_hoch = dict(ZEILE_MORBIDITAET, risk_class="hoch")
+    eintraege = klimawirkungen([zeile_gering, zeile_hoch])
+    treffer_95 = next(e for e in eintraege if e["kwra_id"] == 95)
+    assert treffer_95["risk_class"] == "hoch"
+
+
+def test_h_teilzeile_ohne_betrag_zeigt_gedankenstrich_statt_absturz():
+    """T-1560-ceo: Eine Klasse-A-Teilzeile ohne Betrag (``cost_eur: None``, etwa Mortalität
+    fehlt für diese Kommune) darf die Kurzfassung nicht mit ``TypeError`` abbrechen. Der
+    Eintrag zeigt die Summe der bezifferten Teilzeile, die Teilzeile ohne Betrag „—“, nie
+    0 € (Vorgabe P2)."""
+    aggregat = {
+        "cost": {
+            "total_eur": 500.0,
+            "by_risk": [
+                {"code": "EXPECTED_ANNUAL_MORTALITY", "name": "Hitzebelastung — Mortalität",
+                 "cost_eur": None, "has_euro_layer": True, "risk_class": "hoch"},
+                {"code": "EXPECTED_ANNUAL_MORBIDITY", "name": "Hitzebelastung — Erkrankungen",
+                 "cost_eur": 500.0, "has_euro_layer": True, "risk_class": "hoch"},
+            ],
+        },
+    }
+    text = kurzfassung_markdown("Musterstadt", aggregat, _projektion(), _kostenuebersicht())
+    daten = _datenzeilen(_abschnitte(text)[UEBERSCHRIFTEN[1]])
+    hitze_index = next(i for i, z in enumerate(daten) if "Hitzebelastung (#95)" in z)
+    assert daten[hitze_index].startswith("| Hitzebelastung (#95) | 500 € |")
+    teilzeilen = daten[hitze_index + 1: hitze_index + 3]
+    assert any("Mortalität" in z and "| — |" in z for z in teilzeilen)
+    assert any("Erkrankungen" in z and "500 €" in z for z in teilzeilen)
