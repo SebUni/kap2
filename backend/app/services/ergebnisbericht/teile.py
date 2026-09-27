@@ -2,7 +2,8 @@
 
 Gliederung: ``dokumente/produkt/pdf-ergebnisbericht-gliederung.md`` (Firmen-Repo), Teile 0 bis 9.
 Der Formatpilot (T-1414) setzt die Teile 0, 1, 4 (nur #95), 7 und 8 um, Teil 2 kommt aus der
-Konformitäts-Checkliste (T-1416, ``konformitaet.py``). Jeder Teil ist eine
+Konformitäts-Checkliste (T-1416, ``konformitaet.py``), Teil 3 aus den Klimakennwerten des
+Sammlers (T-1417, ``klima.py``). Jeder Teil ist eine
 Funktion ``(Berichtsdaten) -> str``; ``TEILE`` ordnet die Nummern zu.
 
 Harte Regeln der Gliederung, die hier schon gelten: kein Euro-Feld mit Null oder leer (wo kein
@@ -27,6 +28,9 @@ from html import escape
 from typing import Callable
 
 from app.services.ergebnisbericht.beispiel import MORB, MORT
+from app.services.ergebnisbericht.klima import (
+    JAHR_START, JAHRE_PROJEKTION, SZENARIEN, Klimazahl,
+)
 from app.services.ergebnisbericht.konformitaet import (
     STATUS, fundstelle_ohne_datei, lies_checkliste, lueckensatz, umschreibe,
 )
@@ -37,6 +41,7 @@ UEBERSCHRIFTEN = {
     0: "Teil 0 · Kopf und Identität",
     1: "Teil 1 · Beschlussfähige Zusammenfassung",
     2: "Teil 2 · Rechtlicher und methodischer Rahmen",
+    3: "Teil 3 · Klimatische Ausgangslage",
     4: "Teil 4 · Betroffenheitsanalyse je Klimawirkung",
     7: "Teil 7 · Parameter- und Quellenverzeichnis",
     8: "Teil 8 · Grenzen und Vollständigkeitsanzeige",
@@ -206,6 +211,86 @@ def teil_2(d: Berichtsdaten, checkliste: str | os.PathLike | None = None) -> str
     return "\n".join(html)
 
 
+# ── Teil 3 ──────────────────────────────────────────────────────────────────────
+
+class _Fussnoten:
+    """Quelle und Datenstand je Zahl als Fußnote; gleiche Paare teilen sich eine Nummer."""
+
+    def __init__(self) -> None:
+        self.paare: list[tuple[str, str]] = []
+
+    def nummer(self, z: Klimazahl) -> int:
+        paar = (z.quelle, z.datenstand)
+        if paar not in self.paare:
+            self.paare.append(paar)
+        return self.paare.index(paar) + 1
+
+    def zahl(self, z: Klimazahl, stellen: int = 1) -> str:
+        """Zahl als ``span.klimazahl`` mit ``data-quelle`` und ``data-datenstand`` und Fußnote;
+        ohne Wert steht der Grund (``span.grund``)."""
+        if z.wert is None:
+            return f'<span class="grund">{_h(z.grund)}</span>'
+        return (f'<span class="klimazahl" data-quelle="{_h(z.quelle)}"'
+                f' data-datenstand="{_h(z.datenstand)}">{_h(de_zahl(z.wert, stellen))}'
+                f'<sup class="fn">{self.nummer(z)}</sup></span>')
+
+    def html(self) -> str:
+        zeilen = [f'<li class="fussnote" data-nr="{i}">Quelle: {_h(q)}. Datenstand: {_h(s)}.</li>'
+                  for i, (q, s) in enumerate(self.paare, 1)]
+        return '<ol class="fussnoten">' + "".join(zeilen) + "</ol>"
+
+
+def teil_3(d: Berichtsdaten) -> str:
+    """Klimatische Ausgangslage (T-1417): je in Euro bezifferter Klimawirkung eine Zeile
+    ``tr.klimawirkung[data-kwra]`` mit Beobachtung (``td.beobachtung``) und Projektion
+    (``td.rcp45``, ``td.rcp85``). Jede Zahl trägt Quelle und Datenstand als Attribut und Fußnote."""
+    k = d.kommune
+    fn = _Fussnoten()
+    html = [_kopf(3)]
+    html.append(
+        f"<p>Die Tabelle zeigt je Klimawirkung, die dieser Bericht in Euro beziffert, den "
+        f"Klimakennwert, der ihren Betrag treibt: gemessen in {_h(k.name)} (Deutscher "
+        f"Wetterdienst, Climate Data Center) und projiziert bis 2065 unter zwei Szenarien. "
+        f"RCP 4.5 steht für moderaten Klimaschutz, RCP 8.5 für eine Entwicklung weiter wie "
+        f"bisher.</p>")
+    kopf = "".join(f'<th class="zahl">{_h(SZENARIEN[sz])} {j}</th>'
+                   for sz in SZENARIEN for j in JAHRE_PROJEKTION)
+    html.append('<table class="klima"><tr><th>Klimawirkung (KWRA)</th><th>Kennwert</th>'
+                f'<th class="zahl">Beobachtung {_h(k.name)}, 2016–2025</th>{kopf}</tr>')
+    for z in d.klima:
+        zellen = "".join(f'<td class="zahl {sz}" data-jahr="{j}">{fn.zahl(z.projektion[sz][j])}</td>'
+                         for sz in SZENARIEN for j in JAHRE_PROJEKTION)
+        html.append(
+            f'<tr class="klimawirkung" data-kwra="{z.kwra_id}"><td>#{z.kwra_id} {_h(z.kwra_name)}</td>'
+            f"<td>{_h(z.kennwert)}</td>"
+            f'<td class="zahl beobachtung">{fn.zahl(z.beobachtung)}</td>{zellen}</tr>')
+    html.append("</table>")
+    for z in d.klima:
+        if z.beobachtung.wert is None:
+            continue
+        land = k.bundesland
+        anstieg = {sz: Klimazahl(z.projektion[sz][JAHRE_PROJEKTION[-1]].wert - z.start[sz].wert,
+                                 z.start[sz].quelle, z.start[sz].datenstand)
+                   for sz in SZENARIEN}
+        html.append(
+            f"<p>#{z.kwra_id} {_h(z.kwra_name)}: Die Projektion ist eine Reihe für {_h(land)}, "
+            f"nicht für {_h(k.name)}. Sie beginnt {JAHR_START} bei "
+            f"{fn.zahl(z.start['rcp45'])} {_h(z.einheit)} und steigt bis {JAHRE_PROJEKTION[-1]} "
+            f"unter RCP 4.5 um {fn.zahl(anstieg['rcp45'])}, unter RCP 8.5 um "
+            f"{fn.zahl(anstieg['rcp85'])} {_h(z.einheit)}. Gemessen hat der Deutsche Wetterdienst "
+            f"in {_h(k.name)} {fn.zahl(z.beobachtung)} {_h(z.einheit)} im Mittel der Jahre "
+            f"2016–2025. Übertragbar auf die Kommune ist der Anstieg, nicht der absolute Wert der "
+            f"Landesreihe: Wer die Landeswerte direkt mit der Messung vergleicht, liest den "
+            f"Unterschied zwischen Kommune und Land fälschlich als Klimawandel.</p>")
+    html.append("<p>Der Euro-Betrag in Teil 4 rechnet mit dem beobachteten Klima 2016–2025; die "
+                "Projektion zeigt, in welche Richtung sich die Belastung verschiebt, und geht "
+                "nicht in den Betrag ein (Teil 8). Einen Kartenausschnitt enthält diese Fassung "
+                "nicht.</p>")
+    html.append(fn.html())
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
 # ── Teil 4 ──────────────────────────────────────────────────────────────────────
 
 def _parameter_quelle(d: Berichtsdaten, param_id: str) -> str:
@@ -343,5 +428,5 @@ def teil_8(d: Berichtsdaten) -> str:
 
 
 TEILE: dict[int, Callable[[Berichtsdaten], str]] = {
-    0: teil_0, 1: teil_1, 2: teil_2, 4: teil_4, 7: teil_7, 8: teil_8,
+    0: teil_0, 1: teil_1, 2: teil_2, 3: teil_3, 4: teil_4, 7: teil_7, 8: teil_8,
 }
