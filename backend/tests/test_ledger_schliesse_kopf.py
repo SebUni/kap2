@@ -1,0 +1,151 @@
+"""Test für T-1533-ceo: `ledger.py --schliesse` darf beim Nachziehen der
+Kopfzählung nur die Überschriftszeile selbst treffen, nicht jedes Vorkommen der
+Zeichenkette im Fließtext.
+
+Anlass (Urteil zu T-1498-methodik_manager, Frage 3 des Prüfers): Im Ledger von
+#98 steht `## Geschlossene Befunde (243)` nicht nur als Überschrift, sondern
+auch in Befundtexten und Prüfausdrücken (Befunde 365, 368, 388). Die beiden
+`re.sub`-Aufrufe in `cmd_schliesse` liefen bisher unverankert über den ganzen
+Text und ohne `count`-Grenze — jedes Vorkommen der Kopfzahl wurde mitgeschrieben,
+auch mitten in Prosa und in Prüfausdrücken. Ein Prüfausdruck, der die Kopfzahl
+sucht, bestätigte sich damit selbst; alte Befundtexte änderten sich nachträglich.
+
+Der Mini-Ledger enthält Befund 1 (offen, grüner Prüfausdruck — wird geschlossen)
+und Befund 2 (bereits geschlossen; sein Befundtext **und** seine
+Prüfausdruck-Zelle enthalten die Zeichenkette `## Geschlossene Befunde (1)`
+mitten in der Zeile, nicht als eigene Überschriftszeile). Nach dem Schließen
+darf sich nur die echte Überschriftszeile ändern.
+"""
+
+from __future__ import annotations
+
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
+
+import ledger  # noqa: E402
+
+LEDGER_PFAD = Path(__file__).resolve().parents[2] / "backend" / "scripts" / "ledger.py"
+
+MINI_LEDGER = """# Befunde 99 (Test)
+
+## Geschlossene Befunde (1)
+
+| Nr | Befund (Ort · Art) | Kat | Status | Nachweis | Prüfausdruck |
+|---|---|---|---|---|---|
+| 1 | Bericht Kap. 1 · Lücke — Beispielbefund mit grünem Ausdruck | B | offen | – | `python3 -c "pass"` |
+| 2 | Bericht Kap. 2 · Lücke — Text erwähnt mitten im Satz "## Geschlossene Befunde (1)" als Zitat | B | geschlossen | Rev. 1 | `echo "## Geschlossene Befunde (1)"` |
+"""
+
+
+def test_schliesse_zieht_nur_ueberschriftszeile_nach(tmp_path: Path) -> None:
+    pfad = tmp_path / "BEFUNDE_99.md"
+    pfad.write_text(MINI_LEDGER, encoding="utf-8")
+
+    rc = ledger.cmd_schliesse(pfad)
+    assert rc == 0
+
+    text = pfad.read_text(encoding="utf-8")
+
+    # Überschrift trägt die neue Zahl (beide Befunde jetzt geschlossen).
+    ueberschriften = re.findall(r"^## Geschlossene Befunde \(\d+\)$", text, flags=re.M)
+    assert ueberschriften == ["## Geschlossene Befunde (2)"]
+
+    # Befundtext und Prüfausdruck-Zelle von Befund 2 sind zeichengleich unverändert
+    # — insbesondere trägt keine der beiden noch die alte Kopfzahl, weil sie nie
+    # verändert werden durften.
+    assert ('Text erwähnt mitten im Satz "## Geschlossene Befunde (1)" als Zitat'
+            in text)
+    assert 'echo "## Geschlossene Befunde (1)"' in text
+
+    befunde = {b.nr: b for b in ledger.parse(pfad)}
+    assert befunde["1"].lage == "geschlossen"
+    assert befunde["2"].lage == "geschlossen"
+
+
+def test_rotprobe_alter_unverankerter_ausdruck_schlaegt_fehl(tmp_path: Path) -> None:
+    """Belegt, dass der alte, nicht verankerte Ausdruck genau diesen Fall verletzt.
+
+    Baut eine Kopie von `ledger.py` mit dem alten `re.sub` (ohne `^…$`/`re.M` und
+    ohne `count=1`), stellt daneben eine Testdatei auf, die dieselbe Prüfung wie
+    `test_schliesse_zieht_nur_ueberschriftszeile_nach` gegen diese alte Kopie
+    ausführt, und lässt pytest selbst darüberlaufen. Erwartet wird die echte
+    pytest-Fehlschlagzeile ('FAILED …') mit AssertionError — nicht eine selbst
+    geschriebene Assert-Meldung.
+    """
+    alt_text = LEDGER_PFAD.read_text(encoding="utf-8")
+    neu_zeile_1 = ('    t = re.sub(r"^## Offene Befunde \\(\\d+\\)$", '
+                   'f"## Offene Befunde ({n_offen})", t,\n'
+                   '               count=1, flags=re.M)\n')
+    neu_zeile_2 = ('    t = re.sub(r"^## Geschlossene Befunde \\(\\d+\\)$", '
+                   'f"## Geschlossene Befunde ({n_zu})", t,\n'
+                   '               count=1, flags=re.M)\n')
+    assert neu_zeile_1 in alt_text
+    assert neu_zeile_2 in alt_text
+    alt_variante = alt_text.replace(
+        neu_zeile_1,
+        '    t = re.sub(r"## Offene Befunde \\(\\d+\\)", '
+        'f"## Offene Befunde ({n_offen})", t)\n',
+    ).replace(
+        neu_zeile_2,
+        '    t = re.sub(r"## Geschlossene Befunde \\(\\d+\\)", '
+        'f"## Geschlossene Befunde ({n_zu})", t)\n',
+    )
+    assert alt_variante != alt_text
+
+    alte_kopie = tmp_path / "ledger_alt.py"
+    alte_kopie.write_text(alt_variante, encoding="utf-8")
+
+    rotprobe_vorlage = (
+        '"""Generierte Rotprobe-Testdatei: dieselbe Pruefung wie\n'
+        'test_schliesse_zieht_nur_ueberschriftszeile_nach, aber gegen ledger_alt\n'
+        '(alter, unverankerter re.sub) statt gegen das reparierte ledger.py."""\n'
+        'import re\n'
+        'import sys\n'
+        '\n'
+        'sys.path.insert(0, {tmp_path!r})\n'
+        'import ledger_alt as ledger\n'
+        '\n'
+        'MINI_LEDGER = {mini_ledger!r}\n'
+        '\n'
+        '\n'
+        'def test_schliesse_zieht_nur_ueberschriftszeile_nach_ALT(tmp_path):\n'
+        '    pfad = tmp_path / "BEFUNDE_99.md"\n'
+        '    pfad.write_text(MINI_LEDGER, encoding="utf-8")\n'
+        '\n'
+        '    rc = ledger.cmd_schliesse(pfad)\n'
+        '    assert rc == 0\n'
+        '\n'
+        '    text = pfad.read_text(encoding="utf-8")\n'
+        '\n'
+        '    ueberschriften = re.findall(r"^## Geschlossene Befunde \\(\\d+\\)$", '
+        'text, flags=re.M)\n'
+        '    assert ueberschriften == ["## Geschlossene Befunde (2)"]\n'
+        '\n'
+        '    zitat = {zitat!r}\n'
+        '    ausdruck = {ausdruck!r}\n'
+        '    assert zitat in text\n'
+        '    assert ausdruck in text\n'
+    ).format(
+        tmp_path=str(tmp_path),
+        mini_ledger=MINI_LEDGER,
+        zitat='Text erwähnt mitten im Satz "## Geschlossene Befunde (1)" als Zitat',
+        ausdruck='echo "## Geschlossene Befunde (1)"',
+    )
+
+    rotprobe_test = tmp_path / "test_rotprobe_generiert.py"
+    rotprobe_test.write_text(rotprobe_vorlage, encoding="utf-8")
+
+    r = subprocess.run(
+        [sys.executable, "-m", "pytest", str(rotprobe_test), "-q"],
+        capture_output=True, text=True, cwd=str(tmp_path),
+    )
+    ausgabe = r.stdout + r.stderr
+    assert r.returncode != 0
+    assert "FAILED" in ausgabe
+    assert "test_schliesse_zieht_nur_ueberschriftszeile_nach_ALT" in ausgabe
+    assert "AssertionError" in ausgabe

@@ -61,6 +61,14 @@ _NOT_APPLICABLE_DERIVATION: dict[str, str] = {
     ),
 }
 
+#: Herleitung von ``default_reduction`` bei S157: Das Feld ist keine Kostenart; die
+#: Maßnahme wirkt nicht über eine pauschale Minderung (Vorgabe P1/P2, T-1410).
+_S157_NO_FLAT_REDUCTION_DERIVATION: dict[str, str] = {
+    key: ("Die Maßnahme wirkt nicht über eine pauschale Minderung, sondern über g_S157 "
+          "auf die Todesfälle ab 85 Jahren in Heimen, abhängig vom gekühlten Anteil s_gek.")
+    for key in ("wert", "band", "sensitivitaet")
+}
+
 # ``source`` in formulas._i steuert die Wertauflösung (const/cell/regional/…); diese Marker
 # sind keine belegbaren Quellen. Für die Anzeige greift dann ``doc_source`` oder ein
 # ehrlicher Modellannahme-Hinweis.
@@ -289,7 +297,10 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             # nie an den Wert 0.0 (anwendbare Nullwerte behalten ihre eigene
             # Herleitung).
             if not applicable and not ev_derivation:
-                ev_derivation = dict(_NOT_APPLICABLE_DERIVATION)
+                if field == "default_reduction" and m.get("effect_model") == "s157":
+                    ev_derivation = dict(_S157_NO_FLAT_REDUCTION_DERIVATION)
+                else:
+                    ev_derivation = dict(_NOT_APPLICABLE_DERIVATION)
             # Block-Kennung je Feld (Kapitel 7 des Methodik-Berichts), nur wenn anwendbar.
             block = (m.get("methodik_bloecke") or {}).get(field) if applicable else None
             params.append(_base_param(
