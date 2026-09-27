@@ -267,9 +267,11 @@ IMPACT_PARAM_SPECS: list[dict] = [
          "wert": "2/7: Jahrgänge 65 und 66 von den sieben Jahrgängen 60–66, gleich viele "
                  "Menschen je Jahrgang angenommen (Bericht #95 §3.3, Stufe 2, Schritt 1).",
          "band": "0/7 bis 7/7 (Gruppe 60–66 gar nicht oder ganz zu den Menschen ab 65).",
-         "sensitivitaet": "Faktor heute gegen Regel über das Band: Berlin × 0,925–0,998, "
-                          "Warmsen × 0,622–0,904 (Bericht #95 §3.3, Tabelle „Gemessene "
-                          "Wirkung“); die Richtung der Korrektur hängt an der Aufteilung nicht.",
+         "sensitivitaet": "Faktor heute gegen Regel über das Band: Berlin × 0,927–1,000, "
+                          "Warmsen × 0,651–0,947 (Bericht #95 §3.3, Tabelle „Gemessene "
+                          "Wirkung“); die Richtung der Korrektur hängt an der Aufteilung nicht. "
+                          "Modellgrenze ohne Gemeindeschlüssel (Zelle ohne Gemeindezuordnung "
+                          "rechnet nur Stufe 1, Befund 141): Berlin × 0,989, Warmsen × 0,838.",
      }},
     # ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5, Kapitel 7, Befunde 122, 124, 130) ──
     # Wirkt nur über die Maßnahme COOLING_ROOMS_DRINKING_WATER mit Eingabe s_gek
@@ -1708,21 +1710,28 @@ _HEAT_HERLEITUNG: dict[str, dict[str, str]] = {
         "wert": "0,357 / 0,588 / 0,631 / 1,0 (u65 / 65–74 / 75–84 / 85+) als Rückrechnung "
                 "aus den RKI-Altersanteilen der Hitzesterbefälle und den Sterbefällen "
                 "2023 mit linearer Näherung (Bericht #95 §3.3a, Anker #f-a).",
-        "band": "Der Bericht nennt kein eigenes Band für f_a; die lineare Näherung ist dort "
-                "als gekennzeichnete Abschätzung geführt.",
+        "band": "0,156–0,562 (u65) / 0,341–0,753 (65–74) / 0,588–0,659 (75–84) / 1,0 (85+, "
+                "per Definition): Rückrechnung mit den Altersanteilen der Hitzesommer 2025 "
+                "und 2026, eine Abschätzung von KAP3 (Bericht #95 §3.3a, §3.5, Befund 152).",
         "sensitivitaet": "f_a skaliert die RR-Steigung des Bandes (β_a = f_a × β_85+) und "
                          "damit den Wochenexzess des Bandes proportional; der Kalibrierfaktor "
-                         "c_kal gleicht die Summe über die Bänder wieder aus.",
+                         "c_kal gleicht die Summe über die Bänder wieder aus. Über das Band "
+                         "neu gefittet (c_kal 0,651 bzw. 0,534) liegt der Betrag für Berlin "
+                         "(Kette) bei 310,2–402,9 Mio. € je Jahr (Bericht #95 §5, Befund 152).",
     },
     "heat.l_restlebenserwartung": {
         "wert": "23,39 / 15,59 / 8,90 / 4,16 Jahre (u65 / 65–74 / 75–84 / 85+): Sterbetafel "
                 "2022/2024 an den Stützstellen e(60)/e(70)/e(80), eine Setzung von KAP3; "
                 "85+ sterbefallgewichtet über die Einzelaltersjahre 85–94 (Bericht #95 §3.5, "
                 "Anker #l-a).",
-        "band": "85+: 4,16–4,20 Jahre (Obergrenze mit der Stützstelle e(95) statt des "
-                "Mittelwerts 95+). Für die drei jüngeren Bänder nennt der Bericht kein Band.",
+        "band": "23,39–28,64 (u65) / 15,31–15,59 (65–74) / 8,54–8,90 (75–84) / 4,16–4,20 "
+                "(85+) Jahre: Stützstelle bis sterbefallgewichteter Wert, eine Abschätzung "
+                "von KAP3 (Bericht #95 §3.5, Befund 152; 85+ Obergrenze mit der Stützstelle "
+                "e(95) statt des Mittelwerts 95+).",
         "sensitivitaet": "Linear: Die verlorenen Lebensjahre (YLL) eines Bandes wachsen im "
-                         "gleichen Verhältnis wie L̄_a; die Zahl der Sterbefälle bleibt gleich.",
+                         "gleichen Verhältnis wie L̄_a; die Zahl der Sterbefälle bleibt "
+                         "gleich. Über das Band liegt der Betrag für Berlin (Kette) bei "
+                         "357,3–381,1 Mio. € je Jahr (Bericht #95 §5, Befund 152).",
     },
     "heat.r0_einweisungsrate": {
         "wert": "1,9 / 6,3 / 10,8 / 15,6 je 100.000 und Jahr (u65 / 65–74 / 75–84 / 85+), "
