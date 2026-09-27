@@ -125,8 +125,32 @@ export interface MeasureImpactSummary {
   benefit_display?: string | null
   /** Zusatz „ohne x Wirkungen im Screening“ zum Euro-Nutzen einer gemischten Maßnahme. */
   benefit_note?: string | null
-  /** S157 (#95 §5): gekühlter Anteil der Heimplätze 0..1, Eingabe der Kommune; null = nicht eingegeben (kein Betrag). */
+  /** S157 (#95 §5): gerechneter gekühlter Anteil der Heimplätze 0..1 — Eingabe der Kommune
+   *  oder, ohne Eingabe, die Voreinstellung 0,11 (Block heat.s_gek, Befund 138). */
   s_gek?: number | null
+  /** S157: true, wenn die Voreinstellung gilt (keine Eingabe der Kommune). */
+  s_gek_is_default?: boolean
+  /** S157: abgezogener Stand der Kalibrierjahre (Block heat.s_gek_kalib, 0,06). */
+  s_gek_kalib?: number
+  /** S157: Kennzeichnung des Betrags als Abschätzung von KAP3 (P2). */
+  s157_estimate_note?: string | null
+  /** COOLING_ROOMS_DRINKING_WATER: Anteil S157 (gekühlte Heimplätze) am vermiedenen Schaden. */
+  s157_benefit_eur?: number
+  /** COOLING_ROOMS_DRINKING_WATER: Anteil der öffentlichen Kühlzentren am vermiedenen
+   *  Schaden (Befunde 139/148); mit s157_benefit_eur zusammen annual_benefit_damage_eur. */
+  kuehlzentren_benefit_eur?: number
+  /** Kühlzentren: Faktor δ_KZ (Block heat.delta_kuehlzentren). */
+  delta_kuehlzentren?: number
+  /** Kühlzentren: Kennzeichnung des Betrags als Abschätzung von KAP3 (P2). */
+  kuehlzentren_estimate_note?: string | null
+  /** Kühlzentren: true, wenn Schutzprogramme in der Kappung mitgerechnet sind. */
+  kuehlzentren_with_vg?: boolean
+  /** Wächter-Frage „Lief das Programm schon 2012–2024?“ (Befund 150): 1 = ja, 0 = nein. */
+  vg_in_kalibrierjahren?: number
+  /** Wächter-Frage: true, wenn die Voreinstellung „nein“ gilt. */
+  vg_in_kalibrierjahren_is_default?: boolean
+  /** Wächter-Frage: Kennzeichnung der Voreinstellung als Abschätzung von KAP3. */
+  vg_in_kalibrierjahren_estimate_note?: string | null
   /** Name der fehlenden Eingabe, wenn deshalb kein Betrag entsteht (S157: "s_gek";
    *  S158: "pollen_group_split"; Stadtbaumwahl: "anteil_ersetzt" oder "canopy"). */
   benefit_missing_input?: string | null
@@ -446,6 +470,17 @@ export interface PlannedRisk {
   exposure_names: string[]
 }
 
+/** Eingabe der Kommune an einer Katalog-Maßnahme (catalog.py, ``config_inputs``). */
+export interface ConfigInputSpec {
+  frage: string
+  typ: string
+  werte?: Record<string, number>
+  voreinstellung?: number
+  voreinstellung_text?: string
+  kennzeichnung?: string
+  parameter?: string
+}
+
 export interface CatalogMeasure {
   code: string
   name: string
@@ -473,6 +508,9 @@ export interface CatalogMeasure {
   /** Nutzersichtbarer Eingabetext samt Herkunft je config-Feld (Vorgabe P1), z. B.
    *  anteil_ersetzt bei LOW_ALLERGEN_TREE_SELECTION (T-1603-cto). */
   config_input_help?: Record<string, string>
+  /** Eingaben der Kommune mit Frage, Typ und Voreinstellung, z. B. vg_in_kalibrierjahren
+   *  (Bericht #95 §5, Befund 150). */
+  config_inputs?: Record<string, ConfigInputSpec>
   kang_cluster?: string
   kang_field?: string
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useStore } from '../store'
 import InfoTooltip from './InfoTooltip'
 import type { MeasureImpactSummary } from '../types'
-import { measureReductionText } from '../utils/measureEffect'
+import { measureReductionText, S157_S_GEK_DEFAULT_PCT, VG_KALIB_FRAGE } from '../utils/measureEffect'
 
 export default function MeasureSidebar() {
   const { selectedMeasure, setSelectedMeasure, calculateImpact, deleteMeasure, updateMeasure, catalog } = useStore()
@@ -11,8 +11,12 @@ export default function MeasureSidebar() {
   const [editName, setEditName] = useState('')
   const [editYear, setEditYear] = useState<number>(2026)
   const [editCount, setEditCount] = useState<number | null>(null)
-  // S157 (#95 §5): gekühlter Anteil der Heimplätze in Prozent; null = keine Eingabe.
+  // S157 (#95 §5): gekühlter Anteil der Heimplätze in Prozent; null = keine Eingabe
+  // (dann rechnet das Backend mit der Voreinstellung 11 %, Befund 138).
   const [editSgek, setEditSgek] = useState<number | null>(null)
+  // Wächter-Frage (#95 §5, Befund 150): 1 = ja, 0 = nein; null = keine Eingabe
+  // (dann gilt die Voreinstellung „nein“).
+  const [editVgKalib, setEditVgKalib] = useState<number | null>(null)
   // Stadtbaumwahl (#96 §5, T-1603-cto): Anteil ersetzter allergener Kronen in Prozent;
   // null = keine Eingabe.
   const [editAnteilErsetzt, setEditAnteilErsetzt] = useState<number | null>(null)
@@ -29,6 +33,9 @@ export default function MeasureSidebar() {
       setEditSgek(typeof sg === 'number' ? Math.round(sg * 1000) / 10 : null)
       const ae = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.anteil_ersetzt
       setEditAnteilErsetzt(typeof ae === 'number' ? Math.round(ae * 1000) / 10 : null)
+      const vk = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.vg_in_kalibrierjahren
+      setEditVgKalib(typeof vk === 'number' ? (vk >= 0.5 ? 1 : 0)
+        : typeof vk === 'boolean' ? (vk ? 1 : 0) : null)
       setShowBreakdown(false)
       setDirty(false)
       setImpact(null)
@@ -51,6 +58,11 @@ export default function MeasureSidebar() {
   const isS157 = selectedMeasure.measure_type === 'COOLING_ROOMS_DRINKING_WATER'
   const isS158 = selectedMeasure.measure_type === 'POLLEN_EARLY_WARNING'
   const isStadtbaum = selectedMeasure.measure_type === 'LOW_ALLERGEN_TREE_SELECTION'
+  // Wächter-Frage „Lief das Programm schon 2012–2024?“ (Befund 150): Schutzprogramme und
+  // Kühle Räume / Kühlzentren.
+  const hasVgKalib = isS157 || selectedMeasure.measure_type === 'VULNERABLE_GROUP_PROGRAMS'
+  const vgKalibSpec = def?.config_inputs?.vg_in_kalibrierjahren
+  const vgKalibHelp = def?.config_input_help?.vg_in_kalibrierjahren
   const anteilErsetztHelp = def?.config_input_help?.anteil_ersetzt
   const reductionIsEstimated = def?.evidence_classes?.default_reduction === 'abgeschaetzt'
   const linkedRisks = (def?.linked_risk_codes || [])
@@ -74,6 +86,12 @@ export default function MeasureSidebar() {
         const base = { ...((payload.config as Record<string, unknown>) || selectedMeasure.config || {}) }
         if (editSgek == null) delete base.s_gek
         else base.s_gek = Math.max(0, Math.min(100, editSgek)) / 100
+        payload.config = base
+      }
+      if (hasVgKalib) {
+        const base = { ...((payload.config as Record<string, unknown>) || selectedMeasure.config || {}) }
+        if (editVgKalib == null) delete base.vg_in_kalibrierjahren
+        else base.vg_in_kalibrierjahren = editVgKalib
         payload.config = base
       }
       if (isStadtbaum) {
@@ -204,14 +222,46 @@ export default function MeasureSidebar() {
               <h3>Gekühlter Anteil der Heimplätze (%)</h3>
               <input
                 type="number" min={0} max={100} step={1} value={editSgek ?? ''}
-                placeholder="nicht eingegeben"
+                placeholder={`Voreinstellung ${S157_S_GEK_DEFAULT_PCT} %`}
                 onChange={e => { setEditSgek(e.target.value === '' ? null : Number(e.target.value)); setDirty(true) }}
                 style={{ fontSize: '0.9rem', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 6px', width: 120, background: 'var(--surface)' }}
               />
               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
-                Nur Heimplätze mit Klimaanlage im Wohnbereich zählen. Ohne Eingabe entsteht kein Betrag
-                (Methodik-Bericht #95, Hebel S157).
+                Nur Heimplätze mit Klimaanlage im Wohnbereich zählen. Ohne Eingabe rechnet KAP3 mit der
+                Voreinstellung {S157_S_GEK_DEFAULT_PCT} % (Abschätzung von KAP3; Methodik-Bericht #95, Hebel S157).
               </div>
+              {impact.s_gek_is_default && (
+                <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4 }}>
+                  Gerechnet mit der Voreinstellung{impact.s_gek != null
+                    ? ` ${(impact.s_gek * 100).toLocaleString('de-DE', { maximumFractionDigits: 1 })} %` : ''}
+                  {' '}({impact.s157_estimate_note || 'Abschätzung von KAP3'})
+                </div>
+              )}
+            </div>
+          )}
+
+          {hasVgKalib && (
+            <div className="card">
+              <h3>{VG_KALIB_FRAGE}</h3>
+              <select
+                value={String(editVgKalib ?? impact.vg_in_kalibrierjahren ?? vgKalibSpec?.voreinstellung ?? 0)}
+                onChange={e => { setEditVgKalib(Number(e.target.value)); setDirty(true) }}
+                style={{ fontSize: '0.9rem', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 6px', background: 'var(--surface)' }}
+              >
+                <option value="0">nein</option>
+                <option value="1">ja</option>
+              </select>
+              {(editVgKalib == null && impact.vg_in_kalibrierjahren_is_default !== false) && (
+                <span className="kap-prov-badge" style={{ marginLeft: 8 }}>
+                  Voreinstellung „{vgKalibSpec?.voreinstellung_text || 'nein'}“
+                  ({impact.vg_in_kalibrierjahren_estimate_note || vgKalibSpec?.kennzeichnung || 'Abschätzung von KAP3'})
+                </span>
+              )}
+              {vgKalibHelp && (
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                  {vgKalibHelp}
+                </div>
+              )}
             </div>
           )}
 
@@ -315,6 +365,28 @@ export default function MeasureSidebar() {
                 ? impact.benefit_display
                 : <>{fmtEur(impact.annual_benefit_eur)}{impact.benefit_note && <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{impact.benefit_note}</span>}</>}</span>
             </div>
+            {isS157 && !impact.benefit_display && impact.kuehlzentren_benefit_eur != null && (
+              <div style={{ marginTop: 4, fontSize: '0.8rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>davon gekühlte Heimplätze (S157)</span>
+                  <span style={{ color: 'var(--success)' }}>{fmtEur(impact.s157_benefit_eur)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>davon öffentliche Kühlzentren</span>
+                  <span style={{ color: 'var(--success)' }}>{fmtEur(impact.kuehlzentren_benefit_eur)}</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4, lineHeight: 1.4 }}>
+                  Beide Beträge sind eine Abschätzung von KAP3: S157 mit dem gekühlten Anteil
+                  {impact.s_gek != null
+                    ? ` ${(impact.s_gek * 100).toLocaleString('de-DE', { maximumFractionDigits: 1 })} %` : ''}
+                  {impact.s_gek_is_default ? ' (Voreinstellung)' : ' (Eingabe der Kommune)'}, Kühlzentren mit δ_KZ
+                  {impact.delta_kuehlzentren != null
+                    ? ` ${impact.delta_kuehlzentren.toLocaleString('de-DE', { maximumFractionDigits: 4 })}` : ''}
+                  {impact.vg_in_kalibrierjahren === 1 ? ' — Kühlzentren liefen schon 2012–2024, daher kein Zusatzbetrag' : ''}
+                  {' '}(Methodik-Bericht #95 §5).
+                </div>
+              </div>
+            )}
             {isS158 && !impact.benefit_display && impact.s158_estimate_note && (
               <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4 }}>
                 {impact.s158_estimate_note}
