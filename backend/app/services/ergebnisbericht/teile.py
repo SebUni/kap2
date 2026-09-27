@@ -197,8 +197,8 @@ def teil_2(d: Berichtsdaten, checkliste: str | os.PathLike | None = None) -> str
         f"{zaehlung['offen']} offen. Wo eine Anforderung nicht voll erfüllt ist, nennt die "
         f"Spalte „Lücke“, was fehlt.</p>")
     html.append(
-        f"<p>Die KWRA 2021 bewertet 102 Klimawirkungen; im Bericht sind davon die Klimawirkungen "
-        f"des Produktkatalogs erfasst ({_h(d.beziffert_text)}).</p>")
+        f"<p>Die KWRA 2021 bewertet 102 Klimawirkungen. Dieser Bericht erfasst die Klimawirkungen "
+        f"des Produktkatalogs ({_h(d.beziffert_text)}).</p>")
     html.append('<table class="konformitaet"><tr><th>Nr</th><th>Anforderung</th><th>Quelle</th>'
                 '<th>Fundstelle</th><th>Status</th><th>Lücke</th></tr>')
     for z in zeilen:
@@ -297,11 +297,16 @@ def teil_3(d: Berichtsdaten) -> str:
 
 def _parameter_quelle(d: Berichtsdaten, param_id: str) -> str:
     """Kennzeichnung eines Parameters wie in Teil 7 (Quelle oder ausgewiesene Abschätzung von KAP3),
-    aus denselben Parameterdaten (``d.parameter``, ``_herkunft``), nicht als fester Text (Vorgabe P1)."""
+    aus denselben Parameterdaten (``d.parameter``, ``_herkunft``), nicht als fester Text (Vorgabe P1).
+
+    Eine unbekannte Kennung liefert keine leere Quellenzelle: Ein Bericht mit leerem Feld wird nicht
+    erzeugt (P1, Entscheidung des CEO, 27.09.2026), deshalb bricht die Erzeugung mit ``ValueError``
+    ab und nennt die Kennung.
+    """
     for p in d.parameter:
         if p.get("id") == param_id:
             return _herkunft(p)
-    return ""
+    raise ValueError(f"Parameter {param_id!r} ist in d.parameter nicht enthalten")
 
 
 def teil_4(d: Berichtsdaten) -> str:

@@ -90,6 +90,15 @@ def test_teil_2_ist_im_bericht():
     assert TEILE[2] is teil_2
 
 
+def test_einleitung_ohne_davon_mit_zwei_saetzen(teil):
+    # T-1561: „davon“ legt nahe, der Produktkatalog sei eine Teilmenge der 102 KWRA-Klimawirkungen —
+    # das stimmt nicht, der Katalog hat mehr Einträge. Deshalb zwei eigenständige Sätze.
+    assert "davon" not in teil
+    assert "Die KWRA 2021 bewertet 102 Klimawirkungen." in teil
+    assert ("Dieser Bericht erfasst die Klimawirkungen des Produktkatalogs "
+            "(1 von 139 Klimawirkungen in Euro beziffert).") in teil
+
+
 # (a) ─────────────────────────────────────────────────────────────────────────
 
 def test_a_gleich_viele_zeilen_wie_checkliste(teil):
