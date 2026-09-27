@@ -12,13 +12,17 @@ prüfbar ist, prüft `backend/scripts/lint_methodik.py` — vom Zahlenformat nur
 ## Zahlen und Beträge
 
 - Dezimalkomma, Tausenderpunkt ab 1.000 (nicht in Jahreszahlen, Postleitzahlen und Kennungen): `2,5`, `1.250,50 €`, `12.400`.
-- Beträge ab einer Million in Millionen oder Milliarden mit einer oder zwei Nachkommastellen: `1,2 Mio. €`,
-  `3,45 Mrd. €` — nie `1.200.000 €`, nie `1200000 €`, nie „1,2 Millionen Euro“. Darunter ausgeschrieben: `350.000 €`.
+- Beträge ab einer Million in Millionen oder Milliarden mit höchstens zwei Nachkommastellen: `1,2 Mio. €`,
+  `11,7 Mio. €`, `339 Mio. €`, `3,45 Mrd. €` — nie `1.200.000 €`, nie `1200000 €`, nie „1,2 Millionen Euro“. Darunter
+  ausgeschrieben: `350.000 €`. Die Rundungsregel (höchstens drei gültige Stellen) geht vor; eine Nachkommastelle wird
+  nicht aufgefüllt: `339 Mio. €`, nicht `339,0 Mio. €`.
 - Euro immer als `€` nach der Zahl mit Leerzeichen (`12 €`), nie `EUR` im Fließtext.
 - Rundung: so genau wie die Quelle; im Fließtext und in Übersichten höchstens drei gültige Stellen, in Rechenketten und
   Herleitungen die Stellen der Rechnung.
 - Prozent mit Leerzeichen: `12 %`; Prozentpunkte `3 Pp.`; Promille `4 ‰`.
 - Spannen mit Halbgeviertstrich ohne Leerzeichen: `0,3–1,4`; mit Einheit einmal am Ende: `12–18 %`.
+- Spannen mit Vorzeichen oder negativer Grenze mit Auslassungszeichen zwischen Leerzeichen, weil ein Halbgeviertstrich
+  neben dem Minuszeichen nicht lesbar ist: `−10,1 … +2,0 %`; Minus immer als `−` (U+2212).
 
 ## Einheiten, Datum, Zeit
 
