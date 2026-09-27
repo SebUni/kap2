@@ -1,13 +1,16 @@
 """T-0759: Zeile 16 der Konformitäts-Checkliste gegen die genannten Belege
 abgesichert; seit der Gegenprobe T-0928-cto steht sie auf 'teilweise'.
+T-1171-cto hat die Belegspalte auf die zehn Pfade erweitert, die die
+Anforderungen A1 bis A13 der Gegenprobe (ab Z. 843) heute im Produkt
+abdecken.
 
 Prüft wörtlich gegen docs/KONFORMITAET_CHECKLISTE.md:
 - es gibt genau eine Zeile, die mit '| 16 |' beginnt,
 - diese Zeile hat sieben Spalten,
 - fünfte Spalte (Status) ist genau 'teilweise',
-- sechste Spalte (Fundstelle/Beleg) ist genau die vier erwarteten Pfade,
+- sechste Spalte (Fundstelle/Beleg) ist genau die zehn erwarteten Pfade,
 - siebte Spalte (Lücke) ist genau der erwartete Satz,
-- jeder der vier genannten Pfade existiert als Datei im Repo.
+- jeder der zehn genannten Pfade existiert als Datei im Repo.
 """
 
 from pathlib import Path
@@ -19,7 +22,13 @@ ERWARTETE_BELEGE = (
     "backend/app/data/bestandsaufnahme.py, "
     "backend/app/services/bestandsaufnahme_service.py, "
     "backend/app/services/bestandsaufnahme_markdown.py, "
-    "docs/BESTANDSAUFNAHME.md"
+    "docs/BESTANDSAUFNAHME.md, "
+    "backend/app/services/kommune_profile_service.py, "
+    "backend/app/services/climate/dwd_data.py, "
+    "backend/app/data/bevoelkerungsentwicklung.py, "
+    "backend/app/data/catrare.py, "
+    "backend/app/data/vorhandene_untersuchungen.py, "
+    "backend/app/services/bestandsaufnahme_handlungsfelder.py"
 )
 ERWARTETE_LUECKE = (
     "Die Bestandsaufnahme erfasst vulnerable Personengruppen und klimasensible "
@@ -80,7 +89,7 @@ def test_zeile_16_luecke_ist_exakt():
 
 def test_zeile_16_belegte_pfade_existieren():
     pfade = [pfad.strip() for pfad in ERWARTETE_BELEGE.split(",")]
-    assert len(pfade) == 4
+    assert len(pfade) == 10
     for pfad in pfade:
         datei = REPO_ROOT / pfad
         assert datei.is_file(), f"Beleg-Datei fehlt: {pfad}"
