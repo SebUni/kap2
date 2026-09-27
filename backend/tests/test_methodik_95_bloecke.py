@@ -63,7 +63,10 @@ def test_block_kennungen_der_registry_sind_genau_die_23_aus_kapitel_7():
     # Gegenzählung ohne YAML-Parser: jede "id:"-Zeile nach "parameter:".
     roh = re.findall(r"^parameter:\n  id: (\S+)", _kapitel7(), re.M)
     assert len(roh) == 23 and set(roh) == soll, sorted(roh)
-    ist = {p["methodik_block"] for p in _registry() if p.get("methodik_block")}
+    # Nur Kennungen von #95 (heat.*): seit T-1480 tragen auch die #96-Parameter
+    # Block-Kennungen (pollen.*), die nicht in diesem Kapitel 7 stehen.
+    ist = {p["methodik_block"] for p in _registry()
+           if (p.get("methodik_block") or "").startswith("heat.")}
     assert ist == soll, (f"fehlen in der Registry: {sorted(soll - ist)}; "
                          f"nicht in Kapitel 7: {sorted(ist - soll)}")
 
