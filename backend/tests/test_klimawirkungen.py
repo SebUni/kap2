@@ -141,3 +141,37 @@ def test_build_cost_summary_baut_klimawirkungen_ohne_feld_im_cache_nach(monkeypa
 
 def test_schema_version_ist_2():
     assert _SUMMARY_SCHEMA_VERSION == 2
+
+
+def test_klasse_a_teilzeile_ohne_betrag_bricht_nicht_ab_summe_der_anderen():
+    """T-1560-ceo: eine Klasse-A-Teilzeile mit ``cost_eur: None`` (Betrag fehlt für eine
+    Kommune) bricht ``klimawirkungen()`` nicht mit ``TypeError`` ab — die Gruppe summiert
+    nur die Teilzeile mit Betrag."""
+    zeile_ohne_betrag = dict(ZEILE_MORTALITAET, cost_eur=None)
+    eintraege = klimawirkungen([zeile_ohne_betrag, dict(ZEILE_MORBIDITAET)])
+    treffer_95 = next(e for e in eintraege if e["kwra_id"] == 95)
+    assert treffer_95["cost_eur"] == 500.0
+
+
+def test_einzelne_klasse_a_zeile_ohne_betrag_ist_none_und_steht_hinter_den_bezifferten():
+    """Hat keine Teilzeile eines Eintrags einen Betrag, ist ``cost_eur`` ``None`` — nie
+    ``0`` (Vorgabe P2) —, und der Eintrag steht in der Sortierung hinter allen
+    Klasse-A-Einträgen mit Betrag."""
+    zeile_ohne_betrag = {"code": "OHNE_BETRAG", "name": "Wirkung ohne Betrag",
+                         "kwra_id": 99, "cost_eur": None, "has_euro_layer": True}
+    eintraege = klimawirkungen([dict(ZEILE_MORTALITAET), zeile_ohne_betrag])
+    treffer_99 = next(e for e in eintraege if e["kwra_id"] == 99)
+    assert treffer_99["cost_eur"] is None
+    positionen = [e["kwra_id"] for e in eintraege]
+    assert positionen.index(99) > positionen.index(95)
+
+
+def test_risk_class_ist_die_hoechste_der_teilzeilen():
+    """Teilzeilen ``gering`` und ``hoch`` ergeben ``risk_class == "hoch"`` (Entscheidung
+    des CEO vom 27.09.2026: eine Zusammenfassung zeigt ein Risiko nie kleiner als
+    einer ihrer Teile)."""
+    zeile_gering = dict(ZEILE_MORTALITAET, risk_class="gering")
+    zeile_hoch = dict(ZEILE_MORBIDITAET, risk_class="hoch")
+    eintraege = klimawirkungen([zeile_gering, zeile_hoch])
+    treffer_95 = next(e for e in eintraege if e["kwra_id"] == 95)
+    assert treffer_95["risk_class"] == "hoch"

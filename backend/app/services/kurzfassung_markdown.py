@@ -134,14 +134,12 @@ def _abschnitt_klimawirkungen(aggregat: dict) -> str:
     „Hitzebelastung (#95)“), Teilzeilen einer zusammengefassten Klimawirkung
     (etwa Mortalität + Erkrankungen) eingerückt darunter — wie in der
     Kostentabelle des Dashboards (``CostTablesSection.tsx``, T-1470-cto)."""
-    zeilen_by_code = {r["code"]: r for r in aggregat["cost"]["by_risk"]}
     zeilen = [
         "| Klimawirkung | Erwarteter Schaden pro Jahr | Risikoklasse |",
         "| --- | --- | --- |",
     ]
     for e in _teuerste_klimawirkungen(aggregat):
-        rows = [zeilen_by_code[code] for code in e["codes"]]
-        klasse = _risk_class_label(rows[0])
+        klasse = _risk_class_label(e)
         zeilen.append(f"| {e['bezeichnung']} | {_de_euro(e['cost_eur'])} | {klasse} |")
         for teil in e["teile"]:
             zeilen.append(f"| &nbsp;&nbsp;{teil['name']} | {_de_euro(teil['cost_eur'])} | {_risk_class_label(teil)} |")
