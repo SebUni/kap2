@@ -470,7 +470,7 @@ es nur Stufe 1, und die Zellen der Stufe 2 behalten 65+ = 0. Der Betrag liegt da
 den Anteil ab 65 liest: Es ist eine Methodik, deshalb nutzen auch die Hitze-Kennzahlen der Übersicht und der Rückfallpfad
 ohne Altersbänder den Ersatzwert (Befund 142).
 *Toleranz (Befunde 140 und 145).* Ein Nachrechnen trifft den Betrag, wenn es um höchstens ± 0,29 % des Betrags
-abweicht: Berlin ± 1 Mio. € um 342,67 Mio. €, Warmsen ± 505 € um 173.099 €. Die Toleranz deckt die Rundung der
+(1 Mio. € / 342,67 Mio. € = 0,2918 %) abweicht: Berlin ± 1 Mio. € um 342,67 Mio. €, Warmsen ± 505 € um 173.099 €. Die Toleranz deckt die Rundung der
 Faktoren und der Wochenquantile ab (§3.2: mit der Datei 342,58 Mio. € und 172.957 €). 362,9, 342,67 und 343 Mio. € meinen
 zwei Rechnungen: 362,9 ist die Kette an einem Punkt (§3.0), 342,67 der Zelllauf mit ungerundeten Faktoren, 343 derselbe
 Zelllauf aus den gerundeten Faktoren im Prüfblock §3.0 (362,9 × 0,934 nach Teilung durch 0,9888 = 342,8; mit dem

@@ -1458,8 +1458,8 @@ IMPACT_GLOBAL_SPECS += _infra_value_specs()
 # aus dem er stammt. Ein Block kann mehrere Parameter tragen (je Region oder
 # Altersband). Die Kostensätze heat.voly und heat.c_fall stehen am Risiko im Katalog
 # (cost_methodik_block), heat.delta_hap an der Maßnahme HEAT_ACTION_PLANS
-# (methodik_bloecke). anteil_60_66_ab65 ist kein Block in Kapitel 7 (Ersatzregel §3.3)
-# und bleibt ohne Kennung. Geprüft in tests/test_methodik_95_bloecke.py.
+# (methodik_bloecke). anteil_60_66_ab65 trägt seit Runde 31 (Befund 141) den Block
+# heat.anteil_60_66 (Ersatzregel §3.3, Stufe 2). Geprüft in tests/test_methodik_95_bloecke.py.
 _HEAT_BLOECKE: dict[tuple[str, str], str] = {
     **{("EXPECTED_ANNUAL_MORTALITY", f"threshold_{r}"): "heat.t0_region"
        for r in ("nord", "mitte", "sued")},
@@ -1482,6 +1482,7 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
     ("EXPECTED_ANNUAL_MORTALITY", "ror_s157"): "heat.ror_s157",
     ("EXPECTED_ANNUAL_MORTALITY", "g_s157"): "heat.g_s157",
     ("EXPECTED_ANNUAL_MORTALITY", "delta_vg"): "heat.delta_vg",
+    ("EXPECTED_ANNUAL_MORTALITY", "anteil_60_66_ab65"): "heat.anteil_60_66",
     **{("EXPECTED_ANNUAL_MORBIDITY", f"r0_{a}"): "heat.r0_einweisungsrate"
        for a in ("u65", "a65_74", "a75_84", "a85p")},
     ("EXPECTED_ANNUAL_MORBIDITY", "excess_per_hotday"): "heat.e_hd",
@@ -1490,7 +1491,8 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
 }
 # Kennzeichnung je Block nach Kapitel 7 (Feld ``kennzeichnung``), übersetzt in die
 # Evidenzklasse der Parameterliste (P1): quelle → belegt, abschaetzung_kap3 →
-# abgeschaetzt, berechnet → berechnet. 9 × belegt, 11 × abgeschaetzt, 3 × berechnet.
+# abgeschaetzt, berechnet → berechnet. 10 × belegt, 12 × abgeschaetzt, 2 × berechnet
+# (Runde 31: heat.beta_iso steht auf quelle, heat.anteil_60_66 ist neu).
 # Die Klasse der drei Katalog-Blöcke (heat.voly, heat.c_fall, heat.delta_hap) steht
 # in data/catalog.py. Geprüft in tests/test_methodik_95_kennzeichnung.py.
 _HEAT_KLASSE: dict[str, str] = {
@@ -1501,7 +1503,7 @@ _HEAT_KLASSE: dict[str, str] = {
     "heat.l_restlebenserwartung": "abgeschaetzt",
     "heat.c_kal": "berechnet",
     "heat.q_wochenquantile": "belegt",
-    "heat.beta_iso": "berechnet",
+    "heat.beta_iso": "belegt",
     "heat.beta_pfl": "berechnet",
     "heat.beta_dist_sensitivitaet": "abgeschaetzt",
     "heat.qbar_1p": "belegt",
@@ -1510,6 +1512,7 @@ _HEAT_KLASSE: dict[str, str] = {
     "heat.ror_s157": "belegt",
     "heat.g_s157": "abgeschaetzt",
     "heat.delta_vg": "abgeschaetzt",
+    "heat.anteil_60_66": "abgeschaetzt",
     "heat.delta_vg_morb": "abgeschaetzt",
     "heat.r0_einweisungsrate": "abgeschaetzt",
     "heat.e_hd": "belegt",
