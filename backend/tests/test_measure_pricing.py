@@ -16,6 +16,8 @@ Läuft mit pytest oder direkt: ``python tests/test_measure_pricing.py``.
 
 from __future__ import annotations
 
+import re
+
 from app.data import catalog, catalog_parked, sources
 from app.services import parameter_registry
 from app.services.measure_service import (
@@ -135,22 +137,28 @@ def test_source_refs_resolve_to_bibliography():
     assert not bad, f"Unbekannte source_refs-Keys: {bad}"
 
 
+_WAYBACK_PERMALINK = re.compile(r"^https://web\.archive\.org/web/\d{14}/.+")
+
+
 def test_bibliography_entries_are_complete():
     """Jeder Bibliografie-Eintrag trägt IEEE-Zitation, Live-URL und Archiv-Snapshot.
 
     `archive_url` ist für jeden Eintrag Pflicht (T-1531-ceo, nimmt die Lockerung aus T-1410
     zurück: die galt nur, weil es damals keinen echten Schnappschuss für den ICAO-Eintrag gab —
     seit T-1511-cto trägt er einen, und eine Ausnahme für Einträge ohne Schnappschuss ist keine
-    dauerhafte Lücke, sonst gingen künftige Quellen ohne Schnappschuss unbemerkt durch).
+    dauerhafte Lücke, sonst gingen künftige Quellen ohne Schnappschuss unbemerkt durch). Das
+    Format ist ein absoluter Wayback-Permalink mit vollem 14-stelligem Zeitstempel
+    (`https://web.archive.org/web/<14 Ziffern>/…`) — eine bloße Jahreszahl statt Zeitstempel
+    ist kein Beleg für einen echten Schnappschuss.
     """
     bad = []
     for key, entry in sources.SOURCE_REFERENCES.items():
         for field in ("ieee", "url", "archive_url"):
             if not entry.get(field):
                 bad.append((key, field))
-        if entry.get("archive_url") and not entry["archive_url"].startswith(
-                "https://web.archive.org/web/"):
-            bad.append((key, "archive_url ist kein absoluter Wayback-Permalink"))
+        if entry.get("archive_url") and not _WAYBACK_PERMALINK.match(entry["archive_url"]):
+            bad.append((key, "archive_url ist kein absoluter Wayback-Permalink "
+                             "mit 14-stelligem Zeitstempel"))
     assert not bad, f"Unvollständige Bibliografie-Einträge: {bad}"
 
 

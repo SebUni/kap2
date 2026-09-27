@@ -30,7 +30,8 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Deutschland (GENESIS-Online),“ Düsseldorf, Deutschland. [Online]. "
                 "Verfügbar: https://www.regionalstatistik.de. [Zugriff: 6. Juli 2026].",
         "url": "https://www.regionalstatistik.de",
-        "archive_url": "https://web.archive.org/web/2026/https://www.regionalstatistik.de/",
+        "archive_url": "https://web.archive.org/web/20260907022126/"
+                       "https://www.regionalstatistik.de/",
         "accessed": "2026-07-06",
     },
     "BuGG_Marktreport_2024": {
@@ -501,7 +502,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Restzone; die Letalität je exponierter Person unterscheidet sich zwischen "
                 "Sturzflut- und Langsam-Anstiegs-Regime um Größenordnungen. [Zugriff: 2. August 2026].",
         "url": "https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1753-318X.2008.00006.x",
-        "archive_url": "https://web.archive.org/web/2026/"
+        "archive_url": "https://web.archive.org/web/20250811152042/"
                        "https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1753-318X.2008.00006.x",
         "accessed": "2026-08-02",
     },
@@ -512,7 +513,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Deutschland, 2021. Ereignisdokumentation der Ahr-/Erft-Flut mit Todesopfern "
                 "und Schadensbild. [Zugriff: 2. August 2026].",
         "url": "https://www.cedim.kit.edu/download/FDA_HochwasserJuli2021_Bericht1.pdf",
-        "archive_url": "https://web.archive.org/web/2026/"
+        "archive_url": "https://web.archive.org/web/20260725032322/"
                        "https://www.cedim.kit.edu/download/FDA_HochwasserJuli2021_Bericht1.pdf",
         "accessed": "2026-08-02",
     },
@@ -523,7 +524,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "[Zugriff: 2. August 2026].",
         "url": "https://www.dwd.de/DE/leistungen/besondereereignisse/stuerme/"
                "20180123_friederike_europa.pdf",
-        "archive_url": "https://web.archive.org/web/2026/"
+        "archive_url": "https://web.archive.org/web/20241208004402/"
                        "https://www.dwd.de/DE/leistungen/besondereereignisse/stuerme/"
                        "20180123_friederike_europa.pdf",
         "accessed": "2026-08-02",
@@ -679,7 +680,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "[Zugriff: 5. Juli 2026].",
         "url": "https://www.dwd.de/DE/leistungen/klimadatendeutschland/"
                "vielj_mittelwerte.html",
-        "archive_url": "https://web.archive.org/web/2026/https://www.dwd.de/DE/"
+        "archive_url": "https://web.archive.org/web/20260825080140/https://www.dwd.de/DE/"
                        "leistungen/klimadatendeutschland/vielj_mittelwerte.html",
         "accessed": "2026-07-05",
     },
@@ -690,7 +691,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "klimastatusbericht.html. [Zugriff: 5. Juli 2026].",
         "url": "https://www.dwd.de/DE/leistungen/klimastatusbericht/"
                "klimastatusbericht.html",
-        "archive_url": "https://web.archive.org/web/2026/https://www.dwd.de/DE/"
+        "archive_url": "https://web.archive.org/web/20260824213159/https://www.dwd.de/DE/"
                        "leistungen/klimastatusbericht/klimastatusbericht.html",
         "accessed": "2026-07-05",
     },
@@ -701,7 +702,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Offenbach, Deutschland. [Online]. Verfügbar: https://opendata.dwd.de/"
                 "climate_environment/CDC/grids_germany/annual/. [Zugriff: 5. Juli 2026].",
         "url": "https://opendata.dwd.de/climate_environment/CDC/grids_germany/annual/",
-        "archive_url": "https://web.archive.org/web/2026/https://opendata.dwd.de/"
+        "archive_url": "https://web.archive.org/web/20260420130208/https://opendata.dwd.de/"
                        "climate_environment/CDC/grids_germany/annual/",
         "accessed": "2026-07-05",
     },
@@ -786,7 +787,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "[Online]. Verfügbar: https://www.opengeodata.nrw.de/produkte/"
                 "geobasis/3dg/lod2_gml/. [Zugriff: 14. Juli 2026].",
         "url": "https://www.opengeodata.nrw.de/produkte/geobasis/3dg/lod2_gml/",
-        "archive_url": "https://web.archive.org/web/2026/https://www.opengeodata"
+        "archive_url": "https://web.archive.org/web/20260614071240/https://www.opengeodata"
                        ".nrw.de/produkte/geobasis/3dg/lod2_gml/",
         "accessed": "2026-07-14",
     },
@@ -797,7 +798,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "bayern.de/opengeodata/OpenDataDetail.html?pn=lod2. "
                 "[Zugriff: 14. Juli 2026].",
         "url": "https://geodaten.bayern.de/opengeodata/OpenDataDetail.html?pn=lod2",
-        "archive_url": "https://web.archive.org/web/2026/https://geodaten.bayern"
+        "archive_url": "https://web.archive.org/web/20260710180631/https://geodaten.bayern"
                        ".de/opengeodata/OpenDataDetail.html?pn=lod2",
         "accessed": "2026-07-14",
     },
@@ -831,7 +832,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Verfügbar: https://www.adv-online.de/AdV-Produkte/Standards-und-"
                 "Produktblaetter/. [Zugriff: 14. Juli 2026].",
         "url": "https://www.adv-online.de/AdV-Produkte/Standards-und-Produktblaetter/",
-        "archive_url": "https://web.archive.org/web/2026/https://www.adv-online.de/"
+        "archive_url": "https://web.archive.org/web/20250421135610/https://www.adv-online.de/"
                        "AdV-Produkte/Standards-und-Produktblaetter/",
         "accessed": "2026-07-14",
     },
@@ -840,7 +841,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Visualization Technique,“ Remote Sensing, Bd. 3, Nr. 2, "
                 "S. 398–415, 2011. doi: 10.3390/rs3020398.",
         "url": "https://www.mdpi.com/2072-4292/3/2/398",
-        "archive_url": "https://web.archive.org/web/2026/https://www.mdpi.com/"
+        "archive_url": "https://web.archive.org/web/20260830145846/https://www.mdpi.com/"
                        "2072-4292/3/2/398",
         "accessed": "2026-07-14",
     },
@@ -850,7 +851,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Climatology, Bd. 1, Nr. 3, S. 237–254, 1981. "
                 "doi: 10.1002/joc.3370010304.",
         "url": "https://onlinelibrary.wiley.com/doi/10.1002/joc.3370010304",
-        "archive_url": "https://web.archive.org/web/2026/https://onlinelibrary"
+        "archive_url": "https://web.archive.org/web/20230109112648/https://onlinelibrary"
                        ".wiley.com/doi/10.1002/joc.3370010304",
         "accessed": "2026-07-14",
     },
@@ -1352,7 +1353,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "[Zugriff: 25. September 2026].",
         "url": "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/"
                "Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122023_Auszug_GV.xlsx",
-        "archive_url": "https://web.archive.org/web/2026/"
+        "archive_url": "https://web.archive.org/web/20250117185451/"
                        "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/"
                        "Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122023_Auszug_GV.xlsx",
         "accessed": "2026-09-25",
