@@ -1,11 +1,13 @@
 """Abgleich Registry ⇄ Parameter-Blöcke des Berichts #95 (T-1370, Übernahmeliste (f)).
 
-Kapitel 7 von ``docs/methodik/95_hitzebelastung.md`` führt 27 maschinenlesbare
+Kapitel 7 von ``docs/methodik/95_hitzebelastung.md`` führt 29 maschinenlesbare
 Parameter-Blöcke (``parameter:`` / ``id: heat.…``); seit Runde 31 (Befund 141) gehört
 ``heat.anteil_60_66`` dazu, der Block des bestehenden Registry-Parameters
 ``anteil_60_66_ab65``. Seit der Fortsetzung der Runde 31, Teil 2 (T-1537, Befunde 138,
 139, 146, 148, 149) kommen ``heat.s_gek``, ``heat.h_heim`` und
-``heat.delta_kuehlzentren`` dazu. Für sie gibt es noch keinen Registry-Parameter; neue
+``heat.delta_kuehlzentren`` dazu, seit Teil 3 (T-1538, Befunde 150, 151)
+``heat.vg_in_kalibrierjahren`` und ``heat.kappung_vg``. Für sie gibt es noch keinen
+Registry-Parameter; neue
 Parameter legt der CTO an. Sie stehen deshalb in ``_AUSSTEHEND_CTO``, und der CTO leert
 die Menge, sobald er die Parameter anlegt. Jeder Registry-Parameter der Hitzebelastung
 trägt im Feld ``methodik_block`` die Kennung seines Blocks. Geprüft wird:
@@ -36,9 +38,10 @@ from app.services.engine import override_context  # noqa: E402
 REPORT = os.path.join(os.path.dirname(__file__), "..", "..",
                       "docs", "methodik", "95_hitzebelastung.md")
 
-# Blöcke aus Kapitel 7 ohne Registry-Parameter: Übernahmeliste an den CTO (T-1537).
+# Blöcke aus Kapitel 7 ohne Registry-Parameter: Übernahmeliste an den CTO (T-1537, T-1538).
 # Der CTO entfernt eine Kennung, sobald er ihren Parameter mit methodik_block anlegt.
-_AUSSTEHEND_CTO = frozenset({"heat.s_gek", "heat.h_heim", "heat.delta_kuehlzentren"})
+_AUSSTEHEND_CTO = frozenset({"heat.s_gek", "heat.h_heim", "heat.delta_kuehlzentren",
+                             "heat.vg_in_kalibrierjahren", "heat.kappung_vg"})
 
 # Schlüssel der Mehrfach-Blöcke (Region/Altersband) → Suffix der Registry-ID.
 _SUFFIX = {"nord": "nord", "mitte": "mitte", "sued": "sued",
@@ -77,11 +80,11 @@ def _heat_bloecke_der_registry() -> set[str]:
             if (p.get("methodik_block") or "").startswith("heat.")}
 
 
-def test_block_kennungen_der_registry_sind_die_27_aus_kapitel_7_ohne_ausstehende():
+def test_block_kennungen_der_registry_sind_die_29_aus_kapitel_7_ohne_ausstehende():
     alle = set(_bloecke())
     # Gegenzählung ohne YAML-Parser: jede "id:"-Zeile nach "parameter:".
     roh = re.findall(r"^parameter:\n  id: (\S+)", _kapitel7(), re.M)
-    assert len(roh) == 27 and set(roh) == alle, sorted(roh)
+    assert len(roh) == 29 and set(roh) == alle, sorted(roh)
     soll = alle - _AUSSTEHEND_CTO
     assert len(soll) == 24
     ist = _heat_bloecke_der_registry()

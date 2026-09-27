@@ -319,7 +319,9 @@ export interface LineageGraph {
 /**
  * Evidenzklasse eines Parameters (Vorgabe P1), gespiegelt aus
  * `parameter_registry.EVIDENCE_CLASSES`: belegt (Quelle), abgeschaetzt
- * (begründete Abschätzung von KAP3) oder berechnet (aus amtlichen Daten berechnet).
+ * (begründete Abschätzung von KAP3) oder berechnet — folgt aus anderen Parameter-Blöcken;
+ * für die Gewissheit zählt er vorläufig wie belegt, die Regel legt die Querschnittsfrage
+ * Gewissheit fest (T-1117-cmo).
  */
 export type EvidenceClass = 'belegt' | 'abgeschaetzt' | 'berechnet'
 
@@ -339,9 +341,10 @@ export interface ModelParameter {
   overridden: boolean
   custom_source?: string | null
   applicable?: boolean
-  // Vorgabe P1: Beleglage je Parameter — belegt (Quelle), berechnet aus amtlichen
-  // Daten oder begründete Abschätzung von KAP3 samt Herleitung (Wert, Bandbreite,
-  // Sensitivität).
+  // Vorgabe P1: Beleglage je Parameter — belegt (Quelle), berechnet (folgt aus anderen
+  // Parameter-Blöcken; für die Gewissheit zählt er vorläufig wie belegt, die Regel legt
+  // die Querschnittsfrage Gewissheit fest, T-1117-cmo) oder begründete Abschätzung von
+  // KAP3 samt Herleitung (Wert, Bandbreite, Sensitivität).
   evidence_class: EvidenceClass
   evidence_note?: string
   evidence_derivation?: { wert: string; band: string; sensitivitaet: string } | null

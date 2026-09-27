@@ -106,7 +106,7 @@ def _fill_climate_impacts_sheet(ws, agg: dict | None, lb_note: str | None) -> No
 
 _EVIDENZ_ANZEIGE = {
     "abgeschaetzt": "abgeschätzt (KAP3)",
-    "berechnet": "berechnet aus amtlichen Daten",
+    "berechnet": "berechnet aus anderen Parametern",
     "belegt": "belegt",
 }
 _EBENE_LABEL = {"gemeinde": "Gemeinde", "kreis": "Kreis", "land": "Land"}

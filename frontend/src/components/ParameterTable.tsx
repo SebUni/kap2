@@ -32,7 +32,7 @@ function HiddenChip() {
 
 /**
  * Beleglage je Parameter (Vorgabe P1): ohne Klick und ohne Hover lesbar, ob der
- * Wert belegt ist, aus amtlichen Daten berechnet oder eine begründete Abschätzung
+ * Wert belegt ist, aus anderen Parametern berechnet oder eine begründete Abschätzung
  * von KAP3. Der Wert kommt aus
  * dem Backend-Feld `evidence_class` — keine Heuristik über den Freitext `source`.
  * Die Herleitung (Wert, Bandbreite, Sensitivität bzw. der Vermerk) ist über die
@@ -59,7 +59,7 @@ function EvidenceCell({ p }: { p: ModelParameter }) {
           <InfoTooltip
             title={abgeschaetzt
               ? 'Abschätzung KAP3 — Herleitung'
-              : berechnet ? 'Berechnet aus amtlichen Daten — Herleitung' : 'Beleglage — Herleitung'}
+              : berechnet ? 'Berechnet aus anderen Parametern — Herleitung' : 'Beleglage — Herleitung'}
             description={p.evidence_note}
             rows={[
               { label: 'Wert', value: d.wert },
