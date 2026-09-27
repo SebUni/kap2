@@ -263,14 +263,20 @@ RISKS: list[dict] = [
      "outcome_unit": "Symptomtage/Jahr", "group": "pollen", "cost_dimension": "health",
      "hazards": ["POLLEN_LOAD"],
      "exposures": ["POPULATION_DENSITY", "AGE_STRUCTURE"],
-     # EARLY_WARNING_SYSTEMS (S158) führt der Bericht §5 ausdrücklich als
-     # qualitativen Hebel mit Default 1 (keine Interventions-Effektgröße) — er
-     # geht daher in keine Formel ein und ist im M0-Katalog nicht angelegt.
+     # S158 ist als Maßnahme POLLEN_EARLY_WARNING angelegt (default_reduction
+     # 0,03, abgeschätzt nach Vorgabe P2, Bericht #96 §5.1, Befund 215,
+     # Register-ID 96-S158-01). Sie wirkt als Hebel auf die Verwundbarkeit
+     # (qualitative_risk_codes) und hängt deshalb nicht hier in
+     # "vulnerabilities" (linked_risk_codes: []).
      "vulnerabilities": ["HEALTHCARE_ACCESS"],
      # Herleitung ref_value (Sanity-Anker, Symptomtage je 100.000 EW): Bundessumme
      # 8,96 Mio Betroffene × 1,988 Tage = 17,8 Mio Tage ÷ 83,456 Mio EW × 100.000
      # ≈ 21.340 (Bericht §4). cost_per_outcome_eur: c_Tag 6,20 €₂₀₂₄ (s. _RISK_COST_RATES).
      "ref_value": 21340.0, "scale": "pop", "cost_per_outcome_eur": 6.20,
+     # Kostensatz = Block pollen.c_tag in Kapitel 7 des Berichts #96, Kennzeichnung
+     # berechnet (= c_Jahr,direkt / d_Saison = 266,90 / 43,05; T-1480).
+     "cost_methodik_block": "pollen.c_tag",
+     "cost_evidence_class": "berechnet",
      "source": "Bericht #96 Rev. 1 (DWD-Phänologie / DEGS1+KiGGS / TOTALL)",
      "source_detail": "Sanity-Anker in Symptomtagen je 100.000 EW: 10,74 % "
         "AR-Prävalenz × 1,988 zusätzliche Symptomtage je Betroffenem·Jahr "
@@ -1700,6 +1706,8 @@ MEASURES: list[dict] = [
                           "opex_per_unit_year": "abgeschaetzt",
                           "unit_density_per_ha": "abgeschaetzt",
                           "benefit_per_m2_year": "abgeschaetzt"},
+     # Wirkungsfaktor = Block pollen.r_s158 in Kapitel 7 des Berichts #96 (T-1480).
+     "methodik_bloecke": {"default_reduction": "pollen.r_s158"},
      "source_details": {
         "capex_per_unit": "Für kommunale Pollen-Messstationen (Fallenkopf + Auswertungs-/"
             "Datenanbindung an das DWD-/PID-Frühwarnsystem) ist keine belastbare öffentliche "

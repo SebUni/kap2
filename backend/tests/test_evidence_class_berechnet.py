@@ -147,4 +147,8 @@ def test_frontend_typ_fuehrt_berechnet():
 def test_frontend_anzeige_berechnet_aus_amtlichen_daten():
     tabelle = (FRONTEND / "components" / "ParameterTable.tsx").read_text(encoding="utf-8")
     assert "p.evidence_class === 'berechnet'" in tabelle
-    assert "Berechnet aus amtlichen Daten" in tabelle
+    # Seit T-1391 steht der Anzeigetext an einer Stelle (utils/evidenceLabel.ts), die
+    # Parameterliste und Maßnahmentabelle beide nutzen.
+    anzeige = (FRONTEND / "utils" / "evidenceLabel.ts").read_text(encoding="utf-8")
+    assert "if (klasse === 'berechnet') return 'berechnet aus amtlichen Daten'" in anzeige
+    assert "evidenzAnzeige(p.evidence_class)" in tabelle

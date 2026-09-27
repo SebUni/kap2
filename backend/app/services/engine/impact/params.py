@@ -305,9 +305,10 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_refs": [],
      "evidence_class": "abgeschaetzt",
      "evidence_derivation": {
-         "wert": "0,29 = (0,93 × 1,11 − 1)/(1,11 − 1) aus rOR 0,93 und OR_ohne 1,11 [46]; "
-                 "Setzung: derselbe Anteil gilt in allen Hitzewochen des Modells, nicht nur an "
-                 "den Extremtagen von [46] (Bericht #95 §5, Befund 124).",
+         "wert": "0,29 = (0,93 × 1,11 − 1)/(1,11 − 1) aus rOR 0,93 und OR_ohne 1,11 der "
+                 "Quelle [46] (Katz u. a. 2026); Setzung: derselbe Anteil gilt in allen "
+                 "Hitzewochen des Modells, nicht nur an den Extremtagen von [46] "
+                 "(Bericht #95 §5, Befund 124).",
          "band": "0–0,90 aus dem Band von rOR (0,87 ⇒ 0, 0,99 ⇒ 0,90); OR_ohne über sein "
                  "Intervall 1,06–1,16 ergibt 0–0,49, beide Intervalle zugleich 0–0,83 "
                  "(Befund 132).",
@@ -663,6 +664,68 @@ IMPACT_PARAM_SPECS: list[dict] = [
                           "(−4,7 %), Mischlage 1,066 → 1,072 (+0,6 %); reproduzierbar "
                           "im Golden-Test test_s_unbekannt_sensitivity_band. Die "
                           "Kommunensumme bleibt wegen der Zentrierung über Ḡ invariant.",
+     }},
+    # ── #96: Kap.-7-Blöcke ohne eigene Rechenstelle (T-1480, Vorgabe P1) ─────────
+    # Die drei folgenden Specs machen Blöcke aus Kapitel 7 in der Parameterliste
+    # sichtbar, rechnen aber nicht: editable=False, kein ctx.p-Aufruf. Sie stehen am
+    # Risiko, nicht an der Maßnahme POLLEN_EARLY_WARNING (test_measure_pricing legt
+    # jede Maßnahme auf 9 Registry-Felder fest).
+    # c_Jahr,direkt: Herleitungsschritt hinter dem Kostensatz c_Tag (Bericht §3.5);
+    # im Produkt maßgeblich ist der Katalog-Kostensatz 6,20 €/Tag.
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "c_jahr_direkt", "value": 266.90,
+     "label": "Direkte Behandlungskosten je Betroffenem und Jahr c_Jahr,direkt",
+     "unit": "EUR/Jahr", "editable": False,
+     "source": "Cardell u. a. 2016 (TOTALL), mit VPI auf 2024 (Bericht #96 §3.5)",
+     "source_detail": "210,3 €₂₀₁₄ direkte Kosten je Betroffenem und Jahr (TOTALL, "
+                      "bevölkerungsbasierte schwedische Stichprobe, 18–65 Jahre, alle "
+                      "Schweregrade) × VPI 119,3/94,0 = 266,90 €₂₀₂₄. Band 266,90–1.018,6 € "
+                      "(Obergrenze: Schramm 2003, moderate bis schwere saisonale AR). "
+                      "Rechnet nicht selbst: Er geht über c_Tag = c_Jahr,direkt / d_Saison "
+                      "= 266,90 / 43,05 = 6,20 € in den Kostensatz des Risikos ein; "
+                      "ändern lässt sich der Kostensatz c_Tag (Bericht #96 §3.5, Kap. 7).",
+     "source_refs": ["Cardell_2016_TOTALL", "Destatis_VPI_lange_Reihen"]},
+    # d_Saison: berechnet aus f, p_B/p_G und L_B/L_G. Die Rechnung bildet d_Saison in
+    # health.py aus den aktuellen Parametern; dieser Eintrag zeigt nur den
+    # Referenzwert 43,05 Tage (POLLEN_D_SAISON_REF) und ändert keine Rechnung.
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "d_saison", "value": 43.05,
+     "label": "Symptomtage je Betroffenem und Referenzsaison d_Saison",
+     "unit": "Tage", "editable": False,
+     "source": "Berechnet aus f, p_B, p_G, L_B, L_G (Bericht #96 §3.5)",
+     "source_detail": "d_Saison = f × (p_B × L_B + p_G × L_G) = 0,70 × (0,55 × 30 + "
+                      "0,75 × 60) = 43,05 Tage. Die additive Form zählt überlappende "
+                      "Wochen bei Doppelt-Sensibilisierten doppelt; d_Saison ist damit eher "
+                      "zu hoch, c_Tag eher zu niedrig, der Euro-Betrag konservativ. Der "
+                      "Wert wird nicht eingegeben: Ändert man f, p_B, p_G, L_B oder L_G, "
+                      "rechnet das Produkt d_Saison und damit c_Tag neu (Bericht #96 §3.5, "
+                      "Kap. 7).",
+     "source_refs": ["Pfaar_2017_EAACI_Pollensaison"]},
+    # t_warn,S158: Anteil gewarnter Zusatztage, Parameter der Wirkung von S158. Die
+    # Wirkung selbst (r_S158 × t_warn im Maßnahmen-Modul) ist noch nicht gebaut; bis
+    # dahin rechnet der Wert nicht und ist nicht editierbar.
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "t_warn_s158", "value": 0.75,
+     "label": "Anteil gewarnter Zusatztage t_warn (Pollen-Frühwarnung S158)",
+     "unit": "Anteil", "editable": False,
+     "source": "Abschätzung von KAP3 (§3.9) — Bericht #96 §5.1; Schwelle nach DWD",
+     "source_detail": "Anteil der zusätzlichen Symptomtage, an denen der "
+                      "Pollenflug-Gefahrenindex des DWD mindestens „mittel“ meldet, gleich "
+                      "für Birkengruppe und Gräser: 0,75 (Band 0,50–1,00). Nur für die "
+                      "Wirkung der Pollen-Frühwarnung (S158), kein Parameter der "
+                      "Schadensformel; noch ohne Wirkung im Produkt.",
+     "source_refs": [],
+     "evidence_derivation": {
+         "wert": "0,75 als Mitte der beiden Anker 0,50 und 1,00, gleich für Birkengruppe "
+                 "und Gräser, weil es keine Auswertung je Gruppe gibt. Die Schwelle "
+                 "„mittel“ (ab 11 Pollen je m³ bei Hasel, Erle, Birke, ab 6 bei Gräsern) "
+                 "stammt vom DWD; der Anteil selbst ist eine Setzung von KAP3 (Bericht #96 "
+                 "§5.1, Anker #s158-wirkung).",
+         "band": "0,50–1,00. Unteres Ende 0,50: Die Zusatztage liegen am Saisonanfang, wo "
+                 "die Konzentration erst steigt, nur jeder zweite erreicht „mittel“. "
+                 "Oberes Ende 1,00: Beschwerden treten nur an Tagen ab „mittel“ auf. "
+                 "Ersetzbar durch min(1; m/f) aus der DWD-Pollenflugstatistik.",
+         "sensitivitaet": "Linear: Der wirksame Faktor der Pollen-Frühwarnung ist "
+                          "r_S158 × t_warn = 0,03 × 0,75 = 2,25 % der Zusatztage; am Band "
+                          "1,5 % bis 3 %. Solange die Wirkung von S158 nicht gebaut ist, "
+                          "ändert der Wert keine Zahl im Produkt.",
      }},
 
     # ── #98 UV-Schädigungen: klimaattribuierte Hautkrebsfälle (Bericht Rev. 1) ─
@@ -1497,4 +1560,106 @@ for _spec in IMPACT_PARAM_SPECS:
         _spec["evidence_class"] = _HEAT_KLASSE[_block]
         if _block in _HEAT_HERLEITUNG:
             _spec.setdefault("evidence_derivation", dict(_HEAT_HERLEITUNG[_block]))
+del _spec, _block
+
+# ── Block-Kennung je Parameter: Abgleich mit Kapitel 7 des Berichts #96 (T-1480) ──
+# 13 Blöcke; pollen.delta_s_region trägt sechs Specs (Gruppe × Region), pollen.p_ar
+# fünf (Altersbänder), pollen.p_sens_gruppen und pollen.l_saison je zwei (Gruppe).
+# Der Kostensatz pollen.c_tag steht am Risiko im Katalog (cost_methodik_block),
+# pollen.r_s158 an der Maßnahme POLLEN_EARLY_WARNING (methodik_bloecke).
+# Geprüft in tests/test_methodik_96_kennzeichnung.py.
+_POLLEN_BLOECKE: dict[tuple[str, str], str] = {
+    **{("EXPECTED_ANNUAL_ALLERGY_DAYS", f"delta_s_{g}_{r}"): "pollen.delta_s_region"
+       for g in ("birke", "graeser") for r in ("nord", "mitte", "sued")},
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "a_attr"): "pollen.a_attr",
+    **{("EXPECTED_ANNUAL_ALLERGY_DAYS", f"p_ar_{a}"): "pollen.p_ar"
+       for a in ("u20", "a20_64", "a65_74", "a75_84", "a85p")},
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "p_sens_birke"): "pollen.p_sens_gruppen",
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "p_sens_graeser"): "pollen.p_sens_gruppen",
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "l_saison_birke"): "pollen.l_saison",
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "l_saison_graeser"): "pollen.l_saison",
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "f_symptomtage"): "pollen.f_symptomtage",
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "lambda_veg"): "pollen.lambda_veg",
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "birch_group_share_default"): "pollen.s_unbekannt",
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "t_warn_s158"): "pollen.t_warn_s158",
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "c_jahr_direkt"): "pollen.c_jahr_direkt",
+    ("EXPECTED_ANNUAL_ALLERGY_DAYS", "d_saison"): "pollen.d_saison",
+}
+# Kennzeichnung je Block nach Kapitel 7, übersetzt in die Evidenzklasse (P1):
+# quelle → belegt, abschaetzung_kap3 → abgeschaetzt, berechnet → berechnet.
+# Über alle 13 Blöcke 4 × belegt, 7 × abgeschaetzt, 2 × berechnet; die Klassen von
+# pollen.c_tag und pollen.r_s158 stehen in data/catalog.py.
+_POLLEN_KLASSE: dict[str, str] = {
+    "pollen.delta_s_region": "belegt",
+    "pollen.a_attr": "belegt",
+    "pollen.p_ar": "belegt",
+    "pollen.p_sens_gruppen": "abgeschaetzt",
+    "pollen.l_saison": "abgeschaetzt",
+    "pollen.f_symptomtage": "abgeschaetzt",
+    "pollen.lambda_veg": "abgeschaetzt",
+    "pollen.s_unbekannt": "abgeschaetzt",
+    "pollen.t_warn_s158": "abgeschaetzt",
+    "pollen.c_jahr_direkt": "belegt",
+    "pollen.d_saison": "berechnet",
+}
+# Herleitung nach P1 für die abgeschätzten Blöcke, deren Spec noch keine eigene trägt
+# (Bericht #96 §3.4 und §3.5). s_unbekannt und t_warn_s158 tragen sie am Spec.
+_POLLEN_HERLEITUNG: dict[str, dict[str, str]] = {
+    "pollen.p_sens_gruppen": {
+        "wert": "p_B = 0,55 (Birkengruppe) und p_G = 0,75 (Gräser) als Anteil der "
+                "Patienten mit allergischer Rhinitis, deren Beschwerden in die Saison der "
+                "Gruppe fallen. Publiziert sind nur Sensibilisierungen der Bevölkerung "
+                "(Haftenberger 2013: Gräser 19,4 %, Birke 17,4 %, Erle 16,5 %, Hasel "
+                "16,2 %); die Rangfolge Gräser vor Birkengruppe stützt die Setzung von "
+                "KAP3 (Bericht #96 §3.4, Anker #p-sens, Entscheidungslog Nr. 8).",
+        "band": "p_B 0,4–0,7, p_G 0,6–0,85. Die Summe über 1 ist gewollt: Viele Betroffene "
+                "sind gegen beide Gruppen sensibilisiert.",
+        "sensitivitaet": "Region Mitte: p_B am Band verschiebt die Zusatztage je Betroffenem "
+                         "um −11,7 % bis +11,7 %, p_G um −11,4 % bis +7,6 %, zusammen "
+                         "−23 % bis +19 %. Über d_Saison läuft der Kostensatz c_Tag mit "
+                         "(Bericht #96 §3.4 und §3.5).",
+    },
+    "pollen.l_saison": {
+        "wert": "L_B = 30 Tage (Birkengruppe) und L_G = 60 Tage (Gräser) als typische "
+                "deutsche Saisonfenster nach dem EAACI-Saisonkriterium (Pfaar 2017). Die "
+                "Quelle definiert das Kriterium, nennt aber keine festen Längen; die Werte "
+                "sind eine Setzung von KAP3 (Bericht #96 §3.5, Anker #d-saison).",
+        "band": "L_B 20–45 Tage, L_G 45–80 Tage.",
+        "sensitivitaet": "L_B und L_G wirken nur über d_Saison = f × (p_B × L_B + p_G × L_G) "
+                         "auf den Kostensatz c_Tag = c_Jahr,direkt / d_Saison: Längere "
+                         "Saisons senken c_Tag und damit den Euro-Betrag, die Zahl der "
+                         "Zusatztage bleibt gleich (Golden-Test "
+                         "test_cost_rate_follows_season_length_chain).",
+    },
+    "pollen.f_symptomtage": {
+        "wert": "f = 0,70 als Anteil der Saisontage mit Beschwerden, eine Modellannahme "
+                "von KAP3. Pfaar 2020 stützt nur qualitativ, dass Pollenflug die "
+                "Beschwerden treibt; einen Zahlenwert nennt keine Quelle (Bericht #96 "
+                "§3.4, Anker #f-sympt, Entscheidungslog Nr. 7).",
+        "band": "0,50–0,85.",
+        "sensitivitaet": "f wirkt nur auf die Zahl der Zusatztage: am Band −28,6 % bis "
+                         "+21,4 %. Im Euro-Betrag kürzt sich f heraus, weil es auch in "
+                         "d_Saison steht (Golden-Test test_f_cancels_in_euro_path).",
+    },
+    "pollen.lambda_veg": {
+        "wert": "λ = 0,7 aus der Spanne der Pollenfallen in Berlin (Werchan 2017: Birke "
+                "245 %, Gräser 306 % zwischen höchstem und niedrigstem Standort) über "
+                "λ_roh = 2(R − 1)/(R + 1) = 1,10 bis 1,21, mal dem Anteil der lokalen "
+                "Vegetation a_veg = 0,6 (Setzung von KAP3): 0,66 bis 0,73, Basiswert 0,7 "
+                "(Bericht #96 §3.4, Anker #lambda-veg).",
+        "band": "0,3–1,0: beide Lesarten der Quelle (Zuwachs und Verhältnis) mal dem Band "
+                "von a_veg 0,4–0,8.",
+        "sensitivitaet": "λ verteilt die Zusatztage im Ausgangsstand nur innerhalb der "
+                         "Kommune, die Kommunensumme bleibt gleich. Die Wirkung einer "
+                         "Maßnahme an der Vegetation wächst linear mit λ (Bericht #96 §5: "
+                         "Allee-Zelle −11,3 Tage bei λ = 0,3 bis −37,6 Tage bei λ = 1,0).",
+    },
+}
+for _spec in IMPACT_PARAM_SPECS:
+    _block = _POLLEN_BLOECKE.get((_spec["risk"], _spec["key"]))
+    if _block:
+        _spec["methodik_block"] = _block
+        _spec["evidence_class"] = _POLLEN_KLASSE[_block]
+        if _block in _POLLEN_HERLEITUNG:
+            _spec.setdefault("evidence_derivation", dict(_POLLEN_HERLEITUNG[_block]))
 del _spec, _block

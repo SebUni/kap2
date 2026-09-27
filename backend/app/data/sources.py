@@ -1388,7 +1388,6 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Kanada, 1993. [Online]. Verfügbar: https://www.icao.int. "
                 "[Zugriff: 26. Sep. 2026].",
         "url": "https://www.icao.int",
-        "archive_url": "https://web.archive.org/web/2026/https://www.icao.int/",
         "accessed": "2026-09-26",
     },
 }
