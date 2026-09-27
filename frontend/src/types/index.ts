@@ -512,20 +512,21 @@ export interface RiskHistogramEntry {
   cost_dimension: string
   counts: number[]
   nonzero_cells: number
-  p90_index: number
-  max_index: number
-  outcome: number
+  /** null: fehlt die Klimawirkung im Aggregat, ist das keine 0 — Nullwirkung wäre falsch (A-0010/P2). */
+  p90_index: number | null
+  max_index: number | null
+  outcome: number | null
   /** Aggregierter Outcome (= outcome; Σ über Zellen für pop/area, sonst P90-basiert). */
-  outcome_sum?: number
+  outcome_sum?: number | null
   cost_eur: number | null
   /** "sum" (Σ über Zellen, pop/area) | "p90" (kommunenweiter Einzelwert, flat). */
   aggregation?: 'sum' | 'p90'
   /** Anteil der Summe aus den stärksten 5 % Zellen (Konzentration/Hotspot-Signal). */
-  top5_share?: number
+  top5_share?: number | null
   /** Fläche der Zellen über der Risikozonen-Schwelle (km²). */
-  area_km2_affected?: number
+  area_km2_affected?: number | null
   /** Anteil der Zellen über der Risikozonen-Schwelle. */
-  share_above_threshold?: number
+  share_above_threshold?: number | null
 }
 
 export interface RiskHistogram {
