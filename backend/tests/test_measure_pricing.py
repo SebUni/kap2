@@ -136,13 +136,16 @@ def test_source_refs_resolve_to_bibliography():
 
 
 def test_bibliography_entries_are_complete():
-    """Jeder Bibliografie-Eintrag trägt IEEE-Zitation und Live-URL; der Archiv-Snapshot ist
-    Pflicht, außer es gibt keinen echten Schnappschuss mit Zeitstempel (T-1410, Punkt 7b) —
-    dann entfällt das Feld, statt eine unbelegte Platzhalter-URL zu tragen.
+    """Jeder Bibliografie-Eintrag trägt IEEE-Zitation, Live-URL und Archiv-Snapshot.
+
+    `archive_url` ist für jeden Eintrag Pflicht (T-1531-ceo, nimmt die Lockerung aus T-1410
+    zurück: die galt nur, weil es damals keinen echten Schnappschuss für den ICAO-Eintrag gab —
+    seit T-1511-cto trägt er einen, und eine Ausnahme für Einträge ohne Schnappschuss ist keine
+    dauerhafte Lücke, sonst gingen künftige Quellen ohne Schnappschuss unbemerkt durch).
     """
     bad = []
     for key, entry in sources.SOURCE_REFERENCES.items():
-        for field in ("ieee", "url"):
+        for field in ("ieee", "url", "archive_url"):
             if not entry.get(field):
                 bad.append((key, field))
         if entry.get("archive_url") and not entry["archive_url"].startswith(
