@@ -127,8 +127,19 @@ export interface MeasureImpactSummary {
   benefit_note?: string | null
   /** S157 (#95 §5): gekühlter Anteil der Heimplätze 0..1, Eingabe der Kommune; null = nicht eingegeben (kein Betrag). */
   s_gek?: number | null
-  /** Name der fehlenden Eingabe, wenn deshalb kein Betrag entsteht (S157: "s_gek"). */
+  /** Name der fehlenden Eingabe, wenn deshalb kein Betrag entsteht (S157: "s_gek";
+   *  S158: "pollen_group_split"). */
   benefit_missing_input?: string | null
+  /** S158 (#96 §5.1, Integrationsauflage Punkt 5): vermiedene Symptomtage/Jahr der
+   *  Kommune (Summe der Zellwerte); fehlt, wenn eine abgedeckte Zelle mit Zusatztagen
+   *  ohne Gruppenaufteilung geblieben ist (dann trägt benefit_display den Vermerk). */
+  s158_avoided_days_total?: number | null
+  /** S158: Euro-Gegenwert der vermiedenen Symptomtage der Kommune (Anteil #96 an
+   *  annual_benefit_damage_eur). */
+  s158_avoided_days_eur?: number | null
+  /** S158: Kennzeichnung der Wirkung als begründete Abschätzung von KAP3 (r_S158,
+   *  t_warn — Vorgabe P2, keine belegten Effektgrößen). */
+  s158_estimate_note?: string | null
   count?: number
   count_is_default?: boolean
   recommended_count?: number

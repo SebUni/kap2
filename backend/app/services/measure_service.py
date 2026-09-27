@@ -265,14 +265,24 @@ def _vg_cell_factor(code: str, frac: float, cell_risk: dict,
 # S157: 1 − ΔTage_vermieden / ΔTage_Zelle auf das Outcome (Symptomtage/€) der Zelle.
 
 ALLERGY_RISK_CODE = "EXPECTED_ANNUAL_ALLERGY_DAYS"
+# S158-Integrationsauflage Punkt 5 (Bericht #96 §5.1 Z. 1416 f.): der Nutzen von S158
+# ist eine begründete Abschätzung von KAP3 (r_S158, t_warn — beide P2), nicht eine
+# belegte Effektgröße; die Kennzeichnung trägt der Ausgabetext, nicht nur die
+# Herleitung im Bericht. Fehlt in einer abgedeckten Zelle mit Zusatztagen (Outcome > 0)
+# die Aufteilung nach Pollengruppe (Alt-Zelle, vor der Neuberechnung), lässt sich die
+# Wirkung dort nicht bestimmen — dann steht ein Vermerk statt eines (ggf. zu niedrigen,
+# als 0 € lesbaren) Betrags (P2: nie 0 € wegen fehlender Eingabe).
+S158_ESTIMATE_NOTE = "Abschätzung von KAP3"
+S158_MISSING_SPLIT_TEXT = ("kein Betrag: Zusatztage je Pollengruppe fehlen, "
+                           "Kommune neu berechnen")
 
 
 def _is_s158(mdef: dict) -> bool:
     return mdef.get("effect_model") == "s158"
 
 
-def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
-    """Faktor (0..1) auf das Symptomtage-Outcome einer Zelle durch S158.
+def _s158_cell_effect(mdef: dict, frac: float, cell_risk: dict) -> tuple[float, float | None, bool]:
+    """(Faktor, vermiedene Tage, fehlende Gruppenaufteilung) einer Zelle durch S158.
 
     Die Gruppentage ΔTage_B/G,Zelle holt der Zweig FRISCH über ``health.pollen_zelltage``
     aus den gespeicherten Roheingaben der Zelle (``betroffene``, ``delta_birke``,
@@ -282,19 +292,26 @@ def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
     multiplikativ zusammen mit S158 (Bericht §5 „Zusammen mit S158“), statt von einer
     zuvor gespeicherten Summe überschrieben zu werden. λ (``lambda_veg``) wird nicht
     gespeichert und deshalb hier aus den Overrides gelesen, damit eine Überschreibung
-    wirkt. Zellen ohne diese Roheingaben (Alt-Zellen vor der Neuberechnung) bleiben
-    unverändert — es gibt keine pauschale Ersatzwirkung.
+    wirkt.
+
+    ``vermiedene Tage`` ist ``None``, wenn die Zelle außerhalb des Geltungsbereichs liegt
+    oder die Roheingaben fehlen (Alt-Zelle vor der Neuberechnung) — dann bleibt der
+    Faktor unverändert (1.0), es gibt keine pauschale Ersatzwirkung. Trägt eine solche
+    Zelle bereits Zusatztage (Outcome > 0), ist die dritte Rückgabe ``True`` (Zelle mit
+    Zusatztagen, aber ohne Gruppenaufteilung — der Betrag der Kommune wäre sonst zu
+    niedrig, ohne dass das sichtbar würde).
     """
     from app.services.engine.impact import health
 
     if frac <= 0.0:
-        return 1.0
+        return 1.0, None, False
     betroffene = cell_risk.get("betroffene")
     delta_b = cell_risk.get("delta_birke")
     delta_g = cell_risk.get("delta_graeser")
     g_cell = cell_risk.get("pollen_g")
     if betroffene is None or delta_b is None or delta_g is None or g_cell is None:
-        return 1.0
+        outcome = float(cell_risk.get("outcome") or 0.0)
+        return 1.0, None, outcome > 0.0
     g_bar0 = cell_risk.get("pollen_g_bar0")
 
     def _p(key: str, default: float) -> float:
@@ -306,13 +323,20 @@ def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
         float(betroffene), float(delta_b), float(delta_g), float(g_cell), g_bar0, lam)
     total = tage_birke + tage_graeser
     if total <= 0.0:
-        return 1.0
+        return 1.0, 0.0, False
 
     r = float(mdef.get("default_reduction") or 0.0)
     t_warn = _p("t_warn_s158", 0.75)
     vermieden = health.s158_vermiedene_tage(
         tage_birke, tage_graeser, frac, r, t_warn, t_warn)
-    return max(0.0, min(1.0, 1.0 - vermieden / total))
+    factor = max(0.0, min(1.0, 1.0 - vermieden / total))
+    return factor, vermieden, False
+
+
+def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
+    """Faktor (0..1) auf das Symptomtage-Outcome einer Zelle durch S158 (Wrapper)."""
+    factor, _, _ = _s158_cell_effect(mdef, frac, cell_risk)
+    return factor
 
 
 def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float,
@@ -378,6 +402,32 @@ def _s157_summary_fields(mdef: dict, config: dict | None) -> dict:
         out["benefit_display"] = S157_NO_INPUT_TEXT
         out["benefit_missing_input"] = "s_gek"
     return out
+
+
+def _s158_summary_fields(mdef: dict, avoided_days_total: float,
+                         avoided_days_eur: float, missing_split: bool) -> dict:
+    """Zusatzfelder des impact_summary für S158 (Integrationsauflage Punkt 5).
+
+    ``s158_avoided_days_total``/``s158_avoided_days_eur`` sind die vermiedenen
+    Symptomtage bzw. Euro/Jahr der Kommune (Summe der Zellwerte), zusammen mit der
+    Kennzeichnung ``s158_estimate_note`` als begründete Abschätzung von KAP3 (P2:
+    ``r_S158``, ``t_warn`` sind keine belegten Effektgrößen). Fehlt in einer
+    abgedeckten Zelle mit Zusatztagen die Gruppenaufteilung, wäre die Kommunensumme
+    zu niedrig, ohne dass das sichtbar würde — dann steht der Vermerk statt eines
+    Betrags (``benefit_display``), und die Zahlenfelder entstehen nicht (kein 0 €).
+    """
+    if not _is_s158(mdef):
+        return {}
+    if missing_split:
+        return {
+            "benefit_display": S158_MISSING_SPLIT_TEXT,
+            "benefit_missing_input": "pollen_group_split",
+        }
+    return {
+        "s158_avoided_days_total": round(avoided_days_total, 1),
+        "s158_avoided_days_eur": round(avoided_days_eur, 2),
+        "s158_estimate_note": S158_ESTIMATE_NOTE,
+    }
 
 
 def _resolve_count(
@@ -733,6 +783,13 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         hap_by_cell = _hap_cell_factors(db, measure, parameter_registry.overrides_map(
             parameter_registry.load_db_overrides(db, measure.kommune_id)))
 
+    # S158-Integrationsauflage Punkt 5: vermiedene Symptomtage der Kommune (Summe der
+    # Zellwerte, identisch zur Summe der MeasureImpact-Zeilen) und ihr Euro-Gegenwert
+    # (Anteil #96 an ``annual_benefit_damage_eur`` — dieselbe Maßnahme verknüpft nur
+    # ALLERGY_RISK_CODE, deshalb ist der Anteil die gesamte Zellkosten-Reduktion).
+    s158_avoided_days_total = 0.0
+    s158_missing_split = False
+
     for cid, frac in coverage.items():
         ca = assessments.get(cid)
         if not ca:
@@ -741,6 +798,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         cell_pop = float(data.get("inputs", {}).get("pop", 0.0) or 0.0)
         cell_risks = data.get("risks", {})
         deltas = {}
+        cell_savings: dict[str, float] = {}
         for code in linked:
             r = cell_risks.get(code, {})
             d_hap = hap_by_cell.get(cid, 1.0)
@@ -751,6 +809,13 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
             deltas[code] = round(new_idx - base_idx, 3)
             covered_base_index[code] = covered_base_index.get(code, 0.0) + base_idx
             covered_new_index[code] = covered_new_index.get(code, 0.0) + new_idx
+            if _is_s158(mdef) and code == ALLERGY_RISK_CODE:
+                _, avoided_days, missing = _s158_cell_effect(mdef, frac, r)
+                if missing:
+                    s158_missing_split = True
+                elif avoided_days is not None:
+                    cell_savings["s158_avoided_days"] = round(avoided_days, 3)
+                    s158_avoided_days_total += avoided_days
             risk = catalog.RISKS_BY_CODE.get(code)
             if (_risk_counts_for_euro_benefit(risk)
                     and risk.get("scale", "pop") in ("pop", "area")):
@@ -759,7 +824,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                 # gekoppelte Folgekosten (nur direkte Sektorschäden treiben k_indirekt)
                 if code in catalog.DIRECT_SECTOR_RISK_CODES:
                     annual_benefit_damage += k_indirect * reduced
-        db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid, indicator_deltas=deltas))
+        db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid, indicator_deltas=deltas,
+                              savings=cell_savings))
 
     # Flat-skalierte verknüpfte Risiken (z. B. Ausfallstunden bei Netzverstärkung):
     # Das Aggregat rechnet sie als kommunenweiten P90-Outcome — der Nutzen dieser
@@ -819,6 +885,10 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
             annual_benefit_damage = cap
             benefit_capped = True
 
+    # S158 verknüpft ausschließlich ALLERGY_RISK_CODE (#96) — ihr Euro-Anteil an
+    # ``annual_benefit_damage_eur`` ist deshalb der ganze (ggf. gekappte) Betrag.
+    s158_avoided_days_eur = annual_benefit_damage if _is_s158(mdef) else 0.0
+
     # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente)
     cost_breakdown = compute_costs(mdef, count, covered_area_m2)
     capex = cost_breakdown["capex"]["total_eur"]
@@ -863,6 +933,10 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         **_s157_summary_fields(mdef, measure.config),
         # Befund 129: S157 zusammen mit dem Hitzeaktionsplan gerechnet (Faktoren multipliziert)
         **({"s157_with_hap": bool(hap_by_cell)} if _is_s157(mdef) else {}),
+        # S158-Integrationsauflage Punkt 5: vermiedene Symptomtage/Euro der Kommune als
+        # Abschätzung von KAP3 gekennzeichnet, oder Vermerk statt Betrag ohne Gruppenaufteilung.
+        **_s158_summary_fields(mdef, s158_avoided_days_total, s158_avoided_days_eur,
+                               s158_missing_split),
         # Befund 126: Schutzprogramme zusammen mit dem Hitzeaktionsplan (mit Kappung 0,794)
         **({"vg_with_hap": bool(hap_by_cell)} if _is_vg(mdef) else {}),
         "params_fingerprint": fingerprint,
