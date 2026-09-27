@@ -87,7 +87,11 @@ def _flood_regime(ci: dict) -> float:
 def build_auxiliary(ci: dict, regional: dict) -> dict[str, float | None]:
     """Map cell inputs + regional context to AUXILIARY catalog codes."""
     pop = float(ci.get("pop") or 0.0)
-    share_o = ci.get("share_over_65")
+    # Befund 142: der angesetzte Wert (Ersatzregel des Zensus-Laders), sonst der
+    # veröffentlichte Zensuswert (Zellen, die der Lader nicht bearbeitet hat).
+    share_o = ci.get("share_over_65_ersatz")
+    if share_o is None:
+        share_o = ci.get("share_over_65")
     share_u = ci.get("share_under_18")
 
     aux: dict[str, Any] = {
