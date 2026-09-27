@@ -122,21 +122,24 @@ def test_zellausgabe_traegt_kronenterme_gleich_den_zelleingaben():
 def test_outcome_und_cost_eur_bleiben_bitgleich_zum_vorzustand():
     """Die neuen Ausgabefelder ändern den bestehenden Rechenweg nicht.
 
-    Unabhängige Gegenrechnung über dieselbe Formel wie vor diesem Ticket
-    (``betroffene``/``delta_r``/``p_hat``, Bericht §5.1) — kein neuer Faktor.
+    Festwerte auf origin/main (95dda1b8, ``python -m pytest -s`` derselben Zelle vor
+    diesem Ticket) ermittelt und hier mit ``==`` (Bit-Genauigkeit über ``float.hex``)
+    gegen den Stand NACH diesem Ticket gebunden — kein Toleranzband, weil das
+    Abnahmekriterium Bitgleichheit verlangt, nicht Näherung. Nachvollzogen im Diff
+    gegen origin/main: die Änderung fügt in ``allergy_symptom_days`` ausschließlich
+    drei neue Ausgabefelder NACH der outcome/cost_eur-Berechnung an; die Rechenzeilen
+    selbst (``tage``, ``_result``, Kostensatz-Kopplung) sind unverändert.
     """
     override_context.set_overrides({})
     ctx = _ctx_mit_kronenterme(0.22, 0.05, 0.30)
     res = impact.compute_all_cell_impacts(ctx)[CODE]
 
-    delta_mitte = 0.70 * (0.55 * 4.20 + 0.75 * 4.08) * 0.50
-    g_cell = ctx.haz("POLLEN_LOAD")
-    p_hat = 1.0 + 0.70 * (g_cell / 0.18 - 1.0)
-    tage_erwartet = res["betroffene"] * delta_mitte * p_hat
-    assert abs(res["outcome"] - tage_erwartet) < 1e-6
-    d_saison = 0.70 * (0.55 * 30.0 + 0.75 * 60.0)
-    cost_erwartet = tage_erwartet * (266.90 / d_saison)
-    assert abs(res["cost_eur"] - cost_erwartet) < 0.5
+    # Auf origin/main (vor diesem Ticket, Commit 95dda1b8) für dieselbe Zelle ermittelt.
+    assert res["outcome"].hex() == float.fromhex("0x1.0cfabdce5fdb6p+8").hex()
+    assert res["outcome"] == 268.97945871200807
+    assert res["cost_eur"].hex() == float.fromhex("0x1.a0eb0c997afa7p+10").hex()
+    assert res["cost_eur"] == 1667.67264401445
+    assert res["betroffene"] == 107.35117871928871
 
 
 def test_runner_speichert_kronenterme_wie_pollen_g():
