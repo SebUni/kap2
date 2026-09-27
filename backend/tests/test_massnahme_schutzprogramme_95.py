@@ -205,3 +205,18 @@ def test_parameters_visible_in_registry_with_resolvable_sources():
         for ref in spec["source_refs"]:
             assert ref in sources.SOURCE_REFERENCES
         assert {"wert", "band", "sensitivitaet"} <= set(spec["evidence_derivation"])
+
+
+def test_zellfaktor_nutzt_heimanteil_der_zelle():
+    """Befund 146: (1 − h_Heim,z) je Zelle, Rückfall 0,344 ohne Zellwert."""
+    base = _berlin_mort_cell()
+    f_heim = _factor(MORT, {**base, "share_care_home_85p": 0.5})
+    f_ohne_heim = _factor(MORT, {**base, "share_care_home_85p": 0.0})
+    f_rueckfall = _factor(MORT, base)
+    assert f_ohne_heim < f_rueckfall < f_heim < 1.0
+    assert f_rueckfall == pytest.approx(_factor(MORT, {**base, "share_care_home_85p": 0.149}),
+                                        rel=1e-12)
+    morb = _berlin_morb_cell()
+    override_context.set_overrides({f"risks.{MORB}.impact.delta_vg_morb": 0.931})
+    assert (_factor(MORB, {**morb, "share_care_home_85p": 0.0})
+            != _factor(MORB, {**morb, "share_care_home_85p": 0.5}))
