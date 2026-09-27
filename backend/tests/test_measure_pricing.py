@@ -136,14 +136,18 @@ def test_source_refs_resolve_to_bibliography():
 
 
 def test_bibliography_entries_are_complete():
-    """Jeder Bibliografie-Eintrag trägt IEEE-Zitation, Live-URL und Archiv-Snapshot."""
+    """Jeder Bibliografie-Eintrag trägt IEEE-Zitation und Live-URL; der Archiv-Snapshot ist
+    Pflicht, außer es gibt keinen echten Schnappschuss mit Zeitstempel (T-1410, Punkt 7b) —
+    dann entfällt das Feld, statt eine unbelegte Platzhalter-URL zu tragen.
+    """
     bad = []
     for key, entry in sources.SOURCE_REFERENCES.items():
-        for field in ("ieee", "url", "archive_url"):
+        for field in ("ieee", "url"):
             if not entry.get(field):
                 bad.append((key, field))
-        if entry.get("archive_url") and "web.archive.org" not in entry["archive_url"]:
-            bad.append((key, "archive_url ist kein Wayback-Permalink"))
+        if entry.get("archive_url") and not entry["archive_url"].startswith(
+                "https://web.archive.org/web/"):
+            bad.append((key, "archive_url ist kein absoluter Wayback-Permalink"))
     assert not bad, f"Unvollständige Bibliografie-Einträge: {bad}"
 
 

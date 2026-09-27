@@ -247,7 +247,7 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "je Meter Höhe. Die Zelltemperatur erhält den Höhenterm −γ_h × "
                       "(Höhe der Zelle − mittlere Höhe der 1-km-Rasterzelle); der Mittelwert "
                       "der Rasterzelle bleibt dabei der gemessene DWD-Wert.",
-     "source_refs": [],
+     "source_refs": ["ICAO_Standardatmosphaere"],
      "evidence_class": "belegt"},
     # ── Ersatzregel für den geheimgehaltenen Anteil 65+ (Bericht #95 §3.3, Log 41) ──
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "anteil_60_66_ab65", "value": 2 / 7,
@@ -282,10 +282,12 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "an Extremhitzetagen Odds ohne Klimaanlage 1,11 (1,06–1,16), mit "
                       "Klimaanlage 1,03 (0,98–1,07); Verhältnis ohne gegen mit 1,08 (1,01–1,15), "
                       "umgekehrt 0,93 (Band 0,87–0,99). Keine Setzung (Log 40); Register "
-                      "95-S157-01.",
-     "source_refs": [],
-     # Kennzeichnung im Bericht: quelle (Kehrwert aus [46]); [46] steht noch nicht
-     # in der Bibliografie, deshalb explizit statt über aufgelöste Referenzen.
+                      "95-S157-01. Nicht editierbar: Die Rechnung liest g_S157, nicht rOR; "
+                      "g_S157 ist aus rOR abgeleitet und wird als eigener Parameter geändert.",
+     "source_refs": ["Katz_2026_Klimaanlagen_Pflegeheime"],
+     # Nicht editierbar (T-1410): Die Maßnahmenrechnung liest nur g_s157; ein Override
+     # von ror_s157 bliebe wirkungslos (toter Parameter).
+     "editable": False,
      "evidence_class": "belegt"},
     # Wert ungerundet aus der Formel des Berichts: Block heat.g_s157 nennt 0,29, das
     # Rechenbeispiel s157_berlin (25,0 Mio. €) rechnet mit g(0,93) = 0,2936 — mit 0,29
@@ -303,9 +305,10 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_refs": [],
      "evidence_class": "abgeschaetzt",
      "evidence_derivation": {
-         "wert": "0,29 = (0,93 × 1,11 − 1)/(1,11 − 1) aus rOR 0,93 und OR_ohne 1,11 [46]; "
-                 "Setzung: derselbe Anteil gilt in allen Hitzewochen des Modells, nicht nur an "
-                 "den Extremtagen von [46] (Bericht #95 §5, Befund 124).",
+         "wert": "0,29 = (0,93 × 1,11 − 1)/(1,11 − 1) aus rOR 0,93 und OR_ohne 1,11 der "
+                 "Quelle [46] (Katz u. a. 2026); Setzung: derselbe Anteil gilt in allen "
+                 "Hitzewochen des Modells, nicht nur an den Extremtagen von [46] "
+                 "(Bericht #95 §5, Befund 124).",
          "band": "0–0,90 aus dem Band von rOR (0,87 ⇒ 0, 0,99 ⇒ 0,90); OR_ohne über sein "
                  "Intervall 1,06–1,16 ergibt 0–0,49, beide Intervalle zugleich 0–0,83 "
                  "(Befund 132).",
@@ -1455,8 +1458,8 @@ IMPACT_GLOBAL_SPECS += _infra_value_specs()
 # aus dem er stammt. Ein Block kann mehrere Parameter tragen (je Region oder
 # Altersband). Die Kostensätze heat.voly und heat.c_fall stehen am Risiko im Katalog
 # (cost_methodik_block), heat.delta_hap an der Maßnahme HEAT_ACTION_PLANS
-# (methodik_bloecke). anteil_60_66_ab65 ist kein Block in Kapitel 7 (Ersatzregel §3.3)
-# und bleibt ohne Kennung. Geprüft in tests/test_methodik_95_bloecke.py.
+# (methodik_bloecke). anteil_60_66_ab65 trägt seit Runde 31 (Befund 141) den Block
+# heat.anteil_60_66 (Ersatzregel §3.3, Stufe 2). Geprüft in tests/test_methodik_95_bloecke.py.
 _HEAT_BLOECKE: dict[tuple[str, str], str] = {
     **{("EXPECTED_ANNUAL_MORTALITY", f"threshold_{r}"): "heat.t0_region"
        for r in ("nord", "mitte", "sued")},
@@ -1479,6 +1482,7 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
     ("EXPECTED_ANNUAL_MORTALITY", "ror_s157"): "heat.ror_s157",
     ("EXPECTED_ANNUAL_MORTALITY", "g_s157"): "heat.g_s157",
     ("EXPECTED_ANNUAL_MORTALITY", "delta_vg"): "heat.delta_vg",
+    ("EXPECTED_ANNUAL_MORTALITY", "anteil_60_66_ab65"): "heat.anteil_60_66",
     **{("EXPECTED_ANNUAL_MORBIDITY", f"r0_{a}"): "heat.r0_einweisungsrate"
        for a in ("u65", "a65_74", "a75_84", "a85p")},
     ("EXPECTED_ANNUAL_MORBIDITY", "excess_per_hotday"): "heat.e_hd",
@@ -1487,7 +1491,8 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
 }
 # Kennzeichnung je Block nach Kapitel 7 (Feld ``kennzeichnung``), übersetzt in die
 # Evidenzklasse der Parameterliste (P1): quelle → belegt, abschaetzung_kap3 →
-# abgeschaetzt, berechnet → berechnet. 9 × belegt, 11 × abgeschaetzt, 3 × berechnet.
+# abgeschaetzt, berechnet → berechnet. 10 × belegt, 12 × abgeschaetzt, 2 × berechnet
+# (Runde 31: heat.beta_iso steht auf quelle, heat.anteil_60_66 ist neu).
 # Die Klasse der drei Katalog-Blöcke (heat.voly, heat.c_fall, heat.delta_hap) steht
 # in data/catalog.py. Geprüft in tests/test_methodik_95_kennzeichnung.py.
 _HEAT_KLASSE: dict[str, str] = {
@@ -1498,7 +1503,7 @@ _HEAT_KLASSE: dict[str, str] = {
     "heat.l_restlebenserwartung": "abgeschaetzt",
     "heat.c_kal": "berechnet",
     "heat.q_wochenquantile": "belegt",
-    "heat.beta_iso": "berechnet",
+    "heat.beta_iso": "belegt",
     "heat.beta_pfl": "berechnet",
     "heat.beta_dist_sensitivitaet": "abgeschaetzt",
     "heat.qbar_1p": "belegt",
@@ -1507,6 +1512,7 @@ _HEAT_KLASSE: dict[str, str] = {
     "heat.ror_s157": "belegt",
     "heat.g_s157": "abgeschaetzt",
     "heat.delta_vg": "abgeschaetzt",
+    "heat.anteil_60_66": "abgeschaetzt",
     "heat.delta_vg_morb": "abgeschaetzt",
     "heat.r0_einweisungsrate": "abgeschaetzt",
     "heat.e_hd": "belegt",

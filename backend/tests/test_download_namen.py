@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from fastapi import HTTPException
 
 from app.api.routes import ergebnis_interpretation as interpretation_route
 from app.api.routes import export as export_route
@@ -136,6 +137,21 @@ def test_route_ohne_gemeindeschluessel(monkeypatch):
     monkeypatch.setattr(export_route, "export_measures_xlsx", lambda db, kid: b"xlsx")
     antwort = export_route.export_measures(7, db=_Session(Kommune=_Kommune()))
     assert 'filename="massnahmen_Bad-Toelz.xlsx"' in _header(antwort)
+
+
+def test_route_massnahmen_ohne_kommune_404(monkeypatch):
+    """Wie export_parameters (T-1471): 404 vor export_measures_xlsx, nicht danach."""
+    aufrufe = {"n": 0}
+
+    def _nicht_erwartet(_db, _kid):
+        aufrufe["n"] += 1
+        return b"xlsx"
+
+    monkeypatch.setattr(export_route, "export_measures_xlsx", _nicht_erwartet)
+    with pytest.raises(HTTPException) as exc:
+        export_route.export_measures(99, db=_Session(Kommune=None))
+    assert exc.value.status_code == 404
+    assert aufrufe["n"] == 0
 
 
 def test_gemeindeschluessel_fehlschlag_bricht_download_nicht_ab(monkeypatch):

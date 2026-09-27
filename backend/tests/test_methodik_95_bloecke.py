@@ -1,10 +1,12 @@
 """Abgleich Registry ⇄ Parameter-Blöcke des Berichts #95 (T-1370, Übernahmeliste (f)).
 
-Kapitel 7 von ``docs/methodik/95_hitzebelastung.md`` führt 23 maschinenlesbare
-Parameter-Blöcke (``parameter:`` / ``id: heat.…``). Jeder Registry-Parameter der
-Hitzebelastung trägt im Feld ``methodik_block`` die Kennung seines Blocks. Geprüft wird:
+Kapitel 7 von ``docs/methodik/95_hitzebelastung.md`` führt 24 maschinenlesbare
+Parameter-Blöcke (``parameter:`` / ``id: heat.…``); seit Runde 31 (Befund 141) gehört
+``heat.anteil_60_66`` dazu, der Block des bestehenden Registry-Parameters
+``anteil_60_66_ab65``. Jeder Registry-Parameter der Hitzebelastung trägt im Feld
+``methodik_block`` die Kennung seines Blocks. Geprüft wird:
 
-1. Die Menge der ``methodik_block``-Werte der Registry ist genau die Menge der 23
+1. Die Menge der ``methodik_block``-Werte der Registry ist genau die Menge der 24
    Block-Kennungen aus Kapitel 7 — kein Block ohne Parameter, keine erfundene Kennung.
 2. Der Wert jedes Registry-Parameters stimmt mit dem ``wert`` seines Blocks überein
    (Divergenz = Meldung an den CMO, nie stiller Code-Fix; Eiserne Regel 5).
@@ -58,11 +60,11 @@ def _registry() -> list[dict]:
     return parameter_registry.catalog_parameters()
 
 
-def test_block_kennungen_der_registry_sind_genau_die_23_aus_kapitel_7():
+def test_block_kennungen_der_registry_sind_genau_die_24_aus_kapitel_7():
     soll = set(_bloecke())
     # Gegenzählung ohne YAML-Parser: jede "id:"-Zeile nach "parameter:".
     roh = re.findall(r"^parameter:\n  id: (\S+)", _kapitel7(), re.M)
-    assert len(roh) == 23 and set(roh) == soll, sorted(roh)
+    assert len(roh) == 24 and set(roh) == soll, sorted(roh)
     # Nur Kennungen von #95 (heat.*): seit T-1480 tragen auch die #96-Parameter
     # Block-Kennungen (pollen.*), die nicht in diesem Kapitel 7 stehen.
     ist = {p["methodik_block"] for p in _registry()

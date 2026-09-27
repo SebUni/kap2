@@ -1,10 +1,11 @@
-"""Kennzeichnung der 23 Parameter-Blöcke von #95 in der Parameterliste (T-1371, Vorgabe P1).
+"""Kennzeichnung der 24 Parameter-Blöcke von #95 in der Parameterliste (T-1371, Vorgabe P1).
 
 Kapitel 7 von ``docs/methodik/95_hitzebelastung.md`` trägt je Block eine ``kennzeichnung``
 (``quelle`` | ``abschaetzung_kap3`` | ``berechnet``). Die Registry führt sie als
 ``evidence_class`` (``belegt`` | ``abgeschaetzt`` | ``berechnet``). Geprüft wird:
 
-1. Die Zählung der Blöcke ist 9 × belegt, 11 × abgeschätzt, 3 × berechnet.
+1. Die Zählung der Blöcke ist 10 × belegt, 12 × abgeschätzt, 2 × berechnet (Runde 31:
+   ``heat.beta_iso`` steht auf ``quelle``, ``heat.anteil_60_66`` ist als Abschätzung neu).
 2. Jeder Registry-Parameter eines Blocks trägt die Klasse seines Blocks.
 3. Jeder als „belegt“ gekennzeichnete Block hat eine Quellenangabe in der Parameterliste.
 """
@@ -31,7 +32,7 @@ def _nach_block() -> dict[str, list[dict]]:
     return nach_block
 
 
-def test_zaehlung_der_kennzeichnungen_9_11_3():
+def test_zaehlung_der_kennzeichnungen_10_12_2():
     soll = Counter(_KLASSE[b["kennzeichnung"]] for b in _bloecke().values())
     nach_block = _nach_block()
     ist = Counter()
@@ -42,7 +43,7 @@ def test_zaehlung_der_kennzeichnungen_9_11_3():
     zaehlung = {"belegt": ist["belegt"], "abgeschaetzt": ist["abgeschaetzt"],
                 "berechnet": ist["berechnet"]}
     print(zaehlung)
-    assert zaehlung == {"belegt": 9, "abgeschaetzt": 11, "berechnet": 3}
+    assert zaehlung == {"belegt": 10, "abgeschaetzt": 12, "berechnet": 2}
     assert dict(soll) == dict(ist)
 
 
