@@ -8,6 +8,7 @@ import AbhaengigkeitenHandlungsfelder from './AbhaengigkeitenHandlungsfelder'
 import DiversitaetAspekte from './DiversitaetAspekte'
 import NachweiseEinbeziehung from './NachweiseEinbeziehung'
 import NachbarkommunenScreening from './NachbarkommunenScreening'
+import LeitfragenUebersicht from './LeitfragenUebersicht'
 
 export interface StrukturierterAbschnittProps {
   kommuneId: number
@@ -24,6 +25,7 @@ export const STRUKTURIERTE_ABSCHNITTE: Record<string, ComponentType<Strukturiert
   'Gender und Diversität': DiversitaetAspekte,
   Einbeziehung: NachweiseEinbeziehung,
   Nachbarkommunen: NachbarkommunenScreening,
+  Leitfragen: LeitfragenUebersicht,
 }
 
 interface Abschnitt {
