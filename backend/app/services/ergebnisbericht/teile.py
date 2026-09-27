@@ -24,6 +24,7 @@ import math
 from html import escape
 from typing import Callable
 
+from app.services.ergebnisbericht.beispiel import MORB, MORT
 from app.services.ergebnisbericht.sammler import DATENSTAENDE, Berichtsdaten
 from app.services.kurzfassung_markdown import _de_euro
 
@@ -165,6 +166,15 @@ def teil_1(d: Berichtsdaten) -> str:
 
 # ── Teil 4 ──────────────────────────────────────────────────────────────────────
 
+def _parameter_quelle(d: Berichtsdaten, param_id: str) -> str:
+    """Kennzeichnung eines Parameters wie in Teil 7 (Quelle oder ausgewiesene Abschätzung von KAP3),
+    aus denselben Parameterdaten (``d.parameter``, ``_herkunft``), nicht als fester Text (Vorgabe P1)."""
+    for p in d.parameter:
+        if p.get("id") == param_id:
+            return _herkunft(p)
+    return ""
+
+
 def teil_4(d: Berichtsdaten) -> str:
     k, e = d.kommune, d.ergebnis95
     html = [_kopf(4)]
@@ -185,11 +195,13 @@ def teil_4(d: Berichtsdaten) -> str:
          "Expositions-Wirkungs-Kurve des RKI, vier Altersbänder"),
         ("Verlorene Lebensjahre je Jahr", de_zahl(e.yll, 2), "Todesfälle × Restlebenserwartung "
          "(Destatis-Sterbetafeln)"),
-        ("× Kostensatz je Lebensjahr", _betrag(d, e.voly_eur), "UBA Methodenkonvention 4.0"),
+        ("× Kostensatz je Lebensjahr", _betrag(d, e.voly_eur),
+         _parameter_quelle(d, f"risks.{MORT}.cost_per_outcome")),
         ("= Betrag Sterblichkeit", _betrag(d, e.betrag_mortalitaet_eur), "Rechnung"),
         ("Hitzebedingte Krankenhauseinweisungen je Jahr", de_zahl(e.einweisungen, 2),
          "Destatis, Karlsson und Ziebarth 2018"),
-        ("× Kostensatz je Fall", _betrag(d, e.c_fall_eur), "Destatis-Kostennachweis 2023"),
+        ("× Kostensatz je Fall", _betrag(d, e.c_fall_eur),
+         _parameter_quelle(d, f"risks.{MORB}.cost_per_outcome")),
         ("= Betrag Erkrankungen", _betrag(d, e.betrag_morbiditaet_eur), "Rechnung"),
     ]
     # Beträge kommen aus _betrag (schon ausgezeichnet und maskiert); alle übrigen Werte werden maskiert.

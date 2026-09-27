@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–431) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–434) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -162,8 +162,8 @@ in längeren, sonnigeren Warmphasen" — Monetarisierung ID 98, Blattzeile 103).
 |---|---|---|---|---|
 | E20 | UV-Strahlung (direkter Hazard) | Schicht A + B | \(\Delta\text{Dosis}\) über SSD-Normalperiodenvergleich × \(k_{\text{UV}}\) × \(a_{\text{attr}}\) (§3.2); Ebene UV_RADIATION/SSD (neu) | — |
 | S154 | Freizeitverhalten | **Sensitivitätsband** (Default 1) | \(v_{\text{verh}}\)-Band +0,25…+0,60 je Komforttag (§3.5) | keine quantifizierte Effektgröße „Mehr-Exposition je Komforttag" für DE [36]; US-Zeitverwendungs-Evidenz nur Band (§3.2: unbelegte Modulatoren Default 1; Log 11) |
-| S155 | Gefahrenbewusstsein | Maßnahmen-Hebel (**qualitativ**) | UV-Schutz im öffentlichen Raum / UV-Index-Kommunikation (§5) | Basiswert: Nutzen-Kosten-Verhältnisse sind keine Effektgröße auf Dosis/Inzidenz (GP-26/34; Log 12) |
-| S158 | Monitoring / Frühwarnsysteme | Maßnahmen-Hebel (**qualitativ**; Kostenwirkung bereits im Basiswert) | Früherkennungs-Förderung (SCS-Teilnahme); §5 — Befund 203 | Basiswert setzt bereits SCS-Kosten für alle Fälle an — additiver Hebel hätte kein Headroom; quantifizierbar erst mit Detektionsmix-Parameter (Ersetzungspfad) |
+| S155 | Gefahrenbewusstsein | Maßnahmen-Hebel (**Abschätzung von KAP3**, Befund 432) | UV-Schutz im öffentlichen Raum / UV-Index-Kommunikation: Dosisminderung \(h_{\text{S155}}\) = 0,018 (0,005–0,045) senkt \(F_e\) in der §3.4-Formel, Einlauf als Rampe über \(a_{\text{erk}}\) (§5; Log 33) | — (nicht im Basiswert: der Basiswert ist der Zustand ohne weitere Anpassung; Berlin −252.500 € je Jahr nach vollem Einlauf) |
+| S158 | Monitoring / Frühwarnsysteme | Maßnahmen-Hebel (**keine eigene Abschätzung**; Kostenwirkung im Basiswert voll angerechnet, Befunde 203/433) | Früherkennungs-Förderung (SCS-Teilnahme); im Produkt der Vermerk »Kostenwirkung im Basiswert voll angerechnet« statt einer Nullwirkung (§5; Log 34) | Basiswert setzt bereits SCS-Kosten für alle Fälle an — ein Hebel auf \(c_e\) zählte doppelt (LF 4); für die Letalität fehlt eine Effektgröße; quantifizierbar erst mit Detektionsmix-Parameter (Ersetzungspfad) |
 | R35 | Vorkommen von Bevölkerung | Schicht A + B | \(\text{pop}_a\) (Zensus 2022; Ebene u20 aus #96 mitgenutzt) | — |
 | R36 | Vorkommen von Gesundheitsinfrastruktur | Schicht A (Screening) | Ebene HEALTHCARE_ACCESS im Index (§3.7) | Basiswert Default 1: keine Evidenz für einen Distanz-/Kapazitätseffekt auf Hautkrebs-Outcomes; Zugangseffekte stecken im SCS-Hebel (§3.2; Log 13) |
 | — | Berufliche Außenexposition (**kein Knoten der W186-Kette**) | **Sensitivitätsband** (Basiswert-Default 1) | \(r_{\text{out}}\) (nur SCC-Anteil am Zusatz, nur Bänder 20–64 … 85+; §3.4); Ebene Außenbeschäftigten-Anteil **geparkt (Datenquelle fehlt)** — Beschaffungs-Watchlist INKAR/SVB (§3.1; Befund 215) | GP-9: Kettentreue („nicht mehr, nicht weniger") — Aufnahme in den Basiswert erforderte eine Fortschreibung der Arbeitsmappe + Abgleich-Protokoll-Punkt (dokumentierter Ersetzungsweg); Evidenz (BK 5103, Meta-OR 1,77 [43]) und \(\bar q_{\text{out}}\)-Herleitung liegen vollständig vor (Log 10) |
@@ -195,11 +195,15 @@ Inzidenzraten der Kalibrierjahre 2021–2023 (ZfKD, §3.3), das bestehende Hautk
 SCS-Kostensätzen, die der Basiswert bereits für alle Fälle ansetzt (§5). Weitere Maßnahmen sind im
 Basiswert nicht enthalten.
 
-**(b) Zustand „mit Anpassung".** Er wird in diesem Bericht **nicht als Zahl dargestellt**: Beide
-Maßnahmen-Hebel (§5) — Förderung der Früherkennung (S158) und UV-Schutz im öffentlichen Raum mit
-Kommunikation (S155) — laufen qualitativ, weil es keine Effektgröße auf Dosis oder Inzidenz gibt
-beziehungsweise der Screening-Effekt schon im Basiswert steht. Einen KWRA-Wert „mit Anpassung" oder ein
-Restrisiko weist der Bericht deshalb nicht aus; der Ersetzungspfad (Detektionsmix-Parameter) steht in §5.
+**(b) Zustand „mit Anpassung".** Einen KWRA-Wert „mit Anpassung" oder ein Restrisiko weist der Bericht
+nicht aus; beziffert ist die Wirkung eines der beiden Maßnahmen-Hebel (§5). **UV-Schutz im öffentlichen Raum
+mit Kommunikation (S155)** ist eine Abschätzung von KAP3: Er senkt die Dosis um 1,8 % (Band 0,5–4,5 %) und
+damit den Betrag für Berlin nach vollem Einlauf um 252.500 € je Jahr (Band 70.100–631.200 €, Preisstand
+2024), das sind 2,2 % des Basiswerts. Die Wirkung läuft über Jahrzehnte ein: nach 10, 20 und 30 Jahren
+werden 34.700, 69.400 und 104.000 € angerechnet. **Förderung der Früherkennung (S158)** bekommt keine eigene
+Zahl, weil der Basiswert die günstigeren Kostensätze früh erkannter Fälle schon für alle Fälle ansetzt; im
+Produkt steht dafür der Vermerk „Kostenwirkung im Basiswert voll angerechnet“, keine Nullwirkung. Der
+Ersetzungspfad (Detektionsmix-Parameter) steht in §5.
 
 **(c) Einstufung der KWRA 2021 ohne Anpassung.** Die KWRA 2021 stuft die Klimawirkung
 „UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)" im Zustand ohne Anpassung so ein:
@@ -225,8 +229,8 @@ Nur Zeilen mit Entscheidung **Basiswert** kommen in den Formeln (§3) vor.
 | 98-K1-01 | Fall → Erstjahres-Behandlungskosten | MM 5.326 (SCS-detektiert) / 9.038 €₍₂₀₁₅₎ (nicht-SCS); NMSC 4.660/5.890 — Basis = SCS-Werte ⇒ 6.724/5.883 €₂₀₂₄ | Krankenkassen-Routinedaten (AOK; DiD-Design) | Speckemeier 2022 [34] (Volltext-Abstract primär verifiziert; Kohorte Diagnose 2014/2015) | DE; **Proxy**: Gesamt- statt inkrementelle Kosten, nur Erstjahr (§3.4) | national | **Basiswert** (untere Stütze) + Band | Log 7 |
 | 98-K1-02 | MM/C44 → Letalität, Restlebenserwartung | \(\lambda_{\text{MM}}\) = 0,11466 · \(\lambda_{\text{C44}}\) = 0,005236 (Mittel 2021–2023); \(\bar L_{\text{MM}}\) = 10,4569 · \(\bar L_{\text{C44}}\) = 5,4787 J. (Jahresmediane des Ankerfensters, Befund 224) | amtliche Statistik + Approximationen (**gekennzeichnet**: Perioden- bzw. Median-Approximation, GP-Befund 43) | ZfKD KID 2025 Tab. 3.13.1/3.14.1 [27]; Sterbetafel 2022/2024 [48] | DE; Zähler und Nenner im selben Fenster wie die Ablesekette (Befund 220) | national | **Basiswert** | Log 8, 16 |
 | 98-S154-01 | S154 Verhalten → Mehr-Exposition je Komforttag | \(s\) ≈ +0,45 (Kernband +0,25…+0,60) als **Tages**wert; Hitzetage > 30 °C: −5…−13 % Aktivität | Zeitverwendungs-/Dosimetrie-Evidenz (US) | Graff Zivin & Neidell 2014 [57]; [58,59] | US-Übertragbarkeit begrenzt; Ambient-Anteil steckt bereits in ΔDosis (Doppelzählungsschutz) | Jahresumrechnung braucht den dosisgewichteten Komforttag-Anteil \(\phi\) — Ebene **geparkt** (§3.4; Befund 216) | **Sensitivitätsband** (Default 1) | Log 11, 17 |
-| 98-S155-01 | S155 UV-Schutzprogramme → Inzidenz | Nutzen-Kosten 2,2–8,7 : 1 (AUS/USA/EU) — **keine** Dosis-/Inzidenz-Effektgröße | Programm-Evaluationen | Shih/Doran/Collins [37] | keine deutsche Studie [37] | kommunal | **Maßnahmen-Hebel (qualitativ)** | Log 12 |
-| 98-S158-01 | S158 Früherkennung (SCS) → Fallkosten/Letalität | −18,8 % [8,4–23,1] Erstjahreskosten je MM-Fall bei SCS-Detektion (belegt das Sparpotenzial); Letalitätswirkung nicht angesetzt | quasi-experimentell (DiD, Routinedaten) | Speckemeier 2022 [34] | DE; **Wirkung im Basiswert enthalten** (Basis-\(c_e\) = SCS-Werte; Befund 203) | kommunal (Teilnahmequoten) | **Maßnahmen-Hebel (qualitativ)** | Log 12 |
+| 98-S155-01 | S155 UV-Schutzprogramme → Dosis → Inzidenz | Nutzen-Kosten 2,2–8,7 : 1 (AUS/USA/EU) — **keine** Dosis-/Inzidenz-Effektgröße; deshalb Dosisminderung \(h_{\text{S155}}\) = 0,018 (0,005–0,045) als **Abschätzung von KAP3** aus drei Faktoren (§5) | Programm-Evaluationen; eigene Abschätzung | Shih/Doran/Collins [37]; Herleitung §5 | keine deutsche Studie [37] | kommunal | **Maßnahmen-Hebel (Abschätzung von KAP3)** | Log 12, 33 |
+| 98-S158-01 | S158 Früherkennung (SCS) → Fallkosten/Letalität | −18,8 % [8,4–23,1] Erstjahreskosten je MM-Fall bei SCS-Detektion (belegt das Sparpotenzial); Letalitätswirkung nicht angesetzt | quasi-experimentell (DiD, Routinedaten) | Speckemeier 2022 [34] | DE; **Wirkung im Basiswert enthalten** (Basis-\(c_e\) = SCS-Werte; Befund 203) | kommunal (Teilnahmequoten) | **Maßnahmen-Hebel (keine eigene Abschätzung; Vermerk statt Nullwirkung)** | Log 12, 34 |
 | 98-OUT-01 | Berufliche Außenexposition → SCC | OR 1,77 [1,37–2,30] (Fall-Kontroll-Pool; Kohorten 1,68 [1,08–2,63]); \(\bar q_{\text{out}}\) = 0,070 (VGR 2023: [572 + 2.643] / 45.909 Tsd. [70]) | Meta-Analyse (BK-5103-Grundlage) | Schmitt 2011 [43] (Abstract primär verifiziert); Destatis VGR [70] | DE; **kein Knoten der W186-Kette** (GP-9); Evidenz gilt für **Erwerbs-/Nacherwerbsbänder**, nicht für u20 (Befund 218) | INKAR/SVB-Branchenanteile — Ebene **geparkt (Datenquelle fehlt)**, Watchlist (Befund 215) | **Sensitivitätsband** (Basiswert-Default 1) | Log 10, 18 |
 | 98-R36-01 | R36 Gesundheitsinfrastruktur → Outcome | keine Evidenz für Distanz-/Kapazitätseffekt auf Hautkrebs-Inzidenz/-Letalität | — | — | Zugangseffekt steckt im SCS-Hebel | HEALTHCARE_ACCESS (Schicht A) | **bewusst inaktiv** (Default 1) | Log 13 |
 
@@ -999,7 +1003,9 @@ Sortierregel: nach dem Buchstaben des Zeichens ohne Groß- und Kleinschreibung; 
 | \(\Delta F_{e,\text{Zelle}}\) | klimaattribuierte Zusatzfälle (Teil-Ausweis) | 1/Jahr | berechnet |
 | \(\text{€}_{\text{Zelle}}\) | bewerteter Schaden K1 (Ursache UV) — Teil-Ausweis | €₂₀₂₄/Jahr | Ergebnis (§3.4) |
 | \(F_{e,\text{Zelle}}\) | Baseline-Neuerkrankungen der Zelle | 1/Jahr | berechnet (§3.3) |
+| \(h_{\text{S155}}\) | relative Minderung der Jahresdosis durch den Hebel S155 (Wirkungsort \(F_e\), §5) | — | **0,018** (0,005–0,045) = 0,30 × 0,60 × 0,10 — Abschätzung von KAP3; herleitung:#hebel-s155 |
 | \(I_{e,a}^{\text{roh}}\) | Roh-Neuerkrankungsrate je Entität und Band (Ablesekette; Anlage-CSV) | 1/(100.000 · Jahr) | Tabelle §3.3 [27,48]; register:98-R35-01; herleitung:#i-raten |
+| \(J\) | Jahre seit Beginn des Hebels S155 | Jahre | Eingabe; angerechneter Anteil \(\min(1, J/a_{\text{erk}})\) (§5); herleitung:#hebel-s155 |
 | \(k_{\text{UV}}\) | Übersetzung SSD-Trend → erythemwirksame Dosis (Elastizität zeitinvariant angenommen, §3.2) | — | **0,7119** (0,3622–1,0616) = (4,9/4,6) × 0,6683, Brücke über die Globalstrahlung; Band = publizierte Standardfehler (§3.2) [31,73]; register:98-E20-02; herleitung:#k-uv |
 | \(\lambda_e\) | Letalitätsanteil (Perioden-Approximation, gekennzeichnet; Anker 2021–2023) | — | MM **0,11466** · C44 **0,005236** [27]; register:98-K1-02 |
 | \(\bar L_e\) | verlorene Lebensjahre je Sterbefall (Median-Approximation, gekennzeichnet; Jahresmediane des Ankerfensters) | Jahre | MM **10,4569** · C44 **5,4787** [27,48]; register:98-K1-02; herleitung:#l-quer |
@@ -1016,6 +1022,7 @@ Sortierregel: nach dem Buchstaben des Zeichens ohne Groß- und Kleinschreibung; 
 | \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136,4–165,6 T€; Kette #95 §3.5) [19]; herleitung:#voly (in #95) |
 | \(v_{\text{verh}}\) | Verhaltens-Sensitivität — **Jahres**faktor, **abgeleitet** aus \(s\) und \(\phi_{\text{Komfort}}\) (kein eigener Parameter, §3.2 Kein-Doppelkanal) | — | \(1+\phi_{\text{Komfort}}(s-1)\) = **1,00** (Band 1,00–1,11); herleitung:#v-verh |
 | \(w_{\text{SCC}}\) | SCC-Anteil an C44 (altersinvariant, dokumentierte Annahme; Quellen-Widerspruch benannt §3.1) | — | **0,25** (Band 0,25–0,50) [27; obere Stütze 2015er-BfS-Split]; herleitung:#baf-c44 |
+| \(W_{\text{S155}}(J)\) | angerechnete Minderung des bewerteten Schadens durch S155 nach \(J\) Jahren (Teil-Ausweis, nicht im Basiswert) | €₂₀₂₄/Jahr | berechnet (§5); herleitung:#hebel-s155 |
 | \(Y(a_{\text{erk}})\) | Inzidenz im Erkrankungsalter \(a_{\text{erk}}\); \(Y(a_{\text{erk}})\sim\Phi(a_{\text{erk}})^{c}\) mit \(c\) = BAF | 1/(100.000 · Jahr) | Funktionsform aus [30]; herleitung:#gleichgewicht |
 | \(\text{YLL}_{\text{Zelle}}\) | verlorene Lebensjahre — **nativer Ausweis** | Jahre/Jahr | Ergebnis |
 | \(z\) | Index der Gemeindepunkte (Kalibrierung, Anlagen [72,73]) bzw. der 100-m-Zellen (Produktion, §3.4-Summen) | — | BKG VG250 `vg250_pk` × Zensus 2022 [72]; berechnet |
@@ -1212,20 +1219,146 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
 
 ## 5 Maßnahmen-Hebel (§2.5/§3.5)
 
-- **Früherkennungs-Förderung / SCS-Teilnahme (S158) — qualitativ** (Befund 203): Die
-  DiD-Evidenz [34] belegt das Sparpotenzial (SCS-detektierte MM-Fälle: **−18,8 %
-  [−23,1; −8,4]** Erstjahreskosten), aber der **Basiswert setzt bereits für alle Fälle
-  die SCS-Kostensätze an** (Untergrenzen-Wahl §3.4) — ein zusätzlicher Hebel auf
-  \(c_e\) würde den Maßnahmeneffekt doppeln (LF-4-Klasse: Maßnahmeneffekt schon im
-  Basiswert). Quantifizierbar wird der Hebel erst mit einem **Detektionsmix-Parameter**
-  (Anteil SCS-detektierter Fälle je Kommune als Basiswert-Größe, Hebel = Mix-Verschiebung
-  × Kostendifferenz 11.410 − 6.724 €) — dokumentierter Ersetzungspfad; bis dahin
-  qualitativ. Letalitätswirkung früherer Erkennung nicht angesetzt (dokumentiert).
-- **UV-Schutz im öffentlichen Raum / Kommunikation (S155) — qualitativ** (§3.5-Regel;
-  GP-Befunde 26/34): publizierte Nutzen-Kosten-Verhältnisse 2,2–8,7 : 1 [37] sind keine
-  Effektgröße auf Dosis oder Inzidenz; keine deutsche Interventionsstudie [37]. Der Hebel
-  läuft ehrlich als „qualitativ" (Verschattung senkt die effektive Dosis exponierter
-  Gruppen — Wirkungsort wäre \(v_{\text{verh}}\)/lokale Dosis, sobald quantifiziert).
+### UV-Schutz im öffentlichen Raum und Kommunikation (S155) — Abschätzung von KAP3
+
+Anker `#hebel-s155`; Befund 432; Log 33. **Was der Hebel tut:** Schatten auf Plätzen, Spielplätzen,
+Schulhöfen, in Parks und Freibädern (Bäume, Sonnensegel, Dächer), dazu UV-Index-Hinweise, die Aufenthalte in
+den Schatten lenken. Eine publizierte Effektgröße auf Dosis oder Inzidenz gibt es nicht: Die
+Nutzen-Kosten-Verhältnisse 2,2–8,7 : 1 [37] sagen, dass sich solche Programme lohnen, nicht, um wie viel sie die
+Dosis senken, und eine deutsche Interventionsstudie fehlt [37]. Nach Vorgabe P2 bleibt trotzdem keine
+Nullwirkung stehen; die Wirkung ist eine Abschätzung von KAP3 aus drei Faktoren:
+
+| Faktor | Wert | Band | Begründung (Abschätzung von KAP3) |
+|---|---|---|---|
+| Anteil der Jahresdosis, der im öffentlichen Raum anfällt | 0,30 | 0,20–0,40 | Der größere Teil fällt im eigenen Garten, auf dem Balkon, im Urlaub und bei der Arbeit an; diese Orte erreicht eine Kommune nicht. |
+| Minderung der Dosis im Schatten gegenüber voller Sonne | 0,60 | 0,50–0,75 | Schatten hält die direkte Sonnenstrahlung ab, nicht die Himmelsstrahlung; er mindert deutlich, aber nicht vollständig. |
+| Anteil der Aufenthalte im öffentlichen Raum, die der Hebel **zusätzlich** in den Schatten verlagert | 0,10 | 0,05–0,15 | Nur zusätzlich zum heutigen Stand, der schon in den Inzidenzraten 2021–2023 steckt; ein Programm erreicht nur einen Teil der Plätze und der Menschen. |
+
+**Dosisminderung:** \(h_{\text{S155}}\) = 0,30 × 0,60 × 0,10 = **0,018** — die Jahresdosis der Bevölkerung sinkt
+um 1,8 %. Band: alle drei Faktoren an der unteren Grenze 0,20 × 0,50 × 0,05 = **0,005**, alle an der oberen
+0,40 × 0,75 × 0,15 = **0,045**.
+
+**Wirkungsort in der Formel aus §3.4:** Der Hebel senkt jede Dosis um denselben Anteil, die heutige wie die
+klimabedingt erhöhte. Deshalb sinkt die Baseline \(F_e\) um \(\text{BAF}_e \cdot h_{\text{S155}}\), während die
+relative Dosiserhöhung \(\Delta\text{Dosis}\) gleich bleibt:
+
+$$ \Delta F_{e}^{\text{mit S155}} \;=\; F_e \cdot \left(1 - \text{BAF}_e \cdot h_{\text{S155}}\right) \cdot \text{BAF}_e \cdot \Delta\text{Dosis} $$
+
+Behandlung und Mortalität hängen linear an \(\Delta F_e\); der Euro-Betrag je Entität sinkt deshalb um denselben
+Anteil: beim MM um 0,6 × 1,8 % = 1,08 %, beim C44 um 1,675 × 1,8 % = 3,02 %. Die Wirkung steht **nicht im
+Basiswert**, weil der Basiswert der Zustand ohne weitere Anpassung ist (Kapitel 1 (a)); sie wird daneben als
+Teil-Ausweis geführt. Doppelt gezählt wird nichts (LF 4): Der heutige Schutz steckt in den Raten der Ebene 2,
+der dritte Faktor zählt nur zusätzlich verlagerte Aufenthalte.
+
+**Latenz: Sprung der Dosis, Rampe der Wirkung.** Die Dosis sinkt als Sprung, sobald der Hebel wirkt. Die
+Wirkung auf die Neuerkrankungen läuft dagegen als Rampe ein: Nach \(J\) Jahren hat ein Mensch im
+Erkrankungsalter \(a_{\text{erk}}\) erst \(J\) seiner \(a_{\text{erk}}\) Lebensjahre unter der gesenkten Dosis
+verbracht, seine Lebenszeitdosis ist also erst um \(h_{\text{S155}} \cdot J/a_{\text{erk}}\) gesunken.
+Angerechnet wird nach \(J\) Jahren der Anteil \(\min(1, J/a_{\text{erk}})\) mit \(a_{\text{erk}}\) = 66 Jahren
+(MM) und 75 Jahren (C44), der Mitte der Median-Erkrankungsalter aus [27] (MM 63–69, C44 74–76 Jahre):
+
+$$ W_{\text{S155}}(J) \;=\; \sum_e \min\!\left(1, \frac{J}{a_{\text{erk},e}}\right) \cdot \text{BAF}_e \cdot h_{\text{S155}} \cdot \text{€}_e $$
+
+Diese Rampe bildet die Einlaufzeit der Lesart unter §3.0 ab, weil eine Dosisänderung erst dann „eingelaufen“
+ist, wenn die ganze Lebenszeitdosis der heute Erkrankenden unter ihr entstanden ist, und das dauert genau ein
+Erkrankungsalter \(a_{\text{erk}}\) aus [27]; \(\tau\) aus §3.4 wirkt dabei kein zweites Mal, weil er nur
+beschreibt, wie weit der Basiswert unter einer Jahres-Attribution des vergangenen Dosisanstiegs läge, im Ausweis
+auf 1 steht und dieselbe Einlaufzeit ein zweites Mal anrechnen würde. Abgezinst wird nicht (Satz unter §3.0).
+
+**Beispiel Berlin** (Werte aus §3.0, Ebene 10; Preisstand 2024):
+
+| Schritt | MM | C44 | zusammen |
+|---|---|---|---|
+| Bewerteter Schaden je Jahr (Ebene 10) | 5,14 Mio. € | 6,53 Mio. € | 11,68 Mio. € |
+| Minderung \(\text{BAF}_e \cdot h_{\text{S155}}\) | 0,6 × 0,018 = 1,08 % | 1,675 × 0,018 = 3,02 % | — |
+| Volle Wirkung je Jahr | 55.600 € | 196.900 € | **252.500 €** (2,2 %) |
+| Weniger Zusatzfälle je Jahr | 0,28 | 18,8 | — |
+| Band mit \(h_{\text{S155}}\) 0,005–0,045 | — | — | 70.100–631.200 € (0,6–5,4 %) |
+
+| angerechnet nach | Anteil MM | Anteil C44 | Berlin je Jahr |
+|---|---|---|---|
+| 10 Jahren | 15 % | 13 % | 34.700 € |
+| 20 Jahren | 30 % | 27 % | 69.400 € |
+| 30 Jahren | 45 % | 40 % | 104.000 € |
+| 66 (MM) bzw. 75 (C44) Jahren | 100 % | 100 % | 252.500 € |
+
+**Sensitivität:** Die Wirkung ist linear in \(h_{\text{S155}}\); jeder Prozentpunkt Dosisminderung ändert Berlin
+um 140.300 € je Jahr. Je ein Faktor an seinen Bandgrenzen, die anderen auf dem Wert: Anteil im öffentlichen
+Raum 168.300–336.700 €, Minderung im Schatten 210.400–315.600 €, zusätzlich verlagerte Aufenthalte
+126.200–378.700 €. **Stärkster Treiber** ist der Anteil der zusätzlich verlagerten Aufenthalte (Faktor 3
+zwischen den Bandgrenzen); er ist zugleich die Größe, die eine Kommune mit ihrem Programm bestimmt.
+
+**Genauigkeit, beide Fassungen:** Die Formel rechnet die Dosis-Wirkung linear (\(\text{BAF}_e \cdot h\)), wie
+§3.4. Genau nach \(Y \sim \Phi^{\text{BAF}}\) wäre die Minderung \(1-(1-h)^{\text{BAF}_e}\); die lineare
+Fassung liegt beim C44 um 0,6 % zu hoch und beim MM um 0,4 % zu niedrig, zusammen 0,4 % zu hoch (252.500
+gegen 251.500 €). Die Kette bleibt linear, weil diese Abweichung gegen das Band (Faktor 9) nicht ins Gewicht
+fällt und die Formel am Zahlenbeispiel nachrechenbar bleibt.
+
+```python test: beispiel_98_s155_wirkung
+# Hebel S155 (Kapitel 5): Wirkung fuer Berlin mit den Werten aus 3.0, mit Band und Latenz
+ew = [673_277, 2_288_153, 339_490, 253_528, 107_933]   # Ebene 1, Frauen + Maenner
+assert sum(ew) == 3_662_381
+f_mm = 1.0012 * sum(e * r / 1e5 for e, r in zip(ew, [0.5, 24.7, 64.0, 94.9, 88.5]))
+f_c44 = 0.9910 * sum(e * r / 1e5 for e, r in zip(ew, [2.0, 125.9, 617.6, 1267.2, 1479.5]))
+dd = 0.07165 * (4.9 / 4.6) * 0.6683 * 0.75                 # Ebenen 4 und 5
+d_mm, d_c44 = f_mm * 0.6 * dd, f_c44 * 1.675 * dd          # Ebene 6
+lam_mm = (2928 + 3146 + 3169) / (26_140 + 27_040 + 27_430)
+lam_c44 = (1178 + 1275 + 1332) / (236_670 + 243_430 + 242_820)
+e_mm = d_mm * 6724 + d_mm * lam_mm * 10.4569 * 160_800     # Ebenen 7 bis 10
+e_c44 = d_c44 * 5883 + d_c44 * lam_c44 * 5.4787 * 160_800
+summe = e_mm + e_c44
+assert abs(summe / 1e6 - 11.68) < 0.005
+h = 0.30 * 0.60 * 0.10                                     # Dosisminderung S155
+assert abs(h - 0.018) < 1e-12
+w = lambda h: h * (0.6 * e_mm + 1.675 * e_c44)             # volle Wirkung
+assert abs(w(h) - 252_500) < 50 and abs(w(h) / summe - 0.022) < 0.0005
+assert abs(0.6 * h * e_mm - 55_600) < 50 and abs(1.675 * h * e_c44 - 196_900) < 50
+assert abs(0.6 * h * d_mm - 0.28) < 0.005 and abs(1.675 * h * d_c44 - 18.8) < 0.05
+lo, hi = 0.20 * 0.50 * 0.05, 0.40 * 0.75 * 0.15            # Band
+assert abs(lo - 0.005) < 1e-12 and abs(hi - 0.045) < 1e-12
+assert abs(w(lo) - 70_100) < 50 and abs(w(hi) - 631_200) < 50
+assert abs(w(lo) / summe - 0.006) < 0.0005 and abs(w(hi) / summe - 0.054) < 0.0005
+# Latenz: Dosis als Sprung, Wirkung als Rampe min(1, J/a_erk), a_erk MM 66, C44 75 [27]
+anr = lambda J: min(1, J / 66) * 0.6 * h * e_mm + min(1, J / 75) * 1.675 * h * e_c44
+assert [round(100 * J / 66) for J in (10, 20, 30)] == [15, 30, 45]
+assert [round(100 * J / 75) for J in (10, 20, 30)] == [13, 27, 40]
+assert abs(anr(10) - 34_700) < 50 and abs(anr(20) - 69_400) < 50 and abs(anr(30) - 104_000) < 50
+assert abs(anr(75) - w(h)) < 1e-6 and anr(65) < w(h)
+# Sensitivitaet: je ein Faktor an seinen Bandgrenzen
+assert abs(w(0.20 * 0.60 * 0.10) - 168_300) < 50 and abs(w(0.40 * 0.60 * 0.10) - 336_700) < 50
+assert abs(w(0.30 * 0.50 * 0.10) - 210_400) < 50 and abs(w(0.30 * 0.75 * 0.10) - 315_600) < 50
+assert abs(w(0.30 * 0.60 * 0.05) - 126_200) < 50 and abs(w(0.30 * 0.60 * 0.15) - 378_700) < 50
+assert abs(w(0.01) - 140_300) < 50
+# Linearisierung gegen die genaue Fassung 1 - (1 - h)^BAF
+g = (1 - (1 - h) ** 0.6) * e_mm + (1 - (1 - h) ** 1.675) * e_c44
+assert abs(g - 251_500) < 50 and abs(w(h) / g - 1 - 0.004) < 0.0005
+assert abs(0.6 * h / (1 - (1 - h) ** 0.6) - 1 + 0.004) < 0.0005
+assert abs(1.675 * h / (1 - (1 - h) ** 1.675) - 1 - 0.006) < 0.0005
+```
+
+**Integrationsauflage** (für den CTO, nach der Abnahme): Das Produkt braucht (1) die drei Parameter aus
+Kapitel 7 — `uv.s155_dosisminderung` (0,018; Band 0,005–0,045), `uv.s155_a_erk_mm` (66) und
+`uv.s155_a_erk_c44` (75) —, in der Parameterliste als Abschätzung von KAP3 mit der Herleitung dieses Abschnitts
+(P1); (2) je Zelle \(\text{BAF}_e\) und den Euro-Betrag je Entität aus §3.4; (3) die Jahre seit Beginn \(J\)
+als Eingabe; ohne Eingabe zeigt das Produkt die volle Wirkung und die Anteile nach 10, 20 und 30 Jahren.
+Der Hebel wirkt nur über \(F_e\), nicht über \(v_{\text{verh}}\) und nicht über \(\Delta\text{Dosis}\). Für S158
+braucht das Produkt keine Zahl, sondern den Vermerk „Kostenwirkung im Basiswert voll angerechnet“.
+
+### Förderung der Früherkennung (S158) — keine eigene Abschätzung, Vermerk statt Nullwirkung
+
+Befunde 203/433; Log 34. Die DiD-Evidenz [34] belegt das Sparpotenzial (SCS-detektierte MM-Fälle: **−18,8 %
+[−23,1; −8,4]** Erstjahreskosten), aber der **Basiswert setzt bereits für alle Fälle die SCS-Kostensätze an**
+(Untergrenzen-Wahl §3.4) — ein zusätzlicher Hebel auf \(c_e\) würde den Maßnahmeneffekt doppeln (LF 4:
+Maßnahmeneffekt schon im Basiswert). Eine Letalitätswirkung früherer Erkennung ist nicht angesetzt, weil es
+dafür keine Effektgröße gibt. **Im Produkt steht deshalb keine Nullwirkung, sondern der Vermerk
+„Kostenwirkung im Basiswert voll angerechnet“.** **Keine Latenz:** Eine Wirkung auf Kosten oder Letalität
+heutiger Fälle setzt ohne Verzögerung ein, sie hängt nicht an der Lebenszeitdosis; die Rampe von S155 gilt hier
+nicht. **Ersetzungspfad Detektionsmix:** Mit einem Parameter „Anteil SCS-detektierter Fälle je Kommune“ würde
+der Basiswert vom SCS-Satz auf den Mix aus SCS- und Nicht-SCS-Sätzen gezogen und damit **steigen** (je MM-Fall
+bis 11.410 statt 6.724 €); der Hebel wäre dann die Mix-Verschiebung × Kostendifferenz 11.410 − 6.724 €, und die
+Untergrenzen-Wahl (Log 7) entfiele. Bis dahin bleibt der Basiswert bei den SCS-Sätzen.
+
+### Weitere Hinweise
 - **R7-Weiche:** nicht einschlägig (keine K8-Vorsorge-Gegenbuchung in der Netzwerkliste;
   kommunale Programmkosten laufen im Maßnahmen-Modul außerhalb der Schadenskonten).
 
@@ -1610,6 +1743,42 @@ parameter:
   preisstand: null
   bandzuordnung: [20-64, 65-74, 75-84, 85+]   # nicht u20 (Befund 218)
   endpunkt: beide
+
+parameter:
+  id: uv.s155_dosisminderung
+  wert: 0.018
+  einheit: "Anteil"
+  band: [0.005, 0.045]   # 0,30 x 0,60 x 0,10; unten 0,20 x 0,50 x 0,05, oben 0,40 x 0,75 x 0,15
+  kennzeichnung: abschaetzung_kap3
+  herkunft: herleitung:#hebel-s155
+  quelle: null   # keine Effektgroesse publiziert [37]; Hebel S155, wirkt nur ueber F_e (Kapitel 5)
+  preisstand: null
+  bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
+  endpunkt: beide
+
+parameter:
+  id: uv.s155_a_erk_mm
+  wert: 66.0
+  einheit: "Jahre"
+  band: [63.0, 69.0]   # Median-Erkrankungsalter MM 2021-2023 [27]; Mitte 66
+  kennzeichnung: abschaetzung_kap3
+  herkunft: herleitung:#hebel-s155
+  quelle: zfkd_kid2025   # Einlaufzeit der Rampe min(1, J/a_erk) fuer S155 (Kapitel 5)
+  preisstand: null
+  bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
+  endpunkt: beide
+
+parameter:
+  id: uv.s155_a_erk_c44
+  wert: 75.0
+  einheit: "Jahre"
+  band: [74.0, 76.0]   # mittleres Erkrankungsalter C44 2021-2023 [27]; Mitte 75
+  kennzeichnung: abschaetzung_kap3
+  herkunft: herleitung:#hebel-s155
+  quelle: zfkd_kid2025   # Einlaufzeit der Rampe min(1, J/a_erk) fuer S155 (Kapitel 5)
+  preisstand: null
+  bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
+  endpunkt: beide
 ```
 
 
@@ -1809,6 +1978,7 @@ Entscheidungsregeln W1–W6 aus `.claude/methodik-loop.md` zitiert).
 **Eintrag 29: Rev.-11-Entscheidung** (Review-Runde 13, Gate 1, 01.09.2026).
 **Einträge 30–32: Rev.-14-Entscheidungen** (Revision nach Review-Runde 23, Gate 1,
 04.09.2026; W-Regeln aus `.claude/methodik-loop.md` zitiert).
+**Einträge 33–35: Fortschreibung 7, Schritt 3** (Ticket T-1499, Vorgabe P2 für S155 und S158, 27.09.2026).
 **Familie und verworfene Ansätze (bis Fortschreibung 7 eigenes Kapitel 9):** #98 ist Folge-Risiko der
 Familie „K1-Gesundheit bottom-up" (Prototyp #95; der vollständige Ansatz-Vergleich für #98 steht in M0
 Rev. 5 Kap. 4/5). 98-B, die reine Dosis-Wirkungs-Kette über eine BfS- oder Satelliten-UV-Klimatologie,
@@ -1833,7 +2003,7 @@ Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 | 9 ⚠ | Entitäten-Split C44? | **SCC 25 % altersinvariant** (aktualisiert nach Befund 202: KID-2025-Primärangabe; Band 0,25–0,50 mit BfS-2015-Split 0,384 als oberer Stütze; Widerspruch benannt §3.8) | Primärquelle vor Sekundärangabe; GP-Befund 41 (Altersinvarianz dokumentiert) | 0,384 (BfS 2015 — M0-Wahl) | BAF_C44 1,675 statt 1,82; C44-Zusatz −8 % |
 | 10 ⚠ | Außenberufe (kein Ketten-Knoten)? | **Sensitivitätsband, Basiswert-Default 1**; Evidenz + q̄_out = 0,070 vollständig hergeleitet; Ersetzungsweg = Arbeitsmappen-Fortschreibung + AP-Punkt | GP-Befund 9 (Kettentreue „nicht mehr, nicht weniger"); Aufnahme in den Basiswert erfordert Quellen-Fortschreibung (§1/LF 14) — nicht still ergänzen | dokumentierte Kettenerweiterung mit sofortiger xlsx-Fortschreibung | Bundessumme unverändert (zentriert); Zell-Differenzierung ±2 % entfällt vorerst |
 | 11 | Verhaltens-Modulation (S154)? | **Default 1**, Band +0,25…+0,60 je Komforttag dokumentiert | keine DE-Effektgröße [36]; US-Evidenz nur Band; Ambient-Anteil schon in ΔDosis (Doppelzählungsschutz) | v_verh im Basiswert | Untergrenze der KWRA-Verhaltens-These |
-| 12 | Maßnahmen-Hebel? | **beide qualitativ** (aktualisiert nach Befund 203): UV-Schutz/Kommunikation ohne Effektgröße; SCS-Förderung mit belegtem Sparpotenzial, aber Kostenwirkung bereits im Basiswert (Untergrenzen-\(c_e\)) | GP-Befunde 26/34 + Befund 203 (LF-4-Wächter); Detektionsmix-Parameter als Ersetzungspfad | Mix-Parameter sofort einführen (Datenlücke: kommunale SCS-Quoten) | Hebelliste ehrlich; kein Doppelzählungsrisiko |
+| 12 | Maßnahmen-Hebel? | **beide qualitativ** (aktualisiert nach Befund 203; für S155 abgelöst durch Nr. 33, für S158 fortgeschrieben durch Nr. 34): UV-Schutz/Kommunikation ohne Effektgröße; SCS-Förderung mit belegtem Sparpotenzial, aber Kostenwirkung bereits im Basiswert (Untergrenzen-\(c_e\)) | GP-Befunde 26/34 + Befund 203 (LF-4-Wächter); Detektionsmix-Parameter als Ersetzungspfad | Mix-Parameter sofort einführen (Datenlücke: kommunale SCS-Quoten) | Hebelliste ehrlich; kein Doppelzählungsrisiko |
 | 13 | R36 im Basiswert? | **Default 1** (nur Schicht A) | keine Evidenz; Zugangseffekt steckt im SCS-Hebel | Distanz-Sensitivität | Basiswert schlanker |
 | 14 ⚠ | Latenz-Behandlung? | **Gleichgewichtslesart** („eingelaufenes Risiko") + Pflicht-Infokasten; kein Latenz-Discounting | [35] nennt „Jahrzehnte" ohne Bezifferung; der Rechenschritt kumulative → jährliche Dosis steht in §3.4 mit Transient-Faktor \(\tau\) = 0,20–0,48 | Kohorten-Latenzmodell (M2+) | **Ergebnis wird gegenüber einer Jahres-Attribution überschätzt** — größte Einzelachse der §4-Bändertabelle (67–339 Mio) |
 | 15 ⚠ | Kalibrierung? | **ein Normierungsskalar je Entität** an der ZfKD-Inzidenz (Werte s. Nr. 16); keine Zeitreihen-Kalibrierung des Klimaanteils (keine amtliche Reihe existiert — dokumentierte Ausnahme analog #96) | §3.4 („EIN Skalar"); Klimaanteil messungsbasiert (SSD/Dosis/BAF) | Fit an KKR-Kostenreihe (konfundiert durch Screening/Kodierung — verworfen) | Baseline amtlich exakt; Klimaanteil über Bänder |
@@ -1853,4 +2023,7 @@ Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 | 29 | Aggregationsregel des Rasterquotienten? | **Punkte mit SSD-Trend < 1 %/Dekade ausgeschlossen**; Regel in der Anlage dokumentiert und die Ergebnis-Sensitivität ausgewiesen ⇒ q = **0,6683**, k_UV = **0,7119** | Befund 297 (**B**): Seit der Fallgewichtung (Nr. 28) ist q ein gewichtetes **Mittel der Punktquotienten**, nicht mehr ein Quotient getrennt summierter Zähler und Nenner. Der Code-Kommentar rechtfertigte die Einbeziehung instabiler Punkte noch mit der alten Formel. 57 Punkte (0,08 % Gewicht) erreichen q bis **196** und hoben den Bundeswert um **+2,3 %** — ein numerisches Artefakt, kein Messergebnis. §3.9 verlangt die Aggregationsregel ausdrücklich | Instabile Punkte behalten und die Verzerrung als Näherung ausweisen — verworfen, weil q dort durch Division durch ~0 entsteht und keine physikalische Bedeutung hat | **€ 347 → 339 Mio (−2,3 %)**; YLL 1.438 → 1.404; Band 118–754 → **115–737 Mio** <!--hist--> |
 | 30 | `/risiko-auto 98` trifft auf einen bestehenden Bericht (23 Review-Runden) — Neuaufschlag oder Wiedereinstieg? | **Wiedereinstieg in den gemeinsamen Loop ab dem Ist-Stand** (L1 mit den offenen Befunden 412–420); kein Schritt A | Ein Neuaufschlag hätte Bericht, Ledger und 29 Log-Einträge überschrieben (Eiserne Regel 2, Grundregel »keine Rückfragen«); die Loop-Schritte L1–L7 sind für beide Commands identisch | Abbruch mit Rückfrage; oder Neuaufschlag unter neuem Slug | keine — Modellkern unverändert |
 | 31 ⚠ | Zurückgestellte C-Befunde 394–399: Sammelbegründung je Befund individualisieren (Vorschlag 417) oder die Befunde beheben? | **Alle sechs behoben** (W1: die saubere Lösung ist mit vorhandenen Daten erreichbar — Punktmengen-Kette in Anlage [72] mitausgegeben, Zeichentabelle um \(a_{\text{erk}}\), \(q_{\text{R}}\), \(q_{\text{R},z}\), \(z\) ergänzt, Unsicherheiten-Liste vollständig geordnet, Lint-Einordnung der Blöcke ohne Spec, Ledger-Texte 336–352 aus dem Archiv restauriert, 353–367 als gekappt offengelegt) | Die Zurückstellung hatte in vier Runden (408/417) jeweils neue Formbefunde erzeugt; Beheben kostet weniger als eine vierte Begründung und beendet die Klasse | Begründung individualisieren, Befunde bis zur Integration offen lassen | keine — kein Modellwert berührt; Symbolumbenennung \(a\) → \(a_{\text{erk}}\) und \(q\) → \(q_{\text{R}}\) rein notational |
+| 33 ⚠ | Hebel S155: abschätzen oder verwerfen, und wo wirkt er in der Formel? | **Abschätzung von KAP3** \(h_{\text{S155}}\) = 0,30 × 0,60 × 0,10 = **0,018** (Band 0,005–0,045); Wirkungsort \(F_e\) in der §3.4-Formel, \(\Delta\text{Dosis}\) bleibt gleich; Teil-Ausweis neben dem Basiswert (Befund 432; ersetzt für S155 Nr. 12) | Vorgabe P2 geht der §3.5-Regel vor; die drei Faktoren sind einzeln erklärbar und begrenzt, und Schatten senkt jede Dosis um denselben Anteil, nicht nur den Klimazuwachs | (a) Verwerfen mit Vermerk — verworfen, weil eine begründete Abschätzung möglich ist; (b) Wirkungsort \(v_{\text{verh}}\) oder \(\Delta\text{Dosis}\) — verworfen, weil das nur den Klimazuwachs mindern würde, obwohl die relative Erhöhung gleich bleibt | Berlin nach vollem Einlauf −252.500 € je Jahr (70.100–631.200 €, 2,2 % des Basiswerts); Basiswert unverändert |
+| 34 | Hebel S158: abschätzen oder verwerfen? | **Keine eigene Abschätzung**; im Produkt der Vermerk „Kostenwirkung im Basiswert voll angerechnet“ statt einer Nullwirkung; keine Latenz, weil eine Wirkung auf heutige Fälle sofort einsetzt (Befund 433; ersetzt für S158 Nr. 12) | Eine Abschätzung für S158 ist nicht möglich, weil der Basiswert die günstigeren SCS-Kostensätze schon für alle Fälle ansetzt, ein Hebel auf \(c_e\) also doppelt zählte (LF 4) und für die Letalität keine Effektgröße vorliegt, und trotzdem bleibt im Produkt keine Nullwirkung stehen, weil diese Kostenwirkung im Basiswert voll angerechnet ist und dort als Vermerk ausgewiesen wird. | (a) Detektionsmix-Parameter sofort einführen — verworfen, weil kommunale SCS-Quoten fehlen und er den Basiswert anheben würde (Ersetzungspfad §5); (b) Letalitätswirkung schätzen — verworfen, weil keine Effektgröße vorliegt | keine Zahl; Basiswert unverändert bei den SCS-Sätzen |
+| 35 ⚠ | Latenz der S155-Wirkung? | **Dosis als Sprung, Wirkung als Rampe** \(\min(1, J/a_{\text{erk}})\) mit \(a_{\text{erk}}\) = 66 (MM) und 75 Jahren (C44) [27]; \(\tau\) nicht zusätzlich; nicht abgezinst | Lesart unter §3.0: Eine Dosisänderung ist erst eingelaufen, wenn die ganze Lebenszeitdosis der Erkrankenden unter ihr entstanden ist, also nach einem Erkrankungsalter; \(\tau\) beschreibt nur den Basiswert und steht im Ausweis auf 1 | (a) Wirkung sofort voll anrechnen — verworfen, weil das der Lesart widerspricht; (b) zusätzlich \(\tau\) ansetzen — verworfen, weil dieselbe Einlaufzeit zweimal zählte; (c) Kohorten-Latenzmodell (M2+) | Berlin nach 10/20/30 Jahren 34.700/69.400/104.000 € je Jahr angerechnet |
 | 32 ⚠ | Historie-Erkennung im Lint: Marker in **beiden** Funktionen zur einzigen Ausnahme machen (414) — auch für Entscheidungslog, Verworfen-Listen und Anlagen? | **Ja, ausnahmslos**: Stichwortliste, Abschnitts-Heuristik und pauschale Blockquote-Ausnahme gestrichen; 14 Log-Zeilen, die Korrekturhistorie, der §7-Kommentar und vier Anlagen-Zeilen tragen jetzt Marker **plus** Revisionsvermerk; Zahl der Marker als Ratchet festgeschrieben, gedeckte Fundstellen werden ausgegeben (419). Einzige verbleibende Ausnahme ist der Kopfvermerk vor Kapitel 1 (Befund 345) | Achte Runde derselben Klasse; jede Heuristik hatte eine neue Lücke geöffnet. Der Marker ist bewusst gesetzt und maschinell zählbar | Abschnitts-Ausnahme für Anlagen behalten (weniger Marker, aber die von 414 gemessene Lücke bliebe) | keine — reine Prüfmechanik |

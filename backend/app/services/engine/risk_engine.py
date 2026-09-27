@@ -25,6 +25,7 @@ from __future__ import annotations
 
 from app.data import catalog
 from app.services.engine import lower_bound, override_context, tunables
+from app.services.klimawirkungen import klimawirkungen
 
 CELL_AREA_KM2 = 0.01  # 100 m × 100 m Rasterzelle
 AGGREGATION_PERCENTILE = 90.0
@@ -373,6 +374,10 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
     cost_block: dict = {
         "total_eur": total_cost,
         "by_risk": by_risk,
+        # Eine Regel für jede Klimawirkung (T-1470-cto): dieselbe Gruppierung wie
+        # bloecke() im Frontend (CostTablesSection.tsx), aber im Backend — amtlicher
+        # Name, kwra_id und Jahresbetrag als ein Eintrag je Klimawirkung.
+        "klimawirkungen": klimawirkungen(by_risk),
         # Vollständigkeitsanzeige neben der Summe („x von y Klimawirkungen in Euro
         # beziffert“), beide Zahlen aus dem Katalog gezählt.
         "euro_coverage": {"covered": cov.covered, "total": cov.total, "text": cov.text},

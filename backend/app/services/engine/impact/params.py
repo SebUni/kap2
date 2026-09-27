@@ -247,7 +247,7 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "je Meter Höhe. Die Zelltemperatur erhält den Höhenterm −γ_h × "
                       "(Höhe der Zelle − mittlere Höhe der 1-km-Rasterzelle); der Mittelwert "
                       "der Rasterzelle bleibt dabei der gemessene DWD-Wert.",
-     "source_refs": [],
+     "source_refs": ["ICAO_Standardatmosphaere"],
      "evidence_class": "belegt"},
     # ── Ersatzregel für den geheimgehaltenen Anteil 65+ (Bericht #95 §3.3, Log 41) ──
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "anteil_60_66_ab65", "value": 2 / 7,
@@ -282,10 +282,12 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "an Extremhitzetagen Odds ohne Klimaanlage 1,11 (1,06–1,16), mit "
                       "Klimaanlage 1,03 (0,98–1,07); Verhältnis ohne gegen mit 1,08 (1,01–1,15), "
                       "umgekehrt 0,93 (Band 0,87–0,99). Keine Setzung (Log 40); Register "
-                      "95-S157-01.",
-     "source_refs": [],
-     # Kennzeichnung im Bericht: quelle (Kehrwert aus [46]); [46] steht noch nicht
-     # in der Bibliografie, deshalb explizit statt über aufgelöste Referenzen.
+                      "95-S157-01. Nicht editierbar: Die Rechnung liest g_S157, nicht rOR; "
+                      "g_S157 ist aus rOR abgeleitet und wird als eigener Parameter geändert.",
+     "source_refs": ["Katz_2026_Klimaanlagen_Pflegeheime"],
+     # Nicht editierbar (T-1410): Die Maßnahmenrechnung liest nur g_s157; ein Override
+     # von ror_s157 bliebe wirkungslos (toter Parameter).
+     "editable": False,
      "evidence_class": "belegt"},
     # Wert ungerundet aus der Formel des Berichts: Block heat.g_s157 nennt 0,29, das
     # Rechenbeispiel s157_berlin (25,0 Mio. €) rechnet mit g(0,93) = 0,2936 — mit 0,29
@@ -303,9 +305,10 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_refs": [],
      "evidence_class": "abgeschaetzt",
      "evidence_derivation": {
-         "wert": "0,29 = (0,93 × 1,11 − 1)/(1,11 − 1) aus rOR 0,93 und OR_ohne 1,11 [46]; "
-                 "Setzung: derselbe Anteil gilt in allen Hitzewochen des Modells, nicht nur an "
-                 "den Extremtagen von [46] (Bericht #95 §5, Befund 124).",
+         "wert": "0,29 = (0,93 × 1,11 − 1)/(1,11 − 1) aus rOR 0,93 und OR_ohne 1,11 der "
+                 "Quelle [46] (Katz u. a. 2026); Setzung: derselbe Anteil gilt in allen "
+                 "Hitzewochen des Modells, nicht nur an den Extremtagen von [46] "
+                 "(Bericht #95 §5, Befund 124).",
          "band": "0–0,90 aus dem Band von rOR (0,87 ⇒ 0, 0,99 ⇒ 0,90); OR_ohne über sein "
                  "Intervall 1,06–1,16 ergibt 0–0,49, beide Intervalle zugleich 0–0,83 "
                  "(Befund 132).",

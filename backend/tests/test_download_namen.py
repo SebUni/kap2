@@ -2,8 +2,9 @@
 
 Regel: ``<art>_<Name der Kommune, dateinamensicher>_<Gemeindeschlüssel>.<endung>``.
 Die Routenfunktionen werden direkt mit einer Ersatz-Session aufgerufen (Muster
-``test_ergebnis_interpretation_api.py``); den Gemeindeschlüssel liefert eine
-ersetzte ``inkar_loader.resolve_ags``, damit kein Netz gebraucht wird.
+``test_ergebnis_interpretation_api.py``); den Gemeindeschlüssel liefert seit
+T-1469 die VG250-Abfrage ``download_namen._ags_aus_gemeinden`` (ersetzt in den
+Tests), nicht mehr ``inkar_loader.resolve_ags`` (Overpass).
 """
 
 from __future__ import annotations
@@ -11,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from fastapi import HTTPException
 
 from app.api.routes import ergebnis_interpretation as interpretation_route
 from app.api.routes import export as export_route
@@ -77,11 +79,15 @@ class _Session:
     def query(self, modell):
         return _Abfrage(self._je_modell.get(modell.__name__))
 
+    def rollback(self):
+        pass
+
 
 @pytest.fixture
 def ags(monkeypatch):
     download_namen._AGS_CACHE.clear()
-    monkeypatch.setattr(inkar_loader, "resolve_ags", lambda osm_id: "09173112" if osm_id == "R12345" else None)
+    monkeypatch.setattr(download_namen, "_ags_aus_gemeinden",
+                         lambda db, kommune: "09173112" if getattr(kommune, "id", None) == 7 else None)
     yield
     download_namen._AGS_CACHE.clear()
 
@@ -127,20 +133,57 @@ def test_route_interpretationsbericht(ags, monkeypatch):
 
 def test_route_ohne_gemeindeschluessel(monkeypatch):
     download_namen._AGS_CACHE.clear()
-    monkeypatch.setattr(inkar_loader, "resolve_ags", lambda osm_id: None)
+    monkeypatch.setattr(download_namen, "_ags_aus_gemeinden", lambda db, kommune: None)
     monkeypatch.setattr(export_route, "export_measures_xlsx", lambda db, kid: b"xlsx")
     antwort = export_route.export_measures(7, db=_Session(Kommune=_Kommune()))
     assert 'filename="massnahmen_Bad-Toelz.xlsx"' in _header(antwort)
 
 
+def test_route_massnahmen_ohne_kommune_404(monkeypatch):
+    """Wie export_parameters (T-1471): 404 vor export_measures_xlsx, nicht danach."""
+    aufrufe = {"n": 0}
+
+    def _nicht_erwartet(_db, _kid):
+        aufrufe["n"] += 1
+        return b"xlsx"
+
+    monkeypatch.setattr(export_route, "export_measures_xlsx", _nicht_erwartet)
+    with pytest.raises(HTTPException) as exc:
+        export_route.export_measures(99, db=_Session(Kommune=None))
+    assert exc.value.status_code == 404
+    assert aufrufe["n"] == 0
+
+
 def test_gemeindeschluessel_fehlschlag_bricht_download_nicht_ab(monkeypatch):
     download_namen._AGS_CACHE.clear()
 
-    def _kaputt(_osm_id):
-        raise RuntimeError("Overpass weg")
+    def _kaputt(_db, _kommune):
+        raise RuntimeError("keine Datenbankverbindung (z. B. ohne PostGIS)")
 
-    monkeypatch.setattr(inkar_loader, "resolve_ags", _kaputt)
-    assert download_namen.download_dateiname_fuer("parameter", _Kommune(), "xlsx") == "parameter_Bad-Toelz.xlsx"
+    monkeypatch.setattr(download_namen, "_ags_aus_gemeinden", _kaputt)
+    ergebnis = download_namen.download_dateiname_fuer("parameter", _Session(), _Kommune(), "xlsx")
+    assert ergebnis == "parameter_Bad-Toelz.xlsx"
+
+
+def test_route_massnahmen_ohne_overpass(monkeypatch):
+    """Der Gemeindeschlüssel kommt aus der VG250-Tabelle; resolve_ags (Overpass) wird
+    dabei nicht mehr angerufen (T-1469)."""
+    download_namen._AGS_CACHE.clear()
+    aufrufe = {"n": 0}
+
+    def _attrappe(_osm_id):
+        aufrufe["n"] += 1
+        raise RuntimeError("Overpass darf hier nicht mehr gerufen werden")
+
+    monkeypatch.setattr(inkar_loader, "resolve_ags", _attrappe)
+    monkeypatch.setattr(download_namen, "_ags_aus_gemeinden",
+                         lambda db, kommune: "09173112" if getattr(kommune, "id", None) == 7 else None)
+    monkeypatch.setattr(export_route, "export_measures_xlsx", lambda db, kid: b"xlsx")
+
+    antwort = export_route.export_measures(7, db=_Session(Kommune=_Kommune()))
+
+    assert "massnahmen_Bad-Toelz_09173112.xlsx" in _header(antwort)
+    assert aufrufe["n"] == 0
 
 
 # ── (c) Frontend bildet den Namen nicht mehr aus der Kennung ──────────────────
