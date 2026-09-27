@@ -1,8 +1,8 @@
 """T-1363-cto: dritte Evidenzklasse „berechnet“ (Vorgabe P1, Vorhaben T-1350 #95).
 
 Der Nutzer soll in der Parameterliste unterscheiden können, ob ein Wert aus einer
-Quelle stammt („belegt“), von KAP3 abgeschätzt ist („abgeschaetzt“) oder aus amtlichen
-Daten berechnet ist („berechnet“, Anzeige „berechnet aus amtlichen Daten“).
+Quelle stammt („belegt“), von KAP3 abgeschätzt ist („abgeschaetzt“) oder aus anderen
+Parameter-Blöcken folgt („berechnet“, Anzeige „berechnet aus anderen Parametern“, T-1510-ceo).
 
 Geprüft wird:
 (a) ``EVIDENCE_CLASSES`` führt genau die drei Klassen,
@@ -10,12 +10,14 @@ Geprüft wird:
 (c) Gewissheitsstufe und Unsicherheits-Zusammenschau zählen „berechnet“ wie „belegt“
     (heutiger Stand; die dritte Klasse ändert keine Stufe und keine Zählung still),
 (d) die Maßnahmen-Gewissheit gibt eine hinterlegte Klasse „berechnet“ unverändert aus,
-(e) Typ und Anzeige im Frontend kennen die dritte Klasse.
+(e) Typ und Anzeige im Frontend kennen die dritte Klasse,
+(f) Oberfläche, Excel-Export und PDF-Ergebnisbericht führen denselben Anzeigetext (T-1510-ceo).
 """
 
 from __future__ import annotations
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -28,8 +30,10 @@ from app.services import (  # noqa: E402
     gewissheit,
     massnahmen_gewissheit,
     parameter_registry,
+    export_service,
     unsicherheits_zusammenschau,
 )
+from app.services.ergebnisbericht import teile  # noqa: E402
 
 TESTCODE = "TEST_BERECHNET_RISIKO"
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "src"
@@ -144,11 +148,42 @@ def test_frontend_typ_fuehrt_berechnet():
     assert "export type EvidenceClass = 'belegt' | 'abgeschaetzt' | 'berechnet'" in typen
 
 
-def test_frontend_anzeige_berechnet_aus_amtlichen_daten():
+def test_frontend_anzeige_berechnet_aus_anderen_parametern():
     tabelle = (FRONTEND / "components" / "ParameterTable.tsx").read_text(encoding="utf-8")
     assert "p.evidence_class === 'berechnet'" in tabelle
     # Seit T-1391 steht der Anzeigetext an einer Stelle (utils/evidenceLabel.ts), die
     # Parameterliste und Maßnahmentabelle beide nutzen.
     anzeige = (FRONTEND / "utils" / "evidenceLabel.ts").read_text(encoding="utf-8")
-    assert "if (klasse === 'berechnet') return 'berechnet aus amtlichen Daten'" in anzeige
+    assert "if (klasse === 'berechnet') return 'berechnet aus anderen Parametern'" in anzeige
     assert "evidenzAnzeige(p.evidence_class)" in tabelle
+    assert "'Berechnet aus anderen Parametern — Herleitung'" in tabelle
+
+
+# ── (f) Oberfläche, Excel-Export und PDF führen denselben Text ─────────────────
+
+def _frontend_evidenztexte() -> dict[str, str]:
+    """Anzeigetexte je Klasse aus ``evidenzAnzeige`` in evidenceLabel.ts (Datei gelesen)."""
+    quelltext = (FRONTEND / "utils" / "evidenceLabel.ts").read_text(encoding="utf-8")
+    texte = dict(re.findall(r"if \(klasse === '(\w+)'\) return '([^']*)'", quelltext))
+    rueckfall = re.search(r"\n  return '([^']*)'\n\}", quelltext)
+    assert rueckfall, "Rückfalltext (belegt) in evidenzAnzeige nicht gefunden"
+    texte["belegt"] = rueckfall.group(1)
+    return texte
+
+
+#: Bewusste Ausnahme im PDF: Die Gliederung (Teil 7) schreibt für Abschätzungen
+#: „ausgewiesene Abschätzung von KAP3“ statt „abgeschätzt (KAP3)“.
+PDF_AUSNAHMEN = {"abgeschaetzt"}
+
+
+def test_evidenztexte_oberflaeche_gleich_excel_export():
+    frontend = _frontend_evidenztexte()
+    assert set(frontend) == set(parameter_registry.EVIDENCE_CLASSES)
+    assert export_service._EVIDENZ_ANZEIGE == frontend
+
+
+def test_evidenztexte_oberflaeche_gleich_pdf_ausser_abschaetzung():
+    frontend = _frontend_evidenztexte()
+    for klasse in set(parameter_registry.EVIDENCE_CLASSES) - PDF_AUSNAHMEN:
+        assert teile._KLASSE[klasse] == frontend[klasse], klasse
+    assert teile._KLASSE["abgeschaetzt"] == "ausgewiesene Abschätzung von KAP3"

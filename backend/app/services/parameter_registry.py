@@ -90,14 +90,15 @@ def _param_doc_source(inp: dict) -> str:
 
 #: Zulässige Werte der maschinenlesbaren Evidenzklasse (Vorgabe P1):
 #: "belegt" (Wert aus einer Quelle), "abgeschaetzt" (begründete Abschätzung von KAP3)
-#: und "berechnet" (aus amtlichen Daten berechnet, Anzeige „berechnet aus amtlichen Daten“).
+#: und "berechnet" — folgt aus anderen Parameter-Blöcken; für die Gewissheit zählt er
+#: vorläufig wie belegt, die Regel legt die Querschnittsfrage Gewissheit fest (T-1117-cmo).
+#: Anzeige „berechnet aus anderen Parametern“.
 EVIDENCE_CLASSES = ("belegt", "abgeschaetzt", "berechnet")
 
 #: Evidenzklassen, die bei Gewissheit und Unsicherheits-Zusammenschau als belegt zählen.
-#: "berechnet" zählt wie "belegt" (heutiger Stand, T-1363-cto): Eine berechnete Größe
-#: beruht auf amtlichen Daten und ist keine Abschätzung von KAP3. So ändert die dritte
-#: Klasse keine Stufe und keine Zählung still; ob sie eigens gewichtet werden soll,
-#: ist eine fachliche Frage an den CMO.
+#: berechnet — folgt aus anderen Parameter-Blöcken; für die Gewissheit zählt er vorläufig
+#: wie belegt, die Regel legt die Querschnittsfrage Gewissheit fest (T-1117-cmo).
+#: So ändert die dritte Klasse keine Stufe und keine Zählung still.
 BELEGTE_KLASSEN = frozenset({"belegt", "berechnet"})
 
 
@@ -147,7 +148,7 @@ def _base_param(
         "overridden": False,
         "custom_source": None,
         "applicable": applicable,
-        # Vorgabe P1: maschinenlesbar, ob der Wert belegt, aus amtlichen Daten
+        # Vorgabe P1: maschinenlesbar, ob der Wert belegt, aus anderen Parameter-Blöcken
         # berechnet oder eine begründete Abschätzung von KAP3 ist — samt Herleitung als Datenfeld (nicht als Kommentar).
         "evidence_class": _evidence_class(evidence_class, references),
         "evidence_note": source_detail,
