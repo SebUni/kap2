@@ -63,7 +63,7 @@ def _profile_lines(db: Session, kommune: Kommune) -> list[str]:
     finance = None
     try:
         from app.services import finance_loader
-        finance = finance_loader.finance_for_kommune(kommune.osm_id, kommune.name)
+        finance = finance_loader.finance_for_kommune(kommune.osm_id, kommune.name, db=db, kommune=kommune)
     except Exception as exc:  # Finance ist optional — Zeile entfällt bei Fehler
         log.info("ai_context: finance_loader übersprungen (kommune=%s): %s", kommune.id, exc)
 

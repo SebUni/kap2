@@ -100,7 +100,7 @@ def test_e_kommune_ohne_netzdienst(monkeypatch):
 
     aufrufe = []
 
-    def _entw(kommune):
+    def _entw(db, kommune):
         aufrufe.append(("entwicklung", kommune.id))
         return None
 
@@ -108,7 +108,7 @@ def test_e_kommune_ohne_netzdienst(monkeypatch):
         aufrufe.append(("zellen", kommune_id))
         return ZELLEN
 
-    def _sozio(kommune):
+    def _sozio(db, kommune):
         aufrufe.append(("sozio", kommune.id))
         return SOZIO
 
@@ -133,11 +133,10 @@ ENTWICKLUNG = {"jahr_alt": 2017, "jahr_neu": 2023, "einwohner_alt": 1000,
 
 def _ohne_db(monkeypatch, ags):
     from app.data import bevoelkerungsentwicklung
-    from app.services import inkar_loader
 
     monkeypatch.setattr(dienst, "_zellen_der_kommune", lambda db, kid: ZELLEN)
-    monkeypatch.setattr(dienst, "_sozialdaten", lambda k: SOZIO)
-    monkeypatch.setattr(inkar_loader, "resolve_ags", lambda osm_id: ags)
+    monkeypatch.setattr(dienst, "_sozialdaten", lambda db, k: SOZIO)
+    monkeypatch.setattr(dienst, "_gemeindeschluessel", lambda db, k: ags)
     gefragt = []
 
     def _entwicklung(a):
@@ -296,7 +295,9 @@ def test_sozialdaten_fehler_ergibt_leeres_dict(monkeypatch):
         raise RuntimeError("kein Netz")
 
     monkeypatch.setattr(inkar_loader, "resolve_ags", _kaputt)
-    assert dienst._sozialdaten(SimpleNamespace(id=1, osm_id="R1")) == {}
+    monkeypatch.setattr(dienst, "_gemeindeschluessel", lambda db, k: "14612000")
+    monkeypatch.setattr(inkar_loader, "fetch_socioeconomic", _kaputt)
+    assert dienst._sozialdaten(object(), SimpleNamespace(id=1, osm_id="R1")) == {}
 
 
 if __name__ == "__main__":  # pragma: no cover
