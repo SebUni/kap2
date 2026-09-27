@@ -3,7 +3,7 @@
 Jeder Endpunkt gibt die Ausgabe des zugehörigen Dienstes oder Datenmoduls
 unverändert weiter; hier wird nichts gerechnet. Drei Endpunkte hüllen die
 Ausgabe ein (T-1299): ``abhaengigkeiten`` in ``{kommune_id, umfang,
-klimawirkungen}``, ``diversitaet`` in ``{quelle, je_klimawirkung}`` und
+klimawirkungen}``, ``diversitaet`` in ``{quelle, umfang, je_klimawirkung}`` (T-1580) und
 ``leitfragen`` in ``{quelle, leitfragen}``.
 
 - ``/kommune/{id}/interpretation/nachbarkommunen`` → ``nachbarkommunen_screening``
@@ -162,17 +162,25 @@ def get_diversitaet_kommune(kommune_id: int, db: Session = Depends(get_db)):
     Die gerechneten Risiko-Codes stammen wie bei ``get_abhaengigkeiten`` aus
     ``get_risk_aggregate(...)["cost"]["by_risk"]``, sofern ``assessment_is_done`` eine
     Berechnung meldet; ohne Berechnung steht der ganze Bestand von
-    ``DIVERSITAET_JE_KLIMAWIRKUNG`` da. Gruppiert wird nach ``kwra_id``: eine Überschrift
-    je Klimawirkung (``bezeichnung`` = „<kwra_name> (#<kwra_id>)“), die Aspekte mehrerer
-    Codes derselben Klimawirkung stehen zusammen, ohne doppelte Einträge.
+    ``DIVERSITAET_JE_KLIMAWIRKUNG`` da, und ``umfang`` sagt das wie bei
+    ``get_abhaengigkeiten``: ``gerechnet`` oder ``katalog`` (T-1580). Gruppiert wird nach
+    ``kwra_id``: eine Überschrift je Klimawirkung (``bezeichnung`` = „<kwra_name>
+    (#<kwra_id>)“), die Aspekte mehrerer Codes derselben Klimawirkung stehen zusammen, ohne
+    doppelte Einträge.
     """
     kommune = _kommune_oder_404(db, kommune_id)
     if assessment_is_done(db, kommune.id):
         agg = get_risk_aggregate(db, kommune.id, apply_measures=False)
         codes = [eintrag["code"] for eintrag in agg["cost"]["by_risk"]]
+        umfang = "gerechnet"
     else:
         codes = list(DIVERSITAET_JE_KLIMAWIRKUNG.keys())
-    return {"quelle": DIVERSITAET_QUELLE, "je_klimawirkung": _diversitaet_je_kwra(codes)}
+        umfang = "katalog"
+    return {
+        "quelle": DIVERSITAET_QUELLE,
+        "umfang": umfang,
+        "je_klimawirkung": _diversitaet_je_kwra(codes),
+    }
 
 
 @router.get("/interpretation/massnahmen-gewissheit")

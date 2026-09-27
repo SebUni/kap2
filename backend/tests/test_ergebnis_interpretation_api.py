@@ -13,6 +13,7 @@ import pytest
 from fastapi import HTTPException
 
 from app.api.routes import ergebnis_interpretation as route
+from app.data import catalog
 from app.data.diversitaet_aspekte import DIVERSITAET_JE_KLIMAWIRKUNG
 from app.data.diversitaet_aspekte import QUELLE as DIVERSITAET_QUELLE
 from app.data.kra_leitfragen import LEITFRAGEN
@@ -213,6 +214,7 @@ def test_diversitaet_kommune_nur_gerechnete_klimawirkung(monkeypatch):
     )
     antwort = route.get_diversitaet_kommune(1, _Session(kommune=_Kommune()))
     assert antwort["quelle"] == DIVERSITAET_QUELLE
+    assert antwort["umfang"] == "gerechnet"
     eintraege = antwort["je_klimawirkung"]
     assert len(eintraege) == 1
     (eintrag,) = eintraege.values()
@@ -225,3 +227,17 @@ def test_diversitaet_kommune_unbekannt_404():
     with pytest.raises(HTTPException) as fehler:
         route.get_diversitaet_kommune(99, _Session(kommune=None))
     assert fehler.value.status_code == 404
+
+
+def test_diversitaet_kommune_ohne_rechnung_katalog(monkeypatch):
+    monkeypatch.setattr(route, "assessment_is_done", lambda db, kid: False)
+
+    def _nicht_aufrufen(*_a, **_k):
+        raise AssertionError("ohne Berechnung wird kein Aggregat gelesen")
+
+    monkeypatch.setattr(route, "get_risk_aggregate", _nicht_aufrufen)
+    antwort = route.get_diversitaet_kommune(1, _Session(kommune=_Kommune()))
+    assert antwort["umfang"] == "katalog"
+    eintraege = antwort["je_klimawirkung"]
+    kwra_ids = {catalog.RISKS_BY_CODE[code]["kwra_id"] for code in DIVERSITAET_JE_KLIMAWIRKUNG}
+    assert set(eintraege.keys()) == {str(kwra_id) for kwra_id in kwra_ids}
