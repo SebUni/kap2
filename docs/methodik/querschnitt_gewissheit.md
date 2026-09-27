@@ -465,14 +465,17 @@ keinen Euro-Betrag am Ende: Die Gewissheit steht neben dem Betrag und ändert ih
 | 10 | Stufe → Vorsichtshinweis (ab „gering“, `VORSICHT_STUFEN`) | Mitte hoch, Ende mittel: kein Hinweis für #95 | `unsicherheits_zusammenschau.py`; Folgegrößen |
 
 Zum Vergleich, geht **nicht** in die Gewissheit ein: die Quellenlage aus dem Endstand der Parameter-Blöcke von
-`docs/methodik/95_hitzebelastung.md` (Kap. 7). Gezählt: 19 Blöcke, davon 8 mit Kennzeichnung `quelle`,
-8 `abschaetzung_kap3`, 3 `berechnet`. Das sind 8 von 19 = 42 % mit Quelle, mit den berechneten 11 von 19 = 58 %.
-Nach der alten Regel stünde #95 damit auf „gering“ (42 % liegt unter 0,5) oder auf „mittel“ (58 %), je nachdem, wie
-man „berechnet“ zählt, und die Registry kommt mit 25 von 26 und 8 von 8 Parametern zu „mittel“ und „hoch“. Die KWRA
-sagt zur Mitte „hoch“. Das ist der Grund, warum die Zählung keine Gewissheit ist.
+`docs/methodik/95_hitzebelastung.md` (Kap. 7). Gezählt: 23 Blöcke, davon 9 mit Kennzeichnung `quelle`,
+11 `abschaetzung_kap3`, 3 `berechnet`. Das sind 9 von 23 = 39 % mit Quelle, mit den berechneten 12 von 23 = 52 %.
+Nach der alten Regel (ab der Hälfte „mittel“, darunter „gering“) stünde #95 damit auf „gering“, wenn man nur die
+Blöcke mit Quelle zählt (39 % liegt unter 0,5), und auf „mittel“, wenn man die berechneten mitzählt (52 % liegt knapp
+darüber). Die Registry des Produkts, nach derselben Regel gezählt, kommt heute für die Sterbefälle mit 16 von
+32 Parametern (genau die Hälfte) zu „mittel“ und für die Krankenhauseinweisungen mit 3 von 9 zu „gering“. Die KWRA sagt
+zur Mitte „hoch“. Dieselbe Rechnung landet also je nach Zählweise und Zerlegung auf „gering“ oder „mittel“, nie auf der
+Stufe der KWRA. Das ist der Grund, warum die Zählung keine Gewissheit ist.
 
-Beispiel-Block `rechenkette_gewissheit_95`, aus dem Stamm des Produkt-Repos ausführbar (am 25.09.2026 gelaufen,
-Ausgabe darunter):
+Beispiel-Block `rechenkette_gewissheit_95`, aus dem Stamm des Produkt-Repos ausführbar (am 27.09.2026 gelaufen,
+Ausgabe darunter). Er zählt die Blöcke in Bericht 95 und die Parameter der Registry selbst nach:
 
 ```python
 # rechenkette_gewissheit_95 — Regel G an #95 nachgerechnet
@@ -507,7 +510,7 @@ HEUTIGES_KLIMA = "in der KWRA nicht ausgewiesen"  # Ebene 5
 zeitreihe = {j: gewissheit(j) for j in range(2025, 2066)}  # Produkt: 2025–2065
 assert all(zeitreihe[j] == "hoch" for j in range(2025, 2061))
 assert all(zeitreihe[j] == "mittel" for j in range(2061, 2066))
-assert gewissheit(2085) == "mittel"
+assert all(gewissheit(j) == "mittel" for j in range(2071, 2101))
 
 # Ebene 9: ein Wert je Klimawirkung, beide Codes von #95 gleich
 codes = ("EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY")
@@ -523,13 +526,35 @@ text = open("docs/methodik/95_hitzebelastung.md", encoding="utf-8").read()
 kap7 = text.split("## 7 Parameter-Blöcke", 1)[1].split("\n## ", 1)[0]
 kz = re.findall(r"^\s*kennzeichnung:\s*(\w+)", kap7, flags=re.M)
 zaehlung = {k: kz.count(k) for k in sorted(set(kz))}
-assert len(kz) == 19
-assert zaehlung == {"abschaetzung_kap3": 8, "berechnet": 3, "quelle": 8}
-assert round(8 / 19, 2) == 0.42 and round(11 / 19, 2) == 0.58
+assert len(kz) == len(re.findall(r"^parameter:", kap7, flags=re.M)) == 23
+assert zaehlung == {"abschaetzung_kap3": 11, "berechnet": 3, "quelle": 9}
+assert round(9 / 23, 2) == 0.39 and round(12 / 23, 2) == 0.52
+
+
+def alte_regel(anteil):
+    """Alte Kennzahl (backend/app/services/gewissheit.py): Stufe aus dem Anteil belegter Parameter."""
+    return "sehr gering" if anteil == 0 else "gering" if anteil < 0.5 else "mittel" if anteil < 1 else "hoch"
+
+
+assert (alte_regel(9 / 23), alte_regel(12 / 23)) == ("gering", "mittel")
+
+# Vergleich, Registry des Produkts nach derselben alten Regel (belegt oder berechnet zählt als belegt)
+import sys
+sys.path.insert(0, "backend")
+from app.services import gewissheit as alt, parameter_registry  # noqa: E402
+
+registry = {}
+for c in codes:
+    klassen = [p["evidence_class"] for p in alt._risiko_parameter(c)]
+    registry[c] = (sum(k in parameter_registry.BELEGTE_KLASSEN for k in klassen), len(klassen))
+assert registry == {"EXPECTED_ANNUAL_MORTALITY": (16, 32), "EXPECTED_ANNUAL_MORBIDITY": (3, 9)}
+assert (alt.gewissheitsstufe(codes[0]), alt.gewissheitsstufe(codes[1])) == ("mittel", "gering")
+assert (alte_regel(16 / 32), alte_regel(3 / 9)) == ("mittel", "gering")
 
 print("Mitte:", mitte, "| Ende:", ende, "| heutiges Klima:", HEUTIGES_KLIMA)
 print("2025:", zeitreihe[2025], "| 2060:", zeitreihe[2060], "| 2061:", zeitreihe[2061], "| 2065:", zeitreihe[2065])
-print("Quellenlage (nur Vergleich):", zaehlung)
+print("Quellenlage Bericht (nur Vergleich):", zaehlung, "| Blöcke:", len(kz))
+print("Registry belegt/alle (nur Vergleich):", registry)
 ```
 
 Ausgabe:
@@ -537,7 +562,8 @@ Ausgabe:
 ```
 Mitte: hoch | Ende: mittel | heutiges Klima: in der KWRA nicht ausgewiesen
 2025: hoch | 2060: hoch | 2061: mittel | 2065: mittel
-Quellenlage (nur Vergleich): {'abschaetzung_kap3': 8, 'berechnet': 3, 'quelle': 8}
+Quellenlage Bericht (nur Vergleich): {'abschaetzung_kap3': 11, 'berechnet': 3, 'quelle': 9} | Blöcke: 23
+Registry belegt/alle (nur Vergleich): {'EXPECTED_ANNUAL_MORTALITY': (16, 32), 'EXPECTED_ANNUAL_MORBIDITY': (3, 9)}
 ```
 
 ### #96 Aeroallergene (Schritt 3)
@@ -761,6 +787,10 @@ verworfen. Änderungen an Abschnitten aus Schritt 1 und 2: Der Vorspann nennt di
 sonst „rechnet nur #95“ behauptete. Der Satz vor der Tabelle unter „Rechenkette“ nennt #96 als zweites Beispiel. Unter
 „Befunde an Berichte“ steht das Ergebnis je Klimawirkung, unter „Quellen“ die Fundstellen von Schritt 3. Sonst ist
 nichts aus Schritt 1 und 2 geändert.
+
+Nachtrag 27.09.2026 (T-1478-methodik_manager): Bericht 95 hat jetzt 23 Parameter-Blöcke statt 19. Der Vergleich unter
+„Rechenkette“ und der Block `rechenkette_gewissheit_95` sind darauf nachgezogen; der Block zählt jetzt auch die Registry
+nach. Die Zahlen in Punkt 2 und 9 sind der Stand vom 25.09.2026. Die Entscheidungen bleiben unverändert.
 
 ## Befunde an Berichte
 
