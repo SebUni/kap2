@@ -264,10 +264,11 @@ RISKS: list[dict] = [
      "hazards": ["POLLEN_LOAD"],
      "exposures": ["POPULATION_DENSITY", "AGE_STRUCTURE"],
      # S158 ist als Maßnahme POLLEN_EARLY_WARNING angelegt (default_reduction
-     # 0,03, abgeschätzt nach Vorgabe P2, Bericht #96 §5.1, Befund 215,
-     # Register-ID 96-S158-01). Sie wirkt als Hebel auf die Verwundbarkeit
-     # (qualitative_risk_codes) und hängt deshalb nicht hier in
-     # "vulnerabilities" (linked_risk_codes: []).
+     # 0,03, abgeschätzt nach Vorgabe P2, Bericht #96 §5.1, Register-ID 96-S158-01).
+     # Seit T-1513-cto verknüpft (linked_risk_codes), aber im Zelllauf über
+     # effect_model 's158' (measure_service._s158_cell_factor) — kein Eintrag hier
+     # in "vulnerabilities", weil der Hebel keine Schicht-A-Vulnerabilität
+     # skaliert, sondern die gespeicherten Zusatztage der Schadensfunktion direkt.
      "vulnerabilities": ["HEALTHCARE_ACCESS"],
      # Herleitung ref_value (Sanity-Anker, Symptomtage je 100.000 EW): Bundessumme
      # 8,96 Mio Betroffene × 1,988 Tage = 17,8 Mio Tage ÷ 83,456 Mio EW × 100.000
@@ -1268,8 +1269,10 @@ def build_pathways(risk: dict) -> list[dict]:
 #   ein Rechenweg sie liest (kein Kanal in measure_service, insbesondere KEINE Nutzung in
 #   _reduction_factor/compute_impact). Für Hebel ohne publizierte Interventions-
 #   Effektgröße (Aufgabe §3.5: "laufen ehrlich als qualitativ") oder mit gesperrtem
-#   linked_risk_codes-Kanal (z. B. Befund 124/#96: zellunscharfer Pauschalfaktor auf ein
-#   Risiko, dessen Evidenz nur intra-urbane Umverteilung trägt). Nur die beiden
+#   linked_risk_codes-Kanal, solange kein zellscharfes Rechenmodell existiert (z. B.
+#   Befund 124/#96 vor T-1513-cto: zellunscharfer Pauschalfaktor auf ein Risiko, dessen
+#   Evidenz nur intra-urbane Umverteilung trägt — inzwischen über effect_model 's158'
+#   im Zelllauf gelöst, siehe POLLEN_EARLY_WARNING). Nur die beiden
 #   Zuordnungsfilter (routes/measures.py, demo_service.py) lesen diesen Schlüssel; er
 #   darf sich mit linked_risk_codes NICHT überschneiden (test_measure_qualitative_risk_codes).
 #
@@ -1662,14 +1665,19 @@ MEASURES: list[dict] = [
             "aufsuchende Betreuung, Aufklärung in Pflegeeinrichtungen) sind organisatorisch "
             "ohne baulichen Anteil; ein einheitlicher Kennwert existiert nicht. Modellannahme "
             "als einmaliges Programmbudget (Konzeption/Koordination) → 35.000 €."}},
-    # Maßnahmen-Hebel (qualitativ) — Ticket T-0015 / Befund 124 (reviews/BEFUNDE_96.md):
-    # #96 darf keinen linked_risk_codes-Wirkungskanal bekommen (verbietet den flächigen,
-    # zellunscharfen Pauschalfaktor auf EXPECTED_ANNUAL_ALLERGY_DAYS, Modellgrenze 7). Die
-    # Zuordnung zum Risiko läuft deshalb ausschließlich über qualitative_risk_codes — ein
-    # rein deklaratives Feld, das kein Rechenweg liest (measure_service kennt nur
-    # linked_risk_codes). Herleitung siehe docs/methodik/96_aeroallergene.md §5 (Z. 657)
-    # und Registerzeile 96-S158-01 (Z. 110, Log 15): keine publizierte
-    # Interventions-Effektgröße für kommunale Pollen-Frühwarnung → §3.5-Regel „qualitativ“.
+    # Maßnahmen-Hebel S158 (Zelllauf) — Ticket T-1513-cto / Bericht #96 §5.1
+    # (Integrationsauflage Z. 1408–1415), Sperre aus Befund 124 aufgehoben: Die Wirkung
+    # läuft NICHT mehr über einen pauschalen linked_risk_codes-Faktor auf gespeicherte
+    # Zell-Outcomes (der von Modellgrenze 7 verbotene flächige Niveaueffekt), sondern über
+    # den Zelllauf ΔTage_vermieden,Zelle = A_Zelle · r_S158 · Σ_g t_warn,g · ΔTage_g,Zelle
+    # (measure_service._s158_cell_factor, health.s158_vermiedene_tage). Die Gruppentage
+    # ΔTage_g,Zelle holt der Zweig frisch über health.pollen_zelltage aus den gespeicherten
+    # Eingaben der Zelle (delta_birke, delta_graeser, pollen_g, pollen_g_bar0, betroffene),
+    # nicht aus den gespeicherten Summen tage_birke/tage_graeser — so wirkt eine spätere
+    # Vegetationsmaßnahme (Stadtbaumwahl, T-1483-cto), die nur Ĝ′ der Zelle ändert,
+    # multiplikativ zusammen mit S158, statt von ihm überschrieben zu werden.
+    # qualitative_risk_codes bleibt leer: die Zuordnung läuft jetzt über die Verknüpfung
+    # selbst (linked_risk_codes + effect_model 's158'), nicht mehr deklarativ daneben.
     # Herleitung capex_per_unit/opex_per_unit_year: für kommunale Pollen-Messstationen
     # (Fallenkopf + Auswertungs-/Datenanbindung an das DWD-/PID-Frühwarnsystem) ist keine
     # belastbare öffentliche Kostenquelle je Station auffindbar — Modellannahme, angelehnt
@@ -1682,15 +1690,19 @@ MEASURES: list[dict] = [
     {"code": "POLLEN_EARLY_WARNING", "name": "Pollen-Frühwarnung",
      "description": "Kommunales Pollenmonitoring/-frühwarnsystem (S158): informiert "
                     "Allergikerinnen und Allergiker über die aktuelle Pollenbelastung "
-                    "(DWD-/PID-Gefahrenindex). Wirkt nicht auf die zellscharfe "
-                    "Vegetations-/Symptomlast der Schadensfunktion — keine publizierte "
-                    "Interventions-Effektgröße; Maßnahmen-Hebel mit ausgewiesener "
-                    "Abschätzung r_S158 = 0,03 (Bericht #96 §5.1, Vorgabe P2), "
-                    "Register-ID 96-S158-01.",
+                    "(DWD-/PID-Gefahrenindex) und mindert die Symptomlast an gewarnten "
+                    "Tagen. Wirkt zellscharf im Geltungsbereich der Maßnahmen-Geometrie "
+                    "(A_Zelle) auf die klimaattribuierten Zusatztage der "
+                    "Aeroallergene-Schadensfunktion (Bericht #96 §5.1): "
+                    "ΔTage_vermieden = A_Zelle · r_S158 · Σ_g t_warn,g · ΔTage_g,Zelle, "
+                    "mit ausgewiesener Abschätzung r_S158 = 0,03 je gewarntem Tag "
+                    "(Vorgabe P2) und dem Risiko-Parameter t_warn = 0,75 Anteil gewarnter "
+                    "Zusatztage, Register-ID 96-S158-01.",
      "measure_type": "organizational",
      "effect_target": ["vulnerability"], "default_reduction": 0.03, "coverage_scaling": "saturating",
-     "linked_risk_codes": [],
-     "qualitative_risk_codes": ["EXPECTED_ANNUAL_ALLERGY_DAYS"],
+     "effect_model": "s158",
+     "linked_risk_codes": ["EXPECTED_ANNUAL_ALLERGY_DAYS"],
+     "qualitative_risk_codes": [],
      "capex_fixed": None, "capex_per_unit": 15000.0, "capex_per_m2": None,
      "opex_fixed_year": None, "opex_per_unit_year": 4000.0, "opex_per_m2_year": None,
      "benefit_per_m2_year": 0.0,
@@ -1731,12 +1743,12 @@ MEASURES: list[dict] = [
             "Nullwirkung (Log 15) ist damit bewusst überstimmt (Befund 151, "
             "reviews/BEFUNDE_96.md). Punktwert r_S158 = 0,03 aus der Dreifaktor-Kette "
             "0,35 (Reichweite) · 0,40 (Handlungsumsetzung) · 0,20 (Tageswirkung) = 0,028. "
-            "EXPECTED_ANNUAL_ALLERGY_DAYS bleibt bewusst NICHT in linked_risk_codes: "
-            "Befund 124/Modellgrenze 7 verbietet jeden flächigen, zellunscharfen "
-            "Pauschalfaktor auf #96 (die λ-Evidenz ist intra-urban, kein Beleg für einen "
-            "kommunenweiten Niveaueffekt). Der Faktor wird deshalb ausschließlich "
-            "ausgewiesen und ändert keine Karten- oder Ergebniswerte; die Zuordnung zum "
-            "Risiko läuft weiterhin deklarativ über qualitative_risk_codes."},
+            "EXPECTED_ANNUAL_ALLERGY_DAYS steht seit der Integration (T-1513-cto, Sperre "
+            "aus Befund 124 aufgehoben) in linked_risk_codes: Der Faktor wirkt nicht mehr "
+            "flächig und zellunscharf auf den Index, sondern zellscharf im Zelllauf auf die "
+            "gespeicherten Zusatztage je Gruppe (Bericht #96 §5.1, Integrationsauflage), "
+            "und ändert Karten- und Ergebniswerte im Geltungsbereich der Maßnahme "
+            "entsprechend."},
      # Herleitung je Kostenparameter nach Aufgabe §3.9 (Vorgabe P1): Punktwert,
      # zwei benannte Bandenden mit Begründung, Sensitivität der ausgewiesenen
      # Maßnahmenkosten. Zahlenwerte unverändert (Eiserne Regel 2: eine
@@ -1769,10 +1781,12 @@ MEASURES: list[dict] = [
                 "begonnene Bedarfsmedikation. Der Punktwert liegt bewusst näher am "
                 "unteren Ende (Untergrenzen-Zusage des Berichts).",
             "sensitivitaet": "Der Faktor wirkt linear: Der ausgewiesene Maßnahmennutzen "
-                "skaliert 1:1 mit ihm, der Schadenswert selbst bleibt unberührt "
-                "(EXPECTED_ANNUAL_ALLERGY_DAYS steht nicht in linked_risk_codes, "
-                "Befund 124 — Karten- und Ergebniswerte ändern sich durch diesen Wert "
-                "nicht). Bezogen auf die Bundessumme von rund 110 Mio. €₂₀₂₄/Jahr "
+                "skaliert 1:1 mit ihm, der Schadenswert selbst bleibt unberührt, solange "
+                "die Maßnahme nicht gewählt ist. Seit der Integration (T-1513-cto) rechnet "
+                "der Faktor zellscharf im Geltungsbereich der Maßnahmen-Geometrie und "
+                "ändert dort Karten- und Ergebniswerte von #96 (vorher, unter der Sperre "
+                "aus Befund 124, ausschließlich ausgewiesen). Bezogen auf die Bundessumme "
+                "von rund 110 Mio. €₂₀₂₄/Jahr "
                 "entspricht der Punktwert ≈ 3,3 Mio. €/Jahr vermiedener "
                 "Behandlungskosten bei flächendeckender Umsetzung; das Band spannt "
                 "0,55–11,0 Mio. €/Jahr. Für eine Kommune mit 100.000 EW im Bundes-"
@@ -1862,11 +1876,10 @@ MEASURES: list[dict] = [
                 "Maßnahme wirkt punktuell über Messstationen (unit_label „Station“), "
                 "nicht flächenbezogen. Ihr eigentlicher Nutzen liegt in der Wirkung auf "
                 "die Symptomtage der Aeroallergene-Schadensfunktion "
-                "(EXPECTED_ANNUAL_ALLERGY_DAYS) — dafür fehlt aber, wie bei "
-                "default_reduction begründet, eine publizierte Interventions-"
-                "Effektgröße; die Verknüpfung läuft deshalb rein qualitativ über "
-                "qualitative_risk_codes und nicht über eine quantifizierte "
-                "Kosten-Nutzen-Rechnung.",
+                "(EXPECTED_ANNUAL_ALLERGY_DAYS) — dafür steht seit T-1513-cto die "
+                "zellscharfe Zelllauf-Rechnung über linked_risk_codes/effect_model "
+                "'s158' (annual_benefit_damage_eur); ein zusätzlicher, davon "
+                "unabhängiger €/m²-Flächennutzen ist damit nicht begründet.",
             "band": "Keine Bandbreite um 0,0 €/(m²·a): Ein Flächen-Nutzenkennwert wäre "
                 "für diese punktuelle, stationsbasierte Maßnahme methodisch unpassend, "
                 "unabhängig vom Zahlenwert. Sollte künftig eine belastbare "
