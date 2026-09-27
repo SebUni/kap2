@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–448) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–452) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
