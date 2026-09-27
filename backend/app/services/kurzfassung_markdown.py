@@ -6,7 +6,11 @@ dieses Modul eine Kurzfassung mit genau fünf festen Abschnitten in dieser
 Reihenfolge:
 
 1. ``Gesamtrisiko`` — ein Satz,
-2. ``Die fünf teuersten Klimawirkungen`` — Tabelle mit höchstens fünf Zeilen,
+2. ``Die fünf teuersten Klimawirkungen`` — Tabelle mit höchstens fünf Klimawirkungen
+   (jede Klimawirkung genau eine Zeile mit amtlichem Namen und Nummer, etwa
+   „Hitzebelastung (#95)“; Teilzeilen einer zusammengefassten Klimawirkung, etwa
+   Mortalität und Erkrankungen bei #95, stehen eingerückt darunter und zählen
+   nicht zur Fünf-Grenze),
 3. ``Erwartete Schadenssumme`` — Summe mit Szenario und Zeitbezug,
 4. ``Die fünf wirksamsten Maßnahmen`` — Tabelle mit höchstens fünf Zeilen,
 5. ``Methode und Grenzen`` — höchstens fünf Sätze.
@@ -15,7 +19,9 @@ Es wird nichts neu berechnet: Jede Zahl stammt unverändert aus den vorhandenen
 Diensten — ``measure_service.get_risk_aggregate`` (Aggregat ohne Maßnahmen),
 ``cost_projection_service.project_costs`` (Projektion 2025–2065) und
 ``measure_service.build_cost_summary`` (Maßnahmendienst). Dieses Modul wählt
-nur aus, sortiert nach den dort gelieferten Beträgen und formatiert.
+nur aus, sortiert nach den dort gelieferten Beträgen und formatiert; die
+Gruppierung der Klimawirkungen kommt aus ``klimawirkungen.klimawirkungen()``
+(T-1470-cto, identisch zur Kostentabelle des Dashboards).
 
 Bewusst nicht enthalten: Kartendarstellungen und der Untergrenzen-Hinweis aus
 T-0440 (späteres Paket).
@@ -27,6 +33,7 @@ from typing import TYPE_CHECKING
 
 from app.data import catalog
 from app.services.engine import tunables
+from app.services.klimawirkungen import klimawirkungen
 
 if TYPE_CHECKING:  # nur für die Typangabe; der Formatter läuft ohne Datenbank
     from sqlalchemy.orm import Session
@@ -69,15 +76,16 @@ def _de_euro(wert: float) -> str:
 def _teuerste_klimawirkungen(aggregat: dict) -> list[dict]:
     """Die höchstens fünf Klimawirkungen mit dem höchsten Betrag.
 
-    ``cost.by_risk`` ist im Aggregat bereits nach Betrag absteigend sortiert
-    (Klasse A zuerst). Übernommen werden nur Wirkungen mit Euro-Schicht, die in
-    die Gesamtsumme eingehen (nicht-additive Teilkennzahlen würden doppelt zählen).
+    Eine Klimawirkung, ein Eintrag: Katalogzeilen mit derselben ``kwra_id``
+    (etwa #95 Mortalität + Erkrankungen) werden über ``klimawirkungen()``
+    (T-1470-cto) zu einem Eintrag mit Summe zusammengefasst, statt sie als
+    zwei Zeilen auszuweisen. Die Grenze zählt Klimawirkungen, nicht Zeilen
+    (wie ``slice(0, 20)`` in T-1432-ceo): Teilzeilen einer angezeigten
+    Klimawirkung zählen nicht mit. Übernommen werden nur Wirkungen mit
+    Euro-Schicht, die in die Gesamtsumme eingehen.
     """
-    zeilen = [
-        r for r in aggregat["cost"]["by_risk"]
-        if r.get("has_euro_layer") and r.get("cost_eur") is not None
-        and r["code"] not in catalog.NON_ADDITIVE_RISK_CODES
-    ]
+    eintraege = klimawirkungen(aggregat["cost"]["by_risk"])
+    zeilen = [e for e in eintraege if e["has_euro_layer"] and e["cost_eur"] is not None]
     return zeilen[:MAX_ZEILEN]
 
 
@@ -117,14 +125,26 @@ def _abschnitt_gesamtrisiko(name: str, aggregat: dict) -> str:
     )
 
 
+def _risk_class_label(row: dict) -> str:
+    return tunables.RISK_CLASS_LABELS.get(row.get("risk_class"), row.get("risk_class") or "—")
+
+
 def _abschnitt_klimawirkungen(aggregat: dict) -> str:
+    """Eine Zeile je Klimawirkung (``bezeichnung`` mit amtlicher Nummer, etwa
+    „Hitzebelastung (#95)“), Teilzeilen einer zusammengefassten Klimawirkung
+    (etwa Mortalität + Erkrankungen) eingerückt darunter — wie in der
+    Kostentabelle des Dashboards (``CostTablesSection.tsx``, T-1470-cto)."""
+    zeilen_by_code = {r["code"]: r for r in aggregat["cost"]["by_risk"]}
     zeilen = [
         "| Klimawirkung | Erwarteter Schaden pro Jahr | Risikoklasse |",
         "| --- | --- | --- |",
     ]
-    for r in _teuerste_klimawirkungen(aggregat):
-        klasse = tunables.RISK_CLASS_LABELS.get(r.get("risk_class"), r.get("risk_class") or "—")
-        zeilen.append(f"| {r['name']} | {_de_euro(r['cost_eur'])} | {klasse} |")
+    for e in _teuerste_klimawirkungen(aggregat):
+        rows = [zeilen_by_code[code] for code in e["codes"]]
+        klasse = _risk_class_label(rows[0])
+        zeilen.append(f"| {e['bezeichnung']} | {_de_euro(e['cost_eur'])} | {klasse} |")
+        for teil in e["teile"]:
+            zeilen.append(f"| &nbsp;&nbsp;{teil['name']} | {_de_euro(teil['cost_eur'])} | {_risk_class_label(teil)} |")
     return "\n".join(zeilen)
 
 
