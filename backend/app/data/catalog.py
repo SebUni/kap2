@@ -2021,12 +2021,16 @@ MEASURES: list[dict] = [
     # Herleitung opex_per_unit_year: Betrieb/Wartung/Beprobung ~2,5-5 T€/a → 3.500 €.
     # Presseberichte nennen ~4.500 €/a für Wartung/Beprobung (innerhalb der Spanne).
     {"code": "COOLING_ROOMS_DRINKING_WATER", "name": "Kühle Räume / Kühlzentren",
-     "description": "Gekühlte Heimplätze (Klimaanlagen in Pflegeheimen, Hebel S157 aus Bericht #95 §5). Wirkung: g_S157 auf die Todesfälle 85+ der Heimbewohner im gekühlten Anteil s_gek der Heimplätze, den die Kommune eingibt; ohne Eingabe kein Betrag.",
+     "description": "Zwei Hebel aus Bericht #95 §5, getrennt ausgewiesen. (1) Gekühlte Heimplätze (Klimaanlagen in Pflegeheimen, Hebel S157): g_S157 auf die Todesfälle 85+ der Heimbewohner im gekühlten Anteil s_gek der Heimplätze über dem Stand der Kalibrierjahre; die Kommune gibt s_gek ein, ohne Eingabe gilt die Voreinstellung 0,11 (Abschätzung von KAP3). (2) Öffentliche Kühlzentren (kühle Orte in Gemeinderäumen, Kirchen oder Bibliotheken) für Menschen ab 75, die zu Hause leben: Faktor δ_KZ = 0,9956 auf deren Hitze-Todesfälle im abgedeckten Teil der Kommune (Abschätzung von KAP3); mit Hitzeaktionsplan und Schutzprogrammen zusammen höchstens so viel wie das Paket Deutschland (Kappung 0,794).",
      "measure_type": "structural",
      # Hebel S157 (Bericht #95 §5, Log 44, Befund 130): die Wirkung läuft NICHT über
      # default_reduction auf die Exposition (früher 0.18), sondern über g_S157 auf
      # D_85+ × h_Heim × s_gek (measure_service._s157_cell_factor). Deshalb kein
      # default_reduction (None = nicht anwendbar) und nur die Mortalität verknüpft.
+     # Dazu öffentliche Kühlzentren (Bericht #95 §5 Z. 1203–1246, Befunde 139, 148,
+     # Entscheidung CEO 27.09.2026): ΔD_KZ = [D_75–84 + D_85+ × (1 − h_Heim)] × (1 − δ_KZ)
+     # im abgedeckten Teil (measure_service._kz_cell_factor); das Kostenmodell je Raum
+     # (ein Raum je 20 ha, „kühle Orte“) beschreibt öffentliche Kühlräume.
      "effect_target": ["vulnerability"], "default_reduction": None, "coverage_scaling": "saturating",
      "effect_model": "s157",
      "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY"],

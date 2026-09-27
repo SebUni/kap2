@@ -316,6 +316,103 @@ def _vg_cell_factor(code: str, frac: float, cell_risk: dict,
     return 1.0
 
 
+# ── Hebel öffentliche Kühlzentren (Bericht #95 §5 Z. 1203–1246, Befunde 139, 148;
+#    Maßnahme COOLING_ROOMS_DRINKING_WATER, Entscheidung CEO 27.09.2026) ──
+# Die Kühlzentren hängen an derselben Maßnahme wie S157, wirken aber auf andere Menschen:
+# ΔD_KZ = [D_75–84 + D_85+ · (1 − h_Heim)] · (1 − δ_KZ) je Zelle, bewertet mit L̄_a (YLL),
+# im abgedeckten Teil der Zelle (wie die Schutzprogramme). Mit Hitzeaktionsplan und
+# Schutzprogrammen zusammen gilt max(δ_HAP × δ_VG × δ_KZ; kappung_vg). S157 (Heimbewohner
+# 85+) und Kühlzentren (zu Hause) treffen getrennte Gruppen, ihre Wirkungen werden addiert.
+
+KZ_ESTIMATE_NOTE = "Abschätzung von KAP3"
+
+
+def _kz_cell_factor(frac: float, cell_risk: dict, delta_hap: float = 1.0,
+                    hap_cap: float = 1.0, delta_vg: float = 1.0,
+                    vg_cap: float = 1.0) -> float:
+    """Faktor (0..1) der öffentlichen Kühlzentren auf das Mortalitäts-Outcome einer Zelle.
+
+    ``frac`` ist der Deckungsgrad; der Hebel wirkt im abgedeckten Teil (Bericht Z. 1243).
+    ``hap_cap`` und ``vg_cap`` sind die Faktoren von Hitzeaktionsplan und Schutzprogrammen
+    in der Zelle für die Kappung ``max(δ_HAP × δ_VG × δ_KZ; kappung_vg)`` (im Aggregat und
+    im Einzelnutzen). ``delta_hap`` und ``delta_vg`` dämpfen den Exzess — nur für den
+    **Einzelnutzen** setzen (``delta_vg`` ist dann der Outcome-Faktor der Schutzprogramme
+    in der Zelle); im Aggregat bleiben sie 1, weil dort die Faktoren ohnehin
+    multipliziert werden. Zellen ohne Teil-Ausweis der Bänder bleiben unverändert.
+    """
+    from app.services.engine.impact import health
+
+    if frac <= 0.0:
+        return 1.0
+    outcome = float(cell_risk.get("outcome") or 0.0)
+    if outcome <= 0.0:
+        return 1.0
+    d75, d85 = cell_risk.get("deaths_a75_84"), cell_risk.get("deaths_a85p")
+    if d75 is None or d85 is None:
+        return 1.0
+
+    _p = _s157_param
+    f = max(0.0, min(1.0, frac))
+    delta = health.kz_effective_delta(
+        _p("delta_kuehlzentren", health.DELTA_KZ), float(hap_cap) * float(vg_cap),
+        paket=_p("kappung_vg", health.VG_PAKET_DE))
+    l75 = _p("life_years_a75_84", health.AGE_LIFE_YEARS["a75_84"])
+    l85 = _p("life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
+    delta_x = health.kz_avoided(
+        float(d75) * l75, float(d85) * l85, delta,
+        _p("qbar_pfl", 0.149), _p("beta_pfl", 1.54),
+        max(0.0, min(1.0, float(delta_hap))) * max(0.0, min(1.0, float(delta_vg))),
+        _cell_q_pfl(cell_risk))
+    return max(0.0, min(1.0, 1.0 - f * delta_x / outcome))
+
+
+def _vg_kz_factors(vg_fracs: list[float], cell_risk: dict,
+                   hap_cap: float = 1.0) -> tuple[float, float]:
+    """Schutzprogramme in einer Zelle, gesehen von den Kühlzentren: (Dämpfung, Kappung).
+
+    ``vg_fracs`` sind die Deckungsgrade der gewählten Schutzprogramme in der Zelle.
+    Dämpfung = Outcome-Faktor der Schutzprogramme (wie im Aggregat), damit die Summe der
+    Einzelnutzen das Aggregat ergibt. Kappung = wirksames δ_VG auf den Bändern, je
+    Deckungsgrad gewichtet: 1 − frac · (1 − δ_VG nach Kappung).
+    """
+    from app.services.engine.impact import health
+
+    damp, cap = 1.0, 1.0
+    if not vg_fracs:
+        return damp, cap
+    d_vg_eff = health.vg_effective_delta(
+        _s157_param("delta_vg", health.DELTA_VG), hap_cap,
+        paket=_s157_param("kappung_vg", health.VG_PAKET_DE))
+    for fr in vg_fracs:
+        if fr <= 0.0:
+            continue
+        damp *= _vg_cell_factor(S157_RISK_CODE, fr, cell_risk, 1.0, hap_cap)
+        cap *= 1.0 - min(1.0, fr) * (1.0 - d_vg_eff)
+    return damp, cap
+
+
+def _kz_summary_fields(mdef: dict, kz_eur: float, s157_eur: float,
+                       with_vg: bool) -> dict:
+    """Zusatzfelder des impact_summary: Betrag der Kühlzentren getrennt von S157.
+
+    ``kuehlzentren_benefit_eur`` und ``s157_benefit_eur`` teilen den vermiedenen Schaden
+    der Mortalität auf die beiden Hebel der Maßnahme; zusammen ergeben sie
+    ``annual_benefit_damage_eur``. ``kuehlzentren_estimate_note`` kennzeichnet den Betrag
+    als begründete Abschätzung von KAP3 (heat.delta_kuehlzentren, P2).
+    """
+    if not _is_s157(mdef):
+        return {}
+    from app.services.engine.impact import health
+
+    return {
+        "kuehlzentren_benefit_eur": round(kz_eur, 2),
+        "s157_benefit_eur": round(s157_eur, 2),
+        "delta_kuehlzentren": _s157_param("delta_kuehlzentren", health.DELTA_KZ),
+        "kuehlzentren_estimate_note": KZ_ESTIMATE_NOTE,
+        "kuehlzentren_with_vg": with_vg,
+    }
+
+
 # ── Hebel S158: Pollen-Frühwarnung (Bericht #96 §5.1; Maßnahme POLLEN_EARLY_WARNING) ──
 # Sperre aus Befund 124 aufgehoben (T-1513-cto): Die Wirkung ist kein flächiger Faktor
 # auf den Index, sondern ΔTage_vermieden = A_Zelle · r_S158 · Σ_g t_warn,g · ΔTage_g,Zelle
@@ -625,18 +722,26 @@ def _stadtbaum_cell_days_factors(db: Session, measure: AdaptationMeasure) -> dic
 def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float,
                          unit_factor: float, cell_risk: dict,
                          delta_hap: float = 1.0, hap_cap: float = 1.0,
-                         s158_days_factor: float = 1.0) -> float:
+                         s158_days_factor: float = 1.0, delta_vg: float = 1.0,
+                         vg_cap: float = 1.0) -> float:
     """Faktor einer Maßnahme auf ein verknüpftes Risiko in einer Zelle.
 
-    ``delta_hap`` wirkt nur auf S157 und die Schutzprogramme (Einzelnutzen),
-    ``hap_cap`` nur auf die Kappung der Schutzprogramme; ``s158_days_factor`` nur auf
-    S158 (Ĝ′-Tage-Faktor einer gleichzeitigen Stadtbaumwahl derselben Kommune); sonst
-    ohne Belang.
+    ``delta_hap`` wirkt nur auf S157, die Schutzprogramme und die Kühlzentren
+    (Einzelnutzen), ``hap_cap`` nur auf die Kappung der Schutzprogramme und der
+    Kühlzentren; ``delta_vg`` (Einzelnutzen) und ``vg_cap`` (Kappung) nur auf die
+    Kühlzentren; ``s158_days_factor`` nur auf S158 (Ĝ′-Tage-Faktor einer gleichzeitigen
+    Stadtbaumwahl derselben Kommune); sonst ohne Belang.
+
+    COOLING_ROOMS_DRINKING_WATER rechnet zwei Hebel auf getrennte Gruppen: S157
+    (Heimbewohner 85+) und öffentliche Kühlzentren (75+ zu Hause); die vermiedenen
+    YLL werden addiert: 1 − (1 − f_S157) − (1 − f_KZ).
     """
     if _is_s157(mdef):
         if code != S157_RISK_CODE:
             return 1.0
-        return _s157_cell_factor(_s157_input(config), frac, cell_risk, delta_hap)
+        f_s157 = _s157_cell_factor(_s157_input(config), frac, cell_risk, delta_hap)
+        f_kz = _kz_cell_factor(frac, cell_risk, delta_hap, hap_cap, delta_vg, vg_cap)
+        return max(0.0, f_s157 + f_kz - 1.0)
     if _is_vg(mdef):
         return _vg_cell_factor(code, frac, cell_risk, delta_hap, hap_cap)
     if _is_s158(mdef):
@@ -659,6 +764,27 @@ def _hap_measures(db: Session, measure: AdaptationMeasure) -> list[AdaptationMea
     return [m for m in kommune_measures_query(db, measure.kommune_id, measure.demo_session_id)
             .filter(AdaptationMeasure.measure_type == S157_HAP_CODE).all()
             if m.id != measure.id]
+
+
+def _vg_measures(db: Session, measure: AdaptationMeasure) -> list[AdaptationMeasure]:
+    """Schutzprogramme (effect_model ``vg``) derselben Kommune und Demo-Sitzung wie ``measure``.
+
+    Grundlage der Kappung der Kühlzentren ``max(δ_HAP × δ_VG × δ_KZ; kappung_vg)``.
+    """
+    return [m for m in kommune_measures_query(db, measure.kommune_id, measure.demo_session_id)
+            .all()
+            if m.id != measure.id
+            and catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"]
+
+
+def _vg_cell_fracs(db: Session, measures: list[AdaptationMeasure]) -> dict[int, list[float]]:
+    """Deckungsgrade der Schutzprogramme je Zelle (für ``_vg_kz_factors``)."""
+    out: dict[int, list[float]] = {}
+    for m in measures:
+        frac_map, _ = _coverage(db, m)
+        for cid, frac in frac_map.items():
+            out.setdefault(cid, []).append(frac)
+    return out
 
 
 def _hap_cell_factors(db: Session, measure: AdaptationMeasure,
@@ -953,6 +1079,12 @@ def _params_fingerprint(db: Session, measure: AdaptationMeasure, mdef: dict,
         payload["hap"] = sorted(
             (m.id, json.dumps(m.config or {}, sort_keys=True, default=str), str(m.geometry))
             for m in _hap_measures(db, measure))
+    if _is_s157(mdef):
+        # Kühlzentren (Bericht #95 §5 Z. 1234–1238): Kappung und Dämpfung hängen an den
+        # Schutzprogrammen der Kommune; ändern sie sich, ist das Summary veraltet.
+        payload["vg"] = sorted(
+            (m.id, json.dumps(m.config or {}, sort_keys=True, default=str), str(m.geometry))
+            for m in _vg_measures(db, measure))
     if _is_s158(mdef):
         # Bericht §5 „Zusammen mit S158" (T-1602-cto): der Nutzen von S158 hängt an
         # der Stadtbaumwahl derselben Kommune (kein vermiedener Tag zählt doppelt);
@@ -1087,6 +1219,15 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         hap_by_cell = _hap_cell_factors(db, measure, parameter_registry.overrides_map(
             parameter_registry.load_db_overrides(db, measure.kommune_id)))
 
+    # Kühlzentren (Bericht #95 §5 Z. 1234–1238): Schutzprogramme derselben Kommune je
+    # Zelle — sie dämpfen den Einzelnutzen der Kühlzentren und gehen in die Kappung
+    # max(δ_HAP × δ_VG × δ_KZ; kappung_vg) ein. Der Betrag der Kühlzentren wird getrennt
+    # von S157 gezählt (Befunde 139, 148).
+    vg_fracs_by_cell: dict[int, list[float]] = {}
+    kz_benefit = 0.0
+    if _is_s157(mdef):
+        vg_fracs_by_cell = _vg_cell_fracs(db, _vg_measures(db, measure))
+
     # Bericht §5 „Zusammen mit S158" (T-1602-cto): deckt zugleich eine Stadtbaumwahl
     # derselben Kommune dieselbe Zelle ab, rechnet S158 seinen Nutzen aus den schon um
     # die Pflanzung geminderten Tagen (Faktoren multipliziert) — kein vermiedener Tag
@@ -1126,8 +1267,11 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
             r = _with_cell_q_pfl(cell_risks.get(code, {}), data.get("inputs"))
             d_hap = hap_by_cell.get(cid, 1.0)
             s158_days_factor = stadtbaum_by_cell.get(cid, 1.0)
+            d_vg, vg_cap = 1.0, 1.0
+            if _is_s157(mdef) and code == S157_RISK_CODE:
+                d_vg, vg_cap = _vg_kz_factors(vg_fracs_by_cell.get(cid, []), r, d_hap)
             factor = _measure_cell_factor(mdef, measure.config, code, frac, unit_factor, r,
-                                          d_hap, d_hap, s158_days_factor)
+                                          d_hap, d_hap, s158_days_factor, d_vg, vg_cap)
             base_idx = float(r.get("index", 0.0))
             new_idx = base_idx * factor
             deltas[code] = round(new_idx - base_idx, 3)
@@ -1161,6 +1305,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     and risk.get("scale", "pop") in ("pop", "area")):
                 reduced = _cell_cost(risk, r, cell_pop) * (1.0 - factor)
                 annual_benefit_damage += reduced
+                if _is_s157(mdef) and code == S157_RISK_CODE:
+                    f_kz = _kz_cell_factor(frac, r, d_hap, d_hap, d_vg, vg_cap)
+                    kz_benefit += min(reduced, _cell_cost(risk, r, cell_pop) * (1.0 - f_kz))
                 # gekoppelte Folgekosten (nur direkte Sektorschäden treiben k_indirekt)
                 if code in catalog.DIRECT_SECTOR_RISK_CODES:
                     annual_benefit_damage += k_indirect * reduced
@@ -1213,6 +1360,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     # Die Kappung fängt künftige Fehlkalibrierungen/Inkonsistenzen ab, statt sie als
     # Millionen-Nutzen ins Dashboard durchzureichen.
     benefit_capped = False
+    benefit_damage_uncapped = annual_benefit_damage
     if annual_benefit_damage > 0.0:
         base_agg = get_risk_aggregate(db, measure.kommune_id, apply_measures=False)
         k = float(override_context.get_override("impact.k_indirect", _K_INDIRECT_DEFAULT))
@@ -1228,6 +1376,13 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     # S158 verknüpft ausschließlich ALLERGY_RISK_CODE (#96) — ihr Euro-Anteil an
     # ``annual_benefit_damage_eur`` ist deshalb der ganze (ggf. gekappte) Betrag.
     s158_avoided_days_eur = annual_benefit_damage if _is_s158(mdef) else 0.0
+
+    # Kühlzentren und S157 getrennt (COOLING_ROOMS_DRINKING_WATER verknüpft nur die
+    # Mortalität): Bei einer Kappung schrumpfen beide Anteile im selben Verhältnis.
+    kz_benefit_eur = 0.0
+    if _is_s157(mdef) and benefit_damage_uncapped > 0.0:
+        kz_benefit_eur = kz_benefit * annual_benefit_damage / benefit_damage_uncapped
+    s157_benefit_eur = max(0.0, annual_benefit_damage - kz_benefit_eur) if _is_s157(mdef) else 0.0
 
     # Trägt am Ende KEINE abgedeckte Zelle einen positiven Effekt und lag zumindest
     # eine ohne Baumkronen im Ausgangsstand, wäre 0 € nicht von einer Datenlücke
@@ -1283,6 +1438,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         **_s157_summary_fields(mdef, measure.config),
         # Befund 129: S157 zusammen mit dem Hitzeaktionsplan gerechnet (Faktoren multipliziert)
         **({"s157_with_hap": bool(hap_by_cell)} if _is_s157(mdef) else {}),
+        # Befunde 139, 148: Betrag der öffentlichen Kühlzentren getrennt von S157,
+        # gekennzeichnet als Abschätzung von KAP3 (heat.delta_kuehlzentren).
+        **_kz_summary_fields(mdef, kz_benefit_eur, s157_benefit_eur, bool(vg_fracs_by_cell)),
         # S158-Integrationsauflage Punkt 5: vermiedene Symptomtage/Euro der Kommune als
         # Abschätzung von KAP3 gekennzeichnet, oder Vermerk statt Betrag ohne Gruppenaufteilung.
         **_s158_summary_fields(mdef, s158_avoided_days_total, s158_avoided_days_eur,
@@ -1350,9 +1508,17 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
     )
     # Befund 126: δ_HAP je Zelle vorab, damit die Schutzprogramme am Paketwert kappen
     # (max(δ_HAP × δ_VG; 0,794)); gedämpft wird hier nicht, das macht die Multiplikation.
+    # Kühlzentren (S157-Maßnahme) kappen ebenso: max(δ_HAP × δ_VG × δ_KZ; kappung_vg).
     hap_cap: dict[int, float] = {}
-    if any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
-           for m in measures):
+    has_kz = any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "s157"
+                 for m in measures)
+    vg_fracs_by_cell: dict[int, list[float]] = {}
+    if has_kz:
+        vg_fracs_by_cell = _vg_cell_fracs(db, [
+            m for m in measures
+            if catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"])
+    if has_kz or any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
+                     for m in measures):
         hap_base = catalog.MEASURES_BY_CODE.get(S157_HAP_CODE)
         if hap_base:
             hap_def = parameter_registry.resolve_measure_def(hap_base, overrides)
@@ -1394,11 +1560,17 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
             cell_risks = (base.get(cid) or {}).get("risks", {})
             cell_inputs = (base.get(cid) or {}).get("inputs")
             for code in mdef.get("linked_risk_codes", []):
+                cell_risk = _with_cell_q_pfl(cell_risks.get(code, {}), cell_inputs)
+                vg_cap = 1.0
+                if _is_s157(mdef) and code == S157_RISK_CODE:
+                    # im Aggregat nur die Kappung, gedämpft wird über die Multiplikation
+                    _, vg_cap = _vg_kz_factors(vg_fracs_by_cell.get(cid, []), cell_risk,
+                                               hap_cap.get(cid, 1.0))
                 factor = _measure_cell_factor(mdef, m.config, code, frac, unit_factor,
-                                              _with_cell_q_pfl(cell_risks.get(code, {}),
-                                                               cell_inputs),
+                                              cell_risk,
                                               hap_cap=hap_cap.get(cid, 1.0),
-                                              s158_days_factor=stadtbaum_days_by_cell.get(cid, 1.0))
+                                              s158_days_factor=stadtbaum_days_by_cell.get(cid, 1.0),
+                                              vg_cap=vg_cap)
                 cell_factors[code] = cell_factors.get(code, 1.0) * factor
 
     out = []

@@ -437,6 +437,59 @@ def vg_avoided(x_7584: float, x_85p: float, delta: float,
     return base * d * (1.0 - float(delta))
 
 
+# ── Hebel öffentliche Kühlzentren (Bericht #95 §5 Z. 1203–1246, Befunde 139, 148) ──
+# δ_KZ = 1 − r_KZ × w_KZ = 1 − 0,05 × 0,71 × 3/24 = 0,9956 (Block heat.delta_kuehlzentren,
+# Band 0,982–0,9994; Abschätzung von KAP3). Der Wert steht im Registry-Parameter
+# heat.delta_kuehlzentren (impact/params.py, Spec ``delta_kuehlzentren``); dieser
+# Default liest ihn dort, damit keine zweite Zahl gepflegt wird. Die Maßnahmen-Engine
+# liest ihn zur Laufzeit override-fähig (measure_service._kz_cell_factor).
+def _delta_kuehlzentren_default() -> float:
+    from app.services.engine.impact import params
+
+    spec = next((s for s in params.IMPACT_PARAM_SPECS
+                 if s.get("risk") == "EXPECTED_ANNUAL_MORTALITY"
+                 and s.get("key") == "delta_kuehlzentren"), None)
+    return float(spec["value"]) if spec is not None and spec.get("value") is not None else 0.9956
+
+
+DELTA_KZ: float = _delta_kuehlzentren_default()
+
+
+def kz_effective_delta(delta_kz: float = DELTA_KZ, delta_andere: float = 1.0,
+                       paket: float = VG_PAKET_DE) -> float:
+    """Wirksamer Faktor δ_KZ nach der Kappung am Paketwert (Bericht #95 §5 Z. 1234–1238).
+
+    Mit Hitzeaktionsplan und Schutzprogrammen zusammen gilt auf den Bändern 75–84 und
+    85+ ohne Heim ``max(δ_HAP × δ_VG × δ_KZ; paket)``. ``delta_andere`` ist das Produkt
+    δ_HAP × δ_VG der übrigen Hebel in der Zelle (δ_VG schon nach seiner eigenen Kappung).
+    Zurückgegeben wird der Anteil, der auf δ_KZ entfällt: ``max(δ_KZ; paket / delta_andere)``,
+    höchstens 1 — so ergibt ``delta_andere`` × Rückgabe genau den gekappten Produktwert.
+    ``paket`` ist der Registry-Parameter heat.kappung_vg (Default 0,794).
+    """
+    d_and = max(0.0, min(1.0, float(delta_andere)))
+    d_kz = max(0.0, min(1.0, float(delta_kz)))
+    if d_and <= 0.0:
+        return 1.0
+    return min(1.0, max(d_kz, paket / d_and))
+
+
+def kz_avoided(x_7584: float, x_85p: float, delta_kz: float = DELTA_KZ,
+               qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
+               delta_hap: float = 1.0, q_pfl: float | None = None) -> float:
+    """Vermiedene Menge durch öffentliche Kühlzentren (Bericht #95 §5 Z. 1207).
+
+    ``ΔD_KZ = [D_75–84 + D_85+ · (1 − h_Heim)] · (1 − δ_KZ)``
+
+    Dieselben Menschen wie beim Hebel Schutzprogramme: ältere Menschen, die zu Hause
+    leben; Heimbewohner ab 85 rechnet S157. X sind Todesfälle oder, mit L̄_a gewichtet,
+    YLL. ``delta_kz`` ist δ_KZ nach der Kappung (``kz_effective_delta``). ``delta_hap``
+    dämpft den Exzess nur für den Einzelnutzen (wie bei ``vg_avoided``).
+    ``q_pfl`` ist der Heimanteil der Zelle (Befund 146); ohne ihn gilt h_Heim = 0,344.
+    """
+    return vg_avoided(x_7584, x_85p, max(0.0, min(1.0, float(delta_kz))),
+                      qbar_pfl, beta_pfl, delta_hap, q_pfl)
+
+
 # ── 2. Hitzemorbidität (Bericht #95 §3.4 — Einweisungen) ──────────────────────
 
 def morbidity(risk: dict, ctx: CellContext) -> dict:
