@@ -839,7 +839,7 @@ $$ \text{€}_{\text{Zelle}} \;=\; \sum_e \Delta F_{e,\text{Zelle}} \cdot c_e \;
   Die Basiswert-Wahl folgt der Untergrenzen-Zusage (#95-Befund-62-Lehre).
 - **VOLY = 160.800 €** (Preisstand 2024) (MK 4.0/P52; Kette in #95 §3.5 [19]); VSL nur Sensitivität.
   **Konsistenz-Check VSL ÷ VOLY (§3.2; Befund 217):** Die Fortschreibung P52 führt
-  VSL 3,5 / 4,7 / 6,19 Mio €/Todesfall als Sensitivitäten. Der Quotient ergibt
+  VSL 3,5 / 4,7 / 6,19 Mio. € je Todesfall als Sensitivitäten. Der Quotient ergibt
   **21,8 / 29,2 / 38,5 Lebensjahre** je Todesfall. Dem stehen die hier tatsächlich
   verlorenen Lebensjahre gegenüber: \(\bar L_{\text{MM}}\) = 10,46 und
   \(\bar L_{\text{C44}}\) = **5,48** Jahre. Der VSL unterstellt also das Zwei- bis
@@ -847,13 +847,13 @@ $$ \text{€}_{\text{Zelle}} \;=\; \sum_e \Delta F_{e,\text{Zelle}} \cdot c_e \;
   altersadjustiert, während die Hautkrebs-Sterbefälle mit medianem Sterbealter 76–88
   Jahren am oberen Ende der Altersverteilung liegen. **Konsequenz (§3.2):** #98 ist der
   altenlastigste Fall der K1-Familie; die YLL-Bewertung fällt hier
-  **um Faktor 2,8 (VSL 3,5 Mio) bis 4,9 (VSL 6,19 Mio) niedriger** aus als eine
-  Bewertung je Todesfall — nachgerechnet: 180,1 klimaattribuierte Todesfälle × 3,5 Mio
-  = 630 Mio € (bzw. 846 bzw. 1.115 Mio € bei VSL 4,7 / 6,19 Mio) gegenüber
-  **226 Mio €** im YLL-Pfad. Die **Relation zwischen den Risiken verschiebt sich
+  **um Faktor 2,8 (VSL 3,5 Mio. €) bis 4,9 (VSL 6,19 Mio. €) niedriger** aus als eine
+  Bewertung je Todesfall — nachgerechnet: 180,1 klimaattribuierte Todesfälle × 3,5 Mio. €
+  = 630 Mio. € (bzw. 846 Mio. € bzw. 1,11 Mrd. € bei VSL 4,7 bzw. 6,19 Mio. €) gegenüber
+  **226 Mio. €** im YLL-Pfad. Die **Relation zwischen den Risiken verschiebt sich
   entsprechend**: #98 erscheint gegenüber jung-lastigen Risiken (Extremereignisse,
   Verkehr) systematisch kleiner als unter VSL. Beide Größen stammen aus derselben
-  Quelle (MK 4.0/Amann 2020a) mit derselben Preisstand-Anpassung (€2024).
+  Quelle (MK 4.0/Amann 2020a) mit derselben Preisstand-Anpassung (Preisstand 2024).
 - **Sensitivitätsband \(r_{\text{out}}\)** (nicht im Basiswert; Log 10; GP-Befund 9;
   Formel-Präzisierung Befund 206): der Außenberufs-Modifikator wirkt auf den
   **SCC-Anteil am C44-Zusatz** \(w^Z = w_{\text{SCC}} \cdot 2{,}5 / \text{BAF}_{\text{C44}}
@@ -1055,7 +1055,7 @@ Sortierregel: nach dem Buchstaben des Zeichens ohne Groß- und Kleinschreibung; 
 | \(\text{SSD}\) | Sonnenscheindauer (Normalperioden-Mittel je Zelle) — Kartenebene **neu anzulegen** (angelegt, §3.6) | h/Jahr | DWD-CDC sunshine_duration 1 km [33]; Gebietsmittel-Referenzen [69]; register:98-E20-01 |
 | \(T\) | Dauer des Dosisanstiegs (Mittelpunktabstand der Normalperioden) | Jahre | **30** (1961–1990 ⇒ 1991–2020); herleitung:#gleichgewicht |
 | \(\tau\) | Transient-Faktor: Anteil der Lebenszeitdosis-Erhöhung an der Jahresdosis-Erhöhung, \(\tau=(T/2)/a_{\text{erk}}\) | — | **1,00** im Ausweis (Gleichgewichtslesart); Spanne **0,20–0,48** als §4-Achse; gekennzeichnete Abschätzung §3.9; herleitung:#gleichgewicht |
-| \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136,4–165,6 T€; Kette #95 §3.5) [19]; herleitung:#voly (in #95) |
+| \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136.400–165.600 €; Kette #95 §3.5) [19]; herleitung:#voly (in #95) |
 | \(v_{\text{verh}}\) | Verhaltens-Sensitivität — **Jahres**faktor, **abgeleitet** aus \(s\) und \(\phi_{\text{Komfort}}\) (kein eigener Parameter, §3.2 Kein-Doppelkanal) | — | \(1+\phi_{\text{Komfort}}(s-1)\) = **1,00** (Band 1,00–1,11); herleitung:#v-verh |
 | \(w_{\text{SCC}}\) | SCC-Anteil an C44 (altersinvariant, dokumentierte Annahme; Quellen-Widerspruch benannt §3.1) | — | **0,25** (Band 0,25–0,50) [27; obere Stütze 2015er-BfS-Split]; herleitung:#baf-c44 |
 | \(W_{\text{S155}}(J)\) | angerechnete Minderung des bewerteten Schadens durch S155 nach \(J\) Jahren (Teil-Ausweis, nicht im Basiswert) | €₂₀₂₄/Jahr | berechnet (§5); herleitung:#hebel-s155 |
@@ -1146,7 +1146,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   Mittel 2021–2023.
 
   **Toleranz hergeleitet statt gesetzt (§3.9 gilt auch für Toleranzen; Befund 229a;
-  Log 22).** Bis Rev. 2 standen hier ±10 % ohne Rechenweg, gesetzt in derselben
+  Log 22).** Bis Rev. 2 standen hier ±10 % ohne Herleitung, gesetzt in derselben
   Revision, die das Ergebnis erzeugt hat. Die Herleitung: Jede Einzelablesung trägt
   ±15 %; die Fehlerfortpflanzung des gewichteten Mittels
   \(\sigma/\text{ASR} = 0{,}15\cdot\sqrt{\sum(w_i r_i)^2}\,/\,\sum(w_i r_i)\) ergibt im
@@ -1158,7 +1158,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   zufällige Anteil der richtige Maßstab. Weil das Ist-Ergebnis mit 0,4 σ weit unter der
   Spezifikation liegt, gilt zusätzlich die engere **Regressionsschranke ±3 %**
   (Golden-Test), damit eine künftige Verschlechterung der Ablesekette auffällt.
-  Rechenweg: Anlage [71], Golden-Test `beispiel_98_struktur_validierung`.
+  Nachrechnung: Anlage [71], Golden-Test `beispiel_98_struktur_validierung`.
 
   | ASR (alter Europastandard), je 100.000 | Modell (Ablesekette) | amtlich 2021–2023 | Abweichung | Verdikt |
   |---|---|---|---|---|
@@ -1193,20 +1193,20 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   (der native YLL-Ausweis und € enthalten nur den Zusatz, keinen Sockel).
 - **Sanity-Bänder (Unter- und Obergrenze):**
   Bundessummen (Basiswerte): \(\Delta F\) = **733 MM + 18.339 C44 ≈ 19.072 Fälle/Jahr**,
-  **YLL ≈ 1.404/Jahr**, **€ ≈ 339 Mio € pro Jahr** (Preisstand 2024) (Behandlung 113 + Mortalität 226).
-  *Obergrenzen:* Behandlungs-€ = 6,2 % der amtlichen KKR C43/C44 (1.823 Mio €₂₀₂₃ [28]) ✓;
+  **YLL ≈ 1.404/Jahr**, **Euro-Betrag ≈ 339 Mio. € je Jahr** (Preisstand 2024) (Behandlung 113 Mio. € + Mortalität 226 Mio. €).
+  *Obergrenzen:* Behandlungs-€ = 6,2 % der amtlichen KKR C43/C44 [28] von 1,82 Mrd. € (Preisstand 2023) ✓;
   klimaattribuierter Inzidenzanteil MM +2,73 %/C44 +7,61 % ≪ beobachteter
   Inzidenzanstieg (standardisierte MM-Rate 1999–2023 deutlich steigend; C44-Hospitali-
   sierungen 2004–2024 +94,5 % [27,28]) ✓; YLL-Anteil = 1.404 / ≈ 39.130 (= \(\sum_e \text{Sterbefälle}_e \times \bar L_e\)
   = 3.081,0 · 10,4569 + 1.261,7 · 5,4787, Anlage [71]; Befund 352) Gesamt-Hautkrebs-
   YLL ≈ **3,6 %** (konsistent zu BAF × ΔDosis) ✓. *Untergrenze:* SSD-Anstieg ist messfest
   > 0 (alle Länder +4,5…+12,1 %, alle Regionen +7,8…+9,2 % [69,72]); untere
-  Bandkombination ergibt ≈ 115 Mio € > 0.
+  Bandkombination ergibt ≈ 115 Mio. € > 0.
 - **Bänder je Achse — separat ausgewiesen, nicht kumuliert (§3.9; Befund 221).**
   Rev. 1 behauptete diese Trennung, bezifferte sie aber nicht; hier die Zahlen
   (Anlage [71]):
 
-  | Achse | Spanne | € Mio/Jahr | Δ gegen Basiswert 339 |
+  | Achse | Spanne | Mio. € je Jahr | Δ gegen Basiswert 339 |
   |---|---|---|---|
   | \(k_{\text{UV}} \times a_{\text{attr}}\), untere Kombination | 0,3622 × 0,50 | **115** | −66 % |
   | \(k_{\text{UV}} \times a_{\text{attr}} \times c_e\) oben, obere Kombination | 1,0616 × 1,00 × \(c_e\) oben (**beide** Entitäten) | **737** | +118 % |
@@ -1218,7 +1218,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   | \(r_{\text{out}}\) (geparkt) | \(q_{\text{out}}\) ∈ [0; 0,21] | 339 | **±0 %** (zentriert) |
   | \(v_{\text{verh}}\) (geparkt) | \(\phi\) ∈ [0; 0,25] | 339 – 377 | ±0 % … +11,3 % |
 
-  **Gesamtband ≈ 115–737 Mio €** = nur die \(k_{\text{UV}}\)/\(a_{\text{attr}}\)/\(c_e\)-Kombination;
+  **Gesamtband ≈ 115–737 Mio. €** = nur die \(k_{\text{UV}}\)/\(a_{\text{attr}}\)/\(c_e\)-Kombination;
   die übrigen Zeilen sind **nicht** hineinmultipliziert. Größte Achse ist der
   einseitige Transient-Faktor \(\tau\) (§3.4); größter **zweiseitiger** Treiber ist die
   \(k_{\text{UV}}\)-Messunsicherheit (±49 %); danach folgen \(a_{\text{attr}}\)
@@ -1242,7 +1242,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   (geparkte Ebene, \(\phi\) ∈ [0; 0,25] ⇒ ±0 … **+11,3 %**, einseitig nach oben);
   **VOLY** (136.400–165.600 € ⇒ **−10,1 … +2,0 %**); Entitäten-Split
   \(w_{\text{SCC}}\) (0,25–0,50 ⇒ BAF_C44 1,675–1,95 ⇒ ±0 … +9,3 %); \(c_e\)-Proxy
-  (obere Kostenbänder beider Entitäten ⇒ Behandlungs-€ 113 → 145 Mio ⇒ +9,3 % auf die
+  (obere Kostenbänder beider Entitäten ⇒ Behandlungs-€ 113 → 145 Mio. € ⇒ +9,3 % auf die
   Summe, einseitig); Anker-Auswahlregel (−4,3 … +2,8 %);
   **Binnenheterogenität des Bandes 20–64 (≈ ±4 % je Kommune, Bundessumme unberührt —
   §6 Modellgrenze 7, Befund 225)**; **Populationsbasis Kalibrierung ↔ Produktion
