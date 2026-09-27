@@ -301,6 +301,14 @@ export default function MeasureSidebar() {
                 </span>
               </div>
             )}
+            {isStadtbaum && !impact.benefit_display && impact.stadtbaum_avoided_days_total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Vermiedene Zusatztage/Jahr</span>
+                <span style={{ color: 'var(--success)' }}>
+                  {impact.stadtbaum_avoided_days_total.toLocaleString('de-DE', { maximumFractionDigits: 1 })} Tage
+                </span>
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
               <span style={{ color: 'var(--text-muted)' }}>Vermiedene Schäden / Nutzen</span>
               <span style={{ color: 'var(--success)' }}>{impact.benefit_display
@@ -310,6 +318,14 @@ export default function MeasureSidebar() {
             {isS158 && !impact.benefit_display && impact.s158_estimate_note && (
               <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4 }}>
                 {impact.s158_estimate_note}
+              </div>
+            )}
+            {isStadtbaum && !impact.benefit_display && impact.stadtbaum_estimate_note && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4 }}>
+                {impact.stadtbaum_estimate_note}
+                {impact.stadtbaum_lambda_hinweis && (
+                  <div style={{ marginTop: 2 }}>{impact.stadtbaum_lambda_hinweis}</div>
+                )}
               </div>
             )}
           </div>
