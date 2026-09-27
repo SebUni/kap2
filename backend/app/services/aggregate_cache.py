@@ -9,7 +9,10 @@ gzip-JSON und liefert es danach als reines I/O — analog zu ``layer_cache``.
 
 Invalidiert wird explizit an allen Mutationspunkten (neue Berechnung, Maßnahmen-,
 Config-/Parameter-Änderung, Reset, Grid-Neubau) sowie automatisch bei einer
-Änderung von ``catalog.MODEL_VERSION`` (Kostensätze/Modelllogik).
+Änderung von ``catalog.MODEL_VERSION`` (Kostensätze/Modelllogik) **oder**
+``AGG_SCHEMA_VERSION`` (Aufbau des gespeicherten Aggregats). Wer den Aufbau des
+gespeicherten Aggregats ändert (z. B. ein neues Feld in ``cost``), ändert
+``AGG_SCHEMA_VERSION``.
 """
 
 from __future__ import annotations
@@ -21,6 +24,13 @@ from app.data import catalog
 from app.services import file_cache
 
 log = logging.getLogger(__name__)
+
+# Schema-Version des gespeicherten Aggregats: unabhängig von ``catalog.MODEL_VERSION``
+# (die für Kostensätze/Modelllogik steht und in Artefakten/Exporten sichtbar ist),
+# damit eine reine Strukturänderung des Zwischenspeichers dort nichts verschiebt.
+# 2026-09-27-klimawirkungen: T-1470-cto ergänzt ``cost`` um das Feld
+# ``klimawirkungen``; ältere Aggregate ohne dieses Feld müssen verworfen werden.
+AGG_SCHEMA_VERSION = "2026-09-27-klimawirkungen"
 
 _CACHE_BASE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -45,8 +55,10 @@ def _version_path(kommune_id: int) -> str:
 
 
 def _ensure_model_version(kommune_id: int) -> None:
-    """Leert den Cache, wenn er unter einer alten Modellversion gebaut wurde."""
-    file_cache.ensure_version_stamp(_cache_dir(kommune_id), catalog.MODEL_VERSION)
+    """Leert den Cache, wenn er unter einer alten Modell- oder Schema-Version
+    gebaut wurde (``catalog.MODEL_VERSION`` + ``AGG_SCHEMA_VERSION`` zusammen)."""
+    stamp = f"{catalog.MODEL_VERSION}|{AGG_SCHEMA_VERSION}"
+    file_cache.ensure_version_stamp(_cache_dir(kommune_id), stamp)
 
 
 # ── Öffentliche API ──────────────────────────────────────────────────────────────
