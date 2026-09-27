@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 from app.data import catalog
 from app.models.models import AdaptationMeasure, MeasureImpact
 from app.services import measure_service
+from app.services import massnahmen_gewissheit as _mg
+from app.data.massnahmen_umsetzung import MASSNAHMEN_UMSETZUNG
 from app.services.engine import lower_bound
 
 
@@ -87,6 +89,49 @@ def _fill_climate_impacts_sheet(ws, agg: dict | None, lb_note: str | None) -> No
         ws.append(["", "Hinweis zur Summe (Untergrenze)", lb_note])
 
 
+_EVIDENZ_ANZEIGE = {
+    "abgeschaetzt": "abgeschätzt (KAP3)",
+    "berechnet": "berechnet aus amtlichen Daten",
+    "belegt": "belegt",
+}
+_EBENE_LABEL = {"gemeinde": "Gemeinde", "kreis": "Kreis", "land": "Land"}
+
+
+def gewissheit_text(g: dict | None) -> str:
+    """Zellentext „Gewissheit“ wie in der Maßnahmentabelle (MeasuresTableTab.tsx)."""
+    if not g:
+        return "nicht hinterlegt"
+    zeilen = [
+        k["name"] + ": " + k["gewissheitsstufe"] + (" (qualitativ)" if k["qualitativ"] else "")
+        for k in g["klimawirkungen"]
+    ]
+    ev = g["wirkung_evidenz"]
+    zeilen.append(_EVIDENZ_ANZEIGE.get(ev, ev))
+    return "\n".join(zeilen)
+
+
+def umsetzung_text(u: dict | None) -> str:
+    """Zellentext „Umsetzung“ wie in der Maßnahmentabelle (MeasuresTableTab.tsx)."""
+    if not u:
+        return "nicht hinterlegt"
+    b = u.get("beleg") or {}
+    if b.get("quelle"):
+        beleg = "Quelle: " + b["quelle"] + (", S. " + b["seite"] if b.get("seite") else "")
+    elif b.get("abschaetzung"):
+        beleg = "Abschätzung von KAP3" + (": " + b["herleitung"] if b.get("herleitung") else "")
+    else:
+        beleg = ""
+    zeilen = [
+        "Kommune allein" if u.get("umsetzung") == "kommune_allein" else "mit Partnern",
+        "Ebenen: " + (", ".join(_EBENE_LABEL.get(e, e) for e in u.get("ebenen") or []) or "–"),
+    ]
+    if u.get("partner"):
+        zeilen.append("Partner: " + ", ".join(u["partner"]))
+    if beleg:
+        zeilen.append(beleg)
+    return "\n".join(zeilen)
+
+
 def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
     """Export all measures for a kommune as an Excel file.
 
@@ -110,8 +155,10 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
         "Ø Risiko-Reduktion (Index-Pkt., Σ)",
         "Anzahl", "Einheit",
         "Hinweis zur Nutzen-Summe (Untergrenze)",
+        "Gewissheit", "Umsetzung",
     ]
     ws.append(headers)
+    gewissheit_map = {g["code"]: g for g in _mg.massnahmen_gewissheit()}
 
     # Untergrenzen-Kennzeichnung (UBA MK 4.0, Anforderung 25; T-0440): Der
     # jährliche Nutzen ist eine vermiedene Schadenssumme über dieselben
@@ -165,6 +212,8 @@ def export_measures_xlsx(db: Session, kommune_id: int) -> bytes:
             count if count is not None else "",
             unit_label,
             row_note,
+            gewissheit_text(gewissheit_map.get(m.measure_type)),
+            umsetzung_text(MASSNAHMEN_UMSETZUNG.get(m.measure_type)),
         ])
 
     # ── Sheet 2: Summary ──
