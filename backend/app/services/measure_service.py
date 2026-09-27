@@ -798,6 +798,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         cell_pop = float(data.get("inputs", {}).get("pop", 0.0) or 0.0)
         cell_risks = data.get("risks", {})
         deltas = {}
+        cell_savings: dict[str, float] = {}
         for code in linked:
             r = cell_risks.get(code, {})
             d_hap = hap_by_cell.get(cid, 1.0)
@@ -813,7 +814,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                 if missing:
                     s158_missing_split = True
                 elif avoided_days is not None:
-                    deltas["s158_avoided_days"] = round(avoided_days, 3)
+                    cell_savings["s158_avoided_days"] = round(avoided_days, 3)
                     s158_avoided_days_total += avoided_days
             risk = catalog.RISKS_BY_CODE.get(code)
             if (_risk_counts_for_euro_benefit(risk)
@@ -823,7 +824,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                 # gekoppelte Folgekosten (nur direkte Sektorschäden treiben k_indirekt)
                 if code in catalog.DIRECT_SECTOR_RISK_CODES:
                     annual_benefit_damage += k_indirect * reduced
-        db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid, indicator_deltas=deltas))
+        db.add(MeasureImpact(measure_id=measure_id, grid_cell_id=cid, indicator_deltas=deltas,
+                              savings=cell_savings))
 
     # Flat-skalierte verknüpfte Risiken (z. B. Ausfallstunden bei Netzverstärkung):
     # Das Aggregat rechnet sie als kommunenweiten P90-Outcome — der Nutzen dieser

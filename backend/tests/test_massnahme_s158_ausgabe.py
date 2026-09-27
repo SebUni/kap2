@@ -141,7 +141,7 @@ def test_kommune_avoided_days_and_euro_match_cell_rows(monkeypatch):
     assert summary["s158_avoided_days_total"] > 0.0
     assert summary["s158_avoided_days_eur"] > 0.0
 
-    rows_sum = sum(o.indicator_deltas.get("s158_avoided_days", 0.0) for o in added)
+    rows_sum = sum((o.savings or {}).get("s158_avoided_days", 0.0) for o in added)
     assert rows_sum == pytest.approx(summary["s158_avoided_days_total"], abs=0.05)
 
     # Erwartungswert unabhängig nachgerechnet (r = 0,03 Katalog, t_warn = 0,75 Default).
@@ -167,7 +167,8 @@ def test_missing_group_split_shows_note_not_amount(monkeypatch):
     # annual_benefit_damage_eur hier 0 — sichtbar wird das nicht, weil benefit_display
     # den Betrag in Sidebar/Tabelle verdeckt (dieselbe Weiche wie bei S157).
     assert summary["annual_benefit_damage_eur"] == 0.0
-    assert added and added[0].indicator_deltas.get("s158_avoided_days") is None
+    assert added and (added[0].savings or {}).get("s158_avoided_days") is None
+    assert added[0].indicator_deltas.get("s158_avoided_days") is None
 
 
 # ── (c) ohne Überschreibung: Euro-Kommunenwert = Anteil #96 an annual_benefit_damage_eur ──
