@@ -298,7 +298,8 @@ def _vg_cell_factor(code: str, frac: float, cell_risk: dict,
         if d75 is None or d85 is None:
             return 1.0
         delta = health.vg_effective_delta(
-            _p(S157_RISK_CODE, "delta_vg", health.DELTA_VG), hap_cap)
+            _p(S157_RISK_CODE, "delta_vg", health.DELTA_VG), hap_cap,
+            paket=_p(S157_RISK_CODE, "kappung_vg", health.VG_PAKET_DE))
         l75 = _p(S157_RISK_CODE, "life_years_a75_84", health.AGE_LIFE_YEARS["a75_84"])
         l85 = _p(S157_RISK_CODE, "life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
         delta_x = health.vg_avoided(float(d75) * l75, float(d85) * l85, delta,

@@ -383,7 +383,20 @@ DELTA_VG_MORB: float = 1.0
 # Paketwert Deutschland: Hitzeschutzpläne senken den hitzebedingten Anteil der
 # Sterbefälle um 20,6 % (Urban u. a. 2025 [47], Tabelle 1) — ein Baustein allein
 # und beide Hebel zusammen wirken nie stärker (Kappung, Befunde 126, 128).
-VG_PAKET_DE: float = 1.0 - 0.206
+# Der Wert steht im Registry-Parameter heat.kappung_vg (impact/params.py, Spec
+# ``kappung_vg``); dieser Default liest ihn dort, damit keine zweite Zahl gepflegt
+# wird (Befund 151). Die Maßnahmen-Engine überschreibt ihn zur Laufzeit über
+# ``override_context`` (measure_service._vg_cell_factor).
+def _kappung_vg_default() -> float:
+    from app.services.engine.impact import params
+
+    spec = next((s for s in params.IMPACT_PARAM_SPECS
+                 if s.get("risk") == "EXPECTED_ANNUAL_MORTALITY"
+                 and s.get("key") == "kappung_vg"), None)
+    return float(spec["value"]) if spec is not None and spec.get("value") is not None else 0.794
+
+
+VG_PAKET_DE: float = _kappung_vg_default()
 
 
 def vg_effective_delta(delta_vg: float = DELTA_VG, delta_hap: float = 1.0,
@@ -391,9 +404,12 @@ def vg_effective_delta(delta_vg: float = DELTA_VG, delta_hap: float = 1.0,
     """Wirksamer Faktor δ_VG nach der Kappung am Paketwert (Bericht #95 §5).
 
     Mit dem Hitzeaktionsplan zusammen gilt auf den Bändern 75–84 und 85+ ohne Heim
-    ``max(δ_HAP × δ_VG; 0,794)``. Zurückgegeben wird der Anteil, der davon auf δ_VG
-    entfällt: ``max(δ_VG; 0,794 / δ_HAP)``, höchstens 1 — so ergibt
-    δ_HAP × Rückgabe genau den gekappten Produktwert.
+    ``max(δ_HAP × δ_VG; paket)``. Zurückgegeben wird der Anteil, der davon auf δ_VG
+    entfällt: ``max(δ_VG; paket / δ_HAP)``, höchstens 1 — so ergibt
+    δ_HAP × Rückgabe genau den gekappten Produktwert. ``paket`` ist der Registry-
+    Parameter heat.kappung_vg (Default 0,794, Befund 151); die Maßnahmen-Engine
+    übergibt ihn override-fähig aus ``override_context``, ruft man die Funktion
+    ohne Angabe, gilt der Default ``VG_PAKET_DE``.
     """
     d_hap = max(0.0, min(1.0, float(delta_hap)))
     d_vg = max(0.0, min(1.0, float(delta_vg)))
