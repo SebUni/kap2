@@ -374,14 +374,18 @@ def test_no_flat_measure_on_allergy_days():
     des Berichts als unbelegt führt (die λ-Evidenz ist intra-urban). Seit T-1513-cto darf
     eine mit #96 verknüpfte Maßnahme deshalb NICHT über ``_reduction_factor`` rechnen,
     sondern nur über ein eigenes Zelllauf-Modell (``effect_model``), das die
-    Vegetations-/Symptomlast zellscharf neu bildet (hier S158: Umverteilungsanteil der
-    gewarnten Tage, ``health.pollen_zelltage``/``s158_vermiedene_tage``) statt den
-    gespeicherten Outcome pauschal zu kürzen.
+    Vegetations-/Symptomlast zellscharf neu bildet: S158 (Umverteilungsanteil der
+    gewarnten Tage, ``health.pollen_zelltage``/``s158_vermiedene_tage``) oder seit
+    T-1600-cto zusätzlich 'stadtbaum' (allergenarme Stadtbaumwahl, Ĝ′ über
+    ``health.stadtbaum_g_neu`` bei festgehaltenem Ḡ₀, ``_stadtbaum_cell_factor``) —
+    statt den gespeicherten Outcome pauschal zu kürzen.
     """
+    ZELLLAUF_MODELLE = {"s158", "stadtbaum"}
     verknuepft = [m for m in catalog.MEASURES
                   if CODE in (m.get("linked_risk_codes") or [])]
     assert verknuepft, "Erwarte mindestens die Pollen-Frühwarnung (S158) verknüpft"
-    ohne_zelllaufmodell = [m["code"] for m in verknuepft if m.get("effect_model") != "s158"]
+    ohne_zelllaufmodell = [m["code"] for m in verknuepft
+                           if m.get("effect_model") not in ZELLLAUF_MODELLE]
     assert not ohne_zelllaufmodell, (
         "Pauschal (über _reduction_factor) wirkende Maßnahme auf #96 verknüpft: "
         + ", ".join(ohne_zelllaufmodell)
