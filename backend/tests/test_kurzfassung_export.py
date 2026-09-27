@@ -158,6 +158,9 @@ def test_g_klimawirkungen_gruppiert_nach_amtlicher_nummer():
 
     allergie_zeile = next(z for z in daten if "(#96)" in z)
     assert "200 €" in allergie_zeile
+    allergie_index = daten.index(allergie_zeile)
+    # keine Teilzeile nach #96
+    assert allergie_index == len(daten) - 1
 
 
 def test_h_teilzeile_ohne_betrag_zeigt_gedankenstrich_statt_absturz():
