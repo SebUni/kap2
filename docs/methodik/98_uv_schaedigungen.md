@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–443) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–444) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -1433,7 +1433,8 @@ Jahres unter der heutigen, eingelaufenen Dosislage; die Latenz steckt in den Inz
    Jahres; die Jahres-Attribution ist konzeptionell unscharf (Infokasten-Pflichttext).
 2. \(k_{\text{UV}}\)-Übersetzung: **ein** Messpunkt (UV-Dosis Dortmund, GR/SunD
    DWD-Station 1117 Bochum, 10 km entfernt); Band **0,3622–1,0616** (publizierte
-   Standardfehler, 1 σ) dominiert die Unsicherheit. Station und Raster
+   Standardfehler, 1 σ) ist der größte zweiseitige Treiber der Unsicherheit (größte Achse insgesamt ist der einseitige Transient-Faktor τ, §3.4/§4).
+   Station und Raster
    unterscheiden sich an der Messzelle **metrikabhängig**: bei der
    Sonnenscheindauer um Faktor **1,71** (11,3 gegen 6,62 %/Dek.), bei der
    Globalstrahlung nur um **1,02** (4,6 gegen 4,51 %/Dek., §3.2). Genau deshalb
