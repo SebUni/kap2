@@ -1324,3 +1324,126 @@ alle Beträge: Kette 362,9 Mio. €, Hitzeaktionsplan 18,1 Mio. €, S157 bei de
 | 174 | reviews/BEFUNDE_95.md, fortgeschriebene Zeile zu Befund 149 im Abschnitt Runde 36 | Formel und Zahl passen nicht zum Bericht (LF 14) | Die Formel steht dort mit „s_gek“, eingesetzt ist aber 0,05 = s_gek − 0,06, und „Warmsen 0,056“, obwohl der Bericht jetzt 0,053 nennt | die Formel mit (s_gek − 0,06) schreiben und „Warmsen 0,053“ setzen, als fortgeschriebene Zeile | C | `python3 -c "import sys; z=[l for l in open('reviews/BEFUNDE_95.md',encoding='utf-8') if l.startswith('\| 149 \|')][-1]; sys.exit(not ('Warmsen 0,053' in z and '- 0{,}06)' in z and 'Warmsen 0,056' not in z))"` | behoben (T-1584-methodik_manager, Nacharbeit 2): fortgeschriebene Zeile zu 149 unten, Prüfausdruck von 149 unverändert |
 | 149 | §5 Hebel S157, Charakterisierung (Anpassungspotenzial) | Nullwirkung in der Charakterisierung (P2) | S157 zählte im Anpassungspotenzial mit 0; es sank auf 0,050 (früher 0,18) | Entscheidung methodik_manager (Runde 31): S157 mit seiner Voreinstellung. Umgesetzt: \(r_{\text{S157}} = a_{85+} \times h_{\text{Heim}} \times (s_{\text{gek}} - 0{,}06) \times (1 - g_{\text{S157}})\) = 0,284 × 0,344 × 0,05 × 0,706 = 0,00345; mit dem Hitzeaktionsplan 1 − 0,95 × (1 − 0,00345) = 0,053; Warmsen 0,053; Gruppe nach KWRA unverändert (unter 0,1). Verworfen: \(1 - g_{\text{S157}}\) = 0,71 unmittelbar (zählte den Heim-Exzess als ganze Hitzemortalität) | B | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); t=s[s.index('## 5 '):s.index('## 6 ')]; sys.exit(not ('S157 mit seiner Voreinstellung' in t and '= 0,284 × 0,344 × 0,05 × 0,706 = 0,00345' in t and '1 − 0,95 × (1 − 0,00345) = 0,053' in t and 'abs(1 - 0.95 * (1 - r) - 0.053)' in s))"` | behoben, Zeile fortgeschrieben in Runde 37 (T-1584-methodik_manager, Nacharbeit 2, Befund 174): Formel mit (s_gek − 0,06) wie im Bericht, Warmsen 0,053; Prüfausdruck unverändert |
 | 138 | §5 Hebel S157 (\(s_{\text{gek}}\)), Log 44/45, Kapitel 7 | Nullwirkung ohne Eingabe (P2) | Ohne Eingabe der Kommune blieb S157 ohne Betrag | Entscheidung methodik_manager (Runde 31): Voreinstellung nach P2 für die ganze Kommune, Block `heat.s_gek`. Umgesetzt: \(s_{\text{gek}}\) = 11 % der Pflegeheime mit Klimaanlage [71] × 1 = 0,11, Band 0,05–0,15 (oben 14,5 % der Neubauten des Sozialwesens 2025 [72]), `abschaetzung_kap3`; Sensitivität Berlin (Kette) 2,7 Mio. € je Jahr (1,2–3,7 Mio. €, 0,3–1,0 % des Jahresbetrags), Zelllauf 2,4 Mio. €, Warmsen 1.032 € | B | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); k=s[s.index('## 7 '):s.index('## 8 ')]; b=k.split('id: heat.s_gek')[1].split('parameter:')[0]; t=s[s.index('## 5 '):s.index('## 6 ')]; sys.exit(not ('wert: 0.11' in b and 'band: [0.05, 0.15]' in b and 'kennzeichnung: abschaetzung_kap3' in b and '= 0,11 (Abschätzung von KAP3, Block' in t and 'Nullwirkung ist keine Voreinstellung (P2)' in t and '× 0,05 = 1,249, gerundet' in t and 'id: heat.s_gek_kalib' in k and 'python test: s157_voreinstellung' in s and '[72]** Statistisches Bundesamt' in s))"` | behoben, Prüfausdruck fortgeschrieben in Runde 37 (T-1584-methodik_manager, Nacharbeit 2): Befund 172 schreibt die Sensitivität ungerundet, 24,99 Mio. € × 0,05 = 1,249, gerundet 1,2 Mio. € |
+
+## Runde 38 — Gegenprüfung nach Runde 31, Abschnitte A und B (frische Sitzung, 27.09.2026): Null-Runde
+
+Die Gegenprüfung nach §5 lief in zwei Paketen unter dem Vorhaben T-1535-cmo, je in frischer Sitzung des
+methodik_manager: Abschnitt A (Kopf bis vor `## 5 `) in T-1598-methodik_manager (Ersatz für T-1583-methodik_manager,
+dessen Runden 32 bis 34 ohne Null-Runde blieben), Abschnitt B (`## 5 ` bis zum Ende) in T-1584-methodik_manager. Beide
+letzten Urteile lauten „Null-Runde: ja“. Die Null-Runde über den ganzen Bericht ist damit Runde 38, das letzte der beiden
+Null-Urteile. Eingetragen mit T-1585-methodik_manager (Paket 3); am Bericht ändert sich nur der Kopf vor `## 1 `.
+
+**Nachweis Abschnitt A.** Firmen-Repo, `tickets/T-1598-methodik_manager.md`, Abschnitt „Urteil“, Eintrag
+„2026-09-27T12:34:23Z · Runde 0 · methodik_manager (opus/high)“, **Urteil:** freigabe. Verdiktzeile wörtlich:
+
+VERDIKT #95 T-1598-methodik_manager Abschnitt A Runde 35 · Null-Runde: ja. Keine neuen A- oder B-Befunde. Es gibt einen neuen C-Befund (162, siehe unten); er hält die Null-Runde nicht auf.
+
+Merge nach `main`: Commit 95dda1b8. Der C-Befund 162 steht seit Runde 36 im Ledger (offen).
+
+**Nachweis Abschnitt B.** Firmen-Repo, `tickets/T-1584-methodik_manager.md`, Abschnitt „Urteil“, Eintrag
+„2026-09-27T13:04:54Z · Runde 2 · methodik_manager (opus/high)“, **Urteil:** freigabe. Verdiktzeile wörtlich:
+
+VERDIKT #95 T-1584-methodik_manager Abschnitt B Runde 38 · Null-Runde: ja
+
+Merge nach `main`: Commit aced8021. „Runde 0“ und „Runde 2“ sind die Zählung im jeweiligen Ticket; im Ledger sind es die
+Runden 35 und 38. Das Urteil zu B hat die einzige Änderung an A seit Runde 35 (Kap. 1, Knotentabelle Zeile S157, Z. 59,
+Befund 169) mitgelesen, ohne Befund.
+
+**Leitfragen nach §5.** Der Skill `methodik_manager-gegenpruefung` nennt 14 Leitfragen; LF 15 haben beide Urteile von
+Hand nach Aufgabe §5 Nr. 15 und §6 Nr. 2 geprüft.
+
+| Leitfrage | Verdikt | Abschnitt |
+|---|---|---|
+| LF 1 Kette | bestanden: alle elf Knoten in der Knoten-Bilanz, S154 und W123 begründet inaktiv (Log 11, Log 15); Hebel S155, S157, S158, S152 in §5 verarbeitet | beide (A: Knoten-Bilanz; B: Hebel) |
+| LF 2 Verteilschlüssel | bestanden: Mortalität ohne Treiber etwa 0, Morbiditätssockel als Grenze in §3.4 und §4 | A (B: „in Abschnitt A“) |
+| LF 3 Physische Zwischengröße | bestanden: D_a, YLL und F je Zelle (§3.5); jeder Hebel über Todesfälle zu YLL und € | beide |
+| LF 4 Doppelzählung | bestanden: HD_ref zweiseitig, Warnwirkung in c_kal (Wächter), R9 mit #101; δ_HAP gegen c_kal abgegrenzt, δ_VG und δ_KZ über die Wächter-Frage, S157 über den Abzug 0,06, Kappung 0,794, R7-Weiche zu #65 | beide |
+| LF 5 Modifikatoren | bestanden: β_iso 0,897 und β_pfl 1,54 zentriert; alle δ multiplikativ auf (RR − 1) | beide |
+| LF 6 Struktur | bestanden: Kopplungen f_a↔m_a und L̄_85+; h_Heim je Zelle, Kopplung HAP × VG × KZ gekappt | beide |
+| LF 7 Tails/Parameter | bestanden: Wochenquantile empirisch, σ = 0,5 K offengelegt; jeder Hebelparameter mit Band | beide |
+| LF 8 Kalibrierung | bestanden: ein Skalar 0,581, 12/16 Länder, Voll-Holdout 12/16, Berlin-Anker −18 % ausgewiesen; der Neufit 0,651 und 0,534 in B aus §5 übernommen | A (B: „in Abschnitt A“) |
+| LF 9 Kostensätze | bestanden: VOLY 160.800 €, c_Fall 7.152 €, Preisstand 2024 einheitlich | beide |
+| LF 10 Quellen | bestanden: Lint und Register Kap. 2; jeder Verweis in B steht in Kap. 8, [15] ist Climate Change 24/2021 | beide |
+| LF 11 Form und Erklärbarkeit (E1–E5) | bestanden, mit den C-Resten 162 (A), 175 und 176 (B); E1 Rechenkette §3.0 mit zehn Ebenen, E2 Rechenbeispiel je Hebel, E3 einfachere Rechnung je beziffert | beide |
+| LF 12 Umsetzbarkeit | bestanden: keyless, Datenebenen spezifiziert; 30 Blöcke vollständig, Code-Nachzug beim cto | beide |
+| LF 13 Herleitungspflicht | bestanden: jedes Zeichen in §3.6 mit Herleitung oder „Abschätzung von KAP3“; δ_HAP, s_gek_kalib, δ_KZ, δ_VG, Kappung nachgerechnet | beide |
+| LF 14 Quellen-Synchronität | bestanden: Monetarisierung Blattzeile 100 und Abgleich-Protokoll stimmen; C-Rest 177 (Log 39) | beide |
+| LF 15 Risiko ohne (weitere) Anpassung | bestanden, von Hand geprüft nach Aufgabe §5 Nr. 15 und §6 Nr. 2, weil der Skill 14 Leitfragen nennt: KWRA-Stufe aus `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Zeile 97 (ID 95) deckt sich mit Kap. 1; (a) ordnet den Basiswert dem Zustand ohne (weitere) Anpassung zu, (b) zeigt „mit Anpassung“ nur als Hebel; alle Wächter in §5 passen dazu | beide |
+
+**Leseliste Abschnitt A** (Urteil zu T-1598, zeilenweise gelesen Z. 1 bis Z. 1043, jede Überschrift):
+- Kopf: `# Methodik-Bericht #95 — Hitzebelastung`, Statuszeile, Revisionsstand;
+- `## 1 Wirkungskette & Knoten-Bilanz (§2.1)` mit `### Knoten-Bilanz`, `### Weitergaben (zweispaltig; Quelle:
+  Netzwerkliste + Abgleich-Protokoll)`, `### Konto-Einbettung`, `### Risiko ohne (weitere) Anpassung`;
+- `## 2 Evidenz-Register (§2.2)`;
+- `## 3 Modell (§2.3) — Ansatz 95-A, Schicht B` mit `### 3.0 Rechenkette` (samt Prüfblock `rechenkette_95`),
+  `### 3.1 Zelltemperatur (vorgelagerter Knoten W124; produktseitig implementiert)`, `### 3.2 Wochenverteilung
+  (empirische intra-saisonale Quantile; §3.2-Tails)`, `### 3.3 Mortalität (nativer Ausweis YLL)` (Ersatzregel, Tabelle,
+  Rechenbeispiel Warmsen, β-Ablesekette, (a) f_a, (b) β_pfl), `### 3.4 Morbidität (altersgeschichtet, §3.2-Struktur)`,
+  `### 3.5 Monetarisierung (K1) und Aggregation`, `### 3.6 Zeichentabelle (alphabetisch; §3.2-Form)` mit Datenebenen,
+  `### 3.7 Schicht A (getrennt; nie auf €-Pfaden)`;
+- `## 4 Kalibrierung & Validierung (§2.4/§3.4)`;
+- mitgelesen ab `## 5 `: §5 Hebel Schutzprogramme (Befunde 161 und 158), Kap. 7 Block zu Befund 158, Entscheidungslog
+  Nr. 24 gegen Nr. 28.
+
+**Leseliste Abschnitt B** (Urteil zu T-1584 Runde 38, jede Überschrift ab `## 5 `):
+- `## 5 Maßnahmen-Hebel (§2.5/§3.5)`, zeilenweise Z. 1044–1378: Hitzeaktionsplan / Frühwarnkette (S155/S158) mit
+  Herleitung δ_HAP, Berliner Betrag und Wächter; Gekühlte Räume / Klimaanlagen in Pflegeheimen (S157) mit s_gek,
+  s_gek_kalib, h_Heim je Zelle, Anpassungspotenzial, Kombination mit δ_HAP, „Beide Fassungen“ und R7-Weiche; Öffentliche
+  Kühlzentren (δ_KZ); Schutzprogramme vulnerable Gruppen (δ_VG, δ_VG,morb, Wächter `heat.vg_in_kalibrierjahren`, Kappung
+  0,794); Sensitivität von f_alter; Sensitivität von l_restlebenserwartung;
+- `## 6 Szenario-Anwendung & Modellgrenzen (§3.2/§3.6)`, zeilenweise Z. 1380–1437: Szenario-Anwendung 95-A,
+  Stationaritätsannahmen, Jahresbeträge ohne Abzinsung, Modellgrenzen 1–5, Infokasten-/UI-Texte, Raten-Darstellung und
+  Aggregation;
+- `## 7 Parameter-Blöcke (maschinenlesbar, §4)`: 30 Blöcke maschinell über den Lint (Vollständigkeit, Kennzeichnung,
+  Beispiel-Blöcke ausgeführt); zeilenweise die seit Runde 37 geänderten Blöcke `heat.g_s157`, `heat.s_gek`,
+  `heat.s_gek_kalib`, `s157_voreinstellung` und `schutzprogramme_berlin`;
+- `## 8 Quellen (§3.8 — #95-relevanter Auszug; Nummern [11]–[62] = M0-Zählung)`, zeilenweise, alle Quellen [11]–[76];
+- `## Entscheidungslog`, zeilenweise, Einleitung und Einträge 1–50;
+- außerhalb von B mitgelesen: Kap. 1 Knotentabelle Zeile S157 (Z. 59) und Kap. 1 (a)/(b) für LF 15.
+
+Beide Listen zusammen decken jede Überschrift des Berichts ab; geprüft ist der ganze Bericht, nicht nur ein Diff.
+
+**Maschinell** (ausgeführt am 27.09.2026 auf dem Stand von `main` nach beiden Merges): `python3
+backend/scripts/lint_methodik.py 95` meldet „304 Checks grün“ und „ALLE LINTS GRÜN“. `python3 backend/scripts/ledger.py 95
+--pruefe` meldet vor diesem Eintrag 158 Befunde, zurückgestellt 1 (116), belegt geschlossen 79, „Prüfausdruck ROT   : 0“
+und die Schlusszeile „GRÜN — kein Prüfausdruck eines geschlossenen Befunds schlägt fehl.“ Nach diesem Eintrag: 161
+Befunde, zurückgestellt 4 (116, 175, 176, 177; die drei roten Ausdrücke von 175–177 sind der zurückgestellte
+Sollzustand), belegt geschlossen 79, „Prüfausdruck ROT   : 0“, Schlusszeile „GRÜN — …“. Der Lint bleibt bei „304
+Checks grün“ und „ALLE LINTS GRÜN“.
+
+**Beträge** (je Jahr, Preisstand 2024):
+- Berlin, Kette (§3.0, Block `rechenkette_95`, im Lint grün): Mortalität 2.250 YLL × 160.800 € = 361,8 Mio. €, Morbidität
+  152,00 Fälle × 7.152 € = 1,09 Mio. €, zusammen 362,9 Mio. €; nachgerechnet im Urteil zu A.
+- Berlin, Golden: 342,67 Mio. € (Zelllauf mit Regel, §3.3 Tabelle Z. 475, gemessen 27.09.2026 mit
+  `95_zellvergleich.py --gemeinde 11000000 --ersatz`). Wie im Urteil zu A nicht im Zelllauf nachgemessen, Herkunft §3.3:
+  `pytest -q backend/tests/test_methodik_95_golden_betraege.py` brach dort beim Import ab (`ImportError: cannot import
+  name 'box' from 'shapely.geometry'`); das Urteil zu B meldet `test_methodik_95_golden.py` mit 12 passed, der Test fragt
+  342,67 Mio. € aber nicht ausdrücklich ab.
+- Warmsen (AGS 03256034): 173.099 € mit Regel, 145.025 € ohne Gemeindeschlüssel (§3.3 Tabelle Z. 476, gemessen
+  27.09.2026 mit `--gemeinde 03256034 --ersatz`).
+
+**Zurückgestellt**, jeweils Code-Nachzug beim cto nach eiserner Regel 5, ohne neue Befundzeile:
+- Befund 116: Ersatzregel für den geheimgehaltenen Anteil 65+ in `backend/app/services/zensus_loader.py` (Log 41).
+- Die Blöcke aus Kapitel 7 ohne Registry-Parameter, geführt in `_AUSSTEHEND_CTO`
+  (`backend/tests/test_methodik_95_bloecke.py`): `heat.s_gek`, `heat.h_heim`, `heat.delta_kuehlzentren`,
+  `heat.vg_in_kalibrierjahren`, `heat.kappung_vg`; dazu der neue Block `heat.s_gek_kalib` (Befund 165) und der Berliner
+  Betrag des Hitzeaktionsplans, die laut Urteil zu B ebenfalls beim cto nachzuziehen sind.
+
+**C-Befunde ohne Sperrwirkung.** 162 (Stelle in A, seit Runde 36 im Ledger) und die drei C-Befunde aus dem Urteil zu
+B, Runde 38, die das Urteil zur Übernahme ins Ledger weitergibt. 175 bis 177 stehen unten wie im Urteil, Stelle,
+Prüfausdruck und Kategorie unverändert. Nach dem Urteil „gehen sie mit der nächsten Änderung in ein Folgepaket“; dieses
+Paket darf den Bericht nur vor `## 1 ` ändern. Sie sind deshalb terminiert zurückgestellt nach Aufgabe §6 (Termin: nächste
+Änderung am Bericht), ihr Prüfausdruck ist bis dahin rot und beschreibt den Sollzustand. Eine Null-Runde halten C-Befunde
+nicht auf.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 175 | docs/methodik/95_hitzebelastung.md Kap. 8 [69] Z. 2205 („Warmsen: 3158 ·“); Entscheidungslog Nr. 41 Z. 2336 („in Warmsen 1416 Einwohner“, „(1342 Gemeinden“) | Stil nach kap3-stil „Tausenderpunkt ab 1.000“ (LF 11 E5) | Befund 160 hat dieselben Zahlen in §3.3 nachgezogen, in B nicht; der Lint prüft den Tausenderpunkt nicht | 3.158, 1.416 und 1.342 schreiben | C | `! grep -qF 'Warmsen: 3158 ·' docs/methodik/95_hitzebelastung.md && ! grep -qF 'Warmsen 1416 Einwohner' docs/methodik/95_hitzebelastung.md && ! grep -qF '(1342 Gemeinden' docs/methodik/95_hitzebelastung.md` | zurückgestellt (Termin: nächste Änderung am Bericht, Folgepaket nach dem Urteil zu T-1584-methodik_manager Runde 38) — Kategorie C |
+| 176 | docs/methodik/95_hitzebelastung.md §5 Schutzprogramme Z. 1300 („von 2,9 bis 23,3 Mio. €“); Log 43 Z. 2338 („kommt auf 23,3 Mio. €“); Block schutzprogramme_berlin Z. 1897 | Rechenweg rechnet mit der gezeigten Zahl nicht auf (LF 11 E5; Folge der Befunde 155/167) | Der Text rechnet mit w_VG = 0,3445 (Z. 1251): 169,5 × 0,40 × 0,3445 = 23,36, also 23,4. Der Block rechnet mit 24,372 (0,3441) und kommt auf 23,33 | 23,4 schreiben und im Block für die Reichweite 0,40 mit 0,3445 prüfen, oder beim Wert „w ungerundet 0,3441“ vermerken; keine wert:-Zeile ändern | C | `! grep -qF 'von 2,9 bis 23,3 Mio. €' docs/methodik/95_hitzebelastung.md && ! grep -qF 'kommt auf 23,3 Mio. €' docs/methodik/95_hitzebelastung.md` | zurückgestellt (Termin: nächste Änderung am Bericht, Folgepaket nach dem Urteil zu T-1584-methodik_manager Runde 38) — Kategorie C |
+| 177 | docs/methodik/95_hitzebelastung.md Entscheidungslog Nr. 39 Z. 2334 und Einleitung Z. 2274–2290 | Eintrag durch späteren überholt, ohne Vermerk (LF 14) | Log 39 begründet mit „Der Bericht hat keine Quelle für die Klimaanlagen-Quote … Pflegeheime …“. Seit Log 50 schätzt der Bericht den Bestand der Kalibrierjahre für Pflegeheime aus [71]/[72] ab; das ist die in Log 39 als Alternative genannte Fortschreibung. Die Einleitung nennt außerdem die Einträge 34–36 nicht | In Log 39 den Vermerk „(Stand T-1119, Historie; für Pflegeheime fortgeschrieben durch Nr. 50)“ setzen; die Wahl bleibt. Einleitung um „Einträge 34–36: …“ ergänzen | C | `python3 -c "import sys; z=[l for l in open('docs/methodik/95_hitzebelastung.md',encoding='utf-8') if l.startswith('\| 39 ⚠ \|')]; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); sys.exit(not (z and 'Nr. 50' in z[0] and 'Einträge 34–36' in s))"` | zurückgestellt (Termin: nächste Änderung am Bericht, Folgepaket nach dem Urteil zu T-1584-methodik_manager Runde 38) — Kategorie C |
+
+**Zählung nach A-0046.** Seit der Null-Runde 30 liefen die Runden 31 bis 38: 31 (Divergenzen aus der Integration),
+32–35 zu Abschnitt A, 36–38 zu Abschnitt B. Runde 38 ist die Null-Runde; die Zählung endet hier, die Grenze Runde 40 ist
+nicht erreicht.
+
+Neue Befunde: keine (keine neuen A- oder B-Befunde; 175–177 sind die C-Befunde des Urteils zu B, hier nur übernommen).
