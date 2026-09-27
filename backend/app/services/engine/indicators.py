@@ -152,9 +152,14 @@ def compute_cell_hev(ci: dict, regional: dict) -> dict:
 
     coastal = regional["is_coastal"]
     dry = regional["dry_index"]
-    share_old = float(ci.get("share_over_65") if ci.get("share_over_65") is not None
-                    else regional["demographics"].get(
-                        "share_over_65", tunables.regional_fallback("share_over_65", 22.0)))
+    # Befund 142: zuerst der angesetzte Wert der Ersatzregel, dann der veröffentlichte
+    # Zensuswert, zuletzt der regionale Rückfall.
+    share_old_raw = ci.get("share_over_65_ersatz")
+    if share_old_raw is None:
+        share_old_raw = ci.get("share_over_65")
+    share_old = float(share_old_raw if share_old_raw is not None
+                      else regional["demographics"].get(
+                          "share_over_65", tunables.regional_fallback("share_over_65", 22.0)))
     share_young = float(ci.get("share_under_18") if ci.get("share_under_18") is not None
                       else regional["demographics"].get(
                           "share_under_18", tunables.regional_fallback("share_under_18", 18.0)))
