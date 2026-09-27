@@ -95,6 +95,16 @@ def build_cell_risks(indices: dict[str, float], impacts: dict[str, dict]) -> dic
         for key in ("cases_melanoma", "cases_c44"):
             if key in imp:
                 risks[code][key] = round(imp[key], 6)
+        # Roheingaben der Aeroallergene-Zellrechnung (#96 §5.1): Basis für den
+        # Zelllauf-Zweig S158 (measure_service._s158_cell_factor), der die
+        # Gruppentage je Zelle frisch aus diesen Werten bildet, statt die
+        # gespeicherten Summen tage_birke/tage_graeser zu lesen — sonst würde eine
+        # spätere Vegetationsmaßnahme (Stadtbaumwahl, Ĝ′) die S158-Wirkung
+        # überschreiben statt multiplikativ zu ergänzen (T-1513-cto).
+        for key in ("betroffene", "delta_birke", "delta_graeser", "pollen_g",
+                   "pollen_g_bar0"):
+            if key in imp and imp[key] is not None:
+                risks[code][key] = round(imp[key], 6)
     return risks
 
 

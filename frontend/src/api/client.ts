@@ -876,9 +876,10 @@ export interface InterpretationDiversitaet {
 export interface DiversitaetJeKlimawirkungKommune extends DiversitaetJeKlimawirkung {
   bezeichnung: string
 }
-/** GET /kommune/{id}/interpretation/diversitaet; nur die gerechneten Klimawirkungen, nach ``kwra_id``. */
+/** GET /kommune/{id}/interpretation/diversitaet; ``umfang`` „gerechnet“ = nur berechnete Klimawirkungen, „katalog“ = ganzer Katalog (T-1580). */
 export interface InterpretationDiversitaetKommune {
   quelle: InterpretationQuelle
+  umfang: 'gerechnet' | 'katalog'
   je_klimawirkung: Record<string, DiversitaetJeKlimawirkungKommune>
 }
 

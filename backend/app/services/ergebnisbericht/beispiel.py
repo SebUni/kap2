@@ -124,8 +124,15 @@ def _band_aus_text(text: str | None) -> tuple[float, float] | None:
     return tuple(float(g.replace(".", "")) for g in m.groups())  # type: ignore[return-value]
 
 
-def rechne_95(kommune: Beispielkommune) -> Ergebnis95:
-    """Jahresbetrag #95 über die Schicht-B-Funktionen des Produkts."""
+def rechne_95(kommune: Beispielkommune, zellfilter=None) -> Ergebnis95:
+    """Jahresbetrag #95 über die Schicht-B-Funktionen des Produkts.
+
+    ``zellfilter`` (optional, Menge von Zellkennungen) beschränkt die Rechnung auf diese Zellen,
+    etwa auf einen Ortsteil. Die Altersbänder bleiben über alle Zellen der Gemeinde aufbereitet
+    (Ersatzregel 65+ gebietsweit); weil die Schadensfunktionen linear in den Altersbändern sind,
+    addieren sich die Ergebnisse disjunkter Teilmengen zum Ergebnis der ganzen Kommune. Ohne
+    Filter ist das Ergebnis unverändert.
+    """
     import numpy as np
 
     from app.data import catalog
@@ -134,6 +141,11 @@ def rechne_95(kommune: Beispielkommune) -> Ergebnis95:
     from app.services.engine.impact.base import CellContext
 
     gids, cis, klima = zellen(kommune.ags)
+    if zellfilter is not None:
+        auswahl = set(zellfilter)
+        paare = [(g, ci) for g, ci in zip(gids, cis) if g in auswahl]
+        gids = tuple(g for g, _ in paare)
+        cis = [ci for _, ci in paare]
     gruppen: dict[tuple[float, float], dict[str, float]] = {}
     for gid, ci in zip(gids, cis):
         acc = gruppen.setdefault(klima[gid], dict.fromkeys(BANDS, 0.0))
