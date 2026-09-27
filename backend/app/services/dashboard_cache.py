@@ -178,7 +178,11 @@ def _build_risk_histogram(db: Session, kommune_id: int) -> dict:
         for code, r in risks.items():
             if code not in counts:
                 continue
-            idx = float(r.get("index", 0.0))
+            # Fehlt der Index in der Zelle, zählt sie in keinem Bin und nicht als
+            # nonzero — eine fehlende Bewertung ist keine Bewertung 0 (A-0010/P2).
+            if "index" not in r:
+                continue
+            idx = float(r["index"])
             b = min(n_bins - 1, max(0, int(idx // width)))
             counts[code][b] += 1
             if idx > 0.0:
@@ -198,17 +202,19 @@ def _build_risk_histogram(db: Session, kommune_id: int) -> dict:
             "cost_dimension": risk["cost_dimension"],
             "counts": counts[code],
             "nonzero_cells": nonzero[code],
-            "p90_index": a.get("index", 0.0),
-            "max_index": a.get("max_index", 0.0),
-            "outcome": a.get("outcome", 0.0),
-            "outcome_sum": a.get("outcome_sum", 0.0),
+            # Fehlender Wert → None (NULL), nie 0.0: eine 0 wäre eine Nullwirkung (A-0010/P2).
+            "p90_index": a.get("index"),
+            "max_index": a.get("max_index"),
+            "outcome": a.get("outcome"),
+            "outcome_sum": a.get("outcome_sum"),
             # Fehlender Betrag → None (NULL), nie 0.0: eine 0 wäre eine Nullwirkung (A-0010/P2).
             "cost_eur": a.get("cost_eur"),
             # Schicht-B-Aggregationskennzahlen (Σ über Zellen vs. P90; Konzentration/Fläche)
             "aggregation": a.get("aggregation", "sum"),
-            "top5_share": a.get("top5_share", 0.0),
-            "area_km2_affected": a.get("area_km2_affected", 0.0),
-            "share_above_threshold": a.get("share_above_threshold", 0.0),
+            # Fehlender Wert → None (NULL), nie 0.0: eine 0 wäre eine Nullwirkung (A-0010/P2).
+            "top5_share": a.get("top5_share"),
+            "area_km2_affected": a.get("area_km2_affected"),
+            "share_above_threshold": a.get("share_above_threshold"),
             # Plausibilitätsanker (Σ/ref_value-Schätzung); Anzeige folgt in Prompt 7.
             "sanity_ratio": a.get("sanity_ratio"),
         }

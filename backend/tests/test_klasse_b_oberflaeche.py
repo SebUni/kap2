@@ -68,9 +68,20 @@ def test_schadenswert_zweig_auf_has_euro_layer(name):
 
 @pytest.mark.parametrize("name", [COST_TABLES, RISK_DISTRIBUTION])
 def test_kein_strich_und_kein_null_euro_als_ersatz(name):
+    """Prüft nur an der Stelle des Schadenswerts (Docstring Punkt 1) — nicht im ganzen
+    Dateitext, sonst träfe die Prüfung auch einen Strich für andere, nicht-monetäre
+    Kennzahlen (etwa fehlenden Index, T-1290). Verankert wird am has_euro_layer-Zweig,
+    der cost_display ausgibt (wie in test_schadenswert_zweig_auf_has_euro_layer), nicht
+    an der ersten Textstelle „Schaden/Jahr“ — die kommt in CostTablesSection.tsx zuerst
+    in einer Tooltip-Beschreibung vor, weit entfernt vom tatsächlichen Schadenswert
+    (T-1290, Prüfer-Mangel 1)."""
     code = _code(name)
-    assert not _STRICH.search(code), f"{name}: Literal '-' als Ersatzdarstellung"
-    assert not _NULL_EURO.search(code), f"{name}: Literal '0 €' als Ersatzdarstellung"
+    treffer = [m for m in _ZWEIG.finditer(code)]
+    assert treffer, f"{name}: kein Zweig auf has_euro_layer, der cost_display ausgibt"
+    pos = treffer[0].start()
+    ausschnitt = code[max(0, pos - 400): pos + 400]
+    assert not _STRICH.search(ausschnitt), f"{name}: Literal '-' als Ersatzdarstellung"
+    assert not _NULL_EURO.search(ausschnitt), f"{name}: Literal '0 €' als Ersatzdarstellung"
 
 
 def test_top_risiken_filtern_nicht_allein_ueber_cost_eur():

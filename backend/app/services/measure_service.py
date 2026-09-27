@@ -132,26 +132,43 @@ def _reduction_factor(mdef: dict, fraction: float, unit_factor: float = 1.0) -> 
 
 # ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5; Maßnahme COOLING_ROOMS_DRINKING_WATER) ──
 # Die Wirkung ist kein default_reduction-Faktor auf den Index, sondern
-# ΔD_S157 = D_85+ · h_Heim · s_gek · (1 − g_S157) je Zelle, bewertet mit L̄_85+ (YLL).
+# ΔD_S157 = D_85+ · h_Heim · max(s_gek − s_gek_kalib; 0) · (1 − g_S157) je Zelle, bewertet
+# mit L̄_85+ (YLL); s_gek_kalib = 0,06 (Block heat.s_gek_kalib, Befund 165, Log 50).
 # Im bestehenden multiplikativen Rahmen wird daraus je Zelle der Faktor
 # 1 − ΔYLL_S157 / YLL_Zelle auf das Mortalitäts-Outcome — so bleiben Einzelnutzen
 # und Aggregat „mit Maßnahmen“ dieselbe Rechnung.
 
 S157_RISK_CODE = "EXPECTED_ANNUAL_MORTALITY"
-S157_NO_INPUT_TEXT = ("kein Betrag: gekühlter Anteil der Heimplätze (s_gek) "
-                      "nicht eingegeben")
+# Befund 138: ohne Eingabe gilt die Voreinstellung s_gek = 0,11 (Block heat.s_gek);
+# der Betrag ist dann eine begründete Abschätzung von KAP3 und wird so gekennzeichnet.
+S157_ESTIMATE_NOTE = "Abschätzung von KAP3"
+S157_S_GEK_DEFAULT = 0.11       # Rückfall, falls der Registry-Parameter fehlt
+S157_S_GEK_KALIB_DEFAULT = 0.06  # dito, Block heat.s_gek_kalib
 
 
 def _is_s157(mdef: dict) -> bool:
     return mdef.get("effect_model") == "s157"
 
 
-def _s157_input(config: dict | None) -> float | None:
-    """Eingabe s_gek der Kommune (Anteil 0..1) aus der Maßnahmen-Konfiguration.
+def _s157_param(key: str, default: float) -> float:
+    """Registry-Parameter der Mortalität für S157 (über override_context).
 
-    Der Bericht trägt keine Voreinstellung; fehlt die Eingabe, gilt None —
-    dann entsteht kein Betrag (auch keine 0).
+    Ohne Überschreibung gilt der Wert des Registry-Specs (``impact.params``,
+    z. B. heat.s_gek 0,11, heat.s_gek_kalib 0,06); ``default`` nur, wenn es den Spec
+    nicht gibt.
     """
+    from app.services.engine.impact import params
+
+    spec = next((s for s in params.IMPACT_PARAM_SPECS
+                 if s.get("risk") == S157_RISK_CODE and s.get("key") == key), None)
+    base = float(spec["value"]) if spec is not None and spec.get("value") is not None \
+        else default
+    v = override_context.get_override(f"risks.{S157_RISK_CODE}.impact.{key}", base)
+    return float(v) if v is not None else base
+
+
+def _s157_config_value(config: dict | None) -> float | None:
+    """Eingabe s_gek der Kommune (Anteil 0..1), None ohne gültige Eingabe."""
     raw = (config or {}).get("s_gek")
     if raw is None or raw == "":
         return None
@@ -161,12 +178,52 @@ def _s157_input(config: dict | None) -> float | None:
         return None
 
 
+def _s157_input(config: dict | None) -> float:
+    """Heute gekühlter Anteil der Heimplätze s_gek (0..1) für S157.
+
+    Die Eingabe der Kommune aus der Maßnahmen-Konfiguration; fehlt sie, gilt die
+    Voreinstellung 0,11 aus dem Registry-Parameter heat.s_gek (Bericht #95 §5,
+    Befund 138, Log 45). Der Wert gilt für die ganze Kommune. Den Abzug des Stands
+    der Kalibrierjahre (heat.s_gek_kalib) rechnet ``_s157_cell_factor``; die
+    Kommune gibt ihren heutigen Anteil ein, nicht den Zuwachs.
+    """
+    s = _s157_config_value(config)
+    if s is not None:
+        return s
+    return max(0.0, min(1.0, _s157_param("s_gek", S157_S_GEK_DEFAULT)))
+
+
+def _cell_q_pfl(cell_risk: dict) -> float | None:
+    """Heimanteil 85+ der Zelle (``share_care_home_85p``, Ebene CARE_HOME_SHARE_85P).
+
+    Grundlage für h_Heim,z (Bericht #95 §5, Befund 146); fehlt er, rechnet
+    ``health.h_heim`` mit dem Rückfallwert 0,344.
+    """
+    q = cell_risk.get("share_care_home_85p")
+    return float(q) if q is not None else None
+
+
+def _with_cell_q_pfl(cell_risk: dict, inputs: dict | None) -> dict:
+    """Risikoeintrag einer Zelle, ergänzt um ihren Heimanteil aus den Zell-Eingaben.
+
+    Der Heimanteil steht in ``data["inputs"]`` der Zellbewertung, nicht im
+    Risikoeintrag; S157 und die Schutzprogramme brauchen ihn für h_Heim,z (Befund 146).
+    """
+    q = (inputs or {}).get("share_care_home_85p")
+    if q is None or "share_care_home_85p" in cell_risk:
+        return cell_risk
+    return {**cell_risk, "share_care_home_85p": q}
+
+
 def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict,
                       delta_hap: float = 1.0) -> float:
     """Faktor (0..1) auf das Mortalitäts-Outcome (YLL) einer Zelle durch S157.
 
-    ``frac`` ist der Deckungsgrad der Zelle durch die Maßnahmen-Geometrie; der
-    gekühlte Anteil wirkt nur im abgedeckten Teil (bei ganzer Kommune = 1).
+    S157 wirkt auf max(s_gek − s_gek_kalib; 0) (Befund 165, Log 50; s_gek_kalib aus
+    dem Registry-Parameter heat.s_gek_kalib). ``s_gek`` gilt für die ganze Kommune,
+    unabhängig von der gezeichneten Fläche (Bericht #95 §5, Modellgrenze): Der
+    Deckungsgrad ``frac`` einer abgedeckten Zelle verkleinert die Wirkung deshalb
+    nicht (Befund 138); nur eine Zelle ohne Deckung (``frac`` ≤ 0) bleibt unberührt.
     Zellen ohne Teil-Ausweis D_85+ (vor der Neuberechnung) bleiben unverändert.
 
     ``delta_hap`` (Befund 129): Faktor des Hitzeaktionsplans in dieser Zelle, wenn
@@ -185,14 +242,13 @@ def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict,
     if yll <= 0.0 or d85 is None:
         return 1.0
 
-    def _p(key: str, default: float) -> float:
-        v = override_context.get_override(f"risks.{S157_RISK_CODE}.impact.{key}", default)
-        return float(v) if v is not None else default
-
+    _p = _s157_param
     delta_d = health.s157_avoided_deaths(
-        float(d85), s_gek * max(0.0, min(1.0, frac)),
+        float(d85), s_gek,
         g_s157=_p("g_s157", health.G_S157), qbar_pfl=_p("qbar_pfl", 0.149),
-        beta_pfl=_p("beta_pfl", 1.54), delta_hap=delta_hap) or 0.0
+        beta_pfl=_p("beta_pfl", 1.54), delta_hap=delta_hap,
+        s_gek_kalib=_p("s_gek_kalib", S157_S_GEK_KALIB_DEFAULT),
+        q_pfl=_cell_q_pfl(cell_risk)) or 0.0
     delta_yll = delta_d * _p("life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
     return max(0.0, min(1.0, 1.0 - delta_yll / yll))
 
@@ -208,6 +264,61 @@ VG_MORB_RISK_CODE = "EXPECTED_ANNUAL_MORBIDITY"
 
 def _is_vg(mdef: dict) -> bool:
     return mdef.get("effect_model") == "vg"
+
+
+# ── Doppelzählungs-Wächter (Bericht #95 §5, Befund 150, Log 47; Block
+#    heat.vg_in_kalibrierjahren) ──
+# Lief das Programm (Schutzprogramme) bzw. liefen die Kühlzentren in der Kommune schon
+# in den Kalibrierjahren 2012–2024, ist es keine zusätzliche Maßnahme: seine Wirkung
+# steckt über c_kal im Basiswert. Dann gilt δ_VG = δ_VG,morb = 1 bzw. δ_KZ = 1. Je
+# Maßnahme eine eigene Frage ja (1) / nein (0) in ``config['vg_in_kalibrierjahren']``;
+# ohne Eingabe gilt der Registry-Wert 0 („nein“, Abschätzung von KAP3 aus [76]).
+VG_KALIB_KEY = "vg_in_kalibrierjahren"
+VG_KALIB_ESTIMATE_NOTE = "Abschätzung von KAP3"
+
+_JA = {"1", "ja", "true", "yes", "j", "y"}
+_NEIN = {"0", "nein", "false", "no", "n"}
+
+
+def _vg_kalib_config_value(config: dict | None) -> int | None:
+    """Eingabe der Kommune zur Wächter-Frage: 1 (ja), 0 (nein), None ohne gültige Eingabe."""
+    raw = (config or {}).get(VG_KALIB_KEY)
+    if raw is None or raw == "":
+        return None
+    if isinstance(raw, bool):
+        return 1 if raw else 0
+    if isinstance(raw, (int, float)):
+        return 1 if float(raw) >= 0.5 else 0
+    s = str(raw).strip().lower()
+    if s in _JA:
+        return 1
+    if s in _NEIN:
+        return 0
+    return None
+
+
+def _vg_kalib_input(config: dict | None) -> int:
+    """Wächter-Frage „Lief das Programm schon 2012–2024?“: 1 = ja, 0 = nein.
+
+    Die Eingabe der Kommune aus der Maßnahmen-Konfiguration (analog ``_s157_input``);
+    fehlt sie, gilt der Registry-Parameter heat.vg_in_kalibrierjahren (0, „nein“,
+    Abschätzung von KAP3; Bericht #95 §5, Befund 150, Log 47).
+    """
+    v = _vg_kalib_config_value(config)
+    if v is not None:
+        return v
+    return 1 if _s157_param(VG_KALIB_KEY, 0.0) >= 0.5 else 0
+
+
+def _vg_kalib_summary_fields(mdef: dict, config: dict | None) -> dict:
+    """Zusatzfelder des impact_summary zur Wächter-Frage (Schutzprogramme, Kühlzentren)."""
+    if not (_is_vg(mdef) or _is_s157(mdef)):
+        return {}
+    return {
+        VG_KALIB_KEY: _vg_kalib_input(config),
+        "vg_in_kalibrierjahren_is_default": _vg_kalib_config_value(config) is None,
+        "vg_in_kalibrierjahren_estimate_note": VG_KALIB_ESTIMATE_NOTE,
+    }
 
 
 def _vg_cell_factor(code: str, frac: float, cell_risk: dict,
@@ -242,20 +353,119 @@ def _vg_cell_factor(code: str, frac: float, cell_risk: dict,
         if d75 is None or d85 is None:
             return 1.0
         delta = health.vg_effective_delta(
-            _p(S157_RISK_CODE, "delta_vg", health.DELTA_VG), hap_cap)
+            _p(S157_RISK_CODE, "delta_vg", health.DELTA_VG), hap_cap,
+            paket=_p(S157_RISK_CODE, "kappung_vg", health.VG_PAKET_DE))
         l75 = _p(S157_RISK_CODE, "life_years_a75_84", health.AGE_LIFE_YEARS["a75_84"])
         l85 = _p(S157_RISK_CODE, "life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
         delta_x = health.vg_avoided(float(d75) * l75, float(d85) * l85, delta,
-                                    qbar, beta, delta_hap)
+                                    qbar, beta, delta_hap, _cell_q_pfl(cell_risk))
         return max(0.0, min(1.0, 1.0 - f * delta_x / outcome))
     if code == VG_MORB_RISK_CODE:
         f75, f85 = cell_risk.get("cases_a75_84"), cell_risk.get("cases_a85p")
         if f75 is None or f85 is None:
             return 1.0
         delta = _p(VG_MORB_RISK_CODE, "delta_vg_morb", health.DELTA_VG_MORB)
-        delta_x = health.vg_avoided(float(f75), float(f85), delta, qbar, beta, delta_hap)
+        delta_x = health.vg_avoided(float(f75), float(f85), delta, qbar, beta, delta_hap,
+                                    _cell_q_pfl(cell_risk))
         return max(0.0, 1.0 - f * delta_x / outcome)
     return 1.0
+
+
+# ── Hebel öffentliche Kühlzentren (Bericht #95 §5 Z. 1203–1246, Befunde 139, 148;
+#    Maßnahme COOLING_ROOMS_DRINKING_WATER, Entscheidung CEO 27.09.2026) ──
+# Die Kühlzentren hängen an derselben Maßnahme wie S157, wirken aber auf andere Menschen:
+# ΔD_KZ = [D_75–84 + D_85+ · (1 − h_Heim)] · (1 − δ_KZ) je Zelle, bewertet mit L̄_a (YLL),
+# im abgedeckten Teil der Zelle (wie die Schutzprogramme). Mit Hitzeaktionsplan und
+# Schutzprogrammen zusammen gilt max(δ_HAP × δ_VG × δ_KZ; kappung_vg). S157 (Heimbewohner
+# 85+) und Kühlzentren (zu Hause) treffen getrennte Gruppen, ihre Wirkungen werden addiert.
+
+KZ_ESTIMATE_NOTE = "Abschätzung von KAP3"
+
+
+def _kz_cell_factor(frac: float, cell_risk: dict, delta_hap: float = 1.0,
+                    hap_cap: float = 1.0, delta_vg: float = 1.0,
+                    vg_cap: float = 1.0) -> float:
+    """Faktor (0..1) der öffentlichen Kühlzentren auf das Mortalitäts-Outcome einer Zelle.
+
+    ``frac`` ist der Deckungsgrad; der Hebel wirkt im abgedeckten Teil (Bericht Z. 1243).
+    ``hap_cap`` und ``vg_cap`` sind die Faktoren von Hitzeaktionsplan und Schutzprogrammen
+    in der Zelle für die Kappung ``max(δ_HAP × δ_VG × δ_KZ; kappung_vg)`` (im Aggregat und
+    im Einzelnutzen). ``delta_hap`` und ``delta_vg`` dämpfen den Exzess — nur für den
+    **Einzelnutzen** setzen (``delta_vg`` ist dann der Outcome-Faktor der Schutzprogramme
+    in der Zelle); im Aggregat bleiben sie 1, weil dort die Faktoren ohnehin
+    multipliziert werden. Zellen ohne Teil-Ausweis der Bänder bleiben unverändert.
+    """
+    from app.services.engine.impact import health
+
+    if frac <= 0.0:
+        return 1.0
+    outcome = float(cell_risk.get("outcome") or 0.0)
+    if outcome <= 0.0:
+        return 1.0
+    d75, d85 = cell_risk.get("deaths_a75_84"), cell_risk.get("deaths_a85p")
+    if d75 is None or d85 is None:
+        return 1.0
+
+    _p = _s157_param
+    f = max(0.0, min(1.0, frac))
+    delta = health.kz_effective_delta(
+        _p("delta_kuehlzentren", health.DELTA_KZ), float(hap_cap) * float(vg_cap),
+        paket=_p("kappung_vg", health.VG_PAKET_DE))
+    l75 = _p("life_years_a75_84", health.AGE_LIFE_YEARS["a75_84"])
+    l85 = _p("life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
+    delta_x = health.kz_avoided(
+        float(d75) * l75, float(d85) * l85, delta,
+        _p("qbar_pfl", 0.149), _p("beta_pfl", 1.54),
+        max(0.0, min(1.0, float(delta_hap))) * max(0.0, min(1.0, float(delta_vg))),
+        _cell_q_pfl(cell_risk))
+    return max(0.0, min(1.0, 1.0 - f * delta_x / outcome))
+
+
+def _vg_kz_factors(vg_fracs: list[float], cell_risk: dict,
+                   hap_cap: float = 1.0) -> tuple[float, float]:
+    """Schutzprogramme in einer Zelle, gesehen von den Kühlzentren: (Dämpfung, Kappung).
+
+    ``vg_fracs`` sind die Deckungsgrade der gewählten Schutzprogramme in der Zelle.
+    Dämpfung = Outcome-Faktor der Schutzprogramme (wie im Aggregat), damit die Summe der
+    Einzelnutzen das Aggregat ergibt. Kappung = wirksames δ_VG auf den Bändern, je
+    Deckungsgrad gewichtet: 1 − frac · (1 − δ_VG nach Kappung).
+    """
+    from app.services.engine.impact import health
+
+    damp, cap = 1.0, 1.0
+    if not vg_fracs:
+        return damp, cap
+    d_vg_eff = health.vg_effective_delta(
+        _s157_param("delta_vg", health.DELTA_VG), hap_cap,
+        paket=_s157_param("kappung_vg", health.VG_PAKET_DE))
+    for fr in vg_fracs:
+        if fr <= 0.0:
+            continue
+        damp *= _vg_cell_factor(S157_RISK_CODE, fr, cell_risk, 1.0, hap_cap)
+        cap *= 1.0 - min(1.0, fr) * (1.0 - d_vg_eff)
+    return damp, cap
+
+
+def _kz_summary_fields(mdef: dict, kz_eur: float, s157_eur: float,
+                       with_vg: bool) -> dict:
+    """Zusatzfelder des impact_summary: Betrag der Kühlzentren getrennt von S157.
+
+    ``kuehlzentren_benefit_eur`` und ``s157_benefit_eur`` teilen den vermiedenen Schaden
+    der Mortalität auf die beiden Hebel der Maßnahme; zusammen ergeben sie
+    ``annual_benefit_damage_eur``. ``kuehlzentren_estimate_note`` kennzeichnet den Betrag
+    als begründete Abschätzung von KAP3 (heat.delta_kuehlzentren, P2).
+    """
+    if not _is_s157(mdef):
+        return {}
+    from app.services.engine.impact import health
+
+    return {
+        "kuehlzentren_benefit_eur": round(kz_eur, 2),
+        "s157_benefit_eur": round(s157_eur, 2),
+        "delta_kuehlzentren": _s157_param("delta_kuehlzentren", health.DELTA_KZ),
+        "kuehlzentren_estimate_note": KZ_ESTIMATE_NOTE,
+        "kuehlzentren_with_vg": with_vg,
+    }
 
 
 # ── Hebel S158: Pollen-Frühwarnung (Bericht #96 §5.1; Maßnahme POLLEN_EARLY_WARNING) ──
@@ -281,7 +491,8 @@ def _is_s158(mdef: dict) -> bool:
     return mdef.get("effect_model") == "s158"
 
 
-def _s158_cell_effect(mdef: dict, frac: float, cell_risk: dict) -> tuple[float, float | None, bool]:
+def _s158_cell_effect(mdef: dict, frac: float, cell_risk: dict,
+                      days_factor: float = 1.0) -> tuple[float, float | None, bool]:
     """(Faktor, vermiedene Tage, fehlende Gruppenaufteilung) einer Zelle durch S158.
 
     Die Gruppentage ΔTage_B/G,Zelle holt der Zweig FRISCH über ``health.pollen_zelltage``
@@ -293,6 +504,16 @@ def _s158_cell_effect(mdef: dict, frac: float, cell_risk: dict) -> tuple[float, 
     zuvor gespeicherten Summe überschrieben zu werden. λ (``lambda_veg``) wird nicht
     gespeichert und deshalb hier aus den Overrides gelesen, damit eine Überschreibung
     wirkt.
+
+    ``days_factor`` (Bericht §5 „Zusammen mit S158", T-1602-cto): deckt dieselbe Zelle
+    zugleich eine Stadtbaumwahl derselben Kommune ab, mindert die Frühwarnung nur die
+    Tage nach der Pflanzung — der Aufrufer übergibt hier den Ĝ′-Tage-Faktor der
+    Stadtbaumwahl (Verhältnis der Zusatztage NACH zu VOR der Pflanzung,
+    ``_stadtbaum_cell_factor``; Standard 1,0 ohne Stadtbaumwahl). Beide Gruppentage
+    skalieren mit demselben Faktor, weil er allein über P̂ wirkt (nur Ĝ ändert sich,
+    B, δ_B, δ_G bleiben gleich) — Bezugsgröße für die vermiedenen Tage UND Nenner des
+    Faktors sind dann die schon um die Pflanzung geminderten Tage, nicht der
+    Ausgangsstand: so zählt kein vermiedener Tag doppelt.
 
     ``vermiedene Tage`` ist ``None``, wenn die Zelle außerhalb des Geltungsbereichs liegt
     oder die Roheingaben fehlen (Alt-Zelle vor der Neuberechnung) — dann bleibt der
@@ -325,38 +546,273 @@ def _s158_cell_effect(mdef: dict, frac: float, cell_risk: dict) -> tuple[float, 
     if total <= 0.0:
         return 1.0, 0.0, False
 
+    df = max(0.0, float(days_factor))
+    tage_birke_adj = tage_birke * df
+    tage_graeser_adj = tage_graeser * df
+    total_adj = tage_birke_adj + tage_graeser_adj
+    if total_adj <= 0.0:
+        return 1.0, 0.0, False
+
     r = float(mdef.get("default_reduction") or 0.0)
     t_warn = _p("t_warn_s158", 0.75)
     vermieden = health.s158_vermiedene_tage(
-        tage_birke, tage_graeser, frac, r, t_warn, t_warn)
-    factor = max(0.0, min(1.0, 1.0 - vermieden / total))
+        tage_birke_adj, tage_graeser_adj, frac, r, t_warn, t_warn)
+    factor = max(0.0, min(1.0, 1.0 - vermieden / total_adj))
     return factor, vermieden, False
 
 
-def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
+def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict,
+                      days_factor: float = 1.0) -> float:
     """Faktor (0..1) auf das Symptomtage-Outcome einer Zelle durch S158 (Wrapper)."""
-    factor, _, _ = _s158_cell_effect(mdef, frac, cell_risk)
+    factor, _, _ = _s158_cell_effect(mdef, frac, cell_risk, days_factor)
     return factor
+
+
+# ── Hebel Stadtbaumwahl (Bericht #96 §5, Integrationsauflage Z. 1111–1125; Maßnahme
+# LOW_ALLERGEN_TREE_SELECTION) — Vorhaben T-1483-cto Teilpaket #2, setzt auf der
+# Zellfunktion health.stadtbaum_g_neu (T-1599-cto) auf. Wie S158 (Sperre aus Befund 124)
+# rechnet der Zweig NICHT als Faktor auf ein gespeichertes Ergebnis, sondern bildet Ĝ′
+# frisch aus den in der Zelle gespeicherten Roheingaben und vergleicht ΔTage vorher/
+# nachher über dieselbe Zellfunktion ``health.pollen_zelltage`` wie S158/die
+# Schadensfunktion selbst.
+
+def _is_stadtbaum(mdef: dict) -> bool:
+    return mdef.get("effect_model") == "stadtbaum"
+
+
+# Integrationsauflage (Stadtbaumwahl) §5 Z. 1111–1125, Punkt (4): Ausgabe der
+# vermiedenen Zusatztage und Euro je Zelle und für die Kommune, gekennzeichnet als
+# begründete Abschätzung von KAP3 (Δk_Birke/Δk_unbek sind keine belegten
+# Effektgrößen, dieselbe Kennzeichnung wie S158 — P2), mit dem Hinweis auf die
+# Richtung des Fehlers in λ (§6 Modellgrenze 7: der örtliche Quellenanteil ist über
+# Gräser belegt [74], nicht über Bäume, und Ferntransport entkoppelt lokale
+# Vegetation und lokalen Pollenflug teilweise — welche Richtung überwiegt, ist nicht
+# bestimmbar). Fehlt ``config['anteil_ersetzt']`` (Punkt (2) der Auflage ohne
+# Eingabe), entsteht kein Betrag statt eines erfundenen (P2, Muster S158
+# ``benefit_missing_input``). Führt eine abgedeckte Zelle im Ausgangsstand keine
+# Baumkronen (``canopy_birch_frac`` + ``canopy_unknown_frac`` ≤ 0), ist dort
+# mechanisch nichts zu ersetzen; trägt am Ende KEINE Zelle einen positiven Effekt,
+# stünde ein irreführendes 0 € (nicht von einer Datenlücke unterscheidbar) — dann
+# steht ein Vermerk statt des Betrags (P2).
+STADTBAUM_ESTIMATE_NOTE = S158_ESTIMATE_NOTE
+STADTBAUM_LAMBDA_HINWEIS = (
+    "Richtung des Fehlers in λ nicht bestimmbar (Modellgrenze 7): der örtliche "
+    "Quellenanteil ist für Gräser belegt, nicht für Bäume, und Ferntransport "
+    "entkoppelt lokale Vegetation und lokalen Pollenflug teilweise.")
+STADTBAUM_MISSING_ANTEIL_TEXT = ("kein Betrag: Anteil ersetzter Kronen "
+                                 "(anteil_ersetzt) fehlt, Eingabe in der Maßnahme ergänzen")
+STADTBAUM_NO_CANOPY_TEXT = ("kein Betrag: abgedeckte Zellen führen im Ausgangsstand "
+                            "keine Baumkronen, dort ist nichts zu ersetzen")
+
+
+def _stadtbaum_cell_effect(config: dict | None, frac: float, cell_risk: dict
+                          ) -> tuple[float, float | None, str | None]:
+    """(Faktor, vermiedene Zusatztage, fehlende Eingabe) einer Zelle durch die
+    Stadtbaumwahl (Integrationsauflage §5 Punkt (4)).
+
+    Bildet dieselbe Ĝ′-Rechnung wie bisher (``_stadtbaum_cell_factor``, jetzt ein
+    dünner Wrapper hierauf), zusätzlich mit der Differenz ΔTage = Tage(Ĝ) − Tage(Ĝ′)
+    und einer Kennzeichnung, warum keine Zahl entsteht: ``'anteil_ersetzt'`` — die
+    Maßnahme trägt kein (oder kein positives) ``config['anteil_ersetzt']``;
+    ``'canopy'`` — die Zelle führt im Ausgangsstand keine Baumkronen
+    (``canopy_birch_frac`` + ``canopy_unknown_frac`` ≤ 0), dort ist mechanisch
+    nichts zu ersetzen. ``None`` als dritte Rückgabe heißt: keine dieser Lagen —
+    entweder die Zelle liegt außerhalb der Deckung/hat keine Roheingaben (Alt-Zelle,
+    kein eigener Grund) oder es entsteht eine reguläre Zahl.
+    """
+    from app.services.engine.impact import health
+
+    if frac <= 0.0:
+        return 1.0, None, None
+    a = float((config or {}).get("anteil_ersetzt") or 0.0)
+
+    betroffene = cell_risk.get("betroffene")
+    delta_b = cell_risk.get("delta_birke")
+    delta_g = cell_risk.get("delta_graeser")
+    g_cell = cell_risk.get("pollen_g")
+    k_birke = cell_risk.get("canopy_birch_frac")
+    k_unbek = cell_risk.get("canopy_unknown_frac")
+    gruen = cell_risk.get("green_frac")
+    if None in (betroffene, delta_b, delta_g, g_cell, k_birke, k_unbek, gruen):
+        return 1.0, None, None
+    if a <= 0.0:
+        return 1.0, None, "anteil_ersetzt"
+    if (float(k_birke) + float(k_unbek)) <= 0.0:
+        return 1.0, 0.0, "canopy"
+    g_bar0 = cell_risk.get("pollen_g_bar0")
+
+    def _p(key: str, default: float) -> float:
+        v = override_context.get_override(f"risks.{ALLERGY_RISK_CODE}.impact.{key}", default)
+        return float(v) if v is not None else default
+
+    lam = _p("lambda_veg", 0.70)
+    s_unbek = _p("birch_group_share_default", 0.12)
+
+    dk_birke = a * frac * float(k_birke)
+    dk_unbek = a * frac * float(k_unbek)
+    g_neu = health.stadtbaum_g_neu(float(g_cell), float(k_birke), float(k_unbek),
+                                   float(gruen), dk_birke, dk_unbek, s_unbek)
+
+    tage_b0, tage_g0 = health.pollen_zelltage(
+        float(betroffene), float(delta_b), float(delta_g), float(g_cell), g_bar0, lam)
+    total0 = tage_b0 + tage_g0
+    if total0 <= 0.0:
+        return 1.0, 0.0, None
+    tage_b1, tage_g1 = health.pollen_zelltage(
+        float(betroffene), float(delta_b), float(delta_g), g_neu, g_bar0, lam)
+    total1 = tage_b1 + tage_g1
+    factor = max(0.0, total1 / total0)
+    return factor, total0 - total1, None
+
+
+def _stadtbaum_summary_fields(mdef: dict, avoided_days_total: float, avoided_days_eur: float,
+                              missing_reason: str | None) -> dict:
+    """Zusatzfelder des impact_summary für die Stadtbaumwahl (Integrationsauflage §5
+    Punkt (4)).
+
+    ``stadtbaum_avoided_days_total``/``stadtbaum_avoided_days_eur`` sind die
+    vermiedenen Zusatztage bzw. Euro/Jahr der Kommune (Summe der Zellwerte),
+    zusammen mit der Kennzeichnung als begründete Abschätzung von KAP3 und dem
+    Hinweis auf die Richtung des Fehlers in λ (Modellgrenze 7). Fehlt
+    ``anteil_ersetzt`` oder führt keine abgedeckte Zelle Baumkronen im
+    Ausgangsstand, steht ein Vermerk statt eines (sonst als 0 € lesbaren) Betrags.
+    """
+    if not _is_stadtbaum(mdef):
+        return {}
+    if missing_reason == "anteil_ersetzt":
+        return {"benefit_display": STADTBAUM_MISSING_ANTEIL_TEXT,
+                "benefit_missing_input": "anteil_ersetzt"}
+    if missing_reason == "canopy":
+        return {"benefit_display": STADTBAUM_NO_CANOPY_TEXT,
+                "benefit_missing_input": "canopy"}
+    return {
+        "stadtbaum_avoided_days_total": round(avoided_days_total, 1),
+        "stadtbaum_avoided_days_eur": round(avoided_days_eur, 2),
+        "stadtbaum_estimate_note": STADTBAUM_ESTIMATE_NOTE,
+        "stadtbaum_lambda_hinweis": STADTBAUM_LAMBDA_HINWEIS,
+    }
+
+
+def _stadtbaum_cell_factor(config: dict | None, frac: float, cell_risk: dict) -> float:
+    """Faktor (0..1) auf das Symptomtage-Outcome einer Zelle durch die Stadtbaumwahl.
+
+    Liest ausschließlich ``config['anteil_ersetzt']`` (a, Anteil der Kommune) — kein
+    eigenes Gattungsfeld der Maßnahme (Vorhabenskriterium iii, Entscheidung CEO in
+    T-1431-ceo). Je Zelle mit Deckungsgrad ``frac`` sinken die Kronenterme im
+    Ausgangsstand der Zelle ANTEILIG in dem Term, in dem sie stehen:
+    ``dk_Birke = a · frac · k_Birke,z`` (Kronen MIT Gattungs-Tag, ``canopy_birch_frac``),
+    ``dk_unbek = a · frac · k_unbek,z`` (Kronen OHNE Gattungs-Tag,
+    ``canopy_unknown_frac``) — Kronen ohne Gattungs-Tag (auch neu gepflanzte
+    allergenarme Bäume ohne Tag) zählen anteilig weiter, das ist eine Modellgrenze,
+    keine eigene Regel.
+
+    Ĝ′ entsteht über ``health.stadtbaum_g_neu`` (Kappung je Term, Boden
+    (1 − w_B)·Grün). Ḡ₀ ist der GESPEICHERTE ``pollen_g_bar0`` der Zelle aus dem
+    Ausgangsstand (``inputs.kommunale_pollen_referenz`` wird hier NICHT erneut
+    aufgerufen — Ḡ₀ bleibt für jedes Maßnahmenszenario festgehalten, Bericht §5 Z.
+    975–989/1115–1121). Der Faktor ist
+    ``health.pollen_zelltage(Ĝ′)/health.pollen_zelltage(Ĝ)`` (Summe beider
+    Pollengruppen) auf dieselben Roheingaben (``betroffene``, ``delta_birke``,
+    ``delta_graeser``) — dasselbe Muster wie ``_s158_cell_effect``: eine frische
+    Zellrechnung, kein Faktor auf ein gespeichertes Ergebnis (Sperre aus Befund 124).
+
+    Ohne Deckung (``frac`` ≤ 0), ohne ``anteil_ersetzt`` (bzw. ≤ 0) oder ohne die
+    nötigen Zell-Roheingaben (Alt-Zelle vor der Neuberechnung, T-1599-cto) bleibt der
+    Faktor 1,0 — keine pauschale Ersatzwirkung. Wrapper um ``_stadtbaum_cell_effect``
+    (T-1604-cto, Ausgabe-Integrationsauflage §5 Punkt (4)): dieselbe Rechnung, hier
+    nur der Faktor.
+    """
+    factor, _, _ = _stadtbaum_cell_effect(config, frac, cell_risk)
+    return factor
+
+
+# S158 zusammen mit der Stadtbaumwahl (Bericht §5 „Zusammen mit S158", T-1602-cto): die
+# Frühwarnung mindert die Tage B·δ_g·P̂′, die NACH der Pflanzung noch anfallen — kein
+# vermiedener Tag zählt doppelt, weil die Frühwarnung nur auf Tage wirkt, die die
+# Pflanzung nicht schon vermieden hat. Muster analog Befund 129 (δ_HAP × S157).
+STADTBAUM_CODE = "LOW_ALLERGEN_TREE_SELECTION"
+
+
+def _stadtbaum_measures(db: Session, measure: AdaptationMeasure) -> list[AdaptationMeasure]:
+    """Stadtbaumwahl-Maßnahmen derselben Kommune (und derselben Demo-Sitzung) wie ``measure``."""
+    return [m for m in kommune_measures_query(db, measure.kommune_id, measure.demo_session_id)
+            .filter(AdaptationMeasure.measure_type == STADTBAUM_CODE).all()
+            if m.id != measure.id]
+
+
+def _stadtbaum_cell_days_factors(db: Session, measure: AdaptationMeasure) -> dict[int, float]:
+    """Ĝ′-Tage-Faktor je Zelle (Zusatztage NACH zu VOR der Pflanzung) aus den
+    Stadtbaumwahl-Maßnahmen derselben Kommune wie ``measure`` — für S158 (Bericht §5
+    „Zusammen mit S158"). Mehrere Stadtbaumwahl-Maßnahmen wirken multiplikativ (Muster
+    δ_HAP, Befund 129). Ohne eine solche Maßnahme, ohne ihre Deckung der Zelle oder ohne
+    die nötigen Zell-Roheingaben bleibt der Faktor 1,0 (``_stadtbaum_cell_factor``).
+    """
+    out: dict[int, float] = {}
+    stadtbaum_measures = _stadtbaum_measures(db, measure)
+    if not stadtbaum_measures:
+        return out
+    cell_ids: set[int] = set()
+    coverage_by_measure: list[tuple[AdaptationMeasure, dict[int, float]]] = []
+    for m in stadtbaum_measures:
+        frac_map, _ = _coverage(db, m)
+        coverage_by_measure.append((m, frac_map))
+        cell_ids.update(frac_map.keys())
+    if not cell_ids:
+        return out
+    assessments = {
+        ca.grid_cell_id: ca for ca in
+        db.query(CellAssessment).filter(CellAssessment.grid_cell_id.in_(cell_ids)).all()
+    }
+    for m, frac_map in coverage_by_measure:
+        for cid, frac in frac_map.items():
+            ca = assessments.get(cid)
+            if not ca:
+                continue
+            cell_risk = ((ca.data or {}).get("risks", {}) or {}).get(ALLERGY_RISK_CODE, {})
+            factor = _stadtbaum_cell_factor(m.config, frac, cell_risk)
+            out[cid] = out.get(cid, 1.0) * factor
+    return out
 
 
 def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float,
                          unit_factor: float, cell_risk: dict,
-                         delta_hap: float = 1.0, hap_cap: float = 1.0) -> float:
+                         delta_hap: float = 1.0, hap_cap: float = 1.0,
+                         s158_days_factor: float = 1.0, delta_vg: float = 1.0,
+                         vg_cap: float = 1.0) -> float:
     """Faktor einer Maßnahme auf ein verknüpftes Risiko in einer Zelle.
 
-    ``delta_hap`` wirkt nur auf S157 und die Schutzprogramme (Einzelnutzen),
-    ``hap_cap`` nur auf die Kappung der Schutzprogramme; sonst ohne Belang.
+    ``delta_hap`` wirkt nur auf S157, die Schutzprogramme und die Kühlzentren
+    (Einzelnutzen), ``hap_cap`` nur auf die Kappung der Schutzprogramme und der
+    Kühlzentren; ``delta_vg`` (Einzelnutzen) und ``vg_cap`` (Kappung) nur auf die
+    Kühlzentren; ``s158_days_factor`` nur auf S158 (Ĝ′-Tage-Faktor einer gleichzeitigen
+    Stadtbaumwahl derselben Kommune); sonst ohne Belang.
+
+    COOLING_ROOMS_DRINKING_WATER rechnet zwei Hebel auf getrennte Gruppen: S157
+    (Heimbewohner 85+) und öffentliche Kühlzentren (75+ zu Hause); die vermiedenen
+    YLL werden addiert: 1 − (1 − f_S157) − (1 − f_KZ).
     """
     if _is_s157(mdef):
         if code != S157_RISK_CODE:
             return 1.0
-        return _s157_cell_factor(_s157_input(config), frac, cell_risk, delta_hap)
+        f_s157 = _s157_cell_factor(_s157_input(config), frac, cell_risk, delta_hap)
+        # Wächter (Befund 150): liefen die Kühlzentren schon 2012–2024, gilt δ_KZ = 1;
+        # S157 bleibt davon unberührt (eigener Abzug über heat.s_gek_kalib).
+        f_kz = 1.0 if _vg_kalib_input(config) else _kz_cell_factor(
+            frac, cell_risk, delta_hap, hap_cap, delta_vg, vg_cap)
+        return max(0.0, f_s157 + f_kz - 1.0)
     if _is_vg(mdef):
+        # Wächter (Befund 150): lief das Programm schon 2012–2024, gilt δ_VG = δ_VG,morb = 1.
+        if _vg_kalib_input(config):
+            return 1.0
         return _vg_cell_factor(code, frac, cell_risk, delta_hap, hap_cap)
     if _is_s158(mdef):
         if code != ALLERGY_RISK_CODE:
             return 1.0
-        return _s158_cell_factor(mdef, frac, cell_risk)
+        return _s158_cell_factor(mdef, frac, cell_risk, s158_days_factor)
+    if _is_stadtbaum(mdef):
+        if code != ALLERGY_RISK_CODE:
+            return 1.0
+        return _stadtbaum_cell_factor(config, frac, cell_risk)
     return _reduction_factor(mdef, frac, unit_factor)
 
 
@@ -369,6 +825,30 @@ def _hap_measures(db: Session, measure: AdaptationMeasure) -> list[AdaptationMea
     return [m for m in kommune_measures_query(db, measure.kommune_id, measure.demo_session_id)
             .filter(AdaptationMeasure.measure_type == S157_HAP_CODE).all()
             if m.id != measure.id]
+
+
+def _vg_measures(db: Session, measure: AdaptationMeasure) -> list[AdaptationMeasure]:
+    """Schutzprogramme (effect_model ``vg``) derselben Kommune und Demo-Sitzung wie ``measure``.
+
+    Grundlage der Kappung der Kühlzentren ``max(δ_HAP × δ_VG × δ_KZ; kappung_vg)``.
+    Programme, die schon in den Kalibrierjahren liefen (Wächter, Befund 150), haben
+    δ_VG = 1 und zählen deshalb weder zur Dämpfung noch zur Kappung.
+    """
+    return [m for m in kommune_measures_query(db, measure.kommune_id, measure.demo_session_id)
+            .all()
+            if m.id != measure.id
+            and catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
+            and not _vg_kalib_input(m.config)]
+
+
+def _vg_cell_fracs(db: Session, measures: list[AdaptationMeasure]) -> dict[int, list[float]]:
+    """Deckungsgrade der Schutzprogramme je Zelle (für ``_vg_kz_factors``)."""
+    out: dict[int, list[float]] = {}
+    for m in measures:
+        frac_map, _ = _coverage(db, m)
+        for cid, frac in frac_map.items():
+            out.setdefault(cid, []).append(frac)
+    return out
 
 
 def _hap_cell_factors(db: Session, measure: AdaptationMeasure,
@@ -393,15 +873,22 @@ def _hap_cell_factors(db: Session, measure: AdaptationMeasure,
 
 
 def _s157_summary_fields(mdef: dict, config: dict | None) -> dict:
-    """Zusatzfelder des impact_summary für S157 (Eingabe und Vermerk ohne Eingabe)."""
+    """Zusatzfelder des impact_summary für S157.
+
+    ``s_gek`` ist der gerechnete Anteil (Eingabe oder Voreinstellung 0,11),
+    ``s_gek_is_default`` sagt, ob die Voreinstellung gilt, ``s_gek_kalib`` ist der
+    abgezogene Stand der Kalibrierjahre. ``s157_estimate_note`` kennzeichnet den
+    Betrag als begründete Abschätzung von KAP3 (P2: heat.s_gek, heat.s_gek_kalib und
+    heat.g_s157 sind Abschätzungen, keine belegten Effektgrößen).
+    """
     if not _is_s157(mdef):
         return {}
-    s_gek = _s157_input(config)
-    out: dict = {"s_gek": s_gek}
-    if s_gek is None:
-        out["benefit_display"] = S157_NO_INPUT_TEXT
-        out["benefit_missing_input"] = "s_gek"
-    return out
+    return {
+        "s_gek": _s157_input(config),
+        "s_gek_is_default": _s157_config_value(config) is None,
+        "s_gek_kalib": _s157_param("s_gek_kalib", S157_S_GEK_KALIB_DEFAULT),
+        "s157_estimate_note": S157_ESTIMATE_NOTE,
+    }
 
 
 def _s158_summary_fields(mdef: dict, avoided_days_total: float,
@@ -656,6 +1143,19 @@ def _params_fingerprint(db: Session, measure: AdaptationMeasure, mdef: dict,
         payload["hap"] = sorted(
             (m.id, json.dumps(m.config or {}, sort_keys=True, default=str), str(m.geometry))
             for m in _hap_measures(db, measure))
+    if _is_s157(mdef):
+        # Kühlzentren (Bericht #95 §5 Z. 1234–1238): Kappung und Dämpfung hängen an den
+        # Schutzprogrammen der Kommune; ändern sie sich, ist das Summary veraltet.
+        payload["vg"] = sorted(
+            (m.id, json.dumps(m.config or {}, sort_keys=True, default=str), str(m.geometry))
+            for m in _vg_measures(db, measure))
+    if _is_s158(mdef):
+        # Bericht §5 „Zusammen mit S158" (T-1602-cto): der Nutzen von S158 hängt an
+        # der Stadtbaumwahl derselben Kommune (kein vermiedener Tag zählt doppelt);
+        # kommt eine hinzu, ändert sich oder fällt weg, ist das Summary veraltet.
+        payload["stadtbaum"] = sorted(
+            (m.id, json.dumps(m.config or {}, sort_keys=True, default=str), str(m.geometry))
+            for m in _stadtbaum_measures(db, measure))
     return hashlib.sha1(
         json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
 
@@ -783,12 +1283,40 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         hap_by_cell = _hap_cell_factors(db, measure, parameter_registry.overrides_map(
             parameter_registry.load_db_overrides(db, measure.kommune_id)))
 
+    # Kühlzentren (Bericht #95 §5 Z. 1234–1238): Schutzprogramme derselben Kommune je
+    # Zelle — sie dämpfen den Einzelnutzen der Kühlzentren und gehen in die Kappung
+    # max(δ_HAP × δ_VG × δ_KZ; kappung_vg) ein. Der Betrag der Kühlzentren wird getrennt
+    # von S157 gezählt (Befunde 139, 148).
+    vg_fracs_by_cell: dict[int, list[float]] = {}
+    kz_benefit = 0.0
+    if _is_s157(mdef):
+        vg_fracs_by_cell = _vg_cell_fracs(db, _vg_measures(db, measure))
+
+    # Bericht §5 „Zusammen mit S158" (T-1602-cto): deckt zugleich eine Stadtbaumwahl
+    # derselben Kommune dieselbe Zelle ab, rechnet S158 seinen Nutzen aus den schon um
+    # die Pflanzung geminderten Tagen (Faktoren multipliziert) — kein vermiedener Tag
+    # zählt doppelt.
+    stadtbaum_by_cell: dict[int, float] = {}
+    if _is_s158(mdef):
+        stadtbaum_by_cell = _stadtbaum_cell_days_factors(db, measure)
+
     # S158-Integrationsauflage Punkt 5: vermiedene Symptomtage der Kommune (Summe der
     # Zellwerte, identisch zur Summe der MeasureImpact-Zeilen) und ihr Euro-Gegenwert
     # (Anteil #96 an ``annual_benefit_damage_eur`` — dieselbe Maßnahme verknüpft nur
     # ALLERGY_RISK_CODE, deshalb ist der Anteil die gesamte Zellkosten-Reduktion).
     s158_avoided_days_total = 0.0
     s158_missing_split = False
+
+    # Integrationsauflage (Stadtbaumwahl) §5 Punkt (4): vermiedene Zusatztage der
+    # Kommune (Summe der Zellwerte) und ihr Euro-Gegenwert. Fehlt ``anteil_ersetzt``
+    # (Punkt 2 der Auflage), lässt sich die Wirkung ohne Eingabe nicht bestimmen —
+    # das gilt für die ganze Maßnahme, nicht je Zelle, deshalb hier vorab geprüft.
+    stadtbaum_avoided_days_total = 0.0
+    stadtbaum_missing_reason: str | None = None
+    stadtbaum_saw_canopy_missing = False
+    stadtbaum_saw_effect = False
+    if _is_stadtbaum(mdef) and float((measure.config or {}).get("anteil_ersetzt") or 0.0) <= 0.0:
+        stadtbaum_missing_reason = "anteil_ersetzt"
 
     for cid, frac in coverage.items():
         ca = assessments.get(cid)
@@ -798,29 +1326,53 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         cell_pop = float(data.get("inputs", {}).get("pop", 0.0) or 0.0)
         cell_risks = data.get("risks", {})
         deltas = {}
-        cell_savings: dict[str, float] = {}
+        cell_savings: dict[str, float | str] = {}
         for code in linked:
-            r = cell_risks.get(code, {})
+            r = _with_cell_q_pfl(cell_risks.get(code, {}), data.get("inputs"))
             d_hap = hap_by_cell.get(cid, 1.0)
+            s158_days_factor = stadtbaum_by_cell.get(cid, 1.0)
+            d_vg, vg_cap = 1.0, 1.0
+            if _is_s157(mdef) and code == S157_RISK_CODE:
+                d_vg, vg_cap = _vg_kz_factors(vg_fracs_by_cell.get(cid, []), r, d_hap)
             factor = _measure_cell_factor(mdef, measure.config, code, frac, unit_factor, r,
-                                          d_hap, d_hap)
+                                          d_hap, d_hap, s158_days_factor, d_vg, vg_cap)
             base_idx = float(r.get("index", 0.0))
             new_idx = base_idx * factor
             deltas[code] = round(new_idx - base_idx, 3)
             covered_base_index[code] = covered_base_index.get(code, 0.0) + base_idx
             covered_new_index[code] = covered_new_index.get(code, 0.0) + new_idx
             if _is_s158(mdef) and code == ALLERGY_RISK_CODE:
-                _, avoided_days, missing = _s158_cell_effect(mdef, frac, r)
+                _, avoided_days, missing = _s158_cell_effect(mdef, frac, r, s158_days_factor)
                 if missing:
                     s158_missing_split = True
                 elif avoided_days is not None:
                     cell_savings["s158_avoided_days"] = round(avoided_days, 3)
                     s158_avoided_days_total += avoided_days
+            if (_is_stadtbaum(mdef) and code == ALLERGY_RISK_CODE
+                    and stadtbaum_missing_reason is None):
+                _, avoided_days, reason = _stadtbaum_cell_effect(measure.config, frac, r)
+                if reason == "canopy":
+                    # Zellweiser Vermerk (Befund Prüfer, Runde 1): Eine kronenlose Zelle
+                    # bekommt einen Grund statt still zu verschwinden — auch bei
+                    # gemischter Deckung, wo die Kommunensumme insgesamt positiv bleibt
+                    # (dann bleibt ``stadtbaum_missing_reason`` auf Kommunenebene leer,
+                    # s. unten).
+                    stadtbaum_saw_canopy_missing = True
+                    cell_savings["stadtbaum_missing_reason"] = "canopy"
+                elif avoided_days is not None:
+                    cell_savings["stadtbaum_avoided_days"] = round(avoided_days, 3)
+                    stadtbaum_avoided_days_total += avoided_days
+                    if avoided_days > 0.0:
+                        stadtbaum_saw_effect = True
             risk = catalog.RISKS_BY_CODE.get(code)
             if (_risk_counts_for_euro_benefit(risk)
                     and risk.get("scale", "pop") in ("pop", "area")):
                 reduced = _cell_cost(risk, r, cell_pop) * (1.0 - factor)
                 annual_benefit_damage += reduced
+                if _is_s157(mdef) and code == S157_RISK_CODE:
+                    f_kz = 1.0 if _vg_kalib_input(measure.config) else _kz_cell_factor(
+                        frac, r, d_hap, d_hap, d_vg, vg_cap)
+                    kz_benefit += min(reduced, _cell_cost(risk, r, cell_pop) * (1.0 - f_kz))
                 # gekoppelte Folgekosten (nur direkte Sektorschäden treiben k_indirekt)
                 if code in catalog.DIRECT_SECTOR_RISK_CODES:
                     annual_benefit_damage += k_indirect * reduced
@@ -873,6 +1425,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     # Die Kappung fängt künftige Fehlkalibrierungen/Inkonsistenzen ab, statt sie als
     # Millionen-Nutzen ins Dashboard durchzureichen.
     benefit_capped = False
+    benefit_damage_uncapped = annual_benefit_damage
     if annual_benefit_damage > 0.0:
         base_agg = get_risk_aggregate(db, measure.kommune_id, apply_measures=False)
         k = float(override_context.get_override("impact.k_indirect", _K_INDIRECT_DEFAULT))
@@ -888,6 +1441,23 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     # S158 verknüpft ausschließlich ALLERGY_RISK_CODE (#96) — ihr Euro-Anteil an
     # ``annual_benefit_damage_eur`` ist deshalb der ganze (ggf. gekappte) Betrag.
     s158_avoided_days_eur = annual_benefit_damage if _is_s158(mdef) else 0.0
+
+    # Kühlzentren und S157 getrennt (COOLING_ROOMS_DRINKING_WATER verknüpft nur die
+    # Mortalität): Bei einer Kappung schrumpfen beide Anteile im selben Verhältnis.
+    kz_benefit_eur = 0.0
+    if _is_s157(mdef) and benefit_damage_uncapped > 0.0:
+        kz_benefit_eur = kz_benefit * annual_benefit_damage / benefit_damage_uncapped
+    s157_benefit_eur = max(0.0, annual_benefit_damage - kz_benefit_eur) if _is_s157(mdef) else 0.0
+
+    # Trägt am Ende KEINE abgedeckte Zelle einen positiven Effekt und lag zumindest
+    # eine ohne Baumkronen im Ausgangsstand, wäre 0 € nicht von einer Datenlücke
+    # unterscheidbar (P2) — dann steht der Vermerk statt des (korrekten, aber
+    # irreführenden) Betrags. Die Stadtbaumwahl verknüpft ebenfalls ausschließlich
+    # ALLERGY_RISK_CODE, ihr Euro-Anteil ist deshalb ebenso der ganze Betrag.
+    if (stadtbaum_missing_reason is None and stadtbaum_saw_canopy_missing
+            and not stadtbaum_saw_effect):
+        stadtbaum_missing_reason = "canopy"
+    stadtbaum_avoided_days_eur = annual_benefit_damage if _is_stadtbaum(mdef) else 0.0
 
     # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente)
     cost_breakdown = compute_costs(mdef, count, covered_area_m2)
@@ -928,15 +1498,25 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # ``annual_benefit_eur`` bleibt eine Zahl (Klasse-A-Anteil + direkter Nutzen),
         # weil Export und Maßnahmentabelle sie als Zahl lesen.
         **_benefit_euro_layer_fields(linked, annual_benefit_direct),
-        # S157 ohne Eingabe s_gek: Vermerk statt Betrag (Bericht #95 §5 trägt keine
-        # Voreinstellung; Divergenz an den CMO, T-1367).
+        # S157: gerechneter Anteil s_gek (ohne Eingabe Voreinstellung 0,11, Befund 138)
+        # und Kennzeichnung als Abschätzung von KAP3.
         **_s157_summary_fields(mdef, measure.config),
+        **_vg_kalib_summary_fields(mdef, measure.config),
         # Befund 129: S157 zusammen mit dem Hitzeaktionsplan gerechnet (Faktoren multipliziert)
         **({"s157_with_hap": bool(hap_by_cell)} if _is_s157(mdef) else {}),
+        # Befunde 139, 148: Betrag der öffentlichen Kühlzentren getrennt von S157,
+        # gekennzeichnet als Abschätzung von KAP3 (heat.delta_kuehlzentren).
+        **_kz_summary_fields(mdef, kz_benefit_eur, s157_benefit_eur, bool(vg_fracs_by_cell)),
         # S158-Integrationsauflage Punkt 5: vermiedene Symptomtage/Euro der Kommune als
         # Abschätzung von KAP3 gekennzeichnet, oder Vermerk statt Betrag ohne Gruppenaufteilung.
         **_s158_summary_fields(mdef, s158_avoided_days_total, s158_avoided_days_eur,
                                s158_missing_split),
+        # Integrationsauflage (Stadtbaumwahl) §5 Punkt (4): vermiedene Zusatztage/Euro
+        # der Kommune als Abschätzung von KAP3 gekennzeichnet, mit Hinweis auf die
+        # Richtung des Fehlers in λ (Modellgrenze 7), oder Vermerk statt Betrag ohne
+        # anteil_ersetzt bzw. ohne Baumkronen in den abgedeckten Zellen.
+        **_stadtbaum_summary_fields(mdef, stadtbaum_avoided_days_total,
+                                    stadtbaum_avoided_days_eur, stadtbaum_missing_reason),
         # Befund 126: Schutzprogramme zusammen mit dem Hitzeaktionsplan (mit Kappung 0,794)
         **({"vg_with_hap": bool(hap_by_cell)} if _is_vg(mdef) else {}),
         "params_fingerprint": fingerprint,
@@ -994,9 +1574,18 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
     )
     # Befund 126: δ_HAP je Zelle vorab, damit die Schutzprogramme am Paketwert kappen
     # (max(δ_HAP × δ_VG; 0,794)); gedämpft wird hier nicht, das macht die Multiplikation.
+    # Kühlzentren (S157-Maßnahme) kappen ebenso: max(δ_HAP × δ_VG × δ_KZ; kappung_vg).
     hap_cap: dict[int, float] = {}
-    if any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
-           for m in measures):
+    has_kz = any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "s157"
+                 for m in measures)
+    vg_fracs_by_cell: dict[int, list[float]] = {}
+    if has_kz:
+        vg_fracs_by_cell = _vg_cell_fracs(db, [
+            m for m in measures
+            if catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
+            and not _vg_kalib_input(m.config)])   # Wächter: δ_VG = 1 (Befund 150)
+    if has_kz or any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "vg"
+                     for m in measures):
         hap_base = catalog.MEASURES_BY_CODE.get(S157_HAP_CODE)
         if hap_base:
             hap_def = parameter_registry.resolve_measure_def(hap_base, overrides)
@@ -1008,6 +1597,23 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
                 uf = _unit_effect_factor(count, recommended)
                 for cid, frac in frac_map.items():
                     hap_cap[cid] = hap_cap.get(cid, 1.0) * _reduction_factor(hap_def, frac, uf)
+    # Bericht §5 „Zusammen mit S158" (T-1602-cto): Ĝ′-Tage-Faktor je Zelle aus den
+    # Stadtbaumwahl-Maßnahmen vorab, damit S158 seinen Nutzen aus den schon um die
+    # Pflanzung geminderten Tagen rechnet (kein vermiedener Tag zählt doppelt) —
+    # dieselbe Basis wie ``_stadtbaum_cell_factor`` selbst: die ungeänderten Roheingaben
+    # in ``base`` (keine erneute DB-Abfrage nötig, anders als in compute_impact).
+    stadtbaum_days_by_cell: dict[int, float] = {}
+    if any(catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") == "s158"
+           for m in measures):
+        for m in measures:
+            if catalog.MEASURES_BY_CODE.get(m.measure_type, {}).get("effect_model") != "stadtbaum":
+                continue
+            frac_map, _ = _coverage(db, m)
+            for cid, frac in frac_map.items():
+                cell_risk = ((base.get(cid) or {}).get("risks", {}) or {}).get(
+                    ALLERGY_RISK_CODE, {})
+                factor = _stadtbaum_cell_factor(m.config, frac, cell_risk)
+                stadtbaum_days_by_cell[cid] = stadtbaum_days_by_cell.get(cid, 1.0) * factor
     for m in measures:
         mbase = catalog.MEASURES_BY_CODE.get(m.measure_type)
         if not mbase:
@@ -1019,10 +1625,19 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
         for cid, frac in frac_map.items():
             cell_factors = factors.setdefault(cid, {})
             cell_risks = (base.get(cid) or {}).get("risks", {})
+            cell_inputs = (base.get(cid) or {}).get("inputs")
             for code in mdef.get("linked_risk_codes", []):
+                cell_risk = _with_cell_q_pfl(cell_risks.get(code, {}), cell_inputs)
+                vg_cap = 1.0
+                if _is_s157(mdef) and code == S157_RISK_CODE:
+                    # im Aggregat nur die Kappung, gedämpft wird über die Multiplikation
+                    _, vg_cap = _vg_kz_factors(vg_fracs_by_cell.get(cid, []), cell_risk,
+                                               hap_cap.get(cid, 1.0))
                 factor = _measure_cell_factor(mdef, m.config, code, frac, unit_factor,
-                                              cell_risks.get(code, {}),
-                                              hap_cap=hap_cap.get(cid, 1.0))
+                                              cell_risk,
+                                              hap_cap=hap_cap.get(cid, 1.0),
+                                              s158_days_factor=stadtbaum_days_by_cell.get(cid, 1.0),
+                                              vg_cap=vg_cap)
                 cell_factors[code] = cell_factors.get(code, 1.0) * factor
 
     out = []

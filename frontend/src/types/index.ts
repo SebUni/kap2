@@ -125,10 +125,34 @@ export interface MeasureImpactSummary {
   benefit_display?: string | null
   /** Zusatz „ohne x Wirkungen im Screening“ zum Euro-Nutzen einer gemischten Maßnahme. */
   benefit_note?: string | null
-  /** S157 (#95 §5): gekühlter Anteil der Heimplätze 0..1, Eingabe der Kommune; null = nicht eingegeben (kein Betrag). */
+  /** S157 (#95 §5): gerechneter gekühlter Anteil der Heimplätze 0..1 — Eingabe der Kommune
+   *  oder, ohne Eingabe, die Voreinstellung 0,11 (Block heat.s_gek, Befund 138). */
   s_gek?: number | null
+  /** S157: true, wenn die Voreinstellung gilt (keine Eingabe der Kommune). */
+  s_gek_is_default?: boolean
+  /** S157: abgezogener Stand der Kalibrierjahre (Block heat.s_gek_kalib, 0,06). */
+  s_gek_kalib?: number
+  /** S157: Kennzeichnung des Betrags als Abschätzung von KAP3 (P2). */
+  s157_estimate_note?: string | null
+  /** COOLING_ROOMS_DRINKING_WATER: Anteil S157 (gekühlte Heimplätze) am vermiedenen Schaden. */
+  s157_benefit_eur?: number
+  /** COOLING_ROOMS_DRINKING_WATER: Anteil der öffentlichen Kühlzentren am vermiedenen
+   *  Schaden (Befunde 139/148); mit s157_benefit_eur zusammen annual_benefit_damage_eur. */
+  kuehlzentren_benefit_eur?: number
+  /** Kühlzentren: Faktor δ_KZ (Block heat.delta_kuehlzentren). */
+  delta_kuehlzentren?: number
+  /** Kühlzentren: Kennzeichnung des Betrags als Abschätzung von KAP3 (P2). */
+  kuehlzentren_estimate_note?: string | null
+  /** Kühlzentren: true, wenn Schutzprogramme in der Kappung mitgerechnet sind. */
+  kuehlzentren_with_vg?: boolean
+  /** Wächter-Frage „Lief das Programm schon 2012–2024?“ (Befund 150): 1 = ja, 0 = nein. */
+  vg_in_kalibrierjahren?: number
+  /** Wächter-Frage: true, wenn die Voreinstellung „nein“ gilt. */
+  vg_in_kalibrierjahren_is_default?: boolean
+  /** Wächter-Frage: Kennzeichnung der Voreinstellung als Abschätzung von KAP3. */
+  vg_in_kalibrierjahren_estimate_note?: string | null
   /** Name der fehlenden Eingabe, wenn deshalb kein Betrag entsteht (S157: "s_gek";
-   *  S158: "pollen_group_split"). */
+   *  S158: "pollen_group_split"; Stadtbaumwahl: "anteil_ersetzt" oder "canopy"). */
   benefit_missing_input?: string | null
   /** S158 (#96 §5.1, Integrationsauflage Punkt 5): vermiedene Symptomtage/Jahr der
    *  Kommune (Summe der Zellwerte); fehlt, wenn eine abgedeckte Zelle mit Zusatztagen
@@ -140,6 +164,18 @@ export interface MeasureImpactSummary {
   /** S158: Kennzeichnung der Wirkung als begründete Abschätzung von KAP3 (r_S158,
    *  t_warn — Vorgabe P2, keine belegten Effektgrößen). */
   s158_estimate_note?: string | null
+  /** Stadtbaumwahl (#96 §5, Integrationsauflage Punkt (4)): vermiedene Zusatztage/Jahr
+   *  der Kommune (Summe der Zellwerte); fehlt ohne anteil_ersetzt oder ohne Baumkronen
+   *  im Ausgangsstand der abgedeckten Zellen (dann trägt benefit_display den Vermerk). */
+  stadtbaum_avoided_days_total?: number | null
+  /** Stadtbaumwahl: Euro-Gegenwert der vermiedenen Zusatztage der Kommune (Anteil #96
+   *  an annual_benefit_damage_eur). */
+  stadtbaum_avoided_days_eur?: number | null
+  /** Stadtbaumwahl: Kennzeichnung der Wirkung als begründete Abschätzung von KAP3
+   *  (Δk_Birke/Δk_unbek — Vorgabe P2, keine belegten Effektgrößen). */
+  stadtbaum_estimate_note?: string | null
+  /** Stadtbaumwahl: Hinweis auf die Richtung des Fehlers in λ (§6 Modellgrenze 7). */
+  stadtbaum_lambda_hinweis?: string | null
   count?: number
   count_is_default?: boolean
   recommended_count?: number
@@ -434,6 +470,17 @@ export interface PlannedRisk {
   exposure_names: string[]
 }
 
+/** Eingabe der Kommune an einer Katalog-Maßnahme (catalog.py, ``config_inputs``). */
+export interface ConfigInputSpec {
+  frage: string
+  typ: string
+  werte?: Record<string, number>
+  voreinstellung?: number
+  voreinstellung_text?: string
+  kennzeichnung?: string
+  parameter?: string
+}
+
 export interface CatalogMeasure {
   code: string
   name: string
@@ -458,6 +505,12 @@ export interface CatalogMeasure {
   sources?: Record<string, string>
   source_details?: Record<string, string>
   evidence_classes?: Record<string, EvidenceClass>
+  /** Nutzersichtbarer Eingabetext samt Herkunft je config-Feld (Vorgabe P1), z. B.
+   *  anteil_ersetzt bei LOW_ALLERGEN_TREE_SELECTION (T-1603-cto). */
+  config_input_help?: Record<string, string>
+  /** Eingaben der Kommune mit Frage, Typ und Voreinstellung, z. B. vg_in_kalibrierjahren
+   *  (Bericht #95 §5, Befund 150). */
+  config_inputs?: Record<string, ConfigInputSpec>
   kang_cluster?: string
   kang_field?: string
 }
@@ -512,20 +565,21 @@ export interface RiskHistogramEntry {
   cost_dimension: string
   counts: number[]
   nonzero_cells: number
-  p90_index: number
-  max_index: number
-  outcome: number
+  /** null: fehlt die Klimawirkung im Aggregat, ist das keine 0 — Nullwirkung wäre falsch (A-0010/P2). */
+  p90_index: number | null
+  max_index: number | null
+  outcome: number | null
   /** Aggregierter Outcome (= outcome; Σ über Zellen für pop/area, sonst P90-basiert). */
-  outcome_sum?: number
+  outcome_sum?: number | null
   cost_eur: number | null
   /** "sum" (Σ über Zellen, pop/area) | "p90" (kommunenweiter Einzelwert, flat). */
   aggregation?: 'sum' | 'p90'
   /** Anteil der Summe aus den stärksten 5 % Zellen (Konzentration/Hotspot-Signal). */
-  top5_share?: number
+  top5_share?: number | null
   /** Fläche der Zellen über der Risikozonen-Schwelle (km²). */
-  area_km2_affected?: number
+  area_km2_affected?: number | null
   /** Anteil der Zellen über der Risikozonen-Schwelle. */
-  share_above_threshold?: number
+  share_above_threshold?: number | null
 }
 
 export interface RiskHistogram {

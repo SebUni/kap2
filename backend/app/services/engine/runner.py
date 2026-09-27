@@ -101,8 +101,11 @@ def build_cell_risks(indices: dict[str, float], impacts: dict[str, dict]) -> dic
         # gespeicherten Summen tage_birke/tage_graeser zu lesen — sonst würde eine
         # spätere Vegetationsmaßnahme (Stadtbaumwahl, Ĝ′) die S158-Wirkung
         # überschreiben statt multiplikativ zu ergänzen (T-1513-cto).
+        # Kronenterme canopy_birch_frac/canopy_unknown_frac/green_frac (§3.3):
+        # Grundlage der Kappungsgrenze je Term in health.stadtbaum_g_neu (T-1599-cto).
         for key in ("betroffene", "delta_birke", "delta_graeser", "pollen_g",
-                   "pollen_g_bar0"):
+                   "pollen_g_bar0", "canopy_birch_frac", "canopy_unknown_frac",
+                   "green_frac"):
             if key in imp and imp[key] is not None:
                 risks[code][key] = round(imp[key], 6)
     return risks
