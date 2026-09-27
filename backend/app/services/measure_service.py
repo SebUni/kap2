@@ -427,6 +427,119 @@ def _is_stadtbaum(mdef: dict) -> bool:
     return mdef.get("effect_model") == "stadtbaum"
 
 
+# Integrationsauflage (Stadtbaumwahl) §5 Z. 1111–1125, Punkt (4): Ausgabe der
+# vermiedenen Zusatztage und Euro je Zelle und für die Kommune, gekennzeichnet als
+# begründete Abschätzung von KAP3 (Δk_Birke/Δk_unbek sind keine belegten
+# Effektgrößen, dieselbe Kennzeichnung wie S158 — P2), mit dem Hinweis auf die
+# Richtung des Fehlers in λ (§6 Modellgrenze 7: der örtliche Quellenanteil ist über
+# Gräser belegt [74], nicht über Bäume, und Ferntransport entkoppelt lokale
+# Vegetation und lokalen Pollenflug teilweise — welche Richtung überwiegt, ist nicht
+# bestimmbar). Fehlt ``config['anteil_ersetzt']`` (Punkt (2) der Auflage ohne
+# Eingabe), entsteht kein Betrag statt eines erfundenen (P2, Muster S158
+# ``benefit_missing_input``). Führt eine abgedeckte Zelle im Ausgangsstand keine
+# Baumkronen (``canopy_birch_frac`` + ``canopy_unknown_frac`` ≤ 0), ist dort
+# mechanisch nichts zu ersetzen; trägt am Ende KEINE Zelle einen positiven Effekt,
+# stünde ein irreführendes 0 € (nicht von einer Datenlücke unterscheidbar) — dann
+# steht ein Vermerk statt des Betrags (P2).
+STADTBAUM_ESTIMATE_NOTE = S158_ESTIMATE_NOTE
+STADTBAUM_LAMBDA_HINWEIS = (
+    "Richtung des Fehlers in λ nicht bestimmbar (Modellgrenze 7): der örtliche "
+    "Quellenanteil ist für Gräser belegt, nicht für Bäume, und Ferntransport "
+    "entkoppelt lokale Vegetation und lokalen Pollenflug teilweise.")
+STADTBAUM_MISSING_ANTEIL_TEXT = ("kein Betrag: Anteil ersetzter Kronen "
+                                 "(anteil_ersetzt) fehlt, Eingabe in der Maßnahme ergänzen")
+STADTBAUM_NO_CANOPY_TEXT = ("kein Betrag: abgedeckte Zellen führen im Ausgangsstand "
+                            "keine Baumkronen, dort ist nichts zu ersetzen")
+
+
+def _stadtbaum_cell_effect(config: dict | None, frac: float, cell_risk: dict
+                          ) -> tuple[float, float | None, str | None]:
+    """(Faktor, vermiedene Zusatztage, fehlende Eingabe) einer Zelle durch die
+    Stadtbaumwahl (Integrationsauflage §5 Punkt (4)).
+
+    Bildet dieselbe Ĝ′-Rechnung wie bisher (``_stadtbaum_cell_factor``, jetzt ein
+    dünner Wrapper hierauf), zusätzlich mit der Differenz ΔTage = Tage(Ĝ) − Tage(Ĝ′)
+    und einer Kennzeichnung, warum keine Zahl entsteht: ``'anteil_ersetzt'`` — die
+    Maßnahme trägt kein (oder kein positives) ``config['anteil_ersetzt']``;
+    ``'canopy'`` — die Zelle führt im Ausgangsstand keine Baumkronen
+    (``canopy_birch_frac`` + ``canopy_unknown_frac`` ≤ 0), dort ist mechanisch
+    nichts zu ersetzen. ``None`` als dritte Rückgabe heißt: keine dieser Lagen —
+    entweder die Zelle liegt außerhalb der Deckung/hat keine Roheingaben (Alt-Zelle,
+    kein eigener Grund) oder es entsteht eine reguläre Zahl.
+    """
+    from app.services.engine.impact import health
+
+    if frac <= 0.0:
+        return 1.0, None, None
+    a = float((config or {}).get("anteil_ersetzt") or 0.0)
+
+    betroffene = cell_risk.get("betroffene")
+    delta_b = cell_risk.get("delta_birke")
+    delta_g = cell_risk.get("delta_graeser")
+    g_cell = cell_risk.get("pollen_g")
+    k_birke = cell_risk.get("canopy_birch_frac")
+    k_unbek = cell_risk.get("canopy_unknown_frac")
+    gruen = cell_risk.get("green_frac")
+    if None in (betroffene, delta_b, delta_g, g_cell, k_birke, k_unbek, gruen):
+        return 1.0, None, None
+    if a <= 0.0:
+        return 1.0, None, "anteil_ersetzt"
+    if (float(k_birke) + float(k_unbek)) <= 0.0:
+        return 1.0, 0.0, "canopy"
+    g_bar0 = cell_risk.get("pollen_g_bar0")
+
+    def _p(key: str, default: float) -> float:
+        v = override_context.get_override(f"risks.{ALLERGY_RISK_CODE}.impact.{key}", default)
+        return float(v) if v is not None else default
+
+    lam = _p("lambda_veg", 0.70)
+    s_unbek = _p("birch_group_share_default", 0.12)
+
+    dk_birke = a * frac * float(k_birke)
+    dk_unbek = a * frac * float(k_unbek)
+    g_neu = health.stadtbaum_g_neu(float(g_cell), float(k_birke), float(k_unbek),
+                                   float(gruen), dk_birke, dk_unbek, s_unbek)
+
+    tage_b0, tage_g0 = health.pollen_zelltage(
+        float(betroffene), float(delta_b), float(delta_g), float(g_cell), g_bar0, lam)
+    total0 = tage_b0 + tage_g0
+    if total0 <= 0.0:
+        return 1.0, 0.0, None
+    tage_b1, tage_g1 = health.pollen_zelltage(
+        float(betroffene), float(delta_b), float(delta_g), g_neu, g_bar0, lam)
+    total1 = tage_b1 + tage_g1
+    factor = max(0.0, total1 / total0)
+    return factor, total0 - total1, None
+
+
+def _stadtbaum_summary_fields(mdef: dict, avoided_days_total: float, avoided_days_eur: float,
+                              missing_reason: str | None) -> dict:
+    """Zusatzfelder des impact_summary für die Stadtbaumwahl (Integrationsauflage §5
+    Punkt (4)).
+
+    ``stadtbaum_avoided_days_total``/``stadtbaum_avoided_days_eur`` sind die
+    vermiedenen Zusatztage bzw. Euro/Jahr der Kommune (Summe der Zellwerte),
+    zusammen mit der Kennzeichnung als begründete Abschätzung von KAP3 und dem
+    Hinweis auf die Richtung des Fehlers in λ (Modellgrenze 7). Fehlt
+    ``anteil_ersetzt`` oder führt keine abgedeckte Zelle Baumkronen im
+    Ausgangsstand, steht ein Vermerk statt eines (sonst als 0 € lesbaren) Betrags.
+    """
+    if not _is_stadtbaum(mdef):
+        return {}
+    if missing_reason == "anteil_ersetzt":
+        return {"benefit_display": STADTBAUM_MISSING_ANTEIL_TEXT,
+                "benefit_missing_input": "anteil_ersetzt"}
+    if missing_reason == "canopy":
+        return {"benefit_display": STADTBAUM_NO_CANOPY_TEXT,
+                "benefit_missing_input": "canopy"}
+    return {
+        "stadtbaum_avoided_days_total": round(avoided_days_total, 1),
+        "stadtbaum_avoided_days_eur": round(avoided_days_eur, 2),
+        "stadtbaum_estimate_note": STADTBAUM_ESTIMATE_NOTE,
+        "stadtbaum_lambda_hinweis": STADTBAUM_LAMBDA_HINWEIS,
+    }
+
+
 def _stadtbaum_cell_factor(config: dict | None, frac: float, cell_risk: dict) -> float:
     """Faktor (0..1) auf das Symptomtage-Outcome einer Zelle durch die Stadtbaumwahl.
 
@@ -452,48 +565,12 @@ def _stadtbaum_cell_factor(config: dict | None, frac: float, cell_risk: dict) ->
 
     Ohne Deckung (``frac`` ≤ 0), ohne ``anteil_ersetzt`` (bzw. ≤ 0) oder ohne die
     nötigen Zell-Roheingaben (Alt-Zelle vor der Neuberechnung, T-1599-cto) bleibt der
-    Faktor 1,0 — keine pauschale Ersatzwirkung.
+    Faktor 1,0 — keine pauschale Ersatzwirkung. Wrapper um ``_stadtbaum_cell_effect``
+    (T-1604-cto, Ausgabe-Integrationsauflage §5 Punkt (4)): dieselbe Rechnung, hier
+    nur der Faktor.
     """
-    from app.services.engine.impact import health
-
-    if frac <= 0.0:
-        return 1.0
-    a = float((config or {}).get("anteil_ersetzt") or 0.0)
-    if a <= 0.0:
-        return 1.0
-
-    betroffene = cell_risk.get("betroffene")
-    delta_b = cell_risk.get("delta_birke")
-    delta_g = cell_risk.get("delta_graeser")
-    g_cell = cell_risk.get("pollen_g")
-    k_birke = cell_risk.get("canopy_birch_frac")
-    k_unbek = cell_risk.get("canopy_unknown_frac")
-    gruen = cell_risk.get("green_frac")
-    if None in (betroffene, delta_b, delta_g, g_cell, k_birke, k_unbek, gruen):
-        return 1.0
-    g_bar0 = cell_risk.get("pollen_g_bar0")
-
-    def _p(key: str, default: float) -> float:
-        v = override_context.get_override(f"risks.{ALLERGY_RISK_CODE}.impact.{key}", default)
-        return float(v) if v is not None else default
-
-    lam = _p("lambda_veg", 0.70)
-    s_unbek = _p("birch_group_share_default", 0.12)
-
-    dk_birke = a * frac * float(k_birke)
-    dk_unbek = a * frac * float(k_unbek)
-    g_neu = health.stadtbaum_g_neu(float(g_cell), float(k_birke), float(k_unbek),
-                                   float(gruen), dk_birke, dk_unbek, s_unbek)
-
-    tage_b0, tage_g0 = health.pollen_zelltage(
-        float(betroffene), float(delta_b), float(delta_g), float(g_cell), g_bar0, lam)
-    total0 = tage_b0 + tage_g0
-    if total0 <= 0.0:
-        return 1.0
-    tage_b1, tage_g1 = health.pollen_zelltage(
-        float(betroffene), float(delta_b), float(delta_g), g_neu, g_bar0, lam)
-    total1 = tage_b1 + tage_g1
-    return max(0.0, total1 / total0)
+    factor, _, _ = _stadtbaum_cell_effect(config, frac, cell_risk)
+    return factor
 
 
 # S158 zusammen mit der Stadtbaumwahl (Bericht §5 „Zusammen mit S158", T-1602-cto): die
@@ -1024,6 +1101,17 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     s158_avoided_days_total = 0.0
     s158_missing_split = False
 
+    # Integrationsauflage (Stadtbaumwahl) §5 Punkt (4): vermiedene Zusatztage der
+    # Kommune (Summe der Zellwerte) und ihr Euro-Gegenwert. Fehlt ``anteil_ersetzt``
+    # (Punkt 2 der Auflage), lässt sich die Wirkung ohne Eingabe nicht bestimmen —
+    # das gilt für die ganze Maßnahme, nicht je Zelle, deshalb hier vorab geprüft.
+    stadtbaum_avoided_days_total = 0.0
+    stadtbaum_missing_reason: str | None = None
+    stadtbaum_saw_canopy_missing = False
+    stadtbaum_saw_effect = False
+    if _is_stadtbaum(mdef) and float((measure.config or {}).get("anteil_ersetzt") or 0.0) <= 0.0:
+        stadtbaum_missing_reason = "anteil_ersetzt"
+
     for cid, frac in coverage.items():
         ca = assessments.get(cid)
         if not ca:
@@ -1032,7 +1120,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         cell_pop = float(data.get("inputs", {}).get("pop", 0.0) or 0.0)
         cell_risks = data.get("risks", {})
         deltas = {}
-        cell_savings: dict[str, float] = {}
+        cell_savings: dict[str, float | str] = {}
         for code in linked:
             r = _with_cell_q_pfl(cell_risks.get(code, {}), data.get("inputs"))
             d_hap = hap_by_cell.get(cid, 1.0)
@@ -1051,6 +1139,22 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                 elif avoided_days is not None:
                     cell_savings["s158_avoided_days"] = round(avoided_days, 3)
                     s158_avoided_days_total += avoided_days
+            if (_is_stadtbaum(mdef) and code == ALLERGY_RISK_CODE
+                    and stadtbaum_missing_reason is None):
+                _, avoided_days, reason = _stadtbaum_cell_effect(measure.config, frac, r)
+                if reason == "canopy":
+                    # Zellweiser Vermerk (Befund Prüfer, Runde 1): Eine kronenlose Zelle
+                    # bekommt einen Grund statt still zu verschwinden — auch bei
+                    # gemischter Deckung, wo die Kommunensumme insgesamt positiv bleibt
+                    # (dann bleibt ``stadtbaum_missing_reason`` auf Kommunenebene leer,
+                    # s. unten).
+                    stadtbaum_saw_canopy_missing = True
+                    cell_savings["stadtbaum_missing_reason"] = "canopy"
+                elif avoided_days is not None:
+                    cell_savings["stadtbaum_avoided_days"] = round(avoided_days, 3)
+                    stadtbaum_avoided_days_total += avoided_days
+                    if avoided_days > 0.0:
+                        stadtbaum_saw_effect = True
             risk = catalog.RISKS_BY_CODE.get(code)
             if (_risk_counts_for_euro_benefit(risk)
                     and risk.get("scale", "pop") in ("pop", "area")):
@@ -1124,6 +1228,16 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     # ``annual_benefit_damage_eur`` ist deshalb der ganze (ggf. gekappte) Betrag.
     s158_avoided_days_eur = annual_benefit_damage if _is_s158(mdef) else 0.0
 
+    # Trägt am Ende KEINE abgedeckte Zelle einen positiven Effekt und lag zumindest
+    # eine ohne Baumkronen im Ausgangsstand, wäre 0 € nicht von einer Datenlücke
+    # unterscheidbar (P2) — dann steht der Vermerk statt des (korrekten, aber
+    # irreführenden) Betrags. Die Stadtbaumwahl verknüpft ebenfalls ausschließlich
+    # ALLERGY_RISK_CODE, ihr Euro-Anteil ist deshalb ebenso der ganze Betrag.
+    if (stadtbaum_missing_reason is None and stadtbaum_saw_canopy_missing
+            and not stadtbaum_saw_effect):
+        stadtbaum_missing_reason = "canopy"
+    stadtbaum_avoided_days_eur = annual_benefit_damage if _is_stadtbaum(mdef) else 0.0
+
     # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente)
     cost_breakdown = compute_costs(mdef, count, covered_area_m2)
     capex = cost_breakdown["capex"]["total_eur"]
@@ -1172,6 +1286,12 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # Abschätzung von KAP3 gekennzeichnet, oder Vermerk statt Betrag ohne Gruppenaufteilung.
         **_s158_summary_fields(mdef, s158_avoided_days_total, s158_avoided_days_eur,
                                s158_missing_split),
+        # Integrationsauflage (Stadtbaumwahl) §5 Punkt (4): vermiedene Zusatztage/Euro
+        # der Kommune als Abschätzung von KAP3 gekennzeichnet, mit Hinweis auf die
+        # Richtung des Fehlers in λ (Modellgrenze 7), oder Vermerk statt Betrag ohne
+        # anteil_ersetzt bzw. ohne Baumkronen in den abgedeckten Zellen.
+        **_stadtbaum_summary_fields(mdef, stadtbaum_avoided_days_total,
+                                    stadtbaum_avoided_days_eur, stadtbaum_missing_reason),
         # Befund 126: Schutzprogramme zusammen mit dem Hitzeaktionsplan (mit Kappung 0,794)
         **({"vg_with_hap": bool(hap_by_cell)} if _is_vg(mdef) else {}),
         "params_fingerprint": fingerprint,

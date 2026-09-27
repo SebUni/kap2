@@ -128,7 +128,7 @@ export interface MeasureImpactSummary {
   /** S157 (#95 §5): gekühlter Anteil der Heimplätze 0..1, Eingabe der Kommune; null = nicht eingegeben (kein Betrag). */
   s_gek?: number | null
   /** Name der fehlenden Eingabe, wenn deshalb kein Betrag entsteht (S157: "s_gek";
-   *  S158: "pollen_group_split"). */
+   *  S158: "pollen_group_split"; Stadtbaumwahl: "anteil_ersetzt" oder "canopy"). */
   benefit_missing_input?: string | null
   /** S158 (#96 §5.1, Integrationsauflage Punkt 5): vermiedene Symptomtage/Jahr der
    *  Kommune (Summe der Zellwerte); fehlt, wenn eine abgedeckte Zelle mit Zusatztagen
@@ -140,6 +140,18 @@ export interface MeasureImpactSummary {
   /** S158: Kennzeichnung der Wirkung als begründete Abschätzung von KAP3 (r_S158,
    *  t_warn — Vorgabe P2, keine belegten Effektgrößen). */
   s158_estimate_note?: string | null
+  /** Stadtbaumwahl (#96 §5, Integrationsauflage Punkt (4)): vermiedene Zusatztage/Jahr
+   *  der Kommune (Summe der Zellwerte); fehlt ohne anteil_ersetzt oder ohne Baumkronen
+   *  im Ausgangsstand der abgedeckten Zellen (dann trägt benefit_display den Vermerk). */
+  stadtbaum_avoided_days_total?: number | null
+  /** Stadtbaumwahl: Euro-Gegenwert der vermiedenen Zusatztage der Kommune (Anteil #96
+   *  an annual_benefit_damage_eur). */
+  stadtbaum_avoided_days_eur?: number | null
+  /** Stadtbaumwahl: Kennzeichnung der Wirkung als begründete Abschätzung von KAP3
+   *  (Δk_Birke/Δk_unbek — Vorgabe P2, keine belegten Effektgrößen). */
+  stadtbaum_estimate_note?: string | null
+  /** Stadtbaumwahl: Hinweis auf die Richtung des Fehlers in λ (§6 Modellgrenze 7). */
+  stadtbaum_lambda_hinweis?: string | null
   count?: number
   count_is_default?: boolean
   recommended_count?: number
