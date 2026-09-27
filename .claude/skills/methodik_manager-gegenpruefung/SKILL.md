@@ -1,6 +1,6 @@
 ---
 name: methodik_manager-gegenpruefung
-description: Gegenprüfung eines Methodik-Berichts nach §5 der Aufgabe durch den methodik_manager (Lints + 14 Leitfragen, LF 11 inkl. Erklärbarkeit §8 E1–E5). Nur in einer FRISCHEN Sitzung — in der Rollenkette der Prüflauf des Managers (früher /review-methodik).
+description: Gegenprüfung eines Methodik-Berichts nach §5 der Aufgabe durch den methodik_manager (Lints + 15 Leitfragen, LF 11 inkl. Erklärbarkeit §8 E1–E5). Nur in einer FRISCHEN Sitzung — in der Rollenkette der Prüflauf des Managers (früher /review-methodik).
 argument-hint: <risiko-nr>
 allowed-tools: Read, Bash, Grep, Glob, Edit, Write
 ---
@@ -36,7 +36,7 @@ selbst per Python/Grep aus und schlage am Ende vor, sie als Skript zu persistier
 - Beispiel-Test-Blöcke ausführen — jedes Mini-Rechenbeispiel muss aufgehen.
 - Preisstand-Einheitlichkeit aller Kostensätze des Berichts.
 
-## 2 · Leitfragen 1–14 (§5) — einzeln, mit Verdikt
+## 2 · Leitfragen 1–15 (§5) — einzeln, mit Verdikt
 
 Beantworte **jede** Leitfrage einzeln mit `bestanden` oder `Befund` **plus Beleg** — niemals
 pauschal „nichts gefunden". Rechne Herleitungen stichprobenhaft nach (Python): OR-Übersetzungen,
@@ -49,12 +49,16 @@ Prüfstein/Abgleich = Befund), fehlende Datenebenen-Spezifikation (§3.1-Anlagep
 benötigte Zellgröße ohne „neu anzulegen"-Ebene bzw. „geparkt"-Watchlist = Befund),
 verletzte Betrachtungsebene (§3.2: Zentrierungsmittel aus modellinterner Aggregation
 über eine höhere Ebene = Befund),
-Referenzwert-Doppelzählung, Quellen-Synchronität (LF 14).
+Referenzwert-Doppelzählung, Quellen-Synchronität (LF 14), Risiko ohne (weitere) Anpassung (LF 15:
+Basiswert dem Zustand „ohne (weitere) Anpassung" zugeordnet, Zustand „mit Anpassung" dargestellt
+oder begründet nicht dargestellt, KWRA-Risikostufe je Zeitscheibe mit Fundstelle — die Stufe direkt
+gegen `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx` abgeglichen, nicht gegen die Behauptung des Berichts).
 
 ### 2.1 · Erklärbarkeit (Vorgabe P3 — §8 der Aufgabe, Anweisung A-0034 vom 13.09.2026)
 
-**Gewählter Weg:** Es tritt **keine** zusätzliche Leitfrage hinzu — die bestehende **Leitfrage 11
-(„Form und Erklärbarkeit")** ist erweitert. Die Zahl der Leitfragen bleibt damit unverändert 14.
+**Gewählter Weg:** Es tritt für die Erklärbarkeit **keine** zusätzliche Leitfrage hinzu — die bestehende
+**Leitfrage 11 („Form und Erklärbarkeit")** ist erweitert. Leitfrage 15 kam am 25.09.2026 für den
+Pflichtabsatz „Risiko ohne (weitere) Anpassung" dazu.
 
 Beantworte im Rahmen von LF 11 die Prüfpunkte aus §8 **einzeln mit ja/nein und Fundstelle**;
 jedes „nein" ist ein Befund (Kategorie B, sofern nicht zugleich ein A-Kriterium verletzt ist).
@@ -95,7 +99,7 @@ vereinfacht wird nie. Nicht Stil bemängeln, sondern Nachvollziehbarkeit.
 
 ## 4 · Konvergenz-Verdikt
 
-Abschluss mit expliziter Aussage: Lints grün? Alle 14 Leitfragen mit Verdikt (LF 11 einschließlich
+Abschluss mit expliziter Aussage: Lints grün? Alle 15 Leitfragen mit Verdikt (LF 11 einschließlich
 der Erklärbarkeits-Prüfpunkte E1–E5)? Neue A-/B-Befunde
 in dieser Runde? → **Null-Runde ja/nein.** Bei „ja" zusätzlich gegen die Abnahmekriterien (§6)
 prüfen und Abnahme-Empfehlung oder Restpunkte-Liste ausgeben.

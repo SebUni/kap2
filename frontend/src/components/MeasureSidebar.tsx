@@ -44,6 +44,7 @@ export default function MeasureSidebar() {
 
   const def = catalog?.measures.find(m => m.code === selectedMeasure.measure_type)
   const isS157 = selectedMeasure.measure_type === 'COOLING_ROOMS_DRINKING_WATER'
+  const isS158 = selectedMeasure.measure_type === 'POLLEN_EARLY_WARNING'
   const reductionIsEstimated = def?.evidence_classes?.default_reduction === 'abgeschaetzt'
   const linkedRisks = (def?.linked_risk_codes || [])
     .map(c => catalog?.risks.find(r => r.code === c)?.name || c)
@@ -263,12 +264,25 @@ export default function MeasureSidebar() {
 
           <div className="card" style={{ borderColor: 'var(--primary)' }}>
             <h3>Nutzen (jährlich)</h3>
+            {isS158 && !impact.benefit_display && impact.s158_avoided_days_total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Vermiedene Symptomtage/Jahr</span>
+                <span style={{ color: 'var(--success)' }}>
+                  {impact.s158_avoided_days_total.toLocaleString('de-DE', { maximumFractionDigits: 1 })} Tage
+                </span>
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
               <span style={{ color: 'var(--text-muted)' }}>Vermiedene Schäden / Nutzen</span>
               <span style={{ color: 'var(--success)' }}>{impact.benefit_display
                 ? impact.benefit_display
                 : <>{fmtEur(impact.annual_benefit_eur)}{impact.benefit_note && <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{impact.benefit_note}</span>}</>}</span>
             </div>
+            {isS158 && !impact.benefit_display && impact.s158_estimate_note && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4 }}>
+                {impact.s158_estimate_note}
+              </div>
+            )}
           </div>
         </>
       )}

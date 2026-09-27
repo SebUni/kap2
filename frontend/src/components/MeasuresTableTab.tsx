@@ -206,7 +206,15 @@ export default function MeasuresTableTab() {
                       <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>{imp ? fmtCurrency(imp.opex_annual_eur || 0) : '–'}</td>
                       <td style={{ textAlign: 'right', fontSize: '0.85rem', color: 'var(--success)' }}>{imp ? (imp.benefit_display
                       ? imp.benefit_display
-                      : <>{fmtCurrency(imp.annual_benefit_eur || 0)}{imp.benefit_note && <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{imp.benefit_note}</span>}</>) : '–'}</td>
+                      : <>{fmtCurrency(imp.annual_benefit_eur || 0)}
+                        {imp.benefit_note && <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{imp.benefit_note}</span>}
+                        {m.measure_type === 'POLLEN_EARLY_WARNING' && imp.s158_estimate_note && (
+                          <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                            {imp.s158_avoided_days_total != null
+                              ? `${imp.s158_avoided_days_total.toLocaleString('de-DE', { maximumFractionDigits: 1 })} Tage/Jahr · ${imp.s158_estimate_note}`
+                              : imp.s158_estimate_note}
+                          </span>
+                        )}</>) : '–'}</td>
                       <td style={{ textAlign: 'right', fontSize: '0.85rem', color: 'var(--success)' }}>
                         {imp?.avg_index_reduction_pct != null ? `−${imp.avg_index_reduction_pct.toFixed(1)} %` : '–'}
                       </td>
