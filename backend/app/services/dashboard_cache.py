@@ -53,6 +53,13 @@ _WEEKLY_ARTIFACTS = frozenset({"profile", "cost_projection"})
 #     Fingerprint nicht erfasst.
 _PROFILE_SCHEMA_VERSION = 5
 
+# Schema-Version der ``risk_summary``/``cost_summary``-Payloads: bei jeder
+# Änderung am Aufbau der beiden Payloads erhöhen, damit sich der ETag ändert
+# und Browser NICHT per 304 den alten Body behalten (der Eingabe-Fingerprint
+# allein erfasst reine Struktur-/Feldänderungen des Payloads nicht, siehe
+# _PROFILE_SCHEMA_VERSION).
+_SUMMARY_SCHEMA_VERSION = 1
+
 _CACHE_BASE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
     ".cache",
@@ -122,6 +129,11 @@ def fingerprint(db: Session, kommune_id: int, name: str) -> str:
         # Schema-Version + Budget-Store-Stand in den ETag ziehen, damit ein neuer
         # Bulk-Import (oder ein geändertes Profil-Schema) Browser-Caches invalidiert.
         extra = f"{extra or ''}|schema:{_PROFILE_SCHEMA_VERSION}|budget:{_budget_store_mtime()}"
+    if name in ("risk_summary", "cost_summary"):
+        # Schema-Version in den ETag ziehen, damit eine Struktur-/Feldänderung am
+        # Payload (z. B. ein neues Feld) Browser-Caches invalidiert, auch wenn der
+        # Eingabe-Fingerprint unverändert bleibt.
+        extra = f"{extra or ''}|schema:{_SUMMARY_SCHEMA_VERSION}"
     return fingerprint_hash(payload, extra)
 
 
