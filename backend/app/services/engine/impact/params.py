@@ -349,6 +349,155 @@ IMPACT_PARAM_SPECS: list[dict] = [
                           "ergab rund 79,8 Mio. € (Bericht #95 §5, Beispiel-Block "
                           "schutzprogramme_berlin).",
      }},
+    # ── Hebel S157/S152: Voreinstellungen, Wächter und Kappung (Bericht #95 §5, Kapitel 7,
+    # Befunde 138, 139, 146, 148, 150, 151, 165; Entscheidungslog Nr. 45–50) ──
+    # Übernahme in die Parameterliste nach P1 (T-1606). Die sechs Werte wirken in diesem
+    # Stand noch nicht auf die Rechnung; der Anschluss an measure_service folgt in eigenen
+    # Paketen (T-1582). Bis dahin nicht editierbar, damit keine Überschreibung ins Leere
+    # läuft (wie ror_s157, T-1410).
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "s_gek", "value": 0.11,
+     "label": "S157: gekühlter Anteil der Heimplätze s_gek (Voreinstellung, wenn die Kommune "
+              "nichts eingibt)", "unit": "Anteil",
+     "source": "Abschätzung von KAP3 aus Care vor9 2026 [71] und Destatis, Zahl der Woche "
+               "27/2026 [72] (Bericht #95 §5, Block heat.s_gek)",
+     "source_detail": "11 % der Pflegeheime haben eine Klimaanlage (Umfrage Care vor9, "
+                      "12.08.2026, 140 Rückmeldungen, nicht repräsentativ [71]) × 1 = 0,11. Der "
+                      "Faktor 1 enthält zwei Setzungen von KAP3: Heime mit und ohne Klimaanlage "
+                      "sind gleich groß, alle Plätze eines Heims mit Klimaanlage sind gekühlt. "
+                      "Gilt für die ganze Kommune, unabhängig von der gezeichneten Fläche "
+                      "(Modellgrenze). Die Eingabe der Kommune ersetzt den Wert. Register "
+                      "95-S157-01.",
+     "source_refs": [],
+     "editable": False,
+     "evidence_derivation": {
+         "wert": "0,11 = 11 % der Pflegeheime mit Klimaanlage [71] × 1 (Setzungen von KAP3: "
+                 "gleich große Heime, alle Plätze gekühlt; Bericht #95 §5, Befund 138, "
+                 "Entscheidungslog Nr. 45).",
+         "band": "0,05–0,15: unten die Hälfte (Teilkühlung, Umfrage nicht repräsentativ [71]); "
+                 "oben 14,5 % der 2025 fertiggestellten Gebäude des Sozialwesens mit einer "
+                 "Anlage zur Kühlung [72], außen gerundet.",
+         "sensitivitaet": "S157 wirkt nur auf s_gek − 0,06, den Anteil über dem Stand der "
+                          "Kalibrierjahre (heat.s_gek_kalib). Berlin (Kette) bei der "
+                          "Voreinstellung 1,2 Mio. € je Jahr, über dieses Band 0–2,2 Mio. € "
+                          "(Bericht #95 §5, Entscheidungslog Nr. 50).",
+     }},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "s_gek_kalib", "value": 0.06,
+     "label": "S157: gekühlter Anteil der Heimplätze im Mittel der Kalibrierjahre 2012–2024",
+     "unit": "Anteil",
+     "source": "Abschätzung von KAP3 aus Care vor9 2026 [71] und Destatis, Zahl der Woche "
+               "27/2026 [72] (Bericht #95 §5, Block heat.s_gek_kalib)",
+     "source_detail": "Stand 2018 = 4,3 % + 3 × 0,67 % = 6,3 %, gerundet 0,06. Der Bestand der "
+                      "Heime wuchs wie der Anteil der Neubauten des Sozialwesens mit Kühlung, "
+                      "5,7 % (2015) zu 14,5 % (2025) [72]; heute 11 % [71], also Stand 2015 = "
+                      "11 % × 5,7 / 14,5 = 4,3 %, 0,67 Prozentpunkte je Jahr. Derselbe Trend gilt "
+                      "2012–2014 (Setzung von KAP3); das Mittel der Kalibrierjahre ist dann der "
+                      "Stand 2018. Steckt über c_kal im Basiswert; S157 wirkt auf "
+                      "max(s_gek − 0,06; 0). Register 95-S157-01.",
+     "source_refs": [],
+     "editable": False,
+     "evidence_derivation": {
+         "wert": "0,06: Stand 2018 = 4,3 % + 3 × 0,67 % = 6,3 % (gleichmäßiges Wachstum "
+                 "2015–2025 nach [72], heute 11 % [71]; Bericht #95 §5, Befund 165, "
+                 "Entscheidungslog Nr. 50). Bliebe der Stand vor 2015 bei 4,3 %, wäre das "
+                 "Mittel 6,6 % (im Band; Befund 170).",
+         "band": "0,04–0,09: unten Stand 2015 (11 % × 5,7 / 14,5 = 4,3 %), oben Stand 2022 "
+                 "(4,3 % + 7 × 0,67 % = 9,0 %; die heißen Sommer 2022–2024 prägen die "
+                 "Kalibrierung).",
+         "sensitivitaet": "Berlin (Kette), S157 bei der Voreinstellung s_gek = 0,11: über "
+                          "dieses Band 0,5–1,7 Mio. € je Jahr (Bericht #95 §5, "
+                          "Entscheidungslog Nr. 50).",
+     }},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "h_heim", "value": 0.344,
+     "label": "Anteil der Heimbewohner an den hitzebedingten Todesfällen ab 85 (h_Heim)",
+     "unit": "Anteil",
+     "source": "Berechnet aus q̄_pfl (Pflegestatistik 2023) und β_pfl (Fouillet 2006, Kette "
+               "Bericht #95 §3.3b) (Bericht #95 §5, Block heat.h_heim)",
+     "source_detail": "h_Heim = q̄_pfl × [1 + β_pfl × (1 − q̄_pfl)] = 0,149 × 2,31 = 0,344 "
+                      "für die Kommune. Je Zelle q_pfl,z × [1 + β_pfl (1 − q̄_pfl)] / "
+                      "[1 + β_pfl (q_pfl,z − q̄_pfl)]; 0,344 ist der Rückfallwert (Befund 146). "
+                      "Wirkt in S157, den Schutzprogrammen und den Kühlzentren. Register "
+                      "95-S153-01.",
+     "source_refs": ["Destatis_Pflegestatistik_2023", "Fouillet_2006_Frankreich"],
+     "editable": False,
+     "evidence_derivation": {
+         "wert": "0,344 = 0,149 × [1 + 1,54 × (1 − 0,149)] aus heat.qbar_pfl und heat.beta_pfl "
+                 "(Bericht #95 §5, Befund 146, Entscheidungslog Nr. 45).",
+         "band": "0,275–0,517 aus dem Band von heat.beta_pfl 1,0–2,9 (0,2758 und 0,5167), "
+                 "außen gerundet.",
+         "sensitivitaet": "h_Heim teilt die Todesfälle ab 85 zwischen S157 (Anteil h_Heim) und "
+                          "den Schutzprogrammen und Kühlzentren (Anteil 1 − h_Heim); die "
+                          "Summe der Todesfälle bleibt gleich (Bericht #95 §5).",
+     }},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "delta_kuehlzentren", "value": 0.9956,
+     "label": "Öffentliche Kühlzentren: Faktor δ_KZ auf den Hitze-Exzess der Todesfälle 75–84 "
+              "und 85+ ohne Heimbewohner", "unit": "Faktor",
+     "source": "Abschätzung von KAP3 aus Katz u. a. 2026 [46] und Meade u. a. 2023 [73], "
+               "plausibilisiert an Bouchama u. a. 2007 [41] (Bericht #95 §5, Block "
+               "heat.delta_kuehlzentren)",
+     "source_detail": "δ_KZ = 1 − r_KZ × w_KZ = 1 − 0,05 × 0,71 × 3/24 = 0,9956. w_KZ = "
+                      "(1 − g_S157) × t_KZ: 71 % Wirkung im gekühlten Raum [46] für 2 h "
+                      "Aufenthalt und 1 h Nachwirkung [73] von 24 h. r_KZ = 5 % ist eine "
+                      "Setzung von KAP3 (ein Viertel von r_VG). Plausibel gegen [41]: Besuch "
+                      "kühler Orte OR 0,34, fünf- bis zehnfach überschätzt (Log 10). Wirkt auf "
+                      "D_75–84 + D_85+ × (1 − h_Heim); mit δ_HAP und δ_VG zusammen "
+                      "max(Produkt; 0,794). Register 95-S157-02.",
+     "source_refs": ["Katz_2026_Klimaanlagen_Pflegeheime", "Bouchama_2007_Meta"],
+     "editable": False,
+     "evidence_derivation": {
+         "wert": "0,9956 = 1 − 0,05 × 0,71 × 3/24: Reichweite 5 % (Setzung von KAP3), Wirkung "
+                 "im gekühlten Raum 0,71 [46], geschützter Anteil des Tages 3/24 [73] "
+                 "(Bericht #95 §5, Befunde 139, 148, Entscheidungslog Nr. 46).",
+         "band": "0,982–0,9994: r_KZ 0,01–0,10 und t_KZ 2/24–6/24, also 1 − 0,10 × 0,71 × 6/24 "
+                 "= 0,98225 bis 1 − 0,01 × 0,71 × 2/24 = 0,99941.",
+         "sensitivitaet": "Berlin (Kette) 0,75 Mio. € je Jahr, Band 0,1–3,0 Mio. €; stärkster "
+                          "Treiber ist die Reichweite (0,15–1,50 Mio. € über 1–10 %) (Bericht "
+                          "#95 §5, Entscheidungslog Nr. 46).",
+     }},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "vg_in_kalibrierjahren", "value": 0,
+     "label": "Doppelzählungs-Wächter: Lief das Programm schon 2012–2024? (0 = nein, 1 = ja; "
+              "Voreinstellung)", "unit": "ja/nein",
+     "source": "Abschätzung von KAP3 aus LZG.NRW 2024 [76] (Bericht #95 §5, Block "
+               "heat.vg_in_kalibrierjahren)",
+     "source_detail": "Voreinstellung „nein“ (0): Das Programm lief nicht schon in den "
+                      "Kalibrierjahren. Bundesweit gab es am 10.06.2024 18 veröffentlichte "
+                      "kommunale Hitzeaktionspläne, in Nordrhein-Westfalen lag im Oktober 2023 "
+                      "in 4 von 53 Kreisen und kreisfreien Städten einer vor [76]. Bei „ja“ gilt "
+                      "δ_VG = δ_VG,morb = 1 (Schutzprogramme) bzw. δ_KZ = 1 (Kühlzentren), je "
+                      "Maßnahme eine eigene Frage; die Eingabe der Kommune ersetzt den Wert. "
+                      "Register 95-S152-03.",
+     "source_refs": [],
+     "editable": False,
+     "evidence_derivation": {
+         "wert": "0 („nein“): 4 von 53 Kreisen und kreisfreien Städten in NRW, 7,5 % [76]; "
+                 "solche Programme waren in den Kalibrierjahren selten (Bericht #95 §5, "
+                 "Befund 150, Entscheidungslog Nr. 47).",
+         "band": "0–1: nein oder ja.",
+         "sensitivitaet": "Erwarteter Fehler auf Berliner Größe mit „nein“ höchstens 7,5 % × "
+                          "11,7 = 0,9 Mio. € je Jahr, mit „ja“ mindestens 92,5 % × 11,7 = "
+                          "10,8 Mio. € (Bericht #95 §5, Entscheidungslog Nr. 47).",
+     }},
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "kappung_vg", "value": 0.794,
+     "label": "Kappung der Hebel auf die Todesfälle 75+: Untergrenze des Produkts "
+              "δ_HAP × δ_VG × δ_KZ", "unit": "Faktor",
+     "source": "Abschätzung von KAP3 aus Urban u. a. 2025 [47], Tabelle 1 (Bericht #95 §5, "
+               "Block heat.kappung_vg)",
+     "source_detail": "0,794 = 1 − 0,206: Hitzeschutzpläne senken den hitzebedingten Anteil "
+                      "der Sterbefälle in Deutschland um 20,6 % ([47] Tabelle 1). Setzung von "
+                      "KAP3 (Log 40, Log 48): Der Paketwert für alle Altersgruppen begrenzt die "
+                      "Hebel auf D_75–84 + D_85+ × (1 − h_Heim): max(δ_HAP × δ_VG × δ_KZ; "
+                      "0,794). Zugleich unteres Bandende von heat.delta_vg. Register "
+                      "95-S152-03.",
+     "source_refs": ["Urban_HHAP_Wirksamkeit_2025"],
+     "editable": False,
+     "evidence_derivation": {
+         "wert": "0,794 = 1 − 0,206 aus [47] Tabelle 1 (Paketwert Deutschland; Bericht #95 §5, "
+                 "Befund 151, Entscheidungslog Nr. 48).",
+         "band": "0,743–0,842 aus dem Intervall 15,8–25,7 % derselben Zeile: 1 − 0,257 bis "
+                 "1 − 0,158.",
+         "sensitivitaet": "Greift bei δ_HAP 0,85 (0,791) und bei Reichweite und Wirkung am "
+                          "oberen Ende. Berlin dort 34,9 Mio. € je Jahr, Band 26,8–43,6 Mio. €, "
+                          "ohne Kappung 46,1 Mio. € (Bericht #95 §5).",
+     }},
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "beta_dist_km", "value": 0.0,
      "label": "Distanz-Effekt (Sensitivität)", "unit": "1/km",
      "source": "Nicholl u. a. 2007 (Sensitivitätsband, Basiswert 0)",
@@ -1493,6 +1642,12 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
     ("EXPECTED_ANNUAL_MORTALITY", "g_s157"): "heat.g_s157",
     ("EXPECTED_ANNUAL_MORTALITY", "delta_vg"): "heat.delta_vg",
     ("EXPECTED_ANNUAL_MORTALITY", "anteil_60_66_ab65"): "heat.anteil_60_66",
+    ("EXPECTED_ANNUAL_MORTALITY", "s_gek"): "heat.s_gek",
+    ("EXPECTED_ANNUAL_MORTALITY", "s_gek_kalib"): "heat.s_gek_kalib",
+    ("EXPECTED_ANNUAL_MORTALITY", "h_heim"): "heat.h_heim",
+    ("EXPECTED_ANNUAL_MORTALITY", "delta_kuehlzentren"): "heat.delta_kuehlzentren",
+    ("EXPECTED_ANNUAL_MORTALITY", "vg_in_kalibrierjahren"): "heat.vg_in_kalibrierjahren",
+    ("EXPECTED_ANNUAL_MORTALITY", "kappung_vg"): "heat.kappung_vg",
     **{("EXPECTED_ANNUAL_MORBIDITY", f"r0_{a}"): "heat.r0_einweisungsrate"
        for a in ("u65", "a65_74", "a75_84", "a85p")},
     ("EXPECTED_ANNUAL_MORBIDITY", "excess_per_hotday"): "heat.e_hd",
@@ -1501,8 +1656,9 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
 }
 # Kennzeichnung je Block nach Kapitel 7 (Feld ``kennzeichnung``), übersetzt in die
 # Evidenzklasse der Parameterliste (P1): quelle → belegt, abschaetzung_kap3 →
-# abgeschaetzt, berechnet → berechnet. 10 × belegt, 12 × abgeschaetzt, 2 × berechnet
-# (Runde 31: heat.beta_iso steht auf quelle, heat.anteil_60_66 ist neu).
+# abgeschaetzt, berechnet → berechnet. 10 × belegt, 17 × abgeschaetzt, 3 × berechnet
+# (Runde 31: heat.beta_iso steht auf quelle, heat.anteil_60_66 ist neu; T-1606: die sechs
+# Blöcke der Hebel S157/S152 aus T-1537, T-1538 und T-1584, fünf abgeschätzt, h_heim berechnet).
 # Die Klasse der drei Katalog-Blöcke (heat.voly, heat.c_fall, heat.delta_hap) steht
 # in data/catalog.py. Geprüft in tests/test_methodik_95_kennzeichnung.py.
 _HEAT_KLASSE: dict[str, str] = {
@@ -1523,6 +1679,12 @@ _HEAT_KLASSE: dict[str, str] = {
     "heat.g_s157": "abgeschaetzt",
     "heat.delta_vg": "abgeschaetzt",
     "heat.anteil_60_66": "abgeschaetzt",
+    "heat.s_gek": "abgeschaetzt",
+    "heat.s_gek_kalib": "abgeschaetzt",
+    "heat.h_heim": "berechnet",
+    "heat.delta_kuehlzentren": "abgeschaetzt",
+    "heat.vg_in_kalibrierjahren": "abgeschaetzt",
+    "heat.kappung_vg": "abgeschaetzt",
     "heat.delta_vg_morb": "abgeschaetzt",
     "heat.r0_einweisungsrate": "abgeschaetzt",
     "heat.e_hd": "belegt",
