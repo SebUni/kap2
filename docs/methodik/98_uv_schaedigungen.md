@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–434) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–437) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -44,14 +44,14 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Zellen summiert — §3.4 „Kalibriermodell = Produktionsmodell" (Befund 223);
 > (2) \(\bar L_e\) wird über die **Jahres**mediane des Ankerfensters gerechnet
 > statt über das Sterbealter des Einzeljahrs 2023 (Befund 224). Dadurch ändern
-> sich alle Bundessummen: € 367 → **401 Mio**, YLL 1.521 → **1.664**.
+> sich alle Bundessummen: 367 → **401 Mio. €**, YLL 1.521 → **1.664**.
 > **Rev. 4 (01.09.2026)** = Review-Runde 6 (Befunde 230–237). Modellrelevant ist
 > **eine** Änderung (Entscheidungslog Nr. 23): \(k_{\text{UV}}\) wird mit einem
 > **ortsgleichen** Nenner hergeleitet — dem Raster-SSD-Trend an der Dortmunder
 > Messzelle (6,48 %/Dek.) statt dem NRW-Gebietsmittel (5,81 %/Dek.) ⇒
 > **0,7562 statt 0,8434**. Zugleich ist der Quellen-Widerspruch benannt, den Rev. 3
 > übersehen hatte: Der Stations-SSD-Trend 11,3 %/Dek. ist **belegt** (Abstract von
-> [31]) und nicht, wie fünfmal behauptet, unbelegt. Wirkung: € 401 → **360 Mio**,
+> [31]) und nicht, wie fünfmal behauptet, unbelegt. Wirkung: 401 → **360 Mio. €**,
 > YLL 1.664 → **1.492**.
 > **Rev. 5 (01.09.2026)** = Review-Runde 7 (Befunde 238–244). Modellrelevant ist
 > wieder \(k_{\text{UV}}\) (Entscheidungslog Nr. 24): Rev. 4 hatte den **Nenner**
@@ -60,14 +60,14 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Station: SSD 0,57, Globalstrahlung 0,76). Die Globalstrahlung liegt in beiden
 > Familien vor und trägt jetzt die Übersetzung ⇒ \(k_{\text{UV}}\) = **0,5782**;
 > beide Bandstützen sind gerechnet (**0,4336–0,6667** statt 0,4336–1,0, Befund 239).
-> Wirkung: € 360 → **275 Mio**, YLL 1.492 → **1.141**.
+> Wirkung: 360 → **275 Mio. €**, YLL 1.492 → **1.141**.
 > **Rev. 6 (01.09.2026)** = Review-Runde 8 (Befunde 245–251). Modellrelevant ist
 > Entscheidungslog Nr. 25: Der Stationsquotient Dosis/Globalstrahlung ist in [31]
 > **beziffert** (»Global radiation increases similarly to the UV data«) und war in
 > Rev. 5 fälschlich aus einer Relationsangabe geschätzt worden ⇒ k_UV = **0,6667**.
 > Das Band kommt jetzt aus der **räumlichen Streuung** über acht Standorte
 > (**0,3656–0,9187**) statt aus zwei Skalen-Grenzfällen — das ist die dominierende
-> Unsicherheit. Wirkung: € 275 → **317 Mio**, YLL 1.141 → **1.315**.
+> Unsicherheit. Wirkung: 275 → **317 Mio. €**, YLL 1.141 → **1.315**.
 > **Rev. 7 (01.09.2026)** = Review-Runde 9 (Befunde 252–263). Der **Volltext** von
 > [31] liegt seit 01.09.2026 vor (Open Access) und löst die beiden offenen
 > A-Befunde: Der Stationsquotient ist in Tab. 2/Tab. 4 **beziffert** (4,9/4,6 =
@@ -75,18 +75,18 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Bochum**, nicht aus Dortmund. Der Rasterquotient war dort **bevölkerungsgewichtet**
 > (0,6323) ⇒ \(k_{\text{UV}}\) = **0,6735**; das Band kam erstmals aus den
 > **publizierten Standardfehlern**, die räumliche Streuung wurde zur
-> **Modellgrenze 9** (Befunde 255/256). Wirkung: € 317 → **320 Mio**.
+> **Modellgrenze 9** (Befunde 255/256). Wirkung: 317 → **320 Mio. €**.
 > **Rev. 8 (01.09.2026)** = Review-Runde 10 (Befunde 264–273). Modellrelevant ist
 > Entscheidungslog Nr. 27: Der bevölkerungsgewichtete Rasterquotient war mit dem
 > **SSD-Trend 1997–2022** gewichtet, das Produktionsmodell multipliziert
 > \(k_{\text{UV}}\) aber mit der **Normalperioden-ΔSSD**; beide Felder korrelieren
 > nur mit r = 0,24. Mit dem richtigen Gewicht: q = **0,6774** statt 0,6320 ⇒
-> \(k_{\text{UV}}\) = **0,7216**. Wirkung: € 320 → **343 Mio**. Zusätzlich ist der
+> \(k_{\text{UV}}\) = **0,7216**. Wirkung: 320 → **343 Mio. €**. Zusätzlich ist der
 > Lint `backend/scripts/lint_methodik.py` gebaut, der Revisionsrückstände und
 > Bericht-⇄-Registry-Divergenzen maschinell abfängt (Befunde 248/258/264).
 > **Rev. 9 (01.09.2026)** = Review-Runde 11 (Befunde 274–282). Zwei Punkte:
 > (1) Der Rasterquotient wird jetzt mit **Baseline-Fällen** statt Köpfen gewichtet
-> (Befund 278) ⇒ q = **0,6843**, \(k_{\text{UV}}\) = **0,7289**, € **347 Mio**.
+> (Befund 278) ⇒ q = **0,6843**, \(k_{\text{UV}}\) = **0,7289**, **347 Mio. €**.
 > (2) Die Runde hat aufgedeckt, dass in Rev. 8 acht Befunde als „übernommen“
 > geschlossen waren, ohne umgesetzt zu sein — Ursache waren Ersetzungsskripte, deren
 > Fehlschläge ich nicht geprüft habe. Der Lint ist entsprechend verschärft: Er sieht
@@ -106,10 +106,10 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > **gewichtetes Mittel der Punktquotienten** — damit schlagen 57 Punkte mit
 > verschwindendem SSD-Trend (q bis 196) voll durch und hoben den Bundeswert um
 > 2,3 %. Sie sind jetzt ausgeschlossen, die **Aggregationsregel** ist dokumentiert
-> (§3.9) ⇒ q = **0,6683**, \(k_{\text{UV}}\) = **0,7119**, € **339 Mio**.
+> (§3.9) ⇒ q = **0,6683**, \(k_{\text{UV}}\) = **0,7119**, **339 Mio. €**.
 > **Rev. 12 (01.09.2026)** = Review-Runde 14 (Befunde 302–318). Keine
 > Modelländerung; abgearbeitet wurden Rückstände, Kennzeichnungen und
-> Lint-Lücken. \(k_{\text{UV}}\) unverändert **0,7119**, € **339 Mio**.
+> Lint-Lücken. \(k_{\text{UV}}\) unverändert **0,7119**, **339 Mio. €**.
 >
 > **Rev. 13 (02.09.2026)** = Review-Runde 15 (Befunde 319–335). Keine
 > Modelländerung. **Diese Fassung ist bei einem Werkzeugfehler verloren gegangen**
@@ -120,7 +120,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 >
 > **Rev. 14 (04.09.2026)** = Review-Runden 16 bis 23 (Befunde 336–421). Keine
 > Modelländerung — \(k_{\text{UV}}\) **0,7119**, ΔDosis **4,54 %**, YLL **1.404**,
-> € **339 Mio** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
+> **339 Mio. €** stehen seit Rev. 11 unverändert und wurden in **jeder** seither
 > gefahrenen Review-Runde unabhängig nachgerechnet. **Eine Zählung steht hier bewusst nicht** (Befunde 400/407/416/427): Die Belege der Nachrechnungen führt das Ledger.
 > Neu ist der **Rechenschritt kumulative → jährliche Dosis** in §3.4
 > (Gleichgewichtslesart mit Transient-Faktor \(\tau\) = 0,20–0,48, jetzt größte
@@ -198,8 +198,8 @@ Basiswert nicht enthalten.
 **(b) Zustand „mit Anpassung".** Einen KWRA-Wert „mit Anpassung" oder ein Restrisiko weist der Bericht
 nicht aus; beziffert ist die Wirkung eines der beiden Maßnahmen-Hebel (§5). **UV-Schutz im öffentlichen Raum
 mit Kommunikation (S155)** ist eine Abschätzung von KAP3: Er senkt die Dosis um 1,8 % (Band 0,5–4,5 %) und
-damit den Betrag für Berlin nach vollem Einlauf um 252.500 € je Jahr (Band 70.100–631.200 €, Preisstand
-2024), das sind 2,2 % des Basiswerts. Die Wirkung läuft über Jahrzehnte ein: nach 10, 20 und 30 Jahren
+damit den Betrag für Berlin nach vollem Einlauf um 252.500 € (Preisstand 2024) je Jahr (Band
+70.100–631.200 €), das sind 2,2 % des Basiswerts. Die Wirkung läuft über Jahrzehnte ein: nach 10, 20 und 30 Jahren
 werden 34.700, 69.400 und 104.000 € angerechnet. **Förderung der Früherkennung (S158)** bekommt keine eigene
 Zahl, weil der Basiswert die günstigeren Kostensätze früh erkannter Fälle schon für alle Fälle ansetzt; im
 Produkt steht dafür der Vermerk „Kostenwirkung im Basiswert voll angerechnet“, keine Nullwirkung. Der
@@ -213,6 +213,42 @@ Ende des Jahrhunderts **mittel** (optimistisch) und **hoch** (pessimistisch). Fu
 („Risiko o. Anp. – Gegenwart" bis „Risiko o. Anp. – Ende pessim."). Der Basiswert dieses Berichts
 gehört zur Zeitscheibe Gegenwart, weil er das Ist-Klima ausweist (Normalperiode 1991–2020 gegen
 1961–1990, §6).
+
+**(d) KWRA-Gewissheit je Zeitscheibe.** Die KWRA bewertet, wie sicher ihre Einstufung ist, nur für
+die beiden Zukunfts-Zeitscheiben:
+
+| Zeitscheibe (KWRA) | Gewissheit | Fundstelle |
+|---|---|---|
+| Gegenwart | nicht ausgewiesen | Mappe ohne Spalte dafür; TB6 bewertet nur Mitte und Ende [76] |
+| Mitte des Jahrhunderts (2031–2060) | **mittel** | `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt „Klimawirkungen", Zeile 100 (ID 98), Spalte S („Gewissheit – Mitte") |
+| Ende des Jahrhunderts (2071–2100) | **sehr gering** | dieselbe Zeile, Spalte T („Gewissheit – Ende"); KWRA 2021, Teilbericht 6, Kapitel 3.3, S. 78 [76] |
+
+Teilbericht 6 nennt „UV-bedingte Gesundheitsschädigungen" auf S. 78 ausdrücklich unter den sieben
+Klimawirkungen, deren Klimarisiko zum Ende des Jahrhunderts „nur mit einer Gewissheit von sehr gering
+bewertet" wurde, und vermutet als Grund, dass sie „komplexe Systeme betreffen und vergleichsweise gering
+erforscht sind" [76]. Die Skala hat vier Stufen („sehr gering", „gering", „mittel", „hoch"); bewertet
+werden das Vorhandensein und die Zuverlässigkeit von Daten, die Kenntnis der Wirkzusammenhänge, die
+Plausibilität der Modellannahmen und die Eindeutigkeit von Trends (ebd.).
+
+**Warum die eigene Quellenlage davon abweicht.** Das Produkt führt #98 bei der Quellenlage auf „hoch",
+weil jeder Parameter dieses Berichts eine Quelle oder eine ausgewiesene Abschätzung mit Herleitung hat
+(Kapitel 7). Das misst etwas anderes als die KWRA-Gewissheit, und keine der beiden Angaben wird der
+anderen angepasst:
+
+- **Die KWRA-Gewissheit** sagt, wie sicher die Einstufung eines *künftigen* Risikos ist. Für 2071–2100
+  hängt sie an der Projektion von Bewölkung und Ozon, am künftigen Freizeit- und Schutzverhalten und an
+  Latenzen von Jahrzehnten zwischen Dosis und Erkrankung. Das ist wenig erforscht, daher „sehr gering".
+- **Die Quellenlage dieses Berichts** sagt, wie gut der Basiswert der *Gegenwart* belegt ist: gemessene
+  Sonnenscheindauer (DWD), amtliche Inzidenz (ZfKD), publizierte Verstärkungsfaktoren und Kostensätze.
+  Eine Zukunftsprojektion rechnet der Basiswert nicht (§6); die Zukunfts-Zeitscheiben der KWRA betrifft
+  er deshalb nicht.
+- **Wo die Unsicherheit des Basiswerts steckt**, zeigen die Bänder in §4 (Tornado): einseitig der
+  Transient-Faktor \(\tau\) (bis −80 %), zweiseitig die Übersetzung von Sonnenschein in UV-Dosis
+  \(k_{\text{UV}}\) (±49 %), danach der Klimaanteil \(a_{\text{attr}}\) (±33,3 %, eine Abschätzung von
+  KAP3). Belegt heißt also nicht genau; die Quellenlage „hoch" ersetzt die Bänder nicht.
+
+Wie das Produkt beide Größen für alle Klimawirkungen nebeneinander zeigt, legt eine übergreifende Regel
+fest (T-1110), nicht dieser Bericht.
 
 ## 2 Evidenz-Register (§2.2)
 
@@ -240,7 +276,7 @@ Nur Zeilen mit Entscheidung **Basiswert** kommen in den Formeln (§3) vor.
 28). Teil-Ausweise unter der KWRA-Klammer: klimaattribuierte Zusatzfälle \(\Delta F_e\)
 (je Entität), €.
 
-**Gemeinsamer Preisstand aller Kostensätze dieses Berichts: €2024**; Umrechnungsfaktoren je
+**Gemeinsamer Preisstand aller Kostensätze dieses Berichts: 2024**; Umrechnungsfaktoren je
 Satz in der Zeichentabelle (Destatis-VPI, 2020 = 100: 2015 = 94,5 · 2024 = 119,3 [19]).
 
 ### 3.0 Rechenkette
@@ -619,7 +655,7 @@ der Formel — die Tabellenwerte sind Rohwerte, Befund 201):**
 240.973/243.158 = **0,9910** — damit reproduziert die Bundes-Baseline den
 ZfKD-Anker 2021–2023 auf der Bezugspopulation der Normierung. Ablese-Toleranz
 (vorab fixiert): ±15 % vor Normierung — **bestanden** (−0,1 % / +0,9 %; Rev. 1 gegen
-das Einzeljahr 2023: −2,2 % / +0,1 %). Rechenweg reproduzierbar in der Anlage
+das Einzeljahr 2023: −2,2 % / +0,1 %). Rechnung reproduzierbar in der Anlage
 `backend/scripts/kalibrierung/kid2025_baseline.py` [71].
 
 **Bezugspopulation der Normierung — gekennzeichnete Näherung (§3.9; Befund 226;
@@ -1502,6 +1538,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: berechnet   # eigene reproduzierbare Auswertung amtlicher Rohdaten (DWD-Raster x VG250 x Zensus 2022), Anlage [72]
+  abgeleitet_aus: [dwd_cdc_ssd_raster_x_vg250_x_zensus2022]
 parameter:
   id: uv.k_uv
   wert: 0.7119
@@ -1531,6 +1569,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: berechnet   # = Stationsquotient 4,9/4,6 aus [31] x Rasterquotient 0,6683 aus eigener Rasterauswertung [73], gewichtet mit uv.ssd_delta_region; beide Quotienten ohne eigenen Block (Log 36)
+  abgeleitet_aus: [lorenz2024_dwd_ssd_trend, dwd_cdc_ssd_raster_x_vg250_x_zensus2022, uv.ssd_delta_region]
 parameter:
   id: uv.a_attr
   wert: 0.75
@@ -1541,6 +1581,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: abschaetzung_kap3   # Einordnung von KAP3 nach [31], Band 0,5-1,0 (§3.2, GP-Befund 15)
+  abgeleitet_aus: []
 parameter:
   id: uv.baf
   wert: {mm: 0.6, c44: 1.675}
@@ -1551,6 +1593,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: berechnet   # MM 0,6 sowie SCC 2,5 und BCC 1,4 aus [29,30]; C44 = 0,75 x 1,4 + 0,25 x 2,5 = 1,675 (§3.1)
+  abgeleitet_aus: [uv.w_scc, slaper1996_rivm2023_madronich2021]
 parameter:
   id: uv.w_scc
   wert: 0.25
@@ -1561,6 +1605,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: quelle   # KID 2025 [27], C44-Kapitel: etwa ein Viertel Plattenepithelkarzinome
+  abgeleitet_aus: []
 parameter:
   id: uv.i_raten_roh
   wert: {mm: {u20: 0.5, 20-64: 24.7, 65-74: 64.0, 75-84: 94.9, 85+: 88.5},
@@ -1575,6 +1621,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: quelle   # Ablesewerte KID 2025 [27], Abb. 3.13.2 und 3.14.2
+  abgeleitet_aus: []
 parameter:
   id: uv.lambda
   wert: {mm: 0.11466, c44: 0.005236}
@@ -1586,6 +1634,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: berechnet   # Sterbefaelle / Neuerkrankungen im Ankerfenster 2021-2023, eigene Auswertung der ZfKD-Zahlen [27]
+  abgeleitet_aus: [zfkd_kid2025]
 parameter:
   id: uv.l_rest
   wert: {mm: 10.4569, c44: 5.4787}
@@ -1600,6 +1650,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: berechnet   # Restlebenserwartung am medianen Sterbealter, sterbefallgewichtet ueber Jahre und Geschlechter [27] x Sterbetafel
+  abgeleitet_aus: [zfkd_kid2025_sterbetafel2224]
 parameter:
   id: uv.c_fall
   wert: {mm: 6724, c44: 5883}
@@ -1610,6 +1662,8 @@ parameter:
   preisstand: "2024"
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
+  kennzeichnung: abschaetzung_kap3   # Proxy (§3.4): Zahlen aus Speckemeier 2022, auf Preisstand 2024 umgerechnet; Einsatz als Fallkosten von KAP3 (Gesamt- statt inkrementelle Kosten, nur Erstjahr)
+  abgeleitet_aus: []
 parameter:
   id: uv.voly
   wert: 160800
@@ -1620,6 +1674,8 @@ parameter:
   preisstand: "2024"
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
+  kennzeichnung: abschaetzung_kap3   # wie heat.voly in #95: Ausgangswert Amann 2020a, Elastizitaet 0,85 beim Raumtransfer Setzung von KAP3
+  abgeleitet_aus: []
 parameter:
   id: uv.c_kal
   wert: {mm: 1.0012, c44: 0.9910}
@@ -1633,6 +1689,9 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: berechnet   # = ZfKD-Anker (Mittel 2021-2023) / Modellsumme der Rohraten (§3.3)
+  abgeleitet_aus: [uv.i_raten_roh, zfkd_kid2025]
+  rolle: kalibrierung
 parameter:
   id: uv.r_out_sensitivitaet
   wert: 1.0
@@ -1651,6 +1710,9 @@ parameter:
                                               # Erwerbstaetigen-Anteil (Befund 218). Fuer 65+
                                               # gekennzeichnete Kohorten-Approximation.
   endpunkt: beide
+  kennzeichnung: abschaetzung_kap3   # Wert 1 exakt per Konstruktion; Bandgrenze q_out = 0,21 ist Abschaetzung von KAP3; Ebene geparkt
+  abgeleitet_aus: []
+  rolle: sensitivitaet
 # Kein-Doppelkanal (§3.2): v_verh ist KEIN eigener Parameter, sondern wird aus den
 # beiden unabhaengigen Groessen s (Tageswert) und phi (Komforttag-Anteil) gerechnet:
 # v_verh = 1 + phi*(s-1); bei geparkter phi-Ebene exakt 1 (Befund 216).
@@ -1666,6 +1728,9 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: abschaetzung_kap3   # zusammengesetzt von KAP3 aus [Graff Zivin/Neidell 2014] (+1,2 min/degC) und Delta T 10 degC; Ebene geparkt
+  abgeleitet_aus: []
+  rolle: sensitivitaet
 parameter:
   id: uv.phi_komfort
   wert: 0.0
@@ -1679,6 +1744,9 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: abschaetzung_kap3   # Neutralwert 0 (Ebene geparkt), Obergrenze 0,25 Abschaetzung von KAP3
+  abgeleitet_aus: []
+  rolle: sensitivitaet
 
 parameter:
   id: uv.i_mm
@@ -1694,6 +1762,8 @@ parameter:
                # die Ableseunsicherheit wirkt ueber die Struktur-Validierung,
                # nicht als eigenes Ergebnisband (Befund 373)
   endpunkt: beide
+  kennzeichnung: quelle   # KID 2025 [27], Abb. 3.13.2
+  abgeleitet_aus: []
 
 parameter:
   id: uv.i_c44
@@ -1706,6 +1776,8 @@ parameter:
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: beide
+  kennzeichnung: quelle   # KID 2025 [27], Abb. 3.14.2
+  abgeleitet_aus: []
 
 parameter:
   id: uv.or_out
@@ -1718,6 +1790,9 @@ parameter:
   bandzuordnung: [20-64, 65-74, 75-84, 85+]   # Aussenberufe: nicht u20
                # (Befunde 218/373); wirkt nur ueber r_out, nicht im Basiswert (§3.4)
   endpunkt: beide
+  kennzeichnung: quelle   # Meta-Analyse Schmitt 2011, 95-%-KI; wirkt nur ueber die geparkte r_out-Ebene
+  abgeleitet_aus: []
+  rolle: sensitivitaet
 
 parameter:
   id: uv.qbar_out
@@ -1730,6 +1805,9 @@ parameter:
   preisstand: null
   bandzuordnung: [20-64, 65-74, 75-84, 85+]   # nicht u20 (Befund 218)
   endpunkt: beide
+  kennzeichnung: abschaetzung_kap3   # Wert 0,07 aus Destatis-VGR [70] gerechnet; Obergrenze 0,21 (3x Bundesanteil) Abschaetzung von KAP3
+  abgeleitet_aus: []
+  rolle: sensitivitaet
 
 parameter:
   id: uv.r_out_enabled
@@ -1743,6 +1821,9 @@ parameter:
   preisstand: null
   bandzuordnung: [20-64, 65-74, 75-84, 85+]   # nicht u20 (Befund 218)
   endpunkt: beide
+  kennzeichnung: abschaetzung_kap3   # Schalter, Setzung von KAP3: 0 solange keine kommunale Aussenberufs-Quote vorliegt
+  abgeleitet_aus: []
+  rolle: sensitivitaet
 
 parameter:
   id: uv.s155_dosisminderung
@@ -1782,7 +1863,7 @@ parameter:
 ```
 
 
-## 8 Quellen (§3.8 — #98-relevanter Auszug; Nummern = M0-Zählung, [69]–[75] neu)
+## 8 Quellen (§3.8 — #98-relevanter Auszug; Nummern = M0-Zählung, [69]–[76] neu)
 
 Zugriff 17./18.08.2026 ([27], [31], [34], [43], [70]: 30.08.2026 primär
 verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Integration).
@@ -1960,6 +2041,16 @@ verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Inte
   https://web.archive.org/web/20260926002751/https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Bevoelkerungsstand/Publikationen/Downloads-Bevoelkerungsstand/statistischer-bericht-bevoelkerungsfortschreibung-zensus-2022-jaehrlich-5124108237005.xlsx?__blob=publicationFile. Altersjahre zu den Bändern aus §3.3 summiert:
   Frauen 1.865.972, Männer 1.796.409, zusammen 3.662.381 (Ebene 1 der Rechenkette, §3.0). Derselbe
   Bericht wie in [48] (dort Tab. 12411-06).
+- **[76]** W. Kahlenborn, L. Porst, M. Voß, L. Hölscher, S. Undorf, M. Wolf, K. Schönthaler,
+  A. Crespi, K. Renner, M. Zebisch, U. Fritsch, I. Schauser, „Klimawirkungs- und Risikoanalyse 2021
+  für Deutschland — Teilbericht 6: Integrierte Auswertung – Klimarisiken, Handlungserfordernisse und
+  Forschungsbedarfe", Umweltbundesamt, Climate Change 25/2021, Dessau-Roßlau, Juni 2021
+  (Publikationsseite https://www.umweltbundesamt.de/publikationen/KWRA-Teil-6-Integrierte-Auswertung;
+  PDF https://www.umweltbundesamt.de/sites/default/files/medien/479/publikationen/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf;
+  im Repo `docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`, gelesen 27.09.2026).
+  Verwendet: Kapitel 3.3, S. 78 (vierstufige Gewissheitsskala, Teilaspekte der Bewertung,
+  „UV-bedingte Gesundheitsschädigungen" unter den sieben Klimawirkungen mit Gewissheit „sehr gering"
+  zum Ende des Jahrhunderts). Zitat wie #95 [68]; Kapitel 1 (d).
 
 ## Entscheidungslog
 
@@ -1979,6 +2070,7 @@ Entscheidungsregeln W1–W6 aus `.claude/methodik-loop.md` zitiert).
 **Einträge 30–32: Rev.-14-Entscheidungen** (Revision nach Review-Runde 23, Gate 1,
 04.09.2026; W-Regeln aus `.claude/methodik-loop.md` zitiert).
 **Einträge 33–35: Fortschreibung 7, Schritt 3** (Ticket T-1499, Vorgabe P2 für S155 und S158, 27.09.2026).
+**Eintrag 36: Fortschreibung 7, Schritt 4** (Ticket T-1500, Kennzeichnung der Parameter-Blöcke, 27.09.2026).
 **Familie und verworfene Ansätze (bis Fortschreibung 7 eigenes Kapitel 9):** #98 ist Folge-Risiko der
 Familie „K1-Gesundheit bottom-up" (Prototyp #95; der vollständige Ansatz-Vergleich für #98 steht in M0
 Rev. 5 Kap. 4/5). 98-B, die reine Dosis-Wirkungs-Kette über eine BfS- oder Satelliten-UV-Klimatologie,
@@ -2026,4 +2118,5 @@ Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 | 33 ⚠ | Hebel S155: abschätzen oder verwerfen, und wo wirkt er in der Formel? | **Abschätzung von KAP3** \(h_{\text{S155}}\) = 0,30 × 0,60 × 0,10 = **0,018** (Band 0,005–0,045); Wirkungsort \(F_e\) in der §3.4-Formel, \(\Delta\text{Dosis}\) bleibt gleich; Teil-Ausweis neben dem Basiswert (Befund 432; ersetzt für S155 Nr. 12) | Vorgabe P2 geht der §3.5-Regel vor; die drei Faktoren sind einzeln erklärbar und begrenzt, und Schatten senkt jede Dosis um denselben Anteil, nicht nur den Klimazuwachs | (a) Verwerfen mit Vermerk — verworfen, weil eine begründete Abschätzung möglich ist; (b) Wirkungsort \(v_{\text{verh}}\) oder \(\Delta\text{Dosis}\) — verworfen, weil das nur den Klimazuwachs mindern würde, obwohl die relative Erhöhung gleich bleibt | Berlin nach vollem Einlauf −252.500 € je Jahr (70.100–631.200 €, 2,2 % des Basiswerts); Basiswert unverändert |
 | 34 | Hebel S158: abschätzen oder verwerfen? | **Keine eigene Abschätzung**; im Produkt der Vermerk „Kostenwirkung im Basiswert voll angerechnet“ statt einer Nullwirkung; keine Latenz, weil eine Wirkung auf heutige Fälle sofort einsetzt (Befund 433; ersetzt für S158 Nr. 12) | Eine Abschätzung für S158 ist nicht möglich, weil der Basiswert die günstigeren SCS-Kostensätze schon für alle Fälle ansetzt, ein Hebel auf \(c_e\) also doppelt zählte (LF 4) und für die Letalität keine Effektgröße vorliegt, und trotzdem bleibt im Produkt keine Nullwirkung stehen, weil diese Kostenwirkung im Basiswert voll angerechnet ist und dort als Vermerk ausgewiesen wird. | (a) Detektionsmix-Parameter sofort einführen — verworfen, weil kommunale SCS-Quoten fehlen und er den Basiswert anheben würde (Ersetzungspfad §5); (b) Letalitätswirkung schätzen — verworfen, weil keine Effektgröße vorliegt | keine Zahl; Basiswert unverändert bei den SCS-Sätzen |
 | 35 ⚠ | Latenz der S155-Wirkung? | **Dosis als Sprung, Wirkung als Rampe** \(\min(1, J/a_{\text{erk}})\) mit \(a_{\text{erk}}\) = 66 (MM) und 75 Jahren (C44) [27]; \(\tau\) nicht zusätzlich; nicht abgezinst | Lesart unter §3.0: Eine Dosisänderung ist erst eingelaufen, wenn die ganze Lebenszeitdosis der Erkrankenden unter ihr entstanden ist, also nach einem Erkrankungsalter; \(\tau\) beschreibt nur den Basiswert und steht im Ausweis auf 1 | (a) Wirkung sofort voll anrechnen — verworfen, weil das der Lesart widerspricht; (b) zusätzlich \(\tau\) ansetzen — verworfen, weil dieselbe Einlaufzeit zweimal zählte; (c) Kohorten-Latenzmodell (M2+) | Berlin nach 10/20/30 Jahren 34.700/69.400/104.000 € je Jahr angerechnet |
+| 36 ⚠ | Kennzeichnung der Parameter-Blöcke (Aufgabe §4): welcher Wert je Block, und wo trägt ein Block ein Feld `rolle`? | **22 von 22 gekennzeichnet (Kapitel 7), schwächste Herkunft im Block:** `quelle` für \(w_{\text{SCC}}\), die Rohraten (`i_raten_roh`, `i_mm`, `i_c44`) und \(OR_{\text{out}}\); `berechnet` für \(\Delta\text{SSD}\) (eigene Auswertung DWD-Raster × VG250 × Zensus), \(k_{\text{UV}}\) (Stationsquotient [31] × Rasterquotient [73]), BAF (C44 aus \(w_{\text{SCC}}\)), \(\lambda\), \(\bar L\) und \(c_{\text{kal}}\), je mit Inline-Liste `abgeleitet_aus`; `abschaetzung_kap3` für \(a_{\text{attr}}\), \(c_e\), VOLY, \(r_{\text{out}}\), \(\bar q_{\text{out}}\), den Schalter der Außenberufs-Ebene, \(s\), \(\phi\) und die drei S155-Blöcke. `rolle: kalibrierung` für \(c_{\text{kal}}\); `rolle: sensitivitaet` für die sechs Blöcke der geparkten Ebenen \(r_{\text{out}}\) und \(v_{\text{verh}}\); sonst keine `rolle`, auch nicht für die S155-Wirkungsfaktoren | Regel t-1070-nachtraege Punkt 4: Ist ein Teil abgeschätzt, heißt der Block `abschaetzung_kap3` — bei \(\bar q_{\text{out}}\) und \(r_{\text{out}}\) ist der Wert aus Destatis gerechnet, die Obergrenze 0,21 aber eine Abschätzung; bei \(s\) und \(\phi\) setzt KAP3 \(\Delta T\) = 10 °C und die Obergrenze 0,25. \(c_e\) ist nach §3.4 ein Proxy: Die Zahlen 5.326/4.660 € stammen aus Speckemeier [34], ihr Einsatz als Fallkosten (Gesamt- statt inkrementelle Kosten, nur Erstjahr) ist eine Wahl von KAP3. VOLY wie `heat.voly` in #95 (Elastizität 0,85 gesetzt). \(c_{\text{kal}}\) normiert die Rohraten auf den ZfKD-Anker und ist damit der Kalibrierskalar; die sechs Blöcke der geparkten Ebenen wirken im Basiswert nicht (Neutralwert 1 oder 0) und dienen nur dem Tornado in §4. **Stations- und Rasterquotient von \(k_{\text{UV}}\) haben keinen eigenen Block**; ein neuer Block änderte `wert:`-Zeilen in Kapitel 7. `abgeleitet_aus` nennt deshalb dort, wo ein Eingang keinen Block hat, den Quellenschlüssel aus `quelle:` statt einer Parameter-ID. **Offene Abweichung von Aufgabe §4** (dort Parameter-IDs verlangt) für sechs Blöcke: \(\Delta\text{SSD}\), \(k_{\text{UV}}\), BAF, \(\lambda\), \(\bar L\), \(c_{\text{kal}}\); entschieden wird sie in Teil 3 der Gegenprüfung | \(k_{\text{UV}}\) als `quelle` (verworfen: 0,7119 steht in keiner Quelle, der Rasterquotient ist eigene Rechnung) · BAF als `quelle` (verworfen: C44 1,675 steht in keiner Quelle) · \(c_e\) als `quelle` (verworfen: §3.4 kennzeichnet den Wert als Proxy) · \(\bar q_{\text{out}}\) als `berechnet` (verworfen: Obergrenze abgeschätzt) · zwei neue Blöcke für die Quotienten von \(k_{\text{UV}}\) (verworfen: außerhalb des Pakets, Kriterium „kein `wert:` geändert“) | keine Wirkung auf Zahlen; kein `wert:` in Kapitel 7 geändert; Ledger-Befund 435 |
 | 32 ⚠ | Historie-Erkennung im Lint: Marker in **beiden** Funktionen zur einzigen Ausnahme machen (414) — auch für Entscheidungslog, Verworfen-Listen und Anlagen? | **Ja, ausnahmslos**: Stichwortliste, Abschnitts-Heuristik und pauschale Blockquote-Ausnahme gestrichen; 14 Log-Zeilen, die Korrekturhistorie, der §7-Kommentar und vier Anlagen-Zeilen tragen jetzt Marker **plus** Revisionsvermerk; Zahl der Marker als Ratchet festgeschrieben, gedeckte Fundstellen werden ausgegeben (419). Einzige verbleibende Ausnahme ist der Kopfvermerk vor Kapitel 1 (Befund 345) | Achte Runde derselben Klasse; jede Heuristik hatte eine neue Lücke geöffnet. Der Marker ist bewusst gesetzt und maschinell zählbar | Abschnitts-Ausnahme für Anlagen behalten (weniger Marker, aber die von 414 gemessene Lücke bliebe) | keine — reine Prüfmechanik |

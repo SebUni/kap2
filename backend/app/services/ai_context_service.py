@@ -19,6 +19,7 @@ from app.data import catalog
 from app.models.models import AdaptationMeasure, Kommune
 from app.services import kommune_profile_service, measure_service
 from app.services.engine import lower_bound
+from app.services.klimawirkungen import klimawirkungen
 
 log = logging.getLogger("app")
 
@@ -46,15 +47,15 @@ def _num(value, decimals: int = 1) -> str:
 
 
 def _euro(value) -> str:
-    """Kompakte €-Angabe (Mio./Tsd.), deutsch."""
+    """€-Angabe, deutsch. Ab 1 Mio. kompakt (Mio.); darunter ganze Euro — eine
+    Rundung auf Tausender (T-1473-cto Nacharbeit) würde Beträge im drei- bis
+    fünfstelligen Bereich um bis zu 50 % verzerren."""
     try:
         f = float(value or 0)
     except (TypeError, ValueError):
         return "?"
     if f >= 1_000_000:
         return f"{_num(f / 1_000_000, 2)} Mio. €"
-    if f >= 1_000:
-        return f"{_num(f / 1_000, 0)} Tsd. €"
     return f"{_num(f, 0)} €"
 
 
@@ -62,7 +63,7 @@ def _profile_lines(db: Session, kommune: Kommune) -> list[str]:
     finance = None
     try:
         from app.services import finance_loader
-        finance = finance_loader.finance_for_kommune(kommune.osm_id, kommune.name)
+        finance = finance_loader.finance_for_kommune(kommune.osm_id, kommune.name, db=db, kommune=kommune)
     except Exception as exc:  # Finance ist optional — Zeile entfällt bei Fehler
         log.info("ai_context: finance_loader übersprungen (kommune=%s): %s", kommune.id, exc)
 
@@ -139,28 +140,43 @@ def _risk_lines(db: Session, kommune_id: int) -> list[str]:
             lines.append(note)
 
     all_risks = cost.get("by_risk") or []
+    code_to_row = {r.get("code"): r for r in all_risks}
+    # Eine Klimawirkung, ein Eintrag (T-1461-ceo Punkt 3, Paket 4): Katalogzeilen mit
+    # derselben kwra_id (z. B. #95 Hitzebelastung — Mortalität + Erkrankungen) werden zu
+    # einer Zeile mit amtlichem Namen und Nummer zusammengefasst; die Obergrenze 8 gilt
+    # für Klimawirkungen, nicht für Katalogzeilen.
+    eintraege = klimawirkungen(all_risks)
     # Klasse B (Screening ohne Euro-Bezifferung, T-0839): kein Betrag, kein Rang
     # in der Top-Liste — aber auch nicht still weglassen, sondern mit Vermerk.
-    klasse_b = [r for r in all_risks if r.get("has_euro_layer") is False]
-    by_risk = [r for r in all_risks
-               if r.get("has_euro_layer") is not False and (r.get("cost_eur") or 0) > 0]
-    by_risk = by_risk[:8]  # Top-Kostentreiber; Liste ist bereits absteigend sortiert
-    if by_risk:
+    klasse_a = [e for e in eintraege
+                if e.get("has_euro_layer") and (e.get("cost_eur") or 0) > 0][:8]
+    klasse_b = [e for e in eintraege if not e.get("has_euro_layer")]
+    if klasse_a:
         lines.append("TOP-EINZELRISIKEN (Schaden/Jahr, Index, Klasse):")
-        for r in by_risk:
-            lines.append(
-                f"- {r.get('name')}: {_euro(r.get('cost_eur'))}, "
-                f"Index {_num(r.get('index'), 0)}, {r.get('risk_class')}"
-            )
+        for e in klasse_a:
+            if e["teile"]:
+                lines.append(f"- {e['bezeichnung']}: {_euro(e['cost_eur'])}")
+                for t in e["teile"]:
+                    lines.append(
+                        f"  - {t.get('name')}: {_euro(t.get('cost_eur'))}, "
+                        f"Index {_num(t.get('index'), 0)}, {t.get('risk_class')}"
+                    )
+            else:
+                row = code_to_row.get(e["codes"][0], {})
+                lines.append(
+                    f"- {e['bezeichnung']}: {_euro(e['cost_eur'])}, "
+                    f"Index {_num(row.get('index'), 0)}, {row.get('risk_class')}"
+                )
     if klasse_b:
         lines.append(
             f"WEITERE WIRKUNGEN ({catalog.NO_EURO_LAYER_TEXT}; nicht in der Gesamtsumme, "
             "keinen Euro-Betrag nennen):"
         )
-        for r in klasse_b:
+        for e in klasse_b:
+            row = code_to_row.get(e["codes"][0], {})
             lines.append(
-                f"- {r.get('name')}: {catalog.NO_EURO_LAYER_TEXT}, "
-                f"Index {_num(r.get('index'), 0)}, {r.get('risk_class')}"
+                f"- {e['bezeichnung']}: {catalog.NO_EURO_LAYER_TEXT}, "
+                f"Index {_num(row.get('index'), 0)}, {row.get('risk_class')}"
             )
 
     return lines

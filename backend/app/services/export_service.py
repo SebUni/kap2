@@ -14,6 +14,7 @@ from app.services import measure_service
 from app.services import massnahmen_gewissheit as _mg
 from app.data.massnahmen_umsetzung import MASSNAHMEN_UMSETZUNG
 from app.services.engine import lower_bound
+from app.services.klimawirkungen import klimawirkungen as _klimawirkungen
 
 
 # Vermerk an nicht-additiven Wirkungen (Teilmenge bereits gezählter Schäden).
@@ -46,11 +47,18 @@ def _lower_bound_qualifier(db: Session, kommune_id: int, agg: dict | None) -> st
     )
 
 
-def _has_euro_layer(row: dict) -> bool:
-    """Klasse A/B einer Aggregatzeile; ohne Kennzeichen entscheidet der Katalog."""
-    if "has_euro_layer" in row:
-        return bool(row["has_euro_layer"])
-    return catalog.risk_has_euro_layer(catalog.RISKS_BY_CODE.get(row.get("code"), {}))
+def _teil_zeile(teil: dict, kwra_id: int | None) -> list:
+    """Teilzeile einer Klimawirkung mit mehreren Katalogzeilen (Vermerk „Teil von #<Nr>“).
+
+    So bleibt in der Spalte „Euro-Bezifferung“ sichtbar, dass der Betrag bereits in der
+    Summenzeile der Klimawirkung steckt — niemand summiert die Spalte selbst und zählt
+    doppelt.
+    """
+    value = round(float(teil.get("cost_eur") or 0.0), 2)
+    klasse = f"Teil von #{kwra_id}" if kwra_id is not None else "Teil einer Klimawirkung"
+    if teil.get("code") in catalog.NON_ADDITIVE_RISK_CODES:
+        klasse = f"{klasse}; {NICHT_IN_SUMME_TEXT}"
+    return [teil.get("code", ""), teil.get("name", ""), value, "€/Jahr", klasse]
 
 
 def _fill_climate_impacts_sheet(ws, agg: dict | None, lb_note: str | None) -> None:
@@ -61,22 +69,29 @@ def _fill_climate_impacts_sheet(ws, agg: dict | None, lb_note: str | None) -> No
     denn ein Gutachter läse 0 als „kein Schaden“. Unter der Tabelle steht die
     Vollständigkeitsanzeige („x von y Klimawirkungen in Euro beziffert“) neben der
     Summe, die nur die Wirkungen mit Euro-Schicht enthält.
+
+    Je Klimawirkung (``klimawirkungen()``, T-1470-cto/T-1476-cto) genau eine Zeile mit
+    ``bezeichnung`` (amtlicher Name + Nummer); tragen mehrere Katalogzeilen zur selben
+    Klimawirkung bei, folgen ihre Teilzeilen mit dem Vermerk „Teil von #<Nr>“.
     """
     ws.append(["Code", "Klimawirkung", "Schaden pro Jahr", "Einheit", "Euro-Bezifferung"])
     if agg is None:
         ws.append(["", "Risikoberechnung für diese Kommune nicht verfügbar"])
         return
     cost = agg.get("cost") or {}
-    for row in cost.get("by_risk") or []:
-        if _has_euro_layer(row):
-            value = round(float(row.get("cost_eur") or 0.0), 2)
+    for eintrag in _klimawirkungen(cost.get("by_risk") or []):
+        if eintrag["has_euro_layer"]:
+            value = round(float(eintrag["cost_eur"] or 0.0), 2)
             unit, klasse = "€/Jahr", "ja (Klasse A)"
         else:
             value = catalog.NO_EURO_LAYER_TEXT
             unit, klasse = "", "nein (Klasse B, Screening)"
-        if row.get("code") in catalog.NON_ADDITIVE_RISK_CODES:
+        code = eintrag["codes"][0] if len(eintrag["codes"]) == 1 else ""
+        if code and code in catalog.NON_ADDITIVE_RISK_CODES:
             klasse = f"{klasse}; {NICHT_IN_SUMME_TEXT}"
-        ws.append([row.get("code", ""), row.get("name", ""), value, unit, klasse])
+        ws.append([code, eintrag["bezeichnung"], value, unit, klasse])
+        for teil in eintrag["teile"]:
+            ws.append(_teil_zeile(teil, eintrag["kwra_id"]))
 
     ws.append([])
     coverage = cost.get("euro_coverage") or {}
@@ -91,7 +106,7 @@ def _fill_climate_impacts_sheet(ws, agg: dict | None, lb_note: str | None) -> No
 
 _EVIDENZ_ANZEIGE = {
     "abgeschaetzt": "abgeschätzt (KAP3)",
-    "berechnet": "berechnet aus amtlichen Daten",
+    "berechnet": "berechnet aus anderen Parametern",
     "belegt": "belegt",
 }
 _EBENE_LABEL = {"gemeinde": "Gemeinde", "kreis": "Kreis", "land": "Land"}
