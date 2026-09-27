@@ -35,6 +35,7 @@ from app.models.models import (
 )
 from app.services import aggregate_cache, parameter_registry
 from app.services.engine import impact, override_context, risk_engine, tunables
+from app.services.klimawirkungen import klimawirkungen
 
 log = logging.getLogger(__name__)
 
@@ -1032,7 +1033,12 @@ def build_cost_summary(db: Session, kommune_id: int, demo_session_id: str | None
         "damages_with_measures_eur": damages_with,
         "damage_reduction_eur": damage_reduction,
         "by_risk": withm["cost"]["by_risk"],
-        "klimawirkungen": withm["cost"]["klimawirkungen"],
+        # Aus einem Aggregat, das vor T-1470-cto im aggregate_cache abgelegt wurde
+        # (der Cache leert sich nur bei einer Änderung von catalog.MODEL_VERSION,
+        # nicht bei dieser Änderung), fehlt "klimawirkungen" noch — dann hier aus
+        # by_risk nachbauen statt mit KeyError abzubrechen.
+        "klimawirkungen": withm["cost"].get("klimawirkungen")
+        or klimawirkungen(withm["cost"]["by_risk"]),
         "measures": {
             "total_capex_eur": round(total_capex, 2),
             "total_opex_annual_eur": round(total_opex, 2),

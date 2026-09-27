@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.services import measure_service  # noqa: E402
 from app.services.dashboard_cache import _SUMMARY_SCHEMA_VERSION  # noqa: E402
+from app.services.engine import override_context, risk_engine  # noqa: E402
 from app.services.klimawirkungen import klimawirkungen  # noqa: E402
 
 ZEILE_MORTALITAET = {
@@ -74,7 +75,34 @@ def test_fehlende_kwra_id_wird_aus_dem_katalog_ergaenzt():
     )
 
 
-def test_build_cost_summary_und_get_risk_aggregate_tragen_cost_klimawirkungen(monkeypatch):
+def test_get_risk_aggregate_traegt_cost_klimawirkungen_am_echten_aggregat():
+    """``risk_engine.aggregate`` (kein Attrappen-Dict) legt ``klimawirkungen`` in ``cost`` ab.
+
+    ``get_risk_aggregate`` reicht ``risk_engine.aggregate`` unverändert weiter (Cache
+    davor/danach); dieser Test prüft deshalb direkt am Ergebnis der Engine, nicht an
+    einer Attrappe, die das Feld selbst mitbringt.
+    """
+    override_context.set_overrides({})
+    zelle = {"risks": {
+        "EXPECTED_ANNUAL_MORTALITY": {"index": 50.0, "outcome": 1.0},
+        "EXPECTED_ANNUAL_MORBIDITY": {"index": 50.0, "outcome": 1.0},
+        "EXPECTED_ANNUAL_ALLERGY_DAYS": {"index": 50.0, "outcome": 1.0},
+    }, "inputs": {"pop": 100.0}}
+    ergebnis = risk_engine.aggregate([zelle], total_pop=100.0, area_km2=1.0)
+    assert "klimawirkungen" in ergebnis["cost"], ergebnis["cost"].keys()
+    kwra_ids = {e["kwra_id"] for e in ergebnis["cost"]["klimawirkungen"]}
+    assert 95 in kwra_ids, ergebnis["cost"]["klimawirkungen"]
+    assert 96 in kwra_ids, ergebnis["cost"]["klimawirkungen"]
+    eintrag_95 = next(e for e in ergebnis["cost"]["klimawirkungen"] if e["kwra_id"] == 95)
+    assert eintrag_95["bezeichnung"] == "Hitzebelastung (#95)"
+    assert len(eintrag_95["teile"]) == 2
+
+
+def _fake_measures_query():
+    return type("Q", (), {"all": lambda self: []})()
+
+
+def test_build_cost_summary_reicht_klimawirkungen_durch(monkeypatch):
     by_risk = _by_risk()
     fake_aggregat = {
         "cost": {"total_eur": 1700.0, "by_risk": by_risk,
@@ -84,11 +112,31 @@ def test_build_cost_summary_und_get_risk_aggregate_tragen_cost_klimawirkungen(mo
     monkeypatch.setattr(measure_service, "get_risk_aggregate",
                         lambda *a, **k: fake_aggregat)
     monkeypatch.setattr(measure_service, "kommune_measures_query",
-                        lambda *a, **k: type("Q", (), {"all": lambda self: []})())
+                        lambda *a, **k: _fake_measures_query())
 
     ergebnis = measure_service.build_cost_summary(db=None, kommune_id=1)
     assert ergebnis["klimawirkungen"] == klimawirkungen(by_risk)
-    assert fake_aggregat["cost"]["klimawirkungen"] == klimawirkungen(by_risk)
+
+
+def test_build_cost_summary_baut_klimawirkungen_ohne_feld_im_cache_nach(monkeypatch):
+    """Ein Aggregat aus dem ``aggregate_cache`` von vor T-1470-cto hat kein ``klimawirkungen``.
+
+    Der Cache leert sich nur bei einer Änderung von ``catalog.MODEL_VERSION``, nicht bei
+    dieser Änderung — ``build_cost_summary`` darf deshalb nicht mit ``KeyError`` abbrechen,
+    sondern muss das Feld aus ``by_risk`` nachbauen.
+    """
+    by_risk = _by_risk()
+    fake_aggregat_ohne_feld = {
+        "cost": {"total_eur": 1700.0, "by_risk": by_risk,
+                  "euro_coverage": {"covered": 3, "total": 3, "text": "3 von 3"}},
+    }
+    monkeypatch.setattr(measure_service, "get_risk_aggregate",
+                        lambda *a, **k: fake_aggregat_ohne_feld)
+    monkeypatch.setattr(measure_service, "kommune_measures_query",
+                        lambda *a, **k: _fake_measures_query())
+
+    ergebnis = measure_service.build_cost_summary(db=None, kommune_id=1)
+    assert ergebnis["klimawirkungen"] == klimawirkungen(by_risk)
 
 
 def test_schema_version_ist_2():
