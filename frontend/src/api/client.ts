@@ -809,6 +809,8 @@ export const api = {
     request<InterpretationAbhaengigkeiten>(`/kommune/${kommuneId}/interpretation/abhaengigkeiten`),
   getInterpretationDiversitaet: () =>
     request<InterpretationDiversitaet>('/interpretation/diversitaet'),
+  getInterpretationDiversitaetKommune: (kommuneId: number) =>
+    request<InterpretationDiversitaetKommune>(`/kommune/${kommuneId}/interpretation/diversitaet`),
   getInterpretationLeitfragen: () =>
     request<InterpretationLeitfragen>('/interpretation/leitfragen'),
 }
@@ -868,6 +870,16 @@ export interface DiversitaetJeKlimawirkung {
 export interface InterpretationDiversitaet {
   quelle: InterpretationQuelle
   je_klimawirkung: Record<string, DiversitaetJeKlimawirkung>
+}
+
+/** Wie ``DiversitaetJeKlimawirkung``, aber je ``kwra_id`` (mehrere Codes zusammengeführt, T-1475). */
+export interface DiversitaetJeKlimawirkungKommune extends DiversitaetJeKlimawirkung {
+  bezeichnung: string
+}
+/** GET /kommune/{id}/interpretation/diversitaet; nur die gerechneten Klimawirkungen, nach ``kwra_id``. */
+export interface InterpretationDiversitaetKommune {
+  quelle: InterpretationQuelle
+  je_klimawirkung: Record<string, DiversitaetJeKlimawirkungKommune>
 }
 
 export interface Leitfrage {
