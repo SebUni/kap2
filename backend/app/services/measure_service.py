@@ -132,26 +132,43 @@ def _reduction_factor(mdef: dict, fraction: float, unit_factor: float = 1.0) -> 
 
 # ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5; Maßnahme COOLING_ROOMS_DRINKING_WATER) ──
 # Die Wirkung ist kein default_reduction-Faktor auf den Index, sondern
-# ΔD_S157 = D_85+ · h_Heim · s_gek · (1 − g_S157) je Zelle, bewertet mit L̄_85+ (YLL).
+# ΔD_S157 = D_85+ · h_Heim · max(s_gek − s_gek_kalib; 0) · (1 − g_S157) je Zelle, bewertet
+# mit L̄_85+ (YLL); s_gek_kalib = 0,06 (Block heat.s_gek_kalib, Befund 165, Log 50).
 # Im bestehenden multiplikativen Rahmen wird daraus je Zelle der Faktor
 # 1 − ΔYLL_S157 / YLL_Zelle auf das Mortalitäts-Outcome — so bleiben Einzelnutzen
 # und Aggregat „mit Maßnahmen“ dieselbe Rechnung.
 
 S157_RISK_CODE = "EXPECTED_ANNUAL_MORTALITY"
-S157_NO_INPUT_TEXT = ("kein Betrag: gekühlter Anteil der Heimplätze (s_gek) "
-                      "nicht eingegeben")
+# Befund 138: ohne Eingabe gilt die Voreinstellung s_gek = 0,11 (Block heat.s_gek);
+# der Betrag ist dann eine begründete Abschätzung von KAP3 und wird so gekennzeichnet.
+S157_ESTIMATE_NOTE = "Abschätzung von KAP3"
+S157_S_GEK_DEFAULT = 0.11       # Rückfall, falls der Registry-Parameter fehlt
+S157_S_GEK_KALIB_DEFAULT = 0.06  # dito, Block heat.s_gek_kalib
 
 
 def _is_s157(mdef: dict) -> bool:
     return mdef.get("effect_model") == "s157"
 
 
-def _s157_input(config: dict | None) -> float | None:
-    """Eingabe s_gek der Kommune (Anteil 0..1) aus der Maßnahmen-Konfiguration.
+def _s157_param(key: str, default: float) -> float:
+    """Registry-Parameter der Mortalität für S157 (über override_context).
 
-    Der Bericht trägt keine Voreinstellung; fehlt die Eingabe, gilt None —
-    dann entsteht kein Betrag (auch keine 0).
+    Ohne Überschreibung gilt der Wert des Registry-Specs (``impact.params``,
+    z. B. heat.s_gek 0,11, heat.s_gek_kalib 0,06); ``default`` nur, wenn es den Spec
+    nicht gibt.
     """
+    from app.services.engine.impact import params
+
+    spec = next((s for s in params.IMPACT_PARAM_SPECS
+                 if s.get("risk") == S157_RISK_CODE and s.get("key") == key), None)
+    base = float(spec["value"]) if spec is not None and spec.get("value") is not None \
+        else default
+    v = override_context.get_override(f"risks.{S157_RISK_CODE}.impact.{key}", base)
+    return float(v) if v is not None else base
+
+
+def _s157_config_value(config: dict | None) -> float | None:
+    """Eingabe s_gek der Kommune (Anteil 0..1), None ohne gültige Eingabe."""
     raw = (config or {}).get("s_gek")
     if raw is None or raw == "":
         return None
@@ -161,12 +178,30 @@ def _s157_input(config: dict | None) -> float | None:
         return None
 
 
+def _s157_input(config: dict | None) -> float:
+    """Heute gekühlter Anteil der Heimplätze s_gek (0..1) für S157.
+
+    Die Eingabe der Kommune aus der Maßnahmen-Konfiguration; fehlt sie, gilt die
+    Voreinstellung 0,11 aus dem Registry-Parameter heat.s_gek (Bericht #95 §5,
+    Befund 138, Log 45). Der Wert gilt für die ganze Kommune. Den Abzug des Stands
+    der Kalibrierjahre (heat.s_gek_kalib) rechnet ``_s157_cell_factor``; die
+    Kommune gibt ihren heutigen Anteil ein, nicht den Zuwachs.
+    """
+    s = _s157_config_value(config)
+    if s is not None:
+        return s
+    return max(0.0, min(1.0, _s157_param("s_gek", S157_S_GEK_DEFAULT)))
+
+
 def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict,
                       delta_hap: float = 1.0) -> float:
     """Faktor (0..1) auf das Mortalitäts-Outcome (YLL) einer Zelle durch S157.
 
-    ``frac`` ist der Deckungsgrad der Zelle durch die Maßnahmen-Geometrie; der
-    gekühlte Anteil wirkt nur im abgedeckten Teil (bei ganzer Kommune = 1).
+    S157 wirkt auf max(s_gek − s_gek_kalib; 0) (Befund 165, Log 50; s_gek_kalib aus
+    dem Registry-Parameter heat.s_gek_kalib). ``s_gek`` gilt für die ganze Kommune,
+    unabhängig von der gezeichneten Fläche (Bericht #95 §5, Modellgrenze): Der
+    Deckungsgrad ``frac`` einer abgedeckten Zelle verkleinert die Wirkung deshalb
+    nicht (Befund 138); nur eine Zelle ohne Deckung (``frac`` ≤ 0) bleibt unberührt.
     Zellen ohne Teil-Ausweis D_85+ (vor der Neuberechnung) bleiben unverändert.
 
     ``delta_hap`` (Befund 129): Faktor des Hitzeaktionsplans in dieser Zelle, wenn
@@ -185,14 +220,12 @@ def _s157_cell_factor(s_gek: float | None, frac: float, cell_risk: dict,
     if yll <= 0.0 or d85 is None:
         return 1.0
 
-    def _p(key: str, default: float) -> float:
-        v = override_context.get_override(f"risks.{S157_RISK_CODE}.impact.{key}", default)
-        return float(v) if v is not None else default
-
+    _p = _s157_param
     delta_d = health.s157_avoided_deaths(
-        float(d85), s_gek * max(0.0, min(1.0, frac)),
+        float(d85), s_gek,
         g_s157=_p("g_s157", health.G_S157), qbar_pfl=_p("qbar_pfl", 0.149),
-        beta_pfl=_p("beta_pfl", 1.54), delta_hap=delta_hap) or 0.0
+        beta_pfl=_p("beta_pfl", 1.54), delta_hap=delta_hap,
+        s_gek_kalib=_p("s_gek_kalib", S157_S_GEK_KALIB_DEFAULT)) or 0.0
     delta_yll = delta_d * _p("life_years_a85p", health.AGE_LIFE_YEARS["a85p"])
     return max(0.0, min(1.0, 1.0 - delta_yll / yll))
 
@@ -548,15 +581,22 @@ def _hap_cell_factors(db: Session, measure: AdaptationMeasure,
 
 
 def _s157_summary_fields(mdef: dict, config: dict | None) -> dict:
-    """Zusatzfelder des impact_summary für S157 (Eingabe und Vermerk ohne Eingabe)."""
+    """Zusatzfelder des impact_summary für S157.
+
+    ``s_gek`` ist der gerechnete Anteil (Eingabe oder Voreinstellung 0,11),
+    ``s_gek_is_default`` sagt, ob die Voreinstellung gilt, ``s_gek_kalib`` ist der
+    abgezogene Stand der Kalibrierjahre. ``s157_estimate_note`` kennzeichnet den
+    Betrag als begründete Abschätzung von KAP3 (P2: heat.s_gek, heat.s_gek_kalib und
+    heat.g_s157 sind Abschätzungen, keine belegten Effektgrößen).
+    """
     if not _is_s157(mdef):
         return {}
-    s_gek = _s157_input(config)
-    out: dict = {"s_gek": s_gek}
-    if s_gek is None:
-        out["benefit_display"] = S157_NO_INPUT_TEXT
-        out["benefit_missing_input"] = "s_gek"
-    return out
+    return {
+        "s_gek": _s157_input(config),
+        "s_gek_is_default": _s157_config_value(config) is None,
+        "s_gek_kalib": _s157_param("s_gek_kalib", S157_S_GEK_KALIB_DEFAULT),
+        "s157_estimate_note": S157_ESTIMATE_NOTE,
+    }
 
 
 def _s158_summary_fields(mdef: dict, avoided_days_total: float,
@@ -1099,8 +1139,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # ``annual_benefit_eur`` bleibt eine Zahl (Klasse-A-Anteil + direkter Nutzen),
         # weil Export und Maßnahmentabelle sie als Zahl lesen.
         **_benefit_euro_layer_fields(linked, annual_benefit_direct),
-        # S157 ohne Eingabe s_gek: Vermerk statt Betrag (Bericht #95 §5 trägt keine
-        # Voreinstellung; Divergenz an den CMO, T-1367).
+        # S157: gerechneter Anteil s_gek (ohne Eingabe Voreinstellung 0,11, Befund 138)
+        # und Kennzeichnung als Abschätzung von KAP3.
         **_s157_summary_fields(mdef, measure.config),
         # Befund 129: S157 zusammen mit dem Hitzeaktionsplan gerechnet (Faktoren multipliziert)
         **({"s157_with_hap": bool(hap_by_cell)} if _is_s157(mdef) else {}),
