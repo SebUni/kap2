@@ -75,6 +75,8 @@ MUSTER_BACKTICK = re.compile(re.escape(chr(96)))
 MUSTER_FUNKTIONSAUFRUF = re.compile(r"\b\w+\(\)")
 # Ein Wort mit Unterstrich, wie ein Code-Bezeichner (nicht: Bindestrich, nicht: einzelne Ziffern).
 MUSTER_UNTERSTRICH = re.compile(r"\b[A-Za-zÄÖÜäöüß]+_[A-Za-zÄÖÜäöüß_]+\b")
+# Interne Anforderungskennung wie „A1“ oder „(A9)“ (T-1561).
+MUSTER_ANFORDERUNGSKENNUNG = re.compile(r"\bA[0-9]+\b")
 
 
 @pytest.mark.parametrize("nr", sorted(KUNDENTEXT))
@@ -88,6 +90,8 @@ def test_kundensatz_ohne_verbotene_begriffe(nr):
     assert not MUSTER_FUNKTIONSAUFRUF.search(satz), f"Zeile {nr}: Funktionsaufruf im Kundensatz"
     assert not MUSTER_UNTERSTRICH.search(satz), \
         f"Zeile {nr}: Code-Bezeichner mit Unterstrich im Kundensatz"
+    assert not MUSTER_ANFORDERUNGSKENNUNG.search(satz), \
+        f"Zeile {nr}: interne Anforderungskennung im Kundensatz"
 
 
 # ── Punkt 2 ────────────────────────────────────────────────────────────────────

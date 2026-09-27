@@ -19,6 +19,8 @@ HIER = os.path.dirname(os.path.abspath(__file__))
 BACKEND = os.path.dirname(HIER)
 sys.path.insert(0, BACKEND)
 
+import pytest  # noqa: E402
+
 from app.services.ergebnisbericht import teile  # noqa: E402
 from app.services.ergebnisbericht.beispiel import MORB, MORT, beispiel  # noqa: E402
 from app.services.ergebnisbericht.sammler import sammle  # noqa: E402
@@ -64,3 +66,12 @@ def test_kostensaetze_in_teil4_wie_in_teil7():
         # Rot-Probe-Gegenstück: der alte feste Text darf dort nicht mehr allein stehen.
         assert quelle_teil4 != "UBA Methodenkonvention 4.0"
         assert quelle_teil4 != "Destatis-Kostennachweis 2023"
+
+
+def test_unbekannte_parameterkennung_bricht_ab():
+    # T-1561: eine unbekannte Kennung liefert keine leere Quellenzelle mehr, sondern bricht ab
+    # (Entscheidung des CEO, 27.09.2026); ein Bericht mit leerem Feld wird nicht erzeugt.
+    d = sammle(beispiel("warmsen"))
+    erfundene_kennung = "risks.ERFUNDEN_T1561.cost_per_outcome"
+    with pytest.raises(ValueError, match=re.escape(erfundene_kennung)):
+        teile._parameter_quelle(d, erfundene_kennung)
