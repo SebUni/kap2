@@ -1032,6 +1032,7 @@ def build_cost_summary(db: Session, kommune_id: int, demo_session_id: str | None
         "damages_with_measures_eur": damages_with,
         "damage_reduction_eur": damage_reduction,
         "by_risk": withm["cost"]["by_risk"],
+        "klimawirkungen": withm["cost"]["klimawirkungen"],
         "measures": {
             "total_capex_eur": round(total_capex, 2),
             "total_opex_annual_eur": round(total_opex, 2),

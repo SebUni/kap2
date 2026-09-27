@@ -58,7 +58,7 @@ _PROFILE_SCHEMA_VERSION = 5
 # und Browser NICHT per 304 den alten Body behalten (der Eingabe-Fingerprint
 # allein erfasst reine Struktur-/Feldänderungen des Payloads nicht, siehe
 # _PROFILE_SCHEMA_VERSION).
-_SUMMARY_SCHEMA_VERSION = 1
+_SUMMARY_SCHEMA_VERSION = 2
 
 _CACHE_BASE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
