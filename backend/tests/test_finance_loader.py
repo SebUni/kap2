@@ -138,7 +138,7 @@ def test_finance_for_kommune_merges_bulk_budget(monkeypatch):
     from app.services import finance_bulk
 
     monkeypatch.setattr(finance_loader, "_gdp_for_osm",
-                        lambda d, o: ({"gdp": {"gdp_meur": 3601.2, "gdp_year": 2022, "level": "kreis"}},
+                        lambda d, o, **_: ({"gdp": {"gdp_meur": 3601.2, "gdp_year": 2022, "level": "kreis"}},
                                       "14730230"))
     monkeypatch.setattr(inkar_loader, "_auth_headers", lambda: {"username": b"x", "password": b""})
     monkeypatch.setattr(finance_bulk, "budget_for_kommune",
