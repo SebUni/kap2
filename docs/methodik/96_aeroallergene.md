@@ -5,7 +5,7 @@ Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048: Schr
 Log 23/24, Befunde 156–167), Schritt 3 Pflichtinhalte — Kap. 1 „Risiko ohne (weitere) Anpassung“,
 Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181),
 Schritt 4 Bezugswert Ḡ₀ der Stadtbaumwahl (T-1323, T-1362, Log 26, Befund 182), Nachzug der Befunde 183–185, Runde 14 mit Befunden 186–194, Runde 15 mit Befunden 195–197 (T-1330), Runde 16 mit Befunden 199–200 und Runde 17 mit Befunden 201–204 und 206 (T-1427);
-Null-Runde über den ganzen Bericht: A Runde 21 (T-1442-methodik_manager), B Runde 22 (T-1443-methodik_manager), Abnahme der Rev. 4 steht aus)** ·
+Null-Runde über den ganzen Bericht: A Runde 21 (T-1442-methodik_manager), B Runde 22 (T-1443-methodik_manager); Runden 24 und 25 nach der Integration mit Befunden 230–245 (T-1632-methodik_manager, T-1633-methodik_manager); in Revision nach der Integration (T-1628-cmo), Abnahme steht aus)** ·
 Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 96-A** (Prävalenz × gemessene Pollensaison-Spreizung, bottom-up; Entscheidungslog Nr. 1)
@@ -46,9 +46,14 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > **Runde 17 (T-1427):** Befunde 201–204 — Sensitivität von p_B/p_G in §3.4 nachgerechnet (−11,7 % bis +11,7 %
 > und −11,4 % bis +7,6 % statt ±6 % und ±8 %), k̄_unbek beim flächigen Programm, Komma in der Statuszeile,
 > u20 in §3.2 aus 5er-Jahresgruppen; Sensitivität von f in §3.4 und Log 7 nachgerechnet (Befund 206).
-> **Code-Stand:** Der Katalogwert `default_reduction` von
-> `POLLEN_EARLY_WARNING` ist 0,03 (`backend/app/data/catalog.py`); `linked_risk_codes` bleibt leer
-> (Sperre aus Befund 124), die Maßnahme wirkt im Produkt also noch nicht auf #96.
+> **Runde 25 (T-1633):** Befunde 241–245 — Zelllauf §3.0 mit der Ersatzregel des Produkts: 4,58 Mio. €
+> je Jahr, Bandsummen mit dem Produktcode nachgemessen (Anlage `96_zelllauf_bandsummen.py`), Unterschied
+> zur Kette und Toleranz ± 0,005 Mio. €; S158 im Zelllauf 16.632 Tage; Schwelle, ab der sich die
+> Frühwarnung gegen den Betrieb trägt (§5.1).
+> **Code-Stand (29.09.2026, Befund 245):** `POLLEN_EARLY_WARNING` führt `EXPECTED_ANNUAL_ALLERGY_DAYS` in
+> `linked_risk_codes` und rechnet mit `default_reduction` = 0,03 im Zelllauf (Modell `s158`, §5.1
+> „Produktstand“); die allergenarme Stadtbaumwahl rechnet als `LOW_ALLERGEN_TREE_SELECTION` im Zelllauf
+> (§5). Der Zelllauf rechnet 65+ mit der Ersatzregel aus #95 §3.3 (§3.0).
 > **Stand der früheren Revisionen** (bis Rev. 4 in der Statuszeile geführt, Befund 181): Rev. 3 (08.09.2026)
 > hatte noch kein eigenes Review (Ledger-Befund 151); sie ist in Rev. 4 fortgeschrieben und wird mit ihr
 > geprüft. Rev. 2 (31.08.2026) war
@@ -301,7 +306,7 @@ Beschwerden, und jeder zusätzliche Beschwerdetag kostet Behandlung.
 | 7 | Vegetationsfaktor \(\hat P\) je Zelle (allergene Bäume und Grünflächen), zentriert auf den Bezugswert Ḡ₀, das betroffenengewichtete Mittel der eigenen Kommune im Ausgangsstand | je Zelle ab 0,3 (keine allergene Vegetation) bis über 1 (Allee, Park); Mittel über Berlin im Ausgangsstand genau **1**, also \(\sum B \hat P = \sum B\) = 402.103 | \(\lambda\) = 0,7 aus Werchan [54,55], Bogawski [56], Lesart als örtlicher Anteil Hugg [74] (§3.3, §3.4, Log 12, 17, 18, 26); Kap. 7 `pollen.lambda_veg` |
 | 8 | Zusätzliche Symptomtage \(\Delta\text{Tage} = B \times \delta \times \hat P\) (native Ergebnisgröße) | 402.103 × 1,8795 × 1 = **755.753 Tage je Jahr** (u20 111.357 · 20–64 567.677 · 65–74 42.751 · 75–84 23.825 · 85+ 10.143) | Ebenen 3, 6 und 7 |
 | 9 | Kostensatz je Symptomtag \(c_{\text{Tag}} = c_{\text{Jahr,direkt}} / d_{\text{Saison}}\) mit \(d_{\text{Saison}} = f \times (p_B L_B + p_G L_G)\) | 266,90 € / (0,70 × (0,55 × 30 + 0,75 × 60)) = 266,90 € / 43,05 Tage = **6,20 € je Tag** (Preisstand 2024) | TOTALL [65], VPI [19]; \(L_B\), \(L_G\): Abschätzung von KAP3 nach [51] (§3.5); Kap. 7 `pollen.c_jahr_direkt`, `pollen.d_saison`, `pollen.c_tag` |
-| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 755.753 × 6,20 € = **4,69 Mio. € je Jahr (Preisstand 2024)**, das sind 1,28 € je Einwohner; der Zelllauf des Produkts ergibt 4,59 Mio. € (Unterschied unten) | Ebenen 8 und 9 |
+| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 755.753 × 6,20 € = **4,69 Mio. € je Jahr (Preisstand 2024)**, das sind 1,28 € je Einwohner; der Zelllauf des Produkts ergibt 4,58 Mio. € (Unterschied und Toleranz unten) | Ebenen 8 und 9 |
 
 **Warum \(f\) im Euro-Betrag keine Rolle spielt.** \(f\) steht in Ebene 6 (mehr Tage) und in
 Ebene 9 (mehr Tage in der Referenzsaison, also billigerer Tag); in Ebene 10 kürzt es sich
@@ -322,28 +327,38 @@ allergenarme Pflanzung senkt deshalb die Summe (§5).
 **Kommune statt Zellen: was die Kette verfälscht und was nicht.** Das Produkt rechnet je
 100-m-Zelle mit der Bevölkerung aus dem Zensus-Gitter (Stichtag 15.05.2022) und summiert; die
 Kette rechnet mit der Fortschreibung für ganz Berlin (Stichtag 31.12.2023, Ebene 1). **Die Kette
-überschätzt Berlin um 2,0 %.** Zwei Schritte sind auf der Ebene der Kommune exakt: \(\delta\) ist
-in der ganzen Kommune gleich (eine Region), und \(\hat P\) mittelt auf 1 (Ebene 7). Wirkungen wie
-in #95 für die Temperatur je Zelle und die Feinstruktur unter 1 km gibt es in #96 deshalb nicht.
-Was bleibt, ist die Bevölkerung. Nachgerechnet mit allen 40.669 bewohnten 100-m-Zellen innerhalb
-der Gemeindegrenze Berlins nach der Logik des Produkts (`zensus_loader.apply_zensus_to_cell_inputs`,
-u20 je Zelle aus den 5er-Jahresgruppen, §3.2; Gemeindegebiet, Gitter und Ersatzregel mit den
-Funktionen aus `docs/methodik/anlagen/95_zellvergleich.py`, Lauf 26.09.2026), ergeben sich zwei
-Wirkungen, jede auf die vorige gerechnet:
-(1) **Einwohnersumme: × 0,981.** Das Gitter zählt 3.593.357 Einwohner, die Fortschreibung
-3.662.381 (#95 Befund 99).
-(2) **Altersbänder je Zelle wie im Produkt: × 0,999 = 0,9969 × 1,0021.** Der erste Faktor ist der
-Altersaufbau im Gitter (u20 658.325 · 20–64 2.240.635 · 65–74 334.709 · 75–84 262.921 ·
-85+ 96.767; Anteil u20 an den unter 65-Jährigen 22,71 % gegen 22,73 % in Ebene 1), gemessen mit
-der Ersatzregel aus #95 §3.3 für Zellen mit geheimgehaltenem Anteil 65+. Der zweite Faktor ist
-eine Eigenheit des Produkts: In 4.774 Zellen mit 99.098 Einwohnern setzt es 65+ = 0 (#95
-Befund 104). In #96 wirkt sie **nach oben**: Die dort nach der Ersatzregel fehlenden 12.921
-Menschen ab 65 zählt das Produkt in den Bändern u20 und 20–64 mit 8,8 % und 13,2 % statt mit
-6,7 % und 5,0 % Prävalenz. In #95 senkt dieselbe Eigenheit den Betrag.
-Zusammen 0,981 × 0,999 = 0,980: Der Zelllauf ergibt für Berlin 394.106 Betroffene, 740.723
-zusätzliche Symptomtage und **4,59 Mio. € je Jahr (Preisstand 2024)**, 2,0 % weniger als die
-Kette; mit der Ersatzregel statt der Eigenheit wären es 4,58 Mio. €. Die Kette zeigt den
-Rechenweg, der Betrag für Berlin ist der Zelllauf des Produkts.
+liegt für Berlin um 2,2 % über dem Zelllauf.** Zwei Schritte sind auf der Ebene der Kommune exakt:
+\(\delta\) ist in der ganzen Kommune gleich (eine Region), und \(\hat P\) mittelt auf 1 (Ebene 7).
+Wirkungen wie in #95 für die Temperatur je Zelle und die Feinstruktur unter 1 km gibt es in #96
+deshalb nicht. Was bleibt, ist die Bevölkerung. Gemessen ist das mit dem Produktcode an allen
+40.669 bewohnten 100-m-Zellen innerhalb der Gemeindegrenze Berlins, gepinnt in
+`backend/data/kalibrierung/golden96_zellen_11000000.csv.gz`. Die Altersbänder je Zelle kommen aus
+`zensus_loader.apply_zensus_to_cell_inputs`, mit der Ersatzregel aus #95 §3.3 für Zellen mit
+geheimgehaltenem Anteil 65+ und mit u20 je Zelle aus den 5er-Jahresgruppen (§3.2). Tage und Euro
+kommen aus `impact.compute_all_cell_impacts`. Anlage `docs/methodik/anlagen/96_zelllauf_bandsummen.py`,
+Aufruf `bash scripts/testlauf.sh docs/methodik/anlagen/96_zelllauf_bandsummen.py -q -s`, Lauf
+29.09.2026. Die Bandsummen des Gitters sind u20 655.066 · 20–64 2.230.974 · 65–74 341.087 ·
+75–84 267.692 · 85+ 98.539 (zusammen 3.593.357; die gerundeten Bänder ergeben 3.593.358). Zwei
+Wirkungen erklären den Unterschied, jede auf die vorige gerechnet:
+(1) **Einwohnersumme: × 0,9812 (−1,88 %).** Das Gitter zählt 3.593.357 Einwohner, die
+Fortschreibung 3.662.381 (#95 Befund 99).
+(2) **Altersbänder je Zelle: × 0,9969 (−0,31 %).** Im Gitter sind mit der Ersatzregel 19,7 % der
+Einwohner 65 Jahre und älter, in der Fortschreibung 19,1 %. Mehr Menschen stehen damit in den
+Bändern mit 6,7 % und 5,0 % Prävalenz statt mit 8,8 % und 13,2 %, und die mittlere Prävalenz sinkt
+von 10,98 % auf 10,95 %. Der Anteil u20 an den unter 65-Jährigen ist fast gleich (22,70 % gegen
+22,73 % in Ebene 1).
+Zusammen 0,9812 × 0,9969 = 0,9781: Der Zelllauf ergibt für Berlin 393.299 Betroffene, 739.205
+zusätzliche Symptomtage und **4,58 Mio. € je Jahr (Preisstand 2024)**. Das sind 2,19 % oder
+0,10 Mio. € weniger als die Kette mit 4,69 Mio. €, davon 0,09 Mio. € aus der Einwohnersumme und
+0,01 Mio. € aus den Altersbändern. **Toleranz des Zelllaufs: ± 0,005 Mio. €.** Der Zelllauf ist auf
+den gepinnten Zelldaten deterministisch: Dieselben Zellen und derselbe Code ergeben dieselbe Zahl,
+gemessen 4,5831 Mio. €. Die Toleranz ist deshalb nur die Rundung auf zwei Nachkommastellen, wie im
+Golden-Test `backend/tests/test_methodik_96_golden_betraege.py`; der Messwert liegt 0,0031 Mio. €
+neben dem Berichtswert. Mehr Spiel wie in Bericht #95 (± 1 Mio. € für Berlin) braucht #96 nicht,
+weil der Betrag der Kommune hier nur von den Einwohnern je Band abhängt. Ein neuer Datenstand
+(anderes Gitter, andere Gemeindezeile für die Ersatzregel) ist eine neue Messung mit der Anlage,
+keine Frage der Toleranz. Die Kette zeigt den Rechenweg, der Betrag für Berlin ist der Zelllauf
+des Produkts.
 Außerdem verliert die Kette die Verteilung innerhalb der Stadt: Zwischen einer vegetationsarmen
 Zelle (0,3) und einer Allee-Zelle (1,7) liegt der Faktor 5,7. Wer wissen will, welches Quartier
 die Tage trägt, braucht die Zellen.
@@ -416,21 +431,28 @@ assert abs(verschiebung - 1_737) < 1 and abs(verschiebung / B - 0.0043) < 0.0001
 assert abs(euro * 0.19 / 0.50 / 1e6 - 1.78) < 0.005
 assert abs(euro * 0.84 / 0.50 / 1e6 - 7.87) < 0.005
 assert abs(tage * 23.66 / 1e6 - 17.9) < 0.05
-# Zelllauf des Produkts (Lauf 26.09.2026, 40.669 Zellen): Bandsummen und Zerlegung
-zell = {"u20": 658_325, "20-64": 2_240_635, "65-74": 334_709, "75-84": 262_921, "85+": 96_767}
-assert sum(zell.values()) == 3_593_357
-assert abs(zell["u20"] / (zell["u20"] + zell["20-64"]) - 0.2271) < 1e-4
+# Zelllauf des Produkts mit Ersatzregel #95 §3.3 (40.669 Zellen, gepinnte Zelldaten; Anlage
+# 96_zelllauf_bandsummen.py, Lauf 29.09.2026): Bandsummen, Zerlegung, Toleranz
+zell = {"u20": 655_066, "20-64": 2_230_974, "65-74": 341_087, "75-84": 267_692, "85+": 98_539}
+assert abs(sum(zell.values()) - 3_593_357) <= 1          # gerundete Baender ergeben 3.593.358
+assert abs(zell["u20"] / (zell["u20"] + zell["20-64"]) - 0.2270) < 1e-4
 B_zell = sum(zell[k] * p_ar[k] for k in zell)
-assert abs(B_zell - 394_106) < 1
-assert abs(B_zell * delta - 740_723) < 1
-assert abs(B_zell * delta * c_tag / 1e6 - 4.59) < 0.005
+assert abs(B_zell - 393_299) < 1
+assert abs(B_zell * delta - 739_205) < 1
+euro_zell = B_zell * delta * c_tag
+tol_zell = 0.005                    # Mio. EUR: Rundung, der Lauf ist deterministisch
+assert abs(euro_zell / 1e6 - 4.58) < tol_zell
 f_ew = 3_593_357 / 3_662_381
-assert abs(f_ew - 0.981) < 0.0005
-B_regel = 393_298.8                 # Ersatzregel #95 §3.3 statt 65+ = 0
-assert abs(B_regel / (B * f_ew) - 0.9969) < 0.0001 and abs(B_zell / B_regel - 1.0021) < 0.0001
-assert abs(B_zell / B - 0.980) < 0.0005 and abs(1 - B_zell / B - 0.020) < 0.0005
-assert abs(B_regel * delta * c_tag / 1e6 - 4.58) < 0.005
-assert 707_318 - 694_397 == 12_921
+assert abs(f_ew - 0.9812) < 0.00005
+f_alter = B_zell / (B * f_ew)
+assert abs(f_alter - 0.9969) < 0.00005
+assert abs(B_zell / B - 0.9781) < 0.00005 and abs(1 - B_zell / B - 0.0219) < 0.00005
+assert abs((euro - euro_zell) / 1e6 - 0.10) < 0.005
+assert abs(euro * (1 - f_ew) / 1e6 - 0.09) < 0.005
+assert abs(euro * f_ew * (1 - f_alter) / 1e6 - 0.01) < 0.005
+ab65_zell = (zell["65-74"] + zell["75-84"] + zell["85+"]) / sum(zell.values())
+assert abs(ab65_zell - 0.197) < 0.0005 and abs((a6574 + a7584 + a85p) / sum(pop.values()) - 0.191) < 0.0005
+assert abs(B_zell / sum(zell.values()) - 0.1095) < 0.00005 and abs(B / sum(pop.values()) - 0.1098) < 0.00005
 ```
 
 ### 3.1 Klimasignal: gemessene Saison-Spreizung ΔS (Anker `#delta-s`)
@@ -1283,7 +1305,7 @@ gewarnte Teil, und davon wird der Anteil \(r_{\text{S158}}\) vermieden.
 ist \(t_{\text{warn}}\) für beide Gruppen gleich (0,75). Die Formel mindert dann jede Zelle im
 Geltungsbereich um denselben Anteil ihrer Zusatztage, 0,03 × 0,75 = 2,25 %. Das Ergebnis ist
 deshalb heute **zahlengleich** mit einem Faktor 0,0225 auf die gespeicherten Zusatztage der Zellen
-im Geltungsbereich; für Berlin ergeben beide Wege 16.666 Tage (Zelllauf, unten). Die Festlegung
+im Geltungsbereich; für Berlin ergeben beide Wege 16.632 Tage (Zelllauf, unten). Die Festlegung
 ändert heute den **Wert**, nicht die Verteilung: 2,25 % statt der 3 % von Rev. 3, weil nur noch
 gewarnte Tage zählen. Die Verteilung ändert erst der Ersetzungspfad: Mit \(t_{\text{warn},g,V}\) je
 Gruppe und DWD-Gebiet \(V\) hängt der Anteil am Gebiet und an der Mischung aus Birken- und
@@ -1334,7 +1356,7 @@ Kap. 1).
 | 5 | in Euro (\(c_{\text{Tag}}\) = 6,20 €) | 17.004 × 6,20 € = **≈ 105.400 € je Jahr** (Preisstand 2024) |
 
 Band: 1.889 Tage (≈ 11.700 €) bis 75.575 Tage (≈ 468.600 €) je Jahr. Der Zelllauf des Produkts
-(740.723 Tage, §3.0) ergibt 16.666 Tage und ≈ 103.300 €, Zelle für Zelle gerechnet und ebenso als
+(739.205 Tage, §3.0) ergibt 16.632 Tage und ≈ 103.100 €, Zelle für Zelle gerechnet und ebenso als
 Faktor 0,0225 auf die Summe: heute zahlengleich (siehe oben). Rev. 3 hätte ohne Tagesauswahl 22.673 Tage
 und ≈ 140.600 € ausgewiesen, ein Drittel mehr. Zellscharf: Eine Allee-Zelle mit 100 Betroffenen
 und \(\hat P\) = 1,7 hat 100 × 1,8795 × 1,7 = 319,5 Zusatztage; im Geltungsbereich werden davon
@@ -1348,8 +1370,8 @@ nicht gewählt ist. Bezogen auf die §4-Bundessumme von ≈ 110 Mio. € je Jahr
 Basiswert bei flächendeckender Umsetzung **≈ 2,5 Mio. € je Jahr** vermiedener Behandlungskosten
 (Band ≈ 0,28–11,0 Mio. €). Ob sich die Maßnahme trägt, rechnet das Maßnahmen-Modul gegen die
 Vorhaltekosten (Katalog `POLLEN_EARLY_WARNING`: 15.000 € Anschaffung je Station, 4.000 € je
-Station und Jahr Betrieb); die Abschätzung macht die Wirkung dafür sichtbar, statt sie als Null
-auszuweisen.
+Station und Jahr Betrieb); ab welchem Punkt im Band das der Fall ist, steht nach dem folgenden
+Block.
 
 ```python test: beispiel_96_s158_wirkung
 # S158 nach Tagen und Belastung (T-1239), Beispielkommune Berlin wie Rechenkette 3.0
@@ -1382,7 +1404,7 @@ t = t_B + t_G
 assert abs(unten * 0.50 * t - 1_889) < 1 and abs(unten * 0.50 * t * c_tag - 11_700) < 50
 assert abs(0.10 * 1.00 * t - 75_575) < 1 and abs(0.10 * 1.00 * t * c_tag - 468_600) < 50
 # Zelllauf des Produkts, Rev. 3 zum Vergleich, eine Allee-Zelle
-assert abs(740_723 * r * t_warn - 16_666) < 1 and abs(740_723 * r * t_warn * c_tag - 103_300) < 50
+assert abs(739_205 * r * t_warn - 16_632) < 1 and abs(739_205 * r * t_warn * c_tag - 103_100) < 50
 assert abs(r * t - 22_673) < 1 and abs(r * t * c_tag - 140_600) < 50
 zelle = 100 * 1.8795 * 1.7
 assert abs(zelle - 319.5) < 0.05 and abs(A * r * t_warn * zelle - 7.19) < 0.005
@@ -1417,6 +1439,74 @@ assert abs(nord - 0.787) < 0.001 and abs(sued - 0.738) < 0.001
 bund = 110e6
 assert abs(r * t_warn * bund / 1e6 - 2.5) < 0.03
 assert abs(unten * 0.50 * bund / 1e6 - 0.28) < 0.01 and abs(0.10 * bund / 1e6 - 11.0) < 0.01
+```
+
+**Ab wann sich die Frühwarnung trägt (Befund 244).** Der Nutzen je Jahr ist der wirksame Wert
+\(r_{\text{S158}} \cdot t_{\text{warn}}\) mal dem Schadenswert im Geltungsbereich; Euro folgen den
+Tagen im gleichen Verhältnis (§3.3). Die Frühwarnung trägt ihren Betrieb, sobald dieser Nutzen die
+Betriebskosten erreicht: 4.000 € je Station und Jahr (Katalog `POLLEN_EARLY_WARNING`,
+Modellannahme). Die Schwelle ist damit: wirksamer Wert ≥ Zahl der Stationen × 4.000 € ÷
+Schadenswert je Jahr.
+
+- **Kommune mit 100.000 Einwohnern im Bundes-Altersmix** (Beispielgröße im Produkttext):
+  Schadenswert rund 132.300 € je Jahr (Produkttext; aus §3.2 und §4 nachgerechnet
+  100.000 × 10,74 % × 1,988 Tage × 6,20 € ≈ 132.400 €, das ändert die Schwelle nicht). Der Nutzen
+  reicht von 330 € (wirksam 0,0025) über 2.980 € am Basiswert (0,0225) bis 13.230 € (0,10) je
+  Jahr. Eine Station trägt sich ab einem wirksamen Wert von 4.000 € ÷ 132.300 € = **0,030**, dem
+  1,34-Fachen des Basiswerts, also \(r_{\text{S158}}\) = 0,040 bei \(t_{\text{warn}}\) = 0,75.
+  Darunter, auch am Basiswert, trägt sie sich nicht; von 0,030 bis zum oberen Bandende trägt sie
+  sich, dort für drei Stationen. \(t_{\text{warn}}\) = 1,00 allein reicht knapp nicht
+  (0,03 × 132.300 € = 3.969 €); \(e_{\text{Tag}}\) am oberen Anker 0,30 reicht
+  (\(r_{\text{S158}}\) = 0,042, wirksam 0,0315, 4.167 €).
+- **Berlin** (Zelllauf 739.205 Tage × 6,20 € = 4,58 Mio. € je Jahr, ganze Stadt im
+  Geltungsbereich): Eine Station trägt sich ab einem wirksamen Wert von 4.000 € ÷ 4,58 Mio. € =
+  **0,00087**. Das liegt unter dem unteren Bandende 0,0025, eine Station trägt sich also im ganzen
+  Band. Der Nutzen deckt den Betrieb von 2 Stationen am unteren Bandende (≈ 11.460 €), von 25 am
+  Basiswert (≈ 103.100 €) und von 114 am oberen Bandende (≈ 458.300 €).
+
+Bei \(n\) Stationen gilt das \(n\)-Fache der Schwelle. Die Schwelle ist **nur gegen den Betrieb**
+gerechnet. Die Anschaffung (15.000 € je Station, Katalog) ist nicht auf Jahre umgelegt, weil es für
+die Nutzungsdauer einer Pollenmessstation weder eine Quelle noch eine Abschätzung von KAP3 gibt;
+jede Umlage hebt die Schwelle um 15.000 € ÷ Nutzungsdauer je Station und Jahr. Der gegenteilige
+Satz im Produkt (Katalog, Feld `sensitivitaet` der Frühwarnung), die Maßnahme trage sich an keiner
+Stelle des Bands, stimmt deshalb nicht. Das Band bleibt, das Produkt übernimmt diesen Absatz
+(Befund 244).
+
+```python test: beispiel_96_s158_schwelle
+# Ab wann traegt sich die Fruehwarnung gegen den Betrieb (Befund 244)? Groessen aus §5.1
+r, t_warn = 0.03, 0.75                          # Kap. 7 pollen.r_s158, pollen.t_warn_s158
+wirksam = r * t_warn
+unten, oben = 0.20 * 0.25 * 0.10 * 0.50, 0.10 * 1.00   # Band wirksam (unveraendert)
+assert abs(unten - 0.0025) < 1e-12 and abs(oben - 0.10) < 1e-12
+opex, c_tag = 4_000, 6.20                       # EUR je Station und Jahr (Katalog); Kap. 7 pollen.c_tag
+def schwelle(schaden, stationen=1):
+    return stationen * opex / schaden           # wirksamer Wert, ab dem der Nutzen den Betrieb traegt
+# (a) Beispielgroesse des Produkttexts: 100.000 Einwohner im Bundes-Altersmix
+s_100k = 132_300
+delta_de = 0.70 * (0.55 * 4.79 + 0.75 * 4.06) * 0.50           # §4
+assert abs(100_000 * 0.1074 * delta_de * c_tag - 132_400) < 50  # nachgerechnet, §3.2 und §4
+assert abs(unten * s_100k - 330) < 1 and abs(oben * s_100k - 13_230) < 1
+assert abs(wirksam * s_100k - 2_980) < 5
+s_a = schwelle(s_100k)
+assert abs(s_a - 0.030) < 0.0005 and unten < s_a < oben
+assert abs(schwelle(132_400) - 0.030) < 0.0005
+assert wirksam * s_100k < opex                  # am Basiswert traegt sie sich nicht
+assert abs(s_a / wirksam - 1.34) < 0.005 and abs(s_a / t_warn - 0.040) < 0.0005
+assert int(oben * s_100k // opex) == 3          # oberes Bandende: drei Stationen
+assert abs(r * 1.00 * s_100k - 3_969) < 1 and r * 1.00 * s_100k < opex
+r_e = 0.35 * 0.40 * 0.30                        # e_Tag am oberen Anker
+assert abs(r_e - 0.042) < 1e-12 and abs(r_e * t_warn - 0.0315) < 1e-12
+assert abs(r_e * t_warn * s_100k - 4_167) < 1 and r_e * t_warn * s_100k > opex
+# (b) Berlin, Zelllauf (§3.0), ganze Stadt im Geltungsbereich
+s_berlin = 739_205 * c_tag
+assert abs(s_berlin - 4_583_071) < 1
+s_b = schwelle(s_berlin)
+assert abs(s_b - 0.00087) < 0.000005 and s_b < unten   # traegt sich im ganzen Band
+assert int(unten * s_berlin // opex) == 2 and abs(unten * s_berlin - 11_460) < 5
+assert int(wirksam * s_berlin // opex) == 25 and abs(wirksam * s_berlin - 103_100) < 50
+assert int(oben * s_berlin // opex) == 114 and abs(oben * s_berlin - 458_300) < 50
+# n Stationen: n-fache Schwelle
+assert abs(schwelle(s_berlin, 25) - 25 * s_b) < 1e-12 and schwelle(s_berlin, 26) > wirksam
 ```
 
 **Integrationsauflage (S158).** Der CTO verknüpft die Maßnahme nach der Abnahme so, dass sie im
