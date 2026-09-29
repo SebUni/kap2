@@ -2,16 +2,25 @@
 
 Teil von Anlage [73]. Erzeugt von `backend/scripts/kalibrierung/k_uv_raumstreuung.py`; die Kreiswerte stehen in `backend/data/kalibrierung/k_uv_raumstreuung.csv`. Grundlage ist die Festlegung der Gesamtschau zu T-1115 vom 27.09.2026 (»Räumliche Streuung von k_UV (Befund 449): Messung und Entscheidungsregel«). Punktmenge, Stabilitätsausschluss und Gewicht sind dieselben wie beim Bundeswert in `k_uv_herleitung.md`; die Leser der DWD-Raster sind aus `k_uv_herleitung.py` übernommen, dessen Anlage bleibt unverändert.
 
-Gefragt ist, ob die Streuung des Rasterquotienten q = ΔGlobalstrahlung ÷ ΔSonnenscheindauer über die Gemeindepunkte ein räumliches Muster ist oder Schätzrauschen zweier Trends über 26 Jahre. Nur ein beständiges Muster könnte die Reihenfolge der Kommunen verändern, wenn das Modell statt des Bundeswerts einen Wert je Kreis nähme.
+Gefragt ist, ob die Streuung des Rasterquotienten q = ΔGlobalstrahlung ÷ ΔSonnenscheindauer über die Gemeindepunkte ein räumliches Muster ist oder Schätzrauschen zweier Trends über 26 Jahre. Ein Wert je Kreis verschöbe die Reihenfolge der Kreise auch dann, wenn er nur Rauschen ist; wie stark, misst die Rangtreue. Dass der Bundeswert die Reihenfolge der Kommunen falsch darstellt (Aufgabe §8 E3, Zweig 3 der Festlegung), belegt aber nur ein beständiges Muster; das misst die Zeitstabilität.
 
 **Abweichung vom Lauf vom 01.09.2026.** Die Gemeindepunkte kommen aus `backend/.cache/60_stichprobe/DE_VG250.gpkg`, Ebene `vg250_pk` (10.939 Punkte, Gebietsstand 2026); `backend/data/vg250/` gibt es auf dem Server nicht. Einwohner und 65+-Anteil je Gemeinde kommen aus `backend/data/kalibrierung/zensus2022_demografie_ab65.csv` über `zensus_loader.demografie_zeile_ab65` und `anteil_ab65_gemeinde` mit dem Anteil 2/7 der Gruppe 60–66, der Regel des Produkts (#95 §3.3). Sie ersetzen `backend/data/lite/zensus_gemeinde.json`, das auf dem Server fehlt. Deshalb weicht die Zahl der Punkte vom Lauf vom 01.09.2026 ab (dort 10.853 mit Einwohnerzahl). Ob der Bundeswert trotzdem derselbe ist, prüft Abschnitt 2.
 
 ## 1 Punktmengen-Kette
 
 - **10.939** Gemeindepunkte in `vg250_pk`
-- **10.743** davon mit eigener Gemeindezeile im Zensus 2022, also mit Einwohnerzahl und 65+-Anteil. Ohne Gewicht bleiben 196 Punkte: 195 mit nur einer Kreiszeile, davon 190 gemeindefreie Gebiete; 1 ohne jede Zeile. Die Kreiszeile nennt den 65+-Anteil, aber nicht die Einwohner der Gemeinde. Umgekehrt haben Gemeinden des Zensus mit zusammen 130.072 Einwohnern (0,16 %) keinen Punkt im Gebietsstand 2026, weil sie seit 2022 in anderen Gemeinden aufgegangen sind.
+- **10.743** davon mit eigener Gemeindezeile im Zensus 2022, also mit Einwohnerzahl und 65+-Anteil. Ohne Gewicht bleiben 196 Punkte. 195 davon haben nur eine Kreiszeile, und die nennt den 65+-Anteil, aber nicht die Einwohner der Gemeinde:
+  - 190 gemeindefreie Gebiete.
+  - Gröde (01054039): Der Zensus weist ».« aus (unbekannt oder geheim).
+  - 4 Gemeinden, die nach dem Zensusstichtag 15.05.2022 neu gebildet wurden und deshalb keine eigene Zeile haben (Wirksamkeit laut VG250): Jahnatal (01.01.2023), Berga-Wünschendorf (01.01.2024), Uder (01.01.2024) und Obergeckler (01.01.2025).
+  - Gar keine Zeile hat Hanau (06415000), seit 01.01.2026 kreisfreie Stadt; auch für seinen Kreis 06415 hat der Zensus keine Zeile.
+- Umgekehrt haben 42 Gemeinden des Zensus mit zusammen 130.072 Einwohnern (0,16 %) keinen Punkt im Gebietsstand 2026:
+  - Hanau, im Zensus 06435014 mit 93.632 Einwohnern (72 %), ist nicht aufgegangen, sondern hat den Schlüssel gewechselt: Die Stadt steht seit 01.01.2026 unter 06415000, dem Punkt ohne jede Zeile. VG250 trägt für den neuen Kreis 06415 und für den abgebenden Kreis 06435 (Main-Kinzig-Kreis) dieselbe Wirksamkeit.
+  - 41 Gemeinden mit 36.440 Einwohnern sind in anderen Gemeinden aufgegangen: In jedem ihrer 14 Kreise trägt VG250 für mindestens eine Gemeinde eine Änderung mit Wirksamkeit nach dem Zensusstichtag.
 - **10.630** davon mit auswertbaren Trendreihen in beiden Rastern (endlicher SSD- und Globalstrahlungstrend 1997–2022, SSD-Trend > 0, ΔSSD der Normalperioden > 0)
-- **10.573** nach dem Stabilitätsausschluss (SSD-Trend ≥ 1 %/Dekade) — die Menge, über die alle folgenden Zahlen laufen. Sie liegen in **399** Kreisen und **16** Ländern. 8 dieser Punkte liegen in mindestens einem Jahr auf einer Rasterzelle ohne Wert (NODATA); die Regel des Bundeswerts schließt sie nicht aus, sie bleiben deshalb in der Menge.
+- **10.573** nach dem Stabilitätsausschluss (SSD-Trend ≥ 1 %/Dekade) — die Menge, über die alle folgenden Zahlen laufen. Sie liegen in **399** Kreisen und **16** Ländern.
+  - VG250 führt im Gebietsstand 2026 401 Kreise. Es fehlen Flensburg (01001): sein einziger Punkt mit Gewicht hat einen SSD-Trend 1997–2022 von −0,79 %/Dekade und fällt an »SSD-Trend > 0« heraus; Hanau (06415): sein Punkt hat keine eigene Gemeindezeile im Zensus und damit kein Gewicht. Beide fehlen deshalb auch in den Kreiswerten, der Rangtreue und der Zeitstabilität.
+  - 8 Punkte der Menge liegen in allen 26 Jahren des Globalstrahlungsrasters auf einer Zelle ohne Wert (NODATA), im Raster der Sonnenscheindauer in keinem: Kappeln, Arnis, Keppeshausen, Ralingen, Pruchten, Wolgast, Bärenstein und Ostritz. Ihr Globalstrahlungstrend ist damit 0 und ihr Punktquotient genau 0. Das drückt die Werte ihrer 7 Kreise: Jeder liegt um den Gewichtsanteil dieser Punkte im Kreis niedriger, als er ohne sie läge, hier um 0,01–12,5 %. Im Bundeswert tragen sie 0,03 % des Gewichts. Die Regel des Bundeswerts schließt sie nicht aus; nach der Festlegung bleiben sie deshalb in der Menge.
 
 ## 2 Reproduktion des Bundeswerts
 
@@ -31,7 +40,7 @@ Perzentile der 399 Kreiswerte, ungewichtet über die Kreise (lineare Interpolati
 | 90. | 0,9536 | +43 % |
 | 95. | 1,1260 | +69 % |
 
-Zwischen dem 10. und 90. Perzentil liegen die Kreiswerte bei −38 % … +43 % um q_Bund, zwischen dem 5. und 95. Perzentil bei −46 % … +69 %. Zum Vergleich die Gemeindepunkte (`k_uv_herleitung.md`, Abschnitt 4): 5./95. Perzentil 0,3225/1,1671.
+Zwischen dem 10. und 90. Perzentil liegen die Kreiswerte bei −38 … +43 % um q_Bund, zwischen dem 5. und 95. Perzentil bei −46 … +69 %. Zum Vergleich die Gemeindepunkte (`k_uv_herleitung.md`, Abschnitt 4): 5./95. Perzentil 0,3225/1,1671.
 
 Die 16 Landeswerte:
 
@@ -58,8 +67,8 @@ Die 16 Landeswerte:
 
 Die Rangkorrelation nach Spearman vergleicht zwei Reihenfolgen derselben Kreise: 1 heißt gleiche Reihenfolge, 0 kein Zusammenhang, −1 umgekehrte Reihenfolge.
 
-- **Rangtreue: 0,60** über 399 Kreise. Verglichen wird die Reihenfolge der Kreise nach dem Euro-Betrag je Einwohner, proportional zu Σ (Gewicht × q) ÷ Einwohner, einmal mit q_Bund für alle Kreise und einmal mit q je Kreis. Einwohner sind die der Punkte in der Menge aus Abschnitt 1.
-- **Zeitstabilität: 0,12** über 398 Kreise. Verglichen wird q je Kreis aus den Trends 1997–2009 mit q je Kreis aus den Trends 2010–2022. q ist dabei jeweils der Quotient der gewichteten Kreistrends (Globalstrahlung ÷ Sonnenscheindauer), mit dem Gewicht aus Abschnitt 3. Einbezogen sind die Kreise mit positivem SSD-Trend in beiden Hälften; 1 Kreis fällt deshalb heraus.
+- **Rangtreue: 0,60** über 399 Kreise, von 401 im Gebietsstand 2026; die fehlenden nennt Abschnitt 1. Verglichen wird die Reihenfolge der Kreise nach dem Euro-Betrag je Einwohner, proportional zu Σ (Gewicht × q) ÷ Einwohner, einmal mit q_Bund für alle Kreise und einmal mit q je Kreis. Einwohner sind die der Punkte in der Menge aus Abschnitt 1.
+- **Zeitstabilität: 0,12** über 398 Kreise. Verglichen wird q je Kreis aus den Trends 1997–2009 mit q je Kreis aus den Trends 2010–2022. q ist dabei jeweils der Quotient der gewichteten Kreistrends (Globalstrahlung ÷ Sonnenscheindauer), mit dem Gewicht aus Abschnitt 3. Einbezogen sind die Kreise mit positivem SSD-Trend in beiden Hälften; 1 Kreis fällt deshalb heraus (Freiburg im Breisgau).
 
 ## 5 Entscheidungsregel und Schwellen
 

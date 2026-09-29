@@ -67,6 +67,7 @@ EUR_ANTEIL_MM_ANLAGE = 0.4316   # k_uv_herleitung.md, Abschnitt 2 (MM-Anteil)
 SCHWELLE_RANG = 0.90            # Setzung von KAP3 (Festlegung)
 SCHWELLE_ZEIT = 0.50            # Setzung von KAP3 (Festlegung)
 HAELFTEN = (list(range(1997, 2010)), list(range(2010, 2023)))
+ZENSUS_STICHTAG = "2022-05-15"  # Stichtag des Zensus 2022, Vergleich mit VG250-Feld WSK
 MINUS = "−"
 
 
@@ -76,10 +77,31 @@ def _z(x: float, n: int = 4) -> str:
     return s.replace("-", MINUS)
 
 
+def _vz(x: float, n: int = 0) -> str:
+    """Relative Abweichung in Prozent mit Vorzeichen, ohne Einheit, z. B. +12 / −8."""
+    s = _z(x * 100, n)
+    return s if s.startswith(MINUS) else "+" + s
+
+
 def _pz(x: float, n: int = 0) -> str:
     """Relative Abweichung mit Vorzeichen, z. B. +12 % / −8 %."""
-    s = _z(x * 100, n)
-    return (s if s.startswith(MINUS) else "+" + s) + " %"
+    return _vz(x, n) + " %"
+
+
+def _spanne(a: float, b: float, n: int = 0) -> str:
+    """Spanne mit Vorzeichen, Einheit einmal am Ende (kap3-stil): −38 … +43 %."""
+    return f"{_vz(a, n)} … {_vz(b, n)} %"
+
+
+def _liste(teile: list[str]) -> str:
+    """Aufzählung im Satz: a, b und c."""
+    return teile[0] if len(teile) == 1 else ", ".join(teile[:-1]) + " und " + teile[-1]
+
+
+def _datum(wsk: str) -> str:
+    """VG250-Feld WSK (ISO) als Datum im Text: 2026-01-01T… → 01.01.2026."""
+    j, m, t = wsk[:10].split("-")
+    return f"{t}.{m}.{j}"
 
 
 def _tsd(n: int) -> str:
@@ -133,35 +155,64 @@ def main() -> int:
     # ── Punktmenge ──────────────────────────────────────────────────────────
     con = sqlite3.connect(GPKG)
     try:
-        roh = con.execute("SELECT AGS, LON_DEZ, LAT_DEZ, BEZ FROM vg250_pk "
+        roh = con.execute("SELECT AGS, LON_DEZ, LAT_DEZ, BEZ, GEN FROM vg250_pk "
                           "WHERE AGS IS NOT NULL AND LON_DEZ IS NOT NULL").fetchall()
         # Die Länderebene führt den Bodensee als eigene Fläche: Namen ohne Zusatz.
         laender = dict(con.execute("SELECT DISTINCT AGS, GEN FROM vg250_lan "
                                    "WHERE GEN NOT LIKE '%Bodensee%'").fetchall())
         kreise = dict(con.execute("SELECT DISTINCT AGS, GEN FROM vg250_krs").fetchall())
+        kreis_bez = dict(con.execute("SELECT DISTINCT AGS, BEZ FROM vg250_krs").fetchall())
+        # WSK = Wirksamkeit der letzten Änderung, je Gemeinde und je Kreis.
+        wsk_gem = dict(con.execute("SELECT AGS, MAX(WSK) FROM vg250_gem GROUP BY AGS").fetchall())
+        wsk_krs = dict(con.execute("SELECT AGS, MAX(WSK) FROM vg250_krs GROUP BY AGS").fetchall())
     finally:
         con.close()
     n_vg = len(roh)
     teil = zl.ANTEIL_60_66_DEFAULT                      # 2/7, Regel #95 §3.3
-    punkte, n_kreis, n_kreis_gf, n_keine = [], 0, 0, 0
-    for ags, lon, lat, bez in roh:
+    demo = zl._demografie_ab65()
+    name = {str(r[0]).zfill(8): r[4] for r in roh}
+    punkte, ohne = [], {"gf": [], "geheim": [], "neu": [], "keine": []}
+    for ags, lon, lat, bez, _gen in roh:
         a = str(ags).zfill(8)
         zeile, ebene = zl.demografie_zeile_ab65(a)
         if ebene == "gemeinde":
             punkte.append((a, float(lon), float(lat), zeile[0],
                            zl.anteil_ab65_gemeinde(zeile, teil)))
-        elif ebene == "kreis":
-            # Die Kreiszeile liefert den 65+-Anteil, aber nicht die Einwohner der
-            # Gemeinde — ohne Einwohner kein Gewicht.
-            n_kreis += 1
-            n_kreis_gf += int(bez == "Gemeindefreies Gebiet")
+        # Die Kreiszeile liefert den 65+-Anteil, aber nicht die Einwohner der
+        # Gemeinde — ohne Einwohner kein Gewicht. Grund je Punkt aus den Daten:
+        elif ebene is None:
+            ohne["keine"].append(a)                     # weder Gemeinde- noch Kreiszeile
+        elif bez == "Gemeindefreies Gebiet":
+            ohne["gf"].append(a)
+        elif a in demo:
+            ohne["geheim"].append(a)                    # Zensuszeile ».«
+        elif (wsk_gem.get(a) or "") > ZENSUS_STICHTAG:
+            ohne["neu"].append(a)                       # nach dem Stichtag neu gebildet
         else:
-            n_keine += 1
-    vg_ags = {a for a, *_ in punkte} | {str(r[0]).zfill(8) for r in roh}
-    ew_ohne_punkt = sum(v[0] for k, v in zl._demografie_ab65().items()
-                        if v is not None and len(k) == 8 and k not in vg_ags)
-    ew_gemeinden = sum(v[0] for k, v in zl._demografie_ab65().items()
-                       if v is not None and len(k) == 8)
+            raise SystemExit(f"Punkt {a} ohne Gemeindezeile: Grund nicht aus den Daten ablesbar")
+    n_kreis = len(roh) - len(punkte) - len(ohne["keine"])
+    # Zensus-Gemeinden ohne Punkt im Gebietsstand 2026, Grund je Posten aus den Daten.
+    fehlend = {k: v[0] for k, v in demo.items()
+               if v is not None and len(k) == 8 and k not in name}
+    ew_ohne_punkt = sum(fehlend.values())
+    ew_gemeinden = sum(v[0] for k, v in demo.items() if v is not None and len(k) == 8)
+    # Schlüsselwechsel: ein Kreis ohne Zensuszeile mit genau einem Punkt und genau eine
+    # fehlende Zensus-Gemeinde desselben Landes, deren Kreis dieselbe Wirksamkeit trägt.
+    wechsel: dict[str, str] = {}
+    for n in sorted(k for k in kreise if k not in demo):
+        neu = [a for a in name if a[:5] == n]
+        alt = [k for k in fehlend if k[:2] == n[:2] and wsk_krs.get(k[:5]) == wsk_krs[n]]
+        if len(neu) != 1 or len(alt) != 1:
+            raise SystemExit(f"Kreis {n} ohne Zensuszeile: Zuordnung nicht eindeutig")
+        wechsel[alt[0]] = neu[0]
+    aufgegangen = [k for k in fehlend if k not in wechsel]
+    # Beleg: Im Kreis jeder dieser Gemeinden trägt eine Gemeinde des Gebietsstands 2026
+    # eine Änderung mit Wirksamkeit nach dem Zensusstichtag.
+    ohne_beleg = [k for k in aufgegangen
+                  if not any((wsk_gem.get(a) or "") > ZENSUS_STICHTAG
+                             for a in name if a[:5] == k[:5])]
+    if ohne_beleg:
+        raise SystemExit(f"Zensus-Gemeinden ohne Punkt und ohne Änderung im Kreis: {ohne_beleg}")
     n_pop = len(punkte)
     ags = np.array([p[0] for p in punkte])
     lon = np.array([p[1] for p in punkte])
@@ -174,6 +225,7 @@ def main() -> int:
     gx, gy = tr.transform(lon, lat)
     reihen: dict[str, np.ndarray] = {}
     nodata_pkt = np.zeros(n_pop, dtype=bool)
+    nd_jahre = {"ssd": np.zeros(n_pop, dtype=int), "rad": np.zeros(n_pop, dtype=int)}
     for key, loader in (("ssd", H._ssd_grid), ("rad", H._rad_grid)):
         werte = []
         for jahr in H.JAHRE:
@@ -181,7 +233,9 @@ def main() -> int:
             col = ((gx - hdr["XLLCORNER"]) / hdr["CELLSIZE"]).astype(int)
             row = ((gy - hdr["YLLCORNER"]) / hdr["CELLSIZE"]).astype(int)
             v = arr[arr.shape[0] - 1 - row, col].astype(float)
-            nodata_pkt |= v == hdr.get("NODATA_VALUE", -999.0)
+            nd = v == hdr.get("NODATA_VALUE", -999.0)
+            nodata_pkt |= nd
+            nd_jahre[key] += nd
             werte.append(v)
         reihen[key] = np.array(werte)                   # (Jahre, Punkte)
     t_ssd = _trend_matrix(H.JAHRE, reihen["ssd"])
@@ -271,6 +325,48 @@ def main() -> int:
         q_h.append(np.where(tk_ssd != 0, tk_rad / np.where(tk_ssd != 0, tk_ssd, 1.0), np.nan))
     n_zeit = int(ssd_pos.sum())
     zeitstab = spearman(q_h[0][ssd_pos], q_h[1][ssd_pos])
+    k_zeit_raus = [kreise.get(k, k) for k, ok in zip(k_ids, ssd_pos) if not ok]
+
+    # ── Kreise des Gebietsstands ohne Kreiswert, Grund aus den Daten ─────────
+    kreis_von = np.array([a[:5] for a in ags])
+
+    def punkt_grund(j: int) -> str:
+        if not (np.isfinite(t_ssd[j]) and np.isfinite(t_rad[j])):
+            return "hat keine auswertbare Trendreihe"
+        if t_ssd[j] <= 0:
+            return (f"hat einen SSD-Trend 1997–2022 von {_z(t_ssd[j], 2)} %/Dekade und "
+                    "fällt an »SSD-Trend > 0« heraus")
+        if not (np.isfinite(d_norm[j]) and d_norm[j] > 0):
+            return "fällt an »ΔSSD der Normalperioden > 0« heraus"
+        return f"hat einen SSD-Trend von {_z(t_ssd[j], 2)} %/Dekade, unter 1 %/Dekade"
+
+    krs_raus = []
+    for k in sorted(set(kreise) - set(k_ids)):
+        i = np.flatnonzero(kreis_von == k)
+        if len(i) == 0:
+            g = "sein Punkt hat keine eigene Gemeindezeile im Zensus und damit kein Gewicht"
+        elif len(i) == 1:
+            g = f"sein einziger Punkt mit Gewicht {punkt_grund(int(i[0]))}"
+        else:
+            g = f"keiner seiner {len(i)} Punkte mit Gewicht bleibt in der Menge"
+        krs_raus.append(f"{kreise[k]} ({k}): {g}")
+
+    # ── NODATA in der stabilen Menge ─────────────────────────────────────────
+    nd_s = np.flatnonzero(nodata_pkt & s)
+    nd_voll = bool(len(nd_s)) and all(nd_jahre["rad"][j] == len(H.JAHRE)
+                                      and nd_jahre["ssd"][j] == 0 for j in nd_s)
+    if len(nd_s) and not (nd_voll and np.all(q_pkt[nd_s] == 0)):
+        raise SystemExit("NODATA in der stabilen Menge anders als in allen Jahren der "
+                         "Globalstrahlung: Text der Anlage passt nicht")
+    nd_krs = sorted({ags[j][:5] for j in nd_s})
+    nd_anteil = [float(gew[[j for j in nd_s if ags[j][:5] == k]].sum() / gew[kr[k]].sum())
+                 for k in nd_krs]
+    nd_bund = float(gew[nd_s].sum())
+    print(f"Ohne Gewicht: {({k: len(v) for k, v in ohne.items()})}; Wechsel {wechsel}; "
+          f"aufgegangen {len(aufgegangen)} ({sum(fehlend[k] for k in aufgegangen):.0f} EW)")
+    print(f"Kreise ohne Wert: {krs_raus}; Zeitstabilität ohne: {k_zeit_raus}")
+    print(f"NODATA stabil: {[name[ags[j]] for j in nd_s]}; Kreisanteile {nd_anteil}; "
+          f"Bund {nd_bund:.6f}")
 
     r_rang, r_zeit = round(rangtreue, 2), round(zeitstab, 2)
     zweig = _zweig(r_rang, r_zeit)
@@ -308,9 +404,11 @@ def main() -> int:
              "`k_uv_herleitung.py` übernommen, dessen Anlage bleibt unverändert.\n")
     p.append("Gefragt ist, ob die Streuung des Rasterquotienten q = ΔGlobalstrahlung ÷ "
              "ΔSonnenscheindauer über die Gemeindepunkte ein räumliches Muster ist oder "
-             "Schätzrauschen zweier Trends über 26 Jahre. Nur ein beständiges Muster "
-             "könnte die Reihenfolge der Kommunen verändern, wenn das Modell statt des "
-             "Bundeswerts einen Wert je Kreis nähme.\n")
+             "Schätzrauschen zweier Trends über 26 Jahre. Ein Wert je Kreis verschöbe die "
+             "Reihenfolge der Kreise auch dann, wenn er nur Rauschen ist; wie stark, misst "
+             "die Rangtreue. Dass der Bundeswert die Reihenfolge der Kommunen falsch "
+             "darstellt (Aufgabe §8 E3, Zweig 3 der Festlegung), belegt aber nur ein "
+             "beständiges Muster; das misst die Zeitstabilität.\n")
     p.append("**Abweichung vom Lauf vom 01.09.2026.** Die Gemeindepunkte kommen aus "
              "`backend/.cache/60_stichprobe/DE_VG250.gpkg`, Ebene `vg250_pk` "
              f"({_tsd(n_vg)} Punkte, Gebietsstand 2026); `backend/data/vg250/` gibt es "
@@ -325,23 +423,63 @@ def main() -> int:
 
     p.append("## 1 Punktmengen-Kette\n")
     p.append(f"- **{_tsd(n_vg)}** Gemeindepunkte in `vg250_pk`")
+    neu = sorted(ohne["neu"], key=lambda a: (wsk_gem[a], name[a]))
     p.append(f"- **{_tsd(n_pop)}** davon mit eigener Gemeindezeile im Zensus 2022, also "
-             f"mit Einwohnerzahl und 65+-Anteil. Ohne Gewicht bleiben {_tsd(n_kreis + n_keine)} "
-             f"Punkte: {_tsd(n_kreis)} mit nur einer Kreiszeile, davon {_tsd(n_kreis_gf)} "
-             f"gemeindefreie Gebiete; {_tsd(n_keine)} ohne jede Zeile. Die Kreiszeile nennt "
-             "den 65+-Anteil, aber nicht die Einwohner der Gemeinde. Umgekehrt haben "
-             f"Gemeinden des Zensus mit zusammen {_tsd(int(round(ew_ohne_punkt)))} "
-             f"Einwohnern ({_z(ew_ohne_punkt / ew_gemeinden * 100, 2)} %) keinen Punkt im "
-             "Gebietsstand 2026, weil sie seit 2022 in anderen Gemeinden aufgegangen sind.")
+             f"mit Einwohnerzahl und 65+-Anteil. Ohne Gewicht bleiben "
+             f"{_tsd(n_vg - n_pop)} Punkte. {_tsd(n_kreis)} davon haben nur eine "
+             "Kreiszeile, und die nennt den 65+-Anteil, aber nicht die Einwohner der Gemeinde:")
+    p.append(f"  - {_tsd(len(ohne['gf']))} gemeindefreie Gebiete.")
+    p.append("  - " + _liste([f"{name[a]} ({a})" for a in ohne["geheim"]])
+             + ": Der Zensus weist ».« aus (unbekannt oder geheim).")
+    p.append(f"  - {_tsd(len(neu))} Gemeinden, die nach dem Zensusstichtag 15.05.2022 neu "
+             "gebildet wurden und deshalb keine eigene Zeile haben (Wirksamkeit laut VG250): "
+             + _liste([f"{name[a]} ({_datum(wsk_gem[a])})" for a in neu]) + ".")
+    p.append("  - Gar keine Zeile hat "
+             + _liste([f"{name[a]} ({a}), seit {_datum(wsk_krs[a[:5]])} "
+                       f"{kreis_bez[a[:5]][:1].lower() + kreis_bez[a[:5]][1:]}; auch für "
+                       f"seinen Kreis {a[:5]} hat der "
+                       "Zensus keine Zeile" for a in ohne["keine"]]) + ".")
+    p.append(f"- Umgekehrt haben {_tsd(len(fehlend))} Gemeinden des Zensus mit zusammen "
+             f"{_tsd(int(round(ew_ohne_punkt)))} Einwohnern "
+             f"({_z(ew_ohne_punkt / ew_gemeinden * 100, 2)} %) keinen Punkt im "
+             "Gebietsstand 2026:")
+    for alt, neu_a in wechsel.items():
+        p.append(f"  - {name[neu_a]}, im Zensus {alt} mit {_tsd(int(fehlend[alt]))} Einwohnern "
+                 f"({_z(fehlend[alt] / ew_ohne_punkt * 100, 0)} %), ist nicht aufgegangen, "
+                 f"sondern hat den Schlüssel gewechselt: Die Stadt steht seit "
+                 f"{_datum(wsk_krs[neu_a[:5]])} unter {neu_a}, dem Punkt ohne jede Zeile. "
+                 f"VG250 trägt für den neuen Kreis {neu_a[:5]} und für den abgebenden Kreis "
+                 f"{alt[:5]} ({kreise[alt[:5]]}) dieselbe Wirksamkeit.")
+    p.append(f"  - {_tsd(len(aufgegangen))} Gemeinden mit "
+             f"{_tsd(int(round(sum(fehlend[k] for k in aufgegangen))))} Einwohnern sind in "
+             f"anderen Gemeinden aufgegangen: In jedem ihrer "
+             f"{_tsd(len({k[:5] for k in aufgegangen}))} Kreise trägt VG250 für mindestens "
+             "eine Gemeinde eine Änderung mit Wirksamkeit nach dem Zensusstichtag.")
     p.append(f"- **{_tsd(n_gilt)}** davon mit auswertbaren Trendreihen in beiden Rastern "
              "(endlicher SSD- und Globalstrahlungstrend 1997–2022, SSD-Trend > 0, "
              "ΔSSD der Normalperioden > 0)")
     p.append(f"- **{_tsd(n_stab)}** nach dem Stabilitätsausschluss (SSD-Trend ≥ 1 %/Dekade) "
              f"— die Menge, über die alle folgenden Zahlen laufen. Sie liegen in "
-             f"**{_tsd(len(k_ids))}** Kreisen und **{_tsd(len(la))}** Ländern. "
-             f"{_tsd(int((nodata_pkt & s).sum()))} dieser Punkte liegen in mindestens "
-             "einem Jahr auf einer Rasterzelle ohne Wert (NODATA); die Regel des "
-             "Bundeswerts schließt sie nicht aus, sie bleiben deshalb in der Menge.\n")
+             f"**{_tsd(len(k_ids))}** Kreisen und **{_tsd(len(la))}** Ländern.")
+    p.append(f"  - VG250 führt im Gebietsstand 2026 {_tsd(len(kreise))} Kreise. Es fehlen "
+             + "; ".join(krs_raus) + ". "
+             + ("Dieser Kreis fehlt" if len(krs_raus) == 1 else "Beide fehlen"
+                if len(krs_raus) == 2 else "Diese Kreise fehlen")
+             + " deshalb auch in den Kreiswerten, der Rangtreue und der Zeitstabilität.")
+    if len(nd_s):
+        p.append(f"  - {_tsd(len(nd_s))} Punkte der Menge liegen in allen "
+                 f"{len(H.JAHRE)} Jahren des Globalstrahlungsrasters auf einer Zelle ohne Wert "
+                 "(NODATA), im Raster der Sonnenscheindauer in keinem: "
+                 + _liste([name[ags[j]] for j in nd_s]) + ". Ihr Globalstrahlungstrend ist "
+                 "damit 0 und ihr Punktquotient genau 0. Das drückt die Werte ihrer "
+                 f"{_tsd(len(nd_krs))} Kreise: Jeder liegt um den Gewichtsanteil dieser "
+                 "Punkte im Kreis niedriger, als er ohne sie läge, hier um "
+                 f"{_z(min(nd_anteil) * 100, 2 if min(nd_anteil) < 0.01 else 1)}–"
+                 f"{_z(max(nd_anteil) * 100, 2 if max(nd_anteil) < 0.01 else 1)} %. Im "
+                 f"Bundeswert tragen sie {_z(nd_bund * 100, 2)} % des Gewichts. Die Regel des "
+                 "Bundeswerts schließt sie nicht aus; nach der Festlegung bleiben sie "
+                 "deshalb in der Menge.")
+    p.append("")
 
     p.append("## 2 Reproduktion des Bundeswerts\n")
     p.append(f"q_Bund = {_z(a_mm)} × {_z(q_mm)} (MM) + {_z(1 - a_mm)} × {_z(q_c44)} (C44) "
@@ -362,9 +500,9 @@ def main() -> int:
         p.append(f"| {name} | {_z(perz[pz])} | {_pz(perz[pz] / q_bund_roh - 1)} |")
     p.append("")
     p.append("Zwischen dem 10. und 90. Perzentil liegen die Kreiswerte bei "
-             f"{_pz(perz[10] / q_bund_roh - 1)} … {_pz(perz[90] / q_bund_roh - 1)} um "
+             f"{_spanne(perz[10] / q_bund_roh - 1, perz[90] / q_bund_roh - 1)} um "
              f"q_Bund, zwischen dem 5. und 95. Perzentil bei "
-             f"{_pz(perz[5] / q_bund_roh - 1)} … {_pz(perz[95] / q_bund_roh - 1)}. Zum "
+             f"{_spanne(perz[5] / q_bund_roh - 1, perz[95] / q_bund_roh - 1)}. Zum "
              "Vergleich die Gemeindepunkte (`k_uv_herleitung.md`, Abschnitt 4): 5./95. "
              "Perzentil 0,3225/1,1671.\n")
     p.append("Die 16 Landeswerte:\n")
@@ -379,7 +517,8 @@ def main() -> int:
     p.append("Die Rangkorrelation nach Spearman vergleicht zwei Reihenfolgen derselben "
              "Kreise: 1 heißt gleiche Reihenfolge, 0 kein Zusammenhang, −1 umgekehrte "
              "Reihenfolge.\n")
-    p.append(f"- **Rangtreue: {_z(rangtreue, 2)}** über {_tsd(len(k_ids))} Kreise. "
+    p.append(f"- **Rangtreue: {_z(rangtreue, 2)}** über {_tsd(len(k_ids))} Kreise, von "
+             f"{_tsd(len(kreise))} im Gebietsstand 2026; die fehlenden nennt Abschnitt 1. "
              "Verglichen wird die Reihenfolge der Kreise nach dem Euro-Betrag je "
              "Einwohner, proportional zu Σ (Gewicht × q) ÷ Einwohner, einmal mit q_Bund "
              "für alle Kreise und einmal mit q je Kreis. Einwohner sind die der Punkte in "
@@ -391,7 +530,8 @@ def main() -> int:
              "Abschnitt 3. Einbezogen sind die Kreise mit positivem SSD-Trend in beiden "
              "Hälften; "
              + ("1 Kreis fällt" if len(k_ids) - n_zeit == 1
-                else f"{_tsd(len(k_ids) - n_zeit)} Kreise fallen") + " deshalb heraus.\n")
+                else f"{_tsd(len(k_ids) - n_zeit)} Kreise fallen") + " deshalb heraus"
+             + (f" ({_liste(k_zeit_raus)}).\n" if k_zeit_raus else ".\n"))
 
     p.append("## 5 Entscheidungsregel und Schwellen\n")
     p.append("Zweig 1 gilt bei Rangtreue ≥ 0,90: Der Bundeswert bleibt, denn die "
