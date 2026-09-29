@@ -9,7 +9,8 @@ Teilen über den Befehl ``python -m app.cli ergebnisbericht`` und liest die HTML
 (b) Teil 9 nennt GeoPackage, Maßnahmen-Excel und Parameter-Excel mit dem Dateinamen, den die
     Namensregel der Downloads (Paket 11, ``download_namen.download_dateiname``) für Warmsen liefert;
 (c) jeder Verweis auf eine Methodenbeschreibung in den Teilen 0 bis 8 („Bericht #95“,
-    „Methodik-Bericht #95“, „Methodenbeschreibung“) nennt eine Anlage aus Teil 9, und kein Teil
+    „Methodik-Bericht #95“, „Methodenbeschreibung“, auch ohne Nummer und in der Mehrzahl wie „die
+    Methodik-Berichte“) nennt eine Anlage aus Teil 9, und kein Teil
     nennt einen Pfad. Gegenproben belegen, dass die Prüffunktion an beiden Verstößen scheitert.
 """
 
@@ -44,7 +45,12 @@ EXPORTE_ERWARTET = {
 }
 
 VERWEIS = re.compile(r"(Anlage (M\d+), )?(?:Methodik-)?Bericht #(\d+)")
-METHODENBESCHREIBUNG = re.compile(r"Methodenbeschreibung")
+# Verweis ohne Nummer, auch in der Mehrzahl oder gebeugt: „die Methodik-Berichte“, „des
+# Methodikberichts“, „Methodenbeschreibungen“, „Methodenbericht“. Ein nummerierter Verweis
+# („Methodik-Bericht #95“) fällt unter VERWEIS und zählt hier nicht doppelt.
+METHODENBESCHREIBUNG = re.compile(
+    r"Methodenbeschreibung(?:en)?|Methodenbericht(?:e|en|s|es)?\b"
+    r"|Methodik-?[Bb]ericht(?:e|en|s|es)?\b(?!\s*#\d)")
 # Pfad im Produkt-Repo (Internetadressen amtlicher Quellen sind kein Pfad in diesem Sinn).
 PFAD = re.compile(r"docs/|reviews/|BEFUNDE_|\bbackend/|\bfrontend/|\b[\w-]+\.md\b")
 BLOCK = {"p", "li", "td", "th", "h1", "h2", "h3", "div"}
@@ -221,6 +227,11 @@ GEGENPROBEN = {
     "fremde-anlage": "<p>Siehe Anlage M96, Methodik-Bericht #96 §2.</p>",
     "falsche-kennung": "<p>Siehe Anlage M98, Methodik-Bericht #95 §2.</p>",
     "methodenbeschreibung": "<p>Die Methodenbeschreibung liegt beim Hersteller.</p>",
+    # Mehrzahl ohne Nummer — so stand es bis Nacharbeitsrunde 1 im Kundensatz zu Zeile 20 (Teil 2).
+    "methodik-berichte": "<td>Die Methodik-Berichte sind nur beim Hersteller einsehbar.</td>",
+    "methodikberichts": "<p>Näheres im Anhang des Methodikberichts.</p>",
+    "methodenberichte": "<li>Die Methodenberichte liegen beim Hersteller.</li>",
+    "mehrzahl-fremde-anlage": "<p>Die Methodik-Berichte gehen als Anlagen mit (Anlage M96).</p>",
     "pfad-text": "<p>Methode siehe docs/methodik/95_hitzebelastung.md.</p>",
     "pfad-verweis": '<p><a href="95_hitzebelastung.md">Methode</a></p>',
 }
@@ -236,3 +247,21 @@ def test_regelkonformes_stueck_besteht():
     verstoesse, n = verweis_verstoesse(
         _stueck("<p>Setzung von KAP3 (Anlage M95, Methodik-Bericht #95 §3.5).</p>"), {"M95"})
     assert verstoesse == [] and n == 1
+
+
+def test_regelkonforme_mehrzahl_besteht():
+    verstoesse, n = verweis_verstoesse(
+        _stueck("<td>Die Methodik-Berichte gehen als Anlagen mit diesem Bericht, verzeichnet in "
+                "Teil 9 (zur Hitzebelastung Anlage M95).</td>"), {"M95"})
+    assert verstoesse == [] and n == 1
+
+
+def test_c_teil2_zeile20_nennt_die_anlage(wurzel, teil9):
+    """Der Kundensatz zu Zeile 20 der Konformitätsliste verweist auf die Methodik-Berichte; er
+    nennt die Anlage aus Teil 9 und sagt nicht mehr, sie seien für die Kommune nicht erreichbar."""
+    teil2 = teile_nach_nummer(wurzel)[2]
+    zeile = next(z for z in teil2.mit_klasse("anforderung") if z.attrs.get("data-nr") == "20")
+    text = _text(zeile)
+    assert METHODENBESCHREIBUNG.search(text), text
+    assert "Anlage M95" in text and "M95" in _anlagen(teil9)
+    assert "nicht erreichbar" not in text and "beim Hersteller" not in text
