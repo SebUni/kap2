@@ -34,6 +34,7 @@ from app.services.ergebnisbericht.klima import (
 from app.services.ergebnisbericht.konformitaet import (
     STATUS, fundstelle_ohne_datei, kundensatz, lies_checkliste, umschreibe,
 )
+from app.services.ergebnisbericht.raum import UEBRIG
 from app.services.ergebnisbericht.sammler import DATENSTAENDE, Berichtsdaten
 from app.services.kurzfassung_markdown import _de_euro
 
@@ -43,6 +44,7 @@ UEBERSCHRIFTEN = {
     2: "Teil 2 · Rechtlicher und methodischer Rahmen",
     3: "Teil 3 · Klimatische Ausgangslage",
     4: "Teil 4 · Betroffenheitsanalyse je Klimawirkung",
+    5: "Teil 5 · Raumergebnis",
     7: "Teil 7 · Parameter- und Quellenverzeichnis",
     8: "Teil 8 · Grenzen und Vollständigkeitsanzeige",
 }
@@ -348,8 +350,104 @@ def teil_4(d: Berichtsdaten) -> str:
     html.append("</table>")
     html.append(f"<p>Jahresbetrag der Hitzebelastung in {_h(k.name)}: "
                 f"<strong>{_preisstand(d, e.jahresbetrag_eur)}</strong>. "
-                f"Der Betrag gilt für die ganze Kommune; eine Aufteilung nach Ortsteilen enthält "
-                f"diese Fassung nicht.</p>")
+                f"Der Betrag gilt für die ganze Kommune; die Aufteilung nach Ortsteilen steht in "
+                f"<a href=\"#teil-5\">Teil 5</a>.</p>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
+# ── Teil 5 ──────────────────────────────────────────────────────────────────────
+
+GRUND_OHNE_ORTSTEILE = "Die Quelle führt für diese Kommune keine Ortsteilgrenzen."
+
+
+def _anzeigename(z, gibt_ortsteile: bool) -> str:
+    """Die Zeile ohne Ortsteilfläche heißt „übriges Gemeindegebiet“, sobald es Ortsteile gibt
+    (eine Zeile mit dem Namen der Kommune läse sich neben ihnen wie eine Summe)."""
+    if z.art == "gemeinde" and gibt_ortsteile:
+        return UEBRIG
+    return z.name
+
+
+def teil_5(d: Berichtsdaten) -> str:
+    """Raumergebnis (T-1565): #95 je Ortsteil, absolut und je 1.000 Einwohner. Eine Zeile ohne
+    bewohnte Zelle nennt den Grund statt eines Betrags; die Summenzeile trägt den Nenner."""
+    k = d.kommune
+    zeilen = list(d.raum)
+    gibt_ortsteile = any(z.art == "ortsteil" for z in zeilen)
+    html = [_kopf(5)]
+    if gibt_ortsteile:
+        html.append(
+            f"<p>Die Tabelle teilt die Hitzebelastung (#95) von {_h(k.name)} nach Ortsteilen auf: "
+            f"jede bewohnte 100-m-Zelle des Zensus zählt zu dem Ortsteil, in dem ihre Mitte liegt. "
+            f"Neben den absoluten Werten stehen die Raten je 1.000 Einwohner, weil sie Ortsteile "
+            f"unterschiedlicher Größe vergleichbar machen. Die Zwischengrößen (Einwohner, davon ab "
+            f"65 Jahren, Hitzetage je Jahr) stehen als eigene Spalten.</p>")
+    else:
+        html.append(
+            f"<p>Die Quelle führt für {_h(k.name)} keine Ortsteilgrenzen. Deshalb steht hier genau "
+            f"eine Zeile für die ganze Kommune; eine Aufteilung nach Ortsteilen ist für diese "
+            f"Kommune nicht möglich.</p>")
+    zahl = 'class="zahl"'
+    html.append(
+        '<table class="raum"><tr><th>Ortsteil</th><th class="zahl">Einwohner</th>'
+        '<th class="zahl">davon ab 65 Jahren</th><th class="zahl">Hitzetage je Jahr</th>'
+        '<th class="zahl">Todesfälle je Jahr</th><th class="zahl">Todesfälle je 1.000 Einwohner</th>'
+        '<th class="zahl">Einweisungen je Jahr</th><th class="zahl">Einweisungen je 1.000 Einwohner</th>'
+        '<th class="zahl">Jahresbetrag</th><th class="zahl">Jahresbetrag je 1.000 Einwohner</th></tr>')
+    for z in zeilen:
+        name = _anzeigename(z, gibt_ortsteile)
+        if z.jahresbetrag_eur is None or z.grund:
+            grund = _h(z.grund or "Für diese Zeile liegt kein Betrag vor.")
+            html.append(
+                f'<tr class="raumzeile" data-art="{_h(z.art)}"><td>{_h(name)}</td>'
+                f'<td {zahl}>{_h(de_zahl(z.einwohner))}</td>'
+                f'<td {zahl}>{_h(de_zahl(z.einwohner_ab65))}</td>'
+                f'<td colspan="7" class="grund">{grund}</td></tr>')
+            continue
+        html.append(
+            f'<tr class="raumzeile" data-art="{_h(z.art)}"><td>{_h(name)}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.einwohner))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.einwohner_ab65))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.hitzetage, 1))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.todesfaelle, 2))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.todesfaelle_je_1000, 2))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.einweisungen, 2))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.einweisungen_je_1000, 2))}</td>'
+            f'<td {zahl}>{_betrag(d, z.jahresbetrag_eur)}</td>'
+            f'<td {zahl}>{_betrag(d, z.jahresbetrag_je_1000_eur)}</td></tr>')
+    bezifferte = [z for z in zeilen if z.jahresbetrag_eur is not None and not z.grund]
+    if bezifferte:
+        ew = sum(z.einwohner for z in zeilen)
+        ab65 = sum(z.einwohner_ab65 for z in zeilen)
+        tote = sum(z.todesfaelle for z in bezifferte)
+        einw = sum(z.einweisungen for z in bezifferte)
+        summe = sum(z.jahresbetrag_eur for z in bezifferte)
+        html.append(
+            f'<tr class="summe"><td>Summe {_nenner(d)}</td><td {zahl}>{_h(de_zahl(ew))}</td>'
+            f'<td {zahl}>{_h(de_zahl(ab65))}</td><td {zahl}>—</td>'
+            f'<td {zahl}>{_h(de_zahl(tote, 2))}</td><td {zahl}>{_h(de_zahl(tote / ew * 1000, 2))}</td>'
+            f'<td {zahl}>{_h(de_zahl(einw, 2))}</td><td {zahl}>{_h(de_zahl(einw / ew * 1000, 2))}</td>'
+            f'<td {zahl}>{_betrag(d, summe)}</td><td {zahl}>{_betrag(d, summe / ew * 1000)}</td></tr>')
+    html.append("</table>")
+    if gibt_ortsteile:
+        uebrig = [z for z in zeilen if _anzeigename(z, True) == UEBRIG]
+        if uebrig:
+            rest = (f"In der Zeile „{_h(UEBRIG)}“ stehen {_h(de_zahl(sum(z.einwohner for z in uebrig)))} "
+                    f"Einwohner, deren Zelle in keiner Ortsteilfläche liegt; sie gehören zu keinem "
+                    f"Ortsteil und sind vom Ortsteilvergleich nicht abgedeckt.")
+        else:
+            rest = "Alle bewohnten Zellen liegen in einer Ortsteilfläche."
+        html.append(
+            "<p>Was die Unterschiede zwischen den Ortsteilen treibt, sind zwei Größen: der Anteil "
+            "der Einwohner ab 65 Jahren, weil die Hitzesterblichkeit mit dem Alter steigt, und die "
+            "Zahl der Hitzetage je Zelle, weil sie die Belastung der Zelle bestimmt; je höher "
+            "beides, desto höher die Rate je 1.000 Einwohner. Raten kleiner Ortsteile beruhen auf "
+            f"wenigen Menschen und schwanken deshalb stärker. {rest}</p>")
+    html.append(
+        "<p>Die Ortsteilgrenzen stammen aus OpenStreetMap (Overpass API, Lizenz ODbL 1.0), Stand der "
+        "Daten 27.09.2026, abgerufen am 27.09.2026. © OpenStreetMap-Mitwirkende. Eine Karte "
+        "enthält diese Fassung nicht.</p>")
     html.append(_stand(d))
     return "\n".join(html)
 
@@ -435,5 +533,5 @@ def teil_8(d: Berichtsdaten) -> str:
 
 
 TEILE: dict[int, Callable[[Berichtsdaten], str]] = {
-    0: teil_0, 1: teil_1, 2: teil_2, 3: teil_3, 4: teil_4, 7: teil_7, 8: teil_8,
+    0: teil_0, 1: teil_1, 2: teil_2, 3: teil_3, 4: teil_4, 5: teil_5, 7: teil_7, 8: teil_8,
 }
