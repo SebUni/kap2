@@ -191,9 +191,9 @@ Basiswert dar, nicht als eigenen Basiswert:
   8.000 Betroffene, 1.179 Tage und ≈ 7.310 € weniger je Jahr; Richtung des Fehlers in
   Modellgrenze 7).
 
-Im Produkt sind beide Wirkungen heute nicht sichtbar (Sperre aus Befund 124; Integrationsauflagen S158 und
-Stadtbaumwahl in §5.1 und §5). Einen Wert „mit Anpassung“ gibt es dort erst nach der Integration und nur, wenn
-eine Kommune Maßnahmen wählt. Die KWRA-Stufen „mit Anpassung“ (Restrisiko, Blatt `Klimawirkungen`, Zeile 98,
+Im Produkt rechnen beide Hebel seit der Integration am 27.09.2026 im Zelllauf, als Katalogmaßnahmen
+„Pollen-Frühwarnung“ und „Allergenarme Stadtbaumwahl“ (Produktstand in §5.1 und §5, Befunde 230 und 231). Einen
+Wert „mit Anpassung“ gibt es dort nur, wenn eine Kommune Maßnahmen wählt. Die KWRA-Stufen „mit Anpassung“ (Restrisiko, Blatt `Klimawirkungen`, Zeile 98,
 Spalten AB bis AF, Maßnahmenpaket und Zeitscheibe nach Kopfzeile 2 der Mappe) sind:
 
 - AB: Aktionsplan Anpassung III (APA III), 2020–2030: gering
@@ -624,18 +624,18 @@ $$ \Delta\text{Tage}_{\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_R \cdot 
   verglichen, also innerhalb einer Stadt. Genau dort misst Hugg 2017 [74] den Anteil der
   örtlichen Quellen an der Pollenlast (Gräser, Helsinki und Espoo, abgeleitet 0,22–0,94;
   Richtung des Fehlers in Modellgrenze 7). Der Vergleich zwischen Kommunen bleibt unberührt
-  (Log 18). **Produktseitige Konsequenz — als Anforderung, nicht als Beleg** (Befund 124):
-  Das Maßnahmen-Modul rechnet \(\hat P\) nicht neu, sondern skaliert die
-  gespeicherten Zell-Outcomes mit dem Wirkungsfaktor der Maßnahme
-  (`measure_service._adjusted_cell_data`). Das ist **kein Nachweis** für die
-  Rechnung nach §5 — im Gegenteil: Eine pauschal auf diesen Risiko-Code
-  verknüpfte Maßnahme (`linked_risk_codes`) würde jede Zelle mit demselben Faktor
+  (Log 18). **Produktseitige Konsequenz** (Befund 124; Stand nach der Integration, Befund 231):
+  Eine pauschal auf diesen Risiko-Code verknüpfte Maßnahme (`linked_risk_codes`) mit einem
+  Wirkungsfaktor auf die gespeicherten Zell-Outcomes würde jede Zelle mit demselben Faktor
   senken, unabhängig von ihrem \(\hat G\) und davon, ob die Maßnahme sie trifft. Daher gilt als
-  **Integrationsauflage**: Für #96 ist **keine** pauschal wirkende Maßnahme
-  verknüpft; eine künftige Verknüpfung darf nur über die zellscharfe Änderung von
-  \(\hat G\) mit anschließender Neuberechnung bei festgehaltenem Ḡ₀ wirken, nie über
-  einen kommunenweiten Reduktionsfaktor. Testseitig
-  gebunden: `test_no_flat_measure_on_allergy_days`.
+  **Integrationsauflage**: Mit #96 ist **keine** pauschal wirkende Maßnahme verknüpft; eine
+  Verknüpfung wirkt nur über eine Rechnung je Zelle, nie über einen kommunenweiten
+  Reduktionsfaktor. Seit der Integration am 27.09.2026 sind zwei Maßnahmen so verknüpft: Die
+  allergenarme Stadtbaumwahl ändert \(\hat G\) der gewählten Zellen zu \(\hat G'\), und das
+  Maßnahmen-Modul rechnet \(\hat P\) und die Zusatztage dieser Zellen bei festgehaltenem Ḡ₀ neu
+  (§5); die Pollen-Frühwarnung rechnet die gewarnten Tage je Pollengruppe und Zelle (§5.1).
+  Beide rechnen frisch aus den gespeicherten Eingaben der Zelle. Testseitig gebunden:
+  `test_no_flat_measure_on_allergy_days` (für #96 nur die Zelllauf-Modelle `s158` und `stadtbaum`).
   Bis zur Anlage der Ebene ist \(\hat P \equiv 1\) **kein zulässiger stiller Fallback** —
   die Ebene ist Teil des Integrationsumfangs (Kartenebenen-Pflicht §3.6).
   **Ergebnis der Integration (31.08.2026; §3.1-Anlagepflicht):** Ebene
@@ -880,7 +880,7 @@ assert abs(dt * 6.20 - 1252) < 5
 | \(t_{\text{warn},g}\) | Anteil der zusätzlichen Symptomtage der Pollengruppe \(g\) (B, G), an denen der DWD-Index mindestens „mittel“ meldet (gewarnte Tage; nur Maßnahmen-Modul; nicht zu verwechseln mit dem Ĝ-Gewicht \(w_B\)) | — | **0,75** (Band 0,50–1,00), beide Gruppen — **§3.9 ABGESCHÄTZT**; Schwelle nach DWD [70], Ersetzungspfad \(\min(1;\ m_{g,V}/f)\) aus [71]; herleitung:#s158-wirkung |
 | \(m_{g,V}\) | Anteil **aller** Tage der Dekaden mit Zusatztagen, an denen der DWD-Index der Gruppe \(g\) im DWD-Gebiet \(V\) mindestens „mittel“ meldet (nur Ersetzungspfad von \(t_{\text{warn}}\)) | — | noch nicht ausgewertet; Quelle DWD-Pollenflugstatistik [71]; wird über \(m_{g,V}/f\) umgerechnet, nie direkt eingesetzt; herleitung:#s158-wirkung |
 | \(V\) | Gebiet des DWD-Pollenflug-Gefahrenindex (12 Gebiete mit 27 Vorhersageflächen [72]), für das [71] den Anteil ausweist; **nicht** die Modellregion \(R\) (Nord/Mitte/Süd, §3.3). Jedes Gebiet liegt in genau einer Modellregion | — | Zuordnung Zelle → DWD-Gebiet über das Bundesland (und das Teilgebiet) der Zelle; herleitung:#s158-wirkung |
-| \(A_{\text{Zelle}}\) | Geltungsbereich der Pollen-Frühwarnung: 1, wenn die Zelle im Gebiet der kommunalen Warnkanäle liegt, sonst 0 (Eingabe im Maßnahmen-Modul) | — | Eingabe des Nutzers, kein Parameter; herleitung:#s158-wirkung |
+| \(A_{\text{Zelle}}\) | Geltungsbereich der Pollen-Frühwarnung: Anteil der Zellfläche im Gebiet der kommunalen Warnkanäle, von 0 (außerhalb) bis 1 (ganz im Gebiet); im Maßnahmen-Modul der Deckungsgrad der Zelle durch die Geometrie der Maßnahme (Befund 232) | — | Eingabe des Nutzers, kein Parameter; herleitung:#s158-wirkung |
 | \(\delta_B,\ \delta_G\) | Zusatztage je Betroffenem der Birkengruppe bzw. der Gräser, \(\delta_B + \delta_G = \delta_R\) | Tage/(Betroffener·Jahr) | Teilung von \(\delta_R\) nach den beiden Summanden (§3.3); Berlin 0,8085 / 1,0710; herleitung:#s158-wirkung |
 
 ### 3.7 Schicht A (getrennt; nie auf €-Pfaden)
@@ -1105,10 +1105,27 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
   anfallen; so zählt kein vermiedener Tag doppelt, weil die Frühwarnung nur auf Tage wirkt, die die
   Pflanzung nicht schon vermieden hat. Befunde 124 und 129 bleiben: keine pauschal verknüpfte
   Maßnahme, gerechnet wird im Zelllauf.
-  **Produktstand, ehrlich benannt:** Im Produkt ist die Wirkung heute **nicht** sichtbar. Die
-  Sperre aus Befund 124 lässt keine Maßnahme auf #96 zu (`linked_risk_codes` leer,
-  `test_no_flat_measure_on_allergy_days`), eine Katalogmaßnahme zur Stadtbaumwahl gibt es nicht, und
-  das Maßnahmen-Modul rechnet \(\hat G\) nicht neu. **Integrationsauflage (Stadtbaumwahl)**, im
+  **Produktstand, ehrlich benannt (seit der Integration am 27.09.2026, Befund 230):** Die Wirkung ist im
+  Produkt sichtbar, als Katalogmaßnahme „Allergenarme Stadtbaumwahl“, die im Zelllauf rechnet. Die
+  Kommune zeichnet die Zellen als Geometrie der Maßnahme und gibt einen Anteil \(a\) ein, 0 < \(a\) ≤ 1:
+  den Anteil der allergenen Kronen, die dort ersetzt werden. Je Zelle sinkt der Kronenanteil mit
+  Gattungs-Tag um \(a\) × Deckungsgrad × \(k_{\text{Birke},z}\) und der ohne Gattungs-Tag um
+  \(a\) × Deckungsgrad × \(k_{\text{unbek},z}\), jeweils in seinem eigenen Term; die Senkung folgt also
+  der Mischung der Zelle im Ausgangsstand (eine Eingabe getrennt nach Kronen mit und ohne Gattungs-Tag,
+  wie sie Punkt (2) unten verlangt, hat das Produkt nicht: Befund 247). Daraus rechnet das Produkt
+  \(\hat G'\) nach der Formel unten, \(\hat P\) mit dem Ḡ₀, das im Ausgangslauf gespeichert wurde, und die
+  Zusatztage der Zelle neu. Ausgewiesen werden die vermiedenen Tage je Zelle und die vermiedenen Tage
+  und Euro der Kommune, gekennzeichnet als „Abschätzung von KAP3“ mit dem Hinweis auf die Richtung des
+  Fehlers in λ (Modellgrenze 7). Fehlt die Eingabe \(a\) oder führen die gewählten Zellen keine Kronen,
+  steht ein Vermerk statt 0 €. Für die Allee-Zelle und das Rechenbeispiel der Kommune oben ergibt das
+  Produkt dieselben Zahlen (26,3 Tage und ≈ 163 € je Jahr; 1.179 Tage und ≈ 7.310 € je Jahr);
+  liegen Frühwarnung und Stadtbaumwahl in derselben Zelle, rechnet die Frühwarnung ihre vermiedenen Tage
+  auf die Tage nach der Pflanzung (Absatz oben; Allee-Zelle 6,597 statt 7,19 Tage). Was noch vom Bericht
+  abweicht, führt das Ledger: Den Euro-Betrag der Frühwarnung rechnet das Produkt in diesem Fall noch auf
+  den Ausgangsstand (44,57 € statt 6,597 × 6,20 € = 40,90 €, Befund 240), Euro je Zelle gibt es nicht aus
+  (Befund 237), die Kosten der Maßnahme sind nicht beziffert (Befund 253), und Gattungswissen der
+  Kommune geht nur kommunenweit über \(s_{\text{unbek}}\) ein (Befund 246).
+  **Integrationsauflage (Stadtbaumwahl)**, im
   Rahmen der Auflage aus §3.3 (nur zellscharfe Änderung von \(\hat G\) mit Neuberechnung, nie ein
   Faktor): Der CTO braucht (1) die vom Nutzer gewählten Zellen, (2) als Eingabe die Änderung des
   Kronenanteils der Birkengruppe in diesen Zellen (Beispiel: 0,30 → 0,20), getrennt nach Kronen mit
@@ -1255,8 +1272,10 @@ zu werden, und \(t_{\text{warn}}\) ist ein Anteil unter den Symptomtagen, nicht 
 $$ \Delta\text{Tage}^{\,\text{mit S158}}_{\text{Zelle}} \;=\; \Delta\text{Tage}_{\text{Zelle}} \;-\; A_{\text{Zelle}} \cdot r_{\text{S158}} \cdot \sum_{g \in \{B,\,G\}} t_{\text{warn},g} \cdot \Delta\text{Tage}_{g,\text{Zelle}}, \qquad \Delta\text{Tage}_{g,\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_g \cdot \hat P_{\text{Zelle}} $$
 
 mit \(r_{\text{S158}} = q_{\text{reich}} \cdot q_{\text{handel}} \cdot e_{\text{Tag}}\). \(A_{\text{Zelle}}\)
-ist 1, wenn die Zelle im Geltungsbereich der kommunalen Warnkanäle liegt, sonst 0;
-\(q_{\text{reich}}\) ist die Reichweite unter den Betroffenen **innerhalb** dieses Bereichs, deshalb
+ist der Anteil der Zellfläche im Geltungsbereich der kommunalen Warnkanäle: 1 für eine Zelle ganz im
+Gebiet, 0 außerhalb, dazwischen für eine Zelle am Rand des Gebiets. Für den Randfall gelten die
+Betroffenen als gleichmäßig über die Zelle verteilt; im Produkt ist \(A_{\text{Zelle}}\) der Deckungsgrad
+der Zelle durch die Geometrie der Maßnahme (Befund 232). \(q_{\text{reich}}\) ist die Reichweite unter den Betroffenen **innerhalb** dieses Bereichs, deshalb
 zählt die Fläche nicht doppelt. In Worten: Von den Zusatztagen einer Zelle zählt je Gruppe nur der
 gewarnte Teil, und davon wird der Anteil \(r_{\text{S158}}\) vermieden.
 
@@ -1412,19 +1431,25 @@ Zelllauf rechnet, nicht als Faktor auf gespeicherte Ergebnisse. Er braucht dafü
    den Faktor \(f\) verdünnen würde);
 3. den Wirkungsfaktor je gewarntem Tag \(r_{\text{S158}}\) (Kapitel 7 `pollen.r_s158`, 0,03);
 4. den Geltungsbereich \(A_{\text{Zelle}}\) als Eingabe im Maßnahmen-Modul (ganze Kommune oder
-   ausgewählte Gebiete);
+   ausgewählte Gebiete, gezeichnet als Geometrie der Maßnahme; je Zelle ihr Deckungsgrad von 0 bis 1);
 5. als Ausgabe die vermiedenen Tage und Euro je Zelle und für die Kommune, gekennzeichnet als
    „Abschätzung von KAP3“ (Vorgabe P1).
 
-Die Sperre aus Befund 124 gilt weiter, bis der CTO die Rechnung im Zelllauf gebaut hat:
-`linked_risk_codes` von `POLLEN_EARLY_WARNING` bleibt leer, `EXPECTED_ANNUAL_ALLERGY_DAYS` steht dort nur
-unter `qualitative_risk_codes` (Zuordnung ohne Rechenwirkung), und der Test
-`test_no_flat_measure_on_allergy_days` bleibt grün. Der Katalog führt `default_reduction` = 0,03
-(`backend/app/data/catalog.py`, Code-Stand im Revisionsstand, Ledger-Befund 215). Weil
-`linked_risk_codes` leer ist, wird der Faktor nur ausgewiesen und ändert keinen Karten- oder
-Ergebniswert von #96. Mit den heutigen Werten wäre ein
+**Produktstand (seit 27.09.2026, Befund 231).** Der CTO hat die Rechnung im Zelllauf gebaut.
+`POLLEN_EARLY_WARNING` führt `EXPECTED_ANNUAL_ALLERGY_DAYS` in `linked_risk_codes` mit dem
+Zelllauf-Modell `s158`, `qualitative_risk_codes` ist leer, `default_reduction` = 0,03
+(`backend/app/data/catalog.py`, Ledger-Befund 215). Die Sperre aus Befund 124 ist damit erfüllt, nicht
+aufgehoben: Der Test `test_no_flat_measure_on_allergy_days` lässt für #96 nur Maßnahmen zu, die im
+Zelllauf rechnen, und keine rechnet über einen pauschalen Reduktionsfaktor. Die Zusatztage je Gruppe
+holt das Maßnahmen-Modul je Zelle frisch aus den gespeicherten Eingaben der Zelle (Punkt 1); im
+Geltungsbereich ändert die Frühwarnung Karten- und Ergebniswerte von #96. Ausgewiesen werden die
+vermiedenen Tage je Zelle und die vermiedenen Tage und Euro der Kommune, gekennzeichnet als „Abschätzung
+von KAP3“ (Punkt 5); ohne Aufteilung nach Gruppe steht ein Vermerk statt 0 €. Zwei Punkte sind nicht
+vollständig umgesetzt: Den Ersetzungspfad aus Punkt 2 hat das Produkt nur als Formel, ohne die Daten
+[71] und [72]; es rechnet mit 0,75 für beide Gruppen und alle Gebiete (Modellgrenze 8, Befund 233). Euro
+je Zelle aus Punkt 5 gibt es nicht aus (Befund 237). Mit den heutigen Werten wäre ein
 Faktor 0,0225 auf die gespeicherten Zusatztage der Zellen im Geltungsbereich zahlengleich (siehe
-„Was die Formel heute von einem Faktor unterscheidet“). Verlangt wird der Zelllauf mit getrennten
+„Was die Formel heute von einem Faktor unterscheidet“). Verlangt war der Zelllauf mit getrennten
 Gruppen trotzdem, weil nur er den Ersetzungspfad ohne Umbau aufnimmt: Mit
 \(t_{\text{warn},g,V}\) je Gruppe und DWD-Gebiet gäbe ein einziger Katalogfaktor für alle
 Kommunen den falschen Wert.
@@ -1450,8 +1475,9 @@ festgehaltenem Ḡ₀ neu gerechnet. So senkt auch ein flächiges Pflanzprogramm
 \(r_{\text{S158}}\) läuft nicht über \(\hat G/\lambda\): Die Frühwarnung ändert keine Bäume und
 keine Pollenlast, sie ist eine Verhaltens- und Expositionsminderung an gewarnten Tagen, also ein
 Verhaltenskanal und kein Vegetationskanal. Die Sperre aus Befund 124
-bleibt **unangetastet** (Integrationsauflage oben). Die Divergenz Bericht ⇄ Code ist
-**ausgewiesen und im Ledger geführt** (Befunde 151 und 156), nicht still (Eiserne Regel 5).
+bleibt **unangetastet**: Die Frühwarnung ist mit #96 nur über ihr Zelllauf-Modell verknüpft
+(Produktstand oben). Divergenzen Bericht ⇄ Code sind **ausgewiesen und im Ledger geführt**
+(Befunde 151 und 156, nach der Integration die Befunde ab 230), nicht still (Eiserne Regel 5).
 
 **Produkt-Kennzeichnung (§3.6/Vorgabe P1).** In der nutzersichtbaren Parameterliste tragen
 \(r_{\text{S158}}\) und \(t_{\text{warn}}\) den Vermerk „Abschätzung von KAP3“ mit dieser Herleitung (Schwelle
@@ -1514,6 +1540,8 @@ gegenläufige Evidenz (Neophyten [23], CO₂ [21,22]) macht das zur Untergrenze;
    (0,005–0,10): Reichweite, Handlungsbereitschaft und Tageswirkung sind je Zelle nicht
    beobachtbar und gelten in allen Zellen gleich. Ebenso pauschal ist vorerst der Anteil
    gewarnter Tage \(t_{\text{warn}}\) = 0,75 (0,50–1,00), gleich für beide Gruppen und alle Regionen.
+   Das Produkt hat die Umrechnung \(\min(1;\ m/f)\) als Funktion, aber weder die Daten [71] und [72]
+   noch die Zuordnung Zelle → DWD-Gebiet; es rechnet deshalb überall mit 0,75 (Befund 233).
    Innerhalb des Geltungsbereichs mindert die Maßnahme deshalb jede Zelle um denselben Anteil
    (2,25 %). **Heute ist das zahlengleich mit einem Faktor 0,0225** auf die Zusatztage der Zellen im
    Geltungsbereich: Die Festlegung hat den Wert geändert (nur gewarnte Tage, 2,25 % statt 3 %),
@@ -1663,10 +1691,10 @@ parameter:
 parameter:
   # Maßnahmen-Wirkungsfaktor S158 (Vorgabe P2 / Aufgabe §3.5 i. d. F. 06.09.2026).
   # KEIN Parameter der Schadensformel: wirkt ausschliesslich im Maßnahmen-Modul
-  # (Katalog POLLEN_EARLY_WARNING, default_reduction). Code-Stand 26.09.2026:
-  # default_reduction = 0,03 (backend/app/data/catalog.py); linked_risk_codes
-  # bleibt leer (Sperre aus Befund 124), im Produkt wirkt der Faktor auf #96
-  # erst nach der Integrationsauflage (S158) in §5.1 (Ledger-Befunde 151, 178, 215).
+  # (Katalog POLLEN_EARLY_WARNING, default_reduction). Code-Stand 29.09.2026:
+  # default_reduction = 0,03 (backend/app/data/catalog.py); seit 27.09.2026 mit
+  # #96 verknuepft ueber das Zelllauf-Modell s158, nie als pauschaler Faktor
+  # (Integrationsauflage S158 in §5.1; Ledger-Befunde 151, 178, 215, 231).
   # Kettenprodukt 0,35 x 0,40 x 0,20 = 0,028, gerundet 0,03 (§5.1); der Kommentar
   # an der wert-Zeile meint diese Rundung (Befund 220).
   id: pollen.r_s158
@@ -1962,6 +1990,6 @@ bewusste Überstimmung von Eintrag 19 (Ledger-Befund 182).
 | 21 | Kapitel 9 (Familien-Einordnung und Verworfen-Liste) nach Fortschreibung 7? | **gestrichen**; es bleibt genau eine Methodik (96-A, Familie „K1-Gesundheit bottom-up“ mit Prototyp #95), die verworfenen Ansätze stehen hier | **96-B (Neophyten-Szenario Ambrosia; Lake [23], Born [25], Hamaoui [24])** ersetzt 96-A nicht, weil es nur eine Art abbildet, Birke und Gräser als Hauptlast fehlen und es 2041–2060 statt heute projiziert (Ergänzungsmodul ab M1, Register 96-W024-02, Log 13). **96-C (nationaler Kostenanker, top-down)** ist nach §3.1 ausgeschieden, weil er einen Verteilschlüssel mit Deutschland-Nenner und einen normativ gesetzten Klimaanteil braucht. | Kapitel 9 behalten (verworfen: Fortschreibung 7, eine Methodik je Risiko; Ledger-Befund 152) | keine Zahlenwirkung |
 | 22 | Quelle von u20 für die Beispielkommune Berlin in der Rechenkette? | **Direkt aus Tab. 12411-09-01-4-B [68]**: u20 = unter 5 + 5–10 + 10–15 + 15–20 = 673.277, 20–64 = u65 − u20 = 2.288.153; die Zahlen nach Altersjahren stehen gleichlautend in Destatis Tab. 12411-09 [69] | Die Tabelle, aus der Ebene 1 schon u65 und die Seniorenbänder nimmt, führt die vier Gruppen selbst: gleicher Stichtag, gleiche Basis Zensus 2022, und ein Sachbearbeiter, der [68] öffnet, kommt auf dieselbe Zahl. | Anteil u20 aus dem Berliner Landesbericht A I 3 – j / 23 (verworfen: noch auf Basis Zensus 2011, 3.070.537 statt 2.961.430 unter 65-Jährige = 673.277 + 2.288.153 nach §3.0 Ebene 1, Mischung zweier Basen; Runde 0 des Managers) · Bundesanteil 24,07 % (verworfen; Rückfall des Produkts; für Berlin 1.737 Betroffene oder 0,43 % zu wenig, §3.0) | u20 673.277 (§3.0 Ebene 1) statt 677.877 im ersten Entwurf; Betroffene 402.103, Tage 755.753, bewerteter Schaden 4,69 Mio. € je Jahr (§3.0) |
 | 23 ⚠ | S158: an welchen Tagen und ab welcher Belastung wirkt die Warnung, und gilt \(e_{\text{Tag}}\) je gewarntem Tag? | **Nur an gewarnten Tagen:** DWD-Pollenflug-Gefahrenindex mindestens „mittel“ [70], je Pollengruppe; Anteil gewarnter Symptom-Zusatztage \(t_{\text{warn}}\) = 0,75 (0,50–1,00, §3.9 ABGESCHÄTZT; eigenes Zeichen, weil \(w_B\) das Ĝ-Gewicht ist; Ersetzungspfad \(\min(1;\ m_{g,V}/f)\), nie \(m_{g,V}\) direkt); \(r_{\text{S158}}\) = 0,03 gilt je gewarntem Tag, Formel zellscharf im Zelllauf mit Geltungsbereich \(A_{\text{Zelle}}\) (§5.1) | Die Anker von \(e_{\text{Tag}}\) beschreiben die Minderung an einem Tag, an dem gehandelt wird, also an einem gewarnten Tag; Rev. 3 hat sie auf alle Zusatztage gerechnet und damit \(t_{\text{warn}} = 1\) unterstellt. Befund 124 verbietet eine Wirkung auf alle Tage pauschal. Mit der Tagesauswahl wirkt jede Größe genau einmal (Tage, Menschen, Tageswirkung) | \(e_{\text{Tag}}\) als Mittel über alle Zusatztage lesen und \(t_{\text{warn}}\) weglassen (verworfen: widerspricht den eigenen Ankern, Befund 124 bliebe verletzt) · \(e_{\text{Tag}}\) durch \(t_{\text{warn}}\) teilen, damit der wirksame Wert gleich bleibt (verworfen: hebt die Wirkung am gewarnten Tag ohne Beleg an) · Schwelle „hoch“ (verworfen als Basiswert: steckt im unteren Band von \(t_{\text{warn}}\)) · DWD-Anteil aller Tage \(m_{g,V}\) direkt einsetzen (verworfen: wählt die Tage über \(f\) und \(m\) zweimal aus und verdünnt um den Faktor \(f\); Befund 162) | wirksamer Wert über alle Zusatztage 0,03 → 0,03 × 0,75 = 0,0225 (0,028 ist nur das Kettenprodukt vor dem Runden); heute zahlengleich mit einem Faktor 0,0225 auf die Zusatztage im Geltungsbereich, geändert ist der Wert, nicht die Verteilung; Berlin 17.004 statt 22.673 vermiedene Tage, ≈ 105.400 statt ≈ 140.600 € je Jahr (§5.1); Kapitel 7: `pollen.r_s158` unverändert, `pollen.t_warn_s158` neu; Ledger-Befunde 156, 157, 161, 162, 163, 165, 167 (DWD-Gebiet \(V\) statt \(R\)) |
-| 24 | Allergenarme Stadtbaumwahl: Wirkung abschätzen oder verwerfen (P2)? | (Die Aussagen zur gleichbleibenden Kommunensumme sind durch Log 26 überholt: Mit festgehaltenem Ḡ₀ sinkt die Summe, Rechenbeispiel §5.) **Abschätzen, zellscharf über \(\hat G\):** −0,14 auf \(\hat P\) je Senkung von \(\hat G/\bar G_0\) um 0,2 (Band 0,06–0,20 über λ; Eingabe ist die Änderung des Kronenanteils, abgezogen im Term, in dem die Kronen im Ausgangsstand stehen, Kronen ohne Gattungs-Tag nur mit 0,12, Befunde 186, 195); Berliner Allee-Zelle mit 100 Betroffenen −26,3 Tage und ≈ 163 € je Jahr (Band −11,3 bis −37,6 Tage, §5); ursprünglich war die gleichbleibende Kommunensumme als Modellgrenze der Abschätzung gesetzt, seit Log 26 senkt die Maßnahme die Summe (Modellgrenze 7) | P2 geht Methodik-Regeln vor; die Wirkung je Zelle ist mechanisch aus \(\hat P\) ableitbar und im Bericht mit Zahl, Band und Sensitivität abgeschätzt; die Summe der Kommune sinkt am festgehaltenen Ḡ₀ mit (Log 26), eine Nullwirkung ist nicht gesetzt. Im Produkt ist die Wirkung heute nicht sichtbar (Sperre aus Befund 124, keine Katalogmaßnahme); sichtbar wird sie über die Integrationsauflage (Stadtbaumwahl) in §5. Die ursprüngliche Begründung (Summe der Kommune per Zentrierung gleichbleibend nach Log 18/19, flächige Wirkung gesperrt) ist durch Log 26 überholt; Befund 124 sperrt nur den pauschalen Faktor, gerechnet wird im Zelllauf über Ĝ′ | mit einem Satz verwerfen (verworfen: die Wirkung je Zelle ist ableitbar, eine Verwerfung ließe sie ohne Zahl) · eigenen Parameter für eine flächige Wirkung schätzen (ursprünglich verworfen mit der λ-Evidenz aus Messungen innerhalb einer Stadt; seit Log 26 läuft die flächige Wirkung über λ am festgehaltenen Ḡ₀, ein zweiter Parameter bleibt verworfen, Log 26) | keine Wirkung auf den Schadenswert im Ausgangsstand, mit Maßnahme sinkt er (Log 26); der Satz, die Umverteilung senke den kommunalen Ausweis, ist ersetzt (Ledger-Befund 158); die P2-Begründung stützt sich nicht mehr auf eine Produktanzeige (Ledger-Befund 164) |
+| 24 | Allergenarme Stadtbaumwahl: Wirkung abschätzen oder verwerfen (P2)? | (Die Aussagen zur gleichbleibenden Kommunensumme sind durch Log 26 überholt: Mit festgehaltenem Ḡ₀ sinkt die Summe, Rechenbeispiel §5.) **Abschätzen, zellscharf über \(\hat G\):** −0,14 auf \(\hat P\) je Senkung von \(\hat G/\bar G_0\) um 0,2 (Band 0,06–0,20 über λ; Eingabe ist die Änderung des Kronenanteils, abgezogen im Term, in dem die Kronen im Ausgangsstand stehen, Kronen ohne Gattungs-Tag nur mit 0,12, Befunde 186, 195); Berliner Allee-Zelle mit 100 Betroffenen −26,3 Tage und ≈ 163 € je Jahr (Band −11,3 bis −37,6 Tage, §5); ursprünglich war die gleichbleibende Kommunensumme als Modellgrenze der Abschätzung gesetzt, seit Log 26 senkt die Maßnahme die Summe (Modellgrenze 7) | P2 geht Methodik-Regeln vor; die Wirkung je Zelle ist mechanisch aus \(\hat P\) ableitbar und im Bericht mit Zahl, Band und Sensitivität abgeschätzt; die Summe der Kommune sinkt am festgehaltenen Ḡ₀ mit (Log 26), eine Nullwirkung ist nicht gesetzt. Im Produkt rechnet sie seit dem 27.09.2026 als Katalogmaßnahme im Zelllauf nach der Integrationsauflage (Stadtbaumwahl) in §5 (Produktstand dort, Befund 230). Die ursprüngliche Begründung (Summe der Kommune per Zentrierung gleichbleibend nach Log 18/19, flächige Wirkung gesperrt) ist durch Log 26 überholt; Befund 124 sperrt nur den pauschalen Faktor, gerechnet wird im Zelllauf über Ĝ′ | mit einem Satz verwerfen (verworfen: die Wirkung je Zelle ist ableitbar, eine Verwerfung ließe sie ohne Zahl) · eigenen Parameter für eine flächige Wirkung schätzen (ursprünglich verworfen mit der λ-Evidenz aus Messungen innerhalb einer Stadt; seit Log 26 läuft die flächige Wirkung über λ am festgehaltenen Ḡ₀, ein zweiter Parameter bleibt verworfen, Log 26) | keine Wirkung auf den Schadenswert im Ausgangsstand, mit Maßnahme sinkt er (Log 26); der Satz, die Umverteilung senke den kommunalen Ausweis, ist ersetzt (Ledger-Befund 158); die P2-Begründung stützt sich nicht mehr auf eine Produktanzeige (Ledger-Befund 164) |
 | 25 | Kennzeichnung der Parameter-Blöcke (Aufgabe §4): welcher Wert je Block, und wo trägt ein Block ein Feld `rolle`? | **13 von 13 gekennzeichnet (Kapitel 7):** `quelle` für \(\Delta S\), \(a_{\text{attr}}\), \(p_{\text{AR}}\), \(c_{\text{jahr}}\); `abschaetzung_kap3` für \(p_B/p_G\), \(L\), \(f\), \(\lambda\), \(s_{\text{unbek}}\), \(r_{\text{S158}}\), \(t_{\text{warn}}\) (Herleitung je Block im Kommentar); `berechnet` für \(d_{\text{Saison}}\) (aus f, p_sens, L) und \(c_{\text{Tag}}\) (aus c_jahr, d_Saison); **kein** Feld `rolle` | \(\Delta S\) ist eine amtliche Messreihe, die Anlage [67] nur auswertet; \(p_{\text{AR}}\) folgt je Band einer Quelle, die Extrapolation 80+ ist in §3.2 gekennzeichnet; \(c_{\text{jahr}}\) ist der Quellwert, nur im Preisstand umgerechnet. Von den vier Rollen nach §4 trifft keine zu: \(s_{\text{unbek}}\) geht in jedem Lauf in \(\hat G\) ein und ist damit ein gewöhnlicher Rechenparameter, keine Sensitivitätsgröße; eine Rolle „abschaetzung“ kennt §4 nicht, die Abschätzung trägt \(r_{\text{S158}}\) schon in `kennzeichnung` | \(s_{\text{unbek}}\) mit `rolle: sensitivitaet` (verworfen: sagte, der Wert diene nur der Sensitivität) · \(r_{\text{S158}}\) mit `rolle: abschaetzung` (verworfen: kein zulässiger Wert nach §4) · \(p_{\text{AR}}\) als `abschaetzung_kap3` (verworfen: vier von fünf Bändern tragen einen Quellwert; die Extrapolation ist am Band gekennzeichnet) | keine Wirkung auf Zahlen; kein `wert:` in Kapitel 7 geändert; Ledger-Befund 173 |
 | 26 ⚠ | Bezugswert der Zentrierung bei Maßnahmen: Ḡ in jedem Lauf neu bilden (Log 19) oder im Ausgangsstand festhalten? | **Festhalten (Weg (a), Festlegung CMO in T-1323):** Ḡ₀ = betroffenengewichtetes Mittel über die bewohnten Zellen der eigenen Kommune im Ausgangsstand ohne die bewerteten Maßnahmen, im Ausgangsszenario gebildet und für jedes Maßnahmenszenario festgehalten; Formel bleibt \(\hat P = 1 + \lambda(\hat G/\bar G_0 - 1)\) (§3.3). Im Ausgangsstand gilt weiter \(\sum B\hat P = \sum B\) exakt; mit Maßnahme sinkt die Summe um \(\lambda \cdot \sum B(\hat G - \hat G')/\bar G_0\) (Rechenbeispiel §5: 15.036 → 13.857 Tage, −1.179 Tage, ≈ 7.310 € je Jahr; Eingabe ist die Änderung des Kronenanteils, abgezogen im Term, in dem die Kronen im Ausgangsstand stehen, Kronen ohne Gattungs-Tag nur mit 0,12, Befunde 186, 195) | (1) **Vorgabe P2:** Ein in jedem Lauf neu gebildetes Ḡ hebt jede Senkung genau auf (Rechenbeispiel §5: Summe bliebe 8.000); weniger Quellbäume hießen dann nicht weniger Pollen — das wäre eine gesetzte Nullwirkung. (2) **Einwand aus Log 19 beantwortet:** Log 19 sah die λ-Evidenz nur für Gradienten innerhalb einer Stadt. Eine Maßnahme wird mit dem Ausgangsstand derselben Kommune verglichen, also innerhalb einer Stadt. Die Lesart von λ als Anteil der örtlichen Quellen an der Pollenlast einer Zelle (1 − λ = regionaler Hintergrund) belegt Hugg 2017 [74], Tabelle 3: städtischste gegenüber allen acht Messstellen, λ = 1 − Hintergrund ÷ Mittel, abgeleitet 0,22–0,94, drei von vier Werten im Band 0,3–1,0 (§3.3, Modellgrenze 7); Conclusions: „The local sources, such as unmanaged open lands, may substantially contribute to pollen exposure.“ (3) Log 17 und 18 bleiben: Gewichtsregel und Bezugsebene Kommune; zwischen Kommunen wirkt die Vegetation weiter nicht. (4) Befunde 124 und 129 bleiben: keine pauschal verknüpfte Maßnahme, gerechnet wird im Zelllauf | Ḡ in jedem Lauf neu (Log 19; verworfen: Nullwirkung, P2) · Summe gleich lassen, Wirkung nur je Zelle (Weg (b); verworfen vom CMO: weniger Quellbäume heißt weniger Pollen) · zweiter Parameter für den Niveaueffekt (verworfen: die Quelle liegt im Band von λ, T-1323 Punkt 1) | Basiswert (Ausgangsstand) unverändert, kein `wert:` in Kapitel 7 geändert; Stadtbaumwahl senkt jetzt die Kommunensumme; Richtung des Fehlers in λ: Modellgrenze 7 (Bezugsstelle in der Stadt → λ unterzeichnet eher; Gräser statt Birke → λ überzeichnet für Bäume eher; nicht bestimmbar, welche überwiegt); Log 19 verworfen; Ledger-Befund 182 |
