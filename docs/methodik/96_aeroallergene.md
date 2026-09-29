@@ -216,8 +216,8 @@ nur ohne Anpassung. Der Bericht übernimmt diese Stufen nicht als Zahl: Sie bewe
 
 Fundstelle: `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt `Klimawirkungen` (ID 96 in Spalte A), Zeile 98, Spalten N bis R
 (Risiko ohne Anpassung) und Spalten S und T (Gewissheit Mitte und Ende). Gleichlautend im zuständigen
-Teilbericht: `docs/KWAR/kwra2021_teilbericht_5_cluster_wirtschaft_gesundheit_bf_211027_0.pdf`, Tabelle 55,
-S. 179 [15]. Die Stufen sind eine qualitative Bewertung. Optimistisch und pessimistisch sind dort die für die
+Teilbericht: `docs/KWAR/kwra2021_teilbericht_5_cluster_wirtschaft_gesundheit_bf_211027_0.pdf`,
+Tabelle 55, S. 179 [15]. Die Stufen sind eine qualitative Bewertung. Optimistisch und pessimistisch sind dort die für die
 Klimawirkung günstigere und die ungünstigere Szenarienkombination; für die Mitte des Jahrhunderts aus Klima-
 und sozioökonomischen Projektionen, für das Ende nur aus Klimaprojektionen (Teilbericht 1, S. 68 [73]).
 Fußnote 7 derselben Seite grenzt die Bewertung von der quantitativen Analyse ab: „zum Beispiel wurde bei der
@@ -228,8 +228,8 @@ Wir lesen das so: Die Zeitscheibe Gegenwart der Stufen meint die jüngere Gegenw
 1971–2000. Dieser Bezugszeitraum und die Perzentile des Modellensembles in Teilbericht 5, S. 177 (Indikator GE-KL-07 S. 176, Projektion S. 178) gehören
 zur quantitativen Auswertung des Indikators GE-KL-07, nicht zu den Stufen. Der Basiswert dieses Berichts
 (Ist-Klima, Normalperiode 1991–2020 gegen 1961–1990) passt damit zur Zeitscheibe Gegenwart der Bewertung.
-Für die Gegenwart weist die KWRA keine Gewissheit aus: Tabelle 55 lässt das
-Feld leer, die Mappe hat dafür keine Spalte. Beide Digitalisate widersprechen sich hier nicht; die Bewertungen
+Für die Gegenwart weist die KWRA keine Gewissheit aus: In Tabelle 55, S. 179, steht in der Zeile „Gewissheit“ nur
+unter 2031–2060 und 2071–2100 je „mittel“; das Feld Gegenwart ist leer, die Mappe hat dafür keine Spalte. Beide Digitalisate widersprechen sich hier nicht; die Bewertungen
 stehen nach der Vorrangregel am Ende der Aufgabe ohnehin nur in der KWRA-2021-Mappe.
 
 **Warum die eigene Quellenlage von der KWRA-Gewissheit abweicht.** Die KWRA-Gewissheit „mittel“ bewertet,
@@ -261,7 +261,7 @@ Spalte verweist auf die Entscheidungslog-Nummer.
 | 96-W025-04 | E09 Trockenheit → Pollenfreisetzung/-transport | Wirkrichtung intensitätserhöhend; keine quantifizierte ERF | — | Rev.-5-Befund 52 | — | — | **bewusst inaktiv** | Log 14 |
 | 96-W024-01 | W024 lokale allergene Vegetation → Symptomlast | \(\lambda\) = 0,7 (0,3–1,0); Kette §3.4: Fallen-Differenzen 245 %/306 % (14 Fallen Berlin; Zuwachs-Lesart ⇒ \(R\) = 3,45/4,06, Verhältnis-Lesart im Band) ⇒ \(\lambda_{\text{roh}}\) 1,10–1,21 × vegetationserklärter Anteil 0,6 (0,4–0,8) | Messreihen (Pollenfallen), Symptomgradient, Lidar-Studie | Werchan 2017 [54], Werchan 2018 [55], Bogawski 2019 [56] | Berlin/Posen; **gekennzeichnete Abschätzung** (§3.9) | OSM-Vegetation; Ebene POLLEN_LOAD **neu anzulegen** (§3.3) | **Basiswert** | Log 12 |
 | 96-W024-02 | W024 Neophyten (Ambrosia) → Sensibilisierung | DE-Sensibilisierung 0–10 % → 15–25 % (2041–2060, 66 % klimabedingt); Kosten 193–1.190 Mio. €/a bei Voll-Etablierung | Projektion (Europa-Modell); Kostenmodell | Lake 2017 [23]; Hamaoui-Laguel 2015 [24]; Born 2012 [25] | Zeithorizont 2041–2060 ≠ M0-Ausweis „heute" | JKI-Fundkarten regional | **bewusst inaktiv** (Modul 96-B ab M1; §8-Verworfen-Liste) | Log 13 |
-| 96-R35-01 | R35 Bevölkerung → Betroffene (Prävalenz) | \(p_{\text{AR},a}\): u20 8,8 % · 20–64 13,2 % · 65–74 6,7 % · 75–84 5,0 % · 85+ 5,0 % (12-Monats, ärztlich diagnostiziert; Herleitung §3.2) | bevölkerungsrepräsentative Surveys | DEGS1: Langen 2013, Tab. 3 [1]; KiGGS W2: Thamm 2018 [2]; Gewichte: Destatis 31.12.2023 [48] | DE; DEGS1 endet bei 79 (75+-Extrapolation gekennzeichnet) | Zensus-Altersbänder; Ebene u20 **neu anzulegen** (§3.2) | **Basiswert** | Log 10 |
+| 96-R35-01 | R35 Bevölkerung → Betroffene (Prävalenz) | \(p_{\text{AR},a}\): u20 8,8 % · 20–64 13,2 % · 65–74 6,7 % · 75–84 5,0 % · 85+ 5,0 % (12-Monats, ärztlich diagnostiziert; Herleitung §3.2) | bevölkerungsrepräsentative Surveys | DEGS1: Langen 2013, Tab. 3 [1]; KiGGS W2: Thamm 2018 [2]; Gewichte: Destatis 31.12.2023 [48] | DE; DEGS1 endet bei 79 (80–84 und 85+ extrapoliert, gekennzeichnet in §3.2) | Zensus-Altersbänder; Ebene u20 **neu anzulegen** (§3.2) | **Basiswert** | Log 10 |
 | 96-R35-02 | Sensibilisierungsprofil der AR-Patienten (Birkengruppe/Gräser) | \(p_B\) = 0,55 (0,4–0,7) · \(p_G\) = 0,75 (0,6–0,85) | **gekennzeichnete Abschätzung** (§3.9); Stütze: Bevölkerungs-Sensibilisierung Gräser 19,4 % > Birke 17,4 % (Rangfolge) | Haftenberger 2013, Tab. 2/Abb. 1 [3] | Anteil *unter AR-Patienten* nicht direkt publiziert (Rev.-5-Befund 36a); Ersetzungspfad: PID-/Versorgungsdaten | national | **Basiswert** (Sensitivität §3.4) | Log 8 |
 | 96-K1-01 | Behandlungskosten je Betroffenem und Jahr (direkt) | 210,3 €₂₀₁₄ (populationsbasiert, alle Schweregrade) ⇒ 266,90 €₂₀₂₄ (§3.5) | Bevölkerungs-Fragebogenstudie (n = 3.501) | Cardell 2016 (TOTALL) [65] | Schweden 18–65, Preisstand Feb. 2014 (CPI-adjustiert); Raumtransfer SE→DE 1:1 dokumentiert | national | **Basiswert** | Log 9 |
 | 96-K1-02 | Behandlungskosten moderate–schwere SAR (direkt) | Erwachsene 42 % × 1.543 = 648 €₂₀₀₀ ⇒ 1.019 €₂₀₂₄; Kinder 60–78 % × 1.089 ⇒ 1.027–1.335 €₂₀₂₄ | Querschnitt (500 Patienten, fachärztlich) | Schramm 2003 [7] (Abstract-Zahlen primärverifiziert) | DE; **moderate–schwere** SAR — Überschätzungsrichtung je Durchschnittspatient | national | **Sensitivitätsband** (Obergrenze \(c_{\text{Tag}}\)) | Log 9 |
@@ -722,7 +722,7 @@ for r, (db, dg) in DS.items():
   Erle 16,5 %, Hasel 16,2 % — Rangfolge Gräser > Birkengruppe konsistent zur Setzung).
   Sensitivität (Region Mitte, \(p_B \Delta S_B + p_G \Delta S_G\) = 5,37 Tage): \(p_B\) 0,4–0,7 verschiebt
   \(\delta\) um −11,7 % bis +11,7 % (±0,15 × 4,20 = ±0,63 Tage), \(p_G\) 0,6–0,85 um −11,4 % bis +7,6 %
-  (−0,15 × 4,08 = −0,612 Tage, +0,10 × 4,08 = +0,408 Tage), zusammen −23 % bis +19 % (Kap. 1 (a)).
+  (−0,15 × 4,08 = −0,612 Tage, +0,10 × 4,08 = +0,408 Tage), zusammen −23 % bis +19 % (Kap. 1, Absatz „Warum die eigene Quellenlage …“).
   Ersetzungspfad: PID-/Versorgungsdaten (Registry-Vermerk).
 - **\(\lambda\) = 0,7 (0,3–1,0) — Herleitungskette** (Anker `#lambda-veg`; Befunde
   102/110): Werchan 2017 [54] misst über 14 Pollenfallen in Berlin die Spanne der
@@ -760,14 +760,14 @@ for r, (db, dg) in DS.items():
 
 $$ \text{€}_{\text{Zelle}} \;=\; \Delta\text{Tage}_{\text{Zelle}} \cdot c_{\text{Tag}}, \qquad c_{\text{Tag}} = \frac{c_{\text{Jahr,direkt}}}{d_{\text{Saison}}}, \qquad d_{\text{Saison}} = f \cdot \bigl( p_B L_B + p_G L_G \bigr), \qquad \text{Kommune} = \sum_{\text{Zellen}} $$
 
-- **\(c_{\text{Jahr,direkt}}\) = 266,90 €₂₀₂₄** (Log 9): TOTALL [65] —
+- **\(c_{\text{Jahr,direkt}}\) = 266,90 €** (Preisstand 2024; Log 9): TOTALL [65] —
   bevölkerungsbasierte Stichprobe (Schweden, 18–65, alle Schweregrade): direkte Kosten
   **210,3 €** je Betroffenem·Jahr (Preisstand Feb. 2014, CPI-adjustiert laut Studie);
-  Indexierung ×119,3/94,0 = ×1,2691 ⇒ 266,90 €₂₀₂₄. Raumtransfer Schweden→Deutschland 1:1
+  Indexierung ×119,3/94,0 = ×1,2691 ⇒ 266,90 € (Preisstand 2024). Raumtransfer Schweden→Deutschland 1:1
   als dokumentierte Annahme (vergleichbare Preisniveaus; ohne Kaufkraft-Korrektur — Band).
   **Warum nicht Schramm als Basis:** Schramm [7] misst **moderate–schwere**, fachärztlich
   behandelte SAR (Erwachsene direkt: 42 % × 1.543 = 648,1 €₂₀₀₀ ⇒ ×119,3/75,9 = **1.018,6
-  €₂₀₂₄**; Kinder 60–78 % × 1.089 ⇒ 1.027–1.335 €₂₀₂₄) — auf **alle** 12-Monats-
+  €** (Preisstand 2024); Kinder 60–78 % × 1.089 ⇒ 1.027–1.335 €, Preisstand 2024) — auf **alle** 12-Monats-
   diagnostizierten Betroffenen angewendet wäre das eine bekannte Überschätzung um grob
   Faktor 4 und würde die Untergrenzen-Zusage verletzen (dieselbe Logik wie #95-Befund 62).
   Schramm bildet daher die **Obergrenze** des \(c_{\text{Tag}}\)-Bands und das Kinder-Band. Die
@@ -780,7 +780,7 @@ $$ \text{€}_{\text{Zelle}} \;=\; \Delta\text{Tage}_{\text{Zelle}} \cdot c_{\te
   überlappende Mai-Wochen doppelt ⇒ \(d_{\text{Saison}}\) eher **überzeichnet** ⇒
   \(c_{\text{Tag}}\) eher **unterschätzt** ⇒ €-Pfad konservativ (Rev.-5-Befund 36b,
   dokumentiert statt korrigiert).
-- **\(c_{\text{Tag}}\) = 266,90 / 43,05 = 6,20 €₂₀₂₄/Tag** (Band 6,20–23,66; Obergrenze =
+- **\(c_{\text{Tag}}\) = 266,90 / 43,05 = 6,20 € je Tag** (Preisstand 2024; Band 6,20–23,66; Obergrenze =
   Schramm-Kette 1.018,6/43,05). Einheitlich über alle Altersbänder (Vereinfachung
   dokumentiert; Kinder-Schramm-Band liegt innerhalb der Obergrenze).
   **Produktverankerung** (Integration 31.08.2026): Maßgeblicher Produktwert ist
@@ -914,7 +914,7 @@ Näherungslauf involviert).
   4 Tage; unsere angesetzten 1,99 Tage je Patient (mit Sensibilisierungs-Gewichten < 1)
   liegen **darunter** ⇒ konservativ konsistent.
 - **Monetär:** Bundessumme = 8,96 Mio. Betroffene × 1,99 Tage × 6,20 € ≈ **110 Mio.
-  €₂₀₂₄/Jahr** (Band ≈ 42–186 Mio. über den Attributions-IQR; obere
+  € je Jahr** (Preisstand 2024; Band ≈ 42–186 Mio. über den Attributions-IQR; obere
   \(c_{\text{Tag}}\)-Sensitivität 23,66 € ⇒ ≈ 420 Mio.). Einordnung gegen amtliche Rahmen:
   impliziter Klimaanteil an den AR-Behandlungskosten = \(\delta/d_{\text{Saison}}\) =
   1,99/43,05 = **4,6 %** — innerhalb des publizierten Bands klimaattribuierter
@@ -925,7 +925,7 @@ Näherungslauf involviert).
   (Ersetzungspfad: exakte J30-Beträge aus GENESIS 23631/GBE-Bund interaktiv ziehen,
   Registry-Vermerk vor Integration).
 - **Impliziter Baseline-Check:** Betroffene × \(c_{\text{Jahr,direkt}}\) = 8,96 Mio. ×
-  266,90 € ≈ 2,39 Mrd. €₂₀₂₄ als implizite AR-Behandlungskosten-Basis — plausible
+  266,90 € ≈ 2,39 Mrd. € (Preisstand 2024) als implizite AR-Behandlungskosten-Basis — plausible
   Größenordnung zwischen Asthma-KKR (1,9 Mrd. [66]) und J-Kapitel (16,5 Mrd. [66]);
   mit der Schramm-Obergrenze wären es 9,1 Mrd. — erkennbar zu hoch, bestätigt die
   Basiswert-Wahl (Log 9).
@@ -1325,7 +1325,7 @@ und \(\hat P\) = 1,7 hat 100 × 1,8795 × 1,7 = 319,5 Zusatztage; im Geltungsber
 \(e_{\text{Tag}}\)**: zwischen seinen Ankern liegt der Faktor 3 (für Berlin 8.502–25.507 Tage,
 ≈ 52.700–158.100 €), vor \(q_{\text{reich}}\) (Faktor 2,75), \(q_{\text{handel}}\) (2,4) und
 \(t_{\text{warn}}\) (2,0; 11.336–22.673 Tage). Der Schadenswert selbst bleibt unberührt, solange die Maßnahme
-nicht gewählt ist. Bezogen auf die §4-Bundessumme von ≈ 110 Mio. €₂₀₂₄ je Jahr entspricht der
+nicht gewählt ist. Bezogen auf die §4-Bundessumme von ≈ 110 Mio. € je Jahr (Preisstand 2024) entspricht der
 Basiswert bei flächendeckender Umsetzung **≈ 2,5 Mio. € je Jahr** vermiedener Behandlungskosten
 (Band ≈ 0,28–11,0 Mio. €). Ob sich die Maßnahme trägt, rechnet das Maßnahmen-Modul gegen die
 Vorhaltekosten (Katalog `POLLEN_EARLY_WARNING`: 15.000 € Anschaffung je Station, 4.000 € je
@@ -1946,7 +1946,7 @@ bewusste Überstimmung von Eintrag 19 (Ledger-Befund 182).
 | 5 | Regionenzuschnitt? | **Bundesland → N/M/S wie #95** (`health.REGION_BY_BUNDESLAND`) | Produktkonsistenz; ΔS-Regionalstreuung −17 % bis +24 % (δ −5 % bis +6 %, Kap. 4) | Naturraumgruppen (feiner) | einheitliche Regionslogik |
 | 6 ⚠ | Kalibrierfaktor? | **c_kal ≡ 1 — dokumentierte Ausnahme** von §3.4: keine amtliche Anker-Zeitreihe existiert [66]; Modell voll messungs-/prävalenzverankert; Sanity-Bänder ersetzen den Fit | ein Fit ohne Anker wäre Scheinkalibrierung; BT-Drs. belegt die Lücke | J30-KKR-Anker bei Integration interaktiv ziehen (Registry-Vermerk) | kein Fit-Schritt; §4-Bänder tragen die Validierung |
 | 7 ⚠ | f-Herleitung? | **Modellannahme 0,70 (0,50–0,85)**; Pfaar-r nur qualitativ; Bastl [53] geprüft — liefert die Größe nicht | behebt Kategorienfehler (Rev.-5-Befund 14) exakt entlang des Gegenprüfungs-Vorschlags | f aus PHD-Tagesdaten (Ersetzungspfad) | nur nativer Ausweis −28,6 % bis +21,4 % (§3.4); € unabhängig von f (§3.5) |
-| 8 ⚠ | p_B/p_G? | **0,55/0,75 als gekennzeichnete Abschätzung** (Rangfolge-Stütze [3]); additive Saisonform als €-konservativ dokumentiert | Anteil unter AR-Patienten nicht publiziert (Befund 36a); Überlappungskorrektur würde € erhöhen (36b) | PID-/Versorgungsdaten (Ersetzungspfad) | δ: p_B −11,7 % bis +11,7 %, p_G −11,4 % bis +7,6 %, zusammen −23 % bis +19 % (Region Mitte, §3.4); Euro nur −6 % bis +8 % (Kap. 1 (a)) |
+| 8 ⚠ | p_B/p_G? | **0,55/0,75 als gekennzeichnete Abschätzung** (Rangfolge-Stütze [3]); additive Saisonform als €-konservativ dokumentiert | Anteil unter AR-Patienten nicht publiziert (Befund 36a); Überlappungskorrektur würde € erhöhen (36b) | PID-/Versorgungsdaten (Ersetzungspfad) | δ: p_B −11,7 % bis +11,7 %, p_G −11,4 % bis +7,6 %, zusammen −23 % bis +19 % (Region Mitte, §3.4); Euro nur −6 % bis +8 % (Kap. 1, Absatz „Warum die eigene Quellenlage …“) |
 | 9 ⚠ | Kostensatz-Basis? | **TOTALL 266,90 €₂₀₂₄ (populationsbasiert)**; Schramm nur Obergrenze/Kinder-Band | Schramm (moderate–schwer) auf alle Betroffenen = bekannte Überschätzung um grob Faktor 4 (§3.5) — verletzt Untergrenzen-Zusage (#95-Befund-62-Lehre); impliziter Baseline-Check §4 bestätigt | Schramm als Basis (M0-Linie; 9,1 Mrd. implizite Basis, Kap. 4 — verworfen) | € −74 % ggü. Schramm-Basis (§3.5) |
 | 10 ⚠ | Prävalenz-Bänder? | **u20-Ebene neu** (Zensus 5er-Jahresgruppen 0–4, 5–9, 10–14, 15–19); 18/19 mit KiGGS-Wert (unterschätzend); 75–84 und 85+ = 5,0 %, davon 80–84 und 85+ extrapoliert (gekennzeichnet, §3.2) | behebt Rev.-5-Befunde 27/35 entlang Variante (a) der Gegenprüfung | Misch-Prävalenz je Zelle ohne u20-Ebene | Alterslast korrekt verteilt |
 | 11 | Attribution? | **a_attr = 0,50 (0,19–0,84)** [9] | einzige publizierte Attribution des Saisontrends; IQR als Band | 1,0 (volle Anrechnung — nicht belegbar) | zentraler Hebel −62 % bis +68 % (§3.0) |
