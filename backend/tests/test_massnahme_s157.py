@@ -2,12 +2,15 @@
 
 Maßnahme ``COOLING_ROOMS_DRINKING_WATER`` ist aktiviert (T-1367) und wirkt mit
 ``ΔD_S157 = D_85+ · h_Heim · s_gek · (1 − g_S157)`` auf die Todesfälle 85+ der
-Heimbewohner, bewertet mit L̄_85+ (YLL) × VOLY. s_gek ist die Eingabe der Kommune;
-ohne Eingabe entsteht kein Betrag (auch keine 0).
+Heimbewohner, bewertet mit L̄_85+ (YLL) × VOLY. s_gek ist der heutige gekühlte Anteil
+der Kommune; ohne Eingabe gilt die Voreinstellung 0,11 (Block heat.s_gek, Befund 138).
+S157 wirkt nur auf max(s_gek − 0,06; 0), den Anteil über dem Stand der Kalibrierjahre
+(Block heat.s_gek_kalib, Befund 165, Log 50). Berlin (Kette) je vollen Anteil 24,99 Mio. €:
+Voreinstellung 0,05 × 24,99 = 1,2 Mio. €, alle Heimplätze gekühlt 0,94 × 24,99 = 23,5 Mio. €.
 
 Zusammen mit dem Hitzeaktionsplan (Befund 129) wirkt S157 auf den schon mit δ_HAP
-gedämpften Heim-Exzess: Berlin zusammen 72,1 %, davon S157 35,5 Todesfälle oder
-23,7 Mio. € je Jahr.
+gedämpften Heim-Exzess: Berlin zusammen 72,1 %, davon S157 je vollen Anteil 35,5
+Todesfälle oder 23,7 Mio. € je Jahr.
 
 DB-frei: prüft die Rechenfunktion in ``health`` und den Zellfaktor der Maßnahmen-Engine
 an einer Zelle mit den Berlin-Werten aus Kette 3.0 (D_85+ = 153,6; L̄_85+ = 4,16).
@@ -35,18 +38,25 @@ def _berlin_cell() -> dict:
     return {"outcome": yll, "deaths_a85p": D85_BERLIN}
 
 
-def _benefit_eur(s_gek, delta_hap: float = 1.0) -> float | None:
+def _benefit_eur(s_gek, delta_hap: float = 1.0, frac: float = 1.0) -> float:
+    """Nutzen in € je Jahr; ``s_gek=None`` heißt: die Kommune gibt nichts ein."""
+    override_context.set_overrides({})
     risk = catalog.RISKS_BY_CODE[MORT]
     mdef = catalog.MEASURES_BY_CODE[CODE]
     cell = _berlin_cell()
     factor = measure_service._measure_cell_factor(
-        mdef, {} if s_gek is None else {"s_gek": s_gek}, MORT, 1.0, 1.0, cell, delta_hap)
-    fields = measure_service._s157_summary_fields(
-        mdef, {} if s_gek is None else {"s_gek": s_gek})
-    if fields.get("benefit_display"):
-        assert factor == 1.0
-        return None
+        mdef, {} if s_gek is None else {"s_gek": s_gek}, MORT, frac, 1.0, cell, delta_hap)
     return risk_engine.cost_from_outcome(risk, cell["outcome"]) * (1.0 - factor)
+
+
+def _s_zus_full() -> float:
+    """Höchster zusätzlicher Anteil 1 − s_gek_kalib = 0,94 (Registry heat.s_gek_kalib)."""
+    return 1.0 - measure_service._s157_param("s_gek_kalib", -1.0)
+
+
+def _per_full_share(s_gek: float = 1.0, delta_hap: float = 1.0) -> float:
+    """Nutzen je vollen Anteil über dem Stand der Kalibrierjahre (Bericht: 24,99 Mio. €)."""
+    return _benefit_eur(s_gek, delta_hap) / _s_zus_full()
 
 
 def test_measure_is_active_not_parked():
@@ -64,23 +74,67 @@ def test_h_heim_and_g_from_report():
     assert health.s157_avoided_deaths(D85_BERLIN, 1.0) == pytest.approx(37.4, abs=0.05)
 
 
-def test_berlin_all_care_home_places_cooled_is_25_0_mio_eur():
-    eur = _benefit_eur(1.0)
+def test_kalib_from_registry_is_0_06():
+    override_context.set_overrides({})
+    assert measure_service._s157_param("s_gek_kalib", -1.0) == pytest.approx(0.06)
+    assert measure_service._s157_param("s_gek", -1.0) == pytest.approx(0.11)
+    assert _s_zus_full() == pytest.approx(0.94)
+
+
+def test_berlin_per_full_share_is_25_0_mio_eur():
+    """Beispiel-Block s157_berlin: je vollen Anteil 25,0 Mio. € (ungerundet 24,99)."""
+    eur = _per_full_share()
     assert round(eur / 1e6, 1) == 25.0
-    assert eur / 1e6 == pytest.approx(25.0, abs=0.05)
+    assert eur / 1e6 == pytest.approx(24.99, abs=0.01)
 
 
-def test_berlin_ten_percent_is_one_tenth():
-    assert _benefit_eur(0.1) == pytest.approx(_benefit_eur(1.0) / 10.0, rel=1e-9)
+def test_berlin_all_care_home_places_cooled_is_23_5_mio_eur():
+    """s_gek = 1: 0,94 × 24,99 = 23,5 Mio. € (Bericht #95 §5, Befund 165)."""
+    eur = _benefit_eur(1.0)
+    assert eur / 1e6 == pytest.approx(23.5, abs=0.05)
+    assert eur / 1e6 == pytest.approx(0.94 * 24.99, abs=0.05)
 
 
-def test_without_input_no_amount():
-    assert health.s157_avoided_deaths(D85_BERLIN, None) is None
-    assert _benefit_eur(None) is None
+def test_berlin_ten_points_above_kalib_is_one_tenth():
+    """10 Prozentpunkte über dem Stand der Kalibrierjahre (s_gek = 0,16): ein Zehntel."""
+    assert _benefit_eur(0.16) == pytest.approx(_per_full_share() / 10.0, rel=1e-9)
+
+
+def test_without_input_default_0_11_gives_1_2_mio_eur():
+    """Befund 138/172: ohne Eingabe s_gek = 0,11, 24,99 × 0,05 = 1,249, gerundet 1,2 Mio. €."""
+    eur = _benefit_eur(None)
+    assert eur / 1e6 == pytest.approx(1.2, abs=0.05)
+    assert round(eur / 1e6, 1) == 1.2
+    assert eur == pytest.approx(_benefit_eur(0.11), rel=1e-12)
     fields = measure_service._s157_summary_fields(catalog.MEASURES_BY_CODE[CODE], {})
-    assert fields["s_gek"] is None
-    assert fields["benefit_display"] == measure_service.S157_NO_INPUT_TEXT
-    assert fields["benefit_missing_input"] == "s_gek"
+    assert fields["s_gek"] == pytest.approx(0.11)
+    assert fields["s_gek_is_default"] is True
+    assert fields["s_gek_kalib"] == pytest.approx(0.06)
+    assert fields["s157_estimate_note"] == "Abschätzung von KAP3"
+    assert "benefit_display" not in fields
+    assert "benefit_missing_input" not in fields
+
+
+def test_with_input_marked_as_input():
+    fields = measure_service._s157_summary_fields(
+        catalog.MEASURES_BY_CODE[CODE], {"s_gek": 0.3})
+    assert fields["s_gek"] == pytest.approx(0.3)
+    assert fields["s_gek_is_default"] is False
+
+
+def test_below_kalib_gives_zero():
+    """s_gek = 0,05 liegt unter dem Stand der Kalibrierjahre 0,06: S157 wirkt nicht."""
+    assert _benefit_eur(0.05) == 0.0
+    assert _benefit_eur(0.06) == pytest.approx(0.0, abs=1e-6)
+
+
+def test_coverage_frac_does_not_shrink_effect():
+    """s_gek gilt für die ganze Kommune; der Deckungsgrad frac verkleinert die Wirkung nicht."""
+    full = _benefit_eur(None, frac=1.0)
+    assert full > 0.0
+    for frac in (0.9, 0.5, 0.1):
+        assert _benefit_eur(None, frac=frac) == pytest.approx(full, rel=1e-12)
+        assert _benefit_eur(1.0, frac=frac) == pytest.approx(_benefit_eur(1.0), rel=1e-12)
 
 
 def test_only_mortality_and_old_cells_unchanged():
@@ -162,12 +216,14 @@ def test_berlin_with_hap_s157_35_5_deaths_and_23_7_mio_eur():
     d_hap = _delta_hap_full()
     s157 = health.s157_avoided_deaths(D85_BERLIN, 1.0, delta_hap=d_hap)
     assert round(s157, 1) == 35.5
-    eur = _benefit_eur(1.0, d_hap)
+    # Bericht §5 „Berlin, voller Anteil“: je vollen Anteil über dem Stand der Kalibrierjahre
+    eur = _per_full_share(1.0, d_hap)
     assert round(eur / 1e6, 1) == 23.7
     # Unterschied zur additiven Lesart 1,25 Mio. € (Beispiel-Block s157_berlin)
-    assert (_benefit_eur(1.0) - eur) / 1e6 == pytest.approx(1.25, abs=0.05)
+    assert (_per_full_share() - eur) / 1e6 == pytest.approx(1.25, abs=0.05)
     # bei δ_HAP = 0,85 rund 3,75 Mio. €
-    assert (_benefit_eur(1.0) - _benefit_eur(1.0, 0.85)) / 1e6 == pytest.approx(3.75, abs=0.05)
+    assert (_per_full_share() - _per_full_share(1.0, 0.85)) / 1e6 == \
+        pytest.approx(3.75, abs=0.05)
 
 
 def test_sum_of_single_benefits_equals_aggregate_with_both():
@@ -190,3 +246,49 @@ def test_without_hap_unchanged():
     assert health.s157_avoided_deaths(D85_BERLIN, 1.0, delta_hap=1.0) == \
         health.s157_avoided_deaths(D85_BERLIN, 1.0)
     assert health.s157_avoided_deaths(D85_BERLIN, None, delta_hap=0.95) is None
+
+
+# ── Befund 146: h_Heim je Zelle aus share_care_home_85p (Bericht #95 §5, Log 45) ──
+
+def test_h_heim_je_zelle_aus_heimanteil():
+    """h_Heim,z = q_pfl,z · [1 + β(1 − q̄)] / [1 + β(q_pfl,z − q̄)], Rückfall 0,344."""
+    # Beispielzelle des Berichts (§5): 0,5 × 2,31 / 1,541 = 0,75
+    assert health.h_heim(q_pfl=0.5) == pytest.approx(0.75, abs=0.005)
+    # Zelle im Mittel: dieselben 0,344 wie die Kommune
+    assert health.h_heim(q_pfl=0.149) == pytest.approx(0.344, abs=0.0005)
+    assert health.h_heim(q_pfl=0.149) == pytest.approx(health.h_heim(), rel=1e-12)
+    # Zelle nur mit Heimbewohnern ab 85
+    assert health.h_heim(q_pfl=1.0) == pytest.approx(1.0, abs=1e-9)
+    # Ohne Zellwert gilt der Rückfall 0,344 (Block heat.h_heim)
+    assert health.h_heim(q_pfl=None) == pytest.approx(0.344, abs=0.0005)
+    assert health.h_heim() == pytest.approx(0.344, abs=0.0005)
+
+
+def test_zellfaktoren_nutzen_heimanteil_der_zelle():
+    """_s157_cell_factor und _vg_cell_factor rechnen mit h_Heim,z der Zelle."""
+    override_context.set_overrides({})
+    ohne_heim = {**_berlin_cell(), "deaths_a75_84": 71.4, "share_care_home_85p": 0.0}
+    mit_heim = {**ohne_heim, "share_care_home_85p": 0.5}
+    ohne_wert = {k: v for k, v in ohne_heim.items() if k != "share_care_home_85p"}
+
+    s157 = [measure_service._s157_cell_factor(0.11, 1.0, c)
+            for c in (ohne_heim, mit_heim, ohne_wert)]
+    assert s157[0] != s157[1]
+    assert s157[0] == pytest.approx(1.0)         # Zelle ohne Heim: keine Wirkung von S157
+    assert s157[1] < s157[2] < 1.0               # Heimzelle stärker als der Rückfall 0,344
+    # Wirkung skaliert mit h_Heim: 0,75 / 0,344
+    assert (1.0 - s157[1]) / (1.0 - s157[2]) == pytest.approx(
+        health.h_heim(q_pfl=0.5) / health.h_heim(), rel=1e-9)
+
+    vg = [measure_service._vg_cell_factor(MORT, 1.0, c) for c in (ohne_heim, mit_heim, ohne_wert)]
+    assert vg[0] != vg[1]
+    assert vg[0] < vg[2] < vg[1] < 1.0           # Heimbewohner sind bei δ_VG herausgenommen
+
+
+def test_heimanteil_kommt_aus_den_zell_eingaben():
+    """Die Zellbewertung trägt share_care_home_85p unter data["inputs"], nicht im Risiko."""
+    cell = _berlin_cell()
+    merged = measure_service._with_cell_q_pfl(cell, {"share_care_home_85p": 0.5})
+    assert merged["share_care_home_85p"] == 0.5 and "share_care_home_85p" not in cell
+    assert measure_service._with_cell_q_pfl(cell, {"pop": 10.0}) is cell
+    assert measure_service._with_cell_q_pfl(cell, None) is cell

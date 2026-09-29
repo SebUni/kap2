@@ -210,7 +210,10 @@ def _age_bands(ctx: CellContext) -> dict[str, float]:
         return {b: float(bands.get(b) or 0.0) for b in AGE_BANDS}
     from app.services.zensus_loader import NATIONAL_SENIOR_SPLIT
     pop = ctx.pop
-    share_o = ctx.ci.get("share_over_65")
+    # Befund 142: angesetzter Wert der Ersatzregel vor dem veröffentlichten Zensuswert.
+    share_o = ctx.ci.get("share_over_65_ersatz")
+    if share_o is None:
+        share_o = ctx.ci.get("share_over_65")
     if share_o is None:
         share_o = ctx.regional.get("demographics", {}).get("share_over_65", 22.0)
     pop_65p = pop * float(share_o) / 100.0
@@ -311,12 +314,25 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
 
 # ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5, Befunde 122, 124, 129, 130) ──
 
-def h_heim(qbar_pfl: float = 0.149, beta_pfl: float = 1.54) -> float:
-    """Anteil der Heimbewohner an den Todesfällen 85+ (Bericht #95 §3.0/§5).
+def h_heim(qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
+           q_pfl: float | None = None) -> float:
+    """Anteil der Heimbewohner an den Todesfällen 85+ (Bericht #95 §3.0/§5, Befund 146).
 
-    ``h_Heim = q̄_pfl · [1 + β_pfl · (1 − q̄_pfl)]`` = 0,344 mit den Basiswerten.
+    Kommune bzw. Rückfall (kein Zellwert): ``h_Heim = q̄_pfl · [1 + β_pfl · (1 − q̄_pfl)]``
+    = 0,344 mit den Basiswerten (Block heat.h_heim).
+
+    Zelle mit Heimanteil ``q_pfl`` (Ebene CARE_HOME_SHARE_85P, ci-Feld
+    ``share_care_home_85p``): ``h_Heim,z = q_pfl,z · [1 + β_pfl(1 − q̄_pfl)]
+    / [1 + β_pfl(q_pfl,z − q̄_pfl)]`` — dieselben Faktoren wie in ``v_vers`` (§3.3).
+    Bei q_pfl,z = q̄_pfl ergibt das wieder 0,344, bei 0,5 den Wert 0,75, bei 1 den Wert 1.
     """
-    return qbar_pfl * (1.0 + beta_pfl * (1.0 - qbar_pfl))
+    if q_pfl is None:
+        return qbar_pfl * (1.0 + beta_pfl * (1.0 - qbar_pfl))
+    q = max(0.0, min(1.0, float(q_pfl)))
+    denom = 1.0 + beta_pfl * (q - qbar_pfl)
+    if denom <= 0.0:
+        return 0.0
+    return max(0.0, min(1.0, q * (1.0 + beta_pfl * (1.0 - qbar_pfl)) / denom))
 
 
 # g_S157 = (rOR · OR_ohne − 1)/(OR_ohne − 1) mit rOR 0,93 und OR_ohne 1,11 [46],
@@ -327,25 +343,34 @@ G_S157: float = (0.93 * 1.11 - 1.0) / (1.11 - 1.0)
 
 def s157_avoided_deaths(d85: float, s_gek: float | None, g_s157: float = G_S157,
                         qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
-                        delta_hap: float = 1.0) -> float | None:
+                        delta_hap: float = 1.0,
+                        s_gek_kalib: float = 0.0,
+                        q_pfl: float | None = None) -> float | None:
     """Vermiedene Todesfälle 85+ durch gekühlte Heimplätze (Bericht #95 §5).
 
-    ``ΔD_S157 = D_85+ · δ_HAP · h_Heim · s_gek · (1 − g_S157)``
+    ``ΔD_S157 = D_85+ · δ_HAP · h_Heim · max(s_gek − s_gek_kalib; 0) · (1 − g_S157)``
 
-    ``s_gek`` ist der gekühlte Anteil der Heimplätze, eine Eingabe der Kommune.
-    Der Bericht trägt dafür keine Voreinstellung: Fehlt die Eingabe (None),
-    entsteht **kein Betrag** — auch keine 0 (Rückgabe None).
+    ``s_gek`` ist der heute gekühlte Anteil der Heimplätze. Die Voreinstellung 0,11
+    (Block heat.s_gek, Befund 138), wenn die Kommune nichts eingibt, setzt die
+    Maßnahmen-Engine (``measure_service._s157_input``), nicht diese Funktion.
+    ``s_gek_kalib`` ist der gekühlte Anteil im Mittel der Kalibrierjahre (Block
+    heat.s_gek_kalib, 0,06; Befund 165, Log 50): Er steckt schon im Basiswert, S157
+    wirkt nur auf den Anteil darüber. Mit dem Standard 0 rechnet die Funktion je
+    vollen Anteil (Beispiel-Block s157_berlin: 37,35 Todesfälle, 25,0 Mio. €).
+    ``None`` (kein Anteil übergeben) ergibt None.
 
     ``delta_hap`` ist der Faktor des Hitzeaktionsplans, wenn die Kommune ihn
     zugleich gewählt hat (sonst 1): S157 wirkt dann auf den schon mit δ_HAP
     gedämpften Heim-Exzess — Faktoren multipliziert, Wirkungen nicht addiert
     (Befund 129; Berlin zusammen 1 − 0,95 × 0,294 = 72,1 %).
+
+    ``q_pfl`` ist der Heimanteil der Zelle (Befund 146); ohne ihn gilt 0,344.
     """
     if s_gek is None:
         return None
-    s = max(0.0, min(1.0, float(s_gek)))
+    s = max(0.0, min(1.0, float(s_gek)) - max(0.0, float(s_gek_kalib)))
     d = max(0.0, min(1.0, float(delta_hap)))
-    return max(0.0, d85) * d * h_heim(qbar_pfl, beta_pfl) * s * (1.0 - g_s157)
+    return max(0.0, d85) * d * h_heim(qbar_pfl, beta_pfl, q_pfl) * s * (1.0 - g_s157)
 
 
 # ── Hebel S152: Schutzprogramme vulnerable Gruppen (Bericht #95 §5, Befunde 123, 125–134) ──
@@ -358,7 +383,20 @@ DELTA_VG_MORB: float = 1.0
 # Paketwert Deutschland: Hitzeschutzpläne senken den hitzebedingten Anteil der
 # Sterbefälle um 20,6 % (Urban u. a. 2025 [47], Tabelle 1) — ein Baustein allein
 # und beide Hebel zusammen wirken nie stärker (Kappung, Befunde 126, 128).
-VG_PAKET_DE: float = 1.0 - 0.206
+# Der Wert steht im Registry-Parameter heat.kappung_vg (impact/params.py, Spec
+# ``kappung_vg``); dieser Default liest ihn dort, damit keine zweite Zahl gepflegt
+# wird (Befund 151). Die Maßnahmen-Engine überschreibt ihn zur Laufzeit über
+# ``override_context`` (measure_service._vg_cell_factor).
+def _kappung_vg_default() -> float:
+    from app.services.engine.impact import params
+
+    spec = next((s for s in params.IMPACT_PARAM_SPECS
+                 if s.get("risk") == "EXPECTED_ANNUAL_MORTALITY"
+                 and s.get("key") == "kappung_vg"), None)
+    return float(spec["value"]) if spec is not None and spec.get("value") is not None else 0.794
+
+
+VG_PAKET_DE: float = _kappung_vg_default()
 
 
 def vg_effective_delta(delta_vg: float = DELTA_VG, delta_hap: float = 1.0,
@@ -366,9 +404,12 @@ def vg_effective_delta(delta_vg: float = DELTA_VG, delta_hap: float = 1.0,
     """Wirksamer Faktor δ_VG nach der Kappung am Paketwert (Bericht #95 §5).
 
     Mit dem Hitzeaktionsplan zusammen gilt auf den Bändern 75–84 und 85+ ohne Heim
-    ``max(δ_HAP × δ_VG; 0,794)``. Zurückgegeben wird der Anteil, der davon auf δ_VG
-    entfällt: ``max(δ_VG; 0,794 / δ_HAP)``, höchstens 1 — so ergibt
-    δ_HAP × Rückgabe genau den gekappten Produktwert.
+    ``max(δ_HAP × δ_VG; paket)``. Zurückgegeben wird der Anteil, der davon auf δ_VG
+    entfällt: ``max(δ_VG; paket / δ_HAP)``, höchstens 1 — so ergibt
+    δ_HAP × Rückgabe genau den gekappten Produktwert. ``paket`` ist der Registry-
+    Parameter heat.kappung_vg (Default 0,794, Befund 151); die Maßnahmen-Engine
+    übergibt ihn override-fähig aus ``override_context``, ruft man die Funktion
+    ohne Angabe, gilt der Default ``VG_PAKET_DE``.
     """
     d_hap = max(0.0, min(1.0, float(delta_hap)))
     d_vg = max(0.0, min(1.0, float(delta_vg)))
@@ -379,7 +420,7 @@ def vg_effective_delta(delta_vg: float = DELTA_VG, delta_hap: float = 1.0,
 
 def vg_avoided(x_7584: float, x_85p: float, delta: float,
                qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
-               delta_hap: float = 1.0) -> float:
+               delta_hap: float = 1.0, q_pfl: float | None = None) -> float:
     """Vermiedene Menge durch Schutzprogramme vulnerable Gruppen (Bericht #95 §5).
 
     ``ΔX_VG = [X_75–84 + X_85+ · (1 − h_Heim)] · δ_HAP · (1 − δ)``
@@ -389,10 +430,64 @@ def vg_avoided(x_7584: float, x_85p: float, delta: float,
     S157, Befund 125). ``delta_hap`` dämpft den Exzess, wenn der Hitzeaktionsplan
     zugleich gewählt ist (nur für den Einzelnutzen; im Aggregat multipliziert
     der Faktor des Plans ohnehin). Negativ, wenn δ > 1 (Einweisungen vorgezogen).
+    ``q_pfl`` ist der Heimanteil der Zelle (Befund 146); ohne ihn gilt h_Heim = 0,344.
     """
-    base = max(0.0, x_7584) + max(0.0, x_85p) * (1.0 - h_heim(qbar_pfl, beta_pfl))
+    base = max(0.0, x_7584) + max(0.0, x_85p) * (1.0 - h_heim(qbar_pfl, beta_pfl, q_pfl))
     d = max(0.0, min(1.0, float(delta_hap)))
     return base * d * (1.0 - float(delta))
+
+
+# ── Hebel öffentliche Kühlzentren (Bericht #95 §5 Z. 1203–1246, Befunde 139, 148) ──
+# δ_KZ = 1 − r_KZ × w_KZ = 1 − 0,05 × 0,71 × 3/24 = 0,9956 (Block heat.delta_kuehlzentren,
+# Band 0,982–0,9994; Abschätzung von KAP3). Der Wert steht im Registry-Parameter
+# heat.delta_kuehlzentren (impact/params.py, Spec ``delta_kuehlzentren``); dieser
+# Default liest ihn dort, damit keine zweite Zahl gepflegt wird. Die Maßnahmen-Engine
+# liest ihn zur Laufzeit override-fähig (measure_service._kz_cell_factor).
+def _delta_kuehlzentren_default() -> float:
+    from app.services.engine.impact import params
+
+    spec = next((s for s in params.IMPACT_PARAM_SPECS
+                 if s.get("risk") == "EXPECTED_ANNUAL_MORTALITY"
+                 and s.get("key") == "delta_kuehlzentren"), None)
+    return float(spec["value"]) if spec is not None and spec.get("value") is not None else 0.9956
+
+
+DELTA_KZ: float = _delta_kuehlzentren_default()
+
+
+def kz_effective_delta(delta_kz: float = DELTA_KZ, delta_andere: float = 1.0,
+                       paket: float = VG_PAKET_DE) -> float:
+    """Wirksamer Faktor δ_KZ nach der Kappung am Paketwert (Bericht #95 §5 Z. 1234–1238).
+
+    Mit Hitzeaktionsplan und Schutzprogrammen zusammen gilt auf den Bändern 75–84 und
+    85+ ohne Heim ``max(δ_HAP × δ_VG × δ_KZ; paket)``. ``delta_andere`` ist das Produkt
+    δ_HAP × δ_VG der übrigen Hebel in der Zelle (δ_VG schon nach seiner eigenen Kappung).
+    Zurückgegeben wird der Anteil, der auf δ_KZ entfällt: ``max(δ_KZ; paket / delta_andere)``,
+    höchstens 1 — so ergibt ``delta_andere`` × Rückgabe genau den gekappten Produktwert.
+    ``paket`` ist der Registry-Parameter heat.kappung_vg (Default 0,794).
+    """
+    d_and = max(0.0, min(1.0, float(delta_andere)))
+    d_kz = max(0.0, min(1.0, float(delta_kz)))
+    if d_and <= 0.0:
+        return 1.0
+    return min(1.0, max(d_kz, paket / d_and))
+
+
+def kz_avoided(x_7584: float, x_85p: float, delta_kz: float = DELTA_KZ,
+               qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
+               delta_hap: float = 1.0, q_pfl: float | None = None) -> float:
+    """Vermiedene Menge durch öffentliche Kühlzentren (Bericht #95 §5 Z. 1207).
+
+    ``ΔD_KZ = [D_75–84 + D_85+ · (1 − h_Heim)] · (1 − δ_KZ)``
+
+    Dieselben Menschen wie beim Hebel Schutzprogramme: ältere Menschen, die zu Hause
+    leben; Heimbewohner ab 85 rechnet S157. X sind Todesfälle oder, mit L̄_a gewichtet,
+    YLL. ``delta_kz`` ist δ_KZ nach der Kappung (``kz_effective_delta``). ``delta_hap``
+    dämpft den Exzess nur für den Einzelnutzen (wie bei ``vg_avoided``).
+    ``q_pfl`` ist der Heimanteil der Zelle (Befund 146); ohne ihn gilt h_Heim = 0,344.
+    """
+    return vg_avoided(x_7584, x_85p, max(0.0, min(1.0, float(delta_kz))),
+                      qbar_pfl, beta_pfl, delta_hap, q_pfl)
 
 
 # ── 2. Hitzemorbidität (Bericht #95 §3.4 — Einweisungen) ──────────────────────
@@ -449,7 +544,10 @@ def pollen_age_bands(ci: dict) -> dict[str, float]:
     u65 = float((bands or {}).get("u65") or 0.0)
     if not u65:
         pop = float(ci.get("pop") or 0.0)
-        share_o = ci.get("share_over_65")
+        # Befund 142: angesetzter Wert der Ersatzregel vor dem veröffentlichten Zensuswert.
+        share_o = ci.get("share_over_65_ersatz")
+        if share_o is None:
+            share_o = ci.get("share_over_65")
         u65 = max(0.0, pop - pop * float(share_o or 0.0) / 100.0)
     return {
         "u20": u65 * NATIONAL_U20_SHARE_OF_U65,
@@ -484,6 +582,45 @@ def pollen_zelltage(betroffene: float, delta_b: float, delta_g: float,
         p_hat = max(0.0, 1.0 + lam * (float(g_zelle) / float(g_bar0) - 1.0))
     b = max(0.0, betroffene)
     return b * delta_b * p_hat, b * delta_g * p_hat
+
+
+def stadtbaum_g_neu(g_zelle: float, k_birke: float, k_unbek: float, gruen: float,
+                     dk_birke: float, dk_unbek: float, s_unbek: float) -> float:
+    """Ĝ' der Zelle nach Stadtbaumwahl (Bericht #96 §5, Z. 975–989, 1115–1121).
+
+    Definition der Ebene POLLEN_LOAD (§3.3, ``indicators.pollen_load``):
+    ``Ĝ_z = w_B · [k_Birke,z + s_unbek · k_unbek,z] + (1 − w_B) · Grün_z``. Ein Austausch
+    allergener Bäume senkt nur den Kronen-Summanden, und zwar **in dem Term, in dem die
+    ersetzten Kronen im Ausgangsstand stehen**: Kronen mit Gattungs-Tag der Birkengruppe
+    zählen voll, Kronen ohne Gattungs-Tag nur mit ``s_unbek`` (Registry
+    ``birch_group_share_default``, Default 0,12) — wie der Ausgangsstand sie gezählt hat.
+
+    ``Ĝ' = Ĝ_z − w_B · (dk_Birke + s_unbek · dk_unbek)``
+
+    ``g_zelle`` ist der gespeicherte Ĝ der Zelle (``pollen_g``, auf 5 Stellen gerundet wie
+    in ``indicators.pollen_load``); die Senkung wird davon abgezogen, KEINE anteilige
+    Senkung von Ĝ (Faktor 1/w_B zu hoch gegenüber der tragenden Kronenfläche, §5 Z.
+    1039–1042/1089).
+
+    Grenze (§5 Z. 988–989, Befund 195): Die Senkung ist höchstens so groß wie der
+    Kronenanteil selbst im Ausgangsstand — der Beitrag der Gehölze sinkt nie unter null.
+    Deshalb wird ``dk_Birke``/``dk_unbek`` je Term an ``k_Birke``/``k_unbek`` gekappt,
+    bevor abgezogen wird (die Kronenterme kommen deshalb zusätzlich getrennt herein — Ĝ
+    allein trägt die Kappungsgrenze je Term nicht); daraus folgt insgesamt
+    ``Ĝ' ≥ (1 − w_B) · Grün`` — als zusätzliche Absicherung wird dieser Boden auch direkt
+    gehalten, falls ``g_zelle`` (Rundung, Alt-Daten) von den Kronentermen abweicht.
+
+    ``dk_Birke`` und ``dk_unbek`` sind Senkungen und damit ≥ 0 (negative Eingaben werden
+    wie Kronenanteile unter 0 defensiv auf 0 gestutzt).
+    """
+    from app.services.engine.indicators import POLLEN_G_WEIGHT_BIRKE
+
+    w_b = POLLEN_G_WEIGHT_BIRKE
+    dk_b = min(max(0.0, float(dk_birke)), max(0.0, float(k_birke)))
+    dk_u = min(max(0.0, float(dk_unbek)), max(0.0, float(k_unbek)))
+    g_neu = float(g_zelle) - w_b * (dk_b + float(s_unbek) * dk_u)
+    floor = (1.0 - w_b) * max(0.0, float(gruen))
+    return max(floor, g_neu)
 
 
 def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
@@ -555,6 +692,12 @@ def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     out["delta_graeser"] = delta_graeser
     out["pollen_g"] = g_cell
     out["pollen_g_bar0"] = g_bar0
+    # Kronenterme der Zelle (§3.3), gleich den Zelleingaben — Grundlage für die
+    # Stadtbaumwahl (health.stadtbaum_g_neu, T-1599-cto): ohne sie ist die
+    # Kappungsgrenze je Term (dk ≤ k) im Maßnahmenlauf nicht rechenbar.
+    out["canopy_birch_frac"] = float(ctx.ci.get("canopy_birch_frac") or 0.0)
+    out["canopy_unknown_frac"] = float(ctx.ci.get("canopy_unknown_frac") or 0.0)
+    out["green_frac"] = float(ctx.ci.get("green_frac") or 0.0)
 
     # Kostensatz-Kopplung (Bericht #96 §3.5, Ledger-Befund 133): Der Ausweis
     # rechnet € = ΔTage · c_Tag mit c_Tag = c_Jahr,direkt / d_Saison und

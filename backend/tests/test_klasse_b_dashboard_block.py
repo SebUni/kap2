@@ -138,3 +138,78 @@ def test_histogramm_fehlender_cost_eur_wird_none(monkeypatch):
     out = dashboard_cache._build_risk_histogram(_DB(), 1)
     assert out["risks"][ohne]["cost_eur"] is None
     assert out["risks"][mit_null]["cost_eur"] == 0.0
+
+
+def test_histogramm_fehlende_index_und_outcome_kennzahlen_werden_none(monkeypatch):
+    """Fehlt eine Klimawirkung im Aggregat, stehen p90_index, max_index, outcome,
+    outcome_sum, top5_share, area_km2_affected und share_above_threshold auf None
+    (nicht 0.0); ein vorhandener Wert 0.0 bleibt 0.0 (T-1290, A-0010/P2)."""
+    from app.data import catalog
+    from app.services import dashboard_cache, measure_service
+
+    codes = [r["code"] for r in catalog.RISKS]
+    mit_null, ohne = codes[0], codes[1]
+    felder = {
+        "index": "p90_index",
+        "max_index": "max_index",
+        "outcome": "outcome",
+        "outcome_sum": "outcome_sum",
+        "top5_share": "top5_share",
+        "area_km2_affected": "area_km2_affected",
+        "share_above_threshold": "share_above_threshold",
+    }
+
+    def _aggregat(db, kommune_id, apply_measures=False):
+        risks = {c: {} for c in codes}
+        risks[mit_null] = {k: 0.0 for k in felder}
+        return {"risks": risks}
+
+    class _Abfrage:
+        def filter(self, *a, **k):
+            return self
+
+        def yield_per(self, *a, **k):
+            return iter([])
+
+    class _DB:
+        def query(self, *a, **k):
+            return _Abfrage()
+
+    monkeypatch.setattr(measure_service, "get_risk_aggregate", _aggregat)
+    out = dashboard_cache._build_risk_histogram(_DB(), 1)
+    for ziel in felder.values():
+        assert out["risks"][ohne][ziel] is None, f"{ziel} ist bei fehlendem Schlüssel nicht None"
+        assert out["risks"][mit_null][ziel] == 0.0, f"{ziel} verliert einen vorhandenen Wert 0.0"
+
+
+def test_histogramm_zelle_ohne_index_zaehlt_nirgends(monkeypatch):
+    """Eine Zelle ohne Schlüssel index zählt in keinem Bin und nicht in nonzero_cells
+    (T-1290, A-0010/P2 — eine fehlende Bewertung ist keine Bewertung 0)."""
+    from app.data import catalog
+    from app.services import dashboard_cache, measure_service
+
+    codes = [r["code"] for r in catalog.RISKS]
+    code = codes[0]
+
+    def _aggregat(db, kommune_id, apply_measures=False):
+        return {"risks": {c: {} for c in codes}}
+
+    class _Abfrage:
+        def filter(self, *a, **k):
+            return self
+
+        def yield_per(self, *a, **k):
+            return iter([
+                ({"risks": {code: {}}},),
+                ({"risks": {code: {"index": 10.0}}},),
+            ])
+
+    class _DB:
+        def query(self, *a, **k):
+            return _Abfrage()
+
+    monkeypatch.setattr(measure_service, "get_risk_aggregate", _aggregat)
+    out = dashboard_cache._build_risk_histogram(_DB(), 1)
+    assert out["total_cells"] == 2
+    assert sum(out["risks"][code]["counts"]) == 1
+    assert out["risks"][code]["nonzero_cells"] == 1

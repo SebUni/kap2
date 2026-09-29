@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–437) — im Review** ·
+Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–452) — im Review** ·
 04.09.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -757,7 +757,8 @@ Die Baseline ist über fünf Altersbänder geschichtet, der BAF wirkt aber
 **unstratifiziert** auf die Bandsumme: Es gilt dieselbe relative Elastizität in
 allen Bändern. Neutral ist das nicht — die τ-Rechnung unten zeigt, dass die
 Lebenszeitdosis-Elastizität mit dem Alter fällt (\(\tau=(T/2)/a_{\text{erk}}\)), und MM mit
-einem Erkrankungsalter von 63–69 Jahren trägt 64 % der YLL. Eine altersgeschichtete
+einem Erkrankungsalter von 63–69 Jahren trägt 62,5 % der YLL (878,3 von 1.404,4 im
+Beispiel `beispiel_98_bundessumme` unten; Befund 450). Eine altersgeschichtete
 Elastizität würde den MM-Pfad also eher anheben, den C44-Pfad eher senken. [30]
 veröffentlicht keine bandweisen BAF; die Annahme bleibt bis dahin bestehen und ist
 über das BAF_MM-Band (±67 % auf den MM-Pfad) mit abgedeckt. **Ersetzungspfad:**
@@ -793,8 +794,8 @@ Inzidenz im Erkrankungsalter \(a_{\text{erk}}\). Nach [27] liegt der Median bei 
 Jahren. Mit dem Mittelpunktabstand der Normalperioden \(T = 30\) Jahre folgt
 \(\tau \approx 0{,}20\text{–}0{,}24\); selbst bei doppelt so langem
 Anstiegsfenster (\(T = 60\)) bleibt \(\tau \le 0{,}48\).
-**Spanne: 0,20–0,48** — weit
-außerhalb des \(k_{\text{UV}}\)-Bandes (±49 %) und damit die **größte**
+**Spanne: 0,20–0,48** — vollständig
+außerhalb des \(k_{\text{UV}}\)-Bandes (−52 … −80 % gegen ±49 %) und damit die **größte**
 Einzelunsicherheit des Modells; sie ist als eigene Achse in der §4-Bändertabelle
 geführt.
 
@@ -839,7 +840,7 @@ $$ \text{€}_{\text{Zelle}} \;=\; \sum_e \Delta F_{e,\text{Zelle}} \cdot c_e \;
   Die Basiswert-Wahl folgt der Untergrenzen-Zusage (#95-Befund-62-Lehre).
 - **VOLY = 160.800 €** (Preisstand 2024) (MK 4.0/P52; Kette in #95 §3.5 [19]); VSL nur Sensitivität.
   **Konsistenz-Check VSL ÷ VOLY (§3.2; Befund 217):** Die Fortschreibung P52 führt
-  VSL 3,5 / 4,7 / 6,19 Mio €/Todesfall als Sensitivitäten. Der Quotient ergibt
+  VSL 3,5 / 4,7 / 6,19 Mio. € je Todesfall als Sensitivitäten. Der Quotient ergibt
   **21,8 / 29,2 / 38,5 Lebensjahre** je Todesfall. Dem stehen die hier tatsächlich
   verlorenen Lebensjahre gegenüber: \(\bar L_{\text{MM}}\) = 10,46 und
   \(\bar L_{\text{C44}}\) = **5,48** Jahre. Der VSL unterstellt also das Zwei- bis
@@ -847,13 +848,13 @@ $$ \text{€}_{\text{Zelle}} \;=\; \sum_e \Delta F_{e,\text{Zelle}} \cdot c_e \;
   altersadjustiert, während die Hautkrebs-Sterbefälle mit medianem Sterbealter 76–88
   Jahren am oberen Ende der Altersverteilung liegen. **Konsequenz (§3.2):** #98 ist der
   altenlastigste Fall der K1-Familie; die YLL-Bewertung fällt hier
-  **um Faktor 2,8 (VSL 3,5 Mio) bis 4,9 (VSL 6,19 Mio) niedriger** aus als eine
-  Bewertung je Todesfall — nachgerechnet: 180,1 klimaattribuierte Todesfälle × 3,5 Mio
-  = 630 Mio € (bzw. 846 bzw. 1.115 Mio € bei VSL 4,7 / 6,19 Mio) gegenüber
-  **226 Mio €** im YLL-Pfad. Die **Relation zwischen den Risiken verschiebt sich
+  **um Faktor 2,8 (VSL 3,5 Mio. €) bis 4,9 (VSL 6,19 Mio. €) niedriger** aus als eine
+  Bewertung je Todesfall — nachgerechnet: 180,1 klimaattribuierte Todesfälle × 3,5 Mio. €
+  = 630 Mio. € (bzw. 846 Mio. € bzw. 1,11 Mrd. € bei VSL 4,7 bzw. 6,19 Mio. €) gegenüber
+  **226 Mio. €** im YLL-Pfad. Die **Relation zwischen den Risiken verschiebt sich
   entsprechend**: #98 erscheint gegenüber jung-lastigen Risiken (Extremereignisse,
   Verkehr) systematisch kleiner als unter VSL. Beide Größen stammen aus derselben
-  Quelle (MK 4.0/Amann 2020a) mit derselben Preisstand-Anpassung (€2024).
+  Quelle (MK 4.0/Amann 2020a) mit derselben Preisstand-Anpassung (Preisstand 2024).
 - **Sensitivitätsband \(r_{\text{out}}\)** (nicht im Basiswert; Log 10; GP-Befund 9;
   Formel-Präzisierung Befund 206): der Außenberufs-Modifikator wirkt auf den
   **SCC-Anteil am C44-Zusatz** \(w^Z = w_{\text{SCC}} \cdot 2{,}5 / \text{BAF}_{\text{C44}}
@@ -895,8 +896,9 @@ $$ \text{€}_{\text{Zelle}} \;=\; \sum_e \Delta F_{e,\text{Zelle}} \cdot c_e \;
   belegte kommunale Verteilung der Außenberufs-Anteile existiert nicht, solange die
   Ebene geparkt ist; drei Kommunaltypen stützen die Größenordnung (reine
   Agrar-/Baugemeinden erreichen ein Vielfaches des Bundesmittels, Großstädte liegen
-  darunter). Ergebnis-Sensitivität: **−1,9 … +3,8 %** auf den C44-Zusatz, **−1,0 … +2,1 %** auf die €-Summe
-  einer Einzelkommune — **null** auf die Bundessumme (Zentrierung). Ersetzungspfad:
+  darunter). Ergebnis-Sensitivität: **−1,9 … +3,8 %** auf den C44-Zusatz, **−1,1 … +2,2 %** auf die €-Summe
+  einer Einzelkommune (C44-Anteil am Euro-Betrag 56,8 % nach `beispiel_98_bundessumme` unten,
+  × −1,9 bzw. +3,8 %; Befund 451) — **null** auf die Bundessumme (Zentrierung). Ersetzungspfad:
   INKAR-Perzentile der Branchenanteile, sobald die Ebene beschafft ist.
 - **Sensitivitätsband \(v_{\text{verh}}\)** (Default 1; Log 11/17; Register 98-S154-01;
   Herleitung migriert, Befund 205; Wirkungsort präzisiert, **Befund 216**).
@@ -1055,7 +1057,7 @@ Sortierregel: nach dem Buchstaben des Zeichens ohne Groß- und Kleinschreibung; 
 | \(\text{SSD}\) | Sonnenscheindauer (Normalperioden-Mittel je Zelle) — Kartenebene **neu anzulegen** (angelegt, §3.6) | h/Jahr | DWD-CDC sunshine_duration 1 km [33]; Gebietsmittel-Referenzen [69]; register:98-E20-01 |
 | \(T\) | Dauer des Dosisanstiegs (Mittelpunktabstand der Normalperioden) | Jahre | **30** (1961–1990 ⇒ 1991–2020); herleitung:#gleichgewicht |
 | \(\tau\) | Transient-Faktor: Anteil der Lebenszeitdosis-Erhöhung an der Jahresdosis-Erhöhung, \(\tau=(T/2)/a_{\text{erk}}\) | — | **1,00** im Ausweis (Gleichgewichtslesart); Spanne **0,20–0,48** als §4-Achse; gekennzeichnete Abschätzung §3.9; herleitung:#gleichgewicht |
-| \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136,4–165,6 T€; Kette #95 §3.5) [19]; herleitung:#voly (in #95) |
+| \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | **160.800** (Band 136.400–165.600 €; Kette #95 §3.5) [19]; herleitung:#voly (in #95) |
 | \(v_{\text{verh}}\) | Verhaltens-Sensitivität — **Jahres**faktor, **abgeleitet** aus \(s\) und \(\phi_{\text{Komfort}}\) (kein eigener Parameter, §3.2 Kein-Doppelkanal) | — | \(1+\phi_{\text{Komfort}}(s-1)\) = **1,00** (Band 1,00–1,11); herleitung:#v-verh |
 | \(w_{\text{SCC}}\) | SCC-Anteil an C44 (altersinvariant, dokumentierte Annahme; Quellen-Widerspruch benannt §3.1) | — | **0,25** (Band 0,25–0,50) [27; obere Stütze 2015er-BfS-Split]; herleitung:#baf-c44 |
 | \(W_{\text{S155}}(J)\) | angerechnete Minderung des bewerteten Schadens durch S155 nach \(J\) Jahren (Teil-Ausweis, nicht im Basiswert) | €₂₀₂₄/Jahr | berechnet (§5); herleitung:#hebel-s155 |
@@ -1134,9 +1136,12 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   [31], BAF [29,30]). **Kalibriermodell = Produktionsmodell** (lineares Modell, keine
   Näherungsläufe).
 - **Struktur-Validierung auf der Altersachse — out-of-sample (§3.4; Befund 214).**
-  Die kritischste Achse dieses Modells ist die **Altersverteilung**: Die Baseline stammt
-  vollständig aus einer Abbildungs-Ablesung, und ein reiner Verteilungsfehler lässt die
-  Bundessumme unberührt, verschiebt aber jede Kommune (Nachweis: Befund 212). Ein
+  Geprüft wird die **Altersverteilung** der Baseline, weil sie die Verteilung auf die
+  Kommunen trägt: Die Baseline unterscheidet Kommunen nur nach Bevölkerung und
+  Alter (»Regionale Achse« unten), sie stammt vollständig aus einer
+  Abbildungs-Ablesung, und ein reiner Verteilungsfehler lässt die
+  Bundessumme unberührt, verschiebt aber jede Kommune (Nachweis: Befund 212).
+  Wie groß diese Achse ist, ordnet die Rangfolge der Unsicherheiten weiter unten in diesem Kapitel ein. Ein
   Vergleich der **rohen** Gesamtrate taugt dafür **nicht** — auf sie wird
   \(c_{\text{kal}}\) gefittet, die Prüfung wäre in-sample.
   Geprüft wird deshalb die **altersstandardisierte Neuerkrankungsrate** (alter
@@ -1146,7 +1151,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   Mittel 2021–2023.
 
   **Toleranz hergeleitet statt gesetzt (§3.9 gilt auch für Toleranzen; Befund 229a;
-  Log 22).** Bis Rev. 2 standen hier ±10 % ohne Rechenweg, gesetzt in derselben
+  Log 22).** Bis Rev. 2 standen hier ±10 % ohne Herleitung, gesetzt in derselben
   Revision, die das Ergebnis erzeugt hat. Die Herleitung: Jede Einzelablesung trägt
   ±15 %; die Fehlerfortpflanzung des gewichteten Mittels
   \(\sigma/\text{ASR} = 0{,}15\cdot\sqrt{\sum(w_i r_i)^2}\,/\,\sum(w_i r_i)\) ergibt im
@@ -1158,7 +1163,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   zufällige Anteil der richtige Maßstab. Weil das Ist-Ergebnis mit 0,4 σ weit unter der
   Spezifikation liegt, gilt zusätzlich die engere **Regressionsschranke ±3 %**
   (Golden-Test), damit eine künftige Verschlechterung der Ablesekette auffällt.
-  Rechenweg: Anlage [71], Golden-Test `beispiel_98_struktur_validierung`.
+  Nachrechnung: Anlage [71], Golden-Test `beispiel_98_struktur_validierung`.
 
   | ASR (alter Europastandard), je 100.000 | Modell (Ablesekette) | amtlich 2021–2023 | Abweichung | Verdikt |
   |---|---|---|---|---|
@@ -1193,60 +1198,81 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   (der native YLL-Ausweis und € enthalten nur den Zusatz, keinen Sockel).
 - **Sanity-Bänder (Unter- und Obergrenze):**
   Bundessummen (Basiswerte): \(\Delta F\) = **733 MM + 18.339 C44 ≈ 19.072 Fälle/Jahr**,
-  **YLL ≈ 1.404/Jahr**, **€ ≈ 339 Mio € pro Jahr** (Preisstand 2024) (Behandlung 113 + Mortalität 226).
-  *Obergrenzen:* Behandlungs-€ = 6,2 % der amtlichen KKR C43/C44 (1.823 Mio €₂₀₂₃ [28]) ✓;
+  **YLL ≈ 1.404/Jahr**, **Euro-Betrag ≈ 339 Mio. € je Jahr** (Preisstand 2024) (Behandlung 113 Mio. € + Mortalität 226 Mio. €).
+  *Obergrenzen:* Behandlungs-€ = 6,2 % der amtlichen KKR C43/C44 [28] von 1,82 Mrd. € (Preisstand 2023) ✓;
   klimaattribuierter Inzidenzanteil MM +2,73 %/C44 +7,61 % ≪ beobachteter
   Inzidenzanstieg (standardisierte MM-Rate 1999–2023 deutlich steigend; C44-Hospitali-
   sierungen 2004–2024 +94,5 % [27,28]) ✓; YLL-Anteil = 1.404 / ≈ 39.130 (= \(\sum_e \text{Sterbefälle}_e \times \bar L_e\)
   = 3.081,0 · 10,4569 + 1.261,7 · 5,4787, Anlage [71]; Befund 352) Gesamt-Hautkrebs-
   YLL ≈ **3,6 %** (konsistent zu BAF × ΔDosis) ✓. *Untergrenze:* SSD-Anstieg ist messfest
   > 0 (alle Länder +4,5…+12,1 %, alle Regionen +7,8…+9,2 % [69,72]); untere
-  Bandkombination ergibt ≈ 115 Mio € > 0.
+  Bandkombination ergibt ≈ 115 Mio. € > 0.
 - **Bänder je Achse — separat ausgewiesen, nicht kumuliert (§3.9; Befund 221).**
   Rev. 1 behauptete diese Trennung, bezifferte sie aber nicht; hier die Zahlen
   (Anlage [71]):
 
-  | Achse | Spanne | € Mio/Jahr | Δ gegen Basiswert 339 |
+  | Achse | Spanne | Mio. € je Jahr | Δ gegen Basiswert 339 |
   |---|---|---|---|
   | \(k_{\text{UV}} \times a_{\text{attr}}\), untere Kombination | 0,3622 × 0,50 | **115** | −66 % |
   | \(k_{\text{UV}} \times a_{\text{attr}} \times c_e\) oben, obere Kombination | 1,0616 × 1,00 × \(c_e\) oben (**beide** Entitäten) | **737** | +118 % |
-  | VOLY | 136.400 / 165.600 € | 304 – 345 | −10,1 % … +2,0 % |
-  | \(a_{\text{attr}}\) | 0,50 / 1,00 | 226 – 452 | −33,3 % … +33,3 % |
-  | BAF_MM | 0,2 / 1,0 | 241 – 436 | −28,8 % … +28,8 % |
-  | \(w_{\text{SCC}}\) (⇒ BAF_C44 1,675/1,95) | 0,25 / 0,50 | 339 – 370 | ±0 % … +9,3 % |
-  | **Transient-Faktor \(\tau\)** (Gleichgewichts- ↔ Jahres-Lesart, §3.4) | 0,20 / 1,00 | **67 – 339** | **−80 % … ±0 %** |
+  | VOLY | 136.400 / 165.600 € | 304–345 | −10,1 % … +2,0 % |
+  | \(a_{\text{attr}}\) | 0,50 / 1,00 | 226–452 | −33,3 % … +33,3 % |
+  | BAF_MM | 0,2 / 1,0 | 241–436 | −28,8 % … +28,8 % |
+  | \(w_{\text{SCC}}\) (⇒ BAF_C44 1,675/1,95) | 0,25 / 0,50 | 339–370 | ±0 % … +9,3 % |
+  | **Transient-Faktor \(\tau\)** (Gleichgewichts- ↔ Jahres-Lesart, §3.4) | 0,20 / 1,00 | **67–339** | **−80 % … ±0 %** |
   | \(r_{\text{out}}\) (geparkt) | \(q_{\text{out}}\) ∈ [0; 0,21] | 339 | **±0 %** (zentriert) |
-  | \(v_{\text{verh}}\) (geparkt) | \(\phi\) ∈ [0; 0,25] | 339 – 377 | ±0 % … +11,3 % |
+  | \(v_{\text{verh}}\) (geparkt) | \(\phi\) ∈ [0; 0,25] | 339–377 | ±0 % … +11,3 % |
 
-  **Gesamtband ≈ 115–737 Mio €** = nur die \(k_{\text{UV}}\)/\(a_{\text{attr}}\)/\(c_e\)-Kombination;
-  die übrigen Zeilen sind **nicht** hineinmultipliziert. Größte Achse ist der
-  einseitige Transient-Faktor \(\tau\) (§3.4); größter **zweiseitiger** Treiber ist die
-  \(k_{\text{UV}}\)-Messunsicherheit (±49 %); danach folgen \(a_{\text{attr}}\)
-  (±33,3 %) und BAF_MM (±28,8 %) — die Reihenfolge entspricht der Tabelle darüber
-  (Befund 282; bis Rev. 8 stand hier eine abweichende Rangfolge). Seit Rev. 3 erzeugt
+  **Gesamtband ≈ 115–737 Mio. €** = nur die \(k_{\text{UV}}\)/\(a_{\text{attr}}\)/\(c_e\)-Kombination;
+  die übrigen Zeilen sind **nicht** hineinmultipliziert. Die beiden Kombinationszeilen
+  kommen in keine Rangfolge, weil sie mehrere Achsen zugleich bewegen. Zwei Achsen haben
+  keine eigene Zeile und stecken nur in den Kombinationszeilen; allein bewegt ergeben sie
+  (nachgerechnet mit der Funktion `sums()` im Skript der Anlage [71], Befund 441):
+  \(k_{\text{UV}}\) 0,3622 / 1,0616 ⇒ 172–505 statt 339 Mio. € je Jahr ⇒ **±49 %**
+  (der Euro-Betrag ist linear in \(k_{\text{UV}}\): 338,6 × 0,3622 / 0,7119 = 172,3;
+  Band aus §3.2, Register 98-E20-02); \(c_e\) mit den oberen Kostenbändern beider
+  Entitäten ⇒ 370,6 statt 338,6 Mio. € je Jahr ⇒ **+9,4 %** (Befund 438). Unter den
+  Achsen ist der einseitige Transient-Faktor \(\tau\) die größte (−80 %, §3.4); größter
+  **zweiseitiger** Treiber ist die \(k_{\text{UV}}\)-Messunsicherheit (±49 %); danach
+  folgen \(a_{\text{attr}}\) (±33,3 %) und BAF_MM (±28,8 %) — die Reihenfolge
+  folgt dem Betrag der Spalte »Δ gegen Basiswert« der Tabelle darüber für die Einzelachsen und
+  ordnet \(k_{\text{UV}}\) mit seiner eben nachgerechneten Einzelwirkung ein (Befunde
+  282/439/441; bis Rev. 8 stand hier eine abweichende Rangfolge). Seit Rev. 3 erzeugt
   die Anlage [71] alle Zeilen; \(a_{\text{attr}}\) ist seit Rev. 8 als eigene Achse
   ausgewiesen (Befund 261).
 - **Unsicherheiten (nach Größe geordnet, Befunde 250/268/398):**
-  Aufgezählt wird hier **nach Größe** der bezifferten Ergebniswirkung (Spalte »Δ gegen
-  Basiswert« der Bändertabelle darüber, maximaler Betrag); die Bändertabelle selbst ist
-  nach Sachgruppen geordnet, nicht nach Größe (Befunde 361/370). **Größte Achse ist
+  Aufgezählt wird hier **nach Größe** der bezifferten Wirkung auf die Bundessumme
+  (maximaler Betrag). Achsen, die nur Kommunen gegeneinander verschieben und die
+  Bundessumme unberührt lassen, folgen danach in einer eigenen Gruppe, geordnet nach
+  ihrer Wirkung je Kommune (Befund 448). Fundstelle je Wert: \(\tau\), \(a_{\text{attr}}\), BAF_MM,
+  \(v_{\text{verh}}\), VOLY, \(w_{\text{SCC}}\) und \(r_{\text{out}}\) (Bundessumme) aus der Spalte
+  »Δ gegen Basiswert« der Bändertabelle darüber; \(k_{\text{UV}}\) und \(c_e\) aus der
+  Nachrechnung unter der Tabelle; die Anker-Auswahlregel aus dem Satz »Sensitivität der
+  Auswahlregel« beim Anker oben; die Populationsbasis aus §3.3; je Kommune die räumliche
+  Streuung aus §6 Modellgrenze 9, die Binnenheterogenität aus §6 Modellgrenze 7 und
+  \(r_{\text{out}}\) aus §3.4 (Bandgrenzen von \(q_{\text{out}}\))
+  (Befund 442). Die Bändertabelle selbst ist nach Sachgruppen geordnet, nicht nach
+  Größe (Befunde 361/370). **Größte Achse ist
   der Transient-Faktor \(\tau\)** (0,20–1,00 ⇒ **−80 %**, §3.4): Er trennt die
   ausgewiesene Gleichgewichtslesart von einer reinen Jahres-Attribution und ist
   einseitig — er kann das Ergebnis nur senken. Danach die
   **k_UV-Messunsicherheit** (Band **0,3622–1,0616** = **±49 %**) — der
   **Stichprobenfehler der publizierten Trendschätzungen**, *nicht* die räumliche
   Übertragbarkeit; letztere steht als Modellgrenze 9. Sie ist der größte
-  *zweiseitige* Treiber. Danach: Attribution \(a_{\text{attr}}\) (±33 %);
+  *zweiseitige* Treiber. Danach: Attribution \(a_{\text{attr}}\) (±33,3 %);
   **BAF_MM** (±67 % auf den MM-Pfad ⇒ ±28,8 % auf die Summe — Befund 356: die Achse
   steht hier **einmal**, nicht doppelt); **Verhaltens-Sensitivität \(v_{\text{verh}}\)**
   (geparkte Ebene, \(\phi\) ∈ [0; 0,25] ⇒ ±0 … **+11,3 %**, einseitig nach oben);
-  **VOLY** (136.400–165.600 € ⇒ **−10,1 … +2,0 %**); Entitäten-Split
-  \(w_{\text{SCC}}\) (0,25–0,50 ⇒ BAF_C44 1,675–1,95 ⇒ ±0 … +9,3 %); \(c_e\)-Proxy
-  (obere Kostenbänder beider Entitäten ⇒ Behandlungs-€ 113 → 145 Mio ⇒ +9,3 % auf die
-  Summe, einseitig); Anker-Auswahlregel (−4,3 … +2,8 %);
-  **Binnenheterogenität des Bandes 20–64 (≈ ±4 % je Kommune, Bundessumme unberührt —
-  §6 Modellgrenze 7, Befund 225)**; **Populationsbasis Kalibrierung ↔ Produktion
-  (−1,19 %, §3.3, Befund 226)**; \(r_{\text{out}}\) (geparkt, zentriert ⇒ ±0 %).
+  **VOLY** (136.400–165.600 € ⇒ **−10,1 … +2,0 %**); \(c_e\)-Proxy
+  (obere Kostenbänder beider Entitäten ⇒ Behandlungs-€ 113 → 145 Mio. € ⇒ +9,4 % auf die
+  Summe, einseitig; Befund 438); Entitäten-Split
+  \(w_{\text{SCC}}\) (0,25–0,50 ⇒ BAF_C44 1,675–1,95 ⇒ ±0 … +9,3 %); Anker-Auswahlregel (−4,3 … +2,8 %);
+  **Populationsbasis Kalibrierung ↔ Produktion (−1,19 %, §3.3, Befund 226)**.
+  **Nur je Kommune, Bundessumme (nahezu) unberührt:** **Räumliche Streuung des
+  \(k_{\text{UV}}\)-Rasterquotienten** (−38 … +43 % zwischen 10. und 90. Perzentil der
+  Kreiswerte, §6 Modellgrenze 9, Befund 449); **Binnenheterogenität des Bandes 20–64 (≈ ±4 % je Kommune —
+  §6 Modellgrenze 7, Befund 225)**; \(r_{\text{out}}\) (geparkt; −1,1 … +2,2 % je Kommune,
+  ±0 % auf die Bundessumme durch die Zentrierung, §3.4).
   **Nicht als Ergebnisachse beziffert** und deshalb hier am Ende, nicht der Größe
   nach eingeordnet: die Zeitinvarianz-Annahme der Elastizität (§3.2, Befund 222);
   die Ablesekette (±15 % je Ablesung, wirkt über \(c_{\text{kal}}\) auf den Anker
@@ -1419,7 +1445,8 @@ Jahres unter der heutigen, eingelaufenen Dosislage; die Latenz steckt in den Inz
    Jahres; die Jahres-Attribution ist konzeptionell unscharf (Infokasten-Pflichttext).
 2. \(k_{\text{UV}}\)-Übersetzung: **ein** Messpunkt (UV-Dosis Dortmund, GR/SunD
    DWD-Station 1117 Bochum, 10 km entfernt); Band **0,3622–1,0616** (publizierte
-   Standardfehler, 1 σ) dominiert die Unsicherheit. Station und Raster
+   Standardfehler, 1 σ) ist der größte zweiseitige Treiber der Unsicherheit (größte Achse insgesamt ist der einseitige Transient-Faktor τ, §3.4/§4).
+   Diese Rangfolge gilt für die Bundessumme (Kapitel 4). Station und Raster
    unterscheiden sich an der Messzelle **metrikabhängig**: bei der
    Sonnenscheindauer um Faktor **1,71** (11,3 gegen 6,62 %/Dek.), bei der
    Globalstrahlung nur um **1,02** (4,6 gegen 4,51 %/Dek., §3.2). Genau deshalb
@@ -1464,21 +1491,53 @@ Jahres unter der heutigen, eingelaufenen Dosislage; die Latenz steckt in den Inz
    möglich, greift aber in die von #96 mitgenutzte Bandkette ein und ist deshalb als
    produktweiter Schritt zu führen, nicht als #98-Alleingang (Log 21).
 8. **Populationsbasis Kalibrierung ↔ Produktion** (−1,19 %, §3.3, Befund 226).
-9. **Räumliche Streuung des \(k_{\text{UV}}\)-Rasterquotienten (Befunde 255/256).**
+9. **Räumliche Streuung des \(k_{\text{UV}}\)-Rasterquotienten (Befunde 255/256/449).**
    Der Quotient ΔGlobal/ΔSSD variiert über die Gemeindepunkte erheblich (5. Perzentil
-   0,3225 · Median 0,6305 · 95. Perzentil 1,1671; gewichteter Bundeswert **0,6683**).
-   Das verschiebt **einzelne Kommunen** gegeneinander. Die Bundessumme ist davon
+   0,3225 · Median 0,6305 · 95. Perzentil 1,1671; gewichteter Bundeswert **0,6683**;
+   `backend/data/kalibrierung/k_uv_herleitung.md` Abschnitt 4). Der Euro-Betrag ist
+   linear in \(k_{\text{UV}}\) (Kapitel 4, Nachrechnung unter der Bändertabelle). Nimmt
+   man jeden Punktquotienten als richtig, liegen die Punkte zwischen 5. und 95. Perzentil
+   bei 0,3225 / 0,6683 = 0,48 und 1,1671 / 0,6683 = 1,75, also **−52 … +75 %** um den
+   Bundeswert, zwischen 10. und 90. Perzentil (0,3693 / 1,0046) bei −45 … +50 %. Als
+   Wirkung je Kommune ist diese Punktspanne nicht belegt: Jeder Punktquotient teilt zwei
+   Trends aus 26 Jahren und trägt deren Schätzrauschen. Ob hinter der Streuung ein
+   räumliches Muster steht, misst Anlage [73] in
+   `backend/data/kalibrierung/k_uv_raumstreuung.md` (Befund 449), mit derselben
+   Punktmenge, demselben Stabilitätsausschluss und demselben Gewicht wie der Bundeswert.
+   Sie reproduziert den Bundeswert mit 0,6671 (Abschnitt 2, Toleranz 0,003).
+
+   - **Kreiswerte** (Abschnitt 3; gewichtetes Mittel der Punktquotienten je Kreis,
+     Perzentile ungewichtet über 399 Kreise): 10. Perzentil 0,4127 und 90. Perzentil
+     0,9536, also −38 … +43 % um den Bundeswert; 5. und 95. Perzentil 0,3598 und 1,1260,
+     also −46 … +69 %; Median 0,6553.
+   - **Landeswerte** (Abschnitt 3): von 0,4800 in Baden-Württemberg (−28 %) bis 0,9920 in
+     Schleswig-Holstein (+49 %); Berlin, die Beispielkommune der Rechenkette, 0,9324 (+40 %).
+   - Eine **Rangkorrelation** (nach Spearman) vergleicht zwei Reihenfolgen derselben
+     Kreise: 1 heißt gleiche Reihenfolge, 0 kein Zusammenhang, −1 umgekehrte Reihenfolge.
+   - **Rangtreue: 0,60** (Abschnitt 4, 399 Kreise): Rangkorrelation der Kreise nach dem
+     Euro-Betrag je Einwohner, einmal mit dem Bundeswert und einmal mit dem Wert je Kreis
+     gerechnet.
+   - **Zeitstabilität: 0,12** (Abschnitt 4, 398 Kreise): Rangkorrelation der Kreiswerte aus
+     den Trends 1997–2009 mit den Kreiswerten aus den Trends 2010–2022.
+
+   Nach der Entscheidungsregel der Anlage (Abschnitt 5; die Schwellen 0,90 und 0,50 sind
+   Setzungen von KAP3) gilt **Zweig 2**: Die Rangtreue liegt unter 0,90, ein Wert je Kreis
+   ordnete die Kreise also merklich anders. Die Zeitstabilität liegt unter 0,50, die beiden
+   Hälften des Messfensters ergeben also fast keine gemeinsame Reihenfolge der Kreise. Ein
+   beständiges räumliches Muster ist damit nicht belegt, und das Modell führt
+   \(k_{\text{UV}}\) als Bundeswert (Entscheidungslog Nr. 37). So offen bleibt die
+   Reihenfolge der Kommunen: Träfen die Kreiswerte doch zu, läge der Euro-Betrag eines
+   Kreises zwischen 10. und 90. Perzentil um −38 … +43 % neben dem Modellwert, und die
+   Reihenfolge der Kreise nach dem Euro-Betrag je Einwohner stimmte mit der des Modells
+   nur zu einer Rangkorrelation von 0,60 überein. Die Bundessumme ist davon
    **nahezu** unberührt, weil sie den mit Baseline-Fällen × ΔSSD gewichteten Wert
    verwendet — dasselbe Gewicht, mit dem das Produktionsmodell summiert (Befunde
    266/278). „Nahezu" statt „exakt", weil die beiden Entitäten leicht verschiedene
    Gewichte hätten (MM 0,6674 · C44 0,6689 gegen den geführten Mittelwert 0,6683);
    die Restdifferenz von < 0,2 % ist als Näherung gekennzeichnet. Deshalb
    steht die Streuung hier als Modellgrenze und **nicht** im Sanity-Band (dieselbe
-   Buchung wie bei \(r_{\text{out}}\) und Modellgrenze 7). Richtung: In Kommunen mit
-   überdurchschnittlichem Quotienten unterschätzt das Modell den Zusatz, in
-   unterdurchschnittlichen überschätzt es ihn. *Ersetzungspfad:* \(k_{\text{UV}}\)
-   als Zellgröße aus dem Quotienten der beiden Raster — die Daten liegen vor, es wäre
-   eine neue Ebene nach §3.1.
+   Buchung wie bei \(r_{\text{out}}\) und Modellgrenze 7). Warum \(k_{\text{UV}}\)
+   nicht je Kreis oder Zelle geführt wird, steht im Entscheidungslog Nr. 37.
 
 **Infokasten-/UI-Texte (§3.6 — Teil des Berichts):**
 
@@ -2026,6 +2085,7 @@ verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Inte
   dort) für den Zähler. \(k_{\text{UV}}\) = (4,9/4,6) × 0,6683 = **0,7119**;
   Band **0,3622–1,0616** aus den publizierten Standardfehlern (±49,1 %, 1 σ).
   Ersetzt die Rev.-4-bis-6-Anlage `ssd_dortmund_k_uv.py`.
+  Dazu die räumliche Streuung von \(k_{\text{UV}}\) (Befund 449): `backend/scripts/kalibrierung/k_uv_raumstreuung.py` → `backend/data/kalibrierung/k_uv_raumstreuung.{csv,md}` mit Kreis- und Landeswerten des Rasterquotienten, Rangtreue 0,60 und Zeitstabilität 0,12 (Rangkorrelation nach Spearman); es gilt Zweig 2, \(k_{\text{UV}}\) bleibt Bundeswert (Entscheidungslog Nr. 37).
 - **[74]** S. Lorenz u. a., „Increasing Solar UV Radiation in Dortmund, Germany, and
   Uccle, Belgium", **Konferenz-Abstract** IUPB/MEPSA 2024,
   iupb-mepsa-2024.m.asnevents.com.au/schedule/session/23372/abstract/104789
@@ -2119,4 +2179,5 @@ Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 | 34 | Hebel S158: abschätzen oder verwerfen? | **Keine eigene Abschätzung**; im Produkt der Vermerk „Kostenwirkung im Basiswert voll angerechnet“ statt einer Nullwirkung; keine Latenz, weil eine Wirkung auf heutige Fälle sofort einsetzt (Befund 433; ersetzt für S158 Nr. 12) | Eine Abschätzung für S158 ist nicht möglich, weil der Basiswert die günstigeren SCS-Kostensätze schon für alle Fälle ansetzt, ein Hebel auf \(c_e\) also doppelt zählte (LF 4) und für die Letalität keine Effektgröße vorliegt, und trotzdem bleibt im Produkt keine Nullwirkung stehen, weil diese Kostenwirkung im Basiswert voll angerechnet ist und dort als Vermerk ausgewiesen wird. | (a) Detektionsmix-Parameter sofort einführen — verworfen, weil kommunale SCS-Quoten fehlen und er den Basiswert anheben würde (Ersetzungspfad §5); (b) Letalitätswirkung schätzen — verworfen, weil keine Effektgröße vorliegt | keine Zahl; Basiswert unverändert bei den SCS-Sätzen |
 | 35 ⚠ | Latenz der S155-Wirkung? | **Dosis als Sprung, Wirkung als Rampe** \(\min(1, J/a_{\text{erk}})\) mit \(a_{\text{erk}}\) = 66 (MM) und 75 Jahren (C44) [27]; \(\tau\) nicht zusätzlich; nicht abgezinst | Lesart unter §3.0: Eine Dosisänderung ist erst eingelaufen, wenn die ganze Lebenszeitdosis der Erkrankenden unter ihr entstanden ist, also nach einem Erkrankungsalter; \(\tau\) beschreibt nur den Basiswert und steht im Ausweis auf 1 | (a) Wirkung sofort voll anrechnen — verworfen, weil das der Lesart widerspricht; (b) zusätzlich \(\tau\) ansetzen — verworfen, weil dieselbe Einlaufzeit zweimal zählte; (c) Kohorten-Latenzmodell (M2+) | Berlin nach 10/20/30 Jahren 34.700/69.400/104.000 € je Jahr angerechnet |
 | 36 ⚠ | Kennzeichnung der Parameter-Blöcke (Aufgabe §4): welcher Wert je Block, und wo trägt ein Block ein Feld `rolle`? | **22 von 22 gekennzeichnet (Kapitel 7), schwächste Herkunft im Block:** `quelle` für \(w_{\text{SCC}}\), die Rohraten (`i_raten_roh`, `i_mm`, `i_c44`) und \(OR_{\text{out}}\); `berechnet` für \(\Delta\text{SSD}\) (eigene Auswertung DWD-Raster × VG250 × Zensus), \(k_{\text{UV}}\) (Stationsquotient [31] × Rasterquotient [73]), BAF (C44 aus \(w_{\text{SCC}}\)), \(\lambda\), \(\bar L\) und \(c_{\text{kal}}\), je mit Inline-Liste `abgeleitet_aus`; `abschaetzung_kap3` für \(a_{\text{attr}}\), \(c_e\), VOLY, \(r_{\text{out}}\), \(\bar q_{\text{out}}\), den Schalter der Außenberufs-Ebene, \(s\), \(\phi\) und die drei S155-Blöcke. `rolle: kalibrierung` für \(c_{\text{kal}}\); `rolle: sensitivitaet` für die sechs Blöcke der geparkten Ebenen \(r_{\text{out}}\) und \(v_{\text{verh}}\); sonst keine `rolle`, auch nicht für die S155-Wirkungsfaktoren | Regel t-1070-nachtraege Punkt 4: Ist ein Teil abgeschätzt, heißt der Block `abschaetzung_kap3` — bei \(\bar q_{\text{out}}\) und \(r_{\text{out}}\) ist der Wert aus Destatis gerechnet, die Obergrenze 0,21 aber eine Abschätzung; bei \(s\) und \(\phi\) setzt KAP3 \(\Delta T\) = 10 °C und die Obergrenze 0,25. \(c_e\) ist nach §3.4 ein Proxy: Die Zahlen 5.326/4.660 € stammen aus Speckemeier [34], ihr Einsatz als Fallkosten (Gesamt- statt inkrementelle Kosten, nur Erstjahr) ist eine Wahl von KAP3. VOLY wie `heat.voly` in #95 (Elastizität 0,85 gesetzt). \(c_{\text{kal}}\) normiert die Rohraten auf den ZfKD-Anker und ist damit der Kalibrierskalar; die sechs Blöcke der geparkten Ebenen wirken im Basiswert nicht (Neutralwert 1 oder 0) und dienen nur dem Tornado in §4. **Stations- und Rasterquotient von \(k_{\text{UV}}\) haben keinen eigenen Block**; ein neuer Block änderte `wert:`-Zeilen in Kapitel 7. `abgeleitet_aus` nennt deshalb dort, wo ein Eingang keinen Block hat, den Quellenschlüssel aus `quelle:` statt einer Parameter-ID. **Offene Abweichung von Aufgabe §4** (dort Parameter-IDs verlangt) für sechs Blöcke: \(\Delta\text{SSD}\), \(k_{\text{UV}}\), BAF, \(\lambda\), \(\bar L\), \(c_{\text{kal}}\); entschieden wird sie in Teil 3 der Gegenprüfung | \(k_{\text{UV}}\) als `quelle` (verworfen: 0,7119 steht in keiner Quelle, der Rasterquotient ist eigene Rechnung) · BAF als `quelle` (verworfen: C44 1,675 steht in keiner Quelle) · \(c_e\) als `quelle` (verworfen: §3.4 kennzeichnet den Wert als Proxy) · \(\bar q_{\text{out}}\) als `berechnet` (verworfen: Obergrenze abgeschätzt) · zwei neue Blöcke für die Quotienten von \(k_{\text{UV}}\) (verworfen: außerhalb des Pakets, Kriterium „kein `wert:` geändert“) | keine Wirkung auf Zahlen; kein `wert:` in Kapitel 7 geändert; Ledger-Befund 435 |
+| 37 | k_UV je Kreis oder Zelle? (Befund 449) | **Bundeswert** \(k_{\text{UV}}\) = **0,7119** bleibt; kein Wert je Kreis oder Zelle | Anlage [73], `backend/data/kalibrierung/k_uv_raumstreuung.md` Abschnitt 4–6: **Rangtreue 0,60** und **Zeitstabilität 0,12** ⇒ Zweig 2 der Entscheidungsregel (Rangtreue unter 0,90 und Zeitstabilität unter 0,50; beide Schwellen sind Setzungen von KAP3, Festlegung der Gesamtschau zu T-1115 vom 27.09.2026). Ein Wert je Kreis ordnete die Kreise anders, aber die Kreiswerte aus den Trends 1997–2009 und 2010–2022 ergeben fast keine gemeinsame Reihenfolge; ein beständiges räumliches Muster ist damit nicht belegt (Aufgabe §8 E3). Wie offen die Reihenfolge der Kommunen bleibt, beziffert §6 Modellgrenze 9 | \(k_{\text{UV}}\) als Zellgröße aus dem Quotienten der beiden DWD-Raster — verworfen, weil die Werte je Kreis über die Zeit nicht stabil sind und so Schätzrauschen als Wert je Kommune ins Produkt trügen | keine Wirkung auf Zahlen: kein `wert:` in Kapitel 7 geändert, Bundessumme unverändert; §6 Modellgrenze 9 und Kapitel 4 (»Nur je Kommune«) nennen die Kreiswerte statt der Punktspanne |
 | 32 ⚠ | Historie-Erkennung im Lint: Marker in **beiden** Funktionen zur einzigen Ausnahme machen (414) — auch für Entscheidungslog, Verworfen-Listen und Anlagen? | **Ja, ausnahmslos**: Stichwortliste, Abschnitts-Heuristik und pauschale Blockquote-Ausnahme gestrichen; 14 Log-Zeilen, die Korrekturhistorie, der §7-Kommentar und vier Anlagen-Zeilen tragen jetzt Marker **plus** Revisionsvermerk; Zahl der Marker als Ratchet festgeschrieben, gedeckte Fundstellen werden ausgegeben (419). Einzige verbleibende Ausnahme ist der Kopfvermerk vor Kapitel 1 (Befund 345) | Achte Runde derselben Klasse; jede Heuristik hatte eine neue Lücke geöffnet. Der Marker ist bewusst gesetzt und maschinell zählbar | Abschnitts-Ausnahme für Anlagen behalten (weniger Marker, aber die von 414 gemessene Lücke bliebe) | keine — reine Prüfmechanik |

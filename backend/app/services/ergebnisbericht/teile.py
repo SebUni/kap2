@@ -3,7 +3,8 @@
 Gliederung: ``dokumente/produkt/pdf-ergebnisbericht-gliederung.md`` (Firmen-Repo), Teile 0 bis 9.
 Der Formatpilot (T-1414) setzt die Teile 0, 1, 4 (nur #95), 7 und 8 um, Teil 2 kommt aus der
 Konformitäts-Checkliste (T-1416, ``konformitaet.py``), Teil 3 aus den Klimakennwerten des
-Sammlers (T-1417, ``klima.py``). Jeder Teil ist eine
+Sammlers (T-1417, ``klima.py``), Teil 6 aus den Maßnahmenzeilen (T-1419, ``massnahmen.py``).
+Jeder Teil ist eine
 Funktion ``(Berichtsdaten) -> str``; ``TEILE`` ordnet die Nummern zu.
 
 Harte Regeln der Gliederung, die hier schon gelten: kein Euro-Feld mit Null oder leer (wo kein
@@ -32,8 +33,12 @@ from app.services.ergebnisbericht.klima import (
     JAHR_START, JAHRE_PROJEKTION, SZENARIEN, Klimazahl,
 )
 from app.services.ergebnisbericht.konformitaet import (
-    STATUS, fundstelle_ohne_datei, lies_checkliste, lueckensatz, umschreibe,
+    STATUS, fundstelle_ohne_datei, kundensatz, lies_checkliste, umschreibe,
 )
+from app.services.ergebnisbericht.massnahmen import (
+    HORIZONT_ENDE, QUALITATIV, blockname, rangfolge,
+)
+from app.services.ergebnisbericht.raum import UEBRIG
 from app.services.ergebnisbericht.sammler import DATENSTAENDE, Berichtsdaten
 from app.services.kurzfassung_markdown import _de_euro
 
@@ -43,6 +48,8 @@ UEBERSCHRIFTEN = {
     2: "Teil 2 · Rechtlicher und methodischer Rahmen",
     3: "Teil 3 · Klimatische Ausgangslage",
     4: "Teil 4 · Betroffenheitsanalyse je Klimawirkung",
+    5: "Teil 5 · Raumergebnis",
+    6: "Teil 6 · Maßnahmen",
     7: "Teil 7 · Parameter- und Quellenverzeichnis",
     8: "Teil 8 · Grenzen und Vollständigkeitsanzeige",
 }
@@ -181,8 +188,10 @@ def teil_2(d: Berichtsdaten, checkliste: str | os.PathLike | None = None) -> str
     """Rechtlicher und methodischer Rahmen, erzeugt aus der Konformitäts-Checkliste (T-1416).
 
     Je Anforderungszeile der Checkliste eine Tabellenzeile ``tr.anforderung[data-nr]`` mit Status
-    (``td.status``) und Lückensatz (``td.luecke``, bei „erfüllt“ ein Strich). ``checkliste`` ist
-    für den Test: eine Kopie mit geändertem Status ändert die Ausgabe dieser Zeile.
+    (``td.status``) und Kundensatz (``td.luecke``, bei „erfüllt“ ein Strich; bei „teilweise“ und
+    „offen“ der Kundensatz aus ``konformitaet_kundentext.py`` statt der internen Spalte „Lücke“,
+    T-1530). ``checkliste`` ist für den Test: eine Kopie mit geändertem Status ändert die Ausgabe
+    dieser Zeile.
     """
     zeilen = lies_checkliste(checkliste)
     zaehlung = {s: sum(1 for z in zeilen if z.status == s) for s in STATUS}
@@ -195,12 +204,12 @@ def teil_2(d: Berichtsdaten, checkliste: str | os.PathLike | None = None) -> str
         f"{zaehlung['offen']} offen. Wo eine Anforderung nicht voll erfüllt ist, nennt die "
         f"Spalte „Lücke“, was fehlt.</p>")
     html.append(
-        f"<p>Die KWRA 2021 bewertet 102 Klimawirkungen; im Bericht sind davon die Klimawirkungen "
-        f"des Produktkatalogs erfasst ({_h(d.beziffert_text)}).</p>")
+        f"<p>Die KWRA 2021 bewertet 102 Klimawirkungen. Dieser Bericht erfasst die Klimawirkungen "
+        f"des Produktkatalogs ({_h(d.beziffert_text)}).</p>")
     html.append('<table class="konformitaet"><tr><th>Nr</th><th>Anforderung</th><th>Quelle</th>'
                 '<th>Fundstelle</th><th>Status</th><th>Lücke</th></tr>')
     for z in zeilen:
-        luecke = lueckensatz(z.luecke) if z.status != "erfüllt" else "—"
+        luecke = kundensatz(z.nr, z.status) if z.status != "erfüllt" else "—"
         html.append(
             f'<tr class="anforderung" data-nr="{z.nr}"><td>{z.nr}</td>'
             f"<td>{_h(umschreibe(z.anforderung))}</td><td>{_h(z.quelle)}</td>"
@@ -295,11 +304,16 @@ def teil_3(d: Berichtsdaten) -> str:
 
 def _parameter_quelle(d: Berichtsdaten, param_id: str) -> str:
     """Kennzeichnung eines Parameters wie in Teil 7 (Quelle oder ausgewiesene Abschätzung von KAP3),
-    aus denselben Parameterdaten (``d.parameter``, ``_herkunft``), nicht als fester Text (Vorgabe P1)."""
+    aus denselben Parameterdaten (``d.parameter``, ``_herkunft``), nicht als fester Text (Vorgabe P1).
+
+    Eine unbekannte Kennung liefert keine leere Quellenzelle: Ein Bericht mit leerem Feld wird nicht
+    erzeugt (P1, Entscheidung des CEO, 27.09.2026), deshalb bricht die Erzeugung mit ``ValueError``
+    ab und nennt die Kennung.
+    """
     for p in d.parameter:
         if p.get("id") == param_id:
             return _herkunft(p)
-    return ""
+    raise ValueError(f"Parameter {param_id!r} ist in d.parameter nicht enthalten")
 
 
 def teil_4(d: Berichtsdaten) -> str:
@@ -341,8 +355,205 @@ def teil_4(d: Berichtsdaten) -> str:
     html.append("</table>")
     html.append(f"<p>Jahresbetrag der Hitzebelastung in {_h(k.name)}: "
                 f"<strong>{_preisstand(d, e.jahresbetrag_eur)}</strong>. "
-                f"Der Betrag gilt für die ganze Kommune; eine Aufteilung nach Ortsteilen enthält "
-                f"diese Fassung nicht.</p>")
+                f"Der Betrag gilt für die ganze Kommune; die Aufteilung nach Ortsteilen steht in "
+                f"<a href=\"#teil-5\">Teil 5</a>.</p>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
+# ── Teil 5 ──────────────────────────────────────────────────────────────────────
+
+GRUND_OHNE_ORTSTEILE = "Die Quelle führt für diese Kommune keine Ortsteilgrenzen."
+
+
+def _anzeigename(z, gibt_ortsteile: bool) -> str:
+    """Die Zeile ohne Ortsteilfläche heißt „übriges Gemeindegebiet“, sobald es Ortsteile gibt
+    (eine Zeile mit dem Namen der Kommune läse sich neben ihnen wie eine Summe)."""
+    if z.art == "gemeinde" and gibt_ortsteile:
+        return UEBRIG
+    return z.name
+
+
+def teil_5(d: Berichtsdaten) -> str:
+    """Raumergebnis (T-1565): #95 je Ortsteil, absolut und je 1.000 Einwohner. Eine Zeile ohne
+    bewohnte Zelle nennt den Grund statt eines Betrags; die Summenzeile trägt den Nenner."""
+    k = d.kommune
+    zeilen = list(d.raum)
+    gibt_ortsteile = any(z.art == "ortsteil" for z in zeilen)
+    html = [_kopf(5)]
+    if gibt_ortsteile:
+        html.append(
+            f"<p>Die Tabelle teilt die Hitzebelastung (#95) von {_h(k.name)} nach Ortsteilen auf: "
+            f"jede bewohnte 100-m-Zelle des Zensus zählt zu dem Ortsteil, in dem ihre Mitte liegt. "
+            f"Neben den absoluten Werten stehen die Raten je 1.000 Einwohner, weil sie Ortsteile "
+            f"unterschiedlicher Größe vergleichbar machen. Die Zwischengrößen (Einwohner, davon ab "
+            f"65 Jahren, Hitzetage je Jahr) stehen als eigene Spalten.</p>")
+    else:
+        html.append(
+            f"<p>Die Quelle führt für {_h(k.name)} keine Ortsteilgrenzen. Deshalb steht hier genau "
+            f"eine Zeile für die ganze Kommune; eine Aufteilung nach Ortsteilen ist für diese "
+            f"Kommune nicht möglich.</p>")
+    zahl = 'class="zahl"'
+    html.append(
+        '<table class="raum"><tr><th>Ortsteil</th><th class="zahl">Einwohner</th>'
+        '<th class="zahl">davon ab 65 Jahren</th><th class="zahl">Hitzetage je Jahr</th>'
+        '<th class="zahl">Todesfälle je Jahr</th><th class="zahl">Todesfälle je 1.000 Einwohner</th>'
+        '<th class="zahl">Einweisungen je Jahr</th><th class="zahl">Einweisungen je 1.000 Einwohner</th>'
+        '<th class="zahl">Jahresbetrag</th><th class="zahl">Jahresbetrag je 1.000 Einwohner</th></tr>')
+    for z in zeilen:
+        name = _anzeigename(z, gibt_ortsteile)
+        if z.jahresbetrag_eur is None or z.grund:
+            grund = _h(z.grund or "Für diese Zeile liegt kein Betrag vor.")
+            html.append(
+                f'<tr class="raumzeile" data-art="{_h(z.art)}"><td>{_h(name)}</td>'
+                f'<td {zahl}>{_h(de_zahl(z.einwohner))}</td>'
+                f'<td {zahl}>{_h(de_zahl(z.einwohner_ab65))}</td>'
+                f'<td colspan="7" class="grund">{grund}</td></tr>')
+            continue
+        html.append(
+            f'<tr class="raumzeile" data-art="{_h(z.art)}"><td>{_h(name)}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.einwohner))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.einwohner_ab65))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.hitzetage, 1))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.todesfaelle, 2))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.todesfaelle_je_1000, 2))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.einweisungen, 2))}</td>'
+            f'<td {zahl}>{_h(de_zahl(z.einweisungen_je_1000, 2))}</td>'
+            f'<td {zahl}>{_betrag(d, z.jahresbetrag_eur)}</td>'
+            f'<td {zahl}>{_betrag(d, z.jahresbetrag_je_1000_eur)}</td></tr>')
+    bezifferte = [z for z in zeilen if z.jahresbetrag_eur is not None and not z.grund]
+    if bezifferte:
+        ew = sum(z.einwohner for z in zeilen)
+        ab65 = sum(z.einwohner_ab65 for z in zeilen)
+        tote = sum(z.todesfaelle for z in bezifferte)
+        einw = sum(z.einweisungen for z in bezifferte)
+        summe = sum(z.jahresbetrag_eur for z in bezifferte)
+        html.append(
+            f'<tr class="summe"><td>Summe {_nenner(d)}</td><td {zahl}>{_h(de_zahl(ew))}</td>'
+            f'<td {zahl}>{_h(de_zahl(ab65))}</td><td {zahl}>—</td>'
+            f'<td {zahl}>{_h(de_zahl(tote, 2))}</td><td {zahl}>{_h(de_zahl(tote / ew * 1000, 2))}</td>'
+            f'<td {zahl}>{_h(de_zahl(einw, 2))}</td><td {zahl}>{_h(de_zahl(einw / ew * 1000, 2))}</td>'
+            f'<td {zahl}>{_betrag(d, summe)}</td><td {zahl}>{_betrag(d, summe / ew * 1000)}</td></tr>')
+    html.append("</table>")
+    if gibt_ortsteile:
+        uebrig = [z for z in zeilen if _anzeigename(z, True) == UEBRIG]
+        if uebrig:
+            rest = (f"In der Zeile „{_h(UEBRIG)}“ stehen {_h(de_zahl(sum(z.einwohner for z in uebrig)))} "
+                    f"Einwohner, deren Zelle in keiner Ortsteilfläche liegt; sie gehören zu keinem "
+                    f"Ortsteil und sind vom Ortsteilvergleich nicht abgedeckt.")
+        else:
+            rest = "Alle bewohnten Zellen liegen in einer Ortsteilfläche."
+        html.append(
+            "<p>Was die Unterschiede zwischen den Ortsteilen treibt, sind zwei Größen: der Anteil "
+            "der Einwohner ab 65 Jahren, weil die Hitzesterblichkeit mit dem Alter steigt, und die "
+            "Zahl der Hitzetage je Zelle, weil sie die Belastung der Zelle bestimmt; je höher "
+            "beides, desto höher die Rate je 1.000 Einwohner. Raten kleiner Ortsteile beruhen auf "
+            f"wenigen Menschen und schwanken deshalb stärker. {rest}</p>")
+    html.append(
+        "<p>Die Ortsteilgrenzen stammen aus OpenStreetMap (Overpass API, Lizenz ODbL 1.0), Stand der "
+        "Daten 27.09.2026, abgerufen am 27.09.2026. © OpenStreetMap-Mitwirkende. Eine Karte "
+        "enthält diese Fassung nicht.</p>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
+# ── Teil 6 ──────────────────────────────────────────────────────────────────────
+
+def _euro_oder(d: Berichtsdaten, wert: float, sonst: str) -> str:
+    """Betrag als ``span.betrag``; zeigt er gerundet keinen ganzen Euro, steht ``sonst`` als Text
+    (harte Regel 1: keine Null im Euro-Feld)."""
+    if isinstance(wert, (int, float)) and math.isfinite(wert) and round(wert) >= 1:
+        return _betrag(d, wert)
+    return f'<span class="grund">{_h(sonst)}</span>'
+
+
+def _zeilen_html(zeilen: list[str]) -> str:
+    """Mehrzeiliger Zellentext (wie im Maßnahmen-Excel) als ``div.zeile`` je Zeile."""
+    return "".join(f'<div class="zeile">{_h(z)}</div>' for z in zeilen)
+
+
+def _verhaeltnis(v: float) -> str:
+    return "ohne Kosten" if math.isinf(v) else de_zahl(v, 1)
+
+
+def teil_6(d: Berichtsdaten) -> str:
+    """Maßnahmen (T-1419): je Maßnahme ein Block ``div.massnahme[data-code][data-rang]``, geordnet
+    nach ``massnahmen.rangfolge``. Kennzahlen stehen in ``td.capex``, ``td.opex``,
+    ``td.vermieden``, ``td.verhaeltnis``, ``td.gewissheit``, ``td.umsetzung`` und ``td.ort``; die
+    Kostenkomponenten in ``tr.komponente`` mit ``td.quelle``. Eine qualitative Maßnahme trägt
+    ``data-qualitativ`` und ``span.qualitativ`` statt eines Betrags für ihre Wirkung."""
+    k = d.kommune
+    zeilen = rangfolge(list(d.massnahmen))
+    html = [_kopf(6)]
+    if not zeilen:
+        html.append(f"<p>Für {_h(k.name)} ist in dieser Fassung des Berichts keine Maßnahme "
+                    f"angelegt. Deshalb steht hier keine Rangfolge; Kosten und vermiedene Schäden "
+                    f"folgen, sobald Maßnahmen verortet sind.</p>")
+        html.append(_stand(d))
+        return "\n".join(html)
+    n_q = sum(1 for z in zeilen if z.qualitativ)
+    html.append(
+        f"<p>Die Maßnahmen stehen in der Reihenfolge ihres Nutzen-Kosten-Verhältnisses, das "
+        f"wirtschaftlichste zuerst. Das Verhältnis teilt den Nutzen über den Zeitraum vom "
+        f"Umsetzungsjahr bis {HORIZONT_ENDE} (vermiedene Schäden und Zusatznutzen je Jahr mal "
+        f"Jahre) durch die Kosten im selben Zeitraum (CAPEX einmal, OPEX je Jahr mal Jahre); "
+        f"ein Verhältnis über 1 heißt, die Maßnahme spart mehr Schaden, als sie kostet. Beträge "
+        f"sind nicht abgezinst, die Wirkung gilt als gleichbleibend. Jede Kostenkomponente nennt "
+        f"ihre Quelle. Gewissheit und Umsetzung stehen wie in der Maßnahmentabelle des Produkts."
+        + (f" {n_q} Maßnahme(n) sind qualitativ bewertet: Für sie liegt keine Wirkung in Euro "
+           f"vor; sie stehen am Ende, ohne Rang nach Euro." if n_q else "")
+        + "</p>")
+    for rang, z in enumerate(zeilen, 1):
+        attr = f' data-code="{_h(z.code)}" data-rang="{rang}"'
+        if z.qualitativ:
+            attr += ' data-qualitativ="ja"'
+        html.append(f'<div class="massnahme"{attr}>')
+        html.append(f"<h2>{rang}. {_h(z.name)}</h2>")
+        html.append('<table class="massnahme-kennzahlen">')
+        ort = z.ort + (f" (abgedeckte Fläche {de_zahl(z.flaeche_m2)} m²)"
+                       if z.flaeche_m2 and z.flaeche_m2 >= 1 else "")
+        html.append(f'<tr><th>Ort</th><td class="ort">{_h(ort)}</td></tr>')
+        html.append(f"<tr><th>Umsetzungsjahr</th><td>{z.umsetzungsjahr}</td></tr>")
+        html.append(f'<tr><th>CAPEX (einmalig)</th><td class="capex">'
+                    f'{_euro_oder(d, z.capex_eur, "keine Investition im Katalog hinterlegt")}</td></tr>')
+        html.append(f'<tr><th>OPEX je Jahr</th><td class="opex">'
+                    f'{_euro_oder(d, z.opex_eur, "keine Betriebskosten im Katalog hinterlegt")}</td></tr>')
+        if z.qualitativ:
+            html.append(f'<tr><th>Vermiedene Schäden je Jahr</th><td class="vermieden">'
+                        f'<span class="qualitativ">{QUALITATIV}</span>: {_h(z.vermerk)}</td></tr>')
+            html.append('<tr><th>Nutzen-Kosten-Verhältnis</th><td class="verhaeltnis">keines, '
+                        'weil die Wirkung nicht in Euro beziffert ist</td></tr>')
+        else:
+            vermieden = (_betrag(d, z.vermiedene_schaeden_eur) if z.vermiedene_schaeden_eur
+                         and round(z.vermiedene_schaeden_eur) >= 1 else
+                         '<span class="grund">keine vermiedenen Schäden in Euro beziffert</span>')
+            html.append(f'<tr><th>Vermiedene Schäden je Jahr</th><td class="vermieden">'
+                        f'{vermieden}</td></tr>')
+            if z.zusatznutzen_eur and round(z.zusatznutzen_eur) >= 1:
+                html.append(f'<tr><th>Zusätzlicher Nutzen je Jahr</th><td class="zusatz">'
+                            f'{_betrag(d, z.zusatznutzen_eur)}</td></tr>')
+            html.append(f'<tr><th>Nutzen-Kosten-Verhältnis ({z.umsetzungsjahr}–{HORIZONT_ENDE})'
+                        f'</th><td class="verhaeltnis">{_h(_verhaeltnis(z.nutzen_kosten))}</td></tr>')
+        html.append(f'<tr><th>Gewissheit</th><td class="gewissheit">'
+                    f'{_zeilen_html(z.gewissheit.split(chr(10)))}</td></tr>')
+        html.append(f'<tr><th>Umsetzung</th><td class="umsetzung">'
+                    f'{_zeilen_html(z.umsetzung.split(chr(10)))}</td></tr>')
+        html.append("</table>")
+        if z.komponenten:
+            html.append('<table class="kostenkomponenten"><tr><th>Kostenart</th><th>Komponente</th>'
+                        '<th class="zahl">Einzelpreis</th><th class="zahl">Menge</th>'
+                        '<th class="zahl">Betrag</th><th>Quelle</th></tr>')
+            for c in z.komponenten:
+                menge = f"{de_zahl(c.menge, 0 if float(c.menge).is_integer() else 2)} {c.mengeneinheit}"
+                html.append(
+                    f'<tr class="komponente" data-block="{_h(c.block)}"><td>{_h(blockname(c.block))}</td>'
+                    f"<td>{_h(c.bezeichnung)}</td>"
+                    f'<td class="zahl">{_euro_oder(d, c.einzelpreis_eur, "ohne Kosten")}</td>'
+                    f'<td class="zahl">{_h(menge.strip())}</td>'
+                    f'<td class="zahl">{_euro_oder(d, c.betrag_eur, "ohne Kosten")}</td>'
+                    f'<td class="quelle">{_h(c.quelle)}</td></tr>')
+            html.append("</table>")
+        html.append("</div>")
     html.append(_stand(d))
     return "\n".join(html)
 
@@ -428,5 +639,6 @@ def teil_8(d: Berichtsdaten) -> str:
 
 
 TEILE: dict[int, Callable[[Berichtsdaten], str]] = {
-    0: teil_0, 1: teil_1, 2: teil_2, 3: teil_3, 4: teil_4, 7: teil_7, 8: teil_8,
+    0: teil_0, 1: teil_1, 2: teil_2, 3: teil_3, 4: teil_4, 5: teil_5, 6: teil_6, 7: teil_7,
+    8: teil_8,
 }

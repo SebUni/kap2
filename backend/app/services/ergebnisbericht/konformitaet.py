@@ -4,11 +4,15 @@ Teil 2 „Rechtlicher und methodischer Rahmen“ wird bei jeder Erzeugung aus
 ``docs/KONFORMITAET_CHECKLISTE.md`` gelesen, nicht von Hand geschrieben: Ändert sich dort der
 Status einer Zeile, ändert sich die Zeile im Bericht.
 
-Übernommen werden Nr, Anforderung, Quelle, Fundstelle (ohne internen PDF-Dateinamen), Status und
-Lücke. Die Spalte „Beleg im Produkt“ bleibt draußen, weil sie Pfade und Quelldateien nennt. Die
-Lücke wird zum Kundentext umgeschrieben (``lueckensatz``): interne Verweise, Pfade, Code,
-Ticketkennungen, Einzelnachweise, Begriffe der Stufen B und C der Transparenzgrenze und Euro-Beträge
-von null fallen weg.
+Übernommen werden Nr, Anforderung, Quelle, Fundstelle (ohne internen PDF-Dateinamen) und Status. Die
+Spalte „Beleg im Produkt“ bleibt draußen, weil sie Pfade und Quelldateien nennt. Statt der Spalte
+„Lücke“ — einer internen Arbeitsnotiz mit Pfaden, Code, Ticketkennungen und dem Stand der eigenen
+Prüfung — zeigt Teil 2 bei „teilweise“ und „offen“ den Kundensatz aus ``konformitaet_kundentext.py``
+(``kundensatz``, T-1530); fehlt er oder weicht sein Status vom Status der Checkliste ab, bricht die
+Erzeugung ab. ``lueckensatz`` filtert die Spalte „Lücke“ selbst auf interne Verweise, Pfade, Code,
+Ticketkennungen, Einzelnachweise, Begriffe der Stufen B und C der Transparenzgrenze und
+Euro-Beträge von null; die Funktion bleibt als Textwerkzeug erhalten, ihr Ergebnis erscheint aber
+seit T-1530 nicht mehr in Teil 2.
 """
 
 from __future__ import annotations
@@ -16,6 +20,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
+
+from app.data.konformitaet_kundentext import KUNDENTEXT
 
 CHECKLISTE = Path(__file__).resolve().parents[4] / "docs" / "KONFORMITAET_CHECKLISTE.md"
 
@@ -182,3 +188,25 @@ def lueckensatz(luecke: str) -> str:
     ergebnis = " ".join(behalten)
     ergebnis = re.sub(r"\s+([,.;:])", r"\1", re.sub(r"\s+", " ", ergebnis)).strip()
     return ergebnis or ERSATZSATZ
+
+
+def kundensatz(nr: int, status: str) -> str:
+    """Der Kundensatz zu Zeile ``nr`` aus ``konformitaet_kundentext.py`` (T-1530).
+
+    Ersetzt in Teil 2 des Ergebnisberichts die interne Spalte „Lücke“ für Anforderungen, die nicht
+    „erfüllt“ sind. Bricht ab, wenn der Kundensatz fehlt oder einen anderen Status trägt als die
+    Checkliste — dann ist der Kundensatz in ``konformitaet_kundentext.py`` nachzuziehen, nicht der
+    Bericht mit einem veralteten Satz zu erzeugen.
+    """
+    eintrag = KUNDENTEXT.get(nr)
+    if eintrag is None:
+        raise ValueError(
+            f"Zeile {nr}: kein Kundensatz in konformitaet_kundentext.py; Status {status!r} verlangt "
+            f"einen. Der Kundensatz ist in konformitaet_kundentext.py nachzuziehen.")
+    text_status, satz = eintrag
+    if text_status != status:
+        raise ValueError(
+            f"Zeile {nr}: Kundensatz in konformitaet_kundentext.py trägt Status {text_status!r}, "
+            f"die Checkliste trägt {status!r}. Der Kundensatz ist in konformitaet_kundentext.py "
+            f"nachzuziehen.")
+    return satz

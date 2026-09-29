@@ -487,7 +487,7 @@ def _graph_95_plan() -> tuple[dict, list[dict]]:
     P("heat.c_kal", "Kalibrierfaktor c_kal", 0.581, "—",
       "RKI-Reihe, Fenster 2012–2024, Fit auf bevölkerungsgewichteten "
       "Sommermitteln (Rev. 7; ersetzt 0,742)", mul_d,
-      "Genau ein nationaler Skalar (Band 0,55–0,66); Pauschalkorrektur und "
+      "Genau ein nationaler Skalar (Band 0,55–0,67); Pauschalkorrektur und "
       "c_reg-Übergangsfaktoren sind in Rev. 7 entfallen (Bericht §4, "
       "Prüfstein 12/16).")
     b.add_node("int:d_faelle", "intermediate", "Hitzebedingte Todesfälle D (Teil-Ausweis)",

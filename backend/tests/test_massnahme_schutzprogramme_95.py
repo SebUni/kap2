@@ -120,6 +120,42 @@ def test_kappung_0_794_with_heat_action_plan():
     assert health.vg_effective_delta(0.5, 1.0) == pytest.approx(0.794, abs=1e-12)
 
 
+def test_kappung_ueber_registry_parameter_kappung_vg():
+    """Befund 151: Kappung kommt aus risks.EXPECTED_ANNUAL_MORTALITY.impact.kappung_vg,
+    nicht aus einer Konstante — override_scope auf 0,85 verschiebt die Kappungshöhe
+    im Aggregat (_factor) und im Einzelnutzen (_benefit_eur) gleichermaßen."""
+    d_hap = 0.85
+    # δ_HAP 0,85: Produkt 0,791 < 0,794 (Default) — mit 0,85 gilt die höhere Kappung
+    assert d_hap * health.DELTA_VG < 0.794 < 0.85
+    assert health.vg_effective_delta(health.DELTA_VG, d_hap, paket=0.794) != health.DELTA_VG
+    assert 0.85 * health.vg_effective_delta(health.DELTA_VG, d_hap, paket=0.85) == \
+        pytest.approx(0.85, abs=1e-12)
+
+    cell = _berlin_mort_cell()
+    base = risk_engine.cost_from_outcome(catalog.RISKS_BY_CODE[MORT], cell["outcome"])
+    einzel_hap = base * (1.0 - d_hap)  # HAP-Anteil, unabhängig von der VG-Kappung
+
+    default_eur = einzel_hap + _benefit_eur(d_hap)
+    aggregat_default = base * (1.0 - d_hap * _factor(MORT, cell, 1.0, d_hap))
+    assert default_eur == pytest.approx(aggregat_default, rel=1e-9)
+
+    with override_context.override_scope({f"risks.{MORT}.impact.kappung_vg": 0.85}):
+        override_eur = einzel_hap + _benefit_eur(d_hap)
+        aggregat_override = base * (1.0 - d_hap * _factor(MORT, cell, 1.0, d_hap))
+        assert override_eur == pytest.approx(aggregat_override, rel=1e-9)
+        # Mit Kappung 0,85 als Untergrenze greift sie sofort auf δ_HAP × δ_VG = 0,85:
+        # keine Wirkung der Schutzprogramme mehr auf 75–84/85+ ohne Heim
+        assert override_eur == pytest.approx(einzel_hap, rel=1e-9)
+
+    # Nach dem Scope gilt wieder der Registry-Default 0,794 (kein Leck der Overrides)
+    assert (einzel_hap + _benefit_eur(d_hap)) == pytest.approx(default_eur, rel=1e-9)
+
+    # die Kappung greift an einer anderen Höhe: der Nutzen sinkt (0,85 statt 0,794),
+    # anders als bei einer niedrigeren Kappung (0,79 hebt den Nutzen, siehe oben)
+    assert override_eur < default_eur
+    assert aggregat_override < aggregat_default
+
+
 def test_kappung_in_cell_factor_berlin():
     """Beide Hebel nehmen zusammen auf 75+ ohne Heim höchstens 20,6 % weg."""
     cell = _berlin_mort_cell()
@@ -205,3 +241,160 @@ def test_parameters_visible_in_registry_with_resolvable_sources():
         for ref in spec["source_refs"]:
             assert ref in sources.SOURCE_REFERENCES
         assert {"wert", "band", "sensitivitaet"} <= set(spec["evidence_derivation"])
+
+
+def test_zellfaktor_nutzt_heimanteil_der_zelle():
+    """Befund 146: (1 − h_Heim,z) je Zelle, Rückfall 0,344 ohne Zellwert."""
+    base = _berlin_mort_cell()
+    f_heim = _factor(MORT, {**base, "share_care_home_85p": 0.5})
+    f_ohne_heim = _factor(MORT, {**base, "share_care_home_85p": 0.0})
+    f_rueckfall = _factor(MORT, base)
+    assert f_ohne_heim < f_rueckfall < f_heim < 1.0
+    assert f_rueckfall == pytest.approx(_factor(MORT, {**base, "share_care_home_85p": 0.149}),
+                                        rel=1e-12)
+    morb = _berlin_morb_cell()
+    override_context.set_overrides({f"risks.{MORB}.impact.delta_vg_morb": 0.931})
+    assert (_factor(MORB, {**morb, "share_care_home_85p": 0.0})
+            != _factor(MORB, {**morb, "share_care_home_85p": 0.5}))
+
+
+# ── Doppelzählungs-Wächter „Lief das Programm schon 2012–2024?“ (Befund 150, Log 47) ──
+
+KZ_CODE = "COOLING_ROOMS_DRINKING_WATER"
+JA, NEIN = {"vg_in_kalibrierjahren": 1}, {"vg_in_kalibrierjahren": 0}
+
+
+def _vg_factor_cfg(code: str, cell: dict, config: dict) -> float:
+    return measure_service._measure_cell_factor(
+        catalog.MEASURES_BY_CODE[CODE], config, code, 1.0, 1.0, cell)
+
+
+def _vg_eur_cfg(config: dict) -> float:
+    cell = _berlin_mort_cell()
+    base = risk_engine.cost_from_outcome(catalog.RISKS_BY_CODE[MORT], cell["outcome"])
+    return base * (1.0 - _vg_factor_cfg(MORT, cell, config))
+
+
+def test_waechter_voreinstellung_nein_aus_registry():
+    """Ohne Eingabe gilt der Registry-Wert 0 („nein“, Abschätzung von KAP3)."""
+    from app.services.engine.impact.params import IMPACT_PARAM_SPECS
+    spec = next(s for s in IMPACT_PARAM_SPECS if s["key"] == "vg_in_kalibrierjahren")
+    assert spec["value"] == 0
+    assert measure_service._vg_kalib_input({}) == 0
+    assert measure_service._vg_kalib_input(None) == 0
+    assert measure_service._vg_kalib_input(JA) == 1
+    assert measure_service._vg_kalib_input(NEIN) == 0
+    assert measure_service._vg_kalib_input({"vg_in_kalibrierjahren": "ja"}) == 1
+    assert measure_service._vg_kalib_input({"vg_in_kalibrierjahren": "nein"}) == 0
+    for code in (CODE, KZ_CODE):
+        feld = catalog.MEASURES_BY_CODE[code]["config_inputs"]["vg_in_kalibrierjahren"]
+        assert feld["voreinstellung"] == 0 and feld["voreinstellung_text"] == "nein"
+        assert feld["typ"] == "ja_nein"
+        assert "2012–2024" in catalog.MEASURES_BY_CODE[code]["config_input_help"][
+            "vg_in_kalibrierjahren"]
+
+
+def test_waechter_ja_schutzprogramme_faktor_1_berlin_0():
+    """Fall 1: „ja“ — δ_VG = δ_VG,morb = 1, Berlin 0 statt 11,7 Mio. €."""
+    assert _vg_factor_cfg(MORT, _berlin_mort_cell(), JA) == 1.0
+    # δ_VG,morb zentral 1,0; auch mit einer Wirkung (0,931) bleibt der Faktor bei „ja“ 1
+    override_context.set_overrides({f"risks.{MORB}.impact.delta_vg_morb": 0.931})
+    assert _vg_factor_cfg(MORB, _berlin_morb_cell(), NEIN) < 1.0
+    assert _vg_factor_cfg(MORB, _berlin_morb_cell(), JA) == 1.0
+    override_context.set_overrides({})
+    assert _vg_eur_cfg(JA) == 0.0
+
+
+def test_waechter_nein_schutzprogramme_berlin_11_7_mio_eur():
+    """Fall 2: „nein“ (und ohne Eingabe) — Berlin bleibt 11,7 Mio. € ± 0,05 Mio. €."""
+    assert _vg_eur_cfg(NEIN) / 1e6 == pytest.approx(11.7, abs=0.05)
+    assert _vg_eur_cfg({}) == pytest.approx(_vg_eur_cfg(NEIN), rel=1e-12)
+
+
+class _Q:
+    def __init__(self, rows):
+        self._rows = list(rows)
+
+    def filter(self, *a, **k):
+        return self
+
+    def all(self):
+        return list(self._rows)
+
+    def first(self):
+        return self._rows[0] if self._rows else None
+
+    def delete(self):
+        return 0
+
+    def scalar(self):
+        return None
+
+
+class _DB:
+    def __init__(self, rows):
+        self._rows = rows
+
+    def query(self, model, *a, **k):
+        return _Q(self._rows.get(model, []))
+
+    def add(self, obj):
+        pass
+
+    def commit(self):
+        pass
+
+
+def _kz_summary(monkeypatch, config: dict) -> dict:
+    from app.models.models import AdaptationMeasure, CellAssessment, ConfigParameter, Kommune
+    measure = AdaptationMeasure(
+        id=1, kommune_id=1, name="Kühle Räume Test", measure_type=KZ_CODE,
+        geometry=None, config=config, implementation_year=2027, description="",
+        impact_summary={})
+    kommune = Kommune(id=1, name="Berlin (Kette)", osm_id="R-KZ",
+                      population=3_700_000, area_km2=891.0)
+    cell = CellAssessment(id=10, kommune_id=1, grid_cell_id=10,
+                          data={"risks": {MORT: {"index": 50.0, **_berlin_mort_cell()}},
+                                "inputs": {"pop": 1000.0}})
+    db = _DB({AdaptationMeasure: [measure], CellAssessment: [cell],
+              ConfigParameter: [], Kommune: [kommune]})
+    monkeypatch.setattr(measure_service, "_coverage", lambda _db, _m: ({10: 1.0}, 200_000.0))
+    monkeypatch.setattr(measure_service, "_params_fingerprint", lambda *a, **k: "fp-kz")
+    monkeypatch.setattr(parameter_registry, "load_db_overrides", lambda *a, **k: [])
+    monkeypatch.setattr(measure_service, "get_risk_aggregate",
+                        lambda *a, **k: {"risks": {MORT: {"cost_eur": 1e12}}})
+    return measure_service.compute_impact(db, measure.id)
+
+
+def test_waechter_ja_kuehlzentren_delta_kz_1_s157_bleibt(monkeypatch):
+    """Fall 3: Kühlzentren „ja“ — δ_KZ = 1, Betrag der Kühlzentren 0, S157 bleibt."""
+    cell = _berlin_mort_cell()
+    mdef = catalog.MEASURES_BY_CODE[KZ_CODE]
+    f_ja = measure_service._measure_cell_factor(mdef, JA, MORT, 1.0, 1.0, cell)
+    f_s157 = measure_service._s157_cell_factor(0.11, 1.0, cell)
+    assert f_ja == pytest.approx(f_s157, rel=1e-12)      # nur S157, δ_KZ = 1
+    f_nein = measure_service._measure_cell_factor(mdef, NEIN, MORT, 1.0, 1.0, cell)
+    assert f_nein < f_ja < 1.0
+
+    nein = _kz_summary(monkeypatch, dict(NEIN))
+    ja = _kz_summary(monkeypatch, dict(JA))
+    assert nein["kuehlzentren_benefit_eur"] / 1e6 == pytest.approx(0.75, abs=0.05)
+    assert ja["kuehlzentren_benefit_eur"] == 0.0
+    assert ja["s157_benefit_eur"] == pytest.approx(nein["s157_benefit_eur"], abs=0.02)
+    assert ja["s157_benefit_eur"] / 1e6 == pytest.approx(1.2, abs=0.05)
+    assert ja["annual_benefit_damage_eur"] == pytest.approx(ja["s157_benefit_eur"], abs=0.02)
+    assert ja["vg_in_kalibrierjahren"] == 1 and nein["vg_in_kalibrierjahren"] == 0
+    assert ja["vg_in_kalibrierjahren_is_default"] is False
+    assert _kz_summary(monkeypatch, {})["vg_in_kalibrierjahren_is_default"] is True
+
+
+def test_waechter_ja_schutzprogramm_zaehlt_nicht_zur_kappung_der_kuehlzentren(monkeypatch):
+    """Ein Programm mit „ja“ hat δ_VG = 1 und fällt aus Dämpfung und Kappung der KZ."""
+    from types import SimpleNamespace
+    m_ja = SimpleNamespace(id=2, measure_type=CODE, config=dict(JA))
+    m_nein = SimpleNamespace(id=3, measure_type=CODE, config=dict(NEIN))
+    monkeypatch.setattr(measure_service, "kommune_measures_query",
+                        lambda *a, **k: _Q([m_ja, m_nein]))
+    got = measure_service._vg_measures(None, SimpleNamespace(
+        id=1, kommune_id=1, demo_session_id=None))
+    assert got == [m_nein]
