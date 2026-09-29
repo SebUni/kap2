@@ -3,7 +3,8 @@
 Gliederung: ``dokumente/produkt/pdf-ergebnisbericht-gliederung.md`` (Firmen-Repo), Teile 0 bis 9.
 Der Formatpilot (T-1414) setzt die Teile 0, 1, 4 (nur #95), 7 und 8 um, Teil 2 kommt aus der
 Konformitäts-Checkliste (T-1416, ``konformitaet.py``), Teil 3 aus den Klimakennwerten des
-Sammlers (T-1417, ``klima.py``). Jeder Teil ist eine
+Sammlers (T-1417, ``klima.py``), Teil 6 aus den Maßnahmenzeilen (T-1419, ``massnahmen.py``).
+Jeder Teil ist eine
 Funktion ``(Berichtsdaten) -> str``; ``TEILE`` ordnet die Nummern zu.
 
 Harte Regeln der Gliederung, die hier schon gelten: kein Euro-Feld mit Null oder leer (wo kein
@@ -34,6 +35,9 @@ from app.services.ergebnisbericht.klima import (
 from app.services.ergebnisbericht.konformitaet import (
     STATUS, fundstelle_ohne_datei, kundensatz, lies_checkliste, umschreibe,
 )
+from app.services.ergebnisbericht.massnahmen import (
+    HORIZONT_ENDE, QUALITATIV, blockname, rangfolge,
+)
 from app.services.ergebnisbericht.raum import UEBRIG
 from app.services.ergebnisbericht.sammler import DATENSTAENDE, Berichtsdaten
 from app.services.kurzfassung_markdown import _de_euro
@@ -45,6 +49,7 @@ UEBERSCHRIFTEN = {
     3: "Teil 3 · Klimatische Ausgangslage",
     4: "Teil 4 · Betroffenheitsanalyse je Klimawirkung",
     5: "Teil 5 · Raumergebnis",
+    6: "Teil 6 · Maßnahmen",
     7: "Teil 7 · Parameter- und Quellenverzeichnis",
     8: "Teil 8 · Grenzen und Vollständigkeitsanzeige",
 }
@@ -452,6 +457,107 @@ def teil_5(d: Berichtsdaten) -> str:
     return "\n".join(html)
 
 
+# ── Teil 6 ──────────────────────────────────────────────────────────────────────
+
+def _euro_oder(d: Berichtsdaten, wert: float, sonst: str) -> str:
+    """Betrag als ``span.betrag``; zeigt er gerundet keinen ganzen Euro, steht ``sonst`` als Text
+    (harte Regel 1: keine Null im Euro-Feld)."""
+    if isinstance(wert, (int, float)) and math.isfinite(wert) and round(wert) >= 1:
+        return _betrag(d, wert)
+    return f'<span class="grund">{_h(sonst)}</span>'
+
+
+def _zeilen_html(zeilen: list[str]) -> str:
+    """Mehrzeiliger Zellentext (wie im Maßnahmen-Excel) als ``div.zeile`` je Zeile."""
+    return "".join(f'<div class="zeile">{_h(z)}</div>' for z in zeilen)
+
+
+def _verhaeltnis(v: float) -> str:
+    return "ohne Kosten" if math.isinf(v) else de_zahl(v, 1)
+
+
+def teil_6(d: Berichtsdaten) -> str:
+    """Maßnahmen (T-1419): je Maßnahme ein Block ``div.massnahme[data-code][data-rang]``, geordnet
+    nach ``massnahmen.rangfolge``. Kennzahlen stehen in ``td.capex``, ``td.opex``,
+    ``td.vermieden``, ``td.verhaeltnis``, ``td.gewissheit``, ``td.umsetzung`` und ``td.ort``; die
+    Kostenkomponenten in ``tr.komponente`` mit ``td.quelle``. Eine qualitative Maßnahme trägt
+    ``data-qualitativ`` und ``span.qualitativ`` statt eines Betrags für ihre Wirkung."""
+    k = d.kommune
+    zeilen = rangfolge(list(d.massnahmen))
+    html = [_kopf(6)]
+    if not zeilen:
+        html.append(f"<p>Für {_h(k.name)} ist in dieser Fassung des Berichts keine Maßnahme "
+                    f"angelegt. Deshalb steht hier keine Rangfolge; Kosten und vermiedene Schäden "
+                    f"folgen, sobald Maßnahmen verortet sind.</p>")
+        html.append(_stand(d))
+        return "\n".join(html)
+    n_q = sum(1 for z in zeilen if z.qualitativ)
+    html.append(
+        f"<p>Die Maßnahmen stehen in der Reihenfolge ihres Nutzen-Kosten-Verhältnisses, das "
+        f"wirtschaftlichste zuerst. Das Verhältnis teilt den Nutzen über den Zeitraum vom "
+        f"Umsetzungsjahr bis {HORIZONT_ENDE} (vermiedene Schäden und Zusatznutzen je Jahr mal "
+        f"Jahre) durch die Kosten im selben Zeitraum (CAPEX einmal, OPEX je Jahr mal Jahre); "
+        f"ein Verhältnis über 1 heißt, die Maßnahme spart mehr Schaden, als sie kostet. Beträge "
+        f"sind nicht abgezinst, die Wirkung gilt als gleichbleibend. Jede Kostenkomponente nennt "
+        f"ihre Quelle. Gewissheit und Umsetzung stehen wie in der Maßnahmentabelle des Produkts."
+        + (f" {n_q} Maßnahme(n) sind qualitativ bewertet: Für sie liegt keine Wirkung in Euro "
+           f"vor; sie stehen am Ende, ohne Rang nach Euro." if n_q else "")
+        + "</p>")
+    for rang, z in enumerate(zeilen, 1):
+        attr = f' data-code="{_h(z.code)}" data-rang="{rang}"'
+        if z.qualitativ:
+            attr += ' data-qualitativ="ja"'
+        html.append(f'<div class="massnahme"{attr}>')
+        html.append(f"<h2>{rang}. {_h(z.name)}</h2>")
+        html.append('<table class="massnahme-kennzahlen">')
+        ort = z.ort + (f" (abgedeckte Fläche {de_zahl(z.flaeche_m2)} m²)"
+                       if z.flaeche_m2 and z.flaeche_m2 >= 1 else "")
+        html.append(f'<tr><th>Ort</th><td class="ort">{_h(ort)}</td></tr>')
+        html.append(f"<tr><th>Umsetzungsjahr</th><td>{z.umsetzungsjahr}</td></tr>")
+        html.append(f'<tr><th>CAPEX (einmalig)</th><td class="capex">'
+                    f'{_euro_oder(d, z.capex_eur, "keine Investition im Katalog hinterlegt")}</td></tr>')
+        html.append(f'<tr><th>OPEX je Jahr</th><td class="opex">'
+                    f'{_euro_oder(d, z.opex_eur, "keine Betriebskosten im Katalog hinterlegt")}</td></tr>')
+        if z.qualitativ:
+            html.append(f'<tr><th>Vermiedene Schäden je Jahr</th><td class="vermieden">'
+                        f'<span class="qualitativ">{QUALITATIV}</span>: {_h(z.vermerk)}</td></tr>')
+            html.append('<tr><th>Nutzen-Kosten-Verhältnis</th><td class="verhaeltnis">keines, '
+                        'weil die Wirkung nicht in Euro beziffert ist</td></tr>')
+        else:
+            vermieden = (_betrag(d, z.vermiedene_schaeden_eur) if z.vermiedene_schaeden_eur
+                         and round(z.vermiedene_schaeden_eur) >= 1 else
+                         '<span class="grund">keine vermiedenen Schäden in Euro beziffert</span>')
+            html.append(f'<tr><th>Vermiedene Schäden je Jahr</th><td class="vermieden">'
+                        f'{vermieden}</td></tr>')
+            if z.zusatznutzen_eur and round(z.zusatznutzen_eur) >= 1:
+                html.append(f'<tr><th>Zusätzlicher Nutzen je Jahr</th><td class="zusatz">'
+                            f'{_betrag(d, z.zusatznutzen_eur)}</td></tr>')
+            html.append(f'<tr><th>Nutzen-Kosten-Verhältnis ({z.umsetzungsjahr}–{HORIZONT_ENDE})'
+                        f'</th><td class="verhaeltnis">{_h(_verhaeltnis(z.nutzen_kosten))}</td></tr>')
+        html.append(f'<tr><th>Gewissheit</th><td class="gewissheit">'
+                    f'{_zeilen_html(z.gewissheit.split(chr(10)))}</td></tr>')
+        html.append(f'<tr><th>Umsetzung</th><td class="umsetzung">'
+                    f'{_zeilen_html(z.umsetzung.split(chr(10)))}</td></tr>')
+        html.append("</table>")
+        if z.komponenten:
+            html.append('<table class="kostenkomponenten"><tr><th>Kostenart</th><th>Komponente</th>'
+                        '<th class="zahl">Einzelpreis</th><th class="zahl">Menge</th>'
+                        '<th class="zahl">Betrag</th><th>Quelle</th></tr>')
+            for c in z.komponenten:
+                menge = f"{de_zahl(c.menge, 0 if float(c.menge).is_integer() else 2)} {c.mengeneinheit}"
+                html.append(
+                    f'<tr class="komponente" data-block="{_h(c.block)}"><td>{_h(blockname(c.block))}</td>'
+                    f"<td>{_h(c.bezeichnung)}</td>"
+                    f'<td class="zahl">{_euro_oder(d, c.einzelpreis_eur, "ohne Kosten")}</td>'
+                    f'<td class="zahl">{_h(menge.strip())}</td>'
+                    f'<td class="zahl">{_euro_oder(d, c.betrag_eur, "ohne Kosten")}</td>'
+                    f'<td class="quelle">{_h(c.quelle)}</td></tr>')
+            html.append("</table>")
+        html.append("</div>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
 # ── Teil 7 ──────────────────────────────────────────────────────────────────────
 
 def _wert(p: dict) -> str:
@@ -533,5 +639,6 @@ def teil_8(d: Berichtsdaten) -> str:
 
 
 TEILE: dict[int, Callable[[Berichtsdaten], str]] = {
-    0: teil_0, 1: teil_1, 2: teil_2, 3: teil_3, 4: teil_4, 5: teil_5, 7: teil_7, 8: teil_8,
+    0: teil_0, 1: teil_1, 2: teil_2, 3: teil_3, 4: teil_4, 5: teil_5, 6: teil_6, 7: teil_7,
+    8: teil_8,
 }
