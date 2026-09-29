@@ -126,6 +126,51 @@ def test_g_fremder_kennzeichnungswert_ist_rot():
     assert fehler[0].startswith("Kennzeichnung t.d")
 
 
+# T-1562: Bänder aus ganzen Zahlen und Zahlen mit Exponent sind Bänder.
+
+def _herleitungsblock(wert: str, band: str) -> str:
+    return "\n".join([
+        "parameter:",
+        "  id: uv.t1562_probe",
+        f"  wert: {wert}",
+        '  einheit: "1/a"',
+        f"  band: {band}",
+        "  herkunft: herleitung:§4.1",
+        "  kennzeichnung: abschaetzung_kap3",
+        "---",
+    ]) + "\n"
+
+
+def _abgleich(wert: str, band: str) -> Lint:
+    from lint_methodik import registry_abgleich
+    lint = Lint()
+    werte, _ = parameter_bloecke(_bericht(_herleitungsblock(wert, band)), lint)
+    lint.fehler.clear()
+    registry_abgleich("98", werte, lint)
+    lint.fehler = [f for f in lint.fehler if "uv.t1562_probe" in f]
+    return lint
+
+
+def test_h_ganzzahliges_band_im_band_ist_abgeleitet_und_gruen():
+    lint = _abgleich("66", "[63, 69]")
+    assert lint.fehler == []
+    assert "Abgeleiteter Block uv.t1562_probe liegt im eigenen Band" in lint.ok
+
+
+def test_i_ganzzahliges_band_wert_ausserhalb_ist_rot():
+    lint = _abgleich("70", "[63, 69]")
+    assert len(lint.fehler) == 1
+    assert lint.fehler[0].startswith(
+        "Abgeleiteter Block uv.t1562_probe liegt im eigenen Band")
+
+
+def test_j_exponent_grenzen_werden_gelesen():
+    from lint_methodik import BLOCK_META
+    parameter_bloecke(_bericht(_herleitungsblock("0.002", "[1.5e-3, 2.5e-3]")),
+                      Lint())
+    assert BLOCK_META["uv.t1562_probe"]["band"] == [0.0015, 0.0025]
+
+
 if __name__ == "__main__":
     import pytest
     sys.exit(pytest.main([__file__, "-q"]))

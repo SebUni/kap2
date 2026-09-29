@@ -213,6 +213,11 @@ def verbotene_formulierungen(src: str, lint: Lint) -> None:
         lint.ok.append("Verbotene Formulierungen")
 
 
+# Bandgrenzen: ganze Zahlen, Dezimalzahlen, Zahlen mit Exponent (63, 0.21, 1.5e-3);
+# Vorzeichen bleiben wie bisher außen vor (T-1562).
+BAND_ZAHL = r"[0-9]+(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?"
+
+
 def parameter_bloecke(src: str, lint: Lint) -> tuple[dict[str, str], set[float]]:
     m = re.search(r"## 7 Parameter-Blöcke.*?\n(.*?)\n## 8 ", src, re.S)
     if not m:
@@ -242,7 +247,7 @@ def parameter_bloecke(src: str, lint: Lint) -> tuple[dict[str, str], set[float]]
         bd = re.search(r"^\s*band:\s*\[([^\]]+)\]", blk, re.M)
         eigenes_band: list[float] = []
         if bd:
-            for zahl in re.findall(r"[0-9]+\.[0-9]+", bd.group(1)):
+            for zahl in re.findall(BAND_ZAHL, bd.group(1)):
                 baender.add(float(zahl))
                 eigenes_band.append(float(zahl))
         hk = re.search(r"^\s*herkunft:\s*(\S+)", blk, re.M)
