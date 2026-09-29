@@ -826,7 +826,7 @@ Paket nicht; wie stark die Bänder den Betrag verschieben, steht in §5 (Sensiti
 | \(\beta_d\) | Distanz-Effekt — **Sensitivitätsband, nicht im Basiswert** (Log 20) | 1/km | ≈ 0,001 (0–0,002) [38]; register:95-R36-01; Hilfsfrist [39] nur Screening |
 | \(\beta_{\text{iso}}\) | Isolations-Effekt, OR-übersetzt: \((\text{OR}-1)/[1+\bar q(\text{OR}-1)]\); nur D-Pfad, Bänder 65+ | — | (2,3−1)/[1+0,346·1,3] = **0,90** (Band 0,3–1,4 = Übersetzung eines OR-Bands ≈ 1,4–3,7 — KI-Approximation, gekennzeichnete Abschätzung §3.9) [40,63]; register:95-S152-02 |
 | \(\beta_{\text{pfl}}\) | Pflegeheim-Effekt (nur Band 85+, nur D-Pfad) | — | (3,0−1)/[1+0,149·2,0] = **1,54** (Band 1,0–2,9); Kette §3.3b [41,44,60,61]; register:95-S153-01 |
-| \(\delta_{\text{HAP}}\) | Hitzeaktionsplan-Dämpfung — multiplikativ auf den Wochen-Exzess (RR−1); Maßnahme §5 | — | 0,95 (0,85–1,00) [45,47]; register:95-S158-01 |
+| \(\delta_{\text{HAP}}\) | Hitzeaktionsplan-Dämpfung — multiplikativ auf den Wochen-Exzess (RR−1); Maßnahme §5 | — | 0,794 (0,794–1,00) = max(1 − (1 − 0,95) × 1,1561 / 0,1561; 0,794): Quellwert 0,95 (0,85–1,00) auf die Sterblichkeit an Hitzetagen insgesamt, übersetzt auf den Exzess 0,630 mit dem RR des Hitzetags aus [45], Tabelle 1, gekappt am Paketwert (Befund 180) [45,47]; register:95-S158-01 |
 | \(\delta_{\text{KZ}}\) | Dämpfung durch öffentliche Kühlzentren — multiplikativ auf den Wochen-Exzess der Bänder 75–84 und 85+ (85+ ohne Heimbewohner); Maßnahme §5 | — | 0,995585 (0,982–0,9994) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,0883; Abschätzung von KAP3 [41,46,73] (Block `heat.delta_kuehlzentren`, Befunde 139, 148); register:95-S157-02 |
 | \(\delta_{\text{VG}}\) | Dämpfung durch Schutzprogramme vulnerable Gruppen — multiplikativ auf den Wochen-Exzess der Bänder 75–84 und 85+ (85+ ohne Heimbewohner); Maßnahme §5 | — | 0,931 (0,794–1,0) = 1 − \(r_{\text{VG}} \times w_{\text{VG}}\) = 1 − 0,20 × 0,3445 (\(w_{\text{VG}}\) ungerundet, gerundet 0,34), Wirkung höchstens bis zum Paketwert 0,794 [47]; Abschätzung von KAP3 [47,70]; register:95-S152-03 |
 | \(\delta_{\text{VG,morb}}\) | Faktor der Schutzprogramme auf die Einweisungen (Morbidität) der Bänder 75–84 und 85+ ohne Heimbewohner; Maßnahme §5 | — | 1,0 (0,931–1,069), Abschätzung von KAP3: unten wie \(\delta_{\text{VG}}\), oben 1 + \(r_{\text{VG}} \times w_{\text{VG}}\) = 1 + 0,20 × 0,3445 = 1,069 (\(w_{\text{VG}}\) ungerundet; Befunde 131, 134); register:95-S152-03 |
@@ -1049,8 +1049,9 @@ assert abs(0.0634 * 1.0 - 0.0634) < 1e-9 and abs(0.0625 * 1.0 - 0.0625) < 1e-9
 Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll-ORs
 (Bouchama: Klimaanlage 0,23) sind keine Einführungswirkungen:
 
-- **Hitzeaktionsplan / Frühwarnkette (S155/S158):** \(\delta_{\text{HAP}}\) zentral 0,95
-  (Band 0,85–1,00), **definiert als multiplikativer Faktor auf den Wochen-Exzess (RR − 1)**
+- **Hitzeaktionsplan / Frühwarnkette (S155/S158):** \(\delta_{\text{HAP}}\) = 0,794 (Band 0,794–1,00) auf den
+  Exzess, übersetzt aus 0,95 (Band 0,85–1,00) auf die Sterblichkeit an Hitzetagen insgesamt und gekappt am Paketwert
+  (Befund 180, Absatz „Lesart und Übersetzung“ unten), **definiert als multiplikativer Faktor auf den Wochen-Exzess (RR − 1)**
   — konsistent zur Studienart der Evidenz (Ergebnis-Effekte; Befund 33; die frühere
   β-Formulierung ist gestrichen; Anwendung auf β wiche je nach Wochenhitze um bis zu
   0,7 %-Punkte ab). Evidenz: DiD 15 dt. Städte RR 1,00 [0,98–1,01], adjustiert 0,85 [45];
@@ -1067,12 +1068,40 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   Gewicht: \(\delta_{\text{HAP}}\) = 2/3 × 1,00 + 1/3 × 0,85 = 1,00 − 1/3 × 0,15 = 0,95. Das Band 0,85–1,00 sind die
   beiden Werte aus [45]. **Warum nicht die Mitte 0,925:** Die Mitte gäbe dem bereinigten Wert dasselbe Gewicht wie dem
   Mittel über alle Städte, obwohl das Mittel mit 0,98–1,01 eng um „keine Wirkung“ liegt. Berlin käme dann auf
-  27,1 statt 18,1 Mio. € je Jahr. **Gegenargument:** 0,95 liegt außerhalb des Intervalls 0,98–1,01 des Mittels. Der
+  27,1 statt 18,1 Mio. € je Jahr (beide vor der Übersetzung unten; übersetzt greift bei 0,925 wie bei 0,95 die
+  Kappung, und der Betrag bleibt 74,5 Mio. €). **Gegenargument:** 0,95 liegt außerhalb des Intervalls 0,98–1,01 des Mittels. Der
   Wert ist nur deshalb nicht 1,00, weil ein Hitzeaktionsplan mehr enthält als die Warnung, deren Wirkung schon im
-  Basiswert steckt (Wächter unten), und weil eine Nullwirkung nicht stehen bleibt (P2). **Berlin** (Beispiel-Block
-  `sensitivitaeten_berlin`, Kapitel 7): Der Faktor wirkt auf den Exzess aller Bänder, also auf die ganze Mortalität der
-  Rechenkette: 361,8 Mio. € × (1 − 0,95) = **18,1 Mio. € je Jahr** (Preisstand 2024; Band 0–54,3 Mio. €), 5,0 % des
-  Jahresbetrags 362,9 Mio. €. Die Morbidität bleibt unberührt; der Block gilt nur für die Mortalität.
+  Basiswert steckt (Wächter unten), und weil eine Nullwirkung nicht stehen bleibt (P2).
+  **Lesart und Übersetzung (Befund 180).** Worauf 0,95 wirkt, legt [45] in Abschnitt 2.2.1 (Difference-in-differences
+  approach, S. 3) fest: „The effect of the heat alerts on the all-cause daily death count per city was estimated as the difference
+  in daily mortality between eligible days and non-eligible days before the HHWS implementation compared to the
+  difference between eligible days and non-eligible days after HHWS implementation.“ Geschätzt wird mit einem
+  quasi-Poisson-Modell auf die Zahl aller Todesfälle je Tag (ebenda: „to estimate the effect of heat alerts on daily
+  all-cause death counts“). Das RR ist also der Faktor auf die
+  Sterblichkeit an Hitzetagen insgesamt, nicht auf ihren hitzebedingten Exzess. Das Produkt legt \(\delta_{\text{HAP}}\)
+  aber auf den Exzess (RR − 1). Deshalb wird übersetzt wie bei S157 (Befund 124). An Hitzetagen starben in den
+  15 Städten vor dem Warnsystem 31,1 Menschen je Tag, an den übrigen Tagen des Sommers 26,9 ([45], Tabelle 1,
+  1993–2004). Das RR des Hitzetags ist 31,1 / 26,9 = 1,1561: Von 1,1561 Todesfällen am Hitzetag sind 0,1561
+  hitzebedingt. Nimmt der Plan 5 % aller Todesfälle am Hitzetag weg, sind das 0,05 × 1,1561 = 0,0578, also
+  0,0578 / 0,1561 = 37 % des Exzesses:
+  δ_Exzess = 1 − (1 − 0,95) × 1,1561 / 0,1561 = 1 − 0,370 = 0,630.
+  Das liegt unter dem Paketwert 0,794 (Block `heat.kappung_vg`): Ein Hitzeaktionsplan nimmt nicht mehr weg als das
+  ganze Paket der Hitzeschutzpläne in Deutschland [47]. Es gilt max(0,630; 0,794) = **0,794** auf allen Bändern. Die
+  Kappung greift, sobald der Quellwert unter 1 − 0,206 × 0,1561 / 1,1561 = 0,972 liegt. Über das Band 0,85–1,00
+  reicht δ_Exzess von −0,111 (gekappt 0,794) bis 1,00; mit dem RR nach Einführung des Warnsystems (30,5 / 26,6,
+  Tabelle 1, 2005–2020) wäre es 0,609, ebenfalls gekappt. **Berlin** (Beispiel-Block `sensitivitaeten_berlin`,
+  Kapitel 7): Der Faktor wirkt auf den Exzess aller Bänder, also auf die ganze Mortalität der Rechenkette:
+  361,8 Mio. € × (1 − 0,794) = **74,5 Mio. € je Jahr** (Preisstand 2024; Band 0–74,5 Mio. €), 20,5 % des
+  Jahresbetrags 362,9 Mio. €; im Zelllauf mit Gemeindeschlüssel 341,5 Mio. € × 0,206 = 70,4 Mio. €. Vorher, mit 0,95
+  unübersetzt auf dem Exzess, waren es 18,1 Mio. € (Zelllauf 17,1 Mio. €). Ungekappt ergäbe die Übersetzung
+  361,8 Mio. € × 0,370 = 134,0 Mio. €. **Was die einfachere Rechnung verfälscht:** 0,95 direkt auf den Exzess liest
+  „5 % weniger Todesfälle am Hitzetag“ als „5 % weniger hitzebedingte Todesfälle“ und unterschätzt den Hebel in Berlin
+  um 74,5 − 18,1 = 56,4 Mio. € je Jahr, auf rund ein Viertel. **Teilabdeckung:** Deckt der Plan nur einen Teil der
+  Kommune ab, gilt die Kappung im abgedeckten Teil, nicht für die Kommune als Ganzes. Beispiel Berlin, Plan für die
+  Hälfte der Einwohner: 1 − 0,5 × (1 − max(0,630; 0,794)) = 1 − 0,5 × 0,206 = 0,897, also 361,8 Mio. € × 0,103 =
+  37,3 Mio. € je Jahr. Würde erst über die ganze Kommune gekappt, stünde da max(1 − 0,5 × 0,370; 0,794) = 0,815 und
+  361,8 Mio. € × 0,185 = 67,0 Mio. €: Der halbe Plan brächte 90 % des ganzen. Die Morbidität bleibt unberührt; der
+  Block gilt nur für die Mortalität.
   **Doppelzählungs-
   Wächter:** \(c_{\text{kal}}\) ist auf Jahre mit laufendem DWD-Warnsystem kalibriert — die
   durchschnittliche Warnwirkung steckt im Basiswert; ein Fouillet-großer Hebel (≈ 4.400
@@ -1665,15 +1694,15 @@ parameter:
   abgeleitet_aus: []
 parameter:
   id: heat.delta_hap
-  wert: 0.95
+  wert: 0.794
   einheit: "-"
-  band: [0.85, 1.00]
+  band: [0.794, 1.00]
   herkunft: register:95-S158-01
   quelle: feldbusch2025_erl2025
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
-  kennzeichnung: abschaetzung_kap3   # 2/3 x 1,00 + 1/3 x 0,85 = 0,95: Mittel ueber 15 Staedte RR 1,00 doppelt gewichtet gegen bereinigt RR 0,85 [45] (Abstract, Results); nicht die Mitte 0,925 (§5, Log 10, Befund 164). Berlin 18,1 Mio. EUR je Jahr, Band 0-54,3 Mio. EUR
+  kennzeichnung: abschaetzung_kap3   # Quellwert 2/3 x 1,00 + 1/3 x 0,85 = 0,95 auf die Sterblichkeit an Hitzetagen insgesamt [45] (Abstract, Results; Befund 164); auf den Exzess 1 - 0,05 x 1,1561 / 0,1561 = 0,630 mit RR 31,1 / 26,9 aus [45] Tabelle 1 (Abschnitt 2.2.1, Befund 180); gekappt max(0,630; 0,794) = 0,794 (heat.kappung_vg), im abgedeckten Teil. Berlin 74,5 Mio. EUR je Jahr (Kette; vorher 18,1), Band 0-74,5 Mio. EUR (§5, Log 10)
   abgeleitet_aus: []
 parameter:
   id: heat.gamma_hoehe
@@ -2037,6 +2066,24 @@ assert abs(mort - 361.8) < 0.05
 assert abs(betrag(0.581 * 0.95, fa0) - morb - 0.95 * mort) < 1e-9   # Faktor auf den Exzess = Faktor auf die Mortalitaet
 assert abs(mort * (1 - 0.95) - 18.1) < 0.05 and abs(mort * (1 - 0.85) - 54.3) < 0.05
 assert abs(mort * (1 - 0.925) - 27.1) < 0.05 and abs(mort * (1 - 0.95) / basis - 0.050) < 0.0005
+# Befund 180: [45] misst die Sterblichkeit an Hitzetagen insgesamt (2.2.1); Uebersetzung auf den Exzess wie g_S157
+rr = 31.1 / 26.9                                            # RR des Hitzetags, [45] Tabelle 1, 1993-2004
+d_exz = 1 - (1 - 0.95) * rr / (rr - 1)
+assert abs(rr - 1.1561) < 5e-5 and abs(d_exz - 0.630) < 0.0005
+assert abs(0.05 * 1.1561 - 0.0578) < 5e-5 and abs(1 - 0.05 * 1.1561 / 0.1561 - 0.630) < 0.0005   # gezeigte Zahlen
+assert abs(1 - 0.15 * rr / (rr - 1) + 0.111) < 0.0005 and abs(1 - 0.206 * (rr - 1) / rr - 0.972) < 0.0005
+assert abs(1 - 0.05 * (30.5 / 26.6) / (30.5 / 26.6 - 1) - 0.609) < 0.0005   # RR nach Einfuehrung, ebenfalls gekappt
+d_hap = max(d_exz, 0.794)                                   # Kappung heat.kappung_vg auf allen Baendern
+assert d_hap == 0.794
+assert abs(mort * (1 - d_hap) - 74.5) < 0.05 and abs(mort * (1 - d_hap) / basis - 0.205) < 0.0005
+assert abs(mort * (1 - d_exz) - 134.0) < 0.05              # ungekappt
+assert abs(mort * (1 - d_hap) - mort * (1 - 0.95) - 56.4) < 0.05   # 0,95 unuebersetzt auf dem Exzess: zu klein
+# Teilabdeckung, Plan fuer die Haelfte der Einwohner: Kappung im abgedeckten Teil
+teil = 1 - 0.5 * (1 - d_hap)
+assert abs(teil - 0.897) < 1e-9 and abs(mort * (1 - teil) - 37.3) < 0.05
+falsch = max(1 - 0.5 * (1 - d_exz), 0.794)                  # erst ueber die ganze Kommune gekappt (verworfen)
+assert abs(falsch - 0.815) < 0.0005 and abs(mort * (1 - falsch) - 67.0) < 0.05
+assert abs((1 - falsch) / (1 - d_hap) - 0.90) < 0.005
 # Band von f_a: Rueckrechnung wie §3.3a mit den Anteilen eines Sommers [74], [75]
 sterbe = [138_024, 166_312, 302_921, 420_949]
 def fa_aus(n):
@@ -2314,7 +2361,7 @@ um die Herleitung von \(\delta_{\text{HAP}}\) ergänzt (T-1584, Befund 164).
 | 7 | (ersetzt durch Nr. 26) | — | — | — | — |
 | 8 | (ersetzt durch Nr. 19) | — | — | — | — |
 | 9 | (ersetzt durch Nr. 23) | — | — | — | — |
-| 10 | Maßnahmen-Effektgrößen? | **Interventionsevidenz, marginal**: \(\delta_{\text{HAP}}\) 0,95 auf (RR−1), hergeleitet als 2/3 × 1,00 + 1/3 × 0,85 aus [45] (Mittel über 15 Städte doppelt gewichtet gegen den bereinigten Wert; Befund 164, §5); Klimaanlagen rOR 0,93; Doppelzählungs-Wächter | Fall-Kontroll-ORs überschätzen Einführungswirkung 5–10×; die Mitte 0,925 gäbe dem bereinigten Wert, der an drei im Produkt nicht nachgebildeten Merkmalen der Städte hängt, dasselbe Gewicht wie dem engen Mittel 0,98–1,01 (Berlin 27,1 statt 18,1 Mio. € je Jahr) | Fouillet-großer Hebel (−4.400) — Doppelbuchung | Maßnahmenwerte klein, ehrlich |
+| 10 | Maßnahmen-Effektgrößen? | **Interventionsevidenz, marginal**: \(\delta_{\text{HAP}}\) 0,95 auf (RR−1), hergeleitet als 2/3 × 1,00 + 1/3 × 0,85 aus [45] (Mittel über 15 Städte doppelt gewichtet gegen den bereinigten Wert; Befund 164, §5); **Befund 180:** 0,95 gilt für die Sterblichkeit an Hitzetagen insgesamt ([45], Abschnitt 2.2.1: „the all-cause daily death count“), auf den Exzess übersetzt 1 − 0,05 × 1,1561 / 0,1561 = 0,630 (RR 31,1 / 26,9, [45] Tabelle 1), gekappt max(0,630; 0,794) = 0,794 im abgedeckten Teil; Berlin 74,5 statt 18,1 Mio. € je Jahr; Klimaanlagen rOR 0,93; Doppelzählungs-Wächter | Fall-Kontroll-ORs überschätzen Einführungswirkung 5–10×; die Mitte 0,925 gäbe dem bereinigten Wert, der an drei im Produkt nicht nachgebildeten Merkmalen der Städte hängt, dasselbe Gewicht wie dem engen Mittel 0,98–1,01; [45] schätzt auf allen Todesfällen des Hitzetags, der Exzess ist nur 0,1561 von 1,1561 | Fouillet-großer Hebel (−4.400) — Doppelbuchung · 0,95 unübersetzt auf den Exzess (Befund 180; verworfen, weil es 5 % aller Todesfälle am Hitzetag als 5 % des Exzesses liest und den Hebel in Berlin um 56,4 Mio. € je Jahr unterschätzt) · Kappung über die ganze Kommune statt im abgedeckten Teil (halber Plan 67,0 statt 37,3 Mio. €) | Maßnahmenwerte klein, ehrlich |
 | 11 | Kante #63 Innenraumklima? | **kein eigener Knoten in M0** — Nachtkomponente des 24-h-Mittels + Hebel S157 | Gebäudephysik-Risiko folgt in M1; Kante bleibt adressiert | eigener Innenraum-Term | Kette vollständig adressiert |
 | 12 | Grünanteil als Vulnerabilität? | **nein** — steckt im UHI-Zuschlag | Kein-Doppelkanal (§3.2) | zweiter Grün-Kanal | keine Doppelzählung |
 | 13 | (ersetzt durch Nr. 20) | — | — | — | — |
