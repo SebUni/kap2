@@ -808,8 +808,8 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Deutschland, dl-de/by-2-0. [Online]. Verfügbar: https://data."
                 "geobasis-bb.de/geobasis/daten/3d_gebaeude/. [Zugriff: 14. Juli 2026].",
         "url": "https://data.geobasis-bb.de/geobasis/daten/3d_gebaeude/",
-        "archive_url": "https://web.archive.org/web/2026/https://data.geobasis-bb"
-                       ".de/geobasis/daten/3d_gebaeude/",
+        "archiv_ausnahme": "Wayback führt einen Schnappschuss (20260714093718), dessen Abruf "
+                           "liefert aber HTTP 500, geprüft 27.09.2026 und 29.09.2026 (T-1531-ceo).",
         "accessed": "2026-07-14",
     },
     "LoD2_HH": {
@@ -820,8 +820,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "3d-gebaeudemodell-lod2-de-hamburg. [Zugriff: 14. Juli 2026].",
         "url": "https://suche.transparenz.hamburg.de/dataset/"
                "3d-gebaeudemodell-lod2-de-hamburg",
-        "archive_url": "https://web.archive.org/web/2026/https://suche.transparenz"
-                       ".hamburg.de/dataset/3d-gebaeudemodell-lod2-de-hamburg",
+        "archiv_ausnahme": "Wayback führt keinen Schnappschuss, geprüft 27.09.2026 (T-1531-ceo).",
         "accessed": "2026-07-14",
     },
     "LoD2_Laender_Sammel": {
@@ -1338,9 +1337,7 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                 "Lizenz CC BY 4.0. [Zugriff: 25. September 2026].",
         "url": "https://opendata.dwd.de/climate_environment/CDC/event_catalogues/germany/"
                "precipitation/CatRaRE_v2026.01/data/CatRaRE_2001_2025_T5_Eta_v2026_01.csv",
-        "archive_url": "https://web.archive.org/web/2026/"
-                       "https://opendata.dwd.de/climate_environment/CDC/event_catalogues/germany/"
-                       "precipitation/CatRaRE_v2026.01/data/CatRaRE_2001_2025_T5_Eta_v2026_01.csv",
+        "archiv_ausnahme": "Wayback führt keinen Schnappschuss, geprüft 27.09.2026 (T-1531-ceo).",
         "accessed": "2026-09-25",
     },
     "Destatis_GVISys_Bevoelkerung": {

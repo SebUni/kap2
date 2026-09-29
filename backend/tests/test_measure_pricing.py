@@ -142,6 +142,11 @@ def test_source_refs_resolve_to_bibliography():
 
 _WAYBACK_PERMALINK = re.compile(r"^https://web\.archive\.org/web/\d{14}/.+")
 
+# Geschlossene Ausnahmeliste (Entscheidung des CEO, 29.09.2026, T-1531-ceo): Für diese
+# Schlüssel ist kein abrufbarer Wayback-Schnappschuss vorhanden; sie tragen statt
+# archive_url ein Feld archiv_ausnahme mit Grund und Prüfdatum. Keine allgemeine Lockerung.
+_ARCHIV_AUSNAHMEN = frozenset({"DWD_CatRaRE", "LoD2_HH", "LoD2_BB"})
+
 
 def test_bibliography_entries_are_complete():
     """Jeder Bibliografie-Eintrag trägt IEEE-Zitation, Live-URL und Archiv-Snapshot.
@@ -156,10 +161,15 @@ def test_bibliography_entries_are_complete():
     """
     bad = []
     for key, entry in sources.SOURCE_REFERENCES.items():
-        for field in ("ieee", "url", "archive_url"):
+        for field in ("ieee", "url"):
             if not entry.get(field):
                 bad.append((key, field))
-        if entry.get("archive_url") and not _WAYBACK_PERMALINK.match(entry["archive_url"]):
+        if not entry.get("archive_url"):
+            # archiv_ausnahme gilt nur für die geschlossene Menge (Entscheidung des CEO,
+            # 29.09.2026); jeder andere Schlüssel ohne archive_url bleibt rot.
+            if not (key in _ARCHIV_AUSNAHMEN and entry.get("archiv_ausnahme")):
+                bad.append((key, "archive_url"))
+        elif not _WAYBACK_PERMALINK.match(entry["archive_url"]):
             bad.append((key, "archive_url ist kein absoluter Wayback-Permalink "
                              "mit 14-stelligem Zeitstempel"))
     assert not bad, f"Unvollständige Bibliografie-Einträge: {bad}"

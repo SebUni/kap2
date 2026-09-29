@@ -903,6 +903,11 @@ def revisionsrueckstaende(nr: str, src: str, baender: set[float],
                         f"Registry sagt {soll} — {zeile.strip()[:60]}")
 
 
+# Geschlossene Ausnahmeliste für archive_url (Entscheidung des CEO, 29.09.2026, T-1531-ceo):
+# kein abrufbarer Wayback-Schnappschuss; der Eintrag trägt stattdessen archiv_ausnahme.
+ARCHIV_AUSNAHMEN = frozenset({"DWD_CatRaRE", "LoD2_HH", "LoD2_BB"})
+
+
 def quellen_ratchet(lint: Lint) -> None:
     try:
         from app.data.sources import SOURCE_REFERENCES
@@ -917,8 +922,11 @@ def quellen_ratchet(lint: Lint) -> None:
             lint.fehler.append(f"Quelle {ref} fehlt im Register")
             continue
         # archive_url ist Pflicht (T-1531-ceo, nimmt die Lockerung aus T-1410 zurück).
+        # archiv_ausnahme ersetzt es nur für die geschlossene Menge ARCHIV_AUSNAHMEN.
         fehlend = [k for k in ("url", "archive_url", "accessed")
-                   if not eintrag.get(k)]
+                   if not eintrag.get(k)
+                   and not (k == "archive_url" and ref in ARCHIV_AUSNAHMEN
+                            and eintrag.get("archiv_ausnahme"))]
         lint.pruefe(not fehlend, f"Quelle {ref}", f"ohne {fehlend}")
 
 
