@@ -169,8 +169,9 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
         "Entscheidungsträger nennt keine Dringlichkeit der Handlungserfordernisse, führt als "
         "Handlungsmöglichkeiten nur bereits geplante Maßnahmen auf, erklärt ihre Fachbegriffe "
         "nicht und enthält keine Karte. Einen ausführlichen Abschlussbericht mit Detailergebnissen "
-        "je Kommune gibt es nicht; die Methodik-Berichte sind bundesweit gleich und für eine "
-        "Kommune selbst nicht erreichbar, sondern nur beim Hersteller einsehbar. Auf einzelne "
+        "je Kommune gibt es nicht; die Methodik-Berichte sind bundesweit gleich und gehen als "
+        "Anlagen mit diesem Bericht, verzeichnet in Teil 9 (zur Hitzebelastung Anlage M95). "
+        "Auf einzelne "
         "Zielgruppen zugeschnittene Kommunikationsziele, Beschlussvorlagen, Veranstaltungen und "
         "Kampagnen bietet das Produkt nicht.",
     ),
