@@ -5,7 +5,7 @@ Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048: Schr
 Log 23/24, Befunde 156–167), Schritt 3 Pflichtinhalte — Kap. 1 „Risiko ohne (weitere) Anpassung“,
 Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181),
 Schritt 4 Bezugswert Ḡ₀ der Stadtbaumwahl (T-1323, T-1362, Log 26, Befund 182), Nachzug der Befunde 183–185, Runde 14 mit Befunden 186–194, Runde 15 mit Befunden 195–197 (T-1330), Runde 16 mit Befunden 199–200 und Runde 17 mit Befunden 201–204 und 206 (T-1427);
-Null-Runde über den ganzen Bericht: A Runde 21 (T-1442-methodik_manager), B Runde 22 (T-1443-methodik_manager); Runden 24 und 25 nach der Integration mit Befunden 230–245 (T-1632-methodik_manager, T-1633-methodik_manager); in Revision nach der Integration (T-1628-cmo), Abnahme steht aus)** ·
+Null-Runde über den ganzen Bericht: A Runde 21 (T-1442-methodik_manager), B Runde 22 (T-1443-methodik_manager); Runden 24 bis 27 nach der Integration mit Befunden 230–253 (T-1632-methodik_manager bis T-1635-methodik_manager); in Revision nach der Integration (T-1628-cmo), Abnahme steht aus)** ·
 Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 96-A** (Prävalenz × gemessene Pollensaison-Spreizung, bottom-up; Entscheidungslog Nr. 1)
@@ -50,6 +50,13 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > je Jahr, Bandsummen mit dem Produktcode nachgemessen (Anlage `96_zelllauf_bandsummen.py`), Unterschied
 > zur Kette und Toleranz ± 0,005 Mio. €; S158 im Zelllauf 16.632 Tage; Schwelle, ab der sich die
 > Frühwarnung gegen den Betrieb trägt (§5.1).
+> **Runde 26 (T-1634):** Befunde 246–252 — Stadtbaumwahl: s_unbek kommunenweit und eine Eingabe a als
+> Modellgrenzen mit Richtung und Größe, Grenze je Term, Boden 0,536 × Grünanteil ohne eigenen Parameter,
+> Toleranz und Block der Allee-Zelle, Wertebereich 0 bis 1 für anteil_ersetzt (§5).
+> **Runde 27 (T-1635):** Befund 253 — Kosten der Stadtbaumwahl je Baum als Abschätzung von KAP3: 60 € bei
+> ohnehin fälliger Nachpflanzung, 4.436 € bei vorgezogenem Ersatz (Preisstand 2024; §5, Kap. 7 Abschnitt 7.1
+> `pollen.stadtbaum_kosten`, Quellen [75]–[79], VPI 2022 in [19]). Kein Basiswert und kein bestehender Wert in
+> Kapitel 7 geändert; der Betrag für Berlin bleibt.
 > **Code-Stand (29.09.2026, Befund 245):** `POLLEN_EARLY_WARNING` führt `EXPECTED_ANNUAL_ALLERGY_DAYS` in
 > `linked_risk_codes` und rechnet mit `default_reduction` = 0,03 im Zelllauf (Modell `s158`, §5.1
 > „Produktstand“); die allergenarme Stadtbaumwahl rechnet als `LOW_ALLERGEN_TREE_SELECTION` im Zelllauf
@@ -1229,6 +1236,99 @@ assert abs(w_b * s_unbek * dk_unbek + 0.0056) < 1e-4   # richtig: nur im Term s_
 assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze nie unter null
 ```
 
+  **Kosten der Stadtbaumwahl (Anker `#stadtbaum-kosten`, Befund 253, §3.9 ABGESCHÄTZT; Kap. 7
+  `pollen.stadtbaum_kosten`).** Die Kosten wirken nicht auf den Schadensbetrag von #96, nur auf die
+  Wirtschaftlichkeit der Maßnahme im Maßnahmen-Modul (Kosten der Kommune außerhalb der Schadenskonten,
+  R7-Weiche unten). Gerechnet wird je ersetztem Baum, getrennt nach zwei Fällen:
+  1. **Nachpflanzung ohnehin:** Der allergene Baum fällt ohnehin, etwa aus Alters- oder
+     Verkehrssicherheitsgründen, und die Kommune pflanzt am selben Standort nach. Fällung, Pflanzung und
+     Anwuchspflege fallen dann in jedem Fall an. Der Maßnahme zuzurechnen sind nur die **Mehrkosten der
+     Artenwahl**: der Preisunterschied zwischen der allergenarmen Art und der Art, die sonst gepflanzt
+     würde, in gleicher Pflanzqualität. Die Preisliste einer Baumschule [79] (gültig ab 14.02.2024,
+     Laubbäume S. 26 f.) ordnet Hochstämme mit 18–20 cm Stammumfang vier Preisgruppen zu: I 395 €,
+     II 455 €, III 485 €, IV 580 € je Stück. Die Birke steht in Gruppe I, die Hainbuche, auch
+     Birkengruppe, in Gruppe II. **Abschätzung von KAP3: 60 € je Baum (Preisstand 2024), Band 0–185 €.**
+     Der Punktwert ist der Schritt von Gruppe I zu Gruppe II, also eine Art der Gruppe II statt einer
+     Birke. 0 € gilt, wenn die allergenarme Art in derselben Preisgruppe steht wie die sonst gewählte
+     Art, 185 € für eine Art der Gruppe IV statt einer Birke. Das sind weniger als 2 % der Pflanzkosten
+     unten. Die Pflege des angewachsenen Baums setzt der Bericht für beide Arten gleich an, weil keine
+     Quelle einen Unterschied belegt; das ist eine Modellgrenze der Abschätzung. Die Art wählt die
+     Kommune nach der GALK-Liste der Zukunftsbäume und der allergologischen Liste ([6], S. 100 f.);
+     welche Art allergenarm ist, legt diese Abschätzung nicht fest.
+  2. **Vorgezogener Ersatz:** Ein gesunder allergener Baum wird gefällt, um ihn früher zu ersetzen. Dann
+     trägt die Maßnahme alles, Fällung, Pflanzung und Anwuchspflege.
+     **Pflanzung mit dreijähriger Anwuchspflege: 3.636 € je Baum (Preisstand 2024), Band 2.400–5.600 €.**
+     Das sind Mittel und Spanne der Hamburger Straßenbaumpflanzungen 2024 [75]. Die Pflege ist darin
+     enthalten: Die Fertigstellungs- und Entwicklungspflege ist „für in der Regel drei Jahre“ Teil der
+     Pflanzkosten [77], Pflanzung und Pflege werden nicht getrennt ausgewiesen [76]. Gegenprobe
+     Beispielkommune Berlin: rund 3.000 € brutto je Straßenbaum einschließlich einer rund dreijährigen
+     Entwicklungspflege (Ausschreibung Herbst 2022) [78], mit dem VPI [19] auf 2024 gerechnet
+     3.000 € × 119,3 / 110,2 = 3.248 €, im Band. Hamburg 2025: 3.120 € im Mittel [76].
+     **Fällung: Abschätzung von KAP3, 800 € je Baum (Preisstand 2024), Band 400–1.600 €**, mit
+     Verkehrssicherung, Abfuhr und Fräsen des Stubbens. Eine amtliche Zahl gibt es nicht: Hamburg
+     erhebt Fällkosten nicht gesondert, sie stecken in großen Ausschreibungen zusammen mit der
+     Baumpflege ([77], S. 1). Das untere Bandende gilt für einen kleinen Baum im Sammelauftrag, das
+     obere für einen großen Baum an der Fahrbahn mit Hubarbeitsbühne und Sperrung.
+     **Zusammen: 4.436 € je Baum (Preisstand 2024), Band 2.800–7.200 €.** Die Bandenden sind addiert,
+     gelten also für beide Enden zugleich. Die Fällung macht 18 % des Punktwerts aus.
+
+  **Rechenbeispiel Allee-Zelle.** Die Pflanzung oben senkt den Kronenanteil der 100-m-Zelle
+  (10.000 m²) um 0,078, also um 781 m² Kronenfläche. Das Produkt setzt für OSM-Bäume ohne Angabe
+  einen Kronendurchmesser von 8 m an (`backend/app/services/climate/heat/osm_data.py`), also 50,3 m²
+  Krone je Baum; 781 ÷ 50,3 ≈ 15,5, das sind 16 Bäume. Vorgezogen ersetzt kosten sie
+  16 × 4.436 € ≈ 71.000 € einmalig (Band 44.800–115.200 €), bei ohnehin fälliger Nachpflanzung
+  16 × 60 € = 960 € (Band 0–2.960 €). Dem stehen 163 € vermiedene Behandlungskosten je Jahr gegenüber
+  (Band über λ 70–233 €). Ohne Zins gerechnet deckt der Nutzen die Mehrkosten der Nachpflanzung in
+  rund sechs Jahren, den vorgezogenen Ersatz in über 400 Jahren. Über die Pollenallergie allein trägt
+  sich also die Artenwahl bei ohnehin fälliger Nachpflanzung; ein vorgezogener Ersatz braucht andere
+  Gründe. **Stärkster Treiber** ist der Fall, nicht das Band: Der vorgezogene Ersatz kostet das
+  74-Fache der Artenwahl. Innerhalb des vorgezogenen Ersatzes treiben die Pflanzkosten am Standort
+  (−28 … +44 % über ihr Band), die Fällung bewegt −9 … +18 %.
+  **Was die einfachere Rechnung verfälschen würde:** Rechnete man für jeden ersetzten Baum die vollen
+  4.436 €, erschiene die Artenwahl bei einer ohnehin fälligen Nachpflanzung 74-mal so teuer, wie sie
+  ist; rechnete man immer nur 60 €, erschiene ein vorgezogener Ersatz fast kostenlos. Zwei
+  Vereinfachungen bleiben und sind benannt. Dass ein vorgezogen gefällter Baum später ohnehin ersetzt
+  worden wäre, rechnet der Bericht nicht gegen; für alte Bäume sind 4.436 € deshalb eine Obergrenze.
+  Bei der Nachpflanzung wirkt die Maßnahme erst, wenn der alte Baum fällt, und die junge Krone ist
+  kleiner; als Anteil \(a\) gibt die Kommune deshalb nur die Kronen an, die im betrachteten Zeitraum
+  ersetzt werden. Ob die Baumschulliste [79] die Umsatzsteuer enthält, sagt sie nicht (gelesen:
+  Titelseite, Inhalt, Laubbäume S. 26 f.); an 60 € macht das höchstens 11 € aus.
+  **Im Produkt** führt die Katalogmaßnahme heute keine Kosten (Befund 253); die Übernahme Ü-11 setzt
+  4.436 € je Baum als Vorgabe und 60 € je Baum als Wert für die Nachpflanzung, die Zahl der Bäume gibt
+  die Kommune ein.
+
+```python test: beispiel_96_stadtbaum_kosten
+import math
+preis = {"I": 395, "II": 455, "III": 485, "IV": 580}   # Preisliste [79], Hochstamm StU 18-20 cm, ab 14.02.2024
+nach = preis["II"] - preis["I"]                         # Nachpflanzung ohnehin: Mehrkosten der Artenwahl
+nach_band = (0, preis["IV"] - preis["I"])
+assert nach == 60 and nach_band == (0, 185)
+pflanz, pflanz_band = 3_636, (2_400, 5_600)             # Hamburg 2024 [75], mit dreijaehriger Anwuchspflege
+faell, faell_band = 800, (400, 1_600)                   # Faellung: Abschaetzung von KAP3
+vor = pflanz + faell                                    # vorgezogener Ersatz
+vor_band = (pflanz_band[0] + faell_band[0], pflanz_band[1] + faell_band[1])
+assert vor == 4_436 and vor_band == (2_800, 7_200)
+assert abs(faell / vor - 0.18) < 0.005 and nach / pflanz < 0.02
+assert round(vor / nach) == 74
+berlin = 3_000 * 119.3 / 110.2                          # Berlin, Herbst 2022 [78], VPI [19] 2022 -> 2024
+assert abs(berlin - 3_248) < 0.5 and pflanz_band[0] <= berlin <= pflanz_band[1]
+assert round((pflanz_band[0] - pflanz) / vor, 2) == -0.28 and round((pflanz_band[1] - pflanz) / vor, 2) == 0.44
+assert round((faell_band[0] - faell) / vor, 2) == -0.09 and round((faell_band[1] - faell) / vor, 2) == 0.18
+# Allee-Zelle (oben): Kronenanteil sinkt um 0,2 x G0 / w_B in einer 100-m-Zelle
+dk, zelle = 0.2 * 0.18125 / 0.464, 10_000
+krone_m2 = math.pi * (8 / 2) ** 2                       # Produkt: 8 m Kronendurchmesser ohne OSM-Angabe
+n = dk * zelle / krone_m2
+assert abs(dk * zelle - 781.25) < 1e-9 and abs(krone_m2 - 50.3) < 0.05 and abs(n - 15.5) < 0.05
+baeume = math.ceil(n)
+assert baeume == 16
+assert baeume * vor == 70_976 and (baeume * vor_band[0], baeume * vor_band[1]) == (44_800, 115_200)
+assert baeume * nach == 960 and baeume * nach_band[1] == 2_960
+nutzen, nutzen_band = 163, (11.3 * 6.20, 37.6 * 6.20)   # Allee-Zelle, EUR je Jahr, Band ueber lambda
+assert round(nutzen_band[0]) == 70 and round(nutzen_band[1]) == 233
+assert round(baeume * nach / nutzen, 1) == 5.9 and baeume * vor / nutzen > 400
+assert 0.19 * nach < 11.5                               # Umsatzsteuer an der Differenz hoechstens 11 EUR
+```
+
   **Zusammen mit S158:** Die Stadtbaumwahl wirkt auf die Quelle (\(\hat P\)), die Frühwarnung auf
   das Verhalten an gewarnten Tagen (§5.1). Im Zelllauf werden beide multiplikativ gerechnet: Die
   Frühwarnung mindert die Tage \(B \cdot \delta_g \cdot \hat P'\), die nach der Pflanzung noch
@@ -1269,7 +1369,8 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
   auf die Tage nach der Pflanzung (Absatz oben; Allee-Zelle 6,597 statt 7,19 Tage). Was noch vom Bericht
   abweicht, führt das Ledger: Den Euro-Betrag der Frühwarnung rechnet das Produkt in diesem Fall noch auf
   den Ausgangsstand (44,57 € statt 6,597 × 6,20 € = 40,90 €, Befund 240), Euro je Zelle gibt es nicht aus
-  (Befund 237), die Kosten der Maßnahme sind nicht beziffert (Befund 253), und Gattungswissen der
+  (Befund 237), Kosten der Maßnahme führt es noch nicht, obwohl der Bericht sie beziffert (Absatz
+  „Kosten der Stadtbaumwahl“ oben, Befund 253), und Gattungswissen der
   Kommune geht nur kommunenweit über \(s_{\text{unbek}}\) ein (Befund 246, Modellgrenze oben).
   Überschreibt die Kommune \(s_{\text{unbek}}\) nach dem Ausgangslauf, rechnet die Maßnahme die
   Senkung mit dem neuen Wert, \(\hat G\) und Ḡ₀ aber aus dem gespeicherten Ausgangslauf mit dem alten
@@ -1986,7 +2087,34 @@ parameter:
   abgeleitet_aus: [pollen.c_jahr_direkt, pollen.d_saison]
 ```
 
-## 8 Quellen (§3.8 — #96-relevanter Auszug; Nummern [1]–[56] = M0-Zählung, [65]–[74] neu)
+### 7.1 Kosten der Maßnahmen (keine Größe der Schadens- oder Wirkungsrechnung)
+
+Die Blöcke oben tragen die Rechnung vom Klimasignal bis zum Euro-Betrag und die Wirkung der Maßnahmen. Der
+Block hier trägt nur die Kosten einer Maßnahme: Er ändert weder den Schadensbetrag von #96 noch die vermiedenen
+Tage, sondern nur die Wirtschaftlichkeit im Maßnahmen-Modul (§5, Absatz „Kosten der Stadtbaumwahl“, Befund 253).
+
+```yaml
+parameter:
+  # Kosten der Stadtbaumwahl je ersetztem Baum (Vorgabe P2, Befund 253). Katalog
+  # LOW_ALLERGEN_TREE_SELECTION, Kostenfeld je Stueck (Uebernahme Ue-11).
+  # vorgezogen = Pflanzung mit dreijaehriger Anwuchspflege 3.636 (Hamburg 2024 [75],
+  # Band 2.400-5.600) + Faellung 800 (Abschaetzung von KAP3, Band 400-1.600);
+  # nachpflanzung = Mehrkosten der Artenwahl, Preisgruppe II - I = 455 - 395 [79]
+  # (Band 0 bis IV - I = 185). Herleitung §5 #stadtbaum-kosten.
+  id: pollen.stadtbaum_kosten
+  wert: {vorgezogen: 4436, nachpflanzung: 60}
+  einheit: "EUR/Baum"
+  band: {vorgezogen: [2800, 7200], nachpflanzung: [0, 185]}   # Bandenden addiert (vorgezogen)
+  herkunft: herleitung:#stadtbaum-kosten
+  quelle: hamburg_drs23_294_leick2024   # Pflanzkosten [75], Preisgruppen [79]; Faellung ohne Quelle
+  preisstand: "2024"
+  bandzuordnung: null   # Kosten der Kommune, keine Altersbaender
+  endpunkt: null        # kein Endpunkt: wirkt nicht auf Tage oder Schadensbetrag
+  kennzeichnung: abschaetzung_kap3   # Pflanzkosten belegt [75]; Faellung und Artenwahl abgeschaetzt
+  abgeleitet_aus: []
+```
+
+## 8 Quellen (§3.8 — #96-relevanter Auszug; Nummern [1]–[56] = M0-Zählung, [65]–[79] neu)
 
 Zugriff 17./18.08.2026 ([1]–[3], [65], [66]: 30.08.2026, Volltext/Abstract gegengelesen). Nennt ein Eintrag ein
 eigenes Abrufdatum, gilt dieses.
@@ -2041,8 +2169,12 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   = PDF-Seiten = Druckseiten). Aufbereitet in `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt
   `Klimawirkungen`, Zeile 98.
 - **[19]** Destatis, VPI für Deutschland, lange Reihen (2020 = 100): 2000 = **75,9** ·
-  2014 = **94,0** · 2023 = 116,7 · 2024 = 119,3 (Statistischer Bericht „VPI lange Reihen",
-  destatis.de; Werte gegen die publizierte Basis-2020-Tabelle geprüft 30.08.2026).
+  2014 = **94,0** · 2022 = 110,2 · 2023 = 116,7 · 2024 = 119,3 (Statistischer Bericht „VPI lange Reihen",
+  destatis.de; Werte gegen die publizierte Basis-2020-Tabelle geprüft 30.08.2026). Der Wert 2022 (Kosten der
+  Stadtbaumwahl, §5) aus der Tabelle „Verbraucherpreisindex: Gesamtindex und 12 Abteilungen“, Jahresdurchschnitte,
+  Stand 10.09.2026, https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Verbraucherpreisindex/Tabellen/Verbraucherpreise-12Kategorien.html
+  (Abruf 29.09.2026; Permalink https://web.archive.org/web/20260922153607/https://www.destatis.de/DE/Themen/Wirtschaft/Preise/Verbraucherpreisindex/Tabellen/Verbraucherpreise-12Kategorien.html);
+  dieselbe Tabelle bestätigt 2023 = 116,7 und 2024 = 119,3.
 - **[20]** Destatis, Krankheitskostenrechnung (Berichtsjahre 2015/2020/2023; GENESIS-Tabellen
   23631-0001/-0003, www-genesis.destatis.de); J30-scharfe Beträge nur interaktiv abrufbar —
   dokumentierte Lücke, s. [66].
@@ -2168,6 +2300,44 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   Helsinki 5,79 (vormittags) und 5,61 (nachmittags), Espoo 26,41 und 84,92 Pollen je m³. Damit Helsinki
   1 − 2,55 / 5,79 = 0,56 und 1 − 4,38 / 5,61 = 0,22, Espoo 1 − 3,59 / 26,41 = 0,86 und 1 − 5,40 / 84,92 = 0,94:
   abgeleitet 0,22–0,94, drei von vier Werten im Band 0,3–1,0 (§3.3, Modellgrenze 7, Log 26).
+- **[75]** Bürgerschaft der Freien und Hansestadt Hamburg, Drucksache 23/294 vom 13.05.2025, Schriftliche Kleine
+  Anfrage des Abgeordneten Sandro Kappe (CDU) vom 05.05.2025 und Antwort des Senats, „Stadtgrün, Klimaschutz und
+  nachhaltige Stadtentwicklung: Herausforderungen und Handlungsfelder in Hamburg“, Antwort zu Frage 11, S. 4: „Die
+  Pflanzkosten für Straßenbäume im Jahr 2024 lagen in Abhängigkeit von den jeweiligen Bedingungen am Pflanzort
+  zwischen 2.400 Euro und 5.600 Euro. Der Durchschnittswert liegt rechnerisch bei 3.636 Euro.“
+  https://www.buergerschaft-hh.de/parldok/dokument/90909/23_00294_stadtgruen_klimaschutz_und_nachhaltige_stadtentwicklung_herausforderungen_und_handlungsfelder_in_hamburg
+  (Abruf 29.09.2026; Permalink https://web.archive.org/web/20260929162654/https://www.buergerschaft-hh.de/parldok/dokument/90909/23_00294_stadtgruen_klimaschutz_und_nachhaltige_stadtentwicklung_herausforderungen_und_handlungsfelder_in_hamburg).
+  Pflanzung mit Anwuchspflege, Kosten der Stadtbaumwahl (§5, Kap. 7 `pollen.stadtbaum_kosten`).
+- **[76]** Bürgerschaft der Freien und Hansestadt Hamburg, Drucksache 23/5166 vom 08.09.2026, Schriftliche Kleine
+  Anfrage des Abgeordneten Sandro Kappe (CDU) vom 31.08.2026 und Antwort des Senats, „Umwelt-, Klima- und
+  Infrastrukturpolitik in Hamburg – Sachstände, Kosten und konkrete Umsetzung“, Antwort zu Frage 11, S. 6: „Die
+  durchschnittlichen Pflanzkosten für das Jahr 2025 betrugen 3.120 Euro. Pflanzung und Pflege werden nicht getrennt
+  ausgewiesen, siehe hierzu Drs. 22/339 beziehungsweise zuletzt Drs. 23/2662.“
+  https://www.buergerschaft-hh.de/parldok/dokument/105068/23_05166_umwelt_klima_und_infrastrukturpolitik_in_hamburg_sachstaende_kosten_und_konkrete_umsetzung
+  (Abruf 29.09.2026; Permalink https://web.archive.org/web/20260929162705/https://www.buergerschaft-hh.de/parldok/dokument/105068/23_05166_umwelt_klima_und_infrastrukturpolitik_in_hamburg_sachstaende_kosten_und_konkrete_umsetzung).
+- **[77]** Bürgerschaft der Freien und Hansestadt Hamburg, Drucksache 22/339 vom 23.06.2020, Große Anfrage der
+  Abgeordneten Sandro Kappe u. a. (CDU) und Fraktion vom 26.05.2020 und Antwort des Senats, „Die Pflicht kommt vor der
+  Kür – Wie viele gefällte Bäume wurden unter dem rot-grünen Senat in Hamburg nicht nachgepflanzt?“. Vorbemerkung,
+  S. 1: „Fällkosten werden im Rahmen der Pflege und Unterhaltung für öffentliche Flächen in den Bezirksämtern nicht
+  gesondert erhoben. In der Regel handelt es sich um große Ausschreibungen, die Baumpflege und Baumfällungen gemeinsam
+  enthalten.“ Antwort zu Fragen 5 und 6, S. 4: „In den Pflanzkosten ist die Fertigstellungs- und Entwicklungspflege
+  für in der Regel drei Jahre enthalten.“
+  https://www.buergerschaft-hh.de/parldok/dokument/70465/die_pflicht_kommt_vor_der_kuer_wie_viele_gefaellte_baeume_wurden_unter_dem_rot_gruenen_senat_in_hamburg_nicht_nachgepflanzt.pdf
+  (Abruf 29.09.2026; Permalink https://web.archive.org/web/20240706153940/https://www.buergerschaft-hh.de/parldok/dokument/70465/die_pflicht_kommt_vor_der_kuer_wie_viele_gefaellte_baeume_wurden_unter_dem_rot_gruenen_senat_in_hamburg_nicht_nachgepflanzt.pdf).
+- **[78]** Abgeordnetenhaus Berlin, Drucksache 19/13426, Schriftliche Anfrage des Abgeordneten Danny Freymark (CDU)
+  vom 28.09.2022 „Straßenbäume in Berlin“ und Antwort der Senatsverwaltung für Umwelt, Mobilität, Verbraucher- und
+  Klimaschutz vom 12.10.2022, Antwort zu 4, S. 6 (PDF-Seite 7): „Im Rahmen der Stadtbaumkampagne kostet derzeit eine
+  Straßenbaumpflanzung einschließlich einer rd. dreijährigen Entwicklungspflege etwa 3.000 Euro brutto (Ausschreibung
+  Herbst 2022).“ https://pardok.parlament-berlin.de/starweb/adis/citat/VT/19/SchrAnfr/S19-13426.pdf
+  (Abruf 29.09.2026; Permalink https://web.archive.org/web/20250719053309/https://pardok.parlament-berlin.de/starweb/adis/citat/VT/19/SchrAnfr/S19-13426.pdf).
+  Gegenprobe der Pflanzkosten für die Beispielkommune (§5).
+- **[79]** Leick Pflanzen & Gärten (Baumschule), Preisliste „gültig ab dem 14.02.2024“, Laubbäume, S. 26 f.
+  (PDF-Seiten 27 und 28): Preis je Stück nach Stammumfang in 1 m Höhe, 18–20 cm: Preisgruppe I 395,00 €,
+  II 455,00 €, III 485,00 €, IV 580,00 €; Betula pendula (Weißbirke) Preisgruppe I, Carpinus betulus (Hainbuche)
+  Preisgruppe II. Ob die Preise die Umsatzsteuer enthalten, nennt die Liste nicht.
+  https://www.leick.de/wp-content/uploads/2022/03/Preisliste_2022.pdf (Dateiname von 2022, Inhalt ab 14.02.2024;
+  Abruf 29.09.2026; Permalink der zitierten Fassung https://web.archive.org/web/20260929162721/https://www.leick.de/wp-content/uploads/2022/03/Preisliste_2022.pdf;
+  der ältere Wayback-Stand vom 27.11.2022 zeigt die Vorgängerliste). Mehrkosten der Artenwahl (§5).
 
 ## Entscheidungslog
 
