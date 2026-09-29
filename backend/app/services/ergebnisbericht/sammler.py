@@ -8,6 +8,7 @@ Gliederung).
 from __future__ import annotations
 
 import datetime as dt
+import glob
 import os
 import re
 from dataclasses import dataclass, field
@@ -46,6 +47,63 @@ class Stand:
                 f"Methodik {self.methodik} · Daten {self.daten}")
 
 
+@dataclass(frozen=True)
+class Anlage:
+    """Methodik-Bericht als Anlage des Ergebnisberichts (Teil 9, T-1420).
+
+    ``kennung`` hängt nur an der Nummer des Berichts (``M95``), nicht an der Reihenfolge: So
+    bleibt ein Verweis „Anlage M95“ in den Teilen 0 bis 8 gleich, wenn weitere Berichte dazukommen.
+    """
+    nr: int
+    titel: str
+    revision: str
+
+    @property
+    def kennung(self) -> str:
+        return anlage_kennung(self.nr)
+
+
+def anlage_kennung(nr: int | str) -> str:
+    return f"M{int(nr)}"
+
+
+# Verweis auf einen Methodik-Bericht im Text der Teile („Bericht #95 §3.5“, „Methodik-Bericht #95“).
+VERWEIS_METHODIK = re.compile(r"(?:Methodik-)?Bericht #(\d+)")
+
+
+def methodik_anlage(nr: int) -> Anlage:
+    """Titel und Revision des Methodik-Berichts ``nr`` aus Überschrift und Statuszeile.
+
+    Fehlt der Bericht oder seine Revision, bricht die Erzeugung ab: Ein Bericht, der auf eine
+    Methodenbeschreibung verweist, die er nicht beilegen kann, wird nicht erzeugt (harte Regel 4).
+    """
+    treffer = sorted(glob.glob(os.path.join(_METHODIK_DIR, f"{int(nr)}_*.md")))
+    if not treffer:
+        raise ValueError(f"Methodik-Bericht #{nr} fehlt; ohne ihn fehlt die Anlage in Teil 9")
+    with open(treffer[0], encoding="utf-8") as fh:
+        kopf = fh.read(4000)
+    ueberschrift = re.search(r"^# (.+)$", kopf, re.MULTILINE)
+    revision = re.search(r"Rev\. \d+(?:, Fortschreibung \d+)?", kopf)
+    if not ueberschrift or not revision:
+        raise ValueError(f"Methodik-Bericht #{nr}: Überschrift oder Revision in der Statuszeile fehlt")
+    titel = ueberschrift.group(1).split(" — ", 1)[-1].strip()
+    return Anlage(int(nr), titel, revision.group(0))
+
+
+def _anlagen(im_bericht: list[dict], parameter: list[dict]) -> list[Anlage]:
+    """Je in Euro bezifferter Klimawirkung ihr Methodik-Bericht, dazu jeder weitere Bericht, auf
+    den ein Parameter verweist (sonst zeigte ein Verweis in Teil 4 oder 7 ins Leere)."""
+    nummern: list[int] = []
+    for w in im_bericht:
+        if int(w["kwra_id"]) not in nummern:
+            nummern.append(int(w["kwra_id"]))
+    for p in parameter:
+        for m in VERWEIS_METHODIK.finditer(repr(p)):
+            if int(m.group(1)) not in nummern:
+                nummern.append(int(m.group(1)))
+    return [methodik_anlage(nr) for nr in nummern]
+
+
 @dataclass
 class Berichtsdaten:
     kommune: Beispielkommune
@@ -59,6 +117,8 @@ class Berichtsdaten:
     # Maßnahmenzeilen (Teil 6, ``massnahmen.massnahmenzeile``). Eine Beispielkommune rechnet
     # ohne Datenbank und hat keine angelegten Maßnahmen; Teil 6 sagt das dann ausdrücklich.
     massnahmen: list = field(default_factory=list)
+    # Methodik-Berichte als Anlagen (Teil 9); Verweise in den Teilen 0 bis 8 nennen ihre Kennung.
+    anlagen: list = field(default_factory=list)
 
     @property
     def beziffert_text(self) -> str:
@@ -108,11 +168,13 @@ def sammle(kommune: Beispielkommune, heute: dt.date | None = None) -> Berichtsda
     from app.services.ergebnisbericht.klima import klimazeilen
     from app.services.ergebnisbericht.raum import raumzeilen
 
+    parameter = _parameter_95()
     return Berichtsdaten(
         kommune=kommune, stand=stand, ergebnis95=ergebnis,
         klimawirkungen_katalog=len(kwra_ids),
         klimawirkungen_im_bericht=im_bericht,
-        parameter=_parameter_95(),
+        parameter=parameter,
         klima=klimazeilen(kommune, ergebnis, im_bericht),
         raum=raumzeilen(kommune),
+        anlagen=_anlagen(im_bericht, parameter),
     )
