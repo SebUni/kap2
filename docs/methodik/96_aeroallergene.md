@@ -55,8 +55,10 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Toleranz und Block der Allee-Zelle, Wertebereich 0 bis 1 für anteil_ersetzt (§5).
 > **Runde 27 (T-1635):** Befund 253 — Kosten der Stadtbaumwahl je Baum als Abschätzung von KAP3: 60 € bei
 > ohnehin fälliger Nachpflanzung, 4.436 € bei vorgezogenem Ersatz (Preisstand 2024; §5, Kap. 7 Abschnitt 7.1
-> `pollen.stadtbaum_kosten`, Quellen [75]–[79], VPI 2022 in [19]). Kein Basiswert und kein bestehender Wert in
-> Kapitel 7 geändert; der Betrag für Berlin bleibt.
+> `pollen.stadtbaum_kosten`, Quellen [75]–[82], VPI 2022 in [19]); Kapitel 7 führt damit 14 Blöcke. Herleitung der
+> Artenwahl (Linde statt Birke) und der Fällung, Amortisation der Nachpflanzung mit wachsender Krone (18 Jahre),
+> Abfrage des Falls im Produkt (Log 27). Kein Basiswert und kein bestehender Wert in Kapitel 7 geändert; der
+> Betrag für Berlin bleibt.
 > **Code-Stand (29.09.2026, Befund 245):** `POLLEN_EARLY_WARNING` führt `EXPECTED_ANNUAL_ALLERGY_DAYS` in
 > `linked_risk_codes` und rechnet mit `default_reduction` = 0,03 im Zelllauf (Modell `s158`, §5.1
 > „Produktstand“); die allergenarme Stadtbaumwahl rechnet als `LOW_ALLERGEN_TREE_SELECTION` im Zelllauf
@@ -1246,15 +1248,30 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
      Artenwahl**: der Preisunterschied zwischen der allergenarmen Art und der Art, die sonst gepflanzt
      würde, in gleicher Pflanzqualität. Die Preisliste einer Baumschule [79] (gültig ab 14.02.2024,
      Laubbäume S. 26 f.) ordnet Hochstämme mit 18–20 cm Stammumfang vier Preisgruppen zu: I 395 €,
-     II 455 €, III 485 €, IV 580 € je Stück. Die Birke steht in Gruppe I, die Hainbuche, auch
-     Birkengruppe, in Gruppe II. **Abschätzung von KAP3: 60 € je Baum (Preisstand 2024), Band 0–185 €.**
-     Der Punktwert ist der Schritt von Gruppe I zu Gruppe II, also eine Art der Gruppe II statt einer
-     Birke. 0 € gilt, wenn die allergenarme Art in derselben Preisgruppe steht wie die sonst gewählte
-     Art, 185 € für eine Art der Gruppe IV statt einer Birke. Das sind weniger als 2 % der Pflanzkosten
+     II 455 €, III 485 €, IV 580 € je Stück. Hergeleitet wird der Punktwert aus zwei Fragen:
+     *Welcher Baum wird ersetzt?* Ersetzt werden Bäume der Birkengruppe (Birke, Erle, Hasel, Hainbuche;
+     §3.3). Unter den Straßenbäumen ist das vor allem die Birke: In Berlin ist sie die einzige Gattung der
+     Gruppe unter den sieben Hauptgattungen, 12.209 von 432.769 Straßenbäumen (Stand 31.12.2021, [78],
+     Anlage); in Hannover mussten Straßenbirken „auffällig häufig“ gefällt werden, 66 Stück, „über 10 %
+     des Gesamtbestands“ ([82], S. 19). Die Hainbuche, in Hannover 4 % der Straßenbäume ([82], S. 9), und
+     die Baumhasel gehören ebenfalls zur Birkengruppe; sie sind Bäume, die ersetzt werden, keine
+     Ersatzarten. *Was wird stattdessen gepflanzt?* Am häufigsten die Linde: Sie ist die häufigste
+     Straßenbaumgattung Berlins (35 %, [78], Anlage) und in Hannover die häufigste Art unter den
+     1.054 jungen Straßenbäumen der Jahre 2023 und 2024 (184 Linden, [82], S. 10). Ihr allergenes
+     Potenzial ist niedrig: Winterlinde und Sommerlinde stehen bei Cariñanos u. a. [81], Tab. 3, auf „Low“,
+     ebenso die Robinie. [81] ist in [6] als Nr. 104 zitiert; [6] selbst nennt keine Arten, sondern
+     verweist auf die GALK-Liste der Zukunftsbäume und eine allergologische Liste (S. 100 f.). In [79]
+     stehen Birke (Betula pendula) in Gruppe I, Hainbuche und Baumhasel in Gruppe II, Winterlinde
+     ‚Greenspire‘, Sommerlinde und Robinie ‚Frisia‘ in Gruppe II, die Kugelakazie (Robinia
+     ‚Umbraculifera‘) in Gruppe I. **Abschätzung von KAP3: 60 € je Baum (Preisstand 2024), Band 0–185 €.**
+     Der Punktwert ist der typische Fall, eine Linde statt einer Birke: 455 € − 395 € = 60 €. 0 € gilt,
+     wenn eine Linde eine Hainbuche oder Baumhasel ersetzt (beide Gruppe II) oder eine Kugelakazie eine
+     Birke (beide Gruppe I); 185 € gilt, wenn statt einer Birke aus anderen Gründen eine Sorte der
+     teuersten Gruppe IV gewählt wird (580 € − 395 €). Das sind weniger als 2 % der Pflanzkosten
      unten. Die Pflege des angewachsenen Baums setzt der Bericht für beide Arten gleich an, weil keine
-     Quelle einen Unterschied belegt; das ist eine Modellgrenze der Abschätzung. Die Art wählt die
-     Kommune nach der GALK-Liste der Zukunftsbäume und der allergologischen Liste ([6], S. 100 f.);
-     welche Art allergenarm ist, legt diese Abschätzung nicht fest.
+     Quelle einen Unterschied belegt; das ist eine Grenze der Abschätzung. Welche Art allergenarm ist,
+     bewerten die Listen nicht einheitlich; [81] nennt die Linde, und die Abschätzung legt die Art der
+     Kommune nicht fest.
   2. **Vorgezogener Ersatz:** Ein gesunder allergener Baum wird gefällt, um ihn früher zu ersetzen. Dann
      trägt die Maßnahme alles, Fällung, Pflanzung und Anwuchspflege.
      **Pflanzung mit dreijähriger Anwuchspflege: 3.636 € je Baum (Preisstand 2024), Band 2.400–5.600 €.**
@@ -1265,37 +1282,77 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
      Entwicklungspflege (Ausschreibung Herbst 2022) [78], mit dem VPI [19] auf 2024 gerechnet
      3.000 € × 119,3 / 110,2 = 3.248 €, im Band. Hamburg 2025: 3.120 € im Mittel [76].
      **Fällung: Abschätzung von KAP3, 800 € je Baum (Preisstand 2024), Band 400–1.600 €**, mit
-     Verkehrssicherung, Abfuhr und Fräsen des Stubbens. Eine amtliche Zahl gibt es nicht: Hamburg
-     erhebt Fällkosten nicht gesondert, sie stecken in großen Ausschreibungen zusammen mit der
-     Baumpflege ([77], S. 1). Das untere Bandende gilt für einen kleinen Baum im Sammelauftrag, das
-     obere für einen großen Baum an der Fahrbahn mit Hubarbeitsbühne und Sperrung.
+     Verkehrssicherung, Abfuhr und Fräsen des Stubbens. Eine amtliche oder verbandliche Zahl je Baum gibt
+     es nicht: Hamburg erhebt Fällkosten nicht gesondert, sie stecken in großen Ausschreibungen zusammen
+     mit der Baumpflege ([77], S. 1). Durchsucht, ohne Fällkosten je Baum, wurden außerdem [75], [76],
+     [78] und [82], die Seite des Bezirksamts Spandau zu Gehwegüberfahrten (Fällkosten nur als Posten
+     des Leistungsbescheids), die Gebührenseite der Stadt Köln zur Fällung städtischer Bäume (nur
+     Genehmigungsgebühren) und die EU-Bekanntmachung eines Berliner Rahmenvertrags über Baumpflege und
+     Fällung (kein Preis je Baum); Adressen in Befund 253. Die Bandenden sind deshalb aus den
+     Arbeitsschritten gesetzt: 400 € für einen kleinen Baum im Sammelauftrag, ohne Hubarbeitsbühne und
+     ohne eigene Sperrung, 1.600 € für einen großen Baum an der Fahrbahn, abgetragen von der
+     Hubarbeitsbühne, mit Sperrung und Fräsen des Stubbens. Der Punktwert ist das geometrische Mittel
+     der Bandenden, √(400 × 1.600) = 800 €: Das Band spannt den Faktor 4, und 800 € liegen von beiden
+     Enden um den Faktor 2 entfernt. Das arithmetische Mittel, 1.000 €, läge ungleich näher am oberen
+     Ende (Faktor 1,6) als am unteren (Faktor 2,5). Die Fällung wirkt nur auf den vorgezogenen Ersatz,
+     um −9 … +18 % über ihr Band; auf die Nachpflanzung ohnehin wirkt sie nicht.
      **Zusammen: 4.436 € je Baum (Preisstand 2024), Band 2.800–7.200 €.** Die Bandenden sind addiert,
      gelten also für beide Enden zugleich. Die Fällung macht 18 % des Punktwerts aus.
 
   **Rechenbeispiel Allee-Zelle.** Die Pflanzung oben senkt den Kronenanteil der 100-m-Zelle
   (10.000 m²) um 0,078, also um 781 m² Kronenfläche. Das Produkt setzt für OSM-Bäume ohne Angabe
   einen Kronendurchmesser von 8 m an (`backend/app/services/climate/heat/osm_data.py`), also 50,3 m²
-  Krone je Baum; 781 ÷ 50,3 ≈ 15,5, das sind 16 Bäume. Vorgezogen ersetzt kosten sie
-  16 × 4.436 € ≈ 71.000 € einmalig (Band 44.800–115.200 €), bei ohnehin fälliger Nachpflanzung
-  16 × 60 € = 960 € (Band 0–2.960 €). Dem stehen 163 € vermiedene Behandlungskosten je Jahr gegenüber
-  (Band über λ 70–233 €). Ohne Zins gerechnet deckt der Nutzen die Mehrkosten der Nachpflanzung in
-  rund sechs Jahren, den vorgezogenen Ersatz in über 400 Jahren. Über die Pollenallergie allein trägt
-  sich also die Artenwahl bei ohnehin fälliger Nachpflanzung; ein vorgezogener Ersatz braucht andere
-  Gründe. **Stärkster Treiber** ist der Fall, nicht das Band: Der vorgezogene Ersatz kostet das
-  74-Fache der Artenwahl. Innerhalb des vorgezogenen Ersatzes treiben die Pflanzkosten am Standort
-  (−28 … +44 % über ihr Band), die Fällung bewegt −9 … +18 %.
+  Krone je Baum; 781 ÷ 50,3 ≈ 15,5, das sind 16 Bäume. Der Nutzen der Pflanzung oben beträgt 163 €
+  vermiedene Behandlungskosten je Jahr (Band über λ 70–233 €), solange die Kronen der sonst stehenden
+  Birken voll ausgebildet sind.
+  - *Vorgezogener Ersatz:* 16 × 4.436 € ≈ 71.000 € einmalig (Band 44.800–115.200 €). Die gefällten
+    Birken sind ausgewachsen, der Nutzen gilt also vom ersten Jahr an. Ohne Zins deckt er die Kosten
+    erst nach über 400 Jahren. Über die Pollenallergie allein trägt sich ein vorgezogener Ersatz nicht,
+    er braucht andere Gründe.
+  - *Nachpflanzung ohnehin:* 16 × 60 € = 960 € (Band 0–2.960 €). Verglichen wird hier mit jungen Birken,
+    die sonst gepflanzt würden. Ihre Kronen wachsen erst heran, so lange ist auch der Nutzen kleiner.
+    Gerechnet ist das mit dem Kronenwachstum junger Straßenlinden in Reihen nach Larsen und
+    Kristoffersen [80], Tab. 3: Kronenradius = 0,1358 × Alter − 0,0008 × Alter² (Meter, Jahre); ein
+    Baum mit 18–20 cm Stammumfang ist bei der Pflanzung rund 10 Jahre alt ([80], S. 209). Der Radius
+    wächst so von 1,28 m bei der Pflanzung auf 4 m, also die 8 m Kronendurchmesser des Produkts, nach
+    28 Jahren. Der Nutzen je Jahr ist 163 € × (Radius ÷ 4 m)², höchstens 163 €: im 1. Jahr 20 €, im
+    10. Jahr 58 €, im 20. Jahr 115 €. Aufsummiert sind die 960 € nach **18 Jahren** gedeckt. Mit voller
+    Krone ab dem ersten Jahr wären es 6 Jahre; diese einfachere Rechnung zeigte die Amortisation also
+    dreimal zu früh. Band: 15 Jahre (λ = 1,0) bis 27 Jahre (λ = 0,3); mit 185 € je Baum 32 Jahre, mit
+    185 € je Baum und λ = 0,3 zusammen 56 Jahre. *Über die Lebensdauer:* Ein Berliner Straßenbaum steht
+    rechnerisch im Mittel rund 69 Jahre (Bestand ÷ Fällungen je Jahr: 432.769 Straßenbäume ÷ 6.269
+    Fällungen im Jahr 2021, [78], Anlage). In
+    69 Jahren summiert sich der Nutzen auf 9.085 €, das 9,5-Fache der 960 €; am ungünstigen Rand
+    (185 € je Baum, λ = 0,3) auf 3.905 € gegen 2.960 €. Birken stehen kürzer als der Durchschnitt
+    (Hannover, oben). Würden die sonst gepflanzten Birken alle 20 Jahre neu gepflanzt, begänne ihr
+    Kronenwachstum jedes Mal von vorn: Die Amortisation bliebe bei 18 Jahren, der Nutzen über 69 Jahre
+    sänke auf 4.121 €, das 4,3-Fache; am ungünstigen Rand auf 1.771 € gegen 2.960 €, dort trüge sich
+    die Artenwahl nicht. Am Punktwert trägt sich die Artenwahl bei ohnehin fälliger Nachpflanzung also
+    über die Lebensdauer des Baums, am ungünstigen Rand nur bei langer Standzeit der sonst gepflanzten
+    Birken. Für die Birke selbst liefert [80] keine Kurve. Wächst eine junge Birke schneller als eine
+    Linde, käme der Nutzen früher, und die 18 Jahre sind eine Obergrenze; wächst sie langsamer, käme er
+    später. Blüte zählt die Ebene nicht, nur Kronenfläche (§3.3). Blühte eine junge Birke erst fünf Jahre nach der Pflanzung, verschöbe sich die
+    Amortisation von 18 auf 19 Jahre, nach zehn Jahren auf 21 Jahre.
+
+  **Stärkster Treiber** ist der Fall, nicht das Band: Der vorgezogene Ersatz kostet das 74-Fache der
+  Artenwahl. Innerhalb des vorgezogenen Ersatzes treiben die Pflanzkosten am Standort (−28 … +44 % über
+  ihr Band), die Fällung bewegt −9 … +18 %.
   **Was die einfachere Rechnung verfälschen würde:** Rechnete man für jeden ersetzten Baum die vollen
   4.436 €, erschiene die Artenwahl bei einer ohnehin fälligen Nachpflanzung 74-mal so teuer, wie sie
-  ist; rechnete man immer nur 60 €, erschiene ein vorgezogener Ersatz fast kostenlos. Zwei
-  Vereinfachungen bleiben und sind benannt. Dass ein vorgezogen gefällter Baum später ohnehin ersetzt
-  worden wäre, rechnet der Bericht nicht gegen; für alte Bäume sind 4.436 € deshalb eine Obergrenze.
-  Bei der Nachpflanzung wirkt die Maßnahme erst, wenn der alte Baum fällt, und die junge Krone ist
-  kleiner; als Anteil \(a\) gibt die Kommune deshalb nur die Kronen an, die im betrachteten Zeitraum
-  ersetzt werden. Ob die Baumschulliste [79] die Umsatzsteuer enthält, sagt sie nicht (gelesen:
-  Titelseite, Inhalt, Laubbäume S. 26 f.); an 60 € macht das höchstens 11 € aus.
-  **Im Produkt** führt die Katalogmaßnahme heute keine Kosten (Befund 253); die Übernahme Ü-11 setzt
-  4.436 € je Baum als Vorgabe und 60 € je Baum als Wert für die Nachpflanzung, die Zahl der Bäume gibt
-  die Kommune ein.
+  ist; rechnete man immer nur 60 €, erschiene ein vorgezogener Ersatz fast kostenlos. Rechnete man bei
+  der Nachpflanzung mit voller Krone ab dem ersten Jahr, erschiene die Amortisation nach 6 statt nach
+  18 Jahren. Eine Vereinfachung bleibt und ist benannt: Dass ein vorgezogen gefällter Baum später
+  ohnehin ersetzt worden wäre, rechnet der Bericht nicht gegen; für alte Bäume sind 4.436 € deshalb eine
+  Obergrenze. Bei der Nachpflanzung wirkt die Maßnahme erst, wenn der alte Baum fällt; als Anteil
+  \(a\) gibt die Kommune deshalb nur die Kronen an, die im betrachteten Zeitraum ersetzt werden. Ob die
+  Baumschulliste [79] die Umsatzsteuer enthält, sagt sie nicht (gelesen: Titelseite, Inhalt,
+  Laubbäume S. 26 f.); an 60 € macht das höchstens 11 € aus.
+  **Im Produkt** führt die Katalogmaßnahme heute keine Kosten (Befund 253). Nach der Übernahme Ü-11
+  fragt das Produkt den Fall ab, Nachpflanzung ohnehin oder vorgezogener Ersatz, und rechnet mit 60 €
+  oder 4.436 € je Baum; die Zahl der Bäume gibt die Kommune ein. Ohne Angabe des Falls zeigt es beide
+  Beträge nebeneinander und keine Kosten-Nutzen-Kennzahl, eine stille Vorgabe auf einen der beiden Fälle
+  gibt es nicht. Im Fall der Nachpflanzung sagt es dazu, dass der Nutzen je Jahr erst mit voller Krone
+  gilt (Amortisation am Punktwert nach 18 Jahren).
 
 ```python test: beispiel_96_stadtbaum_kosten
 import math
@@ -1325,8 +1382,48 @@ assert baeume * vor == 70_976 and (baeume * vor_band[0], baeume * vor_band[1]) =
 assert baeume * nach == 960 and baeume * nach_band[1] == 2_960
 nutzen, nutzen_band = 163, (11.3 * 6.20, 37.6 * 6.20)   # Allee-Zelle, EUR je Jahr, Band ueber lambda
 assert round(nutzen_band[0]) == 70 and round(nutzen_band[1]) == 233
-assert round(baeume * nach / nutzen, 1) == 5.9 and baeume * vor / nutzen > 400
+assert baeume * vor / nutzen > 400                      # vorgezogen: volle Krone ab dem ersten Jahr
+assert round(baeume * nach / nutzen, 1) == 5.9          # Nachpflanzung mit voller Krone ab Jahr 1 (zu frueh)
 assert 0.19 * nach < 11.5                               # Umsatzsteuer an der Differenz hoechstens 11 EUR
+# Punktwert der Artenwahl: Linde (II) statt Birke (I) [79]; Birke 12.209 von 432.769 Strassenbaeumen [78]
+assert preis["II"] - preis["I"] == nach and round(151_764 / 432_769, 2) == 0.35   # Linde 35 % in Berlin [78]
+# Nachpflanzung: Krone der sonst gepflanzten Birke waechst (Linden-Kurve [80], Tab. 3, Reihen)
+def radius(alter):
+    return 0.1358 * alter - 0.0008 * alter ** 2
+
+
+def nutzen_jahr(t, voll=nutzen):                         # t = Jahre nach der Pflanzung, Alter bei Pflanzung 10
+    return voll * min(1.0, (radius(10 + t) / 4) ** 2)
+
+
+def amortisation(kosten, voll=nutzen, start=1, zyklus=None):
+    summe = 0.0
+    for t in range(1, 500):
+        tt = t if zyklus is None else (t - 1) % zyklus + 1
+        if tt >= start:
+            summe += nutzen_jahr(tt, voll)
+        if summe >= kosten:
+            return t
+
+
+assert abs(radius(10) - 1.28) < 0.005 and radius(38) >= 4 > radius(37)   # volle Krone nach 28 Jahren
+assert round(nutzen_jahr(1)) == 20 and round(nutzen_jahr(10)) == 58 and round(nutzen_jahr(20)) == 115
+assert amortisation(baeume * nach) == 18                # statt 6 mit voller Krone ab Jahr 1
+assert amortisation(baeume * nach, nutzen_band[1]) == 15 and amortisation(baeume * nach, nutzen_band[0]) == 27
+assert amortisation(baeume * nach_band[1]) == 32 and amortisation(baeume * nach_band[1], nutzen_band[0]) == 56
+standzeit = 432_769 / 6_269                              # Berlin 2021: Bestand / Faellungen [78]
+assert round(standzeit) == 69
+summe69 = sum(nutzen_jahr(t) for t in range(1, 70))
+assert round(summe69) == 9_085 and round(summe69 / (baeume * nach), 1) == 9.5
+assert round(sum(nutzen_jahr(t, nutzen_band[0]) for t in range(1, 70))) == 3_905
+kette = sum(nutzen_jahr((t - 1) % 20 + 1) for t in range(1, 70))            # Birken alle 20 Jahre neu
+assert round(kette) == 4_121 and round(kette / (baeume * nach), 1) == 4.3
+assert amortisation(baeume * nach, zyklus=20) == 18
+assert round(sum(nutzen_jahr((t - 1) % 20 + 1, nutzen_band[0]) for t in range(1, 70))) == 1_771
+assert amortisation(baeume * nach, start=6) == 19 and amortisation(baeume * nach, start=11) == 21   # Bluete spaeter
+# Faellung: geometrisches Mittel der Bandenden
+assert math.sqrt(faell_band[0] * faell_band[1]) == faell
+assert round(1_000 / faell_band[0], 1) == 2.5 and round(faell_band[1] / 1_000, 1) == 1.6
 ```
 
   **Zusammen mit S158:** Die Stadtbaumwahl wirkt auf die Quelle (\(\hat P\)), die Frühwarnung auf
@@ -2092,21 +2189,26 @@ parameter:
 Die Blöcke oben tragen die Rechnung vom Klimasignal bis zum Euro-Betrag und die Wirkung der Maßnahmen. Der
 Block hier trägt nur die Kosten einer Maßnahme: Er ändert weder den Schadensbetrag von #96 noch die vermiedenen
 Tage, sondern nur die Wirtschaftlichkeit im Maßnahmen-Modul (§5, Absatz „Kosten der Stadtbaumwahl“, Befund 253).
+Mit ihm führt Kapitel 7 14 Blöcke (Log 25, Log 27).
 
 ```yaml
 parameter:
   # Kosten der Stadtbaumwahl je ersetztem Baum (Vorgabe P2, Befund 253). Katalog
   # LOW_ALLERGEN_TREE_SELECTION, Kostenfeld je Stueck (Uebernahme Ue-11).
   # vorgezogen = Pflanzung mit dreijaehriger Anwuchspflege 3.636 (Hamburg 2024 [75],
-  # Band 2.400-5.600) + Faellung 800 (Abschaetzung von KAP3, Band 400-1.600);
-  # nachpflanzung = Mehrkosten der Artenwahl, Preisgruppe II - I = 455 - 395 [79]
-  # (Band 0 bis IV - I = 185). Herleitung §5 #stadtbaum-kosten.
+  # Band 2.400-5.600) + Faellung 800 (Abschaetzung von KAP3: geometrisches Mittel des
+  # Bands 400-1.600, Bandenden aus den Arbeitsschritten, keine Kostenquelle je Baum);
+  # nachpflanzung = Mehrkosten der Artenwahl im typischen Fall Linde statt Birke,
+  # Preisgruppe II - I = 455 - 395 [79] (Birke meistgefaellt [78], [82]; Linde meistgepflanzt
+  # [78], [82], allergen "Low" [81]); Band 0 (Linde statt Hainbuche, beide II) bis
+  # IV - I = 185. Das Produkt fragt den Fall ab, keine stille Vorgabe (Ue-11).
+  # Herleitung §5 #stadtbaum-kosten, Log 27.
   id: pollen.stadtbaum_kosten
   wert: {vorgezogen: 4436, nachpflanzung: 60}
   einheit: "EUR/Baum"
   band: {vorgezogen: [2800, 7200], nachpflanzung: [0, 185]}   # Bandenden addiert (vorgezogen)
   herkunft: herleitung:#stadtbaum-kosten
-  quelle: hamburg_drs23_294_leick2024   # Pflanzkosten [75], Preisgruppen [79]; Faellung ohne Quelle
+  quelle: hamburg_drs23_294_leick2024   # Pflanzkosten [75], Preisgruppen [79], Arten [78], [81], [82]; Faellung ohne Quelle
   preisstand: "2024"
   bandzuordnung: null   # Kosten der Kommune, keine Altersbaender
   endpunkt: null        # kein Endpunkt: wirkt nicht auf Tage oder Schadensbetrag
@@ -2114,7 +2216,7 @@ parameter:
   abgeleitet_aus: []
 ```
 
-## 8 Quellen (§3.8 — #96-relevanter Auszug; Nummern [1]–[56] = M0-Zählung, [65]–[79] neu)
+## 8 Quellen (§3.8 — #96-relevanter Auszug; Nummern [1]–[56] = M0-Zählung, [65]–[82] neu)
 
 Zugriff 17./18.08.2026 ([1]–[3], [65], [66]: 30.08.2026, Volltext/Abstract gegengelesen). Nennt ein Eintrag ein
 eigenes Abrufdatum, gilt dieses.
@@ -2330,7 +2432,12 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   Straßenbaumpflanzung einschließlich einer rd. dreijährigen Entwicklungspflege etwa 3.000 Euro brutto (Ausschreibung
   Herbst 2022).“ https://pardok.parlament-berlin.de/starweb/adis/citat/VT/19/SchrAnfr/S19-13426.pdf
   (Abruf 29.09.2026; Permalink https://web.archive.org/web/20250719053309/https://pardok.parlament-berlin.de/starweb/adis/citat/VT/19/SchrAnfr/S19-13426.pdf).
-  Gegenprobe der Pflanzkosten für die Beispielkommune (§5).
+  Gegenprobe der Pflanzkosten für die Beispielkommune (§5). Anlagen (GRIS-Auszüge der Senatsverwaltung):
+  „Bestandsveränderung in Berlin und den Bezirken einschl. Zu- und Abgänge 2021“, Stand 31.12.2021, PDF-Seite 17,
+  Zeile Berlin gesamt: Bestand 01.01. 430.358, Neupflanzungen 2.972, Fällungen 6.269, Bestand 31.12. 432.769;
+  „Bestand nach Hauptgattungen in den Berliner Bezirken“, Stand 31.12.2021, PDF-Seite 24, Zeile Berlin gesamt:
+  Linde 151.764 (35 %), Ahorn 87.341, Eiche 38.700, Platane 24.737, Kastanie 20.380, Birke 12.209, Robinie
+  10.802. Mittlere Standzeit und Artenwahl der Stadtbaumwahl (§5).
 - **[79]** Leick Pflanzen & Gärten (Baumschule), Preisliste „gültig ab dem 14.02.2024“, Laubbäume, S. 26 f.
   (PDF-Seiten 27 und 28): Preis je Stück nach Stammumfang in 1 m Höhe, 18–20 cm: Preisgruppe I 395,00 €,
   II 455,00 €, III 485,00 €, IV 580,00 €; Betula pendula (Weißbirke) Preisgruppe I, Carpinus betulus (Hainbuche)
@@ -2338,6 +2445,32 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   https://www.leick.de/wp-content/uploads/2022/03/Preisliste_2022.pdf (Dateiname von 2022, Inhalt ab 14.02.2024;
   Abruf 29.09.2026; Permalink der zitierten Fassung https://web.archive.org/web/20260929162721/https://www.leick.de/wp-content/uploads/2022/03/Preisliste_2022.pdf;
   der ältere Wayback-Stand vom 27.11.2022 zeigt die Vorgängerliste). Mehrkosten der Artenwahl (§5).
+- **[80]** F. K. Larsen, P. Kristoffersen, „Tilia’s Physical Dimensions Over Time“, Journal of Arboriculture
+  28(5):209–214, 2002. doi:10.48044/jauf.2002.031. S. 209, Materials and Methods: „If tree size at the time of
+  establishment was not known, then 10 years, which corresponds to a trunk circumference of 18 to 20 cm (7 to 8 in.),
+  was added to the age.“ S. 211, Table 3, Growth formulas: „Crown radius, shaded 0.1358 –0.0008“ (b1, b2; Linden in
+  Reihen in Kopenhagen, n = 463, r² = 0,9356). Die Formel ist nach dem Methodenteil Y = b1 × d + b2 × d² mit
+  d = Alter; die Fußnote von Table 3 („Y = b1 + b2d²“) lässt das erste d aus, Table 2 (Wachstumsraten
+  b1 + 2 × b2 × d: 0,1358 und −0,0016) bestätigt die Lesart. https://auf.isa-arbor.com/content/isa/28/5/209.full.pdf
+  (Abruf 29.09.2026; Permalink https://web.archive.org/web/20260425090058/https://auf.isa-arbor.com/content/isa/28/5/209.full.pdf).
+  Kronenwachstum für die Amortisation der Nachpflanzung (§5).
+- **[81]** P. Cariñanos, F. Grilo, P. Pinho u. a., „Estimation of the Allergenic Potential of Urban Trees and Urban
+  Parks: Towards the Healthy Design of Urban Green Spaces of the Future“, Int J Environ Res Public Health
+  16(8):1357, 2019. doi:10.3390/ijerph16081357 (PMC6517926; in [6] als Nr. 104 zitiert). Table 3 „Attributes,
+  origin, allergenicity and hardiness zones of the 20 most-frequent species in Mediterranean parks“, Spalte
+  Allergenicity Level: „Tilia cordata … Low“, „Tilia platyphyllos … Low“, „Robinia pseudoacacia … Low“,
+  „Acer campestre … Moderate“. https://www.mdpi.com/1660-4601/16/8/1357 (Abruf des Volltexts 29.09.2026 über
+  Europe PMC, https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6517926/fullTextXML; Permalink
+  https://web.archive.org/web/20260425042213/https://www.mdpi.com/1660-4601/16/8/1357). Lizenz CC BY 4.0.
+  Allergenes Potenzial der Ersatzarten (§5).
+- **[82]** Landeshauptstadt Hannover, „Stadtbäume der Landeshauptstadt Hannover. Jahresbericht 2023/2024“, Anlage 1
+  zu einer Drucksache, Sachgebiet 67.33, Stand 12.11.2025. S. 9, Abb. 10 „Anteile der Haupt-Straßenbaumarten 2024“
+  (Hainbuche 4 %, Linde 24 %, Eiche 22 %); S. 10: „Von den in den letzten beiden Jahren neu gepflanzten 1.054 jungen
+  Straßenbäumen waren 184 Linden“; S. 19, Fällungen: „Bei den Straßenbäumen mussten auffällig häufig Birken
+  (66 Stück = über 10 % des Gesamtbestands) gefällt werden“.
+  https://www.hannover.de/content/download/1059971/file/Jahresbericht%20Stadtb%C3%A4ume%202023-2024%20Anlage.pdf
+  (Abruf 29.09.2026; Permalink https://web.archive.org/web/20260515080623/https://www.hannover.de/content/download/1059971/file/Jahresbericht%20Stadtb%C3%A4ume%202023-2024%20Anlage.pdf).
+  Welche Bäume ersetzt und welche gepflanzt werden (§5).
 
 ## Entscheidungslog
 
@@ -2355,6 +2488,8 @@ allergenarme Stadtbaumwahl als Abschätzung je Zelle (Ledger-Befunde 156–167).
 168–181).
 **Eintrag 26: Rev. 4 (26.09.2026, T-1362)** — Bezugswert Ḡ₀ im Ausgangsstand festgehalten;
 bewusste Überstimmung von Eintrag 19 (Ledger-Befund 182).
+**Eintrag 27: Runde 27 (29.09.2026, T-1635)** — Kosten der Stadtbaumwahl nach Vorgabe P2 (Ledger-Befund 253);
+Vermerk an Eintrag 25 zur Zahl der Blöcke.
 **Überstimmungsweg für alle Einträge:** „Entscheidung Nr. X ändern auf …" → Delta-Lauf
 (Neurechnung betroffener Kopplungen + Re-Review + PDF-Neuexport). ⚠ = Ermessensfall.
 
@@ -2384,5 +2519,6 @@ bewusste Überstimmung von Eintrag 19 (Ledger-Befund 182).
 | 22 | Quelle von u20 für die Beispielkommune Berlin in der Rechenkette? | **Direkt aus Tab. 12411-09-01-4-B [68]**: u20 = unter 5 + 5–10 + 10–15 + 15–20 = 673.277, 20–64 = u65 − u20 = 2.288.153; die Zahlen nach Altersjahren stehen gleichlautend in Destatis Tab. 12411-09 [69] | Die Tabelle, aus der Ebene 1 schon u65 und die Seniorenbänder nimmt, führt die vier Gruppen selbst: gleicher Stichtag, gleiche Basis Zensus 2022, und ein Sachbearbeiter, der [68] öffnet, kommt auf dieselbe Zahl. | Anteil u20 aus dem Berliner Landesbericht A I 3 – j / 23 (verworfen: noch auf Basis Zensus 2011, 3.070.537 statt 2.961.430 unter 65-Jährige = 673.277 + 2.288.153 nach §3.0 Ebene 1, Mischung zweier Basen; Runde 0 des Managers) · Bundesanteil 24,07 % (verworfen; Rückfall des Produkts; für Berlin 1.737 Betroffene oder 0,43 % zu wenig, §3.0) | u20 673.277 (§3.0 Ebene 1) statt 677.877 im ersten Entwurf; Betroffene 402.103, Tage 755.753, bewerteter Schaden 4,69 Mio. € je Jahr (§3.0) |
 | 23 ⚠ | S158: an welchen Tagen und ab welcher Belastung wirkt die Warnung, und gilt \(e_{\text{Tag}}\) je gewarntem Tag? | **Nur an gewarnten Tagen:** DWD-Pollenflug-Gefahrenindex mindestens „mittel“ [70], je Pollengruppe; Anteil gewarnter Symptom-Zusatztage \(t_{\text{warn}}\) = 0,75 (0,50–1,00, §3.9 ABGESCHÄTZT; eigenes Zeichen, weil \(w_B\) das Ĝ-Gewicht ist; Ersetzungspfad \(\min(1;\ m_{g,V}/f)\), nie \(m_{g,V}\) direkt); \(r_{\text{S158}}\) = 0,03 gilt je gewarntem Tag, Formel zellscharf im Zelllauf mit Geltungsbereich \(A_{\text{Zelle}}\) (§5.1) | Die Anker von \(e_{\text{Tag}}\) beschreiben die Minderung an einem Tag, an dem gehandelt wird, also an einem gewarnten Tag; Rev. 3 hat sie auf alle Zusatztage gerechnet und damit \(t_{\text{warn}} = 1\) unterstellt. Befund 124 verbietet eine Wirkung auf alle Tage pauschal. Mit der Tagesauswahl wirkt jede Größe genau einmal (Tage, Menschen, Tageswirkung) | \(e_{\text{Tag}}\) als Mittel über alle Zusatztage lesen und \(t_{\text{warn}}\) weglassen (verworfen: widerspricht den eigenen Ankern, Befund 124 bliebe verletzt) · \(e_{\text{Tag}}\) durch \(t_{\text{warn}}\) teilen, damit der wirksame Wert gleich bleibt (verworfen: hebt die Wirkung am gewarnten Tag ohne Beleg an) · Schwelle „hoch“ (verworfen als Basiswert: steckt im unteren Band von \(t_{\text{warn}}\)) · DWD-Anteil aller Tage \(m_{g,V}\) direkt einsetzen (verworfen: wählt die Tage über \(f\) und \(m\) zweimal aus und verdünnt um den Faktor \(f\); Befund 162) | wirksamer Wert über alle Zusatztage 0,03 → 0,03 × 0,75 = 0,0225 (0,028 ist nur das Kettenprodukt vor dem Runden); heute zahlengleich mit einem Faktor 0,0225 auf die Zusatztage im Geltungsbereich, geändert ist der Wert, nicht die Verteilung; Berlin 17.004 statt 22.673 vermiedene Tage, ≈ 105.400 statt ≈ 140.600 € je Jahr (§5.1); Kapitel 7: `pollen.r_s158` unverändert, `pollen.t_warn_s158` neu; Ledger-Befunde 156, 157, 161, 162, 163, 165, 167 (DWD-Gebiet \(V\) statt \(R\)) |
 | 24 | Allergenarme Stadtbaumwahl: Wirkung abschätzen oder verwerfen (P2)? | (Die Aussagen zur gleichbleibenden Kommunensumme sind durch Log 26 überholt: Mit festgehaltenem Ḡ₀ sinkt die Summe, Rechenbeispiel §5.) **Abschätzen, zellscharf über \(\hat G\):** −0,14 auf \(\hat P\) je Senkung von \(\hat G/\bar G_0\) um 0,2 (Band 0,06–0,20 über λ; Eingabe ist die Änderung des Kronenanteils, abgezogen im Term, in dem die Kronen im Ausgangsstand stehen, Kronen ohne Gattungs-Tag nur mit 0,12, Befunde 186, 195); Berliner Allee-Zelle mit 100 Betroffenen −26,3 Tage und ≈ 163 € je Jahr (Band −11,3 bis −37,6 Tage, §5); ursprünglich war die gleichbleibende Kommunensumme als Modellgrenze der Abschätzung gesetzt, seit Log 26 senkt die Maßnahme die Summe (Modellgrenze 7) | P2 geht Methodik-Regeln vor; die Wirkung je Zelle ist mechanisch aus \(\hat P\) ableitbar und im Bericht mit Zahl, Band und Sensitivität abgeschätzt; die Summe der Kommune sinkt am festgehaltenen Ḡ₀ mit (Log 26), eine Nullwirkung ist nicht gesetzt. Im Produkt rechnet sie seit dem 27.09.2026 als Katalogmaßnahme im Zelllauf nach der Integrationsauflage (Stadtbaumwahl) in §5 (Produktstand dort, Befund 230). Die ursprüngliche Begründung (Summe der Kommune per Zentrierung gleichbleibend nach Log 18/19, flächige Wirkung gesperrt) ist durch Log 26 überholt; Befund 124 sperrt nur den pauschalen Faktor, gerechnet wird im Zelllauf über Ĝ′ | mit einem Satz verwerfen (verworfen: die Wirkung je Zelle ist ableitbar, eine Verwerfung ließe sie ohne Zahl) · eigenen Parameter für eine flächige Wirkung schätzen (ursprünglich verworfen mit der λ-Evidenz aus Messungen innerhalb einer Stadt; seit Log 26 läuft die flächige Wirkung über λ am festgehaltenen Ḡ₀, ein zweiter Parameter bleibt verworfen, Log 26) | keine Wirkung auf den Schadenswert im Ausgangsstand, mit Maßnahme sinkt er (Log 26); der Satz, die Umverteilung senke den kommunalen Ausweis, ist ersetzt (Ledger-Befund 158); die P2-Begründung stützt sich nicht mehr auf eine Produktanzeige (Ledger-Befund 164) |
-| 25 | Kennzeichnung der Parameter-Blöcke (Aufgabe §4): welcher Wert je Block, und wo trägt ein Block ein Feld `rolle`? | **13 von 13 gekennzeichnet (Kapitel 7):** `quelle` für \(\Delta S\), \(a_{\text{attr}}\), \(p_{\text{AR}}\), \(c_{\text{jahr}}\); `abschaetzung_kap3` für \(p_B/p_G\), \(L\), \(f\), \(\lambda\), \(s_{\text{unbek}}\), \(r_{\text{S158}}\), \(t_{\text{warn}}\) (Herleitung je Block im Kommentar); `berechnet` für \(d_{\text{Saison}}\) (aus f, p_sens, L) und \(c_{\text{Tag}}\) (aus c_jahr, d_Saison); **kein** Feld `rolle` | \(\Delta S\) ist eine amtliche Messreihe, die Anlage [67] nur auswertet; \(p_{\text{AR}}\) folgt je Band einer Quelle, die Extrapolation 80+ ist in §3.2 gekennzeichnet; \(c_{\text{jahr}}\) ist der Quellwert, nur im Preisstand umgerechnet. Von den vier Rollen nach §4 trifft keine zu: \(s_{\text{unbek}}\) geht in jedem Lauf in \(\hat G\) ein und ist damit ein gewöhnlicher Rechenparameter, keine Sensitivitätsgröße; eine Rolle „abschaetzung“ kennt §4 nicht, die Abschätzung trägt \(r_{\text{S158}}\) schon in `kennzeichnung` | \(s_{\text{unbek}}\) mit `rolle: sensitivitaet` (verworfen: sagte, der Wert diene nur der Sensitivität) · \(r_{\text{S158}}\) mit `rolle: abschaetzung` (verworfen: kein zulässiger Wert nach §4) · \(p_{\text{AR}}\) als `abschaetzung_kap3` (verworfen: vier von fünf Bändern tragen einen Quellwert; die Extrapolation ist am Band gekennzeichnet) | keine Wirkung auf Zahlen; kein `wert:` in Kapitel 7 geändert; Ledger-Befund 173 |
+| 25 | Kennzeichnung der Parameter-Blöcke (Aufgabe §4): welcher Wert je Block, und wo trägt ein Block ein Feld `rolle`? | (Stand Schritt 3. Seit Runde 27 führt Kapitel 7 14 Blöcke: dazu `pollen.stadtbaum_kosten` im Abschnitt 7.1, gekennzeichnet `abschaetzung_kap3`, Log 27.) **13 von 13 gekennzeichnet (Kapitel 7):** `quelle` für \(\Delta S\), \(a_{\text{attr}}\), \(p_{\text{AR}}\), \(c_{\text{jahr}}\); `abschaetzung_kap3` für \(p_B/p_G\), \(L\), \(f\), \(\lambda\), \(s_{\text{unbek}}\), \(r_{\text{S158}}\), \(t_{\text{warn}}\) (Herleitung je Block im Kommentar); `berechnet` für \(d_{\text{Saison}}\) (aus f, p_sens, L) und \(c_{\text{Tag}}\) (aus c_jahr, d_Saison); **kein** Feld `rolle` | \(\Delta S\) ist eine amtliche Messreihe, die Anlage [67] nur auswertet; \(p_{\text{AR}}\) folgt je Band einer Quelle, die Extrapolation 80+ ist in §3.2 gekennzeichnet; \(c_{\text{jahr}}\) ist der Quellwert, nur im Preisstand umgerechnet. Von den vier Rollen nach §4 trifft keine zu: \(s_{\text{unbek}}\) geht in jedem Lauf in \(\hat G\) ein und ist damit ein gewöhnlicher Rechenparameter, keine Sensitivitätsgröße; eine Rolle „abschaetzung“ kennt §4 nicht, die Abschätzung trägt \(r_{\text{S158}}\) schon in `kennzeichnung` | \(s_{\text{unbek}}\) mit `rolle: sensitivitaet` (verworfen: sagte, der Wert diene nur der Sensitivität) · \(r_{\text{S158}}\) mit `rolle: abschaetzung` (verworfen: kein zulässiger Wert nach §4) · \(p_{\text{AR}}\) als `abschaetzung_kap3` (verworfen: vier von fünf Bändern tragen einen Quellwert; die Extrapolation ist am Band gekennzeichnet) | keine Wirkung auf Zahlen; kein `wert:` in Kapitel 7 geändert; Ledger-Befund 173 |
 | 26 ⚠ | Bezugswert der Zentrierung bei Maßnahmen: Ḡ in jedem Lauf neu bilden (Log 19) oder im Ausgangsstand festhalten? | **Festhalten (Weg (a), Festlegung CMO in T-1323):** Ḡ₀ = betroffenengewichtetes Mittel über die bewohnten Zellen der eigenen Kommune im Ausgangsstand ohne die bewerteten Maßnahmen, im Ausgangsszenario gebildet und für jedes Maßnahmenszenario festgehalten; Formel bleibt \(\hat P = 1 + \lambda(\hat G/\bar G_0 - 1)\) (§3.3). Im Ausgangsstand gilt weiter \(\sum B\hat P = \sum B\) exakt; mit Maßnahme sinkt die Summe um \(\lambda \cdot \sum B(\hat G - \hat G')/\bar G_0\) (Rechenbeispiel §5: 15.036 → 13.857 Tage, −1.179 Tage, ≈ 7.310 € je Jahr; Eingabe ist die Änderung des Kronenanteils, abgezogen im Term, in dem die Kronen im Ausgangsstand stehen, Kronen ohne Gattungs-Tag nur mit 0,12, Befunde 186, 195) | (1) **Vorgabe P2:** Ein in jedem Lauf neu gebildetes Ḡ hebt jede Senkung genau auf (Rechenbeispiel §5: Summe bliebe 8.000); weniger Quellbäume hießen dann nicht weniger Pollen — das wäre eine gesetzte Nullwirkung. (2) **Einwand aus Log 19 beantwortet:** Log 19 sah die λ-Evidenz nur für Gradienten innerhalb einer Stadt. Eine Maßnahme wird mit dem Ausgangsstand derselben Kommune verglichen, also innerhalb einer Stadt. Die Lesart von λ als Anteil der örtlichen Quellen an der Pollenlast einer Zelle (1 − λ = regionaler Hintergrund) belegt Hugg 2017 [74], Tabelle 3: städtischste gegenüber allen acht Messstellen, λ = 1 − Hintergrund ÷ Mittel, abgeleitet 0,22–0,94, drei von vier Werten im Band 0,3–1,0 (§3.3, Modellgrenze 7); Conclusions: „The local sources, such as unmanaged open lands, may substantially contribute to pollen exposure.“ (3) Log 17 und 18 bleiben: Gewichtsregel und Bezugsebene Kommune; zwischen Kommunen wirkt die Vegetation weiter nicht. (4) Befunde 124 und 129 bleiben: keine pauschal verknüpfte Maßnahme, gerechnet wird im Zelllauf | Ḡ in jedem Lauf neu (Log 19; verworfen: Nullwirkung, P2) · Summe gleich lassen, Wirkung nur je Zelle (Weg (b); verworfen vom CMO: weniger Quellbäume heißt weniger Pollen) · zweiter Parameter für den Niveaueffekt (verworfen: die Quelle liegt im Band von λ, T-1323 Punkt 1) | Basiswert (Ausgangsstand) unverändert, kein `wert:` in Kapitel 7 geändert; Stadtbaumwahl senkt jetzt die Kommunensumme; Richtung des Fehlers in λ: Modellgrenze 7 (Bezugsstelle in der Stadt → λ unterzeichnet eher; Gräser statt Birke → λ überzeichnet für Bäume eher; nicht bestimmbar, welche überwiegt); Log 19 verworfen; Ledger-Befund 182 |
+| 27 | Kosten der Stadtbaumwahl (Vorgabe P2, Befund 253): eine Zahl oder nach Fall getrennt, woher die Werte, und wo stehen sie in Kapitel 7? | **Je ersetztem Baum nach Fall getrennt, Preisstand 2024:** Nachpflanzung ohnehin 60 € (Mehrkosten der Artenwahl im typischen Fall Linde statt Birke, Preisgruppe II − I [79]; Birke meistgefällt, Linde meistgepflanzt [78], [82], allergen „Low“ [81]); vorgezogener Ersatz 4.436 € (Pflanzung mit Anwuchspflege 3.636 € [75] plus Fällung 800 €, Abschätzung von KAP3); Block `pollen.stadtbaum_kosten` im eigenen Abschnitt 7.1; im Produkt Abfrage des Falls ohne stille Vorgabe (Ü-11); Amortisation der Nachpflanzung mit wachsender Krone, 18 Jahre am Punktwert (§5) | Die beiden Fälle unterscheiden sich um den Faktor 74; eine Zahl für beide stellte einen der Fälle falsch dar. Die Kosten wirken weder auf Tage noch auf den Schadensbetrag und stehen deshalb getrennt von den Größen der Schadens- und Wirkungsrechnung. Für die Fällung gibt es keine Kostenquelle je Baum (§5, durchsuchte Quellen in Befund 253), deshalb eine Abschätzung von KAP3 mit dem geometrischen Mittel des Bands. Bei der Nachpflanzung ist der Vergleich ein junger Baum, dessen Krone erst wächst [80] | eine Zahl, 4.436 €, für alle Fälle (verworfen: die Artenwahl bei Nachpflanzung erschiene 74-mal zu teuer) · 4.436 € als Vorgabe, 60 € als Überschreibung (verworfen: stille Vorgabe auf den teuren Fall) · Fällkosten aus Preisportalen von Anbietern (verworfen: keine amtliche oder verbandliche Quelle, Herkunft nicht prüfbar) · Block im ersten yaml-Abschnitt von Kapitel 7 (verworfen: Kosten sind keine Größe der Schadensrechnung; gemessen schlügen dort vier statt ein Kennzeichnungstest fehl) · Amortisation mit voller Krone ab dem ersten Jahr (verworfen: 6 statt 18 Jahre, dreimal zu früh) | keine Wirkung auf Tage, Schadensbetrag und Berlin (4,69 Mio. € Kette, 4,58 Mio. € Zelllauf); kein bestehender `wert:` in Kapitel 7 geändert, ein Block mehr (14); Ledger-Befund 253, Übernahmen Ü-11 und Ü-12 |
