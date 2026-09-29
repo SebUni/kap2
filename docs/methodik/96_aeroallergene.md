@@ -8,7 +8,7 @@ Schritt 4 Bezugswert Ḡ₀ der Stadtbaumwahl (T-1323, T-1362, Log 26, Befund 18
 Null-Runde über den ganzen Bericht: A Runde 21 (T-1442-methodik_manager), B Runde 22 (T-1443-methodik_manager); Runden 24 bis 27 nach der Integration mit Befunden 230–253 (T-1632-methodik_manager bis T-1635-methodik_manager); Runde 28 über A und B mit Befunden 254–257, Nacharbeit Runde 29 (T-1638-methodik_manager); in Revision nach der Integration (T-1628-cmo), Abnahme steht aus)** ·
 Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
-**Ansatz 96-A** (Prävalenz × gemessene Pollensaison-Spreizung, bottom-up; Entscheidungslog Nr. 1)
+**Ansatz 96-A** (Prävalenz, also Anteil der Betroffenen an der Bevölkerung, × gemessene Pollensaison-Spreizung, bottom-up; Entscheidungslog Nr. 1)
 · Familie: **K1-Gesundheit bottom-up** (Prototyp #95; §2.6 — kein erneuter Drei-Ansätze-Vergleich)
 
 > **Konformitätsvermerk zu den Aufgaben-Fortschreibungen 30./31.08.2026**
@@ -121,7 +121,7 @@ S010–S020 Habitat/Landnutzung, R03/R04).
 | W024 | Ausbreitung von Pflanzenarten mit allergenem Potenzial (0 €; E01, S010–S020, R03/R04) | Schicht B (lokal) + dokumentierte Alternative | lokale allergene Vegetation \(\hat G\) im Faktor \(\hat P_{\text{Zelle}}\) (§3.3); Neophyten-Pfad (Ambrosia) = Modul 96-B ab M1 | Ambrosia-Arealmodell bewusst nicht in M0 (Log 13) |
 | #1/W022 | Phänologie/Vegetationsperiode (Netzwerklisten-Kante; Treiber 0 €) | Schicht B | die ΔS-Messung (§3.1) **ist** die Operationalisierung dieses Knotens (KWRA-Indikator GE-KL-07 = Front-Marker) | — |
 | E01 | Durchschnittstemperatur (eine Ebene tief, via W024/W025) | implizit in Schicht B | steckt im **gemessenen** Phänologie-Signal ΔS; kein eigener Temperatur-Term (Kein-Doppelkanal §3.2) | — |
-| E09 | Trockenheit (eine Ebene tief, Eingang von W025) | **bewusst inaktiv** | — | keine quantifizierte Trockenheit→Pollen-ERF; Wirkrichtung intensitätserhöhend — konsistent zur konservativen Nicht-Ansetzung der Intensität (Log 14; Rev.-5-Befund 52) |
+| E09 | Trockenheit (eine Ebene tief, Eingang von W025) | **bewusst inaktiv** | — | keine quantifizierte Trockenheit→Pollen-ERF (ERF heißt Expositions-Wirkungs-Funktion: um wie viel die Pollenbelastung je Einheit Trockenheit steigt); Wirkrichtung intensitätserhöhend — konsistent zur konservativen Nicht-Ansetzung der Intensität (Log 14; Rev.-5-Befund 52) |
 | S010–S020 | Habitat-/Landnutzungs-Sensitivitäten (Eingänge W024) | teilweise Schicht B | nicht separat parametrisiert; wirken über die lokale allergene Vegetation \(\hat G\) (analog W124-Komponenten-Logik in #95) | — |
 | R03/R04 | Vorkommen von Arealen/Arten bzw. Biotopen (Eingänge W024/W025) | Schicht B (via \(\hat G\)) | OSM-Vegetationsdaten der Zelle | — |
 | S158 | Monitoring von Gesundheitsgefahren / Frühwarnsysteme | Maßnahmen-Hebel (**abgeschätzt**, §5.1) | Pollen-Frühwarnung (DWD/PID-Gefahrenindex); Ebene EARLY_WARNING_SYSTEMS (§5); Wirkungsfaktor \(r_{\text{S158}}\) = 0,03 (0,005–0,10), §3.9 ABGESCHÄTZT | wirkt **nur** im Maßnahmen-Modul, nicht im Basiswert des Schadens (dort weiterhin Default 1); keine publizierte Interventions-Effektgröße — deshalb Abschätzung statt Nullwirkung (Log 15/20, Vorgabe P2) |
@@ -275,7 +275,7 @@ Spalte verweist auf die Entscheidungslog-Nummer.
 | Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | Entscheidung | E-Regel |
 |---|---|---|---|---|---|---|---|---|
 | 96-W025-01 | W025/#1 Phänologie → Saison-Spreizung | \(\Delta S_B\) = 3,96/4,20/5,94 · \(\Delta S_G\) = 4,78/4,08/3,70 Tage (N/M/S; 1961–90 → 1991–2020) | amtliche Messreihe (DWD-Phänologie), eigene Auswertung (Skript [67]) | DWD-CDC Jahresmelder [33]; `pollensaison_region.csv` [67] | DE-weit, 1.083/1.085 gepaarte Stationen; Marker-Wahl §3.1 (Birke Phase 4 — Log 3) | regional (N/M/S je Bundesland, wie #95) | **Basiswert** | Log 2–5 |
-| 96-W025-02 | Klimawandel → Anteil am Saisontrend | \(a_{\text{attr}}\) = 0,50 (IQR 0,19–0,84). IQR heißt Interquartilsabstand: die Spanne, in der die mittlere Hälfte der Schätzungen liegt, je ein Viertel liegt darunter und darüber. Die Studie schätzt den Anteil mit 22 Klimamodellen je Kennzahl und Zeitraum; 0,19–0,84 umfasst die vier Spannen für Beginn und Länge der Pollensaison 1990–2018 und 2003–2018 (19–35 %, 22–41 %, 35–66 %, 45–84 %; [9], Results und Abb. 3) und ist deshalb breiter als jede einzelne | Attributionsstudie (Beobachtung × Klimamodelle) | Anderegg 2021, PNAS [9] | Nordamerika 1990–2018; Übertragung auf DE als dokumentierte Annahme (einzige publizierte Attribution) | Literatur-Band | **Basiswert** | Log 11 |
+| 96-W025-02 | Klimawandel → Anteil am Saisontrend | \(a_{\text{attr}}\) = 0,50 (IQR 0,19–0,84). IQR heißt Interquartilsabstand: die Spanne, in der die mittlere Hälfte der Schätzungen liegt, je ein Viertel liegt darunter und darüber. Die Studie schätzt den Anteil mit 22 Klimamodellen je Kennzahl und Zeitraum; 0,19–0,84 umfasst die vier Spannen für Beginn und Länge der Pollensaison 1990–2018 und 2003–2018 (19–35 %, 22–41 %, 35–66 %, 45–84 %; [9], Results und Abb. 3) und ist deshalb breiter als jede einzelne | Attributionsstudie (Beobachtung × Klimamodelle; sie trennt den Anteil des Klimawandels von anderen Ursachen) | Anderegg 2021, PNAS [9] | Nordamerika 1990–2018; Übertragung auf DE als dokumentierte Annahme (einzige publizierte Attribution) | Literatur-Band | **Basiswert** | Log 11 |
 | 96-W025-03 | Intensitätszunahme (Pollenmenge, Herbst-Verlängerung) | Pollenintegral +20,9 % [9]; CO₂-Effekt Ambrosia +61…131 % [21,22]; Herbst-Spreizung der Kräuterpollen [6] | Beobachtung/Experiment | [6,9,21,22] | belegt, aber ohne DE-ERF je Zelle | — | **bewusst inaktiv** (Untergrenze; §6 Modellgrenze 1) | Log 4/14 |
 | 96-W025-04 | E09 Trockenheit → Pollenfreisetzung/-transport | Wirkrichtung intensitätserhöhend; keine quantifizierte ERF | — | Rev.-5-Befund 52 | — | — | **bewusst inaktiv** | Log 14 |
 | 96-W024-01 | W024 lokale allergene Vegetation → Symptomlast | \(\lambda\) = 0,7 (0,3–1,0); Kette §3.4: Fallen-Differenzen 245 %/306 % (14 Fallen Berlin; Zuwachs-Lesart ⇒ \(R\) = 3,45/4,06, Verhältnis-Lesart im Band) ⇒ \(\lambda_{\text{roh}}\) 1,10–1,21 × vegetationserklärter Anteil 0,6 (0,4–0,8) | Messreihen (Pollenfallen), Symptomgradient, Lidar-Studie | Werchan 2017 [54], Werchan 2018 [55], Bogawski 2019 [56] | Berlin/Posen; **gekennzeichnete Abschätzung** (§3.9) | OSM-Vegetation; Ebene POLLEN_LOAD **neu anzulegen** (§3.3) | **Basiswert** | Log 12 |
@@ -283,7 +283,7 @@ Spalte verweist auf die Entscheidungslog-Nummer.
 | 96-R35-01 | R35 Bevölkerung → Betroffene (Prävalenz) | \(p_{\text{AR},a}\): u20 8,8 % · 20–64 13,2 % · 65–74 6,7 % · 75–84 5,0 % · 85+ 5,0 % (12-Monats, ärztlich diagnostiziert; Herleitung §3.2) | bevölkerungsrepräsentative Surveys | DEGS1: Langen 2013, Tab. 3 [1]; KiGGS W2: Thamm 2018 [2]; Gewichte: Destatis 31.12.2023 [48] | DE; DEGS1 endet bei 79 (80–84 und 85+ extrapoliert, gekennzeichnet in §3.2) | Zensus-Altersbänder; Ebene u20 **neu anzulegen** (§3.2) | **Basiswert** | Log 10 |
 | 96-R35-02 | Sensibilisierungsprofil der AR-Patienten (Birkengruppe/Gräser) | \(p_B\) = 0,55 (0,4–0,7) · \(p_G\) = 0,75 (0,6–0,85) | **gekennzeichnete Abschätzung** (§3.9); Stütze: Bevölkerungs-Sensibilisierung Gräser 19,4 % > Birke 17,4 % (Rangfolge) | Haftenberger 2013, Tab. 2/Abb. 1 [3] | Anteil *unter AR-Patienten* nicht direkt publiziert (Rev.-5-Befund 36a); Ersetzungspfad: PID-/Versorgungsdaten | national | **Basiswert** (Sensitivität §3.4) | Log 8 |
 | 96-K1-01 | Behandlungskosten je Betroffenem und Jahr (direkt) | 210,3 €₂₀₁₄ (populationsbasiert, alle Schweregrade) ⇒ 266,90 €₂₀₂₄ (§3.5) | Bevölkerungs-Fragebogenstudie (n = 3.501) | Cardell 2016 (TOTALL) [65] | Schweden 18–65, Preisstand Feb. 2014 (CPI-adjustiert); Raumtransfer Schweden → Deutschland 1:1 dokumentiert | national | **Basiswert** | Log 9 |
-| 96-K1-02 | Behandlungskosten moderate–schwere SAR (direkt) | Erwachsene 42 % × 1.543 = 648 €₂₀₀₀ ⇒ 1.019 €₂₀₂₄; Kinder 60–78 % × 1.089 ⇒ 1.027–1.335 €₂₀₂₄ | Querschnitt (500 Patienten, fachärztlich) | Schramm 2003 [7] (Abstract-Zahlen primärverifiziert) | DE; **moderate–schwere** SAR — Überschätzungsrichtung je Durchschnittspatient | national | **Sensitivitätsband** (Obergrenze \(c_{\text{Tag}}\)) | Log 9 |
+| 96-K1-02 | Behandlungskosten moderate–schwere SAR (direkt) | Erwachsene 42 % × 1.543 = 648 €₂₀₀₀ ⇒ 1.019 €₂₀₂₄; Kinder 60–78 % × 1.089 ⇒ 1.027–1.335 €₂₀₂₄ | Querschnitt, also Erhebung zu einem Zeitpunkt (500 Patienten, fachärztlich) | Schramm 2003 [7] (Abstract-Zahlen primärverifiziert) | DE; **moderate–schwere** SAR — Überschätzungsrichtung je Durchschnittspatient | national | **Sensitivitätsband** (Obergrenze \(c_{\text{Tag}}\)) | Log 9 |
 | 96-S158-01 | S158 Pollen-Frühwarnung → Symptomlast | keine quantifizierte Interventions-Effektgröße publiziert ⇒ **Abschätzung** \(r_{\text{S158}}\) = 0,03 (Band 0,005–0,10) aus der offengelegten Dreifaktor-Kette §5.1 | — (keine Interventionsstudie; §3.8-Datenlücke ausdrücklich benannt) | Wirkungsort/Kette: §5.1 (`#s158-wirkung`); Ebene EARLY_WARNING_SYSTEMS (DWD/PID-Gefahrenindex) | Setzung für deutsche Kommunen; **§3.9 ABGESCHÄTZT**, im Produkt als „Abschätzung von KAP3" gekennzeichnet | gewarnte Tage (DWD-Index mindestens „mittel“, je Pollengruppe), zellscharf im Geltungsbereich; Personenteil pauschal (Modellgrenze 8 der Abschätzung) | **Maßnahmen-Hebel (abgeschätzt, §5.1)** — kein Basiswert der Schadensformel | Log 15/20 |
 | 96-R36-01 | R36 Gesundheitsinfrastruktur → AR-Outcome | keine Evidenz für Distanz-/Kapazitätseffekt auf ambulante AR-Behandlung | — | — | AR wird ambulant/selbstmediziert behandelt | HEALTHCARE_ACCESS (Schicht A) | **bewusst inaktiv** (Basiswert Default 1) | Log 16 |
 
@@ -558,7 +558,7 @@ die Produktbänder (Gewichte: Bevölkerung 31.12.2023 nach Altersjahren [48]):
   60–64 mit dem 60–69-Wert 8,2).
 - **65–74 = 6,7 %**: (5.180.675·8,2 + 4.388.965·5,0)/9.569.640 = 6,73 (65–69 → 8,2;
   70–74 → 5,0).
-- **75–84 = 5,0 %** (DEGS1 70–79; 80–84 = Extrapolation, gekennzeichnet).
+- **75–84 = 5,0 %** (DEGS1 70–79; 80–84 = Extrapolation, also über das Ende der Messwerte hinaus fortgeschrieben, gekennzeichnet).
 - **85+ = 5,0 %** (Extrapolation über das DEGS1-Ende 79 hinaus, gekennzeichnet; Richtung
   unklar — Prävalenz fällt mit Alter, Untererfassung bei Hochaltrigen möglich).
 
@@ -803,7 +803,7 @@ for r, (db, dg) in DS.items():
   Lidar-Birkendichte-Kopplung [56].
 - **Altersinvarianz (explizite §3.2-Annahme; Befund 109):** \(f\), \(p_B/p_G\) und
   \(\lambda\) sind **altersinvariant** angesetzt („gleiche relative Elastizität über
-  alle Bänder"); real sind Sensibilisierungsprofile altersabhängig — die Bänder decken
+  alle Bänder"; Elastizität heißt: um wie viel Prozent sich eine Größe ändert, wenn sich eine andere um ein Prozent ändert); real sind Sensibilisierungsprofile altersabhängig — die Bänder decken
   diese Streuung, das absolute Altersmuster entsteht über \(p_{\text{AR},a}\)
   (für \(c_{\text{Tag}}\) ist die bandeinheitliche Vereinfachung in §3.5 dokumentiert).
 
@@ -2497,7 +2497,7 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   28(5):209–214, 2002. doi:10.48044/jauf.2002.031. S. 209, Materials and Methods: „If tree size at the time of
   establishment was not known, then 10 years, which corresponds to a trunk circumference of 18 to 20 cm (7 to 8 in.),
   was added to the age.“ S. 211, Table 3, Growth formulas: „Crown radius, shaded 0.1358 –0.0008“ (b1, b2; Linden in
-  Reihen in Kopenhagen, n = 463, r² = 0,9356). Die Formel ist nach dem Methodenteil Y = b1 × d + b2 × d² mit
+  Reihen in Kopenhagen, n = 463, r² = 0,9356; r² heißt Bestimmtheitsmaß: der Anteil der Streuung der Messwerte, den die Formel erklärt, 1 hieße vollständig). Die Formel ist nach dem Methodenteil Y = b1 × d + b2 × d² mit
   d = Alter; die Fußnote von Table 3 („Y = b1 + b2d²“) lässt das erste d aus, Table 2 (Wachstumsraten
   b1 + 2 × b2 × d: 0,1358 und −0,0016) bestätigt die Lesart. https://auf.isa-arbor.com/content/isa/28/5/209.full.pdf
   (Abruf 29.09.2026; Permalink https://web.archive.org/web/20260425090058/https://auf.isa-arbor.com/content/isa/28/5/209.full.pdf).

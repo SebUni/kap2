@@ -1482,3 +1482,84 @@ Bindung der geänderten Einträge im Entscheidungslog:
 | 20 | keine Zahl geändert; Sperre aus Befund 124 | (a) gleichlautend mit §5.1, Produktstand, und Revisionsstand, Zeile „Code-Stand“; (b) Verweis Befunde 231, 254; (c) vorher „Befund-124-Sperre (linked_risk_codes leer) bleibt bestehen“ (Befund 254) |
 | 22 | 702.852, 3.070.537, 22,89 % | (a) keine Stelle im Bericht, weil verworfene Alternative; Fundstelle Statistischer Bericht A I 3 – j / 23, Tab. 3.1, S. 6; (b) Adresse, Abruf, SHA-256 und Wayback-Permalink in Befund 257; (c) 702.852 und 22,89 % neu im Log, standen im ersten Entwurf (a065da3c) in Ebene 1 und in [69] alt; 3.070.537 unverändert |
 | 22 | 677.877 = 2.961.430 × 702.852 ÷ 3.070.537 | (a) 2.961.430 = 673.277 + 2.288.153 gleichlautend mit §3.0 Ebene 1; (b) Verweis Befunde 154, 257; (c) Wert unverändert, Rechnung neu im Log |
+
+## Runde 30 des methodik_manager zu T-1650-methodik_manager (29.09.2026) — Übernahme der Runden 28 und 29 (6b77ed4a), Befunde 258 und 259, neue Befunde ab Nr. 260
+
+Anlass: Vorhaben T-1629-cmo, Nachtrag des CMO vom 29.09.2026; Ersatz für T-1638-methodik_manager (eskaliert nach
+Runde 29). Nach A-0046 ist das die achte Runde ab Runde 23. Übernahme: `git log --oneline d0960c93..origin/main --
+docs/methodik/96_aeroallergene.md reviews/BEFUNDE_96.md` war leer, `git show --stat 6b77ed4a` lesbar (nur diese zwei
+Dateien). Beide Dateien sind byte-gleich aus `git show 6b77ed4a:<pfad>` geschrieben, danach war
+`git diff --stat 6b77ed4a` für beide leer; kein Merge, kein anderer Pfad. Die Befunde 258 und 259 stammen aus dem
+Urteil der Runde 29 (Firmen-Repo, tickets/T-1638-methodik_manager.md, Abschnitt Urteil, Runde 1) und sind hier vor jeder
+Änderung am Bericht eingetragen. Zeilenangaben beziehen sich auf den Stand 6b77ed4a.
+
+| Nr | Stelle | Art | Befund & Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 258 | Bericht, Kap. 2 Register 96-W025-02 (Z. 278), §4 physisch (Z. 965–969), Entscheidungslog Nr. 11 (Z. 2558), Kap. 8 [9] (Z. 2302) | Widerspruch | Der Bericht nennt aus [9] die Spannen für den Saisonbeginn (35–66 % und 45–84 %) und die Saisonlänge (19–35 % und 22–41 %). ΔS ist eine Verlängerung (Ebene 4), 0,50 liegt über beiden Längen-Spannen. Welcher Kennzahl die Spreizung entspricht, sagt der Bericht nicht. §4 rechnet „+8 Tage Länge … ≈ 4 Tage“ und folgert, 1,99 Tage lägen darunter; mit den Längen-Spannen sind es 8 × 0,19 bis 8 × 0,41 = 1,5–3,3 Tage. | Festlegung des CMO (T-1650): a_attr ist die Attribution der Saisonlänge (Ebene 4, §3.1); Fall 1 (0,50 bleibt, nur wenn [9] die rund 50 % ausdrücklich für die Länge nennt) oder Fall 2 (Median 1990–2018 aus [9], sonst Mitte des IQR 19–35 % als Abschätzung von KAP3, Band 0,19–0,41) mit Nachzug nach T-1650; §4 misst gegen 8 Tage × Band | B | `python3 -c "import sys; t=open('docs/methodik/96_aeroallergene.md',encoding='utf-8').read(); i=t.find('id: pollen.a_attr'); b=t[i:i+400]; f=[k for k,ok in (('wert 0.27','wert: 0.27' in b),('band 0.19-0.41','band: [0.19, 0.41]' in b),('alte Spanne','0,19–0,84' not in t),('Abstract [9]','of the trend in pollen seasons' in t),('Results [9]','of the trend in pollen season length' in t),('Paragraf 4','1,52–3,28' in t)) if not ok]; print(f); sys.exit(bool(f))"` | offen |
+| 259 | Bericht, Knoten-Bilanz E09 (Z. 124), Register 96-W025-03 und -04 (Z. 279 f.), Entscheidungslog Nr. 14 (Z. 2561), §3.4 (Z. 805), Kap. 8 [80] (Z. 2500) | Lücke (E4, Rest von Befund 255) | „ERF“ steht viermal ohne Erklärung, ebenso „Elastizität“ und „r²“. | Festlegung des CMO (T-1650): die Klasse schließen, nicht den Einzelfall; Begriffstabelle in diesem Abschnitt (Begriff, erste Verwendung, Erklärung, Prüfwort), der Ausdruck prüft je Zeile höchstens 700 Zeichen Abstand | B | `python3 -c "import sys,itertools; t=open('docs/methodik/96_aeroallergene.md',encoding='utf-8').read(); b=open('reviews/BEFUNDE_96.md',encoding='utf-8').read().split(chr(10)); i=[j for j,l in enumerate(b) if l.startswith(chr(124)+' Begriff '+chr(124))]; z=[[c.strip() for c in l.strip().strip(chr(124)).split(chr(124))] for l in itertools.takewhile(lambda l: l.startswith(chr(124)), b[i[-1]+2:])] if i else []; f=[x[0] for x in z if t.find(x[0])<0 or t.find(x[3])<0 or abs(t.find(x[0])-t.find(x[3]))>700]; f+=[k for k in ('ERF','Elastizität','r² = 0,9356','IQR','SD 7,46','SE 0,23','erwartungstreu','RCT','DiD','quasi-experimentell') if k not in [x[0] for x in z]]; print(f); sys.exit(bool(f))"` | behoben (Autor, T-1650-methodik_manager, Runde 30, 29.09.2026): ERF (Knoten-Bilanz E09), Elastizität (§3.4, Altersinvarianz) und r² (Kap. 8 [80]) stehen jetzt bei erster Verwendung in Klartext. Die Klasse ist über die Begriffstabelle unten geschlossen (22 Begriffe mit erster Verwendung, Erklärung und Prüfwort). Neu erklärt außerdem Prävalenz (Kopf, Ansatz 96-A), Attributionsstudie und Querschnitt (Kap. 2 Register), Extrapolation (§3.2). Keine Zahl geändert, kein wert: in Kap. 7. Ausdruck vorher exit 1, nachher exit 0. |
+
+**Befund 258: Fall 2 festgestellt, Nachzug nicht in diesem Lauf.** [9] (Anderegg 2021, PNAS 118(7) e2013284118),
+Volltext https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7896283/fullTextXML, Abruf 29.09.2026, 23:48 Uhr UTC,
+HTTP 200, SHA-256 d02d5a7be0e7bc374f5c6750f15d48996723069c652fdc186c901fb61926f903 (gleich dem Abruf der Runde 29).
+Abstract: „Human forcing of the climate system contributed ∼50% (interquartile range: 19–84%) of the trend in pollen
+seasons and ∼8% (4–14%) of the trend in pollen concentrations.“ Results, Absatz zu Abb. 3: „Anthropogenic forcing
+contributed to an estimated 35–66% (interquartile range) of the full trend and 45–84% of the recent trend in pollen
+season start date and 19–35% and 22–41% of the trend in pollen season length over the 1990–2018 and 2003–2018 periods,
+respectively (Fig. 3).“ Results, Absatz zu Abb. 1: „lengthening of the pollen season by ∼8 d over the same period“.
+Die rund 50 % gelten den „pollen seasons“ insgesamt; das IQR 19–84 % umfasst Beginn und Länge. Für die Länge nennt [9]
+nur die Spannen, einen Median als Zahl nennt der Text nicht (Abb. 3 zeigt ihn nur als Boxplot). Damit gilt Fall 2:
+a_attr = 0,27 (Mitte des IQR 19–35 %, Abschätzung von KAP3), Band 0,19–0,41, Verhältnis 0,27 ÷ 0,50 = 0,54.
+
+Sollwerte des Nachzugs, gerechnet, noch nicht im Bericht: δ Berlin 0,70 × 5,37 × 0,27 = 1,01493 Tage; Kette
+402.103 × 1,01493 = 408.106 Tage × 6,20 € = 2,53 Mio. € je Jahr (Preisstand 2024); Zelllauf rund 4,58 × 0,54 = 2,47 Mio. €
+(mit der Anlage über den Override zu messen); Band Berlin 1,78–3,84 Mio. € (−30 % bis +52 %); δ Bund
+0,70 × 5,6795 × 0,27 = 1,07 Tage, Bundessumme ≈ 60 Mio. € (Band ≈ 42–91 Mio. €); S158 17.004 → 9.182 und
+16.632 → 8.981 Tage; Stadtbaumwahl −26,3 → −14,2 Tage und 163 → 88 € je Jahr, Kommune −1.179 → −637 Tage.
+
+**Folge für §4, Befund an den CMO.** Die Festlegung „§4 misst die 1,99 Tage gegen 8 Tage × Band“ setzt a_attr 0,50
+voraus. Mit 0,27 sinkt δ Bund von 1,99 auf 1,07 Tage und liegt unter 8 × 0,19 bis 8 × 0,41 = 1,52–3,28 Tage. Der
+implizite Klimaanteil an den Behandlungskosten sinkt von 1,99 ÷ 43,05 = 4,6 % auf 1,07 ÷ 43,05 = 2,5 % und liegt unter
+dem Band ≈ 3–20 % in §4, das selbst mit der Attribution aus [9] gebildet ist. Beide Plausibilisierungen sind im Nachzug
+neu zu fassen (etwa δ ÷ f = 5,6795 × 0,27 = 1,53 gewichtete Saisontage gegen 1,52–3,28), nicht nur die Zahl zu tauschen.
+Der Nachzug umfasst rund 60 Zahlen in Kap. 1, Kap. 2, §3.0, drei Beispiel-Blöcken, Kap. 7, der Anlage, §4, §5 (mit neuer
+Amortisationsrechnung), §5.1, §6, Kap. 8 und den Logs 11, 20, 23, dazu docs/evidenz/register.md, Ü-13 und die
+Folgezeilen zu 155, 180, 212, 241 und 243. Er ist in diesem Lauf nicht begonnen, damit Bericht und Ledger nicht halb
+nachgezogen stehen; 258 bleibt offen.
+
+**Befund 259: Begriffstabelle.** Zeilen im Bericht nach dieser Runde. Der Ausdruck von 259 liest diese Tabelle und prüft
+je Zeile, ob das Prüfwort höchstens 700 Zeichen von der ersten Verwendung des Begriffs entfernt steht. Neue Begriffe
+späterer Runden kommen in dieselbe Tabelle.
+
+| Begriff | erste Verwendung (Zeile) | Erklärung im Bericht (Zeile) | Prüfwort |
+|---|---|---|---|
+| ERF | 124 | 124 | Expositions-Wirkungs-Funktion |
+| Elastizität | 805 | 806 | um ein Prozent ändert |
+| r² = 0,9356 | 2500 | 2500 | Bestimmtheitsmaß |
+| IQR | 278 | 278 | Interquartilsabstand |
+| SD 7,46 | 497 | 499 | Standardabweichung |
+| SE 0,23 | 497 | 500 | Standardfehler |
+| erwartungstreu | 645 | 646 | weder zu hoch noch zu niedrig |
+| RCT | 1534 | 1534 | randomisierte kontrollierte Studie |
+| DiD | 1921 | 1922 | Differenz-von-Differenzen |
+| quasi-experimentell | 1562 | 1564 | ohne Losentscheid |
+| Perzentil | 246 | 246 | Perzentil: |
+| Korrelation | 616 | 617 | Korrelation: |
+| Korrelationskoeffizient | 760 | 761 | 0 heißt kein Zusammenhang |
+| Proxy | 657 | 657 | Ersatzgröße |
+| Fit | 620 | 621 | nachträgliche Anpassung |
+| gefittet | 950 | 950 | angepasst |
+| zentriert | 191 | 192 | gewichtetes Mittel über die Zellen der Kommune genau 1 |
+| deterministisch | 368 | 368 | ergeben dieselbe Zahl |
+| Extrapolation | 561 | 561 | über das Ende der Messwerte hinaus |
+| Querschnitt | 286 | 286 | Erhebung zu einem Zeitpunkt |
+| Attributionsstudie | 278 | 278 | Anteil des Klimawandels von anderen Ursachen |
+| Prävalenz | 11 | 11 | Anteil der Betroffenen an der Bevölkerung |
+
+**Messungen nach der Nacharbeit, 29.09.2026 (Runde 30).** `python3 backend/scripts/ledger.py 96 --pruefe`: 174 Befunde,
+96 belegt geschlossen, 11 zurückgestellt mit rotem Ausdruck (unverändert 234–240, 244, 251–253), `Prüfausdruck ROT   : 1`
+(allein 258, offen), Gesamtergebnis ROT statt GRÜN, solange 258 offen ist. `python3 backend/scripts/lint_methodik.py 96`:
+237 Checks, ALLE LINTS GRÜN. `_stand()`: Rev. 4. `grep -c '4,59 Mio'` im Bericht: 0. Testlauf der Dateien
+`backend/tests/test_methodik_96_*.py` über `scripts/testlauf.sh`: nicht gemessen, der Aufruf war in dieser Sitzung nicht
+freigegeben. Kein `wert:` in Kap. 7 und keine Zahl der Rechnung ist geändert; ein neuer roter Test ist deshalb nicht zu
+erwarten, belegt ist das nicht. Befund 258 der Tabelle von #98 („dort 0,50“) ist nicht geändert; der Nachzug von 258 hier
+muss ihn abgleichen.
