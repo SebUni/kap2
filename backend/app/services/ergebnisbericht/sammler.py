@@ -56,6 +56,9 @@ class Berichtsdaten:
     parameter: list[dict] = field(default_factory=list)
     klima: list = field(default_factory=list)   # Klimazeile je bezifferter Klimawirkung (Teil 3)
     raum: list = field(default_factory=list)    # Raumzeilen von #95 je Ortsteil (Teil 5)
+    # Maßnahmenzeilen (Teil 6, ``massnahmen.massnahmenzeile``). Eine Beispielkommune rechnet
+    # ohne Datenbank und hat keine angelegten Maßnahmen; Teil 6 sagt das dann ausdrücklich.
+    massnahmen: list = field(default_factory=list)
 
     @property
     def beziffert_text(self) -> str:
