@@ -1405,3 +1405,40 @@ Der Merge von T-1636-methodik_manager nach main war leer, weil der Consultant in
 stand und nichts committet hat. Übernommen ist deshalb byte-gleich der Stand d454697f: Bericht, Ledger, QUELLEN.md und
 die Textabbilder 75, 76, 77, 78, 81 und 82 unter docs/quellen/methodik/96/. Die Befunde 230–253 und die Übernahmeliste
 Ü-1 bis Ü-12 bleiben unverändert; dieser Absatz ist die einzige Änderung gegenüber d454697f.
+
+## Runde 28 des methodik_manager zu T-1638-methodik_manager (29.09.2026) — volle Gegenprüfung A und B nach der Integration, neue Befunde ab Nr. 254
+
+Anlass: Vorhaben T-1629-cmo, Punkt 8 von T-1463-ceo. Gegenstand ist der ganze Bericht, Abschnitt A (Kopf bis §5) und
+Abschnitt B (§5.1 bis Ende Entscheidungslog) zusammen, nach `/methodik_manager-gegenpruefung 96`. Nach A-0046 ist das
+die sechste Runde ab Runde 23. Vorlage des methodik_consultant (Runde 0 des Tickets): Der Bericht ist nicht geändert,
+keine Befundnummer ist neu, keine Entscheidung und kein Status geändert. Voraussetzung erfüllt: Runde 27 liegt auf main
+(`origin/main` = d0960c93, T-1637-methodik_manager, freigegeben vom Prüfer); `git diff --name-only origin/main HEAD` war
+vor dieser Vorlage leer.
+
+**Messungen auf dem Branch, 29.09.2026, vor dem Urteil.**
+
+| Messung | Aufruf | Ergebnis |
+|---|---|---|
+| Ledger | `python3 backend/scripts/ledger.py 96 --pruefe` | GRÜN; 168 Befunde; `Prüfausdruck ROT   : 0`; 91 belegt geschlossen; 11 zurückgestellt (234, 235, 236, 237, 238, 239, 240, 244, 251, 252, 253), alle mit rotem Ausdruck gegen den Code (Sollzustand bis zur CTO-Übernahme Ü-1 bis Ü-12) |
+| Lint | `python3 backend/scripts/lint_methodik.py 96` | 237 Checks grün, `ALLE LINTS GRÜN` |
+| Stand der Übersicht | `_stand(_status(…))` aus `backend/scripts/methodik_uebersicht.py` auf `docs/methodik/96_aeroallergene.md` | `Rev. 4`; `_pruefakte` vor dieser Vorlage offene Befunde A/B/C `0/0/0`, letzte Runde 27 |
+| Alter Zelllauf | `grep -c '4,59 Mio' docs/methodik/96_aeroallergene.md` | 0 (Soll 0) |
+| Testlauf | die fünf Dateien aus Kriterium (8) von T-1632 (`test_methodik_96_golden.py`, `_kennzeichnung.py`, `_golden_betraege.py`, `_stadtbaum_golden.py`, `_s158_golden.py`) über `scripts/testlauf.sh … -q` | `1 failed, 36 passed, 1 warning`; rot allein `test_methodik_96_kennzeichnung.py::test_block_kennungen_sind_genau_die_13_aus_kapitel_7` (`assert (14 == 13)`, Übernahme Ü-12, nicht geändert) |
+| Sechste Datei | `backend/tests/test_methodik_96_endpunkt_berlin.py` über `scripts/testlauf.sh … -q`, getrennt, weil nicht in Kriterium (8) | `1 passed, 1 warning` |
+
+**Fundstellen im Bericht** (`docs/methodik/96_aeroallergene.md`, Stand d0960c93):
+
+| Stelle | Zeile | Inhalt |
+|---|---|---|
+| §3.0 Rechenkette | Z. 295–318 | zehn Ebenen, Tabelle Z. 307–318 |
+| §3.0 Ebene 10 | Z. 318 | 755.753 × 6,20 € = 4,69 Mio. € je Jahr (Preisstand 2024), Zelllauf 4,58 Mio. € |
+| §3.0 „Kommune statt Zellen“ | Z. 336–373 | Absatzbeginn Z. 336; Bandsummen des Gitters Z. 349–351; Zerlegung × 0,9812 und × 0,9969 Z. 352–358; Zelllauf 4,58 Mio. € und Unterschied 2,19 % Z. 359–362; Toleranz ± 0,005 Mio. € Z. 362–366 |
+| §5 Stadtbaumwahl | Z. 1006 ff. | Hebel „Allergenarme Stadtbaumwahl (W024-Pfad)“; Kosten Z. 1241–1302 |
+| §5 Punkt 1 | Z. 1245–1274 | Nachpflanzung ohnehin, Abschätzung von KAP3 60 € je Baum (Z. 1266), Band 0–185 € |
+| §5 Punkt 2 | Z. 1275–1302 | vorgezogener Ersatz, 3.636 € [75] (Z. 1277) plus Fällung 800 € (Z. 1284) = 4.436 € je Baum (Z. 1301) |
+| §5.1 S158 | Z. 1518 ff. | Wirkungsabschätzung S158 Pollen-Frühwarnung, §3.9 ABGESCHÄTZT |
+
+**Hinweis der Vorlage, kein Befund.** Entscheidungslog Nr. 20 (Z. 2524), letzte Spalte, sagt noch „Befund-124-Sperre
+(linked_risk_codes leer) bleibt bestehen“. Seit der Integration führt `POLLEN_EARLY_WARNING` den Risiko-Code in
+`linked_risk_codes` (Bericht Z. 63 und Z. 1862, Befund 231); Befund 231 hat §3.3, §5.1 und Kapitel 7 nachgezogen, Log 20
+nicht. Ob das ein Befund ist, entscheidet die Gegenprüfung.
