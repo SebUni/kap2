@@ -1016,9 +1016,12 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   des einen Terms im anderen abgezogen werden, etwa Kronen mit Gattungs-Tag, die es nicht gibt.
   **Der Boden 0,536 × Grünanteil ist kein eigener Parameter (Befund 249):** 0,536 = 1 − \(w_B\) ist
   die Definitionskonstante der Ebene (§3.3), der Grünanteil ist die Zelleingabe. Das Produkt hält
-  den Boden zusätzlich direkt; er greift dort nur, wenn das gespeicherte \(\hat G\) durch die Rundung
-  auf fünf Stellen um höchstens 0,000005 neben seinen Kronentermen liegt (gemessen höchstens
-  0,000004, an der Allee-Zelle unten weniger als 0,01 Tage).
+  den Boden zusätzlich direkt. Er greift dort in zwei Fällen: wenn das gespeicherte \(\hat G\) durch
+  die Rundung auf fünf Stellen um höchstens 0,000005 neben seinen Kronentermen liegt (gemessen
+  höchstens 0,000004, an der Allee-Zelle unten weniger als 0,01 Tage), und, bis das Produkt Befund 252
+  behebt, wenn die Kommune \(s_{\text{unbek}}\) nach dem Ausgangslauf überschrieben hat. Im zweiten
+  Fall verdeckt er einen Fehler, statt ihn zu beheben (Absatz „Produktstand“ unten: 14,65 statt
+  30,52 Tage).
   Kennt die Kommune die Gattungen ihrer Bäume selbst (Baumkataster), gehen diese Angaben schon in
   den Ausgangsstand und in Ḡ₀ ein, nicht erst in das Maßnahmenszenario; sonst würde die Senkung
   an Kronen gerechnet, die der Ausgangsstand nur mit 0,12 kennt. Die Effektgröße ist damit
@@ -1113,9 +1116,17 @@ assert abs(1 - vor[0.12] / vor[0.25] - 0.070) < 0.0005  # oder 7,0 % zu niedrig
 assert abs(verm[0.12] / verm[0.05] - 2.4) < 0.005      # Senkung Faktor 2,4 zu hoch
 assert abs(verm[0.25] / verm[0.12] - 2.08) < 0.005     # oder Faktor 2,08 zu niedrig
 assert 100 / 393_299 * (g_s[0.25] - g_s[0.05]) < 1e-5  # Ḡ₀ Berlins bewegt sich kaum (§3.0)
-# a ueber 1 (Befund 251): die Grenze je Term zaehlt es still wie 1
-for x in (1.0, 1.5, 2.0):
-    assert abs(tage(g_vor) - tage(g_vor - w_b * min(x * k, k)) - 122.1) < tol_tage
+# a ueber 1 (Befund 251): Produkt bildet a * Deckungsgrad * k und kappt dann je Term am Kronenanteil
+def verm_a(x, deckung):
+    return tage(g_vor) - tage(g_vor - w_b * min(x * deckung * k, k))
+
+
+for x in (1.0, 1.5, 2.0):                              # voll gedeckt: zaehlt wie 1
+    assert abs(verm_a(x, 1.0) - 122.1) < tol_tage
+assert abs(verm_a(1.0, 0.5) - 61.0) < tol_tage          # halb gedeckt: a = 1
+assert abs(verm_a(1.5, 0.5) - 91.6) < tol_tage          # a = 1,5 senkt mehr als a = 1
+assert abs(verm_a(2.0, 0.5) - 122.1) < tol_tage         # a = 2,0 das Doppelte (1/Deckungsgrad)
+assert abs(verm_a(2.0, 0.5) / verm_a(1.0, 0.5) - 1 / 0.5) < 1e-9
 # s_unbek nach dem Ausgangslauf ueberschrieben, 0,12 -> 0,25 (Befund 252)
 gemischt = tage(g_s[0.12]) - tage(g_s[0.12] - w_b * 0.25 * min(a * k, k))
 assert abs(gemischt - 6.58) < 0.005 and abs(vor[0.12] - 212.1) < tol_tage
@@ -1231,9 +1242,13 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
   **Wertebereich 0 bis 1** (0 < \(a\) ≤ 1; 1 heißt: alle allergenen Kronen der Zelle). Eine Eingabe
   über 1 hat keine Bedeutung. Das Produkt weist sie bei Anlage und Änderung einer Maßnahme ab; über
   den Excel-Import von Maßnahmen und in Maßnahmen, die vor dieser Prüfung gespeichert wurden, kommt
-  sie ungeprüft in die Rechnung und zählt dort still wie 1 (gemessen an der Allee-Zelle: \(a\) = 1,5
-  und \(a\) = 2,0 ergeben dieselben 122,1 vermiedenen Tage wie \(a\) = 1). Das Produkt soll sie auch dort abweisen oder
-  sichtbar kappen (Befund 251). Je Zelle sinkt der Kronenanteil mit
+  sie ungeprüft in die Rechnung. Dort bildet das Produkt erst \(a\) × Deckungsgrad × Kronenanteil
+  und kappt dann je Term am Kronenanteil. Eine Eingabe über 1 zählt deshalb nur bei voll gedeckter
+  Zelle wie 1; bei teilweiser Deckung senkt sie mehr als \(a\) = 1, bis zum 1/Deckungsgrad-Fachen,
+  ohne dass es sichtbar wird. Gemessen an der Allee-Zelle: Bei Deckungsgrad 1 ergeben \(a\) = 1,
+  1,5 und 2,0 je 122,1 vermiedene Tage; bei Deckungsgrad 0,5 ergibt \(a\) = 1 61,0 Tage,
+  \(a\) = 1,5 91,6 Tage und \(a\) = 2,0 122,1 Tage, das Doppelte. Das Produkt soll solche Eingaben
+  auch dort abweisen oder sichtbar kappen (Befund 251). Je Zelle sinkt der Kronenanteil mit
   Gattungs-Tag um \(a\) × Deckungsgrad × \(k_{\text{Birke},z}\) und der ohne Gattungs-Tag um
   \(a\) × Deckungsgrad × \(k_{\text{unbek},z}\), jeweils in seinem eigenen Term und höchstens bis auf
   null (Grenze je Term oben); die Senkung folgt also der Mischung der Zelle im Ausgangsstand. Eine
