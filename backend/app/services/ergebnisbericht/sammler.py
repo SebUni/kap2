@@ -26,6 +26,9 @@ DATENSTAENDE = [
                                     "Mittel der Sommer 2016–2025"),
     ("Gemeindegrenze", "BKG, Verwaltungsgebiete 1 : 250 000 (VG250), Gebietsstand 01.01. der "
                        "aktuellen Ausgabe, abgerufen am 26.09.2026"),
+    ("Ortsteilgrenzen", "OpenStreetMap über Overpass API, ODbL 1.0, © OpenStreetMap-Mitwirkende; "
+                        "Stand der OSM-Daten 27.09.2026, 11:19 Uhr UTC (Zeitstempel der Datenbasis), "
+                        "abgerufen am 27.09.2026"),
     ("Kostensätze", "Preisstand 2024"),
 ]
 
@@ -52,6 +55,7 @@ class Berichtsdaten:
     klimawirkungen_im_bericht: list[dict]
     parameter: list[dict] = field(default_factory=list)
     klima: list = field(default_factory=list)   # Klimazeile je bezifferter Klimawirkung (Teil 3)
+    raum: list = field(default_factory=list)    # Raumzeilen von #95 je Ortsteil (Teil 5)
 
     @property
     def beziffert_text(self) -> str:
@@ -99,6 +103,7 @@ def sammle(kommune: Beispielkommune, heute: dt.date | None = None) -> Berichtsda
         "betrag_eur": ergebnis.jahresbetrag_eur,
     }]
     from app.services.ergebnisbericht.klima import klimazeilen
+    from app.services.ergebnisbericht.raum import raumzeilen
 
     return Berichtsdaten(
         kommune=kommune, stand=stand, ergebnis95=ergebnis,
@@ -106,4 +111,5 @@ def sammle(kommune: Beispielkommune, heute: dt.date | None = None) -> Berichtsda
         klimawirkungen_im_bericht=im_bericht,
         parameter=_parameter_95(),
         klima=klimazeilen(kommune, ergebnis, im_bericht),
+        raum=raumzeilen(kommune),
     )
