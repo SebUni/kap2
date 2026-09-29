@@ -1007,8 +1007,21 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   \(\Delta\hat G = -0{,}464 \cdot (\Delta k_{\text{Birke}} + 0{,}12 \cdot \Delta k_{\text{unbek}})\).
   Kronen mit Gattungs-Tag der Birkengruppe zählen voll, Kronen ohne Gattungs-Tag (in OSM der
   Regelfall) nur mit 0,12, so wie der Ausgangsstand sie gezählt hat. Der Grünanteil (Gräser)
-  bleibt. **Grenze:** Die Senkung ist höchstens so groß wie der Kronen-Summand im Ausgangsstand,
-  also \(\hat G' \ge 0{,}536 \times\) Grünanteil; der Beitrag der Gehölze sinkt nie unter null.
+  bleibt. **Grenze je Term (Befund 248):** Ersetzt werden kann höchstens, was in einem Term steht,
+  \(\Delta k_{\text{Birke}} \le k_{\text{Birke}}\) und \(\Delta k_{\text{unbek}} \le k_{\text{unbek}}\).
+  Daraus folgt, dass die Senkung höchstens so groß ist wie der Kronen-Summand im Ausgangsstand,
+  also \(\hat G' \ge 0{,}536 \times\) Grünanteil; der Beitrag der Gehölze sinkt nie unter null. Eine
+  Grenze nur für den ganzen Kronen-Summanden ergibt, solange jede Senkung in ihrem Term bleibt,
+  dieselbe Zahl (gemessen am Produktcode, Befund 248). Sie ließe aber zu, dass zu viel ersetzte Kronen
+  des einen Terms im anderen abgezogen werden, etwa Kronen mit Gattungs-Tag, die es nicht gibt.
+  **Der Boden 0,536 × Grünanteil ist kein eigener Parameter (Befund 249):** 0,536 = 1 − \(w_B\) ist
+  die Definitionskonstante der Ebene (§3.3), der Grünanteil ist die Zelleingabe. Das Produkt hält
+  den Boden zusätzlich direkt. Er greift dort in zwei Fällen: wenn das gespeicherte \(\hat G\) durch
+  die Rundung auf fünf Stellen um höchstens 0,000005 neben seinen Kronentermen liegt (gemessen
+  höchstens 0,000004, an der Allee-Zelle unten weniger als 0,01 Tage), und, bis das Produkt Befund 252
+  behebt, wenn die Kommune \(s_{\text{unbek}}\) nach dem Ausgangslauf überschrieben hat. Im zweiten
+  Fall verdeckt er einen Fehler, statt ihn zu beheben (Absatz „Produktstand“ unten: 14,65 statt
+  30,52 Tage).
   Kennt die Kommune die Gattungen ihrer Bäume selbst (Baumkataster), gehen diese Angaben schon in
   den Ausgangsstand und in Ḡ₀ ein, nicht erst in das Maßnahmenszenario; sonst würde die Senkung
   an Kronen gerechnet, die der Ausgangsstand nur mit 0,12 kennt. Die Effektgröße ist damit
@@ -1034,6 +1047,101 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   ≈ 163 € je Jahr; die Tage verteilen sich nicht auf andere Zellen. Unter der früheren Regel
   (Ḡ in jedem Lauf neu gebildet, Log 19) stimmte die Aussage nicht, eine solche Pflanzung senke
   die Summe der Kommune; mit festgehaltenem Ḡ₀ stimmt sie.
+  **Toleranz der Allee-Zelle (Befund 250):** ± 0,05 Tage und ± 0,5 €, die halbe Einheit der
+  letzten genannten Stelle; so bindet auch der Golden-Test des Produkts die Zelle. Block
+  `beispiel_96_stadtbaum_allee` unten rechnet sie nach.
+
+  **Modellgrenze: \(s_{\text{unbek}}\) gilt für die ganze Kommune (Befund 246).** Das Produkt liest
+  kein Baumkataster je Zelle ein. Kronen ohne Gattungs-Tag zählen deshalb in jeder Zelle mit
+  demselben \(s_{\text{unbek}}\) = 0,12. Liegt der wahre Anteil der Birkengruppe an diesen Kronen in
+  einer Zelle höher, rechnet das Produkt dort Zusatztage und Senkung zu klein, liegt er niedriger, zu
+  groß. **Richtung:** Nach den Ankern von \(s_{\text{unbek}}\) (§3.3) liegen Straßenbäume am unteren
+  Bandende (0,05), Parks und Gehölze mit Hasel und Hainbuche am oberen (0,25). Für eine Allee aus
+  Straßenbäumen ohne Gattungs-Tag rechnet das Produkt also eher zu viel Last und zu viel Senkung.
+  Vegetationsarme Zellen führen kaum Kronen; ihr \(\hat G/\bar G_0\) ändert sich über das ganze Band
+  um weniger als 1 % (§3.3: +0,9 %). Im Ausgangsstand bleibt die Kommunensumme gleich: Was die
+  Allee-Zellen zu viel tragen, fehlt über ein höheres Ḡ₀ den übrigen Zellen, auch den
+  vegetationsarmen. Mit einer Maßnahme gibt es diesen Ausgleich nicht, der Fehler der Senkung bleibt
+  ganz stehen. **Größe an der Allee-Zelle:** Die Allee-Zelle oben führt ihre Kronen mit
+  Gattungs-Tag; \(s_{\text{unbek}}\) geht dort nicht ein, der Fehler ist null. Stehen dieselben
+  Kronen (Kronenanteil 0,3625) in OSM ohne Gattungs-Tag, wie meist, rechnet das Produkt mit 0,12:
+  \(\hat G\) = 0,2145, 212,1 Zusatztage im Ausgangsstand und 3,16 vermiedene Tage (≈ 19,58 € je Jahr)
+  für dieselbe Pflanzung. Mit einem Wert für diese Zelle wären es bei 0,05 203,5 und 1,32 Tage
+  (≈ 8,16 €), bei 0,25 227,9 und 6,58 Tage (≈ 40,79 €). Die Zusatztage liegen damit 4,2 % zu hoch
+  bis 7,0 % zu niedrig, die vermiedenen Tage um den Faktor 2,4 zu hoch bis 2,08 zu niedrig; die
+  Senkung ist linear in \(s_{\text{unbek}}\). Ḡ₀ bleibt dabei fest (Log 26); ein eigener Wert in nur
+  einer Zelle bewegt Ḡ₀ ohnehin kaum, in Berlin (393.299 Betroffene, §3.0) um weniger als 0,00001.
+  **Ersetzungspfad:** das Baumkataster der Kommune je Zelle im Ausgangsstand (§3.3).
+
+```python test: beispiel_96_stadtbaum_allee
+lam, delta, c_tag = 0.7, 1.8795, 6.20       # Kap. 7 pollen.lambda_veg, Ebene 6, Kap. 7 pollen.c_tag
+w_b, g0, B = 0.464, 0.18125, 100            # Ebenendefinition §3.3, Ḡ₀ der Beispielkommune, Betroffene
+tol_tage, tol_euro = 0.05, 0.5               # Toleranz der Allee-Zelle (Befund 250), wie der Golden-Test
+k = 0.3625                                   # Kronenanteil mit Gattungs-Tag = Grünanteil der Allee-Zelle
+g_vor = w_b * k + (1 - w_b) * k              # G^ im Ausgangsstand
+assert abs(g_vor / g0 - 2.0) < 1e-12
+dk = 0.2 * g0 / w_b                          # Senkung des Kronenanteils: G^/G0 sinkt um 0,2
+a = dk / k                                   # Eingabe anteil_ersetzt im Produkt (0 bis 1)
+assert abs(dk - 0.078125) < 1e-12 and 0 < a <= 1
+
+
+def tage(g, l=lam):                          # Zusatztage der Zelle, G0 festgehalten
+    return B * delta * (1 + l * (g / g0 - 1))
+
+
+g_nach = g_vor - w_b * min(a * k, k)         # Grenze je Term (Befund 248)
+assert abs(g_nach / g0 - 1.8) < 1e-12
+assert abs(tage(g_vor) - 319.5) < tol_tage and abs(tage(g_nach) - 293.2) < tol_tage
+senkung = tage(g_vor) - tage(g_nach)
+assert abs(senkung - 26.3) < tol_tage and abs(senkung / tage(g_vor) - 0.082) < 0.0005
+assert abs(senkung * c_tag - 163) < tol_euro
+assert abs(tage(g_vor, 0.3) - tage(g_nach, 0.3) - 11.3) < tol_tage
+assert abs(tage(g_vor, 1.0) - tage(g_nach, 1.0) - 37.6) < tol_tage
+# Grenze je Term gegen Grenze fuer den ganzen Kronen-Summanden (Befund 248): im Bereich gleich
+for x in (0.0, 0.25, 0.5, a, 1.0):
+    assert w_b * min(x * k, k) == min(w_b * x * k, w_b * k)
+# s_unbek kommunenweit (Befund 246): dieselben Kronen ohne Gattungs-Tag, dieselbe Pflanzung a
+g_s = {s: w_b * s * k + (1 - w_b) * k for s in (0.05, 0.12, 0.25)}
+vor = {s: tage(g) for s, g in g_s.items()}
+verm = {s: tage(g) - tage(g - w_b * s * min(a * k, k)) for s, g in g_s.items()}
+assert abs(g_s[0.12] - 0.2145) < 0.0001
+assert abs(vor[0.12] - 212.1) < tol_tage and abs(vor[0.05] - 203.5) < tol_tage
+assert abs(vor[0.25] - 227.9) < tol_tage
+assert abs(verm[0.12] - 3.16) < 0.005 and abs(verm[0.05] - 1.32) < 0.005
+assert abs(verm[0.25] - 6.58) < 0.005
+assert abs(verm[0.12] * c_tag - 19.58) < 0.01 and abs(verm[0.05] * c_tag - 8.16) < 0.01
+assert abs(verm[0.25] * c_tag - 40.79) < 0.01
+assert abs(vor[0.12] / vor[0.05] - 1.042) < 0.0005     # Ausgangsstand 4,2 % zu hoch
+assert abs(1 - vor[0.12] / vor[0.25] - 0.070) < 0.0005  # oder 7,0 % zu niedrig
+assert abs(verm[0.12] / verm[0.05] - 2.4) < 0.005      # Senkung Faktor 2,4 zu hoch
+assert abs(verm[0.25] / verm[0.12] - 2.08) < 0.005     # oder Faktor 2,08 zu niedrig
+assert 100 / 393_299 * (g_s[0.25] - g_s[0.05]) < 1e-5  # Ḡ₀ Berlins bewegt sich kaum (§3.0)
+# a ueber 1 (Befund 251): Produkt bildet a * Deckungsgrad * k und kappt dann je Term am Kronenanteil
+def verm_a(x, deckung):
+    return tage(g_vor) - tage(g_vor - w_b * min(x * deckung * k, k))
+
+
+for x in (1.0, 1.5, 2.0):                              # voll gedeckt: zaehlt wie 1
+    assert abs(verm_a(x, 1.0) - 122.1) < tol_tage
+assert abs(verm_a(1.0, 0.5) - 61.0) < tol_tage          # halb gedeckt: a = 1
+assert abs(verm_a(1.5, 0.5) - 91.6) < tol_tage          # a = 1,5 senkt mehr als a = 1
+assert abs(verm_a(2.0, 0.5) - 122.1) < tol_tage         # a = 2,0 das Doppelte (1/Deckungsgrad)
+assert abs(verm_a(2.0, 0.5) / verm_a(1.0, 0.5) - 1 / 0.5) < 1e-9
+# s_unbek nach dem Ausgangslauf ueberschrieben, 0,12 -> 0,25 (Befund 252)
+gemischt = tage(g_s[0.12]) - tage(g_s[0.12] - w_b * 0.25 * min(a * k, k))
+assert abs(gemischt - 6.58) < 0.005 and abs(vor[0.12] - 212.1) < tol_tage
+boden = (1 - w_b) * k                                  # Boden bei a = 1
+assert abs(tage(g_s[0.12]) - tage(max(boden, g_s[0.12] - w_b * 0.25 * k)) - 14.65) < 0.005
+assert abs(tage(g_s[0.25]) - tage(boden) - 30.52) < 0.005
+# eine Eingabe a fuer Kronen mit und ohne Gattungs-Tag (Befund 247), gleiche ersetzte Kronenflaeche
+kb = ku = 0.20
+s = 0.12
+produkt = w_b * (a * kb + s * a * ku)                  # Produkt: beide Terme um a
+nur_mit_tag = w_b * a * (kb + ku)                      # nur Baeume mit Gattungs-Tag ersetzt
+nur_ohne_tag = w_b * s * a * (kb + ku)                 # nur Baeume ohne Gattungs-Tag ersetzt
+assert abs(produkt / nur_mit_tag - 0.56) < 1e-12
+assert abs(produkt / nur_ohne_tag - 4.67) < 0.005
+```
 
   **Rechenbeispiel Kommunensumme (§3.9 ABGESCHÄTZT; vier Zellen wie in Ebene 7, \(\delta_R\) =
   1,8795 Tage je Betroffenem aus Ebene 6, \(c_{\text{Tag}}\) = 6,20 € aus Kapitel 7
@@ -1129,12 +1237,28 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
   Maßnahme, gerechnet wird im Zelllauf.
   **Produktstand, ehrlich benannt (seit der Integration am 27.09.2026, Befund 230):** Die Wirkung ist im
   Produkt sichtbar, als Katalogmaßnahme „Allergenarme Stadtbaumwahl“, die im Zelllauf rechnet. Die
-  Kommune zeichnet die Zellen als Geometrie der Maßnahme und gibt einen Anteil \(a\) ein, 0 < \(a\) ≤ 1:
-  den Anteil der allergenen Kronen, die dort ersetzt werden. Je Zelle sinkt der Kronenanteil mit
+  Kommune zeichnet die Zellen als Geometrie der Maßnahme und gibt einen Anteil \(a\) ein, im Produkt
+  das Feld `anteil_ersetzt`: den Anteil der allergenen Kronen, die dort ersetzt werden.
+  **Wertebereich 0 bis 1** (0 < \(a\) ≤ 1; 1 heißt: alle allergenen Kronen der Zelle). Eine Eingabe
+  über 1 hat keine Bedeutung. Das Produkt weist sie bei Anlage und Änderung einer Maßnahme ab; über
+  den Excel-Import von Maßnahmen und in Maßnahmen, die vor dieser Prüfung gespeichert wurden, kommt
+  sie ungeprüft in die Rechnung. Dort bildet das Produkt erst \(a\) × Deckungsgrad × Kronenanteil
+  und kappt dann je Term am Kronenanteil. Eine Eingabe über 1 zählt deshalb nur bei voll gedeckter
+  Zelle wie 1; bei teilweiser Deckung senkt sie mehr als \(a\) = 1, bis zum 1/Deckungsgrad-Fachen,
+  ohne dass es sichtbar wird. Gemessen an der Allee-Zelle: Bei Deckungsgrad 1 ergeben \(a\) = 1,
+  1,5 und 2,0 je 122,1 vermiedene Tage; bei Deckungsgrad 0,5 ergibt \(a\) = 1 61,0 Tage,
+  \(a\) = 1,5 91,6 Tage und \(a\) = 2,0 122,1 Tage, das Doppelte. Das Produkt soll solche Eingaben
+  auch dort abweisen oder sichtbar kappen (Befund 251). Je Zelle sinkt der Kronenanteil mit
   Gattungs-Tag um \(a\) × Deckungsgrad × \(k_{\text{Birke},z}\) und der ohne Gattungs-Tag um
-  \(a\) × Deckungsgrad × \(k_{\text{unbek},z}\), jeweils in seinem eigenen Term; die Senkung folgt also
-  der Mischung der Zelle im Ausgangsstand (eine Eingabe getrennt nach Kronen mit und ohne Gattungs-Tag,
-  wie sie Punkt (2) unten verlangt, hat das Produkt nicht: Befund 247). Daraus rechnet das Produkt
+  \(a\) × Deckungsgrad × \(k_{\text{unbek},z}\), jeweils in seinem eigenen Term und höchstens bis auf
+  null (Grenze je Term oben); die Senkung folgt also der Mischung der Zelle im Ausgangsstand. Eine
+  Eingabe getrennt nach Kronen mit und ohne Gattungs-Tag, wie sie Punkt (2) unten verlangt, hat das
+  Produkt nicht. **Das ist eine Modellgrenze (Befund 247), deren Richtung offen ist:** In der
+  Allee-Zelle oben stehen nur Kronen mit Gattungs-Tag, dort ist der Fehler null, ebenso wenn die
+  ersetzten Bäume gemischt sind wie die Zelle. Führt eine Zelle gleich viel Kronen mit und ohne
+  Gattungs-Tag und werden bei gleicher ersetzter Kronenfläche nur Bäume mit Tag ersetzt, rechnet das
+  Produkt das 0,56-Fache der Senkung; werden nur Bäume ohne Tag ersetzt, das 4,67-Fache (Block
+  `beispiel_96_stadtbaum_allee`). Daraus rechnet das Produkt
   \(\hat G'\) nach der Formel unten, \(\hat P\) mit dem Ḡ₀, das im Ausgangslauf gespeichert wurde, und die
   Zusatztage der Zelle neu. Ausgewiesen werden die vermiedenen Tage je Zelle und die vermiedenen Tage
   und Euro der Kommune, gekennzeichnet als „Abschätzung von KAP3“ mit dem Hinweis auf die Richtung des
@@ -1146,7 +1270,15 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
   abweicht, führt das Ledger: Den Euro-Betrag der Frühwarnung rechnet das Produkt in diesem Fall noch auf
   den Ausgangsstand (44,57 € statt 6,597 × 6,20 € = 40,90 €, Befund 240), Euro je Zelle gibt es nicht aus
   (Befund 237), die Kosten der Maßnahme sind nicht beziffert (Befund 253), und Gattungswissen der
-  Kommune geht nur kommunenweit über \(s_{\text{unbek}}\) ein (Befund 246).
+  Kommune geht nur kommunenweit über \(s_{\text{unbek}}\) ein (Befund 246, Modellgrenze oben).
+  Überschreibt die Kommune \(s_{\text{unbek}}\) nach dem Ausgangslauf, rechnet die Maßnahme die
+  Senkung mit dem neuen Wert, \(\hat G\) und Ḡ₀ aber aus dem gespeicherten Ausgangslauf mit dem alten
+  (Befund 252). Nach Log 26 gehören \(\hat G\), \(\hat G'\) und Ḡ₀ zum selben Ausgangsstand; ein
+  neues \(s_{\text{unbek}}\) ist ein neuer Ausgangsstand und braucht einen neuen Zelllauf. Gemessen an
+  der Allee-Zelle ohne Gattungs-Tag (Ausgangslauf mit 0,12, danach 0,25): 6,58 vermiedene Tage gegen
+  212,1 Tage des Ausgangslaufs, gleich gerechnet wären es 3,16 von 212,1 oder 6,58 von 227,9 Tagen;
+  bei \(a\) = 1 hält der Boden die Senkung beim Kronen-Summanden des alten Laufs (14,65 Tage statt
+  30,52 Tage mit 0,25).
   **Integrationsauflage (Stadtbaumwahl)**, im
   Rahmen der Auflage aus §3.3 (nur zellscharfe Änderung von \(\hat G\) mit Neuberechnung, nie ein
   Faktor): Der CTO braucht (1) die vom Nutzer gewählten Zellen, (2) als Eingabe die Änderung des
@@ -1155,8 +1287,9 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
   \(\hat G_z = w_B\,[k_{\text{Birke},z} + s_{\text{unbek}}\,k_{\text{unbek},z}] + (1-w_B)\,\text{Grün}_z\)
   (§3.3). Die Senkung wird in dem Term abgezogen, in dem die ersetzten Kronen im Ausgangsstand
   stehen, \(\hat G' = \hat G - 0{,}464 \cdot (\Delta k_{\text{Birke}} + 0{,}12 \cdot \Delta
-  k_{\text{unbek}})\), mit der Grenze \(\hat G' \ge 0{,}536 \times\) Grünanteil (Beitrag der
-  Gehölze nie unter null), nie aus einer anteiligen Senkung von \(\hat G\) und nie mit 0,464 voll
+  k_{\text{unbek}})\), mit der Grenze je Term \(\Delta k_{\text{Birke}} \le k_{\text{Birke}}\) und
+  \(\Delta k_{\text{unbek}} \le k_{\text{unbek}}\), daraus \(\hat G' \ge 0{,}536 \times\) Grünanteil
+  (Beitrag der Gehölze nie unter null; Befunde 248, 249), nie aus einer anteiligen Senkung von \(\hat G\) und nie mit 0,464 voll
   auf Kronen, die der Ausgangsstand ohne Gattungs-Tag führt; eigene Gattungsangaben der Kommune
   gehen schon in den Ausgangsstand und in Ḡ₀ ein, (3) den Zelllauf mit
   dem im Ausgangsszenario gebildeten und festgehaltenen Ḡ₀ und neuem \(\hat P\) je Zelle und (4) als
