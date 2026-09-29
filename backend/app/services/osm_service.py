@@ -196,6 +196,7 @@ async def _fetch_via_overpass(osm_id: str, osm_type: str, overpass_url: str) -> 
         resp = await client.post(
             overpass_url,
             data={"data": query},
+            headers={"User-Agent": settings.NOMINATIM_USER_AGENT},
             timeout=60.0,
         )
         resp.raise_for_status()
@@ -210,20 +211,30 @@ async def _fetch_via_overpass(osm_id: str, osm_type: str, overpass_url: str) -> 
     # Build GeoJSON from Overpass response
     if "members" in element:
         outer_coords = []
+        inner_coords = []
         for member in element.get("members", []):
-            if member.get("role") == "outer" and "geometry" in member:
-                ring = [(pt["lon"], pt["lat"]) for pt in member["geometry"]]
-                outer_coords.append(ring)
+            if "geometry" not in member:
+                continue
+            role = member.get("role")
+            if role == "outer":
+                outer_coords.append([(pt["lon"], pt["lat"]) for pt in member["geometry"]])
+            elif role == "inner":
+                inner_coords.append([(pt["lon"], pt["lat"]) for pt in member["geometry"]])
 
         if not outer_coords:
             return None
 
-        merged = _merge_rings(outer_coords)
+        polygons = [[ring] for ring in _merge_rings(outer_coords)]
 
-        if len(merged) == 1:
-            return {"type": "MultiPolygon", "coordinates": [[merged[0]]]}
-        else:
-            return {"type": "MultiPolygon", "coordinates": [[ring] for ring in merged]}
+        # Innere Ringe (Enklaven, Löcher) gehören als Loch in das Polygon,
+        # in dem sie liegen; ein Ring ohne umgebendes Polygon entfällt.
+        for hole in _merge_rings(inner_coords):
+            for polygon in polygons:
+                if _ring_in_ring(hole, polygon[0]):
+                    polygon.append(hole)
+                    break
+
+        return {"type": "MultiPolygon", "coordinates": polygons}
 
     elif "geometry" in element:
         coords = [(pt["lon"], pt["lat"]) for pt in element["geometry"]]
@@ -293,6 +304,26 @@ def _merge_rings(rings: list[list]) -> list[list]:
         merged.append(current)
 
     return merged
+
+
+def _point_in_ring(pt: tuple, ring: list) -> bool:
+    """Strahlverfahren: liegt der Punkt (lon, lat) im geschlossenen Ring?"""
+    x, y = pt
+    inside = False
+    for (x1, y1), (x2, y2) in zip(ring, ring[1:]):
+        if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+            inside = not inside
+    return inside
+
+
+def _ring_in_ring(inner: list, outer: list) -> bool:
+    """Ein innerer Ring liegt im äußeren, wenn die Mehrheit seiner Punkte darin liegt
+    (Punkte auf der Grenze zählen je nach Rundung mal innen, mal außen)."""
+    punkte = inner[:-1] if len(inner) > 1 else inner
+    if not punkte:
+        return False
+    innen = sum(1 for p in punkte if _point_in_ring(p, outer))
+    return innen * 2 > len(punkte)
 
 
 def _points_close(a: tuple, b: tuple, tol: float = 1e-6) -> bool:
