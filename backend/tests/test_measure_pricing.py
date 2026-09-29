@@ -16,6 +16,8 @@ Läuft mit pytest oder direkt: ``python tests/test_measure_pricing.py``.
 
 from __future__ import annotations
 
+import re
+
 from app.data import catalog, catalog_parked, sources
 from app.services import parameter_registry
 from app.services.measure_service import (
@@ -138,19 +140,38 @@ def test_source_refs_resolve_to_bibliography():
     assert not bad, f"Unbekannte source_refs-Keys: {bad}"
 
 
+_WAYBACK_PERMALINK = re.compile(r"^https://web\.archive\.org/web/\d{14}/.+")
+
+# Geschlossene Ausnahmeliste (Entscheidung des CEO, 29.09.2026, T-1531-ceo): Für diese
+# Schlüssel ist kein abrufbarer Wayback-Schnappschuss vorhanden; sie tragen statt
+# archive_url ein Feld archiv_ausnahme mit Grund und Prüfdatum. Keine allgemeine Lockerung.
+_ARCHIV_AUSNAHMEN = frozenset({"DWD_CatRaRE", "LoD2_HH", "LoD2_BB"})
+
+
 def test_bibliography_entries_are_complete():
-    """Jeder Bibliografie-Eintrag trägt IEEE-Zitation und Live-URL; der Archiv-Snapshot ist
-    Pflicht, außer es gibt keinen echten Schnappschuss mit Zeitstempel (T-1410, Punkt 7b) —
-    dann entfällt das Feld, statt eine unbelegte Platzhalter-URL zu tragen.
+    """Jeder Bibliografie-Eintrag trägt IEEE-Zitation, Live-URL und Archiv-Snapshot.
+
+    `archive_url` ist für jeden Eintrag Pflicht (T-1531-ceo, nimmt die Lockerung aus T-1410
+    zurück: die galt nur, weil es damals keinen echten Schnappschuss für den ICAO-Eintrag gab —
+    seit T-1511-cto trägt er einen, und eine Ausnahme für Einträge ohne Schnappschuss ist keine
+    dauerhafte Lücke, sonst gingen künftige Quellen ohne Schnappschuss unbemerkt durch). Das
+    Format ist ein absoluter Wayback-Permalink mit vollem 14-stelligem Zeitstempel
+    (`https://web.archive.org/web/<14 Ziffern>/…`) — eine bloße Jahreszahl statt Zeitstempel
+    ist kein Beleg für einen echten Schnappschuss.
     """
     bad = []
     for key, entry in sources.SOURCE_REFERENCES.items():
         for field in ("ieee", "url"):
             if not entry.get(field):
                 bad.append((key, field))
-        if entry.get("archive_url") and not entry["archive_url"].startswith(
-                "https://web.archive.org/web/"):
-            bad.append((key, "archive_url ist kein absoluter Wayback-Permalink"))
+        if not entry.get("archive_url"):
+            # archiv_ausnahme gilt nur für die geschlossene Menge (Entscheidung des CEO,
+            # 29.09.2026); jeder andere Schlüssel ohne archive_url bleibt rot.
+            if not (key in _ARCHIV_AUSNAHMEN and entry.get("archiv_ausnahme")):
+                bad.append((key, "archive_url"))
+        elif not _WAYBACK_PERMALINK.match(entry["archive_url"]):
+            bad.append((key, "archive_url ist kein absoluter Wayback-Permalink "
+                             "mit 14-stelligem Zeitstempel"))
     assert not bad, f"Unvollständige Bibliografie-Einträge: {bad}"
 
 
