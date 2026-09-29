@@ -8,10 +8,11 @@ Kappung 0,794 und die Bänder von \(f_a\) und \(\bar L_a\) ergänzt, die Runden 
 Kalibrierjahre bei S157 und den Berliner Betrag des Hitzeaktionsplans; `MANAGER-REVIEW: ABGENOMMEN` am 27.09.2026,
 T-1585-methodik_manager) · 27.09.2026 ·
 Rev. 8 vom 30.08.2026 (§3.4-Ressourcen-Regel, q_pfl-Ebene angelegt, q_1P geparkt, L̄_85+ exakt 4,16 J; Befunde
-86–94 behoben) hat Fortschreibung 7 in den Ledger-Runden 10–29 um die Rechenkette 3.0, den Pflichtabschnitt „Risiko
+86–94 behoben) hat Fortschreibung 7 in den Ledger-Runden 10–38 um die Rechenkette 3.0, den Pflichtabschnitt „Risiko
 ohne (weitere) Anpassung“, die Kennzeichnung der Parameter, die Ersatzregel für den Anteil 65+, den Berlin-Anker und
-die Maßnahmen-Hebel S157 und Schutzprogramme vulnerable Gruppen ergänzt; im Produkt stehen die Ersatzregel (Befund
-116), die Kennzeichnung der Parameter und die beiden Hebel noch aus ·
+die Maßnahmen-Hebel S157 (mit dem Abzug des Bestands der Kalibrierjahre, Block `heat.s_gek_kalib`), öffentliche
+Kühlzentren und Schutzprogramme vulnerable Gruppen ergänzt; seit dem Code-Nachzug T-1582-ceo rechnet das Produkt die
+drei Hebel und führt die Kennzeichnung der Parameter, aus steht dort noch die Ersatzregel (Befund 116) ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 95-A** (RKI-Expositions-Wirkungs-Funktion, bottom-up; Entscheidungslog Nr. 1)
 
@@ -158,9 +159,9 @@ Spalte verweist auf die Entscheidungslog-Nummer.
 | 95-S154-01 | S154 Freizeitverhalten → Morbidität (exertional) | zweite Fallspitze junger Erwachsener; überwiegend ambulant | Beschreibung [16,18] | M0 Rev. 5 | — | — | **bewusst inaktiv** | Log 15 |
 | 95-S155-01 | S155 Gefahrenbewusstsein → Mortalität | Bestandteil der Warn-/Verhaltenskette (\(\delta_{\text{HAP}}\)) | Interventions-/quasi-exp. Evidenz | [45,47] | Städte-DiD DE; Europa-Review | kommunal | **Maßnahmen-Hebel** | Log 10 |
 | 95-S152-03 | Schutzprogramme vulnerable Gruppen → Mortalität und Einweisungen 75+ | \(\delta_{\text{VG}}\) 0,931 (0,794–1,0) auf den Wochenexzess 75–84 und 85+ ohne Heimbewohner; auf die Einweisungen derselben Bänder \(\delta_{\text{VG,morb}}\) 1,0 (0,931–1,069) | Abschätzung von KAP3 aus Paketwirkung (Ländervergleich, Obergrenze; Kappung 0,794 (0,743–0,842) als eigener Block) und quasi-experimentellem Vergleich (Wirkung bei Erreichten); Doppelzählungs-Wächter mit Voreinstellung „nein“ aus der Verbreitung kommunaler Hitzeaktionspläne | [47], [70], [76] | Europa 1990–2019; Rom 2015 | kommunal | **Maßnahmen-Hebel** (abgeschätzt, §5) | Log 43 |
-| 95-S157-01 | S157 gekühlte Räume → Mortalität (Heime) | rOR ≈ 0,93 (0,87–0,99) an Extremhitzetagen ⇒ Exzessfaktor \(g_{\text{S157}}\) 0,29; gekühlter Anteil der Heimplätze \(s_{\text{gek}}\) voreingestellt 0,11 (0,05–0,15) | Case-Crossover (Ontario, 73.578 Todesfälle); Anteil gekühlter Heime aus Umfrage und Baustatistik | [46], [71], [72] | Ontario 2010–2023; Deutschland 2025/2026 | Heim-Ebene; \(s_{\text{gek}}\) für die ganze Kommune | **Maßnahmen-Hebel** (R7-Weiche §5) | Log 10, 45 |
-| 95-S157-02 | S157 öffentliche Kühlzentren → Mortalität 75+ außerhalb der Heime | \(\delta_{\text{KZ}}\) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,71 × 3/24 = 0,9956 (0,982–0,9994) | Abschätzung von KAP3: Klimaanlagen-Effekt [46] × Dauer der Kühlwirkung aus einer Laborstudie [73]; Plausibilisierung an der Fall-Kontroll-Meta-Analyse [41] | [41], [46], [73] | eine Studie, die die Wirkung von Kühlzentren auf die Sterblichkeit misst, hat KAP3 nicht gefunden (Suche 27.09.2026); Übertragung aus Heimen und Labor | kommunal | **Maßnahmen-Hebel** (abgeschätzt, §5) | Log 46 |
-| 95-S158-01 | S158 Frühwarnsysteme → Mortalität | DiD 15 dt. Städte: RR 1,00 [0,98–1,01]; adjustiert 0,85 [0,75–0,97]; Europa: HAF-Reduktion 25,2 % [19,8–31,9] (Einführungseffekt [47], Befund 68) | quasi-experimentell | [45,47] | DE/Europa; im Basiswert der Kalibrierjahre enthalten | kommunal | **Maßnahmen-Hebel** (\(\delta_{\text{HAP}}\) = 0,95, marginal) | Log 10 |
+| 95-S157-01 | S157 gekühlte Räume → Mortalität (Heime) | rOR ≈ 0,93 (0,87–0,99) an Extremhitzetagen ⇒ Exzessfaktor \(g_{\text{S157}}\) 0,2936; gekühlter Anteil der Heimplätze \(s_{\text{gek}}\) voreingestellt 0,11 (0,05–0,15) | Case-Crossover (Ontario, 73.578 Todesfälle); Anteil gekühlter Heime aus Umfrage und Baustatistik | [46], [71], [72] | Ontario 2010–2023; Deutschland 2025/2026 | Heim-Ebene; \(s_{\text{gek}}\) für die ganze Kommune | **Maßnahmen-Hebel** (R7-Weiche §5) | Log 10, 45 |
+| 95-S157-02 | S157 öffentliche Kühlzentren → Mortalität 75+ außerhalb der Heime | \(\delta_{\text{KZ}}\) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,7064 × 3/24 = 0,995585 (0,982–0,9994) | Abschätzung von KAP3: Klimaanlagen-Effekt [46] × Dauer der Kühlwirkung aus einer Laborstudie [73]; Plausibilisierung an der Fall-Kontroll-Meta-Analyse [41] | [41], [46], [73] | eine Studie, die die Wirkung von Kühlzentren auf die Sterblichkeit misst, hat KAP3 nicht gefunden (Suche 27.09.2026); Übertragung aus Heimen und Labor | kommunal | **Maßnahmen-Hebel** (abgeschätzt, §5) | Log 46 |
+| 95-S158-01 | S158 Frühwarnsysteme → Mortalität | DiD 15 dt. Städte: RR 1,00 [0,98–1,01]; adjustiert 0,85 [0,75–0,97]; Europa: HAF-Reduktion 25,2 % [19,8–31,9] (Einführungseffekt [47], Befund 68) | quasi-experimentell | [45,47] | DE/Europa; im Basiswert der Kalibrierjahre enthalten | kommunal | **Maßnahmen-Hebel** (\(\delta_{\text{HAP}}\) = 0,939, marginal) | Log 10 |
 | 95-R35-01 | R35 Bevölkerung → Exposition | \(\text{pop}_a\) je Zelle | amtliche Statistik | Zensus 2022 (100-m-Gitter) | DE-weit | vorhanden | **Basiswert** | Log 1 |
 | 95-R36-01 | R36 Gesundheitsinfrastruktur → Mortalität | +≈1 % Mortalität je +10 km KH-Distanz (transportierte Notfälle) | Beobachtung | Nicholl 2007 [38]; Hilfsfrist [39] | UK; Hitzetote sterben überwiegend zu Hause — Übertragbarkeit zu schwach für den Basiswert | HEALTHCARE_ACCESS-Distanz | **Sensitivitätsband** (Basiswert-Default 1) | Log 20 |
 
@@ -489,7 +490,7 @@ Faktoren und der Wochenquantile ab (§3.2: mit der Datei 342,58 Mio. € und 172
 zwei Rechnungen: 362,9 ist die Kette an einem Punkt (§3.0), 342,67 der Zelllauf mit ungerundeten Faktoren, 343 derselbe
 Zelllauf aus den gerundeten Faktoren im Prüfblock §3.0 (362,9 × 0,934 nach Teilung durch 0,9888 = 342,8; mit dem
 ungerundeten Produkt 0,9343 der vier Faktoren, wie im Prüfblock, 342,9). Warmsen zählt nach dem Zensus 2022 amtlich 3.158 Einwohner
-[69], liegt also unter 10.000. Gewählt ist Warmsen, weil sie unter allen Gemeinden mit 2000 bis
+[69], liegt also unter 10.000. Gewählt ist Warmsen, weil sie unter allen Gemeinden mit 2.000 bis
 unter 10.000 Einwohnern im Zensus-Gitter den höchsten Anteil der Einwohner in Zellen mit
 geheimgehaltenem Anteil 65+ hat (Median der Gemeinden unter 10.000 Einwohnern 27,9 %; Aufruf
 `python3 docs/methodik/anlagen/95_zellvergleich.py --rangliste`).
@@ -799,7 +800,7 @@ Paket nicht; wie stark die Bänder den Betrag verschieben, steht in §5 (Sensiti
 | \(e_{\text{HD}}\) | rel. Mehr-Einweisungen je Hitzetag (> 30 °C), **konditional** | 1/Tag | 0,024 (Band 0,024–0,061; unkond. 0,054), K&Z Tab. 1 [18,62]; register:95-E02-02; Log 19 |
 | \(f_a\) | Altersfaktor der RR-Steigung rel. zu 85+ | — | 0,357 / 0,588 / 0,631 / 1,0 — Rückrechnung §3.3a (lineare Näherung, gekennzeichnet); Band 0,156–0,562 / 0,341–0,753 / 0,588–0,659 / 1,0 aus den Altersanteilen der Sommer 2025 und 2026 [74, 75] (Befund 152); herleitung:#f-a |
 | \(F_{\text{Zelle}}\) | hitzeassoziierte Erkrankungsfälle (Teil-Ausweis) | 1/Jahr | Ergebnis |
-| \(g_{\text{S157}}\) | Exzessfaktor gekühlter Heimplätze: Anteil des Hitze-Exzesses, der mit Klimaanlage bleibt (Maßnahme §5) | — | 0,29 (Band 0–0,90) = (rOR × OR_ohne − 1)/(OR_ohne − 1), Abschätzung von KAP3 aus [46]; register:95-S157-01 |
+| \(g_{\text{S157}}\) | Exzessfaktor gekühlter Heimplätze: Anteil des Hitze-Exzesses, der mit Klimaanlage bleibt (Maßnahme §5) | — | 0,2936 (Band 0–0,90) = (rOR × OR_ohne − 1)/(OR_ohne − 1), Abschätzung von KAP3 aus [46]; register:95-S157-01 |
 | \(h_{\text{Heim}},\ h_{\text{Heim},z}\) | Anteil der Heimbewohner an den Todesfällen 85+ auf Ebene der Kommune / der Zelle \(z\) | — | Kommune: \(\bar q_{\text{pfl}}\,[1 + \beta_{\text{pfl}}(1 - \bar q_{\text{pfl}})]\) = 0,344 (Band 0,275–0,517); Zelle: \(q_{\text{pfl},z}\,[1 + \beta_{\text{pfl}}(1 - \bar q_{\text{pfl}})] / [1 + \beta_{\text{pfl}}(q_{\text{pfl},z} - \bar q_{\text{pfl}})]\), Rückfallwert 0,344 (§5, Befund 146); berechnet, Block `heat.h_heim` [61]; register:95-S153-01 |
 | \(\text{HD},\ \text{HD}_{\text{ref}}\) | Hitzetage der Zelle (DWD-CDC hot_days 1 km, ohne UHI — §3.4) / Referenz = K&Z-Basisperiode | Tage/Jahr | HD: DWD-CDC [33]; \(\text{HD}_{\text{ref}}\) = **7,2** (Ø 1999–2008 [18]); herleitung:#hd-ref |
 | \(\bar L_a\) | Restlebenserwartung je Band (Sterbetafel 2022/2024; u65–75–84 Stützstellen e(60)/e(70)/e(80); **85+ exakt sterbefallgewichtet, Rev. 8**) | Jahre | 23,39 / 15,59 / 8,90 / **4,16** (Band 23,39–28,64 / 15,31–15,59 / 8,54–8,90 / 4,16–4,20: Stützstelle bis sterbefallgewichteter Wert, §3.5, Befund 152; Anlage l85_sterbefallgewichtung.csv) [48,49]; herleitung:#l-a |
@@ -811,7 +812,7 @@ Paket nicht; wie stark die Bänder den Betrag verschieben, steht in §5 (Sensiti
 | \(q_{w,\text{Region}}\) | empirisches Anomalie-Quantil der Sommerwoche | K | Tabelle §3.2; wochenquantile_region.csv [33,50] |
 | \(r_{0,a}\) | Baseline-Einweisungsrate je Band | 1/100.000·a | 1,9 / 6,3 / 10,8 / 15,6 (= 1:3,3:5,7:8,2; Summe 3,54; Band ×0,6–1,6 = Summen-Band 2,9–4,3 [×0,83–1,23] kombiniert mit Altersprofil-Unsicherheit ±25 % [Option-B-Profil §3.4] ⇒ ≈ ×0,6–1,6) — Herleitung §3.4, Altersprofil gekennzeichnete Abschätzung [16,18,62]; herleitung:#r0-a |
 | \(\text{rOR}\) | Verhältnis der Odds des Todes an Extremhitzetagen, Heime mit gegen ohne Klimaanlage (Maßnahme S157, §5) | — | 0,93 (0,87–0,99) = Kehrwert von 1,08 (1,01–1,15) [46]; register:95-S157-01 |
-| \(r_{\text{KZ}},\ t_{\text{KZ}},\ w_{\text{KZ}}\) | öffentliche Kühlzentren: Reichweite (Anteil der Menschen ab 75 außerhalb der Heime, die an Hitzetagen hingehen) / geschützter Anteil des Tages / Wirkung bei Nutzern (Anteil ihres Exzesses, der wegfällt) | — | 0,05 (0,01–0,10), Setzung von KAP3 / 3/24 (2/24–6/24): 2 h Aufenthalt und 1 h Nachwirkung [73] / \(w_{\text{KZ}} = (1 - g_{\text{S157}}) \times t_{\text{KZ}}\) = 0,71 × 3/24 = 0,089, Abschätzung von KAP3 [46,73] (Befunde 139, 148); register:95-S157-02 |
+| \(r_{\text{KZ}},\ t_{\text{KZ}},\ w_{\text{KZ}}\) | öffentliche Kühlzentren: Reichweite (Anteil der Menschen ab 75 außerhalb der Heime, die an Hitzetagen hingehen) / geschützter Anteil des Tages / Wirkung bei Nutzern (Anteil ihres Exzesses, der wegfällt) | — | 0,05 (0,01–0,10), Setzung von KAP3 / 3/24 (2/24–6/24): 2 h Aufenthalt und 1 h Nachwirkung [73] / \(w_{\text{KZ}} = (1 - g_{\text{S157}}) \times t_{\text{KZ}}\) = 0,7064 × 3/24 = 0,0883, Abschätzung von KAP3 [46,73] (Befunde 139, 148); register:95-S157-02 |
 | \(r_{\text{VG}},\ w_{\text{VG}}\) | Reichweite eines Schutzprogramms (Anteil der Menschen ab 75) / Wirkung bei Erreichten (Anteil des Exzesses, der wegfällt) | — | 0,20 (0,05–0,40), Setzung von KAP3 / 0,34 (0–0,68), Abschätzung von KAP3 = bereinigte Senkung des Anstiegs 24,4 Pp. ([70] Tabelle 3) geteilt durch den Anstieg ohne Programm 97,3 % und den Einschreibeanteil 0,728 (Befunde 128, 134); untere Grenze aus [70] Tabelle 2 (Befund 132), obere Grenze der rohe Unterschied 0,498 / 0,728 = 0,68; register:95-S152-03 |
 | \(s_{\text{gek}}\) | gekühlter Anteil der Heimplätze der Kommune (Eingabe der Maßnahme, gilt für die ganze Kommune) | — | Voreinstellung **0,11** (Band 0,05–0,15), Abschätzung von KAP3 aus [71] und [72] (Block `heat.s_gek`, Befund 138); die Eingabe der Kommune im Produkt (`COOLING_ROOMS_DRINKING_WATER`) ersetzt sie; Beispiel 1 in §5; register:95-S157-01 |
 | \(T_{0,\text{Region}}\) | Wirkschwelle Wochenmittel | °C | 19,7 / 20,2 / 20,8 (N/M/S), Winklmayr [11]; register:95-E02-01 |
@@ -825,8 +826,8 @@ Paket nicht; wie stark die Bänder den Betrag verschieben, steht in §5 (Sensiti
 | \(\beta_d\) | Distanz-Effekt — **Sensitivitätsband, nicht im Basiswert** (Log 20) | 1/km | ≈ 0,001 (0–0,002) [38]; register:95-R36-01; Hilfsfrist [39] nur Screening |
 | \(\beta_{\text{iso}}\) | Isolations-Effekt, OR-übersetzt: \((\text{OR}-1)/[1+\bar q(\text{OR}-1)]\); nur D-Pfad, Bänder 65+ | — | (2,3−1)/[1+0,346·1,3] = **0,90** (Band 0,3–1,4 = Übersetzung eines OR-Bands ≈ 1,4–3,7 — KI-Approximation, gekennzeichnete Abschätzung §3.9) [40,63]; register:95-S152-02 |
 | \(\beta_{\text{pfl}}\) | Pflegeheim-Effekt (nur Band 85+, nur D-Pfad) | — | (3,0−1)/[1+0,149·2,0] = **1,54** (Band 1,0–2,9); Kette §3.3b [41,44,60,61]; register:95-S153-01 |
-| \(\delta_{\text{HAP}}\) | Hitzeaktionsplan-Dämpfung — multiplikativ auf den Wochen-Exzess (RR−1); Maßnahme §5 | — | 0,95 (0,85–1,00) [45,47]; register:95-S158-01 |
-| \(\delta_{\text{KZ}}\) | Dämpfung durch öffentliche Kühlzentren — multiplikativ auf den Wochen-Exzess der Bänder 75–84 und 85+ (85+ ohne Heimbewohner); Maßnahme §5 | — | 0,9956 (0,982–0,9994) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,089; Abschätzung von KAP3 [41,46,73] (Block `heat.delta_kuehlzentren`, Befunde 139, 148); register:95-S157-02 |
+| \(\delta_{\text{HAP}}\) | Hitzeaktionsplan-Dämpfung — multiplikativ auf den Wochen-Exzess (RR−1); Maßnahme §5 | — | 0,939 (0,852–1,00): Exzess am Hitzetag nach / vor Einführung des Warnsystems, roh 0,1466 / 0,1561 aus [45], Tabelle 1; unten Durchschnittsstadt 0,98 auf den Exzess übersetzt, 1 − 0,02 × 1,1561 / 0,1561 = 0,852; oben keine Wirkung; Abschätzung von KAP3 (Befunde 164, 180) [45,47]; register:95-S158-01 |
+| \(\delta_{\text{KZ}}\) | Dämpfung durch öffentliche Kühlzentren — multiplikativ auf den Wochen-Exzess der Bänder 75–84 und 85+ (85+ ohne Heimbewohner); Maßnahme §5 | — | 0,995585 (0,982–0,9994) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,0883; Abschätzung von KAP3 [41,46,73] (Block `heat.delta_kuehlzentren`, Befunde 139, 148); register:95-S157-02 |
 | \(\delta_{\text{VG}}\) | Dämpfung durch Schutzprogramme vulnerable Gruppen — multiplikativ auf den Wochen-Exzess der Bänder 75–84 und 85+ (85+ ohne Heimbewohner); Maßnahme §5 | — | 0,931 (0,794–1,0) = 1 − \(r_{\text{VG}} \times w_{\text{VG}}\) = 1 − 0,20 × 0,3445 (\(w_{\text{VG}}\) ungerundet, gerundet 0,34), Wirkung höchstens bis zum Paketwert 0,794 [47]; Abschätzung von KAP3 [47,70]; register:95-S152-03 |
 | \(\delta_{\text{VG,morb}}\) | Faktor der Schutzprogramme auf die Einweisungen (Morbidität) der Bänder 75–84 und 85+ ohne Heimbewohner; Maßnahme §5 | — | 1,0 (0,931–1,069), Abschätzung von KAP3: unten wie \(\delta_{\text{VG}}\), oben 1 + \(r_{\text{VG}} \times w_{\text{VG}}\) = 1 + 0,20 × 0,3445 = 1,069 (\(w_{\text{VG}}\) ungerundet; Befunde 131, 134); register:95-S152-03 |
 | \(\Delta D_{\text{KZ}}\) | vermiedene Todesfälle 75–84 und 85+ außerhalb der Heime durch öffentliche Kühlzentren | 1/Jahr | berechnet (§5) |
@@ -1048,30 +1049,70 @@ assert abs(0.0634 * 1.0 - 0.0634) < 1e-9 and abs(0.0625 * 1.0 - 0.0625) < 1e-9
 Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll-ORs
 (Bouchama: Klimaanlage 0,23) sind keine Einführungswirkungen:
 
-- **Hitzeaktionsplan / Frühwarnkette (S155/S158):** \(\delta_{\text{HAP}}\) zentral 0,95
-  (Band 0,85–1,00), **definiert als multiplikativer Faktor auf den Wochen-Exzess (RR − 1)**
+- **Hitzeaktionsplan / Frühwarnkette (S155/S158):** \(\delta_{\text{HAP}}\) = 0,939 (Band 0,852–1,00),
+  **definiert als multiplikativer Faktor auf den Wochen-Exzess (RR − 1)**
   — konsistent zur Studienart der Evidenz (Ergebnis-Effekte; Befund 33; die frühere
   β-Formulierung ist gestrichen; Anwendung auf β wiche je nach Wochenhitze um bis zu
   0,7 %-Punkte ab). Evidenz: DiD 15 dt. Städte RR 1,00 [0,98–1,01], adjustiert 0,85 [45];
   Europa-Analyse [47] (Zahlen korrigiert, Befund 68): HAF-Reduktion durch Präventionspläne
   **25,2 % [19,8–31,9]** (regional −11,9…−33,2 %, Länderspanne −10…−43 %; ohne 2003:
   15,2 % [4,1–23,7]) — das ist der **Einführungseffekt** über drei Jahrzehnte, nicht der
-  marginale Spielraum gegenüber dem heutigen deutschen Stand; der Basiswert
-  \(\delta_{\text{HAP}}\) = 0,95 (Band 0,85–1,00) bleibt daher [45]-gestützt und marginal.
-  **Herleitung (Abschätzung von KAP3, Befund 164):** [45] nennt zwei Werte für die Wirkung der Hitzewarnungen auf die
-  Sterblichkeit in Hitzeperioden: gemittelt über die 15 Städte RR 1,00 (0,98–1,01), also keine Wirkung, und bereinigt
-  um Erholungsfläche je Einwohner, Einwohnerzahl und Bevölkerungsdichte der Städte RR 0,85 (0,75–0,97), eine kleine
-  Wirkung (Abstract, Teil Results). Der erste Wert gilt für die durchschnittliche Stadt. Der zweite hängt an einer
-  Bereinigung über drei Merkmale der Städte, die das Produkt nicht nachbildet. KAP3 gibt dem ersten deshalb doppeltes
-  Gewicht: \(\delta_{\text{HAP}}\) = 2/3 × 1,00 + 1/3 × 0,85 = 1,00 − 1/3 × 0,15 = 0,95. Das Band 0,85–1,00 sind die
-  beiden Werte aus [45]. **Warum nicht die Mitte 0,925:** Die Mitte gäbe dem bereinigten Wert dasselbe Gewicht wie dem
-  Mittel über alle Städte, obwohl das Mittel mit 0,98–1,01 eng um „keine Wirkung“ liegt. Berlin käme dann auf
-  27,1 statt 18,1 Mio. € je Jahr. **Gegenargument:** 0,95 liegt außerhalb des Intervalls 0,98–1,01 des Mittels. Der
-  Wert ist nur deshalb nicht 1,00, weil ein Hitzeaktionsplan mehr enthält als die Warnung, deren Wirkung schon im
-  Basiswert steckt (Wächter unten), und weil eine Nullwirkung nicht stehen bleibt (P2). **Berlin** (Beispiel-Block
-  `sensitivitaeten_berlin`, Kapitel 7): Der Faktor wirkt auf den Exzess aller Bänder, also auf die ganze Mortalität der
-  Rechenkette: 361,8 Mio. € × (1 − 0,95) = **18,1 Mio. € je Jahr** (Preisstand 2024; Band 0–54,3 Mio. €), 5,0 % des
-  Jahresbetrags 362,9 Mio. €. Die Morbidität bleibt unberührt; der Block gilt nur für die Mortalität.
+  marginale Spielraum gegenüber dem heutigen deutschen Stand. \(\delta_{\text{HAP}}\) bleibt daher [45]-gestützt
+  und marginal: Ein Plan nimmt 6,1 % des Exzesses weg, das ganze Paket der Hitzeschutzpläne in Deutschland 20,6 %
+  (0,794, Block `heat.kappung_vg`).
+  **Lesart (Befund 180).** Worauf die Werte aus [45] wirken, legt die Quelle in Abschnitt 2.2.1
+  (Difference-in-differences approach, S. 3) fest: „The effect of the heat alerts on the all-cause daily death count
+  per city was estimated as the difference in daily mortality between eligible days and non-eligible days before the
+  HHWS implementation compared to the difference between eligible days and non-eligible days after HHWS
+  implementation.“ Geschätzt wird mit einem quasi-Poisson-Modell auf die Zahl aller Todesfälle je Tag (ebenda: „to
+  estimate the effect of heat alerts on daily all-cause death counts“). Ein RR aus [45] ist also ein Faktor auf die
+  Sterblichkeit an Hitzetagen insgesamt, nicht auf ihren hitzebedingten Exzess. Das Produkt legt
+  \(\delta_{\text{HAP}}\) aber auf den Exzess (RR − 1); deshalb wird übersetzt wie bei S157 (Befund 124). An
+  Hitzetagen starben in den 15 Städten vor dem Warnsystem 31,1 Menschen je Tag, an den übrigen Tagen des Sommers 26,9
+  ([45], Tabelle 1, 1993–2004). Das RR des Hitzetags ist 31,1 / 26,9 = 1,1561: Von 1,1561 Todesfällen am Hitzetag
+  sind 0,1561 hitzebedingt. Ein Faktor d auf alle Todesfälle nimmt (1 − d) × 1,1561 weg, das ist der Anteil
+  (1 − d) × 1,1561 / 0,1561 des Exzesses:
+  δ_Exzess = 1 − (1 − d) × 1,1561 / 0,1561.
+  Für die Werte aus [45] heißt das: Die Durchschnittsstadt, RR 1,00 (0,98–1,01), bleibt auf dem Exzess 1,00
+  (0,852–1,074). Der Achsenabschnitt der Meta-Regression, 0,85 (0,75–0,97), wird −0,111 (−0,85 bis 0,78). Der
+  bisherige Wert 0,95 = 2/3 × 1,00 + 1/3 × 0,85 wird 0,630 = 2/3 × 1,00 + 1/3 × (−0,111): Seine ganze Wirkung kommt
+  aus dem Drittel des Achsenabschnitts.
+  **Herleitung (Abschätzung von KAP3, Befunde 164 und 180).** Ausgangspunkt ist die Durchschnittsstadt, weil das
+  Produkt die Merkmale der Städte nicht nachbildet: auf dem Exzess 1,00, also keine Wirkung. Eine Nullwirkung bleibt
+  nicht stehen (P2), und ein Hitzeaktionsplan enthält mehr als die Warnung, deren Wirkung schon im Basiswert steckt
+  (Wächter unten). Wie viel eine Warnkette am Exzess deutscher Städte ausmachte, zeigt Tabelle 1 von [45] roh: Nach
+  Einführung des Warnsystems ist das RR des Hitzetags 30,5 / 26,6 = 1,1466 statt 1,1561, der Exzess also
+  0,1466 / 0,1561 = 0,939 des früheren, 6,1 % weniger. KAP3 setzt diesen Wert für den Plan:
+  \(\delta_{\text{HAP}}\) = **0,939** (ungerundet 0,93904; die Rundung verschiebt den Berliner Betrag um 0,07 %).
+  **Gegen die Quelle geprüft:** Auf alle Todesfälle bezogen ist der rohe Wert 1,1466 / 1,1561 = 0,992; er liegt im
+  Intervall der Durchschnittsstadt 0,98–1,01. Auf dem Exzess liegt 0,939 in deren Intervall 0,852–1,074 und weit über
+  dem Paketwert 0,794. **Band 0,852–1,00:** unten das untere Ende der Durchschnittsstadt, oben keine Wirkung; 1,074
+  hieße, der Plan erhöhe die Zahl der Hitzetoten, deshalb endet das Band bei 1,00. **Warum nicht der Achsenabschnitt
+  0,85:** [45] führt ihn in Abschnitt 2.2.2 (S. 4) als Nebenschätzung: „We also reported the intercept of the final
+  model as an alternative pooled estimator, which controls for the identified meta-variables.“ Er ist die Vorhersage
+  der Meta-Regression für eine Stadt, deren drei Merkmale (Erholungsfläche je Einwohner, Einwohnerzahl,
+  Bevölkerungsdichte) auf dem Nullpunkt ihrer Skala liegen, nicht für die Durchschnittsstadt; die ergibt 1,00. Auf dem
+  Exzess ist er unmöglich: −0,111 hieße, der Plan nähme mehr als den ganzen Hitze-Exzess weg, und selbst das günstige
+  Ende 0,78 läge unter dem Paketwert aller deutschen Hitzeschutzpläne (0,794). Tabelle 1 zeigt roh nur 6,1 % weniger
+  Exzess. Der Achsenabschnitt geht deshalb weder in den Zentralwert noch ins Band ein. **Warum nicht 0,95 übersetzt
+  (0,630):** Der Wert bekäme seine ganze Wirkung aus dem Drittel des Achsenabschnitts. Gekappt am Paketwert leistete ein
+  Plan allein das ganze Paket, Berlin 74,5 Mio. € je Jahr, im Widerspruch zum Wächter unten. **Gegenargument:** Der Wert
+  aus Tabelle 1 ist roh, nicht um Temperatur, Trend und Wochentag bereinigt; bereinigt zeigt die Durchschnittsstadt
+  keine Wirkung. [45] misst die Warnung, nicht den Plan, und nur an Warntagen; das Produkt legt den Faktor auf den
+  Exzess aller Hitzewochen. Deshalb reicht das Band bis zu keiner Wirkung.
+  **Berlin** (Beispiel-Block `sensitivitaeten_berlin`, Kapitel 7): Der Faktor wirkt auf den Exzess aller Bänder, also
+  auf die ganze Mortalität der Rechenkette: 361,8 Mio. € × (1 − 0,939) = **22,1 Mio. € je Jahr** (Preisstand 2024;
+  Band 0–53,5 Mio. €), 6,1 % des Jahresbetrags 362,9 Mio. €; im Zelllauf mit Gemeindeschlüssel
+  341,5 Mio. € × 0,061 = 20,8 Mio. €. Vorher, mit 0,95 unübersetzt auf dem Exzess, waren es 18,1 Mio. € (Zelllauf
+  17,1 Mio. €). **Was die einfachere Rechnung verfälscht:** 0,95 direkt auf den Exzess liest „5 % weniger Todesfälle am
+  Hitzetag“ als „5 % weniger hitzebedingte Todesfälle“. Der Betrag läge mit 18,1 Mio. € nur 4,0 Mio. € je Jahr unter
+  22,1 Mio. €, aber aus dem falschen Grund: Richtig übersetzt ergäbe derselbe Wert gekappt 74,5 Mio. €, gut das
+  Dreifache, und seine Wirkung käme allein aus dem Achsenabschnitt. **Kappung und Teilabdeckung:** Faktor und Kappung
+  gelten im abgedeckten Teil der Kommune: 1 − a × (1 − max(\(\delta_{\text{HAP}}\); 0,794)) bei einem Anteil a der
+  Einwohner. Plan für die Hälfte der Einwohner Berlins: 1 − 0,5 × (1 − max(0,939; 0,794)) = 1 − 0,5 × 0,061 = 0,9695,
+  also 361,8 Mio. € × 0,0305 = 11,0 Mio. € je Jahr. Allein greift die Kappung nicht; mit den Schutzprogrammen greift
+  sie am unteren Bandende (0,852 × 0,931 = 0,793, es gilt 0,794; Hebel Schutzprogramme unten). Die Morbidität bleibt
+  unberührt; der Block gilt nur für die Mortalität.
   **Doppelzählungs-
   Wächter:** \(c_{\text{kal}}\) ist auf Jahre mit laufendem DWD-Warnsystem kalibriert — die
   durchschnittliche Warnwirkung steckt im Basiswert; ein Fouillet-großer Hebel (≈ 4.400
@@ -1087,8 +1128,8 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   gegen mit ist 1,08 (1,01–1,15), umgekehrt gelesen 0,93 (0,87–0,99). Der Faktor wirkt also auf das
   ganze Sterberisiko am Hitzetag. **Übersetzung auf den Exzess** (Abschätzung von KAP3, Block
   `heat.g_s157`): \(g_{\text{S157}} = (\text{rOR} \times \text{OR}_{\text{ohne}} - 1)/(\text{OR}_{\text{ohne}} - 1)
-  = (0{,}93 \times 1{,}11 - 1)/0{,}11 = 0{,}29\): Mit Klimaanlage bleiben 29 % des Hitze-Exzesses,
-  71 % fallen weg (Band 0–0,90 aus dem Band von rOR). Gesetzt ist, dass derselbe Anteil in allen
+  = (0{,}93 \times 1{,}11 - 1)/0{,}11 = 0{,}2936\): Mit Klimaanlage bleiben 29,36 % des Hitze-Exzesses,
+  70,64 % fallen weg (Band 0–0,90 aus dem Band von rOR). Gesetzt ist, dass derselbe Anteil in allen
   Hitzewochen des Modells gilt, nicht nur an den Extremtagen von [46].
   **Warum \(\text{OR}_{\text{ohne}}\) = 1,11 fest bleibt (Befund 132):** Auch \(\text{OR}_{\text{ohne}}\) hat in [46]
   ein Konfidenzintervall, 1,06–1,16. Bei rOR 0,93 liegt \(g_{\text{S157}}\) damit zwischen 0 und
@@ -1109,7 +1150,7 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   **Stand im Produkt (Befund 130, fortgeschrieben mit Befund 138):** Bis zur Integration war die Maßnahme geparkt
   (`backend/app/data/catalog_parked.py`) und hatte keine Wirkung, auch keine Nullwirkung; der geparkte Katalog setzte
   `default_reduction` 0.18 auf die Exposition. Seit der Integration (T-1367-cto) steht sie in
-  `backend/app/data/catalog.py` ohne `default_reduction` und rechnet \(g_{\text{S157}}\) = 0,29 auf den Heim-Exzess;
+  `backend/app/data/catalog.py` ohne `default_reduction` und rechnet \(g_{\text{S157}}\) = 0,2936 auf den Heim-Exzess;
   bis zur Voreinstellung zeigte sie ohne Eingabe der Kommune keinen Betrag (Log 44, fortgeschrieben durch Nr. 45).
   **Voreinstellung \(s_{\text{gek}}\) = 0,11 (Abschätzung von KAP3, Block `heat.s_gek`, Befund 138).** Eine
   Nullwirkung ist keine Voreinstellung (P2). Gibt die Kommune nichts ein, gilt:
@@ -1152,7 +1193,7 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   Kommune, unabhängig von der gezeichneten Fläche. Welche Heime gekühlt sind, weiß weder der Bericht noch das Produkt;
   eine Kommune mit bekannten gekühlten Heimen gibt deren Anteil an allen Heimplätzen der Kommune ein. Der Abzug
   unterschätzt die Wirkung leicht: Im Basiswert haben die schon gekühlten 6 % nur 29 % des Exzesses. Bezogen auf die
-  ungekühlten Plätze ist die Wirkung deshalb 1 / (1 − 0,06 × 0,706) = 1,04-mal so groß; das Ergebnis ist insoweit eine
+  ungekühlten Plätze ist die Wirkung deshalb 1 / (1 − 0,06 × 0,7064) = 1,04-mal so groß; das Ergebnis ist insoweit eine
   Untergrenze (rund 4 %).
   **\(h_{\text{Heim}}\) je Zelle (Block `heat.h_heim`, Befund 146).** Das Produkt führt den Heimanteil
   \(q_{\text{pfl},z}\) je Zelle (Ebene `CARE_HOME_SHARE_85P`, §3.6). Dort gilt
@@ -1169,10 +1210,10 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   **S157 mit seiner Voreinstellung im Anpassungspotenzial (Befund 149).** Die Charakterisierung im Produkt zählt je
   Maßnahme, um welchen Anteil sie die ganze Hitzemortalität senkt. Für S157 bei der Voreinstellung ist das
   \(r_{\text{S157}} = a_{85+} \times h_{\text{Heim}} \times (s_{\text{gek}} - 0{,}06) \times (1 - g_{\text{S157}})\)
-  = 0,284 × 0,344 × 0,05 × 0,706 = 0,00345, mit \(a_{85+}\) = 638,8 / 2.250 YLL = 0,284, dem Anteil des Bands 85+ an den
-  YLL der Rechenkette (§3.0 Ebene 7). Mit dem Hitzeaktionsplan (1 − 0,95 = 0,05) ergibt das
-  1 − 0,95 × (1 − 0,00345) = 0,053 statt 0,050 ohne S157. \(a_{85+}\) hängt am Altersaufbau: In Warmsen ist er 0,224
-  (Zelllauf), \(r_{\text{S157}}\) dann 0,0027 und das Anpassungspotenzial ebenfalls 0,053; die Gruppe nach KWRA (unter 0,1)
+  = 0,284 × 0,344 × 0,05 × 0,7064 = 0,00345, mit \(a_{85+}\) = 638,8 / 2.250 YLL = 0,284, dem Anteil des Bands 85+ an den
+  YLL der Rechenkette (§3.0 Ebene 7). Mit dem Hitzeaktionsplan (1 − 0,939 = 0,061) ergibt das
+  1 − 0,939 × (1 − 0,00345) = 0,064 statt 0,061 ohne S157. \(a_{85+}\) hängt am Altersaufbau: In Warmsen ist er 0,224
+  (Zelllauf), \(r_{\text{S157}}\) dann 0,0027 und das Anpassungspotenzial ebenfalls 0,064; die Gruppe nach KWRA (unter 0,1)
   ändert sich in beiden Fällen nicht. Anzeige und Quelle in der Parameterliste regelt T-1410-ceo. **Berlin**
   (Beispiel-Block `s157_berlin`, Kapitel 7): 153,6 Todesfälle 85+ × 0,3443 = 52,88 Todesfälle von
   Heimbewohnern. Rechnerisch je vollen Anteil (Anteil 1 über dem Stand der Kalibrierjahre) fielen
@@ -1184,10 +1225,10 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   Bänder, also auch den Heim-Exzess. Wählt die Kommune beide Hebel, wird \(\Delta D_{\text{S157}}\) deshalb
   aus \(D_{85+} \times \delta_{\text{HAP}}\) gerechnet statt aus \(D_{85+}\): Die beiden Faktoren werden
   multipliziert, nicht ihre Wirkungen addiert. Berlin, voller Anteil: Zusammen fallen
-  1 − 0,95 × 0,294 = 72,1 % des Heim-Exzesses weg, das sind 38,1 der 52,9 Todesfälle. Davon entfallen
-  auf S157 52,9 × 0,95 × 0,706 = 35,5 Todesfälle oder 23,7 Mio. € je Jahr. Addiert man stattdessen
-  5 % und 70,6 %, wären es 75,6 %, also 1,9 Todesfälle oder 1,2 Mio. € je Jahr doppelt gebucht, bei
-  \(\delta_{\text{HAP}}\) = 0,85 schon 3,7 Mio. €.
+  1 − 0,939 × 0,2936 = 72,4 % des Heim-Exzesses weg, das sind 38,3 der 52,9 Todesfälle. Davon entfallen
+  auf S157 52,9 × 0,939 × 0,7064 = 35,1 Todesfälle oder 23,5 Mio. € je Jahr. Addiert man stattdessen
+  6,1 % und 70,64 %, wären es 76,74 %, also 2,3 Todesfälle oder 1,5 Mio. € je Jahr doppelt gebucht, am unteren
+  Bandende \(\delta_{\text{HAP}}\) = 0,852 schon 3,7 Mio. €.
   **Beide Fassungen (Befund 124):** Legte man 0,93 unmittelbar auf den Exzess, fielen nur 7 % weg,
   2,5 Mio. € je Jahr, rund ein Zehntel. Das ist einfacher zu lesen, stellt [46] aber falsch dar, weil
   der Faktor dort das ganze Risiko am Hitzetag senkt; gewählt ist deshalb die Übersetzung.
@@ -1206,11 +1247,12 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   (Block `heat.delta_kuehlzentren`), multiplikativ auf (RR − 1). **Formelzeile:**
   \(\Delta D_{\text{KZ}} = [D_{75\text{–}84} + D_{85+} \times (1 - h_{\text{Heim}})] \times (1 - \delta_{\text{KZ}})\),
   mit \(\delta_{\text{KZ}} = 1 - r_{\text{KZ}} \times w_{\text{KZ}}\) und
-  \(w_{\text{KZ}} = (1 - g_{\text{S157}}) \times t_{\text{KZ}} = 0{,}71 \times 3/24 = 0{,}089\), also
-  \(\delta_{\text{KZ}} = 1 - 0{,}05 \times 0{,}089 = 0{,}9956\) (**Abschätzung von KAP3**, Band 0,982–0,9994).
+  \(w_{\text{KZ}} = (1 - g_{\text{S157}}) \times t_{\text{KZ}} = 0{,}7064 \times 3/24 = 0{,}0883\), also
+  \(\delta_{\text{KZ}} = 1 - 0{,}05 \times 0{,}0883 = 0{,}995585\) (**Abschätzung von KAP3**, Band 0,982–0,9994; ungerundet
+  0,9955852, die Rundung auf sechs Stellen hebt den Kühlzentren-Betrag Berlin um 0,005 %; Befund 178).
   **Herleitung:** Eine publizierte Effektgröße für Kühlzentren hat KAP3 nicht gefunden (Suche 27.09.2026); die Wirkung
-  ist deshalb aus drei Stücken zusammengesetzt. (1) **Wirkung im gekühlten Raum** 0,71: In Heimen mit Klimaanlage fallen
-  71 % des Hitze-Exzesses weg (\(1 - g_{\text{S157}}\), [46]); dort wirkt die Kühlung den ganzen Tag. (2) **Geschützter
+  ist deshalb aus drei Stücken zusammengesetzt. (1) **Wirkung im gekühlten Raum** 0,7064: In Heimen mit Klimaanlage fallen
+  70,64 % des Hitze-Exzesses weg (\(1 - g_{\text{S157}}\), [46]); dort wirkt die Kühlung den ganzen Tag. (2) **Geschützter
   Anteil des Tages** \(t_{\text{KZ}}\) = 3/24: In der Laborstudie von Meade u. a. [73] ruhten 20 Menschen von 64 bis 79
   Jahren während einer neunstündigen simulierten Hitzewelle (Hitzeindex 37 °C) zwei Stunden in einem Raum mit rund
   23 °C. Am Ende der Kühlung lag ihre Körperkerntemperatur 0,8 °C (0,6–0,9) unter der Vergleichsgruppe, eine Stunde
@@ -1223,19 +1265,23 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   haben ein 6,44-fach, Menschen, die nicht täglich aus dem Haus gehen, ein 3,35-fach erhöhtes Sterberisiko in
   Hitzewellen [41]. **Plausibilisierung:** Die Fall-Kontroll-Studien in [41] geben für den Besuch kühler Orte die Odds
   Ratio 0,34 (0,2–0,5), also 66 % weniger. Nach Log 10 überschätzen Fall-Kontroll-Odds-Ratios die Wirkung einer
-  eingeführten Maßnahme 5- bis 10-fach: 0,66 / 10 bis 0,66 / 5 = 0,066–0,132; \(w_{\text{KZ}}\) = 0,089 liegt darin.
+  eingeführten Maßnahme 5- bis 10-fach: 0,66 / 10 bis 0,66 / 5 = 0,066–0,132; \(w_{\text{KZ}}\) = 0,0883 liegt darin.
   **Berlin** (Beispiel-Block `kuehlzentren_berlin`, Kapitel 7): Die Bänder 75–84 und 85+ außerhalb der Heime tragen
-  1.054 YLL, also 169,5 Mio. € (wie beim Hebel Schutzprogramme); × 0,05 × 0,089 = **0,75 Mio. € je Jahr** (Preisstand 2024; Band
-  0,1–3,0 Mio. €), 0,2 % des Jahresbetrags 362,9 Mio. €. Im Zelllauf mit Gemeindeschlüssel 0,72 Mio. €, in Warmsen
-  (Zelllauf) 320 € je Jahr. **Stärkster Treiber** ist die Reichweite: Über ihr Band 1–10 % wandert der Betrag von 0,15
+  1.054 YLL, also 169,5 Mio. € (wie beim Hebel Schutzprogramme); × 0,05 × 0,0883 = **0,75 Mio. € je Jahr** (Preisstand 2024; Band
+  0,1–3,0 Mio. €), 0,2 % des Jahresbetrags 362,9 Mio. €. Im Zelllauf mit Gemeindeschlüssel 0,71 Mio. €, in Warmsen
+  (Zelllauf) 318 € je Jahr. **Stärkster Treiber** ist die Reichweite: Über ihr Band 1–10 % wandert der Betrag von 0,15
   bis 1,50 Mio. €, über den geschützten Anteil des Tages 2/24–6/24 von 0,50 bis 1,50 Mio. €. **Was eine einfachere
-  Rechnung verfälschen würde:** Den Faktor aus [46] ohne die Stunden anzusetzen (\(w_{\text{KZ}}\) = 0,71) hieße, ein
-  Besuch im Kühlzentrum schütze wie eine Klimaanlage rund um die Uhr: 169,5 Mio. € × 0,05 × 0,71 = 6,0 Mio. €, achtmal
+  Rechnung verfälschen würde:** Den Faktor aus [46] ohne die Stunden anzusetzen (\(w_{\text{KZ}}\) = 0,7064) hieße, ein
+  Besuch im Kühlzentrum schütze wie eine Klimaanlage rund um die Uhr: 169,5 Mio. € × 0,05 × 0,7064 = 6,0 Mio. €, achtmal
   so viel. **Zusammen mit Hitzeaktionsplan und Schutzprogrammen:** Die Faktoren werden auf den Bändern 75–84 und 85+
   (ohne Heim) multipliziert, und wie beim Hebel Schutzprogramme nehmen alle zusammen nie mehr weg als das gemessene
   Paket Deutschland [47]: \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}} \times \delta_{\text{KZ}};\ 0{,}794)\), mit der
   Kappung aus dem Block `heat.kappung_vg` (unten beim Hebel Schutzprogramme);
-  zentral 0,95 × 0,931 × 0,9956 = 0,881, die Kappung greift nicht. Hatte die Kommune schon in den Kalibrierjahren
+  zentral 0,939 × 0,931 × 0,995585 = 0,870, die Kappung greift nicht. **Wer die Kappung trägt (Befund 179):** Das
+  Produkt kappt zuerst die Schutzprogramme gegen den Hitzeaktionsplan, dann die Kühlzentren gegen beide; das Produkt
+  der wirksamen Faktoren ist dabei immer \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}} \times \delta_{\text{KZ}};\ 0{,}794)\)
+  (Regel gemessen am 29.09.2026, Befund 179; mit dem Zentralwert etwa 0,939 × 0,80 × 0,99: wirksam 0,939 × 0,8456 × 1,0 = 0,794), den Einzelnutzen der
+  Kühlzentren kürzt die Kappung aber zuerst, bis auf null. Hatte die Kommune schon in den Kalibrierjahren
   Kühlzentren, gilt derselbe Doppelzählungs-Wächter wie bei \(\delta_{\text{VG}}\): eine eigene Frage ja oder nein für diese
   Maßnahme, Voreinstellung „nein“ aus demselben Grund, bei „ja“ \(\delta_{\text{KZ}}\) = 1 (Block
   `heat.vg_in_kalibrierjahren`). **Modellgrenze:** Jüngere
@@ -1299,7 +1345,7 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   638,8 × (1 − 0,344) = 419 YLL; zusammen 1.054 YLL, also 169,5 Mio. €. × (1 − 0,931) = **11,7 Mio. €
   je Jahr** weniger (Band 0–34,9 Mio. €), das sind 3,2 % (0–9,6 %) des Jahresbetrags 362,9 Mio. €.
   **Stärkster Treiber** ist die Wirkung bei Erreichten \(w_{\text{VG}}\), knapp vor der Reichweite: Über ihr Band
-  0–0,68 wandert der Betrag von 0 bis 23,1 Mio. €, über die Reichweite 5–40 % von 2,9 bis 23,3 Mio. €. Erst wenn
+  0–0,68 wandert der Betrag von 0 bis 23,1 Mio. €, über die Reichweite 5–40 % von 2,9 bis 23,4 Mio. €. Erst wenn
   beide am oberen Ende liegen, greift die Kappung bei 34,9 Mio. €. **Morbidität (Befund 131, Block `heat.delta_vg_morb`):** Faktor \(\delta_{\text{VG,morb}}\) = 1,0
   (Band 0,931–1,069, **Abschätzung von KAP3**) auf die Einweisungen \(F_{75\text{–}84} + F_{85+} \times (1 - h_{\text{Heim}})\),
   gleiche Formelzeile wie oben mit \(F\) statt \(D\). Die Wirkung geht in beide Richtungen: Aufsuchende Betreuung
@@ -1328,12 +1374,12 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   Kalibrierjahren ein solches Programm hatte, gibt Berlin selbst ein. Heimbewohner ab 85 zählen über S157 (siehe
   Formelzeile). **Zusammen mit dem Hitzeaktionsplan
   (Befund 126):** \(\delta_{\text{HAP}}\) stützt sich auf [45] und [47], und das Paket von [47] enthält
-  den Schutz vulnerabler Gruppen. Ob \(\delta_{\text{HAP}}\) = 0,95 diesen Baustein schon enthält, lässt
+  den Schutz vulnerabler Gruppen. Ob \(\delta_{\text{HAP}}\) = 0,939 diesen Baustein schon enthält, lässt
   sich aus [45] nicht ausschließen. Wählt eine Kommune beide Hebel, gilt auf den Bändern 75–84 und 85+
   (ohne Heim) deshalb das Produkt beider Faktoren, höchstens aber bis zum Paketwert Deutschland:
-  \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}};\ 0{,}794)\). Zentral ist das 0,95 × 0,931 = 0,885,
-  die Kappung greift nicht; sie bleibt in der Formel, weil sie bei \(\delta_{\text{HAP}}\) = 0,85 greift (Produkt
-  0,791, es gilt 0,794) und am oberen Ende des Bands von \(\delta_{\text{VG}}\).
+  \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}};\ 0{,}794)\). Zentral ist das 0,939 × 0,931 = 0,874,
+  die Kappung greift nicht; sie bleibt in der Formel, weil sie am unteren Bandende \(\delta_{\text{HAP}}\) = 0,852 greift (Produkt
+  0,793, es gilt 0,794) und am oberen Ende des Bands von \(\delta_{\text{VG}}\).
   Zusammen können die beiden Hebel also nie mehr wegnehmen als das ganze gemessene Paket.
   **Kappung 0,794 (Block `heat.kappung_vg`, Befund 151).** Die Kappung begrenzt den Betrag und ist deshalb ein eigener
   Parameter (P1). **Herleitung:** Urban u. a. 2025 [47] messen für Deutschland, dass Hitzeschutzpläne den hitzebedingten
@@ -1343,8 +1389,8 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   der Wert steht für eine andere Größe). **Beziehung zu \(\delta_{\text{VG}}\):** 0,794 ist das untere Bandende von
   \(\delta_{\text{VG}}\), und zwar wegen der Kappung: Mit Reichweite und Wirkung am oberen Ende ihrer Bänder ergäbe sich
   1 − 0,40 × 0,68 = 0,728, die Kappung hebt das auf 0,794. **Wann sie greift (Befund 126, Runde 29):** allein bei Reichweite
-  und Wirkung am oberen Ende; zusammen mit dem Hitzeaktionsplan schon bei \(\delta_{\text{HAP}}\) = 0,85 und dem Zentralwert
-  (0,85 × 0,931 = 0,791, mit Kühlzentren 0,788); zentral (0,95 × 0,931 × 0,9956 = 0,881) greift sie nicht.
+  und Wirkung am oberen Ende; zusammen mit dem Hitzeaktionsplan schon bei \(\delta_{\text{HAP}}\) = 0,852 und dem Zentralwert
+  (0,852 × 0,931 = 0,793, mit Kühlzentren 0,790); zentral (0,939 × 0,931 × 0,995585 = 0,870) greift sie nicht.
   **Sensitivität**, wo sie greift (Berlin, Reichweite und Wirkung am oberen Ende): 169,5 Mio. € × (1 − 0,794) = 34,9 Mio. €
   je Jahr, über das Band 0,743–0,842 von 26,8 bis 43,6 Mio. €. **Was eine Rechnung ohne Kappung verfälschen würde:**
   169,5 Mio. € × (1 − 0,728) = 46,1 Mio. €, also 11,2 Mio. € mehr, als das gemessene Paket für Deutschland hergibt
@@ -1355,7 +1401,7 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
 
 **Sensitivitäten des Basiswerts im Vergleich zu den Hebeln (Befund 152; Beispiel-Block `sensitivitaeten_berlin`).** Die
 Hebel oben verschieben den Jahresbetrag Berlin (Kette 362,9 Mio. €, Preisstand 2024) im Zentralwert um 0,75 bis
-18,1 Mio. € (Kühlzentren bis Hitzeaktionsplan). Zwei
+22,1 Mio. € (Kühlzentren bis Hitzeaktionsplan). Zwei
 Parameter des Basiswerts, gemessen wie die Hebel an beiden Enden ihres Bands (Herleitung der Bänder in §3.3a und §3.5):
 
 - **Sensitivität von f_alter** (Block `heat.f_alter`, \(f_a\)): Mit den Altersanteilen des Sommers 2025 (0,156 · 0,341 ·
@@ -1374,8 +1420,8 @@ Parameter des Basiswerts, gemessen wie die Hebel an beiden Enden ihres Bands (He
   Teil trägt das Band u65: 20,4 Todesfälle × 5,25 J = 107 YLL, also 17,2 Mio. €.
 
 Beide Bänder sind breiter als der Zentralwert jedes Hebels: Das Band von \(\bar L_a\) umfasst 23,8 Mio. €, der größte
-Hebel, der Hitzeaktionsplan, 18,1 Mio. €. Über sein eigenes Band 0,85–1,00 verschiebt der Hitzeaktionsplan den Betrag
-um 0–54,3 Mio. €, weiter als \(\bar L_a\) und weniger weit als \(f_a\) (92,7 Mio. €). Stärkster Treiber des Betrags bleibt die Temperatur (§3.0: −23 % und +27 %
+Hebel, der Hitzeaktionsplan, 22,1 Mio. €. Über sein eigenes Band 0,852–1,00 verschiebt der Hitzeaktionsplan den Betrag
+um 0–53,5 Mio. €, weiter als \(\bar L_a\) und weniger weit als \(f_a\) (92,7 Mio. €). Stärkster Treiber des Betrags bleibt die Temperatur (§3.0: −23 % und +27 %
 bei 0,5 K weniger oder mehr); \(f_a\) verschiebt ihn um −15 % und +11 %, \(\bar L_a\) um −2 % und +5 %. Die Hebel wirken auf
 denselben Basiswert und ändern sich mit ihm.
 
@@ -1659,15 +1705,15 @@ parameter:
   abgeleitet_aus: []
 parameter:
   id: heat.delta_hap
-  wert: 0.95
+  wert: 0.939
   einheit: "-"
-  band: [0.85, 1.00]
+  band: [0.852, 1.00]
   herkunft: register:95-S158-01
   quelle: feldbusch2025_erl2025
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
-  kennzeichnung: abschaetzung_kap3   # 2/3 x 1,00 + 1/3 x 0,85 = 0,95: Mittel ueber 15 Staedte RR 1,00 doppelt gewichtet gegen bereinigt RR 0,85 [45] (Abstract, Results); nicht die Mitte 0,925 (§5, Log 10, Befund 164). Berlin 18,1 Mio. EUR je Jahr, Band 0-54,3 Mio. EUR
+  kennzeichnung: abschaetzung_kap3   # roh 0,1466 / 0,1561 = 0,939 (ungerundet 0,93904, Berlin +0,07 %): Exzess am Hitzetag nach / vor dem Warnsystem, [45] Tabelle 1; [45] misst alle Todesfaelle am Hitzetag (Abschnitt 2.2.1), uebersetzt 1 - (1 - d) x 1,1561 / 0,1561: Durchschnittsstadt 1,00 (0,852-1,074), Achsenabschnitt 0,85 -> -0,111 (nicht verwendet), 0,95 alt -> 0,630 (verworfen). Band 0,852-1,00. Berlin 22,1 Mio. EUR je Jahr (Kette; vorher 18,1), Band 0-53,5 Mio. EUR (§5, Log 10, Befunde 164, 180)
   abgeleitet_aus: []
 parameter:
   id: heat.gamma_hoehe
@@ -1695,7 +1741,7 @@ parameter:
   abgeleitet_aus: []
 parameter:
   id: heat.g_s157
-  wert: 0.29
+  wert: 0.2936   # (0,93 x 1,11 - 1)/0,11, ungerundet 0,293636; 0,29 verschob S157 Berlin um +0,5 % (Befund 178)
   einheit: "-"
   band: [0.0, 0.90]   # aus dem Band von heat.ror_s157: rOR 0,87 => 0 (Exzess ganz weg), rOR 0,99 => 0,90
   herkunft: register:95-S157-01
@@ -1779,15 +1825,15 @@ parameter:
   abgeleitet_aus: [heat.qbar_pfl, heat.beta_pfl]
 parameter:
   id: heat.delta_kuehlzentren
-  wert: 0.9956   # 1 - r_KZ x w_KZ = 1 - 0,05 x 0,71 x 3/24 (Befunde 139, 148)
+  wert: 0.995585   # 1 - r_KZ x w_KZ = 1 - 0,05 x 0,7064 x 3/24, ungerundet 0,9955852; Abweichung am Kuehlzentren-Betrag Berlin +0,005 % (Befunde 139, 148, 178)
   einheit: "-"
-  band: [0.982, 0.9994]   # r_KZ 0,01-0,10 und t_KZ 2/24-6/24: 1 - 0,10 x 0,71 x 6/24 = 0,98225 bis 1 - 0,01 x 0,71 x 2/24 = 0,99941
+  band: [0.982, 0.9994]   # r_KZ 0,01-0,10 und t_KZ 2/24-6/24: 1 - 0,10 x 0,7064 x 6/24 = 0,98234 bis 1 - 0,01 x 0,7064 x 2/24 = 0,99941
   herkunft: register:95-S157-02
   quelle: katz2026_meade2023_bouchama2007
   preisstand: null
   bandzuordnung: [75-84, 85+]
   endpunkt: mortalitaet
-  kennzeichnung: abschaetzung_kap3   # w_KZ = (1 - g_S157) x t_KZ: 71 % Wirkung im gekuehlten Raum [46] fuer 2 h Aufenthalt + 1 h Nachwirkung [73] von 24 h; r_KZ Setzung von KAP3 (ein Viertel von r_VG); plausibilisiert an [41] (OR 0,34 kuehle Orte, 5- bis 10-fach ueberschaetzt, Log 10). Faktor auf D_75-84 + D_85+ x (1 - h_Heim); mit heat.delta_hap und heat.delta_vg zusammen max(Produkt; 0,794). Berlin 0,75 Mio. EUR je Jahr, Band 0,1-3,0 Mio. EUR (§5, Log 46)
+  kennzeichnung: abschaetzung_kap3   # w_KZ = (1 - g_S157) x t_KZ: 70,64 % Wirkung im gekuehlten Raum [46] fuer 2 h Aufenthalt + 1 h Nachwirkung [73] von 24 h; r_KZ Setzung von KAP3 (ein Viertel von r_VG); plausibilisiert an [41] (OR 0,34 kuehle Orte, 5- bis 10-fach ueberschaetzt, Log 10). Faktor auf D_75-84 + D_85+ x (1 - h_Heim); mit heat.delta_hap und heat.delta_vg zusammen max(Produkt; 0,794). Berlin 0,75 Mio. EUR je Jahr, Band 0,1-3,0 Mio. EUR (§5, Log 46)
   abgeleitet_aus: [heat.g_s157]
 parameter:
   id: heat.kappung_vg
@@ -1799,7 +1845,7 @@ parameter:
   preisstand: null
   bandzuordnung: [75-84, 85+]
   endpunkt: mortalitaet
-  kennzeichnung: abschaetzung_kap3   # Setzung von KAP3 (Log 40, Log 48): der Paketwert fuer alle Altersgruppen begrenzt die Hebel auf D_75-84 + D_85+ x (1 - h_Heim): max(delta_hap x delta_vg x delta_kz; 0,794). Zugleich unteres Bandende von heat.delta_vg (ohne Kappung 1 - 0,40 x 0,68 = 0,728). Greift bei delta_hap 0,85 (0,791) und bei r, w am oberen Ende. Sensitivitaet Berlin dort 34,9 Mio. EUR, Band 26,8-43,6 Mio. EUR, ohne Kappung 46,1 Mio. EUR (§5)
+  kennzeichnung: abschaetzung_kap3   # Setzung von KAP3 (Log 40, Log 48): der Paketwert fuer alle Altersgruppen begrenzt die Hebel auf D_75-84 + D_85+ x (1 - h_Heim): max(delta_hap x delta_vg x delta_kz; 0,794). Zugleich unteres Bandende von heat.delta_vg (ohne Kappung 1 - 0,40 x 0,68 = 0,728). Greift bei delta_hap 0,852 (0,793) und bei r, w am oberen Ende. Sensitivitaet Berlin dort 34,9 Mio. EUR, Band 26,8-43,6 Mio. EUR, ohne Kappung 46,1 Mio. EUR (§5)
   abgeleitet_aus: []
 parameter:
   id: heat.vg_in_kalibrierjahren
@@ -1850,15 +1896,15 @@ def p_unter(x, n=2000):                        # Anteil der Werte von g bis x, u
 assert p_unter(0.0) > 0.025 and p_unter(0.83) < 0.975 < p_unter(0.835)   # 95 % zwischen 0 und 0,83
 # zusammen mit dem Hitzeaktionsplan (Befund 129): S157 wirkt auf den schon mit delta_hap gedaempften Heim-Exzess
 d_heim = d85 * h_heim                                        # 52,9 Todesfaelle von Heimbewohnern
-for delta_hap, zu_viel in ((0.95, 1.25), (0.85, 3.75)):
+for delta_hap, zu_viel in ((0.939, 1.52), (0.852, 3.70)):
     s157_mit_hap = d85 * delta_hap * h_heim * s_gek * (1 - g(ror))
     gesamt = d_heim * (1 - delta_hap) + s157_mit_hap         # multiplikativ: 1 - delta_hap x g
     assert abs(gesamt - d_heim * (1 - delta_hap * g(ror))) < 1e-9
     additiv = d_heim * ((1 - delta_hap) + (1 - g(ror)))
     assert abs((additiv - gesamt) * L85 * voly / 1e6 - zu_viel) < 0.05
-s157_mit_hap = d85 * 0.95 * h_heim * s_gek * (1 - g(ror))
-assert abs(1 - 0.95 * g(ror) - 0.721) < 0.001 and abs(d_heim * (1 - 0.95 * g(ror)) - 38.1) < 0.05
-assert abs(s157_mit_hap - 35.5) < 0.05 and abs(s157_mit_hap * L85 * voly / 1e6 - 23.7) < 0.05
+s157_mit_hap = d85 * 0.939 * h_heim * s_gek * (1 - g(ror))
+assert abs(1 - 0.939 * g(ror) - 0.724) < 0.001 and abs(d_heim * (1 - 0.939 * g(ror)) - 38.3) < 0.05
+assert abs(s157_mit_hap - 35.1) < 0.05 and abs(s157_mit_hap * L85 * voly / 1e6 - 23.5) < 0.05
 ```
 
 ```python test: schutzprogramme_berlin
@@ -1896,9 +1942,10 @@ assert abs(eur_7585 * (1 - delta_vg) / 362.9 - 0.032) < 0.001
 assert abs(eur_7585 * (1 - paket_de) / 362.9 - 0.096) < 0.001
 # staerkster Treiber: w ueber sein Band 0-0,68, knapp vor der Reichweite 5-40 % (Kappung dort nicht erreicht)
 assert abs(eur_7585 * (1 - dvg(r, 0.68)) - 23.1) < 0.05 and dvg(r, 0.0) == 1.0
-assert abs(eur_7585 * (1 - dvg(0.05, w)) - 2.9) < 0.05 and abs(eur_7585 * (1 - dvg(0.40, w)) - 23.3) < 0.05
+assert abs(eur_7585 * (1 - dvg(0.05, w)) - 2.9) < 0.05 and abs(eur_7585 * (1 - dvg(0.40, 0.3445)) - 23.4) < 0.05   # Befund 176: Text mit w = 0,3445
+assert abs(eur_7585 * (1 - dvg(0.40, w)) - 23.33) < 0.01   # w ungerundet 0,3441 ergibt 23,33 Mio. EUR
 assert 1 - 0.40 * w > paket_de
-assert (23.1 - 0.0) > (23.3 - 2.9)
+assert (23.1 - 0.0) > (23.4 - 2.9)
 # Log 43: Katalogwert 0.22 auf alle Baender ergaebe rund 79,8 Mio. EUR; der Hebel ergibt rund 15 % davon
 assert abs(eur_7585 * (1 - delta_vg) / 79.8 - 0.15) < 0.005
 # verworfene Variante (Log 43): roher Unterschied als Zentralwert ergaebe 23,1 Mio. EUR, doppelt so viel
@@ -1912,14 +1959,14 @@ for m in morb_band:
 alt = (635.4 + 638.8 * 1.0) * 160_800 / 1e6 * (1 - delta_vg)             # mit Heimbewohnern: doppelt zu S157
 assert alt - eur_7585 * (1 - delta_vg) > 2
 # gleichzeitige Wahl mit dem Hitzeaktionsplan (Befund 126)
-for delta_hap, soll in ((0.95, 0.885), (0.85, 0.794)):
+for delta_hap, soll in ((0.939, 0.874), (0.852, 0.794)):
     assert abs(max(delta_hap * delta_vg, 0.794) - soll) < 0.001
-assert 0.85 * delta_vg < 0.794                # bei delta_hap 0,85 greift die Kappung (0,791)
+assert 0.852 * delta_vg < 0.794               # bei delta_hap 0,852 greift die Kappung (0,793)
 ```
 
 ```python test: s157_voreinstellung
 # Voreinstellung s_gek (Befund 138), h_Heim je Zelle (Befund 146), S157 im Anpassungspotenzial (Befund 149)
-g = (0.93 * 1.11 - 1) / 0.11                  # wie s157_berlin, 1 - g = 0,706
+g = (0.93 * 1.11 - 1) / 0.11                  # wie s157_berlin, 1 - g = 0,7064
 qbar, beta, L85, voly = 0.149, 1.54, 4.16, 160_800
 h = qbar * (1 + beta * (1 - qbar))            # heat.h_heim, Kommune
 assert abs(h - 0.344) < 0.001
@@ -1968,46 +2015,47 @@ yll85_berlin, yll85_warmsen = 556.27, 0.2398   # Zelllauf mit Gemeindeschluessel
 zell = lambda y85, s: y85 * h * s * (1 - g) * voly
 assert abs(zell(yll85_berlin, zus(s_gek)) / 1e6 - 1.1) < 0.05
 assert abs(zell(yll85_warmsen, zus(s_gek)) - 469) < 1
-# Anpassungspotenzial: r_S157 = a_85+ x h x (s_gek - 0,06) x (1 - g); mit Hitzeaktionsplan 1 - 0,95 x (1 - r)
+# Anpassungspotenzial: r_S157 = a_85+ x h x (s_gek - 0,06) x (1 - g); mit Hitzeaktionsplan 1 - 0,939 x (1 - r)
 a85 = 638.8 / 2250                            # Anteil 85+ an den YLL der Kette (Ebene 7)
 r = a85 * h * zus(s_gek) * (1 - g)
 assert abs(a85 - 0.284) < 0.0005 and abs(r - 0.00345) < 0.000005
 assert abs(0.284 * 0.344 * 0.05 * 0.706 - 0.00345) < 0.000005
-assert abs(1 - 0.95 * (1 - r) - 0.053) < 0.0005 and abs(1 - 0.95 - 0.050) < 1e-9
+assert abs(1 - 0.939 * (1 - r) - 0.064) < 0.0005 and abs(1 - 0.939 - 0.061) < 1e-9
 a85_w = yll85_warmsen / 1.0713               # Warmsen, Zelllauf (YLL gesamt 1,0713)
 r_w = a85_w * h * zus(s_gek) * (1 - g)
-assert abs(a85_w - 0.224) < 0.0005 and abs(r_w - 0.0027) < 0.00005 and abs(1 - 0.95 * (1 - r_w) - 0.053) < 0.0005
-assert 1 - 0.95 * (1 - r) < 0.1               # Gruppe nach KWRA unveraendert (unter 0,1)
+assert abs(a85_w - 0.224) < 0.0005 and abs(r_w - 0.0027) < 0.00005 and abs(1 - 0.939 * (1 - r_w) - 0.064) < 0.0005
+assert 1 - 0.939 * (1 - r) < 0.1               # Gruppe nach KWRA unveraendert (unter 0,1)
 ```
 
 ```python test: kuehlzentren_berlin
 # Hebel oeffentliche Kuehlzentren (Befunde 139, 148): delta_KZ = 1 - r_KZ x w_KZ, w_KZ = (1 - g_S157) x t_KZ
-w = 0.71 * 3 / 24                             # 71 % Wirkung im gekuehlten Raum [46], 2 h + 1 h von 24 h [73]
+g = (0.93 * 1.11 - 1) / 0.11                  # heat.g_s157, 1 - g = 0,7064 (Befund 178)
+w = (1 - g) * 3 / 24                          # 70,64 % Wirkung im gekuehlten Raum [46], 2 h + 1 h von 24 h [73]
 r = 0.05                                      # Reichweite, Setzung von KAP3 (ein Viertel von r_VG 0,20)
-assert abs(w - 0.089) < 0.0005 and abs(r - 0.20 / 4) < 1e-12
+assert abs(1 - g - 0.7064) < 0.00005 and abs(w - 0.0883) < 0.00005 and abs(r - 0.20 / 4) < 1e-12
 delta_kz = 1 - r * w
-assert abs(delta_kz - 0.9956) < 0.00005
-assert abs(1 - 0.10 * 0.71 * 6 / 24 - 0.98225) < 1e-9 and abs(1 - 0.01 * 0.71 * 2 / 24 - 0.9994) < 0.00005
+assert abs(delta_kz - 0.995585) < 5e-7 and abs((1 - 0.995585) / (1 - delta_kz) - 1) < 0.001   # Rundung am Betrag 0,005 %
+assert abs(1 - 0.10 * (1 - g) * 6 / 24 - 0.98234) < 0.000005 and abs(1 - 0.01 * (1 - g) * 2 / 24 - 0.9994) < 0.00005
 assert 0.066 <= w <= 0.132 and abs(0.66 / 10 - 0.066) < 1e-9   # Plausibilisierung an [41]: OR 0,34, 5- bis 10-fach
 h = 0.149 * (1 + 1.54 * (1 - 0.149))          # wie s157_berlin
 eur_7585 = (635.4 + 638.8 * (1 - h)) * 160_800 / 1e6   # 75-84 ganz, 85+ ohne Heimbewohner (wie schutzprogramme_berlin)
 assert abs(eur_7585 - 169.5) < 0.05 and abs(635.4 + 638.8 * (1 - h) - 1054) < 1
 kz = eur_7585 * (1 - delta_kz)
 assert abs(kz - 0.75) < 0.005 and abs(kz / 362.9 - 0.002) < 0.0005
-assert abs(eur_7585 * 0.01 * 0.71 * 2 / 24 - 0.1) < 0.005 and abs(eur_7585 * 0.10 * 0.71 * 6 / 24 - 3.0) < 0.05
+assert abs(eur_7585 * 0.01 * (1 - g) * 2 / 24 - 0.1) < 0.005 and abs(eur_7585 * 0.10 * (1 - g) * 6 / 24 - 3.0) < 0.05
 # staerkster Treiber: Reichweite 1-10 % (0,15-1,50 Mio. EUR) vor Stunden 2/24-6/24 (0,50-1,50 Mio. EUR)
 r_lo, r_hi = eur_7585 * 0.01 * w, eur_7585 * 0.10 * w
-t_lo, t_hi = eur_7585 * r * 0.71 * 2 / 24, eur_7585 * r * 0.71 * 6 / 24
+t_lo, t_hi = eur_7585 * r * (1 - g) * 2 / 24, eur_7585 * r * (1 - g) * 6 / 24
 assert abs(r_lo - 0.15) < 0.005 and abs(r_hi - 1.50) < 0.005 and abs(t_lo - 0.50) < 0.005 and abs(t_hi - 1.50) < 0.005
 assert r_hi - r_lo > t_hi - t_lo
-# einfachere Rechnung: 0,71 ohne Stunden
-naiv = eur_7585 * r * 0.71
+# einfachere Rechnung: 0,7064 ohne Stunden
+naiv = eur_7585 * r * (1 - g)
 assert abs(naiv - 6.0) < 0.05 and 7.5 < naiv / kz < 8.5
 # Zelllauf mit Gemeindeschluessel (anlagen/95_zellvergleich.py --ersatz): YLL 75-84 und 85+
-for y7584, y85, soll, tol in ((637.67, 556.27, 0.72e6, 0.005e6), (0.2905, 0.2398, 320, 1)):
+for y7584, y85, soll, tol in ((637.67, 556.27, 0.71e6, 0.005e6), (0.2905, 0.2398, 318, 1)):
     assert abs((y7584 + y85 * (1 - h)) * 160_800 * r * w - soll) < tol
 # zusammen mit Hitzeaktionsplan und Schutzprogrammen: max(delta_hap x delta_vg x delta_kz; 0,794)
-assert abs(max(0.95 * 0.931 * delta_kz, 0.794) - 0.881) < 0.0005 and 0.95 * 0.931 * delta_kz > 0.794
+assert abs(max(0.939 * 0.931 * delta_kz, 0.794) - 0.870) < 0.0005 and 0.939 * 0.931 * delta_kz > 0.794
 ```
 
 ```python test: sensitivitaeten_berlin
@@ -2022,13 +2070,31 @@ tote = lambda c, fa: [c * p * mm / 100_000 / 52 * exz(0.0625 * f) for p, mm, f i
 betrag = lambda c, fa, L=L0: sum(d * l for d, l in zip(tote(c, fa), L)) * voly / 1e6 + morb
 basis = betrag(0.581, fa0)
 assert abs(basis - 362.9) < 0.05
-# Befunde 163, 164: Hitzeaktionsplan auf den Exzess aller Baender, delta_hap = 2/3 x 1,00 + 1/3 x 0,85 [45]
-assert abs(2 / 3 * 1.00 + 1 / 3 * 0.85 - 0.95) < 1e-12 and abs((1.00 + 0.85) / 2 - 0.925) < 1e-12
+# Befunde 163, 164, 180: Hitzeaktionsplan auf den Exzess aller Baender; [45] misst alle Todesfaelle am Hitzetag (2.2.1)
 mort = basis - morb                                         # Mortalitaet der Kette, 361,8 Mio. EUR
 assert abs(mort - 361.8) < 0.05
-assert abs(betrag(0.581 * 0.95, fa0) - morb - 0.95 * mort) < 1e-9   # Faktor auf den Exzess = Faktor auf die Mortalitaet
-assert abs(mort * (1 - 0.95) - 18.1) < 0.05 and abs(mort * (1 - 0.85) - 54.3) < 0.05
-assert abs(mort * (1 - 0.925) - 27.1) < 0.05 and abs(mort * (1 - 0.95) / basis - 0.050) < 0.0005
+assert abs(betrag(0.581 * 0.939, fa0) - morb - 0.939 * mort) < 1e-9   # Faktor auf den Exzess = Faktor auf die Mortalitaet
+rr, rr_nach = 31.1 / 26.9, 30.5 / 26.6                      # RR des Hitzetags vor / nach dem Warnsystem, [45] Tabelle 1
+T = lambda d: 1 - (1 - d) * rr / (rr - 1)                   # Faktor auf alle Todesfaelle -> Faktor auf den Exzess
+assert abs(rr - 1.1561) < 5e-5 and abs(rr_nach - 1.1466) < 5e-5
+assert abs(T(1.00) - 1.00) < 1e-12 and abs(T(0.98) - 0.852) < 0.0005 and abs(T(1.01) - 1.074) < 0.0005   # Durchschnittsstadt
+assert abs(T(0.85) + 0.111) < 0.0005 and abs(T(0.75) + 0.85) < 0.005 and abs(T(0.97) - 0.78) < 0.005   # Achsenabschnitt
+assert abs(2 / 3 * 1.00 + 1 / 3 * 0.85 - 0.95) < 1e-12 and abs(T(0.95) - 0.630) < 0.0005
+assert abs(2 / 3 * T(1.00) + 1 / 3 * T(0.85) - T(0.95)) < 1e-12   # 0,95 alt: Wirkung nur aus dem Drittel des Achsenabschnitts
+d_roh = (rr_nach - 1) / (rr - 1)                            # Exzess am Hitzetag nach / vor dem Warnsystem, roh
+assert abs(d_roh - 0.93904) < 1e-5 and abs(0.1466 / 0.1561 - 0.939) < 0.0005
+assert abs(rr_nach / rr - 0.992) < 0.0005 and 0.98 <= rr_nach / rr <= 1.01   # roh auf allen Todesfaellen: im Intervall
+d_hap = 0.939
+assert T(0.98) < d_hap < 1.00 and d_hap > 0.794             # im Intervall der Durchschnittsstadt, weit ueber dem Paketwert
+assert abs(mort * (1 - d_hap) - 22.1) < 0.05 and abs(mort * (1 - d_hap) / basis - 0.061) < 0.0005
+assert abs(mort * (1 - d_roh) - mort * (1 - d_hap)) / (mort * (1 - d_roh)) < 0.001   # Rundung 0,939: 0,07 %
+assert abs(mort * (1 - 0.852) - 53.5) < 0.05                # Band 0-53,5 Mio. EUR
+assert abs(mort * (1 - 0.95) - 18.1) < 0.05                 # vorher: 0,95 unuebersetzt auf dem Exzess
+assert abs(mort * (1 - max(T(0.95), 0.794)) - 74.5) < 0.05  # verworfen: 0,95 uebersetzt und gekappt
+# Kappung und Teilabdeckung: 1 - a x (1 - max(delta_hap; 0,794)); Plan fuer die Haelfte der Einwohner
+teil = 1 - 0.5 * (1 - max(d_hap, 0.794))
+assert abs(teil - 0.9695) < 1e-9 and abs(mort * (1 - teil) - 11.0) < 0.05
+assert 0.852 * 0.931 < 0.794 < d_hap * 0.931                # mit Schutzprogrammen: Kappung erst am unteren Bandende
 # Band von f_a: Rueckrechnung wie §3.3a mit den Anteilen eines Sommers [74], [75]
 sterbe = [138_024, 166_312, 302_921, 420_949]
 def fa_aus(n):
@@ -2055,8 +2121,8 @@ assert abs(kapp - 0.794) < 1e-9 and abs(k_lo - 0.743) < 1e-9 and abs(k_hi - 0.84
 h = 0.149 * (1 + 1.54 * (1 - 0.149))
 e7585 = (635.4 + 638.8 * (1 - h)) * voly / 1e6            # wie schutzprogramme_berlin: 169,5 Mio. EUR
 assert abs(1 - 0.40 * 0.68 - 0.728) < 1e-9 and 1 - 0.40 * 0.68 < kapp   # ohne Kappung unter dem Paket
-assert abs(0.85 * 0.931 - 0.791) < 0.0005 and abs(0.85 * 0.931 * 0.9956 - 0.788) < 0.0005
-assert abs(0.95 * 0.931 * 0.9956 - 0.881) < 0.0005 and 0.95 * 0.931 * 0.9956 > kapp
+assert abs(0.852 * 0.931 - 0.793) < 0.0005 and abs(0.852 * 0.931 * 0.995585 - 0.790) < 0.0005 and 0.852 * 0.931 < kapp
+assert abs(0.939 * 0.931 * 0.995585 - 0.870) < 0.0005 and 0.939 * 0.931 * 0.995585 > kapp
 assert abs(e7585 * (1 - kapp) - 34.9) < 0.05
 assert abs(e7585 * (1 - k_hi) - 26.8) < 0.05 and abs(e7585 * (1 - k_lo) - 43.6) < 0.05
 assert abs(e7585 * (1 - 0.728) - 46.1) < 0.05 and abs(e7585 * (0.794 - 0.728) - 11.2) < 0.05
@@ -2204,7 +2270,7 @@ DOI-Links die persistenten Referenzen.
 - **[69]** Statistische Ämter des Bundes und der Länder, Zensus 2022 — Regionaltabelle „Demografie“
   (Ausgewählte Ergebnisse zur Demografie zum Stichtag 15.05.2022), Blatt „Demografie“, Spalten
   „Insgesamt“ und „Im Alter von … bis … Jahren: 60–66, 67–74, 75 und älter“, Zeilen ARS
-  032565408034 (Warmsen: 3158 · 388 · 257 · 345) und 110000000000 (Berlin, Stadt: 3.596.999 ·
+  032565408034 (Warmsen: 3.158 · 388 · 257 · 345) und 110000000000 (Berlin, Stadt: 3.596.999 ·
   292.354 · 261.676 · 362.829) (https://www.destatis.de/static/DE/zensus/gitterdaten/Regionaltabelle_Demografie.xlsx,
   abgerufen 25.09.2026; Archiv
   https://web.archive.org/web/20260925192632/https://www.destatis.de/static/DE/zensus/gitterdaten/Regionaltabelle_Demografie.xlsx)
@@ -2276,7 +2342,9 @@ DOI-Links die persistenten Referenzen.
 Einträge 1–18: in M0 (Rev. 1–5) getroffene Setzungen (rückwirkend dokumentiert bei der
 Migration). Einträge 19–27: Rev.-6-Entscheidungen (`/risiko-auto`, Gate 1); Einträge 28–30:
 Revision nach Review-Runde 1 (Befunde 58/59/62); Einträge 31–33: Rev.-7-Kalibrier-Revision
-(Auflösung der §6-Eskalation, 30.08.2026). Einträge 37–38: verworfene Ansätze aus dem früheren
+(Auflösung der §6-Eskalation, 30.08.2026). Einträge 34–36: Setzungen der Rev. 8 (Kalibrier-Abgleich über
+kommunale Stichproben statt Zelllauf, q_pfl-Ebene ohne Kreis-Pflegestatistik, \(\bar L_{85+}\) exakt 4,16 J).
+Einträge 37–38: verworfene Ansätze aus dem früheren
 Kapitel 9 (Ansatz-Vergleich), das mit Fortschreibung 7 entfällt (eine Methodik je Risiko,
 Befund 95); der gewählte Ansatz 95-A ist Nr. 1. Einträge 39–40: Fortschreibung 7, Schritt 2
 (Pflichtabschnitt „Risiko ohne (weitere) Anpassung“, Kennzeichnung der Parameter; Befunde 107–111).
@@ -2304,7 +2372,7 @@ um die Herleitung von \(\delta_{\text{HAP}}\) ergänzt (T-1584, Befund 164).
 | 7 | (ersetzt durch Nr. 26) | — | — | — | — |
 | 8 | (ersetzt durch Nr. 19) | — | — | — | — |
 | 9 | (ersetzt durch Nr. 23) | — | — | — | — |
-| 10 | Maßnahmen-Effektgrößen? | **Interventionsevidenz, marginal**: \(\delta_{\text{HAP}}\) 0,95 auf (RR−1), hergeleitet als 2/3 × 1,00 + 1/3 × 0,85 aus [45] (Mittel über 15 Städte doppelt gewichtet gegen den bereinigten Wert; Befund 164, §5); Klimaanlagen rOR 0,93; Doppelzählungs-Wächter | Fall-Kontroll-ORs überschätzen Einführungswirkung 5–10×; die Mitte 0,925 gäbe dem bereinigten Wert, der an drei im Produkt nicht nachgebildeten Merkmalen der Städte hängt, dasselbe Gewicht wie dem engen Mittel 0,98–1,01 (Berlin 27,1 statt 18,1 Mio. € je Jahr) | Fouillet-großer Hebel (−4.400) — Doppelbuchung | Maßnahmenwerte klein, ehrlich |
+| 10 | Maßnahmen-Effektgrößen? | **Interventionsevidenz, marginal**: \(\delta_{\text{HAP}}\) = 0,939 (Band 0,852–1,00) auf (RR−1), Abschätzung von KAP3 aus [45], Tabelle 1: der Exzess am Hitzetag nach / vor Einführung des Warnsystems, roh 0,1466 / 0,1561 (Befunde 164 und 180, §5); [45] misst alle Todesfälle am Hitzetag (Abschnitt 2.2.1: „the all-cause daily death count“), übersetzt bleibt die Durchschnittsstadt 1,00 (0,852–1,074); Berlin 22,1 Mio. € je Jahr; Klimaanlagen rOR 0,93; Doppelzählungs-Wächter | Fall-Kontroll-ORs überschätzen Einführungswirkung 5–10×; die Durchschnittsstadt ist die Stadt, die das Produkt rechnet, ihr Wert 1,00 wäre eine Nullwirkung (P2); der rohe Wert liegt in ihrem Intervall (auf alle Todesfälle 0,992 in 0,98–1,01) und weit über dem Paketwert 0,794. **Gegenargument:** roh, nicht um Temperatur und Trend bereinigt; [45] misst die Warnung an Warntagen, nicht den Plan | Fouillet-großer Hebel (−4.400) — Doppelbuchung · 0,95 = 2/3 × 1,00 + 1/3 × 0,85 unübersetzt auf den Exzess (Befund 164; verworfen, weil es 5 % aller Todesfälle am Hitzetag als 5 % des Exzesses liest; Berlin 18,1 Mio. €) · 0,95 übersetzt 0,630, gekappt 0,794 (verworfen, weil die ganze Wirkung aus dem Achsenabschnitt 0,85 kommt, der auf dem Exzess −0,111 ergibt, und ein Plan allein das ganze Paket leistete; Berlin 74,5 Mio. €) | Maßnahmenwerte klein, ehrlich |
 | 11 | Kante #63 Innenraumklima? | **kein eigener Knoten in M0** — Nachtkomponente des 24-h-Mittels + Hebel S157 | Gebäudephysik-Risiko folgt in M1; Kante bleibt adressiert | eigener Innenraum-Term | Kette vollständig adressiert |
 | 12 | Grünanteil als Vulnerabilität? | **nein** — steckt im UHI-Zuschlag | Kein-Doppelkanal (§3.2) | zweiter Grün-Kanal | keine Doppelzählung |
 | 13 | (ersetzt durch Nr. 20) | — | — | — | — |
@@ -2333,15 +2401,15 @@ um die Herleitung von \(\delta_{\text{HAP}}\) ergänzt (T-1584, Befund 164).
 | 36 | L̄_85+ exakt statt Approximation? | **4,16 J** — Einzeljahres-Sterbefälle 85–94 × e(x), 95+-Rest tafelintern gewichtet, m/w sterbefallgewichtet kombiniert | Befund-22-Auflösung wie in §3.5 terminiert; Kreuzcheck 12613-02↔-03 exakt | Stützstellen-Variante (4,83 — behebt nur den Gewichte-Fehler, nicht die Untergrenzen-Stützstellen) | YLL-Bundessumme ≈ −8 %; €-Ausweis sinkt entsprechend (konservativ) |
 | 37 | Ansatz 95-B (nationaler Anker, top-down)? | **verworfen** | 95-B verteilt eine feste nationale Zahl von Hitzetoten über einen Schlüssel und scheidet nach §3.1 aus, weil damit auch eine Kommune ohne Hitze Todesfälle erhielte. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
 | 38 | Ansatz 95-C (Personen-Hitzegradtage-Regression)? | **verworfen** | 95-C ersetzt die publizierte und kalibrierte RKI-Kurve durch eine lineare Regression mit aufgesetzter Krümmung (κ ≈ 1,2–1,5) und wäre gegenüber 95-A ein Rückschritt. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
-| 39 ⚠ | Satz „Bestand an Klimaanlagen und Hitzeaktionsplänen im Basiswert“ (Kapitel 1, Absatz (a))? | **gestrichen** — Absatz (a) sagt nur noch, was aus der Kalibrierung folgt: \(c_{\text{kal}}\) ist an die RKI-Reihe 2012–2024 angepasst, der Anpassungsstand dieser Jahre steckt damit im Niveau; genannt bleibt nur das DWD-Hitzewarnsystem mit Beleg [45] | Der Bericht hat keine Quelle für die Klimaanlagen-Quote und keine für die Verbreitung kommunaler Hitzeaktionspläne in den Kalibrierjahren; eine Behauptung ohne Beleg bleibt nicht stehen (P1) | Satz belegen: Klimaanlagen-Quote der Haushalte und Pflegeheime sowie Einführungsjahre der Hitzeaktionspläne gegen das Fenster 2012–2024 (Fortschreibung) | keine Zahl betroffen; Aussage (a) schmaler, aber belegt |
+| 39 ⚠ | Satz „Bestand an Klimaanlagen und Hitzeaktionsplänen im Basiswert“ (Kapitel 1, Absatz (a))? | **gestrichen** (Stand T-1119, Historie; für Pflegeheime fortgeschrieben durch Nr. 50) — Absatz (a) sagt nur noch, was aus der Kalibrierung folgt: \(c_{\text{kal}}\) ist an die RKI-Reihe 2012–2024 angepasst, der Anpassungsstand dieser Jahre steckt damit im Niveau; genannt bleibt nur das DWD-Hitzewarnsystem mit Beleg [45] | Der Bericht hat keine Quelle für die Klimaanlagen-Quote und keine für die Verbreitung kommunaler Hitzeaktionspläne in den Kalibrierjahren; eine Behauptung ohne Beleg bleibt nicht stehen (P1) | Satz belegen: Klimaanlagen-Quote der Haushalte und Pflegeheime sowie Einführungsjahre der Hitzeaktionspläne gegen das Fenster 2012–2024 (Fortschreibung) | keine Zahl betroffen; Aussage (a) schmaler, aber belegt |
 | 40 ⚠ | Kennzeichnung der Grenzfälle in Kapitel 7? | **`abschaetzung_kap3`**, sobald eine Setzung von KAP3 im Wert steckt (\(\beta_{85+}\) Süd-Nachschätzung, \(f_a\) lineare Näherung, VOLY-Elastizität beim Raumtransfer, \(c_{\text{Fall}}\) als Proxy aus dem Durchschnitt aller Krankenhausfälle, Stützstellen e(60)/e(70)/e(80) für die Bänder u65, 65–74 und 75–84 in \(\bar L_a\), \(r_{0,a}\)-Altersprofil, \(\delta_{\text{HAP}}\), Distanzterm); **`quelle`** für reine Rechnungen aus amtlichen oder gemessenen Zahlen ohne Setzung (Quotienten, ausgezählte Quantile); Prüfstein: Misst der Wert die Zielgröße selbst, ist die bloße Wahl zwischen Quellenwerten keine Setzung (\(e_{\text{HD}}\) konditional statt unkonditional, Log 19; Stationsauswahl für \(q_w\), Log 5) — steht er für eine andere Größe (Proxy) oder nähert er ein Bandmittel durch einen Punkt an, ist es eine; **`berechnet`** nur, wo der Wert aus anderen Blöcken folgt (\(c_{\text{kal}}\), \(\beta_{\text{pfl}}\)); eine nur umgerechnete Studienzahl ist `quelle` (\(\beta_{\text{iso}}\), Befund 136) | Die Parameterliste im Produkt (P1) soll eine Setzung nie als Quellenwert zeigen; gleiche Lesart wie die Blöcke in `60_*.md` („Quotient zweier amtlicher Summen“ = `quelle`) | alle aus Quellen abgeleiteten Werte als `abschaetzung_kap3` (überzeichnet die Unsicherheit amtlicher Quotienten) | keine Zahl betroffen; Anzeige „Quelle“ oder „Abschätzung von KAP3“ im Produkt |
-| 41 ⚠ | Womit ersetzt das Produkt den Anteil 65+ einer Zelle, der im Zensus-Gitter geheimgehalten ist („–“)? | **zweistufige Ersatzregel, Abschätzung von KAP3** (§3.3, festgelegt vom methodik_manager in T-1199, Stufe 2 neu gefasst in T-1233): Stufe 1 Summe der veröffentlichten 5er-Jahresgruppen ab 65 der Zelle geteilt durch ihre Einwohner, sofern mindestens eine der sechs Gruppen veröffentlicht ist; Stufe 2 der Rest aus der Gemeindesumme: Zielzahl Z = A_G × Einwohnersumme der Gemeinde im Gitter mit A_G = (Einwohner ab 67 + 2/7 der Gruppe 60–66) / Einwohner aus dem Zensus 2022 [69] (fehlt die Gemeindezeile oder steht dort „.“, A_G der Kreiszeile, Befund 119), Rest R = Z − Einwohner ab 65 der Zellen mit veröffentlichtem Anteil − Einwohner ab 65 aus Stufe 1, jede übrige geheimgehaltene Zelle bekommt R / Einwohner dieser Zellen, begrenzt auf 0–100 % (R < 0 gibt 0); gilt auch für Gemeinden ohne Zelle mit veröffentlichtem Anteil (die frühere Modellgrenze, 30 Gemeinden mit 376 Einwohnern, entfällt) | Das „–“ ist Geheimhaltung, nicht null (Befund 104), steht aber meist für Zellen mit wenigen Älteren: Das Altersgitter derselben Zellen zeigt Berlin 2,6 %, Warmsen 5,2 % Personen ab 65. Die frühere Stufe 2 (einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil, Warmsen 46,00 %) setzte in Warmsen 1416 Einwohner ab 65 an, mehr als die 990 ab 60 [69] (Befund 117). Der Rest aus der Gemeindesumme hält die amtliche Zahl der Gemeinde: Warmsen 697, Berlin 707.318 Einwohner ab 65, je zwischen „ab 67“ und „ab 60“ aus [69]. Lesart „mindestens eine Gruppe“ in Stufe 1, weil mit „alle sechs Gruppen“ Stufe 1 leer bliebe. **Gegenargumente:** (1) Aufteilung der Gruppe 60–66: [69] trennt bei 67; die 2/7 (Jahrgänge 65 und 66 von sieben, gleich viele Menschen je Jahrgang) sind eine Abschätzung von KAP3; zählt die Gruppe ganz oder gar nicht, liegt der Faktor ohne Gemeindeschlüssel gegen Regel in Warmsen bei × 0,651–0,947, in Berlin bei × 0,927–1,000 (Block `heat.anteil_60_66`). (2) Stichtag: Gitter und [69] zählen zum 15.05.2022, Ebene 1 der Rechenkette zum 31.12.2023 (Befund 99, Wirkung (b) in §3.0); die Regel gleicht die Zellen an den Zensus an, nicht an die Fortschreibung. (3) Ist R < 0, bleibt ein Überhang stehen (1342 Gemeinden, 3,7 % der Einwohner in Zellen der Stufe 2, im Median 5 Einwohner ab 65). (4) 68 Gemeinden ohne Gemeindezeile nehmen den Altersaufbau des Kreises; ohne jede Zeile rechnet nur Hanau (VG250 06415000, in [69] 06435014) wie heute | 65+ = 0 lassen (frühere Produktlogik vor Stufe 1, Historie; unterschätzt Warmsen: 508 gegen 602 ab 67 [69]) · Stufe 2 als einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil (Fassung T-1199; verdoppelt ländliche Kommunen, Befund 117) · Gruppe 60–66 ganz oder gar nicht zählen (Spanne oben) | Berlin ohne Gemeindeschlüssel gegen Regel × 0,989, Warmsen × 0,838 (§3.3, `--ersatz`, gemessen 27.09.2026); Code-Nachzug beim cto nach dieser Fassung (Befund 116) |
+| 41 ⚠ | Womit ersetzt das Produkt den Anteil 65+ einer Zelle, der im Zensus-Gitter geheimgehalten ist („–“)? | **zweistufige Ersatzregel, Abschätzung von KAP3** (§3.3, festgelegt vom methodik_manager in T-1199, Stufe 2 neu gefasst in T-1233): Stufe 1 Summe der veröffentlichten 5er-Jahresgruppen ab 65 der Zelle geteilt durch ihre Einwohner, sofern mindestens eine der sechs Gruppen veröffentlicht ist; Stufe 2 der Rest aus der Gemeindesumme: Zielzahl Z = A_G × Einwohnersumme der Gemeinde im Gitter mit A_G = (Einwohner ab 67 + 2/7 der Gruppe 60–66) / Einwohner aus dem Zensus 2022 [69] (fehlt die Gemeindezeile oder steht dort „.“, A_G der Kreiszeile, Befund 119), Rest R = Z − Einwohner ab 65 der Zellen mit veröffentlichtem Anteil − Einwohner ab 65 aus Stufe 1, jede übrige geheimgehaltene Zelle bekommt R / Einwohner dieser Zellen, begrenzt auf 0–100 % (R < 0 gibt 0); gilt auch für Gemeinden ohne Zelle mit veröffentlichtem Anteil (die frühere Modellgrenze, 30 Gemeinden mit 376 Einwohnern, entfällt) | Das „–“ ist Geheimhaltung, nicht null (Befund 104), steht aber meist für Zellen mit wenigen Älteren: Das Altersgitter derselben Zellen zeigt Berlin 2,6 %, Warmsen 5,2 % Personen ab 65. Die frühere Stufe 2 (einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil, Warmsen 46,00 %) setzte in Warmsen 1.416 Einwohner ab 65 an, mehr als die 990 ab 60 [69] (Befund 117). Der Rest aus der Gemeindesumme hält die amtliche Zahl der Gemeinde: Warmsen 697, Berlin 707.318 Einwohner ab 65, je zwischen „ab 67“ und „ab 60“ aus [69]. Lesart „mindestens eine Gruppe“ in Stufe 1, weil mit „alle sechs Gruppen“ Stufe 1 leer bliebe. **Gegenargumente:** (1) Aufteilung der Gruppe 60–66: [69] trennt bei 67; die 2/7 (Jahrgänge 65 und 66 von sieben, gleich viele Menschen je Jahrgang) sind eine Abschätzung von KAP3; zählt die Gruppe ganz oder gar nicht, liegt der Faktor ohne Gemeindeschlüssel gegen Regel in Warmsen bei × 0,651–0,947, in Berlin bei × 0,927–1,000 (Block `heat.anteil_60_66`). (2) Stichtag: Gitter und [69] zählen zum 15.05.2022, Ebene 1 der Rechenkette zum 31.12.2023 (Befund 99, Wirkung (b) in §3.0); die Regel gleicht die Zellen an den Zensus an, nicht an die Fortschreibung. (3) Ist R < 0, bleibt ein Überhang stehen (1.342 Gemeinden, 3,7 % der Einwohner in Zellen der Stufe 2, im Median 5 Einwohner ab 65). (4) 68 Gemeinden ohne Gemeindezeile nehmen den Altersaufbau des Kreises; ohne jede Zeile rechnet nur Hanau (VG250 06415000, in [69] 06435014) wie heute | 65+ = 0 lassen (frühere Produktlogik vor Stufe 1, Historie; unterschätzt Warmsen: 508 gegen 602 ab 67 [69]) · Stufe 2 als einwohnergewichteter Anteil der Zellen mit veröffentlichtem Anteil (Fassung T-1199; verdoppelt ländliche Kommunen, Befund 117) · Gruppe 60–66 ganz oder gar nicht zählen (Spanne oben) | Berlin ohne Gemeindeschlüssel gegen Regel × 0,989, Warmsen × 0,838 (§3.3, `--ersatz`, gemessen 27.09.2026); Code-Nachzug beim cto nach dieser Fassung (Befund 116) |
 | 42 ⚠ | Stichtag der Einwohner je Altersband in Ebene 1 der Rechenkette (§3.0)? | **Fortschreibung des Bevölkerungsstandes zum 31.12.2023, Basis Zensus 2022** (Tab. 12411-09-01-4-B [48]; festgelegt vom methodik_manager in T-1233, Befund 99) | Gleicher Stichtag wie der Nenner der Basissterberaten m_a [49] (Sterbefälle 2023 / Bevölkerung 31.12.2023): Einwohner und Sterberate beziehen sich auf denselben Tag. Der Abstand zum Zensus-Gitter (15.05.2022) ist als Wirkung (b) in §3.0 beziffert, in Berlin × 0,981. **Gegenargument:** Gitter und Ersatzregel in §3.3 zählen zum 15.05.2022; ein Sachbearbeiter sieht in §3.0 und §3.3 zwei Stichtage | Zensus-Tabelle 1000A zum 15.05.2022 (Stichtag gleich dem Gitter, aber verschieden vom Nenner von m_a; die Zensus-Datenbank war bis 05.10.2026 in Wartung, nach dem 05.10.2026 wird nicht umgestellt) | keine Zahl betroffen; Kapitel 7 und Kette (362,89 Mio. €) unverändert |
-| 43 ⚠ | Wirkung der Schutzprogramme vulnerable Gruppen (`VULNERABLE_GROUP_PROGRAMS`) und ihr Andockpunkt? | **\(\delta_{\text{VG}}\) = 0,931 (Band 0,794–1,0) als Faktor auf den Wochenexzess der Bänder 75–84 und 85+ ohne Heimbewohner; auf die Einweisungen \(\delta_{\text{VG,morb}}\) = 1,0 (Band 0,931–1,069, Befund 131); mit \(\delta_{\text{HAP}}\) zusammen \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}};\ 0{,}794)\); Abschätzung von KAP3** (§5, Block `heat.delta_vg`, Befunde 123, 125–128, 134) | Der Katalog im Produkt setzt `default_reduction` 0.22 auf Mortalität und Morbidität aller Bänder und beruft sich auf das Gesamtpaket der Hitzeschutzpläne (Urban u. a. 2025 [47], −25,2 %). Das ist der Einführungseffekt des ganzen Pakets über drei Jahrzehnte; ein einzelner Baustein wirkt nicht stärker (für Deutschland ist das Paket −20,6 % [47, Tabelle 1], also Faktor 0,794, und \(\delta_{\text{VG}}\) liegt nie darunter), und er erreicht nur die Gemeldeten (Reichweite 20 %, Wirkung bei Erreichten 0,34 = 24,4 / 97,3 / 0,728 aus [70], Tabellen 1–3, bereinigt um die Sterberate vor dem Sommer und den Anteil ab 90). Heimbewohner ab 85 zählen über S157, nicht hier. Umgerechnet auf den Berlin-Betrag: 0.22 auf alle Bänder ergäbe rund 79,8 Mio. € je Jahr, \(\delta_{\text{VG}}\) ergibt 11,7 Mio. €, rund 15 %. **Kappung (Befund 126):** Ob \(\delta_{\text{HAP}}\) den Baustein schon enthält, lässt sich aus [45] nicht ausschließen; deshalb nehmen beide Hebel zusammen nie mehr weg als das Paket Deutschland (zentral 0,885, keine Kappung; sie greift bei \(\delta_{\text{HAP}}\) = 0,85). **Gegenargument:** Der Paketwert ist gemessen, die Reichweite ist eine Setzung; wer sie auf 40 % hebt, kommt auf 23,3 Mio. €, noch immer weniger als ein Drittel von 79,8 Mio. €; erst mit \(w_{\text{VG}}\) am oberen Bandende 0,68 erreicht er die Kappung bei 34,9 Mio. €. Andockpunkt nicht \(v_{\text{vers},a}\), weil es auf Ebene der Kommune genau 1 ist | 0.22 übernehmen (überzeichnet: Paketwert für einen Baustein, dazu auf Bänder und Morbidität ohne Evidenz); rohe Lesart als Zentralwert, Wirkung bei Erreichten aus dem rohen Unterschied der Anstiege, 0,68 = 0,498 / 0,728 aus [70] Tabelle 2 (Berlin 23,1 Mio. €; verworfen, weil der rohe Unterschied die höhere Altersstruktur der Stadtteile ohne Programm als Wirkung mitzählt und die Quelle selbst auf −24,4 Pp. bereinigt; bleibt als obere Grenze des Bands); Hebel streichen (P2 verbietet eine unbegründete Nullwirkung; die Maßnahme besteht im Produkt) | Kette 362,9 Mio. € unverändert (Hebel wirkt nur bei Wahl der Maßnahme); Abweichung Bericht ↔ Katalog (0.22 ↔ 0,931 auf 75+ ohne Heimbewohner, Kappung mit \(\delta_{\text{HAP}}\)) geht als Punkt in die Meldung an den cto (eiserne Regel 5) |
-| 44 ⚠ | Wie steht der Hebel S157 zur geparkten Maßnahme `COOLING_ROOMS_DRINKING_WATER`? | (**Stand 26.09.2026, Historie; fortgeschrieben durch Nr. 45 und 46:** seit T-1367-cto ist die Maßnahme aktiv, \(s_{\text{gek}}\) hat die Voreinstellung 0,11, die Kühlzentren haben einen eigenen Hebel \(\delta_{\text{KZ}}\).) **Die Maßnahme bleibt im Produkt geparkt und hat heute keine Wirkung, auch keine Nullwirkung. Beim Aktivieren gilt \(g_{\text{S157}}\) = 0,29 (Band 0–0,90) auf den Heim-Exzess 85+ im gekühlten Anteil \(s_{\text{gek}}\), den die Kommune eingibt; Abschätzung von KAP3** (§5, Befund 130) | Der geparkte Katalog (`backend/app/data/catalog_parked.py`) führt die Maßnahme mit `default_reduction` 0.18 auf die Exposition (`effect_target: exposure`) für alle Menschen. [46] misst dagegen Klimaanlagen in Heimen: Mit ihnen bleiben 29 % des Heim-Exzesses (Faktor 0,29), 71 % fallen weg, und zwar nur bei Heimbewohnern ab 85 im gekühlten Anteil. 0.18 auf die Exposition ist also weder dieselbe Größe noch derselbe Personenkreis; wie groß ihre Wirkung in Euro wäre, hängt an der Expositionskette des Produkts und ist mit den 25,0 Mio. € für Berlin nicht vergleichbar. Wie viele Heimplätze gekühlt sind, weiß nur die Kommune, deshalb ist \(s_{\text{gek}}\) ihre Eingabe. Öffentliche Kühlzentren außerhalb der Heime bekommen beim Aktivieren eine eigene Abschätzung nach P2. **Gegenargument:** 0.18 wirkt auf alle Menschen und erfasst damit auch öffentliche Kühlzentren, die der Bericht heute nicht rechnet; wer sie ersetzt, verliert diesen Teil, bis die eigene Abschätzung vorliegt. Weil die Maßnahme geparkt ist, fehlt dadurch heute keiner Kommune eine Wirkung | 0.18 auf die Exposition übernehmen (ohne Beleg aus [46], anderer Personenkreis); S157 ohne Andockpunkt führen (die geparkte Maßnahme ist die einzige passende im Produkt) | Kette 362,9 Mio. € und S157 25,0 Mio. € unverändert; Empfehlung an den cto in der Meldung: beim Aktivieren von `COOLING_ROOMS_DRINKING_WATER` \(g_{\text{S157}}\) auf \(D_{85+} \times h_{\text{Heim}} \times s_{\text{gek}}\) statt 0.18 auf die Exposition (eiserne Regel 5) |
-| 45 ⚠ | Was gilt für S157, wenn die Kommune keinen gekühlten Anteil eingibt, wie rechnet \(h_{\text{Heim}}\) in der Zelle, und mit welcher Wirkung zählt S157 im Anpassungspotenzial? | **Voreinstellung \(s_{\text{gek}}\) = 0,11 (Band 0,05–0,15) für die ganze Kommune, Abschätzung von KAP3** (Block `heat.s_gek`, Befund 138); **\(h_{\text{Heim},z} = q_{\text{pfl},z}\,[1 + \beta_{\text{pfl}}(1 - \bar q_{\text{pfl}})] / [1 + \beta_{\text{pfl}}(q_{\text{pfl},z} - \bar q_{\text{pfl}})]\) je Zelle, Rückfallwert 0,344** (Block `heat.h_heim`, Befund 146); **\(r_{\text{S157}} = a_{85+} \times h_{\text{Heim}} \times s_{\text{gek}} \times (1 - g_{\text{S157}})\) = 0,284 × 0,344 × 0,11 × 0,706 = 0,0076 im Anpassungspotenzial** (Befund 149; §5) | Eine Nullwirkung ist keine Voreinstellung (P2, A-0010): Ohne Eingabe zeigte S157 keinen Betrag und zählte im Anpassungspotenzial mit 0. 11 % der Pflegeheime haben eine Klimaanlage [71]; 14,5 % der Neubauten des Sozialwesens 2025 haben eine Anlage zur Kühlung [72]; den älteren Bestand setzt KAP3 nicht höher an. Welche Heime gekühlt sind, weiß nur die Kommune, deshalb gilt der Wert für ihre ganze Fläche. Das Produkt führt \(q_{\text{pfl}}\) je Zelle (Log 35); mit derselben Formel wie \(v_{\text{vers}}\) liegen die Heim-Todesfälle in den Zellen der Heime, summiert über die Kommune bleibt es 0,344 × \(D_{85+}\). **Gegenargumente:** (1) Die Umfrage [71] hat 140 Rückmeldungen und ist nicht repräsentativ; „Klimaanlage in der Einrichtung“ heißt nicht, dass alle Plätze gekühlt sind (deshalb unten 0,05). (2) \(a_{85+}\) stammt aus der Rechenkette Berlin (0,284); in Warmsen ist er 0,224, das Anpassungspotenzial dann 0,056 statt 0,057 | Nullwirkung behalten (S157 ohne Eingabe ohne Betrag; verstößt gegen P2) · 0,145 aus [72] als Zentralwert (Neubauten, überzeichnet den Bestand) · 0,344 in jeder Zelle (verteilt Heim-Todesfälle auf Zellen ohne Heim) · S157 mit \(1 - g_{\text{S157}}\) = 0,71 im Anpassungspotenzial (zählte den Heim-Exzess aller Heime als ganze Hitzemortalität, 0,71 / 0,0076 = rund 90-mal zu groß) | (**Stand T-1537, Historie; fortgeschrieben durch Nr. 50:** S157 wirkt nur auf \(s_{\text{gek}}\) − 0,06, Berlin bei der Voreinstellung 1,2 Mio. €, Warmsen 469 €, Anpassungspotenzial 0,053.) Kette 362,9 Mio. € unverändert; S157 Berlin (Kette) bei der Voreinstellung 2,7 Mio. € je Jahr (Preisstand 2024; Band 1,2–3,7 Mio. €), alle Heime gekühlt weiter 25,0 Mio. €; Warmsen (Zelllauf) 1.032 € je Jahr; Anpassungspotenzial der Hitzemortalität 0,057 statt 0,050; Umsetzung beim cto (eiserne Regel 5) |
-| 46 ⚠ | Welche Wirkung haben öffentliche Kühlzentren außerhalb der Heime (Log 44, Zusage einer eigenen Abschätzung nach P2)? | **\(\delta_{\text{KZ}}\) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,71 × 3/24 = 0,9956 (Band 0,982–0,9994) als Faktor auf den Wochenexzess der Bänder 75–84 und 85+ ohne Heimbewohner; mit \(\delta_{\text{HAP}}\) und \(\delta_{\text{VG}}\) zusammen \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}} \times \delta_{\text{KZ}};\ 0{,}794)\); Abschätzung von KAP3** (§5, Block `heat.delta_kuehlzentren`, Befunde 139, 148) | Eine Effektgröße für Kühlzentren hat KAP3 nicht gefunden (Suche 27.09.2026). Die Wirkung im gekühlten Raum ist gemessen (Klimaanlage in Heimen: 71 % des Exzesses fallen weg [46]), ebenso wie lange eine Kühlpause wirkt (2 h Kühlung wirken etwa 1 h nach [73]); daraus 0,71 × 3/24 = 0,089 für Nutzer. Die Reichweite ist eine Setzung: ein Viertel der Reichweite eines Schutzprogramms, weil nur hingeht, wer in der Hitze das Haus verlässt, und gerade die Gefährdetsten das nicht tun [41]. Plausibel gegen [41]: Besuch kühler Orte OR 0,34, nach Log 10 fünf- bis zehnfach überschätzt, also 0,066–0,132 für Nutzer. **Gegenargumente:** (1) Die Reichweite 5 % ist nicht gemessen; sie ist der stärkste Treiber (Berlin 0,15–1,50 Mio. € über 1–10 %). (2) Das Labor [73] misst die Körpertemperatur, nicht die Sterblichkeit. (3) Jüngere Nutzer zählen nicht (Untergrenze) | Nullwirkung (verstößt gegen P2) · Faktor aus [46] ohne die Stunden (0,71 für Nutzer; Berlin 6,0 statt 0,75 Mio. €, ein Besuch wirkte wie eine Klimaanlage rund um die Uhr) · Odds Ratio 0,34 aus [41] unmittelbar (Fall-Kontroll-Wert, Log 10) | Kette 362,9 Mio. € unverändert (Hebel wirkt nur bei Wahl der Maßnahme); Berlin (Kette) 0,75 Mio. € je Jahr (Preisstand 2024; Band 0,1–3,0 Mio. €), Warmsen (Zelllauf) 320 €; Andockpunkt `COOLING_ROOMS_DRINKING_WATER`, Umsetzung beim cto (eiserne Regel 5) |
+| 43 ⚠ | Wirkung der Schutzprogramme vulnerable Gruppen (`VULNERABLE_GROUP_PROGRAMS`) und ihr Andockpunkt? | **\(\delta_{\text{VG}}\) = 0,931 (Band 0,794–1,0) als Faktor auf den Wochenexzess der Bänder 75–84 und 85+ ohne Heimbewohner; auf die Einweisungen \(\delta_{\text{VG,morb}}\) = 1,0 (Band 0,931–1,069, Befund 131); mit \(\delta_{\text{HAP}}\) zusammen \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}};\ 0{,}794)\); Abschätzung von KAP3** (§5, Block `heat.delta_vg`, Befunde 123, 125–128, 134) | Der Katalog im Produkt setzt `default_reduction` 0.22 auf Mortalität und Morbidität aller Bänder und beruft sich auf das Gesamtpaket der Hitzeschutzpläne (Urban u. a. 2025 [47], −25,2 %). Das ist der Einführungseffekt des ganzen Pakets über drei Jahrzehnte; ein einzelner Baustein wirkt nicht stärker (für Deutschland ist das Paket −20,6 % [47, Tabelle 1], also Faktor 0,794, und \(\delta_{\text{VG}}\) liegt nie darunter), und er erreicht nur die Gemeldeten (Reichweite 20 %, Wirkung bei Erreichten 0,34 = 24,4 / 97,3 / 0,728 aus [70], Tabellen 1–3, bereinigt um die Sterberate vor dem Sommer und den Anteil ab 90). Heimbewohner ab 85 zählen über S157, nicht hier. Umgerechnet auf den Berlin-Betrag: 0.22 auf alle Bänder ergäbe rund 79,8 Mio. € je Jahr, \(\delta_{\text{VG}}\) ergibt 11,7 Mio. €, rund 15 %. **Kappung (Befund 126):** Ob \(\delta_{\text{HAP}}\) den Baustein schon enthält, lässt sich aus [45] nicht ausschließen; deshalb nehmen beide Hebel zusammen nie mehr weg als das Paket Deutschland (zentral 0,874, keine Kappung; sie greift bei \(\delta_{\text{HAP}}\) = 0,852). **Gegenargument:** Der Paketwert ist gemessen, die Reichweite ist eine Setzung; wer sie auf 40 % hebt, kommt auf 23,4 Mio. €, noch immer weniger als ein Drittel von 79,8 Mio. €; erst mit \(w_{\text{VG}}\) am oberen Bandende 0,68 erreicht er die Kappung bei 34,9 Mio. €. Andockpunkt nicht \(v_{\text{vers},a}\), weil es auf Ebene der Kommune genau 1 ist | 0.22 übernehmen (überzeichnet: Paketwert für einen Baustein, dazu auf Bänder und Morbidität ohne Evidenz); rohe Lesart als Zentralwert, Wirkung bei Erreichten aus dem rohen Unterschied der Anstiege, 0,68 = 0,498 / 0,728 aus [70] Tabelle 2 (Berlin 23,1 Mio. €; verworfen, weil der rohe Unterschied die höhere Altersstruktur der Stadtteile ohne Programm als Wirkung mitzählt und die Quelle selbst auf −24,4 Pp. bereinigt; bleibt als obere Grenze des Bands); Hebel streichen (P2 verbietet eine unbegründete Nullwirkung; die Maßnahme besteht im Produkt) | Kette 362,9 Mio. € unverändert (Hebel wirkt nur bei Wahl der Maßnahme); Abweichung Bericht ↔ Katalog (0.22 ↔ 0,931 auf 75+ ohne Heimbewohner, Kappung mit \(\delta_{\text{HAP}}\)) geht als Punkt in die Meldung an den cto (eiserne Regel 5) |
+| 44 ⚠ | Wie steht der Hebel S157 zur geparkten Maßnahme `COOLING_ROOMS_DRINKING_WATER`? | (**Stand 26.09.2026, Historie; fortgeschrieben durch Nr. 45 und 46:** seit T-1367-cto ist die Maßnahme aktiv, \(s_{\text{gek}}\) hat die Voreinstellung 0,11, die Kühlzentren haben einen eigenen Hebel \(\delta_{\text{KZ}}\).) **Die Maßnahme bleibt im Produkt geparkt und hat heute keine Wirkung, auch keine Nullwirkung. Beim Aktivieren gilt \(g_{\text{S157}}\) = 0,29 (Band 0–0,90) auf den Heim-Exzess 85+ im gekühlten Anteil \(s_{\text{gek}}\), den die Kommune eingibt; Abschätzung von KAP3** (§5, Befund 130) | Der geparkte Katalog (`backend/app/data/catalog_parked.py`) führt die Maßnahme mit `default_reduction` 0.18 auf die Exposition (`effect_target: exposure`) für alle Menschen. [46] misst dagegen Klimaanlagen in Heimen: Mit ihnen bleiben 29,36 % des Heim-Exzesses (Faktor 0,2936), 70,64 % fallen weg, und zwar nur bei Heimbewohnern ab 85 im gekühlten Anteil. 0.18 auf die Exposition ist also weder dieselbe Größe noch derselbe Personenkreis; wie groß ihre Wirkung in Euro wäre, hängt an der Expositionskette des Produkts und ist mit den 25,0 Mio. € für Berlin nicht vergleichbar. Wie viele Heimplätze gekühlt sind, weiß nur die Kommune, deshalb ist \(s_{\text{gek}}\) ihre Eingabe. Öffentliche Kühlzentren außerhalb der Heime bekommen beim Aktivieren eine eigene Abschätzung nach P2. **Gegenargument:** 0.18 wirkt auf alle Menschen und erfasst damit auch öffentliche Kühlzentren, die der Bericht heute nicht rechnet; wer sie ersetzt, verliert diesen Teil, bis die eigene Abschätzung vorliegt. Weil die Maßnahme geparkt ist, fehlt dadurch heute keiner Kommune eine Wirkung | 0.18 auf die Exposition übernehmen (ohne Beleg aus [46], anderer Personenkreis); S157 ohne Andockpunkt führen (die geparkte Maßnahme ist die einzige passende im Produkt) | Kette 362,9 Mio. € und S157 25,0 Mio. € unverändert; Empfehlung an den cto in der Meldung: beim Aktivieren von `COOLING_ROOMS_DRINKING_WATER` \(g_{\text{S157}}\) auf \(D_{85+} \times h_{\text{Heim}} \times s_{\text{gek}}\) statt 0.18 auf die Exposition (eiserne Regel 5) |
+| 45 ⚠ | Was gilt für S157, wenn die Kommune keinen gekühlten Anteil eingibt, wie rechnet \(h_{\text{Heim}}\) in der Zelle, und mit welcher Wirkung zählt S157 im Anpassungspotenzial? | **Voreinstellung \(s_{\text{gek}}\) = 0,11 (Band 0,05–0,15) für die ganze Kommune, Abschätzung von KAP3** (Block `heat.s_gek`, Befund 138); **\(h_{\text{Heim},z} = q_{\text{pfl},z}\,[1 + \beta_{\text{pfl}}(1 - \bar q_{\text{pfl}})] / [1 + \beta_{\text{pfl}}(q_{\text{pfl},z} - \bar q_{\text{pfl}})]\) je Zelle, Rückfallwert 0,344** (Block `heat.h_heim`, Befund 146); **\(r_{\text{S157}} = a_{85+} \times h_{\text{Heim}} \times s_{\text{gek}} \times (1 - g_{\text{S157}})\) = 0,284 × 0,344 × 0,11 × 0,7064 = 0,0076 im Anpassungspotenzial** (Befund 149; §5) | Eine Nullwirkung ist keine Voreinstellung (P2, A-0010): Ohne Eingabe zeigte S157 keinen Betrag und zählte im Anpassungspotenzial mit 0. 11 % der Pflegeheime haben eine Klimaanlage [71]; 14,5 % der Neubauten des Sozialwesens 2025 haben eine Anlage zur Kühlung [72]; den älteren Bestand setzt KAP3 nicht höher an. Welche Heime gekühlt sind, weiß nur die Kommune, deshalb gilt der Wert für ihre ganze Fläche. Das Produkt führt \(q_{\text{pfl}}\) je Zelle (Log 35); mit derselben Formel wie \(v_{\text{vers}}\) liegen die Heim-Todesfälle in den Zellen der Heime, summiert über die Kommune bleibt es 0,344 × \(D_{85+}\). **Gegenargumente:** (1) Die Umfrage [71] hat 140 Rückmeldungen und ist nicht repräsentativ; „Klimaanlage in der Einrichtung“ heißt nicht, dass alle Plätze gekühlt sind (deshalb unten 0,05). (2) \(a_{85+}\) stammt aus der Rechenkette Berlin (0,284); in Warmsen ist er 0,224, das Anpassungspotenzial dann 0,056 statt 0,057 | Nullwirkung behalten (S157 ohne Eingabe ohne Betrag; verstößt gegen P2) · 0,145 aus [72] als Zentralwert (Neubauten, überzeichnet den Bestand) · 0,344 in jeder Zelle (verteilt Heim-Todesfälle auf Zellen ohne Heim) · S157 mit \(1 - g_{\text{S157}}\) = 0,7064 im Anpassungspotenzial (zählte den Heim-Exzess aller Heime als ganze Hitzemortalität, 0,7064 / 0,0076 = rund 90-mal zu groß) | (**Stand T-1537, Historie; fortgeschrieben durch Nr. 50:** S157 wirkt nur auf \(s_{\text{gek}}\) − 0,06, Berlin bei der Voreinstellung 1,2 Mio. €, Warmsen 469 €, Anpassungspotenzial 0,053.) Kette 362,9 Mio. € unverändert; S157 Berlin (Kette) bei der Voreinstellung 2,7 Mio. € je Jahr (Preisstand 2024; Band 1,2–3,7 Mio. €), alle Heime gekühlt weiter 25,0 Mio. €; Warmsen (Zelllauf) 1.032 € je Jahr; Anpassungspotenzial der Hitzemortalität 0,057 statt 0,050; Umsetzung beim cto (eiserne Regel 5) |
+| 46 ⚠ | Welche Wirkung haben öffentliche Kühlzentren außerhalb der Heime (Log 44, Zusage einer eigenen Abschätzung nach P2)? | **\(\delta_{\text{KZ}}\) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,7064 × 3/24 = 0,995585 (Band 0,982–0,9994) als Faktor auf den Wochenexzess der Bänder 75–84 und 85+ ohne Heimbewohner; mit \(\delta_{\text{HAP}}\) und \(\delta_{\text{VG}}\) zusammen \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}} \times \delta_{\text{KZ}};\ 0{,}794)\); Abschätzung von KAP3** (§5, Block `heat.delta_kuehlzentren`, Befunde 139, 148) | Eine Effektgröße für Kühlzentren hat KAP3 nicht gefunden (Suche 27.09.2026). Die Wirkung im gekühlten Raum ist gemessen (Klimaanlage in Heimen: 70,64 % des Exzesses fallen weg [46]), ebenso wie lange eine Kühlpause wirkt (2 h Kühlung wirken etwa 1 h nach [73]); daraus 0,7064 × 3/24 = 0,0883 für Nutzer. Die Reichweite ist eine Setzung: ein Viertel der Reichweite eines Schutzprogramms, weil nur hingeht, wer in der Hitze das Haus verlässt, und gerade die Gefährdetsten das nicht tun [41]. Plausibel gegen [41]: Besuch kühler Orte OR 0,34, nach Log 10 fünf- bis zehnfach überschätzt, also 0,066–0,132 für Nutzer. **Gegenargumente:** (1) Die Reichweite 5 % ist nicht gemessen; sie ist der stärkste Treiber (Berlin 0,15–1,50 Mio. € über 1–10 %). (2) Das Labor [73] misst die Körpertemperatur, nicht die Sterblichkeit. (3) Jüngere Nutzer zählen nicht (Untergrenze) | Nullwirkung (verstößt gegen P2) · Faktor aus [46] ohne die Stunden (0,7064 für Nutzer; Berlin 6,0 statt 0,75 Mio. €, ein Besuch wirkte wie eine Klimaanlage rund um die Uhr) · Odds Ratio 0,34 aus [41] unmittelbar (Fall-Kontroll-Wert, Log 10) | Kette 362,9 Mio. € unverändert (Hebel wirkt nur bei Wahl der Maßnahme); Berlin (Kette) 0,75 Mio. € je Jahr (Preisstand 2024; Band 0,1–3,0 Mio. €), Warmsen (Zelllauf) 318 €; Andockpunkt `COOLING_ROOMS_DRINKING_WATER`, Umsetzung beim cto (eiserne Regel 5) |
 | 47 ⚠ | Was gilt beim Doppelzählungs-Wächter der Schutzprogramme (und der Kühlzentren), bis die Kommune angibt, ob das Programm schon in den Kalibrierjahren lief? | **Eingabe ja/nein je Maßnahme, Voreinstellung „nein“, Abschätzung von KAP3** (Block `heat.vg_in_kalibrierjahren`, Befund 150; §5); bei „ja“ gilt \(\delta_{\text{VG}}\) = \(\delta_{\text{VG,morb}}\) = 1 bzw. \(\delta_{\text{KZ}}\) = 1 | Ein Programm, das schon 2012–2024 lief, ist keine zusätzliche Maßnahme; seine Wirkung gehört zum Anpassungsstand des Basiswerts (Kapitel 1 (a)). Solche Programme waren selten: 18 veröffentlichte kommunale Hitzeaktionspläne bundesweit am 10.06.2024, in Nordrhein-Westfalen 4 von 53 Kreisen und kreisfreien Städten im Oktober 2023, also 7,5 % [76]. Auf Berliner Größe ist der erwartete Fehler mit „nein“ höchstens 7,5 % × 11,7 = 0,9 Mio. €, mit „ja“ mindestens 92,5 % × 11,7 = 10,8 Mio. €. **Gegenargument:** Die Zahlen stammen vom Ende des Kalibrierfensters und aus einem Land und zählen Pläne, nicht einzelne Programme; ein älteres Hitzetelefon ohne Plan fehlt darin. Eine Kommune, die es hatte und nicht antwortet, zählt seine Wirkung doppelt | Voreinstellung „ja“ (jede Kommune ohne Antwort ohne Wirkung der Schutzprogramme, Berlin 0 statt 11,7 Mio. € je Jahr; Unterschätzung für mehr als 90 % der Kommunen und Nullwirkung gegen P2) · keine Eingabe, Wächter nur als Text (Stand bis T-1538; das Produkt kann ihn nicht anwenden) | Kette 362,9 Mio. € und Schutzprogramme Berlin 11,7 Mio. € je Jahr unverändert (Voreinstellung „nein“ rechnet wie bisher); Umsetzung beim cto (eiserne Regel 5) |
-| 48 ⚠ | Ist die Kappung 0,794 ein eigener Parameter oder nur das Band von \(\delta_{\text{VG}}\)? | **eigener Block `heat.kappung_vg`: 0,794 (Band 0,743–0,842), Abschätzung von KAP3** (Befund 151; §5) | Ein Wert, der den Betrag begrenzt, ist ein Parameter mit Herleitung (P1). 0,794 = 1 − 0,206 aus [47], Tabelle 1 (Deutschland, 15,8–25,7 %); `abschaetzung_kap3`, weil der Paketwert aller Altersgruppen für die Hebel auf den Bändern ab 75 ohne Heim steht (Log 40). Er ist zugleich das untere Bandende von \(\delta_{\text{VG}}\) (ohne Kappung 0,728) und greift bei \(\delta_{\text{HAP}}\) = 0,85 (0,791) und bei Reichweite und Wirkung am oberen Ende. **Gegenargument:** Der Wert ist ein Zentralwert mit Intervall; eine feste Kappung verschiebt den Betrag dort, wo sie greift, über ihr Band um 26,8–43,6 Mio. € | nur im Band von \(\delta_{\text{VG}}\) führen (Grenze ohne eigenen Block, P1 verletzt) · Quellenwert `quelle` (verdeckt, dass der Paketwert für eine andere Größe steht) · ohne Kappung (Berlin am oberen Ende 46,1 statt 34,9 Mio. €) | keine Zahl betroffen; Kette 362,9 Mio. € unverändert; Umsetzung beim cto (Konstante `VG_PAKET_DE` wird Registry-Parameter) |
+| 48 ⚠ | Ist die Kappung 0,794 ein eigener Parameter oder nur das Band von \(\delta_{\text{VG}}\)? | **eigener Block `heat.kappung_vg`: 0,794 (Band 0,743–0,842), Abschätzung von KAP3** (Befund 151; §5) | Ein Wert, der den Betrag begrenzt, ist ein Parameter mit Herleitung (P1). 0,794 = 1 − 0,206 aus [47], Tabelle 1 (Deutschland, 15,8–25,7 %); `abschaetzung_kap3`, weil der Paketwert aller Altersgruppen für die Hebel auf den Bändern ab 75 ohne Heim steht (Log 40). Er ist zugleich das untere Bandende von \(\delta_{\text{VG}}\) (ohne Kappung 0,728) und greift bei \(\delta_{\text{HAP}}\) = 0,852 (0,793) und bei Reichweite und Wirkung am oberen Ende. **Gegenargument:** Der Wert ist ein Zentralwert mit Intervall; eine feste Kappung verschiebt den Betrag dort, wo sie greift, über ihr Band um 26,8–43,6 Mio. € | nur im Band von \(\delta_{\text{VG}}\) führen (Grenze ohne eigenen Block, P1 verletzt) · Quellenwert `quelle` (verdeckt, dass der Paketwert für eine andere Größe steht) · ohne Kappung (Berlin am oberen Ende 46,1 statt 34,9 Mio. €) | keine Zahl betroffen; Kette 362,9 Mio. € unverändert; Umsetzung beim cto (Konstante `VG_PAKET_DE` wird Registry-Parameter) |
 | 49 ⚠ | Welches Band tragen \(f_a\) und \(\bar L_a\), und wie stark verschieben sie den Betrag? | **\(f_a\): Rückrechnung mit den Altersanteilen der Sommer 2025 [74] und 2026 [75], 0,156–0,562 / 0,341–0,753 / 0,588–0,659 / 1,0; \(\bar L_a\): Stützstelle bis sterbefallgewichteter Wert, 23,39–28,64 / 15,31–15,59 / 8,54–8,90 / 4,16–4,20 J; beides Abschätzung von KAP3** (Befund 152; §3.3a, §3.5, §5) | Beide Blöcke hatten kein Band (\(\bar L_a\) nur für 85+). Die Altersanteile schwanken von Sommer zu Sommer; die Sterbefälle je Altersjahr [49] und die Sterbetafel [48] erlauben für alle Bänder denselben Rechenweg wie für 85+. Berlin (Kette): \(f_a\) 310,2–402,9 Mio. € mit neu gefittetem \(c_{\text{kal}}\) (0,651 und 0,534), \(\bar L_a\) 357,3–381,1 Mio. €. **Gegenargument:** Zwei Sommer sind keine Verteilung; die RKI-Zahlen sind laufende, gerundete Schätzungen. Die sterbefallgewichteten \(\bar L_a\) liegen für 65–74 und 75–84 unter den Stützstellen; der zutreffende Wert liegt dort am unteren Bandende | \(f_a\) tauschen und \(c_{\text{kal}}\) festhalten (277,0–438,3 Mio. €, fast doppelt so weit; die Zahl der Hitzetoten passte nicht mehr zur RKI-Reihe) · Band aus der Toleranz der Altersvalidierung ± 5 Pp. (nicht gemessen) | keine Zahl betroffen; Kette 362,9 Mio. € unverändert; Blöcke `heat.f_alter` und `heat.l_restlebenserwartung` tragen die Bänder |
 | 50 ⚠ | Zählt S157 den heutigen Bestand an Klimaanlagen in Heimen, der schon in den Kalibrierjahren lief? | **Nein: S157 wirkt auf \(\max(s_{\text{gek}} - 0{,}06;\ 0)\), den Anteil über dem Stand der Kalibrierjahre; 0,06 (Band 0,04–0,09) Abschätzung von KAP3** (Block `heat.s_gek_kalib`, Befund 165; §5). Die Kommune gibt weiter ihren heutigen Anteil \(s_{\text{gek}}\) ein (Voreinstellung 0,11), den Abzug rechnet das Produkt | \(c_{\text{kal}}\) ist an die Hitzetoten 2012–2024 angepasst; was in diesen Jahren an Klimaanlagen lief, steckt im Basiswert (Kapitel 1 (a)). Ohne Zeitreihe gekühlter Heimplätze setzt KAP3 das Wachstum wie bei den Neubauten des Sozialwesens mit Kühlung, 5,7 % (2015) zu 14,5 % (2025) [72]: Stand 2015 = 11 % × 5,7 / 14,5 = 4,3 % [71], 0,67 Prozentpunkte je Jahr, Mittel der Kalibrierjahre = Stand 2018 = 6,3 %. **Gegenargumente:** (1) Heime werden eher nachgerüstet als neu gebaut, die Neubauten zeigen nur die Richtung; wuchs der Bestand erst nach 2024, ist die Wirkung höher (bis 0,07). (2) Der Abzug nimmt das Mittel Deutschlands, nicht den Stand der Kommune, weil der Basiswert für alle Kommunen an dieselbe Reihe angepasst ist. (3) Die schon gekühlten Plätze tragen im Basiswert nur 29 % ihres Exzesses; der Abzug unterschätzt die Wirkung um rund 4 % | ganzen Bestand 0,11 zählen (Berlin 2,7 statt 1,2 Mio. €; mehr als die Hälfte wäre Wirkung, die schon im Basiswert steckt) · Wächter-Frage ja oder nein wie bei \(\delta_{\text{VG}}\) (ein Anteil ist kein Ja oder Nein) · Voreinstellung 0 (Nullwirkung gegen P2) | Kette 362,9 Mio. € unverändert; S157 Berlin (Kette) bei der Voreinstellung 1,2 Mio. € je Jahr (Preisstand 2024; über den Bestand 0,5–1,7 Mio. €, über \(s_{\text{gek}}\) 0–2,2 Mio. €), voller Anteil 25,0 Mio. €, heute alle Heime gekühlt 23,5 Mio. €; Warmsen (Zelllauf) 469 € je Jahr; Anpassungspotenzial 0,053 statt 0,057; Umsetzung beim cto (eiserne Regel 5) |
