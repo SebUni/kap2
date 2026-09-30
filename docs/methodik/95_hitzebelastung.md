@@ -209,7 +209,7 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   sechs heißen Wochen; deshalb rechnet die Kette jede der 13 Sommerwochen einzeln. Der Teiler 52
   ist keine Vereinfachung: Die 39 Wochen außerhalb des Sommers tragen nach dem Modell nichts bei.
 - **Ebenen 1, 2 und 6, eine Zelle statt aller Zellen: Die Kette überschätzt Berlin um rund
-  6 %.** Das Produkt rechnet jede 100-m-Zelle mit ihrer eigenen Temperatur (§3.1) und ihrer
+  5 %.** Das Produkt rechnet jede 100-m-Zelle mit ihrer eigenen Temperatur (§3.1) und ihrer
   eigenen Bevölkerung aus dem Zensus-Gitter und summiert. Die Kette setzt für die ganze Kommune
   die Zelle Berlin-Mitte und die Fortschreibung aus Ebene 1 an. Die Zelle Berlin-Mitte ist
   praktisch der Gemeindepunkt der Kalibrierung (§4): Dessen Reihe in
@@ -326,6 +326,7 @@ assert abs((eur_mort + eur_morb) / 1e6 * gesamt - 341) < 1
 assert abs((eur_mort + eur_morb) / 1e6 * gesamt / 0.9888 - 345) < 1  # mit Regel 3.3: 345,11 (Befund 145)
 assert abs(0.948 * 1.028 - 0.974) < 0.001                # (a) x (d), Befund 101 (ungerundet 0,9743)
 assert abs(345.11 / 362.89 - 0.95) < 0.005               # 5 % weniger als die Kette
+assert abs(362.89 / 345.11 - 1.05) < 0.005               # die Kette ueberschaetzt Berlin um rund 5 % (Befund 208)
 assert abs(362.89 * 0.94037 - 341.25) < 0.005 and round(0.94037, 3) == 0.94   # Anlage: ungerundete Faktoren (Befund 199)
 assert abs(341.25 / 0.9888 - 345.11) < 0.05                                   # mit Regel 3.3
 # (d) ein Faktor (Befunde 181, 182): Zelllauf des Produkts mit gegen ohne Feinstruktur

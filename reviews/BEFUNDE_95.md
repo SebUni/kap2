@@ -1654,3 +1654,81 @@ Urteil Runde 2 (30.09.2026, 00:50 Uhr UTC, opus/max): **nacharbeit**, „VERDIKT
 | 205 | docs/methodik/95_hitzebelastung.md Kapitel 8, Log 45, Spalte Wirkung (Z. 2436) | Überholter Wert (Folgestelle der Befunde 181 und 194, Abnahmekriterium 5) | Der Verweis „(Stand T-1537, Historie; fortgeschrieben durch Nr. 50: S157 wirkt nur auf s_gek − 0,06, Berlin bei der Voreinstellung 1,2 Mio. €, Warmsen 469 €, Anpassungspotenzial 0,053.)“ nennt Werte, die Log 50 (Z. 2441) nicht mehr führt. Dort stehen jetzt Warmsen (Zelllauf) 475 € mit σ = 0,58 K und Anpassungspotenzial 0,064. Gegenargument (2) derselben Zeile nennt ebenfalls 0,064. Der Wert „469 €“ steht im ganzen Bericht nur noch hier | Die Werte im Verweis an Log 50 angleichen (Warmsen 475 €, Anpassungspotenzial 0,064) oder den Verweis ohne Zahlen führen | C | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); z=[l for l in s.split(chr(10)) if l.startswith(chr(124)+' 45 ')]; sys.exit(not (len(z)==1 and '469 €' not in s and 'Anpassungspotenzial 0,053' not in s and 'fortgeschrieben durch Nr. 50:** S157 wirkt nur auf den gekühlten Anteil über dem Stand der Kalibrierjahre; die geltenden Werte stehen dort.)' in z[0]))"` | behoben (T-1652-methodik_manager): Verweis ohne Zahlen, „(Stand T-1537, Historie; fortgeschrieben durch Nr. 50: S157 wirkt nur auf den gekühlten Anteil über dem Stand der Kalibrierjahre; die geltenden Werte stehen dort.)“; ohne Zahl kann er nicht wieder veralten; der Rest der Zeile bleibt; „469 €“ und „Anpassungspotenzial 0,053“ stehen im Bericht nicht mehr |
 | 206 | docs/methodik/95_hitzebelastung.md Kapitel 8, Log 50, Spalte Wirkung, und Log 45, Klammer „fortgeschrieben durch Nr. 50“ | Schlussprüfung aus T-1645-methodik_manager (Urteil Runde 42, 29.09.2026, 23:05 Uhr UTC), LF 13 | Beide nannten das Anpassungspotenzial mit δ_HAP = 0,95 („0,053 statt 0,057“ bzw. „0,053“). Mit 0,939 sind es 0,064 statt 0,068 (1 − 0,939 × (1 − 0,00759) = 0,0681), wie in §5. Log 50 ist über Befund 200 nachgezogen, Log 45 über Befund 205; in der Auflösung von T-1646 durch den methodik_manager gefasst (T-1642-cmo, Planung vom 30.09.2026) | Log 45: Verweis an Log 50 angleichen oder ohne Zahlen führen (Nachtrag des CMO vom 30.09.2026, Ziffer 3) | C | `python3 -c "import sys; L=[l for l in open('docs/methodik/95_hitzebelastung.md',encoding='utf-8') if l.startswith(chr(124)+' 45 ') or l.startswith(chr(124)+' 50 ')]; sys.exit(not (len(L)==2 and all('0,053' not in l for l in L) and 'Anpassungspotenzial 0,064 statt 0,068 (mit δ_HAP = 0,939' in L[1] and 'fortgeschrieben durch Nr. 50:** S157 wirkt nur auf den gekühlten Anteil' in L[0]))"` | behoben (T-1652-methodik_manager): Log 50 nennt „Anpassungspotenzial 0,064 statt 0,068 (mit δ_HAP = 0,939, …)“ (Befund 200), Log 45 führt den Verweis ohne Zahlen (Befund 205); keine der beiden Zeilen nennt 0,053 |
 | 207 | reviews/BEFUNDE_95.md Übernahmeliste Paket 4 und backend/tests/test_methodik_95_golden_massnahmen.py, Docstring Z. 24–29 | Schlussprüfung aus dem Urteil Runde 44, LF 14 | Der Docstring nennt „709.059 € statt 720.000 €“, gerechnet mit σ = 0,5 K und δ_KZ = 0,9956. Nach dem Nachzug von σ (Paket 4) und δ_KZ (T-1644-methodik_manager) stimmt der Wert nicht mehr, und keine Stelle im Ledger führt ihn; in der Auflösung von T-1646 durch den methodik_manager gefasst (T-1642-cmo, Planung vom 30.09.2026) | über die Musterzeile der Übernahmeliste (Form nach Ziffer 2 des Nachtrags des CMO vom 30.09.2026) | C | `python3 -c "import sys; z=open('reviews/BEFUNDE_95.md',encoding='utf-8').read().split(chr(10)); m=[l for l in z if l.startswith(chr(124)+' Freitext im Code')]; g=[i for i,l in enumerate(z) if l.startswith('grep -rnF') and '709.059' in l and l.endswith(chr(124)+' wc -l')]; sys.exit(not (len(m)==1 and '„709.059“ → „716.654“' in m[0] and len(g)==1 and z[g[0]+1]=='36' and '0.5 0.9956 11000000 709059.04' in z and '0.58 0.995585 11000000 716653.58' in z))"` | behoben (T-1652-methodik_manager): die Musterzeile führt „709.059“ mit dem neuen Wert „716.654“, gemessen nach dem Nachzug (σ = 0,58 K, δ_KZ = 0,995585; Messbefehl Kühlzentren im Paket 4, der alte Wert 709.059,04 € ist dort reproduziert); gerundet 0,72 Mio. € wie §5, die Divergenz des Docstrings entfällt |
+
+## Paket 5 aus T-1642-cmo — Abschnitt A nach den Runden 39–42 (T-1647-methodik_manager, 30.09.2026): neuer Befund 208, behoben
+
+Abschnitt A ist der Bericht von Z. 1 bis vor `## 5 ` (heute Z. 1–1059). Die Tabelle führt jeden Wert, den die Befunde
+178–183 geändert haben, dazu die Werte, die aus ihnen folgen (Zusammenstellung der Wirkungen (a)–(d), Berlin-Anker,
+Abstand der Kette zum Zelllauf) und die Folgestellen aus Befund 194. Gezählt ist mit dem Befehl unter der Tabelle,
+gemessen am 30.09.2026 auf dem Branch `ticket/T-1647-methodik_manager` nach der Änderung dieses Pakets. Die Statuszeile
+des Kopfs (Z. 3–9) ist nicht Gegenstand dieses Pakets (Paket 7).
+
+| Wert (Befund) | alt | neu | Muster | Treffer alt in A | Einordnung der Treffer |
+|---|---|---|---|---|---|
+| δ_KZ (178) | 0,9956 | 0,995585 | `0[,.]9956(?![0-9])` | 0 | — |
+| 1 − g_S157 (178) | 0,71 und 0,706 | 0,7064 | `0,71(?![0-9])`, `0,706(?![0-9])` | 0 und 0 | — |
+| g_S157 (178) | 0,29 | 0,2936 | `0[,.]29(?![0-9])` | 1 | Z. 500 „± 0,29 %“ ist die Toleranz aus §3.3 (0,2898 %), nicht g_S157 |
+| w_KZ (178) | 0,089 | 0,0883 | `0[,.]089(?![0-9])` | 1 | Z. 376 Schiefe der Wochenquantile „−0,089“, nicht w_KZ |
+| δ_HAP (180) | 0,95 | 0,939 | `0[,.]95(?![0-9])` | 1 | Z. 328 Prüfblock `345.11 / 362.89 - 0.95` (Abstand Zelllauf zur Kette), nicht δ_HAP |
+| δ_HAP, unteres Bandende (180) | 0,85 | 0,852 | `0[,.]85(?![0-9])` | 4 | Z. 164 Wert der Quelle [45] („adjustiert 0,85“, Register); Z. 732, 733 Elastizität der VOLY-Kette; Z. 927 Offset Berlin „+0,85“ K; keiner ist das Bandende |
+| Hitzeaktionsplan Berlin (180) | 18,1 und 17,1 Mio. € | 22,1 und 20,8 Mio. € | `18,1 Mio`, `17,1 Mio` | 0 und 0 | — |
+| σ (181) | 0,5 K | 0,58 K | `0[,.]5 ?K`, `σ = 0[,.]5(?![0-9])` | 3 und 0 | Z. 201, 202 „0,5 K kühler/wärmer“ ist der stärkste Treiber (Sommer ± 0,5 K), nicht σ; Z. 494 „die Anlage steht ohne `--sigma` noch auf 0,5 K“ beschreibt den Stand der Anlage bis zum Code-Nachzug (Übernahmeliste Paket 4, `--sigma` Vorgabe) |
+| Golden Berlin, Tabelle §3.3 (181) | 342,67 Mio. € | 345,11 Mio. € | `342[,.]67` | 0 | — |
+| Golden Warmsen, Tabelle §3.3 (181) | 173.099 € | 175.256 € | `173[.,_]?099` | 0 | — |
+| Zelllauf des Produkts Berlin (181, 188) | 342,58 Mio. € | 345,03 Mio. € | `342[,.]58` | 0 | — |
+| Zelllauf des Produkts Warmsen (181, 188) | 172.957 € | 175.116 € | `172[.,_]?957` | 0 | — |
+| Feinstruktur (d) (182) | × 1,021; × 1,019; × 1,023–1,024 | × 1,028 | `1[,.]021`, `1[,.]019`, `1[,.]02[34]` | 0, 0 und 0 | — |
+| Zusammenstellung (a)–(d) (182) | 0,934 | 0,941 | `0[,.]934(?![0-9])` | 0 | — |
+| (a) × (d) (182) | 0,967 | 0,974 | `0[,.]967` | 0 | — |
+| Zelllauf ohne und mit Gemeindeschlüssel, gerundet (182) | 339 und 343 Mio. € | 341 und 345 Mio. € | `(339\|343) Mio` | 0 | — |
+| Berlin-Anker (182) | 214 je 100.000, −18 %, 214 / 260 = 0,82 | 215 je 100.000, −17 %, 215 / 260 = 0,83 | `214 je`, `18 %`, `0[,.]82(?![0-9])` | 0, 0 und 1 | Z. 925 siehe unter der Ausgabe |
+| Überschätzung der Kette gegen den Zelllauf (182) | rund 6 % | rund 5 % (362,89 / 345,11 = 1,052) | `^  6 %` | 1 vor diesem Paket, 0 danach | Z. 212 nachgezogen (Befund 208) |
+| a_85+ (183) | 0,284 als Konstante | je Kommune (Berlin 0,262, Warmsen 0,224) | `0[,.]284` | 1 | Z. 349 Prüfblock `anteil85 - 0.284`: Anteil 85+ der Kette an der Beispielkommune (638,8 / 2.250 YLL), den der Heim-Extremfall in §3.0 verwendet; keine Konstante für andere Kommunen |
+| Anpassungspotenzial (194) | 0,053 | 0,064 | `0[,.]053(?![0-9])` | 0 | die Treffer von `0,053` ohne Grenze sind β_85+ Süd 0,0531 (Z. 149, 554, 839, 977, 980, 992) |
+| Schutzprogramme zentral (194) | 0,885 | 0,874 | `0[,.]885` | 0 | — |
+
+```
+python3 -c "import re; L=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read().split(chr(10)); A=L[:next(i for i,l in enumerate(L) if l.startswith('## 5 '))]; print('Abschnitt A: Z. 1 bis', len(A)); [print(p, '->', sum(len(re.findall(p,l)) for l in A), [i+1 for i,l in enumerate(A) if re.search(p,l)]) for p in ('0[,.]9956(?![0-9])', '0,71(?![0-9])', '0,706(?![0-9])', '0[,.]29(?![0-9])', '0[,.]089(?![0-9])', '0[,.]95(?![0-9])', '0[,.]85(?![0-9])', '18,1 Mio', '17,1 Mio', '0[,.]5 ?K', 'σ = 0[,.]5(?![0-9])', '342[,.]67', '173[.,_]?099', '342[,.]58', '172[.,_]?957', '1[,.]021', '1[,.]019', '1[,.]02[34]', '0[,.]934(?![0-9])', '0[,.]967', '(339|343) Mio', '214 je', '18 %', '0[,.]82(?![0-9])', '^  6 %', '0[,.]284', '0[,.]053(?![0-9])', '0[,.]885')]"
+```
+
+Ausgabe wörtlich (Exit 0). `0[,.]82` ist das Verhältnis des alten Ankers 214 / 260 = 0,82 (neu 215 / 260 = 0,83); der
+Treffer Z. 925 ist die Rev.-6-Korrektur „×0,82-Zentralkorrektur und ihr Band entfallen“, nicht der Anker:
+
+```
+Abschnitt A: Z. 1 bis 1059
+0[,.]9956(?![0-9]) -> 0 []
+0,71(?![0-9]) -> 0 []
+0,706(?![0-9]) -> 0 []
+0[,.]29(?![0-9]) -> 1 [500]
+0[,.]089(?![0-9]) -> 1 [376]
+0[,.]95(?![0-9]) -> 1 [328]
+0[,.]85(?![0-9]) -> 4 [164, 732, 733, 927]
+18,1 Mio -> 0 []
+17,1 Mio -> 0 []
+0[,.]5 ?K -> 3 [201, 202, 494]
+σ = 0[,.]5(?![0-9]) -> 0 []
+342[,.]67 -> 0 []
+173[.,_]?099 -> 0 []
+342[,.]58 -> 0 []
+172[.,_]?957 -> 0 []
+1[,.]021 -> 0 []
+1[,.]019 -> 0 []
+1[,.]02[34] -> 0 []
+0[,.]934(?![0-9]) -> 0 []
+0[,.]967 -> 0 []
+(339|343) Mio -> 0 []
+214 je -> 0 []
+18 % -> 0 []
+0[,.]82(?![0-9]) -> 1 [925]
+^  6 % -> 0 []
+0[,.]284 -> 1 [349]
+0[,.]053(?![0-9]) -> 0 []
+0[,.]885 -> 0 []
+```
+
+Golden-Betrag (Messbefehl E aus Paket 4 mit `t.SIGMA_K=0.58;` vor dem Aufruf, 30.09.2026, Branch dieses Tickets),
+Ausgabe wörtlich: `345026859 175116` (stderr leer, Exit 0).
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 208 | docs/methodik/95_hitzebelastung.md §3.0, „Wo die Kette zusammenfasst“, Ebenen 1, 2 und 6, Z. 211–212 („Die Kette überschätzt Berlin um rund 6 %.“) | Überholter Wert (Folgestelle der Befunde 181 und 182, LF 11 E3) | Die 6 % stammen aus dem Stand vor Paket 4: 362,89 / 342,67 = 1,059. Mit σ = 0,58 K ist der Zelllauf mit Gemeindeschlüssel 345,11 Mio. €, 362,89 / 345,11 = 1,052, also rund 5 %. Z. 256 und der Prüfblock (Z. 328) sagen schon „5 % weniger als die Kette“; der Leser sah im selben Absatz 6 % und 5 % für denselben Abstand | „rund 5 %“; Prüfblock um die Überschätzung ergänzen | B | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); sys.exit(not ('überschätzt Berlin um rund'+chr(10)+'  5 %.**' in s and 'um rund'+chr(10)+'  6 %.**' not in s and 'assert abs(362.89 / 345.11 - 1.05) < 0.005' in s))"` | behoben (T-1647-methodik_manager): Z. 212 „rund 5 %“; Prüfblock `rechenkette_95` Z. 329 neu `assert abs(362.89 / 345.11 - 1.05) < 0.005`; weitere Treffer alter Werte in Abschnitt A außerhalb markierter Historie: keine (Tabelle oben) |
