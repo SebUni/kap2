@@ -5,7 +5,7 @@ Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048: Schr
 Log 23/24, Befunde 156–167), Schritt 3 Pflichtinhalte — Kap. 1 „Risiko ohne (weitere) Anpassung“,
 Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181),
 Schritt 4 Bezugswert Ḡ₀ der Stadtbaumwahl (T-1323, T-1362, Log 26, Befund 182), Nachzug der Befunde 183–185, Runde 14 mit Befunden 186–194, Runde 15 mit Befunden 195–197 (T-1330), Runde 16 mit Befunden 199–200 und Runde 17 mit Befunden 201–204 und 206 (T-1427);
-Null-Runde über den ganzen Bericht: A Runde 21 (T-1442-methodik_manager), B Runde 22 (T-1443-methodik_manager); Runden 24 bis 27 nach der Integration mit Befunden 230–253 (T-1632-methodik_manager bis T-1635-methodik_manager); Runde 28 über A und B mit Befunden 254–257, Nacharbeit Runde 29 (T-1638-methodik_manager); Runden 30–32 mit Befunden 258–264 (T-1650-methodik_manager, T-1651-methodik_manager): Klimaanteil \(a_{\text{attr}}\) 0,27 statt 0,50 (Befund 258); in Revision nach der Integration (T-1628-cmo), Abnahme steht aus)** ·
+Null-Runde über den ganzen Bericht: A Runde 21 (T-1442-methodik_manager), B Runde 22 (T-1443-methodik_manager); Runden 24 bis 27 nach der Integration mit Befunden 230–253 (T-1632-methodik_manager bis T-1635-methodik_manager); Runde 28 über A und B mit Befunden 254–257, Nacharbeit Runde 29 (T-1638-methodik_manager); Runden 30–32 mit Befunden 258–264 (T-1650-methodik_manager, T-1651-methodik_manager): Klimaanteil \(a_{\text{attr}}\) 0,27 statt 0,50 (Befund 258); Null-Runde der vollen Gegenprüfung A und B in Runde 32 (T-1651-methodik_manager); ABGENOMMEN durch den methodik_manager am 30.09.2026 (T-1639-methodik_manager))** ·
 Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 96-A** (Prävalenz, also Anteil der Betroffenen an der Bevölkerung, × gemessene Pollensaison-Spreizung, bottom-up; Entscheidungslog Nr. 1)
@@ -995,7 +995,8 @@ Näherungslauf involviert).
   physische Vergleich: \(\delta/d_{\text{Saison}} = (\sum p\,\Delta S \div \sum p\,L) \times a_{\text{attr}}\) =
   (5,6795 ÷ 61,5) × 0,27, also 9,2 % Saisonverlängerung im Modell mal Klimaanteil. Einen belegten Wert für die
   Verlängerung als Anteil der Saison, gegen den die 9,2 % zu stellen wären, gibt es nicht: [9] nennt rund 8 Tage,
-  aber keine mittlere Saisonlänge (gelesen: Abstract, Results and Discussion, Methods), [6] beschreibt die
+  aber keine mittlere Saisonlänge (gelesen: Significance, Abstract, Einleitung, Results and Discussion, Methods),
+  [6] beschreibt die
   Verlängerung ohne Zahl. Der Vergleich ist deshalb **kein Prüfstein**. Zur Einordnung das Ergebnis der früheren
   M0-Herleitung (Anteil der Saisonverschiebung 0,15–0,25 mal Attribution): Ihre untere Grenze
   0,15 × 0,19 = 2,85 %, also ≈ 2,9 %, liegt knapp über den 2,5 % des Modells. Das Modell liegt damit eher zu

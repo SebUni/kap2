@@ -1787,7 +1787,7 @@ und schließt ihn hier. Sein Ausdruck endet heute mit exit 1, gemessen am 30.09.
 
 | Nr | Stelle | Art | Befund & Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
 |---|---|---|---|---|---|---|---|
-| 265 | Bericht §4, Absatz „Monetär“, „(gelesen: Abstract, Results and Discussion, Methods)“ | Widerspruch | Kap. 8 [9] und das Ledger der Runde 32 nennen den ganzen Haupttext von [9] als gelesen, §4 nur drei Teile. Die Aussage stimmt, die Liste weicht ab. | §4 an Kap. 8 [9] angleichen | C | `python3 -c "import sys; t=' '.join(open('docs/methodik/96_aeroallergene.md',encoding='utf-8').read().split()); v=t[t.index('## 4 '):t.index('## 5 ')]; sys.exit('gelesen: Abstract, Results and Discussion, Methods' in v)"` | zurückgestellt (Termin: T-1640-methodik_manager): Urteil der Runde 32 (freigabe, T-1651-methodik_manager, 30.09.2026); T-1639 sperrt den Bericht. Ausdruck heute exit 1. |
+| 265 | Bericht §4, Absatz „Monetär“, „(gelesen: Abstract, Results and Discussion, Methods)“ | Widerspruch | Kap. 8 [9] und das Ledger der Runde 32 nennen den ganzen Haupttext von [9] als gelesen, §4 nur drei Teile. Die Aussage stimmt, die Liste weicht ab. | §4 an Kap. 8 [9] angleichen | C | `python3 -c "import sys; t=' '.join(open('docs/methodik/96_aeroallergene.md',encoding='utf-8').read().split()); v=t[t.index('## 4 '):t.index('## 5 ')]; sys.exit('gelesen: Abstract, Results and Discussion, Methods' in v)"` | behoben (Autor, T-1640-methodik_manager, 30.09.2026): §4, Absatz „Monetär“, nennt jetzt wie Kap. 8 [9] „(gelesen: Significance, Abstract, Einleitung, Results and Discussion, Methods)“; vor der Statuszeile behoben (Festlegung „C-Befunde nach der Null-Runde“). Ausdruck vorher exit 1, nachher exit 0. |
 
 Zurückgestellt bleiben außerdem 234–240, 244 und 251–253 mit ihren Terminen (Übernahme durch den CTO), wie im Urteil
 unter §6 genannt; Restpunkte sind Ü-12 und Ü-13 (Code folgt Bericht). Wirkung auf Kapitel 7: kein `wert:` geändert. Die 14
@@ -1795,3 +1795,18 @@ Zeilen `wert:` sind vor und nach Runde 32 gleich (`79e69fce` gegen `1a447e1e`, g
 aus Runde 30 (Befund 258). In diesem Paket ist der Bericht unverändert.
 
 Null-Runde: ja
+
+## T-1640-methodik_manager — Befund 265, Statuszeile nach der Abnahme und Export (30.09.2026)
+
+Anlass: Paket 4 des Vorhabens T-1629-cmo. Befund 265 ist vor der Statuszeile behoben (Zeile im Abschnitt Runde 32).
+Die Statuszeile nennt statt „in Revision nach der Integration (T-1628-cmo), Abnahme steht aus“ jetzt die Null-Runde der
+vollen Gegenprüfung A und B in Runde 32 (T-1651-methodik_manager) und „ABGENOMMEN durch den methodik_manager am
+30.09.2026 (T-1639-methodik_manager)“. Kein `wert:` geändert.
+
+**Folgezeilen.** Gemessen rot nur durch die neue Statuszeile war 245; sein Ausdruck verlangte den alten Schluss. Die
+Folgezeile zu 245 macht den Ausdruck von 225 rot (doppelte Nummer); seine Folgezeile nimmt 245 in die Ausnahmeliste auf.
+
+| Nr | Stelle | Art | Befund & Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 245 | Bericht, Statuszeile und Revisionsstand, Zeile „Code-Stand“ | Folgezeile | Der Ausdruck war nur durch die neue Statuszeile rot (Abnahme, T-1640): Er verlangte „in Revision nach der Integration (T-1628-cmo), Abnahme steht aus“. Die Ursprungszeile bleibt stehen. | Derselbe Ausdruck mit dem Schluss nach der Abnahme | C | `python3 -c "import sys; t=open('docs/methodik/96_aeroallergene.md',encoding='utf-8').read(); c=open('backend/app/data/catalog.py',encoding='utf-8').read(); sys.exit('wirkt im Produkt also noch nicht auf #96' in t or 'Code-Stand (29.09.2026, Befund 245)' not in t or 'steht aus)**' in t or 'ABGENOMMEN durch den methodik_manager am 30.09.2026 (T-1639-methodik_manager)' not in t or 'Abnahme der Rev. 4 steht aus' in t or 'LOW_ALLERGEN_TREE_SELECTION' not in c)"` | behoben (Ausdruck nachgezogen mit der Statuszeile, T-1640) |
+| 225 | `reviews/BEFUNDE_96.md`, Befundnummern 218 und 219; Folgezeilen | Folgezeile | Der Ausdruck war rot, weil die Folgezeile zu 245 ihre Nummer gewollt ein zweites Mal führt, nicht wegen einer Doppelvergabe. Die Ursprungszeile bleibt stehen. | Derselbe Ausdruck; ausgenommen ist zusätzlich 245 | C | `python3 -c "import re,sys,collections; c=collections.Counter(m.group(1) for z in open('reviews/BEFUNDE_96.md',encoding='utf-8') for m in [re.match(r'^\\| (\\d{3}) \\|',z)] if m); d=[k for k,v in c.items() if v>1 and k not in ('157','162','155','180','183','211','241','243','225','245')]; sys.exit(bool(d) or any(c[str(n)]!=1 for n in range(218,230) if n!=225))"` | behoben (Ausdruck nachgezogen mit der Statuszeile, T-1640) |
