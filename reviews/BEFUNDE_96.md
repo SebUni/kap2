@@ -1742,3 +1742,56 @@ der Klimaanteil 0,27 ist eher zu niedrig als zu hoch angesetzt.
 | 243 | Bericht §5.1, „Was die Formel heute von einem Faktor unterscheidet“, Absatz nach der Tabelle Berlin, Block beispiel_96_s158_wirkung | Folgezeile | Der Ausdruck war nur durch die neue Zahl rot (a_attr 0,27, Befund 258, Teil 3): Zelllauf 16.632 → 8.981 vermiedene Tage, 739.205 → 399.171 Tage, ≈ 103.100 → 55.700 €. Die Ursprungszeile bleibt stehen. | Derselbe Ausdruck mit der neuen Zahl | C | `python3 -c "import sys; t=open('docs/methodik/96_aeroallergene.md',encoding='utf-8').read(); sys.exit(any(x in t for x in ('16.666','16_666','740.723','740_723','103.300','103_300')) or 'ergeben beide Wege 8.981 Tage' not in t or '(399.171 Tage, §3.0) ergibt 8.981 Tage und ≈ 55.700 €' not in t or 'abs(399_171 * r * t_warn - 8_981) < 1' not in t)"` | behoben (Ausdruck nachgezogen mit Befund 258) |
 
 **Messungen nach Teil 3, 30.09.2026 (Runde 32).** `python3 backend/scripts/lint_methodik.py 96`: 237 Checks, ALLE LINTS GRÜN. `python3 backend/scripts/ledger.py 96 --pruefe`: GRÜN, `Prüfausdruck ROT   : 0` (vor der Folgezeile war allein 243 rot, danach allein 225, bis dessen Ausnahmeliste 243 aufnahm); 258 ist geschlossen, Code folgt Bericht (CTO-Übernahme Ü-13). Ausdruck (a) des Tickets: `[]`, exit 0. `_stand()`: Rev. 4, abnahmereif, integriert. `grep -c '4,59 Mio'` im Bericht: 0. Testlauf der sechs Dateien `backend/tests/test_methodik_96_*.py` über `scripts/testlauf.sh`, aufgerufen über python3 mit subprocess: 5 failed, 33 passed; rot sind `test_block_kennungen_sind_genau_die_13_aus_kapitel_7` (Ü-12) und `test_werte_stimmen_mit_den_bloecken_ueberein`, `test_jeder_parameter_des_risikos_traegt_block_und_klasse`, `test_abgeschaetzte_bloecke_tragen_herleitung`, `test_zaehlung_der_kennzeichnungen_4_7_2` (Ü-13). Golden-, Endpunkt-, Stadtbaum- und S158-Tests sind grün, weil sie den Code mit 0,50 prüfen; ihre neuen Sollzahlen stehen in Ü-13 (Teile 1 bis 3). Anlage `96_zelllauf_bandsummen.py`: 1 passed, 2.474.857,71 €. In dieser Runde sind kein Test, kein Produktcode, kein Register, keine Anlage und keine Quelle geändert.
+
+## Runde 32 — volle Gegenprüfung A und B nach der Integration (frische Sitzung, 30.09.2026): Null-Runde
+
+Anlass: Urteil „freigabe“ des methodik_manager zu T-1651-methodik_manager (Paket 2 des Vorhabens T-1629-cmo), Firmen-Repo
+`tickets/T-1651-methodik_manager.md`, Abschnitt „Urteil“, Eintrag 2026-09-30T03:14:18Z (Runde 2 des Tickets). Das Urteil
+beginnt mit „VERDIKT #96 T-1651-methodik_manager Runde 32 · Null-Runde: ja“ und prüft den ganzen Bericht, Abschnitte A
+und B zusammen. Tor laut Urteil am 30.09.2026 auf `f5b10f37`: Ausdruck (a) `[]`, Ledger GRÜN mit `Prüfausdruck ROT   : 0`,
+237 Checks mit ALLE LINTS GRÜN. Gemerged nach `main` mit `1a447e1e`. Eingetragen in T-1639-methodik_manager (Paket 3).
+
+Leitfragen, übernommen aus dem Urteil:
+
+| LF | Verdikt | Stelle |
+|---|---|---|
+| LF 1 | bestanden | Kap. 1 und Knotenabgleich im Lint: W189 (Z412), W024, W025, S158, R35, R36; Netzwerkliste Z97 (Eingang 1, K1), gelesen per openpyxl |
+| LF 2 | bestanden | §3.1: ΔS gemessen; §3.0 Ebene 7: ohne Vegetation P̂ = 0,3 als Hintergrund |
+| LF 3 | bestanden | §3.0 Ebene 8: ΔTage als native Ergebnisgröße |
+| LF 4 | bestanden | §5.1: S158 nur im Maßnahmen-Modul; K2 über #87 |
+| LF 5 | bestanden | Entscheidungslog 26: P̂ auf Ḡ₀ zentriert; Band und Endpunkt per Lint |
+| LF 6 | bestanden | §3.0: Kette gegen Zelllauf beziffert |
+| LF 7 | bestanden | Kap. 7 und §3.0 „Stärkster Treiber“: Bänder statt Verteilungen; Band von a_attr aus beiden Längen-Spannen |
+| LF 8 | bestanden | §4: beide Vergleiche beim selben a_attr, kein Parameter angepasst |
+| LF 9 | bestanden | Preisstand 2024 (Lint); K1, Ursache Allergene, nur Morbidität |
+| LF 10 | bestanden | Kap. 8 [9], Textabbild `docs/quellen/methodik/96/09_Anderegg2021_Pollensaison.md` und QUELLEN.md; Zitate geprüft |
+| LF 11 | bestanden | E1 ja (§3.0); E2 ja (Blöcke in §3, §5, §5.1); E3 ja (Zelllauf 2,2 %, volle Krone, 1.372 gegen 637 Tage); E4 ja (Begriffstabelle aus Befund 259, §3.6); E5 ja (Lint) |
+| LF 12 | bestanden | Blöcke vollständig; Ü-13 mit den Sollzahlen der Teile 1–3 |
+| LF 13 | bestanden | a_attr (0,19 + 0,35) ÷ 2 = 0,27; r_S158 = 0,35 × 0,40 × 0,20; Kosten in 7.1 |
+| LF 14 | bestanden | Arbeitsmappen unverändert, Knotenabgleich grün |
+| LF 15 | bestanden | KWRA Z98, Spalten N–T und AB–AF gleich der Mappe |
+
+Mitgeprüft sind nach dem Urteil §3.0 (10 Ebenen, 402.103 × 1,01493 = 408.106 Tage × 6,20 € = 2,53 Mio. € je Jahr
+(Preisstand 2024); Zelllauf 2,47 Mio. €, Unterschied 2,2 %, Toleranz ± 0,005 Mio. €; die Bandsummen rechnet die Anlage
+`docs/methodik/anlagen/96_zelllauf_bandsummen.py`, gemessen in Runde 32: 1 passed, 2.474.857,71 €), §5 (Stadtbaumwahl:
+Allee-Zelle −14,2 Tage, ≈ 88 €; Amortisation 24 Jahre, bei voller Krone 11, bei Ersatz alle 20 Jahre 32; Kommune
+−637 Tage, ≈ 3.950 €) und §5.1 (S158: Berlin 9.182 Tage, ≈ 56.900 €, Zelllauf 8.981 Tage; Schwelle 0,056 bei
+100.000 Einwohnern, Berlin 0,0016), dazu §4 beim selben a_attr, die Bindung von a_attr 0,27 an [9] (Bindungstabelle zu
+Log 11, Abschnitt Runde 32) und die Begriffstabelle aus Befund 259. P1 (a_attr 0,27, 60 € und 4.436 € je Baum als
+Abschätzung von KAP3 mit Herleitung) und P2 (S158 0,03 > 0, Stadtbaumwahl abgeschätzt) sind erfüllt.
+
+C-Befunde dieser Runde: einer, 265, in Text, den Runde 32 nicht angefasst hat. Er liegt im Bericht (§4) und lässt sich
+deshalb nicht am Ledger beheben; Kriterium (2) von T-1639 sperrt den Bericht. Nach der Festlegung des methodik_manager vom
+30.09.2026 („C-Befunde nach der Null-Runde“) ist er zurückgestellt; T-1640-methodik_manager behebt ihn vor der Statuszeile
+und schließt ihn hier. Sein Ausdruck endet heute mit exit 1, gemessen am 30.09.2026.
+
+| Nr | Stelle | Art | Befund & Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 265 | Bericht §4, Absatz „Monetär“, „(gelesen: Abstract, Results and Discussion, Methods)“ | Widerspruch | Kap. 8 [9] und das Ledger der Runde 32 nennen den ganzen Haupttext von [9] als gelesen, §4 nur drei Teile. Die Aussage stimmt, die Liste weicht ab. | §4 an Kap. 8 [9] angleichen | C | `python3 -c "import sys; t=' '.join(open('docs/methodik/96_aeroallergene.md',encoding='utf-8').read().split()); v=t[t.index('## 4 '):t.index('## 5 ')]; sys.exit('gelesen: Abstract, Results and Discussion, Methods' in v)"` | zurückgestellt (Termin: T-1640-methodik_manager): Urteil der Runde 32 (freigabe, T-1651-methodik_manager, 30.09.2026); T-1639 sperrt den Bericht. Ausdruck heute exit 1. |
+
+Zurückgestellt bleiben außerdem 234–240, 244 und 251–253 mit ihren Terminen (Übernahme durch den CTO), wie im Urteil
+unter §6 genannt; Restpunkte sind Ü-12 und Ü-13 (Code folgt Bericht). Wirkung auf Kapitel 7: kein `wert:` geändert. Die 14
+Zeilen `wert:` sind vor und nach Runde 32 gleich (`79e69fce` gegen `1a447e1e`, gemessen am 30.09.2026); a_attr 0,27 stammt
+aus Runde 30 (Befund 258). In diesem Paket ist der Bericht unverändert.
+
+Null-Runde: ja
