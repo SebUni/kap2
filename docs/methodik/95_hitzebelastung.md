@@ -1,18 +1,18 @@
 # Methodik-Bericht #95 — Hitzebelastung
 
-Status: **Rev. 8, Fortschreibung 7 — ABNAHMEREIF, abgenommen am 27.09.2026** (A-0048; Null-Runde 38 über den ganzen
-Bericht, Vorhaben T-1535-cmo: Abschnitt A mit dem Urteil zu T-1598-methodik_manager, Runde 35, „Null-Runde: ja“,
-Abschnitt B mit dem Urteil zu T-1584-methodik_manager, Runde 38, „Null-Runde: ja“; seit der Null-Runde 30 hat Runde 31
-den Hebel S157 mit Voreinstellung, die öffentlichen Kühlzentren als eigenen Hebel, den Doppelzählungs-Wächter, die
-Kappung 0,794 und die Bänder von \(f_a\) und \(\bar L_a\) ergänzt, die Runden 32–38 den Abzug des Bestands der
-Kalibrierjahre bei S157 und den Berliner Betrag des Hitzeaktionsplans; `MANAGER-REVIEW: ABGENOMMEN` am 27.09.2026,
-T-1585-methodik_manager) · 27.09.2026 ·
+Status: **Rev. 8, Fortschreibung 7 — ABNAHMEREIF** (A-0048; Null-Runde 48 über den ganzen Bericht, Vorhaben
+T-1642-cmo: Abschnitt A mit den Urteilen zu T-1653-methodik_manager, Runde 48, und zu T-1647-methodik_manager,
+Runde 46, Abschnitt B mit dem Urteil zu T-1648-methodik_manager, Runde 47, je „Null-Runde: ja“; die Runden 39–45 haben
+die Streuung der Zelltemperatur auf σ = 0,58 K gesetzt, die Feinstruktur als eine Korrektur × 1,028 geführt, δ_KZ =
+0,995585 für die öffentlichen Kühlzentren und δ_HAP = 0,939 für den Hitzeaktionsplan als Faktor auf dem Exzess gesetzt
+und den Anteil a_85+ je Kommune gerechnet) · 30.09.2026 ·
 Rev. 8 vom 30.08.2026 (§3.4-Ressourcen-Regel, q_pfl-Ebene angelegt, q_1P geparkt, L̄_85+ exakt 4,16 J; Befunde
-86–94 behoben) hat Fortschreibung 7 in den Ledger-Runden 10–38 um die Rechenkette 3.0, den Pflichtabschnitt „Risiko
+86–94 behoben) hat Fortschreibung 7 in den Ledger-Runden 10–48 um die Rechenkette 3.0, den Pflichtabschnitt „Risiko
 ohne (weitere) Anpassung“, die Kennzeichnung der Parameter, die Ersatzregel für den Anteil 65+, den Berlin-Anker und
 die Maßnahmen-Hebel S157 (mit dem Abzug des Bestands der Kalibrierjahre, Block `heat.s_gek_kalib`), öffentliche
 Kühlzentren und Schutzprogramme vulnerable Gruppen ergänzt; seit dem Code-Nachzug T-1582-ceo rechnet das Produkt die
-drei Hebel und führt die Kennzeichnung der Parameter, aus steht dort noch die Ersatzregel (Befund 116) ·
+drei Hebel und führt die Kennzeichnung der Parameter, die Ersatzregel rechnet es seit T-1364-cto, und die Werte der
+Runden 39–45 zieht es über die Übernahmeliste an den cto nach ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 95-A** (RKI-Expositions-Wirkungs-Funktion, bottom-up; Entscheidungslog Nr. 1)
 
