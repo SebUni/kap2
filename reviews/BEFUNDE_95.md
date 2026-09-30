@@ -1732,3 +1732,95 @@ Ausgabe wörtlich: `345026859 175116` (stderr leer, Exit 0).
 | Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
 |---|---|---|---|---|---|---|---|
 | 208 | docs/methodik/95_hitzebelastung.md §3.0, „Wo die Kette zusammenfasst“, Ebenen 1, 2 und 6, Z. 211–212 („Die Kette überschätzt Berlin um rund 6 %.“) | Überholter Wert (Folgestelle der Befunde 181 und 182, LF 11 E3) | Die 6 % stammen aus dem Stand vor Paket 4: 362,89 / 342,67 = 1,059. Mit σ = 0,58 K ist der Zelllauf mit Gemeindeschlüssel 345,11 Mio. €, 362,89 / 345,11 = 1,052, also rund 5 %. Z. 256 und der Prüfblock (Z. 328) sagen schon „5 % weniger als die Kette“; der Leser sah im selben Absatz 6 % und 5 % für denselben Abstand | „rund 5 %“; Prüfblock um die Überschätzung ergänzen | B | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); sys.exit(not ('überschätzt Berlin um rund'+chr(10)+'  5 %.**' in s and 'um rund'+chr(10)+'  6 %.**' not in s and 'assert abs(362.89 / 345.11 - 1.05) < 0.005' in s))"` | behoben (T-1647-methodik_manager): Z. 212 „rund 5 %“; Prüfblock `rechenkette_95` Z. 329 neu `assert abs(362.89 / 345.11 - 1.05) < 0.005`; weitere Treffer alter Werte in Abschnitt A außerhalb markierter Historie: keine (Tabelle oben) |
+
+## Paket 6 aus T-1642-cmo — Abschnitt B nach den Runden 39–42 (T-1648-methodik_manager, 30.09.2026): neue Befunde 209–210, behoben
+
+Abschnitt B ist der Bericht von `## 5 ` bis zum Ende (heute Z. 1060–2451: §5 Maßnahmen-Hebel, Kap. 6, Kap. 7, Kap. 8,
+Entscheidungslog). Die Tabelle führt dieselben Werte wie Paket 5 (Befunde 178–183, Folgewerte, Befund 194), dazu vier
+Muster, die nur in Abschnitt B vorkommen (0,057, 469 €, 709.059 € und als Kontrolle 1,2 Mio. €). Gezählt ist mit dem
+Befehl unter der Tabelle, gemessen am 30.09.2026 auf dem Branch `ticket/T-1648-methodik_manager` nach den Änderungen
+dieses Pakets. „Historie“ heißt: die Stelle nennt den Wert ausdrücklich als früheren oder verworfenen Stand, oder sie
+steht in einem Log-Eintrag mit Vermerk „(Stand …, Historie; fortgeschrieben durch Nr. …)“.
+
+| Wert (Befund) | alt | neu | Muster | Treffer alt in B | Einordnung der Treffer |
+|---|---|---|---|---|---|
+| δ_KZ (178) | 0,9956 | 0,995585 | `0[,.]9956(?![0-9])` | 0 | — |
+| 1 − g_S157 (178) | 0,71 und 0,706 | 0,7064 | `0[,.]71(?![0-9])`, `0[,.]706(?![0-9])` | 0 und 0 (vor diesem Paket 0 und 1) | Z. 2044 Prüfblock `s157_berlin` `0.706` → `0.7064` nachgezogen (Befund 209) |
+| g_S157 (178) | 0,29 | 0,2936 | `0[,.]29(?![0-9])` | 2 (vor diesem Paket 3) | Z. 1766 Block `heat.g_s157`, Kommentar „0,29 verschob S157 Berlin um +0,5 % (Befund 178)“: Historie; Z. 2440 Log 44, Eintrag mit Vermerk „Stand 26.09.2026, Historie; fortgeschrieben durch Nr. 45, 46 und 53“; Z. 1891 Prüfblock `s157_berlin` `g(ror) - 0.29` → `0.2936` nachgezogen (Befund 209) |
+| w_KZ (178) | 0,089 | 0,0883 | `0[,.]089(?![0-9])` | 0 | — |
+| δ_HAP (180) | 0,95 | 0,939 | `0[,.]95(?![0-9])` | 15 | Z. 1091, 1110, 1119, 1120 §5 Hitzeaktionsplan: der bisherige und verworfene Wert mit Übersetzung („bisherige Wert 0,95 … wird 0,630“, „Warum nicht 0,95 übersetzt“, „Vorher, mit 0,95 unübersetzt“, „Was die einfachere Rechnung verfälscht“); Z. 1738 Block `heat.delta_hap`, Kommentar „0,95 alt -> 0,630 (verworfen)“; Z. 2109, 2110, 2119, 2120 Beispiel-Block rechnet die verworfenen Fassungen nach; Z. 2406 Log 10, Spalte Alternative (verworfen): alle Historie |
+| δ_HAP, unteres Bandende (180) | 0,85 | 0,852 | `0[,.]85(?![0-9])` | 16 | keiner ist das Bandende: Z. 1069, 2217 Wert der Quelle [45] („adjustiert 0,85“); Z. 1090, 1091, 1104, 1738, 2108–2110, 2406 Achsenabschnitt der Meta-Regression 0,85 (0,75–0,97) und sein übersetzter Wert −0,85; Z. 1592, 2400 VOLY-Elastizität (Block `heat.voly`, Log 4); Z. 2449 Log 53 „0,85 %“ (Rundungsverlust aus Befund 178) |
+| Hitzeaktionsplan Berlin (180) | 18,1 und 17,1 Mio. € | 22,1 Mio. € (Zelllauf 21,0 Mio. €) | `18,1 Mio`, `17,1 Mio` | 4 und 0 | Z. 1120, 1121 §5 „Vorher, mit 0,95 unübersetzt … 18,1 Mio. €“; Z. 2406 Log 10 und Z. 2448 Log 52, Spalte Alternative (verworfen): alle Historie |
+| σ (181) | 0,5 K | 0,58 K | `0[,.]5 ?K`, `σ = 0[,.]5(?![0-9])` | 3 und 0 | Z. 1447 Kap. 6 „bei 0,5 K weniger oder mehr“ ist der Sommer ± 0,5 K (stärkster Treiber), nicht σ; Z. 2447 Log 51 zweimal: Rest-Bias-Diagnose Rev. 7 rechnet mit 0,5 K (Kennzahl, Übernahmeliste Befund 197) und Alternative „0,5 K behalten“ (verworfen) |
+| Golden Berlin / Warmsen, Tabelle §3.3 (181) | 342,67 Mio. € / 173.099 € | 345,11 Mio. € / 175.256 € | `342[,.]67`, `173[.,_]?099` | 0 und 0 | — |
+| Zelllauf des Produkts Berlin / Warmsen (181, 188) | 342,58 Mio. € / 172.957 € | 345,03 Mio. € / 175.116 € | `342[,.]58`, `172[.,_]?957` | 0 und 0 | — |
+| Feinstruktur (d) (182) | × 1,021; × 1,019; × 1,023–1,024 | × 1,028 | `1[,.]021`, `1[,.]019`, `1[,.]02[34]` | 0, 0 und 0 | — |
+| Zusammenstellung (a)–(d) (182) | 0,934 | 0,941 | `0[,.]934(?![0-9])` | 0 | — |
+| (a) × (d) (182) | 0,967 | 0,974 | `0[,.]967` | 0 | — |
+| Zelllauf gerundet (182) | 339 und 343 Mio. € | 341 und 345 Mio. € | `(339\|343) Mio` | 0 | — |
+| Berlin-Anker (182) | 214 je 100.000, −18 %, 0,82 | 215 je 100.000, −17 %, 0,83 | `214 je`, `18 %`, `0[,.]82(?![0-9])` | 0, 0 und 1 | Z. 2426 Log 30 „ersetzt durch Nr. 31: die Pauschalkorrektur ×0,82 entfällt“: Rev.-6-Korrektur, nicht der Anker, Historie |
+| Überschätzung der Kette (182) | rund 6 % | rund 5 % | `^  6 %` | 0 | — |
+| a_85+ (183) | 0,284 als Konstante | je Kommune (Berlin 0,262, Warmsen 0,224) | `0[,.]284` | 10 | keine Konstante für andere Kommunen: Z. 1227, 1231, 1238 §5 S157, Beispiel der Kette (638,8 / 2.250 YLL) mit dem Satz „Die 0,284 der Kette sind nur das Beispiel“ und dem Fehler einer Berliner Konstante in Warmsen; Z. 2043, 2044 Beispiel-Block `s157_berlin` rechnet dasselbe Beispiel; Z. 2441 Log 45, Vermerk „Historie; … fortgeschrieben durch Nr. 50 und 54“; Z. 2450 Log 54 („die 0,284 der Kette sind das Beispiel“, Alternative verworfen) |
+| Anpassungspotenzial (194) | 0,053 | 0,064 | `0[,.]053(?![0-9])` | 0 | — |
+| Anpassungspotenzial Log 45 (203) | 0,057 statt 0,050 | 0,064 | `0[,.]057(?![0-9])` | 1 | Z. 2441 Log 45, Spalte Auswirkung, hinter „(Stand T-1537, Historie; fortgeschrieben durch Nr. 50: … die geltenden Werte stehen dort.)“: Historie (Befund 205) |
+| Schutzprogramme zentral (194) | 0,885 | 0,874 | `0[,.]885` | 0 | — |
+| Warmsen S157 (181) | 469 € | 475 € | `469 ?€` | 0 | — |
+| Kühlzentren Produkt (178, 207) | 709.059 € | 716.654 € | `709[.,_]?059` | 0 | — |
+| Kontrolle S157 Kette (165) | — | 1,2 Mio. € | `1[,.]2 Mio` | 7 | geltender Wert, kein alter: Z. 1190, 1195, 1199, 1822, 2446 S157 Berlin (Kette) bei der Voreinstellung; Z. 1418 ist „11,2 Mio. €“ (Schutzprogramme) |
+
+```
+python3 -c "import re; L=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read().split(chr(10)); s=next(i for i,l in enumerate(L) if l.startswith('## 5 ')); B=L[s:]; print('Abschnitt B: Z.', s+1, 'bis', len(L)); [print(p, '->', sum(len(re.findall(p,l)) for l in B), [s+i+1 for i,l in enumerate(B) if re.search(p,l)]) for p in ('0[,.]9956(?![0-9])', '0[,.]71(?![0-9])', '0[,.]706(?![0-9])', '0[,.]29(?![0-9])', '0[,.]089(?![0-9])', '0[,.]95(?![0-9])', '0[,.]85(?![0-9])', '18,1 Mio', '17,1 Mio', '0[,.]5 ?K', 'σ = 0[,.]5(?![0-9])', '342[,.]67', '173[.,_]?099', '342[,.]58', '172[.,_]?957', '1[,.]021', '1[,.]019', '1[,.]02[34]', '0[,.]934(?![0-9])', '0[,.]967', '(339|343) Mio', '214 je', '18 %', '0[,.]82(?![0-9])', '^  6 %', '0[,.]284', '0[,.]053(?![0-9])', '0[,.]885', '0[,.]057(?![0-9])', '469 ?€', '709[.,_]?059', '1[,.]2 Mio')]"
+```
+
+Ausgabe wörtlich (Exit 0). Die Liste nennt jede Zeile einmal, die Zahl davor zählt die Treffer:
+
+```
+Abschnitt B: Z. 1060 bis 2451
+0[,.]9956(?![0-9]) -> 0 []
+0[,.]71(?![0-9]) -> 0 []
+0[,.]706(?![0-9]) -> 0 []
+0[,.]29(?![0-9]) -> 2 [1766, 2440]
+0[,.]089(?![0-9]) -> 0 []
+0[,.]95(?![0-9]) -> 15 [1091, 1110, 1119, 1120, 1738, 2109, 2110, 2119, 2120, 2406]
+0[,.]85(?![0-9]) -> 16 [1069, 1090, 1091, 1104, 1592, 1738, 2108, 2109, 2110, 2217, 2400, 2406, 2449]
+18,1 Mio -> 4 [1120, 1121, 2406, 2448]
+17,1 Mio -> 0 []
+0[,.]5 ?K -> 3 [1447, 2447]
+σ = 0[,.]5(?![0-9]) -> 0 []
+342[,.]67 -> 0 []
+173[.,_]?099 -> 0 []
+342[,.]58 -> 0 []
+172[.,_]?957 -> 0 []
+1[,.]021 -> 0 []
+1[,.]019 -> 0 []
+1[,.]02[34] -> 0 []
+0[,.]934(?![0-9]) -> 0 []
+0[,.]967 -> 0 []
+(339|343) Mio -> 0 []
+214 je -> 0 []
+18 % -> 0 []
+0[,.]82(?![0-9]) -> 1 [2426]
+^  6 % -> 0 []
+0[,.]284 -> 10 [1227, 1231, 1238, 2043, 2044, 2441, 2450]
+0[,.]053(?![0-9]) -> 0 []
+0[,.]885 -> 0 []
+0[,.]057(?![0-9]) -> 1 [2441]
+469 ?€ -> 0 []
+709[.,_]?059 -> 0 []
+1[,.]2 Mio -> 7 [1190, 1195, 1199, 1418, 1822, 2446]
+```
+
+Vor den Änderungen dieses Pakets gab derselbe Befehl (ohne die vier Zusatzmuster) für Abschnitt B Z. 1060–2444 aus:
+`0[,.]29` 3 Treffer [1766, 1891, 2436], und das Muster `0\.706(?![0-9])` traf Z. 2044. Beide Stellen sind nachgezogen
+(Befund 209). Alle übrigen Treffer sind oben eingeordnet; ein alter Wert als geltender Wert steht in Abschnitt B nicht mehr.
+
+**Entscheidungslog.** Seit der Null-Runde 38 (Stand 5a5acce9) haben die Runden 39–42 die Einträge 10, 34, 39, 41, 43,
+44, 45, 46, 48 und 50 geändert und Nr. 51 angelegt (Vergleich der Log-Zeilen gegen `git show 5a5acce9`). 39 trug den
+Vermerk schon, 41 änderte nur die Schreibweise zweier Zahlen (1416 → 1.416). Die übrigen acht trugen keinen Vermerk,
+obwohl ihre Wahl oder Zahl überholt war; drei Entscheidungen der Runden (δ_HAP, δ_KZ, a_85+) standen nur als stille
+Änderung älterer Einträge im Log. Befund 210.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 209 | docs/methodik/95_hitzebelastung.md Kap. 7, Beispiel-Block `s157_berlin`, Z. 1891 (`abs(g(ror) - 0.29) < 0.005`) und Z. 2044 (`0.284 * 0.344 * 0.05 * 0.706`) | Überholter Wert im Prüfblock (Folgestelle Befund 178, LF 13) | Seit Befund 178 steht g_S157 als 0,2936 und 1 − g_S157 als 0,7064 an jeder Stelle. Die beiden Asserts liefen mit den alten Werten grün, weil ihre Toleranz den Unterschied schluckt; der Leser sah im Block 0,29 und 0,706 neben 0,2936 im Parameter-Block | Werte angleichen, Toleranz von 0,005 auf 0,00005 enger | C | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); sys.exit(not ('assert abs(g(ror) - 0.2936) < 0.00005' in s and '0.284 * 0.344 * 0.05 * 0.7064 - 0.00345' in s and 'g(ror) - 0.29)' not in s and '0.05 * 0.706 -' not in s))"` | behoben (T-1648-methodik_manager): Z. 1891 `abs(g(ror) - 0.2936) < 0.00005` (g(0,93) = 0,293636), Z. 2044 `0.7064` (0,284 × 0,344 × 0,05 × 0,7064 = 0,0034506); Lint grün, beide Blöcke laufen |
+| 210 | docs/methodik/95_hitzebelastung.md Entscheidungslog, Einleitung und Einträge 10, 34, 43, 44, 45, 46, 48, 50 | Entscheidungslog ohne Fortschreibung (LF 13, Ticket T-1648 Punkt 3) | Die Runden 39–42 haben δ_HAP (Befunde 180, 194), δ_KZ und 1 − g_S157 (178, 179) und a_85+ (183, 195, 198) neu entschieden, aber nur die Werte in älteren Einträgen ersetzt; Nr. 51 (σ) stand nicht in der Einleitung. Ein Leser sah nicht, welcher Eintrag welchen Stand trägt und wo die Entscheidung mit Gegenargument und Alternative steht | Neue Einträge 52 (δ_HAP), 53 (δ_KZ, g_S157, Kappung), 54 (a_85+) mit Frage, Entscheidung, Begründung, Gegenargument, Alternative und Auswirkung; die überholten Einträge mit Vermerk „(Stand …, Historie; fortgeschrieben durch Nr. …)“; Einleitung nennt 51–54 | B | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); L=s.split('## Entscheidungslog',1)[1].split(chr(10)); z=lambda n: [l for l in L if l.startswith(chr(124)+' '+n+' ')]; sys.exit(not (all(len(z(n))==1 and 'Historie; ' in z(n)[0] and 'fortgeschrieben durch Nr. ' in z(n)[0] for n in ('10','34','43','44','45','46','48','50')) and all(len(z(n))==1 for n in ('51','52','53','54')) and 'Einträge 51–54 aus den Runden 39–42' in s))"` | behoben (T-1648-methodik_manager): Einträge 52–54 neu; Vermerke an 10 (→ 52), 34 (→ 51), 43 (→ 52), 44 (→ 45, 46, 53), 45 (→ 50, 54), 46 (→ 53, 51), 48 (→ 52), 50 (→ 51, 52, 54); die Wahl der Einträge 10, 34, 43, 46, 48, 50 gilt weiter, ihre Zahlen waren schon nachgezogen und bleiben; Einleitung nennt 51–54 und die fortgeschriebenen Einträge |
