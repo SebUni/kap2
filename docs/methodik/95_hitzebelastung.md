@@ -220,7 +220,7 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   (`zensus_loader.apply_zensus_to_cell_inputs`: Einwohner × Anteil 65+, Aufteilung der 65+ aus
   den 5er-Jahresgruppen), ergeben sich vier Wirkungen, jede auf die vorige gerechnet.
   Die Rechnung liegt als Skript `docs/methodik/anlagen/95_zellvergleich.py` bei; Aufruf für Berlin:
-  `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000`
+  `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --sigma 0.58`
   (lädt Zensus-Gitter, DWD-Raster und VG250 in einen Cache außerhalb des Repos; mit
   `--gemeinde` und einem anderen Gemeindeschlüssel für jede Kommune):
   (a) **Temperatur je Zelle: × 0,948.** Das Bevölkerungsmittel liegt bei 19,96 °C, also 0,11 K
@@ -237,15 +237,25 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   der Rest, ist das, was die Altersbänder je Zelle nach dieser Regel gegenüber (b) ändern: wie
   alt die Einwohner im Gitter sind und in welchen Zellen die Älteren wohnen; er senkt den Betrag
   um 0,5 %.
-  (d) **Wärmeinsel-Feinstruktur unter 1 km: × 1,021.** Modellrechnung mit derselben gesetzten
-  Streuung σ = 0,5 K wie in §4, keine Messung; die gekrümmte Kurve hebt die Summe. Die Herleitung
-  in §4 ergäbe σ = 0,58 K; am Punkt nachgerechnet hebt 0,5 K den Betrag um × 1,019, 0,58 K um × 1,026.
-  Die Setzung hält den Betrag damit rund 0,7 % niedriger (§4).
-  Zusammen 0,948 × 0,981 × 0,984 × 1,021 = 0,934: Ohne Gemeindeschlüssel ergibt der Zelllauf für Berlin
-  rund 339 Mio. € je Jahr (Preisstand 2024); mit Gemeindeschlüssel, also mit der ganzen Ersatzregel, sind es
-  rund 343 Mio. € (342,67 Mio. €, Tabelle in §3.3), 6 % weniger als die Kette. Die
+  (d) **Wärmeinsel-Feinstruktur unter 1 km: × 1,028.** Auch innerhalb einer 1-km-Zelle ist es nicht
+  überall gleich warm. KAP3 setzt dafür eine Streuung σ = 0,58 K um den Rasterwert (Herleitung in §4:
+  Spanne ± 1 K, Gleichverteilung, 2/√12 = 0,577 K, auf 0,58 K gerundet; die Rundung hebt den Betrag
+  um 0,025 %; Befund 181). Das ist eine Modellrechnung, keine Messung: Die Kurve ist gekrümmt, deshalb
+  heben die wärmeren Stellen den Betrag mehr, als die kühleren ihn senken. Der Faktor ist das Verhältnis
+  des Zelllaufs Berlin mit und ohne Feinstruktur, 345,03 zu 335,68 Mio. € (Zelllauf des Produkts; die
+  Anlage zeigt in Zeile (d) dasselbe, × 1,028, genau 1,02778). Das ist die einzige Zahl für diese Wirkung;
+  §4 verweist hierher (Befund 182). Der Faktor hängt an der Kommune: In Warmsen ist er × 1,048
+  (175.116 zu 167.066 €), weil in der kühleren Kommune weniger Wochen über der Schwelle liegen und die
+  wärmeren Stellen deshalb stärker ins Gewicht fallen. **Was die Rechnung ohne Feinstruktur verfälscht:**
+  Sie setzte jede Zelle auf ihren Mittelwert und läge in Berlin um 2,7 % (335,68 statt 345,03 Mio. €), in
+  Warmsen um 4,6 % (167.066 statt 175.116 €) zu niedrig.
+  Zusammen 0,948 × 0,981 × 0,984 × 1,028 = 0,941 aus den gerundeten Faktoren; die Anlage multipliziert die
+  ungerundeten und zeigt „zusammen: × 0,940 (genau 0,94037)“, 362,89 × 0,94037 = 341,25 Mio. € (Befund 199). Der
+  Unterschied liegt in der dritten Stelle der Faktoren, nicht in der Rechnung. Ohne Gemeindeschlüssel ergibt der Zelllauf für Berlin
+  rund 341 Mio. € je Jahr (Preisstand 2024); mit Gemeindeschlüssel, also mit der ganzen Ersatzregel, sind es
+  rund 345 Mio. € (345,11 Mio. €, Tabelle in §3.3), 5 % weniger als die Kette. Die
   Kette zeigt den Rechenweg, der Betrag für Berlin ist der Zelllauf des Produkts mit Gemeindeschlüssel. Die Wirkungen
-  (a) und (d) zusammen (× 0,967, aus den ungerundeten Faktoren) zeigen, dass das Zellmodell für Berlin unter dem Gemeindepunkt liegt; der Berlin-Anker
+  (a) und (d) zusammen (× 0,974, aus den ungerundeten Faktoren) zeigen, dass das Zellmodell für Berlin unter dem Gemeindepunkt liegt; der Berlin-Anker
   in §4 rechnet damit (Befund 101).
 - **Ebene 6, \(v_{\text{vers},a}\) = 1.** Auf Ebene der Kommune ist der Modifikator genau 1:
   \(\beta_{\text{iso}}\) wirkt heute nicht, weil \(q_{\text{1P}}\) mangels Zellquelle gleich dem
@@ -310,20 +320,21 @@ assert sum(c_kal * p * mm / 100_000 * (math.exp(b85 * f * max(0.0, t_mittel - t0
 # Eine Zelle statt aller Zellen (Zelllauf Berlin, Messwerte aus dem Text): (a) x (b) x (c) x (d)
 assert abs(3_593_357 / sum(pop) - 0.981) < 0.0005        # (b) Einwohnersumme Gitter / Fortschreibung
 assert abs(0.9888 * 0.9948 - 0.984) < 0.0005             # (c) = ohne gegen mit Gemeindeschluessel x Rest (Befunde 121, 141)
-gesamt = 0.948 * 0.981 * 0.984 * 1.021                   # Skript anlagen/95_zellvergleich.py
-assert abs(gesamt - 0.934) < 0.001
-assert abs((eur_mort + eur_morb) / 1e6 * gesamt - 339) < 1
-assert abs((eur_mort + eur_morb) / 1e6 * gesamt / 0.9888 - 343) < 1  # mit Regel 3.3: 342,67 (Befund 145)
-assert abs(0.948 * 1.021 - 0.967) < 0.001                # (a) x (d), Befund 101 (ungerundet 0,9674)
-# (d) nachgerechnet am Punkt: sigma 0,5 K, mittelwerttreu, Gauss-Hermite-Mittel
-zs = [-2.0201828705, -0.9585724646, 0.0, 0.9585724646, 2.0201828705]
-ws = [0.0199532421, 0.3936193232, 0.9453087205, 0.3936193232, 0.0199532421]
-uhi = sum(w * yll(t_mittel + 0.5 * math.sqrt(2) * z)[1] for z, w in zip(zs, ws)) / sum(ws)
-assert abs(uhi / y - 1.02) < 0.003
-s_her = 2 / math.sqrt(12)                                # Herleitung §4: 0,58 K statt gesetzt 0,5 K
-uhi_her = sum(w * yll(t_mittel + s_her * math.sqrt(2) * z)[1] for z, w in zip(zs, ws)) / sum(ws)
-assert abs(s_her - 0.577) < 0.001 and abs(uhi_her / y - 1.026) < 0.003
-assert abs(uhi_her / uhi - 1.007) < 0.001                # Betrag rund 0,7 % hoeher (Befund 157)
+gesamt = 0.948 * 0.981 * 0.984 * 1.028                   # Skript anlagen/95_zellvergleich.py --sigma 0.58
+assert abs(gesamt - 0.941) < 0.001
+assert abs((eur_mort + eur_morb) / 1e6 * gesamt - 341) < 1
+assert abs((eur_mort + eur_morb) / 1e6 * gesamt / 0.9888 - 345) < 1  # mit Regel 3.3: 345,11 (Befund 145)
+assert abs(0.948 * 1.028 - 0.974) < 0.001                # (a) x (d), Befund 101 (ungerundet 0,9743)
+assert abs(345.11 / 362.89 - 0.95) < 0.005               # 5 % weniger als die Kette
+assert abs(362.89 * 0.94037 - 341.25) < 0.005 and round(0.94037, 3) == 0.94   # Anlage: ungerundete Faktoren (Befund 199)
+assert abs(341.25 / 0.9888 - 345.11) < 0.05                                   # mit Regel 3.3
+# (d) ein Faktor (Befunde 181, 182): Zelllauf des Produkts mit gegen ohne Feinstruktur
+s_fein = 2 / math.sqrt(12)                               # Herleitung §4: Spanne +-1 K, Gleichverteilung
+assert abs(s_fein - 0.577) < 0.0005 and round(s_fein, 2) == 0.58
+b_ohne, b_mit, w_ohne, w_mit = 335_683_393, 345_026_859, 167_066, 175_116   # sigma 0 und 0,58 K
+assert abs(b_mit / b_ohne - 1.028) < 0.0005 and abs(w_mit / w_ohne - 1.048) < 0.0005
+assert abs(1 - b_ohne / b_mit - 0.027) < 0.0005 and abs(1 - w_ohne / w_mit - 0.046) < 0.0005
+assert abs(b_mit / 344_939_407 - 1.00025) < 0.00001      # Rundung 0,577 -> 0,58 K: + 0,025 %
 # Heim-Extremfall (Abschaetzung von KAP3): alle Heimbewohner 1 K ueber dem Mittel der Kommune
 v_heim, v_rest = 1 + 1.54 * (1 - 0.149), 1 + 1.54 * (0 - 0.149)
 g_heim, g_rest = 0.149 * v_heim, 0.851 * v_rest
@@ -367,8 +378,8 @@ zwischenjährliche Streuung wird nicht verwendet. Restannahme: UHI verschiebt nu
 Mittelwert. Skript/Daten: `backend/scripts/kalibrierung/dwd_wochenquantile.py`,
 `backend/data/kalibrierung/wochenquantile_region.csv` [33,50]. Rechengrundlage ist die Datei (vier Nachkommastellen,
 Befund 144); die folgende Tabelle ist die auf zwei Stellen gerundete Lesehilfe, mit der auch die Rechenkette §3.0 rechnet.
-Mit der Datei ergibt die Kette für Berlin 362,80 statt 362,89 Mio. €, der Zelllauf 342,58 Mio. € statt 342,67 Mio. €,
-für Warmsen 172.957 € statt 173.099 € (`95_zellvergleich.py --wochenquantile produkt`); der Unterschied liegt unter
+Mit der Datei ergibt die Kette für Berlin 362,80 statt 362,89 Mio. €, der Zelllauf 345,03 Mio. € statt 345,11 Mio. €,
+für Warmsen 175.116 € statt 175.256 € (Zelllauf des Produkts gegen `95_zellvergleich.py --ersatz --sigma 0.58`); der Unterschied liegt unter
 0,1 % und innerhalb der Toleranz aus §3.3.
 
 | \(w\) | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
@@ -475,21 +486,24 @@ Gruppe 60–66 gar nicht (0/7) oder ganz (7/7) zu den Menschen ab 65 zählt:
 
 | Beispielkommune | Aufruf | Einwohner (Zensus-Gitter) | davon in Zellen mit geheimgehaltenem Anteil 65+ | Einwohner ab 65 ohne Gemeindeschlüssel | Einwohner ab 65 mit Regel | Jahresbetrag ohne Gemeindeschlüssel | Jahresbetrag mit Regel | Faktor ohne Gemeindeschlüssel gegen Regel | Spanne des Faktors (60–66 ganz oder gar nicht) |
 |---|---|---|---|---|---|---|---|---|---|
-| Berlin (AGS 11000000) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz` | 3.593.357 | 2,8 % | 696.648 | 707.318 | 338,84 Mio. € | 342,67 Mio. € | × 0,989 | × 0,927–1,000 |
-| Warmsen, Landkreis Nienburg (Weser) (AGS 03256034) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz` | 3.087 | 64,2 % | 544 | 697 | 145.025 € | 173.099 € | × 0,838 | × 0,651–0,947 |
+| Berlin (AGS 11000000) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz --sigma 0.58` | 3.593.357 | 2,8 % | 696.648 | 707.318 | 341,25 Mio. € | 345,11 Mio. € | × 0,989 | × 0,927–1,000 |
+| Warmsen, Landkreis Nienburg (Weser) (AGS 03256034) | `python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz --sigma 0.58` | 3.087 | 64,2 % | 544 | 697 | 146.828 € | 175.256 € | × 0,838 | × 0,651–0,947 |
 
-Beträge je Jahr (Preisstand 2024), gemessen am 27.09.2026. *Modellgrenze ohne Gemeindeschlüssel (Befund 141).* Das
+Beträge je Jahr (Preisstand 2024), gemessen am 29.09.2026 mit σ = 0,58 K (Befund 181; die Anlage steht ohne
+`--sigma` noch auf 0,5 K). *Modellgrenze ohne Gemeindeschlüssel (Befund 141).* Das
 Produkt braucht für Stufe 2 den Gemeindeschlüssel der Kommune. Ist die Kommune kein Gemeindeteil der VG250 [65], rechnet
-es nur Stufe 1, und die Zellen der Stufe 2 behalten 65+ = 0. Der Betrag liegt dann in Berlin um 1,1 % (338,84 statt
-342,67 Mio. €), in Warmsen um 16 % (145.025 statt 173.099 €) zu niedrig. Dieselbe Regel gilt überall, wo das Produkt
+es nur Stufe 1, und die Zellen der Stufe 2 behalten 65+ = 0. Der Betrag liegt dann in Berlin um 1,1 % (341,25 statt
+345,11 Mio. €), in Warmsen um 16 % (146.828 statt 175.256 €) zu niedrig. Dieselbe Regel gilt überall, wo das Produkt
 den Anteil ab 65 liest: Es ist eine Methodik, deshalb nutzen auch die Hitze-Kennzahlen der Übersicht und der Rückfallpfad
 ohne Altersbänder den Ersatzwert (Befund 142).
 *Toleranz (Befunde 140 und 145).* Ein Nachrechnen trifft den Betrag, wenn es um höchstens ± 0,29 % des Betrags
-(1 Mio. € / 342,67 Mio. € = 0,2918 %) abweicht: Berlin ± 1 Mio. € um 342,67 Mio. €, Warmsen ± 505 € um 173.099 €. Die Toleranz deckt die Rundung der
-Faktoren und der Wochenquantile ab (§3.2: mit der Datei 342,58 Mio. € und 172.957 €). 362,9, 342,67 und 343 Mio. € meinen
-zwei Rechnungen: 362,9 ist die Kette an einem Punkt (§3.0), 342,67 der Zelllauf mit ungerundeten Faktoren, 343 derselbe
-Zelllauf aus den gerundeten Faktoren im Prüfblock §3.0 (362,9 × 0,934 nach Teilung durch 0,9888 = 342,8; mit dem
-ungerundeten Produkt 0,9343 der vier Faktoren, wie im Prüfblock, 342,9). Warmsen zählt nach dem Zensus 2022 amtlich 3.158 Einwohner
+(1 Mio. € / 345,11 Mio. € = 0,2898 %) abweicht: Berlin ± 1 Mio. € um 345,11 Mio. €, Warmsen ± 508 € um 175.256 €. Die Toleranz deckt die Rundung der
+Faktoren und der Wochenquantile ab (§3.2: mit der Datei 345,03 Mio. € und 175.116 €). 362,9, 345,11 und 345 Mio. € meinen
+zwei Rechnungen: 362,9 ist die Kette an einem Punkt (§3.0), 345,11 der Zelllauf mit ungerundeten Faktoren, 345 derselbe
+Zelllauf aus den gerundeten Faktoren im Prüfblock §3.0 (362,9 × 0,941 nach Teilung durch 0,9888 = 345,4; mit dem
+nicht gerundeten Produkt 0,9407 der vier gerundeten Faktoren, wie im Prüfblock, 345,3; mit den ungerundeten Faktoren der
+Anlage, × 0,94037, genau 345,11, Befund 199). Die Rundung von σ auf 0,58 K (0,025 %, §3.0 (d))
+liegt weit innerhalb der Toleranz. Warmsen zählt nach dem Zensus 2022 amtlich 3.158 Einwohner
 [69], liegt also unter 10.000. Gewählt ist Warmsen, weil sie unter allen Gemeinden mit 2.000 bis
 unter 10.000 Einwohnern im Zensus-Gitter den höchsten Anteil der Einwohner in Zellen mit
 geheimgehaltenem Anteil 65+ hat (Median der Gemeinden unter 10.000 Einwohnern 27,9 %; Aufruf
@@ -915,12 +929,10 @@ war zu niedrig, genau wie der Kovarianz-Vorbehalt (Befund 67) vermutete.
 Stichproben-Abgleiche** — §3.4-Ressourcen-Regel: ein nationaler
 100-m-Vollraster-Lauf ist als Prüf-/Abgleichinstrument unzulässig (Log 34);
 nicht abnahmerelevant): UHI-Feinstruktur unterhalb der Gemeinde — Konvexitätsbeitrag als
-**Modellrechnung gegen die weiterhin gesetzte** Streuung σ = 0,5 K: ×1,023–1,024
-(mittelwerttreu; σ-Abschätzung wie in Rev. 6 aus der ±1-K-Spanne der Zellabweichungen um
-das Gebietsmittel, Gleichverteilungsannahme ⇒ σ = 2/√12 = 0,58 K; gesetzt ist 0,5 K, abgerundet
-und damit den Betrag eher unterschätzend: mit 0,58 K läge Wirkung (d) in §3.0 für Berlin am Punkt
-bei × 1,026 statt × 1,019, der Betrag rund 0,7 % höher, mehr als die Toleranz von 0,29 % aus §3.3
-— **keine Messung**;
+**Modellrechnung** mit der Streuung σ = 0,58 K (mittelwerttreu; Herleitung wie in Rev. 6 aus der
+±1-K-Spanne der Zellabweichungen um das Gebietsmittel, Gleichverteilungsannahme ⇒ σ = 2/√12 =
+0,577 K, auf 0,58 K gerundet; Befund 181). Die Wirkung steht als ein Faktor in §3.0, Wirkung (d)
+(Berlin × 1,028, Warmsen × 1,048; Befund 182) — **keine Messung**;
 der Messpfad „σ aus dem Stadtmodell" gehört zum Stichproben-Abgleich) — sowie
 intra-kommunale Bevölkerungsgewichtung.
 
@@ -1008,13 +1020,13 @@ assert abs(0.0634 * 1.0 - 0.0634) < 1e-9 and abs(0.0625 * 1.0 - 0.0625) < 1e-9
 - **Zusatz-Anker** Berlin 2018, Band 85+ (nationaler Skalar 0,581): Modell =
   **221 je 100.000** gegen die RKI-Referenz 260–320 [14] — **unterschätzend (−15 %)**
   gegen die Untergrenze 260, etwas stärker als in Rev. 6 (−11 %). **Richtung gemessen**
-  (Zellvergleich §3.0, Skript `docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000`,
+  (Zellvergleich §3.0, Skript `docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --sigma 0.58`,
   Ledger Runde 16): Der Berlin-Gemeindepunkt (20,06 °C im Mittel 2016–2025) liegt 0,1 K
   über dem Bevölkerungsmittel der Zellen (19,96 °C). Für den Anker zählen nur die zwei
   Wirkungen, die den Gemeindepunkt betreffen: Temperatur je Zelle × 0,948 und Feinstruktur
-  σ = 0,5 K × 1,021, zusammen × 0,967. Das Zellmodell liegt damit nicht über, sondern
-  **unter** dem Gemeindepunkt-Wert: 221 × 0,967 ≈ **214 je 100.000**, also rund **−18 %**
-  gegen die Untergrenze 260 (214 / 260 = 0,82). Die übrigen Wirkungen aus §3.0 (Einwohnersumme,
+  × 1,028 (§3.0, Wirkung (d)), zusammen × 0,974. Das Zellmodell liegt damit nicht über, sondern
+  **unter** dem Gemeindepunkt-Wert: 221 × 0,974 ≈ **215 je 100.000**, also rund **−17 %**
+  gegen die Untergrenze 260 (215 / 260 = 0,83). Die übrigen Wirkungen aus §3.0 (Einwohnersumme,
   Bänder je Zelle) betreffen die Bevölkerungsgrundlage, nicht den Gemeindepunkt. **Die Lücke
   bleibt unerklärt:** Die Wärmeinsel erklärt sie nicht, und der Bericht hat dafür keine
   gemessene Ursache; sie steht als offene Abweichung, nicht als Korrektur. Der Anker bleibt ein
@@ -1032,7 +1044,7 @@ assert abs(0.0634 * 1.0 - 0.0634) < 1e-9 and abs(0.0625 * 1.0 - 0.0625) < 1e-9
   über den HD-Term nur moduliert (HD = 0 → ×0,83) — dokumentierte Grenze §3.4, keine
   Verteilschlüssel-Logik (kein nationaler Topf wird verteilt; die Zellrate ist lokal
   definiert).
-- **Unsicherheiten:** Rest-Bias UHI-Feinstruktur (×1,02-Konvexität + intra-kommunale
+- **Unsicherheiten:** Rest-Bias UHI-Feinstruktur (Konvexität, als ein Faktor in §3.0 Wirkung (d); dazu intra-kommunale
   Gewichtung; kommunale Stichproben-Abgleiche als Fortschreibungsvermerk — §3.4-
   Ressourcen-Regel, kein nationaler Vollraster-Lauf);
   \(s_{\text{Süd}}\)-Profil-Band 1,45–1,85 (⇒ \(c_{\text{kal}}\) 0,604–0,559, Gegenläufigkeit,
@@ -1103,8 +1115,8 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   **Berlin** (Beispiel-Block `sensitivitaeten_berlin`, Kapitel 7): Der Faktor wirkt auf den Exzess aller Bänder, also
   auf die ganze Mortalität der Rechenkette: 361,8 Mio. € × (1 − 0,939) = **22,1 Mio. € je Jahr** (Preisstand 2024;
   Band 0–53,5 Mio. €), 6,1 % des Jahresbetrags 362,9 Mio. €; im Zelllauf mit Gemeindeschlüssel
-  341,5 Mio. € × 0,061 = 20,8 Mio. €. Vorher, mit 0,95 unübersetzt auf dem Exzess, waren es 18,1 Mio. € (Zelllauf
-  17,1 Mio. €). **Was die einfachere Rechnung verfälscht:** 0,95 direkt auf den Exzess liest „5 % weniger Todesfälle am
+  344,0 Mio. € × 0,061 = 21,0 Mio. € (mit σ = 0,58 K, §3.0 (d)). Vorher, mit 0,95 unübersetzt auf dem Exzess, waren es
+  18,1 Mio. € (Zelllauf 17,2 Mio. €). **Was die einfachere Rechnung verfälscht:** 0,95 direkt auf den Exzess liest „5 % weniger Todesfälle am
   Hitzetag“ als „5 % weniger hitzebedingte Todesfälle“. Der Betrag läge mit 18,1 Mio. € nur 4,0 Mio. € je Jahr unter
   22,1 Mio. €, aber aus dem falschen Grund: Richtig übersetzt ergäbe derselbe Wert gekappt 74,5 Mio. €, gut das
   Dreifache, und seine Wirkung käme allein aus dem Achsenabschnitt. **Kappung und Teilabdeckung:** Faktor und Kappung
@@ -1186,9 +1198,10 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   × 0,05 = 1,249, gerundet **1,2 Mio. € je Jahr** (Preisstand 2024), 0,3 % des Jahresbetrags 362,9 Mio. €. Über den Bestand der Kalibrierjahre
   0,04–0,09 liegt der Betrag bei 0,5–1,7 Mio. €, über das Band von \(s_{\text{gek}}\) 0,05–0,15 bei 0–2,2 Mio. €
   (bei 0,05 liegt der Anteil unter dem Stand der Kalibrierjahre, und S157 wirkt nicht zusätzlich). Stärkster Treiber
-  ist also \(s_{\text{gek}}\). Im Zelllauf mit Gemeindeschlüssel 1,1 Mio. €; Warmsen (Zelllauf) 469 € je Jahr.
-  Gemessen mit `docs/methodik/anlagen/95_zellvergleich.py --ersatz`, YLL 85+ im Zelllauf: Berlin 556,27, Warmsen 0,2398
-  (27.09.2026; Beispiel-Block `s157_voreinstellung`). Gibt die Kommune ihren eigenen Anteil ein, gilt dieser, abzüglich
+  ist also \(s_{\text{gek}}\). Im Zelllauf mit Gemeindeschlüssel 1,1 Mio. €; Warmsen (Zelllauf) 475 € je Jahr.
+  Gemessen im Zelllauf des Produkts mit Gemeindeschlüssel und σ = 0,58 K (Golden-Test `_mortalitaet_summen`, gepinnte
+  Zelldaten; Messbefehl und Ausgabe im Befund-Ledger, Befund 198), YLL 85+: Berlin 560,28, Warmsen 0,2427
+  (29.09.2026; Beispiel-Block `s157_voreinstellung`). Gibt die Kommune ihren eigenen Anteil ein, gilt dieser, abzüglich
   0,06. **Modellgrenzen:** \(s_{\text{gek}}\) gilt für die ganze
   Kommune, unabhängig von der gezeichneten Fläche. Welche Heime gekühlt sind, weiß weder der Bericht noch das Produkt;
   eine Kommune mit bekannten gekühlten Heimen gibt deren Anteil an allen Heimplätzen der Kommune ein. Der Abzug
@@ -1211,10 +1224,18 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   Maßnahme, um welchen Anteil sie die ganze Hitzemortalität senkt. Für S157 bei der Voreinstellung ist das
   \(r_{\text{S157}} = a_{85+} \times h_{\text{Heim}} \times (s_{\text{gek}} - 0{,}06) \times (1 - g_{\text{S157}})\)
   = 0,284 × 0,344 × 0,05 × 0,7064 = 0,00345, mit \(a_{85+}\) = 638,8 / 2.250 YLL = 0,284, dem Anteil des Bands 85+ an den
-  YLL der Rechenkette (§3.0 Ebene 7). Mit dem Hitzeaktionsplan (1 − 0,939 = 0,061) ergibt das
-  1 − 0,939 × (1 − 0,00345) = 0,064 statt 0,061 ohne S157. \(a_{85+}\) hängt am Altersaufbau: In Warmsen ist er 0,224
-  (Zelllauf), \(r_{\text{S157}}\) dann 0,0027 und das Anpassungspotenzial ebenfalls 0,064; die Gruppe nach KWRA (unter 0,1)
-  ändert sich in beiden Fällen nicht. Anzeige und Quelle in der Parameterliste regelt T-1410-ceo. **Berlin**
+  YLL der Rechenkette Berlin (§3.0 Ebene 7). Mit dem Hitzeaktionsplan (1 − 0,939 = 0,061) ergibt das
+  1 − 0,939 × (1 − 0,00345) = 0,064 statt 0,061 ohne S157. **\(a_{85+}\) je Kommune (Befund 183).** \(a_{85+}\) hängt
+  am Altersaufbau, deshalb rechnet die Methodik ihn für jede Kommune aus ihrem Zelllauf: YLL des Bands 85+ geteilt durch
+  alle YLL, beide aus den Altersbändern der Zellen (Zensus 2022 [67, 69]). Die 0,284 der Kette sind nur das Beispiel.
+  Im Zelllauf ist \(a_{85+}\) in Berlin 560,28 / 2.139,06 = 0,262, in Warmsen 0,2427 / 1,0839 = 0,224 (Zelllauf des
+  Produkts, σ = 0,58 K, Befund 198); \(r_{\text{S157}}\) ist dann 0,0032 und 0,0027, das Anpassungspotenzial in beiden
+  Kommunen 0,064; die Gruppe nach KWRA (unter 0,1) ändert sich nicht. **Stand im Produkt (Befund 195):** Die
+  Charakterisierung rechnet heute noch mit der Berliner Konstante (`A85_PLUS_BERLIN` = 638,8 / 2.250 in
+  `charakterisierung.py`) und kennt die Kommune nicht; je Kommune rechnet bisher nur der Golden-Test. Der Nachzug steht
+  in der Übernahmeliste; für Berlin wird das Anpassungspotenzial danach 0,0640 statt 0,0642. **Was eine Berliner Konstante verfälschen würde:** In Warmsen läge
+  \(r_{\text{S157}}\) mit 0,284 bei 0,00345 statt 0,0027, also 27 % zu hoch; beim Anpassungspotenzial ist das
+  0,0642 statt 0,0636, auf drei Stellen unsichtbar, im Beitrag von S157 aber ein Viertel zu viel. Anzeige und Quelle in der Parameterliste regelt T-1410-ceo. **Berlin**
   (Beispiel-Block `s157_berlin`, Kapitel 7): 153,6 Todesfälle 85+ × 0,3443 = 52,88 Todesfälle von
   Heimbewohnern. Rechnerisch je vollen Anteil (Anteil 1 über dem Stand der Kalibrierjahre) fielen
   52,88 × 0,7064 = 37,35 weg, das sind 155 YLL und **25,0 Mio. € je Jahr** (ungerundet 24,99 Mio. €; Band
@@ -1268,8 +1289,8 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   eingeführten Maßnahme 5- bis 10-fach: 0,66 / 10 bis 0,66 / 5 = 0,066–0,132; \(w_{\text{KZ}}\) = 0,0883 liegt darin.
   **Berlin** (Beispiel-Block `kuehlzentren_berlin`, Kapitel 7): Die Bänder 75–84 und 85+ außerhalb der Heime tragen
   1.054 YLL, also 169,5 Mio. € (wie beim Hebel Schutzprogramme); × 0,05 × 0,0883 = **0,75 Mio. € je Jahr** (Preisstand 2024; Band
-  0,1–3,0 Mio. €), 0,2 % des Jahresbetrags 362,9 Mio. €. Im Zelllauf mit Gemeindeschlüssel 0,71 Mio. €, in Warmsen
-  (Zelllauf) 318 € je Jahr. **Stärkster Treiber** ist die Reichweite: Über ihr Band 1–10 % wandert der Betrag von 0,15
+  0,1–3,0 Mio. €), 0,2 % des Jahresbetrags 362,9 Mio. €. Im Zelllauf mit Gemeindeschlüssel 0,72 Mio. €, in Warmsen
+  (Zelllauf) 322 € je Jahr. **Stärkster Treiber** ist die Reichweite: Über ihr Band 1–10 % wandert der Betrag von 0,15
   bis 1,50 Mio. €, über den geschützten Anteil des Tages 2/24–6/24 von 0,50 bis 1,50 Mio. €. **Was eine einfachere
   Rechnung verfälschen würde:** Den Faktor aus [46] ohne die Stunden anzusetzen (\(w_{\text{KZ}}\) = 0,7064) hieße, ein
   Besuch im Kühlzentrum schütze wie eine Klimaanlage rund um die Uhr: 169,5 Mio. € × 0,05 × 0,7064 = 6,0 Mio. €, achtmal
@@ -1452,7 +1473,7 @@ noch auf einen Barwert abgezinst.
    Wirkung, Sensitivität ausgewiesen.
 3. Skalentransfer: ERF auf Regions-Gebietsmitteln geschätzt, auf Zelltemperaturen
    angewendet; \(c_{\text{kal}}\) fängt das Niveau, nicht die Form.
-4. Kalibrier-Rest-Bias: UHI-Feinstruktur unterhalb der Gemeinde (Konvexität ×1,02, intra-kommunale Gewichtung) — kommunale Stichproben-Abgleiche als Fortschreibungsvermerk (§4; §3.4-Ressourcen-Regel: kein nationaler Vollraster-Lauf); Süd-ERF-Nachschätzung ist modellintern (Profil-Band 1,45–1,85).
+4. Kalibrier-Rest-Bias: UHI-Feinstruktur unterhalb der Gemeinde (Konvexität, Faktor in §3.0 Wirkung (d); intra-kommunale Gewichtung) — kommunale Stichproben-Abgleiche als Fortschreibungsvermerk (§4; §3.4-Ressourcen-Regel: kein nationaler Vollraster-Lauf); Süd-ERF-Nachschätzung ist modellintern (Profil-Band 1,45–1,85).
 5. UHI-Modellgüte als gemeinsamer Treiber der #95-Feinstruktur; HD ohne UHI-Verschiebung
    (Unterschätzung der Morbidität in UHI-Lagen, §3.4).
 
@@ -2011,19 +2032,24 @@ for sk, soll in ((s_kal_hi, 0.5), (s_kal_lo, 1.7)):                             
     assert abs(s157(153.6, s_gek - sk) / 1e6 - soll) < 0.05
 assert zus(0.05) == 0.0 and abs(s157(153.6, zus(0.15)) / 1e6 - 2.2) < 0.05          # Band von s_gek
 assert abs(1 / (1 - s_kal * (1 - g)) - 1.04) < 0.005                                # Modellgrenze, Untergrenze
-yll85_berlin, yll85_warmsen = 556.27, 0.2398   # Zelllauf mit Gemeindeschluessel, anlagen/95_zellvergleich.py --ersatz
+yll85_berlin, yll85_warmsen = 560.28, 0.2427   # Zelllauf des Produkts mit Gemeindeschluessel, sigma 0,58 K (Befund 198)
 zell = lambda y85, s: y85 * h * s * (1 - g) * voly
 assert abs(zell(yll85_berlin, zus(s_gek)) / 1e6 - 1.1) < 0.05
-assert abs(zell(yll85_warmsen, zus(s_gek)) - 469) < 1
+assert abs(zell(yll85_warmsen, zus(s_gek)) - 475) < 1
 # Anpassungspotenzial: r_S157 = a_85+ x h x (s_gek - 0,06) x (1 - g); mit Hitzeaktionsplan 1 - 0,939 x (1 - r)
 a85 = 638.8 / 2250                            # Anteil 85+ an den YLL der Kette (Ebene 7)
 r = a85 * h * zus(s_gek) * (1 - g)
 assert abs(a85 - 0.284) < 0.0005 and abs(r - 0.00345) < 0.000005
 assert abs(0.284 * 0.344 * 0.05 * 0.706 - 0.00345) < 0.000005
 assert abs(1 - 0.939 * (1 - r) - 0.064) < 0.0005 and abs(1 - 0.939 - 0.061) < 1e-9
-a85_w = yll85_warmsen / 1.0713               # Warmsen, Zelllauf (YLL gesamt 1,0713)
+a85_w = yll85_warmsen / 1.0839               # Warmsen, Zelllauf (YLL gesamt 1,0839), je Kommune (Befund 183)
 r_w = a85_w * h * zus(s_gek) * (1 - g)
 assert abs(a85_w - 0.224) < 0.0005 and abs(r_w - 0.0027) < 0.00005 and abs(1 - 0.939 * (1 - r_w) - 0.064) < 0.0005
+a85_bz = yll85_berlin / 2139.06              # Berlin, Zelllauf (YLL gesamt 2.139,06)
+r_bz = a85_bz * h * zus(s_gek) * (1 - g)
+assert abs(a85_bz - 0.262) < 0.0005 and abs(r_bz - 0.0032) < 0.00005 and abs(1 - 0.939 * (1 - r_bz) - 0.064) < 0.0005
+assert abs(r / r_w - 1.27) < 0.005                                    # Berliner Konstante in Warmsen: 27 % zu hoch
+assert abs(1 - 0.939 * (1 - r) - 0.0642) < 0.00005 and abs(1 - 0.939 * (1 - r_w) - 0.0636) < 0.00005
 assert 1 - 0.939 * (1 - r) < 0.1               # Gruppe nach KWRA unveraendert (unter 0,1)
 ```
 
@@ -2051,8 +2077,8 @@ assert r_hi - r_lo > t_hi - t_lo
 # einfachere Rechnung: 0,7064 ohne Stunden
 naiv = eur_7585 * r * (1 - g)
 assert abs(naiv - 6.0) < 0.05 and 7.5 < naiv / kz < 8.5
-# Zelllauf mit Gemeindeschluessel (anlagen/95_zellvergleich.py --ersatz): YLL 75-84 und 85+
-for y7584, y85, soll, tol in ((637.67, 556.27, 0.71e6, 0.005e6), (0.2905, 0.2398, 318, 1)):
+# Zelllauf des Produkts mit Gemeindeschluessel, sigma 0,58 K (Befund 198): YLL 75-84 und 85+
+for y7584, y85, soll, tol in ((642.08, 560.28, 0.72e6, 0.005e6), (0.2939, 0.2427, 322, 1)):
     assert abs((y7584 + y85 * (1 - h)) * 160_800 * r * w - soll) < tol
 # zusammen mit Hitzeaktionsplan und Schutzprogrammen: max(delta_hap x delta_vg x delta_kz; 0,794)
 assert abs(max(0.939 * 0.931 * delta_kz, 0.794) - 0.870) < 0.0005 and 0.939 * 0.931 * delta_kz > 0.794
@@ -2396,7 +2422,7 @@ um die Herleitung von \(\delta_{\text{HAP}}\) ergänzt (T-1584, Befund 164).
 | 31 ⚠ | Kalibrierbasis Rev. 7? | **bevölkerungsgewichtete Sommermittel je Land** (DWD-JJA-Raster × Gemeindepunkt × Zensus-Bevölkerung; Skript rev7) statt Flächenmittel + Pauschalkorrektur | setzt die in §4 (Rev. 6) benannte keyless Messung um; löst die Befund-1-Hauptkomponente direkt (DE +0,53 K, regional heterogen); §6-Eskalation ohne Zell-Lauf auflösbar | Zell-Lauf sofort (braucht Produktionsimplementierung — Kausalschleife mit der Abnahme) | c_kal 0,742 → 0,581; Prüfstein-Basis |
 | 32 ⚠ | Regionale ERF-Nachschätzung? | **nur Süd**: \(s_{\text{Süd}}\) = 1,65 (Holdout-Fit ohne 2018/19/22; Profil-Band 1,45–1,85, Bandregel +10 % Zielfunktion) ⇒ \(\beta_{85+,\text{Süd}}\) = 0,0876 K⁻¹; Nord nicht identifizierbar (0 Fit-Jahre), Mitte-Optimum 1,0 | §3.4 („Wirkungsfunktion regional nachschätzen"); minimal-invasiv genau dort, wo Diagnose + Identifikation zusammenkommen; Einbrenn-Einwand aus Nr. 26 durch messungsbasierte Kalibrierbasis entkräftet | 3-Regionen-Nachschätzung (verworfen: Nord-Skalar läuft mangels Daten an den Gitterrand und zerstört die Nord-Prüfung) | Prüfstein 10/16 → **12/16 (bestanden)** |
 | 33 | Regionale Übergangsfaktoren? | **entfallen** — Produktausweis mit genau einem nationalen Skalar | Prüfstein mit einem Skalar bestanden; §3.4-Ideal erreicht | c_reg beibehalten (unnötig geworden) | Süden im Ausweis über \(\beta_{\text{Süd}}\) statt Faktor ×1,6 |
-| 34 ⚠ | Finaler Kalibrier-Abgleich ohne Zell-Lauf? | **kommunale Stichproben-Abgleiche** (Anker-Kommunen, Produktionsmodell) ersetzen den nationalen 100-m-Vollraster-Lauf überall im Bericht | Nutzer-Entscheid 30.08.2026 + §3.4-Ressourcen-Regel (Aufgaben-Fortschreibung): Vollraster-Läufe fressen zu viele Ressourcen und dürfen nie Prüf-/Abgleichvoraussetzung sein | nationaler Zell-Lauf (verworfen per Regel) | Rest-Bias-Prüfung (×1,02, Topographie-Anteil Süd) läuft über Stichproben statt Vollraster |
+| 34 ⚠ | Finaler Kalibrier-Abgleich ohne Zell-Lauf? | **kommunale Stichproben-Abgleiche** (Anker-Kommunen, Produktionsmodell) ersetzen den nationalen 100-m-Vollraster-Lauf überall im Bericht | Nutzer-Entscheid 30.08.2026 + §3.4-Ressourcen-Regel (Aufgaben-Fortschreibung): Vollraster-Läufe fressen zu viele Ressourcen und dürfen nie Prüf-/Abgleichvoraussetzung sein | nationaler Zell-Lauf (verworfen per Regel) | Rest-Bias-Prüfung (Feinstruktur als ein Faktor in §3.0 Wirkung (d), Befund 202; Topographie-Anteil Süd) läuft über Stichproben statt Vollraster |
 | 35 ⚠ | q_pfl-Ebene ohne Kreis-Pflegestatistik? | `CARE_HOME_SHARE_85P` aus OSM, **kommunen-erwartungstreu** auf q̄_pfl normiert (statt Kreis-Skalierung); q_1P-Ebene **geparkt** (keine offene Quelle) | §3.1-Anlagepflicht; Tab. 22421 je Kreis nicht keyless; Erwartungstreue hält die Kalibrierneutralität je Kommune | Kreis-Skalierung (nicht keyless) · dauerhafter Neutral-Fallback (per §3.1 unzulässig) | intra-kommunale 85+-Differenzierung aktiv; zwischen Kommunen weiter q̄ |
 | 36 | L̄_85+ exakt statt Approximation? | **4,16 J** — Einzeljahres-Sterbefälle 85–94 × e(x), 95+-Rest tafelintern gewichtet, m/w sterbefallgewichtet kombiniert | Befund-22-Auflösung wie in §3.5 terminiert; Kreuzcheck 12613-02↔-03 exakt | Stützstellen-Variante (4,83 — behebt nur den Gewichte-Fehler, nicht die Untergrenzen-Stützstellen) | YLL-Bundessumme ≈ −8 %; €-Ausweis sinkt entsprechend (konservativ) |
 | 37 | Ansatz 95-B (nationaler Anker, top-down)? | **verworfen** | 95-B verteilt eine feste nationale Zahl von Hitzetoten über einen Schlüssel und scheidet nach §3.1 aus, weil damit auch eine Kommune ohne Hitze Todesfälle erhielte. | — (Beschreibung M0 Rev. 5, Kap. 2) | keine |
@@ -2407,9 +2433,10 @@ um die Herleitung von \(\delta_{\text{HAP}}\) ergänzt (T-1584, Befund 164).
 | 42 ⚠ | Stichtag der Einwohner je Altersband in Ebene 1 der Rechenkette (§3.0)? | **Fortschreibung des Bevölkerungsstandes zum 31.12.2023, Basis Zensus 2022** (Tab. 12411-09-01-4-B [48]; festgelegt vom methodik_manager in T-1233, Befund 99) | Gleicher Stichtag wie der Nenner der Basissterberaten m_a [49] (Sterbefälle 2023 / Bevölkerung 31.12.2023): Einwohner und Sterberate beziehen sich auf denselben Tag. Der Abstand zum Zensus-Gitter (15.05.2022) ist als Wirkung (b) in §3.0 beziffert, in Berlin × 0,981. **Gegenargument:** Gitter und Ersatzregel in §3.3 zählen zum 15.05.2022; ein Sachbearbeiter sieht in §3.0 und §3.3 zwei Stichtage | Zensus-Tabelle 1000A zum 15.05.2022 (Stichtag gleich dem Gitter, aber verschieden vom Nenner von m_a; die Zensus-Datenbank war bis 05.10.2026 in Wartung, nach dem 05.10.2026 wird nicht umgestellt) | keine Zahl betroffen; Kapitel 7 und Kette (362,89 Mio. €) unverändert |
 | 43 ⚠ | Wirkung der Schutzprogramme vulnerable Gruppen (`VULNERABLE_GROUP_PROGRAMS`) und ihr Andockpunkt? | **\(\delta_{\text{VG}}\) = 0,931 (Band 0,794–1,0) als Faktor auf den Wochenexzess der Bänder 75–84 und 85+ ohne Heimbewohner; auf die Einweisungen \(\delta_{\text{VG,morb}}\) = 1,0 (Band 0,931–1,069, Befund 131); mit \(\delta_{\text{HAP}}\) zusammen \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}};\ 0{,}794)\); Abschätzung von KAP3** (§5, Block `heat.delta_vg`, Befunde 123, 125–128, 134) | Der Katalog im Produkt setzt `default_reduction` 0.22 auf Mortalität und Morbidität aller Bänder und beruft sich auf das Gesamtpaket der Hitzeschutzpläne (Urban u. a. 2025 [47], −25,2 %). Das ist der Einführungseffekt des ganzen Pakets über drei Jahrzehnte; ein einzelner Baustein wirkt nicht stärker (für Deutschland ist das Paket −20,6 % [47, Tabelle 1], also Faktor 0,794, und \(\delta_{\text{VG}}\) liegt nie darunter), und er erreicht nur die Gemeldeten (Reichweite 20 %, Wirkung bei Erreichten 0,34 = 24,4 / 97,3 / 0,728 aus [70], Tabellen 1–3, bereinigt um die Sterberate vor dem Sommer und den Anteil ab 90). Heimbewohner ab 85 zählen über S157, nicht hier. Umgerechnet auf den Berlin-Betrag: 0.22 auf alle Bänder ergäbe rund 79,8 Mio. € je Jahr, \(\delta_{\text{VG}}\) ergibt 11,7 Mio. €, rund 15 %. **Kappung (Befund 126):** Ob \(\delta_{\text{HAP}}\) den Baustein schon enthält, lässt sich aus [45] nicht ausschließen; deshalb nehmen beide Hebel zusammen nie mehr weg als das Paket Deutschland (zentral 0,874, keine Kappung; sie greift bei \(\delta_{\text{HAP}}\) = 0,852). **Gegenargument:** Der Paketwert ist gemessen, die Reichweite ist eine Setzung; wer sie auf 40 % hebt, kommt auf 23,4 Mio. €, noch immer weniger als ein Drittel von 79,8 Mio. €; erst mit \(w_{\text{VG}}\) am oberen Bandende 0,68 erreicht er die Kappung bei 34,9 Mio. €. Andockpunkt nicht \(v_{\text{vers},a}\), weil es auf Ebene der Kommune genau 1 ist | 0.22 übernehmen (überzeichnet: Paketwert für einen Baustein, dazu auf Bänder und Morbidität ohne Evidenz); rohe Lesart als Zentralwert, Wirkung bei Erreichten aus dem rohen Unterschied der Anstiege, 0,68 = 0,498 / 0,728 aus [70] Tabelle 2 (Berlin 23,1 Mio. €; verworfen, weil der rohe Unterschied die höhere Altersstruktur der Stadtteile ohne Programm als Wirkung mitzählt und die Quelle selbst auf −24,4 Pp. bereinigt; bleibt als obere Grenze des Bands); Hebel streichen (P2 verbietet eine unbegründete Nullwirkung; die Maßnahme besteht im Produkt) | Kette 362,9 Mio. € unverändert (Hebel wirkt nur bei Wahl der Maßnahme); Abweichung Bericht ↔ Katalog (0.22 ↔ 0,931 auf 75+ ohne Heimbewohner, Kappung mit \(\delta_{\text{HAP}}\)) geht als Punkt in die Meldung an den cto (eiserne Regel 5) |
 | 44 ⚠ | Wie steht der Hebel S157 zur geparkten Maßnahme `COOLING_ROOMS_DRINKING_WATER`? | (**Stand 26.09.2026, Historie; fortgeschrieben durch Nr. 45 und 46:** seit T-1367-cto ist die Maßnahme aktiv, \(s_{\text{gek}}\) hat die Voreinstellung 0,11, die Kühlzentren haben einen eigenen Hebel \(\delta_{\text{KZ}}\).) **Die Maßnahme bleibt im Produkt geparkt und hat heute keine Wirkung, auch keine Nullwirkung. Beim Aktivieren gilt \(g_{\text{S157}}\) = 0,29 (Band 0–0,90) auf den Heim-Exzess 85+ im gekühlten Anteil \(s_{\text{gek}}\), den die Kommune eingibt; Abschätzung von KAP3** (§5, Befund 130) | Der geparkte Katalog (`backend/app/data/catalog_parked.py`) führt die Maßnahme mit `default_reduction` 0.18 auf die Exposition (`effect_target: exposure`) für alle Menschen. [46] misst dagegen Klimaanlagen in Heimen: Mit ihnen bleiben 29,36 % des Heim-Exzesses (Faktor 0,2936), 70,64 % fallen weg, und zwar nur bei Heimbewohnern ab 85 im gekühlten Anteil. 0.18 auf die Exposition ist also weder dieselbe Größe noch derselbe Personenkreis; wie groß ihre Wirkung in Euro wäre, hängt an der Expositionskette des Produkts und ist mit den 25,0 Mio. € für Berlin nicht vergleichbar. Wie viele Heimplätze gekühlt sind, weiß nur die Kommune, deshalb ist \(s_{\text{gek}}\) ihre Eingabe. Öffentliche Kühlzentren außerhalb der Heime bekommen beim Aktivieren eine eigene Abschätzung nach P2. **Gegenargument:** 0.18 wirkt auf alle Menschen und erfasst damit auch öffentliche Kühlzentren, die der Bericht heute nicht rechnet; wer sie ersetzt, verliert diesen Teil, bis die eigene Abschätzung vorliegt. Weil die Maßnahme geparkt ist, fehlt dadurch heute keiner Kommune eine Wirkung | 0.18 auf die Exposition übernehmen (ohne Beleg aus [46], anderer Personenkreis); S157 ohne Andockpunkt führen (die geparkte Maßnahme ist die einzige passende im Produkt) | Kette 362,9 Mio. € und S157 25,0 Mio. € unverändert; Empfehlung an den cto in der Meldung: beim Aktivieren von `COOLING_ROOMS_DRINKING_WATER` \(g_{\text{S157}}\) auf \(D_{85+} \times h_{\text{Heim}} \times s_{\text{gek}}\) statt 0.18 auf die Exposition (eiserne Regel 5) |
-| 45 ⚠ | Was gilt für S157, wenn die Kommune keinen gekühlten Anteil eingibt, wie rechnet \(h_{\text{Heim}}\) in der Zelle, und mit welcher Wirkung zählt S157 im Anpassungspotenzial? | **Voreinstellung \(s_{\text{gek}}\) = 0,11 (Band 0,05–0,15) für die ganze Kommune, Abschätzung von KAP3** (Block `heat.s_gek`, Befund 138); **\(h_{\text{Heim},z} = q_{\text{pfl},z}\,[1 + \beta_{\text{pfl}}(1 - \bar q_{\text{pfl}})] / [1 + \beta_{\text{pfl}}(q_{\text{pfl},z} - \bar q_{\text{pfl}})]\) je Zelle, Rückfallwert 0,344** (Block `heat.h_heim`, Befund 146); **\(r_{\text{S157}} = a_{85+} \times h_{\text{Heim}} \times s_{\text{gek}} \times (1 - g_{\text{S157}})\) = 0,284 × 0,344 × 0,11 × 0,7064 = 0,0076 im Anpassungspotenzial** (Befund 149; §5) | Eine Nullwirkung ist keine Voreinstellung (P2, A-0010): Ohne Eingabe zeigte S157 keinen Betrag und zählte im Anpassungspotenzial mit 0. 11 % der Pflegeheime haben eine Klimaanlage [71]; 14,5 % der Neubauten des Sozialwesens 2025 haben eine Anlage zur Kühlung [72]; den älteren Bestand setzt KAP3 nicht höher an. Welche Heime gekühlt sind, weiß nur die Kommune, deshalb gilt der Wert für ihre ganze Fläche. Das Produkt führt \(q_{\text{pfl}}\) je Zelle (Log 35); mit derselben Formel wie \(v_{\text{vers}}\) liegen die Heim-Todesfälle in den Zellen der Heime, summiert über die Kommune bleibt es 0,344 × \(D_{85+}\). **Gegenargumente:** (1) Die Umfrage [71] hat 140 Rückmeldungen und ist nicht repräsentativ; „Klimaanlage in der Einrichtung“ heißt nicht, dass alle Plätze gekühlt sind (deshalb unten 0,05). (2) \(a_{85+}\) stammt aus der Rechenkette Berlin (0,284); in Warmsen ist er 0,224, das Anpassungspotenzial dann 0,056 statt 0,057 | Nullwirkung behalten (S157 ohne Eingabe ohne Betrag; verstößt gegen P2) · 0,145 aus [72] als Zentralwert (Neubauten, überzeichnet den Bestand) · 0,344 in jeder Zelle (verteilt Heim-Todesfälle auf Zellen ohne Heim) · S157 mit \(1 - g_{\text{S157}}\) = 0,7064 im Anpassungspotenzial (zählte den Heim-Exzess aller Heime als ganze Hitzemortalität, 0,7064 / 0,0076 = rund 90-mal zu groß) | (**Stand T-1537, Historie; fortgeschrieben durch Nr. 50:** S157 wirkt nur auf \(s_{\text{gek}}\) − 0,06, Berlin bei der Voreinstellung 1,2 Mio. €, Warmsen 469 €, Anpassungspotenzial 0,053.) Kette 362,9 Mio. € unverändert; S157 Berlin (Kette) bei der Voreinstellung 2,7 Mio. € je Jahr (Preisstand 2024; Band 1,2–3,7 Mio. €), alle Heime gekühlt weiter 25,0 Mio. €; Warmsen (Zelllauf) 1.032 € je Jahr; Anpassungspotenzial der Hitzemortalität 0,057 statt 0,050; Umsetzung beim cto (eiserne Regel 5) |
-| 46 ⚠ | Welche Wirkung haben öffentliche Kühlzentren außerhalb der Heime (Log 44, Zusage einer eigenen Abschätzung nach P2)? | **\(\delta_{\text{KZ}}\) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,7064 × 3/24 = 0,995585 (Band 0,982–0,9994) als Faktor auf den Wochenexzess der Bänder 75–84 und 85+ ohne Heimbewohner; mit \(\delta_{\text{HAP}}\) und \(\delta_{\text{VG}}\) zusammen \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}} \times \delta_{\text{KZ}};\ 0{,}794)\); Abschätzung von KAP3** (§5, Block `heat.delta_kuehlzentren`, Befunde 139, 148) | Eine Effektgröße für Kühlzentren hat KAP3 nicht gefunden (Suche 27.09.2026). Die Wirkung im gekühlten Raum ist gemessen (Klimaanlage in Heimen: 70,64 % des Exzesses fallen weg [46]), ebenso wie lange eine Kühlpause wirkt (2 h Kühlung wirken etwa 1 h nach [73]); daraus 0,7064 × 3/24 = 0,0883 für Nutzer. Die Reichweite ist eine Setzung: ein Viertel der Reichweite eines Schutzprogramms, weil nur hingeht, wer in der Hitze das Haus verlässt, und gerade die Gefährdetsten das nicht tun [41]. Plausibel gegen [41]: Besuch kühler Orte OR 0,34, nach Log 10 fünf- bis zehnfach überschätzt, also 0,066–0,132 für Nutzer. **Gegenargumente:** (1) Die Reichweite 5 % ist nicht gemessen; sie ist der stärkste Treiber (Berlin 0,15–1,50 Mio. € über 1–10 %). (2) Das Labor [73] misst die Körpertemperatur, nicht die Sterblichkeit. (3) Jüngere Nutzer zählen nicht (Untergrenze) | Nullwirkung (verstößt gegen P2) · Faktor aus [46] ohne die Stunden (0,7064 für Nutzer; Berlin 6,0 statt 0,75 Mio. €, ein Besuch wirkte wie eine Klimaanlage rund um die Uhr) · Odds Ratio 0,34 aus [41] unmittelbar (Fall-Kontroll-Wert, Log 10) | Kette 362,9 Mio. € unverändert (Hebel wirkt nur bei Wahl der Maßnahme); Berlin (Kette) 0,75 Mio. € je Jahr (Preisstand 2024; Band 0,1–3,0 Mio. €), Warmsen (Zelllauf) 318 €; Andockpunkt `COOLING_ROOMS_DRINKING_WATER`, Umsetzung beim cto (eiserne Regel 5) |
+| 45 ⚠ | Was gilt für S157, wenn die Kommune keinen gekühlten Anteil eingibt, wie rechnet \(h_{\text{Heim}}\) in der Zelle, und mit welcher Wirkung zählt S157 im Anpassungspotenzial? | **Voreinstellung \(s_{\text{gek}}\) = 0,11 (Band 0,05–0,15) für die ganze Kommune, Abschätzung von KAP3** (Block `heat.s_gek`, Befund 138); **\(h_{\text{Heim},z} = q_{\text{pfl},z}\,[1 + \beta_{\text{pfl}}(1 - \bar q_{\text{pfl}})] / [1 + \beta_{\text{pfl}}(q_{\text{pfl},z} - \bar q_{\text{pfl}})]\) je Zelle, Rückfallwert 0,344** (Block `heat.h_heim`, Befund 146); **\(r_{\text{S157}} = a_{85+} \times h_{\text{Heim}} \times s_{\text{gek}} \times (1 - g_{\text{S157}})\) = 0,284 × 0,344 × 0,11 × 0,7064 = 0,0076 im Anpassungspotenzial** (Befund 149; §5) | Eine Nullwirkung ist keine Voreinstellung (P2, A-0010): Ohne Eingabe zeigte S157 keinen Betrag und zählte im Anpassungspotenzial mit 0. 11 % der Pflegeheime haben eine Klimaanlage [71]; 14,5 % der Neubauten des Sozialwesens 2025 haben eine Anlage zur Kühlung [72]; den älteren Bestand setzt KAP3 nicht höher an. Welche Heime gekühlt sind, weiß nur die Kommune, deshalb gilt der Wert für ihre ganze Fläche. Das Produkt führt \(q_{\text{pfl}}\) je Zelle (Log 35); mit derselben Formel wie \(v_{\text{vers}}\) liegen die Heim-Todesfälle in den Zellen der Heime, summiert über die Kommune bleibt es 0,344 × \(D_{85+}\). **Gegenargumente:** (1) Die Umfrage [71] hat 140 Rückmeldungen und ist nicht repräsentativ; „Klimaanlage in der Einrichtung“ heißt nicht, dass alle Plätze gekühlt sind (deshalb unten 0,05). (2) \(a_{85+}\) hängt am Altersaufbau; seit Befund 183 rechnet die Methodik ihn je Kommune aus ihrem Zelllauf (Berlin 0,262, Warmsen 0,224; die 0,284 der Kette sind das Beispiel), das Anpassungspotenzial ist in beiden Kommunen 0,064 (δ_HAP = 0,939, S157 nur über dem Stand der Kalibrierjahre, §5); im Produkt gilt bis zum Code-Nachzug die Berliner Konstante (Befunde 195 und 203) | Nullwirkung behalten (S157 ohne Eingabe ohne Betrag; verstößt gegen P2) · 0,145 aus [72] als Zentralwert (Neubauten, überzeichnet den Bestand) · 0,344 in jeder Zelle (verteilt Heim-Todesfälle auf Zellen ohne Heim) · S157 mit \(1 - g_{\text{S157}}\) = 0,7064 im Anpassungspotenzial (zählte den Heim-Exzess aller Heime als ganze Hitzemortalität, 0,7064 / 0,0076 = rund 90-mal zu groß) | (**Stand T-1537, Historie; fortgeschrieben durch Nr. 50:** S157 wirkt nur auf den gekühlten Anteil über dem Stand der Kalibrierjahre; die geltenden Werte stehen dort.) Kette 362,9 Mio. € unverändert; S157 Berlin (Kette) bei der Voreinstellung 2,7 Mio. € je Jahr (Preisstand 2024; Band 1,2–3,7 Mio. €), alle Heime gekühlt weiter 25,0 Mio. €; Warmsen (Zelllauf) 1.032 € je Jahr; Anpassungspotenzial der Hitzemortalität 0,057 statt 0,050; Umsetzung beim cto (eiserne Regel 5) |
+| 46 ⚠ | Welche Wirkung haben öffentliche Kühlzentren außerhalb der Heime (Log 44, Zusage einer eigenen Abschätzung nach P2)? | **\(\delta_{\text{KZ}}\) = 1 − \(r_{\text{KZ}} \times w_{\text{KZ}}\) = 1 − 0,05 × 0,7064 × 3/24 = 0,995585 (Band 0,982–0,9994) als Faktor auf den Wochenexzess der Bänder 75–84 und 85+ ohne Heimbewohner; mit \(\delta_{\text{HAP}}\) und \(\delta_{\text{VG}}\) zusammen \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}} \times \delta_{\text{KZ}};\ 0{,}794)\); Abschätzung von KAP3** (§5, Block `heat.delta_kuehlzentren`, Befunde 139, 148) | Eine Effektgröße für Kühlzentren hat KAP3 nicht gefunden (Suche 27.09.2026). Die Wirkung im gekühlten Raum ist gemessen (Klimaanlage in Heimen: 70,64 % des Exzesses fallen weg [46]), ebenso wie lange eine Kühlpause wirkt (2 h Kühlung wirken etwa 1 h nach [73]); daraus 0,7064 × 3/24 = 0,0883 für Nutzer. Die Reichweite ist eine Setzung: ein Viertel der Reichweite eines Schutzprogramms, weil nur hingeht, wer in der Hitze das Haus verlässt, und gerade die Gefährdetsten das nicht tun [41]. Plausibel gegen [41]: Besuch kühler Orte OR 0,34, nach Log 10 fünf- bis zehnfach überschätzt, also 0,066–0,132 für Nutzer. **Gegenargumente:** (1) Die Reichweite 5 % ist nicht gemessen; sie ist der stärkste Treiber (Berlin 0,15–1,50 Mio. € über 1–10 %). (2) Das Labor [73] misst die Körpertemperatur, nicht die Sterblichkeit. (3) Jüngere Nutzer zählen nicht (Untergrenze) | Nullwirkung (verstößt gegen P2) · Faktor aus [46] ohne die Stunden (0,7064 für Nutzer; Berlin 6,0 statt 0,75 Mio. €, ein Besuch wirkte wie eine Klimaanlage rund um die Uhr) · Odds Ratio 0,34 aus [41] unmittelbar (Fall-Kontroll-Wert, Log 10) | Kette 362,9 Mio. € unverändert (Hebel wirkt nur bei Wahl der Maßnahme); Berlin (Kette) 0,75 Mio. € je Jahr (Preisstand 2024; Band 0,1–3,0 Mio. €), Warmsen (Zelllauf) 322 € (mit σ = 0,58 K, Befund 181); Andockpunkt `COOLING_ROOMS_DRINKING_WATER`, Umsetzung beim cto (eiserne Regel 5) |
 | 47 ⚠ | Was gilt beim Doppelzählungs-Wächter der Schutzprogramme (und der Kühlzentren), bis die Kommune angibt, ob das Programm schon in den Kalibrierjahren lief? | **Eingabe ja/nein je Maßnahme, Voreinstellung „nein“, Abschätzung von KAP3** (Block `heat.vg_in_kalibrierjahren`, Befund 150; §5); bei „ja“ gilt \(\delta_{\text{VG}}\) = \(\delta_{\text{VG,morb}}\) = 1 bzw. \(\delta_{\text{KZ}}\) = 1 | Ein Programm, das schon 2012–2024 lief, ist keine zusätzliche Maßnahme; seine Wirkung gehört zum Anpassungsstand des Basiswerts (Kapitel 1 (a)). Solche Programme waren selten: 18 veröffentlichte kommunale Hitzeaktionspläne bundesweit am 10.06.2024, in Nordrhein-Westfalen 4 von 53 Kreisen und kreisfreien Städten im Oktober 2023, also 7,5 % [76]. Auf Berliner Größe ist der erwartete Fehler mit „nein“ höchstens 7,5 % × 11,7 = 0,9 Mio. €, mit „ja“ mindestens 92,5 % × 11,7 = 10,8 Mio. €. **Gegenargument:** Die Zahlen stammen vom Ende des Kalibrierfensters und aus einem Land und zählen Pläne, nicht einzelne Programme; ein älteres Hitzetelefon ohne Plan fehlt darin. Eine Kommune, die es hatte und nicht antwortet, zählt seine Wirkung doppelt | Voreinstellung „ja“ (jede Kommune ohne Antwort ohne Wirkung der Schutzprogramme, Berlin 0 statt 11,7 Mio. € je Jahr; Unterschätzung für mehr als 90 % der Kommunen und Nullwirkung gegen P2) · keine Eingabe, Wächter nur als Text (Stand bis T-1538; das Produkt kann ihn nicht anwenden) | Kette 362,9 Mio. € und Schutzprogramme Berlin 11,7 Mio. € je Jahr unverändert (Voreinstellung „nein“ rechnet wie bisher); Umsetzung beim cto (eiserne Regel 5) |
 | 48 ⚠ | Ist die Kappung 0,794 ein eigener Parameter oder nur das Band von \(\delta_{\text{VG}}\)? | **eigener Block `heat.kappung_vg`: 0,794 (Band 0,743–0,842), Abschätzung von KAP3** (Befund 151; §5) | Ein Wert, der den Betrag begrenzt, ist ein Parameter mit Herleitung (P1). 0,794 = 1 − 0,206 aus [47], Tabelle 1 (Deutschland, 15,8–25,7 %); `abschaetzung_kap3`, weil der Paketwert aller Altersgruppen für die Hebel auf den Bändern ab 75 ohne Heim steht (Log 40). Er ist zugleich das untere Bandende von \(\delta_{\text{VG}}\) (ohne Kappung 0,728) und greift bei \(\delta_{\text{HAP}}\) = 0,852 (0,793) und bei Reichweite und Wirkung am oberen Ende. **Gegenargument:** Der Wert ist ein Zentralwert mit Intervall; eine feste Kappung verschiebt den Betrag dort, wo sie greift, über ihr Band um 26,8–43,6 Mio. € | nur im Band von \(\delta_{\text{VG}}\) führen (Grenze ohne eigenen Block, P1 verletzt) · Quellenwert `quelle` (verdeckt, dass der Paketwert für eine andere Größe steht) · ohne Kappung (Berlin am oberen Ende 46,1 statt 34,9 Mio. €) | keine Zahl betroffen; Kette 362,9 Mio. € unverändert; Umsetzung beim cto (Konstante `VG_PAKET_DE` wird Registry-Parameter) |
 | 49 ⚠ | Welches Band tragen \(f_a\) und \(\bar L_a\), und wie stark verschieben sie den Betrag? | **\(f_a\): Rückrechnung mit den Altersanteilen der Sommer 2025 [74] und 2026 [75], 0,156–0,562 / 0,341–0,753 / 0,588–0,659 / 1,0; \(\bar L_a\): Stützstelle bis sterbefallgewichteter Wert, 23,39–28,64 / 15,31–15,59 / 8,54–8,90 / 4,16–4,20 J; beides Abschätzung von KAP3** (Befund 152; §3.3a, §3.5, §5) | Beide Blöcke hatten kein Band (\(\bar L_a\) nur für 85+). Die Altersanteile schwanken von Sommer zu Sommer; die Sterbefälle je Altersjahr [49] und die Sterbetafel [48] erlauben für alle Bänder denselben Rechenweg wie für 85+. Berlin (Kette): \(f_a\) 310,2–402,9 Mio. € mit neu gefittetem \(c_{\text{kal}}\) (0,651 und 0,534), \(\bar L_a\) 357,3–381,1 Mio. €. **Gegenargument:** Zwei Sommer sind keine Verteilung; die RKI-Zahlen sind laufende, gerundete Schätzungen. Die sterbefallgewichteten \(\bar L_a\) liegen für 65–74 und 75–84 unter den Stützstellen; der zutreffende Wert liegt dort am unteren Bandende | \(f_a\) tauschen und \(c_{\text{kal}}\) festhalten (277,0–438,3 Mio. €, fast doppelt so weit; die Zahl der Hitzetoten passte nicht mehr zur RKI-Reihe) · Band aus der Toleranz der Altersvalidierung ± 5 Pp. (nicht gemessen) | keine Zahl betroffen; Kette 362,9 Mio. € unverändert; Blöcke `heat.f_alter` und `heat.l_restlebenserwartung` tragen die Bänder |
-| 50 ⚠ | Zählt S157 den heutigen Bestand an Klimaanlagen in Heimen, der schon in den Kalibrierjahren lief? | **Nein: S157 wirkt auf \(\max(s_{\text{gek}} - 0{,}06;\ 0)\), den Anteil über dem Stand der Kalibrierjahre; 0,06 (Band 0,04–0,09) Abschätzung von KAP3** (Block `heat.s_gek_kalib`, Befund 165; §5). Die Kommune gibt weiter ihren heutigen Anteil \(s_{\text{gek}}\) ein (Voreinstellung 0,11), den Abzug rechnet das Produkt | \(c_{\text{kal}}\) ist an die Hitzetoten 2012–2024 angepasst; was in diesen Jahren an Klimaanlagen lief, steckt im Basiswert (Kapitel 1 (a)). Ohne Zeitreihe gekühlter Heimplätze setzt KAP3 das Wachstum wie bei den Neubauten des Sozialwesens mit Kühlung, 5,7 % (2015) zu 14,5 % (2025) [72]: Stand 2015 = 11 % × 5,7 / 14,5 = 4,3 % [71], 0,67 Prozentpunkte je Jahr, Mittel der Kalibrierjahre = Stand 2018 = 6,3 %. **Gegenargumente:** (1) Heime werden eher nachgerüstet als neu gebaut, die Neubauten zeigen nur die Richtung; wuchs der Bestand erst nach 2024, ist die Wirkung höher (bis 0,07). (2) Der Abzug nimmt das Mittel Deutschlands, nicht den Stand der Kommune, weil der Basiswert für alle Kommunen an dieselbe Reihe angepasst ist. (3) Die schon gekühlten Plätze tragen im Basiswert nur 29 % ihres Exzesses; der Abzug unterschätzt die Wirkung um rund 4 % | ganzen Bestand 0,11 zählen (Berlin 2,7 statt 1,2 Mio. €; mehr als die Hälfte wäre Wirkung, die schon im Basiswert steckt) · Wächter-Frage ja oder nein wie bei \(\delta_{\text{VG}}\) (ein Anteil ist kein Ja oder Nein) · Voreinstellung 0 (Nullwirkung gegen P2) | Kette 362,9 Mio. € unverändert; S157 Berlin (Kette) bei der Voreinstellung 1,2 Mio. € je Jahr (Preisstand 2024; über den Bestand 0,5–1,7 Mio. €, über \(s_{\text{gek}}\) 0–2,2 Mio. €), voller Anteil 25,0 Mio. €, heute alle Heime gekühlt 23,5 Mio. €; Warmsen (Zelllauf) 469 € je Jahr; Anpassungspotenzial 0,053 statt 0,057; Umsetzung beim cto (eiserne Regel 5) |
+| 50 ⚠ | Zählt S157 den heutigen Bestand an Klimaanlagen in Heimen, der schon in den Kalibrierjahren lief? | **Nein: S157 wirkt auf \(\max(s_{\text{gek}} - 0{,}06;\ 0)\), den Anteil über dem Stand der Kalibrierjahre; 0,06 (Band 0,04–0,09) Abschätzung von KAP3** (Block `heat.s_gek_kalib`, Befund 165; §5). Die Kommune gibt weiter ihren heutigen Anteil \(s_{\text{gek}}\) ein (Voreinstellung 0,11), den Abzug rechnet das Produkt | \(c_{\text{kal}}\) ist an die Hitzetoten 2012–2024 angepasst; was in diesen Jahren an Klimaanlagen lief, steckt im Basiswert (Kapitel 1 (a)). Ohne Zeitreihe gekühlter Heimplätze setzt KAP3 das Wachstum wie bei den Neubauten des Sozialwesens mit Kühlung, 5,7 % (2015) zu 14,5 % (2025) [72]: Stand 2015 = 11 % × 5,7 / 14,5 = 4,3 % [71], 0,67 Prozentpunkte je Jahr, Mittel der Kalibrierjahre = Stand 2018 = 6,3 %. **Gegenargumente:** (1) Heime werden eher nachgerüstet als neu gebaut, die Neubauten zeigen nur die Richtung; wuchs der Bestand erst nach 2024, ist die Wirkung höher (bis 0,07). (2) Der Abzug nimmt das Mittel Deutschlands, nicht den Stand der Kommune, weil der Basiswert für alle Kommunen an dieselbe Reihe angepasst ist. (3) Die schon gekühlten Plätze tragen im Basiswert nur 29 % ihres Exzesses; der Abzug unterschätzt die Wirkung um rund 4 % | ganzen Bestand 0,11 zählen (Berlin 2,7 statt 1,2 Mio. €; mehr als die Hälfte wäre Wirkung, die schon im Basiswert steckt) · Wächter-Frage ja oder nein wie bei \(\delta_{\text{VG}}\) (ein Anteil ist kein Ja oder Nein) · Voreinstellung 0 (Nullwirkung gegen P2) | Kette 362,9 Mio. € unverändert; S157 Berlin (Kette) bei der Voreinstellung 1,2 Mio. € je Jahr (Preisstand 2024; über den Bestand 0,5–1,7 Mio. €, über \(s_{\text{gek}}\) 0–2,2 Mio. €), voller Anteil 25,0 Mio. €, heute alle Heime gekühlt 23,5 Mio. €; Warmsen (Zelllauf) 475 € je Jahr (mit σ = 0,58 K, Befund 181); Anpassungspotenzial 0,064 statt 0,068 (mit δ_HAP = 0,939, Befunde 194 und 200); Umsetzung beim cto (eiserne Regel 5) |
+| 51 ⚠ | Mit welcher Streuung rechnet die Wärmeinsel-Feinstruktur unter 1 km, und mit welchem Faktor steht sie im Bericht? | **σ = 0,58 K (Herleitung 2/√12 = 0,577 K, gerundet), ein Faktor: Zelllauf mit gegen ohne Feinstruktur, Berlin × 1,028, Warmsen × 1,048 (§3.0 Wirkung (d))**, Abschätzung von KAP3 (Befunde 181, 182; Entscheidung des methodik_manager in T-1646) | Die Herleitung in §4 (Spanne ± 1 K, Gleichverteilung) ergibt 0,577 K; „abgerundet, eher unterschätzend“ ist kein Grund, den die Herleitung kennt. Die Anpassung von \(c_{\text{kal}}\) verwendet kein σ, \(c_{\text{kal}}\) bleibt. Nur die Rest-Bias-Diagnose des Kalibrierlaufs Rev. 7 rechnet mit 0,5 K (`calibrate_heat_mortality_rev7.py` Z. 342, Ergebnis [50] Z. 33–34); sie ist eine Kennzahl, kein Faktor im Betrag, und läuft nach dem Code-Nachzug mit 0,58 K neu (Übernahmeliste, Befund 197). Der Faktor am Punkt der Kette und ein Bereich in §4 waren zwei weitere Zahlen für dieselbe Wirkung; im Betrag steckt nur der Zelllauf. **Gegenargument:** Die Spanne ± 1 K ist selbst nicht gemessen; ein Stadtmodell könnte eine kleinere Streuung zeigen (Stichproben-Abgleich, §4) | 0,5 K behalten (Setzung ohne Grund außerhalb der Herleitung) · 0,577 K ungerundet (0,025 % am Betrag, unter jeder Anzeigestelle) · Faktor am Punkt der Kette (gilt nur für Berlin-Mitte, nicht für die Kommune) | Kette 362,9 Mio. € unverändert; Zelllauf Berlin 345,11 Mio. € (Produkt 345,03 Mio. €), Warmsen 175.256 € (Produkt 175.116 €), Werte vorher im Ledger (Befund 181); Umsetzung über die Übernahmeliste beim cto (eiserne Regel 5) |
