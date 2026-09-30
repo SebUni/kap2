@@ -388,7 +388,9 @@ Altersbänder der Kommune in Ebene 1, nie die des Landes.
 **Stärkster Treiber** ist der Klimaanteil \(a_{\text{attr}}\) (Ebene 6): Sein Band 0,19–0,41
 (Anderegg [9], Kap. 2) setzt Tage und Euro für Berlin auf das 0,70- bis 1,52-Fache (−30 % bis +52 %), also 1,78–3,84 Mio. €
 je Jahr. Nachgeprüft an den übrigen Bändern aus Kapitel 7: \(f\) (0,50–0,85) wirkt nur auf die Tage, −29 % bis
-+21 %; \(p_B/p_G\) wirkt auf die Tage −23 % bis +19 % und auf den Euro-Betrag −6 % bis +8 % (Kap. 1); \(\lambda\)
++21 %; \(p_B/p_G\) wirkt auf die Tage −23 % bis +19 % und auf den Euro-Betrag −6 % bis +8 % (Kap. 1); \(L_B/L_G\)
+(20–45 und 45–80 Tage, Kap. 7 `pollen.l_saison`) wirkt über \(d_{\text{Saison}}\) nur auf den Euro-Betrag, −27 % bis
++37 % (1,84–3,48 Mio. €); \(\lambda\)
 ändert die Summe der Kommune im Ausgangsstand nicht (Ebene 7). Weiter reicht nur das Band des Kostensatzes nach oben (Obergrenze 23,66 € je Tag aus
 Schramm [7] für mittelschwer bis schwer Erkrankte, damit 9,7 Mio. €); es ist einseitig und
 wirkt nur auf den Euro-Betrag, nicht auf die Tage (§3.5).
@@ -448,6 +450,9 @@ assert abs(verschiebung - 1_737) < 1 and abs(verschiebung / B - 0.0043) < 0.0001
 assert abs(euro * 0.19 / a_attr / 1e6 - 1.78) < 0.005 and abs(0.19 / a_attr - 0.70) < 0.005
 assert abs(euro * 0.41 / a_attr / 1e6 - 3.84) < 0.005 and abs(0.41 / a_attr - 1.52) < 0.005
 assert abs(tage * 23.66 / 1e6 - 9.7) < 0.05
+L_lo, L_hi = 0.55 * 20 + 0.75 * 45, 0.55 * 45 + 0.75 * 80   # Kap. 7 pollen.l_saison, Bandenden (Befund 260)
+assert abs(euro * 61.5 / L_hi / 1e6 - 1.84) < 0.005 and abs(euro * 61.5 / L_lo / 1e6 - 3.48) < 0.005
+assert round((61.5 / L_hi - 1) * 100) == -27 and round((61.5 / L_lo - 1) * 100) == 37
 # Zelllauf des Produkts mit Ersatzregel #95 §3.3 (40.669 Zellen, gepinnte Zelldaten; Anlage
 # 96_zelllauf_bandsummen.py, Lauf 30.09.2026): Bandsummen, Zerlegung, Toleranz
 zell = {"u20": 655_066, "20-64": 2_230_974, "65-74": 341_087, "75-84": 267_692, "85+": 98_539}
@@ -966,18 +971,31 @@ Näherungslauf involviert).
   Standardfehler des Mittels, §3.1). Beide Mittel liegen mehr als 20 Standardfehler über null
   (4,79 ÷ 0,23 ≈ 21; 4,06 ÷ 0,18 ≈ 23). Schon ab etwa zwei Standardfehlern gilt ein Mittel
   üblicherweise als nicht zufällig von null verschieden; ein Zufallsergebnis ist hier damit praktisch
-  ausgeschlossen. \(\delta\)-Band aus dem Band des Klimaanteils \(a_{\text{attr}}\) (IQR 0,19–0,84, Kap. 2):
-  0,76–3,34 Tage je Betroffenem·Jahr (Basis 1,99). Externe Obergrenzen-Plausibilisierung:
-  Anderegg [9] misst +8 Tage Saisonlänge (Nordamerika, ~30 Jahre) — klimaattribuiert ≈
-  4 Tage; unsere angesetzten 1,99 Tage je Patient (mit Sensibilisierungs-Gewichten < 1)
-  liegen **darunter** ⇒ konservativ konsistent.
-- **Monetär:** Bundessumme = 8,96 Mio. Betroffene × 1,99 Tage × 6,20 € ≈ **110 Mio.
-  € je Jahr** (Preisstand 2024; Band ≈ 42–186 Mio. über das Band des Klimaanteils, IQR 0,19–0,84; obere
-  \(c_{\text{Tag}}\)-Sensitivität 23,66 € ⇒ ≈ 420 Mio.). Einordnung gegen amtliche Rahmen:
-  impliziter Klimaanteil an den AR-Behandlungskosten = \(\delta/d_{\text{Saison}}\) =
-  1,99/43,05 = **4,6 %** — innerhalb des publizierten Bands klimaattribuierter
-  Allergiekosten-Anteile (≈ 3–20 %, M0-Herleitung aus \(\Delta S/S\)-Trends × Attribution
-  [4–6,9]); Bundessumme ≪ Krankheitskosten des J-Kapitels (16,5 Mrd. €, KKR 2015 [66]) und
+  ausgeschlossen. \(\delta\)-Band aus dem Band des Klimaanteils \(a_{\text{attr}}\) (0,19–0,41, Kap. 2):
+  0,76–1,63 Tage je Betroffenem·Jahr (Basis 1,07). **Größenordnung gegen [9], beim selben \(a_{\text{attr}}\)
+  (Befund 258, Log 28):** [9] misst für Nordamerika 1990–2018 „lengthening of the pollen season by ∼8 d“
+  (Results and Discussion, Absatz zu Abb. 1); der Klimaanteil daran ist 8 Tage × \(a_{\text{attr}}\). Das Modell setzt je
+  Betroffenem \(\delta\) = 0,70 × 5,6795 Tage × \(a_{\text{attr}}\) = 3,98 Tage × \(a_{\text{attr}}\) an. Der Anteil steht auf beiden
+  Seiten und kürzt sich: 3,98 Tage liegen unter 8 Tagen, also liegt \(\delta\) bei jedem \(a_{\text{attr}}\) darunter, bei
+  rund der Hälfte. Am Basiswert 0,27 sind es 1,07 gegen 2,16 Tage, über das Band 0,76–1,63 Tage gegen
+  1,52–3,28 Tage. Das prüft nur die Größenordnung: Die 8 Tage gelten der ganzen Saison in Nordamerika,
+  \(\delta\) den Beschwerdetagen eines Betroffenen in Deutschland (mit \(f\) = 0,70 und den Anteilen \(p_B\), \(p_G\) < 1).
+  Ein Quotient \(\delta \div f\) wird deshalb nicht gebildet.
+- **Monetär:** Bundessumme = 8,96 Mio. Betroffene × 1,07 Tage × 6,20 € ≈ **60 Mio.
+  € je Jahr** (Preisstand 2024; 9,62 Mio. Symptomtage; Band ≈ 42–91 Mio. € über das Band des Klimaanteils
+  0,19–0,41; obere \(c_{\text{Tag}}\)-Sensitivität 23,66 € ⇒ ≈ 228 Mio. €). **Anteil an den Behandlungskosten,
+  beim selben \(a_{\text{attr}}\) wie oben:** \(\delta/d_{\text{Saison}}\) = 1,07/43,05 = **2,5 %**. Er zerlegt sich wie der
+  physische Vergleich: \(\delta/d_{\text{Saison}} = (\sum p\,\Delta S \div \sum p\,L) \times a_{\text{attr}}\) =
+  (5,6795 ÷ 61,5) × 0,27, also 9,2 % Saisonverlängerung im Modell mal Klimaanteil. Einen belegten Wert für die
+  Verlängerung als Anteil der Saison, gegen den die 9,2 % zu stellen wären, gibt es nicht: [9] nennt rund 8 Tage,
+  aber keine mittlere Saisonlänge (gelesen: Abstract, Results and Discussion, Methods), [6] beschreibt die
+  Verlängerung ohne Zahl. Der Vergleich ist deshalb **kein Prüfstein**. Zur Einordnung das Ergebnis der früheren
+  M0-Herleitung (Anteil der Saisonverschiebung 0,15–0,25 mal Attribution): Ihre untere Grenze
+  0,15 × 0,19 = 2,85 %, also ≈ 2,9 %, liegt knapp über den 2,5 % des Modells. Das Modell liegt damit eher zu
+  niedrig, in derselben Richtung wie die Aussage in §3.5, der Euro-Betrag sei eine Untergrenze. Das Band jener
+  Herleitung war keine publizierte Spanne und entfällt, weil Log 2 den Anteil der Saisonverschiebung als nicht
+  hergeleitet verwirft (Log 28). Kein Parameter ist geändert, um einen Vergleich zu bestehen, und kein Band
+  geweitet (Aufgabe §5). **Getrennt davon die amtlichen Rahmen:** Bundessumme ≪ Krankheitskosten des J-Kapitels (16,5 Mrd. €, KKR 2015 [66]) und
   deutlich unter dem Asthma-Vergleichswert (1,9 Mrd. €, KKR 2015 [66]). Eine amtliche
   **J30-Untergrenze existiert nicht** — dokumentierte Datenlücke mit Beleg [66]
   (Ersetzungspfad: exakte J30-Beträge aus GENESIS 23631/GBE-Bund interaktiv ziehen,
@@ -990,13 +1008,26 @@ Näherungslauf involviert).
 
 ```python test: beispiel_96_bundessumme
 betroffene = 8_959_105          # §3.2-Konvention: gerundete Band-p (verbindliche Produktwerte)
-delta_de   = 0.70 * (0.55*4.79 + 0.75*4.06) * 0.50
+a_attr     = 0.27                                    # Kap. 7 pollen.a_attr (Befund 258)
+gew_de     = 0.55*4.79 + 0.75*4.06
+delta_de   = 0.70 * gew_de * a_attr
 dt = betroffene * delta_de
-assert abs(delta_de - 1.988) < 0.002
-assert abs(dt / 1e6 - 17.8) < 0.1                    # 17,8 Mio Symptomtage/Jahr
-assert abs(dt * 6.20 / 1e6 - 110) < 2                # ~110 Mio EUR_2024/Jahr
-assert abs(delta_de / 43.05 * 100 - 4.62) < 0.05     # impliziter Klimaanteil 4,6 %
-assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-Band
+assert abs(delta_de - 1.073) < 0.002
+assert abs(dt / 1e6 - 9.62) < 0.01                   # 9,62 Mio Symptomtage/Jahr
+assert abs(dt * 6.20 / 1e6 - 60) < 1                 # ~60 Mio EUR_2024/Jahr
+assert abs(dt * 6.20 * 0.19 / a_attr / 1e6 - 42) < 1 and abs(dt * 6.20 * 0.41 / a_attr / 1e6 - 91) < 1
+assert abs(dt * 23.66 / 1e6 - 228) < 1               # obere c_Tag-Sensitivitaet
+# (a) physisch beim selben a_attr: 0,70 x 5,6795 = 3,98 Tage x a_attr gegen 8 Tage x a_attr [9]
+assert abs(0.70 * gew_de - 3.98) < 0.005 and 0.70 * gew_de < 8
+assert abs(8 * a_attr - 2.16) < 1e-9 and abs(delta_de - 1.07) < 0.005
+assert (round(0.70 * gew_de * 0.19, 2), round(0.70 * gew_de * 0.41, 2)) == (0.76, 1.63)
+assert (round(8 * 0.19, 2), round(8 * 0.41, 2)) == (1.52, 3.28)
+# (b) monetaer: delta / d_Saison = (Summe p dS / Summe p L) x a_attr; kein Pruefstein ohne belegten Wert
+d_saison = 0.70 * (0.55*30 + 0.75*60)
+assert abs(delta_de / d_saison - gew_de / 61.5 * a_attr) < 1e-12
+assert abs(gew_de / 61.5 * 100 - 9.2) < 0.05          # 9,2 % Saisonverlaengerung im Modell
+assert abs(delta_de / d_saison * 100 - 2.5) < 0.05    # impliziter Klimaanteil 2,5 %
+assert abs(0.15 * 0.19 - 0.0285) < 1e-12              # untere Grenze der M0-Herleitung, ~2,9 %
 ```
 
 - **Verteilschlüssel-Test (§3.1):** strikt bottom-up — Zelle ohne Bevölkerung → 0;
@@ -1012,8 +1043,8 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   Stationsspitzen, Mittel darunter — konsistent), Birke −6,4 (Endler: 1–1,5 Wochen für
   1991–2017 — konsistent), Vorfrühlings-Verschiebung DWD ≈ −17 Tage [5] als Rahmen ✓.
   Regionale Streuung der \(\Delta S\)-Werte: \(\Delta S_B\) −17 % bis +24 %, \(\Delta S_G\)
-  −9 % bis +18 % um das Bundesmittel; \(\delta\) je Region nur −5 % bis +6 % (1,88–2,12
-  gegen 1,99) —
+  −9 % bis +18 % um das Bundesmittel; \(\delta\) je Region nur −5 % bis +6 % (1,01–1,14
+  gegen 1,07) —
   die Zellverteilung wird von \(\text{pop} \times p_{\text{AR}} \times \hat P\) dominiert.
   **Toleranzen je Referenz (vorab fixiert, nur Referenzen mit definierter
   Vergleichsgröße; Befund 108):** (a) früheste Frühblüher (Hasel) gegen die
@@ -1068,19 +1099,19 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   unten) sind das 0,078, also 7,8 Pp. weniger Kronenfläche. Artenwahl nach GALK-/allergologischer
   Liste [6].
   **Abschätzung am Zahlenbeispiel (§3.9 ABGESCHÄTZT, Log 24):** Eine Allee-Zelle in Berlin mit
-  100 Betroffenen und \(\hat G/\bar G_0\) = 2 hat \(\hat P\) = 1,7 und 100 × 1,8795 × 1,7 = 319,5
+  100 Betroffenen und \(\hat G/\bar G_0\) = 2 hat \(\hat P\) = 1,7 und 100 × 1,01493 × 1,7 = 172,5
   Zusatztage; nach der Pflanzung (Kronenanteil mit Gattungs-Tag der Birkengruppe um
   0,2 × Ḡ₀ / 0,464 gesenkt; bei Ḡ₀ = 0,18125 der Beispielkommune wären das 0,078, das Ḡ₀ Berlins
-  weist der Bericht nicht aus) ist \(\hat G/\bar G_0\) = 1,8, \(\hat P\) = 1,56, also 293,2 Tage.
-  **Wirkung: −26,3 Tage je Jahr (−8,2 %), ≈ 163 € je Jahr** (\(c_{\text{Tag}}\) = 6,20 €); Band über
-  λ: −11,3 Tage (λ = 0,3) bis −37,6 Tage (λ = 1,0). **Sensitivität:** linear in λ und in der
+  weist der Bericht nicht aus) ist \(\hat G/\bar G_0\) = 1,8, \(\hat P\) = 1,56, also 158,3 Tage.
+  **Wirkung: −14,2 Tage je Jahr (−8,2 %), ≈ 88 € je Jahr** (\(c_{\text{Tag}}\) = 6,20 €); Band über
+  λ: −6,1 Tage (λ = 0,3) bis −20,3 Tage (λ = 1,0). **Sensitivität:** linear in λ und in der
   Senkung des Kronenanteils; stärkster Treiber ist λ (Faktor 3,3 zwischen den Bandenden).
   **Wirkungsort:** ausschließlich über \(\hat G\) der Zelle, die im Zelllauf neu berechnet wird.
   **Wirkung auf die Kommunensumme (Rev. 4, Log 26; Log 19 verworfen):** Weil Ḡ₀ festgehalten
   wird, ändern sich die übrigen Zellen nicht. Die Kommunensumme sinkt um genau die Senkung in den
   bepflanzten Zellen, \(\lambda \cdot \sum B\,(\hat G - \hat G')/\bar G_0\) Betroffene (§3.3), mal
-  \(\delta_R\) in Tagen. Die Berliner Allee-Zelle oben senkt die Summe Berlins also um 26,3 Tage und
-  ≈ 163 € je Jahr; die Tage verteilen sich nicht auf andere Zellen. Unter der früheren Regel
+  \(\delta_R\) in Tagen. Die Berliner Allee-Zelle oben senkt die Summe Berlins also um 14,2 Tage und
+  ≈ 88 € je Jahr; die Tage verteilen sich nicht auf andere Zellen. Unter der früheren Regel
   (Ḡ in jedem Lauf neu gebildet, Log 19) stimmte die Aussage nicht, eine solche Pflanzung senke
   die Summe der Kommune; mit festgehaltenem Ḡ₀ stimmt sie.
   **Toleranz der Allee-Zelle (Befund 250):** ± 0,05 Tage und ± 0,5 €, die halbe Einheit der
@@ -1101,16 +1132,16 @@ assert 0.03 <= delta_de / 43.05 <= 0.20              # im publizierten a_klima-B
   ganz stehen. **Größe an der Allee-Zelle:** Die Allee-Zelle oben führt ihre Kronen mit
   Gattungs-Tag; \(s_{\text{unbek}}\) geht dort nicht ein, der Fehler ist null. Stehen dieselben
   Kronen (Kronenanteil 0,3625) in OSM ohne Gattungs-Tag, wie meist, rechnet das Produkt mit 0,12:
-  \(\hat G\) = 0,2145, 212,1 Zusatztage im Ausgangsstand und 3,16 vermiedene Tage (≈ 19,58 € je Jahr)
-  für dieselbe Pflanzung. Mit einem Wert für diese Zelle wären es bei 0,05 203,5 und 1,32 Tage
-  (≈ 8,16 €), bei 0,25 227,9 und 6,58 Tage (≈ 40,79 €). Die Zusatztage liegen damit 4,2 % zu hoch
+  \(\hat G\) = 0,2145, 114,5 Zusatztage im Ausgangsstand und 1,71 vermiedene Tage (≈ 10,57 € je Jahr)
+  für dieselbe Pflanzung. Mit einem Wert für diese Zelle wären es bei 0,05 109,9 und 0,71 Tage
+  (≈ 4,40 €), bei 0,25 123,1 und 3,55 Tage (≈ 22,02 €). Die Zusatztage liegen damit 4,2 % zu hoch
   bis 7,0 % zu niedrig, die vermiedenen Tage um den Faktor 2,4 zu hoch bis 2,08 zu niedrig; die
   Senkung ist linear in \(s_{\text{unbek}}\). Ḡ₀ bleibt dabei fest (Log 26); ein eigener Wert in nur
   einer Zelle bewegt Ḡ₀ ohnehin kaum, in Berlin (393.299 Betroffene, §3.0) um weniger als 0,00001.
   **Ersetzungspfad:** das Baumkataster der Kommune je Zelle im Ausgangsstand (§3.3).
 
 ```python test: beispiel_96_stadtbaum_allee
-lam, delta, c_tag = 0.7, 1.8795, 6.20       # Kap. 7 pollen.lambda_veg, Ebene 6, Kap. 7 pollen.c_tag
+lam, delta, c_tag = 0.7, 1.01493, 6.20       # Kap. 7 pollen.lambda_veg, Ebene 6, Kap. 7 pollen.c_tag
 w_b, g0, B = 0.464, 0.18125, 100            # Ebenendefinition §3.3, Ḡ₀ der Beispielkommune, Betroffene
 tol_tage, tol_euro = 0.05, 0.5               # Toleranz der Allee-Zelle (Befund 250), wie der Golden-Test
 k = 0.3625                                   # Kronenanteil mit Gattungs-Tag = Grünanteil der Allee-Zelle
@@ -1127,12 +1158,12 @@ def tage(g, l=lam):                          # Zusatztage der Zelle, G0 festgeha
 
 g_nach = g_vor - w_b * min(a * k, k)         # Grenze je Term (Befund 248)
 assert abs(g_nach / g0 - 1.8) < 1e-12
-assert abs(tage(g_vor) - 319.5) < tol_tage and abs(tage(g_nach) - 293.2) < tol_tage
+assert abs(tage(g_vor) - 172.5) < tol_tage and abs(tage(g_nach) - 158.3) < tol_tage
 senkung = tage(g_vor) - tage(g_nach)
-assert abs(senkung - 26.3) < tol_tage and abs(senkung / tage(g_vor) - 0.082) < 0.0005
-assert abs(senkung * c_tag - 163) < tol_euro
-assert abs(tage(g_vor, 0.3) - tage(g_nach, 0.3) - 11.3) < tol_tage
-assert abs(tage(g_vor, 1.0) - tage(g_nach, 1.0) - 37.6) < tol_tage
+assert abs(senkung - 14.2) < tol_tage and abs(senkung / tage(g_vor) - 0.082) < 0.0005
+assert abs(senkung * c_tag - 88) < tol_euro
+assert abs(tage(g_vor, 0.3) - tage(g_nach, 0.3) - 6.1) < tol_tage
+assert abs(tage(g_vor, 1.0) - tage(g_nach, 1.0) - 20.3) < tol_tage
 # Grenze je Term gegen Grenze fuer den ganzen Kronen-Summanden (Befund 248): im Bereich gleich
 for x in (0.0, 0.25, 0.5, a, 1.0):
     assert w_b * min(x * k, k) == min(w_b * x * k, w_b * k)
@@ -1141,12 +1172,12 @@ g_s = {s: w_b * s * k + (1 - w_b) * k for s in (0.05, 0.12, 0.25)}
 vor = {s: tage(g) for s, g in g_s.items()}
 verm = {s: tage(g) - tage(g - w_b * s * min(a * k, k)) for s, g in g_s.items()}
 assert abs(g_s[0.12] - 0.2145) < 0.0001
-assert abs(vor[0.12] - 212.1) < tol_tage and abs(vor[0.05] - 203.5) < tol_tage
-assert abs(vor[0.25] - 227.9) < tol_tage
-assert abs(verm[0.12] - 3.16) < 0.005 and abs(verm[0.05] - 1.32) < 0.005
-assert abs(verm[0.25] - 6.58) < 0.005
-assert abs(verm[0.12] * c_tag - 19.58) < 0.01 and abs(verm[0.05] * c_tag - 8.16) < 0.01
-assert abs(verm[0.25] * c_tag - 40.79) < 0.01
+assert abs(vor[0.12] - 114.5) < tol_tage and abs(vor[0.05] - 109.9) < tol_tage
+assert abs(vor[0.25] - 123.1) < tol_tage
+assert abs(verm[0.12] - 1.71) < 0.005 and abs(verm[0.05] - 0.71) < 0.005
+assert abs(verm[0.25] - 3.55) < 0.005
+assert abs(verm[0.12] * c_tag - 10.57) < 0.01 and abs(verm[0.05] * c_tag - 4.40) < 0.01
+assert abs(verm[0.25] * c_tag - 22.02) < 0.01
 assert abs(vor[0.12] / vor[0.05] - 1.042) < 0.0005     # Ausgangsstand 4,2 % zu hoch
 assert abs(1 - vor[0.12] / vor[0.25] - 0.070) < 0.0005  # oder 7,0 % zu niedrig
 assert abs(verm[0.12] / verm[0.05] - 2.4) < 0.005      # Senkung Faktor 2,4 zu hoch
@@ -1158,17 +1189,17 @@ def verm_a(x, deckung):
 
 
 for x in (1.0, 1.5, 2.0):                              # voll gedeckt: zaehlt wie 1
-    assert abs(verm_a(x, 1.0) - 122.1) < tol_tage
-assert abs(verm_a(1.0, 0.5) - 61.0) < tol_tage          # halb gedeckt: a = 1
-assert abs(verm_a(1.5, 0.5) - 91.6) < tol_tage          # a = 1,5 senkt mehr als a = 1
-assert abs(verm_a(2.0, 0.5) - 122.1) < tol_tage         # a = 2,0 das Doppelte (1/Deckungsgrad)
+    assert abs(verm_a(x, 1.0) - 65.9) < tol_tage
+assert abs(verm_a(1.0, 0.5) - 33.0) < tol_tage          # halb gedeckt: a = 1
+assert abs(verm_a(1.5, 0.5) - 49.4) < tol_tage          # a = 1,5 senkt mehr als a = 1
+assert abs(verm_a(2.0, 0.5) - 65.9) < tol_tage         # a = 2,0 das Doppelte (1/Deckungsgrad)
 assert abs(verm_a(2.0, 0.5) / verm_a(1.0, 0.5) - 1 / 0.5) < 1e-9
 # s_unbek nach dem Ausgangslauf ueberschrieben, 0,12 -> 0,25 (Befund 252)
 gemischt = tage(g_s[0.12]) - tage(g_s[0.12] - w_b * 0.25 * min(a * k, k))
-assert abs(gemischt - 6.58) < 0.005 and abs(vor[0.12] - 212.1) < tol_tage
+assert abs(gemischt - 3.55) < 0.005 and abs(vor[0.12] - 114.5) < tol_tage
 boden = (1 - w_b) * k                                  # Boden bei a = 1
-assert abs(tage(g_s[0.12]) - tage(max(boden, g_s[0.12] - w_b * 0.25 * k)) - 14.65) < 0.005
-assert abs(tage(g_s[0.25]) - tage(boden) - 30.52) < 0.005
+assert abs(tage(g_s[0.12]) - tage(max(boden, g_s[0.12] - w_b * 0.25 * k)) - 7.91) < 0.005
+assert abs(tage(g_s[0.25]) - tage(boden) - 16.48) < 0.005
 # eine Eingabe a fuer Kronen mit und ohne Gattungs-Tag (Befund 247), gleiche ersetzte Kronenflaeche
 kb = ku = 0.20
 s = 0.12
@@ -1180,7 +1211,7 @@ assert abs(produkt / nur_ohne_tag - 4.67) < 0.005
 ```
 
   **Rechenbeispiel Kommunensumme (§3.9 ABGESCHÄTZT; vier Zellen wie in Ebene 7, \(\delta_R\) =
-  1,8795 Tage je Betroffenem aus Ebene 6, \(c_{\text{Tag}}\) = 6,20 € aus Kapitel 7
+  1,01493 Tage je Betroffenem aus Ebene 6, \(c_{\text{Tag}}\) = 6,20 € aus Kapitel 7
   `pollen.c_tag`, λ = 0,7 aus Kapitel 7 `pollen.lambda_veg`).** Eine Kommune hat vier bewohnte
   Zellen mit B = 1.000 / 4.000 / 2.500 / 500 Betroffenen und \(\hat G\) = 0 / 0,10 / 0,30 / 0,60.
   Zelle 3 (Grünanlage) hat den Kronenanteil mit Gattungs-Tag der Birkengruppe 0,30 und den
@@ -1193,18 +1224,18 @@ assert abs(produkt / nur_ohne_tag - 4.67) < 0.005
   | 1 Bezugswert im Ausgangsstand | Ḡ₀ = (1.000 × 0 + 4.000 × 0,10 + 2.500 × 0,30 + 500 × 0,60) / 8.000 = 1.450 / 8.000 | **Ḡ₀ = 0,18125** |
   | 2 \(\hat P\) vorher | 1 + 0,7 × (\(\hat G\)/0,18125 − 1) | 0,300 / 0,686 / 1,459 / 2,617 |
   | 3 Summe vorher | 300 + 2.745 + 3.647 + 1.309 | Σ B·P̂ = **8.000** = Σ B |
-  | 4 Tage und Euro vorher | 8.000 × 1,8795; × 6,20 € | **15.036 Tage**, 93.223 € |
+  | 4 Tage und Euro vorher | 8.000 × 1,01493; × 6,20 € | **8.119 Tage**, 50.341 € |
   | 5 Maßnahme | Zellen 3 und 4: ein Drittel der allergenen Bäume durch allergenarme Arten ersetzt, Kronenanteil der Birkengruppe 0,30 → 0,20 und 0,60 → 0,40, Grünanteil unverändert; \(\hat G'\) = 0,30 − 0,464 × 0,10 und 0,60 − 0,464 × 0,20 | \(\hat G'\) = 0,2536 und 0,5072; Ḡ₀ bleibt 0,18125 |
   | 6 \(\hat P\) nachher | 1 + 0,7 × (0,2536/0,18125 − 1); 1 + 0,7 × (0,5072/0,18125 − 1) | 1,279 und 2,259; Zellen 1 und 2 unverändert |
   | 7 Summe nachher | 300 + 2.745 + 3.199 + 1.129 | Σ B·P̂′ = **7.373** |
-  | 8 Tage und Euro nachher | 7.372,8 × 1,8795; × 6,20 € | **13.857 Tage**, 85.915 € |
-  | 9 Senkung | 15.036 − 13.857; Kontrolle: 0,7 × (2.500 × 0,0464 + 500 × 0,0928) / 0,18125 × 1,8795 | **−1.179 Tage je Jahr (−7,8 %), ≈ 7.310 € je Jahr** (Preisstand 2024) |
+  | 8 Tage und Euro nachher | 7.372,8 × 1,01493; × 6,20 € | **7.483 Tage**, 46.394 € |
+  | 9 Senkung | 8.119,44 − 7.482,88; Kontrolle: 0,7 × (2.500 × 0,0464 + 500 × 0,0928) / 0,18125 × 1,01493 | **−637 Tage je Jahr (−7,8 %), ≈ 3.950 € je Jahr** (Preisstand 2024) |
 
   **Sensitivität:** Die Senkung ist linear in λ und in der Summe \(\sum B\,(\hat G - \hat G')\);
-  stärkster Treiber ist λ: bei λ = 0,3 sind es 505 Tage und ≈ 3.130 €, bei λ = 1,0 1.684 Tage
-  und ≈ 10.440 €. **Was die einfachere Rechnung verfälschen würde:** Setzte man „ein Drittel der
+  stärkster Treiber ist λ: bei λ = 0,3 sind es 273 Tage und ≈ 1.690 €, bei λ = 1,0 909 Tage
+  und ≈ 5.640 €. **Was die einfachere Rechnung verfälschen würde:** Setzte man „ein Drittel der
   Bäume ersetzt“ gleich mit einem Drittel weniger \(\hat G\) (0,30 → 0,20, 0,60 → 0,40), sänke
-  auch der Gräser-Anteil mit, und die Senkung wäre mit 2.541 Tagen mehr als doppelt so groß
+  auch der Gräser-Anteil mit, und die Senkung wäre mit 1.372 Tagen mehr als doppelt so groß
   (Faktor 1 / 0,464). Stehen die ersetzten Bäume in OSM **ohne Gattungs-Tag**, kennt der
   Ausgangsstand sie nur mit 0,12 ihrer Kronenfläche. Zöge man trotzdem 0,464 × ΔKronenanteil voll
   ab, sänke \(\hat G\) bis zu 1 / 0,12 ≈ 8-mal stärker, als der Ausgangsstand den Bäumen
@@ -1222,7 +1253,7 @@ assert abs(produkt / nur_ohne_tag - 4.67) < 0.005
   über \(\hat G'\), nie als pauschaler Faktor (Integrationsauflage unten).
 
 ```python test: beispiel_96_stadtbaum_kommunensumme
-lam, delta, c_tag = 0.7, 1.8795, 6.20       # Kap. 7 pollen.lambda_veg, Ebene 6, Kap. 7 pollen.c_tag
+lam, delta, c_tag = 0.7, 1.01493, 6.20       # Kap. 7 pollen.lambda_veg, Ebene 6, Kap. 7 pollen.c_tag
 B = [1_000, 4_000, 2_500, 500]              # Betroffene je Zelle (wie Ebene 7)
 G_vor = [0.00, 0.10, 0.30, 0.60]            # G^ im Ausgangsstand
 w_b = 0.464                                  # Gewicht der Kronen in G^ (Ebenendefinition §3.3)
@@ -1243,16 +1274,16 @@ assert abs(s_vor - sum(B)) < 1e-9          # Ausgangsstand: Summe B*P^ = Summe B
 assert s_nach < s_vor                        # Maßnahme senkt die Kommunensumme
 assert abs(s_nach - 7_372.8) < 0.01
 tage_vor, tage_nach = s_vor * delta, s_nach * delta
-assert abs(tage_vor - 15_036) < 0.5 and abs(tage_nach - 13_857.2) < 0.1
+assert abs(tage_vor - 8_119.4) < 0.5 and abs(tage_nach - 7_482.9) < 0.1
 senkung = tage_vor - tage_nach
-assert abs(senkung - 1_178.8) < 0.1 and abs(senkung / tage_vor - 0.078) < 0.001
+assert abs(senkung - 636.6) < 0.1 and abs(senkung / tage_vor - 0.078) < 0.001
 assert abs(senkung - lam * sum(b * (v - n) for b, v, n in zip(B, G_vor, G_nach)) / g0 * delta) < 1e-6
-assert abs(tage_vor * c_tag - 93_223) < 1 and abs(tage_nach * c_tag - 85_915) < 1
-assert abs(senkung * c_tag - 7_310) < 5
+assert abs(tage_vor * c_tag - 50_341) < 1 and abs(tage_nach * c_tag - 46_394) < 1
+assert abs(senkung * c_tag - 3_947) < 5
 k = senkung / lam
-assert abs(k * 0.3 - 505) < 1 and abs(k * 1.0 - 1_684) < 1
-assert abs(k * 0.3 * c_tag - 3_130) < 5 and abs(k * 1.0 * c_tag - 10_440) < 5
-assert abs(senkung / w_b - 2_540.6) < 0.1    # anteilige Senkung von G^ waere Faktor 1/w_b zu hoch
+assert abs(k * 0.3 - 273) < 1 and abs(k * 1.0 - 909) < 1
+assert abs(k * 0.3 * c_tag - 1_690) < 5 and abs(k * 1.0 * c_tag - 5_640) < 5
+assert abs(senkung / w_b - 1371.9) < 0.1    # anteilige Senkung von G^ waere Faktor 1/w_b zu hoch
 g_neu = sum(b * g for b, g in zip(B, G_nach)) / sum(B)   # verworfene Regel (Log 19)
 assert abs(g_neu - 0.16095) < 1e-12
 assert abs(sum(b * (1 + lam * (g / g_neu - 1)) for b, g in zip(B, G_nach)) - sum(B)) < 1e-9
@@ -1338,12 +1369,12 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
   **Rechenbeispiel Allee-Zelle.** Die Pflanzung oben senkt den Kronenanteil der 100-m-Zelle
   (10.000 m²) um 0,078, also um 781 m² Kronenfläche. Das Produkt setzt für OSM-Bäume ohne Angabe
   einen Kronendurchmesser von 8 m an (`backend/app/services/climate/heat/osm_data.py`), also 50,3 m²
-  Krone je Baum; 781 ÷ 50,3 ≈ 15,5, das sind 16 Bäume. Der Nutzen der Pflanzung oben beträgt 163 €
-  vermiedene Behandlungskosten je Jahr (Band über λ 70–233 €), solange die Kronen der sonst stehenden
+  Krone je Baum; 781 ÷ 50,3 ≈ 15,5, das sind 16 Bäume. Der Nutzen der Pflanzung oben beträgt 88 €
+  vermiedene Behandlungskosten je Jahr (Band über λ 38–126 €), solange die Kronen der sonst stehenden
   Birken voll ausgebildet sind.
   - *Vorgezogener Ersatz:* 16 × 4.436 € ≈ 71.000 € einmalig (Band 44.800–115.200 €). Die gefällten
     Birken sind ausgewachsen, der Nutzen gilt also vom ersten Jahr an. Ohne Zins deckt er die Kosten
-    erst nach über 400 Jahren. Über die Pollenallergie allein trägt sich ein vorgezogener Ersatz nicht,
+    erst nach über 800 Jahren. Über die Pollenallergie allein trägt sich ein vorgezogener Ersatz nicht,
     er braucht andere Gründe.
   - *Nachpflanzung ohnehin:* 16 × 60 € = 960 € (Band 0–2.960 €). Verglichen wird hier mit jungen Birken,
     die sonst gepflanzt würden. Ihre Kronen wachsen erst heran, so lange ist auch der Nutzen kleiner.
@@ -1351,24 +1382,24 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
     Kristoffersen [80], Tab. 3: Kronenradius = 0,1358 × Alter − 0,0008 × Alter² (Meter, Jahre); ein
     Baum mit 18–20 cm Stammumfang ist bei der Pflanzung rund 10 Jahre alt ([80], S. 209). Der Radius
     wächst so von 1,28 m bei der Pflanzung auf 4 m, also die 8 m Kronendurchmesser des Produkts, nach
-    28 Jahren. Der Nutzen je Jahr ist 163 € × (Radius ÷ 4 m)², höchstens 163 €: im 1. Jahr 20 €, im
-    10. Jahr 58 €, im 20. Jahr 115 €. Aufsummiert sind die 960 € nach **18 Jahren** gedeckt. Mit voller
-    Krone ab dem ersten Jahr wären es 6 Jahre; diese einfachere Rechnung zeigte die Amortisation also
-    dreimal zu früh. Band: 15 Jahre (λ = 1,0) bis 27 Jahre (λ = 0,3); mit 185 € je Baum 32 Jahre, mit
-    185 € je Baum und λ = 0,3 zusammen 56 Jahre. *Über die Lebensdauer:* Ein Berliner Straßenbaum steht
+    28 Jahren. Der Nutzen je Jahr ist 88 € × (Radius ÷ 4 m)², höchstens 88 €: im 1. Jahr 11 €, im
+    10. Jahr 32 €, im 20. Jahr 62 €. Aufsummiert sind die 960 € nach **24 Jahren** gedeckt. Mit voller
+    Krone ab dem ersten Jahr wären es 11 Jahre; diese einfachere Rechnung zeigte die Amortisation also
+    gut doppelt so früh. Band: 20 Jahre (λ = 1,0) bis 39 Jahre (λ = 0,3); mit 185 € je Baum 47 Jahre, mit
+    185 € je Baum und λ = 0,3 zusammen 92 Jahre. *Über die Lebensdauer:* Ein Berliner Straßenbaum steht
     rechnerisch im Mittel rund 69 Jahre (Bestand ÷ Fällungen je Jahr: 432.769 Straßenbäume ÷ 6.269
     Fällungen im Jahr 2021, [78], Anlage). In
-    69 Jahren summiert sich der Nutzen auf 9.085 €, das 9,5-Fache der 960 €; am ungünstigen Rand
-    (185 € je Baum, λ = 0,3) auf 3.905 € gegen 2.960 €. Birken stehen kürzer als der Durchschnitt
+    69 Jahren summiert sich der Nutzen auf 4.905 €, das 5,1-Fache der 960 €; am ungünstigen Rand
+    (185 € je Baum, λ = 0,3) auf 2.108 € gegen 2.960 €, dort trägt sich die Artenwahl nicht mehr. Birken stehen kürzer als der Durchschnitt
     (Hannover, oben). Würden die sonst gepflanzten Birken alle 20 Jahre neu gepflanzt, begänne ihr
-    Kronenwachstum jedes Mal von vorn: Die Amortisation bliebe bei 18 Jahren, der Nutzen über 69 Jahre
-    sänke auf 4.121 €, das 4,3-Fache; am ungünstigen Rand auf 1.771 € gegen 2.960 €, dort trüge sich
-    die Artenwahl nicht. Am Punktwert trägt sich die Artenwahl bei ohnehin fälliger Nachpflanzung also
-    über die Lebensdauer des Baums, am ungünstigen Rand nur bei langer Standzeit der sonst gepflanzten
-    Birken. Für die Birke selbst liefert [80] keine Kurve. Wächst eine junge Birke schneller als eine
-    Linde, käme der Nutzen früher, und die 18 Jahre sind eine Obergrenze; wächst sie langsamer, käme er
+    Kronenwachstum jedes Mal von vorn: Die Amortisation stiege von 24 auf 32 Jahre, denn die 24 Jahre liegen über den 20 Jahren bis
+    zum nächsten Ersatz; der Nutzen über 69 Jahre sänke auf 2.225 €, das 2,3-Fache, am ungünstigen Rand auf
+    956 € gegen 2.960 €. Am Punktwert trägt sich die Artenwahl bei ohnehin fälliger Nachpflanzung also über
+    die Lebensdauer des Baums, auch bei Ersatz alle 20 Jahre; am ungünstigen Rand trägt sie sich in keinem
+    der beiden Fälle. Für die Birke selbst liefert [80] keine Kurve. Wächst eine junge Birke schneller als eine
+    Linde, käme der Nutzen früher, und die 24 Jahre sind eine Obergrenze; wächst sie langsamer, käme er
     später. Blüte zählt die Ebene nicht, nur Kronenfläche (§3.3). Blühte eine junge Birke erst fünf Jahre nach der Pflanzung, verschöbe sich die
-    Amortisation von 18 auf 19 Jahre, nach zehn Jahren auf 21 Jahre.
+    Amortisation von 24 auf 25 Jahre, nach zehn Jahren auf 27 Jahre.
 
   **Stärkster Treiber** ist der Fall, nicht das Band: Der vorgezogene Ersatz kostet das 74-Fache der
   Artenwahl. Innerhalb des vorgezogenen Ersatzes treiben die Pflanzkosten am Standort (−28 … +44 % über
@@ -1376,8 +1407,8 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
   **Was die einfachere Rechnung verfälschen würde:** Rechnete man für jeden ersetzten Baum die vollen
   4.436 €, erschiene die Artenwahl bei einer ohnehin fälligen Nachpflanzung 74-mal so teuer, wie sie
   ist; rechnete man immer nur 60 €, erschiene ein vorgezogener Ersatz fast kostenlos. Rechnete man bei
-  der Nachpflanzung mit voller Krone ab dem ersten Jahr, erschiene die Amortisation nach 6 statt nach
-  18 Jahren. Eine Vereinfachung bleibt und ist benannt: Dass ein vorgezogen gefällter Baum später
+  der Nachpflanzung mit voller Krone ab dem ersten Jahr, erschiene die Amortisation nach 11 statt nach
+  24 Jahren. Eine Vereinfachung bleibt und ist benannt: Dass ein vorgezogen gefällter Baum später
   ohnehin ersetzt worden wäre, rechnet der Bericht nicht gegen; für alte Bäume sind 4.436 € deshalb eine
   Obergrenze. Bei der Nachpflanzung wirkt die Maßnahme erst, wenn der alte Baum fällt; als Anteil
   \(a\) gibt die Kommune deshalb nur die Kronen an, die im betrachteten Zeitraum ersetzt werden. Ob die
@@ -1388,7 +1419,7 @@ assert beitrag + w_b * s_unbek * dk_unbek >= 0   # Grenze: Beitrag der Gehoelze 
   oder 4.436 € je Baum; die Zahl der Bäume gibt die Kommune ein. Ohne Angabe des Falls zeigt es beide
   Beträge nebeneinander und keine Kosten-Nutzen-Kennzahl, eine stille Vorgabe auf einen der beiden Fälle
   gibt es nicht. Im Fall der Nachpflanzung sagt es dazu, dass der Nutzen je Jahr erst mit voller Krone
-  gilt (Amortisation am Punktwert nach 18 Jahren).
+  gilt (Amortisation am Punktwert nach 24 Jahren).
 
 ```python test: beispiel_96_stadtbaum_kosten
 import math
@@ -1416,10 +1447,10 @@ baeume = math.ceil(n)
 assert baeume == 16
 assert baeume * vor == 70_976 and (baeume * vor_band[0], baeume * vor_band[1]) == (44_800, 115_200)
 assert baeume * nach == 960 and baeume * nach_band[1] == 2_960
-nutzen, nutzen_band = 163, (11.3 * 6.20, 37.6 * 6.20)   # Allee-Zelle, EUR je Jahr, Band ueber lambda
-assert round(nutzen_band[0]) == 70 and round(nutzen_band[1]) == 233
-assert baeume * vor / nutzen > 400                      # vorgezogen: volle Krone ab dem ersten Jahr
-assert round(baeume * nach / nutzen, 1) == 5.9          # Nachpflanzung mit voller Krone ab Jahr 1 (zu frueh)
+nutzen, nutzen_band = 88, (6.1 * 6.20, 20.3 * 6.20)   # Allee-Zelle, EUR je Jahr, Band ueber lambda
+assert round(nutzen_band[0]) == 38 and round(nutzen_band[1]) == 126
+assert baeume * vor / nutzen > 800                      # vorgezogen: volle Krone ab dem ersten Jahr
+assert round(baeume * nach / nutzen, 1) == 10.9          # Nachpflanzung mit voller Krone ab Jahr 1 (zu frueh)
 assert 0.19 * nach < 11.5                               # Umsatzsteuer an der Differenz hoechstens 11 EUR
 # Punktwert der Artenwahl: Linde (II) statt Birke (I) [79]; Birke 12.209 von 432.769 Strassenbaeumen [78]
 assert preis["II"] - preis["I"] == nach and round(151_764 / 432_769, 2) == 0.35   # Linde 35 % in Berlin [78]
@@ -1443,20 +1474,20 @@ def amortisation(kosten, voll=nutzen, start=1, zyklus=None):
 
 
 assert abs(radius(10) - 1.28) < 0.005 and radius(38) >= 4 > radius(37)   # volle Krone nach 28 Jahren
-assert round(nutzen_jahr(1)) == 20 and round(nutzen_jahr(10)) == 58 and round(nutzen_jahr(20)) == 115
-assert amortisation(baeume * nach) == 18                # statt 6 mit voller Krone ab Jahr 1
-assert amortisation(baeume * nach, nutzen_band[1]) == 15 and amortisation(baeume * nach, nutzen_band[0]) == 27
-assert amortisation(baeume * nach_band[1]) == 32 and amortisation(baeume * nach_band[1], nutzen_band[0]) == 56
+assert round(nutzen_jahr(1)) == 11 and round(nutzen_jahr(10)) == 32 and round(nutzen_jahr(20)) == 62
+assert amortisation(baeume * nach) == 24                # statt 11 mit voller Krone ab Jahr 1
+assert amortisation(baeume * nach, nutzen_band[1]) == 20 and amortisation(baeume * nach, nutzen_band[0]) == 39
+assert amortisation(baeume * nach_band[1]) == 47 and amortisation(baeume * nach_band[1], nutzen_band[0]) == 92
 standzeit = 432_769 / 6_269                              # Berlin 2021: Bestand / Faellungen [78]
 assert round(standzeit) == 69
 summe69 = sum(nutzen_jahr(t) for t in range(1, 70))
-assert round(summe69) == 9_085 and round(summe69 / (baeume * nach), 1) == 9.5
-assert round(sum(nutzen_jahr(t, nutzen_band[0]) for t in range(1, 70))) == 3_905
+assert round(summe69) == 4_905 and round(summe69 / (baeume * nach), 1) == 5.1
+assert round(sum(nutzen_jahr(t, nutzen_band[0]) for t in range(1, 70))) == 2_108
 kette = sum(nutzen_jahr((t - 1) % 20 + 1) for t in range(1, 70))            # Birken alle 20 Jahre neu
-assert round(kette) == 4_121 and round(kette / (baeume * nach), 1) == 4.3
-assert amortisation(baeume * nach, zyklus=20) == 18
-assert round(sum(nutzen_jahr((t - 1) % 20 + 1, nutzen_band[0]) for t in range(1, 70))) == 1_771
-assert amortisation(baeume * nach, start=6) == 19 and amortisation(baeume * nach, start=11) == 21   # Bluete spaeter
+assert round(kette) == 2_225 and round(kette / (baeume * nach), 1) == 2.3
+assert amortisation(baeume * nach, zyklus=20) == 32
+assert round(sum(nutzen_jahr((t - 1) % 20 + 1, nutzen_band[0]) for t in range(1, 70))) == 956
+assert amortisation(baeume * nach, start=6) == 25 and amortisation(baeume * nach, start=11) == 27   # Bluete spaeter
 # Faellung: geometrisches Mittel der Bandenden
 assert math.sqrt(faell_band[0] * faell_band[1]) == faell
 assert round(1_000 / faell_band[0], 1) == 2.5 and round(faell_band[1] / 1_000, 1) == 1.6
@@ -1497,7 +1528,7 @@ assert round(1_000 / faell_band[0], 1) == 2.5 and round(faell_band[1] / 1_000, 1
   und Euro der Kommune, gekennzeichnet als „Abschätzung von KAP3“ mit dem Hinweis auf die Richtung des
   Fehlers in λ (Modellgrenze 7). Fehlt die Eingabe \(a\) oder führen die gewählten Zellen keine Kronen,
   steht ein Vermerk statt 0 €. Für die Allee-Zelle und das Rechenbeispiel der Kommune oben ergibt das
-  Produkt dieselben Zahlen (26,3 Tage und ≈ 163 € je Jahr; 1.179 Tage und ≈ 7.310 € je Jahr);
+  Produkt dieselben Zahlen (14,2 Tage und ≈ 88 € je Jahr; 637 Tage und ≈ 3.950 € je Jahr), sobald Ü-13 den Klimaanteil 0,27 übernimmt; bis dahin mit 0,50 das 1,85-Fache;
   liegen Frühwarnung und Stadtbaumwahl in derselben Zelle, rechnet die Frühwarnung ihre vermiedenen Tage
   auf die Tage nach der Pflanzung (Absatz oben; Allee-Zelle 6,597 statt 7,19 Tage). Was noch vom Bericht
   abweicht, führt das Ledger: Den Euro-Betrag der Frühwarnung rechnet das Produkt in diesem Fall noch auf
@@ -1509,10 +1540,10 @@ assert round(1_000 / faell_band[0], 1) == 2.5 and round(faell_band[1] / 1_000, 1
   Senkung mit dem neuen Wert, \(\hat G\) und Ḡ₀ aber aus dem gespeicherten Ausgangslauf mit dem alten
   (Befund 252). Nach Log 26 gehören \(\hat G\), \(\hat G'\) und Ḡ₀ zum selben Ausgangsstand; ein
   neues \(s_{\text{unbek}}\) ist ein neuer Ausgangsstand und braucht einen neuen Zelllauf. Gemessen an
-  der Allee-Zelle ohne Gattungs-Tag (Ausgangslauf mit 0,12, danach 0,25): 6,58 vermiedene Tage gegen
-  212,1 Tage des Ausgangslaufs, gleich gerechnet wären es 3,16 von 212,1 oder 6,58 von 227,9 Tagen;
-  bei \(a\) = 1 hält der Boden die Senkung beim Kronen-Summanden des alten Laufs (14,65 Tage statt
-  30,52 Tage mit 0,25).
+  der Allee-Zelle ohne Gattungs-Tag (Ausgangslauf mit 0,12, danach 0,25): 3,55 vermiedene Tage gegen
+  114,5 Tage des Ausgangslaufs, gleich gerechnet wären es 1,71 von 114,5 oder 3,55 von 123,1 Tagen;
+  bei \(a\) = 1 hält der Boden die Senkung beim Kronen-Summanden des alten Laufs (7,91 Tage statt
+  16,48 Tage mit 0,25).
   **Integrationsauflage (Stadtbaumwahl)**, im
   Rahmen der Auflage aus §3.3 (nur zellscharfe Änderung von \(\hat G\) mit Neuberechnung, nie ein
   Faktor): Der CTO braucht (1) die vom Nutzer gewählten Zellen, (2) als Eingabe die Änderung des
@@ -1970,8 +2001,11 @@ gegenläufige Evidenz (Neophyten [23], CO₂ [21,22]) macht das zur Untergrenze;
    Marker-Spreizung misst die lokale Blühsukzession.
 3. \(\hat P\) bleibt Proxy (kein flächiges Pollenmessnetz); Ebene POLLEN_LOAD neu.
 4. Birken-Marker Phase 4 (Offset-Trend ≤ 1,3 Tage, ins Band aufgenommen, §3.1).
-5. Attributions-Übertrag Nordamerika→DE (IQR 0,19–0,84 aus den Schätzungen von 22 Klimamodellen als Band
-   ausgewiesen; Interquartilsabstand erklärt in Kap. 2).
+5. Attributions-Übertrag Nordamerika→DE: Der Klimaanteil 0,27 ist die Mitte der Spanne 19–35 % für die Saisonlänge
+   1990–2018 aus den Schätzungen von 22 Klimamodellen in [9], eine Abschätzung von KAP3 mit dem Band 0,19–0,41 aus
+   beiden Spannen der Länge (Interquartilsabstand erklärt in Kap. 2, Befund 258). Ob der Anteil in Deutschland
+   ebenso hoch ist, belegt keine Quelle; §4 zeigt nur, dass \(\delta\) in der Größenordnung unter dem Klimaanteil
+   der Saisonverlängerung aus [9] liegt.
 6. Kostensatz: **Proxy** (§3.5) — Umlage der Jahreskosten (inkl. perennialer AR) auf
    Saisontage und Durchschnitts- statt Grenzkosten wirken überschätzend, ausgelassene
    Selbstmedikation Nicht-Diagnostizierter und fehlender Kaufkraft-Aufschlag
@@ -2299,13 +2333,19 @@ Mechanik bei Integration; bis dahin sind DOI-/amtliche Links die persistenten Re
   diseases in the EU: a GA²LEN review", Allergy 69(10):1275–1279, 2014.
   doi:10.1111/all.12470 (indirekte Kosten — bleibt per R9 bei K2/#87).
 - **[9]** W. R. L. Anderegg u. a., „Anthropogenic climate change is worsening North
-  American pollen seasons", PNAS 118(7):e2013284118, 2021. doi:10.1073/pnas.2013284118
-  (Saisonbeginn ≈ −20 Tage, Länge +8 Tage, Pollenintegral +20,9 %; ≈ 50 % [19–84 %] des
-  Saisontrends anthropogen). Die Spanne 19–84 % umfasst die Interquartilsabstände über 22 Klimamodelle für
-  Beginn und Länge der Pollensaison 1990–2018 und 2003–2018. Abschnitt Results nennt als „interquartile range“
-  für den Saisonbeginn 35–66 % (1990–2018) und 45–84 % (2003–2018), für die Saisonlänge 19–35 % und 22–41 %;
-  Abb. 3: „Data are plotted from 22 climate models“. Volltext frei bei Europe PMC (PMC7896283),
-  https://europepmc.org/articles/PMC7896283.
+  American pollen seasons", PNAS 118(7):e2013284118, 2021. doi:10.1073/pnas.2013284118.
+  Abstract: „Human forcing of the climate system contributed ∼50 % (interquartile range: 19–84 %)
+  of the trend in pollen seasons and ∼8 % (4–14 %) of the trend in pollen concentrations.“ Results and Discussion, Absatz zu Abb. 1: „We also
+  found significant advances of ∼20 d in pollen season start date and lengthening of the pollen season by ∼8 d over
+  the same period“. Results and Discussion, Absatz zu Abb. 3: „Anthropogenic forcing contributed to an estimated
+  35–66 % (interquartile range) of the full trend and 45–84 % of the recent trend in pollen season start date and
+  19–35 % and 22–41 % of the trend in pollen season length over the 1990–2018 and 2003–2018 periods, respectively
+  (Fig. 3).“ Abb. 3: „Data are plotted from 22 climate models“. Zitate wörtlich, nur das Prozentzeichen nach kap3-stil mit
+  Leerzeichen. Die rund 50 % des Abstracts gelten Beginn und Länge
+  zusammen; für die Länge nennt der Text nur die Spannen, keinen Zentralwert (gelesen: Abstract, Results and
+  Discussion, Methods). Der Bericht nimmt deshalb die Mitte der Spanne 1990–2018, 0,27 (Kap. 2, Befund 258).
+  Textabbild `docs/quellen/methodik/96/09_Anderegg2021_Pollensaison.md` (Abruf 30.09.2026, SHA-256 d02d5a7b…f903).
+  Volltext frei bei Europe PMC (PMC7896283), https://europepmc.org/articles/PMC7896283.
 - **[10]** C. Ziello u. a., „Changes to Airborne Pollen Counts across Europe", PLoS ONE
   7(4):e34076, 2012. doi:10.1371/journal.pone.0034076
 - **[15]** UBA (Hrsg.), KWRA 2021, Teilbericht 5: Risiken und Anpassung in den Clustern Wirtschaft
@@ -2576,3 +2616,4 @@ Vermerk an Eintrag 25 zur Zahl der Blöcke.
 | 25 | Kennzeichnung der Parameter-Blöcke (Aufgabe §4): welcher Wert je Block, und wo trägt ein Block ein Feld `rolle`? | (Stand Schritt 3. Seit Runde 27 führt Kapitel 7 14 Blöcke: dazu `pollen.stadtbaum_kosten` im Abschnitt 7.1, gekennzeichnet `abschaetzung_kap3`, Log 27.) **13 von 13 gekennzeichnet (Kapitel 7):** `quelle` für \(\Delta S\), \(a_{\text{attr}}\), \(p_{\text{AR}}\), \(c_{\text{jahr}}\); `abschaetzung_kap3` für \(p_B/p_G\), \(L\), \(f\), \(\lambda\), \(s_{\text{unbek}}\), \(r_{\text{S158}}\), \(t_{\text{warn}}\) (Herleitung je Block im Kommentar); `berechnet` für \(d_{\text{Saison}}\) (aus f, p_sens, L) und \(c_{\text{Tag}}\) (aus c_jahr, d_Saison); **kein** Feld `rolle` | \(\Delta S\) ist eine amtliche Messreihe, die Anlage [67] nur auswertet; \(p_{\text{AR}}\) folgt je Band einer Quelle, die Extrapolation 80+ ist in §3.2 gekennzeichnet; \(c_{\text{jahr}}\) ist der Quellwert, nur im Preisstand umgerechnet. Von den vier Rollen nach §4 trifft keine zu: \(s_{\text{unbek}}\) geht in jedem Lauf in \(\hat G\) ein und ist damit ein gewöhnlicher Rechenparameter, keine Sensitivitätsgröße; eine Rolle „abschaetzung“ kennt §4 nicht, die Abschätzung trägt \(r_{\text{S158}}\) schon in `kennzeichnung` | \(s_{\text{unbek}}\) mit `rolle: sensitivitaet` (verworfen: sagte, der Wert diene nur der Sensitivität) · \(r_{\text{S158}}\) mit `rolle: abschaetzung` (verworfen: kein zulässiger Wert nach §4) · \(p_{\text{AR}}\) als `abschaetzung_kap3` (verworfen: vier von fünf Bändern tragen einen Quellwert; die Extrapolation ist am Band gekennzeichnet) | keine Wirkung auf Zahlen; kein `wert:` in Kapitel 7 geändert; Ledger-Befund 173 |
 | 26 ⚠ | Bezugswert der Zentrierung bei Maßnahmen: Ḡ in jedem Lauf neu bilden (Log 19) oder im Ausgangsstand festhalten? | **Festhalten (Weg (a), Festlegung CMO in T-1323):** Ḡ₀ = betroffenengewichtetes Mittel über die bewohnten Zellen der eigenen Kommune im Ausgangsstand ohne die bewerteten Maßnahmen, im Ausgangsszenario gebildet und für jedes Maßnahmenszenario festgehalten; Formel bleibt \(\hat P = 1 + \lambda(\hat G/\bar G_0 - 1)\) (§3.3). Im Ausgangsstand gilt weiter \(\sum B\hat P = \sum B\) exakt; mit Maßnahme sinkt die Summe um \(\lambda \cdot \sum B(\hat G - \hat G')/\bar G_0\) (Rechenbeispiel §5: 15.036 → 13.857 Tage, −1.179 Tage, ≈ 7.310 € je Jahr; Eingabe ist die Änderung des Kronenanteils, abgezogen im Term, in dem die Kronen im Ausgangsstand stehen, Kronen ohne Gattungs-Tag nur mit 0,12, Befunde 186, 195) | (1) **Vorgabe P2:** Ein in jedem Lauf neu gebildetes Ḡ hebt jede Senkung genau auf (Rechenbeispiel §5: Summe bliebe 8.000); weniger Quellbäume hießen dann nicht weniger Pollen — das wäre eine gesetzte Nullwirkung. (2) **Einwand aus Log 19 beantwortet:** Log 19 sah die λ-Evidenz nur für Gradienten innerhalb einer Stadt. Eine Maßnahme wird mit dem Ausgangsstand derselben Kommune verglichen, also innerhalb einer Stadt. Die Lesart von λ als Anteil der örtlichen Quellen an der Pollenlast einer Zelle (1 − λ = regionaler Hintergrund) belegt Hugg 2017 [74], Tabelle 3: städtischste gegenüber allen acht Messstellen, λ = 1 − Hintergrund ÷ Mittel, abgeleitet 0,22–0,94, drei von vier Werten im Band 0,3–1,0 (§3.3, Modellgrenze 7); Conclusions: „The local sources, such as unmanaged open lands, may substantially contribute to pollen exposure.“ (3) Log 17 und 18 bleiben: Gewichtsregel und Bezugsebene Kommune; zwischen Kommunen wirkt die Vegetation weiter nicht. (4) Befunde 124 und 129 bleiben: keine pauschal verknüpfte Maßnahme, gerechnet wird im Zelllauf | Ḡ in jedem Lauf neu (Log 19; verworfen: Nullwirkung, P2) · Summe gleich lassen, Wirkung nur je Zelle (Weg (b); verworfen vom CMO: weniger Quellbäume heißt weniger Pollen) · zweiter Parameter für den Niveaueffekt (verworfen: die Quelle liegt im Band von λ, T-1323 Punkt 1) | Basiswert (Ausgangsstand) unverändert, kein `wert:` in Kapitel 7 geändert; Stadtbaumwahl senkt jetzt die Kommunensumme; Richtung des Fehlers in λ: Modellgrenze 7 (Bezugsstelle in der Stadt → λ unterzeichnet eher; Gräser statt Birke → λ überzeichnet für Bäume eher; nicht bestimmbar, welche überwiegt); Log 19 verworfen; Ledger-Befund 182 |
 | 27 | Kosten der Stadtbaumwahl (Vorgabe P2, Befund 253): eine Zahl oder nach Fall getrennt, woher die Werte, und wo stehen sie in Kapitel 7? | **Je ersetztem Baum nach Fall getrennt, Preisstand 2024:** Nachpflanzung ohnehin 60 € (Mehrkosten der Artenwahl im typischen Fall Linde statt Birke, Preisgruppe II − I [79]; Birke meistgefällt, Linde meistgepflanzt [78], [82], allergen „Low“ [81]); vorgezogener Ersatz 4.436 € (Pflanzung mit Anwuchspflege 3.636 € [75] plus Fällung 800 €, Abschätzung von KAP3); Block `pollen.stadtbaum_kosten` im eigenen Abschnitt 7.1; im Produkt Abfrage des Falls ohne stille Vorgabe (Ü-11); Amortisation der Nachpflanzung mit wachsender Krone, 18 Jahre am Punktwert (§5) | Die beiden Fälle unterscheiden sich um den Faktor 74; eine Zahl für beide stellte einen der Fälle falsch dar. Die Kosten wirken weder auf Tage noch auf den Schadensbetrag und stehen deshalb getrennt von den Größen der Schadens- und Wirkungsrechnung. Für die Fällung fand sich in den durchsuchten Quellen keine Kostenangabe je Baum (§5, Liste in Befund 253), deshalb eine Abschätzung von KAP3 mit dem geometrischen Mittel des Bands. Bei der Nachpflanzung ist der Vergleich ein junger Baum, dessen Krone erst wächst [80] | eine Zahl, 4.436 €, für alle Fälle (verworfen: die Artenwahl bei Nachpflanzung erschiene 74-mal zu teuer) · 4.436 € als Vorgabe, 60 € als Überschreibung (verworfen: stille Vorgabe auf den teuren Fall) · Fällkosten aus Preisportalen von Anbietern (verworfen: keine amtliche oder verbandliche Quelle, Herkunft nicht prüfbar) · Block im ersten yaml-Abschnitt von Kapitel 7 (verworfen: Kosten sind keine Größe der Schadensrechnung; gemessen schlügen dort vier statt ein Kennzeichnungstest fehl) · Amortisation mit voller Krone ab dem ersten Jahr (verworfen: 6 statt 18 Jahre, dreimal zu früh) | keine Wirkung auf Tage, Schadensbetrag und Berlin (4,69 Mio. € Kette, 4,58 Mio. € Zelllauf); kein bestehender `wert:` in Kapitel 7 geändert, ein Block mehr (14); Ledger-Befund 253, Übernahmen Ü-11 und Ü-12 |
+| 28 | Befund 258, §4: Wie wird \(\delta\) nach dem Wechsel auf \(a_{\text{attr}}\) = 0,27 gegen [9] geprüft, und was wird aus dem Band der Klimaanteile an den Behandlungskosten? | **Beide Vergleiche beim selben \(a_{\text{attr}}\)** (Festlegung des methodik_manager, T-1651): physisch 3,98 Tage × \(a_{\text{attr}}\) gegen 8 Tage × \(a_{\text{attr}}\) ([9], Results and Discussion, Abb. 1), am Basiswert 1,07 gegen 2,16 Tage, im Band 0,76–1,63 gegen 1,52–3,28 Tage; monetär \(\delta/d_{\text{Saison}}\) = (Σ p ΔS ÷ Σ p L) × \(a_{\text{attr}}\), im Modell 9,2 % Saisonverlängerung mal 0,27 = 2,5 %; ohne belegten Vergleichswert kein Prüfstein, §4 nennt das Ergebnis der M0-Herleitung (2,5 % gegen ≈ 2,9 %); deren Band entfällt | Der Anteil steht auf beiden Seiten und kürzt sich; so prüft §4 die Größenordnung von \(\delta\) unabhängig vom gewählten Anteil. Das Band der M0-Herleitung war aus dem Anteil der Saisonverschiebung gebildet, den Log 2 als nicht hergeleitet verwirft | Nur die Zahl tauschen (1,07 gegen die frühere Schätzung „≈ 4 Tage“) oder \(\delta \div f\) gegen 8 Tage × Band stellen: verworfen, weil das Beschwerdetage und Saisontage vermischt | §4: \(\delta\) liegt bei jedem \(a_{\text{attr}}\) bei rund der Hälfte des Klimaanteils der Saisonverlängerung aus [9]; Bundessumme ≈ 60 Mio. € je Jahr (Band ≈ 42–91 Mio. €); kein Parameter geändert, kein Band geweitet |
