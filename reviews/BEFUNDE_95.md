@@ -1956,3 +1956,148 @@ ganzen Liste gilt 345.026.859 € aus Paket 4.
 Z. 129, test_massnahme_s157.py Z. 197–248, test_massnahme_schutzprogramme_95.py Z. 111–175 und
 test_massnahme_kuehlzentren_95.py Z. 98–129; T-1645 hatte sie als nicht geprüft vermerkt (Beobachtung 2).
 (5) Die Kühlzentren-Tests Z. 57 und Z. 80 (0.71) sowie Z. 74 (0.089) sind je eigene Zeilen, weil sie in drei Testfunktionen stehen.
+
+## Runde 48 — Gegenprüfung nach den Runden 39–45, Abschnitte A und B (frische Sitzung, 30.09.2026): Null-Runde
+
+Die Gegenprüfung nach §5 lief unter dem Vorhaben T-1642-cmo in drei Urteilen des methodik_manager, je in frischer
+Sitzung: Abschnitt A (Kopf bis vor `## 5 `) mit dem Urteil zu T-1647-methodik_manager (Paket 5, Runde 46, Lesung
+Z. 1–1059) und mit dem Urteil zu T-1653-methodik_manager (Paket 7a, Runde 48, LF 1–15 nach §5), Abschnitt B (`## 5 ` bis
+zum Ende) mit dem Urteil zu T-1648-methodik_manager (Paket 6, Runde 47). Alle drei lauten „Null-Runde: ja“. Runde 48 gibt
+es, weil das Urteil zu T-1647 die Leitfragen nach den Fehlerklassen des Skills nummeriert und für A vier Leitfragen aus §5
+nicht ausdrücklich beantwortet hatte; die Begründung steht im Abschnitt „Vorbereitung der Runde 48“ oben (T-1653, Absatz
+„Warum Runde 48“ und Tabelle „LF-Zuordnung“). Die Null-Runde über den ganzen Bericht ist damit Runde 48, das letzte der
+drei Null-Urteile. Eingetragen mit T-1655-methodik_manager (Paket 7c); am Bericht ändert sich nur der Kopf vor `## 1 `.
+
+**Nachweis Abschnitt A, Runde 46.** Firmen-Repo, `tickets/T-1647-methodik_manager.md`, Abschnitt „Urteil“, Eintrag
+„2026-09-30T03:17:06Z · Runde 0 · methodik_manager (opus/high)“, **Urteil:** freigabe. Verdiktzeile wörtlich:
+
+VERDIKT #95 T-1647-methodik_manager Abschnitt A Runde 46 · Null-Runde: ja
+
+Merge nach `main`: Commit 3da69b79.
+
+**Nachweis Abschnitt A, Runde 48.** Firmen-Repo, `tickets/T-1653-methodik_manager.md`, Abschnitt „Urteil“, Eintrag
+„2026-09-30T05:57:30Z · Runde 0 · methodik_manager (opus/high)“, **Urteil:** freigabe. Verdiktzeile wörtlich:
+
+VERDIKT #95 T-1653-methodik_manager Abschnitt A Runde 48 · Null-Runde: ja
+
+Merge nach `main`: Commit 70baf6ff.
+
+**Nachweis Abschnitt B, Runde 47.** Firmen-Repo, `tickets/T-1648-methodik_manager.md`, Abschnitt „Urteil“, Eintrag
+„2026-09-30T03:46:27Z · Runde 0 · methodik_manager (opus/high)“, **Urteil:** freigabe. Verdiktzeile wörtlich:
+
+VERDIKT #95 T-1648-methodik_manager Abschnitt B Runde 47 · Null-Runde: ja
+
+Merge nach `main`: Commit bb5f0535. „Runde 0“ ist in allen drei Fällen die Zählung im jeweiligen Ticket; im Ledger sind es
+die Runden 46, 48 und 47. Das Urteil zu B nennt einen C-Hinweis zu Quelle [45] (Befund 212, unten); er hält die
+Null-Runde nicht auf.
+
+**Leitfragen nach §5** (Aufgabe Z. 486–515, Namen nach §5, Wortlaut gekürzt). Verdikt A ist das Urteil zu T-1653
+(Runde 48), weil es die Leitfragen nach §5 nummeriert; die Nummern aus dem Urteil zu T-1647 sind nicht übernommen (siehe
+„LF-Zuordnung“ oben).
+
+| Leitfrage | Verdikt A (Runde 48) | Verdikt B (Runde 47) |
+|---|---|---|
+| LF 1 Kette | bestanden: W182 mit Z405, Knoten E02, S152–S155, S157, S158, R35, R36, W124 und W123 über #63 in der Knoten-Bilanz Z. 53–65, S154 begründet inaktiv | ja: die Hebel docken an S155/S158, S157 und S152 an; die Kette von 362,9 Mio. € bleibt |
+| LF 2 Verteilschlüssel-Test | bestanden: Kommune ohne Hitzesignal ergibt bei der Mortalität etwa 0 (§4 Z. 1042–1047), Morbiditäts-Sockel als Grenze (Z. 656–660, Log 29) | ja: kein Hebel verteilt eine feste Summe, alle wirken als Faktor auf den Exzess je Zelle |
+| LF 3 Physische Zwischengröße | bestanden: Euro-Betrag = YLL × VOLY + F × c_Fall (§3.5 Z. 729), YLL und F nativ ausgewiesen | ja: die Hebel wirken auf Exzess und Todesfälle, der Euro-Betrag entsteht erst über YLL × VOLY |
+| LF 4 Doppelzählung | bestanden: HD_ref 7,2 zweiseitig, R9-Partition zu #101, Wächter für die Warnwirkung in c_kal, UHI ohne Doppelkanal, K8 über die R7-Weiche | ja: Wächter für HAP (c_kal), Schutzprogramme und Kühlzentren (`heat.vg_in_kalibrierjahren`) und S157 (`heat.s_gek_kalib`); S157 mit HAP multiplikativ |
+| LF 5 Modifikatoren | bestanden: Band- und Endpunkt-Tabelle (Z. 408–418), OR 0,90 und 1,54 nachgerechnet, Fall-Kontroll-Evidenz nur als Vulnerabilität | ja: h_Heim je Zelle nutzt dieselben Faktoren wie v_vers |
+| LF 6 Struktur | bestanden: D und F altersgeschichtet, Kopplung f_a↔m_a (Z. 570–572) und L̄_85+ (Z. 792–793) neu gerechnet | ja |
+| LF 7 Tails/Parameter | bestanden: empirische Wochenquantile (Z. 374–384), σ = 0,58 K als Modellrechnung mit Messpfad (Z. 929–938), Feinstruktur × 1,028 als Rest-Bias (Z. 1048) | ja: jeder Hebel hat ein Band, δ_HAP 0,852–1,00 aus [45] übersetzt |
+| LF 8 Kalibrierung | bestanden: ein Skalar 0,581 (Z. 944), Voll-Holdout 12/16 (Z. 998–1007), in-sample/out-of-sample gekennzeichnet | ja: σ = 0,58 K in Log 51, c_kal unverändert |
+| LF 9 Kostensätze | bestanden: Preisstand 2024 einheitlich (Z. 174), VSL ÷ VOLY = 38,5 LJ, Konto K1 = Monetarisierung Z100 | ja: VOLY 160.800 € und 7.152 € je Fall, Preisstand 2024 |
+| LF 10 Quellen | bestanden: Stichprobe [69], Warmsen 3.158/388/602 und Berlin 624.505 + 292.354 = 916.859 (Z. 522) gegen die Anlagen-CSV; Befund 213 (Register) bekannt | ja, mit C-Hinweis zu [45] (Befund 212) |
+| LF 11 Form und Erklärbarkeit | bestanden: E1 §3.0 mit zehn Ebenen bis zum Euro-Betrag, E2 Beispiel-Blöcke, E3 Verfälschungen beziffert und eine Methodik (Z. 257), E4 §3.6, E5 Lint grün | ja: je Hebel Formelzeile, Berliner Zahl, Band, stärkster Treiber und „Was die einfachere Rechnung verfälscht“ |
+| LF 12 Umsetzbarkeit | bestanden: q_pfl „neu anzulegen“, q_1P „geparkt“ mit Watchlist (Z. 852–890), Datenlücken benannt (Z. 703, 877), keine Vollrasterrechnung | ja: Andockpunkte `COOLING_ROOMS_DRINKING_WATER` und `VULNERABLE_GROUP_PROGRAMS`, Code-Abweichungen über die Übernahmeliste |
+| LF 13 Herleitungspflicht | bestanden: jedes Zeichen in §3.6 mit Wert und Herkunft (Lint); Stand-Angaben Z. 15 und Z. 540 als Befund 211 bekannt | ja: Befunde 209 und 210 geprüft, Vermerke „fortgeschrieben durch Nr. …“ vollständig |
+| LF 14 Quellen-Synchronität | bestanden: beide Mappen per openpyxl gelesen, Z96 und Z100 (K1, YLL × VOLY, R7/R9) wie §1 | ja: Arbeitsmappen nicht berührt, keine stille Abweichung |
+| LF 15 Risiko ohne (weitere) Anpassung | bestanden: KWRA-Mappe Z97, N–T hoch · mittel · hoch · mittel · hoch, Gewissheit hoch/mittel, wie Z. 101–110; Aussagen (a) und (b) in Z. 122–138 | ja: B verweist nur auf Kapitel 1 (a), konsistent |
+
+**Leseliste Abschnitt A** (Urteile zu T-1653 und T-1647, zeilenweise gelesen Z. 1–1059, jede Überschrift):
+- Kopf: `# Methodik-Bericht #95 — Hitzebelastung`, Statuszeile, Revisionsstand (Z. 1–41);
+- `## 1 Wirkungskette & Knoten-Bilanz (§2.1)` mit `### Knoten-Bilanz`, `### Weitergaben (zweispaltig; Quelle:
+  Netzwerkliste + Abgleich-Protokoll)`, `### Konto-Einbettung`, `### Risiko ohne (weitere) Anpassung`;
+- `## 2 Evidenz-Register (§2.2)`;
+- `## 3 Modell (§2.3) — Ansatz 95-A, Schicht B` mit `### 3.0 Rechenkette` (samt Prüfblock `rechenkette_95`),
+  `### 3.1 Zelltemperatur`, `### 3.2 Wochenverteilung`, `### 3.3 Mortalität (nativer Ausweis YLL)` (Ersatzregel,
+  Tabelle, Toleranz, (a) f_a, (b) β_pfl), `### 3.4 Morbidität`, `### 3.5 Monetarisierung (K1) und Aggregation`,
+  `### 3.6 Zeichentabelle`, `### 3.7 Schicht A`;
+- `## 4 Kalibrierung & Validierung (§2.4/§3.4)`;
+- mitgelesen ab `## 5 `: Log 51 (Urteil zu T-1647, zu σ und (d)).
+
+**Leseliste Abschnitt B** (Urteil zu T-1648, Punkt (a), jede Überschrift ab `## 5 `):
+- `## 5 Maßnahmen-Hebel (§2.5/§3.5)`, zeilenweise Z. 1060–1448, mit allen Hebeln: Hitzeaktionsplan S155/S158 (Lesart,
+  Herleitung, Kappung, Teilabdeckung, Wächter); S157 (OR_ohne, Formelzeile, Stand im Produkt, Voreinstellung s_gek,
+  Bestand der Kalibrierjahre, h_Heim je Zelle, Anpassungspotenzial mit a_85+ je Kommune, Zusammenwirken mit δ_HAP,
+  R7-Weiche); Kühlzentren; Schutzprogramme (Morbidität, Wächter, Zusammenwirken, Kappung 0,794); Sensitivitäten f_alter
+  und l_restlebenserwartung;
+- `## 6 Szenario-Anwendung & Modellgrenzen (§3.2/§3.6)`, Z. 1450–1508;
+- `## 7 Parameter-Blöcke (maschinenlesbar, §4)`: maschinell über den Lint; zeilenweise die seit Runde 38 geänderten
+  Blöcke `heat.delta_hap`, `heat.g_s157`, `heat.delta_kuehlzentren`, `heat.kappung_vg` und die Beispiel-Blöcke
+  Z. 1915–2154;
+- `## 8 Quellen (§3.8 — #95-relevanter Auszug; Nummern [11]–[62] = M0-Zählung)`, Z. 2164–2366, vollständig;
+- `## Entscheidungslog`, Z. 2367–2450, Einleitung und Einträge 1–54 vollständig;
+- mitgelesen aus A: laut Urteil keine Änderung an A seit der Null-Runde von Paket 5.
+
+Beide Listen zusammen decken jede Überschrift des Berichts von Z. 1 bis zum Ende ab: Kopf; `## 1` mit den vier
+Unterabschnitten; `## 2`; `## 3` mit `### 3.0` bis `### 3.7`; `## 4`; `## 5`; `## 6`; `## 7`; `## 8`; `## Entscheidungslog`.
+Den Kopf ändert dieses Paket danach (Statuszeile Z. 3–9 und Satz Z. 10–15); ab `## 1 ` ist der Bericht gleich `main`
+(`git show origin/main:docs/methodik/95_hitzebelastung.md` ab „`## 1 `“ gleich der Datei: `True`). Die Prüfung des Kopfs
+liegt bei der Abnahme durch den methodik_manager; sie ist keine Prüfrunde nach A-0046.
+
+**Maschinell** (ausgeführt am 30.09.2026 auf dem Branch `ticket/T-1655-methodik_manager` aus dem Wurzelverzeichnis):
+`python3 backend/scripts/lint_methodik.py 95` meldet vor und nach der Änderung am Kopf „304 Checks grün“ und
+„ALLE LINTS GRÜN“. `python3 backend/scripts/ledger.py 95 --pruefe` meldet vor diesem Eintrag 197 Befunde, zurückgestellt
+3 (211, 212, 213; ihre drei roten Ausdrücke sind der zurückgestellte Sollzustand), belegt geschlossen 116,
+„Prüfausdruck ROT   : 0“ und die Schlusszeile „GRÜN — kein Prüfausdruck eines geschlossenen Befunds schlägt fehl.“ Nach
+diesem Eintrag: 197 Befunde, zurückgestellt 3 (211, 212, 213), belegt geschlossen 116, „Prüfausdruck ROT   : 0“,
+Schlusszeile „GRÜN — …“, Exit 0.
+
+**Beträge** (je Jahr, Preisstand 2024):
+- Berlin, Kette (§3.0, Block `rechenkette_95`, im Lint grün): Mortalität 2.250 YLL × 160.800 € = 361,8 Mio. €, Morbidität
+  152,00 Fälle × 7.152 € = 1,09 Mio. €, zusammen 362,9 Mio. €; nachgerechnet in den Urteilen zu T-1647 und T-1653.
+- Berlin, Golden-Betrag: nach Tabelle §3.3 (Z. 490, `95_zellvergleich.py --gemeinde 11000000 --ersatz --sigma 0.58`)
+  345,11 Mio. €. Im Produkt heute 342.581.893 € (σ = 0,5 K), nach dem Nachzug der Übernahmeliste 345.026.859 €.
+- Warmsen (AGS 03256034): nach Tabelle §3.3 (Z. 491) 175.256 €; im Produkt heute 172.957 €, nach dem Nachzug 175.116 €.
+
+Messbefehl E (Befund 188) mit `t.SIGMA_K=0.58;` vor dem Aufruf, ausgeführt am 30.09.2026 auf diesem Branch:
+
+```
+python3 -c "import subprocess,sys,os; py=os.path.expanduser('~/.venvs/kap2/bin/python'); env=dict(os.environ, PYTHONPATH='backend:backend/tests'); code='import test_methodik_95_golden_betraege as t; t.SIGMA_K=0.58; print(round(t._jahresbetrag(t.BERLIN)), round(t._jahresbetrag(t.WARMSEN)))'; p=subprocess.run([py,'-c',code],capture_output=True,text=True,env=env); print(p.stdout.strip(), p.stderr[-1500:]); sys.exit(p.returncode)"
+```
+
+Ausgabe wörtlich (stderr leer, Exit 0): `345026859 175116`. Derselbe Befehl ohne `t.SIGMA_K=0.58;` (Stand des Produkts
+heute): `342581893 172957`.
+
+**Zurückgestellt**, je Kategorie C, Termin: nächste Änderung am Bericht (Zeilen in „Vorbereitung der Runde 48“):
+- 211: Stand-Angabe zur Ersatzregel. Die Stelle im Kopf hat dieses Paket nachgezogen (Z. 14–15: „die Ersatzregel rechnet
+  es seit T-1364-cto“); es bleiben §3.3 Z. 540 und Log 41, Spalte Auswirkung, deshalb ist der Prüfausdruck noch rot.
+- 212: Fundstellen der Herleitung von δ_HAP im Quelleneintrag [45] (Kap. 8).
+- 213: `docs/evidenz/register.md`, Zeilen 95-S158-01 und 95-S157-01 auf dem Stand des Berichts.
+
+Fortschreibung des Satzes aus Runde 38 zu Befund 116 und `_AUSSTEHEND_CTO`: Befund 116 ist behoben (T-1364-cto, Commit
+fe76ba2f vom 26.09.2026; festgestellt in T-1653-methodik_manager, Paket 7a); das Produkt rechnet die Ersatzregel seit
+T-1364-cto. `_AUSSTEHEND_CTO` ist mit T-1606-cto entfallen (Commit 98a4d24d vom 27.09.2026; `grep -c '_AUSSTEHEND_CTO'
+backend/tests/test_methodik_95_bloecke.py` gibt `0`).
+
+**Übernahmeliste an den CTO.** Sie besteht aus zwei Tabellen:
+- Paket 4: Abschnitt `### Paket 4 aus T-1642-cmo (T-1646-methodik_manager, 29.09.2026): Befunde 181–183 behoben`, zwölf
+  Zeilen (elf Wertzeilen und die Musterzeile „Freitext im Code …“); Musterbefehl unter der Tabelle (`grep -rnF -e "0,5 K"
+  … | wc -l`), gemessen am 30.09.2026 auf diesem Branch: `36`.
+- Paket 7b: Abschnitt `## Übernahmeliste an den CTO nach T-1642-cmo — Pakete 2 und 3 (δ_KZ, g_S157, δ_HAP;
+  T-1654-methodik_manager, 30.09.2026)`, 26 Zeilen (25 Wertzeilen und die Musterzeile „Freitext der Pakete 2 und 3 …“);
+  Musterbefehl unter der Tabelle (`grep -rnF -e "0,9956" … | wc -l`), gemessen am 30.09.2026 auf diesem Branch: `56`.
+Zeilenzahl gezählt mit `python3 -c "z=open('reviews/BEFUNDE_95.md',encoding='utf-8').read().split(chr(10)); h=[i for i,l in
+enumerate(z) if l.startswith('| Pfad | Schlüssel')]; print([sum(1 for l in z[i+2:] [:next(j for j,x in
+enumerate(z[i+2:]) if not x.startswith(chr(124)))]) for i in h])"`, Ausgabe `[12, 26]`.
+
+**Folgearbeit.** Nach dem Code-Nachzug des CTO folgt eine Änderung am Bericht. Sie betrifft Z. 494 („die Anlage steht
+ohne `--sigma` noch auf 0,5 K“), §5 „Stand im Produkt (Befund 195)“ (Z. 1234) und die Befunde 211 und 212, ebenso
+`docs/evidenz/register.md` (Befund 213).
+
+**Zählung nach A-0046.** Seit der Null-Runde 38 liefen die Runden 39 bis 48, also zehn Runden: 39 (Anlässe aus
+T-1642-cmo, T-1643), 40–41 (Pakete 2 und 3, T-1644 und T-1645), 42–44 (Paket 4, T-1646), 45 (T-1652), 46 (Paket 5,
+T-1647), 47 (Paket 6, T-1648), 48 (Paket 7a, T-1653). Runde 48 ist die Null-Runde; die Zählung endet hier, die Grenze
+Runde 48 ist erreicht, aber nicht überschritten, eine Benachrichtigung des Aufsichtsrats nach A-0046 entfällt.
+
+Neue Befunde: keine.
