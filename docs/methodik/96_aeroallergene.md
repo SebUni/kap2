@@ -157,7 +157,7 @@ lange Anpassungsvorlaufzeiten: Stadtbaum-Generationen) [15].
 
 **(a) Zuordnung der Zahlen.** Alle Zahlen des Basiswerts in diesem Bericht — Betroffene, zusätzliche
 Symptomtage und die daraus bewerteten Euro-Beträge in K1-Morbidität, für die Beispielkommune Berlin
-755.753 Tage und 4,69 Mio. € je Jahr (Preisstand 2024) in der Rechenkette §3.0 — gehören zum KWRA-Zustand
+408.106 Tage und 2,53 Mio. € je Jahr (Preisstand 2024) in der Rechenkette §3.0 — gehören zum KWRA-Zustand
 **„Risiko ohne (weitere) Anpassung“**, und zwar zur Zeitscheibe Gegenwart: M0 weist das Ist-Klima aus
 (Normalperioden 1961–1990 gegen 1991–2020, Kapitel 6). Der umgesetzte Anpassungsstand steckt über die
 Erhebungsjahre der gemessenen Größen im Basiswert, nicht in einem eigenen Faktor:
@@ -198,15 +198,15 @@ Basiswert dar, nicht als eigenen Basiswert:
 - **Pollen-Frühwarnung S158** (§5.1, Abschätzung von KAP3 nach Vorgabe P2): Sie wirkt nur an gewarnten Tagen
   (DWD-Pollenflug-Gefahrenindex mindestens „mittel“ [70], je Pollengruppe) und nur in Zellen im
   Geltungsbereich. Dort mindert sie \(r_{\text{S158}} \cdot t_{\text{warn}}\) = 0,03 × 0,75 = 2,25 % der
-  Zusatztage. Beispielkommune Berlin, ganze Stadt im Geltungsbereich: 17.004 vermiedene Tage und
-  ≈ 105.400 € je Jahr (Preisstand 2024).
+  Zusatztage. Beispielkommune Berlin, ganze Stadt im Geltungsbereich: 9.182 vermiedene Tage und
+  ≈ 56.900 € je Jahr (Preisstand 2024).
 - **Allergenarme Stadtbaumwahl** (§5, Log 24): Sie senkt den Kronenanteil allergener Bäume einer Zelle;
   \(\hat G\) sinkt um 0,464 × diese Änderung bei Kronen mit Gattungs-Tag der Birkengruppe, bei Kronen
   ohne Gattungs-Tag nur um 0,464 × 0,12 × diese Änderung, so wie der Ausgangsstand sie zählt
   (Ebenendefinition §3.3), \(\hat P\) um 0,14 je Senkung von
   \(\hat G/\bar G_0\) um 0,2. Weil der Bezugswert Ḡ₀ im Ausgangsstand festgehalten wird, sinkt die
   Summe der Kommune um die Senkung in den bepflanzten Zellen (Rechenbeispiel §5: vier Zellen,
-  8.000 Betroffene, 1.179 Tage und ≈ 7.310 € weniger je Jahr; Richtung des Fehlers in
+  8.000 Betroffene, 637 Tage und ≈ 3.950 € weniger je Jahr; Richtung des Fehlers in
   Modellgrenze 7).
 
 Im Produkt rechnen beide Hebel seit der Integration am 27.09.2026 im Zelllauf, als Katalogmaßnahmen
@@ -255,15 +255,16 @@ stehen nach der Vorrangregel am Ende der Aufgabe ohnehin nur in der KWRA-2021-Ma
 wie sicher die Projektion für 2031–2060 und 2071–2100 ist. Der Basiswert dieses Berichts rechnet dagegen die
 Gegenwart aus gemessenen Größen (Phänologie an über 1.000 DWD-Stationen, Prävalenz aus Surveys). Seine
 Unsicherheit liegt nicht in einer Klimaprojektion, sondern in drei Bändern (Beispielkommune Berlin, Basis
-755.753 Tage und 4,69 Mio. € je Jahr, §3.0):
+408.106 Tage und 2,53 Mio. € je Jahr, §3.0):
 
-- **Klimaanteil \(a_{\text{attr}}\)** = 0,50 (0,19–0,84), übertragen aus einer nordamerikanischen Studie [9]:
-  stärkster Treiber für Tage und Euro gleichermaßen, 1,78–7,87 Mio. € je Jahr.
+- **Klimaanteil \(a_{\text{attr}}\)** = 0,27 (0,19–0,41), Abschätzung von KAP3 aus einer nordamerikanischen Studie [9]:
+  die Mitte der dort genannten Spanne für die Länge der Pollensaison 1990–2018 (Kap. 2, Befund 258). Stärkster
+  Treiber für Tage und Euro gleichermaßen, 1,78–3,84 Mio. € je Jahr (−30 % bis +52 %).
 - **Kostensatz \(c_{\text{Tag}}\)** = 6,20 € je Tag, Band bis 23,66 € (Schramm [7], mittelschwer bis schwer
-  Erkrankte): wirkt nur auf den Euro-Betrag und nur nach oben, bis 17,9 Mio. € je Jahr; die Tage ändert er nicht.
+  Erkrankte): wirkt nur auf den Euro-Betrag und nur nach oben, bis 9,7 Mio. € je Jahr; die Tage ändert er nicht.
 - **Sensibilisierungsprofil \(p_B/p_G\)** (Abschätzung von KAP3, §3.4; Bänder 0,4–0,7 und 0,6–0,85): wirkt fast
-  nur auf die Tage, 580.958–901.837 Tage (−23 % bis +19 %). Im Euro-Betrag kürzt es sich fast heraus, weil es
-  über \(d_{\text{Saison}}\) auch im Kostensatz je Tag steht: 4,38–5,07 Mio. € (−6 % bis +8 %).
+  nur auf die Tage, 313.718–486.992 Tage (−23 % bis +19 %). Im Euro-Betrag kürzt es sich fast heraus, weil es
+  über \(d_{\text{Saison}}\) auch im Kostensatz je Tag steht: 2,37–2,74 Mio. € (−6 % bis +8 %).
 
 ## 2 Evidenz-Register (§2.2)
 
@@ -275,7 +276,7 @@ Spalte verweist auf die Entscheidungslog-Nummer.
 | Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | Entscheidung | E-Regel |
 |---|---|---|---|---|---|---|---|---|
 | 96-W025-01 | W025/#1 Phänologie → Saison-Spreizung | \(\Delta S_B\) = 3,96/4,20/5,94 · \(\Delta S_G\) = 4,78/4,08/3,70 Tage (N/M/S; 1961–90 → 1991–2020) | amtliche Messreihe (DWD-Phänologie), eigene Auswertung (Skript [67]) | DWD-CDC Jahresmelder [33]; `pollensaison_region.csv` [67] | DE-weit, 1.083/1.085 gepaarte Stationen; Marker-Wahl §3.1 (Birke Phase 4 — Log 3) | regional (N/M/S je Bundesland, wie #95) | **Basiswert** | Log 2–5 |
-| 96-W025-02 | Klimawandel → Anteil am Saisontrend | \(a_{\text{attr}}\) = 0,50 (IQR 0,19–0,84). IQR heißt Interquartilsabstand: die Spanne, in der die mittlere Hälfte der Schätzungen liegt, je ein Viertel liegt darunter und darüber. Die Studie schätzt den Anteil mit 22 Klimamodellen je Kennzahl und Zeitraum; 0,19–0,84 umfasst die vier Spannen für Beginn und Länge der Pollensaison 1990–2018 und 2003–2018 (19–35 %, 22–41 %, 35–66 %, 45–84 %; [9], Results und Abb. 3) und ist deshalb breiter als jede einzelne | Attributionsstudie (Beobachtung × Klimamodelle; sie trennt den Anteil des Klimawandels von anderen Ursachen) | Anderegg 2021, PNAS [9] | Nordamerika 1990–2018; Übertragung auf DE als dokumentierte Annahme (einzige publizierte Attribution) | Literatur-Band | **Basiswert** | Log 11 |
+| 96-W025-02 | Klimawandel → Anteil am Saisontrend | \(a_{\text{attr}}\) = 0,27 (Band 0,19–0,41), Abschätzung von KAP3. IQR heißt Interquartilsabstand: die Spanne, in der die mittlere Hälfte der Schätzungen liegt, je ein Viertel liegt darunter und darüber. Die Studie schätzt den Anteil mit 22 Klimamodellen je Kennzahl und Zeitraum und nennt vier solche Spannen: Saisonbeginn 35–66 % (1990–2018) und 45–84 % (2003–2018), Saisonlänge 19–35 % (1990–2018) und 22–41 % (2003–2018) ([9], Results und Abb. 3). \(\Delta S\) ist eine Verlängerung der Saison (§3.1), deshalb gilt die Saisonlänge; die rund 50 % im Abstract von [9] gelten Beginn und Länge zusammen. Eine Zahl für die Mitte der Schätzungen zur Länge nennt der Text nicht, Abb. 3 zeigt sie nur als Kasten. KAP3 nimmt deshalb die Mitte der Spanne 1990–2018: (0,19 + 0,35) ÷ 2 = 0,27; das Band 0,19–0,41 umfasst beide Spannen der Länge | Attributionsstudie (Beobachtung × Klimamodelle; sie trennt den Anteil des Klimawandels von anderen Ursachen) | Anderegg 2021, PNAS [9] | Nordamerika 1990–2018; Übertragung auf DE als dokumentierte Annahme (einzige publizierte Attribution) | Literatur-Band | **Basiswert** | Log 11 |
 | 96-W025-03 | Intensitätszunahme (Pollenmenge, Herbst-Verlängerung) | Pollenintegral +20,9 % [9]; CO₂-Effekt Ambrosia +61…131 % [21,22]; Herbst-Spreizung der Kräuterpollen [6] | Beobachtung/Experiment | [6,9,21,22] | belegt, aber ohne DE-ERF je Zelle | — | **bewusst inaktiv** (Untergrenze; §6 Modellgrenze 1) | Log 4/14 |
 | 96-W025-04 | E09 Trockenheit → Pollenfreisetzung/-transport | Wirkrichtung intensitätserhöhend; keine quantifizierte ERF | — | Rev.-5-Befund 52 | — | — | **bewusst inaktiv** | Log 14 |
 | 96-W024-01 | W024 lokale allergene Vegetation → Symptomlast | \(\lambda\) = 0,7 (0,3–1,0); Kette §3.4: Fallen-Differenzen 245 %/306 % (14 Fallen Berlin; Zuwachs-Lesart ⇒ \(R\) = 3,45/4,06, Verhältnis-Lesart im Band) ⇒ \(\lambda_{\text{roh}}\) 1,10–1,21 × vegetationserklärter Anteil 0,6 (0,4–0,8) | Messreihen (Pollenfallen), Symptomgradient, Lidar-Studie | Werchan 2017 [54], Werchan 2018 [55], Bogawski 2019 [56] | Berlin/Posen; **gekennzeichnete Abschätzung** (§3.9) | OSM-Vegetation; Ebene POLLEN_LOAD **neu anzulegen** (§3.3) | **Basiswert** | Log 12 |
@@ -316,11 +317,11 @@ Beschwerden, und jeder zusätzliche Beschwerdetag kostet Behandlung.
 | 3 | Betroffene \(B = \sum_a \text{pop}_a \times p_{\text{AR},a}\) | 59.248 + 302.036 + 22.746 + 12.676 + 5.397 = **402.103 Betroffene** (11,0 % der Einwohner) | Ebenen 1 und 2 |
 | 4 | Klimasignal der Region: Verlängerung der Saison als Spreizung \(\Delta S_B\) (Erle → Birke) und \(\Delta S_G\) (Fuchsschwanz → Knäuelgras), 1991–2020 gegen 1961–1990 | Region Mitte: \(\Delta S_B\) = 4,20 Tage, \(\Delta S_G\) = 4,08 Tage | DWD-Phänologie, `pollensaison_region.csv`, Zeilen `mitte` [67] (§3.1); Kap. 7 `pollen.delta_s_region` |
 | 5 | Gewichtet mit dem Anteil der Betroffenen, die auf die jeweilige Saison reagieren: \(p_B \Delta S_B + p_G \Delta S_G\) | 0,55 × 4,20 + 0,75 × 4,08 = 2,31 + 3,06 = 5,37 Tage | \(p_B\), \(p_G\): Abschätzung von KAP3, Rangfolge nach [3] (§3.4, Log 8); Kap. 7 `pollen.p_sens_gruppen` |
-| 6 | Zusätzliche Symptomtage je Betroffenem \(\delta = f \times \text{Ebene 5} \times a_{\text{attr}}\) (Anteil der Saisontage mit Beschwerden, Anteil des Klimawandels am Trend) | 0,70 × 5,37 × 0,50 = **1,8795 Tage** je Betroffenem und Jahr | \(f\): Abschätzung von KAP3 (§3.4, Log 7); \(a_{\text{attr}}\): Anderegg [9] (Log 11); Kap. 7 `pollen.f_symptomtage`, `pollen.a_attr` |
+| 6 | Zusätzliche Symptomtage je Betroffenem \(\delta = f \times \text{Ebene 5} \times a_{\text{attr}}\) (Anteil der Saisontage mit Beschwerden, Anteil des Klimawandels am Trend) | 0,70 × 5,37 × 0,27 = **1,01493 Tage** je Betroffenem und Jahr | \(f\): Abschätzung von KAP3 (§3.4, Log 7); \(a_{\text{attr}}\): Abschätzung von KAP3, Mitte der Spanne 19–35 % für die Saisonlänge 1990–2018 aus Anderegg [9] (Kap. 2, Log 11, Befund 258); Kap. 7 `pollen.f_symptomtage`, `pollen.a_attr` |
 | 7 | Vegetationsfaktor \(\hat P\) je Zelle (allergene Bäume und Grünflächen), zentriert auf den Bezugswert Ḡ₀, das betroffenengewichtete Mittel der eigenen Kommune im Ausgangsstand | je Zelle ab 0,3 (keine allergene Vegetation) bis über 1 (Allee, Park); Mittel über Berlin im Ausgangsstand genau **1**, also \(\sum B \hat P = \sum B\) = 402.103 | \(\lambda\) = 0,7 aus Werchan [54,55], Bogawski [56], Lesart als örtlicher Anteil Hugg [74] (§3.3, §3.4, Log 12, 17, 18, 26); Kap. 7 `pollen.lambda_veg` |
-| 8 | Zusätzliche Symptomtage \(\Delta\text{Tage} = B \times \delta \times \hat P\) (native Ergebnisgröße) | 402.103 × 1,8795 × 1 = **755.753 Tage je Jahr** (u20 111.357 · 20–64 567.677 · 65–74 42.751 · 75–84 23.825 · 85+ 10.143) | Ebenen 3, 6 und 7 |
+| 8 | Zusätzliche Symptomtage \(\Delta\text{Tage} = B \times \delta \times \hat P\) (native Ergebnisgröße) | 402.103 × 1,01493 × 1 = **408.106 Tage je Jahr** (u20 60.133 · 20–64 306.546 · 65–74 23.085 · 75–84 12.866 · 85+ 5.477; die gerundeten Bänder ergeben 408.107, mit den ungerundeten Betroffenen 402.103,45 sind es 408.106,9) | Ebenen 3, 6 und 7 |
 | 9 | Kostensatz je Symptomtag \(c_{\text{Tag}} = c_{\text{Jahr,direkt}} / d_{\text{Saison}}\) mit \(d_{\text{Saison}} = f \times (p_B L_B + p_G L_G)\) | 266,90 € / (0,70 × (0,55 × 30 + 0,75 × 60)) = 266,90 € / 43,05 Tage = **6,20 € je Tag** (Preisstand 2024) | TOTALL [65], VPI [19]; \(L_B\), \(L_G\): Abschätzung von KAP3 nach [51] (§3.5); Kap. 7 `pollen.c_jahr_direkt`, `pollen.d_saison`, `pollen.c_tag` |
-| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 755.753 × 6,20 € = **4,69 Mio. € je Jahr (Preisstand 2024)**, das sind 1,28 € je Einwohner; der Zelllauf des Produkts ergibt 4,58 Mio. € (Unterschied und Toleranz unten) | Ebenen 8 und 9 |
+| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 408.106 × 6,20 € = **2,53 Mio. € je Jahr (Preisstand 2024)**, das sind 0,69 € je Einwohner; der Zelllauf des Produkts ergibt 2,47 Mio. € (Unterschied und Toleranz unten). Das Produkt rechnet bis zur Übernahme Ü-13 noch mit \(a_{\text{attr}}\) = 0,50 und zeigt deshalb heute 4,58 Mio. € | Ebenen 8 und 9 |
 
 **Warum \(f\) im Euro-Betrag keine Rolle spielt.** \(f\) steht in Ebene 6 (mehr Tage) und in
 Ebene 9 (mehr Tage in der Referenzsaison, also billigerer Tag); in Ebene 10 kürzt es sich
@@ -351,7 +352,7 @@ deshalb nicht. Was bleibt, ist die Bevölkerung. Gemessen ist das mit dem Produk
 geheimgehaltenem Anteil 65+ und mit u20 je Zelle aus den 5er-Jahresgruppen (§3.2). Tage und Euro
 kommen aus `impact.compute_all_cell_impacts`. Anlage `docs/methodik/anlagen/96_zelllauf_bandsummen.py`,
 Aufruf `bash scripts/testlauf.sh docs/methodik/anlagen/96_zelllauf_bandsummen.py -q -s`, Lauf
-29.09.2026. Die Bandsummen des Gitters sind u20 655.066 · 20–64 2.230.974 · 65–74 341.087 ·
+30.09.2026, mit \(a_{\text{attr}}\) aus Kapitel 7 (Block `pollen.a_attr`). Die Bandsummen des Gitters sind u20 655.066 · 20–64 2.230.974 · 65–74 341.087 ·
 75–84 267.692 · 85+ 98.539 (zusammen 3.593.357; die gerundeten Bänder ergeben 3.593.358). Zwei
 Wirkungen erklären den Unterschied, jede auf die vorige gerechnet:
 (1) **Einwohnersumme: × 0,9812 (−1,88 %).** Das Gitter zählt 3.593.357 Einwohner, die
@@ -361,13 +362,13 @@ Einwohner 65 Jahre und älter, in der Fortschreibung 19,1 %. Mehr Menschen stehe
 Bändern mit 6,7 % und 5,0 % Prävalenz statt mit 8,8 % und 13,2 %, und die mittlere Prävalenz sinkt
 von 10,98 % auf 10,95 %. Der Anteil u20 an den unter 65-Jährigen ist fast gleich (22,70 % gegen
 22,73 % in Ebene 1).
-Zusammen 0,9812 × 0,9969 = 0,9781: Der Zelllauf ergibt für Berlin 393.299 Betroffene, 739.205
-zusätzliche Symptomtage und **4,58 Mio. € je Jahr (Preisstand 2024)**. Das sind 2,19 % oder
-0,10 Mio. € weniger als die Kette mit 4,69 Mio. €, davon 0,09 Mio. € aus der Einwohnersumme und
+Zusammen 0,9812 × 0,9969 = 0,9781: Der Zelllauf ergibt für Berlin 393.299 Betroffene, 399.171
+zusätzliche Symptomtage und **2,47 Mio. € je Jahr (Preisstand 2024)**. Das sind 2,19 % oder
+0,06 Mio. € weniger als die Kette mit 2,53 Mio. €, davon 0,05 Mio. € aus der Einwohnersumme und
 0,01 Mio. € aus den Altersbändern. **Toleranz des Zelllaufs: ± 0,005 Mio. €.** Der Zelllauf ist auf
 den gepinnten Zelldaten deterministisch: Dieselben Zellen und derselbe Code ergeben dieselbe Zahl,
-gemessen 4,5831 Mio. €. Die Toleranz ist deshalb nur die Rundung auf zwei Nachkommastellen, wie im
-Golden-Test `backend/tests/test_methodik_96_golden_betraege.py`; der Messwert liegt 0,0031 Mio. €
+gemessen 2,4749 Mio. €. Die Toleranz ist deshalb nur die Rundung auf zwei Nachkommastellen, wie im
+Golden-Test `backend/tests/test_methodik_96_golden_betraege.py`; der Messwert liegt 0,0049 Mio. €
 neben dem Berichtswert. Mehr Spiel wie in Bericht #95 (± 1 Mio. € für Berlin) braucht #96 nicht,
 weil der Betrag der Kommune hier nur von den Einwohnern je Band abhängt. Ein neuer Datenstand
 (anderes Gitter, andere Gemeindezeile für die Ersatzregel) ist eine neue Messung mit der Anlage,
@@ -384,10 +385,12 @@ u20-Anteil sind es 1.303 Betroffene (0,32 %). Größer wird dieser Fehler bei Ko
 Altersaufbau stärker vom Bund oder Land abweicht (Universitätsstadt, Kurort): Dort gehören die
 Altersbänder der Kommune in Ebene 1, nie die des Landes.
 
-**Stärkster Treiber** ist der Klimaanteil \(a_{\text{attr}}\) (Ebene 6): Sein Band 0,19–0,84
-(Anderegg [9]) setzt Tage und Euro für Berlin auf das 0,38- bis 1,68-Fache (−62 % bis +68 %), also 1,78–7,87 Mio. €
-je Jahr. Weiter reicht nur das Band des Kostensatzes nach oben (Obergrenze 23,66 € je Tag aus
-Schramm [7] für mittelschwer bis schwer Erkrankte, damit 17,9 Mio. €); es ist einseitig und
+**Stärkster Treiber** ist der Klimaanteil \(a_{\text{attr}}\) (Ebene 6): Sein Band 0,19–0,41
+(Anderegg [9], Kap. 2) setzt Tage und Euro für Berlin auf das 0,70- bis 1,52-Fache (−30 % bis +52 %), also 1,78–3,84 Mio. €
+je Jahr. Nachgeprüft an den übrigen Bändern aus Kapitel 7: \(f\) (0,50–0,85) wirkt nur auf die Tage, −29 % bis
++21 %; \(p_B/p_G\) wirkt auf die Tage −23 % bis +19 % und auf den Euro-Betrag −6 % bis +8 % (Kap. 1); \(\lambda\)
+ändert die Summe der Kommune im Ausgangsstand nicht (Ebene 7). Weiter reicht nur das Band des Kostensatzes nach oben (Obergrenze 23,66 € je Tag aus
+Schramm [7] für mittelschwer bis schwer Erkrankte, damit 9,7 Mio. €); es ist einseitig und
 wirkt nur auf den Euro-Betrag, nicht auf die Tage (§3.5).
 
 ```python test: rechenkette_96
@@ -408,11 +411,11 @@ B = sum(b_band.values())
 assert abs(B - 402_103) < 1
 assert abs(B / sum(pop.values()) - 0.110) < 0.001
 dS_B, dS_G = 4.20, 4.08          # pollensaison_region.csv, Region mitte
-p_B, p_G, f, a_attr = 0.55, 0.75, 0.70, 0.50
+p_B, p_G, f, a_attr = 0.55, 0.75, 0.70, 0.27   # a_attr: Kap. 7 pollen.a_attr (Befund 258)
 gew = p_B * dS_B + p_G * dS_G
 assert abs(gew - 5.37) < 1e-9
 delta = f * gew * a_attr
-assert abs(delta - 1.8795) < 1e-9
+assert abs(delta - 1.01493) < 1e-9
 # Ebene 7: Zentrierung auf G0 der eigenen Kommune -> Summe im Ausgangsstand gegen P^ invariant
 # (mit Massnahme sinkt sie, G0 festgehalten: Beispiel beispiel_96_stadtbaum_kommunensumme, Kap. 5)
 lam = 0.7
@@ -422,18 +425,18 @@ p_hat = [1 + lam * (g / g_bar - 1) for _, g in zellen]
 assert abs(sum(b * p for (b, _), p in zip(zellen, p_hat)) - sum(b for b, _ in zellen)) < 1e-9
 assert abs(p_hat[0] - 0.3) < 1e-9 and abs((1 + lam * (2 - 1)) - 1.7) < 1e-9
 tage = B * delta * 1.0
-assert abs(tage - 755_753) < 1
+assert abs(tage - 408_106) < 1 and abs(402_103 * delta - 408_106) < 0.5
 tage_band = {k: v * delta for k, v in b_band.items()}
-for k, soll in {"u20": 111_357, "20-64": 567_677, "65-74": 42_751,
-                "75-84": 23_825, "85+": 10_143}.items():
+for k, soll in {"u20": 60_133, "20-64": 306_546, "65-74": 23_085,
+                "75-84": 12_866, "85+": 5_477}.items():
     assert abs(tage_band[k] - soll) < 1
 d_saison = f * (p_B * 30 + p_G * 60)
 assert abs(d_saison - 43.05) < 1e-9
 c_tag = 6.20                      # Kap. 7 pollen.c_tag (= 266,90 / 43,05, gerundet)
 assert abs(266.90 / d_saison - c_tag) < 0.01
 euro = tage * c_tag
-assert abs(euro / 1e6 - 4.69) < 0.005
-assert abs(euro / sum(pop.values()) - 1.28) < 0.005
+assert abs(euro / 1e6 - 2.53) < 0.005
+assert abs(euro / sum(pop.values()) - 0.69) < 0.005
 # Grenze der Kommunenrechnung (Bundes- statt Kommunenanteil u20) und staerkster Treiber
 assert abs(0.01 * u65 * (0.132 - 0.088) - 1_303) < 1
 anteil_bund = 15_583_456 / 64_747_448
@@ -442,27 +445,28 @@ mehr_u20 = round(u65 * anteil_bund) - pop["u20"]
 verschiebung = mehr_u20 * (0.132 - 0.088)
 assert abs(mehr_u20 - 39_482) < 2
 assert abs(verschiebung - 1_737) < 1 and abs(verschiebung / B - 0.0043) < 0.0001
-assert abs(euro * 0.19 / 0.50 / 1e6 - 1.78) < 0.005
-assert abs(euro * 0.84 / 0.50 / 1e6 - 7.87) < 0.005
-assert abs(tage * 23.66 / 1e6 - 17.9) < 0.05
+assert abs(euro * 0.19 / a_attr / 1e6 - 1.78) < 0.005 and abs(0.19 / a_attr - 0.70) < 0.005
+assert abs(euro * 0.41 / a_attr / 1e6 - 3.84) < 0.005 and abs(0.41 / a_attr - 1.52) < 0.005
+assert abs(tage * 23.66 / 1e6 - 9.7) < 0.05
 # Zelllauf des Produkts mit Ersatzregel #95 §3.3 (40.669 Zellen, gepinnte Zelldaten; Anlage
-# 96_zelllauf_bandsummen.py, Lauf 29.09.2026): Bandsummen, Zerlegung, Toleranz
+# 96_zelllauf_bandsummen.py, Lauf 30.09.2026): Bandsummen, Zerlegung, Toleranz
 zell = {"u20": 655_066, "20-64": 2_230_974, "65-74": 341_087, "75-84": 267_692, "85+": 98_539}
 assert abs(sum(zell.values()) - 3_593_357) <= 1          # gerundete Baender ergeben 3.593.358
 assert abs(zell["u20"] / (zell["u20"] + zell["20-64"]) - 0.2270) < 1e-4
 B_zell = sum(zell[k] * p_ar[k] for k in zell)
 assert abs(B_zell - 393_299) < 1
-assert abs(B_zell * delta - 739_205) < 1
+assert abs(B_zell * delta - 399_171) < 1
 euro_zell = B_zell * delta * c_tag
 tol_zell = 0.005                    # Mio. EUR: Rundung, der Lauf ist deterministisch
-assert abs(euro_zell / 1e6 - 4.58) < tol_zell
+assert abs(euro_zell / 1e6 - 2.47) < tol_zell
+assert abs(euro_zell * 0.50 / a_attr / 1e6 - 4.58) < tol_zell   # heutiger Produktwert mit 0,50 bis Ue-13
 f_ew = 3_593_357 / 3_662_381
 assert abs(f_ew - 0.9812) < 0.00005
 f_alter = B_zell / (B * f_ew)
 assert abs(f_alter - 0.9969) < 0.00005
 assert abs(B_zell / B - 0.9781) < 0.00005 and abs(1 - B_zell / B - 0.0219) < 0.00005
-assert abs((euro - euro_zell) / 1e6 - 0.10) < 0.005
-assert abs(euro * (1 - f_ew) / 1e6 - 0.09) < 0.005
+assert abs((euro - euro_zell) / 1e6 - 0.06) < 0.005
+assert abs(euro * (1 - f_ew) / 1e6 - 0.05) < 0.005
 assert abs(euro * f_ew * (1 - f_alter) / 1e6 - 0.01) < 0.005
 ab65_zell = (zell["65-74"] + zell["75-84"] + zell["85+"]) / sum(zell.values())
 assert abs(ab65_zell - 0.197) < 0.0005 and abs((a6574 + a7584 + a85p) / sum(pop.values()) - 0.191) < 0.0005
@@ -736,18 +740,18 @@ $$ \Delta\text{Tage}_{\text{Zelle}} \;=\; B_{\text{Zelle}} \cdot \delta_R \cdot 
   \(\hat G\) über drei Siedlungstypen: Offenbach am Main 0,174 · Freising 0,180 ·
   Weyarn 0,270 (2.896 bewohnte Zellen) — der Stadt-Land-Kontrast ist die erwartete
   Richtung und belegt, dass die Ebene misst, was sie soll.
-- Werte je Region: \(\delta\) = **2,02 / 1,88 / 2,12** Tage je Betroffenem·Jahr (N/M/S;
-  DE-gewichtet 1,99) mit den Basiswerten \(f\) = 0,70, \(p_B\) = 0,55, \(p_G\) = 0,75,
-  \(a_{\text{attr}}\) = 0,50.
+- Werte je Region: \(\delta\) = **1,09 / 1,01 / 1,14** Tage je Betroffenem·Jahr (N/M/S;
+  DE-gewichtet 1,07) mit den Basiswerten \(f\) = 0,70, \(p_B\) = 0,55, \(p_G\) = 0,75,
+  \(a_{\text{attr}}\) = 0,27.
 - **Saison-Fenster überlappen nicht:** \(\Delta S_B\) wirkt im Februar–April (Front der
   Birkengruppe), \(\Delta S_G\) im Mai–Juni (Gräser-Sukzession) — die Addition zählt keine
   Tage doppelt. (Zur Überlappung in \(d_{\text{Saison}}\) s. §3.5 — dort ist die additive
   Form €-konservativ; Rev.-5-Befund 36b.)
 
 ```python test: beispiel_96_delta_je_region
-f, pB, pG, a = 0.70, 0.55, 0.75, 0.50
+f, pB, pG, a = 0.70, 0.55, 0.75, 0.27
 DS = {"nord": (3.96, 4.78), "mitte": (4.20, 4.08), "sued": (5.94, 3.70), "de": (4.79, 4.06)}
-soll = {"nord": 2.017, "mitte": 1.880, "sued": 2.115, "de": 1.988}
+soll = {"nord": 1.089, "mitte": 1.015, "sued": 1.142, "de": 1.073}
 for r, (db, dg) in DS.items():
     delta = f * (pB*db + pG*dg) * a
     assert abs(delta - soll[r]) < 0.002
@@ -878,7 +882,7 @@ assert abs(kind_lo - 1027) < 2 and abs(kind_hi - 1335) < 2
 
 ```python test: beispiel_96_f_kuerzung
 # Der f-Parameter kuerzt sich im EUR-Pfad vollstaendig heraus
-pB, pG, LB, LG, a, c = 0.55, 0.75, 30, 60, 0.50, 266.90
+pB, pG, LB, LG, a, c = 0.55, 0.75, 30, 60, 0.27, 266.90
 def euro_pro_betroffenem(f, dsB, dsG):
     delta = f * (pB*dsB + pG*dsG) * a          # Tage
     c_tag = c / (f * (pB*LB + pG*LG))          # EUR/Tag
@@ -890,14 +894,14 @@ assert abs(e1 - e2) < 1e-9
 
 ```python test: beispiel_96_beispielzelle
 # Beispielzelle: 1.000 EW im Bundes-Altersmix, Region Mitte, P^=1
-# Betroffene ~107,4; Delta-Tage ~202; EUR ~1.251/Jahr
+# Betroffene ~107,4; Delta-Tage ~109; EUR ~676/Jahr
 pbar = 10.74 / 100          # gewichtete Bundes-Praevalenz (§3.2)
 b = 1000 * pbar
-delta_mitte = 0.70 * (0.55*4.20 + 0.75*4.08) * 0.50
+delta_mitte = 0.70 * (0.55*4.20 + 0.75*4.08) * 0.27
 dt = b * delta_mitte
 assert abs(b - 107.4) < 0.1
-assert abs(dt - 201.9) < 0.5
-assert abs(dt * 6.20 - 1252) < 5
+assert abs(dt - 109.0) < 0.5
+assert abs(dt * 6.20 - 676) < 5
 ```
 
 ### 3.6 Zeichentabelle (alphabetisch; §3.2-Form)
@@ -905,12 +909,12 @@ assert abs(dt * 6.20 - 1252) < 5
 | Zeichen | Name | Einheit | Wert / Herkunft |
 |---|---|---|---|
 | \(a\) | Altersband u20 · 20–64 · 65–74 · 75–84 · 85+ (u20 neu; 20–64 = u65 − u20) | — | Zensus-Altersbänder + neue Ebene u20 (§3.2) |
-| \(a_{\text{attr}}\) | klimaattribuierter Anteil des Saisontrends | — | **0,50** (IQR 0,19–0,84, aus den Schätzungen von 22 Klimamodellen; Interquartilsabstand erklärt in Kap. 2) [9]; register:96-W025-02 |
+| \(a_{\text{attr}}\) | klimaattribuierter Anteil des Saisontrends | — | **0,27** (Band 0,19–0,41; Abschätzung von KAP3: Mitte des IQR 19–35 % der Saisonlänge 1990–2018 aus den Schätzungen von 22 Klimamodellen; Interquartilsabstand erklärt in Kap. 2) [9]; register:96-W025-02 |
 | \(B_{\text{Zelle}}\) | Betroffene (aktive allergische Rhinitis) der Zelle | Personen | berechnet (§3.2) |
 | \(c_{\text{Jahr,direkt}}\) | direkte Behandlungskosten je Betroffenem und Jahr (populationsbasiert) | €₂₀₂₄ | **266,90** = 210,3 €₂₀₁₄ × 119,3/94,0 (Band bis 1.018,6 = Schramm-Kette; Kinder 1.027–1.335) [7,19,65]; register:96-K1-01/-02; herleitung:#c-tag |
 | \(c_{\text{Tag}}\) | Behandlungskostensatz je Symptomtag | €₂₀₂₄/Tag | **6,20** = 266,90/43,05 (Band 6,20–23,66); herleitung:#c-tag |
 | \(d_{\text{Saison}}\) | Symptomtage je Betroffenem und Referenzsaison | Tage | **43,05** = 0,70 × (0,55·30 + 0,75·60); additive Form €-konservativ (§3.5); herleitung:#d-saison |
-| \(\delta_R\) | zusätzliche Symptomtage je Betroffenem und Jahr, Region R | Tage/Jahr | **2,02/1,88/2,12** (N/M/S; DE 1,99); berechnet (§3.3) |
+| \(\delta_R\) | zusätzliche Symptomtage je Betroffenem und Jahr, Region R | Tage/Jahr | **1,09/1,01/1,14** (N/M/S; DE 1,07); berechnet (§3.3) |
 | \(\Delta S_{B,R},\ \Delta S_{G,R}\) | gemessene Saison-Spreizung Birkengruppe/Gräser je Region (1961–90 → 1991–2020) | Tage | 3,96/4,20/5,94 · 4,78/4,08/3,70 (N/M/S); `pollensaison_region.csv` [33,67]; register:96-W025-01; herleitung:#delta-s |
 | \(\Delta\text{Tage}_{\text{Zelle}}\) | zusätzliche Symptomtage — **nativer Ausweis** | Tage/Jahr | Ergebnis |
 | \(\text{€}_{\text{Zelle}}\) | bewerteter Schaden K1 (Ursache Allergene) — Teil-Ausweis | €₂₀₂₄/Jahr | Ergebnis = ΔTage × \(c_{\text{Tag}}\) (§3.5) |
@@ -2060,15 +2064,15 @@ parameter:
   abgeleitet_aus: []
 parameter:
   id: pollen.a_attr
-  wert: 0.50
+  wert: 0.27
   einheit: "-"
-  band: [0.19, 0.84]
+  band: [0.19, 0.41]
   herkunft: register:96-W025-02
   quelle: anderegg2021
   preisstand: null
   bandzuordnung: [u20, 20-64, 65-74, 75-84, 85+]
   endpunkt: morbiditaet
-  kennzeichnung: quelle   # Anderegg 2021 [9]
+  kennzeichnung: abschaetzung_kap3   # Herleitung Kap. 2 (96-W025-02): Mitte des IQR 19–35 % der Saisonlaenge 1990–2018 aus Anderegg 2021 [9], Results; Band 0,19–0,41 umfasst beide Laengen-Spannen (Befund 258)
   abgeleitet_aus: []
 parameter:
   id: pollen.p_ar
@@ -2555,7 +2559,7 @@ Vermerk an Eintrag 25 zur Zahl der Blöcke.
 | 8 ⚠ | p_B/p_G? | **0,55/0,75 als gekennzeichnete Abschätzung** (Rangfolge-Stütze [3]); additive Saisonform als €-konservativ dokumentiert | Anteil unter AR-Patienten nicht publiziert (Befund 36a); Überlappungskorrektur würde € erhöhen (36b) | PID-/Versorgungsdaten (Ersetzungspfad) | δ: p_B −11,7 % bis +11,7 %, p_G −11,4 % bis +7,6 %, zusammen −23 % bis +19 % (Region Mitte, §3.4); Euro nur −6 % bis +8 % (Kap. 1, Absatz „Warum die eigene Quellenlage …“) |
 | 9 ⚠ | Kostensatz-Basis? | **TOTALL 266,90 €₂₀₂₄ (populationsbasiert)**; Schramm nur Obergrenze/Kinder-Band | Schramm (moderate–schwer) auf alle Betroffenen = bekannte Überschätzung um grob Faktor 4 (§3.5) — verletzt Untergrenzen-Zusage (#95-Befund-62-Lehre); impliziter Baseline-Check §4 bestätigt | Schramm als Basis (M0-Linie; 9,1 Mrd. implizite Basis, Kap. 4 — verworfen) | € −74 % ggü. Schramm-Basis (§3.5) |
 | 10 ⚠ | Prävalenz-Bänder? | **u20-Ebene neu** (Zensus 5er-Jahresgruppen 0–4, 5–9, 10–14, 15–19); 18/19 mit KiGGS-Wert (unterschätzend); 75–84 und 85+ = 5,0 %, davon 80–84 und 85+ extrapoliert (gekennzeichnet, §3.2) | behebt Rev.-5-Befunde 27/35 entlang Variante (a) der Gegenprüfung | Misch-Prävalenz je Zelle ohne u20-Ebene | Alterslast korrekt verteilt |
-| 11 | Attribution? | **a_attr = 0,50 (0,19–0,84)** [9] | einzige publizierte Attribution des Saisontrends; IQR (Interquartilsabstand, Kap. 2) als Band | 1,0 (volle Anrechnung — nicht belegbar) | zentraler Hebel −62 % bis +68 % (§3.0) |
+| 11 | Attribution? | **a_attr = 0,50 (0,19–0,84)** [9] | einzige publizierte Attribution des Saisontrends; IQR (Interquartilsabstand, Kap. 2) als Band | 1,0 (volle Anrechnung — nicht belegbar) | zentraler Hebel −30 % bis +52 % (§3.0) |
 | 12 | Vegetations-Modulation? | **λ = 0,7 (0,3–1,0)** (aktualisiert Runde 2, Befund 110: wörtliche Zuwachs-Lesart der Werchan-Prozente; Verhältnis-Lesart im Band), P̂ in beiden Pfaden; Ḡ₀-Zentrierung §3.3 | Kette #lambda-veg reproduzierbar; Kommunensumme im Ausgangsstand λ-invariant (§3.4; seit Log 18 je Kommune, damit auch die Bundessumme) — Lesart wirkt im Ausgangsstand nur verteilend (mit Maßnahme ist die Senkung proportional zu λ, Log 26) | Verhältnis-Lesart als Basiswert (in M0 λ = 0,6; verworfen, geht als untere Lesart ins Band ein, §3.4) | lokale Differenzierung: \(\hat P\) = 0,65…1,35 bei \(\hat G/\bar G_0\) = 0,5…1,5 (§3.6); zwischen vegetationsarmer Zelle (0,3) und Allee-Zelle (1,7) der Faktor 5,7 (§3.0) |
 | 13 | Ambrosia (W024)? | **bewusst inaktiv in M0**, Modul 96-B ab M1 | Zeithorizont 2041–2060 ≠ „heute"; Teilausschnitt | sofortiges Zusatzmodul | Untergrenze |
 | 14 | E09 Trockenheit / Intensität? | **bewusst inaktiv** (Register 96-W025-03/-04) | keine quantifizierte ERF; Wirkrichtung erhöhend → konservativ | Sensitivitätsband nach Literatur | Untergrenze |

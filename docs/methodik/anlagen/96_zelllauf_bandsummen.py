@@ -23,7 +23,11 @@ Was die Anlage rechnet, Schritt für Schritt:
      Kommune genauso gut an den summierten Bändern (wie der Golden-Test
      backend/tests/test_methodik_96_golden_betraege.py).
   4. Betroffene, zusätzliche Symptomtage und Euro aus impact.compute_all_cell_impacts, Kostensatz je
-     Symptomtag aus dem Katalog (6,20 €, Kap. 7 pollen.c_tag). Dasselbe für die Kette (Ebene 1 der
+     Symptomtag aus dem Katalog (6,20 €, Kap. 7 pollen.c_tag). Den Klimaanteil a_attr liest die Anlage
+     aus dem Block pollen.a_attr in Kapitel 7 des Berichts (Feld wert) und setzt ihn in rechnen() über
+     override_context mit dem Schlüssel risks.EXPECTED_ANNUAL_ALLERGY_DAYS.impact.a_attr, den
+     CellContext.p (impact/base.py) liest. So rechnet der Zelllauf mit dem Wert des Berichts, auch
+     solange die Registry noch den alten Wert trägt (Befund 258, Übernahme Ü-13). Dasselbe für die Kette (Ebene 1 der
      Rechenkette) und die Zerlegung Zelllauf gegen Kette in Einwohnersumme und Altersbänder.
 
 Die Testfunktion vergleicht die Ausgabe mit dem Bericht: Bänder in der Zeile ``zell = {…}`` des
@@ -92,6 +96,13 @@ def zellen(ersatzregel_stufe2: bool = True) -> list[dict]:
     return cis
 
 
+def a_attr_bericht() -> float:
+    """Feld ``wert`` des Parameter-Blocks ``pollen.a_attr`` (Kapitel 7 des Berichts)."""
+    text = open(BERICHT, encoding="utf-8").read()
+    i = text.index("id: pollen.a_attr")
+    return float(re.search(r"^\s*wert:\s*([0-9.]+)", text[i:i + 400], re.M).group(1))
+
+
 def rechnen(bands: dict[str, float]) -> tuple[float, float, float]:
     """(Betroffene, Symptomtage, Euro je Jahr) aus dem Produkt für summierte Bänder."""
     b = {k: float(v) for k, v in bands.items()}
@@ -101,7 +112,7 @@ def rechnen(bands: dict[str, float]) -> tuple[float, float, float]:
         hev={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
         hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
         indices={}, regional={"bundesland": "Berlin"})
-    override_context.set_overrides({})
+    override_context.set_overrides({f"risks.{CODE}.impact.a_attr": a_attr_bericht()})
     res = impact.compute_all_cell_impacts(ctx)[CODE]
     c_tag = catalog.risk_default_cost_per_outcome(catalog.RISKS_BY_CODE[CODE])
     return res["betroffene"], res["outcome"], res["outcome"] * c_tag
@@ -164,7 +175,7 @@ def test_zelllauf_bandsummen():
     for wert in (_de(m["betroffene"]), _de(m["tage"])):
         assert re.search(re.escape(wert) + r"\s", s), wert
     assert f"**{_de(m['euro'] / 1e6, 2)} Mio. € je Jahr" in s
-    assert abs(m["euro"] / 1e6 - 4.58) < 0.005
+    assert abs(m["euro"] / 1e6 - 2.47) < 0.005
 
 
 if __name__ == "__main__":
