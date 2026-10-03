@@ -24,7 +24,7 @@ KALIB = os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "kalib
 MORT, MORB = "EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"
 BANDS = ("u65", "a65_74", "a75_84", "a85p")
 SPALTEN65 = ("a65bis69", "a70bis74", "a75bis79", "a80bis84", "a85bis89", "a90undaelter")
-SIGMA_K = 0.5
+SIGMA_K = 0.58           # Feinstruktur unter 1 km, 0,58 K (Bericht §3.0 (d), §4); die einzige Stelle im Code
 GH_PUNKTE = 21
 
 
