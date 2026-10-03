@@ -143,6 +143,34 @@ def test_t_warn_override_scales_avoided_days_by_four_thirds():
     assert vermieden_basis == pytest.approx(direkt_basis, rel=1e-9)
 
 
+# ── (c2) Überschreibung lambda_veg der Kommune wirkt auf den Zellfaktor (T-1592-ceo) ──
+
+def test_lambda_veg_override_changes_avoided_days_not_factor():
+    """λ aus der Parameterliste wirkt in der Zelle (T-1592-ceo).
+
+    P̂ = 1 + λ·(Ĝ/Ḡ₀ − 1) skaliert beide Gruppentage gleich und kürzt sich im Faktor
+    1 − vermieden/Σ Tage heraus; der Faktor hängt von λ deshalb nicht ab. Die
+    vermiedenen Tage (zweite Rückgabe von ``_s158_cell_effect``) folgen λ.
+    """
+    cell = _allee_cell()
+    factor_basis, tage_basis, _ = measure_service._s158_cell_effect(_mdef(), 1.0, cell)
+
+    override_context.set_overrides({f"risks.{RISK}.impact.lambda_veg": 0.50})
+    try:
+        factor_050, tage_050, _ = measure_service._s158_cell_effect(_mdef(), 1.0, cell)
+    finally:
+        override_context.set_overrides({})
+
+    assert tage_050 != pytest.approx(tage_basis, abs=1e-6)
+    # Gegenprobe über die reine Funktion mit λ = 0,50: P̂ = 1 + 0,5·(2 − 1) = 1,5.
+    tb, tg = health.pollen_zelltage(
+        cell["betroffene"], cell["delta_birke"], cell["delta_graeser"],
+        cell["pollen_g"], cell["pollen_g_bar0"], lam=0.50)
+    vermieden = health.s158_vermiedene_tage(tb, tg, 1.0, R_S158, T_WARN, T_WARN)
+    assert tage_050 == pytest.approx(vermieden, rel=1e-9)
+    assert factor_050 == pytest.approx(factor_basis, rel=1e-9)
+
+
 # ── (d) Zelle ohne Gruppentage/Roheingaben: Faktor 1,0, keine pauschalen 0,03 ────
 
 def test_cell_without_group_day_inputs_keeps_factor_one():
