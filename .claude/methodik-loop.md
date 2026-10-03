@@ -81,6 +81,28 @@ für den dieser Ablauf nicht gilt: Alle Methodiken werden ab M0 neu angefasst.
 Schritte in einer Sitzung; L4 beauftragt den Subagenten `methodik-reviewer` in frischem Kontext, L2 läuft in derselben
 Sitzung, wenn das Risiko integriert ist.
 
+## Abgleich Bericht ↔ Code
+
+Aufsichtsrat, 30.09.2026: So läuft ein Abgleich zwischen Bericht und Code. Die Eiserne Regel 5 bleibt: nie still im Code
+fixen, jede Abweichung kommt ins Ledger.
+
+1. **Abweichung als Befund.** Eine Abweichung Bericht ↔ Code ist nicht pauschal ein A-Befund mit voller Prüfung. Sie kommt
+   mit Richtung (welche Seite weicht ab) und Wirkung (was ändert sich im Ergebnis) als Befund ins Ledger. Die Klasse
+   richtet sich nach der Wirkung wie bei jedem anderen Befund.
+2. **Zwischenprüfungen nur an den geänderten Stellen.** Zwischen den Teilpaketen prüft der Review nur die geänderten
+   Stellen (Re-Review, Aufgabe §6).
+3. **Eine Schlussprüfung.** Am Schluss steht genau eine volle Gegenprüfung über Bericht und Code (Aufgabe §5, alle 15
+   Leitfragen), wiederholt bis zur Null-Runde. Im Firmenablauf ist das die Schlussprüfung des Abgleich-Vorhabens
+   (`abgleich: ja`, `quelle:` mit dem Pfad des Berichts, Abschnitt „## Schlussprüfung“, bei Bedarf `schlusspruefung_rolle`).
+4. **Feste Richtung.** Der Code folgt dem Bericht. Der Bericht ändert sich nur, wo er selbst falsch ist (W5).
+5. **Ein Wert, eine Stelle.** Jeder Wert steht an genau einer Stelle, überall gleich gerundet, und ein Test vergleicht
+   Bericht und Code.
+6. **Kein Umsetzungsstand im Bericht.** Der Bericht beschreibt nicht den Stand der Umsetzung. Was der Code noch nicht kann,
+   steht im Ledger, nicht im Bericht.
+7. **Zurückgestellte Entscheidungen.** Wird eine Entscheidung zurückgestellt, bekommt sie Termin und Zuständigen.
+
+Entwickler und Integration melden jede Abweichung im Antwortfeld `abweichungen`, mit Richtung und Wirkung.
+
 ## L1 · Revision (Bericht ist die Quelle)
 
 Alle offenen A- und B-Befunde beheben, C-Befunde gleich mit. Betroffene Kopplungen nach W6

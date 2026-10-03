@@ -3,8 +3,8 @@
 Gliederung: ``dokumente/produkt/pdf-ergebnisbericht-gliederung.md`` (Firmen-Repo), Teile 0 bis 9.
 Der Formatpilot (T-1414) setzt die Teile 0, 1, 4 (nur #95), 7 und 8 um, Teil 2 kommt aus der
 Konformitäts-Checkliste (T-1416, ``konformitaet.py``), Teil 3 aus den Klimakennwerten des
-Sammlers (T-1417, ``klima.py``), Teil 6 aus den Maßnahmenzeilen (T-1419, ``massnahmen.py``).
-Jeder Teil ist eine
+Sammlers (T-1417, ``klima.py``), Teil 6 aus den Maßnahmenzeilen (T-1419, ``massnahmen.py``),
+Teil 9 aus den Anlagen des Sammlers und der Namensregel der Downloads (T-1420). Jeder Teil ist eine
 Funktion ``(Berichtsdaten) -> str``; ``TEILE`` ordnet die Nummern zu.
 
 Harte Regeln der Gliederung, die hier schon gelten: kein Euro-Feld mit Null oder leer (wo kein
@@ -39,7 +39,10 @@ from app.services.ergebnisbericht.massnahmen import (
     HORIZONT_ENDE, QUALITATIV, blockname, rangfolge,
 )
 from app.services.ergebnisbericht.raum import UEBRIG
-from app.services.ergebnisbericht.sammler import DATENSTAENDE, Berichtsdaten
+from app.services.ergebnisbericht.sammler import (
+    DATENSTAENDE, VERWEIS_METHODIK, Berichtsdaten, anlage_kennung,
+)
+from app.services.download_namen import download_dateiname
 from app.services.kurzfassung_markdown import _de_euro
 
 UEBERSCHRIFTEN = {
@@ -52,6 +55,7 @@ UEBERSCHRIFTEN = {
     6: "Teil 6 · Maßnahmen",
     7: "Teil 7 · Parameter- und Quellenverzeichnis",
     8: "Teil 8 · Grenzen und Vollständigkeitsanzeige",
+    9: "Teil 9 · Anhang",
 }
 
 SCREENING_SATZ = "Screening-Analyse, kein Ersatz für ein Detailgutachten."
@@ -106,6 +110,13 @@ def _betrag(d: Berichtsdaten, wert: float) -> str:
             f' data-datenstand="{_h(s.daten)}">{_h(text)}</span>')
 
 
+def mit_anlage(text: str) -> str:
+    """Verweis auf einen Methodik-Bericht mit seiner Anlage aus Teil 9 (harte Regel 4, T-1420):
+    „Bericht #95 §3.5“ → „Anlage M95, Methodik-Bericht #95 §3.5“. Reiner Text, noch unmaskiert."""
+    return VERWEIS_METHODIK.sub(
+        lambda m: f"Anlage {anlage_kennung(m.group(1))}, Methodik-Bericht #{m.group(1)}", text)
+
+
 def _nenner(d: Berichtsdaten) -> str:
     """Nenner einer Summe (harte Regel 2): „x von y Klimawirkungen in Euro beziffert“."""
     return f'<span class="nenner">{_h(d.beziffert_text)}</span>'
@@ -125,7 +136,9 @@ def teil_0(d: Berichtsdaten) -> str:
         ("Gebietsstand", "Gemeindegrenze nach VG250 (BKG), Gebietsstand 01.01. der aktuellen Ausgabe"),
         ("Einwohner (Zensus 2022)", f"{de_zahl(e.einwohner)}, davon {de_zahl(e.einwohner_ab65)} ab 65 Jahren"),
         ("Berichtsversion", s.bericht),
-        ("Methodikversion", f"{s.methodik} (Modellstand {s.modell})"),
+        ("Methodikversion", f"{s.methodik} (Modellstand {s.modell})"
+                            + "".join(mit_anlage(f"; Methodik-Bericht #{a.nr} (Teil 9)")
+                                      for a in getattr(d, "anlagen", []))),
         ("Erstellt am", f"{s.erstellt:%d.%m.%Y}"),
     ]
     html = [_kopf(0), '<table class="kopf">']
@@ -580,8 +593,8 @@ def _herkunft(p: dict) -> str:
     quelle = p.get("source") or ""
     if klasse == "abgeschaetzt":
         herleitung = (p.get("evidence_derivation") or {}).get("wert") or p.get("evidence_note") or quelle
-        return f"{_KLASSE[klasse]}: {herleitung}"
-    return f"{_KLASSE.get(klasse, 'belegt')}: {quelle}"
+        return mit_anlage(f"{_KLASSE[klasse]}: {herleitung}")
+    return mit_anlage(f"{_KLASSE.get(klasse, 'belegt')}: {quelle}")
 
 
 def teil_7(d: Berichtsdaten) -> str:
@@ -638,7 +651,68 @@ def teil_8(d: Berichtsdaten) -> str:
     return "\n".join(html)
 
 
+# ── Teil 9 ──────────────────────────────────────────────────────────────────────
+
+# Exporte der Anwendung: (Art nach der Namensregel, Endung, Bezeichnung, Inhalt). Die Art ist
+# dieselbe, die die Download-Routen an ``download_namen`` geben (T-1424).
+EXPORTE = [
+    ("geodaten", "gpkg", "GeoPackage",
+     "Ergebnisse je bewohnter 100-m-Zelle zum Öffnen in einem Geoinformationssystem"),
+    ("massnahmen", "xlsx", "Maßnahmen-Excel",
+     "Maßnahmen mit Kosten, vermiedenen Schäden, Gewissheit und Umsetzung"),
+    ("parameter", "xlsx", "Parameter-Excel",
+     "alle Parameter der Rechnung mit Wert, Einheit und Quelle oder ausgewiesener Abschätzung"),
+]
+
+
+def export_dateiname(d: Berichtsdaten, art: str, endung: str) -> str:
+    """Dateiname eines Exports nach der Namensregel der Downloads (T-1424)."""
+    return download_dateiname(art, d.kommune.name, d.kommune.ags, endung)
+
+
+def teil_9(d: Berichtsdaten) -> str:
+    """Anhang (T-1420): je Methodik-Bericht eine Zeile ``tr.anlage[data-kwra][id=anlage-M…]`` mit
+    ``td.kennung``, ``td.titel`` und ``td.revision``; je Export eine Zeile ``tr.export[data-art]``
+    mit ``td.dateiname`` nach der Namensregel. Die Teile 0 bis 8 verweisen auf die Kennung
+    („Anlage M95“), nie auf einen Pfad."""
+    k = d.kommune
+    anlagen = list(getattr(d, "anlagen", []))
+    html = [_kopf(9)]
+    html.append("<h2>Anlagen: Methodik-Berichte</h2>")
+    html.append(
+        "<p>Jede Klimawirkung, die dieser Bericht in Euro beziffert, ist in einem Methodik-Bericht "
+        "beschrieben: Rechenkette von der amtlichen Quelle bis zum Euro-Betrag, jeder Parameter mit "
+        "Quelle, Modellgrenzen. Die Methodik-Berichte gehen als Anlagen mit diesem Bericht an die "
+        "Kommune. Wo die Teile 0 bis 8 auf eine Methodenbeschreibung verweisen, nennen sie die "
+        "Kennung der Anlage aus dieser Tabelle.</p>")
+    if anlagen:
+        html.append('<table class="anlagen"><tr><th>Anlage</th><th>Methodik-Bericht</th>'
+                    '<th>Titel</th><th>Revision</th></tr>')
+        for a in anlagen:
+            html.append(
+                f'<tr class="anlage" id="anlage-{_h(a.kennung)}" data-kwra="{a.nr}">'
+                f'<td class="kennung">Anlage {_h(a.kennung)}</td><td>#{a.nr}</td>'
+                f'<td class="titel">{_h(a.titel)}</td><td class="revision">{_h(a.revision)}</td></tr>')
+        html.append("</table>")
+    else:
+        html.append("<p>Dieser Bericht verweist auf keinen Methodik-Bericht; deshalb liegt keine "
+                    "Anlage bei.</p>")
+    html.append("<h2>Exporte</h2>")
+    html.append(
+        f"<p>Die Daten dieses Berichts gibt es für {_h(k.name)} zusätzlich als Dateien zum "
+        f"Herunterladen in der Anwendung. Die Dateinamen folgen einer Regel: Art des Dokuments, "
+        f"Name der Kommune und amtlicher Gemeindeschlüssel.</p>")
+    html.append('<table class="exporte"><tr><th>Export</th><th>Inhalt</th><th>Dateiname</th></tr>')
+    for art, endung, bezeichnung, inhalt in EXPORTE:
+        html.append(
+            f'<tr class="export" data-art="{_h(art)}"><td>{_h(bezeichnung)}</td><td>{_h(inhalt)}</td>'
+            f'<td class="dateiname">{_h(export_dateiname(d, art, endung))}</td></tr>')
+    html.append("</table>")
+    html.append(_stand(d))
+    return "\n".join(html)
+
+
 TEILE: dict[int, Callable[[Berichtsdaten], str]] = {
     0: teil_0, 1: teil_1, 2: teil_2, 3: teil_3, 4: teil_4, 5: teil_5, 6: teil_6, 7: teil_7,
-    8: teil_8,
+    8: teil_8, 9: teil_9,
 }
