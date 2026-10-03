@@ -333,14 +333,14 @@ def run_evaluation(t_sommer: dict, fa: dict, tag_suffix: str,
                  f"(RKI-Referenz 260–320)")
     res["berlin"] = rate
 
-    # Rest-Bias: UHI-Feinstruktur-Konvexität (mittelwerttreu, σ = 0,5 K).
+    # Rest-Bias: UHI-Feinstruktur-Konvexität (mittelwerttreu, σ = 0,58 K).
     # Nur im unskalierten Lauf aussagekräftig (model_year kennt keine β-Skalare).
     if not scale:
         for J in (2018, 2022):
             base = nat(J)
             su = sum(sum(b.values()) for b in
-                     model_year(J, t_sommer, q_w, pop, fa, uhi_sigma=0.5).values())
-            lines.append(f"- Rest-Bias UHI-Konvexität {J}: ×{su / base:.3f} (σ = 0,5 K, "
+                     model_year(J, t_sommer, q_w, pop, fa, uhi_sigma=0.58).values())
+            lines.append(f"- Rest-Bias UHI-Konvexität {J}: ×{su / base:.3f} (σ = 0,58 K, "
                          f"mittelwerttreu — verbleibende dokumentierte Näherung)")
     return res
 
