@@ -1,0 +1,2 @@
+# Befehle, die gesteuerte Läufe direkt aufrufen dürfen: der Testlauf des Produkts. Siehe docs/BETRIEB.md.
+bash scripts/testlauf.sh
