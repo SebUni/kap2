@@ -39,8 +39,9 @@ Einstiegspunkt:
 
 Was Integration, Betrieb oder Nutzer gemeldet hat, wird **zuerst Befund**, nicht sofort Fix:
 neue Zeile in `reviews/BEFUNDE_<nr>.md` (fortlaufende Nummer, Stelle · Art · Begründung ·
-Vorschlag · Kategorie). Eine Divergenz Bericht ↔ Code ist Kategorie A, solange sie nicht
-geklärt ist (W5). Erst danach revidieren.
+Vorschlag · Kategorie). Eine Abweichung Bericht ↔ Code kommt mit Richtung und Wirkung ins
+Ledger; die Klasse richtet sich nach der Wirkung wie bei jedem anderen Befund (Abschnitt
+„Abgleich Bericht ↔ Code“ in @.claude/methodik-loop.md). Erst danach revidieren.
 
 ## Schritt C — Gemeinsamer Loop
 
@@ -48,6 +49,6 @@ Weiter mit **L1–L7** aus @.claude/methodik-loop.md. Für den Wiedereinstieg gi
 
 - **L2** (Code-Nachzug) greift, sobald das Risiko integriert ist — beim Wiedereinstieg der
   Regelfall.
-- **L4** läuft als volle Prüfung, sobald Kalibrierung oder Modellstruktur berührt wurden;
-  das ist beim Wiedereinstieg der Regelfall.
+- **L4** läuft zwischendurch nur an den geänderten Stellen und am Schluss einmal voll
+  (alle 15 Leitfragen, bis zur Null-Runde); so steht es im Abschnitt „Abgleich Bericht ↔ Code“.
 - **L7** Punkt 2 (Anlass und was daraus wurde) ist hier Pflicht.

@@ -68,8 +68,9 @@ festgehalten) — niemals aus einer Aggregation über eine höhere Ebene.
 ## 5 · Abschluss
 
 Gesamte Testsuite ausführen. **Bei jeder Divergenz Bericht ↔ Code: nicht still im Code fixen** —
-Befund ins Ledger (Kategorie A, „Integration blockiert durch …") und melden; die Methodik ist
-die Wahrheit, bis ein Review sie ändert. Abschlussbericht: angelegte Parameter, Funktionen,
+die Integration meldet jede Abweichung mit Richtung und Wirkung im Antwortfeld `abweichungen`
+und folgt dem Abschnitt „Abgleich Bericht ↔ Code“ in `.claude/methodik-loop.md`: Befund ins Ledger, Klasse nach
+Wirkung, der Code folgt dem Bericht. Abschlussbericht: angelegte Parameter, Funktionen,
 Ebenen, Tests (grün/rot), offene Punkte.
 
 Bleibt dabei ein methodischer Punkt offen — Divergenz, Unklarheit, Fehler im Bericht —, geht er als Befund an den
