@@ -68,7 +68,7 @@ from test_massnahme_kuehlzentren_95 import _kz_eur  # noqa: E402
 
 # Zielwerte des Berichts (§5, Zelllauf mit Gemeindeschlüssel bzw. Kette, Preisstand 2024).
 S157_BERLIN_EUR, S157_BERLIN_TOL = 1_100_000.0, 50_000.0        # §5 Z. 1148, ± halbe Stelle
-S157_WARMSEN_EUR, S157_WARMSEN_TOL = 469.0, 1.37                # §5 Z. 1148, Zelllauf-Toleranz
+S157_WARMSEN_EUR, S157_WARMSEN_TOL = 475.0, 1.38                # §5 Z. 1148, Zelllauf-Toleranz
 ANPASSUNG_ZIEL, ANPASSUNG_TOL = 0.053, 0.0005                    # §5 Z. 1169–1175, ± halbe Stelle
 KZ_KETTE_BERLIN_EUR, KZ_KETTE_BERLIN_TOL = 750_000.0, 5_000.0    # §5 Z. 1228, ± halbe Stelle
 

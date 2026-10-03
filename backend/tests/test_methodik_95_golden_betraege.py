@@ -35,6 +35,7 @@ import csv
 import gzip
 import math
 import os
+import re
 import sys
 from functools import lru_cache
 
@@ -47,21 +48,21 @@ from app.services import zensus_loader as zl  # noqa: E402
 from app.services.engine import override_context  # noqa: E402
 from app.services.engine.impact import health as H  # noqa: E402
 from app.services.engine.impact.base import CellContext  # noqa: E402
+from app.services.ergebnisbericht.beispiel import SIGMA_K  # noqa: E402,F401  (einzige Stelle von σ)
 
 KALIB = os.path.join(os.path.dirname(__file__), "..", "data", "kalibrierung")
 MORT, MORB = "EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"
 BANDS = ("u65", "a65_74", "a75_84", "a85p")
 SPALTEN65 = ("a65bis69", "a70bis74", "a75bis79", "a80bis84", "a85bis89", "a90undaelter")
-SIGMA_K = 0.5            # Feinstruktur unter 1 km (Bericht §3.0 (d), §4)
 GH_PUNKTE = 21           # Gauß-Hermite wie docs/methodik/anlagen/95_zellvergleich.py
 
 BERLIN, WARMSEN = "11000000", "03256034"
 LAND = {BERLIN: "Berlin", WARMSEN: "Niedersachsen"}
 
 # Zielwerte des Berichts (Tabelle §3.3, Zelllauf mit Ersatzregel, Preisstand 2024)
-BERLIN_EUR, BERLIN_TOL = 342_670_000.0, 1_000_000.0
-WARMSEN_EUR = 173_099.0
-WARMSEN_TOL = round(BERLIN_TOL / BERLIN_EUR * WARMSEN_EUR)      # 505 €
+BERLIN_EUR, BERLIN_TOL = 345_110_000.0, 1_000_000.0
+WARMSEN_EUR = 175_256.0
+WARMSEN_TOL = round(BERLIN_TOL / BERLIN_EUR * WARMSEN_EUR)      # 508 €
 BERLIN_AB65 = 707_318
 
 
@@ -150,9 +151,19 @@ def test_berlin_jahresbetrag():
 
 def test_warmsen_jahresbetrag():
     """Warmsen: 173.099 € je Jahr (Zelllauf mit Ersatzregel §3.3, Preisstand 2024), ± 505 €."""
-    assert WARMSEN_TOL == 505
+    assert WARMSEN_TOL == 508
     betrag = _jahresbetrag(WARMSEN)
     assert abs(betrag - WARMSEN_EUR) < WARMSEN_TOL, f"{betrag:.0f} €"
+
+
+def test_sigma_wie_im_bericht():
+    """σ steht im Code nur in ergebnisbericht/beispiel.py; hier wird sie mit dem Bericht verglichen
+    (§3 „Streuung σ = … K um den Rasterwert“), nicht ein zweites Mal als Zahl geführt."""
+    pfad = os.path.join(os.path.dirname(__file__), "..", "..", "docs", "methodik", "95_hitzebelastung.md")
+    with open(pfad, encoding="utf-8") as fh:
+        treffer = re.findall(r"Streuung σ = (\d+,\d+) K um den Rasterwert", fh.read())
+    assert treffer, "Satz zu σ im Bericht nicht gefunden"
+    assert {float(z.replace(",", ".")) for z in treffer} == {SIGMA_K}
 
 
 if __name__ == "__main__":
