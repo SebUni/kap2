@@ -13,7 +13,7 @@ Was das Skript rechnet, Schritt für Schritt, jeder Schritt auf den vorigen:
          Einwohnersumme und Altersstruktur bleiben die der Kette (Einwohner der Zelle nur als Gewicht).
   (b)    Einwohnersumme: wie (a), aber mit der Einwohnersumme des Zensus-Gitters [67].
   (c)    Altersbänder je Zelle wie im Produkt: Bänder nach zensus_loader.apply_zensus_to_cell_inputs.
-  (d)    Feinstruktur unter 1 km: Streuung sigma = 0,5 K um den Rasterwert (wie §4), Gauß-Hermite
+  (d)    Feinstruktur unter 1 km: Streuung sigma = 0,58 K um den Rasterwert (wie §4), Gauß-Hermite
          mit 21 Punkten; wirkt nur auf die Mortalität (die Morbidität hängt an den Hitzetagen).
 
 Mit --ersatz zusätzlich die Ersatzregel aus §3.3 für Zellen, deren Anteil 65+ im Gitter geheimgehalten
@@ -820,7 +820,7 @@ def main():
     ap.add_argument("--einwohner", help="Ebene 1 als u65,65-74,75-84,85+ (Vorgabe: Landeszeile der "
                                        "Fortschreibung bei Stadtstaaten, sonst Gitter-Summe × "
                                        "Altersstruktur des Landes)")
-    ap.add_argument("--sigma", type=float, default=0.5, help="Feinstruktur unter 1 km in K (§4)")
+    ap.add_argument("--sigma", type=float, default=0.58, help="Feinstruktur unter 1 km in K (§4)")
     ap.add_argument("--wochenquantile", choices=("bericht", "produkt"), default="bericht",
                     help="q_w aus Tabelle §3.2 (wie Rechenkette 3.0) oder aus wochenquantile_region.csv "
                          "(wie das Produkt); die Faktoren ändern sich dadurch erst in der fünften Stelle")
@@ -991,7 +991,7 @@ def main():
     print(f"Kette (ein Punkt, Ebene 1): {mio(eur['kette'])} je Jahr (Preisstand 2024)")
     schritte = [("a", "(a) Temperatur je Zelle", "kette"), ("b", "(b) Einwohnersumme", "a"),
                 ("c", "(c) Altersbänder je Zelle wie im Produkt", "b"),
-                ("d", f"(d) Feinstruktur σ = {de(args.sigma, 1)} K", "c")]
+                ("d", f"(d) Feinstruktur σ = {de(args.sigma, 2)} K", "c")]
     for k, text, vor in schritte:
         print(f"{text}: {mio(eur[k])} × {de(eur[k] / eur[vor], 3)}  (genau {de(eur[k] / eur[vor], 5)})")
     print(f"zusammen: × {de(eur['d'] / eur['kette'], 3)}  (genau {de(eur['d'] / eur['kette'], 5)})")
