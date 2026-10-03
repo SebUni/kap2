@@ -449,7 +449,11 @@ def _delta_kuehlzentren_default() -> float:
     spec = next((s for s in params.IMPACT_PARAM_SPECS
                  if s.get("risk") == "EXPECTED_ANNUAL_MORTALITY"
                  and s.get("key") == "delta_kuehlzentren"), None)
-    return float(spec["value"]) if spec is not None and spec.get("value") is not None else 0.9956
+    if spec is None or spec.get("value") is None:
+        raise RuntimeError(
+            "Registry-Wert heat.delta_kuehlzentren (impact/params.py, Schlüssel "
+            "delta_kuehlzentren) fehlt; es gibt bewusst keinen zweiten Rückfallwert.")
+    return float(spec["value"])
 
 
 DELTA_KZ: float = _delta_kuehlzentren_default()

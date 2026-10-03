@@ -53,15 +53,15 @@ def _kz_eur(frac: float = 1.0, **kw) -> float:
 # ── Parameter und Formel ─────────────────────────────────────────────────────────
 
 def test_delta_kz_from_registry():
-    assert health.DELTA_KZ == pytest.approx(0.9956, abs=1e-12)
-    assert 1.0 - 0.05 * 0.71 * 3.0 / 24.0 == pytest.approx(health.DELTA_KZ, abs=0.00005)
-    assert measure_service._s157_param("delta_kuehlzentren", -1.0) == pytest.approx(0.9956)
+    assert health.DELTA_KZ == pytest.approx(0.995585, abs=1e-12)
+    assert 1.0 - 0.05 * 0.7064 * 3.0 / 24.0 == pytest.approx(health.DELTA_KZ, abs=0.0000005)
+    assert measure_service._s157_param("delta_kuehlzentren", -1.0) == pytest.approx(0.995585)
 
 
 def test_formula_deaths_berlin():
     """ΔD_KZ = [71,4 + 153,6 × (1 − 0,344)] × 0,0044 ≈ 0,76 Todesfälle."""
     d = health.kz_avoided(D75_BERLIN, D85_BERLIN)
-    soll = (D75_BERLIN + D85_BERLIN * (1.0 - health.h_heim())) * (1.0 - 0.9956)
+    soll = (D75_BERLIN + D85_BERLIN * (1.0 - health.h_heim())) * (1.0 - 0.995585)
     assert d == pytest.approx(soll, rel=1e-12)
 
 
@@ -71,13 +71,13 @@ def test_berlin_chain_0_75_mio_eur():
     eur = _kz_eur()
     assert eur / 1e6 == pytest.approx(0.75, abs=0.05)
     # Rechenweg des Berichts: 169,5 Mio. € × 0,05 × 0,089
-    assert 169.5 * 0.05 * 0.089 == pytest.approx(0.75, abs=0.005)
+    assert 169.5 * 0.05 * 0.0883 == pytest.approx(0.75, abs=0.005)
 
 
 def test_band_reichweite_0_15_bis_1_50_mio_eur():
     for r, soll in ((0.01, 0.15), (0.10, 1.50)):
         override_context.set_overrides(
-            {f"risks.{MORT}.impact.delta_kuehlzentren": 1.0 - r * 0.71 * 3.0 / 24.0})
+            {f"risks.{MORT}.impact.delta_kuehlzentren": 1.0 - r * 0.7064 * 3.0 / 24.0})
         assert _kz_eur() / 1e6 == pytest.approx(soll, abs=0.02)
 
 
@@ -94,17 +94,17 @@ def test_old_cells_without_band_values_unchanged():
 # ── Kappung max(δ_HAP × δ_VG × δ_KZ; 0,794) ──────────────────────────────────────
 
 def test_kappung_zentral_greift_nicht():
-    """0,95 × 0,931 × 0,9956 = 0,881 > 0,794 (Bericht Z. 1238)."""
-    d_and = 0.95 * health.DELTA_VG
+    """0,939 × 0,931 × 0,995585 = 0,870 > 0,794 (Bericht Z. 1238)."""
+    d_and = 0.939 * health.DELTA_VG
     assert d_and * health.kz_effective_delta(health.DELTA_KZ, d_and) == \
-        pytest.approx(0.881, abs=0.001)
+        pytest.approx(0.870, abs=0.001)
     assert health.kz_effective_delta(health.DELTA_KZ, d_and) == health.DELTA_KZ
 
 
 def test_kappung_am_paketwert():
     # δ_HAP × δ_VG schon am Paketwert: die Kühlzentren nehmen nichts mehr weg
     assert health.kz_effective_delta(health.DELTA_KZ, 0.794) == pytest.approx(1.0)
-    assert _kz_eur(hap_cap=0.85, vg_cap=0.794 / 0.85) == pytest.approx(0.0, abs=1e-6)
+    assert _kz_eur(hap_cap=0.852, vg_cap=0.794 / 0.852) == pytest.approx(0.0, abs=1e-6)
     # knapp darüber: nur der Rest bis 0,794
     d_and = 0.797
     assert d_and * health.kz_effective_delta(health.DELTA_KZ, d_and) == \
@@ -126,7 +126,7 @@ def test_measure_factor_adds_s157_and_kz():
 def test_sum_of_single_benefits_equals_aggregate_with_hap_and_vg():
     cell = _berlin_cell()
     base = _base_eur(cell)
-    d_hap = 0.95
+    d_hap = 0.939
     f_vg = measure_service._vg_cell_factor(MORT, 1.0, cell, 1.0, d_hap)
     d_vg, vg_cap = measure_service._vg_kz_factors([1.0], cell, d_hap)
     assert d_vg == pytest.approx(f_vg, rel=1e-12)
@@ -199,7 +199,7 @@ def test_summary_kuehlzentren_berlin_0_75_mio_eur_getrennt_von_s157(monkeypatch)
     s = _summary(monkeypatch)
     assert s["kuehlzentren_benefit_eur"] / 1e6 == pytest.approx(0.75, abs=0.05)
     assert s["kuehlzentren_estimate_note"] == "Abschätzung von KAP3"
-    assert s["delta_kuehlzentren"] == pytest.approx(0.9956)
+    assert s["delta_kuehlzentren"] == pytest.approx(0.995585)
     # S157 ohne Eingabe (Voreinstellung 0,11): 1,2 Mio. € (Bericht Z. 1148), getrennt
     assert s["s157_benefit_eur"] / 1e6 == pytest.approx(1.2, abs=0.05)
     assert s["kuehlzentren_benefit_eur"] + s["s157_benefit_eur"] == \
