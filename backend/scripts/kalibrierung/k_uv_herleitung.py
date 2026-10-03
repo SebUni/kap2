@@ -407,7 +407,7 @@ def main() -> None:
                         ("Median", np.median(q_zelle)),
                         ("90. Perzentil", np.percentile(q_zelle, 90)),
                         ("95. Perzentil", np.percentile(q_zelle, 95)),
-                        ("bevölkerungsgewichtet (Bundeswert)", q_de)):
+                        ("fallgewichtet (Bundeswert)", q_de)):
         p.append(f"- {label}: **{wert:.4f}**")
     p.append("")
     p.append("Über die Gemeindepunkte streut der Rasterquotient erheblich. Das "

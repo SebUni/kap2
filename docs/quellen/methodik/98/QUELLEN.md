@@ -29,7 +29,7 @@ Branches am 27.09.2026). Nach Abschnitten statt nach Zeilennummern, weil sich di
   (verweist auf „[31] (Tab. 2/4, Kap. 2)“); Entscheidungslog Nr. 26.
 - [27]: Evidenz-Register 98-R35-01 (Abb. 3.13.2/3.14.3) und 98-K1-02 (Tab. 3.13.1/3.14.1); §3.3 (Ablesekette Abb. 3.13.2 und
   3.14.3, Anker Tab. 3.13.1/3.14.1, zwei Rechenblöcke); §4 (Vergleichswerte Tab. 3.13.1/3.14.1); Parameterblöcke der
-  Ablesewerte (Abb. 3.13.2, „Abb. 3.14.2“); Kap. 8 [27]; Entscheidungslog Nr. 20.
+  Ablesewerte (Abb. 3.13.2, „Abb. 3.14.2“, mit Befund 459 auf Abb. 3.14.3 berichtigt); Kap. 8 [27]; Entscheidungslog Nr. 20.
 - [48]: §3.3 (Tab. 12411-06); Kap. 8 [48] (Tab. 12411-06).
 - [75]: §3.0 Rechenkette, Ebene 1 (Tab. 12411-09); Kap. 8 [75] (Tab. 12411-09, mit Verweis auf Tab. 12411-06 von [48]).
 - [76]: Kap. 1, Tabelle der Zeitscheiben und Absatz dazu (Kapitel 3.3, S. 78); Kap. 8 [76] (Kapitel 3.3, S. 78).
@@ -42,6 +42,7 @@ Branches am 27.09.2026). Nach Abschnitten statt nach Zeilennummern, weil sich di
    Abb. 3.13.2 und 3.14.2`, `quelle: zfkd_kid2025   # Abb. 3.14.2, altersspezifische Rohraten heller Hautkrebs (C44)` und
    `# KID 2025 [27], Abb. 3.14.2`) nennen Abb. 3.14.2. In KID 2025 ist Abb. 3.14.2 „Relatives 5-Jahres-Überleben nach
    Histologie und Geschlecht“; die altersspezifischen Neuerkrankungsraten C44 stehen in **Abb. 3.14.3** (PDF-Seite 2 von
-   C44). Evidenz-Register, §3.3 und Kap. 8 nennen richtig Abb. 3.14.3.
+   C44). Evidenz-Register, §3.3 und Kap. 8 nennen richtig Abb. 3.14.3. **Erledigt mit Befund 459:** Die Parameterblöcke
+   nennen jetzt ebenfalls Abb. 3.14.3.
 2. [29]: Der Bericht zitiert „S. 21 f.“; die drei BAF-Werte stehen auf S. 22 („Page 22 of 56“), der Abschnitt beginnt auf
    S. 21. Die Angabe deckt die Fundstelle, ist aber weiter als nötig. Kein Fehler, nur zur Kenntnis.
