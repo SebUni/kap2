@@ -20,6 +20,8 @@ export default function MeasureSidebar() {
   // Stadtbaumwahl (#96 §5, T-1603-cto): Anteil ersetzter allergener Kronen in Prozent;
   // null = keine Eingabe.
   const [editAnteilErsetzt, setEditAnteilErsetzt] = useState<number | null>(null)
+  // Ersatzfall der Stadtbaumwahl (Ü-11): 'nachpflanzung' | 'vorgezogen'; null = nicht gewählt.
+  const [editErsatzfall, setEditErsatzfall] = useState<string | null>(null)
   const [showBreakdown, setShowBreakdown] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -33,6 +35,8 @@ export default function MeasureSidebar() {
       setEditSgek(typeof sg === 'number' ? Math.round(sg * 1000) / 10 : null)
       const ae = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.anteil_ersetzt
       setEditAnteilErsetzt(typeof ae === 'number' ? Math.round(ae * 1000) / 10 : null)
+      const ef = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.ersatzfall
+      setEditErsatzfall(ef === 'nachpflanzung' || ef === 'vorgezogen' ? ef : null)
       const vk = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.vg_in_kalibrierjahren
       setEditVgKalib(typeof vk === 'number' ? (vk >= 0.5 ? 1 : 0)
         : typeof vk === 'boolean' ? (vk ? 1 : 0) : null)
@@ -98,6 +102,8 @@ export default function MeasureSidebar() {
         const base = { ...((payload.config as Record<string, unknown>) || selectedMeasure.config || {}) }
         if (editAnteilErsetzt == null) delete base.anteil_ersetzt
         else base.anteil_ersetzt = Math.max(0.1, Math.min(100, editAnteilErsetzt)) / 100
+        if (editErsatzfall == null) delete base.ersatzfall
+        else base.ersatzfall = editErsatzfall
         payload.config = base
       }
       const updated = await updateMeasure(selectedMeasure.id, payload)
@@ -281,6 +287,21 @@ export default function MeasureSidebar() {
             </div>
           )}
 
+          {isStadtbaum && (
+            <div className="card">
+              <h3>Ersatzfall</h3>
+              <select
+                value={editErsatzfall ?? ''}
+                onChange={e => { setEditErsatzfall(e.target.value === '' ? null : e.target.value); setDirty(true) }}
+                style={{ fontSize: '0.9rem', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 6px', background: 'var(--surface)' }}
+              >
+                <option value="">bitte wählen</option>
+                <option value="nachpflanzung">Nachpflanzung ohnehin</option>
+                <option value="vorgezogen">vorgezogener Ersatz</option>
+              </select>
+            </div>
+          )}
+
           <div className="card">
             <h3 style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               Kosten
@@ -292,8 +313,28 @@ export default function MeasureSidebar() {
             </h3>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
               <span style={{ color: 'var(--text-muted)' }}>CAPEX (einmalig)</span>
-              <span>{fmtEur(impact.capex_eur)}</span>
+              <span>{impact.capex_je_fall ? '–' : fmtEur(impact.capex_eur)}</span>
             </div>
+            {isStadtbaum && impact.capex_je_fall && (
+              <div style={{ fontSize: '0.85rem' }}>
+                {([['nachpflanzung', 'CAPEX bei Nachpflanzung ohnehin'], ['vorgezogen', 'CAPEX bei vorgezogenem Ersatz']] as const).map(([fall, label]) => (
+                  <div key={fall} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>{label}</span>
+                    <span>{fmtEur(impact.capex_je_fall![fall])}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {isStadtbaum && impact.kosten_vermerk && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4, lineHeight: 1.4 }}>
+                {impact.kosten_vermerk}
+              </div>
+            )}
+            {isStadtbaum && impact.stadtbaum_kosten_hinweis && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>
+                {impact.stadtbaum_kosten_hinweis}
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0', fontSize: '0.85rem' }}>
               <span style={{ color: 'var(--text-muted)' }}>OPEX/Jahr</span>
               <span>{fmtEur(impact.opex_annual_eur)}</span>

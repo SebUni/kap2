@@ -176,6 +176,14 @@ export interface MeasureImpactSummary {
   stadtbaum_estimate_note?: string | null
   /** Stadtbaumwahl: Hinweis auf die Richtung des Fehlers in λ (§6 Modellgrenze 7). */
   stadtbaum_lambda_hinweis?: string | null
+  /** Stadtbaumwahl: gewählter Ersatzfall (null = noch keiner gewählt). */
+  ersatzfall?: 'nachpflanzung' | 'vorgezogen' | null
+  /** Stadtbaumwahl ohne gewählten Fall: CAPEX je Fall in Euro, beide nebeneinander. */
+  capex_je_fall?: { nachpflanzung: number; vorgezogen: number }
+  /** Stadtbaumwahl: Vermerk des Backends (Fall wählen / Zahl der Bäume eingeben). */
+  kosten_vermerk?: string | null
+  /** Stadtbaumwahl: Hinweis zum Nutzen bei Nachpflanzung. */
+  stadtbaum_kosten_hinweis?: string | null
   count?: number
   count_is_default?: boolean
   recommended_count?: number
