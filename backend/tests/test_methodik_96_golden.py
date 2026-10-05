@@ -187,6 +187,8 @@ def test_national_sum_matches_report_sanity_band():
     tage_de = betroffene * 1.0734                       # DE-gewichtetes δ
     assert abs(tage_de / 1e6 - 9.62) < 0.1
     assert abs(tage_de * 6.20 / 1e6 - 60) < 1
+    # Sanity-Anker: 9,62 Mio ÷ 83,456 Mio EW × 100.000 = 11.527 → 11.530
+    assert catalog.RISKS_BY_CODE["EXPECTED_ANNUAL_ALLERGY_DAYS"]["ref_value"] == 11530.0
 
 
 def test_implied_climate_share_in_published_band():

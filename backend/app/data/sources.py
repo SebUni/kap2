@@ -1047,7 +1047,9 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
         "ieee": "W. R. L. Anderegg u. a., „Anthropogenic climate change is worsening "
                 "North American pollen seasons,“ PNAS, Bd. 118, Nr. 7, e2013284118, "
                 "2021. doi: 10.1073/pnas.2013284118 (Saisonlänge +8 Tage, Pollenintegral "
-                "+20,9 %; klimaattribuierter Anteil ≈ 50 % [IQR 19–84 %] — a_attr).",
+                "+20,9 %; klimaattribuierter Anteil der Saisonlänge 19–35 % (1990–2018) — "
+                "Grundlage für a_attr 0,27, eine Abschätzung von KAP3; die rund 50 % "
+                "gelten Beginn und Länge zusammen).",
         "url": "https://doi.org/10.1073/pnas.2013284118",
         "archive_url": "https://web.archive.org/web/20260808163832/"
                        "https://doi.org/10.1073/pnas.2013284118",
