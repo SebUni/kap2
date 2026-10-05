@@ -1397,7 +1397,7 @@ MEASURES: list[dict] = [
      # u. a. 2025 sind der EINFÜHRUNGSEFFEKT über drei Jahrzehnte, nicht der marginale
      # Spielraum gegenüber dem heutigen deutschen Stand — c_kal ist auf Jahre mit
      # laufendem DWD-Warnsystem kalibriert (Doppelzählungs-Wächter, Befund 33/68).
-     "effect_target": ["vulnerability"], "default_reduction": 0.05, "coverage_scaling": "saturating",
+     "effect_target": ["vulnerability"], "default_reduction": 0.061, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"],
      "capex_fixed": 100000.0, "capex_per_unit": None, "capex_per_m2": None,
      "opex_fixed_year": 20000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
