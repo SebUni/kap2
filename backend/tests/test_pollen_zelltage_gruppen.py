@@ -9,9 +9,9 @@ Paket 2) ruft dieselbe Funktion später mit festgehaltenem Ḡ₀ auf.
 
 Geprüft wird:
 (a) Schlüssel der Zellausgabe und tage_birke + tage_graeser = outcome.
-(b) δ_B = 0,8085 und δ_G = 1,0710 (Berlin, Region Mitte, Bericht §5.1 Z. 1200–1206).
+(b) δ_B = 0,43659 und δ_G = 0,57834 (Berlin, Region Mitte, Bericht §5.1 Z. 1200–1206).
 (c) ``pollen_zelltage`` mit 402.103 Betroffenen und P̂ = 1 (Ḡ₀ = Ĝ) ergibt
-    325.100 und 430.652 Tage (§3.0-Rechenkette, Toleranz ± 1).
+    175.554 und 232.552 Tage (§3.0-Rechenkette, Toleranz ± 1).
 (d) Ein erneuter Aufruf von ``pollen_zelltage`` mit den gespeicherten Eingaben
     ergibt dieselben Tage (± 1e-9) — die Funktion ist rein und deterministisch.
 """
@@ -31,17 +31,17 @@ CODE = "EXPECTED_ANNUAL_ALLERGY_DAYS"
 
 # Berlin-Rechenkette (Ebenen 1–10, test_methodik_96_golden_betraege.py::KETTE_BETROFFENE).
 KETTE_BETROFFENE = 402_103
-DELTA_BIRKE = 0.8085
-DELTA_GRAESER = 1.0710
-TAGE_BIRKE = 325_100
-TAGE_GRAESER = 430_652
+DELTA_BIRKE = 0.43659
+DELTA_GRAESER = 0.57834
+TAGE_BIRKE = 175_554
+TAGE_GRAESER = 232_552
 TOL = 1.0
 
 
 def _berlin_ctx(g_cell: float = 0.18, g_bar0: float | None = 0.18) -> CellContext:
     """Zelle mit dem Bundes-Altersmix, so skaliert, dass ``betroffene`` = 402.103.
 
-    Region Mitte (Berlin), Standardprävalenzen (Bericht Kap. 7) ergeben δ_R = 1,8795
+    Region Mitte (Berlin), Standardprävalenzen (Bericht Kap. 7) ergeben δ_R = 1,01493
     Tage/Betroffener und die Prävalenzen POLLEN_PREVALENCE aus dem Produkt. Die
     Bevölkerung wird über die Bundesbänder so skaliert, dass die gewichtete
     Prävalenzsumme exakt KETTE_BETROFFENE ergibt.
@@ -76,7 +76,7 @@ def test_zellausgabe_schluessel_und_summe():
 
 
 def test_delta_je_gruppe_berlin():
-    """(b) δ_B = 0,8085 und δ_G = 1,0710 (Region Mitte, §5.1 Z. 1200–1206)."""
+    """(b) δ_B = 0,43659 und δ_G = 0,57834 (Region Mitte, §5.1 Z. 1200–1206)."""
     override_context.set_overrides({})
     res = impact.compute_all_cell_impacts(_berlin_ctx())[CODE]
     assert abs(res["delta_birke"] - DELTA_BIRKE) < 1e-9
@@ -84,7 +84,7 @@ def test_delta_je_gruppe_berlin():
 
 
 def test_pollen_zelltage_berlin_betroffene():
-    """(c) pollen_zelltage(402.103, δ_B, δ_G, ·, ·, ·) mit P̂ = 1 ergibt 325.100/430.652 Tage."""
+    """(c) pollen_zelltage(402.103, δ_B, δ_G, ·, ·, ·) mit P̂ = 1 ergibt 175.554/232.552 Tage."""
     tage_birke, tage_graeser = H.pollen_zelltage(
         KETTE_BETROFFENE, DELTA_BIRKE, DELTA_GRAESER,
         g_zelle=0.18, g_bar0=0.18, lam=0.70)

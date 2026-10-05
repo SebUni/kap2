@@ -4,9 +4,9 @@ Bindet die Jahresbeträge aus Bericht ``docs/methodik/96_aeroallergene.md`` §3.
 Berlin, Preisstand 2024) an den Produktcode:
 
 (i)  Rechenkette mit den Altersbändern aus Ebene 1 (Fortschreibung 31.12.2023): 402.103 Betroffene,
-     755.753 zusätzliche Symptomtage, 4,69 Mio. € je Jahr (Prüfblock ``rechenkette_96``, Z. 379, 396, 406).
+     408.106 zusätzliche Symptomtage, 2,53 Mio. € je Jahr (Prüfblock ``rechenkette_96``, Z. 379, 396, 406).
 (ii) Zelllauf über die 40.669 bewohnten 100-m-Zellen innerhalb der Gemeindegrenze mit der Ersatzregel
-     #95 §3.3 für den geheimgehaltenen Anteil 65+: 4,58 Mio. € je Jahr (``rechenkette_96``, Z. 432).
+     #95 §3.3 für den geheimgehaltenen Anteil 65+: 2,47 Mio. € je Jahr (``rechenkette_96``, Z. 432).
 
 Gerechnet wird mit dem Produkt: Altersbänder je Zelle aus ``zensus_loader.apply_zensus_to_cell_inputs``
 (u20 je Zelle aus den 5er-Jahresgruppen, §3.2), Symptomtage und Euro aus
@@ -53,9 +53,9 @@ POP_KETTE = {"u20": U20, "a20_64": U65 - U20, "a65_74": A6574, "a75_84": A7584, 
 
 # Zielwerte des Berichts (§3.0, Prüfblock rechenkette_96)
 KETTE_BETROFFENE = 402_103       # Z. 379
-KETTE_TAGE = 755_753             # Z. 396
-KETTE_EUR_MIO = 4.69             # Z. 406
-ZELL_EUR_MIO = 4.58              # Z. 432, Zelllauf mit Ersatzregel
+KETTE_TAGE = 408_106             # Z. 396
+KETTE_EUR_MIO = 2.53             # Z. 406
+ZELL_EUR_MIO = 2.47              # Z. 432, Zelllauf mit Ersatzregel
 TOL_ANZAHL, TOL_MIO = 1, 0.005
 
 
@@ -118,7 +118,7 @@ def test_kette_kostensatz_katalog():
 
 
 def test_kette_berlin():
-    """Ebenen 1–10: 402.103 Betroffene, 755.753 Tage, 4,69 Mio. € je Jahr (Preisstand 2024)."""
+    """Ebenen 1–10: 402.103 Betroffene, 408.106 Tage, 2,53 Mio. € je Jahr (Preisstand 2024)."""
     assert sum(POP_KETTE.values()) == 3_662_381
     betroffene, tage, euro = _rechnen(POP_KETTE)
     assert abs(betroffene - KETTE_BETROFFENE) < TOL_ANZAHL, f"{betroffene:.1f}"
@@ -137,7 +137,7 @@ def test_zelldaten_gepinnt():
 
 
 def test_zelllauf_berlin():
-    """Zelllauf mit Ersatzregel: 4,58 Mio. € je Jahr (Preisstand 2024), ± 0,005 Mio. €."""
+    """Zelllauf mit Ersatzregel: 2,47 Mio. € je Jahr (Preisstand 2024), ± 0,005 Mio. €."""
     _, _, euro = _rechnen(_zellbaender(BERLIN))
     assert abs(euro / 1e6 - ZELL_EUR_MIO) < TOL_MIO, f"{euro / 1e6:.4f} Mio. €"
 

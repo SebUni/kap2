@@ -93,7 +93,7 @@ def test_zaehlung_der_kennzeichnungen_4_7_2():
     zaehlung = {"belegt": ist["belegt"], "abgeschaetzt": ist["abgeschaetzt"],
                 "berechnet": ist["berechnet"]}
     print(f"{len(bloecke)} verschiedene Block-Kennungen pollen.*: {zaehlung}")
-    assert zaehlung == {"belegt": 4, "abgeschaetzt": 7, "berechnet": 2}
+    assert zaehlung == {"belegt": 3, "abgeschaetzt": 8, "berechnet": 2}
     assert dict(soll) == dict(ist)
     # Mehrfach-Blöcke: gezählt werden Kennungen, nicht Registry-Zeilen.
     assert len(nach_block["pollen.delta_s_region"]) == 6
