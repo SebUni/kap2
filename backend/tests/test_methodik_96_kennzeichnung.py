@@ -1,12 +1,12 @@
-"""Block-Kennung und Kennzeichnung der 13 Parameter-Blöcke von #96 (T-1480, Vorgabe P1).
+"""Block-Kennung und Kennzeichnung der 14 Parameter-Blöcke von #96 (T-1480, Vorgabe P1).
 
 Kapitel 7 von ``docs/methodik/96_aeroallergene.md`` trägt je Block eine ``kennzeichnung``
 (``quelle`` | ``abschaetzung_kap3`` | ``berechnet``). Die Registry führt sie als
 ``evidence_class`` (``belegt`` | ``abgeschaetzt`` | ``berechnet``) und die Block-Kennung
 im Feld ``methodik_block``. Geprüft wird:
 
-1. Die Menge der ``pollen.*``-Kennungen der Registry ist genau die Menge der 13 Blöcke,
-   gezählt über verschiedene Kennungen: 4 × belegt, 7 × abgeschätzt, 2 × berechnet.
+1. Die Menge der ``pollen.*``-Kennungen der Registry ist genau die Menge der 14 Blöcke,
+   gezählt über verschiedene Kennungen: 3 × belegt, 9 × abgeschätzt, 2 × berechnet.
 2. Jeder #96-Parameter der Registry trägt Kennung und Klasse seines Blocks; Katalog-Blöcke
    stehen am Risiko (pollen.c_tag) bzw. an der Maßnahme POLLEN_EARLY_WARNING (pollen.r_s158).
 3. pollen.t_warn_s158 = 0,75 ist ein Spec des Risikos, kein Feld der Maßnahme; seit
@@ -41,7 +41,8 @@ _KLASSE = {"quelle": "belegt", "abschaetzung_kap3": "abgeschaetzt", "berechnet":
 
 # Schlüssel der Mehrfach-Blöcke → Suffix der Registry-ID.
 _SUFFIX = {"u20": "u20", "20-64": "a20_64", "65-74": "a65_74", "75-84": "a75_84",
-           "85+": "a85p", "birkengruppe": "birke", "graeser": "graeser"}
+           "85+": "a85p", "birkengruppe": "birke", "graeser": "graeser",
+           "vorgezogen": "vorgezogen", "nachpflanzung": "nachpflanzung"}
 
 
 def _kapitel7() -> str:
@@ -54,7 +55,7 @@ def _kapitel7() -> str:
 
 def _bloecke() -> dict[str, dict]:
     """Block-Kennung → Block (aus dem YAML-Abschnitt von Kapitel 7)."""
-    yaml_teil = re.search(r"```yaml\n(.*?)```", _kapitel7(), re.S).group(1)
+    yaml_teil = "\n".join(re.findall(r"```yaml\n(.*?)```", _kapitel7(), re.S))
     bloecke = {}
     for teil in re.split(r"^parameter:\n", yaml_teil, flags=re.M):
         if not teil.strip():
@@ -72,16 +73,16 @@ def _nach_block() -> dict[str, list[dict]]:
     return nach_block
 
 
-def test_block_kennungen_sind_genau_die_13_aus_kapitel_7():
+def test_block_kennungen_sind_genau_die_14_aus_kapitel_7():
     soll = set(_bloecke())
     roh = re.findall(r"^  id: (pollen\.\S+)", _kapitel7(), re.M)
-    assert len(roh) == 13 and set(roh) == soll, sorted(roh)
+    assert len(roh) == 14 and set(roh) == soll, sorted(roh)
     ist = set(_nach_block())
     assert ist == soll, (f"fehlen in der Registry: {sorted(soll - ist)}; "
                          f"nicht in Kapitel 7: {sorted(ist - soll)}")
 
 
-def test_zaehlung_der_kennzeichnungen_4_7_2():
+def test_zaehlung_der_kennzeichnungen_3_9_2():
     bloecke = _bloecke()
     soll = Counter(_KLASSE[b["kennzeichnung"]] for b in bloecke.values())
     nach_block = _nach_block()
@@ -93,7 +94,7 @@ def test_zaehlung_der_kennzeichnungen_4_7_2():
     zaehlung = {"belegt": ist["belegt"], "abgeschaetzt": ist["abgeschaetzt"],
                 "berechnet": ist["berechnet"]}
     print(f"{len(bloecke)} verschiedene Block-Kennungen pollen.*: {zaehlung}")
-    assert zaehlung == {"belegt": 3, "abgeschaetzt": 8, "berechnet": 2}
+    assert zaehlung == {"belegt": 3, "abgeschaetzt": 9, "berechnet": 2}
     assert dict(soll) == dict(ist)
     # Mehrfach-Blöcke: gezählt werden Kennungen, nicht Registry-Zeilen.
     assert len(nach_block["pollen.delta_s_region"]) == 6
