@@ -22,7 +22,8 @@ KATEX="$ROOT/frontend/node_modules/katex/dist"
 
 # Python-Interpreter mit Playwright finden (Projekt-venvs, PATH, Playwright-CLI-Umgebung).
 PY=""
-for c in "$ROOT/.venv/bin/python" "$ROOT/backend/.venv/bin/python" python3 \
+VENV="${KAP2_VENV:-$HOME/.venvs/kap2}"
+for c in "$VENV/bin/python" "$ROOT/.venv/bin/python" "$ROOT/backend/.venv/bin/python" python3 \
          "$(command -v playwright >/dev/null && dirname "$(command -v playwright)")/python"; do
   [[ -x "$c" || "$c" == python3 ]] || continue
   if "$c" -c 'import playwright' 2>/dev/null; then PY="$c"; break; fi
@@ -59,7 +60,8 @@ echo "PDF erzeugt: $OUT"
 # Wirkungsmechanismus-Vorschau (Produkt-Diagramm, KAP3-Look) neben dem PDF erzeugen.
 # Nutzt das Repo-venv (Backend-Importe); bei Risiken ohne Vorschau-Definition nur Hinweis.
 NR="$(basename "$MD" | cut -d_ -f1)"
-PREVIEW_PY="$ROOT/.venv/bin/python"
+PREVIEW_PY="$VENV/bin/python"
+[[ -x "$PREVIEW_PY" ]] || PREVIEW_PY="$ROOT/.venv/bin/python"
 [[ -x "$PREVIEW_PY" ]] || PREVIEW_PY="python3"
 "$PREVIEW_PY" "$ROOT/scripts/wirkungsmechanismus_preview.py" "$NR" || \
   echo "WARNUNG: Wirkungsmechanismus-Vorschau fehlgeschlagen (PDF ist unabhängig davon erzeugt)." >&2
