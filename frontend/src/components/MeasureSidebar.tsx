@@ -317,9 +317,9 @@ export default function MeasureSidebar() {
             </div>
             {isStadtbaum && impact.capex_je_fall && (
               <div style={{ fontSize: '0.85rem' }}>
-                {([['nachpflanzung', 'Nachpflanzung ohnehin'], ['vorgezogen', 'vorgezogener Ersatz']] as const).map(([fall, label]) => (
+                {([['nachpflanzung', 'CAPEX bei Nachpflanzung ohnehin'], ['vorgezogen', 'CAPEX bei vorgezogenem Ersatz']] as const).map(([fall, label]) => (
                   <div key={fall} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>CAPEX bei {label}</span>
+                    <span style={{ color: 'var(--text-muted)' }}>{label}</span>
                     <span>{fmtEur(impact.capex_je_fall![fall])}</span>
                   </div>
                 ))}
