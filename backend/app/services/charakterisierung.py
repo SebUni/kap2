@@ -132,7 +132,9 @@ def a85_plus_anteil(ags: str) -> float:
     Zellen aus den gepinnten Zelldaten ``backend/data/kalibrierung/golden95_zellen_<AGS>.csv.gz``
     (ohne Datenbank), je Rasterwert (Sommermittel, Hitzetage) nach Altersbändern zusammengefasst,
     Feinstruktur σ = ``SIGMA_K`` mit Gauß-Hermite (``GH_PUNKTE`` Punkte) auf
-    ``impact.health.mortality``. Für Kommunen ohne gepinnte Zelldaten gibt es keinen Wert
+    ``impact.health.mortality``. Die Rechnung läuft samt Laden der Zellen in
+    ``override_context.override_scope({})``: Overrides eines laufenden Bewertungslaufs
+    bleiben unberührt. Für Kommunen ohne gepinnte Zelldaten gibt es keinen Wert
     (``FileNotFoundError``); es wird keiner ersetzt.
     """
     import numpy as np
@@ -143,30 +145,30 @@ def a85_plus_anteil(ags: str) -> float:
     from app.services.ergebnisbericht import beispiel
     from app.services.lite.vg250_loader import BUNDESLAND_BY_SNL
 
-    gids, cis, klima = beispiel.zellen(ags)
-    gruppen: dict[tuple[float, float], dict[str, float]] = {}
-    for gid, ci in zip(gids, cis):
-        acc = gruppen.setdefault(klima[gid], dict.fromkeys(beispiel.BANDS, 0.0))
-        for b in beispiel.BANDS:
-            acc[b] += float(ci["pop_age_bands"][b])
+    with override_context.override_scope({}):
+        gids, cis, klima = beispiel.zellen(ags)
+        gruppen: dict[tuple[float, float], dict[str, float]] = {}
+        for gid, ci in zip(gids, cis):
+            acc = gruppen.setdefault(klima[gid], dict.fromkeys(beispiel.BANDS, 0.0))
+            for b in beispiel.BANDS:
+                acc[b] += float(ci["pop_age_bands"][b])
 
-    xs, ws = np.polynomial.hermite.hermgauss(beispiel.GH_PUNKTE)
-    mort_risk = catalog.RISKS_BY_CODE["EXPECTED_ANNUAL_MORTALITY"]
-    regional = {"bundesland": BUNDESLAND_BY_SNL.get(ags[:2])}
-    override_context.set_overrides({})
-    yll = deaths_a85p = 0.0
-    for (t, hd), bands in gruppen.items():
-        def ctx(temp, bands=bands, hd=hd):
-            return CellContext(
-                ci={"pop": sum(bands.values()), "summer_temp_cell": temp, "pop_age_bands": bands},
-                hev={"hazards": {"HEAT_WAVE": hd}, "exposures": {}, "vulnerabilities": {}},
-                hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
-                indices={}, regional=regional)
-        for x, w in zip(xs, ws):
-            r = H.mortality(mort_risk, ctx(t + math.sqrt(2) * beispiel.SIGMA_K * x))
-            wgt = w / math.sqrt(math.pi)
-            yll += wgt * r["outcome"]
-            deaths_a85p += wgt * r["deaths_a85p"]
+        xs, ws = np.polynomial.hermite.hermgauss(beispiel.GH_PUNKTE)
+        mort_risk = catalog.RISKS_BY_CODE["EXPECTED_ANNUAL_MORTALITY"]
+        regional = {"bundesland": BUNDESLAND_BY_SNL.get(ags[:2])}
+        yll = deaths_a85p = 0.0
+        for (t, hd), bands in gruppen.items():
+            def ctx(temp, bands=bands, hd=hd):
+                return CellContext(
+                    ci={"pop": sum(bands.values()), "summer_temp_cell": temp, "pop_age_bands": bands},
+                    hev={"hazards": {"HEAT_WAVE": hd}, "exposures": {}, "vulnerabilities": {}},
+                    hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
+                    indices={}, regional=regional)
+            for x, w in zip(xs, ws):
+                r = H.mortality(mort_risk, ctx(t + math.sqrt(2) * beispiel.SIGMA_K * x))
+                wgt = w / math.sqrt(math.pi)
+                yll += wgt * r["outcome"]
+                deaths_a85p += wgt * r["deaths_a85p"]
     return deaths_a85p * H.AGE_LIFE_YEARS["a85p"] / yll
 
 
