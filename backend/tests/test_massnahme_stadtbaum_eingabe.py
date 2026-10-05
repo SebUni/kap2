@@ -114,5 +114,46 @@ def test_anteil_ersetzt_ohne_eingabe_bleibt_zulaessig():
     MeasureUpdate(config={"anteil_ersetzt": None})
 
 
+def test_anteil_ersetzt_ueber_eins_im_rechenweg_abgewiesen_oder_sichtbar_gekappt():
+    """Ü-9 (Befund 251), Rechenweg: a > 1 ergibt keinen Betrag, sondern den Vermerk und
+    ``benefit_missing_input`` = 'anteil_ersetzt'. Allee-Zelle nach Ü-13 (B 100, δ_B 0,43659,
+    δ_G 0,57834, Ḡ₀ 0,18125, Ĝ 0,3625, Kronen 0,3625 mit Tag, Grün 0,3625): a = 1 ergibt
+    65,93 Tage bei Deckungsgrad 1 und 32,96 Tage bei Deckungsgrad 0,5 (vorher, mit
+    δ 1,8795, 122,09 und 61,05)."""
+    from app.services import measure_service as ms
+
+    cell = {
+        "betroffene": 100.0, "delta_birke": 0.43659, "delta_graeser": 0.57834,
+        "pollen_g": 0.3625, "pollen_g_bar0": 0.18125,
+        "canopy_birch_frac": 0.3625, "canopy_unknown_frac": 0.0, "green_frac": 0.3625,
+    }
+
+    # a = 1: unverändert eine Zahl.
+    _, tage_voll, grund = ms._stadtbaum_cell_effect({"anteil_ersetzt": 1.0}, 1.0, cell)
+    assert grund is None
+    assert tage_voll == pytest.approx(65.93, abs=0.01)
+    _, tage_halb, grund = ms._stadtbaum_cell_effect({"anteil_ersetzt": 1.0}, 0.5, cell)
+    assert grund is None
+    assert tage_halb == pytest.approx(32.96, abs=0.01)
+
+    # a > 1: kein Betrag, Grund 'anteil_ersetzt_bereich' (bei jedem Deckungsgrad).
+    for a in (1.5, 2.0, 4.0):
+        for frac in (1.0, 0.5):
+            faktor, tage, grund = ms._stadtbaum_cell_effect({"anteil_ersetzt": a}, frac, cell)
+            assert tage is None, (a, frac)
+            assert faktor == 1.0
+            assert grund == ms.STADTBAUM_ANTEIL_BEREICH_REASON
+
+    # Der Vermerk der Kommune: kein Betrag, benefit_missing_input wie bei fehlender Eingabe.
+    felder = ms._stadtbaum_summary_fields(
+        _mdef(), 0.0, 0.0, ms.STADTBAUM_ANTEIL_BEREICH_REASON)
+    assert felder["benefit_missing_input"] == "anteil_ersetzt"
+    assert felder["benefit_display"] == (
+        "kein Betrag: Anteil ersetzter Kronen (anteil_ersetzt) muss zwischen 0 und 1 liegen, "
+        "Eingabe in der Maßnahme berichtigen")
+    assert "stadtbaum_avoided_days_total" not in felder
+    assert "stadtbaum_avoided_days_eur" not in felder
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-q"]))
