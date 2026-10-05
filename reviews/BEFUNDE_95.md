@@ -2101,3 +2101,60 @@ T-1647), 47 (Paket 6, T-1648), 48 (Paket 7a, T-1653). Runde 48 ist die Null-Rund
 Runde 48 ist erreicht, aber nicht überschritten, eine Benachrichtigung des Aufsichtsrats nach A-0046 entfällt.
 
 Neue Befunde: keine.
+
+## Vorbereitung der Schlussprüfung nach dem Nachzug der Übernahmelisten (T-1742-supervisor, methodik_consultant, 05.10.2026): 211 und 212 behoben, neue Befunde 214 (B, zurückgestellt) und 215 (C, behoben)
+
+**Anlass.** Vorhaben T-1660-ceo: Der cto hat die Übernahmelisten der Pakete 2 bis 4 nachgezogen (T-1671-cto bis
+T-1681-cto). Die „Folgearbeit“ aus Runde 48 und die Termine der Befunde 211 und 212 („nächste Änderung am Bericht“)
+sind damit fällig. Diese Runde ändert nur den Bericht und den Ledger, keinen Code.
+
+**Gesammelte Punkte des Tickets.**
+- T-1645 Runde 1 (Log 50 und Log 45, „0,053“): schon behoben über die Befunde 200, 205 und 206; Prüfausdrücke grün.
+- T-1646 Runde 2 (Log 34, Rest-Bias ×1,02): schon behoben über Befund 202; Log 34 verweist auf §3.0 Wirkung (d) und führt
+  den Historie-Marker.
+- T-1646 Runde 2 (Log 45, Gegenargument (2), a85+ Berlin 0,284): schon behoben über Befund 203 (a85+ je Kommune, Berlin
+  0,262, Warmsen 0,224, Anpassungspotenzial 0,064). Den Satz zum Stand im Produkt zieht diese Runde nach (Befund 214).
+- T-1646 Runde 3 und T-1673 bis T-1678 (Freitext im Code): Der Musterbefehl aus Paket 7b mit berichtigtem Muster (unten)
+  gibt am 05.10.2026 auf diesem Branch keinen Treffer. `grep -rnF -e "342,58" -e "342,67" -e "173.099" -e "± 505" -e
+  "0,2839" -e "Die Divergenz ist an den"` über backend/tests und backend/app gibt ebenfalls nichts aus (T-1671, T-1676, T-1678).
+- T-1672 (Z. 494, „die Anlage steht ohne `--sigma` noch auf 0,5 K“): Befund 215.
+- T-1679 und T-1680 (Code): bleiben als Nachtrag an den Entwickler. `scripts/wirkungsmechanismus_preview.py` Z. 648, 650 und
+  681 führen „(integriert)“ in festen Etiketten, Z. 704 den festen Banner der Vorschau #98;
+  `backend/tests/test_massnahme_s157.py` Z. 177 „Blockwert 0,2936 gerundet“. Methodik, Zahlen und Rechenweg sind davon
+  nicht berührt.
+- T-1681 (Fundort der Kostentabellen im Dashboard): betrifft die Ergebnisnotiz des cto, nicht Bericht oder Code von #95.
+- CEO, Musterbefehl „0,053*“: siehe unten.
+
+**Musterbefehl der Übernahmeliste Paket 7b (Muster „0,053*“).** `grep -F` liest den Stern wörtlich. Das Muster trifft
+deshalb nicht „nie“, sondern genau das Fettende `**0,053**`. Am Stand der Messung vom 30.09.2026 (Commit d55c30b5) trifft
+`git grep -nF -e "0,053)" -e "0,053." -e "0,053*" d55c30b5 -- backend/app backend/tests backend/scripts
+backend/data/kalibrierung docs/methodik/anlagen scripts frontend/src` genau eine Zeile:
+`backend/tests/test_methodik_95_golden_massnahmen.py:15: … Befund 149): **0,053**, gleich in Berlin`. Die Zahl 56 vom
+30.09.2026 enthält diese Fundstelle; das Muster ist dort also einmal rot gesehen. Ein Muster `0,053` ohne Grenze träfe
+am Stand vom 05.10.2026 die sechs Stellen von β_85+ Süd 0,0531 (health.py Z. 78, params.py Z. 95 und 1697,
+test_methodik_95_golden.py Z. 67, calibrate_heat_mortality_rev6.py Z. 40, wirkungsmechanismus_preview.py Z. 445). Deshalb
+fällt der Stern nicht ersatzlos weg: Die Messung vom 30.09.2026 bleibt wörtlich stehen, weil die Zahl 56 zu ihr gehört.
+Der Befehl für künftige Läufe behält „0,053*“ (Fettende) und ergänzt die Grenzen „0,053)“ und „0,053.“:
+
+```
+grep -rnF -e "0,9956" -e "× 0,71 ×" -e "0,71 [46]" -e "× 0,0044 " -e "heat.g_s157: 0,29)" -e "heat.g_s157: 0,29 =" -e "nennt 0,29," -e "= 0,2936 — mit 0,29" -e "0,29: mit Klimaanlage" -e "0,29 = (0,93" -e "Blockwert 0,29 " -e "0,95 × 0,294" -e "72,1 %" -e "72_1_percent" -e "75,6 %" -e "35_5_deaths" -e "23,7 Mio" -e "1,25 Mio" -e "δ_HAP = 0,95" -e "δ_HAP = 0,85 " -e "0,85–1,00" -e "1 − 0,95" -e "18,1 Mio" -e "3,75 Mio" -e "0,95 × 0,931" -e "0,885" -e "0,881" -e "Faktor 0,95" -e "1/3 × 0,85" -e "0,053*" -e "0,053)" -e "0,053." -e '0,053"' -e "0,053," -e "0,053 " -e "0,089" -e "0,791" --include="*.py" --include="*.md" --include="*.ts" --include="*.tsx" backend/app backend/tests backend/scripts backend/data/kalibrierung docs/methodik/anlagen scripts frontend/src | wc -l
+0
+```
+
+Gemessen am 05.10.2026 auf dem Branch `ticket/T-1742-supervisor` aus dem Wurzelverzeichnis des Repos.
+
+| Nr | Stelle | Art | Begründung | Vorschlag | Kat. | Prüfausdruck | Status |
+|---|---|---|---|---|---|---|---|
+| 211 | docs/methodik/95_hitzebelastung.md Kopf Z. 15 („aus steht dort noch die Ersatzregel (Befund 116)“), §3.3 Z. 540 („Der Code-Nachzug der Regel liegt beim cto (Befund 116).“) und Log 41, Spalte Auswirkung („Code-Nachzug beim cto nach dieser Fassung (Befund 116)“) | überholte Stand-Angabe (LF 13) | Das Produkt rechnet die Regel seit T-1364-cto; die drei Stellen nennen den Nachzug als ausstehend. Kategorie C, weil Methodik, Zahlen und Rechenweg stimmen; überholt ist nur die Angabe zum Stand im Produkt | auf den Stand nach T-1364-cto bringen | C | `python3 -c "import sys; s=' '.join(open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read().split()); sys.exit(any(x in s for x in ('aus steht dort noch die Ersatzregel', 'Der Code-Nachzug der Regel liegt beim cto (Befund 116)', 'Code-Nachzug beim cto nach dieser Fassung (Befund 116)')))"` | behoben (T-1742-supervisor, 05.10.2026): §3.3 „Das Produkt rechnet die Regel seit T-1364-cto (Befund 116).“; Log 41 „im Produkt seit T-1364-cto (Befund 116)“; den Kopf hatte Paket 7c nachgezogen |
+| 212 | docs/methodik/95_hitzebelastung.md Kap. 8, Quelle [45] | Fundstelle fehlt im Quelleneintrag (LF 10; C-Hinweis aus dem Urteil zu T-1648-methodik_manager, Eintrag 2026-09-30T03:46:27Z) | Der Eintrag nannte nur RR 1,00 und „adjustiert 0,85“. Die Fundstellen der Herleitung von δ_HAP standen in §5 und im Block heat.delta_hap, nicht im Quelleneintrag | die Fundstellen in [45] nennen, wie [47] und [70] es für §5 tun | C | `python3 -c "import sys; s=open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read(); e=' '.join(s.split('- **[45]**',1)[1].split('- **[46]**',1)[0].split()); sys.exit(not all(x in e for x in ('Tabelle 1', '2.2.1', '2.2.2')))"` | behoben (T-1742-supervisor, 05.10.2026): [45] nennt Tabelle 1 (31,1 / 26,9 und 30,5 / 26,6), Abschnitt 2.2.1, S. 3, und Abschnitt 2.2.2, S. 4, mit den Seitenzahlen, die §5 schon führt; eine Seitenzahl für Tabelle 1 nennt der Bericht nirgends, sie ist deshalb auch hier nicht gesetzt |
+| 214 | backend/app/services/charakterisierung.py Z. 187–188 (`if ags is None: return 1.0` in der Funktion zum Faktor von S157) gegen docs/methodik/95_hitzebelastung.md §5, Anpassungspotenzial („in beiden Kommunen 0,064“) | Divergenz Bericht ↔ Code (eiserne Regel 5), Nullwirkung in einem Aufrufpfad (P2) | Seit T-1676-cto rechnet die Charakterisierung a85+ je Kommune; Aufrufe ohne Kommune (Katalog, Interpretationsbericht) zählen S157 im Anpassungspotenzial nicht mit, 0,061 statt 0,064. Die Gruppe nach KWRA (unter 0,1) ändert sich nicht. Bericht §5, Log 45 (Gegenargument (2)), Log 54 und Kopf nennen die Abweichung jetzt mit diesem Befund | Aufrufe ohne Kommune mit einer begründeten Abschätzung für a85+ rechnen oder die Kommune durchreichen, keine Wirkung null | B | `python3 -c "import sys; s=open('backend/app/services/charakterisierung.py',encoding='utf-8').read(); sys.exit('if ags is None:' + chr(10) + '        return 1.0' in s)"` | zurückgestellt (Termin: Folgepaket T-1740-ceo; Grund: Entscheidung des CEO vom 05.10.2026 zu den Fragen aus T-1676-cto, nicht in Vorhaben T-1660-ceo; Code liegt außerhalb dieser Runde) |
+| 215 | docs/methodik/95_hitzebelastung.md §3.3, Satz unter der Tabelle zum Gemeindeschlüssel (Z. 493–494) | überholte Stand-Angabe (LF 13; Punkt aus T-1672-cto) | Der Satz sagte „die Anlage steht ohne `--sigma` noch auf 0,5 K“; `docs/methodik/anlagen/95_zellvergleich.py` Z. 823 setzt `default=0.58`. Beträge unverändert (Berlin 345,11 Mio. €, Warmsen 175.256 €) | Satz auf den Stand der Anlage bringen | C | `python3 -c "import sys; s=' '.join(open('docs/methodik/95_hitzebelastung.md',encoding='utf-8').read().split()); sys.exit('noch auf 0,5 K' in s or 'rechnet auch ohne '+chr(96)+'--sigma'+chr(96)+' mit 0,58 K' not in s)"` | behoben (T-1742-supervisor, 05.10.2026): „die Anlage rechnet auch ohne `--sigma` mit 0,58 K, der Schalter steht im Aufruf nur zur Deutlichkeit“ |
+
+Weitere Änderungen am Bericht in dieser Runde, ohne eigene Nummer, weil sie Folgestellen der Befunde 195, 197 und 214 sind:
+Kopf (Stand im Produkt nach dem Nachzug der Übernahmelisten), §5 „Stand im Produkt (Befund 195)“ (Überschrift wörtlich
+belassen, weil der Prüfausdruck von 195 sie verlangt; Befund 214 steht im Text), Log 45
+Gegenargument (2), Log 51 (Rest-Bias-Diagnose: Z. 342 rechnet seit dem Nachzug mit `uhi_sigma=0.58`), Log 54, Spalte
+Auswirkung. Befund 213 (`docs/evidenz/register.md`) bleibt zurückgestellt: Die Datei liegt außerhalb des Dateirahmens
+dieses Tickets.
+
+Neue Befunde: 214 (B, zurückgestellt), 215 (C, behoben).
