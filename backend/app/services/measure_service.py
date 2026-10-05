@@ -1410,6 +1410,11 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     s158_missing_split = True
                 elif avoided_days is not None:
                     cell_savings["s158_avoided_days"] = round(avoided_days, 3)
+                    # Euro je Zelle (Befund 237, Ü-4): vermiedene Tage × c_Tag des
+                    # Risikos (Katalog-Kostensatz pollen.c_tag, mit Override wie die
+                    # Zellkosten), gerundet auf 0,01 €.
+                    cell_savings["s158_avoided_eur"] = round(risk_engine.cost_from_outcome(
+                        catalog.RISKS_BY_CODE[code], avoided_days), 2)
                     s158_avoided_days_total += avoided_days
             if (_is_stadtbaum(mdef) and code == ALLERGY_RISK_CODE
                     and stadtbaum_missing_reason is None):
@@ -1424,6 +1429,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     cell_savings["stadtbaum_missing_reason"] = "canopy"
                 elif avoided_days is not None:
                     cell_savings["stadtbaum_avoided_days"] = round(avoided_days, 3)
+                    # Euro je Zelle (Befund 237, Ü-4), Rechnung wie bei S158.
+                    cell_savings["stadtbaum_avoided_eur"] = round(risk_engine.cost_from_outcome(
+                        catalog.RISKS_BY_CODE[code], avoided_days), 2)
                     stadtbaum_avoided_days_total += avoided_days
                     if avoided_days > 0.0:
                         stadtbaum_saw_effect = True
