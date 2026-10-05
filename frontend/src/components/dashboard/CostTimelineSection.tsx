@@ -220,6 +220,11 @@ export default function CostTimelineSection({ className = '' }: { className?: st
             {proj.warnings.map((w, i) => (
               <span key={i} style={{ color: 'var(--warning)', marginRight: 10 }}>⚠ {w}</span>
             ))}
+            {(proj.hinweise_massnahmen ?? []).length > 0 && (
+              <ul style={{ margin: '2px 0 0', paddingLeft: 16 }} data-testid="cost-hinweise-massnahmen">
+                {(proj.hinweise_massnahmen ?? []).map((h, i) => <li key={i}>{h}</li>)}
+              </ul>
+            )}
           </div>
         </>
       )}

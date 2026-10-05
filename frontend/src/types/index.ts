@@ -835,6 +835,10 @@ export interface CostProjection {
     capex_eur: number; opex_annual_eur: number
   }[]
   assumptions: string[]
+  /** Hinweise zu einzelnen Maßnahmen neben der Zeitreihe (z. B. Wirkungsverzug der
+   *  Stadtbaumwahl, Bericht #96 §5). Leer ohne betroffene Maßnahme; bei älteren
+   *  Cache-Ständen nicht vorhanden. */
+  hinweise_massnahmen?: string[]
   warnings: string[]
   source?: string
   /** Untergrenzen-Hinweis: gesetzt, wenn die fortgeschriebenen Kategorien
