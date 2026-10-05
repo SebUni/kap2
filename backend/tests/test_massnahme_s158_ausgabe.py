@@ -181,6 +181,30 @@ def test_euro_value_equals_share_of_annual_benefit_damage(monkeypatch):
         summary["annual_benefit_damage_eur"], rel=1e-9)
 
 
+# ── (d) Euro je Zelle (Ü-4, Befund 237): vermiedene Tage × c_Tag ─────────────────
+
+def test_zelle_traegt_vermiedene_euro(monkeypatch):
+    """Allee-Zelle nach Ü-13 (δ_B 0,43659, δ_G 0,57834, Ĝ/Ḡ₀ = 2, Ausgangsstand
+    172,538 Tage), Frühwarnung allein: 3,882 Tage × 6,20 € = 24,07 €. Die Summe der
+    Zell-Euro ist der Euro-Betrag der Kommune (ohne Kappung)."""
+    allee = {
+        "index": 172.538, "outcome": 172.538,
+        "betroffene": 100.0, "delta_birke": 0.43659, "delta_graeser": 0.57834,
+        "pollen_g": 0.3625, "pollen_g_bar0": 0.18125,
+    }
+    summary, added = _run({40: allee}, {40: 1.0}, monkeypatch)
+
+    zeile = next(o for o in added if o.grid_cell_id == 40)
+    assert (zeile.savings or {})["s158_avoided_days"] == pytest.approx(3.882, abs=0.001)
+    assert (zeile.savings or {})["s158_avoided_eur"] == pytest.approx(24.07, abs=0.01)
+
+    c_tag = catalog.risk_default_cost_per_outcome(catalog.RISKS_BY_CODE[RISK])
+    assert c_tag == 6.20
+    summe = sum((o.savings or {}).get("s158_avoided_eur", 0.0) for o in added)
+    assert summe == pytest.approx(summary["s158_avoided_days_eur"], abs=0.01)
+    assert summe == pytest.approx(summary["annual_benefit_damage_eur"], abs=0.01)
+
+
 if __name__ == "__main__":
     import sys
 
