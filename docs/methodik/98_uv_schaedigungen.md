@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–479)** ·
+Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–481)** ·
 05.10.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -139,7 +139,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > `backend/data/kalibrierung/k_uv_raumstreuung.md` (räumliche Streuung von \(k_{\text{UV}}\),
 > Modellgrenze 9; Festlegung zu Befund 449: \(k_{\text{UV}}\) bleibt Bundeswert **0,7119**).
 > Bundessumme unverändert **339 Mio. €** je Jahr (Preisstand 2024). Zurückgestellt sind
-> 453, 463 und 479 (Ledger, Abschnitt »Null-Runde nach Fortschreibung 7«).
+> 453, 463 und 481, behoben ist 479; 480 und 481 stammen aus der Schlussprüfung (Ledger, Abschnitte »Null-Runde nach Fortschreibung 7« und »Schlussprüfung Teil 1/3«).
 >
 > Status je Befund in `reviews/BEFUNDE_98.md`. Diese Markdown-Datei ist die Quelle für
 > #98 (§2.7). Alle Ermessensentscheidungen im **Entscheidungslog** (Ende der Datei).
