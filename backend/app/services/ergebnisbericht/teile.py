@@ -639,7 +639,7 @@ def teil_8(d: Berichtsdaten) -> str:
         "Kostensatz je Krankenhausfall: Durchschnitt aller Krankenhausfälle als Ersatz, weil ein "
         "Satz für hitzebedingte Einweisungen nicht veröffentlicht ist (ausgewiesene Abschätzung "
         "von KAP3, Teil 7).",
-        "Temperatur je Zelle: Rasterwert 1 km mit einer Feinstruktur von 0,5 K darunter; lokale "
+        "Temperatur je Zelle: Rasterwert 1 km mit einer Feinstruktur von 0,58 K darunter; lokale "
         "Wärmeinseln einzelner Straßenzüge sind darin nur gemittelt enthalten.",
         "Zeitraum: Klima der Sommer 2016–2025; die Projektion bis 2065 ist nicht Teil dieses "
         "Betrags.",
