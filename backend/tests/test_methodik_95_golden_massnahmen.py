@@ -9,8 +9,8 @@ den Produktcode, und einen vierten Wert der Kette (kein Zelllauf) aus
 
 - **S157 (gekühlte Heimplätze) bei der Voreinstellung** ``s_gek = 0,11`` ohne Eingabe der
   Kommune (Bericht §5, Block ``heat.s_gek``, Befund 138): Berlin **1,1 Mio. € je Jahr**,
-  Warmsen **469 € je Jahr** (§5 Z. 1148: „Im Zelllauf mit Gemeindeschlüssel 1,1 Mio. €;
-  Warmsen (Zelllauf) 469 € je Jahr.").
+  Warmsen **475 € je Jahr** (§5 Z. 1148: „Im Zelllauf mit Gemeindeschlüssel 1,1 Mio. €;
+  Warmsen (Zelllauf) 475 € je Jahr.").
 - **Anpassungspotenzial der Hitzemortalität** mit S157 bei der Voreinstellung und dem
   Hitzeaktionsplan (Bericht §5 Z. 1169–1175, Befund 149): **0,053**, gleich in Berlin
   (a_85+ = 0,284) und in Warmsen (a_85+ = 0,224 im Zelllauf), obwohl der Altersaufbau
@@ -24,13 +24,13 @@ den Produktcode, und einen vierten Wert der Kette (kein Zelllauf) aus
 Den Zelllauf-Wert der Kühlzentren (0,72 Mio. €, §5 Z. 1229) bindet dieser Test nicht: Der
 Bericht rechnet ihn mit dem ungerundeten Faktor 0,05 × 0,71 × 3/24 = 0,0044375, sein Block
 ``heat.delta_kuehlzentren`` (Kap. 7 Z. 1782) und die Registry führen aber 0,9956 (also 0,0044).
-Das Produkt ergibt deshalb im Zelllauf 709.059 € statt 720.000 €. Die Divergenz ist an den
+Die Divergenz ist an den
 CMO gemeldet (Ergebnis T-1616-cto); dieses Paket (T-1618-cto, Ersatz für T-1616) untersucht
 sie nicht weiter und bindet nur den Kettenwert Z. 1228.
 
 Gerechnet wird wie in ``test_methodik_95_golden_betraege.py``: Zellen aus ``_zellen(ags)``
 nach Rasterwert (Sommermittel, Hitzetage) gruppiert, Gauß-Hermite mit 21 Punkten und
-Feinstruktur σ = 0,5 K je Gruppe auf ``impact.health.mortality`` — hier zusätzlich mit den
+Feinstruktur σ = 0,58 K je Gruppe auf ``impact.health.mortality`` — hier zusätzlich mit den
 Teil-Ausweisen ``deaths_a85p``/``deaths_a75_84`` (Andockpunkte des Hebels S157, Bericht §5).
 Aus den Summen über die Kommune bildet ``health.s157_avoided_deaths`` die vermiedene Menge
 (Todesfälle); bewertet wird mit ``catalog.risk_default_cost_per_outcome`` (VOLY), wie im
@@ -39,10 +39,10 @@ Konstanten) werden importiert, nicht verändert.
 
 Toleranz (Ticket-Vorgabe T-1618-cto, Abnahmekriterium): Der Bericht nennt für diese Werte
 keine eigene Toleranz. Es gilt die größere von zwei Grenzen: der halben letzten Stelle des
-Berichtswerts oder der Zelllauf-Toleranz des Berichts von 0,2918 % (§3.3, Befund 140) relativ
-zum Berichtswert. Daraus: Berlin S157 ± 0,05 Mio. €, Warmsen S157 ± 1,37 €,
+Berichtswerts oder der Zelllauf-Toleranz des Berichts von 0,2898 % (§3.3, Befund 140) relativ
+zum Berichtswert. Daraus: Berlin S157 ± 0,05 Mio. €, Warmsen S157 ± 1,38 €,
 Anpassungspotenzial ± 0,0005, Kühlzentren-Kette ± 5.000 € (halbe letzte Stelle; die
-Zelllauf-Toleranz wäre hier nur ± 2.189 €).
+Zelllauf-Toleranz wäre hier nur ± 2.173 €).
 """
 
 from __future__ import annotations
@@ -145,8 +145,8 @@ def test_s157_voreinstellung_berlin_1_1_mio_eur():
     assert abs(eur - S157_BERLIN_EUR) < S157_BERLIN_TOL, f"{eur / 1e6:.2f} Mio. €"
 
 
-def test_s157_voreinstellung_warmsen_469_eur():
-    """S157 bei der Voreinstellung s_gek = 0,11, Warmsen (Zelllauf): 469 € je Jahr
+def test_s157_voreinstellung_warmsen_475_eur():
+    """S157 bei der Voreinstellung s_gek = 0,11, Warmsen (Zelllauf): 475 € je Jahr
     (Bericht §5 Z. 1148)."""
     eur = _s157_eur(WARMSEN)
     assert abs(eur - S157_WARMSEN_EUR) < S157_WARMSEN_TOL, f"{eur:.2f} €"
