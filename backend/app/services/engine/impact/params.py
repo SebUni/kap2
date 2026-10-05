@@ -430,7 +430,7 @@ IMPACT_PARAM_SPECS: list[dict] = [
                           "den Schutzprogrammen und Kühlzentren (Anteil 1 − h_Heim); die "
                           "Summe der Todesfälle bleibt gleich (Bericht #95 §5).",
      }},
-    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "delta_kuehlzentren", "value": 0.9956,
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "delta_kuehlzentren", "value": 0.995585,
      "label": "Öffentliche Kühlzentren: Faktor δ_KZ auf den Hitze-Exzess der Todesfälle 75–84 "
               "und 85+ ohne Heimbewohner", "unit": "Faktor",
      "source": "Abschätzung von KAP3 aus Katz u. a. 2026 [46] und Meade u. a. 2023 [73], "
