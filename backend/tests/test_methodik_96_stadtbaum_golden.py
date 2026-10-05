@@ -5,7 +5,7 @@ Produktfunktionen — nicht am Beispiel-Block selbst (der läuft bereits über
 Vorhabens-Kriterium (i), T-1601-cto: bindet ``health.stadtbaum_g_neu``,
 ``health.pollen_zelltage`` und den Zweig ``'stadtbaum'`` in ``measure_service``
 (``measure_service._stadtbaum_cell_factor``) an die im Bericht genannten Zahlenwerte —
-δ_R = 1,8795 (Ebene 6, wie im S158-Golden-Test), λ = 0,7 und c_Tag = 6,20 € aus dem Katalog
+δ_R = 1,01493 (Ebene 6, wie im S158-Golden-Test), λ = 0,7 und c_Tag = 6,20 € aus dem Katalog
 (Kap. 7 ``pollen.lambda_veg``/``pollen.c_tag``, wie in ``test_methodik_96_s158_golden.py``).
 
 **Allee-Zelle (§5, Z. 999–1006).** B = 100, Ḡ₀ = 0,18125, Kronenanteil mit Gattungs-Tag
@@ -44,7 +44,7 @@ from app.services.engine import override_context  # noqa: E402
 from app.services.engine.impact import health as H  # noqa: E402
 
 CODE = "EXPECTED_ANNUAL_ALLERGY_DAYS"
-DELTA_R = 1.8795        # Ebene 6 des Berichts (wie test_methodik_96_s158_golden.py)
+DELTA_R = 1.01493       # Ebene 6 des Berichts (wie test_methodik_96_s158_golden.py)
 LAM = 0.70               # Kap. 7 pollen.lambda_veg
 
 
@@ -69,8 +69,8 @@ def _tage(betroffene: float, g_zelle: float, g_bar0: float, lam: float = LAM) ->
 # ── Allee-Zelle (§5, Z. 999–1006) ────────────────────────────────────────────
 
 def test_allee_zelle_stadtbaum():
-    """100 Betroffene: 319,5 → 293,2 Tage, Senkung 26,3 Tage / ≈163 € je Jahr;
-    Band λ 0,3 → 11,3 Tage, λ 1,0 → 37,6 Tage."""
+    """100 Betroffene: 172,5 → 158,3 Tage, Senkung 14,2 Tage / ≈88 € je Jahr;
+    Band λ 0,3 → 6,1 Tage, λ 1,0 → 20,3 Tage."""
     b_zelle, g_bar0 = 100.0, 0.18125
     k_birke = gruen = 0.3625
     g_vor = 0.464 * k_birke + 0.536 * gruen
@@ -85,12 +85,12 @@ def test_allee_zelle_stadtbaum():
 
     tage_vor = _tage(b_zelle, g_vor, g_bar0)
     tage_nach = _tage(b_zelle, g_neu, g_bar0)
-    assert abs(tage_vor - 319.5) < 0.05, f"{tage_vor:.3f}"
-    assert abs(tage_nach - 293.2) < 0.05, f"{tage_nach:.3f}"
+    assert abs(tage_vor - 172.5) < 0.05, f"{tage_vor:.3f}"
+    assert abs(tage_nach - 158.3) < 0.05, f"{tage_nach:.3f}"
 
     senkung = tage_vor - tage_nach
-    assert abs(senkung - 26.3) < 0.05, f"{senkung:.3f}"
-    assert abs(senkung * _c_tag() - 163) < 0.5, f"{senkung * _c_tag():.2f} €"
+    assert abs(senkung - 14.2) < 0.05, f"{senkung:.3f}"
+    assert abs(senkung * _c_tag() - 88) < 0.5, f"{senkung * _c_tag():.2f} €"
 
     # Zweig 'stadtbaum' in measure_service: derselbe Faktor über die Zellfunktion.
     cell_risk = {
@@ -104,11 +104,11 @@ def test_allee_zelle_stadtbaum():
     # Band über λ (§5, Z. 1005–1006).
     tage_vor_03 = _tage(b_zelle, g_vor, g_bar0, lam=0.3)
     tage_nach_03 = _tage(b_zelle, g_neu, g_bar0, lam=0.3)
-    assert abs((tage_vor_03 - tage_nach_03) - 11.3) < 0.05
+    assert abs((tage_vor_03 - tage_nach_03) - 6.1) < 0.05
 
     tage_vor_10 = _tage(b_zelle, g_vor, g_bar0, lam=1.0)
     tage_nach_10 = _tage(b_zelle, g_neu, g_bar0, lam=1.0)
-    assert abs((tage_vor_10 - tage_nach_10) - 37.6) < 0.05
+    assert abs((tage_vor_10 - tage_nach_10) - 20.3) < 0.05
 
 
 # ── Kommune (§5, Z. 1016–1035) ────────────────────────────────────────────────
@@ -131,8 +131,8 @@ def _kommune_zellen() -> list[dict]:
 
 
 def test_kommune_stadtbaum_kommunensumme():
-    """Σ B·P̂′ = 7.372,8; 15.036 → 13.857,2 Tage; Senkung 1.178,8 Tage (Anteil 0,078);
-    ≈7.310 € je Jahr; Zellen 1 und 2 unverändert."""
+    """Σ B·P̂′ = 7.372,8; 8.119,4 → 7.482,9 Tage; Senkung 636,6 Tage (Anteil 0,078);
+    ≈3.950 € je Jahr; Zellen 1 und 2 unverändert."""
     zellen = _kommune_zellen()
     a = 1.0 / 3.0
 
@@ -141,7 +141,7 @@ def test_kommune_stadtbaum_kommunensumme():
 
     tage_vor_je_zelle = [_tage(z["betroffene"], z["pollen_g"], z["pollen_g_bar0"]) for z in zellen]
     tage_vor = sum(tage_vor_je_zelle)
-    assert abs(tage_vor - 15_036) < 0.5, f"{tage_vor:.2f}"
+    assert abs(tage_vor - 8_119.4) < 0.5, f"{tage_vor:.2f}"
 
     # frac: Zellen 1/2 ohne Deckung (unverändert), Zellen 3/4 vollständig gedeckt.
     fracs = [0.0, 0.0, 1.0, 1.0]
@@ -156,7 +156,7 @@ def test_kommune_stadtbaum_kommunensumme():
     assert abs(tage_nach_je_zelle[1] - tage_vor_je_zelle[1]) < 1e-9
 
     tage_nach = sum(tage_nach_je_zelle)
-    assert abs(tage_nach - 13_857.2) < 0.1, f"{tage_nach:.2f}"
+    assert abs(tage_nach - 7_482.9) < 0.1, f"{tage_nach:.2f}"
 
     # Kontrolle über Σ B·P̂′ direkt (Ĝ′ je Zelle über health.stadtbaum_g_neu).
     g_neu_je_zelle = []
@@ -173,11 +173,11 @@ def test_kommune_stadtbaum_kommunensumme():
     assert abs(summe_b_phat_nach - 7_372.8) < 0.01, f"{summe_b_phat_nach:.2f}"
 
     senkung = tage_vor - tage_nach
-    assert abs(senkung - 1_178.8) < 0.1, f"{senkung:.2f}"
+    assert abs(senkung - 636.6) < 0.1, f"{senkung:.2f}"
     assert abs(senkung / tage_vor - 0.078) < 0.001
 
     euro = senkung * _c_tag()
-    assert abs(euro - 7_310) < 5, f"{euro:.2f} €"
+    assert abs(euro - 3_950) < 5, f"{euro:.2f} €"
 
 
 if __name__ == "__main__":

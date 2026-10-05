@@ -58,7 +58,7 @@ def test_registry_matches_report_parameters():
                      ("delta_s_birke_sued", 5.94), ("delta_s_graeser_nord", 4.78),
                      ("delta_s_graeser_mitte", 4.08), ("delta_s_graeser_sued", 3.70)):
         assert _spec(key)["value"] == val, key
-    assert _spec("a_attr")["value"] == 0.50
+    assert _spec("a_attr")["value"] == 0.27
     for key, val in (("p_ar_u20", 0.088), ("p_ar_a20_64", 0.132),
                      ("p_ar_a65_74", 0.067), ("p_ar_a75_84", 0.050),
                      ("p_ar_a85p", 0.050)):
@@ -85,6 +85,8 @@ def test_registry_matches_report_parameters():
                                    "a75_84": 0.050, "a85p": 0.050}
     assert H.POLLEN_DELTA_S_BIRKE == {"nord": 3.96, "mitte": 4.20, "sued": 5.94}
     assert H.POLLEN_DELTA_S_GRAESER == {"nord": 4.78, "mitte": 4.08, "sued": 3.70}
+    # Rückfallwert des Call-Sites == Spec (eine Zahl, an einer Stelle, geprüft).
+    assert H.POLLEN_A_ATTR == _spec("a_attr")["value"]
 
 
 def test_cost_rate_chain_matches_report():
@@ -173,26 +175,29 @@ def _ctx(pop: float, bundesland: str = "Nordrhein-Westfalen",
 
 
 def test_national_sum_matches_report_sanity_band():
-    """Kap. 4: ~17,8 Mio Symptomtage und ~110 Mio €₂₀₂₄/Jahr (Bundessumme)."""
+    """Kap. 4: ~9,62 Mio Symptomtage und ~60 Mio €₂₀₂₄/Jahr (Bundessumme)."""
     override_context.set_overrides({})
     # Region Mitte trägt die DE-nahen ΔS-Werte; für die Bundessumme rechnet der
     # Bericht mit den DE-Mittelwerten — hier über den Δ-Term direkt geprüft.
     res = impact.compute_all_cell_impacts(_ctx(float(_POP_DE)))[CODE]
     betroffene = res["betroffene"]
     assert abs(betroffene / 1e6 - 8.96) < 0.02, betroffene
-    # Mitte: δ = 0,70·(0,55·4,20 + 0,75·4,08)·0,50 = 1,880 Tage
-    assert abs(res["outcome"] / betroffene - 1.880) < 0.002
-    tage_de = betroffene * 1.988                        # DE-gewichtetes δ
-    assert abs(tage_de / 1e6 - 17.8) < 0.1
-    assert abs(tage_de * 6.20 / 1e6 - 110) < 2
+    # Mitte: δ = 0,70·(0,55·4,20 + 0,75·4,08)·0,27 = 1,01493 Tage
+    assert abs(res["outcome"] / betroffene - 1.01493) < 0.002
+    tage_de = betroffene * 1.0734                       # DE-gewichtetes δ
+    assert abs(tage_de / 1e6 - 9.62) < 0.1
+    assert abs(tage_de * 6.20 / 1e6 - 60) < 1
 
 
 def test_implied_climate_share_in_published_band():
-    """Impliziter Klimaanteil δ/d_Saison = 4,6 % ∈ [3 %, 20 %] (Kap. 4)."""
-    delta_de = 0.70 * (0.55 * 4.79 + 0.75 * 4.06) * 0.50
+    """Impliziter Klimaanteil δ/d_Saison = 2,5 % (Kap. 4).
+
+    Die Prüfung gegen das frühere Band [3 %, 20 %] entfällt (Bericht §4, Log Nr. 28:
+    „deren Band entfällt“).
+    """
+    delta_de = 0.70 * (0.55 * 4.79 + 0.75 * 4.06) * 0.27
     share = delta_de / (0.70 * (0.55 * 30 + 0.75 * 60))
-    assert abs(share * 100 - 4.62) < 0.05
-    assert 0.03 <= share <= 0.20
+    assert abs(share * 100 - 2.5) < 0.05
 
 
 def test_cell_hand_calculation_and_p_hat_centering():
@@ -201,9 +206,9 @@ def test_cell_hand_calculation_and_p_hat_centering():
     res = impact.compute_all_cell_impacts(_ctx(1000.0, "Hessen"))[CODE]
     # Betroffene = 1000 × gewichtete Bundesprävalenz 10,74 %
     assert abs(res["betroffene"] - 107.4) < 0.1
-    # Region Mitte, P̂ = 1 (Ĝ = Ḡ): ΔTage ≈ 201,9; € ≈ 1.252
-    assert abs(res["outcome"] - 201.9) < 0.5
-    assert abs(res["cost_eur"] - 201.9 * 6.20) < 5
+    # Region Mitte, P̂ = 1 (Ĝ = Ḡ): ΔTage ≈ 109,0 (107,4 · 1,01493); € ≈ 676
+    assert abs(res["outcome"] - 109.0) < 0.5
+    assert abs(res["cost_eur"] - 109.0 * 6.20) < 5
 
     # P̂ skaliert linear mit λ: Ĝ = 1,5·Ḡ ⇒ P̂ = 1 + 0,7·0,5 = 1,35
     rich = impact.compute_all_cell_impacts(
@@ -227,7 +232,7 @@ def test_reference_is_closed_within_the_kommune():
     # (a) keine Referenz → P̂ = 1
     neutral = impact.compute_all_cell_impacts(
         _ctx(1000.0, "Hessen", g_cell=0.30, g_ref=None))[CODE]["outcome"]
-    assert abs(neutral - 201.9) < 0.5
+    assert abs(neutral - 109.0) < 0.5
 
     # (b) gleiche Zelle, unterschiedliche Kommunen-Referenz
     gruen = impact.compute_all_cell_impacts(
@@ -260,7 +265,7 @@ def test_reference_is_closed_within_the_kommune():
         summe_mit += res["outcome"]
         # δ Mitte exakt (nicht gerundet), damit der Test die ZENTRIERUNG prüft
         # und nicht die Rundung des δ-Werts.
-        delta_mitte = 0.70 * (0.55 * 4.20 + 0.75 * 4.08) * 0.50
+        delta_mitte = 0.70 * (0.55 * 4.20 + 0.75 * 4.08) * 0.27
         summe_ohne += res["betroffene"] * delta_mitte
     # Exakt bis auf Fließkomma-Rundung (keine 1e-6-Toleranz mehr: die Referenz
     # wird ungerundet gebildet und nutzt dieselben Prävalenzen wie der Zähler).
