@@ -11,7 +11,7 @@ Berlin, Preisstand 2024) an den Produktcode:
 Gerechnet wird mit dem Produkt: Altersbänder je Zelle aus ``zensus_loader.apply_zensus_to_cell_inputs``
 (u20 je Zelle aus den 5er-Jahresgruppen, §3.2), Symptomtage und Euro aus
 ``impact.compute_all_cell_impacts``, Kostensatz je Symptomtag aus dem Katalog. Die Zelldaten
-(Zensus-Gitter [67], Gemeindegrenze VG250 [65]) liegen gepinnt unter
+(Zensus-Gitter Bericht #95 [67], Gemeindegrenze VG250 Bericht #95 [65]) liegen gepinnt unter
 ``backend/data/kalibrierung/golden96_zellen_11000000.csv.gz``; erzeugt mit
 ``backend/scripts/golden_96_zelldaten.py`` (Beschreibung: ``golden96_zellen.md``).
 

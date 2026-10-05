@@ -1,10 +1,10 @@
 """Gepinnte Zelldaten für den Golden-Test der Beträge #96 (Bericht §3.0, Zelllauf Berlin).
 
-Schreibt je Gemeinde alle bewohnten 100-m-Zellen innerhalb der Gemeindegrenze (VG250 [65]) mit den
+Schreibt je Gemeinde alle bewohnten 100-m-Zellen innerhalb der Gemeindegrenze (VG250 Bericht #95 [65]) mit den
 Eingängen, die ``zensus_loader.apply_zensus_to_cell_inputs`` für die Altersbänder von #96 braucht, nach
 ``backend/data/kalibrierung/golden96_zellen_<AGS>.csv.gz``:
 
-  gitter_id, einwohner            Zensus-2022-Gitter 100 m [67], Datensatz „population“
+  gitter_id, einwohner            Zensus-2022-Gitter 100 m Bericht #95 [67], Datensatz „population“
   anteil_ueber65                  Datensatz „share_over_65“ (leer = geheimgehalten „–“)
   unter5 … a90undaelter           Datensatz „age_groups“, alle 19 5er-Jahresgruppen
                                   (die vier unter 20 tragen die Aufteilung u20 / 20–64, §3.2)
