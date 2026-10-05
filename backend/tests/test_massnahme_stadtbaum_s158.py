@@ -10,24 +10,24 @@ multiplizieren sich die Faktoren schon (T-1602-cto-Ergänzung der bestehenden
 Zell-Schleife); das bleibt so.
 
 Rechenbeispiel Allee-Zelle (Berlin Mitte, Bericht §5.1 Z. 1200–1206): Betroffene B 100,
-δ_R = δ_Birke + δ_Gräser = 0,8085 + 1,0710 = 1,8795, Ḡ₀ 0,18125, Ĝ 0,3625 (Ĝ/Ḡ₀ = 2)
-→ Zusatztage im Ausgangsstand (P̂ = 1 + 0,70·(2−1) = 1,7): 100·1,8795·1,7 = 319,515.
+δ_R = δ_Birke + δ_Gräser = 0,43659 + 0,57834 = 1,01493, Ḡ₀ 0,18125, Ĝ 0,3625 (Ĝ/Ḡ₀ = 2)
+→ Zusatztage im Ausgangsstand (P̂ = 1 + 0,70·(2−1) = 1,7): 100·1,01493·1,7 = 172,538.
 Die Stadtbaumwahl (``anteil_ersetzt`` 1,0, ``canopy_birch_frac`` 0,078125,
 ``canopy_unknown_frac`` 0) senkt Ĝ auf Ĝ′ = 0,3625 − 0,464·0,078125 = 0,32625
 (Ĝ′/Ḡ₀ = 1,8, P̂′ = 1 + 0,70·(1,8−1) = 1,56) → Tage nach der Pflanzung:
-100·1,8795·1,56 = 293,202 (Stadtbaumwahl-Nutzen 319,515 − 293,202 = 26,313 Tage).
-S158 (r_S158 0,03, t_warn 0,75) mindert davon 0,03·0,75·293,202 = 6,597 Tage — nicht
-0,03·0,75·319,515 = 7,19 Tage (das wäre die doppelt zählende Rechnung gegen den
+100·1,01493·1,56 = 158,329 (Stadtbaumwahl-Nutzen 172,538 − 158,329 = 14,209 Tage).
+S158 (r_S158 0,03, t_warn 0,75) mindert davon 0,03·0,75·158,329 = 3,562 Tage — nicht
+0,03·0,75·172,538 = 3,88 Tage (das wäre die doppelt zählende Rechnung gegen den
 Ausgangsstand).
 
 Geprüft wird (Abnahmekriterium T-1602-cto):
-(a) ``_adjusted_cell_data`` (beide Maßnahmen, volle Deckung) ergibt 286,605 Tage
-    (293,202 − 6,597 = 319,515 − 26,313 − 6,597).
-(b) ``compute_impact`` der Frühwarnung weist 6,597 vermiedene Tage aus (nicht 7,19),
-    die Stadtbaumwahl 26,313 (Delta des Index, hier bitgleich der Tage — s. ``_cell``).
-(c) Die Summe beider Einzelnutzen ist exakt 319,515 − Tage mit beiden Maßnahmen (auf
+(a) ``_adjusted_cell_data`` (beide Maßnahmen, volle Deckung) ergibt 154,767 Tage
+    (158,329 − 3,562 = 172,538 − 14,209 − 3,562).
+(b) ``compute_impact`` der Frühwarnung weist 3,562 vermiedene Tage aus (nicht 3,88),
+    die Stadtbaumwahl 14,209 (Delta des Index, hier bitgleich der Tage — s. ``_cell``).
+(c) Die Summe beider Einzelnutzen ist exakt 172,538 − Tage mit beiden Maßnahmen (auf
     den unrundeten Werten, kein vermiedener Tag zählt doppelt).
-(d) Ohne Stadtbaumwahl in der Zelle bleibt die Frühwarnung bei 7,19 Tagen (unveränderter
+(d) Ohne Stadtbaumwahl in der Zelle bleibt die Frühwarnung bei 3,88 Tagen (unveränderter
     Ausgangsstand, Muster ``test_massnahme_s158.py``).
 
 DB-frei: (c) prüft die reinen Zellfunktionen (``_stadtbaum_cell_factor``,
@@ -55,8 +55,8 @@ CELL_ID = 42
 
 # Rechenbeispiel (Berlin Mitte, s. Modul-Docstring).
 BETROFFENE = 100.0
-DELTA_BIRKE = 0.8085
-DELTA_GRAESER = 1.0710
+DELTA_BIRKE = 0.43659
+DELTA_GRAESER = 0.57834
 G_BAR0 = 0.18125
 G_CELL = 0.3625          # Ĝ/Ḡ₀ = 2
 CANOPY_BIRKE = 0.078125  # → Ĝ′/Ḡ₀ = 1,8
@@ -95,7 +95,7 @@ def _tage_ausgangsstand() -> float:
     return tage_b + tage_g
 
 
-TOTAL0 = _tage_ausgangsstand()  # 319,515
+TOTAL0 = _tage_ausgangsstand()  # 172,538
 
 
 # ── Session-Doppel mit echter Attribut-Filterung (mehrere Maßnahmen je Kommune) ──────
@@ -183,9 +183,9 @@ def _patch_common(monkeypatch) -> None:
         lambda *a, **k: {"risks": {RISK: {"cost_eur": 1_000_000_000.0}}})
 
 
-# ── (a) _adjusted_cell_data: beide Maßnahmen zusammen, 286,605 Tage ──────────────────
+# ── (a) _adjusted_cell_data: beide Maßnahmen zusammen, 154,767 Tage ──────────────────
 
-def test_adjusted_cell_data_beide_massnahmen_286_605(monkeypatch):
+def test_adjusted_cell_data_beide_massnahmen_154_767(monkeypatch):
     m_s158 = _measure(1, S158_CODE)
     m_baum = _measure(2, STADTBAUM_CODE, {"anteil_ersetzt": ANTEIL_ERSETZT})
     db = _db(_cell(TOTAL0), [m_s158, m_baum])
@@ -193,13 +193,13 @@ def test_adjusted_cell_data_beide_massnahmen_286_605(monkeypatch):
 
     out = measure_service._adjusted_cell_data(db, KOMMUNE_ID, apply_measures=True)
     assert len(out) == 1
-    assert out[0]["risks"][RISK]["outcome"] == pytest.approx(286.605, abs=0.005)
-    assert out[0]["risks"][RISK]["index"] == pytest.approx(286.605, abs=0.005)
+    assert out[0]["risks"][RISK]["outcome"] == pytest.approx(154.767, abs=0.005)
+    assert out[0]["risks"][RISK]["index"] == pytest.approx(154.767, abs=0.005)
 
 
-# ── (b) compute_impact: Frühwarnung 6,597, Stadtbaumwahl 26,313 ─────────────────────
+# ── (b) compute_impact: Frühwarnung 3,562, Stadtbaumwahl 14,209 ─────────────────────
 
-def test_compute_impact_fruehwarnung_6_597_avoided_days(monkeypatch):
+def test_compute_impact_fruehwarnung_3_562_avoided_days(monkeypatch):
     m_s158 = _measure(1, S158_CODE)
     m_baum = _measure(2, STADTBAUM_CODE, {"anteil_ersetzt": ANTEIL_ERSETZT})
     db = _db(_cell(TOTAL0), [m_s158, m_baum])
@@ -207,10 +207,10 @@ def test_compute_impact_fruehwarnung_6_597_avoided_days(monkeypatch):
 
     measure_service.compute_impact(db, 1)
     zeile = next(o for o in db.added if o.measure_id == 1)
-    assert (zeile.savings or {}).get("s158_avoided_days") == pytest.approx(6.597, abs=0.005)
+    assert (zeile.savings or {}).get("s158_avoided_days") == pytest.approx(3.562, abs=0.005)
 
 
-def test_compute_impact_stadtbaumwahl_26_313_avoided_days(monkeypatch):
+def test_compute_impact_stadtbaumwahl_14_209_avoided_days(monkeypatch):
     m_s158 = _measure(1, S158_CODE)
     m_baum = _measure(2, STADTBAUM_CODE, {"anteil_ersetzt": ANTEIL_ERSETZT})
     db = _db(_cell(TOTAL0), [m_s158, m_baum])
@@ -221,7 +221,7 @@ def test_compute_impact_stadtbaumwahl_26_313_avoided_days(monkeypatch):
     # index == outcome == Tage (s. ``_cell``): das Delta des Index ist hier bitgleich
     # den vermiedenen Tagen der Stadtbaumwahl.
     avoided = -(zeile.indicator_deltas or {}).get(RISK, 0.0)
-    assert avoided == pytest.approx(26.313, abs=0.005)
+    assert avoided == pytest.approx(14.209, abs=0.005)
 
 
 # ── (c) kein vermiedener Tag zählt doppelt: exakte Summe auf den unrundeten Werten ──
@@ -241,21 +241,49 @@ def test_summe_beider_nutzen_gleich_ausgangsstand_minus_kombiniert():
     kombiniert = TOTAL0 * stadtbaum_factor * factor_s158
     assert (vermieden_stadtbaum + vermieden_s158) == pytest.approx(
         TOTAL0 - kombiniert, abs=1e-6)
-    assert kombiniert == pytest.approx(286.605, abs=0.005)
-    assert vermieden_stadtbaum == pytest.approx(26.313, abs=0.005)
-    assert vermieden_s158 == pytest.approx(6.597, abs=0.005)
+    assert kombiniert == pytest.approx(154.767, abs=0.005)
+    assert vermieden_stadtbaum == pytest.approx(14.209, abs=0.005)
+    assert vermieden_s158 == pytest.approx(3.562, abs=0.005)
 
 
-# ── (d) ohne Stadtbaumwahl in der Zelle: Frühwarnung bleibt bei 7,19 Tagen ───────────
+# ── (d) ohne Stadtbaumwahl in der Zelle: Frühwarnung bleibt bei 3,88 Tagen ───────────
 
-def test_compute_impact_ohne_stadtbaumwahl_bleibt_bei_7_19(monkeypatch):
+def test_compute_impact_ohne_stadtbaumwahl_bleibt_bei_3_88(monkeypatch):
     m_s158 = _measure(1, S158_CODE)
     db = _db(_cell(TOTAL0), [m_s158])  # keine Stadtbaumwahl in der Kommune
     _patch_common(monkeypatch)
 
     measure_service.compute_impact(db, 1)
     zeile = next(o for o in db.added if o.measure_id == 1)
-    assert (zeile.savings or {}).get("s158_avoided_days") == pytest.approx(7.19, abs=0.005)
+    assert (zeile.savings or {}).get("s158_avoided_days") == pytest.approx(3.88, abs=0.005)
+
+
+# ── (e) Euro der Frühwarnung nach der Pflanzung (Befund 240, Ü-7) ────────────────────
+
+def test_euro_der_fruehwarnung_nach_der_pflanzung(monkeypatch):
+    """Kosten und Index-Delta der Frühwarnung beziehen sich auf die Tage NACH der
+    Pflanzung: 3,562 Tage × 6,20 € = 22,09 € (nicht 3,882 × 6,20 € = 24,07 €). Mit
+    beiden Maßnahmen ist die Summe der Euro-Nutzen (172,538 − 154,767) × 6,20 € =
+    110,18 €; ohne Stadtbaumwahl bleibt die Frühwarnung bei 24,07 €."""
+    m_s158 = _measure(1, S158_CODE)
+    m_baum = _measure(2, STADTBAUM_CODE, {"anteil_ersetzt": ANTEIL_ERSETZT})
+    db = _db(_cell(TOTAL0), [m_s158, m_baum])
+    _patch_common(monkeypatch)
+
+    summary_s158 = measure_service.compute_impact(db, 1)
+    summary_baum = measure_service.compute_impact(db, 2)
+    eur_s158 = summary_s158["s158_avoided_days_eur"]
+    eur_baum = summary_baum["stadtbaum_avoided_days_eur"]
+    assert eur_s158 == pytest.approx(22.09, abs=0.01)
+    assert eur_s158 + eur_baum == pytest.approx(110.18, abs=0.01)
+    # Index-Delta der Frühwarnung = vermiedene Tage nach der Pflanzung (Index = Tage).
+    zeile = next(o for o in db.added if o.measure_id == 1)
+    assert -(zeile.indicator_deltas or {}).get(RISK, 0.0) == pytest.approx(3.562, abs=0.005)
+
+    # ohne Stadtbaumwahl: Frühwarnung gegen den Ausgangsstand, unverändert 24,07 €
+    db2 = _db(_cell(TOTAL0), [_measure(1, S158_CODE)])
+    summary_allein = measure_service.compute_impact(db2, 1)
+    assert summary_allein["s158_avoided_days_eur"] == pytest.approx(24.07, abs=0.01)
 
 
 if __name__ == "__main__":

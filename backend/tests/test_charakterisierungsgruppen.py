@@ -122,11 +122,12 @@ def test_anpassungspotenzial_ohne_massnahme_null_und_multiplikativ():
 
 
 def test_anpassungspotenzial_s157_hitzemortalitaet():
-    """Befunde 149/165/174 (docs/methodik/95_hitzebelastung.md §5 Hebel S157, Log 50):
+    """Befunde 149/165/174/183/195 (docs/methodik/95_hitzebelastung.md §5 Hebel S157, Log 50):
     r_S157 = a_85+ × h_Heim × max(s_gek − s_gek_kalib; 0) × (1 − g_S157), mit dem
-    Hitzeaktionsplan zusammen 1 − 0,95 × (1 − r_S157) = 0,053 (nachgerechnet
-    1 − 0,95 × (1 − 0,2839 × 0,34427 × 0,05 × 0,70636) = 0,0533)."""
-    assert round(charakterisierung.anpassungspotenzial("EXPECTED_ANNUAL_MORTALITY"), 3) == 0.064
+    Hitzeaktionsplan zusammen 1 − δ_HAP × (1 − r_S157). a_85+ kommt aus dem Zelllauf der
+    Kommune (Berlin 0,2619, Warmsen 0,2239); Berlin ergibt 0,0640, Warmsen 0,0636."""
+    assert round(charakterisierung.anpassungspotenzial(
+        "EXPECTED_ANNUAL_MORTALITY", "11000000"), 3) == 0.064
 
 
 def test_unbekannter_code():

@@ -16,7 +16,7 @@ Geprüft wird (Abnahmekriterium T-1513-cto):
 (a) ``POLLEN_EARLY_WARNING`` führt EXPECTED_ANNUAL_ALLERGY_DAYS in ``linked_risk_codes``
     und ``effect_model`` = 's158'.
 (b) Eine Allee-Zelle (Betroffene 100, Berlin, Ĝ/Ḡ₀ = 2) mit voller Deckung ergibt
-    7,19 ± 0,005 vermiedene Tage, mit Deckung 0 genau 0.
+    3,88 ± 0,005 vermiedene Tage, mit Deckung 0 genau 0.
 (c) Die Überschreibung ``t_warn_s158`` = 1,0 hebt die vermiedenen Tage auf das
     4/3-Fache (0,75 → 1,00).
 (d) Eine Zelle ohne ``tage_birke``/``tage_graeser`` (bzw. ihre Roheingaben) behält den
@@ -39,8 +39,8 @@ CODE = "POLLEN_EARLY_WARNING"
 RISK = "EXPECTED_ANNUAL_ALLERGY_DAYS"
 
 # Berlin, Region Mitte (Bericht #96 §5.1 Z. 1200–1206 / §3.0 Ebenen 4–6).
-DELTA_BIRKE = 0.8085
-DELTA_GRAESER = 1.0710
+DELTA_BIRKE = 0.43659
+DELTA_GRAESER = 0.57834
 R_S158 = 0.03      # Katalog default_reduction, Block pollen.r_s158
 T_WARN = 0.75      # Registry-Parameter t_warn_s158, Block pollen.t_warn_s158
 LAM = 0.70         # lambda_veg-Default
@@ -88,17 +88,17 @@ def test_measure_is_active_linked_via_zelllauf_model():
     assert m["default_reduction"] == pytest.approx(R_S158)
 
 
-# ── (b) Allee-Zelle: 7,19 vermiedene Tage bei voller Deckung, 0 bei Deckung 0 ──
+# ── (b) Allee-Zelle: 3,88 vermiedene Tage bei voller Deckung, 0 bei Deckung 0 ──
 
-def test_allee_cell_full_coverage_7_19_avoided_days():
+def test_allee_cell_full_coverage_3_88_avoided_days():
     cell = _allee_cell()
     tage_birke, tage_graeser = _gruppentage(cell)
-    # P̂ = 1 + λ·(Ĝ/Ḡ₀ − 1) = 1 + 0,70·(2 − 1) = 1,7; Betroffene·δ·P̂ = 319,5 Tage (Bericht-Beispiel).
-    assert (tage_birke + tage_graeser) == pytest.approx(319.5, abs=0.05)
+    # P̂ = 1 + λ·(Ĝ/Ḡ₀ − 1) = 1 + 0,70·(2 − 1) = 1,7; Betroffene·δ·P̂ = 172,5 Tage (Bericht-Beispiel).
+    assert (tage_birke + tage_graeser) == pytest.approx(172.5, abs=0.05)
 
     vermieden = health.s158_vermiedene_tage(
         tage_birke, tage_graeser, a_zelle=1.0, r=R_S158, t_warn_b=T_WARN, t_warn_g=T_WARN)
-    assert vermieden == pytest.approx(7.19, abs=0.005)
+    assert vermieden == pytest.approx(3.882, abs=0.005)
 
     factor = measure_service._s158_cell_factor(_mdef(), 1.0, cell)
     total = tage_birke + tage_graeser
@@ -141,6 +141,39 @@ def test_t_warn_override_scales_avoided_days_by_four_thirds():
         tage_birke, tage_graeser, 1.0, R_S158, 1.0, 1.0)
     assert direkt_voll == pytest.approx(direkt_basis * 4.0 / 3.0, rel=1e-9)
     assert vermieden_basis == pytest.approx(direkt_basis, rel=1e-9)
+
+
+# ── (c2) Überschreibung lambda_veg der Kommune wirkt auf den Zellfaktor (T-1592-ceo) ──
+
+def test_lambda_veg_override_changes_avoided_days_not_factor():
+    """λ aus der Parameterliste wirkt in der Zelle (T-1592-ceo).
+
+    P̂ = 1 + λ·(Ĝ/Ḡ₀ − 1) skaliert beide Gruppentage gleich und kürzt sich im Faktor
+    1 − vermieden/Σ Tage heraus; der Faktor hängt von λ deshalb nicht ab. Die
+    vermiedenen Tage (zweite Rückgabe von ``_s158_cell_effect``) folgen λ.
+    Allee-Zelle: 172,5 Zusatztage bei λ 0,70 → 3,882 vermiedene Tage; bei λ 0,50 → 3,425.
+    """
+    cell = _allee_cell()
+    factor_basis, tage_basis, _ = measure_service._s158_cell_effect(_mdef(), 1.0, cell)
+    tb0, tg0 = _gruppentage(cell)
+    assert (tb0 + tg0) == pytest.approx(172.5, abs=0.05)
+    assert tage_basis == pytest.approx(3.882, abs=0.005)
+
+    override_context.set_overrides({f"risks.{RISK}.impact.lambda_veg": 0.50})
+    try:
+        factor_050, tage_050, _ = measure_service._s158_cell_effect(_mdef(), 1.0, cell)
+    finally:
+        override_context.set_overrides({})
+
+    assert tage_050 == pytest.approx(3.425, abs=0.005)
+    assert tage_050 != pytest.approx(tage_basis, abs=1e-6)
+    # Gegenprobe über die reine Funktion mit λ = 0,50: P̂ = 1 + 0,5·(2 − 1) = 1,5.
+    tb, tg = health.pollen_zelltage(
+        cell["betroffene"], cell["delta_birke"], cell["delta_graeser"],
+        cell["pollen_g"], cell["pollen_g_bar0"], lam=0.50)
+    vermieden = health.s158_vermiedene_tage(tb, tg, 1.0, R_S158, T_WARN, T_WARN)
+    assert tage_050 == pytest.approx(vermieden, rel=1e-9)
+    assert factor_050 == pytest.approx(factor_basis, abs=1e-12)
 
 
 # ── (d) Zelle ohne Gruppentage/Roheingaben: Faktor 1,0, keine pauschalen 0,03 ────
