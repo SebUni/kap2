@@ -1,0 +1,4 @@
+# Sichtstart: startet Frontend und Backend zusammen (scripts/sichtstart.sh, siehe docs/BETRIEB.md)
+bash scripts/sichtstart.sh
+http://127.0.0.1:5173/
+http://127.0.0.1:8000/api/health
