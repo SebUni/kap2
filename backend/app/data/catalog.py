@@ -1392,8 +1392,8 @@ MEASURES: list[dict] = [
     # nennen selbst keine Kostenzahlen) → Punktwert 100.000 € (unterer Mittelwert).
     {"code": "HEAT_ACTION_PLANS", "name": "Hitzeaktionspläne",
      "description": "Kommunale Hitzeaktionspläne.", "measure_type": "organizational",
-     # default_reduction 0,05 (Rev.-7-Integration, Bericht #95 §5): δ_HAP = 0,95 auf den
-     # Wochen-Exzess (RR−1) ⇒ linear −5 % Outcome (Band 0–0,15). Die 25,2 % von Urban
+     # default_reduction 0,061 (Bericht #95 §5, Block heat.delta_hap): δ_HAP = 0,939 auf den
+     # Wochen-Exzess (RR−1) ⇒ linear −6,1 % Outcome (Band 0–0,148). Die 25,2 % von Urban
      # u. a. 2025 sind der EINFÜHRUNGSEFFEKT über drei Jahrzehnte, nicht der marginale
      # Spielraum gegenüber dem heutigen deutschen Stand — c_kal ist auf Jahre mit
      # laufendem DWD-Warnsystem kalibriert (Doppelzählungs-Wächter, Befund 33/68).
@@ -1405,33 +1405,36 @@ MEASURES: list[dict] = [
      "source": "klimastadtraum.de (Praxisrichtwert) / Modellannahme",
      "sources": {"opex_fixed_year": "Modellannahme (laufende Fortschreibung/Koordination)",
                  "capex_fixed": "klimastadtraum.de (Praxisrichtwert Hitzeaktionsplan)",
-                 "default_reduction": "Bericht #95 §5: δ_HAP = 0,95 (Band 0,85–1,00), marginal"},
+                 "default_reduction": "Bericht #95 §5: δ_HAP = 0,939 (Band 0,852–1,00), marginal"},
      "source_refs": {"default_reduction": ["Feldbusch_2025_HHWS",
                                            "Urban_HHAP_Wirksamkeit_2025"]},
-     # Kennzeichnung nach Kapitel 7: abschaetzung_kap3 — 0,95 = 2/3 × 1,00 + 1/3 × 0,85:
-     # Mittel über 15 Städte doppelt gewichtet gegen den bereinigten Wert (Feldbusch u. a.
-     # 2025 [45]), nicht die Mitte 0,925 (Bericht §5, Log 10, Befund 164).
+     # Kennzeichnung nach Kapitel 7: abschaetzung_kap3 — 0,939 = 0,1466 / 0,1561: Exzess
+     # am Hitzetag nach / vor Einführung des Warnsystems (Feldbusch u. a. 2025 [45],
+     # Tabelle 1), übersetzt nach Befund 124 (Bericht §5, Log 10, Befunde 164, 180).
      "evidence_classes": {"default_reduction": "abgeschaetzt"},
-     # Block heat.delta_hap (Bericht #95 Kapitel 7): Faktor 0,95 auf den Exzess,
-     # hier als Minderung 1 − 0,95 = 0,05 geführt.
+     # Block heat.delta_hap (Bericht #95 Kapitel 7): Faktor 0,939 auf den Exzess,
+     # hier als Minderung 1 − 0,939 = 0,061 geführt.
      "methodik_bloecke": {"default_reduction": "heat.delta_hap"},
      # Herleitungen der Abschätzungen nach P1/§3.9 (Zahlenwert, Bandbreite,
      # Sensitivität) als Datenfeld — ein Code-Kommentar allein genügt nicht.
      "evidence_derivations": {
         "default_reduction": {
-            "wert": "0,05 = 1 − δ_HAP mit δ_HAP = 0,95 als Faktor auf den Wochenexzess. "
-                    "Feldbusch u. a. 2025 [45] messen gemittelt über 15 Städte RR 1,00 "
-                    "(0,98–1,01), also keine Wirkung, und bereinigt um drei Merkmale der "
-                    "Städte, die das Produkt nicht nachbildet, RR 0,85 (0,75–0,97). KAP3 "
-                    "gibt dem Mittel doppeltes Gewicht: δ_HAP = "
-                    "2/3 × 1,00 + 1/3 × 0,85 = 0,95 (= 1,00 − 1/3 × 0,15), "
-                    "nicht die Mitte 0,925. Berlin: "
-                    "361,8 Mio. € × (1 − 0,95) = 18,1 Mio. € je Jahr (Preisstand 2024; "
-                    "Band 0–54,3 Mio. €). Abschätzung von KAP3 (Bericht #95 §5, "
-                    "Entscheidungslog Nr. 10, Befund 164).",
-            "band": "0–0,15 Minderung (δ_HAP 0,85–1,00).",
+            "wert": "0,061 = 1 − δ_HAP mit δ_HAP = 0,939 als Faktor auf den Wochenexzess. "
+                    "δ_HAP = 0,1466 / 0,1561 = 0,939: Exzess am Hitzetag nach / vor "
+                    "Einführung des Warnsystems, roh, aus Feldbusch u. a. 2025 [45], "
+                    "Tabelle 1. [45] misst alle Todesfälle am Hitzetag; auf den Exzess "
+                    "übersetzt, liegt der Wert der Durchschnittsstadt bei 1,00 "
+                    "(0,852–1,074), der Wert 0,939 liegt in diesem Intervall. Berlin: "
+                    "361,8 Mio. € × 0,061 = 22,1 Mio. € je Jahr (Preisstand 2024; "
+                    "Band 0–53,5 Mio. €). Abschätzung von KAP3 (Bericht #95 §5, "
+                    "Block heat.delta_hap, Entscheidungslog Nr. 10, Befunde 164, 180).",
+            "band": "0–0,148 Minderung (δ_HAP 0,852–1,00). Gegenargument: Der Wert ist roh, "
+                    "nicht um Temperatur, Trend und Wochentag bereinigt; [45] misst die "
+                    "Warnung an Warntagen, nicht den Plan. Deshalb reicht das Band bis zu "
+                    "keiner Wirkung.",
             "sensitivitaet": "Linear: Die vermiedenen Schäden der Maßnahme wachsen mit der "
-                             "Minderung; 0,15 statt 0,05 verdreifacht sie (Bericht #95 §5).",
+                             "Minderung; 0,148 statt 0,061 steigert sie auf das 2,4-Fache "
+                             "(Bericht #95 §5).",
         },
         "capex_fixed": {
             "wert": "100.000 € einmalig für die Erstellung eines kommunalen "
@@ -1495,10 +1498,11 @@ MEASURES: list[dict] = [
         },
      },
      "source_details": {
-        "default_reduction": "δ_HAP = 0,95 multiplikativ auf den Wochen-Exzess (RR−1) ⇒ "
-            "linear −5 % Outcome (Band 0–15 %; Bericht #95 §5, abgenommen Rev. 7). Evidenz: "
-            "DiD über 15 deutsche Städte (Feldbusch u. a. 2025: RR 1,00 [0,98–1,01], "
-            "adjustiert 0,85) — der MARGINALE Spielraum gegenüber dem heutigen deutschen "
+        "default_reduction": "δ_HAP = 0,939 multiplikativ auf den Wochen-Exzess (RR−1) ⇒ "
+            "linear −6,1 % Outcome (Band 0–14,8 %; Bericht #95 §5, Block heat.delta_hap). "
+            "Evidenz: Exzess am Hitzetag nach / vor Einführung des Warnsystems in 15 "
+            "deutschen Städten, 0,1466 / 0,1561 = 0,939 (Feldbusch u. a. 2025 [45], "
+            "Tabelle 1) — der MARGINALE Spielraum gegenüber dem heutigen deutschen "
             "Stand. Die 25,2 % (95 %-KI 19,8–31,9) von Urban u. a. 2025 (102 Städte, "
             "14 Länder, 1990–2019) sind der Einführungseffekt über drei Jahrzehnte und "
             "stecken bereits im Basiswert: Der Kalibrierfaktor ist auf Jahre mit laufendem "
@@ -2160,7 +2164,7 @@ MEASURES: list[dict] = [
     # Herleitung opex_per_unit_year: Betrieb/Wartung/Beprobung ~2,5-5 T€/a → 3.500 €.
     # Presseberichte nennen ~4.500 €/a für Wartung/Beprobung (innerhalb der Spanne).
     {"code": "COOLING_ROOMS_DRINKING_WATER", "name": "Kühle Räume / Kühlzentren",
-     "description": "Zwei Hebel aus Bericht #95 §5, getrennt ausgewiesen. (1) Gekühlte Heimplätze (Klimaanlagen in Pflegeheimen, Hebel S157): g_S157 auf die Todesfälle 85+ der Heimbewohner im gekühlten Anteil s_gek der Heimplätze über dem Stand der Kalibrierjahre; die Kommune gibt s_gek ein, ohne Eingabe gilt die Voreinstellung 0,11 (Abschätzung von KAP3). (2) Öffentliche Kühlzentren (kühle Orte in Gemeinderäumen, Kirchen oder Bibliotheken) für Menschen ab 75, die zu Hause leben: Faktor δ_KZ = 0,9956 auf deren Hitze-Todesfälle im abgedeckten Teil der Kommune (Abschätzung von KAP3); mit Hitzeaktionsplan und Schutzprogrammen zusammen höchstens so viel wie das Paket Deutschland (Kappung 0,794).",
+     "description": "Zwei Hebel aus Bericht #95 §5, getrennt ausgewiesen. (1) Gekühlte Heimplätze (Klimaanlagen in Pflegeheimen, Hebel S157): g_S157 auf die Todesfälle 85+ der Heimbewohner im gekühlten Anteil s_gek der Heimplätze über dem Stand der Kalibrierjahre; die Kommune gibt s_gek ein, ohne Eingabe gilt die Voreinstellung 0,11 (Abschätzung von KAP3). (2) Öffentliche Kühlzentren (kühle Orte in Gemeinderäumen, Kirchen oder Bibliotheken) für Menschen ab 75, die zu Hause leben: Faktor δ_KZ = 0,995585 auf deren Hitze-Todesfälle im abgedeckten Teil der Kommune (Abschätzung von KAP3); mit Hitzeaktionsplan und Schutzprogrammen zusammen höchstens so viel wie das Paket Deutschland (Kappung 0,794).",
      "measure_type": "structural",
      # Hebel S157 (Bericht #95 §5, Log 44, Befund 130): die Wirkung läuft NICHT über
      # default_reduction auf die Exposition (früher 0.18), sondern über g_S157 auf

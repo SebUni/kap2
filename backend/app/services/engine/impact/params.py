@@ -291,15 +291,12 @@ IMPACT_PARAM_SPECS: list[dict] = [
      # von ror_s157 bliebe wirkungslos (toter Parameter).
      "editable": False,
      "evidence_class": "belegt"},
-    # Wert ungerundet aus der Formel des Berichts: Block heat.g_s157 nennt 0,29, das
-    # Rechenbeispiel s157_berlin (25,0 Mio. €) rechnet mit g(0,93) = 0,2936 — mit 0,29
-    # ergäbe Berlin 25,1 Mio. €. Divergenz an den CMO gemeldet (T-1367).
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "g_s157", "value": (0.93 * 1.11 - 1) / (1.11 - 1),
      "label": "S157: Exzessfaktor gekühlter Heimplätze g_S157 (Anteil des Hitze-Exzesses, "
               "der mit Klimaanlage bleibt)", "unit": "Anteil",
      "source": "Abschätzung von KAP3 aus Katz u. a. 2026 [46] (Bericht #95 §5, Block heat.g_s157)",
      "source_detail": "g_S157 = (rOR × OR_ohne − 1)/(OR_ohne − 1) = (0,93 × 1,11 − 1)/0,11 = "
-                      "0,29: mit Klimaanlage bleiben 29 % des Hitze-Exzesses, 71 % fallen weg. "
+                      "0,2936: mit Klimaanlage bleiben 29,36 % des Hitze-Exzesses, 70,64 % fallen weg. "
                       "Wirkt nur auf D_85+ × h_Heim × s_gek (Todesfälle 85+ der Heimbewohner im "
                       "gekühlten Anteil der Heimplätze); h_Heim = q̄_pfl × [1 + β_pfl × "
                       "(1 − q̄_pfl)] = 0,344. Andockpunkt: Maßnahme „Kühle Räume / Kühlzentren“ "
@@ -307,7 +304,7 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_refs": [],
      "evidence_class": "abgeschaetzt",
      "evidence_derivation": {
-         "wert": "0,29 = (0,93 × 1,11 − 1)/(1,11 − 1) aus rOR 0,93 und OR_ohne 1,11 der "
+         "wert": "0,2936 = (0,93 × 1,11 − 1)/(1,11 − 1) aus rOR 0,93 und OR_ohne 1,11 der "
                  "Quelle [46] (Katz u. a. 2026); Setzung: derselbe Anteil gilt in allen "
                  "Hitzewochen des Modells, nicht nur an den Extremtagen von [46] "
                  "(Bericht #95 §5, Befund 124).",
@@ -436,8 +433,8 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source": "Abschätzung von KAP3 aus Katz u. a. 2026 [46] und Meade u. a. 2023 [73], "
                "plausibilisiert an Bouchama u. a. 2007 [41] (Bericht #95 §5, Block "
                "heat.delta_kuehlzentren)",
-     "source_detail": "δ_KZ = 1 − r_KZ × w_KZ = 1 − 0,05 × 0,71 × 3/24 = 0,9956. w_KZ = "
-                      "(1 − g_S157) × t_KZ: 71 % Wirkung im gekühlten Raum [46] für 2 h "
+     "source_detail": "δ_KZ = 1 − r_KZ × w_KZ = 1 − 0,05 × 0,7064 × 3/24 = 0,995585. w_KZ = "
+                      "(1 − g_S157) × t_KZ: 70,64 % Wirkung im gekühlten Raum [46] für 2 h "
                       "Aufenthalt und 1 h Nachwirkung [73] von 24 h. r_KZ = 5 % ist eine "
                       "Setzung von KAP3 (ein Viertel von r_VG). Plausibel gegen [41]: Besuch "
                       "kühler Orte OR 0,34, fünf- bis zehnfach überschätzt (Log 10). Wirkt auf "
@@ -446,11 +443,11 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source_refs": ["Katz_2026_Klimaanlagen_Pflegeheime", "Bouchama_2007_Meta"],
      "editable": False,
      "evidence_derivation": {
-         "wert": "0,9956 = 1 − 0,05 × 0,71 × 3/24: Reichweite 5 % (Setzung von KAP3), Wirkung "
-                 "im gekühlten Raum 0,71 [46], geschützter Anteil des Tages 3/24 [73] "
+         "wert": "0,995585 = 1 − 0,05 × 0,7064 × 3/24: Reichweite 5 % (Setzung von KAP3), Wirkung "
+                 "im gekühlten Raum 0,7064 [46], geschützter Anteil des Tages 3/24 [73] "
                  "(Bericht #95 §5, Befunde 139, 148, Entscheidungslog Nr. 46).",
-         "band": "0,982–0,9994: r_KZ 0,01–0,10 und t_KZ 2/24–6/24, also 1 − 0,10 × 0,71 × 6/24 "
-                 "= 0,98225 bis 1 − 0,01 × 0,71 × 2/24 = 0,99941.",
+         "band": "0,982–0,9994: r_KZ 0,01–0,10 und t_KZ 2/24–6/24, also 1 − 0,10 × 0,7064 × 6/24 "
+                 "= 0,98234 bis 1 − 0,01 × 0,7064 × 2/24 = 0,99941.",
          "sensitivitaet": "Berlin (Kette) 0,75 Mio. € je Jahr, Band 0,1–3,0 Mio. €; stärkster "
                           "Treiber ist die Reichweite (0,15–1,50 Mio. € über 1–10 %) (Bericht "
                           "#95 §5, Entscheidungslog Nr. 46).",
@@ -496,7 +493,7 @@ IMPACT_PARAM_SPECS: list[dict] = [
                  "Befund 151, Entscheidungslog Nr. 48).",
          "band": "0,743–0,842 aus dem Intervall 15,8–25,7 % derselben Zeile: 1 − 0,257 bis "
                  "1 − 0,158.",
-         "sensitivitaet": "Greift bei δ_HAP 0,85 (0,791) und bei Reichweite und Wirkung am "
+         "sensitivitaet": "Greift bei δ_HAP 0,852 (0,793) und bei Reichweite und Wirkung am "
                           "oberen Ende. Berlin dort 34,9 Mio. € je Jahr, Band 26,8–43,6 Mio. €, "
                           "ohne Kappung 46,1 Mio. € (Bericht #95 §5).",
      }},
