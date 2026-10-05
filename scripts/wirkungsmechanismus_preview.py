@@ -353,11 +353,11 @@ def _graph_98() -> tuple[dict, list[dict]]:
 # ── Stand aus der Statuszeile des Berichts ───────────────────────────────────
 
 def bericht_stand(nr: str) -> dict:
-    """Revision und Integrationsstand aus der Statuszeile des Methodik-Berichts.
+    """Revision aus der Statuszeile des Methodik-Berichts.
 
-    Liest die Zeile „Status: **Rev. N, …**“ und, falls vorhanden, den Satz
-    „im Produkt stehen … noch aus“ aus dem Kopf des Berichts. Nichts davon ist
-    im Skript fest eingetragen; fehlt eine Angabe, steht das ausdrücklich da.
+    Liest die Zeile „Status: **Rev. N, …**“ aus dem Kopf des Berichts. Der Bericht
+    beschreibt keinen Umsetzungsstand (Regel vom 30.09.2026); einen Integrationsstand
+    liest die Vorschau deshalb nicht aus ihm und trägt auch keinen fest ein.
     """
     files = sorted(OUT_DIR.glob(f"{nr}_*.md"))
     kopf = ""
@@ -367,13 +367,7 @@ def bericht_stand(nr: str) -> dict:
     status = m.group(1).strip() if m else ""
     r = re.match(r"(Rev\.\s*\d+)", status)
     revision = r.group(1) if r else "Revision unbekannt"
-    i = re.search(r"im Produkt stehen\s+(.+?)\s+noch aus", kopf, re.S)
-    if i:
-        offen = re.sub(r"\s+", " ", i.group(1)).strip()
-        integration = f"Im Produkt stehen noch aus: {offen}."
-    else:
-        integration = "Integrationsstand steht nicht in der Statuszeile des Berichts."
-    return {"revision": revision, "status": status, "integration": integration}
+    return {"revision": revision, "status": status}
 
 
 # ── #95 Hitzebelastung (Ziel-Modell laut Bericht, Revision aus Statuszeile) ──
@@ -657,8 +651,7 @@ def build_payload(nr: str) -> dict:
             if code in catalog.RISKS_BY_CODE:
                 tabs.append({
                     "label": label,
-                    "note": "Ist-Stand aus Backend-Registry/Lineage-Builder. "
-                            + stand["integration"],
+                    "note": "Ist-Stand aus Backend-Registry/Lineage-Builder.",
                     "lineage": lineage_graph.build_risk_lineage(code),
                     "parameters": params,
                 })
@@ -668,8 +661,7 @@ def build_payload(nr: str) -> dict:
                         "(docs/methodik/95_hitzebelastung.md); Ist-Produktstand als "
                         "Vergleichstabs.",
             "banner": f"Stand laut Statuszeile des Berichts: {stand['status']}. "
-                      + stand["integration"]
-                      + " Die Ist-Tabs kommen live aus Backend-Registry/Lineage-Builder.",
+                      "Die Ist-Tabs kommen live aus Backend-Registry/Lineage-Builder.",
             "generated": today,
             "tabs": tabs,
         }
