@@ -15,15 +15,22 @@ Geprüft wird je Katalogmaßnahme mit ``default_reduction`` None:
     keinen TypeError: einmal mit dem echten Maßnahmenzweig, einmal ohne
     ``effect_model`` — dann rechnet er über ``_reduction_factor`` und liefert 1,0;
 (c) eine Maßnahme mit gesetztem ``default_reduction`` rechnet unverändert
-    (``1 − r·Deckung`` bei einem Ziel).
+    (``1 − r·Deckung`` bei einem Ziel);
+(d) der Weg über ein verknüpftes **kommunenweites** (flat-skaliertes) Risiko — Zweig
+    ``flat_linked`` in ``_compute_impact_scoped`` — wirft keinen TypeError, der Faktor
+    ist dort 1,0 (flacher Nutzen genau 0); eine Kontrolle mit gesetztem
+    ``default_reduction`` zeigt, dass der Zweig wirklich erreicht wird.
 
-DB-frei: reine Rechenfunktionen aus ``measure_service`` und der Katalog.
+DB-frei: reine Rechenfunktionen aus ``measure_service``, der Katalog und eine Stub-Session.
 """
 from __future__ import annotations
+
+from types import SimpleNamespace
 
 import pytest
 
 from app.data import catalog
+from app.models.models import CellAssessment, Kommune, MeasureImpact
 from app.services import measure_service
 
 _OHNE_DEFAULT = [m for m in catalog.MEASURES if m.get("default_reduction") is None]
@@ -69,3 +76,103 @@ def test_wirkung_ueber_verknuepftes_risiko_ohne_typeerror(mdef):
 def test_reduction_factor_mit_default_reduction_rechnet_unveraendert():
     mdef = {"default_reduction": 0.2, "coverage_scaling": "linear", "effect_target": ["hazard"]}
     assert measure_service._reduction_factor(mdef, 0.5) == pytest.approx(1.0 - 0.2 * 0.5)
+
+
+# --- (d) Kommunenweites (flat) verknüpftes Risiko über ``_compute_impact_scoped`` ---------
+# Zweig ``flat_linked`` (measure_service Z. ~1565–1596): dort ruft die große Nutzenrechnung
+# ``_reduction_factor(mdef, …)`` direkt mit der Maßnahmendefinition auf. Das Muster (Stub-
+# Session, Testrisiko in catalog.RISKS_BY_CODE, _coverage und get_risk_aggregate per
+# monkeypatch) stammt aus test_klasse_b_direktnutzen.py — keine Datenbank nötig.
+
+FLAT_CODE = "TEST_FLAT_OHNE_DEFAULT"
+_N_ZELLEN = 10
+
+
+def _flat_eintrag() -> dict:
+    return {
+        "code": FLAT_CODE, "name": "Testwirkung kommunenweit", "group": "infrastructure",
+        "outcome_unit": "Stunden/Jahr", "ref_value": 100.0, "scale": "flat",
+        "cost_per_outcome_eur": 1000.0, "cost_dimension": "economic",
+        "cost_source": "Testquelle",
+    }
+
+
+class _Query:
+    def __init__(self, rows):
+        self._rows = list(rows)
+
+    def filter(self, *a, **k):
+        return self
+
+    filter_by = filter
+
+    def all(self):
+        return list(self._rows)
+
+    def first(self):
+        return self._rows[0] if self._rows else None
+
+    def delete(self):
+        return 0
+
+
+class _Session:
+    def __init__(self, cells, kommune):
+        self._rows = {CellAssessment: cells, Kommune: [kommune], MeasureImpact: []}
+
+    def query(self, model):
+        return _Query(self._rows.get(model, []))
+
+    def add(self, obj):
+        pass
+
+    def commit(self):
+        pass
+
+
+@pytest.fixture
+def flat_risiko(monkeypatch):
+    e = _flat_eintrag()
+    monkeypatch.setitem(catalog.RISKS_BY_CODE, e["code"], e)
+    monkeypatch.setattr(catalog, "RISKS", list(catalog.RISKS) + [e])
+    assert catalog.risk_contributes_to_total(e) and catalog.risk_has_euro_layer(e)
+
+
+def _rechne_flat(monkeypatch, mdef: dict) -> dict:
+    """Nutzen der Maßnahme ``mdef``, verknüpft mit dem kommunenweiten Testrisiko."""
+    deckung = {cid: 1.0 for cid in range(1, _N_ZELLEN + 1)}
+    monkeypatch.setattr(measure_service, "_coverage", lambda db, m: (dict(deckung), 20000.0))
+    monkeypatch.setattr(
+        measure_service, "get_risk_aggregate",
+        lambda db, kid, apply_measures=False, demo_session_id=None: {"risks": {}})
+    # Hitzeaktionspläne/Schutzprogramme-Zweige lesen Parameter-Overrides aus der Datenbank.
+    monkeypatch.setattr(measure_service.parameter_registry, "load_db_overrides",
+                        lambda db, kid: {})
+    # Zellen mit gestuftem Index, damit eine echte Minderung das P90 bewegen würde.
+    zellen = [SimpleNamespace(
+        grid_cell_id=cid, kommune_id=1,
+        data={"risks": {FLAT_CODE: {"index": 10.0 * cid, "outcome": 0.0, "cost_eur": 0.0}},
+              "inputs": {"pop": 250.0}}) for cid in range(1, _N_ZELLEN + 1)]
+    d = {**mdef, "linked_risk_codes": [FLAT_CODE], "custom_sources": {}}
+    measure = SimpleNamespace(id=7, kommune_id=1, measure_type=mdef["code"], config={},
+                              impact_summary=None, demo_session_id=None)
+    db = _Session(zellen, SimpleNamespace(population=100000, area_km2=50.0))
+    return measure_service._compute_impact_scoped(db, measure, d, "fp")
+
+
+@pytest.mark.parametrize("mdef", _OHNE_DEFAULT, ids=_IDS)
+def test_kommunenweites_risiko_ohne_typeerror_und_faktor_eins(monkeypatch, flat_risiko, mdef):
+    # Kein TypeError, und weil der Faktor auf diesem Weg 1,0 ist, bewegt sich das P90
+    # nicht: der flache Nutzen ist genau 0 (die Wirkung rechnet der eigene Zweig).
+    s = _rechne_flat(monkeypatch, mdef)
+    assert s["annual_benefit_flat_eur"] == 0.0, mdef["code"]
+    assert s["annual_benefit_damage_eur"] == 0.0, mdef["code"]
+
+
+def test_kommunenweites_risiko_kontrolle_mit_default_reduction_hat_nutzen(monkeypatch, flat_risiko):
+    # Kontrolle: derselbe Aufbau mit gesetztem default_reduction bewegt das P90 — der Test
+    # erreicht den flat-Zweig also wirklich und die 0 oben ist kein Leerlauf.
+    basis = next(m for m in catalog.MEASURES if float(m.get("default_reduction") or 0) > 0
+                 and not m.get("effect_model"))
+    s = _rechne_flat(monkeypatch, basis)
+    assert s["annual_benefit_flat_eur"] > 0.0
