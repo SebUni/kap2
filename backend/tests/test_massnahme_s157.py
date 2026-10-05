@@ -175,7 +175,7 @@ def test_parameters_visible_in_registry():
     g = next(p for pid, p in params.items() if pid.endswith(".g_s157"))
     ror = next(p for pid, p in params.items() if pid.endswith(".ror_s157"))
     # Blockwert 0,29 gerundet; gerechnet wird ungerundet wie im Beispiel s157_berlin
-    assert round(g["value"], 2) == 0.29 and g["evidence_class"] == "abgeschaetzt"
+    assert round(g["value"], 4) == 0.2936 and g["evidence_class"] == "abgeschaetzt"
     assert g["value"] == pytest.approx(health.G_S157)
     assert ror["value"] == 0.93 and ror["evidence_class"] == "belegt"
 
@@ -194,7 +194,7 @@ def _delta_hap_full() -> float:
 def test_hap_factor_is_report_delta_hap():
     assert HAP in catalog.MEASURES_BY_CODE
     assert MORT in catalog.MEASURES_BY_CODE[HAP]["linked_risk_codes"]
-    assert _delta_hap_full() == pytest.approx(0.95, abs=1e-12)
+    assert _delta_hap_full() == pytest.approx(0.939, abs=1e-12)
 
 
 def test_berlin_with_hap_combined_72_1_percent():
@@ -204,26 +204,26 @@ def test_berlin_with_hap_combined_72_1_percent():
     s157 = health.s157_avoided_deaths(D85_BERLIN, 1.0, delta_hap=d_hap)
     gesamt = d_heim * (1.0 - d_hap) + s157
     assert gesamt / d_heim == pytest.approx(1.0 - d_hap * health.G_S157, rel=1e-12)
-    assert round(100 * gesamt / d_heim, 1) == 72.1
-    assert gesamt == pytest.approx(38.1, abs=0.05)
-    # additiv gelesen wären es 75,6 % — das bucht 1,9 Todesfälle doppelt
+    assert round(100 * gesamt / d_heim, 1) == 72.4
+    assert gesamt == pytest.approx(38.3, abs=0.05)
+    # additiv gelesen wären es 76,7 % — das bucht 2,3 Todesfälle doppelt
     additiv = (1.0 - d_hap) + (1.0 - health.G_S157)
-    assert round(100 * additiv, 1) == 75.6
-    assert (additiv * d_heim - gesamt) == pytest.approx(1.9, abs=0.05)
+    assert round(100 * additiv, 1) == 76.7
+    assert (additiv * d_heim - gesamt) == pytest.approx(2.3, abs=0.05)
 
 
 def test_berlin_with_hap_s157_35_5_deaths_and_23_7_mio_eur():
     d_hap = _delta_hap_full()
     s157 = health.s157_avoided_deaths(D85_BERLIN, 1.0, delta_hap=d_hap)
-    assert round(s157, 1) == 35.5
+    assert round(s157, 1) == 35.1
     # Bericht §5 „Berlin, voller Anteil“: je vollen Anteil über dem Stand der Kalibrierjahre
     eur = _per_full_share(1.0, d_hap)
-    assert round(eur / 1e6, 1) == 23.7
-    # Unterschied zur additiven Lesart 1,25 Mio. € (Beispiel-Block s157_berlin)
-    assert (_per_full_share() - eur) / 1e6 == pytest.approx(1.25, abs=0.05)
-    # bei δ_HAP = 0,85 rund 3,75 Mio. €
-    assert (_per_full_share() - _per_full_share(1.0, 0.85)) / 1e6 == \
-        pytest.approx(3.75, abs=0.05)
+    assert round(eur / 1e6, 1) == 23.5
+    # Unterschied zur additiven Lesart 1,5 Mio. € (Beispiel-Block s157_berlin)
+    assert (_per_full_share() - eur) / 1e6 == pytest.approx(1.5, abs=0.05)
+    # bei δ_HAP = 0,852 rund 3,7 Mio. €
+    assert (_per_full_share() - _per_full_share(1.0, 0.852)) / 1e6 == \
+        pytest.approx(3.7, abs=0.05)
 
 
 def test_sum_of_single_benefits_equals_aggregate_with_both():

@@ -271,17 +271,18 @@ RISKS: list[dict] = [
      # skaliert, sondern die gespeicherten Zusatztage der Schadensfunktion direkt.
      "vulnerabilities": ["HEALTHCARE_ACCESS"],
      # Herleitung ref_value (Sanity-Anker, Symptomtage je 100.000 EW): Bundessumme
-     # 8,96 Mio Betroffene × 1,988 Tage = 17,8 Mio Tage ÷ 83,456 Mio EW × 100.000
-     # ≈ 21.340 (Bericht §4). cost_per_outcome_eur: c_Tag 6,20 €₂₀₂₄ (s. _RISK_COST_RATES).
-     "ref_value": 21340.0, "scale": "pop", "cost_per_outcome_eur": 6.20,
+     # 9,62 Mio Symptomtage (Bericht §4; 8,96 Mio Betroffene × 1,07 Tage) ÷ 83,456 Mio EW
+     # × 100.000 = 11.527, auf Zehner gerundet 11.530 (a_attr 0,27, Abschätzung von KAP3).
+     # cost_per_outcome_eur: c_Tag 6,20 €₂₀₂₄ (s. _RISK_COST_RATES).
+     "ref_value": 11530.0, "scale": "pop", "cost_per_outcome_eur": 6.20,
      # Kostensatz = Block pollen.c_tag in Kapitel 7 des Berichts #96, Kennzeichnung
      # berechnet (= c_Jahr,direkt / d_Saison = 266,90 / 43,05; T-1480).
      "cost_methodik_block": "pollen.c_tag",
      "cost_evidence_class": "berechnet",
      "source": "Bericht #96 Rev. 1 (DWD-Phänologie / DEGS1+KiGGS / TOTALL)",
      "source_detail": "Sanity-Anker in Symptomtagen je 100.000 EW: 10,74 % "
-        "AR-Prävalenz × 1,988 zusätzliche Symptomtage je Betroffenem·Jahr "
-        "(f 0,70 · (p_B·ΔS_B + p_G·ΔS_G) · a_attr 0,50) = 21.340 Tage/100k. Kein "
+        "AR-Prävalenz × 1,07 zusätzliche Symptomtage je Betroffenem·Jahr "
+        "(f 0,70 · (p_B·ΔS_B + p_G·ΔS_G) · a_attr 0,27) = 11.530 Tage/100k. Kein "
         "Rechenweg — Schicht B rechnet die Schadensfunktion; der Anker dient der "
         "Sanity-Prüfung (Faktor 5).",
      "source_refs": ["DWD_CDC_Phaenologie", "Langen_2013_DEGS1",
@@ -1396,7 +1397,7 @@ MEASURES: list[dict] = [
      # u. a. 2025 sind der EINFÜHRUNGSEFFEKT über drei Jahrzehnte, nicht der marginale
      # Spielraum gegenüber dem heutigen deutschen Stand — c_kal ist auf Jahre mit
      # laufendem DWD-Warnsystem kalibriert (Doppelzählungs-Wächter, Befund 33/68).
-     "effect_target": ["vulnerability"], "default_reduction": 0.05, "coverage_scaling": "saturating",
+     "effect_target": ["vulnerability"], "default_reduction": 0.061, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"],
      "capex_fixed": 100000.0, "capex_per_unit": None, "capex_per_m2": None,
      "opex_fixed_year": 20000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
