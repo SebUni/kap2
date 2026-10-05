@@ -189,7 +189,7 @@ def test_measure_hap_marginal_effect():
     """§5-Maßnahme: δ_HAP = 0,95 ⇒ default_reduction 0,05 (marginal, nicht der
     Urban-Einführungseffekt 0,25 — Doppelzählungs-Wächter)."""
     m = next(m for m in catalog.MEASURES if m["code"] == "HEAT_ACTION_PLANS")
-    assert m["default_reduction"] == 0.05
+    assert m["default_reduction"] == 0.061
 
 
 if __name__ == "__main__":

@@ -522,7 +522,7 @@ def _graph_95_plan() -> tuple[dict, list[dict]]:
     b.add_edge("mass:s157", op_s157)
     P("heat.ror_s157", "Klimaanlagen-Effekt rOR (S157)", 0.93, "—",
       "Katz u. a. 2026 [46] (Kehrwert von rOR 1,08; Band 0,87–0,99)", op_s157)
-    P("heat.g_s157", "Exzessfaktor gekühlter Heimplätze g_S157", 0.29, "—",
+    P("heat.g_s157", "Exzessfaktor gekühlter Heimplätze g_S157", 0.2936, "—",
       "Abschätzung von KAP3 aus Katz u. a. 2026 [46] (Band 0–0,90)", op_s157,
       "wirkt nur auf D₈₅₊ × h_Heim × s_gek; mit δ_HAP multiplikativ (Befund 129).")
     b.add_node("int:g_s157", "intermediate", "Heim-Exzess 85+ mit Kühlräumen",
@@ -557,7 +557,7 @@ def _graph_95_plan() -> tuple[dict, list[dict]]:
     b.add_edge("mass:hap", mul_hebel)
     b.add_edge("int:g_s157", mul_hebel)
     b.add_edge("int:delta_vg", mul_hebel)
-    P("heat.delta_hap", "Faktor Hitzeaktionsplan δ_HAP", 0.95, "—",
+    P("heat.delta_hap", "Faktor Hitzeaktionsplan δ_HAP", 0.939, "—",
       "Abschätzung von KAP3 aus Feldbusch 2025 [45] (Band 0,85–1,00)", mul_hebel,
       "auf den Wochenexzess aller Bänder (Bericht §5).")
     b.add_node("int:d_mass", "intermediate", "Hitzebedingte Todesfälle D nach Maßnahmen",
