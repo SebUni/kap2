@@ -75,10 +75,12 @@ def pollen_load(ci: dict) -> float:
     betroffenengewichtete Mittel Ḡ₀ des Ausgangsstands, das im Ausgangsstand
     gebildet und für Maßnahmenszenarien festgehalten wird. Die Kommunensumme
     ist nur im Ausgangsstand gleich; mit Maßnahme sinkt sie (Log 26, §3.3, §5).
-    ``s_unbek`` verschiebt daher nur die Gewichtung von Kronen gegen Grün
-    innerhalb der Kommune und wirkt auf die ZELLVERTEILUNG — gehölzgeprägte
-    Zellen reagieren zweistellig, vegetationsarme kaum (Bericht §3.3,
-    Golden-Test ``test_s_unbekannt_sensitivity_band``).
+    Im Ausgangsstand verschiebt ``s_unbek`` daher nur die Gewichtung von Kronen
+    gegen Grün innerhalb der Kommune und wirkt auf die Zellverteilung —
+    gehölzgeprägte Zellen reagieren zweistellig, vegetationsarme kaum (Bericht
+    §3.3, Golden-Test ``test_s_unbekannt_sensitivity_band``);
+    mit einer Stadtbaumwahl bestimmt es außerdem, wie stark die Senkung von
+    Kronen ohne Gattungs-Tag zählt (Bericht §5).
     """
     from app.services.engine import override_context
 
