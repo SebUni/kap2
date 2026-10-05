@@ -1397,7 +1397,7 @@ MEASURES: list[dict] = [
      # u. a. 2025 sind der EINFÜHRUNGSEFFEKT über drei Jahrzehnte, nicht der marginale
      # Spielraum gegenüber dem heutigen deutschen Stand — c_kal ist auf Jahre mit
      # laufendem DWD-Warnsystem kalibriert (Doppelzählungs-Wächter, Befund 33/68).
-     "effect_target": ["vulnerability"], "default_reduction": 0.05, "coverage_scaling": "saturating",
+     "effect_target": ["vulnerability"], "default_reduction": 0.061, "coverage_scaling": "saturating",
      "linked_risk_codes": ["EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"],
      "capex_fixed": 100000.0, "capex_per_unit": None, "capex_per_m2": None,
      "opex_fixed_year": 20000.0, "opex_per_unit_year": None, "opex_per_m2_year": None, "benefit_per_m2_year": 0.0,
@@ -1820,19 +1820,31 @@ MEASURES: list[dict] = [
                 "nicht r_S158 allein, sondern der WIRKSAME Wert je Zusatztag "
                 "r_S158 · t_warn = 0,03 · 0,75 = 0,0225 (Bericht §5.1, Befund 165): Nur der "
                 "Anteil der Zusatztage mit Pollenflug-Gefahrenindex ab „mittel“ zählt. "
-                "Bezogen auf die Bundessumme von rund 110 Mio. €₂₀₂₄/Jahr entspricht der "
-                "Punktwert ≈ 2,5 Mio. €/Jahr vermiedener Behandlungskosten bei "
+                "Bezogen auf die Bundessumme von rund 60 Mio. €₂₀₂₄/Jahr entspricht der "
+                "Basiswert ≈ 1,3 Mio. €/Jahr vermiedener Behandlungskosten bei "
                 "flächendeckender Umsetzung; das Band (0,0025–0,10 wirksam, aus "
-                "r_S158 · t_warn an den jeweiligen Bandenden) spannt ≈ 0,28–11,0 Mio. €/Jahr. "
-                "Für eine Kommune mit 100.000 EW im Bundes-Altersmix (≈ 132.300 €/Jahr "
-                "Schadenswert) sind das ≈ 2.980 €/Jahr (Band ≈ 330–13.230 €/Jahr). Gegen die "
-                "Vorhaltekosten des Messnetzes "
-                "(15.000 €/Station, 4.000 €/(Station·Jahr)) trägt sich die Maßnahme "
-                "über diesen Nutzen in keinem Punkt des Bands — die Abschätzung ändert "
-                "die Vorteilhaftigkeits-Aussage also nicht, macht die Wirkung aber "
-                "sichtbar statt sie als Null auszuweisen. Modellgrenze der Abschätzung "
-                "(Bericht #96 §6, Grenze 8): kommunenweiter Pauschalfaktor, keine "
-                "zellscharfe Bauform.",
+                "r_S158 · t_warn an den jeweiligen Bandenden) spannt ≈ 0,15–6,0 Mio. €/Jahr. "
+                "Ab wann sich die Frühwarnung trägt (Bericht §5.1, Befund 244): Sie trägt "
+                "ihren Betrieb, sobald der Nutzen die Betriebskosten erreicht "
+                "(4.000 €/(Station·Jahr)); die Anschaffung (15.000 €/Station) ist nicht auf "
+                "Jahre umgelegt, weil es für die Nutzungsdauer einer Pollenmessstation weder "
+                "Quelle noch Abschätzung von KAP3 gibt. Für eine Kommune mit 100.000 EW im "
+                "Bundes-Altersmix (Schadenswert 71.477 €/Jahr) beträgt der Nutzen 1.608 €/Jahr "
+                "am Basiswert (Band 179–7.148 €/Jahr). Eine Station trägt sich ab einem "
+                "wirksamen Wert von 4.000 € ÷ 71.477 € = 0,056, dem 2,49-Fachen des "
+                "Basiswerts (r_S158 = 0,075 bei t_warn = 0,75). Darunter, auch am Basiswert, "
+                "trägt sie sich nicht; vom Wert 0,056 bis zum oberen Bandende trägt sie sich, "
+                "dort für eine Station. Kein Faktor allein an seinem oberen Anker reicht, "
+                "auch keine zwei; drei reichen. Für Berlin (Zelllauf 2,47 Mio. €/Jahr, ganze "
+                "Stadt im Geltungsbereich) liegt die Schwelle für eine Station bei 0,0016, "
+                "also unter dem unteren Bandende; am Basiswert deckt der Nutzen den Betrieb "
+                "von 13 Stationen. Bei n Stationen gilt das n-Fache der Schwelle. Wert, Band "
+                "und Klasse bleiben unverändert; die Abschätzung macht die Wirkung sichtbar "
+                "statt sie als Null auszuweisen. Modellgrenze der Abschätzung "
+                "(Bericht #96 §6, Grenze 8): Tage, Belastung und Geltungsbereich rechnen "
+                "zellscharf im Zelllauf; pauschal bleibt der Personenteil "
+                "r_S158 = q_reich · q_handel · e_Tag und, bis zur Auswertung je "
+                "DWD-Gebiet, t_warn = 0,75.",
         },
         "capex_per_unit": {
             "wert": "15.000 €/Station (Punktwert, Modellannahme). Anker: das geparkte "

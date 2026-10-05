@@ -10,18 +10,20 @@ eines erfundenen (P2, Muster S158 ``benefit_missing_input``). Führt keine abged
 Ausgangsstand Baumkronen, wäre ein ausgewiesenes 0 € nicht von einer Datenlücke unterscheidbar
 (P2) — auch dort steht ein Vermerk statt des Betrags.
 
-Rechenbeispiel Allee-Zelle (Berlin Mitte, Bericht §5.1, Vorhaben T-1483-cto Planung #cto):
-Betroffene B 100, δ_R = δ_Birke + δ_Gräser = 0,8085 + 1,0710 = 1,8795, Ḡ₀ 0,18125, Ĝ 0,3625
-(Ĝ/Ḡ₀ = 2) → 319,515 Tage im Ausgangsstand. ``anteil_ersetzt`` 1,0, ``canopy_birch_frac``
-0,078125, ``canopy_unknown_frac`` 0 senkt Ĝ auf Ĝ′ = 0,3625 − 0,464·0,078125 = 0,32625
-(Ĝ′/Ḡ₀ = 1,8) → 293,202 Tage nach der Pflanzung, Nutzen 319,515 − 293,202 = 26,313 Tage,
-≈ 163 € je Jahr (Rate aus dem Katalog-Kostensatz von #96, Vorhaben-Planung: 163,14 €).
+Rechenbeispiel Allee-Zelle nach Ü-13 (Bericht §5, Block ``beispiel_96_stadtbaum_allee``, wie
+``test_massnahme_stadtbaum_kosten.py``): Betroffene B 100, δ_B 0,43659, δ_G 0,57834, Ḡ₀ 0,18125,
+Ĝ 0,3625 (Ĝ/Ḡ₀ = 2) → 172,538 Tage im Ausgangsstand. ``anteil_ersetzt`` 1,0,
+``canopy_birch_frac`` 0,078125, ``canopy_unknown_frac`` 0 senkt Ĝ auf Ĝ′ = 0,3625 −
+0,464·0,078125 = 0,32625 (Ĝ′/Ḡ₀ = 1,8); Nutzen 14,209 Tage, ≈ 88 € je Jahr (14,209 Tage ×
+6,20 € = 88,10 €, Rate aus dem Katalog-Kostensatz von #96).
 
 Geprüft wird (Abnahmekriterium T-1604-cto):
 (a) ``compute_impact`` liefert an der Allee-Zelle ``stadtbaum_avoided_days`` je Zelle und
-    ``stadtbaum_avoided_days_total`` = 26,3 ± 0,05, ``stadtbaum_avoided_days_eur`` = 163 ± 0,5,
+    ``stadtbaum_avoided_days_total`` = 14,2 ± 0,05, ``stadtbaum_avoided_days_eur`` = 88 ± 0,5,
     ``stadtbaum_estimate_note`` == „Abschätzung von KAP3“, dazu ein Hinweistext mit
     „Modellgrenze 7“ zur Richtung des Fehlers in λ.
+(a2) Ü-4 (Befund 237): die Zelle trägt ``stadtbaum_avoided_eur`` = 88,10 ± 0,01 €; die Summe der
+    Zell-Euro ist der Euro-Betrag der Kommune ± 0,01 €.
 (b) Ohne ``anteil_ersetzt`` steht ``benefit_missing_input`` == 'anteil_ersetzt' und kein Betrag
     (keine Zahlenfelder, ``annual_benefit_damage_eur`` bleibt 0 — sichtbar wird das nicht, weil
     ``benefit_display`` den Betrag verdeckt).
@@ -44,10 +46,11 @@ RISK = "EXPECTED_ANNUAL_ALLERGY_DAYS"
 KOMMUNE_ID = 1
 CELL_ID = 42
 
-# Allee-Zelle (Berlin Mitte, s. Modul-Docstring).
+# Allee-Zelle nach Ü-13 (s. Modul-Docstring).
 BETROFFENE = 100.0
-DELTA_BIRKE = 0.8085
-DELTA_GRAESER = 1.0710
+AUSGANGSSTAND_TAGE = 172.538
+DELTA_BIRKE = 0.43659
+DELTA_GRAESER = 0.57834
 G_BAR0 = 0.18125
 G_CELL = 0.3625          # Ĝ/Ḡ₀ = 2
 CANOPY_BIRKE = 0.078125  # → Ĝ′/Ḡ₀ = 1,8
@@ -97,7 +100,7 @@ class _DB:
 
 def _allee_cell() -> dict:
     return {
-        "index": 319.515, "outcome": 319.515,
+        "index": AUSGANGSSTAND_TAGE, "outcome": AUSGANGSSTAND_TAGE,
         "betroffene": BETROFFENE, "delta_birke": DELTA_BIRKE, "delta_graeser": DELTA_GRAESER,
         "pollen_g": G_CELL, "pollen_g_bar0": G_BAR0,
         "canopy_birch_frac": CANOPY_BIRKE, "canopy_unknown_frac": CANOPY_UNBEK,
@@ -152,20 +155,20 @@ def _run(cell: dict, config: dict, monkeypatch,
     return _run_cells({CELL_ID: cell}, config, monkeypatch, area_m2, base_agg_cost_eur)
 
 
-# ── (a) Allee-Zelle: 26,3 Tage, 163 €, Kennzeichnung, Hinweis Modellgrenze 7 ─────────
+# ── (a) Allee-Zelle: 14,2 Tage, 88 €, Kennzeichnung, Hinweis Modellgrenze 7 ─────────
 
-def test_allee_zelle_26_3_tage_163_euro_gekennzeichnet(monkeypatch):
+def test_allee_zelle_14_2_tage_88_euro_gekennzeichnet(monkeypatch):
     summary, added = _run(_allee_cell(), {"anteil_ersetzt": ANTEIL_ERSETZT}, monkeypatch)
 
-    assert summary["stadtbaum_avoided_days_total"] == pytest.approx(26.3, abs=0.05)
-    assert summary["stadtbaum_avoided_days_eur"] == pytest.approx(163, abs=0.5)
+    assert summary["stadtbaum_avoided_days_total"] == pytest.approx(14.2, abs=0.05)
+    assert summary["stadtbaum_avoided_days_eur"] == pytest.approx(88, abs=0.5)
     assert summary["stadtbaum_estimate_note"] == "Abschätzung von KAP3"
     assert "Modellgrenze 7" in summary["stadtbaum_lambda_hinweis"]
     assert summary.get("benefit_display") is None
     assert summary.get("benefit_missing_input") is None
 
     zeile = next(o for o in added if o.measure_id == 1)
-    assert (zeile.savings or {}).get("stadtbaum_avoided_days") == pytest.approx(26.3, abs=0.05)
+    assert (zeile.savings or {}).get("stadtbaum_avoided_days") == pytest.approx(14.2, abs=0.05)
     assert (zeile.savings or {}).get("stadtbaum_avoided_days") == pytest.approx(
         summary["stadtbaum_avoided_days_total"], abs=0.05)
 
@@ -215,17 +218,33 @@ def test_gemischte_deckung_kronenlose_zelle_bekommt_eigenen_vermerk(monkeypatch)
     # eines Vermerks (kein 0 € insgesamt).
     assert summary.get("benefit_missing_input") is None
     assert summary.get("benefit_display") is None
-    assert summary["stadtbaum_avoided_days_total"] == pytest.approx(26.3, abs=0.05)
+    assert summary["stadtbaum_avoided_days_total"] == pytest.approx(14.2, abs=0.05)
 
     zeile_allee = next(o for o in added if o.grid_cell_id == CELL_ID)
     zeile_ohne_kronen = next(o for o in added if o.grid_cell_id == CELL_ID + 1)
     assert (zeile_allee.savings or {}).get("stadtbaum_avoided_days") == pytest.approx(
-        26.3, abs=0.05)
+        14.2, abs=0.05)
     assert (zeile_allee.savings or {}).get("stadtbaum_missing_reason") is None
     # Die kronenlose Zelle verschwindet nicht stumm: eigener Vermerk trotz positiver
     # Kommunensumme.
     assert (zeile_ohne_kronen.savings or {}).get("stadtbaum_avoided_days") is None
     assert (zeile_ohne_kronen.savings or {}).get("stadtbaum_missing_reason") == "canopy"
+
+
+# ── (e) Euro je Zelle (Ü-4, Befund 237): vermiedene Tage × c_Tag ─────────────────────
+
+def test_zelle_traegt_vermiedene_euro(monkeypatch):
+    """Allee-Zelle: 14,209 Tage × 6,20 € = 88,10 €; die Summe der Zell-Euro ist der
+    Euro-Betrag der Kommune (ohne Kappung)."""
+    summary, added = _run(_allee_cell(), {"anteil_ersetzt": ANTEIL_ERSETZT}, monkeypatch)
+
+    zeile = next(o for o in added if o.measure_id == 1)
+    assert (zeile.savings or {})["stadtbaum_avoided_days"] == pytest.approx(14.209, abs=0.001)
+    assert (zeile.savings or {})["stadtbaum_avoided_eur"] == pytest.approx(88.10, abs=0.01)
+
+    summe = sum((o.savings or {}).get("stadtbaum_avoided_eur", 0.0) for o in added)
+    assert summe == pytest.approx(summary["stadtbaum_avoided_days_eur"], abs=0.01)
+    assert summe == pytest.approx(summary["annual_benefit_damage_eur"], abs=0.01)
 
 
 if __name__ == "__main__":
