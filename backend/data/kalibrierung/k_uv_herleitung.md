@@ -61,7 +61,7 @@ Verteilung über 10.682 Gemeindepunkte mit einem SSD-Trend ≥ 1 %/Dekade (darun
 - Median: **0.6305**
 - 90. Perzentil: **1.0046**
 - 95. Perzentil: **1.1671**
-- bevölkerungsgewichtet (Bundeswert): **0.6683**
+- fallgewichtet (Bundeswert): **0.6683**
 
 Über die Gemeindepunkte streut der Rasterquotient erheblich. Das verschiebt **einzelne Kommunen** gegeneinander, nicht die Bundessumme — es gehört deshalb in die Modellgrenzen (wie die Binnenheterogenität des Bandes 20–64), nicht in das Sanity-Band.
 

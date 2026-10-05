@@ -157,6 +157,13 @@ def _validate_config_value_ranges(config: Optional[dict]) -> Optional[dict]:
         if a is not None:
             if isinstance(a, bool) or not isinstance(a, (int, float)) or not (0.0 < float(a) <= 1.0):
                 raise ValueError("config['anteil_ersetzt'] muss 0 < a ≤ 1 sein")
+    # ``ersatzfall`` (LOW_ALLERGEN_TREE_SELECTION, Kosten der Stadtbaumwahl, Bericht #96
+    # §5, Ü-11 (b)): genau nachpflanzung oder vorgezogen; jeder andere Wert wird
+    # abgewiesen. Fehlt die Angabe, gibt es keinen Vorgabefall.
+    if config and "ersatzfall" in config:
+        fall = config["ersatzfall"]
+        if fall is not None and fall not in ("nachpflanzung", "vorgezogen"):
+            raise ValueError("config['ersatzfall'] muss 'nachpflanzung' oder 'vorgezogen' sein")
     return config
 
 

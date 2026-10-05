@@ -7,7 +7,7 @@ Zelle nach der Produktlogik aus ``zensus_loader.apply_zensus_to_cell_inputs``, d
 Aufruf über alle Zellen summiert — Symptomtage und Euro sind linear in der Bevölkerung je Band,
 Berlin liegt in einer Region), liest ``["cost"]["by_risk"]`` und prüft, dass genau eine Zeile
 kwra_id 96 trägt und ihr ``cost_eur`` auf 1 € mit ``_rechnen(_zellbaender(BERLIN))`` aus dem
-Golden-Test übereinstimmt (4,58 Mio. € je Jahr, §3.0, Zelllauf mit Ersatzregel).
+Golden-Test übereinstimmt (2,47 Mio. € je Jahr, §3.0, Zelllauf mit Ersatzregel; 393.299 Betroffene, 399.171 Tage).
 
 Ohne Datenbank, ohne Server. Sichtbar mit ``-s``.
 """
@@ -54,7 +54,11 @@ def test_berlin_by_risk_96():
     zeilen_96 = [e for e in by_risk if e.get("kwra_id") == 96]
     assert len(zeilen_96) == 1, f"{len(zeilen_96)} Zeilen mit kwra_id 96 statt genau einer"
     cost_eur = zeilen_96[0]["cost_eur"]
-    _, _, golden = _rechnen(_zellbaender(BERLIN))
+    betroffene, tage, golden = _rechnen(_zellbaender(BERLIN))
+    # Sollzahlen Zelllauf Berlin (Ü-13, Anlage 96_zelllauf_bandsummen.py, Lauf 30.09.2026):
+    # 393.298,65 Betroffene · 399.170,60 Tage · 2.474.857,71 €.
+    assert abs(betroffene - 393_299) < 1.0, f"{betroffene:.2f} Betroffene"
+    assert abs(tage - 399_171) < 1.0, f"{tage:.2f} Tage"
     print(f"by_risk Berlin #96 ({zeilen_96[0]['code']}): cost_eur = {cost_eur:,.2f} € "
           f"({cost_eur / 1e6:.2f} Mio. €); Golden = {golden:,.2f} €")
     assert abs(cost_eur - golden) <= 1.0, f"Endpunktweg {cost_eur:.2f} € ≠ Golden {golden:.2f} €"

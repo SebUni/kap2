@@ -126,6 +126,12 @@ POLLEN_D_SAISON_REF: float = 43.05
 POLLEN_DELTA_S_BIRKE: dict[str, float] = {"nord": 3.96, "mitte": 4.20, "sued": 5.94}
 POLLEN_DELTA_S_GRAESER: dict[str, float] = {"nord": 4.78, "mitte": 4.08, "sued": 3.70}
 
+# Klimaattribuierter Anteil des Saisontrends a_attr (Bericht #96 Kap. 2 und [9]:
+# Saisonlänge 19–35 %, Mitte 0,27; Abschätzung von KAP3, Ü-13). Rückfallwert des
+# Call-Sites, wenn keine Registry-Spec greift; gebunden an den Spec in
+# tests/test_methodik_96_golden.py (test_registry_matches_report_parameters).
+POLLEN_A_ATTR: float = 0.27
+
 # Baseline-Einweisungsraten je Band (Fälle/100.000·Jahr) — Morbiditätspfad
 # (Bericht #95 §3.4, Anker #r0-a; bevölkerungsgewichtete Summe 3,54).
 AGE_MORBIDITY_R0: dict[str, float] = {
@@ -660,7 +666,7 @@ def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     f = ctx.p(code, "f_symptomtage", 0.70)
     p_b = ctx.p(code, "p_sens_birke", 0.55)
     p_g = ctx.p(code, "p_sens_graeser", 0.75)
-    a_attr = ctx.p(code, "a_attr", 0.50)
+    a_attr = ctx.p(code, "a_attr", POLLEN_A_ATTR)
     ds_b = ctx.p(code, f"delta_s_birke_{region}", POLLEN_DELTA_S_BIRKE[region])
     ds_g = ctx.p(code, f"delta_s_graeser_{region}", POLLEN_DELTA_S_GRAESER[region])
     delta_birke = f * p_b * ds_b * a_attr

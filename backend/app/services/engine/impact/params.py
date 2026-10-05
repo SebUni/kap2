@@ -663,14 +663,15 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "source": "DWD-Phänologie, gepaarte Stationen (Bericht #96 §3.1)",
      "source_detail": _POLLEN_DS_G + " Süd: 420 Stationenpaare.",
      "source_refs": ["DWD_CDC_Phaenologie"]},
-    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "a_attr", "value": 0.50,
+    {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "a_attr", "value": 0.27,
      "label": "Klima-Attribution des Saisontrends", "unit": "Anteil",
      "source": "Anderegg u. a. 2021 (PNAS)",
      "source_detail": "Anteil des beobachteten Pollensaison-Trends, der dem "
-                      "anthropogenen Klimawandel zurechenbar ist: ≈ 50 % "
-                      "(IQR 19–84 %, Nordamerika — Übertrag auf DE als dokumentierte "
-                      "Annahme, Band = Sensitivitätsspanne des Berichts §4). "
-                      "Multiplikativ auf die gemessene Saison-Spreizung.",
+                      "anthropogenen Klimawandel zurechenbar ist: Saisonlänge "
+                      "19–35 % (1990–2018), Mitte 0,27 — Abschätzung von KAP3 nach "
+                      "Bericht #96 Kap. 2 und [9] (Nordamerika, Übertrag auf DE als "
+                      "dokumentierte Annahme). Multiplikativ auf die gemessene "
+                      "Saison-Spreizung.",
      "source_refs": ["Anderegg_2021_Pollensaison"]},
     {"risk": "EXPECTED_ANNUAL_ALLERGY_DAYS", "key": "p_ar_u20", "value": 0.088,
      "label": "AR-Prävalenz Band u20", "unit": "Anteil",
@@ -1777,11 +1778,11 @@ _POLLEN_BLOECKE: dict[tuple[str, str], str] = {
 }
 # Kennzeichnung je Block nach Kapitel 7, übersetzt in die Evidenzklasse (P1):
 # quelle → belegt, abschaetzung_kap3 → abgeschaetzt, berechnet → berechnet.
-# Über alle 13 Blöcke 4 × belegt, 7 × abgeschaetzt, 2 × berechnet; die Klassen von
+# Über alle 13 Blöcke 3 × belegt, 8 × abgeschaetzt, 2 × berechnet; die Klassen von
 # pollen.c_tag und pollen.r_s158 stehen in data/catalog.py.
 _POLLEN_KLASSE: dict[str, str] = {
     "pollen.delta_s_region": "belegt",
-    "pollen.a_attr": "belegt",
+    "pollen.a_attr": "abgeschaetzt",
     "pollen.p_ar": "belegt",
     "pollen.p_sens_gruppen": "abgeschaetzt",
     "pollen.l_saison": "abgeschaetzt",
@@ -1795,6 +1796,18 @@ _POLLEN_KLASSE: dict[str, str] = {
 # Herleitung nach P1 für die abgeschätzten Blöcke, deren Spec noch keine eigene trägt
 # (Bericht #96 §3.4 und §3.5). s_unbekannt und t_warn_s158 tragen sie am Spec.
 _POLLEN_HERLEITUNG: dict[str, dict[str, str]] = {
+    "pollen.a_attr": {
+        "wert": "0,27: Mitte des Interquartilsabstands 19–35 % der Saisonlänge "
+                "1990–2018 aus Anderegg 2021 [9], Results: (0,19 + 0,35) ÷ 2 = 0,27. "
+                "ΔS ist eine Verlängerung der Saison, deshalb gilt die Saisonlänge und "
+                "nicht die rund 50 % des Abstracts, die Beginn und Länge zusammen "
+                "betreffen (Bericht #96 Kap. 2, 96-W025-02, Befund 258).",
+        "band": "0,19–0,41: umfasst beide Spannen der Saisonlänge aus [9] "
+                "(1990–2018: 19–35 %, 2003–2018: 22–41 %).",
+        "sensitivitaet": "Stärkster Treiber: Tage und Euro wirken linear, Berlin "
+                         "1,78–3,84 Mio. € je Jahr (−30 % bis +52 %) um 2,53 Mio. € "
+                         "(Bericht #96 §3.0).",
+    },
     "pollen.p_sens_gruppen": {
         "wert": "p_B = 0,55 (Birkengruppe) und p_G = 0,75 (Gräser) als Anteil der "
                 "Patienten mit allergischer Rhinitis, deren Beschwerden in die Saison der "
