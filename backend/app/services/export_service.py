@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.data import catalog
 from app.models.models import AdaptationMeasure, MeasureImpact
+from app.schemas.schemas import _validate_config_value_ranges
 from app.services import measure_service
 from app.services import massnahmen_gewissheit as _mg
 from app.data.massnahmen_umsetzung import MASSNAHMEN_UMSETZUNG
@@ -318,6 +319,15 @@ def import_measures_xlsx(db: Session, kommune_id: int, file: BinaryIO) -> dict:
                     config["count"] = int(round(float(row[11])))
                 except (TypeError, ValueError):
                     pass
+
+            # Gleiche Wertebereichsprüfung wie beim Anlegen/Ändern über die API
+            # (MeasureCreate): eine verletzte Regel macht die Zeile zum Fehler.
+            try:
+                _validate_config_value_ranges(config)
+            except ValueError as ve:
+                errors.append(f"Zeile {i}: Ungültige Konfiguration — {ve}")
+                skipped += 1
+                continue
 
             measure = AdaptationMeasure(
                 kommune_id=kommune_id,
