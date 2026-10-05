@@ -558,7 +558,7 @@ def _graph_95_plan() -> tuple[dict, list[dict]]:
     b.add_edge("int:g_s157", mul_hebel)
     b.add_edge("int:delta_vg", mul_hebel)
     P("heat.delta_hap", "Faktor Hitzeaktionsplan δ_HAP", 0.939, "—",
-      "Abschätzung von KAP3 aus Feldbusch 2025 [45] (Band 0,85–1,00)", mul_hebel,
+      "Abschätzung von KAP3 aus Feldbusch 2025 [45] (Band 0,852–1,00)", mul_hebel,
       "auf den Wochenexzess aller Bänder (Bericht §5).")
     b.add_node("int:d_mass", "intermediate", "Hitzebedingte Todesfälle D nach Maßnahmen",
                column=4, collapse_group="intermediates", meta={"unit": "1/Jahr"})

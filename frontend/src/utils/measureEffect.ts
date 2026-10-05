@@ -2,10 +2,10 @@ import type { CatalogMeasure } from '../types'
 
 /** Wirkungstext der Maßnahme COOLING_ROOMS_DRINKING_WATER (Bericht #95 §5): zwei Hebel,
  *  S157 (gekühlte Heimplätze, Befund 138: ohne Eingabe Voreinstellung s_gek = 11 %) und
- *  öffentliche Kühlzentren (Befunde 139/148: δ_KZ 0,9956, Block heat.delta_kuehlzentren). */
+ *  öffentliche Kühlzentren (Befunde 139/148: δ_KZ 0,995585, Block heat.delta_kuehlzentren). */
 export const S157_EFFECT_TEXT = 'g_S157 auf die Todesfälle 85+ in Heimen, abhängig von s_gek '
   + '(ohne Eingabe Voreinstellung 11 %, Abschätzung von KAP3); öffentliche Kühlzentren: '
-  + 'δ_KZ 0,9956 auf die Todesfälle ab 75 zu Hause (Abschätzung von KAP3)'
+  + 'δ_KZ 0,995585 auf die Todesfälle ab 75 zu Hause (Abschätzung von KAP3)'
 
 /** Voreinstellung s_gek in Prozent (Bericht #95 §5, Block heat.s_gek, Befund 138):
  *  gilt, wenn die Kommune keinen gekühlten Anteil der Heimplätze eingibt. */

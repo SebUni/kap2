@@ -122,23 +122,27 @@ def test_zellausgabe_traegt_kronenterme_gleich_den_zelleingaben():
 def test_outcome_und_cost_eur_bleiben_bitgleich_zum_vorzustand():
     """Die neuen Ausgabefelder ändern den bestehenden Rechenweg nicht.
 
-    Festwerte auf origin/main (95dda1b8, ``python -m pytest -s`` derselben Zelle vor
-    diesem Ticket) ermittelt und hier mit ``==`` (Bit-Genauigkeit über ``float.hex``)
-    gegen den Stand NACH diesem Ticket gebunden — kein Toleranzband, weil das
-    Abnahmekriterium Bitgleichheit verlangt, nicht Näherung. Nachvollzogen im Diff
-    gegen origin/main: die Änderung fügt in ``allergy_symptom_days`` ausschließlich
-    drei neue Ausgabefelder NACH der outcome/cost_eur-Berechnung an; die Rechenzeilen
-    selbst (``tage``, ``_result``, Kostensatz-Kopplung) sind unverändert.
+    Festwerte neu ermittelt (T-1714) auf main, Commit
+    a823f5821e2802381dd148f49c2985d6985971af, nachdem a_attr auf 0,27 (Ü-13) stand
+    (alt 0,50; Verhältnis 0,54 = 0,27 ÷ 0,50). Befehl, im Repo wörtlich ausführbar:
+    ``bash scripts/testlauf.sh backend/tests/test_stadtbaum_zellfunktion.py -q -s -k
+    bitgleich``. Er gibt über die ``print``-Zeile unten ``outcome``, ``cost_eur`` und
+    ``betroffene`` samt ``float.hex`` für die Zelle ``_ctx_mit_kronenterme(0.22, 0.05,
+    0.30)`` aus; diese Werte stehen unten als Festwerte. Sie sind mit ``==``
+    (Bit-Genauigkeit über ``float.hex``) gebunden — kein Toleranzband, weil das
+    Abnahmekriterium Bitgleichheit verlangt, nicht Näherung. Der Test sichert, dass
+    die Zellausgabe den heutigen Rechenstand unverändert trägt.
     """
     override_context.set_overrides({})
     ctx = _ctx_mit_kronenterme(0.22, 0.05, 0.30)
     res = impact.compute_all_cell_impacts(ctx)[CODE]
+    print({k: (res[k], res[k].hex()) for k in ("outcome", "cost_eur", "betroffene")})
 
-    # Auf origin/main (vor diesem Ticket, Commit 95dda1b8) für dieselbe Zelle ermittelt.
-    assert res["outcome"].hex() == float.fromhex("0x1.0cfabdce5fdb6p+8").hex()
-    assert res["outcome"] == 268.97945871200807
-    assert res["cost_eur"].hex() == float.fromhex("0x1.a0eb0c997afa7p+10").hex()
-    assert res["cost_eur"] == 1667.67264401445
+    # Neu ermittelt auf main a823f5821e2802381dd148f49c2985d6985971af (a_attr 0,27, Ü-13).
+    assert res["outcome"].hex() == float.fromhex("0x1.227f70d4a4f73p+7").hex()
+    assert res["outcome"] == 145.24890770448437
+    assert res["cost_eur"].hex() == float.fromhex("0x1.c245887ccc7f2p+9").hex()
+    assert res["cost_eur"] == 900.543227767803
     assert res["betroffene"] == 107.35117871928871
 
 
