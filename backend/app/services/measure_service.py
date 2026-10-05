@@ -601,6 +601,13 @@ STADTBAUM_LAMBDA_HINWEIS = (
     "entkoppelt lokale Vegetation und lokalen Pollenflug teilweise.")
 STADTBAUM_MISSING_ANTEIL_TEXT = ("kein Betrag: Anteil ersetzter Kronen "
                                  "(anteil_ersetzt) fehlt, Eingabe in der Maßnahme ergänzen")
+# Ü-9 (Befund 251): anteil_ersetzt ist ein Anteil in [0, 1]. Eine Eingabe über 1 (am Schema
+# abgewiesen, aber ungeprüft über Excel-Import, ältere Maßnahmen und direkte Aufrufe möglich)
+# erzeugt keinen Betrag: die Kappung je Term in health.stadtbaum_g_neu ließe sie bei
+# Deckungsgrad 1 still wie 1 zählen und bei teilweiser Deckung mehr senken als a = 1.
+STADTBAUM_ANTEIL_BEREICH_TEXT = ("kein Betrag: Anteil ersetzter Kronen (anteil_ersetzt) muss "
+                                 "zwischen 0 und 1 liegen, Eingabe in der Maßnahme berichtigen")
+STADTBAUM_ANTEIL_BEREICH_REASON = "anteil_ersetzt_bereich"
 STADTBAUM_NO_CANOPY_TEXT = ("kein Betrag: abgedeckte Zellen führen im Ausgangsstand "
                             "keine Baumkronen, dort ist nichts zu ersetzen")
 
@@ -614,6 +621,8 @@ def _stadtbaum_cell_effect(config: dict | None, frac: float, cell_risk: dict
     dünner Wrapper hierauf), zusätzlich mit der Differenz ΔTage = Tage(Ĝ) − Tage(Ĝ′)
     und einer Kennzeichnung, warum keine Zahl entsteht: ``'anteil_ersetzt'`` — die
     Maßnahme trägt kein (oder kein positives) ``config['anteil_ersetzt']``;
+    ``'anteil_ersetzt_bereich'`` — ``config['anteil_ersetzt']`` liegt über 1 (Ü-9,
+    Befund 251: kein Betrag, Eingabe berichtigen);
     ``'canopy'`` — die Zelle führt im Ausgangsstand keine Baumkronen
     (``canopy_birch_frac`` + ``canopy_unknown_frac`` ≤ 0), dort ist mechanisch
     nichts zu ersetzen. ``None`` als dritte Rückgabe heißt: keine dieser Lagen —
@@ -637,6 +646,8 @@ def _stadtbaum_cell_effect(config: dict | None, frac: float, cell_risk: dict
         return 1.0, None, None
     if a <= 0.0:
         return 1.0, None, "anteil_ersetzt"
+    if a > 1.0:
+        return 1.0, None, STADTBAUM_ANTEIL_BEREICH_REASON
     if (float(k_birke) + float(k_unbek)) <= 0.0:
         return 1.0, 0.0, "canopy"
     g_bar0 = cell_risk.get("pollen_g_bar0")
@@ -681,6 +692,9 @@ def _stadtbaum_summary_fields(mdef: dict, avoided_days_total: float, avoided_day
         return {}
     if missing_reason == "anteil_ersetzt":
         return {"benefit_display": STADTBAUM_MISSING_ANTEIL_TEXT,
+                "benefit_missing_input": "anteil_ersetzt"}
+    if missing_reason == STADTBAUM_ANTEIL_BEREICH_REASON:
+        return {"benefit_display": STADTBAUM_ANTEIL_BEREICH_TEXT,
                 "benefit_missing_input": "anteil_ersetzt"}
     if missing_reason == "canopy":
         return {"benefit_display": STADTBAUM_NO_CANOPY_TEXT,
@@ -1378,8 +1392,12 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     stadtbaum_missing_reason: str | None = None
     stadtbaum_saw_canopy_missing = False
     stadtbaum_saw_effect = False
-    if _is_stadtbaum(mdef) and float((measure.config or {}).get("anteil_ersetzt") or 0.0) <= 0.0:
-        stadtbaum_missing_reason = "anteil_ersetzt"
+    if _is_stadtbaum(mdef):
+        _a_ersetzt = float((measure.config or {}).get("anteil_ersetzt") or 0.0)
+        if _a_ersetzt <= 0.0:
+            stadtbaum_missing_reason = "anteil_ersetzt"
+        elif _a_ersetzt > 1.0:
+            stadtbaum_missing_reason = STADTBAUM_ANTEIL_BEREICH_REASON
 
     for cid, frac in coverage.items():
         ca = assessments.get(cid)

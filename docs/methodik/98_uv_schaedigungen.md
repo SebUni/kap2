@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–479)** ·
+Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–485)** ·
 05.10.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -134,12 +134,12 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > Runden 24–36 (Befunde 422–479). Geprüft in drei Teilen, jeder bis zu einer Null-Runde:
 > Teil 1 (bis §3.3) in Runde 24, Teil 2 (§3.4 bis Kapitel 6) in Runde 31, Teil 3
 > (Kapitel 7, 8 und Entscheidungslog) in Runde 36. Neu sind die Rechenkette in §3.0,
-> die Hebel S155 und S158 in Kapitel 5 und die Parameter-Blöcke in Kapitel 7; das
+> die Hebel S155 und S158 in Kapitel 5 sowie in Kapitel 7 die Herkunftsangabe `abgeleitet_aus` (in 19 von 22 Parameter-Blöcken) und die drei S155-Blöcke; das
 > frühere Kapitel 9 ist aufgelöst. Neue Anlage: `backend/scripts/kalibrierung/k_uv_raumstreuung.py` +
-> `backend/data/kalibrierung/k_uv_raumstreuung.md` (räumliche Streuung von \(k_{\text{UV}}\),
+> `backend/data/kalibrierung/k_uv_raumstreuung.{csv,md}` (räumliche Streuung von \(k_{\text{UV}}\),
 > Modellgrenze 9; Festlegung zu Befund 449: \(k_{\text{UV}}\) bleibt Bundeswert **0,7119**).
 > Bundessumme unverändert **339 Mio. €** je Jahr (Preisstand 2024). Zurückgestellt sind
-> 453, 463 und 479 (Ledger, Abschnitt »Null-Runde nach Fortschreibung 7«).
+> 453, 463 und 481, behoben ist 479; 480–485 stammen aus der Schlussprüfung (Ledger, Abschnitte »Null-Runde nach Fortschreibung 7« und »Schlussprüfung Teil 1/3«). Mit 482 folgt §3.7 der Knoten-Bilanz in Kapitel 1: In Schicht A rechnet als Vulnerabilität allein R36; keine Zahl ändert sich.
 >
 > Status je Befund in `reviews/BEFUNDE_98.md`. Diese Markdown-Datei ist die Quelle für
 > #98 (§2.7). Alle Ermessensentscheidungen im **Entscheidungslog** (Ende der Datei).
@@ -155,7 +155,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > `backend/scripts/kalibrierung/k_uv_herleitung.py` +
 > `backend/data/kalibrierung/k_uv_herleitung.{csv,md}`
 > (\(k_{\text{UV}}\)-Herleitung auf Rasterskala, §3.2 — Rev. 7; ersetzt die
-> Rev.-4-bis-6-Anlage `ssd_dortmund_k_uv.py`).
+> Rev.-4-bis-6-Anlage `ssd_dortmund_k_uv.py`); `backend/scripts/kalibrierung/k_uv_raumstreuung.py` + `backend/data/kalibrierung/k_uv_raumstreuung.{csv,md}` (räumliche Streuung von \(k_{\text{UV}}\), Modellgrenze 9 — neu in Rev. 15); `backend/scripts/kalibrierung/dwd_ssd_normalperioden.py` + `backend/data/kalibrierung/ssd_normalperioden.npz` und `ssd_normalperioden.md` (SSD-Mittelraster der Normalperioden 1961–1990 und 1991–2020 je Rasterzelle, §3.2).
 
 ## 1 Wirkungskette & Knoten-Bilanz (§2.1)
 
@@ -1107,7 +1107,7 @@ der **Basiswert** des Berichts ist von ihnen unabhängig und exakt reproduzierba
 ### 3.7 Schicht A (getrennt; nie auf €-Pfaden)
 
 \(\hat H\)(E20: UV_RADIATION/SSD) × \(\hat E\)(R35: POPULATION_DENSITY / AGE_STRUCTURE) ×
-\(\hat V\)(S154/S155/S158: Verhalten/Bewusstsein/Screening; R36: HEALTHCARE_ACCESS);
+\(\hat V\)(R36: HEALTHCARE_ACCESS; S154 rechnet als Sensitivitätsband, S155 und S158 als Maßnahmen-Hebel, nicht in Schicht A — Kapitel 1);
 \(\text{Index} = 100 \cdot \max_p (w_p \hat H_p \hat E_p \hat V_p)\) (Worst-Pathway;
 Normierungen editierbar, testseitig von €-Pfaden getrennt).
 
@@ -2082,7 +2082,10 @@ verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Inte
   klein und teils gegenläufig; der Wert 8,51 % trägt. Die Kontrollgröße
   „Punktmittel ≈ Flächenmittel" belegt sie **nicht** (sie mittelt über Gemeinden, nicht
   über Fläche: RP 2.266 Punkte für 4,1 Mio. EW gegen NRW 395 Punkte für 17,8 Mio. EW) —
-  sie zeigt nur, dass die Punktablesung als solche unverzerrt ist.
+  sie zeigt nur, dass die Punktablesung als solche unverzerrt ist. **Fundstelle der drei
+  Näherungswerte:** Sie stehen nicht in der Ergebnisdatei `ssd_povw.md`, sondern im Kopftext
+  des Skripts `backend/scripts/kalibrierung/ssd_povw.py`, Absatz „Gekennzeichnete
+  Näherungen" (Zeilen 25–30), und im Befund-Ledger `reviews/BEFUNDE_98.md`, Befund 235.
 - **[73]** \(k_{\text{UV}}\)-Herleitung auf Rasterskala (Befunde 230/238/239/245/252/255/256):
   `backend/scripts/kalibrierung/k_uv_herleitung.py` →
   `backend/data/kalibrierung/k_uv_herleitung.{csv,md}` (Lauf 01.09.2026):

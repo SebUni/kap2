@@ -77,6 +77,8 @@ class Massnahmenzeile:
     zusatznutzen_eur: float | None = None
     vermerk: str | None = None      # nur bei qualitativen Maßnahmen: warum kein Betrag
     flaeche_m2: float | None = None
+    kosten_offen: bool = False      # summary: kosten_nutzen_kennzahl_offen (Stadtbaum ohne Fall/Stückzahl)
+    kosten_vermerk: str | None = None
     extra: dict = field(default_factory=dict)
 
     @property
@@ -103,9 +105,9 @@ class Massnahmenzeile:
     @property
     def nutzen_kosten(self) -> float | None:
         """Nutzen-Kosten-Verhältnis über den Betrachtungszeitraum; ``math.inf`` ohne Kosten,
-        None bei qualitativer Maßnahme."""
+        None bei qualitativer Maßnahme und bei offenen Kosten (``kosten_offen``: keine Kennzahl)."""
         n = self.nutzen_eur
-        if n is None:
+        if n is None or self.kosten_offen:
             return None
         k = self.kosten_zeitraum_eur
         return math.inf if k <= 0 else n * self.jahre / k
@@ -154,17 +156,21 @@ def massnahmenzeile(measure_type: str, name: str, summary: dict, *, ort: str,
         zusatznutzen_eur=zusatz if zusatz > 0 else None,
         vermerk=vermerk,
         flaeche_m2=summary.get("affected_area_m2"),
+        kosten_offen=bool(summary.get("kosten_nutzen_kennzahl_offen")),
+        kosten_vermerk=summary.get("kosten_vermerk") or None,
     )
 
 
 def rangfolge(zeilen: list[Massnahmenzeile]) -> list[Massnahmenzeile]:
     """Bezifferte Maßnahmen absteigend nach Nutzen-Kosten-Verhältnis (bei Gleichstand nach
     Nutzen, dann Name), danach die qualitativen in der Reihenfolge nach Name."""
-    bezifferte = [z for z in zeilen if not z.qualitativ]
+    bezifferte = [z for z in zeilen if not z.qualitativ and z.nutzen_kosten is not None]
+    offene = [z for z in zeilen if not z.qualitativ and z.nutzen_kosten is None]
     qualitative = [z for z in zeilen if z.qualitativ]
     bezifferte.sort(key=lambda z: (-z.nutzen_kosten, -z.nutzen_eur, z.name))
+    offene.sort(key=lambda z: (-(z.nutzen_eur or 0.0), z.name))
     qualitative.sort(key=lambda z: z.name)
-    return bezifferte + qualitative
+    return bezifferte + offene + qualitative
 
 
 def blockname(block: str) -> str:
