@@ -34,8 +34,8 @@ des Quotienten — genau die Größe, mit der die Zellsummen gebildet werden.
 acht handverlesene Städte — eine *räumliche* Streuung, als Band der *Bundes*summe
 gebucht. Richtig ist: Für die Bundessumme zählt der mit **Baseline-Fällen ×
 ΔSSD_Normalperiode** gewichtete Rasterquotient über alle Gemeindepunkte — dasselbe
-Gewicht, mit dem das Produktionsmodell ΔF summiert (Kopfgewichtung wäre um 1 %
-daneben, Befund 278); die
+Gewicht, mit dem das Produktionsmodell ΔF summiert (mit Köpfen gewichtet ergäbe
+sich 0,6644, der geführte Wert 0,6683 liegt +0,6 % darüber, Befund 278); die
 räumliche Streuung ist eine **Modellgrenze** der kommunalen Differenzierung, kein
 Bundesband. Das Band selbst kommt aus den **publizierten Standardfehlern** der beiden
 Stationstrends.
@@ -192,8 +192,9 @@ def main() -> None:
     # Fallgewichtung (Befunde 266/278) ist q ein gewichtetes MITTEL DER
     # PUNKTQUOTIENTEN — nicht mehr ein Quotient getrennt summierter Zaehler und
     # Nenner. Damit schlagen Punkte mit verschwindendem SSD-Trend voll durch: 57
-    # Punkte (0,08 % Gewicht) erreichen q bis 196 und heben den Bundeswert um
-    # +2,3 %. Sie werden deshalb AUSGESCHLOSSEN — ihr Quotient ist numerisch
+    # Punkte (0,08 % Gewicht, q bis 196; gemessen zu Log 29) heben den Bundeswert
+    # um +2,4 % (Schwellenreihe der Anlage, Zeile >= 0,00 %/Dekade). Sie werden
+    # deshalb AUSGESCHLOSSEN — ihr Quotient ist numerisch
     # instabil, nicht klein. Schwelle: SSD-Trend >= 1 %/Dekade.
     gilt = np.isfinite(t_ssd) & np.isfinite(t_rad) & (t_ssd > 0)
     stabil = gilt & (t_ssd > 1.0)      # >= 1 %/Dekade SSD-Trend
@@ -213,7 +214,8 @@ def main() -> None:
     # Befund 278: Gewichtet wird mit BASELINE-FAELLEN x DeltaSSD, nicht mit Koepfen —
     # das Produktionsmodell summiert DeltaF = F_z x BAF x DeltaDosis_z. Weil die
     # Altersstruktur regional variiert, sind Kopf- und Fallgewicht nicht identisch
-    # (+0,8 % MM / +1,2 % C44). Die beiden Entitaeten ergaeben leicht verschiedene q;
+    # (MM 0,6674 und C44 0,6689 gegen 0,6644 mit Koepfen: +0,45 % / +0,68 %; Log 28
+    # nennt den damaligen Stand). Die beiden Entitaeten ergaeben leicht verschiedene q;
     # gefuehrt wird das mit ihrem EUR-Anteil gewichtete Mittel, die Restdifferenz
     # (< 0,2 %) ist als Naeherung gekennzeichnet.
     from app.services.engine.impact.health import (UV_INCIDENCE_C44,
