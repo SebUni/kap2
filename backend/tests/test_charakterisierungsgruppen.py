@@ -126,7 +126,8 @@ def test_anpassungspotenzial_s157_hitzemortalitaet():
     r_S157 = a_85+ × h_Heim × max(s_gek − s_gek_kalib; 0) × (1 − g_S157), mit dem
     Hitzeaktionsplan zusammen 1 − 0,95 × (1 − r_S157) = 0,053 (nachgerechnet
     1 − 0,95 × (1 − 0,2839 × 0,34427 × 0,05 × 0,70636) = 0,0533)."""
-    assert round(charakterisierung.anpassungspotenzial("EXPECTED_ANNUAL_MORTALITY"), 3) == 0.064
+    assert round(charakterisierung.anpassungspotenzial(
+        "EXPECTED_ANNUAL_MORTALITY", "11000000"), 3) == 0.064
 
 
 def test_unbekannter_code():

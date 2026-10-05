@@ -31,17 +31,12 @@ Abweichungen von der KWRA (Modellgrenze, bewusst ausgewiesen):
 
 from __future__ import annotations
 
+import math
+from functools import lru_cache
+
 from app.data import catalog
 from app.services import gewissheit
 from app.services.engine.impact.params import IMPACT_PARAM_SPECS
-
-#: Anteil des Bands 85+ an den YLL der Rechenkette Berlin: 638,8 / 2.250 YLL (Bericht #95
-#: §3.5 Ebene 7, Tabelle „Verlorene Lebensjahre"). Keine Registry-Größe (§3.0 Rechenkette
-#: Berlin, gemeindespezifisch — anders als s_gek, s_gek_kalib, h_heim und g_S157, die
-#: kommunenunabhängige Modellparameter sind); deshalb hier als benannte Konstante mit
-#: Verweis, nicht als eigener Parameter (Bericht #95 §5 Hebel S157, Log 50, Beispiel-Block
-#: ``s157_voreinstellung``).
-A85_PLUS_BERLIN = 638.8 / 2250
 
 #: Die fünf KWRA-Charakterisierungsgruppen (TB6 Kap. 6.2, Gruppen I–V).
 CHARAKTERISIERUNGSGRUPPEN = (
@@ -127,24 +122,79 @@ def _registry_wert(risk_code: str, key: str) -> float:
     raise KeyError(f"Registry-Parameter {key!r} für {risk_code!r} nicht gefunden")
 
 
-def _s157_faktor(risk_code: str) -> float:
+@lru_cache(maxsize=None)
+def a85_plus_anteil(ags: str) -> float:
+    """a_85+ der Kommune: Anteil des Bands 85+ an allen verlorenen Lebensjahren (YLL) der
+    Hitzemortalität, aus dem Zelllauf dieser Kommune (Bericht #95 §5 Hebel S157, Befund 183).
+
+    a_85+ = (Todesfälle 85+ × Lebensjahre je Fall 85+) / YLL aller Bänder, summiert über alle
+    Zellen der Kommune. Gerechnet wird wie im Jahresbetrag (``ergebnisbericht.beispiel``):
+    Zellen aus den gepinnten Zelldaten ``backend/data/kalibrierung/golden95_zellen_<AGS>.csv.gz``
+    (ohne Datenbank), je Rasterwert (Sommermittel, Hitzetage) nach Altersbändern zusammengefasst,
+    Feinstruktur σ = ``SIGMA_K`` mit Gauß-Hermite (``GH_PUNKTE`` Punkte) auf
+    ``impact.health.mortality``. Für Kommunen ohne gepinnte Zelldaten gibt es keinen Wert
+    (``FileNotFoundError``); es wird keiner ersetzt.
+    """
+    import numpy as np
+
+    from app.services.engine import override_context
+    from app.services.engine.impact import health as H
+    from app.services.engine.impact.base import CellContext
+    from app.services.ergebnisbericht import beispiel
+    from app.services.lite.vg250_loader import BUNDESLAND_BY_SNL
+
+    gids, cis, klima = beispiel.zellen(ags)
+    gruppen: dict[tuple[float, float], dict[str, float]] = {}
+    for gid, ci in zip(gids, cis):
+        acc = gruppen.setdefault(klima[gid], dict.fromkeys(beispiel.BANDS, 0.0))
+        for b in beispiel.BANDS:
+            acc[b] += float(ci["pop_age_bands"][b])
+
+    xs, ws = np.polynomial.hermite.hermgauss(beispiel.GH_PUNKTE)
+    mort_risk = catalog.RISKS_BY_CODE["EXPECTED_ANNUAL_MORTALITY"]
+    regional = {"bundesland": BUNDESLAND_BY_SNL.get(ags[:2])}
+    override_context.set_overrides({})
+    yll = deaths_a85p = 0.0
+    for (t, hd), bands in gruppen.items():
+        def ctx(temp, bands=bands, hd=hd):
+            return CellContext(
+                ci={"pop": sum(bands.values()), "summer_temp_cell": temp, "pop_age_bands": bands},
+                hev={"hazards": {"HEAT_WAVE": hd}, "exposures": {}, "vulnerabilities": {}},
+                hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
+                indices={}, regional=regional)
+        for x, w in zip(xs, ws):
+            r = H.mortality(mort_risk, ctx(t + math.sqrt(2) * beispiel.SIGMA_K * x))
+            wgt = w / math.sqrt(math.pi)
+            yll += wgt * r["outcome"]
+            deaths_a85p += wgt * r["deaths_a85p"]
+    return deaths_a85p * H.AGE_LIFE_YEARS["a85p"] / yll
+
+
+def _s157_faktor(risk_code: str, ags: str | None) -> float:
     """Faktor (1 − r_S157), den die Maßnahme „Kühle Räume / Kühlzentren" (Hebel S157)
     multiplikativ zum Anpassungspotenzial beiträgt.
 
     r_S157 = a_85+ × h_Heim × max(s_gek − s_gek_kalib; 0) × (1 − g_S157); s_gek,
     s_gek_kalib, h_Heim und g_S157 kommen aus der Registry (Voreinstellungen, keine
-    Kommunen-Eingabe), a_85+ ist ``A85_PLUS_BERLIN`` (Bericht #95 §5 Hebel S157, Log 50,
-    Beispiel-Block ``s157_voreinstellung``: „r_S157 = a_85+ × h × (s_gek − 0,06) × (1 − g)").
+    Kommunen-Eingabe), a_85+ ist ``a85_plus_anteil(ags)`` (je Kommune aus ihrem Zelllauf;
+    Bericht #95 §5 Hebel S157, Log 50, Beispiel-Block ``s157_voreinstellung``:
+    „r_S157 = a_85+ × h × (s_gek − 0,06) × (1 − g)"). Ohne Kommune (``ags`` ``None``) gibt es
+    kein a_85+ und keinen Ersatzwert: Der Hebel S157 geht dann nicht in das Potenzial ein
+    (Faktor 1).
     """
+    if ags is None:
+        return 1.0
     s_gek = _registry_wert(risk_code, "s_gek")
     s_gek_kalib = _registry_wert(risk_code, "s_gek_kalib")
     h_heim = _registry_wert(risk_code, "h_heim")
     g_s157 = _registry_wert(risk_code, "g_s157")
-    r_s157 = A85_PLUS_BERLIN * h_heim * max(s_gek - s_gek_kalib, 0.0) * (1.0 - g_s157)
+    r_s157 = a85_plus_anteil(ags) * h_heim * max(s_gek - s_gek_kalib, 0.0) * (1.0 - g_s157)
     return max(0.0, min(1.0, 1.0 - r_s157))
 
 
-def anpassungspotenzial(risk_code: str, *, _massnahmen: list[dict] | None = None) -> float:
+def anpassungspotenzial(
+    risk_code: str, ags: str | None = None, *, _massnahmen: list[dict] | None = None,
+) -> float:
     """Relative Risikominderung (0..1) durch die im Katalog hinterlegten Maßnahmen.
 
     Maßnahmen sind alle Einträge aus ``catalog.MEASURES``, deren
@@ -156,7 +206,8 @@ def anpassungspotenzial(risk_code: str, *, _massnahmen: list[dict] | None = None
     Ausnahme ``effect_model`` ``"s157"`` (Hebel S157, gekühlte Heimplätze): Die Maßnahme
     setzt ``default_reduction`` nicht an (wirkt nicht über eine pauschale Minderung,
     T-1410); ihr Faktor ist stattdessen ``1 − r_S157`` aus ``_s157_faktor`` (Bericht #95
-    §5 Hebel S157, Log 50). Mehrere Maßnahmen wirken multiplikativ: p = 1 − Π f. Ohne
+    §5 Hebel S157, Log 50), mit a_85+ der Kommune ``ags`` (Gemeindeschlüssel, Zelllauf);
+    ohne ``ags`` trägt S157 nichts bei. Mehrere Maßnahmen wirken multiplikativ: p = 1 − Π f. Ohne
     Maßnahme ist p = 0.
     """
     if risk_code not in catalog.RISKS_BY_CODE:
@@ -167,7 +218,7 @@ def anpassungspotenzial(risk_code: str, *, _massnahmen: list[dict] | None = None
         if risk_code not in (m.get("linked_risk_codes") or []):
             continue
         if m.get("effect_model") == "s157":
-            rest *= _s157_faktor(risk_code)
+            rest *= _s157_faktor(risk_code, ags)
             continue
         r = max(0.0, min(1.0, float(m.get("default_reduction") or 0.0)))
         n = max(1, len(m.get("effect_target") or []))
