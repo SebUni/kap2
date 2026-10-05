@@ -3,8 +3,8 @@
 Dateien: `golden95_zellen_11000000.csv.gz` (Berlin, 40.669 Zellen, 3.593.357 Einwohner) und
 `golden95_zellen_03256034.csv.gz` (Warmsen, Landkreis Nienburg (Weser), 529 Zellen, 3087 Einwohner).
 Gebraucht von `backend/tests/test_methodik_95_golden_betraege.py`. Der Test bindet die Jahresbeträge des Zelllaufs
-aus Bericht #95 (§3.0, Tabelle „Gemessene Wirkung“ in §3.3) an den Produktcode: Berlin 342,67 Mio. € und
-707.318 Einwohner ab 65, Warmsen 173.099 € (Preisstand 2024).
+aus Bericht #95 (§3.0, Tabelle „Gemessene Wirkung“ in §3.3) an den Produktcode: Berlin 345,11 Mio. € und
+707.318 Einwohner ab 65, Warmsen 175.256 € (Preisstand 2024).
 
 ## Spalten
 

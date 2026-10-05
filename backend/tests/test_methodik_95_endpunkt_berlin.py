@@ -7,7 +7,7 @@ zusammengefasst; Mortalität und Morbidität sind linear in der Bevölkerung je 
 ``["cost"]["by_risk"]`` und prüft die Summe von EXPECTED_ANNUAL_MORTALITY und EXPECTED_ANNUAL_MORBIDITY
 
 (i) gegen ``_jahresbetrag("11000000")`` des Golden-Tests (auf 1 € genau),
-(ii) gegen 342,67 Mio. € aus Bericht §3.0 (± 1 Mio. €).
+(ii) gegen 345,11 Mio. € aus Bericht §3.0 (± 1 Mio. €).
 
 Ohne Datenbank, ohne Server. Sichtbar mit ``-s``.
 """

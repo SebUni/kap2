@@ -6,7 +6,7 @@ Gemeindegrenze VG250; Beschreibung in ``golden95_zellen.md``). Der Jahresbetrag 
 wie im Produkt über die Schicht-B-Funktionen ``impact.health.mortality`` und
 ``impact.health.morbidity``, mit derselben Aufbereitung der Altersbänder
 (``zensus_loader.apply_zensus_to_cell_inputs`` samt Ersatzregel 65+) und derselben
-Feinstruktur unter 1 km wie der Zelllauf des Berichts (σ = 0,5 K, Gauß-Hermite mit 21 Punkten,
+Feinstruktur unter 1 km wie der Zelllauf des Berichts (σ = 0,58 K, Gauß-Hermite mit 21 Punkten,
 nur auf die Mortalität) — also dieselbe Rechnung wie ``tests/test_methodik_95_golden_betraege.py``.
 """
 

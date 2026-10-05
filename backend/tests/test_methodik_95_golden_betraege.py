@@ -4,8 +4,8 @@ Bindet die Jahresbeträge des Zelllaufs aus Bericht ``docs/methodik/95_hitzebela
 (§3.0 und Tabelle „Gemessene Wirkung“ in §3.3, Spalte „Jahresbetrag mit Regel“, Preisstand 2024)
 an den Produktcode:
 
-- Berlin (AGS 11000000): 342,67 Mio. € je Jahr, 707.318 Einwohner ab 65,
-- Warmsen (AGS 03256034): 173.099 € je Jahr.
+- Berlin (AGS 11000000): 345,11 Mio. € je Jahr, 707.318 Einwohner ab 65,
+- Warmsen (AGS 03256034): 175.256 € je Jahr.
 
 Gerechnet wird mit dem Produkt: Altersbänder je Zelle aus ``zensus_loader.apply_zensus_to_cell_inputs``
 (mit der Ersatzregel §3.3 für den geheimgehaltenen Anteil 65+), Todesfälle, YLL und Einweisungen aus
@@ -15,17 +15,17 @@ Gerechnet wird mit dem Produkt: Altersbänder je Zelle aus ``zensus_loader.apply
 ``backend/scripts/golden_95_zelldaten.py`` (Beschreibung: ``golden95_zellen.md``).
 
 Wie im Zelllauf des Berichts (Wirkung (d) in §3.0) gilt je Zelle der Rasterwert des Sommermittels mit
-einer Feinstruktur σ = 0,5 K darunter, Gauß-Hermite mit 21 Punkten; sie wirkt nur auf die Mortalität.
+einer Feinstruktur σ = 0,58 K darunter, Gauß-Hermite mit 21 Punkten; sie wirkt nur auf die Mortalität.
 Die Wärmeinsel-Abweichung aus OSM, mit der das Produkt diese Feinstruktur im Betrieb rechnet, ist nicht
 Teil der gepinnten Daten.
 
 Gemessen (26.09.2026): Das Produkt lädt die Wochenquantile aus ``wochenquantile_region.csv``
-(vier Nachkommastellen) und kommt auf 342,58 Mio. € und 172.957 €. Mit der Tabelle §3.2 des Berichts
-(zwei Nachkommastellen), wie sie der Zelllauf des Berichts nutzt, sind es 342,67 Mio. € und 173.099 €.
+(vier Nachkommastellen) und kommt auf 345,03 Mio. € und 175.116 €. Mit der Tabelle §3.2 des Berichts
+(zwei Nachkommastellen), wie sie der Zelllauf des Berichts nutzt, sind es 345,11 Mio. € und 175.256 €.
 Die Differenz liegt in der Toleranz und ist als Divergenz an den CMO gemeldet (T-1366-cto).
 
-Toleranzen: Berlin ± 1 Mio. € (Bericht §3.0, Prüfblock ``rechenkette_95``: ``… / 0.9888 - 343) < 1``);
-Warmsen ± 505 €, dieselbe Toleranz relativ übertragen (1 / 342,67 × 173.099 €; Vorgabe CEO in
+Toleranzen: Berlin ± 1 Mio. € (Bericht §3.0, Prüfblock ``rechenkette_95``: ``… / 0.9888 - 345) < 1``);
+Warmsen ± 508 €, dieselbe Toleranz relativ übertragen (1 / 345,11 × 175.256 €; Vorgabe CEO in
 T-1350-ceo, Nachtrag 26.09.2026, bis zur Bestätigung durch den CMO in T-1351-ceo).
 """
 
@@ -144,13 +144,13 @@ def test_berlin_einwohner_ab65():
 
 
 def test_berlin_jahresbetrag():
-    """Berlin: 342,67 Mio. € je Jahr (Zelllauf mit Ersatzregel §3.3, Preisstand 2024), ± 1 Mio. €."""
+    """Berlin: 345,11 Mio. € je Jahr (Zelllauf mit Ersatzregel §3.3, Preisstand 2024), ± 1 Mio. €."""
     betrag = _jahresbetrag(BERLIN)
     assert abs(betrag - BERLIN_EUR) < BERLIN_TOL, f"{betrag / 1e6:.2f} Mio. €"
 
 
 def test_warmsen_jahresbetrag():
-    """Warmsen: 173.099 € je Jahr (Zelllauf mit Ersatzregel §3.3, Preisstand 2024), ± 505 €."""
+    """Warmsen: 175.256 € je Jahr (Zelllauf mit Ersatzregel §3.3, Preisstand 2024), ± 508 €."""
     assert WARMSEN_TOL == 508
     betrag = _jahresbetrag(WARMSEN)
     assert abs(betrag - WARMSEN_EUR) < WARMSEN_TOL, f"{betrag:.0f} €"

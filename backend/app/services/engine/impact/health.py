@@ -737,8 +737,8 @@ def s158_vermiedene_tage(tage_birke: float, tage_graeser: float, a_zelle: float,
 
     ``ΔTage_vermieden = A_Zelle · r_S158 · (t_warn,B · ΔTage_B,Zelle + t_warn,G · ΔTage_G,Zelle)``
 
-    ``a_zelle`` ist der Deckungsgrad der Maßnahmen-Geometrie in der Zelle (Anteil 0..1 —
-    im Produkt-Code, anders als im Bericht mit binärem 0/1, Muster S157/D3): außerhalb
+    ``a_zelle`` ist der Deckungsgrad der Maßnahmen-Geometrie in der Zelle (Anteil 0 bis 1,
+    wie Bericht §5.1: Anteil der Zellfläche im Geltungsbereich): außerhalb
     des Geltungsbereichs (0) entsteht keine Wirkung. ``r`` ist die Wirkung je gewarntem
     Tag (Katalog-Wert ``default_reduction`` der Maßnahme, Block ``pollen.r_s158``);
     ``t_warn_b``/``t_warn_g`` der Anteil gewarnter Zusatztage je Gruppe (Risiko-Parameter
