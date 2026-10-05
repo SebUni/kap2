@@ -1399,6 +1399,12 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                 d_vg, vg_cap = _vg_kz_factors(vg_fracs_by_cell.get(cid, []), r, d_hap)
             factor = _measure_cell_factor(mdef, measure.config, code, frac, unit_factor, r,
                                           d_hap, d_hap, s158_days_factor, d_vg, vg_cap)
+            if _is_s158(mdef) and s158_days_factor != 1.0:
+                # Doppelzähler (Befund 240, Ü-7): Der S158-Faktor ist ein Anteil an den Tagen
+                # NACH der Pflanzung (Nenner total_adj). Auf Index und Kosten des Ausgangsstands
+                # angewandt, würde er auch Tage mindern, die die Stadtbaumwahl schon vermieden
+                # hat. Deshalb Minderung = Index/Kosten × days_factor × (1 − factor).
+                factor = 1.0 - max(0.0, float(s158_days_factor)) * (1.0 - factor)
             base_idx = float(r.get("index", 0.0))
             new_idx = base_idx * factor
             deltas[code] = round(new_idx - base_idx, 3)
