@@ -342,7 +342,7 @@ def h_heim(qbar_pfl: float = 0.149, beta_pfl: float = 1.54,
 
 
 # g_S157 = (rOR · OR_ohne − 1)/(OR_ohne − 1) mit rOR 0,93 und OR_ohne 1,11 [46],
-# ungerundet 0,2936 wie im Beispiel-Block s157_berlin (Block heat.g_s157: 0,29).
+# ungerundet 0,2936 wie im Beispiel-Block s157_berlin (Block heat.g_s157: 0,2936).
 # Muss mit dem Registry-Spec g_s157 in impact/params.py übereinstimmen.
 G_S157: float = (0.93 * 1.11 - 1.0) / (1.11 - 1.0)
 
@@ -368,7 +368,7 @@ def s157_avoided_deaths(d85: float, s_gek: float | None, g_s157: float = G_S157,
     ``delta_hap`` ist der Faktor des Hitzeaktionsplans, wenn die Kommune ihn
     zugleich gewählt hat (sonst 1): S157 wirkt dann auf den schon mit δ_HAP
     gedämpften Heim-Exzess — Faktoren multipliziert, Wirkungen nicht addiert
-    (Befund 129; Berlin zusammen 1 − 0,95 × 0,294 = 72,1 %).
+    (Befund 129; Berlin zusammen 1 − 0,939 × 0,2936 = 72,4 %).
 
     ``q_pfl`` ist der Heimanteil der Zelle (Befund 146); ohne ihn gilt 0,344.
     """
@@ -444,7 +444,7 @@ def vg_avoided(x_7584: float, x_85p: float, delta: float,
 
 
 # ── Hebel öffentliche Kühlzentren (Bericht #95 §5 Z. 1203–1246, Befunde 139, 148) ──
-# δ_KZ = 1 − r_KZ × w_KZ = 1 − 0,05 × 0,71 × 3/24 = 0,9956 (Block heat.delta_kuehlzentren,
+# δ_KZ = 1 − r_KZ × w_KZ = 1 − 0,05 × 0,7064 × 3/24 = 0,995585 (Block heat.delta_kuehlzentren,
 # Band 0,982–0,9994; Abschätzung von KAP3). Der Wert steht im Registry-Parameter
 # heat.delta_kuehlzentren (impact/params.py, Spec ``delta_kuehlzentren``); dieser
 # Default liest ihn dort, damit keine zweite Zahl gepflegt wird. Die Maßnahmen-Engine
