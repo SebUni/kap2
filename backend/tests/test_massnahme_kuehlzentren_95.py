@@ -1,9 +1,9 @@
 """Öffentliche Kühlzentren an COOLING_ROOMS_DRINKING_WATER (Bericht #95 §5 Z. 1203–1246,
 Block ``heat.delta_kuehlzentren`` Kap. 7 Z. 1781–1790, Befunde 139, 148, Log 46).
 
-``ΔD_KZ = [D_75–84 + D_85+ · (1 − h_Heim)] · (1 − δ_KZ)``, δ_KZ = 1 − 0,05 × 0,71 × 3/24
-= 0,9956, im abgedeckten Teil der Kommune (wie die Schutzprogramme). Berlin (Kette):
-1.054 YLL = 169,5 Mio. €, × 0,05 × 0,089 = 0,75 Mio. € je Jahr (Z. 1228). Zusammen mit
+``ΔD_KZ = [D_75–84 + D_85+ · (1 − h_Heim)] · (1 − δ_KZ)``, δ_KZ = 1 − 0,05 × 0,7064 × 3/24
+= 0,995585, im abgedeckten Teil der Kommune (wie die Schutzprogramme). Berlin (Kette):
+1.054 YLL = 169,5 Mio. €, × 0,05 × 0,0883 = 0,75 Mio. € je Jahr (Z. 1228). Zusammen mit
 Hitzeaktionsplan und Schutzprogrammen gilt max(δ_HAP × δ_VG × δ_KZ; 0,794).
 
 DB-frei: Rechenfunktionen in ``health``, Zellfaktor der Maßnahmen-Engine und
@@ -59,7 +59,7 @@ def test_delta_kz_from_registry():
 
 
 def test_formula_deaths_berlin():
-    """ΔD_KZ = [71,4 + 153,6 × (1 − 0,344)] × 0,0044 ≈ 0,76 Todesfälle."""
+    """ΔD_KZ = [71,4 + 153,6 × (1 − 0,344)] × 0,004415 ≈ 0,76 Todesfälle."""
     d = health.kz_avoided(D75_BERLIN, D85_BERLIN)
     soll = (D75_BERLIN + D85_BERLIN * (1.0 - health.h_heim())) * (1.0 - 0.995585)
     assert d == pytest.approx(soll, rel=1e-12)
@@ -70,7 +70,7 @@ def test_formula_deaths_berlin():
 def test_berlin_chain_0_75_mio_eur():
     eur = _kz_eur()
     assert eur / 1e6 == pytest.approx(0.75, abs=0.05)
-    # Rechenweg des Berichts: 169,5 Mio. € × 0,05 × 0,089
+    # Rechenweg des Berichts: 169,5 Mio. € × 0,05 × 0,0883
     assert 169.5 * 0.05 * 0.0883 == pytest.approx(0.75, abs=0.005)
 
 

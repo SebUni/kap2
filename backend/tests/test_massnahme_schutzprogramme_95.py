@@ -125,7 +125,7 @@ def test_kappung_ueber_registry_parameter_kappung_vg():
     nicht aus einer Konstante — override_scope auf 0,85 verschiebt die Kappungshöhe
     im Aggregat (_factor) und im Einzelnutzen (_benefit_eur) gleichermaßen."""
     d_hap = 0.852
-    # δ_HAP 0,85: Produkt 0,791 < 0,794 (Default) — mit 0,85 gilt die höhere Kappung
+    # δ_HAP 0,852: Produkt 0,793 < 0,794 (Default) — mit 0,85 gilt die höhere Kappung
     assert d_hap * health.DELTA_VG < 0.794 < 0.85
     assert health.vg_effective_delta(health.DELTA_VG, d_hap, paket=0.794) != health.DELTA_VG
     assert d_hap * health.vg_effective_delta(health.DELTA_VG, d_hap, paket=0.85) == \

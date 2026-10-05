@@ -9,8 +9,8 @@ S157 wirkt nur auf max(s_gek − 0,06; 0), den Anteil über dem Stand der Kalibr
 Voreinstellung 0,05 × 24,99 = 1,2 Mio. €, alle Heimplätze gekühlt 0,94 × 24,99 = 23,5 Mio. €.
 
 Zusammen mit dem Hitzeaktionsplan (Befund 129) wirkt S157 auf den schon mit δ_HAP
-gedämpften Heim-Exzess: Berlin zusammen 72,1 %, davon S157 je vollen Anteil 35,5
-Todesfälle oder 23,7 Mio. € je Jahr.
+gedämpften Heim-Exzess: Berlin zusammen 72,4 %, davon S157 je vollen Anteil 35,1
+Todesfälle oder 23,5 Mio. € je Jahr.
 
 DB-frei: prüft die Rechenfunktion in ``health`` und den Zellfaktor der Maßnahmen-Engine
 an einer Zelle mit den Berlin-Werten aus Kette 3.0 (D_85+ = 153,6; L̄_85+ = 4,16).
@@ -174,7 +174,7 @@ def test_parameters_visible_in_registry():
         layer_code=MORT, layer_category="risks")}
     g = next(p for pid, p in params.items() if pid.endswith(".g_s157"))
     ror = next(p for pid, p in params.items() if pid.endswith(".ror_s157"))
-    # Blockwert 0,29 gerundet; gerechnet wird ungerundet wie im Beispiel s157_berlin
+    # Blockwert 0,2936 gerundet; gerechnet wird ungerundet wie im Beispiel s157_berlin
     assert round(g["value"], 4) == 0.2936 and g["evidence_class"] == "abgeschaetzt"
     assert g["value"] == pytest.approx(health.G_S157)
     assert ror["value"] == 0.93 and ror["evidence_class"] == "belegt"
@@ -197,8 +197,8 @@ def test_hap_factor_is_report_delta_hap():
     assert _delta_hap_full() == pytest.approx(0.939, abs=1e-12)
 
 
-def test_berlin_with_hap_combined_72_1_percent():
-    """Zusammen fallen 1 − 0,95 × 0,294 = 72,1 % des Heim-Exzesses weg (38,1 von 52,9)."""
+def test_berlin_with_hap_combined_72_4_percent():
+    """Zusammen fallen 1 − 0,939 × 0,2936 = 72,4 % des Heim-Exzesses weg (38,1 von 52,9)."""
     d_hap = _delta_hap_full()
     d_heim = D85_BERLIN * health.h_heim()
     s157 = health.s157_avoided_deaths(D85_BERLIN, 1.0, delta_hap=d_hap)
@@ -212,7 +212,7 @@ def test_berlin_with_hap_combined_72_1_percent():
     assert (additiv * d_heim - gesamt) == pytest.approx(2.3, abs=0.05)
 
 
-def test_berlin_with_hap_s157_35_5_deaths_and_23_7_mio_eur():
+def test_berlin_with_hap_s157_35_1_deaths_and_23_5_mio_eur():
     d_hap = _delta_hap_full()
     s157 = health.s157_avoided_deaths(D85_BERLIN, 1.0, delta_hap=d_hap)
     assert round(s157, 1) == 35.1
