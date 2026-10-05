@@ -158,6 +158,9 @@ Befundnummer — und ausdrücklich den **Prüfumfang**:
   Modellstruktur geändert wurden (§6) — im Erstdurchlauf immer, im Wiedereinstieg der Regelfall;
 - sonst Diff-Runde: geänderte Abschnitte, Regression der geschlossenen Befunde, offene Befunde.
 
+Im Abgleich Bericht ↔ Code gilt der Abschnitt „Abgleich Bericht ↔ Code“: Zwischen den Teilpaketen wird nur an den
+geänderten Stellen geprüft, die volle Prüfung ist allein die Schlussprüfung des Abgleich-Vorhabens.
+
 Für die Umsetzungskontrolle bekommt der Reviewer `ledger.py --pruefe` an die Hand: Er führt es
 aus und prüft **stichprobenhaft, ob die Prüfausdrücke das Richtige messen** — ein Ausdruck, der
 grün wird, ohne die Umsetzung zu belegen, ist selbst ein Befund. Das ist wirksamer, als
