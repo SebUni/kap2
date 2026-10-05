@@ -1961,10 +1961,13 @@ MEASURES: list[dict] = [
     # Zellgeometrie (canopy_birch_frac/canopy_unknown_frac) und führt kommunenweit nur
     # den ungetaggten Anteil s_unbek (Registry birch_group_share_default) — kein
     # eigenständiges Baumkataster je Baum.
-    # DIVERGENZ AN DEN CMO (3): Der Bericht beziffert die Kosten der Stadtbaumwahl
-    # nicht (§5 nennt keinen Kostensatz je Baum/ha für den Austausch allergener
-    # Arten). Alle Kostenfelder bleiben deshalb None (nicht anwendbar) statt eines
-    # erfundenen Werts; Herkunft s. source/source_details unten.
+    # Kosten der Stadtbaumwahl (Bericht #96 §5, Absatz „Kosten der Stadtbaumwahl“,
+    # Kap. 7.1 Block pollen.stadtbaum_kosten; Befund 253, Übernahme Ü-11): je ersetztem
+    # Baum getrennt nach Fall, als maßnahmenspezifische Zusatzfelder
+    # (zusatz_kostenfelder; MEASURE_PARAM_SPECS bleibt bei neun Feldern). Gerechnet wird
+    # mit dem Fall aus config['ersatzfall'] (measure_service._stadtbaum_kosten); ohne
+    # Fall bleibt capex_per_unit None, beide Beträge stehen nebeneinander, keine stille
+    # Vorgabe. Die Zahl der Bäume ist Pflichteingabe (count_pflicht).
     {"code": "LOW_ALLERGEN_TREE_SELECTION", "name": "Allergenarme Stadtbaumwahl",
      "description": "Ersatz allergener Straßen-/Stadtbäume (v. a. Birkengruppe) durch "
                     "allergenarme Arten in den gewählten Zellen (Bericht #96 §5, "
@@ -1974,8 +1977,11 @@ MEASURES: list[dict] = [
                     "Zelllauf über die OSM-Kronenanteile der gewählten Zellen "
                     "(canopy_birch_frac, canopy_unknown_frac) und senkt dort Ĝ, bei "
                     "festgehaltener Referenz Ḡ₀ des Ausgangsstands — kein Katalog-"
-                    "Wirkungsfaktor (default_reduction). Kosten: nicht beziffert, "
-                    "Bericht #96 nennt keine Kosten.",
+                    "Wirkungsfaktor (default_reduction). Kosten je ersetztem Baum: "
+                    "60 € bei ohnehin fälliger Nachpflanzung, 4.436 € bei "
+                    "vorgezogenem Ersatz, Preisstand 2024, Bericht #96 §5, Abschätzung "
+                    "von KAP3. Die Kommune wählt den Fall (config-Feld ersatzfall) und "
+                    "gibt die Zahl der ersetzten Bäume ein (config-Feld count).",
      "measure_type": "structural",
      "effect_target": ["hazard"], "default_reduction": None, "coverage_scaling": "linear",
      "effect_model": "stadtbaum",
@@ -1984,16 +1990,102 @@ MEASURES: list[dict] = [
      "capex_fixed": None, "capex_per_unit": None, "capex_per_m2": None,
      "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None,
      "benefit_per_m2_year": None,
-     "unit_label": None, "unit_density_per_ha": None,
-     "source": "nicht beziffert, Bericht #96 nennt keine Kosten",
-     "sources": {},
-     "source_refs": {},
-     "evidence_classes": {},
-     # Kein Katalog-Wirkungsfaktor (default_reduction None) — kein Methodik-Block hier;
-     # die Rechnung selbst steht in health.stadtbaum_g_neu (Kapitel 7, Block pollen.g_neu).
-     "methodik_bloecke": {},
-     "source_details": {},
-     "evidence_derivation": {},
+     # Zahl der ersetzten Bäume: Pflichteingabe ohne Richtwert-Dichte (count_pflicht);
+     # fehlt config['count'], steht ein Vermerk statt der Kosten (Ü-11 (c)).
+     "unit_label": "Baum", "unit_density_per_ha": None,
+     "count_pflicht": True,
+     # Kosten je ersetztem Baum nach Fall (Ü-11 (a)); OPEX bleiben None: laufende
+     # Pflege nach der Anwuchspflege ist für beide Arten gleich angesetzt (§5).
+     "capex_per_unit_nachpflanzung": 60.0,
+     "capex_per_unit_vorgezogen": 4436.0,
+     "zusatz_kostenfelder": (
+        ("capex_per_unit_nachpflanzung",
+         "CAPEX – Investition je Baum, Nachpflanzung ohnehin", "€/Baum"),
+        ("capex_per_unit_vorgezogen",
+         "CAPEX – Investition je Baum, vorgezogener Ersatz", "€/Baum"),
+     ),
+     "source": "Kosten je ersetztem Baum: 60 € bei ohnehin fälliger Nachpflanzung, "
+               "4.436 € bei vorgezogenem Ersatz, Preisstand 2024, Bericht #96 §5, "
+               "Abschätzung von KAP3",
+     "sources": {
+        "capex_per_unit_nachpflanzung": "Abschätzung von KAP3 (Preisgruppen einer "
+            "Baumschule, Bericht #96 §5)",
+        "capex_per_unit_vorgezogen": "Abschätzung von KAP3 (Pflanzkosten Hamburg 2024, "
+            "Fällung abgeschätzt, Bericht #96 §5)"},
+     "source_refs": {
+        "capex_per_unit_nachpflanzung": ["Leick_Preisliste_2024", "Berlin_Drs_19_13426",
+                                         "Hannover_Stadtbaeume_2023_2024",
+                                         "Carinanos_2019_Allergenic_Potential",
+                                         "Larsen_2002_Tilia"],
+        "capex_per_unit_vorgezogen": ["Hamburg_Drs_23_294", "Hamburg_Drs_23_5166",
+                                      "Hamburg_Drs_22_339", "Berlin_Drs_19_13426"]},
+     "evidence_classes": {"capex_per_unit_nachpflanzung": "abgeschaetzt",
+                          "capex_per_unit_vorgezogen": "abgeschaetzt"},
+     # Wirkung: kein Katalog-Wirkungsfaktor (default_reduction None), die Rechnung steht
+     # in health.stadtbaum_g_neu. Kosten: Kap. 7.1, Block pollen.stadtbaum_kosten.
+     "methodik_bloecke": {"capex_per_unit_nachpflanzung": "pollen.stadtbaum_kosten",
+                          "capex_per_unit_vorgezogen": "pollen.stadtbaum_kosten"},
+     "source_details": {
+        "capex_per_unit_nachpflanzung": "Mehrkosten der Artenwahl, wenn der allergene "
+            "Baum ohnehin fällt und am selben Standort nachgepflanzt wird: Fällung, "
+            "Pflanzung und Anwuchspflege fallen dann in jedem Fall an. Typischer Fall "
+            "Linde statt Birke: Preisgruppe II − I einer Baumschulliste für Hochstämme "
+            "18–20 cm Stammumfang, 455 € − 395 € = 60 € (Preisstand 2024). Birke ist der "
+            "meistgefällte Baum der Birkengruppe (Berlin, Hannover), Linde der "
+            "meistgepflanzte (Berlin 35 %), allergenes Potenzial „Low“. Bericht #96 §5, "
+            "Absatz „Kosten der Stadtbaumwahl“, Abschätzung von KAP3.",
+        "capex_per_unit_vorgezogen": "Ein gesunder allergener Baum wird gefällt, um ihn "
+            "früher zu ersetzen; die Maßnahme trägt alles. Pflanzung mit dreijähriger "
+            "Anwuchspflege 3.636 € (Mittel der Hamburger Straßenbaumpflanzungen 2024, "
+            "Pflege enthalten) plus Fällung 800 € (Abschätzung von KAP3: geometrisches "
+            "Mittel des Bands 400–1.600 €, Bandenden aus den Arbeitsschritten; eine "
+            "amtliche oder verbandliche Zahl je Baum fand sich in den durchsuchten "
+            "Quellen nicht) = 4.436 € (Preisstand 2024). Gegenprobe Berlin: 3.000 € "
+            "brutto (Herbst 2022), auf 2024 gerechnet 3.248 €, im Band. Bericht #96 §5, "
+            "Absatz „Kosten der Stadtbaumwahl“."},
+     "evidence_derivation": {
+        "capex_per_unit_nachpflanzung": {
+            "wert": "60 € je Baum (Preisstand 2024): Mehrkosten der Artenwahl im "
+                "typischen Fall Linde statt Birke, Preisgruppe II − I einer "
+                "Baumschulliste, 455 € − 395 € (Bericht #96 §5, Absatz „Kosten der "
+                "Stadtbaumwahl“).",
+            "band": "0–185 € je Baum: 0 €, wenn Linde eine Hainbuche oder Baumhasel "
+                "ersetzt (beide Gruppe II) oder Kugelakazie eine Birke (beide Gruppe I); "
+                "185 €, wenn statt einer Birke eine Sorte der teuersten Gruppe IV "
+                "gewählt wird (580 € − 395 €).",
+            "sensitivitaet": "Wirkt nur auf die Kosten, nicht auf Tage und "
+                "Schadensbetrag. Am Punktwert ist die Artenwahl nach rund 24 Jahren "
+                "gedeckt, mit 185 € je Baum nach 47 Jahren (Bericht #96 §5). Stärkster "
+                "Treiber ist der Fall: Der vorgezogene Ersatz kostet das 74-Fache."},
+        "capex_per_unit_vorgezogen": {
+            "wert": "4.436 € je Baum (Preisstand 2024): Pflanzung mit dreijähriger "
+                "Anwuchspflege 3.636 € (Hamburg 2024) plus Fällung 800 € (Abschätzung "
+                "von KAP3), Bericht #96 §5, Absatz „Kosten der Stadtbaumwahl“.",
+            "band": "2.800–7.200 € je Baum: Pflanzung 2.400–5.600 € plus Fällung "
+                "400–1.600 €; die Bandenden sind addiert und gelten für beide Enden "
+                "zugleich.",
+            "sensitivitaet": "Wirkt nur auf die Kosten, nicht auf Tage und "
+                "Schadensbetrag. Die Pflanzkosten am Standort bewegen den Wert um "
+                "−28 … +44 %, die Fällung um −9 … +18 % (Bericht #96 §5). Stärkster "
+                "Treiber ist der Fall: 74-mal so teuer wie die Artenwahl bei "
+                "Nachpflanzung."},
+        "capex_per_unit": {
+            "wert": "Kein einheitlicher Wert je Baum: gerechnet wird mit dem Wert des "
+                "Falls, den die Kommune in der Maßnahme wählt (Eingabe ersatzfall): "
+                "60 € je Baum bei ohnehin fälliger Nachpflanzung (Parameter ‚CAPEX – "
+                "Investition je Baum, Nachpflanzung ohnehin‘) oder 4.436 € je Baum bei "
+                "vorgezogenem Ersatz (Parameter ‚CAPEX – Investition je Baum, "
+                "vorgezogener Ersatz‘), Preisstand 2024, Bericht #96 §5. Ohne gewählten "
+                "Fall entsteht kein CAPEX; beide Beträge stehen nebeneinander.",
+            "band": "Band des gewählten Falls: 0–185 € je Baum (Nachpflanzung) oder "
+                "2.800–7.200 € je Baum (vorgezogen).",
+            "sensitivitaet": "Der Fall ist der stärkste Treiber: Der vorgezogene Ersatz "
+                "kostet das 74-Fache der Artenwahl bei Nachpflanzung (Bericht #96 §5)."},
+        "unit_density_per_ha": {
+            key: "Kein Richtwert: Die Zahl der ersetzten Bäume gibt die Kommune ein "
+                 "(Pflichteingabe); ohne Eingabe steht ein Vermerk statt der Kosten."
+            for key in ("wert", "band", "sensitivitaet")},
+     },
      # Vorgabe P1 (Vorhabenskriterium ii, T-1603-cto): nutzersichtbarer Eingabetext
      # für config['anteil_ersetzt'] samt Herkunft — kein neues Registry-Feld
      # (test_measure_pricing bindet 9 Felder je Maßnahme), deshalb NICHT in
@@ -2009,7 +2101,18 @@ MEASURES: list[dict] = [
             "OSM-Tags der gewählten Zellen (canopy_birch_frac, canopy_unknown_frac); "
             "der Anteil a ist eine Eingabe der Kommune. Gattungen aus einem "
             "Baumkataster gehen — wo vorhanden — über den Ausgangsstand "
-            "(birch_group_share_default, s_unbek) ein, nicht über diese Maßnahme."},
+            "(birch_group_share_default, s_unbek) ein, nicht über diese Maßnahme.",
+        "ersatzfall": "Fall des Ersatzes, Wert nachpflanzung oder vorgezogen (Bericht "
+            "#96 §5, Absatz „Kosten der Stadtbaumwahl“): nachpflanzung, wenn der "
+            "allergene Baum ohnehin fällt und nachgepflanzt wird (Mehrkosten der "
+            "Artenwahl, 60 € je Baum); vorgezogen, wenn ein gesunder Baum gefällt wird, "
+            "um ihn früher zu ersetzen (Fällung, Pflanzung und Anwuchspflege, 4.436 € je "
+            "Baum). Preisstand 2024, Abschätzung von KAP3. Ohne Angabe stehen beide "
+            "Beträge nebeneinander und es entsteht kein CAPEX; eine Vorgabe gibt es "
+            "nicht.",
+        "count": "Zahl der ersetzten Bäume (Pflichteingabe, kein Richtwert). Sie wirkt "
+            "nur auf die Kosten; die Wirkung rechnet über den Anteil anteil_ersetzt. "
+            "Ohne Eingabe steht ein Vermerk statt der Kosten."},
     },
     # Herleitung capex_fixed: angepasste Arbeitszeitmodelle bei Hitze verursachen im Kern nur
     # organisatorischen Aufwand (Dienstplanung, Betriebsvereinbarung); kein Marktkennwert.
