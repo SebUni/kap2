@@ -15,11 +15,15 @@ from app.services.engine.inputs import gather_cell_inputs
 from app.services.engine.parallel import cow_pool, n_workers
 from app.services.engine.indicators import compute_cell_hev
 from app.services.engine.auxiliary import build_auxiliary
-from app.services.engine import impact, risk_engine
+from app.services.engine import impact, override_context, risk_engine
 from app.services.engine.impact.base import CellContext
 from app.services.engine.progress import RISK_COMPOSE, FINALIZE, lerp
 
 log = logging.getLogger(__name__)
+
+# Vorgabewert von s_unbek (Registry ``birch_group_share_default``, wie in
+# ``indicators.pollen_load``), falls der Lauf keinen Override trägt.
+POLLEN_S_UNBEK_DEFAULT = 0.12
 
 COASTAL_BUNDESLAENDER = {
     "Schleswig-Holstein", "Mecklenburg-Vorpommern", "Niedersachsen",
@@ -108,6 +112,17 @@ def build_cell_risks(indices: dict[str, float], impacts: dict[str, dict]) -> dic
                    "green_frac"):
             if key in imp and imp[key] is not None:
                 risks[code][key] = round(imp[key], 6)
+        # s_unbek des Laufs (Registry ``birch_group_share_default``, ggf. Override der
+        # Kommune): derselbe Wert, mit dem ``indicators.pollen_load`` Ĝ dieser Zelle
+        # gebildet hat. Die Stadtbaumwahl (measure_service._stadtbaum_cell_effect) rechnet
+        # die Senkung der Kronen ohne Gattungs-Tag mit diesem Wert statt mit der
+        # Überschreibung von heute — sonst ginge Ĝ′ von einem anderen s_unbek aus als Ĝ
+        # (Ü-10, Befund 252). Nur Zellen mit Pollenrechnung (pollen_g) tragen das Feld.
+        if imp.get("pollen_g") is not None:
+            s_unbek = override_context.get_override(
+                f"risks.{code}.impact.birch_group_share_default", POLLEN_S_UNBEK_DEFAULT)
+            risks[code]["pollen_s_unbek"] = round(
+                float(POLLEN_S_UNBEK_DEFAULT if s_unbek is None else s_unbek), 6)
     return risks
 
 
