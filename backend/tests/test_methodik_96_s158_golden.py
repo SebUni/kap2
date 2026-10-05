@@ -21,13 +21,11 @@ sind linear in der Bevölkerung je Band bei gleichem P̂; die Zellbänder werden
 S158-Aufruf summiert (wie dort), statt 40.669 Einzelzellen zu durchlaufen — Ergebnis ist exakt
 dasselbe wie eine Summe über getrennte Zellaufrufe mit p_hat ≡ 1.
 
-**Divergenz Bericht ↔ Code (kein stiller Fix, Befund an den CMO, s. Ticket-Ergebnis).** Der
-Zelllauf des Berichts (Z. 1318, Z. 1366) rechnet auf 740.723 Zusatztagen (Preisstand 2024) und
-weist 16.666 Tage / ≈ 103.300 € aus; der hier gebundene Produktcode liefert auf den gepinnten
-Zelldaten 739.204,8 Zusatztage und damit 16.632 Tage / ≈ 103.119 €. Der Test bindet an den
-gemessenen Code-Wert (T-1463-ceo/T-1431-ceo: dieselbe Ursache wie 4,59 gegen 4,58 Mio. € in
-§3.0), nicht an die Berichtszahlen 16.666/103.300; die Toleranz des Prüfblocks gilt, bis der
-Bericht für den Zelllauf eine eigene nennt.
+**Zelllauf des Berichts ↔ Code.** Der Zelllauf des Berichts (§5.1) rechnet auf 399.171
+Zusatztagen (Preisstand 2024) und weist 8.981 Tage / ≈ 55.700 € aus; der hier gebundene
+Produktcode liefert auf den gepinnten Zelldaten 399.170,6 Zusatztage und damit 8.981 Tage /
+≈ 55.684 € (2,47 Mio. € je Jahr, §3.0). Der Test bindet an den gemessenen Code-Wert
+(T-1463-ceo/T-1431-ceo); die Toleranz des Prüfblocks gilt.
 
 **Nicht gebunden.** ``e_Tag``, ``q_reich`` und ``q_handel`` sind keine Produktparameter (nur
 ``r_s158`` = ihr Produkt und ``t_warn_s158`` sind Registry-/Katalogwerte, s. Bericht Kap. 7); ihr
@@ -80,51 +78,51 @@ def _kette_tage_birke_graeser() -> tuple[float, float]:
 # ── Kette Berlin (§5.1, Z. 1309–1316) ────────────────────────────────────────
 
 def test_kette_berlin_s158():
-    """Ebenen 1–5: 325.100/430.652 Tage, 566.814 gewarnt, 17.004 vermieden, ≈105.400 €."""
+    """Ebenen 1–5: 175.554/232.552 Tage, 306.080 gewarnt, 9.182 vermieden, ≈56.900 €."""
     tage_birke, tage_graeser = _kette_tage_birke_graeser()
-    assert abs(tage_birke - 325_100) < 1, f"{tage_birke:.1f}"
-    assert abs(tage_graeser - 430_652) < 1, f"{tage_graeser:.1f}"
-    assert abs((tage_birke + tage_graeser) - 755_753) < 1
+    assert abs(tage_birke - 175_554) < 1, f"{tage_birke:.1f}"
+    assert abs(tage_graeser - 232_552) < 1, f"{tage_graeser:.1f}"
+    assert abs((tage_birke + tage_graeser) - 408_106) < 1
 
     gewarnt = T_WARN * tage_birke + T_WARN * tage_graeser
-    assert abs(gewarnt - 566_814) < 1, f"{gewarnt:.1f}"
+    assert abs(gewarnt - 306_080) < 1, f"{gewarnt:.1f}"
 
     vermieden = H.s158_vermiedene_tage(tage_birke, tage_graeser, 1, R_S158, T_WARN, T_WARN)
-    assert abs(vermieden - 17_004) < 1, f"{vermieden:.1f}"
+    assert abs(vermieden - 9_182) < 1, f"{vermieden:.1f}"
 
     euro = vermieden * _c_tag()
-    assert abs(euro - 105_400) < 100, f"{euro:.1f} €"
+    assert abs(euro - 56_900) < 100, f"{euro:.1f} €"
 
 
 def test_band_s158():
-    """Bandenden (Aushang-Fall / aktivierte Warnkette): 1.889/75.575 Tage, ≈11.700/468.600 €."""
+    """Bandenden (Aushang-Fall / aktivierte Warnkette): 1.020/40.811 Tage, ≈6.300/253.000 €."""
     tage_birke, tage_graeser = _kette_tage_birke_graeser()
     c_tag = _c_tag()
 
     unten = H.s158_vermiedene_tage(tage_birke, tage_graeser, 1, 0.005, 0.50, 0.50)
-    assert abs(unten - 1_889) < 1, f"{unten:.1f}"
-    assert abs(unten * c_tag - 11_700) < 50, f"{unten * c_tag:.1f} €"
+    assert abs(unten - 1_020) < 1, f"{unten:.1f}"
+    assert abs(unten * c_tag - 6_300) < 50, f"{unten * c_tag:.1f} €"
 
     oben = H.s158_vermiedene_tage(tage_birke, tage_graeser, 1, 0.10, 1.00, 1.00)
-    assert abs(oben - 75_575) < 1, f"{oben:.1f}"
-    assert abs(oben * c_tag - 468_600) < 50, f"{oben * c_tag:.1f} €"
+    assert abs(oben - 40_811) < 1, f"{oben:.1f}"
+    assert abs(oben * c_tag - 253_000) < 50, f"{oben * c_tag:.1f} €"
 
 
 def test_t_warn_sensitivity():
-    """Sensitivität t_warn (r fest bei 0,03): 11.336 Tage (0,50) und 22.673 Tage (1,00)."""
+    """Sensitivität t_warn (r fest bei 0,03): 6.122 Tage (0,50) und 12.243 Tage (1,00)."""
     tage_birke, tage_graeser = _kette_tage_birke_graeser()
 
     tw050 = H.s158_vermiedene_tage(tage_birke, tage_graeser, 1, R_S158, 0.50, 0.50)
-    assert abs(tw050 - 11_336) < 1, f"{tw050:.1f}"
+    assert abs(tw050 - 6_122) < 1, f"{tw050:.1f}"
 
     tw100 = H.s158_vermiedene_tage(tage_birke, tage_graeser, 1, R_S158, 1.00, 1.00)
-    assert abs(tw100 - 22_673) < 1, f"{tw100:.1f}"
+    assert abs(tw100 - 12_243) < 1, f"{tw100:.1f}"
 
 
 # ── Allee-Zelle (§5.1, Z. 1320–1322) ─────────────────────────────────────────
 
 def test_allee_zelle_s158():
-    """100 Betroffene, P̂ = 1,7: 319,5 Zusatztage, 7,19 vermieden (≈45 €); A = 0 ⇒ 0."""
+    """100 Betroffene, P̂ = 1,7: 172,5 Zusatztage, 3,88 vermieden (≈24 €); A = 0 ⇒ 0."""
     _, _, roh = _tage_birke_graeser(_betraege.POP_KETTE)
     delta_birke, delta_graeser = roh["delta_birke"], roh["delta_graeser"]
 
@@ -132,11 +130,11 @@ def test_allee_zelle_s158():
     tage_birke, tage_graeser = H.pollen_zelltage(
         100, delta_birke, delta_graeser, g_zelle=2.0, g_bar0=1.0, lam=0.70)
     zelle = tage_birke + tage_graeser
-    assert abs(zelle - 319.5) < 0.05, f"{zelle:.3f}"
+    assert abs(zelle - 172.5) < 0.05, f"{zelle:.3f}"
 
     vermieden = H.s158_vermiedene_tage(tage_birke, tage_graeser, 1, R_S158, T_WARN, T_WARN)
-    assert abs(vermieden - 7.19) < 0.005, f"{vermieden:.4f}"
-    assert abs(vermieden * _c_tag() - 45) < 0.5, f"{vermieden * _c_tag():.2f} €"
+    assert abs(vermieden - 3.88) < 0.005, f"{vermieden:.4f}"
+    assert abs(vermieden * _c_tag() - 24) < 0.5, f"{vermieden * _c_tag():.2f} €"
 
     ausserhalb = H.s158_vermiedene_tage(tage_birke, tage_graeser, 0, R_S158, T_WARN, T_WARN)
     assert ausserhalb == 0.0
@@ -153,16 +151,16 @@ def test_ersetzungspfad_dwd_anteil():
 # ── Zelllauf Berlin auf den gepinnten Zelldaten (Z. 1317–1319, 1366) ─────────
 
 def test_zelllauf_berlin_golden96():
-    """A = 1: 16.632 vermiedene Tage, ≈103.119 €; Faktor 0,0225 auf die Summe (siehe Docstring)."""
+    """A = 1: 8.981 vermiedene Tage, ≈55.684 €; Faktor 0,0225 auf die Summe (siehe Docstring)."""
     zellbaender = _betraege._zellbaender(_betraege.BERLIN)
     tage_birke, tage_graeser, _ = _tage_birke_graeser(zellbaender)
     summe = tage_birke + tage_graeser
 
     vermieden = H.s158_vermiedene_tage(tage_birke, tage_graeser, 1, R_S158, T_WARN, T_WARN)
-    assert abs(vermieden - 16_632) < 1, f"{vermieden:.1f}"
+    assert abs(vermieden - 8_981) < 1, f"{vermieden:.1f}"
 
     euro = vermieden * _c_tag()
-    assert abs(euro - 103_119) < 50, f"{euro:.1f} €"
+    assert abs(euro - 55_684) < 50, f"{euro:.1f} €"
 
     faktor = R_S158 * T_WARN
     assert abs(faktor - 0.0225) < 1e-9
