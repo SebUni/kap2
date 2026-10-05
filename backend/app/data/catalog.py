@@ -1433,7 +1433,7 @@ MEASURES: list[dict] = [
                     "Warnung an Warntagen, nicht den Plan. Deshalb reicht das Band bis zu "
                     "keiner Wirkung.",
             "sensitivitaet": "Linear: Die vermiedenen Schäden der Maßnahme wachsen mit der "
-                             "Minderung; 0,148 statt 0,061 steigert sie auf das 2,4-Fache"
+                             "Minderung; 0,148 statt 0,061 steigert sie auf das 2,4-Fache "
                              "(Bericht #95 §5).",
         },
         "capex_fixed": {
