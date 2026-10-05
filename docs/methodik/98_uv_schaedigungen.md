@@ -1,7 +1,7 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 14 (Abarbeitung der Review-Runden 16–23 und Fortschreibung 7, Schritt 1; Befunde 336–479) — im Review** ·
-04.09.2026 ·
+Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–479)** ·
+05.10.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
 · Familie: **K1-Gesundheit bottom-up** (Prototyp #95; §2.6 — kein erneuter Drei-Ansätze-Vergleich)
@@ -129,6 +129,17 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > abgeleitet (W7); Lint-Ratchets gegen zu enge Ausnahmen und gegen Registry-Specs
 > ohne Parameter-Block.
 > Befund **421** stammt nicht aus einer Review-Runde, sondern ist ein Code-Nachzug aus der Ticketarbeit: ein Herleitungstext im Code war gegenüber dem Bericht stehen geblieben. Am Modell und an der Herleitung im Bericht ändert er nichts — er ist nur in der Befundspanne mitgezählt.
+>
+> **Rev. 15 (05.10.2026)** = Neufassung nach Fortschreibung 7 der Aufgabe (A-0048),
+> Runden 24–36 (Befunde 422–479). Geprüft in drei Teilen, jeder bis zu einer Null-Runde:
+> Teil 1 (bis §3.3) in Runde 24, Teil 2 (§3.4 bis Kapitel 6) in Runde 31, Teil 3
+> (Kapitel 7, 8 und Entscheidungslog) in Runde 36. Neu sind die Rechenkette in §3.0,
+> die Hebel S155 und S158 in Kapitel 5 und die Parameter-Blöcke in Kapitel 7; das
+> frühere Kapitel 9 ist aufgelöst. Neue Anlage: `backend/scripts/kalibrierung/k_uv_raumstreuung.py` +
+> `backend/data/kalibrierung/k_uv_raumstreuung.md` (räumliche Streuung von \(k_{\text{UV}}\),
+> Modellgrenze 9; Festlegung zu Befund 449: \(k_{\text{UV}}\) bleibt Bundeswert **0,7119**).
+> Bundessumme unverändert **339 Mio. €** je Jahr (Preisstand 2024). Zurückgestellt sind
+> 453, 463 und 479 (Ledger, Abschnitt »Null-Runde nach Fortschreibung 7«).
 >
 > Status je Befund in `reviews/BEFUNDE_98.md`. Diese Markdown-Datei ist die Quelle für
 > #98 (§2.7). Alle Ermessensentscheidungen im **Entscheidungslog** (Ende der Datei).
