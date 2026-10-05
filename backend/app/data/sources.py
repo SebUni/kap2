@@ -1393,6 +1393,118 @@ SOURCE_REFERENCES: dict[str, dict[str, str]] = {
                        "262500-feet-doc-7488",
         "accessed": "2026-09-27",
     },
+    # Kosten der Stadtbaumwahl (Bericht #96 §5, Kap. 7.1 pollen.stadtbaum_kosten,
+    # Quellen [75]–[82], Übernahme Ü-11).
+    "Hamburg_Drs_23_294": {
+        "ieee": "Bürgerschaft der Freien und Hansestadt Hamburg, „Stadtgrün, Klimaschutz "
+                "und nachhaltige Stadtentwicklung: Herausforderungen und Handlungsfelder "
+                "in Hamburg,“ Schriftliche Kleine Anfrage und Antwort des Senats, "
+                "Drucksache 23/294, 13. Mai 2025, Antwort zu Frage 11, S. 4. [Online]. "
+                "Verfügbar: https://www.buergerschaft-hh.de/parldok/dokument/90909/"
+                "23_00294_stadtgruen_klimaschutz_und_nachhaltige_stadtentwicklung_"
+                "herausforderungen_und_handlungsfelder_in_hamburg. [Zugriff: 29. Sep. 2026].",
+        "url": "https://www.buergerschaft-hh.de/parldok/dokument/90909/23_00294_stadtgruen_"
+               "klimaschutz_und_nachhaltige_stadtentwicklung_herausforderungen_und_"
+               "handlungsfelder_in_hamburg",
+        "archive_url": "https://web.archive.org/web/20260929162654/https://www.buergerschaft-"
+                       "hh.de/parldok/dokument/90909/23_00294_stadtgruen_klimaschutz_und_"
+                       "nachhaltige_stadtentwicklung_herausforderungen_und_handlungsfelder_"
+                       "in_hamburg",
+        "accessed": "2026-09-29",
+    },
+    "Hamburg_Drs_23_5166": {
+        "ieee": "Bürgerschaft der Freien und Hansestadt Hamburg, „Umwelt-, Klima- und "
+                "Infrastrukturpolitik in Hamburg – Sachstände, Kosten und konkrete "
+                "Umsetzung,“ Schriftliche Kleine Anfrage und Antwort des Senats, "
+                "Drucksache 23/5166, 8. Sep. 2026, Antwort zu Frage 11, S. 6. [Online]. "
+                "Verfügbar: https://www.buergerschaft-hh.de/parldok/dokument/105068/"
+                "23_05166_umwelt_klima_und_infrastrukturpolitik_in_hamburg_sachstaende_"
+                "kosten_und_konkrete_umsetzung. [Zugriff: 29. Sep. 2026].",
+        "url": "https://www.buergerschaft-hh.de/parldok/dokument/105068/23_05166_umwelt_"
+               "klima_und_infrastrukturpolitik_in_hamburg_sachstaende_kosten_und_"
+               "konkrete_umsetzung",
+        "archive_url": "https://web.archive.org/web/20260929162705/https://www.buergerschaft-"
+                       "hh.de/parldok/dokument/105068/23_05166_umwelt_klima_und_"
+                       "infrastrukturpolitik_in_hamburg_sachstaende_kosten_und_konkrete_"
+                       "umsetzung",
+        "accessed": "2026-09-29",
+    },
+    "Hamburg_Drs_22_339": {
+        "ieee": "Bürgerschaft der Freien und Hansestadt Hamburg, „Die Pflicht kommt vor der "
+                "Kür – Wie viele gefällte Bäume wurden unter dem rot-grünen Senat in "
+                "Hamburg nicht nachgepflanzt?,“ Große Anfrage und Antwort des Senats, "
+                "Drucksache 22/339, 23. Juni 2020, Vorbemerkung S. 1, Antwort zu 5 und 6, "
+                "S. 4. [Online]. Verfügbar: https://www.buergerschaft-hh.de/parldok/"
+                "dokument/70465/die_pflicht_kommt_vor_der_kuer_wie_viele_gefaellte_baeume_"
+                "wurden_unter_dem_rot_gruenen_senat_in_hamburg_nicht_nachgepflanzt.pdf. "
+                "[Zugriff: 29. Sep. 2026].",
+        "url": "https://www.buergerschaft-hh.de/parldok/dokument/70465/die_pflicht_kommt_vor_"
+               "der_kuer_wie_viele_gefaellte_baeume_wurden_unter_dem_rot_gruenen_senat_in_"
+               "hamburg_nicht_nachgepflanzt.pdf",
+        "archive_url": "https://web.archive.org/web/20240706153940/https://www.buergerschaft-"
+                       "hh.de/parldok/dokument/70465/die_pflicht_kommt_vor_der_kuer_wie_"
+                       "viele_gefaellte_baeume_wurden_unter_dem_rot_gruenen_senat_in_"
+                       "hamburg_nicht_nachgepflanzt.pdf",
+        "accessed": "2026-09-29",
+    },
+    "Berlin_Drs_19_13426": {
+        "ieee": "Abgeordnetenhaus Berlin, „Straßenbäume in Berlin,“ Schriftliche Anfrage "
+                "und Antwort der Senatsverwaltung für Umwelt, Mobilität, Verbraucher- und "
+                "Klimaschutz, Drucksache 19/13426, 12. Okt. 2022, Antwort zu 4, S. 6, mit "
+                "Anlagen (Bestand und Hauptgattungen, Stand 31.12.2021). [Online]. "
+                "Verfügbar: https://pardok.parlament-berlin.de/starweb/adis/citat/VT/19/"
+                "SchrAnfr/S19-13426.pdf. [Zugriff: 29. Sep. 2026].",
+        "url": "https://pardok.parlament-berlin.de/starweb/adis/citat/VT/19/SchrAnfr/"
+               "S19-13426.pdf",
+        "archive_url": "https://web.archive.org/web/20250719053309/https://pardok.parlament-"
+                       "berlin.de/starweb/adis/citat/VT/19/SchrAnfr/S19-13426.pdf",
+        "accessed": "2026-09-29",
+    },
+    "Leick_Preisliste_2024": {
+        "ieee": "Leick Pflanzen & Gärten (Baumschule), „Preisliste, gültig ab dem "
+                "14.02.2024,“ Laubbäume, S. 26 f. (Hochstämme 18–20 cm Stammumfang, "
+                "Preisgruppen I–IV). [Online]. Verfügbar: https://www.leick.de/wp-content/"
+                "uploads/2022/03/Preisliste_2022.pdf. [Zugriff: 29. Sep. 2026].",
+        "url": "https://www.leick.de/wp-content/uploads/2022/03/Preisliste_2022.pdf",
+        "archive_url": "https://web.archive.org/web/20260929162721/https://www.leick.de/"
+                       "wp-content/uploads/2022/03/Preisliste_2022.pdf",
+        "accessed": "2026-09-29",
+    },
+    "Larsen_2002_Tilia": {
+        "ieee": "F. K. Larsen und P. Kristoffersen, „Tilia’s Physical Dimensions Over "
+                "Time,“ Journal of Arboriculture, Jg. 28, Nr. 5, S. 209–214, 2002, "
+                "doi: 10.48044/jauf.2002.031. [Online]. Verfügbar: https://auf.isa-arbor."
+                "com/content/isa/28/5/209.full.pdf. [Zugriff: 29. Sep. 2026].",
+        "url": "https://auf.isa-arbor.com/content/isa/28/5/209.full.pdf",
+        "archive_url": "https://web.archive.org/web/20260425090058/https://auf.isa-arbor.com/"
+                       "content/isa/28/5/209.full.pdf",
+        "accessed": "2026-09-29",
+    },
+    "Carinanos_2019_Allergenic_Potential": {
+        "ieee": "P. Cariñanos, F. Grilo, P. Pinho u. a., „Estimation of the Allergenic "
+                "Potential of Urban Trees and Urban Parks: Towards the Healthy Design of "
+                "Urban Green Spaces of the Future,“ International Journal of Environmental "
+                "Research and Public Health, Jg. 16, Nr. 8, Art. 1357, 2019, "
+                "doi: 10.3390/ijerph16081357. [Online]. Verfügbar: https://www.mdpi.com/"
+                "1660-4601/16/8/1357. [Zugriff: 29. Sep. 2026].",
+        "url": "https://www.mdpi.com/1660-4601/16/8/1357",
+        "archive_url": "https://web.archive.org/web/20260425042213/https://www.mdpi.com/"
+                       "1660-4601/16/8/1357",
+        "accessed": "2026-09-29",
+    },
+    "Hannover_Stadtbaeume_2023_2024": {
+        "ieee": "Landeshauptstadt Hannover, „Stadtbäume der Landeshauptstadt Hannover. "
+                "Jahresbericht 2023/2024,“ Anlage 1 zu einer Drucksache, Sachgebiet 67.33, "
+                "Stand 12.11.2025, S. 9, 10 und 19. [Online]. Verfügbar: "
+                "https://www.hannover.de/content/download/1059971/file/Jahresbericht%20"
+                "Stadtb%C3%A4ume%202023-2024%20Anlage.pdf. [Zugriff: 29. Sep. 2026].",
+        "url": "https://www.hannover.de/content/download/1059971/file/Jahresbericht%20"
+               "Stadtb%C3%A4ume%202023-2024%20Anlage.pdf",
+        "archive_url": "https://web.archive.org/web/20260515080623/https://www.hannover.de/"
+                       "content/download/1059971/file/Jahresbericht%20Stadtb%C3%A4ume%20"
+                       "2023-2024%20Anlage.pdf",
+        "accessed": "2026-09-29",
+    },
 }
 
 

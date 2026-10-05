@@ -693,6 +693,61 @@ def _stadtbaum_summary_fields(mdef: dict, avoided_days_total: float, avoided_day
     }
 
 
+# Kosten der Stadtbaumwahl (Bericht #96 §5, Absatz „Kosten der Stadtbaumwahl“, Kap. 7.1
+# Block pollen.stadtbaum_kosten; Befund 253, Übernahme Ü-11 (b), (c)): je ersetztem Baum
+# nach dem Fall, den die Kommune wählt (config['ersatzfall']). Ohne Fall kein CAPEX und
+# keine Kosten-Nutzen-Kennzahl, beide Beträge nebeneinander; eine stille Vorgabe auf
+# einen Fall gibt es nicht. Ohne Zahl der Bäume ein Vermerk statt eines Betrags.
+STADTBAUM_ERSATZFAELLE = ("nachpflanzung", "vorgezogen")
+STADTBAUM_FALL_WAEHLEN_TEXT = "Fall wählen: Nachpflanzung ohnehin oder vorgezogener Ersatz"
+STADTBAUM_COUNT_FEHLT_TEXT = "Zahl der ersetzten Bäume eingeben"
+STADTBAUM_NACHPFLANZUNG_HINWEIS = (
+    "Der Nutzen je Jahr gilt erst mit voller Krone der sonst gepflanzten Bäume; "
+    "Amortisation am Punktwert nach rund 24 Jahren (Bericht #96 §5)")
+
+
+def _stadtbaum_kosten(mdef: dict, config: dict | None, count: int) -> tuple[dict, dict]:
+    """(Definition für ``compute_costs``, Zusatzfelder des impact_summary) der Stadtbaumwahl.
+
+    Mit gewähltem Fall und Stückzahl setzt die Funktion ``capex_per_unit`` (samt Quelle
+    und Herleitung) aus dem aufgelösten Zusatzfeld ``capex_per_unit_<fall>``. Ohne Fall
+    bleibt ``capex_per_unit`` None; das summary führt ``capex_je_fall`` mit beiden
+    Beträgen und den Vermerk, den Fall zu wählen. Ohne Stückzahl steht der Vermerk
+    ``STADTBAUM_COUNT_FEHLT_TEXT`` statt eines Betrags.
+    """
+    if not _is_stadtbaum(mdef) or not mdef.get("zusatz_kostenfelder"):
+        return mdef, {}
+    fall = (config or {}).get("ersatzfall")
+    count_fehlt = mdef.get("count_pflicht") and (config or {}).get("count") is None
+    felder: dict = {"ersatzfall": fall if fall in STADTBAUM_ERSATZFAELLE else None}
+    if count_fehlt:
+        felder["kosten_vermerk"] = STADTBAUM_COUNT_FEHLT_TEXT
+        felder["kosten_nutzen_kennzahl_offen"] = True
+        return mdef, felder
+    if fall not in STADTBAUM_ERSATZFAELLE:
+        felder["capex_je_fall"] = {
+            f: round(count * float(mdef.get(f"capex_per_unit_{f}") or 0.0), 2)
+            for f in STADTBAUM_ERSATZFAELLE}
+        felder["kosten_vermerk"] = STADTBAUM_FALL_WAEHLEN_TEXT
+        felder["kosten_nutzen_kennzahl_offen"] = True
+        return mdef, felder
+    quelle = f"capex_per_unit_{fall}"
+    out = dict(mdef)
+    out["capex_per_unit"] = mdef.get(quelle)
+    for name in ("sources", "source_details", "source_refs"):
+        karte = dict(mdef.get(name) or {})
+        if quelle in karte:
+            karte["capex_per_unit"] = karte[quelle]
+        out[name] = karte
+    custom = dict(mdef.get("custom_sources") or {})
+    if quelle in custom:
+        custom["capex_per_unit"] = custom[quelle]
+    out["custom_sources"] = custom
+    if fall == "nachpflanzung":
+        felder["stadtbaum_kosten_hinweis"] = STADTBAUM_NACHPFLANZUNG_HINWEIS
+    return out, felder
+
+
 def _stadtbaum_cell_factor(config: dict | None, frac: float, cell_risk: dict) -> float:
     """Faktor (0..1) auf das Symptomtage-Outcome einer Zelle durch die Stadtbaumwahl.
 
@@ -929,9 +984,16 @@ def _resolve_count(
     """
     if mdef.get("unit_label") is None:
         return 0, False, 0
+    raw = (config or {}).get("count")
+    if mdef.get("count_pflicht") and mdef.get("unit_density_per_ha") is None:
+        # Pflichteingabe ohne Richtwert (Stadtbaumwahl, Bericht #96 §5, Ü-11 (c)): ohne
+        # Eingabe keine Richtwert-Anzahl, sondern (0, False, 0) und ein Vermerk statt
+        # der Kosten; die Stückzahl skaliert die Wirkung nicht (Richtwert 0).
+        if raw is None:
+            return 0, False, 0
+        return max(0, int(round(float(raw)))), False, 0
     density = float(mdef.get("unit_density_per_ha") or 0.0)
     recommended = max(1, round(density * covered_area_m2 / 10_000))
-    raw = (config or {}).get("count")
     if raw is None:
         return recommended, True, recommended
     return max(0, int(round(float(raw)))), False, recommended
@@ -1123,7 +1185,8 @@ def _params_fingerprint(db: Session, measure: AdaptationMeasure, mdef: dict,
     cells_marker = db.query(sa_func.max(CellAssessment.calculated_at)).filter(
         CellAssessment.kommune_id == measure.kommune_id).scalar()
     payload = {
-        "mdef": {k: mdef.get(k) for k in _FINGERPRINT_MDEF_FIELDS},
+        "mdef": {k: mdef.get(k) for k in _FINGERPRINT_MDEF_FIELDS
+                 + tuple(f for f, _, _ in (mdef.get("zusatz_kostenfelder") or ()))},
         "overrides": sorted((str(k), str(v)) for k, v in (overrides or {}).items()),
         "config": measure.config or {},
         "model_version": catalog.MODEL_VERSION,
@@ -1459,8 +1522,10 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         stadtbaum_missing_reason = "canopy"
     stadtbaum_avoided_days_eur = annual_benefit_damage if _is_stadtbaum(mdef) else 0.0
 
-    # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente)
-    cost_breakdown = compute_costs(mdef, count, covered_area_m2)
+    # Kosten (CAPEX + OPEX, je fix/Stück/Fläche; None-Felder erzeugen keine Komponente).
+    # Stadtbaumwahl: capex_per_unit aus dem Zusatzfeld des gewählten Falls (Ü-11 (b)).
+    cost_mdef, stadtbaum_kosten_felder = _stadtbaum_kosten(mdef, measure.config, count)
+    cost_breakdown = compute_costs(cost_mdef, count, covered_area_m2)
     capex = cost_breakdown["capex"]["total_eur"]
     opex_annual = cost_breakdown["opex"]["total_eur"]
     annual_benefit_direct = float(mdef.get("benefit_per_m2_year") or 0.0) * covered_area_m2
@@ -1517,6 +1582,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # anteil_ersetzt bzw. ohne Baumkronen in den abgedeckten Zellen.
         **_stadtbaum_summary_fields(mdef, stadtbaum_avoided_days_total,
                                     stadtbaum_avoided_days_eur, stadtbaum_missing_reason),
+        # Kosten der Stadtbaumwahl (Ü-11): gewählter Fall, ohne Fall beide Beträge
+        # nebeneinander (capex_je_fall) und Vermerk, ohne Stückzahl Vermerk statt Betrag.
+        **stadtbaum_kosten_felder,
         # Befund 126: Schutzprogramme zusammen mit dem Hitzeaktionsplan (mit Kappung 0,794)
         **({"vg_with_hap": bool(hap_by_cell)} if _is_vg(mdef) else {}),
         "params_fingerprint": fingerprint,

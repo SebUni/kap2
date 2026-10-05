@@ -282,7 +282,10 @@ def catalog_parameters(layer_code: str | None = None, layer_category: str | None
             continue
         if layer_code and m["code"] != layer_code:
             continue
-        for field, label, unit in MEASURE_PARAM_SPECS:
+        # Maßnahmenspezifische Zusatzfelder (``zusatz_kostenfelder``, etwa die Kosten je
+        # Baum nach Fall der Stadtbaumwahl, Bericht #96 §5, Ü-11) hängen an der Maßnahme;
+        # MEASURE_PARAM_SPECS bleibt bei den neun gemeinsamen Feldern.
+        for field, label, unit in MEASURE_PARAM_SPECS + tuple(m.get("zusatz_kostenfelder") or ()):
             applicable = m.get(field) is not None
             source = (m.get("sources") or {}).get(field) or m.get("source") \
                 or "Modellannahme (Maßnahmenkosten, unbelegt)"
@@ -563,7 +566,8 @@ def resolve_measure_def(mdef: dict, overrides: dict[str, Any] | None = None) -> 
     ov = overrides or {}
     code = mdef["code"]
     out = dict(mdef)
-    for field in MEASURE_OVERRIDE_FIELDS:
+    zusatz = tuple(field for field, _, _ in (mdef.get("zusatz_kostenfelder") or ()))
+    for field in MEASURE_OVERRIDE_FIELDS + zusatz:
         val = ov.get(f"measures.{code}.{field}")
         if val is not None:
             out[field] = float(val)
