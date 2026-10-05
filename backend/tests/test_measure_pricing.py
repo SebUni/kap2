@@ -79,13 +79,24 @@ def test_every_measure_has_all_cost_field_slots():
     assert not bad, f"Fehlende Kostenfeld-Slots: {bad}"
 
 
+def _zusatzfelder(m: dict) -> tuple[str, ...]:
+    """Maßnahmenspezifische Zusatzfelder (``zusatz_kostenfelder``, Ü-11 zu Befund 253)."""
+    return tuple(field for field, _, _ in (m.get("zusatz_kostenfelder") or ()))
+
+
 def test_unit_label_implies_density_and_a_unit_cost_field():
+    # Ü-11 (Befund 253): Eine Stück-Maßnahme ohne Richtwert-Dichte ist zulässig, wenn die
+    # Stückzahl Pflichteingabe ist (count_pflicht); ihr Stückkostenfeld darf ein
+    # Zusatzfeld capex_per_unit_* sein (Kosten je Baum nach Fall der Stadtbaumwahl).
     bad = []
     for m in _ALL_MEASURES:
         if m.get("unit_label") is not None:
-            if m.get("unit_density_per_ha") is None:
+            if m.get("unit_density_per_ha") is None and not m.get("count_pflicht"):
                 bad.append((m["code"], "unit_density_per_ha fehlt trotz unit_label"))
-            if m.get("capex_per_unit") is None and m.get("opex_per_unit_year") is None:
+            zusatz_stueck = any(m.get(f) is not None for f in _zusatzfelder(m)
+                                if f.startswith("capex_per_unit_"))
+            if (m.get("capex_per_unit") is None and m.get("opex_per_unit_year") is None
+                    and not zusatz_stueck):
                 bad.append((m["code"], "weder capex_per_unit noch opex_per_unit_year gesetzt"))
         else:
             if m.get("unit_density_per_ha") is not None:
@@ -101,7 +112,7 @@ def test_source_maps_keys_are_valid_field_names():
     for m in _ALL_MEASURES:
         for mapname in ("sources", "source_details", "source_refs"):
             for key in (m.get(mapname) or {}).keys():
-                if key not in _ALL_NUMERIC_FIELDS:
+                if key not in _ALL_NUMERIC_FIELDS + _zusatzfelder(m):
                     bad.append((m["code"], mapname, key))
     assert not bad, f"Ungültige Quellen-Map-Keys: {bad}"
 
@@ -275,7 +286,11 @@ def test_measure_param_specs_has_nine_entries():
 def test_registry_applicable_and_editable_match_none_fields():
     for m in catalog.MEASURES:
         params = parameter_registry.catalog_parameters(layer_code=m["code"], layer_category="measures")
-        assert len(params) == 9, f"{m['code']}: erwartet 9 Parameter, bekommen {len(params)}"
+        # 9 gemeinsame Felder plus die Zusatzfelder der Maßnahme (Ü-11: 11 für
+        # LOW_ALLERGEN_TREE_SELECTION, 9 für alle übrigen).
+        soll = 9 + len(_zusatzfelder(m))
+        assert soll == (11 if m["code"] == "LOW_ALLERGEN_TREE_SELECTION" else 9)
+        assert len(params) == soll, f"{m['code']}: erwartet {soll} Parameter, bekommen {len(params)}"
         for p in params:
             field = p["id"].rsplit(".", 1)[-1]
             expected_applicable = m.get(field) is not None
@@ -308,6 +323,32 @@ def test_resolve_measure_def_applies_all_nine_override_fields():
     resolved = parameter_registry.resolve_measure_def(mdef, overrides)
     for idx, field in enumerate(parameter_registry.MEASURE_OVERRIDE_FIELDS):
         assert resolved[field] == idx + 1.0, f"Override für {field} nicht angewendet"
+
+
+def test_resolve_measure_def_wendet_zusatzfelder_an():
+    """Ü-11 (a): Überschreibungen wirken auch auf die Zusatzfelder der Maßnahme."""
+    code = "LOW_ALLERGEN_TREE_SELECTION"
+    mdef = catalog.MEASURES_BY_CODE[code]
+    assert mdef["capex_per_unit_nachpflanzung"] == 60.0
+    assert mdef["capex_per_unit_vorgezogen"] == 4436.0
+    resolved = parameter_registry.resolve_measure_def(
+        mdef, {f"measures.{code}.capex_per_unit_nachpflanzung": 75})
+    assert resolved["capex_per_unit_nachpflanzung"] == 75.0
+    assert resolved["capex_per_unit_vorgezogen"] == 4436.0
+    assert resolved["capex_per_unit"] is None
+    # Die Registry führt beide Zusatzzeilen anwendbar, editierbar, abgeschätzt, mit Block.
+    params = {p["id"]: p for p in parameter_registry.catalog_parameters(
+        layer_code=code, layer_category="measures")}
+    for fall in ("nachpflanzung", "vorgezogen"):
+        p = params[f"measures.{code}.capex_per_unit_{fall}"]
+        assert p["applicable"] and p["editable"]
+        assert p["evidence_class"] == "abgeschaetzt"
+        assert p["methodik_block"] == "pollen.stadtbaum_kosten"
+        assert set(p["evidence_derivation"]) >= {"wert", "band", "sensitivitaet"}
+    for field in ("capex_per_unit", "unit_density_per_ha"):
+        p = params[f"measures.{code}.{field}"]
+        assert not p["applicable"] and not p["editable"] and p["value"] == 0.0
+        assert p["evidence_derivation"] != parameter_registry._NOT_APPLICABLE_DERIVATION
 
 
 if __name__ == "__main__":
