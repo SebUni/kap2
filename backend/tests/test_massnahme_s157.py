@@ -198,7 +198,7 @@ def test_hap_factor_is_report_delta_hap():
 
 
 def test_berlin_with_hap_combined_72_4_percent():
-    """Zusammen fallen 1 − 0,939 × 0,2936 = 72,4 % des Heim-Exzesses weg (38,1 von 52,9)."""
+    """Zusammen fallen 1 − 0,939 × 0,2936 = 72,4 % des Heim-Exzesses weg (38,3 von 52,9)."""
     d_hap = _delta_hap_full()
     d_heim = D85_BERLIN * health.h_heim()
     s157 = health.s157_avoided_deaths(D85_BERLIN, 1.0, delta_hap=d_hap)
