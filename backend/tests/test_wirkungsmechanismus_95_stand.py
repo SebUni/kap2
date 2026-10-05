@@ -1,4 +1,4 @@
-"""Die Wirkungsmechanismus-Vorschau #95 liest Revision und Integrationsstand aus dem Bericht (T-1365)."""
+"""Die Wirkungsmechanismus-Vorschau #95 liest aus dem Bericht nur die Revision (T-1365, T-1679)."""
 import importlib.util
 import re
 from pathlib import Path
@@ -20,14 +20,13 @@ def test_revision_stammt_aus_der_statuszeile():
     assert _modul().bericht_stand("95")["revision"] == soll
 
 
-def test_payload_zeigt_revision_und_integrationsstand():
+def test_payload_zeigt_revision_ohne_umsetzungsstand():
     m = _modul()
     stand = m.bericht_stand("95")
     payload = m.build_payload("95")
     assert stand["revision"] in payload["tabs"][0]["label"]
     assert stand["revision"] in payload["subtitle"]
-    assert stand["integration"] in payload["banner"]
-    assert stand["integration"].startswith("Im Produkt stehen noch aus:")
+    assert "integration" not in stand
 
 
 def test_keine_festen_staende_mehr_im_skript():
