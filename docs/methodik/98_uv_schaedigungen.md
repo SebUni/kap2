@@ -2082,7 +2082,10 @@ verifiziert/neu gezogen). **Archiv-Snapshots:** wie #95 Kap. 8 (Ratchet bei Inte
   klein und teils gegenläufig; der Wert 8,51 % trägt. Die Kontrollgröße
   „Punktmittel ≈ Flächenmittel" belegt sie **nicht** (sie mittelt über Gemeinden, nicht
   über Fläche: RP 2.266 Punkte für 4,1 Mio. EW gegen NRW 395 Punkte für 17,8 Mio. EW) —
-  sie zeigt nur, dass die Punktablesung als solche unverzerrt ist.
+  sie zeigt nur, dass die Punktablesung als solche unverzerrt ist. **Fundstelle der drei
+  Näherungswerte:** Sie stehen nicht in der Ergebnisdatei `ssd_povw.md`, sondern im Kopftext
+  des Skripts `backend/scripts/kalibrierung/ssd_povw.py`, Absatz „Gekennzeichnete
+  Näherungen" (Zeilen 25–30), und im Befund-Ledger `reviews/BEFUNDE_98.md`, Befund 235.
 - **[73]** \(k_{\text{UV}}\)-Herleitung auf Rasterskala (Befunde 230/238/239/245/252/255/256):
   `backend/scripts/kalibrierung/k_uv_herleitung.py` →
   `backend/data/kalibrierung/k_uv_herleitung.{csv,md}` (Lauf 01.09.2026):
