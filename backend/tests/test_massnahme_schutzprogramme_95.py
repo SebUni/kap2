@@ -107,13 +107,13 @@ def test_band_upper_end_is_package_value_34_9_mio_eur():
 
 
 def test_kappung_0_794_with_heat_action_plan():
-    # zentral 0,95 × 0,931 = 0,885, keine Kappung
-    assert 0.95 * health.vg_effective_delta(health.DELTA_VG, 0.95) == \
-        pytest.approx(0.885, abs=0.001)
-    assert health.vg_effective_delta(health.DELTA_VG, 0.95) == health.DELTA_VG
-    # δ_HAP 0,85: Produkt 0,791 < 0,794 — es gilt 0,794
-    assert 0.85 * health.DELTA_VG < 0.794
-    assert 0.85 * health.vg_effective_delta(health.DELTA_VG, 0.85) == \
+    # zentral 0,939 × 0,931 = 0,874, keine Kappung
+    assert 0.939 * health.vg_effective_delta(health.DELTA_VG, 0.939) == \
+        pytest.approx(0.874, abs=0.001)
+    assert health.vg_effective_delta(health.DELTA_VG, 0.939) == health.DELTA_VG
+    # δ_HAP 0,852: Produkt 0,793 < 0,794 — es gilt 0,794
+    assert 0.852 * health.DELTA_VG < 0.794
+    assert 0.852 * health.vg_effective_delta(health.DELTA_VG, 0.852) == \
         pytest.approx(0.794, abs=1e-12)
     # ohne Hitzeaktionsplan gilt δ_VG, nie unter 0,794
     assert health.vg_effective_delta(health.DELTA_VG, 1.0) == health.DELTA_VG
@@ -124,11 +124,11 @@ def test_kappung_ueber_registry_parameter_kappung_vg():
     """Befund 151: Kappung kommt aus risks.EXPECTED_ANNUAL_MORTALITY.impact.kappung_vg,
     nicht aus einer Konstante — override_scope auf 0,85 verschiebt die Kappungshöhe
     im Aggregat (_factor) und im Einzelnutzen (_benefit_eur) gleichermaßen."""
-    d_hap = 0.85
+    d_hap = 0.852
     # δ_HAP 0,85: Produkt 0,791 < 0,794 (Default) — mit 0,85 gilt die höhere Kappung
     assert d_hap * health.DELTA_VG < 0.794 < 0.85
     assert health.vg_effective_delta(health.DELTA_VG, d_hap, paket=0.794) != health.DELTA_VG
-    assert 0.85 * health.vg_effective_delta(health.DELTA_VG, d_hap, paket=0.85) == \
+    assert d_hap * health.vg_effective_delta(health.DELTA_VG, d_hap, paket=0.85) == \
         pytest.approx(0.85, abs=1e-12)
 
     cell = _berlin_mort_cell()
@@ -144,8 +144,9 @@ def test_kappung_ueber_registry_parameter_kappung_vg():
         aggregat_override = base * (1.0 - d_hap * _factor(MORT, cell, 1.0, d_hap))
         assert override_eur == pytest.approx(aggregat_override, rel=1e-9)
         # Mit Kappung 0,85 als Untergrenze greift sie sofort auf δ_HAP × δ_VG = 0,85:
-        # keine Wirkung der Schutzprogramme mehr auf 75–84/85+ ohne Heim
-        assert override_eur == pytest.approx(einzel_hap, rel=1e-9)
+        # nahezu keine Wirkung der Schutzprogramme mehr auf 75–84/85+ ohne Heim
+        # (δ_HAP 0,852 liegt knapp über 0,85, der Restnutzen bleibt unter 1 % des HAP-Anteils)
+        assert override_eur == pytest.approx(einzel_hap, rel=1e-2)
 
     # Nach dem Scope gilt wieder der Registry-Default 0,794 (kein Leck der Overrides)
     assert (einzel_hap + _benefit_eur(d_hap)) == pytest.approx(default_eur, rel=1e-9)
@@ -163,7 +164,7 @@ def test_kappung_in_cell_factor_berlin():
     eur_7585 = health.vg_avoided(D75_BERLIN * health.AGE_LIFE_YEARS["a75_84"],
                                  D85_BERLIN * health.AGE_LIFE_YEARS["a85p"], 0.0) \
         * base / cell["outcome"]
-    for d_hap, soll in ((0.95, 0.885), (0.85, 0.794)):
+    for d_hap, soll in ((0.939, 0.874), (0.852, 0.794)):
         einzel_hap = eur_7585 * (1.0 - d_hap)
         gesamt = einzel_hap + _benefit_eur(d_hap)
         assert gesamt / eur_7585 == pytest.approx(1.0 - soll, abs=0.001)
@@ -172,7 +173,7 @@ def test_kappung_in_cell_factor_berlin():
 def test_sum_of_single_benefits_equals_aggregate_with_both():
     cell = _berlin_mort_cell()
     base = risk_engine.cost_from_outcome(catalog.RISKS_BY_CODE[MORT], cell["outcome"])
-    for d_hap in (0.95, 0.85):
+    for d_hap in (0.939, 0.852):
         # Aggregat „mit Maßnahmen“: Faktoren multipliziert, δ_VG dort nur gekappt
         aggregat = base * (1.0 - d_hap * _factor(MORT, cell, 1.0, d_hap))
         einzel = base * (1.0 - d_hap) + _benefit_eur(d_hap)
