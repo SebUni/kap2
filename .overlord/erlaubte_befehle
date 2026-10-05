@@ -1,2 +1,6 @@
 # Befehle, die gesteuerte Läufe direkt aufrufen dürfen: der Testlauf des Produkts. Siehe docs/BETRIEB.md.
 bash scripts/testlauf.sh
+# L6-Export der Methodik-Berichte (Lese-PDF und Übersicht), aufgerufen als bash scripts/export_methodik_pdf.sh <nr>.
+bash scripts/export_methodik_pdf.sh
+# Layout-Stichprobe des Exports: einzelne PDF-Seiten als Bild ansehen.
+pdftoppm
