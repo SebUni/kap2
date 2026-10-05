@@ -612,6 +612,41 @@ STADTBAUM_NO_CANOPY_TEXT = ("kein Betrag: abgedeckte Zellen führen im Ausgangss
                             "keine Baumkronen, dort ist nichts zu ersetzen")
 
 
+# Ü-10 (Befund 252): s_unbek der Stadtbaumwahl ist der des Ausgangslaufs (Zellfeld
+# ``pollen_s_unbek``), nicht die Überschreibung von heute. Ĝ der Zelle ist im Lauf mit
+# diesem Wert gebildet; Ĝ′ mit einem anderen s_unbek zu bilden, mischte zwei Stände
+# (Ĝ − w_B·s_unbek,neu·dk). Eine Überschreibung gilt deshalb erst mit einem neuen
+# Zelllauf — das impact_summary sagt das, statt still mit dem alten Wert zu rechnen.
+STADTBAUM_S_UNBEK_ABWEICHUNG = "ueberschreibung_erst_mit_neuem_lauf"
+STADTBAUM_S_UNBEK_ALTLAUF = "ausgangslauf_ohne_s_unbek"
+
+
+def _stadtbaum_s_unbek(cell_risk: dict) -> tuple[float, str | None]:
+    """(s_unbek für die Senkung, Lage) einer Zelle.
+
+    Der Wert ist ``pollen_s_unbek`` des gespeicherten Ausgangslaufs. Lage
+    ``STADTBAUM_S_UNBEK_ABWEICHUNG``: die Überschreibung von heute weicht davon ab und
+    gilt erst mit einem neuen Zelllauf. Lage ``STADTBAUM_S_UNBEK_ALTLAUF``: der Lauf
+    stammt von vor dieser Änderung und trägt das Feld nicht — die Senkung rechnet dann
+    mit dem Wert von heute, der Ausgangslauf ist neu zu rechnen. ``None``: kein Hinweis.
+    """
+    heute = override_context.get_override(
+        f"risks.{ALLERGY_RISK_CODE}.impact.birch_group_share_default", 0.12)
+    heute = 0.12 if heute is None else float(heute)
+    lauf = cell_risk.get("pollen_s_unbek")
+    if lauf is None:
+        return heute, STADTBAUM_S_UNBEK_ALTLAUF
+    lauf = float(lauf)
+    if abs(lauf - heute) > 1e-9:
+        return lauf, STADTBAUM_S_UNBEK_ABWEICHUNG
+    return lauf, None
+
+
+def _de_zahl(x: float) -> str:
+    """Zahl mit Dezimalkomma, ohne angehängte Nullen (``0,12``, ``0,25``)."""
+    return f"{x:.4f}".rstrip("0").rstrip(".").replace(".", ",")
+
+
 def _stadtbaum_cell_effect(config: dict | None, frac: float, cell_risk: dict
                           ) -> tuple[float, float | None, str | None]:
     """(Faktor, vermiedene Zusatztage, fehlende Eingabe) einer Zelle durch die
@@ -628,6 +663,10 @@ def _stadtbaum_cell_effect(config: dict | None, frac: float, cell_risk: dict
     nichts zu ersetzen. ``None`` als dritte Rückgabe heißt: keine dieser Lagen —
     entweder die Zelle liegt außerhalb der Deckung/hat keine Roheingaben (Alt-Zelle,
     kein eigener Grund) oder es entsteht eine reguläre Zahl.
+
+    s_unbek ist das des Ausgangslaufs (Zellfeld ``pollen_s_unbek``, ``_stadtbaum_s_unbek``),
+    nicht die Überschreibung von heute; fehlt das Feld (Lauf vor Ü-10), gilt der Wert von
+    heute und das impact_summary verlangt den neuen Ausgangslauf.
     """
     from app.services.engine.impact import health
 
@@ -657,7 +696,7 @@ def _stadtbaum_cell_effect(config: dict | None, frac: float, cell_risk: dict
         return float(v) if v is not None else default
 
     lam = _p("lambda_veg", 0.70)
-    s_unbek = _p("birch_group_share_default", 0.12)
+    s_unbek, _ = _stadtbaum_s_unbek(cell_risk)
 
     dk_birke = a * frac * float(k_birke)
     dk_unbek = a * frac * float(k_unbek)
@@ -676,8 +715,35 @@ def _stadtbaum_cell_effect(config: dict | None, frac: float, cell_risk: dict
     return factor, total0 - total1, None
 
 
+def _stadtbaum_s_unbek_hinweis(s_unbek_lagen: dict[str, set[float]]) -> dict:
+    """Hinweisfelder zu s_unbek der Stadtbaumwahl (Ü-10, Befund 252).
+
+    ``s_unbek_lagen`` ordnet je Lage (``STADTBAUM_S_UNBEK_ABWEICHUNG``/``…_ALTLAUF``) die
+    Werte zu, mit denen Zellen gerechnet haben. Leer: kein Hinweis, kein Feld.
+    """
+    heute = override_context.get_override(
+        f"risks.{ALLERGY_RISK_CODE}.impact.birch_group_share_default", 0.12)
+    heute = 0.12 if heute is None else float(heute)
+    texte: list[str] = []
+    abw = s_unbek_lagen.get(STADTBAUM_S_UNBEK_ABWEICHUNG)
+    if abw:
+        werte = " und ".join(_de_zahl(w) for w in sorted(abw))
+        texte.append(
+            f"Die Überschreibung von s_unbek ({_de_zahl(heute)}) gilt erst mit einem neuen "
+            f"Zelllauf; die Senkung rechnet mit s_unbek = {werte} des Ausgangslaufs.")
+    if s_unbek_lagen.get(STADTBAUM_S_UNBEK_ALTLAUF):
+        texte.append(
+            "Der Ausgangslauf stammt von vor dieser Änderung und trägt s_unbek nicht; die "
+            f"Senkung rechnet mit s_unbek = {_de_zahl(heute)}. Der Ausgangslauf ist neu zu "
+            "rechnen.")
+    if not texte:
+        return {}
+    return {"stadtbaum_s_unbek_hinweis": " ".join(texte)}
+
+
 def _stadtbaum_summary_fields(mdef: dict, avoided_days_total: float, avoided_days_eur: float,
-                              missing_reason: str | None) -> dict:
+                              missing_reason: str | None,
+                              s_unbek_lagen: dict[str, set[float]] | None = None) -> dict:
     """Zusatzfelder des impact_summary für die Stadtbaumwahl (Integrationsauflage §5
     Punkt (4)).
 
@@ -704,6 +770,7 @@ def _stadtbaum_summary_fields(mdef: dict, avoided_days_total: float, avoided_day
         "stadtbaum_avoided_days_eur": round(avoided_days_eur, 2),
         "stadtbaum_estimate_note": STADTBAUM_ESTIMATE_NOTE,
         "stadtbaum_lambda_hinweis": STADTBAUM_LAMBDA_HINWEIS,
+        **_stadtbaum_s_unbek_hinweis(s_unbek_lagen or {}),
     }
 
 
@@ -1392,6 +1459,7 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     stadtbaum_missing_reason: str | None = None
     stadtbaum_saw_canopy_missing = False
     stadtbaum_saw_effect = False
+    stadtbaum_s_unbek_lagen: dict[str, set[float]] = {}
     if _is_stadtbaum(mdef):
         _a_ersetzt = float((measure.config or {}).get("anteil_ersetzt") or 0.0)
         if _a_ersetzt <= 0.0:
@@ -1457,6 +1525,13 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     cell_savings["stadtbaum_avoided_eur"] = round(risk_engine.cost_from_outcome(
                         catalog.RISKS_BY_CODE[code], avoided_days), 2)
                     stadtbaum_avoided_days_total += avoided_days
+                    # s_unbek nur dort melden, wo es die Senkung bestimmt (Kronen ohne
+                    # Gattungs-Tag); Zellen ohne solche Kronen rechnen davon unabhängig.
+                    if float(r.get("canopy_unknown_frac") or 0.0) > 0.0:
+                        s_wert, s_lage = _stadtbaum_s_unbek(r)
+                        if s_lage is not None:
+                            stadtbaum_s_unbek_lagen.setdefault(s_lage, set()).add(s_wert)
+                            cell_savings["stadtbaum_s_unbek_hinweis"] = s_lage
                     if avoided_days > 0.0:
                         stadtbaum_saw_effect = True
             risk = catalog.RISKS_BY_CODE.get(code)
@@ -1613,7 +1688,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # Richtung des Fehlers in λ (Modellgrenze 7), oder Vermerk statt Betrag ohne
         # anteil_ersetzt bzw. ohne Baumkronen in den abgedeckten Zellen.
         **_stadtbaum_summary_fields(mdef, stadtbaum_avoided_days_total,
-                                    stadtbaum_avoided_days_eur, stadtbaum_missing_reason),
+                                    stadtbaum_avoided_days_eur, stadtbaum_missing_reason,
+                                    stadtbaum_s_unbek_lagen),
         # Kosten der Stadtbaumwahl (Ü-11): gewählter Fall, ohne Fall beide Beträge
         # nebeneinander (capex_je_fall) und Vermerk, ohne Stückzahl Vermerk statt Betrag.
         **stadtbaum_kosten_felder,
