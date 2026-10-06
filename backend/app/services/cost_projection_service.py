@@ -113,7 +113,10 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
                 f"Maßnahme „{m.name}“ liegt mit Umsetzungsjahr {impl} außerhalb "
                 f"des Projektionshorizonts (bis {horizon_end})"
             )
+        # Der Hinweis gilt nur bei Nachpflanzung oder ohne Fall; „vorgezogen“ löst ihn nicht aus.
         if (m.measure_type == STADTBAUM_CODE
+                and ((getattr(m, "config", None) or {}).get("ersatzfall")
+                     in (None, "nachpflanzung"))
                 and STADTBAUM_WIRKUNGSVERZUG_HINWEIS not in hinweise_massnahmen):
             hinweise_massnahmen.append(STADTBAUM_WIRKUNGSVERZUG_HINWEIS)
         measure_rows.append({
