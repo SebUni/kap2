@@ -56,7 +56,7 @@ def _aggregat_zellen(ags: str) -> tuple[list[dict], float]:
                 hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
                 indices={}, regional=regional)
 
-        yll = sum(w * H.mortality(mort_risk, ctx(t + math.sqrt(2) * SIGMA_K * x))["outcome"]
+        yll = sum(w * H.mortality_punkt(mort_risk, ctx(t + math.sqrt(2) * SIGMA_K * x))["outcome"]
                   for x, w in zip(xs, ws)) / math.sqrt(math.pi)
         faelle = H.morbidity(morb_risk, ctx(t))["outcome"]
         zellen.append({"inputs": {"pop": pop},
