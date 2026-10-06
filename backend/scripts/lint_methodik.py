@@ -173,6 +173,87 @@ def zeichentabelle(src: str, lint: Lint) -> None:
                     f"ohne Herkunft: {herkunft[:50]}")
 
 
+TABELLEN_TRENNZEILE = re.compile(r"^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$")
+
+
+def _tabellenzellen(zeile: str) -> int:
+    """Zahl der Zellen einer Pipe-Tabellenzeile (T-1817-ceo).
+
+    Kein Trenner sind maskierte Pipes (Backslash davor) und Pipes in Code-Spans
+    (Backtick-Folge gleicher Laenge oeffnet und schliesst). Fuehrender und
+    abschliessender Rand-Strich erzeugen keine Zelle.
+    """
+    z = zeile.strip()
+    teile: list[str] = [""]
+    i = 0
+    while i < len(z):
+        c = z[i]
+        if c == "\\" and i + 1 < len(z):
+            teile[-1] += z[i:i + 2]
+            i += 2
+        elif c == "`":
+            j = i
+            while j < len(z) and z[j] == "`":
+                j += 1
+            lauf = z[i:j]
+            ende = z.find(lauf, j)
+            if ende == -1:
+                teile[-1] += lauf
+                i = j
+            else:
+                teile[-1] += z[i:ende + len(lauf)]
+                i = ende + len(lauf)
+        elif c == "|":
+            teile.append("")
+            i += 1
+        else:
+            teile[-1] += c
+            i += 1
+    if z.startswith("|"):
+        teile = teile[1:]
+    if len(teile) > 1 and not teile[-1].strip() and z.endswith("|"):
+        teile = teile[:-1]
+    return len(teile)
+
+
+def tabellen_spaltenzahl(src: str, datei: str = "") -> list[str]:
+    """Fundstellen von Tabellenzeilen, deren Spaltenzahl von der Kopfzeile abweicht.
+
+    Anlass: Befund 494 (T-1728-methodik_manager) — zwei unmaskierte Pipes in einer
+    Zelle verschoben die Spalten, sichtbar erst am PDF-Bild. Code-Zaeune werden
+    uebersprungen. Rueckgabe: Zeilen »<Datei> Z. <n>: Soll <a>, Ist <b>«.
+    """
+    zeilen = src.split("\n")
+    funde: list[str] = []
+    im_zaun = False
+    i = 0
+    while i < len(zeilen):
+        z = zeilen[i]
+        if z.lstrip().startswith(("```", "~~~")):
+            im_zaun = not im_zaun
+            i += 1
+            continue
+        if (not im_zaun and "|" in z and i + 1 < len(zeilen)
+                and "|" in zeilen[i + 1] and TABELLEN_TRENNZEILE.match(zeilen[i + 1])):
+            soll = _tabellenzellen(z)
+            j = i + 2
+            while j < len(zeilen) and zeilen[j].strip() and "|" in zeilen[j]:
+                ist = _tabellenzellen(zeilen[j])
+                if ist != soll:
+                    funde.append(f"{datei} Z. {j + 1}: Soll {soll}, Ist {ist}")
+                j += 1
+            i = j
+            continue
+        i += 1
+    return funde
+
+
+def tabellen_spalten(src: str, lint: Lint, datei: str = "") -> None:
+    funde = tabellen_spaltenzahl(src, datei)
+    lint.pruefe(not funde, "Tabellenzeilen haben die Spaltenzahl ihrer Kopfzeile",
+                "; ".join(funde))
+
+
 def verbotene_formulierungen(src: str, lint: Lint) -> None:
     """Verbotene Formulierungen zeilengenau, mit Historie-Ausnahme (Ticket T-0007).
 
@@ -1207,6 +1288,7 @@ def pruefe_bericht(pfad: str) -> bool:
     rechenkette(src, lint)
     zahlenformat(src, lint)
     zeichentabelle(src, lint)
+    tabellen_spalten(src, lint, os.path.basename(pfad))
     verbotene_formulierungen(src, lint)
     werte, baender = parameter_bloecke(src, lint)
     registry_abgleich(nr, werte, lint)
