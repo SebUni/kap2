@@ -19,20 +19,36 @@ Setzung erkennt, legt Frage 1 mit den Merkmalen S1 und S2 fest.
 Reihenfolge. Die erste Antwort „ja“ entscheidet.
 
 1. **Steckt im Wert des Blocks selbst eine Setzung von KAP3?** Ja: Kennzeichnung `abschaetzung_kap3`, Anzeigetext
-   „Abschätzung von KAP3“. Das gilt auch, wenn der Block zusätzlich andere Blöcke nutzt. Eine Setzung liegt vor, wenn
-   eines der beiden Merkmale zutrifft:
+   „Abschätzung von KAP3“. Das gilt auch, wenn der Block zusätzlich andere Blöcke nutzt, und es genügt, dass ein Teil
+   des Werts die Setzung trägt, etwa ein Band oder eine Region. Eine Setzung liegt vor, wenn eines der beiden Merkmale
+   zutrifft:
    - **S1 Zahl von KAP3:** KAP3 setzt oder schätzt eine Zahl, die so in keiner Quelle steht, etwa die
-     Süd-Nachschätzung s_Süd = 1,65 in heat.beta_85plus_region. Erkennbar daran, dass der Bericht den Block als
-     `abschaetzung_kap3` führt.
-   - **S2 Näherung:** Der Wert stammt aus Zahlen einer Quelle, nähert damit aber eine Größe an, die die Quelle nicht
-     ausweist: als Proxy für eine andere Größe (heat.c_fall, uv.lambda), als Punkt statt Bandmittel (Stützstellen in
-     heat.l_restlebenserwartung, medianes Sterbealter in uv.l_rest) oder in vereinfachter Form (lineare Näherung in
-     heat.f_alter). Erkennbar daran, dass der Block die Näherung selbst benennt („Proxy“, „Approximation“,
-     „Näherung“, „Stützstelle“).
+     Süd-Nachschätzung s_Süd = 1,65 in heat.beta_85plus_region (Nord und Mitte sind abgelesen). Erkennbar daran, dass
+     der Bericht den Block als `abschaetzung_kap3` führt.
+   - **S2 Näherung:** Der Wert stammt aus Zahlen einer Quelle, ein Teil davon steht aber für eine Größe, für die die
+     Quelle keine Zahl ausweist: für eine andere Größe (Proxy: heat.c_fall, uv.lambda), für eine Gruppe jenseits der
+     Quelle (Extrapolation: pollen.p_ar, die Altersgruppen ab 80 Jahren mit dem Wert der 70- bis 79-Jährigen), als
+     Punkt statt Bandmittel (Stützstellen in heat.l_restlebenserwartung, medianes Sterbealter in uv.l_rest) oder in
+     vereinfachter Form (lineare Näherung in heat.f_alter). Erkennbar ist S2 an der Aussage, nicht an einem bestimmten
+     Wort: Der Block sagt in einem Feld oder Kommentar, dass ein Teil seines Werts so entsteht. In M0 sagen die Blöcke
+     das mit „Proxy“, „Approximation“, „Näherung“, „Stützstelle“ und „extrapoliert“.
 
    **Eine benannte Näherung ist immer eine Setzung**, gleich ob der Bericht sie als Modellgrenze, als gekennzeichnete
    Näherung oder als Abschätzung führt. Keine Setzung ist es, wenn der Wert seine Zielgröße selbst misst, auch wenn
-   KAP3 ihn aus Zahlen der Quelle rechnet oder zwischen Quellenwerten wählt.
+   KAP3 ihn aus Zahlen der Quelle rechnet oder zwischen Quellenwerten wählt. In M0 sehen drei Fälle einer Näherung
+   ähnlich und sind keine; der Beispiel-Block prüft an allen 66 Blöcken, dass jeder solche Block hier steht:
+   - **Ablesewert:** Ein aus einer Abbildung der Quelle abgelesener Wert misst die Größe, die die Quelle zeigt; die
+     Ableseungenauigkeit ist Unsicherheit (heat.t0_region, uv.i_raten_roh, uv.i_mm, uv.i_c44; uv.c_kal nennt die
+     Ablesewerte seines Eingangs).
+   - **Gemessener Versatz im Band:** pollen.delta_s_region nimmt für die Birke die Blattentfaltung statt der Blüte,
+     weil die Blüte 1960–1990 eine Meldelücke hat. Den Versatz misst #96 §3.1 in den Jahren mit beiden Meldungen
+     (+3,29 Tage); was davon im Wert bleibt, bis zu 1,3 Tage, führt der Block im Band. Die Quelle selbst sagt also,
+     wie weit der Wert von der Zielgröße abweicht.
+   - **Annahme über die Geltung eines Werts:** uv.k_uv nennt die Elastizität „zeitinvariant angenommen“ und ihre
+     räumliche Streuung Modellgrenze 9. Der Block führt keinen eigenen Wert für eine andere Zeit oder einen Ort; sein
+     Wert 0,7119 ist aus dem Stationsquotienten der Quelle und der Rasterauswertung gerechnet. Ob er zu jeder Zeit und
+     an jedem Ort gilt, ist eine Annahme des Modells. Anders pollen.p_ar: Dort steht im Wert ein eigener Eintrag für das
+     Band ab 85 Jahren, für das die Quelle keine Zahl hat.
 2. **Nennt `abgeleitet_aus` keine Parameter-ID?** Ja: Kennzeichnung `quelle`, Anzeigetext „Quelle“. Das umfasst den
    Wert, der so in der Quelle steht, und die Rechnung aus Zahlen einer Quelle, die ihre Zielgröße selbst misst
    (Quotient, Summe, ausgezähltes Quantil, eigene Auswertung amtlicher Rohdaten).
@@ -62,9 +78,11 @@ selbst ausführt: Sie ist `quelle`, wenn sie ihre Zielgröße selbst misst, und 
 Näherung nach S2 trägt. Der Wortlaut von Aufgabe §4 trägt die Grenze zu `berechnet`: „`berechnet`: der Wert folgt
 rechnerisch aus anderen Parametern“, und `abgeleitet_aus` nennt „die Parameter-IDs, aus denen der Wert entsteht“.
 #95 Log 40 zieht beide Grenzen so: „`berechnet` nur, wo der Wert aus anderen Blöcken folgt“, dazu der Prüfstein für
-Setzungen, den Frage 1 übernimmt. #96 Log 25 folgt dem (ΔS als ausgewertete amtliche Messreihe = `quelle`). #98
-Log 36 zieht die Grenze anders („schwächste Herkunft im Block“, eigene Auswertung = `berechnet`). Nach Regel K gilt sie
-nicht mehr, und beide Berichte werden nach derselben Regel gelesen.
+Setzungen, den Frage 1 übernimmt. #96 Log 25 folgt der Grenze zu `berechnet` (ΔS als ausgewertete amtliche
+Messreihe = `quelle`), nicht aber dem Prüfstein: Es führt pollen.p_ar als `quelle`, weil vier von fünf Bändern einen
+Quellwert tragen und die Extrapolation am Band gekennzeichnet ist. #98 Log 36 zieht die Grenze zu `berechnet` anders
+(„schwächste Herkunft im Block“, eigene Auswertung = `berechnet`). Nach Regel K gilt keine der beiden Abweichungen
+mehr, und alle drei Berichte werden nach derselben Regel gelesen.
 
 - **uv.ssd_delta_region** (eigene Auswertung DWD-Raster × VG250 × Zensus 2022): einziger Eingang ist der
   Quellenschlüssel `dwd_cdc_ssd_raster_x_vg250_x_zensus2022`, keine Parameter-ID. Der Block benennt keine Näherung;
@@ -73,7 +91,7 @@ nicht mehr, und beide Berichte werden nach derselben Regel gelesen.
 - **uv.lambda** = Sterbefälle ÷ Neuerkrankungen im Fenster 2021–2023 aus ZfKD [27], beim Melanom 3.081,0 ÷ 26.870 =
   0,11466: einziger Eingang ist `zfkd_kid2025`, keine Parameter-ID, also nicht `berechnet`. Der Block benennt aber
   eine „Perioden-Approximation“: Der Quotient eines Zeitfensters steht für den Anteil der Erkrankten, die an der
-  Krankheit sterben, und diesen Anteil weist die Quelle nicht aus (#98 §3.3: „bei steigender Inzidenz keine
+  Krankheit sterben, und diesen Anteil weist die Quelle nicht aus (#98 §3.4: „bei steigender Inzidenz keine
   Kohorten-Letalität; Richtung: Überschätzung des Mortalitätsanteils“). Das ist S2. Nach Regel K `abschaetzung_kap3`,
   Anzeigetext „Abschätzung von KAP3“ (#98 Log 36: `berechnet`). Anders heat.m_basissterberate in #95: Sterbefälle
   2023 ÷ Bevölkerung ist genau die Sterberate, die das Modell braucht, also `quelle`.
@@ -81,8 +99,11 @@ nicht mehr, und beide Berichte werden nach derselben Regel gelesen.
   „Median-Approximation“, also einen Punkt statt des Mittels über alle Sterbealter (S2). Nach Regel K
   `abschaetzung_kap3`, wie die Stützstellen e(60), e(70) und e(80) in heat.l_restlebenserwartung, die #95 nach Log 40
   als `abschaetzung_kap3` führt.
-- **Folge außerhalb der 11 Blöcke:** heat.beta_iso steht in #95 als `quelle`, nennt in `abgeleitet_aus` aber den Block
-  heat.qbar_1p. Nach Regel K ist er `berechnet`, Anzeigetext „berechnet aus Quellen“; er zählt weiter als belegt.
+- **Folgen außerhalb der 11 Blöcke:** heat.beta_iso steht in #95 als `quelle`, nennt in `abgeleitet_aus` aber den
+  Block heat.qbar_1p. Nach Regel K ist er `berechnet`, Anzeigetext „berechnet aus Quellen“; er zählt weiter als belegt.
+  pollen.p_ar steht in #96 als `quelle`, führt für die Bänder 75–84 und ab 85 Jahren aber den DEGS1-Wert der 70- bis
+  79-Jährigen (#96 §3.2: „Extrapolation über das DEGS1-Ende 79 hinaus“). Nach Regel K (Frage 1, S2) ist er
+  `abschaetzung_kap3`, Anzeigetext „Abschätzung von KAP3“; er zählt nicht mehr als belegt.
 
 ### (b) Eingang ohne eigenen Block (Quellenschlüssel in `abgeleitet_aus`)
 
@@ -136,15 +157,16 @@ viel sich verschiebt, zeigt die Zählung über die Blöcke in Kapitel 7 (nachger
 | Bericht | Blöcke | belegt bisher | belegt nach Regel K |
 |---|---|---|---|
 | 95 | 30 | 13 | 12 |
-| 96 | 14 | 5 | 3 |
+| 96 | 14 | 5 | 2 |
 | 98 | 22 | 11 | 9 |
 
-Bei #95 fällt heat.c_kal heraus, bei #96 fallen pollen.d_saison und pollen.c_tag heraus, bei #98 uv.lambda und
-uv.l_rest (Frage 1, benannte Näherung). uv.ssd_delta_region wechselt von `berechnet` nach `quelle` und bleibt belegt.
+Bei #95 fällt heat.c_kal heraus, bei #96 fallen pollen.d_saison, pollen.c_tag und pollen.p_ar heraus, bei #98
+uv.lambda und uv.l_rest. pollen.p_ar, uv.lambda und uv.l_rest entscheidet Frage 1 (benannte Näherung).
+uv.ssd_delta_region wechselt von `berechnet` nach `quelle` und bleibt belegt.
 **Die Gewissheit nach Regel G ändert sich nicht:** Sie übernimmt die Stufe der KWRA (TB6 Tabelle 1) und nimmt die
 Quellenlage nicht auf ([querschnitt_gewissheit.md](querschnitt_gewissheit.md), „Festlegung“). Solange der Code die
 Stufe noch aus dem Anteil der belegten Parameter bildet (`gewissheit.py`, `gewissheitsstufe`), verschiebt Regel K auch
-diese Stufe, und die Unsicherheits-Zusammenschau führt die fünf Werte als nicht belegt. Wie der Code das umsetzt,
+diese Stufe, und die Unsicherheits-Zusammenschau führt die sechs Werte als nicht belegt. Wie der Code das umsetzt,
 legt Schritt 2 fest.
 
 ### Begründung und Fundstelle
@@ -165,7 +187,7 @@ legt Schritt 2 fest.
 - **#95 Log 40** (Prüfstein für Setzungen, Grundlage von Frage 1): „Misst der Wert die Zielgröße selbst, ist die bloße
   Wahl zwischen Quellenwerten keine Setzung (…) — steht er für eine andere Größe (Proxy) oder nähert er ein Bandmittel
   durch einen Punkt an, ist es eine“. Regel K schreibt diesen Prüfstein als S2 für alle Berichte fest, also auch für
-  #98.
+  #96 und #98.
 
 **Was Regel K dem Bericht überlässt.** Regel K entscheidet jede der drei Fragen selbst. Aus dem Bericht übernimmt sie
 nur Tatsachen: welche Zahl KAP3 setzt (S1, `abschaetzung_kap3`), welche Näherung der Block benennt (S2) und welche
@@ -210,7 +232,7 @@ ANZEIGE = {"quelle": "Quelle", "abschaetzung_kap3": "Abschätzung von KAP3",
            "aus_quellen": "berechnet aus Quellen", "mit_abschaetzung": "berechnet, enthält Abschätzung von KAP3"}
 ZUSATZ = {"aus_quellen": "aus Quellen", "mit_abschaetzung": "enthält Abschätzung von KAP3"}
 # S2: Näherung, die der Block selbst benennt (die Blöcke schreiben Umlaute teils als ae und ue)
-NAEHERUNG = re.compile(r"(?i)proxy|approximation|n(ä|ae)herung|st(ü|ue)tzstelle")
+NAEHERUNG = re.compile(r"(?i)proxy|approximation|n(ä|ae)herung|st(ü|ue)tzstelle|extrapol")
 
 
 def feld(block, name):
@@ -316,13 +338,22 @@ for i in ("heat.l_restlebenserwartung", "heat.c_fall", "heat.f_alter"):
     assert KZ["95"][i] == "abschaetzung_kap3" and NAEHERUNG.search(B["95"][i]), i
 assert regel_k("95", "heat.m_basissterberate") == regel_k("96", "pollen.delta_s_region") == ("quelle", "quelle")
 naeh = sorted(i for nr in B for i in B[nr] if NAEHERUNG.search(B[nr][i]) and KZ[nr][i] != "abschaetzung_kap3")
-assert naeh == ["uv.l_rest", "uv.lambda"], naeh
+assert naeh == ["pollen.p_ar", "uv.l_rest", "uv.lambda"], naeh
 print("Setzung nach S2, im Bericht nicht abschaetzung_kap3:", naeh)
+
+# Frage 1, Abgrenzung: jeder Block ohne S1 und S2, dessen Text einer Näherung ähnlich sieht, steht in der Festlegung
+AEHNLICH = re.compile(r"(?i)ablese|offset|marker|angenommen|annahme|modellgrenze|statt|transfer|(ü|ue)bertr|gesch(ä|ae)tzt")
+festlegung = q.split("\n## Festlegung")[1].split("\n### (a)")[0]
+aehnlich = sorted(i for nr in B for i in B[nr] if AEHNLICH.search(B[nr][i]) and not setzung(nr, i))
+assert aehnlich == ["heat.t0_region", "pollen.delta_s_region", "uv.c_kal", "uv.i_c44", "uv.i_mm", "uv.i_raten_roh",
+                    "uv.k_uv"], aehnlich
+assert all(i in festlegung for i in aehnlich), [i for i in aehnlich if i not in festlegung]
+print("Einer Näherung ähnlich, nach Frage 1 keine Setzung:", aehnlich)
 
 # Wo Regel K von der Kennzeichnung im Bericht abweicht (alle Blöcke, nicht nur die 11)
 wechsel = sorted((i, KZ[nr][i], regel_k(nr, i)[0]) for nr in B for i in B[nr] if regel_k(nr, i)[0] != KZ[nr][i])
-assert wechsel == [("heat.beta_iso", "quelle", "berechnet"), ("uv.l_rest", "berechnet", "abschaetzung_kap3"),
-                   ("uv.lambda", "berechnet", "abschaetzung_kap3"),
+assert wechsel == [("heat.beta_iso", "quelle", "berechnet"), ("pollen.p_ar", "quelle", "abschaetzung_kap3"),
+                   ("uv.l_rest", "berechnet", "abschaetzung_kap3"), ("uv.lambda", "berechnet", "abschaetzung_kap3"),
                    ("uv.ssd_delta_region", "berechnet", "quelle")], wechsel
 print("Kennzeichnung weicht vom Bericht ab:", "; ".join(f"{i} {a} → {n}" for i, a, n in wechsel))
 
@@ -355,10 +386,11 @@ Ausgabe:
 #98 uv.lambda              abschaetzung_kap3  „Abschätzung von KAP3“
 #98 uv.l_rest              abschaetzung_kap3  „Abschätzung von KAP3“
 #98 uv.c_kal               berechnet          „berechnet aus Quellen“
-Setzung nach S2, im Bericht nicht abschaetzung_kap3: ['uv.l_rest', 'uv.lambda']
-Kennzeichnung weicht vom Bericht ab: heat.beta_iso quelle → berechnet; uv.l_rest berechnet → abschaetzung_kap3; uv.lambda berechnet → abschaetzung_kap3; uv.ssd_delta_region berechnet → quelle
+Setzung nach S2, im Bericht nicht abschaetzung_kap3: ['pollen.p_ar', 'uv.l_rest', 'uv.lambda']
+Einer Näherung ähnlich, nach Frage 1 keine Setzung: ['heat.t0_region', 'pollen.delta_s_region', 'uv.c_kal', 'uv.i_c44', 'uv.i_mm', 'uv.i_raten_roh', 'uv.k_uv']
+Kennzeichnung weicht vom Bericht ab: heat.beta_iso quelle → berechnet; pollen.p_ar quelle → abschaetzung_kap3; uv.l_rest berechnet → abschaetzung_kap3; uv.lambda berechnet → abschaetzung_kap3; uv.ssd_delta_region berechnet → quelle
 abgeleitet_aus gefüllt, nach Regel K nicht berechnet: ['heat.delta_kuehlzentren', 'heat.delta_vg_morb', 'heat.g_s157', 'uv.l_rest', 'uv.lambda', 'uv.ssd_delta_region']
-Blöcke, belegt bisher, belegt nach Regel K: {'95': (30, 13, 12), '96': (14, 5, 3), '98': (22, 11, 9)}
+Blöcke, belegt bisher, belegt nach Regel K: {'95': (30, 13, 12), '96': (14, 5, 2), '98': (22, 11, 9)}
 ```
 
 ## Rechenkette
@@ -405,9 +437,9 @@ beiden ZfKD-Zahlen. Zum Vergleich heat.m_basissterberate: Sterbefälle 2023 ÷ B
 die das Hitzemodell braucht, und die Liste zeigt „Quelle“.
 
 **Was die einfachere Regel verfälschen würde (§8 E3).** Liest man `berechnet` wie heute als belegt und übernimmt die
-Kennzeichnung der Berichte, zählen heat.c_kal, pollen.d_saison, pollen.c_tag, uv.lambda und uv.l_rest als belegt: #95
-käme auf 13 statt 12 belegte Blöcke von 30, #96 auf 5 statt 3 von 14, #98 auf 11 statt 9 von 22, und die Liste zeigte
-fünf Werte mit Setzung als belegt. Schreibt man stattdessen schlicht „Abschätzung von KAP3“, verliert die Anzeige,
+Kennzeichnung der Berichte, zählen heat.c_kal, pollen.d_saison, pollen.c_tag, pollen.p_ar, uv.lambda und uv.l_rest als
+belegt: #95 käme auf 13 statt 12 belegte Blöcke von 30, #96 auf 5 statt 2 von 14, #98 auf 11 statt 9 von 22, und die
+Liste zeigte sechs Werte mit Setzung als belegt. Schreibt man stattdessen schlicht „Abschätzung von KAP3“, verliert die Anzeige,
 dass c_kal ein Fit an die RKI-Reihe ist und drei seiner fünf Eingänge aus Quellen stammen.
 
 ## Entscheidungslog
@@ -421,9 +453,15 @@ Berichte. Verworfen, je in einem Satz:
 - **Ansatz C** (ein berechneter Wert mit abgeschätztem Eingang heißt schlicht `abschaetzung_kap3`): Er hält den
   Prüfstein ein, verliert in der Anzeige aber, dass der Wert aus anderen Parametern folgt und welche davon belegt
   sind, also die Herleitung, die P1 verlangt.
-- **Ansatz D** (Urteil je Block ohne feste Regel): Er ließ #95 Log 40 und #98 Log 36 auseinanderlaufen (eine benannte
-  Näherung dort `abschaetzung_kap3`, hier `berechnet`) und ließe sich weder im Beispiel-Block noch im Code
-  nachrechnen, während Regel K auch Frage 1 nach festen Merkmalen beantwortet.
+- **Ansatz D** (Urteil je Block ohne feste Regel): Er ließ die Berichte bei gleicher Bauart auseinanderlaufen (eine
+  benannte Näherung in #95 `abschaetzung_kap3`, in #96 `quelle`, in #98 `berechnet`) und ließe sich weder im
+  Beispiel-Block noch im Code nachrechnen, während Regel K auch Frage 1 nach festen Merkmalen beantwortet.
+- **Erkennung von S2 an einer festen Wortliste** (wie in der zweiten Fassung dieser Datei): Sie übersah die
+  Extrapolation in pollen.p_ar, die der Block mit einem anderen Wort benennt, deshalb entscheidet die Aussage des
+  Blocks und nicht das Wort.
+- **Teil-Näherung nur am Band kennzeichnen** (pollen.p_ar bleibt `quelle`, weil vier von fünf Bändern einen Quellwert
+  tragen, #96 Log 25): Sie zeigte die Altersgruppen ab 80 Jahren, für die DEGS1 keine Zahl hat, als Quelle und
+  behandelte p_ar anders als heat.beta_85plus_region, bei dem der Süd-Wert allein die Kennzeichnung bestimmt.
 - **Benannte Näherung als Modellgrenze statt als Setzung** (uv.lambda und uv.l_rest wären `quelle`, wie in der ersten
   Fassung dieser Datei): Sie zeigte in #98 als Quelle, was #95 bei gleicher Bauart (Stützstellen in
   heat.l_restlebenserwartung, Proxy heat.c_fall) als Abschätzung führt, und verletzte damit den Prüfstein aus P1.
