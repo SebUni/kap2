@@ -38,6 +38,12 @@ trap cleanup EXIT INT TERM
 # Bytecode-Cache außerhalb des Arbeitsbaums halten.
 export PYTHONPYCACHEPREFIX="$VENV/pycache"
 
+# Lokale Anmeldung für die Sichtprüfung (T-1771): das Backend behandelt Anfragen
+# von 127.0.0.1 ohne Login-Cookie als Admin „Sichtprüfung (lokal)“. Nur dieses
+# Skript setzt die Variable; in Umgebungsdateien der Testumgebung oder der
+# Produktion darf sie nie stehen (docs/BETRIEB.md, Abschnitt „Sichtprüfung“).
+export KAP2_SICHTSTART_ANMELDUNG=1
+
 (
   cd "$ROOT/backend"
   exec "$PY" -m uvicorn app.main:app --host 127.0.0.1 --port 8000
