@@ -176,6 +176,9 @@ export interface MeasureImpactSummary {
   stadtbaum_estimate_note?: string | null
   /** Stadtbaumwahl: Hinweis auf die Richtung des Fehlers in λ (§6 Modellgrenze 7). */
   stadtbaum_lambda_hinweis?: string | null
+  /** Stadtbaumwahl: Hinweis, dass s_unbek in dieser Zelle den vermiedenen Betrag ändert
+   *  (nur gesetzt, wo s_unbek die Zahl ändert). */
+  stadtbaum_s_unbek_hinweis?: string | null
   /** Stadtbaumwahl: gewählter Ersatzfall (null = noch keiner gewählt). */
   ersatzfall?: 'nachpflanzung' | 'vorgezogen' | null
   /** Stadtbaumwahl ohne gewählten Fall: CAPEX je Fall in Euro, beide nebeneinander. */

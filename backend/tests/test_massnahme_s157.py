@@ -174,7 +174,8 @@ def test_parameters_visible_in_registry():
         layer_code=MORT, layer_category="risks")}
     g = next(p for pid, p in params.items() if pid.endswith(".g_s157"))
     ror = next(p for pid, p in params.items() if pid.endswith(".ror_s157"))
-    # Blockwert 0,2936 gerundet; gerechnet wird ungerundet wie im Beispiel s157_berlin
+    # Der Block nennt 0,2936 (vier Stellen); der Parameter trägt den ungerundeten Wert
+    # health.G_S157, mit dem auch das Beispiel s157_berlin rechnet
     assert round(g["value"], 4) == 0.2936 and g["evidence_class"] == "abgeschaetzt"
     assert g["value"] == pytest.approx(health.G_S157)
     assert ror["value"] == 0.93 and ror["evidence_class"] == "belegt"
