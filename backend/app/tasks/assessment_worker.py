@@ -52,6 +52,42 @@ def _apply_rlimit_backstop() -> None:
         log.exception("[WORKER] RLIMIT_AS konnte nicht gesetzt werden")
 
 
+def _gemeindeschluessel(db, kommune) -> str | None:
+    """Gemeindeschlüssel (VG250) für Stufe 2 der Ersatzregel 65+ (Bericht #95 §3.3).
+
+    Die Gemeinde ist die, die einen inneren Punkt der Kommune enthält. Findet sich keiner
+    (Tabelle ``gemeinden`` leer, kein Polygon trifft, Abfrage schlägt fehl, Kommune ohne Grenze),
+    entfällt Stufe 2 (Anteil 65+ = 0 in diesen Zellen). Das ist eine stille Null im Sinne von P2
+    und wird deshalb als WARNING mit dem Namen der Kommune geschrieben; das Assessment läuft wie
+    bisher weiter, die Zuordnung darf es nie kippen.
+    """
+    name = getattr(kommune, "name", None) or "(unbekannt)"
+    ags = None
+    grund = "Kommune ohne Grenze"
+    if kommune is not None and kommune.boundary is not None:
+        try:
+            from geoalchemy2.shape import to_shape
+            from sqlalchemy import func
+
+            from app.models.lite_models import Gemeinde
+
+            pt = to_shape(kommune.boundary).representative_point()
+            hit = (db.query(Gemeinde.ags)
+                   .filter(func.ST_Contains(Gemeinde.geometry,
+                                            func.ST_SetSRID(func.ST_MakePoint(pt.x, pt.y), 4326)))
+                   .first())
+            ags = hit[0] if hit else None
+            grund = "keine Gemeinde in der Tabelle gemeinden enthält den inneren Punkt"
+        except Exception as exc:  # noqa: BLE001 — die Zuordnung darf das Assessment nie kippen
+            db.rollback()
+            ags = None
+            grund = f"Abfrage fehlgeschlagen: {type(exc).__name__}: {exc}"
+    if not ags:
+        log.warning("[WORKER] Kommune %s: kein Gemeindeschlüssel (%s) – "
+                    "Stufe 2 der Ersatzregel 65+ entfällt", name, grund)
+    return ags
+
+
 def worker_main(kommune_id: int) -> int:
     from geoalchemy2.shape import to_shape
 
@@ -203,20 +239,7 @@ def worker_main(kommune_id: int) -> int:
         # Gemeindeschlüssel der Kommune für Stufe 2 der Ersatzregel 65+ (Bericht #95
         # §3.3): Gemeinde (VG250), die einen inneren Punkt der Kommune enthält. Fehlt
         # die Tabelle oder trifft kein Polygon, entfällt Stufe 2 (65+ = 0 in diesen Zellen).
-        ags = None
-        if kommune is not None and kommune.boundary is not None:
-            try:
-                from sqlalchemy import func
-                from app.models.lite_models import Gemeinde
-                pt = to_shape(kommune.boundary).representative_point()
-                hit = (db.query(Gemeinde.ags)
-                       .filter(func.ST_Contains(Gemeinde.geometry,
-                                                func.ST_SetSRID(func.ST_MakePoint(pt.x, pt.y), 4326)))
-                       .first())
-                ags = hit[0] if hit else None
-            except Exception:  # noqa: BLE001 — die Zuordnung darf das Assessment nie kippen
-                db.rollback()
-                ags = None
+        ags = _gemeindeschluessel(db, kommune)
 
         _last_pct = [0.0]
         _last_phase = [""]

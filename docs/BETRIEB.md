@@ -328,12 +328,30 @@ die Downloads gehen in die von `.gitignore` ausgenommenen Verzeichnisse (`backen
 Gewählte Maßnahme: „Hitzeaktionspläne“ (Typ `HEAT_ACTION_PLANS`), Geltungsbereich die größte Fläche
 der Gemeindegrenze; sie ist der erste Katalogtyp mit Nutzen für #95 oder #96, der einen Jahresnutzen
 größer 0 liefert. Der Jahresbetrag #95 laut API (`risk-summary`, ohne Wirkung der Maßnahme) beträgt
-144.392,88 €. Die Karte „Erwartete Schäden je Risiko“ zeigt diesen Wert nur, solange `cost-summary` nicht
+170.809,72 € (Stand T-1814, mit gefüllter Gemeindetabelle; **vor diesem Paket** waren es 144.392,88 €).
+Die Karte „Erwartete Schäden je Risiko“ zeigt diesen Wert nur, solange `cost-summary` nicht
 geladen ist; sonst nimmt sie `costSummary.klimawirkungen` vor `riskSummary`
-(`frontend/src/components/dashboard/CostTablesSection.tsx`, Z. 17–19) und zeigt mit der Maßnahme 135.838 €.
+(`frontend/src/components/dashboard/CostTablesSection.tsx`, Z. 17–19) und zeigt mit der Maßnahme
+160.667 € (vor diesem Paket 135.838 €).
 Der Golden-Test im Bericht #95 nennt für Warmsen 175.256 €
-(`backend/data/kalibrierung/golden95_zellen.md`). Die Abweichung ist nicht angeglichen; sie ist
-nicht geklärt.
+(`backend/data/kalibrierung/golden95_zellen.md`). Die Abweichung ist nicht angeglichen (jetzt
+−4.446,28 €, vorher −30.863,12 €); der Rest ist nicht geklärt.
+
+**Gemeindetabelle (T-1814).** Der Worker ordnet Stufe 2 der Ersatzregel 65+ (Bericht #95 §3.3) die VG250-Gemeinde
+zu, die einen inneren Punkt der Kommune enthält (`_gemeindeschluessel` in
+`backend/app/tasks/assessment_worker.py`). Ist `gemeinden` leer, entfällt Stufe 2 (in Warmsen zählte der
+Anteil ab 65 in 369 von 541 Zellen als 0), und der Worker schreibt eine Logzeile der Stufe `WARNING` mit
+dem Namen der Kommune und dem Text „Stufe 2 der Ersatzregel 65+ entfällt“ (`backend/logs/worker-<kommune_id>.log`).
+`scripts/sicht_beispielkommune.py` füllt die Tabelle vor der Bewertung über den VG250-Import des Produkts
+(`ingest_gemeinden`, Bundesland Niedersachsen, 964 Gemeinden; Download ins ignorierte Verzeichnis
+`backend/data/vg250/`), wenn Warmsen (AGS 03256034) fehlt, und rechnet eine ohne Gemeindetabelle
+entstandene Bewertung einmal neu. Mit gefüllter Tabelle macht der zweite Aufruf nichts davon.
+
+Port-Ausdruck (Sichtstart beendet, Ports 5173 und 8000 frei; gibt dann `[]` aus):
+
+```bash
+python3 -c "import socket;print([p for p in (5173,8000) if socket.socket().connect_ex(('127.0.0.1',p))==0])"
+```
 
 Warmsen hat in der Sichtstart-Datenbank Daten (berechnet, Maßnahme „Sichtstart: Hitzeaktionspläne“). Zwei
 Aufnahmen mit Klickfolge, kopierbar (aus dem Repo-Wurzelverzeichnis, nur auf dem Server). `--klick` ist ein
@@ -344,18 +362,20 @@ Der Klick auf „81.6 km²“ (Flächenangabe im Kopf) wartet, bis die Kommune g
 beiden Aufnahmen. Ohne ihn lief ein späterer Klick einmal in den Timeout (`ok: false`, Bild zeigte das
 Dashboard). Endet ein Aufruf trotzdem mit `ok: false`, erneut ausführen.
 
-Maßnahmen-Übersicht (Bild zeigt „Warmsen (81.6 km²)“, „Nutzen/Jahr 8.555 €“, „Netto-Nutzen/Jahr -11.445 €“):
+Maßnahmen-Übersicht (Bild zeigt „Warmsen (81.6 km²)“, „Nutzen/Jahr 10.143 €“, „Netto-Nutzen/Jahr -9.857 €“;
+vor T-1814, ohne Gemeindetabelle: 8.555 € und -11.445 €):
 
 ```bash
 python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app/massnahmen --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=81.6 km²" --klick "text=Maßnahmen-Übersicht" --klick "text=Netto-Nutzen/Jahr" --ziel <Verzeichnis>/sicht1 --start-timeout 300
 ```
 
 Dashboard, Karte „Erwartete Schäden je Risiko“ (Bild zeigt „Allergische Reaktionen durch Aeroallergene
-pflanzlicher Herkunft (#96)“ mit „2.342 €“ Schaden/Jahr; stabil). Der Betrag von „Hitzebelastung (#95)“ hängt vom
-Stand von `cost-summary` ab: Die Karte nimmt `costSummary.klimawirkungen` vor `riskSummary`
-(`CostTablesSection.tsx`, Z. 17–19). Mit der Maßnahme „Hitzeaktionspläne“ zeigt das Bild „135.838 €“;
-„144.393 €“ ist der API-Wert von `risk-summary` ohne Maßnahmenwirkung (so gibt ihn `sicht_beispielkommune.py`
-aus) und erscheint nur, solange `cost-summary` fehlt. Zitiert wird, was das Bild zeigt.
+pflanzlicher Herkunft (#96)“ mit „2.281 €“ Schaden/Jahr, vor T-1814 „2.342 €“; stabil). Der Betrag von
+„Hitzebelastung (#95)“ hängt vom Stand von `cost-summary` ab: Die Karte nimmt `costSummary.klimawirkungen`
+vor `riskSummary` (`CostTablesSection.tsx`, Z. 17–19). Mit der Maßnahme „Hitzeaktionspläne“ zeigt das Bild
+„160.667 €“ (Stand nach T-1814; vor diesem Paket „135.838 €“); „170.810 €“ (vor diesem Paket „144.393 €“) ist
+der API-Wert von `risk-summary` ohne Maßnahmenwirkung (so gibt ihn `sicht_beispielkommune.py` aus) und
+erscheint nur, solange `cost-summary` fehlt. Zitiert wird, was das Bild zeigt.
 
 ```bash
 python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=81.6 km²" --klick "text=Details: Risikoverteilung" --klick "text=Erwartete Schäden je Risiko" --ziel <Verzeichnis>/sicht2 --start-timeout 300
