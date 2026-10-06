@@ -307,6 +307,28 @@ bestehen. Zurücksetzen: Sichtstart beenden und das Verzeichnis
 `~/.local/share/kap2-sicht/pgdata` löschen; der nächste Start legt es neu an, das
 Schema legt das Backend beim Start selbst an (`create_all`).
 
+Beispielkommune des Sichtstarts ist **Warmsen** (Landkreis Nienburg (Weser), AGS 03256034,
+3.150 Einwohner laut Bewertungslauf), nicht Berlin: Der Server hat 2 CPU und 4 GB
+Speicher, Berlin hat 40.669 bewohnte Zellen. Angelegt wird sie mit
+`python3 scripts/sicht_beispielkommune.py` (aus dem Repo-Wurzelverzeichnis, nur Standardbibliothek).
+Das Skript startet `scripts/sichtstart.sh` selbst, steuert die API auf 127.0.0.1:8000 mit denselben
+Schritten wie die Oberfläche (Kommune suchen und anlegen, Raster, Bewertung bis Status `done`, eine
+Maßnahme aus dem Katalog, Wirkung berechnen) und beendet den Sichtstart am Ende wieder, auch bei
+Fehlern. Die Zahlen stammen aus dem Rechenweg des Produkts; nichts wird von Hand in die Datenbank
+geschrieben. Die letzte Ausgabezeile ist JSON (Kommune, Status, Jahresbetrag #95, Maßnahme, Jahresnutzen).
+Ein zweiter Aufruf legt nichts neu an und startet keinen neuen Bewertungslauf; er liest und gibt
+dieselben Beträge aus. Neu anlegen: Sichtstart beendet, Verzeichnis `~/.local/share/kap2-sicht/pgdata`
+löschen (siehe oben), Skript erneut aufrufen. Der erste Lauf hat am 06.10.2026 auf dem Server 270 s
+gedauert (4 s Start, 255 s Bewertung mit Zensus-, OSM- und Höhenmodell-Download, 8.495 Zellen à 100 m);
+die Downloads gehen in die von `.gitignore` ausgenommenen Verzeichnisse (`backend/data/zensus/…`,
+`backend/data/dwd_cdc/`, `backend/.cache/`). Der zweite Aufruf dauerte 7 s (4 s Sichtstart, 3 s Abfragen).
+Gewählte Maßnahme: „Hitzeaktionspläne“ (Typ `HEAT_ACTION_PLANS`), Geltungsbereich die größte Fläche
+der Gemeindegrenze; sie ist der erste Katalogtyp mit Nutzen für #95 oder #96, der einen Jahresnutzen
+größer 0 liefert. Der Jahresbetrag #95 (Quelle: `risk-summary`, Karte „Erwartete Schäden je Risiko“)
+beträgt 144.392,88 €; der Golden-Test im Bericht #95 nennt für Warmsen 175.256 €
+(`backend/data/kalibrierung/golden95_zellen.md`). Die Abweichung ist nicht angeglichen; sie ist
+nicht geklärt.
+
 Die Demo (`/demo/…`) ist über `frontend/src/config/features.ts` (`demo: false`)
 abgeschaltet.
 
