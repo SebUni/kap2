@@ -305,8 +305,12 @@ def import_measures_xlsx(db: Session, kommune_id: int, file: BinaryIO) -> dict:
             # Parse config
             try:
                 config = json.loads(config_str) if config_str else {}
-            except (json.JSONDecodeError, TypeError):
-                config = {}
+            except (json.JSONDecodeError, TypeError) as je:
+                # Nicht lesbares JSON wird nicht still zu {} (sonst fehlt der
+                # Eingabefehler und die Maßnahme hätte keinen Fall): Fehlerzeile.
+                errors.append(f"Zeile {i}: Konfiguration ist kein gültiges JSON — {str(je)[:120]}")
+                skipped += 1
+                continue
 
             # Anzahl-Spalte (falls vorhanden) überschreibt einen evtl. in der
             # Konfigurations-JSON eingebetteten count-Wert bewusst - im Bulk-
