@@ -118,8 +118,13 @@ def _reduction_factor(mdef: dict, fraction: float, unit_factor: float = 1.0) -> 
     ``unit_factor`` (0..1) skaliert die Wirkung von Stück-Maßnahmen anhand der
     Anzahl gegenüber dem Richtwert (min(1, Anzahl/Richtwert)); für Flächen-
     maßnahmen ist er 1.0 und lässt die bisherige Rechnung unverändert.
+
+    ``default_reduction`` None (Schlüssel vorhanden, Wert „nicht anwendbar“) heißt:
+    keine Wirkung über den Index-Faktor, also Faktor 1,0. Die Wirkung dieser Maßnahmen
+    (vg, stadtbaum, s157) rechnet ihr eigener Zweig; ``mdef.get(…, 0.0)`` allein fängt
+    nur den fehlenden Schlüssel ab, nicht den Wert None (TypeError in ``float``).
     """
-    base_r = float(mdef.get("default_reduction", 0.0))
+    base_r = float(mdef.get("default_reduction") or 0.0)
     if mdef.get("coverage_scaling") == "saturating":
         r = base_r * min(1.0, fraction * tunables.effective_measure_saturation())
     else:
