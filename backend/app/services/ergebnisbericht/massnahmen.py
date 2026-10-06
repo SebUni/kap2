@@ -144,6 +144,10 @@ def massnahmenzeile(measure_type: str, name: str, summary: dict, *, ort: str,
         vermerk = ("Für diese Maßnahme liegt keine in Euro bezifferte Wirkung vor; sie ist "
                    "deshalb qualitativ bewertet.")
 
+    extra: dict = {}
+    if summary.get("stadtbaum_s_unbek_hinweis"):
+        extra["stadtbaum_s_unbek_hinweis"] = summary["stadtbaum_s_unbek_hinweis"]
+
     gewissheit = {g["code"]: g for g in mg.massnahmen_gewissheit()}.get(measure_type)
     return Massnahmenzeile(
         code=measure_type, name=name, ort=ort, umsetzungsjahr=int(umsetzungsjahr),
@@ -158,6 +162,7 @@ def massnahmenzeile(measure_type: str, name: str, summary: dict, *, ort: str,
         flaeche_m2=summary.get("affected_area_m2"),
         kosten_offen=bool(summary.get("kosten_nutzen_kennzahl_offen")),
         kosten_vermerk=summary.get("kosten_vermerk") or None,
+        extra=extra,
     )
 
 
