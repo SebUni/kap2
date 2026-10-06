@@ -55,6 +55,12 @@ th, td {
 }
 th { background: #eef2f6; font-size: 8.2pt; }
 td code, th code { overflow-wrap: anywhere; }
+/* Tabellen mit neun und mehr Spalten (Evidenz-Register, §2): Ohne feste Aufteilung ist ihre
+   Mindestbreite die Summe der längsten Wörter je Spalte, weil Silbentrennung und break-word dort
+   nicht mitzählen. Sie ist breiter als der Satzspiegel, und Chromium schneidet die rechten Spalten
+   ab (Befund 493 in reviews/BEFUNDE_98.md). Mit fester Aufteilung gelten die Spaltenbreiten aus
+   pandoc; lange Wörter werden getrennt oder umbrochen. Andere Tabellen bleiben unverändert. */
+table:has(> thead > tr > th:nth-child(9)) { table-layout: fixed; }
 
 /* Code */
 code {
