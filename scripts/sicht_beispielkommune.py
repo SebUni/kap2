@@ -13,7 +13,8 @@ direkt, mit denselben Schritten wie die Oberfläche:
   (c) Raster erzeugen,
   (d) Bewertung einreihen und den Status abfragen, bis `done`,
   (e) genau eine Maßnahme aus dem Katalog anlegen und ihre Wirkung berechnen,
-  (f) den Jahresbetrag #95 aus `risk-summary` lesen (Quelle der Kostentabellen).
+  (f) den Jahresbetrag #95 aus `risk-summary` lesen (API-Wert ohne Wirkung der Maßnahme; die Karte
+      nimmt bei geladenem `cost-summary` den Stand mit Maßnahmen).
 
 Am Ende beendet es den Sichtstart mit SIGTERM und wartet auf sein Ende, auch bei
 Fehlern. Keine Zahl wird von Hand in die Datenbank geschrieben; alle Beträge stammen
@@ -250,7 +251,10 @@ def massnahme(kommune):
 
 
 def betrag_95(kommune_id):
-    """(f) Jahresbetrag #95: die Gruppenzeile der Karte „Erwartete Schäden je Risiko“."""
+    """(f) Jahresbetrag #95 ohne Wirkung der Maßnahme (API-Wert aus `risk-summary`).
+
+    Die Karte „Erwartete Schäden je Risiko“ zeigt ihn nur, solange `cost-summary` nicht geladen ist.
+    """
     cost = api("GET", f"/api/kommune/{kommune_id}/risk-summary")["cost"]
     for k in cost["klimawirkungen"]:
         if "#95" in (k.get("bezeichnung") or ""):
