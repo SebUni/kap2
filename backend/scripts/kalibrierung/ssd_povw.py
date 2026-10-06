@@ -35,8 +35,8 @@ Produktfunktion gelesen, die auch die Schadensfunktion benutzt
 nicht von der Produktion entkoppeln.
 
 Ausgaben (backend/data/kalibrierung/):
-    ssd_povw.csv   je Gebiet: flächengewichtet, bevölkerungsgewichtet, Δ
-    ssd_povw.md    Kennzahlen, Bundes-/Regionswerte, Wirkung auf die Bundessumme
+    ssd_povw.csv   je Gebiet: Gemeinden, Bevölkerung, ΔSSD bevölkerungsgewichtet und ungewichtetes Punktmittel
+    ssd_povw.md    Kennzahlen, Bundes-, Landes- und Regionswerte, Wirkung auf die Bundessummen
 
 Aufruf: python backend/scripts/kalibrierung/ssd_povw.py
 Quellen: BKG VG250 (DL-DE->BY-2.0), Zensus 2022 (Destatis), DWD-CDC
@@ -72,7 +72,7 @@ LAND = {
     "16": "Thüringen",
 }
 
-# Modellparameter für die Wirkungsrechnung (Bericht §3.1–§3.4, Rev. 3).
+# Modellparameter für die Wirkungsrechnung (Bericht §3.1–§3.4, Rev. 15; k_UV nach Log Nr. 29).
 K_UV, A_ATTR = (4.9 / 4.6) * 0.6683, 0.75   # k_UV rasterskaliert (Befunde 238/245/252)
 BAF = {"mm": 0.6, "c44": 0.75 * 1.4 + 0.25 * 2.5}
 ANKER = {"mm": (26_140 + 27_040 + 27_430) / 3,
