@@ -271,9 +271,44 @@ python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite / --zie
 ```
 
 Seiten hinter der Anmeldung (`/app/…`, zum Beispiel die Maßnahmen-Übersicht unter
-`/app/massnahmen`, `frontend/src/layouts/ProductLayout.tsx`) nimmt die Sichtprüfung
-ohne Anmeldung als Anmeldeseite auf; die Demo (`/demo/…`) ist über
-`frontend/src/config/features.ts` (`demo: false`) abgeschaltet.
+`/app/massnahmen`, `frontend/src/layouts/ProductLayout.tsx`) liegen hinter
+`RequireAuth`. Damit die Sichtprüfung die Oberfläche statt der Anmeldeseite
+aufnimmt, setzt `scripts/sichtstart.sh` vor dem Start von uvicorn
+`KAP2_SICHTSTART_ANMELDUNG=1` (`export`). Das Backend (`get_current_user` in
+`backend/app/api/deps.py`) behandelt dann eine Anfrage **ohne gültiges
+Login-Cookie** als angemeldeten Admin „Sichtprüfung (lokal)“, sofern der Client
+`127.0.0.1` oder `::1` ist. Dieser Nutzer wird nicht gespeichert: kein
+Passwort-Hash, kein Datenbankzugriff, keine Sitzung. Ein gültiges Login-Cookie
+geht vor; jeder andere Wert der Variablen als `1` schaltet nichts frei. Gelesen
+wird sie bei jedem Aufruf.
+
+Warum die Variable die eigentliche Sperre ist: Auf der Testumgebung kommen alle
+Anfragen über Apache (`deploy/apache-kap2-test.conf`, Proxy auf 127.0.0.1:8010)
+von 127.0.0.1 am Dienst an; die Prüfung auf Loopback allein hält dort niemanden
+auf. Deshalb darf nur `scripts/sichtstart.sh` die Variable setzen. Sie darf in
+keiner Umgebungsdatei der Testumgebung (`/etc/overlord/kap2-test.env`) oder der
+Produktion stehen, nicht in `deploy/` und nicht in `start-dev.sh`. Belegt ist das
+durch `backend/tests/test_sichtstart_anmeldung.py` und durch die Suche
+`grep -rlI KAP2_SICHTSTART_ANMELDUNG backend/app backend/tests scripts deploy docs .overlord frontend/src`,
+die genau diese vier Dateien nennt: `deps.py`, den Test, `sichtstart.sh` und diese
+Datei.
+
+Datenbank des Sichtstarts: `scripts/sichtstart.sh` startet vor uvicorn eine eigene
+Postgres-Instanz (mit PostGIS) im Verzeichnis
+`${KAP2_SICHT_PGDATA:-$HOME/.local/share/kap2-sicht/pgdata}`, also außerhalb des
+Arbeitsbaums; fehlt es, legt `initdb` es an (Zugriff `trust`, kein Passwort). Die
+Instanz hört nicht auf TCP (`listen_addresses=''`) und ist nur über den Socket im
+Datenverzeichnis erreichbar, die Datenbank heißt `kap2_sicht`; `DATABASE_URL` setzt
+das Skript auf diesen Socket. Sie ist von der Testumgebung getrennt: Der
+System-Cluster auf localhost:5432 und die Datenbank der Testumgebung werden weder
+genutzt noch verändert. Beim Beenden stoppt das Skript die Instanz, aber nur, wenn
+dieser Start sie gestartet hat; eine schon laufende (paralleler Sichtstart) bleibt
+bestehen. Zurücksetzen: Sichtstart beenden und das Verzeichnis
+`~/.local/share/kap2-sicht/pgdata` löschen; der nächste Start legt es neu an, das
+Schema legt das Backend beim Start selbst an (`create_all`).
+
+Die Demo (`/demo/…`) ist über `frontend/src/config/features.ts` (`demo: false`)
+abgeschaltet.
 
 ## Migration / Upgrade
 

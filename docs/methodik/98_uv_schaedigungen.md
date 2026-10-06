@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–485)** ·
+Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–488)** ·
 05.10.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -860,7 +860,7 @@ $$ \text{€}_{\text{Zelle}} \;=\; \sum_e \Delta F_{e,\text{Zelle}} \cdot c_e \;
   Jahren am oberen Ende der Altersverteilung liegen. **Konsequenz (§3.2):** #98 ist der
   altenlastigste Fall der K1-Familie; die YLL-Bewertung fällt hier
   **um Faktor 2,8 (VSL 3,5 Mio. €) bis 4,9 (VSL 6,19 Mio. €) niedriger** aus als eine
-  Bewertung je Todesfall — nachgerechnet: 180,1 klimaattribuierte Todesfälle × 3,5 Mio. €
+  Bewertung je Todesfall — nachgerechnet: 180,0 klimaattribuierte Todesfälle × 3,5 Mio. €
   = 630 Mio. € (bzw. 846 Mio. € bzw. 1,11 Mrd. € bei VSL 4,7 bzw. 6,19 Mio. €) gegenüber
   **226 Mio. €** im YLL-Pfad. Die **Relation zwischen den Risiken verschiebt sich
   entsprechend**: #98 erscheint gegenüber jung-lastigen Risiken (Extremereignisse,
@@ -1016,6 +1016,15 @@ def summe(k, a, c_mm, c_c44):
     return m * c_mm + c * c_c44 + y * 160_800
 assert abs(summe(0.3622, 0.5, 6724, 5883) / 1e6 - 115) < 2    # 1 sigma unten
 assert abs(summe(1.0616, 1.0, 11410, 7436) / 1e6 - 737) < 2   # 1 sigma oben
+# Sensitivitaet der Auswahlregel (Kap. 4, Befund 487): Anker und lambda des
+# Einzeljahres, alles Uebrige (auch L_quer) wie im Basiswert
+def einzeljahr(a_mm, t_mm, a_c44, t_c44):
+    m, c = a_mm * 0.6 * dd, a_c44 * 1.675 * dd
+    y = m * t_mm / a_mm * L_MM + c * t_c44 / a_c44 * L_C44
+    return (m * 6724 + c * 5883 + y * 160_800) / euro - 1
+assert abs(einzeljahr(27_430, 3169, 242_820, 1332) - 0.029) < 0.0005   # 2023: +2,9 %
+assert abs(einzeljahr(27_040, 3146, 243_430, 1275) - 0.015) < 0.0005   # 2022: +1,5 %
+assert abs(einzeljahr(26_140, 2928, 236_670, 1178) + 0.043) < 0.0005   # 2021: -4,3 %
 ```
 
 ```python test: beispiel_98_beispielzelle
@@ -1134,10 +1143,12 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   242.820 ⇒ **240.973**. Revisionsstand: KID 2025; die Neuerkrankungszahlen sind
   vollzähligkeitskorrigierte **Schätzungen** des ZfKD, kein Jahr ist als vorläufig
   ausgewiesen — die Drei-Jahres-Mittelung ist zugleich die Absicherung gegen die
-  Restunsicherheit des jüngsten Registerjahrs. Sensitivität der Auswahlregel:
-  Einzeljahres-Anker 2023 (Rev. 1) ⇒ \(c_{\text{kal}}\) 1,0221/0,9986 und
-  **+2,8 %** auf die €-Summe; Anker 2022 ⇒ +1,5 %; Anker 2021 ⇒ **−4,3 %** — die
-  Spanne der Auswahlregel beträgt damit −4,3 … +2,8 %, weit innerhalb der Bänder.
+  Restunsicherheit des jüngsten Registerjahrs. Sensitivität der Auswahlregel (Anker
+  und \(\lambda_e\) des Einzeljahres, alles Übrige einschließlich \(\bar L_e\) wie im
+  Basiswert; nachgerechnet in `beispiel_98_bundessumme`, §3.4): Einzeljahres-Anker 2023
+  (Rev. 1) ⇒ \(c_{\text{kal}}\) 1,0221/0,9986 und **+2,9 %** auf die €-Summe; Anker 2022
+  ⇒ +1,5 %; Anker 2021 ⇒ **−4,3 %** — die Spanne der Auswahlregel beträgt damit
+  −4,3 … +2,9 %, weit innerhalb der Bänder.
   Genau diese Streuung ist der Grund für die Mittelung. Seit Rev. 3 gilt dieselbe
   Auswahlregel auch für \(\bar L_e\) (Befund 224) — Anker, \(c_{\text{kal}}\),
   \(\lambda_e\) und \(\bar L_e\) stehen jetzt vollständig im selben Fenster.
@@ -1277,7 +1288,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   **VOLY** (136.400–165.600 € ⇒ **−10,1 … +2,0 %**); \(c_e\)-Proxy
   (obere Kostenbänder beider Entitäten ⇒ Behandlungs-€ 113 → 145 Mio. € ⇒ +9,4 % auf die
   Summe, einseitig; Befund 438); Entitäten-Split
-  \(w_{\text{SCC}}\) (0,25–0,50 ⇒ BAF_C44 1,675–1,95 ⇒ ±0 … +9,3 %); Anker-Auswahlregel (−4,3 … +2,8 %);
+  \(w_{\text{SCC}}\) (0,25–0,50 ⇒ BAF_C44 1,675–1,95 ⇒ ±0 … +9,3 %); Anker-Auswahlregel (−4,3 … +2,9 %);
   **Populationsbasis Kalibrierung ↔ Produktion (−1,19 %, §3.3, Befund 226)**.
   **Nur je Kommune, Bundessumme (nahezu) unberührt:** **Räumliche Streuung des
   \(k_{\text{UV}}\)-Rasterquotienten** (−38 … +43 % zwischen 10. und 90. Perzentil der
@@ -1513,9 +1524,12 @@ Jahres unter der heutigen, eingelaufenen Dosislage; die Latenz steckt in den Inz
    Wirkung je Kommune ist diese Punktspanne nicht belegt: Jeder Punktquotient teilt zwei
    Trends aus 26 Jahren und trägt deren Schätzrauschen. Ob hinter der Streuung ein
    räumliches Muster steht, misst Anlage [73] in
-   `backend/data/kalibrierung/k_uv_raumstreuung.md` (Befund 449), mit derselben
-   Punktmenge, demselben Stabilitätsausschluss und demselben Gewicht wie der Bundeswert.
-   Sie reproduziert den Bundeswert mit 0,6671 (Abschnitt 2, Toleranz 0,003).
+   `backend/data/kalibrierung/k_uv_raumstreuung.md` (Befund 449), nach denselben Regeln
+   für Punktmenge, Stabilitätsausschluss und Gewicht wie der Bundeswert, aber auf dem
+   Gebietsstand 2026 und mit einer anderen Zensus-Datei für Einwohner und 65+-Anteil: 10.573 statt
+   10.682 Punkte (Anlage, Absatz »Abweichung vom Lauf vom 01.09.2026« und Abschnitt 1).
+   Mit dieser Punktmenge reproduziert die Anlage den Bundeswert 0,6683 mit 0,6671
+   (Abschnitt 2, Abweichung −0,0012, Toleranz 0,003).
 
    - **Kreiswerte** (Abschnitt 3; gewichtetes Mittel der Punktquotienten je Kreis,
      Perzentile ungewichtet über 399 Kreise): 10. Perzentil 0,4127 und 90. Perzentil
@@ -1754,7 +1768,7 @@ parameter:
   band: null   # Normierungsskalar je Entitaet; wirkt in der §3.3-Formel auf uv.i_raten_roh
                # (Befund 201). Anker = Mittel 2021-2023 (MM 26.870 / C44 240.973), also
                # dasselbe Fenster, ueber das die Ablesewerte gepoolt sind (Befund 220).
-               # Auswahlregel-Sensitivitaet: Einzeljahre -4,3 ... +2,8 % auf die EUR-Summe
+               # Auswahlregel-Sensitivitaet: Einzeljahre -4,3 ... +2,9 % auf die EUR-Summe
   herkunft: herleitung:#i-raten
   quelle: zfkd_kid2025
   preisstand: null
