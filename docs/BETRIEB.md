@@ -329,6 +329,24 @@ beträgt 144.392,88 €; der Golden-Test im Bericht #95 nennt für Warmsen 175.2
 (`backend/data/kalibrierung/golden95_zellen.md`). Die Abweichung ist nicht angeglichen; sie ist
 nicht geklärt.
 
+Warmsen hat in der Sichtstart-Datenbank Daten (berechnet, Maßnahme „Sichtstart: Hitzeaktionspläne“). Zwei
+Aufnahmen mit Klickfolge, kopierbar (aus dem Repo-Wurzelverzeichnis, nur auf dem Server). `--klick` ist ein
+Playwright-Selektor und klickt der Reihe nach; der letzte Klick ist ein Element, das erst nach dem Laden der
+Daten erscheint. Zuerst wird Warmsen gewählt, weil `/app/massnahmen` ohne gewählte Kommune auf `/app` umleitet.
+
+Maßnahmen-Übersicht (Bild zeigt „Warmsen (81.6 km²)“, „Nutzen/Jahr 8.555 €“, „Netto-Nutzen/Jahr -11.445 €“):
+
+```bash
+python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app/massnahmen --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=Maßnahmen-Übersicht" --klick "text=Netto-Nutzen/Jahr" --ziel <Verzeichnis>/sicht1 --start-timeout 300
+```
+
+Dashboard, Karte „Erwartete Schäden je Risiko“ (Bild zeigt „Hitzebelastung (#95)“ mit „144.393 €“ Schaden/Jahr
+und „Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft (#96)“ mit „2.342 €“):
+
+```bash
+python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=Details: Risikoverteilung" --klick "text=Erwartete Schäden je Risiko" --ziel <Verzeichnis>/sicht2 --start-timeout 300
+```
+
 Die Demo (`/demo/…`) ist über `frontend/src/config/features.ts` (`demo: false`)
 abgeschaltet.
 
