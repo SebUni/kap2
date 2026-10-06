@@ -23,7 +23,9 @@ from app.data import diskontierung
 # Weiter aus diesem Modul importierbar; Quelle ist app.data.diskontierung.
 from app.data.diskontierung import PURE_TIME_PREFERENCE_RATES  # noqa: F401
 from app.services.climate.dwd_data import get_climate_projection
-from app.services.measure_service import get_risk_aggregate, kommune_measures_query
+from app.services.measure_service import (
+    STADTBAUM_CODE, get_risk_aggregate, kommune_measures_query,
+)
 from app.services.projection_service import scenario_factors
 
 
@@ -66,6 +68,18 @@ def _group_costs(agg: dict) -> dict[str, float]:
     return {g: round(v, 2) for g, v in out.items()}
 
 
+# Hinweis neben der Zeitreihe: Die Projektion rechnet jede Maßnahme ab dem
+# Umsetzungsjahr mit voller Wirkung; bei der Stadtbaumwahl gilt das für die
+# Nachpflanzung nicht. Wortlaut aus Bericht #96 §5 (Absatz „Kosten der
+# Stadtbaumwahl“), keine eigene Jahreszahl.
+STADTBAUM_WIRKUNGSVERZUG_HINWEIS = (
+    "Stadtbaumwahl: Die Projektion rechnet die Maßnahme ab dem Umsetzungsjahr mit "
+    "voller Wirkung. Bei der Nachpflanzung wirkt die Maßnahme erst, wenn der alte "
+    "Baum fällt, und der Nutzen je Jahr gilt erst mit voller Krone (Amortisation am "
+    "Punktwert nach 24 Jahren; Bericht #96 §5)."
+)
+
+
 def project_costs(db: Session, kommune_id: int, bundesland: str,
                   demo_session_id: str | None = None) -> dict:
     base = get_risk_aggregate(db, kommune_id, apply_measures=False)
@@ -84,6 +98,7 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
     measures = kommune_measures_query(db, kommune_id, demo_session_id).all()
     warnings: list[str] = []
     measure_rows: list[dict] = []
+    hinweise_massnahmen: list[str] = []
     for m in measures:
         summary = m.impact_summary or {}
         if not summary:
@@ -98,6 +113,9 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
                 f"Maßnahme „{m.name}“ liegt mit Umsetzungsjahr {impl} außerhalb "
                 f"des Projektionshorizonts (bis {horizon_end})"
             )
+        if (m.measure_type == STADTBAUM_CODE
+                and STADTBAUM_WIRKUNGSVERZUG_HINWEIS not in hinweise_massnahmen):
+            hinweise_massnahmen.append(STADTBAUM_WIRKUNGSVERZUG_HINWEIS)
         measure_rows.append({
             "id": m.id,
             "name": m.name,
@@ -232,6 +250,7 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             "diskontraten": diskontraten,
             "modellgrenzen": list(diskontierung.MODELLGRENZEN),
         },
+        "hinweise_massnahmen": hinweise_massnahmen,
         "warnings": warnings,
         "source": proj.get("source"),
     }

@@ -109,7 +109,7 @@ def test_werte_der_registry_stimmen_mit_den_bloecken_ueberein():
         if isinstance(wert, str):
             gleich = ist == wert
         else:
-            # Der Block rundet (heat.g_s157: 0,29 = 0,2936 aus der Formel, T-1367).
+            # Der Block rundet auf seine Stellen (heat.g_s157: 0,2936 aus der Formel, T-1367).
             stellen = len(repr(float(wert)).split(".")[1])
             gleich = round(float(ist), stellen) == float(wert)
         if not gleich:

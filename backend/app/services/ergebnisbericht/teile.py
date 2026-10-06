@@ -485,7 +485,9 @@ def _zeilen_html(zeilen: list[str]) -> str:
     return "".join(f'<div class="zeile">{_h(z)}</div>' for z in zeilen)
 
 
-def _verhaeltnis(v: float) -> str:
+def _verhaeltnis(v: float | None) -> str:
+    if v is None:
+        return "Kosten offen"
     return "ohne Kosten" if math.isinf(v) else de_zahl(v, 1)
 
 
@@ -546,7 +548,9 @@ def teil_6(d: Berichtsdaten) -> str:
                 html.append(f'<tr><th>Zusätzlicher Nutzen je Jahr</th><td class="zusatz">'
                             f'{_betrag(d, z.zusatznutzen_eur)}</td></tr>')
             html.append(f'<tr><th>Nutzen-Kosten-Verhältnis ({z.umsetzungsjahr}–{HORIZONT_ENDE})'
-                        f'</th><td class="verhaeltnis">{_h(_verhaeltnis(z.nutzen_kosten))}</td></tr>')
+                        f'</th><td class="verhaeltnis">{_h(_verhaeltnis(z.nutzen_kosten))}'
+                        + (f': {_h(z.kosten_vermerk)}' if z.kosten_offen and z.kosten_vermerk else "")
+                        + '</td></tr>')
         html.append(f'<tr><th>Gewissheit</th><td class="gewissheit">'
                     f'{_zeilen_html(z.gewissheit.split(chr(10)))}</td></tr>')
         html.append(f'<tr><th>Umsetzung</th><td class="umsetzung">'

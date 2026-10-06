@@ -12,21 +12,14 @@ den Produktcode, und einen vierten Wert der Kette (kein Zelllauf) aus
   Warmsen **475 € je Jahr** (§5 Z. 1148: „Im Zelllauf mit Gemeindeschlüssel 1,1 Mio. €;
   Warmsen (Zelllauf) 475 € je Jahr.").
 - **Anpassungspotenzial der Hitzemortalität** mit S157 bei der Voreinstellung und dem
-  Hitzeaktionsplan (Bericht §5 Z. 1169–1175, Befund 149): **0,053**, gleich in Berlin
+  Hitzeaktionsplan (Bericht §5 Z. 1169–1175, Befund 149): **0,064**, gleich in Berlin
   (a_85+ = 0,284) und in Warmsen (a_85+ = 0,224 im Zelllauf), obwohl der Altersaufbau
-  unterschiedlich ist — „das Anpassungspotenzial ebenfalls 0,053".
+  unterschiedlich ist — „das Anpassungspotenzial ebenfalls 0,064".
 - **Öffentliche Kühlzentren bei der Voreinstellung, in der Kette** (Bericht §5, Block
   ``heat.delta_kuehlzentren``, Befunde 139/148, §5 Z. 1228): Berlin **0,75 Mio. € je Jahr**
-  („169,5 Mio. € × 0,05 × 0,089 = 0,75 Mio. €"), gerechnet mit ``_kz_eur`` aus
+  („169,5 Mio. € × 0,05 × 0,0883 = 0,75 Mio. €"), gerechnet mit ``_kz_eur`` aus
   ``test_massnahme_kuehlzentren_95.py`` (importiert, nicht geändert; diese Funktion rechnet
   mit einer gepinnten Berlin-Zelle der Kette, nicht mit dem Zelllauf).
-
-Den Zelllauf-Wert der Kühlzentren (0,72 Mio. €, §5 Z. 1229) bindet dieser Test nicht: Der
-Bericht rechnet ihn mit dem ungerundeten Faktor 0,05 × 0,71 × 3/24 = 0,0044375, sein Block
-``heat.delta_kuehlzentren`` (Kap. 7 Z. 1782) und die Registry führen aber 0,9956 (also 0,0044).
-Die Divergenz ist an den
-CMO gemeldet (Ergebnis T-1616-cto); dieses Paket (T-1618-cto, Ersatz für T-1616) untersucht
-sie nicht weiter und bindet nur den Kettenwert Z. 1228.
 
 Gerechnet wird wie in ``test_methodik_95_golden_betraege.py``: Zellen aus ``_zellen(ags)``
 nach Rasterwert (Sommermittel, Hitzetage) gruppiert, Gauß-Hermite mit 21 Punkten und
@@ -152,9 +145,9 @@ def test_s157_voreinstellung_warmsen_475_eur():
     assert abs(eur - S157_WARMSEN_EUR) < S157_WARMSEN_TOL, f"{eur:.2f} €"
 
 
-def test_anpassungspotenzial_hitzemortalitaet_0_053():
+def test_anpassungspotenzial_hitzemortalitaet_0_064():
     """Anpassungspotenzial der Hitzemortalität mit S157 (Voreinstellung) und
-    Hitzeaktionsplan: 0,053, gleich in Berlin und in Warmsen trotz unterschiedlichem
+    Hitzeaktionsplan: 0,064, gleich in Berlin und in Warmsen trotz unterschiedlichem
     Altersaufbau (Bericht §5 Z. 1169–1175, Befund 149)."""
     p_berlin = _anpassungspotenzial(BERLIN)
     p_warmsen = _anpassungspotenzial(WARMSEN)
@@ -164,9 +157,8 @@ def test_anpassungspotenzial_hitzemortalitaet_0_053():
 
 def test_kuehlzentren_voreinstellung_berlin_kette_0_75_mio_eur():
     """Öffentliche Kühlzentren bei der Voreinstellung, Berlin in der Kette (nicht im
-    Zelllauf): 0,75 Mio. € je Jahr (Bericht §5 Z. 1228: „169,5 Mio. € × 0,05 × 0,089 =
-    0,75 Mio. €"). Der Zelllauf-Wert 0,72 Mio. € (§5 Z. 1229) ist als Divergenz an den CMO
-    gemeldet (T-1616-cto) und wird hier nicht gebunden."""
+    Zelllauf): 0,75 Mio. € je Jahr (Bericht §5 Z. 1228: „169,5 Mio. € × 0,05 × 0,0883 =
+    0,75 Mio. €")."""
     override_context.set_overrides({})
     eur = _kz_eur()
     assert abs(eur - KZ_KETTE_BERLIN_EUR) < KZ_KETTE_BERLIN_TOL, f"{eur / 1e6:.4f} Mio. €"

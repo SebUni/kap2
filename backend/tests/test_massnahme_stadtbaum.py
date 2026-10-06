@@ -42,6 +42,8 @@ import os
 import re
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.data import catalog  # noqa: E402
@@ -213,7 +215,110 @@ def test_docstring_kommunale_pollen_referenz_nennt_ausgangsstand():
     assert "gilt im Ausgangsstand; mit einer Maßnahme sinkt die Summe" in normalisiert
 
 
+# ── (g) s_unbek der Maßnahme ist der des Ausgangslaufs (Ü-10, Befund 252) ─────────────
+
+S_UNBEK_ALLEE_KRONE = 0.3625
+
+
+def _allee_zelle_ohne_tag(**extra) -> dict:
+    """Allee-Zelle nach Ü-13 ohne Gattungs-Tag: Kronenanteil 0,3625 nur in
+    ``canopy_unknown_frac``, Grün 0,3625, 100 Betroffene, Ḡ₀ 0,18125. Ĝ im Ausgangslauf mit
+    s_unbek 0,12: 0,464·(0,12·0,3625) + 0,536·0,3625 = 0,21448."""
+    zelle = {
+        "index": 172.5, "outcome": 172.5,
+        "betroffene": 100.0, "delta_birke": 0.43659, "delta_graeser": 0.57834,
+        "pollen_g": 0.21448, "pollen_g_bar0": 0.18125,
+        "canopy_birch_frac": 0.0, "canopy_unknown_frac": S_UNBEK_ALLEE_KRONE,
+        "green_frac": S_UNBEK_ALLEE_KRONE,
+    }
+    zelle.update(extra)
+    return zelle
+
+
+_A_ALLEE = 0.078125 / S_UNBEK_ALLEE_KRONE
+_OVERRIDE_S_UNBEK = "risks.EXPECTED_ANNUAL_ALLERGY_DAYS.impact.birch_group_share_default"
+
+
+def _summary_mit_overrides(zelle: dict, overrides: dict, monkeypatch) -> dict:
+    """impact_summary der Stadtbaumwahl über ``compute_impact`` (DB-frei, Doppel aus
+    test_massnahme_stadtbaum_ausgabe); die vermiedenen Tage der Zelle (auf drei Stellen
+    gerundet, das Kommunenfeld rundet auf eine) stehen zusätzlich unter ``_zelltage``."""
+    from app.services import parameter_registry
+    from test_massnahme_stadtbaum_ausgabe import _run
+
+    monkeypatch.setattr(parameter_registry, "overrides_map", lambda *_a, **_k: dict(overrides))
+    summary, added = _run(zelle, {"anteil_ersetzt": _A_ALLEE}, monkeypatch)
+    zeile = next(o for o in added if o.measure_id == 1)
+    return {**summary, "_zelltage": (zeile.savings or {}).get("stadtbaum_avoided_days")}
+
+
+def test_s_unbek_der_massnahme_aus_dem_ausgangslauf(monkeypatch):
+    """Ausgangslauf mit s_unbek 0,12 (Zellfeld ``pollen_s_unbek``); die spätere
+    Überschreibung 0,25 ändert die Senkung nicht (1,71 statt 3,55 vermiedene Tage), das
+    impact_summary sagt, dass sie erst mit einem neuen Zelllauf gilt. Ohne Überschreibung
+    ebenfalls 1,71 Tage und kein Hinweis."""
+    zelle = _allee_zelle_ohne_tag(pollen_s_unbek=0.12)
+
+    # Ohne Überschreibung: 1,71 Tage, kein Hinweis.
+    ohne = _summary_mit_overrides(zelle, {}, monkeypatch)
+    assert ohne["_zelltage"] == pytest.approx(1.71, abs=0.01)
+    assert "stadtbaum_s_unbek_hinweis" not in ohne
+
+    # Überschreibung 0,25 nach dem Lauf: weiter 1,71 Tage, nicht 3,55; Hinweis im Summary.
+    mit = _summary_mit_overrides(zelle, {_OVERRIDE_S_UNBEK: 0.25}, monkeypatch)
+    assert mit["_zelltage"] == pytest.approx(1.71, abs=0.01)
+    assert abs(mit["_zelltage"] - 3.55) > 1.0
+    assert mit["stadtbaum_avoided_days_total"] == pytest.approx(1.7, abs=0.05)
+    hinweis = mit["stadtbaum_s_unbek_hinweis"]
+    assert "0,25" in hinweis and "0,12" in hinweis
+    assert "neuen Zelllauf" in hinweis
+
+    # Zellebene: Faktor und Tage hängen nicht an der Überschreibung.
+    a = {"anteil_ersetzt": _A_ALLEE}
+    f_ohne, t_ohne, _ = measure_service._stadtbaum_cell_effect(a, 1.0, zelle)
+    with override_context.override_scope({_OVERRIDE_S_UNBEK: 0.25}):
+        f_mit, t_mit, _ = measure_service._stadtbaum_cell_effect(a, 1.0, zelle)
+    assert f_ohne == f_mit and t_ohne == t_mit
+
+
+def test_s_unbek_ausgangslauf_ohne_feld_rechnet_mit_heutigem_wert_und_sagt_es(monkeypatch):
+    """Gespeicherter Lauf vor dieser Änderung (kein ``pollen_s_unbek``): die Senkung rechnet
+    mit dem Wert von heute, das impact_summary verlangt den neuen Ausgangslauf — keine
+    stille Zahl."""
+    zelle = _allee_zelle_ohne_tag()
+    assert "pollen_s_unbek" not in zelle
+
+    summary = _summary_mit_overrides(zelle, {_OVERRIDE_S_UNBEK: 0.25}, monkeypatch)
+    assert summary["_zelltage"] == pytest.approx(3.55, abs=0.01)
+    hinweis = summary["stadtbaum_s_unbek_hinweis"]
+    assert "neu zu rechnen" in hinweis and "0,25" in hinweis
+
+    ohne = _summary_mit_overrides(zelle, {}, monkeypatch)
+    assert ohne["_zelltage"] == pytest.approx(1.71, abs=0.01)
+    assert "neu zu rechnen" in ohne["stadtbaum_s_unbek_hinweis"]
+
+
+def test_zelle_legt_s_unbek_des_laufs_ab():
+    """``runner.build_cell_risks`` legt neben ``pollen_g_bar0`` den s_unbek des Laufs ab
+    (Override der Kommune oder Vorgabe 0,12); Risiken ohne Pollenrechnung tragen das Feld
+    nicht."""
+    from app.services.engine import runner
+
+    impacts = {RISK: {"outcome": 1.0, "cost_eur": 6.2, "pollen_g": 0.21448,
+                      "pollen_g_bar0": 0.18125},
+               "OTHER": {"outcome": 1.0, "cost_eur": 1.0}}
+    indices = {RISK: 50.0, "OTHER": 10.0}
+
+    risks = runner.build_cell_risks(indices, impacts)
+    assert risks[RISK]["pollen_s_unbek"] == 0.12
+    assert "pollen_s_unbek" not in risks["OTHER"]
+
+    with override_context.override_scope({_OVERRIDE_S_UNBEK: 0.0}):
+        assert runner.build_cell_risks(indices, impacts)[RISK]["pollen_s_unbek"] == 0.0
+    with override_context.override_scope({_OVERRIDE_S_UNBEK: 0.25}):
+        assert runner.build_cell_risks(indices, impacts)[RISK]["pollen_s_unbek"] == 0.25
+
+
 if __name__ == "__main__":
-    import pytest
 
     sys.exit(pytest.main([__file__, "-q"]))
