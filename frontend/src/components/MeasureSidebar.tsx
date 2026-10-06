@@ -406,6 +406,11 @@ export default function MeasureSidebar() {
                 ? impact.benefit_display
                 : <>{fmtEur(impact.annual_benefit_eur)}{impact.benefit_note && <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{impact.benefit_note}</span>}</>}</span>
             </div>
+            {isStadtbaum && impact.stadtbaum_s_unbek_hinweis && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 2 }}>
+                {impact.stadtbaum_s_unbek_hinweis}
+              </div>
+            )}
             {isS157 && !impact.benefit_display && impact.kuehlzentren_benefit_eur != null && (
               <div style={{ marginTop: 4, fontSize: '0.8rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0' }}>
