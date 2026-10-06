@@ -636,8 +636,8 @@ def build_payload(nr: str) -> dict:
         rev = stand["revision"]
         tabs = [{
             "label": f"Ziel-Modell (Bericht {rev}): YLL & €",
-            "note": "So wird #95 nach der Integration (cto-integration 95) im Produkt gerechnet und "
-                    "dargestellt (YLL × VOLY, empirische Wochenquantile, ein nationaler "
+            "note": f"So rechnet die Methodik #95 laut Bericht {rev} "
+                    "(YLL × VOLY, empirische Wochenquantile, ein nationaler "
                     "Skalar c_kal 0,581 auf bevölkerungsgewichteter Kalibrierbasis, "
                     "β_Süd nachgeschätzt 0,0876, neue Altersketten).",
             "lineage": g, "parameters": p,
@@ -645,9 +645,9 @@ def build_payload(nr: str) -> dict:
         params = parameter_registry.catalog_parameters()
         for code, label in (
                 ("EXPECTED_ANNUAL_MORTALITY",
-                 "Ist-Produktstand Mortalität (integriert)"),
+                 "Ist-Produktstand Mortalität"),
                 ("EXPECTED_ANNUAL_MORBIDITY",
-                 "Ist-Produktstand Erkrankungen (integriert)")):
+                 "Ist-Produktstand Erkrankungen")):
             if code in catalog.RISKS_BY_CODE:
                 tabs.append({
                     "label": label,
@@ -660,8 +660,9 @@ def build_payload(nr: str) -> dict:
             "subtitle": f"Ziel-Modell laut Methodik-Bericht {rev} "
                         "(docs/methodik/95_hitzebelastung.md); Ist-Produktstand als "
                         "Vergleichstabs.",
-            "banner": f"Stand laut Statuszeile des Berichts: {stand['status']}. "
-                      "Die Ist-Tabs kommen live aus Backend-Registry/Lineage-Builder.",
+            "banner": f"Ziel-Modell laut Bericht {rev}. Die Ist-Tabs kommen live aus "
+                      "Backend-Registry/Lineage-Builder; wie weit das Produkt dem Bericht folgt, "
+                      "steht im Befund-Ledger (reviews/BEFUNDE_95.md), nicht in dieser Vorschau.",
             "generated": today,
             "tabs": tabs,
         }
@@ -670,7 +671,7 @@ def build_payload(nr: str) -> dict:
         g, p = _graph_96()
         tabs = [{
             "label": "Ziel-Modell (Bericht Rev. 1): Symptomtage & €",
-            "note": "So rechnet das Produkt #96 seit der Integration (31.08.2026): "
+            "note": "So rechnet die Methodik #96 laut Bericht: "
                     "gemessene Saison-Spreizung × Prävalenz × Klima-Attribution, "
                     "moduliert mit der lokalen Vegetationslast P̂.",
             "lineage": g, "parameters": p,
@@ -678,7 +679,7 @@ def build_payload(nr: str) -> dict:
         code = "EXPECTED_ANNUAL_ALLERGY_DAYS"
         if code in catalog.RISKS_BY_CODE:
             tabs.append({
-                "label": "Ist-Produktstand (integriert)",
+                "label": "Ist-Produktstand",
                 "note": "Live aus Backend-Registry/Lineage-Builder — Abweichungen "
                         "zum Ziel-Modell wären ein Ledger-Befund.",
                 "lineage": lineage_graph.build_risk_lineage(code),
@@ -687,11 +688,11 @@ def build_payload(nr: str) -> dict:
         return {
             "title": "#96 Aeroallergene pflanzlicher Herkunft",
             "subtitle": "Schicht-B-Modell laut Methodik-Bericht "
-                        "(docs/methodik/96_aeroallergene.md), integriert 31.08.2026.",
-            "banner": "Integration vollzogen: Symptomtage sind die native "
-                      "Ergebnisgröße (€ = ΔTage × c_Tag 6,20 €₂₀₂₄); die Ebenen "
-                      "POLLEN_LOAD, POPULATION_U20 und CANOPY_BIRCH_FRACTION sind "
-                      "angelegt.",
+                        "(docs/methodik/96_aeroallergene.md).",
+            "banner": "Symptomtage sind die native Ergebnisgröße (€ = ΔTage × c_Tag "
+                      "6,20 €₂₀₂₄). Der Ist-Tab kommt live aus Backend-Registry/"
+                      "Lineage-Builder; wie weit das Produkt dem Bericht folgt, steht im "
+                      "Befund-Ledger (reviews/BEFUNDE_96.md), nicht in dieser Vorschau.",
             "generated": today,
             "tabs": tabs,
         }
@@ -699,11 +700,11 @@ def build_payload(nr: str) -> dict:
         g, p = _graph_98()
         return {
             "title": "#98 UV-bedingte Gesundheitsschädigungen",
-            "subtitle": "Geplantes Schicht-B-Modell laut Methodik-Bericht "
+            "subtitle": "Schicht-B-Modell laut Methodik-Bericht "
                         "(docs/methodik/98_uv_schaedigungen.md).",
-            "banner": "Vorschau des geplanten Modells — noch nicht integriert. "
-                      "Nach der Integration (cto-integration 98) erzeugt das Produkt dieses Diagramm "
-                      "aus der Registry; Abweichungen wären ein Befund.",
+            "banner": "Wirkungsmechanismus laut Methodik-Bericht. Wie weit das Produkt ihn "
+                      "umsetzt, steht im Befund-Ledger (reviews/BEFUNDE_98.md), nicht in dieser "
+                      "Vorschau; Abweichungen wären ein Befund.",
             "generated": today,
             "tabs": [{"label": "YLL, Zusatzfälle & € (K1 UV)", "lineage": g,
                       "parameters": p}],
