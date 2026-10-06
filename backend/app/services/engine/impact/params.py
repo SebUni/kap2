@@ -1863,3 +1863,10 @@ for _spec in IMPACT_PARAM_SPECS:
         if _block in _POLLEN_HERLEITUNG:
             _spec.setdefault("evidence_derivation", dict(_POLLEN_HERLEITUNG[_block]))
 del _spec, _block
+
+# Vorgabewert von s_unbek (Registry-Spec ``birch_group_share_default``, Berichtsblock
+# ``pollen.s_unbekannt``). Die Zahl steht nur in der Spec oben; Runner, Maßnahmen-
+# rechnung und ``indicators.pollen_load`` lesen sie hier (Abgleich-Regel 4).
+BIRCH_GROUP_SHARE_DEFAULT: float = next(
+    float(s["value"]) for s in IMPACT_PARAM_SPECS
+    if s["risk"] == "EXPECTED_ANNUAL_ALLERGY_DAYS" and s["key"] == "birch_group_share_default")

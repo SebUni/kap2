@@ -626,18 +626,26 @@ STADTBAUM_S_UNBEK_ABWEICHUNG = "ueberschreibung_erst_mit_neuem_lauf"
 STADTBAUM_S_UNBEK_ALTLAUF = "ausgangslauf_ohne_s_unbek"
 
 
+def _s_unbek_heute() -> float:
+    """s_unbek von heute: Überschreibung der Kommune, sonst der Vorgabewert der Registry."""
+    from app.services.engine.impact.params import BIRCH_GROUP_SHARE_DEFAULT
+
+    heute = override_context.get_override(
+        f"risks.{ALLERGY_RISK_CODE}.impact.birch_group_share_default",
+        BIRCH_GROUP_SHARE_DEFAULT)
+    return BIRCH_GROUP_SHARE_DEFAULT if heute is None else float(heute)
+
+
 def _stadtbaum_s_unbek(cell_risk: dict) -> tuple[float, str | None]:
     """(s_unbek für die Senkung, Lage) einer Zelle.
 
     Der Wert ist ``pollen_s_unbek`` des gespeicherten Ausgangslaufs. Lage
     ``STADTBAUM_S_UNBEK_ABWEICHUNG``: die Überschreibung von heute weicht davon ab und
     gilt erst mit einem neuen Zelllauf. Lage ``STADTBAUM_S_UNBEK_ALTLAUF``: der Lauf
-    stammt von vor dieser Änderung und trägt das Feld nicht — die Senkung rechnet dann
-    mit dem Wert von heute, der Ausgangslauf ist neu zu rechnen. ``None``: kein Hinweis.
+    ist älter und speichert das Feld noch nicht — die Senkung rechnet dann mit dem Wert
+    von heute, der Ausgangslauf ist neu zu rechnen. ``None``: kein Hinweis.
     """
-    heute = override_context.get_override(
-        f"risks.{ALLERGY_RISK_CODE}.impact.birch_group_share_default", 0.12)
-    heute = 0.12 if heute is None else float(heute)
+    heute = _s_unbek_heute()
     lauf = cell_risk.get("pollen_s_unbek")
     if lauf is None:
         return heute, STADTBAUM_S_UNBEK_ALTLAUF
@@ -726,9 +734,7 @@ def _stadtbaum_s_unbek_hinweis(s_unbek_lagen: dict[str, set[float]]) -> dict:
     ``s_unbek_lagen`` ordnet je Lage (``STADTBAUM_S_UNBEK_ABWEICHUNG``/``…_ALTLAUF``) die
     Werte zu, mit denen Zellen gerechnet haben. Leer: kein Hinweis, kein Feld.
     """
-    heute = override_context.get_override(
-        f"risks.{ALLERGY_RISK_CODE}.impact.birch_group_share_default", 0.12)
-    heute = 0.12 if heute is None else float(heute)
+    heute = _s_unbek_heute()
     texte: list[str] = []
     abw = s_unbek_lagen.get(STADTBAUM_S_UNBEK_ABWEICHUNG)
     if abw:
@@ -738,9 +744,9 @@ def _stadtbaum_s_unbek_hinweis(s_unbek_lagen: dict[str, set[float]]) -> dict:
             f"Zelllauf; die Senkung rechnet mit s_unbek = {werte} des Ausgangslaufs.")
     if s_unbek_lagen.get(STADTBAUM_S_UNBEK_ALTLAUF):
         texte.append(
-            "Der Ausgangslauf stammt von vor dieser Änderung und trägt s_unbek nicht; die "
-            f"Senkung rechnet mit s_unbek = {_de_zahl(heute)}. Der Ausgangslauf ist neu zu "
-            "rechnen.")
+            "Der Ausgangslauf ist älter und speichert den Anteil der Kronen ohne Gattung "
+            f"noch nicht (s_unbek). Die Senkung rechnet mit s_unbek = {_de_zahl(heute)}. "
+            "Rechnen Sie den Ausgangslauf neu.")
     if not texte:
         return {}
     return {"stadtbaum_s_unbek_hinweis": " ".join(texte)}

@@ -77,6 +77,32 @@ def test_mehrere_stadtbaumwahlen_bleiben_ein_hinweis(monkeypatch):
     assert len(out["hinweise_massnahmen"]) == 1
 
 
+def _baum(mid, fall=None):
+    m = _measure(mid, f"Stadtbaumwahl {mid}", STADTBAUM_CODE)
+    m.config = {"ersatzfall": fall} if fall else {}
+    return m
+
+
+def test_hinweis_bei_nachpflanzung(monkeypatch):
+    out = _projektion(monkeypatch, [_baum(1, "nachpflanzung")])
+    assert out["hinweise_massnahmen"] == [cps.STADTBAUM_WIRKUNGSVERZUG_HINWEIS]
+
+
+def test_hinweis_ohne_fall(monkeypatch):
+    out = _projektion(monkeypatch, [_baum(1)])
+    assert out["hinweise_massnahmen"] == [cps.STADTBAUM_WIRKUNGSVERZUG_HINWEIS]
+
+
+def test_kein_hinweis_bei_vorgezogen(monkeypatch):
+    out = _projektion(monkeypatch, [_baum(1, "vorgezogen")])
+    assert out["hinweise_massnahmen"] == []
+
+
+def test_vorgezogen_und_nachpflanzung_genau_ein_hinweis(monkeypatch):
+    out = _projektion(monkeypatch, [_baum(1, "vorgezogen"), _baum(2, "nachpflanzung")])
+    assert out["hinweise_massnahmen"] == [cps.STADTBAUM_WIRKUNGSVERZUG_HINWEIS]
+
+
 def test_ohne_stadtbaumwahl_leere_liste(monkeypatch):
     out = _projektion(monkeypatch, [_measure(2, "Entsiegelung", "DEPAVING")])
     assert out["hinweise_massnahmen"] == []

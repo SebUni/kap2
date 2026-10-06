@@ -307,6 +307,52 @@ bestehen. Zurücksetzen: Sichtstart beenden und das Verzeichnis
 `~/.local/share/kap2-sicht/pgdata` löschen; der nächste Start legt es neu an, das
 Schema legt das Backend beim Start selbst an (`create_all`).
 
+Beispielkommune des Sichtstarts ist **Warmsen** (Landkreis Nienburg (Weser), AGS 03256034,
+3.150 Einwohner laut Bewertungslauf), nicht Berlin: Der Server hat 2 CPU und 4 GB
+Speicher, Berlin hat 40.669 bewohnte Zellen. Angelegt wird sie mit
+`python3 scripts/sicht_beispielkommune.py` (aus dem Repo-Wurzelverzeichnis, nur Standardbibliothek).
+Das Skript startet `scripts/sichtstart.sh` selbst, steuert die API auf 127.0.0.1:8000 mit denselben
+Schritten wie die Oberfläche (Kommune suchen und anlegen, Raster, Bewertung bis Status `done`, eine
+Maßnahme aus dem Katalog, Wirkung berechnen) und beendet den Sichtstart am Ende wieder, auch bei
+Fehlern. Die Zahlen stammen aus dem Rechenweg des Produkts; nichts wird von Hand in die Datenbank
+geschrieben. Die letzte Ausgabezeile ist JSON (Kommune, Status, Jahresbetrag #95, Maßnahme, Jahresnutzen).
+Ein zweiter Aufruf legt nichts neu an und startet keinen neuen Bewertungslauf; er liest und gibt
+dieselben Beträge aus. Neu anlegen: Sichtstart beendet, Verzeichnis `~/.local/share/kap2-sicht/pgdata`
+löschen (siehe oben), Skript erneut aufrufen. Der erste Lauf hat am 06.10.2026 auf dem Server 270 s
+gedauert (4 s Start, 255 s Bewertung mit Zensus-, OSM- und Höhenmodell-Download, 8.495 Zellen à 100 m);
+die Downloads gehen in die von `.gitignore` ausgenommenen Verzeichnisse (`backend/data/zensus/…`,
+`backend/data/dwd_cdc/`, `backend/.cache/`). Der zweite Aufruf dauerte 7 s (4 s Sichtstart, 3 s Abfragen).
+Gewählte Maßnahme: „Hitzeaktionspläne“ (Typ `HEAT_ACTION_PLANS`), Geltungsbereich die größte Fläche
+der Gemeindegrenze; sie ist der erste Katalogtyp mit Nutzen für #95 oder #96, der einen Jahresnutzen
+größer 0 liefert. Der Jahresbetrag #95 (Quelle: `risk-summary`, Karte „Erwartete Schäden je Risiko“)
+beträgt 144.392,88 €; der Golden-Test im Bericht #95 nennt für Warmsen 175.256 €
+(`backend/data/kalibrierung/golden95_zellen.md`). Die Abweichung ist nicht angeglichen; sie ist
+nicht geklärt.
+
+Warmsen hat in der Sichtstart-Datenbank Daten (berechnet, Maßnahme „Sichtstart: Hitzeaktionspläne“). Zwei
+Aufnahmen mit Klickfolge, kopierbar (aus dem Repo-Wurzelverzeichnis, nur auf dem Server). `--klick` ist ein
+Playwright-Selektor und klickt der Reihe nach; der letzte Klick ist ein Element, das erst nach dem Laden der
+Daten erscheint. Zuerst wird Warmsen gewählt, weil `/app/massnahmen` ohne gewählte Kommune auf `/app` umleitet.
+
+Maßnahmen-Übersicht (Bild zeigt „Warmsen (81.6 km²)“, „Nutzen/Jahr 8.555 €“, „Netto-Nutzen/Jahr -11.445 €“):
+
+```bash
+python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app/massnahmen --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=81.6 km²" --klick "text=Maßnahmen-Übersicht" --klick "text=Netto-Nutzen/Jahr" --ziel <Verzeichnis>/sicht1 --start-timeout 300
+```
+
+Dashboard, Karte „Erwartete Schäden je Risiko“ (Bild zeigt „Allergische Reaktionen durch Aeroallergene
+pflanzlicher Herkunft (#96)“ mit „2.342 €“ Schaden/Jahr; stabil). Der Betrag von „Hitzebelastung (#95)“ hängt vom
+Rechenstand ab: „135.838 €“ mit Wirkung der Maßnahme „Hitzeaktionspläne“, „144.393 €“ ohne sie (API-Wert aus
+`sicht_beispielkommune.py`). Zitiert wird, was das Bild zeigt.
+
+Der Klick auf „81.6 km²“ (Flächenangabe im Kopf) wartet, bis die Kommune gewählt und geladen ist. Ohne ihn lief
+ein späterer Klick einmal in den Timeout (`ok: false`, Bild zeigte das Dashboard). Endet ein Aufruf trotzdem mit
+`ok: false`, erneut ausführen.
+
+```bash
+python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=81.6 km²" --klick "text=Details: Risikoverteilung" --klick "text=Erwartete Schäden je Risiko" --ziel <Verzeichnis>/sicht2 --start-timeout 300
+```
+
 Die Demo (`/demo/…`) ist über `frontend/src/config/features.ts` (`demo: false`)
 abgeschaltet.
 

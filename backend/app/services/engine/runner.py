@@ -17,13 +17,15 @@ from app.services.engine.indicators import compute_cell_hev
 from app.services.engine.auxiliary import build_auxiliary
 from app.services.engine import impact, override_context, risk_engine
 from app.services.engine.impact.base import CellContext
+from app.services.engine.impact.params import BIRCH_GROUP_SHARE_DEFAULT
 from app.services.engine.progress import RISK_COMPOSE, FINALIZE, lerp
 
 log = logging.getLogger(__name__)
 
 # Vorgabewert von s_unbek (Registry ``birch_group_share_default``, wie in
-# ``indicators.pollen_load``), falls der Lauf keinen Override trägt.
-POLLEN_S_UNBEK_DEFAULT = 0.12
+# ``indicators.pollen_load``), falls der Lauf keinen Override trägt. Die Zahl steht nur
+# in der Registry (impact/params.py).
+POLLEN_S_UNBEK_DEFAULT = BIRCH_GROUP_SHARE_DEFAULT
 
 COASTAL_BUNDESLAENDER = {
     "Schleswig-Holstein", "Mecklenburg-Vorpommern", "Niedersachsen",
