@@ -337,14 +337,20 @@ Daten erscheint. Zuerst wird Warmsen gewählt, weil `/app/massnahmen` ohne gewä
 Maßnahmen-Übersicht (Bild zeigt „Warmsen (81.6 km²)“, „Nutzen/Jahr 8.555 €“, „Netto-Nutzen/Jahr -11.445 €“):
 
 ```bash
-python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app/massnahmen --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=Maßnahmen-Übersicht" --klick "text=Netto-Nutzen/Jahr" --ziel <Verzeichnis>/sicht1 --start-timeout 300
+python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app/massnahmen --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=81.6 km²" --klick "text=Maßnahmen-Übersicht" --klick "text=Netto-Nutzen/Jahr" --ziel <Verzeichnis>/sicht1 --start-timeout 300
 ```
 
-Dashboard, Karte „Erwartete Schäden je Risiko“ (Bild zeigt „Hitzebelastung (#95)“ mit „144.393 €“ Schaden/Jahr
-und „Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft (#96)“ mit „2.342 €“):
+Dashboard, Karte „Erwartete Schäden je Risiko“ (Bild zeigt „Allergische Reaktionen durch Aeroallergene
+pflanzlicher Herkunft (#96)“ mit „2.342 €“ Schaden/Jahr; stabil). Der Betrag von „Hitzebelastung (#95)“ hängt vom
+Rechenstand ab: „135.838 €“ mit Wirkung der Maßnahme „Hitzeaktionspläne“, „144.393 €“ ohne sie (API-Wert aus
+`sicht_beispielkommune.py`). Zitiert wird, was das Bild zeigt.
+
+Der Klick auf „81.6 km²“ (Flächenangabe im Kopf) wartet, bis die Kommune gewählt und geladen ist. Ohne ihn lief
+ein späterer Klick einmal in den Timeout (`ok: false`, Bild zeigte das Dashboard). Endet ein Aufruf trotzdem mit
+`ok: false`, erneut ausführen.
 
 ```bash
-python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=Details: Risikoverteilung" --klick "text=Erwartete Schäden je Risiko" --ziel <Verzeichnis>/sicht2 --start-timeout 300
+python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=81.6 km²" --klick "text=Details: Risikoverteilung" --klick "text=Erwartete Schäden je Risiko" --ziel <Verzeichnis>/sicht2 --start-timeout 300
 ```
 
 Die Demo (`/demo/…`) ist über `frontend/src/config/features.ts` (`demo: false`)
