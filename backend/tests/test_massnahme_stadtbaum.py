@@ -291,11 +291,12 @@ def test_s_unbek_ausgangslauf_ohne_feld_rechnet_mit_heutigem_wert_und_sagt_es(mo
     summary = _summary_mit_overrides(zelle, {_OVERRIDE_S_UNBEK: 0.25}, monkeypatch)
     assert summary["_zelltage"] == pytest.approx(3.55, abs=0.01)
     hinweis = summary["stadtbaum_s_unbek_hinweis"]
-    assert "neu zu rechnen" in hinweis and "0,25" in hinweis
+    assert "Rechnen Sie den Ausgangslauf neu" in hinweis and "0,25" in hinweis
+    assert "älter" in hinweis and "Kronen ohne Gattung" in hinweis and "Änderung" not in hinweis
 
     ohne = _summary_mit_overrides(zelle, {}, monkeypatch)
     assert ohne["_zelltage"] == pytest.approx(1.71, abs=0.01)
-    assert "neu zu rechnen" in ohne["stadtbaum_s_unbek_hinweis"]
+    assert "Rechnen Sie den Ausgangslauf neu" in ohne["stadtbaum_s_unbek_hinweis"]
 
 
 def test_zelle_legt_s_unbek_des_laufs_ab():

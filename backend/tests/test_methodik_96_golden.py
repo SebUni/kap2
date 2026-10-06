@@ -89,6 +89,33 @@ def test_registry_matches_report_parameters():
     assert H.POLLEN_A_ATTR == _spec("a_attr")["value"]
 
 
+def test_s_unbekannt_block_wert_gleich_registry_und_an_einer_stelle():
+    """Kap.-7-Block ``pollen.s_unbekannt`` (docs/methodik/96_aeroallergene.md) == Registry-
+    Spec ``birch_group_share_default`` == der Wert, den Runner, Maßnahmenrechnung und
+    ``indicators.pollen_load`` ohne Überschreibung verwenden (die Zahl steht nur in der
+    Registry, Abgleich-Regel 4)."""
+    with open(os.path.abspath(REPORT), encoding="utf-8") as fh:
+        text = fh.read()
+    kap7 = text[text.index("## 7 Parameter-Blöcke"):]
+    m = re.search(r"^\s*id: pollen\.s_unbekannt\s*\n\s*wert:\s*([0-9.]+)", kap7, re.M)
+    assert m, "Kap.-7-Block pollen.s_unbekannt mit wert fehlt im Bericht"
+    block_wert = float(m.group(1))
+    reg = _spec("birch_group_share_default")["value"]
+    assert block_wert == reg
+
+    from app.services import measure_service
+    from app.services.engine import runner
+    from app.services.engine.impact.params import BIRCH_GROUP_SHARE_DEFAULT
+    from app.services.engine.indicators import POLLEN_G_WEIGHT_BIRKE, pollen_load
+
+    assert BIRCH_GROUP_SHARE_DEFAULT == reg
+    assert runner.POLLEN_S_UNBEK_DEFAULT == reg
+    assert measure_service._s_unbek_heute() == reg
+    # pollen_load ohne Überschreibung: nur ungetaggte Kronen → Ĝ = w_B · s_unbek.
+    g = pollen_load({"canopy_birch_frac": 0.0, "canopy_unknown_frac": 1.0, "green_frac": 0.0})
+    assert g == round(POLLEN_G_WEIGHT_BIRKE * reg, 5)
+
+
 def test_cost_rate_chain_matches_report():
     """§3.5-Kette: c_Tag = c_Jahr/d_Saison — testgebunden an den Katalog-Kostensatz."""
     risk = catalog.RISKS_BY_CODE[CODE]
