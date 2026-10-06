@@ -17,9 +17,9 @@ den Produktcode, und einen vierten Wert der Kette (kein Zelllauf) aus
   unterschiedlich ist — „das Anpassungspotenzial in beiden Kommunen 0,064".
 - **Öffentliche Kühlzentren bei der Voreinstellung, in der Kette** (Bericht §5, Block
   ``heat.delta_kuehlzentren``, Befunde 139/148): Berlin **0,75 Mio. € je Jahr**
-  („169,5 Mio. € × 0,05 × 0,0883 = 0,75 Mio. €"), gerechnet mit ``_kz_eur`` aus
-  ``test_massnahme_kuehlzentren_95.py`` (importiert, nicht geändert; diese Funktion rechnet
-  mit einer gepinnten Berlin-Zelle der Kette, nicht mit dem Zelllauf).
+  (Rechnung nach §5: 169,5 Mio. € × 0,05 × 0,0883 = 0,75 Mio. €), gerechnet mit
+  ``_kz_eur`` aus ``test_massnahme_kuehlzentren_95.py`` (importiert, nicht geändert; diese
+  Funktion rechnet mit einer gepinnten Berlin-Zelle der Kette, nicht mit dem Zelllauf).
 
 Gerechnet wird wie in ``test_methodik_95_golden_betraege.py``: Zellen aus ``_zellen(ags)``
 nach Rasterwert (Sommermittel, Hitzetage) gruppiert, Gauß-Hermite mit 21 Punkten und
@@ -157,8 +157,8 @@ def test_anpassungspotenzial_hitzemortalitaet_0_064():
 
 def test_kuehlzentren_voreinstellung_berlin_kette_0_75_mio_eur():
     """Öffentliche Kühlzentren bei der Voreinstellung, Berlin in der Kette (nicht im
-    Zelllauf): 0,75 Mio. € je Jahr (Bericht §5 Kühlzentren: „169,5 Mio. € × 0,05 × 0,0883 =
-    0,75 Mio. €")."""
+    Zelllauf): 0,75 Mio. € je Jahr. Rechnung nach Bericht §5 Kühlzentren:
+    169,5 Mio. € × 0,05 × 0,0883 = 0,75 Mio. €."""
     override_context.set_overrides({})
     eur = _kz_eur()
     assert abs(eur - KZ_KETTE_BERLIN_EUR) < KZ_KETTE_BERLIN_TOL, f"{eur / 1e6:.4f} Mio. €"

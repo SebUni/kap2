@@ -1305,7 +1305,7 @@ Konservative **Interventionseffekte** (nicht Teil des Basiswerts); Fall-Kontroll
   die Wirkung ist aus Heimen und aus dem Labor übertragen. Wie \(\delta_{\text{VG}}\) wirkt der Hebel im abgedeckten Teil
   der Kommune. **Andockpunkt im Produkt:** dieselbe Maßnahme `COOLING_ROOMS_DRINKING_WATER` („Kühle Räume /
   Kühlzentren“); ihr Kostenmodell (je Raum, ein Raum je 20 ha nach dem Konzept „kühle Orte“) beschreibt öffentliche
-  Kühlräume. Umsetzung beim CTO (eiserne Regel 5). **R7-Weiche:** wie bei S157, Kühl-Mehrkosten ab Stufe M5 bei #65.
+  Kühlräume. **R7-Weiche:** wie bei S157, Kühl-Mehrkosten ab Stufe M5 bei #65.
 - **Schutzprogramme vulnerable Gruppen (Knoten S152; Hitzetelefon, aufsuchende Betreuung,
   Besuchsdienste für Menschen ab 75 zu Hause):** Faktor \(\delta_{\text{VG}}\) auf den Wochenexzess der
   Bänder 75–84 und 85+ (Block `heat.delta_vg`, Befunde 123, 125–128), wie \(\delta_{\text{HAP}}\)
