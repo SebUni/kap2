@@ -5,7 +5,7 @@ Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048: Schr
 Log 23/24, Befunde 156–167), Schritt 3 Pflichtinhalte — Kap. 1 „Risiko ohne (weitere) Anpassung“,
 Kennzeichnung der Parameter-Blöcke, Jahresbeträge ohne Abzinsung (T-1240, Log 25, Befunde 168–181),
 Schritt 4 Bezugswert Ḡ₀ der Stadtbaumwahl (T-1323, T-1362, Log 26, Befund 182), Nachzug der Befunde 183–185, Runde 14 mit Befunden 186–194, Runde 15 mit Befunden 195–197 (T-1330), Runde 16 mit Befunden 199–200 und Runde 17 mit Befunden 201–204 und 206 (T-1427);
-Null-Runde über den ganzen Bericht: A Runde 21 (T-1442-methodik_manager), B Runde 22 (T-1443-methodik_manager); Runden 24 bis 27 nach der Integration mit Befunden 230–253 (T-1632-methodik_manager bis T-1635-methodik_manager); Runde 28 über A und B mit Befunden 254–257, Nacharbeit Runde 29 (T-1638-methodik_manager); Runden 30–32 mit Befunden 258–264 (T-1650-methodik_manager, T-1651-methodik_manager): Klimaanteil \(a_{\text{attr}}\) 0,27 statt 0,50 (Befund 258); Null-Runde der vollen Gegenprüfung A und B in Runde 32 (T-1651-methodik_manager); ABGENOMMEN durch den methodik_manager am 30.09.2026 (T-1639-methodik_manager))** ·
+Null-Runde über den ganzen Bericht: A Runde 21 (T-1442-methodik_manager), B Runde 22 (T-1443-methodik_manager); Runden 24 bis 27 nach der Integration mit Befunden 230–253 (T-1632-methodik_manager bis T-1635-methodik_manager); Runde 28 über A und B mit Befunden 254–257, Nacharbeit Runde 29 (T-1638-methodik_manager); Runden 30–32 mit Befunden 258–264 (T-1650-methodik_manager, T-1651-methodik_manager): Klimaanteil \(a_{\text{attr}}\) 0,27 statt 0,50 (Befund 258); Null-Runde der vollen Gegenprüfung A und B in Runde 32 (T-1651-methodik_manager); ABGENOMMEN durch den methodik_manager am 30.09.2026 (T-1639-methodik_manager); Abgleich mit der Übernahme Ü-1 bis Ü-13 des CTO (T-1690-ceo, T-1691-ceo): Bericht nachgezogen am 06.10.2026 (T-1773-supervisor: §3.6 Zeile δ, §5 Absatz „Produktstand“); die volle Schlussprüfung A und B folgt im selben Ticket)** ·
 Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 96-A** (Prävalenz, also Anteil der Betroffenen an der Bevölkerung, × gemessene Pollensaison-Spreizung, bottom-up; Entscheidungslog Nr. 1)
@@ -948,7 +948,7 @@ assert abs(dt * 6.20 - 676) < 5
 | \(m_{g,V}\) | Anteil **aller** Tage der Dekaden mit Zusatztagen, an denen der DWD-Index der Gruppe \(g\) im DWD-Gebiet \(V\) mindestens „mittel“ meldet (nur Ersetzungspfad von \(t_{\text{warn}}\)) | — | noch nicht ausgewertet; Quelle DWD-Pollenflugstatistik [71]; wird über \(m_{g,V}/f\) umgerechnet, nie direkt eingesetzt; herleitung:#s158-wirkung |
 | \(V\) | Gebiet des DWD-Pollenflug-Gefahrenindex (12 Gebiete mit 27 Vorhersageflächen [72]), für das [71] den Anteil ausweist; **nicht** die Modellregion \(R\) (Nord/Mitte/Süd, §3.3). Jedes Gebiet liegt in genau einer Modellregion | — | Zuordnung Zelle → DWD-Gebiet über das Bundesland (und das Teilgebiet) der Zelle; herleitung:#s158-wirkung |
 | \(A_{\text{Zelle}}\) | Geltungsbereich der Pollen-Frühwarnung: Anteil der Zellfläche im Gebiet der kommunalen Warnkanäle, von 0 (außerhalb) bis 1 (ganz im Gebiet); im Maßnahmen-Modul der Deckungsgrad der Zelle durch die Geometrie der Maßnahme (Befund 232) | — | Eingabe des Nutzers, kein Parameter; herleitung:#s158-wirkung |
-| \(\delta_B,\ \delta_G\) | Zusatztage je Betroffenem der Birkengruppe bzw. der Gräser, \(\delta_B + \delta_G = \delta_R\) | Tage/(Betroffener·Jahr) | Teilung von \(\delta_R\) nach den beiden Summanden (§3.3); Berlin 0,8085 / 1,0710; herleitung:#s158-wirkung |
+| \(\delta_B,\ \delta_G\) | Zusatztage je Betroffenem der Birkengruppe bzw. der Gräser, \(\delta_B + \delta_G = \delta_R\) | Tage/(Betroffener·Jahr) | Teilung von \(\delta_R\) nach den beiden Summanden (§3.3); Berlin 0,43659 / 0,57834 (\(a_{\text{attr}}\) = 0,27); herleitung:#s158-wirkung |
 
 ### 3.7 Schicht A (getrennt; nie auf €-Pfaden)
 
@@ -1512,15 +1512,15 @@ assert round(1_000 / faell_band[0], 1) == 2.5 and round(faell_band[1] / 1_000, 1
   Kommune zeichnet die Zellen als Geometrie der Maßnahme und gibt einen Anteil \(a\) ein, im Produkt
   das Feld `anteil_ersetzt`: den Anteil der allergenen Kronen, die dort ersetzt werden.
   **Wertebereich 0 bis 1** (0 < \(a\) ≤ 1; 1 heißt: alle allergenen Kronen der Zelle). Eine Eingabe
-  über 1 hat keine Bedeutung. Das Produkt weist sie bei Anlage und Änderung einer Maßnahme ab; über
-  den Excel-Import von Maßnahmen und in Maßnahmen, die vor dieser Prüfung gespeichert wurden, kommt
-  sie ungeprüft in die Rechnung. Dort bildet das Produkt erst \(a\) × Deckungsgrad × Kronenanteil
-  und kappt dann je Term am Kronenanteil. Eine Eingabe über 1 zählt deshalb nur bei voll gedeckter
-  Zelle wie 1; bei teilweiser Deckung senkt sie mehr als \(a\) = 1, bis zum 1/Deckungsgrad-Fachen,
-  ohne dass es sichtbar wird. Gemessen an der Allee-Zelle: Bei Deckungsgrad 1 ergeben \(a\) = 1,
-  1,5 und 2,0 je 65,9 vermiedene Tage; bei Deckungsgrad 0,5 ergibt \(a\) = 1 33,0 Tage,
-  \(a\) = 1,5 49,4 Tage und \(a\) = 2,0 65,9 Tage, das Doppelte. Das Produkt soll solche Eingaben
-  auch dort abweisen oder sichtbar kappen (Befund 251). Je Zelle sinkt der Kronenanteil mit
+  über 1 hat keine Bedeutung. Das Produkt weist sie bei Anlage und Änderung einer Maßnahme und im
+  Excel-Import ab (dort als Fehlerzeile mit Zeilennummer). Trägt eine früher gespeicherte Maßnahme
+  noch \(a\) über 1, rechnet die Zelle keinen Betrag und nennt die Eingabe, die zu berichtigen ist
+  (Befund 251, Übernahme Ü-9). Ohne diese Sperre bildete der Rechenweg erst \(a\) × Deckungsgrad ×
+  Kronenanteil und kappte dann je Term am Kronenanteil; bei teilweiser Deckung senkte eine Eingabe
+  über 1 dann mehr als \(a\) = 1, bis zum 1/Deckungsgrad-Fachen, ohne dass es sichtbar wurde.
+  Gemessen an der Allee-Zelle: Bei Deckungsgrad 1 ergäben \(a\) = 1, 1,5 und 2,0 ohne Sperre je
+  65,9 vermiedene Tage; bei Deckungsgrad 0,5 ergäbe \(a\) = 1 33,0 Tage, \(a\) = 1,5 49,4 Tage und \(a\) = 2,0
+  65,9 Tage, das Doppelte. Je Zelle sinkt der Kronenanteil mit
   Gattungs-Tag um \(a\) × Deckungsgrad × \(k_{\text{Birke},z}\) und der ohne Gattungs-Tag um
   \(a\) × Deckungsgrad × \(k_{\text{unbek},z}\), jeweils in seinem eigenen Term und höchstens bis auf
   null (Grenze je Term oben); die Senkung folgt also der Mischung der Zelle im Ausgangsstand. Eine
@@ -1536,22 +1536,25 @@ assert round(1_000 / faell_band[0], 1) == 2.5 and round(faell_band[1] / 1_000, 1
   und Euro der Kommune, gekennzeichnet als „Abschätzung von KAP3“ mit dem Hinweis auf die Richtung des
   Fehlers in λ (Modellgrenze 7). Fehlt die Eingabe \(a\) oder führen die gewählten Zellen keine Kronen,
   steht ein Vermerk statt 0 €. Für die Allee-Zelle und das Rechenbeispiel der Kommune oben ergibt das
-  Produkt dieselben Zahlen (14,2 Tage und ≈ 88 € je Jahr; 637 Tage und ≈ 3.950 € je Jahr), sobald Ü-13 den Klimaanteil 0,27 übernimmt; bis dahin mit 0,50 das 1,85-Fache;
-  liegen Frühwarnung und Stadtbaumwahl in derselben Zelle, rechnet die Frühwarnung ihre vermiedenen Tage
-  auf die Tage nach der Pflanzung (Absatz oben; Allee-Zelle 6,597 statt 7,19 Tage). Was noch vom Bericht
-  abweicht, führt das Ledger: Den Euro-Betrag der Frühwarnung rechnet das Produkt in diesem Fall noch auf
-  den Ausgangsstand (44,57 € statt 6,597 × 6,20 € = 40,90 €, Befund 240), Euro je Zelle gibt es nicht aus
-  (Befund 237), Kosten der Maßnahme führt es noch nicht, obwohl der Bericht sie beziffert (Absatz
-  „Kosten der Stadtbaumwahl“ oben, Befund 253), und Gattungswissen der
-  Kommune geht nur kommunenweit über \(s_{\text{unbek}}\) ein (Befund 246, Modellgrenze oben).
-  Überschreibt die Kommune \(s_{\text{unbek}}\) nach dem Ausgangslauf, rechnet die Maßnahme die
-  Senkung mit dem neuen Wert, \(\hat G\) und Ḡ₀ aber aus dem gespeicherten Ausgangslauf mit dem alten
-  (Befund 252). Nach Log 26 gehören \(\hat G\), \(\hat G'\) und Ḡ₀ zum selben Ausgangsstand; ein
-  neues \(s_{\text{unbek}}\) ist ein neuer Ausgangsstand und braucht einen neuen Zelllauf. Gemessen an
-  der Allee-Zelle ohne Gattungs-Tag (Ausgangslauf mit 0,12, danach 0,25): 3,55 vermiedene Tage gegen
-  114,5 Tage des Ausgangslaufs, gleich gerechnet wären es 1,71 von 114,5 oder 3,55 von 123,1 Tagen;
-  bei \(a\) = 1 hält der Boden die Senkung beim Kronen-Summanden des alten Laufs (7,91 Tage statt
-  16,48 Tage mit 0,25).
+  Produkt dieselben Zahlen mit dem Klimaanteil 0,27 (Übernahme Ü-13): 14,2 Tage und ≈ 88 € je Jahr;
+  637 Tage und ≈ 3.950 € je Jahr. Liegen Frühwarnung und Stadtbaumwahl in derselben Zelle, rechnet die
+  Frühwarnung ihre vermiedenen Tage und Euro auf die Tage nach der Pflanzung (Absatz oben; Allee-Zelle
+  3,56 statt 3,88 Tage, 3,56 × 6,20 € = 22,09 € statt 24,07 €; Befund 240, Übernahme Ü-7). Je Zelle
+  gibt das Produkt die vermiedenen Tage und Euro aus, Euro = Tage × 6,20 € (Allee-Zelle: Stadtbaumwahl
+  88,10 €, Frühwarnung allein 24,07 €); die Summe der ungerundeten Zellwerte ist der Euro-Betrag der
+  Kommune, gerundet wird nur in der Anzeige (Befund 237, Übernahme Ü-4). Die Kosten der Maßnahme führt
+  es je gewähltem Fall wie im Absatz „Kosten der Stadtbaumwahl“ oben (Befund 253, Übernahmen Ü-11 und
+  Ü-12). Gattungswissen der Kommune geht nur kommunenweit über \(s_{\text{unbek}}\) ein (Befund 246,
+  Modellgrenze oben). Nach Log 26 gehören \(\hat G\), \(\hat G'\) und Ḡ₀ zum selben Ausgangsstand;
+  ein neues \(s_{\text{unbek}}\) ist ein neuer Ausgangsstand und braucht einen neuen Zelllauf. Das
+  Produkt rechnet die Senkung deshalb mit dem \(s_{\text{unbek}}\), das im Ausgangslauf je Zelle
+  gespeichert ist. Überschreibt die Kommune den Wert danach, sagt ein Hinweis neben dem Betrag, dass
+  er erst mit einem neuen Zelllauf gilt; trägt ein älterer Ausgangslauf den Wert noch nicht, rechnet
+  die Maßnahme mit dem Wert von heute und bittet, den Ausgangslauf neu zu rechnen (Befund 252,
+  Übernahme Ü-10). Gemessen an der Allee-Zelle ohne Gattungs-Tag (Ausgangslauf mit 0,12, danach
+  0,25): 1,71 vermiedene Tage von 114,5 wie ohne Überschreibung; erst ein neuer Zelllauf mit 0,25
+  ergibt 3,55 von 123,1 Tagen. Vor Ü-10 mischte das Produkt beide Stände und wies 3,55 von 114,5 Tagen
+  aus.
   **Integrationsauflage (Stadtbaumwahl)**, im
   Rahmen der Auflage aus §3.3 (nur zellscharfe Änderung von \(\hat G\) mit Neuberechnung, nie ein
   Faktor): Der CTO braucht (1) die vom Nutzer gewählten Zellen, (2) als Eingabe die Änderung des
