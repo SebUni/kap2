@@ -8,6 +8,10 @@ als Kindprozess (eigene Postgres-Instanz, Backend auf 127.0.0.1:8000, Frontend a
 127.0.0.1:5173), wartet auf `/api/health` und steuert dann die API des Produkts
 direkt, mit denselben Schritten wie die Oberfläche:
 
+  (0) Gemeindetabelle füllen: fehlt die VG250-Gemeinde von Warmsen in `gemeinden`, läuft der
+      vorhandene VG250-Import des Produkts (`ingest_gemeinden`, Niedersachsen). Ohne sie findet der
+      Worker keinen Gemeindeschlüssel, und Stufe 2 der Ersatzregel 65+ entfällt (T-1814). War Warmsen
+      schon berechnet, wird nach dem Füllen einmal neu berechnet.
   (a) vorhanden? Warmsen mit Status `done` und die Maßnahme da: nur lesen und ausgeben,
   (b) Suche und Anlegen der Kommune (Grenze aus OSM),
   (c) Raster erzeugen,
@@ -22,6 +26,7 @@ aus Antworten der API. Die letzte Zeile der Ausgabe ist JSON; Exit-Code 0 nur, w
 alles gelungen ist.
 """
 import argparse
+import getpass
 import gzip
 import json
 import os
@@ -44,6 +49,13 @@ RISIKEN_95_96 = {
     "EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY",
     "EXPECTED_ANNUAL_ALLERGY_DAYS",
 }
+AGS_WARMSEN = "03256034"
+BUNDESLAND_WARMSEN = "Niedersachsen"
+VENV = os.environ.get("KAP2_VENV", os.path.join(os.path.expanduser("~"), ".venvs", "kap2"))
+PGDATA = os.environ.get("KAP2_SICHT_PGDATA",
+                        os.path.join(os.path.expanduser("~"), ".local", "share", "kap2-sicht", "pgdata"))
+# Datenbank des Sichtstarts, gleiche Form wie in scripts/sichtstart.sh (Socket, ohne Passwort).
+DATENBANK_URL = f"postgresql://{getpass.getuser()}@/kap2_sicht?host={PGDATA}"
 GOLDEN_95_EUR = 175256  # backend/data/kalibrierung/golden95_zellen.md
 
 
@@ -129,6 +141,77 @@ def log_ende(log_pfad, zeichen=2000):
         return "(kein Protokoll)"
 
 
+# ── Produktcode in der Projektumgebung (Gemeindetabelle) ──────────────────────
+
+_CODE_FUELLEN = """
+import json, sys
+from app.db.database import SessionLocal
+from app.models.lite_models import Gemeinde
+from app.services.lite.vg250_loader import ingest_gemeinden
+ags, land = sys.argv[1], sys.argv[2]
+db = SessionLocal()
+try:
+    vorher = db.query(Gemeinde).count()
+    da = db.query(Gemeinde.ags).filter(Gemeinde.ags == ags).first() is not None
+    geschrieben = 0
+    if not da:
+        geschrieben = ingest_gemeinden(db, bundesland=land)
+    print(json.dumps({"vorher": vorher, "warmsen_vorher": da, "geschrieben": geschrieben,
+                      "nachher": db.query(Gemeinde).count(),
+                      "warmsen_nachher": db.query(Gemeinde.ags).filter(Gemeinde.ags == ags).first() is not None}))
+finally:
+    db.close()
+"""
+
+_CODE_SCHLUESSEL = """
+import sys
+from app.db.database import SessionLocal
+from app.models.models import Kommune
+from app.tasks.assessment_worker import _gemeindeschluessel
+db = SessionLocal()
+try:
+    print(_gemeindeschluessel(db, db.query(Kommune).filter(Kommune.id == int(sys.argv[1])).first()))
+finally:
+    db.close()
+"""
+
+
+def produktcode(code, *argumente, timeout=1800):
+    """Führt Produktcode mit der Projektumgebung gegen die Sichtstart-Datenbank aus; gibt die
+    letzte Ausgabezeile zurück."""
+    python = os.path.join(VENV, "bin", "python")
+    if not os.path.exists(python):
+        raise Fehler(f"Projektumgebung fehlt: {python} (anlegen mit bash scripts/testlauf.sh)")
+    env = dict(os.environ, DATABASE_URL=DATENBANK_URL,
+               PYTHONPYCACHEPREFIX=os.path.join(VENV, "pycache"))
+    try:
+        p = subprocess.run([python, "-c", code, *argumente], cwd=os.path.join(ROOT, "backend"),
+                           env=env, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired as exc:
+        raise Fehler(f"Produktcode nach {timeout} s nicht fertig") from exc
+    if p.returncode != 0:
+        raise Fehler(f"Produktcode endete mit Exit {p.returncode}:\n{(p.stdout + p.stderr)[-2000:]}")
+    zeilen = [z for z in p.stdout.splitlines() if z.strip()]
+    return zeilen[-1] if zeilen else ""
+
+
+def fuelle_gemeinden():
+    """(0) Gemeindetabelle über den VG250-Import des Produkts füllen, wenn Warmsen fehlt.
+
+    Gibt True zurück, wenn dabei geschrieben wurde (eine frühere Bewertung ist dann veraltet).
+    """
+    melde("Gemeindetabelle prüfen (VG250, ggf. Download und Import für Niedersachsen) …")
+    antwort = json.loads(produktcode(_CODE_FUELLEN, AGS_WARMSEN, BUNDESLAND_WARMSEN))
+    if not antwort["warmsen_nachher"]:
+        raise Fehler(f"Gemeinde {AGS_WARMSEN} fehlt nach dem VG250-Import in `gemeinden`.")
+    if antwort["warmsen_vorher"]:
+        melde(f"Gemeindetabelle schon gefüllt: {antwort['nachher']} Zeilen, Warmsen ({AGS_WARMSEN}) dabei.")
+        return False
+    melde(f"Gemeindetabelle gefüllt: {antwort['vorher']} → {antwort['nachher']} Zeilen "
+          f"({antwort['geschrieben']} Gemeinden {BUNDESLAND_WARMSEN} aus VG250), Warmsen ({AGS_WARMSEN}) dabei.")
+    return True
+
+
 # ── Schritte ──────────────────────────────────────────────────────────────────
 
 def finde_kommune():
@@ -165,10 +248,18 @@ def lege_kommune_an():
     return kommune
 
 
-def bewertung(kommune_id, max_sekunden):
-    """(c)+(d) Raster, Bewertung einreihen, abfragen bis `done`. Gibt den Status zurück."""
+def bewertung(kommune_id, max_sekunden, neu_rechnen=False):
+    """(c)+(d) Raster, Bewertung einreihen, abfragen bis `done`. Gibt den Status zurück.
+
+    `neu_rechnen`: eine abgeschlossene Bewertung entstand ohne Gemeindeschlüssel (leere
+    Gemeindetabelle) und wird einmal neu eingereiht.
+    """
     status = api("GET", f"/api/kommune/{kommune_id}/status")
-    if status.get("status") == "done":
+    if status.get("status") == "done" and neu_rechnen:
+        melde("Bewertung entstand ohne Gemeindetabelle: wird einmal neu berechnet.")
+        api("POST", f"/api/kommune/{kommune_id}/assess")
+        status = {"status": "queued"}
+    elif status.get("status") == "done":
         melde("Bewertung schon abgeschlossen (done): kein neuer Bewertungslauf gestartet.")
         return status
     if status.get("status") in (None, "error"):
@@ -264,13 +355,18 @@ def betrag_95(kommune_id):
 
 def arbeite(max_sekunden):
     start = time.time()
+    gemeinden_neu = fuelle_gemeinden()
     kommune = finde_kommune()
     war_vorhanden = kommune is not None
     if not kommune:
         kommune = lege_kommune_an()
     else:
         melde(f"Kommune {kommune['name']} schon vorhanden (id {kommune['id']}).")
-    status = bewertung(kommune["id"], max_sekunden)
+    ags = produktcode(_CODE_SCHLUESSEL, str(kommune["id"]))
+    melde(f"Gemeindeschlüssel für {kommune['name']} laut Worker-Abfrage: {ags}")
+    if ags in ("", "None"):
+        raise Fehler("Die Abfrage des Workers liefert für Warmsen keinen Gemeindeschlüssel.")
+    status = bewertung(kommune["id"], max_sekunden, neu_rechnen=gemeinden_neu)
     kommune = api("GET", f"/api/kommune/{kommune['id']}")  # Einwohner stehen erst nach der Bewertung
     m, wirkung, grund, neu = massnahme(kommune)
     betrag, bezeichnung = betrag_95(kommune["id"])
@@ -279,13 +375,14 @@ def arbeite(max_sekunden):
     melde(f"Jahresbetrag {bezeichnung}: {euro(betrag)} (Golden-Test #95 im Bericht: "
           f"{euro(GOLDEN_95_EUR, 0)}; Abweichung {euro(betrag - GOLDEN_95_EUR)}, nicht angeglichen)")
     melde(f"Einwohner laut Kommune: {kommune.get('population')} (Golden-Test: 3087)")
-    if war_vorhanden and not neu:
+    if war_vorhanden and not neu and not gemeinden_neu:
         melde("Nichts neu angelegt: Kommune und Maßnahme waren da, kein neuer Bewertungslauf.")
     melde(f"Dauer dieses Aufrufs ohne Sichtstart-Start: {int(time.time() - start)} s")
     return {
         "kommune": kommune["name"],
         "kommune_id": kommune["id"],
         "status": status["status"],
+        "gemeindeschluessel": ags,
         "betrag_95_eur_jahr": round(betrag, 2),
         "massnahme": {"name": m["name"], "typ": m["measure_type"]},
         "nutzen_eur_jahr": float(wirkung["annual_benefit_eur"]),
