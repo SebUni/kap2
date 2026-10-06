@@ -324,8 +324,11 @@ die Downloads gehen in die von `.gitignore` ausgenommenen Verzeichnisse (`backen
 `backend/data/dwd_cdc/`, `backend/.cache/`). Der zweite Aufruf dauerte 7 s (4 s Sichtstart, 3 s Abfragen).
 Gewählte Maßnahme: „Hitzeaktionspläne“ (Typ `HEAT_ACTION_PLANS`), Geltungsbereich die größte Fläche
 der Gemeindegrenze; sie ist der erste Katalogtyp mit Nutzen für #95 oder #96, der einen Jahresnutzen
-größer 0 liefert. Der Jahresbetrag #95 (Quelle: `risk-summary`, Karte „Erwartete Schäden je Risiko“)
-beträgt 144.392,88 €; der Golden-Test im Bericht #95 nennt für Warmsen 175.256 €
+größer 0 liefert. Der Jahresbetrag #95 laut API (`risk-summary`, ohne Wirkung der Maßnahme) beträgt
+144.392,88 €. Die Karte „Erwartete Schäden je Risiko“ zeigt diesen Wert nur, solange `cost-summary` nicht
+geladen ist; sonst nimmt sie `costSummary.klimawirkungen` vor `riskSummary`
+(`frontend/src/components/dashboard/CostTablesSection.tsx`, Z. 17–19) und zeigt mit der Maßnahme 135.838 €.
+Der Golden-Test im Bericht #95 nennt für Warmsen 175.256 €
 (`backend/data/kalibrierung/golden95_zellen.md`). Die Abweichung ist nicht angeglichen; sie ist
 nicht geklärt.
 
@@ -333,6 +336,10 @@ Warmsen hat in der Sichtstart-Datenbank Daten (berechnet, Maßnahme „Sichtstar
 Aufnahmen mit Klickfolge, kopierbar (aus dem Repo-Wurzelverzeichnis, nur auf dem Server). `--klick` ist ein
 Playwright-Selektor und klickt der Reihe nach; der letzte Klick ist ein Element, das erst nach dem Laden der
 Daten erscheint. Zuerst wird Warmsen gewählt, weil `/app/massnahmen` ohne gewählte Kommune auf `/app` umleitet.
+
+Der Klick auf „81.6 km²“ (Flächenangabe im Kopf) wartet, bis die Kommune gewählt und geladen ist; er steht in
+beiden Aufnahmen. Ohne ihn lief ein späterer Klick einmal in den Timeout (`ok: false`, Bild zeigte das
+Dashboard). Endet ein Aufruf trotzdem mit `ok: false`, erneut ausführen.
 
 Maßnahmen-Übersicht (Bild zeigt „Warmsen (81.6 km²)“, „Nutzen/Jahr 8.555 €“, „Netto-Nutzen/Jahr -11.445 €“):
 
@@ -342,12 +349,10 @@ python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app/ma
 
 Dashboard, Karte „Erwartete Schäden je Risiko“ (Bild zeigt „Allergische Reaktionen durch Aeroallergene
 pflanzlicher Herkunft (#96)“ mit „2.342 €“ Schaden/Jahr; stabil). Der Betrag von „Hitzebelastung (#95)“ hängt vom
-Rechenstand ab: „135.838 €“ mit Wirkung der Maßnahme „Hitzeaktionspläne“, „144.393 €“ ohne sie (API-Wert aus
-`sicht_beispielkommune.py`). Zitiert wird, was das Bild zeigt.
-
-Der Klick auf „81.6 km²“ (Flächenangabe im Kopf) wartet, bis die Kommune gewählt und geladen ist. Ohne ihn lief
-ein späterer Klick einmal in den Timeout (`ok: false`, Bild zeigte das Dashboard). Endet ein Aufruf trotzdem mit
-`ok: false`, erneut ausführen.
+Stand von `cost-summary` ab: Die Karte nimmt `costSummary.klimawirkungen` vor `riskSummary`
+(`CostTablesSection.tsx`, Z. 17–19). Mit der Maßnahme „Hitzeaktionspläne“ zeigt das Bild „135.838 €“;
+„144.393 €“ ist der API-Wert von `risk-summary` ohne Maßnahmenwirkung (so gibt ihn `sicht_beispielkommune.py`
+aus) und erscheint nur, solange `cost-summary` fehlt. Zitiert wird, was das Bild zeigt.
 
 ```bash
 python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=81.6 km²" --klick "text=Details: Risikoverteilung" --klick "text=Erwartete Schäden je Risiko" --ziel <Verzeichnis>/sicht2 --start-timeout 300
