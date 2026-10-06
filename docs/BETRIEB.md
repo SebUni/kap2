@@ -293,6 +293,20 @@ durch `backend/tests/test_sichtstart_anmeldung.py` und durch die Suche
 die genau diese vier Dateien nennt: `deps.py`, den Test, `sichtstart.sh` und diese
 Datei.
 
+Datenbank des Sichtstarts: `scripts/sichtstart.sh` startet vor uvicorn eine eigene
+Postgres-Instanz (mit PostGIS) im Verzeichnis
+`${KAP2_SICHT_PGDATA:-$HOME/.local/share/kap2-sicht/pgdata}`, also außerhalb des
+Arbeitsbaums; fehlt es, legt `initdb` es an (Zugriff `trust`, kein Passwort). Die
+Instanz hört nicht auf TCP (`listen_addresses=''`) und ist nur über den Socket im
+Datenverzeichnis erreichbar, die Datenbank heißt `kap2_sicht`; `DATABASE_URL` setzt
+das Skript auf diesen Socket. Sie ist von der Testumgebung getrennt: Der
+System-Cluster auf localhost:5432 und die Datenbank der Testumgebung werden weder
+genutzt noch verändert. Beim Beenden stoppt das Skript die Instanz, aber nur, wenn
+dieser Start sie gestartet hat; eine schon laufende (paralleler Sichtstart) bleibt
+bestehen. Zurücksetzen: Sichtstart beenden und das Verzeichnis
+`~/.local/share/kap2-sicht/pgdata` löschen; der nächste Start legt es neu an, das
+Schema legt das Backend beim Start selbst an (`create_all`).
+
 Die Demo (`/demo/…`) ist über `frontend/src/config/features.ts` (`demo: false`)
 abgeschaltet.
 
