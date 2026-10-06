@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–488)** ·
+Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–489)** ·
 05.10.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -1227,7 +1227,7 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   sierungen 2004–2024 +94,5 % [27,28]) ✓; YLL-Anteil = 1.404 / ≈ 39.130 (= \(\sum_e \text{Sterbefälle}_e \times \bar L_e\)
   = 3.081,0 · 10,4569 + 1.261,7 · 5,4787, Anlage [71]; Befund 352) Gesamt-Hautkrebs-
   YLL ≈ **3,6 %** (konsistent zu BAF × ΔDosis) ✓. *Untergrenze:* SSD-Anstieg ist messfest
-  > 0 (alle Länder +4,5…+12,1 %, alle Regionen +7,8…+9,2 % [69,72]); untere
+  > 0 (bevölkerungsgewichtet alle Länder +4,8…+12,1 %, alle Regionen +7,8…+9,2 % [72]); untere
   Bandkombination ergibt ≈ 115 Mio. € > 0.
 - **Bänder je Achse — separat ausgewiesen, nicht kumuliert (§3.9; Befund 221).**
   Rev. 1 behauptete diese Trennung, bezifferte sie aber nicht; hier die Zahlen
