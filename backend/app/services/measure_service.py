@@ -1515,9 +1515,11 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     cell_savings["s158_avoided_days"] = round(avoided_days, 3)
                     # Euro je Zelle (Befund 237, Ü-4): vermiedene Tage × c_Tag des
                     # Risikos (Katalog-Kostensatz pollen.c_tag, mit Override wie die
-                    # Zellkosten), gerundet auf 0,01 €.
-                    cell_savings["s158_avoided_eur"] = round(risk_engine.cost_from_outcome(
-                        catalog.RISKS_BY_CODE[code], avoided_days), 2)
+                    # Zellkosten), ungerundet aus den ungerundeten Tagen gespeichert:
+                    # Die Summe der Zellwerte bleibt so an den Kommunenbetrag gebunden;
+                    # gerundet wird nur in der Anzeige.
+                    cell_savings["s158_avoided_eur"] = risk_engine.cost_from_outcome(
+                        catalog.RISKS_BY_CODE[code], avoided_days)
                     s158_avoided_days_total += avoided_days
             if (_is_stadtbaum(mdef) and code == ALLERGY_RISK_CODE
                     and stadtbaum_missing_reason is None):
@@ -1532,9 +1534,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     cell_savings["stadtbaum_missing_reason"] = "canopy"
                 elif avoided_days is not None:
                     cell_savings["stadtbaum_avoided_days"] = round(avoided_days, 3)
-                    # Euro je Zelle (Befund 237, Ü-4), Rechnung wie bei S158.
-                    cell_savings["stadtbaum_avoided_eur"] = round(risk_engine.cost_from_outcome(
-                        catalog.RISKS_BY_CODE[code], avoided_days), 2)
+                    # Euro je Zelle (Befund 237, Ü-4), Rechnung wie bei S158, ungerundet.
+                    cell_savings["stadtbaum_avoided_eur"] = risk_engine.cost_from_outcome(
+                        catalog.RISKS_BY_CODE[code], avoided_days)
                     stadtbaum_avoided_days_total += avoided_days
                     # s_unbek nur dort melden, wo es die Senkung bestimmt (Kronen ohne
                     # Gattungs-Tag); Zellen ohne solche Kronen rechnen davon unabhängig.
