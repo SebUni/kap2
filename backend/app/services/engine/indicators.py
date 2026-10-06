@@ -83,6 +83,7 @@ def pollen_load(ci: dict) -> float:
     Kronen ohne Gattungs-Tag zählt (Bericht §5).
     """
     from app.services.engine import override_context
+    from app.services.engine.impact.params import BIRCH_GROUP_SHARE_DEFAULT
 
     code = "EXPECTED_ANNUAL_ALLERGY_DAYS"
 
@@ -98,7 +99,7 @@ def pollen_load(ci: dict) -> float:
     # oder die DE-Spreizungen, ohne die Konstante nachzuziehen, wird der
     # Golden-Test rot.
     w_b = POLLEN_G_WEIGHT_BIRKE
-    share_default = _p("birch_group_share_default", 0.12)
+    share_default = _p("birch_group_share_default", BIRCH_GROUP_SHARE_DEFAULT)
     birch = float(ci.get("canopy_birch_frac") or 0.0)
     unknown = float(ci.get("canopy_unknown_frac") or 0.0)
     green = float(ci.get("green_frac") or 0.0)
