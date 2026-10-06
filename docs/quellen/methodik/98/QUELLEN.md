@@ -22,11 +22,11 @@ ohne Netz nachlesen kann (Ticket T-1501, Regel T-1352-ceo, Muster `docs/quellen/
 
 **Zuordnung nach Abschnitten des Berichts** `docs/methodik/98_uv_schaedigungen.md`: je Kennung die Stellen, die die Quelle
 mit Seite, Tabelle oder Abbildung zitieren (Treffer von `grep -n -E "S\. [0-9]|Tab\. [0-9]|Abb\. [0-9]"`, Stand des
-Branches am 27.09.2026). Nach Abschnitten statt nach Zeilennummern, weil sich die Zeilen mit jeder Runde verschieben.
+Branches am 27.09.2026, nachgezogen am 06.10.2026 (Befund 491)). Nach Abschnitten statt nach Zeilennummern, weil sich die Zeilen mit jeder Runde verschieben.
 
 - [31]: Kap. 1 (A-Befunde, „Tab. 2/Tab. 4“); Evidenz-Register 98-E20-02; §3.2 (Rechenblock Stationsquotient, Tabelle
   Station gegen Raster, Erläuterung zu Tab. 2 und Tab. 4); Parameterblock `k_uv`; Kap. 8 [31] (Tab. 2, Tab. 4); Kap. 8 [74]
-  (verweist auf „[31] (Tab. 2/4, Kap. 2)“); Entscheidungslog Nr. 26.
+  (verweist auf „[31] (Tab. 2/4, Kap. 2)“); Entscheidungslog Nr. 23 und 26.
 - [27]: Evidenz-Register 98-R35-01 (Abb. 3.13.2/3.14.3) und 98-K1-02 (Tab. 3.13.1/3.14.1); §3.3 (Ablesekette Abb. 3.13.2 und
   3.14.3, Anker Tab. 3.13.1/3.14.1, zwei Rechenblöcke); §4 (Vergleichswerte Tab. 3.13.1/3.14.1); Parameterblöcke der
   Ablesewerte (Abb. 3.13.2, „Abb. 3.14.2“, mit Befund 459 auf Abb. 3.14.3 berichtigt); Kap. 8 [27]; Entscheidungslog Nr. 20.
