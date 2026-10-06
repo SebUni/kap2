@@ -303,7 +303,10 @@ das Skript auf diesen Socket. Sie ist von der Testumgebung getrennt: Der
 System-Cluster auf localhost:5432 und die Datenbank der Testumgebung werden weder
 genutzt noch verändert. Beim Beenden stoppt das Skript die Instanz, aber nur, wenn
 dieser Start sie gestartet hat; eine schon laufende (paralleler Sichtstart) bleibt
-bestehen. Zurücksetzen: Sichtstart beenden und das Verzeichnis
+bestehen. Vor `initdb` und `pg_ctl` nimmt das Skript eine exklusive Sperre auf
+`~/.local/share/kap2-sicht/sichtstart.lock`; ein zweiter Start, solange der erste
+läuft, nennt die Sperre, endet mit Exit-Code 1 und startet, stoppt und
+initialisiert nichts. Zurücksetzen: Sichtstart beenden und das Verzeichnis
 `~/.local/share/kap2-sicht/pgdata` löschen; der nächste Start legt es neu an, das
 Schema legt das Backend beim Start selbst an (`create_all`).
 

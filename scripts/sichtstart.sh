@@ -72,6 +72,19 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+# Sperre gegen parallelen Start (T-1797): Entwickler und Prüfer können den
+# Sichtstart gleichzeitig aufrufen. Wer die Sperre nicht bekommt, beendet sich
+# mit Exit 1, ohne initdb, pg_ctl start oder pg_ctl stop zu berühren. Die Sperre
+# hält Dateikennung 9 bis zum Ende dieses Skripts (flock gibt sie beim Beenden frei).
+LOCKDIR="$HOME/.local/share/kap2-sicht"
+LOCKFILE="$LOCKDIR/sichtstart.lock"
+mkdir -p "$LOCKDIR"
+exec 9>"$LOCKFILE"
+if ! flock -n 9; then
+  echo "[sichtstart] Sperre $LOCKFILE gehalten: ein anderer Sichtstart läuft; dieser Start tut nichts" >&2
+  exit 1
+fi
+
 if [ ! -f "$PGDATA/PG_VERSION" ]; then
   mkdir -p "$PGDATA"
   chmod 700 "$PGDATA"
@@ -79,9 +92,10 @@ if [ ! -f "$PGDATA/PG_VERSION" ]; then
 fi
 
 if ! "$PG_BIN/pg_ctl" -D "$PGDATA" status >/dev/null 2>&1; then
-  PG_STARTED=1
+  # Dateikennung 9 schließen, damit der Postgres-Daemon die Sperre nicht erbt.
   "$PG_BIN/pg_ctl" -D "$PGDATA" -w -t 60 -l "$PGDATA/../postgres.log" \
-    -o "-c listen_addresses='' -c unix_socket_directories='$PGSOCK'" start >/dev/null
+    -o "-c listen_addresses='' -c unix_socket_directories='$PGSOCK'" start >/dev/null 9>&-
+  PG_STARTED=1
 fi
 
 if [ "$(psql -h "$PGSOCK" -U "$PGUSER_SICHT" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$PGDB'")" != "1" ]; then
