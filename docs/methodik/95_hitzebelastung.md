@@ -65,7 +65,7 @@ Baumkronen → W127 Vegetation in Siedlungen; Durchlüftung (vent_score) → Zir
 des Containers; E19 Sonnenscheindauer: implizit im DWD-Temperaturraster enthalten, nicht
 separat modelliert; S095–S099 wirken über die genannten physischen Komponenten (Vorsorge-/
 Zustandsgrößen, nicht separat parametrisiert). W124 ist vorgelagert (0 € per R2) und
-produktseitig implementiert.
+liefert die Zelltemperatur (§3.1).
 
 KWRA-Indikatoren (intensive Betrachtung „Hitzebelastung älterer, alleinstehender Personen"):
 GE-KL-01/02 (Hitzeperioden), BAU-KL-05 (UHImax), GE-SO-03/04/05 (Bevölkerung, 65+),
@@ -139,11 +139,17 @@ Nur Zeilen mit Entscheidung **Basiswert** kommen in den Formeln (§3) vor. Spalt
 die Aufgabe definiert keine §2.8-E-Regeln (Lücken-Vermerk §2.8) — die
 Spalte verweist auf die Entscheidungslog-Nummer.
 
+**Lesehilfe Odds Ratio.** Die Odds Ratio (OR, Chancenverhältnis) vergleicht zwei Gruppen, etwa Alleinlebende und
+Nicht-Alleinlebende. Sie teilt die Chance zu sterben in der einen Gruppe (Gestorbene je Überlebende) durch dieselbe
+Chance in der anderen: OR 2,3 heißt 2,3-mal so hohe Chance, OR 1 kein Unterschied, eine OR unter 1 eine geringere
+Chance. Bei seltenen Ereignissen wie dem Hitzetod liegt die OR nahe am Verhältnis der Sterberisiken; so geht sie in
+§3.3 in die Faktoren \(\beta_{\text{iso}}\) und \(\beta_{\text{pfl}}\) ein.
+
 | Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | Entscheidung | E-Regel |
 |---|---|---|---|---|---|---|---|---|
 | 95-E02-01 | E02 Hitze → Mortalität | RR-Kurve: \(T_0\) 19,7/20,2/20,8 °C; \(\beta_{85+}\) 0,0634/0,0625/0,0531 K⁻¹ (N/M/S) | amtliche Statistik / publizierte ERF | Winklmayr 2022, Abb. 3 [11] | DE 1992–2021, 3 Regionen; Skalentransfer Region→Zelle als Modellgrenze (§6) | Zelltemperatur (DWD 1 km + UHI) | **Basiswert** | Log 1 |
 | 95-E02-02 | E02 Hitzetage → Einweisungen | konditional +2,4 %/Hitzetag (+1,408/100.000·Tag); unkonditional +5,4 % | quasi-experimentell (Panel, 170 Mio. Fälle) | Karlsson & Ziebarth 2018 [18], IZA-DP 7875 Tab. 1 [62] | DE 1999–2008; Alterstabelle nicht publiziert (top-kodiert > 75) | DWD hot_days (§3.4) | **Basiswert** (konditional; Log 19) | Log 19 |
-| 95-W124-01 | W124 Stadtklima → Zelltemperatur | UHI-\(\Delta T\), mittelwerttreu je 1-km-Zelle | Modell (OSM/SVF-Stadtmodell, produktseitig implementiert) | §3.1; Produktdoku | DE-weit, 100 m | vorhanden | **Basiswert** | Log 12 |
+| 95-W124-01 | W124 Stadtklima → Zelltemperatur | UHI-\(\Delta T\), mittelwerttreu je 1-km-Zelle | Modell (OSM/SVF-Stadtmodell) | §3.1; Produktdoku | DE-weit, 100 m | vorhanden | **Basiswert** | Log 12 |
 | 95-W123-01 | W123/#63 Innenraumklima → Mortalität | über Nachtkomponente des 24-h-Mittels abgebildet | Modellannahme | M0 Rev. 5 Kap. 2 | — | (24-h-Zelltemperatur) | **bewusst inaktiv** als eigener Knoten (bis M1) | Log 11 |
 | 95-S152-01 | S152 Altersstruktur → Mortalität | \(f_a\) = 0,357/0,588/0,631/1,0 (Rückrechnung §3.3a); \(m_a\); \(\bar L_a\) | amtliche Statistik + Rückrechnung | RKI [12]; Destatis [48,49] | DE; Rückrechnungskette vollständig in §3.3a | Zensus-2022-Altersbänder | **Basiswert** | Log 22 |
 | 95-S152-02 | S152/GE-SO-06 soziale Isolation → **Mortalität** | OR ≈ 2,3 „allein lebend" ⇒ \(\beta_{\text{iso}}\) = 0,90 (zentriert, \(\bar q\) = 0,346) | Fall-Kontrolle (als Vulnerabilität, nicht als Maßnahme) | Semenza 1996 [40]; Mikrozensus 2023 [63] | Chicago 1995 (Todesfälle); für Einweisungen keine Evidenz → F-Pfad Default 1 (Log 28) | Zensus-2022-Haushaltsgitter; Fallback §3.6 | **Basiswert** (Bänder 65+, nur D-Pfad) | Log 21/28 |
@@ -253,7 +259,7 @@ und der Kalibrierfaktor \(c_{\text{kal}}\), der den Betrag im selben Verhältnis
   (a) und (d) zusammen (× 0,974, aus den ungerundeten Faktoren) zeigen, dass das Zellmodell für Berlin unter dem Gemeindepunkt liegt; der Berlin-Anker
   in §4 rechnet damit (Befund 101).
 - **Ebene 6, \(v_{\text{vers},a}\) = 1.** Auf Ebene der Kommune ist der Modifikator genau 1:
-  \(\beta_{\text{iso}}\) wirkt heute nicht, weil \(q_{\text{1P}}\) mangels Zellquelle gleich dem
+  \(\beta_{\text{iso}}\) wirkt nicht, weil \(q_{\text{1P}}\) mangels Zellquelle gleich dem
   Bundesmittel gesetzt ist (§3.6), und die Ebene \(q_{\text{pfl}}\) verteilt die Heimbewohner
   erwartungstreu auf die Zellen der Kommune. Innerhalb der Kommune verschiebt \(\beta_{\text{pfl}}\)
   nur, *wo* die Todesfälle anfallen. Abweichen kann die Zellsumme nur, wenn Heime systematisch in
@@ -345,7 +351,7 @@ assert abs(anteil85 - 0.284) < 0.001
 assert abs(anteil85 * (d85 - 1) - 0.058) < 0.001        # +5,8 % auf den Betrag
 ```
 
-### 3.1 Zelltemperatur (vorgelagerter Knoten W124; produktseitig implementiert)
+### 3.1 Zelltemperatur (vorgelagerter Knoten W124)
 
 $$ T_{\text{Zelle}} \;=\; T_{\text{DWD}} \;+\; \bigl[\, \Delta T_{\text{UHI}} - \overline{\Delta T_{\text{UHI}}}^{\,1\,\text{km}} \,\bigr] \;-\; \gamma_h \cdot ( h - \bar{h} ) $$
 
@@ -418,7 +424,7 @@ Zensus-Gitter [67]: Einwohner der Zelle × Anteil 65+ ergibt die Menschen ab 65;
 5er-Jahresgruppen der Zelle teilen sie auf die Bänder 65–74, 75–84 und 85+ auf (fehlen sie, die
 Aufteilung des Gebiets). Wo der Anteil 65+ im Gitter geheimgehalten ist („–“), setzt das Produkt
 die Ersatzregel ein, ohne Gemeindeschlüssel nur Stufe 1 (Modellgrenze unter der Tabelle).
-**Regel (Abschätzung von KAP3, festgelegt vom methodik_manager):** Ist der Anteil 65+ einer
+**Regel (Abschätzung von KAP3):** Ist der Anteil 65+ einer
 Zelle im Zensus-Gitter geheimgehalten („–“), ersetzt das Produkt ihn in zwei Stufen.
 *Stufe 1:* Ist in der Zelle mindestens eine der sechs 5er-Jahresgruppen ab 65 im Altersgitter
 veröffentlicht, gilt die Summe der veröffentlichten Gruppen ab 65 geteilt durch die Einwohner der
@@ -670,10 +676,9 @@ $$ F_{\text{Zelle}} \;=\; \sum_a \text{pop}_a \cdot \frac{r_{0,a}}{100\,000} \cd
   gemessen wurde — verhindert Doppelzählung des Durchschnittseffekts; räumlich konstanter
   Registry-Parameter.
 - **HD-Datenquelle** (Befund 38): DWD-CDC-Raster hot_days (1 km), am Zell-/Kommune-Standort
-  abgegriffen — **ohne UHI-Verschiebung**; das Produkt implementiert keine solche Umrechnung
-  (Ist-Stand `inputs.py`: „dwd_cdc_raster"). Richtung: Unterschätzung der Morbidität in
+  abgegriffen — **ohne UHI-Verschiebung**. Richtung: Unterschätzung der Morbidität in
   UHI-Lagen; UHI→hot_days-Umrechnung als dokumentierte Erweiterung (Fortschreibungsvermerk,
-  Log 25). Die Rev.-5-Formulierung „+ UHI-Verschiebung" beschrieb Nicht-Implementiertes.
+  Log 25).
 - Altersschichtung: hitzeassoziierte Einweisungen konzentrieren sich auf Ältere
   (Herz-Kreislauf/Nieren; T67-Raten steigen steil mit Alter [16,18]). K&Z ohne numerische
   Alterstabelle (Fig. 9; top-kodiert > 75) — \(e_{\text{HD}}\) als gleiche relative
@@ -796,8 +801,8 @@ Quellenarchiv). Das Band je Altersband reicht von der Stützstelle bis zu diesem
 15,31–15,59 J, 75–84 8,54–8,90 J, 85+ 4,16–4,20 J. Die sterbefallgewichteten Werte setzen voraus, dass Hitzetote
 innerhalb eines Bands so alt sind wie alle Gestorbenen. Weil die Hitzewirkung mit dem Alter steigt (§3.3a), sind sie
 älter: unter 65 deutlich, denn den hohen Wert 28,64 tragen die wenigen Sterbefälle unter 50; ab 65 kaum. Der
-zutreffende Wert liegt deshalb für u65 im Band, für 65–74 und 75–84 am unteren Ende. Die Werte selbst ändert dieses
-Paket nicht; wie stark die Bänder den Betrag verschieben, steht in §5 (Sensitivitäten des Basiswerts).
+zutreffende Wert liegt deshalb für u65 im Band, für 65–74 und 75–84 am unteren Ende. Die Werte selbst bleiben
+unverändert; wie stark die Bänder den Betrag verschieben, steht in §5 (Sensitivitäten des Basiswerts).
 
 ### 3.6 Zeichentabelle (alphabetisch; §3.2-Form)
 
@@ -900,8 +905,9 @@ jeweiligen Fensters — 13 bzw. 26 Jahre, Einzeljahre in `c_kal_rev6_ergebnis.md
 1994: 10.200 · 2003: 10.200 · 2006: 7.700 · 2010: 4.090 · 2013: 3.500 · 2015: 7.000 ·
 2018: 8.500 · 2019: 6.800 · 2020: 3.700 · 2022: 4.500 · 2023: 3.100 · 2024: 2.800.
 2025 (≈ 2.500, Wochenbericht KW 38) ist **vorläufig** und geht nicht in die Basis ein
-(Befund 24; Sensitivität unten); 2026 (laufend) ausgeschlossen. Signifikant = untere
-Prädiktionsgrenze > 0. Kommunale Zusatz-Anker: Hessen 2018 ≈ 920 / Berlin 2018 ≈ 460
+(Befund 24; Sensitivität unten); 2026 (laufend) ausgeschlossen. Weil sich Hitzetote nur
+statistisch schätzen lassen, gibt das RKI zu jeder Jahreszahl eine Spanne an, das Prädiktionsintervall (RKI-PI);
+signifikant heißt, dass auch die untere Grenze dieser Spanne über null liegt. Kommunale Zusatz-Anker: Hessen 2018 ≈ 920 / Berlin 2018 ≈ 460
 (85+: 260–320 je 100.000 [14]) [11–14].
 
 **Kalibrierbasis Rev. 7 — bevölkerungsgewichtete Sommermittel** (Anker `#t-povw`;
@@ -935,7 +941,11 @@ nutzt):
 
 - **Fit: ein nationaler Skalar \(c_{\text{kal}}\) = 0,581** (Anker `#c-kal`) — Kleinste
   Quadrate durch den Ursprung, **Fenster 2012–2024** (13 signifikante Jahre; R² = 0,65;
-  8/13 Jahre im RKI-PI), mit nachgeschätzter Süd-ERF (s. u.). Das Fenster enthält die
+  8/13 Jahre im RKI-PI), mit nachgeschätzter Süd-ERF (s. u.). Kleinste Quadrate durch den Ursprung
+  heißt: \(c_{\text{kal}}\) ist der Faktor, bei dem die Summe der quadrierten Abstände zwischen Modell ×
+  \(c_{\text{kal}}\) und RKI-Zahl über alle Jahre am kleinsten ist. R² = 0,65 heißt: Die Modellreihe mit diesem Faktor
+  erklärt 65 % der Schwankung der RKI-Zahlen von Jahr zu Jahr (1 hieße jedes Jahr genau getroffen, 0 nicht besser als
+  der Durchschnitt der Jahre). Das Fenster enthält die
   Prüfjahre 2018/2019/2022 — der Niveau-Skalar selbst ist damit **in-sample** gefittet
   (präzise Kennzeichnung, Befund 78; Voll-Holdout-Variante s. Verteilungsprüfung).
   Sensitivitäten: ohne Süd-Nachschätzung 0,661; Vollreihe 1992–2024: 0,660; inkl.
