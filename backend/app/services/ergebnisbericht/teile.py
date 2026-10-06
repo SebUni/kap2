@@ -507,6 +507,7 @@ def teil_6(d: Berichtsdaten) -> str:
         html.append(_stand(d))
         return "\n".join(html)
     n_q = sum(1 for z in zeilen if z.qualitativ)
+    n_offen = sum(1 for z in zeilen if not z.qualitativ and z.nutzen_kosten is None)
     html.append(
         f"<p>Die Maßnahmen stehen in der Reihenfolge ihres Nutzen-Kosten-Verhältnisses, das "
         f"wirtschaftlichste zuerst. Das Verhältnis teilt den Nutzen über den Zeitraum vom "
@@ -515,6 +516,9 @@ def teil_6(d: Berichtsdaten) -> str:
         f"ein Verhältnis über 1 heißt, die Maßnahme spart mehr Schaden, als sie kostet. Beträge "
         f"sind nicht abgezinst, die Wirkung gilt als gleichbleibend. Jede Kostenkomponente nennt "
         f"ihre Quelle. Gewissheit und Umsetzung stehen wie in der Maßnahmentabelle des Produkts."
+        + (f" {n_offen} Maßnahme(n) zeigen „Kosten offen“: Ihre Kosten sind noch nicht "
+           f"bestimmt, deshalb steht für sie kein Verhältnis; sie stehen zwischen den "
+           f"bezifferten und den qualitativen Maßnahmen." if n_offen else "")
         + (f" {n_q} Maßnahme(n) sind qualitativ bewertet: Für sie liegt keine Wirkung in Euro "
            f"vor; sie stehen am Ende, ohne Rang nach Euro." if n_q else "")
         + "</p>")
@@ -529,8 +533,12 @@ def teil_6(d: Berichtsdaten) -> str:
                        if z.flaeche_m2 and z.flaeche_m2 >= 1 else "")
         html.append(f'<tr><th>Ort</th><td class="ort">{_h(ort)}</td></tr>')
         html.append(f"<tr><th>Umsetzungsjahr</th><td>{z.umsetzungsjahr}</td></tr>")
-        html.append(f'<tr><th>CAPEX (einmalig)</th><td class="capex">'
-                    f'{_euro_oder(d, z.capex_eur, "keine Investition im Katalog hinterlegt")}</td></tr>')
+        if z.kosten_offen:
+            capex = ("–" + (f' <span class="grund">{_h(z.kosten_vermerk)}</span>'
+                            if z.kosten_vermerk else ""))
+        else:
+            capex = _euro_oder(d, z.capex_eur, "keine Investition im Katalog hinterlegt")
+        html.append(f'<tr><th>CAPEX (einmalig)</th><td class="capex">{capex}</td></tr>')
         html.append(f'<tr><th>OPEX je Jahr</th><td class="opex">'
                     f'{_euro_oder(d, z.opex_eur, "keine Betriebskosten im Katalog hinterlegt")}</td></tr>')
         if z.qualitativ:
@@ -556,6 +564,8 @@ def teil_6(d: Berichtsdaten) -> str:
         html.append(f'<tr><th>Umsetzung</th><td class="umsetzung">'
                     f'{_zeilen_html(z.umsetzung.split(chr(10)))}</td></tr>')
         html.append("</table>")
+        if z.extra.get("stadtbaum_s_unbek_hinweis"):
+            html.append(f'<p class="hinweis">{_h(z.extra["stadtbaum_s_unbek_hinweis"])}</p>')
         if z.komponenten:
             html.append('<table class="kostenkomponenten"><tr><th>Kostenart</th><th>Komponente</th>'
                         '<th class="zahl">Einzelpreis</th><th class="zahl">Menge</th>'
