@@ -271,9 +271,30 @@ python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite / --zie
 ```
 
 Seiten hinter der Anmeldung (`/app/…`, zum Beispiel die Maßnahmen-Übersicht unter
-`/app/massnahmen`, `frontend/src/layouts/ProductLayout.tsx`) nimmt die Sichtprüfung
-ohne Anmeldung als Anmeldeseite auf; die Demo (`/demo/…`) ist über
-`frontend/src/config/features.ts` (`demo: false`) abgeschaltet.
+`/app/massnahmen`, `frontend/src/layouts/ProductLayout.tsx`) liegen hinter
+`RequireAuth`. Damit die Sichtprüfung die Oberfläche statt der Anmeldeseite
+aufnimmt, setzt `scripts/sichtstart.sh` vor dem Start von uvicorn
+`KAP2_SICHTSTART_ANMELDUNG=1` (`export`). Das Backend (`get_current_user` in
+`backend/app/api/deps.py`) behandelt dann eine Anfrage **ohne gültiges
+Login-Cookie** als angemeldeten Admin „Sichtprüfung (lokal)“, sofern der Client
+`127.0.0.1` oder `::1` ist. Dieser Nutzer wird nicht gespeichert: kein
+Passwort-Hash, kein Datenbankzugriff, keine Sitzung. Ein gültiges Login-Cookie
+geht vor; jeder andere Wert der Variablen als `1` schaltet nichts frei. Gelesen
+wird sie bei jedem Aufruf.
+
+Warum die Variable die eigentliche Sperre ist: Auf der Testumgebung kommen alle
+Anfragen über Apache (`deploy/apache-kap2-test.conf`, Proxy auf 127.0.0.1:8010)
+von 127.0.0.1 am Dienst an; die Prüfung auf Loopback allein hält dort niemanden
+auf. Deshalb darf nur `scripts/sichtstart.sh` die Variable setzen. Sie darf in
+keiner Umgebungsdatei der Testumgebung (`/etc/overlord/kap2-test.env`) oder der
+Produktion stehen, nicht in `deploy/` und nicht in `start-dev.sh`. Belegt ist das
+durch `backend/tests/test_sichtstart_anmeldung.py` und durch die Suche
+`grep -rlI KAP2_SICHTSTART_ANMELDUNG backend/app backend/tests scripts deploy docs .overlord frontend/src`,
+die genau diese vier Dateien nennt: `deps.py`, den Test, `sichtstart.sh` und diese
+Datei.
+
+Die Demo (`/demo/…`) ist über `frontend/src/config/features.ts` (`demo: false`)
+abgeschaltet.
 
 ## Migration / Upgrade
 

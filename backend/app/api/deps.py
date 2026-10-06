@@ -14,13 +14,14 @@ Principals:
   auf ``request.state``, damit Routen (Parameter-Stripping, Live-Aggregate)
   darauf reagieren können.
 """
+import os
 from dataclasses import dataclass, field
 
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.models.auth_models import User, user_kommunen
+from app.models.auth_models import ROLE_ADMIN, User, user_kommunen
 from app.models.demo_models import DemoSession
 from app.models.models import AdaptationMeasure
 from app.services import auth_service, demo_service
@@ -47,12 +48,43 @@ class DemoActor:
 Actor = User | DemoActor
 
 
+SICHTSTART_ENV = "KAP2_SICHTSTART_ANMELDUNG"
+_LOOPBACK_HOSTS = ("127.0.0.1", "::1")
+
+
+def _sichtpruefer(request: Request) -> User | None:
+    """Lokale Anmeldung für die Sichtprüfung (``scripts/sichtstart.sh``).
+
+    Nur wenn ``KAP2_SICHTSTART_ANMELDUNG`` genau ``1`` ist UND der Client
+    Loopback ist, ein nicht gespeicherter Admin-``User`` ohne Passwort-Hash,
+    ohne Datenbankzugriff und ohne Sitzung. Die Variable wird bei jedem Aufruf
+    gelesen. Sie ist die eigentliche Sperre: hinter einem lokalen Proxy (Apache
+    der Testumgebung) kommen alle Anfragen von 127.0.0.1 an. Setzen darf sie
+    nur ``scripts/sichtstart.sh`` (docs/BETRIEB.md, „Sichtprüfung").
+    """
+    if os.environ.get(SICHTSTART_ENV) != "1":
+        return None
+    client = request.client
+    if client is None or client.host not in _LOOPBACK_HOSTS:
+        return None
+    return User(
+        id=0,
+        email="sichtpruefung@localhost",
+        password_hash="",
+        display_name="Sichtprüfung (lokal)",
+        role=ROLE_ADMIN,
+        is_active=True,
+    )
+
+
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> User | None:
     """Login-Cookie → Nutzer (oder None). Wirft nie."""
     token = request.cookies.get(SESSION_COOKIE)
-    if not token:
-        return None
-    return auth_service.resolve_session(db, token)
+    if token:
+        user = auth_service.resolve_session(db, token)
+        if user is not None:
+            return user
+    return _sichtpruefer(request)
 
 
 def get_demo_actor(request: Request, db: Session) -> DemoActor | None:
