@@ -23,7 +23,7 @@ den Produktcode, und einen vierten Wert der Kette (kein Zelllauf) aus
 
 Gerechnet wird wie in ``test_methodik_95_golden_betraege.py``: Zellen aus ``_zellen(ags)``
 nach Rasterwert (Sommermittel, Hitzetage) gruppiert, Gauß-Hermite mit 21 Punkten und
-Feinstruktur σ = 0,58 K je Gruppe auf ``impact.health.mortality`` — hier zusätzlich mit den
+Feinstruktur σ = 0,58 K je Gruppe auf ``impact.health.mortality_punkt`` (σ hier ausgeschrieben) — hier zusätzlich mit den
 Teil-Ausweisen ``deaths_a85p``/``deaths_a75_84`` (Andockpunkte des Hebels S157, Bericht §5).
 Aus den Summen über die Kommune bildet ``health.s157_avoided_deaths`` die vermiedene Menge
 (Todesfälle); bewertet wird mit ``catalog.risk_default_cost_per_outcome`` (VOLY), wie im
@@ -93,7 +93,7 @@ def _mortalitaet_summen(ags: str) -> tuple[float, float, float]:
                 hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
                 indices={}, regional=regional)
         for x, w in zip(xs, ws):
-            r = H.mortality(mort_risk, ctx(t + math.sqrt(2) * SIGMA_K * x))
+            r = H.mortality_punkt(mort_risk, ctx(t + math.sqrt(2) * SIGMA_K * x))
             wgt = w / math.sqrt(math.pi)
             yll += wgt * r["outcome"]
             deaths_a85p += wgt * r["deaths_a85p"]
