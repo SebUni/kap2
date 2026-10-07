@@ -531,6 +531,121 @@ uv.lambda und uv.l_rest als belegt: #95 käme auf 13 statt 10 belegte Blöcke vo
 „Abschätzung von KAP3“, verliert die Anzeige, dass c_kal ein Fit an die RKI-Reihe ist und drei seiner fünf Eingänge
 aus Quellen stammen.
 
+## Übernahmeliste an den CTO
+
+Schritt 2 (Ticket T-1835-methodik_manager). Termin für die Umsetzung im Produkt: **23.10.2026**. Jede Zeile nennt
+den Sollzustand nach Regel K (Abschnitt „Festlegung“); der heutige Stand steht nur zur Orientierung in der Spalte
+„heute“ und ist nie Vorgabe. Die Umsetzung vergibt der CEO an den CTO; dieses Paket ändert keinen Code. Zeilen nach dem
+Stand vom 07.10.2026.
+
+**Durchgehendes Beispiel: heat.c_kal = 0,581 (Bericht 95).** Eingänge heat.t0_region, heat.m_basissterberate,
+heat.q_wochenquantile (`quelle`), heat.beta_85plus_region und heat.f_alter (`abschaetzung_kap3`). Sollzustand: Klasse
+`berechnet`, Anzeigetext „berechnet, enthält Abschätzung von KAP3“, darunter die fünf Eingänge mit ihrem Anzeigetext
+(dreimal „Quelle“, zweimal „Abschätzung von KAP3“); in der Zählung abgeschätzt. Gegenbeispiel uv.c_kal (Bericht 98):
+einziger Parameter-Eingang uv.i_raten_roh (`quelle`), Anzeigetext „berechnet aus Quellen“, in der Zählung belegt.
+
+| Stelle im Produkt | heute | Sollzustand nach Regel K | Beispiel |
+|---|---|---|---|
+| Kennzeichnung der 11 Parameter in der Registry: `backend/app/services/parameter_registry.py` übernimmt die Klasse aus `_HEAT_KLASSE` und `_UV_KLASSE` in `backend/app/services/engine/impact/params.py` (Z. 1702 ff., 1941 ff.), `_POLLEN_KLASSE` (ebenda) und `cost_evidence_class` in `backend/app/data/catalog.py` (Z. 281) | alle 11 `berechnet` (uv.ssd_delta_region ohne eigene Stelle, Ebene UV_RADIATION) | Klasse je Block nach der Spalte „Kennzeichnung nach der Regel“ der Tabelle der 11, übersetzt wie bisher (`quelle` → `belegt`, `abschaetzung_kap3` → `abgeschaetzt`, `berechnet` → `berechnet`): `abgeschaetzt` für heat.beta_pfl, heat.h_heim, pollen.d_saison, pollen.c_tag, uv.k_uv, uv.lambda, uv.l_rest, je mit Herleitung als Datenfeld `evidence_derivation`, die die Setzung nach Frage 1 nennt (P1); `berechnet` für heat.c_kal, uv.baf, uv.c_kal; uv.ssd_delta_region `belegt`, sobald er eine Stelle in der Registry bekommt, bis dahin ändert sich an der Parameterliste nichts, weil er dort nicht erscheint. Jeder `berechnet`-Parameter führt zusätzlich seine Parameter-Eingänge (`abgeleitet_aus` des Blocks, nur Parameter-IDs) und ein daraus über alle Stufen gerechnetes Merkmal `enthaelt_abschaetzung` (wahr, sobald ein Eingang `abgeschaetzt` ist oder selbst `enthaelt_abschaetzung` trägt). `EVIDENCE_CLASSES` bleibt bei drei Werten (Festlegung: die drei Werte aus §4 bleiben). | heat.beta_pfl: `abgeschaetzt`, Herleitung „Exzess-Verhältnis aus Frankreich 2003 für Deutschland übertragen (S2, Extrapolation)“; heat.c_kal: `berechnet`, `enthaelt_abschaetzung` wahr; uv.baf: `berechnet`, `enthaelt_abschaetzung` falsch |
+| `BELEGTE_KLASSEN` (`parameter_registry.py`, Z. 102) | `frozenset({"belegt", "berechnet"})`: jeder berechnete Parameter zählt als belegt | Eine Menge von Klassen kann Regel K nicht ausdrücken, weil `berechnet` je nach Eingängen belegt oder abgeschätzt zählt. Soll: eine Prüfung je Parameter, „zählt als belegt“ = Klasse `belegt`, oder Klasse `berechnet` und `enthaelt_abschaetzung` falsch. Alle Aufrufer (`gewissheit.py`, `unsicherheits_zusammenschau.py`) nutzen diese Prüfung statt der Menge. | heat.c_kal zählt abgeschätzt, uv.c_kal belegt |
+| Gewissheitsstufe (`backend/app/services/gewissheit.py`, Z. 86, `gewissheitsstufe`) | Stufe aus dem Anteil der Parameter in `BELEGTE_KLASSEN` | Die Stufe selbst folgt Regel G ([querschnitt_gewissheit.md](querschnitt_gewissheit.md)): Stufe der KWRA, nicht aus Parametern; daran ändert Regel K nichts. Die Zählung „x von y Parametern mit Quelle“ (Quellenlage, nur zum Vergleich) zählt nach der Prüfung „zählt als belegt“. Solange der Code die Stufe noch aus dem Anteil bildet, nutzt auch dieser Anteil die neue Prüfung, damit keine Setzung als belegt eingeht. | Kapitel 7 von #95: 10 statt 13 von 31 Blöcken belegt (Festlegung, d) |
+| Unsicherheits-Zusammenschau (`backend/app/services/unsicherheits_zusammenschau.py`, Z. 99) | führt einen Parameter als nicht belegt, wenn seine Klasse weder `belegt` noch `berechnet` ist | Nicht belegt ist jeder Parameter, der die Prüfung „zählt als belegt“ nicht besteht. Damit erscheinen die acht Werte heat.c_kal, heat.beta_pfl, heat.h_heim, pollen.d_saison, pollen.c_tag, uv.k_uv, uv.lambda, uv.l_rest als nicht belegt; uv.baf und uv.c_kal bleiben belegt. | heat.c_kal steht unter den nicht belegten Werten |
+| Anzeigetext in der Oberfläche: `frontend/src/utils/evidenceLabel.ts` (Z. 6), `frontend/src/components/ParameterTable.tsx` (Z. 47–62), dazu Excel (`backend/app/services/export_service.py`, Z. 110) und PDF (`backend/app/services/ergebnisbericht/teile.py`, Z. 67) | ein Text für alle berechneten Parameter: „berechnet aus anderen Parametern“ | vier Anzeigetexte nach Regel K: „Quelle“, „Abschätzung von KAP3“, „berechnet aus Quellen“ (`berechnet`, `enthaelt_abschaetzung` falsch), „berechnet, enthält Abschätzung von KAP3“ (`berechnet`, `enthaelt_abschaetzung` wahr). Neben einem berechneten Parameter stehen seine Eingänge mit deren Anzeigetext. Oberfläche, Excel und PDF zeigen denselben Text. | heat.c_kal: „berechnet, enthält Abschätzung von KAP3“, darunter heat.beta_85plus_region „Abschätzung von KAP3“ … heat.m_basissterberate „Quelle“ |
+| `backend/tests/test_evidence_class_berechnet.py`, Teil (c) (Z. 76–135) | schreibt fest, dass `berechnet` wie `belegt` zählt (`test_belegte_klassen_sind_belegt_und_berechnet`, `test_gewissheit_zaehlt_berechnet_wie_belegt`, `test_alle_berechnet_ergibt_hoch`, `test_zusammenschau_zaehlt_berechnet_nicht_als_unbelegt`) | Teil (c) prüft Regel K: ein berechneter Parameter ohne abgeschätzten Eingang zählt wie belegt, einer mit abgeschätztem Eingang, auch über zwei Stufen, zählt wie abgeschätzt, in Gewissheit (Quellenlage) und Zusammenschau. Die Anzeigetests (Z. 151 ff., 179 ff.) prüfen die zwei Texte „berechnet aus Quellen“ und „berechnet, enthält Abschätzung von KAP3“ statt „berechnet aus anderen Parametern“. | Fall „`berechnet` mit Eingang `abgeschaetzt`, dazu `belegt`“ zählt wie `["abgeschaetzt", "belegt"]`; Zweistufen-Fall wie heat.beta_pfl → heat.h_heim |
+| `backend/tests/test_methodik_95_kennzeichnung.py` | erwartet in Kapitel 7 und Registry 10 × belegt, 18 × abgeschätzt, 3 × berechnet und je Parameter die Klasse seines Blocks | Erwartet für die drei Blöcke unter den 11 die Klasse nach Regel K, gelesen aus der Tabelle der 11 dieser Datei: 10 × belegt, 20 × abgeschätzt, 1 × berechnet (heat.c_kal, `enthaelt_abschaetzung` wahr). Ändert die Runde an #95 Kapitel 7 entsprechend, liest der Test wieder nur den Bericht. | heat.h_heim: `abgeschaetzt` |
+| `backend/tests/test_methodik_96_kennzeichnung.py` | erwartet 3 × belegt, 9 × abgeschätzt, 2 × berechnet; `c_tag["evidence_class"] == "berechnet"` (Z. 123), `d["evidence_class"] == "berechnet"` (Z. 166) | Erwartet 3 × belegt, 11 × abgeschätzt, 0 × berechnet; pollen.c_tag und pollen.d_saison `abgeschaetzt` mit Herleitung (Z. 123 und 166 entsprechend). Werte bleiben (43,05 und 266,90 ÷ 43,05). | pollen.d_saison: `abgeschaetzt`, Wert 43,05 |
+| `backend/tests/test_methodik_98_kennzeichnung.py` | **Vermerk:** Am 06.10.2026, als das Paket geschnitten wurde, fehlte die Datei; es gab nur die Tests für #95 und #96. Seit 07.10.2026 ist sie angelegt (Commit ee83c67b, T-1820-cto) und prüft die Klasse je Block gegen Kapitel 7 (`test_klasse_in_der_parameterliste_folgt_der_kennzeichnung`, Z. 134). | Erwartet für die sechs Blöcke unter den 11 die Klasse nach Regel K: `abgeschaetzt` für uv.k_uv, uv.lambda, uv.l_rest (mit Herleitung, `test_abgeschaetzte_bloecke_tragen_herleitung`), `berechnet` mit `enthaelt_abschaetzung` falsch für uv.baf und uv.c_kal; uv.ssd_delta_region bleibt ohne eigene Stelle (`test_bloecke_ohne_eigene_stelle_bleiben_abweichung`), Soll-Kennzeichnung `quelle`. | uv.lambda: `abgeschaetzt`, Herleitung „Periodenquotient 3.081,0 ÷ 26.870 = 0,11466 für den Letalitätsanteil (S2, Proxy)“ |
+
+**Was sich nicht ändert.** Werte, Bänder und Rechenwege der 11 Parameter bleiben; Regel K ändert nur Kennzeichnung,
+Anzeigetext und Zählung. Die Blöcke außerhalb der 11 behalten im Produkt die Klasse ihres Berichts, auch die der
+Zweifel-Liste, bis die Runde am Bericht entscheidet. Die Gewissheitsstufe nach Regel G bleibt.
+
+**Reihenfolge.** Der Code kann vor den Berichten umgestellt werden, weil die Tests für die 11 Blöcke aus dieser Datei
+lesen. Ändert eine Runde Kapitel 7 eines Berichts nach den Befunden unten, laufen Bericht und Code wieder gleich; eine
+Abweichung dazwischen ist ein Befund im Ledger, kein stiller Fix (CLAUDE.md, eiserne Regel 5).
+
+## Befunde an Berichte
+
+Je Bericht (a) jede `kennzeichnung:`-Zeile der 11 Blöcke und jede Textstelle, die Regel K widerspricht, mit Fundstelle
+und Sollzustand, und (b) die Blöcke dieses Berichts aus der Zweifel-Liste. Die Berichte ändert dieses Paket nicht; jede
+Änderung ist eine eigene Runde am Bericht, mit Eintrag im Ledger `reviews/BEFUNDE_<nr>.md`. Zeilen nach dem Stand vom
+07.10.2026.
+
+### #95 Hitzebelastung
+
+**(a) Widersprüche zu Regel K**
+
+| Fundstelle | Block-ID | heute | Sollzustand |
+|---|---|---|---|
+| Kap. 7, Z. 1611, `kennzeichnung:` | heat.c_kal | `berechnet` | bleibt `berechnet`; kein Widerspruch (Anzeigetext „berechnet, enthält Abschätzung von KAP3“) |
+| Kap. 7, Z. 1684, `kennzeichnung:` | heat.beta_pfl | `berechnet` | `abschaetzung_kap3` (Frage 1, S2 Extrapolation: Exzess-Verhältnis Frankreich 2003 für Deutschland); `abgeleitet_aus` leeren oder die Abweichung von §4 begründen (Festlegung, b) |
+| Kap. 7, Z. 1841, `kennzeichnung:` | heat.h_heim | `berechnet` | `abschaetzung_kap3` (Frage 1, S2 Proxy: Zellwert aus OSM-Pflegeeinrichtungen); `abgeleitet_aus` leeren oder begründen |
+| Kap. 7, Absatz „Kennzeichnung `berechnet`“, Z. 1506–1514 | heat.beta_pfl | „\(\beta_{\text{pfl}}\) stützt sich auf \(m_{85+}\) und \(\bar q_{\text{pfl}}\), beide `quelle`, und zählt wie belegt“ | β_pfl zählt als abgeschätzt, weil er selbst eine Setzung trägt; „berechnet“ nur für c_kal |
+| ebenda | alle berechneten | „Im Produkt lautet der Anzeigetext ‚berechnet aus anderen Parametern‘“; „Ob diese Regel für alle Klimawirkungen gilt, wird risikoübergreifend festgelegt.“ | Anzeigetext nach Regel K („berechnet aus Quellen“ oder „berechnet, enthält Abschätzung von KAP3“); Verweis auf diese Datei als die risikoübergreifende Festlegung |
+| ebenda, zum Satz aus dem Ticket „bis dahin zählt das Produkt `berechnet` wie ‚belegt‘“ | alle berechneten | Der Satz steht in der Fassung vom 07.10.2026 nicht mehr wörtlich in §7 (gesucht nach „bis dahin zählt“ und „wie ‚belegt‘“, Absatz Z. 1506–1514 ganz gelesen). Seinen Inhalt trägt dort der Halbsatz „zählt wie belegt“ zu β_pfl. | Beurteilt: Die Aussage widerspricht Regel K. Soll: Ein berechneter Wert zählt nur dann als belegt, wenn kein Eingang über alle Stufen eine Abschätzung von KAP3 trägt (Festlegung, d); steht der Satz in einer anderen Fassung, wird er so ersetzt |
+| Kap. 7, `abgeleitet_aus` bei heat.g_s157, heat.delta_vg_morb, heat.delta_kuehlzentren (`abschaetzung_kap3`) | heat.g_s157 · heat.delta_vg_morb · heat.delta_kuehlzentren | Feld gefüllt, obwohl der Block nicht `berechnet` ist | Feld leeren oder die Abweichung von §4 im Bericht begründen (Festlegung, b) |
+
+Übereinstimmend und ohne Befund: Log 40 (Prüfstein, Grundlage von Frage 1) und im Absatz Z. 1506–1514 die Aussage, dass
+c_kal über β85+ und f_a wie eine Abschätzung zählt.
+
+**(b) Zweifel aus der Liste.** Die nächste Runde an #95 entscheidet je Block; bis dahin gilt die Kennzeichnung des
+Berichts.
+
+| Block-ID | Fundstelle | Form nach dem Merkmal | Sollzustand nach dem Merkmal |
+|---|---|---|---|
+| heat.t0_region | Register 95-E02-01 (Z. 150); Modellgrenze 3 (Z. 1470) | S2, Proxy: Schwelle der Region für jede Zelle | `abschaetzung_kap3` |
+| heat.q_wochenquantile | Modellgrenze 1 (Z. 1461) | S2, Punkt statt Bandmittel | `abschaetzung_kap3` |
+| heat.e_hd | Register 95-E02-02 (Z. 151); §3.4 (Z. 684–686) | S2, Extrapolation über Altersbänder | `abschaetzung_kap3` |
+| heat.beta_iso | Register 95-S152-02 (Z. 155); Zeichentabelle (Z. 842); §7 Z. 1508–1509 („ist deshalb `quelle`“) | S2, Extrapolation Chicago 1995 → Deutschland | `abschaetzung_kap3`, `abgeleitet_aus` dann nach Festlegung (b) |
+| heat.qbar_pfl | Register 95-S153-01 (Z. 156) | S2, Proxy: Zellwert aus OSM | `abschaetzung_kap3` |
+| heat.gamma_hoehe | Kap. 7 (Z. 1741); Register 95-W124-01 (Z. 152) | S2, Proxy: Gradient der Standardatmosphäre | `abschaetzung_kap3` |
+| heat.ror_s157 | Register 95-S157-01 (Z. 163) | S2, Extrapolation Ontario → deutsche Heime | `abschaetzung_kap3` |
+
+### #96 Aeroallergene
+
+**(a) Widersprüche zu Regel K**
+
+| Fundstelle | Block-ID | heute | Sollzustand |
+|---|---|---|---|
+| Kap. 7, Z. 2264, `kennzeichnung:` | pollen.d_saison | `berechnet` | `abschaetzung_kap3` (Frage 1, S2 vereinfachte Form: additive Form zählt Doppelt-Sensibilisierte doppelt); `abgeleitet_aus` leeren oder begründen (Festlegung, b) |
+| Kap. 7, Z. 2276, `kennzeichnung:` | pollen.c_tag | `berechnet` | `abschaetzung_kap3` (Frage 1, S2 Proxy: Durchschnitts-Kostensatz, §3.5 „Proxy-Kennzeichnung“, Modellgrenze 6); `abgeleitet_aus` leeren oder begründen |
+| Log 25 (Z. 2637), Spalte Entscheidung | pollen.d_saison · pollen.c_tag | „`berechnet` für \(d_{\text{Saison}}\) (aus f, p_sens, L) und \(c_{\text{Tag}}\) (aus c_jahr, d_Saison)“ | beide `abschaetzung_kap3`; der Log-Eintrag wird in der Runde fortgeschrieben, mit Verweis auf diese Datei |
+
+**(b) Zweifel aus der Liste.** Die nächste Runde an #96 entscheidet je Block; bis dahin gilt die Kennzeichnung des
+Berichts.
+
+| Block-ID | Fundstelle | Form nach dem Merkmal | Sollzustand nach dem Merkmal |
+|---|---|---|---|
+| pollen.delta_s_region | Kap. 7, Feld `band`; Modellgrenze 4 (Z. 2019) | S2, Proxy: Blattentfaltung statt Blüte bei der Birke | `abschaetzung_kap3` |
+| pollen.p_ar | Kap. 7, Feld `band`; §3.2 (Z. 578); Log 25 (Z. 2637, „die Extrapolation ist am Band gekennzeichnet“) | S2, Extrapolation auf die Bänder ab 80 Jahren | `abschaetzung_kap3` |
+| pollen.c_jahr_direkt | Register 96-K1-01 (Z. 293) | S2, Extrapolation Schweden → Deutschland | `abschaetzung_kap3` |
+
+### #98 UV-Schädigungen
+
+**(a) Widersprüche zu Regel K**
+
+| Fundstelle | Block-ID | heute | Sollzustand |
+|---|---|---|---|
+| Kap. 7, Z. 1626, `kennzeichnung:` | uv.ssd_delta_region | `berechnet` | `quelle` (Frage 2: keine Parameter-ID; misst die Zielgröße selbst); `abgeleitet_aus` leeren oder begründen (Festlegung, b) |
+| Kap. 7, Z. 1657, `kennzeichnung:` | uv.k_uv | `berechnet` | `abschaetzung_kap3` (Frage 1, S2 Extrapolation, Modellgrenze 2 und 9); `abgeleitet_aus` leeren oder begründen |
+| Kap. 7, Z. 1681, `kennzeichnung:` | uv.baf | `berechnet` | bleibt `berechnet`; kein Widerspruch (Anzeigetext „berechnet aus Quellen“) |
+| Kap. 7, Z. 1722, `kennzeichnung:` | uv.lambda | `berechnet` | `abschaetzung_kap3` (Frage 1, S2 Proxy: Periodenquotient für den Letalitätsanteil); `abgeleitet_aus` leeren oder begründen |
+| Kap. 7, Z. 1738, `kennzeichnung:` | uv.l_rest | `berechnet` | `abschaetzung_kap3` (Frage 1, S2 Punkt statt Bandmittel: medianes Sterbealter); `abgeleitet_aus` leeren oder begründen |
+| Kap. 7, Z. 1777, `kennzeichnung:` | uv.c_kal | `berechnet` | bleibt `berechnet`; kein Widerspruch (Anzeigetext „berechnet aus Quellen“) |
+| Log 36 (Z. 2212), Spalte Entscheidung | uv.ssd_delta_region · uv.k_uv · uv.lambda · uv.l_rest | „schwächste Herkunft im Block“, `berechnet` für ΔSSD als eigene Auswertung amtlicher Daten, für \(k_{\text{UV}}\), λ und \(\bar L\) | Beurteilt: widerspricht Regel K in der Grenze zu `berechnet` (Festlegung, a). Soll: `berechnet` nur mit Parameter-ID; eigene Auswertung ohne Näherung = `quelle` (ΔSSD), mit benannter Näherung = `abschaetzung_kap3` (k_UV, λ, \(\bar L\)) |
+| Log 36 (Z. 2212), Begründung der „Abweichung von Aufgabe §4“ für sechs Blöcke | uv.ssd_delta_region · uv.k_uv · uv.lambda · uv.l_rest | Quellenschlüssel in `abgeleitet_aus`, weil die Blöcke `berechnet` seien | Für diese vier trägt die Begründung nicht mehr: Feld leeren oder die Abweichung neu begründen. Für uv.baf und uv.c_kal bleibt sie tragfähig, der Quellenschlüssel zählt als `quelle` (Festlegung, b) |
+
+**(b) Zweifel aus der Liste.** Die nächste Runde an #98 entscheidet je Block; bis dahin gilt die Kennzeichnung des
+Berichts.
+
+| Block-ID | Fundstelle | Form nach dem Merkmal | Sollzustand nach dem Merkmal |
+|---|---|---|---|
+| uv.w_scc | Zeichentabelle (Z. 1082); §3.1 (Z. 392) | S2, Extrapolation über Altersbänder | `abschaetzung_kap3`; dann zeigt uv.baf „berechnet, enthält Abschätzung von KAP3“ |
+| uv.i_raten_roh | Register 98-R35-01 (Z. 275); Modellgrenze 5 (Z. 1497) | S2, Proxy: gepoolte Rohraten aus der Ablesekette | `abschaetzung_kap3`; dann zeigt uv.c_kal „berechnet, enthält Abschätzung von KAP3“ |
+| uv.i_mm | Kap. 7, Feld `quelle` (Abb. 3.13.2) | Ablesewert, keine Setzung | `quelle`; die Runde bestätigt den Fall |
+| uv.i_c44 | Kap. 7, Feld `quelle` (Abb. 3.14.3) | Ablesewert, keine Setzung | `quelle`; die Runde bestätigt den Fall |
+| uv.or_out | Kap. 7, Feld `kennzeichnung` (Meta-Analyse Schmitt 2011) | Geltung weist die Quelle selbst aus | `quelle`; die Runde bestätigt den Fall |
+
 ## Entscheidungslog
 
 **Gewählt:** Ansatz B, die Vererbung der schwächsten Kennzeichnung über alle Stufen, angezeigt als Verbindung, mit
