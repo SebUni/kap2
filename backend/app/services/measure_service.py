@@ -573,6 +573,101 @@ def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict,
     return factor
 
 
+# ── Hebel S155: UV-Schutz im öffentlichen Raum (Bericht #98 §5; Maßnahme UV_PROTECTION_PUBLIC_SPACE) ──
+# Abschätzung von KAP3 (Vorgabe P2). Die Jahresdosis sinkt um h; die Baseline F_e sinkt um
+# BAF_e · h, ΔDosis bleibt — der bewertete Schaden je Entität sinkt um denselben Anteil
+# (health.s155_wirkung_je_entitaet). Das Produkt kennt keinen Zeitbezug J für
+# Maßnahmenwirkungen: der Zellfaktor rechnet die volle Wirkung, die Zusammenfassung weist
+# die Anteile der Rampe min(1, J/a_erk) nach 10, 20 und 30 Jahren daneben aus
+# (Bericht §5, Integrationsauflage Punkt 3).
+
+UV_RISK_CODE = "EXPECTED_ANNUAL_UV_YLL"
+S155_ESTIMATE_NOTE = "Abschätzung von KAP3"
+S155_MISSING_TEXT = ("kein Betrag: Schaden je Entität fehlt in der Zelle, "
+                     "Kommune neu berechnen")
+S155_RAMPE_JAHRE = (10, 20, 30)
+
+
+def _is_s155(mdef: dict) -> bool:
+    return mdef.get("effect_model") == "s155"
+
+
+def _s155_cell_effect(mdef: dict, frac: float, cell_risk: dict
+                      ) -> tuple[float, tuple[float, float] | None, bool]:
+    """(Faktor auf die YLL, (€ MM, € C44) vermieden, fehlende Entitätswerte) einer Zelle durch S155.
+
+    Der Faktor wirkt auf das Outcome (YLL) der Zelle: ``1 − Σ_e BAF_e · h · frac · YLL_e / YLL``.
+    Die Euro-Wirkung je Entität kommt aus ``health.s155_wirkung_je_entitaet`` (volle
+    Wirkung, ohne Zeitbezug) auf den gespeicherten Schaden je Entität der Zelle
+    (``eur_mm``, ``eur_c44``). Fehlen diese (Alt-Zelle vor der Neuberechnung) bei
+    positivem Outcome, ist die dritte Rückgabe ``True``: dann steht ein Vermerk statt
+    eines zu niedrigen Betrags (P2: nie 0 € wegen fehlender Eingabe).
+    """
+    from app.services.engine.impact import health
+
+    if frac <= 0.0:
+        return 1.0, None, False
+    eur_mm, eur_c44 = cell_risk.get("eur_mm"), cell_risk.get("eur_c44")
+    yll_mm, yll_c44 = cell_risk.get("yll_mm"), cell_risk.get("yll_c44")
+    if eur_mm is None or eur_c44 is None or yll_mm is None or yll_c44 is None:
+        return 1.0, None, float(cell_risk.get("outcome") or 0.0) > 0.0
+
+    def _p(key: str, default: float) -> float:
+        v = override_context.get_override(f"risks.{UV_RISK_CODE}.impact.{key}", default)
+        return float(v) if v is not None else default
+
+    baf_mm, baf_c44 = _p("baf_mm", 0.60), _p("baf_c44", 1.675)
+    h = float(mdef.get("default_reduction") or 0.0) * min(1.0, float(frac))
+    eur = health.s155_wirkung_je_entitaet(float(eur_mm), float(eur_c44), h, baf_mm, baf_c44)
+    total_yll = float(yll_mm) + float(yll_c44)
+    if total_yll <= 0.0:
+        return 1.0, eur, False
+    vermieden = (max(0.0, baf_mm) * h * float(yll_mm) + max(0.0, baf_c44) * h * float(yll_c44))
+    return max(0.0, min(1.0, 1.0 - vermieden / total_yll)), eur, False
+
+
+def _s155_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
+    """Faktor (0..1) auf das YLL-Outcome einer Zelle durch S155 (Wrapper)."""
+    factor, _, _ = _s155_cell_effect(mdef, frac, cell_risk)
+    return factor
+
+
+def _s155_summary_fields(mdef: dict, eur_mm_total: float, eur_c44_total: float,
+                         missing: bool) -> dict:
+    """Zusatzfelder des impact_summary für S155 (Bericht §5, Integrationsauflage).
+
+    ``s155_avoided_eur`` ist die volle Wirkung je Jahr (Summe der Zellwerte, ohne Zeitbezug),
+    ``s155_band_eur`` das Band bei ``h`` an den Bandgrenzen (Wirkung linear in h),
+    ``s155_rampe`` die angerechnete Wirkung nach 10, 20 und 30 Jahren mit den Anteilen
+    min(1, J/a_erk); alles gekennzeichnet als Abschätzung von KAP3. Fehlen Entitätswerte
+    in einer abgedeckten Zelle, steht ein Vermerk statt eines Betrags.
+    """
+    if not _is_s155(mdef):
+        return {}
+    if missing:
+        return {"benefit_display": S155_MISSING_TEXT,
+                "benefit_missing_input": "uv_entity_split"}
+    from app.services.engine.impact import health
+
+    h = float(mdef.get("default_reduction") or 0.0)
+    voll = eur_mm_total + eur_c44_total
+    lo, hi = mdef.get("default_reduction_band") or (h, h)
+    a_mm, a_c44 = float(mdef.get("a_erk_mm") or 0.0), float(mdef.get("a_erk_c44") or 0.0)
+    rampe = []
+    for j in S155_RAMPE_JAHRE:
+        anteil_mm, anteil_c44 = health.s155_rampe(j, a_mm), health.s155_rampe(j, a_c44)
+        rampe.append({"jahre": j, "anteil_mm": round(anteil_mm, 4),
+                      "anteil_c44": round(anteil_c44, 4),
+                      "eur": round(anteil_mm * eur_mm_total + anteil_c44 * eur_c44_total, 2)})
+    return {
+        "s155_avoided_eur": round(voll, 2),
+        "s155_band_eur": ([round(voll * lo / h, 2), round(voll * hi / h, 2)] if h > 0.0
+                          else [0.0, 0.0]),
+        "s155_rampe": rampe,
+        "s155_estimate_note": S155_ESTIMATE_NOTE,
+    }
+
+
 # ── Hebel Stadtbaumwahl (Bericht #96 §5, Integrationsauflage Z. 1111–1125; Maßnahme
 # LOW_ALLERGEN_TREE_SELECTION) — Vorhaben T-1483-cto Teilpaket #2, setzt auf der
 # Zellfunktion health.stadtbaum_g_neu (T-1599-cto) auf. Wie S158 (Sperre aus Befund 124)
@@ -956,6 +1051,10 @@ def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float
         if code != ALLERGY_RISK_CODE:
             return 1.0
         return _s158_cell_factor(mdef, frac, cell_risk, s158_days_factor)
+    if _is_s155(mdef):
+        if code != UV_RISK_CODE:
+            return 1.0
+        return _s155_cell_factor(mdef, frac, cell_risk)
     if _is_stadtbaum(mdef):
         if code != ALLERGY_RISK_CODE:
             return 1.0
@@ -1462,6 +1561,11 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
     s158_avoided_days_total = 0.0
     s158_missing_split = False
 
+    # S155: volle Wirkung je Entität (Summe der Zellwerte) und Vermerk bei Alt-Zellen.
+    s155_eur_mm_total = 0.0
+    s155_eur_c44_total = 0.0
+    s155_missing = False
+
     # Integrationsauflage (Stadtbaumwahl) §5 Punkt (4): vermiedene Zusatztage der
     # Kommune (Summe der Zellwerte) und ihr Euro-Gegenwert. Fehlt ``anteil_ersetzt``
     # (Punkt 2 der Auflage), lässt sich die Wirkung ohne Eingabe nicht bestimmen —
@@ -1521,6 +1625,17 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     cell_savings["s158_avoided_eur"] = risk_engine.cost_from_outcome(
                         catalog.RISKS_BY_CODE[code], avoided_days)
                     s158_avoided_days_total += avoided_days
+            if _is_s155(mdef) and code == UV_RISK_CODE:
+                _, eur_s155, missing_s155 = _s155_cell_effect(mdef, frac, r)
+                if missing_s155:
+                    s155_missing = True
+                elif eur_s155 is not None:
+                    # Euro je Zelle und Entität, ungerundet (Summe der Zellwerte bleibt
+                    # an den Kommunenbetrag gebunden; gerundet wird nur in der Anzeige).
+                    cell_savings["s155_avoided_eur_mm"] = eur_s155[0]
+                    cell_savings["s155_avoided_eur_c44"] = eur_s155[1]
+                    s155_eur_mm_total += eur_s155[0]
+                    s155_eur_c44_total += eur_s155[1]
             if (_is_stadtbaum(mdef) and code == ALLERGY_RISK_CODE
                     and stadtbaum_missing_reason is None):
                 _, avoided_days, reason = _stadtbaum_cell_effect(measure.config, frac, r)
@@ -1696,6 +1811,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # Abschätzung von KAP3 gekennzeichnet, oder Vermerk statt Betrag ohne Gruppenaufteilung.
         **_s158_summary_fields(mdef, s158_avoided_days_total, s158_avoided_days_eur,
                                s158_missing_split),
+        # S155 (Bericht #98 §5): volle Wirkung, Band und Rampe nach 10/20/30 Jahren als
+        # Abschätzung von KAP3, oder Vermerk statt Betrag bei Alt-Zellen.
+        **_s155_summary_fields(mdef, s155_eur_mm_total, s155_eur_c44_total, s155_missing),
         # Integrationsauflage (Stadtbaumwahl) §5 Punkt (4): vermiedene Zusatztage/Euro
         # der Kommune als Abschätzung von KAP3 gekennzeichnet, mit Hinweis auf die
         # Richtung des Fehlers in λ (Modellgrenze 7), oder Vermerk statt Betrag ohne

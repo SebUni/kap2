@@ -1909,8 +1909,8 @@ del _spec, _block
 # (``cost_methodik_block``). Ohne eigene Stelle im Code sind ``uv.ssd_delta_region``
 # (Wert ist eine CSV, im Produkt die Ebene UV_RADIATION), ``uv.i_raten_roh`` (dieselben
 # Werte wie ``uv.i_mm`` und ``uv.i_c44``) und ``uv.r_out_sensitivitaet`` (keine Spec);
-# die drei S155-Blöcke gehören zu Paket 5/7. Geprüft in
-# tests/test_methodik_98_kennzeichnung.py.
+# die drei S155-Blöcke stehen an der Katalog-Maßnahme UV_PROTECTION_PUBLIC_SPACE
+# (``methodik_bloecke``, Paket 5/7). Geprüft in tests/test_methodik_98_kennzeichnung.py.
 _UV_BLOECKE: dict[tuple[str, str], str] = {
     ("EXPECTED_ANNUAL_UV_YLL", "k_uv"): "uv.k_uv",
     ("EXPECTED_ANNUAL_UV_YLL", "a_attr"): "uv.a_attr",
