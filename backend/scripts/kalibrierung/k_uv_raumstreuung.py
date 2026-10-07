@@ -61,6 +61,69 @@ GPKG = os.path.join(ROOT, ".cache", "60_stichprobe", "DE_VG250.gpkg")
 # Globalstrahlungs-Raster nicht unter ~/.cache, sondern im ignorierten Repo-Cache.
 H.RAD_CACHE = os.path.join(ROOT, ".cache", "k_uv_raumstreuung", "rad")
 
+# Abschnitt »Eingangsdaten« der Anlage (T-1823, Nachträge 2 und 8 des CEO zu T-1662):
+# Herkunft, Lizenz und Abrufbefehl je Eingangsdatei, damit die Anlage ohne
+# Probeverzeichnis nachrechenbar ist. Steht gleichlautend in k_uv_raumstreuung.md.
+EINGANGSDATEN = """## Eingangsdaten
+
+Das Skript liest drei Eingänge, die nicht im Repository liegen (`backend/.cache/` und `backend/data/dwd_cdc/` stehen in `.gitignore`), und zwei, die im Repository liegen: die Zensus-Gemeindedatei und die Normalperioden-Raster `backend/data/kalibrierung/ssd_normalperioden.npz`. Alle Pfade gelten ab dem Wurzelverzeichnis des Repositorys. Die Abrufbefehle legen die Dateien dorthin, wo `k_uv_raumstreuung.py` sie erwartet; danach läuft `python backend/scripts/kalibrierung/k_uv_raumstreuung.py` ohne Zwischenstände aus einem Probeverzeichnis. Fehlt eine Datei, die das Skript braucht, bricht es mit »BLOCKIERT: Eingang fehlt« ab, statt eine Ersatzzahl zu schreiben.
+
+### VG250 (GeoPackage)
+
+- **Pfad:** `backend/.cache/60_stichprobe/DE_VG250.gpkg`, Ebene `vg250_pk` (Verwaltungspunkte), Gebietsstand 2026.
+- **Herkunft:** Bundesamt für Kartographie und Geodäsie (BKG), Verwaltungsgebiete 1:250 000 (VG250), Ausgabe Stand 01.01., UTM32s-GeoPackage. Bezugsadresse: https://daten.gdz.bkg.bund.de/produkte/vg/vg250_ebenen_0101/2026/vg250_01-01.utm32s.gpkg.ebenen.zip (Katalogseite: https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-250-000-ebenen-stand-01-01-vg250-ebenen-01-01.html).
+- **Lizenz:** Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0), Quelle: BKG.
+- **Abrufbefehl** (aus dem Wurzelverzeichnis des Repositorys):
+
+```
+python3 -c "import io,os,urllib.request,zipfile;z=zipfile.ZipFile(io.BytesIO(urllib.request.urlopen('https://daten.gdz.bkg.bund.de/produkte/vg/vg250_ebenen_0101/2026/vg250_01-01.utm32s.gpkg.ebenen.zip',timeout=600).read()));n=[x for x in z.namelist() if x.endswith('DE_VG250.gpkg')][0];os.makedirs('backend/.cache/60_stichprobe',exist_ok=True);open('backend/.cache/60_stichprobe/DE_VG250.gpkg','wb').write(z.read(n))"
+```
+
+- **Gemessen am 07.10.2026:** Die so entpackte Datei hat SHA-256 `25dfeadf75c9d03939144a43e0a073b5311fdf2b72ae3097e31b3abda3edefcb`, ist byteweise die Datei, die auf dem Server unter diesem Pfad liegt, und hat 10.939 Punkte in `vg250_pk`.
+- **Gebietsstand beachten:** Die Anlage [72] (`ssd_povw.md`) rechnet mit dem Stand 2025 (10.949 Punkte), diese Anlage mit dem Stand 2026. Die Adresse `…/aktuell/` zeigt am 07.10.2026 auf den Stand 2026, wechselt aber mit der nächsten Ausgabe; deshalb steht oben die Jahresadresse.
+
+### Zensus-Gemeindedatei (CSV)
+
+- **Pfad:** `backend/data/kalibrierung/zensus2022_demografie_ab65.csv` (liegt im Repository), Spalten `schluessel, ebene, insgesamt, g60_66, ab67` je Gemeinde und Kreis, Stichtag 15.05.2022. Sie ersetzt hier die Gemeindedatei `backend/data/lite/zensus_gemeinde.json`, die [72] liest und die auf dem Server fehlt (Abschnitt »Eingangsdaten« in `ssd_povw.md`).
+- **Herkunft:** Statistische Ämter des Bundes und der Länder, Zensus 2022, Regionaltabelle »Demografie«, Blatt »CSV-Demografie«: https://www.destatis.de/static/DE/zensus/gitterdaten/Regionaltabelle_Demografie.xlsx (abgerufen am 26.09.2026, laut `zensus2022_demografie_ab65.md`).
+- **Lizenz:** Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0), © Statistische Ämter des Bundes und der Länder.
+- **Abrufbefehl** (lädt die Tabelle von destatis.de und überschreibt die Datei an ihrem Pfad):
+
+```
+python3 backend/scripts/zensus_demografie_ab65.py
+```
+
+### DWD-Globalstrahlung (Jahresraster 1997–2022)
+
+- **Pfad:** `backend/.cache/k_uv_raumstreuung/rad/<Jahr>.asc`, 26 Dateien (1997 bis 2022). Fehlt eine, lädt der Leser `_rad_grid` aus `k_uv_herleitung.py` sie beim Lauf selbst nach.
+- **Herkunft:** Deutscher Wetterdienst (DWD), Climate Data Center, Raster der jährlichen Globalstrahlung (`radiation_global`, 1 km): https://opendata.dwd.de/climate_environment/CDC/grids_germany/annual/radiation_global/ (je Jahr `grids_germany_annual_radiation_global_<Jahr>.zip` mit einer `.asc`-Datei).
+- **Lizenz:** Geodatennutzungsverordnung (GeoNutzV), Datenlizenz Deutschland – Zero – Version 2.0 (dl-de/zero-2-0), laut Quellenverzeichnis des Produkts (`DWD_CDC_Globalstrahlung_Raster`).
+- **Abrufbefehl** (aus dem Wurzelverzeichnis des Repositorys):
+
+```
+python3 -c "import io,os,urllib.request,zipfile;D='backend/.cache/k_uv_raumstreuung/rad';B='https://opendata.dwd.de/climate_environment/CDC/grids_germany/annual/radiation_global/grids_germany_annual_radiation_global_';os.makedirs(D,exist_ok=True);[open(D+'/%d.asc'%j,'wb').write(zipfile.ZipFile(io.BytesIO(urllib.request.urlopen(B+'%d.zip'%j,timeout=180).read())).read('grids_germany_annual_radiation_global_%d.asc'%j)) for j in range(1997,2023)]"
+```
+
+- **Gemessen am 07.10.2026:** Der Befehl legt 26 Dateien `1997.asc` bis `2022.asc` ab.
+
+### DWD-Sonnenscheindauer (Jahresraster 1997–2022)
+
+- **Pfad:** `backend/data/dwd_cdc/sunshine_duration_<Jahr>.asc.gz`, 26 Dateien (1997 bis 2022); der Disk-Cache des Produkts (`app.services.climate.dwd_cdc_grid`), der fehlende Jahre beim Lauf ebenfalls selbst nachlädt.
+- **Herkunft:** Deutscher Wetterdienst (DWD), Climate Data Center, Raster der jährlichen Sonnenscheindauer (`sunshine_duration`, 1 km): https://opendata.dwd.de/climate_environment/CDC/grids_germany/annual/sunshine_duration/ (je Jahr `grids_germany_annual_sunshine_duration_<Jahr>17.asc.gz`).
+- **Lizenz:** Geodatennutzungsverordnung (GeoNutzV), Datenlizenz Deutschland – Zero – Version 2.0 (dl-de/zero-2-0), laut Quellenverzeichnis des Produkts (`DWD_CDC_SSD_Raster`).
+- **Abrufbefehl** (aus dem Wurzelverzeichnis des Repositorys):
+
+```
+python3 -c "import os,urllib.request;D='backend/data/dwd_cdc';B='https://opendata.dwd.de/climate_environment/CDC/grids_germany/annual/sunshine_duration/grids_germany_annual_sunshine_duration_';os.makedirs(D,exist_ok=True);[open(D+'/sunshine_duration_%d.asc.gz'%j,'wb').write(urllib.request.urlopen(B+'%d17.asc.gz'%j,timeout=180).read()) for j in range(1997,2023)]"
+```
+
+- **Gemessen am 07.10.2026:** Für 1997 und 2022 ist die abgerufene Datei byteweise die Datei, die auf dem Server im Disk-Cache liegt.
+
+### Vorbehalt
+
+Die Abrufe für VG250, Globalstrahlung und Sonnenscheindauer sind am 07.10.2026 mit gleichwertigem Code gegen die Adressen ausgeführt worden, mit Ausgabe in ein Probeverzeichnis statt an den Pfad (VG250 und Sonnenscheindauer mit Vergleich gegen die Dateien auf dem Server, Globalstrahlung mit Zählung der Dateien). Den Aufruf von `zensus_demografie_ab65.py` hat dieser Lauf nicht ausgeführt, weil er die Datei im Repository überschreiben würde. Die Anlage selbst lässt sich im Projekt-venv des Produkts (`scripts/testlauf.sh`) neu erzeugen; mit dem System-Python des Servers bricht das Skript am fehlenden `numpy` ab. Am 07.10.2026 hat ein Lauf in diesem venv die Anlage `k_uv_raumstreuung.md` mit diesem Abschnitt geschrieben.
+"""
+
 Q_BUND_ANLAGE = 0.6683          # k_uv_herleitung.md, Abschnitt 2 (Rasterquotient)
 TOLERANZ = 0.003                # Festlegung: sonst gilt keine der folgenden Zahlen
 EUR_ANTEIL_MM_ANLAGE = 0.4316   # k_uv_herleitung.md, Abschnitt 2 (MM-Anteil)
@@ -562,6 +625,7 @@ def main() -> int:
     p.append(f"Rangtreue: Rangkorrelation = {_z(r_rang, 2)}\n")
     p.append(f"Zeitstabilität: Rangkorrelation = {_z(r_zeit, 2)}\n")
     p.append(f"Zweig: {zweig}")
+    p.append("\n" + EINGANGSDATEN.rstrip("\n"))
 
     out = "\n".join(p) + "\n"
     with open(os.path.join(DATA, "k_uv_raumstreuung.md"), "w", encoding="utf-8") as fh:

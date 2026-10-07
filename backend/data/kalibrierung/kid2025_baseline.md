@@ -77,6 +77,8 @@ Alle Zeilen der Berichts-Tabelle §4 werden hier erzeugt — auch die beiden zen
 | Basiswert | — | 339 | +0.0% |
 | k_UV × a_attr (untere Kombination) | 0,3622 × 0,50 | 115 | -66.1% |
 | k_UV × a_attr × c_e oben (obere Kombination) | 1,0616 × 1,00 × c_e oben | 737 | +117.6% |
+| k_UV allein | 0,3622 / 1,0616 | 172 – 505 | -49.1% … +49.1% |
+| c_e oben | Behandlung je Fall MM 11.410 € / C44 7.436 € | 371 | +9.4% |
 | VOLY | 136.400 / 165.600 € | 304 – 345 | -10.1% … +2.0% |
 | a_attr | 0,50 / 1,00 | 226 – 452 | -33.3% … +33.3% |
 | BAF_MM | 0,2 / 1,0 | 241 – 436 | -28.8% … +28.8% |
