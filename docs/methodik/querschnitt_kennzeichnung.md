@@ -112,15 +112,19 @@ verlangt; hinter einem Schlüssel darf sie nicht stehen. Ob ein Schlüssel spät
 Befund 463), ändert das Ergebnis nicht, solange dieser Block eine reine Auswertung der Quelle ist.
 
 **`abgeleitet_aus` bei einem Block, der nach Regel K nicht `berechnet` ist.** Aufgabe §4 verlangt dort ein leeres
-Feld („sonst leer“). Sechs Blöcke führen es dennoch: uv.ssd_delta_region (`quelle`), uv.lambda und uv.l_rest
-(`abschaetzung_kap3`) mit einem Quellenschlüssel, heat.g_s157, heat.delta_vg_morb und heat.delta_kuehlzentren
-(`abschaetzung_kap3`) mit einer Parameter-ID. Regel K wertet das Feld dort nicht aus, weil Frage 1 oder 2 entschieden
-hat, bevor Frage 3 es liest. Es gilt als Verweis auf die Herleitung und als benannte Abweichung von §4. Für die drei
-Blöcke aus #98 hat #98 Log 36 diese Abweichung begründet (Teil 3 der Gegenprüfung, Befund 460): Der Quellenschlüssel
-bleibt, bis die Eingänge eigene Blöcke haben (Befund 463). Diese Begründung setzt voraus, dass die drei Blöcke
-`berechnet` sind; nach Regel K sind sie es nicht. Ob das Feld bei den sechs Blöcken geleert oder die Abweichung neu
+Feld („sonst leer“). Elf Blöcke führen es dennoch. Nur mit Quellenschlüsseln: uv.ssd_delta_region (`quelle`),
+uv.lambda und uv.l_rest (`abschaetzung_kap3`). Mit mindestens einer Parameter-ID: uv.k_uv, heat.beta_pfl,
+heat.h_heim, pollen.d_saison und pollen.c_tag (nach Frage 1 `abschaetzung_kap3`) sowie heat.g_s157,
+heat.delta_vg_morb und heat.delta_kuehlzentren (`abschaetzung_kap3` im Bericht). Regel K wertet das Feld dort nicht
+aus: Bei den acht Blöcken unter den 11 hat Frage 1 oder 2 entschieden, bevor Frage 3 es liest, und die drei Blöcke aus
+#95 außerhalb der 11 tragen die Kennzeichnung ihres Berichts. Das Feld gilt als Verweis auf die Herleitung und als
+benannte Abweichung von §4. Für die vier Blöcke aus #98 hat #98 Log 36 diese Abweichung begründet (Teil 3 der
+Gegenprüfung, Befund 460; uv.k_uv nennt Log 36 in seinem Kommentar selbst): Der Quellenschlüssel bleibt, bis die
+Eingänge eigene Blöcke haben (Befund 463). Diese Begründung setzt voraus, dass die Blöcke `berechnet` sind; nach
+Regel K sind sie es nicht. heat.beta_pfl, heat.h_heim, pollen.d_saison und pollen.c_tag führen das Feld, weil ihr
+Bericht sie heute als `berechnet` kennzeichnet. Ob das Feld bei den elf Blöcken geleert oder die Abweichung neu
 begründet wird, ist ein Befund an die Berichte (Schritt 2). Bis dahin gilt die Lesart dieses Absatzes. heat.beta_iso
-führt das Feld ebenfalls, als `quelle` des Berichts; er steht in der Zweifel-Liste.
+führt das Feld ebenfalls, als `quelle` des Berichts; er zählt nicht zu den elf und steht in der Zweifel-Liste.
 
 ### (c) Kalibrierskalar, gefittet gegen eine amtliche Reihe
 
@@ -221,7 +225,8 @@ ihre Kennzeichnung in derselben Reihenfolge: außerhalb der 11 die des Berichts,
 | 98 | `uv.l_rest` | `zfkd_kid2025_sterbetafel2224` | `quelle (kein Block)` | `abschaetzung_kap3` | „Abschätzung von KAP3“ | kein Eingang aus der Zweifel-Liste: keine Änderung |
 | 98 | `uv.c_kal` | `uv.i_raten_roh` · `zfkd_kid2025` | `quelle` · `quelle (kein Block)` | `berechnet` | „berechnet aus Quellen“ | `uv.i_raten_roh`: Anzeige wird „berechnet, enthält Abschätzung von KAP3“ |
 
-Neun Blöcke entscheidet Frage 1 (sieben mit „ja“), uv.ssd_delta_region entscheidet Frage 2. Bei einem Block mit
+Frage 1 entscheidet bei sieben Blöcken (Antwort „ja“), Frage 2 bei uv.ssd_delta_region und Frage 3 bei heat.c_kal,
+uv.baf und uv.c_kal. Bei einem Block mit
 „ja“ und bei uv.ssd_delta_region wertet Regel K die Eingänge nicht aus (Festlegung, b); die Spalten nennen sie, weil
 der Bericht sie führt. Zur Zielreihe von heat.c_kal: `rki_eb19_2025` steht im Feld `quelle:`, nicht in
 `abgeleitet_aus`. Sie zählt nach Festlegung (c) als `quelle` und ändert das Ergebnis nicht.
@@ -271,6 +276,7 @@ genau ein Sollzustand nach dem Merkmal.
 |---|---|---|---|---|
 | 95 | `heat.t0_region` | Register 95-E02-01 (Z. 150): „Skalentransfer Region→Zelle als Modellgrenze (§6)“; Modellgrenze 3 (Z. 1470) | S2, Proxy: Schwelle der Region für jede Zelle; das Ablesen aus Winklmayr 2022, Abb. 3 ist keine Setzung | `abschaetzung_kap3` |
 | 95 | `heat.q_wochenquantile` | Modellgrenze 1 (Z. 1461): Quantile bilden das „mittlere“ Jahr ab | S2, Punkt statt Bandmittel: das klimatologisch mittlere Jahr für jedes Jahr | `abschaetzung_kap3` |
+| 95 | `heat.e_hd` | Register 95-E02-02 (Z. 151): „Alterstabelle nicht publiziert (top-kodiert > 75)“; §3.4 (Z. 684–686): e_HD „als gleiche relative Elastizität über alle Bänder (dokumentierte Annahme …)“ | S2, Extrapolation: ein Wert der Gesamtstudie für alle Altersbänder, wie bei uv.w_scc | `abschaetzung_kap3` |
 | 95 | `heat.beta_iso` | Register 95-S152-02 (Z. 155): „Chicago 1995 (Todesfälle)“; Zeichentabelle (Z. 842): Band als „KI-Approximation“ | S2, Extrapolation: OR aus Chicago 1995 für Deutschland; das Merkmal geht hier über #95 Log 40 hinaus, das eine nur umgerechnete Studienzahl als `quelle` führt (Befund 136), und nach der Grenze (a) wäre der Block wegen heat.qbar_1p in `abgeleitet_aus` sonst `berechnet` | `abschaetzung_kap3` |
 | 95 | `heat.qbar_pfl` | Register 95-S153-01 (Z. 156), Spalte „Datenlage je Zelle“: „Proxy, Fallback §3.6“ | S2, Proxy: Zellwert aus OSM-Pflegeeinrichtungen; der Kommunenwert 0,149 ist ein Quotient amtlicher Summen | `abschaetzung_kap3` |
 | 95 | `heat.gamma_hoehe` | Block: `quelle: icao_standardatmosphaere` (Z. 1741), `herkunft` verweist auf Register 95-W124-01 (Z. 152), den Stadtklima-Zuschlag | S2, Proxy: Gradient der Standardatmosphäre für den bodennahen Gradienten | `abschaetzung_kap3` |
@@ -285,9 +291,8 @@ genau ein Sollzustand nach dem Merkmal.
 | 98 | `uv.or_out` | Block, Feld `kennzeichnung`: „Meta-Analyse Schmitt 2011“ | S2, Extrapolation geprüft: Meta-Analyse mehrerer Länder, deren Geltung die Quelle selbst ausweist; der Zweifel trägt nicht, die Runde an #98 bestätigt den Fall | `quelle` |
 
 Ohne begründeten Zweifel: heat.m_basissterberate (Quotient amtlicher Summen, misst die Sterberate selbst),
-heat.e_hd (deutsche Daten; konditional statt unkonditional ist nach #95 Log 40 eine Wahl zwischen Quellenwerten),
-heat.hd_ref (Panelbeschreibung derselben deutschen Studie, misst die Referenz selbst) und heat.qbar_1p (Mikrozensus
-2023, misst den Anteil Alleinlebender selbst).
+heat.hd_ref (Panelbeschreibung bei Karlsson und Ziebarth 2018, misst die Referenzgröße des Studienpanels selbst) und
+heat.qbar_1p (Mikrozensus 2023, misst den Anteil Alleinlebender selbst).
 
 ### Beispiel-Block
 
@@ -427,6 +432,13 @@ assert abs(2 / (1 + 0.149 * 2) - float(feld(B["95"]["heat.beta_pfl"], "wert"))) 
 assert abs(0.149 * (1 + 1.54 * (1 - 0.149)) - float(feld(B["95"]["heat.h_heim"], "wert"))) < 5e-4
 assert regel_k("95", "heat.h_heim", frage1={"heat.h_heim": "nein"}) == ("berechnet", "mit_abschaetzung")
 
+# (b) abgeleitet_aus gefüllt, obwohl der Block nicht berechnet ist: alle in Festlegung (b) genannt
+gefuellt = sorted(i for nr in B for i in B[nr] if AUS[nr][i]
+                  and (regel_k(nr, i)[0] if (nr, i) in F1 else KZ[nr][i]) != "berechnet")
+abschnitt_b = q.split("\n### (b)")[1].split("\n### (c)")[0]
+assert len(gefuellt) == 12 and all(i in abschnitt_b for i in gefuellt), [i for i in gefuellt if i not in abschnitt_b]
+print("abgeleitet_aus gefüllt, nicht berechnet:", gefuellt)
+
 # (d) Zählung belegt: bisher quelle + berechnet; nach der Regel „Quelle“ + „berechnet aus Quellen“,
 #     außerhalb der 11 mit der Kennzeichnung des Berichts
 zaehl = {nr: (len(B[nr]), sum(KZ[nr][i] in ("quelle", "berechnet") for i in B[nr]),
@@ -451,10 +463,11 @@ Ausgabe:
 #98 uv.lambda            abschaetzung_kap3  „Abschätzung von KAP3“
 #98 uv.l_rest            abschaetzung_kap3  „Abschätzung von KAP3“
 #98 uv.c_kal             berechnet          „berechnet aus Quellen“
+abgeleitet_aus gefüllt, nicht berechnet: ['heat.beta_iso', 'heat.beta_pfl', 'heat.delta_kuehlzentren', 'heat.delta_vg_morb', 'heat.g_s157', 'heat.h_heim', 'pollen.c_tag', 'pollen.d_saison', 'uv.k_uv', 'uv.l_rest', 'uv.lambda', 'uv.ssd_delta_region']
 #95: 31 Blöcke, belegt bisher 13 / belegt nach der Regel 10
 #96: 14 Blöcke, belegt bisher 5 / belegt nach der Regel 3
 #98: 22 Blöcke, belegt bisher 11 / belegt nach der Regel 8
-Zweifel-Liste: 14 Blöcke; ohne begründeten Zweifel: ['heat.e_hd', 'heat.hd_ref', 'heat.m_basissterberate', 'heat.qbar_1p']
+Zweifel-Liste: 15 Blöcke; ohne begründeten Zweifel: ['heat.hd_ref', 'heat.m_basissterberate', 'heat.qbar_1p']
 ```
 
 ## Rechenkette
@@ -493,8 +506,9 @@ Süden, wird aus 0,581 eine 0,559. Deshalb zeigt die Parameterliste „berechnet
 c_kal nicht als belegt. Den Ausschlag geben Ebene 2 und 3; ein einziger abgeschätzter Eingang hätte genügt.
 
 **Über zwei Rechenstufen: heat.beta_pfl → heat.h_heim (Bericht 95).** Stufe 1: β_pfl = (3,0 − 1) ÷ [1 + 0,149 ×
-(3,0 − 1)] = 2 ÷ 1,298 = 1,54, mit dem Odds-Verhältnis 3,0 aus Fouillet (Frankreich 2003) und der Heimquote 0,149 aus
-der Pflegestatistik. Stufe 2: h_heim = 0,149 × [1 + 1,54 × (1 − 0,149)] = 0,149 × 2,31 = 0,344. β_pfl überträgt
+(3,0 − 1)] = 2 ÷ 1,298 = 1,54, mit der Heimquote 0,149 aus der Pflegestatistik und dem
+Odds-Verhältnis 3,0, das KAP3 nach #95 §3.3b selbst bildet: Exzess-Verhältnis 1,0 aus Frankreich 2003 (Fouillet) ×
+Basissterblichkeits-Verhältnis 2,97 (WIdO, m_85+ und Heimquote) ≈ 3,0. Stufe 2: h_heim = 0,149 × [1 + 1,54 × (1 − 0,149)] = 0,149 × 2,31 = 0,344. β_pfl überträgt
 einen Wert aus Frankreich nach Deutschland und zeigt nach Frage 1 „Abschätzung von KAP3“. Hätte h_heim selbst keine
 Setzung, zeigte die Liste trotzdem „berechnet, enthält Abschätzung von KAP3“, weil Frage 3 die Setzung aus Stufe 1
 über Stufe 2 weiterreicht; tatsächlich trägt h_heim mit dem Zellwert einen eigenen Proxy und zeigt „Abschätzung von
@@ -534,9 +548,9 @@ auf die 11 berechneten Blöcke. Verworfen, je in einem Satz:
 - **Erkennung von S2 an einer festen Wortliste** (wie in der zweiten Fassung dieser Datei): Sie übersähe die
   vereinfachte Form in pollen.d_saison und die Übertragung in heat.beta_pfl, die der Bericht mit anderen Worten
   benennt, deshalb entscheidet die Aussage und nicht das Wort.
-- **Teil-Näherung nur am Band kennzeichnen** (#96 Log 25): Sie zeigte heat.h_heim als Quelle, obwohl sein Zellwert
-  über einen Proxy entsteht, und behandelte ihn anders als heat.beta_85plus_region, bei dem der Süd-Wert allein die
-  Kennzeichnung bestimmt.
+- **Teil-Näherung nur am Band kennzeichnen** (#96 Log 25): Sie ließe den eigenen Zell-Proxy von heat.h_heim aus der
+  Kennzeichnung verschwinden, weil nur ein Teil des Werts ihn trägt, und behandelte h_heim anders als
+  heat.beta_85plus_region, bei dem der Süd-Wert allein die Kennzeichnung bestimmt.
 - **Benannte Näherung als Modellgrenze statt als Setzung** (uv.lambda und uv.l_rest wären `quelle`, wie in der ersten
   Fassung dieser Datei): Sie zeigte in #98 als Quelle, was #95 bei gleicher Bauart (Stützstellen in
   heat.l_restlebenserwartung, Proxy heat.c_fall) als Abschätzung führt, und verletzte damit den Prüfstein aus P1.
