@@ -939,7 +939,64 @@ def uv_yll(risk: dict, ctx: CellContext) -> dict:
                         + d_c44 * ctx.p(code, "c_fall_c44", 5883.0))
     out["cases_melanoma"] = d_mm
     out["cases_c44"] = d_c44
+    # Je Entität der bewertete Schaden (Behandlung + YLL · VOLY) — Eingabe des Hebels S155
+    # (Bericht §5: W = Σ_e min(1, J/a_erk,e) · BAF_e · h · €_e). Zusatzschlüssel, der
+    # Basiswert ändert sich nicht.
+    yll_mm = d_mm * ctx.p(code, "lambda_mm", 0.11466) * ctx.p(code, "l_rest_mm", 10.4569)
+    yll_c44 = (d_c44 * ctx.p(code, "lambda_c44", 0.005236)
+               * ctx.p(code, "l_rest_c44", 5.4787))
+    out["eur_mm"] = d_mm * ctx.p(code, "c_fall_mm", 6724.0) + _result(risk, yll_mm)["cost_eur"]
+    out["eur_c44"] = (d_c44 * ctx.p(code, "c_fall_c44", 5883.0)
+                      + _result(risk, yll_c44)["cost_eur"])
+    out["yll_mm"] = yll_mm
+    out["yll_c44"] = yll_c44
     return out
+
+
+# ── Hebel S155: UV-Schutz im öffentlichen Raum und Kommunikation (Bericht #98 §5) ──
+# Abschätzung von KAP3 nach Vorgabe P2: keine publizierte Effektgröße auf Dosis oder
+# Inzidenz. Der Hebel senkt jede Dosis um denselben Anteil h, die Baseline F_e sinkt um
+# BAF_e · h, ΔDosis bleibt; der bewertete Schaden je Entität sinkt um denselben Anteil.
+
+def s155_rampe(jahre: float | None, a_erk: float) -> float:
+    """Angerechneter Anteil der Wirkung nach ``jahre`` Jahren: ``min(1, J/a_erk)`` (Bericht §5).
+
+    Die Dosis sinkt als Sprung, die Wirkung auf die Neuerkrankungen läuft als Rampe ein:
+    Nach J Jahren hat ein Mensch im Erkrankungsalter ``a_erk`` erst J seiner ``a_erk``
+    Lebensjahre unter der gesenkten Dosis verbracht. ``jahre`` ``None`` heißt: keine
+    Zeitangabe, die volle Wirkung gilt (Integrationsauflage Punkt 3).
+    """
+    if jahre is None:
+        return 1.0
+    if a_erk <= 0.0:
+        return 1.0
+    return max(0.0, min(1.0, float(jahre) / float(a_erk)))
+
+
+def s155_wirkung_je_entitaet(eur_mm: float, eur_c44: float, h: float,
+                             baf_mm: float, baf_c44: float,
+                             jahre: float | None = None,
+                             a_erk_mm: float = 66.0,
+                             a_erk_c44: float = 75.0) -> tuple[float, float]:
+    """(MM, C44) der vermiedenen bewerteten Schäden je Jahr durch S155 (Bericht §5, Z. 1344).
+
+    ``W_e = min(1, J/a_erk,e) · BAF_e · h · €_e``. ``h`` ist die Dosisminderung (Katalog-Wert
+    ``default_reduction`` der Maßnahme, Block ``uv.s155_dosisminderung``), ``a_erk_*`` die
+    Einlaufzeiten (Blöcke ``uv.s155_a_erk_mm``/``_c44``), ``eur_*`` der bewertete Schaden
+    je Entität aus ``uv_yll`` (Schlüssel ``eur_mm``, ``eur_c44``). Ohne ``jahre`` die volle
+    Wirkung.
+    """
+    h = max(0.0, float(h))
+    return (s155_rampe(jahre, a_erk_mm) * max(0.0, baf_mm) * h * max(0.0, eur_mm),
+            s155_rampe(jahre, a_erk_c44) * max(0.0, baf_c44) * h * max(0.0, eur_c44))
+
+
+def s155_wirkung(eur_mm: float, eur_c44: float, h: float, baf_mm: float, baf_c44: float,
+                 jahre: float | None = None, a_erk_mm: float = 66.0,
+                 a_erk_c44: float = 75.0) -> float:
+    """Summe von ``s155_wirkung_je_entitaet`` — ``W_S155(J)`` (Bericht §5, Z. 1344)."""
+    return sum(s155_wirkung_je_entitaet(
+        eur_mm, eur_c44, h, baf_mm, baf_c44, jahre, a_erk_mm, a_erk_c44))
 
 
 # ── 3. Todesfälle durch Hochwasser/Sturzfluten ────────────────────────────────

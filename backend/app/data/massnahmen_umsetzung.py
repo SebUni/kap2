@@ -201,6 +201,30 @@ MASSNAHMEN_UMSETZUNG: dict[str, dict] = {
             ),
         },
     },
+    # T-1824-cto: neu im Katalog (Bericht #98 §5, Hebel S155). Schatten auf Plätzen,
+    # Spielplätzen, Schulhöfen, in Parks und Freibädern und UV-Index-Hinweise liegen bei
+    # der Kommune; ein Partner außerhalb der Verwaltung ist weder genannt noch nötig.
+    "UV_PROTECTION_PUBLIC_SPACE": {
+        "umsetzung": "kommune_allein",
+        "partner": [],
+        "ebenen": ["gemeinde"],
+        "beleg": {
+            "ebenen_begruendung": (
+                "gemeinde: Plätze, Spielplätze, Schulhöfe, Parks und Freibäder sowie die "
+                "Öffentlichkeitsarbeit zum UV-Index liegen bei der Stadt oder Gemeinde. Keine "
+                "der ausgewerteten Quellen (UBA-Broschüre 2022, S. 29–30; "
+                "kang_zustaendigkeit.py) nennt für diese Maßnahme eine Stelle außerhalb der "
+                "Kommune."
+            ),
+            "abschaetzung": True,
+            "herleitung": (
+                "Abschätzung von KAP3: Der Bericht #98 (§5, Hebel S155) beschreibt Schatten im "
+                "öffentlichen Raum und UV-Index-Hinweise als kommunales Programm und nennt "
+                "keinen Träger außerhalb der Kommune. Die Einstufung ersetzt eine Quelle, die "
+                "die Zuständigkeit ausdrücklich nennt, sobald eine gefunden ist."
+            ),
+        },
+    },
     # T-1600-cto: neu im Katalog (Bericht #96 §5, Stadtbaumwahl). Kein Partner außerhalb
     # der Kommunalverwaltung genannt oder erforderlich: Straßen-/Stadtbäume stehen auf
     # kommunalem Grund, die Baumartenwahl liegt beim kommunalen Grünflächen-/Garten- und

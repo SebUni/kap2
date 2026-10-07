@@ -11,10 +11,12 @@ aus dem Bericht selbst und prüft je Block, außer den benannten Ausnahmen:
    berechnet → berechnet;
 4. bei abgeschätzten Blöcken eine Herleitung (Wert, Band, Sensitivität) in der Parameterliste.
 
-Benannte Ausnahmen:
+Die drei Blöcke der Maßnahme S155 (``uv.s155_dosisminderung``, ``uv.s155_a_erk_mm``,
+``uv.s155_a_erk_c44``) tragen ihre Stelle an der Katalog-Maßnahme ``UV_PROTECTION_PUBLIC_SPACE``
+(``methodik_bloecke``, Paket 5/7, T-1824-cto) und werden wie alle anderen geprüft.
 
-* ``uv.s155_dosisminderung``, ``uv.s155_a_erk_mm``, ``uv.s155_a_erk_c44`` — Maßnahme S155,
-  Paket 5/7 des Abgleichs.
+Benannte Ausnahme:
+
 * ohne eigene Stelle im Code (Abweichung, dem Vorhaben gemeldet; der Test stellt fest, dass
   es dabei bleibt): ``uv.ssd_delta_region`` (Wert ist eine CSV, im Produkt die Ebene
   UV_RADIATION), ``uv.i_raten_roh`` (dieselben Werte wie ``uv.i_mm`` und ``uv.i_c44``),
@@ -39,8 +41,8 @@ CSV = os.path.join(os.path.dirname(__file__), "..", "data", "kalibrierung", "ssd
 CODE = "EXPECTED_ANNUAL_UV_YLL"
 _KLASSE = {"quelle": "belegt", "abschaetzung_kap3": "abgeschaetzt", "berechnet": "berechnet"}
 
-# Maßnahme S155: Paket 5/7 des Abgleich-Vorhabens T-1662-ceo.
-AUSNAHME_S155 = {"uv.s155_dosisminderung", "uv.s155_a_erk_mm", "uv.s155_a_erk_c44"}
+# Maßnahme S155 (Paket 5/7 des Abgleich-Vorhabens T-1662-ceo): Blöcke an der Katalog-Maßnahme.
+S155 = {"uv.s155_dosisminderung", "uv.s155_a_erk_mm", "uv.s155_a_erk_c44"}
 # Ohne eigene Stelle im Code (Abweichungen, siehe Modulkopf).
 OHNE_STELLE = {"uv.ssd_delta_region", "uv.i_raten_roh", "uv.r_out_sensitivitaet"}
 
@@ -78,7 +80,7 @@ def _stellen() -> dict[str, list[dict]]:
 
 def _geprueft() -> dict[str, dict]:
     return {bid: b for bid, b in _bloecke().items()
-            if bid not in AUSNAHME_S155 and bid not in OHNE_STELLE}
+            if bid not in OHNE_STELLE}
 
 
 def _paare(bid: str, wert, stellen: list[dict]) -> list[tuple[str, object, dict]]:
@@ -106,8 +108,8 @@ def test_bericht_fuehrt_22_bloecke_und_ausnahmen_sind_echte_bloecke():
     bloecke = _bloecke()
     roh = re.findall(r"^  id: (uv\.\S+)", _kapitel7(), re.M)
     assert len(roh) == 22 and set(roh) == set(bloecke), sorted(roh)
-    assert AUSNAHME_S155 <= set(bloecke) and OHNE_STELLE <= set(bloecke)
-    assert len(_geprueft()) == 16
+    assert S155 <= set(bloecke) and OHNE_STELLE <= set(bloecke)
+    assert len(_geprueft()) == 19
 
 
 def test_jeder_block_hat_genau_eine_stelle_im_code():
@@ -154,6 +156,20 @@ def test_abgeschaetzte_bloecke_tragen_herleitung():
     assert not ohne, ohne
 
 
+def test_s155_bloecke_stehen_an_der_massnahme():
+    """Jeder der drei S155-Blöcke hat genau eine Stelle: ein Feld in ``methodik_bloecke``."""
+    from app.data import catalog
+
+    m = catalog.MEASURES_BY_CODE["UV_PROTECTION_PUBLIC_SPACE"]
+    assert set(m["methodik_bloecke"].values()) == S155
+    assert len(m["methodik_bloecke"]) == 3
+    nach_block = _stellen()
+    for bid in S155:
+        assert [p["id"] for p in nach_block[bid]] == [
+            f"measures.UV_PROTECTION_PUBLIC_SPACE.{feld}"
+            for feld, b in m["methodik_bloecke"].items() if b == bid]
+
+
 def test_voly_steht_am_risiko_im_katalog():
     by_id = {p["id"]: p for p in parameter_registry.catalog_parameters()}
     v = by_id[f"risks.{CODE}.cost_per_outcome"]
@@ -165,7 +181,7 @@ def test_bloecke_ohne_eigene_stelle_bleiben_abweichung():
     """Wer eine eigene Stelle anlegt, nimmt den Block aus OHNE_STELLE und prüft ihn voll."""
     nach_block = _stellen()
     bloecke = _bloecke()
-    for bid in OHNE_STELLE | AUSNAHME_S155:
+    for bid in OHNE_STELLE:
         assert bid not in nach_block, bid
     assert os.path.exists(os.path.abspath(CSV))
     assert bloecke["uv.ssd_delta_region"]["wert"].endswith("ssd_povw.csv")

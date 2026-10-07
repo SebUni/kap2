@@ -60,8 +60,10 @@ def test_measure_count_is_47():
     # T-1600-cto: 5 aktive — LOW_ALLERGEN_TREE_SELECTION (#96 Stadtbaumwahl, effect_model
     # 'stadtbaum') neu im Katalog (nicht aus catalog_parked verschoben, deshalb steigt die
     # Gesamtzahl auf 49).
-    assert len(catalog.MEASURES) == 5
-    assert len(_ALL_MEASURES) == 49
+    # T-1824-cto: 6 aktive — UV_PROTECTION_PUBLIC_SPACE (#98 Hebel S155, effect_model
+    # 's155') neu im Katalog; Gesamtzahl 50.
+    assert len(catalog.MEASURES) == 6
+    assert len(_ALL_MEASURES) == 50
 
 
 def test_every_measure_has_source():
@@ -287,9 +289,11 @@ def test_registry_applicable_and_editable_match_none_fields():
     for m in catalog.MEASURES:
         params = parameter_registry.catalog_parameters(layer_code=m["code"], layer_category="measures")
         # 9 gemeinsame Felder plus die Zusatzfelder der Maßnahme (Ü-11: 11 für
-        # LOW_ALLERGEN_TREE_SELECTION, 9 für alle übrigen).
+        # LOW_ALLERGEN_TREE_SELECTION, T-1824-cto: 11 für UV_PROTECTION_PUBLIC_SPACE
+        # mit a_erk_mm/a_erk_c44, 9 für alle übrigen).
         soll = 9 + len(_zusatzfelder(m))
-        assert soll == (11 if m["code"] == "LOW_ALLERGEN_TREE_SELECTION" else 9)
+        assert soll == (11 if m["code"] in ("LOW_ALLERGEN_TREE_SELECTION",
+                                            "UV_PROTECTION_PUBLIC_SPACE") else 9)
         assert len(params) == soll, f"{m['code']}: erwartet {soll} Parameter, bekommen {len(params)}"
         for p in params:
             field = p["id"].rsplit(".", 1)[-1]
