@@ -420,6 +420,13 @@ def main() -> None:
          sums(k=K_UV_BAND[0], a=0.5)[3], None),
         ("k_UV × a_attr × c_e oben (obere Kombination)", "1,0616 × 1,00 × c_e oben",
          sums(k=K_UV_BAND[1], a=1.0, c_fall=C_FALL_OBEN)[3], None),
+        # Die beiden Achsen, die der Bericht (Kapitel 4, Befunde 438/441) nur mit
+        # Aufrufen von sums() belegt und die bis Befund 453 hier nicht gedruckt wurden.
+        ("k_UV allein", "0,3622 / 1,0616",
+         sums(k=K_UV_BAND[0])[3], sums(k=K_UV_BAND[1])[3]),
+        ("c_e oben", f"Behandlung je Fall MM {C_FALL_OBEN['mm']:,.0f} € / "
+                     f"C44 {C_FALL_OBEN['c44']:,.0f} €".replace(",", "."),
+         sums(c_fall=C_FALL_OBEN)[3], None),
         ("VOLY", "136.400 / 165.600 €",
          sums(voly=VOLY_BAND[0])[3], sums(voly=VOLY_BAND[1])[3]),
         ("a_attr", "0,50 / 1,00", sums(a=0.5)[3], sums(a=1.0)[3]),
