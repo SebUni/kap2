@@ -19,8 +19,8 @@ Zeitscheibe Mitte des Jahrhunderts (2031–2060) und ein Wert für die Zeitschei
 der Skala sehr gering, gering, mittel, hoch, mit der Fundstelle TB6 Tabelle 1. Die Jahre des Produkts bekommen den
 Wert nach der Zuordnungstabelle unten. Für das heutige Klima steht „in der KWRA nicht ausgewiesen“. Der Anteil der
 Parameter mit Quelle, den `gewissheit.py` heute als Gewissheit ausgibt, ist keine Gewissheit: Er heißt „Quellenlage
-der Rechnung“, erscheint nur als Zählung (etwa „10 von 30 Parametern mit Quelle“ bei #95, Stand 07.10.2026), ohne
-Stufe, und keine Folgegröße setzt auf ihm auf.
+der Rechnung“, erscheint nur als Zählung (etwa „10 von 31 Parametern mit Quelle“ bei #95, Stand 07.10.2026 nach
+T-1850-ceo), ohne Stufe, und keine Folgegröße setzt auf ihm auf.
 
 ### Herleitung und Fundstelle
 
@@ -89,7 +89,7 @@ zwei Codes, `EXPECTED_ANNUAL_MORTALITY` (Sterbefälle) und `EXPECTED_ANNUAL_MORB
 (`docs/KONFORMITAET_CHECKLISTE.md`, Abschnitt „Gegenprobe Zeile 8“). Beide Codes zeigen dieselbe Gewissheit aus
 derselben Zelle (Zeile 97 der Mappe). Die Kennzahl in `gewissheit.py` zählt dagegen je Code. Am 25.09.2026 standen
 die beiden Codes damit auf verschiedenen Stufen (mittel und hoch), obwohl es eine Klimawirkung ist. Gemessen am
-07.10.2026 stehen beide auf „gering“ (Sterbefälle 17 von 38, Krankenhauseinweisungen 3 von 9), aber nur, weil zwei
+07.10.2026 stehen beide auf „gering“ (Sterbefälle 17 von 39, Krankenhauseinweisungen 3 von 9), aber nur, weil zwei
 getrennte Zählungen zufällig dieselbe Stufe ergeben. Nach Regel G entfällt die Stufe je Code. Die Quellenlage zählt
 ebenfalls je Klimawirkung, über die Parameter-Blöcke des einen Berichts, jeder Block einmal.
 
@@ -469,15 +469,15 @@ denselben zehn Ebenen.
 | 10 | Stufe → Vorsichtshinweis (ab „gering“, `VORSICHT_STUFEN`) | Mitte hoch, Ende mittel: kein Hinweis für #95 | `unsicherheits_zusammenschau.py`; Folgegrößen |
 
 Zum Vergleich, geht **nicht** in die Gewissheit ein: die Quellenlage aus dem Endstand der Parameter-Blöcke von
-`docs/methodik/95_hitzebelastung.md` (Kap. 7; Stand Commit `b0f3ad9a` vom 06.10.2026, T-1791-ceo). Gezählt: 30 Blöcke,
-davon 10 mit Kennzeichnung `quelle`, 17 `abschaetzung_kap3`, 3 `berechnet`. Das sind 10 von 30 = 33 % mit Quelle, mit
-den berechneten 13 von 30 = 43 %. Nach der alten Regel (ab der Hälfte „mittel“, darunter „gering“) stünde #95 damit in
-beiden Zählweisen auf „gering“ (beide Anteile unter 0,5). Die Registry des Produkts, nach derselben Regel gezählt, kommt
-heute für die Sterbefälle mit 17 von 38 Parametern (45 %) und für die Krankenhauseinweisungen mit 3 von 9 (33 %)
-ebenfalls zu „gering“. Die KWRA sagt zur Mitte „hoch“. Dieselbe Rechnung landet also in allen vier Zählweisen zwei
-Stufen unter der KWRA. Am 27.09.2026 lag sie mit 23 Blöcken und 32 Registry-Parametern noch je nach Zählweise auf
-„gering“ oder „mittel“. Die Stufe wandert mit der Zahl der Blöcke, nicht mit dem Wissen über Hitze. Das ist der Grund,
-warum die Zählung keine Gewissheit ist.
+`docs/methodik/95_hitzebelastung.md` (Kap. 7; Stand Commit `84210278` vom 07.10.2026, T-1850-ceo, mit dem neuen Block
+`heat.sigma_k`). Gezählt: 31 Blöcke, davon 10 mit Kennzeichnung `quelle`, 18 `abschaetzung_kap3`, 3 `berechnet`. Das
+sind 10 von 31 = 32 % mit Quelle, mit den berechneten 13 von 31 = 42 %. Nach der alten Regel (ab der Hälfte „mittel“,
+darunter „gering“) stünde #95 damit in beiden Zählweisen auf „gering“ (beide Anteile unter 0,5). Die Registry des
+Produkts, nach derselben Regel gezählt, kommt heute für die Sterbefälle mit 17 von 39 Parametern (44 %) und für die
+Krankenhauseinweisungen mit 3 von 9 (33 %) ebenfalls zu „gering“. Die KWRA sagt zur Mitte „hoch“. Dieselbe Rechnung
+landet also in allen vier Zählweisen zwei Stufen unter der KWRA. Am 27.09.2026 lag sie mit 23 Blöcken und 32
+Registry-Parametern noch je nach Zählweise auf „gering“ oder „mittel“. Die Stufe wandert mit der Zahl der Blöcke, nicht
+mit dem Wissen über Hitze. Das ist der Grund, warum die Zählung keine Gewissheit ist.
 
 Beispiel-Block `rechenkette_gewissheit_95`, aus dem Stamm des Produkt-Repos ausführbar (am 07.10.2026 gelaufen,
 Ausgabe darunter). Er zählt die Blöcke in Bericht 95 und die Parameter der Registry selbst nach:
@@ -531,9 +531,9 @@ text = open("docs/methodik/95_hitzebelastung.md", encoding="utf-8").read()
 kap7 = text.split("## 7 Parameter-Blöcke", 1)[1].split("\n## ", 1)[0]
 kz = re.findall(r"^\s*kennzeichnung:\s*(\w+)", kap7, flags=re.M)
 zaehlung = {k: kz.count(k) for k in sorted(set(kz))}
-assert len(kz) == len(re.findall(r"^parameter:", kap7, flags=re.M)) == 30
-assert zaehlung == {"abschaetzung_kap3": 17, "berechnet": 3, "quelle": 10}
-assert round(10 / 30, 2) == 0.33 and round(13 / 30, 2) == 0.43
+assert len(kz) == len(re.findall(r"^parameter:", kap7, flags=re.M)) == 31
+assert zaehlung == {"abschaetzung_kap3": 18, "berechnet": 3, "quelle": 10}
+assert round(10 / 31, 2) == 0.32 and round(13 / 31, 2) == 0.42
 
 
 def alte_regel(anteil):
@@ -541,7 +541,7 @@ def alte_regel(anteil):
     return "sehr gering" if anteil == 0 else "gering" if anteil < 0.5 else "mittel" if anteil < 1 else "hoch"
 
 
-assert (alte_regel(10 / 30), alte_regel(13 / 30)) == ("gering", "gering")
+assert (alte_regel(10 / 31), alte_regel(13 / 31)) == ("gering", "gering")
 
 # Vergleich, Registry des Produkts nach derselben alten Regel (belegt oder berechnet zählt als belegt)
 import sys
@@ -552,9 +552,10 @@ registry = {}
 for c in codes:
     klassen = [p["evidence_class"] for p in alt._risiko_parameter(c)]
     registry[c] = (sum(k in parameter_registry.BELEGTE_KLASSEN for k in klassen), len(klassen))
-assert registry == {"EXPECTED_ANNUAL_MORTALITY": (17, 38), "EXPECTED_ANNUAL_MORBIDITY": (3, 9)}
+assert registry == {"EXPECTED_ANNUAL_MORTALITY": (17, 39), "EXPECTED_ANNUAL_MORBIDITY": (3, 9)}
 assert (alt.gewissheitsstufe(codes[0]), alt.gewissheitsstufe(codes[1])) == ("gering", "gering")
-assert (alte_regel(17 / 38), alte_regel(3 / 9)) == ("gering", "gering")
+assert (alte_regel(17 / 39), alte_regel(3 / 9)) == ("gering", "gering")
+assert round(17 / 39, 2) == 0.44 and round(3 / 9, 2) == 0.33
 
 print("Mitte:", mitte, "| Ende:", ende, "| heutiges Klima:", HEUTIGES_KLIMA)
 print("2025:", zeitreihe[2025], "| 2060:", zeitreihe[2060], "| 2061:", zeitreihe[2061], "| 2065:", zeitreihe[2065])
@@ -567,8 +568,8 @@ Ausgabe:
 ```
 Mitte: hoch | Ende: mittel | heutiges Klima: in der KWRA nicht ausgewiesen
 2025: hoch | 2060: hoch | 2061: mittel | 2065: mittel
-Quellenlage Bericht (nur Vergleich): {'abschaetzung_kap3': 17, 'berechnet': 3, 'quelle': 10} | Blöcke: 30
-Registry belegt/alle (nur Vergleich): {'EXPECTED_ANNUAL_MORTALITY': (17, 38), 'EXPECTED_ANNUAL_MORBIDITY': (3, 9)}
+Quellenlage Bericht (nur Vergleich): {'abschaetzung_kap3': 18, 'berechnet': 3, 'quelle': 10} | Blöcke: 31
+Registry belegt/alle (nur Vergleich): {'EXPECTED_ANNUAL_MORTALITY': (17, 39), 'EXPECTED_ANNUAL_MORBIDITY': (3, 9)}
 ```
 
 ### #96 Aeroallergene (Schritt 3)
@@ -1063,6 +1064,17 @@ Codes unter „Ein Wert je Klimawirkung“ ihr Datum an der Stelle selbst (Nacht
 steht #98, unter „Quellen“ die Fundstellen von Schritt 4. Die Übersicht am Ende ist neu. Sonst ist nichts aus Schritt 1
 bis 3 geändert.
 
+Nachtrag Schlussprüfung, 07.10.2026 (T-1837-supervisor): Der gesammelte Hinweis zu den zwei Angaben unter „Festlegung“
+war schon mit Runde 2 behoben (Nachtrag Runde 2). Danach hat T-1850-ceo (Commit `84210278`) in Bericht 95 den Block
+`heat.sigma_k` (Streuung σ = 0,58 K, `abschaetzung_kap3`) ergänzt und in der Registry den passenden Parameter für die
+Sterbefälle. Der Block `rechenkette_gewissheit_95` schlug damit fehl (`AssertionError` bei der Blockzahl 30).
+Nachgezogen sind Block und Ausgabe, der Vergleich unter „Rechenkette“, das Beispiel der Zählung in Regel G, der Stand
+vom 07.10.2026 unter „Ein Wert je Klimawirkung“, die Übersicht und die Quellen. Neu gezählt: 31 Blöcke, 10 von 31 =
+32 % mit Quelle, mit den berechneten 13 von 31 = 42 %; Registry für die Sterbefälle 17 von 39 (44 %), für die
+Krankenhauseinweisungen unverändert 3 von 9. Alle vier Zählweisen bleiben „gering“. An Regel G, Zuordnungstabelle und
+Einordnung ändert sich nichts. Die Zahlen in den Nachträgen oben (30 Blöcke, „10 von 30“, 17 von 38) sind der Stand
+vor T-1850-ceo.
+
 ## Befunde an Berichte
 
 #95: keine. #96: keine. #98: keine.
@@ -1130,13 +1142,17 @@ Bericht 98 gehört nicht zu diesem Paket; Bericht 98 ist hier nicht geändert.
   Kap. 7 (Commit `b0f3ad9a`), `docs/methodik/96_aeroallergene.md` Kap. 7 (Commit `c0486100`). Für die Registry von
   #98 (Runde 1): `backend/app/services/engine/impact/params.py`, `_UV_BLOECKE` und `_UV_KLASSE` (T-1820-cto, Commit
   `c8aba66f`); Stand davor gemessen an `backend/app` aus Commit `22f532d3`.
+- **[Schlussprüfung]** `docs/methodik/95_hitzebelastung.md` Kap. 7 mit dem Block `heat.sigma_k` und
+  `backend/app/services/engine/impact/params.py` mit dem Registry-Parameter
+  `risks.EXPECTED_ANNUAL_MORTALITY.impact.sigma_k` (beide T-1850-ceo, Commit `84210278`, 07.10.2026).
 - **[Produkt]** `backend/app/services/gewissheit.py`, `charakterisierung.py`, `unsicherheits_zusammenschau.py`;
   `backend/app/api/routes/assessment.py`; `docs/KONFORMITAET_CHECKLISTE.md`, „Gegenprobe Zeile 8“.
 
 ## Übersicht für die Übergabe
 
-Stand 07.10.2026, Schritt 4. Pfad der Gewissheit: Mappe `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt
-„Klimawirkungen“, Spalte S (Mitte) und Spalte T (Ende) in der Zeile der Klimawirkung; Fundstelle TB6 Tabelle 1, S. 41.
+Stand 07.10.2026, Schritt 4 mit Schlussprüfung (T-1837-supervisor). Pfad der Gewissheit: Mappe
+`docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt „Klimawirkungen“, Spalte S (Mitte) und Spalte T (Ende) in der Zeile
+der Klimawirkung; Fundstelle TB6 Tabelle 1, S. 41.
 Folgegrößen und Schwellen knapp, Einzelheiten in den genannten Abschnitten:
 
 - **Gewissheit einer Klimawirkung:** Wert übernommen, keine Schwelle von KAP3; `SCHWELLE_MITTEL` = 0,5 entfällt
@@ -1154,6 +1170,6 @@ Folgegrößen und Schwellen knapp, Einzelheiten in den genannten Abschnitten:
 
 | Klimawirkung (Zeile der Mappe) | Heutiges Klima (Betrag M0) | 2025–2060 (Mitte, Spalte S) | 2061–2070 (niedrigere Stufe) | 2071–2100 (Ende, Spalte T) | Hinweis zur vorsichtigen Interpretation | Gruppe der Charakterisierung (Mitte) | Quellenlage (Zählung, keine Stufe) |
 |---|---|---|---|---|---|---|---|
-| #95 Hitzebelastung (97) | in der KWRA nicht ausgewiesen | hoch | mittel | mittel | keiner | (3 + 2) : 2 = 2,5, ausreichend; „Entwicklung“ | 10 von 30 Parametern mit Quelle |
+| #95 Hitzebelastung (97) | in der KWRA nicht ausgewiesen | hoch | mittel | mittel | keiner | (3 + 2) : 2 = 2,5, ausreichend; „Entwicklung“ | 10 von 31 Parametern mit Quelle |
 | #96 Aeroallergene (98) | in der KWRA nicht ausgewiesen | mittel | mittel | mittel | keiner | (2 + 1) : 2 = 1,5, nicht ausreichend; „Umsetzung“, ohne Zusatz | 3 von 14 Parametern mit Quelle |
 | #98 UV-Schädigungen (100) | in der KWRA nicht ausgewiesen | mittel | sehr gering | sehr gering | ab 2061 und zum Ende | (2 + 2) : 2 = 2,0, ausreichend; „Entwicklung“ | 5 von 22 Parametern mit Quelle |
