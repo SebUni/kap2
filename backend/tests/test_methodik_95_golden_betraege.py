@@ -16,8 +16,8 @@ Gerechnet wird mit dem Produkt: Altersbänder je Zelle aus ``zensus_loader.apply
 
 Wie im Zelllauf des Berichts (Wirkung (d) in §3.0) gilt je Zelle der Rasterwert des Sommermittels mit
 einer Feinstruktur σ = 0,58 K darunter, Gauß-Hermite mit 21 Punkten; sie wirkt nur auf die Mortalität.
-Die Wärmeinsel-Abweichung aus OSM, mit der das Produkt diese Feinstruktur im Betrieb rechnet, ist nicht
-Teil der gepinnten Daten.
+Die Wärmeinsel-Abweichung aus OSM, die das Produkt im Betrieb je Zelle zusätzlich auf den Rasterwert
+setzt (Mittelwertverschiebung, keine Streuung innerhalb der Zelle), ist nicht Teil der gepinnten Daten.
 
 Gemessen (26.09.2026): Das Produkt lädt die Wochenquantile aus ``wochenquantile_region.csv``
 (vier Nachkommastellen) und kommt auf 345,03 Mio. € und 175.116 €. Mit der Tabelle §3.2 des Berichts

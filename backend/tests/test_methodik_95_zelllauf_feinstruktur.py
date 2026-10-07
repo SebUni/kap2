@@ -134,5 +134,30 @@ def test_sigma_steht_an_genau_einer_stelle():
     assert H.SIGMA_K == 0.58
 
 
+def test_sigma_nicht_als_text_im_backend():
+    """Auch der Wert als Text („0,58 K“, „0.58 K“) steht im Backend-Code nur in ``health.py`` — der
+    Ergebnisbericht bildet ihn aus ``SIGMA_K`` (``teile._sigma_text``)."""
+    wurzel = os.path.join(os.path.dirname(__file__), "..", "app")
+    muster = re.compile(r"\b0[.,]58\s*K\b")
+    treffer = []
+    for pfad, _, dateien in os.walk(wurzel):
+        for name in dateien:
+            if name.endswith(".py"):
+                voll = os.path.join(pfad, name)
+                with open(voll, encoding="utf-8") as fh:
+                    for nr, zeile in enumerate(fh, 1):
+                        if muster.search(zeile):
+                            treffer.append((os.path.relpath(voll, wurzel), nr))
+    assert {t[0] for t in treffer} <= {os.path.join("services", "engine", "impact", "health.py")}, treffer
+
+
+def test_bericht_nennt_sigma_aus_dem_code(monkeypatch):
+    from app.services.ergebnisbericht import teile
+
+    assert teile._sigma_text() == "0,58 K"
+    monkeypatch.setattr(H, "SIGMA_K", 0.7)
+    assert teile._sigma_text() == "0,70 K"
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-q"]))
