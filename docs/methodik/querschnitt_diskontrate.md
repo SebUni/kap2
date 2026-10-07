@@ -408,8 +408,9 @@ Jeder der beiden Wege für sich senkt den Barwert; die Kette mit vollem Betrag i
 die Festlegung folgt daraus: Zinst Regel D nach dem Jahr des Schadens ab, bleibt allein τ offen. Das ist eine Frage an
 den Bericht, und er hat sie mit τ = 1 im Ausweis entschieden (Entscheidungslog Nr. 14 des Berichts). Zinst Regel D nach
 dem Jahr der Belastung ab, braucht #98 eine Verschiebung mit einer belegten Latenz in Jahren; der Bericht nennt nur
-„Jahrzehnte“ (Kap. 6, Modellgrenze 1). Zur RZPR 1 % wirken zehn Jahre Verschiebung so stark wie die Wahl der RZPR
-selbst. Deshalb gehört die Frage in die Festlegung und nicht still in diese Kette.
+„Jahrzehnte“ (Kap. 6, Modellgrenze 1). Zur RZPR 1 % liegen schon zehn Jahre Verschiebung in der Größenordnung der
+Wahl der RZPR: −10 % gegen −17 %. Bei zwei Jahrzehnten liegt die Verschiebung mit −20 % darüber (1 ÷ 1,011 hoch 20 =
+0,803). Deshalb gehört die Frage in die Festlegung und nicht still in diese Kette.
 
 **Wie weit die Spanne mit τ trägt (Folgerung von KAP3 aus Bericht 98, Kap. 3.4, keine Zahl des Berichts).** Bericht 98
 gibt τ für die Menschen an, die heute erkranken. Bleibt die Dosis auf dem heutigen Stand, entsteht von Jahr zu Jahr ein
@@ -539,6 +540,9 @@ assert abs(bw98_0 / bw98_regel[1] - 1 - 0.234) < 0.0005
 # Latenz, Pruefall (keine Zahl aus einer Quelle): Schaden je zehn Jahre spaeter angesetzt
 assert abs(faktor(0.001, 2035) - 1 + 0.010) < 0.0005 and abs(faktor(0.011, 2035) - 1 + 0.104) < 0.0005
 assert abs(faktor(0.001, 2035) - 0.990) < 0.0005 and abs(faktor(0.011, 2035) - 0.896) < 0.0005
+# Zur RZPR 1 %: zehn Jahre (-10 %) unter der Wahl der RZPR (-17 %), zwei Jahrzehnte (-20 %, Faktor 0,803) darueber
+assert abs(faktor(0.011, 2045) - 0.803) < 0.0005 and abs(1 - faktor(0.011, 2045) - 0.20) < 0.005
+assert 1 - faktor(0.011, 2035) < 1 - bw98_regel[1] / bw98_regel[0] < 1 - faktor(0.011, 2045)
 # Transient-Faktor tau = (T/2)/a_erk, Spanne 0,20-0,48 (Bericht 98, Kap. 3.4), in allen 41 Jahren gleich angesetzt
 assert abs(30 / 2 / 75 - 0.20) < 0.005 and abs(60 / 2 / 63 - 0.48) < 0.005
 # Berlin je Jahr mit tau 2,34-5,60 Mio. EUR (Bericht 98, Kap. 3.0, Punkt "Lesart tau = 1")
@@ -634,14 +638,24 @@ in Prozent weiter um 23 %.
   Die Abweichung der Variante 0 % steigt nur von 2,0 % auf 2,3 %, die der Variante 1 % von 1,9 % auf 2,1 %. Die
   Aussage der Sensitivität hängt also nicht am Verlauf, der Betrag des Barwerts schon. Mit dem Ist-Klima in jedem Jahr
   liegt er bei einem wärmer werdenden Klima zu niedrig (Befunde B1, B2 und B4). Bei #98 auch deshalb, weil der Bericht
-  die Inzidenz als stationär ansetzt, obwohl sie real steigt (Bericht 98, Kap. 6, Absatz „Szenario-Anwendung 98-A“).
-  **Für #98 ist der Barwert trotzdem keine Untergrenze**, weil die Latenz in die andere Richtung wirkt: Gegenüber einer
-  Jahres-Attribution liegt der Jahresbetrag um bis zu 80 % zu hoch (Transient-Faktor τ, Absatz „Wann der Schaden
-  eintritt“). Nach dem, was Bericht 98 beziffert, überwiegt diese Richtung: τ ist seine größte Achse (Kap. 4), die
-  steigende Inzidenz nennt er nur als Untergrenze ohne Zahl (Kap. 6). „Untergrenze“ nennt der Bericht seinen Betrag
-  sonst nur, weil Teile fehlen: Augenschäden und Produktivität sind nicht im Konto K1 (Kap. 1, „Konto-Einbettung“;
-  Kap. 6, Modellgrenze 6). Innerhalb des Kontos K1 weist er fünf überschätzende Näherungen aus, und die größte ist die
-  Gleichgewichtslesart der Latenz (Kap. 6, Infokasten 1).
+  für Szenarien eine weiter steigende UV-B-Belastung nennt und die Inzidenz als stationär ansetzt, obwohl sie real
+  steigt (Bericht 98, Kap. 6, Absatz „Szenario-Anwendung 98-A“). **Für #98 ist der Barwert trotzdem keine
+  Untergrenze**, weil die Latenz in die andere Richtung wirkt: Gegenüber einer Jahres-Attribution liegt der
+  Jahresbetrag um bis zu 80 % zu hoch (Transient-Faktor τ, Absatz „Wann der Schaden eintritt“). Nach dem, was der
+  Bericht beziffert, überwiegt diese Richtung: τ ist seine größte Achse (Kap. 4). Den Anstieg der UV-B-Belastung nennt
+  er nur als Plausibilisierungsrahmen (UV-B-Projektion +1,3 % je Dekade für 2050–2100), die steigende Inzidenz ohne
+  Zahl; wie stark der Verlauf auf den Jahresbetrag wirkt, beziffert er nicht (Kap. 6, Absatz
+  „Szenario-Anwendung 98-A“; Kap. 8, Quelle [32]). „Untergrenze“ nennt Bericht 98 seinen Betrag, weil Teile fehlen,
+  etwa die Augenschäden und die Produktivität; diese gehört zum Konto K2, und in M0 ist nur K1 aktiv (Kap. 1,
+  „Konto-Einbettung“; Kap. 6, Modellgrenze 6). Außerdem folgt innerhalb von K1 die Wahl einzelner Parameter einer
+  „Untergrenzen-Zusage“, etwa die der Kostensätze (Kap. 3.4, Punkt \(c_e\); Entscheidungslog Nr. 7 des Berichts).
+  Diese Zusage schränkt der Bericht selbst ein, weil die Änderung der Dosis eher überschätzt wird (Kap. 3.2; Kap. 6,
+  Modellgrenze 2). Beide Richtungen stellt er in Infokasten 1 nebeneinander (Kap. 6): fünf bewusst überschätzende
+  Näherungen, deren größte die Gleichgewichtslesart der Latenz ist,
+  „und mehrere *unterschätzende* (nur Konto K1, nur Erstjahreskosten, geparkte Sensitivitäten)“. Unter den Achsen, die
+  nur nach oben wirken, beziffert er höchstens +11,3 % je Achse (Verhaltens-Sensitivität, Kap. 4); die fehlenden Teile
+  des Kontos und die Folgejahre der Behandlung beziffert er nicht (Kap. 3.4, Punkt \(c_e\); Kap. 4, Schluss der
+  „Unsicherheiten“; Kap. 6, Modellgrenze 6).
 
 ## Entscheidungslog
 
@@ -732,8 +746,9 @@ Zur Rechenkette von #98 (Schritt 4); Regel D und die Werte für #95 und #96 nach
     er „kein Latenz-Discounting“ festlegt (Entscheidungslog Nr. 14 des Berichts) und weil er die Latenz in Jahren nicht
     beziffert, nur „Jahrzehnte“ (Kap. 6, Modellgrenze 1). Eine angesetzte Verschiebung wäre eine stille Änderung der
     Regel mit einer Zahl ohne Quelle. Die Größenordnung steht als Prüffall im Abschnitt „Rechenkette“: je zehn Jahre
-    −1,0 % (RZPR 0 %) und −10 % (RZPR 1 %). **Gegenargument:** Zur RZPR 1 % ist die Wirkung so groß wie die Wahl der
-    RZPR; bis die Festlegung entscheidet, kann der Barwert von #98 zur RZPR 1 % deshalb zu hoch sein.
+    −1,0 % (RZPR 0 %) und −10 % (RZPR 1 %). **Gegenargument:** Zur RZPR 1 % liegt die Wirkung schon bei zehn Jahren in
+    der Größenordnung der Wahl der RZPR (−10 % gegen −17 %) und bei zwei Jahrzehnten darüber (−20 %); bis die
+    Festlegung entscheidet, kann der Barwert von #98 zur RZPR 1 % deshalb zu hoch sein.
 21. **Ein Barwert des Produkts für #98** ist verworfen, weil Bericht 98 keinen Betrag des Zelllaufs für Berlin nennt und
     eine Umrechnung allein über die 2,1 % weniger Einwohner andere Unterschiede zwischen Kette und Zellen außer Acht ließe.
 22. **Der Transient-Faktor τ (0,20–0,48) auf den Jahresbetrag der Kette für #98** ist verworfen, weil Bericht 98 im
@@ -776,14 +791,17 @@ Kap. 5 (S155), Kap. 6 (Modellgrenzen 1 und 2, Infokasten 1) und den Entscheidung
 Kap. 1 (Konto-Einbettung), Kap. 3.2, 3.3 und 3.4, Kap. 4, Kap. 5 (S158), Kap. 6 (Szenario-Anwendung, Modellgrenzen 2, 4
 und 6, Infokasten 1, Pflicht-Elemente) und den Entscheidungslog Nr. 7, 11 und 12. Schritt 4 hatte τ in Kap. 3.0 und 3.4
 gelesen, aber nicht in diese Datei übernommen; das ist mit B4, B5 und dem Absatz „Wann der Schaden eintritt“ nachgeholt.
-Diese Datei ändert keinen Bericht.
+Für die zweite Nacharbeit am selben Tag zusätzlich gelesen: Kap. 3.2, Punkt „Stationaritätsannahme der Elastizität“;
+Kap. 3.4, Punkte \(c_e\) und VOLY; Kap. 8, Quelle [32]; Entscheidungslog des Berichts Nr. 16–37. Gesucht nach
+„Erstjahr“, „Folgejahr“ und „[32]“: Die Folgejahre der Behandlung nennt nur Kap. 3.4, Punkt \(c_e\), ohne Zahl; [32]
+steht in Kap. 3.2, Kap. 6 und Kap. 8. Diese Datei ändert keinen Bericht.
 
 | Nr | Bericht, Stelle | Stand im Bericht | Festlegung | Art |
 |---|---|---|---|---|
 | B1 | Bericht 95, Kap. 6, Absätze „Szenario-Anwendung 95-A“ und „Jahresbeträge ohne Abzinsung“ | „M0 weist das Ist-Klima aus“; die Euro-Beträge „gelten für ein Jahr im heutigen Klima“; Szenariofähigkeit folgt mit Stufe M1+. Einen Jahresbetrag für die Jahre nach dem Ist-Klima nennt der Bericht nicht | Barwert über die 41 Jahre 2025–2065 („Bezugsjahr und Zeitraum der Abzinsung“); das Produkt schreibt die Jahresbeträge mit dem Klimasignal fort („Warum der Preiseffekt in die Diskontrate gehört“) | Verlauf fehlt im Bericht. Die Rechenkette rechnet deshalb mit gleichbleibendem Jahresbetrag; bei wärmer werdendem Klima ist ihr Barwert eine Untergrenze. Zu klären ist, welchen Verlauf das Produkt für #95 in M0 abzinst: Ist-Klima in jedem Jahr oder Szenario 95-A (Kap. 6, Absatz „Szenario-Anwendung 95-A“) |
 | B2 | Bericht 96, Kap. 6, Absätze „Jahresbeträge ohne Abzinsung“ und „Szenario-Anwendung 96-A“ | Die Euro-Beträge „gelten für ein Jahr im Ist-Klima zum Preisstand 2024“; „M0 weist das Ist-Klima aus“; die Szenario-Anwendung verschiebt nur das Klimasignal der Saison-Spreizung und braucht Phänologie-Modelle der Stufe M1+. Einen Jahresbetrag für die Jahre nach dem Ist-Klima nennt der Bericht nicht | wie B1: Barwert über die 41 Jahre 2025–2065, Jahresbeträge mit dem Klimasignal fortgeschrieben | Verlauf fehlt im Bericht, wie B1. Die Rechenkette für #96 rechnet mit gleichbleibendem Jahresbetrag; weil der Blühbeginn der Erle nach der Projektion bis 2100 um etwa zwei Wochen weiter vorrückt (Bericht 96, Kap. 6, Absatz „Szenario-Anwendung 96-A“), ist ihr Barwert eine Untergrenze. Zu klären ist, welchen Verlauf das Produkt für #96 in M0 abzinst |
 | B3 | Bericht 96, Kap. 6, Absatz „Jahresbeträge ohne Abzinsung“, letzter Satz | „Die Diskontrate für mehrjährige Rechnungen legt T-1116 fest.“ | Die Regel steht in `docs/methodik/querschnitt_diskontrate.md`, Abschnitt „Festlegung“ (Regel D) | Verweis auf ein Ticket des Firmen-Repos statt auf die Festlegung; ein Leser des Berichts kann ihn nicht auflösen. Bericht 95 hat den Satz ohne diesen Verweis (Kap. 6, Absatz „Jahresbeträge ohne Abzinsung“) |
-| B4 | Bericht 98, Kap. 6, Absätze „Szenario-Anwendung 98-A“ und „Jahresbeträge ohne Abzinsung“ | „M0 weist das Ist-Klima aus“ (Normalperiodenvergleich); konstant gehalten werden unter anderem Inzidenzraten und Kostensätze; „Inzidenz-Baseline stationär (real steigend — Untergrenze)“. Einen Jahresbetrag für die Jahre nach dem Ist-Klima nennt der Bericht nicht | wie B1: Barwert über die 41 Jahre 2025–2065, Jahresbeträge mit dem Klimasignal fortgeschrieben | Verlauf fehlt im Bericht, wie B1 und B2. Die Rechenkette für #98 rechnet mit gleichbleibendem Jahresbetrag. Weil der Bericht für Szenarien eine weiter steigende UV-B-Belastung als Rahmen nennt (UV-B-Projektion +1,3 % je Dekade, Kap. 6) und die Inzidenz real steigt, liegt ihr Barwert auf der Achse Verlauf zu niedrig. Eine Untergrenze ist er trotzdem nicht: Auf der Achse Latenz liegt er gegenüber einer Jahres-Attribution um bis zu 80 % zu hoch (Transient-Faktor τ, Befund B5). Nach dem, was der Bericht beziffert, überwiegt diese Richtung: τ ist seine größte Achse (Kap. 4), den Verlauf nennt er ohne Zahl (Kap. 6). Zu klären ist, welchen Verlauf das Produkt für #98 in M0 abzinst |
+| B4 | Bericht 98, Kap. 6, Absätze „Szenario-Anwendung 98-A“ und „Jahresbeträge ohne Abzinsung“ | „M0 weist das Ist-Klima aus“ (Normalperiodenvergleich); konstant gehalten werden unter anderem Inzidenzraten und Kostensätze; „Inzidenz-Baseline stationär (real steigend — Untergrenze)“. Einen Jahresbetrag für die Jahre nach dem Ist-Klima nennt der Bericht nicht | wie B1: Barwert über die 41 Jahre 2025–2065, Jahresbeträge mit dem Klimasignal fortgeschrieben | Verlauf fehlt im Bericht, wie B1 und B2. Die Rechenkette für #98 rechnet mit gleichbleibendem Jahresbetrag. Weil der Bericht für Szenarien eine weiter steigende UV-B-Belastung nennt und die Inzidenz real steigt, liegt ihr Barwert auf der Achse Verlauf zu niedrig. Eine Untergrenze ist er trotzdem nicht: Auf der Achse Latenz liegt er gegenüber einer Jahres-Attribution um bis zu 80 % zu hoch (Transient-Faktor τ, Befund B5). Nach dem, was der Bericht beziffert, überwiegt diese Richtung: τ ist seine größte Achse (Kap. 4). Den Anstieg der UV-B-Belastung nennt er nur als Plausibilisierungsrahmen (UV-B-Projektion +1,3 % je Dekade für 2050–2100), die steigende Inzidenz ohne Zahl; wie stark der Verlauf auf den Jahresbetrag wirkt, beziffert er nicht (Kap. 6, Absatz „Szenario-Anwendung 98-A“; Kap. 8, Quelle [32]). Zu klären ist, welchen Verlauf das Produkt für #98 in M0 abzinst |
 | B5 | Bericht 98, Kap. 3.0, „Lesart des Jahresbetrags“ und Punkt „Lesart τ = 1“; Kap. 3.4, „Abschätzung des Transient-Faktors“; Kap. 3.5, Zeichentabelle, Zeile τ; Kap. 4, Bändertabelle; Kap. 5, Absatz „Latenz: Sprung der Dosis, Rampe der Wirkung“; Kap. 6, Absatz „Jahresbeträge ohne Abzinsung“ und Modellgrenze 1; Entscheidungslog des Berichts Nr. 14 und Nr. 35 | Der Jahresbetrag beziffert „die Fälle eines Jahres unter der heutigen, eingelaufenen Dosislage — die Latenz von Jahrzehnten steckt schon in den Inzidenzraten der Ebene 2 […], und deshalb wird nicht weiter abgezinst“ (Kap. 3.0); er ist das „eingelaufene Risiko“, „keine Vorhersage der Fälle *dieses* Jahres“ (Modellgrenze 1). Entscheidungslog Nr. 14: „Gleichgewichtslesart“, „kein Latenz-Discounting“, „Ergebnis wird gegenüber einer Jahres-Attribution überschätzt — größte Achse der §4-Bändertabelle (67–339 Mio. €), einseitig“. Den Abstand zur Jahres-Attribution beziffert der Bericht mit dem Transient-Faktor τ = 0,20–0,48 (Kap. 3.4), im Ausweis τ = 1; Berlin läge mit τ um 52–80 % niedriger (Kap. 3.0). Bei der Maßnahme S155 bildet der Bericht die Verzögerung als Rampe im Jahresbetrag ab, „Abgezinst wird nicht“, und setzt τ nicht zusätzlich an, „weil dieselbe Einlaufzeit zweimal zählte“ (Nr. 35) | Regel D zinst jeden Jahresbetrag mit (Jahr − 2025) ab. **Ob „Jahr“ das Jahr des Schadenseintritts oder das Jahr der Belastung ist, legt die Festlegung nicht fest.** Einen verzögerten Schadenseintritt erwähnt sie nicht | Lücke in der Festlegung, keine Abweichung des Berichts. Die Rechenkette für #98 rechnet nach der Gleichgewichtslesart des Berichts (voller Betrag im Jahr des Betrags, τ = 1) und ändert Regel D nicht (Entscheidungslog Nr. 20 und 22). Die Latenz kann auf zwei Wegen eingehen, die einander ausschließen: als τ auf den Betrag im Jahr des Schadens (Barwert bis −80 %: 93,9–225,3 Mio. € zur RZPR 0 %, 77,6–186,2 Mio. € zur RZPR 1 %, bei τ in allen Jahren gleich) oder als Verschiebung nach dem Jahr der Belastung (je zehn Jahre −1,0 % zur RZPR 0 %, −10 % zur RZPR 1 %). Zu entscheiden ist, nach welchem Jahr Regel D abzinst. Nach dem Jahr des Schadens: Dann sind Basiswert und Rampe von S155 so gebucht, und offen bleibt allein τ, eine Frage an den Bericht, die er mit τ = 1 im Ausweis entschieden hat. Nach dem Jahr der Belastung: Dann braucht #98 eine Verschiebung mit einer belegten Latenz in Jahren, ohne τ. Außerdem ist der Satz „deshalb wird nicht weiter abgezinst“ (Kap. 3.0) doppeldeutig: Gemeint ist kein Latenzabschlag im Jahresbetrag, wie Nr. 14 („kein Latenz-Discounting“) eindeutiger sagt, nicht der Verzicht auf Regel D in einer mehrjährigen Rechnung |
 
 **Ohne Abweichung:** Jahresbetrag 362,9 Mio. € je Jahr (Preisstand 2024) in Kap. 3.0, Ebene 10; Anteil Mortalität
@@ -879,12 +897,13 @@ Abruf gesperrt ist. Er ist in der Quellenpflege nachzutragen (Aufgabe §3.8).
   Gelesen am 06.10.2026.
 - **[Bericht 98]** `docs/methodik/98_uv_schaedigungen.md`, Rev. 15 vom 05.10.2026: Kap. 1 („Konto-Einbettung“), Kap. 3.0
   (Ebenen 9 und 10, Ebene 10 in Zeile 310, gemessen am 06.10.2026 und am 07.10.2026; „Lesart des Jahresbetrags“; Punkte
-  „Stärkster Treiber“, „Lesart τ = 1“ und „Bevölkerung im Produkt“), Kap. 3.4 (Gleichgewichtslesart und „Abschätzung
-  des Transient-Faktors“, Monetarisierung, VOLY, Konsistenz-Check VSL ÷ VOLY), Kap. 3.5 (Zeichentabelle, Zeile τ),
-  Kap. 4 (Bändertabelle, Zeile „Transient-Faktor τ“; „Unsicherheiten (nach Größe geordnet)“), Kap. 5 (Absatz „Latenz:
-  Sprung der Dosis, Rampe der Wirkung“), Kap. 6 (Absätze „Szenario-Anwendung 98-A“ und „Jahresbeträge ohne Abzinsung“,
-  Modellgrenzen 1, 2 und 6, Infokasten 1), Entscheidungslog Nr. 14 und Nr. 35. Gelesen am 06.10.2026, nachgelesen am
-  07.10.2026.
+  „Stärkster Treiber“, „Lesart τ = 1“ und „Bevölkerung im Produkt“), Kap. 3.2 (Punkt „Stationaritätsannahme der
+  Elastizität“), Kap. 3.4 (Gleichgewichtslesart und „Abschätzung des Transient-Faktors“, Monetarisierung, Punkt \(c_e\)
+  mit der „Untergrenzen-Zusage“, VOLY, Konsistenz-Check VSL ÷ VOLY), Kap. 3.5 (Zeichentabelle, Zeile τ), Kap. 4
+  (Bändertabelle, Zeile „Transient-Faktor τ“; „Unsicherheiten (nach Größe geordnet)“), Kap. 5 (Absatz „Latenz: Sprung
+  der Dosis, Rampe der Wirkung“), Kap. 6 (Absätze „Szenario-Anwendung 98-A“ und „Jahresbeträge ohne Abzinsung“,
+  Modellgrenzen 1, 2 und 6, Infokasten 1), Kap. 8 (Quelle [32]), Entscheidungslog Nr. 7, Nr. 14 und Nr. 35. Gelesen am
+  06.10.2026, nachgelesen am 07.10.2026.
 - **[Produkt]** `backend/app/data/diskontierung.py`; `backend/app/services/cost_projection_service.py`
   (`_diskontraten()`, `project_costs()`, `_discounted()`); `backend/app/services/climate/dwd_data.py`
   (`get_climate_projection()`); `docs/KONFORMITAET_CHECKLISTE.md`, Zeile 22 und „Gegenprobe Zeile 22“.
