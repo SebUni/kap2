@@ -16,6 +16,9 @@ Deckt ab:
       Endwert liegt unter dem von ``cumulative``.
   (g) ``RELATIVE_PRICE_COMPONENT_SPEC`` ist als Abschätzung von KAP3
       gekennzeichnet, ``MODELLGRENZEN`` nennt die drei Grenzen mit Seite.
+  (h) ``test_komponente_gilt_nur_fuer_m0_gesundheit``: Die Komponente trifft nur
+      Risiken mit ``kwra_id`` 95, 96 oder 98; Übriges, OPEX und CAPEX werden mit
+      der RZPR allein abgezinst, ``diskontraten_uebrige`` ist je RZPR die RZPR.
 
 Diskontrate = Reine Zeitpräferenzrate (0 % und 1 %) + Komponente der relativen
 Preise (``app.data.diskontierung``, vorläufig 0 Pp.).
@@ -47,6 +50,39 @@ def _fake_aggregate(db, kommune_id, apply_measures=False, demo_session_id=None):
         "cost": {
             "total_eur": total,
             "by_risk": [{"code": "TEST_RISK", "cost_eur": total}],
+            "lower_bound": None,
+        }
+    }
+
+
+def _fake_aggregate_m0(db, kommune_id, apply_measures=False, demo_session_id=None):
+    """Wie ``_fake_aggregate``, aber das Risiko trägt einen Katalogeintrag mit
+    ``kwra_id`` 95 (Gruppe ``heat``) und zählt damit zu den Gesundheitsschäden von M0."""
+    total = 800_000.0 if apply_measures else 1_000_000.0
+    return {
+        "cost": {
+            "total_eur": total,
+            "by_risk": [{"code": "EXPECTED_ANNUAL_MORTALITY", "cost_eur": total}],
+            "lower_bound": None,
+        }
+    }
+
+
+M0_ANTEIL = {False: 600_000.0, True: 480_000.0}      # #95 ohne / mit Maßnahmen
+UEBRIGER_ANTEIL = {False: 400_000.0, True: 320_000.0}  # TEST_RISK, ohne M0-Bezug
+
+
+def _fake_aggregate_gemischt(db, kommune_id, apply_measures=False, demo_session_id=None):
+    """Aggregat aus #95 (M0) und TEST_RISK (kein Katalogeintrag, kein M0-Bezug)."""
+    m0 = M0_ANTEIL[bool(apply_measures)]
+    rest = UEBRIGER_ANTEIL[bool(apply_measures)]
+    return {
+        "cost": {
+            "total_eur": m0 + rest,
+            "by_risk": [
+                {"code": "EXPECTED_ANNUAL_MORTALITY", "cost_eur": m0},
+                {"code": "TEST_RISK", "cost_eur": rest},
+            ],
             "lower_bound": None,
         }
     }
@@ -135,6 +171,11 @@ def test_diskontraten_sind_rzpr_plus_komponente(projection):
 
 def test_komponente_verschiebt_die_diskontrate(projection, monkeypatch):
     """(f) Komponente 0,01: Reihe zur RZPR 0 % = Reihe zur RZPR 1 % bei Komponente 0."""
+    # Die Komponente gilt nur für M0-Gesundheit: Das Aggregat trägt dafür ein
+    # Katalogrisiko mit kwra_id 95; ``projection`` ist damit die Vergleichsreihe
+    # bei Komponente 0.
+    monkeypatch.setattr(cps, "get_risk_aggregate", _fake_aggregate_m0)
+    projection = cps.project_costs(db=None, kommune_id=1, bundesland="SN")
     monkeypatch.setattr(diskontierung, "RELATIVE_PRICE_COMPONENT", 0.01)
     mit_komponente = cps.project_costs(db=None, kommune_id=1, bundesland="SN")
     assert mit_komponente["diskontierung"]["diskontraten"]["0.0"] == pytest.approx(0.01)
@@ -142,6 +183,60 @@ def test_komponente_verschiebt_die_diskontrate(projection, monkeypatch):
         ohne = projection["scenarios"][scenario][pfad]
         assert block["discounted"]["0.0"] == ohne["discounted"]["0.01"], (scenario, pfad)
         assert block["discounted"]["0.0"][-1] < block["cumulative"][-1], (scenario, pfad)
+
+
+def test_komponente_gilt_nur_fuer_m0_gesundheit(monkeypatch):
+    """(h) Komponente 0,01 trifft nur den M0-Anteil (#95); der übrige Anteil, OPEX
+    und CAPEX werden mit der RZPR allein abgezinst."""
+    from types import SimpleNamespace
+
+    massnahme = SimpleNamespace(
+        id=1, name="Testmaßnahme",
+        impact_summary={"capex_eur": 100_000.0, "opex_annual_eur": 5_000.0},
+        implementation_year=2030, measure_type="TEST_MASSNAHME", config={},
+    )
+
+    class _QueryMitMassnahme:
+        def all(self):
+            return [massnahme]
+
+    monkeypatch.setattr(cps, "get_risk_aggregate", _fake_aggregate_gemischt)
+    monkeypatch.setattr(cps, "get_climate_projection", _fake_projection)
+    monkeypatch.setattr(cps, "scenario_factors", _fake_scenario_factors)
+    monkeypatch.setattr(cps, "kommune_measures_query",
+                        lambda db, kommune_id, demo_session_id: _QueryMitMassnahme())
+    monkeypatch.setattr(diskontierung, "RELATIVE_PRICE_COMPONENT", 0.01)
+    ergebnis = cps.project_costs(db=None, kommune_id=1, bundesland="SN")
+
+    faktoren = _fake_scenario_factors(None, "rcp45", "heat")
+    for scenario, pfad, block in _pfade(ergebnis):
+        mit = pfad == "with_measures"
+        # Handrechnung: M0-Anteil mit 1 % abgezinst, Übriges (und Maßnahmenkosten) nicht.
+        erwartet, laufend = [], 0.0
+        for i, jahr in enumerate(YEARS):
+            m0 = M0_ANTEIL[mit] * faktoren[i] / 1.01 ** i
+            uebrig = UEBRIGER_ANTEIL[mit] * faktoren[i]
+            if mit:
+                uebrig += 5_000.0 if jahr >= 2030 else 0.0  # OPEX ab Umsetzungsjahr
+                uebrig += 100_000.0 if jahr == 2030 else 0.0  # CAPEX einmalig
+            laufend += m0 + uebrig
+            erwartet.append(laufend)
+        ist = block["discounted"]["0.0"]
+        assert len(ist) == len(erwartet), (scenario, pfad)
+        for jahr, a, b in zip(YEARS, ist, erwartet):
+            assert a == pytest.approx(b, abs=0.01), (scenario, pfad, jahr)
+        if mit:
+            # Die Maßnahmenkosten der Handrechnung stimmen mit den Komponenten überein;
+            # abgezinst werden sie in der Handrechnung oben nicht.
+            assert block["components"]["capex"][YEARS.index(2030)] == 100_000.0
+            assert block["components"]["opex"][-1] == 5_000.0
+
+    diskontierung_block = ergebnis["diskontierung"]
+    assert diskontierung_block["relative_preise"]["gilt_fuer_kwra"] == [95, 96, 98]
+    assert set(diskontierung_block["diskontraten_uebrige"]) == set(diskontierung_block["diskontraten"])
+    for r in diskontierung_block["rzpr"]:
+        assert diskontierung_block["diskontraten_uebrige"][str(r)] == pytest.approx(r)
+        assert diskontierung_block["diskontraten"][str(r)] == pytest.approx(r + 0.01)
 
 
 def test_spec_und_modellgrenzen():

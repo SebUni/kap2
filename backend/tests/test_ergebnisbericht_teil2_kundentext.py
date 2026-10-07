@@ -130,9 +130,10 @@ def test_status_abweichend_von_kundentext_bricht_teil_2_ab(tmp_path):
 
 
 def test_fehlender_kundensatz_bricht_teil_2_ab(tmp_path):
-    # Zeile 14 ist heute "erfüllt" und hat deshalb keinen Eintrag in KUNDENTEXT; kippt ihr Status
+    # Zeile 1 ist heute "erfüllt" und hat deshalb keinen Eintrag in KUNDENTEXT; kippt ihr Status
     # auf "offen", fehlt der nötige Kundensatz ganz, und die Erzeugung von Teil 2 muss abbrechen.
-    nr = 14
+    # (Bis T-1868 diente Zeile 14 als Beispiel; sie steht seit der Gegenprobe auf "teilweise".)
+    nr = 1
     assert nr not in KUNDENTEXT
     kopie = _kopie_mit_status(tmp_path, nr, "offen")
     zeilen = {z.nr: z.status for z in lies_checkliste(kopie)}
