@@ -47,17 +47,30 @@ def _prozent(anteil: float) -> str:
     return f"{wert:g}".replace(".", ",")
 
 
-def _group_costs(agg: dict) -> dict[str, float]:
+def _ist_m0_gesundheit(code: str) -> bool:
+    """True, wenn der Katalogeintrag des Risikos eine ``kwra_id`` aus
+    ``RELATIVE_PRICE_COMPONENT_KWRA_IDS`` trägt (Gesundheitsschäden von M0).
+    Risiken ohne Katalogeintrag oder ohne ``kwra_id`` haben keinen M0-Bezug."""
+    spec = catalog.RISKS_BY_CODE.get(code) or {}
+    return spec.get("kwra_id") in diskontierung.RELATIVE_PRICE_COMPONENT_KWRA_IDS
+
+
+def _group_costs(agg: dict, nur_m0: bool = False) -> dict[str, float]:
     """Schadenskosten je KWRA-Gruppe (nicht-additive Sammelrisiken ausgeschlossen,
     damit die Gruppensumme der ausgewiesenen Gesamtsumme entspricht).
 
     Klasse-B-Wirkungen (Screening ohne Euro-Bezifferung, ``euro_layer: False``)
     werden ausgelassen, nicht als 0 gezählt: Sie tragen keinen Euro-Betrag, und
-    eine Gruppe, die nur aus Klasse B besteht, erscheint nicht mit 0 €."""
+    eine Gruppe, die nur aus Klasse B besteht, erscheint nicht mit 0 €.
+
+    ``nur_m0=True`` zählt nur die Risiken, für die die Komponente der relativen
+    Preise gilt (``_ist_m0_gesundheit``); Standard sind alle Risiken."""
     out: dict[str, float] = {}
     for r in agg["cost"]["by_risk"]:
         code = r["code"]
         if code in catalog.NON_ADDITIVE_RISK_CODES:
+            continue
+        if nur_m0 and not _ist_m0_gesundheit(code):
             continue
         spec = catalog.RISKS_BY_CODE.get(code)
         if (r.get("has_euro_layer") is False
@@ -143,16 +156,29 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             out.append(round(running, 2))
         return out
 
-    def _discounted(series: list[float]) -> dict[str, list[float]]:
+    def _discounted(series: list[float], series_m0: list[float]) -> dict[str, list[float]]:
         """Kumulierte Kosten als Barwerte je Diskontrate (UBA MK 4.0, Kap. 2.2.3):
         mindestens 0 % und 1 %, abgezinst auf das Basisjahr ``years[0]`` mit dem
-        Faktor 1/(1+d)^(Jahr − Basisjahr). Die Diskontrate d ist je RZPR r gleich
-        r + Komponente der relativen Preise; Schlüssel bleibt die RZPR."""
+        Faktor 1/(1+d)^(Jahr − Basisjahr); Schlüssel bleibt die RZPR r.
+
+        Die Komponente der relativen Preise gilt nur für die Gesundheitsschäden von
+        M0 (``series_m0``, Teil von ``series``): Dieser Anteil wird mit
+        d = r + Komponente abgezinst, alles Übrige (andere Schadensarten, nicht
+        gruppierbarer Rest, OPEX, CAPEX) mit r allein. Gerechnet wird je Jahr
+        ``Jahreswert / (1+r)^t + M0-Anteil × (1/(1+d)^t − 1/(1+r)^t)``; bei
+        Komponente 0 verschwindet der zweite Term exakt, und der Barwert zur RZPR
+        0 % ist gleich ``cumulative``. Gerundet wird erst am Ende je Jahr."""
+        raten = _diskontraten()
         out: dict[str, list[float]] = {}
-        for key, rate in _diskontraten().items():
+        for r in diskontierung.PURE_TIME_PREFERENCE_RATES:
+            key = str(r)
+            d_m0 = raten[key]
             running, row = 0.0, []
-            for year, value in zip(years, series):
-                running += value / ((1.0 + rate) ** (year - years[0]))
+            for year, value, value_m0 in zip(years, series, series_m0):
+                t = year - years[0]
+                faktor_r = 1.0 / ((1.0 + r) ** t)
+                faktor_m0 = 1.0 / ((1.0 + d_m0) ** t)
+                running += value / ((1.0 + r) ** t) + value_m0 * (faktor_m0 - faktor_r)
                 row.append(round(running, 2))
             out[key] = row
         return out
@@ -166,6 +192,15 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
         groups_with = _group_costs(withm)
         factors = {g: scenario_factors(proj, scenario, g) for g in set(groups_base) | set(groups_with)}
         n_years = len(years)
+
+        def _series_m0(group_costs_m0: dict[str, float]) -> list[float]:
+            """Anteil der M0-Gesundheitsschäden an der Schadensreihe, mit denselben
+            Gruppenfaktoren fortgeschrieben wie ``_series``. Der nicht gruppierbare
+            Rest gehört nicht dazu."""
+            return [
+                sum(c * factors[g][i] for g, c in group_costs_m0.items())
+                for i in range(n_years)
+            ]
 
         def _series(group_costs: dict[str, float], total: float) -> list[float]:
             covered = sum(group_costs.values())
@@ -183,6 +218,8 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
 
         damages_no = _series(groups_base, total_base)
         damages_with = _series(groups_with, total_with)
+        m0_no = _series_m0(_group_costs(base, nur_m0=True))
+        m0_with = _series_m0(_group_costs(withm, nur_m0=True))
         annual_with = [
             round(d + o + c, 2)
             for d, o, c in zip(damages_with, opex_by_year, capex_by_year)
@@ -192,12 +229,12 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             "no_measures": {
                 "annual": damages_no,
                 "cumulative": _cumulative(damages_no),
-                "discounted": _discounted(damages_no),
+                "discounted": _discounted(damages_no, m0_no),
             },
             "with_measures": {
                 "annual": annual_with,
                 "cumulative": _cumulative(annual_with),
-                "discounted": _discounted(annual_with),
+                "discounted": _discounted(annual_with, m0_with),
                 "components": {
                     "damages": damages_with,
                     "opex": [round(v, 2) for v in opex_by_year],
@@ -246,11 +283,13 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             "rzpr": rzpr,
             "relative_preise": {
                 "wert": komponente,
+                "gilt_fuer_kwra": list(diskontierung.RELATIVE_PRICE_COMPONENT_KWRA_IDS),
                 "evidence_class": diskontierung.RELATIVE_PRICE_COMPONENT_SPEC["evidence_class"],
                 "begruendung": diskontierung.RELATIVE_PRICE_COMPONENT_SPEC[
                     "evidence_derivation"]["wert"],
             },
             "diskontraten": diskontraten,
+            "diskontraten_uebrige": {str(r): r for r in rzpr},
             "modellgrenzen": list(diskontierung.MODELLGRENZEN),
         },
         "hinweise_massnahmen": hinweise_massnahmen,
