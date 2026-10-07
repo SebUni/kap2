@@ -19,8 +19,8 @@ Zeitscheibe Mitte des Jahrhunderts (2031–2060) und ein Wert für die Zeitschei
 der Skala sehr gering, gering, mittel, hoch, mit der Fundstelle TB6 Tabelle 1. Die Jahre des Produkts bekommen den
 Wert nach der Zuordnungstabelle unten. Für das heutige Klima steht „in der KWRA nicht ausgewiesen“. Der Anteil der
 Parameter mit Quelle, den `gewissheit.py` heute als Gewissheit ausgibt, ist keine Gewissheit: Er heißt „Quellenlage
-der Rechnung“, erscheint nur als Zählung (etwa „8 von 19 Parametern mit Quelle“), ohne Stufe, und keine Folgegröße
-setzt auf ihm auf.
+der Rechnung“, erscheint nur als Zählung (etwa „10 von 30 Parametern mit Quelle“ bei #95, Stand 07.10.2026), ohne
+Stufe, und keine Folgegröße setzt auf ihm auf.
 
 ### Herleitung und Fundstelle
 
@@ -87,9 +87,11 @@ Die KWRA bewertet je Klimawirkung (eine Zeile je Klimawirkung in Tabelle 1 und i
 **einen Wert je Klimawirkung und Zeitscheibe**, nicht je Risikocode des Produkts. #95 „Hitzebelastung“ hat im Produkt
 zwei Codes, `EXPECTED_ANNUAL_MORTALITY` (Sterbefälle) und `EXPECTED_ANNUAL_MORBIDITY` (Krankenhauseinweisungen)
 (`docs/KONFORMITAET_CHECKLISTE.md`, Abschnitt „Gegenprobe Zeile 8“). Beide Codes zeigen dieselbe Gewissheit aus
-derselben Zelle (Zeile 97 der Mappe). Heute stehen sie auf verschiedenen Stufen (mittel und hoch), obwohl es eine
-Klimawirkung ist; das entfällt. Die Quellenlage zählt ebenfalls je Klimawirkung, über die Parameter-Blöcke des einen
-Berichts, jeder Block einmal.
+derselben Zelle (Zeile 97 der Mappe). Die Kennzahl in `gewissheit.py` zählt dagegen je Code. Am 25.09.2026 standen
+die beiden Codes damit auf verschiedenen Stufen (mittel und hoch), obwohl es eine Klimawirkung ist. Gemessen am
+07.10.2026 stehen beide auf „gering“ (Sterbefälle 17 von 38, Krankenhauseinweisungen 3 von 9), aber nur, weil zwei
+getrennte Zählungen zufällig dieselbe Stufe ergeben. Nach Regel G entfällt die Stufe je Code. Die Quellenlage zählt
+ebenfalls je Klimawirkung, über die Parameter-Blöcke des einen Berichts, jeder Block einmal.
 
 ### Was die Gewissheit über den Euro-Betrag von KAP3 aussagt und was nicht
 
@@ -759,11 +761,14 @@ Stufe. So steht weder ein „hoch“ noch ein „mittel“ ohne Zeitbezug neben 
 
 **Das „mittel“ der Kennzahl trifft die KWRA zur Mitte nur zufällig.** Es folgt aus einem Anteil über der Hälfte, nicht
 aus einer Bewertung der Gewissheit. An einem Tag ist es ohne neues Wissen über UV von „hoch“ auf „mittel“ gefallen,
-allein weil die Parameter anders eingeteilt wurden. Aus den Blöcken des Berichts gezählt gibt dieselbe Regel „gering“
-(5 von 22). Und es hat keinen Zeitbezug, es stünde auch für 2061–2100, wo die KWRA „sehr gering“ nennt. Die einfachere
-Rechnung, die Kennzahl als Gewissheit, stellt die Lage deshalb falsch dar: Ein Nutzer läse aus einer Stufe ohne
-Zeitbezug, die Gewissheit sei bis 2100 mindestens „mittel“. Die KWRA zählt genau diese Klimawirkung zu den sieben mit
-der geringsten Gewissheit zum Ende (TB6 S. 78).
+allein weil die Parameter anders eingeteilt wurden. Aus den Blöcken des Berichts gezählt gibt dieselbe Regel je nach
+Zählweise eine andere Stufe: „gering“, wenn nur die Parameter mit Quelle zählen (5 von 22 = 23 %), und „mittel“, wenn
+wie in der Registry auch die berechneten zählen (11 von 22 = 50 %, genau auf der Hälfte). Und es hat keinen Zeitbezug:
+Es stünde auch für 2071–2100, wo die KWRA „sehr gering“ nennt, und für 2061–2070. Zu diesen Jahren sagt die KWRA
+nichts; dort setzt die Zuordnung von KAP3 („niedrigere Stufe“) „sehr gering“. Die einfachere Rechnung, die Kennzahl als
+Gewissheit, stellt die Lage deshalb falsch dar: Ein Nutzer läse aus einer Stufe ohne Zeitbezug, die Gewissheit sei bis
+2100 mindestens „mittel“. Die KWRA zählt genau diese Klimawirkung zu den sieben mit der geringsten Gewissheit zum Ende
+(TB6 S. 78).
 
 **Einordnung nach „Einordnung der Charakterisierung“ (Zeitscheibe Mitte).**
 
@@ -1039,10 +1044,24 @@ gering“. Ihr Anteil hängt von der Zerlegung ab: Registry 22 von 30 = 73 %, Bl
 Regel G, Zuordnungstabelle und Einordnung ändert sich nichts. Die Einordnung von #98 („Entwicklung“, 2,0) setzt auf
 Zellen der KWRA und auf Tabelle 24 auf, nicht auf der Kennzahl.
 
+Nachtrag Runde 2, 07.10.2026 (Urteil des Managers zu Runde 1): Unter „#98 UV-Schädigungen“ nennt der Absatz zum
+zufälligen „mittel“ jetzt beide Zählweisen der Blöcke („gering“ mit 5 von 22, „mittel“ mit 11 von 22). Beim fehlenden
+Zeitbezug trennt er 2071–2100, wo die KWRA „sehr gering“ nennt, von 2061–2070, wo die Zuordnung von KAP3 „sehr gering“
+setzt. Zwei Angaben unter „Festlegung“ beschrieben im Präsens den Stand vom 25.09.2026 und tragen ihr Datum jetzt an
+der Stelle selbst, nicht nur in den Nachträgen oben. In Regel G zeigt das Beispiel der Zählung jetzt den Stand vom
+07.10.2026 („10 von 30 Parametern mit Quelle“ bei #95, vorher „8 von 19“), weil es nur die Form der Anzeige zeigt und
+so mit der Übersicht am Ende übereinstimmt; „8 von 19“ mit Datum wäre ein überholtes Beispiel in der Regel geblieben.
+Unter „Ein Wert je Klimawirkung“ steht der Satz „Heute stehen sie auf verschiedenen Stufen (mittel und hoch)“ jetzt als
+Stand vom 25.09.2026, daneben der Stand vom 07.10.2026 (beide Codes „gering“). Regel G selbst ist unverändert: Das
+Produkt zeigt als Gewissheit den Wert der KWRA je Zeitscheibe, und die Quellenlage erscheint nur als Zählung ohne
+Stufe. Zuordnungstabelle und Einordnung sind ebenfalls unverändert.
+
 Änderungen an Abschnitten aus Schritt 1 bis 3: Der Vorspann nennt Schritt 4 mit Ticket. Der Satz vor der Tabelle unter
 „Rechenkette“ nennt #98 als drittes Beispiel. Vergleich und Block zu #95 und #96 sind auf den heutigen Stand
-nachgezogen (oben). Unter „Befunde an Berichte“ steht #98, unter „Quellen“ die Fundstellen von Schritt 4. Die Übersicht
-am Ende ist neu. Sonst ist nichts aus Schritt 1 bis 3 geändert.
+nachgezogen (oben). Unter „Festlegung“ tragen das Beispiel der Zählung in Regel G und der Satz zu den Stufen der beiden
+Codes unter „Ein Wert je Klimawirkung“ ihr Datum an der Stelle selbst (Nachtrag Runde 2). Unter „Befunde an Berichte“
+steht #98, unter „Quellen“ die Fundstellen von Schritt 4. Die Übersicht am Ende ist neu. Sonst ist nichts aus Schritt 1
+bis 3 geändert.
 
 ## Befunde an Berichte
 
