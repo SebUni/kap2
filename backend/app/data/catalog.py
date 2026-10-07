@@ -305,16 +305,35 @@ RISKS: list[dict] = [
      "exposures": ["POPULATION_DENSITY", "AGE_STRUCTURE"],
      "vulnerabilities": ["HEALTHCARE_ACCESS"],
      # Herleitung ref_value (Sanity-Anker, YLL je 100.000 EW): Bundessumme
-     # ≈ 1.580 YLL/Jahr ÷ 83,456 Mio EW × 100.000 ≈ 1,89.
+     # 1.404 YLL/Jahr (Bericht §4, Prüfblock) ÷ 83.456.045 EW × 100.000 = 1,6823,
+     # gerundet auf zwei Stellen 1,68.
      # cost_per_outcome_eur: VOLY 160.800 €₂₀₂₄ wie #95 — ABER der €-Ausweis
      # enthält zusätzlich die Behandlungskosten je Zusatzfall (§3.4); die
      # Schadensfunktion setzt cost_eur deshalb selbst (s. impact/health.py).
-     "ref_value": 1.89, "scale": "pop", "cost_per_outcome_eur": 160800.0,
-     "source": "Bericht #98 Rev. 1 (ZfKD KID 2025 / DWD-SSD / Slaper-BAF)",
+     "ref_value": 1.68, "scale": "pop", "cost_per_outcome_eur": 160800.0,
+     # Kostensatz = Block uv.voly in Kapitel 7 des Berichts #98, Kennzeichnung
+     # abschaetzung_kap3 (VOLY wie heat.voly: Elastizität 0,85 beim Raumtransfer gesetzt).
+     "cost_methodik_block": "uv.voly",
+     "cost_evidence_class": "abgeschaetzt",
+     "cost_evidence_derivation": {
+         "wert": "160.800 €₂₀₂₄ je verlorenem Lebensjahr: wie in #95 aus Amann 2020a "
+                 "Tab. 3.15 (UBA MK 4.0, Fortschreibung P52), auf 2024 hochgerechnet; die "
+                 "Elastizität 0,85 beim Raumtransfer ist eine Setzung von KAP3 (Bericht "
+                 "#98 §3.4, Kapitel 7, Block uv.voly). Der Statistische Wert eines "
+                 "Todesfalls (VSL) bleibt Sensitivität, weil er das Zwei- bis Siebenfache "
+                 "der tatsächlich verlorenen Lebensjahre unterstellte.",
+         "band": "136.400–165.600 €₂₀₂₄ (Bericht #98 Kapitel 7, Block uv.voly).",
+         "sensitivitaet": "Linear: Der Wert der verlorenen Lebensjahre wächst und fällt im "
+                          "gleichen Verhältnis wie VOLY; die Behandlungskosten je Fall "
+                          "und die Zahl der Lebensjahre ändern sich nicht (Bericht #98 "
+                          "§3.4).",
+     },
+     "source": "Bericht #98 (ZfKD KID 2025 / DWD-SSD / Slaper-BAF)",
      "source_detail": "Sanity-Anker in YLL je 100.000 EW: klimaattribuierte "
-        "Zusatzfälle 814 (Melanom) + 20.118 (C44) × Letalität × "
-        "Restlebenserwartung = 1.580 YLL/Jahr bundesweit ⇒ 1,89 je 100.000 EW "
-        "(Bericht §4). Kein Rechenweg — Schicht B rechnet die Schadensfunktion.",
+        "Zusatzfälle 733 (Melanom) + 18.339 (C44) × Letalität × "
+        "Restlebenserwartung = 1.404 YLL/Jahr bundesweit (339 Mio. € je Jahr) ⇒ "
+        "1,68 je 100.000 EW (Bericht §4). Kein Rechenweg — Schicht B rechnet die "
+        "Schadensfunktion.",
      "source_refs": ["ZfKD_KID_2025", "DWD_CDC_SSD_Raster", "Slaper_1996_BAF"],
      "description": "Verlorene Lebensjahre durch klimabedingt zusätzliche "
                     "Hautkrebsfälle (malignes Melanom und nicht-melanotischer "
@@ -1947,6 +1966,129 @@ MEASURES: list[dict] = [
                 "rechnerischer Effekt ohne fachliche Grundlage. Der Wert bleibt deshalb "
                 "bei 0,0, bis eine solche Grundlage vorliegt.",
         }}},
+    # Maßnahme UV-Schutz im öffentlichen Raum und Kommunikation (S155) — Bericht #98 §5
+    # (Anker #hebel-s155, Befund 432, Log 33), Abgleich-Paket 5/7 (T-1824-cto, Vorhaben
+    # T-1662-ceo). Abschätzung von KAP3 nach Vorgabe P2: keine publizierte Effektgröße
+    # auf Dosis oder Inzidenz (Nutzen-Kosten-Verhältnisse 2,2–8,7 : 1 [37] sagen nur, dass
+    # sich solche Programme lohnen). Wirkung: Die Jahresdosis sinkt um
+    # h = 0,30 · 0,60 · 0,10 = 0,018 (``default_reduction``, Block uv.s155_dosisminderung),
+    # die Baseline F_e um BAF_e · h, ΔDosis bleibt. Der bewertete Schaden je Entität sinkt
+    # um denselben Anteil (health.s155_wirkung); die Wirkung steht NICHT im Basiswert,
+    # sondern als Teil-Ausweis der Maßnahme. Zellfaktor: measure_service._s155_cell_effect
+    # (kein pauschaler Index-Faktor — der Hebel wirkt je Entität mit eigenem BAF_e).
+    # Latenz: Rampe min(1, J/a_erk) mit a_erk MM 66 und C44 75 Jahren (Blöcke
+    # uv.s155_a_erk_mm/_c44, Felder a_erk_mm/a_erk_c44 der Maßnahme). DARSTELLUNGSGRENZE:
+    # Das Produkt kennt keinen Zeitbezug J für Maßnahmenwirkungen; der Zellfaktor rechnet
+    # die volle Wirkung, die Zusammenfassung weist die Anteile nach 10, 20 und 30 Jahren
+    # daneben aus (Bericht §5, Integrationsauflage Punkt 3).
+    # Kosten: Der Bericht nennt keine Kostenansätze für S155; es steht kein Betrag da.
+    {"code": "UV_PROTECTION_PUBLIC_SPACE",
+     "name": "UV-Schutz im öffentlichen Raum und Kommunikation",
+     "description": "Schatten auf Plätzen, Spielplätzen, Schulhöfen, in Parks und Freibädern "
+                    "(Bäume, Sonnensegel, Dächer) und UV-Index-Hinweise, die Aufenthalte in "
+                    "den Schatten lenken (S155, Bericht #98 §5). Eine Abschätzung von KAP3 "
+                    "(Vorgabe P2): Die Jahresdosis der Bevölkerung sinkt um 1,8 % "
+                    "(Band 0,5–4,5 %) = 0,30 Anteil der Dosis im öffentlichen Raum · 0,60 "
+                    "Minderung im Schatten · 0,10 zusätzlich verlagerte Aufenthalte. Der "
+                    "bewertete Schaden je Entität (Melanom, Hautkrebs C44) sinkt um BAF_e · "
+                    "1,8 %; die Wirkung steht nicht im Basiswert, sondern als Teil-Ausweis "
+                    "der Maßnahme. Sie läuft als Rampe ein: nach J Jahren min(1, J/a_erk) "
+                    "mit a_erk 66 Jahren (Melanom) und 75 Jahren (C44).",
+     "measure_type": "organizational",
+     "effect_target": ["hazard"], "default_reduction": 0.018, "coverage_scaling": "linear",
+     "effect_model": "s155",
+     "linked_risk_codes": ["EXPECTED_ANNUAL_UV_YLL"],
+     "qualitative_risk_codes": [],
+     "capex_fixed": None, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None,
+     "benefit_per_m2_year": None,
+     "unit_label": None, "unit_density_per_ha": None,
+     # Band der Dosisminderung (Bericht §5): alle drei Faktoren an der unteren bzw. oberen
+     # Grenze, 0,20·0,50·0,05 und 0,40·0,75·0,15; die Zusammenfassung weist daran das Band
+     # des Betrags aus (Wirkung linear in h).
+     "default_reduction_band": (0.005, 0.045),
+     # Einlaufzeiten der Rampe (Erkrankungsalter, Jahre) als Zusatzfelder der Maßnahme.
+     "a_erk_mm": 66.0,
+     "a_erk_c44": 75.0,
+     "zusatz_kostenfelder": (
+        ("a_erk_mm", "Einlaufzeit der Wirkung — Erkrankungsalter Melanom", "Jahre"),
+        ("a_erk_c44", "Einlaufzeit der Wirkung — Erkrankungsalter Hautkrebs C44", "Jahre"),
+     ),
+     "source": "Abschätzung von KAP3 (Vorgabe P2): keine publizierte Effektgröße auf Dosis "
+               "oder Inzidenz, Bericht #98 §5 (Hebel S155)",
+     "sources": {
+        "default_reduction": "Abschätzung von KAP3 (Bericht #98 §5, Hebel S155)",
+        "a_erk_mm": "Abschätzung von KAP3 (Mitte des Median-Erkrankungsalters aus [27])",
+        "a_erk_c44": "Abschätzung von KAP3 (Mitte des Median-Erkrankungsalters aus [27])"},
+     "source_refs": {"a_erk_mm": ["ZfKD_KID_2025"], "a_erk_c44": ["ZfKD_KID_2025"]},
+     "evidence_classes": {"default_reduction": "abgeschaetzt",
+                          "a_erk_mm": "abgeschaetzt",
+                          "a_erk_c44": "abgeschaetzt"},
+     # Block-Kennungen in Kapitel 7 des Berichts #98 (Abgleich-Paket 5/7).
+     "methodik_bloecke": {"default_reduction": "uv.s155_dosisminderung",
+                          "a_erk_mm": "uv.s155_a_erk_mm",
+                          "a_erk_c44": "uv.s155_a_erk_c44"},
+     "source_details": {
+        "default_reduction": "Dosisminderung h = 0,30 × 0,60 × 0,10 = 0,018 aus drei Faktoren "
+            "(Bericht #98 §5, Anker #hebel-s155): Anteil der Jahresdosis, der im öffentlichen "
+            "Raum anfällt (0,30), Minderung der Dosis im Schatten gegenüber voller Sonne "
+            "(0,60), Anteil der Aufenthalte im öffentlichen Raum, die der Hebel zusätzlich "
+            "in den Schatten verlagert (0,10). Eine Abschätzung von KAP3.",
+        "a_erk_mm": "Einlaufzeit der Rampe min(1, J/a_erk) für Melanom: 66 Jahre, Mitte des "
+            "Median-Erkrankungsalters 63–69 Jahre (2021–2023) aus [27]; Bericht #98 §5.",
+        "a_erk_c44": "Einlaufzeit der Rampe min(1, J/a_erk) für C44: 75 Jahre, Mitte des "
+            "mittleren Erkrankungsalters 74–76 Jahre (2021–2023) aus [27]; Bericht #98 §5."},
+     "evidence_derivation": {
+        "default_reduction": {
+            "wert": "0,018 (1,8 %) — Abschätzung von KAP3 nach Vorgabe P2, keine "
+                "Primärquelle: Eine publizierte Effektgröße auf Dosis oder Inzidenz gibt es "
+                "nicht, die Nutzen-Kosten-Verhältnisse 2,2–8,7 : 1 [37] sagen nur, dass sich "
+                "solche Programme lohnen, und eine deutsche Interventionsstudie fehlt. Statt "
+                "einer Nullwirkung steht eine Dreifaktor-Kette: 0,30 Anteil der Jahresdosis "
+                "im öffentlichen Raum (der größere Teil fällt im eigenen Garten, auf dem "
+                "Balkon, im Urlaub und bei der Arbeit an) · 0,60 Minderung der Dosis im "
+                "Schatten (Schatten hält die direkte Strahlung ab, nicht die "
+                "Himmelsstrahlung) · 0,10 zusätzlich in den Schatten verlagerte Aufenthalte "
+                "(nur zusätzlich zum Stand, der schon in den Inzidenzraten 2021–2023 steckt) "
+                "= 0,018. Wirkungsort ist die Baseline F_e, die um BAF_e · h sinkt; "
+                "ΔDosis bleibt (Bericht #98 §5).",
+            "band": "0,005–0,045: alle drei Faktoren an der unteren Grenze "
+                "(0,20 × 0,50 × 0,05 = 0,005) bzw. an der oberen (0,40 × 0,75 × 0,15 = "
+                "0,045). Die Faktoren stehen im Bericht einzeln mit ihren Bändern: Anteil "
+                "im öffentlichen Raum 0,20–0,40, Minderung im Schatten 0,50–0,75, "
+                "zusätzlich verlagerte Aufenthalte 0,05–0,15.",
+            "sensitivitaet": "Die Wirkung ist linear in h: Für Berlin ändert jeder "
+                "Prozentpunkt Dosisminderung den Betrag um 140.300 € je Jahr; am Basiswert "
+                "252.500 € je Jahr (2,2 % des bewerteten Schadens), am Band 70.100–631.200 €. "
+                "Stärkster Treiber ist der Anteil der zusätzlich verlagerten Aufenthalte "
+                "(Faktor 3 zwischen den Bandgrenzen, 126.200–378.700 €), zugleich die Größe, "
+                "die eine Kommune mit ihrem Programm bestimmt (Bericht #98 §5).",
+        },
+        "a_erk_mm": {
+            "wert": "66 Jahre als Einlaufzeit der Wirkung auf das Melanom: Die Dosis sinkt "
+                "als Sprung, die Wirkung auf die Neuerkrankungen läuft als Rampe "
+                "min(1, J/a_erk) ein, weil ein Mensch im Erkrankungsalter nach J Jahren erst "
+                "J seiner a_erk Lebensjahre unter der gesenkten Dosis verbracht hat. Mitte "
+                "des Median-Erkrankungsalters 63–69 Jahre (2021–2023) aus [27] — eine "
+                "Abschätzung von KAP3 (Bericht #98 §5).",
+            "band": "63–69 Jahre (Median-Erkrankungsalter Melanom aus [27]).",
+            "sensitivitaet": "Wirkt nur auf den zeitlichen Verlauf, nicht auf die volle "
+                "Wirkung: Der Anteil Melanom nach 10 Jahren liegt bei 15 % (a_erk 66), "
+                "nach 20 Jahren bei 30 %, nach 30 Jahren bei 45 %; τ wirkt dabei kein "
+                "zweites Mal (Bericht #98 §5).",
+        },
+        "a_erk_c44": {
+            "wert": "75 Jahre als Einlaufzeit der Wirkung auf C44 (Rampe min(1, J/a_erk), "
+                "Begründung wie beim Melanom): Mitte des mittleren Erkrankungsalters "
+                "74–76 Jahre (2021–2023) aus [27] — eine Abschätzung von KAP3 "
+                "(Bericht #98 §5).",
+            "band": "74–76 Jahre (mittleres Erkrankungsalter C44 aus [27]).",
+            "sensitivitaet": "Wirkt nur auf den zeitlichen Verlauf, nicht auf die volle "
+                "Wirkung: Der Anteil C44 nach 10 Jahren liegt bei 13 % (a_erk 75), nach "
+                "20 Jahren bei 27 %, nach 30 Jahren bei 40 % (Bericht #98 §5). Für Berlin "
+                "ergibt das 34.700 €, 69.400 € und 104.000 € je Jahr zusammen mit dem "
+                "Melanom.",
+        }}},
     # Maßnahme allergenarme Stadtbaumwahl (Zelllauf) — Ticket T-1600-cto / Bericht #96
     # §5 Z. 975–989, 1113–1125 (Integrationsauflage), Vorhaben T-1483-cto Teilpaket #2.
     # Die Wirkung läuft NICHT über einen Katalog-Wirkungsfaktor (default_reduction),
@@ -2843,6 +2985,7 @@ _MEASURE_KANG_MAP: dict[str, tuple[str, str]] = {
     "WILDFIRE_PREVENTION": ("land", "forestry"),
     "HEAT_ACTION_PLANS": ("health", "health"),
     "POLLEN_EARLY_WARNING": ("health", "health"),
+    "UV_PROTECTION_PUBLIC_SPACE": ("health", "health"),
     "COOLING_ROOMS_DRINKING_WATER": ("health", "health"),
     "DRINKING_FOUNTAINS": ("health", "health"),
     "EARLY_WARNING_MEASURE": ("urban", "civil_protection"),

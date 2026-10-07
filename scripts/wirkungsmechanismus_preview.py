@@ -66,7 +66,7 @@ def _mp(pid: str, label: str, value, unit: str, source: str) -> dict:
     }
 
 
-# ── #96 Aeroallergene (geplantes Modell laut Bericht Rev. 1) ─────────────────
+# ── #96 Aeroallergene (Ziel-Modell laut Bericht) ──────────────────────────────
 
 def _graph_96() -> tuple[dict, list[dict]]:
     b = LineageBuilder()
@@ -206,7 +206,7 @@ def _graph_96() -> tuple[dict, list[dict]]:
     return _prune_lineage(b.build()), params
 
 
-# ── #98 UV-Schädigungen (geplantes Modell laut Bericht Rev. 1) ───────────────
+# ── #98 UV-Schädigungen (Ziel-Modell laut Bericht, Revision aus Statuszeile) ─
 
 def _graph_98() -> tuple[dict, list[dict]]:
     b = LineageBuilder()
@@ -223,9 +223,11 @@ def _graph_98() -> tuple[dict, list[dict]]:
                              "(Bericht §3.2/§3.6)."})
     b.add_node("ind:POP", "exposure", "Bevölkerungsdichte / Altersstruktur",
                column=2, collapse_group="indicators")
-    b.add_node("ind:VERH", "vulnerability", "Verhalten / Bewusstsein / Screening",
+    b.add_node("ind:HEALTH", "vulnerability",
+               "Gesundheitsinfrastruktur R36 (HEALTHCARE_ACCESS)",
                column=2, collapse_group="indicators",
-               meta={"note": "S154/S155/S158 — Schicht A und Maßnahmen (Bericht Kap. 1/§5)."})
+               meta={"note": "R36 — einzige Schicht-A-Vulnerabilität (Bericht Kap. 1, §3.7); "
+                             "Basiswert Default 1."})
     b.add_node("src:dwd", "source", "DWD", column=0, collapse_group="sources",
                meta={"description": "DWD-CDC Sonnenscheindauer (Raster + Gebietsmittel)",
                      "prov": "dwd"})
@@ -239,13 +241,13 @@ def _graph_98() -> tuple[dict, list[dict]]:
     b.add_edge("src:dwd", "ind:UV")
     b.add_edge("src:zensus", "ind:POP")
     mul_path = _op(b, "op:mul:path", "multiply", "×",
-                   "Wirkungskette Schicht A: Ĥ(UV/SSD) × Ê(Bevölkerung/Alter) × V̂ "
+                   "Wirkungskette Schicht A: Ĥ(UV/SSD) × Ê(Bevölkerung/Alter) × V̂(R36) "
                    "(Worst-Pathway, Bericht §3.7).")
     b.add_node("pathway:0", "pathway",
                "Steigende UV-Dosis trifft exponierte Bevölkerung",
                column=3, collapse_group="pathways",
-               meta={"chain_label": "UV_RADIATION × Bevölkerung × Verhalten/Screening"})
-    for nid in ("ind:UV", "ind:POP", "ind:VERH"):
+               meta={"chain_label": "UV_RADIATION × Bevölkerung × HEALTHCARE_ACCESS"})
+    for nid in ("ind:UV", "ind:POP", "ind:HEALTH"):
         b.add_edge(nid, mul_path)
     b.add_edge(mul_path, "pathway:0")
     b.add_node("out:index", "outcome", "KWRA-Index", column=4,
@@ -257,23 +259,22 @@ def _graph_98() -> tuple[dict, list[dict]]:
     b.add_node("int:ssd", "intermediate", "SSD-Änderung (Normalperioden)",
                column=1, collapse_group="intermediates",
                meta={"unit": "%",
-                     "note": "SSD 1991–2020 vs. 1961–1990 je Zelle; DE +7,82 % "
-                             "(N +6,3 / M +8,4 / S +7,5) — Bericht §3.2, Anlage "
-                             "ssd_trend_region.csv."})
+                     "note": "SSD 1991–2020 vs. 1961–1990, bevölkerungsgewichtet "
+                             "(Gemeindepunkte): DE +8,51 % (Nord +7,82 / Mitte +9,15 / "
+                             "Süd +7,77) — Bericht §3.2, Anlage ssd_povw.csv [72]."})
     b.add_edge("src:dwd", "int:ssd")
     mul_dd = _op(b, "op:mul:dosis", "multiply", "×",
                  "Klimaattribuierte Dosisänderung.\n"
                  r"$$\Delta\mathrm{Dosis}_z = \Delta\mathrm{SSD}_z \cdot k_{\mathrm{UV}} \cdot a_{\mathrm{attr}}$$")
     b.add_edge("int:ssd", mul_dd)
-    P("uv.k_uv", "SSD→Dosis-Übersetzung k_UV", 0.84, "—",
-      "Lorenz 2024 ÷ eigener NRW-SSD-Trend (Band 0,4–1,0)", mul_dd,
-      "= Dosistrend 4,9 %/Dek. ÷ SSD-Trend 5,81 %/Dek., gleiches Fenster 1997–2022 "
-      "(Bericht §3.2).")
+    P("uv.k_uv", "SSD→Dosis-Übersetzung k_UV", 0.7119, "—",
+      "Brücke über die Globalstrahlung, [31] und Anlage [73] (Band 0,3622–1,0616)", mul_dd,
+      "= (4,9 / 4,6) × 0,6683 über die Globalstrahlung (Bericht §3.2).")
     P("uv.a_attr", "Klima-Attribution a_attr", 0.75, "—",
       "gekennzeichnete Abschätzung (Band 0,5–1,0)", mul_dd)
     b.add_node("int:dosis", "intermediate", "Dosisänderung ΔDosis",
                column=2, collapse_group="intermediates",
-               meta={"unit": "%", "note": "DE 4,95 % (N 3,96 / M 5,33 / S 4,76) — §3.2."})
+               meta={"unit": "%", "note": "DE 4,54 % (Nord 4,17 / Mitte 4,89 / Süd 4,14) — §3.2."})
     b.add_edge(mul_dd, "int:dosis")
 
     # Schicht B — Baseline
@@ -287,12 +288,12 @@ def _graph_98() -> tuple[dict, list[dict]]:
     b.add_edge("src:zfkd", mul_base)
     P("uv.i_raten_roh", "Inzidenz je Band (roh)", "MM 0,5–94,9 · C44 2–1.480",
       "1/100.000·a", "ZfKD KID 2025 (Ablesekette, Anlage-CSV)", mul_base,
-      "Normierung über c_kal je Entität (1,022 / 0,999) auf die amtlichen "
-      "Fallzahlen 2023 (Bericht §3.3).")
+      "Normierung über c_kal je Entität (MM 1,0012 · C44 0,9910) auf den "
+      "Anker Mittel 2021–2023 (Bericht §3.3, Rechenkette Ebene 2).")
     b.add_node("int:faelle", "intermediate", "Baseline-Fälle je Entität",
                column=2, collapse_group="intermediates",
-               meta={"unit": "1/Jahr", "note": "reproduziert amtlich: 27.430 MM · "
-                                               "242.820 C44 (2023)."})
+               meta={"unit": "1/Jahr", "note": "Anker 26.870 MM · 240.973 C44 "
+                                               "(Mittel 2021–2023)."})
     b.add_edge(mul_base, "int:faelle")
 
     # Zusatzfälle
@@ -308,10 +309,18 @@ def _graph_98() -> tuple[dict, list[dict]]:
       "Schmitt 2011 (OR 1,77); Default 1", mul_df,
       "Kein Knoten der W186-Kette — Sensitivitätsband, Basiswert-Default 1 "
       "(Bericht Kap. 1/§3.4).")
+    P("uv.s_komforttag", "S154 Freizeitverhalten (Sensitivitätsband)", 1.45, "—",
+      "Graff Zivin/Neidell 2014; Abschätzung von KAP3 (Band 1,25–1,60)", mul_df,
+      "Tageswert je Komforttag; Basiswert-Default v_verh = 1, Ebene φ geparkt "
+      "(Bericht Kap. 1, §3.5).")
+    P("uv.s155_dosisminderung", "S155 Gefahrenbewusstsein (Maßnahmen-Hebel)", 0.018,
+      "Anteil", "Abschätzung von KAP3 (Band 0,005–0,045)", mul_df,
+      "Dosisminderung h_S155, senkt F_e in der §3.4-Formel; nicht im Basiswert "
+      "(Bericht Kap. 1, §5).")
     b.add_node("int:delta_f", "intermediate", "Zusatzfälle ΔF (Teil-Ausweis)",
                column=3, collapse_group="intermediates",
                meta={"unit": "1/Jahr",
-                     "note": "Bundessumme ≈ 814 MM + 20.118 C44 (Bericht §4)."})
+                     "note": "Bundessumme ≈ 733 MM + 18.339 C44 (Bericht §4)."})
     b.add_edge(mul_df, "int:delta_f")
 
     # Mortalität → YLL (nativ)
@@ -319,15 +328,15 @@ def _graph_98() -> tuple[dict, list[dict]]:
                   "Mortalitätspfad (YLL × VOLY, MK 4.0/P52).\n"
                   r"$$\mathrm{YLL}_z = \sum_e \Delta F_{e,z}\,\lambda_e\,\bar L_e$$")
     b.add_edge("int:delta_f", mul_yll)
-    P("uv.lambda", "Letalität λ", "MM 0,1155 · C44 0,0055", "—",
-      "ZfKD 2023 (Perioden-Approximation)", mul_yll)
-    P("uv.l_rest", "Restlebenserwartung L̄", "MM 10,58 · C44 5,30", "Jahre",
+    P("uv.lambda", "Letalität λ", "MM 0,11466 · C44 0,005236", "—",
+      "ZfKD, Mittel 2021–2023 (Perioden-Approximation)", mul_yll)
+    P("uv.l_rest", "Restlebenserwartung L̄", "MM 10,4569 · C44 5,4787", "Jahre",
       "Sterbetafel 2022/2024 (Median-Approximation)", mul_yll)
     b.add_node("out:native", "outcome", "Verlorene Lebensjahre (YLL)",
                column=4, collapse_group="outcome",
                meta={"result_kind": "native", "unit": "Jahre/Jahr", "is_outcome": True,
                      "note": "Nativer Ausweis; Rate: YLL je 1.000 EW·Jahr. "
-                             "Bundessumme ≈ 1.580 YLL/Jahr (Bericht §4)."})
+                             "Bundessumme ≈ 1.404 YLL/Jahr (Bericht §4)."})
     b.add_edge(mul_yll, "out:native")
 
     # €
@@ -339,11 +348,16 @@ def _graph_98() -> tuple[dict, list[dict]]:
     P("uv.c_fall", "Erstjahreskosten je Fall", "MM 6.724 · C44 5.883", "€₂₀₂₄",
       "Speckemeier 2022 (SCS-detektiert; Proxy)", cost)
     P("uv.voly", "VOLY", 160800, "€₂₀₂₄/Jahr", "UBA MK 4.0 / Amann 2020a", cost)
+    b.add_node("meas:s158", "intermediate", "S158 Monitoring / Frühwarnsysteme",
+               column=1, collapse_group="intermediates",
+               meta={"note": "Maßnahmen-Hebel ohne eigene Abschätzung: Kostenwirkung im "
+                             "Basiswert voll angerechnet (Bericht Kap. 1, §5)."})
+    b.add_edge("meas:s158", cost)
     b.add_node("out:eur", "outcome", "Bewerteter Schaden — Konto K1 (UV)",
                column=5, collapse_group="outcome",
                meta={"result_kind": "eur", "unit": "€/Jahr", "is_outcome": True,
-                     "note": "Bundessumme ≈ 378 Mio €₂₀₂₄/Jahr (Band 119–653; "
-                             "Bericht §4). Untergrenze; Latenz-Infokasten Pflicht."})
+                     "note": "Bundessumme ≈ 339 Mio. €₂₀₂₄/Jahr (Gesamtband "
+                             "≈ 115–737 Mio. €; Bericht §4). Untergrenze; Latenz-Infokasten Pflicht."})
     b.add_edge(cost, "out:eur")
 
     return _prune_lineage(b.build()), params
@@ -698,13 +712,14 @@ def build_payload(nr: str) -> dict:
         }
     if nr == "98":
         g, p = _graph_98()
+        rev = bericht_stand("98")["revision"]
         return {
             "title": "#98 UV-bedingte Gesundheitsschädigungen",
-            "subtitle": "Schicht-B-Modell laut Methodik-Bericht "
+            "subtitle": f"Schicht-B-Modell laut Methodik-Bericht {rev} "
                         "(docs/methodik/98_uv_schaedigungen.md).",
-            "banner": "Wirkungsmechanismus laut Methodik-Bericht. Wie weit das Produkt ihn "
-                      "umsetzt, steht im Befund-Ledger (reviews/BEFUNDE_98.md), nicht in dieser "
-                      "Vorschau; Abweichungen wären ein Befund.",
+            "banner": f"Wirkungsmechanismus laut Bericht {rev}. Wie weit das Produkt ihm "
+                      "folgt, steht im Befund-Ledger (reviews/BEFUNDE_98.md), nicht in dieser "
+                      "Vorschau.",
             "generated": today,
             "tabs": [{"label": "YLL, Zusatzfälle & € (K1 UV)", "lineage": g,
                       "parameters": p}],

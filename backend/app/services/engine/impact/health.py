@@ -39,7 +39,9 @@ eingetragen; ``compute_all_cell_impacts`` verteilt darauf, sonst auf
 
 from __future__ import annotations
 
-from math import exp
+from math import exp, pi, sqrt
+
+import numpy as np
 
 from app.services.engine import risk_engine
 from app.services.engine.impact.base import CellContext, attributable_fraction
@@ -181,6 +183,35 @@ def _load_week_anomalies() -> dict[str, tuple[float, ...]]:
 REGION_WEEK_ANOMALIES: dict[str, tuple[float, ...]] = _load_week_anomalies()
 
 
+# Wärmeinsel-Feinstruktur unter 1 km (Bericht #95 §3.0 Wirkung (d), Herleitung §4: Spanne ± 1 K,
+# Gleichverteilung, 2/√12 = 0,577 K, auf 0,58 K gerundet). Auch innerhalb einer Rasterzelle ist
+# es nicht überall gleich warm; der Zelllauf mittelt die Mortalität über diese Streuung um den
+# Rasterwert (Gauß-Hermite mit ``GH_PUNKTE`` Punkten). DIE einzige Stelle von σ im Code:
+# ``ergebnisbericht/beispiel.py`` und ``charakterisierung.py`` lesen sie von hier.
+SIGMA_K = 0.58
+GH_PUNKTE = 21
+
+
+def _berechne_feinstruktur_knoten() -> tuple[tuple[float, float], ...]:
+    """Stützstellen der Feinstruktur: ``(Offset in K, Gewicht)`` je Gauß-Hermite-Punkt.
+
+    ``E[f(T + σ·Z)] ≈ Σ_k w_k/√π · f(T + √2·σ·x_k)``; die Gewichte summieren sich zu 1.
+    """
+    xs, ws = np.polynomial.hermite.hermgauss(GH_PUNKTE)
+    return tuple((sqrt(2.0) * SIGMA_K * float(x), float(w) / sqrt(pi)) for x, w in zip(xs, ws))
+
+
+# Einmal beim Laden des Moduls berechnet (nicht erst im Zelllauf): Die Zellanalyse läuft in
+# Kindprozessen, und ein Import oder eine Berechnung erst dort könnte an einer beim Fork
+# gehaltenen Sperre hängen.
+_FEINSTRUKTUR_KNOTEN = _berechne_feinstruktur_knoten()
+
+
+def feinstruktur_knoten() -> tuple[tuple[float, float], ...]:
+    """Die Stützstellen der Feinstruktur (``(Offset in K, Gewicht)``), siehe oben."""
+    return _FEINSTRUKTUR_KNOTEN
+
+
 def weekly_temperatures(mean_temp: float, region: str) -> list[float]:
     """Wochenmitteltemperaturen der 13 Sommerwochen: T_w = T̄ + q_w,Region.
 
@@ -258,12 +289,20 @@ def _v_vers(ctx: CellContext, code: str, band: str) -> float:
     return max(0.0, v)
 
 
-def mortality(risk: dict, ctx: CellContext) -> dict:
+def mortality(risk: dict, ctx: CellContext, *, feinstruktur: bool = True) -> dict:
     """Verlorene Lebensjahre (YLL) je Zelle und Jahr; Todesfälle als Teil-Ausweis.
 
     ``D_a = c_kal · v_vers,a · pop_a · m_a/100k · (1/52) · Σ_w (e^{β_a(T_w−T_0)⁺} − 1)``
     ``YLL = Σ_a D_a · L̄_a`` — Bewertung €: YLL × VOLY (Kostensatz des Risikos).
+
+    Mit Wärmeinsel-Feinstruktur unter 1 km (Bericht #95 §3.0 Wirkung (d)): ``D_a`` wird
+    über eine Streuung σ = ``SIGMA_K`` um das Sommermittel der Zelle gemittelt (Gauß-Hermite,
+    ``feinstruktur_knoten``; Gewichte summieren sich zu 1, die Rechnung ist linear in der
+    Summe über die Wochen, also gleich dem Gewichtsmittel einzelner Rechnungen je Offset).
+    Das ist der Zelllauf des Berichts. ``feinstruktur=False`` rechnet dieselbe Kurve nur bei der
+    Temperatur der Zelle (``mortality_punkt``).
     """
+    knoten = feinstruktur_knoten() if feinstruktur else ((0.0, 1.0),)
     from app.data.germany_health_reference import BASELINE_MORTALITY_PER_100K
 
     code = risk["code"]
@@ -292,7 +331,8 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
             continue
         m_a = ctx.p(code, f"baseline_mort_{band}", BASELINE_MORTALITY_PER_100K[band])
         beta_a = beta85 * ctx.p(code, f"beta_factor_{band}", AGE_BETA_FACTOR[band])
-        excess = sum(exp(beta_a * max(0.0, t - thr)) - 1.0 for t in temps)
+        excess = sum(w_k * sum(exp(beta_a * max(0.0, t + off - thr)) - 1.0 for t in temps)
+                     for off, w_k in knoten)
         d_a = (calib * _v_vers(ctx, code, band) * pop_a
                * (m_a / 100_000.0) * (1.0 / 52.0) * excess)
         deaths += d_a
@@ -316,6 +356,14 @@ def mortality(risk: dict, ctx: CellContext) -> dict:
     # Teil-Ausweis D_75–84 — Andockpunkt der Schutzprogramme δ_VG (Bericht #95 §5).
     out["deaths_a75_84"] = max(0.0, deaths_7584)
     return out
+
+
+def mortality_punkt(risk: dict, ctx: CellContext) -> dict:
+    """Wie ``mortality``, aber ohne Feinstruktur: ein Temperaturwert je Zelle (``cell_summer_temp``).
+
+    Stützwert der σ-Rechnung (Gauß-Hermite-Summe) und Vergleichsrechnung der Tests.
+    """
+    return mortality(risk, ctx, feinstruktur=False)
 
 
 # ── Hebel S157: gekühlte Heimplätze (Bericht #95 §5, Befunde 122, 124, 129, 130) ──
@@ -891,7 +939,64 @@ def uv_yll(risk: dict, ctx: CellContext) -> dict:
                         + d_c44 * ctx.p(code, "c_fall_c44", 5883.0))
     out["cases_melanoma"] = d_mm
     out["cases_c44"] = d_c44
+    # Je Entität der bewertete Schaden (Behandlung + YLL · VOLY) — Eingabe des Hebels S155
+    # (Bericht §5: W = Σ_e min(1, J/a_erk,e) · BAF_e · h · €_e). Zusatzschlüssel, der
+    # Basiswert ändert sich nicht.
+    yll_mm = d_mm * ctx.p(code, "lambda_mm", 0.11466) * ctx.p(code, "l_rest_mm", 10.4569)
+    yll_c44 = (d_c44 * ctx.p(code, "lambda_c44", 0.005236)
+               * ctx.p(code, "l_rest_c44", 5.4787))
+    out["eur_mm"] = d_mm * ctx.p(code, "c_fall_mm", 6724.0) + _result(risk, yll_mm)["cost_eur"]
+    out["eur_c44"] = (d_c44 * ctx.p(code, "c_fall_c44", 5883.0)
+                      + _result(risk, yll_c44)["cost_eur"])
+    out["yll_mm"] = yll_mm
+    out["yll_c44"] = yll_c44
     return out
+
+
+# ── Hebel S155: UV-Schutz im öffentlichen Raum und Kommunikation (Bericht #98 §5) ──
+# Abschätzung von KAP3 nach Vorgabe P2: keine publizierte Effektgröße auf Dosis oder
+# Inzidenz. Der Hebel senkt jede Dosis um denselben Anteil h, die Baseline F_e sinkt um
+# BAF_e · h, ΔDosis bleibt; der bewertete Schaden je Entität sinkt um denselben Anteil.
+
+def s155_rampe(jahre: float | None, a_erk: float) -> float:
+    """Angerechneter Anteil der Wirkung nach ``jahre`` Jahren: ``min(1, J/a_erk)`` (Bericht §5).
+
+    Die Dosis sinkt als Sprung, die Wirkung auf die Neuerkrankungen läuft als Rampe ein:
+    Nach J Jahren hat ein Mensch im Erkrankungsalter ``a_erk`` erst J seiner ``a_erk``
+    Lebensjahre unter der gesenkten Dosis verbracht. ``jahre`` ``None`` heißt: keine
+    Zeitangabe, die volle Wirkung gilt (Integrationsauflage Punkt 3).
+    """
+    if jahre is None:
+        return 1.0
+    if a_erk <= 0.0:
+        return 1.0
+    return max(0.0, min(1.0, float(jahre) / float(a_erk)))
+
+
+def s155_wirkung_je_entitaet(eur_mm: float, eur_c44: float, h: float,
+                             baf_mm: float, baf_c44: float,
+                             jahre: float | None = None,
+                             a_erk_mm: float = 66.0,
+                             a_erk_c44: float = 75.0) -> tuple[float, float]:
+    """(MM, C44) der vermiedenen bewerteten Schäden je Jahr durch S155 (Bericht §5, Z. 1344).
+
+    ``W_e = min(1, J/a_erk,e) · BAF_e · h · €_e``. ``h`` ist die Dosisminderung (Katalog-Wert
+    ``default_reduction`` der Maßnahme, Block ``uv.s155_dosisminderung``), ``a_erk_*`` die
+    Einlaufzeiten (Blöcke ``uv.s155_a_erk_mm``/``_c44``), ``eur_*`` der bewertete Schaden
+    je Entität aus ``uv_yll`` (Schlüssel ``eur_mm``, ``eur_c44``). Ohne ``jahre`` die volle
+    Wirkung.
+    """
+    h = max(0.0, float(h))
+    return (s155_rampe(jahre, a_erk_mm) * max(0.0, baf_mm) * h * max(0.0, eur_mm),
+            s155_rampe(jahre, a_erk_c44) * max(0.0, baf_c44) * h * max(0.0, eur_c44))
+
+
+def s155_wirkung(eur_mm: float, eur_c44: float, h: float, baf_mm: float, baf_c44: float,
+                 jahre: float | None = None, a_erk_mm: float = 66.0,
+                 a_erk_c44: float = 75.0) -> float:
+    """Summe von ``s155_wirkung_je_entitaet`` — ``W_S155(J)`` (Bericht §5, Z. 1344)."""
+    return sum(s155_wirkung_je_entitaet(
+        eur_mm, eur_c44, h, baf_mm, baf_c44, jahre, a_erk_mm, a_erk_c44))
 
 
 # ── 3. Todesfälle durch Hochwasser/Sturzfluten ────────────────────────────────

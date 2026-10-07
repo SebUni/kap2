@@ -56,7 +56,7 @@ from calibrate_heat_mortality_rev6 import (  # noqa: E402
     ls_origin, model_year,
 )
 from app.services.engine.impact.health import (  # noqa: E402
-    AGE_BANDS, REGION_BY_BUNDESLAND, REGION_THRESHOLD,
+    AGE_BANDS, REGION_BY_BUNDESLAND, REGION_THRESHOLD, SIGMA_K,
 )
 
 YEARS = range(1992, 2026)  # inkl. 2025 (nur für die Sensitivität "inkl. vorläufig 2025"; Befund 77)
@@ -333,14 +333,15 @@ def run_evaluation(t_sommer: dict, fa: dict, tag_suffix: str,
                  f"(RKI-Referenz 260–320)")
     res["berlin"] = rate
 
-    # Rest-Bias: UHI-Feinstruktur-Konvexität (mittelwerttreu, σ = 0,58 K).
+    # Rest-Bias: UHI-Feinstruktur-Konvexität (mittelwerttreu, σ = health.SIGMA_K).
     # Nur im unskalierten Lauf aussagekräftig (model_year kennt keine β-Skalare).
     if not scale:
+        sigma_text = f"{SIGMA_K:.2f}".replace(".", ",")
         for J in (2018, 2022):
             base = nat(J)
             su = sum(sum(b.values()) for b in
-                     model_year(J, t_sommer, q_w, pop, fa, uhi_sigma=0.58).values())
-            lines.append(f"- Rest-Bias UHI-Konvexität {J}: ×{su / base:.3f} (σ = 0,58 K, "
+                     model_year(J, t_sommer, q_w, pop, fa, uhi_sigma=SIGMA_K).values())
+            lines.append(f"- Rest-Bias UHI-Konvexität {J}: ×{su / base:.3f} (σ = {sigma_text} K, "
                          f"mittelwerttreu — verbleibende dokumentierte Näherung)")
     return res
 
