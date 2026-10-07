@@ -31,7 +31,6 @@ Abweichungen von der KWRA (Modellgrenze, bewusst ausgewiesen):
 
 from __future__ import annotations
 
-import math
 from functools import lru_cache
 
 from app.data import catalog
@@ -131,14 +130,12 @@ def a85_plus_anteil(ags: str) -> float:
     Zellen der Kommune. Gerechnet wird wie im Jahresbetrag (``ergebnisbericht.beispiel``):
     Zellen aus den gepinnten Zelldaten ``backend/data/kalibrierung/golden95_zellen_<AGS>.csv.gz``
     (ohne Datenbank), je Rasterwert (Sommermittel, Hitzetage) nach Altersbändern zusammengefasst,
-    Feinstruktur σ = ``SIGMA_K`` mit Gauß-Hermite (``GH_PUNKTE`` Punkte) auf
-    ``impact.health.mortality``. Die Rechnung läuft samt Laden der Zellen in
+    Feinstruktur σ (``impact.health.SIGMA_K``, Gauß-Hermite mit ``GH_PUNKTE`` Punkten), die
+    ``impact.health.mortality`` selbst rechnet. Die Rechnung läuft samt Laden der Zellen in
     ``override_context.override_scope({})``: Overrides eines laufenden Bewertungslaufs
     bleiben unberührt. Für Kommunen ohne gepinnte Zelldaten gibt es keinen Wert
     (``FileNotFoundError``); es wird keiner ersetzt.
     """
-    import numpy as np
-
     from app.services.engine import override_context
     from app.services.engine.impact import health as H
     from app.services.engine.impact.base import CellContext
@@ -153,7 +150,6 @@ def a85_plus_anteil(ags: str) -> float:
             for b in beispiel.BANDS:
                 acc[b] += float(ci["pop_age_bands"][b])
 
-        xs, ws = np.polynomial.hermite.hermgauss(beispiel.GH_PUNKTE)
         mort_risk = catalog.RISKS_BY_CODE["EXPECTED_ANNUAL_MORTALITY"]
         regional = {"bundesland": BUNDESLAND_BY_SNL.get(ags[:2])}
         yll = deaths_a85p = 0.0
@@ -164,11 +160,9 @@ def a85_plus_anteil(ags: str) -> float:
                     hev={"hazards": {"HEAT_WAVE": hd}, "exposures": {}, "vulnerabilities": {}},
                     hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
                     indices={}, regional=regional)
-            for x, w in zip(xs, ws):
-                r = H.mortality(mort_risk, ctx(t + math.sqrt(2) * beispiel.SIGMA_K * x))
-                wgt = w / math.sqrt(math.pi)
-                yll += wgt * r["outcome"]
-                deaths_a85p += wgt * r["deaths_a85p"]
+            r = H.mortality(mort_risk, ctx(t))   # mit Feinstruktur σ (health.SIGMA_K)
+            yll += r["outcome"]
+            deaths_a85p += r["deaths_a85p"]
     return deaths_a85p * H.AGE_LIFE_YEARS["a85p"] / yll
 
 

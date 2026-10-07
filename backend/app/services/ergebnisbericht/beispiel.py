@@ -6,15 +6,15 @@ Gemeindegrenze VG250; Beschreibung in ``golden95_zellen.md``). Der Jahresbetrag 
 wie im Produkt über die Schicht-B-Funktionen ``impact.health.mortality`` und
 ``impact.health.morbidity``, mit derselben Aufbereitung der Altersbänder
 (``zensus_loader.apply_zensus_to_cell_inputs`` samt Ersatzregel 65+) und derselben
-Feinstruktur unter 1 km wie der Zelllauf des Berichts (σ = 0,58 K, Gauß-Hermite mit 21 Punkten,
-nur auf die Mortalität) — also dieselbe Rechnung wie ``tests/test_methodik_95_golden_betraege.py``.
+Feinstruktur unter 1 km wie der Zelllauf des Berichts: ``impact.health.mortality`` rechnet sie selbst
+(σ = ``health.SIGMA_K``, Gauß-Hermite mit ``health.GH_PUNKTE`` Punkten, nur auf die Mortalität); hier
+steht kein eigener Wert dafür. Das ist dieselbe Rechnung wie ``tests/test_methodik_95_golden_betraege.py``.
 """
 
 from __future__ import annotations
 
 import csv
 import gzip
-import math
 import os
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -24,8 +24,6 @@ KALIB = os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "kalib
 MORT, MORB = "EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"
 BANDS = ("u65", "a65_74", "a75_84", "a85p")
 SPALTEN65 = ("a65bis69", "a70bis74", "a75bis79", "a80bis84", "a85bis89", "a90undaelter")
-SIGMA_K = 0.58           # Feinstruktur unter 1 km, 0,58 K (Bericht §3.0 (d), §4); die einzige Stelle im Code
-GH_PUNKTE = 21
 
 
 @dataclass(frozen=True)
@@ -133,8 +131,6 @@ def rechne_95(kommune: Beispielkommune, zellfilter=None) -> Ergebnis95:
     addieren sich die Ergebnisse disjunkter Teilmengen zum Ergebnis der ganzen Kommune. Ohne
     Filter ist das Ergebnis unverändert.
     """
-    import numpy as np
-
     from app.data import catalog
     from app.services.engine import override_context
     from app.services.engine.impact import health as H
@@ -152,7 +148,6 @@ def rechne_95(kommune: Beispielkommune, zellfilter=None) -> Ergebnis95:
         for b in BANDS:
             acc[b] += float(ci["pop_age_bands"][b])
 
-    xs, ws = np.polynomial.hermite.hermgauss(GH_PUNKTE)
     mort_risk, morb_risk = catalog.RISKS_BY_CODE[MORT], catalog.RISKS_BY_CODE[MORB]
     regional = {"bundesland": kommune.bundesland}
     override_context.set_overrides({})
@@ -164,10 +159,9 @@ def rechne_95(kommune: Beispielkommune, zellfilter=None) -> Ergebnis95:
                 hev={"hazards": {"HEAT_WAVE": hd}, "exposures": {}, "vulnerabilities": {}},
                 hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
                 indices={}, regional=regional)
-        for x, w in zip(xs, ws):
-            out = H.mortality(mort_risk, ctx(t + math.sqrt(2) * SIGMA_K * x))
-            yll += w * out["outcome"] / math.sqrt(math.pi)
-            tote += w * out["deaths"] / math.sqrt(math.pi)
+        out = H.mortality(mort_risk, ctx(t))   # mit Feinstruktur σ (health.SIGMA_K)
+        yll += out["outcome"]
+        tote += out["deaths"]
         faelle += H.morbidity(morb_risk, ctx(t))["outcome"]
 
     voly = catalog.risk_default_cost_per_outcome(mort_risk)
