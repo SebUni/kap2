@@ -1,7 +1,8 @@
 """Abgleich Registry ⇄ Parameter-Blöcke des Berichts #95 (T-1370, Übernahmeliste (f)).
 
-Kapitel 7 von ``docs/methodik/95_hitzebelastung.md`` führt 30 maschinenlesbare
-Parameter-Blöcke (``parameter:`` / ``id: heat.…``); seit Runde 31 (Befund 141) gehört
+Kapitel 7 von ``docs/methodik/95_hitzebelastung.md`` führt 31 maschinenlesbare
+Parameter-Blöcke (``parameter:`` / ``id: heat.…``); der letzte ist ``heat.sigma_k`` (Streuung σ der
+Feinstruktur, Registry-Eintrag liest ``health.SIGMA_K``); seit Runde 31 (Befund 141) gehört
 ``heat.anteil_60_66`` dazu, der Block des bestehenden Registry-Parameters
 ``anteil_60_66_ab65``. Seit der Fortsetzung der Runde 31, Teil 2 (T-1537, Befunde 138,
 139, 146, 148, 149) kommen ``heat.s_gek``, ``heat.h_heim`` und
@@ -73,11 +74,11 @@ def _heat_bloecke_der_registry() -> set[str]:
             if (p.get("methodik_block") or "").startswith("heat.")}
 
 
-def test_block_kennungen_der_registry_sind_die_30_aus_kapitel_7():
+def test_block_kennungen_der_registry_sind_die_31_aus_kapitel_7():
     soll = set(_bloecke())
     # Gegenzählung ohne YAML-Parser: jede "id:"-Zeile nach "parameter:".
     roh = re.findall(r"^parameter:\n  id: (\S+)", _kapitel7(), re.M)
-    assert len(roh) == 30 and set(roh) == soll, sorted(roh)
+    assert len(roh) == 31 and set(roh) == soll, sorted(roh)
     ist = _heat_bloecke_der_registry()
     assert ist == soll, (f"fehlen in der Registry: {sorted(soll - ist)}; "
                          f"nicht in Kapitel 7: {sorted(ist - soll)}")

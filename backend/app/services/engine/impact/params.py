@@ -13,6 +13,12 @@ Modellparameter (RKI/Winklmayr 2022; UBA MK3.1; GDV/BBK; Prognos 2023).
 
 from __future__ import annotations
 
+# σ der Wärmeinsel-Feinstruktur: DIE einzige Zuweisung steht in health.py (Bericht #95 §3.0 (d));
+# der Registry-Eintrag ``sigma_k`` liest sie von dort.
+from app.services.engine.impact.health import SIGMA_K as _SIGMA_K
+
+_SIGMA_TEXT = f"{_SIGMA_K:.2f}".replace(".", ",") + " K"   # Dezimalkomma, Einheit (wie teile._sigma_text)
+
 _HEAT_AF = ("Nichtlineare attributable Fraktion AF = 1−exp(−β·(Hitzetage−Schwelle)+). "
             "β und Schwelle kalibriert auf die RKI-/Winklmayr-Größenordnung (~20 Hitzetage → "
             "~1 % hitzeattributable Sterblichkeit; ~4.500–8.700 Hitzetote/Jahr in DE).")
@@ -249,6 +255,36 @@ IMPACT_PARAM_SPECS: list[dict] = [
                       "der Rasterzelle bleibt dabei der gemessene DWD-Wert.",
      "source_refs": ["ICAO_Standardatmosphaere"],
      "evidence_class": "belegt"},
+    # ── Streuung der Wärmeinsel-Feinstruktur (Bericht #95 §3.0 (d), §4, Block heat.sigma_k) ──
+    # Der Wert steht im Code nur in health.SIGMA_K; dieser Eintrag liest ihn von dort (P1:
+    # Parameterliste mit Abschätzung ausgewiesen). Nicht editierbar, weil der Zelllauf die
+    # Gauß-Hermite-Stützstellen einmal beim Laden von health.py aus SIGMA_K bildet — eine
+    # Überschreibung in der Registry liefe ins Leere.
+    {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "sigma_k", "value": _SIGMA_K,
+     "label": "Streuung der Wärmeinsel-Feinstruktur unter 1 km um den Rasterwert (σ)",
+     "unit": "K",
+     "source": "Abschätzung von KAP3 (Bericht #95 §3.0 (d) und §4, Block heat.sigma_k)",
+     "source_detail": "Auch innerhalb einer 1-km-Zelle ist es nicht überall gleich warm. KAP3 "
+                      "setzt die Spanne der Zellabweichungen um das Gebietsmittel auf ± 1 K und "
+                      "nimmt Gleichverteilung an; daraus folgt die Streuung 2/√12 = 0,577 K, "
+                      f"auf {_SIGMA_TEXT} gerundet (die Rundung hebt den Betrag um 0,025 %). Der "
+                      "Zelllauf mittelt die Mortalität über diese Streuung um den Rasterwert "
+                      "(Gauß-Hermite), mittelwerttreu. Eine Modellrechnung, keine Messung. "
+                      "Betrag: Berlin × 1,028, Warmsen × 1,048 gegenüber dem Lauf ohne "
+                      "Feinstruktur.",
+     "source_refs": [],
+     "editable": False,
+     "evidence_derivation": {
+         "wert": f"{_SIGMA_TEXT} = 2/√12 = 0,577 K, gerundet: Spanne ± 1 K der Zellabweichungen "
+                 "um das Gebietsmittel, Gleichverteilung (Bericht #95 §4, Absatz „Modellrechnung "
+                 "mit der Streuung“, Befund 181).",
+         "band": f"Kein Band; die Wirkung σ 0 → {_SIGMA_TEXT} steht in §3.0 (d): Berlin × 1,028 "
+                 "(345,03 statt 335,68 Mio. €), Warmsen × 1,048 (175.116 statt 167.066 €).",
+         "sensitivitaet": "Die Spanne ± 1 K ist nicht gemessen; ein Stadtmodell könnte eine "
+                          "kleinere Streuung zeigen (Stichproben-Abgleich, Bericht #95 §4). "
+                          "Ohne Feinstruktur läge der Betrag in Berlin um 2,7 %, in Warmsen "
+                          "um 4,6 % zu niedrig (Bericht #95 §3.0 (d)).",
+     }},
     # ── Ersatzregel für den geheimgehaltenen Anteil 65+ (Bericht #95 §3.3, Log 41) ──
     {"risk": "EXPECTED_ANNUAL_MORTALITY", "key": "anteil_60_66_ab65", "value": 2 / 7,
      "label": "Anteil der Gruppe 60–66, der zu den Menschen ab 65 zählt (Ersatzregel 65+)",
@@ -1638,6 +1674,7 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
     ("EXPECTED_ANNUAL_MORTALITY", "qbar_1p"): "heat.qbar_1p",
     ("EXPECTED_ANNUAL_MORTALITY", "qbar_pfl"): "heat.qbar_pfl",
     ("EXPECTED_ANNUAL_MORTALITY", "gamma_hoehe"): "heat.gamma_hoehe",
+    ("EXPECTED_ANNUAL_MORTALITY", "sigma_k"): "heat.sigma_k",
     ("EXPECTED_ANNUAL_MORTALITY", "ror_s157"): "heat.ror_s157",
     ("EXPECTED_ANNUAL_MORTALITY", "g_s157"): "heat.g_s157",
     ("EXPECTED_ANNUAL_MORTALITY", "delta_vg"): "heat.delta_vg",
@@ -1656,9 +1693,10 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
 }
 # Kennzeichnung je Block nach Kapitel 7 (Feld ``kennzeichnung``), übersetzt in die
 # Evidenzklasse der Parameterliste (P1): quelle → belegt, abschaetzung_kap3 →
-# abgeschaetzt, berechnet → berechnet. 10 × belegt, 17 × abgeschaetzt, 3 × berechnet
+# abgeschaetzt, berechnet → berechnet. 10 × belegt, 18 × abgeschaetzt, 3 × berechnet
 # (Runde 31: heat.beta_iso steht auf quelle, heat.anteil_60_66 ist neu; T-1606: die sechs
-# Blöcke der Hebel S157/S152 aus T-1537, T-1538 und T-1584, fünf abgeschätzt, h_heim berechnet).
+# Blöcke der Hebel S157/S152 aus T-1537, T-1538 und T-1584, fünf abgeschätzt, h_heim berechnet;
+# heat.sigma_k, die Streuung der Feinstruktur, ist abgeschätzt).
 # Die Klasse der drei Katalog-Blöcke (heat.voly, heat.c_fall, heat.delta_hap) steht
 # in data/catalog.py. Geprüft in tests/test_methodik_95_kennzeichnung.py.
 _HEAT_KLASSE: dict[str, str] = {
@@ -1675,6 +1713,7 @@ _HEAT_KLASSE: dict[str, str] = {
     "heat.qbar_1p": "belegt",
     "heat.qbar_pfl": "belegt",
     "heat.gamma_hoehe": "belegt",
+    "heat.sigma_k": "abgeschaetzt",
     "heat.ror_s157": "belegt",
     "heat.g_s157": "abgeschaetzt",
     "heat.delta_vg": "abgeschaetzt",
