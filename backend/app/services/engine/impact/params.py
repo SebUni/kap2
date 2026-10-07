@@ -931,9 +931,9 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "label": "Klima-Attribution des Dosistrends", "unit": "Anteil",
      "source": "Gekennzeichnete Abschätzung (§3.9; Bericht #98 §3.2)",
      "source_detail": "Anteil des SSD-/Dosistrends, der dem Klimawandel "
-                      "zuzurechnen ist: 0,75 (Band 0,5–1,0). Für UV existiert "
-                      "KEINE Attributionsstudie (anders als bei #96, dort 0,50 "
-                      "gemessen) — Begründung: Lorenz nennt als Trendursache "
+                      "zuzurechnen ist: 0,75 (Band 0,5–1,0). Analog zur #96-Logik "
+                      "(siehe #96, Kapitel 3); für UV existiert "
+                      "KEINE Attributionsstudie — Begründung: Lorenz nennt als Trendursache "
                       "v. a. die Bewölkungsabnahme (klimasystemisch → hoher Wert), "
                       "das Aerosol-Brightening seit den 1980ern ist anthropogen, "
                       "aber keine Klimawirkung im KWRA-Sinn (→ < 1,0). "
@@ -1862,6 +1862,136 @@ for _spec in IMPACT_PARAM_SPECS:
         _spec["evidence_class"] = _POLLEN_KLASSE[_block]
         if _block in _POLLEN_HERLEITUNG:
             _spec.setdefault("evidence_derivation", dict(_POLLEN_HERLEITUNG[_block]))
+del _spec, _block
+
+# ── Block-Kennung je Parameter: Abgleich mit Kapitel 7 des Berichts #98 (T-1820-cto) ──
+# Kapitel 7 führt 22 Blöcke. Hier tragen 15 davon Registry-Specs (je Entität ``_mm``/``_c44``
+# bzw. je Altersband ein Spec); ``uv.voly`` steht als 16. am Risiko im Katalog
+# (``cost_methodik_block``). Ohne eigene Stelle im Code sind ``uv.ssd_delta_region``
+# (Wert ist eine CSV, im Produkt die Ebene UV_RADIATION), ``uv.i_raten_roh`` (dieselben
+# Werte wie ``uv.i_mm`` und ``uv.i_c44``) und ``uv.r_out_sensitivitaet`` (keine Spec);
+# die drei S155-Blöcke gehören zu Paket 5/7. Geprüft in
+# tests/test_methodik_98_kennzeichnung.py.
+_UV_BLOECKE: dict[tuple[str, str], str] = {
+    ("EXPECTED_ANNUAL_UV_YLL", "k_uv"): "uv.k_uv",
+    ("EXPECTED_ANNUAL_UV_YLL", "a_attr"): "uv.a_attr",
+    ("EXPECTED_ANNUAL_UV_YLL", "baf_mm"): "uv.baf",
+    ("EXPECTED_ANNUAL_UV_YLL", "baf_c44"): "uv.baf",
+    ("EXPECTED_ANNUAL_UV_YLL", "w_scc"): "uv.w_scc",
+    ("EXPECTED_ANNUAL_UV_YLL", "lambda_mm"): "uv.lambda",
+    ("EXPECTED_ANNUAL_UV_YLL", "lambda_c44"): "uv.lambda",
+    ("EXPECTED_ANNUAL_UV_YLL", "l_rest_mm"): "uv.l_rest",
+    ("EXPECTED_ANNUAL_UV_YLL", "l_rest_c44"): "uv.l_rest",
+    ("EXPECTED_ANNUAL_UV_YLL", "c_fall_mm"): "uv.c_fall",
+    ("EXPECTED_ANNUAL_UV_YLL", "c_fall_c44"): "uv.c_fall",
+    ("EXPECTED_ANNUAL_UV_YLL", "c_kal_mm"): "uv.c_kal",
+    ("EXPECTED_ANNUAL_UV_YLL", "c_kal_c44"): "uv.c_kal",
+    ("EXPECTED_ANNUAL_UV_YLL", "s_komforttag"): "uv.s_komforttag",
+    ("EXPECTED_ANNUAL_UV_YLL", "phi_komfort"): "uv.phi_komfort",
+    **{("EXPECTED_ANNUAL_UV_YLL", f"i_mm_{a}"): "uv.i_mm"
+       for a in ("u20", "a20_64", "a65_74", "a75_84", "a85p")},
+    **{("EXPECTED_ANNUAL_UV_YLL", f"i_c44_{a}"): "uv.i_c44"
+       for a in ("u20", "a20_64", "a65_74", "a75_84", "a85p")},
+    ("EXPECTED_ANNUAL_UV_YLL", "or_out"): "uv.or_out",
+    ("EXPECTED_ANNUAL_UV_YLL", "qbar_out"): "uv.qbar_out",
+    ("EXPECTED_ANNUAL_UV_YLL", "r_out_enabled"): "uv.r_out_enabled",
+}
+# Kennzeichnung je Block nach Kapitel 7, übersetzt in die Evidenzklasse (P1):
+# quelle → belegt, abschaetzung_kap3 → abgeschaetzt, berechnet → berechnet.
+# ``uv.voly`` steht in data/catalog.py (abgeschaetzt).
+_UV_KLASSE: dict[str, str] = {
+    "uv.k_uv": "berechnet",
+    "uv.a_attr": "abgeschaetzt",
+    "uv.baf": "berechnet",
+    "uv.w_scc": "belegt",
+    "uv.lambda": "berechnet",
+    "uv.l_rest": "berechnet",
+    "uv.c_fall": "abgeschaetzt",
+    "uv.c_kal": "berechnet",
+    "uv.s_komforttag": "abgeschaetzt",
+    "uv.phi_komfort": "abgeschaetzt",
+    "uv.i_mm": "belegt",
+    "uv.i_c44": "belegt",
+    "uv.or_out": "belegt",
+    "uv.qbar_out": "abgeschaetzt",
+    "uv.r_out_enabled": "abgeschaetzt",
+}
+# Herleitung nach P1 für die abgeschätzten Blöcke (Bericht #98 §3.2 bis §3.4 und Kapitel 7).
+_UV_HERLEITUNG: dict[str, dict[str, str]] = {
+    "uv.a_attr": {
+        "wert": "0,75 als Anteil des Sonnenscheindauer-Trends, der dem Klimawandel zuzurechnen "
+                "ist. Für UV gibt es keine Attributionsstudie; Lorenz 2024 nennt als "
+                "Trendursache vor allem die Bewölkungsabnahme (klimasystemisch, hoher Wert), "
+                "das Aerosol-Brightening seit den 1980ern ist anthropogen, aber keine "
+                "Klimawirkung im KWRA-Sinn (unter 1,0). Setzung von KAP3 (Bericht #98 §3.2, "
+                "Entscheidungslog Nr. 3, Befund 15).",
+        "band": "0,5–1,0: beide Grenzen im Band, Zentralwert 0,75.",
+        "sensitivitaet": "Linear: Zusatzfälle, Lebensjahre und Euro wachsen im gleichen "
+                         "Verhältnis wie a_attr; Band ±33 % um den Zentralwert, −25 % gegenüber "
+                         "dem unattribuierten Stand M0 (Bericht #98, Entscheidungslog Nr. 3).",
+    },
+    "uv.c_fall": {
+        "wert": "Behandlungskosten je Fall im Erstjahr nach Speckemeier 2022: Melanom 5.326 "
+                "€₂₀₁₅, C44 4.660 €₂₀₁₅, mit dem Verbraucherpreisindex 119,3/94,5 auf 2024 "
+                "indexiert: 6.724 und 5.883 €₂₀₂₄. Proxy von KAP3 (Bericht #98 §3.4): "
+                "überschätzend, weil Gesamt- statt Inkrementalkosten; unterschätzend, weil "
+                "nur das Erstjahr.",
+        "band": "Melanom 6.724–11.410 €₂₀₂₄, C44 5.883–7.436 €₂₀₂₄ (Kapitel 7, Block uv.c_fall).",
+        "sensitivitaet": "Linear im Behandlungskosten-Anteil des Euro-Betrags (Bundessumme "
+                         "rund 113 von 339 Mio. € je Jahr, Bericht #98 §4); die Zahl der Fälle "
+                         "und der Lebensjahre ändert sich nicht.",
+    },
+    "uv.s_komforttag": {
+        "wert": "1,45 als Dosis-Multiplikator an einem Komforttag (Tageswert): +1,2 min "
+                "Außenzeit je °C (Graff Zivin & Neidell 2014, Basis 44 min/Tag), bei "
+                "ΔT = +10 °C etwa +27 % Außenzeit, dazu +15 % Kleidungskomponente (Schmalwieser "
+                "2021). Setzung von KAP3: ΔT = 10 °C. Wirkt nur über phi_komfort auf das Jahr "
+                "(Bericht #98 §3.4, Register 98-S154-01).",
+        "band": "1,25–1,60 (Kernband des Tageswerts).",
+        "sensitivitaet": "Wirkt nur im Sensitivitätsband, nicht im Basiswert: Mit "
+                         "phi_komfort = 0 ist der Jahresfaktor v_verh = 1 + phi × (s − 1) "
+                         "genau 1, die Euro-Summe ändert sich nicht (Bericht #98 §3.4).",
+    },
+    "uv.phi_komfort": {
+        "wert": "0 als Neutralwert: Die Ebene des dosisgewichteten Komforttag-Anteils am Jahr "
+                "ist geparkt, weil keine freie Quelle für Tagestemperatur und Tagesdosis in "
+                "Kombination vorliegt (Bericht #98 §3.1, §3.4, Befund 216). Die Obergrenze "
+                "0,25 ist eine Abschätzung von KAP3: Die erythemwirksame Dosis entfällt zu "
+                "rund 70 % auf Mai bis August, und dort ist nicht jeder Tag ein Komforttag.",
+        "band": "0–0,25, damit v_verh 1,00–1,11.",
+        "sensitivitaet": "Im Basiswert null (v_verh = 1); am Band erhöht phi die "
+                         "Jahres-Dosis um bis zu 11 % und damit Fälle und Euro in gleichem "
+                         "Verhältnis (Bericht #98 §3.4).",
+    },
+    "uv.qbar_out": {
+        "wert": "0,070 als Bundesmittel des Außenberufs-Anteils: (572 Tsd. Land-, Forstwirtschaft "
+                "und Fischerei + 2.643 Tsd. Baugewerbe) ÷ 45.909 Tsd. Erwerbstätige (Destatis "
+                "VGR 2023). Proxy von KAP3, weil nicht alle Beschäftigten dieser Branchen im "
+                "Freien arbeiten und Außenberufe anderer Branchen fehlen (Bericht #98 §3.4).",
+        "band": "q_out 0–0,21; die Obergrenze, das Dreifache des Bundesmittels, ist eine "
+                "Abschätzung von KAP3.",
+        "sensitivitaet": "Wirkt nur im Sensitivitätsband r_out (Basiswert-Default 1): "
+                         "−1,9 bis +3,8 % auf den C44-Zusatz und −1,1 bis +2,2 % auf die "
+                         "Euro-Summe einer Einzelkommune, null auf die Bundessumme "
+                         "(Zentrierung, Bericht #98 §3.4).",
+    },
+    "uv.r_out_enabled": {
+        "wert": "0 (aus) als Basiswert: Der Außenberufs-Modifikator ist ausdrücklich ein "
+                "Sensitivitätsband und geht nicht in den Basiswert ein (Bericht #98 §3.4, "
+                "Entscheidungslog Nr. 10). Die Zellgröße (Außenbeschäftigten-Anteil) ist als "
+                "Ebene geparkt, weil keine freie Quelle je Zelle vorliegt.",
+        "band": "0 oder 1 (Schalter).",
+        "sensitivitaet": "Schalter auf 1: −1,9 bis +3,8 % auf den C44-Zusatz einer "
+                         "Einzelkommune, null auf die Bundessumme (Bericht #98 §3.4).",
+    },
+}
+for _spec in IMPACT_PARAM_SPECS:
+    _block = _UV_BLOECKE.get((_spec["risk"], _spec["key"]))
+    if _block:
+        _spec["methodik_block"] = _block
+        _spec["evidence_class"] = _UV_KLASSE[_block]
+        if _block in _UV_HERLEITUNG:
+            _spec.setdefault("evidence_derivation", dict(_UV_HERLEITUNG[_block]))
 del _spec, _block
 
 # Vorgabewert von s_unbek (Registry-Spec ``birch_group_share_default``, Berichtsblock
