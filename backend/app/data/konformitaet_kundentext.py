@@ -112,6 +112,16 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
         "werden nicht getrennt ausgewiesen, und ob Versickerungs-, Speicher- und "
         "Verdunstungsflächen erhalten bleiben, erfasst das Produkt nicht.",
     ),
+    14: (
+        "teilweise",
+        "Das Produkt zeigt je Bundesland, ob und welche Stellen das Landesrecht für die Aufstellung "
+        "von Klimaanpassungskonzepten bestimmt, wendet diese Regel aber nicht auf die einzelne "
+        "Kommune an: Es unterscheidet nicht, ob die Gemeinde selbst oder ihr Kreis zuständig ist, "
+        "berücksichtigt keine Größengrenze, unterhalb derer eine Gemeinde kein eigenes Konzept "
+        "aufstellen muss, und erfasst nicht, ob für das Gebiet bereits ein Konzept vorliegt. Für "
+        "acht Länder beruht die Angabe, dass keine Landesbestimmung getroffen sei, nur auf einer "
+        "Websuche ohne Durchsicht der amtlichen Rechtssammlungen.",
+    ),
     15: (
         "teilweise",
         "Wie bei der Einstufung dringender Handlungserfordernisse übernimmt das Produkt die "

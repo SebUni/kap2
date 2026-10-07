@@ -1,12 +1,13 @@
-"""T-0753: Zeile 14 der Konformitäts-Checkliste ist auf 'erfüllt' gesetzt und gegen
+"""T-0753, T-1868: Zeile 14 der Konformitäts-Checkliste steht nach der Gegenprobe am
+Normtext (§ 12 Abs. 1 KAnG, Abschnitt „Gegenprobe Zeile 14“) auf 'teilweise' und ist gegen
 die genannten Belege abgesichert.
 
 Prüft wörtlich gegen docs/KONFORMITAET_CHECKLISTE.md:
 - es gibt genau eine Zeile, die mit '| 14 |' beginnt,
 - diese Zeile hat sieben Spalten,
-- fünfte Spalte (Status) ist genau 'erfüllt',
+- fünfte Spalte (Status) ist genau 'teilweise',
 - sechste Spalte (Fundstelle/Beleg) ist genau die vier erwarteten Pfade,
-- siebte Spalte (Lücke) ist genau '—',
+- siebte Spalte (Lücke) ist nicht leer und nicht '—',
 - jeder der vier genannten Pfade existiert als Datei im Repo.
 """
 
@@ -49,9 +50,9 @@ def test_zeile_14_hat_sieben_spalten():
     assert len(spalten) == 7, f"Erwartet 7 Spalten, gefunden: {len(spalten)} -> {spalten}"
 
 
-def test_zeile_14_status_ist_erfuellt():
+def test_zeile_14_status_ist_teilweise():
     spalten = _spalten(_zeile_14())
-    assert spalten[4].strip() == "erfüllt"
+    assert spalten[4].strip() == "teilweise"
 
 
 def test_zeile_14_beleg_ist_exakt():
@@ -59,9 +60,10 @@ def test_zeile_14_beleg_ist_exakt():
     assert spalten[5].strip() == ERWARTETE_BELEGE
 
 
-def test_zeile_14_luecke_ist_leer():
+def test_zeile_14_luecke_ist_benannt():
     spalten = _spalten(_zeile_14())
-    assert spalten[6].strip() == "—"
+    luecke = spalten[6].strip()
+    assert luecke not in ("", "—"), f"Lücke fehlt: {luecke!r}"
 
 
 def test_zeile_14_belegte_pfade_existieren():

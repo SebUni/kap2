@@ -27,6 +27,14 @@ PURE_TIME_PREFERENCE_RATES: tuple[float, ...] = (0.0, 0.01)
 # (0,01 = 1 Prozentpunkt). Abschätzung von KAP3, siehe RELATIVE_PRICE_COMPONENT_SPEC.
 RELATIVE_PRICE_COMPONENT: float = 0.0
 
+# Schadensarten, für die die Komponente gilt: die Gesundheitsschäden von M0, das sind die
+# KWRA-Klimawirkungen #95 Hitzebelastung, #96 Aeroallergene und #98 UV-Schädigungen. Quelle:
+# docs/methodik/querschnitt_diskontrate.md, Abschnitt „Geltung für die Schadensarten von M0“
+# (Befund C5). Für andere Schadensarten und für Maßnahmenkosten setzt die Quelle keinen Wert
+# (Anweisung A-0048); sie werden nur mit der RZPR abgezinst. Maßgeblich ist das Feld ``kwra_id``
+# des Katalogeintrags eines Risikos.
+RELATIVE_PRICE_COMPONENT_KWRA_IDS: tuple[int, ...] = (95, 96, 98)
+
 RELATIVE_PRICE_COMPONENT_SPEC: dict = {
     "label": "Komponente der relativen Preise (Diskontrate)",
     "unit": "Prozentpunkte (als Dezimalzahl, 0,01 = 1 Pp.)",
