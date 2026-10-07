@@ -2,5 +2,7 @@
 bash scripts/testlauf.sh
 # L6-Export der Methodik-Berichte (Lese-PDF und Übersicht), aufgerufen als bash scripts/export_methodik_pdf.sh <nr>.
 bash scripts/export_methodik_pdf.sh
+# Methodik-Lint über den Interpreter der Projektumgebung (Beispiel-Blöcke brauchen numpy), aufgerufen als bash scripts/lint_methodik.sh <nr>.
+bash scripts/lint_methodik.sh
 # Layout-Stichprobe des Exports: einzelne PDF-Seiten als Bild ansehen.
 pdftoppm
