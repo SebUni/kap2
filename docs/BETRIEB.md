@@ -331,11 +331,11 @@ größer 0 liefert. Der Jahresbetrag #95 laut API (`risk-summary`, ohne Wirkung 
 179.020,81 € (Stand T-1815, mit gefüllter Gemeindetabelle und Feinstruktur σ = 0,58 K im Zelllauf; **vor diesem
 Paket** waren es 170.809,72 €, davor ohne Gemeindetabelle 144.392,88 €). Der Anstieg um 8.211,09 € ist ×1,0481, der
 Faktor von Bericht #95 §3.0 Wirkung (d) für Warmsen (× 1,048).
-Die Karte „Erwartete Schäden je Risiko“ zeigt diesen Wert nur, solange `cost-summary` nicht
-geladen ist; sonst nimmt sie `costSummary.klimawirkungen` vor `riskSummary`
-(`frontend/src/components/dashboard/CostTablesSection.tsx`, Z. 17–19). In der Aufnahme vom 06.10.2026 nach T-1815
-zeigt sie „179.021 €“ (vor diesem Paket „170.810 €“); die früheren Angaben „160.667 €“ und „135.838 €“ mit
-Maßnahme zeigte die Aufnahme nicht mehr.
+Die Karte „Erwartete Schäden je Risiko“ zeigt diesen Wert in der Spalte „Schaden/Jahr“ immer, unabhängig davon,
+ob und wann `cost-summary` geladen ist (`frontend/src/components/dashboard/CostTablesSection.tsx`, seit T-1816).
+Weicht der Betrag aus `cost-summary` (Schaden mit Wirkung der Maßnahmen) für eine Zeile davon ab, steht er daneben in
+der Spalte „nach Maßnahmen“; ohne Abweichung oder ohne geladenes `cost-summary` gibt es die Spalte nicht. Die
+Aufnahme vom 07.10.2026 nach T-1816 zeigt für #95 „179.021 €“ und „nach Maßnahmen“ „168.391 €“.
 Der Golden-Test im Bericht #95 nennt für Warmsen 175.256 €
 (`backend/data/kalibrierung/golden95_zellen.md`). Die Abweichung ist nicht angeglichen (jetzt
 +3.764,81 €, vorher −4.446,28 € und davor −30.863,12 €). Mit der Feinstruktur liegt der Zelllauf des Produkts über
@@ -375,10 +375,11 @@ python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app/ma
 
 Dashboard, Karte „Erwartete Schäden je Risiko“ (Bild zeigt „Allergische Reaktionen durch Aeroallergene
 pflanzlicher Herkunft (#96)“ mit „2.281 €“ Schaden/Jahr, vor T-1814 „2.342 €“; stabil). Der Betrag von
-„Hitzebelastung (#95)“ hängt vom Stand von `cost-summary` ab: Die Karte nimmt `costSummary.klimawirkungen`
-vor `riskSummary` (`CostTablesSection.tsx`, Z. 17–19). Das Bild nach T-1815 zeigt „179.021 €“ (vor diesem Paket „170.810 €“); das ist der API-Wert von `risk-summary`
-(so gibt ihn `sicht_beispielkommune.py` aus). Die Angabe „160.667 €“ mit Maßnahme (Stand nach T-1814) zeigte
-die Aufnahme nach T-1815 nicht. Zitiert wird, was das Bild zeigt.
+„Hitzebelastung (#95)“ in „Schaden/Jahr“ ist der API-Wert von `risk-summary` ohne Wirkung der Maßnahmen, unabhängig
+vom Ladestand von `cost-summary` (`CostTablesSection.tsx`, seit T-1816); das Bild zeigt „179.021 €“ (so gibt ihn
+`sicht_beispielkommune.py` aus). Daneben steht in der Spalte „nach Maßnahmen“ der Betrag aus `cost-summary`, hier
+„168.391 €“ (Gesamtzeile: „Gesamtschaden 190.048 €/Jahr · nach Maßnahmen 179.419 €/Jahr“). Zitiert wird, was das Bild
+zeigt. Dieser Sichtstart-Nachweis gilt zusätzlich zur Prüfung in der Testumgebung (A-0066), er ersetzt sie nicht.
 
 ```bash
 python3 /opt/overlord/overlord/skripte/sichtpruefung.py --repo . --seite /app --klick "text=Meine Gebiete" --klick "text=Warmsen" --klick "text=81.6 km²" --klick "text=Details: Risikoverteilung" --klick "text=Erwartete Schäden je Risiko" --ziel <Verzeichnis>/sicht2 --start-timeout 300
