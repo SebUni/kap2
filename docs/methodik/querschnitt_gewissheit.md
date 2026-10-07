@@ -745,15 +745,25 @@ Bei #98 liegen Mitte und Ende zwei Stufen auseinander. Hier wirkt die Regel „n
 ersten Mal: Die Zeitreihe zeigt 2025–2060 „mittel“ und 2061–2065 „sehr gering“. Den Ausschlag geben die Zellen S100 und
 T100.
 
-**Wie Regel G das Auseinanderfallen von Produktstufe und KWRA-Stufe ausweist (§8 E3).** Heute meldet das Produkt für #98
-eine Gewissheit „hoch“, weil alle 30 Parameter der Registry als belegt gelten (`gewissheit.gewissheitsstufe`, im Block
-nachgerechnet). Die KWRA nennt zum Ende „sehr gering“, drei Stufen tiefer. Nach Regel G verschwindet die „hoch“: Das
-Produkt zeigt als Gewissheit Mitte „mittel“ und Ende „sehr gering“, je mit Fundstelle Mappe S100 und T100 und TB6
-Tabelle 1, S. 41, und ab 2061 den Hinweis zur vorsichtigen Interpretation. Die Quellenlage steht daneben nur als
-Zählung, „5 von 22 Parametern mit Quelle“, ohne Stufe. So steht kein zweites „hoch“ neben dem „sehr gering“. Die
-einfachere Rechnung, die heutige Kennzahl, stellt die Lage falsch dar: Ein Nutzer läse aus „hoch“, die UV-Schäden seien
-bis 2100 gut verstanden. Die KWRA zählt genau diese Klimawirkung zu den sieben mit der geringsten Gewissheit zum Ende
-(TB6 S. 78).
+**Wie Regel G das Auseinanderfallen von Produktstufe und KWRA-Stufe ausweist (§8 E3).** Die heutige Kennzahl des
+Produkts (`gewissheit.gewissheitsstufe`) stand für #98 bis T-1820-cto auf „hoch“. Alle 30 Parameter der Registry galten
+als belegt, gemessen am 07.10.2026 am Stand davor (Commit `22f532d3`). Seit T-1820-cto (Commit `c8aba66f`, 07.10.2026)
+übernimmt die Registry die Kennzeichnung der Blöcke aus Kapitel 7 von Bericht 98 (`_UV_BLOECKE` und `_UV_KLASSE` in
+`backend/app/services/engine/impact/params.py`). Seitdem zählt sie 22 von 30 Parametern als belegt oder berechnet
+(73 %) und meldet „mittel“, im Block nachgerechnet. Die KWRA nennt zum Ende „sehr gering“: Die Kennzahl lag vorher drei
+Stufen darüber, jetzt zwei. Regel G weist das Auseinanderfallen in beiden Fällen gleich aus. Als Gewissheit zeigt das
+Produkt nicht mehr die Kennzahl, sondern je Zeitscheibe den Wert der KWRA: Mitte „mittel“, Ende „sehr gering“, je mit
+Fundstelle Mappe S100 und T100 und TB6 Tabelle 1, S. 41. Die Zeitreihe zeigt ab 2061 „sehr gering“ mit dem Hinweis zur
+vorsichtigen Interpretation. Die Quellenlage steht daneben nur als Zählung, „5 von 22 Parametern mit Quelle“, ohne
+Stufe. So steht weder ein „hoch“ noch ein „mittel“ ohne Zeitbezug neben dem „sehr gering“.
+
+**Das „mittel“ der Kennzahl trifft die KWRA zur Mitte nur zufällig.** Es folgt aus einem Anteil über der Hälfte, nicht
+aus einer Bewertung der Gewissheit. An einem Tag ist es ohne neues Wissen über UV von „hoch“ auf „mittel“ gefallen,
+allein weil die Parameter anders eingeteilt wurden. Aus den Blöcken des Berichts gezählt gibt dieselbe Regel „gering“
+(5 von 22). Und es hat keinen Zeitbezug, es stünde auch für 2061–2100, wo die KWRA „sehr gering“ nennt. Die einfachere
+Rechnung, die Kennzahl als Gewissheit, stellt die Lage deshalb falsch dar: Ein Nutzer läse aus einer Stufe ohne
+Zeitbezug, die Gewissheit sei bis 2100 mindestens „mittel“. Die KWRA zählt genau diese Klimawirkung zu den sieben mit
+der geringsten Gewissheit zum Ende (TB6 S. 78).
 
 **Einordnung nach „Einordnung der Charakterisierung“ (Zeitscheibe Mitte).**
 
@@ -786,10 +796,13 @@ Die gebrauchte Quellenlage nach Regel G, gezählt aus dem Endstand der Parameter
 `uv.s155_dosisminderung`, `uv.s155_a_erk_mm`, `uv.s155_a_erk_c44`) und 6 `berechnet` (`uv.ssd_delta_region`,
 `uv.k_uv`, `uv.baf`, `uv.lambda`, `uv.l_rest`, `uv.c_kal`). Angezeigt wird „5 von 22 Parametern mit Quelle“ (23 %).
 Zum Vergleich, geht **nicht** in die Gewissheit ein: Mit den berechneten sind es 11 von 22 = 50 %. Nach der alten Regel
-stünde #98 damit auf „gering“ (23 %) oder, genau auf der Hälfte, auf „mittel“ (50 %). Die Registry kommt mit 30 von
-30 auf „hoch“. Dieselbe alte Regel gibt also je nach Zählweise drei verschiedene Stufen, und keine trifft das „sehr
-gering“ der KWRA zum Ende. Die drei Blöcke `uv.s155_…` wirken nur im Maßnahmen-Modul. Ohne sie wären es 5 von 19 =
-26 %. Regel G zählt jeden Block einmal, also 22.
+stünde #98 damit auf „gering“ (23 %) oder, genau auf der Hälfte, auf „mittel“ (50 %). Die Registry kommt heute mit 22
+von 30 (73 %) auf „mittel“, bis T-1820-cto kam sie mit 30 von 30 auf „hoch“. Dieselbe alte Regel gibt also je nach
+Zählweise heute zwei verschiedene Stufen (gering, mittel, mittel), vorher drei, und keine trifft das „sehr gering“ der
+KWRA zum Ende. Dass die Registry trotz derselben Kennzeichnung auf 73 % statt 50 % kommt, liegt an der Zerlegung: Von
+ihren 30 Parametern gehören 29 zu 16 Blöcken des Berichts, mehrere je Block (etwa fünf Altersgruppen bei `uv.i_mm` und
+bei `uv.i_c44`), dazu kommt der Referenzwert des Index ohne Block. Die drei Blöcke `uv.s155_…` wirken nur im
+Maßnahmen-Modul. Ohne sie wären es 5 von 19 = 26 %. Regel G zählt jeden Block einmal, also 22.
 
 Beispiel-Block `rechenkette_gewissheit_98`, aus dem Stamm des Produkt-Repos ausführbar (am 07.10.2026 gelaufen,
 Ausgabe darunter):
@@ -878,15 +891,18 @@ def alte_regel(anteil):
     return "sehr gering" if anteil == 0 else "gering" if anteil < 0.5 else "mittel" if anteil < 1 else "hoch"
 
 
-# Vergleich, Registry des Produkts nach der alten Regel: heute „hoch“
+# Vergleich, Registry des Produkts nach der alten Regel: seit T-1820-cto „mittel“
 sys.path.insert(0, "backend")
 from app.services import gewissheit as alt, parameter_registry  # noqa: E402
 
 klassen = [p["evidence_class"] for p in alt._risiko_parameter(codes[0])]
 registry = (sum(k in parameter_registry.BELEGTE_KLASSEN for k in klassen), len(klassen))
-assert registry == (30, 30) and alt.gewissheitsstufe(codes[0]) == "hoch"
-assert (alte_regel(5 / 22), alte_regel(11 / 22), alte_regel(30 / 30)) == ("gering", "mittel", "hoch")
-assert STUFEN.index("hoch") - STUFEN.index(ende) == 3    # drei Stufen zwischen Produkt heute und KWRA Ende
+assert {k: klassen.count(k) for k in sorted(set(klassen))} == {"abgeschaetzt": 8, "belegt": 13, "berechnet": 9}
+assert registry == (22, 30) and alt.gewissheitsstufe(codes[0]) == "mittel"
+assert (alte_regel(5 / 22), alte_regel(11 / 22), alte_regel(22 / 30)) == ("gering", "mittel", "mittel")
+assert STUFEN.index(alt.gewissheitsstufe(codes[0])) - STUFEN.index(ende) == 2   # heute zwei Stufen über dem Ende
+# Stand vor T-1820-cto (Commit 22f532d3, gemessen am 07.10.2026): 30 von 30 belegt, also „hoch“, drei Stufen darüber
+assert alte_regel(30 / 30) == "hoch" and STUFEN.index("hoch") - STUFEN.index(ende) == 3
 
 print("Mitte:", mitte, "| Ende:", ende, "| heutiges Klima:", HEUTIGES_KLIMA)
 print("2025:", zeitreihe[2025], "| 2060:", zeitreihe[2060], "| 2061:", zeitreihe[2061], "| 2065:", zeitreihe[2065])
@@ -903,7 +919,7 @@ Mitte: mittel | Ende: sehr gering | heutiges Klima: in der KWRA nicht ausgewiese
 2025: mittel | 2060: mittel | 2061: sehr gering | 2065: sehr gering
 Gesamtgewissheit Mitte: 2.0 | ausreichend: True | Gruppe: Entwicklung | Wirksamkeit Y/AA: 0.25 0.5
 Quellenlage: {'abschaetzung_kap3': 11, 'berechnet': 6, 'quelle': 5} | angezeigt: 5 von 22 Parametern mit Quelle
-Registry belegt/alle (nur Vergleich): (30, 30) | Stufe heute: hoch
+Registry belegt/alle (nur Vergleich): (22, 30) | Stufe heute: mittel
 ```
 
 ## Entscheidungslog
@@ -1011,6 +1027,18 @@ gilt verschärft, weil die Kennzahl jetzt in jeder Zählweise zwei Stufen unter 
 Codes einer Klimawirkung je eigene Zählungen tragen und heute nur zufällig gleich lauten. **Die Einordnung von #95
 ändert sich nicht** (Gesamtgewissheit 2,5, „Entwicklung“): Sie setzt auf Zellen der KWRA auf, nicht auf der Zählung.
 
+Nachtrag Runde 1, 07.10.2026 (T-1820-cto): Seit Commit `c8aba66f` übernimmt die Registry für #98 die Kennzeichnung der
+Blöcke aus Kapitel 7 von Bericht 98. Die alte Kennzahl meldet für #98 seitdem „mittel“ (22 von 30) statt „hoch“ (30
+von 30, gemessen am Stand `22f532d3`). Die Angaben zu #98 in Punkt 1 („#98 steht auf ‚hoch‘“) und Punkt 2 („bei #98
+‚hoch‘ neben ‚sehr gering‘“) sind deshalb der Stand bis T-1820-cto. Block, Text unter „#98 UV-Schädigungen“ und der
+Hinweis unter „Befunde an Berichte“ sind nachgezogen. Die Entscheidungen bleiben. Punkt 1 bleibt, weil die Kennzahl
+die Lage auch mit „mittel“ falsch darstellt: Sie hat keinen Zeitbezug und liegt zwei Stufen über dem „sehr gering“ zum
+Ende. Gewechselt hat sie an einem Tag ohne neues Wissen, allein durch die Einteilung der Parameter. Punkt 2 bleibt,
+weil eine zweite Stufe neben der Gewissheit weiterhin als zweite Gewissheit gelesen würde, jetzt „mittel“ neben „sehr
+gering“. Ihr Anteil hängt von der Zerlegung ab: Registry 22 von 30 = 73 %, Blöcke des Berichts 11 von 22 = 50 %. An
+Regel G, Zuordnungstabelle und Einordnung ändert sich nichts. Die Einordnung von #98 („Entwicklung“, 2,0) setzt auf
+Zellen der KWRA und auf Tabelle 24 auf, nicht auf der Kennzahl.
+
 Änderungen an Abschnitten aus Schritt 1 bis 3: Der Vorspann nennt Schritt 4 mit Ticket. Der Satz vor der Tabelle unter
 „Rechenkette“ nennt #98 als drittes Beispiel. Vergleich und Block zu #95 und #96 sind auf den heutigen Stand
 nachgezogen (oben). Unter „Befunde an Berichte“ steht #98, unter „Quellen“ die Fundstellen von Schritt 4. Die Übersicht
@@ -1042,10 +1070,12 @@ mittel und hoch; Spalten N–R) stimmt mit N100–R100 und mit demselben Bild ü
 „sehr gering“ zum Ende stimmt mit dem Text dort.
 
 Hinweis an Bericht 98, keine Abweichung von einer Zelle: Aussage (d) sagt, das Produkt führe #98 „bei der Quellenlage
-auf ‚hoch‘“. Das beschreibt den heutigen Stand der Registry richtig (30 von 30). Nach Regel G trägt die Quellenlage
-keine Stufe mehr und lautet „5 von 22 Parametern mit Quelle“. Der Satz wird mit der Umsetzung von Regel G
-(T-1030-ceo) überholt; Bericht 98 verweist für die Darstellung selbst auf die übergreifende Regel (T-1110). Bericht 98
-ist hier nicht geändert.
+auf ‚hoch‘“, weil jeder Parameter eine Quelle oder eine ausgewiesene Abschätzung mit Herleitung habe. Das beschrieb
+die Registry bis T-1820-cto (30 von 30, „hoch“). Seit T-1820-cto (Commit `c8aba66f`, 07.10.2026) zählt die Registry
+abgeschätzte Parameter nicht mehr als belegt, kommt auf 22 von 30 und meldet „mittel“. Der Satz beschreibt das Produkt
+also nicht mehr. Nach Regel G trägt die Quellenlage ohnehin keine Stufe und lautet „5 von 22 Parametern mit Quelle“
+(T-1030-ceo). Bericht 98 verweist für die Darstellung selbst auf die übergreifende Regel (T-1110). Der Nachzug in
+Bericht 98 gehört nicht zu diesem Paket; Bericht 98 ist hier nicht geändert.
 
 ## Quellen
 
@@ -1078,7 +1108,9 @@ ist hier nicht geändert.
   „Klimawirkungen“, Zeile 100, Zellen A100, D100, N100–T100, V100, Y100, AA100, AJ100.
   `docs/methodik/98_uv_schaedigungen.md` (Rev. 15, Commit `5a59ef3b`), Kap. 1, Abschnitt „Risiko ohne (weitere)
   Anpassung“, Aussagen (c) und (d); Kap. 7 „Parameter-Blöcke“. Für den Nachzug: `docs/methodik/95_hitzebelastung.md`
-  Kap. 7 (Commit `b0f3ad9a`), `docs/methodik/96_aeroallergene.md` Kap. 7 (Commit `c0486100`).
+  Kap. 7 (Commit `b0f3ad9a`), `docs/methodik/96_aeroallergene.md` Kap. 7 (Commit `c0486100`). Für die Registry von
+  #98 (Runde 1): `backend/app/services/engine/impact/params.py`, `_UV_BLOECKE` und `_UV_KLASSE` (T-1820-cto, Commit
+  `c8aba66f`); Stand davor gemessen an `backend/app` aus Commit `22f532d3`.
 - **[Produkt]** `backend/app/services/gewissheit.py`, `charakterisierung.py`, `unsicherheits_zusammenschau.py`;
   `backend/app/api/routes/assessment.py`; `docs/KONFORMITAET_CHECKLISTE.md`, „Gegenprobe Zeile 8“.
 
