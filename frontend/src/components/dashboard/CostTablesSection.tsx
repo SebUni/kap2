@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { useStore } from '../../store'
 import InfoTooltip from '../InfoTooltip'
 import { fmtEur } from '../../utils/format'
+import { gesamtNachMassnahmen, schadenNachMassnahmen, schluesselKlimawirkung } from '../../utils/schadenNachMassnahmen'
 import type { RiskAggregate } from '../../types'
 
 type Zeile = RiskAggregate['cost']['by_risk'][number]
@@ -14,9 +15,13 @@ export default function CostTablesSection() {
   const { riskSummary, costSummary } = useStore()
   if (!riskSummary) return null
 
-  const byRisk = costSummary?.by_risk || riskSummary.cost.by_risk
-  const byRiskCode = new Map(byRisk.map(z => [z.code, z]))
-  const klimawirkungen = costSummary?.klimawirkungen || riskSummary.cost.klimawirkungen
+  // Die Karte zeigt immer die Ausgangslage (risk-summary, ohne Wirkung der Maßnahmen),
+  // unabhängig davon, ob und wann cost-summary geladen ist (T-1816). Der Betrag mit
+  // Maßnahmen steht nur bei Abweichung in der Spalte „nach Maßnahmen“.
+  const byRiskCode = new Map(riskSummary.cost.by_risk.map(z => [z.code, z]))
+  const klimawirkungen = riskSummary.cost.klimawirkungen
+  const nach = schadenNachMassnahmen(riskSummary.cost, costSummary, MAX_BLOECKE)
+  const gesamtNach = gesamtNachMassnahmen(riskSummary.cost.total_eur, costSummary)
 
   return (
     <section>
@@ -25,7 +30,7 @@ export default function CostTablesSection() {
         <h3 className="chart-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           Erwartete Schäden je Risiko
           <InfoTooltip title="Aggregation je Risiko"
-            description="Schaden/Jahr = Σ über alle 100m-Zellen (bevölkerungs-/flächenbezogene Risiken) bzw. P90-Index × Kommune (Ausfall-/Screening-Risiken, nicht zell-additiv). Der Gesamtschaden ist die nachrechenbare Summe dieser Zeilen – ohne nicht-additive Teilkennzahlen (z. B. Restaurierung, = Anteil bereits gezählter Sektorschäden)." />
+            description="Schaden/Jahr = Σ über alle 100m-Zellen (bevölkerungs-/flächenbezogene Risiken) bzw. P90-Index × Kommune (Ausfall-/Screening-Risiken, nicht zell-additiv). Der Gesamtschaden ist die nachrechenbare Summe dieser Zeilen – ohne nicht-additive Teilkennzahlen (z. B. Restaurierung, = Anteil bereits gezählter Sektorschäden). Die Spalte „Schaden/Jahr“ zeigt den Schaden ohne Wirkung der Maßnahmen; weicht der Betrag mit den Maßnahmen der Kommune davon ab, steht er daneben in der Spalte „nach Maßnahmen“." />
         </h3>
         <table className="data-table">
           <thead>
@@ -34,6 +39,7 @@ export default function CostTablesSection() {
               <th style={{ textAlign: 'right' }}>Index</th>
               <th style={{ textAlign: 'right' }}>Ergebnis</th>
               <th style={{ textAlign: 'right' }}>Schaden/Jahr</th>
+              {nach.hatSpalte && <th style={{ textAlign: 'right' }}>nach Maßnahmen</th>}
             </tr>
           </thead>
           <tbody>
@@ -50,8 +56,9 @@ export default function CostTablesSection() {
                       <td />
                       <td />
                       <td style={{ textAlign: 'right', fontWeight: 600 }}>{fmtEur(k.cost_eur ?? 0)}</td>
+                      {nach.hatSpalte && <NachMassnahmenZelle eur={nach.summe.get(schluesselKlimawirkung(k))} fett />}
                     </tr>
-                    {k.teile.map(t => <KostenZeile key={t.code} r={t} teilzeile />)}
+                    {k.teile.map(t => <KostenZeile key={t.code} r={t} teilzeile nach={nach.hatSpalte ? { eur: nach.zeile.get(t.code) } : undefined} />)}
                   </Fragment>
                 )
               }
@@ -59,13 +66,15 @@ export default function CostTablesSection() {
               // Summenzeile; ihre einzige Zeile trägt Name und Nummer (bezeichnung).
               const zeile = byRiskCode.get(k.codes[0])
               if (!zeile) return null
-              return <KostenZeile key={zeile.code} r={{ ...zeile, name: k.bezeichnung }} teilzeile={false} />
+              return <KostenZeile key={zeile.code} r={{ ...zeile, name: k.bezeichnung }} teilzeile={false}
+                nach={nach.hatSpalte ? { eur: nach.zeile.get(zeile.code) } : undefined} />
             })}
           </tbody>
         </table>
         {riskSummary.cost.euro_coverage && (
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 6 }}>
-            Gesamtschaden {fmtEur(costSummary?.damages_with_measures_eur ?? riskSummary.cost.total_eur)}/Jahr
+            Gesamtschaden {fmtEur(riskSummary.cost.total_eur)}/Jahr
+            {gesamtNach != null && <>{' · '}nach Maßnahmen {fmtEur(gesamtNach)}/Jahr</>}
             {' · '}{riskSummary.cost.euro_coverage.text}
           </p>
         )}
@@ -103,7 +112,7 @@ export default function CostTablesSection() {
 }
 
 /** Zeile der Tabelle „Erwartete Schäden je Risiko“; Teilzeilen einer Klimawirkung stehen eingerückt. */
-function KostenZeile({ r, teilzeile }: { r: Zeile; teilzeile: boolean }) {
+function KostenZeile({ r, teilzeile, nach }: { r: Zeile; teilzeile: boolean; nach?: { eur?: number } }) {
   return (
     <tr>
       <td style={teilzeile
@@ -118,6 +127,18 @@ function KostenZeile({ r, teilzeile }: { r: Zeile; teilzeile: boolean }) {
             Screening-Vermerk des Backends, nie einen Strich oder 0 €. */}
         {r.has_euro_layer === false || r.cost_eur == null ? String(r.cost_display ?? '') : fmtEur(r.cost_eur)}
       </td>
+      {nach && <NachMassnahmenZelle eur={nach.eur} muted={teilzeile} />}
     </tr>
+  )
+}
+
+/** Zelle der Spalte „nach Maßnahmen“: nur bei Abweichung ein Betrag, sonst leer. */
+function NachMassnahmenZelle({ eur, fett, muted }: { eur?: number; fett?: boolean; muted?: boolean }) {
+  return (
+    <td style={{
+      textAlign: 'right',
+      ...(fett ? { fontWeight: 600 } : {}),
+      ...(muted ? { color: 'var(--text-muted)' } : {}),
+    }}>{eur == null ? '' : fmtEur(eur)}</td>
   )
 }
