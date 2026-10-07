@@ -157,6 +157,8 @@ Nach dem Merge ruft ein gesteuerter Lauf `bash scripts/testlauf.sh <dateien>` di
 
 Gesteuerte Läufe rufen den Methodik-Export `bash scripts/export_methodik_pdf.sh <nr>` nach dem Merge direkt auf (ebenso `pdftoppm` für die Layout-Stichprobe); der `python3`-Subprozess bleibt der Ausweichweg.
 
+Den Methodik-Lint rufen gesteuerte Läufe als `bash scripts/lint_methodik.sh <nr>` auf, weil er den Interpreter der Projektumgebung nutzt und die Beispiel-Blöcke der Berichte `numpy` brauchen (mit dem System-Python endet `python3 backend/scripts/lint_methodik.py <nr>` mit `LINTS ROT`).
+
 **Wenn der Aufruf verweigert wird:** Wie beim Frontend-Build (siehe unten) kann
 `bash scripts/testlauf.sh` in einem gesteuerten Lauf an der Berechtigungsliste
 scheitern (`This command requires approval`) — `bash`, `npm` und der
