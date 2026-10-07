@@ -25,7 +25,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 11 | Die Bundesregierung erstellt eine Klimarisikoanalyse nach dem aktuellen Stand der Wissenschaft, veröffentlicht sie und aktualisiert sie mindestens alle acht Jahre, um Handlungsfelder, Klimawirkungen und Regionen mit besonders hohen Klimarisiken aufzuzeigen. | KAnG, https://www.gesetze-im-internet.de/kang/__4.html | § 4 Abs. 1 | teilweise | docs/methodik/95_hitzebelastung.md, backend/app/data/catalog.py | Das Produkt liefert eine quantitative Risikobewertung je Kommune und Klimawirkung (Methodik-Berichte, Katalog), das ist aber keine Klimarisikoanalyse der Bundesregierung im Sinne des § 4 KAnG und enthält keinen eingebauten Mechanismus, der eine Aktualisierung im gesetzlich vorgesehenen Achtjahresturnus sicherstellt oder dokumentiert. |
 | 12 | Die Bundesregierung legt eine vorsorgende Klimaanpassungsstrategie mit messbaren Zielen vor, setzt sie um und schreibt sie unter Berücksichtigung aktueller wissenschaftlicher Erkenntnisse alle vier Jahre fort. | KAnG, https://www.gesetze-im-internet.de/kang/__3.html | § 3 Abs. 1 | offen | — | Das Produkt ist ein Werkzeug für Kommunen und Berater und bildet weder eine Bundesstrategie noch einen Fortschreibungszyklus ab; die Pflicht richtet sich an die Bundesregierung und wird vom Produkt nicht adressiert. |
 | 13 | Die Träger öffentlicher Aufgaben haben bei ihren Planungen und Entscheidungen das Ziel der Klimaanpassung fachübergreifend und integriert zu berücksichtigen. | KAnG, https://www.gesetze-im-internet.de/kang/__8.html | § 8 Abs. 1 | teilweise | backend/app/data/kang_handlungsfelder.py, backend/app/services/kang_beruecksichtigung.py, backend/app/services/kang_nachweis_markdown.py, docs/NACHWEIS_FACHUEBERGREIFEND_KANG.md, frontend/src/components/dashboard/KangNachweisSection.tsx, backend/app/api/routes/kommune.py | Fachübergreifend nur dem Raster nach: Alle aktiven Klimawirkungen liegen im Handlungsfeld Gesundheit, die übrigen 16 Felder stehen immer auf „nicht betroffen“; keine Maßnahme des Katalogs wirkt über mehr als ein Handlungsfeld („integriert“ bleibt leer); die in § 8 Abs. 1 Satz 2 Nr. 1–3 genannten Auswirkungen (Überflutung, Grundwasser und Trockenheit, Bodenerosion) sind nur geplant, nicht gerechnet; die Erzeugung oder Verstärkung einer Wärmeinsel durch eine Planung wird nicht verglichen; eingetretene und zu erwartende Auswirkungen trennt der Nachweis nicht; der Erhalt von Versickerungs-, Speicher- und Verdunstungsflächen (Satz 3) wird nicht erfasst. Einzelnachweis: Abschnitt „Gegenprobe Zeile 13“ |
-| 14 | Die Länder bestimmen im Rahmen der Grenzen des Art. 28 Abs. 2 Grundgesetz diejenigen öffentlichen Stellen, die für die Gebiete der Gemeinden und Kreise jeweils ein Klimaanpassungskonzept aufzustellen haben, soweit nicht bereits vorhanden. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 1 | erfüllt | docs/KANG_ZUSTAENDIGKEIT_LAENDER.md, backend/app/data/kang_zustaendigkeit.py, backend/app/api/routes/kommune.py, frontend/src/components/dashboard/KangZustaendigkeit.tsx | — |
+| 14 | Die Länder bestimmen im Rahmen der Grenzen des Art. 28 Abs. 2 Grundgesetz diejenigen öffentlichen Stellen, die für die Gebiete der Gemeinden und Kreise jeweils ein Klimaanpassungskonzept aufzustellen haben, soweit nicht bereits vorhanden. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 1 | teilweise | docs/KANG_ZUSTAENDIGKEIT_LAENDER.md, backend/app/data/kang_zustaendigkeit.py, backend/app/api/routes/kommune.py, frontend/src/components/dashboard/KangZustaendigkeit.tsx | Abgebildet ist je Land die Regel, nicht die zuständige Stelle je Kommune: backend/app/api/routes/kommune.py liest nur das Bundesland, und frontend/src/components/dashboard/KangZustaendigkeit.tsx zeigt deshalb „Pflicht: ja“ auch bei Gemeinden, für deren Gebiet nach Landesrecht der Kreis zuständig ist oder die unter der Größengrenze nach § 12 Abs. 1 Satz 2 liegen (Schleswig-Holstein: unter 100.000 Einwohnern); ob für das Gebiet schon ein Klimaanpassungskonzept vorliegt („soweit nicht bereits vorhanden“), erfasst das Produkt nicht; für 8 der 11 Länder ohne Bestimmung (Bayern, Brandenburg, Bremen, Hamburg, Hessen, Rheinland-Pfalz, Saarland, Thüringen) stützt sich der Befund in docs/KANG_ZUSTAENDIGKEIT_LAENDER.md nur auf nicht abgerufene Suchtreffer, ohne Durchsicht der Landesrecht-Portale. Einzelnachweis: Abschnitt „Gegenprobe Zeile 14“. |
 | 15 | Klimaanpassungskonzepte sollen auf einer Klimarisikoanalyse im Sinne einer Feststellung von potentiellen prioritären Risiken und sehr dringlichen Handlungserfordernissen (Betroffenheitsanalyse) oder vergleichbaren Entscheidungsgrundlagen beruhen. | KAnG, https://www.gesetze-im-internet.de/kang/__12.html | § 12 Abs. 3 | teilweise | backend/app/data/catalog.py, frontend/src/pages/roadmap/roadmapData.ts | Wie bereits zu Zeile 6 festgehalten, übernimmt das Produkt die Kategorie "sehr dringend" punktuell in der Roadmap, ohne die zugrunde liegende Klimarisikoanalyse systematisch und vollständig nach dieser gesetzlichen Vorgabe herzuleiten; laut docs/KATALOG_KRITIK.md fehlen im heutigen Katalog Klimawirkungen, die bundesweit als sehr dringend eingestuft sind. |
 | 16 | Vor der eigentlichen Risikobewertung ist der Kontext festzulegen (Bestandsaufnahme): lokale sozioökonomische und geographische Rahmenbedingungen sowie Trends sind zu erfassen, ebenso bereits vorhandene Informationen zu vergangenen und erwarteten Klimarisiken, einschließlich besonders klimasensibler Strukturen (z. B. kritische Infrastruktur) und vulnerabler Personengruppen. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Bestandsaufnahme"/"Festlegung des Kontexts", S. 12) | teilweise | backend/app/data/bestandsaufnahme.py, backend/app/services/bestandsaufnahme_service.py, backend/app/services/bestandsaufnahme_markdown.py, docs/BESTANDSAUFNAHME.md, backend/app/services/kommune_profile_service.py, backend/app/services/climate/dwd_data.py, backend/app/data/bevoelkerungsentwicklung.py, backend/app/data/catrare.py, backend/app/data/vorhandene_untersuchungen.py, backend/app/services/bestandsaufnahme_handlungsfelder.py | Die Bestandsaufnahme erfasst vulnerable Personengruppen und klimasensible Strukturen nur zum Teil: vier von sieben Personengruppen und Kindertagesstätten und Schulen stehen ohne Wert mit Lückensatz, Naturschutzgebiete und Lieferketten fehlen. Trends wie demographischer Wandel und Urbanisierung, natürliche Systeme, vergangene Extremereignisse und ihre Schäden sowie vorhandene Untersuchungen der Kommune (etwa Hochwasser- und Starkregengefahrenkarten, Klimaanalysekarten) erhebt sie nicht, und sie identifiziert keine betroffenen Handlungsfelder. Sozioökonomische und geographische Rahmenbedingungen und den Temperaturverlauf zeigt nur das Kommunenprofil, dieser nur je Bundesland. Einzelnachweis: Abschnitt „Gegenprobe Zeile 16“. |
 | 17 | In der Vorbereitungsphase sind interessierte Parteien mit einschlägiger Fachexpertise zu identifizieren und über partizipative Ansätze frühzeitig in die Entscheidungsfindung einzubeziehen, um ein gemeinsames Verständnis und Verantwortungsgefühl unter den Beteiligten zu fördern. | ISO 14091:2021, Sekundärquelle: Umweltbundesamt, "Klimarisikoanalysen auf kommunaler Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091", https://www.umweltbundesamt.de/publikationen/klimarisikoanalysen-auf-kommunaler-ebene | Kap. 5 (dort Abschnitt 2.1.2 "Interessierte Parteien identifizieren und partizipative Ansätze planen", S. 13) | offen | — | Das Produkt bietet keinen Prozess und keine Funktion, mit der eine Kommune interessierte Parteien identifiziert oder einen partizipativen Beteiligungsprozess plant und begleitet; es ist ein Analysewerkzeug für die inhaltliche Berechnung von Klimarisiken, keine Prozessunterstützung für Beteiligungsverfahren. |
@@ -1102,6 +1102,129 @@ derselben Änderung auf `teilweise` gesetzt; die Spalte „Lücke“ nennt, was 
 `backend/tests/test_konformitaet_zeile18.py` verlangt Status und Lücke neu. Die Zählungen in den Abschnitten „Nachtrag:
 Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist Sache der Gesamtzählung
 (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 14 gegen KAnG, § 12 Abs. 1
+
+Frage: Trägt die Übersicht der Landeszuständigkeiten, was § 12 Abs. 1 KAnG regelt — welche öffentliche Stelle für das
+Gebiet einer Gemeinde oder eines Kreises ein Klimaanpassungskonzept aufstellt, im Rahmen von Art. 28 Abs. 2 GG und
+„soweit nicht bereits vorhanden“ —, und zeigt das Produkt diese Stelle für die einzelne Kommune richtig an? Gelesen wurde
+`docs/quellen/normtexte/KAnG.pdf`: Bundes-Klimaanpassungsgesetz vom 20.12.2023 (BGBl. 2023 I Nr. 393), nichtamtliche
+Fassung von gesetze-im-internet.de, Textnachweis ab 01.07.2024; 7 Seiten, 72.562 Byte, SHA-256
+`284f8df9facd04783059843ae64dfd169ce5d9db5022f1bce1d2b7f8e2ffcc0e`. PDF-Seitenzahl und gedruckte Seitenzahl stimmen
+überein (Fußzeile „Seite n von 7“); die Spalte „Seite“ nennt beide zugleich, dazu Absatz und Satz. Den Wortlaut von
+Art. 28 Abs. 2 GG, auf den § 12 Abs. 1 Satz 1 verweist, enthält die Datei nicht; er wurde einmal direkt abgerufen
+(unten).
+
+Wortlaut von § 12 Abs. 1 (S. 6): „Die Länder bestimmen im Rahmen der Grenzen des Artikels 28 Absatz 2 des Grundgesetzes
+diejenigen öffentlichen Stellen, die für die Gebiete der Gemeinden und Kreise jeweils ein Klimaanpassungskonzept – soweit
+nicht bereits vorhanden – aufstellen. Dabei können die Länder bestimmen, dass für das Gebiet einer Gemeinde unterhalb
+einer von den Ländern zu bestimmenden Größe kein Klimaanpassungskonzept aufgestellt werden muss, solange dieses Gebiet
+durch ein Klimaanpassungskonzept für das Gebiet eines Kreises abgedeckt ist. Länder, die von Satz 2 keinen Gebrauch
+machen, können bestimmen, dass für das Gebiet von Kreisen kein Klimaanpassungskonzept aufgestellt werden muss.“
+Art. 28 Abs. 2 Satz 1 und 2 GG: „Den Gemeinden muß das Recht gewährleistet sein, alle Angelegenheiten der örtlichen
+Gemeinschaft im Rahmen der Gesetze in eigener Verantwortung zu regeln. Auch die Gemeindeverbände haben im Rahmen ihres
+gesetzlichen Aufgabenbereiches nach Maßgabe der Gesetze das Recht der Selbstverwaltung.“
+
+Im Produkt wurden die vier Belege der Zeile vollständig gelesen: `docs/KANG_ZUSTAENDIGKEIT_LAENDER.md`,
+`backend/app/data/kang_zustaendigkeit.py`, `backend/app/api/routes/kommune.py` und
+`frontend/src/components/dashboard/KangZustaendigkeit.tsx`. Dazu die Stellen, die sie weiterverwenden (Grep über
+`backend/app` und `frontend/src`, keine weiteren Nutzer): in `frontend/src/api/client.ts` die Schnittstelle
+`KangZustaendigkeit` (Werte von `pflicht`: `ja`, `nein`, `keine Bestimmung getroffen`, `unbekannt`) und
+`getKangZustaendigkeit`, in `frontend/src/components/dashboard/KommuneHeader.tsx` die Einbindung in den Kommunenkopf
+(Zeile 178). Aus `backend/app/models/models.py` nur die Felder `landkreis` (bei kreisfreien Städten leer, Zeile 39–40)
+und `population` (Zeile 44) des Modells `Kommune`. Ausgeführt wurde nichts. Stand beim Lesen: 16 Länder, davon 5 mit
+Bestimmung (Baden-Württemberg, Mecklenburg-Vorpommern, Niedersachsen, Sachsen-Anhalt, Schleswig-Holstein) und 11 mit
+„keine Bestimmung getroffen“, alle mit Stand 23.09.2026. Die Route `get_kommune_kang_zustaendigkeit()` lädt von der
+Kommune nur `id` und `bundesland` und gibt den Eintrag des Landes unverändert zurück.
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | „Die Länder bestimmen … diejenigen öffentlichen Stellen, die … ein Klimaanpassungskonzept … aufstellen.“ | S. 6, § 12 Abs. 1 Satz 1 | `KANG_ZUSTAENDIGKEIT_LAENDER.md`, Tabelle und Abschnitt „Belege je Land“; `kang_zustaendigkeit.py`, `ZUSTAENDIGKEIT` (16 Länder mit Rechtsgrundlage, Fundstelle, zuständiger Stelle, Pflicht und Stand) und `zustaendigkeit_fuer()`; `kommune.py`, `get_kommune_kang_zustaendigkeit()`; `KangZustaendigkeit.tsx` (Anzeige im Kommunenkopf mit Link auf die Fundstelle) | trägt teilweise |
+| A2 | „… für die Gebiete der Gemeinden und Kreise jeweils …“ | S. 6, § 12 Abs. 1 Satz 1 | `kommune.py`, `get_kommune_kang_zustaendigkeit()` (liest nur `bundesland`); `KangZustaendigkeit.tsx`, `pflichtText()`; Feld `zustaendige_stelle` als Freitext | trägt teilweise |
+| A3 | „… im Rahmen der Grenzen des Artikels 28 Absatz 2 des Grundgesetzes …“ | S. 6, § 12 Abs. 1 Satz 1 | `KANG_ZUSTAENDIGKEIT_LAENDER.md`, Zweck und Erläuterung zu `keine Bestimmung getroffen`; `zustaendigkeit_fuer()` (Pflicht nur aus einer Landesnorm); Hinweis „Abbildung der Rechtslage, keine Rechtsauskunft“ in Dokument, Modul und Anzeige | trägt |
+| A4 | „… ein Klimaanpassungskonzept – soweit nicht bereits vorhanden – aufstellen.“ | S. 6, § 12 Abs. 1 Satz 1 | keiner. Weder Dokument noch Modul, Route oder Anzeige erfassen, ob für das Gebiet einer Kommune oder ihres Kreises schon ein Konzept vorliegt; Grep über `backend/app` und `frontend/src` ohne Treffer. | trägt nicht |
+| A5 | „Dabei können die Länder bestimmen, dass für das Gebiet einer Gemeinde unterhalb einer von den Ländern zu bestimmenden Größe kein Klimaanpassungskonzept aufgestellt werden muss, solange dieses Gebiet durch ein Klimaanpassungskonzept für das Gebiet eines Kreises abgedeckt ist.“ | S. 6, § 12 Abs. 1 Satz 2 | `ZUSTAENDIGKEIT`, Eintrag Schleswig-Holstein, Feld `zustaendige_stelle` (Freitext „Gemeinden unter 100.000 Einwohnern ohne eigene Pflicht, wenn ein Kreiskonzept erstellt wird“) | trägt teilweise |
+| A6 | „Länder, die von Satz 2 keinen Gebrauch machen, können bestimmen, dass für das Gebiet von Kreisen kein Klimaanpassungskonzept aufgestellt werden muss.“ | S. 6, § 12 Abs. 1 Satz 3 | `ZUSTAENDIGKEIT`, Feld `zustaendige_stelle` der fünf Länder mit Bestimmung (überall sind Landkreise oder Kreise bestimmt); `KANG_ZUSTAENDIGKEIT_LAENDER.md`, Wortlaut je Land unter „Belege je Land“ | trägt |
+
+**Begründung je Urteil:**
+
+- A1: Für alle 16 Länder steht, ob und durch welche Landesnorm die Stellen bestimmt sind. Für die fünf Länder mit
+  Bestimmung ist die Norm genannt und im Wortlaut oder in enger Wiedergabe belegt, für Sachsen-Anhalt nach der
+  angenommenen Beschlussempfehlung, nicht nach der verkündeten Fassung. Von den elf Ländern ohne Bestimmung ist der
+  Befund für Berlin am Gesetz und seiner Begründung belegt, für Nordrhein-Westfalen und Sachsen an abgerufenen Seiten. Für
+  die übrigen acht (Bayern, Brandenburg, Bremen, Hamburg, Hessen, Rheinland-Pfalz, Saarland, Thüringen) beruht er nur auf
+  Suchergebnissen, die laut „Belege je Land“ nicht einzeln abgerufen wurden; die Landesrecht-Portale wurden nicht
+  durchsucht (Kopf des Dokuments, „Erhebungsweg“). Das Dokument sagt das richtig („In der Erhebung wurde keine geltende
+  Landesnorm gefunden“); die Anzeige macht daraus „Pflicht: keine Landesbestimmung“, also eine Feststellung. Der Stand
+  23.09.2026 wird von Hand gepflegt; für Nordrhein-Westfalen erwartet das Dokument selbst ein Landesgesetz im Herbst 2026
+  (Abschnitt „Anhängige Entwürfe“).
+- A2: § 12 Abs. 1 verlangt die Stelle je Gebiet einer Gemeinde und eines Kreises. Das Produkt zeigt im Kopf jeder
+  Kommune die Regel ihres Landes im Wortlaut der Spalte „Zuständige Stelle“, ordnet die Kommune aber keiner Stelle zu:
+  Die Route liest nur das Bundesland, und in den fünf Ländern mit Bestimmung steht bei jeder Kommune „Pflicht: ja“. Nach
+  den eigenen Einträgen ist für viele dieser Kommunen der Kreis zuständig, nicht die Gemeinde: in Niedersachsen für die
+  kreisangehörigen Gemeinden außer Hannover und Göttingen, in Sachsen-Anhalt für alle kreisangehörigen Gemeinden, in
+  Baden-Württemberg für die kreisangehörigen Gemeinden ohne Große Kreisstädte, in Mecklenburg-Vorpommern für die
+  Gemeinden außer den kreisfreien und großen kreisangehörigen Städten. Das Dokument meint mit `Pflicht` die Pflicht der
+  bestimmten Stelle; der Kopfkommentar der Anzeige verspricht aber zu zeigen, „ob die Kommune … ein
+  Klimaanpassungskonzept aufstellen muss“, und das Dokument, es bilde „je Kommune die zuständige Stelle ab“. Das Feld
+  `landkreis` (leer bei kreisfreien Städten) würde die Unterscheidung kreisfrei oder kreisangehörig erlauben; die Route
+  nutzt es nicht. Ob eine Gemeinde Große Kreisstadt oder große kreisangehörige Stadt ist, führt das Produkt nicht.
+- A3: Art. 28 Abs. 2 GG sichert Gemeinden und Gemeindeverbänden die Selbstverwaltung im Rahmen der Gesetze; die Grenze
+  bindet das Land, wenn es Stellen bestimmt, nicht ein Werkzeug, das die Bestimmung abbildet. Das Produkt leitet eine
+  Pflicht nur aus einer Landesnorm ab und setzt keine, wo das Land nichts bestimmt hat. Ob eine Landesnorm die Grenze
+  wahrt, beurteilt es nicht und sagt das („keine Rechtsauskunft“). Art. 28 GG nennt es nirgends (Grep über
+  `backend/app`, `frontend/src` und die Belegdateien ohne Treffer); für die Abbildung ist das nicht nötig.
+- A4: „soweit nicht bereits vorhanden“ nimmt Gebiete aus, für die schon ein Klimaanpassungskonzept besteht. Das Produkt
+  zeigt „Pflicht: ja“, ohne zu wissen, ob die Kommune oder ihr Kreis schon ein Konzept hat. Eine Quelle dafür nennt das
+  Gesetz selbst: Nach § 11 Abs. 1 Satz 1 (S. 6) berichten die Länder dem Bund ab dem 30.09.2024 alle zwei Jahre, in
+  welchen Gemeinden und Kreisen Klimaanpassungskonzepte vorliegen und in welchen nicht.
+- A5: Nach den Einträgen macht nur Schleswig-Holstein von Satz 2 Gebrauch (Grenze 100.000 Einwohner). Die Ausnahme steht
+  als Freitext in der Anzeige, wird aber nicht auf die Kommune angewandt, obwohl das Modell die Einwohnerzahl führt: Eine
+  Gemeinde mit 5.000 Einwohnern in Schleswig-Holstein sieht „Pflicht: ja“. Ob die Bedingung erfüllt ist („solange …
+  abgedeckt“), also ein Kreiskonzept vorliegt, erfasst das Produkt ebenso wenig wie in A4. Mecklenburg-Vorpommern
+  beschränkt die Pflicht auf Landkreise und bestimmte Städte und empfiehlt den übrigen Gemeinden vereinfachte Konzepte
+  (§ 24 Abs. 2 KlVG M-V); auch das steht nur als Freitext da.
+- A6: Keines der fünf Länder mit Bestimmung nimmt die Kreise aus; alle bestimmen Landkreise oder Kreise als Stelle, unter
+  „Belege je Land“ im Wortlaut belegt (für Niedersachsen in Wiedergabe). Für die Abbildung gibt es damit heute nichts
+  weiter zu tragen. Eine künftige Ausnahme ließe sich nur als Freitext im Feld `zustaendige_stelle` eintragen, nicht als
+  eigene Angabe; das wiegt erst, wenn ein Land davon Gebrauch macht.
+
+Nicht als eigene Anforderung gewertet: § 12 Abs. 2 bis 7 (S. 6), die Ziel, Grundlage, Inhalte, Nachbarschaft, zu
+berücksichtigende Planungen und Förderung der Konzepte regeln und außerhalb der Fundstelle der Zeile liegen (Abs. 3 ist
+Fundstelle der Zeile 15); § 11 Abs. 1 (S. 6), eine Berichtspflicht der Länder, nur in der Begründung zu A4 herangezogen;
+§ 10 Abs. 6 (S. 5) mit derselben Wendung „soweit nicht bereits vorhanden“, die dort die Landesstrategien betrifft.
+
+**Gelesene Seiten und Abschnitte:**
+
+- Inventar mit `python3 /home/basti/overlord/overlord/skripte/dokumente.py inventar` (7 Seiten; keine Gliederung,
+  Abbildungen oder Tabellen erkannt). Ein Inhaltsverzeichnis hat die Datei nicht; die Gliederung (Abschnitte 1 bis 5,
+  §§ 1 bis 14) wurde aus dem Text gelesen.
+- Text S. 1–7 ganz, damit § 12 Abs. 1 bis 7 auf S. 6 vollständig. Kapitelgrenzen geprüft: Abschnitt 4 „Klimaanpassung
+  durch die Länder“ (§§ 9 bis 12) beginnt auf S. 4; § 12 beginnt auf S. 6 nach § 11 und endet dort mit Abs. 7; S. 7
+  beginnt mit Abschnitt 5 und § 13. Die einzige Fußnote der Datei („Textnachweis ab: 1.7.2024“, S. 1) gelesen. Keine
+  Seite als Bild angesehen, weil die Datei weder Tabellen noch Abbildungen enthält.
+- Art. 28 GG: https://www.gesetze-im-internet.de/gg/art_28.html, abgerufen am 07.10.2026 um 13:53:20 UTC mit
+  `seite_lesen.py` (HTTP 200, SHA-256 `ebcff3374b076c100021674f4687cb77775b2784808e3a993d378d8e131e10a9`), Abs. 1 bis 3
+  ganz.
+- Belegdateien vollständig: `docs/KANG_ZUSTAENDIGKEIT_LAENDER.md` (227 Zeilen), `backend/app/data/kang_zustaendigkeit.py`
+  (141 Zeilen), `backend/app/api/routes/kommune.py` (505 Zeilen), `frontend/src/components/dashboard/KangZustaendigkeit.tsx`
+  (69 Zeilen). Dazu die oben genannten Stellen in `client.ts`, `KommuneHeader.tsx` und `models.py`.
+
+**Nicht gelesen:** die Landesnormen selbst und die Textabbilder unter `docs/quellen/kang-laender/`;
+`backend/tests/test_kang_zustaendigkeit.py` und `backend/tests/test_kang_zustaendigkeit_doku.py`; `KommuneHeader.tsx`
+und `models.py` über die genannten Zeilen hinaus; die Gesetzesbegründung (Bundestags-Drucksache), die amtliche Fassung
+im Bundesgesetzblatt und Kommentarliteratur zu Art. 28 Abs. 2 GG.
+
+**Schluss:** Zeile 14 bleibt nicht `erfüllt`. Von 6 Anforderungen trägt der Bestand zwei voll (A3, A6), drei teilweise
+(A1, A2, A5) und eine nicht (A4). Zur Frage der Gegenprobe: Die Übersicht der 16 Länder trägt die Abbildung der
+Landesregeln, für acht Länder ohne Bestimmung aber nur auf nicht abgerufene Suchtreffer gestützt. Für die einzelne
+Kommune zeigt das Produkt die Regel des Landes, nicht die zuständige Stelle: Es unterscheidet nicht Gemeinde und Kreis,
+wendet die Größengrenze nicht an und weiß nicht, ob schon ein Konzept vorliegt; „Pflicht: ja“ erscheint deshalb auch bei
+Kommunen, die nach Landesrecht kein eigenes Konzept aufstellen. Der Status der Zeile 14 ist in derselben Änderung auf
+`teilweise` gesetzt; die Spalte „Lücke“ nennt, was fehlt, `backend/tests/test_konformitaet_zeile14.py` verlangt Status
+und Lücke neu, und `backend/app/data/konformitaet_kundentext.py` führt den Kundensatz. Die Zählungen in den Abschnitten
+„Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist Sache der
+Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
 
 ## Ergebnis
 
