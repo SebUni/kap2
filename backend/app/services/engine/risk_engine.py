@@ -133,6 +133,41 @@ def cost_from_outcome(risk: dict, outcome: float) -> float:
     return outcome * rate
 
 
+UV_RISK_CODE = "EXPECTED_ANNUAL_UV_YLL"
+_UV_BEHANDLUNG = (("cases_melanoma", "c_fall_mm"), ("cases_c44", "c_fall_c44"))
+
+
+def _uv_behandlungskosten_satz(key: str) -> float:
+    """Behandlungskosten je Fall (``c_fall_mm`` / ``c_fall_c44``) mit Override-Vorrang.
+
+    Vorgabewert und Override-Schlüssel (``risks.<UV>.impact.<key>``) sind dieselben wie in
+    ``health.uv_yll`` (Registry-Spec in ``impact.params``); es gibt keine zweite Stelle für den Satz.
+    """
+    from app.services.engine.impact import params  # lazy: Zyklus impact→risk_engine vermeiden
+    default = next(float(s["value"]) for s in params.IMPACT_PARAM_SPECS
+                   if s["risk"] == UV_RISK_CODE and s["key"] == key)
+    v = override_context.get_override(f"risks.{UV_RISK_CODE}.impact.{key}", default)
+    return float(default if v is None else v)
+
+
+def cost_from_cell_entry(risk: dict, outcome: float, entry: dict | None = None) -> float:
+    """Kosten eines gespeicherten Zelleintrags — DIE gemeinsame Grundlage von ``aggregate``
+    und ``measure_service._cell_cost`` (Maßnahmen-Nutzen = Aggregat-Delta).
+
+    Outcome × Kostensatz wie ``cost_from_outcome``. Für UV-Schädigungen (#98) kommen die
+    Behandlungskosten der Zusatzfälle hinzu (Bericht #98, Ebene 10):
+    ``cases_melanoma · c_fall_mm + cases_c44 · c_fall_c44``. Fehlen die Fallschlüssel
+    (Alt-Zelle), bleibt es beim Outcome-Anteil.
+    """
+    cost = cost_from_outcome(risk, outcome)
+    if risk["code"] == UV_RISK_CODE and entry:
+        for cases_key, rate_key in _UV_BEHANDLUNG:
+            cases = entry.get(cases_key)
+            if cases:
+                cost += float(cases) * _uv_behandlungskosten_satz(rate_key)
+    return cost
+
+
 def estimate_outcome_and_cost(risk: dict, agg_index: float, total_pop: float, area_km2: float) -> dict:
     """Outcome + Kosten für ein Risiko aus einem AGGREGIERTEN Index (P90).
 
@@ -235,8 +270,9 @@ def aggregate(cell_data_list: list[dict], total_pop: float, area_km2: float) -> 
             # Kosten LIVE aus dem gespeicherten Outcome monetarisieren (statt das beim Lauf
             # materialisierte cost_eur zu summieren), damit Kostensatz-Overrides
             # (risks.*.cost_per_outcome) ohne Neuberechnung wirken (§8/B2). Monetäre
-            # Risiken: cost == outcome; nicht-monetäre: outcome × effektiver Kostensatz.
-            c = cost_from_outcome(risk, o)
+            # Risiken: cost == outcome; nicht-monetäre: outcome × effektiver Kostensatz;
+            # UV (#98): zusätzlich die Behandlungskosten der Zusatzfälle (Ebene 10).
+            c = cost_from_cell_entry(risk, o, r)
             sum_outcome[code] = sum_outcome.get(code, 0.0) + o
             sum_cost[code] = sum_cost.get(code, 0.0) + c
             weights_by_code.setdefault(code, []).append(c if c else o)

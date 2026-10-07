@@ -101,6 +101,11 @@ def build_cell_risks(indices: dict[str, float], impacts: dict[str, dict]) -> dic
         for key in ("cases_melanoma", "cases_c44"):
             if key in imp:
                 risks[code][key] = round(imp[key], 6)
+        # Bewerteter Schaden und YLL je Entität (#98 §5): Eingabe des Hebels S155
+        # (measure_service._s155_cell_effect); ohne sie meldet jede frisch gerechnete Zelle den Vermerk.
+        for key in ("eur_mm", "eur_c44", "yll_mm", "yll_c44"):
+            if key in imp:
+                risks[code][key] = round(imp[key], 6)
         # Roheingaben der Aeroallergene-Zellrechnung (#96 §5.1): Basis für den
         # Zelllauf-Zweig S158 (measure_service._s158_cell_factor), der die
         # Gruppentage je Zelle frisch aus diesen Werten bildet, statt die

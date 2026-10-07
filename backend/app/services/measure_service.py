@@ -71,8 +71,9 @@ def _cell_cost(risk: dict, cell_risk: dict, cell_pop: float) -> float:
     """Zellkosten eines Risikos – identische Basis wie ``risk_engine.aggregate``.
 
     Kosten werden LIVE aus dem gespeicherten ``outcome`` × aktuellem Kostensatz
-    abgeleitet (``cost_from_outcome``), NICHT aus dem materialisierten ``cost_eur``
-    gelesen — so wirken Kostensatz-Overrides ohne Neuberechnung, und die Reconciliation
+    abgeleitet (``risk_engine.cost_from_cell_entry``: Outcome × Kostensatz, für UV
+    zusätzlich die Behandlungskosten der Zusatzfälle), NICHT aus dem materialisierten
+    ``cost_eur`` gelesen — so wirken Kostensatz-Overrides ohne Neuberechnung, und die Reconciliation
     (Maßnahmen-Nutzen == Aggregat-Delta) bleibt exakt, weil ``aggregate`` dieselbe
     Ableitung nutzt (§8/B2). Für Alt-Zelldaten ohne Outcome (Kommune vor Neuberechnung)
     den Outcome über den linearen Legacy-Weg nachrechnen.
@@ -81,7 +82,21 @@ def _cell_cost(risk: dict, cell_risk: dict, cell_pop: float) -> float:
     if o is None:
         idx = float(cell_risk.get("index", 0.0))
         o = impact.compute_cell_impacts(risk, idx, cell_pop)["outcome"]
-    return risk_engine.cost_from_outcome(risk, float(o))
+    return risk_engine.cost_from_cell_entry(risk, float(o), cell_risk)
+
+
+def _scaled_cell_entry(r: dict, factor: float) -> dict:
+    """Gespeicherter Zelleintrag eines Risikos, mit ``factor`` skaliert (ohne Datenbank).
+
+    Index, ``outcome`` und ``cost_eur`` skalieren mit demselben Faktor; ebenso die Zusatzfälle
+    ``cases_melanoma`` und ``cases_c44`` (UV, #98): ``risk_engine.cost_from_cell_entry`` bildet
+    daraus die Behandlungskosten, die sonst im Aggregat mit Maßnahmen wegfielen.
+    """
+    entry = {"index": float(r.get("index", 0.0)) * factor}
+    for key in ("outcome", "cost_eur", "cases_melanoma", "cases_c44"):
+        if key in r:
+            entry[key] = float(r[key]) * factor
+    return entry
 
 
 def _coverage(db: Session, measure: AdaptationMeasure) -> tuple[dict[int, float], float]:
@@ -1960,18 +1975,13 @@ def _adjusted_cell_data(db: Session, kommune_id: int, apply_measures: bool,
         cell_factors = factors.get(cid, {})
         for code, r in risks.items():
             factor = cell_factors.get(code, 1.0)
-            entry = {"index": float(r.get("index", 0.0)) * factor}
             # Der Maßnahmen-Faktor mindert den Screening-Index; die Schicht-B-Outcomes
             # hängen zwar an der Hazard-Intensität (nicht direkt am Index), werden hier
             # aber bewusst PROPORTIONAL zum Index-Faktor skaliert — die pragmatische
             # Brücke zwischen index-basierter Maßnahmenwirkung und der Kostenschicht
             # (bewusste Vereinfachung, keine „lineare Legacy-Rechnung"). aggregate()
             # summiert die Zell-Werte und leitet die Kosten live aus dem Outcome ab.
-            if "outcome" in r:
-                entry["outcome"] = float(r["outcome"]) * factor
-            if "cost_eur" in r:
-                entry["cost_eur"] = float(r["cost_eur"]) * factor
-            new_data["risks"][code] = entry
+            new_data["risks"][code] = _scaled_cell_entry(r, factor)
         # Folgekosten (indirekt/Restaurierung) aus den NEUEN direkten Sektorschäden neu
         # bilden, sonst bliebe indirekt = k·Σ direkt VOR den Maßnahmen stehen (§8/B3).
         _reconsolidate_cell_folgekosten(new_data["risks"])
