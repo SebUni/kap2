@@ -1876,6 +1876,18 @@ parameter:
   endpunkt: mortalitaet
   kennzeichnung: abschaetzung_kap3   # 18 veroeffentlichte kommunale Hitzeaktionsplaene bundesweit am 10.06.2024, 4 von 53 Kreisen und kreisfreien Staedten in NRW im Oktober 2023 [76]; erwarteter Fehler Berlin-Groesse mit nein hoechstens 0,9 Mio. EUR, mit ja mindestens 10,8 Mio. EUR (§5, Log 47)
   abgeleitet_aus: []
+parameter:
+  id: heat.sigma_k
+  wert: 0.58   # Streuung der Waermeinsel-Feinstruktur unter 1 km um den Rasterwert, gerundet aus 0,577 K (§3.0 (d))
+  einheit: "K"
+  band: null   # Wirkung σ 0 → 0,58 K in §3.0 (d): Berlin × 1,028, Warmsen × 1,048
+  herkunft: herleitung:§4   # Absatz "Modellrechnung mit der Streuung σ = 0,58 K" (§4, Fortschreibungsvermerk kommunale Stichproben-Abgleiche)
+  quelle: null   # Setzung von KAP3, keine externe Quelle fuer die Spanne ± 1 K
+  preisstand: null
+  bandzuordnung: [u65, 65-74, 75-84, 85+]
+  endpunkt: mortalitaet
+  kennzeichnung: abschaetzung_kap3   # Spanne ± 1 K, Gleichverteilung, 2/√12 = 0,577 K, gerundet (Befund 181)
+  abgeleitet_aus: []
 ```
 
 ```python test: s157_berlin

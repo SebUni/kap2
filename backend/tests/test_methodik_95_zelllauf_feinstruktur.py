@@ -151,6 +151,26 @@ def test_sigma_nicht_als_text_im_backend():
     assert {t[0] for t in treffer} <= {os.path.join("services", "engine", "impact", "health.py")}, treffer
 
 
+def test_registry_und_kalibrierskript_lesen_sigma_aus_health():
+    """Block ``heat.sigma_k`` (Kapitel 7): Der Registry-Eintrag liest ``health.SIGMA_K``; das
+    Kalibrierskript Rev. 7 hat keinen eigenen Zahlwert für σ."""
+    from app.services import parameter_registry
+
+    eintraege = [p for p in parameter_registry.catalog_parameters()
+                 if p.get("methodik_block") == "heat.sigma_k"]
+    assert len(eintraege) == 1, eintraege
+    p = eintraege[0]
+    assert p["value"] == H.SIGMA_K and p["unit"] == "K" and p["evidence_class"] == "abgeschaetzt"
+    assert p["editable"] is False       # die Stützstellen entstehen einmal beim Laden von health.py
+
+    skript = os.path.join(os.path.dirname(__file__), "..", "scripts", "kalibrierung",
+                          "calibrate_heat_mortality_rev7.py")
+    with open(skript, encoding="utf-8") as fh:
+        text = fh.read()
+    assert "uhi_sigma=SIGMA_K" in text
+    assert not re.search(r"uhi_sigma\s*=\s*\d", text) and not re.search(r"\b0[.,]58\s*K\b", text)
+
+
 def test_bericht_nennt_sigma_aus_dem_code(monkeypatch):
     from app.services.ergebnisbericht import teile
 
