@@ -17,7 +17,10 @@ Läuft mit pytest oder direkt: ``python tests/test_impact_health.py``.
 
 from __future__ import annotations
 
+import math
 from math import exp
+
+import numpy as np
 
 from app.data import catalog, catalog_parked
 from app.data import germany_health_reference as ghr
@@ -106,12 +109,17 @@ def test_mortality_matches_hand_calc():
     region = "mitte"
     thr, b85 = H.REGION_THRESHOLD[region], H.REGION_BETA_85P[region]
     temps = H.weekly_temperatures(19.0, region)
+    # Feinstruktur σ = 0,58 K (Bericht #95 §3.0 Wirkung (d)): Mittel der Wochenkurve über
+    # T + √2·σ·x_k mit Gewicht w_k/√π (Gauß-Hermite, 21 Punkte), hier unabhängig ausgeschrieben.
+    xs, ws = np.polynomial.hermite.hermgauss(21)
     exp_deaths, exp_yll = 0.0, 0.0
     for band in H.AGE_BANDS:
         pop_a = _bands(100_000.0)[band]
         m_a = ghr.BASELINE_MORTALITY_PER_100K[band]
         beta = b85 * H.AGE_BETA_FACTOR[band]
-        exc = sum(exp(beta * max(0.0, t - thr)) - 1.0 for t in temps)
+        exc = sum(w / math.sqrt(math.pi) * sum(
+            exp(beta * max(0.0, t + math.sqrt(2) * 0.58 * x - thr)) - 1.0 for t in temps)
+            for x, w in zip(xs, ws))
         # v_vers = 1 (keine Zellwerte für q_1P/q_pfl → Bundesmittel, §3.3)
         d_a = 0.581 * pop_a * (m_a / 100_000.0) * (1 / 52) * exc
         exp_deaths += d_a

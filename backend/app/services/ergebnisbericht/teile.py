@@ -91,6 +91,13 @@ def _stand(d: Berichtsdaten) -> str:
     return f'<p class="stand">{_h(d.stand.zeile())}</p>\n'
 
 
+def _sigma_text() -> str:
+    """Feinstruktur σ des Zelllaufs mit Dezimalkomma und Einheit Kelvin, gelesen aus ``health.SIGMA_K``."""
+    from app.services.engine.impact.health import SIGMA_K
+
+    return f"{SIGMA_K:.2f}".replace(".", ",") + " K"
+
+
 def _betrag(d: Berichtsdaten, wert: float) -> str:
     """Euro-Betrag als ``<span class="betrag">`` mit Berichts-, Methodik- und Datenstand.
 
@@ -653,7 +660,7 @@ def teil_8(d: Berichtsdaten) -> str:
         "Kostensatz je Krankenhausfall: Durchschnitt aller Krankenhausfälle als Ersatz, weil ein "
         "Satz für hitzebedingte Einweisungen nicht veröffentlicht ist (ausgewiesene Abschätzung "
         "von KAP3, Teil 7).",
-        "Temperatur je Zelle: Rasterwert 1 km mit einer Feinstruktur von 0,58 K darunter; lokale "
+        f"Temperatur je Zelle: Rasterwert 1 km mit einer Feinstruktur von {_sigma_text()} darunter; lokale "
         "Wärmeinseln einzelner Straßenzüge sind darin nur gemittelt enthalten.",
         "Zeitraum: Klima der Sommer 2016–2025; die Projektion bis 2065 ist nicht Teil dieses "
         "Betrags.",

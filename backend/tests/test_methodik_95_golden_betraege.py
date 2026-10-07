@@ -16,8 +16,8 @@ Gerechnet wird mit dem Produkt: Altersbänder je Zelle aus ``zensus_loader.apply
 
 Wie im Zelllauf des Berichts (Wirkung (d) in §3.0) gilt je Zelle der Rasterwert des Sommermittels mit
 einer Feinstruktur σ = 0,58 K darunter, Gauß-Hermite mit 21 Punkten; sie wirkt nur auf die Mortalität.
-Die Wärmeinsel-Abweichung aus OSM, mit der das Produkt diese Feinstruktur im Betrieb rechnet, ist nicht
-Teil der gepinnten Daten.
+Die Wärmeinsel-Abweichung aus OSM, die das Produkt im Betrieb je Zelle zusätzlich auf den Rasterwert
+setzt (Mittelwertverschiebung, keine Streuung innerhalb der Zelle), ist nicht Teil der gepinnten Daten.
 
 Gemessen (26.09.2026): Das Produkt lädt die Wochenquantile aus ``wochenquantile_region.csv``
 (vier Nachkommastellen) und kommt auf 345,03 Mio. € und 175.116 €. Mit der Tabelle §3.2 des Berichts
@@ -48,13 +48,12 @@ from app.services import zensus_loader as zl  # noqa: E402
 from app.services.engine import override_context  # noqa: E402
 from app.services.engine.impact import health as H  # noqa: E402
 from app.services.engine.impact.base import CellContext  # noqa: E402
-from app.services.ergebnisbericht.beispiel import SIGMA_K  # noqa: E402,F401  (einzige Stelle von σ)
+from app.services.engine.impact.health import GH_PUNKTE, SIGMA_K  # noqa: E402,F401  (einzige Stelle von σ)
 
 KALIB = os.path.join(os.path.dirname(__file__), "..", "data", "kalibrierung")
 MORT, MORB = "EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY"
 BANDS = ("u65", "a65_74", "a75_84", "a85p")
 SPALTEN65 = ("a65bis69", "a70bis74", "a75bis79", "a80bis84", "a85bis89", "a90undaelter")
-GH_PUNKTE = 21           # Gauß-Hermite wie docs/methodik/anlagen/95_zellvergleich.py
 
 BERLIN, WARMSEN = "11000000", "03256034"
 LAND = {BERLIN: "Berlin", WARMSEN: "Niedersachsen"}
@@ -118,7 +117,7 @@ def _jahresbetrag(ags: str) -> float:
                 hev={"hazards": {"HEAT_WAVE": hd}, "exposures": {}, "vulnerabilities": {}},
                 hev_norm={"hazards": {}, "exposures": {}, "vulnerabilities": {}},
                 indices={}, regional=regional)
-        yll += sum(w * H.mortality(mort_risk, ctx(t + math.sqrt(2) * SIGMA_K * x))["outcome"]
+        yll += sum(w * H.mortality_punkt(mort_risk, ctx(t + math.sqrt(2) * SIGMA_K * x))["outcome"]
                    for x, w in zip(xs, ws)) / math.sqrt(math.pi)
         faelle += H.morbidity(morb_risk, ctx(t))["outcome"]
     return (yll * catalog.risk_default_cost_per_outcome(mort_risk)
@@ -157,7 +156,7 @@ def test_warmsen_jahresbetrag():
 
 
 def test_sigma_wie_im_bericht():
-    """σ steht im Code nur in ergebnisbericht/beispiel.py; hier wird sie mit dem Bericht verglichen
+    """σ steht im Code nur in engine/impact/health.py (``SIGMA_K``); hier wird sie mit dem Bericht verglichen
     (§3 „Streuung σ = … K um den Rasterwert“), nicht ein zweites Mal als Zahl geführt."""
     pfad = os.path.join(os.path.dirname(__file__), "..", "..", "docs", "methodik", "95_hitzebelastung.md")
     with open(pfad, encoding="utf-8") as fh:
