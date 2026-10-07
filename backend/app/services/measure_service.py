@@ -609,9 +609,15 @@ def _is_s155(mdef: dict) -> bool:
 
 def _s155_cell_effect(mdef: dict, frac: float, cell_risk: dict
                       ) -> tuple[float, tuple[float, float] | None, bool]:
-    """(Faktor auf die YLL, (€ MM, € C44) vermieden, fehlende Entitätswerte) einer Zelle durch S155.
+    """(Faktor auf die Zelle, (€ MM, € C44) vermieden, fehlende Entitätswerte) einer Zelle durch S155.
 
-    Der Faktor wirkt auf das Outcome (YLL) der Zelle: ``1 − Σ_e BAF_e · h · frac · YLL_e / YLL``.
+    Der Faktor ist der **Euro-Anteil**, der in der Zelle bleibt: ``1 − Σ_e W_e / Zellkosten``,
+    mit ``W_e = BAF_e · h · frac · €_e`` (Bericht #98 §5, Ebene 10: bewerteter Schaden je
+    Entität = verlorene Lebensjahre × VOLY plus Behandlungskosten je Fall) und den Zellkosten
+    aus ``risk_engine.cost_from_cell_entry``. Damit bewertet der Aggregatweg
+    (``Zellkosten · (1 − Faktor)``) die vermiedenen Fälle je Krebsart wie der Bericht; ein Faktor
+    nach Lebensjahren allein (``Σ_e BAF_e · h · YLL_e / YLL``) gewichtete Krebsarten und
+    Behandlungskosten anders (T-1861-ceo, Messung Berlin: −17,3 %).
     Die Euro-Wirkung je Entität kommt aus ``health.s155_wirkung_je_entitaet`` (volle
     Wirkung, ohne Zeitbezug) auf den gespeicherten Schaden je Entität der Zelle
     (``eur_mm``, ``eur_c44``). Fehlen diese (Alt-Zelle vor der Neuberechnung) bei
@@ -634,11 +640,14 @@ def _s155_cell_effect(mdef: dict, frac: float, cell_risk: dict
     baf_mm, baf_c44 = _p("baf_mm", 0.60), _p("baf_c44", 1.675)
     h = float(mdef.get("default_reduction") or 0.0) * min(1.0, float(frac))
     eur = health.s155_wirkung_je_entitaet(float(eur_mm), float(eur_c44), h, baf_mm, baf_c44)
-    total_yll = float(yll_mm) + float(yll_c44)
-    if total_yll <= 0.0:
+    outcome = cell_risk.get("outcome")
+    if outcome is None:
+        outcome = float(yll_mm) + float(yll_c44)
+    zellkosten = risk_engine.cost_from_cell_entry(
+        catalog.RISKS_BY_CODE[UV_RISK_CODE], float(outcome), cell_risk)
+    if zellkosten <= 0.0:
         return 1.0, eur, False
-    vermieden = (max(0.0, baf_mm) * h * float(yll_mm) + max(0.0, baf_c44) * h * float(yll_c44))
-    return max(0.0, min(1.0, 1.0 - vermieden / total_yll)), eur, False
+    return max(0.0, min(1.0, 1.0 - (eur[0] + eur[1]) / zellkosten)), eur, False
 
 
 def _s155_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:

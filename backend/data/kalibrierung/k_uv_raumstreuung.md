@@ -4,7 +4,7 @@ Teil von Anlage [73]. Erzeugt von `backend/scripts/kalibrierung/k_uv_raumstreuun
 
 Gefragt ist, ob die Streuung des Rasterquotienten q = ΔGlobalstrahlung ÷ ΔSonnenscheindauer über die Gemeindepunkte ein räumliches Muster ist oder Schätzrauschen zweier Trends über 26 Jahre. Ein Wert je Kreis verschöbe die Reihenfolge der Kreise auch dann, wenn er nur Rauschen ist; wie stark, misst die Rangtreue. Dass der Bundeswert die Reihenfolge der Kommunen falsch darstellt (Aufgabe §8 E3, Zweig 3 der Festlegung), belegt aber nur ein beständiges Muster; das misst die Zeitstabilität.
 
-**Abweichung vom Lauf vom 01.09.2026.** Die Gemeindepunkte kommen aus `backend/.cache/60_stichprobe/DE_VG250.gpkg`, Ebene `vg250_pk` (10.939 Punkte, Gebietsstand 2026); `backend/data/vg250/` gibt es auf dem Server nicht. Einwohner und 65+-Anteil je Gemeinde kommen aus `backend/data/kalibrierung/zensus2022_demografie_ab65.csv` über `zensus_loader.demografie_zeile_ab65` und `anteil_ab65_gemeinde` mit dem Anteil 2/7 der Gruppe 60–66, der Regel des Produkts (#95 §3.3). Sie ersetzen `backend/data/lite/zensus_gemeinde.json`, das auf dem Server fehlt. Deshalb weicht die Zahl der Punkte vom Lauf vom 01.09.2026 ab (dort 10.853 mit Einwohnerzahl). Ob der Bundeswert trotzdem derselbe ist, prüft Abschnitt 2.
+**Abweichung vom Lauf vom 01.09.2026.** Die Gemeindepunkte kommen aus `backend/.cache/60_stichprobe/DE_VG250.gpkg`, Ebene `vg250_pk` (10.939 Punkte, Gebietsstand 2026); der Lauf liest nicht `backend/data/vg250/`, sondern diese Datei. Einwohner und 65+-Anteil je Gemeinde kommen aus `backend/data/kalibrierung/zensus2022_demografie_ab65.csv` über `zensus_loader.demografie_zeile_ab65` und `anteil_ab65_gemeinde` mit dem Anteil 2/7 der Gruppe 60–66, der Regel des Produkts (#95 §3.3). Sie ersetzen `backend/data/lite/zensus_gemeinde.json`, die der Lauf nicht liest. Deshalb weicht die Zahl der Punkte vom Lauf vom 01.09.2026 ab (dort 10.853 mit Einwohnerzahl). Ob der Bundeswert trotzdem derselbe ist, prüft Abschnitt 2.
 
 ## 1 Punktmengen-Kette
 
@@ -114,7 +114,7 @@ python3 -c "import io,os,urllib.request,zipfile;z=zipfile.ZipFile(io.BytesIO(url
 
 ### Zensus-Gemeindedatei (CSV)
 
-- **Pfad:** `backend/data/kalibrierung/zensus2022_demografie_ab65.csv` (liegt im Repository), Spalten `schluessel, ebene, insgesamt, g60_66, ab67` je Gemeinde und Kreis, Stichtag 15.05.2022. Sie ersetzt hier die Gemeindedatei `backend/data/lite/zensus_gemeinde.json`, die [72] liest und die auf dem Server fehlt (Abschnitt »Eingangsdaten« in `ssd_povw.md`).
+- **Pfad:** `backend/data/kalibrierung/zensus2022_demografie_ab65.csv` (liegt im Repository), Spalten `schluessel, ebene, insgesamt, g60_66, ab67` je Gemeinde und Kreis, Stichtag 15.05.2022. Sie ersetzt hier die Gemeindedatei `backend/data/lite/zensus_gemeinde.json`, die [72] liest; dieser Lauf liest sie nicht, sondern die Zensus-Datei im Repository (Abschnitt »Eingangsdaten« in `ssd_povw.md`).
 - **Herkunft:** Statistische Ämter des Bundes und der Länder, Zensus 2022, Regionaltabelle »Demografie«, Blatt »CSV-Demografie«: https://www.destatis.de/static/DE/zensus/gitterdaten/Regionaltabelle_Demografie.xlsx (abgerufen am 26.09.2026, laut `zensus2022_demografie_ab65.md`).
 - **Lizenz:** Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0), © Statistische Ämter des Bundes und der Länder.
 - **Abrufbefehl** (lädt die Tabelle von destatis.de und überschreibt die Datei an ihrem Pfad):
