@@ -928,12 +928,23 @@ war zu niedrig, genau wie der Kovarianz-Vorbehalt (Befund 67) vermutete.
 Stichproben-Abgleiche** — §3.4-Ressourcen-Regel: ein nationaler
 100-m-Vollraster-Lauf ist als Prüf-/Abgleichinstrument unzulässig (Log 34);
 nicht abnahmerelevant): UHI-Feinstruktur unterhalb der Gemeinde — Konvexitätsbeitrag als
-**Modellrechnung** mit der Streuung σ = 0,58 K (mittelwerttreu; Herleitung wie in Rev. 6 aus der
+**Modellrechnung** mit der Streuung σ = 0,58 K (Anker `#sigma-k`; mittelwerttreu; Herleitung wie in Rev. 6 aus der
 ±1-K-Spanne der Zellabweichungen um das Gebietsmittel, Gleichverteilungsannahme ⇒ σ = 2/√12 =
 0,577 K, auf 0,58 K gerundet; Befund 181). Die Wirkung steht als ein Faktor in §3.0, Wirkung (d)
 (Berlin × 1,028, Warmsen × 1,048; Befund 182) — **keine Messung**;
 der Messpfad „σ aus dem Stadtmodell" gehört zum Stichproben-Abgleich) — sowie
 intra-kommunale Bevölkerungsgewichtung.
+
+**Band der Streuung σ** (Abschätzung von KAP3, Befund 232): Die Spanne ± 1 K ist nicht gemessen, und keine Messung gibt
+eine Richtung vor. Das Band nimmt deshalb die halbe und die anderthalbfache Spanne bei derselben Gleichverteilung:
+± 0,5 K ergibt σ = 1/√12 = 0,29 K, ± 1,5 K ergibt σ = 3/√12 = 0,87 K. Auch eine andere Form der Verteilung bei ± 1 K
+liegt im Band: Liegen die meisten Stellen nahe am Mittel (Dreieck), ist σ = 1/√6 = 0,41 K. Wirkung auf den Betrag,
+gerechnet mit der Anlage `95_zellvergleich.py --ersatz --sigma 0.29` und `--sigma 0.87` (Zelllauf mit Ersatzregel):
+Berlin 337,99 Mio. € und 356,97 Mio. € je Jahr statt 345,11 Mio. € (−2,1 % und +3,4 %), Warmsen 169.125 € und
+185.173 € statt 175.256 € (−3,5 % und +5,7 %), Preisstand 2024. Die Zeile (d) der Anlage zeigt dazu die Wirkung der
+Feinstruktur an den Bandenden: Berlin × 1,007–1,063, Warmsen × 1,011–1,107. Weil die Kurve gekrümmt ist, wächst die
+Wirkung etwa mit dem Quadrat von σ: Die halbe Streuung bringt rund ein Viertel der Wirkung, die anderthalbfache gut das
+Doppelte. Den Faktor bei σ = 0,58 K nennt nur §3.0 (d).
 
 **Kalibrierlauf Rev. 7** (Ergebnis `c_kal_rev7_ergebnis.md` [50]; Produktionsnähe:
 Gemeindepunkt-Temperaturen aus derselben DWD-Rasterfamilie, die das Produkt je Zelle
@@ -1880,8 +1891,8 @@ parameter:
   id: heat.sigma_k
   wert: 0.58   # Streuung der Waermeinsel-Feinstruktur unter 1 km um den Rasterwert, gerundet aus 0,577 K (§3.0 (d))
   einheit: "K"
-  band: null   # Wirkung σ 0 → 0,58 K in §3.0 (d): Berlin × 1,028, Warmsen × 1,048
-  herkunft: herleitung:§4   # Absatz "Modellrechnung mit der Streuung σ = 0,58 K" (§4, Fortschreibungsvermerk kommunale Stichproben-Abgleiche)
+  band: [0.29, 0.87]   # Spanne ± 0,5 K bis ± 1,5 K, Gleichverteilung (§4, Absatz "Band der Streuung σ", Befund 232); Zelllauf mit Ersatzregel Berlin 337,99-356,97 Mio. EUR statt 345,11, Warmsen 169.125-185.173 EUR statt 175.256
+  herkunft: herleitung:#sigma-k   # §4, Absatz "Modellrechnung mit der Streuung σ = 0,58 K" (Wert) und Absatz "Band der Streuung σ" (Band, Wirkung an den Enden)
   quelle: null   # Setzung von KAP3, keine externe Quelle fuer die Spanne ± 1 K
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
