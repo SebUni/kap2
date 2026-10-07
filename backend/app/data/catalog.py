@@ -305,16 +305,35 @@ RISKS: list[dict] = [
      "exposures": ["POPULATION_DENSITY", "AGE_STRUCTURE"],
      "vulnerabilities": ["HEALTHCARE_ACCESS"],
      # Herleitung ref_value (Sanity-Anker, YLL je 100.000 EW): Bundessumme
-     # ≈ 1.580 YLL/Jahr ÷ 83,456 Mio EW × 100.000 ≈ 1,89.
+     # 1.404 YLL/Jahr (Bericht §4, Prüfblock) ÷ 83.456.045 EW × 100.000 = 1,6823,
+     # gerundet auf zwei Stellen 1,68.
      # cost_per_outcome_eur: VOLY 160.800 €₂₀₂₄ wie #95 — ABER der €-Ausweis
      # enthält zusätzlich die Behandlungskosten je Zusatzfall (§3.4); die
      # Schadensfunktion setzt cost_eur deshalb selbst (s. impact/health.py).
-     "ref_value": 1.89, "scale": "pop", "cost_per_outcome_eur": 160800.0,
-     "source": "Bericht #98 Rev. 1 (ZfKD KID 2025 / DWD-SSD / Slaper-BAF)",
+     "ref_value": 1.68, "scale": "pop", "cost_per_outcome_eur": 160800.0,
+     # Kostensatz = Block uv.voly in Kapitel 7 des Berichts #98, Kennzeichnung
+     # abschaetzung_kap3 (VOLY wie heat.voly: Elastizität 0,85 beim Raumtransfer gesetzt).
+     "cost_methodik_block": "uv.voly",
+     "cost_evidence_class": "abgeschaetzt",
+     "cost_evidence_derivation": {
+         "wert": "160.800 €₂₀₂₄ je verlorenem Lebensjahr: wie in #95 aus Amann 2020a "
+                 "Tab. 3.15 (UBA MK 4.0, Fortschreibung P52), auf 2024 hochgerechnet; die "
+                 "Elastizität 0,85 beim Raumtransfer ist eine Setzung von KAP3 (Bericht "
+                 "#98 §3.4, Kapitel 7, Block uv.voly). Der Statistische Wert eines "
+                 "Todesfalls (VSL) bleibt Sensitivität, weil er das Zwei- bis Siebenfache "
+                 "der tatsächlich verlorenen Lebensjahre unterstellte.",
+         "band": "136.400–165.600 €₂₀₂₄ (Bericht #98 Kapitel 7, Block uv.voly).",
+         "sensitivitaet": "Linear: Der Wert der verlorenen Lebensjahre wächst und fällt im "
+                          "gleichen Verhältnis wie VOLY; die Behandlungskosten je Fall "
+                          "und die Zahl der Lebensjahre ändern sich nicht (Bericht #98 "
+                          "§3.4).",
+     },
+     "source": "Bericht #98 (ZfKD KID 2025 / DWD-SSD / Slaper-BAF)",
      "source_detail": "Sanity-Anker in YLL je 100.000 EW: klimaattribuierte "
-        "Zusatzfälle 814 (Melanom) + 20.118 (C44) × Letalität × "
-        "Restlebenserwartung = 1.580 YLL/Jahr bundesweit ⇒ 1,89 je 100.000 EW "
-        "(Bericht §4). Kein Rechenweg — Schicht B rechnet die Schadensfunktion.",
+        "Zusatzfälle 733 (Melanom) + 18.339 (C44) × Letalität × "
+        "Restlebenserwartung = 1.404 YLL/Jahr bundesweit (339 Mio. € je Jahr) ⇒ "
+        "1,68 je 100.000 EW (Bericht §4). Kein Rechenweg — Schicht B rechnet die "
+        "Schadensfunktion.",
      "source_refs": ["ZfKD_KID_2025", "DWD_CDC_SSD_Raster", "Slaper_1996_BAF"],
      "description": "Verlorene Lebensjahre durch klimabedingt zusätzliche "
                     "Hautkrebsfälle (malignes Melanom und nicht-melanotischer "
