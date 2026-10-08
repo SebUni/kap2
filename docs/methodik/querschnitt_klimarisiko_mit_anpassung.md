@@ -17,9 +17,10 @@ Zeilen 3–104 die 102 Klimawirkungen; #95 steht in Zeile 97).
 „Klimarisiko mit Anpassung = Klimarisiko ohne Anpassung – Anpassungskapazität“. Eingang ist die Stufe der KWRA ohne
 Anpassung für die Gegenwart (Mappe, Spalte N). Davon geht die Wirksamkeit der Anpassung ab. Sie folgt aus der Summe der
 vier Reifegrade, die die Kommune für diese Klimawirkung einstuft, und wird nach unten durch die Wirksamkeit der
-beschlossenen Maßnahmen der KWRA (Spalte W) und nach oben durch die Wirksamkeit der weiterreichenden Anpassung der KWRA
-(höherer Wert aus Spalte Z und AA) begrenzt. Summentabelle und Rahmen sind Festlegungen von KAP3; die Werte des Rahmens
-stammen aus der Mappe. Das Ergebnis ist eine Stufe auf der Skala von Tabelle 5; Werte unter 1 heißen „gering“.
+beschlossenen Maßnahmen der KWRA (Spalte W, 2020–2030) und nach oben durch die Wirksamkeit der weiterreichenden
+Anpassung der KWRA (höherer Wert aus Spalte Z und AA, Mitte des Jahrhunderts 2031–2060) begrenzt. Summentabelle und
+Rahmen sind Festlegungen von KAP3; die Werte des Rahmens stammen aus der Mappe. Das Ergebnis ist eine Stufe auf der
+Skala von Tabelle 5; Werte unter 1 heißen „gering“.
 
 Grundlage ist Abschnitt 2.2.5 der Broschüre (S. 28–29): „Aus der Kombination der Bewertung der Klimarisiken ohne
 weitere Anpassung und der Anpassungskapazität kann die Höhe der Klimarisiken mit Anpassung abgeleitet werden (siehe
@@ -104,8 +105,10 @@ dagegen immer dann, wenn die schwächste Komponente für die Klimawirkung nicht 
 ungünstige Richtung. Beispiel #95: Eine Kommune mit Organisation 3, Technik 3, Finanzen 3 und Ökosystem 0 (etwa dicht
 bebaut, ohne Grünflächen, aber mit Hitzeaktionsplan, Warnkette und Geld) hätte nach der Engpassregel die Wirksamkeit 0,
 nach der Untergrenze (e) 0,5 und die Stufe mit Anpassung „mittel-hoch“. Nach der Summe (9 Punkte, 1,5, durch die
-Obergrenze 1) ergibt sich „mittel“. Die schwächste Komponente bleibt sichtbar und zeigt, welche Art von Anpassung fehlt;
-auf die Stufe wirkt sie nicht mehr.
+Obergrenze 1) ergibt sich „mittel“. Die schwächste Komponente bleibt sichtbar und zeigt, welche Art von Anpassung fehlt.
+Als Engpass wirkt sie nicht mehr; in die Stufe geht sie wie die anderen drei mit ihren Punkten ein. Beispiel #95 mit
+Organisation 2, Technik 2 und Finanzen 1: Steigt Ökosystem von 0 auf 1, steigt die Summe von 5 auf 6, und die Stufe mit
+Anpassung sinkt von „mittel-hoch“ auf „mittel“.
 
 **Richtung und Größe der möglichen Verzerrung.** Die gleich gewichtete Summe verfälscht die Lage, wenn die vier
 Komponenten für eine Klimawirkung unterschiedlich wichtig sind:
@@ -115,10 +118,10 @@ Komponenten für eine Klimawirkung unterschiedlich wichtig sind:
 - Ist eine niedrig stehende Komponente für die Klimawirkung unerheblich, zieht sie die Summe herunter. Die Stufe fällt zu
   ungünstig aus.
 
-Größer als die Breite des Rahmens aus (e) kann die Verzerrung nicht werden, weil die Wirksamkeit nie unter Spalte W und
-nie über den höheren Wert aus Z und AA fällt. Gemessen am 08.10.2026 an den 33 analysierten Zeilen: Der Rahmen ist 21-mal
-eine Stufe breit, 2-mal 1,5 Stufen (ID 21 und 25), 9-mal eine halbe Stufe und einmal null. Sichtbar wird davon nach (d)
-weniger, weil Werte unter 1 als „gering“ erscheinen: In 18 Zeilen kann sich die ausgewiesene Stufe um eine Stufe
+Größer als die Breite des Rahmens aus (e) kann die Verzerrung nicht werden, weil die Wirksamkeit nie unter Spalte W fällt
+und nie über den höheren Wert aus Z und AA steigt. Gemessen am 08.10.2026 an den 33 analysierten Zeilen: Der Rahmen ist
+21-mal eine Stufe breit, 2-mal 1,5 Stufen (ID 21 und 25), 9-mal eine halbe Stufe und einmal null. Sichtbar wird davon
+nach (d) weniger, weil Werte unter 1 als „gering“ erscheinen: In 18 Zeilen kann sich die ausgewiesene Stufe um eine Stufe
 verschieben, in 6 um eine halbe, in 9 gar nicht. Für #95 ist der Rahmen eine halbe Stufe breit (0,5–1), die Verzerrung
 also höchstens eine halbe Stufe. Bei den 69 Zeilen mit Spalte V = „nein“ ist der Rahmen nach (f) eine Stufe breit;
 sichtbar wird das nur in den 17 Zeilen mit Spalte N „mittel“, in den 52 mit „gering“ nicht. Die Engpassregel hätte
@@ -146,7 +149,10 @@ Maßnahmen einschließen und über diese hinausgehen“, und berücksichtigt „
 Bundesebene“ (TB6 S. 112), also auch Kommunen. Beide Abzüge zusammengezählt, würde dieselbe Anpassung zweimal zählen.
 
 **Rahmen.** Unter- und Obergrenze bilden den Rahmen der Wirksamkeit. Er ist eine Festlegung von KAP3; seine Werte liest
-das Produkt je Klimawirkung aus der Mappe (Spalten W, Z und AA), bei Spalte V = „nein“ gilt (f).
+das Produkt je Klimawirkung aus der Mappe (Spalten W, Z und AA), bei Spalte V = „nein“ gilt (f). Die beiden Grenzen
+gelten für verschiedene Zeiträume: Spalte W für 2020–2030, die Spalten Z und AA für die Mitte des Jahrhunderts, 2031–2060
+(Köpfe W2, Z2 und AA2; TB6 S. 112). Die Obergrenze der Wirksamkeit, mit der die heutige Stufe gerechnet wird, ist also
+ein Wert für die Mitte des Jahrhunderts.
 
 **Untergrenze: die beschlossenen Maßnahmen (Spalte W).** Die beschlossenen Maßnahmen des Aktionsplans Anpassung III
 „liegen fast nur in der Zuständigkeit des Bundes. Es wird davon ausgegangen, dass diese unter aus heutiger Sicht
@@ -179,8 +185,8 @@ Eine Abweichung bleibt: ID 10 „Bodenerosion durch Wasser“ (Zeile 12), P12 �
 führt in AF12 „mittel-hoch“. Das Restrisiko der KWRA ist eine Bewertung durch Fachleute, keine Rechnung; in diesem einen
 Fall haben sie eine halbe Stufe höher bewertet, als die Subtraktion ergibt (dieselbe Stelle ist in
 `querschnitt_gewissheit.md`, Abschnitt „Die Regel der KWRA für Entwicklung“, als einziger Fehltreffer vermerkt). Regel A
-folgt Tabelle 5 und bildet diese Einzelbewertung nicht nach. Die Kommune sieht das bundesweite Restrisiko (Spalte AB)
-zum Vergleich neben ihrer Stufe; es geht nicht in die Rechnung ein.
+folgt Tabelle 5 und bildet diese Einzelbewertung nicht nach. Die Kommune sieht das bundesweite Restrisiko (Spalte AB,
+2020–2030) zum Vergleich neben ihrer Stufe; es geht nicht in die Rechnung ein.
 
 ### (f) Klimawirkungen ohne analysierte Anpassungskapazität
 
@@ -197,8 +203,9 @@ KAP3** an Stelle der fehlenden Grenzen:
 
 Empfindlichkeit: Weil Spalte N hier höchstens „mittel“ (2) ist, ändert eine höhere Obergrenze nichts am ausgewiesenen
 Wort (2 − 1 = 1 ist schon „gering“). Eine Untergrenze 0,5 statt 0 senkte die Stufe nur bei einer Kommune mit der Summe 0–2
-und Spalte N „mittel“, und zwar von „mittel“ auf „gering-mittel“. Das Produkt kennzeichnet die Stufe dieser Klimawirkungen als „Abschätzung von KAP3; die
-KWRA hat die Anpassungskapazität nicht analysiert“. Eine stille Null gibt es nicht.
+und Spalte N „mittel“, und zwar von „mittel“ auf „gering-mittel“. Das Produkt kennzeichnet die Stufe dieser
+Klimawirkungen als „Abschätzung von KAP3; die KWRA hat die Anpassungskapazität nicht analysiert“. Eine stille Null gibt
+es nicht.
 
 ### (g) Minderungssätze
 
@@ -210,10 +217,11 @@ die Stufe und ihren Weg zeigt, also auch den Rahmen. Für Klimawirkungen mit Spa
 
 > Klimarisiko ohne Anpassung (Gegenwart, KWRA 2021): {Stufe ohne}. Wirksamkeit der Anpassung nach der
 > Selbsteinschätzung der Kommune: {Wirksamkeit aus der Summe} ({Summe} von 12 Punkten). Die KWRA hält für diese
-> Klimawirkung eine Wirksamkeit von {Spalte W} (beschlossene Maßnahmen) bis {höherer Wert aus Z und AA}
-> (weiterreichende Anpassung) für erreichbar; gerechnet wird mit {Wirksamkeit im Rahmen}. Klimarisiko mit Anpassung:
-> {Stufe mit} (UBA 2022, Tabelle 5, S. 29; Summentabelle und Rahmen sind Festlegungen von KAP3, der Rahmen stammt aus
-> der KWRA-Mappe, Spalten W, Z und AA). Bundesweit nach den beschlossenen Maßnahmen: {Spalte AB}.
+> Klimawirkung eine Wirksamkeit von {Spalte W} (beschlossene Maßnahmen, 2020–2030) bis {höherer Wert aus Z und AA}
+> (weiterreichende Anpassung, Mitte des Jahrhunderts 2031–2060) für erreichbar; gerechnet wird mit {Wirksamkeit im
+> Rahmen}. Klimarisiko mit Anpassung: {Stufe mit} (UBA 2022, Tabelle 5, S. 29; Summentabelle und Rahmen sind
+> Festlegungen von KAP3, der Rahmen stammt aus der KWRA-Mappe, Spalten W, Z und AA). Bundesweit nach den beschlossenen
+> Maßnahmen (2020–2030): {Spalte AB}.
 
 Für Klimawirkungen mit Spalte V = „nein“, deren Spalten W–AF leer sind:
 
@@ -223,21 +231,26 @@ Für Klimawirkungen mit Spalte V = „nein“, deren Spalten W–AF leer sind:
 > Abschätzung von KAP3, mit {Wirksamkeit im Rahmen}. Klimarisiko mit Anpassung: {Stufe mit} (Abschätzung von KAP3 nach
 > UBA 2022, Tabelle 5, S. 29). Ein bundesweites Restrisiko weist die KWRA für diese Klimawirkung nicht aus.
 
-Beispiel #95 mit der Summe 12: „Wirksamkeit der Anpassung nach der Selbsteinschätzung der Kommune: hoch (12 von 12
-Punkten). Die KWRA hält für diese Klimawirkung eine Wirksamkeit von gering-mittel (beschlossene Maßnahmen) bis mittel
-(weiterreichende Anpassung) für erreichbar; gerechnet wird mit mittel. Klimarisiko mit Anpassung: mittel …“ Wer mit
-Tabelle 5 selbst 3 − 2 nachrechnet, sieht im Satz, warum das Ergebnis nicht „gering“ lautet. Ergibt Tabelle 5 einen Wert
-unter 1, steht hinter der Stufe der Zusatz aus (d). Der Satz für eine unvollständige Selbsteinschätzung bleibt in der
-Sache: „nicht bestimmbar: Selbsteinschätzung unvollständig“.
+Beispiel #95 mit der Summe 12, vollständig: „Klimarisiko ohne Anpassung (Gegenwart, KWRA 2021): hoch. Wirksamkeit der
+Anpassung nach der Selbsteinschätzung der Kommune: hoch (12 von 12 Punkten). Die KWRA hält für diese Klimawirkung eine
+Wirksamkeit von gering-mittel (beschlossene Maßnahmen, 2020–2030) bis mittel (weiterreichende Anpassung, Mitte des
+Jahrhunderts 2031–2060) für erreichbar; gerechnet wird mit mittel. Klimarisiko mit Anpassung: mittel (UBA 2022,
+Tabelle 5, S. 29; Summentabelle und Rahmen sind Festlegungen von KAP3, der Rahmen stammt aus der KWRA-Mappe, Spalten W, Z
+und AA). Bundesweit nach den beschlossenen Maßnahmen (2020–2030): mittel-hoch.“ Wer mit Tabelle 5 selbst 3 − 2
+nachrechnet, sieht im Satz, warum das Ergebnis nicht „gering“ lautet: Mehr als die Wirksamkeit, die die KWRA der
+weiterreichenden Anpassung für die Mitte des Jahrhunderts zuschreibt, rechnet Regel A auch heute nicht an (Begründung
+unter (e), „Obergrenze“). Ergibt Tabelle 5 einen Wert unter 1, steht hinter der Stufe der Zusatz aus (d). Der Satz für
+eine unvollständige Selbsteinschätzung bleibt in der Sache: „nicht bestimmbar: Selbsteinschätzung unvollständig“.
 
 ## Herkunft der Reifegrade
 
 **Gelesen für diese Frage:** Broschüre Abschnitt 2.2.5 (S. 28–29) vollständig mit den Fußnoten 32–34 und Tabelle 5;
 S. 18 mit Abbildung 3 (als Bild angesehen); S. 19 mit der Infobox „Zentrale Begriffe“; S. 27 (Ende 2.2.4) und S. 30
-(2.2.6) zur Abgrenzung. TB6 Kap. 5.1, S. 112–113. Die Broschüre nennt aus Anhang G der ISO 14091 nur die vier
-Komponenten (Fußnote 32) und aus Anhang H nur, dass es „verschiedene Niveaus der Anpassungskapazität“ gibt (S. 29 mit
-Fußnote 33); die Niveaus selbst nennt sie nicht. Fußnote 34 verweist für „methodische Details“ auf Kahlenborn et al.
-2021a. Abbildung 3 zeigt die Anpassungskapazität als ein Feld zwischen „Klimarisiko ohne Anpassung“ und „Klimarisiko mit
+(2.2.6) zur Abgrenzung. TB6 Kap. 5.1, S. 112–113. Die Broschüre nennt die vier Komponenten (Fußnote 32) und
+„verschiedene Niveaus der Anpassungskapazität“ (S. 29); für die Niveaus verweist sie mit Fußnote 33 auf Anhang G
+(„Komponenten der Anpassungskapazität“) und Anhang H („Bewertung der Anpassungskapazität“) der ISO 14091. Die Niveaus
+selbst nennt sie nicht. Fußnote 34 verweist für „methodische Details“ auf Kahlenborn et al. 2021a.
+Abbildung 3 zeigt die Anpassungskapazität als ein Feld zwischen „Klimarisiko ohne Anpassung“ und „Klimarisiko mit
 Anpassung“, ohne Stufen. TB6 S. 112 nennt fünf Stufen der Wirksamkeit und S. 113 sechs „Anpassungsdimensionen“, aber
 keine Reifegrade. Den Normtext ISO 14091:2021 hat KAP3 nicht gelesen (Menschenticket T-0531-ceo offen).
 
@@ -256,12 +269,13 @@ die fünf Stufen von Tabelle 5 leistet die Summentabelle unter (c).
 **Vorgeschlagener neuer Wortlaut für `HERLEITUNG_REIFEGRADE`:**
 
 > Abschätzung von KAP3: Die vier Stufen 0 bis 3 und ihre Beschreibungen legt KAP3 fest. Die UBA-Handlungsempfehlungen
-> zur ISO 14091 (2022) nennen auf S. 29 die vier Komponenten und verweisen für die Niveaus der Anpassungskapazität auf
-> Anhang H der ISO 14091; die Niveaus selbst nennen sie nicht, und den Normtext hat KAP3 nicht gelesen. Die Stufen ordnen
-> nur und sind kein Messwert. Die Kommune stuft die vier Komponenten je Klimawirkung ein. Die Summe der vier Stufen
-> (0 bis 12) wird nach einer festen Tabelle in die Wirksamkeit der Anpassung nach Tabelle 5 (S. 29) übersetzt: je drei
-> Punkte eine halbe Stufe, abgerundet. Diese Wirksamkeit wird in den Rahmen der KWRA 2021 für die Klimawirkung gesetzt:
-> nicht unter die Wirksamkeit der beschlossenen Maßnahmen und nicht über die der weiterreichenden Anpassung (Mappe
+> zur ISO 14091 (2022) nennen auf S. 29 die vier Komponenten (Fußnote 32) und verweisen für die Niveaus der
+> Anpassungskapazität auf Anhang G und H der ISO 14091 (Fußnote 33); die Niveaus selbst nennen sie nicht, und den
+> Normtext hat KAP3 nicht gelesen. Die Stufen ordnen nur und sind kein Messwert. Die Kommune stuft die vier Komponenten
+> je Klimawirkung ein. Die Summe der vier Stufen (0 bis 12) wird nach einer festen Tabelle in die Wirksamkeit der
+> Anpassung nach Tabelle 5 (S. 29) übersetzt: je drei Punkte eine halbe Stufe, abgerundet. Diese Wirksamkeit wird in den
+> Rahmen der KWRA 2021 für die Klimawirkung gesetzt: nicht unter die Wirksamkeit der beschlossenen Maßnahmen für
+> 2020–2030 und nicht über die der weiterreichenden Anpassung für die Mitte des Jahrhunderts, 2031–2060 (Mappe
 > KWRA-2021_Klimawirkungen.xlsx, Spalten W, Z und AA). Hat die KWRA die Anpassungskapazität einer Klimawirkung nicht
 > analysiert, gilt als Abschätzung von KAP3 der Rahmen gering (0) bis mittel (1). Summentabelle und Rahmen sind
 > Festlegungen von KAP3.
@@ -279,15 +293,15 @@ Euro-Betrag am Ende: Ergebnisgröße ist die Stufe auf der Skala von Tabelle 5.
 | 4 | Summe der vier Reifegrade | 3 + 2 + 1 + 3 = 9 | Rechnung |
 | 5 | Summe → Wirksamkeit der Kommune (Summentabelle) | 9 → mittel-hoch = 1,5 | Festlegung (c), Abschätzung von KAP3 |
 | 6 | Untergrenze: Wirksamkeit der beschlossenen Maßnahmen 2020–2030 (Kopf W2) | gering-mittel = 0,5 | Mappe W97; TB6 S. 112 |
-| 7 | Obergrenze: höherer Wert aus weiterreichender Anpassung Mitte optim. und pessim. (Köpfe Z2, AA2) | mittel = 1 und mittel = 1 → 1 | Mappe Z97, AA97 |
+| 7 | Obergrenze: höherer Wert aus weiterreichender Anpassung, Mitte des Jahrhunderts 2031–2060, optim. und pessim. (Köpfe Z2, AA2) | mittel = 1 und mittel = 1 → 1 | Mappe Z97, AA97; TB6 S. 112 |
 | 8 | Wirksamkeit im Rahmen: nicht unter Ebene 6, nicht über Ebene 7 | 1,5 → 1 (mittel) | Festlegung (e) |
 | 9 | Tabelle 5: Zeile „Hoch (3)“, Spalte „Mittel (1)“ | 3 − 1 = 2 | Broschüre Tabelle 5, S. 29 |
 | 10 | Wert → Stufe mit Anpassung | 2 = **mittel** | Festlegung (b) und (d) |
 
 Neben der Stufe, nicht in der Rechnung: schwächste Komponente Finanzen (1), also fehlt vor allem Geld (Broschüre S. 29);
-bundesweit nach den beschlossenen Maßnahmen „mittel-hoch“ (AB97). Stärkster Treiber ist die Stufe ohne Anpassung
-(„hoch“). Die beiden Grenzen aus der KWRA lassen der Selbsteinschätzung für #95 eine halbe Stufe Spielraum: Die Stufe
-mit Anpassung hängt nur daran, ob die Summe unter 6 liegt.
+bundesweit nach den beschlossenen Maßnahmen (2020–2030) „mittel-hoch“ (AB97). Stärkster Treiber ist die Stufe ohne
+Anpassung („hoch“). Die beiden Grenzen aus der KWRA lassen der Selbsteinschätzung für #95 eine halbe Stufe Spielraum:
+Die Stufe mit Anpassung hängt nur daran, ob die Summe unter 6 liegt.
 
 | Summe für #95 | 0–2 | 3–5 | 6–8 | 9–11 | 12 |
 |---|---|---|---|---|---|
