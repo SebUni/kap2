@@ -370,10 +370,10 @@ je Teil des Schadens (Block `doppelzaehlung_95`):
 
 | Teil des Schadens, Berlin (Kette) | Betrag | Hebel und Regel (Bericht 95 Kapitel 5) | weniger |
 |---|---|---|---|
-| Mortalität, Bänder 75–84 und 85+ außerhalb der Heime | 169,5 Mio. € (Hebel Schutzprogramme, Absatz „Berlin“) | Hitzeaktionsplan, Schutzprogramme und Kühlzentren multipliziert: 0,939 × 0,931 × 0,995585 = 0,870; die Kappung 0,794 greift nicht (Absatz „Kappung 0,794“) | 169,5 × (1 − 0,870) = 21,98 Mio. € |
-| Mortalität, Heimbewohner ab 85 | 638,8 YLL × 0,344 × 160.800 € = 35,3 Mio. € (YLL 85+ und Heimanteil wie bei den Schutzprogrammen, Wert je YLL §3.0 Ebene 8) | Hitzeaktionsplan 1 − 0,939 = 0,061 | 35,3 × 0,061 = 2,16 Mio. € |
-| dazu S157 bei der Voreinstellung | 1,249 Mio. € (Hebel S157, Absatz „Sensitivität“) | mit dem Plan gedämpft, × 0,939 (Absatz „Zusammen mit dem Hitzeaktionsplan (Befund 129)“) | 1,17 Mio. € |
-| Mortalität, Bänder unter 75 | Rest: 361,8 − 169,5 − 35,3 = 157,0 Mio. € (§3.0 Ebene 8) | Hitzeaktionsplan 0,061 | 9,57 Mio. € |
+| Mortalität, Bänder 75–84 und 85+ außerhalb der Heime | 169,5 Mio. € (Hebel Schutzprogramme, Absatz „Berlin“) | Hitzeaktionsplan, Schutzprogramme und Kühlzentren multipliziert: 0,939 × 0,931 × 0,995585 = 0,8703; die Kappung 0,794 greift nicht (Absatz „Kappung 0,794“) | 169,5 × (1 − 0,8703) = 21,98 Mio. € |
+| Mortalität, Heimbewohner ab 85 | 638,8 YLL × 0,344 × 160.800 € = 35,34 Mio. € (YLL 85+ und Heimanteil wie bei den Schutzprogrammen, Wert je YLL §3.0 Ebene 8) | Hitzeaktionsplan 1 − 0,939 = 0,061 | 35,34 × 0,061 = 2,16 Mio. € |
+| dazu S157 bei der Voreinstellung | 1,249 Mio. € (Hebel S157, Absatz „Sensitivität“) | mit dem Plan gedämpft, × 0,939 (Absatz „Zusammen mit dem Hitzeaktionsplan (Befund 129)“) | 1,249 × 0,939 = 1,17 Mio. € |
+| Mortalität, Bänder unter 75 | Rest: 361,8 − 169,5 − 35,34 = 156,96 Mio. € (§3.0 Ebene 8) | Hitzeaktionsplan 0,061 | 156,96 × 0,061 = 9,57 Mio. € |
 | Morbidität | 1,09 Mio. € (§3.0 Ebene 9) | keiner wirkt (Hitzeaktionsplan: „Die Morbidität bleibt unberührt“; Schutzprogramme \(\delta_{\text{VG,morb}}\) = 1,0) | 0 |
 | zusammen | 362,9 Mio. € | | **34,9 Mio. €** |
 
@@ -407,21 +407,22 @@ als Befund 1 unter „Befunde an Berichte“; der Code bleibt hier unverändert.
 
 **Warum die Kapazität nur auf die Stufe wirkt:**
 
-- **Keine Effektgröße.** Die Reifegrade sind eine Selbsteinschätzung und kein Nachweis einer Wirkung ((c), „Warum
-  abgerundet wird“). Ein Euro-Hebel braucht eine Effektgröße aus Interventionsstudien oder eine hergeleitete
-  Abschätzung, marginal gegenüber dem heutigen Stand (Aufgabe §3.5). Tabelle 5 rechnet in Stufen von 1 bis 3 und kennt
-  keinen Euro (Broschüre S. 29).
-- **Dieselben Maßnahmen.** Für #95 fragt die Einstufung nach Hitzeaktionsplan, Warnkette, Kühlräumen und Grünflächen
-  ((c), „Körnigkeit“). Den Hitzeaktionsplan, die Kühlräume und die Schutzprogramme rechnet Kapitel 5 schon als Hebel in
-  Euro. Eine Minderung aus der Kapazität käme hinzu und zöge denselben Plan ein zweites Mal ab.
-- **Der Bestand im Mittel Deutschlands steckt im Basiswert.** Was in den Kalibrierjahren 2012–2024 schon wirkte, ist im
-  Euro-Betrag ohne weitere Anpassung enthalten, und zwar im Mittel Deutschlands, nicht im Stand der Kommune: Der
-  Kalibrierfaktor ist an die Hitzetoten Deutschlands angepasst (Bericht 95 Kapitel 1 (a)), und „Der Abzug rechnet mit
-  dem Mittel Deutschlands, nicht mit dem Stand der Kommune“ (Bericht 95 Kapitel 5, Hebel S157, Gegenargument (3)).
-  Kapitel 5 zieht bestehende Programme deshalb ab (Doppelzählungs-Wächter `heat.vg_in_kalibrierjahren`; Bestand
-  gekühlter Heimplätze `heat.s_gek_kalib`). Die Selbsteinschätzung beschreibt den Stand der Kommune. Soweit er dem Mittel
-  entspricht, zählte sie ihn als Euro-Minderung ein zweites Mal. Für einen Stand über dem Mittel gilt das nicht; die
-  Entscheidung tragen dort die beiden Gründe oben (Modellgrenze unten).
+1. **Keine Effektgröße (Grund 1).** Die Reifegrade sind eine Selbsteinschätzung und kein Nachweis einer Wirkung ((c),
+   „Warum abgerundet wird“). Ein Euro-Hebel braucht eine Effektgröße aus Interventionsstudien oder eine hergeleitete
+   Abschätzung, marginal gegenüber dem heutigen Stand (Aufgabe §3.5). Tabelle 5 rechnet in Stufen von 1 bis 3 und kennt
+   keinen Euro (Broschüre S. 29).
+2. **Dieselben Maßnahmen (Grund 2).** Für #95 fragt die Einstufung nach Hitzeaktionsplan, Warnkette, Kühlräumen und
+   Grünflächen ((c), „Körnigkeit“). Den Hitzeaktionsplan, die Kühlräume und die Schutzprogramme rechnet Kapitel 5 schon
+   als Hebel in Euro. Eine Minderung aus der Kapazität käme hinzu und zöge denselben Plan ein zweites Mal ab.
+3. **Der Bestand im Mittel Deutschlands steckt im Basiswert (Grund 3).** Was in den Kalibrierjahren 2012–2024 schon
+   wirkte, ist im Euro-Betrag ohne weitere Anpassung enthalten, und zwar im Mittel Deutschlands, nicht im Stand der
+   Kommune: Der Kalibrierfaktor ist an die Hitzetoten Deutschlands angepasst (Bericht 95 Kapitel 1 (a)), und „Der Abzug
+   rechnet mit dem Mittel Deutschlands, nicht mit dem Stand der Kommune“ (Bericht 95 Kapitel 5, Hebel S157,
+   Gegenargument (3)). Kapitel 5 zählt ein Programm, das schon in diesen Jahren lief, deshalb nicht noch einmal als
+   Hebel (Doppelzählungs-Wächter `heat.vg_in_kalibrierjahren`); bei den gekühlten Heimplätzen zählt nur der Anteil über
+   dem Mittel der Kalibrierjahre (`heat.s_gek_kalib`). Die Selbsteinschätzung beschreibt den Stand der Kommune. Soweit
+   er dem Mittel entspricht, zählte sie ihn als Euro-Minderung ein zweites Mal. Für einen Stand über dem Mittel gilt das
+   nicht; die Entscheidung tragen dort die Gründe 1 und 2 (Modellgrenze unten).
 
 **Warum nichts doppelt zählt.** Jede Maßnahme wirkt auf jeder Skala genau einmal. Im Euro-Betrag wirkt sie als Hebel aus
 Kapitel 5. In der Stufe wirkt sie über die Selbsteinschätzung der Kommune, die an die Stelle der bundesweiten Wirksamkeit
@@ -439,12 +440,17 @@ wegen dieses Plans hoch einstuft.
 
 - Wählt eine Kommune Maßnahmen, ohne ihre Selbsteinschätzung nachzuführen, sinkt der Betrag, die Stufe aber nicht. Das
   ist keine Doppelzählung, sondern ein fehlender Abgleich; das Produkt zeigt beides mit seiner Grundlage nebeneinander.
-- Der Basiswert rechnet jede Kommune mit dem Anpassungsstand im Mittel Deutschlands. Ein Bestand der Kommune über dem
-  Mittel geht nur über die Eingaben der Hebel in den Euro-Betrag ein: über den Anteil gekühlter Heimplätze
-  \(s_{\text{gek}}\), von dem das Produkt das Mittel der Kalibrierjahre abzieht (`heat.s_gek_kalib`), und über die
-  Wächter-Fragen zu Schutzprogrammen und Kühlzentren (`heat.vg_in_kalibrierjahren`). Über die Selbsteinschätzung geht
-  er nicht ein. Einen Bestand über dem Mittel, den keine Eingabe erfasst, rechnet der Betrag mit dem Mittel; die
-  Selbsteinschätzung zeigt ihn dann nur in der Stufe.
+- Der Basiswert rechnet jede Kommune mit dem Anpassungsstand im Mittel Deutschlands. Was darüber hinausgeht, senkt den
+  Euro-Betrag nur auf zwei Wegen: über den Anteil gekühlter Heimplätze, soweit er über dem Mittel der Kalibrierjahre
+  liegt (\(s_{\text{gek}}\) − 0,06, `heat.s_gek_kalib`), und über neu gewählte Maßnahmen, bei Schutzprogrammen und
+  Kühlzentren mit der Wächter-Antwort „nein“. Ein älteres Programm, das schon 2012–2024 lief, bekommt die Antwort „ja“,
+  und dann gilt \(\delta_{\text{VG}}\) = \(\delta_{\text{VG,morb}}\) = 1 und \(\delta_{\text{KZ}}\) = 1 (Bericht 95
+  Kapitel 5, Hebel Schutzprogramme, Absatz „Doppelzählungs-Wächter (Befund 150)“, und Hebel Kühlzentren; Block
+  `heat.vg_in_kalibrierjahren`). Ein solches Programm steckt im Betrag also nur mit dem Mittel Deutschlands; seinen
+  Vorsprung vor dem Mittel zeigt allein die Stufe über die Selbsteinschätzung. Für eine Kommune mit einem älteren
+  Programm fällt der Betrag deshalb zu hoch aus, nach den Abschätzungen aus Kapitel 5 höchstens um die Wirkung, die das
+  Programm als neue Maßnahme hätte: in Berlin 11,7 Mio. € (Schutzprogramme) und 0,75 Mio. € je Jahr (Kühlzentren). In
+  den Betrag holt die Selbsteinschätzung diesen Vorsprung nicht, weil sie keine Effektgröße hat (Grund 1).
 
 ## Rechenkette
 
@@ -621,8 +627,11 @@ p_berlin = sum(weniger.values()) / S_OHNE
 print({k: round(v, 2) for k, v in weniger.items()}, "| zusammen:", round(sum(weniger.values()), 2),
       "| S_alle:", round(S_OHNE - sum(weniger.values()), 1), "| p:", round(p_berlin, 4),
       "| Abstand zu 0,1 in Pp.:", round((0.1 - p_berlin) * 100, 1))
-assert (round(e_heim, 1), round(e_unter75, 1), round(faktor_75, 3)) == (35.3, 157.0, 0.870)
+assert (round(e_heim, 2), round(e_unter75, 2), round(faktor_75, 4)) == (35.34, 156.96, 0.8703)
 assert [round(v, 2) for v in weniger.values()] == [21.98, 2.16, 1.17, 9.57, 0.0]
+# Tabelle „Teil des Schadens“ mit den angezeigten Stellen nachgerechnet
+assert [round(x, 2) for x in (169.5 * (1 - 0.8703), 35.34 * 0.061, 1.249 * 0.939, 156.96 * 0.061)] == \
+    [21.98, 2.16, 1.17, 9.57]
 assert (round(sum(weniger.values()), 1), round(p_berlin, 3), round((0.1 - p_berlin) * 100, 1)) == (34.9, 0.096, 0.4)
 assert p_heute < p_berlin < p_oben
 
@@ -686,10 +695,11 @@ die Stufe, nicht auf den Euro-Betrag. Regel A bleibt unverändert; kein Befund d
 Verworfen, je mit einem Satz:
 
 12. **Die Kapazität mindert den Euro-Betrag zusätzlich zu den Maßnahmen:** verworfen, weil die Selbsteinschätzung keine
-    Effektgröße hat und ihre Fähigkeiten dieselben Maßnahmen sind, die Kapitel 5 schon abzieht (in Berlin fielen so
-    weitere 113,6 Mio. € je Jahr weg); das Gegenargument, dass der Basiswert nur den Bestand im Mittel Deutschlands
-    enthält und nicht den Stand der Kommune, trifft zu, ändert die Entscheidung aber nicht, weil ein Bestand über dem
-    Mittel über die Eingaben der Hebel (\(s_{\text{gek}}\), Wächter-Fragen) in den Betrag eingeht.
+    Effektgröße hat (Grund 1) und ihre Fähigkeiten dieselben Maßnahmen sind, die Kapitel 5 schon als Hebel abzieht
+    (Grund 2; in Berlin fielen so weitere 113,6 Mio. € je Jahr weg); das Gegenargument, dass der Basiswert nur den
+    Bestand im Mittel Deutschlands enthält und der Vorsprung eines älteren Programms deshalb im Betrag fehlt, trifft zu,
+    ändert die Entscheidung aber nicht, weil die Selbsteinschätzung auch diesen Vorsprung nicht in Euro messen kann
+    (Grund 1) und eine Minderung aus ihr zugleich jede neu gewählte Maßnahme ein zweites Mal träfe (Grund 2).
 13. **Die Kapazität ersetzt die Maßnahmenwahl im Euro-Betrag (Betrag mit Anpassung aus der Stufe):** verworfen, weil
     Tabelle 5 keine Euro-Skala hat und jeder Umrechnungsfaktor von Stufe in Euro ohne Quelle wäre.
 14. **Das Anpassungspotenzial als eigene Faktorformel neben dem Euro-Pfad (heutiger Stand):** verworfen, weil derselbe
