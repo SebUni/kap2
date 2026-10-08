@@ -372,6 +372,56 @@ for i in $(seq 1 60); do
   sleep 2
 done
 
+SCHRITT="beispielkommune"
+# T-1831 (Vorhaben T-1828, A-0066): Nach dem Neustart rechnet der gerade ausgelieferte Stand die
+# Beispielkommune Warmsen vollstaendig neu; der Health-Check oben hat den Commit schon bestaetigt.
+# Das Skript legt Gemeindetabelle (VG250), Kommune und Massnahme an, falls sie fehlen, und meldet
+# sich mit einer technischen Sitzung an (--anmeldung sitzung). DATABASE_URL steht aus der oben
+# eingelesenen Umgebungsdatei in der Umgebung; sie wird hier weder ausgegeben noch kopiert, und das
+# Skript gibt den Sitzungsschluessel nie aus.
+# Wartegrenze (Frist des Watchers: DEPLOY_FRIST_MIN = 30 min = 1800 s): --warte-sekunden 900 bricht
+# die Bewertung nach 15 min ab. Gemessen (T-1830, Sichtstart): Neurechnung 642 s, 399 s, 195 s; ganzer
+# Aufruf 801 s, 442 s, 296 s, 208 s. Die bisherigen Deploys ohne diesen Schritt brauchten von der
+# Anforderung bis "fertig" hoechstens 8 min (480 s, davon bis zu 2 min Watcher-Takt). Schlechtester Fall:
+# 480 s + 900 s = 1380 s (23 min); bleiben 420 s fuer VG250-Import, Raster und Massnahme beim ersten Lauf.
+# Die Zeit dieser Zwischenschritte begrenzt --warte-sekunden nicht (je Aufruf des Produktcodes
+# hoechstens 1800 s im Skript), deshalb steht die Frist nicht allein auf dieser Grenze.
+# Ausgabe: alles geht ins Protokoll (tee); die letzte Zeile (JSON) liegt zusaetzlich in BEISPIEL_JSON,
+# das Paket 4 in den Status uebernimmt. Scheitert das Skript oder die Pruefung unten, endet der Schritt
+# ueber die ERR-Falle: Status "fehler", nie "fertig". pipefail laesst den Rueckgabewert des Skripts
+# durch das tee hindurch wirken.
+BEISPIEL_LOG=$(mktemp "$DEPLOY_TMP/beispielkommune.XXXXXX.log")
+BEISPIEL_JSON=$(mktemp "$DEPLOY_TMP/beispielkommune.XXXXXX.json")
+KAP2_VENV="$VENV" python3 "$PRODUKT/scripts/sicht_beispielkommune.py" \
+  --basis http://127.0.0.1:8010 --neu-rechnen --anmeldung sitzung --warte-sekunden 900 2>&1 \
+  | tee "$BEISPIEL_LOG"
+tail -n 1 "$BEISPIEL_LOG" > "$BEISPIEL_JSON"
+rm -f "$BEISPIEL_LOG"
+# Pruefung der Schlusszeile: JSON, je eine Klimawirkung #95, #96 und #98 in "bezeichnung", und der
+# gemeldete Commit ist der ausgelieferte. Jede Abweichung beendet den Schritt mit Rueckgabewert 1.
+python3 - "$BEISPIEL_JSON" "$COMMIT" <<'PY'
+import json, sys
+pfad, commit = sys.argv[1:3]
+zeile = open(pfad, encoding="utf-8").read().strip()
+try:
+    d = json.loads(zeile)
+except ValueError:
+    d = None
+if not isinstance(d, dict):
+    print("!! Beispielkommune: Die letzte Ausgabezeile des Skripts ist kein JSON-Objekt.")
+    sys.exit(1)
+liste = d.get("klimawirkungen")
+bezeichnungen = [str(k.get("bezeichnung") or "") for k in liste if isinstance(k, dict)] if isinstance(liste, list) else []
+fehlt = [c for c in ("#95", "#96", "#98") if not any(c in b for b in bezeichnungen)]
+if fehlt:
+    print("!! Beispielkommune: Keine Klimawirkung mit " + ", ".join(fehlt) + " in der Bezeichnung.")
+    sys.exit(1)
+if d.get("commit") != commit:
+    print("!! Beispielkommune: Gerechnet hat Commit '%s', ausgeliefert ist '%s'." % (d.get("commit"), commit))
+    sys.exit(1)
+print("Beispielkommune %s: %d Klimawirkungen gerechnet mit Commit %s" % (d.get("kommune"), len(bezeichnungen), commit))
+PY
+
 SCHRITT="status"
 # Trap bleibt bewusst aktiv: scheitert das Schreiben oder Pushen des Status, ist der Lauf nicht
 # bestaetigt -- dann darf er nicht stumm enden und den vorherigen Status stehen lassen.
