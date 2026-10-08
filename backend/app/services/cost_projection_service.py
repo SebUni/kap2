@@ -7,8 +7,9 @@ Maßnahmenkosten ein: OPEX jährlich ab Umsetzungsjahr, CAPEX einmalig im
 Umsetzungsjahr. Die kumulierten Kosten werden zusätzlich als Barwerte
 ausgewiesen. Die Diskontrate ist nach UBA Methodenkonvention 4.0, Kap. 2.2.3,
 die Summe aus Reiner Zeitpräferenzrate (RZPR, 0 % und 1 %) und der Komponente
-der relativen Preise (``app.data.diskontierung``, vorläufig 0 Pp. als
-Abschätzung von KAP3). Bewusste, im Response dokumentierte Vereinfachung —
+der relativen Preise (``app.data.diskontierung``, 0,1 Pp. als Abschätzung von KAP3).
+Die Komponente gilt für die Gesundheitsschäden von M0 (#95, #96, #98); die übrigen
+Schäden und die Maßnahmenkosten werden mit der RZPR allein abgezinst. Bewusste, im Response dokumentierte Vereinfachung —
 Maßnahmenwirkung zeitkonstant.
 """
 
@@ -253,6 +254,7 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
     rzpr = list(diskontierung.PURE_TIME_PREFERENCE_RATES)
     raten_text = " und ".join(f"{_prozent(v)} %" for v in diskontraten.values())
     rzpr_text = " und ".join(f"{_prozent(v)} %" for v in rzpr)
+    uebrige_text = rzpr_text
 
     out = {
         "years": years,
@@ -269,14 +271,18 @@ def project_costs(db: Session, kommune_id: int, bundesland: str,
             "DWD-Hitzetage-Trend (gleiches Klimasignal wie die Risiko-Projektion)",
             "CAPEX einmalig im Umsetzungsjahr (Default: Folgejahr); die "
             "kumulierten Kosten werden zusätzlich als Barwerte ausgewiesen, "
-            f"abgezinst mit einer Diskontrate von {raten_text} (Feld „discounted“, "
-            f"abgezinst auf das Basisjahr {years[0]})",
+            f"abgezinst mit einer Diskontrate von {raten_text} für die "
+            "Gesundheitsschäden #95, #96 und #98 und von "
+            f"{uebrige_text} für die übrigen Schäden und die Maßnahmenkosten "
+            f"(Feld „discounted“, abgezinst auf das Basisjahr {years[0]})",
             "Zusammensetzung der Diskontrate nach UBA Methodenkonvention 4.0, "
             "Kap. 2.2.3: Diskontrate = Reine Zeitpräferenzrate (RZPR) + Komponente "
             f"der relativen Preise. Die RZPR beträgt {rzpr_text}. Die Komponente der "
-            f"relativen Preise ist mit {_prozent(komponente)} Pp. angesetzt, eine "
-            "Abschätzung von KAP3, bis die Methodik sie festlegt; ihre Richtung "
-            "für Gesundheitsschäden ist offen (Feld „diskontierung“)",
+            f"relativen Preise beträgt {_prozent(komponente)} Pp. (positiv, Band "
+            "0–0,7 Pp.), eine Abschätzung von KAP3. Sie gilt für die Gesundheitsschäden "
+            "(#95 Hitzebelastung, #96 Aeroallergene, #98 UV-Schädigungen); die übrigen "
+            "Schäden und die Maßnahmenkosten werden mit der RZPR allein abgezinst "
+            "(Feld „diskontierung“)",
             "Maßnahmenwirkung zeitkonstant über den Horizont; OPEX ab Umsetzungsjahr",
         ],
         "diskontierung": {
