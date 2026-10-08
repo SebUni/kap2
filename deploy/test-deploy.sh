@@ -266,49 +266,37 @@ speicher_zeile "nach frontend-build"
 SCHRITT="datenbank"
 cd "$PRODUKT/backend"
 mkdir -p logs
-# T-0339: Der bisherige Rückfall ("Warnung ... Fortsetzung mit create_all-Fallback") hat den Fehler
-# verschluckt statt ihn zu beheben. app/main.py legt beim Start ohnehin alle Tabellen per
-# Base.metadata.create_all an, setzt dabei aber NIE die Alembic-Versionstabelle. Damit beginnt
-# "alembic upgrade head" beim naechsten Deploy wieder bei der Basis-Migration und scheitert dort
-# dauerhaft an 'relation "app_settings" already exists' -- ein Zustand, der sich nicht von selbst
-# loest und jeden weiteren Deploy rot faerbt. Genau dieser eine Fall ist heilbar: Sieht der Fehler
-# nach "existiert bereits" aus UND kennt die Datenbank noch keinen Alembic-Stand (Tabelle
-# alembic_version fehlt oder ist leer), dann ist das Schema durch einen frueheren create_all-
-# Rueckfall schon vorhanden -- einmal auf den Kopf stempeln (ohne die SQL-Anweisungen erneut
-# auszufuehren) und danach regulaer hochziehen. Jeder andere Fehler bricht den Schritt fatal ab;
-# still weiterlaufen tut der Schritt nicht mehr, auch nicht mit create_all als Rueckfall.
+# T-1829: Der Schritt fuehrt genau einen Weg aus -- "alembic upgrade head" -- und scheitert laut,
+# wenn der misslingt. Es gibt weder einen Rueckfall auf die Anlage per Base.metadata.create_all
+# (T-0339) noch ein Setzen des Alembic-Stands ohne Migration. Beides erklaerte ein Schema, das
+# beim Dienststart per create_all entstanden ist (app/main.py, _ensure_tables), still fuer
+# migriert; beim Deploy vom 06.10.2026 (ce951ead) lief das so, ohne dass das Runbook-Kriterium
+# (leere Ausgabe von "alembic check") geprueft worden waere. Eine Bestandsdatenbank, deren Schema
+# nicht aus der Migrationskette stammt, hebt ein Mensch nach docs/BETRIEB.md, Abschnitt
+# "Bestandsdatenbank auf die Migrationskette heben", auf die Kette.
+# Der Stand wird sichtbar gemacht: Ausgabe von "alembic current" vor und nach dem Upgrade, auch
+# in den Variablen DATENBANK_VORHER und DATENBANK_NACHHER (Paket 4 schreibt sie in den Status).
+# Leer heisst vorher: keine Tabelle alembic_version oder kein Eintrag darin. Schlaegt schon diese
+# Abfrage fehl (Datenbank nicht erreichbar), bleibt der Wert leer und das Upgrade meldet den
+# Fehler selbst.
+DATENBANK_VORHER=$("$VENV/bin/alembic" current 2>/dev/null | tr '\n' ' ' | sed 's/ *$//' || true)
+echo "Datenbank vorher: $DATENBANK_VORHER"
 ALEMBIC_LOG=$(mktemp "$DEPLOY_TMP/alembic.XXXXXX.log")
 if "$VENV/bin/alembic" upgrade head >"$ALEMBIC_LOG" 2>&1; then
   cat "$ALEMBIC_LOG"
   rm -f "$ALEMBIC_LOG"
 else
   cat "$ALEMBIC_LOG"
-  ALEMBIC_DOPPELT=0
-  if grep -qiE 'DuplicateTable|DuplicateColumn|already exists' "$ALEMBIC_LOG"; then ALEMBIC_DOPPELT=1; fi
-  rm -f "$ALEMBIC_LOG"
-  # Den Alembic-Stand nur abfragen, wenn der Fehler ueberhaupt nach Doppelanlage aussieht:
-  # sonst waere es ein zusaetzlicher Aufruf gegen eine Datenbank, die gerade nicht antwortet.
-  ALEMBIC_STAND="nicht_geprueft"
-  if [[ "$ALEMBIC_DOPPELT" == "1" ]]; then
-    # Leere Ausgabe heisst: keine Tabelle alembic_version oder kein Eintrag darin.
-    ALEMBIC_STAND=$("$VENV/bin/alembic" current 2>/dev/null | tr -d '[:space:]' || true)
-  fi
-  if [[ "$ALEMBIC_DOPPELT" == "1" && -z "$ALEMBIC_STAND" ]]; then
-    echo "Schema vorhanden, aber ohne Alembic-Stand (fruehere create_all-Anlage) -- stemple einmalig auf head."
-    if ! "$VENV/bin/alembic" stamp head; then
-      echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic stamp head)"
-      false
-    fi
-    if ! "$VENV/bin/alembic" upgrade head; then
-      echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head nach stamp head)"
-      false
-    fi
-    echo "Datenbank nach dem Stempel regulaer auf head hochgezogen."
+  if grep -qiE 'DuplicateTable|DuplicateColumn|already exists' "$ALEMBIC_LOG"; then
+    echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head): Tabelle oder Spalte existiert bereits -- das Schema stammt nicht aus der Migrationskette. Nichts wird gesetzt oder nachgebaut. Weiter nach docs/BETRIEB.md, Abschnitt \"Bestandsdatenbank auf die Migrationskette heben\"."
   else
-    echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head), kein heilbarer Doppelanlage-Fall -- Abbruch ohne create_all-Rueckfall"
-    false
+    echo "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head), Ursache im Alembic-Protokoll oben. Bei einer Bestandsdatenbank ohne Migrationsstand: docs/BETRIEB.md, Abschnitt \"Bestandsdatenbank auf die Migrationskette heben\"."
   fi
+  rm -f "$ALEMBIC_LOG"
+  false
 fi
+DATENBANK_NACHHER=$("$VENV/bin/alembic" current 2>/dev/null | tr '\n' ' ' | sed 's/ *$//')
+echo "Datenbank nachher: $DATENBANK_NACHHER"
 
 SCHRITT="dienst"
 # T-0197: kap2-test.service ist eine System-Unit und wird ohne sudo neu gestartet. "systemctl
