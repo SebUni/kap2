@@ -3,7 +3,9 @@
 Querschnittsdatei der Methodik, gültig für alle 102 Klimawirkungen der KWRA 2021. Frage: Wie stark senkt die
 Anpassungskapazität einer Kommune die Einstufung einer Klimawirkung, und woher stammen die Reifegrade? Werte bekommt in
 diesem Schritt nur #95 Hitzebelastung (A-0048; Vorhaben T-1122-cmo, Schritt 1 = Ticket T-1895-methodik_manager). Die
-Regel ergibt eine Stufe, keinen Euro-Betrag.
+Regel ergibt eine Stufe, keinen Euro-Betrag. Schritt 2 (Ticket T-1896-methodik_manager) legt im Abschnitt
+„Anpassungspotenzial und Doppelzählung“ fest, was das Anpassungspotenzial ist und wie Stufe, Anpassungspotenzial und
+der Euro-Betrag der Maßnahmen aufeinander wirken.
 
 Abkürzungen: **Broschüre** = Umweltbundesamt (Porst, Voß, Kahlenborn, Schauser): „Klimarisikoanalysen auf kommunaler
 Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091“, Juni 2022 (PDF-Seite = gedruckte Seite); **KWRA** =
@@ -280,6 +282,114 @@ die fünf Stufen von Tabelle 5 leistet die Summentabelle unter (c).
 > analysiert, gilt als Abschätzung von KAP3 der Rahmen gering (0) bis mittel (1). Summentabelle und Rahmen sind
 > Festlegungen von KAP3.
 
+## Anpassungspotenzial und Doppelzählung
+
+Drei Größen des Produkts setzen auf denselben Maßnahmen auf: die Wirkung der Maßnahmen in Euro (Kapitel 5 der Berichte,
+`backend/app/services/measure_service.py`), das Anpassungspotenzial (`anpassungspotenzial()` in
+`backend/app/services/charakterisierung.py`) und die Anpassungskapazität mit der Stufe aus Regel A. Dieser Abschnitt
+legt genau eine Definition des Anpassungspotenzials fest (Definition P) und eine Regel, wie die drei Größen aufeinander
+wirken (Regel D). Regel A bleibt unverändert.
+
+### Definition P: Anpassungspotenzial
+
+**Das Anpassungspotenzial einer Klimawirkung in einer Kommune ist der Anteil ihres bewerteten Schadens, den alle
+Maßnahmen des Katalogs für diese Klimawirkung zusammen wegnehmen, wenn jede die ganze Kommune abdeckt:**
+\(p = 1 - S_{\text{alle}} / S_{\text{ohne}}\).
+
+| Zeichen | Bedeutung | Einheit | Herleitung |
+|---|---|---|---|
+| \(p\) | Anpassungspotenzial der Klimawirkung in der Kommune | Anteil, 0–1 | abgeleitet aus den beiden Zeilen darunter |
+| \(S_{\text{ohne}}\) | bewerteter Schaden der Klimawirkung ohne weitere Anpassung, Summe über ihre Risiko-Codes; der heutige Anpassungsstand steckt darin (#95: über die Kalibrierung, Bericht 95 Kapitel 1 (a)) | Mio. € je Jahr | übernommen aus der Rechenkette des Berichts; #95 Berlin 362,9 Mio. € (Preisstand 2024), Bericht 95 §3.0 Ebene 10; im Produkt `damages_base_eur` in `build_cost_summary` |
+| \(S_{\text{alle}}\) | bewerteter Schaden derselben Klimawirkung, wenn jede Maßnahme, die der Katalog ihr im Euro-Pfad zuordnet (`linked_risk_codes`), die ganze Kommune abdeckt (Abdeckung 1, Stückzahl am Richtwert); Eingaben wie der Anteil gekühlter Heimplätze mit dem Wert der Kommune, sonst mit der Voreinstellung aus Kapitel 7 des Berichts | Mio. € je Jahr | abgeleitet mit den Hebeln aus Kapitel 5 des Berichts samt ihren Regeln für das Zusammenwirken, Kappungen und Doppelzählungs-Wächtern; im Produkt derselbe Rechenweg wie `damages_with_measures_eur` in `build_cost_summary` |
+
+Gründe:
+
+- **Je Klimawirkung, nicht je Risiko-Code.** Die KWRA ordnet Klimawirkungen den Gruppen zu: „Welche Klimawirkung auf
+  Basis der Betrachtung der Anpassungskapazität welcher Gruppe von Handlungserfordernissen zugeordnet wird, hängt davon
+  ab, welches Restrisiko … akzeptiert werden soll“ (TB6 Kap. 6.2, S. 141). Regel A rechnet ebenso je Klimawirkung. In
+  Euro lassen sich die Risiko-Codes einer Klimawirkung zusammenzählen (#95: Mortalität und Morbidität).
+- **Ein Anteil, kein Betrag.** Die Frage der KWRA ist, ob die Maßnahmen das Risiko auf ein gesetztes Niveau senken
+  (TB6 S. 140); die Einordnungsschwellen 0,5 und 0,1 in `querschnitt_gewissheit.md` sind Anteile und bleiben dort.
+- **Aus dem Euro-Pfad abgelesen, nicht nachgebaut.** \(p\) nutzt dieselben Hebel, Faktoren und Grenzen wie der
+  Euro-Betrag mit Maßnahmen. So steht jeder Wert an einer Stelle (Abgleich-Regel 5 in `.claude/methodik-loop.md`), und
+  jede Maßnahme, die den Betrag senkt, zählt auch in \(p\). Keine zählt still mit null (P2).
+- **Ohne Kommune eine Untergrenze.** Hängt ein Hebel am Altersaufbau oder an den Zellen der Kommune (#95: S157,
+  Kühlzentren, Schutzprogramme), gibt es ohne Kommune, etwa im Katalog, keinen Betrag für ihn. Er zählt dann nicht,
+  \(p\) ist eine Untergrenze, und ein sichtbarer Vermerk nennt die fehlenden Hebel. Bericht 95 regelt das für S157
+  schon so (Kapitel 5, Hebel S157, Absatz „Ohne Kommune (Befund 214)“); einen Ersatzwert gibt es nicht. Hat eine
+  Klimawirkung im Produkt keinen bewerteten Schaden, ist \(p\) „nicht bestimmbar: kein Euro-Betrag“, nie still 0.
+
+**Gegen den Code.** `anpassungspotenzial()` in `backend/app/services/charakterisierung.py` rechnet heute so (gemessen am
+08.10.2026, ohne Kommune: 0,061 für `EXPECTED_ANNUAL_MORTALITY` und 0,061 für `EXPECTED_ANNUAL_MORBIDITY`):
+
+| Punkt | Definition P | `anpassungspotenzial()` heute | Folge für #95 |
+|---|---|---|---|
+| Bezug | je Klimawirkung, Euro-Summe ihrer Risiko-Codes | je Risiko-Code; `charakterisierungen()` gibt jedem Code aus `catalog.RISKS_BY_CODE` einen Wert | #95 hat zwei Werte und damit zwei mögliche Gruppen |
+| Rechenweg | derselbe wie der Euro-Betrag mit Maßnahmen | eigene Formel \(1 - \prod (1 - r)^n\), die `_reduction_factor` in `measure_service.py` bei voller Abdeckung nachbildet; S157 über `_s157_faktor` | zwei Stellen für denselben Wert |
+| Hebel mit eigenem Zweig | zählen mit ihrer Euro-Wirkung | Schutzprogramme (`effect_model` „vg“) haben keine `default_reduction` und zählen mit \(r = 0\); die Kühlzentren im Zweig „s157“ zählen nicht, nur \(r_{\text{S157}}\) | es fehlen 11,7 Mio. € (Schutzprogramme) und 0,75 Mio. € je Jahr (Kühlzentren), Kapitel 5 |
+| Morbidität | Hitzeaktionsplan nur auf die Mortalität (Kapitel 5, Hebel Hitzeaktionsplan: „Die Morbidität bleibt unberührt“) | 0,061 auch für die Morbidität, weil der Katalog den Plan mit ihr verknüpft | dieselbe Ursache wie Befund 230 in `reviews/BEFUNDE_95.md` |
+| ohne Kommune | Untergrenze mit Vermerk für alle fehlenden Hebel | S157 zählt nicht (Befund 214); Schutzprogramme und Kühlzentren zählen nie | 0,061, Vermerk nur für S157 |
+
+**Was die heutige Formel an der Lage verfälscht.** Für Berlin nennt Bericht 95 nach der heutigen Formel \(p\) = 0,064
+(Kapitel 5, Hebel S157, Absatz „S157 mit seiner Voreinstellung im Anpassungspotenzial (Befund 149)“). Nach Definition P
+zählen Schutzprogramme und Kühlzentren mit. Die Summe der Einzelbeträge aus Kapitel 5 ist eine Obergrenze, weil die Hebel
+auf denselben Exzess multipliziert und gekappt werden und zusammen nie mehr wegnehmen als einzeln addiert:
+(22,1 + 1,2 + 0,75 + 11,7) / 362,9 = 35,75 / 362,9 = 0,0985. \(p\) liegt also zwischen 0,064 und 0,0985; den genauen
+Wert rechnet das Produkt auf dem Euro-Pfad. Beide liegen unter der Schwelle 0,1, die Gruppe bleibt. Der Abstand zur
+Schwelle schrumpft aber von 3,6 Pp. auf bis zu 0,15 Pp. Am oberen Bandende der Schutzprogramme (34,9 Mio. €, Kapitel 5,
+Absatz „Kappung 0,794“) liegt \(p\) bei mindestens (34,9 + 192,3 × 0,061) / 362,9 = 0,128 und damit über 0,1;
+192,3 Mio. € = 361,8 − 169,5 Mio. € ist die Mortalität außerhalb der Bänder ab 75 ohne Heim, auf die dort nur der
+Hitzeaktionsplan wirkt. Die Gruppe hängt dann an einem Hebel, den die heutige Formel nicht sieht. Die Abweichung steht
+als Befund 1 unter „Befunde an Berichte“; der Code bleibt hier unverändert.
+
+### Regel D: wie die drei Größen aufeinander wirken
+
+**Regel D.**
+
+1. Den Euro-Betrag senken nur die Maßnahmen, die die Kommune wählt, über die Hebel aus Kapitel 5 ihres Berichts, jeder
+   einmal und nach den Regeln dort für das Zusammenwirken. Der Euro-Betrag hat zwei Zustände: ohne weitere Anpassung
+   (\(S_{\text{ohne}}\)) und mit den gewählten Maßnahmen.
+2. Die Anpassungskapazität wirkt nur auf die Stufe (Regel A), nie auf den Euro-Betrag.
+3. Das Anpassungspotenzial wird aus dem Euro-Pfad abgelesen (Definition P) und wirkt nur auf die
+   Charakterisierungsgruppe, zusammen mit der Gewissheit. Es wird weder vom Euro-Betrag noch von der Stufe abgezogen.
+4. Stufe und Euro-Betrag werden nie ineinander umgerechnet.
+
+| Größe | auf den Euro-Betrag | auf die Stufe mit Anpassung | auf die Charakterisierungsgruppe |
+|---|---|---|---|
+| Wirkung der gewählten Maßnahmen (Kapitel 5, `measure_service.py`) | senkt ihn, jeder Hebel einmal | keine | keine |
+| Anpassungspotenzial \(p\) (Definition P, `charakterisierung.py`) | keine; wird aus ihm abgelesen | keine | wirkt, mit der Gewissheit |
+| Anpassungskapazität: Summe der Reifegrade → Wirksamkeit (Regel A) | keine | senkt sie | keine |
+
+**Warum die Kapazität nur auf die Stufe wirkt:**
+
+- **Keine Effektgröße.** Die Reifegrade sind eine Selbsteinschätzung und kein Nachweis einer Wirkung ((c), „Warum
+  abgerundet wird“). Ein Euro-Hebel braucht eine Effektgröße aus Interventionsstudien oder eine hergeleitete
+  Abschätzung, marginal gegenüber dem heutigen Stand (Aufgabe §3.5). Tabelle 5 rechnet in Stufen von 1 bis 3 und kennt
+  keinen Euro (Broschüre S. 29).
+- **Dieselben Maßnahmen.** Für #95 fragt die Einstufung nach Hitzeaktionsplan, Warnkette, Kühlräumen und Grünflächen
+  ((c), „Körnigkeit“). Den Hitzeaktionsplan, die Kühlräume und die Schutzprogramme rechnet Kapitel 5 schon als Hebel in
+  Euro. Eine Minderung aus der Kapazität käme hinzu und zöge denselben Plan ein zweites Mal ab.
+- **Der Bestand steckt im Basiswert.** Was in den Kalibrierjahren 2012–2024 schon wirkte, ist im Euro-Betrag ohne
+  weitere Anpassung enthalten (Bericht 95 Kapitel 1 (a)). Kapitel 5 zieht bestehende Programme deshalb ab
+  (Doppelzählungs-Wächter `heat.vg_in_kalibrierjahren`; Bestand gekühlter Heimplätze `heat.s_gek_kalib`). Die
+  Selbsteinschätzung beschreibt gerade diesen Bestand; als Euro-Minderung zählte sie ihn ein zweites Mal.
+
+**Warum nichts doppelt zählt.** Jede Maßnahme wirkt auf jeder Skala genau einmal. Im Euro-Betrag wirkt sie als Hebel aus
+Kapitel 5. In der Stufe wirkt sie über die Selbsteinschätzung der Kommune, die an die Stelle der bundesweiten Wirksamkeit
+tritt ((e), „Ersetzen, nicht addieren“). Die gewählten Maßnahmen senken die Stufe nicht noch einmal, und die Stufe senkt
+den Euro-Betrag nicht. Stufe und Betrag stehen nebeneinander und werden nie addiert, multipliziert oder ineinander
+umgerechnet. Das Anpassungspotenzial ist ein Verhältnis zweier Beträge desselben Pfads und zieht nichts ab.
+
+**Was die einfachere Rechnung verfälschen würde.** Läse man die Minderung der Stufe als Minderung des Betrags, im
+Beispiel der Rechenkette von 3 auf 2 also als ein Drittel weniger, fielen in Berlin nach dem Hitzeaktionsplan weitere
+340,8 Mio. € × (1 − 2/3) = 113,6 Mio. € je Jahr weg (Block `doppelzaehlung_95`). Das ist gut das Fünffache des Plans
+selbst (22,1 Mio. €), ohne Effektgröße, und den Plan zählte die Rechnung zweimal, wenn die Kommune ihre Organisation
+wegen dieses Plans hoch einstuft.
+
+**Modellgrenze.** Wählt eine Kommune Maßnahmen, ohne ihre Selbsteinschätzung nachzuführen, sinkt der Betrag, die Stufe
+aber nicht. Das ist keine Doppelzählung, sondern ein fehlender Abgleich; das Produkt zeigt beides mit seiner Grundlage
+nebeneinander.
+
 ## Rechenkette
 
 Format nach Aufgabe §4, hier „Feld der Mappe → Stufe“ und Nachschlagen in Tabellen statt „Zahl × Faktor“. Kein
@@ -308,6 +418,14 @@ Die Stufe mit Anpassung hängt nur daran, ob die Summe unter 6 liegt.
 | Wirksamkeit nach Summentabelle | 0 | 0,5 | 1 | 1,5 | 2 |
 | im Rahmen 0,5–1 | 0,5 | 0,5 | 1 | 1 | 1 |
 | Stufe mit Anpassung | mittel-hoch | mittel-hoch | mittel | mittel | mittel |
+
+**Euro-Betrag ohne und mit Maßnahmen nach Regel D (#95, Berlin).** Ohne weitere Anpassung trägt #95 in Berlin
+362,9 Mio. € je Jahr (Preisstand 2024; Bericht 95 §3.0 Ebene 10, Zustand nach Kapitel 1 (a)). Mit dem Hitzeaktionsplan
+sind es 362,9 − 22,1 = 340,8 Mio. € je Jahr; die 22,1 Mio. € = 361,8 Mio. € × (1 − 0,939) stehen in Bericht 95
+Kapitel 5, Hebel „Hitzeaktionsplan / Frühwarnkette (S155/S158)“, Absatz „Berlin“. Die Selbsteinschätzung aus Ebene 3
+(Summe 9) ändert keinen der beiden Beträge (Regel D, Punkt 2); sie senkt allein die Stufe von „hoch“ auf „mittel“
+(Ebenen 2 und 10). Der Plan ändert die Stufe nur, wenn die Kommune ihn in ihrer Selbsteinschätzung führt. Das
+Anpassungspotenzial nach Definition P liegt für Berlin zwischen 0,064 und 0,0985.
 
 Beispiel-Block `rechenkette_klimarisiko_mit_anpassung_95`, aus dem Stamm des Produkt-Repos ausführbar (am 07.10.2026
 gelaufen, Ausgabe darunter):
@@ -400,6 +518,42 @@ je Summe: {0: 'mittel-hoch', 1: 'mittel-hoch', 2: 'mittel-hoch', 3: 'mittel-hoch
 Zeilen V = ja: 33 | Paare: 165 | treffen ohne (d): 150 | mit (d): 164 | Abweichung: [(10, 'P12', 'AA12', 'AF12', 2.0, 'mittel-hoch')] | #95: [True, True, True, True, True]
 ```
 
+Beispiel-Block `doppelzaehlung_95`, Regel D und Definition P an #95, Berlin; alle Beträge aus Bericht 95 (am 08.10.2026
+gelaufen, Ausgabe darunter):
+
+```python
+# doppelzaehlung_95 — Regel D und Definition P an #95, Berlin (Beträge aus Bericht 95)
+S_OHNE = 362.9   # Mio. € je Jahr (Preisstand 2024), Bericht 95 §3.0 Ebene 10
+MORT = 361.8     # Mio. € je Jahr, Mortalität, Bericht 95 §3.0 Ebene 8
+D_HAP = 0.939    # Kapitel 5, Hebel Hitzeaktionsplan
+EINZELN = {"Hitzeaktionsplan": 22.1, "S157": 1.2, "Kuehlzentren": 0.75, "Schutzprogramme": 11.7}  # Kapitel 5, Berlin
+R_S157 = 0.00345  # Kapitel 5, Hebel S157, Absatz „S157 mit seiner Voreinstellung im Anpassungspotenzial“
+VG_BAENDER = 169.5  # Mio. € je Jahr, Bänder 75–84 und 85+ außerhalb der Heime, Kapitel 5, Schutzprogramme
+VG_OBEN = 34.9   # Mio. € je Jahr, Schutzprogramme am oberen Bandende, Kappung 0,794, Kapitel 5
+
+# Regel D, Punkte 1 und 2: Euro ohne und mit Hitzeaktionsplan; die Kapazität wirkt auf keinen Betrag
+hap = round(MORT * (1 - D_HAP), 1)
+s_mit = round(S_OHNE - hap, 1)
+# Definition P: Grenzen für Berlin
+p_heute = 1 - D_HAP * (1 - R_S157)
+p_oben = sum(EINZELN.values()) / S_OHNE
+p_vg_oben = (VG_OBEN + (MORT - VG_BAENDER) * (1 - D_HAP)) / S_OHNE
+# verworfene Rechnung: Stufe 3 → 2 als ein Drittel weniger Euro
+verworfen = s_mit * (1 - 2 / 3)
+print("ohne:", S_OHNE, "| Hitzeaktionsplan:", hap, "| mit:", s_mit, "| p heute:", round(p_heute, 3),
+      "| p höchstens:", round(p_oben, 4), "| p am oberen Band der Schutzprogramme mindestens:", round(p_vg_oben, 3),
+      "| verworfen, Stufe als Euro:", round(verworfen, 1))
+assert (hap, s_mit, round(p_heute, 3), round(p_oben, 4), round(p_vg_oben, 3), round(verworfen, 1)) == \
+    (22.1, 340.8, 0.064, 0.0985, 0.128, 113.6)
+assert round(p_heute, 3) < 0.1 and p_oben < 0.1 < p_vg_oben  # Schwelle 0,1 aus querschnitt_gewissheit.md
+```
+
+Ausgabe:
+
+```
+ohne: 362.9 | Hitzeaktionsplan: 22.1 | mit: 340.8 | p heute: 0.064 | p höchstens: 0.0985 | p am oberen Band der Schutzprogramme mindestens: 0.128 | verworfen, Stufe als Euro: 113.6
+```
+
 ## Entscheidungslog
 
 Gewählt ist Regel A. Der Vorschlag des CEO (qualitativ, ohne Euro-Betrag, mit Seite) ist darin im Kern gewählt und
@@ -434,6 +588,27 @@ Verworfen, je mit einem Satz:
     Klimawirkung führen und eine Fähigkeit, die für eine Klimawirkung viel und für eine andere wenig beiträgt, sonst
     überall mit demselben Wert einginge.
 
+**Schritt 2 (T-1896-methodik_manager).** Gewählt sind Definition P und Regel D: Die Anpassungskapazität wirkt nur auf
+die Stufe, nicht auf den Euro-Betrag. Regel A bleibt unverändert; kein Befund dieses Schritts erzwingt eine Änderung.
+Verworfen, je mit einem Satz:
+
+12. **Die Kapazität mindert den Euro-Betrag zusätzlich zu den Maßnahmen:** verworfen, weil die Selbsteinschätzung keine
+    Effektgröße hat, ihre Fähigkeiten dieselben Maßnahmen sind, die Kapitel 5 schon abzieht, und der Bestand schon im
+    Basiswert steckt; in Berlin fielen so weitere 113,6 Mio. € je Jahr weg.
+13. **Die Kapazität ersetzt die Maßnahmenwahl im Euro-Betrag (Betrag mit Anpassung aus der Stufe):** verworfen, weil
+    Tabelle 5 keine Euro-Skala hat und jeder Umrechnungsfaktor von Stufe in Euro ohne Quelle wäre.
+14. **Das Anpassungspotenzial als eigene Faktorformel neben dem Euro-Pfad (heutiger Stand):** verworfen, weil derselbe
+    Wert dann an zwei Stellen steht und Hebel mit eigenem Zweig still mit null zählen, in Berlin 12,45 Mio. € je Jahr.
+15. **Das Anpassungspotenzial je Risiko-Code statt je Klimawirkung:** verworfen, weil die KWRA Klimawirkungen den
+    Gruppen zuordnet (TB6 S. 141) und #95 sonst zwei Gruppen haben könnte.
+16. **Das Anpassungspotenzial aus der bundesweiten Wirksamkeit der KWRA (Spalten W, Z und AA):** verworfen, weil es dann
+    für alle Kommunen gleich wäre, die Maßnahmen des Katalogs nicht sähe und die Schwellen in `querschnitt_gewissheit.md`
+    auf die Minderung durch die Katalogmaßnahmen bezogen sind.
+17. **Das Anpassungspotenzial aus der Stufe der Kommune (Wirksamkeit geteilt durch Stufe ohne Anpassung):** verworfen,
+    weil es dann die Kapazität ein zweites Mal ausdrückte und die Charakterisierung Regel A wiederholte.
+18. **Das Anpassungspotenzial zusätzlich vom Euro-Betrag abziehen:** verworfen, weil es aus denselben Hebeln besteht,
+    die den Betrag mit Maßnahmen schon senken.
+
 **Bewusst offen (Gegenprobe Zeile 18, `docs/KONFORMITAET_CHECKLISTE.md`):**
 
 - **A3** „welche Anpassungsmöglichkeiten grundsätzlich bestehen“ (S. 28): Regel A nennt keine Maßnahme. Zuständig: CTO
@@ -448,7 +623,24 @@ Verworfen, je mit einem Satz:
 
 ## Befunde an Berichte
 
-Keine. Verglichen wurde `docs/methodik/95_hitzebelastung.md`, Abschnitt „Risiko ohne (weitere) Anpassung“ (ab Zeile 94),
+**Schritt 2.** Beide Befunde gehen über den CMO weiter (eiserne Regel 5); Code und Bericht 95 ändert dieser Schritt nicht.
+
+- **Befund 1, an den CTO.** `backend/app/services/charakterisierung.py`, `anpassungspotenzial()` (mit `_s157_faktor` und
+  `charakterisierungen()`), gegen Definition P. Richtung: Der Code weicht ab. Er rechnet je Risiko-Code mit einer
+  eigenen Faktorformel und zählt die Schutzprogramme (r = 0, weil `default_reduction` leer ist) und die Kühlzentren
+  nicht mit. Wirkung für #95 in Berlin: \(p\) = 0,064 statt eines Werts zwischen 0,064 und 0,0985; die Gruppe (unter
+  0,1) bleibt, am oberen Bandende der Schutzprogramme läge \(p\) bei mindestens 0,128. Für die Morbidität gibt der Code
+  0,061 statt 0, aus derselben Ursache wie Befund 230 in `reviews/BEFUNDE_95.md` (zurückgestellt, CTO, Termin
+  16.10.2026). Gemessen am 08.10.2026 mit
+  `python3 -c "import sys; sys.path.insert(0,'backend'); from app.services import charakterisierung as ch; print(round(ch.anpassungspotenzial('EXPECTED_ANNUAL_MORTALITY'),4), round(ch.anpassungspotenzial('EXPECTED_ANNUAL_MORBIDITY'),4))"`:
+  `0.061 0.061`.
+- **Befund 2, an das Vorhaben von Bericht 95.** `docs/methodik/95_hitzebelastung.md`, Kapitel 5, Hebel S157, Absätze
+  „S157 mit seiner Voreinstellung im Anpassungspotenzial (Befund 149)“ und „\(a_{85+}\) je Kommune (Befund 183)“: Der Bericht
+  nennt als Anpassungspotenzial 0,064 aus Hitzeaktionsplan und S157. Nach Definition P zählen Schutzprogramme und
+  Kühlzentren mit. Richtung: Der Bericht beschreibt den heutigen Code. Wirkung: kein Euro-Betrag des Berichts ändert
+  sich, nur die Zahl 0,064 und ihr Satz.
+
+**Schritt 1.** Keine. Verglichen wurde `docs/methodik/95_hitzebelastung.md`, Abschnitt „Risiko ohne (weitere) Anpassung“ (ab Zeile 94),
 mit der Mappe am 07.10.2026: Gegenwart „hoch“ = N97, Mitte optimistisch „mittel“ = O97, Mitte pessimistisch „hoch“ = P97,
 Ende optimistisch „mittel“ = Q97, Ende pessimistisch „hoch“ = R97; Fundstelle Zeile 97, Spalten N–R mit Kopfzellen N2 bis
 R2 = Mappe; Gewissheit Mitte „hoch“ = S97, Ende „mittel“ = T97.
@@ -465,7 +657,15 @@ R2 = Mappe; Gewissheit Mitte „hoch“ = S97, Ende „mittel“ = T97.
   Auswertung – Klimarisiken, Handlungserfordernisse und Forschungsbedarfe. Reihe Climate Change, Dessau-Roßlau, Oktober
   2021. Lokale Kopie `docs/KWAR/kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf`, SHA-256
   `e21823b021f3f774331ccd7b3efa086446084ae4781993d6f86fb671d678bc8f`. Verwendet: Kap. 5.1, S. 112–113 (Autoren Porst,
-  Kahlenborn).
+  Kahlenborn); Kap. 6.2 „Charakterisierung der Handlungserfordernisse“, S. 140–141 (Schritt 2).
+- **[Bericht 95]** `docs/methodik/95_hitzebelastung.md` (abgenommen), Schritt 2: Kapitel 1, Abschnitt „Risiko ohne
+  (weitere) Anpassung“, Absatz (a); §3.0 Rechenkette, Ebenen 8 und 10; Kapitel 5, Hebel „Hitzeaktionsplan /
+  Frühwarnkette (S155/S158)“ (Absätze „Berlin“ und „Doppelzählungs-Wächter“), „Gekühlte Räume / Klimaanlagen in
+  Pflegeheimen (S157)“ (Absätze zum Anpassungspotenzial, Befunde 149, 183 und 214), „Öffentliche Kühlzentren“ und
+  „Schutzprogramme vulnerable Gruppen“ (Absätze „Berlin“, „Doppelzählungs-Wächter (Befund 150)“, „Kappung 0,794“).
+- **[Code]** `backend/app/services/charakterisierung.py` (`anpassungspotenzial`, `_s157_faktor`, `charakterisierungen`)
+  und `backend/app/services/measure_service.py` (`_reduction_factor`, `_measure_cell_factor`, `build_cost_summary`),
+  gelesen am 08.10.2026 auf dem Stand von `main`.
 - **[Mappe]** `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, SHA-256
   `70cf6d0090e24b15098f61e5004bf709e91c41cc2b397510499a4cedb8223611`, Blatt „Klimawirkungen“: Kopfzeile 2; Zeile 97
   (#95), Spalten A, D, N–T, U, V, W–AF, AI, AJ (AJ97: „TB 6 Tab. 1 | TB 6 Tab. 22 | …“); für den Gegenabgleich und (f)
