@@ -43,7 +43,9 @@ heat.gamma_hoehe). h ist die mittlere Geländehöhe der Zelle (5 × 5 Punkte, bi
 des 1-km-Blocks (EPSG:3035), beide aus den Terrarium-Höhenkacheln, die auch das Produkt liest (Adresse aus
 backend/app/services/terrain_service.py; Zoom 12, rund 23 m je Pixel). Ausgegeben werden die mittlere
 Höhenabweichung der Einwohner, die Verschiebung ihrer Temperatur und der Zelllauf ohne und mit Höhenterm (mit
---ersatz der Zelllauf ohne Eigenheit, sonst (d)).
+--ersatz der Zelllauf ohne Eigenheit, sonst (d)). Zum Vergleich folgt der Zelllauf mit h̄ nur über die bewohnten
+Zellen der Gemeinde im Block (Befund 242): Dann mitteln sich die Abweichungen dieser Zellen im Block zu null, und die
+gerichtete Wirkung (die Menschen wohnen unten) fällt weg.
 Beispiel: python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz --hoehe
 
 Mit --rangliste (ohne --gemeinde) zählt das Skript für alle Gemeinden aus VG250 den Anteil der Einwohner in
@@ -1174,8 +1176,17 @@ def main():
         print((f"  h − h̄ der bewohnten Zellen: Einwohnermittel {de(dh_ew, 1)} m, Spanne {de(min(dh), 1)} bis "
                f"{de(max(dh), 1)} m; Temperatur der Einwohner im Mittel {de(-gamma * dh_ew, 3)} K").replace("-", "−"))
         text = "Zelllauf ohne Eigenheit (Ersatzregel, dazu (d))" if args.ersatz else "(d)"
-        print(f"  {text}: ohne Höhenterm {mio(vorher)}, mit Höhenterm {mio(nachher)} je Jahr, "
-              f"× {de(nachher / vorher, 5)} ({de(100 * (nachher / vorher - 1), 2)} %)")
+        print((f"  {text}: ohne Höhenterm {mio(vorher)}, mit Höhenterm {mio(nachher)} je Jahr, "
+               f"× {de(nachher / vorher, 5)} ({de(100 * (nachher / vorher - 1), 2)} %)").replace("-", "−"))
+        # Vergleich (Befund 242): h̄ nur über die bewohnten Zellen der Gemeinde im Block statt über alle 100 Zellen
+        teil: dict = {}
+        for x, y in xy:
+            teil.setdefault((int(x) // 1000, int(y) // 1000), []).append(gl.zelle(x, y))
+        dh_teil = [gl.zelle(x, y) - sum(teil[k]) / len(teil[k]) for x, y in xy for k in [(int(x) // 1000, int(y) // 1000)]]
+        teilw = modell.euro([(bd, t - gamma * d, h) for (bd, t, h), d in zip(basis, dh_teil)], args.sigma, gh)
+        print((f"  zum Vergleich h̄ nur über die bewohnten Zellen der Gemeinde im Block: {mio(teilw)} je Jahr, "
+               f"× {de(teilw / vorher, 5)} ({de(100 * (teilw / vorher - 1), 2)} %); Einwohnermittel h − h̄ "
+               f"{de(sum(e * d for e, d in zip(ew, dh_teil)) / sum_ew, 1)} m").replace("-", "−"))
     with open(KALIB / "sommermittel_bundesland_povw.csv", newline="", encoding="utf-8") as fh:
         reihe = [float(r["t_sommer_povw"]) for r in csv.DictReader(fh)
                  if r["bundesland"] == land and args.bis_jahr - 9 <= int(r["jahr"]) <= args.bis_jahr]

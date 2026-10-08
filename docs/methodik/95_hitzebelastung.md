@@ -360,7 +360,7 @@ $$ T_{\text{Zelle}} \;=\; T_{\text{DWD}} \;+\; \bigl[\, \Delta T_{\text{UHI}} - 
 | \(T_{\text{DWD}}\) | DWD-CDC-Rasterwert air_temperature_mean (Jun–Aug) | °C | DWD, 1 km |
 | \(\Delta T_{\text{UHI}}\) | Stadtklima-Zuschlag der Zelle (OSM/SVF-Stadtmodell) | K | Produktmodell; register:95-W124-01 |
 | \(\overline{\Delta T_{\text{UHI}}}^{1\text{km}}\) | Mittel der Zuschläge derselben 1-km-Zelle (Mittelwerttreue) | K | berechnet |
-| \(h,\ \bar h\) | Geländehöhe Zelle bzw. 1-km-Mittel (DGM) | m | Geländemodell |
+| \(h,\ \bar h\) | Geländehöhe der 100-m-Zelle bzw. Mittel aller 100 Zellen ihres 1-km-Blocks (DGM), bewohnt oder nicht, unabhängig davon, welche Zellen gerechnet werden | m | Geländemodell |
 | \(\gamma_h\) | Standard-Temperaturgradient | K/m | 0,0065 (ICAO) |
 
 Mittelwerttreue: Das DWD-Raster enthält die Wärmeinsel bereits teilweise; das Stadtmodell
@@ -753,13 +753,19 @@ Die einzige Messung zum Fallmix zeigt nach unten: Hitzefälle liegen kürzer im 
 Karlsson & Ziebarth [62] nennen für alle Fälle 488,87 Krankenhaustage auf 57,99 Aufnahmen je 100.000 Einwohner und
 Tag, also 8,43 Tage je Fall (Tab. A1, PDF-S. 61). Ein Hitzetag bringt nach Ansatz II, dem Basiswert (Log 19),
 8.000 Krankenhaustage (Tab. 5, PDF-S. 59) auf 1.148 Aufnahmen (Anmerkung zu Tab. 3, PDF-S. 57), also 6,97 Tage je
-Fall. Das Verhältnis ist 6,97 / 8,43 = 0,827; nach Ansatz I sind es 19.000 / 2.542 = 7,47 Tage (Anmerkung zu Tab. 1,
-PDF-S. 55), Verhältnis 0,887. Das untere Ende nimmt an, dass die Kosten mit den Liegetagen sinken:
-7.152 × 0,827 = 5.912 €, nach außen gerundet 5.910 €. Das obere Ende ist der Wert selbst, weil die Fallpauschale je
-Fall zahlt und nicht je Tag. Der Wert liegt damit am oberen Rand des Bandes; das ist gewollt, weil die einzige
-Messung in eine Richtung zeigt. Wirkung auf den Jahresbetrag (Rechenkette §3.0, Zeile 9): Am oberen Ende ändert sich
-nichts. Am unteren Ende sinkt der Betrag in Berlin um 152,0 Fälle × 1.242 € = 0,19 Mio. € je Jahr, von 362,89 auf
-362,70 Mio. € (−0,05 %), in Warmsen um 0,121 Fälle × 1.242 € = 151 € je Jahr, von 177.406 auf 177.255 € (−0,08 %).
+Fall. Das Verhältnis der ungerundeten Werte ist (8.000 / 1.148) / (488,87 / 57,99) = 0,8266; nach Ansatz I sind es
+19.000 / 2.542 = 7,47 Tage (Anmerkung zu Tab. 1, PDF-S. 55), Verhältnis 0,8866. Das untere Ende nimmt an, dass die
+Kosten mit den Liegetagen sinken: 7.152 × 0,8266 = 5.912 €, nach außen gerundet 5.910 €. Das obere Ende ist der Wert
+selbst, weil die Fallpauschale je Fall zahlt und nicht je Tag. Der Wert liegt damit am oberen Rand des Bandes; das ist
+gewollt, weil die einzige Messung in eine Richtung zeigt. Wirkung auf den Jahresbetrag (Rechenkette §3.0, Zeile 9): Am
+oberen Ende ändert sich nichts. Am unteren Ende sinkt der Betrag in Berlin um 152,0 Fälle × 1.242 € = 0,19 Mio. € je
+Jahr, von 362,89 auf 362,70 Mio. € (−0,05 %). Für Warmsen rechnet dieselbe Kette mit den Eingaben der Anlage
+`95_zellvergleich.py --gemeinde 03256034` (Zeile „Kette“): Punkt 52,437 °N, 8,848 °E (Mittel der Außengrenze),
+18,63 °C und 11,3 Hitzetage aus dem DWD-Raster [33], Ebene 1 = 3.087 Einwohner im Zensus-Gitter [67] mit der
+Altersstruktur Niedersachsens, 2.381 · 360 · 239 · 107 (u65 · 65–74 · 75–84 · 85+). Das ergibt 177.406 € je Jahr, den
+Ausgangspunkt des Zelllaufs, der für Warmsen 175.256 € ergibt (§3.3). Fälle: (2.381 × 1,9 + 360 × 6,3 + 239 × 10,8 +
+107 × 15,6) / 100.000 × [1 + 0,024 × (11,3 − 7,2)] = 0,11042 × 1,0984 = 0,1213. Am unteren Ende sinkt der Betrag dort
+um 0,1213 Fälle × 1.242 € = 151 € je Jahr, von 177.406 auf 177.255 € (−0,085 %).
 
 ```python test: beispiel_95_voly_kette
 # VOLY-Kette: 79.500 x 1,4638 x 1,1792 x 1,1719 = ~160.800 EUR (Preisstand 2024)
@@ -985,10 +991,16 @@ der Mortalität. Er ist eine Verschiebung aus gemessener Höhe (Geländemodell) 
 und T + 0,195 K steigt der Betrag dann um den Faktor 1,098 im Klima von Berlin und 1,131 im Klima von Warmsen.
 **Was die einfachere Rechnung verfälschen würde:** Ohne Höhenterm läge der Betrag dort um rund 9 % zu niedrig, mehr als
 die Wirkung des oberen σ-Bandendes (Berlin × 1,063). Der Zelllauf rechnet den Höhenterm je Zelle mit γ_h aus
-`heat.gamma_hoehe` (Anlage `95_zellvergleich.py --ersatz --hoehe`; h je 100-m-Zelle, h̄ als Mittel der 100 Zellen des
+`heat.gamma_hoehe` (Anlage `95_zellvergleich.py --ersatz --hoehe`; h je 100-m-Zelle, h̄ als Mittel aller 100 Zellen des
 1-km-Blocks): Berlin 344,31 Mio. € statt 345,11 Mio. € je Jahr (−0,23 %), Warmsen 174.483 € statt 175.256 € (−0,44 %),
 Preisstand 2024. In beiden Kommunen wohnen die Menschen im Mittel kaum tiefer oder höher als das Mittel ihres 1-km-Blocks
-(Berlin 0,8 m, Warmsen 1,1 m höher); deshalb ist die Wirkung klein. Die Schritte (a) bis (d) des Zelllaufs in §3.0
+(Berlin 0,8 m, Warmsen 1,1 m höher); deshalb ist die Wirkung klein. h̄ ist das Mittel aller 100 Zellen des Blocks,
+bewohnt oder nicht (§3.1), denn nur gegen dieses Mittel sieht der Betrag, dass die Menschen unten wohnen. **Was ein
+Mittel nur über die bewohnten Zellen verfälschen würde:** Die Abweichungen der bewohnten Zellen mittelten sich dann im
+Block zu null, und die gerichtete Wirkung fiele weg; übrig bliebe nur, wie sich die Einwohner, vor allem die Älteren,
+auf höhere und tiefere Zellen des Blocks verteilen. Wohnen alle Menschen eines Blocks 30 m unter dessen Mittel, ergäbe ein Mittel nur über ihre Zellen
+h − h̄ = 0, und statt × 1,098 bliebe × 1. Mit der Anlage gerechnet (Zeile „zum Vergleich“): Berlin 344,69 Mio. € je Jahr
+(−0,12 %) statt 344,31 Mio. € (−0,23 %), Warmsen 175.217 € (−0,02 %) statt 174.483 € (−0,44 %). Die Schritte (a) bis (d) des Zelllaufs in §3.0
 und die Beträge, die darauf aufbauen, rechnen auf dem Rasterwert; der Höhenterm ist der Teil des Rests
 „intra-kommunale Bevölkerungsgewichtung“, den der Zelllauf beziffert. **Gegenargument:** Stadtklima und Relief werden
 verschieden behandelt. σ legt um jede Zelle dieselbe Streuung. Auch das Stadtklima könnte das Mittel verschieben, weil
@@ -1655,7 +1667,7 @@ parameter:
   id: heat.c_fall
   wert: 7152
   einheit: "EUR/Fall"
-  band: [5910, 7152]   # Proxy (Durchschnitt aller KH-Faelle); unten kuerzere Liegedauer der Hitzefaelle 6,97/8,43 Tage = 0,827 (Karlsson & Ziebarth [62], Tab. A1, 3, 5), oben der Wert (Fallpauschale je Fall); Wirkung unten Berlin -0,05 %, Warmsen -0,08 % (Anker #c-fall, Befund 240)
+  band: [5910, 7152]   # Proxy (Durchschnitt aller KH-Faelle); unten kuerzere Liegedauer der Hitzefaelle (8.000/1.148)/(488,87/57,99) = 0,8266, also 7.152 x 0,8266 = 5.912, nach aussen 5.910 (Karlsson & Ziebarth [62], Tab. A1, 3, 5), oben der Wert (Fallpauschale je Fall); Wirkung unten Berlin -0,05 %, Warmsen -0,085 % (Anker #c-fall, Befund 240)
   herkunft: herleitung:#c-fall
   quelle: destatis_kostennachweis2023
   preisstand: "2024"
