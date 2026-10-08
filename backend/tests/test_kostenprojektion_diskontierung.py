@@ -21,7 +21,7 @@ Deckt ab:
       der RZPR allein abgezinst, ``diskontraten_uebrige`` ist je RZPR die RZPR.
 
 Diskontrate = Reine Zeitpräferenzrate (0 % und 1 %) + Komponente der relativen
-Preise (``app.data.diskontierung``, vorläufig 0 Pp.).
+Preise (``app.data.diskontierung``, 0,1 Pp. für die Gesundheitsschäden von M0).
 
 Läuft ohne Datenbank: Aggregat, Klimaprojektion, Szenariofaktoren und
 Maßnahmenabfrage werden ersetzt, ``db`` bleibt ungenutzt.
@@ -141,7 +141,11 @@ def test_assumptions_ohne_keine_diskontierung(projection):
 
 def test_assumptions_nennen_die_diskontrate(projection):
     """(d) Die Annahmen sprechen von der Diskontrate, nicht von ausgewiesener RZPR."""
-    assert any("Diskontrate von 0 % und 1 %" in e for e in projection["assumptions"])
+    assert any("Diskontrate von 0,1 % und 1,1 %" in e and "von 0 % und 1 %" in e
+               for e in projection["assumptions"])
+    assert any("0,1 Pp." in e and "#95 Hitzebelastung, #96 Aeroallergene, #98 UV-Schädigungen" in e
+               for e in projection["assumptions"])
+    assert any("mit der RZPR allein abgezinst" in e for e in projection["assumptions"])
     # Zeichenfolge geteilt, damit die Testdatei die alte Formulierung nicht selbst trägt.
     alt = "Reiner Zeitpräferenzrate" + " ausgewiesen"
     for eintrag in projection["assumptions"]:
@@ -175,6 +179,7 @@ def test_komponente_verschiebt_die_diskontrate(projection, monkeypatch):
     # Katalogrisiko mit kwra_id 95; ``projection`` ist damit die Vergleichsreihe
     # bei Komponente 0.
     monkeypatch.setattr(cps, "get_risk_aggregate", _fake_aggregate_m0)
+    monkeypatch.setattr(diskontierung, "RELATIVE_PRICE_COMPONENT", 0.0)
     projection = cps.project_costs(db=None, kommune_id=1, bundesland="SN")
     monkeypatch.setattr(diskontierung, "RELATIVE_PRICE_COMPONENT", 0.01)
     mit_komponente = cps.project_costs(db=None, kommune_id=1, bundesland="SN")
@@ -243,7 +248,7 @@ def test_spec_und_modellgrenzen():
     """(g) Die Komponente ist als Abschätzung gekennzeichnet; Modellgrenzen mit Seite."""
     assert diskontierung.PURE_TIME_PREFERENCE_RATES == (0.0, 0.01)
     assert cps.PURE_TIME_PREFERENCE_RATES is diskontierung.PURE_TIME_PREFERENCE_RATES
-    assert diskontierung.RELATIVE_PRICE_COMPONENT == 0.0
+    assert diskontierung.RELATIVE_PRICE_COMPONENT == 0.001
     spec = diskontierung.RELATIVE_PRICE_COMPONENT_SPEC
     for feld in ("label", "unit", "source", "source_detail"):
         assert isinstance(spec[feld], str) and spec[feld].strip(), feld
@@ -255,8 +260,13 @@ def test_spec_und_modellgrenzen():
     assert isinstance(grenzen, list) and grenzen
     for satz in grenzen:
         assert "Methodenkonvention 4.0" in satz and "S. " in satz, satz
-    for stichworte in (("Richtung", "offen"), ("Risikoaversion",),
-                       ("Finanzmärkten", "Grenznutzen der Betroffenen")):
+    assert "0,1 Pp." in spec["evidence_derivation"]["wert"]
+    assert "0–0,7 Pp." in spec["evidence_derivation"]["band"]
+    assert "+2,0 % bis −11 %" in spec["evidence_derivation"]["sensitivitaet"]
+    for stichworte in (("Richtung", "positiv", "0,1 Pp."), ("Risikoaversion", "RZPR von 0 %"),
+                       ("Finanzmärkten", "Grenznutzen der Betroffenen", "Bauweise"),
+                       ("konstant",), ("Behandlungskosten", "denselben Wert"),
+                       ("2025–2065",)):
         treffer = [s for s in grenzen if all(w in s for w in stichworte)]
         assert treffer, stichworte
-        assert all("S. 15" in s for s in treffer), stichworte
+        assert all("S. " in s for s in treffer), stichworte
