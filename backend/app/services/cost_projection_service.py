@@ -9,8 +9,9 @@ ausgewiesen. Die Diskontrate ist nach UBA Methodenkonvention 4.0, Kap. 2.2.3,
 die Summe aus Reiner Zeitpräferenzrate (RZPR, 0 % und 1 %) und der Komponente
 der relativen Preise (``app.data.diskontierung``, 0,1 Pp. als Abschätzung von KAP3).
 Die Komponente gilt für die Gesundheitsschäden von M0 (#95, #96, #98); die übrigen
-Schäden und die Maßnahmenkosten werden mit der RZPR allein abgezinst. Bewusste, im Response dokumentierte Vereinfachung —
-Maßnahmenwirkung zeitkonstant.
+Schäden und die Maßnahmenkosten werden mit der RZPR allein abgezinst.
+
+Bewusste, im Response dokumentierte Vereinfachung: Maßnahmenwirkung zeitkonstant.
 """
 
 from __future__ import annotations
