@@ -32,6 +32,10 @@ Divergenzen an den CMO (siehe Ergebnis-Notiz des Tickets und Katalog-Kommentar):
   (§5 Z. 990–992), kein zellscharfes Kataster.
 - Kosten der Maßnahme: der Bericht beziffert sie nicht.
 
+Fixture ``_zelle3``: δ 0,8085 / 1,0710 ist der Stand vor Ü-13 (a_attr 0,50) und bleibt
+als Testeingabe. Der geprüfte Faktor ist ein Verhältnis und ändert sich nicht, wenn beide
+δ gemeinsam skaliert werden (0,8085 / 1,0710 = 0,43659 / 0,57834 ≈ 0,7549).
+
 DB-frei: prüft die reine Zellfunktion der Maßnahmen-Engine
 (``measure_service._stadtbaum_cell_factor``) und den Katalogeintrag.
 """
@@ -70,7 +74,12 @@ def _mdef() -> dict:
 
 def _zelle3() -> dict:
     """Zelle 3 des Kommunenbeispiels (Vorhaben T-1483-cto, Planung #cto): B 2.500,
-    Ĝ 0,30, k_Birke 0,30, k_unbek 0 (kein Gattungs-Tag-Anteil), Grün 0,30, Ḡ₀ 0,18125."""
+    Ĝ 0,30, k_Birke 0,30, k_unbek 0 (kein Gattungs-Tag-Anteil), Grün 0,30, Ḡ₀ 0,18125.
+
+    Vermerk zu δ: δ_Birke 0,8085 / δ_Gräser 1,0710 ist der Stand vor Ü-13 (a_attr 0,50)
+    und bleibt als Testeingabe. Der geprüfte Faktor ist ein Verhältnis; er ändert sich
+    nicht, wenn beide δ gemeinsam skaliert werden (0,8085 / 1,0710 = 0,43659 / 0,57834
+    ≈ 0,7549). Die Werte der Fixture bleiben deshalb unverändert."""
     return {
         "betroffene": 2500.0,
         "delta_birke": 0.8085,

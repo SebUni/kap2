@@ -9,7 +9,7 @@ Stadtbaumwahl DERSELBEN Kommune (und Demo-Sitzung) abdeckt (Muster
 multiplizieren sich die Faktoren schon (T-1602-cto-Ergänzung der bestehenden
 Zell-Schleife); das bleibt so.
 
-Rechenbeispiel Allee-Zelle (Berlin Mitte, Bericht §5.1 Z. 1200–1206): Betroffene B 100,
+Rechenbeispiel Allee-Zelle (Berlin Mitte, Bericht §5.1, Anker #s158-wirkung): Betroffene B 100,
 δ_R = δ_Birke + δ_Gräser = 0,43659 + 0,57834 = 1,01493, Ḡ₀ 0,18125, Ĝ 0,3625 (Ĝ/Ḡ₀ = 2)
 → Zusatztage im Ausgangsstand (P̂ = 1 + 0,70·(2−1) = 1,7): 100·1,01493·1,7 = 172,538.
 Die Stadtbaumwahl (``anteil_ersetzt`` 1,0, ``canopy_birch_frac`` 0,078125,

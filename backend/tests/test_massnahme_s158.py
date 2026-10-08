@@ -38,7 +38,7 @@ from app.services.engine.impact import health
 CODE = "POLLEN_EARLY_WARNING"
 RISK = "EXPECTED_ANNUAL_ALLERGY_DAYS"
 
-# Berlin, Region Mitte (Bericht #96 §5.1 Z. 1200–1206 / §3.0 Ebenen 4–6).
+# Berlin, Region Mitte (Bericht #96 §5.1, Anker #s158-wirkung / §3.0 Ebenen 4–6).
 DELTA_BIRKE = 0.43659
 DELTA_GRAESER = 0.57834
 R_S158 = 0.03      # Katalog default_reduction, Block pollen.r_s158

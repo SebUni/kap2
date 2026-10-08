@@ -79,7 +79,7 @@ def test_reduction_factor_mit_default_reduction_rechnet_unveraendert():
 
 
 # --- (d) Kommunenweites (flat) verknüpftes Risiko über ``_compute_impact_scoped`` ---------
-# Zweig ``flat_linked`` (measure_service Z. ~1565–1596): dort ruft die große Nutzenrechnung
+# Zweig ``flat_linked`` (``flat_linked`` in ``_compute_impact_scoped``): dort ruft die große Nutzenrechnung
 # ``_reduction_factor(mdef, …)`` direkt mit der Maßnahmendefinition auf. Das Muster (Stub-
 # Session, Testrisiko in catalog.RISKS_BY_CODE, _coverage und get_risk_aggregate per
 # monkeypatch) stammt aus test_klasse_b_direktnutzen.py — keine Datenbank nötig.
