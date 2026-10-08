@@ -134,6 +134,7 @@ def cost_from_outcome(risk: dict, outcome: float) -> float:
 
 
 UV_RISK_CODE = "EXPECTED_ANNUAL_UV_YLL"
+POLLEN_RISK_CODE = "EXPECTED_ANNUAL_ALLERGY_DAYS"
 _UV_BEHANDLUNG = (("cases_melanoma", "c_fall_mm"), ("cases_c44", "c_fall_c44"))
 
 
@@ -160,6 +161,11 @@ def cost_from_cell_entry(risk: dict, outcome: float, entry: dict | None = None) 
     (Alt-Zelle), bleibt es beim Outcome-Anteil.
     """
     cost = cost_from_outcome(risk, outcome)
+    if risk["code"] == POLLEN_RISK_CODE:
+        # #96: c_Tag = c_Jahr/d_Saison läuft mit den Saisonparametern der Kommune mit
+        # (Bericht #96 §3.5), wie die Zelle (health.allergy_symptom_days); bei Vorgabe 1,0.
+        from app.services.engine.impact import health  # lazy: Zyklus impact→risk_engine vermeiden
+        cost *= health.pollen_saison_faktor(risk["code"])
     if risk["code"] == UV_RISK_CODE and entry:
         for cases_key, rate_key in _UV_BEHANDLUNG:
             cases = entry.get(cases_key)
