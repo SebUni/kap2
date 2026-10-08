@@ -121,7 +121,7 @@ python3 -c "import os,urllib.request;D='backend/data/dwd_cdc';B='https://opendat
 
 ### Vorbehalt
 
-Die Abrufe für VG250, Globalstrahlung und Sonnenscheindauer sind am 07.10.2026 mit gleichwertigem Code gegen die Adressen ausgeführt worden, mit Ausgabe in ein Probeverzeichnis statt an den Pfad (VG250 und Sonnenscheindauer mit Vergleich gegen die Dateien auf dem Server, Globalstrahlung mit Zählung der Dateien). Den Aufruf von `zensus_demografie_ab65.py` hat dieser Lauf nicht ausgeführt, weil er die Datei im Repository überschreiben würde. Die Anlage selbst lässt sich im Projekt-venv des Produkts (`scripts/testlauf.sh`) neu erzeugen; mit dem System-Python des Servers bricht das Skript am fehlenden `numpy` ab. Am 07.10.2026 hat ein Lauf in diesem venv die Anlage `k_uv_raumstreuung.md` mit diesem Abschnitt geschrieben.
+Die Abrufe für VG250, Globalstrahlung und Sonnenscheindauer sind am 07.10.2026 mit gleichwertigem Code gegen die Adressen ausgeführt worden, mit Ausgabe in ein Probeverzeichnis statt an den Pfad (VG250 und Sonnenscheindauer mit Vergleich gegen die Dateien auf dem Server, Globalstrahlung mit Zählung der Dateien). Den Aufruf von `zensus_demografie_ab65.py` hat dieser Lauf nicht ausgeführt, weil er die Datei im Repository überschreiben würde. Die Anlage selbst lässt sich im Projekt-venv des Produkts (`scripts/testlauf.sh`) neu erzeugen; mit einem Python ohne `numpy` bricht das Skript an diesem Import ab. Am 07.10.2026 hat ein Lauf in diesem venv die Anlage `k_uv_raumstreuung.md` mit diesem Abschnitt geschrieben.
 """
 
 Q_BUND_ANLAGE = 0.6683          # k_uv_herleitung.md, Abschnitt 2 (Rasterquotient)

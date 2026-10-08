@@ -89,7 +89,7 @@ cd backend && python3 -c "from app.services import zensus_loader as zl;[zl.ensur
 ```
 
   dann die Aggregation, die die JSON-Datei an den oben genannten Pfad schreibt: als Administrator `POST /api/admin/lite-batch` mit dem Inhalt `{"bundesland": null, "force_zensus": true}`. Der Batch liest die VG250-Datei aus dem Abschnitt davor; sie muss deshalb vorher an ihrem Pfad liegen, sonst lädt er den neuesten Gebietsstand.
-- **Grenze dieser Fassung:** Der Aggregationsschritt braucht die Datenbank des Produkts (PostGIS-Tabelle `gemeinden`) und die Gemeindedatei `backend/data/lite/zensus_gemeinde.json`. Ohne beide lässt er sich nicht ausführen; die beiden Befehle sind in diesem Lauf nicht ausgeführt worden. Die Anlage `ssd_povw.md` ist deshalb von Hand fortgeschrieben und nicht neu erzeugt; der Abschnitt steht in Skript und Anlage gleichlautend.
+- **Grenze dieser Fassung:** Der Aggregationsschritt braucht die Datenbank des Produkts (PostGIS-Tabelle `gemeinden`) und schreibt die Gemeindedatei `backend/data/lite/zensus_gemeinde.json`, die `ssd_povw.py` liest. Ohne die Datenbank lässt er sich nicht ausführen; die beiden Befehle sind in diesem Lauf nicht ausgeführt worden. Die Anlage `ssd_povw.md` ist deshalb von Hand fortgeschrieben und nicht neu erzeugt; der Abschnitt steht in Skript und Anlage gleichlautend.
 """
 
 # Regionszuordnung wie ``dwd_ssd_trend.py``/Bericht §3.2 (Nord/Mitte/Süd).
