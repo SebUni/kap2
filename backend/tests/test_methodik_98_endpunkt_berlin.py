@@ -61,6 +61,23 @@ def test_berlin_by_risk_98():
     assert catalog.RISKS_BY_CODE[CODE]["kwra_id"] == 98
 
 
+def test_berlin_klimawirkung_98_eine_zeile():
+    """Derselbe ``aggregate``-Lauf: ``klimawirkungen`` trägt genau einen Block #98 ohne Teile."""
+    eintrag, pop = _gespeicherte_zelle()
+    zelle = {"inputs": {"pop": pop}, "risks": {CODE: eintrag}}
+    cost = risk_engine.aggregate([zelle], pop, AREA_KM2)["cost"]
+    bloecke = [k for k in cost["klimawirkungen"] if k.get("kwra_id") == 98]
+    assert len(bloecke) == 1, f"{len(bloecke)} Blöcke mit kwra_id 98 statt genau einem"
+    block = bloecke[0]
+    assert block["teile"] == []
+    assert block["bezeichnung"].endswith("(#98)")
+    zeile = [e for e in cost["by_risk"] if e.get("kwra_id") == 98]
+    assert len(zeile) == 1
+    print(f"klimawirkungen Berlin #98: bezeichnung = {block['bezeichnung']!r}, teile = {block['teile']}, "
+          f"cost_eur = {block['cost_eur']:,.2f} €; by_risk = {zeile[0]['cost_eur']:,.2f} €")
+    assert abs(block["cost_eur"] - zeile[0]["cost_eur"]) <= 1.0
+
+
 def test_zelle_traegt_entitaetsschluessel_und_s155_rechnet():
     eintrag, _ = _gespeicherte_zelle()
     for key in ("eur_mm", "eur_c44", "yll_mm", "yll_c44"):

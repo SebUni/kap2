@@ -312,6 +312,11 @@ def import_measures_xlsx(db: Session, kommune_id: int, file: BinaryIO) -> dict:
                 skipped += 1
                 continue
 
+            if not isinstance(config, dict):
+                errors.append(f"Zeile {i}: Konfiguration ist kein JSON-Objekt")
+                skipped += 1
+                continue
+
             # Anzahl-Spalte (falls vorhanden) überschreibt einen evtl. in der
             # Konfigurations-JSON eingebetteten count-Wert bewusst - im Bulk-
             # Excel-Workflow ist die sichtbare Anzahl-Zelle die maßgebliche

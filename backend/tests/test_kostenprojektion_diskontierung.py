@@ -1,13 +1,14 @@
 """Diskontierung der Kostenprojektion (UBA Methodenkonvention 4.0, Kap. 2.2.3).
 
 Deckt ab:
-  (a) Die Reihe zur Diskontrate 0,0 ist elementweise gleich der
-      undiskontierten ``cumulative``-Reihe — Abzinsen mit 0 % ändert nichts.
-  (b) Der Endwert der Reihe zur Diskontrate 0,01 liegt unter dem Endwert von
-      ``cumulative`` — mit 1 % Diskontrate ist der Barwert kleiner.
+  (a) Die Reihe zur RZPR 0,0 ist für Risiken ohne M0-Bezug (TEST_RISK, Diskontrate
+      gleich RZPR) elementweise gleich der undiskontierten ``cumulative``-Reihe —
+      Abzinsen mit 0 % ändert nichts.
+  (b) Der Endwert der Reihe zur RZPR 0,01 liegt für Risiken ohne M0-Bezug unter dem
+      Endwert von ``cumulative`` — mit 1 % ist der Barwert kleiner.
   (c) Die Zeichenfolge „keine Diskontierung" kommt in ``assumptions`` nicht
       mehr vor; die frühere Einschränkung ist aufgehoben.
-  (d) ``assumptions`` benennt die Diskontrate von 0 % und 1 % und behauptet
+  (d) ``assumptions`` benennt die Diskontrate von 0,1 % und 1,1 % und behauptet
       nicht, die Reine Zeitpräferenzrate sei der ausgewiesene Zinssatz.
   (e) ``diskontierung.diskontraten`` ist je Schlüssel RZPR + Komponente der
       relativen Preise.
@@ -15,7 +16,7 @@ Deckt ab:
       elementweise gleich ``discounted["0.01"]`` bei Komponente 0, und ihr
       Endwert liegt unter dem von ``cumulative``.
   (g) ``RELATIVE_PRICE_COMPONENT_SPEC`` ist als Abschätzung von KAP3
-      gekennzeichnet, ``MODELLGRENZEN`` nennt die drei Grenzen mit Seite.
+      gekennzeichnet, ``MODELLGRENZEN`` nennt die sechs Grenzen mit Seite.
   (h) ``test_komponente_gilt_nur_fuer_m0_gesundheit``: Die Komponente trifft nur
       Risiken mit ``kwra_id`` 95, 96 oder 98; Übriges, OPEX und CAPEX werden mit
       der RZPR allein abgezinst, ``diskontraten_uebrige`` ist je RZPR die RZPR.
@@ -121,14 +122,14 @@ def _pfade(projection):
 
 
 def test_rate_null_ist_die_undiskontierte_reihe(projection):
-    """(a) Diskontrate 0 % reproduziert die kumulierte Reihe elementweise."""
+    """(a) RZPR 0 % reproduziert für Risiken ohne M0-Bezug die kumulierte Reihe elementweise."""
     for scenario, pfad, block in _pfade(projection):
         assert set(block["discounted"]) == {"0.0", "0.01"}, (scenario, pfad)
         assert block["discounted"]["0.0"] == block["cumulative"], (scenario, pfad)
 
 
 def test_rate_ein_prozent_senkt_den_endwert(projection):
-    """(b) Diskontrate 1 % ergibt einen kleineren Barwert am Ende des Horizonts."""
+    """(b) RZPR 1 % ergibt für Risiken ohne M0-Bezug einen kleineren Barwert am Ende des Horizonts."""
     for scenario, pfad, block in _pfade(projection):
         assert block["discounted"]["0.01"][-1] < block["cumulative"][-1], (scenario, pfad)
 
