@@ -217,7 +217,7 @@ export default function CostTimelineSection({ className = '' }: { className?: st
                   Die Diskontrate ist die Summe aus Reiner Zeitpräferenzrate und Komponente der relativen Preise.
                   Sie gilt nur für die Gesundheitsschäden der Klimawirkungen {kwraNummern}. Die übrigen Schäden und die
                   Maßnahmenkosten werden allein mit der Reinen Zeitpräferenzrate abgezinst.
-                  Die Komponente ist eine Abschätzung von KAP3:{disk.relative_preise.begruendung}
+                  Die Komponente ist eine Abschätzung von KAP3: {disk.relative_preise.begruendung}
                   {disk.modellgrenzen.length > 0 && (
                     <ul style={{ margin: '2px 0 0', paddingLeft: 16 }} data-testid="cost-discounted-grenzen">
                       {disk.modellgrenzen.map((g, i) => <li key={i}>{g}</li>)}
