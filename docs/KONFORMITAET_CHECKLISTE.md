@@ -12,7 +12,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 
 | Nr | Anforderung | Quelle | Fundstelle | Status | Beleg im Produkt | Lücke |
 |---|---|---|---|---|---|---|
-| 1 | Das Klimarisiko ist über Klimawirkungsketten herzuleiten, die klimatischen Einfluss, Sensitivität und räumliche Exposition als benannte, unterscheidbare Komponenten abbilden. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 | erfüllt | docs/methodik/95_hitzebelastung.md, docs/methodik/61_vegetation_in_siedlungen.md | — |
+| 1 | Das Klimarisiko ist über Klimawirkungsketten herzuleiten, die klimatischen Einfluss, Sensitivität und räumliche Exposition als benannte, unterscheidbare Komponenten abbilden. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 | teilweise | docs/methodik/95_hitzebelastung.md, docs/methodik/61_vegetation_in_siedlungen.md | Die Herleitung über die Klimawirkungskette trägt nur der Bericht zur Hitzebelastung (docs/methodik/95_hitzebelastung.md): Er rechnet Hitze (E02), Altersstruktur und Pflegebedürftigkeit (S152, S153) und Bevölkerung (R35) als getrennte Größen bis zum Euro-Betrag. Der Bericht zu Vegetation in Siedlungen (docs/methodik/61_vegetation_in_siedlungen.md) ist ein ungeprüfter Erstaufschlag: Er listet die Knoten der Kette W127, die Spalte „rechnet in“ steht bei allen auf „offen“, Kap. 3, 4 und 6 sind nur Kommentar; ein Klimarisiko leitet er nicht her. In beiden Berichten sind die Komponenten über die Knotenkennungen E, S und R der Arbeitsmappe und die Knotennamen unterscheidbar, die R-Knoten heißen wie in Tabelle 4 der Quelle „Vorkommen von …“; es fehlt aber die Erklärung, wofür E, S und R stehen. Außerdem schreibt docs/methodik/95_hitzebelastung.md Schicht A (Kap. 3.7) als Ĥ × Ê × V̂ in der Schreibweise des IPCC (Hazard, Exposure, Vulnerability) und nennt die Sensitivität stellenweise „Vulnerabilität“, einen Begriff, den die KWRA in Kap. 2.1.4.2 vermeidet und von der Sensitivität abgrenzt; docs/methodik/61_vegetation_in_siedlungen.md spricht von „Hazard-Kanal“ und „Kandidat Vulnerabilität“. Gerechnet wird nur das heutige Klima; die Wirkung des Klimawandels als Differenz zwischen Bezugszeitraum (1971–2000) und künftigem Zeitraum rechnet kein Beleg. Einzelnachweis: Abschnitt „Gegenprobe Zeile 1“. |
 | 2 | Das Klimarisiko ist ausdrücklich als "Risiko ohne (weitere) Anpassung" auszuweisen und von einem Zustand "mit Anpassung" begrifflich zu unterscheiden. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 | teilweise | docs/methodik/61_vegetation_in_siedlungen.md | Nur der Methodik-Bericht zu Vegetation in Siedlungen weist einen Vergleichswert "ohne Anpassung" explizit in KWRA-Terminologie aus. Für die übrigen vorliegenden Methodik-Berichte fehlt ein systematischer, unter diesem Begriff geführter Ausweis; die Aufgabenbeschreibung (docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md) definiert die Unterscheidung "ohne Anpassung"/"mit Anpassung" bislang nicht als eigenen Pflichtabschnitt. |
 | 3 | Für jeden in die Bewertung eingehenden Parameter beziehungsweise Faktor ist die zugrunde gelegte Quelle offenzulegen und zu dokumentieren; ist keine Quelle vorhanden, ist die Abschätzung als solche kenntlich zu machen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.3 (S. 42, Tabelle 3) und Kap. 1.3 (S. 34) | erfüllt | docs/evidenz/register.md, docs/methodik/95_hitzebelastung.md, frontend/src/components/ParameterTable.tsx | — |
 | 4 | Sensitivität (Anfälligkeit eines Systems gegenüber einem klimatischen Einfluss) und räumliche Exposition (Vorhandensein potenziell betroffener Systemelemente) sind begrifflich und methodisch getrennt zu führen, nicht zu vermischen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 (S. 44) | erfüllt | docs/methodik/95_hitzebelastung.md | — |
@@ -1228,6 +1228,140 @@ Kommunen, die nach Landesrecht kein eigenes Konzept aufstellen. Der Status der Z
 und Lücke neu, und `backend/app/data/konformitaet_kundentext.py` führt den Kundensatz. Die Zählungen in den Abschnitten
 „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist Sache der
 Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 1 gegen KWRA 2021, Teilbericht 1, Kap. 2.1.4.1
+
+Frage: Leiten die beiden Belege der Zeile das Klimarisiko so über Klimawirkungsketten her, wie Kap. 2.1.4.1 es
+beschreibt, mit klimatischem Einfluss, Sensitivität und räumlicher Exposition als benannten, unterscheidbaren
+Komponenten? Gelesen wurde `docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf` (KWRA 2021, Teilbericht 1:
+Grundlagen, 215 PDF-Seiten). Die gedruckte Seitenzahl ist die PDF-Seitenzahl minus 1; die Spalte „Seite“ nennt die
+gedruckte Seite, die PDF-Seite in Klammern. Die Fundstelle stimmt: Kap. 2.1.4.1 „Generelles Konzept und zentrale
+Begriffe“ steht auf S. 43–45 (PDF 44–46), Abbildung 2 „Methodischer Rahmen und zentrale Begriffe“ auf S. 45 (PDF 46).
+Kap. 2.1.4 hat keinen eigenen Einleitungstext; auf die Überschrift folgt direkt 2.1.4.1.
+
+Im Produkt wurden die beiden Belege der Zeile vollständig gelesen: `docs/methodik/95_hitzebelastung.md` (2.537
+Zeilen, Rev. 8, Fortschreibung 7, Status „abnahmereif“) und `docs/methodik/61_vegetation_in_siedlungen.md` (379
+Zeilen, Status „Erstaufschlag — noch nicht gegengeprüft“, 11.09.2026). Ausgeführt wurden nur Stichwortsuchen über
+beide Dateien nach den Begriffen der drei Komponenten und nach einer Erklärung der Knotenkennungen sowie ein
+Lesezugriff auf die Kopfzeile und sieben Zeilen der Arbeitsmappe (Ergebnis in A3).
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | Grundlage sind Klimawirkungsketten; sie „stellen logisch und systematisch dar, welche klimatischen Einflussfaktoren zu welcher Klimawirkung führen können … und welche weiteren Faktoren diese Wirkung beeinflussen können“. | S. 43 (PDF 44), 2.1.4.1 Abs. 1 | `95_hitzebelastung.md` Kap. 1 „Knoten-Bilanz“ (Kette W182 aus der Arbeitsmappe, je Knoten „rechnet in“ und „Wo“) und Kap. 3.0 „Rechenkette“ (Ebenen 1–10 bis zum Euro-Betrag); `61_vegetation_in_siedlungen.md` Kap. 1 „Knoten-Bilanz“ (Kette W127 mit W030, „rechnet in“ durchgängig `offen`) | trägt teilweise |
+| A2 | „Eine Klimawirkung bezieht sich immer auf einen bestimmten Zeitraum …“; „Die Wirkung des Klimawandels ergibt sich aus der Differenz der Klimawirkungen zwischen Bezugszeitraum und zukünftigem Zeitraum.“ Abbildung 2: 1971–2000, 2031–2060, 2071–2100. | S. 44 (PDF 45), 2.1.4.1 Abs. 2; S. 45 (PDF 46), Abb. 2 | `95_hitzebelastung.md` Kap. 3.0 (Temperatur als Mittel der zehn jüngsten Jahre), Kap. 6 „Szenario-Anwendung“ („M0 weist das Ist-Klima aus“), Kap. 1 „Risiko ohne (weitere) Anpassung“ (KWRA-Stufen je Zeitscheibe zitiert); `61_vegetation_in_siedlungen.md` Kap. 6 nur Kommentar | trägt teilweise |
+| A3 | „Die Einflussfaktoren einer Klimawirkung können den … Komponenten („klimatischer Einfluss“, „Sensitivität“ und „räumliche Exposition“) zugeordnet werden (Abbildung 2).“ Abbildung 2 führt je Komponente eigene Faktoren (K, S, R). | S. 44 (PDF 45), 2.1.4.1 Abs. 2; S. 45 (PDF 46), Abb. 2 | beide Berichte, Kap. 1 „Knoten-Bilanz“: Knotenkennungen E, S und R und Knotennamen aus der Arbeitsmappe (dort Spalte „Typ“: Einfluss, Sensitivität, Räumlich), ohne Erklärung der Kennbuchstaben; `95_hitzebelastung.md` Kap. 3.7 „Schicht A“ (Ĥ × Ê × V̂) | trägt teilweise |
+| A4 | Der klimatische Einfluss „beschreibt einen sich ändernden Aspekt des Klimasystems“; je stärker, „desto stärker fällt tendenziell auch die Klimawirkung aus“. | S. 44 (PDF 45), erster Spiegelstrich | `95_hitzebelastung.md` Knoten E02 Hitze (Schicht A und B; \(\bar T\), \(T_w\), HD aus dem DWD-Raster, Kap. 3.1–3.4); `61_vegetation_in_siedlungen.md` E01, E06 nur über W030, `offen` | trägt teilweise |
+| A5 | Die Sensitivität „beschreibt das Ausmaß, zu dem ein System durch Schwankungen oder Änderungen des Klimas vor- oder nachteilig beeinflusst wird“, Faktoren etwa „die Altersstruktur der Bevölkerung“. | S. 44 (PDF 45), zweiter Spiegelstrich | `95_hitzebelastung.md` S152 Altersstruktur (\(f_a\), \(m_a\), \(\bar L_a\)), S153 (\(\beta_{\text{pfl}}\)), \(\beta_{\text{iso}}\), Kap. 3.3; S154 bewusst inaktiv mit Begründung; `61_vegetation_in_siedlungen.md` S010–S020, S096, S099 `offen` | trägt teilweise |
+| A6 | Die räumliche Exposition „beschreibt das Vorhandensein von Systemen … in Gegenden und Umständen, die betroffen sein könnten“; „Ohne räumliche Exposition kann es zu keiner Klimawirkung kommen.“ | S. 44 (PDF 45), dritter Spiegelstrich | `95_hitzebelastung.md` R35 Bevölkerung (\(\text{pop}_a\) aus dem Zensus-Gitter 100 m, Faktor in jeder Formel von Kap. 3.3 und 3.4), R36 als Sensitivitätsband; `61_vegetation_in_siedlungen.md` R03, R04, R23–R25 `offen` | trägt teilweise |
+| A7 | Bei längeren Ketten wirken „vorgeschaltete Wirkungen als auslösender Faktor“, aus Sicht der nachgeschalteten Klimawirkung „vorgelagerte Wirkung“. | S. 44 (PDF 45), 2.1.4.1 Abs. 3 | `95_hitzebelastung.md` W124 Stadtklima/Wärmeinseln (vorgelagert, 0 € nach R2, liefert die Zelltemperatur, Kap. 3.1) und W123 Innenraumklima (Log 11); `61_vegetation_in_siedlungen.md` W030 als einziger Wirkungs-Eingang von W127, seine Eingänge eine Ebene tief aufgenommen | trägt |
+| A8 | Die Anpassungskapazität ist eine weitere Komponente, „die aber nicht Teil der Wirkungsketten ist“; Anpassung „verringert in der Regel direkt die Sensitivität oder … das räumliche Vorkommen“. | S. 44 (PDF 45), 2.1.4.1 Abs. 4; S. 45 (PDF 46), Abb. 2 | `95_hitzebelastung.md` Kap. 1 „Risiko ohne (weitere) Anpassung“ (a) und (b), Kap. 5 (Hebel an S152, S155, S157, S158, getrennt vom Basiswert, Doppelzählungs-Wächter); `61_vegetation_in_siedlungen.md` Kap. 5.1 (Hebel an der Ketten-Sensitivität S099) | trägt |
+
+**Begründung je Urteil:**
+
+- A1: Der Bericht zur Hitzebelastung trägt die Anforderung: Er übernimmt die Kette W182 aus der Arbeitsmappe, sagt je
+  Knoten, ob und wo er rechnet, begründet jeden inaktiven Knoten (S154, R36 im Basiswert, W123 als eigener Knoten) und
+  erzählt die Rechnung in Kap. 3.0 von der amtlichen Quelle bis zum Betrag (Berlin 362,9 Mio. € je Jahr, Preisstand
+  2024). Der Bericht zu Vegetation in Siedlungen listet die Knoten der Kette W127, leitet aber nichts her: Die Spalte
+  „rechnet in“ steht bei allen 21 Knoten auf `offen`, Kap. 3, 4 und 6 sind nur Kommentar, Ergebnisgröße und Ansatz
+  sind offen (Kap. 9). Die Zeile nennt ihn als zweiten tragenden Beleg; als Herleitung trägt er nicht.
+- A2: Die Belege nennen ihren Zeitraum, aber nur einen. Der Bericht zur Hitzebelastung rechnet das heutige Klima (Mittel
+  der zehn jüngsten Jahre) und weist es als Zustand „ohne (weitere) Anpassung“ aus; Kap. 6 beschreibt, welche Größe für
+  ein Szenariojahr verschoben würde, rechnet es aber nicht („Szenariofähigkeit folgt … Stufe M1+“). Die KWRA-Stufen für
+  Mitte und Ende des Jahrhunderts sind nur zitiert. Die Wirkung des Klimawandels als Differenz zwischen Bezugszeitraum
+  1971–2000 und künftigem Zeitraum rechnet kein Beleg; der Betrag ist die ganze hitzebedingte Last im heutigen Klima,
+  nicht ihr Anstieg gegenüber dem Bezugszeitraum. Der Bericht zu Vegetation in Siedlungen hat dafür nur einen Kommentar.
+- A3: Die Ketten der KWRA schreiben den Namen der Komponente nicht an den Faktor; sie unterscheiden die Komponenten
+  über die Form des Symbols: klimatischer Einfluss als Rechteck (Beispiel „Hitze“), Klimawirkung als Raute, Sensitivität
+  als Oval, räumliche Exposition als Textliste, die in den Ketten noch „räumliches Vorkommen“ heißt (Tabelle 4, S. 47,
+  PDF 48, als Bild gelesen; Kap. 2.1.4.3). Dieselbe Unterscheidung führt die Arbeitsmappe in der Spalte „Typ“
+  (Einfluss, Sensitivität, Räumlich, Klimawirkung) und in getrennten Eingangsspalten je Komponente: Für W182
+  Hitzebelastung (Blatt „Klimawirkungsketten“, Zeile 405) ist E02 der Einfluss, S152, S153, S154, S155, S157 und S158
+  sind die Sensitivitäten, R35 und R36 die räumlichen Eingänge, W124 die vorgelagerte Wirkung. Beide Berichte
+  übernehmen Knotenkennungen und Namen der Ketten: E02 „Hitze“ ist das Beispiel der Tabelle 4 für einen klimatischen
+  Einfluss, „Altersstruktur“ (S152) das Beispiel aus 2.1.4.1 für einen Sensitivitätsfaktor (S. 44, PDF 45), und die
+  R-Knoten heißen „Vorkommen von …“, im Bericht zu Vegetation in Siedlungen R03 und R04 wörtlich wie die beiden Beispiele
+  der Tabelle 4. Dass die Wörter „klimatischer Einfluss“ und „räumliche Exposition“ in keinem Beleg vorkommen
+  (Stichwortsuche über beide Dateien nach dem vollständigen Lesen), ist deshalb für sich keine Lücke. Es fehlen zwei
+  Dinge. Erstens erklärt keiner der beiden Berichte, wofür die Kennbuchstaben E, S und R stehen: Eine Legende wie
+  Tabelle 4 oder die Spalte „Typ“ der Arbeitsmappe hat keiner, und der Bericht zu Vegetation in Siedlungen spricht vom
+  „W-Knoten“, ohne den Buchstaben zu erklären (Kap. 1 und Log 1). Wer die Arbeitsmappe nicht kennt, sieht E02, S152 und
+  R35, aber nicht, dass es die drei Komponenten sind. Zweitens benennen beide Berichte die Komponenten stellenweise mit
+  Begriffen des IPCC statt der KWRA: Schicht A im Bericht zur Hitzebelastung (Kap. 3.7) schreibt die drei Faktoren als
+  Ĥ(E02) × Ê(R35) × V̂(S152–S158), in der Schreibweise des IPCC (Hazard, Exposure, Vulnerability); derselbe Bericht
+  verwendet für die Sensitivität das Wort „Vulnerabilität“ (Register 95-S152-02, Kap. 3.1, Log 12), der Bericht zu
+  Vegetation in Siedlungen spricht vom „Hazard-Kanal“ (W030) und vom „Kandidat Vulnerabilität“ (S013). Die KWRA
+  vermeidet „Vulnerabilität“ ausdrücklich und grenzt die Sensitivität vom IPCC-Begriff „vulnerability“ ab, der die
+  Anpassungskapazität einschließt (Kap. 2.1.4.2, S. 45–46, PDF 46–47). In der Sache ist die Zuordnung im Bericht zur
+  Hitzebelastung richtig; erklärt und in den Begriffen der KWRA benannt ist sie nicht.
+- A4: Hitze (E02) ist der Klimaeingang der Rechnung, aus dem DWD-Raster je Zelle, mit Wochenverteilung und Hitzetagen,
+  und ein stärkerer Einfluss gibt einen höheren Betrag (0,5 K wärmer: +27 %, Kap. 3.0). Als sich ändernder Aspekt ist er
+  nur im heutigen Klima gerechnet (siehe A2). Im Bericht zu Vegetation in Siedlungen wirken E01 und E06 nur über W030 und
+  sind `offen`.
+- A5: Im Bericht zur Hitzebelastung sind die Sensitivitätsfaktoren eigene, getrennte Größen: Altersstruktur über
+  Altersbänder, Altersfaktoren und Basissterberaten, Pflegebedürftigkeit über \(\beta_{\text{pfl}}\), Isolation über
+  \(\beta_{\text{iso}}\), jeweils mit Quelle; nicht gerechnete Faktoren sind begründet (Log 14, 15). Auch die
+  Trennung von der Exposition (Zeile 4) hält: Demografie steckt genau einmal in \(\text{pop}_a\) (Kap. 3.6,
+  \(v_{\text{vers},a}\)). Im Bericht zu Vegetation in Siedlungen sind alle S-Knoten `offen`.
+- A6: Die Bevölkerung je Altersband und Zelle (R35) ist die Exposition; ohne Einwohner gibt jede Formel null, wie es
+  die KWRA verlangt. Der Bericht zu Vegetation in Siedlungen nennt Kandidaten für das Mengengerüst (S099, R24, R25),
+  alle `offen`; seine Datenebenen sind nicht spezifiziert (Kap. 3, Kommentar).
+- A7: Beide Berichte führen vorgelagerte Wirkungen als eigene Knoten mit Rolle: W124 liefert im Bericht zur
+  Hitzebelastung die Zelltemperatur und bucht selbst 0 €, W123 ist adressiert; der Bericht zu Vegetation in Siedlungen
+  nennt W030 als einzigen Eingang von W127 und nimmt dessen Eingänge eine Ebene tief auf. So behandelte auch die KWRA
+  vorgelagerte Wirkungen, „ähnlich wie ein klimatischer Einfluss“ (Kap. 2.1.4.3, S. 48, PDF 49); W124 geht im Bericht
+  zur Hitzebelastung genau so als Temperatur in die Rechnung ein.
+- A8: Der Bericht zur Hitzebelastung hält die Anpassung aus der Kette heraus: Der Basiswert ist der Zustand ohne weitere
+  Anpassung, der heutige Anpassungsstand steckt über die Kalibrierung darin, und jede Maßnahme wirkt als eigener Hebel
+  auf den Exzess, angedockt an Sensitivitätsknoten, wie die KWRA es beschreibt. Der Bericht zu Vegetation in Siedlungen
+  setzt seine einzige bezifferte Maßnahme ebenfalls an eine Ketten-Sensitivität (S099). Ob das Klimarisiko „ohne“ und
+  „mit Anpassung“ getrennt ausgewiesen wird, ist Gegenstand der Zeile 2 und hier nicht gewertet.
+
+Nicht als eigene Anforderung gewertet: dass sich das Konzept international bewährt hat und Bestandteil der ISO 14091
+ist (S. 43, PDF 44), und die Überarbeitung der Ketten der VA 2015 nach Becker et al. 2016 (ebenda), beides Befunde der
+Quelle; die Begriffsbestimmung „Klimarisiko“, das die KWRA erst ab der Bewertung durch das Behördennetzwerk so nennt
+(S. 44, PDF 45), ein Verfahrensschritt der KWRA; die Unterscheidung „ohne weitere Anpassung“ und „mit Anpassung“
+(S. 44–45, PDF 45–46), Fundstelle der Zeile 2; die Einordnung in die IPCC-Begriffe (Kap. 2.1.4.2) und der Aufbau der Ketten mit
+Tabelle 4 (Kap. 2.1.4.3, S. 46–48, PDF 47–49), beide außerhalb der Fundstelle und nur in den Begründungen zu A3 und A7
+herangezogen.
+
+**Gelesene Seiten und Abschnitte:**
+
+- Inventar mit `python3 /home/basti/overlord/overlord/skripte/dokumente.py inventar` (215 PDF-Seiten; Gliederung,
+  Abbildungen und Tabellen je Seite).
+- Inhaltsverzeichnis ganz: PDF 7–8 (gedruckt S. 6–7).
+- Text PDF 43–50 (gedruckt S. 42–49) ganz: Seite davor mit dem Ende von Kap. 2.1.3 (Tabelle 3) und dem Kasten
+  „Einbindung von Fachleuten“, Kap. 2.1.4 und 2.1.4.1 ganz, Kap. 2.1.4.2 ganz, Kap. 2.1.4.3 ganz (S. 46–48, PDF 47–49)
+  samt Tabelle 4 und den Unterschriften der Abbildungen 3 und 4, Anfang von Kap. 2.1.5 und 2.1.5.1 (PDF 49–50).
+  Kapitelgrenzen geprüft: 2.1.4.1 beginnt auf S. 43 (PDF 44) unter der Überschrift 2.1.4 und endet auf S. 45 (PDF 46)
+  mit Abbildung 2 vor der Überschrift 2.1.4.2. Fußnoten haben 2.1.4.1 bis 2.1.4.3 keine; die nächste Fußnote (Fn. 5,
+  S. 49, PDF 50) gehört zu 2.1.5.1.
+- Als Bild angesehen: PDF-Seite 46 (gedruckt S. 45) mit Abbildung 2 „Methodischer Rahmen und zentrale Begriffe“
+  (Komponenten mit Faktoren K, S, R; Anpassungskapazität außerhalb; Zeitachse 1971–2000, 2031–2060, 2071–2100) und
+  PDF-Seite 48 (gedruckt S. 47) mit Abbildung 3 „Wirkungsketten für das Handlungsfeld „Landwirtschaft““ und Tabelle 4
+  „Umsetzung der zentralen Begriffe in den Wirkungsketten“ (Symbole: Rechteck „Hitze“, Raute „Ertragsausfälle“, Oval
+  „Art und Zustand der landwirtschaftlichen Infrastruktur“, Textliste „Räumliches Vorkommen“ mit „Vorkommen von
+  Arealen, Arten und Populationen“ und „Vorkommen von Biotopen, Habitaten und Ökosystemen“).
+- Arbeitsmappe `docs/Schadensbaum/KWRA-Schadensbaum_X_UBA-klimawirkungsketten.xlsx`, Blatt „Klimawirkungsketten“,
+  Spalten A–I der Kopfzeile und der Zeilen 2, 58, 69, 264, 269, 404 und 405, nur zur Bedeutung der Kennbuchstaben (A3).
+- Belegdateien vollständig: `docs/methodik/95_hitzebelastung.md` (2.537 Zeilen, Kap. 1–8 und Entscheidungslog 1–56) und
+  `docs/methodik/61_vegetation_in_siedlungen.md` (379 Zeilen, Kap. 1–9 samt Kommentaren und Entscheidungslog 1–6).
+
+**Nicht gelesen:** die Zusammenfassung des Berichts (PDF 22–32), Kap. 1 und Kap. 2.1.1–2.1.3 außer den Seiten oben,
+Kap. 2.1.5 ab PDF 51; Abbildung 4 (PDF 49) nur in Unterschrift und Hinweis, nicht als Bild, weil sie einen Auszug einer
+Kette ohne eigene Anforderung zeigt; die zitierten Quellen Buth et al. 2017, Agard et al. 2014 und Becker et al. 2016;
+die Arbeitsmappen über die genannten Zeilen hinaus, das Befund-Ledger `reviews/BEFUNDE_95.md` und Produktcode.
+
+**Schluss:** Zeile 1 bleibt nicht `erfüllt`. Von 8 Anforderungen tragen die Belege zwei voll (A7, A8), sechs teilweise
+(A1 bis A6) und keine nicht. Zur Frage der Gegenprobe: Der Bericht zur Hitzebelastung leitet das Klimarisiko über die
+Kette W182 her und rechnet klimatischen Einfluss (E02), Sensitivität (S152, S153) und Exposition (R35) als getrennte
+Größen. Was die Kennbuchstaben E, S und R bedeuten, erklärt er aber nicht, stellenweise benennt er die Komponenten
+mit Begriffen des IPCC statt der KWRA, und die Wirkung des Klimawandels als Differenz zum Bezugszeitraum rechnet er
+nicht. Der Bericht zu Vegetation in Siedlungen ist
+ein ungeprüfter Erstaufschlag ohne Herleitung und trägt die Zeile nicht als zweiter Beleg. Der Status der Zeile 1 ist in
+derselben Änderung auf `teilweise` gesetzt; die Spalte „Lücke“ nennt, was fehlt, `backend/tests/test_konformitaet_zeile1.py`
+schreibt Status und Lücke fest, und `backend/app/data/konformitaet_kundentext.py` führt den Kundensatz. Die Zählungen in
+den Abschnitten „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist
+Sache der Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
 
 ## Ergebnis
 
