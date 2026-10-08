@@ -929,7 +929,7 @@ IMPACT_PARAM_SPECS: list[dict] = [
                           "vermiedenen Tage proportional.",
      }},
 
-    # ── #98 UV-Schädigungen: klimaattribuierte Hautkrebsfälle (Bericht Rev. 1) ─
+    # ── #98 UV-Schädigungen: klimaattribuierte Hautkrebsfälle (Bericht #98, §3) ──
     # ΔF_e = F_e · BAF_e · ΔDosis;  YLL = Σ_e ΔF_e · λ_e · L̄_e
     {"risk": "EXPECTED_ANNUAL_UV_YLL", "key": "k_uv", "value": 0.7119,
      "label": "Übersetzung SSD-Trend → UV-Dosis", "unit": "Faktor",
@@ -1906,9 +1906,11 @@ del _spec, _block
 # ── Block-Kennung je Parameter: Abgleich mit Kapitel 7 des Berichts #98 (T-1820-cto) ──
 # Kapitel 7 führt 22 Blöcke. Hier tragen 15 davon Registry-Specs (je Entität ``_mm``/``_c44``
 # bzw. je Altersband ein Spec); ``uv.voly`` steht als 16. am Risiko im Katalog
-# (``cost_methodik_block``). Ohne eigene Stelle im Code sind ``uv.ssd_delta_region``
-# (Wert ist eine CSV, im Produkt die Ebene UV_RADIATION), ``uv.i_raten_roh`` (dieselben
-# Werte wie ``uv.i_mm`` und ``uv.i_c44``) und ``uv.r_out_sensitivitaet`` (keine Spec);
+# (``cost_methodik_block``). Ohne eigene Stelle im Code, weil keiner davon im Produkt eigens
+# wirkt (Befund 497): ``uv.ssd_delta_region`` (Wert ist eine CSV der Kalibrierung, die kein
+# Produktcode liest; je Zelle wirkt die Ebene UV_RADIATION), ``uv.i_raten_roh`` (dieselben
+# Werte wie ``uv.i_mm`` und ``uv.i_c44``, die wirken) und ``uv.r_out_sensitivitaet``
+# (abgeleitetes Band; r_out wirkt über ``uv.or_out``, ``uv.qbar_out``, ``uv.r_out_enabled``);
 # die drei S155-Blöcke stehen an der Katalog-Maßnahme UV_PROTECTION_PUBLIC_SPACE
 # (``methodik_bloecke``, Paket 5/7). Geprüft in tests/test_methodik_98_kennzeichnung.py.
 _UV_BLOECKE: dict[tuple[str, str], str] = {

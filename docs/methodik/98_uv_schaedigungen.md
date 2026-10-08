@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–494)** ·
+Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–501)** ·
 05.10.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -241,8 +241,8 @@ erforscht sind" [76]. Die Skala hat vier Stufen („sehr gering", „gering", �
 werden das Vorhandensein und die Zuverlässigkeit von Daten, die Kenntnis der Wirkzusammenhänge, die
 Plausibilität der Modellannahmen und die Eindeutigkeit von Trends (ebd.).
 
-**Warum die eigene Quellenlage davon abweicht.** Das Produkt führt #98 bei der Quellenlage auf „hoch",
-weil jeder Parameter dieses Berichts eine Quelle oder eine ausgewiesene Abschätzung mit Herleitung hat
+**Warum die eigene Quellenlage davon abweicht.** Die Quellenlage dieses Berichts ist „hoch", weil
+jeder Parameter des Berichts eine Quelle oder eine ausgewiesene Abschätzung mit Herleitung hat
 (Kapitel 7). Das misst etwas anderes als die KWRA-Gewissheit, und keine der beiden Angaben wird der
 anderen angepasst:
 
@@ -1276,8 +1276,8 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   (Befund 442). Die Bändertabelle selbst ist nach Sachgruppen geordnet, nicht nach
   Größe (Befunde 361/370). **Größte Achse ist
   der Transient-Faktor \(\tau\)** (0,20–1,00 ⇒ **−80 %**, §3.4): Er trennt die
-  ausgewiesene Gleichgewichtslesart von einer reinen Jahres-Attribution und ist
-  einseitig — er kann das Ergebnis nur senken. Danach die
+  ausgewiesene Gleichgewichtslesart von einer reinen Jahres-Attribution, beziffert so die
+  Latenz (§6, Modellgrenze 1) und ist einseitig — er kann das Ergebnis nur senken. Danach die
   **k_UV-Messunsicherheit** (Band **0,3622–1,0616** = **±49 %**) — der
   **Stichprobenfehler der publizierten Trendschätzungen**, *nicht* die räumliche
   Übertragbarkeit; letztere steht als Modellgrenze 9. Sie ist der größte
@@ -1298,8 +1298,8 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   **Nicht als Ergebnisachse beziffert** und deshalb hier am Ende, nicht der Größe
   nach eingeordnet: die Zeitinvarianz-Annahme der Elastizität (§3.2, Befund 222);
   die Ablesekette (±15 % je Ablesung, wirkt über \(c_{\text{kal}}\) auf den Anker
-  und ist dort out-of-sample gegen die ASR bestätigt, s. o.); Latenz (§6);
-  Augenschäden fehlen (§6).
+  und ist dort out-of-sample gegen die ASR bestätigt, s. o.); Augenschäden fehlen (§6).
+  Die Latenz steht nicht hier, weil \(\tau\) sie oben als größte Achse beziffert (Befund 496).
 
 ## 5 Maßnahmen-Hebel (§2.5/§3.5)
 
