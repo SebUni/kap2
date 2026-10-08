@@ -512,7 +512,34 @@ REKURSIONS_FLAG = "KAP2_LEDGER_PRUEFE_AKTIV"
 # und eine Bilanz, die daraus stammen soll, kann nicht entstanden sein. Die
 # Grenze wirkt unabhaengig davon, WELCHER Ausdruck sich verschachtelt: Ein
 # blockierender Ausdruck ist immer ein Befund, nie ein gruener Beleg.
-AUSDRUCK_TIMEOUT_S = 25
+#
+# Die Grenze kommt aus der Umgebungsvariable LEDGER_AUSDRUCK_TIMEOUT_S (Sekunden,
+# positive Zahl); ohne sie gilt 90 s. Unter Serverlast braucht ein Ausdruck
+# laenger (07.10.2026: 37,6 s kalt bei Last 43 auf 2 Kernen) — ein falsches Rot
+# kostet eine Pruefrunde, eine hoehere Grenze nur Wartezeit.
+TIMEOUT_VARIABLE = "LEDGER_AUSDRUCK_TIMEOUT_S"
+TIMEOUT_STANDARD_S = 90.0
+
+
+_WARNUNG_GEZEIGT: set[str] = set()
+
+
+def _ausdruck_timeout() -> float:
+    """Liest die geltende Zeitgrenze; ungueltige Werte fallen mit Warnung auf 90 s."""
+    roh = os.environ.get(TIMEOUT_VARIABLE)
+    if roh is None or roh.strip() == "":
+        return TIMEOUT_STANDARD_S
+    try:
+        wert = float(roh)
+    except ValueError:
+        wert = 0.0
+    if not (0 < wert < float("inf")):  # schliesst 0, negativ, nan und inf aus
+        if roh not in _WARNUNG_GEZEIGT:  # je Wert einmal, nicht je Ausdruck
+            _WARNUNG_GEZEIGT.add(roh)
+            print(f"WARNUNG: {TIMEOUT_VARIABLE}={roh!r} ist keine positive Zahl — "
+                  f"es gilt {TIMEOUT_STANDARD_S:g}s.", file=sys.stderr)
+        return TIMEOUT_STANDARD_S
+    return wert
 
 
 def _fuehre_aus(kommando: str) -> tuple[int, str]:
@@ -522,11 +549,13 @@ def _fuehre_aus(kommando: str) -> tuple[int, str]:
     Pfad des laufenden Ledgers) und wird an den Kindprozess vererbt.
     """
     umgebung = dict(os.environ)
+    grenze = _ausdruck_timeout()
     try:
         r = subprocess.run(kommando, shell=True, cwd=REPO, capture_output=True,
-                           text=True, timeout=AUSDRUCK_TIMEOUT_S, env=umgebung)
+                           text=True, timeout=grenze, env=umgebung)
     except subprocess.TimeoutExpired:
-        return 124, (f"TIMEOUT nach {AUSDRUCK_TIMEOUT_S}s — der Ausdruck blockiert; "
+        return 124, (f"TIMEOUT nach {grenze:g}s (Grenze aus {TIMEOUT_VARIABLE}, "
+                     f"Standard {TIMEOUT_STANDARD_S:g}s) — der Ausdruck blockiert; "
                      f"ruft er die Prüfung selbst auf?")
     ausgabe = re.sub(r"[\r\n]+", " ", (r.stderr or r.stdout).strip())
     return r.returncode, ausgabe[:110]

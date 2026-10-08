@@ -65,8 +65,12 @@ export default function CostTimelineSection({ className = '' }: { className?: st
   const rateRows = disk
     ? Object.entries(disk.diskontraten).map(([key, diskontrate], i) => ({
         key, diskontrate, label: `${fmtProzent(disk.rzpr[i] ?? Number(key))} %`,
+        uebrige: disk.diskontraten_uebrige?.[key] ?? null,
       }))
-    : DISCOUNT_RATES.map(r => ({ ...r, diskontrate: null as number | null }))
+    : DISCOUNT_RATES.map(r => ({ ...r, diskontrate: null as number | null, uebrige: null as number | null }))
+  const kwraNummern = disk
+    ? (disk.relative_preise.gilt_fuer_kwra ?? []).map(n => `#${n}`).join(', ')
+    : ''
 
   const data = proj && scen
     ? proj.years.map((year, i) => {
@@ -165,7 +169,18 @@ export default function CostTimelineSection({ className = '' }: { className?: st
                 <tr style={{ color: 'var(--text-muted)', textAlign: 'right' }}>
                   <th style={{ textAlign: 'left', paddingRight: 12, fontWeight: 400 }}>Reine Zeitpräferenzrate</th>
                   {disk && <th style={{ paddingRight: 12, fontWeight: 400 }}>Komponente der relativen Preise</th>}
-                  {disk && <th style={{ paddingRight: 12, fontWeight: 400 }}>Diskontrate</th>}
+                  {disk && (
+                    <th style={{ paddingRight: 12, fontWeight: 400 }}>
+                      Diskontrate Gesundheitsschäden ({kwraNummern})
+                      <div style={{ fontSize: '0.68rem' }}>Summe aus Reiner Zeitpräferenzrate und Komponente</div>
+                    </th>
+                  )}
+                  {disk && (
+                    <th style={{ paddingRight: 12, fontWeight: 400 }}>
+                      Diskontrate übrige Schäden und Maßnahmenkosten
+                      <div style={{ fontSize: '0.68rem' }}>nur Reine Zeitpräferenzrate</div>
+                    </th>
+                  )}
                   <th style={{ paddingRight: 12, fontWeight: 400 }}>Ohne Maßnahmen</th>
                   {proj.has_measures && <th style={{ fontWeight: 400 }}>Mit Maßnahmen</th>}
                 </tr>
@@ -186,6 +201,7 @@ export default function CostTimelineSection({ className = '' }: { className?: st
                         </td>
                       )}
                       {disk && <td style={{ paddingRight: 12 }}>{r.diskontrate != null ? `${fmtProzent(r.diskontrate)} %` : '–'}</td>}
+                      {disk && <td style={{ paddingRight: 12 }}>{r.uebrige != null ? `${fmtProzent(r.uebrige)} %` : '–'}</td>}
                       <td style={{ paddingRight: 12 }}>{ohne?.length ? fmtEurCompact(ohne[ohne.length - 1]) : '–'}</td>
                       {proj.has_measures && (
                         <td>{mit?.length ? fmtEurCompact(mit[mit.length - 1]) : '–'}</td>
@@ -198,7 +214,9 @@ export default function CostTimelineSection({ className = '' }: { className?: st
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
               {disk ? (
                 <>
-                  Abgezinst wird mit der Diskontrate = Reine Zeitpräferenzrate + Komponente der relativen Preise.
+                  Die Diskontrate ist die Summe aus Reiner Zeitpräferenzrate und Komponente der relativen Preise.
+                  Sie gilt nur für die Gesundheitsschäden der Klimawirkungen {kwraNummern}. Die übrigen Schäden und die
+                  Maßnahmenkosten werden allein mit der Reinen Zeitpräferenzrate abgezinst.
                   Die Komponente ist eine Abschätzung von KAP3: {disk.relative_preise.begruendung}
                   {disk.modellgrenzen.length > 0 && (
                     <ul style={{ margin: '2px 0 0', paddingLeft: 16 }} data-testid="cost-discounted-grenzen">

@@ -477,6 +477,10 @@ Neuanlegen des Schemas. Der Übergang ist reine Buchführung in
 
    Erwarteter Stand: `f1a2b3c4d5e6 (head)`.
 
+## Befund-Ledger prüfen (`ledger.py --pruefe`)
+
+`python3 backend/scripts/ledger.py <nr> --pruefe` führt die Prüfausdrücke aus `reviews/BEFUNDE_<nr>.md` aus; die Zeitgrenze je Ausdruck steht ohne Einstellung bei 90 s und lässt sich mit der Umgebungsvariable `LEDGER_AUSDRUCK_TIMEOUT_S` (Sekunden, positive Zahl) ändern, damit Serverlast kein falsches Rot erzeugt; ein ungültiger Wert fällt mit einer Warnzeile auf 90 s zurück.
+
 ## Grenzen (bewusst so gelassen)
 
 - Ein uvicorn-Worker; Multi-Worker bräuchte DB-basierte Queue-Slots

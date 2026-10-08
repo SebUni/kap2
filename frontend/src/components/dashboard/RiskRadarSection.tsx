@@ -4,6 +4,7 @@ import { useStore } from '../../store'
 import InfoTooltip from '../InfoTooltip'
 import ChartSkeleton from './ChartSkeleton'
 import { fmtEur, fmtEurCompact, fmtNum } from '../../utils/format'
+import { schadenNachMassnahmen, schluesselKlimawirkung } from '../../utils/schadenNachMassnahmen'
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, Tooltip,
@@ -250,9 +251,15 @@ export function GroupRadarCard({ className = '' }: { className?: string }) {
 /** Top-Risiken nach erwartetem Jahresschaden (€) + Maßnahmen-Kurzbilanz. */
 export function TopRisksCard({ className = '' }: { className?: string }) {
   const { riskSummary, costSummary } = useStore()
-  const byRisk = costSummary?.by_risk || riskSummary?.cost.by_risk || []
+  // Die Beträge der Rangliste kommen immer aus risk-summary (ohne Wirkung der Maßnahmen) und
+  // springen nicht, wenn cost-summary später nachlädt (T-1863, wie T-1816). Der Betrag mit
+  // Maßnahmen steht nur bei Abweichung und beschriftet daneben.
+  const byRisk = riskSummary?.cost.by_risk || []
   const byRiskCode = new Map(byRisk.map(r => [r.code, r]))
-  const klimawirkungen = costSummary?.klimawirkungen || riskSummary?.cost.klimawirkungen || []
+  const klimawirkungen = riskSummary?.cost.klimawirkungen || []
+  const nach = riskSummary
+    ? schadenNachMassnahmen(riskSummary.cost, costSummary, klimawirkungen.length)
+    : null
   // Verwechslungssperre Klasse A/B (T-0517, T-0823): Die Rangliste enthält nur Klasse A
   // (mit Euro-Bezifferung). Klasse B fällt nicht still weg, sondern steht in einem
   // eigenen Block „Ohne Euro-Bezifferung (Screening)“ — ohne Rang, ohne Betrag. Je
@@ -268,7 +275,7 @@ export function TopRisksCard({ className = '' }: { className?: string }) {
       <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         Größte Schadenstreiber
         <InfoTooltip title="Top-Risiken nach €"
-          description="Die fünf Risiken mit dem höchsten erwarteten Jahresschaden (mit Maßnahmen, falls vorhanden). Vollständige Tabelle unter „Details“ am Seitenende." />
+          description="Die fünf Risiken mit dem höchsten erwarteten Jahresschaden (ohne Wirkung der Maßnahmen; weicht der Betrag mit den Maßnahmen ab, steht er daneben als „nach Maßnahmen“). Vollständige Tabelle unter „Details“ am Seitenende." />
       </h2>
       {!riskSummary ? (
         <ChartSkeleton height={RADAR_HEIGHT} label="Kostendaten werden geladen …" />
@@ -281,7 +288,10 @@ export function TopRisksCard({ className = '' }: { className?: string }) {
                   <span style={{ fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{k.bezeichnung}</span>
                   </span>
-                  <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtEurCompact(k.cost_eur ?? 0)}/a</span>
+                  <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtEurCompact(k.cost_eur ?? 0)}/a
+                    <NachMassnahmenHinweis eur={k.teile.length > 0
+                      ? nach?.summe.get(schluesselKlimawirkung(k)) : nach?.zeile.get(k.codes[0])} />
+                  </span>
                 </div>
                 <div style={{ height: 6, background: 'var(--bg)', borderRadius: 4, overflow: 'hidden' }}>
                   <div style={{
@@ -297,7 +307,9 @@ export function TopRisksCard({ className = '' }: { className?: string }) {
                     {k.teile.map(t => (
                       <div key={t.code} style={{ display: 'flex', justifyContent: 'space-between', gap: 6, fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</span>
-                        <span style={{ whiteSpace: 'nowrap' }}>{fmtEurCompact(t.cost_eur ?? 0)}/a</span>
+                        <span style={{ whiteSpace: 'nowrap' }}>{fmtEurCompact(t.cost_eur ?? 0)}/a
+                          <NachMassnahmenHinweis eur={nach?.zeile.get(t.code)} />
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -372,6 +384,12 @@ export function TopRisksCard({ className = '' }: { className?: string }) {
       )}
     </section>
   )
+}
+
+/** Beschrifteter Betrag mit Maßnahmen neben der Ausgangslage; leer, wenn er nicht abweicht. */
+function NachMassnahmenHinweis({ eur }: { eur?: number }) {
+  if (eur == null) return null
+  return <span style={{ fontWeight: 400, fontSize: '0.72rem', color: 'var(--text-muted)' }}> · nach Maßnahmen {fmtEurCompact(eur)}/a</span>
 }
 
 /** Umschalter Index-Ansicht ↔ absolute €-Ansicht der Einzelrisiko-Netzgrafiken. */

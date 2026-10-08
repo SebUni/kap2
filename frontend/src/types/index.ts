@@ -820,9 +820,19 @@ export interface CostDiskontierung {
   /** Reine Zeitpräferenzrate(n) als Dezimalanteil. */
   rzpr: number[]
   /** Komponente der relativen Preise (Dezimalanteil, Abschätzung von KAP3). */
-  relative_preise: { wert: number; evidence_class: EvidenceClass; begruendung: string }
-  /** Diskontrate je RZPR; gleiche Schlüssel wie `discounted`. */
+  relative_preise: {
+    wert: number
+    /** Nummern der Klimawirkungen (KWRA), für die die Komponente gilt (#95, #96, #98). */
+    gilt_fuer_kwra: number[]
+    evidence_class: EvidenceClass
+    begruendung: string
+  }
+  /** Diskontrate je RZPR (RZPR + Komponente), gilt für die Gesundheitsschäden aus
+   *  `relative_preise.gilt_fuer_kwra`; gleiche Schlüssel wie `discounted`. */
   diskontraten: Record<string, number>
+  /** Diskontrate je RZPR für die übrigen Schäden und die Maßnahmenkosten (nur RZPR);
+   *  gleiche Schlüssel wie `discounted`. */
+  diskontraten_uebrige: Record<string, number>
   modellgrenzen: string[]
 }
 
