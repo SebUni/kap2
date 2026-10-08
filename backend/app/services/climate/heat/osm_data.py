@@ -281,11 +281,15 @@ def _overpass_query(query_body: str, _retries: int = 5) -> dict:
     """
     import time as _time
     full_query = f"[out:json][timeout:{OVERPASS_TIMEOUT}];\n{query_body}"
+    # Hauptserver zuerst, bei jedem weiteren Versuch der nächste Ausweich-Server
+    # (reihum): Ein 504 des Hauptservers ließ sonst den ganzen Lauf scheitern.
+    urls = [settings.OVERPASS_URL, *settings.OVERPASS_FALLBACK_URLS]
     for attempt in range(1, _retries + 1):
+        url = urls[(attempt - 1) % len(urls)]
         try:
             with httpx.Client(timeout=OVERPASS_TIMEOUT + 10) as client:
                 resp = client.post(
-                    settings.OVERPASS_URL,
+                    url,
                     data={"data": full_query},
                     headers={
                         "User-Agent": settings.NOMINATIM_USER_AGENT,

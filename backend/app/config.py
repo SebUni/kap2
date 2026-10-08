@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     ZENSUS_USER_AGENT: str = "kap2-climate-planner/1.0 (zensus-autoload)"
     NOMINATIM_URL: str = "https://nominatim.openstreetmap.org"
     OVERPASS_URL: str = "https://overpass-api.de/api/interpreter"
+    # Ausweich-Server, wenn OVERPASS_URL 429/5xx/Timeout liefert (osm_data._overpass_query)
+    OVERPASS_FALLBACK_URLS: list[str] = [
+        "https://overpass.kumi.systems/api/interpreter",
+        "https://overpass.private.coffee/api/interpreter",
+    ]
     NOMINATIM_USER_AGENT: str = "kap2-climate-planner/1.0"
 
     # ── BBSR INKAR / Regionalstatistik (GENESIS-Online REST) ──────────────────
