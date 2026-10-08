@@ -1645,8 +1645,10 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     # Risikos (Katalog-Kostensatz pollen.c_tag, mit Override wie die
                     # Zellkosten), ungerundet aus den ungerundeten Tagen gespeichert:
                     # Die Summe der Zellwerte bleibt so an den Kommunenbetrag gebunden;
-                    # gerundet wird nur in der Anzeige.
-                    cell_savings["s158_avoided_eur"] = risk_engine.cost_from_outcome(
+                    # gerundet wird nur in der Anzeige. Über ``cost_from_cell_entry``, damit der
+                    # Saisonfaktor POLLEN_D_SAISON_REF / d_Saison (T-1916-ceo) wie im Aggregat
+                    # und in der Zelle mitläuft; bei den Vorgabewerten 1,0.
+                    cell_savings["s158_avoided_eur"] = risk_engine.cost_from_cell_entry(
                         catalog.RISKS_BY_CODE[code], avoided_days)
                     s158_avoided_days_total += avoided_days
             if _is_s155(mdef) and code == UV_RISK_CODE:
@@ -1673,8 +1675,9 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                     cell_savings["stadtbaum_missing_reason"] = "canopy"
                 elif avoided_days is not None:
                     cell_savings["stadtbaum_avoided_days"] = round(avoided_days, 3)
-                    # Euro je Zelle (Befund 237, Ü-4), Rechnung wie bei S158, ungerundet.
-                    cell_savings["stadtbaum_avoided_eur"] = risk_engine.cost_from_outcome(
+                    # Euro je Zelle (Befund 237, Ü-4), Rechnung wie bei S158, ungerundet,
+                    # mit Saisonfaktor (T-1916-ceo).
+                    cell_savings["stadtbaum_avoided_eur"] = risk_engine.cost_from_cell_entry(
                         catalog.RISKS_BY_CODE[code], avoided_days)
                     stadtbaum_avoided_days_total += avoided_days
                     # s_unbek nur dort melden, wo es die Senkung bestimmt (Kronen ohne

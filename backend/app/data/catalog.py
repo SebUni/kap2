@@ -275,10 +275,27 @@ RISKS: list[dict] = [
      # × 100.000 = 11.527, auf Zehner gerundet 11.530 (a_attr 0,27, Abschätzung von KAP3).
      # cost_per_outcome_eur: c_Tag 6,20 €₂₀₂₄ (s. _RISK_COST_RATES).
      "ref_value": 11530.0, "scale": "pop", "cost_per_outcome_eur": 6.20,
-     # Kostensatz = Block pollen.c_tag in Kapitel 7 des Berichts #96, Kennzeichnung
-     # berechnet (= c_Jahr,direkt / d_Saison = 266,90 / 43,05; T-1480).
+     # Kostensatz = Block pollen.c_tag in Kapitel 7 des Berichts #96, dort Kennzeichnung
+     # berechnet (= c_Jahr,direkt / d_Saison = 266,90 / 43,05; T-1480). Regel K
+     # (docs/methodik/querschnitt_kennzeichnung.md, T-1898-cto): Der Durchschnitts-Kostensatz
+     # eines Fallmix für jeden Symptomtag ist nach Frage 1 eine Setzung (S2, Proxy), die
+     # Registry führt ihn als abgeschaetzt.
      "cost_methodik_block": "pollen.c_tag",
-     "cost_evidence_class": "berechnet",
+     "cost_evidence_class": "abgeschaetzt",
+     "cost_evidence_derivation": {
+         "wert": "6,20 €₂₀₂₄ je Symptomtag = c_Jahr,direkt ÷ d_Saison = 266,90 ÷ 43,05: "
+                 "Durchschnitts-Kostensatz eines Fallmix für jeden Symptomtag (S2, Proxy), "
+                 "wie heat.c_fall nach #95 Log 40. Der Nenner d_Saison trägt selbst eine "
+                 "Setzung (additive Form, Doppelt-Sensibilisierte doppelt gezählt). "
+                 "Cardell 2016 (TOTALL) liefert die Kosten je Betroffenem und Jahr, nicht den Satz je Tag "
+                 "(Bericht #96 §3.5, Anker #c-tag, Kapitel 7, Modellgrenze 6).",
+         "band": "6,20–23,66 €₂₀₂₄ je Symptomtag (Bericht #96 §3.5, Kapitel 7, Block "
+                 "pollen.c_tag).",
+         "sensitivitaet": "Linear: Der Euro-Betrag wächst im gleichen Verhältnis wie c_Tag; "
+                          "die Zahl der Symptomtage ändert sich nicht. Über d_Saison laufen "
+                          "f, p_B, p_G, L_B und L_G in den Satz ein, wobei f sich im "
+                          "Euro-Betrag herauskürzt (Bericht #96 §3.4 und §3.5).",
+     },
      "source": "Bericht #96 Rev. 1 (DWD-Phänologie / DEGS1+KiGGS / TOTALL)",
      "source_detail": "Sanity-Anker in Symptomtagen je 100.000 EW: 10,74 % "
         "AR-Prävalenz × 1,07 zusätzliche Symptomtage je Betroffenem·Jahr "
