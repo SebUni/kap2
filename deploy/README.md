@@ -13,6 +13,18 @@
   suchen Textanker in `test-deploy.sh` nur in Befehlszeilen (`backend/tests/_deploy_anker.py`):
   ein fehlender oder nur noch in einem Kommentar stehender Anker macht den Test rot, mit dem
   Namen des Ankers in der Meldung.
+- Der Schritt `datenbank` führt genau einen Weg aus: `alembic upgrade head`. Davor gibt er die Zeile
+  `Datenbank vorher: <Ausgabe von alembic current, oder leer>` aus, nach dem Erfolg
+  `Datenbank nachher: <…>`; beide Werte stehen in den Shell-Variablen `DATENBANK_VORHER` und
+  `DATENBANK_NACHHER`. Scheitert das Upgrade — auch mit „already exists“ —, endet der Schritt über die
+  ERR-Falle (`Abbruch`, Deploy-Status `fehler`), und die Meldung verweist auf
+  `docs/BETRIEB.md`, Abschnitt „Bestandsdatenbank auf die Migrationskette heben“. Der Deploy setzt
+  den Alembic-Stand nie von Hand und legt das Schema nie auf anderem Weg an; ein Schema, das nicht aus
+  der Migrationskette stammt, hebt ein Mensch nach dem Runbook auf die Kette.
+- **Regel für eine neue Datenbank der Testumgebung:** Sie bekommt ihr Schema nur über den Deploy.
+  `kap2-test.service` darf vor dem ersten Deploy nicht starten, weil `app/main.py` beim Start
+  `create_all` ausführt: Das Schema entstünde dann ohne Alembic-Stand, und der erste `alembic upgrade
+  head` scheiterte an der Doppelanlage.
 - `kap2-test.service`: uvicorn auf 127.0.0.1:8010, Konfiguration in `/etc/overlord/kap2-test.env`,
   läuft als `User=overlord`. Installation als **System-Unit**: `cp deploy/kap2-test.service
   /etc/systemd/system/kap2-test.service && systemctl daemon-reload && systemctl enable --now kap2-test`
