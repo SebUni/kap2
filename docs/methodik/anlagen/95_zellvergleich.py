@@ -38,6 +38,14 @@ mit Ersatzregel samt (d), derselbe Wert wie in der Tabelle §3.3. Ohne --ersatz 
 und Einwohner (die Aufteilung braucht [69]).
 Beispiel: python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 11000000 --ersatz
 
+Mit --hoehe zusätzlich der Höhenterm aus §3.1, −γ_h·(h − h̄), je bewohnter 100-m-Zelle (γ_h aus dem Block
+heat.gamma_hoehe). h ist die mittlere Geländehöhe der Zelle (5 × 5 Punkte, bilinear), h̄ das Mittel der 100 Zellen
+des 1-km-Blocks (EPSG:3035), beide aus den Terrarium-Höhenkacheln, die auch das Produkt liest (Adresse aus
+backend/app/services/terrain_service.py; Zoom 12, rund 23 m je Pixel). Ausgegeben werden die mittlere
+Höhenabweichung der Einwohner, die Verschiebung ihrer Temperatur und der Zelllauf ohne und mit Höhenterm (mit
+--ersatz der Zelllauf ohne Eigenheit, sonst (d)).
+Beispiel: python3 docs/methodik/anlagen/95_zellvergleich.py --gemeinde 03256034 --ersatz --hoehe
+
 Mit --rangliste (ohne --gemeinde) zählt das Skript für alle Gemeinden aus VG250 den Anteil der Einwohner in
 Zellen mit geheimgehaltenem Anteil 65+ aus und nennt die Gemeinden mit dem höchsten Anteil unter denen mit
 2000 bis unter 10.000 Einwohnern im Gitter (Wahl der ländlichen Beispielkommune in §3.3; einige Minuten).
@@ -55,7 +63,8 @@ Daten (werden geladen und im Cache-Verzeichnis außerhalb des Repos abgelegt, Vo
     backend/app/services/zensus_loader.py (importiert, nicht geändert),
   - DWD-CDC-Raster 1 km [33]: Monatsmittel der Lufttemperatur Juni–August und Jahresraster hot_days,
     je die zehn jüngsten verfügbaren Jahre wie dwd_cdc_grid.climatology_grid / sample_climatology,
-  - Gemeindegebiet: BKG VG250, Ebene vg250_gem, GF = 4 (Adresse aus backend/app/config.py).
+  - Gemeindegebiet: BKG VG250, Ebene vg250_gem, GF = 4 (Adresse aus backend/app/config.py),
+  - Geländehöhe (nur mit --hoehe): Terrarium-Höhenkacheln (PNG, hier ohne Drittpaket entpackt).
 
 Das Skript braucht nur die Python-Standardbibliothek. Weil numpy, shapely und pyproj auf den
 Prüfrechnern fehlen können, sind die Koordinatenumrechnungen hier nachgebaut (EPSG:3035 LAEA,
@@ -809,6 +818,85 @@ def rangliste(cache: Path, vg250_url: str, von: int = 2_000, bis: int = 10_000, 
 
 # ── Hauptprogramm ─────────────────────────────────────────────────────────────
 
+# ── Geländehöhe für den Höhenterm §3.1 (Terrarium-Kacheln wie terrain_service.py) ──
+
+def _png_pixel(daten: bytes) -> tuple[int, int, bytes]:
+    """PNG mit 8 bit je Kanal, RGB oder RGBA, ohne Zeilensprung -> Breite, Bytes je Pixel, entfilterte Pixel."""
+    import zlib
+    pos, idat, breite, hoehe, bpp = 8, bytearray(), 0, 0, 3
+    while pos < len(daten):
+        laenge, typ = struct.unpack(">I4s", daten[pos:pos + 8])
+        teil = daten[pos + 8:pos + 8 + laenge]
+        if typ == b"IHDR":
+            breite, hoehe, tiefe, farbe = struct.unpack(">IIBB", teil[:10])
+            if tiefe != 8 or farbe not in (2, 6) or teil[12] != 0:
+                raise ValueError("PNG-Form nicht unterstützt")
+            bpp = 3 if farbe == 2 else 4
+        elif typ == b"IDAT":
+            idat += teil
+        pos += 12 + laenge
+    roh, zl_ = zlib.decompress(bytes(idat)), breite * bpp
+    aus, vor = bytearray(), bytearray(zl_)
+    for r in range(hoehe):
+        f, z = roh[r * (zl_ + 1)], bytearray(roh[r * (zl_ + 1) + 1:(r + 1) * (zl_ + 1)])
+        for i in range(zl_) if f else ():
+            a = z[i - bpp] if i >= bpp else 0
+            b = vor[i]
+            if f == 1:
+                z[i] = (z[i] + a) & 255
+            elif f == 2:
+                z[i] = (z[i] + b) & 255
+            elif f == 3:
+                z[i] = (z[i] + (a + b) // 2) & 255
+            else:
+                c = vor[i - bpp] if i >= bpp else 0
+                p = a + b - c
+                pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                z[i] = (z[i] + (a if pa <= pb and pa <= pc else b if pb <= pc else c)) & 255
+        aus += z
+        vor = z
+    return breite, bpp, bytes(aus)
+
+
+class Gelaende:
+    """Geländehöhe in m aus Terrarium-Kacheln (Höhe = R·256 + G + B/256 − 32768), bilinear."""
+
+    def __init__(self, cache: Path, url: str, zoom: int = 12):
+        self.cache, self.url, self.z, self.kacheln, self.zellen = cache / "terrarium", url, zoom, {}, {}
+
+    def _px(self, gx: int, gy: int) -> float:
+        k = (gx // 256, gy // 256)
+        if k not in self.kacheln:
+            ziel = lade(self.url.format(z=self.z, x=k[0], y=k[1]), self.cache / f"{self.z}_{k[0]}_{k[1]}.png")
+            breite, bpp, p = _png_pixel(ziel.read_bytes())
+            assert breite == 256
+            self.kacheln[k] = [p[i] * 256 + p[i + 1] + p[i + 2] / 256 - 32768 for i in range(0, len(p), bpp)]
+        return self.kacheln[k][(gy % 256) * 256 + gx % 256]
+
+    def am_punkt(self, lon: float, lat: float) -> float:
+        n = 256 * 2 ** self.z
+        fx = (lon + 180) / 360 * n - 0.5
+        fy = (1 - math.asinh(math.tan(math.radians(lat))) / math.pi) / 2 * n - 0.5
+        x0, y0 = math.floor(fx), math.floor(fy)
+        dx, dy = fx - x0, fy - y0
+        return (self._px(x0, y0) * (1 - dx) * (1 - dy) + self._px(x0 + 1, y0) * dx * (1 - dy)
+                + self._px(x0, y0 + 1) * (1 - dx) * dy + self._px(x0 + 1, y0 + 1) * dx * dy)
+
+    def zelle(self, x: float, y: float) -> float:
+        """Mittlere Höhe der 100-m-Zelle mit der Mitte (x, y) in EPSG:3035, 5 × 5 Punkte wie das Produkt."""
+        k = (round(x), round(y))
+        if k not in self.zellen:
+            werte = [self.am_punkt(*LAEA3035.zurueck(x - 50 + (i + 0.5) * 20, y - 50 + (j + 0.5) * 20))
+                     for i in range(5) for j in range(5)]
+            self.zellen[k] = sum(werte) / len(werte)
+        return self.zellen[k]
+
+    def block(self, bx: int, by: int) -> float:
+        """Mittel der 100 Zellen des 1-km-Blocks (bx, by) = (x // 1000, y // 1000) in EPSG:3035."""
+        return sum(self.zelle(bx * 1000 + 50 + 100 * i, by * 1000 + 50 + 100 * j)
+                   for i in range(10) for j in range(10)) / 100
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--gemeinde", help="Amtlicher Gemeindeschlüssel (8 Stellen)")
@@ -829,6 +917,8 @@ def main():
     ap.add_argument("--ersatz", action="store_true",
                     help="zusätzlich die Ersatzregel §3.3 für den geheimgehaltenen Anteil 65+ rechnen "
                          "(Jahresbetrag heute, Jahresbetrag mit Ersatzregel, Faktor)")
+    ap.add_argument("--hoehe", action="store_true",
+                    help="zusätzlich der Höhenterm §3.1 je Zelle (γ_h aus heat.gamma_hoehe): Zelllauf ohne und mit")
     ap.add_argument("--cache", default=os.environ.get("KAP3_CACHE",
                                                       str(Path.home() / ".cache" / "kap3" / "95_zellvergleich")))
     args = ap.parse_args()
@@ -1062,6 +1152,30 @@ def main():
                 print(f"  Gruppe 60–66 zählt {text}: Einwohner ab 65 {de_int(s65)}, Jahresbetrag {mio(betrag)}, "
                       f"Faktor × {de(eur['d'] / betrag, 3)}")
             print(f"  Spanne des Faktors (60–66 ganz oder gar nicht): × {de(min(spanne), 3)}–{de(max(spanne), 3)}")
+    if args.hoehe:
+        # Höhenterm §3.1: T_Zelle = Rasterwert − γ_h·(h − h̄); die Abweichung des Stadtmodells bleibt draußen (§4)
+        gamma = float(bericht_parameter()["heat.gamma_hoehe"])
+        gl = Gelaende(cache, _literal_aus_datei(REPO / "backend/app/services/terrain_service.py", "TERRARIUM_URL"))
+        xy = [(float(zensus["population"][g]["x"]), float(zensus["population"][g]["y"])) for g in gids]
+        bloecke = {}
+        dh = []
+        for x, y in xy:
+            k = (int(x) // 1000, int(y) // 1000)
+            if k not in bloecke:
+                bloecke[k] = gl.block(*k)
+            dh.append(gl.zelle(x, y) - bloecke[k])
+        basis = regel if args.ersatz else zell_c
+        vorher = modell.euro(basis, args.sigma, gh)
+        nachher = modell.euro([(bd, t - gamma * d, h) for (bd, t, h), d in zip(basis, dh)], args.sigma, gh)
+        dh_ew = sum(e * d for e, d in zip(ew, dh)) / sum_ew
+        print()
+        print(f"Höhenterm §3.1 (γ_h = {de(gamma, 4)} K/m aus heat.gamma_hoehe; h je Zelle 5 × 5 Punkte, h̄ = Mittel "
+              f"der 100 Zellen des 1-km-Blocks; Terrarium Zoom {gl.z}, {len(gl.kacheln)} Kacheln):")
+        print((f"  h − h̄ der bewohnten Zellen: Einwohnermittel {de(dh_ew, 1)} m, Spanne {de(min(dh), 1)} bis "
+               f"{de(max(dh), 1)} m; Temperatur der Einwohner im Mittel {de(-gamma * dh_ew, 3)} K").replace("-", "−"))
+        text = "Zelllauf ohne Eigenheit (Ersatzregel, dazu (d))" if args.ersatz else "(d)"
+        print(f"  {text}: ohne Höhenterm {mio(vorher)}, mit Höhenterm {mio(nachher)} je Jahr, "
+              f"× {de(nachher / vorher, 5)} ({de(100 * (nachher / vorher - 1), 2)} %)")
     with open(KALIB / "sommermittel_bundesland_povw.csv", newline="", encoding="utf-8") as fh:
         reihe = [float(r["t_sommer_povw"]) for r in csv.DictReader(fh)
                  if r["bundesland"] == land and args.bis_jahr - 9 <= int(r["jahr"]) <= args.bis_jahr]

@@ -147,9 +147,9 @@ Chance. Bei seltenen Ereignissen wie dem Hitzetod liegt die OR nahe am Verhältn
 
 | Register-ID | Knoten → Outcome | Effektgröße | Studientyp | Quelle | Übertragbarkeit | Datenlage je Zelle | Entscheidung | E-Regel |
 |---|---|---|---|---|---|---|---|---|
-| 95-E02-01 | E02 Hitze → Mortalität | RR-Kurve: \(T_0\) 19,7/20,2/20,8 °C; \(\beta_{85+}\) 0,0634/0,0625/0,0531 K⁻¹ (N/M/S) | amtliche Statistik / publizierte ERF | Winklmayr 2022, Abb. 3 [11] | DE 1992–2021, 3 Regionen; Skalentransfer Region→Zelle als Modellgrenze (§6) | Zelltemperatur (DWD 1 km + UHI) | **Basiswert** | Log 1 |
+| 95-E02-01 | E02 Hitze → Mortalität | RR-Kurve: \(T_0\) 19,7/20,2/20,8 °C; \(\beta_{85+}\) 0,0634/0,0625/0,0531 K⁻¹ (N/M/S) | amtliche Statistik / publizierte ERF | Winklmayr 2022, Abb. 3 [11] | DE 1992–2021, 3 Regionen; Skalentransfer Region→Zelle als Modellgrenze (§6) | Rasterwert DWD 1 km mit Höhenterm (§3.1), Streuung des Stadtklimas über σ (§4 `#sigma-k`) | **Basiswert** | Log 1 |
 | 95-E02-02 | E02 Hitzetage → Einweisungen | konditional +2,4 %/Hitzetag (+1,408/100.000·Tag); unkonditional +5,4 % | quasi-experimentell (Panel, 170 Mio. Fälle) | Karlsson & Ziebarth 2018 [18], IZA-DP 7875 Tab. 1 [62] | DE 1999–2008; Alterstabelle nicht publiziert (top-kodiert > 75) | DWD hot_days (§3.4) | **Basiswert** (konditional; Log 19) | Log 19 |
-| 95-W124-01 | W124 Stadtklima → Zelltemperatur | UHI-\(\Delta T\), mittelwerttreu je 1-km-Zelle | Modell (OSM/SVF-Stadtmodell) | §3.1; Produktdoku | DE-weit, 100 m | vorhanden | **Basiswert** | Log 12 |
+| 95-W124-01 | W124 Stadtklima → Zelltemperatur | UHI-\(\Delta T\), mittelwerttreu je 1-km-Zelle; im Betrag als Streuung σ (§4 `#sigma-k`) | Modell (OSM/SVF-Stadtmodell) | §3.1; Produktdoku | DE-weit, 100 m | vorhanden | **Basiswert** | Log 12 |
 | 95-W123-01 | W123/#63 Innenraumklima → Mortalität | über Nachtkomponente des 24-h-Mittels abgebildet | Modellannahme | M0 Rev. 5 Kap. 2 | — | (24-h-Zelltemperatur) | **bewusst inaktiv** als eigener Knoten (bis M1) | Log 11 |
 | 95-S152-01 | S152 Altersstruktur → Mortalität | \(f_a\) = 0,357/0,588/0,631/1,0 (Rückrechnung §3.3a); \(m_a\); \(\bar L_a\) | amtliche Statistik + Rückrechnung | RKI [12]; Destatis [48,49] | DE; Rückrechnungskette vollständig in §3.3a | Zensus-2022-Altersbänder | **Basiswert** | Log 22 |
 | 95-S152-02 | S152/GE-SO-06 soziale Isolation → **Mortalität** | OR ≈ 2,3 „allein lebend" ⇒ \(\beta_{\text{iso}}\) = 0,90 (zentriert, \(\bar q\) = 0,346) | Fall-Kontrolle (als Vulnerabilität, nicht als Maßnahme) | Semenza 1996 [40]; Mikrozensus 2023 [63] | Chicago 1995 (Todesfälle); für Einweisungen keine Evidenz → F-Pfad Default 1 (Log 28) | Zensus-2022-Haushaltsgitter; Fallback §3.6 | **Basiswert** (Bänder 65+, nur D-Pfad) | Log 21/28 |
@@ -369,6 +369,13 @@ verteilt nur die Feinstruktur unterhalb 1 km. Beispiel: DWD-Wert 21,0 °C, Zell-
 1-km-Mittel); das 1-km-Mittel bleibt exakt der DWD-Wert. Kein Doppelkanal —
 Grün-/Baumkronenanteil steckt genau hier und ist **nicht** zusätzlich Vulnerabilität
 (Log Nr. 12).
+
+**Im Betrag der Mortalität** rechnet \(\bar T_{\text{Zelle}}\) ohne die Klammer des Stadtmodells, aber mit dem
+Höhenterm: \(T_{\text{DWD}} - \gamma_h \cdot (h - \bar h)\). Jede Ursache der Feinstruktur unter 1 km geht über genau
+einen Kanal in den Betrag: das Relief über den Höhenterm, das Stadtklima über σ (§3.0 (d); Wahl und Gründe in §4,
+Anker `#sigma-k`, Log 56). Der Höhenterm ist eine Verschiebung aus gemessener Höhe und einem belegten Gradienten; in
+Tal- und Kessellagen wirkt er gerichtet und streut nicht nur. Die Klammer des Stadtmodells gehört zur Kartenebene der
+Zelltemperatur; mit ihr und σ zählte dieselbe Spanne zweimal.
 
 ### 3.2 Wochenverteilung (empirische intra-saisonale Quantile; §3.2-Tails)
 
@@ -741,6 +748,19 @@ EU-Referenz) und 3,5 Mio. € (Nutzer-Setzung der Arbeitsmappe vor Fortschreibun
 (Durchschnitt **aller** Krankenhausfälle; hitzeassoziierte Fälle haben einen anderen Fallmix;
 Befund 42; DRG-basierte Sätze als Sensitivität benannt).
 
+**Band für \(c_{\text{Fall}}\)** (Anker `#c-fall`; Abschätzung von KAP3, Befund 240): **5.910–7.152 €** (Preisstand 2024).
+Die einzige Messung zum Fallmix zeigt nach unten: Hitzefälle liegen kürzer im Krankenhaus als der Durchschnitt.
+Karlsson & Ziebarth [62] nennen für alle Fälle 488,87 Krankenhaustage auf 57,99 Aufnahmen je 100.000 Einwohner und
+Tag, also 8,43 Tage je Fall (Tab. A1, PDF-S. 61). Ein Hitzetag bringt nach Ansatz II, dem Basiswert (Log 19),
+8.000 Krankenhaustage (Tab. 5, PDF-S. 59) auf 1.148 Aufnahmen (Anmerkung zu Tab. 3, PDF-S. 57), also 6,97 Tage je
+Fall. Das Verhältnis ist 6,97 / 8,43 = 0,827; nach Ansatz I sind es 19.000 / 2.542 = 7,47 Tage (Anmerkung zu Tab. 1,
+PDF-S. 55), Verhältnis 0,887. Das untere Ende nimmt an, dass die Kosten mit den Liegetagen sinken:
+7.152 × 0,827 = 5.912 €, nach außen gerundet 5.910 €. Das obere Ende ist der Wert selbst, weil die Fallpauschale je
+Fall zahlt und nicht je Tag. Der Wert liegt damit am oberen Rand des Bandes; das ist gewollt, weil die einzige
+Messung in eine Richtung zeigt. Wirkung auf den Jahresbetrag (Rechenkette §3.0, Zeile 9): Am oberen Ende ändert sich
+nichts. Am unteren Ende sinkt der Betrag in Berlin um 152,0 Fälle × 1.242 € = 0,19 Mio. € je Jahr, von 362,89 auf
+362,70 Mio. € (−0,05 %), in Warmsen um 0,121 Fälle × 1.242 € = 151 € je Jahr, von 177.406 auf 177.255 € (−0,08 %).
+
 ```python test: beispiel_95_voly_kette
 # VOLY-Kette: 79.500 x 1,4638 x 1,1792 x 1,1719 = ~160.800 EUR (Preisstand 2024)
 v = 79_500 * 1.4638 * 1.1792 * 1.1719
@@ -832,7 +852,7 @@ unverändert; wie stark die Bänder den Betrag verschieben, steht in §5 (Sensit
 | \(s_{\text{gek}}\) | gekühlter Anteil der Heimplätze der Kommune (Eingabe der Maßnahme, gilt für die ganze Kommune) | — | Voreinstellung **0,11** (Band 0,05–0,15), Abschätzung von KAP3 aus [71] und [72] (Block `heat.s_gek`, Befund 138); die Eingabe der Kommune im Produkt (`COOLING_ROOMS_DRINKING_WATER`) ersetzt sie; Beispiel 1 in §5; register:95-S157-01 |
 | \(T_{0,\text{Region}}\) | Wirkschwelle Wochenmittel | °C | 19,7 / 20,2 / 20,8 (N/M/S), Winklmayr [11]; register:95-E02-01 |
 | \(T_w\) | Wochenmitteltemperatur der Sommerwoche | °C | berechnet |
-| \(\bar T_{\text{Zelle}}\) | Sommermitteltemperatur (24-h, §3.1) — Kartenebene | °C | DWD-CDC-Raster 1 km [33] + Stadtklima-Zuschlag, mittelwerttreu (§3.1); register:95-W124-01 |
+| \(\bar T_{\text{Zelle}}\) | Sommermitteltemperatur (24-h, §3.1) — Kartenebene | °C | DWD-CDC-Raster 1 km [33] + Stadtklima-Zuschlag, mittelwerttreu (§3.1); im Betrag der Mortalität ohne Stadtklima-Zuschlag, die Streuung unter 1 km trägt σ (§4 `#sigma-k`); register:95-W124-01 |
 | \(v_{\text{vers},a}\) | bandweiser Versorgungs-/Isolations-Modifikator (§3.3; Demografie steckt genau einmal in \(\text{pop}_a\)) | — | berechnet |
 | \(\text{VOLY}\) | Wert eines verlorenen Lebensjahres | €₂₀₂₄ | 160.800 (Band 136,4–165,6 T€; Herleitung §3.5 [19]); herleitung:#voly |
 | \(\text{YLL}_{\text{Zelle}}\) | verlorene Lebensjahre — **nativer Ausweis** | Jahre/Jahr | Ergebnis |
@@ -928,12 +948,52 @@ war zu niedrig, genau wie der Kovarianz-Vorbehalt (Befund 67) vermutete.
 Stichproben-Abgleiche** — §3.4-Ressourcen-Regel: ein nationaler
 100-m-Vollraster-Lauf ist als Prüf-/Abgleichinstrument unzulässig (Log 34);
 nicht abnahmerelevant): UHI-Feinstruktur unterhalb der Gemeinde — Konvexitätsbeitrag als
-**Modellrechnung** mit der Streuung σ = 0,58 K (mittelwerttreu; Herleitung wie in Rev. 6 aus der
+**Modellrechnung** mit der Streuung σ = 0,58 K (Anker `#sigma-k`; mittelwerttreu; Herleitung wie in Rev. 6 aus der
 ±1-K-Spanne der Zellabweichungen um das Gebietsmittel, Gleichverteilungsannahme ⇒ σ = 2/√12 =
 0,577 K, auf 0,58 K gerundet; Befund 181). Die Wirkung steht als ein Faktor in §3.0, Wirkung (d)
 (Berlin × 1,028, Warmsen × 1,048; Befund 182) — **keine Messung**;
 der Messpfad „σ aus dem Stadtmodell" gehört zum Stichproben-Abgleich) — sowie
-intra-kommunale Bevölkerungsgewichtung.
+intra-kommunale Bevölkerungsgewichtung. Zu ihr gehört der Höhenterm aus §3.1: Die Rechenkette §3.0 rechnet auf dem
+1-km-Wert, der Zelllauf rechnet den Höhenterm je Zelle (Absatz „Welche Größe die Streuung unter 1 km trägt“, unten).
+
+**Band der Streuung σ** (Abschätzung von KAP3, Befund 232): Die Spanne ± 1 K ist nicht gemessen, und keine Messung gibt
+eine Richtung vor. Das Band nimmt deshalb die halbe und die anderthalbfache Spanne bei derselben Gleichverteilung:
+± 0,5 K ergibt σ = 1/√12 = 0,29 K, ± 1,5 K ergibt σ = 3/√12 = 0,87 K. Auch eine andere Form der Verteilung bei ± 1 K
+liegt im Band: Liegen die meisten Stellen nahe am Mittel (Dreieck), ist σ = 1/√6 = 0,41 K. Wirkung auf den Betrag,
+gerechnet mit der Anlage `95_zellvergleich.py --ersatz --sigma 0.29` und `--sigma 0.87` (Zelllauf mit Ersatzregel):
+Berlin 337,99 Mio. € und 356,97 Mio. € je Jahr statt 345,11 Mio. € (−2,1 % und +3,4 %), Warmsen 169.125 € und
+185.173 € statt 175.256 € (−3,5 % und +5,7 %), Preisstand 2024. Die Zeile (d) der Anlage zeigt dazu die Wirkung der
+Feinstruktur an den Bandenden: Berlin × 1,007–1,063, Warmsen × 1,011–1,107. Weil die Kurve gekrümmt ist, wächst die
+Wirkung etwa mit dem Quadrat von σ: Die halbe Streuung bringt rund ein Viertel der Wirkung, die anderthalbfache gut das
+Doppelte. Der Faktor bei σ = 0,58 K steht in §3.0 (d).
+
+**Welche Größe die Streuung unter 1 km trägt** (Log 55, abgelöst durch Log 56; Befunde 235 und 238): Jede Ursache
+der Feinstruktur unter 1 km geht über genau einen Kanal in den Betrag der Mortalität, das Relief über den Höhenterm,
+das Stadtklima über σ. Für die Streuung aus dem Stadtklima gilt: Im Betrag trägt sie allein σ. Die Mortalität
+rechnet je Zelle mit der Zelltemperatur ohne die Klammer des Stadtmodells, mit dem Höhenterm (§3.1), und mittelt über
+die Streuung σ um diesen Wert; die Klammer zeigt die Kartenebene. Beides zusammen zählte dieselbe Streuung zweimal, denn σ ist aus genau
+der Spanne hergeleitet, die das Stadtmodell je 100-m-Zelle verteilt. **Was die doppelte Zählung verfälschen würde:**
+Hat das Stadtmodell dieselbe Spanne, wächst die Streuung auf √2 × 0,58 = 0,82 K, und der Betrag läge in Berlin bei
+354,64 Mio. € statt 345,11 Mio. € (+2,8 %), in Warmsen bei 183.046 € statt 175.256 € (+4,4 %; Anlage mit
+`--sigma 0.82`). Gründe für σ: \(c_{\text{kal}}\) ist auf den Rasterwert am Gemeindepunkt angepasst, ohne
+Stadtmodell, und der Betrag rechnet mit demselben Rasterwert; Rechenkette und Anlage rechnen den Betrag nach, die
+Abweichung je Zelle nicht; die Güte des Stadtmodells ist eine Modellgrenze (§6, Nr. 5), im Stichproben-Abgleich ist es
+der Messpfad für σ (oben). **Relief über den Höhenterm:** Der Höhenterm −γ_h·(h − h̄) bleibt in der Zelltemperatur
+der Mortalität. Er ist eine Verschiebung aus gemessener Höhe (Geländemodell) und dem belegten Gradienten γ_h = 0,0065 K/m
+(Block `heat.gamma_hoehe`). In Tal- und Kessellagen wirkt er gerichtet: Wohnen die Menschen einer 1-km-Zelle im Mittel
+30 m tiefer als deren mittlere Höhe, ist ihre Temperatur um 0,0065 × 30 = 0,195 K höher. Mit der Rechenkette §3.0
+und T + 0,195 K steigt der Betrag dann um den Faktor 1,098 im Klima von Berlin und 1,131 im Klima von Warmsen.
+**Was die einfachere Rechnung verfälschen würde:** Ohne Höhenterm läge der Betrag dort um rund 9 % zu niedrig, mehr als
+die Wirkung des oberen σ-Bandendes (Berlin × 1,063). Der Zelllauf rechnet den Höhenterm je Zelle mit γ_h aus
+`heat.gamma_hoehe` (Anlage `95_zellvergleich.py --ersatz --hoehe`; h je 100-m-Zelle, h̄ als Mittel der 100 Zellen des
+1-km-Blocks): Berlin 344,31 Mio. € statt 345,11 Mio. € je Jahr (−0,23 %), Warmsen 174.483 € statt 175.256 € (−0,44 %),
+Preisstand 2024. In beiden Kommunen wohnen die Menschen im Mittel kaum tiefer oder höher als das Mittel ihres 1-km-Blocks
+(Berlin 0,8 m, Warmsen 1,1 m höher); deshalb ist die Wirkung klein. Die Schritte (a) bis (d) des Zelllaufs in §3.0
+und die Beträge, die darauf aufbauen, rechnen auf dem Rasterwert; der Höhenterm ist der Teil des Rests
+„intra-kommunale Bevölkerungsgewichtung“, den der Zelllauf beziffert. **Gegenargument:** Stadtklima und Relief werden
+verschieden behandelt. σ legt um jede Zelle dieselbe Streuung. Auch das Stadtklima könnte das Mittel verschieben, weil
+Menschen eher in den wärmeren, dichter bebauten Kernen wohnen; das sieht der Betrag nicht (intra-kommunale
+Bevölkerungsgewichtung, oben), und der Betrag je Zelle zeigt keine heißen Stellen unter 1 km.
 
 **Kalibrierlauf Rev. 7** (Ergebnis `c_kal_rev7_ergebnis.md` [50]; Produktionsnähe:
 Gemeindepunkt-Temperaturen aus derselben DWD-Rasterfamilie, die das Produkt je Zelle
@@ -1472,6 +1532,11 @@ noch auf einen Barwert abgezinst.
 4. Kalibrier-Rest-Bias: UHI-Feinstruktur unterhalb der Gemeinde (Konvexität, Faktor in §3.0 Wirkung (d); intra-kommunale Gewichtung) — kommunale Stichproben-Abgleiche als Fortschreibungsvermerk (§4; §3.4-Ressourcen-Regel: kein nationaler Vollraster-Lauf); Süd-ERF-Nachschätzung ist modellintern (Profil-Band 1,45–1,85).
 5. UHI-Modellgüte als gemeinsamer Treiber der #95-Feinstruktur; HD ohne UHI-Verschiebung
    (Unterschätzung der Morbidität in UHI-Lagen, §3.4).
+6. Reliefanteil an der Streuung: σ enthält nur die Streuung des Stadtklimas. Das Relief verschiebt die Zelltemperatur
+   über den Höhenterm (§3.1); seine Streuung um diesen Wert ist in σ nicht enthalten. Rechnung: Liegen die Höhen
+   gleichverteilt über ± 30 m um das Mittel, ist σ_Relief = 0,0065 × 60/√12 = 0,11 K, zusammen
+   √(0,58² + 0,11²) = 0,59 K. Das liegt im Band 0,29–0,87 K (§4, „Band der Streuung σ“), bei ± 100 m sind es 0,69 K.
+   σ bleibt deshalb 0,58 K (Log 56).
 
 **Infokasten-/UI-Texte (§3.6 — Teil des Berichts):**
 
@@ -1590,7 +1655,7 @@ parameter:
   id: heat.c_fall
   wert: 7152
   einheit: "EUR/Fall"
-  band: null   # Proxy (Durchschnitt aller KH-Faelle, §3.5); DRG-Saetze als Sensitivitaet
+  band: [5910, 7152]   # Proxy (Durchschnitt aller KH-Faelle); unten kuerzere Liegedauer der Hitzefaelle 6,97/8,43 Tage = 0,827 (Karlsson & Ziebarth [62], Tab. A1, 3, 5), oben der Wert (Fallpauschale je Fall); Wirkung unten Berlin -0,05 %, Warmsen -0,08 % (Anker #c-fall, Befund 240)
   herkunft: herleitung:#c-fall
   quelle: destatis_kostennachweis2023
   preisstand: "2024"
@@ -1741,7 +1806,7 @@ parameter:
   quelle: icao_standardatmosphaere
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
-  endpunkt: mortalitaet   # Befund 73: speist nur den D-/Temperaturpfad
+  endpunkt: mortalitaet   # Befund 73: speist nur den D-/Temperaturpfad. Hoehenterm bleibt im Betrag der Mortalitaet: Relief ueber den Hoehenterm, Stadtklima ueber sigma (§3.1, §4 #sigma-k, Log 56, Befund 238)
   kennzeichnung: quelle   # ICAO-Standardatmosphaere
   abgeleitet_aus: []
 parameter:
@@ -1880,13 +1945,13 @@ parameter:
   id: heat.sigma_k
   wert: 0.58   # Streuung der Waermeinsel-Feinstruktur unter 1 km um den Rasterwert, gerundet aus 0,577 K (§3.0 (d))
   einheit: "K"
-  band: null   # Wirkung σ 0 → 0,58 K in §3.0 (d): Berlin × 1,028, Warmsen × 1,048
-  herkunft: herleitung:§4   # Absatz "Modellrechnung mit der Streuung σ = 0,58 K" (§4, Fortschreibungsvermerk kommunale Stichproben-Abgleiche)
+  band: [0.29, 0.87]   # Spanne ± 0,5 K bis ± 1,5 K, Gleichverteilung (§4, Absatz "Band der Streuung σ", Befund 232); Zelllauf mit Ersatzregel Berlin 337,99-356,97 Mio. EUR statt 345,11, Warmsen 169.125-185.173 EUR statt 175.256
+  herkunft: herleitung:#sigma-k   # §4, Absatz "Modellrechnung mit der Streuung σ = 0,58 K" (Wert) und Absatz "Band der Streuung σ" (Band, Wirkung an den Enden)
   quelle: null   # Setzung von KAP3, keine externe Quelle fuer die Spanne ± 1 K
   preisstand: null
   bandzuordnung: [u65, 65-74, 75-84, 85+]
   endpunkt: mortalitaet
-  kennzeichnung: abschaetzung_kap3   # Spanne ± 1 K, Gleichverteilung, 2/√12 = 0,577 K, gerundet (Befund 181)
+  kennzeichnung: abschaetzung_kap3   # Spanne ± 1 K, Gleichverteilung, 2/√12 = 0,577 K, gerundet (Befund 181). Traegt im Betrag allein die Streuung unter 1 km aus dem Stadtklima; das Relief geht ueber den Hoehenterm ein (heat.gamma_hoehe). Die Mortalitaet rechnet die Zelltemperatur ohne die Klammer des Stadtmodells, mit Hoehenterm (§3.1, §4, Log 56, Befunde 235, 238); Reliefanteil an der Streuung als Modellgrenze §6 Nr. 6
   abgeleitet_aus: []
 ```
 
@@ -2456,3 +2521,5 @@ Befunde 183, 195 und 198). Dadurch fortgeschrieben: Einträge 10, 34, 43, 44, 45
 | 52 ⚠ | Auf welche Größe wirkt der Hitzeaktionsplan, und mit welchem Wert? | **\(\delta_{\text{HAP}}\) = 0,939 (Band 0,852–1,00) als Faktor auf den Exzess (RR−1) aller Bänder; Abschätzung von KAP3 aus [45], Tabelle 1: Exzess am Hitzetag nach / vor Einführung des Warnsystems, roh 0,1466 / 0,1561** (§5, Block `heat.delta_hap`, Befunde 180 und 194; Entscheidung des methodik_manager in T-1645) | [45] misst alle Todesfälle am Hitzetag (Abschnitt 2.2.1, S. 3: „the all-cause daily death count“). Ein Faktor darauf heißt nicht dasselbe auf dem Exzess; übersetzt mit dem RR des Hitzetags 31,1 / 26,9 = 1,1561 ([45] Tabelle 1) nach 1 − (1 − d) × 1,1561 / 0,1561 wie Befund 124: Durchschnittsstadt 1,00 (0,98–1,01) → 1,00 (0,852–1,074). Ihr Zentralwert wäre eine Nullwirkung (P2); der rohe Wert 0,939 liegt in ihrem Intervall und bleibt über dem Paketwert 0,794. **Gegenargument:** roh, nicht um Temperatur, Trend und Wochentag bereinigt; [45] misst die Warnung an Warntagen, nicht den Plan; deshalb reicht das Band bis zu keiner Wirkung | Stand T-1584 unübersetzt auf den Exzess (liest 5 % aller Todesfälle am Hitzetag als 5 % des Exzesses; Berlin 18,1 Mio. €) · derselbe Wert übersetzt 0,630, gekappt 0,794 (die ganze Wirkung käme aus dem Achsenabschnitt, der übersetzt −0,111 ergibt; ein Plan allein leistete das ganze Paket; Berlin 74,5 Mio. €) · Durchschnittsstadt 1,00 (Nullwirkung gegen P2) | Kette 362,9 Mio. € unverändert; Hitzeaktionsplan Berlin 361,8 Mio. € × 0,061 = 22,1 Mio. € je Jahr (Preisstand 2024; Band 0–53,5 Mio. €), Zelllauf 21,0 Mio. €; Anpassungspotenzial 0,064; mit den Schutzprogrammen zentral 0,939 × 0,931 = 0,874, die Kappung 0,794 greift erst bei \(\delta_{\text{HAP}}\) = 0,852; fortgeschrieben: Nr. 10, 43, 48, 50 |
 | 53 ⚠ | Mit wie vielen Stellen stehen \(\delta_{\text{KZ}}\) und \(1 - g_{\text{S157}}\), und wie teilt die Kappung den Nutzen auf? | **\(g_{\text{S157}}\) = (0,93 × 1,11 − 1) / 0,11 = 0,2936, also \(1 - g_{\text{S157}}\) = 0,7064 an jeder Stelle; \(\delta_{\text{KZ}}\) = 1 − 0,05 × 0,7064 × 3/24 = 0,995585 ungerundet in Block und Formel; die Kappung gilt auf dem Produkt aller drei Faktoren, \(\max(\delta_{\text{HAP}} \times \delta_{\text{VG}} \times \delta_{\text{KZ}};\ 0{,}794)\)** (§5, Blöcke `heat.g_s157` und `heat.delta_kuehlzentren`, Befunde 178 und 179; Entscheidung des methodik_manager in T-1644) | Der Hebel der Kühlzentren hängt an \(1 - \delta_{\text{KZ}}\), rund 0,0044; eine Rundung auf vier Stellen nahm davon 0,85 % weg, und Bericht und Produkt nannten verschiedene Beträge (Befund 178). \(g_{\text{S157}}\) auf zwei Stellen verschob S157 Berlin im Zelllauf um +0,5 %. Die Kappung ist in der Reihenfolge des Produkts gemessen (Schutzprogramme gegen \(\delta_{\text{HAP}}\), dann Kühlzentren gegen beide): in sechs Fällen gleich dem Maximum über das Produkt; den Einzelnutzen trägt zuerst der Hebel der Kühlzentren (Befund 179). **Gegenargument:** Reichweite 5 % und Stunden 3/24 sind Setzungen; mehr Stellen machen sie nicht genauer, sie verhindern nur zwei Zahlen für eine Setzung | gerundeter Registry-Wert und §5 auf dessen Betrag nachziehen (eine Setzung mit zwei Zahlen bliebe im Bericht) · 1 − g_S157 an verschiedenen Stellen mit zwei oder drei Stellen · Kappung nur gegen \(\delta_{\text{HAP}}\) (so las Anlass A in T-1642-cmo den Code; gemessen gilt sie über alle drei Faktoren, Befund 179) | Kette 362,9 Mio. € unverändert; Kühlzentren Berlin (Kette) 0,75 Mio. € je Jahr, im Zelllauf 0,72 Mio. € (716.654 € mit σ = 0,58 K, Paket 4); fortgeschrieben: Nr. 44, 46 |
 | 54 ⚠ | Mit welchem Anteil 85+ rechnet S157 im Anpassungspotenzial einer Kommune? | **\(a_{85+}\) je Kommune aus ihrem Zelllauf: YLL 85+ / alle YLL aus den Altersbändern der Zellen (Zensus 2022 [67, 69]); Berlin 560,28 / 2.139,06 = 0,262, Warmsen 0,2427 / 1,0839 = 0,224; die 0,284 der Kette sind das Beispiel** (§5, Beispiel-Block `s157_berlin`, Befunde 183, 195 und 198; Entscheidung des methodik_manager in T-1646) | Der Anteil hängt am Altersaufbau; eine Berliner Konstante stellt ländliche Kommunen falsch dar: in Warmsen wäre \(r_{\text{S157}}\) 0,00345 statt 0,0027, 27 % zu hoch. Die Werte je Band liefert der Zelllauf schon (Messbefehl YLL je Band im Ledger, Paket 4). **Gegenargument:** Am Anpassungspotenzial ändert das wenig (Warmsen 0,0642 statt 0,0636); die Konstante wäre einfacher | Konstante 0,284 mit ausgewiesenem Fehler für Warmsen (verworfen, weil die Quelle den Wert je Gemeinde liefert) | Kette 362,9 Mio. € unverändert; Anpassungspotenzial Berlin 0,0640, Warmsen 0,0636; ohne Kommune zählt S157 nicht mit, 0,061 statt 0,064 mit sichtbarem Vermerk, Gruppe nach KWRA unverändert (Befund 214); fortgeschrieben: Nr. 45, 50 |
+| 55 ⚠ | Welche Größe trägt die Wärmeinsel-Streuung unter 1 km im Betrag: σ oder die Abweichung des Stadtmodells je Zelle? | **σ allein: Die Mortalität rechnet die Zelltemperatur ohne die Klammer des Stadtmodells (§3.1) und mittelt über σ = 0,58 K; die Klammer zeigt die Kartenebene** (§4, Absatz „Welche Größe die Streuung unter 1 km trägt“, Block `heat.sigma_k`, Befund 235; W2, W4) | σ ist aus der Spanne hergeleitet, die das Stadtmodell je 100-m-Zelle verteilt; beides zusammen zählte dieselbe Streuung zweimal. \(c_{\text{kal}}\) ist auf den Rasterwert am Gemeindepunkt angepasst, ohne Stadtmodell; der Betrag rechnet mit demselben Rasterwert (W4). Das Stadtmodell bleibt für die anderen Ebenen, wie es ist; nur die Mortalität liest die Zelltemperatur ohne die Klammer (W2). Rechenkette und Anlage rechnen den Betrag nach. **Gegenargument:** σ legt um jede Zelle dieselbe Streuung; wohnen die Älteren in den wärmeren Teilen einer 1-km-Zelle, sieht der Betrag das nicht, und der Betrag je Zelle zeigt keine heißen Stellen unter 1 km | Stadtmodell statt σ (σ = 0; ändert alle Beträge, nicht nachrechenbar, seine Güte ist eine Modellgrenze, §6 Nr. 5) · beide Wege (doppelte Zählung: Berlin 354,64 Mio. € statt 345,11 Mio. €, +2,8 %, Warmsen +4,4 %) · σ nur, wo das Stadtmodell keine Abweichung liefert (zwei Rechenwege je nach Datenlage, Beträge der Kommunen nicht vergleichbar) | keine Zahl betroffen: Kette 362,9 Mio. €, Zelllauf Berlin 345,11 Mio. € und Warmsen 175.256 € rechnen ohne Stadtmodell (Befunde 235, 236) |
+| 56 ⚠ | Geht der Höhenterm −γ_h·(h − h̄) in den Betrag der Mortalität ein? (löst Log 55 ab) | **Ja. Jede Ursache der Feinstruktur unter 1 km geht über genau einen Kanal in den Betrag: das Relief über den Höhenterm, das Stadtklima über σ.** Die Zelltemperatur der Mortalität ist der Rasterwert DWD plus −γ_h·(h − h̄); die Abweichung des Stadtmodells geht nicht ein, σ = 0,58 K trägt ihre Streuung, sie bleibt Kartenebene. Der Reliefanteil an der Streuung ist in σ nicht enthalten (§6 Nr. 6). Festlegung Höhenterm des CEO, revidiert 08.10.2026 (§3.1, §4 `#sigma-k`, Blöcke `heat.gamma_hoehe` und `heat.sigma_k`, Befund 238) | Der Höhenterm ist eine Verschiebung aus gemessener Höhe und einem belegten Gradienten und wirkt in Tal- und Kessellagen gerichtet: 30 m tiefer wohnen ergibt + 0,195 K und den Faktor 1,098 (Berlin) und 1,131 (Warmsen); ohne ihn läge der Betrag dort um rund 9 % zu niedrig, mehr als das obere σ-Bandende (× 1,063). Die Streuung des Reliefs ist klein: √(0,58² + 0,11²) = 0,59 K bei ± 30 m, im Band 0,29–0,87 K. Eine Regel „jede Ursache über einen Kanal“ ist erklärbar. **Gegenargument:** Stadtklima und Relief werden verschieden behandelt; auch das Stadtklima könnte das Mittel verschieben, weil Menschen eher in den wärmeren Kernen wohnen. Diese Verschiebung bleibt in σ und im Rest „intra-kommunale Bevölkerungsgewichtung“ | kein Höhenterm, σ trägt allein die Feinstruktur (Festlegung vom 07.10.2026; scheitert an ihrem Ausstieg, 30 m → + 9,8 % über + 6,3 %) · Relief zusätzlich in σ (verschiebt das Mittel nicht, verfehlt die gerichtete Wirkung) | keine `wert:`-Zeile und keine Zahl der Rechenkette §3.0 betroffen; Zelllauf mit Höhenterm (Anlage `--hoehe`): Berlin 344,31 Mio. € statt 345,11 Mio. € (−0,23 %), Warmsen 174.483 € statt 175.256 € (−0,44 %) |
