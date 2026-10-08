@@ -1,20 +1,22 @@
-"""Tests für T-0339: Der Deploy-Schritt `datenbank` heilt genau einen Zustand selbst und
-scheitert bei allem anderen laut.
+"""Tests für T-1829 (zuvor T-0339): Der Deploy-Schritt `datenbank` führt genau `alembic upgrade
+head` aus, macht den Stand davor und danach sichtbar und scheitert bei jedem Fehler laut.
 
-Anlass: Das Test-Deployment vom 18.09.2026 ist an `relation "app_settings" already exists`
-gescheitert. `app/main.py` legt beim Start alle Tabellen per `create_all` an, setzt dabei aber
-nie die Alembic-Versionstabelle. Damit begann jeder folgende Deploy wieder bei der
-Basis-Migration und scheiterte erneut — ein Zustand, der sich nicht von selbst löst. Der
-frühere Rückfall („Fortsetzung mit create_all-Fallback") hat den Fehler stumm übersprungen.
+Anlass: Beim Deploy vom 06.10.2026 (Commit `ce951ead`) scheiterte `alembic upgrade head` an
+`relation "app_settings" already exists`, weil das Schema beim Dienststart per `create_all`
+entstanden war (`app/main.py`, `_ensure_tables`). Das Skript stempelte die Datenbank daraufhin
+auf `head` und meldete `fertig` — ohne die Prüfung, die das Runbook (`docs/BETRIEB.md`, Fall B)
+vor einem Stempel verlangt (leere Ausgabe von `alembic check`). Seit T-1829 gibt es im Deploy
+weder den Stempel noch den Rückfall auf `create_all`; eine Bestandsdatenbank hebt ein Mensch nach
+dem Runbook auf die Migrationskette.
 
 Geprüft wird das echte Skript: der Block zwischen `SCHRITT="datenbank"` und `SCHRITT="dienst"`
 wird aus `deploy/test-deploy.sh` herausgeschnitten und mit einem Stub-`alembic` in einem
-temporären `PATH` ausgeführt. Drei Läufe, je gegen die wörtliche Protokollausgabe:
+temporären `PATH` ausgeführt. Drei Fälle, je gegen die wörtliche Protokollausgabe:
 
-(a) `upgrade` gelingt sofort            → kein `stamp`, Schritt grün
-(b) `upgrade` scheitert mit „already exists", `alembic_version` fehlt
-                                        → genau ein `stamp head`, danach `upgrade`, Schritt grün
-(c) `upgrade` scheitert anders           → kein `stamp`, Schritt rot mit `FEHLGESCHLAGEN`
+(a) `upgrade head` gelingt   → Aufrufe `current`, `upgrade head`, `current`; Schritt grün
+(b) Doppelanlage („already exists")
+                             → kein `stamp`, Rückgabewert ≠ 0, Verweis auf den Runbook-Abschnitt
+(c) anderer Fehler           → kein `stamp`, Rückgabewert ≠ 0, Schritt rot
 """
 
 from __future__ import annotations
@@ -31,25 +33,25 @@ STUB = r"""#!/usr/bin/env bash
 echo "$*" >> "$STUB_PROTOKOLL"
 case "${1:-}" in
   upgrade)
-    UPGRADES=$(grep -c '^upgrade' "$STUB_PROTOKOLL")
     case "$STUB_MODUS" in
-      gut)
-        echo "INFO  [alembic.runtime.migration] Running upgrade  -> 9f1a2b3c4d5e"
+      gut|gut_leer)
+        echo "INFO  [alembic.runtime.migration] Running upgrade  -> a1b2c3d4e5f6"
         exit 0;;
       doppelt)
-        if [[ "$UPGRADES" == "1" ]]; then
-          echo 'sqlalchemy.exc.ProgrammingError: (psycopg2.errors.DuplicateTable) relation "app_settings" already exists' >&2
-          exit 1
-        fi
-        echo "INFO  [alembic.runtime.migration] Running upgrade 9f1a2b3c4d5e -> a1b2c3d4e5f6"
-        exit 0;;
+        echo 'sqlalchemy.exc.ProgrammingError: (psycopg2.errors.DuplicateTable) relation "app_settings" already exists' >&2
+        exit 1;;
       *)
         echo 'sqlalchemy.exc.OperationalError: (psycopg2.OperationalError) could not connect to server: Connection refused' >&2
         exit 1;;
     esac;;
   current)
-    # Im heilbaren Fall fehlt die Tabelle alembic_version: leere Ausgabe auf stdout.
-    if [[ "$STUB_MODUS" == "doppelt" ]]; then exit 0; fi
+    AUFRUFE=$(grep -c '^current' "$STUB_PROTOKOLL")
+    # Erster Aufruf = Stand vor dem Upgrade. Bei fehlender Tabelle alembic_version
+    # (Modus gut_leer, doppelt) ist die Ausgabe leer.
+    if [[ "$AUFRUFE" == "1" ]]; then
+      if [[ "$STUB_MODUS" == "gut" ]]; then echo "9f1a2b3c4d5e"; fi
+      exit 0
+    fi
     echo "a1b2c3d4e5f6 (head)"
     exit 0;;
   stamp)
@@ -74,11 +76,19 @@ trap fehler_abbruch ERR
 
 {block}
 echo "== schritt datenbank beendet"
+echo "== VORHER=[$DATENBANK_VORHER] NACHHER=[$DATENBANK_NACHHER]"
 """
+
+ABSCHNITT = "Bestandsdatenbank auf die Migrationskette heben"
 
 
 def _datenbank_block() -> str:
     return ausschnitt('SCHRITT="datenbank"', 'SCHRITT="dienst"')
+
+
+def _befehlszeilen(block: str) -> str:
+    """Block ohne Kommentarzeilen (dort wird der Verzicht auf Stempel und Rückfall begründet)."""
+    return "\n".join(z for z in block.splitlines() if not z.lstrip().startswith("#"))
 
 
 def _lauf(tmp_path: Path, modus: str) -> tuple[int, str, list[str]]:
@@ -96,11 +106,8 @@ def _lauf(tmp_path: Path, modus: str) -> tuple[int, str, list[str]]:
     produkt = tmp_path / "produkt"
     (produkt / "backend").mkdir(parents=True)
 
-    # Seit T-0425 legt der Schritt sein Alembic-Protokoll mit "mktemp $DEPLOY_TMP/..." an
-    # (vorher fest in $DEPLOY_TMP von deploy/test-deploy.sh selbst gesetzt, oberhalb dieses
-    # herausgeschnittenen Blocks). Die Werkbank hier schneidet nur den Block aus, nicht die
-    # Zeile, die DEPLOY_TMP definiert -- ohne eigenen Wert bricht "set -u" mit "unbound
-    # variable" ab, bevor alembic ueberhaupt aufgerufen wird.
+    # Der Schritt legt sein Alembic-Protokoll mit "mktemp $DEPLOY_TMP/..." an; DEPLOY_TMP wird
+    # oberhalb des herausgeschnittenen Blocks gesetzt. Ohne eigenen Wert bricht "set -u" ab.
     deploy_tmp = tmp_path / "deploy-tmp"
     deploy_tmp.mkdir()
 
@@ -135,58 +142,77 @@ def test_skript_ist_syntaktisch_fehlerfrei():
     assert ergebnis.stderr == ""
 
 
-def test_a_upgrade_gelingt_sofort_kein_stamp(tmp_path):
-    """(a) Gelingt `upgrade head` sofort, wird nicht gestempelt und der Schritt ist grün."""
+def test_a_upgrade_gelingt_current_upgrade_current(tmp_path):
+    """(a) Gelingt der Lauf: `current`, `upgrade head`, `current`; Stand vorher und nachher sichtbar."""
     rc, ausgabe, aufrufe = _lauf(tmp_path, "gut")
     assert rc == 0, ausgabe
-    assert aufrufe == ["upgrade head"], aufrufe
-    assert "INFO  [alembic.runtime.migration] Running upgrade  -> 9f1a2b3c4d5e" in ausgabe
+    assert aufrufe == ["current", "upgrade head", "current"], aufrufe
+    assert "Datenbank vorher: 9f1a2b3c4d5e\n" in ausgabe
+    assert "Datenbank nachher: a1b2c3d4e5f6 (head)\n" in ausgabe
+    # vorher vor nachher, und das Upgrade dazwischen
+    assert (
+        ausgabe.index("Datenbank vorher:")
+        < ausgabe.index("Running upgrade  -> a1b2c3d4e5f6")
+        < ausgabe.index("Datenbank nachher:")
+    )
+    assert "== VORHER=[9f1a2b3c4d5e] NACHHER=[a1b2c3d4e5f6 (head)]" in ausgabe
     assert "stamp" not in ausgabe
     assert "FEHLGESCHLAGEN" not in ausgabe
     assert "== schritt datenbank beendet" in ausgabe
 
 
-def test_b_doppelanlage_ohne_alembic_stand_wird_gestempelt(tmp_path):
-    """(b) „already exists" + fehlende `alembic_version` → genau ein `stamp head`, dann `upgrade`."""
-    rc, ausgabe, aufrufe = _lauf(tmp_path, "doppelt")
+def test_a_leerer_stand_vorher_ist_eine_leere_angabe(tmp_path):
+    """Ohne Tabelle `alembic_version` ist der Stand vorher leer; der Schritt ist trotzdem grün."""
+    rc, ausgabe, aufrufe = _lauf(tmp_path, "gut_leer")
     assert rc == 0, ausgabe
-    # Genau ein Stempel, und zwar zwischen dem gescheiterten und dem wiederholten upgrade.
-    assert aufrufe == ["upgrade head", "current", "stamp head", "upgrade head"], aufrufe
-    assert aufrufe.count("stamp head") == 1, aufrufe
-    assert 'relation "app_settings" already exists' in ausgabe
-    assert (
-        "Schema vorhanden, aber ohne Alembic-Stand (fruehere create_all-Anlage)"
-        " -- stemple einmalig auf head." in ausgabe
-    )
-    assert "INFO  [alembic.runtime.migration] Running stamp_revision  -> a1b2c3d4e5f6" in ausgabe
-    assert (
-        "INFO  [alembic.runtime.migration] Running upgrade 9f1a2b3c4d5e -> a1b2c3d4e5f6" in ausgabe
-    )
-    assert "Datenbank nach dem Stempel regulaer auf head hochgezogen." in ausgabe
-    assert "FEHLGESCHLAGEN" not in ausgabe
-    assert "== schritt datenbank beendet" in ausgabe
+    assert aufrufe == ["current", "upgrade head", "current"], aufrufe
+    assert "Datenbank vorher: \n" in ausgabe
+    assert "Datenbank nachher: a1b2c3d4e5f6 (head)\n" in ausgabe
+    assert "== VORHER=[] NACHHER=[a1b2c3d4e5f6 (head)]" in ausgabe
 
 
-def test_c_anderer_fehler_bricht_fatal_ab(tmp_path):
-    """(c) Jeder andere Fehler: kein `stamp`, Rückgabewert ≠ 0, Zeile mit `FEHLGESCHLAGEN`."""
-    rc, ausgabe, aufrufe = _lauf(tmp_path, "anders")
+def test_b_doppelanlage_bricht_ab_ohne_stamp_mit_verweis(tmp_path):
+    """(b) „already exists": kein `stamp`, Rückgabewert ≠ 0, Verweis auf den Runbook-Abschnitt."""
+    rc, ausgabe, aufrufe = _lauf(tmp_path, "doppelt")
     assert rc != 0, ausgabe
-    assert aufrufe == ["upgrade head"], aufrufe
+    assert aufrufe == ["current", "upgrade head"], aufrufe
     assert "stamp" not in " ".join(aufrufe)
-    assert "could not connect to server: Connection refused" in ausgabe
-    assert (
-        "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head), kein heilbarer"
-        " Doppelanlage-Fall -- Abbruch ohne create_all-Rueckfall" in ausgabe
-    )
+    assert 'relation "app_settings" already exists' in ausgabe
+    assert "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head)" in ausgabe
+    assert f'docs/BETRIEB.md, Abschnitt "{ABSCHNITT}"' in ausgabe
+    # Der Abbruch läuft über die ERR-Falle, nicht über ein stilles Weiterlaufen.
     assert "!! Fehler im Schritt datenbank (Rueckgabewert 1)" in ausgabe
-    # Kein stilles Weiterlaufen: der Schritt endet nicht regulär.
+    assert "Datenbank nachher:" not in ausgabe
     assert "== schritt datenbank beendet" not in ausgabe
 
 
-def test_create_all_rueckfall_ist_entfallen():
-    """Der stille Rückfall auf `create_all` steht nicht mehr im Schritt."""
-    block = _datenbank_block()
-    # Kommentarzeilen ausnehmen: dort wird der Verzicht auf den Rückfall gerade begründet.
-    befehle = "\n".join(z for z in block.splitlines() if not z.lstrip().startswith("#"))
-    assert "Fortsetzung mit create_all-Fallback" not in befehle
-    assert "Tabellen werden beim Start per create_all angelegt" not in befehle
+def test_c_anderer_fehler_ist_rot(tmp_path):
+    """(c) Jeder andere Fehler: kein `stamp`, Rückgabewert ≠ 0, Zeile mit `FEHLGESCHLAGEN`."""
+    rc, ausgabe, aufrufe = _lauf(tmp_path, "anders")
+    assert rc != 0, ausgabe
+    assert aufrufe == ["current", "upgrade head"], aufrufe
+    assert "stamp" not in " ".join(aufrufe)
+    assert "could not connect to server: Connection refused" in ausgabe
+    assert "!! SCHRITT datenbank FEHLGESCHLAGEN (alembic upgrade head)" in ausgabe
+    assert "!! Fehler im Schritt datenbank (Rueckgabewert 1)" in ausgabe
+    assert "Datenbank nachher:" not in ausgabe
+    assert "== schritt datenbank beendet" not in ausgabe
+
+
+def test_kein_stempel_und_kein_create_all_in_befehlszeilen():
+    """Zwischen den Schrittmarken steht in keiner Befehlszeile `stamp` oder `create_all`."""
+    befehle = _befehlszeilen(_datenbank_block())
+    assert "stamp" not in befehle
+    assert "create_all" not in befehle
+
+
+def test_vorher_und_nachher_stehen_in_variablen_und_meldung_nennt_abschnitt():
+    """Beide Stände liegen in Shell-Variablen (Paket 4); die Fehlermeldungen nennen den Abschnitt."""
+    befehle = _befehlszeilen(_datenbank_block())
+    assert 'DATENBANK_VORHER=$("$VENV/bin/alembic" current' in befehle
+    assert 'DATENBANK_NACHHER=$("$VENV/bin/alembic" current' in befehle
+    assert 'echo "Datenbank vorher: $DATENBANK_VORHER"' in befehle
+    assert 'echo "Datenbank nachher: $DATENBANK_NACHHER"' in befehle
+    assert befehle.index("DATENBANK_VORHER=") < befehle.index("alembic\" upgrade head")
+    assert befehle.index("alembic\" upgrade head") < befehle.index("DATENBANK_NACHHER=")
+    assert befehle.count(ABSCHNITT) == 2
