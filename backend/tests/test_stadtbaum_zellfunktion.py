@@ -10,7 +10,7 @@ Teilpaket #1 des Vorhabens T-1483-cto (Punkt (d), Spiegelstriche 2–4):
 3. Die Zellausgabe von ``allergy_symptom_days`` trägt die Kronenterme
    (``canopy_birch_frac``, ``canopy_unknown_frac``, ``green_frac``) gleich den
    Zelleingaben; ``runner.build_cell_risks`` speichert sie wie ``pollen_g``, ``outcome``
-   und ``cost_eur`` bleiben unverändert (kein neuer Rechenpfad).
+   und ``cost_eur`` tragen den Rechenstand nach Ü-13 (a_attr 0,27) als bitgleiche Festwerte.
 
 Die Maßnahme selbst (Ĝ' im Zelllauf einer Maßnahme, Ḡ₀-Festhaltung) ist NICHT Teil
 dieses Pakets (#2 aus T-1483-cto).
@@ -119,8 +119,8 @@ def test_zellausgabe_traegt_kronenterme_gleich_den_zelleingaben():
     assert res["green_frac"] == 0.30
 
 
-def test_outcome_und_cost_eur_bleiben_bitgleich_zum_vorzustand():
-    """Die neuen Ausgabefelder ändern den bestehenden Rechenweg nicht.
+def test_outcome_und_cost_eur_festwerte_nach_ue13_bitgleich():
+    """Outcome und Kosten der Zelle stimmen mit den Festwerten nach Ü-13 bitgleich überein.
 
     Festwerte neu ermittelt (T-1714) auf main, Commit
     a823f5821e2802381dd148f49c2985d6985971af, nachdem a_attr auf 0,27 (Ü-13) stand
