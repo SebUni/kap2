@@ -29,6 +29,7 @@ REPO = Path(__file__).resolve().parents[2]
 FRONTEND = REPO / "frontend"
 QUELLE = FRONTEND / "src" / "utils" / "schadenNachMassnahmen.ts"
 KOMPONENTE = FRONTEND / "src" / "components" / "dashboard" / "CostTablesSection.tsx"
+RADAR = FRONTEND / "src" / "components" / "dashboard" / "RiskRadarSection.tsx"
 ESBUILD = FRONTEND / "node_modules" / ".bin" / "esbuild"
 NODE = shutil.which("node")
 
@@ -129,4 +130,16 @@ def test_komponente_liest_schaden_je_jahr_nur_aus_risk_summary() -> None:
                      "costSummary?.damages_with_measures_eur", "costSummary.klimawirkungen"):
         assert verboten not in text, f"Ersatz der Ausgangslage durch cost-summary: {verboten}"
     assert "riskSummary.cost.klimawirkungen" in text
+    assert "nach Maßnahmen" in text
+
+
+def test_schadenstreiber_karte_liest_betraege_nur_aus_risk_summary() -> None:
+    """T-1863: TopRisksCard (RiskRadarSection) fällt nicht auf costSummary zurück."""
+    text = RADAR.read_text(encoding="utf-8")
+    for verboten in ("costSummary?.by_risk", "costSummary?.klimawirkungen",
+                     "costSummary.by_risk", "costSummary.klimawirkungen",
+                     "costSummary?.by_risk ||", "costSummary?.klimawirkungen ||"):
+        assert verboten not in text, f"Rückfall auf cost-summary: {verboten}"
+    assert "riskSummary?.cost.klimawirkungen" in text
+    assert "schadenNachMassnahmen(" in text
     assert "nach Maßnahmen" in text
