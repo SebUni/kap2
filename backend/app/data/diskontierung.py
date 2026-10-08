@@ -42,7 +42,8 @@ RELATIVE_PRICE_COMPONENT_SPEC: dict = {
     "unit": "Prozentpunkte (als Dezimalzahl, 0,01 = 1 Pp.)",
     "source": (
         "Abschätzung von KAP3 aus drei Quellenwerten (UBA Methodenkonvention 4.0, Kap. 2.2.3, "
-        "S. 14–15 und S. 22; Sachverständigenrat; Green Book; OECD)"
+        "S. 14–16 und S. 22; Sachverständigenrat; 2024 Ageing Report, Country fiche Germany; "
+        "World Bank, World Development Indicators; Green Book; OECD)"
     ),
     "source_detail": (
         "Die UBA Methodenkonvention 4.0 verlangt eine Diskontrate aus zwei Teilen: der "
@@ -65,7 +66,10 @@ RELATIVE_PRICE_COMPONENT_SPEC: dict = {
             "0,1 Prozentpunkte, positives Vorzeichen (Abschätzung von KAP3). Gerechnet aus drei "
             "Quellenwerten: Konsumwachstum je Kopf 0,7 % je Jahr (Band 0,4–1,1 %; Potenzialwachstum "
             "2023–2070 im Mittel 0,7 % je Jahr, Sachverständigenrat, S. 15, bei nahezu gleicher "
-            "Bevölkerung 2022–2070, Tabelle 2 der EUROPOP2023-Auswertung); Elastizität des "
+            "Bevölkerung 2022–2070, 2024 Ageing Report, Country fiche Germany, Tabelle 2; Untergrenze "
+            "0,4 %: Potenzialwachstum der 2020er Jahre, Sachverständigenrat, S. 15; Obergrenze "
+            "1,1 %: BIP je Kopf Deutschlands 1991–2024, im Mittel 1,06 % je Jahr, World Bank, "
+            "World Development Indicators, NY.GDP.PCAP.KD, Preise von 2015); Elastizität des "
             "Grenznutzens 1,0 (Band 1,0–1,5; Green Book §2.13, Spanne §2.12; Rechenbeispiel der "
             "UBA Methodenkonvention 4.0, S. 16, entspricht 1); Einkommenselastizität des "
             "Schadenswerts 0,85 (Band 0,85–1,0; UBA Methodenkonvention 4.0, S. 22; Obergrenze nach "

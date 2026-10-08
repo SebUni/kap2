@@ -171,7 +171,7 @@ export default function CostTimelineSection({ className = '' }: { className?: st
                   {disk && <th style={{ paddingRight: 12, fontWeight: 400 }}>Komponente der relativen Preise</th>}
                   {disk && (
                     <th style={{ paddingRight: 12, fontWeight: 400 }}>
-                      Diskontrate Gesundheitsschäden ({kwraNummern})
+                      Diskontrate Gesundheitsschäden{kwraNummern ? ` (${kwraNummern})` : ''}
                       <div style={{ fontSize: '0.68rem' }}>Summe aus Reiner Zeitpräferenzrate und Komponente</div>
                     </th>
                   )}
@@ -214,8 +214,10 @@ export default function CostTimelineSection({ className = '' }: { className?: st
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
               {disk ? (
                 <>
-                  Die Diskontrate ist die Summe aus Reiner Zeitpräferenzrate und Komponente der relativen Preise.
-                  Sie gilt nur für die Gesundheitsschäden der Klimawirkungen {kwraNummern}. Die übrigen Schäden und die
+                  Die Diskontrate ist die Summe aus Reiner Zeitpräferenzrate und Komponente der relativen Preise.{' '}
+                  {kwraNummern
+                    ? <>Sie gilt nur für die Gesundheitsschäden der Klimawirkungen {kwraNummern}.</>
+                    : <>Sie gilt nur für die Gesundheitsschäden.</>} Die übrigen Schäden und die
                   Maßnahmenkosten werden allein mit der Reinen Zeitpräferenzrate abgezinst.
                   Die Komponente ist eine Abschätzung von KAP3: {disk.relative_preise.begruendung}
                   {disk.modellgrenzen.length > 0 && (
