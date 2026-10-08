@@ -44,7 +44,6 @@ REPORT = os.path.join(os.path.dirname(__file__), "..", "..",
                       "docs", "methodik", "98_uv_schaedigungen.md")
 CSV = os.path.join(os.path.dirname(__file__), "..", "data", "kalibrierung", "ssd_povw.csv")
 CODE = "EXPECTED_ANNUAL_UV_YLL"
-_KLASSE = {"quelle": "belegt", "abschaetzung_kap3": "abgeschaetzt", "berechnet": "berechnet"}
 
 # Maßnahme S155 (Paket 5/7 des Abgleich-Vorhabens T-1662-ceo): Blöcke an der Katalog-Maßnahme.
 S155 = {"uv.s155_dosisminderung", "uv.s155_a_erk_mm", "uv.s155_a_erk_c44"}

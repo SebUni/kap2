@@ -42,7 +42,6 @@ from app.services.engine.impact.base import CellContext  # noqa: E402
 REPORT = os.path.join(os.path.dirname(__file__), "..", "..",
                       "docs", "methodik", "96_aeroallergene.md")
 CODE = "EXPECTED_ANNUAL_ALLERGY_DAYS"
-_KLASSE = {"quelle": "belegt", "abschaetzung_kap3": "abgeschaetzt", "berechnet": "berechnet"}
 
 # Schlüssel der Mehrfach-Blöcke → Suffix der Registry-ID.
 _SUFFIX = {"u20": "u20", "20-64": "a20_64", "65-74": "a65_74", "75-84": "a75_84",
@@ -131,7 +130,7 @@ def test_katalog_bloecke_am_risiko_und_an_der_massnahme():
     by_id = {p["id"]: p for p in parameter_registry.catalog_parameters()}
     c_tag = by_id[f"risks.{CODE}.cost_per_outcome"]
     assert c_tag["methodik_block"] == "pollen.c_tag" and c_tag["value"] == 6.20
-    assert c_tag["evidence_class"] == "abgeschaetzt"
+    assert c_tag["evidence_class"] == _soll()["pollen.c_tag"]
     c_jahr = by_id[f"risks.{CODE}.impact.c_jahr_direkt"]
     assert c_jahr["methodik_block"] == "pollen.c_jahr_direkt" and c_jahr["layer_code"] == CODE
     r = by_id["measures.POLLEN_EARLY_WARNING.default_reduction"]
@@ -174,7 +173,7 @@ def test_nicht_rechnende_bloecke_aendern_keine_rechnung():
     """
     by_id = {p["id"]: p for p in parameter_registry.catalog_parameters()}
     d = by_id[f"risks.{CODE}.impact.d_saison"]
-    assert d["evidence_class"] == "abgeschaetzt" and d["value"] == 43.05
+    assert d["evidence_class"] == _soll()["pollen.d_saison"] and d["value"] == 43.05
     for key in ("d_saison", "c_jahr_direkt"):
         assert by_id[f"risks.{CODE}.impact.{key}"]["editable"] is False, key
     override_context.set_overrides({})
