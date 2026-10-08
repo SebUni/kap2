@@ -21,6 +21,31 @@
   `docs/BETRIEB.md`, Abschnitt „Bestandsdatenbank auf die Migrationskette heben“. Der Deploy setzt
   den Alembic-Stand nie von Hand und legt das Schema nie auf anderem Weg an; ein Schema, das nicht aus
   der Migrationskette stammt, hebt ein Mensch nach dem Runbook auf die Kette.
+- Der Schritt `beispielkommune` (T-1831, A-0066) steht nach dem Health-Check und vor `status`. Aufruf:
+  `KAP2_VENV="$VENV" python3 "$PRODUKT/scripts/sicht_beispielkommune.py" --basis http://127.0.0.1:8010
+  --neu-rechnen --anmeldung sitzung --warte-sekunden 900`. Er rechnet die Beispielkommune Warmsen mit dem
+  gerade ausgelieferten Stand neu (legt Gemeindetabelle, Kommune und Maßnahme an, falls sie fehlen) und
+  meldet sich mit einer technischen Sitzung an; `DATABASE_URL` und der Sitzungsschlüssel werden nie
+  ausgegeben. **Wartegrenze:** 900 s für die Bewertung (Frist des Watchers: 30 min = 1800 s; schlechtester
+  Fall 480 s + 900 s = 1380 s). Die ganze Ausgabe geht ins Protokoll, die letzte Zeile (JSON) liegt in der
+  Datei, auf die die Shell-Variable `BEISPIEL_JSON` zeigt. **Rot** (ERR-Falle, Status `fehler`, nie
+  `fertig`) wird der Schritt, wenn (1) das Skript mit Rückgabewert ≠ 0 endet, auch bei der Wartegrenze,
+  (2) die letzte Ausgabezeile kein JSON-Objekt ist, (3) in `klimawirkungen` keine Bezeichnung mit `#95`,
+  `#96` oder `#98` steht (die Meldung nennt die fehlenden), oder (4) der gemeldete `commit` nicht der
+  ausgelieferte ist.
+- Die Statusdatei `betrieb/deploy-status.json` trägt seit T-1832 zwei Felder als Nachweis ohne Browser;
+  sie stehen in jedem Status, auch bei `fehler`:
+  - `datenbank`: `{"vorher": …, "nachher": …}` mit der Ausgabe von `alembic current` vor und nach
+    `alembic upgrade head` (Werte der Variablen `DATENBANK_VORHER` und `DATENBANK_NACHHER`). Eine leere
+    Ausgabe (keine Tabelle `alembic_version` oder kein Eintrag darin) und ein Wert, der wegen eines
+    früheren Abbruchs nie gesetzt wurde, stehen beide als `null`.
+  - `beispielkommune`: `kommune`, `gemeindeschluessel`, `commit`, `zeit_rechnung` und `klimawirkungen`
+    (Liste mit `bezeichnung` und `betrag_eur_jahr`), gelesen aus der Datei in `BEISPIEL_JSON`. Übernommen
+    wird nur diese feste Auswahl, nie die ganze Datei. Ist die Datei nicht vorhanden, leer oder kein
+    JSON-Objekt — etwa bei einem Abbruch vor dem Schritt —, steht `beispielkommune: null`; die Statusdatei
+    mit `status: fehler` und den Protokollzeilen wird trotzdem geschrieben, auch unter `set -u`.
+  Das Passwort steht nie in der Datei, nur `zugang.passwort_quelle` (T-0169). Der Watcher liest daraus nur
+  `zeit`, `status` und `fehler`; die zusätzlichen Felder stören ihn nicht.
 - **Regel für eine neue Datenbank der Testumgebung:** Sie bekommt ihr Schema nur über den Deploy.
   `kap2-test.service` darf vor dem ersten Deploy nicht starten, weil `app/main.py` beim Start
   `create_all` ausführt: Das Schema entstünde dann ohne Alembic-Stand, und der erste `alembic upgrade

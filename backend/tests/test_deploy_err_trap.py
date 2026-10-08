@@ -22,6 +22,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shlex
 import subprocess
 from pathlib import Path
 
@@ -67,8 +68,18 @@ def _funktionsblock() -> str:
     return text[anfang:ende]
 
 
-def _werkbank(tmp_path: Path, set_zeile: str) -> tuple[Path, dict[str, str]]:
-    """Legt Firmen-Repo, Gegenstelle, python3-Attrappe und Lauf-Skript an."""
+def _werkbank(
+    tmp_path: Path,
+    set_zeile: str,
+    datenbank: tuple[str, str] | None = None,
+    beispiel: dict | str | None = None,
+) -> tuple[Path, dict[str, str]]:
+    """Legt Firmen-Repo, Gegenstelle, python3-Attrappe und Lauf-Skript an.
+
+    Seit T-1832 liest `status_lokal_schreiben` auch DATENBANK_VORHER, DATENBANK_NACHHER und die
+    Datei in BEISPIEL_JSON. `datenbank` und `beispiel` setzen sie wie die Schritte `datenbank` und
+    `beispielkommune` des echten Skripts; ohne beide Angaben bleiben die drei Variablen ungesetzt
+    (Abbruch vor diesen Schritten, unter `set -u`)."""
     firma = tmp_path / "firma"
     (firma / "betrieb").mkdir(parents=True)
     remote = tmp_path / "remote.git"
@@ -117,11 +128,22 @@ def _werkbank(tmp_path: Path, set_zeile: str) -> tuple[Path, dict[str, str]]:
         encoding="utf-8",
     )
 
+    schritt_variablen: list[str] = []
+    if datenbank is not None:
+        schritt_variablen.append(f"DATENBANK_VORHER={shlex.quote(datenbank[0])}")
+        schritt_variablen.append(f"DATENBANK_NACHHER={shlex.quote(datenbank[1])}")
+    if beispiel is not None:
+        beispiel_datei = tmp_path / "beispielkommune.json"
+        roh = beispiel if isinstance(beispiel, str) else json.dumps(beispiel, ensure_ascii=False)
+        beispiel_datei.write_text(roh + "\n" if roh else "", encoding="utf-8")
+        schritt_variablen.append(f"BEISPIEL_JSON={shlex.quote(str(beispiel_datei))}")
+
     lauf = tmp_path / "lauf.sh"
     lauf.write_text(
         "\n".join(
             [
                 set_zeile,
+                *schritt_variablen,
                 f'FIRMA="{firma}"',
                 f'PROTOKOLL="{protokoll}"',
                 'COMMIT="4fa6eeb8"',
@@ -143,7 +165,8 @@ def _werkbank(tmp_path: Path, set_zeile: str) -> tuple[Path, dict[str, str]]:
     return lauf, umgebung
 
 
-def _gemeldeter_status(tmp_path: Path, umgebung: dict[str, str]) -> str:
+def _gemeldete_datei(tmp_path: Path, umgebung: dict[str, str]) -> tuple[dict, str]:
+    """Gepushte `betrieb/deploy-status.json` als Objekt und als Rohtext."""
     ergebnis = subprocess.run(
         ["git", "-C", str(tmp_path / "firma"), "show", "origin/main:betrieb/deploy-status.json"],
         env=umgebung,
@@ -151,11 +174,17 @@ def _gemeldeter_status(tmp_path: Path, umgebung: dict[str, str]) -> str:
         capture_output=True,
         text=True,
     )
-    return json.loads(ergebnis.stdout)["status"]
+    return json.loads(ergebnis.stdout), ergebnis.stdout
 
 
-def _lauf(tmp_path: Path, set_zeile: str) -> tuple[subprocess.CompletedProcess, str]:
-    lauf, umgebung = _werkbank(tmp_path, set_zeile)
+def _gemeldeter_status(tmp_path: Path, umgebung: dict[str, str]) -> str:
+    return _gemeldete_datei(tmp_path, umgebung)[0]["status"]
+
+
+def _lauf_datei(
+    tmp_path: Path, set_zeile: str, **werkbank: object
+) -> tuple[subprocess.CompletedProcess, dict, str]:
+    lauf, umgebung = _werkbank(tmp_path, set_zeile, **werkbank)
     ergebnis = subprocess.run(
         ["bash", str(lauf)], env=umgebung, capture_output=True, text=True
     )
@@ -165,7 +194,13 @@ def _lauf(tmp_path: Path, set_zeile: str) -> tuple[subprocess.CompletedProcess, 
         check=True,
         capture_output=True,
     )
-    return ergebnis, _gemeldeter_status(tmp_path, umgebung)
+    datei, roh = _gemeldete_datei(tmp_path, umgebung)
+    return ergebnis, datei, roh
+
+
+def _lauf(tmp_path: Path, set_zeile: str) -> tuple[subprocess.CompletedProcess, str]:
+    ergebnis, datei, _ = _lauf_datei(tmp_path, set_zeile)
+    return ergebnis, datei["status"]
 
 
 def test_set_zeile_traegt_grosses_e():
@@ -196,6 +231,88 @@ def test_fehler_in_status_schreiben_wird_gemeldet(tmp_path):
     assert "!! Fehler im Schritt status" in ergebnis.stdout
     assert "== fertig" not in ergebnis.stdout
     assert status == "fehler"
+
+
+BEISPIEL_DATEI = {
+    "kommune": "Warmsen",
+    "gemeindeschluessel": "03256033",
+    "status": "done",
+    "commit": "4fa6eeb8",
+    "zeit_rechnung": "2026-10-08T10:45:59+00:00",
+    "klimawirkungen": [
+        {"bezeichnung": "Hitzebelastung (#95)", "betrag_eur_jahr": 179020.81, "intern": "nicht uebernehmen"},
+        {"bezeichnung": "Allergische Reaktionen durch Aeroallergene (#96)", "betrag_eur_jahr": 2280.6},
+        {"bezeichnung": "UV-bedingte Gesundheitsschaedigungen (#98)", "betrag_eur_jahr": None},
+    ],
+    # Felder ausserhalb der festen Liste: duerfen nie in die Statusdatei.
+    "sitzung": "GEHEIMER-SITZUNGSWERT",
+    "zugang": {"passwort": "GEHEIMES-PASSWORT"},
+}
+
+
+@pytest.mark.skipif(not Path("/usr/bin/python3").exists(), reason="kein /usr/bin/python3")
+def test_abbruch_schreibt_datenbank_und_beispielkommune_in_den_gepushten_status(tmp_path):
+    """T-1832, Fall 1: Mit Beispieldatei in BEISPIEL_JSON enthält der gepushte Status beide Felder
+    mit genau diesen Werten — und nur die Felder der festen Liste."""
+    ergebnis, datei, roh = _lauf_datei(
+        tmp_path,
+        _set_zeile(),
+        datenbank=("0042_abc (head)", "0043_def (head)"),
+        beispiel=BEISPIEL_DATEI,
+    )
+    assert ergebnis.returncode != 0, ergebnis.stdout
+    assert datei["status"] == "fehler"
+    assert "Schritt status fehlgeschlagen" in datei["fehler"]
+    assert datei["datenbank"] == {"vorher": "0042_abc (head)", "nachher": "0043_def (head)"}
+    assert datei["beispielkommune"] == {
+        "kommune": "Warmsen",
+        "gemeindeschluessel": "03256033",
+        "commit": "4fa6eeb8",
+        "zeit_rechnung": "2026-10-08T10:45:59+00:00",
+        "klimawirkungen": [
+            {"bezeichnung": "Hitzebelastung (#95)", "betrag_eur_jahr": 179020.81},
+            {"bezeichnung": "Allergische Reaktionen durch Aeroallergene (#96)", "betrag_eur_jahr": 2280.6},
+            {"bezeichnung": "UV-bedingte Gesundheitsschaedigungen (#98)", "betrag_eur_jahr": None},
+        ],
+    }
+    for fremd in ("GEHEIMER-SITZUNGSWERT", "GEHEIMES-PASSWORT", "nicht uebernehmen", '"sitzung"'):
+        assert fremd not in roh, fremd
+
+
+@pytest.mark.skipif(not Path("/usr/bin/python3").exists(), reason="kein /usr/bin/python3")
+def test_abbruch_ohne_datei_und_variablen_schreibt_status_fehler_und_null(tmp_path):
+    """T-1832, Fall 2: Ohne Beispieldatei und ohne DATENBANK_VORHER/-NACHHER/BEISPIEL_JSON (Abbruch
+    vor diesen Schritten, `set -u` aktiv) wird der Fehlerstatus trotzdem geschrieben."""
+    assert "u" in _set_zeile().split()[1]
+    ergebnis, datei, _ = _lauf_datei(tmp_path, _set_zeile())
+    assert "unbound variable" not in ergebnis.stderr, ergebnis.stderr
+    assert ergebnis.returncode != 0
+    assert datei["status"] == "fehler"
+    assert "Schritt status fehlgeschlagen" in datei["fehler"]
+    assert "npm run build: FATAL ERROR" in datei["fehler"]  # Protokollzeilen stehen weiter drin
+    assert datei["beispielkommune"] is None
+    assert datei["datenbank"] == {"vorher": None, "nachher": None}
+
+
+@pytest.mark.skipif(not Path("/usr/bin/python3").exists(), reason="kein /usr/bin/python3")
+def test_leere_oder_unlesbare_beispieldatei_ergibt_null(tmp_path):
+    """BEISPIEL_JSON zeigt auf eine leere Datei (Skript vor der Schlusszeile abgebrochen) oder auf
+    eine Datei ohne JSON: `beispielkommune` ist null, der Status wird geschrieben."""
+    for name, inhalt in (("leer", ""), ("kein_json", "Dauer dieses Aufrufs: 12 s")):
+        unter = tmp_path / name
+        unter.mkdir()
+        _, datei, _ = _lauf_datei(unter, _set_zeile(), datenbank=("", ""), beispiel=inhalt)
+        assert datei["status"] == "fehler", name
+        assert datei["beispielkommune"] is None, name
+        assert datei["datenbank"] == {"vorher": None, "nachher": None}, name
+    # Ein JSON-Objekt ohne die Felder der festen Liste: jedes Feld null, nichts erfunden.
+    ohne = tmp_path / "ohne_felder"
+    ohne.mkdir()
+    _, datei, _ = _lauf_datei(ohne, _set_zeile(), beispiel={"anderes": 1})
+    assert datei["beispielkommune"] == {
+        "kommune": None, "gemeindeschluessel": None, "commit": None, "zeit_rechnung": None,
+        "klimawirkungen": None,
+    }
 
 
 @pytest.mark.skipif(not Path("/usr/bin/python3").exists(), reason="kein /usr/bin/python3")

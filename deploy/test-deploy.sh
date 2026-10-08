@@ -144,13 +144,54 @@ status_lokal_schreiben() {  # $1 = fertig|fehler, $2 = Fehlertext -- schreibt nu
   adresse="${KAP2_TEST_URL:-http://localhost}"
   # Passwort selbst geht nie in die Statusdatei des Firmen-Repos (T-0169): nur der Pfad der
   # Datei auf dem Server, in der es liegt.
-  python3 - "$st" "$fehler" "$zeit" "$adresse" "$COMMIT" "$PROTOKOLL" "${KAP2_TEST_BENUTZER:-}" "$PASSWORT_QUELLE" > "$FIRMA/betrieb/deploy-status.json.neu" <<'PY'
+  # T-1832: Nachweis ohne Browser. Zusaetzlich zwei Felder: "datenbank" (DATENBANK_VORHER/-NACHHER
+  # aus dem Schritt datenbank) und "beispielkommune" (feste Auswahl aus der Datei in BEISPIEL_JSON
+  # aus dem Schritt beispielkommune). Die Funktion laeuft auch im Abbruchpfad, wenn der Lauf vor
+  # diesen Schritten endete: die Variablen sind dann ungesetzt (set -u!), deshalb ${NAME:-} --
+  # leer wird im Status zu null. Die Datei in BEISPIEL_JSON wird nie ganz uebernommen.
+  python3 - "$st" "$fehler" "$zeit" "$adresse" "$COMMIT" "$PROTOKOLL" "${KAP2_TEST_BENUTZER:-}" "$PASSWORT_QUELLE" \
+    "${DATENBANK_VORHER:-}" "${DATENBANK_NACHHER:-}" "${BEISPIEL_JSON:-}" > "$FIRMA/betrieb/deploy-status.json.neu" <<'PY'
 import json, sys
-st, fehler, zeit, adresse, commit, protokoll, benutzer, passwort_quelle = sys.argv[1:9]
+st, fehler, zeit, adresse, commit, protokoll, benutzer, passwort_quelle, db_vorher, db_nachher, beispiel_pfad = sys.argv[1:12]
+
+
+def zahl(w):
+    return w if isinstance(w, (int, float)) and not isinstance(w, bool) else None
+
+
+def text(w):
+    if isinstance(w, str):
+        return w[:300]
+    return zahl(w)
+
+
+def beispielkommune(pfad):
+    """Feste Auswahl aus der Schlusszeile des Beispielkommune-Skripts; sonst null."""
+    if not pfad:
+        return None
+    try:
+        with open(pfad, encoding="utf-8") as f:
+            roh = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(roh, dict):
+        return None
+    liste = roh.get("klimawirkungen")
+    wirkungen = None
+    if isinstance(liste, list):
+        wirkungen = [{"bezeichnung": text(k.get("bezeichnung")), "betrag_eur_jahr": zahl(k.get("betrag_eur_jahr"))}
+                     for k in liste if isinstance(k, dict)]
+    return {"kommune": text(roh.get("kommune")), "gemeindeschluessel": text(roh.get("gemeindeschluessel")),
+            "commit": text(roh.get("commit")), "zeit_rechnung": text(roh.get("zeit_rechnung")),
+            "klimawirkungen": wirkungen}
+
+
 d = {"zeit": zeit, "status": st, "adresse": adresse, "commit": commit or None,
      "fehler": (fehler[:1500] if st == "fehler" else None), "protokoll": protokoll}
 if benutzer:
     d["zugang"] = {"benutzer": benutzer, "passwort_quelle": passwort_quelle, "hinweis": "HTTP Basic Auth der Testumgebung"}
+d["datenbank"] = {"vorher": db_vorher[:500] or None, "nachher": db_nachher[:500] or None}
+d["beispielkommune"] = beispielkommune(beispiel_pfad)
 print(json.dumps(d, ensure_ascii=False, indent=1))
 PY
   # Erst lokal festschreiben, dann veroeffentlichen (T-0132): trifft waehrend des Pushens
