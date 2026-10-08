@@ -20,12 +20,14 @@ from __future__ import annotations
 KUNDENTEXT: dict[int, tuple[str, str]] = {
     1: (
         "teilweise",
-        "Nur bei der Hitzebelastung leitet der Bericht den Betrag vollständig über die Wirkungskette "
-        "her und rechnet Klimasignal, Empfindlichkeit der Bevölkerung und Zahl der Betroffenen "
-        "getrennt; bei der Vegetation in Siedlungen ist die Wirkungskette erst aufgestellt, aber "
-        "noch nicht gerechnet. Die drei Bausteine tragen zudem noch nicht die Namen des amtlichen "
-        "Vorbilds, und gerechnet wird das heutige Klima, nicht der Unterschied zwischen "
-        "Bezugszeitraum und künftigem Klima.",
+        "Von den beiden Methodik-Berichten, an denen diese Anforderung geprüft wurde, leitet der zur "
+        "Hitzebelastung den Betrag über die Wirkungskette her und rechnet die Hitze, die "
+        "Empfindlichkeit der Bevölkerung und die Zahl der Betroffenen getrennt; der zur Vegetation "
+        "in Siedlungen stellt die Wirkungskette erst auf und rechnet sie noch nicht. Beide Berichte "
+        "erklären nicht, welche Kennbuchstaben der Wirkungskette für welchen der drei Bausteine "
+        "stehen, und benennen diese stellenweise mit Begriffen des Weltklimarats wie „Vulnerabilität“ "
+        "statt mit denen des amtlichen Vorbilds; gerechnet wird zudem nur das heutige Klima, nicht "
+        "der Unterschied zwischen Bezugszeitraum und künftigem Klima.",
     ),
     2: (
         "teilweise",
