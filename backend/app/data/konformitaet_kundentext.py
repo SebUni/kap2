@@ -18,6 +18,15 @@ Nur Zeilen mit Status „teilweise“ oder „offen“ stehen hier; „erfüllt�
 from __future__ import annotations
 
 KUNDENTEXT: dict[int, tuple[str, str]] = {
+    1: (
+        "teilweise",
+        "Nur bei der Hitzebelastung leitet der Bericht den Betrag vollständig über die Wirkungskette "
+        "her und rechnet Klimasignal, Empfindlichkeit der Bevölkerung und Zahl der Betroffenen "
+        "getrennt; bei der Vegetation in Siedlungen ist die Wirkungskette erst aufgestellt, aber "
+        "noch nicht gerechnet. Die drei Bausteine tragen zudem noch nicht die Namen des amtlichen "
+        "Vorbilds, und gerechnet wird das heutige Klima, nicht der Unterschied zwischen "
+        "Bezugszeitraum und künftigem Klima.",
+    ),
     2: (
         "teilweise",
         "Nur bei einer der bewerteten Klimawirkungen weist der Bericht ausdrücklich aus, wie hoch "
