@@ -684,7 +684,7 @@ def build_payload(nr: str) -> dict:
         from app.data import catalog
         g, p = _graph_96()
         tabs = [{
-            "label": "Ziel-Modell (Bericht Rev. 1): Symptomtage & €",
+            "label": f"Ziel-Modell (Bericht {bericht_stand('96')['revision']}): Symptomtage & €",
             "note": "So rechnet die Methodik #96 laut Bericht: "
                     "gemessene Saison-Spreizung × Prävalenz × Klima-Attribution, "
                     "moduliert mit der lokalen Vegetationslast P̂.",
