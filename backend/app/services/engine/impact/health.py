@@ -43,7 +43,7 @@ from math import exp, pi, sqrt
 
 import numpy as np
 
-from app.services.engine import risk_engine
+from app.services.engine import override_context, risk_engine
 from app.services.engine.impact.base import CellContext, attributable_fraction
 
 
@@ -123,6 +123,23 @@ POLLEN_SAISON_LAENGE: dict[str, float] = {"birke": 30.0, "graeser": 60.0}
 # das gleichbedeutend mit einem anderen c_Jahr,direkt — die Kette bleibt
 # konsistent (Ledger #96 Befund 137).
 POLLEN_D_SAISON_REF: float = 43.05
+
+
+def pollen_saison_faktor(code: str) -> float:
+    """Saisonkopplung POLLEN_D_SAISON_REF / d_Saison, d_Saison = f·(p_B·L_B + p_G·L_G).
+
+    Bericht #96 §3.5, aus den wirksamen Parametern (Vorgabe oder Override der Kommune).
+    DIE gemeinsame Stelle von Zelle (``allergy_symptom_days``) und Aggregat
+    (``risk_engine.cost_from_cell_entry``, T-1894-ceo). Bei den Vorgabewerten 1,0.
+    """
+    def p(key: str, default: float) -> float:
+        v = override_context.get_override(f"risks.{code}.impact.{key}", default)
+        return float(v) if v is not None else float(default)
+
+    d_saison = p("f_symptomtage", 0.70) * (
+        p("p_sens_birke", 0.55) * p("l_saison_birke", POLLEN_SAISON_LAENGE["birke"])
+        + p("p_sens_graeser", 0.75) * p("l_saison_graeser", POLLEN_SAISON_LAENGE["graeser"]))
+    return POLLEN_D_SAISON_REF / d_saison if d_saison > 0.0 else 1.0
 
 # Gemessene Saison-Spreizung je Region (Tage; DWD-Phänologie, §3.1).
 POLLEN_DELTA_S_BIRKE: dict[str, float] = {"nord": 3.96, "mitte": 4.20, "sued": 5.94}
@@ -764,11 +781,7 @@ def allergy_symptom_days(risk: dict, ctx: CellContext) -> dict:
     # Nutzer aber f, p_B, p_G oder eine Saisonlänge, muss c_Tag mitlaufen —
     # sonst bräche die im Bericht tragende f-Kürzung (f steht in ΔTage UND in
     # d_Saison und kürzt sich im €-Pfad vollständig heraus).
-    l_b = ctx.p(code, "l_saison_birke", POLLEN_SAISON_LAENGE["birke"])
-    l_g = ctx.p(code, "l_saison_graeser", POLLEN_SAISON_LAENGE["graeser"])
-    d_saison = f * (p_b * l_b + p_g * l_g)
-    if d_saison > 0.0:
-        out["cost_eur"] *= POLLEN_D_SAISON_REF / d_saison
+    out["cost_eur"] *= pollen_saison_faktor(code)
     out["betroffene"] = max(0.0, betroffene)
     return out
 
