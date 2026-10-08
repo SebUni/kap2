@@ -6,7 +6,11 @@ Kapitel 7 von ``docs/methodik/96_aeroallergene.md`` trägt je Block eine ``kennz
 im Feld ``methodik_block``. Geprüft wird:
 
 1. Die Menge der ``pollen.*``-Kennungen der Registry ist genau die Menge der 14 Blöcke,
-   gezählt über verschiedene Kennungen: 3 × belegt, 9 × abgeschätzt, 2 × berechnet.
+   gezählt über verschiedene Kennungen: 3 × belegt, 11 × abgeschätzt, 0 × berechnet. Kapitel 7
+   zählt 3 × belegt, 9 × abgeschätzt, 2 × berechnet; die Klasse von pollen.c_tag und
+   pollen.d_saison kommt nach Regel K aus der Spalte „Kennzeichnung nach der Regel“ der Tabelle
+   in ``docs/methodik/querschnitt_kennzeichnung.md`` (Kopfzeile ``| Bericht | Block-ID |
+   Eingänge |``), gelesen zur Laufzeit (T-1898-cto); für alle übrigen Blöcke gilt Kapitel 7.
 2. Jeder #96-Parameter der Registry trägt Kennung und Klasse seines Blocks; Katalog-Blöcke
    stehen am Risiko (pollen.c_tag) bzw. an der Maßnahme POLLEN_EARLY_WARNING (pollen.r_s158).
 3. pollen.t_warn_s158 = 0,75 ist ein Spec des Risikos, kein Feld der Maßnahme; seit
@@ -29,6 +33,7 @@ import yaml
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from regel_k_tabelle import soll_klasse  # noqa: E402
 from app.data import catalog, sources  # noqa: E402
 from app.services import parameter_registry  # noqa: E402
 from app.services.engine import impact, override_context  # noqa: E402
@@ -65,6 +70,11 @@ def _bloecke() -> dict[str, dict]:
     return bloecke
 
 
+def _soll() -> dict[str, str]:
+    """Block-ID → erwartete Registry-Klasse: Regel K für die 11, sonst Kapitel 7."""
+    return soll_klasse("96", _bloecke())
+
+
 def _nach_block() -> dict[str, list[dict]]:
     nach_block: dict[str, list[dict]] = {}
     for p in parameter_registry.catalog_parameters():
@@ -82,9 +92,9 @@ def test_block_kennungen_sind_genau_die_14_aus_kapitel_7():
                          f"nicht in Kapitel 7: {sorted(ist - soll)}")
 
 
-def test_zaehlung_der_kennzeichnungen_3_9_2():
+def test_zaehlung_der_kennzeichnungen_3_11_0():
     bloecke = _bloecke()
-    soll = Counter(_KLASSE[b["kennzeichnung"]] for b in bloecke.values())
+    soll = Counter(_soll().values())
     nach_block = _nach_block()
     ist = Counter()
     for bid in bloecke:
@@ -94,7 +104,7 @@ def test_zaehlung_der_kennzeichnungen_3_9_2():
     zaehlung = {"belegt": ist["belegt"], "abgeschaetzt": ist["abgeschaetzt"],
                 "berechnet": ist["berechnet"]}
     print(f"{len(bloecke)} verschiedene Block-Kennungen pollen.*: {zaehlung}")
-    assert zaehlung == {"belegt": 3, "abgeschaetzt": 9, "berechnet": 2}
+    assert zaehlung == {"belegt": 3, "abgeschaetzt": 11, "berechnet": 0}
     assert dict(soll) == dict(ist)
     # Mehrfach-Blöcke: gezählt werden Kennungen, nicht Registry-Zeilen.
     assert len(nach_block["pollen.delta_s_region"]) == 6
@@ -103,6 +113,7 @@ def test_zaehlung_der_kennzeichnungen_3_9_2():
 
 def test_jeder_parameter_des_risikos_traegt_block_und_klasse():
     bloecke = _bloecke()
+    soll = _soll()
     ohne, falsch = [], []
     for p in parameter_registry.catalog_parameters(layer_code=CODE):
         if ".impact." not in p["id"] and not p["id"].endswith(".cost_per_outcome"):
@@ -110,7 +121,7 @@ def test_jeder_parameter_des_risikos_traegt_block_und_klasse():
         bid = p.get("methodik_block")
         if bid not in bloecke:
             ohne.append(p["id"])
-        elif p["evidence_class"] != _KLASSE[bloecke[bid]["kennzeichnung"]]:
+        elif p["evidence_class"] != soll[bid]:
             falsch.append((p["id"], bid, p["evidence_class"]))
     assert not ohne, ohne
     assert not falsch, falsch
@@ -120,7 +131,7 @@ def test_katalog_bloecke_am_risiko_und_an_der_massnahme():
     by_id = {p["id"]: p for p in parameter_registry.catalog_parameters()}
     c_tag = by_id[f"risks.{CODE}.cost_per_outcome"]
     assert c_tag["methodik_block"] == "pollen.c_tag" and c_tag["value"] == 6.20
-    assert c_tag["evidence_class"] == "berechnet"
+    assert c_tag["evidence_class"] == "abgeschaetzt"
     c_jahr = by_id[f"risks.{CODE}.impact.c_jahr_direkt"]
     assert c_jahr["methodik_block"] == "pollen.c_jahr_direkt" and c_jahr["layer_code"] == CODE
     r = by_id["measures.POLLEN_EARLY_WARNING.default_reduction"]
@@ -163,7 +174,7 @@ def test_nicht_rechnende_bloecke_aendern_keine_rechnung():
     """
     by_id = {p["id"]: p for p in parameter_registry.catalog_parameters()}
     d = by_id[f"risks.{CODE}.impact.d_saison"]
-    assert d["evidence_class"] == "berechnet" and d["value"] == 43.05
+    assert d["evidence_class"] == "abgeschaetzt" and d["value"] == 43.05
     for key in ("d_saison", "c_jahr_direkt"):
         assert by_id[f"risks.{CODE}.impact.{key}"]["editable"] is False, key
     override_context.set_overrides({})
@@ -196,8 +207,8 @@ def test_belegte_bloecke_loesen_ihre_quelle_auf():
 def test_abgeschaetzte_bloecke_tragen_herleitung():
     nach_block = _nach_block()
     ohne = []
-    for bid, block in _bloecke().items():
-        if block["kennzeichnung"] != "abschaetzung_kap3":
+    for bid, klasse in _soll().items():
+        if klasse != "abgeschaetzt":
             continue
         for p in nach_block[bid]:
             h = p.get("evidence_derivation") or {}

@@ -8,8 +8,12 @@ aus dem Bericht selbst und prüft je Block, außer den benannten Ausnahmen:
    Schlüssel eine (``<name>_<schlüssel>``, etwa ``baf_mm``);
 2. gleicher Wert bei gleicher Rundung (Nachkommastellen des Berichtswerts);
 3. Klasse in der Ausgabe der Parameterliste: quelle → belegt, abschaetzung_kap3 → abgeschaetzt,
-   berechnet → berechnet;
-4. bei abgeschätzten Blöcken eine Herleitung (Wert, Band, Sensitivität) in der Parameterliste.
+   berechnet → berechnet. Für die Blöcke unter den 11 (``uv.k_uv``, ``uv.baf``, ``uv.lambda``,
+   ``uv.l_rest``, ``uv.c_kal``) gilt die Spalte „Kennzeichnung nach der Regel“ der Tabelle in
+   ``docs/methodik/querschnitt_kennzeichnung.md`` (Kopfzeile ``| Bericht | Block-ID | Eingänge |``),
+   gelesen zur Laufzeit (T-1898-cto); für alle übrigen Blöcke Kapitel 7;
+4. bei abgeschätzten Blöcken (in der Klasse der Parameterliste, also nach Regel K) eine
+   Herleitung (Wert, Band, Sensitivität) in der Parameterliste.
 
 Die drei Blöcke der Maßnahme S155 (``uv.s155_dosisminderung``, ``uv.s155_a_erk_mm``,
 ``uv.s155_a_erk_c44``) tragen ihre Stelle an der Katalog-Maßnahme ``UV_PROTECTION_PUBLIC_SPACE``
@@ -33,6 +37,7 @@ import yaml
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from regel_k_tabelle import soll_klasse  # noqa: E402
 from app.services import parameter_registry  # noqa: E402
 
 REPORT = os.path.join(os.path.dirname(__file__), "..", "..",
@@ -81,6 +86,11 @@ def _stellen() -> dict[str, list[dict]]:
 def _geprueft() -> dict[str, dict]:
     return {bid: b for bid, b in _bloecke().items()
             if bid not in OHNE_STELLE}
+
+
+def _soll() -> dict[str, str]:
+    """Block-ID → erwartete Registry-Klasse der geprüften Blöcke: Regel K für die 11, sonst Kapitel 7."""
+    return soll_klasse("98", _geprueft())
 
 
 def _paare(bid: str, wert, stellen: list[dict]) -> list[tuple[str, object, dict]]:
@@ -134,8 +144,7 @@ def test_werte_stimmen_mit_den_bloecken_ueberein():
 def test_klasse_in_der_parameterliste_folgt_der_kennzeichnung():
     nach_block = _stellen()
     falsch = []
-    for bid, b in _geprueft().items():
-        soll = _KLASSE[b["kennzeichnung"]]
+    for bid, soll in _soll().items():
         for p in nach_block[bid]:
             if p["evidence_class"] != soll:
                 falsch.append((bid, p["id"], p["evidence_class"], soll))
@@ -145,8 +154,8 @@ def test_klasse_in_der_parameterliste_folgt_der_kennzeichnung():
 def test_abgeschaetzte_bloecke_tragen_herleitung():
     nach_block = _stellen()
     ohne = []
-    for bid, b in _geprueft().items():
-        if b["kennzeichnung"] != "abschaetzung_kap3":
+    for bid, klasse in _soll().items():
+        if klasse != "abgeschaetzt":
             continue
         for p in nach_block[bid]:
             h = p.get("evidence_derivation") or {}

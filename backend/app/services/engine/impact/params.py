@@ -456,7 +456,10 @@ IMPACT_PARAM_SPECS: list[dict] = [
      "editable": False,
      "evidence_derivation": {
          "wert": "0,344 = 0,149 × [1 + 1,54 × (1 − 0,149)] aus heat.qbar_pfl und heat.beta_pfl "
-                 "(Bericht #95 §5, Befund 146, Entscheidungslog Nr. 45).",
+                 "(Bericht #95 §5, Befund 146, Entscheidungslog Nr. 45). Zellwert aus "
+                 "OSM-Pflegeeinrichtungen statt Heimquote der Zelle (S2, Proxy): Je Zelle "
+                 "q_pfl,z aus den OSM-Pflegeeinrichtungen mal der Pflegestatistik, "
+                 "Rückfallwert 0,344 (Register 95-S153-01, Bericht #95 §3.6).",
          "band": "0,275–0,517 aus dem Band von heat.beta_pfl 1,0–2,9 (0,2758 und 0,5167), "
                  "außen gerundet.",
          "sensitivitaet": "h_Heim teilt die Todesfälle ab 85 zwischen S157 (Anteil h_Heim) und "
@@ -1693,10 +1696,14 @@ _HEAT_BLOECKE: dict[tuple[str, str], str] = {
 }
 # Kennzeichnung je Block nach Kapitel 7 (Feld ``kennzeichnung``), übersetzt in die
 # Evidenzklasse der Parameterliste (P1): quelle → belegt, abschaetzung_kap3 →
-# abgeschaetzt, berechnet → berechnet. 10 × belegt, 18 × abgeschaetzt, 3 × berechnet
-# (Runde 31: heat.beta_iso steht auf quelle, heat.anteil_60_66 ist neu; T-1606: die sechs
-# Blöcke der Hebel S157/S152 aus T-1537, T-1538 und T-1584, fünf abgeschätzt, h_heim berechnet;
-# heat.sigma_k, die Streuung der Feinstruktur, ist abgeschätzt).
+# abgeschaetzt, berechnet → berechnet. Kapitel 7 zählt 10 × belegt, 18 × abgeschaetzt,
+# 3 × berechnet (Runde 31: heat.beta_iso steht auf quelle, heat.anteil_60_66 ist neu; T-1606:
+# die sechs Blöcke der Hebel S157/S152 aus T-1537, T-1538 und T-1584, fünf abgeschätzt, h_heim
+# berechnet; heat.sigma_k, die Streuung der Feinstruktur, ist abgeschätzt).
+# Regel K (docs/methodik/querschnitt_kennzeichnung.md, T-1898-cto): Die Registry folgt der Spalte
+# „Kennzeichnung nach der Regel“ der Tabelle der 11 Blöcke. heat.beta_pfl und heat.h_heim tragen
+# nach Frage 1 eine Setzung und stehen auf abgeschaetzt, heat.c_kal bleibt berechnet. Damit
+# zählt die Registry 10 × belegt, 20 × abgeschaetzt, 1 × berechnet; Kapitel 7 bleibt bei 18 und 3.
 # Die Klasse der drei Katalog-Blöcke (heat.voly, heat.c_fall, heat.delta_hap) steht
 # in data/catalog.py. Geprüft in tests/test_methodik_95_kennzeichnung.py.
 _HEAT_KLASSE: dict[str, str] = {
@@ -1708,7 +1715,7 @@ _HEAT_KLASSE: dict[str, str] = {
     "heat.c_kal": "berechnet",
     "heat.q_wochenquantile": "belegt",
     "heat.beta_iso": "belegt",
-    "heat.beta_pfl": "berechnet",
+    "heat.beta_pfl": "abgeschaetzt",
     "heat.beta_dist_sensitivitaet": "abgeschaetzt",
     "heat.qbar_1p": "belegt",
     "heat.qbar_pfl": "belegt",
@@ -1720,7 +1727,7 @@ _HEAT_KLASSE: dict[str, str] = {
     "heat.anteil_60_66": "abgeschaetzt",
     "heat.s_gek": "abgeschaetzt",
     "heat.s_gek_kalib": "abgeschaetzt",
-    "heat.h_heim": "berechnet",
+    "heat.h_heim": "abgeschaetzt",
     "heat.delta_kuehlzentren": "abgeschaetzt",
     "heat.vg_in_kalibrierjahren": "abgeschaetzt",
     "heat.kappung_vg": "abgeschaetzt",
@@ -1731,6 +1738,22 @@ _HEAT_KLASSE: dict[str, str] = {
 }
 # Herleitung nach P1 für die Blöcke, deren Spec noch keine eigene trägt (Bericht #95).
 _HEAT_HERLEITUNG: dict[str, dict[str, str]] = {
+    "heat.beta_pfl": {
+        "wert": "1,54: Exzess-Verhältnis aus Frankreich 2003 für Deutschland übertragen (S2, "
+                "Extrapolation). Fouillet 2006, Tab. 2, misst für Frankreich 2003 "
+                "O/E 1,9 in Heimen und in Wohnungen ab 75, also das Exzess-Verhältnis 1,0; "
+                "das Register führt die Übertragung „F 2003 / DE“ selbst. Mit dem "
+                "Basissterblichkeits-Verhältnis 2,97 (Heim 0,34 je Jahr gegen 0,1144 je Jahr) "
+                "ergibt sich OR 3,0 und "
+                "β = (3,0 − 1) ÷ [1 + 0,149 × 2,0] = 1,54 (Bericht #95 §3.3b, Block "
+                "heat.beta_pfl, Register 95-S153-01).",
+        "band": "1,0–2,9; Stützen Bouchama 2007 und Klenk 2010 (Bericht #95 §3.3b, Kapitel 7, "
+                "Block heat.beta_pfl).",
+        "sensitivitaet": "β_pfl geht über den Zellwert 1 + β_pfl × (q_pfl − q̄_pfl) nur in das "
+                         "Altersband 85+ und nur in die Mortalität ein. Über h_Heim läuft es "
+                         "in S157, die Schutzprogramme und die Kühlzentren: Am Band liegt "
+                         "h_Heim bei 0,275–0,517 statt 0,344 (Bericht #95 §3.3b und §5).",
+    },
     "heat.beta_85plus_region": {
         "wert": "Nord 0,0634 und Mitte 0,0625 K⁻¹ aus Ablesewerten von Winklmayr 2022; Süd "
                 "0,0876 K⁻¹ = 0,0531 × s_Süd 1,65, eine Nachschätzung von KAP3 auf den "
@@ -1814,8 +1837,11 @@ _POLLEN_BLOECKE: dict[tuple[str, str], str] = {
 }
 # Kennzeichnung je Block nach Kapitel 7, übersetzt in die Evidenzklasse (P1):
 # quelle → belegt, abschaetzung_kap3 → abgeschaetzt, berechnet → berechnet.
-# Über alle 13 Blöcke 3 × belegt, 8 × abgeschaetzt, 2 × berechnet; die Klassen von
-# pollen.c_tag und pollen.r_s158 stehen in data/catalog.py.
+# Regel K (docs/methodik/querschnitt_kennzeichnung.md, T-1898-cto): pollen.d_saison steht nach
+# Frage 1 (Setzung im Wert) auf abgeschaetzt, obwohl Kapitel 7 berechnet sagt. Diese Tabelle
+# führt 11 Blöcke: 3 × belegt, 8 × abgeschaetzt, 0 × berechnet. Mit den Klassen von pollen.c_tag
+# (ebenfalls Regel K, abgeschaetzt), pollen.r_s158 und pollen.stadtbaum_kosten aus
+# data/catalog.py zählt die Registry 3 × belegt, 11 × abgeschaetzt, 0 × berechnet.
 _POLLEN_KLASSE: dict[str, str] = {
     "pollen.delta_s_region": "belegt",
     "pollen.a_attr": "abgeschaetzt",
@@ -1827,11 +1853,27 @@ _POLLEN_KLASSE: dict[str, str] = {
     "pollen.s_unbekannt": "abgeschaetzt",
     "pollen.t_warn_s158": "abgeschaetzt",
     "pollen.c_jahr_direkt": "belegt",
-    "pollen.d_saison": "berechnet",
+    "pollen.d_saison": "abgeschaetzt",
 }
 # Herleitung nach P1 für die abgeschätzten Blöcke, deren Spec noch keine eigene trägt
 # (Bericht #96 §3.4 und §3.5). s_unbekannt und t_warn_s158 tragen sie am Spec.
 _POLLEN_HERLEITUNG: dict[str, dict[str, str]] = {
+    "pollen.d_saison": {
+        "wert": "43,05 Tage = f × (p_B × L_B + p_G × L_G) = 0,70 × (0,55 × 30 + 0,75 × 60). "
+                "Vereinfachte Form (S2): Die additive Summe zählt Doppelt-Sensibilisierte "
+                "doppelt, weil p_B + p_G über 1 liegt; d_Saison ist damit eher zu hoch und "
+                "c_Tag eher zu niedrig (Bericht #96 §3.5, Anker #d-saison, Kapitel 7).",
+        "band": "Kapitel 7 führt kein Band (band: null). Aus den Bändern der Eingänge f "
+                "0,50–0,85, p_B 0,4–0,7, p_G 0,6–0,85, L_B 20–45 Tage und L_G 45–80 Tage folgen "
+                "rechnerisch als äußere Grenzen 17,5–84,6 Tage, wenn alle Eingänge zugleich "
+                "am Rand liegen.",
+        "sensitivitaet": "Die additive Form ist EUR-konservativ: Bei zu hohem d_Saison "
+                         "sinkt c_Tag = c_Jahr,direkt ÷ d_Saison, die Zahl der Zusatztage "
+                         "bleibt gleich, der Euro-Betrag fällt eher zu niedrig aus. Länger "
+                         "dauernde Saisons senken c_Tag (Golden-Test "
+                         "test_cost_rate_follows_season_length_chain); f kürzt sich im "
+                         "Euro-Betrag heraus (Bericht #96 §3.5).",
+    },
     "pollen.a_attr": {
         "wert": "0,27: Mitte des Interquartilsabstands 19–35 % der Saisonlänge "
                 "1990–2018 aus Anderegg 2021 [9], Results: (0,19 + 0,35) ÷ 2 = 0,27. "
@@ -1938,13 +1980,16 @@ _UV_BLOECKE: dict[tuple[str, str], str] = {
 # Kennzeichnung je Block nach Kapitel 7, übersetzt in die Evidenzklasse (P1):
 # quelle → belegt, abschaetzung_kap3 → abgeschaetzt, berechnet → berechnet.
 # ``uv.voly`` steht in data/catalog.py (abgeschaetzt).
+# Regel K (docs/methodik/querschnitt_kennzeichnung.md, T-1898-cto): uv.k_uv, uv.lambda und
+# uv.l_rest tragen nach Frage 1 eine Setzung und stehen auf abgeschaetzt, obwohl Kapitel 7
+# berechnet sagt; uv.baf und uv.c_kal bleiben berechnet (ohne Abschätzung im Eingang).
 _UV_KLASSE: dict[str, str] = {
-    "uv.k_uv": "berechnet",
+    "uv.k_uv": "abgeschaetzt",
     "uv.a_attr": "abgeschaetzt",
     "uv.baf": "berechnet",
     "uv.w_scc": "belegt",
-    "uv.lambda": "berechnet",
-    "uv.l_rest": "berechnet",
+    "uv.lambda": "abgeschaetzt",
+    "uv.l_rest": "abgeschaetzt",
     "uv.c_fall": "abgeschaetzt",
     "uv.c_kal": "berechnet",
     "uv.s_komforttag": "abgeschaetzt",
@@ -1957,6 +2002,48 @@ _UV_KLASSE: dict[str, str] = {
 }
 # Herleitung nach P1 für die abgeschätzten Blöcke (Bericht #98 §3.2 bis §3.4 und Kapitel 7).
 _UV_HERLEITUNG: dict[str, dict[str, str]] = {
+    "uv.k_uv": {
+        "wert": "0,7119 = 1,0652 × 0,6683: Elastizität aus einem Messpunkt für alle "
+                "Gemeinden und als zeitinvariant angenommen (S2, Extrapolation). Der "
+                "Stationsquotient 4,9 ÷ 4,6 = 1,0652 stammt aus Lorenz 2024 (Bochum), der "
+                "Rasterquotient 0,6683 aus der eigenen Auswertung des DWD-Rasters; die "
+                "Übertragung auf alle Gemeindepunkte und alle Zeiten ist eine gekennzeichnete "
+                "Annahme (Bericht #98 §3.2, Modellgrenze 2, Befund 292).",
+        "band": "0,3622–1,0616: publizierte Standardfehler beider Stationstrends, "
+                "unkorreliert fortgepflanzt (±49,1 %, 1 σ). Die räumliche Streuung des "
+                "Rasterquotienten ist Modellgrenze 9 und kein Band der Bundessumme.",
+        "sensitivitaet": "Linear: Zusatzfälle, Lebensjahre und Euro wachsen im gleichen "
+                         "Verhältnis wie k_UV (ΔDosis = k_UV × ΔSSD). k_UV ist der stärkste "
+                         "Bandtreiber des Berichts (Bericht #98 §4, Kapitel 7).",
+    },
+    "uv.lambda": {
+        "wert": "Melanom 0,11466 = 3.081,0 ÷ 26.870, C44 0,005236 = 1.261,7 ÷ 240.973: "
+                "Periodenquotient (Sterbefälle ÷ Neuerkrankungen im Ankerfenster 2021–2023) "
+                "für den Letalitätsanteil (S2, Proxy). Bei steigender Inzidenz ist er keine "
+                "Kohorten-Letalität; er überschätzt den Mortalitätsanteil (Bericht #98 §3.4, "
+                "Register 98-K1-02).",
+        "band": "Kapitel 7 führt kein Band (band: null); die Richtung der Abweichung ist "
+                "Überschätzung des Mortalitätsanteils.",
+        "sensitivitaet": "Linear: Die verlorenen Lebensjahre (YLL = ΔF × λ × L̄) und der "
+                         "VOLY-Anteil des Euro-Betrags wachsen im gleichen Verhältnis wie "
+                         "λ; die Zahl der Zusatzfälle ändert sich nicht (Bericht #98 §3.4).",
+    },
+    "uv.l_rest": {
+        "wert": "Melanom 10,4569 Jahre, C44 5,4787 Jahre: Restlebenserwartung nur am "
+                "medianen Sterbealter des jeweiligen Jahres (Punkt statt Bandmittel, S2), "
+                "sterbefallgewichtet über die Jahre und Geschlechter des Ankerfensters "
+                "2021–2023 aus der Sterbetafel 2022/2024. Bei rechtsschiefer "
+                "Sterbealter-Verteilung leicht überschätzend (Bericht #98 §3.4, Befund 224, "
+                "Register 98-K1-02).",
+        "band": "Kapitel 7 führt kein Band (band: null). Als Größenordnung dient die Wahl "
+                "des Fensters: Der Einzeljahr-Wert 2023 lag bei Melanom 10,58 und bei C44 "
+                "5,30 Jahren (Entscheidungslog Nr. 20).",
+        "sensitivitaet": "Linear: Die verlorenen Lebensjahre und der VOLY-Anteil des "
+                         "Euro-Betrags wachsen im gleichen Verhältnis wie L̄; die Zahl der "
+                         "Zusatzfälle ändert sich nicht. Die Fensterwahl verschob L̄ für "
+                         "Melanom um −1,16 % und für C44 um +3,37 %, die Lebensjahre netto "
+                         "um +0,5 % (Bericht #98, Entscheidungslog Nr. 20).",
+    },
     "uv.a_attr": {
         "wert": "0,75 als Anteil des Sonnenscheindauer-Trends, der dem Klimawandel zuzurechnen "
                 "ist. Für UV gibt es keine Attributionsstudie; Lorenz 2024 nennt als "
