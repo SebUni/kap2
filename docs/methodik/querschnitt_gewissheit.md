@@ -473,7 +473,7 @@ Zum Vergleich, geht **nicht** in die Gewissheit ein: die Quellenlage aus dem End
 `heat.sigma_k`). Gezählt: 31 Blöcke, davon 10 mit Kennzeichnung `quelle`, 18 `abschaetzung_kap3`, 3 `berechnet`. Das
 sind 10 von 31 = 32 % mit Quelle, mit den berechneten 13 von 31 = 42 %. Nach der alten Regel (ab der Hälfte „mittel“,
 darunter „gering“) stünde #95 damit in beiden Zählweisen auf „gering“ (beide Anteile unter 0,5). Die Registry des
-Produkts, nach derselben Regel gezählt, kommt heute für die Sterbefälle mit 17 von 39 Parametern (44 %) und für die
+Produkts, nach derselben Regel gezählt, kommt auf Commit `ae31922b` (gemessen am 08.10.2026) für die Sterbefälle mit 15 von 39 Parametern (38 %) und für die
 Krankenhauseinweisungen mit 3 von 9 (33 %) ebenfalls zu „gering“. Die KWRA sagt zur Mitte „hoch“. Dieselbe Rechnung
 landet also in allen vier Zählweisen zwei Stufen unter der KWRA. Am 27.09.2026 lag sie mit 23 Blöcken und 32
 Registry-Parametern noch je nach Zählweise auf „gering“ oder „mittel“. Die Stufe wandert mit der Zahl der Blöcke, nicht
@@ -527,7 +527,9 @@ VORSICHT_STUFEN = ("sehr gering", "gering")
 assert mitte not in VORSICHT_STUFEN and ende not in VORSICHT_STUFEN
 
 # Vergleich, geht nicht in die Gewissheit ein: Quellenlage aus dem Endstand der Parameter-Blöcke
-text = open("docs/methodik/95_hitzebelastung.md", encoding="utf-8").read()
+import subprocess
+COMMIT = "ae31922b"  # fester Stand: main am 08.10.2026, nach T-1898-cto (Commit 895aefe1)
+text = subprocess.run(["git", "show", COMMIT + ":docs/methodik/95_hitzebelastung.md"], capture_output=True, text=True, check=True).stdout
 kap7 = text.split("## 7 Parameter-Blöcke", 1)[1].split("\n## ", 1)[0]
 kz = re.findall(r"^\s*kennzeichnung:\s*(\w+)", kap7, flags=re.M)
 zaehlung = {k: kz.count(k) for k in sorted(set(kz))}
@@ -543,19 +545,11 @@ def alte_regel(anteil):
 
 assert (alte_regel(10 / 31), alte_regel(13 / 31)) == ("gering", "gering")
 
-# Vergleich, Registry des Produkts nach derselben alten Regel (belegt oder berechnet zählt als belegt)
-import sys
-sys.path.insert(0, "backend")
-from app.services import gewissheit as alt, parameter_registry  # noqa: E402
-
-registry = {}
-for c in codes:
-    klassen = [p["evidence_class"] for p in alt._risiko_parameter(c)]
-    registry[c] = (sum(k in parameter_registry.BELEGTE_KLASSEN for k in klassen), len(klassen))
-assert registry == {"EXPECTED_ANNUAL_MORTALITY": (17, 39), "EXPECTED_ANNUAL_MORBIDITY": (3, 9)}
-assert (alt.gewissheitsstufe(codes[0]), alt.gewissheitsstufe(codes[1])) == ("gering", "gering")
-assert (alte_regel(17 / 39), alte_regel(3 / 9)) == ("gering", "gering")
-assert round(17 / 39, 2) == 0.44 and round(3 / 9, 2) == 0.33
+# Vergleich, Registry des Produkts nach derselben alten Regel (belegt oder berechnet zählt als belegt).
+# Feste Werte, gemessen am 08.10.2026 auf Commit ae31922b; kein Import von Produktcode.
+registry = {"EXPECTED_ANNUAL_MORTALITY": (15, 39), "EXPECTED_ANNUAL_MORBIDITY": (3, 9)}
+assert (alte_regel(15 / 39), alte_regel(3 / 9)) == ("gering", "gering")
+assert round(15 / 39, 2) == 0.38 and round(3 / 9, 2) == 0.33
 
 print("Mitte:", mitte, "| Ende:", ende, "| heutiges Klima:", HEUTIGES_KLIMA)
 print("2025:", zeitreihe[2025], "| 2060:", zeitreihe[2060], "| 2061:", zeitreihe[2061], "| 2065:", zeitreihe[2065])
@@ -569,7 +563,7 @@ Ausgabe:
 Mitte: hoch | Ende: mittel | heutiges Klima: in der KWRA nicht ausgewiesen
 2025: hoch | 2060: hoch | 2061: mittel | 2065: mittel
 Quellenlage Bericht (nur Vergleich): {'abschaetzung_kap3': 18, 'berechnet': 3, 'quelle': 10} | Blöcke: 31
-Registry belegt/alle (nur Vergleich): {'EXPECTED_ANNUAL_MORTALITY': (17, 39), 'EXPECTED_ANNUAL_MORBIDITY': (3, 9)}
+Registry belegt/alle (nur Vergleich): {'EXPECTED_ANNUAL_MORTALITY': (15, 39), 'EXPECTED_ANNUAL_MORBIDITY': (3, 9)}
 ```
 
 ### #96 Aeroallergene (Schritt 3)
@@ -622,7 +616,7 @@ vom 30.09.2026, T-1640-methodik_manager). Gezählt: 14 Blöcke, davon 3 mit Kenn
 `pollen.p_sens_gruppen`, `pollen.l_saison`, `pollen.f_symptomtage`, `pollen.lambda_veg`, `pollen.s_unbekannt`,
 `pollen.r_s158`, `pollen.t_warn_s158`, `pollen.stadtbaum_kosten`) und 2 `berechnet` (`pollen.d_saison`,
 `pollen.c_tag`). Das sind 3 von 14 = 21 % mit Quelle, mit den berechneten 5 von 14 = 36 %. Nach der alten Regel stünde
-#96 in beiden Zählweisen auf „gering“ (unter 0,5). Die Registry kommt heute mit 15 von 24 Parametern (63 %) zu
+#96 in beiden Zählweisen auf „gering“ (unter 0,5). Die Registry kommt auf Commit `ae31922b` (gemessen am 08.10.2026) mit 13 von 24 Parametern (54 %) zu
 „mittel“, nachgerechnet im Block; die Konformitätsliste („Gegenprobe Zeile 8“) nennt noch den älteren Stand 20 von 21.
 Die KWRA sagt zur Mitte und zum Ende „mittel“. Dass Registry und KWRA hier gleich lauten, liegt an der Zerlegung: Aus
 den Blöcken des Berichts ergibt dieselbe alte Regel „gering“. Drei der 14 Blöcke wirken nicht auf den Schadensbetrag:
@@ -692,7 +686,9 @@ gruppe = "Umsetzung" if w_y >= SCHWELLE_UMSETZUNG else "(nicht Umsetzung)"
 assert gruppe == "Umsetzung"                         # wie TB6 Tabelle 27, S. 142; kein Zusatz (S. 140)
 
 # Vergleich, geht nicht in die Gewissheit ein: Quellenlage aus dem Endstand der Parameter-Blöcke
-text = open("docs/methodik/96_aeroallergene.md", encoding="utf-8").read()
+import subprocess
+COMMIT = "ae31922b"  # fester Stand: main am 08.10.2026, nach T-1898-cto (Commit 895aefe1)
+text = subprocess.run(["git", "show", COMMIT + ":docs/methodik/96_aeroallergene.md"], capture_output=True, text=True, check=True).stdout
 kap7 = text.split("## 7 Parameter-Blöcke", 1)[1].split("\n## ", 1)[0]
 kz = re.findall(r"^\s*kennzeichnung:\s*(\w+)", kap7, flags=re.M)
 zaehlung = {k: kz.count(k) for k in sorted(set(kz))}
@@ -700,14 +696,15 @@ assert len(kz) == len(re.findall(r"^parameter:", kap7, flags=re.M)) == 14
 assert zaehlung == {"abschaetzung_kap3": 9, "berechnet": 2, "quelle": 3}
 assert round(3 / 14, 2) == 0.21 and round(5 / 14, 2) == 0.36 and round(3 / 11, 2) == 0.27
 
-# Vergleich, Registry des Produkts nach der alten Regel (belegt oder berechnet zählt als belegt)
-import sys
-sys.path.insert(0, "backend")
-from app.services import gewissheit as alt, parameter_registry  # noqa: E402
+# Vergleich, Registry des Produkts nach der alten Regel (belegt oder berechnet zählt als belegt).
+# Feste Werte, gemessen am 08.10.2026 auf Commit ae31922b; kein Import von Produktcode.
+def alte_regel(anteil):
+    """Alte Kennzahl (backend/app/services/gewissheit.py): Stufe aus dem Anteil belegter Parameter."""
+    return "sehr gering" if anteil == 0 else "gering" if anteil < 0.5 else "mittel" if anteil < 1 else "hoch"
 
-klassen = [p["evidence_class"] for p in alt._risiko_parameter(codes[0])]
-registry = (sum(k in parameter_registry.BELEGTE_KLASSEN for k in klassen), len(klassen))
-assert registry == (15, 24) and alt.gewissheitsstufe(codes[0]) == "mittel"
+
+registry = (13, 24)
+assert alte_regel(13 / 24) == "mittel" and round(13 / 24, 2) == 0.54
 
 print("Mitte:", mitte, "| Ende:", ende, "| heutiges Klima:", HEUTIGES_KLIMA)
 print("2025:", zeitreihe[2025], "| 2060:", zeitreihe[2060], "| 2061:", zeitreihe[2061], "| 2065:", zeitreihe[2065])
@@ -722,7 +719,7 @@ Ausgabe:
 Mitte: mittel | Ende: mittel | heutiges Klima: in der KWRA nicht ausgewiesen
 2025: mittel | 2060: mittel | 2061: mittel | 2065: mittel
 Gesamtgewissheit Mitte: 1.5 | ausreichend: False | Gruppe: Umsetzung | Wirksamkeit Y/AA: 0.5 0.5
-Quellenlage (nur Vergleich): {'abschaetzung_kap3': 9, 'berechnet': 2, 'quelle': 3} | Registry belegt/alle (nur Vergleich): (15, 24)
+Quellenlage (nur Vergleich): {'abschaetzung_kap3': 9, 'berechnet': 2, 'quelle': 3} | Registry belegt/alle (nur Vergleich): (13, 24)
 ```
 
 ### #98 UV-Schädigungen (Schritt 4)
@@ -752,8 +749,8 @@ T100.
 Produkts (`gewissheit.gewissheitsstufe`) stand für #98 bis T-1820-cto auf „hoch“. Alle 30 Parameter der Registry galten
 als belegt, gemessen am 07.10.2026 am Stand davor (Commit `22f532d3`). Seit T-1820-cto (Commit `c8aba66f`, 07.10.2026)
 übernimmt die Registry die Kennzeichnung der Blöcke aus Kapitel 7 von Bericht 98 (`_UV_BLOECKE` und `_UV_KLASSE` in
-`backend/app/services/engine/impact/params.py`). Seitdem zählt sie 22 von 30 Parametern als belegt oder berechnet
-(73 %) und meldet „mittel“, im Block nachgerechnet. Die KWRA nennt zum Ende „sehr gering“: Die Kennzahl lag vorher drei
+`backend/app/services/engine/impact/params.py`). Auf Commit `ae31922b` (gemessen am 08.10.2026, nach T-1898-cto) zählt sie 17 von 30 Parametern als belegt oder
+berechnet (57 %) und meldet „mittel“, im Block als fester Wert nachgerechnet. Die KWRA nennt zum Ende „sehr gering“: Die Kennzahl lag vorher drei
 Stufen darüber, jetzt zwei. Regel G weist das Auseinanderfallen in beiden Fällen gleich aus. Als Gewissheit zeigt das
 Produkt nicht mehr die Kennzahl, sondern je Zeitscheibe den Wert der KWRA: Mitte „mittel“, Ende „sehr gering“, je mit
 Fundstelle Mappe S100 und T100 und TB6 Tabelle 1, S. 41. Die Zeitreihe zeigt ab 2061 „sehr gering“ mit dem Hinweis zur
@@ -802,10 +799,10 @@ Die gebrauchte Quellenlage nach Regel G, gezählt aus dem Endstand der Parameter
 `uv.s155_dosisminderung`, `uv.s155_a_erk_mm`, `uv.s155_a_erk_c44`) und 6 `berechnet` (`uv.ssd_delta_region`,
 `uv.k_uv`, `uv.baf`, `uv.lambda`, `uv.l_rest`, `uv.c_kal`). Angezeigt wird „5 von 22 Parametern mit Quelle“ (23 %).
 Zum Vergleich, geht **nicht** in die Gewissheit ein: Mit den berechneten sind es 11 von 22 = 50 %. Nach der alten Regel
-stünde #98 damit auf „gering“ (23 %) oder, genau auf der Hälfte, auf „mittel“ (50 %). Die Registry kommt heute mit 22
-von 30 (73 %) auf „mittel“, bis T-1820-cto kam sie mit 30 von 30 auf „hoch“. Dieselbe alte Regel gibt also je nach
+stünde #98 damit auf „gering“ (23 %) oder, genau auf der Hälfte, auf „mittel“ (50 %). Die Registry kommt auf Commit `ae31922b` (gemessen am
+08.10.2026) mit 17 von 30 (57 %) auf „mittel“, bis T-1820-cto kam sie mit 30 von 30 auf „hoch“. Dieselbe alte Regel gibt also je nach
 Zählweise heute zwei verschiedene Stufen (gering, mittel, mittel), vorher drei, und keine trifft das „sehr gering“ der
-KWRA zum Ende. Dass die Registry trotz derselben Kennzeichnung auf 73 % statt 50 % kommt, liegt an der Zerlegung: Von
+KWRA zum Ende. Dass die Registry trotz derselben Kennzeichnung auf 57 % statt 50 % kommt, liegt an der Zerlegung: Von
 ihren 30 Parametern gehören 29 zu 16 Blöcken des Berichts, mehrere je Block (etwa fünf Altersgruppen bei `uv.i_mm` und
 bei `uv.i_c44`), dazu kommt der Referenzwert des Index ohne Block. Die drei Blöcke `uv.s155_…` wirken nur im
 Maßnahmen-Modul. Ohne sie wären es 5 von 19 = 26 %. Regel G zählt jeden Block einmal, also 22.
@@ -883,7 +880,9 @@ assert gruppe(w_aa) == "Umsetzung"                   # an AA gemessen: gegen Tab
 assert gruppe(0.0) == "Innovation"                   # heutiger Eingang des Produkts
 
 # Gebrauchte Quellenlage: Endstand der Parameter-Blöcke, jeder Block einmal
-text = open("docs/methodik/98_uv_schaedigungen.md", encoding="utf-8").read()
+import subprocess
+COMMIT = "ae31922b"  # fester Stand: main am 08.10.2026, nach T-1898-cto (Commit 895aefe1)
+text = subprocess.run(["git", "show", COMMIT + ":docs/methodik/98_uv_schaedigungen.md"], capture_output=True, text=True, check=True).stdout
 kap7 = text.split("## 7 Parameter-Blöcke", 1)[1].split("\n## ", 1)[0]
 kz = re.findall(r"^\s*kennzeichnung:\s*(\w+)", kap7, flags=re.M)
 zaehlung = {k: kz.count(k) for k in sorted(set(kz))}
@@ -897,16 +896,14 @@ def alte_regel(anteil):
     return "sehr gering" if anteil == 0 else "gering" if anteil < 0.5 else "mittel" if anteil < 1 else "hoch"
 
 
-# Vergleich, Registry des Produkts nach der alten Regel: seit T-1820-cto „mittel“
-sys.path.insert(0, "backend")
-from app.services import gewissheit as alt, parameter_registry  # noqa: E402
-
-klassen = [p["evidence_class"] for p in alt._risiko_parameter(codes[0])]
-registry = (sum(k in parameter_registry.BELEGTE_KLASSEN for k in klassen), len(klassen))
-assert {k: klassen.count(k) for k in sorted(set(klassen))} == {"abgeschaetzt": 8, "belegt": 13, "berechnet": 9}
-assert registry == (22, 30) and alt.gewissheitsstufe(codes[0]) == "mittel"
-assert (alte_regel(5 / 22), alte_regel(11 / 22), alte_regel(22 / 30)) == ("gering", "mittel", "mittel")
-assert STUFEN.index(alt.gewissheitsstufe(codes[0])) - STUFEN.index(ende) == 2   # heute zwei Stufen über dem Ende
+# Vergleich, Registry des Produkts nach der alten Regel (belegt oder berechnet zählt als belegt).
+# Feste Werte, gemessen am 08.10.2026 auf Commit ae31922b; kein Import von Produktcode.
+klassen = {"abgeschaetzt": 13, "belegt": 13, "berechnet": 4}
+registry = (klassen["belegt"] + klassen["berechnet"], sum(klassen.values()))
+assert registry == (17, 30)
+stufe_registry = alte_regel(17 / 30)
+assert (alte_regel(5 / 22), alte_regel(11 / 22), stufe_registry) == ("gering", "mittel", "mittel")
+assert STUFEN.index(stufe_registry) - STUFEN.index(ende) == 2   # auf Commit ae31922b zwei Stufen über dem Ende
 # Stand vor T-1820-cto (Commit 22f532d3, gemessen am 07.10.2026): 30 von 30 belegt, also „hoch“, drei Stufen darüber
 assert alte_regel(30 / 30) == "hoch" and STUFEN.index("hoch") - STUFEN.index(ende) == 3
 
@@ -915,7 +912,7 @@ print("2025:", zeitreihe[2025], "| 2060:", zeitreihe[2060], "| 2061:", zeitreihe
 print("Gesamtgewissheit Mitte:", gesamt, "| ausreichend:", gesamt > 1.5, "| Gruppe:", gruppe(w_y),
       "| Wirksamkeit Y/AA:", w_y, w_aa)
 print("Quellenlage:", zaehlung, "| angezeigt:", f"{zaehlung['quelle']} von {len(kz)} Parametern mit Quelle")
-print("Registry belegt/alle (nur Vergleich):", registry, "| Stufe heute:", alt.gewissheitsstufe(codes[0]))
+print("Registry belegt/alle (nur Vergleich):", registry, "| Stufe auf Commit", COMMIT + ":", stufe_registry)
 ```
 
 Ausgabe:
@@ -925,7 +922,7 @@ Mitte: mittel | Ende: sehr gering | heutiges Klima: in der KWRA nicht ausgewiese
 2025: mittel | 2060: mittel | 2061: sehr gering | 2065: sehr gering
 Gesamtgewissheit Mitte: 2.0 | ausreichend: True | Gruppe: Entwicklung | Wirksamkeit Y/AA: 0.25 0.5
 Quellenlage: {'abschaetzung_kap3': 11, 'berechnet': 6, 'quelle': 5} | angezeigt: 5 von 22 Parametern mit Quelle
-Registry belegt/alle (nur Vergleich): (22, 30) | Stufe heute: mittel
+Registry belegt/alle (nur Vergleich): (17, 30) | Stufe auf Commit ae31922b: mittel
 ```
 
 ## Entscheidungslog
@@ -1034,14 +1031,14 @@ Codes einer Klimawirkung je eigene Zählungen tragen und heute nur zufällig gle
 ändert sich nicht** (Gesamtgewissheit 2,5, „Entwicklung“): Sie setzt auf Zellen der KWRA auf, nicht auf der Zählung.
 
 Nachtrag Runde 1, 07.10.2026 (T-1820-cto): Seit Commit `c8aba66f` übernimmt die Registry für #98 die Kennzeichnung der
-Blöcke aus Kapitel 7 von Bericht 98. Die alte Kennzahl meldet für #98 seitdem „mittel“ (22 von 30) statt „hoch“ (30
+Blöcke aus Kapitel 7 von Bericht 98. Die alte Kennzahl meldet für #98 seitdem „mittel“ (22 von 30, Stand bis T-1898-cto; auf Commit `ae31922b` 17 von 30) statt „hoch“ (30
 von 30, gemessen am Stand `22f532d3`). Die Angaben zu #98 in Punkt 1 („#98 steht auf ‚hoch‘“) und Punkt 2 („bei #98
 ‚hoch‘ neben ‚sehr gering‘“) sind deshalb der Stand bis T-1820-cto. Block, Text unter „#98 UV-Schädigungen“ und der
 Hinweis unter „Befunde an Berichte“ sind nachgezogen. Die Entscheidungen bleiben. Punkt 1 bleibt, weil die Kennzahl
 die Lage auch mit „mittel“ falsch darstellt: Sie hat keinen Zeitbezug und liegt zwei Stufen über dem „sehr gering“ zum
 Ende. Gewechselt hat sie an einem Tag ohne neues Wissen, allein durch die Einteilung der Parameter. Punkt 2 bleibt,
 weil eine zweite Stufe neben der Gewissheit weiterhin als zweite Gewissheit gelesen würde, jetzt „mittel“ neben „sehr
-gering“. Ihr Anteil hängt von der Zerlegung ab: Registry 22 von 30 = 73 %, Blöcke des Berichts 11 von 22 = 50 %. An
+gering“. Ihr Anteil hängt von der Zerlegung ab: Registry 22 von 30 = 73 % (Stand bis T-1898-cto; auf Commit `ae31922b` 17 von 30 = 57 %), Blöcke des Berichts 11 von 22 = 50 %. An
 Regel G, Zuordnungstabelle und Einordnung ändert sich nichts. Die Einordnung von #98 („Entwicklung“, 2,0) setzt auf
 Zellen der KWRA und auf Tabelle 24 auf, nicht auf der Kennzahl.
 
@@ -1070,10 +1067,58 @@ war schon mit Runde 2 behoben (Nachtrag Runde 2). Danach hat T-1850-ceo (Commit 
 Sterbefälle. Der Block `rechenkette_gewissheit_95` schlug damit fehl (`AssertionError` bei der Blockzahl 30).
 Nachgezogen sind Block und Ausgabe, der Vergleich unter „Rechenkette“, das Beispiel der Zählung in Regel G, der Stand
 vom 07.10.2026 unter „Ein Wert je Klimawirkung“, die Übersicht und die Quellen. Neu gezählt: 31 Blöcke, 10 von 31 =
-32 % mit Quelle, mit den berechneten 13 von 31 = 42 %; Registry für die Sterbefälle 17 von 39 (44 %), für die
+32 % mit Quelle, mit den berechneten 13 von 31 = 42 %; Registry für die Sterbefälle 17 von 39 (44 %; Stand bis T-1898-cto, auf Commit `ae31922b` 15 von 39), für die
 Krankenhauseinweisungen unverändert 3 von 9. Alle vier Zählweisen bleiben „gering“. An Regel G, Zuordnungstabelle und
 Einordnung ändert sich nichts. Die Zahlen in den Nachträgen oben (30 Blöcke, „10 von 30“, 17 von 38) sind der Stand
 vor T-1850-ceo.
+
+Nachtrag 08.10.2026 (T-1930-methodik_manager): Registry-Vergleiche eingefroren auf Commit `ae31922b`. Ursache:
+T-1898-cto (Commit `895aefe1`) hat die Klassen der Registry geändert. Gemessen am 08.10.2026 auf `ae31922b`, alt gegen
+neu: Sterbefälle (#95) 17 von 39 gegen 15 von 39, Krankenhauseinweisungen (#95) 3 von 9 unverändert, Allergietage
+(#96) 15 von 24 gegen 13 von 24, verlorene Lebensjahre (#98) 22 von 30 gegen 17 von 30, Klassen bei #98 abgeschaetzt,
+belegt, berechnet 8/13/9 gegen 13/13/4. Die Stufen der alten Regel bleiben: #95 gering/gering, #96 mittel, #98 mittel,
+zwei Stufen über dem „sehr gering“ zum Ende. Kap. 7 der drei Berichte ist auf `ae31922b` unverändert (#95: 31 Blöcke,
+18/3/10; #96: 14, 9/2/3; #98: 22, 11/6/5).
+
+- **Festlegung: eingefroren auf Commit `ae31922b`** (Frage Q-20261007T113135Z-methodik_consultant-f6dbf3-1, Festlegung
+  des Methodik-Managers). Die Blöcke 2, 3 und 4 lesen Kap. 7 über `git show ae31922b:docs/methodik/<bericht>.md` und
+  führen die Registry-Zahlen als feste Werte mit Commit und Messdatum. Kein Block importiert mehr Produktcode. Live
+  geprüft wird nur die Rechnung auf diesen Werten, etwa `alte_regel(15 / 39) == "gering"`.
+- **Begründung:** Die Zählungen sind ein Vergleich und gehen nicht in die Gewissheit ein. Ein Vergleich, der jedem
+  Umbau der Registry nachläuft, macht die Querschnittsdatei bei jeder Änderung am Produkt rot, ohne dass sich an
+  Regel G etwas ändert. Der Prüfausdruck läuft damit auch mit dem einfachen python3 ohne numpy (vorher brach er beim
+  Import von `health.py` ab) und übersteht T-1903-cto, das `BELEGTE_KLASSEN` ersetzt.
+- **Gegenargument:** Eingefrorene Werte veralten still. Ändert sich die Registry wieder, zeigt die Datei einen alten
+  Stand, ohne dass ein Block rot wird. Dem steht entgegen, dass jede Zahl ihren Commit und ihr Messdatum nennt und die
+  Berichte führen; die Querschnittsdatei zieht bei Bedarf nach.
+- **Geänderte Stellen (vorher → nachher):**
+  - Block 2 (`rechenkette_gewissheit_95`): `open("docs/methodik/95_hitzebelastung.md")` → `git show
+    ae31922b:docs/methodik/95_hitzebelastung.md`; Import aus dem Produktcode, Zählung über `_risiko_parameter` und
+    `BELEGTE_KLASSEN`, `gewissheitsstufe` → feste Werte; `(17, 39)` → `(15, 39)`; `round(17 / 39, 2) == 0.44` →
+    `round(15 / 39, 2) == 0.38`; Ausgabe `'EXPECTED_ANNUAL_MORTALITY': (17, 39)` → `(15, 39)`.
+  - Block 3 (#96): Lesen von Kap. 7 wie Block 2 über `git show`; Import und Zählung → feste Werte mit eigener Funktion
+    `alte_regel`; `registry == (15, 24)` → `registry = (13, 24)`, geprüft `alte_regel(13 / 24) == "mittel"`; Ausgabe
+    `(15, 24)` → `(13, 24)`.
+  - Block 4 (#98): Lesen von Kap. 7 über `git show`; Klassen `8/13/9` → `13/13/4`; `(22, 30)` → `(17, 30)`;
+    `alte_regel(22 / 30)` → `alte_regel(17 / 30)`; „heute zwei Stufen über dem Ende“ → „auf Commit ae31922b zwei Stufen
+    über dem Ende“ (nachgemessen: mittel gegen sehr gering, weiter 2); Ausgabe „(22, 30) | Stufe heute: mittel“ →
+    „(17, 30) | Stufe auf Commit ae31922b: mittel“.
+  - Rechenkette #95: „kommt heute für die Sterbefälle mit 17 von 39 Parametern (44 %)“ → „kommt auf Commit `ae31922b`
+    (gemessen am 08.10.2026) für die Sterbefälle mit 15 von 39 Parametern (38 %)“.
+  - #96: „kommt heute mit 15 von 24 Parametern (63 %)“ → „kommt auf Commit `ae31922b` (gemessen am 08.10.2026) mit 13
+    von 24 Parametern (54 %)“.
+  - #98, Absatz „Wie Regel G …“: „Seitdem zählt sie 22 von 30 … (73 %) … im Block nachgerechnet“ → „Auf Commit
+    `ae31922b` … zählt sie 17 von 30 … (57 %) … im Block als fester Wert nachgerechnet“.
+  - #98, Vergleich der Quellenlage: „kommt heute mit 22 von 30 (73 %)“ → „kommt auf Commit `ae31922b` (gemessen am
+    08.10.2026) mit 17 von 30 (57 %)“; „auf 73 % statt 50 %“ → „auf 57 % statt 50 %“.
+  - Entscheidungslog, Nachtrag T-1820-cto: „(22 von 30)“ und „Registry 22 von 30 = 73 %“ bleiben als Stand bis
+    T-1898-cto stehen, ergänzt um den Wert auf `ae31922b` (17 von 30 = 57 %).
+  - Entscheidungslog, Nachtrag `heat.sigma_k`: „Sterbefälle 17 von 39 (44 %)“ bleibt als Stand bis T-1898-cto stehen,
+    ergänzt um „auf Commit `ae31922b` 15 von 39“.
+  - Befunde an Berichte, #98: „kommt auf 22 von 30 und meldet ‚mittel‘“ → „kam bis T-1898-cto auf 22 von 30, auf
+    Commit `ae31922b` (gemessen am 08.10.2026) auf 17 von 30, und meldet ‚mittel‘“.
+  - Unverändert: `## Festlegung` (auch die dort am 07.10.2026 gemessenen 17 von 39), Regel G, Zuordnungstabelle,
+    Einordnung.
 
 ## Befunde an Berichte
 
@@ -1103,7 +1148,7 @@ mittel und hoch; Spalten N–R) stimmt mit N100–R100 und mit demselben Bild ü
 Hinweis an Bericht 98, keine Abweichung von einer Zelle: Aussage (d) sagt, das Produkt führe #98 „bei der Quellenlage
 auf ‚hoch‘“, weil jeder Parameter eine Quelle oder eine ausgewiesene Abschätzung mit Herleitung habe. Das beschrieb
 die Registry bis T-1820-cto (30 von 30, „hoch“). Seit T-1820-cto (Commit `c8aba66f`, 07.10.2026) zählt die Registry
-abgeschätzte Parameter nicht mehr als belegt, kommt auf 22 von 30 und meldet „mittel“. Der Satz beschreibt das Produkt
+abgeschätzte Parameter nicht mehr als belegt, kam bis T-1898-cto auf 22 von 30, auf Commit `ae31922b` (gemessen am 08.10.2026) auf 17 von 30, und meldet „mittel“. Der Satz beschreibt das Produkt
 also nicht mehr. Nach Regel G trägt die Quellenlage ohnehin keine Stufe und lautet „5 von 22 Parametern mit Quelle“
 (T-1030-ceo). Bericht 98 verweist für die Darstellung selbst auf die übergreifende Regel (T-1110). Der Nachzug in
 Bericht 98 gehört nicht zu diesem Paket; Bericht 98 ist hier nicht geändert.
