@@ -603,6 +603,14 @@ def gather_cell_inputs(
     # Punkt-Features (lon/lat) → als Points indizieren, passend zum
     # contains()-Test in compute_cell_buildings.
     from shapely.geometry import Point
+    from app.services.climate.heat.osm_data import repair_invalid_geometries
+    # Ungültige OSM-Geometrien einmal vor dem Indexaufbau reparieren (sonst
+    # TopologyException in intersection/difference der Zellanalyse).
+    n_repariert = sum(
+        repair_invalid_geometries(feats)
+        for feats in (landuse_features, buildings, roads, paved_areas)
+    )
+    log.info("OSM-Geometrien: %d ungültige Geometrien repariert", n_repariert)
     _w["lu"] = landuse_features
     _w["lu_tree"] = _build_geom_tree([f["geometry"] for f in landuse_features])
     _w["bldgs"] = buildings

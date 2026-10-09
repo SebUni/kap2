@@ -484,6 +484,32 @@ def fetch_landuse(grid_cells: list[dict]) -> list[dict]:
     return results, response_bytes
 
 
+def repair_invalid_geometries(features: list[dict], key: str = "geometry") -> int:
+    """Repariert ungültige OSM-Geometrien in ``features`` (Einträge werden ersetzt).
+
+    Selbstüberschneidende Flächen („Schleifen“) lassen ``intersection`` und
+    ``difference`` mit einer TopologyException abbrechen. ``shapely.make_valid``
+    zerlegt sie in gültige Teile; bei Flächen bleiben nur die Flächenteile, damit
+    Linienreste der Reparatur keine Fläche vortäuschen. Nichts wird verworfen.
+    Gibt die Zahl der reparierten Geometrien zurück.
+    """
+    from shapely import make_valid
+
+    repaired = 0
+    for feat in features:
+        g = feat.get(key)
+        if g is None or g.is_valid:
+            continue
+        fixed = make_valid(g)
+        if g.geom_type in ("Polygon", "MultiPolygon") and fixed.geom_type == "GeometryCollection":
+            parts = [p for p in fixed.geoms if p.geom_type in ("Polygon", "MultiPolygon")]
+            if parts:
+                fixed = unary_union(parts)
+        feat[key] = fixed
+        repaired += 1
+    return repaired
+
+
 def _water_tag(tags: dict) -> str:
     """Kurzbeschreibung des OSM-Tags, das ein Feature zum Gewässer macht."""
     if tags.get("natural") == "water":

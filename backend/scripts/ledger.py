@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import shlex
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -36,6 +37,34 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 REVIEWS = REPO / "reviews"
 ARCHIV = REVIEWS / "archiv"
+
+
+def projektumgebung_neu_starten() -> None:
+    """Startet das Skript im Interpreter der Projektumgebung neu, wenn dieser fehlt.
+
+    Belege rufen `python3 backend/scripts/...` auf; je nach Rechner hat dieses
+    `python3` weder numpy noch shapely (Server), und derselbe Befehl bricht ab.
+    Fehlt dem laufenden Interpreter eines der Pakete und gibt es den Interpreter
+    der Projektumgebung (`${KAP2_VENV:-~/.venvs/kap2}/bin/python`, derselbe wie in
+    `scripts/testlauf.sh`), der ein anderer ist, ersetzt sich der Prozess per
+    `os.execv` durch ihn, mit denselben Argumenten. Davor steht genau eine Zeile
+    `Projektumgebung: <Pfad>`. Ohne Projektumgebung läuft alles wie bisher.
+    """
+    import importlib.util
+
+    if all(importlib.util.find_spec(m) is not None for m in ("numpy", "shapely")):
+        return
+    venv = Path(os.environ.get("KAP2_VENV") or "~/.venvs/kap2").expanduser()
+    py = venv / "bin" / "python"
+    if not (py.is_file() and os.access(py, os.X_OK)):
+        return
+    # Schon in dieser Umgebung? Der Pfad des Interpreters allein genügt nicht, denn
+    # ein venv-Python ist meist ein Verweis auf das System-Python.
+    if (os.path.abspath(sys.executable) == os.path.abspath(py)
+            or Path(sys.prefix).resolve() == venv.resolve()):
+        return
+    print(f"Projektumgebung: {py}", flush=True)
+    os.execv(str(py), [str(py), *sys.argv])
 
 
 # ---------------------------------------------------------------- Parsen
@@ -542,14 +571,28 @@ def _ausdruck_timeout() -> float:
     return wert
 
 
+def _mit_eigenem_interpreter(kommando: str) -> str:
+    """Ersetzt ein führendes `python3` durch den laufenden Interpreter (`sys.executable`).
+
+    Ein Prüfausdruck, der mit `python3 ` beginnt (auch hinter einer Negation `! `),
+    läuft so in derselben Umgebung wie das Werkzeug — nicht im `python3` vom PATH,
+    dem auf dem Server numpy fehlt.
+    """
+    return re.sub(r"^(\s*(?:!\s+)?)python3(?=\s)",
+                  lambda m: m.group(1) + shlex.quote(sys.executable), kommando, count=1)
+
+
 def _fuehre_aus(kommando: str) -> tuple[int, str]:
     """Fuehrt einen Pruefausdruck mit Zeitgrenze und Wiedereintritts-Sperre aus.
 
     Die Sperre steht bereits in `os.environ` (gesetzt von `cmd_pruefe`, mit dem
-    Pfad des laufenden Ledgers) und wird an den Kindprozess vererbt.
+    Pfad des laufenden Ledgers) und wird an den Kindprozess vererbt. Beginnt der
+    Ausdruck mit `python3 `, läuft er mit `sys.executable` (siehe
+    `_mit_eigenem_interpreter`).
     """
     umgebung = dict(os.environ)
     grenze = _ausdruck_timeout()
+    kommando = _mit_eigenem_interpreter(kommando)
     try:
         r = subprocess.run(kommando, shell=True, cwd=REPO, capture_output=True,
                            text=True, timeout=grenze, env=umgebung)
@@ -719,7 +762,10 @@ def cmd_selbsttest() -> int:
 
 
 def cmd_schliesse(pfad: Path) -> int:
-    """Schliesst offene Befunde, deren Pruefausdruck gruen ist (W7).
+    """Schliesst offene und zurueckgestellte Befunde, deren Pruefausdruck gruen ist (W7).
+
+    „Zurueckgestellt (Termin …)“ wird wie „offen“ behandelt: ein Code-Nachtrag zu
+    einem zurueckgestellten Befund muss ihn nicht erst von Hand oeffnen.
 
     Der Status wird nicht gesetzt, sondern ABGELEITET: Nur was sein eigener
     Pruefausdruck belegt, gilt als geschlossen. Ohne Ausdruck oder mit rotem
@@ -751,7 +797,9 @@ def cmd_schliesse(pfad: Path) -> int:
         if len(schief) > 10:
             print(f"  ({len(schief) - 10} weitere nicht angezeigt)", file=sys.stderr)
 
-    offen = [b for b in parse(pfad) if b.lage in ("offen", "unklar")]
+    # Zurückgestellte Befunde gehören dazu: Ein Code-Nachtrag zu einem Befund mit
+    # Status „zurückgestellt (Termin …)“ wird so genauso geschlossen wie ein offener.
+    offen = [b for b in parse(pfad) if b.lage in ("offen", "unklar", "zurückgestellt")]
     if not offen:
         print("Keine offenen Befunde.")
         return 0
@@ -768,11 +816,17 @@ def cmd_schliesse(pfad: Path) -> int:
         cells = _zellen(b.roh)
         ziel = None
         for i, c in enumerate(cells):
-            if _entfette(c).strip().lower() in ("offen", "**offen**"):
+            sauber = _entfette(c).strip()
+            if sauber.lower() in ("offen", "**offen**"):
+                ziel = i
+                break
+            # Zurückgestellt: die Zelle, deren Text der geparste Status ist
+            # („zurückgestellt (Termin: Rev. 3)“), nie die Nummern- oder Textzelle.
+            if i > 0 and b.lage == "zurückgestellt" and sauber == b.status:
                 ziel = i
                 break
         if ziel is None:
-            bleibt.append((b.nr, "keine Status-Zelle 'offen' gefunden")); continue
+            bleibt.append((b.nr, f"keine Status-Zelle '{b.lage}' gefunden")); continue
         cells[ziel] = "geschlossen"
         neu_zeile = "| " + " | ".join(cells) + " |"
         if b.roh not in text:
@@ -833,7 +887,8 @@ def main() -> int:
     ap.add_argument("--pruefe", action="store_true", help="Status aus Prüfausdrücken ableiten")
     ap.add_argument("--selbsttest", action="store_true", help="Statuslogik gegen bekannte Fälle")
     ap.add_argument("--schliesse", action="store_true",
-                    help="offene Befunde mit grünem Prüfausdruck schließen (W7)")
+                    help="offene und zurückgestellte Befunde (Status „zurückgestellt (Termin …)“) "
+                         "mit grünem Prüfausdruck schließen (W7)")
     ap.add_argument("--streng", action="store_true",
                     help="auch Altbefunde ohne Prüfausdruck als rot werten")
     ap.add_argument("--runde", type=int, default=16, help="letzte Review-Runde (für --kompakt)")
@@ -855,4 +910,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    projektumgebung_neu_starten()
     raise SystemExit(main())

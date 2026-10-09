@@ -43,6 +43,11 @@ backend/.cache/
 backend/data/osm_cache/
 backend/data/terrain_tiles/
 
+# Finanz-Zwischenspeicher (finance_loader._write_cache schreibt bei Sichtstart und
+# Bewertung nach backend/data/inkar/, REGIONALSTATISTIK_CACHE_DIR). Bereits
+# getrackte Dateien bleiben im Repo; eine neue Datei bräuchte `git add -f`.
+backend/data/inkar/finance_osm_*.json
+
 # VG250 Rohdaten-Download (Verwaltungsgebiete, ~300MB)
 backend/data/vg250/
 

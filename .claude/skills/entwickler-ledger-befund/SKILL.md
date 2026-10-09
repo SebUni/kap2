@@ -96,6 +96,7 @@ Spalten: `| Nr | Befund (Stelle · Kurzfassung) | Kat. | Status | Umsetzungsnach
   zurückgestellt, wie es der Kopf der Datei bisher gezählt hat) und vergleiche mit N. Weicht der Bestand schon vor
   deiner Änderung ab (Beispiel BEFUNDE_60: Überschrift 3, `--status` meldet 5 offen), ändere das nicht still, sondern
   notiere es als Beobachtung — außer das Ticket verlangt die Korrektur.
+- `ledger.py <nr> --schliesse` schließt offene **und** zurückgestellte Befunde (Status „zurückgestellt (Termin …)“), sobald ihr Prüfausdruck grün ist; ein zurückgestellter Befund muss vorher nicht von Hand auf `offen` gesetzt werden.
 - Prüfe jede weitere Stelle, die die Zahl wiederholt (Schlussabsatz, Zähler im Kopftext), mit
   `grep -n '<alte Zahl>' reviews/BEFUNDE_<nr>.md` vorher und nachher.
 

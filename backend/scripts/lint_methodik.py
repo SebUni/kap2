@@ -36,6 +36,7 @@ import glob
 import os
 import re
 import sys
+from pathlib import Path
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT)
@@ -1408,6 +1409,35 @@ def berichtsauswahl(ziel: str | None = None) -> tuple[list[str], list[str], list
     return berichte, steckbriefe, querschnitte
 
 
+def projektumgebung_neu_starten() -> None:
+    """Startet das Skript im Interpreter der Projektumgebung neu, wenn dieser fehlt.
+
+    Belege rufen `python3 backend/scripts/lint_methodik.py` auf; je nach Rechner hat
+    dieses `python3` weder numpy noch shapely (Server), und der Lint endet mit
+    „Registry nicht ladbar“. Fehlt dem laufenden Interpreter eines der Pakete und
+    gibt es den Interpreter der Projektumgebung (`${KAP2_VENV:-~/.venvs/kap2}/bin/python`,
+    derselbe wie in `scripts/testlauf.sh`), der ein anderer ist, ersetzt sich der
+    Prozess per `os.execv` durch ihn, mit denselben Argumenten. Davor steht genau
+    eine Zeile `Projektumgebung: <Pfad>`. Ohne Projektumgebung läuft alles wie bisher.
+    (Dieselbe Funktion steht in `ledger.py`.)
+    """
+    import importlib.util
+
+    if all(importlib.util.find_spec(m) is not None for m in ("numpy", "shapely")):
+        return
+    venv = Path(os.environ.get("KAP2_VENV") or "~/.venvs/kap2").expanduser()
+    py = venv / "bin" / "python"
+    if not (py.is_file() and os.access(py, os.X_OK)):
+        return
+    # Schon in dieser Umgebung? Der Pfad des Interpreters allein genügt nicht, denn
+    # ein venv-Python ist meist ein Verweis auf das System-Python.
+    if (os.path.abspath(sys.executable) == os.path.abspath(py)
+            or Path(sys.prefix).resolve() == venv.resolve()):
+        return
+    print(f"Projektumgebung: {py}", flush=True)
+    os.execv(str(py), [str(py), *sys.argv])
+
+
 def main() -> int:
     # Option --datei <pfad> (T-1464-ceo): prüft genau diese Datei, etwa eine Kopie
     # für eine Rotprobe; die Risikonummer folgt aus dem Dateinamen (96_…md → 96).
@@ -1442,4 +1472,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    projektumgebung_neu_starten()
     sys.exit(main())
