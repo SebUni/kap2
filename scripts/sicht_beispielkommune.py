@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Beispielkommune Warmsen für den Sichtstart anlegen (T-1775).
 
-    python3 scripts/sicht_beispielkommune.py [--warte-sekunden N]
+    python3 scripts/sicht_beispielkommune.py [--warte-sekunden N] [--basis URL] [--neu-rechnen]
+                                             [--anmeldung lokal|sitzung]
 
 Das Skript nutzt nur die Standardbibliothek. Es startet `bash scripts/sichtstart.sh`
 als Kindprozess (eigene Postgres-Instanz, Backend auf 127.0.0.1:8000, Frontend auf
@@ -20,10 +21,22 @@ direkt, mit denselben Schritten wie die Oberfläche:
   (f) den Jahresbetrag #95 aus `risk-summary` lesen (API-Wert ohne Wirkung der Maßnahme; die Karte
       nimmt bei geladenem `cost-summary` den Stand mit Maßnahmen).
 
+Zweites Ziel (T-1830): Mit `--basis URL` startet das Skript keinen Sichtstart, sondern spricht
+einen laufenden Dienst unter dieser Adresse an (z. B. kap2-test auf 127.0.0.1:8010). Der Produktcode
+(Gemeindetabelle, Gemeindeschlüssel, Sitzung) läuft dann gegen die Datenbank aus `DATABASE_URL`, mit
+der Projektumgebung aus `KAP2_VENV`; fehlt `DATABASE_URL`, endet das Skript mit Exit 1.
+`--neu-rechnen` reiht die Bewertung auch bei Status `done` neu ein und wartet bis `done`.
+`--anmeldung sitzung` legt über Produktcode einen technischen Nutzer ohne verwendbares Passwort an
+(falls er fehlt), erzeugt mit `auth_service.create_session` eine Sitzung, sendet sie als Cookie
+`kap2_session` und widerruft sie am Ende mit `auth_service.revoke_session`. `/api/auth/me` muss den
+technischen Nutzer nennen, sonst bricht das Skript ab. Der Sitzungsschlüssel erscheint in keiner
+Ausgabe und reist nie als Argument.
+
 Am Ende beendet es den Sichtstart mit SIGTERM und wartet auf sein Ende, auch bei
 Fehlern. Keine Zahl wird von Hand in die Datenbank geschrieben; alle Beträge stammen
 aus Antworten der API. Die letzte Zeile der Ausgabe ist JSON; Exit-Code 0 nur, wenn
-alles gelungen ist.
+alles gelungen ist. Die Schlusszeile nennt zusätzlich alle Klimawirkungen aus `risk-summary` mit
+Jahresbetrag, den Commit des Dienstes (`/api/health`) und die Zeit der Rechnung (UTC).
 """
 import argparse
 import getpass
@@ -35,6 +48,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from datetime import datetime, timezone
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -56,7 +70,14 @@ PGDATA = os.environ.get("KAP2_SICHT_PGDATA",
                         os.path.join(os.path.expanduser("~"), ".local", "share", "kap2-sicht", "pgdata"))
 # Datenbank des Sichtstarts, gleiche Form wie in scripts/sichtstart.sh (Socket, ohne Passwort).
 DATENBANK_URL = f"postgresql://{getpass.getuser()}@/kap2_sicht?host={PGDATA}"
+# Ziel dieses Aufrufs: Adresse der API und Datenbank für den Produktcode (main setzt sie).
+ZIEL = {"basis": BASIS, "datenbank": DATENBANK_URL}
 GOLDEN_95_EUR = 175256  # backend/data/kalibrierung/golden95_zellen.md
+SESSION_COOKIE = "kap2_session"  # backend/app/api/deps.py
+TECHNIK_EMAIL = "sichtstart-technik@kap3.invalid"
+SITZUNG_ENV = "KAP2_SICHT_SITZUNG"  # Übergabe an das Kind nur über die Umgebung, nie als Argument
+# Die Sitzung des Laufs; der Wert wird in jeder Ausgabe durch *** ersetzt.
+SITZUNG = {"wert": None}
 
 
 class Fehler(RuntimeError):
@@ -69,8 +90,14 @@ def euro(betrag, stellen=2):
     return text + " €"
 
 
+def verdecke(text):
+    """Ersetzt den Sitzungsschlüssel in einem Text durch ***."""
+    wert = SITZUNG["wert"]
+    return str(text).replace(wert, "***") if wert else str(text)
+
+
 def melde(text):
-    print(text, flush=True)
+    print(verdecke(text), flush=True)
 
 
 # ── HTTP ──────────────────────────────────────────────────────────────────────
@@ -79,10 +106,12 @@ def api(methode, pfad, daten=None, timeout=120):
     """Eine Anfrage an die API; gibt das ausgewertete JSON zurück (gzip wird entpackt)."""
     body = None
     kopf = {"Accept": "application/json"}
+    if SITZUNG["wert"]:
+        kopf["Cookie"] = f"{SESSION_COOKIE}={SITZUNG['wert']}"
     if daten is not None:
         body = json.dumps(daten).encode("utf-8")
         kopf["Content-Type"] = "application/json"
-    anfrage = urllib.request.Request(BASIS + pfad, data=body, method=methode, headers=kopf)
+    anfrage = urllib.request.Request(ZIEL["basis"] + pfad, data=body, method=methode, headers=kopf)
     try:
         with urllib.request.urlopen(anfrage, timeout=timeout) as antwort:
             roh = antwort.read()
@@ -90,9 +119,9 @@ def api(methode, pfad, daten=None, timeout=120):
                 roh = gzip.decompress(roh)
     except urllib.error.HTTPError as exc:
         text = exc.read().decode("utf-8", "replace")[:500]
-        raise Fehler(f"{methode} {pfad} -> HTTP {exc.code}: {text}") from exc
+        raise Fehler(f"{methode} {pfad} -> HTTP {exc.code}: {verdecke(text)}") from exc
     except (urllib.error.URLError, OSError) as exc:
-        raise Fehler(f"{methode} {pfad} nicht erreichbar: {exc}") from exc
+        raise Fehler(f"{methode} {pfad} nicht erreichbar: {verdecke(exc)}") from exc
     return json.loads(roh) if roh else None
 
 
@@ -110,16 +139,16 @@ def starte_sichtstart(log_pfad):
 def warte_auf_health(proc, log_pfad, sekunden):
     ende = time.time() + sekunden
     while time.time() < ende:
-        if proc.poll() is not None:
+        if proc is not None and proc.poll() is not None:
             raise Fehler(f"Sichtstart endete vorzeitig (Exit {proc.returncode}):\n{log_ende(log_pfad)}")
         try:
-            with urllib.request.urlopen(BASIS + "/api/health", timeout=5) as r:
+            with urllib.request.urlopen(ZIEL["basis"] + "/api/health", timeout=5) as r:
                 if r.status == 200:
                     return
         except (urllib.error.URLError, OSError):
             pass
         time.sleep(2)
-    raise Fehler(f"/api/health antwortet nach {sekunden} s nicht:\n{log_ende(log_pfad)}")
+    raise Fehler(f"/api/health antwortet nach {sekunden} s nicht:\n{log_ende(log_pfad) if proc else ''}")
 
 
 def beende_sichtstart(proc, log):
@@ -176,23 +205,95 @@ finally:
 """
 
 
-def produktcode(code, *argumente, timeout=1800):
-    """Führt Produktcode mit der Projektumgebung gegen die Sichtstart-Datenbank aus; gibt die
-    letzte Ausgabezeile zurück."""
+def produktcode(code, *argumente, timeout=1800, umgebung=None):
+    """Führt Produktcode mit der Projektumgebung gegen die Datenbank des Ziels aus (Sichtstart-
+    Datenbank, mit `--basis` `DATABASE_URL`); gibt die letzte Ausgabezeile zurück.
+
+    `umgebung`: zusätzliche Umgebungsvariablen (so reist die Sitzung zum Kind, nie als Argument).
+    """
     python = os.path.join(VENV, "bin", "python")
     if not os.path.exists(python):
         raise Fehler(f"Projektumgebung fehlt: {python} (anlegen mit bash scripts/testlauf.sh)")
-    env = dict(os.environ, DATABASE_URL=DATENBANK_URL,
-               PYTHONPYCACHEPREFIX=os.path.join(VENV, "pycache"))
+    env = dict(os.environ, DATABASE_URL=ZIEL["datenbank"],
+               PYTHONPYCACHEPREFIX=os.path.join(VENV, "pycache"), **(umgebung or {}))
     try:
         p = subprocess.run([python, "-c", code, *argumente], cwd=os.path.join(ROOT, "backend"),
                            env=env, capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired as exc:
         raise Fehler(f"Produktcode nach {timeout} s nicht fertig") from exc
     if p.returncode != 0:
-        raise Fehler(f"Produktcode endete mit Exit {p.returncode}:\n{(p.stdout + p.stderr)[-2000:]}")
+        raise Fehler(f"Produktcode endete mit Exit {p.returncode}:\n{verdecke((p.stdout + p.stderr)[-2000:])}")
     zeilen = [z for z in p.stdout.splitlines() if z.strip()]
     return zeilen[-1] if zeilen else ""
+
+
+# Technischer Nutzer: feste Adresse (.invalid wird nie aufgelöst) und Passwort-Hash "!". Das ist kein
+# bcrypt-Hash; `auth_service.verify_password` fängt den ValueError und liefert False, ein Login mit
+# Passwort ist damit nie möglich. `Kommune` wird mitimportiert, weil der Mapper von `User` sie kennt.
+_CODE_SITZUNG_ANLEGEN = """
+import sys
+from app.db.database import SessionLocal
+from app.models.models import Kommune  # noqa: F401
+from app.models.auth_models import User, ROLE_ADMIN
+from app.services import auth_service
+email = sys.argv[1]
+db = SessionLocal()
+try:
+    nutzer = db.query(User).filter(User.email == email).first()
+    if nutzer is None:
+        nutzer = User(email=email, password_hash="!", display_name="Sichtstart (technisch)",
+                      role=ROLE_ADMIN, is_active=True)
+        db.add(nutzer)
+        db.commit()
+        db.refresh(nutzer)
+    elif nutzer.password_hash != "!" or nutzer.role != ROLE_ADMIN or not nutzer.is_active:
+        nutzer.password_hash, nutzer.role, nutzer.is_active = "!", ROLE_ADMIN, True
+        db.commit()
+    print(auth_service.create_session(db, nutzer))
+finally:
+    db.close()
+"""
+
+_CODE_SITZUNG_WIDERRUFEN = """
+import os
+from app.db.database import SessionLocal
+from app.models.models import Kommune  # noqa: F401
+from app.models.auth_models import User  # noqa: F401
+from app.services import auth_service
+db = SessionLocal()
+try:
+    auth_service.revoke_session(db, os.environ["KAP2_SICHT_SITZUNG"])
+    print("widerrufen")
+finally:
+    db.close()
+"""
+
+
+def melde_sitzung_an():
+    """`--anmeldung sitzung`: technischen Nutzer anlegen (falls er fehlt), Sitzung erzeugen und über
+    `/api/auth/me` belegen, dass genau sie wirkt (nicht die lokale Anmeldung des Sichtstarts)."""
+    SITZUNG["wert"] = produktcode(_CODE_SITZUNG_ANLEGEN, TECHNIK_EMAIL) or None
+    if not SITZUNG["wert"]:
+        raise Fehler("Die Sitzung wurde nicht erzeugt (keine Ausgabe des Produktcodes).")
+    ich = api("GET", "/api/auth/me")
+    nutzer = (ich or {}).get("user") or {}
+    if not (ich or {}).get("authenticated") or nutzer.get("email") != TECHNIK_EMAIL:
+        raise Fehler(f"/api/auth/me nennt nicht den technischen Nutzer {TECHNIK_EMAIL}, sondern "
+                     f"{nutzer.get('email')!r} – Abbruch, die Sitzung wirkt nicht.")
+    melde(f"Angemeldet als {TECHNIK_EMAIL} (Rolle {nutzer.get('role')}) laut /api/auth/me.")
+
+
+def widerrufe_sitzung():
+    """Sitzung im `finally` widerrufen; gibt False zurück, wenn das scheitert."""
+    if not SITZUNG["wert"]:
+        return True
+    try:
+        produktcode(_CODE_SITZUNG_WIDERRUFEN, umgebung={SITZUNG_ENV: SITZUNG["wert"]}, timeout=120)
+    except Fehler as exc:
+        print(f"FEHLER: Sitzung nicht widerrufen: {verdecke(exc)}", file=sys.stderr, flush=True)
+        return False
+    melde("Sitzung widerrufen.")
+    return True
 
 
 def fuelle_gemeinden():
@@ -248,15 +349,17 @@ def lege_kommune_an():
     return kommune
 
 
-def bewertung(kommune_id, max_sekunden, neu_rechnen=False):
+def bewertung(kommune_id, max_sekunden, neu_rechnen=False, grund_neu=""):
     """(c)+(d) Raster, Bewertung einreihen, abfragen bis `done`. Gibt den Status zurück.
 
-    `neu_rechnen`: eine abgeschlossene Bewertung entstand ohne Gemeindeschlüssel (leere
-    Gemeindetabelle) und wird einmal neu eingereiht.
+    `neu_rechnen`: eine abgeschlossene Bewertung wird einmal neu eingereitet (Gemeindetabelle eben
+    gefüllt oder `--neu-rechnen`) und erst als fertig gewertet, wenn ihr `finished_at` ein neues ist.
     """
     status = api("GET", f"/api/kommune/{kommune_id}/status")
+    alt_ende = None
     if status.get("status") == "done" and neu_rechnen:
-        melde("Bewertung entstand ohne Gemeindetabelle: wird einmal neu berechnet.")
+        melde(f"Bewertung wird neu berechnet{grund_neu}.")
+        alt_ende = status.get("finished_at")
         api("POST", f"/api/kommune/{kommune_id}/assess")
         status = {"status": "queued"}
     elif status.get("status") == "done":
@@ -279,7 +382,7 @@ def bewertung(kommune_id, max_sekunden, neu_rechnen=False):
         if zeile != letzte:
             melde(f"[{int(time.time() - start):>5} s] {zeile[0]} {zeile[1]} % {zeile[2] or ''}")
             letzte = zeile
-        if status.get("status") == "done":
+        if status.get("status") == "done" and (alt_ende is None or status.get("finished_at") != alt_ende):
             return status
         if status.get("status") == "error":
             raise Fehler(f"Bewertung endete mit error: {status.get('message')}")
@@ -353,7 +456,28 @@ def betrag_95(kommune_id):
     raise Fehler("risk-summary enthält keine Klimawirkung #95.")
 
 
-def arbeite(max_sekunden):
+def baue_klimawirkungen(risk_summary):
+    """Alle Einträge aus `risk-summary` → `cost.klimawirkungen` als Liste mit `bezeichnung` und
+    `betrag_eur_jahr` (aus `cost_eur`, auf den Cent gerundet; ohne Euro-Ebene `null`)."""
+    liste = []
+    for k in (risk_summary.get("cost") or {}).get("klimawirkungen") or []:
+        betrag = k.get("cost_eur")
+        liste.append({"bezeichnung": k.get("bezeichnung"),
+                      "betrag_eur_jahr": None if betrag is None else round(float(betrag), 2)})
+    return liste
+
+
+def zeit_utc(zeitpunkt):
+    """`finished_at` der API (UTC, meist ohne Zonenangabe) als ISO 8601 mit +00:00; None bleibt None."""
+    if not zeitpunkt:
+        return None
+    zeit = datetime.fromisoformat(zeitpunkt)
+    if zeit.tzinfo is None:
+        zeit = zeit.replace(tzinfo=timezone.utc)
+    return zeit.astimezone(timezone.utc).isoformat()
+
+
+def arbeite(max_sekunden, neu_rechnen=False):
     start = time.time()
     gemeinden_neu = fuelle_gemeinden()
     kommune = finde_kommune()
@@ -366,7 +490,8 @@ def arbeite(max_sekunden):
     melde(f"Gemeindeschlüssel für {kommune['name']} laut Worker-Abfrage: {ags}")
     if ags in ("", "None"):
         raise Fehler("Die Abfrage des Workers liefert für Warmsen keinen Gemeindeschlüssel.")
-    status = bewertung(kommune["id"], max_sekunden, neu_rechnen=gemeinden_neu)
+    status = bewertung(kommune["id"], max_sekunden, neu_rechnen=gemeinden_neu or neu_rechnen,
+                       grund_neu=" (--neu-rechnen)" if neu_rechnen else " (Gemeindetabelle eben gefüllt)")
     kommune = api("GET", f"/api/kommune/{kommune['id']}")  # Einwohner stehen erst nach der Bewertung
     m, wirkung, grund, neu = massnahme(kommune)
     betrag, bezeichnung = betrag_95(kommune["id"])
@@ -375,9 +500,11 @@ def arbeite(max_sekunden):
     melde(f"Jahresbetrag {bezeichnung}: {euro(betrag)} (Golden-Test #95 im Bericht: "
           f"{euro(GOLDEN_95_EUR, 0)}; Abweichung {euro(betrag - GOLDEN_95_EUR)}, nicht angeglichen)")
     melde(f"Einwohner laut Kommune: {kommune.get('population')} (Golden-Test: 3087)")
-    if war_vorhanden and not neu and not gemeinden_neu:
+    if war_vorhanden and not neu and not gemeinden_neu and not neu_rechnen:
         melde("Nichts neu angelegt: Kommune und Maßnahme waren da, kein neuer Bewertungslauf.")
     melde(f"Dauer dieses Aufrufs ohne Sichtstart-Start: {int(time.time() - start)} s")
+    zusammenfassung = api("GET", f"/api/kommune/{kommune['id']}/risk-summary")
+    gesundheit = api("GET", "/api/health")
     return {
         "kommune": kommune["name"],
         "kommune_id": kommune["id"],
@@ -386,32 +513,64 @@ def arbeite(max_sekunden):
         "betrag_95_eur_jahr": round(betrag, 2),
         "massnahme": {"name": m["name"], "typ": m["measure_type"]},
         "nutzen_eur_jahr": float(wirkung["annual_benefit_eur"]),
+        "massnahmen_mit_praefix": sum(1 for x in api("GET", f"/api/kommune/{kommune['id']}/measures")
+                                      if (x.get("name") or "").startswith(MASSNAHME_PRAEFIX)),
+        "klimawirkungen": baue_klimawirkungen(zusammenfassung),
+        "commit": gesundheit.get("commit"),
+        "zeit_rechnung": zeit_utc(status.get("finished_at")),
     }
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--warte-sekunden", type=int, default=7200,
                     help="längste Wartezeit auf die Bewertung (Vorgabe 7200)")
     ap.add_argument("--start-sekunden", type=int, default=300,
                     help="längste Wartezeit auf /api/health (Vorgabe 300)")
-    args = ap.parse_args()
+    ap.add_argument("--basis", metavar="URL",
+                    help="laufenden Dienst unter dieser Adresse ansprechen, kein Sichtstart; "
+                         "Produktcode läuft gegen DATABASE_URL")
+    ap.add_argument("--neu-rechnen", action="store_true",
+                    help="Bewertung auch bei Status done neu einreihen und bis done warten")
+    ap.add_argument("--anmeldung", choices=("lokal", "sitzung"), default="lokal",
+                    help="lokal: Anmeldung des Sichtstarts (Vorgabe); sitzung: technischer Nutzer "
+                         "mit Cookie kap2_session")
+    args = ap.parse_args(argv)
+
+    if args.basis:
+        datenbank = os.environ.get("DATABASE_URL")
+        if not datenbank:
+            print("FEHLER: Mit --basis muss die Umgebungsvariable DATABASE_URL gesetzt sein "
+                  "(Datenbank des Dienstes für den Produktcode).", file=sys.stderr, flush=True)
+            return 1
+        ZIEL["basis"] = args.basis.rstrip("/")
+        ZIEL["datenbank"] = datenbank
 
     log_pfad = os.path.join(tempfile.gettempdir(), f"sichtstart-beispielkommune-{os.getpid()}.log")
     t0 = time.time()
-    proc, log = starte_sichtstart(log_pfad)
+    proc = log = None
+    ergebnis = None
+    rc = 0
     try:
+        if not args.basis:
+            proc, log = starte_sichtstart(log_pfad)
         warte_auf_health(proc, log_pfad, args.start_sekunden)
-        melde(f"Sichtstart bereit nach {int(time.time() - t0)} s.")
-        ergebnis = arbeite(args.warte_sekunden)
+        melde(f"{'Sichtstart' if proc else 'Dienst unter ' + ZIEL['basis']} bereit nach {int(time.time() - t0)} s.")
+        if args.anmeldung == "sitzung":
+            melde_sitzung_an()
+        ergebnis = arbeite(args.warte_sekunden, neu_rechnen=args.neu_rechnen)
     except Fehler as exc:
-        print(f"FEHLER: {exc}", file=sys.stderr, flush=True)
-        return 1
+        print(f"FEHLER: {verdecke(exc)}", file=sys.stderr, flush=True)
+        rc = 1
     finally:
-        beende_sichtstart(proc, log)
-        melde("Sichtstart beendet.")
-    print(json.dumps(ergebnis, ensure_ascii=False), flush=True)
-    return 0
+        if not widerrufe_sitzung():
+            rc = 1
+        if proc is not None:
+            beende_sichtstart(proc, log)
+            melde("Sichtstart beendet.")
+    if rc == 0 and ergebnis is not None:
+        print(verdecke(json.dumps(ergebnis, ensure_ascii=False)), flush=True)
+    return rc
 
 
 if __name__ == "__main__":

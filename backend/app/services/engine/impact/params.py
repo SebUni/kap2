@@ -2122,6 +2122,35 @@ for _spec in IMPACT_PARAM_SPECS:
             _spec.setdefault("evidence_derivation", dict(_UV_HERLEITUNG[_block]))
 del _spec, _block
 
+# ── Regel K, Schritt 3 (docs/methodik/querschnitt_kennzeichnung.md, T-1900-cto): Eingänge ──
+# Parameter-IDs, aus denen ein berechneter Block entsteht: genau die Parameter-IDs aus dem Feld
+# ``abgeleitet_aus`` des Blocks in Kapitel 7 des Berichts, in dessen Reihenfolge. Quellenschlüssel
+# (etwa ``rki_eb19_2025``, ``zfkd_kid2025``) sind keine Parameter-IDs und stehen hier nicht
+# (Festlegung b). Das ist ein Datenfeld der Spezifikation (P1), kein Kommentar: Die Registry
+# rechnet daraus ``abgeleitet_aus``, ``enthaelt_abschaetzung`` und ``eingaenge`` jedes Parameters.
+# Nur die Blöcke, die nach Regel K ``berechnet`` sind, stehen hier. Geprüft in
+# tests/test_regel_k_kennzeichnung.py gegen die Tabelle der 11 Blöcke.
+ABGELEITET_AUS: dict[str, tuple[str, ...]] = {
+    # Bericht #95, Kapitel 7: Fit gegen die RKI-Reihe (Zielreihe ``rki_eb19_2025`` steht im Feld ``quelle:``).
+    "heat.c_kal": ("heat.t0_region", "heat.beta_85plus_region", "heat.f_alter",
+                   "heat.m_basissterberate", "heat.q_wochenquantile"),
+    # Bericht #98, Kapitel 7: Eingang ``slaper1996_rivm2023_madronich2021`` ist ein Quellenschlüssel.
+    "uv.baf": ("uv.w_scc",),
+    # Bericht #98, Kapitel 7: Eingang ``zfkd_kid2025`` ist ein Quellenschlüssel.
+    "uv.c_kal": ("uv.i_raten_roh",),
+}
+
+# Klasse eines Eingangs, der im Produkt keine eigene Stelle in der Registry hat. Er trägt die
+# Kennzeichnung seines Berichts, übersetzt wie die Tabellen oben (quelle → belegt,
+# abschaetzung_kap3 → abgeschaetzt). Bewusst eine eigene Tabelle und nicht ``_UV_KLASSE``: Deren
+# Schlüssel sind die Blöcke mit Registry-Stelle (tests/test_methodik_98_kennzeichnung.py).
+# uv.i_raten_roh: dieselben Werte wie uv.i_mm und uv.i_c44, Kapitel 7 Zeile 1709
+# (``kennzeichnung: quelle``). Bleibt es nach der Runde an #98 bei ``quelle`` (Zweifel-Liste,
+# Sollzustand ``abschaetzung_kap3``), ändert sich nur diese Zeile.
+KLASSE_OHNE_STELLE: dict[str, str] = {
+    "uv.i_raten_roh": "belegt",
+}
+
 # Vorgabewert von s_unbek (Registry-Spec ``birch_group_share_default``, Berichtsblock
 # ``pollen.s_unbekannt``). Die Zahl steht nur in der Spec oben; Runner, Maßnahmen-
 # rechnung und ``indicators.pollen_load`` lesen sie hier (Abgleich-Regel 4).

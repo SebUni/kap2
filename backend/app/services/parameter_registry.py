@@ -16,7 +16,9 @@ _PARKED_CATEGORY: dict[str, str] = (
     | {e["code"]: "exposures" for e in catalog_parked._PARKED_EXPOSURES}
     | {v["code"]: "vulnerabilities" for v in catalog_parked._PARKED_VULNERABILITIES}
 )
-from app.services.engine.impact.params import IMPACT_PARAM_SPECS, IMPACT_GLOBAL_SPECS
+from app.services.engine.impact.params import (
+    ABGELEITET_AUS, IMPACT_GLOBAL_SPECS, IMPACT_PARAM_SPECS, KLASSE_OHNE_STELLE,
+)
 
 # Impact-Parameter (Schicht B) je Risiko gruppiert für die Emission in der Risiko-Schleife.
 _IMPACT_SPECS_BY_RISK: dict[str, list[dict]] = {}
@@ -90,16 +92,52 @@ def _param_doc_source(inp: dict) -> str:
 
 #: Zulässige Werte der maschinenlesbaren Evidenzklasse (Vorgabe P1):
 #: "belegt" (Wert aus einer Quelle), "abgeschaetzt" (begründete Abschätzung von KAP3)
-#: und "berechnet" — folgt aus anderen Parameter-Blöcken; für die Gewissheit zählt er
-#: vorläufig wie belegt, die Regel legt die Querschnittsfrage Gewissheit fest (T-1117-cmo).
-#: Anzeige „berechnet aus anderen Parametern“.
+#: und "berechnet" — folgt aus anderen Parameter-Blöcken. Ob ein berechneter Parameter eine
+#: Abschätzung von KAP3 enthält, sagt ``enthaelt_abschaetzung`` über alle Rechenstufen; den
+#: Anzeigetext („berechnet aus Quellen“ oder „berechnet, enthält Abschätzung von KAP3“) liefert
+#: ``anzeigetext`` (Regel K, docs/methodik/querschnitt_kennzeichnung.md). Die drei Werte bleiben.
 EVIDENCE_CLASSES = ("belegt", "abgeschaetzt", "berechnet")
 
 #: Evidenzklassen, die bei Gewissheit und Unsicherheits-Zusammenschau als belegt zählen.
 #: berechnet — folgt aus anderen Parameter-Blöcken; für die Gewissheit zählt er vorläufig
 #: wie belegt, die Regel legt die Querschnittsfrage Gewissheit fest (T-1117-cmo).
 #: So ändert die dritte Klasse keine Stufe und keine Zählung still.
+#: Abgelöst durch ``zaehlt_als_belegt`` (Regel K, Festlegung d); die Aufrufer wechseln in
+#: Paket 6, bis dahin bleibt die Menge unverändert.
 BELEGTE_KLASSEN = frozenset({"belegt", "berechnet"})
+
+#: Die vier Anzeigetexte nach Regel K (querschnitt_kennzeichnung.md, Festlegung).
+ANZEIGETEXT_QUELLE = "Quelle"
+ANZEIGETEXT_ABSCHAETZUNG = "Abschätzung von KAP3"
+ANZEIGETEXT_BERECHNET_QUELLEN = "berechnet aus Quellen"
+ANZEIGETEXT_BERECHNET_ABSCHAETZUNG = "berechnet, enthält Abschätzung von KAP3"
+
+
+def _anzeigetext_von(klasse: str, enthaelt_abschaetzung: bool) -> str:
+    """Anzeigetext aus Klasse und Merkmal ``enthaelt_abschaetzung`` (Regel K)."""
+    if klasse == "belegt":
+        return ANZEIGETEXT_QUELLE
+    if klasse == "abgeschaetzt":
+        return ANZEIGETEXT_ABSCHAETZUNG
+    if klasse == "berechnet":
+        return (ANZEIGETEXT_BERECHNET_ABSCHAETZUNG if enthaelt_abschaetzung
+                else ANZEIGETEXT_BERECHNET_QUELLEN)
+    raise ValueError(f"Unbekannte Evidenzklasse: {klasse!r}")
+
+
+def anzeigetext(p: dict) -> str:
+    """Anzeigetext eines Registry-Parameters: genau einer der vier Texte von Regel K."""
+    klasse = p["evidence_class"]
+    return _anzeigetext_von(klasse, bool(p["enthaelt_abschaetzung"]) if klasse == "berechnet" else False)
+
+
+def zaehlt_als_belegt(p: dict) -> bool:
+    """Zählt der Parameter als belegt? Ja für ``belegt``; für ``berechnet`` nur ohne Abschätzung
+    in einem Eingang (über alle Stufen). ``abgeschaetzt`` zählt nie als belegt."""
+    klasse = p["evidence_class"]
+    if klasse == "berechnet":
+        return not p["enthaelt_abschaetzung"]
+    return klasse == "belegt"
 
 
 def _evidence_class(explicit: Any, references: list[dict] | None) -> str:
@@ -132,6 +170,7 @@ def _base_param(
     evidence_derivation: dict | None = None,
     methodik_block: str | None = None,
 ) -> dict:
+    klasse = _evidence_class(evidence_class, references)
     return {
         "id": pid,
         "layer_code": layer_code,
@@ -150,18 +189,99 @@ def _base_param(
         "applicable": applicable,
         # Vorgabe P1: maschinenlesbar, ob der Wert belegt, aus anderen Parameter-Blöcken
         # berechnet oder eine begründete Abschätzung von KAP3 ist — samt Herleitung als Datenfeld (nicht als Kommentar).
-        "evidence_class": _evidence_class(evidence_class, references),
+        "evidence_class": klasse,
         "evidence_note": source_detail,
         "evidence_derivation": evidence_derivation or None,
         # Kennung des Parameter-Blocks in Kapitel 7 des Methodik-Berichts (etwa
         # "heat.voly"). Ein Block kann mehrere Registry-Parameter tragen (je Region
         # oder Altersband); None, wenn der Parameter keinem Block entspricht.
         "methodik_block": methodik_block or None,
+        # Regel K (Schritt 3): Parameter-IDs des Blocks, aus denen der Wert entsteht (nur bei
+        # ``berechnet``), ob über alle Rechenstufen eine Abschätzung von KAP3 darin steckt, und die
+        # Eingänge als {block, anzeigetext}. Gefüllt von ``_mit_eingaengen`` am Ende von
+        # ``catalog_parameters``; hier die Vorbelegung ohne Eingänge.
+        "abgeleitet_aus": [],
+        "enthaelt_abschaetzung": klasse == "abgeschaetzt",
+        "eingaenge": [],
     }
 
 
+def _klassen_der_bloecke(params: list[dict]) -> dict[str, str]:
+    """Evidenzklasse je Block-Kennung aus den Parametern (ein Block, eine Klasse)."""
+    out: dict[str, str] = {}
+    for p in params:
+        block = p.get("methodik_block")
+        if block:
+            out.setdefault(block, p["evidence_class"])
+    return out
+
+
+def _mit_eingaengen(
+    params: list[dict],
+    abgeleitet_aus: dict[str, tuple[str, ...]] | None = None,
+    klasse_ohne_stelle: dict[str, str] | None = None,
+) -> list[dict]:
+    """Setzt ``abgeleitet_aus``, ``enthaelt_abschaetzung`` und ``eingaenge`` (Regel K).
+
+    ``enthaelt_abschaetzung`` wird über alle Rechenstufen gerechnet: ein Block enthält eine
+    Abschätzung, wenn er selbst ``abgeschaetzt`` ist oder ein Eingang (rekursiv) eine enthält.
+    Die Klasse eines Eingangs kommt aus den Parametern mit diesem ``methodik_block``; hat der
+    Eingang keine eigene Stelle in der Registry, aus ``klasse_ohne_stelle``. Steht ein Eingang
+    nicht in der gefilterten Liste, wird er aus der ungefilterten Registry nachgeladen.
+    """
+    aus = ABGELEITET_AUS if abgeleitet_aus is None else abgeleitet_aus
+    ohne_stelle = KLASSE_OHNE_STELLE if klasse_ohne_stelle is None else klasse_ohne_stelle
+    klassen = _klassen_der_bloecke(params)
+    klassen.update({b: k for b, k in ohne_stelle.items() if b not in klassen})
+
+    def bloecke_von(block: str, gesehen: tuple[str, ...] = ()) -> set[str]:
+        if block in gesehen:
+            raise ValueError(f"Zyklus in abgeleitet_aus: {' → '.join(gesehen + (block,))}")
+        out = {block}
+        for e in aus.get(block, ()):
+            out |= bloecke_von(e, gesehen + (block,))
+        return out
+
+    gebraucht: set[str] = set()
+    for p in params:
+        if p["evidence_class"] == "berechnet" and p.get("methodik_block"):
+            gebraucht |= bloecke_von(p["methodik_block"])
+    if gebraucht - set(klassen):
+        # Gefilterte Liste ohne die Eingänge: Klassen aus der ungefilterten Registry ergänzen.
+        for b, k in _klassen_der_bloecke(_catalog_parameters_roh()).items():
+            klassen.setdefault(b, k)
+
+    def enthaelt(block: str) -> bool:
+        if block not in klassen:
+            raise ValueError(f"Block {block!r} hat weder eine Stelle in der Registry noch einen "
+                             "Eintrag in KLASSE_OHNE_STELLE (params.py)")
+        if klassen[block] == "abgeschaetzt":
+            return True
+        return klassen[block] == "berechnet" and any(enthaelt(e) for e in aus.get(block, ()))
+
+    def text(block: str) -> str:
+        return _anzeigetext_von(klassen[block], enthaelt(block))
+
+    for p in params:
+        if p["evidence_class"] != "berechnet":
+            continue
+        block = p.get("methodik_block")
+        if not block or block not in aus:
+            raise ValueError(f"Parameter {p['id']!r} ist berechnet, aber sein Block {block!r} hat "
+                             "keinen Eintrag in ABGELEITET_AUS (params.py)")
+        p["abgeleitet_aus"] = list(aus[block])
+        p["enthaelt_abschaetzung"] = enthaelt(block)
+        p["eingaenge"] = [{"block": e, "anzeigetext": text(e)} for e in aus[block]]
+    return params
+
+
 def catalog_parameters(layer_code: str | None = None, layer_category: str | None = None) -> list[dict]:
-    """Alle Katalog-Parameter (Defaults)."""
+    """Alle Katalog-Parameter (Defaults), berechnete mit ihren Eingängen (Regel K)."""
+    return _mit_eingaengen(_catalog_parameters_roh(layer_code, layer_category))
+
+
+def _catalog_parameters_roh(layer_code: str | None = None, layer_category: str | None = None) -> list[dict]:
+    """Katalog-Parameter ohne die Eingänge der berechneten (siehe ``_mit_eingaengen``)."""
     params: list[dict] = []
 
     def match(code: str, cat: str) -> bool:

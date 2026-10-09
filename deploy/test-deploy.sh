@@ -144,13 +144,54 @@ status_lokal_schreiben() {  # $1 = fertig|fehler, $2 = Fehlertext -- schreibt nu
   adresse="${KAP2_TEST_URL:-http://localhost}"
   # Passwort selbst geht nie in die Statusdatei des Firmen-Repos (T-0169): nur der Pfad der
   # Datei auf dem Server, in der es liegt.
-  python3 - "$st" "$fehler" "$zeit" "$adresse" "$COMMIT" "$PROTOKOLL" "${KAP2_TEST_BENUTZER:-}" "$PASSWORT_QUELLE" > "$FIRMA/betrieb/deploy-status.json.neu" <<'PY'
+  # T-1832: Nachweis ohne Browser. Zusaetzlich zwei Felder: "datenbank" (DATENBANK_VORHER/-NACHHER
+  # aus dem Schritt datenbank) und "beispielkommune" (feste Auswahl aus der Datei in BEISPIEL_JSON
+  # aus dem Schritt beispielkommune). Die Funktion laeuft auch im Abbruchpfad, wenn der Lauf vor
+  # diesen Schritten endete: die Variablen sind dann ungesetzt (set -u!), deshalb ${NAME:-} --
+  # leer wird im Status zu null. Die Datei in BEISPIEL_JSON wird nie ganz uebernommen.
+  python3 - "$st" "$fehler" "$zeit" "$adresse" "$COMMIT" "$PROTOKOLL" "${KAP2_TEST_BENUTZER:-}" "$PASSWORT_QUELLE" \
+    "${DATENBANK_VORHER:-}" "${DATENBANK_NACHHER:-}" "${BEISPIEL_JSON:-}" > "$FIRMA/betrieb/deploy-status.json.neu" <<'PY'
 import json, sys
-st, fehler, zeit, adresse, commit, protokoll, benutzer, passwort_quelle = sys.argv[1:9]
+st, fehler, zeit, adresse, commit, protokoll, benutzer, passwort_quelle, db_vorher, db_nachher, beispiel_pfad = sys.argv[1:12]
+
+
+def zahl(w):
+    return w if isinstance(w, (int, float)) and not isinstance(w, bool) else None
+
+
+def text(w):
+    if isinstance(w, str):
+        return w[:300]
+    return zahl(w)
+
+
+def beispielkommune(pfad):
+    """Feste Auswahl aus der Schlusszeile des Beispielkommune-Skripts; sonst null."""
+    if not pfad:
+        return None
+    try:
+        with open(pfad, encoding="utf-8") as f:
+            roh = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(roh, dict):
+        return None
+    liste = roh.get("klimawirkungen")
+    wirkungen = None
+    if isinstance(liste, list):
+        wirkungen = [{"bezeichnung": text(k.get("bezeichnung")), "betrag_eur_jahr": zahl(k.get("betrag_eur_jahr"))}
+                     for k in liste if isinstance(k, dict)]
+    return {"kommune": text(roh.get("kommune")), "gemeindeschluessel": text(roh.get("gemeindeschluessel")),
+            "commit": text(roh.get("commit")), "zeit_rechnung": text(roh.get("zeit_rechnung")),
+            "klimawirkungen": wirkungen}
+
+
 d = {"zeit": zeit, "status": st, "adresse": adresse, "commit": commit or None,
      "fehler": (fehler[:1500] if st == "fehler" else None), "protokoll": protokoll}
 if benutzer:
     d["zugang"] = {"benutzer": benutzer, "passwort_quelle": passwort_quelle, "hinweis": "HTTP Basic Auth der Testumgebung"}
+d["datenbank"] = {"vorher": db_vorher[:500] or None, "nachher": db_nachher[:500] or None}
+d["beispielkommune"] = beispielkommune(beispiel_pfad)
 print(json.dumps(d, ensure_ascii=False, indent=1))
 PY
   # Erst lokal festschreiben, dann veroeffentlichen (T-0132): trifft waehrend des Pushens
@@ -371,6 +412,56 @@ for i in $(seq 1 60); do
   fi
   sleep 2
 done
+
+SCHRITT="beispielkommune"
+# T-1831 (Vorhaben T-1828, A-0066): Nach dem Neustart rechnet der gerade ausgelieferte Stand die
+# Beispielkommune Warmsen vollstaendig neu; der Health-Check oben hat den Commit schon bestaetigt.
+# Das Skript legt Gemeindetabelle (VG250), Kommune und Massnahme an, falls sie fehlen, und meldet
+# sich mit einer technischen Sitzung an (--anmeldung sitzung). DATABASE_URL steht aus der oben
+# eingelesenen Umgebungsdatei in der Umgebung; sie wird hier weder ausgegeben noch kopiert, und das
+# Skript gibt den Sitzungsschluessel nie aus.
+# Wartegrenze (Frist des Watchers: DEPLOY_FRIST_MIN = 30 min = 1800 s): --warte-sekunden 900 bricht
+# die Bewertung nach 15 min ab. Gemessen (T-1830, Sichtstart): Neurechnung 642 s, 399 s, 195 s; ganzer
+# Aufruf 801 s, 442 s, 296 s, 208 s. Die bisherigen Deploys ohne diesen Schritt brauchten von der
+# Anforderung bis "fertig" hoechstens 8 min (480 s, davon bis zu 2 min Watcher-Takt). Schlechtester Fall:
+# 480 s + 900 s = 1380 s (23 min); bleiben 420 s fuer VG250-Import, Raster und Massnahme beim ersten Lauf.
+# Die Zeit dieser Zwischenschritte begrenzt --warte-sekunden nicht (je Aufruf des Produktcodes
+# hoechstens 1800 s im Skript), deshalb steht die Frist nicht allein auf dieser Grenze.
+# Ausgabe: alles geht ins Protokoll (tee); die letzte Zeile (JSON) liegt zusaetzlich in BEISPIEL_JSON,
+# das Paket 4 in den Status uebernimmt. Scheitert das Skript oder die Pruefung unten, endet der Schritt
+# ueber die ERR-Falle: Status "fehler", nie "fertig". pipefail laesst den Rueckgabewert des Skripts
+# durch das tee hindurch wirken.
+BEISPIEL_LOG=$(mktemp "$DEPLOY_TMP/beispielkommune.XXXXXX.log")
+BEISPIEL_JSON=$(mktemp "$DEPLOY_TMP/beispielkommune.XXXXXX.json")
+KAP2_VENV="$VENV" python3 "$PRODUKT/scripts/sicht_beispielkommune.py" \
+  --basis http://127.0.0.1:8010 --neu-rechnen --anmeldung sitzung --warte-sekunden 900 2>&1 \
+  | tee "$BEISPIEL_LOG"
+tail -n 1 "$BEISPIEL_LOG" > "$BEISPIEL_JSON"
+rm -f "$BEISPIEL_LOG"
+# Pruefung der Schlusszeile: JSON, je eine Klimawirkung #95, #96 und #98 in "bezeichnung", und der
+# gemeldete Commit ist der ausgelieferte. Jede Abweichung beendet den Schritt mit Rueckgabewert 1.
+python3 - "$BEISPIEL_JSON" "$COMMIT" <<'PY'
+import json, sys
+pfad, commit = sys.argv[1:3]
+zeile = open(pfad, encoding="utf-8").read().strip()
+try:
+    d = json.loads(zeile)
+except ValueError:
+    d = None
+if not isinstance(d, dict):
+    print("!! Beispielkommune: Die letzte Ausgabezeile des Skripts ist kein JSON-Objekt.")
+    sys.exit(1)
+liste = d.get("klimawirkungen")
+bezeichnungen = [str(k.get("bezeichnung") or "") for k in liste if isinstance(k, dict)] if isinstance(liste, list) else []
+fehlt = [c for c in ("#95", "#96", "#98") if not any(c in b for b in bezeichnungen)]
+if fehlt:
+    print("!! Beispielkommune: Keine Klimawirkung mit " + ", ".join(fehlt) + " in der Bezeichnung.")
+    sys.exit(1)
+if d.get("commit") != commit:
+    print("!! Beispielkommune: Gerechnet hat Commit '%s', ausgeliefert ist '%s'." % (d.get("commit"), commit))
+    sys.exit(1)
+print("Beispielkommune %s: %d Klimawirkungen gerechnet mit Commit %s" % (d.get("kommune"), len(bezeichnungen), commit))
+PY
 
 SCHRITT="status"
 # Trap bleibt bewusst aktiv: scheitert das Schreiben oder Pushen des Status, ist der Lauf nicht
