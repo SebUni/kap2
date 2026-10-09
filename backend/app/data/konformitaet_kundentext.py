@@ -39,7 +39,7 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
         "teilweise",
         "Jeder Parameter zeigt seine Quelle oder den Vermerk, dass er eine Abschätzung von KAP3 ist, "
         "samt Herleitung; im Verzeichnis der Belege sind aber noch nicht alle Abschätzungen als solche "
-        "gekennzeichnet. Die Parameterliste trennt fachliche Annahmen nicht von Bewertungsentscheidungen, "
+        "gekennzeichnet. Die Parameterliste trennt fachliche Abschätzungen nicht von Bewertungsentscheidungen, "
         "sagt nicht, wer welchen Arbeitsschritt verantwortet, und erfasst einen eigenen Wert der Kommune "
         "nur mit Quelle, nicht als ihre eigene Abschätzung.",
     ),

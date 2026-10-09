@@ -1386,19 +1386,20 @@ Im Produkt wurden die drei Belege vollständig gelesen: `docs/evidenz/register.m
 
 | Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
 |---|---|---|---|---|
-| A1 | Fachliche Analyseebene und normative Bewertungsebene werden getrennt behandelt; „die Ebenen möglichst zu trennen“. | S. 34 (PDF 35), Kap. 1.3 vorletzter Absatz; S. 42 (PDF 43), Kap. 2.1.3 | `95_hitzebelastung.md` Kap. 7 (Kennzeichnung `quelle`, `berechnet`, `abschaetzung_kap3` je Block, Regel in Log 40); `ParameterTable.tsx` `EvidenceCell` (Spalte „Beleglage“) | trägt teilweise |
+| A1 | Fachliche Analyseebene und normative Bewertungsebene werden getrennt behandelt; „die Ebenen möglichst zu trennen“. | S. 34 (PDF 35), Kap. 1.3 drittletzter Absatz; S. 42 (PDF 43), Kap. 2.1.3 | `95_hitzebelastung.md` Kap. 7 (Kennzeichnung `quelle`, `berechnet`, `abschaetzung_kap3` je Block, Regel in Log 40); `ParameterTable.tsx` `EvidenceCell` (Spalte „Beleglage“) | trägt teilweise |
 | A2 | „die jeweiligen Arbeitsschritte stets transparent zu machen“. | S. 42 (PDF 43), Kap. 2.1.3 | `95_hitzebelastung.md` Kap. 3.0 (Rechenkette mit Quelle je Ebene), Kap. 3.1–3.6, Kap. 7, Kap. 8; `ParameterTable.tsx` Spalten „Quelle“, „Beleglage“, Schaltfläche „Herleitung“ | trägt |
 | A3 | Bei normativen Entscheidungen und Bewertungen sind „die zugrunde gelegten Prinzipien und Kriterien offenzulegen und zu dokumentieren“. | S. 42 (PDF 43), Kap. 2.1.3 | `95_hitzebelastung.md` Entscheidungslog 1–56 (Frage, Entscheidung, Begründung, Alternative, Auswirkung), Kap. 4 „Begriff definiert“ (konservativ = unterschätzend), Log 2 (YLL × VOLY nach MK 4.0) | trägt |
 | A4 | Entscheidungen mit normativen Aspekten auf der fachlichen Ebene werden nach Möglichkeit auf der normativen Ebene vorbereitet; sonst werden „Entscheidungen und ihre Grundlagen dokumentiert und die Legitimität der Entscheidungen nachträglich auf der normativen Entscheidungsebene hergestellt“. | S. 42 (PDF 43), Kap. 2.1.3 | `95_hitzebelastung.md` Kap. 7 (Kommentar je `abschaetzung_kap3`), Log 40–56 („festgelegt vom methodik_manager“), Überstimmungsweg; `register.md` Spalte „Effektgröße“; `ParameterTable.tsx` `saveOne` (Quelle Pflicht bei Abweichung), Status „Default“/„Override“ | trägt teilweise |
 | A5 | Jeder Arbeitsschritt ist der fachlichen Arbeitsebene oder der normativen Entscheidungsebene und den beteiligten Akteuren zugeordnet (Tabelle 3: K, E, N, I). | S. 41–42 (PDF 42–43), Kap. 2.1.3 mit Tabelle 3 | `95_hitzebelastung.md` Kopf (Status, Instruktionsquelle), Log 34, 41, 42, 51–56 (Urheber der Entscheidung); `register.md` und `ParameterTable.tsx` „Abschätzung von KAP3“ als Urheber je Parameter | trägt teilweise |
-| A6 | Die Wissensgrundlage wird offengelegt: „Literaturauswertungen, Analysen von Daten und Modellergebnissen sowie zahlreiche[] Experteninterviews“, samt Recherchezeitraum („bis Anfang 2020“, Anpassungskapazität „bis Ende September 2020“). | S. 35 (PDF 36), Kap. 1.3 letzter Absatz | `95_hitzebelastung.md` Kap. 8 (Vollzitat, DOI, Zugriffsdatum, bei neueren Quellen Abrufzeit und SHA-256), Kap. 5 („Suche 27.09.2026“); `register.md` Spalten „Quelle“ und „Studientyp“; `ParameterTable.tsx` Spalte „Quelle“ mit `source_detail` und `references` | trägt |
+| A6 | Die Wissensgrundlage wird offengelegt: „Literaturauswertungen, Analysen von Daten und Modellergebnissen sowie zahlreiche[] Experteninterviews“, samt Recherchezeitraum („bis Anfang 2020“, Anpassungskapazität „bis Ende September 2020“). | S. 35 (PDF 36), Kap. 1.3 vorletzter Absatz | `95_hitzebelastung.md` Kap. 8 (Vollzitat, DOI, Zugriffsdatum, bei neueren Quellen Abrufzeit und SHA-256), Kap. 5 („Suche 27.09.2026“); `register.md` Spalten „Quelle“ und „Studientyp“; `ParameterTable.tsx` Spalte „Quelle“ mit `source_detail` und `references` | trägt |
 
 **Begründung je Urteil:**
 
 - A1: Je Parameter trennt das Produkt, was belegt ist, was aus anderen Parametern folgt und was KAP3 setzt: Der Bericht
   kennzeichnet jeden Block in Kap. 7 nach der Regel aus Log 40, die Parameterliste zeigt die Kennzeichnung ohne Klick in
-  der Spalte „Beleglage“ („Abschätzung KAP3“, „berechnet“, belegt). Die Trennung der Quelle ist aber eine zwischen Analyse
-  und Bewertung. Unter „Abschätzung von KAP3“ stehen im Produkt beide Arten: fachliche Annahmen (etwa „Heime mit und ohne
+  der Spalte „Beleglage“ („abgeschätzt (KAP3)“, „berechnet aus anderen Parametern“, „belegt“; Anzeigetexte aus
+  `evidenzAnzeige` in `frontend/src/utils/evidenceLabel.ts`). Die Trennung der Quelle ist aber eine zwischen Analyse
+  und Bewertung. Unter „abgeschätzt (KAP3)“ stehen im Produkt beide Arten: fachliche Abschätzungen (etwa „Heime mit und ohne
   Klimaanlage gleich groß“, Block `heat.s_gek`) und Bewertungsentscheidungen nach Abwägung (etwa die Voreinstellung
   „nein“ beim Doppelzählungs-Wächter, Block `heat.vg_in_kalibrierjahren`, gewählt nach dem erwarteten Fehler, Log 47).
   Die Parameterliste unterscheidet sie nicht.
@@ -1447,7 +1448,8 @@ Handlungsfeld, Verfahrensschritte der KWRA, in A5 herangezogen.
   Arbeitsebene beziehungsweise zur normativen Entscheidungsebene“ (neun Arbeitsschritte, Legende K, E, N, I); der Text
   stimmt mit dem Bild überein.
 - Belegdateien vollständig: `docs/evidenz/register.md`, `docs/methodik/95_hitzebelastung.md`,
-  `frontend/src/components/ParameterTable.tsx`.
+  `frontend/src/components/ParameterTable.tsx`; dazu die von `ParameterTable.tsx` eingebundene Datei
+  `frontend/src/utils/evidenceLabel.ts` (Anzeigetexte der Spalte „Beleglage“, 13 Zeilen).
 
 **Nicht gelesen:** die Zusammenfassung des Berichts (PDF 22–32), das Glossar (PDF 16–21), Kap. 1.5 ab PDF 37 und 1.6,
 Kap. 2.1.4 ab PDF 46 und alle späteren Kapitel; der Leitfaden Buth et al. 2017, auf den 2.1.3 sich stützt; im Produkt
@@ -1457,7 +1459,7 @@ die Backend-Stellen, die `evidence_class`, `source` und `custom_source` liefern,
 teilweise (A1, A4, A5) und keine nicht. Zur Frage der Gegenprobe: Eine Quelle je Parameter und die Kennzeichnung von
 Abschätzungen verlangt die Fundstelle nicht wörtlich; was sie verlangt, transparente Schritte, offengelegte Prinzipien
 und dokumentierte Grundlagen, tragen der Bericht zur Hitzebelastung und die Parameterliste. Es fehlen die Trennung von
-fachlicher Annahme und Bewertungsentscheidung, die Zuordnung der Schritte zu Ebene und Akteur, eine Bestätigung der
+fachlicher Abschätzung und Bewertungsentscheidung, die Zuordnung der Schritte zu Ebene und Akteur, eine Bestätigung der
 Setzungen durch die Kommune und die Kennzeichnung der Abschätzungen im Evidenz-Register. Der Status der Zeile 3 ist in
 derselben Änderung auf `teilweise` gesetzt; `backend/tests/test_konformitaet_zeile3.py` schreibt Status und Lücke fest,
 `backend/app/data/konformitaet_kundentext.py` führt den Kundensatz. Die Zählungen in den Abschnitten „Nachtrag:
