@@ -52,6 +52,14 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
         "Empfindlichkeit zu, anders als die Wirkungskette, und der Bericht nennt die Empfindlichkeit stellenweise "
         "„Vulnerabilität“, einen Begriff, den das amtliche Vorbild vermeidet.",
     ),
+    5: (
+        "teilweise",
+        "Die Methodik-Berichte nennen, welche Schäden und Konten sie nicht enthalten, auf welches "
+        "Klima sich der Betrag bezieht und wie unsicher die Werte sind; sie sagen aber nicht, dass "
+        "der Betrag eine genauere örtliche oder fachliche Risikoanalyse nicht ersetzt und die "
+        "gerechneten Wirkungen von Maßnahmen keine Empfehlung sind. Was von außerhalb der Kommune "
+        "wirkt und welche Chancen der Klimawandel mit sich bringen kann, benennen sie ebenfalls nicht.",
+    ),
     6: (
         "teilweise",
         "Die Reihenfolge, in der neue Klimawirkungen ins Produkt aufgenommen werden, ist nicht für "

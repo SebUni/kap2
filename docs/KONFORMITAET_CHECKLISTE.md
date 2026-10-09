@@ -16,7 +16,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 2 | Das Klimarisiko ist ausdrücklich als "Risiko ohne (weitere) Anpassung" auszuweisen und von einem Zustand "mit Anpassung" begrifflich zu unterscheiden. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 | teilweise | docs/methodik/61_vegetation_in_siedlungen.md | Nur der Methodik-Bericht zu Vegetation in Siedlungen weist einen Vergleichswert "ohne Anpassung" explizit in KWRA-Terminologie aus. Für die übrigen vorliegenden Methodik-Berichte fehlt ein systematischer, unter diesem Begriff geführter Ausweis; die Aufgabenbeschreibung (docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md) definiert die Unterscheidung "ohne Anpassung"/"mit Anpassung" bislang nicht als eigenen Pflichtabschnitt. |
 | 3 | Für jeden in die Bewertung eingehenden Parameter beziehungsweise Faktor ist die zugrunde gelegte Quelle offenzulegen und zu dokumentieren; ist keine Quelle vorhanden, ist die Abschätzung als solche kenntlich zu machen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.3 (S. 42, Tabelle 3) und Kap. 1.3 (S. 34) | teilweise | docs/evidenz/register.md, docs/methodik/95_hitzebelastung.md, frontend/src/components/ParameterTable.tsx | Die Fundstelle verlangt keine Quelle je Parameter, sondern getrennte Ebenen, transparente Arbeitsschritte und dokumentierte Grundlagen normativer Entscheidungen; das tragen docs/methodik/95_hitzebelastung.md (Kennzeichnung je Block in Kap. 7, Entscheidungslog) und frontend/src/components/ParameterTable.tsx (Spalten „Quelle“ und „Beleglage“ mit Herleitung). Es fehlt: docs/evidenz/register.md weist Setzungen von KAP3, die der Bericht als Abschätzung kennzeichnet, nicht als solche aus (95-E02-01 nennt für Süd 0,0531 statt der Nachschätzung 0,0876, 95-S152-01 die Altersfaktoren, 95-S158-01 den Faktor 0,939 des Hitzeaktionsplans); frontend/src/components/ParameterTable.tsx trennt fachliche Abschätzungen nicht von Bewertungsentscheidungen wie Voreinstellungen nach Fehlerabwägung, ordnet die Arbeitsschritte nicht wie Tabelle 3 einer Ebene und einem Akteur zu und erfasst bei einer Änderung nur Wert und Quelle, sodass ein eigener Wert der Kommune nicht als ihre Abschätzung gekennzeichnet und eine Setzung von KAP3 nicht ausdrücklich bestätigt werden kann. Einzelnachweis: Abschnitt „Gegenprobe Zeile 3“. |
 | 4 | Sensitivität (Anfälligkeit eines Systems gegenüber einem klimatischen Einfluss) und räumliche Exposition (Vorhandensein potenziell betroffener Systemelemente) sind begrifflich und methodisch getrennt zu führen, nicht zu vermischen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 (S. 44) | teilweise | docs/methodik/95_hitzebelastung.md | Der Bericht zur Hitzebelastung (docs/methodik/95_hitzebelastung.md) rechnet in Schicht B Exposition und Sensitivität als getrennte Faktoren: die Bevölkerung je Zelle (R35) als Exposition, Altersfaktoren, Basissterberaten, Restlebenserwartung, Heim- und Isolationsterm (S152, S153) als Sensitivität; ohne Einwohner ist die Wirkung null, und alle Maßnahmen-Hebel setzen an Sensitivitätsknoten an. Drei Dinge fehlen. Erstens führt die Knoten-Bilanz die Einwohner je Altersband (pop_a) zugleich bei S152 und bei R35, und Ebene 1 der Rechenkette (Kap. 3.0) fasst Einwohnerzahl (Exposition) und Altersaufbau (Sensitivität) in einer Größe, ohne die Zerlegung als Exposition × Sensitivität hinzuschreiben; keine Ebene der Rechenkette nennt ihre Komponente. Zweitens ordnet Schicht A (Kap. 3.7) die Ebenen Altersstruktur und vulnerable Gruppen der Exposition Ê (R35) zu und den Zugang zur Gesundheitsversorgung (R36, in der Kette ein räumlicher Knoten) der Vulnerabilität V̂ (S152–S158); R36 rechnet auch sonst als Modulator der Anfälligkeit (Distanzterm, Log 20), ohne dass der Bericht die Umordnung von der Exposition zur Sensitivität begründet. Drittens heißt die Sensitivität stellenweise „Vulnerabilität“ (Register 95-S152-02, Kap. 3.1, Log 12), ein Begriff, den die KWRA vermeidet, und „Sensitivität“ steht zugleich für die Sensitivitätsrechnung („Sensitivitätsband“ bei S153 und R36). Einzelnachweis: Abschnitt „Gegenprobe Zeile 4“. |
-| 5 | Die Analyse muss ihre methodischen Grenzen und ihren Anwendungsbereich explizit benennen, insbesondere dass sie keine detailliertere lokale oder sektorale Risikoanalyse ersetzt. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 1.4 (S. 35) | erfüllt | docs/methodik/95_hitzebelastung.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | — |
+| 5 | Die Analyse muss ihre methodischen Grenzen und ihren Anwendungsbereich explizit benennen, insbesondere dass sie keine detailliertere lokale oder sektorale Risikoanalyse ersetzt. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 1.4 (S. 35) | teilweise | docs/methodik/95_hitzebelastung.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | Einzelne Grenzen benennen beide Berichte: docs/methodik/95_hitzebelastung.md (Konto-Einbettung, Kap. 4, Kap. 6, Infokasten 1) und docs/methodik/60_gebaeudeschaeden_flusshochwasser.md (Geltungsbereich, Kap. 6, Infokasten) nennen Kontoumfang und Ausschlüsse, Zeitbezug, Unsicherheiten und die Herkunft der Evidenz. Den Anwendungsbereich des Ergebnisses benennen sie nicht. Keiner sagt, dass der Betrag eine detailliertere lokale oder sektorale Risikoanalyse nicht ersetzt; beide nennen nur einzelne Grenzen der Genauigkeit am Ort (docs/methodik/95_hitzebelastung.md: Wärmeinsel unter 1 km nur als Modellrechnung, unbekannt, welche Heime gekühlt sind; docs/methodik/60_gebaeudeschaeden_flusshochwasser.md: NHK-Wertsatz ohne Regionalfaktor, DGM1-Höhenfehler, S092 als kommunenweiter Pauschalfaktor). Keiner sagt, dass die Maßnahmen-Hebel keine Empfehlung sind und Auswahl, Ausgestaltung und Bündelung der Maßnahmen Sache der Anpassungsplanung der Kommune bleiben. Was von außerhalb der Kommune wirkt (überregionale und weltweite Rückwirkungen) und dass Chancen des Klimawandels nicht betrachtet werden, benennt keiner. docs/methodik/60_gebaeudeschaeden_flusshochwasser.md ist nur in Kopf, Kap. 1 und Kap. 6 gelesen, docs/methodik/95_hitzebelastung.md ohne den Entscheidungslog. Einzelnachweis: Abschnitt „Gegenprobe Zeile 5“. |
 | 6 | Klimawirkungen sind anhand des Klimarisikos (ohne Anpassung, pessimistischer Fall) und der Anpassungsdauer in Prioritätsstufen "sehr dringende" und "dringende" Handlungserfordernisse einzustufen, damit erkennbar ist, wo Anpassung schon jetzt beginnen muss. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.1 (S. 136–140) | teilweise | frontend/src/pages/roadmap/roadmapData.ts, docs/KATALOG_KRITIK.md | Die Produkt-Roadmap übernimmt die KWRA-Kategorie "sehr dringende Klimawirkungen" wörtlich, um die Ausbaureihenfolge zu begründen (zuerst die drei sehr dringenden Gesundheits-Klimawirkungen, danach 15 weitere). Es gibt aber keine im Produkt selbst nachvollziehbare, aus Klimarisiko und Anpassungsdauer hergeleitete Einstufung je Klimawirkung, und laut docs/KATALOG_KRITIK.md sind 10 der bundesweit 31 "sehr dringenden" Klimawirkungen im heutigen Katalog nicht abgebildet, weil sie ausgewählt statt systematisch aus der KWRA-Einstufung hergeleitet wurden. |
 | 7 | Klimawirkungen mit sehr dringenden Handlungserfordernissen sind anhand von Anpassungspotenzial und Bewertungsgewissheit in Charakterisierungsgruppen (Umsetzung, Entwicklung, Entwicklung unter Unsicherheit, Innovation, Innovation unter Unsicherheit) einzuordnen, um den Handlungstyp zu benennen. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.2 (S. 140–145) | teilweise | backend/app/services/charakterisierung.py, backend/app/services/gewissheit.py, backend/app/api/routes/catalog.py, backend/tests/test_charakterisierungsgruppen.py | Die fünf Gruppen und eine dokumentierte Entscheidungstabelle sind vorhanden, die Schwellen sind nach P1 als Abschätzung von KAP3 ausgewiesen. Es fehlt aber, was die Einordnung nach Kap. 6.2 trägt: Beschlossene und weiterreichende Maßnahmen werden nicht getrennt, und es gibt keinen optimistischen und pessimistischen Fall. „Innovation“ heißt im Produkt nur, dass der Katalog keinen verknüpften Hebel ab 10 % hat, nicht, dass auch alle Maßnahmen das Ziel verfehlen. Die Gewissheit enthält nicht die Gewissheit der Anpassungskapazität. Die Ausnahme der KWRA für die Allergien (Bewertung auf Basis der beschlossenen Maßnahmen, Fn. 28/29) fehlt, ebenso eine gerechnete Sensitivität der Zuordnung und das Handlungserfordernis je Gruppe. Eingeordnet wird jeder Katalogcode, nicht nur die sehr dringenden. Ergebnis: Nur #95 Hitzebelastung liegt wie in Tabelle 27 in „Entwicklung“. #96 Aeroallergene (KWRA „Umsetzung“) und #98 UV-Schädigungen (KWRA „Entwicklung“) landen mit Anpassungspotenzial 0 in „Innovation“, weil keine Maßnahme im Rechenweg wirkt: Die Pollen-Frühwarnung ist nur qualitativ verknüpft, für UV gibt es keine Maßnahme. Die Modellgrenze der API nennt diese Ursache nicht. Einzelnachweis: Abschnitt „Gegenprobe Zeile 7“. |
 | 8 | Die Bewertungsgewissheit ist für jede Klimawirkung auf einer einheitlichen, mehrstufigen Skala (sehr gering bis hoch) auszuweisen und handlungsfeldübergreifend vergleichbar zu machen, damit erkennbar ist, wo hohe Unsicherheiten vorsichtige Interpretation erfordern. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 3.3 (S. 78–82) | teilweise | backend/app/services/gewissheit.py, backend/app/api/routes/catalog.py, backend/tests/test_gewissheitsstufe.py | Die Skala stimmt: Jede Klimawirkung des Katalogs trägt eine Stufe auf der vierstufigen Skala der KWRA (sehr gering, gering, mittel, hoch), gebildet nach derselben dokumentierten Regel. Die Herleitung passt aber nicht. Die KWRA bewertet die Gewissheit je Zeitscheibe (Mitte und Ende des Jahrhunderts) aus fünf Teilaspekten: Vorhandensein und Zuverlässigkeit der Daten, Kenntnis der Wirkzusammenhänge, Genauigkeit und Plausibilität der Modellannahmen, Eindeutigkeit der Trends. Das Produkt misst nur den Anteil der Rechenparameter mit Evidenzklasse „belegt“, ohne Zeitscheibe. Damit misst es die Quellenlage der Rechnung, nicht die Gewissheit des Klimarisikos, und widerspricht der KWRA bei den eigenen Klimawirkungen: #98 UV-Schädigungen steht im Produkt auf „hoch“, bei der KWRA zum Ende des Jahrhunderts auf „sehr gering“; ein einziger abgeschätzter Parameter senkt #95 Hitzebelastung (Mortalität) auf „mittel“. Es fehlen zudem die Mittelung je Handlungsfeld und Cluster mit Grad (Tabelle 17), die Änderung zwischen den Zeitscheiben, der Bezug zur Höhe des Klimarisikos (Abbildung 7) und ein handlungsfeldübergreifender Vergleich: Der aktive Katalog hat nur das Handlungsfeld „Menschliche Gesundheit“. Einzelnachweis: Abschnitt „Gegenprobe Zeile 8“. |
@@ -1587,6 +1587,135 @@ nennt, was fehlt, `backend/tests/test_konformitaet_zeile4.py` schreibt Spaltenza
 `backend/tests/test_ergebnisbericht_teil2_kundentext.py` für den fehlenden Kundensatz Zeile 5 als Beispiel; der
 Prüfgehalt bleibt gleich. Die Zählungen in den Abschnitten „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind
 damit weiter überholt; sie nachzuziehen ist Sache der Gesamtzählung, nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 5 gegen KWRA 2021, Teilbericht 1, Kap. 1.4
+
+Frage: Benennen die beiden Belege der Zeile ihre methodischen Grenzen und ihren Anwendungsbereich so, wie Kap. 1.4 die
+Grenzen der KWRA 2021 benennt, insbesondere dass sie eine detailliertere lokale oder sektorale Risikoanalyse nicht
+ersetzen? Gelesen wurde `docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf` (KWRA 2021, Teilbericht 1:
+Grundlagen, 215 PDF-Seiten). Die gedruckte Seitenzahl ist die PDF-Seitenzahl minus 1; die Spalte „Seite“ nennt die
+gedruckte Seite, die PDF-Seite in Klammern. Die Fundstelle stimmt im Kapitel, in der Seite nur zum Teil: Kap. 1.4 „Die
+Grenzen der KWRA 2021“ beginnt auf S. 35 (PDF 36) und endet auf S. 36 (PDF 37) mit dem Absatz zur Heterogenität der
+Grundlagen, vor Kap. 1.5.
+
+**Befund zum Wortlaut der Zeile.** Kap. 1.4 stellt keine Anforderung an andere Analysen. Es beschreibt, was die KWRA 2021
+selbst nicht leistet („eine Anzahl von Fragen wurden bewusst nicht adressiert“, S. 35, PDF 36). Der Satz zur lokalen
+Ebene lautet: „Durch die Breite der vorliegenden Untersuchung können die Ergebnisse der Analyse auch nicht als
+unmittelbare Grundlage für die regionale oder lokale Anpassungsplanung dienen. Dafür werden detailliertere
+Risikoanalysen benötigt, die jeweils lokale und sektorale Gegebenheiten beachten.“ (S. 35, PDF 36). Die Zeile liest
+daraus die Pflicht, die eigenen Grenzen ebenso zu benennen. Geprüft wird unten, ob die Belege jede Art von Grenze, die
+Kap. 1.4 für die KWRA nennt, für sich selbst benennen. Für ein Produkt, das je Kommune und 100-m-Zelle rechnet, heißt die
+Grenze der lokalen Ebene: sagen, wie genau der Betrag am Ort ist und wofür er als Grundlage einer örtlichen Planung nicht
+reicht. Der Wortlaut der Zeile ist nicht geändert.
+
+Im Produkt gelesen: `docs/methodik/95_hitzebelastung.md` (2.537 Zeilen, Rev. 8, Fortschreibung 7, Status
+„abnahmereif“) in den Zeilen 1–2405, das sind Kap. 1–7 und Kap. 8 bis zur Quelle [70];
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` (3.585 Zeilen, Revision nach Review-Runde 3, nicht abgenommen) in
+den Zeilen 1–168 (Kopf mit Geltungsbereich, Ergebnis, Kap. 1) und 2249–2324 (Kap. 6 samt Infokasten), dazu die Liste
+aller Überschriften. Das Ticket verlangt beide Belege vollständig; das ist nicht erreicht (siehe „Nicht gelesen“).
+Ergänzend lief eine Stichwortsuche über beide Dateien ganz (Chancen, Kälte, „ersetzt nicht“, „ersetzt keine“, „kein
+Ersatz“, Empfehlung, Migration, weltweit); sie ersetzt das Lesen nicht. Ausgeführt wurde sonst nichts.
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | „So breit und vielfältig das Spektrum der behandelten Themen und Fragen auch ist, eine Anzahl von Fragen wurden bewusst nicht adressiert.“ Benannt wird, was die Analyse umfasst und was nicht. | S. 35 (PDF 36), Abs. 1 | `95_hitzebelastung.md` Kap. 1 „Konto-Einbettung“ (nur K1 aktiv, Untergrenze), Knoten-Bilanz (S154, W123 bewusst inaktiv), Kap. 6 Infokasten 1; `60_gebaeudeschaeden_flusshochwasser.md` Kopf „Geltungsbereich“, Kap. 1 „Nur K3 aktiv“, Kap. 6 Modellgrenzen 1 und 3, Versionsstempel | trägt |
+| A2 | Ziel ist nicht, „konkrete Maßnahmen zur Anpassung herauszuarbeiten oder Empfehlungen diesbezüglich auszusprechen“; die Identifizierung und Ausgestaltung von Maßnahmen und ihre Kombination in Maßnahmenbündeln sind Aufgabe nachfolgender Schritte. | S. 35 (PDF 36), Abs. 2 | `95_hitzebelastung.md` Kap. 1 (b) „Zustand mit Anpassung“, Kap. 5 (Hebel je gewählter Maßnahme, Kappung am Paketwert); `60_gebaeudeschaeden_flusshochwasser.md` Kap. 6 Modellgrenze 2 (S092 „keine Zellprognose“) | trägt teilweise |
+| A3 | Die Ergebnisse können „nicht als unmittelbare Grundlage für die regionale oder lokale Anpassungsplanung dienen“; dafür werden „detailliertere Risikoanalysen benötigt, die jeweils lokale und sektorale Gegebenheiten beachten“. | S. 35 (PDF 36), Abs. 3 | `95_hitzebelastung.md` Kap. 3.0 (eine Zelle statt aller Zellen), Kap. 4 (Streuung σ „keine Messung“, kommunale Stichproben-Abgleiche), Kap. 5 Modellgrenzen S157, Kap. 6 Modellgrenzen 3–5; `60_gebaeudeschaeden_flusshochwasser.md` Kap. 6 Modellgrenzen 2, 4, 5 und 6 | trägt teilweise |
+| A4 | Aufgabe ist nicht, „bereits sichtbare Klimawirkungen oder den Effekt von Anpassungsmaßnahmen zu untersuchen“ (Monitoring und Evaluation); die Analyse ist „zukunftsgerichtet“. Benannt wird der Zeitbezug. | S. 35 (PDF 36), Abs. 4 | `95_hitzebelastung.md` Kap. 1 „Gewissheit der KWRA-Bewertung“ und (a), Kap. 5 (Hebel als Abschätzung aus Studien), Kap. 6 „Szenario-Anwendung“ und „Jahresbeträge ohne Abzinsung“; `60_gebaeudeschaeden_flusshochwasser.md` Kap. 6 „Szenario-Anwendung 60-A“, Modellgrenze 8 | trägt |
+| A5 | „Die KWRA 2021 ist vorwiegend national ausgerichtet.“ Rückwirkungen des weltweiten Klimawandels, etwa infolge von Migration oder Risiken für die internationale Zusammenarbeit, werden nicht betrachtet. Benannt werden der räumliche Bezug und was von außerhalb fehlt. | S. 35 (PDF 36), Abs. 5 | `95_hitzebelastung.md` Kap. 3.5 (Kommune = Summe der Zellen), Kap. 6 „Raten-Darstellung und Aggregation“; `60_gebaeudeschaeden_flusshochwasser.md` Kap. 1 „Weitergaben“, Kap. 6 „Szenario-Anwendung 60-A“ | trägt teilweise |
+| A6 | „Chancen, die sich teils auch aus dem Klimawandel ergeben, werden nicht systematisch untersucht.“ | S. 35 (PDF 36), Abs. 6 | keiner: In den gelesenen Teilen beider Belege steht kein Satz zu Chancen oder günstigen Wirkungen des Klimawandels, und die Stichwortsuche über beide Dateien ganz findet keinen | trägt nicht |
+| A7 | Aussagen über die Zukunft sind „immer mit Unsicherheiten behaftet“ (fehlende Daten und Modelle, Wissenslücken, heutige Entscheidungen; Klimasystem und sozioökonomische Entwicklung); sie „sollten bei der Lektüre des Berichtes im Blick behalten werden“. | S. 35 (PDF 36), Abs. 7 | `95_hitzebelastung.md` Kap. 1 (Band je Parameter statt Stufe), Kap. 3.6 (Ebene q_1P „geparkt — Datenquelle fehlt“), Kap. 4 „Unsicherheiten“ und Zusatz-Anker Berlin, Kap. 6 Stationaritätsannahmen und Modellgrenzen 1–6, Kap. 7 Bänder; `60_gebaeudeschaeden_flusshochwasser.md` Ergebnis „Offen“ (λ vorläufig), Kap. 6 Stationaritätsannahmen, Modellgrenzen 2 und 4–8 | trägt |
+| A8 | Die „Heterogenität der Grundlagen“ ist „bei der Interpretation der Ergebnisse zu berücksichtigen“. | S. 36 (PDF 37), Abs. 1 | `95_hitzebelastung.md` Kap. 2 Register (Spalten Studientyp, Übertragbarkeit), Kap. 7 „Kennzeichnung `berechnet`“ und Kennzeichnung je Block; `60_gebaeudeschaeden_flusshochwasser.md` Kopf „Geltungsbereich“ (7 von 32 Registerzeilen belegt, Abschätzungen von KAP3 gekennzeichnet) | trägt |
+
+**Begründung je Urteil:**
+
+- A1: Der Bericht zur Hitzebelastung sagt in Kap. 1, dass nur K1 aktiv ist, K2 (#87) ab Stufe M3 und K8 ab Stufe M5
+  folgen und der Betrag „bewusst als Untergrenze“ gilt; Infokasten 1 sagt dem Nutzer, was nicht enthalten ist
+  (Arbeitsproduktivität, Sach- und Infrastrukturschäden, Vorsorgekosten). Nicht gerechnete Knoten tragen eine Begründung
+  (S154 Log 15, W123 Log 11). Der Bericht zum Flusshochwasser grenzt im Kopf ab, was befüllt und entschieden ist, führt die
+  25 inaktiven Registerzeilen mit Begründung, nennt in Kap. 6 Nr. 1 und 3 die fehlenden Konten K1, K4, K5 und K8 und die
+  Nichtwohngebäude; der Versionsstempel lautet „Untergrenze im Kontoumfang (nur K3, nur Wohngebäude)“.
+- A2: Anders als die KWRA rechnen beide Belege Maßnahmen. Der Bericht zur Hitzebelastung sagt, der Wert „mit Anpassung“
+  entstehe „erst, wenn eine Kommune Maßnahmen wählt“ (Kap. 1 (b)), und regelt, wie mehrere Hebel zusammenwirken
+  (Faktoren multipliziert, Kappung am Paketwert 0,794, Kap. 5). Kein Satz sagt, ob die Hebelbeträge eine Empfehlung sind
+  oder nur die geschätzte Wirkung einer gewählten Maßnahme, und dass Auswahl, Ausgestaltung und Bündelung der Maßnahmen
+  Sache der Anpassungsplanung der Kommune bleiben. Der Bericht zum Flusshochwasser nennt S092 in Kap. 6 Nr. 2 einen
+  „kommunenweiten Pauschalfaktor“, „keine Zellprognose“; seine Kap. 5 ist nicht gelesen.
+- A3: Viele Grenzen der Genauigkeit am Ort sind benannt. Der Bericht zur Hitzebelastung rechnet die Wärmeinsel unter 1 km
+  als Modellrechnung, „keine Messung“ (Kap. 3.0 (d), Kap. 4), sagt, „der Betrag je Zelle zeigt keine heißen Stellen unter
+  1 km“ (Kap. 4), welche Heime gekühlt sind, „weiß weder der Bericht noch das Produkt“ (Kap. 5, S157), und nennt die Güte
+  des Stadtmodells und den Skalentransfer von der Region auf die Zelle (Kap. 6 Nr. 3 und 5). Der Bericht zum
+  Flusshochwasser nennt den bundeseinheitlichen NHK-Wertsatz ohne Regionalfaktor (± 20 %), den DGM1-Höhenfehler, die nicht
+  deckungsgleichen Zonierungen und S092 ohne Wirkung je Zelle (Kap. 6 Nr. 2 und 4–6). Es fehlt der Satz, den Kap. 1.4 für
+  die KWRA setzt: dass der Betrag eine detailliertere lokale oder sektorale Analyse nicht ersetzt und wofür er als
+  Grundlage einer örtlichen Planung nicht reicht. Der Leser erfährt Einzelgrenzen, nicht den Anwendungsbereich des
+  Ergebnisses. Die Stichwortsuche fand den Satz auch in den nicht gelesenen Teilen nicht.
+- A4: Der Bericht zur Hitzebelastung nennt seinen Zeitbezug ausdrücklich: Er rechnet „das *heutige* Klima“ aus gemessenen
+  Größen, anders als die KWRA, die das künftige Risiko bewertet (Kap. 1); „M0 weist das Ist-Klima aus“, Szenarien folgen
+  ab Stufe M1, und alle Euro-Beträge gelten „für ein Jahr im heutigen Klima“ (Kap. 6). Anpassung, die in den
+  Kalibrierjahren schon wirkte, steckt im Basiswert (Kap. 1 (a)); die Hebel sind als Abschätzungen aus Studien
+  gekennzeichnet, nicht als gemessene Wirkung in der Kommune (Kap. 5). Der Bericht zum Flusshochwasser beschreibt, was im
+  Szenariojahr verschoben und was konstant gehalten wird (Kap. 6, Modellgrenze 8). Dass die Belege anders als die KWRA das
+  heutige Klima rechnen, ist hier kein Mangel: Kap. 1.4 nennt den Zeitbezug als Grenze, und beide nennen ihn. Die fehlende
+  Differenz zwischen Bezugszeitraum und künftigem Zeitraum hält Zeile 1 fest.
+- A5: Den räumlichen Bezug nennen beide: Gerechnet wird je 100-m-Zelle, die Kommune ist die Summe der Zellen (#95 Kap. 3.5
+  und Kap. 6; #60 Kap. 6 „je Zelle“). Was von außerhalb der Kommune wirkt, nennt keiner. Der Bericht zur Hitzebelastung
+  rechnet die Belastung am Wohnort; dass Menschen sie auch anderswo erleiden, steht nicht als Grenze da, die
+  Pendlerstruktur nur als Erklärung eines Ausreißers der Kalibrierung (Brandenburg 1,42, Kap. 4). Der Bericht zum
+  Flusshochwasser führt keine ausgehende Kante und grenzt seeseitige Schäden ab (Kap. 1), sagt aber nicht, dass Folgen
+  außerhalb der Kommune nicht zählen. Überregionale oder weltweite Rückwirkungen benennt keiner.
+- A6: Kap. 1.4 nennt die Beschränkung auf Risiken ausdrücklich als Grenze. Beide Belege rechnen nur Schäden, ohne das zu
+  sagen. Bei der Hitzebelastung läge eine günstige Wirkung nahe (weniger Todesfälle durch Kälte in milderen Wintern), bei
+  Gebäudeschäden durch Hochwasser kaum; ein Satz, dass günstige Wirkungen nicht betrachtet werden, fehlt in beiden.
+- A7: Der Bericht zur Hitzebelastung weist die Unsicherheit als Band je Parameter aus (Kap. 1, Kap. 7), nennt fehlende
+  Daten (Ebene q_1P „geparkt — Datenquelle fehlt“, Kap. 3.6), die Unsicherheiten der Kalibrierung (Kap. 4), eine offene
+  Abweichung („Die Lücke bleibt unerklärt“, Zusatz-Anker Berlin, Kap. 4), die Stationaritätsannahmen und sechs
+  Modellgrenzen (Kap. 6); für Szenarien bleibt die Bevölkerung konstant (Kap. 6). Der Bericht zum Flusshochwasser nennt den
+  Niveau-Skalar vorläufig, weil die Verteilungsprüfung nicht bestanden ist (Ergebnis), dazu Stationaritätsannahmen und die
+  Modellgrenzen 2 und 4–8 mit Richtung des Fehlers.
+- A8: Der Bericht zur Hitzebelastung führt je Registerzeile Studientyp und Übertragbarkeit (etwa „Chicago 1995“,
+  „Ontario 2010–2023“, „Übertragbarkeit zu schwach für den Basiswert“) und kennzeichnet jeden Parameter als `quelle`,
+  `berechnet` oder `abschaetzung_kap3` (Kap. 7); der Leser sieht, worauf welche Zahl beruht. Der Bericht zum Flusshochwasser
+  sagt im Kopf, dass 7 von 32 Registerzeilen belegt und 25 bewusst inaktiv sind und jede Abschätzung von KAP3 in ihrer
+  Registerzeile gekennzeichnet ist; sein Register (Kap. 2) ist nicht gelesen.
+
+Nicht als eigene Anforderung gewertet: der erste Satz von Kap. 1.4 (breiter Umfang, Analyse der Anpassungskapazität), der
+Verweis auf Monitoringbericht und Evaluation der DAS (UBA 2019a, 2019b), „Im Vordergrund steht, die sich ergebenden
+Problemlagen zu skizzieren und Handlungspotenziale zu benennen“ (S. 35) und „Durch die große Palette von Expertisen
+wurden sektorenübergreifende Betrachtungen erst möglich“ (S. 36), alles Selbstbeschreibung der KWRA; in A4, A6 und A8
+herangezogen.
+
+**Gelesene Seiten und Abschnitte:**
+
+- Inventar mit `python3 /home/basti/overlord/overlord/skripte/dokumente.py inventar` (215 PDF-Seiten; Gliederung,
+  Abbildungen und Tabellen je Seite).
+- Inhaltsverzeichnis ganz: PDF 7–8 (gedruckt S. 6–7).
+- Text PDF 33–38 (gedruckt S. 32–37) ganz: Kap. 1 Einleitung mit 1.1, 1.2, 1.3, 1.4 und 1.5 ganz, PDF 38 mit Abbildung 1
+  und Fußnote 4. Kapitelgrenzen geprüft: 1.4 beginnt auf S. 35 (PDF 36) nach dem Ende von 1.3 und endet auf S. 36
+  (PDF 37) vor der Überschrift 1.5. Kap. 1.4 hat keine Fußnoten; Fußnote 4 auf PDF 38 gehört zu Abbildung 1 in Kap. 1.5.
+  Kap. 1.4 hat keine Tabelle und keine Abbildung; keine Seite als Bild angesehen.
+- `docs/methodik/95_hitzebelastung.md` Zeilen 1–2405 (Kopf, Kap. 1–7, Kap. 8 bis [70]).
+- `docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` Zeilen 1–168 (Kopf, Geltungsbereich, Ergebnis, Kap. 1) und
+  2249–2324 (Kap. 6 mit Infokasten), dazu alle Überschriften.
+
+**Nicht gelesen:** die Zusammenfassung des Berichts (PDF 22–32), das Glossar (PDF 16–21) und Kap. 1.6 ab PDF 39; in
+`docs/methodik/95_hitzebelastung.md` die Zeilen 2406–2537 (Rest der Quellen ab [70] und der Entscheidungslog); in
+`docs/methodik/60_gebaeudeschaeden_flusshochwasser.md` die Zeilen 169–2248 (Kap. 2–5) und 2325–3585 (Kap. 7–9 und
+Entscheidungslog). Das Ticket verlangt beide Belege vollständig; das Lesen wurde wegen des Laufbudgets abgebrochen. Die
+Urteile zu #60 stützen sich nur auf die gelesenen Teile und die Stichwortsuche.
+
+**Schluss:** Zeile 5 bleibt nicht `erfüllt`. Von 8 Anforderungen tragen die Belege vier voll (A1, A4, A7, A8), drei
+teilweise (A2, A3, A5) und eine nicht (A6). Zur Frage der Gegenprobe: Einzelne Grenzen benennen beide Berichte
+ausführlich, Kontoumfang, Zeitbezug, Unsicherheiten und Herkunft der Evidenz. Den Anwendungsbereich des Ergebnisses
+benennen sie nicht: Kein Satz sagt, dass der Betrag eine detailliertere lokale oder sektorale Risikoanalyse nicht
+ersetzt, dass die Maßnahmen-Hebel keine Empfehlung sind, was von außerhalb der Kommune fehlt und dass Chancen nicht
+betrachtet werden. Der Status hängt nicht an den nicht gelesenen Teilen: A6 trägt schon im Bericht zur Hitzebelastung
+nicht, und auch ein Satz in #60 höbe das Urteil höchstens auf „trägt teilweise“. Der Status der Zeile 5 ist in derselben
+Änderung auf `teilweise` gesetzt; `backend/tests/test_konformitaet_zeile5.py` schreibt Spaltenzahl, Status und Lücke fest,
+`backend/app/data/konformitaet_kundentext.py` führt den Kundensatz. Weil Zeile 5 nicht mehr `erfüllt` ist, nimmt
+`backend/tests/test_ergebnisbericht_teil2_kundentext.py` für den fehlenden Kundensatz Zeile 23 als Beispiel; der
+Prüfgehalt bleibt gleich. Die Zählungen in den Abschnitten „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit
+weiter überholt; sie nachzuziehen ist Sache der Gesamtzählung, nicht dieser Gegenprobe.
 
 ## Ergebnis
 
