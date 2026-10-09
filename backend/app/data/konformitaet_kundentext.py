@@ -21,7 +21,7 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
     1: (
         "teilweise",
         "Von den beiden Methodik-Berichten, an denen diese Anforderung geprüft wurde, leitet der zur "
-        "Hitzebelastung den Betrag über die Wirkungskette her und rechnet die Hitze, die "
+        "Hitzebelastung (Anlage M95) den Betrag über die Wirkungskette her und rechnet die Hitze, die "
         "Empfindlichkeit der Bevölkerung und die Zahl der Betroffenen getrennt; der zur Vegetation "
         "in Siedlungen stellt die Wirkungskette erst auf und rechnet sie noch nicht. Beide Berichte "
         "erklären nicht, welche Kennbuchstaben der Wirkungskette für welchen der drei Bausteine "
