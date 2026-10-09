@@ -21,10 +21,12 @@ Die drei Blöcke der Maßnahme S155 (``uv.s155_dosisminderung``, ``uv.s155_a_erk
 
 Benannte Ausnahme:
 
-* ohne eigene Stelle im Code (Abweichung, dem Vorhaben gemeldet; der Test stellt fest, dass
-  es dabei bleibt): ``uv.ssd_delta_region`` (Wert ist eine CSV, im Produkt die Ebene
-  UV_RADIATION), ``uv.i_raten_roh`` (dieselben Werte wie ``uv.i_mm`` und ``uv.i_c44``),
-  ``uv.r_out_sensitivitaet`` (keine Spec).
+* ohne eigene Stelle im Code, weil keiner der drei Blöcke im Produkt eigens wirkt (Befund 497
+  im Ledger 98; der Test stellt fest, dass es dabei bleibt): ``uv.ssd_delta_region`` (Wert ist
+  eine CSV der Kalibrierung, die kein Produktcode liest; je Zelle wirkt die Ebene UV_RADIATION),
+  ``uv.i_raten_roh`` (dieselben Werte wie ``uv.i_mm`` und ``uv.i_c44``, die wirken),
+  ``uv.r_out_sensitivitaet`` (abgeleitetes Band ohne Spec; r_out wirkt über ``uv.or_out``,
+  ``uv.qbar_out`` und ``uv.r_out_enabled``).
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 # Methodik-Bericht #98 — UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)
 
-Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–494)** ·
+Status: **Rev. 15 (Neufassung nach Fortschreibung 7, Null-Runden der Teile 1–3 in den Runden 24, 31 und 36; Befunde 336–505)** ·
 05.10.2026 ·
 Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzungsgrundlage:
 **Ansatz 98-A** (amtliche Inzidenz + Trend-Attribution über BAF; Entscheidungslog Nr. 1)
@@ -139,7 +139,7 @@ Instruktionsquelle: `docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md` (v2) · Umsetzun
 > `backend/data/kalibrierung/k_uv_raumstreuung.{csv,md}` (räumliche Streuung von \(k_{\text{UV}}\),
 > Modellgrenze 9; Festlegung zu Befund 449: \(k_{\text{UV}}\) bleibt Bundeswert **0,7119**).
 > Bundessumme unverändert **339 Mio. €** je Jahr (Preisstand 2024). Zurückgestellt sind
-> 453, 463 und 481, behoben ist 479; 480–485 stammen aus der Schlussprüfung (Ledger, Abschnitte »Null-Runde nach Fortschreibung 7« und »Schlussprüfung Teil 1/3«). Mit 482 folgt §3.7 der Knoten-Bilanz in Kapitel 1: In Schicht A rechnet als Vulnerabilität allein R36; keine Zahl ändert sich.
+> 453, 463 und 481, behoben ist 479 (Stand 05.10.2026; 453 und 481 sind seither geschlossen, den aktuellen Stand führt der Ledger, Befund 504); 480–485 stammen aus der Schlussprüfung (Ledger, Abschnitte »Null-Runde nach Fortschreibung 7« und »Schlussprüfung Teil 1/3«). Mit 482 folgt §3.7 der Knoten-Bilanz in Kapitel 1: In Schicht A rechnet als Vulnerabilität allein R36; keine Zahl ändert sich. Schlussprüfung des Abgleichs T-1662-ceo (08.10.2026, Befunde 495–505): §1 (d) und §3.0 beschreiben keinen Produktstand mehr (495, 505), §1 (b) und Kapitel 5 nennen den Vermerk zu S158 als Vorgabe an das Produkt (502), Kapitel 4 ordnet die Latenz dem Transient-Faktor \(\tau\) zu (496); keine Zahl ändert sich.
 >
 > Status je Befund in `reviews/BEFUNDE_98.md`. Diese Markdown-Datei ist die Quelle für
 > #98 (§2.7). Alle Ermessensentscheidungen im **Entscheidungslog** (Ende der Datei).
@@ -212,8 +212,8 @@ mit Kommunikation (S155)** ist eine Abschätzung von KAP3: Er senkt die Dosis um
 damit den Betrag für Berlin nach vollem Einlauf um 252.500 € (Preisstand 2024) je Jahr (Band
 70.100–631.200 €), das sind 2,2 % des Basiswerts. Die Wirkung läuft über Jahrzehnte ein: nach 10, 20 und 30 Jahren
 werden 34.700, 69.400 und 104.000 € angerechnet. **Förderung der Früherkennung (S158)** bekommt keine eigene
-Zahl, weil der Basiswert die günstigeren Kostensätze früh erkannter Fälle schon für alle Fälle ansetzt; im
-Produkt steht dafür der Vermerk „Kostenwirkung im Basiswert voll angerechnet“, keine Nullwirkung. Der
+Zahl, weil der Basiswert die günstigeren Kostensätze früh erkannter Fälle schon für alle Fälle ansetzt; das
+Produkt soll dafür den Vermerk „Kostenwirkung im Basiswert voll angerechnet“ zeigen, keine Nullwirkung (§5). Der
 Ersetzungspfad (Detektionsmix-Parameter) steht in §5.
 
 **(c) Einstufung der KWRA 2021 ohne Anpassung.** Die KWRA 2021 stuft die Klimawirkung
@@ -241,8 +241,8 @@ erforscht sind" [76]. Die Skala hat vier Stufen („sehr gering", „gering", �
 werden das Vorhandensein und die Zuverlässigkeit von Daten, die Kenntnis der Wirkzusammenhänge, die
 Plausibilität der Modellannahmen und die Eindeutigkeit von Trends (ebd.).
 
-**Warum die eigene Quellenlage davon abweicht.** Das Produkt führt #98 bei der Quellenlage auf „hoch",
-weil jeder Parameter dieses Berichts eine Quelle oder eine ausgewiesene Abschätzung mit Herleitung hat
+**Warum die eigene Quellenlage davon abweicht.** Die Quellenlage dieses Berichts ist „hoch", weil
+jeder Parameter des Berichts eine Quelle oder eine ausgewiesene Abschätzung mit Herleitung hat
 (Kapitel 7). Das misst etwas anderes als die KWRA-Gewissheit, und keine der beiden Angaben wird der
 anderen angepasst:
 
@@ -337,8 +337,8 @@ Lesart \(\tau\) (unten).
 - **Lesart \(\tau\) = 1:** Die Kette setzt keinen Transient-Faktor an. Mit \(\tau\) = 0,20–0,48 (§3.4,
   reine Jahres-Attribution) läge Berlin um 52–80 % niedriger, bei 2,34–5,60 Mio. € (Preisstand 2024) je
   Jahr.
-- **Bevölkerung im Produkt:** Das Produkt liest Berlin mit 3.586.909 Einwohnern (Zensus 2022 am
-  Gemeindepunkt, Anlage [72]) statt 3.662.381; es rechnet damit mit 2,1 % weniger Einwohnern.
+- **Bevölkerung der Zellen:** Je Zelle rechnet das Modell mit der Bevölkerung am Gemeindepunkt (Zensus 2022,
+  Anlage [72]); für Berlin sind das 3.586.909 statt 3.662.381 Einwohner, 2,1 % weniger (§6, Modellgrenze 8).
 
 ```python test: rechenkette_98
 # Rechenkette Berlin (Abschnitt 3.0), Ebenen 1-10, Werte aus Kapitel 7
@@ -1276,8 +1276,8 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   (Befund 442). Die Bändertabelle selbst ist nach Sachgruppen geordnet, nicht nach
   Größe (Befunde 361/370). **Größte Achse ist
   der Transient-Faktor \(\tau\)** (0,20–1,00 ⇒ **−80 %**, §3.4): Er trennt die
-  ausgewiesene Gleichgewichtslesart von einer reinen Jahres-Attribution und ist
-  einseitig — er kann das Ergebnis nur senken. Danach die
+  ausgewiesene Gleichgewichtslesart von einer reinen Jahres-Attribution, beziffert so die
+  Latenz (§6, Modellgrenze 1) und ist einseitig — er kann das Ergebnis nur senken. Danach die
   **k_UV-Messunsicherheit** (Band **0,3622–1,0616** = **±49 %**) — der
   **Stichprobenfehler der publizierten Trendschätzungen**, *nicht* die räumliche
   Übertragbarkeit; letztere steht als Modellgrenze 9. Sie ist der größte
@@ -1298,8 +1298,8 @@ Normierungen editierbar, testseitig von €-Pfaden getrennt).
   **Nicht als Ergebnisachse beziffert** und deshalb hier am Ende, nicht der Größe
   nach eingeordnet: die Zeitinvarianz-Annahme der Elastizität (§3.2, Befund 222);
   die Ablesekette (±15 % je Ablesung, wirkt über \(c_{\text{kal}}\) auf den Anker
-  und ist dort out-of-sample gegen die ASR bestätigt, s. o.); Latenz (§6);
-  Augenschäden fehlen (§6).
+  und ist dort out-of-sample gegen die ASR bestätigt, s. o.); Augenschäden fehlen (§6).
+  Die Latenz steht nicht hier, weil \(\tau\) sie oben als größte Achse beziffert (Befund 496).
 
 ## 5 Maßnahmen-Hebel (§2.5/§3.5)
 
@@ -1434,8 +1434,8 @@ Befunde 203/433; Log 34. Die DiD-Evidenz [34] belegt das Sparpotenzial (SCS-dete
 [−23,1; −8,4]** Erstjahreskosten), aber der **Basiswert setzt bereits für alle Fälle die SCS-Kostensätze an**
 (Untergrenzen-Wahl §3.4) — ein zusätzlicher Hebel auf \(c_e\) würde den Maßnahmeneffekt doppeln (LF 4:
 Maßnahmeneffekt schon im Basiswert). Eine Letalitätswirkung früherer Erkennung ist nicht angesetzt, weil es
-dafür keine Effektgröße gibt. **Im Produkt steht deshalb keine Nullwirkung, sondern der Vermerk
-„Kostenwirkung im Basiswert voll angerechnet“.** **Keine Latenz:** Eine Wirkung auf Kosten oder Letalität
+dafür keine Effektgröße gibt. **Vorgabe an das Produkt ist deshalb keine Nullwirkung, sondern der Vermerk
+„Kostenwirkung im Basiswert voll angerechnet“ (Integrationsauflage oben).** **Keine Latenz:** Eine Wirkung auf Kosten oder Letalität
 heutiger Fälle setzt ohne Verzögerung ein, sie hängt nicht an der Lebenszeitdosis; die Rampe von S155 gilt hier
 nicht. **Ersetzungspfad Detektionsmix:** Mit einem Parameter „Anteil SCS-detektierter Fälle je Kommune“ würde
 der Basiswert vom SCS-Satz auf den Mix aus SCS- und Nicht-SCS-Sätzen gezogen und damit **steigen** (je MM-Fall
