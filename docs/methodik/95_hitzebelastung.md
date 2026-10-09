@@ -1552,13 +1552,16 @@ noch auf einen Barwert abgezinst.
 7. Zwei Gitter: Das 1-km-Raster des DWD liegt in seinem eigenen Gitter, nicht im Gitter EPSG:3035 der Zensus-Zellen;
    \(\bar h\) wird aber über den 1-km-Block des Gitters EPSG:3035 gebildet (§3.1). Block und DWD-Zelle sind je Achse um
    0 bis 500 m gegeneinander versetzt. **Abschätzung von KAP3:** Auf einem Hang mit dem Gefälle g weicht \(\bar h\)
-   um g × Versatz von der mittleren Höhe der DWD-Zelle ab, bei gleichverteiltem Versatz im Mittel um g × 250 m. Mit
-   0,0065 K je Meter (§3.1) verschiebt das den Höhenterm um 1,6 K × g, bei 1 % Gefälle um 0,016 K, höchstens um
-   0,033 K. Um 1 K wärmer wächst der Wochenexzess 85+ in Berlin auf das 1,598-Fache (§3.0, Extremfall der Heime); 0,016 K
-   sind damit 0,75 % des Exzesses (1,598^0,016 = 1,0075), 0,033 K sind 1,5 %, je nach Richtung des Hangs nach oben oder
-   unten. Diese Werte gelten nur für eine Kommune, deren Hänge alle in dieselbe Richtung fallen. Der Versatz ist
-   örtlich fest, die Hänge einer Kommune fallen aber in verschiedene Richtungen. In der Summe heben sich die
-   Abweichungen deshalb weitgehend auf. Der Betrag wird nicht korrigiert.
+   um g × Versatz in Richtung des Hangs von der mittleren Höhe der DWD-Zelle ab. Bei gleichverteiltem Versatz sind das
+   im Mittel g × 250 m bei einem Hang entlang einer Gitterachse und g × 236 m bei einem Hang schräg zu beiden Achsen.
+   Mit 0,0065 K je Meter (§3.1) verschiebt das den Höhenterm im Mittel um 1,5 bis 1,6 K × g, bei 1 % Gefälle um 0,015
+   bis 0,016 K. Am größten ist der Versatz in Richtung des Hangs bei einem Hang schräg zu beiden Achsen:
+   500 m × √2 = 707 m, bei 1 % Gefälle also 0,046 K. Um 1 K wärmer wächst der Wochenexzess 85+ in Berlin auf das
+   1,598-Fache (§3.0, Extremfall der Heime); 0,016 K sind damit 0,75 % des Exzesses (1,598^0,016 = 1,0075), 0,046 K sind
+   2,2 % (1,598^0,046 = 1,022), je nach Richtung des Hangs nach oben oder unten. Diese Werte gelten nur für eine
+   Kommune, deren Hänge alle in dieselbe Richtung fallen. Der Versatz ist örtlich fest, die Hänge einer Kommune fallen
+   aber in verschiedene Richtungen. In der Summe heben sich die Abweichungen deshalb weitgehend auf. Der Betrag wird
+   nicht korrigiert.
 
 **Infokasten-/UI-Texte (§3.6 — Teil des Berichts):**
 
