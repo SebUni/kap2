@@ -114,8 +114,8 @@ Satzanfang: der Satz oder die Tabellenzelle, in dem der erste Treffer der Zeile 
 | 2609 | **Eintrag 27: Runde 27 (29.09.2026, T-1635)** — Kosten der Stadtbaumwahl nach Vo | Log, Stand von damals | Präambel des Entscheidungslogs: datierte Einträge, wie sie galten |
 | 2621 | J30-KKR-Anker bei Integration interaktiv ziehen (Registry-Vermerk) \| kein Fit-S | Log, Stand von damals | Zeile des Entscheidungslogs, Entscheidung wie sie galt |
 | 2634 | die Produktmechanik (measure_service skaliert gespeicherte Outcomes) ist KEIN Be | Log, Stand von damals | Zeile des Entscheidungslogs, Entscheidung wie sie galt |
-| 2635 | 3 zunächst 0,0 (Code-Nachzug L2 nach der P1-Kennzeichnung; überholt, heutiger Co | Log, Stand von damals | Zeile des Entscheidungslogs, Entscheidung wie sie galt |
-| 2639 | Im Produkt rechnet sie seit dem 27.09.2026 als Katalogmaßnahme im Zelllauf nach  | Log, Stand von damals | Zeile des Entscheidungslogs, Entscheidung wie sie galt |
+| 2635 | 3 zunächst 0,0 (Code-Nachzug L2 nach der P1-Kennzeichnung; überholt, heutiger Co | Log, Stand von damals | Log 20: Entscheidung wie sie galt; Verweis auf den Absatz „Verknüpfung im Zelllauf“ statt „Produktstand“ (Nacharbeit 1) |
+| 2639 | Im Produkt rechnet sie seit dem 27.09.2026 als Katalogmaßnahme im Zelllauf nach  | Log, Stand von damals | Log 24: der Präsenssatz „Im Produkt rechnet sie seit dem 27.09.2026 …“ ist als datiertes Ereignis gefasst („Am 27.09.2026 ging sie … in den Zelllauf“), wie Log 43 bei #95; Verweis auf den Absatz „Vorgabe für das Produkt (Befund 230)“ (Nacharbeit 1) |
 | 2641 | **Festhalten (Weg (a), Festlegung CMO in T-1323):** Ḡ₀ = betroffenengewichtetes  | Log, Stand von damals | Zeile des Entscheidungslogs, Entscheidung wie sie galt |
 | 2642 | im Produkt Abfrage des Falls ohne stille Vorgabe (Ü-11); Amortisation der Nachpf | Log, Stand von damals | Zeile des Entscheidungslogs, Entscheidung wie sie galt |
 | 2643 | **Beide Vergleiche beim selben \(a_{\text{attr}}\)** (Festlegung des methodik_ma | Log, Stand von damals | Zeile des Entscheidungslogs, Entscheidung wie sie galt |
@@ -139,6 +139,10 @@ Zeilen ohne Treffer von M, die Umsetzungsstand trugen und im selben Zug zeitlos 
 | 1936 | „heute führt die Schicht-B-Funktion nur ihre Summe“ als Vorgabe „nicht nur ihre Summe“ |
 | 1957 | „Zwei Punkte sind nicht vollständig umgesetzt“ entfällt |
 | 1960 | „gibt es nicht aus (Befund 237)“ und „mit den heutigen Werten“ entfallen |
+
+## Verweise auf umbenannte Absätze (Nacharbeit 1)
+
+Ohne Treffer von M, Folge der Umbenennung in diesem Durchgang: Z. 1098 verweist auf den Absatz „Vorgabe für das Produkt (Befund 230)“ statt „Produktstand“, Z. 1991 auf den Absatz „Verknüpfung im Zelllauf (Befund 231)“ statt „Produktstand oben“. Die Verweise im Block „Revisionsstand“ (Z. 64, Z. 75) nennen die Überschrift vom 29.09.2026 und bleiben als Stand von damals.
 
 ## Selbstprüfung
 
