@@ -479,7 +479,7 @@ Neuanlegen des Schemas. Der Übergang ist reine Buchführung in
 
 ## Befund-Ledger prüfen (`ledger.py --pruefe`)
 
-`python3 backend/scripts/ledger.py <nr> --pruefe` führt die Prüfausdrücke aus `reviews/BEFUNDE_<nr>.md` aus; die Zeitgrenze je Ausdruck steht ohne Einstellung bei 90 s und lässt sich mit der Umgebungsvariable `LEDGER_AUSDRUCK_TIMEOUT_S` (Sekunden, positive Zahl) ändern, damit Serverlast kein falsches Rot erzeugt; ein ungültiger Wert fällt mit einer Warnzeile auf 90 s zurück.
+In gesteuerten Läufen ist der reguläre Aufruf `bash scripts/ledger.sh <nr> --pruefe`; das Skript startet `backend/scripts/ledger.py` im Interpreter der Projektumgebung (`${KAP2_VENV:-$HOME/.venvs/kap2}/bin/python`, fehlt er: Exit 2) und stellt dessen `bin` vorn in `PATH`, damit Prüfausdrücke mit `python3` denselben Interpreter nutzen. Das System-`python3` reicht dafür nicht, weil numpy fehlt. `ledger.py <nr> --pruefe` führt die Prüfausdrücke aus `reviews/BEFUNDE_<nr>.md` aus; die Zeitgrenze je Ausdruck steht ohne Einstellung bei 90 s und lässt sich mit der Umgebungsvariable `LEDGER_AUSDRUCK_TIMEOUT_S` (Sekunden, positive Zahl) ändern, damit Serverlast kein falsches Rot erzeugt; ein ungültiger Wert fällt mit einer Warnzeile auf 90 s zurück.
 
 ## Grenzen (bewusst so gelassen)
 
