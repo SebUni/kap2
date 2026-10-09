@@ -14,7 +14,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 |---|---|---|---|---|---|---|
 | 1 | Das Klimarisiko ist über Klimawirkungsketten herzuleiten, die klimatischen Einfluss, Sensitivität und räumliche Exposition als benannte, unterscheidbare Komponenten abbilden. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 | teilweise | docs/methodik/95_hitzebelastung.md, docs/methodik/61_vegetation_in_siedlungen.md | Die Herleitung über die Klimawirkungskette trägt nur der Bericht zur Hitzebelastung (docs/methodik/95_hitzebelastung.md): Er rechnet Hitze (E02), Altersstruktur und Pflegebedürftigkeit (S152, S153) und Bevölkerung (R35) als getrennte Größen bis zum Euro-Betrag. Der Bericht zu Vegetation in Siedlungen (docs/methodik/61_vegetation_in_siedlungen.md) ist ein ungeprüfter Erstaufschlag: Er listet die Knoten der Kette W127, die Spalte „rechnet in“ steht bei allen auf „offen“, Kap. 3, 4 und 6 sind nur Kommentar; ein Klimarisiko leitet er nicht her. In beiden Berichten sind die Komponenten über die Knotenkennungen E, S und R der Arbeitsmappe und die Knotennamen unterscheidbar, die R-Knoten heißen wie in Tabelle 4 der Quelle „Vorkommen von …“; es fehlt aber die Erklärung, wofür E, S und R stehen. Außerdem schreibt docs/methodik/95_hitzebelastung.md Schicht A (Kap. 3.7) als Ĥ × Ê × V̂ in der Schreibweise des IPCC (Hazard, Exposure, Vulnerability) und nennt die Sensitivität stellenweise „Vulnerabilität“, einen Begriff, den die KWRA in Kap. 2.1.4.2 vermeidet und von der Sensitivität abgrenzt; docs/methodik/61_vegetation_in_siedlungen.md spricht von „Hazard-Kanal“ und „Kandidat Vulnerabilität“. Gerechnet wird nur das heutige Klima; die Wirkung des Klimawandels als Differenz zwischen Bezugszeitraum (1971–2000) und künftigem Zeitraum rechnet kein Beleg. Einzelnachweis: Abschnitt „Gegenprobe Zeile 1“. |
 | 2 | Das Klimarisiko ist ausdrücklich als "Risiko ohne (weitere) Anpassung" auszuweisen und von einem Zustand "mit Anpassung" begrifflich zu unterscheiden. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 | teilweise | docs/methodik/61_vegetation_in_siedlungen.md | Nur der Methodik-Bericht zu Vegetation in Siedlungen weist einen Vergleichswert "ohne Anpassung" explizit in KWRA-Terminologie aus. Für die übrigen vorliegenden Methodik-Berichte fehlt ein systematischer, unter diesem Begriff geführter Ausweis; die Aufgabenbeschreibung (docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md) definiert die Unterscheidung "ohne Anpassung"/"mit Anpassung" bislang nicht als eigenen Pflichtabschnitt. |
-| 3 | Für jeden in die Bewertung eingehenden Parameter beziehungsweise Faktor ist die zugrunde gelegte Quelle offenzulegen und zu dokumentieren; ist keine Quelle vorhanden, ist die Abschätzung als solche kenntlich zu machen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.3 (S. 42, Tabelle 3) und Kap. 1.3 (S. 34) | erfüllt | docs/evidenz/register.md, docs/methodik/95_hitzebelastung.md, frontend/src/components/ParameterTable.tsx | — |
+| 3 | Für jeden in die Bewertung eingehenden Parameter beziehungsweise Faktor ist die zugrunde gelegte Quelle offenzulegen und zu dokumentieren; ist keine Quelle vorhanden, ist die Abschätzung als solche kenntlich zu machen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.3 (S. 42, Tabelle 3) und Kap. 1.3 (S. 34) | teilweise | docs/evidenz/register.md, docs/methodik/95_hitzebelastung.md, frontend/src/components/ParameterTable.tsx | Die Fundstelle verlangt keine Quelle je Parameter, sondern getrennte Ebenen, transparente Arbeitsschritte und dokumentierte Grundlagen normativer Entscheidungen; das tragen docs/methodik/95_hitzebelastung.md (Kennzeichnung je Block in Kap. 7, Entscheidungslog) und frontend/src/components/ParameterTable.tsx (Spalten „Quelle“ und „Beleglage“ mit Herleitung). Es fehlt: docs/evidenz/register.md weist Setzungen von KAP3, die der Bericht als Abschätzung kennzeichnet, nicht als solche aus (95-E02-01 nennt für Süd 0,0531 statt der Nachschätzung 0,0876, 95-S152-01 die Altersfaktoren, 95-S158-01 den Faktor 0,939 des Hitzeaktionsplans); frontend/src/components/ParameterTable.tsx trennt fachliche Abschätzungen nicht von Bewertungsentscheidungen wie Voreinstellungen nach Fehlerabwägung, ordnet die Arbeitsschritte nicht wie Tabelle 3 einer Ebene und einem Akteur zu und erfasst bei einer Änderung nur Wert und Quelle, sodass ein eigener Wert der Kommune nicht als ihre Abschätzung gekennzeichnet und eine Setzung von KAP3 nicht ausdrücklich bestätigt werden kann. Einzelnachweis: Abschnitt „Gegenprobe Zeile 3“. |
 | 4 | Sensitivität (Anfälligkeit eines Systems gegenüber einem klimatischen Einfluss) und räumliche Exposition (Vorhandensein potenziell betroffener Systemelemente) sind begrifflich und methodisch getrennt zu führen, nicht zu vermischen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 (S. 44) | erfüllt | docs/methodik/95_hitzebelastung.md | — |
 | 5 | Die Analyse muss ihre methodischen Grenzen und ihren Anwendungsbereich explizit benennen, insbesondere dass sie keine detailliertere lokale oder sektorale Risikoanalyse ersetzt. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 1.4 (S. 35) | erfüllt | docs/methodik/95_hitzebelastung.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | — |
 | 6 | Klimawirkungen sind anhand des Klimarisikos (ohne Anpassung, pessimistischer Fall) und der Anpassungsdauer in Prioritätsstufen "sehr dringende" und "dringende" Handlungserfordernisse einzustufen, damit erkennbar ist, wo Anpassung schon jetzt beginnen muss. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.1 (S. 136–140) | teilweise | frontend/src/pages/roadmap/roadmapData.ts, docs/KATALOG_KRITIK.md | Die Produkt-Roadmap übernimmt die KWRA-Kategorie "sehr dringende Klimawirkungen" wörtlich, um die Ausbaureihenfolge zu begründen (zuerst die drei sehr dringenden Gesundheits-Klimawirkungen, danach 15 weitere). Es gibt aber keine im Produkt selbst nachvollziehbare, aus Klimarisiko und Anpassungsdauer hergeleitete Einstufung je Klimawirkung, und laut docs/KATALOG_KRITIK.md sind 10 der bundesweit 31 "sehr dringenden" Klimawirkungen im heutigen Katalog nicht abgebildet, weil sie ausgewählt statt systematisch aus der KWRA-Einstufung hergeleitet wurden. |
@@ -1362,6 +1362,109 @@ derselben Änderung auf `teilweise` gesetzt; die Spalte „Lücke“ nennt, was 
 schreibt Status und Lücke fest, und `backend/app/data/konformitaet_kundentext.py` führt den Kundensatz. Die Zählungen in
 den Abschnitten „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt. Sie nachzuziehen ist
 Sache der Gesamtzählung (T-0821-ceo, T-0487), nicht dieser Gegenprobe.
+
+### Gegenprobe Zeile 3 gegen KWRA 2021, Teilbericht 1, Kap. 2.1.3 und Kap. 1.3
+
+Frage: Tragen die drei Belege der Zeile, was Kap. 2.1.3 samt Tabelle 3 und Kap. 1.3 an die Offenlegung der Quelle je
+Parameter oder Faktor und an die Kennzeichnung von Abschätzungen verlangen? Gelesen wurde
+`docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf` (KWRA 2021, Teilbericht 1: Grundlagen, 215 PDF-Seiten).
+Die gedruckte Seitenzahl ist die PDF-Seitenzahl minus 1; die Spalte „Seite“ nennt die gedruckte Seite, die PDF-Seite in
+Klammern. Die Fundstelle stimmt: Kap. 2.1.3 „Wissenschaftliche Analyse und normative Bewertung im Wechselspiel“ steht auf
+S. 41–43 (PDF 42–44), samt Kasten „Einbindung von Fachleuten“ auf S. 43, Tabelle 3 auf S. 42 (PDF 43); Kap. 1.3
+„Methodisches Vorgehen“ steht auf S. 33–35 (PDF 34–36), die Trennung der Ebenen auf S. 34.
+
+**Befund zum Wortlaut der Zeile.** Den Satz der Zeile („für jeden … Parameter … die zugrunde gelegte Quelle offenzulegen …;
+ist keine Quelle vorhanden, ist die Abschätzung als solche kenntlich zu machen“) enthalten die gelesenen Seiten nicht,
+weder wörtlich noch dem Sinn nach. Am nächsten kommt S. 42 (PDF 43): „bei normativen Entscheidungen und Bewertungen die
+zugrunde gelegten Prinzipien und Kriterien offenzulegen und zu dokumentieren“, und Entscheidungen auf der fachlichen
+Ebene samt „ihre[n] Grundlagen“ zu dokumentieren. Die Zeile liest damit die Vorgabe P1 in die Quelle hinein. Geprüft
+wird unten, was die Quelle verlangt; der Wortlaut der Zeile ist nicht geändert, das entscheidet die Gesamtzählung.
+
+Im Produkt wurden die drei Belege vollständig gelesen: `docs/evidenz/register.md` (200 Zeilen),
+`docs/methodik/95_hitzebelastung.md` (2.537 Zeilen, Rev. 8, Fortschreibung 7, Kap. 1–8 und Entscheidungslog 1–56) und
+`frontend/src/components/ParameterTable.tsx` (831 Zeilen). Ausgeführt wurde nichts außer dem Lesen.
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | Fachliche Analyseebene und normative Bewertungsebene werden getrennt behandelt; „die Ebenen möglichst zu trennen“. | S. 34 (PDF 35), Kap. 1.3 drittletzter Absatz; S. 42 (PDF 43), Kap. 2.1.3 | `95_hitzebelastung.md` Kap. 7 (Kennzeichnung `quelle`, `berechnet`, `abschaetzung_kap3` je Block, Regel in Log 40); `ParameterTable.tsx` `EvidenceCell` (Spalte „Beleglage“) | trägt teilweise |
+| A2 | „die jeweiligen Arbeitsschritte stets transparent zu machen“. | S. 42 (PDF 43), Kap. 2.1.3 | `95_hitzebelastung.md` Kap. 3.0 (Rechenkette mit Quelle je Ebene), Kap. 3.1–3.6, Kap. 7, Kap. 8; `ParameterTable.tsx` Spalten „Quelle“, „Beleglage“, Schaltfläche „Herleitung“ | trägt |
+| A3 | Bei normativen Entscheidungen und Bewertungen sind „die zugrunde gelegten Prinzipien und Kriterien offenzulegen und zu dokumentieren“. | S. 42 (PDF 43), Kap. 2.1.3 | `95_hitzebelastung.md` Entscheidungslog 1–56 (Frage, Entscheidung, Begründung, Alternative, Auswirkung), Kap. 4 „Begriff definiert“ (konservativ = unterschätzend), Log 2 (YLL × VOLY nach MK 4.0) | trägt |
+| A4 | Entscheidungen mit normativen Aspekten auf der fachlichen Ebene werden nach Möglichkeit auf der normativen Ebene vorbereitet; sonst werden „Entscheidungen und ihre Grundlagen dokumentiert und die Legitimität der Entscheidungen nachträglich auf der normativen Entscheidungsebene hergestellt“. | S. 42 (PDF 43), Kap. 2.1.3 | `95_hitzebelastung.md` Kap. 7 (Kommentar je `abschaetzung_kap3`), Log 40–56 („festgelegt vom methodik_manager“), Überstimmungsweg; `register.md` Spalte „Effektgröße“; `ParameterTable.tsx` `saveOne` (Quelle Pflicht bei Abweichung), Status „Default“/„Override“ | trägt teilweise |
+| A5 | Jeder Arbeitsschritt ist der fachlichen Arbeitsebene oder der normativen Entscheidungsebene und den beteiligten Akteuren zugeordnet (Tabelle 3: K, E, N, I). | S. 41–42 (PDF 42–43), Kap. 2.1.3 mit Tabelle 3 | `95_hitzebelastung.md` Kopf (Status, Instruktionsquelle), Log 34, 41, 42, 51–56 (Urheber der Entscheidung); `register.md` und `ParameterTable.tsx` „Abschätzung von KAP3“ als Urheber je Parameter | trägt teilweise |
+| A6 | Die Wissensgrundlage wird offengelegt: „Literaturauswertungen, Analysen von Daten und Modellergebnissen sowie zahlreiche[] Experteninterviews“, samt Recherchezeitraum („bis Anfang 2020“, Anpassungskapazität „bis Ende September 2020“). | S. 35 (PDF 36), Kap. 1.3 vorletzter Absatz | `95_hitzebelastung.md` Kap. 8 (Vollzitat, DOI, Zugriffsdatum, bei neueren Quellen Abrufzeit und SHA-256), Kap. 5 („Suche 27.09.2026“); `register.md` Spalten „Quelle“ und „Studientyp“; `ParameterTable.tsx` Spalte „Quelle“ mit `source_detail` und `references` | trägt |
+
+**Begründung je Urteil:**
+
+- A1: Je Parameter trennt das Produkt, was belegt ist, was aus anderen Parametern folgt und was KAP3 setzt: Der Bericht
+  kennzeichnet jeden Block in Kap. 7 nach der Regel aus Log 40, die Parameterliste zeigt die Kennzeichnung ohne Klick in
+  der Spalte „Beleglage“ („abgeschätzt (KAP3)“, „berechnet aus anderen Parametern“, „belegt“; Anzeigetexte aus
+  `evidenzAnzeige` in `frontend/src/utils/evidenceLabel.ts`). Die Trennung der Quelle ist aber eine zwischen Analyse
+  und Bewertung. Unter „abgeschätzt (KAP3)“ stehen im Produkt beide Arten: fachliche Abschätzungen (etwa „Heime mit und ohne
+  Klimaanlage gleich groß“, Block `heat.s_gek`) und Bewertungsentscheidungen nach Abwägung (etwa die Voreinstellung
+  „nein“ beim Doppelzählungs-Wächter, Block `heat.vg_in_kalibrierjahren`, gewählt nach dem erwarteten Fehler, Log 47).
+  Die Parameterliste unterscheidet sie nicht.
+- A2: Der Bericht macht jeden Schritt nachrechenbar: Rechenkette Ebene 1–10 mit Quelle je Ebene, Formeln mit
+  Zeichentabelle, Prüfblöcke, Quellen mit Fundstelle. Die Parameterliste zeigt je Parameter Quelle, Beleglage und auf
+  Klick Wert, Bandbreite, Sensitivität und Vermerk.
+- A3: Der Entscheidungslog führt jede Ermessensentscheidung mit Begründung, Alternative und Auswirkung, ab Log 39 mit
+  Gegenargument; Begriffe, die eine Bewertung tragen („konservativ“, „Untergrenze“), sind definiert, das
+  Bewertungsprinzip der Mortalität (YLL × VOLY statt VSL) ist mit der Methodenkonvention begründet. Geprüft ist das nur
+  für #95; andere Berichte sind keine Belege der Zeile.
+- A4: Dokumentiert sind die Entscheidungen und ihre Grundlagen: Jede Setzung trägt im Bericht ihre Herleitung, in der
+  Parameterliste den Vermerk „Abschätzung KAP3 — Herleitung“. Zwei Dinge fehlen. Erstens zeigt das Evidenz-Register,
+  das jeder Bericht nur referenziert, Setzungen, die der Bericht als Abschätzung kennzeichnet, nicht als solche: Zeile
+  95-E02-01 nennt für Süd 0,0531 K⁻¹ als „publizierte ERF“, gerechnet wird mit der Nachschätzung 0,0876 K⁻¹
+  (`abschaetzung_kap3`, Log 32); 95-S152-01 führt die Altersfaktoren als „amtliche Statistik + Rückrechnung“, Kap. 7
+  kennzeichnet `heat.f_alter` als Abschätzung; 95-S158-01 nennt 0,939 ohne Vermerk, Kap. 7 kennzeichnet `heat.delta_hap`
+  als Abschätzung. Log 40 verlangt selbst, dass eine Setzung nie als Quellenwert erscheint. Zweitens gibt es keinen
+  Schritt, in dem die Kommune als Entscheidungsebene die Setzungen bestätigt: Die Parameterliste zeigt nur „Default“
+  oder „Override“; bei einer Änderung fragt `saveOne` Wert und Quelle ab, nicht, ob der neue Wert eine Abschätzung der
+  Kommune ist.
+- A5: Den Urheber nennt das Produkt je Parameter („Abschätzung von KAP3“, sonst die Quelle), der Bericht für einzelne
+  Entscheidungen (Nutzer-Entscheid in Log 34, methodik_manager in Log 41, 42 und 51–55, CEO in Log 56). Eine Zuordnung
+  der Arbeitsschritte zur fachlichen oder normativen Ebene wie Tabelle 3 gibt es nicht; welcher Schritt eine Bewertung
+  ist und wer ihn verantwortet, sieht ein Nutzer der Parameterliste nicht.
+- A6: Der Bericht nennt jede Quelle mit Vollzitat, DOI oder Adresse und Zugriffsdatum, bei neueren Quellen mit Abrufzeit
+  und SHA-256, und sagt, wo eine Suche nichts fand und wann (Kühlzentren, 27.09.2026). Das Register führt Studientyp und
+  Quelle je Zeile, die Parameterliste die Quelle mit Detail und Verweisen.
+
+Nicht als eigene Anforderung gewertet: die Weiterentwicklung gegenüber der VA 2015 (S. 33–34, PDF 34–35), der stärkere
+Schwerpunkt auf qualitativem Vorgehen, der Delphi-Ansatz, die Begriffe des 5. Sachstandsberichts und die Kaskadeneffekte
+(S. 34, PDF 35), alles Befunde oder Verfahrensentscheidungen der KWRA; die Benennung der vier Akteursgruppen und ihrer
+Rollen (S. 41–42, PDF 42–43) und der Kasten „Einbindung von Fachleuten“ (S. 43, PDF 44) mit der Auswahl der Fachleute je
+Handlungsfeld, Verfahrensschritte der KWRA, in A5 herangezogen.
+
+**Gelesene Seiten und Abschnitte:**
+
+- Inventar mit `python3 /home/basti/overlord/overlord/skripte/dokumente.py inventar` (215 PDF-Seiten; Gliederung,
+  Abbildungen und Tabellen je Seite).
+- Inhaltsverzeichnis ganz: PDF 7–8 (gedruckt S. 6–7).
+- Einleitung: PDF 33–37 (gedruckt S. 32–36) ganz, Kap. 1.1, 1.2, 1.3 und 1.4 ganz, Anfang von 1.5. Kapitelgrenzen
+  geprüft: 1.3 beginnt auf S. 33 (PDF 34) nach 1.2 und endet auf S. 35 (PDF 36) vor 1.4.
+- PDF 41–45 (gedruckt S. 40–44) ganz: Kap. 2, 2.1.1, 2.1.2, 2.1.3 samt Tabelle 3 und Kasten „Einbindung von Fachleuten“,
+  Anfang von 2.1.4.1. Kapitelgrenzen geprüft: 2.1.3 beginnt auf S. 41 (PDF 42) nach 2.1.2 und endet auf S. 43 (PDF 44) mit
+  dem Kasten vor 2.1.4. Fußnoten haben diese Seiten keine.
+- Als Bild angesehen: PDF-Seite 43 (gedruckt S. 42) mit Tabelle 3 „Arbeitsschritte und ihre Zuordnung zur fachlichen
+  Arbeitsebene beziehungsweise zur normativen Entscheidungsebene“ (neun Arbeitsschritte, Legende K, E, N, I); der Text
+  stimmt mit dem Bild überein.
+- Belegdateien vollständig: `docs/evidenz/register.md`, `docs/methodik/95_hitzebelastung.md`,
+  `frontend/src/components/ParameterTable.tsx`; dazu die von `ParameterTable.tsx` eingebundene Datei
+  `frontend/src/utils/evidenceLabel.ts` (Anzeigetexte der Spalte „Beleglage“, 13 Zeilen).
+
+**Nicht gelesen:** die Zusammenfassung des Berichts (PDF 22–32), das Glossar (PDF 16–21), Kap. 1.5 ab PDF 37 und 1.6,
+Kap. 2.1.4 ab PDF 46 und alle späteren Kapitel; der Leitfaden Buth et al. 2017, auf den 2.1.3 sich stützt; im Produkt
+die Backend-Stellen, die `evidence_class`, `source` und `custom_source` liefern, und die Berichte zu anderen Risiken.
+
+**Schluss:** Zeile 3 bleibt nicht `erfüllt`. Von 6 Anforderungen tragen die Belege drei voll (A2, A3, A6), drei
+teilweise (A1, A4, A5) und keine nicht. Zur Frage der Gegenprobe: Eine Quelle je Parameter und die Kennzeichnung von
+Abschätzungen verlangt die Fundstelle nicht wörtlich; was sie verlangt, transparente Schritte, offengelegte Prinzipien
+und dokumentierte Grundlagen, tragen der Bericht zur Hitzebelastung und die Parameterliste. Es fehlen die Trennung von
+fachlicher Abschätzung und Bewertungsentscheidung, die Zuordnung der Schritte zu Ebene und Akteur, eine Bestätigung der
+Setzungen durch die Kommune und die Kennzeichnung der Abschätzungen im Evidenz-Register. Der Status der Zeile 3 ist in
+derselben Änderung auf `teilweise` gesetzt; `backend/tests/test_konformitaet_zeile3.py` schreibt Status und Lücke fest,
+`backend/app/data/konformitaet_kundentext.py` führt den Kundensatz. Die Zählungen in den Abschnitten „Nachtrag:
+Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt; sie nachzuziehen ist Sache der Gesamtzählung, nicht
+dieser Gegenprobe.
 
 ## Ergebnis
 
