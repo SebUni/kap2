@@ -8,7 +8,9 @@ Berlin, Preisstand 2024) an die Produktfunktion ``health.uv_yll``, nicht an eine
 - Ziele Ebene 10 (Z. 368, 370): MM 5,14 Mio. €, C44 6,53 Mio. €, Summe 11,68 Mio. € je Jahr.
 
 Toleranz aus dem Prüfblock ``rechenkette_98``: Euro ± 0,005 Mio. € (Fälle ± 0,05).
-Die Bevölkerung im Produkt (3.586.909, Z. 340) gehört nicht hierher, sondern in Paket 7/7.
+Die Bevölkerung am Gemeindepunkt (3.586.909, Bericht §3.0, Abweichungsliste) bindet dieser Test
+nicht: Sie beschreibt die Populationsbasis des Modells (Anlage [72], §6 Modellgrenze 8), keinen
+Produktwert (Befund 505 im Ledger 98).
 """
 
 from __future__ import annotations
