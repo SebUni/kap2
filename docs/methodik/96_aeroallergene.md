@@ -1093,11 +1093,10 @@ assert abs(0.15 * 0.19 - 0.0285) < 1e-12              # untere Grenze der M0-Her
   die Definitionskonstante der Ebene (§3.3), der Grünanteil ist die Zelleingabe. Das Produkt hält
   den Boden zusätzlich direkt. Er greift dort in zwei Fällen: wenn das gespeicherte \(\hat G\) durch
   die Rundung auf fünf Stellen um höchstens 0,000005 neben seinen Kronentermen liegt (gemessen
-  höchstens 0,000004, an der Allee-Zelle unten weniger als 0,01 Tage), und wenn ein Ausgangslauf
-  \(s_{\text{unbek}}\) noch nicht je Zelle trägt und die Kommune den Wert danach überschrieben hat.
-  Dann rechnet die Senkung mit dem Wert von heute, \(\hat G\) aber mit dem alten; der Boden
-  verdeckt diesen gemischten Stand nur, deshalb bittet das Produkt dort, den Ausgangslauf neu zu
-  rechnen (Absatz „Vorgabe für das Produkt (Befund 230)“ unten, Befund 252).
+  höchstens 0,000004, an der Allee-Zelle unten weniger als 0,01 Tage), und wenn ein älterer Ausgangslauf
+  \(s_{\text{unbek}}\) nicht je Zelle trägt und die Kommune den Wert danach überschrieben hat. Dann rechnet
+  die Senkung mit dem Wert von heute, \(\hat G\) mit dem alten (Absatz „Vorgabe für das Produkt (Befund 230)“
+  unten, Befund 252); der Boden verdeckt diesen gemischten Stand nur, behoben ist er erst mit einem neuen Zelllauf.
   Kennt die Kommune die Gattungen ihrer Bäume selbst (Baumkataster), gehen diese Angaben schon in
   den Ausgangsstand und in Ḡ₀ ein, nicht erst in das Maßnahmenszenario; sonst würde die Senkung
   an Kronen gerechnet, die der Ausgangsstand nur mit 0,12 kennt. Die Effektgröße ist damit
