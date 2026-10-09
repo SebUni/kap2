@@ -618,7 +618,7 @@ def gather_cell_inputs(
     try:
         with cow_pool() as pool:
             for done, (idx, lu, bm) in enumerate(
-                pool.imap_unordered(_cell_worker, range(total), chunksize=_CHUNK)
+                pool.map_unordered(_cell_worker, range(total), chunksize=_CHUNK)
             ):
                 lu_bm[idx] = (lu, bm)
                 if progress_callback and (done % 100 == 0 or done + 1 == total):
@@ -683,7 +683,7 @@ def gather_cell_inputs(
     try:
         with cow_pool() as pool:
             for done, (idx, ci) in enumerate(
-                pool.imap_unordered(_neighbor_worker, range(total), chunksize=_CHUNK)
+                pool.map_unordered(_neighbor_worker, range(total), chunksize=_CHUNK)
             ):
                 cell_inputs[idx] = ci
                 if progress_callback and (done % 200 == 0 or done + 1 == total):
