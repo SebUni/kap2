@@ -272,7 +272,7 @@ NATURAL_ALBEDO: dict[str, float] = {
     "sand": 0.35,
 }
 
-def _overpass_query(query_body: str, _retries: int = 5) -> dict:
+def _overpass_query(query_body: str, _retries: int = 8) -> dict:
     """Execute a synchronous Overpass API query with retry on transient errors.
 
     Handles 429 (rate-limit) by respecting the ``Retry-After`` header, and
@@ -309,17 +309,18 @@ def _overpass_query(query_body: str, _retries: int = 5) -> dict:
                     wait = int(retry_after) if retry_after and retry_after.isdigit() else 30
                     wait = min(wait, 90)  # cap at 90 s
                 else:
-                    wait = 5 * attempt  # 5s, 10s, 15s …
+                    wait = min(5 * attempt, 30)  # 5s, 10s, 15s … höchstens 30 s
                 log.warning("Overpass query attempt %d/%d failed (HTTP %s), retrying in %ds",
                             attempt, _retries, exc.response.status_code, wait)
                 _time.sleep(wait)
             else:
                 raise
-        except httpx.TransportError as exc:
-            # Timeout, ConnectError, DNS-Fehler, abgewiesene Verbindung: wie ein
+        except (httpx.TransportError, ValueError) as exc:
+            # Timeout, ConnectError, DNS-Fehler, abgewiesene Verbindung, Antwort ohne
+            # gültiges JSON (Overpass liefert Fehlertext mit HTTP 200): wie ein
             # Timeout behandeln – Backoff, dann der nächste Server der Liste.
             if attempt < _retries:
-                wait = 5 * attempt
+                wait = min(5 * attempt, 30)
                 log.warning("Overpass query attempt %d/%d failed (%s), retrying in %ds",
                             attempt, _retries, type(exc).__name__, wait)
                 _time.sleep(wait)

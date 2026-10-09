@@ -155,6 +155,8 @@ Arbeitsverzeichnis mit.
 
 Nach dem Merge ruft ein gesteuerter Lauf `bash scripts/testlauf.sh <dateien>` direkt auf (freigegeben über `.overlord/erlaubte_befehle`); der `python3`-Subprozess bleibt der Ausweichweg, wenn der direkte Aufruf abgewiesen wird.
 
+Die Python-Blöcke der Querschnittsdateien (`docs/methodik/querschnitt_*.md`) führt `backend/tests/test_methodik_querschnitt_bloecke.py` aus und vergleicht ihre dokumentierte Ausgabe; der Methodik-Lint überspringt diese Dateien.
+
 Gesteuerte Läufe rufen den Methodik-Export `bash scripts/export_methodik_pdf.sh <nr>` nach dem Merge direkt auf (ebenso `pdftoppm` für die Layout-Stichprobe); der `python3`-Subprozess bleibt der Ausweichweg.
 
 Den Methodik-Lint rufen gesteuerte Läufe als `bash scripts/lint_methodik.sh <nr>` auf, weil er den Interpreter der Projektumgebung nutzt und die Beispiel-Blöcke der Berichte `numpy` brauchen (mit dem System-Python endet `python3 backend/scripts/lint_methodik.py <nr>` mit `LINTS ROT`).
@@ -479,7 +481,7 @@ Neuanlegen des Schemas. Der Übergang ist reine Buchführung in
 
 ## Befund-Ledger prüfen (`ledger.py --pruefe`)
 
-`python3 backend/scripts/ledger.py <nr> --pruefe` führt die Prüfausdrücke aus `reviews/BEFUNDE_<nr>.md` aus; die Zeitgrenze je Ausdruck steht ohne Einstellung bei 90 s und lässt sich mit der Umgebungsvariable `LEDGER_AUSDRUCK_TIMEOUT_S` (Sekunden, positive Zahl) ändern, damit Serverlast kein falsches Rot erzeugt; ein ungültiger Wert fällt mit einer Warnzeile auf 90 s zurück.
+In gesteuerten Läufen ist der reguläre Aufruf `bash scripts/ledger.sh <nr> --pruefe`; das Skript startet `backend/scripts/ledger.py` im Interpreter der Projektumgebung (`${KAP2_VENV:-$HOME/.venvs/kap2}/bin/python`, fehlt er: Exit 2) und stellt dessen `bin` vorn in `PATH`, damit Prüfausdrücke mit `python3` denselben Interpreter nutzen. Das System-`python3` reicht dafür nicht, weil numpy fehlt. `ledger.py <nr> --pruefe` führt die Prüfausdrücke aus `reviews/BEFUNDE_<nr>.md` aus; die Zeitgrenze je Ausdruck steht ohne Einstellung bei 90 s und lässt sich mit der Umgebungsvariable `LEDGER_AUSDRUCK_TIMEOUT_S` (Sekunden, positive Zahl) ändern, damit Serverlast kein falsches Rot erzeugt; ein ungültiger Wert fällt mit einer Warnzeile auf 90 s zurück.
 
 ## Grenzen (bewusst so gelassen)
 

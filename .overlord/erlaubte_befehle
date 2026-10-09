@@ -4,5 +4,7 @@ bash scripts/testlauf.sh
 bash scripts/export_methodik_pdf.sh
 # Methodik-Lint über den Interpreter der Projektumgebung (Beispiel-Blöcke brauchen numpy), aufgerufen als bash scripts/lint_methodik.sh <nr>.
 bash scripts/lint_methodik.sh
+# Befund-Ledger prüfen über den Interpreter der Projektumgebung (System-python3 hat kein numpy), aufgerufen als bash scripts/ledger.sh <nr> --pruefe.
+bash scripts/ledger.sh
 # Layout-Stichprobe des Exports: einzelne PDF-Seiten als Bild ansehen.
 pdftoppm

@@ -339,8 +339,10 @@ einen Ersatzwert für sie gibt es nicht (Bericht 95 Kapitel 5, Hebel S157, Absat
 Kommune kommen sie hinzu, deshalb ist \(p_0\) eine Untergrenze (Berlin 0,096, unten). Die Gewichte \(a_c\) stammen aus
 der Beispielkommune des Berichts, hängen aber kaum an ihr: In Warmsen trägt die Mortalität 0,995 des Betrags (Kette
 177.406 € je Jahr, davon Morbidität 0,1213 Fälle × 7.152 € = 868 €; Bericht 95 §3.5), \(p_0\) ist dort 0,0607, auf drei
-Stellen ebenfalls 0,061. Anders als \(a_{85+}\) bei S157, mit dem Berliner Wert in Warmsen 27 % zu hoch (Befund 183), ist
-\(a_c\) deshalb keine Berliner Konstante, die andere Kommunen falsch darstellt.
+Stellen ebenfalls 0,061. \(a_c\) ist deshalb keine Berliner Konstante, die andere Kommunen falsch darstellt. Anders bei
+S157: Dort rechnet Bericht 95 mit \(a_{85+}\), dem Anteil des Altersbands 85+ an den verlorenen Lebensjahren (YLL) der
+Kommune. Mit dem Wert der Berliner Rechenkette, 0,284 statt 0,224, läge er in Warmsen 27 % zu hoch; deshalb rechnet
+Bericht 95 ihn je Kommune (Kapitel 5, Hebel S157, Absatz „\(a_{85+}\) je Kommune (Befund 183)“).
 
 **Was die einfachere Rechnung ohne Kommune verfälschen würde.** Den Berliner Wert 0,096 in den Katalog zu setzen, rechnete
 die Hebel an den Altersbändern für jede Kommune mit dem Altersaufbau Berlins; schon bei S157 läge Warmsen damit 27 % zu
@@ -376,7 +378,7 @@ je Teil des Schadens (Block `doppelzaehlung_95`):
 | Mortalität, Heimbewohner ab 85 | 638,8 YLL × 0,344 × 160.800 € = 35,34 Mio. € (YLL 85+ und Heimanteil wie bei den Schutzprogrammen, Wert je YLL §3.0 Ebene 8) | Hitzeaktionsplan 1 − 0,939 = 0,061 | 35,34 × 0,061 = 2,16 Mio. € |
 | dazu S157 bei der Voreinstellung | 1,249 Mio. € (Hebel S157, Absatz „Sensitivität“) | mit dem Plan gedämpft, × 0,939 (Absatz „Zusammen mit dem Hitzeaktionsplan (Befund 129)“) | 1,249 × 0,939 = 1,17 Mio. € |
 | Mortalität, Bänder unter 75 | Rest: 361,8 − 169,5 − 35,34 = 156,96 Mio. € (§3.0 Ebene 8) | Hitzeaktionsplan 0,061 | 156,96 × 0,061 = 9,57 Mio. € |
-| Morbidität | 1,09 Mio. € (§3.0 Ebene 9) | keiner wirkt (Hitzeaktionsplan: „Die Morbidität bleibt unberührt“; Schutzprogramme \(\delta_{\text{VG,morb}}\) = 1,0) | 0 |
+| Morbidität | 1,09 Mio. € (§3.0 Ebene 9) | keiner wirkt (Hitzeaktionsplan: „Die Morbidität bleibt unberührt“; Schutzprogramme: ihr Faktor auf die Einweisungen, \(\delta_{\text{VG,morb}}\), ist 1,0, und 1 heißt keine Wirkung; Bericht 95 Kapitel 5, Hebel Schutzprogramme, Absatz „Morbidität (Befund 131)“) | 0 |
 | zusammen | 362,9 Mio. € | | **34,9 Mio. €** |
 
 \(S_{\text{alle}}\) = 362,9 − 34,9 = 328,0 Mio. € je Jahr, \(p\) = 1 − 328,0 / 362,9 = 34,9 / 362,9 = **0,096**.
@@ -443,11 +445,13 @@ wegen dieses Plans hoch einstuft.
 - Wählt eine Kommune Maßnahmen, ohne ihre Selbsteinschätzung nachzuführen, sinkt der Betrag, die Stufe aber nicht. Das
   ist keine Doppelzählung, sondern ein fehlender Abgleich; das Produkt zeigt beides mit seiner Grundlage nebeneinander.
 - Der Basiswert rechnet jede Kommune mit dem Anpassungsstand im Mittel Deutschlands. Was darüber hinausgeht, senkt den
-  Euro-Betrag nur auf zwei Wegen: über den Anteil gekühlter Heimplätze, soweit er über dem Mittel der Kalibrierjahre
-  liegt (\(s_{\text{gek}}\) − 0,06, `heat.s_gek_kalib`), und über neu gewählte Maßnahmen, bei Schutzprogrammen und
-  Kühlzentren mit der Wächter-Antwort „nein“. Ein älteres Programm, das schon 2012–2024 lief, bekommt die Antwort „ja“,
-  und dann gilt \(\delta_{\text{VG}}\) = \(\delta_{\text{VG,morb}}\) = 1 und \(\delta_{\text{KZ}}\) = 1 (Bericht 95
-  Kapitel 5, Hebel Schutzprogramme, Absatz „Doppelzählungs-Wächter (Befund 150)“, und Hebel Kühlzentren; Block
+  Euro-Betrag nur auf zwei Wegen: über den Anteil gekühlter Heimplätze \(s_{\text{gek}}\), soweit er über dem Mittel der
+  Kalibrierjahre von 0,06 liegt (\(s_{\text{gek}}\) − 0,06, `heat.s_gek_kalib`), und über neu gewählte Maßnahmen, bei
+  Schutzprogrammen und Kühlzentren mit der Wächter-Antwort „nein“. Ein älteres Programm, das schon 2012–2024 lief,
+  bekommt die Antwort „ja“. Dann sind die Faktoren der Schutzprogramme auf die Hitzetoten und die Einweisungen der
+  Bänder ab 75 außerhalb der Heime, \(\delta_{\text{VG}}\) und \(\delta_{\text{VG,morb}}\), und der Faktor der
+  Kühlzentren auf dieselben Hitzetoten, \(\delta_{\text{KZ}}\), je 1; 1 heißt keine Wirkung (Bericht 95 Kapitel 5, Hebel
+  Schutzprogramme, Absatz „Doppelzählungs-Wächter (Befund 150)“, und Hebel Kühlzentren; Block
   `heat.vg_in_kalibrierjahren`). Ein solches Programm steckt im Betrag also nur mit dem Mittel Deutschlands; seinen
   Vorsprung vor dem Mittel zeigt allein die Stufe über die Selbsteinschätzung. Für eine Kommune mit einem älteren
   Programm fällt der Betrag deshalb zu hoch aus, nach den Abschätzungen aus Kapitel 5 höchstens um die Wirkung, die das
@@ -1055,17 +1059,19 @@ unverändert. Verworfen, je mit einem Satz:
 23. **Für #96 die Mitte (P98 „hoch“) als Eingang, damit die Selbsteinschätzung sichtbar wirkt:** verworfen aus demselben
     Grund wie Nummer 6; die Stufen zur Mitte bleiben im Bericht sichtbar ((a)).
 
-**Bewusst offen (Gegenprobe Zeile 18, `docs/KONFORMITAET_CHECKLISTE.md`):**
+**Bewusst offen (Gegenprobe Zeile 18, `docs/KONFORMITAET_CHECKLISTE.md`).** Das Vorhaben T-1122-cmo nimmt diese vier
+Punkte von seinem Abnahmekriterium aus; diese Datei klärt sie nicht. Ist die Produktseite fertig, prüft das Vorhaben
+T-1194-cmo (Normprüfung aus T-1112-ceo) Zeile 18 am Normtext nach. Stand der Tickets: 09.10.2026.
 
 - **A3** „welche Anpassungsmöglichkeiten grundsätzlich bestehen“ (S. 28): Regel A nennt keine Maßnahme. Zuständig: CTO
-  (Produktseite Zeile 18, T-1071-ceo).
+  (Produktseite Zeile 18, Planung T-1162-ceo; sie ersetzt für Zeile 18 das abgebrochene T-1071-ceo).
 - **A4** „Bedarf nach zusätzlicher, möglicherweise transformativer Anpassung“ (S. 28): Regel A sagt, wo die Kommune
-  steht, nicht, wie viel Anpassung fehlt. Zuständig: CMO (Vorhaben T-1122-cmo).
+  steht, nicht, wie viel Anpassung fehlt. Zuständig: CMO; ein eigenes Vorhaben dafür ist noch nicht angelegt.
 - **A11** Wechselwirkungen, Synergien und Zielkonflikte zwischen Maßnahmen (S. 29): Regel A betrachtet keine Maßnahme
-  einzeln. Zuständig: CMO (Vorhaben T-1122-cmo).
-- **A12** „die Grenzen der Klimaanpassung beleuchten“ (S. 29): Die Obergrenze aus (e) ist eine Grenze der Rechnung, keine
-  Aussage über Grenzen der Anpassung; die Mappe führt dafür Spalte AI „Grenzen der Anpassung“, für #95 leer (AI97,
-  gemessen am 07.10.2026). Zuständig: CMO (Vorhaben T-1122-cmo).
+  einzeln. Zuständig: CMO; ein eigenes Vorhaben dafür ist noch nicht angelegt.
+- **A12** „die Grenzen der Klimaanpassung beleuchtet werden“ (S. 29): Die Obergrenze aus (e) ist eine Grenze der
+  Rechnung, keine Aussage über Grenzen der Anpassung; die Mappe führt dafür Spalte AI „Grenzen der Anpassung“, für #95
+  leer (AI97, gemessen am 07.10.2026). Zuständig: CMO; ein eigenes Vorhaben dafür ist noch nicht angelegt.
 
 ## Befunde an Berichte
 
