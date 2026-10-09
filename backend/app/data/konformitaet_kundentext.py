@@ -43,6 +43,15 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
         "sagt nicht, wer welchen Arbeitsschritt verantwortet, und erfasst einen eigenen Wert der Kommune "
         "nur mit Quelle, nicht als ihre eigene Abschätzung.",
     ),
+    4: (
+        "teilweise",
+        "Der Bericht zur Hitzebelastung (Anlage M95) rechnet die Zahl der Betroffenen und ihre Empfindlichkeit "
+        "als getrennte Faktoren, führt die Einwohner je Altersgruppe aber als eine Größe, ohne zu zeigen, welcher "
+        "Teil dieser Größe die Zahl und welcher die Empfindlichkeit ist. Die Kennzahl für die erste Einschätzung ordnet "
+        "den Altersaufbau der Zahl der Betroffenen und die Erreichbarkeit der Gesundheitsversorgung der "
+        "Empfindlichkeit zu, anders als die Wirkungskette, und der Bericht nennt die Empfindlichkeit stellenweise "
+        "„Vulnerabilität“, einen Begriff, den das amtliche Vorbild vermeidet.",
+    ),
     6: (
         "teilweise",
         "Die Reihenfolge, in der neue Klimawirkungen ins Produkt aufgenommen werden, ist nicht für "
