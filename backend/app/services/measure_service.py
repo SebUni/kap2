@@ -692,6 +692,39 @@ def _s155_summary_fields(mdef: dict, eur_mm_total: float, eur_c44_total: float,
     }
 
 
+# ── Hebel S158 des Berichts #98: Förderung der Früherkennung von Hautkrebs (Bericht #98
+# §5, Abschnitt „Förderung der Früherkennung (S158)“ und Integrationsauflage, Log 34;
+# Maßnahme SKIN_CANCER_EARLY_DETECTION; T-1937-cto, Befund 502) ──
+# Keine Zahl und keine Nullwirkung (Vorgabe P2): Der Basiswert setzt die SCS-Kostensätze
+# schon für alle Fälle an, ein Hebel darauf zählte doppelt (LF 4), und für die Letalität
+# gibt es keine Effektgröße. Das Produkt zeigt den Vermerk statt eines Betrags. Der Code
+# S158 steht im Katalog schon bei POLLEN_EARLY_WARNING (#96), deshalb eigener Code.
+
+UV_FRUEHERKENNUNG_VERMERK = "Kostenwirkung im Basiswert voll angerechnet"
+# Euro-Nutzenfelder, die für diese Maßnahme gar nicht erst entstehen (kein 0 €).
+UV_FRUEHERKENNUNG_OHNE_NUTZEN_FELDER = (
+    "annual_benefit_eur", "annual_benefit_damage_eur",
+    "annual_benefit_flat_eur", "annual_benefit_direct_eur",
+)
+
+
+def _is_uv_fruherkennung(mdef: dict) -> bool:
+    return mdef.get("effect_model") == "s158_uv"
+
+
+def _uv_fruherkennung_summary_fields(mdef: dict) -> dict:
+    """Vermerk statt Betrag für die Früherkennungs-Förderung zu #98 (``benefit_display``).
+
+    ``benefit_has_euro_layer`` False: Es gibt keinen Euro-Nutzen aus vermiedenen Schäden
+    und damit kein Nutzen-Kosten-Verhältnis (auch keine 0). Die Nutzenfelder in
+    ``UV_FRUEHERKENNUNG_OHNE_NUTZEN_FELDER`` entfernt der Aufrufer aus der Zusammenfassung.
+    """
+    if not _is_uv_fruherkennung(mdef):
+        return {}
+    return {"benefit_display": UV_FRUEHERKENNUNG_VERMERK,
+            "benefit_has_euro_layer": False}
+
+
 # ── Hebel Stadtbaumwahl (Bericht #96 §5, Integrationsauflage Z. 1111–1125; Maßnahme
 # LOW_ALLERGEN_TREE_SELECTION) — Vorhaben T-1483-cto Teilpaket #2, setzt auf der
 # Zellfunktion health.stadtbaum_g_neu (T-1599-cto) auf. Wie S158 (Sperre aus Befund 124)
@@ -1841,6 +1874,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         # S155 (Bericht #98 §5): volle Wirkung, Band und Rampe nach 10/20/30 Jahren als
         # Abschätzung von KAP3, oder Vermerk statt Betrag bei Alt-Zellen.
         **_s155_summary_fields(mdef, s155_eur_mm_total, s155_eur_c44_total, s155_missing),
+        # S158 des Berichts #98 (Früherkennungs-Förderung): Vermerk statt Betrag.
+        **_uv_fruherkennung_summary_fields(mdef),
         # Integrationsauflage (Stadtbaumwahl) §5 Punkt (4): vermiedene Zusatztage/Euro
         # der Kommune als Abschätzung von KAP3 gekennzeichnet, mit Hinweis auf die
         # Richtung des Fehlers in λ (Modellgrenze 7), oder Vermerk statt Betrag ohne
@@ -1861,6 +1896,11 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
         "unit_factor": round(unit_factor, 4),
         "cost_breakdown": cost_breakdown,
     }
+
+    if _is_uv_fruherkennung(mdef):
+        # Vorgabe P2: kein Euro-Nutzen 0 €, der Vermerk steht an seiner Stelle.
+        for feld in UV_FRUEHERKENNUNG_OHNE_NUTZEN_FELDER:
+            summary.pop(feld, None)
 
     # Persistiert am Maßnahmen-Objekt (bereits in der Session geladen) statt an
     # einer per Nachfrage-Query gesuchten MeasureImpact-Zelle - so unabhängig von
