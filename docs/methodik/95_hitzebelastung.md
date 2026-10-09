@@ -192,7 +192,7 @@ zehn jüngsten verfügbaren Jahre, Abruf 25.09.2026).
 | 2 | Sommermittel der Temperatur \(\bar T\) (Juni–August, 24-h-Mittel) | 20,07 °C | DWD-CDC-Raster air_temperature_mean, 1 km [33] |
 | 3 | Schwelle und Steigung der Region Mitte: \(T_0\); \(\beta_a = \beta_{85+} \times f_a\) | \(T_0\) = 20,2 °C; \(\beta_{85+}\) = 0,0625 K⁻¹ × \(f_a\) 0,357 · 0,588 · 0,631 · 1,0 = 0,0223 · 0,0368 · 0,0394 · 0,0625 K⁻¹ | Winklmayr 2022 [11] (§3.3); \(f_a\) Rückrechnung §3.3a [12,49] |
 | 4 | Wochenexzess: 13 Sommerwochen \(T_w = \bar T + q_w\), je Woche Übersterblichkeit \(e^{\beta_a (T_w - T_0)_+} - 1\), summiert | 6 von 13 Wochen über 20,2 °C (20,58–24,67 °C); Summe 0,289 · 0,486 · 0,524 · 0,860 | Wochenquantile Mitte, Tabelle §3.2 [33,50] |
-| 5 | Basissterbefälle je Woche: \(\text{pop}_a \times m_a / 100.000 / 52\) | \(m_a\) 213,2 · 1.737,9 · 4.812,3 · 14.800,2 je 100.000 ⇒ 121,4 · 113,5 · 234,6 · 307,2 Sterbefälle je Woche | Sterbefälle 2023 [49] (§3.5) |
+| 5 | Basissterbefälle je Woche: \(\text{pop}_a \times m_a / 100.000 / 52\) | \(m_a\) 213,2 · 1.737,9 · 4.812,3 · 14.800,2 je 100.000 ⇒ 121,4 · 113,5 · 234,6 · 307,2 Sterbefälle je Woche | Sterbefälle 2023 [49] (§3.5) (Anker `#m-a`) |
 | 6 | Zusätzliche Sterbefälle \(D_a\) = \(c_{\text{kal}}\) × \(v_{\text{vers},a}\) × Ebene 5 × Ebene 4 | 0,581 × 1 × … = 20,4 · 32,0 · 71,4 · 153,6 = **277,4 Todesfälle je Jahr** | \(c_{\text{kal}}\) Kalibrierung §4 [50]; \(v_{\text{vers}}\) §3.3 |
 | 7 | Verlorene Lebensjahre: \(\text{YLL} = \sum_a D_a \times \bar L_a\) | \(\bar L_a\) 23,39 · 15,59 · 8,90 · 4,16 J ⇒ 476,3 + 499,5 + 635,4 + 638,8 = **2.250 YLL je Jahr** (native Ergebnisgröße) | Sterbetafel 2022/2024 [48], Sterbefälle 2023 [49] (§3.5) |
 | 8 | Mortalität in Euro: YLL × VOLY | 2.250 × 160.800 € = 361,8 Mio. € (Preisstand 2024) | VOLY-Kette §3.5 [19] |
@@ -564,7 +564,7 @@ for rr, t0, soll in [(1.40, 19.7, 0.0634), (1.35, 20.2, 0.0625), (1.25, 20.8, 0.
     assert abs(math.log(rr) / (25.0 - t0) - soll) < 0.0002
 ```
 
-**(a) Rückrechnung der Altersfaktoren \(f_a\)** (Befund 32; §3.9 „Abgeleitet"):
+**(a) Rückrechnung der Altersfaktoren \(f_a\)** (Anker `#f-a`) (Befund 32; §3.9 „Abgeleitet"):
 Für kleine \(\beta\,\Delta\) gilt je Band \(\text{Todesfälle}_a \propto \text{pop}_a \cdot
 m_a \cdot \beta_a\), also \(f_a \propto \text{Anteil}_a / (\text{pop}_a \cdot m_a)\)
 — **lineare Näherung, gekennzeichnet**; ihre Güte wird in §4 (Altersverteilungs-Ist) geprüft.
@@ -735,7 +735,7 @@ assert abs(r0["a85p"] / r0["u65"] - 8.2) < 0.05
 
 $$ \text{€}_{\text{Zelle}} \;=\; \text{YLL}_{\text{Zelle}} \cdot \text{VOLY} \;+\; F_{\text{Zelle}} \cdot c_{\text{Fall}}, \qquad \text{Kommune} = \sum_{\text{Zellen}} \quad (\text{Ausweis: YLL / Fälle / €}) $$
 
-VOLY-Herleitung (MK-4.0-Regel): Amann 2020a Tab. 3.15: 79.500 €₂₀₀₅; Anpassung VPI
+VOLY-Herleitung (MK-4.0-Regel) (Anker `#voly`): Amann 2020a Tab. 3.15: 79.500 €₂₀₀₅; Anpassung VPI
 2005→2024 ×1,4638 · Kaufkraft-Raumtransfer EU27→DE mit Elastizität 0,85 ×1,1792 ·
 Einkommensentwicklung ^0,85 ×1,1719 ⇒ **160.800 € (Preisstand 2024)** (Preisstand-Label korrigiert,
 Befund 10: alle Indexendpunkte sind 2024). **Band** (Befund 10, definiert): Untergrenze
@@ -904,7 +904,7 @@ Anlagepflicht der Aufgabe, ersetzt die Rev.-5-Fallback-Definitionen aus Befund 2
   \(q_{\text{pfl}} = \bar q\) (OSM-Lücke nicht von „keine Heime"
   unterscheidbar — dokumentiert).
 - **\(q_{\text{1P}}\) — Ebene `SINGLE_HH_SHARE_65P` („geparkt — Datenquelle
-  fehlt"; §3.1):** Es existiert keine offene Zellquelle (Zensus-2022-Gitter ohne
+  fehlt"; §3.1)** (Anker `#qbar-1p`)**:** Es existiert keine offene Zellquelle (Zensus-2022-Gitter ohne
   1P×65+-Kreuzung und ohne Gesamt-1P-Anteil; Mikrozensus nur Bundesebene).
   Bis zur Beschaffung gilt \(q_{\text{1P}} = \bar q_{\text{1P}}\) (Faktor 1,
   kalibrierneutral). **Watchlist:** Zensus-Gitterdaten-Nachlieferungen
@@ -1549,6 +1549,16 @@ noch auf einen Barwert abgezinst.
    gleichverteilt über ± 30 m um das Mittel, ist σ_Relief = 0,0065 × 60/√12 = 0,11 K, zusammen
    √(0,58² + 0,11²) = 0,59 K. Das liegt im Band 0,29–0,87 K (§4, „Band der Streuung σ“), bei ± 100 m sind es 0,69 K.
    σ bleibt deshalb 0,58 K (Log 56).
+7. Zwei Gitter: Das 1-km-Raster des DWD liegt in seinem eigenen Gitter, nicht im Gitter EPSG:3035 der Zensus-Zellen;
+   \(\bar h\) wird aber über den 1-km-Block des Gitters EPSG:3035 gebildet (§3.1). Block und DWD-Zelle sind je Achse um
+   0 bis 500 m gegeneinander versetzt. **Abschätzung von KAP3:** Auf einem Hang mit dem Gefälle g weicht \(\bar h\)
+   um g × Versatz von der mittleren Höhe der DWD-Zelle ab, bei gleichverteiltem Versatz im Mittel um g × 250 m. Mit
+   0,0065 K je Meter (§3.1) verschiebt das den Höhenterm um 1,6 K × g, bei 1 % Gefälle um 0,016 K, höchstens um
+   0,033 K. Um 1 K wärmer wächst der Wochenexzess 85+ in Berlin auf das 1,598-Fache (§3.0, Extremfall der Heime); 0,016 K
+   sind damit 0,75 % des Exzesses (1,598^0,016 = 1,0075), 0,033 K sind 1,5 %, je nach Richtung des Hangs nach oben oder
+   unten. Diese Werte gelten nur für eine Kommune, deren Hänge alle in dieselbe Richtung fallen. Der Versatz ist
+   örtlich fest, die Hänge einer Kommune fallen aber in verschiedene Richtungen. In der Summe heben sich die
+   Abweichungen deshalb weitgehend auf. Der Betrag wird nicht korrigiert.
 
 **Infokasten-/UI-Texte (§3.6 — Teil des Berichts):**
 
@@ -1955,7 +1965,7 @@ parameter:
   abgeleitet_aus: []
 parameter:
   id: heat.sigma_k
-  wert: 0.58   # Streuung der Waermeinsel-Feinstruktur unter 1 km um den Rasterwert, gerundet aus 0,577 K (§3.0 (d))
+  wert: 0.58   # Streuung der Waermeinsel-Feinstruktur unter 1 km um Rasterwert plus Hoehenterm (§3.1), gerundet aus 0,577 K (§3.0 (d))
   einheit: "K"
   band: [0.29, 0.87]   # Spanne ± 0,5 K bis ± 1,5 K, Gleichverteilung (§4, Absatz "Band der Streuung σ", Befund 232); Zelllauf mit Ersatzregel Berlin 337,99-356,97 Mio. EUR statt 345,11, Warmsen 169.125-185.173 EUR statt 175.256
   herkunft: herleitung:#sigma-k   # §4, Absatz "Modellrechnung mit der Streuung σ = 0,58 K" (Wert) und Absatz "Band der Streuung σ" (Band, Wirkung an den Enden)
@@ -2435,8 +2445,8 @@ DOI-Link die persistente Referenz.
   gerundet“). Verwendet in §3.3a (Band von \(f_a\)). Archiv wie [71]; die DOI ist die persistente Referenz.
 - **[75]** M. an der Heiden, B. Zacher, RKI-Geschäftsstelle für Klimawandel & Gesundheit, M. Diercke, V. Bremer,
   „Wochenbericht zur hitzebedingten Mortalität KW 37/2026 vom 24.09.2026“, Robert Koch-Institut. doi:10.25646/14459
-  (https://www.rki.de/DE/Themen/Gesundheit-und-Gesellschaft/Gesundheitliche-Einflussfaktoren-A-Z/H/Hitze/Bericht_Hitzemortalitaet.html,
-  abgerufen 27.09.2026, 11:01 UTC, HTTP 200, SHA-256 76af8672…f1ce; die Seite wird wöchentlich überschrieben). Tabelle 1:
+  (PDF unter der DOI: https://edoc.rki.de/bitstream/handle/176904/13938/RKI-Wochenbericht_Hitzemortalit%c3%a4t_KW37_2026-09-24.pdf,
+  abgerufen 09.10.2026, 16:15 UTC, HTTP 200, SHA-256 bd0f9ab0…04ff). Tabelle 1, Seite 1:
   Sommer 2026, kumulativ bis KW 37, Gesamt 16.000 [14.400; 17.600], < 65: 1.510, 65–74: 2.440, 75–84: 3.890, 85+: 8.200.
   Verwendet in §3.3a (Band von \(f_a\)). Archiv wie [71]; die DOI ist die persistente Referenz.
 - **[76]** K. Müller, „Stand der kommunalen Hitzeaktionsplanung in Nordrhein-Westfalen“, Abstract zur
