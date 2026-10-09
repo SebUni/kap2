@@ -15,7 +15,7 @@ Zeilen 6–25 sind eigene, spätere Pakete und werden hier nicht vorweggenommen.
 | 1 | Das Klimarisiko ist über Klimawirkungsketten herzuleiten, die klimatischen Einfluss, Sensitivität und räumliche Exposition als benannte, unterscheidbare Komponenten abbilden. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 | teilweise | docs/methodik/95_hitzebelastung.md, docs/methodik/61_vegetation_in_siedlungen.md | Die Herleitung über die Klimawirkungskette trägt nur der Bericht zur Hitzebelastung (docs/methodik/95_hitzebelastung.md): Er rechnet Hitze (E02), Altersstruktur und Pflegebedürftigkeit (S152, S153) und Bevölkerung (R35) als getrennte Größen bis zum Euro-Betrag. Der Bericht zu Vegetation in Siedlungen (docs/methodik/61_vegetation_in_siedlungen.md) ist ein ungeprüfter Erstaufschlag: Er listet die Knoten der Kette W127, die Spalte „rechnet in“ steht bei allen auf „offen“, Kap. 3, 4 und 6 sind nur Kommentar; ein Klimarisiko leitet er nicht her. In beiden Berichten sind die Komponenten über die Knotenkennungen E, S und R der Arbeitsmappe und die Knotennamen unterscheidbar, die R-Knoten heißen wie in Tabelle 4 der Quelle „Vorkommen von …“; es fehlt aber die Erklärung, wofür E, S und R stehen. Außerdem schreibt docs/methodik/95_hitzebelastung.md Schicht A (Kap. 3.7) als Ĥ × Ê × V̂ in der Schreibweise des IPCC (Hazard, Exposure, Vulnerability) und nennt die Sensitivität stellenweise „Vulnerabilität“, einen Begriff, den die KWRA in Kap. 2.1.4.2 vermeidet und von der Sensitivität abgrenzt; docs/methodik/61_vegetation_in_siedlungen.md spricht von „Hazard-Kanal“ und „Kandidat Vulnerabilität“. Gerechnet wird nur das heutige Klima; die Wirkung des Klimawandels als Differenz zwischen Bezugszeitraum (1971–2000) und künftigem Zeitraum rechnet kein Beleg. Einzelnachweis: Abschnitt „Gegenprobe Zeile 1“. |
 | 2 | Das Klimarisiko ist ausdrücklich als "Risiko ohne (weitere) Anpassung" auszuweisen und von einem Zustand "mit Anpassung" begrifflich zu unterscheiden. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 | teilweise | docs/methodik/61_vegetation_in_siedlungen.md | Nur der Methodik-Bericht zu Vegetation in Siedlungen weist einen Vergleichswert "ohne Anpassung" explizit in KWRA-Terminologie aus. Für die übrigen vorliegenden Methodik-Berichte fehlt ein systematischer, unter diesem Begriff geführter Ausweis; die Aufgabenbeschreibung (docs/AUFGABE_METHODIK_SCHADENSRECHNUNG.md) definiert die Unterscheidung "ohne Anpassung"/"mit Anpassung" bislang nicht als eigenen Pflichtabschnitt. |
 | 3 | Für jeden in die Bewertung eingehenden Parameter beziehungsweise Faktor ist die zugrunde gelegte Quelle offenzulegen und zu dokumentieren; ist keine Quelle vorhanden, ist die Abschätzung als solche kenntlich zu machen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.3 (S. 42, Tabelle 3) und Kap. 1.3 (S. 34) | teilweise | docs/evidenz/register.md, docs/methodik/95_hitzebelastung.md, frontend/src/components/ParameterTable.tsx | Die Fundstelle verlangt keine Quelle je Parameter, sondern getrennte Ebenen, transparente Arbeitsschritte und dokumentierte Grundlagen normativer Entscheidungen; das tragen docs/methodik/95_hitzebelastung.md (Kennzeichnung je Block in Kap. 7, Entscheidungslog) und frontend/src/components/ParameterTable.tsx (Spalten „Quelle“ und „Beleglage“ mit Herleitung). Es fehlt: docs/evidenz/register.md weist Setzungen von KAP3, die der Bericht als Abschätzung kennzeichnet, nicht als solche aus (95-E02-01 nennt für Süd 0,0531 statt der Nachschätzung 0,0876, 95-S152-01 die Altersfaktoren, 95-S158-01 den Faktor 0,939 des Hitzeaktionsplans); frontend/src/components/ParameterTable.tsx trennt fachliche Abschätzungen nicht von Bewertungsentscheidungen wie Voreinstellungen nach Fehlerabwägung, ordnet die Arbeitsschritte nicht wie Tabelle 3 einer Ebene und einem Akteur zu und erfasst bei einer Änderung nur Wert und Quelle, sodass ein eigener Wert der Kommune nicht als ihre Abschätzung gekennzeichnet und eine Setzung von KAP3 nicht ausdrücklich bestätigt werden kann. Einzelnachweis: Abschnitt „Gegenprobe Zeile 3“. |
-| 4 | Sensitivität (Anfälligkeit eines Systems gegenüber einem klimatischen Einfluss) und räumliche Exposition (Vorhandensein potenziell betroffener Systemelemente) sind begrifflich und methodisch getrennt zu führen, nicht zu vermischen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 (S. 44) | erfüllt | docs/methodik/95_hitzebelastung.md | — |
+| 4 | Sensitivität (Anfälligkeit eines Systems gegenüber einem klimatischen Einfluss) und räumliche Exposition (Vorhandensein potenziell betroffener Systemelemente) sind begrifflich und methodisch getrennt zu führen, nicht zu vermischen. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 2.1.4.1 (S. 44) | teilweise | docs/methodik/95_hitzebelastung.md | Der Bericht zur Hitzebelastung (docs/methodik/95_hitzebelastung.md) rechnet in Schicht B Exposition und Sensitivität als getrennte Faktoren: die Bevölkerung je Zelle (R35) als Exposition, Altersfaktoren, Basissterberaten, Restlebenserwartung, Heim- und Isolationsterm (S152, S153) als Sensitivität; ohne Einwohner ist die Wirkung null, und alle Maßnahmen-Hebel setzen an Sensitivitätsknoten an. Drei Dinge fehlen. Erstens führt die Knoten-Bilanz die Einwohner je Altersband (pop_a) zugleich bei S152 und bei R35, und Ebene 1 der Rechenkette (Kap. 3.0) fasst Einwohnerzahl (Exposition) und Altersaufbau (Sensitivität) in einer Größe, ohne die Zerlegung als Exposition × Sensitivität hinzuschreiben; keine Ebene der Rechenkette nennt ihre Komponente. Zweitens ordnet Schicht A (Kap. 3.7) die Ebenen Altersstruktur und vulnerable Gruppen der Exposition Ê (R35) zu und den Zugang zur Gesundheitsversorgung (R36, in der Kette ein räumlicher Knoten) der Vulnerabilität V̂ (S152–S158); R36 rechnet auch sonst als Modulator der Anfälligkeit (Distanzterm, Log 20), ohne dass der Bericht die Umordnung von der Exposition zur Sensitivität begründet. Drittens heißt die Sensitivität stellenweise „Vulnerabilität“ (Register 95-S152-02, Kap. 3.1, Log 12), ein Begriff, den die KWRA vermeidet, und „Sensitivität“ steht zugleich für die Sensitivitätsrechnung („Sensitivitätsband“ bei S153 und R36). Einzelnachweis: Abschnitt „Gegenprobe Zeile 4“. |
 | 5 | Die Analyse muss ihre methodischen Grenzen und ihren Anwendungsbereich explizit benennen, insbesondere dass sie keine detailliertere lokale oder sektorale Risikoanalyse ersetzt. | KWRA 2021 | kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf, Kap. 1.4 (S. 35) | erfüllt | docs/methodik/95_hitzebelastung.md, docs/methodik/60_gebaeudeschaeden_flusshochwasser.md | — |
 | 6 | Klimawirkungen sind anhand des Klimarisikos (ohne Anpassung, pessimistischer Fall) und der Anpassungsdauer in Prioritätsstufen "sehr dringende" und "dringende" Handlungserfordernisse einzustufen, damit erkennbar ist, wo Anpassung schon jetzt beginnen muss. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.1 (S. 136–140) | teilweise | frontend/src/pages/roadmap/roadmapData.ts, docs/KATALOG_KRITIK.md | Die Produkt-Roadmap übernimmt die KWRA-Kategorie "sehr dringende Klimawirkungen" wörtlich, um die Ausbaureihenfolge zu begründen (zuerst die drei sehr dringenden Gesundheits-Klimawirkungen, danach 15 weitere). Es gibt aber keine im Produkt selbst nachvollziehbare, aus Klimarisiko und Anpassungsdauer hergeleitete Einstufung je Klimawirkung, und laut docs/KATALOG_KRITIK.md sind 10 der bundesweit 31 "sehr dringenden" Klimawirkungen im heutigen Katalog nicht abgebildet, weil sie ausgewählt statt systematisch aus der KWRA-Einstufung hergeleitet wurden. |
 | 7 | Klimawirkungen mit sehr dringenden Handlungserfordernissen sind anhand von Anpassungspotenzial und Bewertungsgewissheit in Charakterisierungsgruppen (Umsetzung, Entwicklung, Entwicklung unter Unsicherheit, Innovation, Innovation unter Unsicherheit) einzuordnen, um den Handlungstyp zu benennen. | KWRA 2021 | kwra2021_teilbericht_6_integrierte_auswertung_bf_211027_0.pdf, Kap. 6.2 (S. 140–145) | teilweise | backend/app/services/charakterisierung.py, backend/app/services/gewissheit.py, backend/app/api/routes/catalog.py, backend/tests/test_charakterisierungsgruppen.py | Die fünf Gruppen und eine dokumentierte Entscheidungstabelle sind vorhanden, die Schwellen sind nach P1 als Abschätzung von KAP3 ausgewiesen. Es fehlt aber, was die Einordnung nach Kap. 6.2 trägt: Beschlossene und weiterreichende Maßnahmen werden nicht getrennt, und es gibt keinen optimistischen und pessimistischen Fall. „Innovation“ heißt im Produkt nur, dass der Katalog keinen verknüpften Hebel ab 10 % hat, nicht, dass auch alle Maßnahmen das Ziel verfehlen. Die Gewissheit enthält nicht die Gewissheit der Anpassungskapazität. Die Ausnahme der KWRA für die Allergien (Bewertung auf Basis der beschlossenen Maßnahmen, Fn. 28/29) fehlt, ebenso eine gerechnete Sensitivität der Zuordnung und das Handlungserfordernis je Gruppe. Eingeordnet wird jeder Katalogcode, nicht nur die sehr dringenden. Ergebnis: Nur #95 Hitzebelastung liegt wie in Tabelle 27 in „Entwicklung“. #96 Aeroallergene (KWRA „Umsetzung“) und #98 UV-Schädigungen (KWRA „Entwicklung“) landen mit Anpassungspotenzial 0 in „Innovation“, weil keine Maßnahme im Rechenweg wirkt: Die Pollen-Frühwarnung ist nur qualitativ verknüpft, für UV gibt es keine Maßnahme. Die Modellgrenze der API nennt diese Ursache nicht. Einzelnachweis: Abschnitt „Gegenprobe Zeile 7“. |
@@ -1465,6 +1465,128 @@ derselben Änderung auf `teilweise` gesetzt; `backend/tests/test_konformitaet_ze
 `backend/app/data/konformitaet_kundentext.py` führt den Kundensatz. Die Zählungen in den Abschnitten „Nachtrag:
 Abschlusszählung“ und „Zusammenfassung“ sind damit weiter überholt; sie nachzuziehen ist Sache der Gesamtzählung, nicht
 dieser Gegenprobe.
+
+### Gegenprobe Zeile 4 gegen KWRA 2021, Teilbericht 1, Kap. 2.1.4.1
+
+Frage: Führt der Beleg der Zeile Sensitivität und räumliche Exposition so begrifflich und methodisch getrennt, wie
+Kap. 2.1.4.1 die beiden Komponenten bestimmt, in Knoten, Rechenkette und Formeln? Gelesen wurde
+`docs/KWAR/kwra2021_teilbericht_1_grundlagen_bf_211027_0.pdf` (KWRA 2021, Teilbericht 1: Grundlagen, 215 PDF-Seiten).
+Die gedruckte Seitenzahl ist die PDF-Seitenzahl minus 1; die Spalte „Seite“ nennt die gedruckte Seite, die PDF-Seite in
+Klammern. Die Fundstelle stimmt: Kap. 2.1.4.1 „Generelles Konzept und zentrale Begriffe“ steht auf S. 43–45
+(PDF 44–46), die Bestimmung der drei Komponenten auf S. 44 (PDF 45), Abbildung 2 „Methodischer Rahmen und zentrale
+Begriffe“ auf S. 45 (PDF 46). Das Kapitel ist dasselbe wie bei Zeile 1; die Tabelle der Gegenprobe Zeile 1 ist nicht
+übernommen, das Kapitel ist für die Trennung von Sensitivität und Exposition neu gelesen.
+
+Im Produkt wurde der Beleg der Zeile vollständig gelesen: `docs/methodik/95_hitzebelastung.md` (2.537 Zeilen, Rev. 8,
+Fortschreibung 7, Status „abnahmereif“; Kap. 1–8, Parameter- und Beispiel-Blöcke, Entscheidungslog 1–56), mit dem
+Augenmerk darauf, ob Sensitivität und Exposition in Knoten-Bilanz (Kap. 1), Rechenkette (Kap. 3.0), Formeln
+(Kap. 3.3–3.5), Zeichentabelle (Kap. 3.6) und Schicht A (Kap. 3.7) getrennt geführt werden. Ausgeführt wurde nichts außer
+dem Lesen.
+
+| Nr | Anforderung (Wortlaut oder enge Wiedergabe) | Seite | tragender Beleg (Datei, Funktion oder Abschnitt) | Urteil |
+|---|---|---|---|---|
+| A1 | „Die Einflussfaktoren einer Klimawirkung können den … Komponenten („klimatischer Einfluss“, „Sensitivität“ und „räumliche Exposition“) zugeordnet werden (Abbildung 2).“ Abbildung 2 führt Sensitivität und räumliche Exposition als zwei getrennte Kästen mit eigenen Faktoren (S, R), beide gespeist aus „Sozioökonomische Daten und Projektionen“. | S. 44 (PDF 45), 2.1.4.1 Abs. 2; S. 45 (PDF 46), Abb. 2 | `95_hitzebelastung.md` Kap. 1 „Knoten-Bilanz“ (S152–S158, R35, R36), Kap. 2 Register (95-R35-01 „R35 Bevölkerung → Exposition“), Kap. 3.0 Ebene 1, Kap. 3.3 \(D_a\), Kap. 3.6 \(\text{pop}_a\) und \(v_{\text{vers},a}\), Kap. 3.7 Schicht A | trägt teilweise |
+| A2 | Die Sensitivität („Anfälligkeit oder Empfindlichkeit“) „beschreibt das Ausmaß, zu dem ein System durch Schwankungen oder Änderungen des Klimas vor- oder nachteilig beeinflusst wird“; Faktoren sind „zum Beispiel die Baumartenzusammensetzung oder die Altersstruktur der Bevölkerung“. | S. 44 (PDF 45), zweiter Spiegelstrich | `95_hitzebelastung.md` S152 Altersstruktur (\(f_a\), \(m_a\), \(\bar L_a\)), S153 (\(\beta_{\text{pfl}}\)), \(\beta_{\text{iso}}\), Kap. 3.3; Register 95-S152-02, Kap. 3.1, Log 12 („Vulnerabilität“); Kap. 3.7 Ê mit AGE_STRUCTURE | trägt teilweise |
+| A3 | „Je höher die Sensitivität ist, umso stärker ist tendenziell die Klimawirkung ausgeprägt.“ | S. 44 (PDF 45), zweiter Spiegelstrich | `95_hitzebelastung.md` Kap. 3.3 (\(\beta_a = \beta_{85+} \cdot f_a\), \(m_a\), \(v_{\text{vers},a}\)), Kap. 3.4 (\(r_{0,a}\)), Kap. 4 „Validierung Altersverteilung“ | trägt |
+| A4 | Die räumliche Exposition „beschreibt das Vorhandensein von Systemen, wie Menschen, … Infrastruktur … in Gegenden und Umständen, die betroffen sein könnten“; Faktoren sind „zum Beispiel die Einwohnerdichte oder das Vorkommen kritischer Infrastruktur“. | S. 44 (PDF 45), dritter Spiegelstrich | `95_hitzebelastung.md` R35 \(\text{pop}_a\) aus dem Zensus-Gitter 100 m (Kap. 1, 3.3, 3.6); R36 Gesundheitsinfrastruktur als Distanzterm \(\beta_d\) (Register 95-R36-01, Log 20) und in Schicht A unter V̂ (HEALTHCARE_ACCESS) | trägt teilweise |
+| A5 | „Ohne räumliche Exposition kann es zu keiner Klimawirkung kommen. Je höher die räumliche Exposition ist, desto stärker ist tendenziell die Klimawirkung.“ | S. 44 (PDF 45), dritter Spiegelstrich | `95_hitzebelastung.md` Kap. 3.3 \(D_a\) und Kap. 3.4 \(F_{\text{Zelle}}\) mit \(\text{pop}_a\) als Faktor, Kap. 3.5 Summe über die Zellen | trägt |
+| A6 | „Anpassung verringert in der Regel direkt die Sensitivität oder auf längeren Zeitskalen auch das räumliche Vorkommen“; in Abbildung 2 wirkt die Anpassungskapazität mit je einem Pfeil auf Sensitivität und räumliche Exposition. | S. 44 (PDF 45), 2.1.4.1 Abs. 4; S. 45 (PDF 46), Abb. 2 | `95_hitzebelastung.md` Kap. 1 „Knoten-Bilanz“ (Hebel an S152, S155, S157, S158) und „Risiko ohne (weitere) Anpassung“ (b), Kap. 5 (Faktoren auf den Exzess, nicht auf \(\text{pop}_a\)) | trägt |
+
+**Begründung je Urteil:**
+
+- A1: In den Formeln der Schicht B sind die Komponenten getrennt: \(D_a = c_{\text{kal}} \cdot v_{\text{vers},a} \cdot
+  \text{pop}_a \cdot m_a/100\,000 \cdot 1/52 \cdot \sum_w(\dots)\) multipliziert die Bevölkerung (R35) mit Faktoren, die
+  nur von Alter, Heim und Haushalt abhängen (S152, S153), und das Register führt R35 ausdrücklich als „Exposition“. Die
+  Zuordnung je Faktor hält der Bericht aber nicht durch. Erstens nennt die Knoten-Bilanz \(\text{pop}_a\) zugleich bei
+  S152 und bei R35, und Ebene 1 der Rechenkette („Einwohner je Altersband“) fasst die Einwohnerzahl, nach der KWRA ein
+  Faktor der Exposition (Beispiel „Einwohnerdichte“), und den Altersaufbau, nach der KWRA ein Faktor der Sensitivität
+  (Beispiel „Altersstruktur der Bevölkerung“), in einer Größe. Kap. 3.3 beschreibt zwar, wie das Produkt
+  \(\text{pop}_a\) aus Einwohnern × Anteil 65+ × Aufteilung auf die Bänder bildet, nennt das aber nicht als Zerlegung in
+  Exposition und Sensitivität, und keine Ebene der Rechenkette sagt, zu welcher Komponente sie gehört. Abbildung 2 zeigt
+  genau diesen Fall: Beide Komponenten speisen sich aus sozioökonomischen Daten und bleiben trotzdem getrennte Kästen.
+  Zweitens ordnet Schicht A (Kap. 3.7) die Ebenen AGE_STRUCTURE und VULNERABLE_GROUPS_POPULATION der Exposition Ê (R35)
+  zu und HEALTHCARE_ACCESS, die Ebene des räumlichen Knotens R36 (Kap. 1), der Vulnerabilität V̂ (S152–S158). Der Satz
+  der Zeichentabelle „Demografie steckt genau einmal in \(\text{pop}_a\)“ schließt eine doppelte Zählung aus; eine
+  Trennung von Einwohnerzahl und Altersaufbau ist er nicht. Das präzisiert die Begründung zu A5 der Gegenprobe Zeile 1,
+  ohne Zeile 1 zu ändern.
+- A2: Die Sensitivitätsfaktoren sind eigene Größen mit Quelle: Altersfaktoren \(f_a\), Basissterberaten \(m_a\) und
+  Restlebenserwartung \(\bar L_a\) für S152, \(\beta_{\text{pfl}}\) für S153, \(\beta_{\text{iso}}\) für die
+  Isolation; nicht gerechnete Faktoren sind begründet (S153-Prävalenzen und Deprivation Log 14, S154 Log 15). Begrifflich
+  ist die Sensitivität nicht durchgehend so benannt, wie die KWRA sie bestimmt. Der Bericht nennt sie stellenweise
+  „Vulnerabilität“ (Register 95-S152-02 „als Vulnerabilität, nicht als Maßnahme“, Kap. 3.1 „nicht zusätzlich
+  Vulnerabilität“, Log 12) und schreibt sie in Schicht A als V̂; die KWRA vermeidet diesen Begriff, weil der IPCC-Begriff
+  die Anpassungskapazität einschließt (Kap. 2.1.4.2, S. 45–46, PDF 46–47). Zugleich steht „Sensitivität“ im Bericht für
+  die Sensitivitätsrechnung: „Sensitivitätsband“ bei S153-02, S153-03 und R36, „Sensitivitäten des Basiswerts“ in Kap. 5;
+  bei R36 liest sich „Sensitivitätsband“ leicht als Zuordnung zur Komponente. Und Schicht A führt die Altersstruktur, das
+  Beispiel der KWRA für einen Sensitivitätsfaktor, unter der Exposition (A1).
+- A3: Jeder Sensitivitätsfaktor wirkt in Schicht B verstärkend: \(f_a\) steigt mit dem Alter bis 1,0 für 85+, \(m_a\)
+  und \(\bar L_a\) tragen das Altersband, \(\beta_{\text{pfl}}\) = 1,54 und \(\beta_{\text{iso}}\) = 0,90 heben den
+  Exzess in Zellen mit mehr Heimbewohnern oder Alleinlebenden; das Altersprofil der Einweisungen steigt 1 : 3,3 : 5,7 :
+  8,2. Die modellierten Altersanteile der Hitzetoten treffen die RKI-Anteile auf weniger als 1 Pp. (Kap. 4).
+- A4: Die Bevölkerung je Altersband und Zelle aus dem Zensus-Gitter 100 m ist das Vorhandensein von Menschen am Ort, wie
+  die KWRA es bestimmt; die KWRA setzt „räumliche Exposition“ mit der „Anwesenheit, Anzahl oder Dichte von Elementen“
+  gleich (Kap. 2.1.4.2, S. 46, PDF 47). Der zweite räumliche Knoten der Kette, R36 „Vorkommen von
+  Gesundheitsinfrastruktur“ (in der Arbeitsmappe räumlicher Eingang, Gegenprobe Zeile 1, A3), rechnet der Bericht nicht
+  als Exposition: Im Register wirkt er als Distanzterm auf die Mortalität (+≈1 % je 10 km, Sensitivitätsband, Log 20), in
+  Schicht A steht seine Ebene unter V̂. In der Sache ist das eine Rolle der Sensitivität, denn die Entfernung zum
+  Krankenhaus ändert, wie stark ein Mensch betroffen ist, nicht, ob er da ist. Der Bericht sagt aber nicht, dass er den
+  Knoten von der Exposition zur Sensitivität umordnet, und begründet es nicht.
+- A5: \(\text{pop}_a\) steht als Faktor in \(D_a\) und in \(F_{\text{Zelle}}\): Eine Zelle ohne Einwohner gibt null, eine
+  Zelle mit doppelt so vielen Einwohnern gleicher Altersstruktur den doppelten Betrag; die Kommune ist die Summe der
+  Zellen (Kap. 3.5).
+- A6: Alle Hebel docken an Sensitivitätsknoten an (Hitzeaktionsplan S155 und S158, gekühlte Räume und Kühlzentren S157,
+  Schutzprogramme S152) und wirken als Faktor auf den Exzess (RR − 1), nie auf \(\text{pop}_a\); der Basiswert ist der
+  Zustand ohne weitere Anpassung (Kap. 1 (a) und (b)). Einen Hebel auf die Exposition verlangt die KWRA nicht („in der
+  Regel … die Sensitivität“, nur „auf längeren Zeitskalen“ das Vorkommen); für die Hitzebelastung, bei der niemand
+  wegzieht, fehlt er zu Recht.
+
+Nicht als eigene Anforderung gewertet: der Zeitbezug der Klimawirkung und die Zeitachse der Abbildung 2 (S. 44–45,
+PDF 45–46), Fundstelle der Gegenprobe Zeile 1 (A2); der klimatische Einfluss, die vorgelagerte Wirkung und die
+Anpassungskapazität als Komponente außerhalb der Ketten (S. 44, PDF 45), ohne Bezug zur Trennung von Sensitivität und
+Exposition; die Begriffsbestimmung „Klimarisiko“ und die Unterscheidung „ohne weitere Anpassung“ und „mit Anpassung“
+(S. 44–45, PDF 45–46), Fundstelle der Zeile 2; dass sich das Konzept international bewährt hat (S. 43, PDF 44), ein Befund
+der Quelle. Die Einordnung in die IPCC-Begriffe (Kap. 2.1.4.2) liegt außerhalb der Fundstelle und ist nur in den
+Begründungen zu A2 und A4 herangezogen.
+
+**Gelesene Seiten und Abschnitte:**
+
+- Inventar mit `python3 /home/basti/overlord/overlord/skripte/dokumente.py inventar` (215 PDF-Seiten; Gliederung,
+  Abbildungen und Tabellen je Seite).
+- Inhaltsverzeichnis ganz: PDF 7–8 (gedruckt S. 6–7).
+- Text PDF 43–47 (gedruckt S. 42–46) ganz: Seite davor mit dem Ende von Kap. 2.1.3 (Tabelle 3) und dem Kasten
+  „Einbindung von Fachleuten“ (PDF 43–44), Kap. 2.1.4 und 2.1.4.1 ganz (PDF 44–46), Kap. 2.1.4.2 ganz (PDF 46–47), Anfang
+  von 2.1.4.3 (PDF 47). Kapitelgrenzen geprüft: 2.1.4.1 beginnt auf S. 43 (PDF 44) direkt unter der Überschrift 2.1.4,
+  die keinen eigenen Einleitungstext hat, und endet auf S. 45 (PDF 46) mit Abbildung 2 vor der Überschrift 2.1.4.2.
+  Fußnoten haben die Seiten PDF 43–47 keine.
+- Als Bild angesehen: PDF-Seite 46 (gedruckt S. 45) mit Abbildung 2 „Methodischer Rahmen und zentrale Begriffe“: drei
+  Kästen „Klimatischer Einfluss“ (K, K, K), „Sensitivität“ (S, S, S) und „Räumliche Exposition“ (R, R, R); Sensitivität
+  und räumliche Exposition beide unter „Sozioökonomische Daten und Projektionen“, beide mit eigenem Pfeil auf „Klimarisiko
+  ohne Anpassung“; „Anpassungskapazität“ mit gestrichelten Pfeilen auf Sensitivität und räumliche Exposition und
+  durchgezogenem Pfeil auf „Klimarisiko mit Anpassung“; Zeitachse 1971–2000, 2031–2060, 2071–2100. Der Text stimmt mit
+  dem Bild überein.
+- Beleg vollständig: `docs/methodik/95_hitzebelastung.md` (2.537 Zeilen).
+
+**Nicht gelesen:** die Zusammenfassung des Berichts (PDF 22–32), das Glossar (PDF 16–21), Kap. 1 und Kap. 2.1.1–2.1.3
+außer PDF 43–44, Kap. 2.1.4.3 ab PDF 48 samt Tabelle 4 und den Abbildungen 3 und 4 (Abbildung 3, auf die 2.1.4.1 im
+ersten Satz verweist, zeigt Beispielketten ohne eigene Anforderung; als Bild gelesen in der Gegenprobe Zeile 1) und alle
+späteren Kapitel; die zitierten Quellen Buth et al. 2017 und Agard et al. 2014; die Arbeitsmappen (der Typ von R36 ist
+aus der Gegenprobe Zeile 1, A3, übernommen); im Produkt der Code der Ebenen der Schicht A, das Befund-Ledger
+`reviews/BEFUNDE_95.md` und die Berichte zu anderen Risiken.
+
+**Schluss:** Zeile 4 bleibt nicht `erfüllt`. Von 6 Anforderungen trägt der Beleg drei voll (A3, A5, A6), drei teilweise
+(A1, A2, A4) und keine nicht. Zur Frage der Gegenprobe: Methodisch trennt der Bericht zur Hitzebelastung in den Formeln
+der Schicht B, was die KWRA trennt: Die Bevölkerung je Zelle ist die Exposition, Altersfaktoren, Basissterberaten,
+Restlebenserwartung und die Heim- und Isolationsterme sind die Sensitivität, ohne Einwohner gibt es keine Wirkung, und
+die Hebel setzen an der Sensitivität an. Begrifflich und in der Darstellung hält er die Trennung nicht durch: Die
+Einwohner je Altersband stehen bei Sensitivität und Exposition zugleich, die Rechenkette nennt keine Komponente je
+Ebene, Schicht A ordnet die Altersstruktur der Exposition und den Zugang zur Gesundheitsversorgung (R36) der
+Vulnerabilität zu, R36 ist ohne Begründung umgeordnet, und „Vulnerabilität“ und das doppelt belegte Wort „Sensitivität“
+verwischen den Begriff. Der Status der Zeile 4 ist in derselben Änderung auf `teilweise` gesetzt; die Spalte „Lücke“
+nennt, was fehlt, `backend/tests/test_konformitaet_zeile4.py` schreibt Spaltenzahl, Status und Lücke fest, und
+`backend/app/data/konformitaet_kundentext.py` führt den Kundensatz. Weil Zeile 4 nicht mehr `erfüllt` ist, nimmt
+`backend/tests/test_ergebnisbericht_teil2_kundentext.py` für den fehlenden Kundensatz Zeile 5 als Beispiel; der
+Prüfgehalt bleibt gleich. Die Zählungen in den Abschnitten „Nachtrag: Abschlusszählung“ und „Zusammenfassung“ sind
+damit weiter überholt; sie nachzuziehen ist Sache der Gesamtzählung, nicht dieser Gegenprobe.
 
 ## Ergebnis
 
