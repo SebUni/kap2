@@ -3,7 +3,7 @@
 Status: **Rev. 4 (26.09.2026, Fortschreibung 7 der Aufgabe für M0, A-0048),
 ABGENOMMEN durch den methodik_manager am 30.09.2026;
 abgeglichen mit der Übernahme Ü-1 bis Ü-13 am 06.10.2026 (§3.6 Zeile δ,
-§5 Absatz „Vorgabe für das Produkt“). Die Schritte der Revision stehen im Block
+§5 Absatz „Vorgabe für das Produkt (Befund 230)“). Die Schritte der Revision stehen im Block
 „Revisionsstand“ unten; Prüfungen, Befunde und Null-Runde stehen nur im Ledger
 `reviews/BEFUNDE_96.md`.** ·
 Stand früherer Revisionen (Rev. 3, Rev. 2, Rev. 1): Block „Revisionsstand“ unten ·
@@ -328,7 +328,7 @@ Beschwerden, und jeder zusätzliche Beschwerdetag kostet Behandlung.
 | 7 | Vegetationsfaktor \(\hat P\) je Zelle (allergene Bäume und Grünflächen), zentriert auf den Bezugswert Ḡ₀, das betroffenengewichtete Mittel der eigenen Kommune im Ausgangsstand | je Zelle ab 0,3 (keine allergene Vegetation) bis über 1 (Allee, Park); Mittel über Berlin im Ausgangsstand genau **1**, also \(\sum B \hat P = \sum B\) = 402.103 | \(\lambda\) = 0,7 aus Werchan [54,55], Bogawski [56], Lesart als örtlicher Anteil Hugg [74] (§3.3, §3.4, Log 12, 17, 18, 26); Kap. 7 `pollen.lambda_veg` |
 | 8 | Zusätzliche Symptomtage \(\Delta\text{Tage} = B \times \delta \times \hat P\) (native Ergebnisgröße) | 402.103 × 1,01493 × 1 = **408.106 Tage je Jahr** (u20 60.133 · 20–64 306.546 · 65–74 23.085 · 75–84 12.866 · 85+ 5.477; die gerundeten Bänder ergeben 408.107, mit den ungerundeten Betroffenen 402.103,45 sind es 408.106,9) | Ebenen 3, 6 und 7 |
 | 9 | Kostensatz je Symptomtag \(c_{\text{Tag}} = c_{\text{Jahr,direkt}} / d_{\text{Saison}}\) mit \(d_{\text{Saison}} = f \times (p_B L_B + p_G L_G)\) | 266,90 € / (0,70 × (0,55 × 30 + 0,75 × 60)) = 266,90 € / 43,05 Tage = **6,20 € je Tag** (Preisstand 2024) | TOTALL [65], VPI [19]; \(L_B\), \(L_G\): Abschätzung von KAP3 nach [51] (§3.5); Kap. 7 `pollen.c_jahr_direkt`, `pollen.d_saison`, `pollen.c_tag` |
-| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 408.106 × 6,20 € = **2,53 Mio. € je Jahr (Preisstand 2024)**, das sind 0,69 € je Einwohner; der Zelllauf des Produkts ergibt 2,47 Mio. € (Unterschied und Toleranz unten). Das Produkt rechnet bis zur Übernahme Ü-13 noch mit \(a_{\text{attr}}\) = 0,50 und zeigt deshalb heute 4,58 Mio. € | Ebenen 8 und 9 |
+| 10 | Bewerteter Schaden (Konto K1, nur Morbidität) je Jahr = \(\Delta\text{Tage} \times c_{\text{Tag}}\) | 408.106 × 6,20 € = **2,53 Mio. € je Jahr (Preisstand 2024)**, das sind 0,69 € je Einwohner; der Zelllauf des Produkts ergibt 2,47 Mio. € (Unterschied und Toleranz unten). | Ebenen 8 und 9 |
 
 **Warum \(f\) im Euro-Betrag keine Rolle spielt.** \(f\) steht in Ebene 6 (mehr Tage) und in
 Ebene 9 (mehr Tage in der Referenzsaison, also billigerer Tag); in Ebene 10 kürzt es sich
@@ -1094,9 +1094,9 @@ assert abs(0.15 * 0.19 - 0.0285) < 1e-12              # untere Grenze der M0-Her
   den Boden zusätzlich direkt. Er greift dort in zwei Fällen: wenn das gespeicherte \(\hat G\) durch
   die Rundung auf fünf Stellen um höchstens 0,000005 neben seinen Kronentermen liegt (gemessen
   höchstens 0,000004, an der Allee-Zelle unten weniger als 0,01 Tage), und wenn ein älterer Ausgangslauf
-  \(s_{\text{unbek}}\) nicht je Zelle trägt und die Kommune den Wert danach überschrieben hat. Dann rechnet
-  die Senkung mit dem Wert von heute, \(\hat G\) mit dem alten (Absatz „Vorgabe für das Produkt (Befund 230)“
-  unten, Befund 252); der Boden verdeckt diesen gemischten Stand nur, behoben ist er erst mit einem neuen Zelllauf.
+  \(s_{\text{unbek}}\) nicht je Zelle trägt, die Kommune den Wert danach erhöht hat und die ersetzten Kronen groß genug sind.
+  Dann rechnet die Senkung mit dem neuen Wert, \(\hat G\) mit dem alten (Absatz „Vorgabe für das Produkt (Befund 230)“
+  unten, Befund 252), und der Boden greift, sobald die Senkung den Kronen-Summanden des alten \(\hat G\) übersteigt. In einer Zelle nur mit Kronen ohne Gattungs-Tag und bei einer Erhöhung von 0,12 auf 0,25 ist das der Fall, wenn mehr als 0,12/0,25 = 0,48 ihrer Kronen ersetzt werden. Ein gesenkter Wert löst ihn nie aus. Er verdeckt den gemischten Stand nur, behoben ist er erst mit einem neuen Zelllauf.
   Kennt die Kommune die Gattungen ihrer Bäume selbst (Baumkataster), gehen diese Angaben schon in
   den Ausgangsstand und in Ḡ₀ ein, nicht erst in das Maßnahmenszenario; sonst würde die Senkung
   an Kronen gerechnet, die der Ausgangsstand nur mit 0,12 kennt. Die Effektgröße ist damit
@@ -1863,7 +1863,7 @@ Schadenswert je Jahr.
 
 - **Kommune mit 100.000 Einwohnern im Bundes-Altersmix** (Beispielgröße im Produkttext):
   Schadenswert des Berichts 100.000 × 10,74 % × 1,07343 Tage × 6,20 € = 71.477 € je Jahr (§3.2, §4;
-  der Produkttext rechnet bis zur Übernahme Ü-13 noch mit \(a_{\text{attr}}\) = 0,50). Der Nutzen reicht von
+  der Produkttext rechnet mit demselben \(a_{\text{attr}}\) = 0,27). Der Nutzen reicht von
   179 € (wirksam 0,0025) über 1.608 € am Basiswert (0,0225) bis 7.148 € (0,10) je Jahr. Eine Station
   trägt sich ab einem wirksamen Wert von 4.000 € ÷ 71.477 € = **0,056**, dem 2,49-Fachen des
   Basiswerts, also \(r_{\text{S158}}\) = 0,075 bei \(t_{\text{warn}}\) = 0,75. Darunter, auch am Basiswert,
@@ -2056,8 +2056,8 @@ gegenläufige Evidenz (Neophyten [23], CO₂ [21,22]) macht das zur Untergrenze;
    (0,005–0,10): Reichweite, Handlungsbereitschaft und Tageswirkung sind je Zelle nicht
    beobachtbar und gelten in allen Zellen gleich. Ebenso pauschal ist vorerst der Anteil
    gewarnter Tage \(t_{\text{warn}}\) = 0,75 (0,50–1,00), gleich für beide Gruppen und alle Regionen.
-   Das Produkt hat die Umrechnung \(\min(1;\ m/f)\) als Funktion, aber weder die Daten [71] und [72]
-   noch die Zuordnung Zelle → DWD-Gebiet; es rechnet deshalb überall mit 0,75 (Befund 233).
+   Die Umrechnung \(\min(1;\ m/f)\) rechnet das Produkt erst mit den Daten [71] und [72] und der
+   Zuordnung Zelle → DWD-Gebiet; ohne sie gilt überall 0,75 (Befund 233).
    Innerhalb des Geltungsbereichs mindert die Maßnahme deshalb jede Zelle um denselben Anteil
    (2,25 %). **Heute ist das zahlengleich mit einem Faktor 0,0225** auf die Zusatztage der Zellen im
    Geltungsbereich: Die Festlegung hat den Wert geändert (nur gewarnte Tage, 2,25 % statt 3 %),
