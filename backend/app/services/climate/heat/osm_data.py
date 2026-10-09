@@ -315,11 +315,13 @@ def _overpass_query(query_body: str, _retries: int = 5) -> dict:
                 _time.sleep(wait)
             else:
                 raise
-        except httpx.TimeoutException as exc:
+        except httpx.TransportError as exc:
+            # Timeout, ConnectError, DNS-Fehler, abgewiesene Verbindung: wie ein
+            # Timeout behandeln – Backoff, dann der nächste Server der Liste.
             if attempt < _retries:
                 wait = 5 * attempt
-                log.warning("Overpass query attempt %d/%d timed out, retrying in %ds",
-                            attempt, _retries, wait)
+                log.warning("Overpass query attempt %d/%d failed (%s), retrying in %ds",
+                            attempt, _retries, type(exc).__name__, wait)
                 _time.sleep(wait)
             else:
                 raise
