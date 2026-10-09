@@ -1096,7 +1096,7 @@ assert abs(0.15 * 0.19 - 0.0285) < 1e-12              # untere Grenze der M0-Her
   höchstens 0,000004, an der Allee-Zelle unten weniger als 0,01 Tage), und wenn ein älterer Ausgangslauf
   \(s_{\text{unbek}}\) nicht je Zelle trägt, die Kommune den Wert danach erhöht hat und die ersetzten Kronen groß genug sind.
   Dann rechnet die Senkung mit dem neuen Wert, \(\hat G\) mit dem alten (Absatz „Vorgabe für das Produkt (Befund 230)“
-  unten, Befund 252), und der Boden greift, sobald die Senkung den Kronen-Summanden des alten \(\hat G\) übersteigt. In einer Zelle nur mit Kronen ohne Gattungs-Tag und bei einer Erhöhung von 0,12 auf 0,25 ist das der Fall, wenn mehr als 0,12/0,25 = 0,48 ihrer Kronen ersetzt werden. Ein gesenkter Wert löst ihn nie aus. Er verdeckt den gemischten Stand nur, behoben ist er erst mit einem neuen Zelllauf.
+  unten, Befund 252), und der Boden greift, sobald die Senkung den Kronen-Summanden des alten \(\hat G\) übersteigt. In einer Zelle nur mit Kronen ohne Gattungs-Tag und bei einer Erhöhung von 0,12 auf 0,25 ist das der Fall, wenn mehr als 0,12/0,25 = 0,48 ihrer Kronen ersetzt werden. Ein gesenkter Wert löst ihn nie aus. Der Boden verdeckt den gemischten Stand nur; behoben ist dieser erst mit einem neuen Zelllauf.
   Kennt die Kommune die Gattungen ihrer Bäume selbst (Baumkataster), gehen diese Angaben schon in
   den Ausgangsstand und in Ḡ₀ ein, nicht erst in das Maßnahmenszenario; sonst würde die Senkung
   an Kronen gerechnet, die der Ausgangsstand nur mit 0,12 kennt. Die Effektgröße ist damit
