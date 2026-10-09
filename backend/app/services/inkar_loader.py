@@ -108,17 +108,25 @@ def resolve_ags(osm_id: str | None) -> str | None:
         return None
     rid = m.group(0)
     query = f"[out:json][timeout:60];relation({rid});out tags;"
-    try:
-        with httpx.Client(timeout=settings.REGIONALSTATISTIK_TIMEOUT_S) as client:
-            resp = client.post(
-                settings.OVERPASS_URL,
-                data={"data": query},
-                headers={"User-Agent": settings.NOMINATIM_USER_AGENT},
-            )
-            resp.raise_for_status()
-            elements = resp.json().get("elements", [])
-    except Exception as exc:  # Netz/Timeout/Parsing → kein AGS
-        log.warning("resolve_ags: Overpass-Abfrage für osm_id=%s fehlgeschlagen: %s", osm_id, exc)
+    # Hauptserver zuerst, dann die Ausweich-Server in der Reihenfolge der Konfiguration.
+    urls = [settings.OVERPASS_URL, *settings.OVERPASS_FALLBACK_URLS]
+    elements: list = []
+    for i, url in enumerate(urls, start=1):
+        try:
+            with httpx.Client(timeout=settings.REGIONALSTATISTIK_TIMEOUT_S) as client:
+                resp = client.post(
+                    url,
+                    data={"data": query},
+                    headers={"User-Agent": settings.NOMINATIM_USER_AGENT},
+                )
+                resp.raise_for_status()
+                elements = resp.json().get("elements", [])
+            break
+        except Exception as exc:  # Netz/Timeout/Parsing → nächster Server
+            log.warning("resolve_ags: Overpass %s für osm_id=%s fehlgeschlagen: %s", url, osm_id, exc)
+            if i < len(urls):
+                time.sleep(min(5 * i, 30))  # Backoff wie osm_data._overpass_query
+    else:
         return None
 
     for el in elements:
