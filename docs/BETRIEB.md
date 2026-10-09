@@ -155,6 +155,8 @@ Arbeitsverzeichnis mit.
 
 Nach dem Merge ruft ein gesteuerter Lauf `bash scripts/testlauf.sh <dateien>` direkt auf (freigegeben über `.overlord/erlaubte_befehle`); der `python3`-Subprozess bleibt der Ausweichweg, wenn der direkte Aufruf abgewiesen wird.
 
+Die Python-Blöcke der Querschnittsdateien (`docs/methodik/querschnitt_*.md`) führt `backend/tests/test_methodik_querschnitt_bloecke.py` aus und vergleicht ihre dokumentierte Ausgabe; der Methodik-Lint überspringt diese Dateien.
+
 Gesteuerte Läufe rufen den Methodik-Export `bash scripts/export_methodik_pdf.sh <nr>` nach dem Merge direkt auf (ebenso `pdftoppm` für die Layout-Stichprobe); der `python3`-Subprozess bleibt der Ausweichweg.
 
 Den Methodik-Lint rufen gesteuerte Läufe als `bash scripts/lint_methodik.sh <nr>` auf, weil er den Interpreter der Projektumgebung nutzt und die Beispiel-Blöcke der Berichte `numpy` brauchen (mit dem System-Python endet `python3 backend/scripts/lint_methodik.py <nr>` mit `LINTS ROT`).
