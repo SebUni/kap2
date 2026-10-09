@@ -1,8 +1,10 @@
 # Querschnitt: Klimarisiko mit Anpassung
 
 Querschnittsdatei der Methodik, gültig für alle 102 Klimawirkungen der KWRA 2021. Frage: Wie stark senkt die
-Anpassungskapazität einer Kommune die Einstufung einer Klimawirkung, und woher stammen die Reifegrade? Werte bekommt in
-diesem Schritt nur #95 Hitzebelastung (A-0048; Vorhaben T-1122-cmo, Schritt 1 = Ticket T-1895-methodik_manager). Die
+Anpassungskapazität einer Kommune die Einstufung einer Klimawirkung, und woher stammen die Reifegrade? Werte bekommen die
+drei Klimawirkungen von M0 (A-0048; Vorhaben T-1122-cmo): #95 Hitzebelastung in Schritt 1 (Ticket
+T-1895-methodik_manager), #96 Aeroallergene und #98 UV-Schädigungen in Schritt 3 (Ticket T-1897-methodik_manager),
+zusammengefasst unter „Ergebnis für M0“. Die
 Regel ergibt eine Stufe, keinen Euro-Betrag. Schritt 2 (Ticket T-1896-methodik_manager) legt im Abschnitt
 „Anpassungspotenzial und Doppelzählung“ fest, was das Anpassungspotenzial ist und wie Stufe, Anpassungspotenzial und
 der Euro-Betrag der Maßnahmen aufeinander wirken.
@@ -11,7 +13,7 @@ Abkürzungen: **Broschüre** = Umweltbundesamt (Porst, Voß, Kahlenborn, Schause
 Ebene – Handlungsempfehlungen zur Umsetzung der ISO 14091“, Juni 2022 (PDF-Seite = gedruckte Seite); **KWRA** =
 Klimawirkungs- und Risikoanalyse 2021 für Deutschland; **TB6** = deren Teilbericht 6 „Integrierte Auswertung“;
 **Mappe** = `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, Blatt „Klimawirkungen“ (Excel-Zeile 1 Gruppen, Zeile 2 Köpfe,
-Zeilen 3–104 die 102 Klimawirkungen; #95 steht in Zeile 97).
+Zeilen 3–104 die 102 Klimawirkungen; #95 steht in Zeile 97, #96 in Zeile 98, #98 in Zeile 100).
 
 ## Festlegung
 
@@ -656,6 +658,326 @@ ohne: 362.9 | Hitzeaktionsplan: 22.1 | mit: 340.8 | p heute: 0.064 | p höchsten
 a Mortalität Berlin: 0.997 | Warmsen: 0.995 | p_0 Berlin: 0.0608 | Warmsen: 0.0607 | Abstand p - p_0 Berlin in Pp.: 3.5
 ```
 
+**#96 Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft (Schritt 3).** Dieselbe Regel und dieselben zehn
+Ebenen wie für #95, Werte aus Zeile 98 der Mappe. Die Kommune stuft die vier Komponenten für diese Klimawirkung ein, etwa:
+Zuständigkeit und Weitergabe der Pollenflug-Warnung an Kitas, Schulen und Heime (Organisation), Warnkette (Technik),
+Mittel dafür (Finanzen), allergenarme Stadtbäume (Ökosystem). Die Beispielwerte sind andere als bei #95, weil die
+Kommune je Klimawirkung einstuft ((c), „Körnigkeit“).
+
+| Ebene | Rechenschritt | Wert (#96, Beispielkommune) | Quelle |
+|---|---|---|---|
+| 1 | Klimawirkung → Zeile der Mappe (Spalte A = 96) | Zeile 98; D98 „Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft“; V98 „ja“ | Mappe A98, D98, V98 |
+| 2 | Stufe ohne Anpassung, Gegenwart (Kopf N2 „Risiko o. Anp. – Gegenwart“) → Zeile von Tabelle 5 | gering = 1 | Mappe N98; Broschüre Tabelle 5, S. 29 |
+| 3 | Selbsteinschätzung der vier Komponenten für #96, **Beispiel, keine Messung** | Organisation 2, Technik 2, Finanzen 1, Ökosystem 2 | Komponenten nach Fußnote 32, S. 29; Stufen `REIFEGRADE` |
+| 4 | Summe der vier Reifegrade | 2 + 2 + 1 + 2 = 7 | Rechnung |
+| 5 | Summe → Wirksamkeit der Kommune (Summentabelle) | 7 → mittel = 1 | Festlegung (c), Abschätzung von KAP3 |
+| 6 | Untergrenze: Wirksamkeit der beschlossenen Maßnahmen 2020–2030 (Kopf W2) | gering-mittel = 0,5 | Mappe W98; TB6 S. 112 |
+| 7 | Obergrenze: höherer Wert aus weiterreichender Anpassung, Mitte des Jahrhunderts 2031–2060 (Köpfe Z2, AA2) | mittel = 1 und mittel = 1 → 1 | Mappe Z98, AA98; TB6 S. 112 |
+| 8 | Wirksamkeit im Rahmen: nicht unter Ebene 6, nicht über Ebene 7 | 1 bleibt 1 (mittel) | Festlegung (e) |
+| 9 | Tabelle 5: Zeile „Gering (1)“, Spalte „Mittel (1)“ | 1 − 1 = 0 | Broschüre Tabelle 5, S. 29 |
+| 10 | Wert → Stufe mit Anpassung | 0 = **gering**, rechnerisch unter der niedrigsten Stufe (Tabelle 5: 0) | Festlegung (b) und (d) |
+
+Neben der Stufe, nicht in der Rechnung: schwächste Komponente Finanzen (1); bundesweit nach den beschlossenen Maßnahmen
+(2020–2030) „gering“ (AB98). Stärkster Treiber ist die Stufe ohne Anpassung: „gering“ ist schon die niedrigste Stufe der
+Skala. Tabelle 5 ergibt aus der Zeile „Gering (1)“ für jede Wirksamkeit von 0 bis 2 einen Wert von 1 oder darunter, also
+„gering“. Keine vollständige Selbsteinschätzung ändert deshalb das Wort; die Summe entscheidet nur über den Zusatz aus (d).
+
+| Summe für #96 | 0–2 | 3–5 | 6–8 | 9–11 | 12 |
+|---|---|---|---|---|---|
+| Wirksamkeit nach Summentabelle | 0 | 0,5 | 1 | 1,5 | 2 |
+| im Rahmen 0,5–1 | 0,5 | 0,5 | 1 | 1 | 1 |
+| Tabelle 5 | 0,5 | 0,5 | 0 | 0 | 0 |
+| Stufe mit Anpassung | gering (Tabelle 5: 0,5) | gering (Tabelle 5: 0,5) | gering (Tabelle 5: 0) | gering (Tabelle 5: 0) | gering (Tabelle 5: 0) |
+
+Was das für die Kommune heißt: Ihre Anpassung reicht für die Gegenwart rechnerisch unter die niedrigste Stufe, schon mit
+den Bundesmaßnahmen allein (Untergrenze 0,5). Das ist keine Aussage über die Zukunft. Ohne Anpassung steigt #96 zur Mitte
+des Jahrhunderts auf „mittel“ (O98) und „hoch“ (P98); diese Stufen bleiben im Bericht sichtbar (Bericht 96, Abschnitt
+„Risiko ohne (weitere) Anpassung“ (c)), und Regel A rechnet sie nicht um ((a)).
+
+**Gegenabgleich #96.** Tabelle 5 auf die bundesweite Wirksamkeit angewandt, verglichen mit der Restrisiko-Zelle der Mappe
+(dieselben fünf Paare wie für #95 unter (e)):
+
+| Paar | ohne Anpassung | − Wirksamkeit | = Tabelle 5 | Restrisiko der Mappe | trifft |
+|---|---|---|---|---|---|
+| Gegenwart / 2020–2030, beschlossen | N98 gering (1) | W98 gering-mittel (0,5) | 0,5, ohne Wort | AB98 gering | erst mit (d) |
+| Mitte optim., beschlossen | O98 mittel (2) | X98 mittel (1) | 1 gering | AC98 gering | ja |
+| Mitte pessim., beschlossen | P98 hoch (3) | Y98 mittel (1) | 2 mittel | AD98 mittel | ja |
+| Mitte optim., weiterreichend | O98 mittel (2) | Z98 mittel (1) | 1 gering | AE98 gering | ja |
+| Mitte pessim., weiterreichend | P98 hoch (3) | AA98 mittel (1) | 2 mittel | AF98 mittel | ja |
+
+**Erklärung der Abweichung im ersten Paar.** Gemessen ist 1 − 0,5 = 0,5, die KWRA führt in AB98 „gering“. Das ist eine
+Grenze der Skala, keine andere Bewertung. Die Skala des Klimarisikos beginnt bei 1 (gering); für 0,5 hat Tabelle 5 kein
+Wort (Fußnote zu Tabelle 5, S. 29). Die KWRA rechnet den Bundesmaßnahmen die halbe Stufe zu (W98 „gering-mittel“;
+„‚gering-mittel‘ würde eine Reduzierung um eine halbe Stufe bedeuten“, TB6 S. 112), kann das Ergebnis aber nicht tiefer
+als „gering“ führen. Festlegung (d) liest den Wert ebenso: „gering“ mit dem Zusatz „rechnerisch unter der niedrigsten
+Stufe (Tabelle 5: 0,5)“. Das Paar ist eines der 14, die erst mit (d) treffen (ID 96 in der Liste unter (e)). Die übrigen
+vier Paare treffen ohne weiteres. Regel A muss deshalb für #96 nicht geändert werden.
+
+**Euro-Betrag ohne und mit Maßnahmen nach Regel D (#96, Berlin).** Ohne weitere Anpassung trägt #96 in Berlin
+408.106 Tage × 6,20 € = 2,53 Mio. € je Jahr (Preisstand 2024; Bericht 96 §3.0 Ebene 10, Zustand nach Kapitel 1,
+Abschnitt „Risiko ohne (weitere) Anpassung“ (a)). Mit der Pollen-Frühwarnung S158, ganze Stadt im Geltungsbereich, fallen
+9.182 Tage × 6,20 € ≈ 56.900 € je Jahr weg, 2,25 % des Betrags; das ist eine Abschätzung von KAP3 nach Vorgabe P2
+(Bericht 96 §5.1, Tabelle „Beispielkommune Berlin“, Schritte 4 und 5). Es bleiben 2,53 Mio. € − 56.900 € = 2,47 Mio. €
+je Jahr. Dass der Zelllauf des Produkts ohne Maßnahme ebenfalls 2,47 Mio. € ergibt (§3.0), ist ein Zufall der Rundung;
+die beiden Zahlen hängen nicht zusammen. Die allergenarme Stadtbaumwahl hat in Kapitel 5 keinen Berliner Betrag, weil sie
+an der Änderung des Kronenanteils je Zelle hängt; das Rechenbeispiel dort (vier Zellen, 8.000 Betroffene) ergibt 637 Tage
+und ≈ 3.950 € weniger je Jahr (Kapitel 5, Hebel „Allergenarme Stadtbaumwahl“, Schritt 9). Die Selbsteinschätzung aus
+Ebene 3 ändert keinen der Beträge (Regel D, Punkt 2), und die gewählten Maßnahmen ändern die Stufe nicht. Führt die
+Kommune ihre Warnkette in der Selbsteinschätzung, wirkt dieselbe Warnung auf jeder Skala einmal: im Euro-Betrag als
+Hebel S158, in der Stufe über die Summe (Regel D, „Warum nichts doppelt zählt“).
+
+Beispiel-Block `rechenkette_klimarisiko_mit_anpassung_96`, aus dem Stamm des Produkt-Repos ausführbar (am 09.10.2026
+gelaufen, Ausgabe darunter):
+
+```python
+# rechenkette_klimarisiko_mit_anpassung_96 — Regel A und Regel D an #96 nachgerechnet
+import openpyxl
+
+RISIKO = {"gering": 1.0, "mittel": 2.0, "hoch": 3.0}  # Broschüre Tabelle 5, S. 29
+WIRKSAMKEIT = {"gering": 0.0, "gering-mittel": 0.5, "mittel": 1.0, "mittel-hoch": 1.5, "hoch": 2.0}  # ebenda
+STUFE = {1.0: "gering", 1.5: "gering-mittel", 2.0: "mittel", 2.5: "mittel-hoch", 3.0: "hoch"}  # TB6 S. 112
+
+
+def wirksamkeit_aus_summe(summe):
+    """Ebene 5: je drei Punkte eine halbe Stufe, abgerundet (Abschätzung von KAP3)."""
+    assert 0 <= summe <= 12
+    return (summe // 3) * 0.5
+
+
+def tabelle_5(ohne, wirksamkeit):
+    """Ebene 9: ohne Anpassung minus Wirksamkeit, unten bei 0 abgeschnitten."""
+    return max(0.0, ohne - wirksamkeit)
+
+
+def stufe(wert):
+    """Ebene 10: Werte unter 1 heißen „gering“, mit Zusatz (Festlegung d)."""
+    if wert < 1:
+        return f"gering (Tabelle 5: {wert:g})"
+    return STUFE[wert]
+
+
+ws = openpyxl.load_workbook("docs/KWAR/KWRA-2021_Klimawirkungen.xlsx", data_only=True)["Klimawirkungen"]
+assert (ws["N2"].value, ws["W2"].value) == ("Risiko o. Anp. – Gegenwart", "Wirksamkeit APA III – 2020–2030")
+assert (ws["Z2"].value, ws["AA2"].value) == ("Wirksamkeit weiterr. – Mitte optim.", "Wirksamkeit weiterr. – Mitte pessim.")
+
+# Ebenen 1 und 2
+zeile = next(r for r in range(3, ws.max_row + 1) if ws.cell(r, 1).value == 96)
+assert zeile == 98 and ws["V98"].value == "ja"
+assert ws["D98"].value == "Allergische Reaktionen durch Aeroallergene pflanzlicher Herkunft"
+ohne = RISIKO[ws["N98"].value]
+
+# Ebenen 3 bis 5 (Selbsteinschätzung als Beispiel)
+beispiel = {"organisation": 2, "technik": 2, "finanzen": 1, "oekosystem": 2}
+summe = sum(beispiel.values())
+eigen = wirksamkeit_aus_summe(summe)
+
+# Ebenen 6 bis 8
+unten = WIRKSAMKEIT[ws["W98"].value]
+oben = max(WIRKSAMKEIT[ws["Z98"].value], WIRKSAMKEIT[ws["AA98"].value])
+wirk = min(max(eigen, unten), oben)
+
+# Ebenen 9 und 10
+wert = tabelle_5(ohne, wirk)
+print("ohne:", ws["N98"].value, ohne, "| Summe:", summe, "| eigen:", eigen, "| Rahmen:", unten, oben,
+      "| Wirksamkeit:", wirk, "| Tabelle 5:", wert, "| mit Anpassung:", stufe(wert),
+      "| Engpass:", min(beispiel, key=beispiel.get), "| bundesweit AB98:", ws["AB98"].value)
+assert (ohne, summe, eigen, unten, oben, wirk, wert) == (1.0, 7, 1.0, 0.5, 1.0, 1.0, 0.0)
+assert stufe(wert) == "gering (Tabelle 5: 0)"
+
+# Stufe mit Anpassung für #96 je Summe 0 bis 12: das Wort bleibt „gering“, nur der Zusatz wechselt
+je_summe = {s: stufe(tabelle_5(ohne, min(max(wirksamkeit_aus_summe(s), unten), oben))) for s in range(13)}
+print("je Summe:", je_summe)
+assert all(je_summe[s] == ("gering (Tabelle 5: 0.5)" if s < 6 else "gering (Tabelle 5: 0)") for s in range(13))
+
+# Gegenabgleich: Tabelle 5 auf die bundesweite Wirksamkeit, Zeile 98
+PAARE = (("N", "W", "AB"), ("O", "X", "AC"), ("P", "Y", "AD"), ("O", "Z", "AE"), ("P", "AA", "AF"))
+abgleich = []
+for o, w, rr in PAARE:
+    roh = tabelle_5(RISIKO[ws[f"{o}98"].value], WIRKSAMKEIT[ws[f"{w}98"].value])
+    wort = STUFE[max(1.0, roh)]
+    abgleich.append((f"{o}98", f"{w}98", roh, f"{rr}98", ws[f"{rr}98"].value, roh in STUFE, wort == ws[f"{rr}98"].value))
+print("Gegenabgleich (ohne, Wirksamkeit, Tabelle 5, Restrisiko, Zelle, Wort ohne (d), trifft mit (d)):", abgleich)
+assert [a[2] for a in abgleich] == [0.5, 1.0, 2.0, 1.0, 2.0]
+assert [a[5] for a in abgleich] == [False, True, True, True, True] and all(a[6] for a in abgleich)
+
+# Regel D: Euro-Betrag Berlin ohne und mit S158 (Bericht 96 §3.0 Ebene 10, §5.1); die Kapazität wirkt auf keinen Betrag
+TAGE, C_TAG = 408106, 6.20           # §3.0 Ebenen 8 bis 10
+VERMIEDEN = 9182                      # §5.1, Tabelle „Beispielkommune Berlin“, Schritt 4
+s_ohne = TAGE * C_TAG
+s158 = VERMIEDEN * C_TAG
+print("ohne:", round(s_ohne), "| S158:", round(s158), "| mit S158:", round(s_ohne - s158),
+      "| Anteil S158:", round(s158 / s_ohne, 4))
+assert (round(s_ohne / 1e6, 2), round(s158, -2), round((s_ohne - s158) / 1e6, 2)) == (2.53, 56900, 2.47)
+```
+
+Ausgabe:
+
+```
+ohne: gering 1.0 | Summe: 7 | eigen: 1.0 | Rahmen: 0.5 1.0 | Wirksamkeit: 1.0 | Tabelle 5: 0.0 | mit Anpassung: gering (Tabelle 5: 0) | Engpass: finanzen | bundesweit AB98: gering
+je Summe: {0: 'gering (Tabelle 5: 0.5)', 1: 'gering (Tabelle 5: 0.5)', 2: 'gering (Tabelle 5: 0.5)', 3: 'gering (Tabelle 5: 0.5)', 4: 'gering (Tabelle 5: 0.5)', 5: 'gering (Tabelle 5: 0.5)', 6: 'gering (Tabelle 5: 0)', 7: 'gering (Tabelle 5: 0)', 8: 'gering (Tabelle 5: 0)', 9: 'gering (Tabelle 5: 0)', 10: 'gering (Tabelle 5: 0)', 11: 'gering (Tabelle 5: 0)', 12: 'gering (Tabelle 5: 0)'}
+Gegenabgleich (ohne, Wirksamkeit, Tabelle 5, Restrisiko, Zelle, Wort ohne (d), trifft mit (d)): [('N98', 'W98', 0.5, 'AB98', 'gering', False, True), ('O98', 'X98', 1.0, 'AC98', 'gering', True, True), ('P98', 'Y98', 2.0, 'AD98', 'mittel', True, True), ('O98', 'Z98', 1.0, 'AE98', 'gering', True, True), ('P98', 'AA98', 2.0, 'AF98', 'mittel', True, True)]
+ohne: 2530257 | S158: 56928 | mit S158: 2473329 | Anteil S158: 0.0225
+```
+
+**#98 UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs) (Schritt 3).** Dieselbe Regel, Werte aus Zeile 100
+der Mappe. Die Kommune stuft die vier Komponenten für diese Klimawirkung ein, etwa: Zuständigkeit und UV-Schutz in Kitas,
+Schulen und Freibädern (Organisation), UV-Index-Hinweise (Technik), Mittel dafür (Finanzen), Schatten durch Bäume und
+Sonnensegel (Ökosystem). Das Beispiel liegt unter der Summe 6, damit beide Fälle des Rahmens einmal vorkommen (#96 darüber).
+
+| Ebene | Rechenschritt | Wert (#98, Beispielkommune) | Quelle |
+|---|---|---|---|
+| 1 | Klimawirkung → Zeile der Mappe (Spalte A = 98) | Zeile 100; D100 „UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)“; V100 „ja“ | Mappe A100, D100, V100 |
+| 2 | Stufe ohne Anpassung, Gegenwart (Kopf N2 „Risiko o. Anp. – Gegenwart“) → Zeile von Tabelle 5 | mittel = 2 | Mappe N100; Broschüre Tabelle 5, S. 29 |
+| 3 | Selbsteinschätzung der vier Komponenten für #98, **Beispiel, keine Messung** | Organisation 2, Technik 1, Finanzen 1, Ökosystem 1 | Komponenten nach Fußnote 32, S. 29; Stufen `REIFEGRADE` |
+| 4 | Summe der vier Reifegrade | 2 + 1 + 1 + 1 = 5 | Rechnung |
+| 5 | Summe → Wirksamkeit der Kommune (Summentabelle) | 5 → gering-mittel = 0,5 | Festlegung (c), Abschätzung von KAP3 |
+| 6 | Untergrenze: Wirksamkeit der beschlossenen Maßnahmen 2020–2030 (Kopf W2) | gering-mittel = 0,5 | Mappe W100; TB6 S. 112 |
+| 7 | Obergrenze: höherer Wert aus weiterreichender Anpassung, Mitte des Jahrhunderts 2031–2060 (Köpfe Z2, AA2) | mittel = 1 und mittel = 1 → 1 | Mappe Z100, AA100; TB6 S. 112 |
+| 8 | Wirksamkeit im Rahmen: nicht unter Ebene 6, nicht über Ebene 7 | 0,5 bleibt 0,5 (gering-mittel) | Festlegung (e) |
+| 9 | Tabelle 5: Zeile „Mittel (2)“, Spalte „Gering-mittel (0,5)“ | 2 − 0,5 = 1,5 | Broschüre Tabelle 5, S. 29 |
+| 10 | Wert → Stufe mit Anpassung | 1,5 = **gering-mittel** | Festlegung (b) |
+
+Neben der Stufe, nicht in der Rechnung: Technik, Finanzen und Ökosystem stehen je auf 1, es fehlt also mehr als eine Art
+von Anpassung (Broschüre S. 29); bundesweit nach den beschlossenen Maßnahmen (2020–2030) „gering-mittel“ (AB100), gleich
+der Stufe der Beispielkommune, weil ihre Summe nicht über die Untergrenze hinausreicht. Stärkster Treiber ist die Stufe
+ohne Anpassung („mittel“). Der Rahmen lässt der Selbsteinschätzung eine halbe Stufe Spielraum: Ein Punkt mehr in einer
+beliebigen Komponente (Summe 6) senkt die Stufe auf „gering“.
+
+| Summe für #98 | 0–2 | 3–5 | 6–8 | 9–11 | 12 |
+|---|---|---|---|---|---|
+| Wirksamkeit nach Summentabelle | 0 | 0,5 | 1 | 1,5 | 2 |
+| im Rahmen 0,5–1 | 0,5 | 0,5 | 1 | 1 | 1 |
+| Stufe mit Anpassung | gering-mittel | gering-mittel | gering | gering | gering |
+
+**Gegenabgleich #98.** Alle fünf Paare treffen ohne (d):
+
+| Paar | ohne Anpassung | − Wirksamkeit | = Tabelle 5 | Restrisiko der Mappe | trifft |
+|---|---|---|---|---|---|
+| Gegenwart / 2020–2030, beschlossen | N100 mittel (2) | W100 gering-mittel (0,5) | 1,5 gering-mittel | AB100 gering-mittel | ja |
+| Mitte optim., beschlossen | O100 mittel (2) | X100 gering-mittel (0,5) | 1,5 gering-mittel | AC100 gering-mittel | ja |
+| Mitte pessim., beschlossen | P100 hoch (3) | Y100 gering-mittel (0,5) | 2,5 mittel-hoch | AD100 mittel-hoch | ja |
+| Mitte optim., weiterreichend | O100 mittel (2) | Z100 mittel (1) | 1 gering | AE100 gering | ja |
+| Mitte pessim., weiterreichend | P100 hoch (3) | AA100 mittel (1) | 2 mittel | AF100 mittel | ja |
+
+**Euro-Betrag ohne und mit Maßnahmen nach Regel D (#98, Berlin).** Ohne weitere Anpassung trägt #98 in Berlin
+11,68 Mio. € je Jahr (Preisstand 2024; Bericht 98 §3.0 Ebene 10, Zustand nach Kapitel 1, Abschnitt „Risiko ohne
+(weitere) Anpassung“ (a)). Mit UV-Schutz im öffentlichen Raum und Kommunikation (S155) sind es nach vollem Einlauf
+11,68 Mio. € − 252.500 € = 11,43 Mio. € je Jahr; die 252.500 € (2,2 %, Band 70.100–631.200 €) sind eine Abschätzung von
+KAP3 (Bericht 98 Kapitel 5, Hebel „UV-Schutz im öffentlichen Raum und Kommunikation (S155)“, Tabelle „Beispiel Berlin“).
+Die Wirkung läuft über Jahrzehnte ein: Nach 10 Jahren werden 34.700 € angerechnet, es bleiben 11,65 Mio. € je Jahr
+(ebenda, Tabelle „angerechnet nach“). Die Förderung der Früherkennung (S158) hat keinen eigenen Betrag, sondern den Vermerk
+„Kostenwirkung im Basiswert voll angerechnet“ (Kapitel 5, Hebel „Förderung der Früherkennung (S158)“). Die
+Selbsteinschätzung aus Ebene 3 ändert keinen der Beträge (Regel D, Punkt 2); sie senkt allein die Stufe von „mittel“ auf
+„gering-mittel“ (Ebenen 2 und 10). Schatten und UV-Index-Hinweise, nach denen die Selbsteinschätzung fragt, sind dieselben
+Maßnahmen, die S155 in Euro rechnet; eine Minderung des Betrags aus der Kapazität zöge sie ein zweites Mal ab (Regel D,
+Grund 2).
+
+Beispiel-Block `rechenkette_klimarisiko_mit_anpassung_98`, aus dem Stamm des Produkt-Repos ausführbar (am 09.10.2026
+gelaufen, Ausgabe darunter):
+
+```python
+# rechenkette_klimarisiko_mit_anpassung_98 — Regel A und Regel D an #98 nachgerechnet
+import openpyxl
+
+RISIKO = {"gering": 1.0, "mittel": 2.0, "hoch": 3.0}  # Broschüre Tabelle 5, S. 29
+WIRKSAMKEIT = {"gering": 0.0, "gering-mittel": 0.5, "mittel": 1.0, "mittel-hoch": 1.5, "hoch": 2.0}  # ebenda
+STUFE = {1.0: "gering", 1.5: "gering-mittel", 2.0: "mittel", 2.5: "mittel-hoch", 3.0: "hoch"}  # TB6 S. 112
+
+
+def wirksamkeit_aus_summe(summe):
+    """Ebene 5: je drei Punkte eine halbe Stufe, abgerundet (Abschätzung von KAP3)."""
+    assert 0 <= summe <= 12
+    return (summe // 3) * 0.5
+
+
+def tabelle_5(ohne, wirksamkeit):
+    """Ebene 9: ohne Anpassung minus Wirksamkeit, unten bei 0 abgeschnitten."""
+    return max(0.0, ohne - wirksamkeit)
+
+
+def stufe(wert):
+    """Ebene 10: Werte unter 1 heißen „gering“, mit Zusatz (Festlegung d)."""
+    if wert < 1:
+        return f"gering (Tabelle 5: {wert:g})"
+    return STUFE[wert]
+
+
+ws = openpyxl.load_workbook("docs/KWAR/KWRA-2021_Klimawirkungen.xlsx", data_only=True)["Klimawirkungen"]
+assert (ws["N2"].value, ws["W2"].value) == ("Risiko o. Anp. – Gegenwart", "Wirksamkeit APA III – 2020–2030")
+assert (ws["Z2"].value, ws["AA2"].value) == ("Wirksamkeit weiterr. – Mitte optim.", "Wirksamkeit weiterr. – Mitte pessim.")
+
+# Ebenen 1 und 2
+zeile = next(r for r in range(3, ws.max_row + 1) if ws.cell(r, 1).value == 98)
+assert zeile == 100 and ws["V100"].value == "ja"
+assert ws["D100"].value == "UV-bedingte Gesundheitsschädigungen (insbesondere Hautkrebs)"
+ohne = RISIKO[ws["N100"].value]
+
+# Ebenen 3 bis 5 (Selbsteinschätzung als Beispiel)
+beispiel = {"organisation": 2, "technik": 1, "finanzen": 1, "oekosystem": 1}
+summe = sum(beispiel.values())
+eigen = wirksamkeit_aus_summe(summe)
+
+# Ebenen 6 bis 8
+unten = WIRKSAMKEIT[ws["W100"].value]
+oben = max(WIRKSAMKEIT[ws["Z100"].value], WIRKSAMKEIT[ws["AA100"].value])
+wirk = min(max(eigen, unten), oben)
+
+# Ebenen 9 und 10
+wert = tabelle_5(ohne, wirk)
+print("ohne:", ws["N100"].value, ohne, "| Summe:", summe, "| eigen:", eigen, "| Rahmen:", unten, oben,
+      "| Wirksamkeit:", wirk, "| Tabelle 5:", wert, "| mit Anpassung:", stufe(wert),
+      "| bundesweit AB100:", ws["AB100"].value)
+assert (ohne, summe, eigen, unten, oben, wirk, wert, stufe(wert)) == (2.0, 5, 0.5, 0.5, 1.0, 0.5, 1.5, "gering-mittel")
+
+# Stufe mit Anpassung für #98 je Summe 0 bis 12
+je_summe = {s: stufe(tabelle_5(ohne, min(max(wirksamkeit_aus_summe(s), unten), oben))) for s in range(13)}
+print("je Summe:", je_summe)
+assert all(je_summe[s] == ("gering-mittel" if s < 6 else "gering") for s in range(13))
+
+# Gegenabgleich: Tabelle 5 auf die bundesweite Wirksamkeit, Zeile 100
+PAARE = (("N", "W", "AB"), ("O", "X", "AC"), ("P", "Y", "AD"), ("O", "Z", "AE"), ("P", "AA", "AF"))
+abgleich = []
+for o, w, rr in PAARE:
+    roh = tabelle_5(RISIKO[ws[f"{o}100"].value], WIRKSAMKEIT[ws[f"{w}100"].value])
+    abgleich.append((f"{o}100", f"{w}100", roh, f"{rr}100", ws[f"{rr}100"].value, STUFE.get(roh) == ws[f"{rr}100"].value))
+print("Gegenabgleich (ohne, Wirksamkeit, Tabelle 5, Restrisiko, Zelle, trifft ohne (d)):", abgleich)
+assert [a[2] for a in abgleich] == [1.5, 1.5, 2.5, 1.0, 2.0] and all(a[5] for a in abgleich)
+
+# Regel D: Euro-Betrag Berlin ohne und mit S155 (Bericht 98 §3.0 Ebene 10, Kapitel 5); die Kapazität wirkt auf keinen Betrag
+S_OHNE = 11.68e6                      # € je Jahr (Preisstand 2024), §3.0 Ebene 10
+S155_VOLL, S155_10J = 252_500, 34_700  # Kapitel 5, Hebel S155, Beispiel Berlin
+print("ohne:", S_OHNE, "| S155 voll:", S155_VOLL, "| mit S155 voll:", S_OHNE - S155_VOLL,
+      "| nach 10 Jahren:", S_OHNE - S155_10J, "| Anteil S155:", round(S155_VOLL / S_OHNE, 4))
+assert (round((S_OHNE - S155_VOLL) / 1e6, 2), round((S_OHNE - S155_10J) / 1e6, 2)) == (11.43, 11.65)
+```
+
+Ausgabe:
+
+```
+ohne: mittel 2.0 | Summe: 5 | eigen: 0.5 | Rahmen: 0.5 1.0 | Wirksamkeit: 0.5 | Tabelle 5: 1.5 | mit Anpassung: gering-mittel | bundesweit AB100: gering-mittel
+je Summe: {0: 'gering-mittel', 1: 'gering-mittel', 2: 'gering-mittel', 3: 'gering-mittel', 4: 'gering-mittel', 5: 'gering-mittel', 6: 'gering', 7: 'gering', 8: 'gering', 9: 'gering', 10: 'gering', 11: 'gering', 12: 'gering'}
+Gegenabgleich (ohne, Wirksamkeit, Tabelle 5, Restrisiko, Zelle, trifft ohne (d)): [('N100', 'W100', 1.5, 'AB100', 'gering-mittel', True), ('O100', 'X100', 1.5, 'AC100', 'gering-mittel', True), ('P100', 'Y100', 2.5, 'AD100', 'mittel-hoch', True), ('O100', 'Z100', 1.0, 'AE100', 'gering', True), ('P100', 'AA100', 2.0, 'AF100', 'mittel', True)]
+ohne: 11680000.0 | S155 voll: 252500 | mit S155 voll: 11427500.0 | nach 10 Jahren: 11645300.0 | Anteil S155: 0.0216
+```
+
+## Ergebnis für M0
+
+Regel A auf die drei Klimawirkungen von M0 angewandt. Die Stufe gilt für die Beispiel-Selbsteinschätzung des jeweiligen
+Blocks; für eine echte Kommune rechnet das Produkt mit ihrer eigenen. Was jede vollständige Selbsteinschätzung ergibt,
+steht in der Stufe „je Summe“. Der Rahmen der Wirksamkeit ist bei allen drei derselbe, 0,5–1 (W, Z und AA der Mappe).
+
+| Klimawirkung (Beispiel-Block) | Eingangsstufe | Wirksamkeit | Stufe mit Anpassung | Kennzeichnung |
+|---|---|---|---|---|
+| #95 Hitzebelastung (`rechenkette_klimarisiko_mit_anpassung_95`) | hoch (3), N97 (Ebene 2) | Beispiel 9 Punkte → 1,5, im Rahmen 0,5–1 → mittel (1) (Ebenen 5–8) | **mittel** (Ebene 10); je Summe: 0–5 mittel-hoch, 6–12 mittel | Eingangsstufe: Quelle (Mappe N97). Wirksamkeit und Stufe: Abschätzung von KAP3 (Summentabelle und Rahmen), Werte des Rahmens aus der Quelle (W97, Z97, AA97), Tabelle 5 aus der Quelle (UBA 2022, S. 29). Nicht bestimmbar, solange eine Komponente fehlt. |
+| #96 Aeroallergene (`rechenkette_klimarisiko_mit_anpassung_96`) | gering (1), N98 (Ebene 2) | Beispiel 7 Punkte → 1, im Rahmen 0,5–1 → mittel (1) (Ebenen 5–8) | **gering** (Tabelle 5: 0) (Ebene 10); je Summe: 0–5 gering (Tabelle 5: 0,5), 6–12 gering (Tabelle 5: 0) | Eingangsstufe: Quelle (Mappe N98). Wirksamkeit und Zusatz: Abschätzung von KAP3 (Summentabelle und Rahmen), Werte des Rahmens aus der Quelle (W98, Z98, AA98). Das Wort „gering“ hängt an keiner Abschätzung: Es folgt für jede Wirksamkeit von 0 bis 2 aus N98 und Tabelle 5 (UBA 2022, S. 29). Nicht bestimmbar, solange eine Komponente fehlt. |
+| #98 UV-Schädigungen (`rechenkette_klimarisiko_mit_anpassung_98`) | mittel (2), N100 (Ebene 2) | Beispiel 5 Punkte → 0,5, im Rahmen 0,5–1 → gering-mittel (0,5) (Ebenen 5–8) | **gering-mittel** (Ebene 10); je Summe: 0–5 gering-mittel, 6–12 gering | Eingangsstufe: Quelle (Mappe N100). Wirksamkeit und Stufe: Abschätzung von KAP3 (Summentabelle und Rahmen), Werte des Rahmens aus der Quelle (W100, Z100, AA100), Tabelle 5 aus der Quelle (UBA 2022, S. 29). Nicht bestimmbar, solange eine Komponente fehlt. |
+
+Kein Euro-Betrag in dieser Tabelle: Nach Regel D wirkt die Selbsteinschätzung auf keinen Betrag. Die Beträge ohne und
+mit Maßnahmen stehen unter dem jeweiligen Beispiel-Block, alle für Berlin, Preisstand 2024: #95 362,9 und 340,8 Mio. €,
+#96 2,53 und 2,47 Mio. €, #98 11,68 und nach vollem Einlauf 11,43 Mio. € je Jahr. Alle drei Klimawirkungen gehören zu
+den 9 Zeilen mit einem Rahmen von einer halben Stufe; sichtbar wird er bei #95 und #98, bei #96 nicht ((c), „Richtung und
+Größe der möglichen Verzerrung“).
+
 ## Entscheidungslog
 
 Gewählt ist Regel A. Der Vorschlag des CEO (qualitativ, ohne Euro-Betrag, mit Seite) ist darin im Kern gewählt und
@@ -723,6 +1045,16 @@ Verworfen, je mit einem Satz:
     unsichtbar (0,0608 statt 0,061), bei einer Klimawirkung, deren Hebel nur einen kleinen Teil des Schadens treffen,
     wäre es ein Vielfaches.
 
+**Schritt 3 (T-1897-methodik_manager).** Regel A, Definition P und Regel D werden auf #96 und #98 angewandt, nicht neu
+gefasst. Kein Wert zwingt zu einer Änderung der Regel: #98 trifft den Gegenabgleich in allen fünf Paaren ohne (d), #96 in
+vier ohne und im ersten Paar (1 − 0,5 = 0,5, KWRA „gering“) mit (d). Der Beispiel-Block für #95 bleibt deshalb
+unverändert. Verworfen, je mit einem Satz:
+
+22. **Für #96 die Selbsteinschätzung weglassen, weil keine vollständige Summe das Wort „gering“ ändert:** verworfen, weil
+    (c) eine fehlende Komponente nicht still ersetzt und der Zusatz aus (d) (Tabelle 5: 0,5 oder 0) an der Summe hängt.
+23. **Für #96 die Mitte (P98 „hoch“) als Eingang, damit die Selbsteinschätzung sichtbar wirkt:** verworfen aus demselben
+    Grund wie Nummer 6; die Stufen zur Mitte bleiben im Bericht sichtbar ((a)).
+
 **Bewusst offen (Gegenprobe Zeile 18, `docs/KONFORMITAET_CHECKLISTE.md`):**
 
 - **A3** „welche Anpassungsmöglichkeiten grundsätzlich bestehen“ (S. 28): Regel A nennt keine Maßnahme. Zuständig: CTO
@@ -736,6 +1068,25 @@ Verworfen, je mit einem Satz:
   gemessen am 07.10.2026). Zuständig: CMO (Vorhaben T-1122-cmo).
 
 ## Befunde an Berichte
+
+**Schritt 3.** Keine Befunde; Bericht 96 und Bericht 98 ändert dieser Schritt nicht. Verglichen am 09.10.2026 mit der
+Mappe (SHA-256 unter „Quellen“), Köpfe in Zeile 2:
+
+- **#96, `docs/methodik/96_aeroallergene.md`: keine.** Abschnitt „Risiko ohne (weitere) Anpassung“ (ab Zeile 163),
+  Unterabschnitt (c): Gegenwart „gering“ = N98, Mitte optimistisch „mittel“ = O98, Mitte pessimistisch „hoch“ = P98, Ende
+  optimistisch „mittel“ = Q98, Ende pessimistisch „hoch“ = R98, Gewissheit Mitte „mittel“ = S98, Ende „mittel“ = T98;
+  Fundstelle Zeile 98 = Mappe. Unterabschnitt (b): AB98 „gering“, AC98 „gering“, AD98 „mittel“, AE98 „gering“, AF98
+  „mittel“ = Mappe; „Für das Ende des Jahrhunderts führt die Mappe kein Restrisiko“ trifft zu (Köpfe AB2–AF2 nennen nur
+  2020–2030 und die Mitte). Kapitel 5 (ab Zeile 1070, mit §5.1) nennt keine Zelle der Mappe; seine Beträge (9.182 Tage
+  und ≈ 56.900 €; 637 Tage und ≈ 3.950 € je Jahr) stimmen mit Unterabschnitt (b) überein.
+- **#98, `docs/methodik/98_uv_schaedigungen.md`: keine.** Abschnitt „Risiko ohne (weitere) Anpassung“ (ab Zeile 199),
+  Unterabschnitt (c): Gegenwart „mittel“ = N100, Mitte „mittel“ und „hoch“ = O100 und P100, Ende „mittel“ und „hoch“ =
+  Q100 und R100; Fundstelle Zeile 100, Kopfnamen N2 und R2 wörtlich = Mappe. Unterabschnitt (d): Gewissheit Mitte
+  „mittel“ = S100, Ende „sehr gering“ = T100, Kopfnamen S2 und T2 wörtlich = Mappe. Kapitel 5 (ab Zeile 1304) nennt keine
+  Zelle der Mappe; S155 mit 252.500 € (Band 70.100–631.200 €; nach 10, 20 und 30 Jahren 34.700, 69.400 und 104.000 €)
+  stimmt mit Unterabschnitt (b) überein. Hinweis ohne Befund: Unterabschnitt (b) sagt, der Bericht weise kein Restrisiko
+  aus, und nennt die Zellen AB100–AF100 nicht, anders als Bericht 96. Ein Widerspruch zur Mappe ist das nicht; diese
+  Datei zeigt die Zellen im Gegenabgleich #98.
 
 **Schritt 2.** Beide Befunde gehen über den CMO weiter (eiserne Regel 5); Code und Bericht 95 ändert dieser Schritt nicht.
 
@@ -786,6 +1137,15 @@ R2 = Mappe; Gewissheit Mitte „hoch“ = S97, Ende „mittel“ = T97.
   „Sensitivität“, „Zusammen mit dem Hitzeaktionsplan (Befund 129)“ und die Absätze zum Anpassungspotenzial, Befunde
   149, 183 und 214), „Öffentliche Kühlzentren“ und „Schutzprogramme vulnerable Gruppen“ (Absätze „Berlin“,
   „Morbidität (Befund 131)“, „Doppelzählungs-Wächter (Befund 150)“, „Kappung 0,794“).
+- **[Bericht 96]** `docs/methodik/96_aeroallergene.md`, Schritt 3: Kapitel 1, Abschnitt „Risiko ohne (weitere)
+  Anpassung“ (ab Zeile 163), Unterabschnitte (a), (b) und (c); §3.0 Rechenkette, Ebene 10 (408.106 Tage × 6,20 € =
+  2,53 Mio. € je Jahr) und Zelllauf (2,47 Mio. €); Kapitel 5 (ab Zeile 1070), Hebel „Allergenarme Stadtbaumwahl“,
+  Rechenbeispiel Schritt 9; §5.1 „Wirkungsabschätzung S158 Pollen-Frühwarnung“, Tabelle „Beispielkommune Berlin“,
+  Schritte 4 und 5.
+- **[Bericht 98]** `docs/methodik/98_uv_schaedigungen.md`, Schritt 3: Kapitel 1, Abschnitt „Risiko ohne (weitere)
+  Anpassung“ (ab Zeile 199), Unterabschnitte (a) bis (d); §3.0 Rechenkette, Ebene 10 (11,68 Mio. € je Jahr); Kapitel 5
+  (ab Zeile 1304), Hebel „UV-Schutz im öffentlichen Raum und Kommunikation (S155)“ (Tabellen „Beispiel Berlin“ und
+  „angerechnet nach“) und „Förderung der Früherkennung (S158)“.
 - **[Ledger 95]** `reviews/BEFUNDE_95.md`, Befund 214 (Entscheidung des CEO vom 06.10.2026, Folgepaket T-1740-ceo) und
   Befund 230.
 - **[Code]** `backend/app/services/charakterisierung.py` (`anpassungspotenzial`, `_s157_faktor`, `charakterisierungen`),
@@ -795,4 +1155,5 @@ R2 = Mappe; Gewissheit Mitte „hoch“ = S97, Ende „mittel“ = T97.
 - **[Mappe]** `docs/KWAR/KWRA-2021_Klimawirkungen.xlsx`, SHA-256
   `70cf6d0090e24b15098f61e5004bf709e91c41cc2b397510499a4cedb8223611`, Blatt „Klimawirkungen“: Kopfzeile 2; Zeile 97
   (#95), Spalten A, D, N–T, U, V, W–AF, AI, AJ (AJ97: „TB 6 Tab. 1 | TB 6 Tab. 22 | …“); für den Gegenabgleich und (f)
-  die Spalten N–AF und V aller 102 Zeilen.
+  die Spalten N–AF und V aller 102 Zeilen; Schritt 3: Zeilen 98 (#96) und 100 (#98), Spalten A, D, N–T, V und W–AF,
+  gelesen am 09.10.2026 mit derselben SHA-256.
