@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Beispielkommune Warmsen für den Sichtstart anlegen (T-1775).
+"""Beispielkommune (Oschatz oder Leipzig, Sachsen) für den Sichtstart anlegen (T-1775).
 
-    python3 scripts/sicht_beispielkommune.py [--warte-sekunden N] [--basis URL] [--neu-rechnen]
+    python3 scripts/sicht_beispielkommune.py [--kommune Oschatz|Leipzig] [--warte-sekunden N] [--basis URL] [--neu-rechnen]
                                              [--anmeldung lokal|sitzung]
 
 Das Skript nutzt nur die Standardbibliothek. Es startet `bash scripts/sichtstart.sh`
@@ -9,17 +9,22 @@ als Kindprozess (eigene Postgres-Instanz, Backend auf 127.0.0.1:8000, Frontend a
 127.0.0.1:5173), wartet auf `/api/health` und steuert dann die API des Produkts
 direkt, mit denselben Schritten wie die Oberfläche:
 
-  (0) Gemeindetabelle füllen: fehlt die VG250-Gemeinde von Warmsen in `gemeinden`, läuft der
-      vorhandene VG250-Import des Produkts (`ingest_gemeinden`, Niedersachsen). Ohne sie findet der
-      Worker keinen Gemeindeschlüssel, und Stufe 2 der Ersatzregel 65+ entfällt (T-1814). War Warmsen
-      schon berechnet, wird nach dem Füllen einmal neu berechnet.
-  (a) vorhanden? Warmsen mit Status `done` und die Maßnahme da: nur lesen und ausgeben,
+  (0) Gemeindetabelle füllen: fehlt die VG250-Gemeinde der gewählten Kommune in `gemeinden`, läuft der
+      vorhandene VG250-Import des Produkts (`ingest_gemeinden`) für ihr Bundesland (beide
+      Beispielkommunen: Sachsen). Ohne sie findet der Worker keinen Gemeindeschlüssel, und Stufe 2
+      der Ersatzregel 65+ entfällt (T-1814). War die Kommune schon berechnet, wird nach dem Füllen
+      einmal neu berechnet. Nach dem Anlegen muss der Schlüssel der Worker-Abfrage dem der Tabelle
+      entsprechen, sonst endet das Skript mit Exit 1.
+  (a) vorhanden? Die Kommune mit Status `done` und die Maßnahme da: nur lesen und ausgeben,
   (b) Suche und Anlegen der Kommune (Grenze aus OSM),
   (c) Raster erzeugen,
   (d) Bewertung einreihen und den Status abfragen, bis `done`,
   (e) genau eine Maßnahme aus dem Katalog anlegen und ihre Wirkung berechnen,
   (f) den Jahresbetrag #95 aus `risk-summary` lesen (API-Wert ohne Wirkung der Maßnahme; die Karte
       nimmt bei geladenem `cost-summary` den Stand mit Maßnahmen).
+
+Beispielkommunen (fest): Oschatz (14730230) und Leipzig (14713000), beide Sachsen; ohne
+`--kommune` gilt Oschatz.
 
 Zweites Ziel (T-1830): Mit `--basis URL` startet das Skript keinen Sichtstart, sondern spricht
 einen laufenden Dienst unter dieser Adresse an (z. B. kap2-test auf 127.0.0.1:8010). Der Produktcode
@@ -36,7 +41,9 @@ Am Ende beendet es den Sichtstart mit SIGTERM und wartet auf sein Ende, auch bei
 Fehlern. Keine Zahl wird von Hand in die Datenbank geschrieben; alle Beträge stammen
 aus Antworten der API. Die letzte Zeile der Ausgabe ist JSON; Exit-Code 0 nur, wenn
 alles gelungen ist. Die Schlusszeile nennt zusätzlich alle Klimawirkungen aus `risk-summary` mit
-Jahresbetrag, den Commit des Dienstes (`/api/health`) und die Zeit der Rechnung (UTC).
+Jahresbetrag, den Commit des Dienstes (`/api/health`), die Zeit der Rechnung (UTC) und die Dauer der
+Bewertung (`dauer_bewertung_s`). Die Warteschleife der Bewertung schreibt mindestens alle 60 s eine
+Zeile mit der verstrichenen Zeit, auch wenn sich der Fortschritt nicht ändert.
 """
 import argparse
 import getpass
@@ -55,16 +62,23 @@ import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASIS = "http://127.0.0.1:8000"
-KOMMUNE = "Warmsen"
-LANDKREIS_HINWEIS = "Nienburg"
+# Feste Beispielkommunen: Gemeindeschlüssel (VG250, `vg250_gem`), Bundesland und ein Hinweis, der im
+# `display_name` des Nominatim-Treffers stehen muss (Leipzig ist kreisfrei, Oschatz liegt im Landkreis
+# Nordsachsen). Ein falscher Treffer fällt über den Gemeindeschlüssel auf.
+KOMMUNEN = {
+    "Oschatz": {"ags": "14730230", "bundesland": "Sachsen", "hinweis": "Nordsachsen"},
+    "Leipzig": {"ags": "14713000", "bundesland": "Sachsen", "hinweis": "Sachsen"},
+}
+STANDARD_KOMMUNE = "Oschatz"
+# Gewählte Kommune dieses Aufrufs (main setzt sie).
+AUSWAHL = {"kommune": STANDARD_KOMMUNE}
+HERZSCHLAG_S = 60  # Warteschleife der Bewertung: spätestens nach so vielen Sekunden eine Zeile
 MASSNAHME_PRAEFIX = "Sichtstart: "
 # Risikocodes der Berichte #95 (Hitzebelastung) und #96 (Aeroallergene).
 RISIKEN_95_96 = {
     "EXPECTED_ANNUAL_MORTALITY", "EXPECTED_ANNUAL_MORBIDITY",
     "EXPECTED_ANNUAL_ALLERGY_DAYS",
 }
-AGS_WARMSEN = "03256034"
-BUNDESLAND_WARMSEN = "Niedersachsen"
 VENV = os.environ.get("KAP2_VENV", os.path.join(os.path.expanduser("~"), ".venvs", "kap2"))
 PGDATA = os.environ.get("KAP2_SICHT_PGDATA",
                         os.path.join(os.path.expanduser("~"), ".local", "share", "kap2-sicht", "pgdata"))
@@ -72,7 +86,6 @@ PGDATA = os.environ.get("KAP2_SICHT_PGDATA",
 DATENBANK_URL = f"postgresql://{getpass.getuser()}@/kap2_sicht?host={PGDATA}"
 # Ziel dieses Aufrufs: Adresse der API und Datenbank für den Produktcode (main setzt sie).
 ZIEL = {"basis": BASIS, "datenbank": DATENBANK_URL}
-GOLDEN_95_EUR = 175256  # backend/data/kalibrierung/golden95_zellen.md
 SESSION_COOKIE = "kap2_session"  # backend/app/api/deps.py
 TECHNIK_EMAIL = "sichtstart-technik@kap3.invalid"
 SITZUNG_ENV = "KAP2_SICHT_SITZUNG"  # Übergabe an das Kind nur über die Umgebung, nie als Argument
@@ -82,6 +95,12 @@ SITZUNG = {"wert": None}
 
 class Fehler(RuntimeError):
     pass
+
+
+def gewaehlt():
+    """Name und Angaben der gewählten Beispielkommune."""
+    name = AUSWAHL["kommune"]
+    return name, KOMMUNEN[name]
 
 
 def euro(betrag, stellen=2):
@@ -185,9 +204,9 @@ try:
     geschrieben = 0
     if not da:
         geschrieben = ingest_gemeinden(db, bundesland=land)
-    print(json.dumps({"vorher": vorher, "warmsen_vorher": da, "geschrieben": geschrieben,
+    print(json.dumps({"vorher": vorher, "da_vorher": da, "geschrieben": geschrieben,
                       "nachher": db.query(Gemeinde).count(),
-                      "warmsen_nachher": db.query(Gemeinde.ags).filter(Gemeinde.ags == ags).first() is not None}))
+                      "da_nachher": db.query(Gemeinde.ags).filter(Gemeinde.ags == ags).first() is not None}))
 finally:
     db.close()
 """
@@ -297,50 +316,52 @@ def widerrufe_sitzung():
 
 
 def fuelle_gemeinden():
-    """(0) Gemeindetabelle über den VG250-Import des Produkts füllen, wenn Warmsen fehlt.
+    """(0) Gemeindetabelle über den VG250-Import des Produkts füllen, wenn die Gemeinde fehlt.
 
     Gibt True zurück, wenn dabei geschrieben wurde (eine frühere Bewertung ist dann veraltet).
     """
-    melde("Gemeindetabelle prüfen (VG250, ggf. Download und Import für Niedersachsen) …")
-    antwort = json.loads(produktcode(_CODE_FUELLEN, AGS_WARMSEN, BUNDESLAND_WARMSEN))
-    if not antwort["warmsen_nachher"]:
-        raise Fehler(f"Gemeinde {AGS_WARMSEN} fehlt nach dem VG250-Import in `gemeinden`.")
-    if antwort["warmsen_vorher"]:
-        melde(f"Gemeindetabelle schon gefüllt: {antwort['nachher']} Zeilen, Warmsen ({AGS_WARMSEN}) dabei.")
+    name, k = gewaehlt()
+    melde(f"Gemeindetabelle prüfen (VG250, ggf. Download und Import für {k['bundesland']}) …")
+    antwort = json.loads(produktcode(_CODE_FUELLEN, k["ags"], k["bundesland"]))
+    if not antwort["da_nachher"]:
+        raise Fehler(f"Gemeinde {k['ags']} fehlt nach dem VG250-Import in `gemeinden`.")
+    if antwort["da_vorher"]:
+        melde(f"Gemeindetabelle schon gefüllt: {antwort['nachher']} Zeilen, {name} ({k['ags']}) dabei.")
         return False
     melde(f"Gemeindetabelle gefüllt: {antwort['vorher']} → {antwort['nachher']} Zeilen "
-          f"({antwort['geschrieben']} Gemeinden {BUNDESLAND_WARMSEN} aus VG250), Warmsen ({AGS_WARMSEN}) dabei.")
+          f"({antwort['geschrieben']} Gemeinden {k['bundesland']} aus VG250), {name} ({k['ags']}) dabei.")
     return True
 
 
 # ── Schritte ──────────────────────────────────────────────────────────────────
 
 def finde_kommune():
-    treffer = [k for k in api("GET", "/api/kommune") if k["name"] == KOMMUNE]
+    treffer = [k for k in api("GET", "/api/kommune") if k["name"] == gewaehlt()[0]]
     return treffer[0] if treffer else None
 
 
 def lege_kommune_an():
     """(b) Suche und Anlegen mit dem Suchtreffer, wie die Oberfläche es tut."""
     treffer = None
+    name, k = gewaehlt()
     for versuch in range(4):
         try:
-            ergebnisse = api("GET", "/api/kommune/search?q=" + urllib.parse.quote(KOMMUNE))
+            ergebnisse = api("GET", "/api/kommune/search?q=" + urllib.parse.quote(name))
         except Fehler as exc:
             melde(f"Suche fehlgeschlagen (Versuch {versuch + 1}/4): {exc}")
             time.sleep(10)
             continue
         passend = [
             e for e in ergebnisse
-            if e.get("name") == KOMMUNE and e.get("osm_type") == "relation"
-            and LANDKREIS_HINWEIS in e.get("display_name", "")
+            if e.get("name") == name and e.get("osm_type") == "relation"
+            and k["hinweis"] in e.get("display_name", "")
         ]
         if passend:
             treffer = passend[0]
             break
         time.sleep(5)
     if not treffer:
-        raise Fehler(f"Kein Suchtreffer „{KOMMUNE}“ im Landkreis {LANDKREIS_HINWEIS} (Nominatim).")
+        raise Fehler(f"Kein Suchtreffer „{name}“ mit „{k['hinweis']}“ im Namen (Nominatim).")
     daten = {k: treffer.get(k) for k in ("osm_id", "name", "osm_type", "geojson", "address")}
     daten["bundesland"] = (treffer.get("address") or {}).get("state")
     kommune = api("POST", "/api/kommune", daten, timeout=300)
@@ -376,14 +397,19 @@ def bewertung(kommune_id, max_sekunden, neu_rechnen=False, grund_neu=""):
         melde(f"Bewertung läuft schon ({status.get('status')}): es wird nur gewartet.")
     start = time.time()
     letzte = None
+    letzte_zeile_um = start
     while time.time() - start < max_sekunden:
         status = api("GET", f"/api/kommune/{kommune_id}/status")
         zeile = (status.get("status"), round(status.get("progress_pct") or 0), status.get("message"))
+        jetzt = time.time()
         if zeile != letzte:
-            melde(f"[{int(time.time() - start):>5} s] {zeile[0]} {zeile[1]} % {zeile[2] or ''}")
-            letzte = zeile
+            melde(f"[{int(jetzt - start):>5} s] {zeile[0]} {zeile[1]} % {zeile[2] or ''}")
+            letzte, letzte_zeile_um = zeile, jetzt
+        elif jetzt - letzte_zeile_um >= HERZSCHLAG_S:
+            melde(f"[{int(jetzt - start):>5} s] wartet noch: {zeile[0]} {zeile[1]} % {zeile[2] or ''} (unverändert)")
+            letzte_zeile_um = jetzt
         if status.get("status") == "done" and (alt_ende is None or status.get("finished_at") != alt_ende):
-            return status
+            return dict(status, dauer_bewertung_s=int(jetzt - start))
         if status.get("status") == "error":
             raise Fehler(f"Bewertung endete mit error: {status.get('message')}")
         time.sleep(15)
@@ -486,10 +512,14 @@ def arbeite(max_sekunden, neu_rechnen=False):
         kommune = lege_kommune_an()
     else:
         melde(f"Kommune {kommune['name']} schon vorhanden (id {kommune['id']}).")
+    name, k = gewaehlt()
     ags = produktcode(_CODE_SCHLUESSEL, str(kommune["id"]))
     melde(f"Gemeindeschlüssel für {kommune['name']} laut Worker-Abfrage: {ags}")
     if ags in ("", "None"):
-        raise Fehler("Die Abfrage des Workers liefert für Warmsen keinen Gemeindeschlüssel.")
+        raise Fehler(f"Die Abfrage des Workers liefert für {name} keinen Gemeindeschlüssel.")
+    if ags != k["ags"]:
+        raise Fehler(f"Gemeindeschlüssel der Worker-Abfrage ({ags}) entspricht nicht dem Schlüssel von "
+                     f"{name} in der Tabelle ({k['ags']}) – falscher Treffer, Abbruch.")
     status = bewertung(kommune["id"], max_sekunden, neu_rechnen=gemeinden_neu or neu_rechnen,
                        grund_neu=" (--neu-rechnen)" if neu_rechnen else " (Gemeindetabelle eben gefüllt)")
     kommune = api("GET", f"/api/kommune/{kommune['id']}")  # Einwohner stehen erst nach der Bewertung
@@ -497,9 +527,8 @@ def arbeite(max_sekunden, neu_rechnen=False):
     betrag, bezeichnung = betrag_95(kommune["id"])
     zellen = len(api("GET", f"/api/measures/{m['id']}/impacts"))
     melde(f"Maßnahme: {m['name']} (Typ {m['measure_type']}, {zellen} Zellen mit Wirkung) – {grund}")
-    melde(f"Jahresbetrag {bezeichnung}: {euro(betrag)} (Golden-Test #95 im Bericht: "
-          f"{euro(GOLDEN_95_EUR, 0)}; Abweichung {euro(betrag - GOLDEN_95_EUR)}, nicht angeglichen)")
-    melde(f"Einwohner laut Kommune: {kommune.get('population')} (Golden-Test: 3087)")
+    melde(f"Jahresbetrag {bezeichnung}: {euro(betrag)}")
+    melde(f"Einwohner laut Kommune: {kommune.get('population')}")
     if war_vorhanden and not neu and not gemeinden_neu and not neu_rechnen:
         melde("Nichts neu angelegt: Kommune und Maßnahme waren da, kein neuer Bewertungslauf.")
     melde(f"Dauer dieses Aufrufs ohne Sichtstart-Start: {int(time.time() - start)} s")
@@ -518,11 +547,14 @@ def arbeite(max_sekunden, neu_rechnen=False):
         "klimawirkungen": baue_klimawirkungen(zusammenfassung),
         "commit": gesundheit.get("commit"),
         "zeit_rechnung": zeit_utc(status.get("finished_at")),
+        "dauer_bewertung_s": status.get("dauer_bewertung_s", 0),
     }
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--kommune", choices=sorted(KOMMUNEN), default=STANDARD_KOMMUNE,
+                    help=f"Beispielkommune (Vorgabe {STANDARD_KOMMUNE})")
     ap.add_argument("--warte-sekunden", type=int, default=7200,
                     help="längste Wartezeit auf die Bewertung (Vorgabe 7200)")
     ap.add_argument("--start-sekunden", type=int, default=300,
@@ -536,6 +568,7 @@ def main(argv=None):
                     help="lokal: Anmeldung des Sichtstarts (Vorgabe); sitzung: technischer Nutzer "
                          "mit Cookie kap2_session")
     args = ap.parse_args(argv)
+    AUSWAHL["kommune"] = args.kommune
 
     if args.basis:
         datenbank = os.environ.get("DATABASE_URL")
