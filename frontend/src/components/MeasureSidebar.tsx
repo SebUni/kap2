@@ -22,6 +22,8 @@ export default function MeasureSidebar() {
   const [editAnteilErsetzt, setEditAnteilErsetzt] = useState<number | null>(null)
   // Ersatzfall der Stadtbaumwahl (Ü-11): 'nachpflanzung' | 'vorgezogen'; null = nicht gewählt.
   const [editErsatzfall, setEditErsatzfall] = useState<string | null>(null)
+  // S155 (#98 §5): Jahre seit Beginn des Hebels (J); null = keine Eingabe (dann volle Wirkung).
+  const [editJahre, setEditJahre] = useState<number | null>(null)
   const [showBreakdown, setShowBreakdown] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -35,6 +37,8 @@ export default function MeasureSidebar() {
       setEditSgek(typeof sg === 'number' ? Math.round(sg * 1000) / 10 : null)
       const ae = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.anteil_ersetzt
       setEditAnteilErsetzt(typeof ae === 'number' ? Math.round(ae * 1000) / 10 : null)
+      const jb = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.jahre_seit_beginn
+      setEditJahre(typeof jb === 'number' ? jb : null)
       const ef = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.ersatzfall
       setEditErsatzfall(ef === 'nachpflanzung' || ef === 'vorgezogen' ? ef : null)
       const vk = (selectedMeasure.config as Record<string, unknown> | null | undefined)?.vg_in_kalibrierjahren
@@ -67,6 +71,9 @@ export default function MeasureSidebar() {
   const hasVgKalib = isS157 || selectedMeasure.measure_type === 'VULNERABLE_GROUP_PROGRAMS'
   const vgKalibSpec = def?.config_inputs?.vg_in_kalibrierjahren
   const vgKalibHelp = def?.config_input_help?.vg_in_kalibrierjahren
+  const isS155 = selectedMeasure.measure_type === 'UV_PROTECTION_PUBLIC_SPACE'
+  const jahreSpec = def?.config_inputs?.jahre_seit_beginn
+  const jahreHelp = def?.config_input_help?.jahre_seit_beginn
   const anteilErsetztHelp = def?.config_input_help?.anteil_ersetzt
   const reductionIsEstimated = def?.evidence_classes?.default_reduction === 'abgeschaetzt'
   const linkedRisks = (def?.linked_risk_codes || [])
@@ -104,6 +111,12 @@ export default function MeasureSidebar() {
         else base.anteil_ersetzt = Math.max(0.1, Math.min(100, editAnteilErsetzt)) / 100
         if (editErsatzfall == null) delete base.ersatzfall
         else base.ersatzfall = editErsatzfall
+        payload.config = base
+      }
+      if (isS155) {
+        const base = { ...((payload.config as Record<string, unknown>) || selectedMeasure.config || {}) }
+        if (editJahre == null) delete base.jahre_seit_beginn
+        else base.jahre_seit_beginn = Math.max(0, editJahre)
         payload.config = base
       }
       const updated = await updateMeasure(selectedMeasure.id, payload)
@@ -287,6 +300,22 @@ export default function MeasureSidebar() {
             </div>
           )}
 
+          {isS155 && (
+            <div className="card">
+              <h3>{jahreSpec?.frage || 'Wie viele Jahre läuft der Hebel schon?'} (Jahre)</h3>
+              <input
+                type="number" min={0} step={1} value={editJahre ?? ''}
+                placeholder="nicht eingegeben"
+                onChange={e => { setEditJahre(e.target.value === '' ? null : Number(e.target.value)); setDirty(true) }}
+                style={{ fontSize: '0.9rem', border: '1px solid var(--border)', borderRadius: 4, padding: '2px 6px', width: 120, background: 'var(--surface)' }}
+              />
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                {jahreHelp || 'Jahre seit Beginn des Hebels S155 (J, Zahl ≥ 0); ohne Eingabe zeigt KAP3 '
+                  + 'die volle Wirkung und die Anteile nach 10, 20 und 30 Jahren (Methodik-Bericht #98 §5).'}
+              </div>
+            </div>
+          )}
+
           {isStadtbaum && (
             <div className="card">
               <h3>Ersatzfall</h3>
@@ -436,6 +465,41 @@ export default function MeasureSidebar() {
             {isS158 && !impact.benefit_display && impact.s158_estimate_note && (
               <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4 }}>
                 {impact.s158_estimate_note}
+              </div>
+            )}
+            {isS155 && !impact.benefit_display && impact.s155_avoided_eur != null && (
+              <div style={{ marginTop: 4, fontSize: '0.8rem' }}>
+                {impact.s155_angerechnet_eur != null ? (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>
+                      angerechnet nach {(impact.s155_jahre_seit_beginn ?? 0).toLocaleString('de-DE')} Jahren
+                    </span>
+                    <span style={{ color: 'var(--success)' }}>{fmtEur(impact.s155_angerechnet_eur)}</span>
+                  </div>
+                ) : null}
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.15rem 0' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>
+                    {impact.s155_angerechnet_eur != null ? 'volle Wirkung je Jahr (Endpunkt)' : 'volle Wirkung je Jahr'}
+                  </span>
+                  <span style={{ color: 'var(--success)' }}>{fmtEur(impact.s155_avoided_eur)}</span>
+                </div>
+                {impact.s155_band_eur && (
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Band: {fmtEur(impact.s155_band_eur[0])} bis {fmtEur(impact.s155_band_eur[1])}
+                  </div>
+                )}
+                {impact.s155_angerechnet_eur == null && impact.s155_rampe && impact.s155_rampe.map(r => (
+                  <div key={r.jahre} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.1rem 0' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>
+                      nach {r.jahre} Jahren ({(r.anteil_mm * 100).toLocaleString('de-DE', { maximumFractionDigits: 1 })} % Melanom,
+                      {' '}{(r.anteil_c44 * 100).toLocaleString('de-DE', { maximumFractionDigits: 1 })} % C44)
+                    </span>
+                    <span style={{ color: 'var(--success)' }}>{fmtEur(r.eur)}</span>
+                  </div>
+                ))}
+                <div style={{ fontSize: '0.72rem', color: 'var(--warning, #b45309)', marginTop: 4, lineHeight: 1.4 }}>
+                  {impact.s155_estimate_note || 'Abschätzung von KAP3'}
+                </div>
               </div>
             )}
             {isStadtbaum && !impact.benefit_display && impact.stadtbaum_estimate_note && (

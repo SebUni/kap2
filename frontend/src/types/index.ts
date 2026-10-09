@@ -164,6 +164,20 @@ export interface MeasureImpactSummary {
   /** S158: Kennzeichnung der Wirkung als begründete Abschätzung von KAP3 (r_S158,
    *  t_warn — Vorgabe P2, keine belegten Effektgrößen). */
   s158_estimate_note?: string | null
+  /** S155 (#98 §5, Integrationsauflage Punkt 3): volle Wirkung je Jahr der Kommune in Euro
+   *  (Summe der Zellwerte, ohne Zeitbezug); fehlt, wenn Entitätswerte fehlen
+   *  (dann trägt benefit_display den Vermerk). */
+  s155_avoided_eur?: number | null
+  /** S155: Band [untere, obere Grenze] der vollen Wirkung je Jahr in Euro. */
+  s155_band_eur?: [number, number] | null
+  /** S155: angerechnete Wirkung nach 10, 20 und 30 Jahren mit den Anteilen min(1, J/a_erk). */
+  s155_rampe?: { jahre: number; anteil_mm: number; anteil_c44: number; eur: number }[] | null
+  /** S155: Kennzeichnung als Abschätzung von KAP3 (Vorgabe P2). */
+  s155_estimate_note?: string | null
+  /** S155: angerechneter Betrag je Jahr bei Eingabe J; fehlt ohne Eingabe. */
+  s155_angerechnet_eur?: number | null
+  /** S155: die Eingabe J (Jahre seit Beginn); fehlt ohne Eingabe. */
+  s155_jahre_seit_beginn?: number | null
   /** Stadtbaumwahl (#96 §5, Integrationsauflage Punkt (4)): vermiedene Zusatztage/Jahr
    *  der Kommune (Summe der Zellwerte); fehlt ohne anteil_ersetzt oder ohne Baumkronen
    *  im Ausgangsstand der abgedeckten Zellen (dann trägt benefit_display den Vermerk). */
