@@ -62,8 +62,10 @@ def test_measure_count_is_47():
     # Gesamtzahl auf 49).
     # T-1824-cto: 6 aktive — UV_PROTECTION_PUBLIC_SPACE (#98 Hebel S155, effect_model
     # 's155') neu im Katalog; Gesamtzahl 50.
-    assert len(catalog.MEASURES) == 6
-    assert len(_ALL_MEASURES) == 50
+    # T-1937-cto: 7 aktive — SKIN_CANCER_EARLY_DETECTION (#98 S158, Vermerk statt Betrag,
+    # effect_model 's158_uv') neu im Katalog; Gesamtzahl 51.
+    assert len(catalog.MEASURES) == 7
+    assert len(_ALL_MEASURES) == 51
 
 
 def test_every_measure_has_source():
