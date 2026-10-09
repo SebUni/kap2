@@ -35,6 +35,13 @@ from app.services import measure_service
 
 _OHNE_DEFAULT = [m for m in catalog.MEASURES if m.get("default_reduction") is None]
 _IDS = [m["code"] for m in _OHNE_DEFAULT]
+# T-1937-cto: SKIN_CANCER_EARLY_DETECTION (#98 S158) trägt default_reduction None UND kein
+# verknüpftes Risiko (nur qualitativ, Vermerk statt Betrag; die Nutzenfelder entstehen
+# nicht). Die Tests unten, die ein verknüpftes Risiko oder die Nutzenfelder voraussetzen,
+# laufen deshalb nur über Maßnahmen mit Wirkungskanal; ihr Verhalten bindet
+# test_massnahme_s158_uv_vermerk.py.
+_OHNE_DEFAULT_MIT_RISIKO = [m for m in _OHNE_DEFAULT if m.get("linked_risk_codes")]
+_IDS_MIT_RISIKO = [m["code"] for m in _OHNE_DEFAULT_MIT_RISIKO]
 
 
 def test_katalog_traegt_massnahmen_mit_default_reduction_none():
@@ -59,7 +66,7 @@ def test_reduction_factor_none_gilt_fuer_lineare_und_saettigende_skalierung(mdef
         assert measure_service._reduction_factor(d, 1.0) == 1.0
 
 
-@pytest.mark.parametrize("mdef", _OHNE_DEFAULT, ids=_IDS)
+@pytest.mark.parametrize("mdef", _OHNE_DEFAULT_MIT_RISIKO, ids=_IDS_MIT_RISIKO)
 def test_wirkung_ueber_verknuepftes_risiko_ohne_typeerror(mdef):
     linked = mdef.get("linked_risk_codes") or []
     assert linked, f"{mdef['code']} hat kein verknüpftes Risiko"
@@ -160,7 +167,7 @@ def _rechne_flat(monkeypatch, mdef: dict) -> dict:
     return measure_service._compute_impact_scoped(db, measure, d, "fp")
 
 
-@pytest.mark.parametrize("mdef", _OHNE_DEFAULT, ids=_IDS)
+@pytest.mark.parametrize("mdef", _OHNE_DEFAULT_MIT_RISIKO, ids=_IDS_MIT_RISIKO)
 def test_kommunenweites_risiko_ohne_typeerror_und_faktor_eins(monkeypatch, flat_risiko, mdef):
     # Kein TypeError, und weil der Faktor auf diesem Weg 1,0 ist, bewegt sich das P90
     # nicht: der flache Nutzen ist genau 0 (die Wirkung rechnet der eigene Zweig).
