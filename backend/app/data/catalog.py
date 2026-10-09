@@ -2106,6 +2106,48 @@ MEASURES: list[dict] = [
                 "ergibt das 34.700 €, 69.400 € und 104.000 € je Jahr zusammen mit dem "
                 "Melanom.",
         }}},
+    # Maßnahme Förderung der Früherkennung von Hautkrebs (S158) — Bericht #98 §5
+    # (Abschnitt „Förderung der Früherkennung (S158)“, Integrationsauflage, Befunde
+    # 203/433, Log 34), Nachtrag zu Befund 502 (T-1937-cto, Vorhaben T-1662-ceo).
+    # Der Code S158 steht im Katalog schon bei POLLEN_EARLY_WARNING (#96); diese
+    # Maßnahme führt deshalb einen eigenen Code. KEINE Zahl und KEINE Nullwirkung (P2):
+    # Der Basiswert setzt für alle Fälle bereits die SCS-Kostensätze an, ein Hebel auf
+    # c_e zählte die Kostenwirkung doppelt (LF 4), und für die Letalität gibt es keine
+    # Effektgröße. Das Produkt zeigt statt eines Betrags den Vermerk
+    # „Kostenwirkung im Basiswert voll angerechnet“ (measure_service.
+    # UV_FRUEHERKENNUNG_VERMERK, ``benefit_display``). Verknüpfung nur qualitativ mit
+    # EXPECTED_ANNUAL_UV_YLL: linked_risk_codes bleibt leer, kein Rechenweg liest die
+    # Maßnahme als Wirkung, default_reduction None (nicht anwendbar). Keine Latenz.
+    # Kosten: Der Bericht nennt keine Kostenansätze für S158; es steht kein Betrag da
+    # und es wird keiner geschätzt.
+    {"code": "SKIN_CANCER_EARLY_DETECTION",
+     "name": "Förderung der Früherkennung von Hautkrebs (S158)",
+     "description": "Förderung der Teilnahme am Hautkrebs-Screening (SCS) (S158, Bericht "
+                    "#98 §5). Keine eigene Abschätzung und keine Nullwirkung (Vorgabe "
+                    "P2): Der Basiswert setzt für alle Fälle bereits die Kostensätze "
+                    "SCS-detektierter Fälle an, ein zusätzlicher Hebel auf die Fallkosten "
+                    "zählte dieselbe Kostenwirkung doppelt, und für die Letalität früherer "
+                    "Erkennung gibt es keine Effektgröße. Das Produkt weist deshalb den "
+                    "Vermerk „Kostenwirkung im Basiswert voll angerechnet“ aus statt eines "
+                    "Betrags. Die Maßnahme ist qualitativ mit den UV-Schädigungen "
+                    "(verlorene Lebensjahre) verknüpft.",
+     "measure_type": "organizational",
+     "effect_target": ["vulnerability"], "default_reduction": None, "coverage_scaling": "linear",
+     "effect_model": "s158_uv",
+     "linked_risk_codes": [],
+     "qualitative_risk_codes": ["EXPECTED_ANNUAL_UV_YLL"],
+     "capex_fixed": None, "capex_per_unit": None, "capex_per_m2": None,
+     "opex_fixed_year": None, "opex_per_unit_year": None, "opex_per_m2_year": None,
+     "benefit_per_m2_year": None,
+     "unit_label": None, "unit_density_per_ha": None,
+     "source": "Bericht #98 §5 (Abschnitt „Förderung der Früherkennung (S158)“, "
+               "Integrationsauflage), Log 34; Sparpotenzial belegt durch Speckemeier 2022 [34], "
+               "im Basiswert schon angerechnet",
+     "sources": {},
+     "source_refs": {},
+     "evidence_classes": {},
+     "source_details": {},
+     "evidence_derivation": {}},
     # Maßnahme allergenarme Stadtbaumwahl (Zelllauf) — Ticket T-1600-cto / Bericht #96
     # §5 Z. 975–989, 1113–1125 (Integrationsauflage), Vorhaben T-1483-cto Teilpaket #2.
     # Die Wirkung läuft NICHT über einen Katalog-Wirkungsfaktor (default_reduction),
@@ -3003,6 +3045,7 @@ _MEASURE_KANG_MAP: dict[str, tuple[str, str]] = {
     "HEAT_ACTION_PLANS": ("health", "health"),
     "POLLEN_EARLY_WARNING": ("health", "health"),
     "UV_PROTECTION_PUBLIC_SPACE": ("health", "health"),
+    "SKIN_CANCER_EARLY_DETECTION": ("health", "health"),
     "COOLING_ROOMS_DRINKING_WATER": ("health", "health"),
     "DRINKING_FOUNTAINS": ("health", "health"),
     "EARLY_WARNING_MEASURE": ("urban", "civil_protection"),
