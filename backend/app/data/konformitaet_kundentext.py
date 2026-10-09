@@ -35,6 +35,14 @@ KUNDENTEXT: dict[int, tuple[str, str]] = {
         "das Risiko ohne zusätzliche Anpassung wäre; bei den übrigen Klimawirkungen fehlt dieser "
         "Vergleichswert bislang.",
     ),
+    3: (
+        "teilweise",
+        "Jeder Parameter zeigt seine Quelle oder den Vermerk, dass er eine Abschätzung von KAP3 ist, "
+        "samt Herleitung; im Verzeichnis der Belege sind aber noch nicht alle Abschätzungen als solche "
+        "gekennzeichnet. Die Parameterliste trennt fachliche Abschätzungen nicht von Bewertungsentscheidungen, "
+        "sagt nicht, wer welchen Arbeitsschritt verantwortet, und erfasst einen eigenen Wert der Kommune "
+        "nur mit Quelle, nicht als ihre eigene Abschätzung.",
+    ),
     6: (
         "teilweise",
         "Die Reihenfolge, in der neue Klimawirkungen ins Produkt aufgenommen werden, ist nicht für "

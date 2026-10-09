@@ -1,3 +1,4 @@
+import math
 from datetime import datetime
 from typing import Any, Optional, Union
 
@@ -164,6 +165,16 @@ def _validate_config_value_ranges(config: Optional[dict]) -> Optional[dict]:
         fall = config["ersatzfall"]
         if fall is not None and fall not in ("nachpflanzung", "vorgezogen"):
             raise ValueError("config['ersatzfall'] muss 'nachpflanzung' oder 'vorgezogen' sein")
+    # ``jahre_seit_beginn`` (Maßnahme UV_PROTECTION_PUBLIC_SPACE, Hebel S155, Bericht #98 §5,
+    # Parametertabelle „J“, T-1938-cto, Befund 503): Jahre seit Beginn des Hebels, eine
+    # endliche Zahl ≥ 0. Negative und nicht numerische Werte (auch Wahrheitswerte und
+    # Zeichenketten) werden abgewiesen; ``None`` heißt keine Eingabe.
+    if config and "jahre_seit_beginn" in config:
+        j = config["jahre_seit_beginn"]
+        if j is not None:
+            if (isinstance(j, bool) or not isinstance(j, (int, float))
+                    or not math.isfinite(float(j)) or float(j) < 0.0):
+                raise ValueError("config['jahre_seit_beginn'] muss eine Zahl ≥ 0 sein (Jahre)")
     return config
 
 

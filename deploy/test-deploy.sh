@@ -413,6 +413,79 @@ for i in $(seq 1 60); do
   sleep 2
 done
 
+SCHRITT="rauchtest"
+# T-1957 (Vorhaben T-1950, A-0068): Der Health-Check oben ist nur die Vorstufe auf 127.0.0.1:8010.
+# Gesehen wird die Testumgebung aber unter ihrer oeffentlichen Adresse, ueber Apache mit Basic-Auth;
+# deshalb prueft dieser Schritt genau dort -- mit derselben Adresse und demselben Zugang, den der
+# Aufsichtsrat im Dashboard benutzt. Adresse: TESTUMGEBUNG_ADRESSE, ersatzweise KAP2_TEST_URL;
+# Zugang: KAP2_TEST_BENUTZER / KAP2_TEST_PASSWORT. Alle vier kommen aus der oben eingelesenen
+# Umgebungsdatei; ihre Werte werden nie ausgegeben. Fehlt die Adresse oder der Zugang, endet der
+# Schritt rot (ERR-Falle, Status "fehler"), er wird nicht uebersprungen.
+# Geprueft wird nur Erreichbarkeit, Identitaet und Schutz, keine Kommunenseite (die Seiten unter
+# /app/ verlangen zusaetzlich eine Anmeldung im Produkt):
+#   (a) /api/health mit Zugang meldet den ausgelieferten Commit,
+#   (b) / mit Zugang liefert HTTP 200 mit der index.html des gerade gebauten Frontends,
+#   (c) / ohne Zugang liefert HTTP 401.
+# Das Passwort steht in keinem Argument eines Kindprozesses: curl liest es als Konfiguration von der
+# Standardeingabe (-K -); printf ist ein Shell-Builtin und startet keinen Prozess. Anfuehrungszeichen
+# und Rueckstrich werden fuer die Konfiguration maskiert.
+rauch_zugang() {
+  local benutzer="${KAP2_TEST_BENUTZER//\\/\\\\}" geheim="${KAP2_TEST_PASSWORT//\\/\\\\}"
+  benutzer="${benutzer//\"/\\\"}"; geheim="${geheim//\"/\\\"}"
+  printf 'user = "%s:%s"\n' "$benutzer" "$geheim"
+}
+RAUCH_ADRESSE="${TESTUMGEBUNG_ADRESSE:-${KAP2_TEST_URL:-}}"
+RAUCH_ADRESSE="${RAUCH_ADRESSE%/}"
+RAUCH_PAUSE="${RAUCH_PAUSE:-2}"
+if [[ -z "$RAUCH_ADRESSE" ]]; then
+  echo "!! Rauchtest: weder TESTUMGEBUNG_ADRESSE noch KAP2_TEST_URL gesetzt (Umgebungsdatei des Servers) -- NICHT uebersprungen"
+  false
+fi
+if [[ -z "${KAP2_TEST_BENUTZER:-}" || -z "${KAP2_TEST_PASSWORT:-}" ]]; then
+  echo "!! Rauchtest: KAP2_TEST_BENUTZER oder KAP2_TEST_PASSWORT fehlt (Umgebungsdatei des Servers) -- NICHT uebersprungen"
+  false
+fi
+echo "Rauchtest an der oeffentlichen Adresse $RAUCH_ADRESSE (erwarteter Commit $COMMIT)"
+# (a) Identitaet: bis zu 5 Versuche, Apache und Dienst brauchen nach dem Neustart einen Moment.
+RAUCH_GEMELDET=""
+for i in $(seq 1 5); do
+  RAUCH_ANTWORT=$(rauch_zugang | curl -sf --max-time 20 -K - "$RAUCH_ADRESSE/api/health" 2>/dev/null || true)
+  RAUCH_GEMELDET=$(printf '%s' "$RAUCH_ANTWORT" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("commit") or "")' 2>/dev/null || true)
+  if [[ "$RAUCH_GEMELDET" == "$COMMIT" ]]; then break; fi
+  if [[ $i -lt 5 ]]; then sleep "$RAUCH_PAUSE"; fi
+done
+if [[ "$RAUCH_GEMELDET" != "$COMMIT" ]]; then
+  if [[ -z "$RAUCH_ANTWORT" ]]; then
+    echo "!! Rauchtest (a): $RAUCH_ADRESSE/api/health antwortet mit Zugang nicht (Apache, Weiterleitung oder Zugang pruefen)"
+  else
+    echo "!! Rauchtest (a): erwartet Commit $COMMIT, gemeldet '${RAUCH_GEMELDET:-unbekannt}'"
+  fi
+  false
+fi
+echo "Rauchtest (a) gruen: /api/health meldet Commit $RAUCH_GEMELDET"
+# (b) Startseite mit Zugang: HTTP 200 und die index.html des Frontends, das gerade gebaut wurde.
+RAUCH_SEITE=$(mktemp "$DEPLOY_TMP/rauchtest.XXXXXX.html")
+RAUCH_CODE=$(rauch_zugang | curl -s --max-time 20 -K - -o "$RAUCH_SEITE" -w '%{http_code}' "$RAUCH_ADRESSE/" 2>/dev/null || true)
+if [[ "$RAUCH_CODE" != "200" ]]; then
+  echo "!! Rauchtest (b): $RAUCH_ADRESSE/ liefert mit Zugang HTTP ${RAUCH_CODE:-keine Antwort}, erwartet 200"
+  rm -f "$RAUCH_SEITE"
+  false
+fi
+if ! cmp -s "$RAUCH_SEITE" "$PRODUKT/frontend/dist/index.html"; then
+  echo "!! Rauchtest (b): $RAUCH_ADRESSE/ liefert nicht die index.html des gebauten Frontends"
+  rm -f "$RAUCH_SEITE"
+  false
+fi
+rm -f "$RAUCH_SEITE"
+echo "Rauchtest (b) gruen: / liefert HTTP 200 mit der index.html des Frontends"
+# (c) Schutz: ohne Zugang muss Apache abweisen.
+RAUCH_CODE=$(curl -s --max-time 20 -o /dev/null -w '%{http_code}' "$RAUCH_ADRESSE/" 2>/dev/null || true)
+if [[ "$RAUCH_CODE" != "401" ]]; then
+  echo "!! Rauchtest (c): $RAUCH_ADRESSE/ liefert ohne Zugang HTTP ${RAUCH_CODE:-keine Antwort}, erwartet 401 -- die Testumgebung ist nicht geschuetzt"
+  false
+fi
+echo "Rauchtest (c) gruen: / liefert ohne Zugang HTTP 401"
+
 SCHRITT="beispielkommune"
 # T-1831 (Vorhaben T-1828, A-0066): Nach dem Neustart rechnet der gerade ausgelieferte Stand die
 # Beispielkommune Warmsen vollstaendig neu; der Health-Check oben hat den Commit schon bestaetigt.

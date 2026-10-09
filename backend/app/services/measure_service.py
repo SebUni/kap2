@@ -23,6 +23,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import math
 
 from geoalchemy2 import functions as func
 from sqlalchemy import case, literal
@@ -591,12 +592,15 @@ def _s158_cell_factor(mdef: dict, frac: float, cell_risk: dict,
 # ── Hebel S155: UV-Schutz im öffentlichen Raum (Bericht #98 §5; Maßnahme UV_PROTECTION_PUBLIC_SPACE) ──
 # Abschätzung von KAP3 (Vorgabe P2). Die Jahresdosis sinkt um h; die Baseline F_e sinkt um
 # BAF_e · h, ΔDosis bleibt — der bewertete Schaden je Entität sinkt um denselben Anteil
-# (health.s155_wirkung_je_entitaet). Das Produkt kennt keinen Zeitbezug J für
-# Maßnahmenwirkungen: der Zellfaktor rechnet die volle Wirkung, die Zusammenfassung weist
-# die Anteile der Rampe min(1, J/a_erk) nach 10, 20 und 30 Jahren daneben aus
-# (Bericht §5, Integrationsauflage Punkt 3).
+# (health.s155_wirkung_je_entitaet). Die Jahre seit Beginn J sind eine optionale Eingabe der
+# Maßnahme (``config['jahre_seit_beginn']``, Jahre, ≥ 0): Mit Eingabe rechnet der Zellfaktor
+# die angerechnete Wirkung Σ_e €_e · min(1, J/a_erk,e) und die Zusammenfassung weist sie als
+# ``s155_angerechnet_eur`` aus; ohne Eingabe rechnet er die volle Wirkung, und die
+# Zusammenfassung weist die Anteile der Rampe nach 10, 20 und 30 Jahren daneben aus
+# (Bericht §5, Integrationsauflage Punkt 3; T-1938-cto, Befund 503).
 
 UV_RISK_CODE = "EXPECTED_ANNUAL_UV_YLL"
+S155_JAHRE_KEY = "jahre_seit_beginn"
 S155_ESTIMATE_NOTE = "Abschätzung von KAP3"
 S155_MISSING_TEXT = ("kein Betrag: Schaden je Entität fehlt in der Zelle, "
                      "Kommune neu berechnen")
@@ -607,7 +611,24 @@ def _is_s155(mdef: dict) -> bool:
     return mdef.get("effect_model") == "s155"
 
 
-def _s155_cell_effect(mdef: dict, frac: float, cell_risk: dict
+def _s155_jahre(config: dict | None) -> float | None:
+    """Eingabe J (Jahre seit Beginn des Hebels S155) der Maßnahme, ``None`` ohne gültige Eingabe.
+
+    Gültig ist eine endliche Zahl ≥ 0 (``schemas._validate_config_value_ranges`` weist alles
+    andere beim Speichern ab); ein bereits gespeicherter ungültiger Wert zählt wie keine Eingabe.
+    """
+    raw = (config or {}).get(S155_JAHRE_KEY)
+    if raw is None or raw == "" or isinstance(raw, bool):
+        return None
+    try:
+        j = float(raw)
+    except (TypeError, ValueError):
+        return None
+    return j if math.isfinite(j) and j >= 0.0 else None
+
+
+def _s155_cell_effect(mdef: dict, frac: float, cell_risk: dict,
+                      jahre: float | None = None
                       ) -> tuple[float, tuple[float, float] | None, bool]:
     """(Faktor auf die Zelle, (€ MM, € C44) vermieden, fehlende Entitätswerte) einer Zelle durch S155.
 
@@ -618,8 +639,8 @@ def _s155_cell_effect(mdef: dict, frac: float, cell_risk: dict
     (``Zellkosten · (1 − Faktor)``) die vermiedenen Fälle je Krebsart wie der Bericht; ein Faktor
     nach Lebensjahren allein (``Σ_e BAF_e · h · YLL_e / YLL``) gewichtete Krebsarten und
     Behandlungskosten anders (T-1861-ceo, Messung Berlin: −17,3 %).
-    Die Euro-Wirkung je Entität kommt aus ``health.s155_wirkung_je_entitaet`` (volle
-    Wirkung, ohne Zeitbezug) auf den gespeicherten Schaden je Entität der Zelle
+    Die Euro-Wirkung je Entität kommt aus ``health.s155_wirkung_je_entitaet`` (ohne ``jahre``
+    die volle Wirkung, mit ``jahre`` die angerechnete, je Entität mit ``min(1, J/a_erk,e)``) auf den gespeicherten Schaden je Entität der Zelle
     (``eur_mm``, ``eur_c44``). Fehlen diese (Alt-Zelle vor der Neuberechnung) bei
     positivem Outcome, ist die dritte Rückgabe ``True``: dann steht ein Vermerk statt
     eines zu niedrigen Betrags (P2: nie 0 € wegen fehlender Eingabe).
@@ -639,7 +660,9 @@ def _s155_cell_effect(mdef: dict, frac: float, cell_risk: dict
 
     baf_mm, baf_c44 = _p("baf_mm", 0.60), _p("baf_c44", 1.675)
     h = float(mdef.get("default_reduction") or 0.0) * min(1.0, float(frac))
-    eur = health.s155_wirkung_je_entitaet(float(eur_mm), float(eur_c44), h, baf_mm, baf_c44)
+    eur = health.s155_wirkung_je_entitaet(
+        float(eur_mm), float(eur_c44), h, baf_mm, baf_c44, jahre,
+        float(mdef.get("a_erk_mm") or 0.0), float(mdef.get("a_erk_c44") or 0.0))
     outcome = cell_risk.get("outcome")
     if outcome is None:
         outcome = float(yll_mm) + float(yll_c44)
@@ -650,14 +673,15 @@ def _s155_cell_effect(mdef: dict, frac: float, cell_risk: dict
     return max(0.0, min(1.0, 1.0 - (eur[0] + eur[1]) / zellkosten)), eur, False
 
 
-def _s155_cell_factor(mdef: dict, frac: float, cell_risk: dict) -> float:
+def _s155_cell_factor(mdef: dict, frac: float, cell_risk: dict,
+                      jahre: float | None = None) -> float:
     """Faktor (0..1) auf das YLL-Outcome einer Zelle durch S155 (Wrapper)."""
-    factor, _, _ = _s155_cell_effect(mdef, frac, cell_risk)
+    factor, _, _ = _s155_cell_effect(mdef, frac, cell_risk, jahre)
     return factor
 
 
 def _s155_summary_fields(mdef: dict, eur_mm_total: float, eur_c44_total: float,
-                         missing: bool) -> dict:
+                         missing: bool, config: dict | None = None) -> dict:
     """Zusatzfelder des impact_summary für S155 (Bericht §5, Integrationsauflage).
 
     ``s155_avoided_eur`` ist die volle Wirkung je Jahr (Summe der Zellwerte, ohne Zeitbezug),
@@ -665,6 +689,11 @@ def _s155_summary_fields(mdef: dict, eur_mm_total: float, eur_c44_total: float,
     ``s155_rampe`` die angerechnete Wirkung nach 10, 20 und 30 Jahren mit den Anteilen
     min(1, J/a_erk); alles gekennzeichnet als Abschätzung von KAP3. Fehlen Entitätswerte
     in einer abgedeckten Zelle, steht ein Vermerk statt eines Betrags.
+
+    Trägt die Maßnahme die Eingabe ``config['jahre_seit_beginn']`` (J), kommt
+    ``s155_angerechnet_eur`` = Σ_e €_e · min(1, J/a_erk,e) dazu (wie die Einträge von
+    ``s155_rampe``, mit J statt 10/20/30) und ``s155_jahre_seit_beginn`` = J. Ohne Eingabe
+    fehlen beide Felder; ``s155_avoided_eur`` bleibt die volle Wirkung.
     """
     if not _is_s155(mdef):
         return {}
@@ -683,13 +712,20 @@ def _s155_summary_fields(mdef: dict, eur_mm_total: float, eur_c44_total: float,
         rampe.append({"jahre": j, "anteil_mm": round(anteil_mm, 4),
                       "anteil_c44": round(anteil_c44, 4),
                       "eur": round(anteil_mm * eur_mm_total + anteil_c44 * eur_c44_total, 2)})
-    return {
+    out = {
         "s155_avoided_eur": round(voll, 2),
         "s155_band_eur": ([round(voll * lo / h, 2), round(voll * hi / h, 2)] if h > 0.0
                           else [0.0, 0.0]),
         "s155_rampe": rampe,
         "s155_estimate_note": S155_ESTIMATE_NOTE,
     }
+    jahre = _s155_jahre(config)
+    if jahre is not None:
+        out["s155_jahre_seit_beginn"] = jahre
+        out["s155_angerechnet_eur"] = round(
+            health.s155_rampe(jahre, a_mm) * eur_mm_total
+            + health.s155_rampe(jahre, a_c44) * eur_c44_total, 2)
+    return out
 
 
 # ── Hebel S158 des Berichts #98: Förderung der Früherkennung von Hautkrebs (Bericht #98
@@ -1111,7 +1147,7 @@ def _measure_cell_factor(mdef: dict, config: dict | None, code: str, frac: float
     if _is_s155(mdef):
         if code != UV_RISK_CODE:
             return 1.0
-        return _s155_cell_factor(mdef, frac, cell_risk)
+        return _s155_cell_factor(mdef, frac, cell_risk, _s155_jahre(config))
     if _is_stadtbaum(mdef):
         if code != ALLERGY_RISK_CODE:
             return 1.0
@@ -1873,7 +1909,8 @@ def _compute_impact_scoped(db: Session, measure: AdaptationMeasure, mdef: dict,
                                s158_missing_split),
         # S155 (Bericht #98 §5): volle Wirkung, Band und Rampe nach 10/20/30 Jahren als
         # Abschätzung von KAP3, oder Vermerk statt Betrag bei Alt-Zellen.
-        **_s155_summary_fields(mdef, s155_eur_mm_total, s155_eur_c44_total, s155_missing),
+        **_s155_summary_fields(mdef, s155_eur_mm_total, s155_eur_c44_total, s155_missing,
+                               measure.config),
         # S158 des Berichts #98 (Früherkennungs-Förderung): Vermerk statt Betrag.
         **_uv_fruherkennung_summary_fields(mdef),
         # Integrationsauflage (Stadtbaumwahl) §5 Punkt (4): vermiedene Zusatztage/Euro

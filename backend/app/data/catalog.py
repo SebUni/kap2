@@ -1994,10 +1994,12 @@ MEASURES: list[dict] = [
     # sondern als Teil-Ausweis der Maßnahme. Zellfaktor: measure_service._s155_cell_effect
     # (kein pauschaler Index-Faktor — der Hebel wirkt je Entität mit eigenem BAF_e).
     # Latenz: Rampe min(1, J/a_erk) mit a_erk MM 66 und C44 75 Jahren (Blöcke
-    # uv.s155_a_erk_mm/_c44, Felder a_erk_mm/a_erk_c44 der Maßnahme). DARSTELLUNGSGRENZE:
-    # Das Produkt kennt keinen Zeitbezug J für Maßnahmenwirkungen; der Zellfaktor rechnet
-    # die volle Wirkung, die Zusammenfassung weist die Anteile nach 10, 20 und 30 Jahren
-    # daneben aus (Bericht §5, Integrationsauflage Punkt 3).
+    # uv.s155_a_erk_mm/_c44, Felder a_erk_mm/a_erk_c44 der Maßnahme). Die Jahre seit Beginn J
+    # sind eine optionale Eingabe der Maßnahme (config['jahre_seit_beginn'], Jahre, ≥ 0;
+    # Bericht §5, Integrationsauflage Punkt 3, T-1938-cto, Befund 503): Mit Eingabe rechnet der
+    # Zellfaktor den angerechneten Betrag Σ_e €_e · min(1, J/a_erk,e) (measure_service), ohne
+    # Eingabe die volle Wirkung, und die Zusammenfassung weist die Anteile nach 10, 20 und
+    # 30 Jahren daneben aus.
     # Kosten: Der Bericht nennt keine Kostenansätze für S155; es steht kein Betrag da.
     {"code": "UV_PROTECTION_PUBLIC_SPACE",
      "name": "UV-Schutz im öffentlichen Raum und Kommunikation",
@@ -2027,6 +2029,23 @@ MEASURES: list[dict] = [
      # Einlaufzeiten der Rampe (Erkrankungsalter, Jahre) als Zusatzfelder der Maßnahme.
      "a_erk_mm": 66.0,
      "a_erk_c44": 75.0,
+     # Eingabe J (Bericht #98 §5, Parametertabelle: „Jahre seit Beginn des Hebels S155“),
+     # gelesen von measure_service._s155_jahre; geprüft in schemas._validate_config_value_ranges.
+     "config_inputs": {
+        "jahre_seit_beginn": {
+            "frage": "Wie viele Jahre läuft der Hebel schon?",
+            "typ": "zahl",
+            "einheit": "Jahre",
+            "min": 0,
+            "voreinstellung": None,
+            "voreinstellung_text": "ohne Eingabe: volle Wirkung und die Anteile nach 10, 20 und 30 Jahren",
+            "kennzeichnung": "Abschätzung von KAP3"}},
+     "config_input_help": {
+        "jahre_seit_beginn": "Jahre seit Beginn des Hebels S155 (J, Zahl ≥ 0). Die Wirkung "
+            "auf die Neuerkrankungen läuft als Rampe ein: Angerechnet wird nach J Jahren der "
+            "Anteil min(1, J/a_erk) mit a_erk 66 Jahren (Melanom) und 75 Jahren (C44), "
+            "Bericht #98 §5. Ohne Eingabe zeigt das Produkt die volle Wirkung und daneben "
+            "die Anteile nach 10, 20 und 30 Jahren (Integrationsauflage Punkt 3)."},
      "zusatz_kostenfelder": (
         ("a_erk_mm", "Einlaufzeit der Wirkung — Erkrankungsalter Melanom", "Jahre"),
         ("a_erk_c44", "Einlaufzeit der Wirkung — Erkrankungsalter Hautkrebs C44", "Jahre"),
