@@ -67,3 +67,36 @@ def test_verbindungsfehler_am_ausweichserver_fuehrt_zum_naechsten(monkeypatch):
 
     assert data["elements"] == []
     assert aufgerufen == [haupt, erster, zweiter]
+
+
+def test_mehrere_ausfaelle_hintereinander_werden_reihum_ueberstanden(monkeypatch):
+    """T-1963: 500 an allen Servern und eine Antwort ohne JSON; erst der 7. Versuch gelingt."""
+    aufgerufen: list[str] = []
+
+    class _Client:
+        def __init__(self, *a, **k):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def post(self, url, **kwargs):
+            aufgerufen.append(url)
+            req = httpx.Request("POST", url)
+            n = len(aufgerufen)
+            if n < 6:
+                return httpx.Response(500, request=req)
+            if n == 6:
+                return httpx.Response(200, request=req, text="Fehlertext")
+            return httpx.Response(200, request=req, json={"elements": []})
+
+    monkeypatch.setattr(osm_data.httpx, "Client", _Client)
+    monkeypatch.setattr("time.sleep", lambda s: None)
+
+    data = osm_data._overpass_query("out;")
+
+    assert data["elements"] == []
+    assert len(aufgerufen) == 7
