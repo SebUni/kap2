@@ -24,6 +24,23 @@ log = logging.getLogger(__name__)
 
 OVERPASS_TIMEOUT = 120
 
+
+def _robust_overlay(op: str, a, b):
+    """Verschneidung/Differenz, die an ungültigen OSM-Polygonen nicht scheitert.
+
+    Selbstberührende oder sich überschneidende Ringe (``TopologyException: side
+    location conflict``) lassen GEOS-Overlays abbrechen und kippten damit die
+    ganze Bewertung. Erst der direkte Versuch; bei Fehler beide Geometrien mit
+    ``make_valid`` reparieren und wiederholen. ``op``: ``intersection`` oder
+    ``difference``.
+    """
+    from shapely.errors import GEOSException
+    from shapely.validation import make_valid
+    try:
+        return getattr(a, op)(b)
+    except GEOSException:
+        return getattr(make_valid(a), op)(make_valid(b))
+
 # ── Thread-safe OSM data cache ────────────────────────────────────────────────
 # Keyed by bbox string. Each entry is (timestamp, data).
 # Cache is shared across assessors so identical Overpass queries are made once.
@@ -711,7 +728,7 @@ def compute_ditch_density_score(
 
     total_len_m = 0.0
     for g in candidates:
-        clipped = cell_geom.intersection(g)
+        clipped = _robust_overlay("intersection", cell_geom, g)
         if clipped.is_empty:
             continue
         # In Grad geclippt, zur Längenmessung nach UTM (Meter) projizieren.
@@ -1127,7 +1144,7 @@ def compute_cell_composition(
         if remaining.is_empty:
             break
         try:
-            clipped = remaining.intersection(g)
+            clipped = _robust_overlay("intersection", remaining, g)
         except Exception:
             continue
         ia = clipped.area
@@ -1143,7 +1160,7 @@ def compute_cell_composition(
         if is_gl:
             glacier_frac += frac
         try:
-            remaining = remaining.difference(g)
+            remaining = _robust_overlay("difference", remaining, g)
         except Exception:
             try:
                 remaining = remaining.difference(g.buffer(0))
@@ -1424,7 +1441,7 @@ def compute_cell_buildings(
         bg = b["geometry"]
         if not cell_geom.intersects(bg):
             continue
-        intersection = cell_geom.intersection(bg)
+        intersection = _robust_overlay("intersection", cell_geom, bg)
         ia = intersection.area
         if ia <= 0:
             continue
@@ -1448,7 +1465,7 @@ def compute_cell_buildings(
             continue
         buf_deg = (r["width_m"] / 2.0) * DEGREE_PER_METER
         buffered = rg.buffer(buf_deg)
-        intersection = cell_geom.intersection(buffered)
+        intersection = _robust_overlay("intersection", cell_geom, buffered)
         road_area += intersection.area
 
     road_coverage = min(road_area / cell_area, 1.0) if cell_area > 0 else 0.0
