@@ -225,6 +225,29 @@ MASSNAHMEN_UMSETZUNG: dict[str, dict] = {
             ),
         },
     },
+    # T-1937-cto: neu im Katalog (Bericht #98 §5, Hebel S158, Förderung der Früherkennung
+    # von Hautkrebs). Das Register des Berichts (98-S158-01) führt die Ebene »kommunal
+    # (Teilnahmequoten)«; ein Partner außerhalb der Verwaltung ist dort nicht genannt.
+    "SKIN_CANCER_EARLY_DETECTION": {
+        "umsetzung": "kommune_allein",
+        "partner": [],
+        "ebenen": ["gemeinde"],
+        "beleg": {
+            "ebenen_begruendung": (
+                "gemeinde: Der Bericht #98 (Register 98-S158-01) führt für die Förderung der "
+                "Früherkennung die Ebene »kommunal (Teilnahmequoten)«. Keine der ausgewerteten "
+                "Quellen (UBA-Broschüre 2022, S. 29–30; kang_zustaendigkeit.py) nennt für diese "
+                "Maßnahme eine Stelle außerhalb der Kommune."
+            ),
+            "abschaetzung": True,
+            "herleitung": (
+                "Abschätzung von KAP3: Der Bericht #98 (§5, Hebel S158) beschreibt die Förderung "
+                "der Früherkennung (Teilnahme am Hautkrebs-Screening) als kommunale Maßnahme und "
+                "nennt keinen Träger außerhalb der Kommune. Die Einstufung ersetzt eine Quelle, "
+                "die die Zuständigkeit ausdrücklich nennt, sobald eine gefunden ist."
+            ),
+        },
+    },
     # T-1600-cto: neu im Katalog (Bericht #96 §5, Stadtbaumwahl). Kein Partner außerhalb
     # der Kommunalverwaltung genannt oder erforderlich: Straßen-/Stadtbäume stehen auf
     # kommunalem Grund, die Baumartenwahl liegt beim kommunalen Grünflächen-/Garten- und
