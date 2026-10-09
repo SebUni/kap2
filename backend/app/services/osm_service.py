@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import httpx
 from typing import Optional
@@ -5,13 +6,6 @@ from typing import Optional
 from app.config import settings
 
 logger = logging.getLogger(__name__)
-
-# Overpass mirrors – tried in order if primary fails
-_OVERPASS_URLS = [
-    settings.OVERPASS_URL,
-    "https://overpass.kumi.systems/api/interpreter",
-    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
-]
 
 
 async def search_kommune(query: str, limit: int = 10) -> list[dict]:
@@ -147,7 +141,9 @@ async def fetch_kommune_boundary(osm_id: str, osm_type: str = "relation",
         logger.warning("Nominatim lookup failed for osm_id=%s: %s", osm_id, e)
 
     # ── 3. Overpass (try mirrors) ─────────────────────────────────────
-    for url in _OVERPASS_URLS:
+    # Hauptserver zuerst, dann die Ausweich-Server in der Reihenfolge der Konfiguration.
+    urls = [settings.OVERPASS_URL, *settings.OVERPASS_FALLBACK_URLS]
+    for i, url in enumerate(urls, start=1):
         try:
             geojson = await _fetch_via_overpass(osm_id, osm_type, url)
             if geojson:
@@ -155,6 +151,8 @@ async def fetch_kommune_boundary(osm_id: str, osm_type: str = "relation",
                 return geojson
         except Exception as e:
             logger.warning("Overpass %s failed for osm_id=%s: %s", url, osm_id, e)
+            if i < len(urls):
+                await asyncio.sleep(min(5 * i, 30))  # Backoff wie osm_data._overpass_query
 
     return None
 

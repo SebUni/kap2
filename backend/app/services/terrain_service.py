@@ -423,7 +423,7 @@ def compute_terrain_for_cells(
     try:
         with cow_pool() as pool:
             for done, (idx, r, c, e) in enumerate(
-                pool.imap_unordered(_elev_worker, range(n_cells), chunksize=_ELEV_CHUNK)
+                pool.map_unordered(_elev_worker, range(n_cells), chunksize=_ELEV_CHUNK)
             ):
                 cell_elev[(r, c)] = e
                 elev_grid[r, c] = e
