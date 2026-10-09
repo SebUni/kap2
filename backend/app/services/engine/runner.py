@@ -173,7 +173,7 @@ def run_full_assessment(
     try:
         with cow_pool() as pool:
             for done, (idx, result) in enumerate(
-                pool.imap_unordered(_risk_worker, range(total), chunksize=_CHUNK)
+                pool.map_unordered(_risk_worker, range(total), chunksize=_CHUNK)
             ):
                 ordered[idx] = result
                 if progress_callback and (done % 150 == 0 or done + 1 == total):
